@@ -73,10 +73,15 @@ new ones.
 
     #mojo on irc.freenode.org
 
-=head2 Mailing-Lists
+=head2 Mailing-List
 
     http://lists.kraih.com/listinfo/mojo
-    http://lists.kraih.com/listinfo/mojo-dev
+
+=head1 DEVELOPMENT
+
+=head2 Repository
+
+    http://github.com/kraih/mojo/commits/master
 
 =head1 SEE ALSO
 

@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojo.
 
 0.8     2008-10-21 00:00:00
+        - Fixed Mojo::Server::Daemon windows support.
         - Generated applications now have individually named executables.
         - Cleaned up Mojo::Home.
         - Changed Mojolicious default application templates to something more

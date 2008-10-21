@@ -1,0 +1,88 @@
+# Copyright (C) 2008, Sebastian Riedel.
+
+package Mojo::Upload;
+
+use strict;
+use warnings;
+
+use base 'Mojo::Base';
+
+use File::Copy ();
+use Mojo::File;
+use Mojo::Headers;
+
+__PACKAGE__->attr('file', chained =>1, default => sub { Mojo::File->new });
+__PACKAGE__->attr('filename', chained =>1);
+__PACKAGE__->attr('headers',
+    chained =>1,
+    default => sub { Mojo::Headers->new }
+);
+
+# B-6
+# You sunk my scrabbleship!
+# This game makes no sense.
+# Tell that to the good men who just lost their lives... SEMPER-FI!
+sub copy_to {
+    my ($self, $path);
+    File::Copy::copy($self->file->handle->filename, $path);
+    return $self;
+}
+
+sub file_length { shift->file->file_length }
+
+sub slurp { shift->file->slurp }
+
+1;
+__END__
+
+=head1 NAME
+
+Mojo::Upload - Upload
+
+=head1 SYNOPSIS
+
+    use Mojo::Upload;
+
+    my $upload = Mojo::Upload->new;
+    print $upload->filename;
+    $upload->copy_to('/foo/bar.txt');
+
+=head1 DESCRIPTION
+
+L<Mojo::Upload> is a container for uploads.
+
+=head1 ATTRIBUTES
+
+=head2 C<file>
+
+    my $file = $upload->file;
+    $upload  = $upload->file(Mojo::File->new);
+
+=head2 C<filename>
+
+    my $filename = $upload->filename;
+    $upload      = $upload->filename('foo');
+
+=head2 C<file_length>
+
+    my $length = $upload->file_length;
+
+=head2 C<headers>
+
+    my $headers = $upload->headers;
+    $upload     = $upload->headers(Mojo::Headers->new);
+
+=head1 METHODS
+
+L<Mojo::Upload> inherits all methods from L<Mojo::Base> and implements the
+following new ones.
+
+=head2 C<copy_to>
+
+    $upload = $upload->copy_to('/foo/bar/baz.txt');
+
+=head2 C<slurp>
+
+    my $content = $upload->slurp;
+
+=cut

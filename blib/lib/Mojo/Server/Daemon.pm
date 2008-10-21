@@ -45,10 +45,8 @@ sub listen {
         Reuse     => 1
     ) or croak "Can't create listen socket: $!";
 
-    # Make socket non blocking on Windows
+    # Make socket non blocking
     if ($^O eq 'MSWin32') { ioctl($self->{listen}, 0x8004667e, 1) }
-
-    # Make socket non blocking for everyone else
     else { $self->{listen}->blocking(0) }
 
     # Friendly message

@@ -13,7 +13,7 @@ __PACKAGE__->attr('types', chained => 1, default => sub {{
     gif   => 'image/gif',
     html  => 'text/html',
     jpg   => 'image/jpeg',
-    js    => 'application/x-jabascript',
+    js    => 'application/x-javascript',
     phtml => 'text/html',
     png   => 'image/png',
     txt   => 'text/plain'

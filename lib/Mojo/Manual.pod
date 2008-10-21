@@ -1,0 +1,34 @@
+# Copyright (C) 2008, Sebastian Riedel.
+
+=head1 Mojo Manual
+
+=over 4
+
+=item L<Mojo::Manual::GettingStarted>
+
+Step by step instructions to get you started.
+
+=item L<Mojo::Manual::Mojolicous>
+
+Introduction to L<Mojolicious>, the L<Mojo> example web framework.
+
+=item L<Mojo::Manual::HTTPGuide>
+
+Introduction to our HTTP 1.1 implementation.
+
+=item L<Mojo::Manual::FrameworkBuilding>
+
+Building your own frameworks upon L<Mojo>.
+
+=item L<Mojo::Manual::Cookbook>
+
+Cooking with L<Mojo>!
+
+=item L<Mojo::CodingGuidelines>
+
+Coding guidelines and mission statement.
+A must read for developers!
+
+=back
+
+=cut

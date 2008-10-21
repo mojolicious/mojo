@@ -1,0 +1,1340 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+   <!--Copyright (c) 1996 Open Market, Inc.                                    -->
+   <!--See the file "LICENSE.TERMS" for information on usage and redistribution-->
+   <!--of this file, and for a DISCLAIMER OF ALL WARRANTIES.                   -->
+   <HEAD>
+      <TITLE>
+         FastCGI Specification
+      </TITLE>
+<STYLE TYPE="text/css">
+ h5.c2 {text-align: center}
+ div.c1 {text-align: center}
+</STYLE>
+   </HEAD>
+   <BODY>
+      <DIV CLASS="c1">
+         <H2>
+            FastCGI Specification
+         </H2>
+      </DIV>
+      <DIV CLASS="c1">
+         Mark R. Brown<BR>
+         Open Market, Inc.<BR>
+         <P>
+            Document Version: 1.0<BR>
+            29 April 1996<BR>
+         </P>
+      </DIV>
+      <P>
+      </P>
+      <H5 CLASS="c2">
+         Copyright &copy; 1996 Open Market, Inc. 245 First Street, Cambridge, MA 02142 U.S.A.<BR>
+         Tel: 617-621-9500 Fax: 617-621-1703 URL: <A HREF=
+         "http://www.openmarket.com/">http://www.openmarket.com/</A><BR>
+         <BR>
+         $Id: fcgi-spec.html,v 1.4 2002/02/25 00:42:59 robs Exp $
+      </H5>
+      <HR>
+      <UL TYPE="square">
+         <LI>
+            <A HREF="#S1">1. Introduction</A>
+         </LI>
+         <LI>
+            <A HREF="#S2">2. Initial Process State</A> 
+            <UL TYPE="square">
+               <LI>
+                  <A HREF="#S2.1">2.1 Argument list</A>
+               </LI>
+               <LI>
+                  <A HREF="#S2.2">2.2 File descriptors</A>
+               </LI>
+               <LI>
+                  <A HREF="#S2.3">2.3 Environment variables</A>
+               </LI>
+               <LI>
+                  <A HREF="#S2.4">2.4 Other state</A>
+               </LI>
+            </UL>
+         </LI>
+         <LI>
+            <A HREF="#S3">3. Protocol Basics</A> 
+            <UL TYPE="square">
+               <LI>
+                  <A HREF="#S3.1">3.1 Notation</A>
+               </LI>
+               <LI>
+                  <A HREF="#S3.2">3.2 Accepting Transport Connections</A>
+               </LI>
+               <LI>
+                  <A HREF="#S3.3">3.3 Records</A>
+               </LI>
+               <LI>
+                  <A HREF="#S3.4">3.4 Name-Value Pairs</A>
+               </LI>
+               <LI>
+                  <A HREF="#S3.5">3.5 Closing Transport Connections</A>
+               </LI>
+            </UL>
+         </LI>
+         <LI>
+            <A HREF="#S4">4. Management Record Types</A> 
+            <UL TYPE="square">
+               <LI>
+                  <A HREF="#S4.1">4.1 <TT>FCGI_GET_VALUES, FCGI_GET_VALUES_RESULT</TT></A>
+               </LI>
+               <LI>
+                  <A HREF="#S4.2">4.2 <TT>FCGI_UNKNOWN_TYPE</TT></A>
+               </LI>
+            </UL>
+         </LI>
+         <LI>
+            <A HREF="#S5">5. Application Record Types</A> 
+            <UL TYPE="square">
+               <LI>
+                  <A HREF="#S5.1">5.1 <TT>FCGI_BEGIN_REQUEST</TT></A>
+               </LI>
+               <LI>
+                  <A HREF="#S5.2">5.2 Name-Value Pair Streams: <TT>FCGI_PARAMS</TT>, <TT>FCGI_RESULTS</TT></A>
+               </LI>
+               <LI>
+                  <A HREF="#S5.3">5.3 Byte Streams: <TT>FCGI_STDIN</TT>, <TT>FCGI_DATA</TT>, <TT>FCGI_STDOUT</TT>,
+                  <TT>FCGI_STDERR</TT></A>
+               </LI>
+               <LI>
+                  <A HREF="#S5.4">5.4 <TT>FCGI_ABORT_REQUEST</TT></A>
+               </LI>
+               <LI>
+                  <A HREF="#S5.5">5.5 <TT>FCGI_END_REQUEST</TT></A>
+               </LI>
+            </UL>
+         </LI>
+         <LI>
+            <A HREF="#S6">6. Roles</A> 
+            <UL TYPE="square">
+               <LI>
+                  <A HREF="#S6.1">6.1 Role Protocols</A>
+               </LI>
+               <LI>
+                  <A HREF="#S6.2">6.2 Responder</A>
+               </LI>
+               <LI>
+                  <A HREF="#S6.3">6.3 Authorizer</A>
+               </LI>
+               <LI>
+                  <A HREF="#S6.4">6.4 Filter</A>
+               </LI>
+            </UL>
+         </LI>
+         <LI>
+            <A HREF="#S7">7. Errors</A>
+         </LI>
+         <LI>
+            <A HREF="#S8">8. Types and Constants</A>
+         </LI>
+         <LI>
+            <A HREF="#S9">9. References</A>
+         </LI>
+         <LI>
+            <A HREF="#SA">A. Table: Properties of the record types</A>
+         </LI>
+         <LI>
+            <A HREF="#SB">B. Typical Protocol Message Flow</A>
+         </LI>
+      </UL>
+      <P>
+      </P>
+      <HR>
+      <H3>
+         <A NAME="S1">1. Introduction</A>
+      </H3>
+      <P>
+         FastCGI is an open extension to CGI that provides high performance for all Internet applications without the
+         penalties of Web server APIs.
+      </P>
+      <P>
+         This specification has narrow goal: to specify, from an application perspective, the interface between a
+         FastCGI application and a Web server that supports FastCGI. Many Web server features related to FastCGI, e.g.
+         application management facilities, have nothing to do with the application to Web server interface, and are
+         not described here.
+      </P>
+      <P>
+         This specification is for Unix (more precisely, for POSIX systems that support Berkeley Sockets). The bulk of
+         the specification is a simple communications protocol that is independent of byte ordering and will extend to
+         other systems.
+      </P>
+      <P>
+         We&#39;ll introduce FastCGI by comparing it with conventional Unix implementations of CGI/1.1. FastCGI is
+         designed to support long-lived application processes, i.e. <I>application servers</I>. That&#39;s a major
+         difference compared with conventional Unix implementations of CGI/1.1, which construct an application process,
+         use it respond to one request, and have it exit.
+      </P>
+      <P>
+         The initial state of a FastCGI process is more spartan than the initial state of a CGI/1.1 process, because
+         the FastCGI process doesn&#39;t begin life connected to anything. It doesn&#39;t have the conventional open
+         files <TT>stdin</TT>, <TT>stdout</TT>, and <TT>stderr</TT>, and it doesn&#39;t receive much information
+         through environment variables. The key piece of initial state in a FastCGI process is a listening socket,
+         through which it accepts connections from a Web server.
+      </P>
+      <P>
+         After a FastCGI process accepts a connection on its listening socket, the process executes a simple protocol
+         to receive and send data. The protocol serves two purposes. First, the protocol multiplexes a single transport
+         connection between several independent FastCGI requests. This supports applications that are able to process
+         concurrent requests using event-driven or multi-threaded programming techniques. Second, within each request
+         the protocol provides several independent data streams in each direction. This way, for instance, both
+         <TT>stdout</TT> and <TT>stderr</TT> data pass over a single transport connection from the application to the
+         Web server, rather than requiring separate pipes as with CGI/1.1.
+      </P>
+      <P>
+         A FastCGI application plays one of several well-defined <I>roles</I>. The most familiar is the
+         <I>Responder</I> role, in which the application receives all the information associated with an HTTP request
+         and generates an HTTP response; that&#39;s the role CGI/1.1 programs play. A second role is <I>Authorizer</I>,
+         in which the application receives all the information associated with an HTTP request and generates an
+         authorized/unauthorized decision. A third role is <I>Filter</I>, in which the application receives all the
+         information associated with an HTTP request, plus an extra stream of data from a file stored on the Web
+         server, and generates a &quot;filtered&quot; version of the data stream as an HTTP response. The framework is
+         extensible so that more FastCGI can be defined later.
+      </P>
+      <P>
+         In the remainder of this specification the terms &quot;FastCGI application,&quot; &quot;application
+         process,&quot; or &quot;application server&quot; are abbreviated to &quot;application&quot; whenever that
+         won&#39;t cause confusion.
+      </P>
+      <P>
+      </P>
+      <H3>
+         <A NAME="S2">2. Initial Process State</A>
+      </H3>
+      <H4>
+         <A NAME="S2.1">2.1 Argument list</A>
+      </H4>
+      <P>
+         By default the Web server creates an argument list containing a single element, the name of the application,
+         taken to be the last component of the executable&#39;s path name. The Web server may provide a way to specify
+         a different application name, or a more elaborate argument list.
+      </P>
+      <P>
+         Note that the file executed by the Web server might be an interpreter file (a text file that starts with the
+         characters <TT>#!</TT>), in which case the application&#39;s argument list is constructed as described in the
+         <TT>execve</TT> manpage.
+      </P>
+      <P>
+      </P>
+      <H4>
+         <A NAME="S2.2">2.2 File descriptors</A>
+      </H4>
+      <P>
+         The Web server leaves a single file descriptor, <TT>FCGI_LISTENSOCK_FILENO</TT>, open when the application
+         begins execution. This descriptor refers to a listening socket created by the Web server.
+      </P>
+      <P>
+         <TT>FCGI_LISTENSOCK_FILENO</TT> equals <TT>STDIN_FILENO</TT>. The standard descriptors <TT>STDOUT_FILENO</TT>
+         and <TT>STDERR_FILENO</TT> are closed when the application begins execution. A reliable method for an
+         application to determine whether it was invoked using CGI or FastCGI is to call
+         <TT>getpeername(FCGI_LISTENSOCK_FILENO)</TT>, which returns -1 with <TT>errno</TT> set to <TT>ENOTCONN</TT>
+         for a FastCGI application.
+      </P>
+      <P>
+         The Web server&#39;s choice of reliable transport, Unix stream pipes (<TT>AF_UNIX</TT>) or TCP/IP
+         (<TT>AF_INET</TT>), is implicit in the internal state of the <TT>FCGI_LISTENSOCK_FILENO</TT> socket.
+      </P>
+      <P>
+      </P>
+      <H4>
+         <A NAME="S2.3">2.3 Environment variables</A>
+      </H4>
+      <P>
+         The Web server may use environment variables to pass parameters to the application. This specification defines
+         one such variable, <TT>FCGI_WEB_SERVER_ADDRS</TT>; we expect more to be defined as the specification evolves.
+         The Web server may provide a way to bind other environment variables, such as the <TT>PATH</TT> variable.
+      </P>
+      <P>
+      </P>
+      <H4>
+         <A NAME="S2.4">2.4 Other state</A>
+      </H4>
+      <P>
+         The Web server may provide a way to specify other components of an application&#39;s initial process state,
+         such as the priority, user ID, group ID, root directory, and working directory of the process.
+      </P>
+      <P>
+      </P>
+      <H3>
+         <A NAME="S3">3. Protocol Basics</A>
+      </H3>
+      <H4>
+         <A NAME="S3.1">3.1 Notation</A>
+      </H4>
+      <P>
+         We use C language notation to define protocol message formats. All structure elements are defined in terms of
+         the <TT>unsigned char</TT> type, and are arranged so that an ISO C compiler lays them out in the obvious
+         manner, with no padding. The first byte defined in the structure is transmitted first, the second byte second,
+         etc.
+      </P>
+      <P>
+         We use two conventions to abbreviate our definitions.
+      </P>
+      <P>
+         First, when two adjacent structure components are named identically except for the suffixes
+         &quot;<TT>B1</TT>&quot; and &quot;<TT>B0</TT>,&quot; it means that the two components may be viewed as a
+         single number, computed as <TT>B1&lt;&lt;8 + B0</TT>. The name of this single number is the name of the
+         components, minus the suffixes. This convention generalizes in an obvious way to handle numbers represented in
+         more than two bytes.
+      </P>
+      <P>
+         Second, we extend C <TT>struct</TT>s to allow the form
+      </P>
+<PRE>
+        struct {
+            unsigned char mumbleLengthB1;
+            unsigned char mumbleLengthB0;
+            ... /* other stuff */
+            unsigned char mumbleData[mumbleLength];
+        };
+</PRE>
+      <P>
+         meaning a structure of varying length, where the length of a component is determined by the values of the
+         indicated earlier component or components.
+      </P>
+      <P>
+      </P>
+      <H4>
+         <A NAME="S3.2">3.2 Accepting Transport Connections</A>
+      </H4>
+      <P>
+         A FastCGI application calls <TT>accept()</TT> on the socket referred to by file descriptor
+         <TT>FCGI_LISTENSOCK_FILENO</TT> to accept a new transport connection. If the <TT>accept()</TT> succeeds, and
+         the <TT>FCGI_WEB_SERVER_ADDRS</TT> environment variable is bound, the application application immediately
+         performs the following special processing:
+      </P>
+      <P>
+      </P>
+      <UL TYPE="square">
+         <LI>
+            <TT>FCGI_WEB_SERVER_ADDRS</TT>: The value is a list of valid IP addresses for the Web server.
+            <P>
+               If <TT>FCGI_WEB_SERVER_ADDRS</TT> was bound, the application checks the peer IP address of the new
+               connection for membership in the list. If the check fails (including the possibility that the connection
+               didn&#39;t use TCP/IP transport), the application responds by closing the connection.
+            </P>
+            <P>
+               <TT>FCGI_WEB_SERVER_ADDRS</TT> is expressed as a comma-separated list of IP addresses. Each IP address
+               is written as four decimal numbers in the range [0..255] separated by decimal points. So one legal
+               binding for this variable is <TT>FCGI_WEB_SERVER_ADDRS=199.170.183.28,199.170.183.71</TT>.
+            </P>
+            <BR>
+            <BR>
+         </LI>
+      </UL>
+      <P>
+         An application may accept several concurrent transport connections, but it need not do so.
+      </P>
+      <P>
+      </P>
+      <H4>
+         <A NAME="S3.3">3.3 Records</A>
+      </H4>
+      <P>
+         Applications execute requests from a Web server using a simple protocol. Details of the protocol depend upon
+         the application&#39;s role, but roughly speaking the Web server first sends parameters and other data to the
+         application, then the application sends result data to the Web server, and finally the application sends the
+         Web server an indication that the request is complete.
+      </P>
+      <P>
+         All data that flows over the transport connection is carried in <I>FastCGI records</I>. FastCGI records
+         accomplish two things. First, records multiplex the transport connection between several independent FastCGI
+         requests. This multiplexing supports applications that are able to process concurrent requests using
+         event-driven or multi-threaded programming techniques. Second, records provide several independent data
+         streams in each direction within a single request. This way, for instance, both <TT>stdout</TT> and
+         <TT>stderr</TT> data can pass over a single transport connection from the application to the Web server,
+         rather than requiring separate connections.
+      </P>
+      <P>
+      </P>
+<PRE>
+        typedef struct {
+            unsigned char version;
+            unsigned char type;
+            unsigned char requestIdB1;
+            unsigned char requestIdB0;
+            unsigned char contentLengthB1;
+            unsigned char contentLengthB0;
+            unsigned char paddingLength;
+            unsigned char reserved;
+            unsigned char contentData[contentLength];
+            unsigned char paddingData[paddingLength];
+        } FCGI_Record;
+</PRE>
+      <P>
+         A FastCGI record consists of a fixed-length prefix followed by a variable number of content and padding bytes.
+         A record contains seven components:
+      </P>
+      <P>
+      </P>
+      <UL TYPE="square">
+         <LI>
+            <TT>version</TT>: Identifies the FastCGI protocol version. This specification documents
+            <TT>FCGI_VERSION_1</TT>.
+            <P>
+            </P>
+         </LI>
+         <LI>
+            <TT>type</TT>: Identifies the FastCGI record type, i.e. the general function that the record performs.
+            Specific record types and their functions are detailed in later sections.
+            <P>
+            </P>
+         </LI>
+         <LI>
+            <TT>requestId</TT>: Identifies the <I>FastCGI request</I> to which the record belongs.
+            <P>
+            </P>
+         </LI>
+         <LI>
+            <TT>contentLength</TT>: The number of bytes in the <TT>contentData</TT> component of the record.
+            <P>
+            </P>
+         </LI>
+         <LI>
+            <TT>paddingLength</TT>: The number of bytes in the <TT>paddingData</TT> component of the record.
+            <P>
+            </P>
+         </LI>
+         <LI>
+            <TT>contentData</TT>: Between 0 and 65535 bytes of data, interpreted according to the record type.
+            <P>
+            </P>
+         </LI>
+         <LI>
+            <TT>paddingData</TT>: Between 0 and 255 bytes of data, which are ignored.<BR>
+            <BR>
+         </LI>
+      </UL>
+      <P>
+         We use a relaxed C <TT>struct</TT> initializer syntax to specify constant FastCGI records. We omit the
+         <TT>version</TT> component, ignore padding, and treat <TT>requestId</TT> as a number. Thus
+         <TT>{FCGI_END_REQUEST, 1, {FCGI_REQUEST_COMPLETE,0}}</TT> is a record with <TT>type == FCGI_END_REQUEST</TT>,
+         <TT>requestId == 1</TT>, and <TT>contentData == {FCGI_REQUEST_COMPLETE,0}</TT>.
+      </P>
+      <P>
+      </P>
+      <H5>
+         Padding
+      </H5>
+      <P>
+         The protocol allows senders to pad the records they send, and requires receivers to interpret the
+         <TT>paddingLength</TT> and skip the <TT>paddingData</TT>. Padding allows senders to keep data aligned for more
+         efficient processing. Experience with the X window system protocols shows the performance benefit of such
+         alignment.
+      </P>
+      <P>
+         We recommend that records be placed on boundaries that are multiples of eight bytes. The fixed-length portion
+         of a <TT>FCGI_Record</TT> is eight bytes.
+      </P>
+      <P>
+      </P>
+      <H5>
+         Managing Request IDs
+      </H5>
+      <P>
+         The Web server re-uses FastCGI request IDs; the application keeps track of the current state of each request
+         ID on a given transport connection. A request ID <TT>R</TT> becomes active when the application receives a
+         record <TT>{FCGI_BEGIN_REQUEST, R, ...}</TT> and becomes inactive when the application sends a record
+         <TT>{FCGI_END_REQUEST, R, ...}</TT> to the Web server.
+      </P>
+      <P>
+         While a request ID <TT>R</TT> is inactive, the application ignores records with <TT>requestId == R</TT>,
+         except for <TT>FCGI_BEGIN_REQUEST</TT> records as just described.
+      </P>
+      <P>
+         The Web server attempts to keep FastCGI request IDs small. That way the application can keep track of request
+         ID states using a short array rather than a long array or a hash table. An application also has the option of
+         accepting only one request at a time. In this case the application simply checks incoming <TT>requestId</TT>
+         values against the current request ID.
+      </P>
+      <P>
+      </P>
+      <H5>
+         Types of Record Types
+      </H5>
+      <P>
+         There are two useful ways of classifying FastCGI record types.
+      </P>
+      <P>
+         The first distinction is between <I>management</I> records and <I>application</I> records. A management record
+         contains information that is not specific to any Web server request, such as information about the protocol
+         capabilities of the application. An application record contains information about a particular request,
+         identified by the <TT>requestId</TT> component.
+      </P>
+      <P>
+         Management records have a <TT>requestId</TT> value of zero, also called the <I>null request ID</I>.
+         Application records have a nonzero <TT>requestId</TT>.
+      </P>
+      <P>
+         The second distinction is between <I>discrete</I> and <I>stream</I> records. A discrete record contains a
+         meaningful unit of data all by itself. A stream record is part of a <I>stream</I>, i.e. a series of zero or
+         more non-empty records (<TT>length != 0</TT>) of the stream type, followed by an empty record (<TT>length ==
+         0</TT>) of the stream type. The <TT>contentData</TT> components of a stream&#39;s records, when concatenated,
+         form a byte sequence; this byte sequence is the value of the stream. Therefore the value of a stream is
+         independent of how many records it contains or how its bytes are divided among the non-empty records.
+      </P>
+      <P>
+         These two classifications are independent. Among the record types defined in this version of the FastCGI
+         protocol, all management record types are also discrete record types, and nearly all application record types
+         are stream record types. But three application record types are discrete, and nothing prevents defining a
+         management record type that&#39;s a stream in some later version of the protocol.
+      </P>
+      <P>
+      </P>
+      <H4>
+         <A NAME="S3.4">3.4 Name-Value Pairs</A>
+      </H4>
+      <P>
+         In many of their roles, FastCGI applications need to read and write varying numbers of variable-length values.
+         So it is useful to adopt a standard format for encoding a name-value pair.
+      </P>
+      <P>
+         FastCGI transmits a name-value pair as the length of the name, followed by the length of the value, followed
+         by the name, followed by the value. Lengths of 127 bytes and less can be encoded in one byte, while longer
+         lengths are always encoded in four bytes:
+      </P>
+      <P>
+      </P>
+<PRE>
+        typedef struct {
+            unsigned char nameLengthB0;  /* nameLengthB0  &gt;&gt; 7 == 0 */
+            unsigned char valueLengthB0; /* valueLengthB0 &gt;&gt; 7 == 0 */
+            unsigned char nameData[nameLength];
+            unsigned char valueData[valueLength];
+        } FCGI_NameValuePair11;
+
+        typedef struct {
+            unsigned char nameLengthB0;  /* nameLengthB0  &gt;&gt; 7 == 0 */
+            unsigned char valueLengthB3; /* valueLengthB3 &gt;&gt; 7 == 1 */
+            unsigned char valueLengthB2;
+            unsigned char valueLengthB1;
+            unsigned char valueLengthB0;
+            unsigned char nameData[nameLength];
+            unsigned char valueData[valueLength
+                    ((B3 &amp; 0x7f) &lt;&lt; 24) + (B2 &lt;&lt; 16) + (B1 &lt;&lt; 8) + B0];
+        } FCGI_NameValuePair14;
+
+        typedef struct {
+            unsigned char nameLengthB3;  /* nameLengthB3  &gt;&gt; 7 == 1 */
+            unsigned char nameLengthB2;
+            unsigned char nameLengthB1;
+            unsigned char nameLengthB0;
+            unsigned char valueLengthB0; /* valueLengthB0 &gt;&gt; 7 == 0 */
+            unsigned char nameData[nameLength
+                    ((B3 &amp; 0x7f) &lt;&lt; 24) + (B2 &lt;&lt; 16) + (B1 &lt;&lt; 8) + B0];
+            unsigned char valueData[valueLength];
+        } FCGI_NameValuePair41;
+
+        typedef struct {
+            unsigned char nameLengthB3;  /* nameLengthB3  &gt;&gt; 7 == 1 */
+            unsigned char nameLengthB2;
+            unsigned char nameLengthB1;
+            unsigned char nameLengthB0;
+            unsigned char valueLengthB3; /* valueLengthB3 &gt;&gt; 7 == 1 */
+            unsigned char valueLengthB2;
+            unsigned char valueLengthB1;
+            unsigned char valueLengthB0;
+            unsigned char nameData[nameLength
+                    ((B3 &amp; 0x7f) &lt;&lt; 24) + (B2 &lt;&lt; 16) + (B1 &lt;&lt; 8) + B0];
+            unsigned char valueData[valueLength
+                    ((B3 &amp; 0x7f) &lt;&lt; 24) + (B2 &lt;&lt; 16) + (B1 &lt;&lt; 8) + B0];
+        } FCGI_NameValuePair44;
+</PRE>
+      <P>
+         The high-order bit of the first byte of a length indicates the length&#39;s encoding. A high-order zero
+         implies a one-byte encoding, a one a four-byte encoding.
+      </P>
+      <P>
+         This name-value pair format allows the sender to transmit binary values without additional encoding, and
+         enables the receiver to allocate the correct amount of storage immediately even for large values.
+      </P>
+      <P>
+      </P>
+      <H4>
+         <A NAME="S3.5">3.5 Closing Transport Connections</A>
+      </H4>
+      <P>
+         The Web server controls the lifetime of transport connections. The Web server can close a connection when no
+         requests are active. Or the Web server can delegate close authority to the application (see
+         <TT>FCGI_BEGIN_REQUEST</TT>). In this case the application closes the connection at the end of a specified
+         request.
+      </P>
+      <P>
+         This flexibility accommodates a variety of application styles. Simple applications will process one request at
+         a time and accept a new transport connection for each request. More complex applications will process
+         concurrent requests, over one or multiple transport connections, and will keep transport connections open for
+         long periods of time.
+      </P>
+      <P>
+         A simple application gets a significant performance boost by closing the transport connection when it has
+         finished writing its response. The Web server needs to control the connection lifetime for long-lived
+         connections.
+      </P>
+      <P>
+         When an application closes a connection or finds that a connection has closed, the application initiates a new
+         connection.
+      </P>
+      <P>
+      </P>
+      <H3>
+         <A NAME="S4">4. Management Record Types</A>
+      </H3>
+      <H4>
+         <A NAME="S4.1">4.1 <TT>FCGI_GET_VALUES, FCGI_GET_VALUES_RESULT</TT></A>
+      </H4>
+      <P>
+         The Web server can query specific variables within the application. The server will typically perform a query
+         on application startup in order to to automate certain aspects of system configuration.
+      </P>
+      <P>
+         The application receives a query as a record <TT>{FCGI_GET_VALUES, 0, ...}</TT>. The <TT>contentData</TT>
+         portion of a <TT>FCGI_GET_VALUES</TT> record contains a sequence of name-value pairs with empty values.
+      </P>
+      <P>
+         The application responds by sending a record <TT>{FCGI_GET_VALUES_RESULT, 0, ...}</TT> with the values
+         supplied. If the application doesn&#39;t understand a variable name that was included in the query, it omits
+         that name from the response.
+      </P>
+      <P>
+         <TT>FCGI_GET_VALUES</TT> is designed to allow an open-ended set of variables. The initial set provides
+         information to help the server perform application and connection management:
+      </P>
+      <P>
+      </P>
+      <UL TYPE="square">
+         <LI>
+            <TT>FCGI_MAX_CONNS</TT>: The maximum number of concurrent transport connections this application will
+            accept, e.g. <TT>&quot;1&quot;</TT> or <TT>&quot;10&quot;</TT>.
+            <P>
+            </P>
+         </LI>
+         <LI>
+            <TT>FCGI_MAX_REQS</TT>: The maximum number of concurrent requests this application will accept, e.g.
+            <TT>&quot;1&quot;</TT> or <TT>&quot;50&quot;</TT>.
+            <P>
+            </P>
+         </LI>
+         <LI>
+            <TT>FCGI_MPXS_CONNS</TT>: <TT>&quot;0&quot;</TT> if this application does not multiplex connections (i.e.
+            handle concurrent requests over each connection), <TT>&quot;1&quot;</TT> otherwise.<BR>
+            <BR>
+         </LI>
+      </UL>
+      <P>
+         An application may receive a <TT>FCGI_GET_VALUES</TT> record at any time. The application&#39;s response
+         should not involve the application proper but only the FastCGI library.
+      </P>
+      <P>
+      </P>
+      <H4>
+         <A NAME="S4.2">4.2 <TT>FCGI_UNKNOWN_TYPE</TT></A>
+      </H4>
+      <P>
+         The set of management record types is likely to grow in future versions of this protocol. To provide for this
+         evolution, the protocol includes the <TT>FCGI_UNKNOWN_TYPE</TT> management record. When an application
+         receives a management record whose type <TT>T</TT> it does not understand, the application responds with
+         <TT>{FCGI_UNKNOWN_TYPE, 0, {T}}</TT>.
+      </P>
+      <P>
+         The <TT>contentData</TT> component of a <TT>FCGI_UNKNOWN_TYPE</TT> record has the form:
+      </P>
+<PRE>
+        typedef struct {
+            unsigned char type;    
+            unsigned char reserved[7];
+        } FCGI_UnknownTypeBody;
+</PRE>
+      <P>
+         The <TT>type</TT> component is the type of the unrecognized management record.
+      </P>
+      <P>
+      </P>
+      <H3>
+         <A NAME="S5">5. Application Record Types</A>
+      </H3>
+      <H4>
+         <A NAME="S5.1">5.1 <TT>FCGI_BEGIN_REQUEST</TT></A>
+      </H4>
+      <P>
+         The Web server sends a <TT>FCGI_BEGIN_REQUEST</TT> record to start a request.
+      </P>
+      <P>
+         The <TT>contentData</TT> component of a <TT>FCGI_BEGIN_REQUEST</TT> record has the form:
+      </P>
+<PRE>
+        typedef struct {
+            unsigned char roleB1;
+            unsigned char roleB0;
+            unsigned char flags;
+            unsigned char reserved[5];
+        } FCGI_BeginRequestBody;
+</PRE>
+      <P>
+         The <TT>role</TT> component sets the role the Web server expects the application to play. The
+         currently-defined roles are:
+      </P>
+      <P>
+      </P>
+      <UL TYPE="square">
+         <LI>
+            <TT>FCGI_RESPONDER</TT>
+         </LI>
+         <LI>
+            <TT>FCGI_AUTHORIZER</TT>
+         </LI>
+         <LI>
+            <TT>FCGI_FILTER</TT>
+         </LI>
+      </UL>
+      <P>
+         Roles are described in more detail in <A HREF="#S6">Section 6</A> below.
+      </P>
+      <P>
+         The <TT>flags</TT> component contains a bit that controls connection shutdown:
+      </P>
+      <P>
+      </P>
+      <UL TYPE="square">
+         <LI>
+            <TT>flags &amp; FCGI_KEEP_CONN</TT>: If zero, the application closes the connection after responding to
+            this request. If not zero, the application does not close the connection after responding to this request;
+            the Web server retains responsibility for the connection.<BR>
+            <BR>
+         </LI>
+      </UL>
+      <H4>
+         <A NAME="S5.2">5.2 Name-Value Pair Stream: <TT>FCGI_PARAMS</TT></A>
+      </H4>
+      <TT>FCGI_PARAMS</TT>
+      <P>
+         is a stream record type used in sending name-value pairs from the Web server to the application. The
+         name-value pairs are sent down the stream one after the other, in no specified order.
+      </P>
+      <P>
+      </P>
+      <H4>
+         <A NAME="S5.3">5.3 Byte Streams: <TT>FCGI_STDIN</TT>, <TT>FCGI_DATA</TT>, <TT>FCGI_STDOUT</TT>,
+         <TT>FCGI_STDERR</TT></A>
+      </H4>
+      <TT>FCGI_STDIN</TT>
+      <P>
+         is a stream record type used in sending arbitrary data from the Web server to the application.
+         <TT>FCGI_DATA</TT> is a second stream record type used to send additional data to the application.
+      </P>
+      <P>
+         <TT>FCGI_STDOUT</TT> and <TT>FCGI_STDERR</TT> are stream record types for sending arbitrary data and error
+         data respectively from the application to the Web server.
+      </P>
+      <P>
+      </P>
+      <H4>
+         <A NAME="S5.4">5.4 <TT>FCGI_ABORT_REQUEST</TT></A>
+      </H4>
+      <P>
+         The Web server sends a <TT>FCGI_ABORT_REQUEST</TT> record to abort a request. After receiving
+         <TT>{FCGI_ABORT_REQUEST, R}</TT>, the application responds as soon as possible with <TT>{FCGI_END_REQUEST, R,
+         {FCGI_REQUEST_COMPLETE, appStatus}}</TT>. This is truly a response from the application, not a low-level
+         acknowledgement from the FastCGI library.
+      </P>
+      <P>
+         A Web server aborts a FastCGI request when an HTTP client closes its transport connection while the FastCGI
+         request is running on behalf of that client. The situation may seem unlikely; most FastCGI requests will have
+         short response times, with the Web server providing output buffering if the client is slow. But the FastCGI
+         application may be delayed communicating with another system, or performing a server push.
+      </P>
+      <P>
+         When a Web server is not multiplexing requests over a transport connection, the Web server can abort a request
+         by closing the request&#39;s transport connection. But with multiplexed requests, closing the transport
+         connection has the unfortunate effect of aborting <I>all</I> the requests on the connection.
+      </P>
+      <P>
+      </P>
+      <H4>
+         <A NAME="S5.5">5.5 <TT>FCGI_END_REQUEST</TT></A>
+      </H4>
+      <P>
+         The application sends a <TT>FCGI_END_REQUEST</TT> record to terminate a request, either because the
+         application has processed the request or because the application has rejected the request.
+      </P>
+      <P>
+         The <TT>contentData</TT> component of a <TT>FCGI_END_REQUEST</TT> record has the form:
+      </P>
+<PRE>
+        typedef struct {
+            unsigned char appStatusB3;
+            unsigned char appStatusB2;
+            unsigned char appStatusB1;
+            unsigned char appStatusB0;
+            unsigned char protocolStatus;
+            unsigned char reserved[3];
+        } FCGI_EndRequestBody;
+</PRE>
+      <P>
+         The <TT>appStatus</TT> component is an application-level status code. Each role documents its usage of
+         <TT>appStatus</TT>.
+      </P>
+      <P>
+         The <TT>protocolStatus</TT> component is a protocol-level status code; the possible <TT>protocolStatus</TT>
+         values are:
+      </P>
+      <P>
+      </P>
+      <UL TYPE="square">
+         <LI>
+            <TT>FCGI_REQUEST_COMPLETE</TT>: normal end of request.
+            <P>
+            </P>
+         </LI>
+         <LI>
+            <TT>FCGI_CANT_MPX_CONN</TT>: rejecting a new request. This happens when a Web server sends concurrent
+            requests over one connection to an application that is designed to process one request at a time per
+            connection.
+            <P>
+            </P>
+         </LI>
+         <LI>
+            <TT>FCGI_OVERLOADED</TT>: rejecting a new request. This happens when the application runs out of some
+            resource, e.g. database connections.
+            <P>
+            </P>
+         </LI>
+         <LI>
+            <TT>FCGI_UNKNOWN_ROLE</TT>: rejecting a new request. This happens when the Web server has specified a role
+            that is unknown to the application.<BR>
+            <BR>
+         </LI>
+      </UL>
+      <H3>
+         <A NAME="S6">6. Roles</A>
+      </H3>
+      <H4>
+         <A NAME="S6.1">6.1 Role Protocols</A>
+      </H4>
+      <P>
+         Role protocols only include records with application record types. They transfer essentially all data using
+         streams.
+      </P>
+      <P>
+         To make the protocols reliable and to simplify application programming, role protocols are designed to use
+         <I>nearly sequential marshalling</I>. In a protocol with strictly sequential marshalling, the application
+         receives its first input, then its second, etc. until it has received them all. Similarly, the application
+         sends its first output, then its second, etc. until it has sent them all. Inputs are not interleaved with each
+         other, and outputs are not interleaved with each other.
+      </P>
+      <P>
+         The sequential marshalling rule is too restrictive for some FastCGI roles, because CGI programs can write to
+         both <TT>stdout</TT> and <TT>stderr</TT> without timing restrictions. So role protocols that use both
+         <TT>FCGI_STDOUT</TT> and <TT>FCGI_STDERR</TT> allow these two streams to be interleaved.
+      </P>
+      <P>
+         All role protocols use the <TT>FCGI_STDERR</TT> stream just the way <TT>stderr</TT> is used in conventional
+         applications programming: to report application-level errors in an intelligible way. Use of the
+         <TT>FCGI_STDERR</TT> stream is always optional. If an application has no errors to report, it sends either no
+         <TT>FCGI_STDERR</TT> records or one zero-length <TT>FCGI_STDERR</TT> record.
+      </P>
+      <P>
+         When a role protocol calls for transmitting a stream other than <TT>FCGI_STDERR</TT>, at least one record of
+         the stream type is always transmitted, even if the stream is empty.
+      </P>
+      <P>
+         Again in the interests of reliable protocols and simplified application programming, role protocols are
+         designed to be <I>nearly request-response</I>. In a truly request-response protocol, the application receives
+         all of its input records before sending its first output record. Request-response protocols don&#39;t allow
+         pipelining.
+      </P>
+      <P>
+         The request-response rule is too restrictive for some FastCGI roles; after all, CGI programs aren&#39;t
+         restricted to read all of <TT>stdin</TT> before starting to write <TT>stdout</TT>. So some role protocols
+         allow that specific possibility. First the application receives all of its inputs except for a final stream
+         input. As the application begins to receive the final stream input, it can begin writing its output.
+      </P>
+      <P>
+         When a role protocol uses <TT>FCGI_PARAMS</TT> to transmit textual values, such as the values that CGI
+         programs obtain from environment variables, the length of the value does not include the terminating null
+         byte, and the value itself does not include a null byte. An application that needs to provide
+         <TT>environ(7)</TT> format name-value pairs must insert an equal sign between the name and value and append a
+         null byte after the value.
+      </P>
+      <P>
+         Role protocols do not support the non-parsed header feature of CGI. FastCGI applications set response status
+         using the <TT>Status</TT> and <TT>Location</TT> CGI headers.
+      </P>
+      <P>
+      </P>
+      <H4>
+         <A NAME="S6.2">6.2 Responder</A>
+      </H4>
+      <P>
+         A Responder FastCGI application has the same purpose as a CGI/1.1 program: It receives all the information
+         associated with an HTTP request and generates an HTTP response.
+      </P>
+      <P>
+         It suffices to explain how each element of CGI/1.1 is emulated by a Responder:
+      </P>
+      <BR>
+      <BR>
+      <UL TYPE="square">
+         <LI>
+            The Responder application receives CGI/1.1 environment variables from the Web server over
+            <TT>FCGI_PARAMS</TT>.
+            <P>
+            </P>
+         </LI>
+         <LI>
+            Next the Responder application receives CGI/1.1 <TT>stdin</TT> data from the Web server over
+            <TT>FCGI_STDIN</TT>. The application receives at most <TT>CONTENT_LENGTH</TT> bytes from this stream before
+            receiving the end-of-stream indication. (The application receives less than <TT>CONTENT_LENGTH</TT> bytes
+            only if the HTTP client fails to provide them, e.g. because the client crashed.)
+            <P>
+            </P>
+         </LI>
+         <LI>
+            The Responder application sends CGI/1.1 <TT>stdout</TT> data to the Web server over <TT>FCGI_STDOUT</TT>,
+            and CGI/1.1 <TT>stderr</TT> data over <TT>FCGI_STDERR</TT>. The application sends these concurrently, not
+            one after the other. The application must wait to finish reading <TT>FCGI_PARAMS</TT> before it begins
+            writing <TT>FCGI_STDOUT</TT> and <TT>FCGI_STDERR</TT>, but it needn&#39;t finish reading from
+            <TT>FCGI_STDIN</TT> before it begins writing these two streams.
+            <P>
+            </P>
+         </LI>
+         <LI>
+            After sending all its <TT>stdout</TT> and <TT>stderr</TT> data, the Responder application sends a
+            <TT>FCGI_END_REQUEST</TT> record. The application sets the <TT>protocolStatus</TT> component to
+            <TT>FCGI_REQUEST_COMPLETE</TT> and the <TT>appStatus</TT> component to the status code that the CGI program
+            would have returned via the <TT>exit</TT> system call.<BR>
+            <BR>
+         </LI>
+      </UL>
+      <P>
+         A Responder performing an update, e.g. implementing a <TT>POST</TT> method, should compare the number of bytes
+         received on <TT>FCGI_STDIN</TT> with <TT>CONTENT_LENGTH</TT> and abort the update if the two numbers are not
+         equal.
+      </P>
+      <P>
+      </P>
+      <H4>
+         <A NAME="S6.3">6.3 Authorizer</A>
+      </H4>
+      <P>
+         An Authorizer FastCGI application receives all the information associated with an HTTP request and generates
+         an authorized/unauthorized decision. In case of an authorized decision the Authorizer can also associate
+         name-value pairs with the HTTP request; when giving an unauthorized decision the Authorizer sends a complete
+         response to the HTTP client.
+      </P>
+      <P>
+         Since CGI/1.1 defines a perfectly good way to represent the information associated with an HTTP request,
+         Authorizers use the same representation:
+      </P>
+      <P>
+      </P>
+      <UL TYPE="square">
+         <LI>
+            The Authorizer application receives HTTP request information from the Web server on the
+            <TT>FCGI_PARAMS</TT> stream, in the same format as a Responder. The Web server does not send
+            <TT>CONTENT_LENGTH</TT>, <TT>PATH_INFO</TT>, <TT>PATH_TRANSLATED</TT>, and <TT>SCRIPT_NAME</TT> headers.
+            <P>
+            </P>
+         </LI>
+         <LI>
+            The Authorizer application sends <TT>stdout</TT> and <TT>stderr</TT> data in the same manner as a
+            Responder. The CGI/1.1 response status specifies the disposition of the request. If the application sends
+            status 200 (OK), the Web server allows access. Depending upon its configuration the Web server may proceed
+            with other access checks, including requests to other Authorizers.
+            <P>
+               An Authorizer application&#39;s 200 response may include headers whose names are prefixed with
+               <TT>Variable-</TT>. These headers communicate name-value pairs from the application to the Web server.
+               For instance, the response header
+            </P>
+<PRE>
+        Variable-AUTH_METHOD: database lookup
+</PRE>
+            transmits the value <TT>&quot;database lookup&quot;</TT> with name <TT>AUTH-METHOD</TT>. The server
+            associates such name-value pairs with the HTTP request and includes them in subsequent CGI or FastCGI
+            requests performed in processing the HTTP request. When the application gives a 200 response, the server
+            ignores response headers whose names aren&#39;t prefixed with <TT>Variable-</TT> prefix, and ignores any
+            response content.
+            <P>
+               For Authorizer response status values other than &quot;200&quot; (OK), the Web server denies access and
+               sends the response status, headers, and content back to the HTTP client.
+            </P>
+            <BR>
+            <BR>
+         </LI>
+      </UL>
+      <H4>
+         <A NAME="S6.4">6.4 Filter</A>
+      </H4>
+      <P>
+         A Filter FastCGI application receives all the information associated with an HTTP request, plus an extra
+         stream of data from a file stored on the Web server, and generates a &quot;filtered&quot; version of the data
+         stream as an HTTP response.
+      </P>
+      <P>
+         A Filter is similar in functionality to a Responder that takes a data file as a parameter. The difference is
+         that with a Filter, both the data file and the Filter itself can be access controlled using the Web
+         server&#39;s access control mechanisms, while a Responder that takes the name of a data file as a parameter
+         must perform its own access control checks on the data file.
+      </P>
+      <P>
+         The steps taken by a Filter are similar to those of a Responder. The server presents the Filter with
+         environment variables first, then standard input (normally form <TT>POST</TT> data), finally the data file
+         input:
+      </P>
+      <BR>
+      <BR>
+      <UL TYPE="square">
+         <LI>
+            Like a Responder, the Filter application receives name-value pairs from the Web server over
+            <TT>FCGI_PARAMS</TT>. Filter applications receive two Filter-specific variables:
+            <TT>FCGI_DATA_LAST_MOD</TT> and <TT>FCGI_DATA_LENGTH</TT>.
+            <P>
+            </P>
+         </LI>
+         <LI>
+            Next the Filter application receives CGI/1.1 <TT>stdin</TT> data from the Web server over
+            <TT>FCGI_STDIN</TT>. The application receives at most <TT>CONTENT_LENGTH</TT> bytes from this stream before
+            receiving the end-of-stream indication. (The application receives less than <TT>CONTENT_LENGTH</TT> bytes
+            only if the HTTP client fails to provide them, e.g. because the client crashed.)
+            <P>
+            </P>
+         </LI>
+         <LI>
+            Next the Filter application receives the file data from the Web server over <TT>FCGI_DATA</TT>. This
+            file&#39;s last modification time (expressed as an integer number of seconds since the epoch January 1,
+            1970 UTC) is <TT>FCGI_DATA_LAST_MOD</TT>; the application may consult this variable and respond from a
+            cache without reading the file data. The application reads at most <TT>FCGI_DATA_LENGTH</TT> bytes from
+            this stream before receiving the end-of-stream indication.
+            <P>
+            </P>
+         </LI>
+         <LI>
+            The Filter application sends CGI/1.1 <TT>stdout</TT> data to the Web server over <TT>FCGI_STDOUT</TT>, and
+            CGI/1.1 <TT>stderr</TT> data over <TT>FCGI_STDERR</TT>. The application sends these concurrently, not one
+            after the other. The application must wait to finish reading <TT>FCGI_STDIN</TT> before it begins writing
+            <TT>FCGI_STDOUT</TT> and <TT>FCGI_STDERR</TT>, but it needn&#39;t finish reading from <TT>FCGI_DATA</TT>
+            before it begins writing these two streams.
+            <P>
+            </P>
+         </LI>
+         <LI>
+            After sending all its <TT>stdout</TT> and <TT>stderr</TT> data, the application sends a
+            <TT>FCGI_END_REQUEST</TT> record. The application sets the <TT>protocolStatus</TT> component to
+            <TT>FCGI_REQUEST_COMPLETE</TT> and the <TT>appStatus</TT> component to the status code that a similar CGI
+            program would have returned via the <TT>exit</TT> system call.<BR>
+            <BR>
+         </LI>
+      </UL>
+      <P>
+         A Filter should compare the number of bytes received on <TT>FCGI_STDIN</TT> with <TT>CONTENT_LENGTH</TT> and
+         on <TT>FCGI_DATA</TT> with <TT>FCGI_DATA_LENGTH</TT>. If the numbers don&#39;t match and the Filter is a
+         query, the Filter response should provide an indication that data is missing. If the numbers don&#39;t match
+         and the Filter is an update, the Filter should abort the update.
+      </P>
+      <P>
+      </P>
+      <H3>
+         <A NAME="S7">7. Errors</A>
+      </H3>
+      <P>
+         A FastCGI application exits with zero status to indicate that it terminated on purpose, e.g. in order to
+         perform a crude form of garbage collection. A FastCGI application that exits with nonzero status is assumed to
+         have crashed. How a Web server or other application manager responds to applications that exit with zero or
+         nonzero status is outside the scope of this specification.
+      </P>
+      <P>
+         A Web server can request that a FastCGI application exit by sending it <TT>SIGTERM</TT>. If the application
+         ignores <TT>SIGTERM</TT> the Web server can resort to <TT>SIGKILL</TT>.
+      </P>
+      <P>
+         FastCGI applications report application-level errors with the <TT>FCGI_STDERR</TT> stream and the
+         <TT>appStatus</TT> component of the <TT>FCGI_END_REQUEST</TT> record. In many cases an error will be reported
+         directly to the user via the <TT>FCGI_STDOUT</TT> stream.
+      </P>
+      <P>
+         On Unix, applications report lower-level errors, including FastCGI protocol errors and syntax errors in
+         FastCGI environment variables, to <TT>syslog</TT>. Depending upon the severity of the error, the application
+         may either continue or exit with nonzero status.
+      </P>
+      <P>
+      </P>
+      <H3>
+         <A NAME="S8">8. Types and Constants</A>
+      </H3>
+<PRE>
+/*
+ * Listening socket file number
+ */
+#define FCGI_LISTENSOCK_FILENO 0
+
+typedef struct {
+    unsigned char version;
+    unsigned char type;
+    unsigned char requestIdB1;
+    unsigned char requestIdB0;
+    unsigned char contentLengthB1;
+    unsigned char contentLengthB0;
+    unsigned char paddingLength;
+    unsigned char reserved;
+} FCGI_Header;
+
+/*
+ * Number of bytes in a FCGI_Header.  Future versions of the protocol
+ * will not reduce this number.
+ */
+#define FCGI_HEADER_LEN  8
+
+/*
+ * Value for version component of FCGI_Header
+ */
+#define FCGI_VERSION_1           1
+
+/*
+ * Values for type component of FCGI_Header
+ */
+#define FCGI_BEGIN_REQUEST       1
+#define FCGI_ABORT_REQUEST       2
+#define FCGI_END_REQUEST         3
+#define FCGI_PARAMS              4
+#define FCGI_STDIN               5
+#define FCGI_STDOUT              6
+#define FCGI_STDERR              7
+#define FCGI_DATA                8
+#define FCGI_GET_VALUES          9
+#define FCGI_GET_VALUES_RESULT  10
+#define FCGI_UNKNOWN_TYPE       11
+#define FCGI_MAXTYPE (FCGI_UNKNOWN_TYPE)
+
+/*
+ * Value for requestId component of FCGI_Header
+ */
+#define FCGI_NULL_REQUEST_ID     0
+
+typedef struct {
+    unsigned char roleB1;
+    unsigned char roleB0;
+    unsigned char flags;
+    unsigned char reserved[5];
+} FCGI_BeginRequestBody;
+
+typedef struct {
+    FCGI_Header header;
+    FCGI_BeginRequestBody body;
+} FCGI_BeginRequestRecord;
+
+/*
+ * Mask for flags component of FCGI_BeginRequestBody
+ */
+#define FCGI_KEEP_CONN  1
+
+/*
+ * Values for role component of FCGI_BeginRequestBody
+ */
+#define FCGI_RESPONDER  1
+#define FCGI_AUTHORIZER 2
+#define FCGI_FILTER     3
+
+typedef struct {
+    unsigned char appStatusB3;
+    unsigned char appStatusB2;
+    unsigned char appStatusB1;
+    unsigned char appStatusB0;
+    unsigned char protocolStatus;
+    unsigned char reserved[3];
+} FCGI_EndRequestBody;
+
+typedef struct {
+    FCGI_Header header;
+    FCGI_EndRequestBody body;
+} FCGI_EndRequestRecord;
+
+/*
+ * Values for protocolStatus component of FCGI_EndRequestBody
+ */
+#define FCGI_REQUEST_COMPLETE 0
+#define FCGI_CANT_MPX_CONN    1
+#define FCGI_OVERLOADED       2
+#define FCGI_UNKNOWN_ROLE     3
+
+/*
+ * Variable names for FCGI_GET_VALUES / FCGI_GET_VALUES_RESULT records
+ */
+#define FCGI_MAX_CONNS  &quot;FCGI_MAX_CONNS&quot;
+#define FCGI_MAX_REQS   &quot;FCGI_MAX_REQS&quot;
+#define FCGI_MPXS_CONNS &quot;FCGI_MPXS_CONNS&quot;
+
+typedef struct {
+    unsigned char type;    
+    unsigned char reserved[7];
+} FCGI_UnknownTypeBody;
+
+typedef struct {
+    FCGI_Header header;
+    FCGI_UnknownTypeBody body;
+} FCGI_UnknownTypeRecord;
+</PRE>
+      <P>
+      </P>
+      <H3>
+         <A NAME="S9">9. References</A>
+      </H3>
+      <P>
+         National Center for Supercomputer Applications, <A HREF="http://hoohoo.ncsa.uiuc.edu/cgi/">The Common Gateway
+         Interface</A>, version CGI/1.1.
+      </P>
+      <P>
+         D.R.T. Robinson, <A HREF="http://cgi-spec.golux.com/">The WWW
+         Common Gateway Interface Version 1.1</A>, Internet-Draft, 15 February 1996.
+      </P>
+      <P>
+      </P>
+      <H3>
+         <A NAME="SA">A. Table: Properties of the record types</A>
+      </H3>
+      <P>
+         The following chart lists all of the record types and indicates these properties of each:
+      </P>
+      <P>
+      </P>
+      <UL TYPE="square">
+         <LI>
+            <TT>WS-&gt;App</TT>: records of this type can only be sent by the Web server to the application. Records of
+            other types can only be sent by the application to the Web server.
+            <P>
+            </P>
+         </LI>
+         <LI>
+            <TT>management</TT>: records of this type contain information that is not specific to a Web server request,
+            and use the null request ID. Records of other types contain request-specific information, and cannot use
+            the null request ID.
+            <P>
+            </P>
+         </LI>
+         <LI>
+            <TT>stream</TT>: records of this type form a stream, terminated by a record with empty
+            <TT>contentData</TT>. Records of other types are discrete; each carries a meaningful unit of data.<BR>
+            <BR>
+         </LI>
+      </UL>
+<PRE>
+                               WS-&gt;App   management  stream
+
+        FCGI_GET_VALUES           x          x
+        FCGI_GET_VALUES_RESULT               x
+        FCGI_UNKNOWN_TYPE                    x
+
+        FCGI_BEGIN_REQUEST        x
+        FCGI_ABORT_REQUEST        x
+        FCGI_END_REQUEST
+        FCGI_PARAMS               x                    x
+        FCGI_STDIN                x                    x
+        FCGI_DATA                 x                    x
+        FCGI_STDOUT                                    x 
+        FCGI_STDERR                                    x     
+
+
+</PRE>
+      <P>
+      </P>
+      <H3>
+         <A NAME="SB">B. Typical Protocol Message Flow</A>
+      </H3>
+      <P>
+         Additional notational conventions for the examples:
+      </P>
+      <UL>
+         <LI>
+            The <TT>contentData</TT> of stream records (<TT>FCGI_PARAMS</TT>, <TT>FCGI_STDIN</TT>,
+            <TT>FCGI_STDOUT</TT>, and <TT>FCGI_STDERR</TT>) is represented as a character string. A string ending in
+            <TT>&quot; ... &quot;</TT> is too long to display, so only a prefix is shown.
+         </LI>
+         <LI>
+            Messages sent to the Web server are indented with respect to messages received from the Web server.
+         </LI>
+         <LI>
+            Messages are shown in the time sequence experienced by the application.
+         </LI>
+      </UL>
+      <P>
+         1. A simple request with no data on <TT>stdin</TT>, and a successful response:
+      </P>
+<PRE>
+{FCGI_BEGIN_REQUEST,   1, {FCGI_RESPONDER, 0}}
+{FCGI_PARAMS,          1, &quot;\013\002SERVER_PORT80\013\016SERVER_ADDR199.170.183.42 ... &quot;}
+{FCGI_PARAMS,          1, &quot;&quot;}
+{FCGI_STDIN,           1, &quot;&quot;}
+
+    {FCGI_STDOUT,      1, &quot;Content-type: text/html\r\n\r\n&lt;html&gt;\n&lt;head&gt; ... &quot;}
+    {FCGI_STDOUT,      1, &quot;&quot;}
+    {FCGI_END_REQUEST, 1, {0, FCGI_REQUEST_COMPLETE}}
+</PRE>
+      <P>
+         2. Similar to example 1, but this time with data on <TT>stdin</TT>. The Web server chooses to send the
+         parameters using more <TT>FCGI_PARAMS</TT> records than before:
+      </P>
+<PRE>
+{FCGI_BEGIN_REQUEST,   1, {FCGI_RESPONDER, 0}}
+{FCGI_PARAMS,          1, &quot;\013\002SERVER_PORT80\013\016SER&quot;}
+{FCGI_PARAMS,          1, &quot;VER_ADDR199.170.183.42 ... &quot;}
+{FCGI_PARAMS,          1, &quot;&quot;}
+{FCGI_STDIN,           1, &quot;quantity=100&amp;item=3047936&quot;}
+{FCGI_STDIN,           1, &quot;&quot;}
+
+    {FCGI_STDOUT,      1, &quot;Content-type: text/html\r\n\r\n&lt;html&gt;\n&lt;head&gt; ... &quot;}
+    {FCGI_STDOUT,      1, &quot;&quot;}
+    {FCGI_END_REQUEST, 1, {0, FCGI_REQUEST_COMPLETE}}
+</PRE>
+      <P>
+         3. Similar to example 1, but this time the application detects an error. The application logs a message to
+         <TT>stderr</TT>, returns a page to the client, and returns non-zero exit status to the Web server. The
+         application chooses to send the page using more <TT>FCGI_STDOUT</TT> records:
+      </P>
+<PRE>
+{FCGI_BEGIN_REQUEST,   1, {FCGI_RESPONDER, 0}}
+{FCGI_PARAMS,          1, &quot;\013\002SERVER_PORT80\013\016SERVER_ADDR199.170.183.42 ... &quot;}
+{FCGI_PARAMS,          1, &quot;&quot;}
+{FCGI_STDIN,           1, &quot;&quot;}
+
+    {FCGI_STDOUT,      1, &quot;Content-type: text/html\r\n\r\n&lt;ht&quot;}
+    {FCGI_STDERR,      1, &quot;config error: missing SI_UID\n&quot;}
+    {FCGI_STDOUT,      1, &quot;ml&gt;\n&lt;head&gt; ... &quot;}
+    {FCGI_STDOUT,      1, &quot;&quot;}
+    {FCGI_STDERR,      1, &quot;&quot;}
+    {FCGI_END_REQUEST, 1, {938, FCGI_REQUEST_COMPLETE}}
+</PRE>
+      <P>
+         4. Two instances of example 1, multiplexed onto a single connection. The first request is more difficult than
+         the second, so the application finishes the requests out of order:
+      </P>
+<PRE>
+{FCGI_BEGIN_REQUEST,   1, {FCGI_RESPONDER, FCGI_KEEP_CONN}}
+{FCGI_PARAMS,          1, &quot;\013\002SERVER_PORT80\013\016SERVER_ADDR199.170.183.42 ... &quot;}
+{FCGI_PARAMS,          1, &quot;&quot;}
+{FCGI_BEGIN_REQUEST,   2, {FCGI_RESPONDER, FCGI_KEEP_CONN}}
+{FCGI_PARAMS,          2, &quot;\013\002SERVER_PORT80\013\016SERVER_ADDR199.170.183.42 ... &quot;}
+{FCGI_STDIN,           1, &quot;&quot;}
+
+    {FCGI_STDOUT,      1, &quot;Content-type: text/html\r\n\r\n&quot;}
+
+{FCGI_PARAMS,          2, &quot;&quot;}
+{FCGI_STDIN,           2, &quot;&quot;}
+
+    {FCGI_STDOUT,      2, &quot;Content-type: text/html\r\n\r\n&lt;html&gt;\n&lt;head&gt; ... &quot;}
+    {FCGI_STDOUT,      2, &quot;&quot;}
+    {FCGI_END_REQUEST, 2, {0, FCGI_REQUEST_COMPLETE}}
+    {FCGI_STDOUT,      1, &quot;&lt;html&gt;\n&lt;head&gt; ... &quot;}
+    {FCGI_STDOUT,      1, &quot;&quot;}
+    {FCGI_END_REQUEST, 1, {0, FCGI_REQUEST_COMPLETE}}
+</PRE>
+      <P>
+      </P>
+      <HR>
+      <ADDRESS>
+         &copy; 1995, 1996 Open Market, Inc. / mbrown@openmarket.com
+      </ADDRESS>
+   </BODY>
+</HTML>
+

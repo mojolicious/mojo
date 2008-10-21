@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2008, Sebastian Riedel.
+
+use strict;
+use warnings;
+
+use Cwd 'getcwd';
+use File::Spec;
+use FindBin;
+
+# Dist
+use lib "$FindBin::Bin/lib";
+use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/../../lib";
+
+# App
+use lib join '/', File::Spec->splitdir(getcwd);
+
+# Check if Mojo is installed
+eval 'use Mojo::Scripts';
+if ($@) {
+    print <<EOF;
+It looks like you don't have the Mojo Framework installed.
+Please visit http://getmojo.kraih.com for detailed installation instructions.
+
+EOF
+    exit;
+}
+
+# Start the script system
+my $scripts = Mojo::Scripts->new;
+$scripts->run(@ARGV);

@@ -1,0 +1,24 @@
+*** IMPORTANT
+
+- Mojo::JSON needs to be written.
+
+- MojoX::Log needs to be written.
+
+- MojoX::Cache needs to be written.
+
+- MojoX::Session needs to be written.
+
+*** IDEAS
+
+- The ability to add more content handlers and filters besides
+  Mojo::Content::Multipart and Mojo::Filter::Chunked might be interesting.
+  (Would be a good sponsored project i guess)
+
+*** THE USUAL STUFF THAT WILL BE ON THIS LIST FOREVER BECAUSE YOU CAN'T HAVE
+    ENOUGH OF IT :)
+
+- A lot of code needs to be cleaned.
+
+- Tons of RFC spec tests need to be written.
+
+- Documentation.

@@ -1,0 +1,41 @@
+This file documents the revision history for Perl extension Mojo.
+
+0.8     2008-10-21 00:00:00
+        - Generated applications now have individually named executables.
+        - Cleaned up Mojo::Home.
+        - Changed Mojolicious default application templates to something more
+          sane.
+        - Removed warning from Mojo.pm.
+        - Fixed documentation links.
+        - Fixed some typos.
+
+0.7     2008-10-11 00:00:00
+        - Added the Mojolicious Web Framework example.
+        - Added upload and GET/POST parameter helpers to Mojo::Message.
+        - Hooks for upload progress and stuff added.
+        - Refactored transfer encoding code into Mojo::Filter and
+          Mojo::Filter::Chunked.
+        - Added callbacks for start line and header generators.
+        - Added workaround for missing IO::Seekable support in older
+          versions of File::Temp (Perl 5.8).
+        - script/mojo.pl got renamed to bin/mojo.
+        - Mojo::Cache got renamed to Mojo::File because there will be a cache
+          module named MojoX::Cache, and that could cause confusion later on.
+        - Fixed many escaping related bugs around Mojo::URL.
+        - Fixed 100-Continue support in Mojo::Server::Daemon and Mojo::Client.
+        - Countless small bugs fixed and tests added.
+
+0.6     2008-09-24 00:00:00
+        - Many more bugfixes.
+
+0.5     2008-09-24 00:00:00
+        - Many small bugfixes.
+
+0.4     2008-09-24 00:00:00
+        - Moved everything into the Mojo namespace.
+
+0.3     2008-09-24 00:00:00
+        - Fixed documentation.
+
+0.2     2008-09-24 00:00:00
+        - First release.

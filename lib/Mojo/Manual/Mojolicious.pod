@@ -9,4 +9,27 @@ Mojo::Manual::Mojolicious - Mojolicious
 This was supposed to be written as part of a Perl Foundation grant,
 sadly the Perl Foundation didn't have the money to sponsor it.
 
+=head1 ROUTES
+
+A simple route mapping "/foo" to Example::test.
+
+    $r->route('/foo')->to(controller => 'example', action => 'test');
+
+You can use placeholders in the pattern and the values will be passed along.
+
+    $r->route('/:test/:action')->to(controller => 'example');
+
+Routes can be nested to factor out repetitive code.
+
+    my $x = $r->route('/test');
+
+    $x->route('/foo')->to(controller => 'example', action => 'test1');
+    $x->route('/bar/:action')->to(controller => 'example2');
+    $x->route('/:(action)-:(id)')->to(controller => 'example3');
+
+Use regular expressions to match more specific.
+
+    $r->route('/:controller/:action/:id', id => qr/\d+/)
+      ->to(controller => 'example');
+
 =cut

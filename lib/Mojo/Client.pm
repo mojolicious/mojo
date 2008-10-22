@@ -43,11 +43,8 @@ sub connect {
             Type  => SOCK_STREAM
         );
 
-        # Windows
-        if ($^O eq 'MSWin32') { ioctl($connection, 0x8004667e, 1) }
-
-        # Sane OS
-        else { $connection->blocking(0) }
+        # Non blocking if we are on a real operating system
+        $connection->blocking(0) unless $^O eq 'MSWin32';
 
         my $address = sockaddr_in($port, scalar inet_aton($host));
         $connection->connect($address);

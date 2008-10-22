@@ -41,8 +41,8 @@ sub listen {
         Reuse     => 1
     ) or croak "Can't create listen socket: $!";
 
-    # Make socket non blocking
-    $self->_unblock_socket($self->{listen});
+    # Non blocking if we are on a real operating system
+    $self->{listen}->blocking(0) unless $^O eq 'MSWin32';
 
     # Friendly message
     print "Server available at http://127.0.0.1:$port.\n";
@@ -99,7 +99,7 @@ sub _prepare_connections {
         }
 
         # Connected
-        $self->_unblock_socket($accept->{socket});
+        $accept->{socket}->blocking(0) unless $^O eq 'MSWin32';
         next unless my $name = $self->_socket_name($accept->{socket});
         $self->{_connections}->{$name} = $accept;
     }
@@ -293,18 +293,6 @@ sub _socket_name {
     my ($self, $s) = @_;
     return undef unless $s->connected;
     return join ':', $s->sockaddr, $s->sockport, $s->peeraddr, $s->peerport;
-}
-
-sub _unblock_socket {
-    my ($self, $socket) = @_;
-
-    # Windows
-    if ($^O eq 'MSWin32') { ioctl($socket, 0x8004667e, 1) }
-
-    # Sane OS
-    else { $socket->blocking(0) }
-
-    return $socket;
 }
 
 sub _write {

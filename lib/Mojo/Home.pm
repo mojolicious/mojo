@@ -74,7 +74,7 @@ sub detect {
     my $path;
     my @base = File::Spec->splitdir($FindBin::Bin);
     my @uplevel;
-    for my (1 .. 5) {
+    for (1 .. 5) {
         push @uplevel, '..';
 
         # executable in bin directory

@@ -73,14 +73,16 @@ sub detect {
     # Try to find executable from t directory
     my $path;
     my @base = File::Spec->splitdir($FindBin::Bin);
-    for my $i (1 .. 5) {
+    my @uplevel;
+    for my (1 .. 5) {
+        push @uplevel, '..';
 
         # executable in bin directory
-        $path = File::Spec->catfile(@base, '..' x $i, 'bin', $name);
+        $path = File::Spec->catfile(@base, @uplevel, 'bin', $name);
         last if -f $path;
 
         # "mojo" in bin directory
-        $path = File::Spec->catfile(@base, '..' x $i, 'bin', 'mojo');
+        $path = File::Spec->catfile(@base, @uplevel, 'bin', 'mojo');
         last if -f $path;
     }
 

@@ -27,5 +27,4 @@ my $original = File::Spec->catdir(
     File::Spec->splitdir($FindBin::Bin), '..', '..'
 );
 $home = Mojo::Home->new;
-warn "HOME: $home\nORIG: $original\n";
 is(Cwd::realpath($original), Cwd::realpath("$home"));

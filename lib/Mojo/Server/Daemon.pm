@@ -38,7 +38,9 @@ sub listen {
     $self->{listen} ||= IO::Socket::INET->new(
         Listen    => $self->listen_queue_size,
         LocalPort => $port,
-        Reuse     => 1
+        Proto     => 'tcp',
+        ReuseAddr => 1,
+        Type      => SOCK_STREAM
     ) or croak "Can't create listen socket: $!";
 
     # Non blocking if we are on a real operating system

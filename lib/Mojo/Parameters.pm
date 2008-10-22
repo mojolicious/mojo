@@ -225,7 +225,7 @@ the following new ones.
 
 =head2 C<parameter>
 
-    my $foo = $params->params('foo');
+    my $foo = $params->param('foo');
     my $foo = $params->parameter('foo');
     my $foo = $params->parameter(foo => 'ba;r');
 

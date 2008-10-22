@@ -33,13 +33,9 @@ sub accept_unlock { return 1 }
 sub listen {
     my $self = shift;
 
-    # Windows doesn't support non blocking open
-    my $blocking = $^O eq 'MSWin32' ? 1 : 0;
-
     # Create socket
     my $port = $self->port;
     $self->{listen} ||= IO::Socket::INET->new(
-        Blocking  => $blocking,
         Listen    => $self->listen_queue_size,
         LocalPort => $port,
         Reuse     => 1

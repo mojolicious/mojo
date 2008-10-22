@@ -101,6 +101,9 @@ sub parent { shift->listen }
 sub run {
     my $self = shift;
 
+    # No windows support
+    die "Prefork daemon not available for Windows.\n" if $^O eq 'MSWin32';
+
     # Pipe for child communication
     pipe($self->{_child_read}, $self->{_child_write})
       or croak "Can't create pipe: $!";

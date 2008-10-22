@@ -42,7 +42,13 @@ sub connect {
             Proto => 'tcp',
             Type  => SOCK_STREAM
         );
-        $connection->blocking(0);
+
+        # Windows
+        if ($^O eq 'MSWin32') { ioctl($connection, 0x8004667e, 1) }
+
+        # Sane OS
+        else { $connection->blocking(0) }
+
         my $address = sockaddr_in($port, scalar inet_aton($host));
         $connection->connect($address);
         $tx->{connect_timeout} = time + 5;

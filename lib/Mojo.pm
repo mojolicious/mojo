@@ -67,7 +67,7 @@ new ones.
 
 =head2 Web
 
-    http://getmojo.kraih.com
+    http://mojolicious.org
 
 =head2 IRC
 

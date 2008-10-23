@@ -22,7 +22,7 @@ eval 'use Mojo::Scripts';
 if ($@) {
     print <<EOF;
 It looks like you don't have the Mojo Framework installed.
-Please visit http://getmojo.kraih.com for detailed installation instructions.
+Please visit http://mojolicious.org for detailed installation instructions.
 
 EOF
     exit;

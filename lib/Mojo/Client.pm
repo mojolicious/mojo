@@ -391,7 +391,9 @@ sub withdraw_connection {
 
 sub _socket_name {
     my ($self, $s) = @_;
-    return join ':', $s->sockhost, $s->sockport, $s->peerhost, $s->peerport;
+    my $n = join ':', $s->sockhost, $s->sockport, $s->peerhost, $s->peerport;
+    $n =~ s/[^\w]/x/gi;
+    return $n;
 }
 
 1;

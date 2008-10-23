@@ -392,7 +392,10 @@ sub withdraw_connection {
 sub _socket_name {
     my ($self, $s) = @_;
     my $n = join ':', $s->sockaddr, $s->sockport, $s->peeraddr, $s->peerport;
+
+    # Temporary workaround for win32 weirdness
     $n =~ s/[^\w]/x/gi;
+
     return $n;
 }
 

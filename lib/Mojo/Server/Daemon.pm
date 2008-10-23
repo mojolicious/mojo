@@ -293,9 +293,15 @@ sub _read {
 
 sub _socket_name {
     my ($self, $s) = @_;
+
+    # Connected?
     return undef unless $s->connected;
+
     my $n = join ':', $s->sockaddr, $s->sockport, $s->peeraddr, $s->peerport;
+
+    # Temporary workaround for win32 weirdness
     $n =~ s/[^\w]/x/gi;
+
     return $n;
 }
 

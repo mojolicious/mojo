@@ -111,6 +111,21 @@ L<Mojo::Server> is a server base class.
         return Mojo::Transaction->new;
     });
 
+=head2 C<continue_handler_cb>
+
+=head2 C<continue_handler_callback>
+
+    my $handler = $server->continue_handler_cb;
+    $server     = $server->continue_handler_cb(sub {
+        my ($self, $tx) = @_;
+        return $tx;
+    });
+    my $handler = $server->continue_handler_callback;
+    $server     = $server->continue_handler_callback(sub {
+        my ($self, $tx) = @_;
+        return $tx;
+    });
+
 =head2 C<handler_cb>
 
 =head2 C<handler_callback>

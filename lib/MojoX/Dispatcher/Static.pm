@@ -108,7 +108,7 @@ implements the follwing the ones.
 
     $dispatcher = $dispatcher->dispatch($tx);
 
-=head2 C<server>
+=head2 C<serve>
 
     $dispatcher = $dispatcher->serve($tx, '/foo/bar.html');
 

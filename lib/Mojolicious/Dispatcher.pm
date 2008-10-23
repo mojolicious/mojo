@@ -51,7 +51,21 @@ L<Mojolicous::Dispatcher> is the default L<Mojolicious> dispatcher.
 =head1 ATTRIBUTES
 
 L<Mojolicious::Dispatcher> inherits all attributes from
-L<MojoX::Dispatcher::Routes>.
+L<MojoX::Dispatcher::Routes> and implements the following new ones.
+
+=head2 C<method>
+
+    my $method  = $dispatcher->method;
+    $dispatcher = $dispatcher->method(qr/GET|POST/);
+
+=head2 C<ua>
+
+=head2 C<user_agent>
+
+    my $ua      = $dispatcher->ua;
+    my $ua      = $dispatcher->user_agent;
+    $dispatcher = $dispatcher->ua(qr/GET|POST/);
+    $dispatcher = $dispatcher->user_agent(qr/GET|POST/);
 
 =head1 METHODS
 

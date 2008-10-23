@@ -74,7 +74,11 @@ L<Mojo::Script>.
 =head1 METHODS
 
 L<Mojolicious::Script::Generate::App> inherits all methods from
-L<Mojo::Script>.
+L<Mojo::Script> and implements the following new ones.
+
+=head2 C<run>
+
+    $app->run(@ARGV);
 
 =cut
 

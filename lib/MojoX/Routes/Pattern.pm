@@ -325,6 +325,12 @@ L<MojoX::Routes::Pattern> is a route pattern container.
 L<MojoX::Routes::Pattern> inherits all methods from L<Mojo::Base> and
 implements the follwing the ones.
 
+=head2 C<new>
+
+    my $pattern = MojoX::Routes::Pattern->new('/:controller/:action',
+        action => qr/\w+/
+    );
+
 =head2 C<match>
 
     my $result = $pattern->match('/foo/bar');

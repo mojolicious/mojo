@@ -43,8 +43,8 @@ sub listen {
         Type      => SOCK_STREAM
     ) or croak "Can't create listen socket: $!";
 
-    # Non blocking if we are on a real operating system
-    $self->{listen}->blocking(0) unless $^O eq 'MSWin32';
+    # Non blocking
+    $self->{listen}->blocking(0);
 
     # Friendly message
     print "Server available at http://127.0.0.1:$port.\n";
@@ -101,7 +101,7 @@ sub _prepare_connections {
         }
 
         # Connected
-        $accept->{socket}->blocking(0) unless $^O eq 'MSWin32';
+        $accept->{socket}->blocking(0);
         next unless my $name = $self->_socket_name($accept->{socket});
         $self->{_connections}->{$name} = $accept;
     }
@@ -294,7 +294,9 @@ sub _read {
 sub _socket_name {
     my ($self, $s) = @_;
     return undef unless $s->connected;
-    return join ':', $s->sockaddr, $s->sockport, $s->peeraddr, $s->peerport;
+    my $n = join ':', $s->sockaddr, $s->sockport, $s->peeraddr, $s->peerport;
+    $n =~ s/[^\w]/x/gi;
+    return $n;
 }
 
 sub _write {

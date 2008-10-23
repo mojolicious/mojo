@@ -43,8 +43,8 @@ sub connect {
             Type  => SOCK_STREAM
         );
 
-        # Non blocking if we are on a real operating system
-        $connection->blocking(0) unless $^O eq 'MSWin32';
+        # Non blocking
+        $connection->blocking(0);
 
         my $address = sockaddr_in($port, scalar inet_aton($host));
         $connection->connect($address);
@@ -185,7 +185,7 @@ sub spin {
         }
 
         # Map
-        my $name = $tx->connection->sockaddr . ':' . $tx->connection->sockport;
+        my $name = $self->_socket_name($tx->connection);
         $transaction{$name} = $tx;
 
         # Request start line written
@@ -277,7 +277,7 @@ sub spin {
     # Read
     if (@$read) {
         my $connection = $read->[0];
-        my $name = $connection->sockaddr . ':' . $connection->sockport;
+        my $name = $self->_socket_name($connection);
         my $tx = $transaction{$name};
         my $res = $tx->res;
 
@@ -326,7 +326,7 @@ sub spin {
         # Check for content
         for my $connection (@$write) {
 
-            my $name = $connection->sockaddr . ':' . $connection->sockport;
+            my $name = $self->_socket_name($connection);
             $tx = $transaction{$name};
             $req = $tx->req;
 
@@ -387,6 +387,13 @@ sub withdraw_connection {
 
     $self->{_connections} = \@connections;
     return $result;
+}
+
+sub _socket_name {
+    my ($self, $s) = @_;
+    my $n = join ':', $s->sockaddr, $s->sockport, $s->peeraddr, $s->peerport;
+    $n =~ s/[^\w]/x/gi;
+    return $n;
 }
 
 1;

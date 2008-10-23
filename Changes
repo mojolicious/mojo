@@ -6,6 +6,7 @@ This file documents the revision history for Perl extension Mojo.
         - Cleaned up Mojo::Home.
         - Changed Mojolicious default application templates to something more
           sane.
+        - Fixed many win32 related bugs.
         - Removed warning from Mojo.pm.
         - Fixed documentation links.
         - Fixed some typos.

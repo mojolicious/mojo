@@ -294,7 +294,7 @@ sub _read {
 sub _socket_name {
     my ($self, $s) = @_;
     return undef unless $s->connected;
-    my $n = join ':', $s->sockhost, $s->sockport, $s->peerhost, $s->peerport;
+    my $n = join ':', $s->sockaddr, $s->sockport, $s->peeraddr, $s->peerport;
     $n =~ s/[^\w]/x/gi;
     return $n;
 }

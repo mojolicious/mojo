@@ -55,6 +55,16 @@ sub connect {
     $tx->connection($connection);
     $tx->state('connect');
 
+    # Connection header
+    unless ($req->headers->connection) {
+        if ($tx->keep_alive || $tx->kept_alive) {
+            $req->headers->connection('Keep-Alive');
+        }
+        else {
+            $req->headers->connection('Close');
+        }
+    }
+
     # We identify ourself
     my $version = $Mojo::VERSION;
     $req->headers->user_agent(

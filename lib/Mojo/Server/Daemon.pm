@@ -186,6 +186,16 @@ sub _prepare_transactions {
         # Writing
         if ($tx->is_state('write')) {
 
+            # Connection header
+            unless ($tx->res->headers->connection) {
+                if ($tx->keep_alive) {
+                    $tx->res->headers->connection('Keep-Alive');
+                }
+                else {
+                    $tx->res->headers->connection('Close');
+                }
+            }
+
             # Ready for next state
             $tx->state('write_start_line');
             $tx->{_to_write} = $tx->res->start_line_length;
@@ -253,7 +263,7 @@ sub _read {
         $tx->kept_alive(1) if $connection->{requests} > 1;
 
         # Last keep alive request?
-        $tx->res->headers->connection('close')
+        $tx->res->headers->connection('Close')
           if $connection->{requests} >= $self->max_keep_alive_requests;
     }
 

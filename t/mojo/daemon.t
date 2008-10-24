@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 15;
 
 use Mojo::Client;
 use Mojo::Transaction;
@@ -32,6 +32,7 @@ $tx->req->body('Hello Mojo!');
 $client->process_all($tx);
 is($tx->res->code, 200);
 is($tx->continued, 1);
+like($tx->res->headers->connection, qr/Keep-Alive/i);
 like($tx->res->body, qr/Mojo is working/);
 
 # Second keep alive request
@@ -39,6 +40,7 @@ $tx = Mojo::Transaction->new_get("http://127.0.0.1:$port/");
 $client->process_all($tx);
 is($tx->res->code, 200);
 is($tx->kept_alive, 1);
+like($tx->res->headers->connection, qr/Keep-Alive/i);
 like($tx->res->body, qr/Mojo is working/);
 
 # Third keep alive request
@@ -46,6 +48,7 @@ $tx = Mojo::Transaction->new_get("http://127.0.0.1:$port/");
 $client->process_all($tx);
 is($tx->res->code, 200);
 is($tx->kept_alive, 1);
+like($tx->res->headers->connection, qr/Keep-Alive/i);
 like($tx->res->body, qr/Mojo is working/);
 
 # Stop

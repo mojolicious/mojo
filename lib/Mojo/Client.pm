@@ -35,6 +35,7 @@ sub connect {
 
     # Try to get a cached connection
     my $connection = $self->withdraw_connection("$host:$port");
+    $tx->kept_alive(1) if $connection;
 
     # Non blocking connect
     unless ($connection) {

@@ -250,6 +250,7 @@ sub _read {
         $tx->connection($socket);
         $tx->state('read');
         $connection->{requests}++;
+        $tx->kept_alive(1) if $connection->{requests} > 1;
 
         # Last keep alive request?
         $tx->res->headers->connection('close')

@@ -10,7 +10,7 @@ use base 'Mojo::Stateful';
 use Mojo::Message::Request;
 use Mojo::Message::Response;
 
-__PACKAGE__->attr([qw/continued connection/], chained => 1);
+__PACKAGE__->attr([qw/continued connection kept_alive/], chained => 1);
 __PACKAGE__->attr('request',
     chained => 1,
     default => sub { Mojo::Message::Request->new }
@@ -125,6 +125,11 @@ implements the following new ones.
 
     my $keep_alive = $tx->keep_alive;
     my $keep_alive = $tx->keep_alive(1);
+
+=head2 C<kept_alive>
+
+    my $kept_alive = $tx->kept_alive;
+    my $kept_alive = $tx->kept_alive(1);
 
 =head2 C<req>
 

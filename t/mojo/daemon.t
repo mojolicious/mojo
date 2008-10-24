@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More tests => 12;
 
 use Mojo::Client;
 use Mojo::Transaction;
@@ -19,17 +19,33 @@ use_ok('Mojo::Server::Daemon');
 my $server = Test::Mojo::Server->new;
 $server->start_daemon_ok;
 
-# 100 Continue request
 my $port = $server->port;
+
+my $client = Mojo::Client->new;
+$client->continue_timeout(60);
+
+# 100 Continue request
 my $tx = Mojo::Transaction->new_get("http://127.0.0.1:$port/",
     Expect => '100-continue'
 );
 $tx->req->body('Hello Mojo!');
-my $client = Mojo::Client->new;
-$client->continue_timeout(60);
 $client->process_all($tx);
 is($tx->res->code, 200);
 is($tx->continued, 1);
+like($tx->res->body, qr/Mojo is working/);
+
+# Second keep alive request
+$tx = Mojo::Transaction->new_get("http://127.0.0.1:$port/");
+$client->process_all($tx);
+is($tx->res->code, 200);
+is($tx->kept_alive, 1);
+like($tx->res->body, qr/Mojo is working/);
+
+# Third keep alive request
+$tx = Mojo::Transaction->new_get("http://127.0.0.1:$port/");
+$client->process_all($tx);
+is($tx->res->code, 200);
+is($tx->kept_alive, 1);
 like($tx->res->body, qr/Mojo is working/);
 
 # Stop

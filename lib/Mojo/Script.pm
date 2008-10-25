@@ -52,7 +52,7 @@ sub chmod_relative_file {
     $path = $self->relative_file($path);
 
     # chmod
-    $self->chmod_file($path);
+    $self->chmod_file($path, $mod);
 }
 
 sub class_to_file {

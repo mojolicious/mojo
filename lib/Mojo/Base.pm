@@ -16,7 +16,7 @@ sub new {
 
     # Check attributes
     my $attrs;
-    if ($_[1]) {
+    if (exists $_[1]) {
         my %attrs = (@_);
         $attrs = \%attrs;
     }
@@ -51,7 +51,7 @@ sub attr {
 
     # Check options
     my $options;
-    if ($_[1]) {
+    if (exists $_[1]) {
         my %options = (@_);
         $options = \%options;
     }
@@ -84,7 +84,7 @@ sub attr {
 
         # No arguments
         $code .= "${ws}if (\@_ == 0) {\n";
-        unless ($default) {
+        unless (defined $default) {
 
             # Return value
             $code .= "$ws${ws}return \$self->{'$attr'};\n";
@@ -93,7 +93,7 @@ sub attr {
 
             # Return value
             $code .= "$ws${ws}return \$self->{'$attr'} ";
-            $code .= "if defined \$self->{'$attr'};\n";
+            $code .= "if exists \$self->{'$attr'};\n";
 
             # Return default value
             $code .= "$ws${ws}return \$self->{'$attr'} = ";

@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 502;
+use Test::More tests => 505;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -31,6 +31,13 @@ for my $i (51 .. 100) {
     is($monkeys->[$i]->bananas, $i);
 }
 my $y = 1;
+
+# "default" defined but false
+my $m = $monkeys->[1];
+ok(defined($m->figs));
+is($m->figs, 0);
+$m->figs(5);
+is($m->figs, 5);
 
 # "default", "filter" support
 for my $i (101 .. 150) {

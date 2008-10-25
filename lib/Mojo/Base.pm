@@ -76,7 +76,8 @@ sub attr {
     my $ws = '    ';
     for my $attr (@$attrs) {
 
-        Carp::croak("Attribute '$attr' invalid") unless $attr =~ /^\w+$/;
+        Carp::croak("Attribute '$attr' invalid")
+          unless $attr =~ /^[a-zA-Z_]\w*$/;
 
         # Header
         my $code = "sub {\n";

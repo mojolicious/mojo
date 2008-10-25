@@ -422,7 +422,7 @@ Mojo::Client - Client
     use Mojo::Client;
     use Mojo::Transaction;
 
-    my $tx = Mojo::Transacrtion->new;
+    my $tx = Mojo::Transaction->new;
     $tx->req->method('GET');
     $tx->req->url->parse('http://cpan.org');
 

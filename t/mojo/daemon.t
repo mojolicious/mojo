@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 15;
+use Test::More tests => 16;
 
 use Mojo::Client;
 use Mojo::Transaction;
@@ -14,6 +14,12 @@ use Test::Mojo::Server;
 # Daddy, I'm scared. Too scared to even wet my pants.
 # Just relax and it'll come, son.
 use_ok('Mojo::Server::Daemon');
+
+# Test sane Mojo::Server subclassing capabilities
+my $daemon = Mojo::Server::Daemon->new;
+my $size = $daemon->listen_queue_size;
+$daemon = Mojo::Server::Daemon->new(listen_queue_size => $size + 10);
+is($daemon->listen_queue_size, $size + 10);
 
 # Start
 my $server = Test::Mojo::Server->new;

@@ -53,7 +53,7 @@ __PACKAGE__->attr('handler_callback',
 *handler_cb          = \&handler_callback;
 
 sub new {
-    my $self = shift->SUPER::new();
+    my $self = shift->SUPER::new(@_);
     $self->_new_mojo_app;
     return $self;
 }

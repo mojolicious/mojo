@@ -60,7 +60,7 @@ $file->close;
 push @INC, $dir;
 require MojoTestReloader;
 is(MojoTestReloader::test(), 23);
-sleep 1;
+sleep 2;
 $file->open("> $path");
 $file->syswrite("package MojoTestReloader;\nsub test { 26 }\n1;");
 $file->close;

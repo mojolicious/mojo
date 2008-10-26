@@ -10,6 +10,7 @@ use bytes;
 
 use Mojo::Buffer;
 use Mojo::Filter::Chunked;
+use Mojo::File;
 use Mojo::File::Memory;
 use Mojo::Content::MultiPart;
 use Mojo::Headers;
@@ -32,7 +33,8 @@ __PACKAGE__->attr('headers',
     chained => 1,
     default => sub { Mojo::Headers->new }
 );
-__PACKAGE__->attr('raw_header_length', default => sub { 0 });
+__PACKAGE__->attr('max_memory_size', chained => 1, default => 10240);
+__PACKAGE__->attr('raw_header_length', chained => 1, default => sub { 0 });
 
 *build_body_cb    = \&build_body_callback;
 *build_headers_cb = \&build_headers_callback;
@@ -212,6 +214,12 @@ sub _parse_headers {
     my $raw_length = $self->headers->buffer->raw_length;
     my $raw_header_length =  $raw_length - $length;
     $self->raw_header_length($raw_header_length);
+
+    # Make sure we don't waste memory
+    $self->file(Mojo::File->new)
+      if !$self->headers->content_length
+      || $self->headers->content_length > $self->max_memory_size;
+
     $self->state('body') if $self->headers->is_state('done');
 }
 
@@ -295,6 +303,11 @@ implements the following new ones.
 
     my $headers = $content->headers;
     $content    = $content->headers(Mojo::Headers->new);
+
+=head2 C<max_memory_size>
+
+    my $size = $content->max_memory_size;
+    $content = $content->max_memory_size(10240);
 
 =head2 C<parse_body_cb>
 

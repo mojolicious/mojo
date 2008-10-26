@@ -71,7 +71,7 @@ new ones.
 
 =head2 IRC
 
-    #mojo on irc.freenode.org
+    #mojo on irc.perl.org
 
 =head2 Mailing-List
 

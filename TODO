@@ -1,12 +1,6 @@
 *** IMPORTANT
 
-- Mojo::JSON needs to be written.
-
-- MojoX::Log needs to be written.
-
-- MojoX::Cache needs to be written.
-
-- MojoX::Session needs to be written.
+All done for now.
 
 *** IDEAS
 

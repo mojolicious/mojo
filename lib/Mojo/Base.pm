@@ -202,7 +202,7 @@ for object oriented Perl programming.
 
 Main design goals are minimalism and staying out of your way.
 
-The syntax is a bit like L<Moose> or Ruby and the performance close to
+The syntax is a bit like L<Moose> or Ruby and the performance better than
 L<Class::Accessor::Fast>.
 (Note that L<Mojo::Base> was never meant as a replacement for L<Moose>, both
 are solutions to completely different problems.)

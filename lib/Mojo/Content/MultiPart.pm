@@ -206,9 +206,7 @@ sub _parse_multipart_boundary {
     # Begin
     if (index($self->buffer->{buffer}, "\x0d\x0a--$boundary\x0d\x0a") == 0) {
         substr $self->buffer->{buffer}, 0, length($boundary) + 6, '';
-        push @{$self->parts}, Mojo::Content->new->max_memory_size(
-            $self->max_memory_size
-        );
+        push @{$self->parts}, Mojo::Content->new;
         $self->state('multipart_body');
         return 1;
     }

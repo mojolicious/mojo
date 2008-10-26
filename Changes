@@ -6,6 +6,7 @@ This file documents the revision history for Perl extension Mojo.
         - Cleaned up Mojo::Home.
         - Changed Mojolicious default application templates to something more
           sane.
+        - Added MOJO_MAX_MEMORY_SIZE environment variable.
         - Fixed many win32 related bugs.
         - Fixed keep alive related bugs in daemon and client. (Pedro Melo)
         - Allow default in Mojo::Base to have false values. (Pedro Melo)

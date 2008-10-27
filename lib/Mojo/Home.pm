@@ -64,7 +64,7 @@ sub detect {
             pop @home while $home[-1] =~ /^b?lib$/ || $home[-1] eq '';
 
             # Check for executable
-            return $self->parts(@home)
+            return $self->parts(\@home)
               if -f File::Spec->catfile(@home, 'bin', $name)
               || -f File::Spec->catfile(@home, 'bin', 'mojo');
         }

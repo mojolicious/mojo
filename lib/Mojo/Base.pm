@@ -81,66 +81,48 @@ sub attr {
 
         # Header
         my $code = "sub {\n";
-        $code .= "${ws}my \$self = shift;\n";
 
-        # No arguments
-        $code .= "${ws}if (\@_ == 0) {\n";
+        # No value
+        $code .= "${ws}if (\@_ == 1) {\n";
         unless (defined $default) {
 
             # Return value
-            $code .= "$ws${ws}return \$self->{'$attr'};\n";
+            $code .= "$ws${ws}return \$_[0]->{'$attr'};\n";
         }
         else {
 
             # Return value
-            $code .= "$ws${ws}return \$self->{'$attr'} ";
-            $code .= "if exists \$self->{'$attr'};\n";
+            $code .= "$ws${ws}return \$_[0]->{'$attr'} ";
+            $code .= "if exists \$_[0]->{'$attr'};\n";
 
             # Return default value
-            $code .= "$ws${ws}return \$self->{'$attr'} = ";
+            $code .= "$ws${ws}return \$_[0]->{'$attr'} = ";
             $code .= ref $default eq 'CODE'
-              ? '$default->($self)'
+              ? '$default->($_[0])'
               : '$default';
             $code .= ";\n";
         }
         $code .= "$ws}\n";
 
-        # Single argument
-        $code .= "${ws}elsif (\@_ == 1) { \n";
+        # Value
         if ($filter) {
 
             # Filter and store argument
-            $code .= "$ws${ws}local \$_ = \$_[0];\n";
-            $code .= "$ws$ws\$self->{'$attr'} = \$filter->(\$self, \$_);\n";
+            $code .= "${ws}local \$_ = \$_[1];\n";
+            $code .= "$ws\$_[0]->{'$attr'} = \$filter->(\$_[0], \$_);\n";
         }
         else {
 
             # Store argument
-            $code .= "$ws$ws\$self->{'$attr'} = \$_[0];\n";
+            $code .= "$ws\$_[0]->{'$attr'} = \$_[1];\n";
         }
-        $code .= "$ws}\n";
-
-        # Multiple arguments
-        $code .= "${ws}else {\n";
-        if ($filter) {
-
-            # Filter and store arguments
-            $code .= "$ws${ws}local \$_ = \\\@_;\n";
-            $code .= "$ws$ws\$self->{'$attr'} = \$filter->(\$self, \$_);\n";
-        }
-        else {
-
-            # Store arguments
-            $code .= "$ws$ws\$self->{'$attr'} = \\\@_;\n";
-        }
-        $code .= "$ws}\n";
 
         # Weaken
-        $code .= "${ws}Scalar::Util::weaken(\$self->{'$attr'});\n" if $weak;
+        $code .= "${ws}Scalar::Util::weaken(\$_[0]->{'$attr'});\n" if $weak;
 
         # Return value or instance for chained
         $code .= "${ws}return ";
-        $code .= $chained ? '$self' : "\$self->{'$attr'}";
+        $code .= $chained ? '$_[0]' : "\$_[0]->{'$attr'}";
         $code .= ";\n";
 
         # Footer

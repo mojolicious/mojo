@@ -14,6 +14,13 @@ require Scalar::Util;
 sub new {
     my $proto = shift;
 
+    # Create instance
+    my $class = ref $proto || $proto;
+    my $self = bless {}, $class;
+
+    # Shortcut
+    return $self unless @_;
+
     # Check attributes
     my $attrs;
     if (exists $_[1]) {
@@ -22,10 +29,6 @@ sub new {
     }
     else { $attrs = $_[0] }
     $attrs ||= {};
-
-    # Create instance
-    my $class = ref $proto || $proto;
-    my $self = bless {}, $class;
 
     # Attributes
     for my $attr (keys %$attrs) {

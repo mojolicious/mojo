@@ -113,17 +113,26 @@ sub attr {
         }
         else {
 
-            # Store argument
-            $code .= "$ws\$_[0]->{'$attr'} = \$_[1];\n";
+            # Store argument optimized
+            if (!$weak && !$chained) {
+                $code .= "${ws}return \$_[0]->{'$attr'} = \$_[1];\n";
+            }
+
+            # Store argument the old way
+            else {
+                $code .= "$ws\$_[0]->{'$attr'} = \$_[1];\n";
+            }
         }
 
         # Weaken
         $code .= "${ws}Scalar::Util::weaken(\$_[0]->{'$attr'});\n" if $weak;
 
-        # Return value or instance for chained
-        $code .= "${ws}return ";
-        $code .= $chained ? '$_[0]' : "\$_[0]->{'$attr'}";
-        $code .= ";\n";
+        # Return value or instance for chained/weak
+        if ($chained || $weak) {
+            $code .= "${ws}return ";
+            $code .= $chained ? '$_[0]' : "\$_[0]->{'$attr'}";
+            $code .= ";\n";
+        }
 
         # Footer
         $code .= '};';

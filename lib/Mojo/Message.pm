@@ -151,9 +151,8 @@ sub fix_headers {
     my $self = shift;
 
     # Content-Length header is required in HTTP 1.0 messages
-    my $length = $self->body_length;
-    if ($self->is_version('1.0') && !$self->is_chunked && $length) {
-        $self->headers->content_length($length)
+    if ($self->is_version('1.0') && !$self->is_chunked) {
+        $self->headers->content_length($self->body_length)
           unless $self->headers->content_length;
     }
 

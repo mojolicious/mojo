@@ -14,6 +14,7 @@ This file documents the revision history for Perl extension Mojo.
         - Allow default in Mojo::Base to have false values. (Pedro Melo)
         - Fixed chmod_rel_file in Mojo::Script. (Shu Cho).
         - Mojo::Base attributes can't start with a digit. (Shu Cho).
+        - Fixed Content-Length header for empty messages.
         - Removed warning from Mojo.pm.
         - Fixed documentation links.
         - Fixed some typos.

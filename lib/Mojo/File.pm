@@ -180,7 +180,7 @@ L<Mojo::File> is a container for files.
 
 =head1 ATTRIBUTES
 
-=head C<cleanup>
+=head2 C<cleanup>
 
     my $cleanup = $file->cleanup;
     $file       = $file->cleanup(1);

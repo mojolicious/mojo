@@ -60,6 +60,7 @@ sub compile {
     }
 
     # Wrap
+    $lines[0] ||= '';
     $lines[0]   = q/sub { my $_MOJO = '';/ . $lines[0];
     $lines[-1] .= q/return $_MOJO; };/;
 

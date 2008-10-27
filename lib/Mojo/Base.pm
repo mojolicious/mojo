@@ -28,7 +28,6 @@ sub new {
         $attrs = \%attrs;
     }
     else { $attrs = $_[0] }
-    $attrs ||= {};
 
     # Attributes
     for my $attr (keys %$attrs) {

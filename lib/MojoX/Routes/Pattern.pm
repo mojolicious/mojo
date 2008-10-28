@@ -159,7 +159,7 @@ sub _compile {
             my $req = $self->reqs->{$name};
             $compiled = "($req)" if $req;
 
-            $optional = 0 unless $self->defaults->{$name};
+            $optional = 0 unless exists $self->defaults->{$name};
 
             $compiled .= '?' if $optional;
         }

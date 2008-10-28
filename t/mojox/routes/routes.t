@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 36;
+use Test::More tests => 39;
 
 use Mojo::Transaction;
 
@@ -86,6 +86,10 @@ is($match->url_for, '/test2/bar');
 
 # Waypoints
 $match = $r->match(_tx('/test3'));
+is($match->stack->[0]->{controller}, 's');
+is($match->stack->[0]->{action}, 'l');
+is($match->url_for, '/test3');
+$match = $r->match(_tx('/test3/'));
 is($match->stack->[0]->{controller}, 's');
 is($match->stack->[0]->{action}, 'l');
 is($match->url_for, '/test3');

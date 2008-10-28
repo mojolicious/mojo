@@ -85,7 +85,7 @@ sub match {
     }
 
     # Waypoint match
-    if ($self->block && !$path) {
+    if ($self->block && (!$path || $path eq '/')) {
         push @{$match->stack}, $captures;
         $match->endpoint($self);
         return $self;

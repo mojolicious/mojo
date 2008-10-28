@@ -84,17 +84,6 @@ default values to C<undef> to make them entirely optional.
     $r->route('/archive/:year')
       ->to(controller => 'archive', action => 'list', year => undef);
 
-=head2 Gates
-
-Sometimes it is neccessary to call multiple method after another (e.g.
-authorization, data processing). That's what the gates are for.
-
-    # /blog
-    $r->gate->to(controller => 'foo', action =>'auth')
-      ->route('/blog')->to(action => 'list');
-
-C<Foo::auth> will be called before C<Foo::list>.
-
 =head2 Nested routes
 
 Don't repeat yourself. For a given root map you can have multiple nested
@@ -105,6 +94,29 @@ maps. This can be used to factor out repetitive code.
     my $b = $r->route('/books/:id')->to(controller => 'book');
     $b->route('/edit')->to(action => 'edit');
     $b->route('/delete')->to(action => 'delete');
+
+=head2 Gates
+
+Sometimes it is neccessary to call multiple method after another (e.g.
+authorization, data processing). That's what gates are for.
+
+    # /blog
+    $r->gate->to(controller => 'foo', action =>'auth')
+      ->route('/blog')->to(action => 'list');
+
+C<Foo::auth> will be called before C<Foo::list>.
+
+=head2 Waypoints
+
+Waypoint is something in between gates and nested routes. It can match even
+if it's not an endpoint, but will behave just like C<route> if children are
+matching too.
+
+    # /books
+    my $b = $r->waypoint('/books')->to(controller => 'books', action => 'list');
+
+    # /books/1
+    $b->route('/:id', id => qr/\d+/)->to(action => 'view');
 
 =head2 Quoted symbols
 

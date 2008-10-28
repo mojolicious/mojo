@@ -7,7 +7,7 @@ use warnings;
 
 use base 'MojoX::Dispatcher::Routes::Context';
 
-__PACKAGE__->attr('mojolicious', chained => 1, weaken => 1);
+__PACKAGE__->attr('mojolicious', chained => 1, weak => 1);
 __PACKAGE__->attr('stash', chained => 1, default => sub { {} });
 
 *mojo = \&mojolicious;
@@ -82,5 +82,6 @@ L<MojoX::Dispatcher::Routes::Context> and implements the following new ones.
 
     my $url = $c->url_for;
     my $url = $c->url_for(controller => 'bar', action => 'baz');
+    my $url = $c->url_for('named', controller => 'bar', action => 'baz');
 
 =cut

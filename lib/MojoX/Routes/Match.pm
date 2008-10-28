@@ -32,8 +32,67 @@ sub new {
 }
 
 sub url_for {
-    my $self   = shift;
-    my $values = ref $_[0] eq 'HASH' ? $_[0] : {@_};
+    my $self     = shift;
+    my $endpoint = $self->endpoint;
+    my $values   = {};
+    my $name     = undef;
+
+    # Single argument
+    if (@_ == 1) {
+
+        # Hash
+        $values = shift if ref $_[0] eq 'HASH';
+
+        # Name
+        $name = $_[0] if $_[0];
+    }
+
+    # Multiple arguments
+    elsif (@_ > 1) {
+
+        # Odd
+        if (@_ % 2) {
+            $name = shift;
+            $values = {@_};
+        }
+
+        # Even
+        else {
+
+           # Name and hashref
+           if (ref $_[1] eq 'HASH') {
+               $name = shift;
+               $values = shift;
+           }
+
+            # Just values
+            $values = {@_};
+
+        }
+    }
+
+    # Named
+    if ($name) {
+
+        # Find root
+        my $stop = $endpoint;
+        while ($stop->parent) {
+            $stop = $stop->parent;
+        }
+
+        # Find endpoint
+        my @children = ($stop);
+        while (my $child = shift @children) {
+
+            if (($child->name || '') eq $name) {
+                $endpoint = $child;
+                last;
+            }
+
+            # Append
+            push @children, @{$child->children};
+        }
+    }
 
     # Merge values
     $values = {%{$self->captures}, %$values};
@@ -41,10 +100,10 @@ sub url_for {
     my $url = Mojo::URL->new;
 
     # No endpoint
-    return $url unless $self->endpoint;
+    return $url unless $endpoint;
 
     # Render
-    $self->endpoint->url_for($url, $values);
+    $endpoint->url_for($url, $values);
 
     return $url;
 }
@@ -112,5 +171,8 @@ implements the follwing the ones.
     my $url = $match->url_for;
     my $url = $match->url_for(foo => 'bar');
     my $url = $match->url_for({foo => 'bar'});
+    my $url = $match->url_for('named');
+    my $url = $match->url_for('named', foo => 'bar');
+    my $url = $match->url_for('named', {foo => 'bar'});
 
 =cut

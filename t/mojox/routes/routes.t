@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 39;
+use Test::More tests => 41;
 
 use Mojo::Transaction;
 
@@ -19,7 +19,7 @@ my $r = MojoX::Routes->new;
 my $test = $r->route('/:controller/test')->to(action => 'test');
 
 # /*/test/edit
-$test->route('/edit')->to(action => 'edit');
+$test->route('/edit')->to(action => 'edit')->name('test_edit');
 
 # /*/test/delete/*
 $test->route('/delete/:id', id => qr/\d+/)->to(action => 'delete', id => 23);
@@ -97,6 +97,11 @@ $match = $r->match(_tx('/test3/edit'));
 is($match->stack->[0]->{controller}, 's');
 is($match->stack->[0]->{action}, 'edit');
 is($match->url_for, '/test3/edit');
+
+# Named url_for
+$match = $r->match(_tx('/test3'));
+is($match->url_for, '/test3');
+is($match->url_for('test_edit', controller => 'foo'), '/foo/test/edit');
 
 # Helper
 sub _tx {

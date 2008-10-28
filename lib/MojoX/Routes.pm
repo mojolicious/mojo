@@ -6,7 +6,6 @@ use strict;
 use warnings;
 
 use base 'Mojo::Base';
-use overload '""' => sub { shift->to_string }, fallback => 1;
 
 use Mojo::URL;
 use MojoX::Routes::Match;
@@ -16,7 +15,7 @@ use constant DEBUG => $ENV{MOJOX_ROUTES_DEBUG} || 0;
 
 __PACKAGE__->attr([qw/block inline name/], chained => 1);
 __PACKAGE__->attr('children', chained => 1, default => sub { [] });
-__PACKAGE__->attr('parent', chained => 1, weaken => 1);
+__PACKAGE__->attr('parent', chained => 1, weak => 1);
 __PACKAGE__->attr('pattern',
     chained => 1,
     default => sub { MojoX::Routes::Pattern->new }

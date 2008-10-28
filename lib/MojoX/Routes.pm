@@ -14,8 +14,8 @@ use MojoX::Routes::Pattern;
 
 use constant DEBUG => $ENV{MOJOX_ROUTES_DEBUG} || 0;
 
+__PACKAGE__->attr([qw/block inline name/], chained => 1);
 __PACKAGE__->attr('children', chained => 1, default => sub { [] });
-__PACKAGE__->attr([qw/inline name/], chained => 1);
 __PACKAGE__->attr('parent', chained => 1, weaken => 1);
 __PACKAGE__->attr('pattern',
     chained => 1,
@@ -84,6 +84,13 @@ sub match {
         push @{$match->stack}, $captures;
     }
 
+    # Waypoint match
+    if ($self->block && !$path) {
+        push @{$match->stack}, $captures;
+        $match->endpoint($self);
+        return $self;
+    }
+
     # Match children
     for my $child (@{$self->children}) {
 
@@ -148,6 +155,8 @@ sub url_for {
     return $url;
 }
 
+sub waypoint { return shift->route(@_)->block(1) }
+
 sub _shape {
     my ($self, $pathref) = @_;
 
@@ -181,6 +190,11 @@ MojoX::Routes - Routes
 L<MojoX::Routes> is a routes implementation.
 
 =head2 ATTRIBUTES
+
+=head2 C<block>
+
+    my $block = $routes->block;
+    $routes   = $routes->block(1);
 
 =head2 C<children>
 
@@ -261,5 +275,9 @@ follwing the ones.
 
     my $url = $routes->url_for($url);
     my $url = $routes->url_for($url, {foo => 'bar'});
+
+=head2 C<waypoint>
+
+    my $route = $routes->waypoint('/:c/:a', a => qr/\w+/);
 
 =cut

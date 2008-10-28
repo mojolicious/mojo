@@ -4,11 +4,6 @@
 
 Mojo::Manual::Mojolicious - Mojolicious
 
-=head1 OVERVIEW
-
-This was supposed to be written as part of a Perl Foundation grant,
-sadly the Perl Foundation didn't have the money to sponsor it.
-
 =head1 ROUTES
 
 Routes allow you to map urls to controller classes and methods. If you are

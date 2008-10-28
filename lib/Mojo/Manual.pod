@@ -1,6 +1,10 @@
 # Copyright (C) 2008, Sebastian Riedel.
 
-=head1 Mojo Manual
+=head1 NAME
+
+Mojo::Manual - Manual
+
+=head1 SECTIONS
 
 =over 4
 

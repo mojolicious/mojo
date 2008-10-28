@@ -4,11 +4,6 @@
 
 Mojo::Manual::GettingStarted - Getting Started
 
-=head1 OVERVIEW
-
-This was supposed to be written as part of a Perl Foundation grant,
-sadly the Perl Foundation didn't have the money to sponsor it.
-
 =head1 FIRST STEPS
 
 *** These are just a few pointers in the right direction in case someone is

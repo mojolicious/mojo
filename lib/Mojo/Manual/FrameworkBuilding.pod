@@ -4,9 +4,4 @@
 
 Mojo::Manual::FrameworkBuilding - Framework Building
 
-=head1 OVERVIEW
-
-This was supposed to be written as part of a Perl Foundation grant,
-sadly the Perl Foundation didn't have the money to sponsor it.
-
 =cut

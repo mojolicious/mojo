@@ -16,6 +16,7 @@ This file documents the revision history for Perl extension Mojo.
         - Mojo::Base attributes can't start with a digit. (Shu Cho).
         - Fixed Content-Length header for empty messages.
         - Removed warning from Mojo.pm.
+        - Added Mojolicious documentation. (vti)
         - Fixed documentation links.
         - Fixed some typos.
 

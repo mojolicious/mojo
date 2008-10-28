@@ -11,25 +11,108 @@ sadly the Perl Foundation didn't have the money to sponsor it.
 
 =head1 ROUTES
 
-A simple route mapping "/foo" to Example::test.
+Routes allow you to map urls to controller classes and methods. If you are
+already familiar with Ruby on Rails you will notice almost similar behavior.
 
-    $r->route('/foo')->to(controller => 'example', action => 'test');
+=head2 Terms
 
-You can use placeholders in the pattern and the values will be passed along.
+There are a couple of terms to know. B<Url> refers to a request path. B<Map>
+is the rule that matches a given path. B<Route> is the path to a class and
+method to be called with additional parameters. It is possible to convert a
+B<Map> to a B<Route> and to convert a B<Route> to a B<Url>.
 
-    $r->route('/:test/:action')->to(controller => 'example');
+=head2 Simple route
 
-Routes can be nested to factor out repetitive code.
+Let's look at the example.
 
-    my $x = $r->route('/test');
+    # /articles
+    $r->route('/articles')->to(controller => 'article', action => 'list');
 
-    $x->route('/foo')->to(controller => 'example', action => 'test1');
-    $x->route('/bar/:action')->to(controller => 'example2');
-    $x->route('/:(action)-:(id)')->to(controller => 'example3');
+When a user requests C</articles>, the module C<Article.pm> is loaded and the
+method C<list> will be called. C<controller> and C<action> values are
+important, because they decide what is going to be called if a url matches
+the given map.
 
-Use regular expressions to match more specific.
+=head2 Additional parameters
 
-    $r->route('/:controller/:action/:id', id => qr/\d+/)
-      ->to(controller => 'example');
+Besides C<controller> and C<action> you can define as many parameters as you
+like.
+
+    # /articles (sort_by = 'date')
+    $r->route('/articles')
+      ->to(controller => 'article, action => 'list', sort_by => 'date');
+
+=head2 Placeholders
+
+Maps can be more specific and automatically provide parameters through
+placeholders.
+
+    # /*
+    $r->route('/:controller')->to(action => 'list');
+
+The colon means that C<controller> will be automatically captured and passed
+along.
+
+=head2 Default values
+
+You can specify default values for all parameters.
+
+    # /* (id = 1)
+    # /*/*
+    $r->route('/:controller/:id')->to(action => 'view', id => 1);
+
+The value for C<id> will be C<1> if it's not specified.
+
+=head2 Constraints
+
+Parameters can also have constraints.
+
+    # /articles/5
+    $r->route('/articles/:id', id => qr/\d+/)
+      ->to(controller => 'article', action => 'view');
+
+This will only match if C<id> is a number. There is no need to specify C<^>
+and C<$>, because they are automatically added.
+
+=head2 Optional parameters
+
+Values are required if no default value was given. You can also just set
+default values to C<undef> to make them entirely optional.
+
+    # /archive
+    # /archive/2008
+    $r->route('/archive/:year')
+      ->to(controller => 'archive', action => 'list', year => undef);
+
+=head2 Gates
+
+Sometimes it is neccessary to call multiple method after another (e.g.
+authorization, data processing). That's what the gates are for.
+
+    # /blog
+    $r->gate->to(controller => 'foo', action =>'auth')
+      ->route('/blog')->to(action => 'list');
+
+C<Foo::auth> will be called before C<Foo::list>.
+
+=head2 Nested routes
+
+Don't repeat yourself. For a given root map you can have multiple nested
+maps. This can be used to factor out repetitive code.
+
+    # /books/5/edit
+    # /books/5/delete
+    my $b = $r->route('/books/:id')->to(controller => 'book');
+    $b->route('/edit')->to(action => 'edit');
+    $b->route('/delete')->to(action => 'delete');
+
+=head2 Quoted symbols
+
+It is not only possible to catch parameters from slash to slash, you can also
+quote them with parentheses for more advanced matching.
+
+    # /view-5
+    # /delete-1
+    $r->route('/:(action)-:(id)')->to(controller => 'album');
 
 =cut

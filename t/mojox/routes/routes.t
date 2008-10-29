@@ -25,13 +25,13 @@ $test->route('/edit')->to(action => 'edit')->name('test_edit');
 $test->route('/delete/:id', id => qr/\d+/)->to(action => 'delete', id => 23);
 
 # /test2
-my $test2 = $r->gate('/test2')->to(controller => 'test2');
+my $test2 = $r->bridge('/test2')->to(controller => 'test2');
 
 # /test2 (inline)
-$test2->gate->to(controller => 'index');
+$test2->bridge->to(controller => 'index');
 
 # /test2/foo
-$test2->gate('/foo')->to(controller => 'baz');
+$test2->bridge('/foo')->to(controller => 'baz');
 
 # /test2/bar
 $test2->route('/bar')->to(controller => 'lalala');

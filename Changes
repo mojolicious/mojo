@@ -16,6 +16,7 @@ This file documents the revision history for Perl extension Mojo.
         - Mojo::Base attributes can't start with a digit. (Shu Cho).
         - Fixed Content-Length header for empty messages.
         - Removed warning from Mojo.pm.
+        - Renamed gate to bridge in MojoX::Routes.
         - Added waypoint() to MojoX::Routes.
         - Added named url_for to MojoX::Routes and Mojolicious.
         - Added Mojolicious documentation. (vti)

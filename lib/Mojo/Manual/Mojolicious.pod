@@ -90,20 +90,20 @@ maps. This can be used to factor out repetitive code.
     $b->route('/edit')->to(action => 'edit');
     $b->route('/delete')->to(action => 'delete');
 
-=head2 Gates
+=head2 Bridges
 
 Sometimes it is neccessary to call multiple method after another (e.g.
-authorization, data processing). That's what gates are for.
+authorization, data processing). That's what C<bridge> is for.
 
     # /blog
-    $r->gate->to(controller => 'foo', action =>'auth')
+    $r->bridge->to(controller => 'foo', action =>'auth')
       ->route('/blog')->to(action => 'list');
 
 C<Foo::auth> will be called before C<Foo::list>.
 
 =head2 Waypoints
 
-Waypoint is something in between gates and nested routes. It can match even
+Waypoint is something in between bridges and nested routes. It can match even
 if it's not an endpoint, but will behave just like C<route> if children are
 matching too.
 

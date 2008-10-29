@@ -29,6 +29,8 @@ sub new {
     return $self;
 }
 
+sub bridge { return shift->route(@_)->inline(1) }
+
 sub defaults {
     my $self = shift;
 
@@ -41,8 +43,6 @@ sub defaults {
 
     return $self;
 }
-
-sub gate { return shift->route(@_)->inline(1) }
 
 sub is_endpoint {
     my $self = shift;
@@ -234,6 +234,11 @@ follwing the ones.
     my $routes = MojoX::Routes->new;
     my $routes = MojoX::Routes->new('/:controller/:action');
 
+=head2 C<bridge>
+
+    my $bridge = $routes->bridge;
+    my $bridge = $routes->bridge('/:controller/:action');
+
 =head2 C<to>
 
 =head2 C<defaults>
@@ -244,11 +249,6 @@ follwing the ones.
     $routes      = $routes->defaults({action => 'foo'});
     $routes      = $routes->to(action => 'foo');
     $routes      = $routes->to({action => 'foo'});
-
-=head2 C<gate>
-
-    my $gate = $routes->gate;
-    my $gate = $routes->gate('/:controller/:action');
 
 =head2 C<is_endpoint>
 

@@ -9,6 +9,9 @@ This file documents the revision history for Perl extension Mojo.
         - Mojo::Base accessors don't take multiple arguments anymore,
           this results in a 25% speed increase.
         - Added MOJO_MAX_MEMORY_SIZE environment variable.
+        - Added prepare_parser and prepare_builder callbacks to
+          Mojo::Message.
+        - Added done and is_done to Mojo::Stateful.
         - Fixed many win32 related bugs.
         - Fixed keep alive related bugs in daemon and client. (Pedro Melo)
         - Allow default in Mojo::Base to have false values. (Pedro Melo)

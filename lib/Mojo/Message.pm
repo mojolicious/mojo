@@ -22,7 +22,11 @@ __PACKAGE__->attr('buffer',
     chained => 1,
     default => sub { Mojo::Buffer->new }
 );
-__PACKAGE__->attr('build_start_line_callback', chained => 1);
+__PACKAGE__->attr([qw/
+    build_start_line_callback
+    prepare_builder_callback
+    prepare_parser_callback
+/], chained => 1);
 __PACKAGE__->attr('content',
     chained => 1,
     default => sub { Mojo::Content->new }
@@ -35,6 +39,8 @@ __PACKAGE__->attr([qw/major_version minor_version/],
 *to_string           = \&build;
 *body_params         = \&body_parameters;
 *build_start_line_cb = \&build_start_line_callback;
+*prepare_builder_cb  = \&prepare_builder_callback;
+*prepare_parser_cb   = \&prepare_parser_callback;
 
 # I'll keep it short and sweet. Family. Religion. Friendship.
 # These are the three demons you must slay if you wish to succeed in
@@ -176,6 +182,12 @@ sub get_header_chunk {
 sub get_start_line_chunk {
     my ($self, $offset) = @_;
 
+    # Prepare
+    if ($self->prepare_builder_cb && !$self->{_prepared_builder}) {
+        $self->prepare_builder_cb->($self);
+        $self->{_prepared_builder}++;
+    }
+
     # Start line generator
     return $self->build_start_line_cb->($self, $offset)
       if $self->build_start_line_cb;
@@ -210,6 +222,12 @@ sub is_version {
 sub parse {
     my $self = shift;
 
+    # Prepare
+    if ($self->prepare_parser_cb && !$self->{_prepared_parser}) {
+        $self->prepare_parser_cb->($self);
+        $self->{_prepared_parser}++;
+    }
+
     # Buffer
     $self->buffer->add_chunk(join '', @_) if @_;
 
@@ -222,7 +240,7 @@ sub parse {
     }
 
     # Done
-    $self->state('done') if $self->content->is_state('done');
+    $self->done if $self->content->is_done;
 
     return $self;
 }
@@ -383,6 +401,28 @@ implements the following new ones.
 
     my $minor_version = $message->minor_version;
     $message          = $message->minor_version(1);
+
+=head2 C<prepare_builder_cb>
+
+=head2 C<prepare_builder_callback>
+
+    my $cb   = $message->prepare_builder_cb;
+    my $cb   = $message->prepare_builder_callback;
+    $message = $message->prepare_builder_callback(sub {
+        my $self = shift;
+        # Do stuff! :)
+    });
+
+=head2 C<prepare_parser_cb>
+
+=head2 C<prepare_parser_callback>
+
+    my $cb   = $message->prepare_parser_cb;
+    my $cb   = $message->prepare_parser_callback;
+    $message = $message->prepare_parser_callback(sub {
+        my $self = shift;
+        # Do stuff! :)
+    });
 
 =head2 C<raw_body_length>
 

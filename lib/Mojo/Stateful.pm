@@ -11,6 +11,8 @@ use base 'Mojo::Base';
 # he'd eat you and everyone you care about!
 __PACKAGE__->attr('state', chained => 1, default => sub { 'start' });
 
+sub done { shift->state('done') }
+
 sub error {
     my ($self, $message) = @_;
     return $self->{error} unless $message;
@@ -19,6 +21,8 @@ sub error {
 }
 
 sub has_error { return defined shift->{error} }
+
+sub is_done { return shift->state eq 'done' }
 
 sub is_state {
     my ($self, @states) = @_;
@@ -58,9 +62,17 @@ L<Mojo::Stateful> is a base class for state keeping instances.
 L<Mojo::Stateful> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
+=head2 C<done>
+
+    $stateful = $stateful->done;
+
 =head2 C<has_error>
 
     my $has_error = $stateful->has_error;
+
+=head2 C<is_done>
+
+    my $done = $stateful->is_done;
 
 =head2 C<is_state>
 

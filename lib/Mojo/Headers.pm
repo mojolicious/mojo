@@ -232,7 +232,7 @@ sub parse {
             }
 
             # Done
-            $self->state('done');
+            $self->done;
             delete $self->{__headers};
             return $self->buffer;
         }

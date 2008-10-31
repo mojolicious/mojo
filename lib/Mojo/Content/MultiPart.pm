@@ -214,7 +214,7 @@ sub _parse_multipart_boundary {
     # End
     if (index($self->buffer->{buffer}, "\x0d\x0a--$boundary--") == 0) {
         $self->buffer->empty;
-        $self->state('done');
+        $self->done;
     }
 
     return 0;

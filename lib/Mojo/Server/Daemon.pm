@@ -222,7 +222,7 @@ sub _prepare_transactions {
             if (defined $tx->continued && $tx->continued == 0) {
                 $tx->continued(1);
                 $tx->state('read');
-                $tx->state('done') unless $tx->res->code == 100;
+                $tx->done unless $tx->res->code == 100;
                 $tx->res->code(0);
                 next;
             }

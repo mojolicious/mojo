@@ -229,11 +229,11 @@ sub spin {
         }
 
         # Done?
-        if ($tx->is_state(qw/done error/)) {
+        if ($tx->is_done) {
             $done++;
 
             # Disconnect
-            $self->disconnect($tx) if $tx->is_state('done');
+            $self->disconnect($tx) if $tx->is_done;
         }
     }
     return 1 if $done;
@@ -303,29 +303,29 @@ sub spin {
 
         # Read 100 Continue
         if ($tx->is_state('read_continue')) {
-            $res->state('done') if $read == 0;
+            $res->done if $read == 0;
             $res->parse($buffer);
 
             # We got a 100 Continue response
-            if ($res->is_state('done') && $res->code == 100) {
+            if ($res->is_done && $res->code == 100) {
                 $tx->res(Mojo::Message::Response->new);
                 $tx->continued(1);
                 $tx->{_continue} = 0;
             }
 
             # We got something else
-            elsif ($res->is_state('done')) {
+            elsif ($res->is_done) {
                 $tx->res($res);
                 $tx->continued(0);
-                $tx->state('done');
+                $tx->done;
             }
         }
 
         # Read response
         elsif ($tx->is_state('read_response')) {
-            $tx->state('done') if $read == 0;
+            $tx->done if $read == 0;
             $res->parse($buffer);
-            $tx->state('done') if $res->is_state('done');
+            $tx->done if $res->is_done;
         }
     }
 

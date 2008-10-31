@@ -12,7 +12,7 @@ sub build {
     my ($self, $chunk) = @_;
 
     # Done
-    return '' if $self->is_state('done');
+    return '' if $self->is_done;
 
     # Shortcut
     return undef unless defined $chunk;
@@ -26,7 +26,7 @@ sub build {
 
     # End
     if ($headers || ($chunk_length == 0)) {
-        $self->state('done');
+        $self->done;
 
         # Normal end
         $formatted = "\x0d\x0a0\x0d\x0a";
@@ -76,7 +76,7 @@ sub parse {
             else {
                 $self->_remove_chunked_encoding;
                 $filter->empty;
-                $self->state('done');
+                $self->done;
             }
             last;
         }
@@ -106,9 +106,9 @@ sub _parse_trailing_headers {
     my $self = shift;
     $self->headers->state('headers');
     $self->headers->parse;
-    if ($self->headers->is_state('done')) {
+    if ($self->headers->is_done) {
         $self->_remove_chunked_encoding;
-        $self->state('done');
+        $self->done;
     }
 }
 

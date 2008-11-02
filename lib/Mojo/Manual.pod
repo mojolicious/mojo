@@ -12,7 +12,7 @@ Mojo::Manual - Manual
 
 Step by step instructions to get you started.
 
-=item L<Mojo::Manual::Mojolicous>
+=item L<Mojo::Manual::Mojolicious>
 
 Introduction to L<Mojolicious>, the L<Mojo> example web framework.
 

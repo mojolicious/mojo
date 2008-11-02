@@ -6,9 +6,6 @@ Mojo::Manual::GettingStarted - Getting Started
 
 =head1 FIRST STEPS
 
-*** These are just a few pointers in the right direction in case someone is
-insane enough to beta test Mojo. :) ***
-
 Use the application generator to create all neccessary files.
 
     mojo generate app MyFirstApp

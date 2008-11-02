@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojo.
 
+0.8.2   2008-11-01 00:00:00
+        - Removed OS X resource fork files.
+
 0.8.1   2008-11-01 00:00:00
         - Made daemon.t developer only.
         - Fixed typos.

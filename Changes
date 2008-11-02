@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojo.
 
-0.9     2008-11-01 00:00:00
+0.8.1   2008-11-01 00:00:00
+        - Made daemon.t developer only.
         - Fixed typos.
 
 0.8     2008-10-21 00:00:00

@@ -5,11 +5,15 @@
 use strict;
 use warnings;
 
-use Test::More tests => 16;
+use Test::More;
 
 use Mojo::Client;
 use Mojo::Transaction;
 use Test::Mojo::Server;
+
+plan skip_all => 'set TEST_DAEMON to enable this test (developer only!)'
+  unless $ENV{TEST_DAEMON};
+plan tests => 16;
 
 # Daddy, I'm scared. Too scared to even wet my pants.
 # Just relax and it'll come, son.

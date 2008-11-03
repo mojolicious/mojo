@@ -309,6 +309,9 @@ sub _build_start_line {
 sub _parse_formdata {
     my $self = shift;
 
+    # Use cached formdata
+    return $self->{_formdata} if $self->{_formdata};
+
     my @formdata;
 
     # Check content
@@ -334,6 +337,9 @@ sub _parse_formdata {
 
         push @formdata, [$name, $filename, $part];
     }
+
+    # Cache formdata
+    $self->{_formdata} = \@formdata;
 
     return \@formdata;
 }

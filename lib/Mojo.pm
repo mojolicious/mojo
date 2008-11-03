@@ -13,7 +13,7 @@ require Carp;
 use Mojo::Transaction;
 
 # Oh, so they have internet on computers now!
-our $VERSION = '0.8.2';
+our $VERSION = '0.9';
 
 *build_tx = \&build_transaction;
 
@@ -109,7 +109,11 @@ Jesse Vincent
 
 Marcus Ramberg
 
+Mark Stosberg
+
 Pedro Melo
+
+Robert Hicks
 
 Shu Cho
 

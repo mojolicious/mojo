@@ -38,7 +38,7 @@ while (1) {
     push @transactions, @buffer;
     last unless @transactions;
 }
-is($tx->res->code, 301);
+is($tx->res->code, 200);
 is($tx->continued, 1);
 is($tx2->res->code, 301);
 is($tx2->continued, 1);

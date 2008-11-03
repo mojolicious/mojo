@@ -217,7 +217,7 @@ __welcome__
     <body>
         <h2>Welcome to the Mojolicious Web Framework!</h2>
         This page was generated from the template
-        "templates/example/test.phtml",
+        "templates/example/welcome.phtml",
         <a href="<%= $c->url_for %>">
             click here
         </a> 

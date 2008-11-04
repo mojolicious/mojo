@@ -4,4 +4,14 @@
 
 Mojo::Manual::FrameworkBuilding - Framework Building
 
+=head1 PLANNING
+
+=head1 INFRASTRUCTURE
+
+=head1 PROTOTYPE
+
+=head1 REBRANDING
+
+=head1 POLISHING
+
 =cut

@@ -14,7 +14,7 @@ Please don't send patches unless you agree with them.
 =head1 MISSION STATEMENT
 
 Mojo is a Perl web framework that provides all the basic tools and helpers
-needed to write simple web applications or higher level web frameworks.
+needed to write simple web applications and higher level web frameworks.
 
 All components should be reusable in other projects and in a UNIXish way
 only loosely coupled.

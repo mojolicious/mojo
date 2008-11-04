@@ -28,6 +28,10 @@ Building your own frameworks upon L<Mojo>.
 
 Cooking with L<Mojo>!
 
+=item L<Mojo::Manual::FAQ>
+
+If you have a question, look here first.
+
 =item L<Mojo::Manual::CodingGuidelines>
 
 Coding guidelines and mission statement.

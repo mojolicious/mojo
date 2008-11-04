@@ -45,9 +45,13 @@ Mojo - The Web In A Box!
 L<Mojo> is a collection of libraries and example web frameworks for web
 framework developers.
 
+If you are searching for a higher level MVC web framework you should take a
+look at L<Mojolicious>.
+
 Don't be scared by the amount of different modules in the distribution, they
-are all very loosely coupled, you can just pick the ones you like and ignore
-the rest.
+are all very loosely coupled.
+You can just pick the ones you like and ignore the rest, there is no
+tradeoff.
 
 For userfriendly documentation see L<Mojo::Manual>.
 

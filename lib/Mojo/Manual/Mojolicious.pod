@@ -6,27 +6,19 @@ Mojo::Manual::Mojolicious - Mojolicious
 
 =head1 ROUTES
 
-Routes allow you to map urls to controller classes and methods. If you are
-already familiar with Ruby on Rails you will notice almost similar behavior.
-
-=head2 Terms
-
-There are a couple of terms to know. B<Url> refers to a request path. B<Map>
-is the rule that matches a given path. B<Route> is the path to a class and
-method to be called with additional parameters. It is possible to convert a
-B<Map> to a B<Route> and to convert a B<Route> to a B<Url>.
+Routes allow you to map requests to controllers and actions.
 
 =head2 Simple route
 
-Let's look at the example.
+Let's look at this example.
 
     # /articles
     $r->route('/articles')->to(controller => 'article', action => 'list');
 
 When a user requests C</articles>, the module C<Article.pm> is loaded and the
 method C<list> will be called. C<controller> and C<action> values are
-important, because they decide what is going to be called if a url matches
-the given map.
+important, because they decide what is going to be called if a path matches
+the given pattern.
 
 =head2 Additional parameters
 
@@ -39,7 +31,7 @@ like.
 
 =head2 Placeholders
 
-Maps can be more specific and automatically provide parameters through
+Pattern can be more specific and automatically provide parameters through
 placeholders.
 
     # /*
@@ -81,8 +73,8 @@ default values to C<undef> to make them entirely optional.
 
 =head2 Nested routes
 
-Don't repeat yourself. For a given root map you can have multiple nested
-maps. This can be used to factor out repetitive code.
+Don't repeat yourself. For a given root pattern you can have multiple nested
+pattern. This can be used to factor out repetitive code.
 
     # /books/5/edit
     # /books/5/delete

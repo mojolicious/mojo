@@ -1,0 +1,19 @@
+# Copyright (C) 2008, Sebastian Riedel.
+
+=head1 NAME
+
+Mojo::Manual::FAQ - Frequently Asked Questions
+
+=head1 QUESTIONS
+
+=head2 Do i have to use L<Mojo::Base>?
+
+Absolutely not, you could just use any other accessor generator in your
+modules, L<Mojo::Base> is just a base class and will stay out of your way.
+
+=head2 Do i have to use L<Mojo::Template>?
+
+Not at all, it is just a convenient default option and can be replaced with
+any other template engine out there.
+
+=cut

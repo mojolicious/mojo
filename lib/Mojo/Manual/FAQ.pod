@@ -16,4 +16,21 @@ modules, L<Mojo::Base> is just a base class and will stay out of your way.
 Not at all, it is just a convenient default option and can be replaced with
 any other template engine out there.
 
+=head2 Why do my programs break if i use C<content> instead of C<body>?
+
+The C<content> attribute of L<Mojo::Message> has to contain a special
+L<Mojo::Content> object which offers advanced HTTP body manipulation
+functions.
+The C<body> method is a wrapper around that and what you will want to use in
+most cases.
+
+    $tx->res->body('Hello World!');
+
+If you want to send a file for example, then C<content> would be the right
+choice.
+
+    my $file = Mojo::File->new;
+    $file->file_name('/etc/passwd');
+    $tx->res->content->file($file);
+
 =cut

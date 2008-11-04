@@ -202,7 +202,7 @@ For debugging you can set the C<MOJO_BASE_DEBUG> environment variable.
         default => 'foo'}
     );
 
-Currently there are four options supported.
+Currently there are three options supported.
 
     chained: Whenever you call an attribute with arguments the instance
              is returned instead of the value.

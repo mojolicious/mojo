@@ -14,13 +14,6 @@ require Scalar::Util;
 sub new {
     my $proto = shift;
 
-    # Create instance
-    my $class = ref $proto || $proto;
-    my $self = bless {}, $class;
-
-    # Shortcut
-    return $self unless @_;
-
     # Check attributes
     my $attrs;
     if (exists $_[1]) {
@@ -28,16 +21,11 @@ sub new {
         $attrs = \%attrs;
     }
     else { $attrs = $_[0] }
+    $attrs ||= {};
 
-    # Attributes
-    for my $attr (keys %$attrs) {
-
-        # Attribute
-        if ($self->can($attr)) { $self->$attr($attrs->{$attr}) }
-
-        # No attribute, pass through to instance hash
-        else { $self->{$attr} = $attrs->{$attr} }
-    }
+    # Create instance
+    my $class = ref $proto || $proto;
+    my $self = bless $attrs, $class;
 
     return $self;
 }
@@ -60,12 +48,8 @@ sub attr {
     else { $options = $_[0] }
     $options ||= {};
 
-    Carp::croak('Option "filter" has to be a coderef')
-      if ($options->{filter} && ref $options->{filter} ne 'CODE');
-
     my $chained = delete $options->{chained};
     my $default = delete $options->{default};
-    my $filter  = delete $options->{filter};
     my $weak    = delete $options->{weak};
 
     undef $options;
@@ -83,6 +67,15 @@ sub attr {
 
         # Header
         my $code = "sub {\n";
+
+        # Warning gets optimized away
+        unless ($ENV{MOJO_BASE_OPTIMIZE}) {
+
+            # Check invocant
+            $code .= "${ws}Carp::croak(\'";
+            $code .= 'Attribute has to be called with an object not a class';
+            $code .= "')\n  ${ws}unless ref \$_[0];\n";
+        }
 
         # No value
         $code .= "${ws}if (\@_ == 1) {\n";
@@ -106,24 +99,15 @@ sub attr {
         }
         $code .= "$ws}\n";
 
-        # Value
-        if ($filter) {
 
-            # Filter and store argument
-            $code .= "${ws}local \$_ = \$_[1];\n";
-            $code .= "$ws\$_[0]->{'$attr'} = \$filter->(\$_[0], \$_);\n";
+        # Store argument optimized
+        if (!$weak && !$chained) {
+            $code .= "${ws}return \$_[0]->{'$attr'} = \$_[1];\n";
         }
+
+        # Store argument the old way
         else {
-
-            # Store argument optimized
-            if (!$weak && !$chained) {
-                $code .= "${ws}return \$_[0]->{'$attr'} = \$_[1];\n";
-            }
-
-            # Store argument the old way
-            else {
-                $code .= "$ws\$_[0]->{'$attr'} = \$_[1];\n";
-            }
+            $code .= "$ws\$_[0]->{'$attr'} = \$_[1];\n";
         }
 
         # Weaken
@@ -166,10 +150,7 @@ Mojo::Base - Once Upon A Midnight Dreary!
     use base 'Mojo::Base';
 
     __PACKAGE__->attr('driver');
-    __PACKAGE__->attr('doors',
-        default => 2,
-        filter  => sub { s/\D//g; $_ }
-    );
+    __PACKAGE__->attr('doors', default => 2);
     __PACKAGE__->attr([qw/passengers seats/],
         chained => 1,
         default => sub { 2 }
@@ -231,8 +212,6 @@ Currently there are four options supported.
              Note that the default value is "lazy", which means it only
              gets assigned to the instance after the attribute has been
              called.
-    filter:  Filters the value before assigning it to the instance,
-             must be a coderef.
     weak:    Weakens the attribute value.
 
 =cut

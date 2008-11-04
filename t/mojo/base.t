@@ -43,8 +43,8 @@ is($m->figs, 5);
 for my $i (101 .. 150) {
     $y = !$y;
     $monkeys->[$i] = LoaderTest->new;
-    is($monkeys->[$i]->name('FooBarBAZ'), 'foobarbaz');
-    $monkeys->[$i]->heads('ab3cd') if $y;
+    is($monkeys->[$i]->name('foobarbaz'), 'foobarbaz');
+    $monkeys->[$i]->heads('3') if $y;
     $y ? is($monkeys->[$i]->heads, 3) : is($monkeys->[$i]->heads, 1);
 }
 

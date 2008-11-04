@@ -20,8 +20,7 @@ sub new {
         my %attrs = (@_);
         $attrs = \%attrs;
     }
-    else { $attrs = $_[0] }
-    $attrs ||= {};
+    else { $attrs = $_[0] || {} }
 
     # Create instance
     my $class = ref $proto || $proto;

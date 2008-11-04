@@ -42,8 +42,12 @@ Mojo - The Web In A Box!
 
 =head1 DESCRIPTION
 
-L<Mojo> is a collection of libraries for web framework developers and example
-web frameworks.
+L<Mojo> is a collection of libraries and example web frameworks for web
+framework developers.
+
+Don't be scared by the amount of different modules in the distribution, they
+are all very loosely coupled, you can just pick the ones you like and ignore
+the rest.
 
 For userfriendly documentation see L<Mojo::Manual>.
 

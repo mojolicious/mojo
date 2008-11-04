@@ -190,15 +190,16 @@ Mojo::Base - Once Upon A Midnight Dreary!
 
 =head1 DESCRIPTION
 
-L<Mojo::Base> is a universal base class containing simple and fast helpers
-for object oriented Perl programming.
+L<Mojo::Base> is a base class containing simple and fast helpers for object
+oriented Perl programming.
 
 Main design goals are minimalism and staying out of your way.
 
-The syntax is a bit like L<Moose> or Ruby and the performance better than
+The syntax is a bit like Ruby and the performance better than
 L<Class::Accessor::Fast>.
-(Note that L<Mojo::Base> was never meant as a replacement for L<Moose>, both
-are solutions to completely different problems.)
+
+Note that this is just an accessor generator, take L<Moose> if you are
+looking for an object system that.
 
 For debugging you can set the C<MOJO_BASE_DEBUG> environment variable.
 

@@ -19,11 +19,6 @@ needed to write simple web applications or higher level web frameworks.
 All components should be reusable in other projects and in a UNIXish way
 only loosely coupled.
 
-While Mojo follows the MVC pattern it does not contain a model layer,
-just a very basic view layer and multiple controllers.
-Users should be free to create their own implementations for all three
-layers.
-
 Especially for people new to Perl it should be as easy as possible to
 install Mojo and get started.
 Writing web applications can be one of the most fun ways to learn a language!
@@ -37,8 +32,8 @@ application.
 =over 4
 
 Keep it simple, no magic unless absolutely neccessary.
- 
-No prereqs outside of the Mojo package.
+
+Only add prereqs if absolutely neccessary.
 
 Code should be written with a Perl6 port in mind.
 

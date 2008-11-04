@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojo.
 0.9     2008-11-03 00:00:00
         - Added caching to uploads in Mojo::Message. (Mark Stosberg)
         - Fixed typos. (Robert Hicks)
+        - Added documentation.
 
 0.8.2   2008-11-01 00:00:00
         - Removed OS X resource fork files.

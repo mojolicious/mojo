@@ -12,7 +12,7 @@ use Mojo::File;
 use Mojo::Headers;
 
 __PACKAGE__->attr('file', chained =>1, default => sub { Mojo::File->new });
-__PACKAGE__->attr('filename', chained =>1);
+__PACKAGE__->attr([qw/filename name/], chained =>1);
 __PACKAGE__->attr('headers',
     chained =>1,
     default => sub { Mojo::Headers->new }
@@ -58,19 +58,35 @@ L<Mojo::Upload> is a container for uploads.
     my $file = $upload->file;
     $upload  = $upload->file(Mojo::File->new);
 
+Returns a L<Mojo::File> object if called without arguments.
+Returns the invocant if called with arguments.
+
 =head2 C<filename>
 
     my $filename = $upload->filename;
-    $upload      = $upload->filename('foo');
+    $upload      = $upload->filename('foo.txt');
+
+Returns a file name like C<foo.txt> if called without arguments.
+Returns the invocant if called with arguments.
 
 =head2 C<file_length>
 
     my $length = $upload->file_length;
 
+Returns the length of the file upload in bytes.
+
 =head2 C<headers>
 
     my $headers = $upload->headers;
     $upload     = $upload->headers(Mojo::Headers->new);
+
+Returns a L<Mojo::Headers> object if called without arguments.
+Returns the invocant if called with arguments.
+
+=head2 C<name>
+
+    my $name = $upload->name;
+    $upload  = $upload->name('foo');
 
 =head1 METHODS
 

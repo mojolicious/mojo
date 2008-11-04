@@ -67,6 +67,10 @@ sub body_length { shift->content->body_length }
 
 sub body_parameters {
     my $self = shift;
+
+    # Cached
+    return $self->{_body_parameters} if $self->{_body_parameters};
+
     my $params = Mojo::Parameters->new;
 
     # "x-application-urlencoded"
@@ -94,7 +98,8 @@ sub body_parameters {
         }
     }
 
-    return $params;
+    # Cache
+    return $self->{_body_parameters} = $params;
 }
 
 sub build {
@@ -151,6 +156,36 @@ sub build_start_line {
     }
 
     return $startline;
+}
+
+sub cookie {
+    my ($self, $name) = @_;
+
+    # Shortcut
+    return undef unless $name;
+
+    # Map
+    unless ($self->{_cookies}) {
+        my $cookies = {};
+        for my $cookie (@{$self->cookies}) {
+            my $cname = $cookie->name;
+
+            # Multiple cookies with same name
+            if (exists $cookies->{$name}) {
+                $cookies->{$cname} = [$cookies->{$cname}]
+                  unless ref $cookies->{$cname} eq 'ARRAY';
+                push @{$cookies->{$cname}}, $cookie;
+            }
+
+            # Cookie
+            else { $cookies->{$cname} = $cookie }
+        }
+
+        # Cache
+        $self->{_cookies} = $cookies;
+    }
+
+    return $self->{_cookies}->{$name};
 }
 
 sub fix_headers {
@@ -247,11 +282,41 @@ sub parse {
 
 sub start_line_length { return length shift->build_start_line }
 
+sub upload {
+    my ($self, $name) = @_;
+
+    # Shortcut
+    return undef unless $name;
+
+    # Map
+    unless ($self->{_uploads}) {
+        my $uploads = {};
+        for my $upload (@{$self->uploads}) {
+            my $uname = $upload->name;
+
+            # Multiple uploads with same name
+            if (exists $uploads->{$name}) {
+                $uploads->{$uname} = [$uploads->{$uname}]
+                  unless ref $uploads->{$uname} eq 'ARRAY';
+                push @{$uploads->{$uname}}, $upload;
+            }
+
+            # Upload
+            else { $uploads->{$uname} = $upload }
+        }
+
+        # Cache
+        $self->{_uploads} = $uploads;
+    }
+
+    return $self->{_uploads}->{$name};
+}
+
 sub uploads {
     my $self = shift;
 
-    my $uploads = {};
-    return $uploads unless $self->is_multipart;
+    my @uploads;
+    return \@uploads unless $self->is_multipart;
 
     my $formdata = $self->_parse_formdata;
 
@@ -264,22 +329,15 @@ sub uploads {
         next unless $filename;
 
         my $upload = Mojo::Upload->new;
+        $upload->name($name);
         $upload->file($part->file);
         $upload->filename($filename);
         $upload->headers($part->headers);
 
-        # Multiple uploads with same name
-        if (exists $uploads->{$name}) {
-            $uploads->{$name} = [$uploads->{$name}]
-              unless ref $uploads->{$name} eq 'ARRAY';
-            push @{$uploads->{$name}}, $upload;
-        }
-
-        # Simple upload
-        else { $uploads->{$name} = $upload }
+        push @uploads, $upload;
     }
 
-    return $uploads;
+    return \@uploads;
 }
 
 sub version {
@@ -309,9 +367,6 @@ sub _build_start_line {
 sub _parse_formdata {
     my $self = shift;
 
-    # Use cached formdata
-    return $self->{_formdata} if $self->{_formdata};
-
     my @formdata;
 
     # Check content
@@ -337,9 +392,6 @@ sub _parse_formdata {
 
         push @formdata, [$name, $filename, $part];
     }
-
-    # Cache formdata
-    $self->{_formdata} = \@formdata;
 
     return \@formdata;
 }
@@ -460,6 +512,8 @@ the following new ones.
     my $params = $message->body_params;
     my $params = $message->body_parameters;
 
+Returns a L<Mojo::Parameters> object, containing POST parameters.
+
 =head2 C<to_string>
 
 =head2 C<build>
@@ -477,6 +531,10 @@ the following new ones.
 =head2 C<build_start_line>
 
     my $string = $message->build_start_line;
+
+=head2 C<cookie>
+
+    my $cookie = $message->cookie('foo');
 
 =head2 C<fix_headers>
 
@@ -510,8 +568,16 @@ the following new ones.
 
     $message = $message->parse('HTTP/1.1 200 OK...');
 
+=head2 C<upload>
+
+    my $upload = $message->upload('foo');
+
+Returns a L<Mojo::Upload> object or a arrayref of L<Mojo::Upload> objects.
+
 =head2 C<uploads>
 
     my $uploads = $message->uploads;
+
+Returns a arrayref of L<Mojo::Upload> objects.
 
 =cut

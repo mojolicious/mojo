@@ -163,10 +163,9 @@ is(ref $req->content->parts->[2], 'Mojo::Content');
 is($req->content->parts->[0]->file->slurp, "hallo welt test123\n");
 is($req->body_params->to_hash->{text1}, "hallo welt test123\n");
 is($req->body_params->to_hash->{text2}, '');
-my $uploads = $req->uploads;
-is($uploads->{upload}->filename, 'hello.pl');
-is(ref $uploads->{upload}->file, 'Mojo::File');
-is($uploads->{upload}->file->file_length, 69);
+is($req->upload('upload')->filename, 'hello.pl');
+is(ref $req->upload('upload')->file, 'Mojo::File');
+is($req->upload('upload')->file->file_length, 69);
 
 # Build minimal HTTP 1.1 request
 $req = Mojo::Message::Request->new;

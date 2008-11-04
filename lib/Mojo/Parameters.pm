@@ -158,6 +158,7 @@ sub to_string {
         $value = Mojo::ByteStream->new($value)
           ->url_escape($Mojo::URL::PCHAR . '\/\?');
 
+        $value ||= '';
         push @params, "$name=$value";
     }
 

@@ -13,7 +13,7 @@ require Carp;
 use Mojo::Transaction;
 
 # Oh, so they have internet on computers now!
-our $VERSION = '0.8.3';
+our $VERSION = '0.8.4';
 
 *build_tx = \&build_transaction;
 
@@ -35,7 +35,10 @@ Mojo - The Web In A Box!
     sub handler {
         my ($self, $tx) = @_;
 
-        # Do magic things!
+        # Hello world!
+        $tx->res->code(200);
+        $tx->res->headers->content_type('text/plain');
+        $tx->res->body('Congratulations, your Mojo is working!');
 
         return $tx;
     }
@@ -67,9 +70,26 @@ new ones.
     my $tx = $mojo->build_tx;
     my $tx = $mojo->build_transaction;
 
+Returns a new L<Mojo::Transaction> object;
+Meant to be overloaded in subclasses.
+
 =head2 C<handler>
 
     $tx = $mojo->handler($tx);
+
+Returns and takes a L<Mojo::Transaction> object as first argument.
+Meant to be overloaded in subclasses.
+
+    sub handler {
+        my ($self, $tx) = @_;
+
+        # Hello world!
+        $tx->res->code(200);
+        $tx->res->headers->content_type('text/plain');
+        $tx->res->body('Congratulations, your Mojo is working!');
+
+        return $tx;
+    }
 
 =head1 SUPPORT
 

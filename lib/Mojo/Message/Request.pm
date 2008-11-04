@@ -269,12 +269,17 @@ implements the following new ones.
     my $params = $req->params;
     my $params = $req->parameters;
 
+Returns a L<Mojo::Parameters> object, containing both GET and POST
+parameters.
+
 =head2 C<query_params>
 
 =head2 C<query_parameters>
 
     my $params = $req->query_params;
     my $params = $req->query_parameters;
+
+Returns a L<Mojo::Parameters> object, containing GET parameters.
 
 =head2 C<url>
 

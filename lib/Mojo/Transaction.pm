@@ -89,7 +89,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Transaction - Transaction
+Mojo::Transaction - HTTP Transaction Container
 
 =head1 SYNOPSIS
 
@@ -139,6 +139,9 @@ implements the following new ones.
     my $req = $tx->request;
     $tx     = $tx->request(Mojo::Message::Request->new);
 
+Returns a L<Mojo::Message::Request> object if called without arguments.
+Returns the invocant if called with arguments.
+
 =head2 C<res>
 
 =head2 C<response>
@@ -146,6 +149,9 @@ implements the following new ones.
     my $res = $tx->res;
     my $res = $tx->response;
     $tx     = $tx->response(Mojo::Message::Response->new);
+
+Returns a L<Mojo::Message::Response> object if called without arguments.
+Returns the invocant if called with arguments.
 
 =head1 METHODS
 

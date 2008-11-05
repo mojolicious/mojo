@@ -13,7 +13,7 @@ require Carp;
 use Mojo::Transaction;
 
 # Oh, so they have internet on computers now!
-our $VERSION = '0.8.5';
+our $VERSION = '0.8005';
 
 *build_tx = \&build_transaction;
 
@@ -122,6 +122,8 @@ Sebastian Riedel, C<sri@cpan.org>.
 =head1 CREDITS
 
 In alphabetical order:
+
+Andreas Koenig.
 
 Andy Grundman
 

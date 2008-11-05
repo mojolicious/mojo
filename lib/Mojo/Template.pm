@@ -14,6 +14,7 @@ use IO::File;
 
 __PACKAGE__->attr('code'           , chained => 1, default => sub {''  });
 __PACKAGE__->attr('comment_mark'   , chained => 1, default => sub {'#' });
+__PACKAGE__->attr('compiled'       , chained => 1);
 __PACKAGE__->attr('expression_mark', chained => 1, default => sub {'=' });
 __PACKAGE__->attr('line_start'     , chained => 1, default => sub {'%' });
 __PACKAGE__->attr('template'       , chained => 1, default => sub {''  });
@@ -21,7 +22,7 @@ __PACKAGE__->attr('tree'           , chained => 1, default => sub {[]  });
 __PACKAGE__->attr('tag_start'      , chained => 1, default => sub {'<%'});
 __PACKAGE__->attr('tag_end'        , chained => 1, default => sub {'%>'});
 
-sub compile {
+sub build {
     my $self = shift;
 
     # Compile
@@ -68,25 +69,42 @@ sub compile {
     return $self;
 }
 
-sub interpret {
+sub compile {
     my $self = shift;
 
     # Shortcut
     my $code = $self->code;
     return undef unless $code;
 
-    # Catch warnings
+    # Catch compilation warnings
     local $SIG{__WARN__} = sub {
         my $error = shift;
         warn $self->_error($error);
     };
 
-    # Prepare
-    my $sub  = eval $code;
-    return $self->_error($@) if $@;
+    # Compile
+    my $compiled = eval $code;
+    die $self->_error($@) if $@;
+
+    $self->compiled($compiled);
+    return $self;
+}
+
+sub interpret {
+    my $self = shift;
+
+    # Shortcut
+    my $compiled = $self->compiled;
+    return undef unless $compiled;
+
+    # Catch interpreter warnings
+    local $SIG{__WARN__} = sub {
+        my $error = shift;
+        warn $self->_error($error);
+    };
 
     # Interpret
-    my $result = eval { $sub->(@_) };
+    my $result = eval { $compiled->(@_) };
     return $self->_error($@) if $@;
 
     return $result;
@@ -213,6 +231,9 @@ sub render {
 
     # Parse
     $self->parse($tmpl);
+
+    # Build
+    $self->build;
 
     # Compile
     $self->compile;
@@ -442,12 +463,13 @@ build a wrapper around it.
     # Compile and store code somewhere
     my $mt = Mojo::Template->new;
     $mt->parse($template);
-    $mt->compile;
+    $mt->build;
     my $code = $mt->code;
 
     # Load code and template (template for debug trace only)
     $mt->template($template);
     $mt->code($code);
+    $mt->compile;
     my $result = $mt->interpret(@arguments);
 
 =head1 ATTRIBUTES
@@ -500,6 +522,10 @@ following new ones.
 =head2 C<new>
 
     my $mt = Mojo::Template->new;
+
+=head2 C<build>
+
+    $mt = $mt->build;
 
 =head2 C<compile>
 

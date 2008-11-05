@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 16;
+use Test::More tests => 21;
 
 use File::Spec;
 use File::Temp;
@@ -26,7 +26,13 @@ $mt->parse(<<'EOF');
 %
 </html>
 EOF
+$mt->build;
+like($mt->code, qr/^sub /);
+like($mt->code, qr/lala/);
+unlike($mt->code, qr/ comment lalala /);
+ok(!defined($mt->compiled));
 $mt->compile;
+is(ref($mt->compiled), 'CODE');
 is($mt->interpret(2), "<html foo=\"bar\">\n3 test 4 lala \n4\%\n</html>\n");
 
 # Arguments

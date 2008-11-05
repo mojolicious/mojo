@@ -13,7 +13,7 @@ require Carp;
 use Mojo::Transaction;
 
 # Oh, so they have internet on computers now!
-our $VERSION = '0.8005';
+our $VERSION = '0.8006';
 
 *build_tx = \&build_transaction;
 

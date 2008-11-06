@@ -108,7 +108,7 @@ is_deeply($req->params->to_hash->{foo}, [qw/bar bar 13/]);
 
 # Parse HTTP 1.1 chunked request with trailing headers
 $req = Mojo::Message::Request->new;
-$req->parse("POST /foo/bar/baz.html?foo=13#23 HTTP/1.1\x0d\x0a");
+$req->parse("POST /foo/bar/baz.html?foo=13&bar=23#23 HTTP/1.1\x0d\x0a");
 $req->parse("Content-Type: text/plain\x0d\x0a");
 $req->parse("Transfer-Encoding: chunked\x0d\x0a");
 $req->parse("Trailer: X-Trailer1; X-Trailer2\x0d\x0a\x0d\x0a");
@@ -123,8 +123,8 @@ is($req->state, 'done');
 is($req->method, 'POST');
 is($req->major_version, 1);
 is($req->minor_version, 1);
-is($req->url, '/foo/bar/baz.html?foo=13#23');
-is($req->query_params, 'foo=13');
+is($req->url, '/foo/bar/baz.html?foo=13&bar=23#23');
+is($req->query_params, 'foo=13&bar=23');
 is($req->headers->content_type, 'text/plain');
 is($req->headers->header('X-Trailer1'), 'test');
 is($req->headers->header('X-Trailer2'), '123');

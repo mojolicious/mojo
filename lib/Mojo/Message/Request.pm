@@ -206,7 +206,7 @@ sub _parse_start_line {
             ^\s*                                         # Start
             ([a-zA-Z]+)                                  # Method
             \s+                                          # Whitespace
-            ([0-9a-zA-Z\$\-_\.\!\?\#\=\*\(\)\,\%\/]+)    # Path
+            ([0-9a-zA-Z\$\-_\.\!\?\#\=\*\(\)\,\%\/\&]+)  # Path
             (?:\s+HTTP\/(\d+)\.(\d+))?                   # Version (optional)
             $                                            # End
         /x) {

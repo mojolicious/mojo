@@ -87,11 +87,15 @@ sub parse {
         # We replace "+" with whitespace
         $pair =~ s/\+/\ /g;
 
-        $pair =~ /^([^\=]*)=(.*)$/;
+        $pair =~ /^([^\=]*)(?:=(.*))?$/;
+
+        my $name  = $1;
+        my $value = $2;
 
         # Unescape
-        my $name  = Mojo::ByteStream->new($1)->url_unescape->to_string;
-        my $value = Mojo::ByteStream->new($2)->url_unescape->to_string;
+        $name  = Mojo::ByteStream->new($name)->url_unescape->to_string;
+        $value = Mojo::ByteStream->new($value)->url_unescape->to_string
+          if $value;
 
         push @{$self->params}, $name, $value;
     }
@@ -147,16 +151,23 @@ sub to_string {
 
         # We replace whitespace with "+"
         $name  =~ s/\ /\+/g;
-        $value =~ s/\ /\+/g;
 
         # *( pchar / "/" / "?" )
         $name  = Mojo::ByteStream->new($name)
           ->url_escape($Mojo::URL::PCHAR . '\/\?');
-        $value = Mojo::ByteStream->new($value)
-          ->url_escape($Mojo::URL::PCHAR . '\/\?');
 
-        $value ||= '';
-        push @params, "$name=$value";
+        # Value is optional
+        if ($value) {
+
+            # We replace whitespace with "+"
+            $value =~ s/\ /\+/g;
+
+            # *( pchar / "/" / "?" )
+            $value = Mojo::ByteStream->new($value)
+              ->url_escape($Mojo::URL::PCHAR . '\/\?');
+        }
+
+        push @params, defined $value ? "$name=$value" : "$name";
     }
 
     my $separator = $self->pair_separator;

@@ -33,6 +33,11 @@ sub run {
     my $path = $self->class_to_path($controller);
     $self->render_to_rel_file('controller', "$name/lib/$path", $controller);
 
+    # Context
+    my $context = "${class}::Context";
+    $path = $self->class_to_path($context);
+    $self->render_to_rel_file('context', "$name/lib/$path", $context);
+
     # Test
     $self->render_to_rel_file('test', "$name/t/basic.t", $class);
 
@@ -149,6 +154,9 @@ sub dispatch {
 sub startup {
     my $self = shift;
 
+    # Use our own context class
+    $self->ctx_class('<%= $class %>::Context');
+
     # Routes
     my $r = $self->routes;
 
@@ -174,6 +182,16 @@ sub welcome {
     # Render template "example/welcome.phtml"
     $c->render;
 }
+
+1;
+__context__
+% my $class = shift;
+package <%= $class %>;
+
+use strict;
+use warnings;
+
+use base 'Mojolicious::Context';
 
 1;
 __static__

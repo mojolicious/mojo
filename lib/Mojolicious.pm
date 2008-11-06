@@ -8,12 +8,16 @@ use warnings;
 use base 'Mojo';
 
 use Mojo::Home;
-use Mojolicious::Context;
+use Mojo::Loader;
 use Mojolicious::Dispatcher;
 use Mojolicious::Renderer;
 use MojoX::Dispatcher::Static;
 use MojoX::Types;
 
+__PACKAGE__->attr('ctx_class',
+    chained => 1,
+    default => 'Mojolicious::Context'
+);
 __PACKAGE__->attr('home', chained => 1, default => sub { Mojo::Home->new });
 __PACKAGE__->attr('renderer',
     chained => 1,
@@ -51,10 +55,16 @@ sub new {
     # Startup
     $self->startup(@_);
 
+    # Load context class
+    Mojo::Loader->new->load($self->ctx_class);
+
     return $self;
 }
 
-sub build_ctx { return Mojolicious::Context->new(app => shift, tx => shift) }
+sub build_ctx {
+    my $self = shift;
+    return $self->ctx_class->new(app => $self, tx => shift);
+}
 
 # You could just overload this method
 sub dispatch {

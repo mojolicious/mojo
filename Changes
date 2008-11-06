@@ -4,6 +4,8 @@ This file documents the revision history for Perl extension Mojo.
         - Simplified api by removing aliases, this will help with subclassing
           annoyances but might break some existing code if you are using long
           versions of formerly aliased attributes.
+        - Fixed support for query strings.
+        - Added a context class to the Mojolicious generator.
         - Cleaned up Mojo::Server api. (Mark Stosberg)
         - Increased Mojo::Template perfromance. (Pedro Melo)
         - Added documentation. (Mark Stosberg)

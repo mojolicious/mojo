@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 180;
+use Test::More tests => 181;
 
 use Mojo::Filter::Chunked;
 use Mojo::Headers;
@@ -133,7 +133,7 @@ is($req->content->file->slurp, 'abcdabcdefghi');
 
 # Parse HTTP 1.1 multipart request
 $req = Mojo::Message::Request->new;
-$req->parse("GET /foo/bar/baz.html?foo=13#23 HTTP/1.1\x0d\x0a");
+$req->parse("GET /foo/bar/baz.html?foo13#23 HTTP/1.1\x0d\x0a");
 $req->parse("Content-Length: 814\x0d\x0a");
 $req->parse('Content-Type: multipart/form-data; bo');
 $req->parse("undary=----------0xKhTmLbOuNdArY\x0d\x0a\x0d\x0a");
@@ -155,7 +155,8 @@ is($req->state, 'done');
 is($req->method, 'GET');
 is($req->major_version, 1);
 is($req->minor_version, 1);
-is($req->url, '/foo/bar/baz.html?foo=13#23');
+is($req->url, '/foo/bar/baz.html?foo13#23');
+is($req->query_params, 'foo13');
 like($req->headers->content_type, qr/multipart\/form-data/);
 is(ref $req->content->parts->[0], 'Mojo::Content');
 is(ref $req->content->parts->[1], 'Mojo::Content');

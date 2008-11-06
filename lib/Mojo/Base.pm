@@ -207,7 +207,7 @@ Currently there are three options supported.
              is returned instead of the value.
     default: Default value for the attribute, can also be a coderef.
              Note that the default value is "lazy", which means it only
-             gets assigned to the instance after the attribute has been
+             gets assigned to the instance when the attribute has been
              called.
     weak:    Weakens the attribute value.
 

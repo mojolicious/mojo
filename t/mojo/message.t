@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 181;
+use Test::More tests => 193;
 
 use Mojo::Filter::Chunked;
 use Mojo::Headers;
@@ -99,6 +99,25 @@ is($req->major_version, 1);
 is($req->minor_version, 1);
 is($req->url, '/foo/bar/baz.html?foo=13#23');
 is($req->headers->content_type, 'x-application-urlencoded');
+is($req->content->file->file_length, 26);
+is($req->content->file->slurp, 'foo=bar& tset=23+;&foo=bar');
+is($req->body_params, 'foo=bar&+tset=23+&foo=bar');
+is_deeply($req->body_params->to_hash->{foo}, [qw/bar bar/]);
+is($req->body_params->to_hash->{' tset'}, '23 ');
+is_deeply($req->params->to_hash->{foo}, [qw/bar bar 13/]);
+
+# Parse HTTP 1.1 "application/x-www-form-urlencoded"
+$req = Mojo::Message::Request->new;
+$req->parse("POST /foo/bar/baz.html?foo=13#23 HTTP/1.1\x0d\x0a");
+$req->parse("Content-Length: 26\x0d\x0a");
+$req->parse("Content-Type: application/x-www-form-urlencoded\x0d\x0a");
+$req->parse("\x0d\x0afoo=bar& tset=23+;&foo=bar");
+is($req->state, 'done');
+is($req->method, 'POST');
+is($req->major_version, 1);
+is($req->minor_version, 1);
+is($req->url, '/foo/bar/baz.html?foo=13#23');
+is($req->headers->content_type, 'application/x-www-form-urlencoded');
 is($req->content->file->file_length, 26);
 is($req->content->file->slurp, 'foo=bar& tset=23+;&foo=bar');
 is($req->body_params, 'foo=bar&+tset=23+&foo=bar');

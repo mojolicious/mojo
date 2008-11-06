@@ -67,12 +67,13 @@ sub body_params {
 
     my $params = Mojo::Parameters->new;
 
-    # "x-application-urlencoded"
+    # "x-application-urlencoded" and "application/x-www-form-urlencoded"
     my $content_type = $self->headers->content_type || '';
-    if ($content_type =~ /x-application-urlencoded/i) {
-        my $raw = $self->content->file->slurp;
+    if ($content_type 
+      =~ /(?:x-application|application\/x-www-form)-urlencoded/i) {
 
         # Parse
+        my $raw = $self->content->file->slurp;
         $params->parse($raw);
 
         return $params;

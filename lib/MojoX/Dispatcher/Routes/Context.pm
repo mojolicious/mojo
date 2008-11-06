@@ -7,17 +7,13 @@ use warnings;
 
 use base 'Mojo::Base';
 
-__PACKAGE__->attr([qw/match transaction/], chained => 1);
-
-*req  = \&request;
-*res  = \&response;
-*tx   = \&transaction;
+__PACKAGE__->attr([qw/match tx/], chained => 1);
 
 # Just make a simple cake. And this time, if someone's going to jump out of
 # it make sure to put them in *after* you cook it.
-sub request { return shift->tx->req }
+sub req { return shift->tx->req }
 
-sub response { return shift->tx->res }
+sub res { return shift->tx->res }
 
 1;
 __END__
@@ -44,24 +40,15 @@ L<MojoX::Dispatcher::Routes::Context> is a context container.
 
 =head2 C<req>
 
-=head2 C<request>
-
     my $req = $c->req;
-    my $req = $c->request;
 
 =head2 C<res>
 
-=head2 C<response>
-
     my $res = $c->res;
-    my $res = $c->response;
 
 =head2 C<tx>
 
-=head2 C<transaction>
-
     my $tx = $c->tx;
-    my $tx = $c->transaction;
 
 =head1 METHODS
 

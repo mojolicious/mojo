@@ -15,9 +15,7 @@ use Mojo::Transaction;
 # Oh, so they have internet on computers now!
 our $VERSION = '0.8006';
 
-*build_tx = \&build_transaction;
-
-sub build_transaction { return Mojo::Transaction->new }
+sub build_tx { return Mojo::Transaction->new }
 
 sub handler { Carp::croak('Method "handler" not implemented in subclass') }
 
@@ -65,10 +63,7 @@ new ones.
 
 =head2 C<build_tx>
 
-=head2 C<build_transaction>
-
     my $tx = $mojo->build_tx;
-    my $tx = $mojo->build_transaction;
 
 Returns a new L<Mojo::Transaction> object;
 Meant to be overloaded in subclasses.

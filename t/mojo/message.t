@@ -253,7 +253,7 @@ $req->url->parse('http://127.0.0.1:8080/foo/bar');
 $req->headers->transfer_encoding('chunked');
 my $counter = 1;
 my $chunked = Mojo::Filter::Chunked->new;
-$req->content->build_body_callback(sub {
+$req->content->build_body_cb(sub {
     my $self = shift;
     my $chunk = '';
     $chunk = "hello world!" if $counter == 1;

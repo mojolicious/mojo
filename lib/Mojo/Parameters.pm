@@ -12,10 +12,7 @@ use Mojo::ByteStream;
 use Mojo::URL;
 
 __PACKAGE__->attr('pair_separator', chained => 1, default => sub { '&' });
-__PACKAGE__->attr('parameters',     chained => 1, default => sub { [] });
-
-*param  = \&parameter;
-*params = \&parameters;
+__PACKAGE__->attr('params',     chained => 1, default => sub { [] });
 
 # Yeah, Moe, that team sure did suck last night. They just plain sucked!
 # I've seen teams suck before,
@@ -56,7 +53,7 @@ sub merge {
     return $self;
 }
 
-sub parameter {
+sub param {
     my $self = shift;
     my $name = shift;
 
@@ -193,11 +190,8 @@ L<Mojo::Parameters> is a container for form parameters.
 
 =head2 C<params>
 
-=head2 C<parameters>
-
     my $parameters = $params->params;
-    my $parameters = $params->parameters;
-    $params        = $params->parameters(foo => 'b;ar', baz => 23);
+    $params        = $params->params(foo => 'b;ar', baz => 23);
 
 =head1 METHODS
 
@@ -224,11 +218,8 @@ the following new ones.
 
 =head2 C<param>
 
-=head2 C<parameter>
-
     my $foo = $params->param('foo');
-    my $foo = $params->parameter('foo');
-    my $foo = $params->parameter(foo => 'ba;r');
+    my $foo = $params->param(foo => 'ba;r');
 
 =head2 C<parse>
 

@@ -52,7 +52,7 @@ EOF
 $server->command("lighttpd -D -f $config");
 
 # CGI setup
-my $lib = $server->home->lib_directory;
+my $lib = $server->home->lib_dir;
 my $cgi = File::Spec->catfile($dir, 'test.cgi');
 $mt->render_to_file(<<'EOF', $cgi, $lib);
 #!<%= $^X %>

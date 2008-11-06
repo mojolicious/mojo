@@ -9,8 +9,6 @@ use base 'MojoX::Dispatcher::Routes';
 
 __PACKAGE__->attr([qw/method user_agent/], chained => 1);
 
-*ua = \&user_agent;
-
 # That's not why people watch TV.
 # Clever things make people feel stupid and unexpected things make them feel
 # scared.
@@ -23,7 +21,7 @@ sub match {
     }
 
     # User-Agent header
-    if (my $regex = $self->ua) {
+    if (my $regex = $self->user_agent) {
         my $ua = $match->tx->req->headers->user_agent || '';
         return undef unless $ua =~ /$regex/;
     }
@@ -58,13 +56,9 @@ L<MojoX::Dispatcher::Routes> and implements the following new ones.
     my $method  = $dispatcher->method;
     $dispatcher = $dispatcher->method(qr/GET|POST/);
 
-=head2 C<ua>
-
 =head2 C<user_agent>
 
-    my $ua      = $dispatcher->ua;
     my $ua      = $dispatcher->user_agent;
-    $dispatcher = $dispatcher->ua(qr/GET|POST/);
     $dispatcher = $dispatcher->user_agent(qr/GET|POST/);
 
 =head1 METHODS

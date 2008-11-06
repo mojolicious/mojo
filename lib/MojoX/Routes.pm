@@ -21,8 +21,6 @@ __PACKAGE__->attr('pattern',
     default => sub { MojoX::Routes::Pattern->new }
 );
 
-*to = \&defaults;
-
 sub new {
     my $self = shift->SUPER::new();
     $self->parse(@_);
@@ -30,19 +28,6 @@ sub new {
 }
 
 sub bridge { return shift->route(@_)->inline(1) }
-
-sub defaults {
-    my $self = shift;
-
-    # Shortcut
-    return $self unless @_;
-
-    # Defaults
-    my $defaults = ref $_[0] eq 'HASH' ? $_[0] : {@_};
-    $self->pattern->defaults($defaults);
-
-    return $self;
-}
 
 sub is_endpoint {
     my $self = shift;
@@ -133,6 +118,19 @@ sub route {
 }
 
 sub segments { return shift->pattern->segments }
+
+sub to {
+    my $self = shift;
+
+    # Shortcut
+    return $self unless @_;
+
+    # Defaults
+    my $defaults = ref $_[0] eq 'HASH' ? $_[0] : {@_};
+    $self->pattern->defaults($defaults);
+
+    return $self;
+}
 
 sub to_string {
     my $self = shift;
@@ -241,14 +239,9 @@ follwing the ones.
 
 =head2 C<to>
 
-=head2 C<defaults>
-
-    my $defaults = $routes->to;
-    my $defaults = $routes->defaults;
-    $routes      = $routes->defaults(action => 'foo');
-    $routes      = $routes->defaults({action => 'foo'});
-    $routes      = $routes->to(action => 'foo');
-    $routes      = $routes->to({action => 'foo'});
+    my $to  = $routes->to;
+    $routes = $routes->to(action => 'foo');
+    $routes = $routes->to({action => 'foo'});
 
 =head2 C<is_endpoint>
 

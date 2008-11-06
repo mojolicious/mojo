@@ -21,7 +21,7 @@ is("$url", 'http://kraih.com');
 $url = Mojo::URL->new(
   'http://sri:foobar@kraih.com:8080/test/index.html?monkey=biz&foo=1#23'
 );
-is($url->is_absolute, 1);
+is($url->is_abs, 1);
 is($url->scheme, 'http');
 is($url->userinfo, 'sri:foobar');
 is($url->user, 'sri');
@@ -40,7 +40,7 @@ is(
 $url = Mojo::URL->new(
   'http://sri:foobar@kraih.com:8080?_monkey=biz%3B&_monkey=23#23'
 );
-is($url->is_absolute, 1);
+is($url->is_abs, 1);
 is($url->scheme, 'http');
 is($url->userinfo, 'sri:foobar');
 is($url->host, 'kraih.com');
@@ -54,27 +54,27 @@ is("$url", 'http://sri:foobar@kraih.com:8080?_monkey=biz;&_monkey=23#23');
 # Relative
 $url = Mojo::URL->new('http://sri:foobar@kraih.com:8080/foo?foo=bar#23');
 $url->base->parse('http://sri:foobar@kraih.com:8080/');
-is($url->is_absolute, 1);
-is($url->to_relative, '/foo?foo=bar#23');
+is($url->is_abs, 1);
+is($url->to_rel, '/foo?foo=bar#23');
 
 # Relative with path
 $url = Mojo::URL->new('http://kraih.com/foo/index.html?foo=bar#23');
 $url->base->parse('http://kraih.com/foo/');
-my $rel = $url->to_relative;
+my $rel = $url->to_rel;
 is($rel, 'index.html?foo=bar#23');
-is($rel->is_absolute, 0);
-is($rel->to_absolute, 'http://kraih.com/foo/index.html?foo=bar#23');
+is($rel->is_abs, 0);
+is($rel->to_abs, 'http://kraih.com/foo/index.html?foo=bar#23');
 
 # Absolute (base without trailing slash)
 $url = Mojo::URL->new('/foo?foo=bar#23');
 $url->base->parse('http://kraih.com/bar');
-is($url->is_absolute, 0);
-is($url->to_absolute, 'http://kraih.com/foo?foo=bar#23');
+is($url->is_abs, 0);
+is($url->to_abs, 'http://kraih.com/foo?foo=bar#23');
 
 # Absolute with path
 $url = Mojo::URL->new('../foo?foo=bar#23');
 $url->base->parse('http://kraih.com/bar/baz/');
-is($url->is_absolute, 0);
-is($url->to_absolute, 'http://kraih.com/bar/baz/../foo?foo=bar#23');
-is($url->to_absolute->to_relative, '../foo?foo=bar#23');
-is($url->to_absolute->base, 'http://kraih.com/bar/baz/');
+is($url->is_abs, 0);
+is($url->to_abs, 'http://kraih.com/bar/baz/../foo?foo=bar#23');
+is($url->to_abs->to_rel, '../foo?foo=bar#23');
+is($url->to_abs->base, 'http://kraih.com/bar/baz/');

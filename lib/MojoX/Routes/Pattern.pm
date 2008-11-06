@@ -13,13 +13,11 @@ __PACKAGE__->attr('defaults',          chained => 1, default => sub { {} });
 __PACKAGE__->attr([qw/pattern regex/], chained => 1);
 __PACKAGE__->attr('quote_end',         chained => 1, default => sub { ')' });
 __PACKAGE__->attr('quote_start',       chained => 1, default => sub { '(' });
-__PACKAGE__->attr('requirements',      chained => 1, default => sub { {} });
+__PACKAGE__->attr('reqs',              chained => 1, default => sub { {} });
 __PACKAGE__->attr('segments',          chained => 1, default => sub { 0 });
 __PACKAGE__->attr('symbol_start',      chained => 1, default => sub { ':' });
 __PACKAGE__->attr('symbols',           chained => 1, default => sub { [] });
 __PACKAGE__->attr('tree',              chained => 1, default => sub { [] });
-
-*reqs = \&requirements;
 
 # This is the worst kind of discrimination. The kind against me!
 sub new {
@@ -293,12 +291,8 @@ L<MojoX::Routes::Pattern> is a route pattern container.
 
 =head2 C<reqs>
 
-=head2 C<requirements>
-
-    my $requirements = $pattern->reqs;
-    my $requirements = $pattern->requirements;
-    $pattern         = $pattern->reqs({foo => qr/\w+/});
-    $pattern         = $pattern->requirements({foo => qr/\w+/});
+    my $reqs = $pattern->reqs;
+    $pattern = $pattern->reqs({foo => qr/\w+/});
 
 =head2 C<segments>
 

@@ -21,7 +21,7 @@ __PACKAGE__->attr([qw/buffer filter_buffer/],
     chained => 1,
     default => sub { Mojo::Buffer->new }
 );
-__PACKAGE__->attr([qw/build_body_callback build_headers_callback filter/],
+__PACKAGE__->attr([qw/build_body_cb build_headers_cb filter/],
     chained => 1
 );
 __PACKAGE__->attr('file',
@@ -33,9 +33,6 @@ __PACKAGE__->attr('headers',
     default => sub { Mojo::Headers->new }
 );
 __PACKAGE__->attr('raw_header_length', chained => 1, default => sub { 0 });
-
-*build_body_cb    = \&build_body_callback;
-*build_headers_cb = \&build_headers_callback;
 
 sub build_body {
     my $self = shift;
@@ -251,13 +248,10 @@ implements the following new ones.
 
 =head2 C<build_body_cb>
 
-=head2 C<build_body_callback>
-
     my $cb = $content->build_body_cb;
-    my $cb = $content->build_body_callback;
 
     $counter = 1;
-    $content = $content->build_body_callback(sub {
+    $content = $content->build_body_cb(sub {
         my $self  = shift;
         my $chunk = '';
         $chunk    = "hello world!" if $counter == 1;
@@ -268,12 +262,9 @@ implements the following new ones.
 
 =head2 C<build_headers_cb>
 
-=head2 C<build_header_callback>
-
     my $cb = $content->build_headers_cb;
-    my $cb = $content->build_headers_callback;
 
-    $content = $content->build_headers_callback(sub {
+    $content = $content->build_headers_cb(sub {
         my $h = Mojo::Headers->new;
         $h->content_type('text/plain');
         return $h->to_string;

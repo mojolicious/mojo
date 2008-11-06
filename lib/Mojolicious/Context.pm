@@ -7,10 +7,8 @@ use warnings;
 
 use base 'MojoX::Dispatcher::Routes::Context';
 
-__PACKAGE__->attr('mojolicious', chained => 1, weak => 1);
+__PACKAGE__->attr('app', chained => 1, weak => 1);
 __PACKAGE__->attr('stash', chained => 1, default => sub { {} });
-
-*mojo = \&mojolicious;
 
 # Space: It seems to go on and on forever...
 # but then you get to the end and a gorilla starts throwing barrels at you.
@@ -25,7 +23,7 @@ sub render {
 
     $options->{template} ||= join '/', $controller, $action;
 
-    return $self->mojo->renderer->render($self, $options);
+    return $self->app->renderer->render($self, $options);
 }
 
 sub url_for {
@@ -57,12 +55,9 @@ L<Mojolicous::Context> is a context container.
 L<Mojolicious::Context> inherits all attributes from
 L<MojoX::Dispatcher::Routes::Context> and implements the following new ones.
 
-=head2 C<mojo>
+=head2 C<app>
 
-=head2 C<mojolicious>
-
-    my $mojo = $c->mojo;
-    my $mojo = $c->mojolicious;
+    my $app = $c->app;
 
 =head2 C<stash>
 

@@ -12,13 +12,8 @@ use File::Spec;
 use FindBin;
 use Mojo::Script;
 
-__PACKAGE__->attr('application_class',  chained => 1);
+__PACKAGE__->attr('app_class',  chained => 1);
 __PACKAGE__->attr('parts',  chained => 1, default => sub { [] });
-
-*app_class = \&application_class;
-*lib_dir   = \&lib_directory;
-*rel_dir   = \&relative_directory;
-*rel_file  = \&relative_file;
 
 # I'm normally not a praying man, but if you're up there,
 # please save me Superman.
@@ -40,8 +35,8 @@ sub new {
 sub detect {
     my ($self, $class) = @_;
 
-    $self->application_class($class) if $class;
-    $class ||= $self->application_class;
+    $self->app_class($class) if $class;
+    $class ||= $self->app_class;
 
     # Environment variable
     if ($ENV{MOJO_HOME}) {
@@ -102,7 +97,7 @@ sub executable {
 
     # Executable
     my $path;
-    if (my $class = $self->application_class) {
+    if (my $class = $self->app_class) {
         my $name = $self->_class_to_file($class);
         $path = File::Spec->catfile(@{$self->parts}, 'bin', $name);
         return $path if -f $path;
@@ -116,7 +111,7 @@ sub executable {
     return undef;
 }
 
-sub lib_directory {
+sub lib_dir {
     my $self = shift;
 
     # Directory found
@@ -134,11 +129,9 @@ sub parse {
     return $self;
 }
 
-sub relative_directory {
-    File::Spec->catdir(@{shift->parts}, split '/', shift);
-}
+sub rel_dir { File::Spec->catdir(@{shift->parts}, split '/', shift) }
 
-sub relative_file { File::Spec->catfile(@{shift->parts}, split '/', shift) }
+sub rel_file { File::Spec->catfile(@{shift->parts}, split '/', shift) }
 
 sub to_string { File::Spec->catdir(@{shift->parts}) }
 
@@ -165,12 +158,8 @@ L<Mojo::Home> is a container for home directories.
 
 =head2 C<app_class>
 
-=head2 C<application_class>
-
     my $class = $home->app_class;
-    my $class = $home->application_class;
     $home     = $home->app_class('Foo::Bar');
-    $home     = $home->application_class('Foo::Bar');
 
 =head2 C<parts>
 
@@ -198,10 +187,7 @@ following new ones.
 
 =head2 C<lib_dir>
 
-=head2 C<lib_directory>
-
     my $path = $home->lib_dir;
-    my $path = $home->lib_directory;
 
 =head2 C<parse>
 
@@ -209,17 +195,11 @@ following new ones.
 
 =head2 C<rel_dir>
 
-=head2 C<relative_directory>
-
     my $path = $home->rel_dir('foo/bar');
-    my $path = $home->relative_directory('foo/bar');
 
 =head2 C<rel_file>
 
-=head2 C<relative_file>
-
     my $path = $home->rel_file('foo/bar.html');
-    my $path = $home->relative_file('foo/bar.html');
 
 =head2 C<to_string>
 

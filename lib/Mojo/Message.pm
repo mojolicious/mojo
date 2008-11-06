@@ -23,9 +23,9 @@ __PACKAGE__->attr('buffer',
     default => sub { Mojo::Buffer->new }
 );
 __PACKAGE__->attr([qw/
-    build_start_line_callback
-    prepare_builder_callback
-    prepare_parser_callback
+    build_start_line_cb
+    prepare_builder_cb
+    prepare_parser_cb
 /], chained => 1);
 __PACKAGE__->attr('content',
     chained => 1,
@@ -35,12 +35,6 @@ __PACKAGE__->attr([qw/major_version minor_version/],
     chained => 1,
     default => sub { 1 }
 );
-
-*to_string           = \&build;
-*body_params         = \&body_parameters;
-*build_start_line_cb = \&build_start_line_callback;
-*prepare_builder_cb  = \&prepare_builder_callback;
-*prepare_parser_cb   = \&prepare_parser_callback;
 
 # I'll keep it short and sweet. Family. Religion. Friendship.
 # These are the three demons you must slay if you wish to succeed in
@@ -65,11 +59,11 @@ sub body {
 
 sub body_length { shift->content->body_length }
 
-sub body_parameters {
+sub body_params {
     my $self = shift;
 
     # Cached
-    return $self->{_body_parameters} if $self->{_body_parameters};
+    return $self->{_body_params} if $self->{_body_params};
 
     my $params = Mojo::Parameters->new;
 
@@ -99,7 +93,7 @@ sub body_parameters {
     }
 
     # Cache
-    return $self->{_body_parameters} = $params;
+    return $self->{_body_params} = $params;
 }
 
 sub build {
@@ -282,6 +276,8 @@ sub parse {
 
 sub start_line_length { return length shift->build_start_line }
 
+sub to_string { shift->build(@_) }
+
 sub upload {
     my ($self, $name) = @_;
 
@@ -427,12 +423,9 @@ implements the following new ones.
 
 =head2 C<build_start_line_cb>
 
-=head2 C<build_start_line_callback>
-
     my $cb = $message->build_start_line_cb;
-    my $cb = $message->build_start_line_callback;
 
-    $message = $content->build_start_line_callback(sub {
+    $message = $content->build_start_line_cb(sub {
         return "HTTP/1.1 200 OK\r\n\r\n";
     });
 
@@ -462,22 +455,16 @@ implements the following new ones.
 
 =head2 C<prepare_builder_cb>
 
-=head2 C<prepare_builder_callback>
-
     my $cb   = $message->prepare_builder_cb;
-    my $cb   = $message->prepare_builder_callback;
-    $message = $message->prepare_builder_callback(sub {
+    $message = $message->prepare_builder_cb(sub {
         my $self = shift;
         # Do stuff! :)
     });
 
 =head2 C<prepare_parser_cb>
 
-=head2 C<prepare_parser_callback>
-
     my $cb   = $message->prepare_parser_cb;
-    my $cb   = $message->prepare_parser_callback;
-    $message = $message->prepare_parser_callback(sub {
+    $message = $message->prepare_parser_cb(sub {
         my $self = shift;
         # Do stuff! :)
     });
@@ -507,10 +494,7 @@ the following new ones.
 
 =head2 C<body_params>
 
-=head2 C<body_parameters>
-
     my $params = $message->body_params;
-    my $params = $message->body_parameters;
 
 Returns a L<Mojo::Parameters> object, containing POST parameters.
 

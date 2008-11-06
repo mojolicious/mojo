@@ -15,8 +15,6 @@ __PACKAGE__->attr('buffer',
     default => sub { Mojo::Buffer->new }
 );
 
-*to_string = \&build;
-
 my @GENERAL_HEADERS = qw/
     Cache-Control
     Connection
@@ -257,6 +255,9 @@ sub remove {
 
 sub set_cookie { return shift->header('Set-Cookie', @_) }
 sub set_cookie2 { return shift->header('Set-Cookie2', @_) }
+
+sub to_string { shift->build(@_) }
+
 sub trailer { return shift->header('Trailer', @_) }
 sub transfer_encoding { return shift->header('Transfer-Encoding', @_) }
 sub user_agent { return shift->header('User-Agent', @_) }

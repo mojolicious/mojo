@@ -11,17 +11,14 @@ use Mojo::Message::Request;
 use Mojo::Message::Response;
 
 __PACKAGE__->attr([qw/continued connection kept_alive/], chained => 1);
-__PACKAGE__->attr('request',
+__PACKAGE__->attr('req',
     chained => 1,
     default => sub { Mojo::Message::Request->new }
 );
-__PACKAGE__->attr('response',
+__PACKAGE__->attr('res',
     chained => 1,
     default => sub { Mojo::Message::Response->new }
 );
-
-*req = \&request;
-*res = \&response;
 
 # What's a wedding?  Webster's dictionary describes it as the act of removing
 # weeds from one's garden.
@@ -133,22 +130,16 @@ implements the following new ones.
 
 =head2 C<req>
 
-=head2 C<request>
-
     my $req = $tx->req;
-    my $req = $tx->request;
-    $tx     = $tx->request(Mojo::Message::Request->new);
+    $tx     = $tx->req(Mojo::Message::Request->new);
 
 Returns a L<Mojo::Message::Request> object if called without arguments.
 Returns the invocant if called with arguments.
 
 =head2 C<res>
 
-=head2 C<response>
-
     my $res = $tx->res;
-    my $res = $tx->response;
-    $tx     = $tx->response(Mojo::Message::Response->new);
+    $tx     = $tx->res(Mojo::Message::Response->new);
 
 Returns a L<Mojo::Message::Response> object if called without arguments.
 Returns the invocant if called with arguments.

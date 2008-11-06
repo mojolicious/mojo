@@ -26,14 +26,6 @@ __PACKAGE__->attr('renderer',
     default => sub { Mojo::Template->new }
 );
 
-*chmod_rel_file     = \&chmod_relative_file;
-*create_dir         = \&create_directory;
-*create_rel_dir     = \&create_relative_directory;
-*rel_dir            = \&relative_directory;
-*rel_file           = \&relative_file;
-*render_to_rel_file = \&render_to_relative_file;
-*write_rel_file     = \&write_relative_file;
-
 sub chmod_file {
     my ($self, $path, $mod) = @_;
 
@@ -45,11 +37,11 @@ sub chmod_file {
     return $self;
 }
 
-sub chmod_relative_file {
+sub chmod_rel_file {
     my ($self, $path, $mod) = @_;
 
     # Path
-    $path = $self->relative_file($path);
+    $path = $self->rel_file($path);
 
     # chmod
     $self->chmod_file($path, $mod);
@@ -74,7 +66,7 @@ sub class_to_path {
     return "$path.pm";
 }
 
-sub create_directory {
+sub create_dir {
     my ($self, $path) = @_;
 
     # Exists
@@ -89,14 +81,14 @@ sub create_directory {
     return $self;
 }
 
-sub create_relative_directory {
+sub create_rel_dir {
     my ($self, $path) = @_;
 
     # Path
-    $path = $self->relative_directory($path);
+    $path = $self->rel_dir($path);
 
     # Create
-    $self->create_directory($path);
+    $self->create_dir($path);
 }
 
 sub get_data {
@@ -129,7 +121,7 @@ sub get_data {
     return undef;
 }
 
-sub relative_directory {
+sub rel_dir {
     my ($self, $path) = @_;
 
     # Parts
@@ -139,7 +131,7 @@ sub relative_directory {
     return File::Spec->catdir(Cwd::getcwd(), @parts);
 }
 
-sub relative_file {
+sub rel_file {
     my ($self, $path) = @_;
 
     # Parts
@@ -174,13 +166,13 @@ sub render_to_file {
     return $self;
 }
 
-sub render_to_relative_file {
+sub render_to_rel_file {
     my $self = shift;
     my $data = shift;
     my $path = shift;
 
     # Path
-    $path = $self->relative_directory($path);
+    $path = $self->rel_dir($path);
 
     # Render
     $self->render_to_file($data, $path, @_);
@@ -196,7 +188,7 @@ sub write_file {
     my @parts = File::Spec->splitdir($path);
     pop @parts;
     my $dir = File::Spec->catdir(@parts);
-    $self->create_directory($dir);
+    $self->create_dir($dir);
 
     # Open file
     my $file = IO::File->new;
@@ -209,11 +201,11 @@ sub write_file {
     return $self;
 }
 
-sub write_relative_file {
+sub write_rel_file {
     my ($self, $path, $data) = @_;
 
     # Path
-    $path = $self->relative_file($path);
+    $path = $self->rel_file($path);
 
     # Write
     $self->write_file($path, $data);
@@ -232,7 +224,7 @@ Mojo::Script - Script Base Class
 
     sub run {
         my $self = shift;
-        $self->render_to_relative_file('foo_bar', 'foo/bar.txt');
+        $self->render_to_rel_file('foo_bar', 'foo/bar.txt');
     }
 
     1;
@@ -269,10 +261,7 @@ following new ones.
 
 =head2 C<chmod_rel_file>
 
-=head2 C<chmod_relative_file>
-
     $script = $script->chmod_rel_file('foo/bar.txt', 0644);
-    $script = $script->chmod_relative_file('foo/bar.txt', 0644);
 
 =head2 C<class_to_file>
 
@@ -284,17 +273,11 @@ following new ones.
 
 =head2 C<create_dir>
 
-=head2 C<create_directory>
-
     $script = $script->create_dir('/foo/bar/baz');
-    $script = $script->create_direcory('/foo/bar/baz');
 
 =head2 C<create_rel_dir>
 
-=head2 C<create_relative_directory>
-
     $script = $script->create_rel_dir('foo/bar/baz');
-    $script = $script->create_relative_direcory('foo/bar/baz');
 
 =head2 C<get_data>
 
@@ -302,17 +285,11 @@ following new ones.
 
 =head2 C<rel_dir>
 
-=head2 C<relative_directory>
-
     my $path = $script->rel_dir('foo/bar');
-    my $path = $script->relative_directory('foo/bar');
 
 =head2 C<rel_file>
 
-=head2 C<relative_file>
-
     my $path = $script->rel_file('foo/bar.txt');
-    my $path = $script->relative_file('foo/bar.txt');
 
 =head2 C<render_data>
 
@@ -324,10 +301,8 @@ following new ones.
 
 =head2 C<render_to_rel_file>
 
-=head2 C<render_to_relative_file>
-
     $script = $script->render_to_rel_file('foo_bar', 'foo/bar.txt');
-    $script = $script->render_to_relative_file('foo_bar', 'foo/bar.txt');
+    $script = $script->render_to_rel_file('foo_bar', 'foo/bar.txt');
 
 =head2 C<run>
 
@@ -339,9 +314,6 @@ following new ones.
 
 =head2 C<write_rel_file>
 
-=head2 C<write_relative_file>
-
     $script = $script->write_rel_file('foo/bar.txt', 'Hello World!');
-    $script = $script->write_relative_file('foo/bar.txt', 'Hello World!');
 
 =cut

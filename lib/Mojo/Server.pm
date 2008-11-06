@@ -12,7 +12,15 @@ use Mojo::Loader;
 
 use constant RELOAD => $ENV{MOJO_RELOAD} || 0;
 
-__PACKAGE__->attr('build_transaction_callback',
+__PACKAGE__->attr('app',
+    chained => 1,
+    default => sub { Mojo::Loader->load_build(shift->app_class) }
+);
+__PACKAGE__->attr('app_class',
+    chained => 1,
+    default => sub { $ENV{MOJO_APP} ||= 'Mojo::HelloWorld' }
+);
+__PACKAGE__->attr('build_tx_cb',
     chained => 1,
     default => sub {
         return sub {
@@ -21,13 +29,14 @@ __PACKAGE__->attr('build_transaction_callback',
             # Reload
             if (RELOAD) {
                 Mojo::Loader->reload;
-                $self->_new_mojo_app;
+                delete $self->{app};
             }
-            return $self->{_mojo_app}->build_tx;
+
+            return $self->app->build_tx;
         }
     }
 );
-__PACKAGE__->attr('continue_handler_callback',
+__PACKAGE__->attr('continue_handler_cb',
     chained => 1,
     default => sub {
         return sub {
@@ -37,26 +46,16 @@ __PACKAGE__->attr('continue_handler_callback',
         };
     }
 );
-__PACKAGE__->attr('handler_callback',
+__PACKAGE__->attr('handler_cb',
     chained => 1,
     default => sub {
         return sub {
             my ($self, $tx) = @_;
-            $self->{_mojo_app}->handler($tx);
+            $self->app->handler($tx);
             return $tx;
         };
     }
 );
-
-*build_tx_cb         = \&build_transaction_callback;
-*continue_handler_cb = \&continue_handler_callback;
-*handler_cb          = \&handler_callback;
-
-sub new {
-    my $self = shift->SUPER::new(@_);
-    $self->_new_mojo_app;
-    return $self;
-}
 
 # It's up to the subclass to decide where log messages go
 sub log {
@@ -74,69 +73,89 @@ sub log {
 # Heh heh heh. Ooh, yeah, right, Lisa. A wonderful, magical animal.
 sub run { croak 'Method "run" not implemented by subclass' }
 
-sub _new_mojo_app {
-    $ENV{MOJO_APP} ||= 'Mojo::HelloWorld';
-    shift->{_mojo_app} = Mojo::Loader->load_build($ENV{MOJO_APP});
-}
-
 1;
 __END__
 
 =head1 NAME
 
-Mojo::Server - Server Base Class
+Mojo::Server - HTTP Server Base Class
 
 =head1 SYNOPSIS
 
     use base 'Mojo::Server';
 
+    sub run {
+        my $self = shift;
+
+        # Get a transaction
+        my $tx = $self->build_tx_cb->($self);
+
+        # Call the handler
+        $tx = $self->handler_cb->($self);
+    }
+
 =head1 DESCRIPTION
 
-L<Mojo::Server> is a server base class.
+L<Mojo::Server> is a HTTP server base class.
+Subclasses should implement their own C<run> method.
+
+The usual request cycle is like this.
+
+    1. Build a new Mojo::Transaction objct with ->build_tx_cb
+    2. Read request information from client
+    3. Put request information into the transaction object
+    4. Call ->handler_cb to build a response
+    5. Get response information from the transaction object
+    6. Write response information to client
+
+We have four servers bundled with L<Mojo>.
+
+L<Mojo::Server::CGI> - Serves a single CGI request.
+
+L<Mojo::Server::Daemon> - Portable standalone HTTP server.
+
+L<Mojo::Server::Daemon::Prefork> - Preforking standalone HTTP server.
+
+L<Mojo::Server::FastCGI> - A FastCGI server.
 
 =head1 ATTRIBUTES
 
-=head2 C<build_tx_cb>
+=head2 C<app>
 
-=head2 C<build_transaction_callback>
+    my $app = $server->app;
+    $server = $server->app(MojoSubclass->new);
+
+Returns the instantiated Mojo application we are serving.
+Overrides C<app_class> if defined.
+
+=head2 C<app_class>
+
+    my $app_class = $server->app_class;
+    $server       = $server->app_class('MojoSubclass');
+
+Returns the class name of the Mojo application we are serving.
+Defaults to C<$ENV{MOJO_APP}> and falls back to C<Mojo::HellWorld>.
+
+=head2 C<build_tx_cb>
 
     my $btx = $server->build_tx_cb;
     $server = $server->build_tx_cb(sub {
         my $self = shift;
         return Mojo::Transaction->new;
     });
-    my $btx = $server->build_transaction_callback;
-    $server = $server->build_transaction_callback(sub {
-        my $self = shift;
-        return Mojo::Transaction->new;
-    });
 
 =head2 C<continue_handler_cb>
-
-=head2 C<continue_handler_callback>
 
     my $handler = $server->continue_handler_cb;
     $server     = $server->continue_handler_cb(sub {
         my ($self, $tx) = @_;
         return $tx;
     });
-    my $handler = $server->continue_handler_callback;
-    $server     = $server->continue_handler_callback(sub {
-        my ($self, $tx) = @_;
-        return $tx;
-    });
 
 =head2 C<handler_cb>
 
-=head2 C<handler_callback>
-
     my $handler = $server->handler_cb;
     $server     = $server->handler_cb(sub {
-        my ($self, $tx) = @_;
-        return $tx;
-    });
-    my $handler = $server->handler_callback;
-    $server     = $server->handler_callback(sub {
         my ($self, $tx) = @_;
         return $tx;
     });
@@ -145,10 +164,6 @@ L<Mojo::Server> is a server base class.
 
 L<Mojo::Server> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
-
-=head2 C<new>
-
-    my $server = Mojo::Server->new;
 
 =head2 C<log>
 

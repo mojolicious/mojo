@@ -22,9 +22,6 @@ __PACKAGE__->attr('query',
     default => sub { Mojo::Parameters->new }
 );
 
-*to_abs = \&to_absolute;
-*to_rel = \&to_relative;
-
 # RFC 3986
 our $UNRESERVED = 'A-Za-z0-9\-\.\_\~';
 our $SUBDELIM   = '!\$\&\'\(\)\*\+\,\;\=';
@@ -91,7 +88,7 @@ sub clone {
     return $clone;
 }
 
-sub is_absolute {
+sub is_abs {
     my $self = shift;
     return 1 if $self->scheme && $self->authority;
     return 0;
@@ -119,7 +116,7 @@ sub parse {
     return $self;
 }
 
-sub to_absolute {
+sub to_abs {
     my $self = shift;
     my $base = shift || $self->base->clone;
 
@@ -143,7 +140,7 @@ sub to_absolute {
     return $abs;
 }
 
-sub to_relative {
+sub to_rel {
     my $self = shift;
     my $base = shift || $self->base->clone;
 
@@ -341,9 +338,9 @@ following new ones.
 
     my $url2 = $url->clone;
 
-=head2 C<is_absolute>
+=head2 C<is_abs>
 
-    my $is_absolute = $url->is_absolute;
+    my $is_abs = $url->is_abs;
 
 =head2 C<parse>
 
@@ -351,17 +348,13 @@ following new ones.
 
 =head2 C<to_abs>
 
-=head2 C<to_absolute>
-
-    my $abs = $url->to_absolute;
-    my $abs = $url->to_absolute(Mojo::URL->new('http://kraih.com/foo'));
+    my $abs = $url->to_abs;
+    my $abs = $url->to_abs(Mojo::URL->new('http://kraih.com/foo'));
 
 =head2 C<to_rel>
 
-=head2 C<to_relative>
-
-    my $rel = $url->to_relative;
-    my $rel = $url->to_relative(Mojo::URL->new('http://kraih.com/foo'));
+    my $rel = $url->to_rel;
+    my $rel = $url->to_rel(Mojo::URL->new('http://kraih.com/foo'));
 
 =head2 C<to_string>
 

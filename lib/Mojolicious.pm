@@ -32,8 +32,6 @@ __PACKAGE__->attr('types',
     default => sub { MojoX::Types->new }
 );
 
-*build_ctx = \&build_context;
-
 # The usual constructor stuff
 sub new {
     my $self = shift->SUPER::new();
@@ -47,8 +45,8 @@ sub new {
 
     # Root
     $self->home->detect(ref $self);
-    $self->renderer->root($self->home->relative_directory('templates'));
-    $self->static->root($self->home->relative_directory('public'));
+    $self->renderer->root($self->home->rel_dir('templates'));
+    $self->static->root($self->home->rel_dir('public'));
 
     # Startup
     $self->startup(@_);
@@ -56,12 +54,7 @@ sub new {
     return $self;
 }
 
-sub build_context {
-    return Mojolicious::Context->new(
-        mojolicious => shift,
-        transaction => shift
-    );
-}
+sub build_ctx { return Mojolicious::Context->new(app => shift, tx => shift) }
 
 # You could just overload this method
 sub dispatch {
@@ -154,10 +147,7 @@ new ones.
 
 =head2 C<build_ctx>
 
-=head2 C<build_context>
-
     my $c = $mojo->build_ctx($tx);
-    my $c = $mojo->build_context($tx);
 
 =head2 C<dispatch>
 

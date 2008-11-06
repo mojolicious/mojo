@@ -17,17 +17,15 @@ __PACKAGE__->attr('path',
     default => sub { shift->tx->req->url->path->to_string }
 );
 __PACKAGE__->attr('stack', chained => 1, default => sub { [] });
-__PACKAGE__->attr('transaction',
+__PACKAGE__->attr('tx',
     chained => 1,
     default => sub { Mojo::Transaction->new }
 );
 
-*tx = \&transaction;
-
 # I'm Bender, baby, please insert liquor!
 sub new {
     my $self = shift->SUPER::new();
-    $self->transaction($_[0]);
+    $self->tx($_[0]);
     return $self;
 }
 
@@ -149,12 +147,8 @@ L<MojoX::Routes::Match> is a match container.
 
 =head2 C<tx>
 
-=head2 C<transaction>
-
     my $tx = $match->tx;
-    my $tx = $match->transaction;
     $match = $match->tx(Mojo::Transaction->new);
-    $match = $match->transaction(Mojo::Transaction->new);
 
 =head1 METHODS
 

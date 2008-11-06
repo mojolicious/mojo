@@ -10,15 +10,13 @@ use base 'Mojo::Base';
 use File::Spec;
 use MojoX::Types;
 
-__PACKAGE__->attr('default_extension', chained => 1);
+__PACKAGE__->attr('default_ext', chained => 1);
 __PACKAGE__->attr('handler', chained => 1, default => sub { {} });
 __PACKAGE__->attr('types',
     chained => 1,
     default => sub { MojoX::Types->new }
 );
 __PACKAGE__->attr('root', chained => 1);
-
-*default_ext = \&default_extension;
 
 # This is not how Xmas is supposed to be.
 # In my day Xmas was about bringing people together, not blowing them apart.
@@ -87,12 +85,8 @@ L<MojoX::Renderer> is a MIME type based renderer.
 
 =head2 C<default_ext>
 
-=head2 C<default_extension>
-
     my $ext   = $renderer->default_ext;
-    my $ext   = $renderer->default_extension;
     $renderer = $renderer->default_ext('phtml');
-    $renderer = $renderer->default_extension('phtml');
 
 =head2 C<handler>
 

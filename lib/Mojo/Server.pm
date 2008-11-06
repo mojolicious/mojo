@@ -115,7 +115,7 @@ The usual request cycle is like this.
     my $app = $server->app;
     $server = $server->app(MojoSubclass->new);
 
-Returns the instantiated Mojo application we are serving.
+Returns the instantiated Mojo application to serve.
 Overrides C<app_class> if defined.
 
 =head2 C<app_class>
@@ -123,8 +123,8 @@ Overrides C<app_class> if defined.
     my $app_class = $server->app_class;
     $server       = $server->app_class('MojoSubclass');
 
-Returns the class name of the Mojo application we are serving.
-Defaults to C<$ENV{MOJO_APP}> and falls back to C<Mojo::HellWorld>.
+Returns the class name of the Mojo application to serve.
+Defaults to C<$ENV{MOJO_APP}> and falls back to C<Mojo::HelloWorld>.
 
 =head2 C<build_tx_cb>
 

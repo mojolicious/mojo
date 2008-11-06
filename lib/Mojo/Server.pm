@@ -108,16 +108,6 @@ The usual request cycle is like this.
     5. Get response information from the transaction object
     6. Write response information to client
 
-We have four servers bundled with L<Mojo>.
-
-L<Mojo::Server::CGI> - Serves a single CGI request.
-
-L<Mojo::Server::Daemon> - Portable standalone HTTP server.
-
-L<Mojo::Server::Daemon::Prefork> - Preforking standalone HTTP server.
-
-L<Mojo::Server::FastCGI> - A FastCGI server.
-
 =head1 ATTRIBUTES
 
 =head2 C<app>
@@ -172,5 +162,15 @@ following new ones.
 =head2 C<run>
 
     $server->run;
+
+=head1 BUNDLED SERVERS
+
+L<Mojo::Server::CGI> - Serves a single CGI request.
+
+L<Mojo::Server::Daemon> - Portable standalone HTTP server.
+
+L<Mojo::Server::Daemon::Prefork> - Preforking standalone HTTP server.
+
+L<Mojo::Server::FastCGI> - A FastCGI server.
 
 =cut

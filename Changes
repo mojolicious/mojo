@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension Mojo.
 
 0.8008  2008-11-07 00:00:00
         - Fixed multipart parsing for short requests.
+        - Fixed content file storage to specific file.
 
 0.8007  2008-11-07 00:00:00
         - Cleaned up the api some more.

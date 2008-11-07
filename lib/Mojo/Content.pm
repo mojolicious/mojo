@@ -207,9 +207,11 @@ sub _parse_headers {
     $self->raw_header_length($raw_header_length);
 
     # Make sure we don't waste memory
-    $self->file(Mojo::File->new)
-      if !$self->headers->content_length
-      || $self->headers->content_length > MAX_MEMORY_SIZE;
+    unless ($self->file->isa('Mojo::File')) {
+        $self->file(Mojo::File->new)
+          if !$self->headers->content_length
+          || $self->headers->content_length > MAX_MEMORY_SIZE;
+    }
 
     $self->state('body') if $self->headers->is_done;
 }

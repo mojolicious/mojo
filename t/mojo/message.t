@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 193;
+use Test::More tests => 197;
 
 use Mojo::Filter::Chunked;
 use Mojo::Headers;
@@ -124,6 +124,8 @@ is($req->body_params, 'foo=bar&+tset=23+&foo=bar');
 is_deeply($req->body_params->to_hash->{foo}, [qw/bar bar/]);
 is($req->body_params->to_hash->{' tset'}, '23 ');
 is_deeply($req->params->to_hash->{foo}, [qw/bar bar 13/]);
+is_deeply($req->param('foo'), [qw/bar bar 13/]);
+is($req->param(' tset'), '23 ');
 
 # Parse HTTP 1.1 chunked request with trailing headers
 $req = Mojo::Message::Request->new;
@@ -186,6 +188,8 @@ is($req->body_params->to_hash->{text2}, '');
 is($req->upload('upload')->filename, 'hello.pl');
 is(ref $req->upload('upload')->file, 'Mojo::File');
 is($req->upload('upload')->file->length, 69);
+ok($req->upload('upload')->copy_to('MOJO_TMP.txt'));
+is((unlink 'MOJO_TMP.txt'), 1);
 
 # Build minimal HTTP 1.1 request
 $req = Mojo::Message::Request->new;

@@ -198,6 +198,10 @@ L<Mojo::File> is a container for files.
     my $handle = $file->handle;
     $file      = $file->handle(IO::File->new);
 
+Returns a L<IO::File> object representing a file upload if called without
+arguments.
+Returns the invocant if called with arguments.
+
 =head2 C<length>
 
     my $length = $file->length;
@@ -232,5 +236,7 @@ following new ones.
 =head2 C<slurp>
 
     my $string = $file->slurp;
+
+Returns the entire file content as a string.
 
 =cut

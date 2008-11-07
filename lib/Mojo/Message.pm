@@ -248,6 +248,12 @@ sub is_version {
     return 0;
 }
 
+sub param {
+    my $self = shift;
+    $self->{body_params} ||= $self->body_params;
+    return $self->{body_params}->param(@_);
+}
+
 # Please don't eat me! I have a wife and kids. Eat them!
 sub parse {
     my $self = shift;
@@ -548,6 +554,10 @@ Returns a L<Mojo::Parameters> object, containing POST parameters.
 =head2 C<is_version>
 
     my $is_version = $message->is_version('1.1);
+
+=head2 C<param>
+
+    my $param = $message->param('foo');
 
 =head2 C<parse>
 

@@ -1,6 +1,10 @@
 This file documents the revision history for Perl extension Mojo.
 
 0.8007  2008-11-07 00:00:00
+        - Cleaned up the api some more.
+        - Added param to Mojo::Message.
+        - Added server.t. (Mark Stosberg)
+        - Added documentation. (Mark Stosberg)
         - Cleaned up Mojo::File api.
         - Fixed infinite loop in Mojo::File. (Leon Brocard)
 

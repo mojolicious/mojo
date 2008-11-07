@@ -17,9 +17,6 @@ __PACKAGE__->attr('method',
 );
 __PACKAGE__->attr('url', chained => 1, default => sub { Mojo::URL->new });
 
-*params = \&parameters;
-*query_params = \&query_parameters;
-
 sub cookies {
     my $self = shift;
 
@@ -67,7 +64,13 @@ sub fix_headers {
     return $self;
 }
 
-sub parameters {
+sub param {
+    my $self = shift;
+    $self->{params} ||= $self->params;
+    return $self->{params}->param(@_);
+}
+
+sub params {
     my $self = shift;
     my $params = Mojo::Parameters->new;
     $params->merge($self->body_params, $self->query_params);
@@ -108,7 +111,7 @@ sub proxy {
     return $self->{proxy};
 }
 
-sub query_parameters { return shift->url->query }
+sub query_params { return shift->url->query }
 
 sub _build_start_line {
     my $self = shift;
@@ -264,20 +267,14 @@ implements the following new ones.
 
 =head2 C<params>
 
-=head2 C<parameters>
-
     my $params = $req->params;
-    my $params = $req->parameters;
 
 Returns a L<Mojo::Parameters> object, containing both GET and POST
 parameters.
 
 =head2 C<query_params>
 
-=head2 C<query_parameters>
-
     my $params = $req->query_params;
-    my $params = $req->query_parameters;
 
 Returns a L<Mojo::Parameters> object, containing GET parameters.
 
@@ -299,6 +296,10 @@ implements the following new ones.
 =head2 C<fix_headers>
 
     $req = $req->fix_headers;
+
+=head2 C<param>
+
+    my $param = $req->param('foo');
 
 =head2 C<parse>
 

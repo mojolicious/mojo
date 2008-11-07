@@ -8,6 +8,9 @@ use bytes;
 
 use base 'Mojo::File';
 
+use Carp 'croak';
+use IO::File;
+
 __PACKAGE__->attr('content', default => sub { '' });
 
 # There's your giraffe, little girl.
@@ -20,9 +23,9 @@ sub add_chunk {
     return $self;
 }
 
-sub length { return length(shift->{content} || '') }
-
 sub contains { return index(shift->{content}, shift) >= 0 ? 1 : 0 }
+
+sub copy_to { shift->_write_to_file(@_) }
 
 sub get_chunk {
     my ($self, $offset) = @_;
@@ -30,7 +33,19 @@ sub get_chunk {
     return substr $copy, $offset, 4096;
 }
 
+sub length { return length(shift->{content} || '') }
+
+sub move_to { shift->_write_to_file(@_) }
+
 sub slurp { return shift->content }
+
+sub _write_to_file {
+    my ($self, $path) = @_;
+    my $file = IO::File->new;
+    $file->open("> $path") or croak qq/Couldn't open file "$path": $!/;
+    $file->syswrite($self->{content});
+    return $self;
+}
 
 1;
 __END__
@@ -75,6 +90,12 @@ the following new ones.
 
     my $contains = $file->contains('random string');
 
+=head2 C<copy_to>
+
+    $file = $file->copy_to('/foo/bar/baz.txt');
+
+Copies the uploaded file contents to the given path and returns the invocant.
+
 =head2 C<get_chunk>
 
     my $chunk = $file->get_chunk($offset);
@@ -82,6 +103,12 @@ the following new ones.
 =head2 C<length>
 
     my $length = $file->length;
+
+=head2 C<move_to>
+
+    $file = $file->move_to('/foo/bar/baz.txt');
+
+Moves the uploaded file contents to the given path and returns the invocant.
 
 =head2 C<slurp>
 

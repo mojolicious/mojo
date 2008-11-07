@@ -8,7 +8,6 @@ use warnings;
 use base 'Mojo::Base';
 
 use Carp 'croak';
-use File::Copy ();
 use Mojo::File;
 use Mojo::Headers;
 
@@ -23,15 +22,11 @@ __PACKAGE__->attr('headers',
 # You sunk my scrabbleship!
 # This game makes no sense.
 # Tell that to the good men who just lost their lives... SEMPER-FI!
-sub copy_to {
-    my ($self, $path) = @_;
-    my $src = $self->file->path;
-    File::Copy::copy($src, $path)
-      || croak qq/Couldn't copy file "$src" to "$path": $!/;
-    return $self;
-}
+sub copy_to { shift->file->copy_to(@_) }
 
 sub length { shift->file->length }
+
+sub move_to { shift->file->move_to(@_) }
 
 sub slurp { shift->file->slurp }
 
@@ -98,9 +93,15 @@ following new ones.
 
 =head2 C<copy_to>
 
-    $upload = $upload->copy_to('/foo/bar/baz.txt');
+    $upload->copy_to('/foo/bar/baz.txt');
 
-Copies the uploaded file contents to the given path and returns the invocant.
+Copies the uploaded file contents to the given path.
+
+=head2 C<move_to>
+
+    $upload->move_to('/foo/bar/baz.txt');
+
+Moves the uploaded file contents to the given path.
 
 =head2 C<slurp>
 

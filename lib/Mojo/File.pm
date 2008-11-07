@@ -10,6 +10,8 @@ use bytes;
 
 # We can't use File::Temp because there is no seek support in the version
 # shipped with Perl 5.8
+use Carp 'croak';
+use File::Copy ();
 use File::Spec;
 use IO::File;
 use Mojo::ByteStream;
@@ -100,6 +102,14 @@ sub contains {
     return 0;
 }
 
+sub copy_to {
+    my ($self, $path) = @_;
+    my $src = $self->path;
+    File::Copy::copy($src, $path)
+      || croak qq/Couldn't copy file "$src" to "$path": $!/;
+    return $self;
+}
+
 sub get_chunk {
     my ($self, $offset) = @_;
 
@@ -120,23 +130,20 @@ sub get_chunk {
 }
 
 sub length {
-    my ($self, $length) = @_;
+    my $self = shift;
 
-    # Set
-    if ($length) {
-        $self->{length} = $length;
-        return $self;
-    }
-
-    # User defined
-    return $self->{length} if $self->{length};
-
-    # From file
     my $file = $self->path;
     return -s $file if $file;
 
-    # None
     return 0;
+}
+
+sub move_to {
+    my ($self, $path) = @_;
+    my $src = $self->path;
+    File::Copy::move($src, $path)
+      || croak qq/Couldn't move file "$src" to "$path": $!/;
+    return $self;
 }
 
 sub path {
@@ -202,11 +209,6 @@ Returns a L<IO::File> object representing a file upload if called without
 arguments.
 Returns the invocant if called with arguments.
 
-=head2 C<length>
-
-    my $length = $file->length;
-    $file      = $file->length(9000);
-
 =head2 C<path>
 
     my $path = $file->path;
@@ -229,9 +231,25 @@ following new ones.
 
     my $contains = $file->contains('random string');
 
+=head2 C<copy_to>
+
+    $file = $file->copy_to('/foo/bar/baz.txt');
+
+Copies the uploaded file contents to the given path and returns the invocant.
+
 =head2 C<get_chunk>
 
     my $chunk = $file->get_chunk($offset);
+
+=head2 C<length>
+
+    my $length = $file->length;
+
+=head2 C<move_to>
+
+    $file = $file->move_to('/foo/bar/baz.txt');
+
+Moves the uploaded file contents to the given path and returns the invocant.
 
 =head2 C<slurp>
 

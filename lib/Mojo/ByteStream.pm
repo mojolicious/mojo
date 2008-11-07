@@ -85,7 +85,8 @@ sub decamelize {
     my $self = shift;
 
     # Shortcut
-    return $self unless defined $self->{bytestream};
+    return $self if !defined $self->{bytestream}
+      || $self->{bytestream} !~ /^[A-Z]+/;
 
     # Split
     my @words;

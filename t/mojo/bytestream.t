@@ -8,7 +8,7 @@ use warnings;
 # Homer, we're going to ask you a few simple yes or no questions.
 # Do you understand?
 # Yes. *lie dectector blows up*
-use Test::More tests => 18;
+use Test::More tests => 20;
 
 # Lisa, if the Bible has taught us nothing else, and it hasn't,
 # it's that girls should stick to girls sports,
@@ -18,9 +18,13 @@ use_ok('Mojo::ByteStream');
 # camelize
 my $stream = Mojo::ByteStream->new('foo_bar_baz');
 is($stream->camelize, 'FooBarBaz');
+$stream = Mojo::ByteStream->new('FooBarBaz');
+is($stream->camelize, 'Foobarbaz');
 
 # decamelize
 $stream = Mojo::ByteStream->new('FooBarBaz');
+is($stream->decamelize, 'foo_bar_baz');
+$stream = Mojo::ByteStream->new('foo_bar_baz');
 is($stream->decamelize, 'foo_bar_baz');
 
 # b64_encode

@@ -168,7 +168,7 @@ sub parse {
         return $self if $self->isa('Mojo::Content::MultiPart');
 
         # Need to upgrade
-        return Mojo::Content::MultiPart->new($self);
+        return Mojo::Content::MultiPart->new($self)->parse;
     }
 
     # Parse body

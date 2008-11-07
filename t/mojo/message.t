@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 197;
+use Test::More tests => 199;
 
 use Mojo::Filter::Chunked;
 use Mojo::Headers;
@@ -667,3 +667,24 @@ is($req->build,
   . "Expect: 100-continue\x0d\x0a\x0d\x0a"
   . "Hello World!\n"
 );
+
+# WebKit multipart/form-data request
+$req = Mojo::Message::Request->new;
+$req->parse(
+      "POST /example/testform_handler HTTP/1.1\x0d\x0a"
+    . "User-Agent: Mozilla/5.0\x0d\x0a"
+    . 'Content-Type: multipart/form-data; '
+    . "boundary=----WebKitFormBoundaryi5BnD9J9zoTMiSuP\x0d\x0a"
+    . "Content-Length: 323\x0d\x0aConnection: keep-alive\x0d\x0a"
+    . "Host: 127.0.0.1:3000\x0d\x0a\x0d\x0a"
+    . "------WebKitFormBoundaryi5BnD9J9zoTMiSuP\x0d\x0a"
+    . "Content-Disposition: form-data; name=\"Vorname\"\x0d\x0a"
+    . "\x0d\x0aT\x0d\x0a------WebKitFormBoundaryi5BnD9J9zoTMiSuP\x0d"
+    . "\x0aContent-Disposition: form-data; name=\"Zuname\"\x0d\x0a"
+    . "\x0d\x0a\x0d\x0a------WebKitFormBoundaryi5BnD9J9zoTMiSuP\x0d"
+    . "\x0aContent-Disposition: form-data; name=\"Text\"\x0d\x0a"
+    . "\x0d\x0a\x0d\x0a------WebKitFormBoundaryi5BnD9J9zoTMiSuP--"
+    . "\x0d\x0a"
+);
+is($req->is_done, 1);
+is($req->param('Vorname'), 'T');

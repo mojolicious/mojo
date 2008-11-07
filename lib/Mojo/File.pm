@@ -52,7 +52,7 @@ __PACKAGE__->attr('handle',
 sub DESTROY {
     my $self = shift;
     my $file = $self->path;
-    unlink $file if $self->cleanup && $file;
+    unlink $file if $self->cleanup && -f $file;
 }
 
 # Hi, Super Nintendo Chalmers!

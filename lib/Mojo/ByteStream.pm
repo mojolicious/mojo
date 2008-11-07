@@ -122,6 +122,12 @@ sub encode {
     return $self;
 }
 
+sub length {
+    my $self = shift;
+    $self->{bytestream} ||= '';
+    return length $self->{bytestream};
+}
+
 sub md5_sum {
     my $self = shift;
 
@@ -162,12 +168,6 @@ sub quote {
     $self->{bytestream} = '"' . $self->{bytestream} . '"';
 
     return $self;
-}
-
-sub stream_length {
-    my $self = shift;
-    $self->{bytestream} ||= '';
-    return length $self->{bytestream};
 }
 
 sub to_string { return shift->{bytestream} }
@@ -266,7 +266,7 @@ Mojo::ByteStream - ByteStream
     $stream->url_sanitize;
     $stream->url_unescape;
 
-    my $stream_length = $stream->stream_length;
+    my $length = $stream->length;
 
     my $stream2 = $stream->clone;
     print $stream2->to_string;
@@ -280,12 +280,6 @@ Mojo::ByteStream - ByteStream
 
 L<Mojo::ByteStream> provides portable text and bytestream manipulation
 functions.
-
-=head1 ATTRIBUTES
-
-=head2 C<stream_length>
-
-    my $stream_length = $stream->stream_length;
 
 =head1 METHODS
 
@@ -323,6 +317,10 @@ the following new ones.
 =head2 C<encode>
 
     $stream = $stream->encode($encoding);
+
+=head2 C<length>
+
+    my $length = $stream->length;
 
 =head2 C<md5_sum>
 

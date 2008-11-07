@@ -1,5 +1,9 @@
 This file documents the revision history for Perl extension Mojo.
 
+0.8007  2008-11-07 00:00:00
+        - Cleaned up Mojo::File api.
+        - Fixed infinite loop in Mojo::File. (Leon Brocard)
+
 0.8006  2008-11-06 00:00:00
         - Simplified api by removing aliases, this will help with subclassing
           annoyances but might break some existing code if you are using long

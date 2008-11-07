@@ -25,12 +25,6 @@ sub add_chunk {
     return $self;
 }
 
-sub buffer_length {
-    my $self = shift;
-    $self->{buffer} ||= '';
-    return length $self->{buffer};
-}
-
 sub empty {
     my $self = shift;
     my $buffer = $self->{buffer};
@@ -54,6 +48,12 @@ sub get_line {
     return $line;
 }
 
+sub length {
+    my $self = shift;
+    $self->{buffer} ||= '';
+    return length $self->{buffer};
+}
+
 sub remove {
     my ($self, $length) = @_;
     return substr $self->{buffer}, 0, $length, '';
@@ -61,7 +61,7 @@ sub remove {
 
 sub replace {
     my ($self, $buffer) = @_;
-    $self->raw_length(length $buffer);
+    $self->raw_length(CORE::length($buffer));
     $self->{buffer} = $buffer;
     return $self;
 }
@@ -90,9 +90,9 @@ L<Mojo::Buffer> is a simple in-memory buffer.
 
 =head1 ATTRIBUTES
 
-=head2 C<buffer_length>
+=head2 C<length>
 
-    my $buffer_length = $buffer->buffer_length;
+    my $length = $buffer->length;
 
 =head2 C<raw_length>
 

@@ -28,7 +28,7 @@ sub copy_to {
     return $self;
 }
 
-sub file_length { shift->file->file_length }
+sub length { shift->file->length }
 
 sub slurp { shift->file->slurp }
 
@@ -69,9 +69,9 @@ Returns the invocant if called with arguments.
 Returns a file name like C<foo.txt> if called without arguments.
 Returns the invocant if called with arguments.
 
-=head2 C<file_length>
+=head2 C<length>
 
-    my $length = $upload->file_length;
+    my $length = $upload->length;
 
 Returns the length of the file upload in bytes.
 

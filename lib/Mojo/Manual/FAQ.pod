@@ -30,7 +30,7 @@ If you want to send a file for example, then C<content> would be the right
 choice.
 
     my $file = Mojo::File->new;
-    $file->file_name('/etc/passwd');
+    $file->path('/etc/passwd');
     $tx->res->content->file($file);
 
 =cut

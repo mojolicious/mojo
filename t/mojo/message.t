@@ -84,7 +84,7 @@ is($req->major_version, 1);
 is($req->minor_version, 1);
 is($req->url, '/foo/bar/baz.html?foo=13#23');
 is($req->headers->content_type, 'text/plain');
-is($req->content->file->file_length, 13);
+is($req->content->file->length, 13);
 is($req->content->file->slurp, 'abcdabcdefghi');
 
 # Parse HTTP 1.1 "x-application-urlencoded"
@@ -99,7 +99,7 @@ is($req->major_version, 1);
 is($req->minor_version, 1);
 is($req->url, '/foo/bar/baz.html?foo=13#23');
 is($req->headers->content_type, 'x-application-urlencoded');
-is($req->content->file->file_length, 26);
+is($req->content->file->length, 26);
 is($req->content->file->slurp, 'foo=bar& tset=23+;&foo=bar');
 is($req->body_params, 'foo=bar&+tset=23+&foo=bar');
 is_deeply($req->body_params->to_hash->{foo}, [qw/bar bar/]);
@@ -118,7 +118,7 @@ is($req->major_version, 1);
 is($req->minor_version, 1);
 is($req->url, '/foo/bar/baz.html?foo=13#23');
 is($req->headers->content_type, 'application/x-www-form-urlencoded');
-is($req->content->file->file_length, 26);
+is($req->content->file->length, 26);
 is($req->content->file->slurp, 'foo=bar& tset=23+;&foo=bar');
 is($req->body_params, 'foo=bar&+tset=23+&foo=bar');
 is_deeply($req->body_params->to_hash->{foo}, [qw/bar bar/]);
@@ -147,7 +147,7 @@ is($req->query_params, 'foo=13&bar=23');
 is($req->headers->content_type, 'text/plain');
 is($req->headers->header('X-Trailer1'), 'test');
 is($req->headers->header('X-Trailer2'), '123');
-is($req->content->file->file_length, 13);
+is($req->content->file->length, 13);
 is($req->content->file->slurp, 'abcdabcdefghi');
 
 # Parse HTTP 1.1 multipart request
@@ -185,7 +185,7 @@ is($req->body_params->to_hash->{text1}, "hallo welt test123\n");
 is($req->body_params->to_hash->{text2}, '');
 is($req->upload('upload')->filename, 'hello.pl');
 is(ref $req->upload('upload')->file, 'Mojo::File');
-is($req->upload('upload')->file->file_length, 69);
+is($req->upload('upload')->file->length, 69);
 
 # Build minimal HTTP 1.1 request
 $req = Mojo::Message::Request->new;

@@ -24,7 +24,7 @@ __PACKAGE__->attr('handle',
         my $handle = IO::File->new;
 
         # Already got a file without handle
-        my $file = $self->file_name;
+        my $file = $self->path;
         if ($file) {
             $handle->open("+>> $file") or die qq/Can't open file "$file": $!/;
             return $handle;
@@ -38,7 +38,7 @@ __PACKAGE__->attr('handle',
             $file = "$base.$sum";
         }
 
-        $self->file_name($file);
+        $self->path($file);
         $self->cleanup(1);
 
         # Open for read/write access
@@ -49,7 +49,7 @@ __PACKAGE__->attr('handle',
 
 sub DESTROY {
     my $self = shift;
-    my $file = $self->file_name;
+    my $file = $self->path;
     unlink $file if $self->cleanup && $file;
 }
 
@@ -88,7 +88,7 @@ sub contains {
     my $offset = $read;
 
     # Moving window search
-    while ($offset < $self->file_length) {
+    while ($offset < $self->length) {
         $read = $self->handle->sysread($buffer, length($bytestream));
         $offset += $read;
         $window .= $buffer;
@@ -100,41 +100,16 @@ sub contains {
     return 0;
 }
 
-sub file_length {
-    my ($self, $length) = @_;
-
-    # Set
-    if ($length) {
-        $self->{file_length} = $length;
-        return $self;
-    }
-
-    # User defined
-    return $self->{file_length} if $self->{file_length};
-
-    # From file
-    my $file = $self->file_name;
-    return -s $file if $file;
-
-    # None
-    return 0;
-}
-
-sub file_name {
-    my ($self, $file) = @_;
-
-    # Set
-    if ($file) {
-        $self->{file_name} = $file;
-        return $self;
-    }
-
-    # Get
-    return $self->{file_name};
-}
-
 sub get_chunk {
     my ($self, $offset) = @_;
+
+    # Cache length
+    $self->{length} = $self->length
+      unless defined $self->{length};
+    my $length = $self->{length};
+
+    # EOF
+    return '' if $offset > $length;
 
     # Seek to start
     $self->handle->seek(0, SEEK_SET);
@@ -142,6 +117,39 @@ sub get_chunk {
     # Read
     $self->handle->sysread(my $buffer, 4096, $offset);
     return $buffer;
+}
+
+sub length {
+    my ($self, $length) = @_;
+
+    # Set
+    if ($length) {
+        $self->{length} = $length;
+        return $self;
+    }
+
+    # User defined
+    return $self->{length} if $self->{length};
+
+    # From file
+    my $file = $self->path;
+    return -s $file if $file;
+
+    # None
+    return 0;
+}
+
+sub path {
+    my ($self, $file) = @_;
+
+    # Set
+    if ($file) {
+        $self->{path} = $file;
+        return $self;
+    }
+
+    # Get
+    return $self->{path};
 }
 
 sub slurp {
@@ -190,15 +198,15 @@ L<Mojo::File> is a container for files.
     my $handle = $file->handle;
     $file      = $file->handle(IO::File->new);
 
-=head2 C<file_length>
+=head2 C<length>
 
-    my $file_length = $file->file_length;
-    $file           = $file->file_length(9000);
+    my $length = $file->length;
+    $file      = $file->length(9000);
 
-=head2 C<file_name>
+=head2 C<path>
 
-    my $file_name = $file->file_name;
-    $file         = $file->file_name(9000);
+    my $path = $file->path;
+    $file    = $file->path('/foo/bar.txt');
 
 =head1 METHODS
 

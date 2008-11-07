@@ -83,7 +83,7 @@ sub body_contains {
     return $self->file->contains($chunk);
 }
 
-sub body_length { shift->file->file_length }
+sub body_length { shift->file->length }
 
 sub get_body_chunk {
     my ($self, $offset) = @_;

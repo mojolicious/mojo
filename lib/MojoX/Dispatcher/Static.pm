@@ -59,7 +59,7 @@ sub serve {
         $res->content(Mojo::Content->new(file => Mojo::File->new));
         $res->code(200);
         $res->headers->content_type($type);
-        $res->content->file->file_name($path);
+        $res->content->file->path($path);
     }
 
     return $self;

@@ -20,7 +20,7 @@ sub add_chunk {
     return $self;
 }
 
-sub file_length { return length(shift->{content} || '') }
+sub length { return length(shift->{content} || '') }
 
 sub contains { return index(shift->{content}, shift) >= 0 ? 1 : 0 }
 
@@ -53,10 +53,6 @@ L<Mojo::File::Memory> is a container for in-memory files.
 
 =head1 ATTRIBUTES
 
-=head2 C<file_length>
-
-    my $file_length = $file->file_length;
-
 =head2 C<content>
 
     my $handle = $file->content;
@@ -82,6 +78,10 @@ the following new ones.
 =head2 C<get_chunk>
 
     my $chunk = $file->get_chunk($offset);
+
+=head2 C<length>
+
+    my $length = $file->length;
 
 =head2 C<slurp>
 

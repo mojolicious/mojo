@@ -191,7 +191,7 @@ sub to_string {
     $url .= lc "$scheme://" if $scheme && $authority;
     $url .= "$authority$path";
     $url .= "?$query" if @{$query->params};
-    $url .= "#$fragment" if $fragment->stream_length;
+    $url .= "#$fragment" if $fragment->length;
 
     return $url;
 }

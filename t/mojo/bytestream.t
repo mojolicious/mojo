@@ -87,6 +87,6 @@ is($stream->unquote, 'foo 23 "bar');
 $stream = Mojo::ByteStream->new('foo bar baz');
 is($stream->md5_sum, 'ab07acbb1e496801937adfa772424bf7');
 
-# stream_length
+# length
 $stream = Mojo::ByteStream->new('foo bar baz');
-is($stream->stream_length, 11);
+is($stream->length, 11);

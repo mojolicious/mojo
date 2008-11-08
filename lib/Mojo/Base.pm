@@ -72,7 +72,7 @@ sub attr {
 
             # Check invocant
             $code .= "${ws}Carp::croak(\'";
-            $code .= 'Attribute has to be called with an object not a class';
+            $code .= 'Attribute has to be called on an object, not a class';
             $code .= "')\n  ${ws}unless ref \$_[0];\n";
         }
 
@@ -141,7 +141,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Base - Once Upon A Midnight Dreary!
+Mojo::Base - Minimal Object System For Mojo Related Projects
 
 =head1 SYNOPSIS
 
@@ -170,14 +170,14 @@ Mojo::Base - Once Upon A Midnight Dreary!
 
 =head1 DESCRIPTION
 
-L<Mojo::Base> is a base class containing simple and fast helpers for object
-oriented Perl programming.
+L<Mojo::Base> is a base class containing a simple and fast object system
+for Perl objects.
 Main design goals are minimalism and staying out of your way.
 The syntax is a bit like Ruby and the performance better than
 L<Class::Accessor::Fast>.
 
-Note that this is just an accessor generator, take L<Moose> if you are
-looking for an object system.
+Note that this is just an accessor generator, look at L<Moose> if you want
+a more comprehensive object system.
 
 For debugging you can set the C<MOJO_BASE_DEBUG> environment variable.
 
@@ -188,6 +188,10 @@ For debugging you can set the C<MOJO_BASE_DEBUG> environment variable.
     my $instance = BaseSubClass->new;
     my $instance = BaseSubClass->new(name => 'value');
     my $instance = BaseSubClass->new({name => 'value'});
+
+This class provides a standard object constructor.
+You can pass arguments to it either as a hash or as a hashref, and they will
+be set in the object's internal hash reference.
 
 =head2 C<attr>
 
@@ -201,6 +205,11 @@ For debugging you can set the C<MOJO_BASE_DEBUG> environment variable.
         default => 'foo'}
     );
 
+The C<attr> method generates one or more accessors, depending on the number
+of arguments, which work as both getters and setters.
+You can modify the accessor behavior by passing arguments to C<attr> either
+as a hash or a hashref.
+
 Currently there are three options supported.
 
     chained: Whenever you call an attribute with arguments the instance
@@ -209,6 +218,7 @@ Currently there are three options supported.
              Note that the default value is "lazy", which means it only
              gets assigned to the instance when the attribute has been
              called.
-    weak:    Weakens the attribute value.
+    weak:    Weakens the attribute value, use to avoid memory leaks with
+             circular references.
 
 =cut

@@ -286,13 +286,13 @@ sub spin {
     $write ||= [];
 
     # Make a random decision about reading or writing
-    my $do_write = -1;
-    $do_write = 0 if @$read;
-    $do_write = 1 if @$write;
-    $do_write = int(rand(3))-1 if @$read && @$write;
+    my $do = -1;
+    $do = 0 if @$read;
+    $do = 1 if @$write;
+    $do = int(rand(3))-1 if @$read && @$write;
 
     # Write
-    if ($do_write == 1) {
+    if ($do == 1) {
 
         my ($tx, $req, $chunk);
 
@@ -329,7 +329,7 @@ sub spin {
     }
 
     # Read
-    elsif ($do_write == 0) {
+    elsif ($do == 0) {
 
         my $connection = $read->[rand(@$read)];
         my $name = $self->_socket_name($connection);

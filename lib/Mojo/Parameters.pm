@@ -153,7 +153,7 @@ sub to_string {
     my @params;
     for (my $i = 0; $i < @$params; $i += 2) {
         my $name  = $params->[$i];
-        my $value = $params->[$i + 1];
+        my $value = $params->[$i + 1] || undef;
 
         # We replace whitespace with "+"
         $name  =~ s/\ /\+/g;
@@ -169,14 +169,15 @@ sub to_string {
               ->url_escape($Mojo::URL::PARAM);
 
             # *( pchar / "/" / "?" ) with the exception of ";", "&" and "="
-            $name  = Mojo::ByteStream->new($name)->url_escape($Mojo::URL::PARAM);
+            $name = Mojo::ByteStream->new($name)
+              ->url_escape($Mojo::URL::PARAM);
         }
 
         # No value
         else {
 
             # *( pchar / "/" / "?" )
-            $name  = Mojo::ByteStream->new($name)
+            $name = Mojo::ByteStream->new($name)
               ->url_escape($Mojo::URL::PCHAR);
         }
 

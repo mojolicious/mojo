@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 199;
+use Test::More tests => 201;
 
 use Mojo::Filter::Chunked;
 use Mojo::Headers;
@@ -277,7 +277,9 @@ $req->url->parse('http://127.0.0.1:8080/foo/bar');
 $req->headers->transfer_encoding('chunked');
 my $counter = 1;
 my $chunked = Mojo::Filter::Chunked->new;
-$req->content->build_body_cb(sub {
+my $counter2 = 0;
+$req->builder_progress_cb(sub { $counter2++ });
+$req->build_body_cb(sub {
     my $self = shift;
     my $chunk = '';
     $chunk = "hello world!" if $counter == 1;
@@ -295,6 +297,7 @@ is($req->build,
   . "hello world2!\n\n"
   . "\x0d\x0a0\x0d\x0a"
 );
+is($counter2, 6);
 
 # Build HTTP 1.1 chunked request with trailing headers
 $req = Mojo::Message::Request->new;
@@ -304,7 +307,7 @@ $req->headers->transfer_encoding('chunked');
 $req->headers->trailer('X-Test; X-Test2');
 $counter = 1;
 $chunked = Mojo::Filter::Chunked->new;
-$req->content->build_body_cb(sub {
+$req->build_body_cb(sub {
     my $self = shift;
     my $chunk = Mojo::Headers->new;
     $chunk->header('X-Test', 'test');
@@ -603,6 +606,8 @@ is($req->build,
 
 # Parse full HTTP 1.0 request with cookies
 $req = Mojo::Message::Request->new;
+$counter = 0;
+$req->parser_progress_cb(sub { $counter++ });
 $req->parse('GET /foo/bar/baz.html?fo');
 $req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
 $req->parse('-Type: text/');
@@ -611,6 +616,7 @@ $req->parse('Cookie: $Version=1; foo=bar; $Path=/foobar; bar=baz; $Path=/t');
 $req->parse("est/23\x0d\x0a");
 $req->parse("Content-Length: 27\x0d\x0a\x0d\x0aHell");
 $req->parse("o World!\n1234\nlalalala\n");
+is($counter, 8);
 is($req->state, 'done');
 is($req->method, 'GET');
 is($req->major_version, 1);
@@ -653,7 +659,7 @@ $req = Mojo::Message::Request->new;
 $req->method('GET');
 $req->url->parse('http://127.0.0.1/test');
 $counter = 1;
-$req->content->build_headers_cb(sub {
+$req->build_headers_cb(sub {
     my $h = '';
     my $headers = Mojo::Headers->new;
     $headers->expect('100-continue');

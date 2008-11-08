@@ -21,9 +21,11 @@ __PACKAGE__->attr([qw/buffer filter_buffer/],
     chained => 1,
     default => sub { Mojo::Buffer->new }
 );
-__PACKAGE__->attr([qw/build_body_cb build_headers_cb filter/],
-    chained => 1
-);
+__PACKAGE__->attr([qw/
+    build_body_cb
+    build_headers_cb filter
+    builder_progress_cb
+/], chained => 1 );
 __PACKAGE__->attr('file',
     chained => 1,
     default => sub { Mojo::File::Memory->new }
@@ -87,6 +89,9 @@ sub body_length { shift->file->length }
 
 sub get_body_chunk {
     my ($self, $offset) = @_;
+
+    # Progress
+    $self->builder_progress_cb->($self) if $self->builder_progress_cb;
 
     # Body generator
     return $self->build_body_cb->($self, $offset) if $self->build_body_cb;
@@ -270,6 +275,14 @@ implements the following new ones.
         my $h = Mojo::Headers->new;
         $h->content_type('text/plain');
         return $h->to_string;
+    });
+
+=head2 C<builder_progress_cb>
+
+    my $cb   = $content->builder_progress_cb;
+    $content = $content->builder_progress_cb(sub {
+        my $self = shift;
+        print '+';
     });
 
 =head2 C<file>

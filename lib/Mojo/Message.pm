@@ -24,8 +24,7 @@ __PACKAGE__->attr('buffer',
 );
 __PACKAGE__->attr([qw/
     build_start_line_cb
-    prepare_builder_cb
-    prepare_parser_cb
+    parser_progress_cb
 /], chained => 1);
 __PACKAGE__->attr('content',
     chained => 1,
@@ -119,6 +118,8 @@ sub build {
 # On top of a pile of money, with many beautiful women.
 sub build_body { shift->content->build_body(@_) }
 
+sub build_body_cb { shift->content->build_body_cb(@_) }
+
 sub build_headers {
     my $self = shift;
 
@@ -130,6 +131,8 @@ sub build_headers {
 
     return $self->content->build_headers;
 }
+
+sub build_headers_cb { shift->content->build_headers_cb(@_) }
 
 sub build_start_line {
     my $self = shift;
@@ -152,6 +155,8 @@ sub build_start_line {
 
     return $startline;
 }
+
+sub builder_progress_cb { shift->content->builder_progress_cb(@_) }
 
 sub cookie {
     my ($self, $name) = @_;
@@ -200,6 +205,9 @@ sub get_body_chunk { shift->content->get_body_chunk(@_) }
 sub get_header_chunk {
     my $self = shift;
 
+    # Progress
+    $self->builder_progress_cb->($self) if $self->builder_progress_cb;
+
     # HTTP 0.9 has no headers
     return '' if $self->version eq '0.9';
 
@@ -212,11 +220,8 @@ sub get_header_chunk {
 sub get_start_line_chunk {
     my ($self, $offset) = @_;
 
-    # Prepare
-    if ($self->prepare_builder_cb && !$self->{_prepared_builder}) {
-        $self->prepare_builder_cb->($self);
-        $self->{_prepared_builder}++;
-    }
+    # Progress
+    $self->builder_progress_cb->($self) if $self->builder_progress_cb;
 
     # Start line generator
     return $self->build_start_line_cb->($self, $offset)
@@ -258,14 +263,11 @@ sub param {
 sub parse {
     my $self = shift;
 
-    # Prepare
-    if ($self->prepare_parser_cb && !$self->{_prepared_parser}) {
-        $self->prepare_parser_cb->($self);
-        $self->{_prepared_parser}++;
-    }
-
     # Buffer
     $self->buffer->add_chunk(join '', @_) if @_;
+
+    # Progress
+    $self->parser_progress_cb->($self) if $self->parser_progress_cb;
 
     # Content
     if ($self->is_state(qw/content done/)) {
@@ -428,12 +430,44 @@ implements the following new ones.
     my $buffer = $message->buffer;
     $message   = $message->buffer(Mojo::Buffer->new);
 
+=head2 C<build_body_cb>
+
+    my $cb = $message->build_body_cb;
+
+    $counter = 1;
+    $message = $message->build_body_cb(sub {
+        my $self  = shift;
+        my $chunk = '';
+        $chunk    = "hello world!" if $counter == 1;
+        $chunk    = "hello world2!\n\n" if $counter == 2;
+        $counter++;
+        return $chunk;
+    });
+
+=head2 C<build_headers_cb>
+
+    my $cb = $message->build_headers_cb;
+
+    $message = $message->build_headers_cb(sub {
+        my $h = Mojo::Headers->new;
+        $h->content_type('text/plain');
+        return $h->to_string;
+    });
+
 =head2 C<build_start_line_cb>
 
     my $cb = $message->build_start_line_cb;
 
     $message = $content->build_start_line_cb(sub {
         return "HTTP/1.1 200 OK\r\n\r\n";
+    });
+
+=head2 C<builder_progress_cb>
+
+    my $cb   = $message->builder_progress_cb;
+    $message = $message->builder_progress_cb(sub {
+        my $self = shift;
+        print '+';
     });
 
 =head2 C<content>
@@ -460,20 +494,12 @@ implements the following new ones.
     my $minor_version = $message->minor_version;
     $message          = $message->minor_version(1);
 
-=head2 C<prepare_builder_cb>
+=head2 C<parser_progress_cb>
 
-    my $cb   = $message->prepare_builder_cb;
-    $message = $message->prepare_builder_cb(sub {
+    my $cb   = $message->parser_progress_cb;
+    $message = $message->parser_progress_cb(sub {
         my $self = shift;
-        # Do stuff! :)
-    });
-
-=head2 C<prepare_parser_cb>
-
-    my $cb   = $message->prepare_parser_cb;
-    $message = $message->prepare_parser_cb(sub {
-        my $self = shift;
-        # Do stuff! :)
+        print '+';
     });
 
 =head2 C<raw_body_length>

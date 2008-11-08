@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 36;
+use Test::More tests => 46;
 
 # I don't want you driving around in a car you built yourself.
 # You can sit there complaining, or you can knit me some seat belts.
@@ -46,10 +46,25 @@ is($url->userinfo, 'sri:foobar');
 is($url->host, 'kraih.com');
 is($url->port, '8080');
 is($url->path, '');
-is($url->query, '_monkey=biz;&_monkey=23');
+is($url->query, '_monkey=biz%3B&_monkey=23');
 is_deeply($url->query->to_hash, {_monkey => ['biz;', 23]});
 is($url->fragment, '23');
-is("$url", 'http://sri:foobar@kraih.com:8080?_monkey=biz;&_monkey=23#23');
+is("$url", 'http://sri:foobar@kraih.com:8080?_monkey=biz%3B&_monkey=23#23');
+
+# Query string
+$url = Mojo::URL->new(
+    'http://sri:foobar@kraih.com:8080?_monkeybiz%3B&_monkey;23#23'
+);
+is($url->is_abs, 1);
+is($url->scheme, 'http');
+is($url->userinfo, 'sri:foobar');
+is($url->host, 'kraih.com');
+is($url->port, '8080');
+is($url->path, '');
+is($url->query, '_monkeybiz%3B&_monkey;23');
+is_deeply($url->query->params, ['_monkeybiz%3B&_monkey;23', undef]);
+is($url->fragment, '23');
+is("$url", 'http://sri:foobar@kraih.com:8080?_monkeybiz%3B&_monkey;23#23');
 
 # Relative
 $url = Mojo::URL->new('http://sri:foobar@kraih.com:8080/foo?foo=bar#23');

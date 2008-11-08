@@ -285,8 +285,45 @@ sub spin {
     $read  ||= [];
     $write ||= [];
 
+    # Write
+    if (@$write) {
+
+        my ($tx, $req, $chunk);
+
+        # Check for content
+        for my $connection (@$write) {
+
+            my $name = $self->_socket_name($connection);
+            $tx = $transaction{$name};
+            $req = $tx->req;
+
+            # Body
+            $chunk = $req->get_body_chunk($tx->{_offset} || 0)
+              if $tx->is_state('write_body');
+
+            # Headers
+            $chunk = $req->get_header_chunk($tx->{_offset} || 0)
+              if $tx->is_state('write_headers');
+
+            # Start line
+            $chunk = $req->get_start_line_chunk($tx->{_offset} || 0)
+              if $tx->is_state('write_start_line');
+
+            # Content generator ready?
+            last if defined $chunk;
+        }
+
+        # Write chunk
+        my $written = $tx->connection->syswrite($chunk, length $chunk);
+        $tx->error("Can't write request: $!") unless defined $written;
+        return 1 if $tx->has_error;
+
+        $tx->{_to_write} -= $written;
+        $tx->{_offset} += $written;
+    }
+
     # Read
-    if (@$read) {
+    elsif (@$read) {
         my $connection = $read->[0];
         my $name = $self->_socket_name($connection);
         my $tx = $transaction{$name};
@@ -327,43 +364,6 @@ sub spin {
             $res->parse($buffer);
             $tx->done if $res->is_done;
         }
-    }
-
-    # Write
-    elsif (@$write) {
-
-        my ($tx, $req, $chunk);
-
-        # Check for content
-        for my $connection (@$write) {
-
-            my $name = $self->_socket_name($connection);
-            $tx = $transaction{$name};
-            $req = $tx->req;
-
-            # Body
-            $chunk = $req->get_body_chunk($tx->{_offset} || 0)
-              if $tx->is_state('write_body');
-
-            # Headers
-            $chunk = $req->get_header_chunk($tx->{_offset} || 0)
-              if $tx->is_state('write_headers');
-
-            # Start line
-            $chunk = $req->get_start_line_chunk($tx->{_offset} || 0)
-              if $tx->is_state('write_start_line');
-
-            # Content generator ready?
-            last if defined $chunk;
-        }
-
-        # Write chunk
-        my $written = $tx->connection->syswrite($chunk, length $chunk);
-        $tx->error("Can't write request: $!") unless defined $written;
-        return 1 if $tx->has_error;
-
-        $tx->{_to_write} -= $written;
-        $tx->{_offset} += $written;
     }
 
     return $done;

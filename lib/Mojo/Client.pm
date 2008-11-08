@@ -288,10 +288,13 @@ sub spin {
     # Write
     if (@$write) {
 
+       # Randomize writers
+       my @write = sort {int(rand(3))-1} @$write;
+
         my ($tx, $req, $chunk);
 
         # Check for content
-        for my $connection (@$write) {
+        for my $connection (@write) {
 
             my $name = $self->_socket_name($connection);
             $tx = $transaction{$name};
@@ -324,7 +327,11 @@ sub spin {
 
     # Read
     elsif (@$read) {
-        my $connection = $read->[0];
+
+        # Randomize readers
+        my @read = sort {int(rand(3))-1} @$read;
+
+        my $connection = $read[0];
         my $name = $self->_socket_name($connection);
         my $tx = $transaction{$name};
         my $res = $tx->res;

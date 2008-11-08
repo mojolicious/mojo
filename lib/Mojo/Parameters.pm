@@ -72,6 +72,13 @@ sub param {
         push @values, $params->[$i + 1] if $params->[$i] eq $name;
     }
 
+    # Unescape
+    for (my $i = 0; $i <= $#values; $i++) {
+        $values[$i] = Mojo::ByteStream->new($values[$i])
+          ->url_unescape
+          ->to_string;
+    }
+
     return defined $values[1] ? \@values : $values[0];
 }
 
@@ -97,11 +104,6 @@ sub parse {
 
         my $name  = $1;
         my $value = $2;
-
-        # Unescape
-        $name  = Mojo::ByteStream->new($name)->url_unescape->to_string;
-        $value = Mojo::ByteStream->new($value)->url_unescape->to_string
-          if $value;
 
         push @{$self->params}, $name, $value;
     }
@@ -131,6 +133,10 @@ sub to_hash {
         my $name  = $params->[$i];
         my $value = $params->[$i + 1];
 
+        # Unescape
+        $name  = Mojo::ByteStream->new($name)->url_unescape->to_string;
+        $value = Mojo::ByteStream->new($value)->url_unescape->to_string;
+
         # Array
         if (exists $params{$name}) {
             $params{$name} = [$params{$name}]
@@ -148,6 +154,9 @@ sub to_hash {
 sub to_string {
     my $self   = shift;
     my $params = $self->params;
+
+    # Shortcut
+    return undef unless @{$self->params};
 
     # Format
     my @params;

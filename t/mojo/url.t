@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 46;
+use Test::More tests => 56;
 
 # I don't want you driving around in a car you built yourself.
 # You can sit there complaining, or you can knit me some seat belts.
@@ -93,3 +93,22 @@ is($url->is_abs, 0);
 is($url->to_abs, 'http://kraih.com/bar/baz/../foo?foo=bar#23');
 is($url->to_abs->to_rel, '../foo?foo=bar#23');
 is($url->to_abs->base, 'http://kraih.com/bar/baz/');
+
+# Real world test
+$url = Mojo::URL->new(
+    'http://acme.s3.amazonaws.com'
+  . '/mojo%2Fg%2B%2B-4%2E2_4%2E2%2E3-2ubuntu7_i386%2Edeb'
+);
+is($url->is_abs, 1);
+is($url->scheme, 'http');
+is($url->userinfo, undef);
+is($url->host, 'acme.s3.amazonaws.com');
+is($url->port, undef);
+is($url->path, '/mojo%2Fg%2B%2B-4%2E2_4%2E2%2E3-2ubuntu7_i386%2Edeb');
+is($url->query, undef);
+is_deeply($url->query->to_hash, {});
+is($url->fragment, undef);
+is("$url",
+      'http://acme.s3.amazonaws.com'
+    . '/mojo%2Fg%2B%2B-4%2E2_4%2E2%2E3-2ubuntu7_i386%2Edeb'
+);

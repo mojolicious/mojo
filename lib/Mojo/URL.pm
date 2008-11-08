@@ -28,7 +28,7 @@ our $SUBDELIM   = '!\$\&\'\(\)\*\+\,\;\=';
 our $PCHAR      = "$UNRESERVED$SUBDELIM\%\:\@";
 
 # The specs for this are blurry, it's mostly a colelction of w3c suggestions
-our $PARAM = "$UNRESERVED\!\$\'\(\)\*\+\,\:\@\/\?";
+our $PARAM = "$UNRESERVED\!\$\'\(\)\*\+\,\:\@\%\/\?";
 
 sub new {
     my $self = shift->SUPER::new();
@@ -51,15 +51,15 @@ sub authority {
         }
 
         # Port
-        my $port = '';
+        my $port = undef;
         if ($host =~ /^([^\:]*)\:(.*)$/) {
             $host = $1;
             $port = $2;
         }
 
         $self->userinfo($userinfo);
-        $self->host(Mojo::ByteStream->new($host)->url_unescape->to_string);
-        $self->port(Mojo::ByteStream->new($port)->url_unescape->to_string);
+        $self->host($host);
+        $self->port($port);
 
         return $self;
     }
@@ -108,13 +108,11 @@ sub parse {
       = $url
       =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
 
-    $self->scheme(Mojo::ByteStream->new($scheme)->url_unescape->to_string);
+    $self->scheme($scheme);
     $self->authority($authority);
     $self->path->parse($path);
     $self->query->parse($query);
-    $self->fragment(
-        Mojo::ByteStream->new($fragment)->url_unescape->to_string
-    );
+    $self->fragment($fragment);
 
     return $self;
 }

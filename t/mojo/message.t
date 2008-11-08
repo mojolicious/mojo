@@ -184,7 +184,7 @@ is(ref $req->content->parts->[1], 'Mojo::Content');
 is(ref $req->content->parts->[2], 'Mojo::Content');
 is($req->content->parts->[0]->file->slurp, "hallo welt test123\n");
 is($req->body_params->to_hash->{text1}, "hallo welt test123\n");
-is($req->body_params->to_hash->{text2}, '');
+is($req->body_params->to_hash->{text2}, undef);
 is($req->upload('upload')->filename, 'hello.pl');
 is(ref $req->upload('upload')->file, 'Mojo::File');
 is($req->upload('upload')->file->length, 69);

@@ -87,8 +87,8 @@ sub parse {
         # Garbage
         next unless $part;
 
-        # Unescape
-        push @parts, Mojo::ByteStream->new($part)->url_unescape->to_string;
+        # Store
+        push @parts, $part;
     }
 
     $self->parts(\@parts);

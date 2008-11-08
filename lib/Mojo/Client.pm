@@ -285,16 +285,19 @@ sub spin {
     $read  ||= [];
     $write ||= [];
 
-    # Write
-    if (@$write) {
+    # Make a random decision about reading or writing
+    my $do_write = -1;
+    $do_write = 0 if @$read;
+    $do_write = 1 if @$write;
+    $do_write = int(rand(3))-1 if @$read && @$write;
 
-       # Randomize writers
-       my @write = sort {int(rand(3))-1} @$write;
+    # Write
+    if ($do_write == 1) {
 
         my ($tx, $req, $chunk);
 
         # Check for content
-        for my $connection (@write) {
+        for my $connection (sort {int(rand(3))-1} @$write) {
 
             my $name = $self->_socket_name($connection);
             $tx = $transaction{$name};
@@ -326,12 +329,9 @@ sub spin {
     }
 
     # Read
-    elsif (@$read) {
+    elsif ($do_write == 0) {
 
-        # Randomize readers
-        my @read = sort {int(rand(3))-1} @$read;
-
-        my $connection = $read[0];
+        my $connection = $read->[rand(@$read)];
         my $name = $self->_socket_name($connection);
         my $tx = $transaction{$name};
         my $res = $tx->res;

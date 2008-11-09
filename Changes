@@ -10,6 +10,8 @@ This file documents the revision history for Perl extension Mojo.
         - Added copy_to and move_to to Mojo::File.
         - Made the daemons about 20% faster.
         - Cleaned up Mojo::File. (Leon Brocard)
+        - Fallback to default renderer in MojoX::Renderer.
+          (Ask Bjoern Hansen)
         - Made Mojo::Base instantiation a little bit faster.
         - Added documentation. (Marcus Ramberg)
 

@@ -7,6 +7,7 @@ use warnings;
 
 use base 'Mojo::Base';
 
+use Carp qw/carp croak/;
 use File::Spec;
 use MojoX::Types;
 
@@ -50,6 +51,14 @@ sub render {
     return 0 unless $ext;
 
     my $handler = $self->handler->{$ext};
+
+    # Fallback
+    unless ($handler) {
+        carp qq/No handler for "$ext" files configured/;
+        $handler = $self->handler->{$default};
+        croak 'Need a valid handler for rendering' unless $handler;
+    }
+
     my $result = $handler->($self, $tx, $path);
 
     return $result if $options->{partial};

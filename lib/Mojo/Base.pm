@@ -12,21 +12,12 @@ require Scalar::Util;
 # Kids, you tried your best and you failed miserably.
 # The lesson is, never try.
 sub new {
-    my $proto = shift;
+    my $class = shift;
 
-    # Check attributes
-    my $attrs;
-    if (exists $_[1]) {
-        my %attrs = (@_);
-        $attrs = \%attrs;
-    }
-    else { $attrs = $_[0] || {} }
-
-    # Create instance
-    my $class = ref $proto || $proto;
-    my $self = bless $attrs, $class;
-
-    return $self;
+    # Instantiate
+    return bless
+      exists $_[0] ? exists $_[1] ? {@_} : $_[0] : {},
+      ref $class || $class;
 }
 
 # Performance is very important for something as often used as accessors,

@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojo.
 
 0.8009  2008-11-07 00:00:00
+        - Cleaned up Mojo::File. (Leon Brocard)
         - Cleaned up Mojo::Message callbacks and added tests.
         - Fixed escaping in Mojo::URL.
         - Fixed query string support and escaping in Mojo::Parameters.

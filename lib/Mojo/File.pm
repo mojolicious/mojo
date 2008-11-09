@@ -122,10 +122,10 @@ sub get_chunk {
     return '' if $offset > $length;
 
     # Seek to start
-    $self->handle->seek(0, SEEK_SET);
+    $self->handle->seek($offset, SEEK_SET);
 
     # Read
-    $self->handle->sysread(my $buffer, 4096, $offset);
+    $self->handle->sysread(my $buffer, 4096);
     return $buffer;
 }
 

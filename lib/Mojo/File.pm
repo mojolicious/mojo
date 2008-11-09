@@ -122,14 +122,6 @@ sub copy_to {
 sub get_chunk {
     my ($self, $offset) = @_;
 
-    # Cache length
-    $self->{length} = $self->length
-      unless defined $self->{length};
-    my $length = $self->{length};
-
-    # EOF
-    return '' if $offset > $length;
-
     # Seek to start
     $self->handle->seek($offset, SEEK_SET);
 

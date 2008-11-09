@@ -28,7 +28,16 @@ __PACKAGE__->attr('handle',
         # Already got a file without handle
         my $file = $self->path;
         if ($file) {
-            $handle->open("+>> $file") or die qq/Can't open file "$file": $!/;
+
+            # New file
+            my $mode = '+>';
+
+            # File exists
+            $mode = '<' if -s $file;
+
+            # Open
+            $handle->open("$mode $file")
+              or die qq/Can't open file "$file": $!/;
             return $handle;
         }
 

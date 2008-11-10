@@ -44,6 +44,9 @@ sub dispatch {
         # Cache
         my $instance = $self->controllers->{$class};
 
+        # Captures
+        $c->match->captures($field);
+
         # Dispatch
         my $done;
         eval {

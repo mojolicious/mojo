@@ -46,6 +46,7 @@ sub run {
         my $options = [];
         push @$options, "$_\::$name" for @$namespaces;
 
+        my $error = '';
         for my $option (@$options) {
 
             # Try
@@ -55,12 +56,10 @@ sub run {
             };
 
             # Show real errors
-            if ($@) {
-                warn "Script error: $@" unless $@ =~ /Can't locate /i;
-            }
+            if ($@) { $error .= $@ }
             else { return $self }
         }
-        print qq/Couldn't find script "$script".\n/;
+        warn "Script error (propably harmless):\n$error";
 
         return $self;
     }

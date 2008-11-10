@@ -10,7 +10,10 @@ use base 'Mojo::Script';
 use Mojo::ByteStream;
 use Mojo::Loader;
 
-__PACKAGE__->attr([qw/base namespace/],
+use constant DEBUG => $ENV{MOJO_SCRIPT_DEBUG} || 0;
+
+__PACKAGE__->attr(
+    [qw/base namespace/],
     chained => 1,
     default => 'Mojo::Script'
 );
@@ -33,38 +36,64 @@ EOF
 sub run {
     my ($self, $script, @args) = @_;
 
+    # Namespaces
+    my @ns = ($self->namespace);
+    unshift @ns, "$ENV{MOJO_APP}\::Script" if $ENV{MOJO_APP};
+
     # Run script
     if ($script) {
-        my $module = $self->namespace . '::'
-          . Mojo::ByteStream->new($script)->camelize;
-        Mojo::Loader->new
-          ->base($self->base)
-          ->load_build($module)
-          ->run(@args);
+
+        # Default namespace
+        my $name = Mojo::ByteStream->new($script)->camelize;
+
+        my @options;
+        push @options, "$_\::$name" for @ns;
+
+        for my $o (@options) {
+
+            # Try
+            eval {
+                Mojo::Loader->new->base($self->base)->load_build($o)
+                  ->run(@args);
+            };
+            if ($@) {
+                warn "Script error: $@" if DEBUG;
+            }
+            else { return $self }
+        }
+        print qq/Couldn't find script "$script".\n/;
+
         return $self;
     }
 
     # Load scripts
-    my $instances = Mojo::Loader->new($self->namespace)
-      ->base($self->base)
-      ->load
-      ->build;
+    my @instances;
+    for my $ns (@ns) {
+        my $instances =
+          Mojo::Loader->new($ns)->base($self->base)->load->build;
+        push @instances, @$instances;
+    }
 
     # Print overview
     print $self->message;
 
     # List available scripts
-    foreach my $instance (@$instances) {
+    my %names;
+    foreach my $instance (@instances) {
 
         # Generate name
-        my $module = ref $instance;
+        my $module    = ref $instance;
         my $namespace = $self->namespace;
-        $module =~ s/^$namespace\:\://;
-        my $name = Mojo::ByteStream->new($module)->decamelize;
+        $module =~ /.*\:\:([^\:]+)$/;
+        my $name = Mojo::ByteStream->new($1)->decamelize;
+
+        next if $names{$name};
 
         # Print description
         print "$name:\n";
         print $instance->description . "\n";
+
+        $names{$name}++;
     }
 
     return $self;

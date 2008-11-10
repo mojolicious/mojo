@@ -3,6 +3,8 @@ This file documents the revision history for Perl extension Mojo.
 0.8010  2008-11-10 00:00:00
         - MojoX::Dispatcher::Routes should be able to fail.
         - Fixed / routes matching too much.
+        - Added support for local app specific scripts like
+          MyApp::Script::Daemon.
         - Fixed typos.
         - Cleaned up Mojo::Transaction. (Ask Bjoern Hansen)
         - Added .perltidyrc. (Ask Bjoern Hansen)

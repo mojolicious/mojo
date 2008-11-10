@@ -50,16 +50,20 @@ sub dispatch {
 
             # Run action
             $instance->$action($c);
-
-            # Done!
-            return 1;
         };
+
+        # Error
         if ($@) {
             warn "Dispatch error (propably harmless):\n$@";
             return 0;
         }
     }
-    return 0;
+
+    # No stack, fail
+    return 0 unless @$stack;
+
+    # All seems ok
+    return 1;
 }
 
 1;

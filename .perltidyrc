@@ -18,7 +18,7 @@
 
 # extras/overrides/deviations from PBP
 
---maximum-line-length=100               # be slightly more generous
+--maximum-line-length=78                # be less generous
 --warning-output                        # Show warnings
 --maximum-consecutive-blank-lines=2     # default is 1
 --nohanging-side-comments               # troublesome for commented out code

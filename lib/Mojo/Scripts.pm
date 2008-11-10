@@ -10,8 +10,7 @@ use base 'Mojo::Script';
 use Mojo::ByteStream;
 use Mojo::Loader;
 
-__PACKAGE__->attr(
-    [qw/base namespace/],
+__PACKAGE__->attr([qw/base namespace/],
     chained => 1,
     default => 'Mojo::Script'
 );
@@ -35,8 +34,8 @@ sub run {
     my ($self, $script, @args) = @_;
 
     # Namespaces
-    my @ns = ($self->namespace);
-    unshift @ns, "$ENV{MOJO_APP}\::Script" if $ENV{MOJO_APP};
+    my $namespaces = [$self->namespace];
+    unshift @$namespaces, "$ENV{MOJO_APP}\::Script" if $ENV{MOJO_APP};
 
     # Run script
     if ($script) {
@@ -44,14 +43,14 @@ sub run {
         # Default namespace
         my $name = Mojo::ByteStream->new($script)->camelize;
 
-        my @options;
-        push @options, "$_\::$name" for @ns;
+        my $options = [];
+        push @$options, "$_\::$name" for @$namespaces;
 
-        for my $o (@options) {
+        for my $option (@$options) {
 
             # Try
             eval {
-                Mojo::Loader->new->base($self->base)->load_build($o)
+                Mojo::Loader->new->base($self->base)->load_build($option)
                   ->run(@args);
             };
 
@@ -68,9 +67,9 @@ sub run {
 
     # Load scripts
     my @instances;
-    for my $ns (@ns) {
+    for my $namespace (@$namespaces) {
         my $instances =
-          Mojo::Loader->new($ns)->base($self->base)->load->build;
+          Mojo::Loader->new($namespace)->base($self->base)->load->build;
         push @instances, @$instances;
     }
 

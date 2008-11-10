@@ -76,6 +76,7 @@ sub match {
     }
 
     # Match children
+    my $snapshot = [@{$match->stack}];
     for my $child (@{$self->children}) {
 
         # Match
@@ -86,6 +87,9 @@ sub match {
 
         # Reset path
         $match->path($path);
+
+        # Reset stack
+        $match->stack($snapshot);
     }
 
     $match->endpoint($self) if $self->is_endpoint;

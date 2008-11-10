@@ -28,13 +28,13 @@ $test->route('/delete/:id', id => qr/\d+/)->to(action => 'delete', id => 23);
 my $test2 = $r->bridge('/test2')->to(controller => 'test2');
 
 # /test2 (inline)
-$test2->bridge->to(controller => 'index');
+my $test4 = $test2->bridge->to(controller => 'index');
 
 # /test2/foo
-$test2->bridge('/foo')->to(controller => 'baz');
+$test4->bridge('/foo')->to(controller => 'baz');
 
 # /test2/bar
-$test2->route('/bar')->to(controller => 'lalala');
+$test4->route('/bar')->to(controller => 'lalala');
 
 # /test3
 my $test3 = $r->waypoint('/test3')->to(controller => 's', action => 'l');

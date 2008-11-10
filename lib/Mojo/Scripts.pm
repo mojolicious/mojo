@@ -57,7 +57,7 @@ sub run {
 
             # Show real errors
             if ($@) {
-                warn "Script error: $@" unless $@ =~ /^Couldn't load modul/i;
+                warn "Script error: $@" unless $@ =~ /Can't locate /i;
             }
             else { return $self }
         }

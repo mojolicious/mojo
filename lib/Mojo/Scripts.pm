@@ -33,65 +33,38 @@ EOF
 sub run {
     my ($self, $script, @args) = @_;
 
-    # Namespaces
-    my $namespaces = [$self->namespace];
-    unshift @$namespaces, "$ENV{MOJO_APP}\::Script" if $ENV{MOJO_APP};
-
     # Run script
     if ($script) {
-
-        # Default namespace
-        my $name = Mojo::ByteStream->new($script)->camelize;
-
-        my $options = [];
-        push @$options, "$_\::$name" for @$namespaces;
-
-        my $error = '';
-        for my $option (@$options) {
-
-            # Try
-            eval {
-                Mojo::Loader->new->base($self->base)->load_build($option)
-                  ->run(@args);
-            };
-
-            # Show real errors first
-            if ($@) { $error = "$@$error" }
-            else { return $self }
-        }
-        warn "Script error (propably harmless):\n$error";
-
+        my $module = $self->namespace . '::'
+          . Mojo::ByteStream->new($script)->camelize;
+        Mojo::Loader->new
+          ->base($self->base)
+          ->load_build($module)
+          ->run(@args);
         return $self;
     }
 
     # Load scripts
-    my @instances;
-    for my $namespace (@$namespaces) {
-        my $instances =
-          Mojo::Loader->new($namespace)->base($self->base)->load->build;
-        push @instances, @$instances;
-    }
+    my $instances = Mojo::Loader->new($self->namespace)
+      ->base($self->base)
+      ->load
+      ->build;
 
     # Print overview
     print $self->message;
 
     # List available scripts
-    my %names;
-    foreach my $instance (@instances) {
+    foreach my $instance (@$instances) {
 
         # Generate name
-        my $module    = ref $instance;
+        my $module = ref $instance;
         my $namespace = $self->namespace;
-        $module =~ /.*\:\:([^\:]+)$/;
-        my $name = Mojo::ByteStream->new($1)->decamelize;
-
-        next if $names{$name};
+        $module =~ s/^$namespace\:\://;
+        my $name = Mojo::ByteStream->new($module)->decamelize;
 
         # Print description
         print "$name:\n";
         print $instance->description . "\n";
-
-        $names{$name}++;
     }
 
     return $self;

@@ -17,6 +17,7 @@ This file documents the revision history for Perl extension Mojo.
         - Moved the home attribute from Mojolicious to Mojo.
         - Fixed MojoX::Renderer to pass options through to the handler.
           (Ask Bjoern Hansen)
+        - Fixed Mojo::Server::FastCGI according to the spec.
         - Added documentation to Mojo::Home. (Mark Stosberg)
         - Added documentation to Mojo::Buffer. (Mark Stosberg)
         - Removed replace from Mojo::Buffer. (Mark Stosberg)

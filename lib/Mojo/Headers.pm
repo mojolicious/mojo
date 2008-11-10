@@ -255,6 +255,7 @@ sub remove {
 
 sub set_cookie { return shift->header('Set-Cookie', @_) }
 sub set_cookie2 { return shift->header('Set-Cookie2', @_) }
+sub status { return shift->header('Status', @_) }
 
 sub to_string { shift->build(@_) }
 
@@ -341,6 +342,11 @@ implements the following new ones.
 
     my $set_cookie2 = $headers->set_cookie2;
     $headers        = $headers->set_cookie2('f=b; Version=1; Path=/');
+
+=head2 C<status>
+
+    my $status = $headers->status;
+    $headers   = $headers->status('200 OK');
 
 =head2 C<trailer>
 

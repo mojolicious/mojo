@@ -232,27 +232,13 @@ sub write_response {
     my $connection = $tx->connection;
     my $res = $tx->res;
 
-    # Start line
-    my $offset = 0;
-    while (1) {
-        my $chunk = $res->get_start_line_chunk($offset);
-
-        # No start line yet, try again
-        unless (defined $chunk) {
-            sleep 1;
-            next;
-        }
-
-        # End of start line
-        last unless length $chunk;
-
-        # Start line
-        $offset += length $chunk;
-        $self->write_records($connection, 'STDOUT', $tx->{fcgi_id}, $chunk);
-    }
+    # Status
+    my $code = $res->code;
+    my $message = $res->message || $res->default_message;
+    $res->headers->status("$code $message") unless $res->headers->status;
 
     # Headers
-    $offset = 0;
+    my $offset = 0;
     while (1) {
         my $chunk = $res->get_header_chunk($offset);
 

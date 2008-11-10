@@ -16,7 +16,7 @@ use Mojo::Transaction;
 __PACKAGE__->attr('home', chained => 1, default => sub { Mojo::Home->new });
 
 # Oh, so they have internet on computers now!
-our $VERSION = '0.8009';
+our $VERSION = '0.8010';
 
 sub build_tx { return Mojo::Transaction->new }
 

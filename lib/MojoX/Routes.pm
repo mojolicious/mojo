@@ -145,6 +145,10 @@ sub url_for {
     # Path prefix
     my $path = $url->path->to_string;
     $path = $self->pattern->render($values) . $path;
+
+    # Make sure there is always a root
+    $path = '/' if !$path && !$self->parent;
+
     $url->path->parse($path);
 
     $self->parent->url_for($url, $values) if $self->parent;

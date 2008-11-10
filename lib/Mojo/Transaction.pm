@@ -40,15 +40,13 @@ sub keep_alive {
 
     # Keep alive?
     $self->{keep_alive} = 1
-      if ($req->headers->connection || '') =~ /keep-alive/i;
-    $self->{keep_alive} = 1
-      if ($res->headers->connection || '') =~ /keep-alive/i;
+      if ($req->headers->connection || '') =~ /keep-alive/i
+      or ($res->headers->connection || '') =~ /keep-alive/i;
 
     # Close?
     $self->{keep_alive} = 0
-      if ($req->headers->connection || '') =~ /close/i;
-    $self->{keep_alive} = 0
-      if ($res->headers->connection || '') =~ /close/i;
+      if ($req->headers->connection || '') =~ /close/i
+      or ($res->headers->connection || '') =~ /close/i;
 
     # Default
     $self->{keep_alive} = 1 unless defined $self->{keep_alive};

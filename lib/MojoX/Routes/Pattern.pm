@@ -137,6 +137,10 @@ sub _compile {
 
             $regex = "$block$regex";
             $block = '';
+
+            # Just a slash
+            $regex = '/' if @{$self->tree} == 1;
+
             next;
         }
 
@@ -237,7 +241,7 @@ sub _tokenize {
     }
 
     # Cleanup segments
-    $segments-- if $tree->[-1]->[0] eq 'slash';
+    $segments-- if $tree->[-1]->[0] eq 'slash' && $segments > 1;
     $self->segments($segments);
 
     $self->tree($tree);

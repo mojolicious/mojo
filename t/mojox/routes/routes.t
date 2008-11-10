@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 41;
+use Test::More tests => 46;
 
 use Mojo::Transaction;
 
@@ -42,8 +42,19 @@ my $test3 = $r->waypoint('/test3')->to(controller => 's', action => 'l');
 # /test3/edit
 $test3->route('/edit')->to(action => 'edit');
 
+# /
+$r->route('/')->to(controller => 'hello', action => 'world');
+
+# Root
+my $match = $r->match(_tx('/'));
+is($match->captures->{controller}, 'hello');
+is($match->captures->{action}, 'world');
+is($match->stack->[0]->{controller}, 'hello');
+is($match->stack->[0]->{action}, 'world');
+is($match->url_for, '/');
+
 # Path and captures
-my $match = $r->match(_tx('/foo/test/edit'));
+$match = $r->match(_tx('/foo/test/edit'));
 is($match->captures->{controller}, 'foo');
 is($match->captures->{action}, 'edit');
 is($match->stack->[0]->{controller}, 'foo');

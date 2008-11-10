@@ -39,7 +39,7 @@ is($m->figs, 0);
 $m->figs(5);
 is($m->figs, 5);
 
-# "default", "filter" support
+# "default" support
 for my $i (101 .. 150) {
     $y = !$y;
     $monkeys->[$i] = LoaderTest->new;

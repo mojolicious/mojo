@@ -10,8 +10,6 @@ use base 'Mojo::Script';
 use Mojo::ByteStream;
 use Mojo::Loader;
 
-use constant DEBUG => $ENV{MOJO_SCRIPT_DEBUG} || 0;
-
 __PACKAGE__->attr(
     [qw/base namespace/],
     chained => 1,
@@ -56,8 +54,10 @@ sub run {
                 Mojo::Loader->new->base($self->base)->load_build($o)
                   ->run(@args);
             };
+
+            # Show real errors
             if ($@) {
-                warn "Script error: $@" if DEBUG;
+                warn "Script error: $@" unless $@ =~ /^Couldn't load modul/i;
             }
             else { return $self }
         }

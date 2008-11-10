@@ -141,10 +141,10 @@ sub dispatch {
     my $done = $self->static->dispatch($c);
 
     # Use routes if we don't have a response code yet
-    $done = $self->routes->dispatch($c) unless $done;
+    $self->routes->dispatch($c) unless $done;
 
     # Nothing found, serve static file "public/404.html"
-    unless ($done) {
+    unless ($c->res->code) {
         $self->static->serve($c, '/404.html');
         $c->res->code(404);
     }

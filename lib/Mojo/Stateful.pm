@@ -9,7 +9,7 @@ use base 'Mojo::Base';
 
 # Don't kid yourself, Jimmy. If a cow ever got the chance,
 # he'd eat you and everyone you care about!
-__PACKAGE__->attr('state', chained => 1, default => sub { 'start' });
+__PACKAGE__->attr('state', chained => 1, default => 'start');
 
 sub done { shift->state('done') }
 

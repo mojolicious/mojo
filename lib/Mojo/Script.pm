@@ -16,11 +16,8 @@ require IO::File;
 use Mojo::ByteStream;
 use Mojo::Template;
 
-__PACKAGE__->attr('description',
-    chained => 1,
-    default => sub { 'No description.' }
-);
-__PACKAGE__->attr('quiet', chained => 1, default => sub { 0 });
+__PACKAGE__->attr('description', chained => 1, default => 'No description.');
+__PACKAGE__->attr('quiet', chained => 1, default => 0);
 __PACKAGE__->attr('renderer',
     chained => 1,
     default => sub { Mojo::Template->new }

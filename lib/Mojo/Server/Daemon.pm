@@ -11,19 +11,10 @@ use Carp 'croak';
 use IO::Select;
 use IO::Socket;
 
-__PACKAGE__->attr('keep_alive_timeout',
-    chained => 1,
-    default => sub { 15 }
-);
-__PACKAGE__->attr('listen_queue_size',
-    chained => 1,
-    default => sub { SOMAXCONN }
-);
-__PACKAGE__->attr('max_clients', chained => 1, default => sub { 1000 });
-__PACKAGE__->attr('max_keep_alive_requests',
-    chained => 1,
-    default => sub { 100 }
-);
+__PACKAGE__->attr('keep_alive_timeout', chained => 1, default => 15);
+__PACKAGE__->attr('listen_queue_size', chained => 1, default => SOMAXCONN);
+__PACKAGE__->attr('max_clients', chained => 1, default => 1000);
+__PACKAGE__->attr('max_keep_alive_requests', chained => 1, default => 100);
 __PACKAGE__->attr('port', chained => 1, default => 3000);
 
 sub accept_lock { return 1 }

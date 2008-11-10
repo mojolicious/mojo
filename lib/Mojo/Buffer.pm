@@ -9,7 +9,7 @@ use base 'Mojo::Base';
 use overload '""' => sub { shift->to_string }, fallback => 1;
 use bytes;
 
-__PACKAGE__->attr('raw_length', chained => 1, default => sub { 0 });
+__PACKAGE__->attr('raw_length', chained => 1, default => 0);
 
 sub new {
     my $self = shift->SUPER::new();

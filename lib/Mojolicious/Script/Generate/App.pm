@@ -138,13 +138,13 @@ sub dispatch {
     my ($self, $c) = @_;
 
     # Try to find a static file
-    $self->static->dispatch($c);
+    my $done = $self->static->dispatch($c);
 
     # Use routes if we don't have a response code yet
-    $self->routes->dispatch($c) unless $c->res->code;
+    $done = $self->routes->dispatch($c) unless $done;
 
     # Nothing found, serve static file "public/404.html"
-    unless ($c->res->code) {
+    unless ($done) {
         $self->static->serve($c, '/404.html');
         $c->res->code(404);
     }

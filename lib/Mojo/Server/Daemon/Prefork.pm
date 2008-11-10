@@ -16,17 +16,14 @@ use IO::Select;
 use IO::Socket;
 use POSIX 'WNOHANG';
 
-__PACKAGE__->attr('cleanup_interval', chained => 1, default => sub { 15 });
-__PACKAGE__->attr('idle_timeout', chained => 1, default => sub { 30 });
-__PACKAGE__->attr('max_clients', chained => 1, default => sub { 1 });
-__PACKAGE__->attr('max_servers', chained => 1, default => sub { 100 });
-__PACKAGE__->attr('max_spare_servers',
-    chained => 1,
-    default => sub { 10 }
-);
+__PACKAGE__->attr('cleanup_interval', chained => 1, default => 15);
+__PACKAGE__->attr('idle_timeout', chained => 1, default => 30);
+__PACKAGE__->attr('max_clients', chained => 1, default => 1);
+__PACKAGE__->attr('max_servers', chained => 1, default => 100);
+__PACKAGE__->attr('max_spare_servers', chained => 1, default => 10);
 __PACKAGE__->attr([qw/min_spare_servers start_servers/],
     chained => 1,
-    default => sub { 5 }
+    default => 5
 );
 __PACKAGE__->attr('pid_file',
     chained => 1,

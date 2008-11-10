@@ -32,7 +32,7 @@ __PACKAGE__->attr('content',
 );
 __PACKAGE__->attr([qw/major_version minor_version/],
     chained => 1,
-    default => sub { 1 }
+    default => 1
 );
 
 # I'll keep it short and sweet. Family. Religion. Friendship.

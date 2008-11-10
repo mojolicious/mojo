@@ -11,11 +11,11 @@ use constant DEBUG => $ENV{MOJOX_ROUTES_DEBUG} || 0;
 
 __PACKAGE__->attr('defaults',          chained => 1, default => sub { {} });
 __PACKAGE__->attr([qw/pattern regex/], chained => 1);
-__PACKAGE__->attr('quote_end',         chained => 1, default => sub { ')' });
-__PACKAGE__->attr('quote_start',       chained => 1, default => sub { '(' });
+__PACKAGE__->attr('quote_end',         chained => 1, default => ')');
+__PACKAGE__->attr('quote_start',       chained => 1, default => '(');
 __PACKAGE__->attr('reqs',              chained => 1, default => sub { {} });
-__PACKAGE__->attr('segments',          chained => 1, default => sub { 0 });
-__PACKAGE__->attr('symbol_start',      chained => 1, default => sub { ':' });
+__PACKAGE__->attr('segments',          chained => 1, default => 0);
+__PACKAGE__->attr('symbol_start',      chained => 1, default => ':');
 __PACKAGE__->attr('symbols',           chained => 1, default => sub { [] });
 __PACKAGE__->attr('tree',              chained => 1, default => sub { [] });
 

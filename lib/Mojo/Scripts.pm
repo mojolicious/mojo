@@ -12,7 +12,7 @@ use Mojo::Loader;
 
 __PACKAGE__->attr([qw/base namespace/],
     chained => 1,
-    default => sub { 'Mojo::Script' }
+    default => 'Mojo::Script'
 );
 __PACKAGE__->attr('message', chained => 1, default => <<'EOF');
 Welcome to the Mojo Framework!

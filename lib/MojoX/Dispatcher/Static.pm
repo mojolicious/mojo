@@ -25,19 +25,17 @@ sub dispatch {
 
     # Prefix
     if (my $prefix = $self->prefix) {
-        return $self unless $tx->req->url->path =~ /^$prefix.*/;
+        return 0 unless $tx->req->url->path =~ /^$prefix.*/;
     }
 
     # Path
     my @parts = @{$tx->req->url->path->clone->canonicalize->parts};
 
     # Shortcut
-    return $self unless @parts;
+    return 0 unless @parts;
 
     # Serve static file
-    $self->serve($tx, File::Spec->catfile(@parts));
-
-    return $self;
+    return $self->serve($tx, File::Spec->catfile(@parts));
 }
 
 sub serve {
@@ -60,9 +58,10 @@ sub serve {
         $res->code(200);
         $res->headers->content_type($type);
         $res->content->file->path($path);
+        return 1;
     }
 
-    return $self;
+    return 0;
 }
 
 1;
@@ -106,10 +105,10 @@ implements the follwing the ones.
 
 =head2 C<dispatch>
 
-    $dispatcher = $dispatcher->dispatch($tx);
+    my $success = $dispatcher->dispatch($tx);
 
 =head2 C<serve>
 
-    $dispatcher = $dispatcher->serve($tx, '/foo/bar.html');
+    my $success = $dispatcher->serve($tx, '/foo/bar.html');
 
 =cut

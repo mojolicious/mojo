@@ -10,11 +10,7 @@ use base 'Mojo::Message';
 use Mojo::Cookie::Request;
 use Mojo::Parameters;
 
-__PACKAGE__->attr('method',
-    chained => 1,
-    default => sub { 'GET' },
-    filter  => sub { uc }
-);
+__PACKAGE__->attr('method', chained => 1, default => 'GET');
 __PACKAGE__->attr('url', chained => 1, default => sub { Mojo::URL->new });
 
 sub cookies {

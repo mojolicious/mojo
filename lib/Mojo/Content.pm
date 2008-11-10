@@ -34,7 +34,7 @@ __PACKAGE__->attr('headers',
     chained => 1,
     default => sub { Mojo::Headers->new }
 );
-__PACKAGE__->attr('raw_header_length', chained => 1, default => sub { 0 });
+__PACKAGE__->attr('raw_header_length', chained => 1, default => 0);
 
 sub build_body {
     my $self = shift;

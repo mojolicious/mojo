@@ -12,15 +12,15 @@ use constant DEBUG => $ENV{MOJO_TEMPLATE_DEBUG} || 0;
 use Carp 'croak';
 use IO::File;
 
-__PACKAGE__->attr('code'           , chained => 1, default => sub {''  });
-__PACKAGE__->attr('comment_mark'   , chained => 1, default => sub {'#' });
+__PACKAGE__->attr('code'           , chained => 1, default => '');
+__PACKAGE__->attr('comment_mark'   , chained => 1, default => '#');
 __PACKAGE__->attr('compiled'       , chained => 1);
-__PACKAGE__->attr('expression_mark', chained => 1, default => sub {'=' });
-__PACKAGE__->attr('line_start'     , chained => 1, default => sub {'%' });
-__PACKAGE__->attr('template'       , chained => 1, default => sub {''  });
-__PACKAGE__->attr('tree'           , chained => 1, default => sub {[]  });
-__PACKAGE__->attr('tag_start'      , chained => 1, default => sub {'<%'});
-__PACKAGE__->attr('tag_end'        , chained => 1, default => sub {'%>'});
+__PACKAGE__->attr('expression_mark', chained => 1, default => '=');
+__PACKAGE__->attr('line_start'     , chained => 1, default => '%');
+__PACKAGE__->attr('template'       , chained => 1, default => '');
+__PACKAGE__->attr('tree'           , chained => 1, default => sub { [] });
+__PACKAGE__->attr('tag_start'      , chained => 1, default => '<%');
+__PACKAGE__->attr('tag_end'        , chained => 1, default => '%>');
 
 sub build {
     my $self = shift;

@@ -185,6 +185,7 @@ sub _kill_children {
 
         # Die die die
         for my $pid (keys %{$self->{_children}}) {
+            $self->log("Killing child $pid") if DEBUG;
             kill 'TERM', $pid;
         }
         $self->_cleanup_children;

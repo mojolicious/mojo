@@ -7,7 +7,6 @@ use warnings;
 
 use base 'Mojo';
 
-use Mojo::Home;
 use Mojo::Loader;
 use Mojolicious::Dispatcher;
 use Mojolicious::Renderer;
@@ -18,7 +17,6 @@ __PACKAGE__->attr('ctx_class',
     chained => 1,
     default => 'Mojolicious::Context'
 );
-__PACKAGE__->attr('home', chained => 1, default => sub { Mojo::Home->new });
 __PACKAGE__->attr('renderer',
     chained => 1,
     default => sub { Mojolicious::Renderer->new }
@@ -120,11 +118,6 @@ See L<Mojo::Manual::Mojolicious> for user friendly documentation.
 
 L<Mojolicious> inherits all attributes from L<Mojo> and implements the
 following new ones.
-
-=head2 C<home>
-
-    my $home = $mojo->home;
-    $mojo    = $mojo->home(Mojo::Home->new);
 
 =head2 C<renderer>
 

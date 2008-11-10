@@ -144,7 +144,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Home - Home Sweet Home!
+Mojo::Home - Detect And Access The Project Root Directory In Mojo
 
 =head1 SYNOPSIS
 
@@ -153,6 +153,7 @@ Mojo::Home - Home Sweet Home!
 =head1 DESCRIPTION
 
 L<Mojo::Home> is a container for home directories.
+Functionality includes locating the home directory and portable path handling.
 
 =head1 ATTRIBUTES
 
@@ -161,10 +162,17 @@ L<Mojo::Home> is a container for home directories.
     my $class = $home->app_class;
     $home     = $home->app_class('Foo::Bar');
 
+Returns the Mojo applications class name if called without arguments.
+Returns the invocant if called with arguments.
+
 =head2 C<parts>
 
     my $parts = $home->parts;
     $home     = $home->parts([qw/foo bar baz/]);
+
+Returns an arrayref containing the parts of the projects root directory if
+called without arguments.
+Returns the invocant if called with arguments.
 
 =head1 METHODS
 
@@ -176,34 +184,57 @@ following new ones.
     my $home = Mojo::Home->new;
     my $home = Mojo::Home->new('/foo/bar/baz');
 
+Returns a new L<Mojo::Home> object, used to find the root directory of the
+project.
+
 =head2 C<detect>
 
     $home = $home->detect;
     $home = $home->detect('My::App');
 
+Returns the invocant and detects the path to the root of the Mojo project.
+C<$ENV{MOJO_HOME}> is used as the location if available.
+Autodetection based on the class name is used as a fallback.
+
 =head2 C<executable>
 
     my $path = $home->executable;
+
+Returns the path to the Mojo executable in the C<bin> directory of your
+project, it will either be named after your project, or C<mojo>.
 
 =head2 C<lib_dir>
 
     my $path = $home->lib_dir;
 
+Returns the path to the C<lib> directory of the project if it exists, or
+undef otherwise.
+
 =head2 C<parse>
 
     $home = $home->parse('/foo/bar');
+
+Returns the invocant and splits the given path into C<parts>.
 
 =head2 C<rel_dir>
 
     my $path = $home->rel_dir('foo/bar');
 
+Returns an absolute directory path based on the projects root directory.
+Note that the UNIX style C</> is used as separator on all platforms.
+
 =head2 C<rel_file>
 
     my $path = $home->rel_file('foo/bar.html');
+
+Returns an absolute file path based on the projects root directory.
+Note that the UNIX style C</> is used as separator on all platforms.
 
 =head2 C<to_string>
 
     my $string = $home->to_string;
     my $string = "$home";
+
+Return the path to projects root directory.
 
 =cut

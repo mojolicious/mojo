@@ -13,7 +13,14 @@ This file documents the revision history for Perl extension Mojo.
         - Fallback to default renderer in MojoX::Renderer.
           (Ask Bjoern Hansen)
         - Made Mojo::Base instantiation a little bit faster.
-        - Added documentation. (Marcus Ramberg)
+        - Added documentation to Mojo::Base. (Marcus Ramberg)
+        - Moved the home attribute from Mojolicious to Mojo.
+        - Fixed MojoX::Renderer to pass options through to the handler.
+          (Ask Bjoern Hansen)
+        - Added documentation to Mojo::Home. (Mark Stosberg)
+        - Added documentation to Mojo::Buffer. (Mark Stosberg)
+        - Removed replace from Mojo::Buffer. (Mark Stosberg)
+        - Added buffer tests. (Mark Stosberg)
 
 0.8008  2008-11-07 00:00:00
         - Fixed multipart parsing for short requests.

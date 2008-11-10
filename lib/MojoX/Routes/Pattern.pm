@@ -138,9 +138,6 @@ sub _compile {
             $regex = "$block$regex";
             $block = '';
 
-            # Just a slash
-            $regex = '/' if @{$self->tree} == 1;
-
             next;
         }
 

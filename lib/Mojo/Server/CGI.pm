@@ -9,7 +9,7 @@ use base 'Mojo::Server';
 
 use IO::Select;
 
-__PACKAGE__->attr('non_parsed_header', chained => 1, default => sub { 0 });
+__PACKAGE__->attr('nph', chained => 1, default => sub { 0 });
 
 # Lisa, you're a Buddhist, so you believe in reincarnation.
 # Eventually, Snowball will be reborn as a higher lifeform... like a snowman.
@@ -38,7 +38,7 @@ sub run {
 
     # Response start line
     my $offset = 0;
-    if ($self->non_parsed_header) {
+    if ($self->nph) {
         while (1) {
             my $chunk = $res->get_start_line_chunk($offset);
 
@@ -60,8 +60,7 @@ sub run {
     # Response headers
     my $code = $res->code;
     my $message = $res->message || $res->default_message;
-    $res->headers->header('Status', "$code $message")
-      unless $self->non_parsed_header;
+    $res->headers->header('Status', "$code $message") unless $self->nph;
     $offset = 0;
     while (1) {
         my $chunk = $res->get_header_chunk($offset);
@@ -125,10 +124,10 @@ L<Mojo::Server::CGI> is a simple and portable CGI implementation.
 L<Mojo::Server::CGI> inherits all attributes from L<Mojo::Server> and
 implements the following new ones.
 
-=head2 C<non_parsed_header>
+=head2 C<nph>
 
-    my $non_parsed_header = $cgi->non_parsed_header;
-    $cgi                  = $cgi->non_parsed_header(1);
+    my $nph = $cgi->nph;
+    $cgi    = $cgi->nph(1);
 
 =head1 METHODS
 

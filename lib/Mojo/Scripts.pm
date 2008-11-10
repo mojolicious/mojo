@@ -55,8 +55,8 @@ sub run {
                   ->run(@args);
             };
 
-            # Show real errors
-            if ($@) { $error .= $@ }
+            # Show real errors first
+            if ($@) { $error = "$@$error" }
             else { return $self }
         }
         warn "Script error (propably harmless):\n$error";

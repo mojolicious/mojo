@@ -17,7 +17,9 @@ WriteMakefile(
     NAME          => 'Mojo',
     VERSION_FROM  => 'lib/Mojo.pm',
     AUTHOR        => 'Sebastian Riedel <sri@cpan.org>',
-    LICENSE       => 'perl',
+    ($ExtUtils::MakeMaker::VERSION >= 6.3002
+      ? ('LICENSE'=> 'perl')
+      : ()),
     EXE_FILES     => ['bin/mojo', 'bin/mojolicious'],
     PREREQ_PM     => {
         'Carp'                  => 0,

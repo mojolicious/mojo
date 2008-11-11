@@ -59,8 +59,11 @@ sub render {
         croak 'Need a valid handler for rendering' unless $handler;
     }
 
-    my $result = $handler->($self, $tx, $path, $options);
+    # Render
+    my $result;
+    return undef unless $handler->($self, $path, \$result, $tx, $options);
 
+    # Partial
     return $result if $options->{partial};
 
     my $res = $tx->res;

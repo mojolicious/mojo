@@ -91,7 +91,8 @@ sub compile {
 }
 
 sub interpret {
-    my $self = shift;
+    my $self   = shift;
+    my $result = shift;
 
     # Shortcut
     my $compiled = $self->compiled;
@@ -104,10 +105,13 @@ sub interpret {
     };
 
     # Interpret
-    my $result = eval { $compiled->(@_) };
-    return $self->_error($@) if $@;
+    $$result = eval { $compiled->(@_) };
+    if ($@) {
+        $$result = $self->_error($@);
+        return 0;
+    }
 
-    return $result;
+    return 1;
 }
 
 # I am so smart! I am so smart! S-M-R-T! I mean S-M-A-R-T...
@@ -266,7 +270,8 @@ sub render_file_to_file {
     my $tpath = shift;
 
     # Render
-    my $result = $self->render_file($spath, @_);
+    my $result;
+    return 0 unless $self->render_file($spath, \$result, @_);
 
     # Write to file
     return $self->_write_file($tpath, $result);
@@ -278,7 +283,8 @@ sub render_to_file {
     my $path = shift;
 
     # Render
-    my $result = $self->render($tmpl, @_);
+    my $result;
+    return 0 unless $self->render($tmpl, \$result, @_);
 
     # Write to file
     return $self->_write_file($path, $result);
@@ -369,7 +375,8 @@ Mojo::Template - Perlish Templates!
     my $mt = Mojo::Template->new;
 
     # Simple
-    print $mt->render(<<'EOF');
+    my $result;
+    $mt->render(<<'EOF', \$result);
     <html>
       <head></head>
       <body>
@@ -377,9 +384,11 @@ Mojo::Template - Perlish Templates!
       </body>
     </html>
     EOF
+    print $result;
 
     # More complicated
-    print $mt->render(<<'EOF', 23, 'foo bar');
+    my $result;
+    $mt->render(<<'EOF', \$result, 23, 'foo bar');
     %= 5 * 5
     % my ($number, $text) = @_;
     test 123
@@ -388,6 +397,7 @@ Mojo::Template - Perlish Templates!
     * some text <%= $i++ %>
     % }
     EOF
+    print $result;
 
 =head1 DESCRIPTION
 
@@ -421,7 +431,7 @@ them if neccessary.
     $mt->tag_start('[@@');
     $mt->tag_end('@@]');
     $mt->expression_mark('&');
-    $mt->render(<<'EOF', 23);
+    $mt->render(<<'EOF', \$result, 23);
     @@ my $i = shift;
     <% no code just text [@@& $i @@]
     EOF
@@ -470,7 +480,8 @@ build a wrapper around it.
     $mt->template($template);
     $mt->code($code);
     $mt->compile;
-    my $result = $mt->interpret(@arguments);
+    my $result;
+    $mt->interpret(\$result, @arguments);
 
 =head1 ATTRIBUTES
 
@@ -534,7 +545,7 @@ following new ones.
 =head2 C<interpret>
 
     my $result = $mt->interpret;
-    my $result = $mt->interpret(@arguments);
+    my $result = $mt->interpret(\$result, @arguments);
 
 =head2 C<parse>
 
@@ -543,12 +554,12 @@ following new ones.
 =head2 C<render>
 
     my $result = $mt->render($template);
-    my $result = $mt->render($template, @arguments);
+    my $result = $mt->render($template, \$result, @arguments);
 
 =head2 C<render_file>
 
     my $result = $mt->render_file($template_file);
-    my $result = $mt->render_file($template_file, @arguments);
+    my $result = $mt->render_file($template_file, \$result, @arguments);
 
 =head2 C<render_file_to_file>
 

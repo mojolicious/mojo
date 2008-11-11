@@ -37,7 +37,7 @@ sub render {
     my $tx   = shift;
 
     my $options = ref $_[0] ? $_[0] : {@_};
-    return 0 unless $options;
+    return undef unless $options;
 
     my $template = $options->{template};
     my $default = $self->default_ext;
@@ -48,7 +48,7 @@ sub render {
     $path =~ /\.(\w+)$/;
     my $ext = $1;
 
-    return 0 unless $ext;
+    return undef unless $ext;
 
     my $handler = $self->handler->{$ext};
 
@@ -66,6 +66,7 @@ sub render {
     # Partial
     return $result if $options->{partial};
 
+    # Response
     my $res = $tx->res;
     $res->code(200) unless $tx->res->code;
     $res->body($result);
@@ -73,6 +74,7 @@ sub render {
     my $type = $self->types->type($ext) || 'text/plain';
     $res->headers->content_type($type);
 
+    # Success!
     return 1;
 }
 

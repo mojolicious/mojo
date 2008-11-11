@@ -77,10 +77,10 @@ sub dispatch {
     my ($self, $c) = @_;
 
     # Try to find a static file
-    $self->static->dispatch($c) unless $c->res->code;
+    my $done = $self->static->dispatch($c);
 
-    # Use routes if we don't have a response code yet
-    $self->routes->dispatch($c) unless $c->res->code;
+    # Use routes if we don't have a response yet
+    $self->routes->dispatch($c) unless $done;
 }
 
 # Bite my shiny metal ass!

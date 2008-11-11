@@ -50,12 +50,12 @@ sub new {
     $self->renderer->root($self->home->rel_dir('templates'));
     $self->static->root($self->home->rel_dir('public'));
 
+    # Startup
+    $self->startup(@_);
+
     # Environment
     my $env = ($ENV{MOJO_ENV} || 'development') . '_env';
     $self->$env if $self->can($env);
-
-    # Startup
-    $self->startup(@_);
 
     # Load context class
     Mojo::Loader->new->load($self->ctx_class);

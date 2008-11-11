@@ -50,6 +50,10 @@ sub new {
     $self->renderer->root($self->home->rel_dir('templates'));
     $self->static->root($self->home->rel_dir('public'));
 
+    # Environment
+    my $env = ($ENV{MOJO_ENV} || 'development') . '_env';
+    $self->$env if $self->can($env);
+
     # Startup
     $self->startup(@_);
 

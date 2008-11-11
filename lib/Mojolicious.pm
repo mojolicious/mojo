@@ -17,6 +17,10 @@ __PACKAGE__->attr('ctx_class',
     chained => 1,
     default => 'Mojolicious::Context'
 );
+__PACKAGE__->attr('mode',
+    chained => 1,
+    default => sub { ($ENV{MOJO_MODE} || 'development') }
+);
 __PACKAGE__->attr('renderer',
     chained => 1,
     default => sub { Mojolicious::Renderer->new }
@@ -32,10 +36,6 @@ __PACKAGE__->attr('static',
 __PACKAGE__->attr('types',
     chained => 1,
     default => sub { MojoX::Types->new }
-);
-__PACKAGE__->attr('environment',
-    chained => 1,
-    default => sub { ($ENV{MOJO_ENV} || 'development') }
 );
 
 # The usual constructor stuff
@@ -57,9 +57,9 @@ sub new {
     # Startup
     $self->startup(@_);
 
-    # Environment
-    my $env = $self->environment . "_env";
-    $self->$env if $self->can($env);
+    # Mode
+    my $mode = $self->mode . '_mode';
+    $self->$mode if $self->can($mode);
 
     # Load context class
     Mojo::Loader->new->load($self->ctx_class);
@@ -127,6 +127,20 @@ See L<Mojo::Manual::Mojolicious> for user friendly documentation.
 L<Mojolicious> inherits all attributes from L<Mojo> and implements the
 following new ones.
 
+=head2 C<mode>
+
+    my $mode = $mojo->mode;
+    $mojo    = $mojo->mode('production');
+
+Returns the current mode if called without arguments.
+Returns the invocant if called with arguments.
+Defaults to C<$ENV{MOJO_MODE}> or C<development>.
+
+    my $mode = $mojo->mode;
+    if ($mode =~ m/^dev/) {
+        do_debug_output();
+     }
+
 =head2 C<renderer>
 
     my $renderer = $mojo->renderer;
@@ -147,15 +161,6 @@ following new ones.
     my $types = $mojo->types;
     $mojo     = $mojo->types(MojoX::Types->new)
 
-=head2 C<environment>
-
-Defaults to ENV{MOJO_ENV} or 'development'.
-
-    my $env = $mojo->environment;
-    if ($env =~ m/^dev/) {
-        do_debug_output();
-     }
-
 =head1 METHODS
 
 L<Mojolicious> inherits all methods from L<Mojo> and implements the following
@@ -165,9 +170,10 @@ new ones.
 
     my $mojo = Mojolicious->new;
 
-This method will call the method called C<${environment}_env>, if it
-exists.  (C<$environment> being the value of that attribute).  For
-example in production mode, C<production_env> will be called.
+Returns a new L<Mojolicious> object.
+This method will call the method C<${mode}_mode> if it exists.
+(C<$mode> being the value of the attribute C<mode>).
+For example in production mode, C<production_mode> will be called.
 
 =head2 C<build_ctx>
 

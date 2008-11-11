@@ -7,14 +7,14 @@ use warnings;
 
 use base 'Mojolicious';
 
-sub development_env {
+sub development_mode {
     my $self = shift;
 
     # Static root for development
     $self->static->root($self->home->rel_dir('t/mojolicious/public_dev'));
 }
 
-sub production_env {
+sub production_mode {
     my $self = shift;
 
     # Static root for production

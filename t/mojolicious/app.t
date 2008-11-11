@@ -33,23 +33,23 @@ is($tx->res->code, 200);
 is($tx->res->headers->content_type, 'text/html');
 like($tx->res->body, qr/Hello Mojo from the template \/foo!/);
 
-# Static file /hello.txt in a production environment
-my $backup = $ENV{MOJO_ENV} || '';
-$ENV{MOJO_ENV} = 'production';
+# Static file /hello.txt in a production mode
+my $backup = $ENV{MOJO_MODE} || '';
+$ENV{MOJO_MODE} = 'production';
 $tx = Mojo::Transaction->new_get('/hello.txt');
 $client->process_local('MojoliciousTest', $tx);
 is($tx->res->code, 200);
 is($tx->res->headers->content_type, 'text/plain');
 like($tx->res->content->file->slurp, qr/Hello Mojo from a static file!/);
-$ENV{MOJO_ENV} = $backup;
+$ENV{MOJO_MODE} = $backup;
 
-# Static file /hello.txt in a development environment
-$backup = $ENV{MOJO_ENV} || '';
-$ENV{MOJO_ENV} = 'development';
+# Static file /hello.txt in a development mode
+$backup = $ENV{MOJO_MODE} || '';
+$ENV{MOJO_MODE} = 'development';
 $tx = Mojo::Transaction->new_get('/hello.txt');
 $client->process_local('MojoliciousTest', $tx);
 is($tx->res->code, 200);
 is($tx->res->headers->content_type, 'text/plain');
 like($tx->res->content->file->slurp,
   qr/Hello Mojo from a development static file!/);
-$ENV{MOJO_ENV} = $backup;
+$ENV{MOJO_MODE} = $backup;

@@ -1,7 +1,7 @@
 This file documents the revision history for Perl extension Mojo.
 
 0.8010  2008-11-10 00:00:00
-        - Added environments to Mojolicious.
+        - Added modes to Mojolicious.
         - MojoX::Dispatcher::Routes should be able to fail.
         - Fixed / routes matching too much.
         - Fixed typos.

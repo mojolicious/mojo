@@ -57,14 +57,14 @@ sub dispatch {
             $done = $instance->$action($c);
         };
 
-        # Break the chain
-        last unless $done;
-
         # Error
         if ($@) {
             warn "Dispatch error (propably harmless):\n$@";
             return 0;
         }
+
+        # Break the chain
+        last unless $done;
     }
 
     # No stack, fail

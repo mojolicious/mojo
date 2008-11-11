@@ -35,20 +35,15 @@ sub run {
 
     # Run script
     if ($script) {
-        my $module = $self->namespace . '::'
-          . Mojo::ByteStream->new($script)->camelize;
-        Mojo::Loader->new
-          ->base($self->base)
-          ->load_build($module)
-          ->run(@args);
+        my $module =
+          $self->namespace . '::' . Mojo::ByteStream->new($script)->camelize;
+        Mojo::Loader->new->base($self->base)->load_build($module)->run(@args);
         return $self;
     }
 
     # Load scripts
-    my $instances = Mojo::Loader->new($self->namespace)
-      ->base($self->base)
-      ->load
-      ->build;
+    my $instances =
+      Mojo::Loader->new($self->namespace)->base($self->base)->load->build;
 
     # Print overview
     print $self->message;
@@ -57,7 +52,7 @@ sub run {
     foreach my $instance (@$instances) {
 
         # Generate name
-        my $module = ref $instance;
+        my $module    = ref $instance;
         my $namespace = $self->namespace;
         $module =~ s/^$namespace\:\://;
         my $name = Mojo::ByteStream->new($module)->decamelize;

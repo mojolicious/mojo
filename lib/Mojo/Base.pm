@@ -21,7 +21,8 @@ sub new {
 }
 
 # Performance is very important for something as often used as accessors,
-# so we optimize them by compiling our own code
+# so we optimize them by compiling our own code, don't be scared, we have
+# tests for every single case
 sub attr {
     my $class = shift;
     my $attrs = shift;

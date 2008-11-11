@@ -48,6 +48,9 @@ sub run {
 
     $SIG{HUP} = $SIG{PIPE} = 'IGNORE';
 
+    # Preload application
+    $self->app;
+
     # Listen
     $self->listen;
 

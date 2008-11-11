@@ -165,6 +165,10 @@ sub role_number {
 
 sub run {
     my $self = shift;
+
+    # Preload application
+    $self->app;
+
     while (my $connection = $self->accept_connection) {
         my $tx = $self->read_request($connection);
 

@@ -114,6 +114,9 @@ sub run {
     $SIG{INT}  = $SIG{TERM} = sub { $done++ };
     $SIG{CHLD} = sub { $self->_reap_child };
 
+    # Preload application
+    $self->app;
+
     # Parent stuff
     $self->parent;
 

@@ -139,7 +139,7 @@ Defaults to C<$ENV{MOJO_MODE}> or C<development>.
     my $mode = $mojo->mode;
     if ($mode =~ m/^dev/) {
         do_debug_output();
-     }
+    }
 
 =head2 C<renderer>
 

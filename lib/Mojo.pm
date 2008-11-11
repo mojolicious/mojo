@@ -140,6 +140,8 @@ Ask Bjoern Hansen
 
 Audrey Tang
 
+Ch Lamprecht
+
 Christian Hansen
 
 Gisle Aas

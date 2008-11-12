@@ -30,20 +30,20 @@ sub attr {
     # Shortcut
     return unless $class && $attrs;
 
-    # Check options
-    my $options;
+    # Check arguments
+    my $args;
     if (exists $_[1]) {
-        my %options = (@_);
-        $options = \%options;
+        my %args = (@_);
+        $args = \%args;
     }
-    else { $options = $_[0] }
-    $options ||= {};
+    else { $args = $_[0] }
+    $args ||= {};
 
-    my $chained = delete $options->{chained};
-    my $default = delete $options->{default};
-    my $weak    = delete $options->{weak};
+    my $chained = delete $args->{chained};
+    my $default = delete $args->{default};
+    my $weak    = delete $args->{weak};
 
-    undef $options;
+    undef $args;
 
     # Allow symbolic references
     no strict 'refs';

@@ -36,10 +36,10 @@ sub render {
     my $self = shift;
     my $tx   = shift;
 
-    my $options = ref $_[0] ? $_[0] : {@_};
-    return undef unless $options;
+    my $args = ref $_[0] ? $_[0] : {@_};
+    return undef unless $args;
 
-    my $template = $options->{template};
+    my $template = $args->{template};
     my $default = $self->default_ext;
     $template .= ".$default" if $default && $template !~ /\.\w+$/;
 
@@ -60,16 +60,21 @@ sub render {
     }
 
     # Render
-    my $result;
-    return undef unless $handler->($self, $path, \$result, $tx, $options);
+    my $output;
+    return undef unless $handler->($self, {
+        args    => $args,
+        output  => \$output,
+        path    => $path,
+        tx      => $tx
+    });
 
     # Partial
-    return $result if $options->{partial};
+    return $output if $args->{partial};
 
     # Response
     my $res = $tx->res;
     $res->code(200) unless $tx->res->code;
-    $res->body($result);
+    $res->body($output);
 
     my $type = $self->types->type($ext) || 'text/plain';
     $res->headers->content_type($type);

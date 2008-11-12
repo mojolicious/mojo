@@ -15,15 +15,15 @@ __PACKAGE__->attr('stash', chained => 1, default => sub { {} });
 sub render {
     my $self    = shift;
 
-    my $options = ref $_[0] ? $_[0] : {@_};
+    my $args = ref $_[0] ? $_[0] : {@_};
 
-    my $controller = $options->{controller}
+    my $controller = $args->{controller}
       || $self->match->captures->{controller};
-    my $action = $options->{action} || $self->match->captures->{action};
+    my $action = $args->{action} || $self->match->captures->{action};
 
-    $options->{template} ||= join '/', $controller, $action;
+    $args->{template} ||= join '/', $controller, $action;
 
-    return $self->app->renderer->render($self, $options);
+    return $self->app->renderer->render($self, $args);
 }
 
 sub url_for {

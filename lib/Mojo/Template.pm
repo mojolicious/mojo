@@ -92,7 +92,7 @@ sub compile {
 
 sub interpret {
     my $self   = shift;
-    my $result = shift;
+    my $output = shift;
 
     # Shortcut
     my $compiled = $self->compiled;
@@ -105,9 +105,9 @@ sub interpret {
     };
 
     # Interpret
-    $$result = eval { $compiled->(@_) };
+    $$output = eval { $compiled->(@_) };
     if ($@) {
-        $$result = $self->_error($@);
+        $$output = $self->_error($@);
         return 0;
     }
 
@@ -270,11 +270,11 @@ sub render_file_to_file {
     my $tpath = shift;
 
     # Render
-    my $result;
-    return 0 unless $self->render_file($spath, \$result, @_);
+    my $output;
+    return 0 unless $self->render_file($spath, \$output, @_);
 
     # Write to file
-    return $self->_write_file($tpath, $result);
+    return $self->_write_file($tpath, $output);
 }
 
 sub render_to_file {
@@ -283,11 +283,11 @@ sub render_to_file {
     my $path = shift;
 
     # Render
-    my $result;
-    return 0 unless $self->render($tmpl, \$result, @_);
+    my $output;
+    return 0 unless $self->render($tmpl, \$output, @_);
 
     # Write to file
-    return $self->_write_file($path, $result);
+    return $self->_write_file($path, $output);
 }
 
 sub _context {
@@ -353,12 +353,12 @@ sub _error {
 }
 
 sub _write_file {
-    my ($self, $path, $result) = @_;
+    my ($self, $path, $output) = @_;
 
     # Write to file
     my $file = IO::File->new;
     $file->open("> $path") or croak "Can't open file '$path': $!";
-    $file->syswrite($result) or croak "Can't write to file '$path': $!";
+    $file->syswrite($output) or croak "Can't write to file '$path': $!";
     return 1;
 }
 
@@ -375,8 +375,8 @@ Mojo::Template - Perlish Templates!
     my $mt = Mojo::Template->new;
 
     # Simple
-    my $result;
-    $mt->render(<<'EOF', \$result);
+    my $output;
+    $mt->render(<<'EOF', \$output);
     <html>
       <head></head>
       <body>
@@ -384,11 +384,11 @@ Mojo::Template - Perlish Templates!
       </body>
     </html>
     EOF
-    print $result;
+    print $output;
 
     # More complicated
-    my $result;
-    $mt->render(<<'EOF', \$result, 23, 'foo bar');
+    my $output;
+    $mt->render(<<'EOF', \$output, 23, 'foo bar');
     %= 5 * 5
     % my ($number, $text) = @_;
     test 123
@@ -397,7 +397,7 @@ Mojo::Template - Perlish Templates!
     * some text <%= $i++ %>
     % }
     EOF
-    print $result;
+    print $output;
 
 =head1 DESCRIPTION
 
@@ -431,7 +431,7 @@ them if neccessary.
     $mt->tag_start('[@@');
     $mt->tag_end('@@]');
     $mt->expression_mark('&');
-    $mt->render(<<'EOF', \$result, 23);
+    $mt->render(<<'EOF', \$output, 23);
     @@ my $i = shift;
     <% no code just text [@@& $i @@]
     EOF
@@ -480,8 +480,8 @@ build a wrapper around it.
     $mt->template($template);
     $mt->code($code);
     $mt->compile;
-    my $result;
-    $mt->interpret(\$result, @arguments);
+    my $output;
+    $mt->interpret(\$output, @arguments);
 
 =head1 ATTRIBUTES
 
@@ -544,8 +544,8 @@ following new ones.
 
 =head2 C<interpret>
 
-    my $result = $mt->interpret;
-    my $result = $mt->interpret(\$result, @arguments);
+    my $success = $mt->interpret;
+    my $success = $mt->interpret(\$output, @arguments);
 
 =head2 C<parse>
 
@@ -553,26 +553,26 @@ following new ones.
 
 =head2 C<render>
 
-    my $result = $mt->render($template);
-    my $result = $mt->render($template, \$result, @arguments);
+    my $success = $mt->render($template);
+    my $success = $mt->render($template, \$output, @arguments);
 
 =head2 C<render_file>
 
-    my $result = $mt->render_file($template_file);
-    my $result = $mt->render_file($template_file, \$result, @arguments);
+    my $success = $mt->render_file($template_file);
+    my $success = $mt->render_file($template_file, \$result, @arguments);
 
 =head2 C<render_file_to_file>
 
-    my $result = $mt->render_file_to_file($template_file, $result_file);
-    my $result = $mt->render_file_to_file(
-        $template_file, $result_file, @arguments
+    my $success = $mt->render_file_to_file($template_file, $output_file);
+    my $success = $mt->render_file_to_file(
+        $template_file, $output_file, @arguments
     );
 
 =head2 C<render_to_file>
 
-    my $result = $mt->render_to_file($template, $result_file);
-    my $result = $mt->render_to_file(
-        $template, $result_file, @arguments
+    my $success = $mt->render_to_file($template, $output_file);
+    my $success = $mt->render_to_file(
+        $template, $output_file, @arguments
     );
 
 =cut

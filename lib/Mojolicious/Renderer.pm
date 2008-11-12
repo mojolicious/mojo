@@ -16,8 +16,10 @@ sub new {
     my $self = shift->SUPER::new(@_);
     $self->default_ext('phtml');
     $self->add_handler(phtml => sub {
-        my ($self, $path, $result, $c, $options) = @_;
-        Mojo::Template->new->render_file($path, $result, $c, $options);
+        my ($self, $args) = @_;
+        Mojo::Template->new->render_file(
+            $args->{path}, $args->{output}, $args->{tx}, $args
+        );
     });
     return $self;
 }

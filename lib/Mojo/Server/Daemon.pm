@@ -37,6 +37,8 @@ sub listen {
     # Non blocking
     $self->{listen}->blocking(0);
 
+    $self->app->log->info("Server started (http://127.0.0.1:$port)");
+
     # Friendly message
     print "Server available at http://127.0.0.1:$port.\n";
 }
@@ -47,9 +49,6 @@ sub run {
     my $self = shift;
 
     $SIG{HUP} = $SIG{PIPE} = 'IGNORE';
-
-    # Preload application
-    $self->app;
 
     # Listen
     $self->listen;

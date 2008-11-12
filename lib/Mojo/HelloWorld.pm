@@ -11,6 +11,16 @@ use base 'Mojo';
 # every time I learn something new, it pushes some old stuff out of my brain.
 # Remember when I took that home winemaking course,
 # and I forgot how to drive?
+sub new {
+    my $self = shift->SUPER::new();
+
+    # This app should log only errors to STDERR
+    $self->log->level('error');
+    $self->log->path(undef);
+
+    return $self;
+}
+
 sub handler {
     my ($self, $tx) = @_;
 
@@ -46,6 +56,10 @@ testing.
 
 L<Mojo::HelloWorld> inherits all methods from L<Mojo> and implements the
 following new ones.
+
+=head2 C<new>
+
+    my $hello = Mojo::HelloWorld->new;
 
 =head2 C<handler>
 

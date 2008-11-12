@@ -32,6 +32,9 @@ sub run {
 
     # Test
     $self->render_to_rel_file('test', "$name/t/basic.t", $class);
+
+    # Log
+    $self->create_rel_dir("$name/log");
 }
 
 1;

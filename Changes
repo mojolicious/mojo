@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension Mojo.
 
 0.8010  2008-11-10 00:00:00
         - Added modes to Mojolicious.
+        - Added Mojo::Log and log support for Mojo/Mojolicious.
         - Changed MojoX::Renderer and Mojo::Template api to make catching
           errors easier, we now use a scalar ref for results like most
           template engines.

@@ -11,12 +11,23 @@ use base 'Mojo::Base';
 require Carp;
 
 use Mojo::Home;
+use Mojo::Log;
 use Mojo::Transaction;
 
 __PACKAGE__->attr('home', chained => 1, default => sub { Mojo::Home->new });
+__PACKAGE__->attr('log',  chained => 1, default => sub { Mojo::Log->new });
 
 # Oh, so they have internet on computers now!
 our $VERSION = '0.8010';
+
+sub new {
+    my $self = shift->SUPER::new();
+
+    # Log directory
+    $self->log->path($self->home->rel_file('log/mojo.log'));
+
+    return $self;
+}
 
 sub build_tx { return Mojo::Transaction->new }
 
@@ -68,10 +79,21 @@ L<Mojo> implements the following attributes.
     my $home = $mojo->home;
     $mojo    = $mojo->home(Mojo::Home->new);
 
+=head2 C<log>
+
+    my $log = $mojo->log;
+    $mojo   = $mojo->home(Mojo::Log->new);
+
 =head1 METHODS
 
 L<Mojo> inherits all methods from L<Mojo::Base> and implements the following
 new ones.
+
+=head2 C<new>
+
+    my $mojo = Mojo->new;
+
+Returns a new L<Mojo> object.
 
 =head2 C<build_tx>
 

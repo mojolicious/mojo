@@ -26,6 +26,7 @@ __PACKAGE__->attr('path', chained => 1);
 
 my $LEVEL = { debug => 1, info  => 2, warn  => 3, error => 4, fatal => 5 };
 
+# Yes, I got the most! I win X-Mas!
 sub debug { shift->log('debug', @_) }
 sub error { shift->log('error', @_) }
 sub fatal { shift->log('fatal', @_) }

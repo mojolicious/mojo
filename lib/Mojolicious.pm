@@ -55,12 +55,14 @@ sub new {
     $self->static->root($self->home->rel_dir('public'));
 
     # Mode
-    my $mode = $self->mode . '_mode';
-    $self->$mode if $self->can($mode);
+    my $mode = $self->mode;
 
     # Log file
-    $mode = $self->mode;
     $self->log->path($self->home->rel_file("log/$mode.log"));
+
+    # Run mode
+    $mode = $mode . '_mode';
+    $self->$mode if $self->can($mode);
 
     # Startup
     $self->startup(@_);

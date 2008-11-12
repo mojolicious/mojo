@@ -34,7 +34,7 @@ sub add_handler {
 
 sub render {
     my $self = shift;
-    my $tx   = shift;
+    my $c    = shift;
 
     my $args = ref $_[0] ? $_[0] : {@_};
     return undef unless $args;
@@ -63,17 +63,17 @@ sub render {
     my $output;
     return undef unless $handler->($self, {
         args    => $args,
+        c       => $c,
         output  => \$output,
-        path    => $path,
-        tx      => $tx
+        path    => $path
     });
 
     # Partial
     return $output if $args->{partial};
 
     # Response
-    my $res = $tx->res;
-    $res->code(200) unless $tx->res->code;
+    my $res = $c->res;
+    $res->code(200) unless $c->res->code;
     $res->body($output);
 
     my $type = $self->types->type($ext) || 'text/plain';
@@ -133,6 +133,6 @@ follwing the ones.
 
 =head2 C<render>
 
-    $renderer = $renderer->render($tx, {template => 'foo.phtml'});
+    $renderer = $renderer->render($c, {template => 'foo.phtml'});
 
 =cut

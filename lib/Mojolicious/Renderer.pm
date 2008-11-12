@@ -18,7 +18,7 @@ sub new {
     $self->add_handler(phtml => sub {
         my ($self, $args) = @_;
         Mojo::Template->new->render_file(
-            $args->{path}, $args->{output}, $args->{tx}, $args
+            $args->{path}, $args->{output}, $args->{c}, $args
         );
     });
     return $self;

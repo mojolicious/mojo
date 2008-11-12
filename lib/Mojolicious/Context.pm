@@ -7,9 +7,6 @@ use warnings;
 
 use base 'MojoX::Dispatcher::Routes::Context';
 
-__PACKAGE__->attr('app', chained => 1, weak => 1);
-__PACKAGE__->attr('stash', chained => 1, default => sub { {} });
-
 # Space: It seems to go on and on forever...
 # but then you get to the end and a gorilla starts throwing barrels at you.
 sub render {
@@ -53,15 +50,7 @@ L<Mojolicous::Context> is a context container.
 =head1 ATTRIBUTES
 
 L<Mojolicious::Context> inherits all attributes from
-L<MojoX::Dispatcher::Routes::Context> and implements the following new ones.
-
-=head2 C<app>
-
-    my $app = $c->app;
-
-=head2 C<stash>
-
-    my $stash = $c->stash;
+L<MojoX::Dispatcher::Routes::Context>.
 
 =head1 METHODS
 

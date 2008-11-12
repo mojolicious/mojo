@@ -5,6 +5,7 @@ This file documents the revision history for Perl extension Mojo.
         - Changed MojoX::Renderer and Mojo::Template api to make catching
           errors easier, we now use a scalar ref for results like most
           template engines.
+        - Added MojoX::Context.
         - MojoX::Dispatcher::Routes should be able to fail.
         - Fixed / routes matching too much.
         - Fixed typos.

@@ -1,6 +1,11 @@
 *** IMPORTANT
 
-All done for now.
+- Mojo::Server::FastCGI needs to work with more servers than Lighttpd.
+
+- Mojo::Client needs some profiling and tuning.
+
+- All the debug flags that output infos to STDERR need to be updated to use
+  the logger.
 
 *** IDEAS
 

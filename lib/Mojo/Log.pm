@@ -59,9 +59,11 @@ sub log {
     return $self unless $level && $self->is_level($level);
 
     # Write
-    $self->handle->syswrite(
-        "[" . localtime(time) . '] ' . "[$level] " . join("\n", @msgs) . "\n"
-    );
+    my $time = localtime(time);
+    my $msgs = join "\n", @msgs;
+    my ($pkg, $line) = (caller())[0,2];
+    ($pkg, $line)    = (caller(1))[0,2] if $pkg eq ref $self;
+    $self->handle->syswrite("[$time][$level][$pkg:$line] $msgs\n");
 
     return $self;
 }

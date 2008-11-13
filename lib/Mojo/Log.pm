@@ -81,9 +81,28 @@ Mojo::Log - Simple Logger For Mojo
 
     use Mojo::Log;
 
+    # Create a logging object. 
+    # By default it will log to STDERR including the time, level, package, line number and message.  
+    my $log = Mojo::Log->new;
+
+    # Customize the log location minimum log level. 
+    my $log = Mojo::Log->new(
+        path  => '/var/log/mojo.log',
+        level => 'warn',
+    );
+
+    $log->debug("Why isn't this working?");
+    $log->info("FYI: it happened again");
+    $log->warn("This might be a problem");
+    $log->error("Garden variety error");
+    $log->fatal("Boom!");
+
 =head1 DESCRIPTION
 
-L<Mojo::Log> is a simple logger.
+L<Mojo::Log> is a simple logger. Include log statements at various levels
+throughout your code. Then when you create the new logging object, set the
+minimum log level you want to keep track off. Set it low, to 'debug' for
+development, then higher in production. 
 
 =head1 ATTRIBUTES
 
@@ -92,15 +111,23 @@ L<Mojo::Log> is a simple logger.
     my $handle = $log->handle;
     $log       = $log->handle(IO::File->new);
 
+Set or return the IO handle used for logging. Any object with a C<syswrite()>
+method will do.
+
 =head2 C<level>
 
     my $level = $log->level;
     $log      = $log->level('debug');
 
+Set or return the minimum logging level. Valid value are: debug, info, warn, error and fatal. 
+
 =head2 C<path>
 
     my $path = $log->path
     $log     = $log->path('/var/log/mojo.log');
+
+Set or return the path to the log to write to. This used by the default C<handle> attribute. 
+STDERR is printed to by default if no path is provided. 
 
 =head1 METHODS
 
@@ -123,36 +150,41 @@ following new ones.
 
     $log = $log->info('You are bad, but you prolly know already');
 
-=head2 C<is_debug>
+=head2 C<warn>
 
-    my $is = $log->is_debug;
-
-=head2 C<is_error>
-
-    my $is = $log->is_error;
-
-=head2 C<is_fatal>
-
-    my $is = $log->is_fatal;
-
-=head2 C<is_info>
-
-    my $is = $log->is_info;
-
-=head2 C<is_level>
-
-    my $is = $log->is_level('debug');
-
-=head2 C<is_warn>
-
-    my $is = $log->is_warn;
+    $log = $log->warn('Dont do that Dave...');
 
 =head2 C<log>
 
     $log = $log->log(debug => 'This should work');
 
-=head2 C<warn>
+A long-hand alternative to the logging shortcuts above. 
 
-    $log = $log->warn('Dont do that Dave...');
+=head2 C<is_level>
+
+=head2 C<is_debug>
+
+=head2 C<is_error>
+
+=head2 C<is_fatal>
+
+=head2 C<is_info>
+
+=head2 C<is_warn>
+
+    my $is = $log->is_level('debug');
+
+    my $is = $log->is_debug;
+    my $is = $log->is_info;
+    my $is = $log->is_warn;
+    my $is = $log->is_error;
+    my $is = $log->is_fatal;
+
+Return true if the current logging level is at or above this level. 
+
+=head1 SEE ALSO
+
+L<Log::Dispatch> is an established logger with a similar interface, with many
+more options logging backends. 
 
 =cut

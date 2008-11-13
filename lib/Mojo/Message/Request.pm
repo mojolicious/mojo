@@ -146,12 +146,12 @@ sub _parse_env {
 
         # Path
         elsif ($name eq 'PATH_INFO') {
-            $self->url->path($value);
+            $self->url->path->parse($value);
         }
 
         # Query
         elsif ($name eq 'QUERY_STRING') {
-            $self->url->query($value);
+            $self->url->query->parse($value);
         }
 
         # Method
@@ -159,7 +159,7 @@ sub _parse_env {
 
         # Base path
         elsif ($name eq 'SCRIPT_NAME') {
-            $self->url->base->path($value);
+            $self->url->base->path->parse($value);
         }
 
         # Host/Port

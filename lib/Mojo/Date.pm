@@ -28,7 +28,7 @@ sub parse {
     $self = $self->new unless ref $self;
 
     # Shortcut
-    return unless $date;
+    return unless defined $date;
 
     # epoch - 784111777
     if ($date =~ /^\d+$/) {
@@ -53,7 +53,7 @@ sub parse {
     # RFC822/1123 - Sun, 06 Nov 1994 08:49:37 GMT
     if ($date =~ /^(\d+)\s+(\w+)\s+(\d+)\s+(\d+):(\d+):(\d+)$/) {
         $day    = $1;
-        $month  = $months->{$2} || 1;
+        $month  = $months->{$2};
         $year   = $3;
         $hour   = $4;
         $minute = $5;
@@ -63,7 +63,7 @@ sub parse {
     # RFC850/1036 - Sunday, 06-Nov-94 08:49:37 GMT
     elsif ($date =~ /^(\d+)-(\w+)-(\d+)\s+(\d+):(\d+):(\d+)$/) {
         $day    = $1;
-        $month  = $months->{$2} || 1;
+        $month  = $months->{$2};
         $year   = $3;
         $hour   = $4;
         $minute = $5;
@@ -72,7 +72,7 @@ sub parse {
 
     # ANSI C asctime() - Sun Nov  6 08:49:37 1994
     elsif ($date =~ /^(\w+)\s+(\d+)\s+(\d+):(\d+):(\d+)\s+(\d+)$/) {
-        $month  = $months->{$1} || 1;
+        $month  = $months->{$1};
         $day    = $2;
         $hour   = $3;
         $minute = $4;
@@ -90,7 +90,9 @@ sub parse {
 
 sub to_string {
     my $self = shift;
-    my $epoch = shift || $self->{epoch} || time;
+    my $epoch = shift || $self->{epoch};
+
+    $epoch = time unless defined $epoch;
 
     my ($second, $minute, $hour, $mday, $month, $year, $wday)
       = gmtime $epoch;

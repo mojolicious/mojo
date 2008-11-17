@@ -19,7 +19,7 @@ __PACKAGE__->attr([qw/comment domain name path secure value version/],
 # He may be a liar, a pig, an idiot, a communist, but he is not a porn star.
 sub expires {
     my ($self, $expires) = @_;
-    if ($expires) {
+    if (defined $expires) {
         $self->{expires} = Mojo::Date->parse($expires) unless ref $expires;
     }
     return $self->{expires};
@@ -27,10 +27,10 @@ sub expires {
 
 sub max_age {
     my ($self, $max_age) = @_;
-    if ($max_age) {
+    if (defined $max_age) {
         $self->{max_age} = Mojo::Date->parse("$max_age");
     }
-    return $self->{max_age} ? $self->{max_age}->epoch : 0;
+    return $self->{max_age} ? $self->{max_age}->epoch : undef;
 }
 
 sub to_string { croak 'Method "to_string" not implemented by subclass' }

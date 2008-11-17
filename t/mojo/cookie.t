@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 31;
+use Test::More tests => 42;
 
 # What good is money if it can't inspire terror in your fellow man?
 use_ok('Mojo::Cookie::Request');
@@ -69,13 +69,13 @@ $cookie->secure(1);
 $cookie->comment('lalalala');
 $cookie->version(1);
 is("$cookie", 'foo=ba r; Version=1; Domain=kraih.com; Path=/test;'
-  . ' Max_Age=1218092879; expires=Thu, 07 Aug 2008 07:07:59 GMT;'
+  . ' Max-Age=1218092879; Expires=Thu, 07 Aug 2008 07:07:59 GMT;'
   . ' Secure=1; Comment=lalalala');
 
 # Parse response cookie
 $cookies = Mojo::Cookie::Response->parse(
-  'foo=ba r; Version=1; Domain=kraih.com; Path=/test; Max_Age=1218092879;'
-  . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; Secure=1; Comment=lalalala'
+  'foo=ba r; Version=1; Domain=kraih.com; Path=/test; Max-Age=1218092879;'
+  . ' Expires=Thu, 07 Aug 2008 07:07:59 GMT; Secure=1; Comment=lalalala'
 );
 is($cookies->[0]->name, 'foo');
 is($cookies->[0]->value, 'ba r');
@@ -83,6 +83,34 @@ is($cookies->[0]->domain, 'kraih.com');
 is($cookies->[0]->path, '/test');
 is($cookies->[0]->max_age, 1218092879);
 is($cookies->[0]->expires, 'Thu, 07 Aug 2008 07:07:59 GMT');
+is($cookies->[0]->secure, '1');
+is($cookies->[0]->comment, 'lalalala');
+is($cookies->[0]->version, '1');
+
+# Cookie with Max-Age=0 and Expires=0
+$cookie = Mojo::Cookie::Response->new;
+$cookie->name('foo');
+$cookie->value('bar');
+$cookie->path('/');
+$cookie->max_age(0);
+$cookie->expires(0);
+$cookie->version(1);
+is("$cookie", 'foo=bar; Version=1; Path=/; Max-Age=0;'
+    .' Expires=Thu, 01 Jan 1970 00:00:00 GMT');
+
+
+# Parse response cookie with Max-Age=0 and Expires=0
+$cookies = Mojo::Cookie::Response->parse(
+  'foo=bar; Version=1; Domain=kraih.com; Path=/; Max-Age=0;'
+  . ' Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure=1; Comment=lalalala'
+);
+is($cookies->[0]->name, 'foo');
+is($cookies->[0]->value, 'bar');
+is($cookies->[0]->domain, 'kraih.com');
+is($cookies->[0]->path, '/');
+is($cookies->[0]->max_age, 0);
+is($cookies->[0]->expires, 'Thu, 01 Jan 1970 00:00:00 GMT');
+is($cookies->[0]->expires->epoch, 0);
 is($cookies->[0]->secure, '1');
 is($cookies->[0]->comment, 'lalalala');
 is($cookies->[0]->version, '1');

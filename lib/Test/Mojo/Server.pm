@@ -14,7 +14,8 @@ use Mojo::Home;
 use Test::Builder::Module;
 
 __PACKAGE__->attr([qw/command pid port/], chained => 1);
-__PACKAGE__->attr('home',
+__PACKAGE__->attr(
+    'home',
     chained => 1,
     default => sub { Mojo::Home->new }
 );
@@ -90,7 +91,6 @@ sub start_daemon_prefork_ok {
 
     # Prepare command
     $self->command(qq/$^X "$path" daemon_prefork $port/);
-    
 
     return $self->start_server_ok($desc);
 }
@@ -104,7 +104,7 @@ sub start_server_ok {
     return $tb->ok(0, $desc) unless $pid;
 
     # Wait for server
-    my $timeout = $self->timeout;
+    my $timeout     = $self->timeout;
     my $time_before = time;
     while ($self->_check_server != 1) {
 
@@ -158,11 +158,19 @@ sub stop_server_ok {
 
     # Stop server
     $self->_stop_server();
-    if ($self->_check_server) {
-        $tb->diag("Can't stop server");
-        $tb->ok(0, $desc);
+
+    # Give it a few seconds to stop
+    foreach (1 .. $self->timeout) {
+        if ($self->_check_server) {
+            sleep 1;
+        }
+        else {
+            $tb->ok(1, $desc);
+            return;
+        }
     }
-    else { $tb->ok(1, $desc) }
+    $tb->diag("Can't stop server");
+    $tb->ok(0, $desc);
 }
 
 sub _check_server {
@@ -182,7 +190,7 @@ sub _check_server {
     }
     else {
         $self->{_tb}->diag("Server check failed: $!") if $diag;
-        return 0
+        return 0;
     }
 }
 
@@ -191,7 +199,7 @@ sub _generate_port {
 
     # Try ports
     my $port = 1 . int(rand 10) . int(rand 10) . int(rand 10) . int(rand 10);
-    while ( $port++ < 30000 ) {
+    while ($port++ < 30000) {
         my $server = IO::Socket::INET->new(
             Listen    => 5,
             LocalAddr => '127.0.0.1',
@@ -206,7 +214,7 @@ sub _generate_port {
 
 sub _start_server {
     my $self = shift;
-    my $tb = $self->{_tb};
+    my $tb   = $self->{_tb};
 
     my $command = $self->command;
     warn "\nSERVER COMMAND: $command\n" if DEBUG;
@@ -216,7 +224,7 @@ sub _start_server {
     $self->pid($pid);
 
     # Process started?
-    unless ($pid) { 
+    unless ($pid) {
         $tb->diag("Can't start server: $!");
         return 0;
     }

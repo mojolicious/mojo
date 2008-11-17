@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojo.
 
+        - When testing, allow servers a few seconds to stop
+          (Leon Brocard)
+
 0.8010  2008-11-10 00:00:00
         - Added modes to Mojolicious.
         - Added Mojo::Log and log support for Mojo/Mojolicious.

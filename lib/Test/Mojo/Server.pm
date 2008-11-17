@@ -14,8 +14,7 @@ use Mojo::Home;
 use Test::Builder::Module;
 
 __PACKAGE__->attr([qw/command pid port/], chained => 1);
-__PACKAGE__->attr(
-    'home',
+__PACKAGE__->attr('home',
     chained => 1,
     default => sub { Mojo::Home->new }
 );

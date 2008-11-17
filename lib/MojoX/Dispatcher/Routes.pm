@@ -32,8 +32,18 @@ sub dispatch {
         my $controller = $field->{controller};
         my $action     = $field->{action};
 
-        my $class = Mojo::ByteStream->new($controller)->camelize;
-        $class    = $self->namespace . "::$class";
+        my @class;
+        for my $part (split /-/, $controller) {
+
+            # Junk
+            next unless $part;
+
+            # Camelize
+            push @class, Mojo::ByteStream->new($part)->camelize;
+        }
+
+        # Format
+        my $class = join '::', $self->namespace, @class;
 
         # Debug
         warn "-> $controller($class) :: $action\n" if DEBUG;

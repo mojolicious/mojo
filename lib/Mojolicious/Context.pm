@@ -18,7 +18,7 @@ sub render {
       || $self->match->captures->{controller};
     my $action = $args->{action} || $self->match->captures->{action};
 
-    $args->{template} ||= join '/', $controller, $action;
+    $args->{template} ||= join '/', split(/-/, $controller), $action;
 
     return $self->app->renderer->render($self, $args);
 }

@@ -138,8 +138,7 @@ sub _parse_env {
         my $value = $env->{$name};
 
         # Headers
-        if ($name =~ /^HTTP_/i) {
-            $name =~ s/^HTTP_//i;
+        if ($name =~ s/^HTTP_//i) {
             $name =~ s/_/-/g;
             $self->headers->header($name, $value);
         }

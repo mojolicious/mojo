@@ -122,7 +122,6 @@ sub read_request {
             }
 
             # Params done
-            $req->state('body');
             while (length $parambuffer) {
 
                 # Name and value length

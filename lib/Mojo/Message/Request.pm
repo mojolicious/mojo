@@ -141,6 +141,32 @@ sub _parse_env {
         if ($name =~ s/^HTTP_//i) {
             $name =~ s/_/-/g;
             $self->headers->header($name, $value);
+
+            # Host/Port
+            if ($name eq 'HOST') {
+                my $host = $value;
+                my $port = undef;
+
+                if ($host =~ /^([^\:]*)\:?(.*)$/) {
+                    $host = $1;
+                    $port = $2;
+                }
+
+                $self->url->host($host);
+                $self->url->port($port);
+                $self->url->base->host($host);
+                $self->url->base->port($port);
+            }
+        }
+
+        # Content-Type is a special case on some servers
+        elsif ($name eq 'CONTENT_TYPE') {
+            $self->headers->content_type($value);
+        }
+
+        # Content-Length is a special case on some servers
+        elsif ($name eq 'CONTENT_LENGTH') {
+            $self->headers->content_length($value);
         }
 
         # Path
@@ -159,22 +185,6 @@ sub _parse_env {
         # Base path
         elsif ($name eq 'SCRIPT_NAME') {
             $self->url->base->path->parse($value);
-        }
-
-        # Host/Port
-        elsif ($name eq 'SERVER_NAME') {
-            my $host = $value;
-            my $port = undef;
-
-            if ($host =~ /^([^\:]*)\:?(.*)$/) {
-                $host = $1;
-                $port = $2;
-            }
-
-            $self->url->host($host);
-            $self->url->port($port);
-            $self->url->base->host($host);
-            $self->url->base->port($port);
         }
 
         # Scheme/Version

@@ -23,7 +23,6 @@ sub run {
     $req->parse(\%ENV);
 
     # Request body
-    $req->state('body');
     my $select = IO::Select->new(\*STDIN);
     while (!$req->is_state(qw/done error/)) {
         last unless $select->can_read(0);

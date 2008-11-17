@@ -56,6 +56,10 @@ sub serve {
         my $res = $tx->res;
         $res->content(Mojo::Content->new(file => Mojo::File->new));
         $res->code(200);
+
+        my $mtime = (stat $path)[9];
+        $res->headers->header('Last-Modified', Mojo::Date->new($mtime));
+
         $res->headers->content_type($type);
         $res->content->file->path($path);
         return 1;

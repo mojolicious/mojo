@@ -110,6 +110,7 @@ sub build {
     my @headers;
     for my $name ($self->names) {
         for my $value ($self->header($name)) {
+            $value = '' unless defined $value;
             push @headers, "$name: $value";
         }
     }
@@ -156,6 +157,7 @@ sub header {
     # Filter
     my @header;
     for my $value (@{$self->{_headers}->{$name}}) {
+        $value = '' unless defined $value;
         $value =~ s/\s+$//;
         $value =~ s/\n\n+/\n/g;
         $value =~ s/\n([^\040\t])/\n $1/g;

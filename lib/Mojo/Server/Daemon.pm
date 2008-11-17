@@ -275,7 +275,7 @@ sub _read {
     my $read = $socket->sysread(my $buffer, 4096, 0);
 
     # Read error
-    unless (defined $read) {
+    unless (defined $read && $buffer) {
         $self->_drop_connection($name);
         return 1;
     }

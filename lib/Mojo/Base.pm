@@ -64,7 +64,7 @@ sub attr {
 
             # Check invocant
             $code .= "${ws}Carp::confess(q[";
-            $code .= "Attribute '$attr' has to be called on an object, not a class";
+            $code .= qq/Attribute "$attr" has to be called on an object, not a class/;
             $code .= "])\n  ${ws}unless ref \$_[0];\n";
         }
 

@@ -45,6 +45,10 @@ sub attr {
 
     undef $args;
 
+    # Check default
+    Carp::croak('Default has to be a code reference or constant value')
+      if ref $default && ref $default ne 'CODE';
+
     # Allow symbolic references
     no strict 'refs';
 
@@ -206,7 +210,8 @@ Currently there are three options supported.
 
     chained: Whenever you call an attribute with arguments the instance
              is returned instead of the value.
-    default: Default value for the attribute, can also be a coderef.
+    default: Default value for the attribute, can be a coderef or constant
+             value. (Not a normal reference!)
              Note that the default value is "lazy", which means it only
              gets assigned to the instance when the attribute has been
              called.

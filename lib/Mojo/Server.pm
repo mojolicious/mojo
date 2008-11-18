@@ -12,49 +12,59 @@ use Mojo::Loader;
 
 use constant RELOAD => $ENV{MOJO_RELOAD} || 0;
 
-__PACKAGE__->attr('app',
-    chained => 1,
-    default => sub { Mojo::Loader->load_build(shift->app_class) }
+__PACKAGE__->attr(
+    app => (
+        chained => 1,
+        default => sub { Mojo::Loader->load_build(shift->app_class) }
+    )
 );
-__PACKAGE__->attr('app_class',
-    chained => 1,
-    default => sub { $ENV{MOJO_APP} ||= 'Mojo::HelloWorld' }
+__PACKAGE__->attr(
+    app_class => (
+        chained => 1,
+        default => sub { $ENV{MOJO_APP} ||= 'Mojo::HelloWorld' }
+    )
 );
-__PACKAGE__->attr('build_tx_cb',
-    chained => 1,
-    default => sub {
-        return sub {
-            my $self = shift;
+__PACKAGE__->attr(
+    build_tx_cb => (
+        chained => 1,
+        default => sub {
+            return sub {
+                my $self = shift;
 
-            # Reload
-            if (RELOAD) {
-                Mojo::Loader->reload;
-                delete $self->{app};
-            }
+                # Reload
+                if (RELOAD) {
+                    Mojo::Loader->reload;
+                    delete $self->{app};
+                }
 
-            return $self->app->build_tx;
+                return $self->app->build_tx;
+              }
         }
-    }
+    )
 );
-__PACKAGE__->attr('continue_handler_cb',
-    chained => 1,
-    default => sub {
-        return sub {
-            my ($self, $tx) = @_;
-            $tx->res->code(100);
-            return $tx;
-        };
-    }
+__PACKAGE__->attr(
+    continue_handler_cb => (
+        chained => 1,
+        default => sub {
+            return sub {
+                my ($self, $tx) = @_;
+                $tx->res->code(100);
+                return $tx;
+            };
+        }
+    )
 );
-__PACKAGE__->attr('handler_cb',
-    chained => 1,
-    default => sub {
-        return sub {
-            my ($self, $tx) = @_;
-            $self->app->handler($tx);
-            return $tx;
-        };
-    }
+__PACKAGE__->attr(
+    handler_cb => (
+        chained => 1,
+        default => sub {
+            return sub {
+                my ($self, $tx) = @_;
+                $self->app->handler($tx);
+                return $tx;
+            };
+        }
+    )
 );
 
 # It's up to the subclass to decide where log messages go

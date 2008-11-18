@@ -27,5 +27,5 @@ is("$date", 'Sun, 06 Nov 1994 08:49:37 GMT');
 # Zero time checks
 $date->parse(0);
 is($date->epoch, 0);
-is("$date", 'Thu, 01 Jan 1970 00:00:00 GMT');
+is("$date",      'Thu, 01 Jan 1970 00:00:00 GMT');
 is($date->parse('Thu, 01 Jan 1970 00:00:00 GMT')->epoch, 0);

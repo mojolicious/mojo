@@ -11,13 +11,15 @@ use Carp qw/carp croak/;
 use File::Spec;
 use MojoX::Types;
 
-__PACKAGE__->attr('default_ext', chained => 1);
-__PACKAGE__->attr('handler', chained => 1, default => sub { {} });
-__PACKAGE__->attr('types',
-    chained => 1,
-    default => sub { MojoX::Types->new }
+__PACKAGE__->attr(default_ext => (chained => 1));
+__PACKAGE__->attr(handler => (chained => 1, default => sub { {} }));
+__PACKAGE__->attr(
+    types => (
+        chained => 1,
+        default => sub { MojoX::Types->new }
+    )
 );
-__PACKAGE__->attr('root', chained => 1);
+__PACKAGE__->attr(root => (chained => 1));
 
 # This is not how Xmas is supposed to be.
 # In my day Xmas was about bringing people together, not blowing them apart.
@@ -40,7 +42,7 @@ sub render {
     return undef unless $args;
 
     my $template = $args->{template};
-    my $default = $self->default_ext;
+    my $default  = $self->default_ext;
     $template .= ".$default" if $default && $template !~ /\.\w+$/;
 
     my $path = File::Spec->catfile($self->root, $template);
@@ -61,12 +63,15 @@ sub render {
 
     # Render
     my $output;
-    return undef unless $handler->($self, {
-        args    => $args,
-        c       => $c,
-        output  => \$output,
-        path    => $path
-    });
+    return undef
+      unless $handler->(
+        $self,
+        {   args   => $args,
+            c      => $c,
+            output => \$output,
+            path   => $path
+        }
+      );
 
     # Partial
     return $output if $args->{partial};

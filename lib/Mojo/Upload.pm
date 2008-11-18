@@ -11,11 +11,13 @@ use Carp 'croak';
 use Mojo::File;
 use Mojo::Headers;
 
-__PACKAGE__->attr('file', chained =>1, default => sub { Mojo::File->new });
-__PACKAGE__->attr([qw/filename name/], chained =>1);
-__PACKAGE__->attr('headers',
-    chained =>1,
-    default => sub { Mojo::Headers->new }
+__PACKAGE__->attr(file => (chained => 1, default => sub { Mojo::File->new }));
+__PACKAGE__->attr([qw/filename name/] => (chained => 1));
+__PACKAGE__->attr(
+    headers => (
+        chained => 1,
+        default => sub { Mojo::Headers->new }
+    )
 );
 
 # B-6

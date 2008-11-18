@@ -53,10 +53,10 @@ sub parse {
     my $self = shift;
 
     # Trailing headers
-   if ($self->is_state('trailing_headers')) {
-       $self->_parse_trailing_headers;
-       return $self;
-   }
+    if ($self->is_state('trailing_headers')) {
+        $self->_parse_trailing_headers;
+        return $self;
+    }
 
     # Got a chunk (we ignore the chunk extension)
     my $filter = $self->input_buffer;
@@ -94,7 +94,7 @@ sub parse {
             }
 
             # Not a whole chunk, need to wait for more data
-            else { last }
+            else {last}
         }
     }
 
@@ -113,7 +113,7 @@ sub _parse_trailing_headers {
 }
 
 sub _remove_chunked_encoding {
-    my $self = shift;
+    my $self     = shift;
     my $encoding = $self->headers->transfer_encoding;
     $encoding =~ s/,?\s*chunked//ig;
     $self->headers->transfer_encoding($encoding);

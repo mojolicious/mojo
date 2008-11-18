@@ -13,29 +13,41 @@ use Mojolicious::Renderer;
 use MojoX::Dispatcher::Static;
 use MojoX::Types;
 
-__PACKAGE__->attr('ctx_class',
-    chained => 1,
-    default => 'Mojolicious::Context'
+__PACKAGE__->attr(
+    ctx_class => (
+        chained => 1,
+        default => 'Mojolicious::Context'
+    )
 );
-__PACKAGE__->attr('mode',
-    chained => 1,
-    default => sub { ($ENV{MOJO_MODE} || 'development') }
+__PACKAGE__->attr(
+    mode => (
+        chained => 1,
+        default => sub { ($ENV{MOJO_MODE} || 'development') }
+    )
 );
-__PACKAGE__->attr('renderer',
-    chained => 1,
-    default => sub { Mojolicious::Renderer->new }
+__PACKAGE__->attr(
+    renderer => (
+        chained => 1,
+        default => sub { Mojolicious::Renderer->new }
+    )
 );
-__PACKAGE__->attr('routes',
-    chained => 1,
-    default => sub { Mojolicious::Dispatcher->new }
+__PACKAGE__->attr(
+    routes => (
+        chained => 1,
+        default => sub { Mojolicious::Dispatcher->new }
+    )
 );
-__PACKAGE__->attr('static',
-    chained => 1,
-    default => sub { MojoX::Dispatcher::Static->new }
+__PACKAGE__->attr(
+    static => (
+        chained => 1,
+        default => sub { MojoX::Dispatcher::Static->new }
+    )
 );
-__PACKAGE__->attr('types',
-    chained => 1,
-    default => sub { MojoX::Types->new }
+__PACKAGE__->attr(
+    types => (
+        chained => 1,
+        default => sub { MojoX::Types->new }
+    )
 );
 
 # The usual constructor stuff
@@ -100,7 +112,7 @@ sub handler {
 }
 
 # This will run once at startup
-sub startup {}
+sub startup { }
 
 1;
 __END__

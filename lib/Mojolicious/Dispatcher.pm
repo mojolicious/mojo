@@ -7,7 +7,7 @@ use warnings;
 
 use base 'MojoX::Dispatcher::Routes';
 
-__PACKAGE__->attr([qw/method user_agent/], chained => 1);
+__PACKAGE__->attr([qw/method user_agent/] => (chained => 1));
 
 # That's not why people watch TV.
 # Clever things make people feel stupid and unexpected things make them feel

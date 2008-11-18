@@ -13,8 +13,8 @@ use File::Spec;
 
 use constant DEBUG => $ENV{MOJO_LOADER_DEBUG} || 0;
 
-__PACKAGE__->attr([qw/base namespace/], chained => 1);
-__PACKAGE__->attr('modules', chained => 1, default => sub { [] });
+__PACKAGE__->attr([qw/base namespace/] => (chained => 1));
+__PACKAGE__->attr(modules => (chained => 1, default => sub { [] }));
 
 my $STATS = {};
 
@@ -45,7 +45,8 @@ sub build {
     foreach my $module (@{$self->modules}) {
 
         eval {
-            if (my $base = $self->base) {
+            if (my $base = $self->base)
+            {
                 die "SHORTCUT\n" unless $module->isa($base);
             }
             my $instance = $module->new(@_);
@@ -77,7 +78,7 @@ sub load {
 }
 
 sub load_build {
-    my $self  = shift;
+    my $self = shift;
 
     # Instantiate self
     $self = $self->new unless ref $self;
@@ -130,7 +131,7 @@ sub search {
     $self->namespace($namespace);
 
     # Directories
-    my @directories = exists $INC{'blib.pm'} ? grep { /blib/ } @INC : @INC;
+    my @directories = exists $INC{'blib.pm'} ? grep {/blib/} @INC : @INC;
 
     # Scan
     my %found;
@@ -143,9 +144,8 @@ sub search {
         my @files = grep /\.pm$/, readdir($dir);
         closedir($dir);
         for my $file (@files) {
-            my $full = File::Spec->catfile(
-                File::Spec->splitdir($path), $file
-            );
+            my $full =
+              File::Spec->catfile(File::Spec->splitdir($path), $file);
             next if -d $full;
             my $name = File::Basename::fileparse($file, qr/\.pm/);
             my $class = "$namespace\::$name";

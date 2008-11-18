@@ -7,17 +7,23 @@ use warnings;
 
 use base 'Mojo::Base';
 
-__PACKAGE__->attr('types', chained => 1, default => sub {{
-    css   => 'text/css',
-    ico   => 'image/x-icon',
-    gif   => 'image/gif',
-    html  => 'text/html',
-    jpg   => 'image/jpeg',
-    js    => 'application/x-javascript',
-    phtml => 'text/html',
-    png   => 'image/png',
-    txt   => 'text/plain'
-}});
+__PACKAGE__->attr(
+    types => (
+        chained => 1,
+        default => sub {
+            {   css   => 'text/css',
+                ico   => 'image/x-icon',
+                gif   => 'image/gif',
+                html  => 'text/html',
+                jpg   => 'image/jpeg',
+                js    => 'application/x-javascript',
+                phtml => 'text/html',
+                png   => 'image/png',
+                txt   => 'text/plain'
+            };
+        }
+    )
+);
 
 # Magic. Got it.
 sub type {

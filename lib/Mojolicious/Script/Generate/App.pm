@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojo::Script';
 
-__PACKAGE__->attr('description', chained => 1, default => <<'EOF');
+__PACKAGE__->attr(description => (chained => 1, default => <<'EOF'));
 * Generate application directory structure. *
 Takes a name as option, by default MyMojoliciousApp will be used.
     generate app TestApp
@@ -30,7 +30,7 @@ sub run {
 
     # Controller
     my $controller = "${class}::Example";
-    my $path = $self->class_to_path($controller);
+    my $path       = $self->class_to_path($controller);
     $self->render_to_rel_file('controller', "$name/lib/$path", $controller);
 
     # Context
@@ -45,16 +45,15 @@ sub run {
     $self->create_rel_dir("$name/log");
 
     # Static
-    $self->render_to_rel_file('404', "$name/public/404.html");
+    $self->render_to_rel_file('404',    "$name/public/404.html");
     $self->render_to_rel_file('static', "$name/public/index.html");
 
     # Template
     $self->renderer->line_start('%%');
     $self->renderer->tag_start('<%%');
     $self->renderer->tag_end('%%>');
-    $self->render_to_rel_file(
-        'welcome', "$name/templates/example/welcome.phtml"
-    );
+    $self->render_to_rel_file('welcome',
+        "$name/templates/example/welcome.phtml");
 }
 
 1;

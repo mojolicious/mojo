@@ -13,12 +13,14 @@ use MojoX::Routes::Pattern;
 
 use constant DEBUG => $ENV{MOJOX_ROUTES_DEBUG} || 0;
 
-__PACKAGE__->attr([qw/block inline name/], chained => 1);
-__PACKAGE__->attr('children', chained => 1, default => sub { [] });
-__PACKAGE__->attr('parent', chained => 1, weak => 1);
-__PACKAGE__->attr('pattern',
-    chained => 1,
-    default => sub { MojoX::Routes::Pattern->new }
+__PACKAGE__->attr([qw/block inline name/] => (chained => 1));
+__PACKAGE__->attr(children => (chained => 1, default => sub { [] }));
+__PACKAGE__->attr(parent => (chained => 1, weak => 1));
+__PACKAGE__->attr(
+    pattern => (
+        chained => 1,
+        default => sub { MojoX::Routes::Pattern->new }
+    )
 );
 
 sub new {
@@ -48,7 +50,7 @@ sub match {
       unless ref $match && $match->isa('MojoX::Routes::Match');
 
     # Path
-    my $path = $match->path;
+    my $path      = $match->path;
     my $substring = $self->_shape(\$path);
 
     # Debug

@@ -11,9 +11,8 @@ use overload '""' => sub { shift->to_string }, fallback => 1;
 use Carp;
 use Mojo::Date;
 
-__PACKAGE__->attr([qw/comment domain name path secure value version/],
-    chained => 1
-);
+__PACKAGE__->attr(
+    [qw/comment domain name path secure value version/] => (chained => 1));
 
 # My Homer is not a communist.
 # He may be a liar, a pig, an idiot, a communist, but he is not a porn star.
@@ -46,7 +45,9 @@ sub _tokenize {
             ^\s*           # Start
             ([^\=\;\,]+)   # Relaxed Netscape token, allowing whitespace
             \s*\=?\s*      # '=' (optional)
-        //x) {
+        //x
+          )
+        {
 
             my $name = $1;
             my $value;
@@ -57,7 +58,11 @@ sub _tokenize {
                 (\"                # Quote
                 (!:\\(!:\\\")?)*   # Value
                 \")                # Quote
-            //x) { $value = Mojo::ByteStream->new($1)->unquote }
+            //x
+              )
+            {
+                $value = Mojo::ByteStream->new($1)->unquote;
+            }
 
             # "expires" is a special case, thank you Netscape...
             elsif ($name =~ /expires/i && $string =~ s/^([^\;]+)\s*//) {
@@ -82,7 +87,7 @@ sub _tokenize {
         }
 
         # Bad format
-        else { last }
+        else {last}
 
     }
 

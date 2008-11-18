@@ -38,7 +38,7 @@ $mt->interpret(\$output, 2);
 is($output, "<html foo=\"bar\">\n3 test 4 lala \n4\%\n</html>\n");
 
 # Arguments
-$mt = Mojo::Template->new;
+$mt     = Mojo::Template->new;
 $output = '';
 $mt->render(<<'EOF', \$output, 'test', {foo => 'bar'});
 % my $message = shift;
@@ -49,7 +49,7 @@ EOF
 is($output, "<html>\ntest bar</html>\n");
 
 # Ugly multiline loop
-$mt = Mojo::Template->new;
+$mt     = Mojo::Template->new;
 $output = '';
 $mt->render(<<'EOF', \$output);
 % my $nums = '';
@@ -60,7 +60,7 @@ EOF
 is($output, "<html>1234</html>\n");
 
 # Clean multiline loop
-$mt = Mojo::Template->new;
+$mt     = Mojo::Template->new;
 $output = '';
 $mt->render(<<'EOF', \$output);
 <html>
@@ -72,7 +72,7 @@ EOF
 is($output, "<html>\n1234</html>\n");
 
 # Escaped line ending
-$mt = Mojo::Template->new;
+$mt     = Mojo::Template->new;
 $output = '';
 $mt->render(<<'EOF', \$output);
 <html>\
@@ -82,7 +82,7 @@ EOF
 is($output, "<html>2222</html>\\\\\\\n");
 
 # Multiline comment
-$mt = Mojo::Template->new;
+$mt     = Mojo::Template->new;
 $output = '';
 $mt->render(<<'EOF', \$output);
 <html><%# this is
@@ -96,7 +96,7 @@ EOF
 is($output, "<html>this not\n1234</html>\n");
 
 # Oneliner
-$mt = Mojo::Template->new;
+$mt     = Mojo::Template->new;
 $output = '';
 $mt->render('<html><%= 3 * 3 %></html>\\', \$output);
 is($output, '<html>9</html>');
@@ -113,7 +113,7 @@ EOF
 is($output, "<html>2222</html>\\\\\\\n");
 
 # Multiline expression
-$mt = Mojo::Template->new;
+$mt     = Mojo::Template->new;
 $output = '';
 $mt->render(<<'EOF', \$output);
 <html><%= do { my $i = '2';
@@ -151,9 +151,8 @@ is($output, "<html>\ntest bar</html>\n");
 
 # File
 $mt = Mojo::Template->new;
-my $file = File::Spec->catfile(
-    File::Spec->splitdir($FindBin::Bin), qw/lib test.mt/
-);
+my $file =
+  File::Spec->catfile(File::Spec->splitdir($FindBin::Bin), qw/lib test.mt/);
 $output = '';
 $mt->render_file($file, \$output, 3);
 is($output, "23Hello World!\n");
@@ -173,6 +172,6 @@ $mt = Mojo::Template->new;
 my $file2 = File::Spec->catfile($dir, 'test2.mt');
 is($mt->render_file_to_file($file, $file2), 1);
 $output = '';
-$mt = Mojo::Template->new;
+$mt     = Mojo::Template->new;
 $mt->render_file($file2, \$output);
 is($output, " foo bar\nbaz 23\ntest\n");

@@ -9,7 +9,7 @@ use base 'Mojo::Script';
 
 use Mojo::Server::FastCGI;
 
-__PACKAGE__->attr('description', chained => 1, default => <<'EOF');
+__PACKAGE__->attr(description => (chained => 1, default => <<'EOF'));
 * Start the fastcgi script. *
 Takes no options.
     fastcgi

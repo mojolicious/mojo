@@ -18,15 +18,15 @@ use_ok('Mojo::Transaction');
 
 # Parallel async io
 my $client = Mojo::Client->new;
-my $tx = Mojo::Transaction->new_post('http://kraih.com',
-    Expect => '100-continue'
-);
+my $tx =
+  Mojo::Transaction->new_post('http://kraih.com', Expect => '100-continue');
 $tx->req->body('foo bar baz');
-my $tx2 = Mojo::Transaction->new_get('http://labs.kraih.com',
-    Expect => '100-continue'
-);
+my $tx2 =
+  Mojo::Transaction->new_get('http://labs.kraih.com',
+    Expect => '100-continue');
 $tx2->req->body('foo bar baz');
 my @transactions = ($tx, $tx2);
+
 while (1) {
     $client->spin(@transactions);
     my @buffer;
@@ -38,7 +38,7 @@ while (1) {
     push @transactions, @buffer;
     last unless @transactions;
 }
-is($tx->res->code, 200);
-is($tx->continued, 1);
+is($tx->res->code,  200);
+is($tx->continued,  1);
 is($tx2->res->code, 301);
 is($tx2->continued, 1);

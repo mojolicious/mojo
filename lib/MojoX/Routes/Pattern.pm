@@ -9,15 +9,15 @@ use base 'Mojo::Base';
 
 use constant DEBUG => $ENV{MOJOX_ROUTES_DEBUG} || 0;
 
-__PACKAGE__->attr('defaults',          chained => 1, default => sub { {} });
-__PACKAGE__->attr([qw/pattern regex/], chained => 1);
-__PACKAGE__->attr('quote_end',         chained => 1, default => ')');
-__PACKAGE__->attr('quote_start',       chained => 1, default => '(');
-__PACKAGE__->attr('reqs',              chained => 1, default => sub { {} });
-__PACKAGE__->attr('segments',          chained => 1, default => 0);
-__PACKAGE__->attr('symbol_start',      chained => 1, default => ':');
-__PACKAGE__->attr('symbols',           chained => 1, default => sub { [] });
-__PACKAGE__->attr('tree',              chained => 1, default => sub { [] });
+__PACKAGE__->attr(defaults => (chained => 1, default => sub { {} }));
+__PACKAGE__->attr([qw/pattern regex/] => (chained => 1));
+__PACKAGE__->attr(quote_end    => (chained => 1, default => ')'));
+__PACKAGE__->attr(quote_start  => (chained => 1, default => '('));
+__PACKAGE__->attr(reqs         => (chained => 1, default => sub { {} }));
+__PACKAGE__->attr(segments     => (chained => 1, default => 0));
+__PACKAGE__->attr(symbol_start => (chained => 1, default => ':'));
+__PACKAGE__->attr(symbols      => (chained => 1, default => sub { [] }));
+__PACKAGE__->attr(tree         => (chained => 1, default => sub { [] }));
 
 # This is the worst kind of discrimination. The kind against me!
 sub new {
@@ -84,9 +84,9 @@ sub render {
 
     # Merge values with defaults
     my $values = ref $_[0] eq 'HASH' ? $_[0] : {@_};
-    $values    = {%{$self->defaults}, %$values};
+    $values = {%{$self->defaults}, %$values};
 
-    my $string = '';
+    my $string   = '';
     my $optional = 1;
     for my $token (reverse @{$self->tree}) {
         my $op       = $token->[0];
@@ -105,7 +105,7 @@ sub render {
 
         # Symbol
         elsif ($op eq 'symbol') {
-            my $name  = $token->[1];
+            my $name = $token->[1];
             $rendered = $values->{$name} || '';
 
             my $default = $self->defaults->{$name} || '';
@@ -122,8 +122,8 @@ sub render {
 sub _compile {
     my $self = shift;
 
-    my $block = '';
-    my $regex = '';
+    my $block    = '';
+    my $regex    = '';
     my $optional = 1;
     for my $token (reverse @{$self->tree}) {
         my $op       = $token->[0];
@@ -149,7 +149,7 @@ sub _compile {
 
         # Symbol
         elsif ($op eq 'symbol') {
-            my $name  = $token->[1];
+            my $name = $token->[1];
 
             unshift @{$self->symbols}, $name;
 

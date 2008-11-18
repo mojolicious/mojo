@@ -36,16 +36,16 @@ $stream = Mojo::ByteStream->new("Zm9vYmFyJCVeJjMyMTc=\n");
 is($stream->b64_decode, 'foobar$%^&3217');
 
 # utf8 b64_encode
-$stream = Mojo::ByteStream->new("foo\x{df}\x{0100}bar%23\x{263a}")
-  ->encode('utf8')
+$stream =
+  Mojo::ByteStream->new("foo\x{df}\x{0100}bar%23\x{263a}")->encode('utf8')
   ->b64_encode;
 is("$stream", "Zm9vw5/EgGJhciUyM+KYug==\n");
 
 # utf8 b64_decode
-my $text = Mojo::ByteStream->new("Zm9vw5/EgGJhciUyM+KYug==\n")
-  ->b64_decode
-  ->decode('utf8');
-is("$text","foo\x{df}\x{0100}bar%23\x{263a}");
+my $text =
+  Mojo::ByteStream->new("Zm9vw5/EgGJhciUyM+KYug==\n")
+  ->b64_decode->decode('utf8');
+is("$text", "foo\x{df}\x{0100}bar%23\x{263a}");
 
 # url_escape
 $stream = Mojo::ByteStream->new('business;23');
@@ -56,15 +56,15 @@ $stream = Mojo::ByteStream->new('business%3B23');
 is($stream->url_unescape, 'business;23');
 
 # utf8 url_escape
-$stream = Mojo::ByteStream->new("foo\x{df}\x{0100}bar\x{263a}")
-  ->encode('utf8')
+$stream =
+  Mojo::ByteStream->new("foo\x{df}\x{0100}bar\x{263a}")->encode('utf8')
   ->url_escape;
 is("$stream", 'foo%C3%9F%C4%80bar%E2%98%BA');
 
 # utf8 url_unescape
-$text = Mojo::ByteStream->new('foo%C3%9F%C4%80bar%E2%98%BA')
-  ->url_unescape
-  ->decode('utf8');
+$text =
+  Mojo::ByteStream->new('foo%C3%9F%C4%80bar%E2%98%BA')
+  ->url_unescape->decode('utf8');
 is("$text", "foo\x{df}\x{0100}bar\x{263a}");
 
 # url_sanitize

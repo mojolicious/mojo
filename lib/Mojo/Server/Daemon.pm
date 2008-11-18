@@ -11,11 +11,11 @@ use Carp 'croak';
 use IO::Select;
 use IO::Socket;
 
-__PACKAGE__->attr('keep_alive_timeout', chained => 1, default => 15);
-__PACKAGE__->attr('listen_queue_size', chained => 1, default => SOMAXCONN);
-__PACKAGE__->attr('max_clients', chained => 1, default => 1000);
-__PACKAGE__->attr('max_keep_alive_requests', chained => 1, default => 100);
-__PACKAGE__->attr('port', chained => 1, default => 3000);
+__PACKAGE__->attr(keep_alive_timeout => (chained => 1, default => 15));
+__PACKAGE__->attr(listen_queue_size  => (chained => 1, default => SOMAXCONN));
+__PACKAGE__->attr(max_clients        => (chained => 1, default => 1000));
+__PACKAGE__->attr(max_keep_alive_requests => (chained => 1, default => 100));
+__PACKAGE__->attr(port                    => (chained => 1, default => 3000));
 
 sub accept_lock { return 1 }
 
@@ -65,8 +65,8 @@ sub spin {
     my ($reader, $writer) = $self->_prepare_select;
 
     # Select
-    my ($read, $write, undef)
-      = IO::Select->select($reader, $writer, undef, 5);
+    my ($read, $write, undef) =
+      IO::Select->select($reader, $writer, undef, 5);
     $read  ||= [];
     $write ||= [];
 
@@ -111,12 +111,12 @@ sub _prepare_connections {
 sub _prepare_select {
     my $self = shift;
 
-    my @read = ();
+    my @read    = ();
     my $clients = keys %{$self->{_connections}};
 
     # Select listen socket if we get the lock on it
     if (($clients < $self->max_clients) && $self->accept_lock(!$clients)) {
-        @read  = ($self->{listen});
+        @read = ($self->{listen});
     }
 
     my @write = ();
@@ -141,7 +141,7 @@ sub _prepare_select {
             # Keep alive request limit
             if ($connection->{requests} >= $self->max_keep_alive_requests) {
                 $self->_drop_connection($name);
-                
+
             }
 
             # Keep alive
@@ -205,14 +205,14 @@ sub _prepare_transactions {
         # Response start line
         if ($tx->is_state('write_start_line') && $tx->{_to_write} <= 0) {
             $tx->state('write_headers');
-            $tx->{_offset} = 0;
+            $tx->{_offset}   = 0;
             $tx->{_to_write} = $tx->res->header_length;
         }
 
         # Response headers
         if ($tx->is_state('write_headers') && $tx->{_to_write} <= 0) {
             $tx->state('write_body');
-            $tx->{_offset} = 0;
+            $tx->{_offset}   = 0;
             $tx->{_to_write} = $tx->res->body_length;
         }
 
@@ -245,11 +245,11 @@ sub _read {
         $socket = $socket->accept;
         $self->accept_unlock;
         return 0 unless $socket;
-        push @{$self->{_accepted}}, {
-            requests  => 0,
-            socket    => $socket,
-            time      => time
-        };
+        push @{$self->{_accepted}},
+          { requests => 0,
+            socket   => $socket,
+            time     => time
+          };
         return 1;
     }
 
@@ -293,7 +293,7 @@ sub _read {
     }
 
     # EOF
-    if(($read == 0) || $req->is_state(qw/done error/)) {
+    if (($read == 0) || $req->is_state(qw/done error/)) {
         $tx->state('write');
 
         # Handle
@@ -356,7 +356,7 @@ sub _write {
     return 1 if $tx->has_error;
 
     $tx->{_to_write} -= $written;
-    $tx->{_offset}   += $written;
+    $tx->{_offset} += $written;
 
     $self->{_connections}->{$name}->{time} = time;
 }

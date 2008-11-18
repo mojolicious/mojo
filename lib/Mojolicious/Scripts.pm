@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojo::Scripts';
 
-__PACKAGE__->attr('message', chained => 1, default => <<'EOF');
+__PACKAGE__->attr(message => (chained => 1, default => <<'EOF'));
 Welcome to the Mojolicious Web Framework!
 
 HINT: In case you don't know what you are doing here try the manual!
@@ -20,9 +20,11 @@ This is the interactive script interface, the syntax is very simple.
 Below you will find a list of available scripts with descriptions.
 
 EOF
-__PACKAGE__->attr('namespace',
-    chained => 1,
-    default => 'Mojolicious::Script'
+__PACKAGE__->attr(
+    namespace => (
+        chained => 1,
+        default => 'Mojolicious::Script'
+    )
 );
 
 # One day a man has everything, the next day he blows up a $400 billion

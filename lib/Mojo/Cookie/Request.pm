@@ -47,7 +47,7 @@ sub parse {
 }
 
 sub prefix {
-    my $self    = shift;
+    my $self = shift;
     my $version = $self->version || 1;
     return "\$Version=$version";
 }
@@ -67,7 +67,7 @@ sub to_string {
 }
 
 sub to_string_with_prefix {
-    my $self = shift;
+    my $self   = shift;
     my $prefix = $self->prefix;
     my $cookie = $self->to_string;
     return "$prefix; $cookie";

@@ -11,7 +11,7 @@ use bytes;
 use Mojo::ByteStream;
 use Mojo::File;
 
-__PACKAGE__->attr('parts', chained => 1, default => sub { [] });
+__PACKAGE__->attr(parts => (chained => 1, default => sub { [] }));
 
 sub body_contains {
     my ($self, $bytestream) = @_;
@@ -63,9 +63,9 @@ sub build_boundary {
     while (1) {
 
         # Mostly taken from LWP
-        $boundary = Mojo::ByteStream->new(
-          join('', map chr(rand(256)), 1..$size * 3)
-        )->b64_encode;
+        $boundary =
+          Mojo::ByteStream->new(join('', map chr(rand(256)), 1 .. $size * 3))
+          ->b64_encode;
         $boundary =~ s/\W/X/g;
 
         # Check parts for boundary
@@ -76,7 +76,7 @@ sub build_boundary {
     # Add boundary to Content-Type header
     ($self->headers->content_type || '') =~ /^(.*multipart\/[^;]+)(.*)$/;
     my $before = $1 || 'multipart/mixed';
-    my $after = $2 || '';
+    my $after  = $2 || '';
     $self->headers->content_type("$before; boundary=$boundary$after");
 
     return $boundary;
@@ -89,9 +89,9 @@ sub get_body_chunk {
     return $self->build_body_cb->($self, $offset) if $self->build_body_cb;
 
     # Multipart
-    my $boundary = $self->build_boundary;
+    my $boundary        = $self->build_boundary;
     my $boundary_length = length($boundary) + 6;
-    my $length = $boundary_length;
+    my $length          = $boundary_length;
 
     # First boundary
     return substr "\x0d\x0a--$boundary\x0d\x0a", $offset
@@ -161,17 +161,17 @@ sub _parse_multipart {
 
         # Preamble
         if ($self->is_state('multipart_preamble')) {
-            last unless $self->_parse_multipart_preamble($boundary)
+            last unless $self->_parse_multipart_preamble($boundary);
         }
 
         # Boundary
         elsif ($self->is_state('multipart_boundary')) {
-            last unless $self->_parse_multipart_boundary($boundary)
+            last unless $self->_parse_multipart_boundary($boundary);
         }
 
         # Body
         elsif ($self->is_state('multipart_body')) {
-            last unless $self->_parse_multipart_body($boundary)
+            last unless $self->_parse_multipart_body($boundary);
         }
     }
 }

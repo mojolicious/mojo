@@ -9,7 +9,7 @@ use base 'Mojo::Script';
 
 use Mojo::Server::Daemon;
 
-__PACKAGE__->attr('description', chained => 1, default => <<'EOF');
+__PACKAGE__->attr(description => (chained => 1, default => <<'EOF'));
 * Start the daemon. *
 Takes a port as option, by default 3000 will be used.
     daemon

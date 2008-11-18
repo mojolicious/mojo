@@ -10,16 +10,20 @@ use base 'Mojo::Base';
 use Mojo::Transaction;
 use Mojo::URL;
 
-__PACKAGE__->attr('captures', chained => 1, default => sub { {} });
-__PACKAGE__->attr('endpoint', chained => 1);
-__PACKAGE__->attr('path',
-    chained => 1,
-    default => sub { shift->tx->req->url->path->to_string }
+__PACKAGE__->attr(captures => (chained => 1, default => sub { {} }));
+__PACKAGE__->attr(endpoint => (chained => 1));
+__PACKAGE__->attr(
+    path => (
+        chained => 1,
+        default => sub { shift->tx->req->url->path->to_string }
+    )
 );
-__PACKAGE__->attr('stack', chained => 1, default => sub { [] });
-__PACKAGE__->attr('tx',
-    chained => 1,
-    default => sub { Mojo::Transaction->new }
+__PACKAGE__->attr(stack => (chained => 1, default => sub { [] }));
+__PACKAGE__->attr(
+    tx => (
+        chained => 1,
+        default => sub { Mojo::Transaction->new }
+    )
 );
 
 # I'm Bender, baby, please insert liquor!
@@ -50,18 +54,18 @@ sub url_for {
 
         # Odd
         if (@_ % 2) {
-            $name = shift;
+            $name   = shift;
             $values = {@_};
         }
 
         # Even
         else {
 
-           # Name and hashref
-           if (ref $_[1] eq 'HASH') {
-               $name = shift;
-               $values = shift;
-           }
+            # Name and hashref
+            if (ref $_[1] eq 'HASH') {
+                $name   = shift;
+                $values = shift;
+            }
 
             # Just values
             $values = {@_};

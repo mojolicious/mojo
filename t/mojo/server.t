@@ -10,10 +10,10 @@ use Test::More tests => 5;
 
 package Mojo::TestServerViaEnv;
 use base 'Mojo';
- 
+
 package Mojo::TestServerViaApp;
 use base 'Mojo';
- 
+
 package main;
 
 use_ok('Mojo::Server');

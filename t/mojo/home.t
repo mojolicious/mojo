@@ -23,8 +23,7 @@ is($home->to_string, $path);
 $ENV{MOJO_HOME} = $backup;
 
 # detect directory
-my $original = File::Spec->catdir(
-    File::Spec->splitdir($FindBin::Bin), '..', '..'
-);
+my $original =
+  File::Spec->catdir(File::Spec->splitdir($FindBin::Bin), '..', '..');
 $home = Mojo::Home->new;
 is(Cwd::realpath($original), Cwd::realpath("$home"));

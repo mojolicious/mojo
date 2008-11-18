@@ -67,18 +67,22 @@ sub to_string {
 
     return '' unless $self->name;
 
-    my $name = $self->name;
+    my $name  = $self->name;
     my $value = $self->value;
     my $cookie .= "$name=$value";
 
     $cookie .= '; Version=';
     $cookie .= $self->version || 1;
 
-    if (my $domain = $self->domain)   { $cookie .= "; Domain=$domain"   }
-    if (my $path = $self->path)       { $cookie .= "; Path=$path"       }
-    if (defined(my $max_age = $self->max_age)) { $cookie .= "; Max-Age=$max_age" }
-    if (defined(my $expires = $self->expires)) { $cookie .= "; expires=$expires" }
-    if (my $secure = $self->secure)   { $cookie .= "; Secure=$secure"   }
+    if (my $domain = $self->domain) { $cookie .= "; Domain=$domain" }
+    if (my $path   = $self->path)   { $cookie .= "; Path=$path" }
+    if (defined(my $max_age = $self->max_age)) {
+        $cookie .= "; Max-Age=$max_age";
+    }
+    if (defined(my $expires = $self->expires)) {
+        $cookie .= "; expires=$expires";
+    }
+    if (my $secure  = $self->secure)  { $cookie .= "; Secure=$secure" }
     if (my $comment = $self->comment) { $cookie .= "; Comment=$comment" }
 
     return $cookie;

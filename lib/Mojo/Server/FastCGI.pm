@@ -23,18 +23,18 @@ my %ROLE_NUMBERS;
 
 #Types
 my @TYPES = qw/
-    BEGIN_REQUEST
-    ABORT_REQUEST
-    END_REQUEST
-    PARAMS
-    STDIN
-    STDOUT
-    STDERR
-    DATA
-    GET_VALUES
-    GET_VALUES_RESULT
-    UNKNOWN_TYPE
-/;
+  BEGIN_REQUEST
+  ABORT_REQUEST
+  END_REQUEST
+  PARAMS
+  STDIN
+  STDOUT
+  STDERR
+  DATA
+  GET_VALUES
+  GET_VALUES_RESULT
+  UNKNOWN_TYPE
+  /;
 my %TYPE_NUMBERS;
 {
     my $i = 1;
@@ -74,7 +74,7 @@ sub read_record {
     my ($version, $type, $id, $clen, $plen) = unpack 'CCnnC', $header;
 
     # Body
-    my $body = $self->_read_chunk($connection, $clen+$plen);
+    my $body = $self->_read_chunk($connection, $clen + $plen);
 
     # No content, just paddign bytes
     $body = undef unless $clen;
@@ -129,7 +129,7 @@ sub read_request {
                 my $vlen = $self->_nv_length(\$parambuffer);
 
                 # Name and value
-                my $name = substr $parambuffer, 0, $nlen, '';
+                my $name  = substr $parambuffer, 0, $nlen, '';
                 my $value = substr $parambuffer, 0, $vlen, '';
 
                 $tx->req->parse({$name => $value});
@@ -209,12 +209,13 @@ sub write_records {
     while (($length > 0) || $empty) {
 
         # Need to split content?
-        my $len = $length > 32*1024 ? 32*1024 : $length;
-	    my $padlen = (8 - ($len % 8)) % 8;
+        my $len = $length > 32 * 1024 ? 32 * 1024 : $length;
+        my $padlen = (8 - ($len % 8)) % 8;
 
         # FCGI version 1 record
         my $template = "CCnnCxa${len}x$padlen";
-        my $record = pack $template, 1, $self->type_number($type), $id, $len, $padlen,
+        my $record = pack $template, 1, $self->type_number($type), $id, $len,
+          $padlen,
           substr($body, $offset, $len);
 
         my $woffset = 0;
@@ -233,7 +234,7 @@ sub write_records {
 sub write_response {
     my ($self, $tx) = @_;
     my $connection = $tx->connection;
-    my $res = $tx->res;
+    my $res        = $tx->res;
 
     # Status
     my $code = $res->code;
@@ -279,7 +280,7 @@ sub write_response {
     }
 
     # The end
-    $self->write_records($connection, 'STDOUT', $tx->{fcgi_id}, undef);
+    $self->write_records($connection, 'STDOUT',      $tx->{fcgi_id}, undef);
     $self->write_records($connection, 'END_REQUEST', $tx->{fcgi_id}, undef);
 }
 

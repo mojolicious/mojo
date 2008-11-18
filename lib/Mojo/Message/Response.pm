@@ -10,7 +10,7 @@ use base 'Mojo::Message';
 use Mojo::Cookie::Response;
 use Mojo::Date;
 
-__PACKAGE__->attr([qw/code message/], chained => 1);
+__PACKAGE__->attr([qw/code message/] => (chained => 1));
 
 # Umarked codes are from RFC 2616 (mostly taken from LWP)
 my %MESSAGES = (
@@ -123,14 +123,14 @@ sub parse {
 }
 
 sub _build_start_line {
-    my $self = shift;
+    my $self    = shift;
     my $version = $self->version;
 
     # HTTP 0.9 has no start line
     return '' if $version eq '0.9';
 
     # HTTP 1.0 and above
-    my $code = $self->code || 200;
+    my $code    = $self->code    || 200;
     my $message = $self->message || $self->default_message;
     return "HTTP/$version $code $message\x0d\x0a";
 }
@@ -173,7 +173,9 @@ sub _parse_start_line {
             \s+               # Whitespace
             ([\w\s]+)         # Message
             $                 # End
-        /x) {
+        /x
+          )
+        {
             $self->major_version($1);
             $self->minor_version($2);
             $self->code($3);

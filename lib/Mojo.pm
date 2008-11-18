@@ -14,8 +14,8 @@ use Mojo::Home;
 use Mojo::Log;
 use Mojo::Transaction;
 
-__PACKAGE__->attr('home', chained => 1, default => sub { Mojo::Home->new });
-__PACKAGE__->attr('log',  chained => 1, default => sub { Mojo::Log->new });
+__PACKAGE__->attr(home => (chained => 1, default => sub { Mojo::Home->new }));
+__PACKAGE__->attr(log  => (chained => 1, default => sub { Mojo::Log->new }));
 
 # Oh, so they have internet on computers now!
 our $VERSION = '0.8010';

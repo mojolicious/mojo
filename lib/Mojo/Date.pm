@@ -10,7 +10,7 @@ use overload '""' => sub { shift->to_string }, fallback => 1;
 
 require Time::Local;
 
-__PACKAGE__->attr('epoch', chained => 1);
+__PACKAGE__->attr(epoch => (chained => 1));
 
 sub new {
     my $self = shift->SUPER::new();
@@ -82,9 +82,9 @@ sub parse {
 
     # Invalid format
     else { return undef }
-    
+
     $self->epoch(
-      Time::Local::timegm($second, $minute, $hour, $day, $month, $year));
+        Time::Local::timegm($second, $minute, $hour, $day, $month, $year));
     return $self;
 }
 
@@ -94,15 +94,17 @@ sub to_string {
 
     $epoch = time unless defined $epoch;
 
-    my ($second, $minute, $hour, $mday, $month, $year, $wday)
-      = gmtime $epoch;
+    my ($second, $minute, $hour, $mday, $month, $year, $wday) = gmtime $epoch;
 
     my $days   = [qw/Sun Mon Tue Wed Thu Fri Sat/];
     my $months = [qw/Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec/];
 
     # Format
-    return sprintf("%s, %02d %s %04d %02d:%02d:%02d GMT", $days->[$wday],
-      $mday, $months->[$month], $year+1900, $hour, $minute, $second);
+    return sprintf(
+        "%s, %02d %s %04d %02d:%02d:%02d GMT",
+        $days->[$wday], $mday, $months->[$month], $year + 1900,
+        $hour, $minute, $second
+    );
 }
 
 1;

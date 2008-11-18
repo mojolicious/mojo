@@ -16,22 +16,26 @@ use IO::Select;
 use IO::Socket;
 use POSIX 'WNOHANG';
 
-__PACKAGE__->attr('cleanup_interval', chained => 1, default => 15);
-__PACKAGE__->attr('idle_timeout', chained => 1, default => 30);
-__PACKAGE__->attr('max_clients', chained => 1, default => 1);
-__PACKAGE__->attr('max_servers', chained => 1, default => 100);
-__PACKAGE__->attr('max_spare_servers', chained => 1, default => 10);
-__PACKAGE__->attr([qw/min_spare_servers start_servers/],
-    chained => 1,
-    default => 5
+__PACKAGE__->attr(cleanup_interval  => (chained => 1, default => 15));
+__PACKAGE__->attr(idle_timeout      => (chained => 1, default => 30));
+__PACKAGE__->attr(max_clients       => (chained => 1, default => 1));
+__PACKAGE__->attr(max_servers       => (chained => 1, default => 100));
+__PACKAGE__->attr(max_spare_servers => (chained => 1, default => 10));
+__PACKAGE__->attr(
+    [qw/min_spare_servers start_servers/] => (
+        chained => 1,
+        default => 5
+    )
 );
-__PACKAGE__->attr('pid_file',
-    chained => 1,
-    default => sub {
-        return File::Spec->catfile(
-            File::Spec->splitdir(File::Spec->tmpdir), 'mojo_prefork.pid'
-        );
-    }
+__PACKAGE__->attr(
+    pid_file => (
+        chained => 1,
+        default => sub {
+            return File::Spec->catfile(
+                File::Spec->splitdir(File::Spec->tmpdir),
+                'mojo_prefork.pid');
+        }
+    )
 );
 
 # Marge? Since I'm not talking to Lisa,
@@ -53,7 +57,8 @@ sub accept_lock {
     $self->{_child_write}->syswrite("$$ idle\n") if $blocking;
 
     # Lock
-    my $lock = $blocking
+    my $lock =
+      $blocking
       ? flock($self->{_lock}, LOCK_EX)
       : flock($self->{_lock}, LOCK_EX | LOCK_NB);
     $self->{_child_write}->syswrite("$$ busy\n") if $lock;
@@ -76,12 +81,12 @@ sub daemonize {
     my $self = shift;
 
     # Fork and kill parent
-    croak "Can't fork: $!" unless defined (my $child = fork);
+    croak "Can't fork: $!" unless defined(my $child = fork);
     exit 0 if $child;
     setsid();
 
     # Close file handles
-    open STDIN, '</dev/null';
+    open STDIN,  '</dev/null';
     open STDOUT, '>/dev/null';
     open STDERR, '>&STDOUT';
 
@@ -110,8 +115,8 @@ sub run {
     $self->_create_pid_file;
 
     # Parent signals
-    my $done   = 0;
-    $SIG{INT}  = $SIG{TERM} = sub { $done++ };
+    my $done = 0;
+    $SIG{INT} = $SIG{TERM} = sub { $done++ };
     $SIG{CHLD} = sub { $self->_reap_child };
 
     # Preload application
@@ -123,7 +128,7 @@ sub run {
     $self->log('Parent started') if DEBUG;
 
     # Prefork
-    $self->_spawn_child for (1 ..  $self->start_servers);
+    $self->_spawn_child for (1 .. $self->start_servers);
 
     # We try to make spawning and killing as smooth as possible
     $self->{_cleanup} = time + $self->cleanup_interval;
@@ -165,7 +170,7 @@ sub _create_pid_file {
     }
 
     # Create new PID file
-    $fh = IO::File->new($file, O_WRONLY|O_CREAT|O_EXCL, 0644)
+    $fh = IO::File->new($file, O_WRONLY | O_CREAT | O_EXCL, 0644)
       or croak "Can't create PID file $file";
 
     # PID
@@ -200,8 +205,8 @@ sub _manage_children {
     my $self = shift;
 
     # Make sure we have enough idle processes
-    my @idle = sort {$a <=> $b}
-      grep {($self->{_children}->{$_}->{state} || '') eq 'idle'}
+    my @idle = sort { $a <=> $b }
+      grep { ($self->{_children}->{$_}->{state} || '') eq 'idle' }
       keys %{$self->{_children}};
 
     # Debug
@@ -216,7 +221,7 @@ sub _manage_children {
     if (@idle < $self->min_spare_servers) {
         for (1 .. $self->{_spawn}) {
             last if $self->max_servers <= keys %{$self->{_children}};
-            $self->_spawn_child ;
+            $self->_spawn_child;
         }
 
         # Spawn counter
@@ -268,7 +273,7 @@ sub _read_messages {
         # Parse
         my $message = substr $self->{_buffer}, 0, $pos + 1, '';
         next unless $message =~ /^(\d+)\ (\w+)\n$/;
-        my $pid = $1;
+        my $pid   = $1;
         my $state = $2;
 
         # Update status
@@ -276,7 +281,7 @@ sub _read_messages {
         else {
             $self->{_children}->{$pid} = {
                 state => $state,
-                time => time
+                time  => time
             };
         }
     }
@@ -294,7 +299,7 @@ sub _spawn_child {
     my $self = shift;
 
     # Fork
-    croak "Can't fork: $!" unless defined (my $child = fork);
+    croak "Can't fork: $!" unless defined(my $child = fork);
 
     # Parent takes care of child
     if ($child) {
@@ -303,7 +308,9 @@ sub _spawn_child {
     }
 
     # Child signal handlers
-    else { $SIG{HUP} = $SIG{INT} = $SIG{CHLD} = $SIG{TERM} = sub { exit 0 } }
+    else {
+        $SIG{HUP} = $SIG{INT} = $SIG{CHLD} = $SIG{TERM} = sub { exit 0 }
+    }
 
     # Do child stuff
     unless ($child) {

@@ -10,8 +10,8 @@ use base 'Mojo::Message';
 use Mojo::Cookie::Request;
 use Mojo::Parameters;
 
-__PACKAGE__->attr('method', chained => 1, default => 'GET');
-__PACKAGE__->attr('url', chained => 1, default => sub { Mojo::URL->new });
+__PACKAGE__->attr(method => (chained => 1, default => 'GET'));
+__PACKAGE__->attr(url => (chained => 1, default => sub { Mojo::URL->new }));
 
 sub cookies {
     my $self = shift;
@@ -67,7 +67,7 @@ sub param {
 }
 
 sub params {
-    my $self = shift;
+    my $self   = shift;
     my $params = Mojo::Parameters->new;
     $params->merge($self->body_params, $self->query_params);
     return $params;
@@ -112,7 +112,7 @@ sub query_params { return shift->url->query }
 sub _build_start_line {
     my $self = shift;
 
-    my $method = $self->method;
+    my $method  = $self->method;
     my $version = $self->version;
 
     # Request url
@@ -190,9 +190,9 @@ sub _parse_env {
         # Scheme/Version
         elsif ($name eq 'SERVER_PROTOCOL') {
             $value =~ /^([^\/]*)\/*(.*)$/;
-            $self->url->scheme($1) if $1;
+            $self->url->scheme($1)       if $1;
             $self->url->base->scheme($1) if $1;
-            $self->version($2) if $2;
+            $self->version($2)           if $2;
         }
     }
 
@@ -217,7 +217,9 @@ sub _parse_start_line {
             ([0-9a-zA-Z\$\-_\.\!\?\#\=\*\(\)\,\%\/\&]+)  # Path
             (?:\s+HTTP\/(\d+)\.(\d+))?                   # Version (optional)
             $                                            # End
-        /x) {
+        /x
+          )
+        {
             $self->method($1);
             $self->url->parse($2);
 

@@ -68,7 +68,8 @@ sub attr {
 
             # Check invocant
             $code .= "${ws}Carp::confess(q[";
-            $code .= qq/Attribute "$attr" has to be called on an object, not a class/;
+            $code
+              .= qq/Attribute "$attr" has to be called on an object, not a class/;
             $code .= "])\n  ${ws}unless ref \$_[0];\n";
         }
 
@@ -87,7 +88,8 @@ sub attr {
 
             # Return default value
             $code .= "$ws${ws}return \$_[0]->{'$attr'} = ";
-            $code .= ref $default eq 'CODE'
+            $code .=
+              ref $default eq 'CODE'
               ? '$default->($_[0])'
               : '$default';
             $code .= ";\n";

@@ -9,33 +9,39 @@ use base 'Mojo::Base';
 
 use IO::File;
 
-__PACKAGE__->attr('handle', chained => 1, default => sub {
-    my $self = shift;
+__PACKAGE__->attr(
+    handle => (
+        chained => 1,
+        default => sub {
+            my $self = shift;
 
-    # Need a log file
-    return \*STDERR unless $self->path;
+            # Need a log file
+            return \*STDERR unless $self->path;
 
-    # Open
-    my $file = IO::File->new;
-    my $path = $self->path;
-    $file->open(">> $path") || die qq/Couldn't open log file "$path": $!/;
-    return $file;
-});
-__PACKAGE__->attr('level', chained => 1, default => 'debug');
-__PACKAGE__->attr('path', chained => 1);
+            # Open
+            my $file = IO::File->new;
+            my $path = $self->path;
+            $file->open(">> $path")
+              || die qq/Couldn't open log file "$path": $!/;
+            return $file;
+        }
+    )
+);
+__PACKAGE__->attr(level => (chained => 1, default => 'debug'));
+__PACKAGE__->attr(path => (chained => 1));
 
-my $LEVEL = { debug => 1, info  => 2, warn  => 3, error => 4, fatal => 5 };
+my $LEVEL = {debug => 1, info => 2, warn => 3, error => 4, fatal => 5};
 
 # Yes, I got the most! I win X-Mas!
 sub debug { shift->log('debug', @_) }
 sub error { shift->log('error', @_) }
 sub fatal { shift->log('fatal', @_) }
-sub info { shift->log('info', @_) }
+sub info  { shift->log('info',  @_) }
 
 sub is_debug { shift->is_level('debug') }
 sub is_error { shift->is_level('error') }
 sub is_fatal { shift->is_level('fatal') }
-sub is_info { shift->is_level('info') }
+sub is_info  { shift->is_level('info') }
 
 sub is_level {
     my ($self, $level) = @_;
@@ -61,8 +67,8 @@ sub log {
     # Write
     my $time = localtime(time);
     my $msgs = join "\n", @msgs;
-    my ($pkg, $line) = (caller())[0,2];
-    ($pkg, $line)    = (caller(1))[0,2] if $pkg eq ref $self;
+    my ($pkg, $line) = (caller())[0, 2];
+    ($pkg, $line) = (caller(1))[0, 2] if $pkg eq ref $self;
     $self->handle->syswrite("[$time][$level][$pkg:$line] $msgs\n");
 
     return $self;

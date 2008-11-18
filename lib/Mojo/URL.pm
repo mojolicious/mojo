@@ -12,14 +12,15 @@ use Mojo::ByteStream;
 use Mojo::Parameters;
 use Mojo::Path;
 
-__PACKAGE__->attr([qw/fragment host password port scheme user/],
-    chained => 1
-);
-__PACKAGE__->attr('base', chained => 1, default => sub { Mojo::URL->new });
-__PACKAGE__->attr('path', chained => 1, default => sub { Mojo::Path->new });
-__PACKAGE__->attr('query',
-    chained => 1,
-    default => sub { Mojo::Parameters->new }
+__PACKAGE__->attr(
+    [qw/fragment host password port scheme user/] => (chained => 1));
+__PACKAGE__->attr(base => (chained => 1, default => sub { Mojo::URL->new }));
+__PACKAGE__->attr(path => (chained => 1, default => sub { Mojo::Path->new }));
+__PACKAGE__->attr(
+    query => (
+        chained => 1,
+        default => sub { Mojo::Parameters->new }
+    )
 );
 
 # RFC 3986
@@ -65,8 +66,8 @@ sub authority {
     }
 
     # *( unreserved / pct-encoded / sub-delims )
-    my $host = Mojo::ByteStream->new($self->host)
-      ->url_escape("$UNRESERVED$SUBDELIM");
+    my $host =
+      Mojo::ByteStream->new($self->host)->url_escape("$UNRESERVED$SUBDELIM");
     my $port     = $self->port;
     my $userinfo = $self->userinfo;
 
@@ -104,8 +105,7 @@ sub parse {
     return $self unless $url;
 
     # Official regex
-    my ($scheme, $authority, $path, $query, $fragment)
-      = $url
+    my ($scheme, $authority, $path, $query, $fragment) = $url
       =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
 
     $self->scheme($scheme);
@@ -137,7 +137,7 @@ sub to_abs {
     $path->leading_slash(1);
     $path->trailing_slash($abs->path->trailing_slash);
     $abs->path($path);
-    
+
     return $abs;
 }
 
@@ -150,7 +150,7 @@ sub to_rel {
     # Different locations
     return $rel
       unless lc $base->scheme eq lc $rel->scheme
-      && $base->authority eq $rel->authority;
+          && $base->authority eq $rel->authority;
 
     # Remove scheme and authority
     $rel->scheme('');
@@ -159,7 +159,7 @@ sub to_rel {
     $rel->base($base->clone);
     my $splice = @{$base->path->parts};
 
-   # Characters after the right-most '/' need to go
+    # Characters after the right-most '/' need to go
     $splice -= 1 unless $base->path->trailing_slash;
 
     my $path = $rel->path->clone;
@@ -167,7 +167,7 @@ sub to_rel {
 
     $rel->path($path);
     $rel->path->leading_slash(0) if $splice;
-    
+
     return $rel;
 }
 
@@ -183,8 +183,8 @@ sub to_string {
     my $query     = $self->query;
 
     # *( pchar / "/" / "?" )
-    my $fragment  = Mojo::ByteStream->new($self->fragment)
-      ->url_escape("$PCHAR\/\?");
+    my $fragment =
+      Mojo::ByteStream->new($self->fragment)->url_escape("$PCHAR\/\?");
 
     # Format
     my $url = '';
@@ -212,16 +212,17 @@ sub userinfo {
 
         $self->user(Mojo::ByteStream->new($user)->url_unescape->to_string);
         $self->password(
-            Mojo::ByteStream->new($password)->url_unescape->to_string
-        );
+            Mojo::ByteStream->new($password)->url_unescape->to_string);
 
         return $self;
     }
 
     # *( unreserved / pct-encoded / sub-delims / ":" )
-    my $user = Mojo::ByteStream->new($self->user)
+    my $user =
+      Mojo::ByteStream->new($self->user)
       ->url_escape("$UNRESERVED$SUBDELIM\:");
-    my $password = Mojo::ByteStream->new($self->password)
+    my $password =
+      Mojo::ByteStream->new($self->password)
       ->url_escape("$UNRESERVED$SUBDELIM\:");
 
     # Format

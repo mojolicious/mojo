@@ -10,7 +10,7 @@ use base 'MojoX::Dispatcher::Routes::Context';
 # Space: It seems to go on and on forever...
 # but then you get to the end and a gorilla starts throwing barrels at you.
 sub render {
-    my $self    = shift;
+    my $self = shift;
 
     my $args = ref $_[0] ? $_[0] : {@_};
 
@@ -25,7 +25,7 @@ sub render {
 
 sub url_for {
     my $self = shift;
-    my $url = $self->match->url_for(@_);
+    my $url  = $self->match->url_for(@_);
     $url->base($self->tx->req->url->base->clone);
     return $url;
 }

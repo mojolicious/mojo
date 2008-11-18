@@ -26,10 +26,9 @@ $headers->expect('continue-100');
 $headers->connection('close');
 is($headers->content_type, 'text/html');
 is("$headers",
-  "Connection: close\x0d\x0a"
-  . "Expect: continue-100\x0d\x0a"
-  . "Content-Type: text/html"
-);
+        "Connection: close\x0d\x0a"
+      . "Expect: continue-100\x0d\x0a"
+      . "Content-Type: text/html");
 is_deeply([$headers->names], [qw/Connection Expect Content-Type/]);
 
 # Parse headers
@@ -39,6 +38,6 @@ Content-Type: text/plain
 Expect: 100-continue
 
 EOF
-is($headers->state, 'done');
+is($headers->state,        'done');
 is($headers->content_type, 'text/plain');
-is($headers->expect, '100-continue');
+is($headers->expect,       '100-continue');

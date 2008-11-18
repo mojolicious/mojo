@@ -9,7 +9,7 @@ use base 'Mojo::Base';
 use overload '""' => sub { shift->to_string }, fallback => 1;
 use bytes;
 
-__PACKAGE__->attr('raw_length', chained => 1, default => 0);
+__PACKAGE__->attr(raw_length => (chained => 1, default => 0));
 
 sub new {
     my $self = shift->SUPER::new();
@@ -26,7 +26,7 @@ sub add_chunk {
 }
 
 sub empty {
-    my $self = shift;
+    my $self   = shift;
     my $buffer = $self->{buffer};
     $self->{buffer} = '';
     return $buffer;

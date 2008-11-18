@@ -18,16 +18,12 @@ use IO::File;
 # Ow. OW. Oh, they're defending themselves somehow.
 use_ok('Mojo::Loader');
 
-my $loader = Mojo::Loader->new;
+my $loader  = Mojo::Loader->new;
 my $modules = $loader->search('LoaderTest')->modules;
 my @modules = sort @$modules;
 
 # Search
-is_deeply(\@modules, [qw/
-    LoaderTest::A
-    LoaderTest::B
-    LoaderTest::C
-/]);
+is_deeply(\@modules, [qw/LoaderTest::A LoaderTest::B LoaderTest::C/]);
 
 # Load
 $loader->load;
@@ -52,7 +48,7 @@ is(ref $instance, 'LoaderTest::B');
 
 # Reload
 my $file = IO::File->new;
-my $dir = File::Temp::tempdir();
+my $dir  = File::Temp::tempdir();
 my $path = File::Spec->catfile($dir, 'MojoTestReloader.pm');
 $file->open("> $path");
 $file->syswrite("package MojoTestReloader;\nsub test { 23 }\n1;");

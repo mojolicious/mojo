@@ -7,9 +7,11 @@ use warnings;
 
 use base 'Mojo::Script::Generate';
 
-__PACKAGE__->attr('namespace',
-    chained => 1,
-    default => 'Mojolicious::Script::Generate'
+__PACKAGE__->attr(
+    namespace => (
+        chained => 1,
+        default => 'Mojolicious::Script::Generate'
+    )
 );
 
 # Ah, nothing like a warm fire and a SuperSoaker of fine cognac.

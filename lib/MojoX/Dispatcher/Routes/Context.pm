@@ -7,7 +7,7 @@ use warnings;
 
 use base 'MojoX::Context';
 
-__PACKAGE__->attr('match', chained => 1);
+__PACKAGE__->attr(match => (chained => 1));
 
 # Just make a simple cake. And this time, if someone's going to jump out of
 # it make sure to put them in *after* you cook it.

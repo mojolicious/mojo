@@ -12,15 +12,15 @@ use constant DEBUG => $ENV{MOJO_TEMPLATE_DEBUG} || 0;
 use Carp 'croak';
 use IO::File;
 
-__PACKAGE__->attr('code'           , chained => 1, default => '');
-__PACKAGE__->attr('comment_mark'   , chained => 1, default => '#');
-__PACKAGE__->attr('compiled'       , chained => 1);
-__PACKAGE__->attr('expression_mark', chained => 1, default => '=');
-__PACKAGE__->attr('line_start'     , chained => 1, default => '%');
-__PACKAGE__->attr('template'       , chained => 1, default => '');
-__PACKAGE__->attr('tree'           , chained => 1, default => sub { [] });
-__PACKAGE__->attr('tag_start'      , chained => 1, default => '<%');
-__PACKAGE__->attr('tag_end'        , chained => 1, default => '%>');
+__PACKAGE__->attr(code            => (chained => 1, default => ''));
+__PACKAGE__->attr(comment_mark    => (chained => 1, default => '#'));
+__PACKAGE__->attr(compiled        => (chained => 1));
+__PACKAGE__->attr(expression_mark => (chained => 1, default => '='));
+__PACKAGE__->attr(line_start      => (chained => 1, default => '%'));
+__PACKAGE__->attr(template        => (chained => 1, default => ''));
+__PACKAGE__->attr(tree => (chained => 1, default => sub { [] }));
+__PACKAGE__->attr(tag_start => (chained => 1, default => '<%'));
+__PACKAGE__->attr(tag_end   => (chained => 1, default => '%>'));
 
 sub build {
     my $self = shift;
@@ -62,7 +62,7 @@ sub build {
 
     # Wrap
     $lines[0] ||= '';
-    $lines[0]   = q/sub { my $_MOJO = '';/ . $lines[0];
+    $lines[0] = q/sub { my $_MOJO = '';/ . $lines[0];
     $lines[-1] .= q/return $_MOJO; };/;
 
     $self->code(join "\n", @lines);
@@ -130,7 +130,7 @@ sub parse {
     my $expr_mark  = quotemeta $self->expression_mark;
 
     # Tokenize
-    my $state = 'text';
+    my $state                = 'text';
     my $multiline_expression = 0;
     for my $line (split /\n/, $tmpl) {
 
@@ -176,7 +176,8 @@ sub parse {
 
         # Mixed line
         my @token;
-        for my $token (split /
+        for my $token (
+            split /
             (
                 $tag_start$expr_mark   # Expression
             |
@@ -186,14 +187,16 @@ sub parse {
             |
                 $tag_end               # End
             )
-        /x, $line) {
+        /x, $line
+          )
+        {
 
             # Garbage
             next unless $token;
 
             # End
             if ($token =~ /^$tag_end$/) {
-                $state = 'text';
+                $state                = 'text';
                 $multiline_expression = 0;
             }
 
@@ -231,7 +234,7 @@ sub parse {
 
 sub render {
     my $self = shift;
-    my $tmpl  = shift;
+    my $tmpl = shift;
 
     # Parse
     $self->parse($tmpl);
@@ -265,7 +268,7 @@ sub render_file {
 }
 
 sub render_file_to_file {
-    my $self = shift;
+    my $self  = shift;
     my $spath = shift;
     my $tpath = shift;
 
@@ -293,7 +296,7 @@ sub render_to_file {
 sub _context {
     my ($self, $text, $line) = @_;
 
-    $line     -= 1;
+    $line -= 1;
     my $nline  = $line + 1;
     my $pline  = $line - 1;
     my $nnline = $line + 2;
@@ -357,7 +360,7 @@ sub _write_file {
 
     # Write to file
     my $file = IO::File->new;
-    $file->open("> $path") or croak "Can't open file '$path': $!";
+    $file->open("> $path")   or croak "Can't open file '$path': $!";
     $file->syswrite($output) or croak "Can't write to file '$path': $!";
     return 1;
 }

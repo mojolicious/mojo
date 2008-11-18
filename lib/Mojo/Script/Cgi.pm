@@ -9,7 +9,7 @@ use base 'Mojo::Script';
 
 use Mojo::Server::CGI;
 
-__PACKAGE__->attr('description', chained => 1, default => <<'EOF');
+__PACKAGE__->attr(description => (chained => 1, default => <<'EOF'));
 * Start the cgi script. *
 Takes no options.
     cgi

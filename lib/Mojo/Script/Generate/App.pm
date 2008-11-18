@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojo::Script';
 
-__PACKAGE__->attr('description', chained => 1, default => <<'EOF');
+__PACKAGE__->attr(description => (chained => 1, default => <<'EOF'));
 * Generate application directory structure. *
 Takes a name as option, by default MyMojoApp will be used.
     generate app TestApp

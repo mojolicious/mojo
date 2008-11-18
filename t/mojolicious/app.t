@@ -22,21 +22,21 @@ my $client = Mojo::Client->new;
 # Foo::test()
 my $tx = Mojo::Transaction->new_get('/foo/test', 'X-Test' => 'Hi there!');
 $client->process_local('MojoliciousTest', $tx);
-is($tx->res->code, 200);
+is($tx->res->code,                        200);
 is($tx->res->headers->header('X-Bender'), 'Kiss my shiny metal ass!');
 like($tx->res->body, qr/\/bar\/test/);
 
 # Foo::index()
 $tx = Mojo::Transaction->new_get('/foo', 'X-Test' => 'Hi there!');
 $client->process_local('MojoliciousTest', $tx);
-is($tx->res->code, 200);
+is($tx->res->code,                  200);
 is($tx->res->headers->content_type, 'text/html');
 like($tx->res->body, qr/Hello Mojo from the template \/foo!/);
 
 # Foo::Bar::index()
 $tx = Mojo::Transaction->new_get('/foo-bar', 'X-Test' => 'Hi there!');
 $client->process_local('MojoliciousTest', $tx);
-is($tx->res->code, 200);
+is($tx->res->code,                  200);
 is($tx->res->headers->content_type, 'text/html');
 like($tx->res->body, qr/Hello Mojo from the other template \/foo-bar!/);
 
@@ -45,7 +45,7 @@ my $backup = $ENV{MOJO_MODE} || '';
 $ENV{MOJO_MODE} = 'production';
 $tx = Mojo::Transaction->new_get('/hello.txt');
 $client->process_local('MojoliciousTest', $tx);
-is($tx->res->code, 200);
+is($tx->res->code,                  200);
 is($tx->res->headers->content_type, 'text/plain');
 like($tx->res->content->file->slurp, qr/Hello Mojo from a static file!/);
 $ENV{MOJO_MODE} = $backup;
@@ -55,8 +55,8 @@ $backup = $ENV{MOJO_MODE} || '';
 $ENV{MOJO_MODE} = 'development';
 $tx = Mojo::Transaction->new_get('/hello.txt');
 $client->process_local('MojoliciousTest', $tx);
-is($tx->res->code, 200);
+is($tx->res->code,                  200);
 is($tx->res->headers->content_type, 'text/plain');
 like($tx->res->content->file->slurp,
-  qr/Hello Mojo from a development static file!/);
+    qr/Hello Mojo from a development static file!/);
 $ENV{MOJO_MODE} = $backup;

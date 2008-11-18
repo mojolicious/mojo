@@ -18,21 +18,25 @@ use Mojo::Parameters;
 use Mojo::Upload;
 use Mojo::URL;
 
-__PACKAGE__->attr('buffer',
-    chained => 1,
-    default => sub { Mojo::Buffer->new }
+__PACKAGE__->attr(
+    buffer => (
+        chained => 1,
+        default => sub { Mojo::Buffer->new }
+    )
 );
-__PACKAGE__->attr([qw/
-    build_start_line_cb
-    parser_progress_cb
-/], chained => 1);
-__PACKAGE__->attr('content',
-    chained => 1,
-    default => sub { Mojo::Content->new }
+__PACKAGE__->attr(
+    [qw/build_start_line_cb parser_progress_cb/] => (chained => 1));
+__PACKAGE__->attr(
+    content => (
+        chained => 1,
+        default => sub { Mojo::Content->new }
+    )
 );
-__PACKAGE__->attr([qw/major_version minor_version/],
-    chained => 1,
-    default => 1
+__PACKAGE__->attr(
+    [qw/major_version minor_version/] => (
+        chained => 1,
+        default => 1
+    )
 );
 
 # I'll keep it short and sweet. Family. Religion. Friendship.
@@ -68,8 +72,9 @@ sub body_params {
 
     # "x-application-urlencoded" and "application/x-www-form-urlencoded"
     my $content_type = $self->headers->content_type || '';
-    if ($content_type 
-      =~ /(?:x-application|application\/x-www-form)-urlencoded/i) {
+    if ($content_type
+        =~ /(?:x-application|application\/x-www-form)-urlencoded/i)
+    {
 
         # Parse
         my $raw = $self->content->file->slurp;
@@ -97,7 +102,7 @@ sub body_params {
 }
 
 sub build {
-    my $self = shift;
+    my $self    = shift;
     my $message = '';
 
     # Start line
@@ -138,7 +143,7 @@ sub build_start_line {
     my $self = shift;
 
     my $startline = '';
-    my $offset = 0;
+    my $offset    = 0;
     while (1) {
         my $chunk = $self->get_start_line_chunk($offset);
 

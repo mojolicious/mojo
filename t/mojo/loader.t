@@ -24,9 +24,9 @@ my @modules = sort @$modules;
 
 # Search
 is_deeply(\@modules, [qw/
-  LoaderTest::A
-  LoaderTest::B
-  LoaderTest::C
+    LoaderTest::A
+    LoaderTest::B
+    LoaderTest::C
 /]);
 
 # Load

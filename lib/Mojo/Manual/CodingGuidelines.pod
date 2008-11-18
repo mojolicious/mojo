@@ -65,6 +65,9 @@ Comments should be funny if possible.
 
 No names outside of the CREDITS section of Mojo.pm.
 
+Code should run through C<perltidy> with the included .perltidyrc before
+being checked-in.
+
 No Elitism.
 
 Peace!

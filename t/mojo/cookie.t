@@ -68,14 +68,16 @@ $cookie->expires(1218092879);
 $cookie->secure(1);
 $cookie->comment('lalalala');
 $cookie->version(1);
-is("$cookie", 'foo=ba r; Version=1; Domain=kraih.com; Path=/test;'
-  . ' Max-Age=1218092879; Expires=Thu, 07 Aug 2008 07:07:59 GMT;'
-  . ' Secure=1; Comment=lalalala');
+is("$cookie",
+    'foo=ba r; Version=1; Domain=kraih.com; Path=/test;'
+  . ' Max-Age=1218092879; expires=Thu, 07 Aug 2008 07:07:59 GMT;'
+  . ' Secure=1; Comment=lalalala'
+);
 
 # Parse response cookie
 $cookies = Mojo::Cookie::Response->parse(
-  'foo=ba r; Version=1; Domain=kraih.com; Path=/test; Max-Age=1218092879;'
-  . ' Expires=Thu, 07 Aug 2008 07:07:59 GMT; Secure=1; Comment=lalalala'
+    'foo=ba r; Version=1; Domain=kraih.com; Path=/test; Max-Age=1218092879;'
+  . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; Secure=1; Comment=lalalala'
 );
 is($cookies->[0]->name, 'foo');
 is($cookies->[0]->value, 'ba r');
@@ -87,7 +89,7 @@ is($cookies->[0]->secure, '1');
 is($cookies->[0]->comment, 'lalalala');
 is($cookies->[0]->version, '1');
 
-# Cookie with Max-Age=0 and Expires=0
+# Cookie with Max-Age 0 and expires 0
 $cookie = Mojo::Cookie::Response->new;
 $cookie->name('foo');
 $cookie->value('bar');
@@ -95,14 +97,15 @@ $cookie->path('/');
 $cookie->max_age(0);
 $cookie->expires(0);
 $cookie->version(1);
-is("$cookie", 'foo=bar; Version=1; Path=/; Max-Age=0;'
-    .' Expires=Thu, 01 Jan 1970 00:00:00 GMT');
+is("$cookie",
+    'foo=bar; Version=1; Path=/; Max-Age=0;'
+  . ' expires=Thu, 01 Jan 1970 00:00:00 GMT'
+);
 
-
-# Parse response cookie with Max-Age=0 and Expires=0
+# Parse response cookie with Max-Age 0 and expires 0
 $cookies = Mojo::Cookie::Response->parse(
-  'foo=bar; Version=1; Domain=kraih.com; Path=/; Max-Age=0;'
-  . ' Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure=1; Comment=lalalala'
+    'foo=bar; Version=1; Domain=kraih.com; Path=/; Max-Age=0;'
+  . ' expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure=1; Comment=lalalala'
 );
 is($cookies->[0]->name, 'foo');
 is($cookies->[0]->value, 'bar');

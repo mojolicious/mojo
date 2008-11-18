@@ -31,7 +31,7 @@ application.
 
 =over 4
 
-Keep it simple, no magic unless absolutely neccessary.
+Keep it simple, no magic unless absolutely necessary.
 
 Code should be written with a Perl6 port in mind.
 
@@ -46,7 +46,7 @@ release.
 
 Deprecating a feature should be avoided at all costs.
 
-Only add prereqs if absolutely neccessary.
+Only add prereqs if absolutely necessary.
 
 Domain specific languages should be avoided in favor of Perl'ish solutions.
 
@@ -57,7 +57,7 @@ Documentation belongs to the manual, module POD is just a api reference.
 Lines should not be longer than 78 characters and we indent with 4
 whitespaces.
 
-No spaghettie code.
+No spaghetti code.
 
 Code should be organized in blocks and those blocks should be commented.
 

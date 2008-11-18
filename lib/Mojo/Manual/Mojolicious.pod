@@ -84,7 +84,7 @@ pattern. This can be used to factor out repetitive code.
 
 =head2 Bridges
 
-Sometimes it is neccessary to call multiple method after another (e.g.
+Sometimes it is necessary to call multiple method after another (e.g.
 authorization, data processing). That's what C<bridge> is for.
 
     # /blog

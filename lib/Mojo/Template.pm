@@ -427,7 +427,7 @@ That means you can access arguments simply via C<@_>.
     test 123 <%= $foo %>
 
 Note that you can't escape L<Mojo::Template> tags, instead we just replace
-them if neccessary.
+them if necessary.
 
     my $mt = Mojo::Template->new;
     $mt->line_start('@@');

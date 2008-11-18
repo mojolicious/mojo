@@ -6,7 +6,7 @@ Mojo::Manual::GettingStarted - Getting Started
 
 =head1 FIRST STEPS
 
-Use the application generator to create all neccessary files.
+Use the application generator to create all necessary files.
 
     mojo generate app MyFirstApp
 

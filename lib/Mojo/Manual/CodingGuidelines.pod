@@ -52,7 +52,7 @@ Domain specific languages should be avoided in favor of Perl'ish solutions.
 
 No inline POD.
 
-Documentation belongs to the manual, module POD is just a api reference.
+Documentation belongs to the manual, module POD is just an API reference.
 
 Lines should not be longer than 78 characters and we indent with 4
 whitespaces.

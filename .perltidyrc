@@ -23,6 +23,7 @@
 --maximum-consecutive-blank-lines=2     # default is 1
 --nohanging-side-comments               # troublesome for commented out code
 --freeze-newlines                       # don't mess with attributes
+--notrim-qw                             # don't touch multiline qw
 
 -isbc   # block comments may only be indented if they have some space characters before the #
 -ci=2   # Continuation indent is 2 cols

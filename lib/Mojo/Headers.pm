@@ -106,7 +106,7 @@ sub build {
 
     # Prepare headers
     my @headers;
-    for my $name ($self->names) {
+    for my $name (@{$self->names}) {
         for my $value ($self->header($name)) {
             $value = '' unless defined $value;
             push @headers, "$name: $value";
@@ -192,7 +192,7 @@ sub names {
         push @headers, $NORMALCASE_HEADERS{$name} || $name;
     }
 
-    return @headers;
+    return \@headers;
 }
 
 sub parse {
@@ -386,7 +386,7 @@ the following new ones.
 
 =head2 C<names>
 
-    my @names = $headers->names;
+    my $names = $headers->names;
 
 =head2 C<parse>
 

@@ -29,7 +29,7 @@ is("$headers",
         "Connection: close\x0d\x0a"
       . "Expect: continue-100\x0d\x0a"
       . "Content-Type: text/html");
-is_deeply([$headers->names], [qw/Connection Expect Content-Type/]);
+is_deeply($headers->names, [qw/Connection Expect Content-Type/]);
 
 # Parse headers
 $headers = Mojo::Headers->new;

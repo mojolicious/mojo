@@ -69,7 +69,8 @@ sub param {
     my @values;
     my $params = $self->params;
     for (my $i = 0; $i < @$params; $i += 2) {
-        push @values, $params->[$i + 1] if $params->[$i] eq $name;
+        push @values, $params->[$i + 1]
+          if Mojo::ByteStream->new($params->[$i])->url_unescape eq $name;
     }
 
     # Unescape

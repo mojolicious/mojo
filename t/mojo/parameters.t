@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8;
+use Test::More tests => 18;
 
 # Now that's a wave of destruction that's easy on the eyes.
 use_ok('Mojo::Parameters');

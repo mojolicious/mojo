@@ -145,9 +145,15 @@ sub remove {
 
     # Remove
     my $params = $self->params;
-    for (my $i = 0; $i < @$params; $i += 2) {
-        splice @$params, $i, 2 if $params->[$i] eq $name;
+    for (my $i = 0; $i < @$params;) {
+        if ($params->[$i] eq $name) {
+            splice @$params, $i, 2;
+        }
+        else {
+            $i += 2;
+        }
     }
+    $self->params($params);
 
     return $self;
 }

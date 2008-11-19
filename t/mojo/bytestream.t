@@ -95,7 +95,7 @@ is($stream->md5_sum, 'ab07acbb1e496801937adfa772424bf7');
 $stream = Mojo::ByteStream->new('foo bar baz');
 is($stream->length, 11);
 
-# '0'
+# "0"
 $stream = Mojo::ByteStream->new('0');
-is($stream->length, 1);
+is($stream->length,    1);
 is($stream->to_string, '0');

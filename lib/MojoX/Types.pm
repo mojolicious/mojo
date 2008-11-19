@@ -11,7 +11,8 @@ __PACKAGE__->attr(
     types => (
         chained => 1,
         default => sub {
-            {   css   => 'text/css',
+            return {
+                css   => 'text/css',
                 ico   => 'image/x-icon',
                 gif   => 'image/gif',
                 html  => 'text/html',

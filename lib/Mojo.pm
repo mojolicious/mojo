@@ -82,7 +82,7 @@ L<Mojo> implements the following attributes.
 =head2 C<log>
 
     my $log = $mojo->log;
-    $mojo   = $mojo->home(Mojo::Log->new);
+    $mojo   = $mojo->log(Mojo::Log->new);
 
 =head1 METHODS
 

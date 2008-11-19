@@ -55,6 +55,7 @@ sub append {
 sub clone {
     my $self  = shift;
     my $clone = Mojo::Parameters->new;
+    $clone->pair_separator($self->pair_separator);
     $clone->params([@{$self->params}]);
     return $clone;
 }
@@ -109,6 +110,9 @@ sub parse {
 
     # Shortcut
     return $self unless defined $_[0];
+
+    # Clear
+    $self->params([]);
 
     # Detect query string without key/value pairs
     if ($_[0] !~ /\=/) {

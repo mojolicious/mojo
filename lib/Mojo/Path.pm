@@ -27,7 +27,17 @@ sub new {
 
 sub append {
     my $self = shift;
-    push @{$self->parts}, @_;
+
+    for (@_) {
+        my $value = "$_";
+
+        # *( pchar / "/" / "?" )
+        $value =
+          Mojo::ByteStream->new($value)->url_escape($Mojo::URL::PCHAR)
+          ->to_string;
+
+        push @{$self->parts}, $value;
+    }
     return $self;
 }
 

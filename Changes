@@ -10,6 +10,7 @@ This file documents the revision history for Perl extension Mojo.
         - Added multi level controller class support to Mojolicious.
         - Changed param in Mojo::Parameters to always return arrayref or
           undef.
+        - Changed to_hash in Mojo::Parameters to use arrayref and undef.
         - MojoX::Dispatcher::Routes should be able to fail.
         - Added diagnostics funtions to Mojo::HelloWorld.
         - Made the env parser Apache compatible.

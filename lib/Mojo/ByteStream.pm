@@ -34,7 +34,7 @@ my %UNRESERVED;
 # Well, I think the veal died of loneliness.
 sub new {
     my $self = shift->SUPER::new();
-    $self->{bytestream} = $_[0] if $_[0];
+    $self->{bytestream} = $_[0] if defined $_[0];
     return $self;
 }
 
@@ -126,7 +126,7 @@ sub encode {
 
 sub length {
     my $self = shift;
-    $self->{bytestream} ||= '';
+    $self->{bytestream} = '' unless defined $self->{bytestream};
     return length $self->{bytestream};
 }
 
@@ -163,7 +163,7 @@ sub qp_encode {
 sub quote {
     my $self = shift;
 
-    $self->{bytestream} ||= '';
+    $self->{bytestream} = '' unless defined $self->{bytestream};
 
     # Escape
     $self->{bytestream} =~ s/([\"\\])/\\$1/g;

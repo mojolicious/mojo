@@ -8,7 +8,7 @@ use warnings;
 # Homer, we're going to ask you a few simple yes or no questions.
 # Do you understand?
 # Yes. *lie dectector blows up*
-use Test::More tests => 20;
+use Test::More tests => 22;
 
 # Lisa, if the Bible has taught us nothing else, and it hasn't,
 # it's that girls should stick to girls sports,
@@ -94,3 +94,8 @@ is($stream->md5_sum, 'ab07acbb1e496801937adfa772424bf7');
 # length
 $stream = Mojo::ByteStream->new('foo bar baz');
 is($stream->length, 11);
+
+# '0'
+$stream = Mojo::ByteStream->new('0');
+is($stream->length, 1);
+is($stream->to_string, '0');

@@ -23,7 +23,7 @@ sub new {
     my $self = shift->SUPER::new();
 
     # Hash/Array
-    if ($_[1]) { $self->append(@_) }
+    if (defined $_[1]) { $self->append(@_) }
 
     # String
     else { $self->parse(@_) }
@@ -177,14 +177,13 @@ sub to_hash {
         $value =~ s/\+/\ /g if $value;
 
         # Array
-        if (exists $params{$name}) {
-            $params{$name} = [$params{$name}]
-              unless ref $params{$name} eq 'ARRAY';
+        if (defined $value) {
+            $params{$name} ||= [];
             push @{$params{$name}}, $value;
         }
 
-        # String
-        else { $params{$name} = $value }
+        # Undef
+        else { $params{$name} = undef }
     }
 
     return \%params;
@@ -200,8 +199,8 @@ sub to_string {
     # Format
     my @params;
     for (my $i = 0; $i < @$params; $i += 2) {
-        my $name = $params->[$i];
-        my $value = $params->[$i + 1] || undef;
+        my $name  = $params->[$i];
+        my $value = $params->[$i + 1];
 
         # We replace whitespace with "+"
         $name =~ s/\ /\+/g;

@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 18;
+use Test::More tests => 22;
 
 # Now that's a wave of destruction that's easy on the eyes.
 use_ok('Mojo::Parameters');
@@ -49,9 +49,17 @@ $params->remove('e');
 is($params->to_string, 'q=1;w=2;t=7');
 
 # Hash
-is_deeply($params->to_hash, {q => 1, w => 2, t => 7});
+is_deeply($params->to_hash, {q => [1], w => [2], t => [7]});
 
 # Append
 $params->append('a', 4, 'a', 5, 'b', 6, 'b', 7);
 is_deeply($params->to_hash,
-    {a => [4, 5], b => [6, 7], q => 1, w => 2, t => 7});
+    {a => [4, 5], b => [6, 7], q => [1], w => [2], t => [7]});
+
+# 0 value
+$params = Mojo::Parameters->new(foo => 0);
+is_deeply($params->param('foo'), [0]);
+is($params->to_string, 'foo=0');
+$params = Mojo::Parameters->new($params->to_string);
+is_deeply($params->param('foo'), [0]);
+is($params->to_string, 'foo=0');

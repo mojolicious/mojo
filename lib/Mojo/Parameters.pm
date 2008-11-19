@@ -101,7 +101,7 @@ sub param {
         $values[$i] =~ s/\+/\ /g if $values[$i];
     }
 
-    return defined $values[1] ? \@values : $values[0];
+    return @values ? \@values : undef;
 }
 
 sub parse {

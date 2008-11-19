@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 215;
+use Test::More tests => 216;
 
 use Mojo::Filter::Chunked;
 use Mojo::Headers;
@@ -124,13 +124,14 @@ is($req->body_params,           'foo=bar&+tset=23+&foo=bar');
 is_deeply($req->body_params->to_hash->{foo}, [qw/bar bar/]);
 is($req->body_params->to_hash->{' tset'}, '23 ');
 is_deeply($req->params->to_hash->{foo}, [qw/bar bar 13/]);
-is_deeply($req->param('foo'), [qw/bar bar 13/]);
-is($req->param(' tset'), '23 ');
+is_deeply($req->param('foo'),           [qw/bar bar 13/]);
+is_deeply($req->param(' tset'),         ['23 ']);
 $req->param('set', 'single');
-is($req->param('set'), 'single', 'setting single param works');
+is_deeply($req->param('set'), ['single'], 'setting single param works');
 $req->param('multi', 1, 2, 3);
 is_deeply($req->param('multi'), [qw/1 2 3/],
     'setting multiple value param works');
+is($req->param('test23'), undef);
 
 # Parse HTTP 1.1 chunked request with trailing headers
 $req = Mojo::Message::Request->new;
@@ -556,7 +557,7 @@ is($req->url->query,      'lalala=23&bar=baz');
 is($req->minor_version,   '0');
 is($req->major_version,   '1');
 is($req->body,            'hello=world');
-is($req->param('hello'),  'world');
+is_deeply($req->param('hello'), ['world']);
 
 # Parse response with cookie
 $res = Mojo::Message::Response->new;
@@ -721,5 +722,5 @@ $req->parse("POST /example/testform_handler HTTP/1.1\x0d\x0a"
       . "\x0aContent-Disposition: form-data; name=\"Text\"\x0d\x0a"
       . "\x0d\x0a\x0d\x0a------WebKitFormBoundaryi5BnD9J9zoTMiSuP--"
       . "\x0d\x0a");
-is($req->is_done,          1);
-is($req->param('Vorname'), 'T');
+is($req->is_done, 1);
+is_deeply($req->param('Vorname'), ['T']);

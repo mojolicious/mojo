@@ -102,9 +102,9 @@ is($req->headers->content_type, 'x-application-urlencoded');
 is($req->content->file->length, 26);
 is($req->content->file->slurp,  'foo=bar& tset=23+;&foo=bar');
 is($req->body_params,           'foo=bar&+tset=23+&foo=bar');
-is_deeply($req->body_params->to_hash->{foo},     [qw/bar bar/]);
-is_deeply($req->body_params->to_hash->{' tset'}, ['23 ']);
-is_deeply($req->params->to_hash->{foo},          [qw/bar bar 13/]);
+is_deeply($req->body_params->to_hash->{foo}, [qw/bar bar/]);
+is_deeply($req->body_params->to_hash->{' tset'}, '23 ');
+is_deeply($req->params->to_hash->{foo}, [qw/bar bar 13/]);
 
 # Parse HTTP 1.1 "application/x-www-form-urlencoded"
 $req = Mojo::Message::Request->new;
@@ -121,16 +121,16 @@ is($req->headers->content_type, 'application/x-www-form-urlencoded');
 is($req->content->file->length, 26);
 is($req->content->file->slurp,  'foo=bar&+tset=23+;&foo=bar');
 is($req->body_params,           'foo=bar&+tset=23+&foo=bar');
-is_deeply($req->body_params->to_hash->{foo},     [qw/bar bar/]);
-is_deeply($req->body_params->to_hash->{' tset'}, ['23 ']);
-is_deeply($req->params->to_hash->{foo},          [qw/bar bar 13/]);
-is_deeply($req->param('foo'),                    [qw/bar bar 13/]);
-is_deeply($req->param(' tset'),                  ['23 ']);
+is_deeply($req->body_params->to_hash->{foo}, [qw/bar bar/]);
+is_deeply($req->body_params->to_hash->{' tset'}, '23 ');
+is_deeply($req->params->to_hash->{foo}, [qw/bar bar 13/]);
+is_deeply([$req->param('foo')], [qw/bar bar 13/]);
+is_deeply($req->param(' tset'), '23 ');
 $req->param('set', 'single');
-is_deeply($req->param('set'), ['single'], 'setting single param works');
+is_deeply($req->param('set'), 'single', 'setting single param works');
 $req->param('multi', 1, 2, 3);
-is_deeply($req->param('multi'), [qw/1 2 3/],
-    'setting multiple value param works');
+is_deeply([$req->param('multi')],
+    [qw/1 2 3/], 'setting multiple value param works');
 is($req->param('test23'), undef);
 
 # Parse HTTP 1.1 chunked request with trailing headers
@@ -189,8 +189,8 @@ is(ref $req->content->parts->[0],          'Mojo::Content');
 is(ref $req->content->parts->[1],          'Mojo::Content');
 is(ref $req->content->parts->[2],          'Mojo::Content');
 is($req->content->parts->[0]->file->slurp, "hallo welt test123\n");
-is_deeply($req->body_params->to_hash->{text1}, ["hallo welt test123\n"]);
-is_deeply($req->body_params->to_hash->{text2}, ['']);
+is_deeply($req->body_params->to_hash->{text1}, "hallo welt test123\n");
+is_deeply($req->body_params->to_hash->{text2}, '');
 is($req->upload('upload')->filename,     'hello.pl');
 is(ref $req->upload('upload')->file,     'Mojo::File');
 is($req->upload('upload')->file->length, 69);
@@ -557,7 +557,7 @@ is($req->url->query,      'lalala=23&bar=baz');
 is($req->minor_version,   '0');
 is($req->major_version,   '1');
 is($req->body,            'hello=world');
-is_deeply($req->param('hello'), ['world']);
+is_deeply($req->param('hello'), 'world');
 
 # Parse response with cookie
 $res = Mojo::Message::Response->new;
@@ -723,4 +723,4 @@ $req->parse("POST /example/testform_handler HTTP/1.1\x0d\x0a"
       . "\x0d\x0a\x0d\x0a------WebKitFormBoundaryi5BnD9J9zoTMiSuP--"
       . "\x0d\x0a");
 is($req->is_done, 1);
-is_deeply($req->param('Vorname'), ['T']);
+is_deeply($req->param('Vorname'), 'T');

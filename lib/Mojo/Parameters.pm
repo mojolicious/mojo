@@ -102,7 +102,7 @@ sub param {
         $values[$i] =~ s/\+/\ /g if $values[$i];
     }
 
-    return @values ? \@values : undef;
+    return wantarray ? @values : $values[0];
 }
 
 sub parse {
@@ -177,13 +177,14 @@ sub to_hash {
         $value =~ s/\+/\ /g if $value;
 
         # Array
-        if (defined $value) {
-            $params{$name} ||= [];
+        if (exists $params{$name}) {
+            $params{$name} = [$params{$name}]
+              unless ref $params{$name} eq 'ARRAY';
             push @{$params{$name}}, $value;
         }
 
-        # Undef
-        else { $params{$name} = undef }
+        # String
+        else { $params{$name} = $value }
     }
 
     return \%params;

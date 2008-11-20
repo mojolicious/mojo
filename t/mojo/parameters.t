@@ -35,8 +35,8 @@ is($params->to_string,  'foo=b%3Bar;baz=23;a=4;a=5;b=6;b=7;x=1;y=2');
 is($params2->to_string, 'x=1&y=2');
 
 # Param
-is_deeply($params->param('foo'), ['b;ar']);
-is_deeply($params->param('a'), [4, 5]);
+is_deeply($params->param('foo'), 'b;ar');
+is_deeply([$params->param('a')], [4, 5]);
 
 # Parse with ";" separator
 $params->parse('q=1;w=2;e=3;e=4;r=6;t=7');
@@ -49,17 +49,17 @@ $params->remove('e');
 is($params->to_string, 'q=1;w=2;t=7');
 
 # Hash
-is_deeply($params->to_hash, {q => [1], w => [2], t => [7]});
+is_deeply($params->to_hash, {q => 1, w => 2, t => 7});
 
 # Append
 $params->append('a', 4, 'a', 5, 'b', 6, 'b', 7);
 is_deeply($params->to_hash,
-    {a => [4, 5], b => [6, 7], q => [1], w => [2], t => [7]});
+    {a => [4, 5], b => [6, 7], q => 1, w => 2, t => 7});
 
 # 0 value
 $params = Mojo::Parameters->new(foo => 0);
-is_deeply($params->param('foo'), [0]);
+is_deeply($params->param('foo'), 0);
 is($params->to_string, 'foo=0');
 $params = Mojo::Parameters->new($params->to_string);
-is_deeply($params->param('foo'), [0]);
+is_deeply($params->param('foo'), 0);
 is($params->to_string, 'foo=0');

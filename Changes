@@ -10,7 +10,7 @@ This file documents the revision history for Perl extension Mojo.
         - Added multi level controller class support to Mojolicious.
         - Changed param in Mojo::Parameters to return a list.
         - MojoX::Dispatcher::Routes should be able to fail.
-        - Added diagnostics funtions to Mojo::HelloWorld.
+        - Added diagnostics functions to Mojo::HelloWorld.
         - Made the env parser Apache compatible.
         - Fixed Mojo::Date bugs. (vti)
         - Fixed / routes matching too much.

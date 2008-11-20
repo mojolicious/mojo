@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 22;
+use Test::More tests => 24;
 
 # Now that's a wave of destruction that's easy on the eyes.
 use_ok('Mojo::Parameters');
@@ -63,3 +63,9 @@ is($params->to_string, 'foo=0');
 $params = Mojo::Parameters->new($params->to_string);
 is_deeply($params->param('foo'), 0);
 is($params->to_string, 'foo=0');
+
+# Reconstruction
+$params = Mojo::Parameters->new('foo=bar&baz=23');
+is("$params", 'foo=bar&baz=23');
+$params = Mojo::Parameters->new('foo=bar;baz=23');
+is("$params", 'foo=bar;baz=23');

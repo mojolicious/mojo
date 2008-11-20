@@ -106,22 +106,26 @@ sub param {
 }
 
 sub parse {
-    my $self = shift;
+    my $self   = shift;
+    my $string = shift;
 
     # Shortcut
-    return $self unless defined $_[0];
+    return $self unless defined $string;
 
     # Clear
     $self->params([]);
 
     # Detect query string without key/value pairs
-    if ($_[0] !~ /\=/) {
-        $self->params([$_[0], undef]);
+    if ($string !~ /\=/) {
+        $self->params([$string, undef]);
         return $self;
     }
 
+    # Detect pair separator for reconstruction
+    $self->pair_separator(';') if $string =~ /\;/ && $string !~ /\&/;
+
     # W3C suggests to also accept ";" as a separator
-    for my $pair (split /[\&\;]+/, $_[0]) {
+    for my $pair (split /[\&\;]+/, $string) {
 
         $pair =~ /^([^\=]*)(?:=(.*))?$/;
 

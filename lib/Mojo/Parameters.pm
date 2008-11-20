@@ -296,6 +296,7 @@ the following new ones.
 =head2 C<param>
 
     my $foo = $params->param('foo');
+    my @foo = $params->param('foo');
     my $foo = $params->param(foo => 'ba;r');
 
 =head2 C<parse>

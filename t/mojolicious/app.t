@@ -5,11 +5,14 @@
 use strict;
 use warnings;
 
-use Test::More tests => 16;
+use Test::More tests => 17;
 
+use File::stat;
+use File::Spec;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
+use Mojo::Date;
 use Mojo::Client;
 use Mojo::Transaction;
 
@@ -50,6 +53,10 @@ is($tx->res->headers->content_type, 'text/plain');
 like($tx->res->content->file->slurp, qr/Hello Mojo from a static file!/);
 $ENV{MOJO_MODE} = $backup;
 
+my $path = File::Spec->catdir( $FindBin::Bin, 'public_dev', 'hello.txt'); 
+my $stat = stat($path);
+my $mtime = Mojo::Date->new( stat($path)->mtime )->to_string;
+
 # Static file /hello.txt in a development mode
 $backup = $ENV{MOJO_MODE} || '';
 $ENV{MOJO_MODE} = 'development';
@@ -57,6 +64,8 @@ $tx = Mojo::Transaction->new_get('/hello.txt');
 $client->process_local('MojoliciousTest', $tx);
 is($tx->res->code,                  200);
 is($tx->res->headers->content_type, 'text/plain');
+is($tx->res->headers->header('Last-Modified'), $mtime, "Last-Modified header is set correctly"); 
 like($tx->res->content->file->slurp,
     qr/Hello Mojo from a development static file!/);
 $ENV{MOJO_MODE} = $backup;
+

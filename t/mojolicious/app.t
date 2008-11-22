@@ -85,5 +85,5 @@ chmod 0000, $path;
 $tx = Mojo::Transaction->new_get('/hello.txt');
 $client->process_local('MojoliciousTest', $tx);
 is($tx->res->code, 403, 'Unreadable file triggers 403 Forbidden');
-chmod 0755, $path;
+chmod 0644, $path;
 $ENV{MOJO_MODE} = $backup;

@@ -154,10 +154,10 @@ sub process_local {
     my $app = Mojo::Loader->load_build($class);
 
     $tx->req->fix_headers;
-    $app->handler($tx);
-    $tx->res->fix_headers;
+    my $new_tx = $app->handler($tx);
+    $new_tx->res->fix_headers;
 
-    return $tx;
+    return $new_tx;
 }
 
 sub spin {

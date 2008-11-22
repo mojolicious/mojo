@@ -76,7 +76,7 @@ __END__
 
 =head1 NAME
 
-MojoX::Dispatcher::Static - Static Dispatcher
+MojoX::Dispatcher::Static - Serve static files over HTTP
 
 =head1 SYNOPSIS
 
@@ -95,15 +95,23 @@ L<MojoX::Dispatcher::Static> is a dispatcher for static files.
     my $prefix  = $dispatcher->prefix;
     $dispatcher = $dispatcher->prefix('/static');
 
+If the prefix attribute is set, we will only try to dispatch URI which begins with this 
+prefix. The URI should begin a "/"
+
 =head2 C<types>
 
     my $types   = $dispatcher->types;
     $dispatcher = $dispatcher->types(MojoX::Types->new);
 
+C<types> maps file extensions to MIME types. This is done with MojoX::Types
+by default. If no type can be determined, C<text/plain> is used. 
+
 =head2 C<root>
 
     my $root    = $dispatcher->root;
     $dispatcher = $dispatcher->root('/foo/bar/files');
+
+Define the root directory where the static files are stored. 
 
 =head1 METHODS
 
@@ -114,8 +122,23 @@ implements the follwing the ones.
 
     my $success = $dispatcher->dispatch($tx);
 
+Prepare an HTTP response via C<< $tx->res >>and return true if we can dispatch
+to a static file, returns false if C<< $tx->req->url->path>> fails to match the
+prefix or if the URI is empty. 
+
 =head2 C<serve>
 
     my $success = $dispatcher->serve($tx, '/foo/bar.html');
+
+Given a L<Mojo::Transaction> object and URI for a file, attempt to
+prepare a HTTP response via C<< $tx->res >> that contains the file and
+return true. 
+
+To succeed, the URI must map exactly to a readable file between C<root>.  We
+will determin the Content-type via C<< types() >>, defaulting to "text/plain".
+A C<Last-Modified> header will always be set according the last modified time
+of the file.
+
+On failure, no response will be prepared and false will returned.
 
 =cut

@@ -108,7 +108,11 @@ MojoX::Dispatcher::Static - Serve Static Files
 
     use MojoX::Dispatcher::Static;
 
-    my $dispatcher = MojoX::Dispatcher::Static->new;
+    my $dispatcher = MojoX::Dispatcher::Static->new(
+            prefix => '/images',
+            root   => '/ftp/pub/images'
+    );
+    my $success = $dispatcher->dispatch($tx);
 
 =head1 DESCRIPTION
 

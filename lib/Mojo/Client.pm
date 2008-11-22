@@ -488,6 +488,9 @@ following new ones.
 
     $tx = $client->process_local('MyApp', $tx);
 
+Process a single L<Mojo::Transaction> by passing it through to the C<< handler >>
+method of a given Mojo class. 
+
 =head2 C<spin>
 
     my $done = $client->spin(@transactions);

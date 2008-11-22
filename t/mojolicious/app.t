@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 18;
+use Test::More tests => 19;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -71,9 +71,19 @@ like($tx->res->content->file->slurp,
     qr/Hello Mojo from a development static file!/);
 $ENV{MOJO_MODE} = $backup;
 
+# Check If-Modified-Since
 $ENV{MOJO_MODE} = 'development';
 $tx = Mojo::Transaction->new_get('/hello.txt');
 $tx->req->headers->header('If-Modified-Since', $mtime);
 $client->process_local('MojoliciousTest', $tx);
 is($tx->res->code, 304, 'Setting If-Modified-Since triggers 304');
+$ENV{MOJO_MODE} = $backup;
+
+# Check 403 Forbidden
+$ENV{MOJO_MODE} = 'development';
+chmod 0000, $path;
+$tx = Mojo::Transaction->new_get('/hello.txt');
+$client->process_local('MojoliciousTest', $tx);
+is($tx->res->code, 403, 'Unreadable file triggers 403 Forbidden');
+chmod 0755, $path;
 $ENV{MOJO_MODE} = $backup;

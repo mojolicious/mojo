@@ -138,6 +138,10 @@ L<Mojo::Date> implements HTTP date and time functions according to RFC2616.
     my $epoch = $date->epoch;
     $date     = $date->epoch(time);
 
+Set or return a date in epoch format. 
+
+This attribute is set by the C<new> and C<parse> methods.
+
 =head1 METHODS
 
 L<Mojo::Date> inherits all methods from L<Mojo::Base> and implements the
@@ -147,12 +151,25 @@ following new ones.
 
     my $date = Mojo::Date->new($string);
 
+Calls C<parse> with a date. 
+
 =head2 C<parse>
 
     $date = $date->parse('Sun Nov  6 08:49:37 1994');
 
+Parse a date and return a Mojo::Date object. Parsable formats include:
+
+    - epoch format ( 784111777 ) 
+    - RFC 822/1123 ( Sun, 06 Nov 1994 08:49:37 GMT ) 
+    - RFC 850/1036 ( Sunday, 06-Nov-94 08:49:37 GMT )
+    - ANSI C asctime() ( Sun Nov  6 08:49:37 1994 )
+
+Undef will returned if we can't parse the format. 
+
 =head2 C<to_string>
 
     my $string = $date->to_string;
+
+After C<< new() >> or C<< parse() >> or call, this can return a date in a valid HTTP format (RFC 822). 
 
 =cut

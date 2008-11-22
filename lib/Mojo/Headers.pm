@@ -370,6 +370,8 @@ the following new ones.
 
     $headers = $headers->add_line('Content-Type', 'text/plain');
 
+Add an additional value to a header with clobbering the existing values.
+
 =head2 C<to_string>
 
 =head2 C<build>

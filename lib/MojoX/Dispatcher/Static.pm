@@ -7,6 +7,7 @@ use warnings;
 
 use base 'Mojo::Base';
 
+use File::stat;
 use File::Spec;
 use Mojo::Content;
 use Mojo::File;
@@ -54,18 +55,43 @@ sub serve {
     my $type = $self->types->type($ext) || 'text/plain';
 
     # Dispatch
-    if (-f $path && -r $path) {
+    if (-f $path) {
+
         my $res = $tx->res;
-        $res->content(Mojo::Content->new(file => Mojo::File->new));
-        $res->code(200);
+        if (-r $path) {
+            my $req  = $tx->req;
+            my $stat = stat($path);
 
-        # Last modified
-        my $mtime = (stat $path)[9];
-        $res->headers->header('Last-Modified', Mojo::Date->new($mtime));
+            # If modified since
+            if (my $date = $req->headers->header('If-Modified-Since')) {
 
-        $res->headers->content_type($type);
-        $res->content->file->path($path);
-        return 1;
+                # Not modified
+                if (Mojo::Date->new($date)->epoch == $stat->mtime) {
+                    $res->code(304);
+                    $res->headers->remove('Content-Type');
+                    $res->headers->remove('Content-Length');
+                    $res->headers->remove('Content-Disposition');
+                    return 1;
+                }
+            }
+
+            $res->content(Mojo::Content->new(file => Mojo::File->new));
+            $res->code(200);
+
+            # Last modified
+            $res->headers->header('Last-Modified',
+                Mojo::Date->new($stat->mtime));
+
+            $res->headers->content_type($type);
+            $res->content->file->path($path);
+            return 1;
+        }
+
+        # Exists, but is forbidden
+        else {
+            $res->code(403);
+            return 1;
+        }
     }
 
     return 0;

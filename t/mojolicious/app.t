@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 17;
+use Test::More tests => 18;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -69,4 +69,11 @@ is($tx->res->headers->header('Last-Modified'),
     $mtime, 'Last-Modified header is set correctly');
 like($tx->res->content->file->slurp,
     qr/Hello Mojo from a development static file!/);
+$ENV{MOJO_MODE} = $backup;
+
+$ENV{MOJO_MODE} = 'development';
+$tx = Mojo::Transaction->new_get('/hello.txt');
+$tx->req->headers->header('If-Modified-Since', $mtime);
+$client->process_local('MojoliciousTest', $tx);
+is($tx->res->code, 304, 'Setting If-Modified-Since triggers 304');
 $ENV{MOJO_MODE} = $backup;

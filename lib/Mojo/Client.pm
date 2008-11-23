@@ -152,7 +152,10 @@ sub process_local {
     }
 
     my $app = Mojo::Loader->load_build($class);
+
+    $tx->req->fix_headers;
     $app->handler($tx);
+    $tx->res->fix_headers;
 
     return $tx;
 }

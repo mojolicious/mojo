@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 19;
+use Test::More tests => 20;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -67,6 +67,8 @@ is($tx->res->code,                  200);
 is($tx->res->headers->content_type, 'text/plain');
 is($tx->res->headers->header('Last-Modified'),
     $mtime, 'Last-Modified header is set correctly');
+is($tx->res->headers->content_length,
+    $stat->size, 'Content-Length is set correctly');
 like($tx->res->content->file->slurp,
     qr/Hello Mojo from a development static file!/);
 $ENV{MOJO_MODE} = $backup;

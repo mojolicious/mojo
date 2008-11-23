@@ -76,7 +76,7 @@ __END__
 
 =head1 NAME
 
-MojoX::Dispatcher::Static - Serve static files over HTTP
+MojoX::Dispatcher::Static - Serve Static Files
 
 =head1 SYNOPSIS
 
@@ -95,23 +95,28 @@ L<MojoX::Dispatcher::Static> is a dispatcher for static files.
     my $prefix  = $dispatcher->prefix;
     $dispatcher = $dispatcher->prefix('/static');
 
-If the prefix attribute is set, we will only try to dispatch URI which begins with this 
-prefix. The URI should begin a "/"
+Returns the path prefix if called without arguments.
+Returns the invocant if called with arguments.
+If defined, files will only get served for url paths beginning with this
+prefix.
 
 =head2 C<types>
 
     my $types   = $dispatcher->types;
     $dispatcher = $dispatcher->types(MojoX::Types->new);
 
-C<types> maps file extensions to MIME types. This is done with MojoX::Types
-by default. If no type can be determined, C<text/plain> is used. 
+Returns a L<Mojo::Types> object if called without arguments.
+Returns the invocant if called with arguments.
+If no type can be determined, C<text/plain> will be used.
 
 =head2 C<root>
 
     my $root    = $dispatcher->root;
     $dispatcher = $dispatcher->root('/foo/bar/files');
 
-Define the root directory where the static files are stored. 
+Returns the root directory from which files get served if called without
+arguments.
+Returns the invocant if called with arguments.
 
 =head1 METHODS
 
@@ -122,23 +127,21 @@ implements the follwing the ones.
 
     my $success = $dispatcher->dispatch($tx);
 
-Prepare an HTTP response via C<< $tx->res >>and return true if we can dispatch
-to a static file, returns false if C<< $tx->req->url->path>> fails to match the
-prefix or if the URI is empty. 
+Returns true if a file matching the request could be found and a response be
+prepared.
+Returns false otherwise.
+Expects a L<Mojo::Transaction> object as first argument.
 
 =head2 C<serve>
 
     my $success = $dispatcher->serve($tx, '/foo/bar.html');
 
-Given a L<Mojo::Transaction> object and URI for a file, attempt to
-prepare a HTTP response via C<< $tx->res >> that contains the file and
-return true. 
-
-To succeed, the URI must map exactly to a readable file between C<root>.  We
-will determin the Content-type via C<< types() >>, defaulting to "text/plain".
-A C<Last-Modified> header will always be set according the last modified time
-of the file.
-
-On failure, no response will be prepared and false will returned.
+Returns true if a readable file could be found under C<root> and a response
+be prepared.
+Returns false otherwise.
+Expects a L<Mojo::Transaction> object and a path as arguments.
+If no type can be determined, C<text/plain> will be used.
+A C<Last-Modified> header will always be set according to the last modified
+time of the file.
 
 =cut

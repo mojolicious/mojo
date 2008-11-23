@@ -370,7 +370,8 @@ the following new ones.
 
     $headers = $headers->add_line('Content-Type', 'text/plain');
 
-Add an additional value to a header with clobbering the existing values.
+Returns the invocant.
+Appends a new line to the header.
 
 =head2 C<to_string>
 

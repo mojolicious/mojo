@@ -319,12 +319,16 @@ L<Mojo::URL> implements a subset of RFC 3986 for Uniform Resource Locators.
 =head2 C<user>
 
     my $user = $url->user;
-    $url     = $url->userinfo('root');
+    $url     = $url->user('root');
 
 =head2 C<userinfo>
 
     my $userinfo = $url->userinfo;
     $url         = $url->userinfo('root:pass%3Bw0rd');
+
+Returns the username/password portion of a URL.
+Returns the invocant when passed the username/password as a
+colon-separated pair.
 
 =head1 METHODS
 

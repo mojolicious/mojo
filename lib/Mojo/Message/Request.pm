@@ -92,16 +92,19 @@ sub parse {
 sub proxy {
     my ($self, $url) = @_;
 
-    # New proxy
-    if ($url) {
-        $url = Mojo::URL->new($url) unless ref $url;
+    # If we have a Mojo::URL object to set
+    if (ref $url) {
         $self->{proxy} = $url;
         return $self;
     }
-
-    # Get proxy from ENV
-    if ($url = $ENV{HTTP_PROXY}) {
-        $self->{proxy} = Mojo::URL->new($url) unless $self->{proxy};
+    # If have a URL to set from a string
+    elsif ($url) {
+        $self->{proxy} = Mojo::URL->new($url);
+        return $self;
+    }
+    # Default to trying %ENV
+    elsif ( (not $self->{proxy}) and $ENV{HTTP_PROXY}) {
+        $self->{proxy} = Mojo::URL->new( $ENV{HTTP_PROXY} );
     }
 
     return $self->{proxy};
@@ -317,5 +320,11 @@ implements the following new ones.
 
     my $proxy = $req->proxy;
     $req      = $req->proxy('http://foo:bar@127.0.0.1:3000');
+    $req      = $req->proxy( Mojo::URL->new('http://127.0.0.1:3000')  );
+
+Returns a L< Mojo::URL > object representing an HTTP proxy for this request.
+Returns the invocant when a new value is set as either a URL string or a
+Mojo::URL object. If no proxy is provided explicitly this way, we will check
+the value of C<< $ENV{HTTP_PROXY} >> as a fallback option.
 
 =cut

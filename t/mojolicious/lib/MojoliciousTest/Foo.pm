@@ -9,7 +9,11 @@ use base 'Mojolicious::Controller';
 
 # If you're programmed to jump off a bridge, would you do it?
 # Let me check my program... Yep.
-sub index { shift->ctx->render }
+sub index {
+    my $self = shift;
+    $self->ctx->stash(msg => 'Hello World!');
+    $self->ctx->render;
+}
 
 sub test {
     my ($self, $c) = @_;

@@ -8,13 +8,31 @@ use warnings;
 use base 'Mojo::Base';
 
 __PACKAGE__->attr(app => (chained => 1, weak => 1));
-__PACKAGE__->attr(stash => (chained => 1, default => sub { {} }));
 __PACKAGE__->attr(tx => (chained => 1));
 
 # This is my first visit to the Galaxy of Terror and I'd like it to be a pleasant one.
 sub req { return shift->tx->req }
 
 sub res { return shift->tx->res }
+
+sub stash {
+    my $self = shift;
+
+    # Initialize
+    $self->{stash} ||= {};
+
+    # Hash
+    return $self->{stash} unless $_[0];
+
+    # Get
+    return $self->{stash}->{$_[0]} unless $_[1] || ref $_[0];
+
+    # Set
+    my $values = exists $_[1] ? {@_} : $_[0];
+    $self->{stash} = {%{$self->{stash}}, %$values};
+
+    return $self;
+}
 
 1;
 __END__
@@ -56,10 +74,13 @@ Returns the invocant if called with arguments.
 =head2 C<stash>
 
     my $stash = $c->stash;
-    $c        = $c->stash({});
+    my $foo   = $c->stash('foo');
+    $c        = $c->stash({foo => 'bar'});
+    $c        = $c->stash(foo => 'bar');
 
 Returns a hash reference if called without arguments.
-Returns the invocant if called with arguments.
+Returns a value if called with a single argument.
+Returns the invocant if called with a hashref or multiple arguments.
 
     $c->stash->{foo} = 'bar';
     my $foo = $c->stash->{foo};

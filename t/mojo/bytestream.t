@@ -73,7 +73,7 @@ is("$text", 't%C3estj1~230');
 
 # qp_encode
 $stream = Mojo::ByteStream->new("foo\x{99}bar$%^&3217");
-is($stream->qp_encode, "foo=99bar0^&3217=\n");
+like($stream->qp_encode, qr/^foo\=99bar0\^\&3217/);
 
 # qp_decode
 $stream = Mojo::ByteStream->new("foo=99bar0^&3217=\n");

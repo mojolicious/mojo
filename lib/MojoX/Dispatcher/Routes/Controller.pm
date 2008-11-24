@@ -7,6 +7,8 @@ use warnings;
 
 use base 'Mojo::Base';
 
+__PACKAGE__->attr(ctx => (chained => 1));
+
 # If we don't go back there and make that event happen,
 # the entire universe will be destroyed...
 # And as an environmentalist, I'm against that.
@@ -25,6 +27,14 @@ MojoX::Dispatcher::Routes::Controller - Controller Base Class
 =head1 DESCRIPTION
 
 L<MojoX::Dispatcher::Routes::Controller> is a controller base class.
+
+=head1 ATTRIBUTES
+
+=head2 C<ctx>
+
+    my $c = $controller->ctx;
+
+Returns a L<MojoX::Dispatcher::Routes::Context> object.
 
 =head1 METHODS
 

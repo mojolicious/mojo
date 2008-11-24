@@ -13,6 +13,8 @@ This file documents the revision history for Perl extension Mojo.
         - Added diagnostics functions to Mojo::HelloWorld.
         - Made the env parser Apache compatible.
         - Made url_for work for rebased applications.
+        - Added ctx attribute to MojoX::Dispatcher::Routes::Controller.
+        - Added blacklist to MojoX::Dispatcher::Routes.
         - Fixed Mojo::Date bugs. (vti)
         - Fixed / routes matching too much.
         - Fixed typos.

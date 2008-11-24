@@ -12,7 +12,12 @@ use Mojo::Loader;
 
 use constant DEBUG => $ENV{MOJOX_ROUTES_DEBUG} || 0;
 
-__PACKAGE__->attr(controllers => (chained => 1, default => sub { {} }));
+__PACKAGE__->attr(
+    disallow => (
+        chained => 1,
+        default => sub { [qw/new attr ctx/] }
+    )
+);
 __PACKAGE__->attr(namespace => (chained => 1));
 
 # Hey. What kind of party is this? There's no booze and only one hooker.
@@ -25,12 +30,21 @@ sub dispatch {
     # Shortcut
     return 0 unless $match;
 
+    # Prepare disallow
+    unless ($self->{_disallow}) {
+        $self->{_disallow} = {};
+        $self->{_disallow}->{$_}++ for @{$self->disallow};
+    }
+
     # Walk the stack
     my $stack = $match->stack;
     for my $field (@$stack) {
 
         my $controller = $field->{controller};
         my $action     = $field->{action};
+
+        # Shortcut for disallowed actions
+        next if $self->{_disallow}->{$action};
 
         my @class;
         for my $part (split /-/, $controller) {
@@ -48,29 +62,34 @@ sub dispatch {
         # Debug
         warn "-> $controller($class) :: $action\n" if DEBUG;
 
-        # Shortcut
-        next unless $class =~ /^[a-zA-Z0-9_:]+$/;
-
-        # Cache
-        my $instance = $self->controllers->{$class};
+        # Shortcut for invalid class and action
+        next
+          unless $class =~ /^[a-zA-Z0-9_:]+$/
+              && $action =~ /^[a-zA-Z0-9_]+$/;
 
         # Captures
         $c->match->captures($field);
 
+        # Load
+        $self->{_loaded} ||= {};
+        eval {
+            Mojo::Loader->new->load($class);
+            $self->{_loaded}->{$class}++;
+        } unless $self->{_loaded}->{$class};
+
+        # Load error
+        if ($@) {
+            warn qq/Couldn't load controller class "$class":\n$@/;
+            return 0;
+        }
+
         # Dispatch
         my $done;
-        eval {
-            $instance = $self->controllers->{$class} =
-              Mojo::Loader->load_build($class)
-              unless $instance;
+        eval { $done = $class->new(ctx => $c)->$action($c) };
 
-            # Run action
-            $done = $instance->$action($c);
-        };
-
-        # Error
+        # Controller error
         if ($@) {
-            warn "Dispatch error (propably harmless):\n$@";
+            warn qq/Controller error in "${class}::$action":\n$@/;
             return 0;
         }
 
@@ -107,10 +126,10 @@ L<MojoX::Dispatcher::Routes> is a dispatcher based on L<MojoX::Routes>.
 L<MojoX::Dispatcher::Routes> inherits all attributes from L<MojoX::Routes>
 and implements the follwing the ones.
 
-=head2 C<controllers>
+=head2 C<disallow>
 
-    my $controllers = $dispatcher->controllers;
-    $dispatcher     = $dispatcher->controllers({ ... });
+    my $disallow = $dispatcher->disallow;
+    $dispatcher  = $dispatcher->disallow([qw/new attr ctx/]);
 
 =head2 C<namespace>
 

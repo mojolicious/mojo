@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 20;
+use Test::More tests => 23;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -22,26 +22,34 @@ use_ok('MojoliciousTest');
 
 my $client = Mojo::Client->new;
 
-# Foo::test()
+# Foo::test
 my $tx = Mojo::Transaction->new_get('/foo/test', 'X-Test' => 'Hi there!');
 $client->process_local('MojoliciousTest', $tx);
 is($tx->res->code,                        200);
 is($tx->res->headers->header('X-Bender'), 'Kiss my shiny metal ass!');
 like($tx->res->body, qr/\/bar\/test/);
 
-# Foo::index()
+# Foo::index
 $tx = Mojo::Transaction->new_get('/foo', 'X-Test' => 'Hi there!');
 $client->process_local('MojoliciousTest', $tx);
 is($tx->res->code,                  200);
 is($tx->res->headers->content_type, 'text/html');
 like($tx->res->body, qr/Hello Mojo from the template \/foo!/);
 
-# Foo::Bar::index()
+# Foo::Bar::index
 $tx = Mojo::Transaction->new_get('/foo-bar', 'X-Test' => 'Hi there!');
 $client->process_local('MojoliciousTest', $tx);
 is($tx->res->code,                  200);
 is($tx->res->headers->content_type, 'text/html');
 like($tx->res->body, qr/Hello Mojo from the other template \/foo-bar!/);
+
+# Foo::Bar::index with rebased application
+$tx = Mojo::Transaction->new_get('/foo-bar', 'X-Test' => 'Hi there!');
+$tx->req->url->base->path->parse('/foo');
+$client->process_local('MojoliciousTest', $tx);
+is($tx->res->code,                  200);
+is($tx->res->headers->content_type, 'text/html');
+like($tx->res->body, qr/Hello Mojo from the other template \/foo\/foo-bar!/);
 
 # Static file /hello.txt in a production mode
 my $backup = $ENV{MOJO_MODE} || '';

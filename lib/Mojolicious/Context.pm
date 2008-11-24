@@ -27,6 +27,11 @@ sub url_for {
     my $self = shift;
     my $url  = $self->match->url_for(@_);
     $url->base($self->tx->req->url->base->clone);
+
+    # Fix paths
+    unshift @{$url->path->parts}, @{$url->base->path->parts};
+    $url->base->path->parts([]);
+
     return $url;
 }
 

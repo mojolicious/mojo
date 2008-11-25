@@ -24,13 +24,13 @@ sub has_error { return defined shift->{error} }
 
 sub is_done { return shift->state eq 'done' }
 
+sub is_finished { return shift->is_state(qw/done error/) }
+
 sub is_state {
     my ($self, @states) = @_;
     for my $state (@states) { return 1 if $self->state eq $state }
     return 0;
 }
-
-sub is_finished { return shift->is_state(qw( done error )) }
 
 1;
 __END__
@@ -76,17 +76,16 @@ following new ones.
 
     my $done = $stateful->is_done;
 
+=head2 C<is_finished>
+
+    my $finished = $stateful->is_finished;
+
+Returns true if C<state> is c<done> or C<error>.
+Returns false otherwise.
+
 =head2 C<is_state>
 
     my $is_state = $stateful->is_state('writing');
     my $is_state = $stateful->is_state(qw/error reading writing/);
-
-=head2 C<is_finished>
-
-    my $nothing_more_to_do = $stateful->is_finished;
-
-Shortcut for $stateful->is_state(qw/ done error /). Tests for common
-end states.
-
 
 =cut

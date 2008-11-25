@@ -80,7 +80,7 @@ following new ones.
 
     my $finished = $stateful->is_finished;
 
-Returns true if C<state> is c<done> or C<error>.
+Returns true if C<state> is C<done> or C<error>.
 Returns false otherwise.
 
 =head2 C<is_state>

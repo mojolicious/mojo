@@ -17,9 +17,9 @@ sub new {
     $self->default_ext('phtml');
     $self->add_handler(
         phtml => sub {
-            my ($self, $args) = @_;
+            my ($self, $c, $output) = @_;
 
-            my $path = $args->{path};
+            my $path = $c->stash->{template_path};
 
             # Check cache
             $self->{_mt_cache} ||= {};
@@ -30,12 +30,11 @@ sub new {
 
                 # Initialize
                 $mt = $self->{_mt_cache}->{$path} = Mojo::Template->new;
-                return $mt->render_file($path, $args->{output}, $args->{c},
-                    $args);
+                return $mt->render_file($path, $output, $c);
             }
 
             # Interpret again
-            $mt->interpret($args->{output}, $args->{c}, $args);
+            $mt->interpret($output, $c);
         }
     );
     return $self;

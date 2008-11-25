@@ -35,20 +35,21 @@ sub add_handler {
 }
 
 sub render {
-    my $self = shift;
-    my $c    = shift;
+    my ($self, $c) = @_;
 
-    my $args = ref $_[0] ? $_[0] : {@_};
-    return undef unless $args;
+    my $template = $c->stash->{template};
 
-    my $template = $args->{template};
-    my $default  = $self->default_ext;
+    return undef unless $template;
+
+    # Extension
+    my $default = $self->default_ext;
     $template .= ".$default" if $default && $template !~ /\.\w+$/;
-
-    my $path = File::Spec->catfile($self->root, $template);
-
-    $path =~ /\.(\w+)$/;
+    $template =~ /\.(\w+)$/;
     my $ext = $1;
+
+    # Path
+    my $path = File::Spec->catfile($self->root, $template);
+    $c->stash->{template_path} ||= $path;
 
     return undef unless $ext;
 
@@ -63,18 +64,10 @@ sub render {
 
     # Render
     my $output;
-    return undef
-      unless $handler->(
-        $self,
-        {   args   => $args,
-            c      => $c,
-            output => \$output,
-            path   => $path
-        }
-      );
+    return undef unless $handler->($self, $c, \$output);
 
     # Partial
-    return $output if $args->{partial};
+    return $output if $c->stash->{partial};
 
     # Response
     my $res = $c->res;
@@ -138,6 +131,6 @@ follwing the ones.
 
 =head2 C<render>
 
-    $renderer = $renderer->render($c, {template => 'foo.phtml'});
+    $renderer = $renderer->render($c);
 
 =cut

@@ -12,15 +12,22 @@ use base 'MojoX::Dispatcher::Routes::Context';
 sub render {
     my $self = shift;
 
+    # Merge args with stash
     my $args = ref $_[0] ? $_[0] : {@_};
+    local $self->{stash} = {%{$self->stash}, %$args};
 
-    my $controller = $args->{controller}
-      || $self->match->captures->{controller};
-    my $action = $args->{action} || $self->match->captures->{action};
+    # Template
+    unless ($self->stash->{template}) {
 
-    $args->{template} ||= join '/', split(/-/, $controller), $action;
+        # Default template
+        my $controller = $self->stash->{controller};
+        my $action     = $self->stash->{action};
 
-    return $self->app->renderer->render($self, $args);
+        $self->stash->{template} = join '/', split(/-/, $controller), $action;
+    }
+
+    # Render
+    return $self->app->renderer->render($self);
 }
 
 sub url_for {

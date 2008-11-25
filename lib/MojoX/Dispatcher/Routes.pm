@@ -30,6 +30,9 @@ sub dispatch {
     # Shortcut
     return 0 unless $match;
 
+    # Initialize stash with captures
+    $c->stash({%{$match->captures}});
+
     # Prepare disallow
     unless ($self->{_disallow}) {
         $self->{_disallow} = {};

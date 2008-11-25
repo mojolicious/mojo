@@ -30,6 +30,8 @@ sub is_state {
     return 0;
 }
 
+sub is_finished { return shift->is_state(qw( done error )) }
+
 1;
 __END__
 
@@ -78,5 +80,13 @@ following new ones.
 
     my $is_state = $stateful->is_state('writing');
     my $is_state = $stateful->is_state(qw/error reading writing/);
+
+=head2 C<is_finished>
+
+    my $nothing_more_to_do = $stateful->is_finished;
+
+Shortcut for $stateful->is_state(qw/ done error /). Tests for common
+end states.
+
 
 =cut

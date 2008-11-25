@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 21;
+use Test::More tests => 25;
 
 # I personalized each of your meals.
 # For example, Amy: you're cute, so I baked you a pony.
@@ -21,12 +21,14 @@ ok(!$stateful->is_done);
 ok($stateful->is_state(qw( start )));
 ok($stateful->is_state(qw( start other )));
 ok(!$stateful->is_state(qw( neither other )));
+ok(!$stateful->is_finished);
 
 # Change state
 $stateful->state('connected');
 is($stateful->state, 'connected');
 ok($stateful->is_state(qw( another connected )));
 ok(!$stateful->is_done);
+ok(!$stateful->is_finished);
 
 # Errors
 ok(!defined($stateful->error));
@@ -38,9 +40,11 @@ is($stateful->error, 'Oops');
 is($stateful->state, 'error');
 ok($stateful->is_state(qw( error another )));
 ok(!$stateful->is_done);
+ok($stateful->is_finished);
 
 # done
 $stateful->done;
 is($stateful->state, 'done');
 ok($stateful->is_state(qw( another done error )));
 ok($stateful->is_done);
+ok($stateful->is_finished);

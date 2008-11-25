@@ -88,7 +88,7 @@ framework.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Scrips> inherits all attributes from L<Mojo::Script> and implements
+L<Mojo::Scripts> inherits all attributes from L<Mojo::Script> and implements
 the following new ones.
 
 =head2 C<base>
@@ -108,7 +108,7 @@ the following new ones.
 
 =head1 METHODS
 
-L<Mojo::Scrips> inherits all methods from L<Mojo::Script> and implements the
+L<Mojo::Scripts> inherits all methods from L<Mojo::Script> and implements the
 following new ones.
 
 =head2 C<run>

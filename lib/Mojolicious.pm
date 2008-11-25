@@ -50,6 +50,8 @@ __PACKAGE__->attr(
     )
 );
 
+our $C;
+
 # The usual constructor stuff
 sub new {
     my $self = shift->SUPER::new();
@@ -90,6 +92,8 @@ sub build_ctx {
     return $self->ctx_class->new(app => $self, tx => shift);
 }
 
+sub c {$C}
+
 # You could just overload this method
 sub dispatch {
     my ($self, $c) = @_;
@@ -106,7 +110,8 @@ sub handler {
     my ($self, $tx) = @_;
 
     # Build context and dispatch
-    $self->dispatch($self->build_ctx($tx));
+    local $C = $self->build_ctx($tx);
+    $self->dispatch($C);
 
     return $tx;
 }
@@ -196,6 +201,12 @@ For example in production mode, C<production_mode> will be called.
 =head2 C<build_ctx>
 
     my $c = $mojo->build_ctx($tx);
+
+=head2 C<c>
+
+    my $c = Mojolicious->c;
+
+Returns a L<Mojolicious::Context> object.
 
 =head2 C<dispatch>
 

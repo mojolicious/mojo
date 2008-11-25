@@ -1,13 +1,17 @@
 #!perl
 
+# Copyright (C) 2008, Sebastian Riedel.
+
 use strict;
 use warnings;
 
 use Test::More tests => 21;
 
+# I personalized each of your meals.
+# For example, Amy: you're cute, so I baked you a pony.
 use_ok('Mojo::Stateful');
 
-# basic stuff
+# Basic stuff
 my $stateful = Mojo::Stateful->new;
 ok($stateful);
 is($stateful->state, 'start');
@@ -18,18 +22,15 @@ ok($stateful->is_state(qw( start )));
 ok($stateful->is_state(qw( start other )));
 ok(!$stateful->is_state(qw( neither other )));
 
-
-# change state
+# Change state
 $stateful->state('connected');
 is($stateful->state, 'connected');
 ok($stateful->is_state(qw( another connected )));
 ok(!$stateful->is_done);
 
-
-# errors
+# Errors
 ok(!defined($stateful->error));
 ok(!$stateful->has_error);
-
 $stateful->error('Oops');
 ok($stateful->error);
 ok($stateful->has_error);
@@ -37,7 +38,6 @@ is($stateful->error, 'Oops');
 is($stateful->state, 'error');
 ok($stateful->is_state(qw( error another )));
 ok(!$stateful->is_done);
-
 
 # done
 $stateful->done;

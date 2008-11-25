@@ -18,15 +18,15 @@ is($stateful->state, 'start');
 ok(!$stateful->is_done);
 
 # is_state
-ok($stateful->is_state(qw( start )));
-ok($stateful->is_state(qw( start other )));
-ok(!$stateful->is_state(qw( neither other )));
+ok($stateful->is_state('start'));
+ok($stateful->is_state(qw/start other/));
+ok(!$stateful->is_state(qw/neither other/));
 ok(!$stateful->is_finished);
 
 # Change state
 $stateful->state('connected');
 is($stateful->state, 'connected');
-ok($stateful->is_state(qw( another connected )));
+ok($stateful->is_state(qw/another connected/));
 ok(!$stateful->is_done);
 ok(!$stateful->is_finished);
 
@@ -38,13 +38,13 @@ ok($stateful->error);
 ok($stateful->has_error);
 is($stateful->error, 'Oops');
 is($stateful->state, 'error');
-ok($stateful->is_state(qw( error another )));
+ok($stateful->is_state(qw/error another/));
 ok(!$stateful->is_done);
 ok($stateful->is_finished);
 
 # done
 $stateful->done;
 is($stateful->state, 'done');
-ok($stateful->is_state(qw( another done error )));
+ok($stateful->is_state(qw/another done error/));
 ok($stateful->is_done);
 ok($stateful->is_finished);

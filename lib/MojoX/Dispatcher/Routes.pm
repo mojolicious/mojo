@@ -132,7 +132,9 @@ and implements the follwing the ones.
 =head2 C<disallow>
 
     my $disallow = $dispatcher->disallow;
-    $dispatcher  = $dispatcher->disallow([qw/new attr ctx/]);
+    $dispatcher  = $dispatcher->disallow(
+        [qw/new attr ctx render req res stash/]
+    );
 
 =head2 C<namespace>
 

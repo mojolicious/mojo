@@ -726,6 +726,15 @@ $req->parse("POST /example/testform_handler HTTP/1.1\x0d\x0a"
 is($req->is_done, 1);
 is_deeply($req->param('Vorname'), 'T');
 
+# Parse ~ in URL
+$req = Mojo::Message::Request->new;
+$req->parse("GET /~foobar/ HTTP/1.1\x0d\x0a\x0d\x0a");
+is($req->state,         'done');
+is($req->method,        'GET');
+is($req->major_version, 1);
+is($req->minor_version, 1);
+is($req->url,           '/~foobar/');
+
 # Version management
 my $m = Mojo::Message->new;
 is($m->major_version, 1, 'major_version defaults to 1');
@@ -735,14 +744,4 @@ ok($m->at_least_version('1.0'), '1.1 object passes at_least_version("1.0")');
 $m = Mojo::Message->new(minor_version => 0);
 is($m->minor_version, 0, 'minor_version set to 0');
 ok(!$m->at_least_version('1.1'), '1.0 object fails at_least_version("1.1")');
-ok($m->at_least_version('1.0'), '1.0 object passes at_least_version("1.0")');
-
-# Parse ~ in URL
-my $req = Mojo::Message::Request->new;
-$req->parse("GET /~foobar/ HTTP/1.1\x0d\x0a\x0d\x0a");
-is($req->state,         'done');
-is($req->method,        'GET');
-is($req->major_version, 1);
-is($req->minor_version, 1);
-is($req->url,           '/~foobar/');
-
+ok($m->at_least_version('1.0'),  '1.0 object passes at_least_version("1.0")');

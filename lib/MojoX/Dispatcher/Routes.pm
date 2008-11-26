@@ -15,7 +15,7 @@ use constant DEBUG => $ENV{MOJOX_ROUTES_DEBUG} || 0;
 __PACKAGE__->attr(
     disallow => (
         chained => 1,
-        default => sub { [qw/new attr/] }
+        default => sub { [qw/new attr render req res stash/] }
     )
 );
 __PACKAGE__->attr(namespace => (chained => 1));
@@ -88,7 +88,7 @@ sub dispatch {
 
         # Dispatch
         my $done;
-        eval { $done = $class->new->$action($c) };
+        eval { $done = $class->new(ctx => $c)->$action($c) };
 
         # Controller error
         if ($@) {

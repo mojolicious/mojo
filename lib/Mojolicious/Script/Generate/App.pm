@@ -179,10 +179,10 @@ use base 'Mojolicious::Controller';
 
 # This action will render a template
 sub welcome {
-    my ($self, $c) = @_;
+    my $self = shift;
 
     # Render template "example/welcome.phtml"
-    $c->render;
+    $self->render;
 }
 
 1;

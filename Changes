@@ -8,26 +8,28 @@ This file documents the revision history for Perl extension Mojo.
           template engines.
         - Added MojoX::Context.
         - Added multi level controller class support to Mojolicious.
-        - Changed param in Mojo::Parameters to return a list.
         - MojoX::Dispatcher::Routes should be able to fail.
         - Added diagnostics functions to Mojo::HelloWorld.
         - Made the env parser Apache compatible.
         - Made url_for work for rebased applications.
+        - Added ctx, render, req, res and stash methods to Mojolicious
+          controllers.
+        - Changed param in Mojo::Parameters to return a list.
         - Added blacklist to MojoX::Dispatcher::Routes.
         - Fixed Mojo::Date bugs. (vti)
         - Fixed / routes matching too much.
-        - Fixed typos.
         - New Windows workaround in Mojo::Client and Mojo::Server::Daemon.
         - Cleaned up Mojo::Transaction. (Ask Bjoern Hansen)
         - Added .perltidyrc. (Ask Bjoern Hansen)
         - Allow chains to be broken with return values in
           MojoX::Dispatcher::Routes.
-        - The stack in MojoX::Routes should reset.
+        - The stack in MojoX::Routes resets now.
         - Preload application in servers. (Graham Barr)
         - Added documentation. (Ch Lamprecht)
         - Added param tests. (Mark Stosberg)
         - Added documentation for Mojo::Log. (Mark Stosberg)
         - When testing, allow servers a few seconds to stop. (Leon Brocard)
+        - Fixed typos.
 
 0.8009  2008-11-07 00:00:00
         - Cleaned up Mojo::Message callbacks and added tests.

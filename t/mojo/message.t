@@ -726,16 +726,13 @@ $req->parse("POST /example/testform_handler HTTP/1.1\x0d\x0a"
 is($req->is_done, 1);
 is_deeply($req->param('Vorname'), 'T');
 
-{
-    my $m = Mojo::Message->new;
-    is( $m->major_version, 1, "major_version defaults to 1");
-    is( $m->minor_version, 1, "minor_version defaults to 1");
-    ok( $m->is_version('1.1'), "1.1 object passes is_version('1.1')");
-    ok( $m->is_version('1.0'), "1.1 object passes is_version('1.0')");
-}
-{
-    my $m = Mojo::Message->new( minor_version => 0 );
-    is( $m->minor_version, 0, "minor_version set to 0");
-    ok( !$m->is_version('1.1'), "1.0 object fails is_version('1.1')");
-    ok( $m->is_version('1.0'), "1.0 object passes is_version('1.0')");
-}
+# Version management
+my $m = Mojo::Message->new;
+is($m->major_version, 1, 'major_version defaults to 1');
+is($m->minor_version, 1, 'minor_version defaults to 1');
+ok($m->at_least_version('1.1'), '1.1 object passes at_least_version("1.1")');
+ok($m->at_least_version('1.0'), '1.1 object passes at_least_version("1.0")');
+$m = Mojo::Message->new(minor_version => 0);
+is($m->minor_version, 0, 'minor_version set to 0');
+ok(!$m->at_least_version('1.1'), '1.0 object fails at_least_version("1.1")');
+ok($m->at_least_version('1.0'), '1.0 object passes at_least_version("1.0")');

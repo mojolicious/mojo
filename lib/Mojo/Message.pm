@@ -494,10 +494,14 @@ implements the following new ones.
     my $major_version = $message->major_version;
     $message          = $message->major_version(1);
 
+The major version of the HTTP specification being followed. Defaults to 1.
+
 =head2 C<minor_version>
 
     my $minor_version = $message->minor_version;
     $message          = $message->minor_version(1);
+
+The minor version of the HTTP specification being followed. Defaults to 1.
 
 =head2 C<parser_progress_cb>
 
@@ -562,6 +566,9 @@ Returns a L<Mojo::Parameters> object, containing POST parameters.
 
     $message = $message->fix_headers;
 
+For HTTP 1.0 and newer, add the required C<< Content-Length >> header if the
+message is not chunked and the header has not already been set.
+
 =head2 C<get_body_chunk>
 
     my $string = $message->get_body_chunk($offset);
@@ -584,7 +591,10 @@ Returns a L<Mojo::Parameters> object, containing POST parameters.
 
 =head2 C<at_least_version>
 
-    my $success = $message->at_least_version('1.1);
+    my $success = $message->at_least_version('1.1');
+
+Returns true if the message version is greater than or equal to the version
+passed in.
 
 =head2 C<param>
 

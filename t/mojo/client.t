@@ -31,7 +31,7 @@ while (1) {
     $client->spin(@transactions);
     my @buffer;
     while (my $transaction = shift @transactions) {
-        unless ($transaction->is_state(qw/done error/)) {
+        unless ($transaction->is_finished) {
             push @buffer, $transaction;
         }
     }

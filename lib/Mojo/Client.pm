@@ -113,9 +113,7 @@ sub process {
     # Finished transactions should be returned first
     my @sorted;
     while (my $tx = shift @transactions) {
-        $tx->is_state(qw/done error/)
-          ? unshift(@sorted, $tx)
-          : push(@sorted, $tx);
+        $tx->is_finished ? unshift(@sorted, $tx) : push(@sorted, $tx);
     }
 
     return @sorted;
@@ -132,9 +130,7 @@ sub process_all {
         my @done = $self->process(@progress);
         @progress = ();
         for my $tx (@done) {
-            $tx->is_state(qw/done error/)
-              ? push(@finished, $tx)
-              : push(@progress, $tx);
+            $tx->is_finished ? push(@finished, $tx) : push(@progress, $tx);
         }
         last unless @progress;
     }

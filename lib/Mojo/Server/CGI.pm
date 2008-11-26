@@ -24,7 +24,7 @@ sub run {
 
     # Request body
     my $select = IO::Select->new(\*STDIN);
-    while (!$req->is_state(qw/done error/)) {
+    while (!$req->is_finished) {
         last unless $select->can_read(0);
         my $read = STDIN->sysread(my $buffer, 4096, 0);
         $req->parse($buffer);

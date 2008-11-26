@@ -293,7 +293,7 @@ sub _read {
     }
 
     # EOF
-    if (($read == 0) || $req->is_state(qw/done error/)) {
+    if (($read == 0) || $req->is_finished) {
         $tx->state('write');
 
         # Handle

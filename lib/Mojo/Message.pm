@@ -42,6 +42,20 @@ __PACKAGE__->attr(
 # I'll keep it short and sweet. Family. Religion. Friendship.
 # These are the three demons you must slay if you wish to succeed in
 # business.
+sub at_least_version {
+    my ($self, $version) = @_;
+    my ($major, $minor) = split /\./, $version;
+
+    # Version is equal or newer
+    return 1 if $major > $self->major_version;
+    if ($major == $self->major_version) {
+        return 1 if $minor <= $self->minor_version;
+    }
+
+    # Version is older
+    return 0;
+}
+
 sub body {
     my ($self, $content) = @_;
 
@@ -197,7 +211,7 @@ sub fix_headers {
     my $self = shift;
 
     # Content-Length header is required in HTTP 1.0 messages
-    if ($self->is_version('1.0') && !$self->is_chunked) {
+    if ($self->at_least_version('1.0') && !$self->is_chunked) {
         $self->headers->content_length($self->body_length)
           unless $self->headers->content_length;
     }
@@ -243,20 +257,6 @@ sub headers { shift->content->headers(@_) }
 sub is_chunked { shift->content->is_chunked }
 
 sub is_multipart { shift->content->is_multipart }
-
-sub is_version {
-    my ($self, $version) = @_;
-    my ($major, $minor) = split /\./, $version;
-
-    # Version is equal or newer
-    return 1 if $major > $self->major_version;
-    if ($major == $self->major_version) {
-        return 1 if $minor <= $self->minor_version;
-    }
-
-    # Version is older
-    return 0;
-}
 
 sub param {
     my $self = shift;
@@ -582,9 +582,9 @@ Returns a L<Mojo::Parameters> object, containing POST parameters.
 
     my $is_multipart = $message->is_multipart;
 
-=head2 C<is_version>
+=head2 C<at_least_version>
 
-    my $is_version = $message->is_version('1.1);
+    my $success = $message->at_least_version('1.1);
 
 =head2 C<param>
 

@@ -25,6 +25,7 @@ This file documents the revision history for Perl extension Mojo.
           MojoX::Dispatcher::Routes.
         - The stack in MojoX::Routes resets now.
         - Preload application in servers. (Graham Barr)
+        - Renamed is_version to at_least_version. (Mark Stosberg)
         - Added documentation. (Ch Lamprecht)
         - Added param tests. (Mark Stosberg)
         - Added documentation for Mojo::Log. (Mark Stosberg)

@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 224;
+use Test::More tests => 229;
 
 use Mojo::Filter::Chunked;
 use Mojo::Headers;
@@ -736,3 +736,13 @@ $m = Mojo::Message->new(minor_version => 0);
 is($m->minor_version, 0, 'minor_version set to 0');
 ok(!$m->at_least_version('1.1'), '1.0 object fails at_least_version("1.1")');
 ok($m->at_least_version('1.0'), '1.0 object passes at_least_version("1.0")');
+
+# Parse ~ in URL
+my $req = Mojo::Message::Request->new;
+$req->parse("GET /~foobar/ HTTP/1.1\x0d\x0a\x0d\x0a");
+is($req->state,         'done');
+is($req->method,        'GET');
+is($req->major_version, 1);
+is($req->minor_version, 1);
+is($req->url,           '/~foobar/');
+

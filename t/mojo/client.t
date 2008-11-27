@@ -9,7 +9,7 @@ use Test::More;
 
 plan skip_all => 'set TEST_CLIENT to enable this test'
   unless $ENV{TEST_CLIENT};
-plan tests => 6;
+plan tests => 12;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -42,3 +42,20 @@ is($tx->res->code,  200);
 is($tx->continued,  1);
 is($tx2->res->code, 301);
 is($tx2->continued, 1);
+
+# Test keep-alive
+$tx = Mojo::Transaction->new_get('http://labs.kraih.com');
+ok(!$tx->kept_alive);
+
+# first time, new connection
+$client->process_all($tx);
+ok($tx->is_done);
+ok(!$tx->kept_alive);
+
+# second time, reuse connection
+$tx = Mojo::Transaction->new_get('http://labs.kraih.com');
+ok(!$tx->kept_alive);
+
+$client->process_all($tx);
+ok($tx->is_done);
+ok($tx->kept_alive);

@@ -1,0 +1,20 @@
+# Copyright (C) 2008, Sebastian Riedel.
+
+=head1 NAME
+
+Mojo::Manual::Deployment - Getting Mojo Running On Production Servers
+
+=head1 OPTIONS
+
+There are multiple deployment options available.
+
+L<Mojo::Server::FCGI> - A very fast XS implementation of the FastCGI
+protocol.
+
+L<Apache::Mojo> - A mod_perl handler for L<Mojo>, using the Apache request
+object.
+
+L<Apache2::Mojo> - A mod_perl2 handler for L<Mojo>, using the Apache2 request
+objects.
+
+=cut

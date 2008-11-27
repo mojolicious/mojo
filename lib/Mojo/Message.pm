@@ -555,21 +555,33 @@ Returns a L<Mojo::Parameters> object, containing POST parameters.
 
     my $string = $message->build;
 
+Both C<< to_string >> and C<< build >> return the complete HTTP message,
+including the start line, headers and body.
+
 =head2 C<build_body>
 
     my $string = $message->build_body;
+
+Return the HTTP message body.
 
 =head2 C<build_headers>
 
     my $string = $message->build_headers;
 
+Returns the HTTP message headers, including the two terminating newlines.
+
 =head2 C<build_start_line>
 
     my $string = $message->build_start_line;
 
+Return the HTTP start line, like "HTTP/1.1 200 OK\r\n\r\n"
+
 =head2 C<cookie>
 
     my $cookie = $message->cookie('foo');
+
+Returns a single L<Mojo::Cookie> object if there is one matching cookie.
+Returns an arrayref of L<Mojo::Cookie> objects for multiple matching cookies.
 
 =head2 C<fix_headers>
 

@@ -47,15 +47,14 @@ is($tx2->continued, 1);
 $tx = Mojo::Transaction->new_get('http://labs.kraih.com');
 ok(!$tx->kept_alive);
 
-# first time, new connection
+# First time, new connection
 $client->process_all($tx);
 ok($tx->is_done);
 ok(!$tx->kept_alive);
 
-# second time, reuse connection
+# Second time, reuse connection
 $tx = Mojo::Transaction->new_get('http://labs.kraih.com');
 ok(!$tx->kept_alive);
-
 $client->process_all($tx);
 ok($tx->is_done);
 ok($tx->kept_alive);

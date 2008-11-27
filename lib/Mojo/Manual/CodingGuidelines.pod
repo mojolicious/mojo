@@ -65,8 +65,7 @@ Comments should be funny if possible.
 
 No names outside of the CREDITS section of Mojo.pm.
 
-Code should run through C<perltidy> with the included .perltidyrc before
-being checked-in.
+Code should be run through L<Perl::Tidy> with the included .perltidyrc.
 
 No Elitism.
 

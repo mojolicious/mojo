@@ -250,7 +250,14 @@ sub get_start_line_chunk {
     return substr($copy, $offset, 4096);
 }
 
-sub header_length { shift->content->header_length }
+sub header_length {
+    my $self = shift;
+
+    # Fix headers
+    $self->fix_headers;
+
+    return $self->content->header_length;
+}
 
 sub headers { shift->content->headers(@_) }
 

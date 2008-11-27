@@ -326,9 +326,9 @@ L<Mojo::URL> implements a subset of RFC 3986 for Uniform Resource Locators.
     my $userinfo = $url->userinfo;
     $url         = $url->userinfo('root:pass%3Bw0rd');
 
-Returns the username/password portion of a URL.
-Returns the invocant when passed the username/password as a
-colon-separated pair.
+Returns the userinfo part of the URL if called without arguments.
+Returns the invocant if called with arguments.
+Expects a string containing user credentials.
 
 =head1 METHODS
 

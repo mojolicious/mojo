@@ -232,7 +232,7 @@ sub get_header_chunk {
     my $self = shift;
 
     # Progress
-    $self->builder_progress_cb->($self, 'header', @_)
+    $self->builder_progress_cb->($self, 'headers', @_)
       if $self->builder_progress_cb;
 
     # HTTP 0.9 has no headers

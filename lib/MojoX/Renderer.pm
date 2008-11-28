@@ -62,7 +62,7 @@ sub render {
 
     # Fallback
     unless ($handler) {
-        carp qq/No handler for "$ext" configured/;
+        carp qq/No handler for "$format" configured/;
         $handler = $self->handler->{$default};
         croak 'Need a valid handler for rendering' unless $handler;
     }

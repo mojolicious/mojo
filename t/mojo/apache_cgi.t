@@ -23,7 +23,7 @@ plan tests => 7;
 # And then, only in the mouth.
 use_ok('Mojo::Server::CGI');
 
-# Lighttpd setup
+# Apache setup
 my $server = Test::Mojo::Server->new;
 my $port   = $server->generate_port_ok;
 my $dir    = File::Temp::tempdir();

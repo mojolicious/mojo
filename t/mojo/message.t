@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 231;
+use Test::More tests => 229;
 
 use Mojo::Filter::Chunked;
 use Mojo::Headers;
@@ -281,7 +281,7 @@ my $counter  = 1;
 my $chunked  = Mojo::Filter::Chunked->new;
 my $counter2 = 0;
 $req->builder_progress_cb(sub { $counter2++ });
-$req->build_body_cb(
+$req->body_cb(
     sub {
         my $self  = shift;
         my $chunk = '';
@@ -310,7 +310,7 @@ $req->headers->transfer_encoding('chunked');
 $req->headers->trailer('X-Test; X-Test2');
 $counter = 1;
 $chunked = Mojo::Filter::Chunked->new;
-$req->build_body_cb(
+$req->body_cb(
     sub {
         my $self  = shift;
         my $chunk = Mojo::Headers->new;
@@ -666,48 +666,6 @@ is($cookies->[1]->name,    'bar');
 is($cookies->[1]->value,   'baz');
 is($cookies->[1]->version, 1);
 is($cookies->[1]->path,    '/test/23');
-
-# Build HTTP 1.1 request with start line callback
-$req = Mojo::Message::Request->new;
-$req->url->parse('http://127.0.0.1/test');
-$counter = 1;
-$req->build_start_line_cb(
-    sub {
-        my $startline = '';
-        $startline = "GET /foo/bar HTTP/1.1\x0d\x0a" if $counter == 1;
-        $counter++;
-        return $startline;
-    }
-);
-$req->headers->expect('100-continue');
-$req->body("Hello World!\n");
-is($req->build,
-        "GET /foo/bar HTTP/1.1\x0d\x0a"
-      . "Expect: 100-continue\x0d\x0a"
-      . "Host: 127.0.0.1\x0d\x0a"
-      . "Content-Length: 13\x0d\x0a\x0d\x0a"
-      . "Hello World!\n");
-
-# Build HTTP 1.1 request with start line callback
-$req = Mojo::Message::Request->new;
-$req->method('GET');
-$req->url->parse('http://127.0.0.1/test');
-$counter = 1;
-$req->build_headers_cb(
-    sub {
-        my $h       = '';
-        my $headers = Mojo::Headers->new;
-        $headers->expect('100-continue');
-        $h = "$headers\x0d\x0a\x0d\x0a" if $counter == 1;
-        $counter++;
-        return $h;
-    }
-);
-$req->body("Hello World!\n");
-is($req->build,
-        "GET /test HTTP/1.1\x0d\x0a"
-      . "Expect: 100-continue\x0d\x0a\x0d\x0a"
-      . "Hello World!\n");
 
 # WebKit multipart/form-data request
 $req = Mojo::Message::Request->new;

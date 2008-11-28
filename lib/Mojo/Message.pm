@@ -24,8 +24,7 @@ __PACKAGE__->attr(
         default => sub { Mojo::Buffer->new }
     )
 );
-__PACKAGE__->attr(
-    [qw/build_start_line_cb parser_progress_cb/] => (chained => 1));
+__PACKAGE__->attr([qw/parser_progress_cb/] => (chained => 1));
 __PACKAGE__->attr(
     content => (
         chained => 1,
@@ -73,6 +72,8 @@ sub body {
     $self->content($content);
     return $self->content;
 }
+
+sub body_cb { shift->content->body_cb(@_) }
 
 sub body_length { shift->content->body_length }
 
@@ -137,8 +138,6 @@ sub build {
 # On top of a pile of money, with many beautiful women.
 sub build_body { shift->content->build_body(@_) }
 
-sub build_body_cb { shift->content->build_body_cb(@_) }
-
 sub build_headers {
     my $self = shift;
 
@@ -150,8 +149,6 @@ sub build_headers {
 
     return $self->content->build_headers;
 }
-
-sub build_headers_cb { shift->content->build_headers_cb(@_) }
 
 sub build_start_line {
     my $self = shift;
@@ -229,7 +226,8 @@ sub get_header_chunk {
     my $self = shift;
 
     # Progress
-    $self->builder_progress_cb->($self) if $self->builder_progress_cb;
+    $self->builder_progress_cb->($self, 'header', @_)
+      if $self->builder_progress_cb;
 
     # HTTP 0.9 has no headers
     return '' if $self->version eq '0.9';
@@ -244,11 +242,8 @@ sub get_start_line_chunk {
     my ($self, $offset) = @_;
 
     # Progress
-    $self->builder_progress_cb->($self) if $self->builder_progress_cb;
-
-    # Start line generator
-    return $self->build_start_line_cb->($self, $offset)
-      if $self->build_start_line_cb;
+    $self->builder_progress_cb->($self, 'start_line', $offset)
+      if $self->builder_progress_cb;
 
     my $copy = $self->_build_start_line;
     return substr($copy, $offset, 4096);
@@ -441,21 +436,12 @@ L<Mojo::Message> is a base class for HTTP messages.
 L<Mojo::Message> inherits all attributes from L<Mojo::Stateful> and
 implements the following new ones.
 
-=head2 C<body_length>
+=head2 C<body_cb>
 
-    my $body_length = $message->body_length;
-
-=head2 C<buffer>
-
-    my $buffer = $message->buffer;
-    $message   = $message->buffer(Mojo::Buffer->new);
-
-=head2 C<build_body_cb>
-
-    my $cb = $message->build_body_cb;
+    my $cb = $message->body_cb;
 
     $counter = 1;
-    $message = $message->build_body_cb(sub {
+    $message = $message->body_cb(sub {
         my $self  = shift;
         my $chunk = '';
         $chunk    = "hello world!" if $counter == 1;
@@ -464,23 +450,14 @@ implements the following new ones.
         return $chunk;
     });
 
-=head2 C<build_headers_cb>
+=head2 C<body_length>
 
-    my $cb = $message->build_headers_cb;
+    my $body_length = $message->body_length;
 
-    $message = $message->build_headers_cb(sub {
-        my $h = Mojo::Headers->new;
-        $h->content_type('text/plain');
-        return $h->to_string;
-    });
+=head2 C<buffer>
 
-=head2 C<build_start_line_cb>
-
-    my $cb = $message->build_start_line_cb;
-
-    $message = $content->build_start_line_cb(sub {
-        return "HTTP/1.1 200 OK\r\n\r\n";
-    });
+    my $buffer = $message->buffer;
+    $message   = $message->buffer(Mojo::Buffer->new);
 
 =head2 C<builder_progress_cb>
 

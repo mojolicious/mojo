@@ -23,9 +23,7 @@ __PACKAGE__->attr(
         default => sub { Mojo::Buffer->new }
     )
 );
-__PACKAGE__->attr(
-    [qw/build_body_cb build_headers_cb filter builder_progress_cb/] =>
-      (chained => 1));
+__PACKAGE__->attr([qw/body_cb filter builder_progress_cb/] => (chained => 1));
 __PACKAGE__->attr(
     file => (
         chained => 1,
@@ -95,10 +93,11 @@ sub get_body_chunk {
     my ($self, $offset) = @_;
 
     # Progress
-    $self->builder_progress_cb->($self) if $self->builder_progress_cb;
+    $self->builder_progress_cb->($self, 'body', $offset)
+      if $self->builder_progress_cb;
 
     # Body generator
-    return $self->build_body_cb->($self, $offset) if $self->build_body_cb;
+    return $self->body_cb->($self, $offset) if $self->body_cb;
 
     # Normal content
     return $self->file->get_chunk($offset);
@@ -106,10 +105,6 @@ sub get_body_chunk {
 
 sub get_header_chunk {
     my ($self, $offset) = @_;
-
-    # Header generator
-    return $self->build_headers_cb->($self, $offset)
-      if $self->build_headers_cb;
 
     # Normal headers
     my $copy = $self->_build_headers;
@@ -253,21 +248,12 @@ L<Mojo::Content> is a container for HTTP content.
 L<Mojo::Content> inherits all attributes from L<Mojo::Stateful> and
 implements the following new ones.
 
-=head2 C<body_length>
+=head2 C<body_cb>
 
-    my $body_length = $content->body_length;
-
-=head2 C<buffer>
-
-    my $buffer = $content->buffer;
-    $content   = $content->buffer(Mojo::Buffer->new);
-
-=head2 C<build_body_cb>
-
-    my $cb = $content->build_body_cb;
+    my $cb = $content->body_cb;
 
     $counter = 1;
-    $content = $content->build_body_cb(sub {
+    $content = $content->body_cb(sub {
         my $self  = shift;
         my $chunk = '';
         $chunk    = "hello world!" if $counter == 1;
@@ -276,15 +262,14 @@ implements the following new ones.
         return $chunk;
     });
 
-=head2 C<build_headers_cb>
+=head2 C<body_length>
 
-    my $cb = $content->build_headers_cb;
+    my $body_length = $content->body_length;
 
-    $content = $content->build_headers_cb(sub {
-        my $h = Mojo::Headers->new;
-        $h->content_type('text/plain');
-        return $h->to_string;
-    });
+=head2 C<buffer>
+
+    my $buffer = $content->buffer;
+    $content   = $content->buffer(Mojo::Buffer->new);
 
 =head2 C<builder_progress_cb>
 

@@ -11,6 +11,7 @@ This file documents the revision history for Perl extension Mojo.
         - MojoX::Dispatcher::Routes should be able to fail.
         - Added diagnostics functions to Mojo::HelloWorld.
         - Made the env parser Apache compatible.
+        - Made Mojo::Server::FastCGI Apache compatible.
         - Made url_for work for rebased applications.
         - Added ctx, render, req, res and stash methods to Mojolicious
           controllers.

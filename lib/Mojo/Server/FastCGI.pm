@@ -280,8 +280,9 @@ sub write_response {
     }
 
     # The end
-    $self->write_records($connection, 'STDOUT',      $tx->{fcgi_id}, undef);
-    $self->write_records($connection, 'END_REQUEST', $tx->{fcgi_id}, undef);
+    $self->write_records($connection, 'STDOUT', $tx->{fcgi_id}, undef);
+    $self->write_records($connection, 'END_REQUEST', $tx->{fcgi_id},
+        pack('CCCCCCCC', 0));
 }
 
 sub _nv_length {

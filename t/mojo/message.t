@@ -281,7 +281,7 @@ my $counter  = 1;
 my $chunked  = Mojo::Filter::Chunked->new;
 my $counter2 = 0;
 $req->builder_progress_cb(sub { $counter2++ });
-$req->body_cb(
+$req->body(
     sub {
         my $self  = shift;
         my $chunk = '';

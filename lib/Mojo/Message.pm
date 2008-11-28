@@ -61,8 +61,14 @@ sub body {
     # Plain old content
     unless ($self->is_multipart) {
 
+        # Callback
+        if ($content && ref $content eq 'CODE') {
+            $self->body_cb($content);
+            return $content;
+        }
+
         # Get/Set content
-        if ($content) {
+        elsif ($content) {
             $self->content->file(Mojo::File::Memory->new);
             $self->content->file->add_chunk($content);
         }
@@ -526,7 +532,17 @@ the following new ones.
 =head2 C<body>
 
     my $string = $message->body;
-    $message = $message->body('Hello!');
+    $message   = $message->body('Hello!');
+
+    $counter = 1;
+    $message = $message->body(sub {
+        my $self  = shift;
+        my $chunk = '';
+        $chunk    = "hello world!" if $counter == 1;
+        $chunk    = "hello world2!\n\n" if $counter == 2;
+        $counter++;
+        return $chunk;
+    });
 
 =head2 C<body_params>
 

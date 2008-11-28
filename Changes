@@ -17,6 +17,7 @@ This file documents the revision history for Perl extension Mojo.
           controllers.
         - Changed cookie, param and upload in Mojo::Parameters to return a
           list.
+        - Added support for templateless renderers to MojoX::Renderer.
         - Added blacklist to MojoX::Dispatcher::Routes.
         - Fixed Mojo::Date bugs. (vti)
         - Fixed / routes matching too much.

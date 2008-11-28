@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 22;
+use Test::More tests => 24;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -50,6 +50,13 @@ $client->process_local('MojoliciousTest', $tx);
 is($tx->res->code,                  200);
 is($tx->res->headers->content_type, 'text/html');
 like($tx->res->body, qr/Hello Mojo from the other template \/foo\/foo-bar!/);
+
+# Foo::templateless
+$tx =
+  Mojo::Transaction->new_get('/foo/templateless', 'X-Test' => 'Hi there!');
+$client->process_local('MojoliciousTest', $tx);
+is($tx->res->code, 200);
+like($tx->res->body, qr/Hello Mojo from a templateless renderer!/);
 
 # Static file /hello.txt in a production mode
 my $backup = $ENV{MOJO_MODE} || '';

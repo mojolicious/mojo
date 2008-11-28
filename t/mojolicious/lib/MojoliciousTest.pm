@@ -28,6 +28,14 @@ sub startup {
     # Template root
     $self->renderer->root($self->home->rel_dir('t/mojolicious/templates'));
 
+    # Templateless renderer
+    $self->renderer->add_handler(
+        test => sub {
+            my ($self, $c, $output) = @_;
+            $$output = 'Hello Mojo from a templateless renderer!';
+        }
+    );
+
     # Routes
     my $r = $self->routes;
 

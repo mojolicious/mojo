@@ -15,6 +15,11 @@ sub index {
     $self->render;
 }
 
+sub templateless {
+    my $self = shift;
+    $self->render(format => 'test');
+}
+
 sub test {
     my ($self, $c) = @_;
     $c->res->code(200);

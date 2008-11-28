@@ -11,7 +11,7 @@ use Carp qw/carp croak/;
 use File::Spec;
 use MojoX::Types;
 
-__PACKAGE__->attr(default_ext => (chained => 1));
+__PACKAGE__->attr(default_handler => (chained => 1));
 __PACKAGE__->attr(handler => (chained => 1, default => sub { {} }));
 __PACKAGE__->attr(
     types => (
@@ -37,27 +37,32 @@ sub add_handler {
 sub render {
     my ($self, $c) = @_;
 
+    my $format   = $c->stash->{format};
     my $template = $c->stash->{template};
 
-    return undef unless $template;
+    return undef unless $format || $template;
 
-    # Extension
-    my $default = $self->default_ext;
-    $template .= ".$default" if $default && $template !~ /\.\w+$/;
-    $template =~ /\.(\w+)$/;
-    my $ext = $1;
+    # Template extension
+    my $default = $self->default_handler;
+    my $ext;
+    if ($template) {
+        $template .= ".$default" if $default && $template !~ /\.\w+$/;
+        $template =~ /\.(\w+)$/;
+        $ext = $1;
 
-    # Path
-    my $path = File::Spec->catfile($self->root, $template);
-    $c->stash->{template_path} ||= $path;
+        # Path
+        my $path = File::Spec->catfile($self->root, $template);
+        $c->stash->{template_path} ||= $path;
 
-    return undef unless $ext;
+        return undef unless $ext || $format;
+    }
 
-    my $handler = $self->handler->{$ext};
+    $format ||= $ext;
+    my $handler = $self->handler->{$format};
 
     # Fallback
     unless ($handler) {
-        carp qq/No handler for "$ext" files configured/;
+        carp qq/No handler for "$ext" configured/;
         $handler = $self->handler->{$default};
         croak 'Need a valid handler for rendering' unless $handler;
     }
@@ -100,10 +105,10 @@ L<MojoX::Renderer> is a MIME type based renderer.
 
 =head2 ATTRIBUTES
 
-=head2 C<default_ext>
+=head2 C<default_handler>
 
-    my $ext   = $renderer->default_ext;
-    $renderer = $renderer->default_ext('phtml');
+    my $ext   = $renderer->default_handler;
+    $renderer = $renderer->default_handler('phtml');
 
 =head2 C<handler>
 

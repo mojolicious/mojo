@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 229;
+use Test::More tests => 231;
 
 use Mojo::Filter::Chunked;
 use Mojo::Headers;
@@ -576,10 +576,12 @@ is($res->headers->content_type,   'text/plain');
 is($res->headers->content_length, 27);
 is($res->headers->set_cookie,     'foo=bar; Version=1; Path=/test');
 my $cookies = $res->cookies;
-is($cookies->[0]->name,    'foo');
-is($cookies->[0]->value,   'bar');
-is($cookies->[0]->version, 1);
-is($cookies->[0]->path,    '/test');
+is($cookies->[0]->name,        'foo');
+is($cookies->[0]->value,       'bar');
+is($cookies->[0]->version,     1);
+is($cookies->[0]->path,        '/test');
+is($res->cookie('foo')->value, 'bar');
+is($res->cookie('foo')->path,  '/test');
 
 # Build HTTP 1.1 response with 2 cookies
 $res = Mojo::Message::Response->new;

@@ -204,7 +204,11 @@ sub cookie {
         $self->{_cookies} = $cookies;
     }
 
-    return $self->{_cookies}->{$name};
+    my @cookies =
+      ref $self->{_cookies}->{$name} eq 'ARRAY'
+      ? @{$self->{_cookies}->{$name}}
+      : ($self->{_cookies}->{$name});
+    return wantarray ? @cookies : $cookies[0];
 }
 
 sub fix_headers {
@@ -326,7 +330,11 @@ sub upload {
         $self->{_uploads} = $uploads;
     }
 
-    return $self->{_uploads}->{$name};
+    my @uploads =
+      ref $self->{_uploads}->{$name} eq 'ARRAY'
+      ? @{$self->{_uploads}->{$name}}
+      : ($self->{_uploads}->{$name});
+    return wantarray ? @uploads : $uploads[0];
 }
 
 sub uploads {
@@ -555,33 +563,30 @@ Returns a L<Mojo::Parameters> object, containing POST parameters.
 
     my $string = $message->build;
 
-Both C<< to_string >> and C<< build >> return the complete HTTP message,
-including the start line, headers and body.
+Returns the complete HTTP message.
 
 =head2 C<build_body>
 
     my $string = $message->build_body;
 
-Return the HTTP message body.
+Returns the HTTP message body.
 
 =head2 C<build_headers>
 
     my $string = $message->build_headers;
 
-Returns the HTTP message headers, including the two terminating newlines.
+Returns the HTTP message headers.
 
 =head2 C<build_start_line>
 
     my $string = $message->build_start_line;
 
-Return the HTTP start line, like "HTTP/1.1 200 OK\r\n\r\n"
+Returns the HTTP start line.
 
 =head2 C<cookie>
 
-    my $cookie = $message->cookie('foo');
-
-Returns a single L<Mojo::Cookie> object if there is one matching cookie.
-Returns an arrayref of L<Mojo::Cookie> objects for multiple matching cookies.
+    my $cookie  = $message->cookie('foo');
+    my @cookies = $message->cookie('foo');
 
 =head2 C<fix_headers>
 
@@ -619,7 +624,8 @@ passed in.
 
 =head2 C<param>
 
-    my $param = $message->param('foo');
+    my $param  = $message->param('foo');
+    my @params = $message->param('foo');
 
 =head2 C<parse>
 
@@ -627,7 +633,8 @@ passed in.
 
 =head2 C<upload>
 
-    my $upload = $message->upload('foo');
+    my $upload  = $message->upload('foo');
+    my @uploads = $message->upload('foo');
 
 Returns a L<Mojo::Upload> object or a arrayref of L<Mojo::Upload> objects.
 

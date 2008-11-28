@@ -79,7 +79,7 @@ sub render {
     $res->code(200) unless $c->res->code;
     $res->body($output);
 
-    my $type = $self->types->type($ext) || 'text/plain';
+    my $type = $self->types->type($format) || 'text/plain';
     $res->headers->content_type($type);
 
     # Success!

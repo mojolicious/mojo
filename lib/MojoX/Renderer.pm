@@ -7,7 +7,6 @@ use warnings;
 
 use base 'Mojo::Base';
 
-use Carp qw/carp croak/;
 use File::Spec;
 use MojoX::Types;
 
@@ -62,9 +61,10 @@ sub render {
 
     # Fallback
     unless ($handler) {
-        carp qq/No handler for "$format" configured/;
+        $c->app->log->debug(qq/No handler for "$format" configured/);
         $handler = $self->handler->{$default};
-        croak 'Need a valid handler for rendering' unless $handler;
+        $c->app->log->debug('Need a valid handler for rendering')
+          unless $handler;
     }
 
     # Render

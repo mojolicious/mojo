@@ -63,7 +63,7 @@ sub dispatch {
         my $class = join '::', $self->namespace, @class;
 
         # Debug
-        warn "-> $controller($class) :: $action\n" if DEBUG;
+        $c->app->log->debug("-> $controller($class) :: $action\n") if DEBUG;
 
         # Shortcut for invalid class and action
         next
@@ -82,7 +82,8 @@ sub dispatch {
 
         # Load error
         if ($@) {
-            warn qq/Couldn't load controller class "$class":\n$@/;
+            $c->app->log->debug(
+                qq/Couldn't load controller class "$class":\n$@/);
             return 0;
         }
 
@@ -96,7 +97,8 @@ sub dispatch {
 
         # Controller error
         if ($@) {
-            warn qq/Controller error in "${class}::$action":\n$@/;
+            $c->app->log->debug(
+                qq/Controller error in "${class}::$action":\n$@/);
             return 0;
         }
 

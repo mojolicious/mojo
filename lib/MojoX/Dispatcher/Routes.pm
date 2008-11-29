@@ -90,7 +90,7 @@ sub dispatch {
         my $done;
         eval {
             die qq/"$class" is not a controller/
-              unless $class->isa('Mojolicious::Controller');
+              unless $class->isa('MojoX::Dispatcher::Routes::Controller');
             $done = $class->new(ctx => $c)->$action($c);
         };
 

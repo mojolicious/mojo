@@ -84,6 +84,7 @@ Returns the invocant if called with a hashref or multiple arguments.
 
     $c->stash->{foo} = 'bar';
     my $foo = $c->stash->{foo};
+    delete $c->stash->{foo};
 
 =head2 C<tx>
 

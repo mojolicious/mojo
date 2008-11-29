@@ -88,7 +88,11 @@ sub dispatch {
 
         # Dispatch
         my $done;
-        eval { $done = $class->new(ctx => $c)->$action($c) };
+        eval {
+            die qq/"$class" is not a controller/
+              unless $class->isa('Mojolicious::Controller');
+            $done = $class->new(ctx => $c)->$action($c);
+        };
 
         # Controller error
         if ($@) {

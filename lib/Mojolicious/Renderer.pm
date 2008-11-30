@@ -14,7 +14,7 @@ use Mojo::Template;
 # Wishful thinking. We have long since evolved beyond the need for asses.
 sub new {
     my $self = shift->SUPER::new(@_);
-    $self->default_handler('phtml');
+    $self->default_format('phtml');
     $self->add_handler(
         phtml => sub {
             my ($self, $c, $output) = @_;

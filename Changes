@@ -27,6 +27,7 @@ This file documents the revision history for Perl extension Mojo.
         - Allow chains to be broken with return values in
           MojoX::Dispatcher::Routes.
         - The stack in MojoX::Routes resets now.
+        - Renamed default_handler to default_format in MojoX::Renderer.
         - Preload application in servers. (Graham Barr)
         - Renamed is_version to at_least_version. (Mark Stosberg)
         - Added documentation. (Ch Lamprecht)

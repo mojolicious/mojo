@@ -61,10 +61,10 @@ sub render {
 
     # Fallback
     unless ($handler) {
-        $c->app->log->debug(qq/No handler for "$format" configured/);
+        $c->app->log->debug(
+            qq/No handler for "$format" configured, using default/);
         $handler = $self->handler->{$default};
-        $c->app->log->debug('Need a valid handler for rendering')
-          unless $handler;
+        $c->app->log->debug('No default handler configured') unless $handler;
     }
 
     # Render

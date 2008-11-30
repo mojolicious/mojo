@@ -63,7 +63,9 @@ sub dispatch {
         my $class = join '::', $self->namespace, @class;
 
         # Debug
-        $c->app->log->debug("-> $controller($class) :: $action\n") if DEBUG;
+        $c->app->log->debug(
+            qq/Dispatching "$controller($class)" -> "$action"/)
+          if DEBUG;
 
         # Shortcut for invalid class and action
         next
@@ -90,7 +92,7 @@ sub dispatch {
         # Dispatch
         my $done;
         eval {
-            die qq/"$class" is not a controller/
+            die "$class is not a controller"
               unless $class->isa('MojoX::Dispatcher::Routes::Controller');
             $done = $class->new(ctx => $c)->$action($c);
         };

@@ -62,7 +62,7 @@ sub dispatch {
 
         # Debug
         $c->app->log->debug(
-            qq/Dispatching "$controller($class)" -> "$action"/);
+            qq/Dispatching action "$action" in "$controller($class)"/);
 
         # Shortcut for invalid class and action
         next

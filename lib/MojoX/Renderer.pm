@@ -69,6 +69,9 @@ sub render {
         $c->app->log->debug('No default handler configured') unless $handler;
     }
 
+    # Debug
+    $c->app->log->debug(qq/Rendering with handler "$format"/);
+
     # Render
     my $output;
     return undef unless $handler->($self, $c, \$output);

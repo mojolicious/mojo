@@ -7,12 +7,11 @@ use warnings;
 
 use Test::More;
 
-if( $INC{'Devel/Cover.pm'} ) {
+# Devel::Cover support
+if ($INC{'Devel/Cover.pm'}) {
     plan skip_all => "Loader tests don't play nice with Devel::Cover";
 }
-else {
-    plan tests => 12;
-}
+else { plan tests => 12 }
 
 use FindBin;
 use lib "$FindBin::Bin/lib";

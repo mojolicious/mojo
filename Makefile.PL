@@ -46,13 +46,12 @@ WriteMakefile(
     test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t'}
 );
 
-
+# Devel::Cover support
 sub MY::postamble {
-  qq[
+    qq/
 testcover :
 \t cover -delete && \\
    HARNESS_PERL_SWITCHES=-MDevel::Cover \$(MAKE) test && \\
    cover
-]
-
+/
 }

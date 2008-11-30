@@ -25,6 +25,9 @@ sub production_mode {
 sub startup {
     my $self = shift;
 
+    # Only log errors
+    $self->log->level('error');
+
     # Template root
     $self->renderer->root($self->home->rel_dir('t/mojolicious/templates'));
 

@@ -10,8 +10,6 @@ use base 'MojoX::Routes';
 use Mojo::ByteStream;
 use Mojo::Loader;
 
-use constant DEBUG => $ENV{MOJOX_ROUTES_DEBUG} || 0;
-
 __PACKAGE__->attr(
     disallow => (
         chained => 1,
@@ -64,8 +62,7 @@ sub dispatch {
 
         # Debug
         $c->app->log->debug(
-            qq/Dispatching "$controller($class)" -> "$action"/)
-          if DEBUG;
+            qq/Dispatching "$controller($class)" -> "$action"/);
 
         # Shortcut for invalid class and action
         next

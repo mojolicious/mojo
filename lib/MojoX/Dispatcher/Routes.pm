@@ -46,6 +46,7 @@ sub dispatch {
 
         # Shortcut for disallowed actions
         next if $self->{_disallow}->{$action};
+        next if index($action, '_') == 0;
 
         my @class;
         for my $part (split /-/, $controller) {

@@ -28,6 +28,7 @@ This file documents the revision history for Perl extension Mojo.
           MojoX::Dispatcher::Routes.
         - The stack in MojoX::Routes resets now.
         - Renamed default_handler to default_format in MojoX::Renderer.
+        - Disallow actions beginning with _ in MojoX::Dispatcher::Routes.
         - Preload application in servers. (Graham Barr)
         - Renamed is_version to at_least_version. (Mark Stosberg)
         - Added documentation. (Ch Lamprecht)

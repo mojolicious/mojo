@@ -65,18 +65,16 @@ sub render {
 
     my $handler = $self->handler->{$format};
 
+    # Debug
     if ($handler) {
-        # Debug
         $c->app->log->debug(qq/Rendering with handler "$format"/);
     }
-    # No format found? give up.
+
+    # No format found
     else {
-        $c->app->log->debug(
-            qq/No handler for "$format" configured/);
+        $c->app->log->debug(qq/No handler for "$format" configured/);
         return undef;
-
     }
-
 
     # Render
     my $output;

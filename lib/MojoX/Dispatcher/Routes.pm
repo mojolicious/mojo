@@ -20,9 +20,9 @@ __PACKAGE__->attr(namespace => (chained => 1));
 
 # Hey. What kind of party is this? There's no booze and only one hooker.
 sub dispatch {
-    my ($self, $c) = @_;
+    my ($self, $c, $match) = @_;
 
-    my $match = $self->match($c->tx);
+    $match ||= $self->match($c->tx);
     $c->match($match);
 
     # Shortcut
@@ -164,6 +164,10 @@ implements the follwing the ones.
 
     my $success = $dispatcher->dispatch(
         MojoX::Dispatcher::Routes::Context->new
+    );
+    my $success = $dispatcher->dispatch(
+        MojoX::Dispatcher::Routes::Context->new,
+        MojoX::Routes::Match->new
     );
 
 =cut

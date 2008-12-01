@@ -57,15 +57,17 @@ Documentation belongs to the manual, module POD is just an API reference.
 Lines should not be longer than 78 characters and we indent with 4
 whitespaces.
 
+Code should be run through L<Perl::Tidy> with the included C<.perltidyrc>.
+
 No spaghetti code.
 
 Code should be organized in blocks and those blocks should be commented.
 
 Comments should be funny if possible.
 
-No names outside of the CREDITS section of Mojo.pm.
+Every file should contain at least one quote from The Simpsons or Futurama.
 
-Code should be run through L<Perl::Tidy> with the included .perltidyrc.
+No names outside of the CREDITS section of Mojo.pm.
 
 No Elitism.
 

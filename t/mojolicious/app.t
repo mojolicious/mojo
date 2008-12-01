@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 24;
+use Test::More tests => 27;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -57,6 +57,13 @@ $tx =
 $client->process_local('MojoliciousTest', $tx);
 is($tx->res->code, 200);
 like($tx->res->body, qr/Hello Mojo from a templateless renderer!/);
+
+# MojoliciousTest2::Foo::test
+$tx = Mojo::Transaction->new_get('/test2', 'X-Test' => 'Hi there!');
+$client->process_local('MojoliciousTest', $tx);
+is($tx->res->code,                        200);
+is($tx->res->headers->header('X-Bender'), 'Kiss my shiny metal ass!');
+like($tx->res->body, qr/\/test2/);
 
 # Static file /hello.txt in a production mode
 my $backup = $ENV{MOJO_MODE} || '';

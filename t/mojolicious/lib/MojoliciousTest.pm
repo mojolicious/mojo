@@ -42,6 +42,13 @@ sub startup {
     # Routes
     my $r = $self->routes;
 
+    # /test2 - different namespace test
+    $r->route('/test2')->to(
+        namespace => 'MojoliciousTest2',
+        class     => 'Foo',
+        method    => 'test'
+    );
+
     # /*/* - the default route
     $r->route('/:controller/:action')->to(action => 'index');
 }

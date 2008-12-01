@@ -41,34 +41,42 @@ sub dispatch {
     my $stack = $match->stack;
     for my $field (@$stack) {
 
-        my $controller = $field->{controller};
-        my $action     = $field->{action};
+        # Method
+        my $method = $field->{method};
+        $method ||= $field->{action};
 
-        # Shortcut for disallowed actions
-        next if $self->{_disallow}->{$action};
-        next if index($action, '_') == 0;
+        # Shortcut for disallowed methods
+        next if $self->{_disallow}->{$method};
+        next if index($method, '_') == 0;
 
-        my @class;
-        for my $part (split /-/, $controller) {
+        # Class
+        my $class = $field->{class};
+        my $controller = $field->{controller} || '';
+        unless ($class) {
+            my @class;
+            for my $part (split /-/, $controller) {
 
-            # Junk
-            next unless $part;
+                # Junk
+                next unless $part;
 
-            # Camelize
-            push @class, Mojo::ByteStream->new($part)->camelize;
+                # Camelize
+                push @class, Mojo::ByteStream->new($part)->camelize;
+            }
+            $class = join '::', @class;
         }
 
         # Format
-        my $class = join '::', $self->namespace, @class;
+        my $namespace = $field->{namespace} || $self->namespace;
+        $class = "${namespace}::$class";
 
         # Debug
         $c->app->log->debug(
-            qq/Dispatching action "$action" in "$controller($class)"/);
+            qq/Dispatching "$method" in "$controller($class)"/);
 
-        # Shortcut for invalid class and action
+        # Shortcut for invalid class and method
         next
           unless $class =~ /^[a-zA-Z0-9_:]+$/
-              && $action =~ /^[a-zA-Z0-9_]+$/;
+              && $method =~ /^[a-zA-Z0-9_]+$/;
 
         # Captures
         $c->match->captures($field);
@@ -92,13 +100,13 @@ sub dispatch {
         eval {
             die "$class is not a controller"
               unless $class->isa('MojoX::Dispatcher::Routes::Controller');
-            $done = $class->new(ctx => $c)->$action($c);
+            $done = $class->new(ctx => $c)->$method($c);
         };
 
         # Controller error
         if ($@) {
             $c->app->log->debug(
-                qq/Controller error in "${class}::$action":\n$@/);
+                qq/Controller error in "${class}::$method":\n$@/);
             return 0;
         }
 

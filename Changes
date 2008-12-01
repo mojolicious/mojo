@@ -36,6 +36,7 @@ This file documents the revision history for Perl extension Mojo.
         - Added documentation. (Ch Lamprecht)
         - Added param tests. (Mark Stosberg)
         - Added documentation for Mojo::Log. (Mark Stosberg)
+        - Add test for MojoX::Renderer (Mark Stosberg) 
         - When testing, allow servers a few seconds to stop. (Leon Brocard)
         - Fixed typos.
 

@@ -65,17 +65,18 @@ sub render {
 
     my $handler = $self->handler->{$format};
 
-    # Fallback
-    unless ($handler) {
+    if ($handler) {
+        # Debug
+        $c->app->log->debug(qq/Rendering with handler "$format"/);
+    }
+    # No format found? give up.
+    else {
         $c->app->log->debug(
-            qq/No handler for "$format" configured, using default/);
-        $handler = $self->handler->{$default};
-        $c->app->log->debug('No default handler configured') unless $handler;
+            qq/No handler for "$format" configured/);
         return undef;
+
     }
 
-    # Debug
-    $c->app->log->debug(qq/Rendering with handler "$format"/);
 
     # Render
     my $output;

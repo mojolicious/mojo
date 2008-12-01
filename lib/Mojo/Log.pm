@@ -19,7 +19,7 @@ __PACKAGE__->attr(
             return \*STDERR unless $self->path;
 
             # Open
-            my $file = IO::File->new;
+l           my $file = IO::File->new;
             my $path = $self->path;
             $file->open(">> $path")
               || die qq/Couldn't open log file "$path": $!/;

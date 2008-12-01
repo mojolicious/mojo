@@ -216,12 +216,12 @@ sub _parse_start_line {
     my $line = $self->buffer->get_line;
     if (defined $line) {
         if ($line =~ /
-            ^\s*                                           # Start
-            ([a-zA-Z]+)                                    # Method
-            \s+                                            # Whitespace
-            ([0-9a-zA-Z\$\-_\.\!\?\#\=\*\(\)\,\%\/\&\~]+)  # Path
-            (?:\s+HTTP\/(\d+)\.(\d+))?                     # Version (optional)
-            $                                              # End
+            ^\s*                                                          # Start
+            ([a-zA-Z]+)                                                   # Method
+            \s+                                                           # Whitespace
+            ([0-9a-zA-Z\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\%]+)  # Path
+            (?:\s+HTTP\/(\d+)\.(\d+))?                                    # Version (optional)
+            $                                                             # End
         /x
           )
         {

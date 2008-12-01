@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 229;
+use Test::More tests => 234;
 
 use Mojo::Filter::Chunked;
 use Mojo::Headers;
@@ -694,6 +694,15 @@ is($req->method,        'GET');
 is($req->major_version, 1);
 is($req->minor_version, 1);
 is($req->url,           '/~foobar/');
+
+# Parse : in URL
+$req = Mojo::Message::Request->new;
+$req->parse("GET /perldoc?Mojo::Message::Request HTTP/1.1\x0d\x0a\x0d\x0a");
+is($req->state,         'done');
+is($req->method,        'GET');
+is($req->major_version, 1);
+is($req->minor_version, 1);
+is($req->url,           '/perldoc?Mojo::Message::Request');
 
 # Version management
 my $m = Mojo::Message->new;

@@ -42,7 +42,9 @@ sub _diag {
 
     # Dispatch
     my $path = $tx->req->url->path;
-    $self->_dump_env($tx) if $path =~ m|^/diag/dump_env|;
+    $self->_dump_env($tx)    if $path =~ m|^/diag/dump_env|;
+    $self->_dump_params($tx) if $path =~ m|^/diag/dump_params|;
+    $self->_dump_url($tx)    if $path =~ m|^/diag/dump_url|;
 
     # Defaults
     $tx->res->code(200) unless $tx->res->code;
@@ -57,6 +59,8 @@ sub _diag {
   <head><title>Mojo Diagnostics</title></head>
   <body>
     <a href="/diag/dump_env">Dump Environment Variables</a><br />
+    <a href="/diag/dump_params">Dump Request Parameters</a><br />
+    <a href="/diag/dump_url">Dump Request URL</a>
   </body>
 </html>
 EOF
@@ -68,6 +72,16 @@ EOF
 sub _dump_env {
     my ($self, $tx) = @_;
     $tx->res->body(Dumper \%ENV);
+}
+
+sub _dump_params {
+    my ($self, $tx) = @_;
+    $tx->res->body(Dumper $tx->req->params->to_hash);
+}
+
+sub _dump_url {
+    my ($self, $tx) = @_;
+    $tx->res->body(Dumper $tx->req->url);
 }
 
 1;

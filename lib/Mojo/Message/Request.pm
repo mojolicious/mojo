@@ -86,7 +86,12 @@ sub parse {
     $self->_parse_start_line if $self->is_state('start');
 
     # Pass through
-    return $self->SUPER::parse();
+    $self->SUPER::parse();
+
+    # Base URL
+    $self->url->base->scheme('http') unless $self->url->base->scheme;
+    $self->url->base->authority($self->headers->host)
+      if !$self->url->base->authority && $self->headers->host;
 }
 
 sub proxy {

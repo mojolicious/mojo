@@ -88,10 +88,16 @@ sub parse {
     # Pass through
     $self->SUPER::parse();
 
-    # Base URL
-    $self->url->base->scheme('http') unless $self->url->base->scheme;
-    $self->url->base->authority($self->headers->host)
-      if !$self->url->base->authority && $self->headers->host;
+    # Fix things we only know after parsing headers
+    unless ($self->is_state(qw/start headers/)) {
+
+        # Base URL
+        $self->url->base->scheme('http') unless $self->url->base->scheme;
+        $self->url->base->authority($self->headers->host)
+          if !$self->url->base->authority && $self->headers->host;
+    }
+
+    return $self;
 }
 
 sub proxy {

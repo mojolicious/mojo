@@ -136,8 +136,8 @@ sub serve_error {
         $c->app->log->debug(qq/Serving error file "$path"/);
 
         # File
-        $res->content(
-            Mojo::Content->new(file => Mojo::File->new(path => $path)));
+        $res->content(Mojo::Content->new(file => Mojo::File->new));
+        $res->content->file->path($path);
 
         # Extension
         $path =~ /\.(\w+)$/;

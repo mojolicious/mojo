@@ -92,7 +92,7 @@ sub cookies {
     }
 
     # No cookies
-    return undef;
+    return [];
 }
 
 sub default_message { return $MESSAGES{$_[1] || $_[0]->code || 200} }

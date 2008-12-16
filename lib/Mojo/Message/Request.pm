@@ -31,7 +31,7 @@ sub cookies {
     }
 
     # No cookies
-    return undef;
+    return [];
 }
 
 sub fix_headers {

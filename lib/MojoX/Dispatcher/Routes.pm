@@ -40,6 +40,7 @@ sub dispatch {
     # Walk the stack
     my $stack = $match->stack;
     for my $field (@$stack) {
+        local $@;
 
         # Method
         my $method = $field->{method};

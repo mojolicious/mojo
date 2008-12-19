@@ -27,4 +27,9 @@ sub test {
     $c->res->body($c->url_for(controller => 'bar'));
 }
 
+sub willdie {
+    my $self = shift;
+    die "for some reason";
+}
+
 1;

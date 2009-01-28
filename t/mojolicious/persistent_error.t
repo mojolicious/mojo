@@ -16,7 +16,7 @@ use_ok('MojoliciousTest');
 
 my $app = MojoliciousTest->new;
 
-# Check soundness first
+# Check soundness
 my $tx = Mojo::Transaction->new_get('/foo');
 $app->handler($tx);
 is($tx->res->code, 200);
@@ -28,7 +28,7 @@ $app->handler($tx);
 is($tx->res->code, 404);
 like($tx->res->body, qr/File Not Found/);
 
-# Shouldn't die
+# Previous error shouldn't be cached
 $tx = Mojo::Transaction->new_get('/foo');
 $app->handler($tx);
 is($tx->res->code, 200);

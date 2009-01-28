@@ -41,6 +41,7 @@ sub dispatch {
     my $stack = $match->stack;
     for my $field (@$stack) {
 
+        # Don't cache errors
         local $@;
 
         # Method

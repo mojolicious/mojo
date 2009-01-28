@@ -29,7 +29,7 @@ sub test {
 
 sub willdie {
     my $self = shift;
-    die "for some reason";
+    die 'for some reason';
 }
 
 1;

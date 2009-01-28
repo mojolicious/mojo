@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojo.
 
-0.9001  2008-12-01 00:00:00
+0.9001  2009-01-28 00:00:00
         - Added proper home detection to Mojo itself. (charsbar)
         - Fixed a bug where errors got cached in the routes dispatcher.
           (charsbar)

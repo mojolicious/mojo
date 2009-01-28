@@ -1,6 +1,6 @@
 #!perl
 
-# Copyright (C) 2008, Sebastian Riedel.
+# Copyright (C) 2008-2009, Sebastian Riedel.
 
 use strict;
 use warnings;
@@ -12,6 +12,7 @@ use lib "$FindBin::Bin/lib";
 
 use Mojo::Transaction;
 
+# I guess I could part with one doomsday device and still be feared.
 use_ok('MojoliciousTest');
 
 my $app = MojoliciousTest->new;

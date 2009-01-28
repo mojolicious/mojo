@@ -1,6 +1,6 @@
 #!perl
 
-# Copyright (C) 2008, Sebastian Riedel.
+# Copyright (C) 2008-2009, Sebastian Riedel.
 
 use 5.008001;
 

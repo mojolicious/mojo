@@ -1,4 +1,4 @@
-# Copyright (C) 2008, Sebastian Riedel.
+# Copyright (C) 2008-2009, Sebastian Riedel.
 
 package Mojo;
 
@@ -198,7 +198,7 @@ And thanks to everyone else i might have forgotten. (Please send me a mail)
 
 =head1 COPYRIGHT
 
-Copyright (C) 2008, Sebastian Riedel.
+Copyright (C) 2008-2009, Sebastian Riedel.
 
 This program is free software, you can redistribute it and/or modify it under
 the same terms as Perl 5.10.

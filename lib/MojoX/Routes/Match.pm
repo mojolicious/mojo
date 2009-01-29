@@ -66,9 +66,10 @@ sub url_for {
                 $name   = shift;
                 $values = shift;
             }
-
             # Just values
-            $values = {@_};
+            else {
+                $values = {@_};
+            }
 
         }
     }

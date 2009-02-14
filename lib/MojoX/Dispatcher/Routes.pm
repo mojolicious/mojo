@@ -29,7 +29,11 @@ sub dispatch {
     return 0 unless $match;
 
     # Initialize stash with captures
-    $c->stash({%{$match->captures}});
+    my %captures = %{$match->captures};
+    foreach my $key (keys %captures) {
+        $captures{$key} = Mojo::ByteStream->new($captures{$key})->url_unescape->to_string;
+    }
+    $c->stash({%captures});
 
     # Prepare disallow
     unless ($self->{_disallow}) {

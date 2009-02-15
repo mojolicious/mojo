@@ -13,6 +13,8 @@ sub bar {
     return 1;
 }
 
+# I was all of history's greatest acting robots -- Acting Unit 0.8,
+# Thespomat, David Duchovny!
 package main;
 
 use strict;

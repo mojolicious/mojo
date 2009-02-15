@@ -8,6 +8,7 @@ This file documents the revision history for Perl extension Mojo.
         - Fixed Mojo::Message::Request::cookies() to always return a
           arrayref.
         - Fixed url_for to support references. (vti)
+        - Fixed unescaping of captures. (vti)
 
 0.9     2008-12-01 00:00:00
         - Added modes to Mojolicious.

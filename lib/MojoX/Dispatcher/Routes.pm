@@ -31,7 +31,8 @@ sub dispatch {
     # Initialize stash with captures
     my %captures = %{$match->captures};
     foreach my $key (keys %captures) {
-        $captures{$key} = Mojo::ByteStream->new($captures{$key})->url_unescape->to_string;
+        $captures{$key} =
+          Mojo::ByteStream->new($captures{$key})->url_unescape->to_string;
     }
     $c->stash({%captures});
 

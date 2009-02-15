@@ -8,7 +8,7 @@ use warnings;
 use Test::More tests => 7;
 
 use FindBin;
-use lib "$FindBin::Bin/lib";
+use lib "$FindBin::Bin/../../mojolicious/lib";
 
 use Mojo::Transaction;
 

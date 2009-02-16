@@ -155,7 +155,7 @@ my $file =
   File::Spec->catfile(File::Spec->splitdir($FindBin::Bin), qw/lib test.mt/);
 $output = '';
 $mt->render_file($file, \$output, 3);
-is($output, "23Hello World!\n");
+like($output, qr/23Hello World!/);
 
 # File to file
 $mt = Mojo::Template->new;

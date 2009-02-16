@@ -22,6 +22,10 @@ sub run {
     # Environment
     $req->parse(\%ENV);
 
+    # Store connection information
+    $tx->remote_address($ENV{REMOTE_ADDR});
+    $tx->local_port($ENV{SERVER_PORT});
+
     # Request body
     my $select = IO::Select->new(\*STDIN);
     while (!$req->is_finished) {

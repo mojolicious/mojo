@@ -12,6 +12,7 @@ use IO::Select;
 use Mojo;
 use Mojo::Loader;
 use Mojo::Message::Response;
+use Socket;
 
 __PACKAGE__->attr(continue_timeout   => (chained => 1, default => 3));
 __PACKAGE__->attr(keep_alive_timeout => (chained => 1, default => 15));
@@ -190,6 +191,14 @@ sub spin {
             # Ready for next state
             $tx->state('write_start_line');
             $tx->{_to_write} = $tx->req->start_line_length;
+
+            # Store connection information
+            my ($lport, $laddr) = sockaddr_in(getsockname($tx->connection));
+            $tx->local_address(inet_ntoa($laddr));
+            $tx->local_port($lport);
+            my ($rport, $raddr) = sockaddr_in(getpeername($tx->connection));
+            $tx->remote_address(inet_ntoa($raddr));
+            $tx->remote_port($rport);
         }
 
         # Map
@@ -406,13 +415,8 @@ sub withdraw_connection {
 
 sub _socket_name {
     my ($self, $s) = @_;
-
-    # Temporary workaround for win32 weirdness
-    my $n = '';
-    for my $h ($s->sockaddr, $s->sockport, $s->peeraddr, $s->peerport) {
-        $n .= unpack 'H*', $h;
-    }
-    return $n;
+    return
+      unpack('H*', $s->sockaddr) . $s->sockport . $s->peername . $s->peerport;
 }
 
 1;

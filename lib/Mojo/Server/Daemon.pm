@@ -266,6 +266,14 @@ sub _read {
         # Last keep alive request?
         $tx->res->headers->connection('Close')
           if $connection->{requests} >= $self->max_keep_alive_requests;
+
+        # Store connection information
+        my ($lport, $laddr) = sockaddr_in(getsockname($tx->connection));
+        $tx->local_address(inet_ntoa($laddr));
+        $tx->local_port($lport);
+        my ($rport, $raddr) = sockaddr_in(getpeername($tx->connection));
+        $tx->remote_address(inet_ntoa($raddr));
+        $tx->remote_port($rport);
     }
 
     my $tx  = $connection->{tx};
@@ -312,12 +320,8 @@ sub _socket_name {
     # Connected?
     return undef unless $s->connected;
 
-    # Temporary workaround for win32 weirdness
-    my $n = '';
-    for my $h ($s->sockaddr, $s->sockport, $s->peeraddr, $s->peerport) {
-        $n .= unpack 'H*', $h;
-    }
-    return $n;
+    return
+      unpack('H*', $s->sockaddr) . $s->sockport . $s->peername . $s->peerport;
 }
 
 sub _write {

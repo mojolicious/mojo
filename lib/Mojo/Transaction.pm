@@ -10,7 +10,18 @@ use base 'Mojo::Stateful';
 use Mojo::Message::Request;
 use Mojo::Message::Response;
 
-__PACKAGE__->attr([qw/continued connection kept_alive/] => (chained => 1));
+__PACKAGE__->attr(
+    [   qw/
+          continued
+          connection
+          kept_alive
+          local_address
+          local_port
+          remote_address
+          remote_port
+          /
+    ] => (chained => 1)
+);
 __PACKAGE__->attr(
     req => (
         chained => 1,
@@ -129,6 +140,26 @@ implements the following new ones.
 
     my $kept_alive = $tx->kept_alive;
     my $kept_alive = $tx->kept_alive(1);
+
+=head2 C<local_address>
+
+    my $address = $tx->local_address;
+    my $address = $tx->local_address('127.0.0.1');
+
+=head2 C<local_port>
+
+    my $port = $tx->local_port;
+    my $port = $tx->local_port(80);
+
+=head2 C<remote_address>
+
+    my $address = $tx->remote_address;
+    my $address = $tx->remote_address('127.0.0.1');
+
+=head2 C<remote_port>
+
+    my $port = $tx->remote_port;
+    my $port = $tx->remote_port(80);
 
 =head2 C<req>
 

@@ -9,7 +9,7 @@ use Test::More;
 
 plan skip_all => 'set TEST_CLIENT to enable this test'
   unless $ENV{TEST_CLIENT};
-plan tests => 12;
+plan tests => 16;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -58,3 +58,7 @@ ok(!$tx->kept_alive);
 $client->process_all($tx);
 ok($tx->is_done);
 ok($tx->kept_alive);
+ok($tx->local_address);
+ok($tx->local_port > 0);
+is($tx->remote_address, '88.198.25.164');
+is($tx->remote_port,    80);

@@ -133,6 +133,10 @@ sub read_request {
                 my $value = substr $parambuffer, 0, $vlen, '';
 
                 $tx->req->parse({$name => $value});
+
+                # Store connection information
+                $tx->remote_address($value) if $name =~ /REMOTE_ADDR/i;
+                $tx->local_port($value)     if $name =~ /SERVER_PORT/i;
             }
         }
 

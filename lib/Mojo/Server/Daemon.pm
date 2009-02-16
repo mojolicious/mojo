@@ -321,7 +321,10 @@ sub _socket_name {
     return undef unless $s->connected;
 
     return
-      unpack('H*', $s->sockaddr) . $s->sockport . $s->peername . $s->peerport;
+        unpack('H*', $s->sockaddr)
+      . $s->sockport
+      . unpack('H*', $s->peeraddr)
+      . $s->peerport;
 }
 
 sub _write {

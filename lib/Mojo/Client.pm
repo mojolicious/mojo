@@ -416,7 +416,10 @@ sub withdraw_connection {
 sub _socket_name {
     my ($self, $s) = @_;
     return
-      unpack('H*', $s->sockaddr) . $s->sockport . $s->peername . $s->peerport;
+        unpack('H*', $s->sockaddr)
+      . $s->sockport
+      . unpack('H*', $s->peeraddr)
+      . $s->peerport;
 }
 
 1;

@@ -154,7 +154,7 @@ Sebastian Riedel, C<sri@cpan.org>.
 
 In alphabetical order:
 
-Andreas Koenig.
+Andreas Koenig
 
 Andy Grundman
 

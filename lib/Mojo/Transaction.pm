@@ -139,27 +139,27 @@ implements the following new ones.
 =head2 C<kept_alive>
 
     my $kept_alive = $tx->kept_alive;
-    my $kept_alive = $tx->kept_alive(1);
+    my $tx         = $tx->kept_alive(1);
 
 =head2 C<local_address>
 
     my $address = $tx->local_address;
-    my $address = $tx->local_address('127.0.0.1');
+    my $tx      = $tx->local_address('127.0.0.1');
 
 =head2 C<local_port>
 
     my $port = $tx->local_port;
-    my $port = $tx->local_port(80);
+    my $tx   = $tx->local_port(80);
 
 =head2 C<remote_address>
 
     my $address = $tx->remote_address;
-    my $address = $tx->remote_address('127.0.0.1');
+    my $tx      = $tx->remote_address('127.0.0.1');
 
 =head2 C<remote_port>
 
     my $port = $tx->remote_port;
-    my $port = $tx->remote_port(80);
+    my $tx   = $tx->remote_port(80);
 
 =head2 C<req>
 

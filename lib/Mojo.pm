@@ -18,7 +18,7 @@ __PACKAGE__->attr(home => (chained => 1, default => sub { Mojo::Home->new }));
 __PACKAGE__->attr(log  => (chained => 1, default => sub { Mojo::Log->new }));
 
 # Oh, so they have internet on computers now!
-our $VERSION = '0.9002';
+our $VERSION = '0.9003';
 
 sub new {
     my $self = shift->SUPER::new();

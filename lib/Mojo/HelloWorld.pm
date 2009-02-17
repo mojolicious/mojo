@@ -44,6 +44,7 @@ sub _diag {
     my $path = $tx->req->url->path;
     $self->_dump_env($tx)    if $path =~ m|^/diag/dump_env|;
     $self->_dump_params($tx) if $path =~ m|^/diag/dump_params|;
+    $self->_dump_tx($tx)     if $path =~ m|^/diag/dump_tx|;
     $self->_dump_url($tx)    if $path =~ m|^/diag/dump_url|;
 
     # Defaults
@@ -60,6 +61,7 @@ sub _diag {
   <body>
     <a href="/diag/dump_env">Dump Environment Variables</a><br />
     <a href="/diag/dump_params">Dump Request Parameters</a><br />
+    <a href="/diag/dump_tx">Dump Transaction</a><br />
     <a href="/diag/dump_url">Dump Request URL</a>
   </body>
 </html>
@@ -77,6 +79,11 @@ sub _dump_env {
 sub _dump_params {
     my ($self, $tx) = @_;
     $tx->res->body(Dumper $tx->req->params->to_hash);
+}
+
+sub _dump_tx {
+    my ($self, $tx) = @_;
+    $tx->res->body(Dumper $tx);
 }
 
 sub _dump_url {

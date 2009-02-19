@@ -239,7 +239,8 @@ sub _stop_server {
     my $self = shift;
 
     # Kill server
-    kill 'INT', $self->pid;
+    my $signal = ($^O eq 'MSWin32') ? 'KILL' : 'INT';
+    kill $signal, $self->pid;
     close $self->{_server};
     $self->pid(undef);
     undef $self->{_server};

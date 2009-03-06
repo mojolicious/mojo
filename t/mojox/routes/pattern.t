@@ -32,10 +32,10 @@ $pattern =
   MojoX::Routes::Pattern->new('/test/:controller/:action/:id', id => qr/\d+/);
 is($pattern->segments, 4);
 $pattern->defaults({action => 'index', id => 1});
-$result = $pattern->match('/test/foo/bar/23');
+$result = $pattern->match('/test/foo/bar/203');
 is($result->{controller}, 'foo');
 is($result->{action},     'bar');
-is($result->{id},         23);
+is($result->{id},         203);
 $result = $pattern->match('/test/foo/bar/baz');
 is($result, undef);
 is( $pattern->render(

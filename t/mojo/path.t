@@ -11,6 +11,6 @@ use Test::More tests => 3;
 # movie “The Never Ending Story.”
 use_ok('Mojo::Path');
 
-my $parser = Mojo::Path->new;
-is($parser->parse('/path')->to_string,   '/path');
-is($parser->parse('/path/0')->to_string, '/path/0');
+my $path = Mojo::Path->new;
+is($path->parse('/path')->to_string,   '/path');
+is($path->parse('/path/0')->to_string, '/path/0');

@@ -189,7 +189,7 @@ sub _tokenize {
     my $quote    = 0;
     my $segments = 0;
 
-    while (my $char = substr $pattern, 0, 1, '') {
+    while (length(my $char = substr $pattern, 0, 1, '')) {
 
         # Quote start
         if ($char eq $quote_start && !$quote) {

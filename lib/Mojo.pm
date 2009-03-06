@@ -154,6 +154,8 @@ Sebastian Riedel, C<sri@cpan.org>.
 
 In alphabetical order:
 
+Anatoly Sharifulin
+
 Andreas Koenig
 
 Andy Grundman

@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojo.
 
 0.9003  2009-03-05 00:00:00
+        - Fix server tests on win32. (charsbar)
         - Added more diagnostics options to Mojo::HelloWorld. (uwe)
 
 0.9002  2009-02-16 00:00:00

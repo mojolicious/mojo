@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojo.
 
 0.9003  2009-03-05 00:00:00
+        - Fixed parsing of "0" in Mojo::Path. (charsbar)
         - Fix server tests on win32. (charsbar)
         - Added more diagnostics options to Mojo::HelloWorld. (uwe)
 

@@ -97,7 +97,7 @@ sub parse {
     for my $part (split '/', $path) {
 
         # Garbage
-        next unless $part;
+        next unless length $part;
 
         # Store
         push @parts, $part;

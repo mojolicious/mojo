@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojo.
 
 0.9003  2009-03-05 00:00:00
+        - Support more CGI implementations.
         - Fixed tokenizer in MojoX::Routes::Pattern to support "0" values.
           (Anatoly Sharifulin)
         - Fixed parsing of "0" in Mojo::Path. (charsbar)

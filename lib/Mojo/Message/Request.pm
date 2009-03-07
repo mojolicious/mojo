@@ -185,7 +185,10 @@ sub _parse_env {
             $self->headers->content_length($value);
         }
 
-        # Path
+        # Path is a special case on some servers
+        elsif ($name eq 'REQUEST_URI') {
+            $self->url->parse($value);
+        }
         elsif ($name eq 'PATH_INFO') {
             $self->url->path->parse($value);
         }

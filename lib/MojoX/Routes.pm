@@ -50,28 +50,26 @@ sub match {
       unless ref $match && $match->isa('MojoX::Routes::Match');
 
     # Path
-    my $path      = $match->path;
-    my $substring = $self->_shape(\$path);
-
-    # Debug
-    warn qq/"$substring" ("$path")\n/ if DEBUG;
+    my $path = $match->path;
 
     # Match
-    my $captures = $self->pattern->match($substring) || return undef;
+    my $captures = $self->pattern->shape_match(\$path);
 
     $match->path($path);
+
+    return undef unless $captures;
 
     # Merge captures
     $captures = {%{$match->captures}, %$captures};
     $match->captures($captures);
 
     # Update stack
-    if ($self->inline || $self->is_endpoint) {
+    if ($self->inline || ($self->is_endpoint && $match->is_path_empty)) {
         push @{$match->stack}, $captures;
     }
 
     # Waypoint match
-    if ($self->block && (!$path || $path eq '/')) {
+    if ($self->block && $match->is_path_empty) {
         push @{$match->stack}, $captures;
         $match->endpoint($self);
         return $self;
@@ -94,7 +92,7 @@ sub match {
         $match->stack($snapshot);
     }
 
-    $match->endpoint($self) if $self->is_endpoint;
+    $match->endpoint($self) if $self->is_endpoint && $match->is_path_empty;
 
     return $match;
 }
@@ -122,8 +120,6 @@ sub route {
 
     return $route;
 }
-
-sub segments { return shift->pattern->segments }
 
 sub to {
     my $self = shift;
@@ -163,21 +159,6 @@ sub url_for {
 }
 
 sub waypoint { return shift->route(@_)->block(1) }
-
-sub _shape {
-    my ($self, $pathref) = @_;
-
-    # Shortcut
-    return '' unless $self->segments;
-
-    my $substring = '';
-    for (1 .. $self->segments) {
-        $$pathref =~ s/^(\/?[^\/]*)//;
-        $substring .= $1;
-    }
-
-    return $substring;
-}
 
 1;
 __END__
@@ -227,10 +208,6 @@ L<MojoX::Routes> is a routes implementation.
 
     my $pattern = $routes->pattern;
     $routes     = $routes->pattern(MojoX::Routes::Pattern->new);
-
-=head2 C<segments>
-
-    my $segments = $routes->segments;
 
 =head1 METHODS
 

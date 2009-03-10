@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 47;
+use Test::More tests => 59;
 
 use Mojo::Transaction;
 
@@ -31,7 +31,7 @@ my $test2 = $r->bridge('/test2')->to(controller => 'test2');
 my $test4 = $test2->bridge->to(controller => 'index');
 
 # /test2/foo
-$test4->bridge('/foo')->to(controller => 'baz');
+$test4->route('/foo')->to(controller => 'baz');
 
 # /test2/bar
 $test4->route('/bar')->to(controller => 'lalala');
@@ -44,6 +44,18 @@ $test3->route('/edit')->to(action => 'edit');
 
 # /
 $r->route('/')->to(controller => 'hello', action => 'world');
+
+# /wildcards/1/*
+$r->route('/wildcards/1/:wildcard', wildcard => qr/(.*)/)
+  ->to(controller => 'wild', action => 'card');
+
+# /wildcards/2/*
+$r->route('/wildcards/2/*wildcard')
+  ->to(controller => 'card', action => 'wild');
+
+# /wildcards/3/*/foo
+$r->route('/wildcards/3/*wildcard/foo')
+  ->to(controller => 'very', action => 'dangerous');
 
 # Root
 my $match = $r->match(_tx('/'));
@@ -87,7 +99,7 @@ is($match->stack->[0]->{controller}, 'test2');
 is($match->stack->[1]->{controller}, 'index');
 is($match->stack->[2]->{controller}, 'baz');
 is($match->captures->{controller},   'baz');
-is($match->url_for,                  '');
+is($match->url_for,                  '/test2/foo');
 $match = $r->match(_tx('/test2/bar'));
 is($match->stack->[0]->{controller}, 'test2');
 is($match->stack->[1]->{controller}, 'index');
@@ -114,6 +126,23 @@ $match = $r->match(_tx('/test3'));
 is($match->url_for, '/test3');
 is($match->url_for('test_edit', controller => 'foo'), '/foo/test/edit');
 is($match->url_for('test_edit', {controller => 'foo'}), '/foo/test/edit');
+
+# Wildcards
+$match = $r->match(_tx('/wildcards/1/hello/there'));
+is($match->stack->[0]->{controller}, 'wild');
+is($match->stack->[0]->{action},     'card');
+is($match->stack->[0]->{wildcard},   'hello/there');
+is($match->url_for,                  '/wildcards/1/hello/there');
+$match = $r->match(_tx('/wildcards/2/hello/there'));
+is($match->stack->[0]->{controller}, 'card');
+is($match->stack->[0]->{action},     'wild');
+is($match->stack->[0]->{wildcard},   'hello/there');
+is($match->url_for,                  '/wildcards/2/hello/there');
+$match = $r->match(_tx('/wildcards/3/hello/there/foo'));
+is($match->stack->[0]->{controller}, 'very');
+is($match->stack->[0]->{action},     'dangerous');
+is($match->stack->[0]->{wildcard},   'hello/there');
+is($match->url_for,                  '/wildcards/3/hello/there/foo');
 
 # Helper
 sub _tx {

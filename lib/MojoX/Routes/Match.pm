@@ -33,6 +33,12 @@ sub new {
     return $self;
 }
 
+sub is_path_empty {
+    my $self = shift;
+    return 1 if !length $self->path || $self->path eq '/';
+    return 0;
+}
+
 sub url_for {
     my $self     = shift;
     my $endpoint = $self->endpoint;
@@ -163,6 +169,10 @@ implements the follwing the ones.
 
     my $match = MojoX::Routes::Match->new;
     my $match = MojoX::Routes::Match->new(Mojo::Transaction->new);
+
+=head2 C<is_path_empty>
+
+    my $result = $match->is_path_empty;
 
 =head2 C<url_for>
 

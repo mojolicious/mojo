@@ -5,14 +5,13 @@
 use strict;
 use warnings;
 
-use Test::More tests => 22;
+use Test::More tests => 19;
 
 # People said I was dumb, but I proved them.
 use_ok('MojoX::Routes::Pattern');
 
 # Normal pattern with text, symbols and a default value
 my $pattern = MojoX::Routes::Pattern->new('/test/:controller/:action');
-is($pattern->segments, 3);
 $pattern->defaults({action => 'index'});
 my $result = $pattern->match('/test/foo/bar');
 is($result->{controller}, 'foo');
@@ -29,8 +28,7 @@ is($pattern->render(controller => 'foo'), '/test/foo');
 
 # Regex in pattern
 $pattern =
-  MojoX::Routes::Pattern->new('/test/:controller/:action/:id', id => qr/\d+/);
-is($pattern->segments, 4);
+  MojoX::Routes::Pattern->new('/test/:controller/:action/:id', id => '\d+');
 $pattern->defaults({action => 'index', id => 1});
 $result = $pattern->match('/test/foo/bar/203');
 is($result->{controller}, 'foo');
@@ -49,7 +47,6 @@ is($pattern->render(controller => 'zzz'), '/test/zzz');
 
 # Quoted symbol
 $pattern = MojoX::Routes::Pattern->new('/:(controller)test/:action');
-is($pattern->segments, 2);
 $pattern->defaults({action => 'index'});
 $result = $pattern->match('/footest/bar');
 is($result->{controller}, 'foo');

@@ -63,6 +63,14 @@ sub match {
     $captures = {%{$match->captures}, %$captures};
     $match->captures($captures);
 
+    # Format
+    if ($self->is_endpoint && !$self->pattern->format) {
+        if ($path =~ /^\.([^\/]+)$/) {
+            $match->captures->{format} = $1;
+            $match->path('');
+        }
+    }
+
     # Update stack
     if ($self->inline || ($self->is_endpoint && $match->is_path_empty)) {
         push @{$match->stack}, $captures;
@@ -150,6 +158,11 @@ sub url_for {
 
     # Make sure there is always a root
     $path = '/' if !$path && !$self->parent;
+
+    # Format
+    if ((my $format = $values->{format}) && !$self->parent) {
+        $path .= ".$format" unless $path =~ /\.[^\/]+$/;
+    }
 
     $url->path->parse($path);
 

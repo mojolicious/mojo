@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 19;
+use Test::More tests => 22;
 
 # People said I was dumb, but I proved them.
 use_ok('MojoX::Routes::Pattern');
@@ -54,3 +54,11 @@ is($result->{action},     'bar');
 is($pattern->render(controller => 'zzz', action => 'lala'), '/zzztest/lala');
 $result = $pattern->match('/test/lala');
 is($result, undef);
+
+# Format
+$pattern = MojoX::Routes::Pattern->new('/:(controller)test/:action');
+is($pattern->format, undef);
+$pattern = MojoX::Routes::Pattern->new('/:(controller)test/:action.html');
+is($pattern->format, 'html');
+$pattern = MojoX::Routes::Pattern->new('/index.cgi');
+is($pattern->format, 'cgi');

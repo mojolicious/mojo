@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 59;
+use Test::More tests => 67;
 
 use Mojo::Transaction;
 
@@ -56,6 +56,11 @@ $r->route('/wildcards/2/*wildcard')
 # /wildcards/3/*/foo
 $r->route('/wildcards/3/*wildcard/foo')
   ->to(controller => 'very', action => 'dangerous');
+
+# /format
+# /format.html
+$r->route('/format')
+  ->to(controller => 'hello', action => 'you', format => 'html');
 
 # Root
 my $match = $r->match(_tx('/'));
@@ -143,6 +148,18 @@ is($match->stack->[0]->{controller}, 'very');
 is($match->stack->[0]->{action},     'dangerous');
 is($match->stack->[0]->{wildcard},   'hello/there');
 is($match->url_for,                  '/wildcards/3/hello/there/foo');
+
+# Format
+$match = $r->match(_tx('/format'));
+is($match->stack->[0]->{controller}, 'hello');
+is($match->stack->[0]->{action},     'you');
+is($match->stack->[0]->{format},     'html');
+is($match->url_for,                  '/format.html');
+$match = $r->match(_tx('/format.html'));
+is($match->stack->[0]->{controller}, 'hello');
+is($match->stack->[0]->{action},     'you');
+is($match->stack->[0]->{format},     'html');
+is($match->url_for,                  '/format.html');
 
 # Helper
 sub _tx {

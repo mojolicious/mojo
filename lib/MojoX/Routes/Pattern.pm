@@ -10,7 +10,7 @@ use base 'Mojo::Base';
 use constant DEBUG => $ENV{MOJOX_ROUTES_DEBUG} || 0;
 
 __PACKAGE__->attr(defaults => (chained => 1, default => sub { {} }));
-__PACKAGE__->attr([qw/pattern regex/] => (chained => 1));
+__PACKAGE__->attr([qw/format pattern regex/] => (chained => 1));
 __PACKAGE__->attr(quote_end      => (chained => 1, default => ')'));
 __PACKAGE__->attr(quote_start    => (chained => 1, default => '('));
 __PACKAGE__->attr(reqs           => (chained => 1, default => sub { {} }));
@@ -43,6 +43,10 @@ sub parse {
 
     # Shortcut
     return $self unless $pattern;
+
+    # Format
+    $pattern =~ /\.([^\/]+)$/;
+    $self->format($1) if $1;
 
     # Requirements
     my $reqs = ref $_[0] eq 'HASH' ? $_[0] : {@_};

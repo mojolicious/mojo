@@ -70,6 +70,8 @@ sub match {
             $match->path('');
         }
     }
+    $match->captures->{format} = $self->pattern->format
+      if $self->pattern->format;
 
     # Update stack
     if ($self->inline || ($self->is_endpoint && $match->is_path_empty)) {

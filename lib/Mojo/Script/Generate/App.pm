@@ -116,6 +116,8 @@ use warnings;
 
 use base 'Mojo';
 
+our $VERSION = '0.1';
+
 sub handler {
     my ($self, $tx) = @_;
 

@@ -135,6 +135,8 @@ use warnings;
 
 use base 'Mojolicious';
 
+our $VERSION = '0.1';
+
 # This method will run for each request
 sub dispatch {
     my ($self, $c) = @_;
@@ -142,7 +144,7 @@ sub dispatch {
     # Try to find a static file
     my $done = $self->static->dispatch($c);
 
-    # Use routes if we don't have a response code yet
+    # Use routes if we don't have a response yet
     $done ||= $self->routes->dispatch($c);
 
     # Nothing found, serve static file "public/404.html"

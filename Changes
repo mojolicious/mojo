@@ -4,6 +4,7 @@ This file documents the revision history for Perl extension Mojo.
         - Added format support to MojoX::Routes.
         - Added wildcard symbol support to MojoX::Routes and rewrote many
           routes internals.
+        - Added Makefile.PL generator.
         - Support more CGI implementations.
         - Fixed tokenizer in MojoX::Routes::Pattern to support "0" values.
           (Anatoly Sharifulin)

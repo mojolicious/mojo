@@ -10,6 +10,7 @@ This file documents the revision history for Perl extension Mojo.
           routes internals.
         - Added Makefile.PL generator.
         - Support more CGI implementations.
+        - Fixed Mojo::Date to not crash on invalid dates. (vti)
         - Fixed tokenizer in MojoX::Routes::Pattern to support "0" values.
           (Anatoly Sharifulin)
         - Fixed parsing of "0" in Mojo::Path. (charsbar)

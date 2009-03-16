@@ -30,6 +30,6 @@ is($date->epoch, 0);
 is("$date",      'Thu, 01 Jan 1970 00:00:00 GMT');
 is($date->parse('Thu, 01 Jan 1970 00:00:00 GMT')->epoch, 0);
 
-# Wrong time checks
+# Bad time checks
 ok(not defined $date->parse('Mon, 01 Jan 1900 00:00:00'));
 is($date->epoch, 0);

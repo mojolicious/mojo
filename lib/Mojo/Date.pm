@@ -85,6 +85,7 @@ sub parse {
 
     my $epoch;
 
+    # Prevent crash
     eval {
         $epoch =
           Time::Local::timegm($second, $minute, $hour, $day, $month, $year);

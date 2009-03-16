@@ -161,6 +161,9 @@ sub startup {
     # Default route
     $r->route('/:controller/:action/:id')
       ->to(controller => 'example', action => 'welcome', id => 1);
+
+    # Use our own context class
+    $self->ctx_class('<%= $class %>::Context');
 }
 
 1;

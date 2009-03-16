@@ -83,8 +83,17 @@ sub parse {
     # Invalid format
     else { return undef }
 
-    $self->epoch(
-        Time::Local::timegm($second, $minute, $hour, $day, $month, $year));
+    my $epoch;
+
+    eval {
+        $epoch =
+          Time::Local::timegm($second, $minute, $hour, $day, $month, $year);
+    };
+
+    return undef if $@;
+
+    $self->epoch($epoch);
+
     return $self;
 }
 

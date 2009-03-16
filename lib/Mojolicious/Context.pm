@@ -14,7 +14,7 @@ sub render {
 
     # Merge args with stash
     my $args = ref $_[0] ? $_[0] : {@_};
-    local $self->{stash} = {%{$self->stash}, %$args};
+    $self->{stash} = {%{$self->stash}, %$args};
 
     # Template
     unless ($self->stash->{template}) {

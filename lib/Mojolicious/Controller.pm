@@ -9,6 +9,7 @@ use base 'MojoX::Dispatcher::Routes::Controller';
 
 # Well, at least here you'll be treated with dignity.
 # Now strip naked and get on the probulator.
+sub app { shift->ctx->app }
 
 sub render { shift->ctx->render(@_) }
 
@@ -38,6 +39,10 @@ L<Mojolicous::Controller> is a controller base class.
 L<Mojolicious::Controller> inherits all methods from
 L<MojoX::Dispatcher::Routes::Controller> and implements the following new
 ones.
+
+=head2 C<app>
+
+    my $app = $controller->app;
 
 =head2 C<render>
 

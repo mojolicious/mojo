@@ -12,12 +12,11 @@ use base 'Mojolicious::Controller';
 sub index {
     my $self = shift;
     $self->stash(msg => 'Hello World!');
-    $self->render;
 }
 
 sub templateless {
     my $self = shift;
-    $self->render(format => 'test');
+    $self->render(handler => 'test');
 }
 
 sub test {

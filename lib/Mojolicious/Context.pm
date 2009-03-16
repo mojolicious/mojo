@@ -23,8 +23,14 @@ sub render {
         my $controller = $self->stash->{controller};
         my $action     = $self->stash->{action};
 
+        # Nothing to render
+        return undef unless $controller && $action;
+
         $self->stash->{template} = join '/', split(/-/, $controller), $action;
     }
+
+    # Format
+    $self->stash->{format} ||= 'html';
 
     # Render
     return $self->app->renderer->render($self);

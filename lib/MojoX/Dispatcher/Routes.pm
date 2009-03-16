@@ -13,7 +13,7 @@ use Mojo::Loader;
 __PACKAGE__->attr(
     disallow => (
         chained => 1,
-        default => sub { [qw/new attr render req res stash/] }
+        default => sub { [qw/new app attr render req res stash/] }
     )
 );
 __PACKAGE__->attr(namespace => (chained => 1));
@@ -121,6 +121,9 @@ sub dispatch {
         # Break the chain
         last unless $done;
     }
+
+    # Render
+    $c->render unless $c->stash->{rendered};
 
     # No stack, fail
     return 0 unless @$stack;

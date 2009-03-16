@@ -53,7 +53,7 @@ sub run {
     $self->renderer->tag_start('<%%');
     $self->renderer->tag_end('%%>');
     $self->render_to_rel_file('welcome',
-        "$name/templates/example/welcome.phtml");
+        "$name/templates/example/welcome.html.epl");
 }
 
 1;
@@ -155,9 +155,6 @@ sub dispatch {
 sub startup {
     my $self = shift;
 
-    # Use our own context class
-    $self->ctx_class('<%= $class %>::Context');
-
     # Routes
     my $r = $self->routes;
 
@@ -180,20 +177,20 @@ use base 'Mojolicious::Controller';
 sub welcome {
     my $self = shift;
 
-    # Render template "example/welcome.phtml"
-    $self->render;
+    # Render template "example/welcome.html.epl" with welcome message
+    $self->render(message => 'Welcome to the Mojolicious Web Framework!');
 }
 
 1;
 __context__
 % my $class = shift;
 package <%= $class %>;
-
+ 
 use strict;
 use warnings;
-
+ 
 use base 'Mojolicious::Context';
-
+ 
 1;
 __static__
 <!doctype html>
@@ -230,14 +227,14 @@ is($tx->res->code, 200);
 is($tx->res->headers->content_type, 'text/html');
 like($tx->res->content->file->slurp, qr/Mojolicious Web Framework/i);
 __welcome__
-% my $c = shift;
+% my $self = shift;
 <!doctype html>
-    <head><title>Welcome to the Mojolicious Web Framework!</title></head>
+    <head><title><%= $self->stash('message') %></title></head>
     <body>
-        <h2>Welcome to the Mojolicious Web Framework!</h2>
+        <h2><%= $self->stash('message') %></h2>
         This page was generated from the template
-        "templates/example/welcome.phtml",
-        <a href="<%= $c->url_for %>">
+        "templates/example/welcome.html.epl",
+        <a href="<%= $self->url_for %>">
             click here
         </a> 
         to reload the page or

@@ -8,9 +8,6 @@ use warnings;
 use base 'Mojolicious::Controller';
 
 # Poor Bender. Without his brain he's become all quiet and helpful.
-sub index {
-    my ($self, $c) = @_;
-    $c->render;
-}
+sub index { }
 
 1;

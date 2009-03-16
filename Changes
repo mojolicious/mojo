@@ -1,6 +1,10 @@
 This file documents the revision history for Perl extension Mojo.
 
 0.9003  2009-03-05 00:00:00
+        - Rewrote MojoX::Renderer, it is not backward compatible and
+          templates need to be renamed in the following 3 part format
+          "index.html.tt"!
+        - Made render call optional.
         - Added format support to MojoX::Routes.
         - Added wildcard symbol support to MojoX::Routes and rewrote many
           routes internals.

@@ -107,12 +107,15 @@ sub render {
         return undef;
     }
 
+    # Partial?
+    my $partial = $c->stash->{partial};
+
     # Render
     my $output;
     return undef unless $r->($self, $c, \$output);
 
     # Partial
-    return $output if $c->stash->{partial};
+    return $output if $partial;
 
     # Response
     my $res = $c->res;
@@ -124,6 +127,7 @@ sub render {
     $res->headers->content_type($type);
 
     # Success!
+    $c->stash->{partial}  = $partial;
     $c->stash->{rendered} = 1;
     return 1;
 }

@@ -16,6 +16,7 @@ This file documents the revision history for Perl extension Mojo.
         - Fixed parsing of "0" in Mojo::Path. (charsbar)
         - Fix server tests on win32. (charsbar)
         - Added more diagnostics options to Mojo::HelloWorld. (uwe)
+        - Updated Mojo::URL to be more template friendly.
 
 0.9002  2009-02-16 00:00:00
         - Added local_address(), local_port(), remote_address() and

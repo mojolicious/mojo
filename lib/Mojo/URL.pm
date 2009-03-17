@@ -129,7 +129,8 @@ sub query {
 
     # Set
     if (@_) {
-        $self->{query} = @_ > 1 ? Mojo::Parameters->new(@_) : $_[0];
+        $self->{query} =
+          @_ > 1 ? Mojo::Parameters->new(ref $_[0] ? @{$_[0]} : @_) : $_[0];
         return $self;
     }
 
@@ -373,6 +374,7 @@ following new ones.
 
     my $query = $url->query;
     $url      = $url->query(name => 'value');
+    $url      = $url->query([name => 'value']);
     $url      = $url->query(Mojo::Parameters->new);
 
 =head2 C<to_abs>

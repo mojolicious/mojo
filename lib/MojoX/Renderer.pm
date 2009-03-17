@@ -83,7 +83,8 @@ sub render {
 
             # Nothing found
             unless ($found) {
-                $c->app->log->debug('No template found for rendering');
+                $c->app->log->debug(
+                    qq/Template not found "$template_path.*"/);
                 return undef;
             }
         }

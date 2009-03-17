@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 71;
+use Test::More tests => 84;
 
 use Mojo::Transaction;
 
@@ -65,8 +65,48 @@ $r->route('/format')
 # /format2.html
 $r->route('/format2.html')->to(controller => 'you', action => 'hello');
 
+# /articles
+# /articles.html
+# /articles/1
+# /articles/1.html
+# /articles/1/edit
+my $articles = $r->waypoint('/articles')->to(
+    controller => 'articles',
+    action     => 'index',
+    format     => 'html'
+);
+my $wp = $articles->waypoint('/:id')->to(
+    controller => 'articles',
+    action     => 'load',
+    format     => 'html'
+);
+my $bridge = $wp->bridge->to(
+    controller => 'articles',
+    action     => 'load',
+    format     => 'html'
+);
+$bridge->route('/edit')->to(controller => 'articles', action => 'edit');
+
+# Real world example using most features at once
+my $match = $r->match(_tx('/articles.html'));
+is($match->stack->[0]->{controller}, 'articles');
+is($match->stack->[0]->{action},     'index');
+is($match->stack->[0]->{format},     'html');
+is($match->url_for,                  '/articles.html');
+$match = $r->match(_tx('/articles/1.html'));
+is($match->stack->[0]->{controller}, 'articles');
+is($match->stack->[0]->{action},     'load');
+is($match->stack->[0]->{id},         '1');
+is($match->stack->[0]->{format},     'html');
+is($match->url_for,                  '/articles/1.html');
+$match = $r->match(_tx('/articles/1/edit'));
+is($match->stack->[1]->{controller}, 'articles');
+is($match->stack->[1]->{action},     'edit');
+is($match->stack->[1]->{format},     'html');
+is($match->url_for,                  '/articles/1/edit.html');
+
 # Root
-my $match = $r->match(_tx('/'));
+$match = $r->match(_tx('/'));
 is($match->captures->{controller},   'hello');
 is($match->captures->{action},       'world');
 is($match->stack->[0]->{controller}, 'hello');

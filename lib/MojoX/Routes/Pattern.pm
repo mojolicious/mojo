@@ -172,7 +172,7 @@ sub _compile {
 
             unshift @{$self->symbols}, $name;
 
-            $compiled = $op eq 'symbol' ? '([^\/]+)' : '(.*)';
+            $compiled = $op eq 'symbol' ? '([^\/\.]+)' : '(.*)';
 
             my $req = $self->reqs->{$name};
             $compiled = "($req)" if $req;

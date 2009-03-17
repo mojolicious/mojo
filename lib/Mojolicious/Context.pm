@@ -7,6 +7,8 @@ use warnings;
 
 use base 'MojoX::Dispatcher::Routes::Context';
 
+use MojoX::Routes::Match;
+
 # Space: It seems to go on and on forever...
 # but then you get to the end and a gorilla starts throwing barrels at you.
 sub render {
@@ -40,7 +42,8 @@ sub url_for {
     my $self = shift;
 
     # Make sure we have a match for named routes
-    $self->match($self->app->routes) unless $self->match;
+    $self->match(MojoX::Routes::Match->new->endpoint($self->app->routes))
+      unless $self->match;
 
     # Use match or root
     my $url = $self->match->url_for(@_);

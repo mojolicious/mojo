@@ -39,11 +39,11 @@ sub render {
 sub url_for {
     my $self = shift;
 
+    # Make sure we have a match for named routes
+    $self->match($self->app->routes) unless $self->match;
+
     # Use match or root
-    my $url =
-        $self->match
-      ? $self->match->url_for(@_)
-      : $self->app->routes->url_for(@_);
+    my $url = $self->match->url_for(@_);
 
     # Base
     $url->base($self->tx->req->url->base->clone);

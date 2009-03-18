@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 use Mojo;
 use MojoX::Context;
@@ -29,6 +29,11 @@ $c->stash->{format}   = 'something';
 # Normal rendering
 $c->stash->{handler} = 'debug';
 is($r->render($c), 'Hello Mojo!', 'normal rendering');
+
+# Normal rendering with path with dots
+$c->stash->{template} = 'some.path.with.dots/template';
+$c->stash->{handler} = 'debug';
+is($r->render($c), 'Hello Mojo!', 'normal rendering with path with dots');
 
 # Unrecognized handler
 $c->stash->{handler} = 'not_defined';

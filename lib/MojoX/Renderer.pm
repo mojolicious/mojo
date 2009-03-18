@@ -94,7 +94,7 @@ sub render {
     local $c->stash->{template_path} = $template_path;
 
     # Extract
-    $template_path =~ /\.(\w+)\.(\w+)/;
+    $template_path =~ /\.(\w+)\.(\w+)$/;
     $format  = $1;
     $handler = $2;
 

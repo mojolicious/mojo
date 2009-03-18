@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 88;
+use Test::More tests => 89;
 
 use Mojo::Transaction;
 
@@ -91,7 +91,7 @@ $bridge->route('/delete')->to(
     controller => 'articles',
     action     => 'delete',
     format     => undef
-);
+)->name('articles_delete');
 
 # Real world example using most features at once
 my $match = $r->match(_tx('/articles.html'));
@@ -110,6 +110,7 @@ is($match->stack->[1]->{controller}, 'articles');
 is($match->stack->[1]->{action},     'edit');
 is($match->stack->[1]->{format},     'html');
 is($match->url_for,                  '/articles/1/edit.html');
+is($match->url_for('articles_delete', format => undef), '/articles/1/delete');
 $match = $r->match(_tx('/articles/1/delete'));
 is($match->stack->[1]->{controller}, 'articles');
 is($match->stack->[1]->{action},     'delete');

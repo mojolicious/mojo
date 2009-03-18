@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 84;
+use Test::More tests => 88;
 
 use Mojo::Transaction;
 
@@ -70,6 +70,7 @@ $r->route('/format2.html')->to(controller => 'you', action => 'hello');
 # /articles/1
 # /articles/1.html
 # /articles/1/edit
+# /articles/1/delete
 my $articles = $r->waypoint('/articles')->to(
     controller => 'articles',
     action     => 'index',
@@ -86,6 +87,11 @@ my $bridge = $wp->bridge->to(
     format     => 'html'
 );
 $bridge->route('/edit')->to(controller => 'articles', action => 'edit');
+$bridge->route('/delete')->to(
+    controller => 'articles',
+    action     => 'delete',
+    format     => undef
+);
 
 # Real world example using most features at once
 my $match = $r->match(_tx('/articles.html'));
@@ -104,6 +110,11 @@ is($match->stack->[1]->{controller}, 'articles');
 is($match->stack->[1]->{action},     'edit');
 is($match->stack->[1]->{format},     'html');
 is($match->url_for,                  '/articles/1/edit.html');
+$match = $r->match(_tx('/articles/1/delete'));
+is($match->stack->[1]->{controller}, 'articles');
+is($match->stack->[1]->{action},     'delete');
+is($match->stack->[1]->{format},     undef);
+is($match->url_for,                  '/articles/1/delete');
 
 # Root
 $match = $r->match(_tx('/'));

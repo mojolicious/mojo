@@ -30,10 +30,10 @@ $c->stash->{format}   = 'something';
 $c->stash->{handler} = 'debug';
 is($r->render($c), 'Hello Mojo!', 'normal rendering');
 
-# Normal rendering with path with dots
+# Rendering a path with dots
 $c->stash->{template} = 'some.path.with.dots/template';
-$c->stash->{handler} = 'debug';
-is($r->render($c), 'Hello Mojo!', 'normal rendering with path with dots');
+$c->stash->{handler}  = 'debug';
+is($r->render($c), 'Hello Mojo!', 'rendering a path with dots');
 
 # Unrecognized handler
 $c->stash->{handler} = 'not_defined';

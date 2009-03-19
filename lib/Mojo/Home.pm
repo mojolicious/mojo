@@ -55,16 +55,16 @@ sub detect {
             $path =~ s/$file$//;
             my @home = File::Spec->splitdir($path);
 
-            if (@home) {
-
-                # Remove "lib" and "blib"
-                pop @home while $home[-1] =~ /^b?lib$/ || $home[-1] eq '';
-
-                # Check for executable
-                return $self->parts(\@home)
-                  if -f File::Spec->catfile(@home, 'bin', $name)
-                      || -f File::Spec->catfile(@home, 'bin', 'mojo');
+            # Remove "lib" and "blib"
+            while (@home) {
+                last unless $home[-1] =~ /^b?lib$/ || $home[-1] eq '';
+                pop @home;
             }
+
+            # Check for executable
+            return $self->parts(\@home)
+              if -f File::Spec->catfile(@home, 'bin', $name)
+                  || -f File::Spec->catfile(@home, 'bin', 'mojo');
         }
     }
 

@@ -97,7 +97,7 @@ __404__
 </html>
 __mojo__
 % my $class = shift;
-#!<%= $^X %>
+#!/usr/bin/perl
 
 # Copyright (C) 2008-2009, Sebastian Riedel.
 

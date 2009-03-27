@@ -226,8 +226,13 @@ sub _parse_env {
 sub _parse_start_line {
     my $self = shift;
 
-    # We have a full request line
     my $line = $self->buffer->get_line;
+    # Ignore any leading empty lines
+    while ((defined $line) && ($line =~ m/^\s*$/)) {
+        $line = $self->buffer->get_line;
+    }
+
+    # We have a (hopefully) full request line
     if (defined $line) {
         if ($line =~ /
             ^\s*                                                          # Start

@@ -38,7 +38,7 @@ sub append {
         my $value = "$_";
 
         # We replace whitespace with "+"
-        $value =~ s/\ /\+/g;
+        #$value =~ s/\ /\+/g;
 
         # *( pchar / "/" / "?" ) with the exception of ";", "&" and "="
         $value =
@@ -94,12 +94,12 @@ sub param {
     # Unescape
     for (my $i = 0; $i <= $#values; $i++) {
 
+        # We replace "+" with whitespace
+        $values[$i] =~ s/\+/\ /g if $values[$i];
+
         # *( pchar / "/" / "?" ) with the exception of ";", "&" and "="
         $values[$i] =
           Mojo::ByteStream->new($values[$i])->url_unescape->to_string;
-
-        # We replace "+" with whitespace
-        $values[$i] =~ s/\+/\ /g if $values[$i];
     }
 
     return wantarray ? @values : $values[0];
@@ -141,11 +141,11 @@ sub parse {
 sub remove {
     my ($self, $name) = @_;
 
-    # *( pchar / "/" / "?" ) with the exception of ";", "&" and "="
-    $name = Mojo::ByteStream->new($name)->url_escape($Mojo::URL::PARAM);
-
     # We replace whitespace with "+"
     $name =~ s/\ /\+/g;
+
+    # *( pchar / "/" / "?" ) with the exception of ";", "&" and "="
+    $name = Mojo::ByteStream->new($name)->url_escape($Mojo::URL::PARAM);
 
     # Remove
     my $params = $self->params;
@@ -172,13 +172,13 @@ sub to_hash {
         my $name  = $params->[$i];
         my $value = $params->[$i + 1];
 
-        # Unescape
-        $name  = Mojo::ByteStream->new($name)->url_unescape->to_string;
-        $value = Mojo::ByteStream->new($value)->url_unescape->to_string;
-
         # We replace "+" with whitepsace
         $name =~ s/\+/\ /g;
         $value =~ s/\+/\ /g if $value;
+
+        # Unescape
+        $name  = Mojo::ByteStream->new($name)->url_unescape->to_string;
+        $value = Mojo::ByteStream->new($value)->url_unescape->to_string;
 
         # Array
         if (exists $params{$name}) {

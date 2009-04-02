@@ -54,14 +54,21 @@ __PACKAGE__->attr(
 # Bart, go to your room.
 sub accept_lock {
     my ($self, $blocking) = @_;
-    $self->{_child_write}->syswrite("$$ idle\n") if $blocking;
+
+    if ($blocking) {
+        $self->{_child_write}->syswrite("$$ idle\n")
+          or die "Can't write to parent: $!";
+    }
 
     # Lock
     my $lock =
       $blocking
       ? flock($self->{_lock}, LOCK_EX)
       : flock($self->{_lock}, LOCK_EX | LOCK_NB);
-    $self->{_child_write}->syswrite("$$ busy\n") if $lock;
+    if ($lock) {
+        $self->{_child_write}->syswrite("$$ busy\n")
+          or die "Can't write to parent: $!";
+    }
     return $lock;
 }
 
@@ -318,7 +325,8 @@ sub _spawn_child {
         $self->log('Child started') if DEBUG;
 
         # No need for child reader
-        delete $self->{_child_read};
+        close(delete $self->{_child_read});
+        delete $self->{_child_select};
 
         # Lockfile
         my $lock = $self->pid_file;
@@ -335,7 +343,8 @@ sub _spawn_child {
         }
 
         # Done
-        $self->{_child_write}->syswrite("$$ done\n");
+        $self->{_child_write}->syswrite("$$ done\n")
+          or die "Can't write to parent: $!";
         delete $self->{_child_write};
         delete $self->{_lock};
         exit 0;

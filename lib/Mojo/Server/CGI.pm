@@ -56,6 +56,7 @@ sub run {
 
             # Start line
             my $written = STDOUT->syswrite($chunk);
+            return unless defined $written;
             $offset += $written;
         }
     }
@@ -79,6 +80,7 @@ sub run {
 
         # Headers
         my $written = STDOUT->syswrite($chunk);
+        return unless defined $written;
         $offset += $written;
     }
 
@@ -98,6 +100,7 @@ sub run {
 
         # Content
         my $written = STDOUT->syswrite($chunk);
+        return unless defined $written;
         $offset += $written;
     }
 

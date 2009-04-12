@@ -38,7 +38,7 @@ sub append {
         my $value = "$_";
 
         # We replace whitespace with "+"
-        #$value =~ s/\ /\+/g;
+        $value =~ s/\ /\+/g;
 
         # *( pchar / "/" / "?" ) with the exception of ";", "&" and "="
         $value =

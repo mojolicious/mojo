@@ -20,9 +20,13 @@ $cookie->version(1);
 is("$cookie",                      'foo=ba =r; $Path=/test');
 is($cookie->to_string_with_prefix, '$Version=1; foo=ba =r; $Path=/test');
 
+# Empty cookie
+$cookie = Mojo::Cookie::Request->new;
+my $cookies = $cookie->parse();
+
 # Parse normal request cookie
 $cookie = Mojo::Cookie::Request->new;
-my $cookies = $cookie->parse('$Version=1; foo=bar; $Path="/test"');
+$cookies = $cookie->parse('$Version=1; foo=bar; $Path="/test"');
 is($cookies->[0]->name,    'foo');
 is($cookies->[0]->value,   'bar');
 is($cookies->[0]->path,    '/test');

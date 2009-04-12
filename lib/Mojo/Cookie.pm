@@ -38,7 +38,7 @@ sub _tokenize {
     my ($self, $string) = @_;
 
     my (@tree, @token);
-    while (length $string) {
+    while ($string) {
 
         # Name
         if ($string =~ s/

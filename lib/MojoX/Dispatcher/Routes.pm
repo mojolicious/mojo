@@ -28,6 +28,10 @@ sub dispatch {
     # Shortcut
     return 0 unless $match;
 
+    # No stack, fail
+    my $stack = $match->stack;
+    return 0 unless @$stack;
+
     # Initialize stash with captures
     my %captures = %{$match->captures};
     foreach my $key (keys %captures) {
@@ -43,7 +47,6 @@ sub dispatch {
     }
 
     # Walk the stack
-    my $stack = $match->stack;
     for my $field (@$stack) {
 
         # Don't cache errors
@@ -124,9 +127,6 @@ sub dispatch {
 
     # Render
     $c->render unless $c->stash->{rendered};
-
-    # No stack, fail
-    return 0 unless @$stack;
 
     # All seems ok
     return 1;

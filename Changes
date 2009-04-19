@@ -17,6 +17,7 @@ This file documents the revision history for Perl extension Mojo.
           (Anatoly Sharifulin)
         - Fixed parsing of "0" in Mojo::Path. (charsbar)
         - Fix server tests on win32. (charsbar)
+        - Fixed leading whitespace problem in the request parser. (Acajou)
         - Added more diagnostics options to Mojo::HelloWorld. (uwe)
         - Updated Mojo::URL to be more template friendly.
 

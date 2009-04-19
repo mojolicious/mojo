@@ -227,6 +227,7 @@ sub _parse_start_line {
     my $self = shift;
 
     my $line = $self->buffer->get_line;
+
     # Ignore any leading empty lines
     while ((defined $line) && ($line =~ m/^\s*$/)) {
         $line = $self->buffer->get_line;

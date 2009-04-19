@@ -400,8 +400,11 @@ sub server_written {
     $self->{_offset} += $written;
 
     # Done early
-    $self->state('done')
-      if $self->is_state('write_body') && $self->{_to_write} <= 0;
+    if ($self->is_state('write_body') && $self->{_to_write} <= 0) {
+      $self->req->is_state('done_with_leftovers')
+        ? $self->state('done_with_leftovers')
+        : $self->state('done');
+    }
 
     return $self;
 }

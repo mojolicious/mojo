@@ -23,6 +23,8 @@ This file documents the revision history for Perl extension Mojo.
         - Fixed empty cookie parsing. (vti)
         - Fixed a case where child processes migth hang in
           Mojo::Server::Daemon::Prefork. (gbarr)
+        - Fixed a bug in MojoX::Dispatcher::Routes where the renderer would
+          be called with an empty stack. (melo)
         - Updated Mojo::URL to be more template friendly.
 
 0.9002  2009-02-16 00:00:00

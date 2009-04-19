@@ -9,14 +9,8 @@ use warnings;
 
 use base 'MojoX::Dispatcher::Routes::Controller';
 
-sub bar {
-    return 1;
-}
-
-sub home {
-    return 1;
-}
-
+sub bar  { return 1 }
+sub home { return 1 }
 
 package Test::Context;
 
@@ -27,18 +21,14 @@ use base 'MojoX::Dispatcher::Routes::Context';
 
 __PACKAGE__->attr('render_called');
 
-sub render {
-    $_[0]->render_called(1);
-}
+sub render { shift->render_called(1) }
 
 sub reset_state {
-    my ($self) = @_;
-
+    my $self = shift;
     $self->render_called(0);
     my $stash = $self->stash;
     delete $stash->{$_} for keys %$stash;
 }
-
 
 # I was all of history's greatest acting robots -- Acting Unit 0.8,
 # Thespomat, David Duchovny!

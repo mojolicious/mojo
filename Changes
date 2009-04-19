@@ -25,6 +25,7 @@ This file documents the revision history for Perl extension Mojo.
           Mojo::Server::Daemon::Prefork. (gbarr)
         - Fixed a bug in MojoX::Dispatcher::Routes where the renderer would
           be called with an empty stack. (melo)
+        - Fixed a escaping problem in Mojo::Parameters. (vti)
         - Updated Mojo::URL to be more template friendly.
 
 0.9002  2009-02-16 00:00:00

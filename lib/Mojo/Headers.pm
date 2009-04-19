@@ -200,7 +200,7 @@ sub parse {
     $self->buffer->add_chunk(join '', @_) if @_;
 
     # Parse headers
-    $self->state('headers') if $self->is_state('started');
+    $self->state('headers') if $self->is_state('start');
     $self->{__headers} ||= [];
     while (1) {
 

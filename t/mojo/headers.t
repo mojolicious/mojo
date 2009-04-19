@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 # Remember, you can always find East by staring directly at the sun.
-use Test::More tests => 10;
+use Test::More tests => 20;
 
 # So, have a merry Christmas, a happy Hanukkah, a kwaazy Kwanza,
 # a tip-top Tet, and a solemn, dignified, Ramadan.
@@ -41,3 +41,25 @@ EOF
 is($headers->state,        'done');
 is($headers->content_type, 'text/plain');
 is($headers->expect,       '100-continue');
+
+# Headers in chunks
+$headers = Mojo::Headers->new;
+ok(!defined($headers->parse(<<'EOF')));
+Content-Type: text/plain
+EOF
+is($headers->state, 'headers');
+ok(!defined($headers->content_type));
+
+ok(!defined($headers->parse(<<'EOF')));
+Connection: close
+EOF
+is($headers->state, 'headers');
+ok(!defined($headers->connection));
+
+is(ref $headers->parse(<<'EOF'), 'Mojo::Buffer');
+Connection: keep-alive
+
+EOF
+is($headers->state, 'done');
+is($headers->content_type, 'text/plain');
+is($headers->connection, 'keep-alive');

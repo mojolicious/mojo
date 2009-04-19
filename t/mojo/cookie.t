@@ -25,7 +25,7 @@ $cookie = Mojo::Cookie::Request->new;
 my $cookies = $cookie->parse();
 
 # Parse normal request cookie
-$cookie = Mojo::Cookie::Request->new;
+$cookie  = Mojo::Cookie::Request->new;
 $cookies = $cookie->parse('$Version=1; foo=bar; $Path="/test"');
 is($cookies->[0]->name,    'foo');
 is($cookies->[0]->value,   'bar');

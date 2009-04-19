@@ -20,6 +20,7 @@ This file documents the revision history for Perl extension Mojo.
         - Fixed leading whitespace problem in the request parser. (Acajou)
         - Fixed broken pipe problem in Mojo::Server::CGI. (vti)
         - Added more diagnostics options to Mojo::HelloWorld. (uwe)
+        - Fixed empty cookie parsing. (vti)
         - Updated Mojo::URL to be more template friendly.
 
 0.9002  2009-02-16 00:00:00

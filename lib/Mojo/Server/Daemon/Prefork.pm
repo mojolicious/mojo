@@ -55,6 +55,7 @@ __PACKAGE__->attr(
 sub accept_lock {
     my ($self, $blocking) = @_;
 
+    # Idle
     if ($blocking) {
         $self->{_child_write}->syswrite("$$ idle\n")
           or die "Can't write to parent: $!";
@@ -65,10 +66,13 @@ sub accept_lock {
       $blocking
       ? flock($self->{_lock}, LOCK_EX)
       : flock($self->{_lock}, LOCK_EX | LOCK_NB);
+
+    # Busy
     if ($lock) {
         $self->{_child_write}->syswrite("$$ busy\n")
           or die "Can't write to parent: $!";
     }
+
     return $lock;
 }
 

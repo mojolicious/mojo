@@ -19,7 +19,7 @@ sub render {
     $self->{stash} = {%{$self->stash}, %$args};
 
     # Template
-    unless ($self->stash->{template}) {
+    unless ($self->stash->{template} || $self->stash->{template_path}) {
 
         # Default template
         my $controller = $self->stash->{controller};
@@ -36,6 +36,19 @@ sub render {
 
     # Render
     return $self->app->renderer->render($self);
+}
+
+sub render_inner {
+    my $self = shift;
+    local $self->stash->{template}      = $self->stash->{inner_template};
+    local $self->stash->{template_path} = $self->stash->{inner_template_path};
+    return $self->render_partial(@_);
+}
+
+sub render_partial {
+    my $self = shift;
+    local $self->stash->{partial} = 1;
+    return $self->render(@_);
 }
 
 sub url_for {
@@ -89,6 +102,16 @@ L<MojoX::Dispatcher::Routes::Context> and implements the following new ones.
 
     $c->render;
     $c->render(action => 'foo');
+
+=head2 C<render_inner>
+
+    $c->render_inner;
+    $c->render_inner(action => 'foo');
+
+=head2 C<render_partial>
+
+    $c->render_partial;
+    $c->render_partial(action => 'foo');
 
 =head2 C<url_for>
 

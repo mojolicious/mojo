@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 234;
+use Test::More tests => 240;
 
 use Mojo::Filter::Chunked;
 use Mojo::Headers;
@@ -31,6 +31,16 @@ is($req->method,        'GET');
 is($req->major_version, 1);
 is($req->minor_version, 1);
 is($req->url,           '/');
+
+# Parse pipelined HTTP 1.1 start line, no headers and body
+$req = Mojo::Message::Request->new;
+$req->parse("GET / HTTP/1.1\x0d\x0a\x0d\x0aGET / HTTP/1.1\x0d\x0a\x0d\x0a");
+is($req->state,         'done_with_leftovers');
+is($req->method,        'GET');
+is($req->major_version, 1);
+is($req->minor_version, 1);
+is($req->url,           '/');
+is($req->leftovers,     "GET / HTTP/1.1\x0d\x0a\x0d\x0a");
 
 # Parse HTTP 1.0 start line and headers, no body
 $req = Mojo::Message::Request->new;

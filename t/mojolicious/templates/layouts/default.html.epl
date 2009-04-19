@@ -1,0 +1,9 @@
+%# I didn’t think it was physically possible, but this both sucks *and*
+%# blows.
+% my $self = shift;
+<!html>
+<head></head>
+<body>
+<%= $self->render_partial(template => '23') %><%= $self->render_inner %>
+</body>
+</html>

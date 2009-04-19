@@ -48,10 +48,12 @@ sub run {
     $self->render_to_rel_file('404',    "$name/public/404.html");
     $self->render_to_rel_file('static', "$name/public/index.html");
 
-    # Template
+    # Layout and Template
     $self->renderer->line_start('%%');
     $self->renderer->tag_start('<%%');
     $self->renderer->tag_end('%%>');
+    $self->render_to_rel_file('layout',
+        "$name/templates/layouts/default.html.epl");
     $self->render_to_rel_file('welcome',
         "$name/templates/example/welcome.html.epl");
 }
@@ -180,8 +182,11 @@ use base 'Mojolicious::Controller';
 sub welcome {
     my $self = shift;
 
-    # Render template "example/welcome.html.epl" with welcome message
-    $self->render(message => 'Welcome to the Mojolicious Web Framework!');
+    # Render template "example/welcome.html.epl" with message and layout
+    $self->render(
+        layout  => 'default',
+        message => 'Welcome to the Mojolicious Web Framework!'
+    );
 }
 
 1;
@@ -229,21 +234,21 @@ $client->process_local('<%= $class %>', $tx);
 is($tx->res->code, 200);
 is($tx->res->headers->content_type, 'text/html');
 like($tx->res->content->file->slurp, qr/Mojolicious Web Framework/i);
-__welcome__
+__layout__
 % my $self = shift;
 <!doctype html>
-    <head><title><%= $self->stash('message') %></title></head>
+    <head><title>Welcome</title></head>
     <body>
-        <h2><%= $self->stash('message') %></h2>
-        This page was generated from the template
-        "templates/example/welcome.html.epl",
-        <a href="<%= $self->url_for %>">
-            click here
-        </a> 
-        to reload the page or
-        <a href="/index.html">
-            here
-        </a>
-        to move forward to a static page.
+        <%= $self->render_inner %>
     </body>
 </html>
+__welcome__
+% my $self = shift;
+<h2><%= $self->stash('message') %></h2>
+This page was generated from the template
+"templates/example/welcome.html.epl" and the layout
+"templates/layouts/default.html.epl",
+<a href="<%= $self->url_for %>">click here</a>
+to reload the page or
+<a href="/index.html">here</a>
+to move forward to a static page.

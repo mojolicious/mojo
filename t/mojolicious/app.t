@@ -34,7 +34,7 @@ $tx = Mojo::Transaction->new_get('/foo', 'X-Test' => 'Hi there!');
 $client->process_local('MojoliciousTest', $tx);
 is($tx->res->code,                  200);
 is($tx->res->headers->content_type, 'text/html');
-like($tx->res->body, qr/Hello Mojo from the template \/foo! Hello World!/);
+like($tx->res->body, qr/<body>\n23Hello Mojo from the template \/foo! He/);
 
 # Foo::Bar::index
 $tx = Mojo::Transaction->new_get('/foo-bar', 'X-Test' => 'Hi there!');

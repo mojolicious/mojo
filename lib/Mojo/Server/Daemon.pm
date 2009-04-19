@@ -10,6 +10,7 @@ use base 'Mojo::Server';
 use Carp 'croak';
 use IO::Select;
 use IO::Socket;
+use Mojo::Pipeline;
 
 __PACKAGE__->attr(keep_alive_timeout => (chained => 1, default => 15));
 __PACKAGE__->attr(listen_queue_size  => (chained => 1, default => SOMAXCONN));
@@ -126,7 +127,7 @@ sub _prepare_select {
         my $connection = $self->{_connections}->{$name};
 
         # Transaction
-        my $tx = $connection->{tx};
+        my $p = $connection->{pipeline};
 
         # Keep alive timeout
         my $timeout = time - $connection->{time};
@@ -136,7 +137,7 @@ sub _prepare_select {
         }
 
         # No transaction in progress
-        unless ($tx) {
+        unless ($p) {
 
             # Keep alive request limit
             if ($connection->{requests} >= $self->max_keep_alive_requests) {
@@ -149,12 +150,12 @@ sub _prepare_select {
             next;
         }
 
-        # Read
-        if ($tx->is_state('read')) { unshift @read, $tx->connection }
+        # We always try to read as sugegsted by the HTTP spec
+        unshift @read, $p->connection;
 
         # Write
-        if ($tx->is_state(qw/write_start_line write_headers write_body/)) {
-            unshift @write, $tx->connection;
+        if ($p->is_state(qw/write_start_line write_headers write_body/)) {
+            unshift @write, $p->connection;
         }
     }
 
@@ -179,58 +180,57 @@ sub _prepare_transactions {
         }
 
         # Transaction
-        my $tx = $connection->{tx};
+        my $p = $connection->{pipeline};
 
         # Just a keep alive, no transaction
-        next unless $tx;
+        next unless $p;
 
-        # Writing
-        if ($tx->is_state('write')) {
+        # Expect 100 Continue?
+        if ($p->is_state('handle_continue')) {
 
-            # Connection header
-            unless ($tx->res->headers->connection) {
-                if ($tx->keep_alive) {
-                    $tx->res->headers->connection('Keep-Alive');
-                }
-                else {
-                    $tx->res->headers->connection('Close');
-                }
-            }
+            # Continue handler
+            $self->continue_handler_cb->($self, $p->server_tx);
 
-            # Ready for next state
-            $tx->state('write_start_line');
-            $tx->{_to_write} = $tx->res->start_line_length;
+            # Handled
+            $p->server_handled;
         }
 
-        # Response start line
-        if ($tx->is_state('write_start_line') && $tx->{_to_write} <= 0) {
-            $tx->state('write_headers');
-            $tx->{_offset}   = 0;
-            $tx->{_to_write} = $tx->res->header_length;
+        # EOF
+        if ($p->is_state('handle_request')) {
+
+            # Handler
+            $self->handler_cb->($self, $p->server_tx);
+
+            # Handled
+            $p->server_handled;
         }
 
-        # Response headers
-        if ($tx->is_state('write_headers') && $tx->{_to_write} <= 0) {
-            $tx->state('write_body');
-            $tx->{_offset}   = 0;
-            $tx->{_to_write} = $tx->res->body_length;
+        # State machine
+        $p->server_spin;
+
+        # Add transactions to the pipe for leftovers
+        if (my $leftovers = $p->server_leftovers) {
+
+            # New transaction
+            my $tx = $self->build_tx_cb->($self);
+            $tx->local_address($p->local_address);
+            $tx->local_port($p->local_port);
+            $tx->remote_address($p->remote_address);
+            $tx->remote_port($p->remote_port);
+
+            # Add to pipeline
+            $p->server_accept($tx);
+
+            # Read leftovers
+            $p->server_read($leftovers);
         }
 
-        # Response body
-        if ($tx->is_state('write_body') && $tx->{_to_write} <= 0) {
+        # Pipeline finished?
+        elsif ($p->is_finished) {
 
-            # Continue done
-            if (defined $tx->continued && $tx->continued == 0) {
-                $tx->continued(1);
-                $tx->state('read');
-                $tx->done unless $tx->res->code == 100;
-                $tx->res->code(0);
-                next;
-            }
-
-            # Done
-            delete $connection->{tx};
-            $self->_drop_connection($name) unless $tx->keep_alive;
+            # Drop
+            delete $connection->{pipeline};
+            $self->_drop_connection($name) unless $p->keep_alive;
         }
     }
 }
@@ -256,28 +256,29 @@ sub _read {
     return 0 unless my $name = $self->_socket_name($socket);
 
     my $connection = $self->{_connections}->{$name};
-    unless ($connection->{tx}) {
-        my $tx = $connection->{tx} ||= $self->build_tx_cb->($self);
-        $tx->connection($socket);
-        $tx->state('read');
+    unless ($connection->{pipeline}) {
+
+        # New pipeline
+        my $p = $connection->{pipeline}
+          ||= Mojo::Pipeline->new->server_accept($self->build_tx_cb->($self));
+        $p->connection($socket);
         $connection->{requests}++;
-        $tx->kept_alive(1) if $connection->{requests} > 1;
+        $p->kept_alive(1) if $connection->{requests} > 1;
 
         # Last keep alive request?
-        $tx->res->headers->connection('Close')
+        $p->server_tx->res->headers->connection('Close')
           if $connection->{requests} >= $self->max_keep_alive_requests;
 
         # Store connection information
-        my ($lport, $laddr) = sockaddr_in(getsockname($tx->connection));
-        $tx->local_address(inet_ntoa($laddr));
-        $tx->local_port($lport);
-        my ($rport, $raddr) = sockaddr_in(getpeername($tx->connection));
-        $tx->remote_address(inet_ntoa($raddr));
-        $tx->remote_port($rport);
+        my ($lport, $laddr) = sockaddr_in(getsockname($p->connection));
+        $p->local_address(inet_ntoa($laddr));
+        $p->local_port($lport);
+        my ($rport, $raddr) = sockaddr_in(getpeername($p->connection));
+        $p->remote_address(inet_ntoa($raddr));
+        $p->remote_port($rport);
     }
 
-    my $tx  = $connection->{tx};
-    my $req = $tx->req;
+    my $p = $connection->{pipeline};
 
     # Read request
     my $read = $socket->sysread(my $buffer, 4096, 0);
@@ -288,25 +289,8 @@ sub _read {
         return 1;
     }
 
-    # Parse
-    $req->parse($buffer);
-
-    # Expect 100 Continue?
-    if ($req->content->is_state('body') && !defined $tx->continued) {
-        if (($req->headers->expect || '') =~ /100-continue/i) {
-            $tx->state('write');
-            $tx->continued(0);
-            $self->continue_handler_cb->($self, $tx);
-        }
-    }
-
-    # EOF
-    if (($read == 0) || $req->is_finished) {
-        $tx->state('write');
-
-        # Handle
-        $self->handler_cb->($self, $tx);
-    }
+    # Read
+    $p->server_read($buffer);
 
     $connection->{time} = time;
 }
@@ -330,26 +314,15 @@ sub _socket_name {
 sub _write {
     my ($self, $sockets) = @_;
 
-    my ($name, $tx, $res, $chunk);
+    my ($name, $p, $chunk);
 
     # Check for content
     for my $socket (@$sockets) {
         next unless $name = $self->_socket_name($socket);
         my $connection = $self->{_connections}->{$name};
-        $tx  = $connection->{tx};
-        $res = $tx->res;
+        $p = $connection->{pipeline};
 
-        # Body
-        $chunk = $res->get_body_chunk($tx->{_offset} || 0)
-          if $tx->is_state('write_body');
-
-        # Headers
-        $chunk = $res->get_header_chunk($tx->{_offset} || 0)
-          if $tx->is_state('write_headers');
-
-        # Start line
-        $chunk = $res->get_start_line_chunk($tx->{_offset} || 0)
-          if $tx->is_state('write_start_line');
+        $chunk = $p->server_get_chunk;
 
         # Content generator ready?
         last if defined $chunk;
@@ -357,13 +330,13 @@ sub _write {
     return 0 unless $name;
 
     # Write chunk
-    return 0 unless $tx->connection->connected;
-    my $written = $tx->connection->syswrite($chunk, length $chunk);
-    $tx->error("Can't write request: $!") unless defined $written;
-    return 1 if $tx->has_error;
+    return 0 unless $p->connection->connected;
 
-    $tx->{_to_write} -= $written;
-    $tx->{_offset} += $written;
+    my $written = $p->connection->syswrite($chunk, length $chunk);
+    $p->error("Can't write request: $!") unless defined $written;
+    return 1 if $p->has_error;
+
+    $p->server_written($written);
 
     $self->{_connections}->{$name}->{time} = time;
 }

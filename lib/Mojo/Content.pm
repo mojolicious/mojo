@@ -36,7 +36,8 @@ __PACKAGE__->attr(
         default => sub { Mojo::Headers->new }
     )
 );
-__PACKAGE__->attr(raw_header_length => (chained => 1, default => 0));
+__PACKAGE__->attr(
+    [qw/raw_header_length relaxed/] => (chained => 1, default => 0));
 
 sub build_body {
     my $self = shift;
@@ -125,6 +126,16 @@ sub is_multipart {
     return $type =~ /multipart/i ? 1 : 0;
 }
 
+sub leftovers {
+    my $self = shift;
+
+    # Chunked leftovers are in the filter buffer
+    return $self->filter_buffer->to_string if $self->is_chunked;
+
+    # Normal leftovers
+    return $self->buffer->to_string;
+}
+
 sub parse {
     my $self = shift;
 
@@ -177,13 +188,27 @@ sub parse {
         return Mojo::Content::MultiPart->new($self)->parse;
     }
 
-    # Parse body
-    $self->file->add_chunk($self->buffer->empty);
+    # Chunked body or relaxed content
+    if ($self->is_chunked || $self->relaxed) {
+        $self->file->add_chunk($self->buffer->empty);
+    }
 
-    # Done
-    unless ($self->is_chunked) {
+    # Normal body
+    else {
+
+        # Slurp
         my $length = $self->headers->content_length || 0;
+        my $need = $length - $self->file->length;
+        $self->file->add_chunk($self->buffer->remove($need)) if $need > 0;
+
+        # Done
         $self->done if $length <= $self->raw_body_length;
+    }
+
+    # With leftovers, maybe pipelined
+    if ($self->is_done) {
+        $self->state('done_with_leftovers')
+          if $self->buffer->length || $self->filter_buffer->length;
     }
 
     return $self;
@@ -306,6 +331,11 @@ implements the following new ones.
 
     my $raw_body_length = $content->raw_body_length;
 
+=head2 C<relaxed>
+
+    my $relaxed = $content->relaxed;
+    $content    = $content->relaxed(1);
+
 =head1 METHODS
 
 L<Mojo::Content> inherits all methods from L<Mojo::Stateful> and implements
@@ -338,6 +368,10 @@ the following new ones.
 =head2 C<is_multipart>
 
     my $multipart = $content->is_multipart;
+
+=head2 C<leftovers>
+
+    my $bytes = $content->leftovers;
 
 =head2 C<parse>
 

@@ -36,67 +36,49 @@ sub add_handler {
 sub render {
     my ($self, $c) = @_;
 
-    my $format        = $c->stash->{format};
-    my $handler       = $c->stash->{handler};
-    my $template      = $c->stash->{template};
-    my $template_path = $c->stash->{template_path};
+    my ($template, $template_path);
+    my $is_layout = 0;
 
-    # Not enough informations
+    # Layout first
+    if ($c->stash->{layout} || $c->stash->{layout_path}) {
+        $template      = $c->stash->{layout};
+        $template_path = $c->stash->{layout_path};
+        $is_layout     = 1;
+    }
+
+    # Normal template
+    else {
+        $template      = $c->stash->{template};
+        $template_path = $c->stash->{template_path};
+    }
+
+    # Not enough information
     return undef unless $template || $template_path;
 
     # Handler precedence
     $self->precedence([sort keys %{$self->handler}])
       unless $self->precedence;
 
-    # Template path
-    $template_path = File::Spec->catfile($self->root, $template)
-      if $template && !$template_path;
+    # Inner
+    local $c->stash->{inner_template} = $c->stash->{template} if $is_layout;
+    local $c->stash->{inner_template_path} = $c->stash->{template_path}
+      if $is_layout;
 
-    # Format
-    unless ($template_path =~ /\.\w+(?:\.\w+)?$/) {
-        if ($format) { $template_path .= ".$format" }
-        else {
-            $c->app->log->debug('Template format missing');
-            return undef;
-        }
-    }
+    # Template has priority
+    $template_path = undef if $template;
 
-    # Handler
-    unless ($template_path =~ /\.\w+\.\w+$/) {
-
-        if ($handler) { $template_path .= ".$handler" }
-
-        # Detect
-        else {
-            my $found = 0;
-            for my $ext (@{$self->precedence}) {
-
-                # Try
-                my $path = "$template_path.$ext";
-                if (-f $path) {
-                    $found++;
-                    $template_path = $path;
-                    $c->app->log->debug(qq/Template found "$template_path"/);
-                    last;
-                }
-            }
-
-            # Nothing found
-            unless ($found) {
-                $c->app->log->debug(
-                    qq/Template not found "$template_path.*"/);
-                return undef;
-            }
-        }
-    }
+    # Path
+    return undef
+      unless $template_path =
+          $self->_fix_path($c, $template, $template_path, $is_layout);
 
     # Store for handler usage
     local $c->stash->{template_path} = $template_path;
 
     # Extract
     $template_path =~ /\.(\w+)\.(\w+)$/;
-    $format  = $1;
-    $handler = $2;
+    my $format  = $1;
+    my $handler = $2;
 
     # Renderer
     my $r = $self->handler->{$handler};
@@ -109,6 +91,11 @@ sub render {
 
     # Partial?
     my $partial = $c->stash->{partial};
+
+    # Clean
+    local $c->stash->{layout}      = undef;
+    local $c->stash->{layout_path} = undef;
+    local $c->stash->{template}    = undef;
 
     # Render
     my $output;
@@ -130,6 +117,84 @@ sub render {
     $c->stash->{partial}  = $partial;
     $c->stash->{rendered} = 1;
     return 1;
+}
+
+sub _fix_format {
+    my ($self, $c, $path) = @_;
+
+    # Format ok
+    return $path if $path =~ /\.\w+(?:\.\w+)?$/;
+
+    my $format = $c->stash->{format};
+
+    # Append format
+    if ($format) { $path .= ".$format" }
+
+    # Missing format
+    else {
+        $c->app->log->debug('Template format missing');
+        return undef;
+    }
+
+    return $path;
+}
+
+sub _fix_handler {
+    my ($self, $c, $path) = @_;
+
+    # Handler ok
+    return $path if $path =~ /\.\w+\.\w+$/;
+
+    my $handler = $c->stash->{handler};
+
+    # Append handler
+    if ($handler) { $path .= ".$handler" }
+
+    # Detect
+    else {
+        my $found = 0;
+        for my $ext (@{$self->precedence}) {
+
+            # Try
+            my $p = "$path.$ext";
+            if (-f $p) {
+                $found++;
+                $path = $p;
+                $c->app->log->debug(qq/Template found "$path"/);
+                last;
+            }
+        }
+
+        # Nothing found
+        unless ($found) {
+            $c->app->log->debug(qq/Template not found "$path.*"/);
+            return undef;
+        }
+    }
+
+    return $path;
+}
+
+sub _fix_path {
+    my ($self, $c, $template, $template_path, $is_layout) = @_;
+
+    # Root
+    my $root =
+      $is_layout ? File::Spec->catfile($self->root, 'layouts') : $self->root;
+
+    # Path
+    $template_path = File::Spec->catfile($root, $template)
+      if $template && !$template_path;
+
+    # Format
+    return undef
+      unless $template_path = $self->_fix_format($c, $template_path);
+
+    # Handler
+    return undef
+      unless $template_path = $self->_fix_handler($c, $template_path);
+
+    return $template_path;
 }
 
 1;

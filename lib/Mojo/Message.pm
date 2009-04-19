@@ -270,6 +270,8 @@ sub is_chunked { shift->content->is_chunked }
 
 sub is_multipart { shift->content->is_multipart }
 
+sub leftovers { shift->content->leftovers }
+
 sub param {
     my $self = shift;
     $self->{body_params} ||= $self->body_params;
@@ -287,15 +289,26 @@ sub parse {
     $self->parser_progress_cb->($self) if $self->parser_progress_cb;
 
     # Content
-    if ($self->is_state(qw/content done/)) {
+    if ($self->is_state(qw/content done done_with_leftovers/)) {
         my $content = $self->content;
+
+        # HTTP 0.9 has no headers
         $content->state('body') if $self->version eq '0.9';
+
+        # Parse
         $content->filter_buffer($self->buffer);
         $self->content($content->parse);
+
+        # HTTP 0.9 has no defined length
+        $content->state('done') if $self->version eq '0.9';
     }
 
     # Done
     $self->done if $self->content->is_done;
+
+    # Done with leftovers, maybe pipelined
+    $self->state('done_with_leftovers')
+      if $self->content->is_state('done_with_leftovers');
 
     return $self;
 }
@@ -529,6 +542,13 @@ Defaults to 1.
 L<Mojo::Message> inherits all methods from L<Mojo::Stateful> and implements
 the following new ones.
 
+=head2 C<at_least_version>
+
+    my $success = $message->at_least_version('1.1');
+
+Returns true if the HTTP version is greater than or equal to the version
+passed in.
+
 =head2 C<body>
 
     my $string = $message->body;
@@ -608,12 +628,9 @@ followed HTTP version are set.
 
     my $is_multipart = $message->is_multipart;
 
-=head2 C<at_least_version>
+=head2 C<leftovers>
 
-    my $success = $message->at_least_version('1.1');
-
-Returns true if the HTTP version is greater than or equal to the version
-passed in.
+    my $bytes = $message->leftovers;
 
 =head2 C<param>
 

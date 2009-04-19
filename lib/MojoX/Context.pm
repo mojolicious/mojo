@@ -11,8 +11,6 @@ __PACKAGE__->attr(app => (chained => 1, weak => 1));
 __PACKAGE__->attr(tx => (chained => 1));
 
 # This is my first visit to the Galaxy of Terror and I'd like it to be a pleasant one.
-sub render { }
-
 sub req { return shift->tx->req }
 
 sub res { return shift->tx->res }
@@ -94,11 +92,6 @@ Returns the invocant if called with a hashref or multiple arguments.
 
 =head1 METHODS
 
-L<MojoX::Context> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
-
-=head2 C<render>
-
-    $c->render;
+L<MojoX::Context> inherits all methods from L<Mojo::Base>.
 
 =cut

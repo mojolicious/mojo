@@ -24,6 +24,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Carp'                  => 0,
         'Cwd'                   => 0,
+        'Data::Dumper'          => 0,
         'Digest::MD5'           => 0,
         'Encode'                => 0,
         'File::Basename'        => 0,

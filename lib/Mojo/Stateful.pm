@@ -24,7 +24,7 @@ sub has_error { return defined shift->{error} }
 
 sub is_done { return shift->state eq 'done' }
 
-sub is_finished { return shift->is_state(qw/done error/) }
+sub is_finished { return shift->is_state(qw/done done_with_leftovers error/) }
 
 sub is_state {
     my ($self, @states) = @_;

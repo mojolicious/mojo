@@ -158,6 +158,7 @@ sub _parse_start_line {
             $self->major_version(0);
             $self->minor_version(9);
             $self->state('content');
+            $self->content->relaxed(1);
             return 1;
         }
     }

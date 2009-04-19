@@ -11,7 +11,7 @@ use base 'Mojolicious::Controller';
 # Let me check my program... Yep.
 sub index {
     my $self = shift;
-    $self->stash(msg => 'Hello World!');
+    $self->stash(layout => 'default', msg => 'Hello World!');
 }
 
 sub templateless {

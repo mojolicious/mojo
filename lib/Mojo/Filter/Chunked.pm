@@ -75,7 +75,6 @@ sub parse {
             # Done
             else {
                 $self->_remove_chunked_encoding;
-                $filter->empty;
                 $self->done;
             }
             last;

@@ -35,7 +35,7 @@ sub append {
     my $self = shift;
 
     for (@_) {
-        my $value = "$_";
+        my $value = defined $_ ? "$_" : '';
 
         # We replace whitespace with "+"
         $value =~ s/\ /\+/g;
@@ -140,6 +140,8 @@ sub parse {
 
 sub remove {
     my ($self, $name) = @_;
+
+    $name = '' unless defined $name;
 
     # We replace whitespace with "+"
     $name =~ s/\ /\+/g;

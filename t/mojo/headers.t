@@ -44,22 +44,20 @@ is($headers->expect,       '100-continue');
 
 # Headers in chunks
 $headers = Mojo::Headers->new;
-ok(!defined($headers->parse(<<'EOF')));
+ok(!defined($headers->parse(<<EOF)));
 Content-Type: text/plain
 EOF
 is($headers->state, 'headers');
 ok(!defined($headers->content_type));
-
-ok(!defined($headers->parse(<<'EOF')));
+ok(!defined($headers->parse(<<EOF)));
 Connection: close
 EOF
 is($headers->state, 'headers');
 ok(!defined($headers->connection));
-
-is(ref $headers->parse(<<'EOF'), 'Mojo::Buffer');
+is(ref $headers->parse(<<EOF), 'Mojo::Buffer');
 Connection: keep-alive
 
 EOF
-is($headers->state, 'done');
+is($headers->state,        'done');
 is($headers->content_type, 'text/plain');
-is($headers->connection, 'keep-alive');
+is($headers->connection,   'keep-alive');

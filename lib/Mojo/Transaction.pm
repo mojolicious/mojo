@@ -401,9 +401,9 @@ sub server_written {
 
     # Done early
     if ($self->is_state('write_body') && $self->{_to_write} <= 0) {
-      $self->req->is_state('done_with_leftovers')
-        ? $self->state('done_with_leftovers')
-        : $self->state('done');
+        $self->req->is_state('done_with_leftovers')
+          ? $self->state('done_with_leftovers')
+          : $self->state('done');
     }
 
     return $self;

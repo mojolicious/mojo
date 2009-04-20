@@ -72,7 +72,7 @@ is("$params", 'foo=bar;baz=23');
 
 # Undefined params
 $params = Mojo::Parameters->new;
-$params->append('c', undef);
+$params->append('c',   undef);
 $params->append(undef, 'c');
 $params->append(undef, undef);
 is($params->to_string, "c=&=c&=");

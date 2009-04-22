@@ -39,6 +39,12 @@ sub startup {
         }
     );
 
+    # Renderer for a different file extension
+    $self->renderer->add_handler(xpl => $self->renderer->handler->{epl});
+
+    # Default handler
+    $self->renderer->default_handler('epl');
+
     # Routes
     my $r = $self->routes;
 

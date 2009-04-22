@@ -10,6 +10,7 @@ use base 'Mojo::Base';
 use File::Spec;
 use MojoX::Types;
 
+__PACKAGE__->attr([qw/default_handler precedence/] => (chained => 1));
 __PACKAGE__->attr(handler => (chained => 1, default => sub { {} }));
 __PACKAGE__->attr(
     types => (
@@ -17,7 +18,6 @@ __PACKAGE__->attr(
         default => sub { MojoX::Types->new }
     )
 );
-__PACKAGE__->attr(precedence => (chained => 1));
 __PACKAGE__->attr(root => (chained => 1, default => '/'));
 
 # This is not how Xmas is supposed to be.
@@ -76,9 +76,9 @@ sub render {
     local $c->stash->{template_path} = $template_path;
 
     # Extract
-    $template_path =~ /\.(\w+)\.(\w+)$/;
-    my $format  = $1;
-    my $handler = $2;
+    $template_path =~ /\.(\w+)(?:\.(\w+))?$/;
+    my $format = $1;
+    my $handler = $2 || $self->default_handler;
 
     # Renderer
     my $r = $self->handler->{$handler};
@@ -119,6 +119,8 @@ sub render {
     return 1;
 }
 
+sub _detect_default_handler { return 1 if shift->default_handler && -f shift }
+
 sub _fix_format {
     my ($self, $c, $path) = @_;
 
@@ -151,7 +153,7 @@ sub _fix_handler {
     if ($handler) { $path .= ".$handler" }
 
     # Detect
-    else {
+    elsif (!$self->_detect_default_handler($path)) {
         my $found = 0;
         for my $ext (@{$self->precedence}) {
 
@@ -216,10 +218,15 @@ L<MojoX::Renderer> is a MIME type based renderer.
 
 =head2 ATTRIBUTES
 
+=head2 C<default_handler>
+
+    my $default = $renderer->default_handler;
+    $renderer   = $renderer->default_handler('epl');
+
 =head2 C<handler>
 
     my $handler = $renderer->handler;
-    $renderer   = $renderer->handler({phtml => sub { ... }});
+    $renderer   = $renderer->handler({epl => sub { ... }});
 
 Returns a hashref of handlers if called without arguments.
 Returns the invocant if called with arguments.
@@ -254,7 +261,7 @@ follwing the ones.
 
 =head2 C<add_handler>
 
-    $renderer = $renderer->add_handler(phtml => sub { ... });
+    $renderer = $renderer->add_handler(epl => sub { ... });
 
 =head2 C<render>
 

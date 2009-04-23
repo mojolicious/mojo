@@ -22,10 +22,10 @@ sub stash {
     $self->{stash} ||= {};
 
     # Hash
-    return $self->{stash} unless $_[0];
+    return $self->{stash} unless @_;
 
     # Get
-    return $self->{stash}->{$_[0]} unless $_[1] || ref $_[0];
+    return $self->{stash}->{$_[0]} unless defined $_[1] || ref $_[0];
 
     # Set
     my $values = exists $_[1] ? {@_} : $_[0];

@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 5;
+use Test::More tests => 9;
 
 # Of all the parasites I've had over the years,
 # these worms are among the best.
@@ -21,9 +21,27 @@ is($c->stash('foo'), 'bar', 'set and return a stash value');
 my $stash = $c->stash;
 is_deeply($stash, {foo => 'bar'}, 'return a hashref');
 
+# Replace
+$c->stash(foo => 'baz');
+is($c->stash('foo'), 'baz', 'replace and return a stash value');
+
+# Set 0
+$c->stash(zero => 0);
+is($c->stash('zero'), 0, 'set 0 value and return 0 value');
+
+# Replace with 0
+$c->stash(foo => 0);
+is($c->stash('foo'), 0, 'replace and return 0 value');
+
+# Use 0 as the key
+$c->stash(0 => 'boo');
+is($c->stash('0'), 'boo', 'set and get with 0 key');
+
 # Delete
 $stash = $c->stash;
 delete $stash->{foo};
+delete $stash->{0};
+delete $stash->{zero};
 is_deeply($stash, {}, 'elements can be deleted');
 $c->stash('foo' => 'zoo');
 delete $c->stash->{foo};

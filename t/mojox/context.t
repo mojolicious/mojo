@@ -27,15 +27,15 @@ is($c->stash('foo'), 'baz', 'replace and return a stash value');
 
 # Set 0
 $c->stash(zero => 0);
-is($c->stash('zero'), 0, 'set 0 value and return 0 value');
+is($c->stash('zero'), 0, 'set and return 0 value');
 
 # Replace with 0
 $c->stash(foo => 0);
 is($c->stash('foo'), 0, 'replace and return 0 value');
 
-# Use 0 as the key
+# Use 0 as key
 $c->stash(0 => 'boo');
-is($c->stash('0'), 'boo', 'set and get with 0 key');
+is($c->stash('0'), 'boo', 'set and get with 0 as key');
 
 # Delete
 $stash = $c->stash;

@@ -7,6 +7,23 @@ use warnings;
 
 use base 'Mojo::Cookie';
 
+use constant RE_COOKIE_FIELDS => qr{
+    \A (
+          Version
+        | Path
+        | Domain
+        | Max-Age
+        | expires
+        | Secure
+        | HttpOnly # IE6 FF3 Opera 9.5
+        | Comment
+    ) \z
+}xmsi;
+use constant RE_COOKIE_FLAGS => qr{
+    # these don't have any value. either exists or not
+    \A (?: Secure | HttpOnly ) \z
+}xmsi;
+
 use Mojo::ByteStream;
 
 # Remember the time he ate my goldfish?
@@ -14,48 +31,27 @@ use Mojo::ByteStream;
 # Then why did I have the bowl Bart? Why did I have the bowl?
 sub parse {
     my ($self, $string) = @_;
-
     my @cookies;
-    for my $knot ($self->_tokenize($string)) {
 
-        my $first = 1;
-        for my $token (@{$knot}) {
-
-            my $name  = $token->[0];
-            my $value = $token->[1];
+    PARSE_OUT: for my $knot ( $self->_tokenize($string) ) {
+        PARSE_IN: for my $i (0..$#{$knot}) {
+            my($name, $value) = @{ $knot->[$i] };
 
             # Value might be quoted
             $value = Mojo::ByteStream->new($value)->unquote->to_string
               if $value;
 
-            # Name and value
-            if ($first) {
+            if ( not $i ) { # this'll only run once
                 push @cookies, Mojo::Cookie::Response->new;
                 $cookies[-1]->name($name);
                 $cookies[-1]->value($value);
-                $first = 0;
+                next PARSE_IN;
             }
 
-            # Version
-            elsif ($name =~ /^Version$/i) { $cookies[-1]->version($value) }
-
-            # Path
-            elsif ($name =~ /^Path$/i) { $cookies[-1]->path($value) }
-
-            # Domain
-            elsif ($name =~ /^Domain$/i) { $cookies[-1]->domain($value) }
-
-            # Max-Age
-            elsif ($name =~ /^Max-Age$/i) { $cookies[-1]->max_age($value) }
-
-            # expires
-            elsif ($name =~ /^expires$/i) { $cookies[-1]->expires($value) }
-
-            # Secure
-            elsif ($name =~ /^Secure$/i) { $cookies[-1]->secure($value) }
-
-            # Comment
-            elsif ($name =~ /^Comment$/i) { $cookies[-1]->comment($value) }
+            if ( my @match = $name =~ RE_COOKIE_FIELDS ) {
+                (my $id = lc $match[0]) =~ tr/-/_/d; # faster than s///
+                $cookies[-1]->$id( $id =~ RE_COOKIE_FLAGS ? 1 : $value);
+            }
         }
     }
 
@@ -82,8 +78,9 @@ sub to_string {
     if (defined(my $expires = $self->expires)) {
         $cookie .= "; expires=$expires";
     }
-    if (my $secure  = $self->secure)  { $cookie .= "; Secure=$secure" }
-    if (my $comment = $self->comment) { $cookie .= "; Comment=$comment" }
+    if (my $secure   = $self->secure)   { $cookie .= "; Secure" }
+    if (my $httponly = $self->httponly) { $cookie .= "; HttpOnly" }
+    if (my $comment  = $self->comment)  { $cookie .= "; Comment=$comment" }
 
     return $cookie;
 }

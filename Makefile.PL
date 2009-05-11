@@ -11,15 +11,36 @@ use warnings;
 # it's not whether you win or lose, it's how drunk you get.
 use ExtUtils::MakeMaker;
 
+my $mm_ver = $ExtUtils::MakeMaker::VERSION;
+
 # We only use core modules, so you shouldn't have to install anything besides
 # Perl 5.8!
 WriteMakefile(
     NAME         => 'Mojo',
     VERSION_FROM => 'lib/Mojo.pm',
     AUTHOR       => 'Sebastian Riedel <sri@cpan.org>',
-    ($ExtUtils::MakeMaker::VERSION >= 6.3002
-        ? ('LICENSE' => 'perl')
-        : ()),
+    ($mm_ver < 6.3002 ? () : (
+        'LICENSE' => 'perl',
+    )),
+
+    ($mm_ver < 6.46 ? () : (
+        META_MERGE => {
+            resources => {
+                license     => 'http://dev.perl.org/licenses/',
+                homepage    => 'http://mojolicious.org',
+                repository  => 'http://github.com/kraih/mojo/tree/master',
+                MailingList => 'http://lists.kraih.com/cgi-bin/mailman/listinfo',
+            },
+            no_index => {
+                directory => [ qw( t ) ],
+            },
+        },
+        META_ADD        => {
+            configure_requires => {},
+            build_requires     => {},
+        },
+    )),
+
     EXE_FILES => ['bin/mojo', 'bin/mojolicious'],
     PREREQ_PM => {
         'Carp'                  => 0,

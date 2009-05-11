@@ -21,8 +21,7 @@ sub parse {
     for my $knot ($self->_tokenize($string)) {
         for my $token (@{$knot}) {
 
-            my $name  = $token->[0];
-            my $value = $token->[1];
+            my($name,$value) = @{ $token };
 
             # Value might be quoted
             $value = Mojo::ByteStream->new($value)->unquote if $value;
@@ -54,13 +53,9 @@ sub prefix {
 
 sub to_string {
     my $self = shift;
-
     return '' unless $self->name;
 
-    my $name   = $self->name;
-    my $value  = $self->value;
-    my $cookie = "$name=$value";
-
+    my $cookie = $self->name . '=' . $self->value;
     if (my $path = $self->path) { $cookie .= "; \$Path=$path" }
 
     return $cookie;

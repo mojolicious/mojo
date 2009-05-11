@@ -63,12 +63,8 @@ sub to_string {
 
     return '' unless $self->name;
 
-    my $name  = $self->name;
-    my $value = $self->value;
-    my $cookie .= "$name=$value";
-
-    $cookie .= '; Version=';
-    $cookie .= $self->version || 1;
+    my $cookie = sprintf "%s=%s; Version=%d",
+                         $self->name, $self->value, ($self->version || 1);
 
     if (my $domain = $self->domain) { $cookie .= "; Domain=$domain" }
     if (my $path   = $self->path)   { $cookie .= "; Path=$path" }

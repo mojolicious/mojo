@@ -7,7 +7,10 @@ use warnings;
 
 use base 'Mojo::Cookie';
 
-use constant RE_COOKIE_FIELDS => qr{
+use Mojo::ByteStream;
+
+# Fields have values
+use constant RE_COOKIE_FIELDS => qr/
     \A (
           Version
         | Path
@@ -15,16 +18,15 @@ use constant RE_COOKIE_FIELDS => qr{
         | Max-Age
         | expires
         | Secure
-        | HttpOnly # IE6 FF3 Opera 9.5
+        | HttpOnly   # IE6 FF3 Opera 9.5
         | Comment
     ) \z
-}xmsi;
-use constant RE_COOKIE_FLAGS => qr{
-    # these don't have any value. either exists or not
-    \A (?: Secure | HttpOnly ) \z
-}xmsi;
+/xmsi;
 
-use Mojo::ByteStream;
+# Flags don't have values
+use constant RE_COOKIE_FLAGS => qr/
+    \A (?: Secure | HttpOnly ) \z
+/xmsi;
 
 # Remember the time he ate my goldfish?
 # And you lied and said I never had goldfish.
@@ -33,24 +35,26 @@ sub parse {
     my ($self, $string) = @_;
     my @cookies;
 
-    PARSE_OUT: for my $knot ( $self->_tokenize($string) ) {
-        PARSE_IN: for my $i (0..$#{$knot}) {
-            my($name, $value) = @{ $knot->[$i] };
+    for my $knot ($self->_tokenize($string)) {
+      PARSE: for my $i (0 .. $#{$knot}) {
+            my ($name, $value) = @{$knot->[$i]};
 
             # Value might be quoted
             $value = Mojo::ByteStream->new($value)->unquote->to_string
               if $value;
 
-            if ( not $i ) { # this'll only run once
+            # This will only run once
+            if (not $i) {
                 push @cookies, Mojo::Cookie::Response->new;
                 $cookies[-1]->name($name);
                 $cookies[-1]->value($value);
-                next PARSE_IN;
+                next PARSE;
             }
 
-            if ( my @match = $name =~ RE_COOKIE_FIELDS ) {
-                (my $id = lc $match[0]) =~ tr/-/_/d; # faster than s///
-                $cookies[-1]->$id( $id =~ RE_COOKIE_FLAGS ? 1 : $value);
+            # Field or flag?
+            if (my @match = $name =~ RE_COOKIE_FIELDS) {
+                (my $id = lc $match[0]) =~ tr/-/_/d;
+                $cookies[-1]->$id($id =~ RE_COOKIE_FLAGS ? 1 : $value);
             }
         }
     }
@@ -64,7 +68,7 @@ sub to_string {
     return '' unless $self->name;
 
     my $cookie = sprintf "%s=%s; Version=%d",
-                         $self->name, $self->value, ($self->version || 1);
+      $self->name, $self->value, ($self->version || 1);
 
     if (my $domain = $self->domain) { $cookie .= "; Domain=$domain" }
     if (my $path   = $self->path)   { $cookie .= "; Path=$path" }

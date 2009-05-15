@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 29;
+use Test::More tests => 32;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -64,6 +64,13 @@ $client->process_local('MojoliciousTest', $tx);
 is($tx->res->code,                        200);
 is($tx->res->headers->header('X-Bender'), 'Kiss my shiny metal ass!');
 like($tx->res->body, qr/\/test2/);
+
+# MojoliciousTestController::index
+$tx = Mojo::Transaction->new_get('/test3', 'X-Test' => 'Hi there!');
+$client->process_local('MojoliciousTest', $tx);
+is($tx->res->code,                        200);
+is($tx->res->headers->header('X-Bender'), 'Kiss my shiny metal ass!');
+like($tx->res->body, qr/No class works!/);
 
 # 404
 $tx = Mojo::Transaction->new_get('/', 'X-Test' => 'Hi there!');

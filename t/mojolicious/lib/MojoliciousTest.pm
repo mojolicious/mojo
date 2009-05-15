@@ -48,6 +48,10 @@ sub startup {
     # Routes
     my $r = $self->routes;
 
+    # /test3 - no class, just a namespace
+    $r->route('/test3')
+      ->to(namespace => 'MojoliciousTestController', method => 'index');
+
     # /test2 - different namespace test
     $r->route('/test2')->to(
         namespace => 'MojoliciousTest2',

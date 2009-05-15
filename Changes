@@ -13,6 +13,8 @@ This file documents the revision history for Perl extension Mojo.
         - Added Makefile.PL generator.
         - Added HttpOnly support to Mojo::Cookie. (burak)
         - Support more CGI implementations.
+        - Added support for namespaces only dispatching in
+          MojoX::Dispatcher::Routes.
         - Fixed Mojo::Date to not crash on invalid dates. (vti)
         - Fixed tokenizer in MojoX::Routes::Pattern to support "0" values.
           (Anatoly Sharifulin)

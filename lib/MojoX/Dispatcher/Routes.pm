@@ -78,7 +78,7 @@ sub dispatch {
 
         # Format
         my $namespace = $field->{namespace} || $self->namespace;
-        $class = "${namespace}::$class";
+        $class = length $class ? "${namespace}::$class" : $namespace;
 
         # Debug
         $c->app->log->debug(

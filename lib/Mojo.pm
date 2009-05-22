@@ -21,7 +21,7 @@ __PACKAGE__->attr(log  => (chained => 1, default => sub { Mojo::Log->new }));
 our $VERSION = '0.9003';
 
 sub new {
-    my $self = shift->SUPER::new();
+    my $self = shift->SUPER::new(@_);
 
     $self->home->detect(ref $self);
 

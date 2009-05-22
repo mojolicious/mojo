@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 32;
+use Test::More tests => 33;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -115,3 +115,7 @@ $tx->req->headers->header('If-Modified-Since', $mtime);
 $client->process_local('MojoliciousTest', $tx);
 is($tx->res->code, 304, 'Setting If-Modified-Since triggers 304');
 $ENV{MOJO_MODE} = $backup;
+
+# make sure we can override attrs with constructor args
+my $app = MojoliciousTest->new({ mode => 'test' });
+is($app->mode, 'test');

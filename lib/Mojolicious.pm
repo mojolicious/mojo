@@ -52,7 +52,7 @@ __PACKAGE__->attr(
 
 # The usual constructor stuff
 sub new {
-    my $self = shift->SUPER::new();
+    my $self = shift->SUPER::new(@_);
 
     # Namespace
     $self->routes->namespace(ref $self);

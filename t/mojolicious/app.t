@@ -116,6 +116,6 @@ $client->process_local('MojoliciousTest', $tx);
 is($tx->res->code, 304, 'Setting If-Modified-Since triggers 304');
 $ENV{MOJO_MODE} = $backup;
 
-# make sure we can override attrs with constructor args
-my $app = MojoliciousTest->new({ mode => 'test' });
+# Make sure we can override attributes with constructor arguments
+my $app = MojoliciousTest->new({mode => 'test'});
 is($app->mode, 'test');

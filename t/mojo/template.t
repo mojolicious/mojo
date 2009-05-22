@@ -157,15 +157,15 @@ $output = '';
 $mt->render_file($file, \$output, 3);
 like($output, qr/23Hello World!/);
 
-# File to file
+# File to file with utf8 data
 $mt = Mojo::Template->new;
 $mt->tag_start('[$-');
 $mt->tag_end('-$]');
 my $dir = File::Temp::tempdir();
 $file = File::Spec->catfile($dir, 'test.mt');
-is($mt->render_to_file(<<'EOF', $file), 1);
-<% my $i = 23 %> foo bar
-baz <%= $i %>
+is($mt->render_to_file(<<"EOF", $file), 1);
+<% my \$i = 23 %> foo bar
+\x{df}\x{0100}bar\x{263a} <%= \$i %>
 test
 EOF
 $mt = Mojo::Template->new;
@@ -174,4 +174,4 @@ is($mt->render_file_to_file($file, $file2), 1);
 $output = '';
 $mt     = Mojo::Template->new;
 $mt->render_file($file2, \$output);
-is($output, " foo bar\nbaz 23\ntest\n");
+is($output, " foo bar\n\x{df}\x{0100}bar\x{263a} 23\ntest\n");

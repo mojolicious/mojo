@@ -10,11 +10,13 @@ use base 'Mojo::Base';
 use constant DEBUG => $ENV{MOJO_TEMPLATE_DEBUG} || 0;
 
 use Carp 'croak';
+use Encode qw/decode encode/;
 use IO::File;
 
 __PACKAGE__->attr(code            => (chained => 1, default => ''));
 __PACKAGE__->attr(comment_mark    => (chained => 1, default => '#'));
 __PACKAGE__->attr(compiled        => (chained => 1));
+__PACKAGE__->attr(encoding        => (chained => 1, default => 'utf8'));
 __PACKAGE__->attr(expression_mark => (chained => 1, default => '='));
 __PACKAGE__->attr(line_start      => (chained => 1, default => '%'));
 __PACKAGE__->attr(template        => (chained => 1, default => ''));
@@ -263,6 +265,9 @@ sub render_file {
         $tmpl .= $buffer;
     }
 
+    # Encoding
+    $tmpl = decode($self->encoding, $tmpl) if $self->encoding;
+
     # Render
     return $self->render($tmpl, @_);
 }
@@ -358,10 +363,16 @@ sub _error {
 sub _write_file {
     my ($self, $path, $output) = @_;
 
-    # Write to file
+    # Open file
     my $file = IO::File->new;
-    $file->open("> $path")   or croak "Can't open file '$path': $!";
+    $file->open("> $path") or croak "Can't open file '$path': $!";
+
+    # Encoding
+    $output = encode($self->encoding, $output) if $self->encoding;
+
+    # Write to file
     $file->syswrite($output) or croak "Can't write to file '$path': $!";
+
     return 1;
 }
 
@@ -497,6 +508,11 @@ build a wrapper around it.
 
     my $comment_mark = $mt->comment_mark;
     $mt              = $mt->comment_mark('#');
+
+=head2 C<encoding>
+
+    my $encoding = $mt->encoding;
+    $mt          = $mt->encoding('utf8');
 
 =head2 C<expression_mark>
 

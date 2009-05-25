@@ -32,6 +32,7 @@ This file documents the revision history for Perl extension Mojo.
           be called with an empty stack. (melo)
         - Fixed a escaping problem in Mojo::Parameters. (vti)
         - Updated Mojo::URL to be more template friendly.
+        - Improved Solaris compatibility.
 
 0.9002  2009-02-16 00:00:00
         - Added local_address(), local_port(), remote_address() and

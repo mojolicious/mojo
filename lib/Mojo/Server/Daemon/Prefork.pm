@@ -334,7 +334,7 @@ sub _spawn_child {
 
         # Lockfile
         my $lock = $self->pid_file;
-        $self->{_lock} = IO::File->new($lock, O_RDONLY)
+        $self->{_lock} = IO::File->new($lock, O_RDWR)
           or die "Can't open lock file $lock: $!";
 
         # Parent will send a SIGHUP when there are too many children idle

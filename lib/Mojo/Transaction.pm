@@ -351,6 +351,7 @@ sub server_read {
 }
 
 sub server_spin {
+
     my $self = shift;
 
     # Initialize
@@ -384,12 +385,22 @@ sub server_spin {
     # Response headers
     if ($self->is_state('write_headers') && $self->{_to_write} <= 0) {
 
-        $self->state('write_body');
-        $self->{_offset}   = 0;
-        $self->{_to_write} = $self->res->body_length;
+        if ($self->req->method eq 'HEAD') {
 
-        # Chunked
-        $self->{_to_write} = 1 if $self->res->is_chunked;
+            # Don't send body if request method is HEAD
+            $self->req->is_state('done_with_leftovers')
+              ? $self->state('done_with_leftovers')
+              : $self->state('done');
+        }
+        else {
+
+            $self->state('write_body');
+            $self->{_offset}   = 0;
+            $self->{_to_write} = $self->res->body_length;
+
+            # Chunked
+            $self->{_to_write} = 1 if $self->res->is_chunked;
+        }
     }
 
     # Response body

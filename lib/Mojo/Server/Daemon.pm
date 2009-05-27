@@ -329,7 +329,10 @@ sub _write {
     }
     return 0 unless $name;
 
-    # Write chunk
+    # Nothing to write
+    return 0 unless $chunk;
+
+    # Connected?
     return 0 unless $p->connection->connected;
 
     my $written = $p->connection->syswrite($chunk, length $chunk);

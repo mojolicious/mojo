@@ -7,8 +7,6 @@ use warnings;
 
 use base 'Mojo::Base';
 
-use constant DEBUG => $ENV{MOJO_TEMPLATE_DEBUG} || 0;
-
 use Carp 'croak';
 use Encode qw/decode encode/;
 use IO::File;
@@ -334,9 +332,6 @@ sub _context {
 sub _error {
     my ($self, $error) = @_;
 
-    # No trace in production mode
-    return undef unless DEBUG;
-
     # Line
     if ($error =~ /at\s+\(eval\s+\d+\)\s+line\s+(\d+)/) {
         my $line  = $1;
@@ -346,11 +341,9 @@ sub _error {
         my $template = $self->_context($self->template, $line);
         $report .= "$delim\n$template$delim\n";
 
-        # Advanced debugging
-        if (DEBUG >= 2) {
-            my $code = $self->_context($self->code, $line);
-            $report .= "$code$delim\n";
-        }
+        # Context
+        my $code = $self->_context($self->code, $line);
+        $report .= "$code$delim\n";
 
         $report .= "$error\n";
         return $report;

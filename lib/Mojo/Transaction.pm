@@ -281,8 +281,17 @@ sub server_get_chunk {
     my $chunk;
 
     # Body
-    $chunk = $self->res->get_body_chunk($self->{_offset} || 0)
-      if $self->is_state('write_body');
+    if ($self->is_state('write_body')) {
+        $chunk = $self->res->get_body_chunk($self->{_offset} || 0);
+
+        # End
+        if (defined $chunk && !length $chunk) {
+            $self->req->is_state('done_with_leftovers')
+              ? $self->state('done_with_leftovers')
+              : $self->state('done');
+            return undef;
+        }
+    }
 
     # Headers
     $chunk = $self->res->get_header_chunk($self->{_offset} || 0)
@@ -359,9 +368,13 @@ sub server_spin {
 
     # Response headers
     if ($self->is_state('write_headers') && $self->{_to_write} <= 0) {
+
         $self->state('write_body');
         $self->{_offset}   = 0;
         $self->{_to_write} = $self->res->body_length;
+
+        # Chunked
+        $self->{_to_write} = 1 if $self->res->is_chunked;
     }
 
     # Response body
@@ -398,6 +411,10 @@ sub server_written {
     # Written
     $self->{_to_write} -= $written;
     $self->{_offset} += $written;
+
+    # Chunked
+    $self->{_to_write} = 1
+      if $self->res->is_chunked && $self->is_state('write_body');
 
     # Done early
     if ($self->is_state('write_body') && $self->{_to_write} <= 0) {

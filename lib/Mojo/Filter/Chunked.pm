@@ -32,7 +32,7 @@ sub build {
         $formatted = "\x0d\x0a0\x0d\x0a";
 
         # Trailing headers
-        $formatted .= "$chunk\x0d\x0a\x0d\x0a" if $headers;
+        $formatted .= $headers ? "$chunk\x0d\x0a\x0d\x0a" : "\x0d\x0a";
     }
 
     # Separator
@@ -66,6 +66,9 @@ sub parse {
         # Last chunk
         if ($length == 0) {
             $filter->{buffer} =~ s/^$1//;
+
+            # Cleanup
+            $filter->{buffer} =~ s/^\x0d?\x0a//;
 
             # Trailing headers
             if ($self->headers->trailer) {
@@ -116,6 +119,7 @@ sub _remove_chunked_encoding {
     my $encoding = $self->headers->transfer_encoding;
     $encoding =~ s/,?\s*chunked//ig;
     $self->headers->transfer_encoding($encoding);
+    $self->headers->content_length($self->output_buffer->raw_length);
 }
 
 1;

@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 241;
+use Test::More tests => 244;
 
 use Mojo::Filter::Chunked;
 use Mojo::Headers;
@@ -94,15 +94,16 @@ $req->parse("4\x0d\x0a");
 $req->parse("abcd\x0d\x0a");
 $req->parse("9\x0d\x0a");
 $req->parse("abcdefghi\x0d\x0a");
-$req->parse("0\x0d\x0a");
-is($req->state,                 'done');
-is($req->method,                'POST');
-is($req->major_version,         1);
-is($req->minor_version,         1);
-is($req->url,                   '/foo/bar/baz.html?foo=13#23');
-is($req->headers->content_type, 'text/plain');
-is($req->content->file->length, 13);
-is($req->content->file->slurp,  'abcdabcdefghi');
+$req->parse("0\x0d\x0a\x0d\x0a");
+is($req->state,                   'done');
+is($req->method,                  'POST');
+is($req->major_version,           1);
+is($req->minor_version,           1);
+is($req->url,                     '/foo/bar/baz.html?foo=13#23');
+is($req->headers->content_length, 13);
+is($req->headers->content_type,   'text/plain');
+is($req->content->file->length,   13);
+is($req->content->file->slurp,    'abcdabcdefghi');
 
 # Parse HTTP 1.1 "x-application-urlencoded"
 $req = Mojo::Message::Request->new;
@@ -172,6 +173,7 @@ is($req->query_params,                  'foo=13&bar=23');
 is($req->headers->content_type,         'text/plain');
 is($req->headers->header('X-Trailer1'), 'test');
 is($req->headers->header('X-Trailer2'), '123');
+is($req->headers->content_length,       13);
 is($req->content->file->length,         13);
 is($req->content->file->slurp,          'abcdabcdefghi');
 
@@ -315,7 +317,7 @@ is($req->build,
       . "hello world!"
       . "\x0d\x0af\x0d\x0a"
       . "hello world2!\n\n"
-      . "\x0d\x0a0\x0d\x0a");
+      . "\x0d\x0a0\x0d\x0a\x0d\x0a");
 is($counter2, 6);
 
 # Build HTTP 1.1 chunked request with trailing headers
@@ -418,14 +420,15 @@ $res->parse("4\x0d\x0a");
 $res->parse("abcd\x0d\x0a");
 $res->parse("9\x0d\x0a");
 $res->parse("abcdefghi\x0d\x0a");
-$res->parse("0\x0d\x0a");
-is($res->state,                 'done');
-is($res->code,                  500);
-is($res->message,               'Internal Server Error');
-is($res->major_version,         1);
-is($res->minor_version,         1);
-is($res->headers->content_type, 'text/plain');
-is($res->content->body_length,  13);
+$res->parse("0\x0d\x0a\x0d\x0a");
+is($res->state,                   'done');
+is($res->code,                    500);
+is($res->message,                 'Internal Server Error');
+is($res->major_version,           1);
+is($res->minor_version,           1);
+is($res->headers->content_type,   'text/plain');
+is($res->headers->content_length, 13);
+is($res->content->body_length,    13);
 
 # Parse HTTP 1.1 multipart response
 $res = Mojo::Message::Response->new;

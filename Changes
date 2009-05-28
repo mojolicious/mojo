@@ -17,13 +17,14 @@ This file documents the revision history for Perl extension Mojo.
           MojoX::Dispatcher::Routes.
         - Added encoding support to Mojo::Template and made "utf8" the
           default.
+        - Added HEAD support to Mojo::Server::Daemon. (acajou)
         - Fixed Mojo::Date to not crash on invalid dates. (vti)
         - Fixed chunked support in Mojo::Server::Daemon and Mojo::Client.
         - Fixed tokenizer in MojoX::Routes::Pattern to support "0" values.
           (Anatoly Sharifulin)
         - Fixed parsing of "0" in Mojo::Path. (charsbar)
         - Fix server tests on win32. (charsbar)
-        - Fixed leading whitespace problem in the request parser. (Acajou)
+        - Fixed leading whitespace problem in the request parser. (acajou)
         - Fixed broken pipe problem in Mojo::Server::CGI. (vti)
         - Added more diagnostics options to Mojo::HelloWorld. (uwe)
         - Fixed empty cookie parsing. (vti)

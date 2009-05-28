@@ -21,10 +21,8 @@ use_ok('Mojo::Transaction');
 my $client = Mojo::Client->new;
 my $tx     = Mojo::Transaction->new_get('http://google.com');
 $tx->req->headers->transfer_encoding('chunked');
-my $counter  = 1;
-my $chunked  = Mojo::Filter::Chunked->new;
-my $counter2 = 0;
-$tx->req->builder_progress_cb(sub { $counter2++ });
+my $counter = 1;
+my $chunked = Mojo::Filter::Chunked->new;
 $tx->req->body(
     sub {
         my $self  = shift;

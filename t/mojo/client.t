@@ -9,7 +9,7 @@ use Test::More;
 
 plan skip_all => 'set TEST_CLIENT to enable this test'
   unless $ENV{TEST_CLIENT};
-plan tests => 34;
+plan tests => 35;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -17,9 +17,29 @@ use_ok('Mojo::Client');
 use_ok('Mojo::Pipeline');
 use_ok('Mojo::Transaction');
 
-# Parallel async io
+# Chunked request
 my $client = Mojo::Client->new;
-my $tx =
+my $tx     = Mojo::Transaction->new_get('http://google.com');
+$tx->req->headers->transfer_encoding('chunked');
+my $counter  = 1;
+my $chunked  = Mojo::Filter::Chunked->new;
+my $counter2 = 0;
+$tx->req->builder_progress_cb(sub { $counter2++ });
+$tx->req->body(
+    sub {
+        my $self  = shift;
+        my $chunk = '';
+        $chunk = "hello world!"      if $counter == 1;
+        $chunk = "hello world2!\n\n" if $counter == 2;
+        $counter++;
+        return $chunked->build($chunk);
+    }
+);
+$client->process_all($tx);
+ok($tx->is_done);
+
+# Parallel async io
+$tx =
   Mojo::Transaction->new_post('http://kraih.com', Expect => '100-continue');
 $tx->req->body('foo bar baz');
 my $tx2 =

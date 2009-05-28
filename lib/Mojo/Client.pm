@@ -247,6 +247,9 @@ sub spin {
             last if defined $chunk;
         }
 
+        # Nothing to write
+        return $done unless $chunk;
+
         # Write chunk
         my $written = $tx->connection->syswrite($chunk, length $chunk);
         $tx->error("Can't write to socket: $!") unless defined $written;

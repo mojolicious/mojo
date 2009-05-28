@@ -84,8 +84,15 @@ sub client_get_chunk {
     my $chunk;
 
     # Body
-    $chunk = $self->req->get_body_chunk($self->{_offset} || 0)
-      if $self->is_state('write_body');
+    if ($self->is_state('write_body')) {
+        $chunk = $self->req->get_body_chunk($self->{_offset} || 0);
+
+        # End
+        if (defined $chunk && !length $chunk) {
+            $self->state('read_response');
+            return undef;
+        }
+    }
 
     # Headers
     $chunk = $self->req->get_header_chunk($self->{_offset} || 0)
@@ -195,11 +202,15 @@ sub client_spin {
     # Request headers written
     if ($self->is_state('write_headers')) {
         if ($self->{_to_write} <= 0) {
+
             $self->{_continue}
               ? $self->state('read_continue')
               : $self->state('write_body');
             $self->{_offset}   = 0;
             $self->{_to_write} = $self->req->body_length;
+
+            # Chunked
+            $self->{_to_write} = 1 if $self->req->is_chunked;
         }
     }
 
@@ -222,6 +233,10 @@ sub client_written {
     # Written
     $self->{_to_write} -= $written;
     $self->{_offset} += $written;
+
+    # Chunked
+    $self->{_to_write} = 1
+      if $self->req->is_chunked && $self->is_state('write_body');
 
     return $self;
 }

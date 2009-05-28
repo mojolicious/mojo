@@ -115,8 +115,12 @@ sub _parse_trailing_headers {
 }
 
 sub _remove_chunked_encoding {
-    my $self = shift;
-    $self->headers->remove('Transfer-Encoding');
+    my $self     = shift;
+    my $encoding = $self->headers->transfer_encoding;
+    $encoding =~ s/,?\s*chunked//ig;
+    $encoding
+      ? $self->headers->transfer_encoding($encoding)
+      : $self->headers->remove('Transfer-Encoding');
     $self->headers->content_length($self->output_buffer->raw_length);
 }
 

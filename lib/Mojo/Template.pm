@@ -50,7 +50,7 @@ sub build {
 
             # Code
             if ($type eq 'code') {
-                $lines[-1] .= "$value;";
+                $lines[-1] .= "$value";
             }
 
             # Expression

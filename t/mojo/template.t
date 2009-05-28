@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 21;
+use Test::More tests => 22;
 
 use File::Spec;
 use File::Temp;
@@ -15,8 +15,27 @@ use FindBin;
 # like God must feel when he's holding a gun.
 use_ok('Mojo::Template');
 
+# Control structures
+my $mt     = Mojo::Template->new;
+my $output = '';
+$mt->render(<<'EOF', \$output);
+% if (23 > 22) {
+foo
+% }
+% else {
+bar
+% }
+% if (23 > 22) {
+bar
+% }
+% else {
+foo
+% }
+EOF
+is($output, "foo\nbar\n");
+
 # All tags
-my $mt = Mojo::Template->new;
+$mt = Mojo::Template->new;
 $mt->parse(<<'EOF');
 <html foo="bar">
 <%= $_[0] + 1 %> test <%= 2 + 2 %> lala <%# comment lalala %>
@@ -33,7 +52,7 @@ unlike($mt->code, qr/ comment lalala /);
 ok(!defined($mt->compiled));
 $mt->compile;
 is(ref($mt->compiled), 'CODE');
-my $output;
+$output = '';
 $mt->interpret(\$output, 2);
 is($output, "<html foo=\"bar\">\n3 test 4 lala \n4\%\n</html>\n");
 
@@ -117,7 +136,7 @@ $mt     = Mojo::Template->new;
 $output = '';
 $mt->render(<<'EOF', \$output);
 <html><%= do { my $i = '2';
-$i x 4; } %>\
+$i x 4; }; %>\
 </html>\
 EOF
 is($output, "<html>2222</html>");
@@ -164,7 +183,7 @@ $mt->tag_end('-$]');
 my $dir = File::Temp::tempdir();
 $file = File::Spec->catfile($dir, 'test.mt');
 is($mt->render_to_file(<<"EOF", $file), 1);
-<% my \$i = 23 %> foo bar
+<% my \$i = 23; %> foo bar
 \x{df}\x{0100}bar\x{263a} <%= \$i %>
 test
 EOF

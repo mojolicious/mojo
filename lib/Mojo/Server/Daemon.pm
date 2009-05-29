@@ -214,10 +214,6 @@ sub _prepare_transactions {
 
             # New transaction
             my $tx = $self->build_tx_cb->($self);
-            $tx->local_address($p->local_address);
-            $tx->local_port($p->local_port);
-            $tx->remote_address($p->remote_address);
-            $tx->remote_port($p->remote_port);
 
             # Add to pipeline
             $p->server_accept($tx);

@@ -159,9 +159,6 @@ sub spin {
 
             $tx->continue_timeout($self->continue_timeout);
 
-            # State machine
-            $tx->client_connected;
-
             # Store connection information
             my ($lport, $laddr) = sockaddr_in(getsockname($tx->connection));
             $tx->local_address(inet_ntoa($laddr));
@@ -169,6 +166,9 @@ sub spin {
             my ($rport, $raddr) = sockaddr_in(getpeername($tx->connection));
             $tx->remote_address(inet_ntoa($raddr));
             $tx->remote_port($rport);
+
+            # State machine
+            $tx->client_connected;
         }
 
         # State machine

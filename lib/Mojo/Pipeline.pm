@@ -5,27 +5,33 @@ package Mojo::Pipeline;
 use strict;
 use warnings;
 
-use base 'Mojo::Transaction';
+use base 'Mojo::Stateful';
 
-use Mojo::Transaction;
-
-__PACKAGE__->attr(txs => (chained => 1, default => sub { [] }));
+__PACKAGE__->attr(
+    [   qw/
+          connection
+          kept_alive
+          local_address
+          local_port
+          remote_address
+          remote_port
+          /
+    ] => (chained => 1)
+);
+__PACKAGE__->attr(continue_timeout => (chained => 1, default => 3));
 
 # No children have ever meddled with the Republican Party and lived to tell
 # about it.
 sub new {
     my $self = shift->SUPER::new();
-    $self->add_tx(@_);
+    $self->{_txs} = [@_];
     return $self;
 }
 
-sub add_tx {
+sub client_info {
     my $self = shift;
-    push @{$self->txs}, @_;
-    return $self;
+    return $self->{_txs}->[0] ? $self->{_txs}->[0]->client_info(@_) : undef;
 }
-
-sub client_info { shift->_proxy('client_info', @_) }
 
 sub client_connect {
     my $self = shift;
@@ -35,7 +41,7 @@ sub client_connect {
     $self->{_reader} = 0;
 
     # Connect all
-    $_->client_connect for @{$self->txs};
+    $_->client_connect for @{$self->{_txs}};
     $self->state('connect');
 
     return $self;
@@ -45,7 +51,20 @@ sub client_connected {
     my $self = shift;
 
     # All connected
-    $_->client_connected for @{$self->txs};
+    for my $tx (@{$self->{_txs}}) {
+
+        # Connected
+        $tx->client_connected;
+
+        # Meta information
+        $tx->connection($self->connection);
+        $tx->kept_alive($self->kept_alive);
+        $tx->local_address($self->local_address);
+        $tx->local_port($self->local_port);
+        $tx->remote_address($self->remote_address);
+        $tx->remote_port($self->remote_port);
+
+    }
     $self->state('write_start_line');
 
     return $self;
@@ -70,8 +89,8 @@ sub client_read {
         # All done
         unless ($self->_next_reader) {
 
-            $self->{_reader} = $#{$self->txs};
-            $self->{_writer} = $#{$self->txs};
+            $self->{_reader} = $#{$self->{_txs}};
+            $self->{_writer} = $#{$self->{_txs}};
 
             $self->done;
             return $self;
@@ -94,14 +113,14 @@ sub client_leftovers {
     return undef unless $previous >= 0;
 
     # Leftovers
-    return $self->txs->[$previous]->client_leftovers;
+    return $self->{_txs}->[$previous]->client_leftovers;
 }
 
 sub client_spin {
     my $self = shift;
 
     # Spin all
-    $_->client_spin for @{$self->txs};
+    $_->client_spin for @{$self->{_txs}};
 
     # Transaction finished
     if (!$self->{_all_written} && $self->_writer->is_state('read_response')) {
@@ -130,28 +149,29 @@ sub client_written {
     return $self;
 }
 
-sub connection       { shift->_proxy('connection',       @_) }
-sub continue_timeout { shift->_proxy('continue_timeout', @_) }
-sub continued        { shift->_proxy('continued',        @_) }
-sub keep_alive       { shift->_proxy('keep_alive',       @_) }
-sub kept_alive       { shift->_proxy('kept_alive',       @_) }
-sub local_address    { shift->_proxy('local_address',    @_) }
-sub local_port       { shift->_proxy('local_port',       @_) }
-sub remote_address   { shift->_proxy('remote_address',   @_) }
-sub remote_port      { shift->_proxy('remote_port',      @_) }
-sub req              { shift->_proxy('req',              @_) }
-sub res              { shift->_proxy('res',              @_) }
+sub keep_alive {
+    my $self = shift;
+    return $self->{_txs}->[0] ? $self->{_txs}->[0]->keep_alive(@_) : undef;
+}
 
 sub server_accept {
     my ($self, $tx) = @_;
 
+    # Meta information
+    $tx->connection($self->connection);
+    $tx->kept_alive($self->kept_alive);
+    $tx->local_address($self->local_address);
+    $tx->local_port($self->local_port);
+    $tx->remote_address($self->remote_address);
+    $tx->remote_port($self->remote_port);
+
     # Accept
     $tx->server_accept;
-    $self->add_tx($tx);
+    push @{$self->{_txs}}, $tx;
 
     # Initialize
     $self->{_writer} ||= 0;
-    $self->{_reader} = $#{$self->txs};
+    $self->{_reader} = $#{$self->{_txs}};
 
     # Inherit state
     $self->_server_inherit_state;
@@ -200,7 +220,7 @@ sub server_read {
     my $self = shift;
 
     # Request without a transaction
-    unless ($self->_reader) { $self->txs->[-1]->server_read(@_) }
+    unless ($self->_reader) { $self->{_txs}->[-1]->server_read(@_) }
 
     # Normal request
     else { $self->_reader->server_read(@_) }
@@ -215,7 +235,7 @@ sub server_spin {
     my $self = shift;
 
     # Spin all
-    $_->server_spin for @{$self->txs};
+    $_->server_spin for @{$self->{_txs}};
 
     # Next reader?
     if ($self->_reader && $self->_reader->req->is_finished) {
@@ -236,8 +256,8 @@ sub server_tx {
     my $self = shift;
 
     # Current reader
-    return $self->{_reader} > $#{$self->txs}
-      ? $self->txs->[-1]
+    return $self->{_reader} > $#{$self->{_txs}}
+      ? $self->{_txs}->[-1]
       : $self->_reader;
 }
 
@@ -280,7 +300,7 @@ sub _next_reader {
     $self->{_reader}++;
 
     # No reader
-    return 0 unless $self->txs->[$self->{_reader}];
+    return 0 unless $self->{_txs}->[$self->{_reader}];
 
     # Found
     return 1;
@@ -293,37 +313,17 @@ sub _next_writer {
     $self->{_writer}++;
 
     # No writer
-    return 0 unless $self->txs->[$self->{_writer}];
+    return 0 unless $self->{_txs}->[$self->{_writer}];
 
     # Found
     return 1;
-}
-
-sub _proxy {
-    my $self   = shift;
-    my $method = shift;
-
-    # Set
-    if (@_) {
-
-        # Proxy
-        $_->$method(@_) for @{$self->txs};
-
-        return $self;
-    }
-
-    # Get
-    return undef unless $self->txs->[0];
-    return wantarray
-      ? ($self->txs->[0]->$method)
-      : scalar $self->txs->[0]->$method;
 }
 
 sub _reader {
     my $self = shift;
 
     # Current reader
-    return $self->txs->[$self->{_reader}];
+    return $self->{_txs}->[$self->{_reader}];
 }
 
 # We are always in reading mode according to RFC, so writing has priority
@@ -348,7 +348,7 @@ sub _writer {
     my $self = shift;
 
     # Current writer
-    return $self->txs->[$self->{_writer}];
+    return $self->{_txs}->[$self->{_writer}];
 }
 
 1;
@@ -369,7 +369,7 @@ L<Mojo::Pipeline> is a container for pipelined HTTP transactions.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Pipeline> inherits all attributes from L<Mojo::Transaction> and
+L<Mojo::Pipeline> inherits all attributes from L<Mojo::Stateful> and
 implements the following new ones.
 
 =head2 C<connection>
@@ -381,11 +381,6 @@ implements the following new ones.
 
     my $continue_timeout = $p->continue_timeout;
     $p                   = $p->continue_timeout(3);
-
-=head2 C<continued>
-
-    my $continued = $p->continued;
-    $p            = $p->continued(1);
 
 =head2 C<keep_alive>
 
@@ -417,25 +412,10 @@ implements the following new ones.
     my $remote_port = $p->remote_port;
     $p              = $p->remote_port($port);
 
-=head2 C<req>
-
-    my $req = $p->req;
-    $p      = $p->req($req);
-
-=head2 C<res>
-
-    my $res = $p->res;
-    $p      = $p->res($res);
-
-=head2 C<txs>
-
-    my $txs = $p->txs;
-    $p      = $p->txs([Mojo::Transaction->new]);
-
 =head1 METHODS
 
-L<Mojo::Pipeline> inherits all methods from L<Mojo::Transaction> and
-implements the following new ones.
+L<Mojo::Pipeline> inherits all methods from L<Mojo::Stateful> and implements
+the following new ones.
 
 =head2 C<new>
 

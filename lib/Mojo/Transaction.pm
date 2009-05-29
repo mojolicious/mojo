@@ -5,25 +5,13 @@ package Mojo::Transaction;
 use strict;
 use warnings;
 
-use base 'Mojo::Stateful';
+use base 'Mojo::Pipeline';
 
 use Mojo;
 use Mojo::Message::Request;
 use Mojo::Message::Response;
 
-__PACKAGE__->attr(
-    [   qw/
-          connection
-          continued
-          kept_alive
-          local_address
-          local_port
-          remote_address
-          remote_port
-          /
-    ] => (chained => 1)
-);
-__PACKAGE__->attr(continue_timeout => (chained => 1, default => 3));
+__PACKAGE__->attr('continued' => (chained => 1));
 __PACKAGE__->attr(
     req => (
         chained => 1,
@@ -496,18 +484,8 @@ L<Mojo::Transaction> is a container for HTTP transactions.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Transaction> inherits all attributes from L<Mojo::Stateful> and
+L<Mojo::Transaction> inherits all attributes from L<Mojo::Pipeline> and
 implements the following new ones.
-
-=head2 C<connection>
-
-    my $connection = $tx->connection;
-    $tx            = $tx->connection($connection);
-
-=head2 C<continue_timeout>
-
-    my $continue_timeout = $tx->continue_timeout;
-    $tx                  = $tx->continue_timeout(5);
 
 =head2 C<continued>
 
@@ -518,31 +496,6 @@ implements the following new ones.
 
     my $keep_alive = $tx->keep_alive;
     $tx            = $tx->keep_alive(1);
-
-=head2 C<kept_alive>
-
-    my $kept_alive = $tx->kept_alive;
-    $tx            = $tx->kept_alive(1);
-
-=head2 C<local_address>
-
-    my $address = $tx->local_address;
-    $tx         = $tx->local_address('127.0.0.1');
-
-=head2 C<local_port>
-
-    my $port = $tx->local_port;
-    $tx      = $tx->local_port(80);
-
-=head2 C<remote_address>
-
-    my $address = $tx->remote_address;
-    $tx         = $tx->remote_address('127.0.0.1');
-
-=head2 C<remote_port>
-
-    my $port = $tx->remote_port;
-    $tx      = $tx->remote_port(80);
 
 =head2 C<req>
 
@@ -562,7 +515,7 @@ Returns the invocant if called with arguments.
 
 =head1 METHODS
 
-L<Mojo::Transaction> inherits all methods from L<Mojo::Stateful> and
+L<Mojo::Transaction> inherits all methods from L<Mojo::Pipeline> and
 implements the following new ones.
 
 =head2 C<client_connect>

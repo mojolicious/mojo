@@ -5,7 +5,7 @@ package Mojo::Pipeline;
 use strict;
 use warnings;
 
-use base 'Mojo::Stateful';
+use base 'Mojo::Transaction';
 
 use Mojo::Transaction;
 
@@ -139,6 +139,10 @@ sub local_address    { shift->_proxy('local_address',    @_) }
 sub local_port       { shift->_proxy('local_port',       @_) }
 sub remote_address   { shift->_proxy('remote_address',   @_) }
 sub remote_port      { shift->_proxy('remote_port',      @_) }
+
+sub req { shift->_writer->req(@_) }
+
+sub res { shift->_writer->res(@_) }
 
 sub server_accept {
     my ($self, $tx) = @_;
@@ -367,7 +371,7 @@ L<Mojo::Pipeline> is a container for pipelined HTTP transactions.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Pipeline> inherits all attributes from L<Mojo::Stateful> and
+L<Mojo::Pipeline> inherits all attributes from L<Mojo::Transaction> and
 implements the following new ones.
 
 =head2 C<connection>
@@ -415,6 +419,16 @@ implements the following new ones.
     my $remote_port = $p->remote_port;
     $p              = $p->remote_port($port);
 
+=head2 C<req>
+
+    my $req = $p->req;
+    $p      = $p->req($req);
+
+=head2 C<res>
+
+    my $res = $p->res;
+    $p      = $p->res($res);
+
 =head2 C<txs>
 
     my $txs = $p->txs;
@@ -422,7 +436,7 @@ implements the following new ones.
 
 =head1 METHODS
 
-L<Mojo::Pipeline> inherits all methods from L<Mojo::Stateful> and
+L<Mojo::Pipeline> inherits all methods from L<Mojo::Transaction> and
 implements the following new ones.
 
 =head2 C<new>

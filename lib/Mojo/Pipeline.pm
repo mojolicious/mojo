@@ -5,7 +5,7 @@ package Mojo::Pipeline;
 use strict;
 use warnings;
 
-use base 'Mojo::Transaction';
+use base 'Mojo::Stateful';
 
 use Mojo::Transaction;
 
@@ -367,7 +367,7 @@ L<Mojo::Pipeline> is a container for pipelined HTTP transactions.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Pipeline> inherits all attributes from L<Mojo::Transaction> and
+L<Mojo::Pipeline> inherits all attributes from L<Mojo::Stateful> and
 implements the following new ones.
 
 =head2 C<connection>
@@ -422,7 +422,7 @@ implements the following new ones.
 
 =head1 METHODS
 
-L<Mojo::Pipeline> inherits all methods from L<Mojo::Transaction> and
+L<Mojo::Pipeline> inherits all methods from L<Mojo::Stateful> and
 implements the following new ones.
 
 =head2 C<new>

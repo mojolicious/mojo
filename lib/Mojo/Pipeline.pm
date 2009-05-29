@@ -139,10 +139,8 @@ sub local_address    { shift->_proxy('local_address',    @_) }
 sub local_port       { shift->_proxy('local_port',       @_) }
 sub remote_address   { shift->_proxy('remote_address',   @_) }
 sub remote_port      { shift->_proxy('remote_port',      @_) }
-
-sub req { shift->_writer->req(@_) }
-
-sub res { shift->_writer->res(@_) }
+sub req              { shift->_proxy('req',              @_) }
+sub res              { shift->_proxy('res',              @_) }
 
 sub server_accept {
     my ($self, $tx) = @_;

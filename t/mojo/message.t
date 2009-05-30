@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 256;
+use Test::More tests => 268;
 
 use Mojo::Filter::Chunked;
 use Mojo::Headers;
@@ -200,6 +200,31 @@ is($req->headers->header('X-Trailer'), '777');
 is($req->headers->content_length,      13);
 is($req->content->file->length,        13);
 is($req->content->file->slurp,         'abcdabcdefghi');
+
+# Parse HTTP 1.1 chunked request with trailing headers (different variation)
+$req = Mojo::Message::Request->new;
+$req->parse("POST /foo/bar/baz.html?foo=13&bar=23#23 HTTP/1.1\x0d\x0a");
+$req->parse("Content-Type: text/plain\x0d\x0a");
+$req->parse("Transfer-Encoding: chunked\x0d\x0a");
+$req->parse("Trailer: X-Trailer1; X-Trailer2\x0d\x0a\x0d\x0a");
+$req->parse("4\x0d\x0a");
+$req->parse("abcd\x0d\x0a");
+$req->parse("9\x0d\x0a");
+$req->parse("abcdefghi\x0d\x0a");
+$req->parse(
+    "0\x0d\x0aX-Trailer1: test\x0d\x0aX-Trailer2: 123\x0d\x0a\x0d\x0a");
+is($req->state,                         'done');
+is($req->method,                        'POST');
+is($req->major_version,                 1);
+is($req->minor_version,                 1);
+is($req->url,                           '/foo/bar/baz.html?foo=13&bar=23#23');
+is($req->query_params,                  'foo=13&bar=23');
+is($req->headers->content_type,         'text/plain');
+is($req->headers->header('X-Trailer1'), 'test');
+is($req->headers->header('X-Trailer2'), '123');
+is($req->headers->content_length,       13);
+is($req->content->file->length,         13);
+is($req->content->file->slurp,          'abcdabcdefghi');
 
 # Parse HTTP 1.1 multipart request
 $req = Mojo::Message::Request->new;

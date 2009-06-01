@@ -66,20 +66,7 @@ sub parse {
         # Last chunk
         if ($length == 0) {
             $filter->{buffer} =~ s/^$1//;
-
-            # Cleanup
-            $filter->{buffer} =~ s/^\x0d?\x0a//;
-
-            # Trailing headers
-            if ($self->headers->trailer) {
-                $self->state('trailing_headers');
-            }
-
-            # Done
-            else {
-                $self->_remove_chunked_encoding;
-                $self->done;
-            }
+            $self->state('trailing_headers');
             last;
         }
 

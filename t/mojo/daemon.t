@@ -35,8 +35,27 @@ my $port = $server->port;
 my $client = Mojo::Client->new;
 $client->continue_timeout(60);
 
+# Pipelined with 100 Continue
+my $tx  = Mojo::Transaction->new_get("http://127.0.0.1:$port/");
+my $tx2 = Mojo::Transaction->new_get("http://127.0.0.1:$port/");
+$tx2->req->headers->expect('100-continue');
+$tx2->req->body('foo bar baz');
+my $tx3 = Mojo::Transaction->new_get("http://127.0.0.1:$port/");
+my $tx4 = Mojo::Transaction->new_get("http://127.0.0.1:$port/");
+$client->process_all(Mojo::Pipeline->new($tx, $tx2, $tx3, $tx4));
+ok($tx->is_done);
+ok($tx2->is_done);
+ok($tx3->is_done);
+ok($tx4->is_done);
+is($tx->res->code,  200);
+is($tx2->res->code, 200);
+is($tx2->continued, 1);
+is($tx3->res->code, 200);
+is($tx4->res->code, 200);
+like($tx2->res->content->file->slurp, qr/Mojo is working/);
+
 # 100 Continue request
-my $tx =
+$tx =
   Mojo::Transaction->new_get("http://127.0.0.1:$port/",
     Expect => '100-continue');
 $tx->req->body('Hello Mojo!');
@@ -63,32 +82,13 @@ like($tx->res->headers->connection, qr/Keep-Alive/i);
 like($tx->res->body,                qr/Mojo is working/);
 
 # Pipelined
-$tx = Mojo::Transaction->new_get("http://127.0.0.1:$port/");
-my $tx2 = Mojo::Transaction->new_get("http://127.0.0.1:$port/");
+$tx  = Mojo::Transaction->new_get("http://127.0.0.1:$port/");
+$tx2 = Mojo::Transaction->new_get("http://127.0.0.1:$port/");
 $client->process_all(Mojo::Pipeline->new($tx, $tx2));
 ok($tx->is_done);
 ok($tx2->is_done);
 is($tx->res->code,  200);
 is($tx2->res->code, 200);
-like($tx2->res->content->file->slurp, qr/Mojo is working/);
-
-# Pipelined with 100 Continue
-$tx  = Mojo::Transaction->new_get("http://127.0.0.1:$port/");
-$tx2 = Mojo::Transaction->new_get("http://127.0.0.1:$port/");
-$tx2->req->headers->expect('100-continue');
-$tx2->req->body('foo bar baz');
-my $tx3 = Mojo::Transaction->new_get("http://127.0.0.1:$port/");
-my $tx4 = Mojo::Transaction->new_get("http://127.0.0.1:$port/");
-$client->process_all(Mojo::Pipeline->new($tx, $tx2, $tx3, $tx4));
-ok($tx->is_done);
-ok($tx2->is_done);
-ok($tx3->is_done);
-ok($tx4->is_done);
-is($tx->res->code,  200);
-is($tx2->res->code, 200);
-is($tx2->continued, 1);
-is($tx3->res->code, 200);
-is($tx4->res->code, 200);
 like($tx2->res->content->file->slurp, qr/Mojo is working/);
 
 # Stop

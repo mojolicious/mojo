@@ -36,12 +36,12 @@ my $client = Mojo::Client->new;
 $client->continue_timeout(60);
 
 # Pipelined with 100 Continue
-my $tx  = Mojo::Transaction->new_get("http://127.0.0.1:$port/");
-my $tx2 = Mojo::Transaction->new_get("http://127.0.0.1:$port/");
+my $tx  = Mojo::Transaction->new_get("http://127.0.0.1:$port/1/");
+my $tx2 = Mojo::Transaction->new_get("http://127.0.0.1:$port/2/");
 $tx2->req->headers->expect('100-continue');
 $tx2->req->body('foo bar baz');
-my $tx3 = Mojo::Transaction->new_get("http://127.0.0.1:$port/");
-my $tx4 = Mojo::Transaction->new_get("http://127.0.0.1:$port/");
+my $tx3 = Mojo::Transaction->new_get("http://127.0.0.1:$port/3/");
+my $tx4 = Mojo::Transaction->new_get("http://127.0.0.1:$port/4/");
 $client->process_all(Mojo::Pipeline->new($tx, $tx2, $tx3, $tx4));
 ok($tx->is_done);
 ok($tx2->is_done);
@@ -56,7 +56,7 @@ like($tx2->res->content->file->slurp, qr/Mojo is working/);
 
 # 100 Continue request
 $tx =
-  Mojo::Transaction->new_get("http://127.0.0.1:$port/",
+  Mojo::Transaction->new_get("http://127.0.0.1:$port/5/",
     Expect => '100-continue');
 $tx->req->body('Hello Mojo!');
 $client->process_all($tx);
@@ -66,7 +66,7 @@ like($tx->res->headers->connection, qr/Keep-Alive/i);
 like($tx->res->body,                qr/Mojo is working/);
 
 # Second keep alive request
-$tx = Mojo::Transaction->new_get("http://127.0.0.1:$port/");
+$tx = Mojo::Transaction->new_get("http://127.0.0.1:$port/6/");
 $client->process_all($tx);
 is($tx->res->code,  200);
 is($tx->kept_alive, 1);
@@ -74,7 +74,7 @@ like($tx->res->headers->connection, qr/Keep-Alive/i);
 like($tx->res->body,                qr/Mojo is working/);
 
 # Third keep alive request
-$tx = Mojo::Transaction->new_get("http://127.0.0.1:$port/");
+$tx = Mojo::Transaction->new_get("http://127.0.0.1:$port/7/");
 $client->process_all($tx);
 is($tx->res->code,  200);
 is($tx->kept_alive, 1);
@@ -82,8 +82,8 @@ like($tx->res->headers->connection, qr/Keep-Alive/i);
 like($tx->res->body,                qr/Mojo is working/);
 
 # Pipelined
-$tx  = Mojo::Transaction->new_get("http://127.0.0.1:$port/");
-$tx2 = Mojo::Transaction->new_get("http://127.0.0.1:$port/");
+$tx  = Mojo::Transaction->new_get("http://127.0.0.1:$port/8/");
+$tx2 = Mojo::Transaction->new_get("http://127.0.0.1:$port/9/");
 $client->process_all(Mojo::Pipeline->new($tx, $tx2));
 ok($tx->is_done);
 ok($tx2->is_done);

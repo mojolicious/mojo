@@ -236,6 +236,18 @@ sub _prepare_transactions {
                 # Handled
                 $p->server_handled;
             }
+            # Or an Expect 100 Continue
+            elsif ($p->is_state('handle_continue')) {
+
+                # Continue handler
+                $self->continue_handler_cb->($self, $p->server_tx);
+
+                # Handled
+                $p->server_handled;
+            }
+        }
+
+
 
         }
 

@@ -51,9 +51,7 @@ __PACKAGE__->attr(
                 if ($self->app->can('continue_handler')) {
                     $self->app->continue_handler($tx);
                 }
-                else {
-                    $tx->res->code(100);
-                }
+                else { $tx->res->code(100) }
                 return $tx;
             };
         }

@@ -236,7 +236,8 @@ sub _prepare_transactions {
                 # Handled
                 $p->server_handled;
             }
-            # Or an Expect 100 Continue
+
+            # Or expects a 100 Continue
             elsif ($p->is_state('handle_continue')) {
 
                 # Continue handler
@@ -248,17 +249,16 @@ sub _prepare_transactions {
         }
 
 
-
-        }
-
-        # Pipeline finished?
-        elsif ($p->is_finished) {
-
-            # Drop
-            delete $connection->{pipeline};
-            $self->_drop_connection($name) unless $p->keep_alive;
-        }
     }
+
+    # Pipeline finished?
+    elsif ($p->is_finished) {
+
+        # Drop
+        delete $connection->{pipeline};
+        $self->_drop_connection($name) unless $p->keep_alive;
+    }
+}
 }
 
 sub _read {

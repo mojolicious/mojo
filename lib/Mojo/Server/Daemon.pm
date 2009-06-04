@@ -71,11 +71,17 @@ sub spin {
     $read  ||= [];
     $write ||= [];
 
+    # Make a random decision about reading or writing
+    my $do = -1;
+    $do = 0 if @$read;
+    $do = 1 if @$write;
+    $do = int(rand(3)) - 1 if @$read && @$write;
+
     # Read
-    if (@$read) { $self->_read($read) }
+    if ($do == 0) { $self->_read($read) }
 
     # Write
-    elsif (@$write) { $self->_write($write) }
+    elsif ($do == 1) { $self->_write($write) }
 
 }
 
@@ -335,7 +341,7 @@ sub _write {
     my ($name, $p, $chunk);
 
     # Check for content
-    for my $socket (@$sockets) {
+    for my $socket (sort { int(rand(3)) - 1 } @$sockets) {
         next unless $name = $self->_socket_name($socket);
         my $connection = $self->{_connections}->{$name};
         $p = $connection->{pipeline};

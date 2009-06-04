@@ -201,17 +201,17 @@ sub server_handled {
 sub server_leftovers {
     my $self = shift;
 
-    # Current reader
-    my $reader = $self->server_tx;
+    # Last Transaction
+    my $last_tx = $self->{_txs}->[-1];
 
     # No leftovers
-    return undef unless $reader->req->is_state('done_with_leftovers');
+    return undef unless $last_tx->req->is_state('done_with_leftovers');
 
     # Leftovers
-    my $leftovers = $reader->req->leftovers;
+    my $leftovers = $last_tx->req->leftovers;
 
     # Done
-    $reader->req->done;
+    $last_tx->req->done;
 
     return $leftovers;
 }
@@ -220,10 +220,10 @@ sub server_read {
     my $self = shift;
 
     # Request without a transaction
-    unless ($self->_reader) { $self->{_txs}->[-1]->server_read(@_) }
+    die "Request without a transaction!" unless ($self->_reader);
 
     # Normal request
-    else { $self->_reader->server_read(@_) }
+    $self->_reader->server_read(@_);
 
     # Inherit state
     $self->_server_inherit_state;
@@ -256,9 +256,7 @@ sub server_tx {
     my $self = shift;
 
     # Current reader
-    return $self->{_reader} > $#{$self->{_txs}}
-      ? $self->{_txs}->[-1]
-      : $self->_reader;
+    return $self->_reader;
 }
 
 sub server_written {

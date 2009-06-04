@@ -48,7 +48,12 @@ __PACKAGE__->attr(
         default => sub {
             return sub {
                 my ($self, $tx) = @_;
-                $tx->res->code(100);
+                if ($self->app->can('continue_handler')) {
+                    $self->app->continue_handler($tx);
+                }
+                else {
+                    $tx->res->code(100);
+                }
                 return $tx;
             };
         }

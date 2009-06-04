@@ -202,16 +202,16 @@ sub server_leftovers {
     my $self = shift;
 
     # Last Transaction
-    my $last_tx = $self->{_txs}->[-1];
+    my $last = $self->{_txs}->[-1];
 
     # No leftovers
-    return undef unless $last_tx->req->is_state('done_with_leftovers');
+    return undef unless $last->req->is_state('done_with_leftovers');
 
     # Leftovers
-    my $leftovers = $last_tx->req->leftovers;
+    my $leftovers = $last->req->leftovers;
 
     # Done
-    $last_tx->req->done;
+    $last->req->done;
 
     return $leftovers;
 }
@@ -220,7 +220,10 @@ sub server_read {
     my $self = shift;
 
     # Request without a transaction
-    die "Request without a transaction!" unless ($self->_reader);
+    unless ($self->_reader) {
+        $self->error('Request without a transaction!');
+        return $self;
+    }
 
     # Normal request
     $self->_reader->server_read(@_);
@@ -252,12 +255,8 @@ sub server_spin {
     return $self;
 }
 
-sub server_tx {
-    my $self = shift;
-
-    # Current reader
-    return $self->_reader;
-}
+# Current reader
+sub server_tx { shift->_reader }
 
 sub server_written {
     my $self = shift;

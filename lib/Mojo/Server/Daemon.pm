@@ -299,8 +299,10 @@ sub _read {
 
     # Need a new transaction?
     unless ($p->server_tx) {
+
         # New transaction
         my $new_tx = $self->build_tx_cb->($self);
+
         # Add to pipeline
         $p->server_accept($new_tx);
     }

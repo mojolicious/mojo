@@ -13,6 +13,7 @@ __PACKAGE__->attr(defaults => (chained => 1, default => sub { {} }));
 __PACKAGE__->attr([qw/format pattern regex/] => (chained => 1));
 __PACKAGE__->attr(quote_end      => (chained => 1, default => ')'));
 __PACKAGE__->attr(quote_start    => (chained => 1, default => '('));
+__PACKAGE__->attr(relaxed_start  => (chained => 1, default => '^'));
 __PACKAGE__->attr(reqs           => (chained => 1, default => sub { {} }));
 __PACKAGE__->attr(symbol_start   => (chained => 1, default => ':'));
 __PACKAGE__->attr(symbols        => (chained => 1, default => sub { [] }));
@@ -83,8 +84,8 @@ sub render {
             $optional = 0;
         }
 
-        # Symbol or wildcard
-        elsif ($op eq 'symbol' || $op eq 'wildcard') {
+        # Relaxed, symbol or wildcard
+        elsif ($op eq 'relaxed' || $op eq 'symbol' || $op eq 'wildcard') {
             my $name = $token->[1];
             $rendered = $values->{$name} || '';
 
@@ -167,12 +168,19 @@ sub _compile {
         }
 
         # Symbol
-        elsif ($op eq 'symbol' || $op eq 'wildcard') {
+        elsif ($op eq 'relaxed' || $op eq 'symbol' || $op eq 'wildcard') {
             my $name = $token->[1];
 
             unshift @{$self->symbols}, $name;
 
-            $compiled = $op eq 'symbol' ? '([^\/\.]+)' : '(.*)';
+            # Relaxed
+            if ($op eq 'relaxed') { $compiled = '([^\/]+)' }
+
+            # Symbol
+            elsif ($op eq 'symbol') { $compiled = '([^\/\.]+)' }
+
+            # Wildcard
+            elsif ($op eq 'wildcard') { $compiled = '(.*)' }
 
             my $req = $self->reqs->{$name};
             $compiled = "($req)" if $req;
@@ -199,6 +207,7 @@ sub _tokenize {
     my $self = shift;
 
     my $pattern        = $self->pattern;
+    my $relaxed_start  = $self->relaxed_start;
     my $quote_end      = $self->quote_end;
     my $quote_start    = $self->quote_start;
     my $symbol_start   = $self->symbol_start;
@@ -229,6 +238,12 @@ sub _tokenize {
             $state = 'text';
         }
 
+        # Relaxed start
+        elsif ($char eq $relaxed_start) {
+            push @$tree, ['relaxed', ''];
+            $state = 'relaxed';
+        }
+
         # Symbol start
         elsif ($char eq $symbol_start) {
             push @$tree, ['symbol', ''];
@@ -241,8 +256,11 @@ sub _tokenize {
             $state = 'wildcard';
         }
 
-        # Symbol or wildcard
-        elsif ($state eq 'symbol' || $state eq 'wildcard') {
+        # Relaxed, symbol or wildcard
+        elsif ($state eq 'relaxed'
+            || $state eq 'symbol'
+            || $state eq 'wildcard')
+        {
             $tree->[-1]->[-1] .= $char;
         }
 

@@ -84,7 +84,7 @@ sub client_read {
     $self->_reader->client_read($chunk);
 
     # Transaction finished
-    if ($self->_reader->is_finished) {
+    while ($self->_reader->is_finished) {
 
         # All done
         unless ($self->_next_reader) {
@@ -94,6 +94,11 @@ sub client_read {
 
             $self->done;
             return $self;
+        }
+
+        # Check for leftovers
+        if (my $leftovers = $self->client_leftovers) {
+            $self->_reader->client_read($leftovers);
         }
     }
 

@@ -269,7 +269,7 @@ sub _read_messages {
 
     # Read messages
     if ($self->{_child_select}->can_read(1)) {
-        next unless $self->{_child_read}->sysread(my $buffer, 4096);
+        return unless $self->{_child_read}->sysread(my $buffer, 4096);
         $self->{_buffer} .= $buffer;
     }
 

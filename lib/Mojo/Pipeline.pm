@@ -135,9 +135,10 @@ sub client_spin {
     }
 
     # Take care of leftovers
-    if (my $leftovers = $self->client_leftovers) {
-        $self->_reader->client_read($leftovers);
-    }
+    # May no longer be necessary since done in client_read
+    # if (my $leftovers = $self->client_leftovers) {
+    #     $self->_reader->client_read($leftovers);
+    # }
 
     # Inherit state
     $self->_client_inherit_state;

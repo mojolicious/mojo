@@ -7,13 +7,13 @@ use warnings;
 
 use Test::More tests => 6;
 
-# Grandpa: Are we there yet?
-# Homer: No
-# Grandpa: Are we there yet?
-# Homer: No
-# Grandpa: Are we there yet?
-# Homer: No
-# Grandpa: ........Where are we going?
+# Are we there yet?
+# No
+# Are we there yet?
+# No
+# Are we there yet?
+# No
+# ...Where are we going?
 use_ok('Mojo::Pipeline');
 use_ok('Mojo::Transaction');
 

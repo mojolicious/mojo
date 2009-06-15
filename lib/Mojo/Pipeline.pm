@@ -134,12 +134,6 @@ sub client_spin {
         $self->{_all_written} = 1 unless $self->_next_writer;
     }
 
-    # Take care of leftovers
-    # May no longer be necessary since done in client_read
-    # if (my $leftovers = $self->client_leftovers) {
-    #     $self->_reader->client_read($leftovers);
-    # }
-
     # Inherit state
     $self->_client_inherit_state;
 

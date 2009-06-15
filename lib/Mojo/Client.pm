@@ -20,10 +20,10 @@ __PACKAGE__->attr(select_timeout     => (chained => 1, default => 5));
 sub connect {
     my ($self, $tx) = @_;
 
-    my ($host, $port) = $tx->client_info;
+    my ($address, $port) = $tx->client_info;
 
     # Try to get a cached connection
-    my $connection = $self->withdraw_connection("$host:$port");
+    my $connection = $self->withdraw_connection("$address:$port");
     $tx->kept_alive(1) if $connection;
 
     # Non blocking connect
@@ -36,8 +36,8 @@ sub connect {
         # Non blocking
         $connection->blocking(0);
 
-        my $address = sockaddr_in($port, scalar inet_aton($host));
-        $connection->connect($address);
+        my $sin = sockaddr_in($port, inet_aton($address));
+        $connection->connect($sin);
         $tx->{_connect_timeout} = time + 5;
 
     }

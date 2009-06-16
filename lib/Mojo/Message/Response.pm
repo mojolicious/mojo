@@ -122,6 +122,19 @@ sub parse {
     return $self->SUPER::parse();
 }
 
+sub parse_headers_only {
+    my $self = shift;
+
+    # Buffer
+    $self->buffer->add_chunk(join '', @_) if @_;
+
+    # Start line
+    $self->_parse_start_line if $self->is_state('start');
+
+    # Pass through
+    return $self->SUPER::parse_headers_only();
+}
+
 sub _build_start_line {
     my $self    = shift;
     my $version = $self->version;

@@ -313,6 +313,40 @@ sub parse {
     return $self;
 }
 
+sub parse_headers_only {
+    my $self = shift;
+
+    # Buffer
+    $self->buffer->add_chunk(join '', @_) if @_;
+
+    # Progress
+    $self->parser_progress_cb->($self) if $self->parser_progress_cb;
+
+    # Content
+    if ($self->is_state(qw/content done done_with_leftovers/)) {
+        my $content = $self->content;
+
+        # HTTP 0.9 has no headers
+        $content->state('body') if $self->version eq '0.9';
+
+        # Parse
+        $content->filter_buffer($self->buffer);
+        $self->content($content->parse_headers_only);
+
+        # HTTP 0.9 has no defined length
+        $content->state('done') if $self->version eq '0.9';
+    }
+
+    # Done
+    $self->done if $self->content->is_done;
+
+    # Done with leftovers, maybe pipelined
+    $self->state('done_with_leftovers')
+      if $self->content->is_state('done_with_leftovers');
+
+    return $self;
+}
+
 sub start_line_length { return length shift->build_start_line }
 
 sub to_string { shift->build(@_) }

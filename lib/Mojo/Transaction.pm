@@ -153,8 +153,25 @@ sub client_read {
     # Read response
     elsif ($self->is_state('read_response')) {
         $self->done if $read == 0;
+
+        my $req_is_head = ($self->req->method eq 'HEAD');
+        if ($req_is_head) {
+            $self->res->parse_headers_only($chunk);
+            if ($self->res->content->is_state('body')) {
+                if ($self->res->content->buffer->length ||
+                    $self->res->content->filter_buffer->length) {
+                    $self->res->state('done_with_leftovers');
+                    $self->state('done_with_leftovers');
+                }
+                else {
+                    $self->done;
+                }
+            }
+            return $self;
+        }
+
         $self->res->parse($chunk);
-        $self->done if $self->res->is_done;
+        $self->done if ($self->res->is_done);
         $self->state('done_with_leftovers')
           if $self->res->is_state('done_with_leftovers');
     }

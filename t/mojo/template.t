@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 22;
+use Test::More tests => 35;
 
 use File::Spec;
 use File::Temp;
@@ -15,9 +15,44 @@ use FindBin;
 # like God must feel when he's holding a gun.
 use_ok('Mojo::Template');
 
-# Control structures
+# Error handling
 my $mt     = Mojo::Template->new;
 my $output = '';
+$mt->render(<<'EOF', \$output);
+test
+123
+% die 'oops!';
+%= 1 + 1
+test
+EOF
+is(ref $output, 'Mojo::Template::Exception');
+like($output->message, qr/oops\!/);
+is($output->lines_before->[0]->[0], 1);
+is($output->lines_before->[0]->[1], 'test');
+is($output->lines_before->[1]->[0], 2);
+is($output->lines_before->[1]->[1], '123');
+is($output->line->[0],              3);
+is($output->line->[1],              "% die 'oops!';");
+is($output->lines_after->[0]->[0],  4);
+is($output->lines_after->[0]->[1],  '%= 1 + 1');
+is($output->lines_after->[1]->[0],  5);
+is($output->lines_after->[1]->[1],  'test');
+$output->message("oops!\n");
+is("$output", <<'EOF');
+Error around line 3.
+----------------------------------------------------------------------------
+1: test
+2: 123
+3: % die 'oops!';
+4: %= 1 + 1
+5: test
+----------------------------------------------------------------------------
+oops!
+EOF
+
+# Control structures
+$mt     = Mojo::Template->new;
+$output = '';
 $mt->render(<<'EOF', \$output);
 % if (23 > 22) {
 foo

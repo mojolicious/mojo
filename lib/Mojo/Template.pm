@@ -10,6 +10,7 @@ use base 'Mojo::Base';
 use Carp 'croak';
 use Encode qw/decode encode/;
 use IO::File;
+use Mojo::Template::Exception;
 
 __PACKAGE__->attr(code            => (chained => 1, default => ''));
 __PACKAGE__->attr(comment_mark    => (chained => 1, default => '#'));
@@ -77,10 +78,7 @@ sub compile {
     return undef unless $code;
 
     # Catch compilation warnings
-    local $SIG{__WARN__} = sub {
-        my $error = shift;
-        warn $self->_error($error);
-    };
+    local $SIG{__WARN__} = sub { };
 
     # Compile
     my $compiled = eval $code;
@@ -99,10 +97,7 @@ sub interpret {
     return undef unless $compiled;
 
     # Catch interpreter warnings
-    local $SIG{__WARN__} = sub {
-        my $error = shift;
-        warn $self->_error($error);
-    };
+    local $SIG{__WARN__} = sub { };
 
     # Interpret
     $$output = eval { $compiled->(@_) };
@@ -296,61 +291,44 @@ sub render_to_file {
     return $self->_write_file($path, $output);
 }
 
-sub _context {
-    my ($self, $text, $line) = @_;
-
-    $line -= 1;
-    my $nline  = $line + 1;
-    my $pline  = $line - 1;
-    my $nnline = $line + 2;
-    my $ppline = $line - 2;
-    my @lines  = split /\n/, $text;
-
-    # Context
-    my $context = (($line + 1) . ': ' . $lines[$line] . "\n");
-
-    # -1
-    $context = (($pline + 1) . ': ' . $lines[$pline] . "\n" . $context)
-      if $lines[$pline];
-
-    # -2
-    $context = (($ppline + 1) . ': ' . $lines[$ppline] . "\n" . $context)
-      if $lines[$ppline];
-
-    # +1
-    $context = ($context . ($nline + 1) . ': ' . $lines[$nline] . "\n")
-      if $lines[$nline];
-
-    # +2
-    $context = ($context . ($nnline + 1) . ': ' . $lines[$nnline] . "\n")
-      if $lines[$nnline];
-
-    return $context;
-}
-
 # Debug goodness
 sub _error {
     my ($self, $error) = @_;
 
+    my $te = Mojo::Template::Exception->new(message => $error);
+
     # Line
     if ($error =~ /at\s+\(eval\s+\d+\)\s+line\s+(\d+)/) {
-        my $line  = $1;
-        my $delim = '-' x 76;
 
-        my $report = "\nTemplate error around line $line.\n";
-        my $template = $self->_context($self->template, $line);
-        $report .= "$delim\n$template$delim\n";
+        my $line = $1;
+        my @lines = split /\n/, $self->template;
 
         # Context
-        my $code = $self->_context($self->code, $line);
-        $report .= "$code$delim\n";
+        $te->line([$line, $lines[$line - 1]]);
 
-        $report .= "$error\n";
-        return $report;
+        # -2
+        my $previous_line = $line - 3;
+        my $code = $previous_line >= 0 ? $lines[$previous_line] : undef;
+        push @{$te->lines_before}, [$line - 2, $code] if $code;
+
+        # -1
+        $previous_line = $line - 2;
+        $code = $previous_line >= 0 ? $lines[$previous_line] : undef;
+        push @{$te->lines_before}, [$line - 1, $code] if $code;
+
+        # +1
+        my $next_line = $line;
+        $code = $next_line >= 0 ? $lines[$next_line] : undef;
+        push @{$te->lines_after}, [$line + 1, $code] if $code;
+
+        # +2
+        $next_line = $line + 1;
+        $code = $next_line >= 0 ? $lines[$next_line] : undef;
+        push @{$te->lines_after}, [$line + 2, $code] if $code;
+
     }
 
-    # No line found
-    return "Template error: $error";
+    return $te;
 }
 
 sub _write_file {
@@ -459,9 +437,8 @@ newline you can escape the backslash with another backslash.
 
 Templates get compiled to Perl code internally, this can make debugging a bit
 tricky.
-But by setting the MOJO_TEMPLATE_DEBUG environment variable to C<1>, you can
-tell L<Mojo::Template> to trace all errors that might occur and present them
-in a very convenient way with context.
+But L<Mojo::Template> will return L<Mojo::Template::Exception> objects that
+stringify to error messages with context.
 
     Template error around line 4.
     -----------------------------------------------------------------

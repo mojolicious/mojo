@@ -115,11 +115,7 @@ sub parse {
     # Buffer
     $self->buffer->add_chunk(join '', @_) if @_;
 
-    # Start line
-    $self->_parse_start_line if $self->is_state('start');
-
-    # Pass through
-    return $self->SUPER::parse();
+    return $self->_parse(0);
 }
 
 sub parse_until_body {
@@ -128,11 +124,18 @@ sub parse_until_body {
     # Buffer
     $self->buffer->add_chunk(join '', @_) if @_;
 
+    return $self->_parse(1);
+}
+
+sub _parse {
+    my $self = shift;
+    my $until_body = shift; # ? 1 : 0;
+
     # Start line
     $self->_parse_start_line if $self->is_state('start');
 
     # Pass through
-    return $self->SUPER::parse_until_body();
+    return $self->SUPER::_parse($until_body);
 }
 
 sub _build_start_line {

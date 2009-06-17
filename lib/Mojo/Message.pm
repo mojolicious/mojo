@@ -285,32 +285,7 @@ sub parse {
     # Buffer
     $self->buffer->add_chunk(join '', @_) if @_;
 
-    # Progress
-    $self->parser_progress_cb->($self) if $self->parser_progress_cb;
-
-    # Content
-    if ($self->is_state(qw/content done done_with_leftovers/)) {
-        my $content = $self->content;
-
-        # HTTP 0.9 has no headers
-        $content->state('body') if $self->version eq '0.9';
-
-        # Parse
-        $content->filter_buffer($self->buffer);
-        $self->content($content->parse);
-
-        # HTTP 0.9 has no defined length
-        $content->state('done') if $self->version eq '0.9';
-    }
-
-    # Done
-    $self->done if $self->content->is_done;
-
-    # Done with leftovers, maybe pipelined
-    $self->state('done_with_leftovers')
-      if $self->content->is_state('done_with_leftovers');
-
-    return $self;
+    return $self->_parse(0);
 }
 
 sub parse_until_body {
@@ -319,6 +294,13 @@ sub parse_until_body {
     # Buffer
     $self->buffer->add_chunk(join '', @_) if @_;
 
+    return $self->_parse(1);
+}
+
+sub _parse {
+    my $self = shift;
+    my $until_body = @_ ? shift : 0;
+
     # Progress
     $self->parser_progress_cb->($self) if $self->parser_progress_cb;
 
@@ -331,7 +313,12 @@ sub parse_until_body {
 
         # Parse
         $content->filter_buffer($self->buffer);
-        $self->content($content->parse_until_body);
+        if ($until_body) {
+            $self->content($content->parse_until_body);
+        }
+        else {
+            $self->content($content->parse);
+        }
 
         # HTTP 0.9 has no defined length
         $content->state('done') if $self->version eq '0.9';

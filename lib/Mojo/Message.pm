@@ -313,12 +313,12 @@ sub _parse {
 
         # Parse
         $content->filter_buffer($self->buffer);
-        if ($until_body) {
-            $self->content($content->parse_until_body);
-        }
-        else {
-            $self->content($content->parse);
-        }
+
+        # Until body
+        if ($until_body) { $self->content($content->parse_until_body) }
+
+        # Whole message
+        else { $self->content($content->parse) }
 
         # HTTP 0.9 has no defined length
         $content->state('done') if $self->version eq '0.9';
@@ -661,6 +661,10 @@ followed HTTP version are set.
 =head2 C<parse>
 
     $message = $message->parse('HTTP/1.1 200 OK...');
+
+=head2 C<parse_until_body>
+
+    $message = $message->parse_until_body('HTTP/1.1 200 OK...');
 
 =head2 C<upload>
 

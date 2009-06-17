@@ -129,10 +129,8 @@ sub is_multipart {
 sub leftovers {
     my $self = shift;
 
-    # Chunked leftovers are in the filter buffer, and so are
-    # those from a headers-only request (e.g. HEAD)
-    # NOTE: Could the filter_buffer be left with crud in it? If so,
-    # the following code will run into a problem...
+    # Chunked leftovers are in the filter buffer, and so are those from a
+    # HEAD request
     return $self->filter_buffer->to_string if $self->filter_buffer->length;
 
     # Normal leftovers
@@ -144,9 +142,8 @@ sub parse {
 
     # Buffer
     $self->filter_buffer->add_chunk(join '', @_) if @_;
-    # my $buffer = $self->filter_buffer; <- UNUSED
 
-    # Parser started / headers
+    # Parse headers
     $self->parse_until_body;
 
     # Still parsing headers
@@ -226,7 +223,7 @@ sub parse_until_body {
     # Parse headers
     $self->_parse_headers if $self->is_state('headers');
 
-    return $self
+    return $self;
 }
 
 sub raw_body_length {
@@ -391,5 +388,11 @@ the following new ones.
 =head2 C<parse>
 
     $content = $content->parse("Content-Length: 12\r\n\r\nHello World!");
+
+=head2 C<parse_until_body>
+
+    $content = $content->parse_until_body(
+        "Content-Length: 12\r\n\r\nHello World!"
+    );
 
 =cut

@@ -264,4 +264,8 @@ implements the following new ones.
 
     $res = $res->parse('HTTP/1.1 200 OK');
 
+=head2 C<parse_until_body>
+
+    $res = $res->parse_until_body('HTTP/1.1 200 OK');
+
 =cut

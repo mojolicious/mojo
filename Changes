@@ -20,6 +20,8 @@ This file documents the revision history for Perl extension Mojo.
         - Added HEAD support to Mojo::Server::Daemon. (acajou)
         - Added new relaxed placeholder to MojoX::Routes::Pattern.
         - Added Mojo::Template::Exception.
+        - Added HEAD support to the Mojo::Transaction state machine and
+          related modules. (acajou)
         - Fixed compiler bug in Mojo::Template that prevented more advanced
           control structures, you might have to add additional semicolons to
           some of your templates.

@@ -158,18 +158,22 @@ sub client_read {
         if ($self->req->method eq 'HEAD') {
             $self->res->parse_until_body($chunk);
             if ($self->res->content->is_state('body')) {
-                if ($self->res->content->buffer->length ||
-                    $self->res->content->filter_buffer->length) {
+
+                # Leftovers?
+                if (   $self->res->content->buffer->length
+                    || $self->res->content->filter_buffer->length)
+                {
                     $self->res->state('done_with_leftovers');
                     $self->state('done_with_leftovers');
                 }
-                else {
-                    $self->done;
-                }
+
+                # Done
+                else { $self->done }
             }
             return $self;
         }
 
+        # Parse
         $self->res->parse($chunk);
         $self->done if $self->res->is_done;
         $self->state('done_with_leftovers')

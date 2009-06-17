@@ -313,7 +313,7 @@ sub parse {
     return $self;
 }
 
-sub parse_headers_only {
+sub parse_until_body {
     my $self = shift;
 
     # Buffer
@@ -331,7 +331,7 @@ sub parse_headers_only {
 
         # Parse
         $content->filter_buffer($self->buffer);
-        $self->content($content->parse_headers_only);
+        $self->content($content->parse_until_body);
 
         # HTTP 0.9 has no defined length
         $content->state('done') if $self->version eq '0.9';

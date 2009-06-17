@@ -154,9 +154,9 @@ sub client_read {
     elsif ($self->is_state('read_response')) {
         $self->done if $read == 0;
 
-        my $req_is_head = ($self->req->method eq 'HEAD');
-        if ($req_is_head) {
-            $self->res->parse_headers_only($chunk);
+        # HEAD request is special case
+        if ($self->req->method eq 'HEAD') {
+            $self->res->parse_until_body($chunk);
             if ($self->res->content->is_state('body')) {
                 if ($self->res->content->buffer->length ||
                     $self->res->content->filter_buffer->length) {
@@ -171,7 +171,7 @@ sub client_read {
         }
 
         $self->res->parse($chunk);
-        $self->done if ($self->res->is_done);
+        $self->done if $self->res->is_done;
         $self->state('done_with_leftovers')
           if $self->res->is_state('done_with_leftovers');
     }

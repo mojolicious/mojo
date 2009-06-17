@@ -122,7 +122,7 @@ sub parse {
     return $self->SUPER::parse();
 }
 
-sub parse_headers_only {
+sub parse_until_body {
     my $self = shift;
 
     # Buffer
@@ -132,7 +132,7 @@ sub parse_headers_only {
     $self->_parse_start_line if $self->is_state('start');
 
     # Pass through
-    return $self->SUPER::parse_headers_only();
+    return $self->SUPER::parse_until_body();
 }
 
 sub _build_start_line {

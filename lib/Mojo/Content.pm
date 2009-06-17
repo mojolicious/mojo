@@ -144,19 +144,10 @@ sub parse {
 
     # Buffer
     $self->filter_buffer->add_chunk(join '', @_) if @_;
-    my $buffer = $self->filter_buffer;
+    # my $buffer = $self->filter_buffer; <- UNUSED
 
-    # Parser started
-    if ($self->is_state('start')) {
-        my $length            = length($self->filter_buffer->{buffer});
-        my $raw_length        = $self->filter_buffer->raw_length;
-        my $raw_header_length = $raw_length - $length;
-        $self->raw_header_length($raw_header_length);
-        $self->state('headers');
-    }
-
-    # Parse headers
-    $self->_parse_headers if $self->is_state('headers');
+    # Parser started / headers
+    $self->parse_until_body;
 
     # Still parsing headers
     return $self if $self->is_state('headers');
@@ -217,12 +208,11 @@ sub parse {
     return $self;
 }
 
-sub parse_headers_only {
+sub parse_until_body {
     my $self = shift;
 
     # Buffer
     $self->filter_buffer->add_chunk(join '', @_) if @_;
-    my $buffer = $self->filter_buffer;
 
     # Parser started
     if ($self->is_state('start')) {

@@ -129,7 +129,7 @@ sub parse_until_body {
 
 sub _parse {
     my $self = shift;
-    my $until_body = shift; # ? 1 : 0;
+    my $until_body = @_ ? shift : 0;
 
     # Start line
     $self->_parse_start_line if $self->is_state('start');

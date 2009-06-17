@@ -255,6 +255,8 @@ sub get_start_line_chunk {
     return substr($copy, $offset, 4096);
 }
 
+sub has_leftovers { shift->content->has_leftovers }
+
 sub header_length {
     my $self = shift;
 
@@ -641,13 +643,17 @@ followed HTTP version are set.
 
     my $string = $message->get_start_line_chunk($offset);
 
+=head2 C<has_leftovers>
+
+    my $leftovers = $message->has_leftovers;
+
 =head2 C<is_chunked>
 
-    my $is_chunked = $message->is_chunked;
+    my $chunked = $message->is_chunked;
 
 =head2 C<is_multipart>
 
-    my $is_multipart = $message->is_multipart;
+    my $multipart = $message->is_multipart;
 
 =head2 C<leftovers>
 

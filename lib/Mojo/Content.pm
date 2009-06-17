@@ -112,6 +112,12 @@ sub get_header_chunk {
     return substr($copy, $offset, 4096);
 }
 
+sub has_leftovers {
+    my $self = shift;
+    return 1 if $self->buffer->length || $self->filter_buffer->length;
+    return 0;
+}
+
 sub header_length { return length shift->build_headers }
 
 sub is_chunked {
@@ -198,8 +204,7 @@ sub parse {
 
     # With leftovers, maybe pipelined
     if ($self->is_done) {
-        $self->state('done_with_leftovers')
-          if $self->buffer->length || $self->filter_buffer->length;
+        $self->state('done_with_leftovers') if $self->has_leftovers;
     }
 
     return $self;
@@ -372,6 +377,10 @@ the following new ones.
 =head2 C<get_header_chunk>
 
     my $chunk = $content->get_header_chunk(13);
+
+=head2 C<has_leftovers>
+
+    my $leftovers = $content->has_leftovers;
 
 =head2 C<is_chunked>
 

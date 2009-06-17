@@ -160,9 +160,7 @@ sub client_read {
             if ($self->res->content->is_state('body')) {
 
                 # Leftovers?
-                if (   $self->res->content->buffer->length
-                    || $self->res->content->filter_buffer->length)
-                {
+                if ($self->res->has_leftovers) {
                     $self->res->state('done_with_leftovers');
                     $self->state('done_with_leftovers');
                 }

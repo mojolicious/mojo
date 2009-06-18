@@ -87,6 +87,7 @@ sub spin {
 
 sub _drop_connection {
     my ($self, $name) = @_;
+    close $self->{_connections}->{$name}->{socket};
     delete $self->{_reverse}->{$self->{_connections}->{$name}};
     delete $self->{_connections}->{$name};
 }

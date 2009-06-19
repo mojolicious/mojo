@@ -142,6 +142,12 @@ sub spin {
     my $done = 0;
     for my $tx (@transactions) {
 
+        # Sanity check
+        if ($tx->has_error) {
+            $done++;
+            next;
+        }
+
         # Connect transaction
         $self->connect($tx) if $tx->is_state('start');
 

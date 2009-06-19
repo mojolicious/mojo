@@ -27,6 +27,8 @@ __PACKAGE__->attr(
 
 # What's a wedding?  Webster's dictionary describes it as the act of removing
 # weeds from one's garden.
+sub new { shift->SUPER::new() }
+
 sub client_connect {
     my $self = shift;
 

@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 14;
+use Test::More tests => 23;
 
 # Are we there yet?
 # No
@@ -49,6 +49,7 @@ EOF
 $pipe->client_read($responses);
 
 # Test
+ok($pipe->is_done);
 ok($tx1->is_done);
 ok($tx2->is_done);
 is($tx1->res->code, 204);
@@ -86,6 +87,7 @@ EOF
 $pipe->client_read($responses);
 
 # Test
+ok($pipe->is_done);
 ok($tx1->is_done);
 ok($tx2->is_done);
 is($tx1->res->code, 404);
@@ -126,7 +128,33 @@ EOF
 $pipe->client_read($responses);
 
 # Test
+ok($pipe->is_done);
 ok($tx1->is_done);
 ok($tx2->is_done);
 is($tx1->res->code, 200);
 is($tx2->res->code, 500);
+
+
+# Transactions
+$tx1 = Mojo::Transaction->new_get("http://127.0.0.1:3000/7/");
+$tx2 = Mojo::Transaction->new_get("http://labs.kraih.com:3000/8/");
+
+# Pipeline
+$pipe = Mojo::Pipeline->new($tx1, $tx2);
+
+# Test
+ok($pipe->has_error);
+is($tx1->state, 'start');
+is($tx2->state, 'start');
+
+# Transactions
+$tx1 = Mojo::Transaction->new_get("http://labs.kraih.com/7/");
+$tx2 = Mojo::Transaction->new_get("http://labs.kraih.com:3000/8/");
+
+# Pipeline
+$pipe = Mojo::Pipeline->new($tx1, $tx2);
+
+# Test
+ok($pipe->has_error);
+is($tx1->state, 'start');
+is($tx2->state, 'start');

@@ -9,7 +9,7 @@ use Test::More;
 
 plan skip_all => 'set TEST_CLIENT to enable this test'
   unless $ENV{TEST_CLIENT};
-plan tests => 35;
+plan tests => 45;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -113,3 +113,26 @@ is($tx2->continued, 1);
 is($tx3->res->code, 200);
 is($tx4->res->code, 301);
 like($tx2->res->content->file->slurp, qr/Mojolicious/);
+
+# Pipelined head
+$tx  = Mojo::Transaction->new_head('http://labs.kraih.com/blog/');
+$tx2 = Mojo::Transaction->new_get('http://mojolicious.org');
+$client->process_all(Mojo::Pipeline->new($tx, $tx2), $tx3);
+ok($tx->is_done);
+ok($tx2->is_done);
+is($tx->res->code,  200);
+is($tx2->res->code, 200);
+like($tx2->res->content->file->slurp, qr/Mojolicious/);
+
+# Bad pipeline
+$tx  = Mojo::Transaction->new_get('http://kraih.com');
+$tx2 = Mojo::Transaction->new_get('http://mojolicious.org:3131/');
+$tx3 = Mojo::Transaction->new_get('http://labs.kraih.com');
+my $pipe = Mojo::Pipeline->new($tx, $tx2);
+$client->process_all($pipe, $tx3);
+ok($pipe->has_error);
+is($tx->state, 'start');
+is($tx2->state, 'start');
+ok($tx3->is_done);
+is($tx3->res->code, 301);
+

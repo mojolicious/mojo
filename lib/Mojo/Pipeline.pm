@@ -25,14 +25,17 @@ __PACKAGE__->attr(continue_timeout => (chained => 1, default => 3));
 sub new {
     my $self = shift->SUPER::new();
     $self->{_txs} = [@_];
-    if (@_) {
+
+    # Check transactions
+    if (@{$self->{_txs}}) {
         my ($address, $port) = $self->client_info;
-        foreach my $i (0 .. $#_) {
-            my ($tx_address, $tx_port) = $_[$i]->client_info;
+
+        for my $i (0 .. $#{$self->{_txs}}) {
+            my ($tx_address, $tx_port) = $self->{_txs}->[$i]->client_info;
+
             unless ($address eq $tx_address && $port eq $tx_port) {
                 $self->error(
-                    "Mismatch! Transaction at index $i does not belong in Pipeline."
-                );
+                    "Transaction at index $i does not belong in pipeline.");
                 last;
             }
         }

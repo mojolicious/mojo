@@ -55,7 +55,6 @@ ok($tx2->is_done);
 is($tx1->res->code, 204);
 is($tx2->res->code, 200);
 
-
 # Transactions
 $tx1 = Mojo::Transaction->new_get("http://127.0.0.1:3000/3/");
 $tx2 = Mojo::Transaction->new_head("http://127.0.0.1:3000/4/");
@@ -92,7 +91,6 @@ ok($tx1->is_done);
 ok($tx2->is_done);
 is($tx1->res->code, 404);
 is($tx2->res->code, 200);
-
 
 # Transactions
 $tx1 = Mojo::Transaction->new_head("http://127.0.0.1:3000/5/");
@@ -133,7 +131,6 @@ ok($tx1->is_done);
 ok($tx2->is_done);
 is($tx1->res->code, 200);
 is($tx2->res->code, 500);
-
 
 # Transactions
 $tx1 = Mojo::Transaction->new_get("http://127.0.0.1:3000/7/");

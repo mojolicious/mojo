@@ -539,6 +539,10 @@ Returns the invocant if called with arguments.
 L<Mojo::Transaction> inherits all methods from L<Mojo::Pipeline> and
 implements the following new ones.
 
+=head2 C<new>
+
+    my $tx = Mojo::Transaction->new;
+
 =head2 C<client_connect>
 
     $tx = $tx->client_connect;

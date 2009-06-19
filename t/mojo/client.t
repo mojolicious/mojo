@@ -131,8 +131,7 @@ $tx3 = Mojo::Transaction->new_get('http://labs.kraih.com');
 my $pipe = Mojo::Pipeline->new($tx, $tx2);
 $client->process_all($pipe, $tx3);
 ok($pipe->has_error);
-is($tx->state, 'start');
+is($tx->state,  'start');
 is($tx2->state, 'start');
 ok($tx3->is_done);
 is($tx3->res->code, 301);
-

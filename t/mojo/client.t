@@ -117,7 +117,7 @@ like($tx2->res->content->file->slurp, qr/Mojolicious/);
 # Pipelined head
 $tx  = Mojo::Transaction->new_head('http://labs.kraih.com/blog/');
 $tx2 = Mojo::Transaction->new_get('http://mojolicious.org');
-$client->process_all(Mojo::Pipeline->new($tx, $tx2), $tx3);
+$client->process_all(Mojo::Pipeline->new($tx, $tx2));
 ok($tx->is_done);
 ok($tx2->is_done);
 is($tx->res->code,  200);

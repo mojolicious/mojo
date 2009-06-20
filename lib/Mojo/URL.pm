@@ -37,6 +37,7 @@ sub address {
     # Set
     if ($address) {
         $self->{address} = $address;
+        $self->host($address) unless $self->host;
         return $self;
     }
 

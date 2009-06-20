@@ -5,20 +5,7 @@ package Mojo::Pipeline;
 use strict;
 use warnings;
 
-use base 'Mojo::Stateful';
-
-__PACKAGE__->attr(
-    [   qw/
-          connection
-          kept_alive
-          local_address
-          local_port
-          remote_address
-          remote_port
-          /
-    ] => (chained => 1)
-);
-__PACKAGE__->attr(continue_timeout => (chained => 1, default => 3));
+use base 'Mojo::Transaction';
 
 # No children have ever meddled with the Republican Party and lived to tell
 # about it.
@@ -164,9 +151,23 @@ sub client_written {
     return $self;
 }
 
+sub continued { shift->{_txs}->[-1]->continued }
+
 sub keep_alive {
     my $self = shift;
     return $self->{_txs}->[0] ? $self->{_txs}->[0]->keep_alive(@_) : undef;
+}
+
+sub req {
+    my @req;
+    push @req, $_->req for @{shift->{_txs}};
+    return \@req;
+}
+
+sub res {
+    my @res;
+    push @res, $_->res for @{shift->{_txs}};
+    return \@res;
 }
 
 sub server_accept {
@@ -381,58 +382,36 @@ L<Mojo::Pipeline> is a container for pipelined HTTP transactions.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Pipeline> inherits all attributes from L<Mojo::Stateful> and
+L<Mojo::Pipeline> inherits all attributes from L<Mojo::Transaction> and
 implements the following new ones.
 
-=head2 C<connection>
+=head2 C<continued>
 
-    my $connection = $p->connection;
-    $p             = $p->connection($connection);
-
-=head2 C<continue_timeout>
-
-    my $continue_timeout = $p->continue_timeout;
-    $p                   = $p->continue_timeout(3);
+    my $continued = $p->continued;
 
 =head2 C<keep_alive>
 
     my $keep_alive = $p->keep_alive;
     $p             = $p->keep_alive(1);
 
-=head2 C<kept_alive>
+=head2 C<req>
 
-    my $kept_alive = $p->kept_alive;
-    $p             = $p->kept_alive(1);
+    my $requests = $p->req;
 
-=head2 C<local_address>
+=head2 C<res>
 
-    my $local_address = $p->local_address;
-    $p                = $p->local_address($address);
-
-=head2 C<local_port>
-
-    my $local_port = $p->local_port;
-    $p             = $p->local_port($port);
-
-=head2 C<remote_address>
-
-    my $remote_address = $p->remote_address;
-    $p                 = $p->remote_address($address);
-
-=head2 C<remote_port>
-
-    my $remote_port = $p->remote_port;
-    $p              = $p->remote_port($port);
+    my $responses = $p->res;
 
 =head1 METHODS
 
-L<Mojo::Pipeline> inherits all methods from L<Mojo::Stateful> and implements
-the following new ones.
+L<Mojo::Pipeline> inherits all methods from L<Mojo::Transaction> and
+implements the following new ones.
 
 =head2 C<new>
 
     my $p = Mojo::Pipeline->new;
-    my $p = Mojo::Pipeline->new($tx);
+    my $p = Mojo::Pipeline->new($tx1);
+    my $p = Mojo::Pipeline->new($tx1, $tx2, $tx3);
 
 =head2 C<client_connect>
 

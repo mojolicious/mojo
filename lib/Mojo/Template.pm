@@ -303,29 +303,7 @@ sub _error {
         my $line = $1;
         my @lines = split /\n/, $self->template;
 
-        # Context
-        $te->line([$line, $lines[$line - 1]]);
-
-        # -2
-        my $previous_line = $line - 3;
-        my $code = $previous_line >= 0 ? $lines[$previous_line] : undef;
-        push @{$te->lines_before}, [$line - 2, $code] if $code;
-
-        # -1
-        $previous_line = $line - 2;
-        $code = $previous_line >= 0 ? $lines[$previous_line] : undef;
-        push @{$te->lines_before}, [$line - 1, $code] if $code;
-
-        # +1
-        my $next_line = $line;
-        $code = $next_line >= 0 ? $lines[$next_line] : undef;
-        push @{$te->lines_after}, [$line + 1, $code] if $code;
-
-        # +2
-        $next_line = $line + 1;
-        $code = $next_line >= 0 ? $lines[$next_line] : undef;
-        push @{$te->lines_after}, [$line + 2, $code] if $code;
-
+        $te->parse_context(\@lines, $line);
     }
 
     return $te;

@@ -15,7 +15,11 @@ use constant RELOAD => $ENV{MOJO_RELOAD} || 0;
 __PACKAGE__->attr(
     app => (
         chained => 1,
-        default => sub { Mojo::Loader->load_build(shift->app_class) }
+        default => sub {
+            my $e = Mojo::Loader->load_build(shift->app_class);
+            die $e if ref $e eq 'Mojo::Loader::Exception';
+            return $e;
+        }
     )
 );
 __PACKAGE__->attr(
@@ -33,7 +37,8 @@ __PACKAGE__->attr(
 
                 # Reload
                 if (RELOAD) {
-                    Mojo::Loader->reload;
+                    my $e = Mojo::Loader->reload;
+                    warn $e if $e;
                     delete $self->{app};
                 }
 

@@ -64,7 +64,7 @@ $pattern = MojoX::Routes::Pattern->new('/index.cgi');
 is($pattern->format, 'cgi');
 
 # Relaxed
-$pattern = MojoX::Routes::Pattern->new('/test/^controller/:action');
+$pattern = MojoX::Routes::Pattern->new('/test/+controller/:action');
 $result  = $pattern->match('/test/foo.bar/baz');
 is($result->{controller}, 'foo.bar');
 is($result->{action},     'baz');

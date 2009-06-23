@@ -1,0 +1,2 @@
+%# Sweet Zombie Jesus!
+%= shift->stash('exception')->message

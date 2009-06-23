@@ -8,8 +8,8 @@ use warnings;
 use base 'Mojo';
 
 use Mojo::Loader;
-use Mojolicious::Dispatcher;
 use Mojolicious::Renderer;
+use MojoX::Dispatcher::Routes;
 use MojoX::Dispatcher::Static;
 use MojoX::Types;
 
@@ -34,7 +34,7 @@ __PACKAGE__->attr(
 __PACKAGE__->attr(
     routes => (
         chained => 1,
-        default => sub { Mojolicious::Dispatcher->new }
+        default => sub { MojoX::Dispatcher::Routes->new }
     )
 );
 __PACKAGE__->attr(
@@ -94,14 +94,32 @@ sub build_ctx {
 sub dispatch {
     my ($self, $c) = @_;
 
+    # New request
+    my $path = $c->req->url->path;
+    $self->log->debug(qq/*** Request for "$path". ***/);
+
     # Try to find a static file
-    my $done = $self->static->dispatch($c);
+    my $e = $self->static->dispatch($c);
 
     # Use routes if we don't have a response yet
-    $done ||= $self->routes->dispatch($c);
+    $e = $self->routes->dispatch($c) if $e;
+
+    # Exception
+    if (ref $e) {
+
+        # Development mode
+        if ($self->mode eq 'development') {
+            $c->stash(exception => $e);
+            $c->res->code(500);
+            $c->render(template => 'exception');
+        }
+
+        # Production mode
+        else { $self->static->serve_500($c) }
+    }
 
     # Nothing found
-    $self->static->serve_404($c) unless $done;
+    elsif ($e) { $self->static->serve_404($c) }
 }
 
 # Bite my shiny metal ass!

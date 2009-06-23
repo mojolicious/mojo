@@ -4,10 +4,14 @@ This file documents the revision history for Perl extension Mojo.
         - Rewrote MojoX::Renderer, it is not backward compatible and
           templates need to be renamed in the following 3 part format
           "index.html.tt"!
+        - Added exception support to MojoX::Dispatcher::Routes, this change
+          is not backward compatible and "dispatch" calls now return
+          exception objects for errors and false for success.
         - Added full HTTP 1.1 pipelining support to all Mojo layers.
         - Added layout support to MojoX::Renderer.
         - Made render call optional.
         - Added format support to MojoX::Routes.
+        - Added Mojo::Loader::Exception.
         - Added wildcard symbol support to MojoX::Routes and rewrote many
           routes internals.
         - Added Makefile.PL generator.

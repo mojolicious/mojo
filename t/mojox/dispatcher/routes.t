@@ -59,14 +59,14 @@ $d->route('/foo/:capture')->to(controller => 'foo', action => 'bar');
 # 404 clean stash
 $c->reset_state;
 $c->tx(_tx('/not_found'));
-is($d->dispatch($c), 0);
+is($d->dispatch($c), 1);
 is_deeply($c->stash, {});
 ok(!$c->render_called);
 
 # No escaping
 $c->reset_state;
 $c->tx(_tx('/foo/hello'));
-is($d->dispatch($c), 1);
+is($d->dispatch($c), 0);
 is_deeply($c->stash,
     {controller => 'foo', action => 'bar', capture => 'hello'});
 ok($c->render_called);
@@ -74,7 +74,7 @@ ok($c->render_called);
 # Escaping
 $c->reset_state;
 $c->tx(_tx('/foo/hello%20there'));
-is($d->dispatch($c), 1);
+is($d->dispatch($c), 0);
 is_deeply($c->stash,
     {controller => 'foo', action => 'bar', capture => 'hello there'});
 ok($c->render_called);

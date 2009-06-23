@@ -85,7 +85,7 @@ sub render {
 
     # Debug
     unless ($r) {
-        $c->app->log->debug(qq/No handler for "$handler" available/);
+        $c->app->log->debug(qq/No handler for "$handler" available./);
         return undef;
     }
 
@@ -134,7 +134,7 @@ sub _fix_format {
 
     # Missing format
     else {
-        $c->app->log->debug('Template format missing');
+        $c->app->log->debug('Template format missing.');
         return undef;
     }
 
@@ -162,14 +162,14 @@ sub _fix_handler {
             if (-f $p) {
                 $found++;
                 $path = $p;
-                $c->app->log->debug(qq/Template found "$path"/);
+                $c->app->log->debug(qq/Template found "$path"./);
                 last;
             }
         }
 
         # Nothing found
         unless ($found) {
-            $c->app->log->debug(qq/Template not found "$path.*"/);
+            $c->app->log->debug(qq/Template not found "$path.*"./);
             return undef;
         }
     }

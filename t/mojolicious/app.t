@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 33;
+use Test::More tests => 35;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -22,8 +22,14 @@ use_ok('MojoliciousTest');
 
 my $client = Mojo::Client->new;
 
+# SyntaxError::foo
+my $tx = Mojo::Transaction->new_get('/syntax_error/foo');
+$client->process_local('MojoliciousTest', $tx);
+is($tx->res->code, 500);
+like($tx->res->body, qr/Missing right curly/);
+
 # Foo::test
-my $tx = Mojo::Transaction->new_get('/foo/test', 'X-Test' => 'Hi there!');
+$tx = Mojo::Transaction->new_get('/foo/test', 'X-Test' => 'Hi there!');
 $client->process_local('MojoliciousTest', $tx);
 is($tx->res->code,                        200);
 is($tx->res->headers->header('X-Bender'), 'Kiss my shiny metal ass!');

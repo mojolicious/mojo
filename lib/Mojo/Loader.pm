@@ -10,6 +10,7 @@ use base 'Mojo::Base';
 use Carp qw/carp croak/;
 use File::Basename;
 use File::Spec;
+use Mojo::Loader::Exception;
 
 use constant DEBUG => $ENV{MOJO_LOADER_DEBUG} || 0;
 
@@ -52,8 +53,7 @@ sub build {
             my $instance = $module->new(@_);
             push @instances, $instance;
         };
-        croak qq/Couldn't instantiate module "$module": $@/
-          if $@ && $@ ne "SHORTCUT\n";
+        return Mojo::Loader::Exception->new($@) if $@ && $@ ne "SHORTCUT\n";
     }
 
     return \@instances;
@@ -71,10 +71,10 @@ sub load {
 
         # Load
         eval "require $module";
-        croak qq/Couldn't load module "$module": $@/ if $@;
+        return Mojo::Loader::Exception->new($@) if $@;
     }
 
-    return $self;
+    return 0;
 }
 
 sub load_build {
@@ -84,17 +84,19 @@ sub load_build {
     $self = $self->new unless ref $self;
 
     # Load
-    $self->load(shift);
+    my $e = $self->load(shift);
+    return $e if $e;
 
     # Build
-    my $instances = $self->build(@_);
-    return $instances->[0];
+    $e = $self->build(@_);
+    return ref $e eq 'Mojo::Loader::Exception' ? $e : $e->[0];
 }
 
 sub reload {
     while (my ($key, $file) = each %INC) {
 
         # Modified time
+        next unless $file;
         my $mtime = (stat $file)[9];
 
         # Startup time as default
@@ -117,11 +119,13 @@ sub reload {
 
             # Reload
             eval { require $key };
-            carp "Can't reload '$file': $@" if $@;
+            return Mojo::Loader::Exception->new($@) if $@;
 
             $STATS->{$file} = $mtime;
         }
     }
+
+    return 0;
 }
 
 sub search {
@@ -217,21 +221,27 @@ following new ones.
 
     my $instances = $loader->build;
     my $instances = $loader->build(qw/foo bar baz/);
+    my $exception = $loader->build;
+    my $exception = $loader->build(qw/foo bar baz/);
 
 =head2 C<load>
 
-    $loader = $loader->load;
+    my $exception = $loader->load;
 
 =head2 C<load_build>
 
-    my $instance = Mojo::Loader->load_build('MyApp');
-    my $instance = $loader->load_build('MyApp');
-    my $instance = Mojo::Loader->load_build('MyApp', qw/some args/);
-    my $instance = $loader->load_build('MyApp', qw/some args/);
+    my $instance  = Mojo::Loader->load_build('MyApp');
+    my $instance  = $loader->load_build('MyApp');
+    my $instance  = Mojo::Loader->load_build('MyApp', qw/some args/);
+    my $instance  = $loader->load_build('MyApp', qw/some args/);
+    my $exception = Mojo::Loader->load_build('MyApp');
+    my $exception = $loader->load_build('MyApp');
+    my $exception = Mojo::Loader->load_build('MyApp', qw/some args/);
+    my $exception = $loader->load_build('MyApp', qw/some args/);
 
 =head2 C<reload>
 
-    Mojo::Loader->reload;
+    my $exception = Mojo::Loader->reload;
 
 =head2 C<search>
 

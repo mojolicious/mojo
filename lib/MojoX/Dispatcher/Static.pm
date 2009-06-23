@@ -28,14 +28,14 @@ sub dispatch {
 
     # Prefix
     if (my $prefix = $self->prefix) {
-        return 0 unless $c->req->url->path =~ /^$prefix.*/;
+        return 1 unless $c->req->url->path =~ /^$prefix.*/;
     }
 
     # Path
     my @parts = @{$c->req->url->path->clone->canonicalize->parts};
 
     # Shortcut
-    return 0 unless @parts;
+    return 1 unless @parts;
 
     # Serve static file
     return $self->serve($c, File::Spec->catfile(@parts));
@@ -58,7 +58,7 @@ sub serve {
     if (-f $path) {
 
         # Log
-        $c->app->log->debug(qq/Serving static file "$path"/);
+        $c->app->log->debug(qq/Serving static file "$path"./);
 
         my $res = $c->res;
         if (-r $path) {
@@ -72,13 +72,13 @@ sub serve {
                 if (Mojo::Date->new($date)->epoch == $stat->mtime) {
 
                     # Log
-                    $c->app->log->debug('File not modified');
+                    $c->app->log->debug('File not modified.');
 
                     $res->code(304);
                     $res->headers->remove('Content-Type');
                     $res->headers->remove('Content-Length');
                     $res->headers->remove('Content-Disposition');
-                    return 1;
+                    return 0;
                 }
             }
 
@@ -91,21 +91,21 @@ sub serve {
 
             $res->headers->content_type($type);
             $res->content->file->path($path);
-            return 1;
+            return 0;
         }
 
         # Exists, but is forbidden
         else {
 
             # Log
-            $c->app->log->debug('File forbidden');
+            $c->app->log->debug('File forbidden.');
 
             $res->code(403);
-            return 1;
+            return 0;
         }
     }
 
-    return 0;
+    return 1;
 }
 
 sub serve_404 { shift->serve_error(shift, 404) }
@@ -116,7 +116,7 @@ sub serve_error {
     my ($self, $c, $code, $path) = @_;
 
     # Shortcut
-    return 0 unless $c && $code;
+    return 1 unless $c && $code;
 
     my $res = $c->res;
 
@@ -133,7 +133,7 @@ sub serve_error {
     if (-r $path) {
 
         # Log
-        $c->app->log->debug(qq/Serving error file "$path"/);
+        $c->app->log->debug(qq/Serving error file "$path"./);
 
         # File
         $res->content(Mojo::Content->new(file => Mojo::File->new));
@@ -152,7 +152,7 @@ sub serve_error {
     elsif ($code == 404) {
 
         # Log
-        $c->app->log->debug('Serving 404 error');
+        $c->app->log->debug('Serving 404 error.');
 
         $res->headers->content_type('text/html');
         $res->body(<<'EOF');
@@ -169,7 +169,7 @@ EOF
     else {
 
         # Log
-        $c->app->log->debug(qq/Serving error "$code"/);
+        $c->app->log->debug(qq/Serving error "$code"./);
 
         $res->headers->content_type('text/html');
         $res->body(<<'EOF');
@@ -182,7 +182,7 @@ EOF
 EOF
     }
 
-    return 1;
+    return 0;
 }
 
 1;
@@ -245,18 +245,18 @@ implements the follwing the ones.
 
     my $success = $dispatcher->dispatch($c);
 
-Returns true if a file matching the request could be found and a response be
+Returns false if a file matching the request could be found and a response be
 prepared.
-Returns false otherwise.
+Returns true otherwise.
 Expects a L<MojoX::Context> object as first argument.
 
 =head2 C<serve>
 
     my $success = $dispatcher->serve($c, 'foo/bar.html');
 
-Returns true if a readable file could be found under C<root> and a response
+Returns false if a readable file could be found under C<root> and a response
 be prepared.
-Returns false otherwise.
+Returns true otherwise.
 Expects a L<MojoX::Context> object and a path as arguments.
 If no type can be determined, C<text/plain> will be used.
 A C<Last-Modified> header will always be set according to the last modified

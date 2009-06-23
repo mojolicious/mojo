@@ -23,11 +23,11 @@ $app->handler($tx);
 is($tx->res->code, 200);
 like($tx->res->body, qr/Hello Mojo from the template \/foo! Hello World!/);
 
-# Let it die (eventually leads to 404)
+# Let it die (eventually leads to 500)
 $tx = Mojo::Transaction->new_get('/foo/willdie');
 $app->handler($tx);
-is($tx->res->code, 404);
-like($tx->res->body, qr/File Not Found/);
+is($tx->res->code, 500);
+like($tx->res->body, qr/Foo\.pm/);
 
 # Previous error shouldn't be cached
 $tx = Mojo::Transaction->new_get('/foo');

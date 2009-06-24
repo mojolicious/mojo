@@ -139,8 +139,8 @@ sub client_read {
     # Length
     my $read = length $chunk;
 
-    # Early response, most likely an error
-    $self->state('read_response')
+    # Buffer early response, most likely an error
+    $self->res->buffer->add_chunk($chunk)
       if $self->is_state(qw/write_start_line write_headers write_body/);
 
     # Read 100 Continue
@@ -149,14 +149,16 @@ sub client_read {
         $self->res->parse($chunk);
 
         # We got a 100 Continue response
-        if ($self->res->is_done && $self->res->code == 100) {
-            $self->res($self->res->new);
+        if (   $self->res->is_state(qw/done done_with_leftovers/)
+            && $self->res->code == 100)
+        {
+            $self->_new_response;
             $self->continued(1);
             $self->{_continue} = 0;
         }
 
         # We got something else
-        elsif ($self->res->is_done) {
+        elsif ($self->res->is_finished) {
             $self->continued(0);
             $self->done;
         }
@@ -169,25 +171,48 @@ sub client_read {
         # HEAD request is special case
         if ($self->req->method eq 'HEAD') {
             $self->res->parse_until_body($chunk);
-            if ($self->res->content->is_state('body')) {
+            while ($self->res->content->is_state('body')) {
+
+                # Check for unexpected 1XX
+                if ($self->res->is_status_class(100)) {
+                    $self->_new_response(1);
+                }
 
                 # Leftovers?
-                if ($self->res->has_leftovers) {
+                elsif ($self->res->has_leftovers) {
                     $self->res->state('done_with_leftovers');
                     $self->state('done_with_leftovers');
+                    last;
                 }
 
                 # Done
-                else { $self->done }
+                else {
+                    $self->done;
+                    last;
+                }
             }
             return $self;
         }
 
         # Parse
         $self->res->parse($chunk);
-        $self->done if $self->res->is_done;
-        $self->state('done_with_leftovers')
-          if $self->res->is_state('done_with_leftovers');
+
+        while ($self->res->is_finished) {
+
+            # Check for unexpected 100
+            if (   $self->res->is_state(qw/done done_with_leftovers/)
+                && $self->res->is_status_class(100))
+            {
+                $self->_new_response;
+            }
+
+            else {
+
+                # Inherit state
+                $self->state($self->res->state);
+                last;
+            }
+        }
     }
 
     return $self;
@@ -489,6 +514,28 @@ sub _builder {
     }
 
     return $self;
+}
+
+sub _new_response {
+    my $self = shift;
+
+    # 1 is special case for HEAD
+    my $until_body = @_ ? shift : 0;
+
+    my $new_res = $self->res->new;
+
+    # Check for leftovers in old response
+    if ($self->res->has_leftovers) {
+
+        $until_body
+          ? $new_res->parse_until_body($self->res->leftovers)
+          : $new_res->parse($self->res->leftovers);
+
+        if   ($new_res->is_finished) { $self->state($new_res->state) }
+        else                         { $self->state('read_response') }
+    }
+
+    $self->res($new_res);
 }
 
 1;

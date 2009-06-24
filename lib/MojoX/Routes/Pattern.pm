@@ -11,14 +11,11 @@ use constant DEBUG => $ENV{MOJOX_ROUTES_DEBUG} || 0;
 
 __PACKAGE__->attr(defaults => (chained => 1, default => sub { {} }));
 __PACKAGE__->attr([qw/format pattern regex/] => (chained => 1));
-__PACKAGE__->attr(quote_end      => (chained => 1, default => ')'));
-__PACKAGE__->attr(quote_start    => (chained => 1, default => '('));
-__PACKAGE__->attr(relaxed_start  => (chained => 1, default => '+'));
-__PACKAGE__->attr(reqs           => (chained => 1, default => sub { {} }));
-__PACKAGE__->attr(symbol_start   => (chained => 1, default => ':'));
-__PACKAGE__->attr(symbols        => (chained => 1, default => sub { [] }));
-__PACKAGE__->attr(tree           => (chained => 1, default => sub { [] }));
-__PACKAGE__->attr(wildcard_start => (chained => 1, default => '*'));
+__PACKAGE__->attr(quote_end   => (chained => 1, default => ')'));
+__PACKAGE__->attr(quote_start => (chained => 1, default => '('));
+__PACKAGE__->attr(reqs        => (chained => 1, default => sub { {} }));
+__PACKAGE__->attr(symbols     => (chained => 1, default => sub { [] }));
+__PACKAGE__->attr(tree        => (chained => 1, default => sub { [] }));
 
 # This is the worst kind of discrimination. The kind against me!
 sub new {
@@ -206,29 +203,47 @@ sub _compile {
 sub _tokenize {
     my $self = shift;
 
-    my $pattern        = $self->pattern;
-    my $relaxed_start  = $self->relaxed_start;
-    my $quote_end      = $self->quote_end;
-    my $quote_start    = $self->quote_start;
-    my $symbol_start   = $self->symbol_start;
-    my $wildcard_start = $self->wildcard_start;
+    my $pattern     = $self->pattern;
+    my $quote_end   = $self->quote_end;
+    my $quote_start = $self->quote_start;
 
     my $tree  = [];
     my $state = 'text';
-    my $quote = 0;
 
     while (length(my $char = substr $pattern, 0, 1, '')) {
 
         # Quote start
-        if ($char eq $quote_start && !$quote) {
-            $quote = 1;
+        if ($char eq $quote_start) {
+
+            # Upgrade state
+            if ($state eq 'relaxed' || $state eq 'symbol') {
+
+                # Upgrade symbol to relaxed
+                if ($state eq 'symbol') {
+                    $state = 'relaxed';
+                    $tree->[-1]->[0] = 'relaxed';
+                }
+
+                # Upgrade relaxed to wildcard
+                if ($state eq 'relaxed') {
+                    $state = 'wildcard';
+                    $tree->[-1]->[0] = 'wildcard';
+                }
+
+            }
+
+            # Start
+            elsif ($state ne 'wildcard') {
+                $state = 'symbol';
+                push @$tree, ['symbol', ''];
+            }
+
             next;
         }
 
         # Quote end
-        if ($char eq $quote_end && $quote) {
+        if ($char eq $quote_end) {
             $state = 'text';
-            $quote = 0;
             next;
         }
 
@@ -236,24 +251,6 @@ sub _tokenize {
         if ($char eq '/') {
             push @$tree, ['slash'];
             $state = 'text';
-        }
-
-        # Relaxed start
-        elsif ($char eq $relaxed_start) {
-            push @$tree, ['relaxed', ''];
-            $state = 'relaxed';
-        }
-
-        # Symbol start
-        elsif ($char eq $symbol_start) {
-            push @$tree, ['symbol', ''];
-            $state = 'symbol';
-        }
-
-        # Wildcard start
-        elsif ($char eq $wildcard_start) {
-            push @$tree, ['wildcard', ''];
-            $state = 'wildcard';
         }
 
         # Relaxed, symbol or wildcard
@@ -310,17 +307,17 @@ L<MojoX::Routes::Pattern> is a route pattern container.
 =head2 C<pattern>
 
     my $pattern = $pattern->pattern;
-    $pattern    = $pattern->pattern('/:foo/:bar');
+    $pattern    = $pattern->pattern('/(foo)/(bar)');
 
 =head2 C<quote_end>
 
     my $quote = $pattern->quote_end;
-    $pattern  = $pattern->quote_end(')');
+    $pattern  = $pattern->quote_end(']');
 
 =head2 C<quote_start>
 
     my $quote = $pattern->quote_start;
-    $pattern  = $pattern->quote_start('(');
+    $pattern  = $pattern->quote_start('[');
 
 =head2 C<regex>
 
@@ -331,11 +328,6 @@ L<MojoX::Routes::Pattern> is a route pattern container.
 
     my $reqs = $pattern->reqs;
     $pattern = $pattern->reqs({foo => qr/\w+/});
-
-=head2 C<symbol_start>
-
-    my $symbol_start = $pattern->symbol_start;
-    $pattern         = $pattern->symbol_start(':');
 
 =head2 C<symbols>
 
@@ -354,7 +346,7 @@ implements the follwing the ones.
 
 =head2 C<new>
 
-    my $pattern = MojoX::Routes::Pattern->new('/:controller/:action',
+    my $pattern = MojoX::Routes::Pattern->new('/(controller)/(action)',
         action => qr/\w+/
     );
 
@@ -364,7 +356,7 @@ implements the follwing the ones.
 
 =head2 C<parse>
 
-    $pattern = $pattern->parse('/:controller/:action', action => qr/\w+/);
+    $pattern = $pattern->parse('/(controller)/(action)', action => qr/\w+/);
 
 =head2 C<render>
 

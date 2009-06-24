@@ -2,6 +2,6 @@
 
 =head1 NAME
 
-Mojo::Manual::Deployment - Deployment
+Mojo::Manual::Transaction - Transactions
 
 =cut

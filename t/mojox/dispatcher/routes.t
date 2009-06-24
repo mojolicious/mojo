@@ -54,7 +54,7 @@ ok($d);
 
 $d->namespace('Test');
 $d->route('/')->to(controller => 'foo', action => 'home');
-$d->route('/foo/:capture')->to(controller => 'foo', action => 'bar');
+$d->route('/foo/(capture)')->to(controller => 'foo', action => 'bar');
 
 # 404 clean stash
 $c->reset_state;

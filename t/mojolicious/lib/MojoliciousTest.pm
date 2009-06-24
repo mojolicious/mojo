@@ -60,7 +60,7 @@ sub startup {
     );
 
     # /*/* - the default route
-    $r->route('/:controller/:action')->to(action => 'index');
+    $r->route('/(controller)/(action)')->to(action => 'index');
 }
 
 1;

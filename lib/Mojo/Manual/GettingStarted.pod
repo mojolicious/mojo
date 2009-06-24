@@ -4,27 +4,4 @@
 
 Mojo::Manual::GettingStarted - Getting Started
 
-=head1 FIRST STEPS
-
-Use the application generator to create all necessary files.
-
-    mojo generate app MyFirstApp
-
-Thats it, you have just created your very first Mojo application.
-Now it's time to start the built in server.
-
-    cd my_first_app
-    bin/my_first_app daemon
-
-You can visit your application at http://127.0.0.1:3000.
-Testing is just as simple.
-
-    bin/my_first_app test
-
-There are many more helpful scripts, and mojo will list them for you.
-
-    bin/my_first_app
-
-Have fun!
-
 =cut

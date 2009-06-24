@@ -2,20 +2,6 @@
 
 =head1 NAME
 
-Mojo::Manual::Cookbook - Cooking With Mojo
-
-=head1 RECIPES
-
-=head2 Starting a new project
-
-You can just use the C<mojo> program to generate a fresh directory structure
-and get started in no time with your project.
-
-    mojo generate app PetStore
-
-If you want to use the L<Mojolicious> MVC web framework the command changes
-only slightly.
-
-    mojolicious generate app PetStore
+Mojo::Manual::Cookbook - Cookbook
 
 =cut

@@ -16,13 +16,13 @@ use_ok('MojoX::Routes');
 my $r = MojoX::Routes->new;
 
 # /*/test
-my $test = $r->route('/:controller/test')->to(action => 'test');
+my $test = $r->route('/(controller)/test')->to(action => 'test');
 
 # /*/test/edit
 $test->route('/edit')->to(action => 'edit')->name('test_edit');
 
 # /*/test/delete/*
-$test->route('/delete/:id', id => qr/\d+/)->to(action => 'delete', id => 23);
+$test->route('/delete/(id)', id => qr/\d+/)->to(action => 'delete', id => 23);
 
 # /test2
 my $test2 = $r->bridge('/test2')->to(controller => 'test2');
@@ -46,15 +46,15 @@ $test3->route('/edit')->to(action => 'edit');
 $r->route('/')->to(controller => 'hello', action => 'world');
 
 # /wildcards/1/*
-$r->route('/wildcards/1/:wildcard', wildcard => qr/(.*)/)
+$r->route('/wildcards/1/(((wildcard)))', wildcard => qr/(.*)/)
   ->to(controller => 'wild', action => 'card');
 
 # /wildcards/2/*
-$r->route('/wildcards/2/*wildcard')
+$r->route('/wildcards/2/(((wildcard)))')
   ->to(controller => 'card', action => 'wild');
 
 # /wildcards/3/*/foo
-$r->route('/wildcards/3/*wildcard/foo')
+$r->route('/wildcards/3/(((wildcard)))/foo')
   ->to(controller => 'very', action => 'dangerous');
 
 # /format
@@ -76,7 +76,7 @@ my $articles = $r->waypoint('/articles')->to(
     action     => 'index',
     format     => 'html'
 );
-my $wp = $articles->waypoint('/:id')->to(
+my $wp = $articles->waypoint('/(id)')->to(
     controller => 'articles',
     action     => 'load',
     format     => 'html'

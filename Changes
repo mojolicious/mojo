@@ -7,6 +7,11 @@ This file documents the revision history for Perl extension Mojo.
         - Added exception support to MojoX::Dispatcher::Routes, this change
           is not backward compatible and "dispatch" calls now return
           exception objects for errors and false for success.
+        - Changed routes syntax, this change is not backward compatible and
+          you need to change all your existing routes.
+            "/:foo" becomes "/(foo)"
+            "/^foo" becomes "/((foo))"
+            "/*foo" becomes "/(((foo)))"
         - Added full HTTP 1.1 pipelining support to all Mojo layers.
         - Added layout support to MojoX::Renderer.
         - Made render call optional.

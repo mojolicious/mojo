@@ -10,27 +10,100 @@ Mojo::Manual - Manual
 
 =item L<Mojo::Manual::GettingStarted>
 
-Step by step instructions to get you started.
+Step by step instructions to get you started with L<Mojo>.
+
+=over 4
+
+=item * Installation
+
+=item * Running the development server
+
+=item * Writing your first micro application and testing it
+
+=back
+
+=item L<Mojo::Manual::Transaction>
+
+Everything in L<Mojo> was built around the idea of processing HTTP requests
+as transactions.
+
+=over 4
+
+=item * HTTP Messages
+
+=item * Request
+
+=item * Response
+
+=item * Cookies
+
+=item * Parameters
+
+=item * Content
+
+=back
+
+=item L<Mojo::Manual::Deployment>
+
+Running L<Mojo> applications in different environemnts.
+
+=over 4
+
+=item * Designed for portability
+
+=item * Built in servers
+
+=item * CGI
+
+=item * FastCGI
+
+=item * Easy to extend
+
+=back
 
 =item L<Mojo::Manual::Mojolicious>
 
 Introduction to L<Mojolicious>, the L<Mojo> example web framework.
 
-=item L<Mojo::Manual::HTTPGuide>
+=over 4
 
-Introduction to our HTTP 1.1 implementation.
+=item * The MVC design pattern
 
-=item L<Mojo::Manual::FrameworkBuilding>
+=item * Application class
 
-Building your own frameworks upon L<Mojo>.
+=item * Dispatchers
+
+=item * Controllers
+
+=item * Routes
+
+=item * Renderer and templates
+
+=item * Modes
+
+=back
+
+=item L<Mojo::Manual::MojoliciousExample>
+
+Building your first real web application with L<Mojolicious>, a POD reader.
+
+=over 4
+
+=item * Directory structure
+
+=item * Model
+
+=item * Controller
+
+=item * Templates
+
+=item * Testing
+
+=back
 
 =item L<Mojo::Manual::Cookbook>
 
-Cooking with L<Mojo>!
-
-=item L<Mojo::Manual::Deployment>
-
-Getting L<Mojo> running on production servers.
+Cooking with L<Mojo> and L<Mojolicious>!
 
 =item L<Mojo::Manual::FAQ>
 
@@ -39,7 +112,7 @@ If you have a question, look here first.
 =item L<Mojo::Manual::CodingGuidelines>
 
 Coding guidelines and mission statement.
-A must read for developers!
+A must read for developers and contributors!
 
 =back
 

@@ -522,20 +522,21 @@ sub _new_response {
     # 1 is special case for HEAD
     my $until_body = @_ ? shift : 0;
 
-    my $new_res = $self->res->new;
+    my $new = $self->res->new;
 
     # Check for leftovers in old response
     if ($self->res->has_leftovers) {
 
         $until_body
-          ? $new_res->parse_until_body($self->res->leftovers)
-          : $new_res->parse($self->res->leftovers);
+          ? $new->parse_until_body($self->res->leftovers)
+          : $new->parse($self->res->leftovers);
 
-        if   ($new_res->is_finished) { $self->state($new_res->state) }
-        else                         { $self->state('read_response') }
+        $new->is_finished
+          ? $self->state($new->state)
+          : $self->state('read_response');
     }
 
-    $self->res($new_res);
+    $self->res($new);
 }
 
 1;

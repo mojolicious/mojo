@@ -33,11 +33,6 @@ sub run {
     my $path       = $self->class_to_path($controller);
     $self->render_to_rel_file('controller', "$name/lib/$path", $controller);
 
-    # Context
-    my $context = "${class}::Context";
-    $path = $self->class_to_path($context);
-    $self->render_to_rel_file('context', "$name/lib/$path", $context);
-
     # Test
     $self->render_to_rel_file('test', "$name/t/basic.t", $class);
 
@@ -155,11 +150,8 @@ sub startup {
     my $r = $self->routes;
 
     # Default route
-    $r->route('/:controller/:action/:id')
+    $r->route('/(controller)/(action)/(id)')
       ->to(controller => 'example', action => 'welcome', id => 1);
-
-    # Use our own context class
-    $self->ctx_class('<%= $class %>::Context');
 }
 
 1;
@@ -183,16 +175,6 @@ sub welcome {
     );
 }
 
-1;
-__context__
-% my $class = shift;
-package <%= $class %>;
- 
-use strict;
-use warnings;
- 
-use base 'Mojolicious::Context';
- 
 1;
 __static__
 <!doctype html>

@@ -111,7 +111,7 @@ sub dispatch {
         if ($self->mode eq 'development') {
             $c->stash(exception => $e);
             $c->res->code(500);
-            $c->render(template => 'exception');
+            $c->render(template => 'exception.html');
         }
 
         # Production mode

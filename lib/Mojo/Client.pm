@@ -20,10 +20,10 @@ __PACKAGE__->attr(select_timeout     => (default => 5));
 sub connect {
     my ($self, $tx) = @_;
 
-    my ($address, $port) = $tx->client_info;
+    my ($scheme, $host, $address, $port) = $tx->client_info;
 
     # Try to get a cached connection
-    my $connection = $self->withdraw_connection("$address:$port");
+    my $connection = $self->withdraw_connection("$scheme:$host:$port");
     $tx->kept_alive(1) if $connection;
 
     # Non blocking connect
@@ -52,11 +52,11 @@ sub connect {
 sub disconnect {
     my ($self, $tx) = @_;
 
-    my ($host, $port) = $tx->client_info;
+    my ($scheme, $host, $address, $port) = $tx->client_info;
 
     # Deposit connection for later or kill socket
     $tx->keep_alive
-      ? $self->deposit_connection("$host:$port", $tx->connection)
+      ? $self->deposit_connection("$scheme:$host:$port", $tx->connection)
       : $tx->connection(undef);
 
     return $tx;

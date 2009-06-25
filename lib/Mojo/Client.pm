@@ -28,7 +28,7 @@ sub connect {
 
     # Non blocking connect
     unless ($connection) {
-        $connection = $self->open_socket($scheme, $address, $port);
+        $connection = $self->open_connection($scheme, $address, $port);
         $tx->{_connect_timeout} = time + 5;
     }
     $tx->connection($connection);
@@ -68,7 +68,7 @@ sub deposit_connection {
     return 0;
 }
 
-sub open_socket {
+sub open_connection {
     my ($self, $scheme, $address, $port) = @_;
 
     my $connection = IO::Socket::INET->new(
@@ -386,9 +386,9 @@ following new ones.
 
     $client->deposit_connection($name, $connection, $timeout);
 
-=head2 C<open_socket>
+=head2 C<open_connection>
 
-    my $connection = $client->open_socket($scheme, $address, $port);
+    my $connection = $client->open_connection($scheme, $address, $port);
 
 =head2 C<process>
 

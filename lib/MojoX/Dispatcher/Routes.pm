@@ -20,7 +20,8 @@ sub dispatch {
     my ($self, $c, $match) = @_;
 
     # Match
-    $match ||= $self->match($c->tx);
+    $match = $self->match($match || $c->tx->req->url->path->to_string)
+      unless ref $match;
     $c->match($match);
 
     # No match
@@ -218,6 +219,10 @@ implements the follwing the ones.
     my $exception = $dispatcher->dispatch(
         MojoX::Dispatcher::Routes::Context->new,
         MojoX::Routes::Match->new
+    );
+    my $exception = $dispatcher->dispatch(
+        MojoX::Dispatcher::Routes::Context->new,
+        '/foo/bar/baz'
     );
 
 =head2 C<generate_class>

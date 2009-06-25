@@ -40,8 +40,8 @@ use warnings;
 use Test::More tests => 10;
 
 use Mojo;
+use Mojo::Transaction;
 use MojoX::Dispatcher::Routes;
-use MojoX::Dispatcher::Routes::Context;
 
 my $c = Test::Context->new(app => Mojo->new);
 
@@ -58,14 +58,14 @@ $d->route('/foo/(capture)')->to(controller => 'foo', action => 'bar');
 
 # 404 clean stash
 $c->reset_state;
-$c->tx(_tx('/not_found'));
+$c->tx(Mojo::Transaction->new_post('/not_found'));
 is($d->dispatch($c), 1);
 is_deeply($c->stash, {});
 ok(!$c->render_called);
 
 # No escaping
 $c->reset_state;
-$c->tx(_tx('/foo/hello'));
+$c->tx(Mojo::Transaction->new_post('/foo/hello'));
 is($d->dispatch($c), 0);
 is_deeply($c->stash,
     {controller => 'foo', action => 'bar', capture => 'hello'});
@@ -73,15 +73,8 @@ ok($c->render_called);
 
 # Escaping
 $c->reset_state;
-$c->tx(_tx('/foo/hello%20there'));
+$c->tx(Mojo::Transaction->new_post('/foo/hello%20there'));
 is($d->dispatch($c), 0);
 is_deeply($c->stash,
     {controller => 'foo', action => 'bar', capture => 'hello there'});
 ok($c->render_called);
-
-# Helper
-sub _tx {
-    my $tx = Mojo::Transaction->new_post;
-    $tx->req->url->path->parse(@_);
-    return $tx;
-}

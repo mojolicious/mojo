@@ -7,17 +7,16 @@ use warnings;
 
 use base 'Mojo::Scripts';
 
-__PACKAGE__->attr(description => (chained => 1, default => <<'EOF'));
+__PACKAGE__->attr(description => (default => <<'EOF'));
 * Generate files and directories from templates. *
 Takes a generator script as option, by default it will list generators.
     generate
 EOF
-__PACKAGE__->attr(message => (chained => 1, default => <<'EOF'));
+__PACKAGE__->attr(message => (default => <<'EOF'));
 Below you will find a list of available generators with descriptions.
 
 EOF
-__PACKAGE__->attr(
-    namespace => (chained => 1, default => 'Mojo::Script::Generate'));
+__PACKAGE__->attr(namespace => (default => 'Mojo::Script::Generate'));
 
 # If The Flintstones has taught us anything,
 # it's that pelicans can be used to mix cement.

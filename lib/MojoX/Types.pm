@@ -9,7 +9,6 @@ use base 'Mojo::Base';
 
 __PACKAGE__->attr(
     types => (
-        chained => 1,
         default => sub {
             return {
                 css   => 'text/css',

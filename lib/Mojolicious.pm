@@ -13,42 +13,16 @@ use MojoX::Dispatcher::Routes;
 use MojoX::Dispatcher::Static;
 use MojoX::Types;
 
+__PACKAGE__->attr(ctx_class => (default => 'Mojolicious::Context'));
 __PACKAGE__->attr(
-    ctx_class => (
-        chained => 1,
-        default => 'Mojolicious::Context'
-    )
-);
+    mode => (default => sub { ($ENV{MOJO_MODE} || 'development') }));
 __PACKAGE__->attr(
-    mode => (
-        chained => 1,
-        default => sub { ($ENV{MOJO_MODE} || 'development') }
-    )
-);
+    renderer => (default => sub { Mojolicious::Renderer->new }));
 __PACKAGE__->attr(
-    renderer => (
-        chained => 1,
-        default => sub { Mojolicious::Renderer->new }
-    )
-);
+    routes => (default => sub { MojoX::Dispatcher::Routes->new }));
 __PACKAGE__->attr(
-    routes => (
-        chained => 1,
-        default => sub { MojoX::Dispatcher::Routes->new }
-    )
-);
-__PACKAGE__->attr(
-    static => (
-        chained => 1,
-        default => sub { MojoX::Dispatcher::Static->new }
-    )
-);
-__PACKAGE__->attr(
-    types => (
-        chained => 1,
-        default => sub { MojoX::Types->new }
-    )
-);
+    static => (default => sub { MojoX::Dispatcher::Static->new }));
+__PACKAGE__->attr(types => (default => sub { MojoX::Types->new }));
 
 # The usual constructor stuff
 sub new {

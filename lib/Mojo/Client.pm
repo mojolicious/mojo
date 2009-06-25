@@ -13,9 +13,9 @@ use Mojo::Loader;
 use Mojo::Message::Response;
 use Socket;
 
-__PACKAGE__->attr(continue_timeout   => (chained => 1, default => 3));
-__PACKAGE__->attr(keep_alive_timeout => (chained => 1, default => 15));
-__PACKAGE__->attr(select_timeout     => (chained => 1, default => 5));
+__PACKAGE__->attr(continue_timeout   => (default => 3));
+__PACKAGE__->attr(keep_alive_timeout => (default => 15));
+__PACKAGE__->attr(select_timeout     => (default => 5));
 
 sub connect {
     my ($self, $tx) = @_;

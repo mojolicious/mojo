@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojo::Scripts';
 
-__PACKAGE__->attr(description => (chained => 1, default => <<'EOF'));
+__PACKAGE__->attr(description => (default => <<'EOF'));
 * Access Mojo scripts. *
 Forwards options to the original Mojo scripts,
 will list available scripts by default.

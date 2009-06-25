@@ -10,13 +10,8 @@ use base 'Mojo::Script';
 use Mojo::ByteStream;
 use Mojo::Loader;
 
-__PACKAGE__->attr(
-    [qw/base namespace/] => (
-        chained => 1,
-        default => 'Mojo::Script'
-    )
-);
-__PACKAGE__->attr(message => (chained => 1, default => <<'EOF'));
+__PACKAGE__->attr([qw/base namespace/] => (default => 'Mojo::Script'));
+__PACKAGE__->attr(message              => (default => <<'EOF'));
 Welcome to the Mojo Framework!
 
 HINT: In case you don't know what you are doing here try the manual!

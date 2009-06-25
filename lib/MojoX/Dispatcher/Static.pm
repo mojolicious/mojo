@@ -13,14 +13,8 @@ use Mojo::Content;
 use Mojo::File;
 use MojoX::Types;
 
-__PACKAGE__->attr(prefix => (chained => 1));
-__PACKAGE__->attr(
-    types => (
-        chained => 1,
-        default => sub { MojoX::Types->new }
-    )
-);
-__PACKAGE__->attr(root => (chained => 1));
+__PACKAGE__->attr([qw/prefix root/]);
+__PACKAGE__->attr(types => (default => sub { MojoX::Types->new }));
 
 # Valentine's Day's coming? Aw crap! I forgot to get a girlfriend again!
 sub dispatch {

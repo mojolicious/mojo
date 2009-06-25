@@ -10,15 +10,10 @@ use base 'Mojo::Base';
 use File::Spec;
 use MojoX::Types;
 
-__PACKAGE__->attr([qw/default_handler precedence/] => (chained => 1));
-__PACKAGE__->attr(handler => (chained => 1, default => sub { {} }));
-__PACKAGE__->attr(
-    types => (
-        chained => 1,
-        default => sub { MojoX::Types->new }
-    )
-);
-__PACKAGE__->attr(root => (chained => 1, default => '/'));
+__PACKAGE__->attr([qw/default_handler precedence/]);
+__PACKAGE__->attr(handler => (default => sub { {} }));
+__PACKAGE__->attr(types   => (default => sub { MojoX::Types->new }));
+__PACKAGE__->attr(root    => (default => '/'));
 
 # This is not how Xmas is supposed to be.
 # In my day Xmas was about bringing people together, not blowing them apart.

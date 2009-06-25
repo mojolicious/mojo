@@ -14,7 +14,6 @@ use constant RELOAD => $ENV{MOJO_RELOAD} || 0;
 
 __PACKAGE__->attr(
     app => (
-        chained => 1,
         default => sub {
             my $e = Mojo::Loader->load_build(shift->app_class);
             die $e if ref $e eq 'Mojo::Loader::Exception';
@@ -23,14 +22,9 @@ __PACKAGE__->attr(
     )
 );
 __PACKAGE__->attr(
-    app_class => (
-        chained => 1,
-        default => sub { $ENV{MOJO_APP} ||= 'Mojo::HelloWorld' }
-    )
-);
+    app_class => (default => sub { $ENV{MOJO_APP} ||= 'Mojo::HelloWorld' }));
 __PACKAGE__->attr(
     build_tx_cb => (
-        chained => 1,
         default => sub {
             return sub {
                 my $self = shift;
@@ -49,7 +43,6 @@ __PACKAGE__->attr(
 );
 __PACKAGE__->attr(
     continue_handler_cb => (
-        chained => 1,
         default => sub {
             return sub {
                 my ($self, $tx) = @_;
@@ -64,7 +57,6 @@ __PACKAGE__->attr(
 );
 __PACKAGE__->attr(
     handler_cb => (
-        chained => 1,
         default => sub {
             return sub {
                 my ($self, $tx) = @_;

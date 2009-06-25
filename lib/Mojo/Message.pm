@@ -18,25 +18,10 @@ use Mojo::Parameters;
 use Mojo::Upload;
 use Mojo::URL;
 
-__PACKAGE__->attr(
-    buffer => (
-        chained => 1,
-        default => sub { Mojo::Buffer->new }
-    )
-);
-__PACKAGE__->attr([qw/parser_progress_cb/] => (chained => 1));
-__PACKAGE__->attr(
-    content => (
-        chained => 1,
-        default => sub { Mojo::Content->new }
-    )
-);
-__PACKAGE__->attr(
-    [qw/major_version minor_version/] => (
-        chained => 1,
-        default => 1
-    )
-);
+__PACKAGE__->attr(buffer => (default => sub { Mojo::Buffer->new }));
+__PACKAGE__->attr([qw/parser_progress_cb/]);
+__PACKAGE__->attr(content => (default => sub { Mojo::Content->new }));
+__PACKAGE__->attr([qw/major_version minor_version/] => (default => 1));
 
 # I'll keep it short and sweet. Family. Religion. Friendship.
 # These are the three demons you must slay if you wish to succeed in

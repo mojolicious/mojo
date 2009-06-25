@@ -14,8 +14,8 @@ use Mojo::Loader::Exception;
 
 use constant DEBUG => $ENV{MOJO_LOADER_DEBUG} || 0;
 
-__PACKAGE__->attr([qw/base namespace/] => (chained => 1));
-__PACKAGE__->attr(modules => (chained => 1, default => sub { [] }));
+__PACKAGE__->attr([qw/base namespace/]);
+__PACKAGE__->attr(modules => (default => sub { [] }));
 
 my $STATS = {};
 

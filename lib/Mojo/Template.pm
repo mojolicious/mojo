@@ -12,16 +12,16 @@ use Encode qw/decode encode/;
 use IO::File;
 use Mojo::Template::Exception;
 
-__PACKAGE__->attr(code            => (chained => 1, default => ''));
-__PACKAGE__->attr(comment_mark    => (chained => 1, default => '#'));
-__PACKAGE__->attr(compiled        => (chained => 1));
-__PACKAGE__->attr(encoding        => (chained => 1, default => 'utf8'));
-__PACKAGE__->attr(expression_mark => (chained => 1, default => '='));
-__PACKAGE__->attr(line_start      => (chained => 1, default => '%'));
-__PACKAGE__->attr(template        => (chained => 1, default => ''));
-__PACKAGE__->attr(tree => (chained => 1, default => sub { [] }));
-__PACKAGE__->attr(tag_start => (chained => 1, default => '<%'));
-__PACKAGE__->attr(tag_end   => (chained => 1, default => '%>'));
+__PACKAGE__->attr(code         => (default => ''));
+__PACKAGE__->attr(comment_mark => (default => '#'));
+__PACKAGE__->attr('compiled');
+__PACKAGE__->attr(encoding        => (default => 'utf8'));
+__PACKAGE__->attr(expression_mark => (default => '='));
+__PACKAGE__->attr(line_start      => (default => '%'));
+__PACKAGE__->attr(template        => (default => ''));
+__PACKAGE__->attr(tree            => (default => sub { [] }));
+__PACKAGE__->attr(tag_start       => (default => '<%'));
+__PACKAGE__->attr(tag_end         => (default => '%>'));
 
 sub build {
     my $self = shift;

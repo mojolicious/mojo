@@ -11,7 +11,6 @@ use IO::File;
 
 __PACKAGE__->attr(
     handle => (
-        chained => 1,
         default => sub {
             my $self = shift;
 
@@ -27,8 +26,8 @@ __PACKAGE__->attr(
         }
     )
 );
-__PACKAGE__->attr(level => (chained => 1, default => 'debug'));
-__PACKAGE__->attr(path => (chained => 1));
+__PACKAGE__->attr(level => (default => 'debug'));
+__PACKAGE__->attr('path');
 
 my $LEVEL = {debug => 1, info => 2, warn => 3, error => 4, fatal => 5};
 

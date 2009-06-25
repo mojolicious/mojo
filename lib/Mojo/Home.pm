@@ -12,8 +12,8 @@ use File::Spec;
 use FindBin;
 use Mojo::Script;
 
-__PACKAGE__->attr(app_class => (chained => 1));
-__PACKAGE__->attr(parts => (chained => 1, default => sub { [] }));
+__PACKAGE__->attr('app_class');
+__PACKAGE__->attr(parts => (default => sub { [] }));
 
 # I'm normally not a praying man, but if you're up there,
 # please save me Superman.

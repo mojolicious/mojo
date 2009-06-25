@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojo::Base';
 
-__PACKAGE__->attr(ctx => (chained => 1));
+__PACKAGE__->attr('ctx');
 
 # If we don't go back there and make that event happen,
 # the entire universe will be destroyed...

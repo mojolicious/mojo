@@ -18,26 +18,11 @@ use Mojo::Headers;
 use constant MAX_MEMORY_SIZE => $ENV{MOJO_MAX_MEMORY_SIZE} || 10240;
 
 __PACKAGE__->attr(
-    [qw/buffer filter_buffer/] => (
-        chained => 1,
-        default => sub { Mojo::Buffer->new }
-    )
-);
-__PACKAGE__->attr([qw/body_cb filter builder_progress_cb/] => (chained => 1));
-__PACKAGE__->attr(
-    file => (
-        chained => 1,
-        default => sub { Mojo::File::Memory->new }
-    )
-);
-__PACKAGE__->attr(
-    headers => (
-        chained => 1,
-        default => sub { Mojo::Headers->new }
-    )
-);
-__PACKAGE__->attr(
-    [qw/raw_header_length relaxed/] => (chained => 1, default => 0));
+    [qw/buffer filter_buffer/] => (default => sub { Mojo::Buffer->new }));
+__PACKAGE__->attr([qw/body_cb filter builder_progress_cb/]);
+__PACKAGE__->attr(file    => (default => sub { Mojo::File::Memory->new }));
+__PACKAGE__->attr(headers => (default => sub { Mojo::Headers->new }));
+__PACKAGE__->attr([qw/raw_header_length relaxed/] => (default => 0));
 
 sub build_body {
     my $self = shift;

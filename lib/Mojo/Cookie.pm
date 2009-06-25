@@ -12,8 +12,7 @@ use Carp;
 use Mojo::Date;
 
 __PACKAGE__->attr(
-    [qw/comment domain httponly name path secure value version/] =>
-      (chained => 1));
+    [qw/comment domain httponly name path secure value version/]);
 
 # My Homer is not a communist.
 # He may be a liar, a pig, an idiot, a communist, but he is not a porn star.

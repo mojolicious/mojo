@@ -18,10 +18,9 @@ use Mojo::ByteStream;
 
 use constant TMPDIR => $ENV{MOJO_TMPDIR} || File::Spec->tmpdir;
 
-__PACKAGE__->attr(cleanup => (chained => 1));
+__PACKAGE__->attr('cleanup');
 __PACKAGE__->attr(
     handle => (
-        chained => 1,
         default => sub {
             my $self   = shift;
             my $handle = IO::File->new;

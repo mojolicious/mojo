@@ -10,7 +10,7 @@ use overload '""' => sub { shift->to_string }, fallback => 1;
 
 require Time::Local;
 
-__PACKAGE__->attr(epoch => (chained => 1));
+__PACKAGE__->attr('epoch');
 
 sub new {
     my $self = shift->SUPER::new();

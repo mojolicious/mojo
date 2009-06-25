@@ -11,17 +11,9 @@ use Carp 'croak';
 use Mojo::Buffer;
 use Mojo::Headers;
 
+__PACKAGE__->attr(headers => (default => sub { Mojo::Headers->new }));
 __PACKAGE__->attr(
-    headers => (
-        chained => 1,
-        default => sub { Mojo::Headers->new }
-    )
-);
-__PACKAGE__->attr(
-    [qw/input_buffer output_buffer/] => (
-        chained => 1,
-        default => sub { Mojo::Buffer->new }
-    )
+    [qw/input_buffer output_buffer/] => (default => sub { Mojo::Buffer->new })
 );
 
 # Quick Smithers. Bring the mind eraser device!

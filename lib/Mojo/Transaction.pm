@@ -11,31 +11,11 @@ use Mojo;
 use Mojo::Message::Request;
 use Mojo::Message::Response;
 
-__PACKAGE__->attr(
-    [   qw/
-          connection
-          kept_alive
-          local_address
-          local_port
-          remote_address
-          remote_port
-          /
-    ] => (chained => 1)
-);
-__PACKAGE__->attr(continue_timeout => (chained => 1, default => 3));
-__PACKAGE__->attr('continued' => (chained => 1));
-__PACKAGE__->attr(
-    req => (
-        chained => 1,
-        default => sub { Mojo::Message::Request->new }
-    )
-);
-__PACKAGE__->attr(
-    res => (
-        chained => 1,
-        default => sub { Mojo::Message::Response->new }
-    )
-);
+__PACKAGE__->attr([qw/connection continued kept_alive/]);
+__PACKAGE__->attr([qw/local_address local_port remote_address remote_port/]);
+__PACKAGE__->attr(continue_timeout => (default => 3));
+__PACKAGE__->attr(req => (default => sub { Mojo::Message::Request->new }));
+__PACKAGE__->attr(res => (default => sub { Mojo::Message::Response->new }));
 
 # What's a wedding?  Webster's dictionary describes it as the act of removing
 # weeds from one's garden.

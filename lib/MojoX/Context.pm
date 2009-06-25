@@ -7,8 +7,8 @@ use warnings;
 
 use base 'Mojo::Base';
 
-__PACKAGE__->attr(app => (chained => 1, weak => 1));
-__PACKAGE__->attr(tx => (chained => 1));
+__PACKAGE__->attr(app => (weak => 1));
+__PACKAGE__->attr('tx');
 
 # This is my first visit to the Galaxy of Terror and I'd like it to be a pleasant one.
 sub req { return shift->tx->req }

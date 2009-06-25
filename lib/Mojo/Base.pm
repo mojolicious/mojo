@@ -39,7 +39,7 @@ sub attr {
     else { $args = $_[0] }
     $args ||= {};
 
-    my $chained = delete $args->{chained};
+    my $chained = exists $args->{chained} ? delete $args->{chained} : 1;
     my $default = delete $args->{default};
     my $weak    = delete $args->{weak};
 
@@ -149,7 +149,7 @@ Mojo::Base - Minimal Object System For Mojo Related Projects
     __PACKAGE__->attr('driver');
     __PACKAGE__->attr('doors', default => 2);
     __PACKAGE__->attr([qw/passengers seats/],
-        chained => 1,
+        chained => 0,
         default => sub { 2 }
     );
     __PACKAGE__->attr('trailer', weak => 1);
@@ -195,11 +195,11 @@ be set in the object's internal hash reference.
 
     __PACKAGE__->attr('name');
     __PACKAGE__->attr([qw/name1 name2 name3/]);
-    __PACKAGE__->attr('name', chained => 1, default => 'foo');
-    __PACKAGE__->attr(name => (chained => 1, default => 'foo'));
-    __PACKAGE__->attr('name', {chained => 1, default => 'foo'});
+    __PACKAGE__->attr('name', chained => 0, default => 'foo');
+    __PACKAGE__->attr(name => (chained => 0, default => 'foo'));
+    __PACKAGE__->attr('name', {chained => 0, default => 'foo'});
     __PACKAGE__->attr([qw/name1 name2 name3/] => {
-        chained => 1,
+        chained => 0,
         default => 'foo'}
     );
 
@@ -211,7 +211,8 @@ as a hash or a hashref.
 Currently there are three options supported.
 
     chained: Whenever you call an attribute with arguments the instance
-             is returned instead of the value.
+             is returned instead of the value. (This will be activated by
+             default and can be deactivated by setting chained to false)
     default: Default value for the attribute, can be a coderef or constant
              value. (Not a normal reference!)
              Note that the default value is "lazy", which means it only

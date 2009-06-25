@@ -28,18 +28,8 @@ sub connect {
 
     # Non blocking connect
     unless ($connection) {
-        $connection = IO::Socket::INET->new(
-            Proto => 'tcp',
-            Type  => SOCK_STREAM
-        );
-
-        # Non blocking
-        $connection->blocking(0);
-
-        my $sin = sockaddr_in($port, inet_aton($address));
-        $connection->connect($sin);
+        $connection = $self->open_socket($scheme, $address, $port);
         $tx->{_connect_timeout} = time + 5;
-
     }
     $tx->connection($connection);
 
@@ -76,6 +66,23 @@ sub deposit_connection {
         return 1;
     }
     return 0;
+}
+
+sub open_socket {
+    my ($self, $scheme, $address, $port) = @_;
+
+    my $connection = IO::Socket::INET->new(
+        Proto => 'tcp',
+        Type  => SOCK_STREAM
+    );
+
+    # Non blocking
+    $connection->blocking(0);
+
+    my $sin = sockaddr_in($port, inet_aton($address));
+    $connection->connect($sin);
+
+    return $connection;
 }
 
 # Marge, I'm going to Moe's. Send the kids to the neighbors,
@@ -378,6 +385,10 @@ following new ones.
 =head2 C<deposit_connection>
 
     $client->deposit_connection($name, $connection, $timeout);
+
+=head2 C<open_socket>
+
+    my $connection = $client->open_socket($scheme, $address, $port);
 
 =head2 C<process>
 

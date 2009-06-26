@@ -10,7 +10,6 @@ use base 'Mojo::Base';
 use IO::Socket::INET;
 use IO::Select;
 use Mojo::Loader;
-use Mojo::Message::Response;
 use Socket;
 
 __PACKAGE__->attr(continue_timeout   => (default => 3));

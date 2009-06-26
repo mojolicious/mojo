@@ -124,8 +124,7 @@ sub client_read {
     my $read = length $chunk;
 
     # Buffer early response, most likely an error
-    $self->res->buffer->add_chunk($chunk)
-      if $self->is_state(qw/write_start_line write_headers write_body/);
+    $self->res->buffer->add_chunk($chunk) if $self->is_writing;
 
     # Read 100 Continue
     if ($self->is_state('read_continue')) {
@@ -480,6 +479,11 @@ sub server_written {
     return $self;
 }
 
+sub is_writing {
+    my $self = shift;
+    return $self->is_state(qw/write_start_line write_headers write_body/);
+}
+
 sub _builder {
     my $class = shift;
     my $self  = $class->new;
@@ -716,5 +720,9 @@ implements the following new ones.
 =head2 C<server_written>
 
     $tx = $tx->server_written($bytes);
+
+=head2 C<is_writing>
+
+    my $writing = $tx->is_writing;
 
 =cut

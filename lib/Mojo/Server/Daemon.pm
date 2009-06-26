@@ -162,9 +162,7 @@ sub _prepare_select {
         unshift @read, $p->connection;
 
         # Write
-        if ($p->is_state(qw/write_start_line write_headers write_body/)) {
-            unshift @write, $p->connection;
-        }
+        unshift @write, $p->connection if $p->is_writing;
     }
 
     # Prepare select

@@ -7,6 +7,8 @@ use warnings;
 
 use base 'Mojo::Transaction';
 
+__PACKAGE__->attr(safe_post => (default => 0));
+
 # No children have ever meddled with the Republican Party and lived to tell
 # about it.
 sub new {
@@ -291,6 +293,28 @@ sub server_written {
     return $self;
 }
 
+sub is_writing {
+    my $self = shift;
+
+    my $writing = $self->SUPER::is_writing;
+    return $writing unless $self->safe_post;
+
+    # If safe_post is on, don't write out a POST request
+    # until response from previous request has been received.
+    # This is even safer than HTTP spec which suggests waiting
+    # until the response status from the previous request has been
+    # received (see rfc2616, section 8.1.2.2).
+    if (   $writing
+        && $self->_reader != $self->_writer
+        && $self->_writer->req->method eq 'POST')
+    {
+        return 0;
+    }
+    else {
+        return $writing;
+    }
+}
+
 # We are always in reading mode according to RFC, so writing has priority
 sub _client_inherit_state {
     my $self = shift;
@@ -409,6 +433,14 @@ implements the following new ones.
 =head2 C<res>
 
     my $responses = $p->res;
+
+=head2 C<safe_post>
+
+    my $safe_post = $p->safe_post;
+    $p            = $p->safe_post(1);
+
+If set to true, a pipeline will wait until the responses to previous
+requests are received before sending a POST.
 
 =head1 METHODS
 

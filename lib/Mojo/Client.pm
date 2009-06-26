@@ -215,9 +215,7 @@ sub spin {
         push @read_select, $connection;
 
         # Write sockets
-        if ($tx->is_state(qw/write_start_line write_headers write_body/)) {
-            push @write_select, $connection;
-        }
+        push @write_select, $connection if ($tx->is_writing);
 
         $waiting++;
     }

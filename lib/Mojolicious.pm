@@ -12,6 +12,7 @@ use Mojolicious::Renderer;
 use MojoX::Dispatcher::Routes;
 use MojoX::Dispatcher::Static;
 use MojoX::Types;
+use Time::HiRes ();
 
 __PACKAGE__->attr(ctx_class => (default => 'Mojolicious::Context'));
 __PACKAGE__->attr(
@@ -100,8 +101,17 @@ sub dispatch {
 sub handler {
     my ($self, $tx) = @_;
 
+    # Start timer
+    my $start = [Time::HiRes::gettimeofday()];
+
     # Build context and dispatch
     $self->dispatch($self->build_ctx($tx));
+
+    # End timer
+    my $elapsed = sprintf '%f',
+      Time::HiRes::tv_interval($start, [Time::HiRes::gettimeofday()]);
+    my $rps = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
+    $self->log->debug("Request took $elapsed seconds ($rps/s).");
 
     return $tx;
 }

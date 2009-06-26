@@ -23,7 +23,8 @@ our $VERSION = '0.9003';
 sub new {
     my $self = shift->SUPER::new(@_);
 
-    $self->home->detect(ref $self);
+    # Home
+    my $home = $self->home->detect(ref $self);
 
     # Log directory
     $self->log->path($self->home->rel_file('log/mojo.log'));

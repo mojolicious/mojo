@@ -63,7 +63,8 @@ WriteMakefile(
         'POSIX'                 => 0,
         'Test::Builder::Module' => 0,
         'Test::Harness'         => 0,
-        'Test::More'            => 0
+        'Test::More'            => 0,
+        'Time::HiRes'           => 0
     },
     test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t'}
 );

@@ -163,6 +163,25 @@ sub client_written {
 
 sub continued { shift->{_txs}->[-1]->continued }
 
+sub is_writing {
+    my $self = shift;
+
+    my $writing = $self->SUPER::is_writing;
+    return $writing unless $self->safe_post;
+
+    # If safe_post is on, don't write out a POST request until response from
+    # previous request has been received
+    # (This is even safer than rfc2616 (section 8.1.2.2), which suggests
+    # waiting until the response status from the previous request has been
+    # received)
+    return 0
+      if $writing
+          && $self->_reader != $self->_writer
+          && $self->_writer->req->method eq 'POST';
+
+    return $writing;
+}
+
 sub keep_alive {
     my $self = shift;
     return $self->{_txs}->[0] ? $self->{_txs}->[0]->keep_alive(@_) : undef;
@@ -293,28 +312,6 @@ sub server_written {
     return $self;
 }
 
-sub is_writing {
-    my $self = shift;
-
-    my $writing = $self->SUPER::is_writing;
-    return $writing unless $self->safe_post;
-
-    # If safe_post is on, don't write out a POST request
-    # until response from previous request has been received.
-    # This is even safer than HTTP spec which suggests waiting
-    # until the response status from the previous request has been
-    # received (see rfc2616, section 8.1.2.2).
-    if (   $writing
-        && $self->_reader != $self->_writer
-        && $self->_writer->req->method eq 'POST')
-    {
-        return 0;
-    }
-    else {
-        return $writing;
-    }
-}
-
 # We are always in reading mode according to RFC, so writing has priority
 sub _client_inherit_state {
     my $self = shift;
@@ -439,6 +436,8 @@ implements the following new ones.
     my $safe_post = $p->safe_post;
     $p            = $p->safe_post(1);
 
+Returns true or false if called without arguments.
+Returns the invocant if called with arguments.
 If set to true, a pipeline will wait until the responses to previous
 requests are received before sending a POST.
 
@@ -484,6 +483,10 @@ implements the following new ones.
 =head2 C<client_written>
 
     $p = $p->client_written($length);
+
+=head2 C<is_writing>
+
+    my $writing = $p->is_writing;
 
 =head2 C<server_accept>
 

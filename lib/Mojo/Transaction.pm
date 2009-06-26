@@ -268,6 +268,10 @@ sub client_written {
     return $self;
 }
 
+sub is_writing {
+    shift->is_state(qw/write_start_line write_headers write_body/);
+}
+
 sub keep_alive {
     my ($self, $keep_alive) = @_;
 
@@ -479,11 +483,6 @@ sub server_written {
     return $self;
 }
 
-sub is_writing {
-    my $self = shift;
-    return $self->is_state(qw/write_start_line write_headers write_body/);
-}
-
 sub _builder {
     my $class = shift;
     my $self  = $class->new;
@@ -652,6 +651,10 @@ implements the following new ones.
 
     $tx = $tx->client_written($length);
 
+=head2 C<is_writing>
+
+    my $writing = $tx->is_writing;
+
 =head2 C<new_delete>
 
     my $tx = Mojo::Transaction->new_delete('http://127.0.0.1',
@@ -720,9 +723,5 @@ implements the following new ones.
 =head2 C<server_written>
 
     $tx = $tx->server_written($bytes);
-
-=head2 C<is_writing>
-
-    my $writing = $tx->is_writing;
 
 =cut

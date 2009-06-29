@@ -54,8 +54,6 @@ Mojo - The Web In A Box!
         $tx->res->code(200);
         $tx->res->headers->content_type('text/plain');
         $tx->res->body('Congratulations, your Mojo is working!');
-
-        return $tx;
     }
 
 =head1 DESCRIPTION

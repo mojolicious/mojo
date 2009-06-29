@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojo.
 
+0.991232 2009-06-29 00:00:00
+        - Fixed tarball.
+
 0.991231 2009-06-29 00:00:00
         - Rewrote MojoX::Renderer, it is not backward compatible and
           templates need to be renamed in the following 3 part format

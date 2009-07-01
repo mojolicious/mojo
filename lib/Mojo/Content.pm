@@ -103,7 +103,7 @@ sub has_leftovers {
     return 0;
 }
 
-sub header_length { return length shift->build_headers }
+sub header_length { length shift->build_headers }
 
 sub is_chunked {
     my $self = shift;

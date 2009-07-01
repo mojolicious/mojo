@@ -9,8 +9,8 @@ use warnings;
 
 use base 'MojoX::Dispatcher::Routes::Controller';
 
-sub bar  { return 1 }
-sub home { return 1 }
+sub bar  {1}
+sub home {1}
 
 package Test::Context;
 

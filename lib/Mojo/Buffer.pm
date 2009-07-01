@@ -59,7 +59,7 @@ sub remove {
     return substr $self->{buffer}, 0, $length, '';
 }
 
-sub to_string { return shift->{buffer} || '' }
+sub to_string { shift->{buffer} || '' }
 
 1;
 __END__

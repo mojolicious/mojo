@@ -25,7 +25,7 @@ sub new {
     return $self;
 }
 
-sub bridge { return shift->route(@_)->inline(1) }
+sub bridge { shift->route(@_)->inline(1) }
 
 sub is_endpoint {
     my $self = shift;
@@ -170,7 +170,7 @@ sub url_for {
     return $url;
 }
 
-sub waypoint { return shift->route(@_)->block(1) }
+sub waypoint { shift->route(@_)->block(1) }
 
 1;
 __END__

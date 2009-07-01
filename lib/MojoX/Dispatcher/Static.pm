@@ -76,7 +76,12 @@ sub serve {
                 }
             }
 
-            $res->content(Mojo::Content->new(file => Mojo::File->new));
+            $res->content(
+                Mojo::Content->new(
+                    file    => Mojo::File->new,
+                    headers => $res->headers
+                )
+            );
             $res->code(200);
 
             # Last modified
@@ -85,6 +90,7 @@ sub serve {
 
             $res->headers->content_type($type);
             $res->content->file->path($path);
+
             return 0;
         }
 

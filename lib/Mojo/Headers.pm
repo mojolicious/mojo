@@ -113,13 +113,13 @@ sub build {
     return length $headers ? $headers : undef;
 }
 
-sub connection          { return shift->header('Connection',          @_) }
-sub content_disposition { return shift->header('Content-Disposition', @_) }
-sub content_length      { return shift->header('Content-Length',      @_) }
-sub content_type        { return shift->header('Content-Type',        @_) }
-sub cookie              { return shift->header('Cookie',              @_) }
-sub date                { return shift->header('Date',                @_) }
-sub expect              { return shift->header('Expect',              @_) }
+sub connection          { shift->header('Connection',          @_) }
+sub content_disposition { shift->header('Content-Disposition', @_) }
+sub content_length      { shift->header('Content-Length',      @_) }
+sub content_type        { shift->header('Content-Type',        @_) }
+sub cookie              { shift->header('Cookie',              @_) }
+sub date                { shift->header('Date',                @_) }
+sub expect              { shift->header('Expect',              @_) }
 
 # Will you be my mommy? You smell like dead bunnies...
 sub header {
@@ -164,7 +164,7 @@ sub header {
     return @header;
 }
 
-sub host { return shift->header('Host', @_) }
+sub host { shift->header('Host', @_) }
 
 sub names {
     my $self = shift;
@@ -231,7 +231,7 @@ sub parse {
     return undef;
 }
 
-sub proxy_authorization { return shift->header('Proxy-Authorization', @_) }
+sub proxy_authorization { shift->header('Proxy-Authorization', @_) }
 
 sub remove {
     my ($self, $name) = @_;
@@ -246,15 +246,16 @@ sub remove {
     return $self;
 }
 
-sub set_cookie  { return shift->header('Set-Cookie',  @_) }
-sub set_cookie2 { return shift->header('Set-Cookie2', @_) }
-sub status      { return shift->header('Status',      @_) }
+sub server      { shift->header('Server',      @_) }
+sub set_cookie  { shift->header('Set-Cookie',  @_) }
+sub set_cookie2 { shift->header('Set-Cookie2', @_) }
+sub status      { shift->header('Status',      @_) }
 
 sub to_string { shift->build(@_) }
 
-sub trailer           { return shift->header('Trailer',           @_) }
-sub transfer_encoding { return shift->header('Transfer-Encoding', @_) }
-sub user_agent        { return shift->header('User-Agent',        @_) }
+sub trailer           { shift->header('Trailer',           @_) }
+sub transfer_encoding { shift->header('Transfer-Encoding', @_) }
+sub user_agent        { shift->header('User-Agent',        @_) }
 
 1;
 __END__
@@ -325,6 +326,11 @@ implements the following new ones.
 
     my $proxy_authorization = $headers->proxy_authorization;
     $headers = $headers->proxy_authorization('Basic Zm9vOmJhcg==');
+
+=head2 C<server>
+
+    my $server = $headers->server;
+    $headers   = $headers->server('Mojo');
 
 =head2 C<set_cookie>
 

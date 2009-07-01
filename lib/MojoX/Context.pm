@@ -11,9 +11,9 @@ __PACKAGE__->attr(app => (weak => 1));
 __PACKAGE__->attr('tx');
 
 # This is my first visit to the Galaxy of Terror and I'd like it to be a pleasant one.
-sub req { return shift->tx->req }
+sub req { shift->tx->req }
 
-sub res { return shift->tx->res }
+sub res { shift->tx->res }
 
 sub stash {
     my $self = shift;

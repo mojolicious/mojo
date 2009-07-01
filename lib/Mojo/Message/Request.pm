@@ -123,7 +123,7 @@ sub proxy {
     return $self->{proxy};
 }
 
-sub query_params { return shift->url->query }
+sub query_params { shift->url->query }
 
 sub _build_start_line {
     my $self = shift;

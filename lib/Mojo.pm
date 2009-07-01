@@ -32,7 +32,11 @@ sub new {
     return $self;
 }
 
-sub build_tx { return Mojo::Transaction->new }
+sub build_tx {
+    my $tx = Mojo::Transaction->new;
+    $tx->res->headers->header('X-Powered-By' => 'Mojo (Perl)');
+    return $tx;
+}
 
 sub handler { Carp::croak('Method "handler" not implemented in subclass') }
 

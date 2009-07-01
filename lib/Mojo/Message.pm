@@ -321,7 +321,7 @@ sub _parse {
     return $self;
 }
 
-sub start_line_length { return length shift->build_start_line }
+sub start_line_length { length shift->build_start_line }
 
 sub to_string { shift->build(@_) }
 

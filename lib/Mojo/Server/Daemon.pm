@@ -18,9 +18,9 @@ __PACKAGE__->attr(max_clients             => (default => 1000));
 __PACKAGE__->attr(max_keep_alive_requests => (default => 100));
 __PACKAGE__->attr(port                    => (default => 3000));
 
-sub accept_lock { return 1 }
+sub accept_lock {1}
 
-sub accept_unlock { return 1 }
+sub accept_unlock {1}
 
 sub listen {
     my $self = shift;
@@ -90,6 +90,30 @@ sub _drop_connection {
     close $self->{_connections}->{$name}->{socket};
     delete $self->{_reverse}->{$self->{_connections}->{$name}};
     delete $self->{_connections}->{$name};
+}
+
+sub _handle {
+    my ($self, $p) = @_;
+
+    # Handle continue
+    if ($p->is_state('handle_continue')) {
+
+        # Continue handler
+        $self->continue_handler_cb->($self, $p->server_tx);
+
+        # Handled
+        $p->server_handled;
+    }
+
+    # Handle request
+    if ($p->is_state('handle_request')) {
+
+        # Handler
+        $self->handler_cb->($self, $p->server_tx);
+
+        # Handled
+        $p->server_handled;
+    }
 }
 
 sub _prepare_connections {
@@ -191,25 +215,8 @@ sub _prepare_transactions {
         # Just a keep alive, no transaction
         next unless $p;
 
-        # Expect 100 Continue?
-        if ($p->is_state('handle_continue')) {
-
-            # Continue handler
-            $self->continue_handler_cb->($self, $p->server_tx);
-
-            # Handled
-            $p->server_handled;
-        }
-
-        # EOF
-        if ($p->is_state('handle_request')) {
-
-            # Handler
-            $self->handler_cb->($self, $p->server_tx);
-
-            # Handled
-            $p->server_handled;
-        }
+        # Handle
+        $self->_handle($p);
 
         # State machine
         $p->server_spin;
@@ -226,25 +233,8 @@ sub _prepare_transactions {
             # Read leftovers
             $p->server_read($leftovers);
 
-            # Check if leftovers contained a whole request
-            if ($p->is_state('handle_request')) {
-
-                # Handler
-                $self->handler_cb->($self, $p->server_tx);
-
-                # Handled
-                $p->server_handled;
-            }
-
-            # Or expects a 100 Continue
-            elsif ($p->is_state('handle_continue')) {
-
-                # Continue handler
-                $self->continue_handler_cb->($self, $p->server_tx);
-
-                # Handled
-                $p->server_handled;
-            }
+            # Handle
+            $self->_handle($p);
         }
 
         # Pipeline finished?

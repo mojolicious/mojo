@@ -7,7 +7,6 @@ use warnings;
 
 use base 'Mojo::Stateful';
 
-use Mojo;
 use Mojo::Message::Request;
 use Mojo::Message::Response;
 
@@ -36,9 +35,7 @@ sub client_connect {
     }
 
     # We identify ourself
-    my $version = $Mojo::VERSION;
-    $self->req->headers->user_agent(
-        "Mozilla/5.0 (compatible; Mojo/$version; Perl)")
+    $self->req->headers->user_agent('Mozilla/5.0 (compatible; Mojo; Perl)')
       unless $self->req->headers->user_agent;
 
     return $self;
@@ -317,6 +314,10 @@ sub server_accept {
 
     # Reading
     $self->state('read');
+
+    # We identify ourself
+    $self->res->headers->server('Mojo (Perl)')
+      unless $self->res->headers->server;
 
     return $self;
 }

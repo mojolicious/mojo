@@ -172,7 +172,7 @@ sub quote {
     return $self;
 }
 
-sub to_string { return shift->{bytestream} }
+sub to_string { shift->{bytestream} }
 
 sub unquote {
     my $self = shift;

@@ -9,7 +9,8 @@ use base 'Mojo::Base';
 
 use IO::Socket::INET;
 use IO::Select;
-use Mojo::Loader;
+use Mojo::Pipeline;
+use Mojo::Server;
 use Socket;
 
 __PACKAGE__->attr(continue_timeout   => (default => 3));
@@ -121,21 +122,82 @@ sub process_all {
 }
 
 sub process_local {
-    my ($self, $class, $tx) = @_;
+    my ($self, $class, $client) = @_;
 
     # Remote server
     if (my $authority = $ENV{MOJO_AUTHORITY}) {
-        $tx->req->url->authority($authority);
-        return $self->process($tx);
+        $client->req->url->authority($authority);
+        return $self->process($client);
     }
 
-    my $app = Mojo::Loader->load_build($class);
+    # Daemon start
+    my $daemon = Mojo::Server->new(app_class => $class);
 
-    $tx->req->fix_headers;
-    my $new_tx = $app->handler($tx);
-    $new_tx->res->fix_headers;
+    # Client connecting
+    $client->client_connect;
+    $client->client_connected;
 
-    return $new_tx;
+    # Server accepting
+    my $server =
+      Mojo::Pipeline->new->server_accept($daemon->build_tx_cb->($daemon));
+
+    # Exchange
+    while ($client->is_writing || $server->is_writing) {
+
+        # Client spins
+        $client->client_spin;
+
+        # Client writing?
+        if ($client->is_writing) {
+
+            # Client grabs chunk
+            my $buffer = $client->client_get_chunk || '';
+
+            # Client write and server read
+            $server->server_read($buffer);
+
+            # Client written
+            $client->client_written(length $buffer);
+        }
+
+        # Spin both
+        $client->client_spin;
+        $server->server_spin;
+
+        # Server writing?
+        if ($server->is_writing) {
+
+            # Server grabs chunk
+            my $buffer = $server->server_get_chunk || '';
+
+            # Server write and client read
+            $client->client_read($buffer);
+
+            # Server written
+            $server->server_written(length $buffer);
+        }
+
+        # Handle
+        $self->_local_handle($daemon, $server);
+
+        # Server spin
+        $server->server_spin;
+
+        # Server takes care of leftovers
+        if (my $leftovers = $server->server_leftovers) {
+
+            # Server adds transaction
+            $server->server_accept($daemon->build_tx_cb->($daemon));
+
+            # Server reads leftovers
+            $server->server_read($leftovers);
+
+            # Handle
+            $self->_local_handle($daemon, $server);
+        }
+    }
+
+    return $client;
 }
 
 sub spin {
@@ -315,6 +377,30 @@ sub withdraw_connection {
 
     $self->{_connections} = \@connections;
     return $result;
+}
+
+sub _local_handle {
+    my ($self, $daemon, $server) = @_;
+
+    # Handle continue
+    if ($server->is_state('handle_continue')) {
+
+        # Continue handler
+        $daemon->continue_handler_cb->($daemon, $server->server_tx);
+
+        # Handled
+        $server->server_handled;
+    }
+
+    # Handle request
+    if ($server->is_state('handle_request')) {
+
+        # Handler
+        $daemon->handler_cb->($daemon, $server->server_tx);
+
+        # Handled
+        $server->server_handled;
+    }
 }
 
 sub _socket_name {

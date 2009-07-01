@@ -23,7 +23,7 @@ sub add_chunk {
     return $self;
 }
 
-sub contains { return index(shift->{content}, shift) >= 0 ? 1 : 0 }
+sub contains { index(shift->{content}, shift) >= 0 ? 1 : 0 }
 
 sub copy_to { shift->_write_to_file(@_) }
 
@@ -33,11 +33,11 @@ sub get_chunk {
     return substr $copy, $offset, 4096;
 }
 
-sub length { return length(shift->{content} || '') }
+sub length { length(shift->{content} || '') }
 
 sub move_to { shift->_write_to_file(@_) }
 
-sub slurp { return shift->content }
+sub slurp { shift->content }
 
 sub _write_to_file {
     my ($self, $path) = @_;

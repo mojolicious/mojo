@@ -31,7 +31,7 @@ my $mt     = Mojo::Template->new;
 
 $mt->render_to_file(<<'EOF', $config, $dir, $port);
 % my ($dir, $port) = @_;
-% use File::Spec::Functions 'catfile'
+% use File::Spec::Functions 'catfile';
 server.modules = (
     "mod_access",
     "mod_cgi",

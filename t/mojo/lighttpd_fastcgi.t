@@ -32,7 +32,7 @@ my $mt     = Mojo::Template->new;
 
 $mt->render_to_file(<<'EOF', $config, $dir, $port, $script);
 % my ($dir, $port, $script) = @_;
-% use File::Spec::Functions 'catfile'
+% use File::Spec::Functions 'catfile';
 server.modules = (
     "mod_access",
     "mod_fastcgi",

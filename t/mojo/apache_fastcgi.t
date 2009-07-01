@@ -52,7 +52,7 @@ ok(-x $fcgi);
 # Apache setup
 $mt->render_to_file(<<'EOF', $config, $dir, $port, $fcgi);
 % my ($dir, $port, $fcgi) = @_;
-% use File::Spec::Functions 'catfile'
+% use File::Spec::Functions 'catfile';
 ServerName 127.0.0.1
 Listen <%= $port %>
 

@@ -14,6 +14,10 @@ sub development_mode {
     $self->static->root($self->home->rel_dir('t/mojolicious/public_dev'));
 }
 
+sub finalize { $_[1]->res->headers->header('X-Finalized' => 'works!') }
+
+sub prepare { $_[1]->res->headers->header('X-Prepared' => 'works!') }
+
 sub production_mode {
     my $self = shift;
 

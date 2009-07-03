@@ -140,8 +140,6 @@ use warnings;
 
 use base 'Mojolicious';
 
-our $VERSION = '0.1';
-
 # This method will run once at server start
 sub startup {
     my $self = shift;

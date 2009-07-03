@@ -83,9 +83,6 @@ WriteMakefile(
     NAME         => '<%= $class %>',
     VERSION_FROM => 'lib/<%= $path %>',
     AUTHOR       => 'A Good Programmer <nospam@cpan.org>',
-    ($ExtUtils::MakeMaker::VERSION >= 6.3002
-        ? ('LICENSE' => 'perl')
-        : ()),
     EXE_FILES => ['bin/<%= $name %>'],
     PREREQ_PM => { 'Mojo' => '0.9003' },
     test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t'}

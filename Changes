@@ -1,5 +1,9 @@
 This file documents the revision history for Perl extension Mojo.
 
+0.991234 2009-07-03 00:00:00
+        - Added prepare/finalize methods to Mojolicious.
+        - Updated generator scripts to play nice with MM->parse_version.
+
 0.991233 2009-07-01 00:00:00
         - Rewrote Mojo::Client::process_local to use the new state machine.
         - Added Server and X-Powered-By headers.

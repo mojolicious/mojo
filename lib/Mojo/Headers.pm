@@ -129,6 +129,10 @@ sub header {
     # Initialize
     $self->{_headers} ||= {};
 
+    # Don't allow illegal chars in header name
+    # Spec: 1*<any CHAR except CTLs or separators>
+    $name =~ s/[[:cntrl:]\(\|\)\<\>\@\,\;\:\\\"\/\[\]\?\=\{\}\s]//g;
+
     # Make sure we have a normal case entry for name
     my $lcname = lc $name;
     unless ($NORMALCASE_HEADERS{$lcname}) {
@@ -136,24 +140,29 @@ sub header {
     }
     $name = $lcname;
 
-    # Get on undefined header
+    # Get an undefined header
     unless ($self->{_headers}->{$name}) {
         return undef unless @_;
     }
 
     # Set
     if (@_) {
-        $self->{_headers}->{$name} = [@_];
+        my @values;
+        for my $v (@_) {
+            my $value = defined $v ? $v : '';
+            # Don't allow control chars in header values
+            $value =~ s/[[:cntrl:]]//g;
+            push @values, $value;
+        }
+        $self->{_headers}->{$name} = [@values];
         return $self;
     }
 
-    # Filter
+    # Get
     my @header;
     for my $value (@{$self->{_headers}->{$name}}) {
         $value = '' unless defined $value;
         $value =~ s/\s+$//;
-        $value =~ s/\n\n+/\n/g;
-        $value =~ s/\n([^\040\t])/\n $1/g;
         push @header, $value;
     }
 
@@ -219,7 +228,7 @@ sub parse {
             # Store headers
             for (my $i = 0; $i < @{$self->{__headers}}; $i += 2) {
                 $self->header($self->{__headers}->[$i],
-                    $self->{__headers}->[$i + 1]);
+                              $self->{__headers}->[$i + 1]);
             }
 
             # Done

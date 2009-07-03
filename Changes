@@ -1,8 +1,11 @@
 This file documents the revision history for Perl extension Mojo.
 
 0.991234 2009-07-03 00:00:00
+        - Added name and value filters to Mojo::Headers. (acajou)
+        - Added clean multiline value handling to Mojo::Headers.
         - Added prepare/finalize methods to Mojolicious.
         - Added some additional mime types to MojoX::Types.
+        - Renamed method add_line to add in Mojo::Headers.
         - Updated generator scripts to play nice with MM->parse_version.
 
 0.991233 2009-07-01 00:00:00

@@ -76,7 +76,7 @@ sub cookies {
         $self->headers->remove('Set-Cookie');
         $self->headers->remove('Set-Cookie2');
         for my $cookie (@_) {
-            $self->headers->add_line('Set-Cookie', "$cookie");
+            $self->headers->add('Set-Cookie', "$cookie");
         }
         return $self;
     }

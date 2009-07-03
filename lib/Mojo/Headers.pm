@@ -81,17 +81,47 @@ my (%ORDERED_HEADERS, %NORMALCASE_HEADERS);
     }
 }
 
-sub add_line {
+sub new {
+    my $self = shift->SUPER::new(@_);
+    $self->{_headers} = {};
+    return $self;
+}
+
+sub add {
     my $self = shift;
     my $name = shift;
-    $name = lc $name;
+
+    # Filter illegal characters from header name
+    # (1*<any CHAR except CTLs or separators>)
+    $name =~ s/[[:cntrl:]\(\|\)\<\>\@\,\;\:\\\"\/\[\]\?\=\{\}\s]//g;
+
+    # Make sure we have a normal case entry for name
+    my $lcname = lc $name;
+    unless ($NORMALCASE_HEADERS{$lcname}) {
+        $NORMALCASE_HEADERS{$lcname} = $name;
+    }
+    $name = $lcname;
 
     # Initialize header
-    $self->{_headers} ||= {};
     $self->{_headers}->{$name} ||= [];
 
+    # Filter values
+    my @values;
+    for my $v (@_) {
+        push @values, [];
+
+        for my $value (@{ref $v eq 'ARRAY' ? $v : [$v]}) {
+
+            # Filter control characters
+            $value = '' unless defined $value;
+            $value =~ s/[[:cntrl:]]//g;
+
+            push @{$values[-1]}, $value;
+        }
+    }
+
     # Add line
-    push @{$self->{_headers}->{$name}}, @_;
+    push @{$self->{_headers}->{$name}}, @values;
 
     return $self;
 }
@@ -102,8 +132,10 @@ sub build {
     # Prepare headers
     my @headers;
     for my $name (@{$self->names}) {
-        for my $value ($self->header($name)) {
-            $value = '' unless defined $value;
+
+        # Multiline value?
+        for my $values ($self->header($name)) {
+            my $value = join "\x0d\x0a ", @$values;
             push @headers, "$name: $value";
         }
     }
@@ -126,60 +158,37 @@ sub header {
     my $self = shift;
     my $name = shift;
 
-    # Initialize
-    $self->{_headers} ||= {};
-
-    # Don't allow illegal chars in header name
-    # Spec: 1*<any CHAR except CTLs or separators>
-    $name =~ s/[[:cntrl:]\(\|\)\<\>\@\,\;\:\\\"\/\[\]\?\=\{\}\s]//g;
-
-    # Make sure we have a normal case entry for name
-    my $lcname = lc $name;
-    unless ($NORMALCASE_HEADERS{$lcname}) {
-        $NORMALCASE_HEADERS{$lcname} = $name;
-    }
-    $name = $lcname;
-
-    # Get an undefined header
-    unless ($self->{_headers}->{$name}) {
-        return undef unless @_;
-    }
-
     # Set
     if (@_) {
-        my @values;
-        for my $v (@_) {
-            my $value = defined $v ? $v : '';
-            # Don't allow control chars in header values
-            $value =~ s/[[:cntrl:]]//g;
-            push @values, $value;
-        }
-        $self->{_headers}->{$name} = [@values];
-        return $self;
+        $self->remove($name);
+        return $self->add($name, @_);
     }
 
     # Get
-    my @header;
-    for my $value (@{$self->{_headers}->{$name}}) {
-        $value = '' unless defined $value;
-        $value =~ s/\s+$//;
-        push @header, $value;
-    }
+    my $headers;
+    return undef unless $headers = $self->{_headers}->{lc $name};
 
     # String
-    return join(', ', @header) unless wantarray;
+    unless (wantarray) {
+
+        # Format
+        my $string = '';
+        for my $header (@$headers) {
+            $string .= ', ' if $string;
+            $string .= join ', ', @$header;
+        }
+
+        return $string;
+    }
 
     # Array
-    return @header;
+    return @$headers;
 }
 
 sub host { shift->header('Host', @_) }
 
 sub names {
     my $self = shift;
-
-    # Initialize
-    $self->{_headers} ||= {};
 
     # Names
     my @names = keys %{$self->{_headers}};
@@ -228,7 +237,7 @@ sub parse {
             # Store headers
             for (my $i = 0; $i < @{$self->{__headers}}; $i += 2) {
                 $self->header($self->{__headers}->[$i],
-                              $self->{__headers}->[$i + 1]);
+                    $self->{__headers}->[$i + 1]);
             }
 
             # Done
@@ -244,13 +253,9 @@ sub proxy_authorization { shift->header('Proxy-Authorization', @_) }
 
 sub remove {
     my ($self, $name) = @_;
-    $name = lc $name;
-
-    # Initialize
-    $self->{_headers} ||= {};
 
     # Delete
-    delete $self->{_headers}->{$name};
+    delete $self->{_headers}->{lc $name};
 
     return $self;
 }
@@ -376,9 +381,13 @@ implements the following new ones.
 L<Mojo::Headers> inherits all methods from L<Mojo::Stateful> and implements
 the following new ones.
 
-=head2 C<add_line>
+=head2 C<new>
 
-    $headers = $headers->add_line('Content-Type', 'text/plain');
+    my $headers = Mojo::Headers->new;
+
+=head2 C<add>
+
+    $headers = $headers->add('Content-Type', 'text/plain');
 
 Returns the invocant.
 Appends a new line to the header.

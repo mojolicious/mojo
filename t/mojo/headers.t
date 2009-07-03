@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 # Remember, you can always find East by staring directly at the sun.
-use Test::More tests => 20;
+use Test::More tests => 23;
 
 # So, have a merry Christmas, a happy Hanukkah, a kwaazy Kwanza,
 # a tip-top Tet, and a solemn, dignified, Ramadan.
@@ -15,8 +15,8 @@ use_ok('Mojo::Headers');
 
 # Basic functionality
 my $headers = Mojo::Headers->new;
-$headers->add_line('Connection', 'close');
-$headers->add_line('Connection', 'keep-alive');
+$headers->add('Connection', 'close');
+$headers->add('Connection', 'keep-alive');
 is($headers->header('Connection'), 'close, keep-alive');
 $headers->remove('Connection');
 is($headers->header('Connection'), undef);
@@ -30,6 +30,18 @@ is("$headers",
       . "Expect: continue-100\x0d\x0a"
       . "Content-Type: text/html");
 is_deeply($headers->names, [qw/Connection Expect Content-Type/]);
+
+# Multiline values
+$headers = Mojo::Headers->new;
+$headers->header('X-Test', [23, 24], 'single line', [25, 26]);
+is("$headers",
+        "X-Test: 23\x0d\x0a 24\x0d\x0a"
+      . "X-Test: single line\x0d\x0a"
+      . "X-Test: 25\x0d\x0a 26");
+my @array = $headers->header('X-Test');
+is_deeply(\@array, [[23, 24], ['single line'], [25, 26]]);
+my $string = $headers->header('X-Test');
+is($string, "23, 24, single line, 25, 26");
 
 # Parse headers
 $headers = Mojo::Headers->new;

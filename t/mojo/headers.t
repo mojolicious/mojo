@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 # Remember, you can always find East by staring directly at the sun.
-use Test::More tests => 23;
+use Test::More tests => 24;
 
 # So, have a merry Christmas, a happy Hanukkah, a kwaazy Kwanza,
 # a tip-top Tet, and a solemn, dignified, Ramadan.
@@ -73,3 +73,9 @@ EOF
 is($headers->state,        'done');
 is($headers->content_type, 'text/plain');
 is($headers->connection,   'keep-alive');
+
+# Filter unallowed characters in name & value
+$headers = Mojo::Headers->new;
+$headers->header("X-T\@est|>\r\ning", "s1n\000gl\1773 \r\n\r\n\006l1n3");
+$string = $headers->header('X-Testing');
+is($string, "s1ngl3 l1n3");

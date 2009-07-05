@@ -9,7 +9,8 @@ Mojo::Manual::FAQ - Frequently Asked Questions
 =head2 Do i have to use L<Mojo::Base>?
 
 Absolutely not, you could just use any other accessor generator in your
-modules, L<Mojo::Base> is just a base class and will stay out of your way.
+modules, L<Mojo::Base> is just a minimalistic base class and will stay out of
+your way.
 
 =head2 Do i have to use L<Mojo::Template>?
 

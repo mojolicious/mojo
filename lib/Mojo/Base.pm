@@ -139,7 +139,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Base - Minimal Object System For Mojo Related Projects
+Mojo::Base - Minimal Base Class For Mojo Projects
 
 =head1 SYNOPSIS
 
@@ -168,15 +168,7 @@ Mojo::Base - Minimal Object System For Mojo Related Projects
 
 =head1 DESCRIPTION
 
-L<Mojo::Base> is a base class containing a simple and fast object system
-for Perl objects.
-Main design goals are minimalism and staying out of your way.
-The syntax is a bit like Ruby and the performance better than
-L<Class::Accessor::Fast>.
-
-Note that this is just an accessor generator, look at L<Moose> if you want
-a more comprehensive object system.
-
+L<Mojo::Base> is a minimalistic base class for L<Mojo> projects.
 For debugging you can set the C<MOJO_BASE_DEBUG> environment variable.
 
 =head1 METHODS

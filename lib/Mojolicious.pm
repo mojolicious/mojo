@@ -97,9 +97,6 @@ sub dispatch {
     elsif ($e) { $self->static->serve_404($c) }
 }
 
-# This will run for every request after dispatch
-sub finalize { }
-
 # Bite my shiny metal ass!
 sub handler {
     my ($self, $tx) = @_;
@@ -107,17 +104,8 @@ sub handler {
     # Start timer
     my $start = [Time::HiRes::gettimeofday()];
 
-    # Context
-    my $c = $self->build_ctx($tx);
-
-    # Prepare
-    $self->prepare($c);
-
-    # Dispatch unless we already have a response code
-    $self->dispatch($c) unless $c->res->code;
-
-    # Finalize
-    $self->finalize($c);
+    # Build context and dispatch
+    $self->dispatch($self->build_ctx($tx));
 
     # End timer
     my $elapsed = sprintf '%f',
@@ -127,9 +115,6 @@ sub handler {
 
     return $tx;
 }
-
-# This will run for every request before dispatch
-sub prepare { }
 
 # This will run once at startup
 sub startup { }
@@ -221,17 +206,9 @@ For example in production mode, C<production_mode> will be called.
 
     $mojo->dispatch($c);
 
-=head2 C<finalize>
-
-    $mojo->finalize($c);
-
 =head2 C<handler>
 
     $tx = $mojo->handler($tx);
-
-=head2 C<prepare>
-
-    $mojo->prepare($c);
 
 =head2 C<startup>
 

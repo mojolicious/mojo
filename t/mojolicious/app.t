@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 76;
+use Test::More tests => 54;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -28,8 +28,6 @@ $client->process_local('MojoliciousTest', $tx);
 is($tx->res->code,                            500);
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->headers->header('X-Finalized'),  'works!');
-is($tx->res->headers->header('X-Prepared'),   'works!');
 like($tx->res->body, qr/Missing right curly/);
 
 # Foo::test
@@ -39,8 +37,6 @@ is($tx->res->code,                            200);
 is($tx->res->headers->header('X-Bender'),     'Kiss my shiny metal ass!');
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->headers->header('X-Finalized'),  'works!');
-is($tx->res->headers->header('X-Prepared'),   'works!');
 like($tx->res->body, qr/\/bar\/test/);
 
 # Foo::index
@@ -50,8 +46,6 @@ is($tx->res->code,                            200);
 is($tx->res->headers->content_type,           'text/html');
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->headers->header('X-Finalized'),  'works!');
-is($tx->res->headers->header('X-Prepared'),   'works!');
 like($tx->res->body, qr/<body>\n23Hello Mojo from the template \/foo! He/);
 
 # Foo::Bar::index
@@ -61,8 +55,6 @@ is($tx->res->code,                            200);
 is($tx->res->headers->content_type,           'text/html');
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->headers->header('X-Finalized'),  'works!');
-is($tx->res->headers->header('X-Prepared'),   'works!');
 like($tx->res->body, qr/Hello Mojo from the other template \/foo-bar!/);
 
 # Foo::templateless
@@ -72,8 +64,6 @@ $client->process_local('MojoliciousTest', $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->headers->header('X-Finalized'),  'works!');
-is($tx->res->headers->header('X-Prepared'),   'works!');
 like($tx->res->body, qr/Hello Mojo from a templateless renderer!/);
 
 # MojoliciousTest2::Foo::test
@@ -83,8 +73,6 @@ is($tx->res->code,                            200);
 is($tx->res->headers->header('X-Bender'),     'Kiss my shiny metal ass!');
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->headers->header('X-Finalized'),  'works!');
-is($tx->res->headers->header('X-Prepared'),   'works!');
 like($tx->res->body, qr/\/test2/);
 
 # MojoliciousTestController::index
@@ -94,8 +82,6 @@ is($tx->res->code,                            200);
 is($tx->res->headers->header('X-Bender'),     'Kiss my shiny metal ass!');
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->headers->header('X-Finalized'),  'works!');
-is($tx->res->headers->header('X-Prepared'),   'works!');
 like($tx->res->body, qr/No class works!/);
 
 # 404
@@ -104,8 +90,6 @@ $client->process_local('MojoliciousTest', $tx);
 is($tx->res->code,                            404);
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->headers->header('X-Finalized'),  'works!');
-is($tx->res->headers->header('X-Prepared'),   'works!');
 like($tx->res->body, qr/File Not Found/);
 
 # Static file /hello.txt in a production mode
@@ -117,8 +101,6 @@ is($tx->res->code,                            200);
 is($tx->res->headers->content_type,           'text/plain');
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->headers->header('X-Finalized'),  'works!');
-is($tx->res->headers->header('X-Prepared'),   'works!');
 like($tx->res->content->file->slurp, qr/Hello Mojo from a static file!/);
 $ENV{MOJO_MODE} = $backup;
 
@@ -140,8 +122,6 @@ is($tx->res->headers->content_length,
     $stat->size, 'Content-Length is set correctly');
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->headers->header('X-Finalized'),  'works!');
-is($tx->res->headers->header('X-Prepared'),   'works!');
 like($tx->res->content->file->slurp,
     qr/Hello Mojo from a development static file!/);
 $ENV{MOJO_MODE} = $backup;
@@ -154,8 +134,6 @@ $client->process_local('MojoliciousTest', $tx);
 is($tx->res->code, 304, 'Setting If-Modified-Since triggers 304');
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->headers->header('X-Finalized'),  'works!');
-is($tx->res->headers->header('X-Prepared'),   'works!');
 $ENV{MOJO_MODE} = $backup;
 
 # Make sure we can override attributes with constructor arguments

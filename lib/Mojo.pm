@@ -14,11 +14,11 @@ use Mojo::Home;
 use Mojo::Log;
 use Mojo::Transaction;
 
-__PACKAGE__->attr(home => (default => sub { Mojo::Home->new }));
-__PACKAGE__->attr(log  => (default => sub { Mojo::Log->new }));
+__PACKAGE__->attr('home', default => sub { Mojo::Home->new });
+__PACKAGE__->attr('log',  default => sub { Mojo::Log->new });
 
 # Oh, so they have internet on computers now!
-our $VERSION = '0.991235';
+our $VERSION = '0.991236';
 
 sub new {
     my $self = shift->SUPER::new(@_);

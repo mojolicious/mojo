@@ -14,16 +14,15 @@ use MojoX::Dispatcher::Static;
 use MojoX::Types;
 use Time::HiRes ();
 
-__PACKAGE__->attr(ctx_class => (default => 'Mojolicious::Context'));
-__PACKAGE__->attr(
-    mode => (default => sub { ($ENV{MOJO_MODE} || 'development') }));
-__PACKAGE__->attr(
-    renderer => (default => sub { Mojolicious::Renderer->new }));
-__PACKAGE__->attr(
-    routes => (default => sub { MojoX::Dispatcher::Routes->new }));
-__PACKAGE__->attr(
-    static => (default => sub { MojoX::Dispatcher::Static->new }));
-__PACKAGE__->attr(types => (default => sub { MojoX::Types->new }));
+__PACKAGE__->attr('ctx_class', default => 'Mojolicious::Context');
+__PACKAGE__->attr('mode',
+    default => sub { ($ENV{MOJO_MODE} || 'development') });
+__PACKAGE__->attr('renderer', default => sub { Mojolicious::Renderer->new });
+__PACKAGE__->attr('routes',
+    default => sub { MojoX::Dispatcher::Routes->new });
+__PACKAGE__->attr('static',
+    default => sub { MojoX::Dispatcher::Static->new });
+__PACKAGE__->attr('types', default => sub { MojoX::Types->new });
 
 # The usual constructor stuff
 sub new {

@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojo.
 
+0.991236 2009-07-05 00:00:00
+        - Cleaned up code.
+
 0.991235 2009-07-05 00:00:00
         - Removed prepare/finalize methods from Mojolicious.
         - Fixed typos.

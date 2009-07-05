@@ -16,20 +16,18 @@ use IO::Select;
 use IO::Socket;
 use POSIX 'WNOHANG';
 
-__PACKAGE__->attr(cleanup_interval                      => (default => 15));
-__PACKAGE__->attr(idle_timeout                          => (default => 30));
-__PACKAGE__->attr(max_clients                           => (default => 1));
-__PACKAGE__->attr(max_servers                           => (default => 100));
-__PACKAGE__->attr(max_spare_servers                     => (default => 10));
-__PACKAGE__->attr([qw/min_spare_servers start_servers/] => (default => 5));
+__PACKAGE__->attr('cleanup_interval',                    default => 15);
+__PACKAGE__->attr('idle_timeout',                        default => 30);
+__PACKAGE__->attr('max_clients',                         default => 1);
+__PACKAGE__->attr('max_servers',                         default => 100);
+__PACKAGE__->attr('max_spare_servers',                   default => 10);
+__PACKAGE__->attr([qw/min_spare_servers start_servers/], default => 5);
 __PACKAGE__->attr(
-    pid_file => (
-        default => sub {
-            return File::Spec->catfile(
-                File::Spec->splitdir(File::Spec->tmpdir),
-                'mojo_prefork.pid');
-        }
-    )
+    'pid_file',
+    default => sub {
+        return File::Spec->catfile(File::Spec->splitdir(File::Spec->tmpdir),
+            'mojo_prefork.pid');
+    }
 );
 
 # Marge? Since I'm not talking to Lisa,

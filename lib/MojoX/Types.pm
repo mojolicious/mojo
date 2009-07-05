@@ -8,26 +8,25 @@ use warnings;
 use base 'Mojo::Base';
 
 __PACKAGE__->attr(
-    types => (
-        default => sub {
-            return {
-                css  => 'text/css',
-                gif  => 'image/gif',
-                gz   => 'application/gzip',
-                htm  => 'text/html',
-                html => 'text/html',
-                ico  => 'image/x-icon',
-                jpeg => 'image/jpeg',
-                jpg  => 'image/jpeg',
-                js   => 'application/x-javascript',
-                png  => 'image/png',
-                tar  => 'application/x-tar',
-                txt  => 'text/plain',
-                xml  => 'text/xml',
-                zip  => 'application/zip'
-            };
-        }
-    )
+    'types',
+    default => sub {
+        return {
+            css  => 'text/css',
+            gif  => 'image/gif',
+            gz   => 'application/gzip',
+            htm  => 'text/html',
+            html => 'text/html',
+            ico  => 'image/x-icon',
+            jpeg => 'image/jpeg',
+            jpg  => 'image/jpeg',
+            js   => 'application/x-javascript',
+            png  => 'image/png',
+            tar  => 'application/x-tar',
+            txt  => 'text/plain',
+            xml  => 'text/xml',
+            zip  => 'application/zip'
+        };
+    }
 );
 
 # Magic. Got it.

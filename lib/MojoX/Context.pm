@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojo::Base';
 
-__PACKAGE__->attr(app => (weak => 1));
+__PACKAGE__->attr('app', weak => 1);
 __PACKAGE__->attr('tx');
 
 # This is my first visit to the Galaxy of Terror and I'd like it to be a pleasant one.

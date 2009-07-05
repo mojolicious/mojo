@@ -9,7 +9,7 @@ use base 'Mojo::Script';
 
 use Mojo::Server::Daemon::Prefork;
 
-__PACKAGE__->attr(description => (default => <<'EOF'));
+__PACKAGE__->attr('description', default => <<'EOF');
 * Start the prefork daemon. *
 Takes a port as option, by default 3000 will be used.
     daemon_prefork

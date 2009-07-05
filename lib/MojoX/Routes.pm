@@ -14,10 +14,9 @@ use MojoX::Routes::Pattern;
 use constant DEBUG => $ENV{MOJOX_ROUTES_DEBUG} || 0;
 
 __PACKAGE__->attr([qw/block inline name/]);
-__PACKAGE__->attr(children => (default => sub { [] }));
-__PACKAGE__->attr(parent => (weak => 1));
-__PACKAGE__->attr(
-    pattern => (default => sub { MojoX::Routes::Pattern->new }));
+__PACKAGE__->attr('children', default => sub { [] });
+__PACKAGE__->attr('parent',   weak    => 1);
+__PACKAGE__->attr('pattern',  default => sub { MojoX::Routes::Pattern->new });
 
 sub new {
     my $self = shift->SUPER::new();

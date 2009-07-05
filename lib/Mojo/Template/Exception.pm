@@ -8,8 +8,7 @@ use warnings;
 use base 'Mojo::Base';
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
-__PACKAGE__->attr(
-    [qw/line lines_before lines_after/] => (default => sub { [] }));
+__PACKAGE__->attr([qw/line lines_before lines_after/], default => sub { [] });
 __PACKAGE__->attr('message');
 
 # Attempted murder? Now honestly, what is that?

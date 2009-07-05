@@ -11,7 +11,7 @@ use base 'Mojo::File';
 use Carp 'croak';
 use IO::File;
 
-__PACKAGE__->attr(content => (default => ''));
+__PACKAGE__->attr('content', default => sub {''});
 
 # There's your giraffe, little girl.
 # I'm a boy.

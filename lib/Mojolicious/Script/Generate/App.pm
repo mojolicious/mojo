@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojo::Script';
 
-__PACKAGE__->attr(description => (default => <<'EOF'));
+__PACKAGE__->attr('description', default => <<'EOF');
 * Generate application directory structure. *
 Takes a name as option, by default MyMojoliciousApp will be used.
     generate app TestApp

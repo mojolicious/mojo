@@ -9,13 +9,13 @@ use base 'Mojo::Base';
 
 use constant DEBUG => $ENV{MOJOX_ROUTES_DEBUG} || 0;
 
-__PACKAGE__->attr(defaults => (default => sub { {} }));
+__PACKAGE__->attr('defaults', default => sub { {} });
 __PACKAGE__->attr([qw/format pattern regex/]);
-__PACKAGE__->attr(quote_end   => (default => ')'));
-__PACKAGE__->attr(quote_start => (default => '('));
-__PACKAGE__->attr(reqs        => (default => sub { {} }));
-__PACKAGE__->attr(symbols     => (default => sub { [] }));
-__PACKAGE__->attr(tree        => (default => sub { [] }));
+__PACKAGE__->attr('quote_end',   default => ')');
+__PACKAGE__->attr('quote_start', default => '(');
+__PACKAGE__->attr('reqs',        default => sub { {} });
+__PACKAGE__->attr('symbols',     default => sub { [] });
+__PACKAGE__->attr('tree',        default => sub { [] });
 
 # This is the worst kind of discrimination. The kind against me!
 sub new {

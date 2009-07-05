@@ -10,23 +10,22 @@ use base 'Mojo::Base';
 use IO::File;
 
 __PACKAGE__->attr(
-    handle => (
-        default => sub {
-            my $self = shift;
+    'handle',
+    default => sub {
+        my $self = shift;
 
-            # Need a log file
-            return \*STDERR unless $self->path;
+        # Need a log file
+        return \*STDERR unless $self->path;
 
-            # Open
-            my $file = IO::File->new;
-            my $path = $self->path;
-            $file->open(">> $path")
-              || die qq/Couldn't open log file "$path": $!/;
-            return $file;
-        }
-    )
+        # Open
+        my $file = IO::File->new;
+        my $path = $self->path;
+        $file->open(">> $path")
+          || die qq/Couldn't open log file "$path": $!/;
+        return $file;
+    }
 );
-__PACKAGE__->attr(level => (default => 'debug'));
+__PACKAGE__->attr('level', default => 'debug');
 __PACKAGE__->attr('path');
 
 my $LEVEL = {debug => 1, info => 2, warn => 3, error => 4, fatal => 5};

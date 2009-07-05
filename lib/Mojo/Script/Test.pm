@@ -12,7 +12,7 @@ use FindBin;
 use File::Spec;
 use Test::Harness;
 
-__PACKAGE__->attr(description => (default => <<'EOF'));
+__PACKAGE__->attr('description', default => <<'EOF');
 * Run unit tests. *
 Takes a list of tests as options, by default it will try to detect a 't'
 directory.

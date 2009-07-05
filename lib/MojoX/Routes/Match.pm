@@ -9,10 +9,10 @@ use base 'Mojo::Base';
 
 use Mojo::URL;
 
-__PACKAGE__->attr(captures => (default => sub { {} }));
+__PACKAGE__->attr('captures', default => sub { {} });
 __PACKAGE__->attr('endpoint');
-__PACKAGE__->attr(path  => (default => sub {'/'}));
-__PACKAGE__->attr(stack => (default => sub { [] }));
+__PACKAGE__->attr('path',  default => sub {'/'});
+__PACKAGE__->attr('stack', default => sub { [] });
 
 # I'm Bender, baby, please insert liquor!
 sub new {

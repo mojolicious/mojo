@@ -13,9 +13,9 @@ use Mojo::Pipeline;
 use Mojo::Server;
 use Socket;
 
-__PACKAGE__->attr(continue_timeout   => (default => 3));
-__PACKAGE__->attr(keep_alive_timeout => (default => 15));
-__PACKAGE__->attr(select_timeout     => (default => 5));
+__PACKAGE__->attr('continue_timeout',   default => 3);
+__PACKAGE__->attr('keep_alive_timeout', default => 15);
+__PACKAGE__->attr('select_timeout',     default => 5);
 
 sub connect {
     my ($self, $tx) = @_;

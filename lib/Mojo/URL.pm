@@ -14,7 +14,7 @@ use Mojo::Path;
 use Socket;
 
 __PACKAGE__->attr([qw/fragment host password port scheme user/]);
-__PACKAGE__->attr(base => (default => sub { Mojo::URL->new }));
+__PACKAGE__->attr('base', default => sub { Mojo::URL->new });
 
 # RFC 3986
 our $UNRESERVED = 'A-Za-z0-9\-\.\_\~';

@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojo::Script';
 
-__PACKAGE__->attr(description => (default => <<'EOF'));
+__PACKAGE__->attr('description', default => <<'EOF');
 * Generate Makefile.PL. *
 Takes no options.
     generate makefile

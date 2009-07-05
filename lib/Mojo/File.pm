@@ -20,44 +20,42 @@ use constant TMPDIR => $ENV{MOJO_TMPDIR} || File::Spec->tmpdir;
 
 __PACKAGE__->attr('cleanup');
 __PACKAGE__->attr(
-    handle => (
-        default => sub {
-            my $self   = shift;
-            my $handle = IO::File->new;
+    'handle',
+    default => sub {
+        my $self   = shift;
+        my $handle = IO::File->new;
 
-            # Already got a file without handle
-            my $file = $self->path;
-            if ($file) {
+        # Already got a file without handle
+        my $file = $self->path;
+        if ($file) {
 
-                # New file
-                my $mode = '+>';
+            # New file
+            my $mode = '+>';
 
-                # File exists
-                $mode = '<' if -s $file;
+            # File exists
+            $mode = '<' if -s $file;
 
-                # Open
-                $handle->open("$mode $file")
-                  or die qq/Can't open file "$file": $!/;
-                return $handle;
-            }
-
-            # Generate temporary file
-            my $base = File::Spec->catfile(TMPDIR, 'mojo.tmp');
-            $file = $base;
-            while (-e $file) {
-                my $sum =
-                  Mojo::ByteStream->new(time . rand(999999999))->md5_sum;
-                $file = "$base.$sum";
-            }
-
-            $self->path($file);
-            $self->cleanup(1);
-
-            # Open for read/write access
-            $handle->open("+> $file") or die qq/Can't open file "$file": $!/;
+            # Open
+            $handle->open("$mode $file")
+              or die qq/Can't open file "$file": $!/;
             return $handle;
         }
-    )
+
+        # Generate temporary file
+        my $base = File::Spec->catfile(TMPDIR, 'mojo.tmp');
+        $file = $base;
+        while (-e $file) {
+            my $sum = Mojo::ByteStream->new(time . rand(999999999))->md5_sum;
+            $file = "$base.$sum";
+        }
+
+        $self->path($file);
+        $self->cleanup(1);
+
+        # Open for read/write access
+        $handle->open("+> $file") or die qq/Can't open file "$file": $!/;
+        return $handle;
+    }
 );
 
 sub DESTROY {

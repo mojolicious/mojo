@@ -11,8 +11,8 @@ use overload '""' => sub { shift->to_string }, fallback => 1;
 use Mojo::ByteStream;
 use Mojo::URL;
 
-__PACKAGE__->attr(pair_separator => (default => '&'));
-__PACKAGE__->attr(params => (default => sub { [] }));
+__PACKAGE__->attr('pair_separator', default => '&');
+__PACKAGE__->attr('params', default => sub { [] });
 
 # Yeah, Moe, that team sure did suck last night. They just plain sucked!
 # I've seen teams suck before,

@@ -67,10 +67,10 @@ sub attr {
         unless ($ENV{MOJO_BASE_OPTIMIZE}) {
 
             # Check invocant
-            $code .= "${ws}Carp::confess(q[";
+            $code .= "${ws}Carp::confess(q/";
             $code
               .= qq/Attribute "$attr" has to be called on an object, not a class/;
-            $code .= "])\n  ${ws}unless ref \$_[0];\n";
+            $code .= "/)\n  ${ws}unless ref \$_[0];\n";
         }
 
         # No value

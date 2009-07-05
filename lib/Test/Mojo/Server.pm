@@ -14,8 +14,8 @@ use Mojo::Home;
 use Test::Builder::Module;
 
 __PACKAGE__->attr([qw/command pid port/]);
-__PACKAGE__->attr(home => (default => sub { Mojo::Home->new }));
-__PACKAGE__->attr(timeout => (default => 5));
+__PACKAGE__->attr('home', default => sub { Mojo::Home->new });
+__PACKAGE__->attr('timeout', default => 5);
 
 # Hello, my name is Barney Gumble, and I'm an alcoholic.
 # Mr Gumble, this is a girl scouts meeting.

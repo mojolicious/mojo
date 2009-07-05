@@ -13,58 +13,54 @@ use Mojo::Loader;
 use constant RELOAD => $ENV{MOJO_RELOAD} || 0;
 
 __PACKAGE__->attr(
-    app => (
-        default => sub {
-            my $e = Mojo::Loader->load_build(shift->app_class);
-            die $e if ref $e eq 'Mojo::Loader::Exception';
-            return $e;
-        }
-    )
+    'app',
+    default => sub {
+        my $e = Mojo::Loader->load_build(shift->app_class);
+        die $e if ref $e eq 'Mojo::Loader::Exception';
+        return $e;
+    }
 );
+__PACKAGE__->attr('app_class',
+    default => sub { $ENV{MOJO_APP} ||= 'Mojo::HelloWorld' });
 __PACKAGE__->attr(
-    app_class => (default => sub { $ENV{MOJO_APP} ||= 'Mojo::HelloWorld' }));
-__PACKAGE__->attr(
-    build_tx_cb => (
-        default => sub {
-            return sub {
-                my $self = shift;
+    'build_tx_cb',
+    default => sub {
+        return sub {
+            my $self = shift;
 
-                # Reload
-                if (RELOAD) {
-                    my $e = Mojo::Loader->reload;
-                    warn $e if $e;
-                    delete $self->{app};
-                }
+            # Reload
+            if (RELOAD) {
+                my $e = Mojo::Loader->reload;
+                warn $e if $e;
+                delete $self->{app};
+            }
 
-                return $self->app->build_tx;
-              }
-        }
-    )
+            return $self->app->build_tx;
+          }
+    }
 );
 __PACKAGE__->attr(
-    continue_handler_cb => (
-        default => sub {
-            return sub {
-                my ($self, $tx) = @_;
-                if ($self->app->can('continue_handler')) {
-                    $self->app->continue_handler($tx);
-                }
-                else { $tx->res->code(100) }
-                return $tx;
-            };
-        }
-    )
+    'continue_handler_cb',
+    default => sub {
+        return sub {
+            my ($self, $tx) = @_;
+            if ($self->app->can('continue_handler')) {
+                $self->app->continue_handler($tx);
+            }
+            else { $tx->res->code(100) }
+            return $tx;
+        };
+    }
 );
 __PACKAGE__->attr(
-    handler_cb => (
-        default => sub {
-            return sub {
-                my ($self, $tx) = @_;
-                $self->app->handler($tx);
-                return $tx;
-            };
-        }
-    )
+    'handler_cb',
+    default => sub {
+        return sub {
+            my ($self, $tx) = @_;
+            $self->app->handler($tx);
+            return $tx;
+        };
+    }
 );
 
 # It's up to the subclass to decide where log messages go

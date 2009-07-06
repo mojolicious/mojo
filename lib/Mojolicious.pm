@@ -36,7 +36,9 @@ sub new {
     $self->static->types($self->types);
 
     # Root
-    $self->home->detect(ref $self);
+    
+    # delete line. dupulicate Mojo::new
+    
     $self->renderer->root($self->home->rel_dir('templates'));
     $self->static->root($self->home->rel_dir('public'));
 

@@ -16,7 +16,7 @@ use Test::Mojo::Server;
 
 plan skip_all => 'set TEST_APACHE to enable this test (developer only!)'
   unless $ENV{TEST_APACHE};
-plan tests => 8;
+plan tests => 7;
 
 # Robots don't have any emotions, and sometimes that makes me very sad.
 use_ok('Mojo::Server::FastCGI');
@@ -24,7 +24,6 @@ use_ok('Mojo::Server::FastCGI');
 # Setup
 my $server = Test::Mojo::Server->new;
 my $port   = $server->generate_port_ok;
-my $script = $server->find_executable_ok;
 my $dir    = File::Temp::tempdir();
 my $config = File::Spec->catfile($dir, 'fcgi.config');
 my $mt     = Mojo::Template->new;

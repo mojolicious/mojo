@@ -9,13 +9,17 @@ use base 'Mojo::Base';
 
 use constant DEBUG => $ENV{MOJO_SERVER_DEBUG} || 0;
 
+use File::Spec;
+use FindBin;
 use IO::Socket::INET;
 use Mojo::Home;
+use Mojo::Script;
 use Test::Builder::Module;
 
 __PACKAGE__->attr([qw/command pid port/]);
-__PACKAGE__->attr('home', default => sub { Mojo::Home->new });
-__PACKAGE__->attr('timeout', default => 5);
+__PACKAGE__->attr('executable', default => 'mojo');
+__PACKAGE__->attr('home',       default => sub { Mojo::Home->new });
+__PACKAGE__->attr('timeout',    default => 5);
 
 # Hello, my name is Barney Gumble, and I'm an alcoholic.
 # Mr Gumble, this is a girl scouts meeting.
@@ -24,6 +28,14 @@ sub new {
     my $self = shift->SUPER::new();
     $self->{_tb} = Test::Builder->new;
     return $self;
+}
+
+sub find_executable_ok {
+    my ($self, $desc) = @_;
+    my $tb   = $self->{_tb};
+    my $path = $self->_find_executable;
+    $tb->ok($path ? 1 : 0, $desc);
+    return $path;
 }
 
 sub generate_port_ok {
@@ -64,7 +76,7 @@ sub start_daemon_ok {
     return $tb->ok(0, $desc) unless $port;
 
     # Path
-    my $path = $self->home->executable;
+    my $path = $self->_find_executable;
     return $tb->ok(0, $desc) unless $path;
 
     # Prepare command
@@ -82,7 +94,7 @@ sub start_daemon_prefork_ok {
     return $tb->ok(0, $desc) unless $port;
 
     # Path
-    my $path = $self->home->executable;
+    my $path = $self->_find_executable;
     return $tb->ok(0, $desc) unless $path;
 
     # Prepare command
@@ -190,6 +202,34 @@ sub _check_server {
     }
 }
 
+sub _find_executable {
+    my $self = shift;
+
+    # Find
+    my @base = File::Spec->splitdir($FindBin::Bin);
+    my $name = Mojo::Script->new->class_to_path($self->home->app_class);
+    my @uplevel;
+    my $path;
+    for (1 .. 5) {
+        push @uplevel, '..';
+
+        # executable in bin directory
+        $path = File::Spec->catfile(@base, @uplevel, 'bin', $name);
+        last if -f $path;
+
+        # "mojo" in bin directory
+        $path =
+          File::Spec->catfile(@base, @uplevel, 'bin', $self->executable);
+        last if -f $path;
+    }
+
+    # Found
+    return $path if -f $path;
+
+    # Not found
+    return undef;
+}
+
 sub _generate_port {
     my $self = shift;
 
@@ -267,6 +307,11 @@ L<Mojo::Test::Server> is a test harness for server tests.
     my $command = $server->command;
     $server     = $server->command("lighttpd -D -f $config");
 
+=head2 C<executable>
+
+    my $script = $server->executable;
+    $server    = $server->executable('mojo');
+
 =head2 C<home>
 
     my $home = $server->home;
@@ -294,6 +339,11 @@ the following new ones.
 =head2 C<new>
 
     my $server = Mojo::Test::Server->new;
+
+=head2 C<find_executable_ok>
+
+    my $path = $server->find_executable_ok;
+    my $path = $server->find_executable_ok('executable found');
 
 =head2 C<generate_port_ok>
 

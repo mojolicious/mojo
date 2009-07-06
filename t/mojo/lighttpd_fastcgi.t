@@ -16,7 +16,7 @@ use Test::Mojo::Server;
 
 plan skip_all => 'set TEST_LIGHTTPD to enable this test (developer only!)'
   unless $ENV{TEST_LIGHTTPD};
-plan tests => 6;
+plan tests => 7;
 
 # They think they're so high and mighty,
 # just because they never got caught driving without pants.
@@ -25,7 +25,7 @@ use_ok('Mojo::Server::FastCGI');
 # Setup
 my $server = Test::Mojo::Server->new;
 my $port   = $server->generate_port_ok;
-my $script = $server->home->executable;
+my $script = $server->find_executable_ok;
 my $dir    = File::Temp::tempdir();
 my $config = File::Spec->catfile($dir, 'fcgi.config');
 my $mt     = Mojo::Template->new;

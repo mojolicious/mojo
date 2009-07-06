@@ -9,10 +9,10 @@ use base 'Mojo::Base';
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
 use File::Spec;
-use FindBin;
+use Mojo::Loader;
 use Mojo::Script;
 
-__PACKAGE__->attr('app_class');
+__PACKAGE__->attr('app_class', default => 'Mojo::HelloWorld');
 __PACKAGE__->attr('parts', default => sub { [] });
 
 # I'm normally not a praying man, but if you're up there,
@@ -35,83 +35,46 @@ sub new {
 sub detect {
     my ($self, $class) = @_;
 
+    # Class
     $self->app_class($class) if $class;
     $class ||= $self->app_class;
 
     # Environment variable
     if ($ENV{MOJO_HOME}) {
         my @parts = File::Spec->splitdir($ENV{MOJO_HOME});
-        return $self->parts(\@parts);
-    }
-
-    my $name = $self->_class_to_file($class);
-
-    # Try to find executable from lib directory
-    if ($class) {
-        my $file = $self->_class_to_path($class);
-
-        if (my $entry = $INC{$file}) {
-            my $path = $entry;
-            $path =~ s/$file$//;
-            my @home = File::Spec->splitdir($path);
-
-            # Remove "lib" and "blib"
-            while (@home) {
-                last unless $home[-1] =~ /^b?lib$/ || $home[-1] eq '';
-                pop @home;
-            }
-
-            # Check for executable
-            return $self->parts(\@home)
-              if -f File::Spec->catfile(@home, 'bin', $name)
-                  || -f File::Spec->catfile(@home, 'bin', 'mojo');
-        }
-    }
-
-    # Try to find executable from t directory
-    my $path;
-    my @base = File::Spec->splitdir($FindBin::Bin);
-    my @uplevel;
-    for (1 .. 5) {
-        push @uplevel, '..';
-
-        # executable in bin directory
-        $path = File::Spec->catfile(@base, @uplevel, 'bin', $name);
-        last if -f $path;
-
-        # "mojo" in bin directory
-        $path = File::Spec->catfile(@base, @uplevel, 'bin', 'mojo');
-        last if -f $path;
-    }
-
-    # Found
-    if (-f $path) {
-        my @parts = File::Spec->splitdir($path);
-        pop @parts;
-        pop @parts;
         $self->parts(\@parts);
+        return $self;
+    }
+
+    my $name = Mojo::Script->class_to_file($class);
+
+    # Try to find home from lib directory
+    if ($class) {
+
+        # Load?
+        my $file = Mojo::Script->class_to_path($class);
+        unless ($INC{$file}) {
+            my $e = Mojo::Loader->new->load($class);
+            die $e if $e;
+        }
+
+        # Detect
+        my $path = $INC{$file};
+        return $self unless $path;
+
+        $path =~ s/$file$//;
+        my @home = File::Spec->splitdir($path);
+
+        # Remove "lib" and "blib"
+        while (@home) {
+            last unless $home[-1] =~ /^b?lib$/ || $home[-1] eq '';
+            pop @home;
+        }
+
+        $self->parts(\@home);
     }
 
     return $self;
-}
-
-sub executable {
-    my $self = shift;
-
-    # Executable
-    my $path;
-    if (my $class = $self->app_class) {
-        my $name = $self->_class_to_file($class);
-        $path = File::Spec->catfile(@{$self->parts}, 'bin', $name);
-        return $path if -f $path;
-    }
-
-    # "mojo"
-    $path = File::Spec->catfile(@{$self->parts}, 'bin', 'mojo');
-    return $path if -f $path;
-
-    # No script
-    return undef;
 }
 
 sub lib_dir {
@@ -137,10 +100,6 @@ sub rel_dir { File::Spec->catdir(@{shift->parts}, split '/', shift) }
 sub rel_file { File::Spec->catfile(@{shift->parts}, split '/', shift) }
 
 sub to_string { File::Spec->catdir(@{shift->parts}) }
-
-sub _class_to_file { Mojo::Script->new->class_to_file($_[1]) }
-
-sub _class_to_path { Mojo::Script->new->class_to_path($_[1]) }
 
 1;
 __END__
@@ -198,13 +157,6 @@ project.
 Returns the invocant and detects the path to the root of the Mojo project.
 C<$ENV{MOJO_HOME}> is used as the location if available.
 Autodetection based on the class name is used as a fallback.
-
-=head2 C<executable>
-
-    my $path = $home->executable;
-
-Returns the path to the Mojo executable in the C<bin> directory of your
-project, it will either be named after your project, or C<mojo>.
 
 =head2 C<lib_dir>
 

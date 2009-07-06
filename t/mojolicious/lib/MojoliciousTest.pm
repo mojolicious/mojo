@@ -11,14 +11,7 @@ sub development_mode {
     my $self = shift;
 
     # Static root for development
-    $self->static->root($self->home->rel_dir('t/mojolicious/public_dev'));
-}
-
-sub production_mode {
-    my $self = shift;
-
-    # Static root for production
-    $self->static->root($self->home->rel_dir('t/mojolicious/public'));
+    $self->static->root($self->home->rel_dir('public_dev'));
 }
 
 # Let's face it, comedy's a dead art form. Tragedy, now that's funny.
@@ -27,9 +20,6 @@ sub startup {
 
     # Only log errors
     $self->log->level('error');
-
-    # Template root
-    $self->renderer->root($self->home->rel_dir('t/mojolicious/templates'));
 
     # Templateless renderer
     $self->renderer->add_handler(

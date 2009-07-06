@@ -8,6 +8,7 @@ use warnings;
 use base 'Mojo::Template::Exception';
 
 use IO::File;
+use Mojo::Script;
 
 __PACKAGE__->attr('loaded', default => 0);
 __PACKAGE__->attr('module');
@@ -42,8 +43,7 @@ sub new {
     }
 
     # Loaded?
-    my $path = "$module.pm";
-    $path =~ s/::/\//g;
+    my $path = Mojo::Script->class_to_path($module);
     $self->loaded(1) unless $msg =~ /^Can't locate $path in \@INC/;
 
     return $self;

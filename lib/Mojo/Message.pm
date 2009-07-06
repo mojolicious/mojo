@@ -31,7 +31,7 @@ sub at_least_version {
     my ($major, $minor) = split /\./, $version;
 
     # Version is equal or newer
-    return 1 if $major > $self->major_version;
+    return 1 if $major < $self->major_version;
     if ($major == $self->major_version) {
         return 1 if $minor <= $self->minor_version;
     }

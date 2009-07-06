@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 280;
+use Test::More tests => 282;
 
 use Mojo::Filter::Chunked;
 use Mojo::Headers;
@@ -806,3 +806,7 @@ $m = Mojo::Message->new(minor_version => 0);
 is($m->minor_version, 0, 'minor_version set to 0');
 ok(!$m->at_least_version('1.1'), '1.0 object fails at_least_version("1.1")');
 ok($m->at_least_version('1.0'),  '1.0 object passes at_least_version("1.0")');
+
+$m = Mojo::Message->new(major_version => 0, minor_version => 9);
+ok(!$m->at_least_version('1.0'), '0.9 object fails at_least_version("1.0")');
+ok($m->at_least_version('0.9'),  '0.9 object passes at_least_version("0.9")');

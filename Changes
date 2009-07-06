@@ -3,6 +3,8 @@ This file documents the revision history for Perl extension Mojo.
 0.991236 2009-07-05 00:00:00
         - Simplified Mojo::Home.
         - Moved executable detection to Test::Mojo::Server.
+        - Improved Mojo::Loader::Exception.
+        - Moved persistent_error.t tests to app.t.
         - Cleaned up code.
 
 0.991235 2009-07-05 00:00:00

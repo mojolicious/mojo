@@ -9,10 +9,17 @@ use base 'Mojo::Template::Exception';
 
 use IO::File;
 
+__PACKAGE__->attr('loaded', default => 0);
+__PACKAGE__->attr('module');
+
 # You killed zombie Flanders!
 # He was a zombie?
 sub new {
     my $self = shift->SUPER::new();
+
+    # Module
+    my $module = shift;
+    $self->module($module);
 
     # Message
     my $msg = shift;
@@ -33,6 +40,11 @@ sub new {
             $self->parse_context(\@lines, $line);
         }
     }
+
+    # Loaded?
+    my $path = "$module.pm";
+    $path =~ s/::/\//g;
+    $self->loaded(1) unless $msg =~ /^Can't locate $path in \@INC/;
 
     return $self;
 }
@@ -56,7 +68,17 @@ L<Mojo::Loader::Exception> is a container for loader exceptions.
 =head1 ATTRIBUTES
 
 L<Mojo::Loader::Exception> inherits all methods from
-L<Mojo::Template::Exception>.
+L<Mojo::Template::Exception> and implements the following new ones.
+
+=head2 C<loaded>
+
+    my $loaded = $e->loaded;
+    $e         = $e->loaded(1);
+
+=head2 C<module>
+
+    my $module = $e->module;
+    $e         = $e->module('Foo::Bar');
 
 =head1 METHODS
 
@@ -65,6 +87,9 @@ L<Mojo::Template::Exception> and implements the following new ones.
 
 =head2 C<new>
 
-    my $e = Mojo::Loader::Exception->new('Something bad happened!');
+    my $e = Mojo::Loader::Exception->new(
+        'SomeClass',
+        'Something bad happened!'
+    );
 
 =cut

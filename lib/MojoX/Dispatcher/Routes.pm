@@ -136,7 +136,7 @@ sub walk_stack {
         }
 
         # Load error
-        if ($e) {
+        if ($e && $e->loaded) {
             $c->app->log->debug($e);
             return $e;
         }
@@ -159,7 +159,7 @@ sub walk_stack {
 
         # Controller error
         if ($@) {
-            my $e = Mojo::Loader::Exception->new($@);
+            my $e = Mojo::Loader::Exception->new($class, $@);
             $c->app->log->debug($e);
             return $e;
         }

@@ -11,7 +11,7 @@ use Test::More;
 if ($INC{'Devel/Cover.pm'}) {
     plan skip_all => "Loader tests don't play nice with Devel::Cover";
 }
-else { plan tests => 21 }
+else { plan tests => 23 }
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -27,7 +27,9 @@ use_ok('Mojo::Loader');
 # Exception
 my $loader = Mojo::Loader->new;
 my $e      = $loader->load('LoaderException');
-is(ref $e, 'Mojo::Loader::Exception');
+is(ref $e,     'Mojo::Loader::Exception');
+is($e->module, 'LoaderException');
+is($e->loaded, 1);
 like($e->message, qr/Missing right curly/);
 is($e->lines_before->[0]->[0], 13);
 is($e->lines_before->[0]->[1], 'foo {');

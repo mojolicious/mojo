@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 54;
+use Test::More tests => 60;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -20,6 +20,7 @@ use Mojo::Transaction;
 # Amy's rich, she's probably got other characteristics...
 use_ok('MojoliciousTest');
 
+# I guess I could part with one doomsday device and still be feared.
 my $client = Mojo::Client->new;
 
 # SyntaxError::foo
@@ -139,3 +140,18 @@ $ENV{MOJO_MODE} = $backup;
 # Make sure we can override attributes with constructor arguments
 my $app = MojoliciousTest->new({mode => 'test'});
 is($app->mode, 'test');
+
+# Persistent error
+$app = MojoliciousTest->new;
+$tx  = Mojo::Transaction->new_get('/foo');
+$app->handler($tx);
+is($tx->res->code, 200);
+like($tx->res->body, qr/Hello Mojo from the template \/foo! Hello World!/);
+$tx = Mojo::Transaction->new_get('/foo/willdie');
+$app->handler($tx);
+is($tx->res->code, 500);
+like($tx->res->body, qr/Foo\.pm/);
+$tx = Mojo::Transaction->new_get('/foo');
+$app->handler($tx);
+is($tx->res->code, 200);
+like($tx->res->body, qr/Hello Mojo from the template \/foo! Hello World!/);

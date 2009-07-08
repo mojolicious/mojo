@@ -139,8 +139,9 @@ Mojolicious - Web Framework
 
 =head1 DESCRIPTION
 
-L<Mojolicous> is a web framework built upon L<Mojo>.
-See L<Mojo::Manual::Mojolicious> for user friendly documentation.
+L<Mojolicous> is a MVC web framework built upon L<Mojo>.
+
+For userfriendly documentation see L<Mojo::Manual::Mojolicious>.
 
 =head1 ATTRIBUTES
 

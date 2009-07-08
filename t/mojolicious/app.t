@@ -25,7 +25,7 @@ my $client = Mojo::Client->new;
 
 # SyntaxError::foo
 my $tx = Mojo::Transaction->new_get('/syntax_error/foo');
-$client->process_local('MojoliciousTest', $tx);
+$client->process_app('MojoliciousTest', $tx);
 is($tx->res->code,                            500);
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
@@ -33,7 +33,7 @@ like($tx->res->body, qr/Missing right curly/);
 
 # Foo::test
 $tx = Mojo::Transaction->new_get('/foo/test', 'X-Test' => 'Hi there!');
-$client->process_local('MojoliciousTest', $tx);
+$client->process_app('MojoliciousTest', $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->header('X-Bender'),     'Kiss my shiny metal ass!');
 is($tx->res->headers->server,                 'Mojo (Perl)');
@@ -42,7 +42,7 @@ like($tx->res->body, qr/\/bar\/test/);
 
 # Foo::index
 $tx = Mojo::Transaction->new_get('/foo', 'X-Test' => 'Hi there!');
-$client->process_local('MojoliciousTest', $tx);
+$client->process_app('MojoliciousTest', $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->content_type,           'text/html');
 is($tx->res->headers->server,                 'Mojo (Perl)');
@@ -51,7 +51,7 @@ like($tx->res->body, qr/<body>\n23Hello Mojo from the template \/foo! He/);
 
 # Foo::Bar::index
 $tx = Mojo::Transaction->new_get('/foo-bar', 'X-Test' => 'Hi there!');
-$client->process_local('MojoliciousTest', $tx);
+$client->process_app('MojoliciousTest', $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->content_type,           'text/html');
 is($tx->res->headers->server,                 'Mojo (Perl)');
@@ -61,7 +61,7 @@ like($tx->res->body, qr/Hello Mojo from the other template \/foo-bar!/);
 # Foo::templateless
 $tx =
   Mojo::Transaction->new_get('/foo/templateless', 'X-Test' => 'Hi there!');
-$client->process_local('MojoliciousTest', $tx);
+$client->process_app('MojoliciousTest', $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
@@ -69,7 +69,7 @@ like($tx->res->body, qr/Hello Mojo from a templateless renderer!/);
 
 # MojoliciousTest2::Foo::test
 $tx = Mojo::Transaction->new_get('/test2', 'X-Test' => 'Hi there!');
-$client->process_local('MojoliciousTest', $tx);
+$client->process_app('MojoliciousTest', $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->header('X-Bender'),     'Kiss my shiny metal ass!');
 is($tx->res->headers->server,                 'Mojo (Perl)');
@@ -78,7 +78,7 @@ like($tx->res->body, qr/\/test2/);
 
 # MojoliciousTestController::index
 $tx = Mojo::Transaction->new_get('/test3', 'X-Test' => 'Hi there!');
-$client->process_local('MojoliciousTest', $tx);
+$client->process_app('MojoliciousTest', $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->header('X-Bender'),     'Kiss my shiny metal ass!');
 is($tx->res->headers->server,                 'Mojo (Perl)');
@@ -87,7 +87,7 @@ like($tx->res->body, qr/No class works!/);
 
 # 404
 $tx = Mojo::Transaction->new_get('/', 'X-Test' => 'Hi there!');
-$client->process_local('MojoliciousTest', $tx);
+$client->process_app('MojoliciousTest', $tx);
 is($tx->res->code,                            404);
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
@@ -97,7 +97,7 @@ like($tx->res->body, qr/File Not Found/);
 my $backup = $ENV{MOJO_MODE} || '';
 $ENV{MOJO_MODE} = 'production';
 $tx = Mojo::Transaction->new_get('/hello.txt');
-$client->process_local('MojoliciousTest', $tx);
+$client->process_app('MojoliciousTest', $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->content_type,           'text/plain');
 is($tx->res->headers->server,                 'Mojo (Perl)');
@@ -114,7 +114,7 @@ my $mtime = Mojo::Date->new(stat($path)->mtime)->to_string;
 $backup = $ENV{MOJO_MODE} || '';
 $ENV{MOJO_MODE} = 'development';
 $tx = Mojo::Transaction->new_get('/hello.txt');
-$client->process_local('MojoliciousTest', $tx);
+$client->process_app('MojoliciousTest', $tx);
 is($tx->res->code,                  200);
 is($tx->res->headers->content_type, 'text/plain');
 is($tx->res->headers->header('Last-Modified'),
@@ -131,7 +131,7 @@ $ENV{MOJO_MODE} = $backup;
 $ENV{MOJO_MODE} = 'development';
 $tx = Mojo::Transaction->new_get('/hello.txt');
 $tx->req->headers->header('If-Modified-Since', $mtime);
-$client->process_local('MojoliciousTest', $tx);
+$client->process_app('MojoliciousTest', $tx);
 is($tx->res->code, 304, 'Setting If-Modified-Since triggers 304');
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');

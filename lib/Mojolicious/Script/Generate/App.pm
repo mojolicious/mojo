@@ -202,7 +202,7 @@ my $client = Mojo::Client->new;
 my $tx     = Mojo::Transaction->new_get('/');
 
 # Process request
-$client->process_local('<%= $class %>', $tx);
+$client->process_app('<%= $class %>', $tx);
 
 # Test response
 is($tx->res->code, 200);

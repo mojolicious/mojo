@@ -121,11 +121,11 @@ sub process_all {
     return @finished;
 }
 
-sub process_local {
+sub process_app {
     my ($self, $class, $client) = @_;
 
     # Remote server
-    if (my $authority = $ENV{MOJO_AUTHORITY}) {
+    if (my $authority = $ENV{MOJO_REMOTE_APP}) {
         $client->req->url->authority($authority);
         return $self->process($client);
     }
@@ -483,9 +483,9 @@ following new ones.
 
     @transactions = $client->process_all(@transactions);
 
-=head2 C<process_local>
+=head2 C<process_app>
 
-    $tx = $client->process_local('MyApp', $tx);
+    $tx = $client->process_app('MyApp', $tx);
 
 =head2 C<spin>
 

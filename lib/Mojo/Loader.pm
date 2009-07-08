@@ -11,11 +11,9 @@ use Carp qw/carp croak/;
 use File::Basename;
 use File::Spec;
 use Mojo::Loader::Exception;
+use Mojo::Script;
 
 use constant DEBUG => $ENV{MOJO_LOADER_DEBUG} || 0;
-
-__PACKAGE__->attr([qw/base namespace/]);
-__PACKAGE__->attr('modules', default => sub { [] });
 
 my $STATS = {};
 
@@ -30,67 +28,30 @@ BEGIN {
 }
 
 # Homer no function beer well without.
-sub new {
-    my ($class, $namespace) = @_;
-    my $self = $class->SUPER::new();
-    $self->namespace($namespace);
-    $self->search if $namespace;
-    return $self;
-}
-
-sub build {
-    my $self = shift;
-
-    # Load and instantiate
-    my @instances;
-    foreach my $module (@{$self->modules}) {
-
-        eval {
-            if (my $base = $self->base)
-            {
-                die "SHORTCUT\n" unless $module->isa($base);
-            }
-            my $instance = $module->new(@_);
-            push @instances, $instance;
-        };
-        return Mojo::Loader::Exception->new($module, $@)
-          if $@ && $@ ne "SHORTCUT\n";
-    }
-
-    return \@instances;
-}
-
 sub load {
-    my ($self, @modules) = @_;
+    my ($self, $module) = @_;
 
-    $self->modules(\@modules) if @modules;
+    # Shortcut
+    return 1 unless $module;
 
-    for my $module (@{$self->modules}) {
+    # Already loaded?
+    return 0 if $module->can('isa');
 
-        # Shortcut
-        next if $module->can('isa');
+    # Try
+    eval "require $module";
 
-        # Load
-        eval "require $module";
-        return Mojo::Loader::Exception->new($module, $@) if $@;
+    # Catch
+    if ($@) {
+
+        # Exists?
+        my $path = Mojo::Script->class_to_path($module);
+        return 1 if $@ =~ /^Can't locate $path in \@INC/;
+
+        # Real error
+        return Mojo::Loader::Exception->new($@);
     }
 
     return 0;
-}
-
-sub load_build {
-    my $self = shift;
-
-    # Instantiate self
-    $self = $self->new unless ref $self;
-
-    # Load
-    my $e = $self->load(shift);
-    return $e if $e;
-
-    # Build
-    $e = $self->build(@_);
-    return ref $e eq 'Mojo::Loader::Exception' ? $e : $e->[0];
 }
 
 sub reload {
@@ -118,9 +79,11 @@ sub reload {
                 delete $DB::sub{$sub};
             }
 
-            # Reload
+            # Try
             eval { require $key };
-            return Mojo::Loader::Exception->new($key, $@) if $@;
+
+            # Catch
+            return Mojo::Loader::Exception->new($@) if $@;
 
             $STATS->{$file} = $mtime;
         }
@@ -132,13 +95,11 @@ sub reload {
 sub search {
     my ($self, $namespace) = @_;
 
-    $namespace ||= $self->namespace;
-    $self->namespace($namespace);
-
     # Directories
     my @directories = exists $INC{'blib.pm'} ? grep {/blib/} @INC : @INC;
 
     # Scan
+    my $modules = [];
     my %found;
     foreach my $directory (@directories) {
         my $path = File::Spec->catdir($directory, (split /::/, $namespace));
@@ -154,12 +115,12 @@ sub search {
             next if -d $full;
             my $name = File::Basename::fileparse($file, qr/\.pm/);
             my $class = "$namespace\::$name";
-            push @{$self->{modules}}, $class unless $found{$class};
+            push @$modules, $class unless $found{$class};
             $found{$class} ||= 1;
         }
     }
 
-    return $self;
+    return $modules;
 }
 
 1;
@@ -173,16 +134,9 @@ Mojo::Loader - Loader
 
     use Mojo::Loader;
 
-    # Long
-    my @instances = Mojo::Loader->new
-      ->namespace('Some::Namespace')
-      ->search
-      ->load
-      ->base('Some::Module')
-      ->build;
-
-    # Short
-    my $something = Mojo::Loader->load_build('Some::Namespace');
+    my $loader = Mojo::Loader->new;
+    my $modules = $loader->search('Some::Namespace');
+    $loader->load($modules->[0]);
 
     # Reload
     Mojo::Loader->reload;
@@ -190,23 +144,6 @@ Mojo::Loader - Loader
 =head1 DESCRIPTION
 
 L<Mojo::Loader> is a class loader and plugin framework.
-
-=head1 ATTRIBUTES
-
-=head2 C<base>
-
-    my $base = $loader->base;
-    $loader  = $loader->base('MyApp::Base');
-
-=head2 C<modules>
-
-    my $modules = $loader->modules;
-    $loader     = $loader->modules([qw/MyApp::Foo MyApp::Bar/]);
-
-=head2 C<namespace>
-
-    my $namespace = $loader->namespace;
-    $loader       = $loader->namespace('MyApp::Namespace');
 
 =head1 METHODS
 
@@ -218,35 +155,16 @@ following new ones.
     my $loader = Mojo::Loader->new;
     my $loader = Mojo::Loader->new('MyApp::Namespace');
 
-=head2 C<build>
-
-    my $instances = $loader->build;
-    my $instances = $loader->build(qw/foo bar baz/);
-    my $exception = $loader->build;
-    my $exception = $loader->build(qw/foo bar baz/);
-
 =head2 C<load>
 
-    my $exception = $loader->load;
-
-=head2 C<load_build>
-
-    my $instance  = Mojo::Loader->load_build('MyApp');
-    my $instance  = $loader->load_build('MyApp');
-    my $instance  = Mojo::Loader->load_build('MyApp', qw/some args/);
-    my $instance  = $loader->load_build('MyApp', qw/some args/);
-    my $exception = Mojo::Loader->load_build('MyApp');
-    my $exception = $loader->load_build('MyApp');
-    my $exception = Mojo::Loader->load_build('MyApp', qw/some args/);
-    my $exception = $loader->load_build('MyApp', qw/some args/);
+    my $e = $loader->load('Foo::Bar');
 
 =head2 C<reload>
 
-    my $exception = Mojo::Loader->reload;
+    my $e = Mojo::Loader->reload;
 
 =head2 C<search>
 
-    $loader = $loader->search;
-    $loader = $loader->search('MyApp::Namespace');
+    my $modules = $loader->search('MyApp::Namespace');
 
 =cut

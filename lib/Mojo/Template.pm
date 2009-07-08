@@ -77,12 +77,12 @@ sub compile {
     my $code = $self->code;
     return undef unless $code;
 
-    # Catch compilation warnings
-    local $SIG{__WARN__} = sub { };
+    # Catch errors
+    $SIG{__DIE__} = sub { $self->_exception(shift) };
 
     # Compile
     my $compiled = eval $code;
-    die $self->_error($@) if $@;
+    die $@ if $@;
 
     $self->compiled($compiled);
     return $self;
@@ -96,13 +96,13 @@ sub interpret {
     my $compiled = $self->compiled;
     return undef unless $compiled;
 
-    # Catch interpreter warnings
-    local $SIG{__WARN__} = sub { };
+    # Catch errors
+    $SIG{__DIE__} = sub { $self->_exception(shift) };
 
     # Interpret
     $$output = eval { $compiled->(@_) };
     if ($@) {
-        $$output = $self->_error($@);
+        $$output = $@;
         return 0;
     }
 
@@ -292,21 +292,39 @@ sub render_to_file {
 }
 
 # Debug goodness
-sub _error {
-    my ($self, $error) = @_;
+sub _exception {
+    my ($self, $msg) = @_;
 
-    my $te = Mojo::Template::Exception->new(message => $error);
+    # Exception
+    my $e = Mojo::Template::Exception->new($msg);
 
-    # Line
-    if ($error =~ /at\s+\(eval\s+\d+\)\s+line\s+(\d+)/) {
+    # Lines
+    my @lines = split /\n/, $self->template;
+    my $line;
 
-        my $line = $1;
-        my @lines = split /\n/, $self->template;
+    # Search template in callstack
+    my $i = 1;
+    while (my ($p, $f, $l) = caller($i++)) {
 
-        $te->parse_context(\@lines, $line);
+        # Found?
+        if ($p eq ref $self && $f =~ /^\(eval\s+\d+\)$/) {
+
+            # Done
+            $line = $l;
+            last;
+        }
     }
 
-    return $te;
+    # Fallback to message parsing
+    if (!$line && $msg =~ /at\s+\(eval\s+\d+\)\s+line\s+(\d+)/) {
+        $line = $1;
+    }
+
+    # Context
+    $e->parse_context(\@lines, $line) if $line;
+
+    # Throw
+    die $e;
 }
 
 sub _write_file {

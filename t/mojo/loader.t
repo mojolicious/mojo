@@ -11,7 +11,7 @@ use Test::More;
 if ($INC{'Devel/Cover.pm'}) {
     plan skip_all => "Loader tests don't play nice with Devel::Cover";
 }
-else { plan tests => 23 }
+else { plan tests => 16 }
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -27,9 +27,7 @@ use_ok('Mojo::Loader');
 # Exception
 my $loader = Mojo::Loader->new;
 my $e      = $loader->load('LoaderException');
-is(ref $e,     'Mojo::Loader::Exception');
-is($e->module, 'LoaderException');
-is($e->loaded, 1);
+is(ref $e, 'Mojo::Loader::Exception');
 like($e->message, qr/Missing right curly/);
 is($e->lines_before->[0]->[0], 13);
 is($e->lines_before->[0]->[1], 'foo {');
@@ -49,32 +47,17 @@ oops!
 EOF
 
 $loader = Mojo::Loader->new;
-my $modules = $loader->search('LoaderTest')->modules;
+my $modules = $loader->search('LoaderTest');
 my @modules = sort @$modules;
 
 # Search
 is_deeply(\@modules, [qw/LoaderTest::A LoaderTest::B LoaderTest::C/]);
 
 # Load
-$loader->load;
+$loader->load($_) for @modules;
 ok(LoaderTest::A->can('new'));
 ok(LoaderTest::B->can('new'));
 ok(LoaderTest::C->can('new'));
-
-# Instantiate
-my $instances = $loader->build;
-my @instances = sort { ref $a cmp ref $b } @$instances;
-is(ref $instances[0], 'LoaderTest::A');
-is(ref $instances[1], 'LoaderTest::B');
-is(ref $instances[2], 'LoaderTest::C');
-
-# Lazy
-is(ref Mojo::Loader->load_build('LoaderTest::B'), 'LoaderTest::B');
-
-# Base
-$loader->base('LoaderTestBase');
-my $instance = $loader->build->[0];
-is(ref $instance, 'LoaderTest::B');
 
 # Reload
 my $file = IO::File->new;

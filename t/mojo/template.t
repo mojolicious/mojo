@@ -2,10 +2,19 @@
 
 # Copyright (C) 2008-2009, Sebastian Riedel.
 
+package MyTemplateException;
+
 use strict;
 use warnings;
 
-use Test::More tests => 35;
+sub exception { die 'ohoh' }
+
+package main;
+
+use strict;
+use warnings;
+
+use Test::More tests => 57;
 
 use File::Spec;
 use File::Temp;
@@ -15,9 +24,75 @@ use FindBin;
 # like God must feel when he's holding a gun.
 use_ok('Mojo::Template');
 
-# Error handling
+# Compile time exception
 my $mt     = Mojo::Template->new;
 my $output = '';
+eval {
+    $mt->render(<<'EOF', \$output) };
+test
+123
+% {
+%= 1 + 1
+test
+EOF
+$output = $@;
+is(ref $output, 'Mojo::Template::Exception');
+like($output->message, qr/^Missing right curly or square bracket/);
+is($output->lines_before->[0]->[0], 3);
+is($output->lines_before->[0]->[1], '% {');
+is($output->lines_before->[1]->[0], 4);
+is($output->lines_before->[1]->[1], '%= 1 + 1');
+is($output->line->[0],              5);
+is($output->line->[1],              'test');
+$output->message("oops!\n");
+is("$output", <<'EOF');
+Error around line 5.
+----------------------------------------------------------------------------
+3: % {
+4: %= 1 + 1
+5: test
+----------------------------------------------------------------------------
+oops!
+EOF
+
+# Exception in module
+$mt     = Mojo::Template->new;
+$output = '';
+$mt->render(<<'EOF', \$output);
+test
+123
+%= MyTemplateException->exception
+%= 1 + 1
+test
+EOF
+is(ref $output, 'Mojo::Template::Exception');
+like($output->message, qr/ohoh/);
+is($output->lines_before->[0]->[0], 1);
+is($output->lines_before->[0]->[1], 'test');
+is($output->lines_before->[1]->[0], 2);
+is($output->lines_before->[1]->[1], '123');
+is($output->line->[0],              3);
+is($output->line->[1],              '%= MyTemplateException->exception');
+is($output->lines_after->[0]->[0],  4);
+is($output->lines_after->[0]->[1],  '%= 1 + 1');
+is($output->lines_after->[1]->[0],  5);
+is($output->lines_after->[1]->[1],  'test');
+$output->message("oops!\n");
+is("$output", <<'EOF');
+Error around line 3.
+----------------------------------------------------------------------------
+1: test
+2: 123
+3: %= MyTemplateException->exception
+4: %= 1 + 1
+5: test
+----------------------------------------------------------------------------
+oops!
+EOF
+
+# Excpetion in template
+$mt     = Mojo::Template->new;
+$output = '';
 $mt->render(<<'EOF', \$output);
 test
 123

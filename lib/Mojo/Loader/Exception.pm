@@ -8,29 +8,18 @@ use warnings;
 use base 'Mojo::Template::Exception';
 
 use IO::File;
-use Mojo::Script;
-
-__PACKAGE__->attr('loaded', default => 0);
-__PACKAGE__->attr('module');
 
 # You killed zombie Flanders!
 # He was a zombie?
 sub new {
-    my $self = shift->SUPER::new();
+    my $self = shift->SUPER::new(shift);
 
-    # Module
-    my $module = shift;
-    $self->module($module);
-
-    # Message
-    my $msg = shift;
-    $self->message($msg);
-
-    if ($msg =~ /at\s+([^\s]+)\s+line\s+(\d+)/) {
+    # Context
+    if ($self->message =~ /at\s+([^\s]+)\s+line\s+(\d+)/) {
         my $file = $1;
         my $line = $2;
 
-        # Context
+        # Readable?
         if (-r $file) {
 
             # Slurp
@@ -41,10 +30,6 @@ sub new {
             $self->parse_context(\@lines, $line);
         }
     }
-
-    # Loaded?
-    my $path = Mojo::Script->class_to_path($module);
-    $self->loaded(1) unless $msg =~ /^Can't locate $path in \@INC/;
 
     return $self;
 }
@@ -59,7 +44,7 @@ Mojo::Loader::Exception - Loader Exception
 =head1 SYNOPSIS
 
     use Mojo::Loader::Exception;
-    my $e = Mojo::Loader::Exception->new;
+    my $e = Mojo::Loader::Exception->new('Oops!');
 
 =head1 DESCRIPTION
 
@@ -68,17 +53,7 @@ L<Mojo::Loader::Exception> is a container for loader exceptions.
 =head1 ATTRIBUTES
 
 L<Mojo::Loader::Exception> inherits all methods from
-L<Mojo::Template::Exception> and implements the following new ones.
-
-=head2 C<loaded>
-
-    my $loaded = $e->loaded;
-    $e         = $e->loaded(1);
-
-=head2 C<module>
-
-    my $module = $e->module;
-    $e         = $e->module('Foo::Bar');
+L<Mojo::Template::Exception>.
 
 =head1 METHODS
 
@@ -87,9 +62,6 @@ L<Mojo::Template::Exception> and implements the following new ones.
 
 =head2 C<new>
 
-    my $e = Mojo::Loader::Exception->new(
-        'SomeClass',
-        'Something bad happened!'
-    );
+    my $e = Mojo::Loader::Exception->new('Oops!');
 
 =cut

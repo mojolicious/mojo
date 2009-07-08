@@ -10,8 +10,8 @@ use base 'Mojo::Script';
 use Mojo::ByteStream;
 use Mojo::Loader;
 
-__PACKAGE__->attr([qw/base namespace/], default => 'Mojo::Script');
-__PACKAGE__->attr('message',            default => <<'EOF');
+__PACKAGE__->attr('namespace', default => 'Mojo::Script');
+__PACKAGE__->attr('message',   default => <<'EOF');
 Welcome to the Mojo Framework!
 
 HINT: In case you don't know what you are doing here try the manual!
@@ -28,54 +28,53 @@ EOF
 # Aren't we forgeting the true meaning of Christmas?
 # You know, the birth of Santa.
 sub run {
-    my ($self, $script, @args) = @_;
+    my ($self, $name, @args) = @_;
 
     # Run script
-    if ($script) {
-        my $module =
-          $self->namespace . '::' . Mojo::ByteStream->new($script)->camelize;
-        my $loader = Mojo::Loader->new->base($self->base);
-        my $e      = $loader->load_build($module);
+    if ($name) {
 
-        # Exception
-        if (ref $e eq 'Mojo::Loader::Exception') {
+        # Generate module
+        my $module =
+          $self->namespace . '::' . Mojo::ByteStream->new($name)->camelize;
+
+        # Load
+        if (my $e = Mojo::Loader->load($module)) {
 
             # Module missing
-            die qq/Script "$script" missing, maybe you need to install it?\n/
-              if "$e" =~ /^Can't locate /;
+            die qq/Script "$name" missing, maybe you need to install it?\n/
+              unless ref $e;
 
             # Real error
             die $e;
         }
 
         # Run
-        $e->run(@args);
+        $module->new->run(@args);
         return $self;
     }
 
     # Load scripts
-    my $loader = Mojo::Loader->new($self->namespace)->base($self->base);
-    my $e      = $loader->load;
-    die $e if $e;
-    $e = $loader->build;
-    die $e if ref $e eq 'Mojo::Loader::Exception';
-    my $instances = $e;
+    my $modules = Mojo::Loader->search($self->namespace);
+    for my $module (@$modules) {
+        if (my $e = Mojo::Loader->load($module)) { die $e }
+    }
 
     # Print overview
     print $self->message;
 
     # List available scripts
-    foreach my $instance (@$instances) {
+    foreach my $module (@$modules) {
+
+        my $script = $module->new;
 
         # Generate name
-        my $module    = ref $instance;
         my $namespace = $self->namespace;
         $module =~ s/^$namespace\:\://;
         my $name = Mojo::ByteStream->new($module)->decamelize;
 
         # Print description
         print "$name:\n";
-        print $instance->description . "\n";
+        print $script->description . "\n";
     }
 
     return $self;
@@ -104,11 +103,6 @@ framework.
 
 L<Mojo::Scripts> inherits all attributes from L<Mojo::Script> and implements
 the following new ones.
-
-=head2 C<base>
-
-    my $base    = $scripts->base;
-    my $scripts = $scripts->base('Mojo::Script');
 
 =head2 C<namespace>
 

@@ -9,10 +9,16 @@ use base 'Mojo::Base';
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
 __PACKAGE__->attr([qw/line lines_before lines_after/], default => sub { [] });
-__PACKAGE__->attr('message');
+__PACKAGE__->attr('message', default => 'Exception!');
 
 # Attempted murder? Now honestly, what is that?
 # Do they give a Nobel Prize for attempted chemistry?
+sub new {
+    my $self = shift->SUPER::new();
+    $self->message(shift);
+    return $self;
+}
+
 sub parse_context {
     my ($self, $lines, $line) = @_;
 
@@ -131,6 +137,10 @@ L<Mojo::Template::Exception> is a container for template exceptions.
 
 L<Mojo::Template::Exception> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
+
+=head2 C<new>
+
+    my $e = Mojo::Loader::Exception->new('Oops!');
 
 =head2 C<parse_context>
 

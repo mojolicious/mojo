@@ -1,6 +1,9 @@
 This file documents the revision history for Perl extension Mojo.
 
 0.991237 2009-07-07 00:00:00
+        - Improved Mojo::Template exception handling.
+        - Cleaned up exception code.
+        - Simplified Mojo::Loader.
         - Fixed typos.
 
 0.991236 2009-07-05 00:00:00

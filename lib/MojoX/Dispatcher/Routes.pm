@@ -129,16 +129,21 @@ sub walk_stack {
 
         # Load class
         $self->{_loaded} ||= {};
-        my $e = 0;
         unless ($self->{_loaded}->{$class}) {
-            $e = Mojo::Loader->new->load($class);
-            $self->{_loaded}->{$class}++ unless $e;
-        }
 
-        # Load error
-        if ($e && $e->loaded) {
-            $c->app->log->debug($e);
-            return $e;
+            # Load
+            if (my $e = Mojo::Loader->load($class)) {
+
+                # Doesn't exist
+                return 1 unless ref $e;
+
+                # Error
+                $c->app->log->debug($e);
+                return $e;
+            }
+
+            # Loaded
+            $self->{_loaded}->{$class}++;
         }
 
         # Check class
@@ -159,7 +164,7 @@ sub walk_stack {
 
         # Controller error
         if ($@) {
-            my $e = Mojo::Loader::Exception->new($class, $@);
+            my $e = ref $@ ? $@ : Mojo::Loader::Exception->new($@);
             $c->app->log->debug($e);
             return $e;
         }
@@ -213,14 +218,14 @@ implements the follwing the ones.
 
 =head2 C<dispatch>
 
-    my $exception = $dispatcher->dispatch(
+    my $e = $dispatcher->dispatch(
         MojoX::Dispatcher::Routes::Context->new
     );
-    my $exception = $dispatcher->dispatch(
+    my $e = $dispatcher->dispatch(
         MojoX::Dispatcher::Routes::Context->new,
         MojoX::Routes::Match->new
     );
-    my $exception = $dispatcher->dispatch(
+    my $e = $dispatcher->dispatch(
         MojoX::Dispatcher::Routes::Context->new,
         '/foo/bar/baz'
     );
@@ -239,6 +244,6 @@ implements the follwing the ones.
 
 =head2 C<walk_stack>
 
-    my $exception = $dispatcher->walk_stack($c);
+    my $e = $dispatcher->walk_stack($c);
 
 =cut

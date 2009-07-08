@@ -50,7 +50,7 @@ sub accept_lock {
     # Idle
     if ($blocking) {
         $self->{_child_write}->syswrite("$$ idle\n")
-          or die "Can't write to parent: $!";
+          or croak "Can't write to parent: $!";
     }
 
     # Lock
@@ -62,7 +62,7 @@ sub accept_lock {
     # Busy
     if ($lock) {
         $self->{_child_write}->syswrite("$$ busy\n")
-          or die "Can't write to parent: $!";
+          or croak "Can't write to parent: $!";
     }
 
     return $lock;
@@ -327,7 +327,7 @@ sub _spawn_child {
         # Lockfile
         my $lock = $self->pid_file;
         $self->{_lock} = IO::File->new($lock, O_RDWR)
-          or die "Can't open lock file $lock: $!";
+          or croak "Can't open lock file $lock: $!";
 
         # Parent will send a SIGHUP when there are too many children idle
         my $done = 0;
@@ -340,7 +340,7 @@ sub _spawn_child {
 
         # Done
         $self->{_child_write}->syswrite("$$ done\n")
-          or die "Can't write to parent: $!";
+          or croak "Can't write to parent: $!";
         delete $self->{_child_write};
         delete $self->{_lock};
         exit 0;

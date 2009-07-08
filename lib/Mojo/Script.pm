@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojo::Base';
 
-require Carp;
+require Carp 'croak';
 require Cwd;
 require File::Path;
 require File::Spec;
@@ -24,7 +24,7 @@ sub chmod_file {
     my ($self, $path, $mod) = @_;
 
     # chmod
-    chmod $mod, $path or die qq/Can't chmod path "$path": $!/;
+    chmod $mod, $path or croak qq/Can't chmod path "$path": $!/;
 
     $mod = sprintf '%lo', $mod;
     print "  [chmod] $path $mod\n" unless $self->quiet;
@@ -70,7 +70,7 @@ sub create_dir {
     }
 
     # Make
-    File::Path::mkpath($path) or die qq/Can't make directory "$path": $!/;
+    File::Path::mkpath($path) or croak qq/Can't make directory "$path": $!/;
     print "  [mkdir] $path\n" unless $self->quiet;
     return $self;
 }
@@ -175,7 +175,7 @@ sub render_to_rel_file {
 }
 
 # My cat's breath smells like cat food.
-sub run { Carp::croak('Method "run" not implemented by subclass') }
+sub run { croak 'Method "run" not implemented by subclass' }
 
 sub write_file {
     my ($self, $path, $data) = @_;
@@ -188,7 +188,7 @@ sub write_file {
 
     # Open file
     my $file = IO::File->new;
-    $file->open(">$path") or die qq/Can't open file "$path": $!/;
+    $file->open(">$path") or croak qq/Can't open file "$path": $!/;
 
     # Write unbuffered
     $file->syswrite($data);

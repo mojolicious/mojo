@@ -7,6 +7,7 @@ use warnings;
 
 use base 'Mojo::Base';
 
+use Carp 'croak';
 use IO::File;
 
 __PACKAGE__->attr(
@@ -21,7 +22,7 @@ __PACKAGE__->attr(
         my $file = IO::File->new;
         my $path = $self->path;
         $file->open(">> $path")
-          || die qq/Couldn't open log file "$path": $!/;
+          || croak qq/Couldn't open log file "$path": $!/;
         return $file;
     }
 );

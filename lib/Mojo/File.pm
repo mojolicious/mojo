@@ -37,7 +37,7 @@ __PACKAGE__->attr(
 
             # Open
             $handle->open("$mode $file")
-              or die qq/Can't open file "$file": $!/;
+              or croak qq/Can't open file "$file": $!/;
             return $handle;
         }
 
@@ -53,7 +53,7 @@ __PACKAGE__->attr(
         $self->cleanup(1);
 
         # Open for read/write access
-        $handle->open("+> $file") or die qq/Can't open file "$file": $!/;
+        $handle->open("+> $file") or croak qq/Can't open file "$file": $!/;
         return $handle;
     }
 );

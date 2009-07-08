@@ -236,6 +236,8 @@ L<Mojo::Script> is a base class for scripts.
 
 =head1 ATTRIBUTES
 
+L<Mojo::Script> implements the following attributes.
+
 =head2 C<description>
 
     my $description = $script->description;

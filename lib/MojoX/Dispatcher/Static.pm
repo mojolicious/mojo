@@ -208,33 +208,22 @@ L<MojoX::Dispatcher::Static> is a dispatcher for static files.
 
 =head2 ATTRIBUTES
 
+L<MojoX::Dispatcher::Static> implements the following attributes.
+
 =head2 C<prefix>
 
     my $prefix  = $dispatcher->prefix;
     $dispatcher = $dispatcher->prefix('/static');
-
-Returns the path prefix if called without arguments.
-Returns the invocant if called with arguments.
-If defined, files will only get served for url paths beginning with this
-prefix.
 
 =head2 C<types>
 
     my $types   = $dispatcher->types;
     $dispatcher = $dispatcher->types(MojoX::Types->new);
 
-Returns a L<Mojo::Types> object if called without arguments.
-Returns the invocant if called with arguments.
-If no type can be determined, C<text/plain> will be used.
-
 =head2 C<root>
 
     my $root    = $dispatcher->root;
     $dispatcher = $dispatcher->root('/foo/bar/files');
-
-Returns the root directory from which files get served if called without
-arguments.
-Returns the invocant if called with arguments.
 
 =head1 METHODS
 
@@ -245,22 +234,9 @@ implements the follwing the ones.
 
     my $success = $dispatcher->dispatch($c);
 
-Returns false if a file matching the request could be found and a response be
-prepared.
-Returns true otherwise.
-Expects a L<MojoX::Context> object as first argument.
-
 =head2 C<serve>
 
     my $success = $dispatcher->serve($c, 'foo/bar.html');
-
-Returns false if a readable file could be found under C<root> and a response
-be prepared.
-Returns true otherwise.
-Expects a L<MojoX::Context> object and a path as arguments.
-If no type can be determined, C<text/plain> will be used.
-A C<Last-Modified> header will always be set according to the last modified
-time of the file.
 
 =head2 C<serve_404>
 

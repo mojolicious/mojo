@@ -30,11 +30,11 @@ L<MojoX::Dispatcher::Routes::Controller> is a controller base class.
 
 =head1 ATTRIBUTES
 
+L<MojoX::Dispatcher::Routes::Controller> implements the following attributes.
+
 =head2 C<ctx>
 
     my $c = $controller->ctx;
-
-Returns a L<MojoX::Dispatcher::Routes::Context> object.
 
 =head1 METHODS
 

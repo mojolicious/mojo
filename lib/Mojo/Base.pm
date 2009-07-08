@@ -179,10 +179,6 @@ For debugging you can set the C<MOJO_BASE_DEBUG> environment variable.
     my $instance = BaseSubClass->new(name => 'value');
     my $instance = BaseSubClass->new({name => 'value'});
 
-This class provides a standard object constructor.
-You can pass arguments to it either as a hash or as a hashref, and they will
-be set in the object's internal hash reference.
-
 =head2 C<attr>
 
     __PACKAGE__->attr('name');
@@ -194,11 +190,6 @@ be set in the object's internal hash reference.
         chained => 0,
         default => 'foo'}
     );
-
-The C<attr> method generates one or more accessors, depending on the number
-of arguments, which work as both getters and setters.
-You can modify the accessor behavior by passing arguments to C<attr> either
-as a hash or a hashref.
 
 Currently there are three options supported.
 

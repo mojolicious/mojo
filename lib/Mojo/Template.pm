@@ -431,6 +431,8 @@ build a wrapper around it.
 
 =head1 ATTRIBUTES
 
+L<Mojo::Template> implements the following attributes.
+
 =head2 C<code>
 
     my $code = $mt->code;

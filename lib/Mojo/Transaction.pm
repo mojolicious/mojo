@@ -604,16 +604,10 @@ implements the following new ones.
     my $req = $tx->req;
     $tx     = $tx->req(Mojo::Message::Request->new);
 
-Returns a L<Mojo::Message::Request> object if called without arguments.
-Returns the invocant if called with arguments.
-
 =head2 C<res>
 
     my $res = $tx->res;
     $tx     = $tx->res(Mojo::Message::Response->new);
-
-Returns a L<Mojo::Message::Response> object if called without arguments.
-Returns the invocant if called with arguments.
 
 =head1 METHODS
 

@@ -68,6 +68,9 @@ L<Mojo::File::Memory> is a container for in-memory files.
 
 =head1 ATTRIBUTES
 
+L<Mojo::File::Memory> inherits all attributes from L<Mojo::File> and
+implements the following new ones.
+
 =head2 C<content>
 
     my $handle = $file->content;
@@ -94,8 +97,6 @@ the following new ones.
 
     $file = $file->copy_to('/foo/bar/baz.txt');
 
-Copies the uploaded file contents to the given path and returns the invocant.
-
 =head2 C<get_chunk>
 
     my $chunk = $file->get_chunk($offset);
@@ -107,8 +108,6 @@ Copies the uploaded file contents to the given path and returns the invocant.
 =head2 C<move_to>
 
     $file = $file->move_to('/foo/bar/baz.txt');
-
-Moves the uploaded file contents to the given path and returns the invocant.
 
 =head2 C<slurp>
 

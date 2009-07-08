@@ -49,6 +49,8 @@ L<Mojo::Stateful> is a base class for state keeping instances.
 
 =head1 ATTRIBUTES
 
+L<Mojo::Stateful> implements the following attributes.
+
 =head2 C<error>
 
     my $error = $stateful->error;
@@ -79,9 +81,6 @@ following new ones.
 =head2 C<is_finished>
 
     my $finished = $stateful->is_finished;
-
-Returns true if C<state> is C<done> or C<error>.
-Returns false otherwise.
 
 =head2 C<is_state>
 

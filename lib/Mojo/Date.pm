@@ -143,13 +143,12 @@ L<Mojo::Date> implements HTTP date and time functions according to RFC2616.
 
 =head1 ATTRIBUTES
 
+L<Mojo::Date> implements the following attributes.
+
 =head2 C<epoch>
 
     my $epoch = $date->epoch;
     $date     = $date->epoch(784111777);
-
-Returns epoch seconds if called without arguments.
-Returns the invocant if called with arguments.
 
 =head1 METHODS
 
@@ -164,9 +163,6 @@ following new ones.
 
     $date = $date->parse('Sun Nov  6 08:49:37 1994');
 
-Returns the invocant if the given date could be parsed successfully.
-Returns false otherwise.
-
 Parsable formats include:
 
     - Epoch format (784111777)
@@ -177,7 +173,5 @@ Parsable formats include:
 =head2 C<to_string>
 
     my $string = $date->to_string;
-
-Returns a valid HTTP date according to RFC 822.
 
 =cut

@@ -144,6 +144,8 @@ L<Mojo::Path> is a container for URL paths.
 
 =head1 ATTRIBUTES
 
+L<Mojo::Path> implements the following attributes.
+
 =head2 C<leading_slash>
 
     my $leading_slash = $path->leading_slash;

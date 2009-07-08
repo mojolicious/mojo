@@ -262,6 +262,8 @@ L<Mojo::Parameters> is a container for form parameters.
 
 =head1 ATTRIBUTES
 
+L<Mojo::Parameters> implements the following attributes.
+
 =head2 C<pair_separator>
 
     my $separator = $params->pair_separator;

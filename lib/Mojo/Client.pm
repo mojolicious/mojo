@@ -437,6 +437,8 @@ L<Mojo::Client> is a full featured async io HTTP 1.1 client.
 
 =head1 ATTRIBUTES
 
+L<Mojo::Client> implements the following attributes.
+
 =head2 C<continue_timeout>
 
     my $timeout = $client->continue_timeout;
@@ -484,10 +486,6 @@ following new ones.
 =head2 C<process_local>
 
     $tx = $client->process_local('MyApp', $tx);
-
-Returns a processed L<Mojo::Transaction> object.
-Expects a Mojo application class name and a L<Mojo::Transaction> object as
-arguments.
 
 =head2 C<spin>
 

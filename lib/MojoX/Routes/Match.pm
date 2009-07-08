@@ -123,6 +123,8 @@ L<MojoX::Routes::Match> is a match container.
 
 =head2 ATTRIBUTES
 
+L<MojoX::Routes::Match> implements the following attributes.
+
 =head2 C<captures>
 
     my $captures = $match->captures;

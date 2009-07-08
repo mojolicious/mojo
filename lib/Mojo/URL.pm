@@ -316,6 +316,8 @@ L<Mojo::URL> implements a subset of RFC 3986 for Uniform Resource Locators.
 
 =head1 ATTRIBUTES
 
+L<Mojo::URL> implements the following attributes.
+
 =head2 C<authority>
 
     my $authority = $url->autority;
@@ -360,10 +362,6 @@ L<Mojo::URL> implements a subset of RFC 3986 for Uniform Resource Locators.
 
     my $userinfo = $url->userinfo;
     $url         = $url->userinfo('root:pass%3Bw0rd');
-
-Returns the userinfo part of the URL if called without arguments.
-Returns the invocant if called with arguments.
-Expects a string containing user credentials.
 
 =head1 METHODS
 

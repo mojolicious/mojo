@@ -389,9 +389,6 @@ the following new ones.
 
     $headers = $headers->add('Content-Type', 'text/plain');
 
-Returns the invocant.
-Appends a new line to the header.
-
 =head2 C<to_string>
 
 =head2 C<build>

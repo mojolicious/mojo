@@ -114,6 +114,8 @@ L<Mojo::Cookie> is a cookie base class.
 
 =head1 ATTRIBUTES
 
+L<Mojo::Cookie> implements the following attributes.
+
 =head2 C<comment>
 
     my $comment = $cookie->comment;

@@ -223,10 +223,6 @@ L<MojoX::Renderer> is a MIME type based renderer.
     my $handler = $renderer->handler;
     $renderer   = $renderer->handler({epl => sub { ... }});
 
-Returns a hashref of handlers if called without arguments.
-Returns the invocant if called with arguments.
-Keys are file extensions and values are coderefs.
-
 =head2 C<precedence>
 
     my $precedence = $renderer->precedence;
@@ -237,17 +233,10 @@ Keys are file extensions and values are coderefs.
     my $types = $renderer->types;
     $renderer = $renderer->types(MojoX::Types->new);
 
-Returns a L<MojoX::Types> object if called without arguments.
-Returns the invocant if called with arguments.
-
 =head2 C<root>
 
    my $root  = $renderer->root;
    $renderer = $renderer->root('/foo/bar/templates');
-
-Return the root file system path where templates are stored if called without
-arguments.
-Returns the invocant if called with arguments.
 
 =head1 METHODS
 

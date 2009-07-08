@@ -299,6 +299,8 @@ L<MojoX::Routes::Pattern> is a route pattern container.
 
 =head2 ATTRIBUTES
 
+L<MojoX::Routes::Pattern> implements the following attributes.
+
 =head2 C<defaults>
 
     my $defaults = $pattern->defaults;

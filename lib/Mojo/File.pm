@@ -196,6 +196,8 @@ L<Mojo::File> is a container for files.
 
 =head1 ATTRIBUTES
 
+L<Mojo::File> implements the following attributes.
+
 =head2 C<cleanup>
 
     my $cleanup = $file->cleanup;
@@ -205,10 +207,6 @@ L<Mojo::File> is a container for files.
 
     my $handle = $file->handle;
     $file      = $file->handle(IO::File->new);
-
-Returns a L<IO::File> object representing a file upload if called without
-arguments.
-Returns the invocant if called with arguments.
 
 =head2 C<path>
 
@@ -236,8 +234,6 @@ following new ones.
 
     $file = $file->copy_to('/foo/bar/baz.txt');
 
-Copies the uploaded file contents to the given path and returns the invocant.
-
 =head2 C<get_chunk>
 
     my $chunk = $file->get_chunk($offset);
@@ -250,12 +246,8 @@ Copies the uploaded file contents to the given path and returns the invocant.
 
     $file = $file->move_to('/foo/bar/baz.txt');
 
-Moves the uploaded file contents to the given path and returns the invocant.
-
 =head2 C<slurp>
 
     my $string = $file->slurp;
-
-Returns the entire file content as a string.
 
 =cut

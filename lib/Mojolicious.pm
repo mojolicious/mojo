@@ -140,7 +140,6 @@ Mojolicious - Web Framework
 =head1 DESCRIPTION
 
 L<Mojolicous> is a web framework built upon L<Mojo>.
-
 See L<Mojo::Manual::Mojolicious> for user friendly documentation.
 
 =head1 ATTRIBUTES
@@ -152,15 +151,6 @@ following new ones.
 
     my $mode = $mojo->mode;
     $mojo    = $mojo->mode('production');
-
-Returns the current mode if called without arguments.
-Returns the invocant if called with arguments.
-Defaults to C<$ENV{MOJO_MODE}> or C<development>.
-
-    my $mode = $mojo->mode;
-    if ($mode =~ m/^dev/) {
-        do_debug_output();
-    }
 
 =head2 C<renderer>
 
@@ -190,11 +180,6 @@ new ones.
 =head2 C<new>
 
     my $mojo = Mojolicious->new;
-
-Returns a new L<Mojolicious> object.
-This method will call the method C<${mode}_mode> if it exists.
-(C<$mode> being the value of the attribute C<mode>).
-For example in production mode, C<production_mode> will be called.
 
 =head2 C<build_ctx>
 

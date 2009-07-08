@@ -436,11 +436,6 @@ implements the following new ones.
     my $safe_post = $p->safe_post;
     $p            = $p->safe_post(1);
 
-Returns true or false if called without arguments.
-Returns the invocant if called with arguments.
-If set to true, a pipeline will wait until the responses to previous
-requests are received before sending a POST.
-
 =head1 METHODS
 
 L<Mojo::Pipeline> inherits all methods from L<Mojo::Transaction> and

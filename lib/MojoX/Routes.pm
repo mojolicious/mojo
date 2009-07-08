@@ -190,6 +190,8 @@ L<MojoX::Routes> is a routes implementation.
 
 =head2 ATTRIBUTES
 
+L<MojoX::Routes> implements the following attributes.
+
 =head2 C<block>
 
     my $block = $routes->block;

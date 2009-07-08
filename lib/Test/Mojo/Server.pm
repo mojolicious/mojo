@@ -302,6 +302,8 @@ L<Mojo::Test::Server> is a test harness for server tests.
 
 =head1 ATTRIBUTES
 
+L<Mojo::Test::Server> implements the following attribute.
+
 =head2 C<command>
 
     my $command = $server->command;

@@ -60,9 +60,6 @@ L<MojoX::Context> implements the following attributes.
     my $app = $c->app;
     $c      = $c->app(MojoSubclass->new);
 
-Returns the application instance when called without arguments.
-Returns the invocant if called with arguments.
-
 =head2 C<req>
 
     my $req = $c->req;
@@ -77,10 +74,6 @@ Returns the invocant if called with arguments.
     my $foo   = $c->stash('foo');
     $c        = $c->stash({foo => 'bar'});
     $c        = $c->stash(foo => 'bar');
-
-Returns a hash reference if called without arguments.
-Returns a value if called with a single argument.
-Returns the invocant if called with a hashref or multiple arguments.
 
     $c->stash->{foo} = 'bar';
     my $foo = $c->stash->{foo};

@@ -48,35 +48,26 @@ L<Mojo::Upload> is a container for uploads.
 
 =head1 ATTRIBUTES
 
+L<Mojo::Upload> implements the following attributes.
+
 =head2 C<file>
 
     my $file = $upload->file;
     $upload  = $upload->file(Mojo::File->new);
-
-Returns a L<Mojo::File> object if called without arguments.
-Returns the invocant if called with arguments.
 
 =head2 C<filename>
 
     my $filename = $upload->filename;
     $upload      = $upload->filename('foo.txt');
 
-Returns a file name like C<foo.txt> if called without arguments.
-Returns the invocant if called with arguments.
-
 =head2 C<length>
 
     my $length = $upload->length;
-
-Returns the length of the file upload in bytes.
 
 =head2 C<headers>
 
     my $headers = $upload->headers;
     $upload     = $upload->headers(Mojo::Headers->new);
-
-Returns a L<Mojo::Headers> object if called without arguments.
-Returns the invocant if called with arguments.
 
 =head2 C<name>
 
@@ -92,13 +83,9 @@ following new ones.
 
     $upload->copy_to('/foo/bar/baz.txt');
 
-Copies the uploaded file contents to the given path.
-
 =head2 C<move_to>
 
     $upload->move_to('/foo/bar/baz.txt');
-
-Moves the uploaded file contents to the given path.
 
 =head2 C<slurp>
 

@@ -105,34 +105,20 @@ Mojo::Server - HTTP Server Base Class
 =head1 DESCRIPTION
 
 L<Mojo::Server> is a HTTP server base class.
-Subclasses should implement their own C<run> method.
-
-The usual request cycle is like this.
-
-    1. Build a new Mojo::Transaction objct with ->build_tx_cb
-    2. Read request information from client
-    3. Put request information into the transaction object
-    4. Call ->handler_cb to build a response
-    5. Get response information from the transaction object
-    6. Write response information to client
 
 =head1 ATTRIBUTES
+
+L<Mojo::Server> implements the following attributes.
 
 =head2 C<app>
 
     my $app = $server->app;
     $server = $server->app(MojoSubclass->new);
 
-Returns the instantiated Mojo application to serve.
-Overrides C<app_class> if defined.
-
 =head2 C<app_class>
 
     my $app_class = $server->app_class;
     $server       = $server->app_class('MojoSubclass');
-
-Returns the class name of the Mojo application to serve.
-Defaults to C<$ENV{MOJO_APP}> and falls back to C<Mojo::HelloWorld>.
 
 =head2 C<build_tx_cb>
 
@@ -170,15 +156,5 @@ following new ones.
 =head2 C<run>
 
     $server->run;
-
-=head1 BUNDLED SERVERS
-
-L<Mojo::Server::CGI> - Serves a single CGI request.
-
-L<Mojo::Server::Daemon> - Portable standalone HTTP server.
-
-L<Mojo::Server::Daemon::Prefork> - Preforking standalone HTTP server.
-
-L<Mojo::Server::FastCGI> - A FastCGI server.
 
 =cut

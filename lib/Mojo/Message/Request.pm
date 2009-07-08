@@ -305,14 +305,9 @@ implements the following new ones.
 
     my $params = $req->params;
 
-Returns a L<Mojo::Parameters> object, containing both GET and POST
-parameters.
-
 =head2 C<query_params>
 
     my $params = $req->query_params;
-
-Returns a L<Mojo::Parameters> object, containing GET parameters.
 
 =head2 C<url>
 
@@ -347,11 +342,5 @@ implements the following new ones.
     my $proxy = $req->proxy;
     $req      = $req->proxy('http://foo:bar@127.0.0.1:3000');
     $req      = $req->proxy( Mojo::URL->new('http://127.0.0.1:3000')  );
-
-Returns a L<Mojo::URL> object representing the HTTP proxy to be used if
-called without arguments.
-Returns the invocant if called with arguments.
-Expects a L<Mojo::URL> object or a string.
-Defaults to the C<HTTP_PROXY> environment variable.
 
 =cut

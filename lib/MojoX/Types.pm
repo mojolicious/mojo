@@ -61,6 +61,8 @@ L<MojoX::Types> is a container for MIME types.
 
 =head2 ATTRIBUTES
 
+L<MojoX::Types> implements the following attributes.
+
 =head2 C<types>
 
     my $map = $types->types;

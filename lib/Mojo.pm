@@ -98,32 +98,13 @@ new ones.
 
     my $mojo = Mojo->new;
 
-Returns a new L<Mojo> object.
-
 =head2 C<build_tx>
 
     my $tx = $mojo->build_tx;
 
-Returns a new L<Mojo::Transaction> object;
-Meant to be overloaded in subclasses.
-
 =head2 C<handler>
 
     $tx = $mojo->handler($tx);
-
-Returns and takes a L<Mojo::Transaction> object as first argument.
-Meant to be overloaded in subclasses.
-
-    sub handler {
-        my ($self, $tx) = @_;
-
-        # Hello world!
-        $tx->res->code(200);
-        $tx->res->headers->content_type('text/plain');
-        $tx->res->body('Congratulations, your Mojo is working!');
-
-        return $tx;
-    }
 
 =head1 SUPPORT
 

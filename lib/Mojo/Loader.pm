@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojo::Base';
 
-use Carp qw/carp croak/;
+use Carp 'carp';
 use File::Basename;
 use File::Spec;
 use Mojo::Loader::Exception;

@@ -78,7 +78,8 @@ sub compile {
     return undef unless $code;
 
     # Catch errors
-    $SIG{__DIE__} = sub { $self->_exception(shift) };
+    $SIG{__DIE__} =
+      sub { Mojo::Template::Exception->throw(shift, $self->template) };
 
     # Compile
     my $compiled = eval $code;
@@ -97,7 +98,8 @@ sub interpret {
     return undef unless $compiled;
 
     # Catch errors
-    $SIG{__DIE__} = sub { $self->_exception(shift) };
+    $SIG{__DIE__} =
+      sub { Mojo::Template::Exception->throw(shift, $self->template) };
 
     # Interpret
     $$output = eval { $compiled->(@_) };
@@ -289,42 +291,6 @@ sub render_to_file {
 
     # Write to file
     return $self->_write_file($path, $output);
-}
-
-# Debug goodness
-sub _exception {
-    my ($self, $msg) = @_;
-
-    # Exception
-    my $e = Mojo::Template::Exception->new($msg);
-
-    # Lines
-    my @lines = split /\n/, $self->template;
-    my $line;
-
-    # Search template in callstack
-    my $i = 1;
-    while (my ($p, $f, $l) = caller($i++)) {
-
-        # Found?
-        if ($p eq ref $self && $f =~ /^\(eval\s+\d+\)$/) {
-
-            # Done
-            $line = $l;
-            last;
-        }
-    }
-
-    # Fallback to message parsing
-    if (!$line && $msg =~ /at\s+\(eval\s+\d+\)\s+line\s+(\d+)/) {
-        $line = $1;
-    }
-
-    # Context
-    $e->parse_context(\@lines, $line) if $line;
-
-    # Throw
-    die $e;
 }
 
 sub _write_file {

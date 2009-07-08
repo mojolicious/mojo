@@ -95,6 +95,41 @@ sub to_string {
     return $string;
 }
 
+sub throw {
+    my $self = shift->new(shift);
+
+    # Lines
+    my @lines = split /\n/, shift;
+    my $line;
+
+    # Caller
+    my $caller = (caller)[0];
+
+    # Search template in callstack
+    my $i = 1;
+    while (my ($p, $f, $l) = caller($i++)) {
+
+        # Found?
+        if ($p eq $caller && $f =~ /^\(eval\s+\d+\)$/) {
+
+            # Done
+            $line = $l;
+            last;
+        }
+    }
+
+    # Fallback to message parsing
+    if (!$line && $self->message =~ /at\s+\(eval\s+\d+\)\s+line\s+(\d+)/) {
+        $line = $1;
+    }
+
+    # Context
+    $self->parse_context(\@lines, $line) if $line;
+
+    # Die
+    die $self;
+}
+
 1;
 __END__
 
@@ -150,5 +185,9 @@ implements the following new ones.
 
     my $string = $e->to_string;
     my $string = "$e";
+
+=head2 C<throw>
+
+    $e->throw('Oops!', $template);
 
 =cut

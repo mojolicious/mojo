@@ -353,7 +353,6 @@ designed specifically for all those small tasks that come up during big
 projects.
 Like preprocessing a config file, generating text from heredocs and stuff
 like that.
-For bigger tasks you might want to use L<HTML::Mason> or L<Template>.
 
     <% Inline Perl %>
     <%= Perl expression, replaced with result %>

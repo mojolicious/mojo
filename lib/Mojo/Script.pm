@@ -7,12 +7,12 @@ use warnings;
 
 use base 'Mojo::Base';
 
-require Carp 'croak';
 require Cwd;
 require File::Path;
 require File::Spec;
 require IO::File;
 
+use Carp 'croak';
 use Mojo::ByteStream;
 use Mojo::Template;
 

@@ -147,7 +147,7 @@ sub walk_stack {
         }
 
         # Not a conroller
-        if (unless $class->isa('MojoX::Dispatcher::Routes::Controller')) {
+        unless ($class->isa('MojoX::Dispatcher::Routes::Controller')) {
             $c->app->log->debug(qq/"$class" is not a controller./);
             return 1;
         }

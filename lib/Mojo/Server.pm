@@ -18,7 +18,7 @@ __PACKAGE__->attr(
         my $self = shift;
 
         # Load
-        if (my $e = Mojo::Loader->load($self->app_class)) { die $e }
+        if (my $e = Mojo::Loader->load($self->app_class)) { die $e if ref $e }
 
         return $self->app_class->new;
     }

@@ -178,7 +178,7 @@ sub process_app {
         }
 
         # Handle
-        $self->_local_handle($daemon, $server);
+        $self->_handle_app($daemon, $server);
 
         # Server spin
         $server->server_spin;
@@ -193,7 +193,7 @@ sub process_app {
             $server->server_read($leftovers);
 
             # Handle
-            $self->_local_handle($daemon, $server);
+            $self->_handle_app($daemon, $server);
         }
     }
 
@@ -379,7 +379,7 @@ sub withdraw_connection {
     return $result;
 }
 
-sub _local_handle {
+sub _handle_app {
     my ($self, $daemon, $server) = @_;
 
     # Handle continue

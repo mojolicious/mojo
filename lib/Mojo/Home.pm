@@ -54,7 +54,7 @@ sub detect {
         # Load?
         my $file = Mojo::Script->class_to_path($class);
         unless ($INC{$file}) {
-            if (my $e = Mojo::Loader->load($class)) { die $e }
+            if (my $e = Mojo::Loader->load($class)) { die $e if ref $e }
         }
 
         # Detect

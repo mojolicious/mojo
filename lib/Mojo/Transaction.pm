@@ -12,7 +12,7 @@ use Mojo::Message::Response;
 
 __PACKAGE__->attr([qw/connection continued kept_alive/]);
 __PACKAGE__->attr([qw/local_address local_port remote_address remote_port/]);
-__PACKAGE__->attr('continue_timeout', default => 3);
+__PACKAGE__->attr('continue_timeout', default => 5);
 __PACKAGE__->attr('req', default => sub { Mojo::Message::Request->new });
 __PACKAGE__->attr('res', default => sub { Mojo::Message::Response->new });
 

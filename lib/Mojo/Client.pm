@@ -13,7 +13,7 @@ use Mojo::Pipeline;
 use Mojo::Server;
 use Socket;
 
-__PACKAGE__->attr('continue_timeout',   default => 3);
+__PACKAGE__->attr('continue_timeout',   default => 5);
 __PACKAGE__->attr('keep_alive_timeout', default => 15);
 __PACKAGE__->attr('select_timeout',     default => 5);
 
@@ -144,9 +144,6 @@ sub process_app {
     # Exchange
     while ($client->is_writing || $server->is_writing) {
 
-        # Client spins
-        $client->client_spin;
-
         # Client writing?
         if ($client->is_writing) {
 
@@ -180,8 +177,9 @@ sub process_app {
         # Handle
         $self->_handle_app($daemon, $server);
 
-        # Server spin
+        # Spin both
         $server->server_spin;
+        $client->client_spin;
 
         # Server takes care of leftovers
         if (my $leftovers = $server->server_leftovers) {

@@ -184,7 +184,9 @@ sub is_writing {
 
 sub keep_alive {
     my $self = shift;
-    return $self->{_txs}->[0] ? $self->{_txs}->[0]->keep_alive(@_) : undef;
+    return $self->{_txs}->[$self->{_writer}]
+      ? $self->{_txs}->[$self->{_writer}]->keep_alive(@_)
+      : $self->{_txs}->[-1]->keep_alive(@_);
 }
 
 sub req {

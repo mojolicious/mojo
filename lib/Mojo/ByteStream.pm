@@ -582,11 +582,11 @@ Mojo::ByteStream - ByteStream
     $stream->b64_decode;
     $stream->encode('utf8');
     $stream->decode('utf8');
-    $stream->html_decode;
     $stream->html_encode;
+    $stream->html_decode;
     $stream->md5_sum;
-    $stream->qp_decode;
     $stream->qp_encode;
+    $stream->qp_decode;
     $stream->quote;
     $stream->unquote;
     $stream->url_escape;

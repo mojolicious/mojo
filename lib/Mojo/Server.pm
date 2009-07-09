@@ -49,9 +49,7 @@ __PACKAGE__->attr(
             if ($self->app->can('continue_handler')) {
                 $self->app->continue_handler($tx);
 
-                # If the continue_handler doesn't tell the client to continue
-                # we must signal for connection close, because of a potential
-                # race condition.
+                # Close connection to prevent potential race condition
                 unless ($tx->res->code == 100) {
                     $tx->keep_alive(0);
                     $tx->res->headers->connection('Close');

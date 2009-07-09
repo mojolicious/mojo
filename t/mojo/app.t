@@ -2,6 +2,21 @@
 
 # Copyright (C) 2008-2009, Sebastian Riedel.
 
+package ContinueHandlerTest;
+
+use strict;
+use warnings;
+
+use base 'Mojo::HelloWorld';
+
+sub continue_handler {
+    my ($self, $tx) = @_;
+    $tx->res->code(417);
+    return $tx;
+}
+
+package main;
+
 use strict;
 use warnings;
 
@@ -16,46 +31,31 @@ use_ok('Mojo::Client');
 use_ok('Mojo::Transaction');
 use_ok('Mojo::HelloWorld');
 
+# Logger
 my $logger = Mojo::Log->new;
 my $app = Mojo->new({log => $logger});
 is($app->log, $logger);
 
 my $client = Mojo::Client->new;
 
-# Vanilla request
+# Normal request
 my $tx = Mojo::Transaction->new_get('/1/');
-
 $client->process_app('Mojo::HelloWorld', $tx);
 is($tx->res->code, 200);
 like($tx->res->body, qr/^Congratulations/);
 
-# Post expecting 100
+# Post request expecting a 100 Continue
 $tx = Mojo::Transaction->new_post('/2/');
 $tx->req->headers->expect('100-continue');
 $tx->req->body('foo bar baz' x 128);
-
 $client->process_app('Mojo::HelloWorld', $tx);
 is($tx->res->code, 200);
 like($tx->res->body, qr/^Congratulations/);
 
-# Continue_handler that doesn't return 100
-{
-
-    package ContinueHandlerTest;
-
-    use base 'Mojo::HelloWorld';
-
-    sub continue_handler {
-        my ($self, $tx) = @_;
-        $tx->res->code(417);
-        return $tx;
-    }
-}
-
+# Continue handler not returning 100 Continue
 $tx = Mojo::Transaction->new_post('/3/');
 $tx->req->headers->expect('100-continue');
 $tx->req->body('bar baz foo' x 128);
-
 $client->process_app('ContinueHandlerTest', $tx);
-is($tx->res->code, 417);
+is($tx->res->code,                417);
 is($tx->res->headers->connection, 'Close');

@@ -4,6 +4,7 @@ This file documents the revision history for Perl extension Mojo.
         - Renamed process_local to process_app in Mojo::Client, this change
           is not backward compatible and you might have to change some of
           your tests.
+        - Added html_encode and html_decode methods to Mojo::ByteStream.
         - Improved 100 Continue handling and added more tests. (acajou)
         - Improved Mojo::Template exception handling.
         - Cleaned up exception code.

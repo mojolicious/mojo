@@ -8,7 +8,7 @@ use warnings;
 # Homer, we're going to ask you a few simple yes or no questions.
 # Do you understand?
 # Yes. *lie dectector blows up*
-use Test::More tests => 22;
+use Test::More tests => 28;
 
 # Lisa, if the Bible has taught us nothing else, and it hasn't,
 # it's that girls should stick to girls sports,
@@ -42,10 +42,10 @@ $stream =
 is("$stream", "Zm9vw5/EgGJhciUyM+KYug==\n");
 
 # utf8 b64_decode
-my $text =
+$stream =
   Mojo::ByteStream->new("Zm9vw5/EgGJhciUyM+KYug==\n")
   ->b64_decode->decode('utf8');
-is("$text", "foo\x{df}\x{0100}bar%23\x{263a}");
+is("$stream", "foo\x{df}\x{0100}bar%23\x{263a}");
 
 # url_escape
 $stream = Mojo::ByteStream->new('business;23');
@@ -62,14 +62,14 @@ $stream =
 is("$stream", 'foo%C3%9F%C4%80bar%E2%98%BA');
 
 # utf8 url_unescape
-$text =
+$stream =
   Mojo::ByteStream->new('foo%C3%9F%C4%80bar%E2%98%BA')
   ->url_unescape->decode('utf8');
-is("$text", "foo\x{df}\x{0100}bar\x{263a}");
+is("$stream", "foo\x{df}\x{0100}bar\x{263a}");
 
 # url_sanitize
-$text = Mojo::ByteStream->new('t%c3est%6a1%7E23%30')->url_sanitize;
-is("$text", 't%C3estj1~230');
+$stream = Mojo::ByteStream->new('t%c3est%6a1%7E23%30')->url_sanitize;
+is("$stream", 't%C3estj1~230');
 
 # qp_encode
 $stream = Mojo::ByteStream->new("foo\x{99}bar$%^&3217");
@@ -99,3 +99,28 @@ is($stream->length, 11);
 $stream = Mojo::ByteStream->new('0');
 is($stream->length,    1);
 is($stream->to_string, '0');
+
+# html_encode
+$stream = Mojo::ByteStream->new('foobar<baz>');
+is($stream->html_encode, 'foobar&lt;baz&gt;');
+
+# html_encode (nothing to encode)
+$stream = Mojo::ByteStream->new('foobar');
+is($stream->html_encode, 'foobar');
+
+# html_decode
+$stream = Mojo::ByteStream->new('foobar&lt;baz&gt;&#x26;&#34;');
+is($stream->html_decode, "foobar<baz>&\"");
+
+# html_decode (nothing to decode)
+$stream = Mojo::ByteStream->new('foobar');
+is($stream->html_decode, 'foobar');
+
+# utf8 html_encode
+$stream = Mojo::ByteStream->new("foobar<baz>&\"\x{152}")->html_encode;
+is("$stream", 'foobar&lt;baz&gt;&amp;&quot;&OElig;');
+
+# utf8 html_decode
+$stream =
+  Mojo::ByteStream->new('foobar&lt;baz&gt;&#x26;&#34;&OElig;')->html_decode;
+is("$stream", "foobar<baz>&\"\x{152}");

@@ -119,12 +119,10 @@ use base 'Mojo';
 sub handler {
     my ($self, $tx) = @_;
 
-    # $tx is a Mojo::Transaction instance
+    # Hello world!
     $tx->res->code(200);
     $tx->res->headers->content_type('text/plain');
     $tx->res->body('Hello Mojo!');
-
-    return $tx;
 }
 
 1;

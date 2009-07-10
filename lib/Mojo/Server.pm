@@ -56,18 +56,13 @@ __PACKAGE__->attr(
                 }
             }
             else { $tx->res->code(100) }
-            return $tx;
         };
     }
 );
 __PACKAGE__->attr(
     'handler_cb',
     default => sub {
-        return sub {
-            my ($self, $tx) = @_;
-            $self->app->handler($tx);
-            return $tx;
-        };
+        sub { shift->app->handler(shift) }
     }
 );
 
@@ -139,7 +134,6 @@ L<Mojo::Server> implements the following attributes.
     my $handler = $server->continue_handler_cb;
     $server     = $server->continue_handler_cb(sub {
         my ($self, $tx) = @_;
-        return $tx;
     });
 
 =head2 C<handler_cb>
@@ -147,7 +141,6 @@ L<Mojo::Server> implements the following attributes.
     my $handler = $server->handler_cb;
     $server     = $server->handler_cb(sub {
         my ($self, $tx) = @_;
-        return $tx;
     });
 
 =head1 METHODS

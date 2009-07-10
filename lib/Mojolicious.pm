@@ -110,8 +110,6 @@ sub handler {
       Time::HiRes::tv_interval($start, [Time::HiRes::gettimeofday()]);
     my $rps = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
     $self->log->debug("Request took $elapsed seconds ($rps/s).");
-
-    return $tx;
 }
 
 # This will run once at startup

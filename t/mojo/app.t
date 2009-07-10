@@ -12,7 +12,6 @@ use base 'Mojo::HelloWorld';
 sub continue_handler {
     my ($self, $tx) = @_;
     $tx->res->code(417);
-    return $tx;
 }
 
 package main;

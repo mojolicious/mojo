@@ -33,8 +33,6 @@ sub handler {
     $tx->res->code(200);
     $tx->res->headers->content_type('text/plain');
     $tx->res->body('Congratulations, your Mojo is working!');
-
-    return $tx;
 }
 
 sub _diag {
@@ -67,8 +65,6 @@ sub _diag {
 </html>
 EOF
     }
-
-    return $tx;
 }
 
 sub _dump_env {

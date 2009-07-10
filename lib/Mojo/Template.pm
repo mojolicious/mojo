@@ -401,7 +401,7 @@ tricky.
 But L<Mojo::Template> will return L<Mojo::Template::Exception> objects that
 stringify to error messages with context.
 
-    Template error around line 4.
+    Error around line 4.
     -----------------------------------------------------------------
     2: </head>
     3: <body>

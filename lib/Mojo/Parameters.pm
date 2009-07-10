@@ -201,7 +201,7 @@ sub to_string {
     my $params = $self->params;
 
     # Shortcut
-    return undef unless @{$self->params};
+    return unless @{$self->params};
 
     # Format
     my @params;

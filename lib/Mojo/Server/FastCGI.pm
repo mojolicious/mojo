@@ -66,11 +66,11 @@ sub accept_connection {
 
 sub read_record {
     my ($self, $connection) = @_;
-    return undef unless $connection;
+    return unless $connection;
 
     # Header
     my $header = $self->_read_chunk($connection, 8);
-    return undef unless $header;
+    return unless $header;
     my ($version, $type, $id, $clen, $plen) = unpack 'CCnnC', $header;
 
     # Body
@@ -97,7 +97,7 @@ sub read_request {
     my ($type, $id, $body) = $self->read_record($connection);
     unless ($type && $type eq 'BEGIN_REQUEST') {
         $self->{error} = "First record wasn't a begin request";
-        return undef;
+        return;
     }
     $ENV{FCGI_ID} = $tx->{fcgi_id} = $id;
 
@@ -156,13 +156,13 @@ sub read_request {
 
 sub role_name {
     my ($self, $role) = @_;
-    return undef unless $role;
+    return unless $role;
     return $ROLES[$role - 1];
 }
 
 sub role_number {
     my ($self, $role) = @_;
-    return undef unless $role;
+    return unless $role;
     return $ROLE_NUMBERS{uc $role};
 }
 
@@ -187,13 +187,13 @@ sub run {
 
 sub type_name {
     my ($self, $type) = @_;
-    return undef unless $type;
+    return unless $type;
     return $TYPES[$type - 1];
 }
 
 sub type_number {
     my ($self, $type) = @_;
-    return undef unless $type;
+    return unless $type;
     return $TYPE_NUMBERS{uc $type};
 }
 
@@ -201,14 +201,14 @@ sub write_records {
     my ($self, $connection, $type, $id, $body) = @_;
 
     # Required
-    return undef unless defined $connection && defined $type && defined $id;
+    return unless defined $connection && defined $type && defined $id;
 
     # Defaults
     $body ||= '';
     my $length = length $body;
 
     # Write records
-    my $empty = 1 unless $body;
+    my $empty = $body ? 0 : 1;
     my $offset = 0;
     while (($length > 0) || $empty) {
 
@@ -313,7 +313,7 @@ sub _read_chunk {
     while (length $chunk < $length) {
 
         # We don't wait forever
-        return undef unless IO::Select->new($connection)->can_read(1);
+        return unless IO::Select->new($connection)->can_read(1);
 
         # Slurp
         $connection->sysread(my $buffer, $length - length $chunk, 0);

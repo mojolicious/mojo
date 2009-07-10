@@ -324,7 +324,7 @@ sub _socket_name {
     return $self->{_reverse}->{$s} if $self->{_reverse}->{$s};
 
     # Connected?
-    return undef unless $s->connected;
+    return unless $s->connected;
 
     return
         unpack('H*', $s->sockaddr)

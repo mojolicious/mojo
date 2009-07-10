@@ -73,7 +73,7 @@ sub new {
 
 sub add_chunk {
     my $self = shift;
-    my $chunk = join '', @_ if @_;
+    my $chunk = join '', @_;
 
     # Shortcut
     return unless $chunk;

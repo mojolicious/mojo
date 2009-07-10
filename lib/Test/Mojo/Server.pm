@@ -227,7 +227,7 @@ sub _find_executable {
     return $path if -f $path;
 
     # Not found
-    return undef;
+    return;
 }
 
 sub _generate_port {

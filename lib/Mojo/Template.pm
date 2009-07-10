@@ -75,7 +75,7 @@ sub compile {
 
     # Shortcut
     my $code = $self->code;
-    return undef unless $code;
+    return unless $code;
 
     # Catch errors
     $SIG{__DIE__} =
@@ -95,7 +95,7 @@ sub interpret {
 
     # Shortcut
     my $compiled = $self->compiled;
-    return undef unless $compiled;
+    return unless $compiled;
 
     # Catch errors
     $SIG{__DIE__} =

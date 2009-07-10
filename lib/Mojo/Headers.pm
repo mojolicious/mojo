@@ -166,7 +166,7 @@ sub header {
 
     # Get
     my $headers;
-    return undef unless $headers = $self->{_headers}->{lc $name};
+    return unless $headers = $self->{_headers}->{lc $name};
 
     # String
     unless (wantarray) {
@@ -246,7 +246,7 @@ sub parse {
             return $self->buffer;
         }
     }
-    return undef;
+    return;
 }
 
 sub proxy_authorization { shift->header('Proxy-Authorization', @_) }

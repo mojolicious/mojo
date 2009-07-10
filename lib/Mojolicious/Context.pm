@@ -26,7 +26,7 @@ sub render {
         my $action     = $self->stash->{action};
 
         # Nothing to render
-        return undef unless $controller && $action;
+        return unless $controller && $action;
 
         $self->stash->{template} = join '/', split(/-/, $controller), $action;
     }

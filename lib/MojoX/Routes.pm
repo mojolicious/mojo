@@ -39,7 +39,7 @@ sub match {
     my ($self, $match) = @_;
 
     # Shortcut
-    return undef unless $match;
+    return unless $match;
 
     # Match object
     $match = MojoX::Routes::Match->new($match)
@@ -53,7 +53,7 @@ sub match {
 
     $match->path($path);
 
-    return undef unless $captures;
+    return unless $captures;
 
     # Merge captures
     $captures = {%{$match->captures}, %$captures};

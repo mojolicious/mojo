@@ -169,7 +169,7 @@ sub cookie {
     my ($self, $name) = @_;
 
     # Shortcut
-    return undef unless $name;
+    return unless $name;
 
     # Map
     unless ($self->{_cookies}) {
@@ -329,7 +329,7 @@ sub upload {
     my ($self, $name) = @_;
 
     # Shortcut
-    return undef unless $name;
+    return unless $name;
 
     # Map
     unless ($self->{_uploads}) {

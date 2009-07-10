@@ -15,12 +15,12 @@ sub build {
     return '' if $self->is_done;
 
     # Shortcut
-    return undef unless defined $chunk;
+    return unless defined $chunk;
 
     my $chunk_length = length $chunk;
 
     # Trailing headers?
-    my $headers = 1 if ref $chunk && $chunk->isa('Mojo::Headers');
+    my $headers = ref $chunk && $chunk->isa('Mojo::Headers') ? 1 : 0;
 
     my $formatted = '';
 

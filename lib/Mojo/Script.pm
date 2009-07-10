@@ -112,7 +112,7 @@ sub get_data {
         return $content if $name eq $data;
     }
 
-    return undef;
+    return;
 }
 
 sub rel_dir {

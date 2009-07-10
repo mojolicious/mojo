@@ -84,7 +84,7 @@ sub lib_dir {
     return $path if -d $path;
 
     # No lib directory
-    return undef;
+    return;
 }
 
 sub parse {

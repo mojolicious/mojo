@@ -36,7 +36,7 @@ sub get_line {
     my $self = shift;
 
     # No full line in buffer
-    return undef unless $self->{buffer} =~ /\x0d?\x0a/;
+    return unless $self->{buffer} =~ /\x0d?\x0a/;
 
     # Locate line ending
     my $pos = index $self->{buffer}, "\x0a";

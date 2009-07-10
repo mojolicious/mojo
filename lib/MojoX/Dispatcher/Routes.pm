@@ -70,7 +70,7 @@ sub generate_class {
     $class = length $class ? "${namespace}::$class" : $namespace;
 
     # Invalid
-    return undef unless $class =~ /^[a-zA-Z0-9_:]+$/;
+    return unless $class =~ /^[a-zA-Z0-9_:]+$/;
 
     return $class;
 }
@@ -88,11 +88,11 @@ sub generate_method {
     $method ||= $field->{action};
 
     # Shortcut for disallowed methods
-    return undef if $self->{_disallow}->{$method};
-    return undef if index($method, '_') == 0;
+    return if $self->{_disallow}->{$method};
+    return if index($method, '_') == 0;
 
     # Invalid
-    return undef unless $method =~ /^[a-zA-Z0-9_:]+$/;
+    return unless $method =~ /^[a-zA-Z0-9_:]+$/;
 
     return $method;
 }

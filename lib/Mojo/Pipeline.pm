@@ -127,7 +127,7 @@ sub client_leftovers {
     my $previous = $self->{_reader} - 1;
 
     # No previous reader
-    return undef unless $previous >= 0;
+    return unless $previous >= 0;
 
     # Leftovers
     return $self->{_txs}->[$previous]->client_leftovers;
@@ -252,7 +252,7 @@ sub server_leftovers {
     my $last = $self->{_txs}->[-1];
 
     # No leftovers
-    return undef unless $last->req->is_state('done_with_leftovers');
+    return unless $last->req->is_state('done_with_leftovers');
 
     # Leftovers
     my $leftovers = $last->req->leftovers;

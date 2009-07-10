@@ -67,7 +67,7 @@ sub client_get_chunk {
         # End
         if (defined $chunk && !length $chunk) {
             $self->state('read_response');
-            return undef;
+            return;
         }
     }
 
@@ -105,7 +105,7 @@ sub client_leftovers {
     my $self = shift;
 
     # No leftovers
-    return undef unless $self->is_state('done_with_leftovers');
+    return unless $self->is_state('done_with_leftovers');
 
     # Leftovers
     my $leftovers = $self->res->leftovers;
@@ -336,7 +336,7 @@ sub server_get_chunk {
             $self->req->is_state('done_with_leftovers')
               ? $self->state('done_with_leftovers')
               : $self->state('done');
-            return undef;
+            return;
         }
     }
 

@@ -48,7 +48,7 @@ sub render {
     }
 
     # Not enough information
-    return undef unless $template || $template_path;
+    return unless $template || $template_path;
 
     # Handler precedence
     $self->precedence([sort keys %{$self->handler}])
@@ -63,7 +63,7 @@ sub render {
     $template_path = undef if $template;
 
     # Path
-    return undef
+    return
       unless $template_path =
           $self->_fix_path($c, $template, $template_path, $is_layout);
 
@@ -81,7 +81,7 @@ sub render {
     # Debug
     unless ($r) {
         $c->app->log->debug(qq/No handler for "$handler" available./);
-        return undef;
+        return;
     }
 
     # Partial?
@@ -94,7 +94,7 @@ sub render {
 
     # Render
     my $output;
-    return undef unless $r->($self, $c, \$output);
+    return unless $r->($self, $c, \$output);
 
     # Partial
     return $output if $partial;
@@ -130,7 +130,7 @@ sub _fix_format {
     # Missing format
     else {
         $c->app->log->debug('Template format missing.');
-        return undef;
+        return;
     }
 
     return $path;
@@ -165,7 +165,7 @@ sub _fix_handler {
         # Nothing found
         unless ($found) {
             $c->app->log->debug(qq/Template not found "$path.*"./);
-            return undef;
+            return;
         }
     }
 
@@ -184,12 +184,10 @@ sub _fix_path {
       if $template && !$template_path;
 
     # Format
-    return undef
-      unless $template_path = $self->_fix_format($c, $template_path);
+    return unless $template_path = $self->_fix_format($c, $template_path);
 
     # Handler
-    return undef
-      unless $template_path = $self->_fix_handler($c, $template_path);
+    return unless $template_path = $self->_fix_handler($c, $template_path);
 
     return $template_path;
 }

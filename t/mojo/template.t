@@ -2,6 +2,17 @@
 
 # Copyright (C) 2008-2009, Sebastian Riedel.
 
+package MyTemplateExporter;
+
+use strict;
+use warnings;
+
+sub import {
+    my $caller = caller;
+    no strict 'refs';
+    *{$caller . '::foo'} = sub {'works!'};
+}
+
 package MyTemplateException;
 
 use strict;
@@ -14,7 +25,7 @@ package main;
 use strict;
 use warnings;
 
-use Test::More tests => 57;
+use Test::More tests => 61;
 
 use File::Spec;
 use File::Temp;
@@ -24,9 +35,36 @@ use FindBin;
 # like God must feel when he's holding a gun.
 use_ok('Mojo::Template');
 
-# Compile time exception
+# Strict
 my $mt     = Mojo::Template->new;
 my $output = '';
+eval {
+    $mt->render(<<'EOF', \$output) };
+% $foo = 1;
+EOF
+$output = $@;
+is(ref $output, 'Mojo::Template::Exception');
+like($output->message, qr/^Global symbol "\$foo" requires/);
+
+# Importing into a template
+$mt     = Mojo::Template->new;
+$output = '';
+$mt->render(<<'EOF', \$output);
+% BEGIN { MyTemplateExporter->import }
+%= __PACKAGE__
+%= foo
+EOF
+is($output, 'Mojo::Templateworks!');
+$mt->render(<<'EOF', \$output);
+% BEGIN { MyTemplateExporter->import }
+%= __PACKAGE__
+%= foo
+EOF
+is($output, 'Mojo::Templateworks!');
+
+# Compile time exception
+$mt     = Mojo::Template->new;
+$output = '';
 eval {
     $mt->render(<<'EOF', \$output) };
 test

@@ -34,49 +34,34 @@ sub render {
     # We got called
     $c->stash->{rendered} = 1;
 
-    my ($template, $template_path);
-    my $is_layout = 0;
+    my $template;
 
     # Layout first
-    if ($c->stash->{layout} || $c->stash->{layout_path}) {
-        $template      = $c->stash->{layout};
-        $template_path = $c->stash->{layout_path};
-        $is_layout     = 1;
+    if (my $layout = delete $c->stash->{layout}) {
+        $template = File::Spec->catfile('layouts', $layout);
+        $c->stash->{inner_template} = delete $c->stash->{template};
     }
 
     # Normal template
-    else {
-        $template      = $c->stash->{template};
-        $template_path = $c->stash->{template_path};
-    }
+    else { $template = delete $c->stash->{template} }
 
-    # Not enough information
-    return unless $template || $template_path;
+    # Nothing to do
+    return unless $template;
 
     # Handler precedence
     $self->precedence([sort keys %{$self->handler}])
       unless $self->precedence;
 
-    # Inner
-    local $c->stash->{inner_template} = $c->stash->{template} if $is_layout;
-    local $c->stash->{inner_template_path} = $c->stash->{template_path}
-      if $is_layout;
+    # Format
+    return unless $template = $self->_fix_format($c, $template);
 
-    # Template has priority
-    $template_path = undef if $template;
-
-    # Path
-    return
-      unless $template_path =
-          $self->_fix_path($c, $template, $template_path, $is_layout);
-
-    # Store for handler usage
-    local $c->stash->{template_path} = $template_path;
+    # Handler
+    return unless $template = $self->_fix_handler($c, $template);
 
     # Extract
-    $template_path =~ /\.(\w+)(?:\.(\w+))?$/;
+    $template =~ /\.(\w+)(?:\.(\w+))?$/;
     my $format = $1;
-    my $handler = $2 || $self->default_handler;
+    my $handler = $c->stash->{handler} || $2 || $self->default_handler;
 
     # Renderer
     my $r = $self->handler->{$handler};
@@ -90,10 +75,8 @@ sub render {
     # Partial?
     my $partial = $c->stash->{partial};
 
-    # Clean
-    local $c->stash->{layout}      = undef;
-    local $c->stash->{layout_path} = undef;
-    local $c->stash->{template}    = undef;
+    # Template
+    $c->stash->{template} = $template;
 
     # Render
     my $output;
@@ -104,30 +87,35 @@ sub render {
 
     # Response
     my $res = $c->res;
-    $res->code(200) unless $c->res->code;
-    $res->body($output);
+    $res->code(200) unless $res->code;
+    $res->body($output) unless $res->body;
 
     # Type
     my $type = $self->types->type($format) || 'text/plain';
-    $res->headers->content_type($type);
+    $res->headers->content_type($type) unless $res->headers->content_type;
 
     # Success!
     $c->stash->{partial} = $partial;
     return 1;
 }
 
-sub _detect_default_handler { return 1 if shift->default_handler && -f shift }
+sub _detect_default_handler {
+    my ($self, $template) = @_;
+    return 1
+      if $self->default_handler
+          && -f File::Spec->catfile($self->root, $template);
+}
 
 sub _fix_format {
-    my ($self, $c, $path) = @_;
+    my ($self, $c, $template) = @_;
 
     # Format ok
-    return $path if $path =~ /\.\w+(?:\.\w+)?$/;
+    return $template if $template =~ /\.\w+(?:\.\w+)?$/;
 
     my $format = $c->stash->{format};
 
     # Append format
-    if ($format) { $path .= ".$format" }
+    if ($format) { $template .= ".$format" }
 
     # Missing format
     else {
@@ -135,63 +123,38 @@ sub _fix_format {
         return;
     }
 
-    return $path;
+    return $template;
 }
 
 sub _fix_handler {
-    my ($self, $c, $path) = @_;
+    my ($self, $c, $template) = @_;
 
     # Handler ok
-    return $path if $path =~ /\.\w+\.\w+$/;
+    return $template if $template =~ /\.\w+\.\w+$/;
 
     my $handler = $c->stash->{handler};
 
     # Append handler
-    if ($handler) { $path .= ".$handler" }
+    if ($handler) { $template .= ".$handler" }
 
     # Detect
-    elsif (!$self->_detect_default_handler($path)) {
-        my $found = 0;
+    elsif (!$self->_detect_default_handler($template)) {
         for my $ext (@{$self->precedence}) {
 
             # Try
-            my $p = "$path.$ext";
-            if (-f $p) {
-                $found++;
-                $path = $p;
-                $c->app->log->debug(qq/Template found "$path"./);
-                last;
+            my $t = "$template.$ext";
+            if (-r File::Spec->catfile($self->root, $t)) {
+                $c->app->log->debug(qq/Template found "$t"./);
+                return $t;
             }
         }
 
         # Nothing found
-        unless ($found) {
-            $c->app->log->debug(qq/Template not found "$path.*"./);
-            return;
-        }
+        $c->app->log->debug(qq/Template not found "$template.*"./);
+        return;
     }
 
-    return $path;
-}
-
-sub _fix_path {
-    my ($self, $c, $template, $template_path, $is_layout) = @_;
-
-    # Root
-    my $root =
-      $is_layout ? File::Spec->catfile($self->root, 'layouts') : $self->root;
-
-    # Path
-    $template_path = File::Spec->catfile($root, $template)
-      if $template && !$template_path;
-
-    # Format
-    return unless $template_path = $self->_fix_format($c, $template_path);
-
-    # Handler
-    return unless $template_path = $self->_fix_handler($c, $template_path);
-
-    return $template_path;
+    return $template;
 }
 
 1;

@@ -36,10 +36,10 @@ sub dispatch {
 }
 
 sub serve {
-    my ($self, $c, $path) = @_;
+    my ($self, $c, $rel) = @_;
 
     # Append path to root
-    $path = File::Spec->catfile($self->root, split('/', $path));
+    my $path = File::Spec->catfile($self->root, split('/', $rel));
 
     # Extension
     $path =~ /\.(\w+)$/;
@@ -52,7 +52,7 @@ sub serve {
     if (-f $path) {
 
         # Log
-        $c->app->log->debug(qq/Serving static file "$path"./);
+        $c->app->log->debug(qq/Serving static file "$rel"./);
 
         my $res = $c->res;
         if (-r $path) {
@@ -113,7 +113,7 @@ sub serve_404 { shift->serve_error(shift, 404) }
 sub serve_500 { shift->serve_error(shift, 500) }
 
 sub serve_error {
-    my ($self, $c, $code, $path) = @_;
+    my ($self, $c, $code, $rel) = @_;
 
     # Shortcut
     return 1 unless $c && $code;
@@ -124,16 +124,16 @@ sub serve_error {
     $res->code($code);
 
     # Default to "code.html"
-    $path ||= "$code.html";
+    $rel ||= "$code.html";
 
     # Append path to root
-    $path = File::Spec->catfile($self->root, split('/', $path));
+    my $path = File::Spec->catfile($self->root, split('/', $rel));
 
     # File
     if (-r $path) {
 
         # Log
-        $c->app->log->debug(qq/Serving error file "$path"./);
+        $c->app->log->debug(qq/Serving error file "$rel"./);
 
         # File
         $res->content(Mojo::Content->new(file => Mojo::File->new));

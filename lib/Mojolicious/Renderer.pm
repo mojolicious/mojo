@@ -7,6 +7,7 @@ use warnings;
 
 use base 'MojoX::Renderer';
 
+use File::Spec;
 use Mojo::Template;
 
 # What do you want?
@@ -18,12 +19,14 @@ sub new {
         epl => sub {
             my ($self, $c, $output) = @_;
 
-            my $path = $c->stash->{template_path};
+            my $template = $c->stash->{template};
+            my $path =
+              File::Spec->catfile($c->app->renderer->root, $template);
 
             # Shortcut
             unless (-r $path) {
                 $c->app->log->error(
-                    qq/Template "$path" missing or not readable./);
+                    qq/Template "$template" missing or not readable./);
                 return;
             }
 
@@ -33,16 +36,16 @@ sub new {
 
             my $success;
 
+            # Interpret again
+            if ($mt) { $success = $mt->interpret($output, $c) }
+
             # No cache
-            unless ($mt) {
+            else {
 
                 # Initialize
                 $mt = $self->{_mt_cache}->{$path} = Mojo::Template->new;
                 $success = $mt->render_file($path, $output, $c);
             }
-
-            # Interpret again
-            $success = $mt->interpret($output, $c);
 
             # Exception
             if (!$success && $c->app->mode eq 'development') {
@@ -55,13 +58,14 @@ sub new {
                 }
 
                 # Log
-                $c->app->log->error(qq/Template error in "$path": $$output/);
+                $c->app->log->error(
+                    qq/Template error in "$template": $$output/);
 
                 # Render exception template
                 $c->stash(exception => $$output);
                 $c->res->code(500);
-                $$output =
-                  $c->render(partial => 1, template => 'exception.html');
+                $c->res->body(
+                    $c->render(partial => 1, template => 'exception.html'));
                 return 1;
             }
 

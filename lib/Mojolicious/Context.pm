@@ -19,7 +19,7 @@ sub render {
     $self->{stash} = {%{$self->stash}, %$args};
 
     # Template
-    unless ($self->stash->{template} || $self->stash->{template_path}) {
+    unless ($self->stash->{template}) {
 
         # Default template
         my $controller = $self->stash->{controller};
@@ -40,8 +40,7 @@ sub render {
 
 sub render_inner {
     my $self = shift;
-    local $self->stash->{template}      = $self->stash->{inner_template};
-    local $self->stash->{template_path} = $self->stash->{inner_template_path};
+    local $self->stash->{template} = delete $self->stash->{inner_template};
     return $self->render_partial(@_);
 }
 

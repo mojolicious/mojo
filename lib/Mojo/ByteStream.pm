@@ -418,9 +418,10 @@ sub html_encode {
     no bytes;
 
     my $encoded = '';
-    while (my $char = substr $self->{bytestream}, 0, 1, '') {
+    for (1 .. length $self->{bytestream}) {
 
         # Encode
+        my $char = substr $self->{bytestream}, 0, 1, '';
         my $num = unpack 'U', $char;
         my $named = $REVERSE_ENTITIES{$num};
         $char = "&$named;" if $named;
@@ -541,10 +542,10 @@ sub _decode {
     my ($num, $entitie, $hex) = @_;
 
     # Named to number
-    if ($entitie) { $num = $ENTITIES{$entitie} }
+    if (defined $entitie) { $num = $ENTITIES{$entitie} }
 
     # Hex to number
-    elsif ($hex) { $num = hex $hex }
+    elsif (defined $hex) { $num = hex $hex }
 
     # Number
     return pack 'U', $num if $num;

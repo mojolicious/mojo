@@ -8,7 +8,7 @@ use warnings;
 # Homer, we're going to ask you a few simple yes or no questions.
 # Do you understand?
 # Yes. *lie dectector blows up*
-use Test::More tests => 28;
+use Test::More tests => 29;
 
 use_ok('Mojo::ByteStream');
 
@@ -121,3 +121,8 @@ is("$stream", 'foobar&lt;baz&gt;&amp;&quot;&OElig;');
 $stream =
   Mojo::ByteStream->new('foobar&lt;baz&gt;&#x26;&#34;&OElig;')->html_decode;
 is("$stream", "foobar<baz>&\"\x{152}");
+
+# html_encode (path)
+$stream = Mojo::ByteStream->new(
+    '/usr/local/lib/perl5/site_perl/5.10.0/Mojo/ByteStream.pm')->html_encode;
+is("$stream", '/usr/local/lib/perl5/site_perl/5.10.0/Mojo/ByteStream.pm');

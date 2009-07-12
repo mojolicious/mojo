@@ -26,28 +26,28 @@ sub new {
     # Shortcut
     return $self unless $lines;
 
+    # Parse message
+    my $line;
+    if ($self->message =~ /at\s+\(eval\s+\d+\)\s+line\s+(\d+)/) {
+        $line = $1;
+    }
+
     # Caller
     my $caller = (caller)[0];
 
     # Search template in callstack
-    my $line;
     my $i = 1;
     while (my ($p, $f, $l) = caller($i++)) {
 
         # Stack
         push @{$self->stack}, [$f, $l];
 
-        # Found?
-        if ($p eq $caller && $f =~ /^\(eval\s+\d+\)$/) {
+        # Try to find template
+        if ($p eq $caller && $f =~ /^\(eval\s+\d+\)$/ && !$line) {
 
             # Done
             $line = $l;
         }
-    }
-
-    # Fallback to message parsing
-    if (!$line && $self->message =~ /at\s+\(eval\s+\d+\)\s+line\s+(\d+)/) {
-        $line = $1;
     }
 
     # Context

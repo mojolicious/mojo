@@ -95,14 +95,11 @@ $ENV{MOJO_APP} = '<%= $class %>';
 
 # Check if Mojo is installed
 eval 'use Mojo::Scripts';
-if ($@) {
-    print <<EOF;
+die <<EOF if $@;
 It looks like you don't have the Mojo Framework installed.
 Please visit http://mojolicious.org for detailed installation instructions.
 
 EOF
-    exit;
-}
 
 # Start the script system
 my $scripts = Mojo::Scripts->new;

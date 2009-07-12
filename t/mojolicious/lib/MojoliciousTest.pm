@@ -18,8 +18,9 @@ sub development_mode {
 sub startup {
     my $self = shift;
 
-    # Only log errors
-    $self->log->level('error');
+    # Only log errors to STDERR
+    $self->log->path(undef);
+    $self->log->level('fatal');
 
     # Templateless renderer
     $self->renderer->add_handler(

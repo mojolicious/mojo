@@ -20,20 +20,52 @@ sub new {
 
             my $path = $c->stash->{template_path};
 
+            # Shortcut
+            unless (-r $path) {
+                $c->app->log->error(
+                    qq/Template "$path" missing or not readable./);
+                return;
+            }
+
             # Check cache
             $self->{_mt_cache} ||= {};
             my $mt = $self->{_mt_cache}->{$path};
+
+            my $success;
 
             # No cache
             unless ($mt) {
 
                 # Initialize
                 $mt = $self->{_mt_cache}->{$path} = Mojo::Template->new;
-                return $mt->render_file($path, $output, $c);
+                $success = $mt->render_file($path, $output, $c);
             }
 
             # Interpret again
-            $mt->interpret($output, $c);
+            $success = $mt->interpret($output, $c);
+
+            # Exception
+            if (!$success && $c->app->mode eq 'development') {
+
+                # Exception template failed
+                if ($c->stash->{exception}) {
+                    $c->app->log->error(
+                        "Exception template error:\n$$output");
+                    return $success;
+                }
+
+                # Log
+                $c->app->log->error(qq/Template error in "$path": $$output/);
+
+                # Render exception template
+                $c->stash(exception => $$output);
+                $c->res->code(500);
+                $$output =
+                  $c->render(partial => 1, template => 'exception.html');
+                return 1;
+            }
+
+            return $success;
         }
     );
     return $self;

@@ -107,7 +107,7 @@ sub run {
     my $self = shift;
 
     # No windows support
-    die "Prefork daemon not available for Windows.\n" if $^O eq 'MSWin32';
+    croak "Prefork daemon not available for Windows.\n" if $^O eq 'MSWin32';
 
     # Pipe for child communication
     pipe($self->{_child_read}, $self->{_child_write})

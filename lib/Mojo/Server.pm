@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojo::Base';
 
-use Carp;
+use Carp 'croak';
 use Mojo::Loader;
 
 use constant RELOAD => $ENV{MOJO_RELOAD} || 0;
@@ -18,7 +18,9 @@ __PACKAGE__->attr(
         my $self = shift;
 
         # Load
-        if (my $e = Mojo::Loader->load($self->app_class)) { die $e if ref $e }
+        if (my $e = Mojo::Loader->load($self->app_class)) {
+            croak $e if ref $e;
+        }
 
         return $self->app_class->new;
     }

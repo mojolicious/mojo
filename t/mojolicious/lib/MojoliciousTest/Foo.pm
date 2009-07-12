@@ -9,15 +9,13 @@ use base 'Mojolicious::Controller';
 
 # If you're programmed to jump off a bridge, would you do it?
 # Let me check my program... Yep.
-sub index {
-    my $self = shift;
-    $self->stash(layout => 'default', msg => 'Hello World!');
-}
+sub badtemplate { shift->render(template => 'badtemplate.html.epl') }
 
-sub templateless {
-    my $self = shift;
-    $self->render(handler => 'test');
-}
+sub index { shift->stash(layout => 'default', msg => 'Hello World!') }
+
+sub syntaxerror { shift->render(template => 'syntaxerror.html.epl') }
+
+sub templateless { shift->render(handler => 'test') }
 
 sub test {
     my ($self, $c) = @_;
@@ -26,9 +24,6 @@ sub test {
     $c->res->body($c->url_for(controller => 'bar'));
 }
 
-sub willdie {
-    my $self = shift;
-    die 'for some reason';
-}
+sub willdie { die 'for some reason' }
 
 1;

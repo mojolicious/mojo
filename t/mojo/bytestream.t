@@ -10,9 +10,6 @@ use warnings;
 # Yes. *lie dectector blows up*
 use Test::More tests => 28;
 
-# Lisa, if the Bible has taught us nothing else, and it hasn't,
-# it's that girls should stick to girls sports,
-# such as hot oil wrestling and foxy boxing and such.
 use_ok('Mojo::ByteStream');
 
 # camelize

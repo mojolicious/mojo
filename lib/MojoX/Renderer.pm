@@ -31,6 +31,9 @@ sub add_handler {
 sub render {
     my ($self, $c) = @_;
 
+    # We got called
+    $c->stash->{rendered} = 1;
+
     my ($template, $template_path);
     my $is_layout = 0;
 
@@ -78,9 +81,9 @@ sub render {
     # Renderer
     my $r = $self->handler->{$handler};
 
-    # Debug
+    # No handler
     unless ($r) {
-        $c->app->log->debug(qq/No handler for "$handler" available./);
+        $c->app->log->error(qq/No handler for "$handler" available./);
         return;
     }
 
@@ -109,8 +112,7 @@ sub render {
     $res->headers->content_type($type);
 
     # Success!
-    $c->stash->{partial}  = $partial;
-    $c->stash->{rendered} = 1;
+    $c->stash->{partial} = $partial;
     return 1;
 }
 

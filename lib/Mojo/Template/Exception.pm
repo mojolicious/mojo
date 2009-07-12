@@ -15,7 +15,42 @@ __PACKAGE__->attr('message', default => 'Exception!');
 # Do they give a Nobel Prize for attempted chemistry?
 sub new {
     my $self = shift->SUPER::new();
+
+    # Message
     $self->message(shift);
+
+    # Lines
+    my $lines = shift;
+
+    # Shortcut
+    return $self unless $lines;
+
+    # Caller
+    my $caller = (caller)[0];
+
+    # Search template in callstack
+    my $line;
+    my $i = 1;
+    while (my ($p, $f, $l) = caller($i++)) {
+
+        # Found?
+        if ($p eq $caller && $f =~ /^\(eval\s+\d+\)$/) {
+
+            # Done
+            $line = $l;
+            last;
+        }
+    }
+
+    # Fallback to message parsing
+    if (!$line && $self->message =~ /at\s+\(eval\s+\d+\)\s+line\s+(\d+)/) {
+        $line = $1;
+    }
+
+    # Context
+    my @lines = split /\n/, $lines;
+    $self->parse_context(\@lines, $line) if $line;
+
     return $self;
 }
 
@@ -95,41 +130,6 @@ sub to_string {
     return $string;
 }
 
-sub throw {
-    my $self = shift->new(shift);
-
-    # Lines
-    my @lines = split /\n/, shift;
-    my $line;
-
-    # Caller
-    my $caller = (caller)[0];
-
-    # Search template in callstack
-    my $i = 1;
-    while (my ($p, $f, $l) = caller($i++)) {
-
-        # Found?
-        if ($p eq $caller && $f =~ /^\(eval\s+\d+\)$/) {
-
-            # Done
-            $line = $l;
-            last;
-        }
-    }
-
-    # Fallback to message parsing
-    if (!$line && $self->message =~ /at\s+\(eval\s+\d+\)\s+line\s+(\d+)/) {
-        $line = $1;
-    }
-
-    # Context
-    $self->parse_context(\@lines, $line) if $line;
-
-    # Die
-    die $self;
-}
-
 1;
 __END__
 
@@ -147,6 +147,8 @@ Mojo::Template::Exception - Template Exception
 L<Mojo::Template::Exception> is a container for template exceptions.
 
 =head1 ATTRIBUTES
+
+L<Mojo::Template::Exception> implements the following attributes.
 
 =head2 C<line>
 
@@ -175,7 +177,7 @@ implements the following new ones.
 
 =head2 C<new>
 
-    my $e = Mojo::Loader::Exception->new('Oops!');
+    my $e = Mojo::Loader::Exception->new('Oops!', $template);
 
 =head2 C<parse_context>
 
@@ -185,9 +187,5 @@ implements the following new ones.
 
     my $string = $e->to_string;
     my $string = "$e";
-
-=head2 C<throw>
-
-    $e->throw('Oops!', $template);
 
 =cut

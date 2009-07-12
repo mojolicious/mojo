@@ -38,11 +38,9 @@ use_ok('Mojo::Template');
 # Strict
 my $mt     = Mojo::Template->new;
 my $output = '';
-eval {
-    $mt->render(<<'EOF', \$output) };
+$mt->render(<<'EOF', \$output);
 % $foo = 1;
 EOF
-$output = $@;
 is(ref $output, 'Mojo::Template::Exception');
 like($output->message, qr/^Global symbol "\$foo" requires/);
 
@@ -65,15 +63,13 @@ is($output, 'Mojo::Templateworks!');
 # Compile time exception
 $mt     = Mojo::Template->new;
 $output = '';
-eval {
-    $mt->render(<<'EOF', \$output) };
+$mt->render(<<'EOF', \$output);
 test
 123
 % {
 %= 1 + 1
 test
 EOF
-$output = $@;
 is(ref $output, 'Mojo::Template::Exception');
 like($output->message, qr/^Missing right curly or square bracket/);
 is($output->lines_before->[0]->[0], 3);

@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 60;
+use Test::More tests => 76;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -23,13 +23,29 @@ use_ok('MojoliciousTest');
 # I guess I could part with one doomsday device and still be feared.
 my $client = Mojo::Client->new;
 
-# SyntaxError::foo
+# SyntaxError::foo (syntax error in controller)
 my $tx = Mojo::Transaction->new_get('/syntax_error/foo');
 $client->process_app('MojoliciousTest', $tx);
 is($tx->res->code,                            500);
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 like($tx->res->body, qr/Missing right curly/);
+
+# Foo::syntaxerror (syntax error in template)
+$tx = Mojo::Transaction->new_get('/foo/syntaxerror');
+$client->process_app('MojoliciousTest', $tx);
+is($tx->res->code,                            500);
+is($tx->res->headers->server,                 'Mojo (Perl)');
+is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+like($tx->res->body, qr/^Missing right curly/);
+
+# Foo::badtemplate (template missing)
+$tx = Mojo::Transaction->new_get('/foo/badtemplate');
+$client->process_app('MojoliciousTest', $tx);
+is($tx->res->code,                            200);
+is($tx->res->headers->server,                 'Mojo (Perl)');
+is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+is($tx->res->body,                            '');
 
 # Foo::test
 $tx = Mojo::Transaction->new_get('/foo/test', 'X-Test' => 'Hi there!');
@@ -93,8 +109,30 @@ is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 like($tx->res->body, qr/File Not Found/);
 
-# Static file /hello.txt in a production mode
+# SyntaxError::foo in production mode (syntax error in controller)
 my $backup = $ENV{MOJO_MODE} || '';
+$ENV{MOJO_MODE} = 'production';
+$tx = Mojo::Transaction->new_get('/syntax_error/foo');
+$client->process_app('MojoliciousTest', $tx);
+is($tx->res->code,                            500);
+is($tx->res->headers->server,                 'Mojo (Perl)');
+is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+like($tx->res->body, qr/Internal Server Error/);
+$ENV{MOJO_MODE} = $backup;
+
+# Foo::syntaxerror in production mode (syntax error in template)
+$backup = $ENV{MOJO_MODE} || '';
+$ENV{MOJO_MODE} = 'production';
+$tx = Mojo::Transaction->new_get('/foo/syntaxerror');
+$client->process_app('MojoliciousTest', $tx);
+is($tx->res->code,                            200);
+is($tx->res->headers->server,                 'Mojo (Perl)');
+is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+is($tx->res->body,                            '');
+$ENV{MOJO_MODE} = $backup;
+
+# Static file /hello.txt in a production mode
+$backup = $ENV{MOJO_MODE} || '';
 $ENV{MOJO_MODE} = 'production';
 $tx = Mojo::Transaction->new_get('/hello.txt');
 $client->process_app('MojoliciousTest', $tx);

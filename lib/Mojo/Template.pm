@@ -77,16 +77,14 @@ sub compile {
     my $code = $self->code;
     return unless $code;
 
-    # Catch errors
-    $SIG{__DIE__} =
-      sub { Mojo::Template::Exception->throw(shift, $self->template) };
-
     # Compile
     my $compiled = eval $code;
-    die $@ if $@;
+
+    # Exception
+    return Mojo::Template::Exception->new($@, $self->template) if $@;
 
     $self->compiled($compiled);
-    return $self;
+    return;
 }
 
 sub interpret {
@@ -98,8 +96,8 @@ sub interpret {
     return unless $compiled;
 
     # Catch errors
-    $SIG{__DIE__} =
-      sub { Mojo::Template::Exception->throw(shift, $self->template) };
+    local $SIG{__DIE__} =
+      sub { croak(Mojo::Template::Exception->new(shift, $self->template)) };
 
     # Interpret
     $$output = eval { $compiled->(@_) };
@@ -230,8 +228,9 @@ sub parse {
 }
 
 sub render {
-    my $self = shift;
-    my $tmpl = shift;
+    my $self   = shift;
+    my $tmpl   = shift;
+    my $output = shift;
 
     # Parse
     $self->parse($tmpl);
@@ -240,10 +239,16 @@ sub render {
     $self->build;
 
     # Compile
-    $self->compile;
+    my $e = $self->compile;
+
+    # Exception
+    if ($e) {
+        $$output = $e;
+        return;
+    }
 
     # Interpret
-    return $self->interpret(@_);
+    return $self->interpret($output, @_);
 }
 
 sub render_file {
@@ -492,7 +497,7 @@ following new ones.
 
 =head2 C<compile>
 
-    $mt = $mt->compile;
+    my $exception = $mt->compile;
 
 =head2 C<interpret>
 

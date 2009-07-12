@@ -138,7 +138,7 @@ sub walk_stack {
                 return 1 unless ref $e;
 
                 # Error
-                $c->app->log->debug($e);
+                $c->app->log->error($e);
                 return $e;
             }
 
@@ -159,7 +159,7 @@ sub walk_stack {
         # Controller error
         if ($@) {
             my $e = ref $@ ? $@ : Mojo::Loader::Exception->new($@);
-            $c->app->log->debug($e);
+            $c->app->log->error($e);
             return $e;
         }
 

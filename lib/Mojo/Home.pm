@@ -8,7 +8,6 @@ use warnings;
 use base 'Mojo::Base';
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
-use Carp 'croak';
 use File::Spec;
 use Mojo::Loader;
 use Mojo::Script;
@@ -55,7 +54,7 @@ sub detect {
         # Load?
         my $file = Mojo::Script->class_to_path($class);
         unless ($INC{$file}) {
-            if (my $e = Mojo::Loader->load($class)) { croak $e if ref $e }
+            if (my $e = Mojo::Loader->load($class)) { die $e if ref $e }
         }
 
         # Detect

@@ -97,7 +97,7 @@ sub interpret {
 
     # Catch errors
     local $SIG{__DIE__} =
-      sub { croak(Mojo::Template::Exception->new(shift, $self->template)) };
+      sub { die Mojo::Template::Exception->new(shift, $self->template) };
 
     # Interpret
     $$output = eval { $compiled->(@_) };

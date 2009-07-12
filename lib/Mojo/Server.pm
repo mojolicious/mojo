@@ -19,7 +19,7 @@ __PACKAGE__->attr(
 
         # Load
         if (my $e = Mojo::Loader->load($self->app_class)) {
-            croak $e if ref $e;
+            die $e if ref $e;
         }
 
         return $self->app_class->new;

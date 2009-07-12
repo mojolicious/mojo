@@ -7,7 +7,6 @@ use warnings;
 
 use base 'Mojo::Script';
 
-use Carp 'croak';
 use Mojo::ByteStream;
 use Mojo::Loader;
 
@@ -46,7 +45,7 @@ sub run {
               unless ref $e;
 
             # Real error
-            croak $e;
+            die $e;
         }
 
         # Run
@@ -57,7 +56,7 @@ sub run {
     # Load scripts
     my $modules = Mojo::Loader->search($self->namespace);
     for my $module (@$modules) {
-        if (my $e = Mojo::Loader->load($module)) { croak $e }
+        if (my $e = Mojo::Loader->load($module)) { die $e }
     }
 
     # Print overview

@@ -407,13 +407,11 @@ But L<Mojo::Template> will return L<Mojo::Template::Exception> objects that
 stringify to error messages with context.
 
     Error around line 4.
-    -----------------------------------------------------------------
     2: </head>
     3: <body>
     4: % my $i = 2; xx
     5: %= $i * 2
     6: </body>
-    -----------------------------------------------------------------
     Bareword "xx" not allowed while "strict subs" in use at (eval 13)
     line 4.
 

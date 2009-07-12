@@ -8,7 +8,8 @@ use warnings;
 use base 'Mojo::Base';
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
-__PACKAGE__->attr([qw/line lines_before lines_after/], default => sub { [] });
+__PACKAGE__->attr([qw/line lines_before lines_after stack/],
+    default => sub { [] });
 __PACKAGE__->attr('message', default => 'Exception!');
 
 # Attempted murder? Now honestly, what is that?
@@ -33,12 +34,14 @@ sub new {
     my $i = 1;
     while (my ($p, $f, $l) = caller($i++)) {
 
+        # Stack
+        push @{$self->stack}, [$f, $l];
+
         # Found?
         if ($p eq $caller && $f =~ /^\(eval\s+\d+\)$/) {
 
             # Done
             $line = $l;
-            last;
         }
     }
 
@@ -103,8 +106,7 @@ sub to_string {
     my $string = '';
 
     # Header
-    my $delim = '-' x 76;
-    $string .= ('Error around line ' . $self->line->[0] . ".\n$delim\n")
+    $string .= ('Error around line ' . $self->line->[0] . ".\n")
       if $self->line->[0];
 
     # Before
@@ -121,8 +123,14 @@ sub to_string {
         $string .= $line->[0] . ': ' . $line->[1] . "\n";
     }
 
-    # Delim
-    $string .= "$delim\n" if length $string;
+    # Stack
+    if (@{$self->stack}) {
+        for my $frame (@{$self->stack}) {
+            my $file = $frame->[0];
+            my $line = $frame->[1];
+            $string .= "$file: $line\n";
+        }
+    }
 
     # Message
     $string .= $self->message if $self->message;
@@ -169,6 +177,11 @@ L<Mojo::Template::Exception> implements the following attributes.
 
     my $message = $e->message;
     $e          = $e->message('oops!');
+
+=head2 C<stack>
+
+    my $stack = $e->line;
+    $e        = $e->line([['/foo/bar.pl', 23], ['/bar.pl', 2]]);
 
 =head1 METHODS
 

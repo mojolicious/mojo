@@ -79,13 +79,14 @@ is($output->lines_before->[1]->[1], '%= 1 + 1');
 is($output->line->[0],              5);
 is($output->line->[1],              'test');
 $output->message("oops!\n");
+$output->stack([['foo', 23], ['bar', 24]]);
 is("$output", <<'EOF');
 Error around line 5.
-----------------------------------------------------------------------------
 3: % {
 4: %= 1 + 1
 5: test
-----------------------------------------------------------------------------
+foo: 23
+bar: 24
 oops!
 EOF
 
@@ -112,15 +113,14 @@ is($output->lines_after->[0]->[1],  '%= 1 + 1');
 is($output->lines_after->[1]->[0],  5);
 is($output->lines_after->[1]->[1],  'test');
 $output->message("oops!\n");
+$output->stack([]);
 is("$output", <<'EOF');
 Error around line 3.
-----------------------------------------------------------------------------
 1: test
 2: 123
 3: %= MyTemplateException->exception
 4: %= 1 + 1
 5: test
-----------------------------------------------------------------------------
 oops!
 EOF
 
@@ -147,15 +147,14 @@ is($output->lines_after->[0]->[1],  '%= 1 + 1');
 is($output->lines_after->[1]->[0],  5);
 is($output->lines_after->[1]->[1],  'test');
 $output->message("oops!\n");
+$output->stack([]);
 is("$output", <<'EOF');
 Error around line 3.
-----------------------------------------------------------------------------
 1: test
 2: 123
 3: % die 'oops!';
 4: %= 1 + 1
 5: test
-----------------------------------------------------------------------------
 oops!
 EOF
 

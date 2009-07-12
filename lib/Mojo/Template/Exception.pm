@@ -180,8 +180,8 @@ L<Mojo::Template::Exception> implements the following attributes.
 
 =head2 C<stack>
 
-    my $stack = $e->line;
-    $e        = $e->line([['/foo/bar.pl', 23], ['/bar.pl', 2]]);
+    my $stack = $e->stack;
+    $e        = $e->stack([['/foo/bar.pl', 23], ['/bar.pl', 2]]);
 
 =head1 METHODS
 

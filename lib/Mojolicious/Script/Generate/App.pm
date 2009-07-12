@@ -229,7 +229,7 @@ __exception__
         </pre>
         <pre>
 % for my $frame (@{$e->stack}) {
-<%= b($frame->[0])->html_encode %>: <%= $frame->[1] %>
+<%= b($frame->[1])->html_encode %>: <%= $frame->[2] %>
 % }
         </pre>
         <pre>

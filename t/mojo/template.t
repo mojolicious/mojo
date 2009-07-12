@@ -79,7 +79,7 @@ is($output->lines_before->[1]->[1], '%= 1 + 1');
 is($output->line->[0],              5);
 is($output->line->[1],              'test');
 $output->message("oops!\n");
-$output->stack([['foo', 23], ['bar', 24]]);
+$output->stack([['Foo', 'foo', 23], ['Bar', 'bar', 24]]);
 is("$output", <<'EOF');
 Error around line 5.
 3: % {

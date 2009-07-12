@@ -712,8 +712,4 @@ the following new ones.
 
     $stream = $stream->url_unescape;
 
-=head1 SEE ALSO
-
-L<Digest::MD5>, L<Encode>, L<MIME::Base64>, L<MIME::QuotedPrint>
-
 =cut

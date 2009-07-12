@@ -20,6 +20,14 @@ sub new {
     # Message
     $self->message(shift);
 
+    # Stack
+    my $i = 1;
+    while (my ($p, $f, $l) = caller($i++)) {
+
+        # Stack
+        push @{$self->stack}, [$p, $f, $l];
+    }
+
     # Lines
     my $lines = shift;
 
@@ -28,19 +36,15 @@ sub new {
 
     # Parse message
     my $line;
-    if ($self->message =~ /at\s+\(eval\s+\d+\)\s+line\s+(\d+)/) {
-        $line = $1;
-    }
+    $line = $1 if $self->message =~ /at\s+\(eval\s+\d+\)\s+line\s+(\d+)/;
 
     # Caller
     my $caller = (caller)[0];
 
     # Search template in callstack
-    my $i = 1;
-    while (my ($p, $f, $l) = caller($i++)) {
+    for my $frame (@{$self->stack}) {
 
-        # Stack
-        push @{$self->stack}, [$f, $l];
+        my ($p, $f, $l) = @$frame;
 
         # Try to find template
         if ($p eq $caller && $f =~ /^\(eval\s+\d+\)$/ && !$line) {
@@ -126,8 +130,8 @@ sub to_string {
     # Stack
     if (@{$self->stack}) {
         for my $frame (@{$self->stack}) {
-            my $file = $frame->[0];
-            my $line = $frame->[1];
+            my $file = $frame->[1];
+            my $line = $frame->[2];
             $string .= "$file: $line\n";
         }
     }
@@ -181,7 +185,7 @@ L<Mojo::Template::Exception> implements the following attributes.
 =head2 C<stack>
 
     my $stack = $e->stack;
-    $e        = $e->stack([['/foo/bar.pl', 23], ['/bar.pl', 2]]);
+    $e        = $e->stack([['Foo::Bar', '/foo/bar.pl', 23]]);
 
 =head1 METHODS
 

@@ -36,6 +36,7 @@ is($e->lines_before->[1]->[1], '');
 is($e->line->[0],              15);
 is($e->line->[1],              "1;");
 $e->message("oops!\n");
+$e->stack([]);
 is("$e", <<'EOF');
 Error around line 15.
 13: foo {

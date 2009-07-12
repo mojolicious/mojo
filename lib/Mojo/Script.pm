@@ -13,7 +13,7 @@ require File::Spec;
 require IO::File;
 
 use Carp 'croak';
-use Mojo::ByteStream;
+use Mojo::ByteStream 'b';
 use Mojo::Template;
 
 __PACKAGE__->attr('description', default => 'No description.');
@@ -46,7 +46,7 @@ sub class_to_file {
 
     # Class to file
     $class =~ s/:://g;
-    $class = Mojo::ByteStream->new($class)->decamelize->to_string;
+    $class = b($class)->decamelize->to_string;
 
     return $class;
 }

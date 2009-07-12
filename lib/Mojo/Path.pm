@@ -8,7 +8,7 @@ use warnings;
 use base 'Mojo::Base';
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
-use Mojo::ByteStream;
+use Mojo::ByteStream 'b';
 use Mojo::URL;
 
 __PACKAGE__->attr([qw/leading_slash trailing_slash/], default => 0);
@@ -27,9 +27,7 @@ sub append {
         my $value = "$_";
 
         # *( pchar / "/" / "?" )
-        $value =
-          Mojo::ByteStream->new($value)->url_escape($Mojo::URL::PCHAR)
-          ->to_string;
+        $value = b($value)->url_escape($Mojo::URL::PCHAR)->to_string;
 
         push @{$self->parts}, $value;
     }
@@ -111,9 +109,7 @@ sub to_string {
     for my $part (@{$self->parts}) {
 
         # *( pchar / "/" / "?" )
-        push @path,
-          Mojo::ByteStream->new($part)->url_escape($Mojo::URL::PCHAR)
-          ->to_string;
+        push @path, b($part)->url_escape($Mojo::URL::PCHAR)->to_string;
     }
 
     # Format

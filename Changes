@@ -5,6 +5,8 @@ This file documents the revision history for Perl extension Mojo.
           is not backward compatible and you might have to change some of
           your tests.
         - Simplified MojoX::Renderer.
+        - Simplified Mojo::Loader.
+        - Simplified Mojo::ByteStream.
         - Simplified exceptions.
         - Updated exception handling in Mojolicious to work with exceptions
           in epl templates.
@@ -12,7 +14,6 @@ This file documents the revision history for Perl extension Mojo.
         - Improved 100 Continue handling and added more tests. (acajou)
         - Improved Mojo::Template exception handling.
         - Cleaned up exception code.
-        - Simplified Mojo::Loader.
         - Fixed typos.
 
 0.991236 2009-07-05 00:00:00

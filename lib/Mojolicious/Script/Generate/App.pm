@@ -207,7 +207,7 @@ is($tx->res->headers->content_type, 'text/html');
 like($tx->res->content->file->slurp, qr/Mojolicious Web Framework/i);
 __exception__
 % use Data::Dumper;
-% use Mojo::ByteStream;
+% use Mojo::ByteStream 'b';
 % my $self = shift;
 % my $e = $self->stash('exception');
 <!html>
@@ -218,22 +218,22 @@ __exception__
         <pre><%= $e->message %></pre>
         <pre>
 % for my $line (@{$e->lines_before}) {
-    <%= $line->[0] %>: <%= Mojo::ByteStream->new($line->[1])->html_encode %>
+    <%= $line->[0] %>: <%= b($line->[1])->html_encode %>
 % }
 % if ($e->line->[0]) {
-    <%= $e->line->[0] %>: <%=Mojo::ByteStream->new($e->line->[1])->html_encode %>
+    <%= $e->line->[0] %>: <%= b($e->line->[1])->html_encode %>
 % }
 % for my $line (@{$e->lines_after}) {
-    <%= $line->[0] %>: <%= Mojo::ByteStream->new($line->[1])->html_encode %>
+    <%= $line->[0] %>: <%= b($line->[1])->html_encode %>
 % }
         </pre>
         <pre>
 % for my $frame (@{$e->stack}) {
-<%=Mojo::ByteStream->new($frame->[0])->html_encode %>: <%= $frame->[1] %>
+<%= b($frame->[0])->html_encode %>: <%= $frame->[1] %>
 % }
         </pre>
         <pre>
-%= Mojo::ByteStream->new(Dumper $self->stash)->html_encode
+%= b(Dumper $self->stash)->html_encode
         </pre>
     </body>
 </html>

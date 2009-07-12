@@ -7,7 +7,7 @@ use warnings;
 
 use base 'MojoX::Routes';
 
-use Mojo::ByteStream;
+use Mojo::ByteStream 'b';
 use Mojo::Loader;
 use Mojo::Loader::Exception;
 
@@ -30,8 +30,7 @@ sub dispatch {
     # Initialize stash with captures
     my %captures = %{$match->captures};
     foreach my $key (keys %captures) {
-        $captures{$key} =
-          Mojo::ByteStream->new($captures{$key})->url_unescape->to_string;
+        $captures{$key} = b($captures{$key})->url_unescape->to_string;
     }
     $c->stash({%captures});
 
@@ -60,7 +59,7 @@ sub generate_class {
             next unless $part;
 
             # Camelize
-            push @class, Mojo::ByteStream->new($part)->camelize;
+            push @class, b($part)->camelize;
         }
         $class = join '::', @class;
     }

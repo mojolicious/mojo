@@ -7,6 +7,7 @@ use warnings;
 
 use base 'Mojo::Message';
 
+use Mojo::ByteStream 'b';
 use Mojo::Cookie::Request;
 use Mojo::Parameters;
 
@@ -52,7 +53,7 @@ sub fix_headers {
 
         # Basic proxy authorization
         if (my $userinfo = $proxy->userinfo) {
-            my $auth = Mojo::ByteStream->new("$userinfo")->b64_encode;
+            my $auth = b("$userinfo")->b64_encode;
             $self->headers->proxy_authorization("Basic $auth");
         }
     }

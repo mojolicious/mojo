@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojo::Script';
 
-use Mojo::ByteStream;
+use Mojo::ByteStream 'b';
 use Mojo::Loader;
 
 __PACKAGE__->attr('namespace', default => 'Mojo::Script');
@@ -34,8 +34,7 @@ sub run {
     if ($name) {
 
         # Generate module
-        my $module =
-          $self->namespace . '::' . Mojo::ByteStream->new($name)->camelize;
+        my $module = $self->namespace . '::' . b($name)->camelize;
 
         # Load
         if (my $e = Mojo::Loader->load($module)) {
@@ -70,7 +69,7 @@ sub run {
         # Generate name
         my $namespace = $self->namespace;
         $module =~ s/^$namespace\:\://;
-        my $name = Mojo::ByteStream->new($module)->decamelize;
+        my $name = b($module)->decamelize;
 
         # Print description
         print "$name:\n";

@@ -11,12 +11,10 @@ use bytes;
 
 use Carp 'croak';
 use Mojo::Buffer;
-use Mojo::ByteStream;
 use Mojo::Content;
 use Mojo::File::Memory;
 use Mojo::Parameters;
 use Mojo::Upload;
-use Mojo::URL;
 
 __PACKAGE__->attr('buffer', default => sub { Mojo::Buffer->new });
 __PACKAGE__->attr([qw/parser_progress_cb/]);

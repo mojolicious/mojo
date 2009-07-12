@@ -8,7 +8,7 @@ use warnings;
 use base 'Mojo::Base';
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
-use Mojo::ByteStream;
+use Mojo::ByteStream 'b';
 use Mojo::URL;
 
 __PACKAGE__->attr('pair_separator', default => '&');
@@ -41,9 +41,7 @@ sub append {
         $value =~ s/\ /\+/g;
 
         # *( pchar / "/" / "?" ) with the exception of ";", "&" and "="
-        $value =
-          Mojo::ByteStream->new($value)->url_escape($Mojo::URL::PARAM)
-          ->to_string;
+        $value = b($value)->url_escape($Mojo::URL::PARAM)->to_string;
 
         # Append
         push @{$self->params}, $value;
@@ -74,7 +72,7 @@ sub param {
     $name =~ s/\ /\+/g;
 
     # *( pchar / "/" / "?" ) with the exception of ";", "&" and "="
-    $name = Mojo::ByteStream->new($name)->url_escape($Mojo::URL::PARAM);
+    $name = b($name)->url_escape($Mojo::URL::PARAM);
 
     # Cleanup
     $self->remove($name) if defined $_[0];
@@ -98,8 +96,7 @@ sub param {
         $values[$i] =~ s/\+/\ /g if $values[$i];
 
         # *( pchar / "/" / "?" ) with the exception of ";", "&" and "="
-        $values[$i] =
-          Mojo::ByteStream->new($values[$i])->url_unescape->to_string;
+        $values[$i] = b($values[$i])->url_unescape->to_string;
     }
 
     return wantarray ? @values : $values[0];
@@ -147,7 +144,7 @@ sub remove {
     $name =~ s/\ /\+/g;
 
     # *( pchar / "/" / "?" ) with the exception of ";", "&" and "="
-    $name = Mojo::ByteStream->new($name)->url_escape($Mojo::URL::PARAM);
+    $name = b($name)->url_escape($Mojo::URL::PARAM);
 
     # Remove
     my $params = $self->params;
@@ -179,8 +176,8 @@ sub to_hash {
         $value =~ s/\+/\ /g if $value;
 
         # Unescape
-        $name  = Mojo::ByteStream->new($name)->url_unescape->to_string;
-        $value = Mojo::ByteStream->new($value)->url_unescape->to_string;
+        $name  = b($name)->url_unescape->to_string;
+        $value = b($value)->url_unescape->to_string;
 
         # Array
         if (exists $params{$name}) {
@@ -219,20 +216,17 @@ sub to_string {
             $value =~ s/\ /\+/g;
 
             # *( pchar / "/" / "?" ) with the exception of ";", "&" and "="
-            $value =
-              Mojo::ByteStream->new($value)->url_escape($Mojo::URL::PARAM);
+            $value = b($value)->url_escape($Mojo::URL::PARAM);
 
             # *( pchar / "/" / "?" ) with the exception of ";", "&" and "="
-            $name =
-              Mojo::ByteStream->new($name)->url_escape($Mojo::URL::PARAM);
+            $name = b($name)->url_escape($Mojo::URL::PARAM);
         }
 
         # No value
         else {
 
             # *( pchar / "/" / "?" )
-            $name =
-              Mojo::ByteStream->new($name)->url_escape($Mojo::URL::PCHAR);
+            $name = b($name)->url_escape($Mojo::URL::PCHAR);
         }
 
         push @params, defined $value ? "$name=$value" : "$name";

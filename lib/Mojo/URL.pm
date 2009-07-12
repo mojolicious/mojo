@@ -8,7 +8,7 @@ use warnings;
 use base 'Mojo::Base';
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
-use Mojo::ByteStream;
+use Mojo::ByteStream 'b';
 use Mojo::Parameters;
 use Mojo::Path;
 use Socket;
@@ -82,8 +82,7 @@ sub authority {
     }
 
     # *( unreserved / pct-encoded / sub-delims )
-    my $host =
-      Mojo::ByteStream->new($self->host)->url_escape("$UNRESERVED$SUBDELIM");
+    my $host     = b($self->host)->url_escape("$UNRESERVED$SUBDELIM");
     my $port     = $self->port;
     my $userinfo = $self->userinfo;
 
@@ -228,8 +227,7 @@ sub to_string {
     my $query     = $self->query;
 
     # *( pchar / "/" / "?" )
-    my $fragment =
-      Mojo::ByteStream->new($self->fragment)->url_escape("$PCHAR\/\?");
+    my $fragment = b($self->fragment)->url_escape("$PCHAR\/\?");
 
     # Format
     my $url = '';
@@ -255,20 +253,15 @@ sub userinfo {
             $password = $2;
         }
 
-        $self->user(Mojo::ByteStream->new($user)->url_unescape->to_string);
-        $self->password(
-            Mojo::ByteStream->new($password)->url_unescape->to_string);
+        $self->user(b($user)->url_unescape->to_string);
+        $self->password(b($password)->url_unescape->to_string);
 
         return $self;
     }
 
     # *( unreserved / pct-encoded / sub-delims / ":" )
-    my $user =
-      Mojo::ByteStream->new($self->user)
-      ->url_escape("$UNRESERVED$SUBDELIM\:");
-    my $password =
-      Mojo::ByteStream->new($self->password)
-      ->url_escape("$UNRESERVED$SUBDELIM\:");
+    my $user     = b($self->user)->url_escape("$UNRESERVED$SUBDELIM\:");
+    my $password = b($self->password)->url_escape("$UNRESERVED$SUBDELIM\:");
 
     # Format
     return $user ? "$user:$password" : undef;

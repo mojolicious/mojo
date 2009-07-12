@@ -8,7 +8,7 @@ use warnings;
 use base 'Mojo::Content';
 use bytes;
 
-use Mojo::ByteStream;
+use Mojo::ByteStream 'b';
 use Mojo::File;
 
 __PACKAGE__->attr('parts', default => sub { [] });
@@ -64,8 +64,7 @@ sub build_boundary {
 
         # Mostly taken from LWP
         $boundary =
-          Mojo::ByteStream->new(join('', map chr(rand(256)), 1 .. $size * 3))
-          ->b64_encode;
+          b(join('', map chr(rand(256)), 1 .. $size * 3))->b64_encode;
         $boundary =~ s/\W/X/g;
 
         # Check parts for boundary

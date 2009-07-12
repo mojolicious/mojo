@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojo::Cookie';
 
-use Mojo::ByteStream;
+use Mojo::ByteStream 'b';
 
 # Fields have values
 use constant RE_COOKIE_FIELDS => qr/
@@ -40,8 +40,7 @@ sub parse {
             my ($name, $value) = @{$knot->[$i]};
 
             # Value might be quoted
-            $value = Mojo::ByteStream->new($value)->unquote->to_string
-              if $value;
+            $value = b($value)->unquote->to_string if $value;
 
             # This will only run once
             if (not $i) {

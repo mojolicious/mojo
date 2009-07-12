@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojo::Cookie';
 
-use Mojo::ByteStream;
+use Mojo::ByteStream 'b';
 
 # Lisa, would you like a donut?
 # No thanks. Do you have any fruit?
@@ -24,7 +24,7 @@ sub parse {
             my ($name, $value) = @{$token};
 
             # Value might be quoted
-            $value = Mojo::ByteStream->new($value)->unquote if $value;
+            $value = b($value)->unquote if $value;
 
             # Path
             if ($name =~ /^\$Path$/i) { $cookies[-1]->path($value) }
@@ -36,7 +36,7 @@ sub parse {
             else {
                 push @cookies, Mojo::Cookie::Request->new;
                 $cookies[-1]->name($name);
-                $cookies[-1]->value(Mojo::ByteStream->new($value)->unquote);
+                $cookies[-1]->value(b($value)->unquote);
                 $cookies[-1]->version($version);
             }
         }

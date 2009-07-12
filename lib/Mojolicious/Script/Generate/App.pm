@@ -206,10 +206,11 @@ is($tx->res->code, 200);
 is($tx->res->headers->content_type, 'text/html');
 like($tx->res->content->file->slurp, qr/Mojolicious Web Framework/i);
 __exception__
-% use Data::Dumper;
+% use Data::Dumper ();
 % use Mojo::ByteStream 'b';
 % my $self = shift;
-% my $e = $self->stash('exception');
+% my $s = $self->stash;
+% my $e = delete $s->{exception};
 <!html>
 <head><title>Exception</title></head>
     <body>
@@ -221,7 +222,7 @@ __exception__
     <%= $line->[0] %>: <%= b($line->[1])->html_encode %>
 % }
 % if ($e->line->[0]) {
-    <%= $e->line->[0] %>: <%= b($e->line->[1])->html_encode %>
+    <b><%= $e->line->[0] %>: <%= b($e->line->[1])->html_encode %></b>
 % }
 % for my $line (@{$e->lines_after}) {
     <%= $line->[0] %>: <%= b($line->[1])->html_encode %>
@@ -233,10 +234,11 @@ __exception__
 % }
         </pre>
         <pre>
-%= b(Dumper $self->stash)->html_encode
+%= b(Data::Dumper->new([$s])->Indent(1)->Terse(1)->Dump)->html_encode
         </pre>
     </body>
 </html>
+% $s->{exception} = $e;
 __layout__
 % my $self = shift;
 <!doctype html>

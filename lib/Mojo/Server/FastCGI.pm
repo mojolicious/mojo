@@ -225,6 +225,7 @@ sub write_records {
         my $woffset = 0;
         while ($woffset < length $record) {
             my $written = $connection->syswrite($record, undef, $woffset);
+            return unless defined $written;
             $woffset += $written;
         }
 
@@ -233,6 +234,8 @@ sub write_records {
 
         last if $empty;
     }
+
+    return 1;
 }
 
 sub write_response {
@@ -261,7 +264,9 @@ sub write_response {
 
         # Headers
         $offset += length $chunk;
-        $self->write_records($connection, 'STDOUT', $tx->{fcgi_id}, $chunk);
+        return
+          unless $self->write_records($connection, 'STDOUT', $tx->{fcgi_id},
+            $chunk);
     }
 
     # Body
@@ -280,12 +285,17 @@ sub write_response {
 
         # Content
         $offset += length $chunk;
-        $self->write_records($connection, 'STDOUT', $tx->{fcgi_id}, $chunk);
+        return
+          unless $self->write_records($connection, 'STDOUT', $tx->{fcgi_id},
+            $chunk);
     }
 
     # The end
-    $self->write_records($connection, 'STDOUT', $tx->{fcgi_id}, undef);
-    $self->write_records($connection, 'END_REQUEST', $tx->{fcgi_id},
+    return
+      unless $self->write_records($connection, 'STDOUT', $tx->{fcgi_id},
+        undef);
+    return
+      unless $self->write_records($connection, 'END_REQUEST', $tx->{fcgi_id},
         pack('CCCCCCCC', 0));
 }
 

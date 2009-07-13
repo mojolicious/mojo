@@ -185,7 +185,8 @@ sub header {
     return @$headers;
 }
 
-sub host { shift->header('Host', @_) }
+sub host     { shift->header('Host',     @_) }
+sub location { shift->header('Location', @_) }
 
 sub names {
     my $self = shift;
@@ -335,6 +336,11 @@ implements the following new ones.
 
     my $host = $headers->host;
     $headers = $headers->host('127.0.0.1');
+
+=head2 C<location>
+
+    my $location = $headers->location;
+    $headers     = $headers->location('http://127.0.0.1/foo');
 
 =head2 C<proxy_authorization>
 

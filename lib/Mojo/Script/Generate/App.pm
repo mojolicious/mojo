@@ -89,7 +89,6 @@ use FindBin;
 
 use lib "$FindBin::Bin/lib";
 use lib "$FindBin::Bin/../lib";
-use lib "$FindBin::Bin/../../lib";
 
 $ENV{MOJO_APP} = '<%= $class %>';
 

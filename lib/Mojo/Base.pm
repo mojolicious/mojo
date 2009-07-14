@@ -32,12 +32,8 @@ sub attr {
 
     # Check arguments
     my $args;
-    if (exists $_[1]) {
-        my %args = (@_);
-        $args = \%args;
-    }
-    else { $args = $_[0] }
-    $args ||= {};
+    if   (exists $_[1]) { $args = {@_} }
+    else                { $args = $_[0] || {} }
 
     my $chained = exists $args->{chained} ? delete $args->{chained} : 1;
     my $default = delete $args->{default};

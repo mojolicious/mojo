@@ -79,11 +79,8 @@ sub parse {
 
     # CGI like environment
     my $env;
-    if (exists $_[1]) {
-        my %env = (@_);
-        $env = \%env;
-    }
-    else { $env = $_[0] if ref $_[0] eq 'HASH' }
+    if   (exists $_[1]) { $env = {@_} }
+    else                { $env = $_[0] if ref $_[0] eq 'HASH' }
     $self->_parse_env($env) if $env;
 
     # Buffer

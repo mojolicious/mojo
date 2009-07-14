@@ -77,14 +77,13 @@ sub params {
 sub parse {
     my $self = shift;
 
-    # CGI like environment
+    # CGI like environment?
     my $env;
     if   (exists $_[1]) { $env = {@_} }
     else                { $env = $_[0] if ref $_[0] eq 'HASH' }
-    $self->_parse_env($env) if $env;
 
-    # Buffer
-    $self->buffer->add_chunk(shift) unless $env;
+    # Parse CGI like environment or add chunk
+    $env ? $self->_parse_env($env) : $self->buffer->add_chunk(shift);
 
     # Start line
     $self->_parse_start_line if $self->is_state('start');

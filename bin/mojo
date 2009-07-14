@@ -14,7 +14,7 @@ use lib "$FindBin::Bin/lib";
 use lib "$FindBin::Bin/../lib";
 
 # App
-use lib join '/', File::Spec->splitdir(getcwd);
+use lib join '/', File::Spec->splitdir(getcwd), 'lib';
 
 # Check if Mojo is installed
 eval 'use Mojo::Scripts';

@@ -12,6 +12,8 @@ This file documents the revision history for Perl extension Mojo.
           in epl templates.
         - Updated Mojo and Mojolicious to log to STDERR if log directory
           isn't writable.
+        - Updated Mojo and Mojolicious to work without boilerplate and a
+          single MyApp.pm file.
         - Added html_encode and html_decode methods to Mojo::ByteStream.
         - Improved 100 Continue handling and added more tests. (acajou)
         - Improved Mojo::Template exception handling.

@@ -265,10 +265,10 @@ sub param {
 
 # Please don't eat me! I have a wife and kids. Eat them!
 sub parse {
-    my $self = shift;
+    my ($self, $chunk) = @_;
 
     # Buffer
-    $self->buffer->add_chunk(join '', @_) if @_;
+    $self->buffer->add_chunk($chunk) if $chunk;
 
     return $self->_parse(0);
 }

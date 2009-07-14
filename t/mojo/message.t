@@ -601,15 +601,14 @@ is($res->build,
 # Parse Lighttpd like CGI like environment variables and a body
 $req = Mojo::Message::Request->new;
 $req->parse(
-    {   HTTP_CONTENT_LENGTH => 11,
-        HTTP_EXPECT         => '100-continue',
-        PATH_INFO           => '/test/index.cgi/foo/bar',
-        QUERY_STRING        => 'lalala=23&bar=baz',
-        REQUEST_METHOD      => 'POST',
-        SCRIPT_NAME         => '/test/index.cgi',
-        HTTP_HOST           => 'localhost:8080',
-        SERVER_PROTOCOL     => 'HTTP/1.0'
-    }
+    HTTP_CONTENT_LENGTH => 11,
+    HTTP_EXPECT         => '100-continue',
+    PATH_INFO           => '/test/index.cgi/foo/bar',
+    QUERY_STRING        => 'lalala=23&bar=baz',
+    REQUEST_METHOD      => 'POST',
+    SCRIPT_NAME         => '/test/index.cgi',
+    HTTP_HOST           => 'localhost:8080',
+    SERVER_PROTOCOL     => 'HTTP/1.0'
 );
 $req->parse('Hello World');
 is($req->state,           'done');
@@ -627,16 +626,15 @@ is($req->body,            'Hello World');
 # Parse Apache like CGI like environment variables and a body
 $req = Mojo::Message::Request->new;
 $req->parse(
-    {   CONTENT_LENGTH  => 11,
-        CONTENT_TYPE    => 'application/x-www-form-urlencoded',
-        HTTP_EXPECT     => '100-continue',
-        PATH_INFO       => '/test/index.cgi/foo/bar',
-        QUERY_STRING    => 'lalala=23&bar=baz',
-        REQUEST_METHOD  => 'POST',
-        SCRIPT_NAME     => '/test/index.cgi',
-        HTTP_HOST       => 'localhost:8080',
-        SERVER_PROTOCOL => 'HTTP/1.0'
-    }
+    CONTENT_LENGTH  => 11,
+    CONTENT_TYPE    => 'application/x-www-form-urlencoded',
+    HTTP_EXPECT     => '100-continue',
+    PATH_INFO       => '/test/index.cgi/foo/bar',
+    QUERY_STRING    => 'lalala=23&bar=baz',
+    REQUEST_METHOD  => 'POST',
+    SCRIPT_NAME     => '/test/index.cgi',
+    HTTP_HOST       => 'localhost:8080',
+    SERVER_PROTOCOL => 'HTTP/1.0'
 );
 $req->parse('hello=world');
 is($req->state,           'done');
@@ -681,16 +679,14 @@ $res->code(404);
 $res->headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
 $res->cookies(
     Mojo::Cookie::Response->new(
-        {   name  => 'foo',
-            value => 'bar',
-            path  => '/foobar'
-        }
+        name  => 'foo',
+        value => 'bar',
+        path  => '/foobar'
     ),
     Mojo::Cookie::Response->new(
-        {   name  => 'bar',
-            value => 'baz',
-            path  => '/test/23'
-        }
+        name  => 'bar',
+        value => 'baz',
+        path  => '/test/23'
     )
 );
 is($res->build,
@@ -707,16 +703,16 @@ $req->url->parse('http://127.0.0.1/foo/bar');
 $req->headers->expect('100-continue');
 $req->cookies(
     Mojo::Cookie::Request->new(
-        {   name  => 'foo',
-            value => 'bar',
-            path  => '/foobar'
-        }
+        name  => 'foo',
+        value => 'bar',
+        path  => '/foobar'
+
     ),
     Mojo::Cookie::Request->new(
-        {   name  => 'bar',
-            value => 'baz',
-            path  => '/test/23'
-        }
+        name  => 'bar',
+        value => 'baz',
+        path  => '/test/23'
+
     )
 );
 $req->body("Hello World!\n");

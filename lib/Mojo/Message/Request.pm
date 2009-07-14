@@ -78,10 +78,16 @@ sub parse {
     my $self = shift;
 
     # CGI like environment
-    $self->_parse_env(shift) if ref $_[0] eq 'HASH';
+    my $env;
+    if (exists $_[1]) {
+        my %env = (@_);
+        $env = \%env;
+    }
+    else { $env = $_[0] if ref $_[0] eq 'HASH' }
+    $self->_parse_env($env) if $env;
 
     # Buffer
-    $self->buffer->add_chunk(join '', @_) if @_;
+    $self->buffer->add_chunk(shift) unless $env;
 
     # Start line
     $self->_parse_start_line if $self->is_state('start');
@@ -336,6 +342,7 @@ implements the following new ones.
 =head2 C<parse>
 
     $req = $req->parse('GET /foo/bar HTTP/1.1');
+    $req = $req->parse(REQUEST_METHOD => 'GET');
     $req = $req->parse({REQUEST_METHOD => 'GET'});
 
 =head2 C<proxy>

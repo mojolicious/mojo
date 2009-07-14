@@ -258,10 +258,7 @@ sub _read {
         $self->accept_unlock;
         return 0 unless $socket;
         push @{$self->{_accepted}},
-          { requests => 0,
-            socket   => $socket,
-            time     => time
-          };
+          {requests => 0, socket => $socket, time => time};
         return 1;
     }
 

@@ -43,7 +43,8 @@ sub new {
     my $mode = $self->mode;
 
     # Log file
-    $self->log->path($self->home->rel_file("log/$mode.log"));
+    $self->log->path($self->home->rel_file("log/$mode.log"))
+      if -w $self->home->rel_file('log');
 
     # Run mode
     $mode = $mode . '_mode';

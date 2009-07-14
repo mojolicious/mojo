@@ -128,7 +128,7 @@ sub to_string {
     }
 
     # Stack
-    if (@{$self->stack}) {
+    if (@{$self->stack} && $ENV{MOJO_EXCEPTION_VERBOSE}) {
         for my $frame (@{$self->stack}) {
             my $file = $frame->[1];
             my $line = $frame->[2];

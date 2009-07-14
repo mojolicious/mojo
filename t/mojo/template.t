@@ -25,7 +25,7 @@ package main;
 use strict;
 use warnings;
 
-use Test::More tests => 61;
+use Test::More tests => 62;
 
 use File::Spec;
 use File::Temp;
@@ -80,6 +80,16 @@ is($output->line->[0],              5);
 is($output->line->[1],              'test');
 $output->message("oops!\n");
 $output->stack([['Foo', 'foo', 23], ['Bar', 'bar', 24]]);
+my $backup = $ENV{MOJO_EXCEPTION_VERBOSE};
+$ENV{MOJO_EXCEPTION_VERBOSE} = 0;
+is("$output", <<'EOF');
+Error around line 5.
+3: % {
+4: %= 1 + 1
+5: test
+oops!
+EOF
+$ENV{MOJO_EXCEPTION_VERBOSE} = 1;
 is("$output", <<'EOF');
 Error around line 5.
 3: % {
@@ -89,6 +99,7 @@ foo: 23
 bar: 24
 oops!
 EOF
+$ENV{MOJO_EXCEPTION_VERBOSE} = $backup;
 
 # Exception in module
 $mt     = Mojo::Template->new;

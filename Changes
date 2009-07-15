@@ -8,6 +8,7 @@ This file documents the revision history for Perl extension Mojo.
         - Simplified Mojo::Loader.
         - Simplified Mojo::ByteStream.
         - Simplified exceptions.
+        - Updated all modules to use IO::Poll instead of IO::Select.
         - Updated exception handling in Mojolicious to work with exceptions
           in epl templates.
         - Updated Mojo and Mojolicious to log to STDERR if log directory

@@ -8,7 +8,7 @@ use warnings;
 use base 'Mojo::Server';
 use bytes;
 
-use IO::Select;
+use IO::Poll 'POLLIN';
 
 # Roles
 my @ROLES = qw/RESPONDER  AUTHORIZER FILTER/;
@@ -323,7 +323,11 @@ sub _read_chunk {
     while (length $chunk < $length) {
 
         # We don't wait forever
-        return unless IO::Select->new($connection)->can_read(1);
+        my $poll = IO::Poll->new;
+        $poll->mask($connection, POLLIN);
+        $poll->poll(1);
+        my @readers = $poll->handles(POLLIN);
+        return unless @readers;
 
         # Slurp
         $connection->sysread(my $buffer, $length - length $chunk, 0);

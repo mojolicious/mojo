@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojo::Server';
 
-use IO::Select;
+use IO::Poll 'POLLIN';
 
 __PACKAGE__->attr('nph', default => 0);
 
@@ -27,9 +27,12 @@ sub run {
     $tx->local_port($ENV{SERVER_PORT});
 
     # Request body
-    my $select = IO::Select->new(\*STDIN);
+    my $poll = IO::Poll->new;
+    $poll->mask(\*STDIN, POLLIN);
     while (!$req->is_finished) {
-        last unless $select->can_read(0);
+        $poll->poll(0);
+        my @readers = $poll->handles(POLLIN);
+        last unless @readers;
         my $read = STDIN->sysread(my $buffer, 4096, 0);
         $req->parse($buffer);
     }

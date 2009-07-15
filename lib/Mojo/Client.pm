@@ -7,15 +7,15 @@ use warnings;
 
 use base 'Mojo::Base';
 
+use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
 use IO::Socket::INET;
-use IO::Select;
 use Mojo::Pipeline;
 use Mojo::Server;
 use Socket;
 
 __PACKAGE__->attr('continue_timeout',   default => 5);
 __PACKAGE__->attr('keep_alive_timeout', default => 15);
-__PACKAGE__->attr('select_timeout',     default => 5);
+__PACKAGE__->attr('poll_timeout',       default => 5);
 
 sub connect {
     my ($self, $tx) = @_;
@@ -261,8 +261,7 @@ sub spin {
     return 1 if $done;
 
     # Sort read/write sockets
-    my @read_select;
-    my @write_select;
+    my $poll    = IO::Poll->new;
     my $waiting = 0;
     for my $tx (@transactions) {
 
@@ -272,10 +271,9 @@ sub spin {
         my $connection = $tx->connection;
 
         # We always try to read as suggested by RFC 2616 for HTTP 1.1 clients
-        push @read_select, $connection;
-
-        # Write sockets
-        push @write_select, $connection if ($tx->is_writing);
+        $tx->is_writing
+          ? $poll->mask($connection, POLLIN | POLLOUT)
+          : $poll->mask($connection, POLLIN);
 
         $waiting++;
     }
@@ -283,22 +281,16 @@ sub spin {
     # No sockets ready yet
     return 0 unless $waiting;
 
-    my $read_select  = @read_select  ? IO::Select->new(@read_select)  : undef;
-    my $write_select = @write_select ? IO::Select->new(@write_select) : undef;
-
-    # Select
-    my ($read, $write, undef) =
-      IO::Select->select($read_select, $write_select, undef,
-        $self->select_timeout);
-
-    $read  ||= [];
-    $write ||= [];
+    # Poll
+    $poll->poll($self->poll_timeout);
+    my @readers = $poll->handles(POLLIN | POLLHUP | POLLERR);
+    my @writers = $poll->handles(POLLOUT);
 
     # Make a random decision about reading or writing
     my $do = -1;
-    $do = 0 if @$read;
-    $do = 1 if @$write;
-    $do = int(rand(3)) - 1 if @$read && @$write;
+    $do = 0 if @readers;
+    $do = 1 if @writers;
+    $do = int(rand(3)) - 1 if @readers && @writers;
 
     # Write
     if ($do == 1) {
@@ -306,7 +298,7 @@ sub spin {
         my ($tx, $chunk);
 
         # Check for content randomly
-        for my $connection (sort { int(rand(3)) - 1 } @$write) {
+        for my $connection (sort { int(rand(3)) - 1 } @writers) {
 
             my $name = $self->_socket_name($connection);
             $tx = $transaction{$name};
@@ -331,7 +323,7 @@ sub spin {
     # Read
     elsif ($do == 0) {
 
-        my $connection = $read->[rand(@$read)];
+        my $connection = $readers[rand(@readers)];
         my $name       = $self->_socket_name($connection);
         my $tx         = $transaction{$name};
 
@@ -351,7 +343,11 @@ sub test_connection {
 
     # There are garbage bytes on the socket, or the peer closed the
     # connection if it is readable
-    return IO::Select->new($connection)->can_read(0) ? 0 : 1;
+    my $poll = IO::Poll->new;
+    $poll->mask($connection, POLLIN);
+    $poll->poll(0);
+    my @readers = $poll->handles(POLLIN);
+    return @readers ? 0 : 1;
 }
 
 sub withdraw_connection {
@@ -447,10 +443,10 @@ L<Mojo::Client> implements the following attributes.
     my $keep_alive_timeout = $client->keep_alive_timeout;
     $client                = $client->keep_alive_timeout(15);
 
-=head2 C<select_timeout>
+=head2 C<poll_timeout>
 
-    my $timeout = $client->select_timeout;
-    $client     = $client->select_timeout(5);
+    my $timeout = $client->poll_timeout;
+    $client     = $client->poll_timeout(5);
 
 =head1 METHODS
 

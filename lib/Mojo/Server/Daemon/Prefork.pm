@@ -12,7 +12,7 @@ use constant DEBUG => $ENV{MOJO_SERVER_DEBUG} || 0;
 use Carp 'croak';
 use Fcntl ':flock';
 use IO::File;
-use IO::Select;
+use IO::Poll 'POLLIN';
 use IO::Socket;
 use POSIX 'WNOHANG';
 
@@ -112,7 +112,8 @@ sub run {
     # Pipe for child communication
     pipe($self->{_child_read}, $self->{_child_write})
       or croak "Can't create pipe: $!";
-    $self->{_child_select} = IO::Select->new($self->{_child_read});
+    $self->{_child_poll} = IO::Poll->new;
+    $self->{_child_poll}->mask($self->{_child_read}, POLLIN);
 
     # Create pid file
     $self->_create_pid_file;
@@ -260,7 +261,9 @@ sub _read_messages {
     my $self = shift;
 
     # Read messages
-    if ($self->{_child_select}->can_read(1)) {
+    $self->{_child_poll}->poll(1);
+    my @readers = $self->{_child_poll}->handles(POLLIN);
+    if (@readers) {
         return unless $self->{_child_read}->sysread(my $buffer, 4096);
         $self->{_buffer} .= $buffer;
     }
@@ -322,7 +325,7 @@ sub _spawn_child {
 
         # No need for child reader
         close(delete $self->{_child_read});
-        delete $self->{_child_select};
+        delete $self->{_child_poll};
 
         # Lockfile
         my $lock = $self->pid_file;

@@ -56,7 +56,7 @@ WriteMakefile(
         'File::Temp'            => 0,
         'FindBin'               => 0,
         'IO::File'              => 0,
-        'IO::Select'            => 0,
+        'IO::Poll'              => 0,
         'IO::Socket'            => 0,
         'MIME::Base64'          => 0,
         'MIME::QuotedPrint'     => 0,

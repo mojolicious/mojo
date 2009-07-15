@@ -8,7 +8,7 @@ use warnings;
 use base 'Mojo::Server';
 
 use Carp 'croak';
-use IO::Select;
+use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
 use IO::Socket;
 use Mojo::Pipeline;
 
@@ -63,25 +63,24 @@ sub spin {
 
     $self->_prepare_connections;
     $self->_prepare_transactions;
-    my ($reader, $writer) = $self->_prepare_select;
+    my $poll = $self->_prepare_poll;
 
-    # Select
-    my ($read, $write, undef) =
-      IO::Select->select($reader, $writer, undef, 5);
-    $read  ||= [];
-    $write ||= [];
+    # Poll
+    $poll->poll(5);
+    my @readers = $poll->handles(POLLIN | POLLHUP | POLLERR);
+    my @writers = $poll->handles(POLLOUT);
 
     # Make a random decision about reading or writing
     my $do = -1;
-    $do = 0 if @$read;
-    $do = 1 if @$write;
-    $do = int(rand(3)) - 1 if @$read && @$write;
+    $do = 0 if @readers;
+    $do = 1 if @writers;
+    $do = int(rand(3)) - 1 if @readers && @writers;
 
     # Read
-    if ($do == 0) { $self->_read($read) }
+    if ($do == 0) { $self->_read(\@readers) }
 
     # Write
-    elsif ($do == 1) { $self->_write($write) }
+    elsif ($do == 1) { $self->_write(\@writers) }
 
 }
 
@@ -141,13 +140,13 @@ sub _prepare_connections {
     $self->{_accepted} = [@accepted];
 }
 
-sub _prepare_select {
+sub _prepare_poll {
     my $self = shift;
 
     my @read    = ();
     my $clients = keys %{$self->{_connections}};
 
-    # Select listen socket if we get the lock on it
+    # Poll listen socket if we get the lock on it
     if (($clients < $self->max_clients) && $self->accept_lock(!$clients)) {
         @read = ($self->{listen});
     }
@@ -189,11 +188,12 @@ sub _prepare_select {
         unshift @write, $p->connection if $p->is_writing;
     }
 
-    # Prepare select
-    my $reader = IO::Select->new(@read);
-    my $writer = @write ? IO::Select->new(@write) : undef;
+    # Prepare Poll
+    my $poll = IO::Poll->new;
+    $poll->mask($_, POLLIN)           for @read;
+    $poll->mask($_, POLLIN | POLLOUT) for @write;
 
-    return $reader, $writer;
+    return $poll;
 }
 
 sub _prepare_transactions {

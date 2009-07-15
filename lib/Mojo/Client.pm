@@ -15,7 +15,6 @@ use Socket;
 
 __PACKAGE__->attr('continue_timeout',   default => 5);
 __PACKAGE__->attr('keep_alive_timeout', default => 15);
-__PACKAGE__->attr('poll_timeout',       default => 5);
 
 sub connect {
     my ($self, $tx) = @_;
@@ -282,7 +281,7 @@ sub spin {
     return 0 unless $waiting;
 
     # Poll
-    $poll->poll($self->poll_timeout);
+    $poll->poll(5);
     my @readers = $poll->handles(POLLIN | POLLHUP | POLLERR);
     my @writers = $poll->handles(POLLOUT);
 
@@ -442,11 +441,6 @@ L<Mojo::Client> implements the following attributes.
 
     my $keep_alive_timeout = $client->keep_alive_timeout;
     $client                = $client->keep_alive_timeout(15);
-
-=head2 C<poll_timeout>
-
-    my $timeout = $client->poll_timeout;
-    $client     = $client->poll_timeout(5);
 
 =head1 METHODS
 

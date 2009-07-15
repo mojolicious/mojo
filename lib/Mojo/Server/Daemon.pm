@@ -352,9 +352,10 @@ sub _write {
         # Shortcut
         next unless $name = $self->_socket_name($socket);
 
-        # Data
         my $connection = $self->{_connections}->{$name};
-        $p     = $connection->{pipeline};
+        $p = $connection->{pipeline};
+
+        # Get chunk
         $chunk = $p->server_get_chunk;
 
         # Content generator ready?

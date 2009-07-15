@@ -67,6 +67,7 @@ sub reload {
         # Modified?
         if ($mtime > $STATS->{$file}) {
 
+            # Debug
             warn "\n$key -> $file modified, reloading!\n" if DEBUG;
 
             # Unload
@@ -105,14 +106,20 @@ sub search {
         my $path = File::Spec->catdir($directory, (split /::/, $namespace));
         next unless (-e $path && -d $path);
 
-        # Find
+        # Get files
         opendir(my $dir, $path);
         my @files = grep /\.pm$/, readdir($dir);
         closedir($dir);
+
+        # Check files
         for my $file (@files) {
             my $full =
               File::Spec->catfile(File::Spec->splitdir($path), $file);
+
+            # Directory
             next if -d $full;
+
+            # Found
             my $name = File::Basename::fileparse($file, qr/\.pm/);
             my $class = "$namespace\::$name";
             push @$modules, $class unless $found{$class};

@@ -233,6 +233,7 @@ sub spin {
         # Connected
         elsif ($tx->is_state('connect')) {
 
+            # Timeout
             $tx->continue_timeout($self->continue_timeout);
 
             # Store connection information
@@ -307,6 +308,7 @@ sub spin {
             my $name = $self->_socket_name($connection);
             $tx = $transaction{$name};
 
+            # Get chunk
             $chunk = $tx->client_get_chunk;
 
             # Content generator ready?
@@ -321,6 +323,7 @@ sub spin {
         $tx->error("Can't write to socket: $!") unless defined $written;
         return 1 if $tx->has_error;
 
+        # Written
         $tx->client_written($written);
     }
 

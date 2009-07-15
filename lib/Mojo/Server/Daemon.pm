@@ -61,11 +61,15 @@ sub run {
 sub spin {
     my $self = shift;
 
+    # Default poll instance
+    $self->{_poll} ||= IO::Poll->new;
+
     $self->_prepare_connections;
     $self->_prepare_transactions;
-    my $poll = $self->_prepare_poll;
+    $self->_prepare_poll;
 
     # Poll
+    my $poll = $self->{_poll};
     $poll->poll(5);
     my @readers = $poll->handles(POLLIN | POLLHUP | POLLERR);
     my @writers = $poll->handles(POLLOUT);
@@ -86,6 +90,7 @@ sub spin {
 
 sub _drop_connection {
     my ($self, $name) = @_;
+    $self->{_poll}->remove($self->{_connections}->{$name}->{socket});
     close $self->{_connections}->{$name}->{socket};
     delete $self->{_reverse}->{$self->{_connections}->{$name}};
     delete $self->{_connections}->{$name};
@@ -143,15 +148,14 @@ sub _prepare_connections {
 sub _prepare_poll {
     my $self = shift;
 
-    my @read    = ();
+    my $poll    = $self->{_poll};
     my $clients = keys %{$self->{_connections}};
 
     # Poll listen socket if we get the lock on it
     if (($clients < $self->max_clients) && $self->accept_lock(!$clients)) {
-        @read = ($self->{listen});
+        $poll->mask($self->{listen}, POLLIN);
     }
-
-    my @write = ();
+    else { $poll->remove($self->{listen}) }
 
     # Sort read/write handles and timeouts
     for my $name (keys %{$self->{_connections}}) {
@@ -177,23 +181,15 @@ sub _prepare_poll {
             }
 
             # Keep alive
-            else { unshift @read, $connection->{socket} }
+            else { $poll->mask($connection->{socket}, POLLIN) }
             next;
         }
 
         # We always try to read as sugegsted by the HTTP spec
-        unshift @read, $p->connection;
-
-        # Write
-        unshift @write, $p->connection if $p->is_writing;
+        $p->is_writing
+          ? $poll->mask($p->connection, POLLIN | POLLOUT)
+          : $poll->mask($p->connection, POLLIN);
     }
-
-    # Prepare Poll
-    my $poll = IO::Poll->new;
-    $poll->mask($_, POLLIN)           for @read;
-    $poll->mask($_, POLLIN | POLLOUT) for @write;
-
-    return $poll;
 }
 
 sub _prepare_transactions {

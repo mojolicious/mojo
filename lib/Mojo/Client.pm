@@ -346,7 +346,7 @@ sub test_connection {
     my $poll = IO::Poll->new;
     $poll->mask($connection, POLLIN);
     $poll->poll(0);
-    my @readers = $poll->handles(POLLIN);
+    my @readers = $poll->handles(POLLIN | POLLHUP | POLLERR);
     return @readers ? 0 : 1;
 }
 

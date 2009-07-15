@@ -19,6 +19,7 @@ __PACKAGE__->attr('keep_alive_timeout', default => 15);
 sub connect {
     my ($self, $tx) = @_;
 
+    # Info
     my ($scheme, $host, $address, $port) = $tx->client_info;
 
     # Try to get a cached connection
@@ -70,6 +71,7 @@ sub deposit_connection {
 sub open_connection {
     my ($self, $scheme, $address, $port) = @_;
 
+    # New connection
     my $connection = IO::Socket::INET->new(
         Proto => 'tcp',
         Type  => SOCK_STREAM
@@ -78,6 +80,7 @@ sub open_connection {
     # Non blocking
     $connection->blocking(0);
 
+    # Connect
     my $sin = sockaddr_in($port, inet_aton($address));
     $connection->connect($sin);
 
@@ -92,29 +95,31 @@ sub process {
     # Parallel async io main loop... woot!
     while (1) { last if $self->spin(@transactions) }
 
-    # Finished transactions should be returned first
-    my @sorted;
-    while (my $tx = shift @transactions) {
-        $tx->is_finished ? unshift(@sorted, $tx) : push(@sorted, $tx);
-    }
-
-    return @sorted;
+    # Done
+    return @transactions;
 }
 
 sub process_all {
     my ($self, @transactions) = @_;
 
     my @finished;
-    my @progress = @transactions;
 
     # Process until all transactions are finished
     while (1) {
-        my @done = $self->process(@progress);
-        @progress = ();
+
+        # Process
+        my @done = $self->process(@transactions);
+        @transactions = ();
+
+        # Check
         for my $tx (@done) {
-            $tx->is_finished ? push(@finished, $tx) : push(@progress, $tx);
+            $tx->is_finished
+              ? push(@finished,     $tx)
+              : push(@transactions, $tx);
         }
-        last unless @progress;
+
+        # Done
+        last unless @transactions;
     }
 
     return @finished;
@@ -326,11 +331,13 @@ sub spin {
         my $name       = $self->_socket_name($connection);
         my $tx         = $transaction{$name};
 
+        # Read chunk
         my $buffer;
         my $read = $connection->sysread($buffer, 1024, 0);
         $tx->error("Can't read from socket: $!") unless defined $read;
         return 1 if $tx->has_error;
 
+        # Parse
         $tx->client_read($buffer);
     }
 
@@ -340,8 +347,7 @@ sub spin {
 sub test_connection {
     my ($self, $connection) = @_;
 
-    # There are garbage bytes on the socket, or the peer closed the
-    # connection if it is readable
+    # There are garbage bytes on the socket or peer closed the connection
     my $poll = IO::Poll->new;
     $poll->mask($connection, POLLIN);
     $poll->poll(0);
@@ -361,10 +367,14 @@ sub withdraw_connection {
     # Check all connections for name, timeout and if they are still alive
     for my $conn (@{$self->{_connections}}) {
         my ($name, $connection, $timeout) = @{$conn};
+
+        # Found
         if ($match eq $name) {
             $result = $connection
               if (time < $timeout) && $self->test_connection($connection);
         }
+
+        # Check time
         else { push(@connections, $conn) if time < $timeout }
     }
 
@@ -398,6 +408,8 @@ sub _handle_app {
 
 sub _socket_name {
     my ($self, $s) = @_;
+
+    # Generate
     return
         unpack('H*', $s->sockaddr)
       . $s->sockport

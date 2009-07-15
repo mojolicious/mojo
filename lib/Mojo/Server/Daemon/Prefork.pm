@@ -187,6 +187,7 @@ sub _create_pid_file {
 sub _kill_children {
     my $self = shift;
 
+    # Close pipe
     delete $self->{_child_read};
 
     # Kill all children
@@ -197,7 +198,11 @@ sub _kill_children {
             $self->log("Killing child $pid") if DEBUG;
             kill 'TERM', $pid;
         }
+
+        # Cleanup
         $self->_cleanup_children;
+
+        # Wait
         sleep 1;
     }
 

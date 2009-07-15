@@ -102,7 +102,7 @@ __500__
 </html>
 __mojo__
 % my $class = shift;
-#!/usr/bin/perl
+#!/usr/bin/env perl -w
 
 # Copyright (C) 2008-2009, Sebastian Riedel.
 
@@ -182,7 +182,7 @@ __static__
 </html>
 __test__
 % my $class = shift;
-#!perl
+#!/usr/bin/env perl -w
 
 use strict;
 use warnings;

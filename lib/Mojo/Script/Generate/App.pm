@@ -78,7 +78,7 @@ implements the following new ones.
 __DATA__
 __mojo__
 % my $class = shift;
-#!/usr/bin/perl
+#!/usr/bin/env perl -w
 
 # Copyright (C) 2008-2009, Sebastian Riedel.
 
@@ -124,7 +124,7 @@ sub handler {
 1;
 __test__
 % my $class = shift;
-#!perl
+#!/usr/bin/env perl -w
 
 use strict;
 use warnings;

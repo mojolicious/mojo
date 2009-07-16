@@ -80,7 +80,7 @@ is($output->line->[0],              5);
 is($output->line->[1],              'test');
 $output->message("oops!\n");
 $output->stack([['Foo', 'foo', 23], ['Bar', 'bar', 24]]);
-my $backup = $ENV{MOJO_EXCEPTION_VERBOSE};
+my $backup = $ENV{MOJO_EXCEPTION_VERBOSE} || '';
 $ENV{MOJO_EXCEPTION_VERBOSE} = 0;
 is("$output", <<'EOF');
 Error around line 5.

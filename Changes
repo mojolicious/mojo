@@ -1,6 +1,9 @@
 This file documents the revision history for Perl extension Mojo.
 
-0.991237 2009-07-07 00:00:00
+0.991238 2009-07-16 00:00:00
+        - Fixed all shebang lines.
+
+0.991237 2009-07-15 00:00:00
         - Renamed process_local to process_app in Mojo::Client, this change
           is not backward compatible and you might have to change some of
           your tests.

@@ -68,7 +68,7 @@ and implements the following new ones.
 __DATA__
 __makefile__
 % my ($class, $path, $name) = @_;
-#!/usr/bin/env perl -w
+#!/usr/bin/env perl
 
 use 5.008001;
 

@@ -14,7 +14,7 @@ use Fcntl ':flock';
 use IO::File;
 use IO::Poll 'POLLIN';
 use IO::Socket;
-use POSIX 'WNOHANG';
+use POSIX qw/setsid WNOHANG/;
 
 __PACKAGE__->attr('cleanup_interval',                    default => 15);
 __PACKAGE__->attr('idle_timeout',                        default => 30);
@@ -86,7 +86,7 @@ sub daemonize {
     # Fork and kill parent
     croak "Can't fork: $!" unless defined(my $child = fork);
     exit 0 if $child;
-    setsid();
+    setsid() or croak "Can't start a new session: $!";
 
     # Close file handles
     open STDIN,  '</dev/null';
@@ -265,6 +265,9 @@ sub _manage_children {
 sub _read_messages {
     my $self = shift;
 
+    # Initialize
+    $self->{_buffer} ||= '';
+
     # Read messages
     $self->{_child_poll}->poll(1);
     my @readers = $self->{_child_poll}->handles(POLLIN);
@@ -340,6 +343,9 @@ sub _spawn_child {
         # Parent will send a SIGHUP when there are too many children idle
         my $done = 0;
         $SIG{HUP} = sub { $done++ };
+
+        # User and group
+        $self->setuidgid;
 
         # Spin
         while (!$done) {

@@ -3,7 +3,10 @@ This file documents the revision history for Perl extension Mojo.
 0.991239 2009-07-16 00:00:00
         - Renamed bin directory to script, old apps should not break but you
           are still encouraged to rename the directory yourself.
-        - Fixed warning template.t.
+        - Added setuid/setgid support to Mojo::Server::Daemon and
+          Mojo::Server::Daemon::Prefork. (James Duncan)
+        - Fixed import problem in Mojo::Server::Daemon::Prefork. (James Duncan)
+        - Fixed warning in template.t.
 
 0.991238 2009-07-16 00:00:00
         - Fixed all shebang lines.

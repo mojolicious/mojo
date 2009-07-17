@@ -12,6 +12,7 @@ use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
 use IO::Socket;
 use Mojo::Pipeline;
 
+__PACKAGE__->attr([qw/group user/]);
 __PACKAGE__->attr('keep_alive_timeout',      default => 15);
 __PACKAGE__->attr('listen_queue_size',       default => SOMAXCONN);
 __PACKAGE__->attr('max_clients',             default => 1000);
@@ -56,8 +57,43 @@ sub run {
     # Listen
     $self->listen;
 
+    # User and group
+    $self->setuidgid;
+
     # Spin
     $self->spin while 1;
+}
+
+sub setuidgid {
+    my $self = shift;
+
+    # Group
+    if (my $group = $self->group) {
+        if (my $gid = (getgrnam($group))[2]) {
+
+            # Cleanup
+            undef $!;
+
+            # Switch
+            $) = $gid;
+            croak qq/Can't switch to effective group "$group": $!/ if $!;
+        }
+    }
+
+    # User
+    if (my $user = $self->user) {
+        if (my $uid = (getpwnam($user))[2]) {
+
+            # Cleanup
+            undef $!;
+
+            # Switch
+            $> = $uid;
+            croak qq/Can't switch to effective user "$user": $!/ if $!;
+        }
+    }
+
+    return $self;
 }
 
 sub spin {
@@ -407,6 +443,11 @@ L<Mojo::Server::Daemon> is a simple and portable async io based HTTP server.
 L<Mojo::Server::Daemon> inherits all attributes from L<Mojo::Server> and
 implements the following new ones.
 
+=head2 C<group>
+
+    my $group = $daemon->group;
+    $daemon   = $daemon->group('users');
+
 =head2 C<keep_alive_timeout>
 
     my $keep_alive_timeout = $daemon->keep_alive_timeout;
@@ -432,6 +473,11 @@ implements the following new ones.
     my $port = $daemon->port;
     $daemon  = $daemon->port(3000);
 
+=head2 C<user>
+
+    my $user = $daemon->user;
+    $daemon  = $daemon->user('web');
+
 =head1 METHODS
 
 L<Mojo::Server::Daemon> inherits all methods from L<Mojo::Server> and
@@ -453,6 +499,10 @@ implements the following new ones.
 =head2 C<run>
 
     $daemon->run;
+
+=head2 C<setuidgid>
+
+    $daemon->setuidgid;
 
 =head2 C<spin>
 

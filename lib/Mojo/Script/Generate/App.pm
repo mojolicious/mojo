@@ -23,8 +23,8 @@ sub run {
     my $name = $self->class_to_file($class);
 
     # Script
-    $self->render_to_rel_file('mojo', "$name/bin/$name", $class);
-    $self->chmod_file("$name/bin/$name", 0744);
+    $self->render_to_rel_file('mojo', "$name/script/$name", $class);
+    $self->chmod_file("$name/script/$name", 0744);
 
     # Appclass
     my $path = $self->class_to_path($class);

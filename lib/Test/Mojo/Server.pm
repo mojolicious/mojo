@@ -213,13 +213,13 @@ sub _find_executable {
     for (1 .. 5) {
         push @uplevel, '..';
 
-        # App executable in bin directory
-        $path = File::Spec->catfile(@base, @uplevel, 'bin', $name);
+        # App executable in script directory
+        $path = File::Spec->catfile(@base, @uplevel, 'script', $name);
         last if -f $path;
 
-        # Custom executable in bin directory
+        # Custom executable in script directory
         $path =
-          File::Spec->catfile(@base, @uplevel, 'bin', $self->executable);
+          File::Spec->catfile(@base, @uplevel, 'script', $self->executable);
         last if -f $path;
     }
 

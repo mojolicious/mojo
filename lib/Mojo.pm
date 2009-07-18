@@ -167,6 +167,8 @@ James Duncan
 
 Jesse Vincent
 
+Kazuhiro Shibuya
+
 Lars Balker Rasmussen
 
 Leon Brocard

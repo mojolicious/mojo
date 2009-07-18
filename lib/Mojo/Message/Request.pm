@@ -96,10 +96,10 @@ sub parse {
 
         # Base URL
         $self->url->base->scheme('http') unless $self->url->base->scheme;
-	if (!$self->url->base->authority && $self->headers->host) {
-	    my $host = $self->headers->host;
-	    $self->url->base->authority($host);
-	}
+        if (!$self->url->base->authority && $self->headers->host) {
+            my $host = $self->headers->host;
+            $self->url->base->authority($host);
+        }
     }
 
     return $self;

@@ -68,13 +68,6 @@ __PACKAGE__->attr(
     }
 );
 
-# It's up to the subclass to decide where log messages go
-sub log {
-    my ($self, $msg) = @_;
-    my $time = localtime(time);
-    warn "[$time] [$$] $msg\n";
-}
-
 # Are you saying you're never going to eat any animal again? What about bacon?
 # No.
 # Ham?
@@ -149,10 +142,6 @@ L<Mojo::Server> implements the following attributes.
 
 L<Mojo::Server> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
-
-=head2 C<log>
-
-    $server->log('Test 123');
 
 =head2 C<run>
 

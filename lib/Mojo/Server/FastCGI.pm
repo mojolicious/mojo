@@ -56,7 +56,8 @@ sub accept_connection {
     # Accept
     my $connection = undef;
     unless (accept $connection, $self->{_listen}) {
-        $self->{error} = "Can't accept connection: $!";
+        $self->app->log->error("Can't accept FastCGI connection: $!");
+        return;
     }
 
     # Blocking sucks
@@ -96,7 +97,8 @@ sub read_request {
     # Type
     my ($type, $id, $body) = $self->read_record($connection);
     unless ($type && $type eq 'BEGIN_REQUEST') {
-        $self->{error} = "First record wasn't a begin request";
+        $self->app->log->error(
+            "First FastCGI record wasn't a begin request.");
         return;
     }
     $ENV{FCGI_ID} = $tx->{fcgi_id} = $id;
@@ -176,7 +178,10 @@ sub run {
         my $tx = $self->read_request($connection);
 
         # Error
-        next unless $tx;
+        unless ($tx) {
+            $self->app->log->error("No transaction for FastCGI request.");
+            next;
+        }
 
         # Handle
         $self->handler_cb->($self, $tx);

@@ -129,7 +129,7 @@ sub run {
     # Parent stuff
     $self->parent;
 
-    $self->log('Parent started') if DEBUG;
+    $self->app->log->debug('Prefork parent started.') if DEBUG;
 
     # Prefork
     $self->_spawn_child for (1 .. $self->start_servers);
@@ -195,7 +195,7 @@ sub _kill_children {
 
         # Die die die
         for my $pid (keys %{$self->{_children}}) {
-            $self->log("Killing child $pid") if DEBUG;
+            $self->app->log->debug("Killing prefork child $pid.") if DEBUG;
             kill 'TERM', $pid;
         }
 
@@ -223,7 +223,8 @@ sub _manage_children {
         my $idle  = @idle;
         my $total = keys %{$self->{_children}};
         my $spawn = $self->{_spawn};
-        $self->log("$idle of $total children idle, 1 listen (spawn $spawn)");
+        $self->app->log->debug(
+            "$idle of $total children idle, 1 listen (spawn $spawn).");
     }
 
     # Need more children
@@ -246,7 +247,7 @@ sub _manage_children {
         for my $idle (@idle) {
             next unless $timeout > $self->{_children}->{$idle}->{time};
             kill 'HUP', $idle;
-            $self->log("Child $idle stopped") if DEBUG;
+            $self->app->log->debug("Prefork child $idle stopped.") if DEBUG;
 
             # Spawn counter
             $self->{_spawn} = $self->{_spawn} / 2 if $self->{_spawn} >= 2;
@@ -304,7 +305,7 @@ sub _read_messages {
 sub _reap_child {
     my $self = shift;
     while ((my $child = waitpid(-1, WNOHANG)) > 0) {
-        $self->log("Child $child died") if DEBUG;
+        $self->app->log->debug("Prefork child $child died.") if DEBUG;
         delete $self->{_children}->{$child};
     }
 }
@@ -329,7 +330,7 @@ sub _spawn_child {
     # Do child stuff
     unless ($child) {
 
-        $self->log('Child started') if DEBUG;
+        $self->app->log->debug('Prefork child started.') if DEBUG;
 
         # No need for child reader
         close(delete $self->{_child_read});

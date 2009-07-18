@@ -5,6 +5,8 @@ This file documents the revision history for Perl extension Mojo.
           are still encouraged to rename the directory yourself.
         - Added setuid/setgid support to Mojo::Server::Daemon and
           Mojo::Server::Daemon::Prefork. (James Duncan)
+        - Updated Mojo::Server::FastCGI and Mojo::Server::Daemon::Prefork to
+          use the application logger.
         - Fixed import problem in Mojo::Server::Daemon::Prefork. (James Duncan)
         - Fixed warning in template.t.
 

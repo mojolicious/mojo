@@ -46,8 +46,6 @@ sub detect {
         return $self;
     }
 
-    my $name = Mojo::Script->class_to_file($class);
-
     # Try to find home from lib directory
     if ($class) {
 

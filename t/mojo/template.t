@@ -37,8 +37,7 @@ use_ok('Mojo::Template');
 
 # Strict
 my $mt     = Mojo::Template->new;
-my $output = '';
-$mt->render(<<'EOF', \$output);
+my $output = $mt->render(<<'EOF');
 % $foo = 1;
 EOF
 is(ref $output, 'Mojo::Template::Exception');
@@ -46,8 +45,7 @@ like($output->message, qr/^Global symbol "\$foo" requires/);
 
 # Importing into a template
 $mt     = Mojo::Template->new;
-$output = '';
-$mt->render(<<'EOF', \$output);
+$output = $mt->render(<<'EOF');
 % BEGIN { MyTemplateExporter->import }
 %= __PACKAGE__
 %= foo
@@ -62,8 +60,7 @@ is($output, 'Mojo::Templateworks!');
 
 # Compile time exception
 $mt     = Mojo::Template->new;
-$output = '';
-$mt->render(<<'EOF', \$output);
+$output = $mt->render(<<'EOF');
 test
 123
 % {
@@ -103,8 +100,7 @@ $ENV{MOJO_EXCEPTION_VERBOSE} = $backup;
 
 # Exception in module
 $mt     = Mojo::Template->new;
-$output = '';
-$mt->render(<<'EOF', \$output);
+$output = $mt->render(<<'EOF');
 test
 123
 %= MyTemplateException->exception
@@ -137,8 +133,7 @@ EOF
 
 # Excpetion in template
 $mt     = Mojo::Template->new;
-$output = '';
-$mt->render(<<'EOF', \$output);
+$output = $mt->render(<<'EOF');
 test
 123
 % die 'oops!';
@@ -171,8 +166,7 @@ EOF
 
 # Control structures
 $mt     = Mojo::Template->new;
-$output = '';
-$mt->render(<<'EOF', \$output);
+$output = $mt->render(<<'EOF');
 % if (23 > 22) {
 foo
 % }
@@ -206,14 +200,12 @@ unlike($mt->code, qr/ comment lalala /);
 ok(!defined($mt->compiled));
 $mt->compile;
 is(ref($mt->compiled), 'CODE');
-$output = '';
-$mt->interpret(\$output, 2);
+$output = $mt->interpret(2);
 is($output, "<html foo=\"bar\">\n3 test 4 lala \n4\%\n</html>\n");
 
 # Arguments
-$mt     = Mojo::Template->new;
-$output = '';
-$mt->render(<<'EOF', \$output, 'test', {foo => 'bar'});
+$mt = Mojo::Template->new;
+$output = $mt->render(<<'EOF', 'test', {foo => 'bar'});
 % my $message = shift;
 <html><% my $hash = $_[0]; %>
 %= $message . ' ' . $hash->{foo}
@@ -223,8 +215,7 @@ is($output, "<html>\ntest bar</html>\n");
 
 # Ugly multiline loop
 $mt     = Mojo::Template->new;
-$output = '';
-$mt->render(<<'EOF', \$output);
+$output = $mt->render(<<'EOF');
 % my $nums = '';
 <html><% for my $i (1..4) {
     $nums .= "$i";
@@ -234,8 +225,7 @@ is($output, "<html>1234</html>\n");
 
 # Clean multiline loop
 $mt     = Mojo::Template->new;
-$output = '';
-$mt->render(<<'EOF', \$output);
+$output = $mt->render(<<'EOF');
 <html>
 %  for my $i (1..4) {
 %=    $i
@@ -246,8 +236,7 @@ is($output, "<html>\n1234</html>\n");
 
 # Escaped line ending
 $mt     = Mojo::Template->new;
-$output = '';
-$mt->render(<<'EOF', \$output);
+$output = $mt->render(<<'EOF');
 <html>\
 %= '2' x 4
 </html>\\\\
@@ -256,8 +245,7 @@ is($output, "<html>2222</html>\\\\\\\n");
 
 # Multiline comment
 $mt     = Mojo::Template->new;
-$output = '';
-$mt->render(<<'EOF', \$output);
+$output = $mt->render(<<'EOF');
 <html><%# this is
 a
 comment %>this not
@@ -270,15 +258,13 @@ is($output, "<html>this not\n1234</html>\n");
 
 # Oneliner
 $mt     = Mojo::Template->new;
-$output = '';
-$mt->render('<html><%= 3 * 3 %></html>\\', \$output);
+$output = $mt->render('<html><%= 3 * 3 %></html>\\');
 is($output, '<html>9</html>');
 
 # Different line start
 $mt = Mojo::Template->new;
 $mt->line_start('$');
-$output = '';
-$mt->render(<<'EOF', \$output);
+$output = $mt->render(<<'EOF');
 <html>\
 $= '2' x 4
 </html>\\\\
@@ -287,8 +273,7 @@ is($output, "<html>2222</html>\\\\\\\n");
 
 # Multiline expression
 $mt     = Mojo::Template->new;
-$output = '';
-$mt->render(<<'EOF', \$output);
+$output = $mt->render(<<'EOF');
 <html><%= do { my $i = '2';
 $i x 4; }; %>\
 </html>\
@@ -300,8 +285,7 @@ $mt = Mojo::Template->new;
 $mt->tag_start('[$-');
 $mt->tag_end('-$]');
 $mt->line_start('$-');
-$output = '';
-$mt->render(<<'EOF', \$output, 'test', {foo => 'bar'});
+$output = $mt->render(<<'EOF', 'test', {foo => 'bar'});
 $- my $message = shift;
 <html>[$- my $hash = $_[0]; -$]
 $-= $message . ' ' . $hash->{foo}
@@ -313,8 +297,7 @@ is($output, "<html>\ntest bar</html>\n");
 $mt = Mojo::Template->new;
 $mt->comment_mark('@@@');
 $mt->expression_mark('---');
-$output = '';
-$mt->render(<<'EOF', \$output, 'test', {foo => 'bar'});
+$output = $mt->render(<<'EOF', 'test', {foo => 'bar'});
 % my $message = shift;
 <html><% my $hash = $_[0]; %><%@@@ comment lalala %>
 %--- $message . ' ' . $hash->{foo}
@@ -326,8 +309,7 @@ is($output, "<html>\ntest bar</html>\n");
 $mt = Mojo::Template->new;
 my $file =
   File::Spec->catfile(File::Spec->splitdir($FindBin::Bin), qw/lib test.mt/);
-$output = '';
-$mt->render_file($file, \$output, 3);
+$output = $mt->render_file($file, 3);
 like($output, qr/23Hello World!/);
 
 # File to file with utf8 data
@@ -336,15 +318,14 @@ $mt->tag_start('[$-');
 $mt->tag_end('-$]');
 my $dir = File::Temp::tempdir();
 $file = File::Spec->catfile($dir, 'test.mt');
-is($mt->render_to_file(<<"EOF", $file), 1);
+is($mt->render_to_file(<<"EOF", $file), 0);
 <% my \$i = 23; %> foo bar
 \x{df}\x{0100}bar\x{263a} <%= \$i %>
 test
 EOF
 $mt = Mojo::Template->new;
 my $file2 = File::Spec->catfile($dir, 'test2.mt');
-is($mt->render_file_to_file($file, $file2), 1);
-$output = '';
+is($mt->render_file_to_file($file, $file2), 0);
 $mt     = Mojo::Template->new;
-$mt->render_file($file2, \$output);
+$output = $mt->render_file($file2);
 is($output, " foo bar\n\x{df}\x{0100}bar\x{263a} 23\ntest\n");

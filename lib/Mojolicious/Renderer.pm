@@ -34,27 +34,25 @@ sub new {
             $self->{_mt_cache} ||= {};
             my $mt = $self->{_mt_cache}->{$path};
 
-            my $success;
-
             # Interpret again
-            if ($mt) { $success = $mt->interpret($output, $c) }
+            if ($mt) { $$output = $mt->interpret($c) }
 
             # No cache
             else {
 
                 # Initialize
                 $mt = $self->{_mt_cache}->{$path} = Mojo::Template->new;
-                $success = $mt->render_file($path, $output, $c);
+                $$output = $mt->render_file($path, $c);
             }
 
             # Exception
-            if (!$success && $c->app->mode eq 'development') {
+            if (ref $$output && $c->app->mode eq 'development') {
 
                 # Exception template failed
                 if ($c->stash->{exception}) {
                     $c->app->log->error(
                         "Exception template error:\n$$output");
-                    return $success;
+                    return;
                 }
 
                 # Log
@@ -69,7 +67,8 @@ sub new {
                 return 1;
             }
 
-            return $success;
+            # Success or exception?
+            return ref $$output ? 0 : 1;
         }
     );
     return $self;

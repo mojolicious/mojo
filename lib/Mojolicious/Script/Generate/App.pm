@@ -125,8 +125,7 @@ Please visit http://mojolicious.org for detailed installation instructions.
 EOF
 
 # Start the script system
-my $scripts = Mojolicious::Scripts->new;
-$scripts->run(@ARGV);
+Mojolicious::Scripts->new->run(@ARGV);
 __appclass__
 % my $class = shift;
 package <%= $class %>;

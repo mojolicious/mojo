@@ -101,8 +101,7 @@ Please visit http://mojolicious.org for detailed installation instructions.
 EOF
 
 # Start the script system
-my $scripts = Mojo::Scripts->new;
-$scripts->run(@ARGV);
+Mojo::Scripts->new->run(@ARGV);
 __appclass__
 % my $class = shift;
 package <%= $class %>;

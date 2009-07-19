@@ -51,7 +51,7 @@ $output = $mt->render(<<'EOF');
 %= foo
 EOF
 is($output, 'Mojo::Templateworks!');
-$mt->render(<<'EOF', \$output);
+$mt->render(<<'EOF');
 % BEGIN { MyTemplateExporter->import }
 %= __PACKAGE__
 %= foo

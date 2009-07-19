@@ -8,7 +8,6 @@ use warnings;
 use base 'Mojo::Server';
 use bytes;
 
-use Carp 'croak';
 use IO::Handle;
 use IO::Poll 'POLLIN';
 

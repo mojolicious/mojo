@@ -55,12 +55,18 @@ sub accept_connection {
     # Listen socket?
     open $self->{_listen}, '<&=0' unless $self->{_listen};
 
+    # Debug
+    $self->app->log->debug('FastCGI listen socket opened.') if DEBUG;
+
     # Accept
     my $connection = undef;
     unless (accept $connection, $self->{_listen}) {
         $self->app->log->error("Can't accept FastCGI connection: $!");
         return;
     }
+
+    # Debug
+    $self->app->log->debug('Accepted FastCGI connection.') if DEBUG;
 
     # Blocking sucks
     $connection->blocking(0);
@@ -97,6 +103,9 @@ sub read_record {
 
 sub read_request {
     my ($self, $connection) = @_;
+
+    # Debug
+    $self->app->log->debug('Reading FastCGI request.') if DEBUG;
 
     # Transaction
     my $tx = $self->build_tx_cb->($self);
@@ -192,6 +201,9 @@ sub run {
             next;
         }
 
+        # Debug
+        $self->app->log->debug('Handling FastCGI request.') if DEBUG;
+
         # Handle
         $self->handler_cb->($self, $tx);
 
@@ -262,6 +274,10 @@ sub write_records {
 
 sub write_response {
     my ($self, $tx) = @_;
+
+    # Debug
+    $self->app->log->debug('Writing FastCGI response.') if DEBUG;
+
     my $connection = $tx->connection;
     my $res        = $tx->res;
 

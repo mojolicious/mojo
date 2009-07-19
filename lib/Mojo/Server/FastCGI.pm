@@ -10,6 +10,8 @@ use bytes;
 
 use IO::Poll 'POLLIN';
 
+use constant DEBUG => $ENV{MOJO_SERVER_DEBUG} || 0;
+
 # Roles
 my @ROLES = qw/RESPONDER  AUTHORIZER FILTER/;
 my %ROLE_NUMBERS;
@@ -82,6 +84,13 @@ sub read_record {
 
     # Ignore padding bytes
     $body = $plen ? substr($body, $clen, 0, '') : $body;
+
+    # Debug
+    if (DEBUG) {
+        my $t = $self->type_name($type);
+        $self->app->log->debug(
+            qq/Reading FastCGI record: $type - $id - "$body"./);
+    }
 
     return $self->type_name($type), $id, $body;
 }
@@ -223,6 +232,14 @@ sub write_records {
 
         # FCGI version 1 record
         my $template = "CCnnCxa${len}x$padlen";
+
+        # Debug
+        if (DEBUG) {
+            my $chunk = substr($body, $offset, $len);
+            $self->app->log->debug(
+                qq/Writing FastCGI record: $type - $id - "$chunk"./);
+        }
+
         my $record = pack $template, 1, $self->type_number($type), $id, $len,
           $padlen,
           substr($body, $offset, $len);

@@ -39,6 +39,11 @@ sub startup {
     # Routes
     my $r = $self->routes;
 
+    # /test4 - named route for url_for
+    $r->route('/test4/(something)')
+      ->to(controller => 'foo', action => 'something', something => 23)
+      ->name('soemthing');
+
     # /test3 - no class, just a namespace
     $r->route('/test3')
       ->to(namespace => 'MojoliciousTestController', method => 'index');

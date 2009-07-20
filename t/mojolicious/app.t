@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 80;
+use Test::More tests => 84;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -72,6 +72,14 @@ is($tx->res->headers->content_type,           'text/html');
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 like($tx->res->body, qr/Hello Mojo from the other template \/foo-bar!/);
+
+# Foo::something
+$tx = Mojo::Transaction->new_get('/test4', 'X-Test' => 'Hi there!');
+$client->process_app('MojoliciousTest', $tx);
+is($tx->res->code,                            200);
+is($tx->res->headers->server,                 'Mojo (Perl)');
+is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+is($tx->res->body,                            '/test4/42');
 
 # Foo::templateless
 $tx =

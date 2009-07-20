@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojo.
 
+0.991241 2009-07-20 00:00:00
+        - Code cleanup.
+
 0.991240 2009-07-19 00:00:00
         - Turned Mojolicious layout rendering inside out for better exception
           handling and to make layouts configurable from templates.

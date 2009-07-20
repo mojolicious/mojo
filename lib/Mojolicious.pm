@@ -110,7 +110,7 @@ sub handler {
     # Start timer
     my $start = [Time::HiRes::gettimeofday()];
 
-    # Build context and dispatch
+    # Build context and process
     eval { $self->process($self->build_ctx($tx)) };
     $self->log->error("Processing request failed: $@") if $@;
 

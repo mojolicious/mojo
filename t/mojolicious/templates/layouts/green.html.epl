@@ -1,0 +1,8 @@
+%# Please don't eat me! I have a wife and kids. Eat them!
+% my $self = shift;
+<!html>
+<head></head>
+<body>
+Same old in green <%= $self->render_inner %>
+</body>
+</html>

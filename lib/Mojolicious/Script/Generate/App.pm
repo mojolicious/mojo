@@ -209,6 +209,7 @@ __exception__
 % my $self = shift;
 % my $s = $self->stash;
 % my $e = delete $s->{exception};
+% delete $s->{inner_template};
 <!html>
 <head><title>Exception</title></head>
     <body>

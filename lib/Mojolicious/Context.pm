@@ -38,11 +38,7 @@ sub render {
     return $self->app->renderer->render($self);
 }
 
-sub render_inner {
-    my $self = shift;
-    local $self->stash->{template} = delete $self->stash->{inner_template};
-    return $self->render_partial(@_);
-}
+sub render_inner { delete shift->stash->{inner_template} }
 
 sub render_partial {
     my $self = shift;
@@ -104,13 +100,12 @@ L<MojoX::Dispatcher::Routes::Context> and implements the following new ones.
 
 =head2 C<render_inner>
 
-    $c->render_inner;
-    $c->render_inner(action => 'foo');
+    my $output = $c->render_inner;
 
 =head2 C<render_partial>
 
-    $c->render_partial;
-    $c->render_partial(action => 'foo');
+    my $output = $c->render_partial;
+    my $output = $c->render_partial(action => 'foo');
 
 =head2 C<url_for>
 

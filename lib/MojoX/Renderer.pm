@@ -34,53 +34,23 @@ sub render {
     # We got called
     $c->stash->{rendered} = 1;
 
-    my $template;
-
-    # Layout first
-    if (my $layout = delete $c->stash->{layout}) {
-        $template = File::Spec->catfile('layouts', $layout);
-        $c->stash->{inner_template} = delete $c->stash->{template};
-    }
-
-    # Normal template
-    else { $template = delete $c->stash->{template} }
-
-    # Nothing to do
-    return unless $template;
-
-    # Handler precedence
-    $self->precedence([sort keys %{$self->handler}])
-      unless $self->precedence;
-
-    # Format
-    return unless $template = $self->_fix_format($c, $template);
-
-    # Handler
-    return unless $template = $self->_fix_handler($c, $template);
-
-    # Extract
-    $template =~ /\.(\w+)(?:\.(\w+))?$/;
-    my $format = $1;
-    my $handler = $c->stash->{handler} || $2 || $self->default_handler;
-
-    # Renderer
-    my $r = $self->handler->{$handler};
-
-    # No handler
-    unless ($r) {
-        $c->app->log->error(qq/No handler for "$handler" available./);
-        return;
-    }
-
     # Partial?
-    my $partial = $c->stash->{partial};
+    my $partial = delete $c->stash->{partial};
+
+    my ($output, $template);
 
     # Template
-    $c->stash->{template} = $template;
+    if ($template = delete $c->stash->{template}) {
+        if ($self->_render_template($c, \$output, \$template)) {
+            $c->stash->{inner_template} = $output if $c->stash->{layout};
+        }
+    }
 
-    # Render
-    my $output;
-    return unless $r->($self, $c, \$output);
+    # Layout
+    if (my $layout = delete $c->stash->{layout}) {
+        $template = File::Spec->catfile('layouts', $layout);
+        $self->_render_template($c, \$output, \$template);
+    }
 
     # Partial
     return $output if $partial;
@@ -90,12 +60,15 @@ sub render {
     $res->code(200) unless $res->code;
     $res->body($output) unless $res->body;
 
+    # Extract format
+    $template =~ /\.(\w+)(?:\.\w+)?$/;
+    my $format = $1;
+
     # Type
     my $type = $self->types->type($format) || 'text/plain';
     $res->headers->content_type($type) unless $res->headers->content_type;
 
     # Success!
-    $c->stash->{partial} = $partial;
     return 1;
 }
 
@@ -155,6 +128,43 @@ sub _fix_handler {
     }
 
     return $template;
+}
+
+sub _render_template {
+    my ($self, $c, $output, $template) = @_;
+
+    # Nothing to do
+    return unless $$template;
+
+    # Handler precedence
+    $self->precedence([sort keys %{$self->handler}])
+      unless $self->precedence;
+
+    # Format
+    return unless $$template = $self->_fix_format($c, $$template);
+
+    # Handler
+    return unless $$template = $self->_fix_handler($c, $$template);
+
+    # Extract handler
+    $$template =~ /\.\w+\.(\w+)$/;
+    my $handler = $c->stash->{handler} || $1 || $self->default_handler;
+
+    # Renderer
+    my $r = $self->handler->{$handler};
+
+    # No handler
+    unless ($r) {
+        $c->app->log->error(qq/No handler for "$handler" available./);
+        return;
+    }
+
+    # Render
+    local $c->stash->{template} = $$template;
+    return unless $r->($self, $c, $output);
+
+    # Success!
+    return 1;
 }
 
 1;

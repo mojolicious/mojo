@@ -23,19 +23,21 @@ $r->add_handler(
         $$output .= 'Hello Mojo!';
     }
 );
-$c->stash->{partial}  = 1;
-$c->stash->{template} = 'something';
-$c->stash->{format}   = 'something';
+$c->stash->{format} = 'something';
 
 # Normal rendering
-$c->stash->{handler} = 'debug';
+$c->stash->{partial}  = 1;
+$c->stash->{template} = 'something';
+$c->stash->{handler}  = 'debug';
 is($r->render($c), 'Hello Mojo!', 'normal rendering');
 
 # Rendering a path with dots
+$c->stash->{partial}  = 1;
 $c->stash->{template} = 'some.path.with.dots/template';
 $c->stash->{handler}  = 'debug';
 is($r->render($c), 'Hello Mojo!', 'rendering a path with dots');
 
 # Unrecognized handler
+$c->stash->{partial} = 1;
 $c->stash->{handler} = 'not_defined';
 is($r->render($c), undef, 'return undef for unrecognized handler');

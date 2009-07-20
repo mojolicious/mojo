@@ -26,4 +26,6 @@ sub test {
 
 sub willdie { die 'for some reason' }
 
+sub withlayout { shift->stash(template => 'withlayout') }
+
 1;

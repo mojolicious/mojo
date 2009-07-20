@@ -46,25 +46,30 @@ sub new {
             }
 
             # Exception
-            if (ref $$output && $c->app->mode eq 'development') {
-
-                # Exception template failed
-                if ($c->stash->{exception}) {
-                    $c->app->log->error(
-                        "Exception template error:\n$$output");
-                    return;
-                }
+            if (ref $$output) {
+                my $e = $$output;
+                $$output = '';
 
                 # Log
-                $c->app->log->error(
-                    qq/Template error in "$template": $$output/);
+                $c->app->log->error(qq/Template error in "$template": $e/);
 
-                # Render exception template
-                $c->stash(exception => $$output);
-                $c->res->code(500);
-                $c->res->body(
-                    $c->render(partial => 1, template => 'exception.html'));
-                return 1;
+                # Development mode
+                if ($c->app->mode eq 'development') {
+
+                    # Exception template failed
+                    return if $c->stash->{exception};
+
+                    # Render exception template
+                    $c->stash(exception => $e);
+                    $c->res->code(500);
+                    $c->res->body(
+                        $c->render(
+                            partial  => 1,
+                            template => 'exception.html'
+                        )
+                    );
+                    return 1;
+                }
             }
 
             # Success or exception?

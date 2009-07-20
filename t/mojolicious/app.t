@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 76;
+use Test::More tests => 80;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -20,7 +20,6 @@ use Mojo::Transaction;
 # Amy's rich, she's probably got other characteristics...
 use_ok('MojoliciousTest');
 
-# I guess I could part with one doomsday device and still be feared.
 my $client = Mojo::Client->new;
 
 # SyntaxError::foo (syntax error in controller)
@@ -82,6 +81,14 @@ is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 like($tx->res->body, qr/Hello Mojo from a templateless renderer!/);
+
+# Foo::withlayout
+$tx = Mojo::Transaction->new_get('/foo/withlayout', 'X-Test' => 'Hi there!');
+$client->process_app('MojoliciousTest', $tx);
+is($tx->res->code,                            200);
+is($tx->res->headers->server,                 'Mojo (Perl)');
+is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+like($tx->res->body, qr/Same old in green Seems to work!/);
 
 # MojoliciousTest2::Foo::test
 $tx = Mojo::Transaction->new_get('/test2', 'X-Test' => 'Hi there!');

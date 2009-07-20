@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension Mojo.
 
 0.991240 2009-07-19 00:00:00
         - Added debug helpers to Mojo::Server::FastCGI.
+        - Fixed detection bug in Mojo::Home.
         - Fixed generator bug in Mojo::Script.
         - Cleaned up code.
 

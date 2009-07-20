@@ -21,13 +21,7 @@ sub new {
     my $self = shift->SUPER::new();
 
     # Parse
-    if (@_) { $self->parse(@_) }
-
-    # Detect
-    else {
-        my $class = (caller())[0];
-        $self->detect($class);
-    }
+    $self->parse(@_) if @_;
 
     return $self;
 }

@@ -41,15 +41,25 @@ sub render {
 
     # Template
     if ($template = delete $c->stash->{template}) {
-        if ($self->_render_template($c, \$output, \$template)) {
+
+        # Fix
+        $template = $self->_fix_template($c, $template);
+
+        # Render
+        if ($self->_render_template($c, $template, \$output)) {
             $c->stash->{inner_template} = $output if $c->stash->{layout};
         }
     }
 
     # Layout
     if (my $layout = delete $c->stash->{layout}) {
+
+        # Fix
         $template = File::Spec->catfile('layouts', $layout);
-        $self->_render_template($c, \$output, \$template);
+        $template = $self->_fix_template($c, $template);
+
+        # Render
+        $self->_render_template($c, $template, \$output);
     }
 
     # Partial
@@ -73,10 +83,9 @@ sub render {
 }
 
 sub _detect_default_handler {
-    my ($self, $template) = @_;
+    my $self = shift;
     return 1
-      if $self->default_handler
-          && -f File::Spec->catfile($self->root, $template);
+      if $self->default_handler && -f File::Spec->catfile($self->root, shift);
 }
 
 sub _fix_format {
@@ -130,24 +139,30 @@ sub _fix_handler {
     return $template;
 }
 
-sub _render_template {
-    my ($self, $c, $output, $template) = @_;
-
-    # Nothing to do
-    return unless $$template;
+sub _fix_template {
+    my ($self, $c, $template) = @_;
 
     # Handler precedence
     $self->precedence([sort keys %{$self->handler}])
       unless $self->precedence;
 
     # Format
-    return unless $$template = $self->_fix_format($c, $$template);
+    return unless $template = $self->_fix_format($c, $template);
 
     # Handler
-    return unless $$template = $self->_fix_handler($c, $$template);
+    return unless $template = $self->_fix_handler($c, $template);
+
+    return $template;
+}
+
+sub _render_template {
+    my ($self, $c, $template, $output) = @_;
+
+    # Nothing to do
+    return unless $template;
 
     # Extract handler
-    $$template =~ /\.\w+\.(\w+)$/;
+    $template =~ /\.\w+\.(\w+)$/;
     my $handler = $c->stash->{handler} || $1 || $self->default_handler;
 
     # Renderer
@@ -160,7 +175,7 @@ sub _render_template {
     }
 
     # Render
-    local $c->stash->{template} = $$template;
+    local $c->stash->{template} = $template;
     return unless $r->($self, $c, $output);
 
     # Success!

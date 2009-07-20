@@ -19,6 +19,7 @@ sub new {
         epl => sub {
             my ($self, $c, $output) = @_;
 
+            # Template
             my $template = $c->stash->{template};
             my $path =
               File::Spec->catfile($c->app->renderer->root, $template);
@@ -68,6 +69,7 @@ sub new {
                             template => 'exception.html'
                         )
                     );
+
                     return 1;
                 }
             }

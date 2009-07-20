@@ -50,7 +50,7 @@ sub is_level {
 
     # Check
     $level = lc $level;
-    my $current = $self->level;
+    my $current = $ENV{MOJO_LOG_LEVEL} || $self->level;
     return $LEVEL->{$level} >= $LEVEL->{$current};
 }
 

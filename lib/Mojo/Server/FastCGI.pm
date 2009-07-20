@@ -70,7 +70,7 @@ sub accept_connection {
     $self->app->log->debug('FastCGI listen socket opened.') if DEBUG;
 
     # Accept
-    my $connection = undef;
+    my $connection;
     unless (accept $connection, $self->{_listen}) {
         $self->app->log->error("Can't accept FastCGI connection: $!");
         return;

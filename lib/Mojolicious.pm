@@ -24,7 +24,7 @@ __PACKAGE__->attr('static',
     default => sub { MojoX::Dispatcher::Static->new });
 __PACKAGE__->attr('types', default => sub { MojoX::Types->new });
 
-# The usual constructor stuff
+# The constructor
 sub new {
     my $self = shift->SUPER::new(@_);
 
@@ -48,23 +48,30 @@ sub new {
 
     # Run mode
     $mode = $mode . '_mode';
-    $self->$mode if $self->can($mode);
+    eval { $self->$mode } if $self->can($mode);
+    $self->log->error(qq/Mode "$mode" failed: $@/) if $@;
 
     # Startup
-    $self->startup(@_);
+    eval { $self->startup(@_) };
+    $self->log->error("Startup failed: $@") if $@;
 
     # Load context class
-    Mojo::Loader->new->load($self->ctx_class);
+    if (my $e = Mojo::Loader->new->load($self->ctx_class)) {
+        my $class = $self->ctx_class;
+        my $msg = ref $e ? $e : "$class doesn't exist.";
+        $self->log->error(qq/Couldn't load context class "$class": $msg/);
+    }
 
     return $self;
 }
 
+# The context builder
 sub build_ctx {
     my $self = shift;
     return $self->ctx_class->new(app => $self, tx => shift);
 }
 
-# You could just overload this method
+# The default dispatchers with exception handling
 sub dispatch {
     my ($self, $c) = @_;
 
@@ -104,7 +111,8 @@ sub handler {
     my $start = [Time::HiRes::gettimeofday()];
 
     # Build context and dispatch
-    $self->dispatch($self->build_ctx($tx));
+    eval { $self->process($self->build_ctx($tx)) };
+    $self->log->error("Processing request failed: $@") if $@;
 
     # End timer
     my $elapsed = sprintf '%f',
@@ -112,6 +120,9 @@ sub handler {
     my $rps = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
     $self->log->debug("Request took $elapsed seconds ($rps/s).");
 }
+
+# This will run for each request
+sub process { shift->dispatch(@_) }
 
 # This will run once at startup
 sub startup { }
@@ -192,6 +203,10 @@ new ones.
 =head2 C<handler>
 
     $tx = $mojo->handler($tx);
+
+=head2 C<process>
+
+    $mojo->process($c);
 
 =head2 C<startup>
 

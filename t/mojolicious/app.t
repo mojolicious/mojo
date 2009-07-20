@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 84;
+use Test::More tests => 93;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -208,3 +208,20 @@ $tx = Mojo::Transaction->new_get('/foo');
 $app->handler($tx);
 is($tx->res->code, 200);
 like($tx->res->body, qr/Hello Mojo from the template \/foo! Hello World!/);
+
+# SingleFileTestApp::Foo::index
+$tx = Mojo::Transaction->new_get('/foo');
+$client->process_app('SingleFileTestApp', $tx);
+is($tx->res->code,                            200);
+is($tx->res->headers->server,                 'Mojo (Perl)');
+is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+like($tx->res->body, qr/Same old in green Seems to work!/);
+
+# SingleFileTestApp::Foo::bar
+$tx = Mojo::Transaction->new_get('/foo/bar');
+$client->process_app('SingleFileTestApp', $tx);
+is($tx->res->code,                            200);
+is($tx->res->headers->header('X-Bender'),     'Kiss my shiny metal ass!');
+is($tx->res->headers->server,                 'Mojo (Perl)');
+is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+is($tx->res->body,                            '/foo/bar');

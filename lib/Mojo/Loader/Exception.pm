@@ -15,7 +15,7 @@ sub new {
     my $self = shift->SUPER::new(shift);
 
     # Context
-    if ($self->message =~ /at\s+([^\s]+)\s+line\s+(\d+)/) {
+    if ($self->message =~ /at\s+(.+)\s+line\s+(\d+)/) {
         my $file = $1;
         my $line = $2;
 

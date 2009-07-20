@@ -336,7 +336,7 @@ Mojo::Template - Perlish Templates!
     %= 5 * 5
     % my ($number, $text) = @_;
     test 123
-    foo <% my $i = $number + 2 %>
+    foo <% my $i = $number + 2; %>
     % for (1 .. 23) {
     * some text <%= $i++ %>
     % }

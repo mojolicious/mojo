@@ -43,7 +43,7 @@ sub render {
     if ($template = delete $c->stash->{template}) {
 
         # Fix
-        $template = $self->_fix_template($c, $template);
+        return unless $template = $self->_fix_template($c, $template);
 
         # Render
         if ($self->_render_template($c, $template, \$output)) {
@@ -56,7 +56,7 @@ sub render {
 
         # Fix
         $template = File::Spec->catfile('layouts', $layout);
-        $template = $self->_fix_template($c, $template);
+        return unless $template = $self->_fix_template($c, $template);
 
         # Render
         $self->_render_template($c, $template, \$output);

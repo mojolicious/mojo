@@ -194,9 +194,6 @@ sub _parse_env {
         elsif ($name eq 'REQUEST_URI') {
             $self->url->parse($value);
         }
-        elsif ($name eq 'PATH_INFO') {
-            $self->url->path->parse($value);
-        }
 
         # Query
         elsif ($name eq 'QUERY_STRING') {
@@ -217,6 +214,21 @@ sub _parse_env {
             $self->url->scheme($1)       if $1;
             $self->url->base->scheme($1) if $1;
             $self->version($2)           if $2;
+        }
+    }
+
+    # PATH_INFO
+    if (my $value = $env->{PATH_INFO}) {
+        my $base = $self->url->base->path->to_string;
+
+        # PATH_INFO already contains SCRIPT_NAME
+        if ($value =~ m/^$base/) {
+            $self->url->path->parse($value);
+        }
+
+        # PATH_INFO does not contain SCRIPT_NAME
+        else {
+            $self->url->path->parse($base . $value);
         }
     }
 

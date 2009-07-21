@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 282;
+use Test::More tests => 284;
 
 use Mojo::Filter::Chunked;
 use Mojo::Headers;
@@ -649,6 +649,22 @@ is($req->minor_version,   '0');
 is($req->major_version,   '1');
 is($req->body,            'hello=world');
 is_deeply($req->param('hello'), 'world');
+
+# Parse Apache like CGI like environment variables and a body with PATH_INFO
+# issue
+$req = Mojo::Message::Request->new;
+$req->parse(
+    CONTENT_LENGTH  => 11,
+    CONTENT_TYPE    => 'application/x-www-form-urlencoded',
+    PATH_INFO       => '/foo/bar',
+    QUERY_STRING    => '',
+    REQUEST_METHOD  => 'GET',
+    SCRIPT_NAME     => '/test/index.cgi',
+    HTTP_HOST       => 'localhost',
+    SERVER_PROTOCOL => 'HTTP/1.0'
+);
+is($req->url->path,       '/test/index.cgi/foo/bar');
+is($req->url->base->path, '/test/index.cgi');
 
 # Parse response with cookie
 $res = Mojo::Message::Response->new;

@@ -90,8 +90,16 @@ sub compile {
 sub interpret {
     my $self = shift;
 
-    # Shortcut
+    # Compile
+    unless ($self->compiled) {
+        my $e = $self->compile;
+
+        # Exception
+        return $e if ref $e;
+    }
     my $compiled = $self->compiled;
+
+    # Shortcut
     return unless $compiled;
 
     # Catch errors

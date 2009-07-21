@@ -24,15 +24,17 @@ sub new {
             my $path =
               File::Spec->catfile($c->app->renderer->root, $template);
 
+            # Initialize cache
+            $self->{_mt_cache} ||= {};
+
             # Shortcut
-            unless (-r $path) {
+            unless (-r $path || $self->{_mt_cache}->{$path}) {
                 $c->app->log->error(
                     qq/Template "$template" missing or not readable./);
                 return;
             }
 
             # Check cache
-            $self->{_mt_cache} ||= {};
             my $mt = $self->{_mt_cache}->{$path};
 
             # Interpret again

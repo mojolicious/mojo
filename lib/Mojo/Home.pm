@@ -9,6 +9,7 @@ use base 'Mojo::Base';
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
 use File::Spec;
+use FindBin;
 use Mojo::Loader;
 use Mojo::Script;
 
@@ -50,20 +51,23 @@ sub detect {
         }
 
         # Detect
-        my $path = $INC{$file};
-        return $self unless $path;
+        if (my $path = $INC{$file}) {
 
-        $path =~ s/$file$//;
-        my @home = File::Spec->splitdir($path);
+            $path =~ s/$file$//;
+            my @home = File::Spec->splitdir($path);
 
-        # Remove "lib" and "blib"
-        while (@home) {
-            last unless $home[-1] =~ /^b?lib$/ || $home[-1] eq '';
-            pop @home;
+            # Remove "lib" and "blib"
+            while (@home) {
+                last unless $home[-1] =~ /^b?lib$/ || $home[-1] eq '';
+                pop @home;
+            }
+
+            $self->parts(\@home);
         }
-
-        $self->parts(\@home);
     }
+
+    # FindBin fallback
+    $self->parts([split /\//, $FindBin::Bin]) unless @{$self->parts};
 
     return $self;
 }

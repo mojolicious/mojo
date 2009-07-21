@@ -205,6 +205,10 @@ sub _parse_env {
 
         # Base path
         elsif ($name eq 'SCRIPT_NAME') {
+
+            # Make sure there is a trailing slash (important for merging)
+            $value .= '/' unless $value =~ /\/$/;
+
             $self->url->base->path->parse($value);
         }
 
@@ -223,6 +227,9 @@ sub _parse_env {
         # Remove SCRIPT_NAME prefix if it's there
         my $base = $self->url->base->path->to_string;
         $value =~ s/^$base//;
+
+        # Make sure we have a leading slash
+        $value = "/$value" unless $value =~ /^\//;
 
         # Parse
         $self->url->path->parse($value);

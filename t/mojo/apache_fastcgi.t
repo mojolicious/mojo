@@ -29,15 +29,15 @@ my $config = File::Spec->catfile($dir, 'fcgi.config');
 my $mt     = Mojo::Template->new;
 
 # FastCGI setup
-my $lib = $server->home->lib_dir;
 my $fcgi = File::Spec->catfile($dir, 'test.fcgi');
-$mt->render_to_file(<<'EOF', $fcgi, $lib);
+$mt->render_to_file(<<'EOF', $fcgi);
 #!<%= $^X %>
 
 use strict;
 use warnings;
 
-use lib '<%= shift %>';
+% use FindBin;
+use lib '<%= "$FindBin::Bin/../../lib" %>';
 
 use Mojo::Server::FastCGI;
 

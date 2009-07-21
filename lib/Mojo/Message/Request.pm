@@ -217,19 +217,15 @@ sub _parse_env {
         }
     }
 
-    # PATH_INFO
+    # Path
     if (my $value = $env->{PATH_INFO}) {
+
+        # Remove SCRIPT_NAME prefix if it's there
         my $base = $self->url->base->path->to_string;
+        $value =~ s/^$base//;
 
-        # PATH_INFO already contains SCRIPT_NAME
-        if ($value =~ m/^$base/) {
-            $self->url->path->parse($value);
-        }
-
-        # PATH_INFO does not contain SCRIPT_NAME
-        else {
-            $self->url->path->parse($base . $value);
-        }
+        # Parse
+        $self->url->path->parse($value);
     }
 
     # There won't be a start line or header when you parse environment

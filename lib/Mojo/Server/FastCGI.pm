@@ -58,7 +58,7 @@ sub accept_connection {
         my $listen = IO::Socket->new;
 
         # Open
-        unless ($listen->fdopen(0, 'rw')) {
+        unless ($listen->fdopen(0, 'r')) {
             $self->app->log->error("Can't open FastCGI socket fd0: $!");
             return;
         }

@@ -17,11 +17,10 @@ __PACKAGE__->attr('namespace');
 
 # Hey. What kind of party is this? There's no booze and only one hooker.
 sub dispatch {
-    my ($self, $c, $match) = @_;
+    my ($self, $c) = @_;
 
     # Match
-    $match = $self->match($match || $c->tx->req->url->path->to_string)
-      unless ref $match;
+    my $match = $self->match($c->req->url->path->to_string);
     $c->match($match);
 
     # No match
@@ -213,14 +212,6 @@ implements the follwing the ones.
 
     my $e = $dispatcher->dispatch(
         MojoX::Dispatcher::Routes::Context->new
-    );
-    my $e = $dispatcher->dispatch(
-        MojoX::Dispatcher::Routes::Context->new,
-        MojoX::Routes::Match->new
-    );
-    my $e = $dispatcher->dispatch(
-        MojoX::Dispatcher::Routes::Context->new,
-        '/foo/bar/baz'
     );
 
 =head2 C<generate_class>

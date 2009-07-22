@@ -230,12 +230,12 @@ follwing the ones.
 =head2 C<new>
 
     my $routes = MojoX::Routes->new;
-    my $routes = MojoX::Routes->new('/(controller)/(action)');
+    my $routes = MojoX::Routes->new('/:controller/:action');
 
 =head2 C<bridge>
 
     my $bridge = $routes->bridge;
-    my $bridge = $routes->bridge('/(controller)/(action)');
+    my $bridge = $routes->bridge('/:controller/:action');
 
 =head2 C<to>
 
@@ -249,15 +249,16 @@ follwing the ones.
 
 =head2 C<match>
 
-    my $match = $routes->match($tx);
+    my $match = $routes->match('/foo/bar');
+    $match = $routes->match($match);
 
 =head2 C<parse>
 
-    $routes = $routes->parse('/(controller)/(action)');
+    $routes = $routes->parse('/:controller/:action');
 
 =head2 C<route>
 
-    my $route = $routes->route('/(c)/(a)', a => qr/\w+/);
+    my $route = $routes->route('/:c/:a', a => qr/\w+/);
 
 =head2 C<to_string>
 
@@ -270,6 +271,6 @@ follwing the ones.
 
 =head2 C<waypoint>
 
-    my $route = $routes->waypoint('/(c)/(a)', a => qr/\w+/);
+    my $route = $routes->waypoint('/:c/:a', a => qr/\w+/);
 
 =cut

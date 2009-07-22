@@ -136,7 +136,7 @@ Mojolicious::Scripts->new->run(@ARGV);
 <%= $self->stash('greeting') %>
 
 <%%= '__layouts/default.html.eplite__' %%>
-%# A minimalistic HTML 5 layout
+%# A minimalistic HTML5 layout
 % my $self = shift;
 <!html>
     <head><title><%= $self->stash('title') || 'Welcome!' %></title></head>

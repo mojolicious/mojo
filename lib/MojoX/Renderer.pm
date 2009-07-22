@@ -131,6 +131,10 @@ sub _fix_handler {
             }
         }
 
+        # Try the default handler if nothing else matches
+        my $default = $self->default_handler;
+        return "$template.$default" if $default;
+
         # Nothing found
         $c->app->log->debug(qq/Template not found "$template.*"./);
         return;

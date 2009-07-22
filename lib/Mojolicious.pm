@@ -146,7 +146,7 @@ Mojolicious - Web Framework
 
         my $r = $self->routes;
 
-        $r->route('/(controller)/(action)')
+        $r->route('/:controller/:action')
           ->to(controller => 'foo', action => 'bar');
     }
 

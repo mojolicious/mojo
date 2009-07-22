@@ -1,6 +1,11 @@
 This file documents the revision history for Perl extension Mojo.
 
 0.991241 2009-07-20 00:00:00
+        - Changed routes syntax again, this change is not entirely backwards
+          compatible but will only affect you if you are using the relaxed
+          and wildcard variations.
+              "/((foo))" becomes "/(.foo)"
+              "/(((foo)))" becomes "/(*foo)"
         - Made Mojolicious much more fault tolerant.
         - Fixed PATH_INFO handling of the CGI environment parser in
           Mojo::Message::Request.

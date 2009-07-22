@@ -85,7 +85,7 @@ sub startup {
     my $r = $self->routes;
 
     # The default route /*/*
-    $r->route('/(controller)/(action)')
+    $r->route('/:controller/:action')
       ->to(controller => 'foo', action => 'index');
 }
 

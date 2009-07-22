@@ -16,7 +16,7 @@ sub startup {
     $self->log->level('fatal');
 
     # /*/* - the default route
-    $self->routes->route('/(controller)/(action)')->to(action => 'index');
+    $self->routes->route('/:controller/:action')->to(action => 'index');
 }
 
 package SingleFileTestApp::Foo;

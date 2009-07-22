@@ -11,11 +11,14 @@ use constant DEBUG => $ENV{MOJOX_ROUTES_DEBUG} || 0;
 
 __PACKAGE__->attr('defaults', default => sub { {} });
 __PACKAGE__->attr([qw/format pattern regex/]);
-__PACKAGE__->attr('quote_end',   default => ')');
-__PACKAGE__->attr('quote_start', default => '(');
-__PACKAGE__->attr('reqs',        default => sub { {} });
-__PACKAGE__->attr('symbols',     default => sub { [] });
-__PACKAGE__->attr('tree',        default => sub { [] });
+__PACKAGE__->attr('quote_end',      default => ')');
+__PACKAGE__->attr('quote_start',    default => '(');
+__PACKAGE__->attr('relaxed_start',  default => '.');
+__PACKAGE__->attr('reqs',           default => sub { {} });
+__PACKAGE__->attr('symbol_start',   default => ':');
+__PACKAGE__->attr('symbols',        default => sub { [] });
+__PACKAGE__->attr('tree',           default => sub { [] });
+__PACKAGE__->attr('wildcard_start', default => '*');
 
 # This is the worst kind of discrimination. The kind against me!
 sub new {
@@ -203,9 +206,12 @@ sub _compile {
 sub _tokenize {
     my $self = shift;
 
-    my $pattern     = $self->pattern;
-    my $quote_end   = $self->quote_end;
-    my $quote_start = $self->quote_start;
+    my $pattern        = $self->pattern;
+    my $quote_end      = $self->quote_end;
+    my $quote_start    = $self->quote_start;
+    my $symbol_start   = $self->symbol_start;
+    my $relaxed_start  = $self->relaxed_start;
+    my $wildcard_start = $self->wildcard_start;
 
     my $tree  = [];
     my $state = 'text';
@@ -214,31 +220,40 @@ sub _tokenize {
 
         # Quote start
         if ($char eq $quote_start) {
-
-            # Upgrade state
-            if ($state eq 'relaxed' || $state eq 'symbol') {
-
-                # Upgrade symbol to relaxed
-                if ($state eq 'symbol') {
-                    $state = 'relaxed';
-                    $tree->[-1]->[0] = 'relaxed';
-                }
-
-                # Upgrade relaxed to wildcard
-                if ($state eq 'relaxed') {
-                    $state = 'wildcard';
-                    $tree->[-1]->[0] = 'wildcard';
-                }
-
-            }
-
-            # Start
-            elsif ($state ne 'wildcard') {
-                $state = 'symbol';
-                push @$tree, ['symbol', ''];
-            }
-
+            $state = 'symbol';
+            push @$tree, ['symbol', ''];
             next;
+        }
+
+        # Symbol start
+        if ($char eq $symbol_start) {
+            push @$tree, ['symbol', ''] if $state ne 'symbol';
+            $state = 'symbol';
+            next;
+        }
+
+        # Relaxed start
+        if ($char eq $relaxed_start) {
+
+            # Upgrade relaxed to wildcard
+            if ($state eq 'symbol') {
+                $state = 'relaxed';
+                $tree->[-1]->[0] = 'relaxed';
+                next;
+            }
+
+        }
+
+        # Wildcard start
+        if ($char eq $wildcard_start) {
+
+            # Upgrade relaxed to wildcard
+            if ($state eq 'symbol') {
+                $state = 'wildcard';
+                $tree->[-1]->[0] = 'wildcard';
+                next;
+            }
+
         }
 
         # Quote end
@@ -326,10 +341,20 @@ L<MojoX::Routes::Pattern> implements the following attributes.
     my $regex = $pattern->regex;
     $pattern  = $pattern->regex(qr/\/foo/);
 
+=head2 C<relaxed_start>
+
+    my $relaxed = $pattern->relaxed_start;
+    $pattern    = $pattern->relaxed_start('*');
+
 =head2 C<reqs>
 
     my $reqs = $pattern->reqs;
     $pattern = $pattern->reqs({foo => qr/\w+/});
+
+=head2 C<symbol_start>
+
+    my $symbol = $pattern->symbol_start;
+    $pattern   = $pattern->symbol_start(':');
 
 =head2 C<symbols>
 
@@ -340,6 +365,11 @@ L<MojoX::Routes::Pattern> implements the following attributes.
 
     my $tree = $pattern->tree;
     $pattern = $pattern->tree([ ... ]);
+
+=head2 C<wildcard_start>
+
+    my $wildcard = $pattern->wildcard_start;
+    $pattern     = $pattern->wildcard_start('*');
 
 =head1 METHODS
 

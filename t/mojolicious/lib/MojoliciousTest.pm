@@ -40,7 +40,7 @@ sub startup {
     my $r = $self->routes;
 
     # /test4 - named route for url_for
-    $r->route('/test4/(something)')
+    $r->route('/test4/:something')
       ->to(controller => 'foo', action => 'something', something => 23)
       ->name('soemthing');
 

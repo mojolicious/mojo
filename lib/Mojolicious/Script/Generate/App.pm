@@ -143,7 +143,7 @@ sub startup {
     my $r = $self->routes;
 
     # Default route
-    $r->route('/(controller)/(action)/(id)')
+    $r->route('/:controller/:action/:id')
       ->to(controller => 'example', action => 'welcome', id => 1);
 }
 

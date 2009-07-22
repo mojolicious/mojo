@@ -5,13 +5,13 @@
 use strict;
 use warnings;
 
-use Test::More tests => 25;
+use Test::More tests => 28;
 
 # People said I was dumb, but I proved them.
 use_ok('MojoX::Routes::Pattern');
 
 # Normal pattern with text, symbols and a default value
-my $pattern = MojoX::Routes::Pattern->new('/test/(controller)/(action)');
+my $pattern = MojoX::Routes::Pattern->new('/test/(controller)/:action');
 $pattern->defaults({action => 'index'});
 my $result = $pattern->match('/test/foo/bar');
 is($result->{controller}, 'foo');
@@ -28,8 +28,7 @@ is($pattern->render(controller => 'foo'), '/test/foo');
 
 # Regex in pattern
 $pattern =
-  MojoX::Routes::Pattern->new('/test/(controller)/(action)/(id)',
-    id => '\d+');
+  MojoX::Routes::Pattern->new('/test/(controller)/:action/(id)', id => '\d+');
 $pattern->defaults({action => 'index', id => 1});
 $result = $pattern->match('/test/foo/bar/203');
 is($result->{controller}, 'foo');
@@ -47,7 +46,7 @@ is( $pattern->render(
 is($pattern->render(controller => 'zzz'), '/test/zzz');
 
 # Quoted symbol
-$pattern = MojoX::Routes::Pattern->new('/(controller)test/(action)');
+$pattern = MojoX::Routes::Pattern->new('/(:controller)test/(action)');
 $pattern->defaults({action => 'index'});
 $result = $pattern->match('/footest/bar');
 is($result->{controller}, 'foo');
@@ -59,15 +58,23 @@ is($result, undef);
 # Format
 $pattern = MojoX::Routes::Pattern->new('/(controller)test/(action)');
 is($pattern->format, undef);
-$pattern = MojoX::Routes::Pattern->new('/(controller)test/(action).html');
+$pattern = MojoX::Routes::Pattern->new('/(:controller)test/:action.html');
 is($pattern->format, 'html');
 $pattern = MojoX::Routes::Pattern->new('/index.cgi');
 is($pattern->format, 'cgi');
 
 # Relaxed
-$pattern = MojoX::Routes::Pattern->new('/test/((controller))/(action)');
+$pattern = MojoX::Routes::Pattern->new('/test/(.controller)/:action');
 $result  = $pattern->match('/test/foo.bar/baz');
 is($result->{controller}, 'foo.bar');
 is($result->{action},     'baz');
 is($pattern->render(controller => 'foo.bar', action => 'baz'),
     '/test/foo.bar/baz');
+
+# Wildcard
+$pattern = MojoX::Routes::Pattern->new('/test/(:controller)/(*action)');
+$result  = $pattern->match('/test/foo/bar.baz/yada');
+is($result->{controller}, 'foo');
+is($result->{action},     'bar.baz/yada');
+is($pattern->render(controller => 'foo', action => 'bar.baz/yada'),
+    '/test/foo/bar.baz/yada');

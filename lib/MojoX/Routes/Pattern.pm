@@ -209,8 +209,8 @@ sub _tokenize {
     my $pattern        = $self->pattern;
     my $quote_end      = $self->quote_end;
     my $quote_start    = $self->quote_start;
-    my $symbol_start   = $self->symbol_start;
     my $relaxed_start  = $self->relaxed_start;
+    my $symbol_start   = $self->symbol_start;
     my $wildcard_start = $self->wildcard_start;
 
     my $tree  = [];

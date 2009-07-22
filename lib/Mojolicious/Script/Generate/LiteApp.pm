@@ -66,7 +66,7 @@ __liteapp__
 %% my $class = shift;
 #!/usr/bin/env perl
 
-# The application class
+# Our application class
 package <%%= $class %%>;
 
 use strict;
@@ -77,10 +77,12 @@ use base 'Mojolicious';
 # This method will run once at startup time
 sub startup {
     my $self = shift;
-    my $r    = $self->routes;
 
     # In lite applications we default to eplite templates
     $self->renderer->default_handler('eplite');
+
+    # Our routes object
+    my $r = $self->routes;
 
     # The default route /*/*
     $r->route('/(controller)/(action)')
@@ -95,10 +97,11 @@ use warnings;
 
 use base 'Mojolicious::Controller';
 
+# And our first action
 sub index {
     my $self = shift;
 
-    # Put a friendly message into the stash for the template
+    # Put a friendly message into the stash for our template
     $self->stash(greeting => 'Hello Mojo!');
 }
 
@@ -122,7 +125,7 @@ $ENV{MOJO_APP} = '<%%= $class %%>';
 Mojolicious::Scripts->new->run(@ARGV);
 
 1;
-# The templates live in the data section
+# Templates live in the data section
 <%%= '__DATA__' %%>
 <%%= '__foo/index.html.eplite__' %%>
 %# Our very first template!

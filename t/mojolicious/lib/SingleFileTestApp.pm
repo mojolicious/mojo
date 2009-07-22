@@ -33,6 +33,25 @@ sub bar {
     $self->res->body($self->ctx->url_for);
 }
 
+sub eplite_template {
+    shift->render(
+        template     => 'index.html.eplite',
+        eplite_class => 'SingleFileTestApp::Foo'
+    );
+}
+
+sub eplite_template2 {
+    shift->render(
+        template     => 'too.html.eplite',
+        eplite_class => 'SingleFileTestApp::Foo'
+    );
+}
+
 sub index { shift->stash(template => 'withlayout', msg => 'works great!') }
 
 1;
+__DATA__
+__index.html.eplite__
+<%= 20 + 3 %> works!
+__too.html.eplite__
+This one works too!

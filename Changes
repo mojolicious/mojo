@@ -5,6 +5,7 @@ This file documents the revision history for Perl extension Mojo.
         - Fixed PATH_INFO handling of the CGI environment parser in
           Mojo::Message::Request.
         - Updated Mojo::Home to fallback to FindBin for detection.
+        - Added eplite handler to Mojolicious::Renderer.
         - Added tests.
         - Allow log level override via environment variable in Mojo::Log.
         - Code cleanup.

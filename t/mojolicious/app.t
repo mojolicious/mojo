@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 93;
+use Test::More tests => 101;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -216,6 +216,22 @@ is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 like($tx->res->body, qr/Same old in green Seems to work!/);
+
+# SingleFileTestApp::Foo::eplite_template
+$tx = Mojo::Transaction->new_get('/foo/eplite_template');
+$client->process_app('SingleFileTestApp', $tx);
+is($tx->res->code,                            200);
+is($tx->res->headers->server,                 'Mojo (Perl)');
+is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+is($tx->res->body,                            "23 works!\n");
+
+# SingleFileTestApp::Foo::eplite_template
+$tx = Mojo::Transaction->new_get('/foo/eplite_template2');
+$client->process_app('SingleFileTestApp', $tx);
+is($tx->res->code,                            200);
+is($tx->res->headers->server,                 'Mojo (Perl)');
+is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+is($tx->res->body,                            "This one works too!\n");
 
 # SingleFileTestApp::Foo::bar
 $tx = Mojo::Transaction->new_get('/foo/bar');

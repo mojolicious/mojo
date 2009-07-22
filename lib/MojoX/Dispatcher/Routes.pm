@@ -20,7 +20,7 @@ sub dispatch {
     my ($self, $c, $match) = @_;
 
     # Match
-    $match = $self->match($match || $c->tx->req->url->path->to_string)
+    $match = $self->match($match || $c->tx->req->url->path->to_string || '/')
       unless ref $match;
     $c->match($match);
 

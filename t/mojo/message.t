@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 298;
+use Test::More tests => 305;
 
 use Mojo::Filter::Chunked;
 use Mojo::Headers;
@@ -683,17 +683,36 @@ $req->parse(
     PATH_INFO       => '/foo/bar',
     QUERY_STRING    => '',
     REQUEST_METHOD  => 'GET',
-    SCRIPT_NAME     => '',
     HTTP_HOST       => 'localhost',
     SERVER_PROTOCOL => 'HTTP/1.0'
 );
 is($req->method,                 'GET');
 is($req->url->host,              'localhost');
 is($req->url->path,              '/foo/bar');
-is($req->url->base->path,        '/');
+is($req->url->base->path,        '');
 is($req->minor_version,          '0');
 is($req->major_version,          '1');
 is($req->url->to_abs->to_string, 'http://localhost/foo/bar');
+
+# Parse Apache 2.2.11 like CGI environment variables and a body
+# (no PATH_INFO)
+$req = Mojo::Message::Request->new;
+$req->parse(
+    CONTENT_LENGTH  => 11,
+    CONTENT_TYPE    => 'application/x-www-form-urlencoded',
+    QUERY_STRING    => '',
+    REQUEST_METHOD  => 'GET',
+    SCRIPT_NAME     => '/test/index.cgi',
+    HTTP_HOST       => 'localhost',
+    SERVER_PROTOCOL => 'HTTP/1.0'
+);
+is($req->method,                 'GET');
+is($req->url->host,              'localhost');
+is($req->url->path,              '');
+is($req->url->base->path,        '/test/index.cgi/');
+is($req->minor_version,          '0');
+is($req->major_version,          '1');
+is($req->url->to_abs->to_string, 'http://localhost/test/index.cgi');
 
 # Parse response with cookie
 $res = Mojo::Message::Response->new;

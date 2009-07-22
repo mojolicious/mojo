@@ -10,7 +10,7 @@ use base 'Mojo::Script';
 __PACKAGE__->attr('description', default => <<'EOF');
 * Generate a minimalistic single file example application. *
 Takes a name as option, by default MyMojoliciousApp will be used.
-    generate liteapp TestApp
+    generate lite_app TestApp
 EOF
 
 # If for any reason you're not completely satisfied, I hate you.

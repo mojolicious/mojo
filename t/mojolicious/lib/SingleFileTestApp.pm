@@ -41,7 +41,7 @@ sub eplite_template {
 }
 
 sub eplite_template2 {
-    shift->render(
+    shift->stash(
         template     => 'too.html.eplite',
         eplite_class => 'SingleFileTestApp::Foo'
     );

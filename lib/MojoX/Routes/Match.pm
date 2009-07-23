@@ -11,13 +11,20 @@ use Mojo::URL;
 
 __PACKAGE__->attr('captures', default => sub { {} });
 __PACKAGE__->attr('endpoint');
-__PACKAGE__->attr('path',  default => sub {'/'});
-__PACKAGE__->attr('stack', default => sub { [] });
+__PACKAGE__->attr('method', default => sub {'get'});
+__PACKAGE__->attr('path',   default => sub {'/'});
+__PACKAGE__->attr('stack',  default => sub { [] });
 
 # I'm Bender, baby, please insert liquor!
 sub new {
     my $self = shift->SUPER::new();
-    $self->path($_[0]);
+
+    # Method and path
+    if ($_[1]) { $self->method($_[0])->path($_[1]) }
+
+    # Path only
+    else { $self->path($_[0]) }
+
     return $self;
 }
 
@@ -134,6 +141,11 @@ L<MojoX::Routes::Match> implements the following attributes.
 
     my $endpoint = $match->endpoint;
     $match       = $match->endpoint(1);
+
+=head2 C<method>
+
+    my $method = $match->method;
+    $match     = $match->method('get');
 
 =head2 C<path>
 

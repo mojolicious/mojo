@@ -36,14 +36,21 @@ sub is_endpoint {
 
 # Life can be hilariously cruel.
 sub match {
-    my ($self, $match) = @_;
+    my $self  = shift;
+    my $match = shift;
 
     # Shortcut
     return unless $match;
 
     # Match object
-    $match = MojoX::Routes::Match->new($match)
+    $match = MojoX::Routes::Match->new($match, @_)
       unless ref $match && $match->isa('MojoX::Routes::Match');
+
+    # Request method
+    if (my $methods = $self->{_methods}) {
+        my $m = lc $match->method;
+        return unless $methods->{$m};
+    }
 
     # Path
     my $path = $match->path;
@@ -169,6 +176,18 @@ sub url_for {
     return $url;
 }
 
+sub via {
+    my $self = shift;
+
+    # Clean
+    $self->{_methods} = {};
+
+    # Methods
+    for my $m (@_) { $self->{_methods}->{lc $m} = 1 }
+
+    return $self;
+}
+
 sub waypoint { shift->route(@_)->block(1) }
 
 1;
@@ -249,8 +268,9 @@ follwing the ones.
 
 =head2 C<match>
 
-    my $match = $routes->match('/foo/bar');
     $match = $routes->match($match);
+    my $match = $routes->match('/foo/bar');
+    my $match = $routes->match(get => '/foo/bar');
 
 =head2 C<parse>
 
@@ -268,6 +288,11 @@ follwing the ones.
 
     my $url = $routes->url_for($url);
     my $url = $routes->url_for($url, {foo => 'bar'});
+
+=head2 C<via>
+
+    $routes = $routes->via('get');
+    $routes = $routes->via(qw/get post/);
 
 =head2 C<waypoint>
 

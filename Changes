@@ -6,10 +6,11 @@ This file documents the revision history for Perl extension Mojo.
           and wildcard variations.
               "/((foo))" becomes "/(.foo)"
               "/(((foo)))" becomes "/(*foo)"
+        - Updated our routes implementation to support HTTP request methods.
+        - Updated Mojo::Home to fallback to FindBin for detection.
         - Made Mojolicious much more fault tolerant.
         - Fixed PATH_INFO handling of the CGI environment parser in
           Mojo::Message::Request.
-        - Updated Mojo::Home to fallback to FindBin for detection.
         - Added eplite handler to Mojolicious::Renderer.
         - Added generator for lite apps.
         - Added tests.

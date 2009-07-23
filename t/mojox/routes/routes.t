@@ -5,9 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 89;
-
-use Mojo::Transaction;
+use Test::More tests => 109;
 
 # They're not very heavy, but you don't hear me not complaining.
 use_ok('MojoX::Routes');
@@ -92,6 +90,18 @@ $bridge->route('/delete')->to(
     action     => 'delete',
     format     => undef
 )->name('articles_delete');
+
+# GET /method/get
+$r->route('/method/get')->via('GET')
+  ->to(controller => 'method', action => 'get');
+
+# POST /method/post
+$r->route('/method/post')->via('post')
+  ->to(controller => 'method', action => 'post');
+
+# POST|GET /method/post_get
+$r->route('/method/post_get')->via(qw/POST get/)
+  ->to(controller => 'method', action => 'post_get');
 
 # Real world example using most features at once
 my $match = $r->match('/articles.html');
@@ -220,3 +230,30 @@ is($match->stack->[0]->{controller}, 'you');
 is($match->stack->[0]->{action},     'hello');
 is($match->stack->[0]->{format},     'html');
 is($match->url_for,                  '/format2.html');
+
+# Request methods
+$match = $r->match(get => '/method/get.html');
+is($match->stack->[0]->{controller}, 'method');
+is($match->stack->[0]->{action},     'get');
+is($match->stack->[0]->{format},     'html');
+is($match->url_for,                  '/method/get.html');
+$match = $r->match(post => '/method/post');
+is($match->stack->[0]->{controller}, 'method');
+is($match->stack->[0]->{action},     'post');
+is($match->stack->[0]->{format},     undef);
+is($match->url_for,                  '/method/post');
+$match = $r->match(GET => '/method/post_get');
+is($match->stack->[0]->{controller}, 'method');
+is($match->stack->[0]->{action},     'post_get');
+is($match->stack->[0]->{format},     undef);
+is($match->url_for,                  '/method/post_get');
+$match = $r->match(post => '/method/post_get');
+is($match->stack->[0]->{controller}, 'method');
+is($match->stack->[0]->{action},     'post_get');
+is($match->stack->[0]->{format},     undef);
+is($match->url_for,                  '/method/post_get');
+$match = $r->match(delete => '/method/post_get');
+is($match->stack->[0]->{controller}, undef);
+is($match->stack->[0]->{action},     undef);
+is($match->stack->[0]->{format},     undef);
+is($match->url_for,                  '');

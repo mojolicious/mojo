@@ -178,13 +178,7 @@ sub url_for {
 
 sub via {
     my $self = shift;
-
-    # Clean
-    $self->{_methods} = {};
-
-    # Methods
-    for my $m (@_) { $self->{_methods}->{lc $m} = 1 }
-
+    $self->{_methods} = {map { lc $_ => 1 } @_};
     return $self;
 }
 

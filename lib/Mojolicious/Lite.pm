@@ -20,7 +20,7 @@ sub import {
     my $class = shift;
 
     # Home
-    $ENV{MOJO_HOME} = File::Spec->catdir(split '/', $FindBin::Bin);
+    $ENV{MOJO_HOME} ||= File::Spec->catdir(split '/', $FindBin::Bin);
 
     # Initialize app
     $APP = $class->new;

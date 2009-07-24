@@ -35,7 +35,7 @@ sub at_least_version {
     }
 
     # Version is older
-    return 0;
+    return;
 }
 
 sub body {

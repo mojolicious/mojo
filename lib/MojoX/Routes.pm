@@ -28,9 +28,9 @@ sub bridge { shift->route(@_)->inline(1) }
 
 sub is_endpoint {
     my $self = shift;
-    return 0 if $self->inline;
+    return   if $self->inline;
     return 1 if $self->block;
-    return 0 if @{$self->children};
+    return   if @{$self->children};
     return 1;
 }
 

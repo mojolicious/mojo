@@ -8,24 +8,22 @@ use warnings;
 use base 'Mojo::Script';
 
 __PACKAGE__->attr('description', default => <<'EOF');
-* Generate a minimalistic single file example application. *
-Takes a name as option, by default MyMojoliciousApp will be used.
-    generate lite_app TestApp
+* Generate a minimalistic web application. *
+Takes a name as option, by default myapp.pl will be used.
+    generate lite_app awesome.pl
 EOF
 
 # If for any reason you're not completely satisfied, I hate you.
 sub run {
-    my ($self, $class) = @_;
-    $class ||= 'MyMojoliciousApp';
-
-    my $name = $self->class_to_file($class);
+    my ($self, $name) = @_;
+    $name ||= 'myapp.pl';
 
     # App
     $self->renderer->line_start('%%');
     $self->renderer->tag_start('<%%');
     $self->renderer->tag_end('%%>');
-    $self->render_to_rel_file('liteapp', "$name.pl", $class);
-    $self->chmod_file("$name.pl", 0744);
+    $self->render_to_rel_file('liteapp', $name);
+    $self->chmod_file($name, 0744);
 }
 
 1;
@@ -66,82 +64,31 @@ __liteapp__
 %% my $class = shift;
 #!/usr/bin/env perl
 
-# Our application class
-package <%%= $class %%>;
-
 use strict;
 use warnings;
 
-use base 'Mojolicious';
+use Mojolicious::Lite;
 
-# This method will run once at startup time
-sub startup {
+get '/' => 'index';
+
+get '/:groovy' => sub {
     my $self = shift;
+    $self->res->code(200);
+    $self->res->body($self->stash('groovy'));
+};
 
-    # In lite applications we default to eplite templates
-    $self->renderer->default_handler('eplite');
-
-    # Our routes object
-    my $r = $self->routes;
-
-    # The default route /*/*
-    $r->route('/:controller/:action')
-      ->to(controller => 'foo', action => 'index');
-}
-
-# Our very first controller class!
-package <%%= $class %%>::Foo;
-
-use strict;
-use warnings;
-
-use base 'Mojolicious::Controller';
-
-# And our first action
-sub index {
-    my $self = shift;
-
-    # Put a friendly message into the stash for our template
-    $self->stash(greeting => 'Hello Mojo!');
-}
-
-# The main package, used mostly for the script system
-package main;
-
-use strict;
-use warnings;
-
-# Check if Mojo is installed
-eval 'use Mojolicious::Scripts';
-die <<EOF if $@;
-It looks like you don't have the Mojo Framework installed.
-Please visit http://mojolicious.org for detailed installation instructions.
-
-EOF
-
-$ENV{MOJO_APP} = '<%%= $class %%>';
-
-# Start the script system and our application
-Mojolicious::Scripts->new->run(@ARGV);
-
-1;
-# Templates live in the data section
+shagadelic;
 <%%= '__DATA__' %%>
-<%%= '__foo/index.html.eplite__' %%>
-%# Our very first template!
+<%%= '__index.html.eplite__' %%>
 % my $self = shift;
-%# We want to use the default layout
-% $self->stash(layout => 'default');
-%# Now we just display the message we put into the stash earlier
-<%= $self->stash('greeting') %>
+% $self->stash(layout => 'funky');
+Yea baby!
 
-<%%= '__layouts/default.html.eplite__' %%>
-%# A minimalistic HTML5 layout
+<%%= '__layouts/funky.html.eplite__' %%>
 % my $self = shift;
 <!html>
-    <head><title><%= $self->stash('title') || 'Welcome!' %></title></head>
+    <head><title>Funky!</title></head>
     <body>
-%# Here we insert the normal template content
-%= $self->render_inner
+        <%= $self->render_inner %>
     </body>
 </html>

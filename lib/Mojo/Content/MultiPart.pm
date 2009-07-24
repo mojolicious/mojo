@@ -184,12 +184,12 @@ sub _parse_multipart_body {
     if ($pos < 0) {
         my $length =
           length($self->buffer->{buffer}) - (length($boundary) + 8);
-        return 0 unless $length > 0;
+        return unless $length > 0;
 
         # Store chunk
         my $chunk = substr $self->buffer->{buffer}, 0, $length, '';
         $self->parts->[-1] = $self->parts->[-1]->parse($chunk);
-        return 0;
+        return;
     }
 
     # Store chunk
@@ -217,7 +217,7 @@ sub _parse_multipart_boundary {
         $self->done;
     }
 
-    return 0;
+    return;
 }
 
 sub _parse_multipart_preamble {
@@ -230,7 +230,7 @@ sub _parse_multipart_preamble {
         $self->state('multipart_boundary');
         return 1;
     }
-    return 0;
+    return;
 }
 
 1;

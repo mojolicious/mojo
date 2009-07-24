@@ -313,7 +313,7 @@ sub _write_file {
     # Write to file
     $file->syswrite($output) or croak "Can't write to file '$path': $!";
 
-    return 0;
+    return;
 }
 
 1;

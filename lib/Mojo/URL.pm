@@ -110,7 +110,7 @@ sub clone {
 sub is_abs {
     my $self = shift;
     return 1 if $self->scheme && $self->authority;
-    return 0;
+    return;
 }
 
 sub parse {

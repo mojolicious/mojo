@@ -100,7 +100,7 @@ sub get_header_chunk {
 sub has_leftovers {
     my $self = shift;
     return 1 if $self->buffer->length || $self->filter_buffer->length;
-    return 0;
+    return;
 }
 
 sub header_length { length shift->build_headers }

@@ -46,7 +46,7 @@ sub is_level {
     my ($self, $level) = @_;
 
     # Shortcut
-    return 0 unless $level;
+    return unless $level;
 
     # Check
     $level = lc $level;

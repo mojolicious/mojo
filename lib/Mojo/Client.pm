@@ -65,7 +65,7 @@ sub deposit_connection {
         push @{$self->{_connections}}, [$name, $connection, time + $timeout];
         return 1;
     }
-    return 0;
+    return;
 }
 
 sub open_connection {
@@ -209,7 +209,7 @@ sub spin {
     my %transaction;
 
     # Prepare
-    my $done = 0;
+    my $done;
     for my $tx (@transactions) {
 
         # Sanity check
@@ -284,7 +284,7 @@ sub spin {
     }
 
     # No sockets ready yet
-    return 0 unless $waiting;
+    return unless $waiting;
 
     # Poll
     $poll->poll(5);
@@ -362,7 +362,7 @@ sub withdraw_connection {
     my ($self, $match) = @_;
 
     # Shortcut
-    return 0 unless $self->{_connections};
+    return unless $self->{_connections};
 
     my $result;
     my @connections;

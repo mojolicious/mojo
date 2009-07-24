@@ -108,7 +108,7 @@ sub contains {
         substr $window, 0, $read, '';
     }
 
-    return 0;
+    return;
 }
 
 sub copy_to {

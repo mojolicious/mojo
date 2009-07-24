@@ -66,7 +66,7 @@ ok(!$c->render_called);
 # No escaping
 $c->reset_state;
 $c->tx(Mojo::Transaction->new_post('/foo/hello'));
-is($d->dispatch($c), 0);
+is($d->dispatch($c), undef);
 is_deeply($c->stash,
     {controller => 'foo', action => 'bar', capture => 'hello'});
 ok($c->render_called);
@@ -74,7 +74,7 @@ ok($c->render_called);
 # Escaping
 $c->reset_state;
 $c->tx(Mojo::Transaction->new_post('/foo/hello%20there'));
-is($d->dispatch($c), 0);
+is($d->dispatch($c), undef);
 is_deeply($c->stash,
     {controller => 'foo', action => 'bar', capture => 'hello there'});
 ok($c->render_called);

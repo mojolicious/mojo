@@ -41,11 +41,94 @@ sub dispatch {
     $self->render($c);
 
     # All seems ok
-    return 0;
+    return;
+}
+
+sub dispatch_callback {
+    my ($self, $c) = @_;
+
+    # Debug
+    $c->app->log->debug(qq/Dispatching callback./);
+
+    # Dispatch
+    my $continue;
+    my $cb = $c->match->captures->{callback};
+    eval { $continue = $cb->($c) };
+
+    # Success!
+    return 1 if $continue;
+
+    # Callback error
+    if ($@) {
+        my $e = ref $@ ? $@ : Mojo::Loader::Exception->new($@);
+        $c->app->log->error($e);
+        return $e;
+    }
+
+    return;
+}
+
+sub dispatch_controller {
+    my ($self, $c) = @_;
+
+    # Method
+    my $method = $self->generate_method($c);
+    return unless $method;
+
+    # Class
+    my $class = $self->generate_class($c);
+    return unless $class;
+
+    # Debug
+    $c->app->log->debug(qq/Dispatching "${class}::$method"./);
+
+    # Load class
+    $self->{_loaded} ||= {};
+    unless ($self->{_loaded}->{$class}) {
+
+        # Load
+        if (my $e = Mojo::Loader->load($class)) {
+
+            # Doesn't exist
+            return unless ref $e;
+
+            # Error
+            $c->app->log->error($e);
+            return $e;
+        }
+
+        # Loaded
+        $self->{_loaded}->{$class}++;
+    }
+
+    # Not a conroller
+    unless ($class->isa('MojoX::Dispatcher::Routes::Controller')) {
+        $c->app->log->debug(qq/"$class" is not a controller./);
+        return;
+    }
+
+    # Dispatch
+    my $continue;
+    eval { $continue = $class->new(ctx => $c)->$method($c) };
+
+    # Success!
+    return 1 if $continue;
+
+    # Controller error
+    if ($@) {
+        my $e = ref $@ ? $@ : Mojo::Loader::Exception->new($@);
+        $c->app->log->error($e);
+        return $e;
+    }
+
+    return;
 }
 
 sub generate_class {
-    my ($self, $c, $field) = @_;
+    my ($self, $c) = @_;
+
+    # Field
+    my $field = $c->match->captures;
 
     # Class
     my $class = $field->{class};
@@ -74,7 +157,10 @@ sub generate_class {
 }
 
 sub generate_method {
-    my ($self, $c, $field) = @_;
+    my ($self, $c) = @_;
+
+    # Field
+    my $field = $c->match->captures;
 
     # Prepare disallow
     unless ($self->{_disallow}) {
@@ -84,6 +170,9 @@ sub generate_method {
 
     my $method = $field->{method};
     $method ||= $field->{action};
+
+    # Shortcut
+    return unless $method;
 
     # Shortcut for disallowed methods
     return if $self->{_disallow}->{$method};
@@ -111,62 +200,24 @@ sub walk_stack {
         # Don't cache errors
         local $@;
 
-        # Method
-        my $method = $self->generate_method($c, $field);
-        next unless $method;
-
-        # Class
-        my $class = $self->generate_class($c, $field);
-        next unless $class;
-
-        # Debug
-        $c->app->log->debug(qq/Dispatching "${class}::$method"./);
-
         # Captures
         $c->match->captures($field);
 
-        # Load class
-        $self->{_loaded} ||= {};
-        unless ($self->{_loaded}->{$class}) {
-
-            # Load
-            if (my $e = Mojo::Loader->load($class)) {
-
-                # Doesn't exist
-                return 1 unless ref $e;
-
-                # Error
-                $c->app->log->error($e);
-                return $e;
-            }
-
-            # Loaded
-            $self->{_loaded}->{$class}++;
-        }
-
-        # Not a conroller
-        unless ($class->isa('MojoX::Dispatcher::Routes::Controller')) {
-            $c->app->log->debug(qq/"$class" is not a controller./);
-            return 1;
-        }
-
         # Dispatch
-        my $done;
-        eval { $done = $class->new(ctx => $c)->$method($c) };
+        my $e =
+            $field->{callback}
+          ? $self->dispatch_callback($c)
+          : $self->dispatch_controller($c);
 
-        # Controller error
-        if ($@) {
-            my $e = ref $@ ? $@ : Mojo::Loader::Exception->new($@);
-            $c->app->log->error($e);
-            return $e;
-        }
+        # Exception
+        return $e if ref $e;
 
         # Break the chain
-        last unless $done;
+        return 1 unless $e;
     }
 
     # Done
-    return 0;
+    return;
 }
 
 1;
@@ -214,13 +265,21 @@ implements the follwing the ones.
         MojoX::Dispatcher::Routes::Context->new
     );
 
+=head2 C<dispatch_callback>
+
+    my $e = $dispatcher->dispatch_callback($c);
+
+=head2 C<dispatch_controller>
+
+    my $e = $dispatcher->dispatch_controller($c);
+
 =head2 C<generate_class>
 
-    my $class = $dispatcher->generate_class($c, $field);
+    my $class = $dispatcher->generate_class($c);
 
 =head2 C<generate_method>
 
-    my $method = $dispatcher->genrate_method($c, $field);
+    my $method = $dispatcher->genrate_method($c);
 
 =head2 C<render>
 

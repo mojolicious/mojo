@@ -49,7 +49,7 @@ sub generate_port_ok {
     }
 
     $tb->ok(0, $desc);
-    return 0;
+    return;
 }
 
 sub server_ok {
@@ -114,7 +114,7 @@ sub start_server_ok {
     # Wait for server
     my $timeout     = $self->timeout;
     my $time_before = time;
-    while ($self->_check_server != 1) {
+    while (!$self->_check_server) {
 
         # Timeout
         $timeout -= time - $time_before;
@@ -198,7 +198,7 @@ sub _check_server {
     }
     else {
         $self->{_tb}->diag("Server check failed: $!") if $diag;
-        return 0;
+        return;
     }
 }
 
@@ -245,7 +245,7 @@ sub _generate_port {
         return $self->port($port)->port;
     }
 
-    return 0;
+    return;
 }
 
 sub _start_server {
@@ -262,7 +262,7 @@ sub _start_server {
     # Process started?
     unless ($pid) {
         $tb->diag("Can't start server: $!");
-        return 0;
+        return;
     }
 
     $self->{_server}->blocking(0);

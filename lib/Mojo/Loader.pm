@@ -35,7 +35,7 @@ sub load {
     return 1 unless $module;
 
     # Already loaded?
-    return 0 if $module->can('isa');
+    return if $module->can('isa');
 
     # Try
     eval "require $module";
@@ -51,7 +51,7 @@ sub load {
         return Mojo::Loader::Exception->new($@);
     }
 
-    return 0;
+    return;
 }
 
 sub reload {
@@ -90,7 +90,7 @@ sub reload {
         }
     }
 
-    return 0;
+    return;
 }
 
 sub search {

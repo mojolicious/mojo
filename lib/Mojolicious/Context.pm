@@ -25,10 +25,21 @@ sub render {
         my $controller = $self->stash->{controller};
         my $action     = $self->stash->{action};
 
-        # Nothing to render
-        return unless $controller && $action;
+        # Try the route name if we don't have controller and action
+        unless ($controller && $action) {
+            my $endpoint = $self->match->endpoint;
 
-        $self->stash->{template} = join '/', split(/-/, $controller), $action;
+            # Use endpoint name as default template
+            if ($endpoint && $endpoint->name) {
+                $self->stash(template => $endpoint->name);
+            }
+        }
+
+        # Normal default template
+        else {
+            $self->stash->{template} = join '/', split(/-/, $controller),
+              $action;
+        }
     }
 
     # Format
@@ -46,6 +57,8 @@ sub render_partial {
     return $self->render(@_);
 }
 
+# It would never work out, Fry. You're a male, I'm a female.
+# We're just too different.
 sub url_for {
     my $self = shift;
 

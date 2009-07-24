@@ -174,7 +174,7 @@ sub is_writing {
     # (This is even safer than rfc2616 (section 8.1.2.2), which suggests
     # waiting until the response status from the previous request has been
     # received)
-    return 0
+    return
       if $writing
           && $self->_reader != $self->_writer
           && $self->_writer->req->method eq 'POST';
@@ -344,7 +344,7 @@ sub _next_reader {
     $self->{_reader}++;
 
     # No reader
-    return 0 unless $self->{_txs}->[$self->{_reader}];
+    return unless $self->{_txs}->[$self->{_reader}];
 
     # Found
     return 1;
@@ -357,7 +357,7 @@ sub _next_writer {
     $self->{_writer}++;
 
     # No writer
-    return 0 unless $self->{_txs}->[$self->{_writer}];
+    return unless $self->{_txs}->[$self->{_writer}];
 
     # Found
     return 1;

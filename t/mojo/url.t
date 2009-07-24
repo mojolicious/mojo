@@ -76,19 +76,19 @@ $url = Mojo::URL->new('http://kraih.com/foo/index.html?foo=bar#23');
 $url->base->parse('http://kraih.com/foo/');
 my $rel = $url->to_rel;
 is($rel,         'index.html?foo=bar#23');
-is($rel->is_abs, 0);
+is($rel->is_abs, undef);
 is($rel->to_abs, 'http://kraih.com/foo/index.html?foo=bar#23');
 
 # Absolute (base without trailing slash)
 $url = Mojo::URL->new('/foo?foo=bar#23');
 $url->base->parse('http://kraih.com/bar');
-is($url->is_abs, 0);
+is($url->is_abs, undef);
 is($url->to_abs, 'http://kraih.com/foo?foo=bar#23');
 
 # Absolute with path
 $url = Mojo::URL->new('../foo?foo=bar#23');
 $url->base->parse('http://kraih.com/bar/baz/');
-is($url->is_abs,         0);
+is($url->is_abs,         undef);
 is($url->to_abs,         'http://kraih.com/bar/baz/../foo?foo=bar#23');
 is($url->to_abs->to_rel, '../foo?foo=bar#23');
 is($url->to_abs->base,   'http://kraih.com/bar/baz/');

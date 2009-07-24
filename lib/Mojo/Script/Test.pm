@@ -35,7 +35,7 @@ sub run {
         $path = File::Spec->catdir(@base, '..', 't') unless -d $path;
         unless (-d $path) {
             print "Can't find test directory.\n";
-            return 0;
+            return;
         }
 
         # List test files

@@ -29,7 +29,7 @@ sub is_finished { shift->is_state(qw/done done_with_leftovers error/) }
 sub is_state {
     my ($self, @states) = @_;
     for my $state (@states) { return 1 if $self->state eq $state }
-    return 0;
+    return;
 }
 
 1;

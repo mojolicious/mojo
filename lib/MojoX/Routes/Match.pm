@@ -31,7 +31,7 @@ sub new {
 sub is_path_empty {
     my $self = shift;
     return 1 if !length $self->path || $self->path eq '/';
-    return 0;
+    return;
 }
 
 sub url_for {

@@ -19,7 +19,6 @@ sub startup {
     my $self = shift;
 
     # Only log errors to STDERR
-    $self->log->path(undef);
     $self->log->level('fatal');
 
     # Templateless renderer

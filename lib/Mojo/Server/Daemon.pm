@@ -300,13 +300,13 @@ sub _read {
     unless ($socket->connected) {
         $socket = $socket->accept;
         $self->accept_unlock;
-        return 0 unless $socket;
+        return unless $socket;
         push @{$self->{_accepted}},
           {requests => 0, socket => $socket, time => time};
         return 1;
     }
 
-    return 0 unless my $name = $self->_socket_name($socket);
+    return unless my $name = $self->_socket_name($socket);
 
     # No pipeline yet
     my $connection = $self->{_connections}->{$name};
@@ -399,13 +399,13 @@ sub _write {
     }
 
     # No name
-    return 0 unless $name;
+    return unless $name;
 
     # Nothing to write
-    return 0 unless $chunk;
+    return unless $chunk;
 
     # Connected?
-    return 0 unless $p->connection->connected;
+    return unless $p->connection->connected;
 
     # Write
     my $written = $p->connection->syswrite($chunk, length $chunk);

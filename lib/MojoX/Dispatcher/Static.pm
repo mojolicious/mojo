@@ -72,7 +72,7 @@ sub serve {
                     $res->headers->remove('Content-Type');
                     $res->headers->remove('Content-Length');
                     $res->headers->remove('Content-Disposition');
-                    return 0;
+                    return;
                 }
             }
 
@@ -91,7 +91,7 @@ sub serve {
             $res->headers->content_type($type);
             $res->content->file->path($path);
 
-            return 0;
+            return;
         }
 
         # Exists, but is forbidden
@@ -101,7 +101,7 @@ sub serve {
             $c->app->log->debug('File forbidden.');
 
             $res->code(403);
-            return 0;
+            return;
         }
     }
 
@@ -182,7 +182,7 @@ EOF
 EOF
     }
 
-    return 0;
+    return;
 }
 
 1;

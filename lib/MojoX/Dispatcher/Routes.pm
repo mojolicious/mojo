@@ -50,6 +50,9 @@ sub dispatch_callback {
     # Debug
     $c->app->log->debug(qq/Dispatching callback./);
 
+    # Catch errors
+    local $SIG{__DIE__} = sub { die Mojo::Loader::Exception->new(shift) };
+
     # Dispatch
     my $continue;
     my $cb = $c->match->captures->{callback};
@@ -60,9 +63,8 @@ sub dispatch_callback {
 
     # Callback error
     if ($@) {
-        my $e = ref $@ ? $@ : Mojo::Loader::Exception->new($@);
-        $c->app->log->error($e);
-        return $e;
+        $c->app->log->error($@);
+        return $@;
     }
 
     return;
@@ -107,6 +109,9 @@ sub dispatch_controller {
         return;
     }
 
+    # Catch errors
+    local $SIG{__DIE__} = sub { die Mojo::Loader::Exception->new(shift) };
+
     # Dispatch
     my $continue;
     eval { $continue = $class->new(ctx => $c)->$method($c) };
@@ -116,9 +121,8 @@ sub dispatch_controller {
 
     # Controller error
     if ($@) {
-        my $e = ref $@ ? $@ : Mojo::Loader::Exception->new($@);
-        $c->app->log->error($e);
-        return $e;
+        $c->app->log->error($@);
+        return $@;
     }
 
     return;

@@ -19,6 +19,10 @@ my $APP;
 sub import {
     my $class = shift;
 
+    # Lite apps are strict!
+    strict->import;
+    warnings->import;
+
     # Home
     $ENV{MOJO_HOME} ||= File::Spec->catdir(split '/', $FindBin::Bin);
 

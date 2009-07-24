@@ -64,9 +64,6 @@ __liteapp__
 %% my $class = shift;
 #!/usr/bin/env perl
 
-use strict;
-use warnings;
-
 use Mojolicious::Lite;
 
 get '/' => 'index';

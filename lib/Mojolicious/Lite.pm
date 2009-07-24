@@ -46,25 +46,23 @@ sub import {
             # Handler
             elsif (ref $arg eq 'CODE') { $cb = $arg }
 
-            # First hashref are constraints
-            elsif (ref $arg eq 'HASH' && !$constraints) {
-                $constraints = $arg;
-            }
+            # Constraints
+            elsif (ref $arg eq 'ARRAY') { $constraints = $arg }
 
-            # Second hashref are defaults
+            # Defaults
             elsif (ref $arg eq 'HASH') { $defaults = $arg }
         }
 
         # Defaults
         $cb ||= sub {1};
-        $constraints ||= {};
+        $constraints ||= [];
 
         # Merge
         $defaults ||= {};
         $defaults = {%$defaults, callback => $cb};
 
         # Create route
-        $APP->routes->route($pattern, $constraints)->via($method)
+        $APP->routes->route($pattern, {@$constraints})->via($method)
           ->to($defaults)->name($name);
     };
 

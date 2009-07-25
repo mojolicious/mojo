@@ -187,6 +187,16 @@ Mojolicious::Lite - Micro Web Framework
     @@ detected.txt.eplite
     TXT was detected.
 
+    # /external (render external template templates/foo/bar.html.epl)
+    any '/external' => sub {
+        my $self = shift;
+        $self->render(template => 'foo/bar.html.epl');
+    };
+
+    # /something.js (serving external static files)
+    % mkdir public
+    % mv something.js public/something.js
+
 =head1 DESCRIPTION
 
 L<Mojolicous::Lite> is a micro web framework built upon L<Mojolicious> and

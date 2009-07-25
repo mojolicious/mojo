@@ -127,6 +127,9 @@ sub new {
         }
     );
 
+    # Set default handler to "epl"
+    $self->default_handler('epl');
+
     return $self;
 }
 

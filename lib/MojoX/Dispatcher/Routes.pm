@@ -192,7 +192,7 @@ sub render {
     my ($self, $c) = @_;
 
     # Render
-    $c->render unless $c->stash->{rendered} || $c->res->code;
+    $c->render unless $c->stash->{rendered};
 }
 
 sub walk_stack {

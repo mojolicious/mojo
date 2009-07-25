@@ -30,7 +30,6 @@ sub handler {
     return $self->_diag($tx) if $tx->req->url->path =~ m|^/diag|;
 
     # Hello world!
-    $tx->res->code(200);
     $tx->res->headers->content_type('text/plain');
     $tx->res->body('Congratulations, your Mojo is working!');
 }
@@ -46,7 +45,6 @@ sub _diag {
     $self->_dump_url($tx)    if $path =~ m|^/diag/dump_url|;
 
     # Defaults
-    $tx->res->code(200) unless $tx->res->code;
     $tx->res->headers->content_type('text/plain')
       unless $tx->res->headers->content_type;
 

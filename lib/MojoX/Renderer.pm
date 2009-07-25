@@ -39,8 +39,16 @@ sub render {
 
     my ($output, $template);
 
+    # Text
+    if (my $text = delete $c->stash->{text}) {
+        $output = $text;
+        $template =
+          $self->_fix_template($c, delete $c->stash->{template} || '');
+        $c->stash->{inner_template} = $output if $c->stash->{layout};
+    }
+
     # Template
-    if ($template = delete $c->stash->{template}) {
+    elsif ($template = delete $c->stash->{template}) {
 
         # Fix
         return unless $template = $self->_fix_template($c, $template);

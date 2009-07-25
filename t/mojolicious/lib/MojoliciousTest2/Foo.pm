@@ -11,9 +11,8 @@ use base 'Mojolicious::Controller';
 # I'm not famous enough to get away with it.
 sub test {
     my $self = shift;
-    $self->res->code(200);
     $self->res->headers->header('X-Bender', 'Kiss my shiny metal ass!');
-    $self->res->body($self->ctx->url_for);
+    $self->render(text => $self->ctx->url_for);
 }
 
 1;

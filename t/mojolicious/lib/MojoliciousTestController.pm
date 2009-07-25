@@ -11,9 +11,8 @@ use base 'Mojolicious::Controller';
 # What am I, the pope?
 sub index {
     my $self = shift;
-    $self->res->code(200);
     $self->res->headers->header('X-Bender', 'Kiss my shiny metal ass!');
-    $self->res->body("No class works!");
+    $self->render(text => "No class works!");
 }
 
 1;

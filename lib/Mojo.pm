@@ -56,7 +56,6 @@ Mojo - The Web In A Box!
         my ($self, $tx) = @_;
 
         # Hello world!
-        $tx->res->code(200);
         $tx->res->headers->content_type('text/plain');
         $tx->res->body('Congratulations, your Mojo is working!');
     }

@@ -104,15 +104,88 @@ Mojolicious::Lite - Micro Web Framework
 
 =head1 SYNOPSIS
 
+    # Using Mojolicious::Lite will enable "strict" and "warnings"
     use Mojolicious::Lite;
 
+    # GET /*/bar (self contained without a template)
     get '/:foo/bar' => sub {
         my $self = shift;
-        $self->res->code(200);
-        $self->res->body('Yea baby!');
+        $self->render(text => 'Yea baby!');
     };
 
+    # Shagadelic will start the Mojolicious script system
     shagadelic;
+
+    # You can use all the normal script options from the command line
+    % ./myapp.pl daemon
+    Server available at http://127.0.0.1:3000.
+    % ./myapp.pl mojo cgi
+    ...CGI output...
+    % ./myapp.pl mojo fastcgi
+    ...Blocking FastCGI main loop...
+
+    # The shagadelic call can be customized to override @ARGV use
+    shagadelic(qw/mojo cgi/);
+
+    # POST /foo/* (with name and matching template in the DATA section)
+    post '/foo/:bar' => 'index';
+    __DATA__
+    @@ index.html.eplite
+    % my $self = shift;
+    Our :bar placeholder matched <%= $self->stash('bar') %>
+
+    # /baz (nothing special, just allowing all methods)
+    any '/baz' => sub {
+        my $self = shift;
+        $self->render(text => 'You called /baz with ' . $self->req->method);
+    };
+
+    # /:something (with special regex constraint only matching digits)
+    any '/:something' => [something => qr/\d+/] => sub {
+        my $self = shift;
+        $self->render(text => 'Something: ' . $self->stash('something'));
+    };
+
+    # GET /hello/* (with default value and template)
+    get '/hello/:name' => {name => 'Sebastian'} => sub {
+        my $self = shift;
+        $self->render(template => 'groovy', format => 'txt');
+    };
+    __DATA__
+    @@ groovy.txt.eplite
+    % my $self = shift;
+    My name is <%= $self->stash('name') %>.
+
+    # GET|POST /bye (allowing GET and POST)
+    any [qw/get post/] => '/bye' => sub {
+        my $self = shift;
+        $self->render(text => 'Bye!');
+    };
+
+    # GET /everything/*?name=* (using a lot of features together)
+    get '/everything/:stuff' => [stuff => qr/\d+/] => {stuff => 23} => sub {
+        shift->render(template => 'welcome');
+    };
+    __DATA__
+    @@ welcome.html.eplite
+    % my $self = shift;
+    Stuff is <%= $self->stash('stuff') %>.
+    Query param name is <%= $self->req->param('name') %>.
+
+    # GET /detection.html (format detection with multiple templates)
+    # GET /detection.txt
+    get '/detection' => sub {
+        my $self = shift;
+        $self->render(template => 'detected');
+    };
+    __DATA__
+    @@ detected.html.eplite
+    <!html>
+        <head><title>Detected!</title></head>
+        <body>HTML was detected.</body>
+    </html>
+    @@ detected.txt.eplite
+    TXT was detected.
 
 =head1 DESCRIPTION
 

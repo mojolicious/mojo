@@ -76,6 +76,7 @@ get '/:groovy' => sub {
 
 shagadelic;
 <%%= '__DATA__' %%>
+
 <%%= '@@ index.html.eplite' %%>
 % my $self = shift;
 % $self->stash(layout => 'funky');

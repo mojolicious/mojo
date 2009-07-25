@@ -178,7 +178,16 @@ sub url_for {
 
 sub via {
     my $self = shift;
-    $self->{_methods} = {map { lc $_ => 1 } @_};
+
+    # Methods
+    my $methods = ref $_[0] ? $_[0] : [@_];
+
+    # Shortcut
+    return $self unless @$methods;
+
+    # Cache
+    $self->{_methods} = {map { lc $_ => 1 } @$methods};
+
     return $self;
 }
 
@@ -287,6 +296,7 @@ follwing the ones.
 
     $routes = $routes->via('get');
     $routes = $routes->via(qw/get post/);
+    $routes = $routes->via([qw/get post/]);
 
 =head2 C<waypoint>
 

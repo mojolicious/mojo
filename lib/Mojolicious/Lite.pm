@@ -34,7 +34,7 @@ sub import {
 
     # Route generator
     my $route = sub {
-        my $method = shift;
+        my $methods = shift;
 
         my ($cb, $constraints, $defaults, $name, $pattern);
 
@@ -47,7 +47,7 @@ sub import {
             # Second scalar is the route name
             elsif (!ref $arg) { $name = $arg }
 
-            # Handler
+            # Callback
             elsif (ref $arg eq 'CODE') { $cb = $arg }
 
             # Constraints
@@ -66,7 +66,7 @@ sub import {
         $defaults = {%$defaults, callback => $cb};
 
         # Create route
-        $APP->routes->route($pattern, {@$constraints})->via($method)
+        $APP->routes->route($pattern, {@$constraints})->via($methods)
           ->to($defaults)->name($name);
     };
 
@@ -76,6 +76,7 @@ sub import {
 
     # Export
     *{"${caller}::app"}  = sub {$APP};
+    *{"${caller}::any"}  = sub { $route->(ref $_[0] ? shift : [], @_) };
     *{"${caller}::get"}  = sub { $route->('get', @_) };
     *{"${caller}::post"} = sub { $route->('post', @_) };
 

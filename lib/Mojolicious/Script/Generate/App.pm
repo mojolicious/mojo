@@ -92,13 +92,17 @@ L<Mojo::Script> and implements the following new ones.
 __DATA__
 __404__
 <!doctype html>
-    <head><title>Document not found.</title></head>
-    <body><h2>Document not found.</h2></body>
+    <head><title>File Not Found</title></head>
+    <body>
+        <h2>File Not Found</h2>
+    </body>
 </html>
 __500__
 <!doctype html>
-    <head><title>Internal server error.</title></head>
-    <body><h2>Internal server error.</h2></body>
+    <head><title>Internal Server Error</title></head>
+    <body>
+        <h2>Internal Server Error</h2>
+    </body>
 </html>
 __mojo__
 % my $class = shift;

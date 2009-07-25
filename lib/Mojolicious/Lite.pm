@@ -197,6 +197,10 @@ Mojolicious::Lite - Micro Web Framework
     % mkdir public
     % mv something.js public/something.js
 
+    # To disable debug messages later in a production setup you can change
+    # the Mojolicious mode (the default mode will be development)
+    % MOJO_MODE=production ./myapp.pl
+
 =head1 DESCRIPTION
 
 L<Mojolicous::Lite> is a micro web framework built upon L<Mojolicious> and

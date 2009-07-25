@@ -80,13 +80,13 @@ sub import {
     *{"${caller}::post"} = sub { $route->('post', @_) };
 
     # Shagadelic!
-    *{"${caller}::shagadelic"} = sub () {
+    *{"${caller}::shagadelic"} = sub {
 
         # We are the app in a lite environment
         $ENV{MOJO_APP} = 'Mojolicious::Lite';
 
         # Start script system
-        Mojolicious::Scripts->new->run(@ARGV);
+        Mojolicious::Scripts->new->run(@_ ? @_ : @ARGV);
     };
 }
 

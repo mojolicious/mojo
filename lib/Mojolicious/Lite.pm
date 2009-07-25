@@ -119,12 +119,16 @@ Mojolicious::Lite - Micro Web Framework
     # You can use all the normal script options from the command line
     % ./myapp.pl daemon
     Server available at http://127.0.0.1:3000.
+    % ./myapp.pl daemon 8080
+    Server available at http://127.0.0.1:8080.
+    % ./myapp.pl mojo daemon_prefork
+    Server available at http://127.0.0.1:3000.
     % ./myapp.pl mojo cgi
     ...CGI output...
     % ./myapp.pl mojo fastcgi
     ...Blocking FastCGI main loop...
 
-    # The shagadelic call can be customized to override @ARGV use
+    # The shagadelic call can be customized to override normal @ARGV use
     shagadelic(qw/mojo cgi/);
 
     # POST /foo/* (with name and matching template in the DATA section)
@@ -132,7 +136,14 @@ Mojolicious::Lite - Micro Web Framework
     __DATA__
     @@ index.html.eplite
     % my $self = shift;
-    Our :bar placeholder matched <%= $self->stash('bar') %>
+    Our :bar placeholder matched <%= $self->stash('bar') %>.
+    We are <%= $self->url_for %>.
+
+    # GET /bar (using url_for to generate the url for "index" aka. /foo/:bar)
+    get '/bar' => sub {
+        my $self = shift;
+        $self->render(text => $self->url_for('index', bar => 'something'));
+    };
 
     # /baz (nothing special, just allowing all methods)
     any '/baz' => sub {
@@ -193,7 +204,7 @@ Mojolicious::Lite - Micro Web Framework
         $self->render(template => 'foo/bar.html.epl');
     };
 
-    # /something.js (serving external static files)
+    # /something.js (serving external static files, yes it's that simple)
     % mkdir public
     % mv something.js public/something.js
 

@@ -165,7 +165,7 @@ Mojolicious::Lite - Micro Web Framework
         $self->render(text => 'You called /baz with ' . $self->req->method);
     };
 
-    # GET /hello/* (matching everything except "/")
+    # GET /hello/* (matching everything after "/hello/" except "/")
     get '/hello/(.you)' => sub {
         shift->render(template => 'groovy');
     };
@@ -173,7 +173,8 @@ Mojolicious::Lite - Micro Web Framework
     @@ groovy.html.eplite
     Your name is <%= shift->stash('you') %>.
 
-    # GET /hello/* (matching absolutely everything including "/" and ".")
+    # GET /hello/* (matching absolutely everything after "/hello/" including
+    # "/" and ".")
     get '/hello/(*you)' => sub {
         shift->render(template => 'groovy');
     };

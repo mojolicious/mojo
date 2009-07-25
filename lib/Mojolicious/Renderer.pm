@@ -90,7 +90,12 @@ sub new {
 
             # Template
             my $template = $c->stash->{template};
-            my $class = delete $c->stash->{eplite_class} || 'main';
+
+            # Class
+            my $class =
+                 delete $c->stash->{eplite_class}
+              || $ENV{MOJO_EPLITE_CLASS}
+              || 'main';
 
             # Path
             my $path =

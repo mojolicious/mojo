@@ -158,5 +158,5 @@ is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 is($tx->res->body,                            'baz');
 
 __DATA__
-__index.html.eplite__
+@@ index.html.eplite
 works!

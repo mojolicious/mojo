@@ -60,7 +60,7 @@ L<Mojo::Script> and implements the following new ones.
 =cut
 
 __DATA__
-__liteapp__
+@@ liteapp
 %% my $class = shift;
 #!/usr/bin/env perl
 
@@ -76,12 +76,12 @@ get '/:groovy' => sub {
 
 shagadelic;
 <%%= '__DATA__' %%>
-<%%= '__index.html.eplite__' %%>
+<%%= '@@ index.html.eplite' %%>
 % my $self = shift;
 % $self->stash(layout => 'funky');
 Yea baby!
 
-<%%= '__layouts/funky.html.eplite__' %%>
+<%%= '@@ layouts/funky.html.eplite' %%>
 % my $self = shift;
 <!html>
     <head><title>Funky!</title></head>

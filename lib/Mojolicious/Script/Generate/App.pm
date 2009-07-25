@@ -90,21 +90,21 @@ L<Mojo::Script> and implements the following new ones.
 =cut
 
 __DATA__
-__404__
+@@ 404
 <!doctype html>
     <head><title>File Not Found</title></head>
     <body>
         <h2>File Not Found</h2>
     </body>
 </html>
-__500__
+@@ 500
 <!doctype html>
     <head><title>Internal Server Error</title></head>
     <body>
         <h2>Internal Server Error</h2>
     </body>
 </html>
-__mojo__
+@@ mojo
 % my $class = shift;
 #!/usr/bin/env perl
 
@@ -130,7 +130,7 @@ EOF
 
 # Start the script system
 Mojolicious::Scripts->new->run(@ARGV);
-__appclass__
+@@ appclass
 % my $class = shift;
 package <%= $class %>;
 
@@ -152,7 +152,7 @@ sub startup {
 }
 
 1;
-__controller__
+@@ controller
 % my $class = shift;
 package <%= $class %>;
 
@@ -173,7 +173,7 @@ sub welcome {
 }
 
 1;
-__static__
+@@ static
 <!doctype html>
     <head><title>Welcome to the Mojolicious Web Framework!</title></head>
     <body>
@@ -183,7 +183,7 @@ __static__
         to get back to the start.
     </body>
 </html>
-__test__
+@@ test
 % my $class = shift;
 #!/usr/bin/env perl
 
@@ -207,7 +207,7 @@ $client->process_app('<%= $class %>', $tx);
 is($tx->res->code, 200);
 is($tx->res->headers->content_type, 'text/html');
 like($tx->res->content->file->slurp, qr/Mojolicious Web Framework/i);
-__exception__
+@@ exception
 % use Data::Dumper ();
 % use Mojo::ByteStream 'b';
 % my $self = shift;
@@ -242,7 +242,7 @@ __exception__
     </body>
 </html>
 % $s->{exception} = $e;
-__layout__
+@@ layout
 % my $self = shift;
 <!doctype html>
     <head><title>Welcome</title></head>
@@ -250,7 +250,7 @@ __layout__
         <%= $self->render_inner %>
     </body>
 </html>
-__welcome__
+@@ welcome
 % my $self = shift;
 <h2><%= $self->stash('message') %></h2>
 This page was generated from the template

@@ -99,7 +99,7 @@ sub get_data {
     seek $d, 0, 0;
 
     # Split
-    my @data = split /^__(.+)__\r?\n/m, join '', <$d>;
+    my @data = split /^@@\s+(.+)\s*\r?\n/m, join '', <$d>;
 
     # Remove split garbage
     shift @data;
@@ -221,7 +221,7 @@ Mojo::Script - Script Base Class
 
     1;
     __DATA__
-    __foo_bar__
+    @@ foo_bar
     % for (1 .. 5) {
         Hello World!
     % }

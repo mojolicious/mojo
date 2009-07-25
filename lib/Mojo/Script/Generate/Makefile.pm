@@ -66,7 +66,7 @@ and implements the following new ones.
 =cut
 
 __DATA__
-__makefile__
+@@ makefile
 % my ($class, $path, $name) = @_;
 #!/usr/bin/env perl
 

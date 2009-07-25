@@ -8,6 +8,8 @@ This file documents the revision history for Perl extension Mojo.
           and wildcard variations.
               "/((foo))" becomes "/(.foo)"
               "/(((foo)))" becomes "/(*foo)"
+        - Updated Mojo::Script::get_data to use "@@ $name" instead of
+          "__$name__".
         - Updated our routes implementation to support HTTP request methods.
         - Updated Mojo::Home to fallback to FindBin for detection.
         - Made Mojolicious much more fault tolerant.

@@ -51,7 +51,7 @@ sub index { shift->stash(template => 'withlayout', msg => 'works great!') }
 
 1;
 __DATA__
-__index.html.eplite__
+@@ index.html.eplite
 <%= 20 + 3 %> works!
-__too.html.eplite__
+@@ too.html.eplite
 This one works too!

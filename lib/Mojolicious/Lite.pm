@@ -139,6 +139,20 @@ Mojolicious::Lite - Micro Web Framework
     Our :bar placeholder matched <%= $self->stash('bar') %>.
     We are <%= $self->url_for %>.
 
+    # GET /with_layout (template and layout)
+    get '/with_layout' => sub {
+        my $self = shift;
+        $self->render(template => 'with_layout', layout => 'green');
+    };
+    __DATA__
+    @@ with_layout.html.eplite
+    We've got content!
+    @@ layouts/green.html.eplite
+    <!html>
+        <head><title>Green!</title></head>
+        <body><%= $self->render_inner %></body>
+    </html>
+
     # GET /bar (using url_for to generate the url for "index" aka. /foo/:bar)
     get '/bar' => sub {
         my $self = shift;
@@ -150,6 +164,22 @@ Mojolicious::Lite - Micro Web Framework
         my $self = shift;
         $self->render(text => 'You called /baz with ' . $self->req->method);
     };
+
+    # GET /hello/* (matching everything except "/")
+    get '/hello/(.you)' => sub {
+        shift->render(template => 'groovy');
+    };
+    __DATA__
+    @@ groovy.html.eplite
+    Your name is <%= shift->stash('you') %>.
+
+    # GET /hello/* (matching absolutely everything including "/" and ".")
+    get '/hello/(*you)' => sub {
+        shift->render(template => 'groovy');
+    };
+    __DATA__
+    @@ groovy.html.eplite
+    Your name is <%= shift->stash('you') %>.
 
     # /:something (with special regex constraint only matching digits)
     any '/:something' => [something => qr/\d+/] => sub {
@@ -211,6 +241,13 @@ Mojolicious::Lite - Micro Web Framework
     # To disable debug messages later in a production setup you can change
     # the Mojolicious mode (the default mode will be development)
     % MOJO_MODE=production ./myapp.pl
+
+    # For more control you can also access the Mojolicious instance directly
+    app->log->level('error');
+    app->routes->route('/foo/:bar')->via('get')->to(callback => sub {
+        my $self = shift;
+        $self->render(text => 'Hello Mojo!');
+    });
 
 =head1 DESCRIPTION
 

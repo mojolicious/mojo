@@ -13,11 +13,15 @@ sub app { shift->ctx->app }
 
 sub render { shift->ctx->render(@_) }
 
+sub render_partial { shift->ctx->render_partial(@_) }
+
 sub req { shift->ctx->req }
 
 sub res { shift->ctx->res }
 
 sub stash { shift->ctx->stash(@_) }
+
+sub url_for { shift->ctx->url_for(@_) }
 
 1;
 __END__
@@ -49,6 +53,11 @@ ones.
     $controller->render;
     $controller->render(action => 'foo');
 
+=head2 C<render_partial>
+
+    my $output = $controller->render_partial;
+    my $output = $controller->render_partial(action => 'foo');
+
 =head2 C<req>
 
     my $req = $controller->req;
@@ -63,5 +72,12 @@ ones.
     my $foo     = $controller->stash('foo');
     $controller = $controller->stash({foo => 'bar'});
     $controller = $controller->stash(foo => 'bar');
+
+=head2 C<url_for>
+
+    my $url = $controller->url_for;
+    my $url = $controller->url_for(controller => 'bar', action => 'baz');
+    my $url =
+      $controller->url_for('named', controller => 'bar', action => 'baz');
 
 =cut

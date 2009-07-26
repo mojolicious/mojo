@@ -117,6 +117,7 @@ sub new {
 
                 # Template
                 my $t = Mojo::Template->new;
+                $t->namespace($class);
                 $t->parse($d);
                 $t->build;
                 $r->{_mt_cache}->{$path} = $t;

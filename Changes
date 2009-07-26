@@ -20,6 +20,7 @@ This file documents the revision history for Perl extension Mojo.
         - Made Mojolicious much more fault tolerant.
         - Fixed PATH_INFO handling of the CGI environment parser in
           Mojo::Message::Request.
+        - Added namespace support to Mojo::Template.
         - Added eplite handler to Mojolicious::Renderer.
         - Added generator for lite apps.
         - Added tests.

@@ -14,7 +14,7 @@ use Mojo::Template::Exception;
 
 __PACKAGE__->attr('code',         default => '');
 __PACKAGE__->attr('comment_mark', default => '#');
-__PACKAGE__->attr('compiled');
+__PACKAGE__->attr([qw/compiled namespace/]);
 __PACKAGE__->attr('encoding',        default => 'utf8');
 __PACKAGE__->attr('expression_mark', default => '=');
 __PACKAGE__->attr('line_start',      default => '%');
@@ -62,8 +62,9 @@ sub build {
     }
 
     # Wrap
+    my $namespace = $self->namespace || ref $self;
     $lines[0] ||= '';
-    $lines[0] = q/sub { my $_MOJO = '';/ . $lines[0];
+    $lines[0] = qq/package $namespace; sub { my \$_MOJO = '';/ . $lines[0];
     $lines[-1] .= q/return $_MOJO; };/;
 
     $self->code(join "\n", @lines);
@@ -458,6 +459,11 @@ L<Mojo::Template> implements the following attributes.
 
     my $line_start = $mt->line_start;
     $mt            = $mt->line_start('%');
+
+=head2 C<namespace>
+
+    my $namespace = $mt->namespace;
+    $mt           = $mt->namespace('main');
 
 =head2 C<template>
 

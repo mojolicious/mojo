@@ -194,7 +194,7 @@ $mt->parse(<<'EOF');
 </html>
 EOF
 $mt->build;
-like($mt->code, qr/^sub /);
+like($mt->code, qr/^package /);
 like($mt->code, qr/lala/);
 unlike($mt->code, qr/ comment lalala /);
 ok(!defined($mt->compiled));

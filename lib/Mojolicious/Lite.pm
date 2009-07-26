@@ -165,7 +165,7 @@ Mojolicious::Lite - Micro Web Framework
         $self->render(text => 'You called /baz with ' . $self->req->method);
     };
 
-    # GET /hello/* (matching everything after "/hello/" except "/")
+    # GET /hello/* (matching everything except "/" after "/hello/")
     get '/hello/(.you)' => sub {
         shift->render(template => 'groovy');
     };

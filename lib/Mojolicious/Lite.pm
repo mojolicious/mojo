@@ -254,6 +254,23 @@ Mojolicious::Lite - Micro Web Framework
         $self->render(text => 'Hello Mojo!');
     });
 
+    # In case your lite apps need to grow, you can easily mix lite and real
+    # Mojolicious apps for a smooth transition process
+    package MyApp::Foo;
+    use base 'Mojolicious::Controller';
+    sub index {
+        shift->render(text => 'It works!');
+    }
+    package main;
+    use Mojolicious::Lite;
+    get '/bar' => sub {
+        shift->render(text => 'This too!');
+    };
+    app->routes->namespace('MyApp');
+    app->routes->route('/foo/:action')->via('get')
+      ->to(controller => 'foo', action => index);
+    shagadelic;
+
 =head1 DESCRIPTION
 
 L<Mojolicous::Lite> is a micro web framework built upon L<Mojolicious> and

@@ -153,7 +153,7 @@ Mojolicious::Lite - Micro Web Framework
         <body><%= $self->render_inner %></body>
     </html>
 
-    # GET /bar (using url_for to generate the url for "index" aka. /foo/:bar)
+    # GET /bar (using url_for to generate url for "index" aka. "/foo/:bar")
     get '/bar' => sub {
         my $self = shift;
         $self->render(text => $self->url_for('index', bar => 'something'));
@@ -242,6 +242,10 @@ Mojolicious::Lite - Micro Web Framework
     # To disable debug messages later in a production setup you can change
     # the Mojolicious mode (the default mode will be development)
     % MOJO_MODE=production ./myapp.pl
+
+    # Log messages will be automatically written to a "log/$mode.log" file if
+    # a log directory exists
+    % mkdir log
 
     # For more control you can also access the Mojolicious instance directly
     app->log->level('error');

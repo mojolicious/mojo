@@ -124,7 +124,8 @@ There is a helper script to generate a small example application.
 
     % mojolicious generate lite_app
 
-All the normal L<Mojolicious> options are available from the command line.
+All the normal L<Mojolicious> script options are available from the command
+line.
 
     % ./myapp.pl daemon
     Server available at http://127.0.0.1:3000.

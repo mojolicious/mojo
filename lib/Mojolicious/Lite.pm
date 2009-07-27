@@ -147,11 +147,11 @@ customized to override normal C<@ARGV> use.
 
     shagadelic(qw/mojo cgi/);
 
-Routes are basically just a path that can contain different kinds of
+Routes are basically just fancy paths that can contain different kinds of
 placeholders.
 
     # /foo
-    get '/:foo/bar' => sub {
+    get '/foo' => sub {
         my $self = shift;
         $self->render(text => 'Yea baby!');
     };

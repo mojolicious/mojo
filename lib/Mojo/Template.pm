@@ -10,12 +10,14 @@ use base 'Mojo::Base';
 use Carp 'croak';
 use Encode qw/decode encode/;
 use IO::File;
+use Mojo::ByteStream;
 use Mojo::Template::Exception;
 
 __PACKAGE__->attr('code',         default => '');
 __PACKAGE__->attr('comment_mark', default => '#');
 __PACKAGE__->attr([qw/compiled namespace/]);
 __PACKAGE__->attr('encoding',        default => 'utf8');
+__PACKAGE__->attr('escape_mark',     default => '=');
 __PACKAGE__->attr('expression_mark', default => '=');
 __PACKAGE__->attr('line_start',      default => '%');
 __PACKAGE__->attr('template',        default => '');
@@ -46,7 +48,7 @@ sub build {
                 $value = quotemeta($value);
                 $value .= '\n' if $newline;
 
-                $lines[-1] .= "\$_MOJO .= \"" . $value . "\";";
+                $lines[-1] .= "\$_M .= \"" . $value . "\";";
             }
 
             # Code
@@ -56,7 +58,13 @@ sub build {
 
             # Expression
             if ($type eq 'expr') {
-                $lines[-1] .= "\$_MOJO .= $value;";
+                $lines[-1] .= "\$_M .= $value;";
+            }
+
+            # Expression that needs to be escaped
+            if ($type eq 'escp') {
+                $lines[-1]
+                  .= "\$_M .= Mojo::ByteStream->new($value)->html_escape;";
             }
         }
     }
@@ -64,8 +72,8 @@ sub build {
     # Wrap
     my $namespace = $self->namespace || ref $self;
     $lines[0] ||= '';
-    $lines[0] = qq/package $namespace; sub { my \$_MOJO = '';/ . $lines[0];
-    $lines[-1] .= q/return $_MOJO; };/;
+    $lines[0] = qq/package $namespace; sub { my \$_M = '';/ . $lines[0];
+    $lines[-1] .= q/return $_M; };/;
 
     $self->code(join "\n", @lines);
     return $self;
@@ -127,6 +135,7 @@ sub parse {
     my $tag_start  = quotemeta $self->tag_start;
     my $tag_end    = quotemeta $self->tag_end;
     my $cmnt_mark  = quotemeta $self->comment_mark;
+    my $escp_mark  = quotemeta $self->escape_mark;
     my $expr_mark  = quotemeta $self->expression_mark;
 
     # Tokenize
@@ -137,6 +146,13 @@ sub parse {
         # Perl line without return value
         if ($line =~ /^$line_start\s+(.+)$/) {
             push @{$self->tree}, ['code', $1];
+            $multiline_expression = 0;
+            next;
+        }
+
+        # Perl line with return value that needs to be escaped
+        if ($line =~ /^$line_start$expr_mark$escp_mark\s+(.+)$/) {
+            push @{$self->tree}, ['escp', $1];
             $multiline_expression = 0;
             next;
         }
@@ -179,13 +195,15 @@ sub parse {
         for my $token (
             split /
             (
-                $tag_start$expr_mark   # Expression
+                $tag_start$expr_mark$escp_mark   # Escaped expression
             |
-                $tag_start$cmnt_mark   # Comment
+                $tag_start$expr_mark             # Expression
             |
-                $tag_start             # Code
+                $tag_start$cmnt_mark             # Comment
             |
-                $tag_end               # End
+                $tag_start                       # Code
+            |
+                $tag_end                         # End
             )
         /x, $line
           )
@@ -209,6 +227,11 @@ sub parse {
             # Expression
             elsif ($token =~ /^$tag_start$expr_mark$/) {
                 $state = 'expr';
+            }
+
+            # Expression that needs to be escaped
+            elsif ($token =~ /^$tag_start$expr_mark$escp_mark$/) {
+                $state = 'escp';
             }
 
             # Value
@@ -449,6 +472,11 @@ L<Mojo::Template> implements the following attributes.
 
     my $encoding = $mt->encoding;
     $mt          = $mt->encoding('utf8');
+
+=head2 C<escape_mark>
+
+    my $escape_mark = $mt->escape_mark;
+    $mt             = $mt->escape_mark('=');
 
 =head2 C<expression_mark>
 

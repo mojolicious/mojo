@@ -25,7 +25,7 @@ package main;
 use strict;
 use warnings;
 
-use Test::More tests => 62;
+use Test::More tests => 63;
 
 use File::Spec;
 use File::Temp;
@@ -242,6 +242,15 @@ $output = $mt->render(<<'EOF');
 </html>\\\\
 EOF
 is($output, "<html>2222</html>\\\\\\\n");
+
+# HTML escape
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+<html><%== '<html>' %>
+%== '&lt;'
+</html>
+EOF
+is($output, "<html>&lt;html&gt;\n&amp;lt;</html>\n");
 
 # Multiline comment
 $mt     = Mojo::Template->new;

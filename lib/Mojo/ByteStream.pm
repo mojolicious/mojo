@@ -16,7 +16,7 @@ require Encode;
 require MIME::Base64;
 require MIME::QuotedPrint;
 
-# XHTML 1.0 entities for html_decode
+# XHTML 1.0 entities for html_unescape
 my %ENTITIES = (
     Aacute   => 193,
     aacute   => 225,
@@ -273,7 +273,7 @@ my %ENTITIES = (
     zwnj     => 8204
 );
 
-# Reverse entities for html_encode
+# Reverse entities for html_escape
 my %REVERSE_ENTITIES;
 while (my ($name, $value) = each %ENTITIES) {
     $REVERSE_ENTITIES{$value} = $name;
@@ -399,28 +399,7 @@ sub encode {
     return $self;
 }
 
-sub html_decode {
-    my $self = shift;
-
-    # Shortcut
-    return $self unless defined $self->{bytestream};
-
-    # Decode
-    $self->{bytestream} =~ s/
-        &(?:
-            \#(\d{1,7})              # Number
-        |
-            ([A-Za-z]{1,8})          # Named
-        |
-            \#x([0-9A-Fa-f]{1,6}))   # Hex
-        ;
-    /_decode($1, $2, $3)/gex;
-
-    # utf8
-    return $self->decode('utf8');
-}
-
-sub html_encode {
+sub html_escape {
     my $self = shift;
 
     # Shortcut
@@ -429,19 +408,40 @@ sub html_encode {
     # Character semantics
     no bytes;
 
-    my $encoded = '';
+    my $escaped = '';
     for (1 .. length $self->{bytestream}) {
 
-        # Encode
+        # Escape
         my $char = substr $self->{bytestream}, 0, 1, '';
         my $num = unpack 'U', $char;
         my $named = $REVERSE_ENTITIES{$num};
         $char = "&$named;" if $named;
-        $encoded .= $char;
+        $escaped .= $char;
     }
-    $self->{bytestream} = $encoded;
+    $self->{bytestream} = $escaped;
 
     return $self;
+}
+
+sub html_unescape {
+    my $self = shift;
+
+    # Shortcut
+    return $self unless defined $self->{bytestream};
+
+    # Unescape
+    $self->{bytestream} =~ s/
+        &(?:
+            \#(\d{1,7})              # Number
+        |
+            ([A-Za-z]{1,8})          # Named
+        |
+            \#x([0-9A-Fa-f]{1,6}))   # Hex
+        ;
+    /_unescape($1, $2, $3)/gex;
+
+    # utf8
+    return $self->decode('utf8');
 }
 
 sub length {
@@ -549,8 +549,18 @@ sub url_unescape {
     return $self;
 }
 
-# Helper for html_decode
-sub _decode {
+# Helper for url_sanitize
+sub _sanitize {
+    my $hex = shift;
+
+    my $char = hex $hex;
+    return chr $char if $UNRESERVED{$char};
+
+    return '%' . uc $hex;
+}
+
+# Helper for html_unescape
+sub _unescape {
     my ($num, $entitie, $hex) = @_;
 
     # Named to number
@@ -564,16 +574,6 @@ sub _decode {
 
     # Unknown entitie
     return "&$entitie;";
-}
-
-# Helper for url_sanitize
-sub _sanitize {
-    my $hex = shift;
-
-    my $char = hex $hex;
-    return chr $char if $UNRESERVED{$char};
-
-    return '%' . uc $hex;
 }
 
 1;
@@ -595,8 +595,8 @@ Mojo::ByteStream - ByteStream
     $stream->b64_decode;
     $stream->encode('utf8');
     $stream->decode('utf8');
-    $stream->html_encode;
-    $stream->html_decode;
+    $stream->html_escape;
+    $stream->html_unescape;
     $stream->md5_sum;
     $stream->qp_encode;
     $stream->qp_decode;
@@ -619,7 +619,7 @@ Mojo::ByteStream - ByteStream
     # Constructor alias
     use Mojo::ByteStream 'b';
 
-    my $stream = b('foobarbaz')->html_encode;
+    my $stream = b('foobarbaz')->html_escape;
 
 =head1 DESCRIPTION
 
@@ -663,13 +663,13 @@ the following new ones.
 
     $stream = $stream->encode($encoding);
 
-=head2 C<html_decode>
+=head2 C<html_escape>
 
-    $stream = $stream->html_decode;
+    $stream = $stream->html_escape;
 
-=head2 C<html_encode>
+=head2 C<html_unescape>
 
-    $stream = $stream->html_encode;
+    $stream = $stream->html_unescape;
 
 =head2 C<length>
 

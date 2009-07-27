@@ -89,31 +89,31 @@ $stream = b('0');
 is($stream->length,    1);
 is($stream->to_string, '0');
 
-# html_encode
+# html_escape
 $stream = b('foobar<baz>');
-is($stream->html_encode, 'foobar&lt;baz&gt;');
+is($stream->html_escape, 'foobar&lt;baz&gt;');
 
-# html_encode (nothing to encode)
+# html_escape (nothing to escape)
 $stream = b('foobar');
-is($stream->html_encode, 'foobar');
+is($stream->html_escape, 'foobar');
 
-# html_decode
+# html_unescape
 $stream = b('foobar&lt;baz&gt;&#x26;&#34;');
-is($stream->html_decode, "foobar<baz>&\"");
+is($stream->html_unescape, "foobar<baz>&\"");
 
-# html_decode (nothing to decode)
+# html_unescape (nothing to unescape)
 $stream = b('foobar');
-is($stream->html_decode, 'foobar');
+is($stream->html_unescape, 'foobar');
 
-# utf8 html_encode
-$stream = b("foobar<baz>&\"\x{152}")->html_encode;
+# utf8 html_escape
+$stream = b("foobar<baz>&\"\x{152}")->html_escape;
 is("$stream", 'foobar&lt;baz&gt;&amp;&quot;&OElig;');
 
-# utf8 html_decode
-$stream = b('foobar&lt;baz&gt;&#x26;&#34;&OElig;')->html_decode;
+# utf8 html_unescape
+$stream = b('foobar&lt;baz&gt;&#x26;&#34;&OElig;')->html_unescape;
 is("$stream", "foobar<baz>&\"\x{152}");
 
-# html_encode (path)
+# html_escape (path)
 $stream =
-  b('/usr/local/lib/perl5/site_perl/5.10.0/Mojo/ByteStream.pm')->html_encode;
+  b('/usr/local/lib/perl5/site_perl/5.10.0/Mojo/ByteStream.pm')->html_escape;
 is("$stream", '/usr/local/lib/perl5/site_perl/5.10.0/Mojo/ByteStream.pm');

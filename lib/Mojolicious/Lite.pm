@@ -333,7 +333,7 @@ multiple features at once.
     Who is groovy?
     <form action="<%= $self->url_for('form') %>" method="POST">
         <input type="text" name="groovy" />
-        <input type="submit" value="Forward">
+        <input type="submit" value="Woosh!">
     </form>
 
     @@ welcome.html.eplite

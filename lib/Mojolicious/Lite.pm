@@ -241,7 +241,9 @@ C</> and C<.>.
     get '/hello/(*you)' => sub {
         shift->render(template => 'groovy');
     };
+
     __DATA__
+
     @@ groovy.html.eplite
     Your name is <%= shift->stash('you') %>.
 

@@ -202,7 +202,7 @@ Templates can have layouts.
     @@ layouts/green.html.eplite
     <!html>
         <head><title>Green!</title></head>
-        <body><%= $self->render_inner %></body>
+        <body><%= shift->render_inner %></body>
     </html>
 
 Route placeholders allow capturing parts of a request path until a C</> or
@@ -210,15 +210,15 @@ C<.> separator occurs, results will be stored by name in the C<stash>.
 
     # /foo/*
     get '/foo/:bar' => sub {
-        my $self = shiftl
-        my $bar = $self->stash('bar');
+        my $self = shift;
+        my $bar  = $self->stash('bar');
         $self->render(text => "Our :bar placeholder matched $bar");
     };
 
     # /*something/foo
     get '/(:bar)something/foo' => sub {
-        my $self = shiftl
-        my $bar = $self->stash('bar');
+        my $self = shift;
+        my $bar  = $self->stash('bar');
         $self->render(text => "Our :bar placeholder matched $bar");
     };
 

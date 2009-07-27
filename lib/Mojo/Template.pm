@@ -385,9 +385,11 @@ like that.
 
     <% Inline Perl %>
     <%= Perl expression, replaced with result %>
+    <%== Perl expression, replaced with HTML escaped result %>
     <%# Comment, useful for debugging %>
     % Perl line
     %= Perl expression line, replaced with result
+    %== Perl expression line, replaced with HTML escaped result
     %# Comment line, useful for debugging
 
 L<Mojo::Template> templates work just like Perl subs (actually they get
@@ -406,9 +408,10 @@ them if necessary.
     $mt->tag_start('[@@');
     $mt->tag_end('@@]');
     $mt->expression_mark('&');
+    $mt->escape_mark('&');
     my $output = $mt->render(<<'EOF', 23);
     @@ my $i = shift;
-    <% no code just text [@@& $i @@]
+    <% no code just text [@@&& $i @@]
     EOF
 
 There is only one case that we can escape with a backslash, and thats a

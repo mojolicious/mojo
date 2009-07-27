@@ -262,16 +262,17 @@ Routes can be restricted to specific request methods.
     any '/baz' => sub {
         my $self = shift;
         my $method = $self->req->method;
-        $self->render(text => "You called /baz with $mthod");
+        $self->render(text => "You called /baz with $method");
     };
 
 All placeholders get compiled to a regex internally, with regex constraints
 this process can be easily customized.
 
-    # /:something
-    any '/:something' => [something => qr/\d+/] => sub {
+    # /*
+    any '/:bar' => [something => qr/\d+/] => sub {
         my $self = shift;
-        $self->render(text => 'Something: ' . $self->stash('something'));
+        my $bar = $self->stash('bar');
+        $self->render(text => "Our :bar placeholder matched $bar");
     };
 
 Routes allow default values to make placeholders optional.

@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojo.
 
+0.991242 2009-07-20 00:00:00
+        - Added more Mojolicious::Lite examples.
+
 0.991241 2009-07-20 00:00:00
         - Mojolicious::Lite has been introduced as a new entry level web
           framework example.

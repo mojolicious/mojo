@@ -104,6 +104,9 @@ Mojolicious::Lite - Micro Web Framework
 
 =head1 SYNOPSIS
 
+    # Generate a small example app
+    % mojolicious generate lite_app
+
     # Using Mojolicious::Lite will enable "strict" and "warnings"
     use Mojolicious::Lite;
 
@@ -130,6 +133,44 @@ Mojolicious::Lite - Micro Web Framework
 
     # The shagadelic call can be customized to override normal @ARGV use
     shagadelic(qw/mojo cgi/);
+
+    # A full html form example using many features together
+    use Mojolicious::Lite;
+    get '/' => 'index';
+    post '/form' => 'form' => sub {
+        my $self = shift;
+        my $groovy = $self->req->param('groovy') || 'Austin Powers';
+        $groovy =~ s/[^\w\s]+//g;
+        $self->render(
+            template => 'welcome',
+            layout   => 'funky',
+            groovy   => $groovy
+        );
+    };
+    shagadelic;
+    __DATA__
+    @@ index.html.eplite
+    % my $self = shift;
+    % $self->stash(layout => 'funky');
+    Who is groovy?
+    <form action="<%= $self->url_for('form') %>" method="POST">
+        <input type="text" name="groovy" />
+        <input type="submit" value="Forward">
+    </form>
+    @@ welcome.html.eplite
+    % my $self = shift;
+    <%= $self->stash('groovy') %> is groovy!
+    <%= $self->render_partial(template => 'menu') %>
+    @@ menu.html.eplite
+    <a href="<%= shift->url_for('index') %>">Try again</a>
+    @@ layouts/funky.html.eplite
+    % my $self = shift;
+    <!html>
+        <head><title>Funky!</title></head>
+        <body>
+            <%= $self->render_inner %>
+        </body>
+    </html>
 
     # POST /foo/* (with name and matching template in the DATA section)
     post '/foo/:bar' => 'index';

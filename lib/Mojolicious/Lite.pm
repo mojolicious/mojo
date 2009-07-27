@@ -181,10 +181,10 @@ template detection and back referencing with C<url_for>.
     __DATA__
 
     @@ index.html.eplite
-    <a href="<%= $self->url_for('foo') %>">Foo</a>.
+    <a href="<%= shift->url_for('foo') %>">Foo</a>.
 
     @@ foo.html.eplite
-    <a href="<%= $self->url_for('index') %>">Home</a>.
+    <a href="<%= shift->url_for('index') %>">Home</a>.
 
 Templates can have layouts.
 

@@ -107,7 +107,7 @@ Mojolicious::Lite - Micro Web Framework
     # Using Mojolicious::Lite will enable "strict" and "warnings"
     use Mojolicious::Lite;
 
-    # GET /*
+    # Route with placeholder
     get '/:foo' => sub {
         my $self = shift;
         $self->render(text => 'Yea baby!');
@@ -120,7 +120,20 @@ Mojolicious::Lite - Micro Web Framework
 
 L<Mojolicous::Lite> is a micro web framework built around L<Mojolicious>.
 
-There is a helper script to generate a small example application.
+A minimal application looks like this.
+
+    #!/usr/bin/env perl
+
+    use Mojolicious::Lite;
+
+    get '/' => sub {
+        my $self = shift;
+        $self->render(text => 'Yea baby!');
+    };
+
+    shagadelic;
+
+There is also a helper script to generate a small example application.
 
     % mojolicious generate lite_app
 

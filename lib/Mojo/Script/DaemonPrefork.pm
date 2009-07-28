@@ -27,7 +27,8 @@ These options are available:
   --interval <seconds>    Set interval for process maintainance, defaults to
                           15.
   --keepalive <seconds>   Set keep-alive timeout, defaults to 15.
-  --maxspare <number>     Set maximum amount of idle children, defaults to 10.
+  --maxspare <number>     Set maximum amount of idle children, defaults to
+                          10.
   --minspare <number>     Set minimum amount of idle children, defaults to 5.
   --pid <path>            Set path to pid file, defaults to a random
                           temporary file.

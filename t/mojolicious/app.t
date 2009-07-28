@@ -243,8 +243,7 @@ is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 is($tx->res->body,                            '/foo/bar');
 
 # MojoliciousTestController::Foo::stage2
-$tx = Mojo::Transaction->new_get('/staged');
-$tx->req->headers->header('X-Pass' => 1);
+$tx = Mojo::Transaction->new_get('/staged', 'X-Pass' => 1);
 $client->process_app('MojoliciousTest', $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');

@@ -22,7 +22,7 @@ These options are available:
                           defaults to 1.
   --daemonize             Daemonize process.
   --group <name>          Set group name for child processes.
-  --idle <seconds>        Set time processes have to be idle before being
+  --idle <seconds>        Set time processes can be idle without getting
                           killed, defaults to 30.
   --interval <seconds>    Set interval for process maintainance, defaults to
                           15.
@@ -33,10 +33,10 @@ These options are available:
                           temporary file.
   --port <port>           Set port to start daemon on, defaults to 3000.
   --queue <size>          Set listen queue size, defaults to SOMAXCONN.
-  --requests <number>     Set the maximum number of requests per keep-alive
+  --requests <number>     Set maximum number of requests per keep-alive
                           connection, defaults to 100.
-  --servers <number>      Set the maximum number of child processes, defaults
-                          to 100.
+  --servers <number>      Set maximum number of child processes, defaults to
+                          100.
   --start <number>        Set number of children to spawn at startup,
                           defaults to 5.
   --user <name>           Set user name for child processes.

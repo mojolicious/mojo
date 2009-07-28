@@ -20,6 +20,19 @@ sub something {
         text => $self->ctx->url_for('something', something => '42'));
 }
 
+sub stage1 {
+    my $self = shift;
+
+    # Authenticated
+    return 1 if $self->req->headers->header('X-Pass');
+
+    # Fail
+    $self->render(text => 'Go away!');
+    return 0;
+}
+
+sub stage2 { shift->render(text => 'Welcome aboard!') }
+
 sub syntaxerror { shift->render(template => 'syntaxerror.html.epl') }
 
 sub templateless { shift->render(handler => 'test') }

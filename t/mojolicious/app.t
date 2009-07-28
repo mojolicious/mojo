@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 101;
+use Test::More tests => 109;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -241,3 +241,20 @@ is($tx->res->headers->header('X-Bender'),     'Kiss my shiny metal ass!');
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 is($tx->res->body,                            '/foo/bar');
+
+# MojoliciousTestController::Foo::stage2
+$tx = Mojo::Transaction->new_get('/staged');
+$tx->req->headers->header('X-Pass' => 1);
+$client->process_app('MojoliciousTest', $tx);
+is($tx->res->code,                            200);
+is($tx->res->headers->server,                 'Mojo (Perl)');
+is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+is($tx->res->body,                            'Welcome aboard!');
+
+# MojoliciousTestController::Foo::stage1
+$tx = Mojo::Transaction->new_get('/staged');
+$client->process_app('MojoliciousTest', $tx);
+is($tx->res->code,                            200);
+is($tx->res->headers->server,                 'Mojo (Perl)');
+is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+is($tx->res->body,                            'Go away!');

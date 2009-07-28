@@ -10,9 +10,10 @@ use base 'Mojo::Script';
 use Mojo::Server::FastCGI;
 
 __PACKAGE__->attr('description', default => <<'EOF');
-* Start the fastcgi script. *
-Takes no options.
-    fastcgi
+Start application with FastCGI backend.
+EOF
+__PACKAGE__->attr('usage', default => <<"EOF");
+usage: $0 fastcgi
 EOF
 
 # Oh boy! Sleep! That's when I'm a Viking!
@@ -48,6 +49,11 @@ implements the following new ones.
 
     my $description = $fastcgi->description;
     $fastcgi        = $fastcgi->description('Foo!');
+
+=head2 C<usage>
+
+    my $usage = $fastcgi->usage;
+    $fastcgi  = $fastcgi->usage('Foo!');
 
 =head1 METHODS
 

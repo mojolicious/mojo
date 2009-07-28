@@ -55,6 +55,7 @@ WriteMakefile(
         'File::Spec::Functions' => 0,
         'File::Temp'            => 0,
         'FindBin'               => 0,
+        'Getopt::Long'          => 0,
         'IO::File'              => 0,
         'IO::Poll'              => 0,
         'IO::Socket'            => 0,

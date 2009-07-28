@@ -8,9 +8,10 @@ use warnings;
 use base 'Mojo::Script';
 
 __PACKAGE__->attr('description', default => <<'EOF');
-* Generate application directory structure. *
-Takes a name as option, by default MyMojoliciousApp will be used.
-    generate app TestApp
+Generate application directory structure.
+EOF
+__PACKAGE__->attr('usage', default => <<"EOF");
+usage: $0 generate app [NAME]
 EOF
 
 # Why can't she just drink herself happy like a normal person?
@@ -76,7 +77,17 @@ L<Mojo::Script::Generate::App> is a application generator.
 =head1 ATTRIBUTES
 
 L<Mojolicious::Script::Generate::App> inherits all attributes from
-L<Mojo::Script>.
+L<Mojo::Script> and implements the following new ones.
+
+=head2 C<description>
+
+    my $description = $app->description;
+    $app            = $app->description('Foo!');
+
+=head2 C<usage>
+
+    my $usage = $app->usage;
+    $app      = $app->usage('Foo!');
 
 =head1 METHODS
 

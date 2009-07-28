@@ -9,22 +9,73 @@ use base 'Mojo::Script';
 
 use Mojo::Server::Daemon::Prefork;
 
+use Getopt::Long 'GetOptionsFromArray';
+
 __PACKAGE__->attr('description', default => <<'EOF');
-* Start the prefork daemon. *
-Takes a port as option, by default 3000 will be used.
-    daemon_prefork
-    daemon_prefork 8080
+Start application with preforking HTTP 1.1 backend.
+EOF
+__PACKAGE__->attr('usage', default => <<"EOF");
+usage: $0 daemon_prefork [OPTIONS]
+
+These options are available:
+  --clients <limit>       Set maximum number of concurrent clients per child,
+                          defaults to 1.
+  --daemonize             Daemonize process.
+  --group <name>          Set group name for child processes.
+  --help                  Display this message and exit.
+  --idle <seconds>        Set time processes have to be idle before being
+                          killed, defaults to 30.
+  --interval <seconds>    Set interval for process maintainance, defaults to
+                          15.
+  --keepalive <seconds>   Set keep-alive timeout, defaults to 15.
+  --maxspare <number>     Set maximum amount of idle children, defaults to 10.
+  --minspare <number>     Set minimum amount of idle children, defaults to 5.
+  --pid <path>            Set path to pid file, defaults to a random
+                          temporary file.
+  --port <port>           Set port to start daemon on, defaults to 3000.
+  --queue <size>          Set listen queue size, defaults to SOMAXCONN.
+  --requests <number>     Set the maximum number of requests per keep-alive
+                          connection, defaults to 100.
+  --servers <number>      Set the maximum number of child processes, defaults
+                          to 100.
+  --start <number>        Set number of children to spawn at startup,
+                          defaults to 5.
+  --user <name>           Set user name for child processes.
 EOF
 
 # Dear Mr. President, there are too many states nowadays.
 # Please eliminate three.
 # P.S. I am not a crackpot.
 sub run {
-    my ($self, $port) = @_;
-
-    # Start server
+    my $self   = shift;
     my $daemon = Mojo::Server::Daemon::Prefork->new;
-    $daemon->port($port) if $port;
+
+    # Options
+    my $daemonize;
+    my @options = @_ ? @_ : @ARGV;
+    GetOptionsFromArray(
+        \@options,
+        'clients=i'   => sub { $daemon->max_clients($_[1]) },
+        'daemonize'   => \$daemonize,
+        'group=s'     => sub { $daemon->group($_[1]) },
+        'help'        => sub { $self->help },
+        'idle=i'      => sub { $daemon->idle_timeout($_[1]) },
+        'interval=i'  => sub { $daemon->cleanup_interval($_[1]) },
+        'keepalive=i' => sub { $daemon->keep_alive_timeout($_[1]) },
+        'maxspare=i'  => sub { $daemon->max_spare_servers($_[1]) },
+        'minspare=i'  => sub { $daemon->min_spare_servers($_[1]) },
+        'pid=s'       => sub { $daemon->pid_file($_[1]) },
+        'port=i'      => sub { $daemon->port($_[1]) },
+        'queue=i'     => sub { $daemon->listen_queue_size($_[1]) },
+        'requests=i'  => sub { $daemon->max_keep_alive_requests($_[1]) },
+        'servers=i'   => sub { $daemon->max_servers($_[1]) },
+        'user=s'      => sub { $daemon->user($_[1]) }
+    );
+
+    # Daemonize
+    $daemon->daemonize if $daemonize;
+
+    # Run
     $daemon->run;
 
     return $self;
@@ -58,6 +109,11 @@ and implements the following new ones.
 
     my $description = $daemon->description;
     $daemon         = $daemon->description('Foo!');
+
+=head2 C<usage>
+
+    my $usage = $daemon->usage;
+    $daemon   = $daemon->usage('Foo!');
 
 =head1 METHODS
 

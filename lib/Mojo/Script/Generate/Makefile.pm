@@ -8,9 +8,10 @@ use warnings;
 use base 'Mojo::Script';
 
 __PACKAGE__->attr('description', default => <<'EOF');
-* Generate Makefile.PL. *
-Takes no options.
-    generate makefile
+Generate Makefile.PL.
+EOF
+__PACKAGE__->attr('usage', default => <<"EOF");
+usage: $0 generate makefile
 EOF
 
 # You don’t like your job, you don’t strike.
@@ -53,6 +54,11 @@ L<Mojo::Scripts> and implements the following new ones.
 
     my $description = $makefile->description;
     $makefile       = $makefile->description('Foo!');
+
+=head2 C<usage>
+
+    my $usage = $makefile->usage;
+    $makefile = $makefile->usage('Foo!');
 
 =head1 METHODS
 

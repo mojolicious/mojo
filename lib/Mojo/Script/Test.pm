@@ -13,11 +13,10 @@ use File::Spec;
 use Test::Harness;
 
 __PACKAGE__->attr('description', default => <<'EOF');
-* Run unit tests. *
-Takes a list of tests as options, by default it will try to detect a 't'
-directory.
-    test
-    test t/*.t ../t/something.t
+Run unit tests.
+EOF
+__PACKAGE__->attr('usage', default => <<"EOF");
+usage: $0 test [TESTS]
 EOF
 
 # My eyes! The goggles do nothing!
@@ -94,6 +93,11 @@ implements the following new ones.
 
     my $description = $test->description;
     $test           = $test->description('Foo!');
+
+=head2 C<usage>
+
+    my $usage = $test->usage;
+    $test     = $test->usage('Foo!');
 
 =head1 METHODS
 

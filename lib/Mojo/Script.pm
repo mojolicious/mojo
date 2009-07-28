@@ -19,6 +19,7 @@ use Mojo::Template;
 __PACKAGE__->attr('description', default => 'No description.');
 __PACKAGE__->attr('quiet',       default => 0);
 __PACKAGE__->attr('renderer',    default => sub { Mojo::Template->new });
+__PACKAGE__->attr('usage',       default => "usage: $0\n");
 
 sub chmod_file {
     my ($self, $path, $mod) = @_;
@@ -111,6 +112,12 @@ sub get_data {
     }
 
     return;
+}
+
+sub help {
+    my $self = shift;
+    print $self->usage;
+    exit;
 }
 
 sub rel_dir {
@@ -221,6 +228,7 @@ Mojo::Script - Script Base Class
 
     1;
     __DATA__
+
     @@ foo_bar
     % for (1 .. 5) {
         Hello World!
@@ -243,6 +251,11 @@ L<Mojo::Script> implements the following attributes.
 
     my $quiet = $script->quiet;
     $script   = $script->quiet(1);
+
+=head2 C<usage>
+
+    my $usage = $script->usage;
+    $script   = $script->usage('Foo!');
 
 =head1 METHODS
 
@@ -276,6 +289,10 @@ following new ones.
 =head2 C<get_data>
 
     my $data = $script->get_data('foo_bar');
+
+=head2 C<help>
+
+    $script->help;
 
 =head2 C<rel_dir>
 

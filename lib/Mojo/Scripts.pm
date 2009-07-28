@@ -10,20 +10,16 @@ use base 'Mojo::Script';
 use Mojo::ByteStream 'b';
 use Mojo::Loader;
 
-__PACKAGE__->attr('namespace', default => 'Mojo::Script');
-__PACKAGE__->attr('message',   default => <<'EOF');
-Welcome to the Mojo Framework!
+__PACKAGE__->attr('hint', default => <<"EOF");
 
-HINT: In case you don't know what you are doing here try the manual!
-    perldoc Mojo::Manual
-    perldoc Mojo::Manual::GettingStarted
-
-This is the interactive script interface, the syntax is very simple.
-    mojo <script> <options>
-
-Below you will find a list of available scripts with descriptions.
-
+See '$0 help SCRIPT' for more information on a specific script.
 EOF
+__PACKAGE__->attr('message', default => <<"EOF");
+usage: $0 SCRIPT [OPTIONS]
+
+These scripts are currently available:
+EOF
+__PACKAGE__->attr('namespaces', default => sub { ['Mojo::Script'] });
 
 # Aren't we forgeting the true meaning of Christmas?
 # You know, the birth of Santa.
@@ -31,50 +27,93 @@ sub run {
     my ($self, $name, @args) = @_;
 
     # Run script
-    if ($name) {
+    if ($name && ($name ne 'help' || $args[0])) {
 
-        # Generate module
-        my $module = $self->namespace . '::' . b($name)->camelize;
+        # Help?
+        my $help = $name eq 'help' ? 1 : 0;
+        $name = shift @args if $help;
 
-        # Load
-        if (my $e = Mojo::Loader->load($module)) {
+        # Try all namespaces
+        my $module;
+        for my $namespace (@{$self->namespaces}) {
 
-            # Module missing
-            die qq/Script "$name" missing, maybe you need to install it?\n/
-              unless ref $e;
+            # Generate module
+            my $try = $namespace . '::' . b($name)->camelize;
 
-            # Real error
-            die $e;
+            # Load
+            if (my $e = Mojo::Loader->load($try)) {
+
+                # Module missing
+                next unless ref $e;
+
+                # Real error
+                die $e;
+            }
+
+            # Found
+            $module = $try;
+            last;
         }
 
+        # Script missing
+        die qq/Script "$name" missing, maybe you need to install it?\n/
+          unless $module;
+
         # Run
-        $module->new->run(@args);
+        my $script = $module->new;
+        $help ? $script->help : $script->run(@args);
         return $self;
     }
 
-    # Load scripts
-    my $modules = Mojo::Loader->search($self->namespace);
-    for my $module (@$modules) {
-        if (my $e = Mojo::Loader->load($module)) { die $e }
+    # Try all namspaces
+    my $scripts = [];
+    my $seen    = {};
+    for my $namespace (@{$self->namespaces}) {
+
+        # Search
+        my $found = Mojo::Loader->search($namespace);
+
+        for my $module (@$found) {
+
+            # Load
+            if (my $e = Mojo::Loader->load($module)) { die $e }
+
+            # Seen?
+            my $script = $module;
+            $script =~ s/^$namespace\:://;
+            push @$scripts, [$script => $module] unless $seen->{$script};
+            $seen->{$script} = 1;
+        }
     }
 
     # Print overview
     print $self->message;
 
-    # List available scripts
-    foreach my $module (@$modules) {
-
-        my $script = $module->new;
+    # Make list
+    my $list   = [];
+    my $length = 0;
+    foreach my $script (@$scripts) {
 
         # Generate name
-        my $namespace = $self->namespace;
-        $module =~ s/^$namespace\:\://;
-        my $name = b($module)->decamelize;
+        my $name = $script->[0];
+        $name = b($name)->decamelize;
 
-        # Print description
-        print "$name:\n";
-        print $script->description . "\n";
+        # Add to list
+        my $l = length $name;
+        $length = $l if $l > $length;
+        push @$list, [$name, $script->[1]->new->description];
     }
+
+    # Print list
+    foreach my $script (@$list) {
+        my $name        = $script->[0];
+        my $description = $script->[1];
+        my $padding     = ' ' x ($length - length $name);
+        print "  $name$padding   $description";
+    }
+
+    # Hint
+    print $self->hint;
 
     return $self;
 }
@@ -103,15 +142,15 @@ framework.
 L<Mojo::Scripts> inherits all attributes from L<Mojo::Script> and implements
 the following new ones.
 
-=head2 C<namespace>
-
-    my $namespace = $scripts->namespace;
-    my $scripts   = $scripts->namespace('Mojo::Script');
-
 =head2 C<message>
 
     my $message = $scripts->message;
     my $scripts = $scripts->message('Hello World!');
+
+=head2 C<namespaces>
+
+    my $namespaces = $scripts->namespaces;
+    my $scripts    = $scripts->namespaces(['Mojo::Script']);
 
 =head1 METHODS
 

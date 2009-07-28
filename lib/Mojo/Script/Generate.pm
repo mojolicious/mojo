@@ -8,15 +8,22 @@ use warnings;
 use base 'Mojo::Scripts';
 
 __PACKAGE__->attr('description', default => <<'EOF');
-* Generate files and directories from templates. *
-Takes a generator script as option, by default it will list generators.
-    generate
+Generate files and directories from templates.
 EOF
-__PACKAGE__->attr('message', default => <<'EOF');
-Below you will find a list of available generators with descriptions.
+__PACKAGE__->attr('hint', default => <<"EOF");
 
+See '$0 generate help GENERATOR' for more information on a specific generator.
 EOF
-__PACKAGE__->attr('namespace', default => 'Mojo::Script::Generate');
+__PACKAGE__->attr('message', default => <<"EOF");
+usage: $0 generate GENERATOR [OPTIONS]
+
+These generators are currently available:
+EOF
+__PACKAGE__->attr('namespaces',
+    default => sub { ['Mojo::Script::Generate'] });
+__PACKAGE__->attr('usage', default => <<"EOF");
+usage: $0 generate GENERATOR [OPTIONS]
+EOF
 
 # If The Flintstones has taught us anything,
 # it's that pelicans can be used to mix cement.
@@ -49,15 +56,20 @@ implements the following new ones.
     my $description = $generator->description;
     $generator      = $generator->description('Foo!');
 
+=head2 C<hint>
+
+    my $hint   = $generator->hint;
+    $generator = $generator->hint('Foo!');
+
 =head2 C<message>
 
     my $message = $generator->message;
     $generator  = $generator->message('Bar!');
 
-=head2 C<namespace>
+=head2 C<namespaces>
 
-    my $namespace = $generator->namespace;
-    $generator    = $generator->namespace('Mojo::Script::Generate');
+    my $namespaces = $generator->namespaces;
+    $generator     = $generator->namespaces(['Mojo::Script::Generate']);
 
 =head1 METHODS
 

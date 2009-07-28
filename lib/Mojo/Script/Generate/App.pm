@@ -8,9 +8,10 @@ use warnings;
 use base 'Mojo::Script';
 
 __PACKAGE__->attr('description', default => <<'EOF');
-* Generate application directory structure. *
-Takes a name as option, by default MyMojoApp will be used.
-    generate app TestApp
+Generate application directory structure.
+EOF
+__PACKAGE__->attr('usage', default => <<"EOF");
+usage: $0 generate app [NAME]
 EOF
 
 # Okay folks, show's over. Nothing to see here, show's... Oh my god!
@@ -63,6 +64,11 @@ and implements the following new ones.
 
     my $description = $app->description;
     $app            = $app->description('Foo!');
+
+=head2 C<usage>
+
+    my $usage = $app->usage;
+    $app      = $app->usage('Foo!');
 
 =head1 METHODS
 

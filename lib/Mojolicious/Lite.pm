@@ -146,19 +146,19 @@ line.
     % ./myapp.pl daemon 8080
     Server available at http://127.0.0.1:8080.
 
-    % ./myapp.pl mojo daemon_prefork
+    % ./myapp.pl daemon_prefork
     Server available at http://127.0.0.1:3000.
 
-    % ./myapp.pl mojo cgi
+    % ./myapp.pl cgi
     ...CGI output...
 
-    % ./myapp.pl mojo fastcgi
+    % ./myapp.pl fastcgi
     ...Blocking FastCGI main loop...
 
 The shagadelic call that starts the L<Mojolicious> script system can be
 customized to override normal C<@ARGV> use.
 
-    shagadelic(qw/mojo cgi/);
+    shagadelic('cgi');
 
 Routes are basically just fancy paths that can contain different kinds of
 placeholders.

@@ -13,6 +13,7 @@ sub app { shift->ctx->app }
 
 sub render { shift->ctx->render(@_) }
 
+# Bodies are for hookers and fat people.
 sub render_partial { shift->ctx->render_partial(@_) }
 
 sub req { shift->ctx->req }

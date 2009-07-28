@@ -1,6 +1,10 @@
 This file documents the revision history for Perl extension Mojo.
 
 0.991242 2009-07-20 00:00:00
+        - Cleaned up the whole script system, this change is mostly backwards
+          compatible except for a few cases.
+              "daemon $port" now becomes "daemon -p $port"
+              "mojolicious mojo $script" becomes "mojolicious $script"
         - Added HTML escape expression marks "<%==" and "%==" to
           Mojo::Template.
         - Added more Mojolicious::Lite examples and reformatted them into a

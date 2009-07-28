@@ -8,9 +8,10 @@ use warnings;
 use base 'Mojo::Script';
 
 __PACKAGE__->attr('description', default => <<'EOF');
-* Generate a minimalistic web application. *
-Takes a name as option, by default myapp.pl will be used.
-    generate lite_app awesome.pl
+Generate a minimalistic web application.
+EOF
+__PACKAGE__->attr('usage', default => <<"EOF");
+usage: $0 generate lite_app [NAME]
 EOF
 
 # If for any reason you're not completely satisfied, I hate you.
@@ -46,7 +47,17 @@ L<Mojo::Script::Generate::LiteApp> is a application generator.
 =head1 ATTRIBUTES
 
 L<Mojolicious::Script::Generate::LiteApp> inherits all attributes from
-L<Mojo::Script>.
+L<Mojo::Script> and implements the following new ones.
+
+=head2 C<description>
+
+    my $description = $app->description;
+    $app            = $app->description('Foo!');
+
+=head2 C<usage>
+
+    my $usage = $app->usage;
+    $app      = $app->usage('Foo!');
 
 =head1 METHODS
 

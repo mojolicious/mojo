@@ -7,7 +7,9 @@ use warnings;
 
 use base 'Mojo::Script::Generate';
 
-__PACKAGE__->attr('namespace', default => 'Mojolicious::Script::Generate');
+__PACKAGE__->attr('namespaces',
+    default =>
+      sub { [qw/Mojolicious::Script::Generate Mojo::Script::Generate/] });
 
 # Ah, nothing like a warm fire and a SuperSoaker of fine cognac.
 
@@ -32,7 +34,12 @@ L<Mojolicious::Script::Generate> lists available generators.
 =head1 ATTRIBUTES
 
 L<Mojolicious::Script::Generate> inherits all attributes from
-L<Mojo::Script::Generate>.
+L<Mojo::Script::Generate> and implements the following new ones.
+
+=head2 C<namespaces>
+
+    my $namespaces = $generator->namespaces;
+    $generator     = $generator->namespaces(['Mojolicious::Script::Generate']);
 
 =head1 METHODS
 

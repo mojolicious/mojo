@@ -7,7 +7,6 @@ use warnings;
 
 use base 'Mojo::Message';
 
-use Mojo::ByteStream 'b';
 use Mojo::Cookie::Request;
 use Mojo::Parameters;
 
@@ -46,16 +45,6 @@ sub fix_headers {
         my $port = $self->url->port;
         $host .= ":$port" if $port;
         $self->headers->host($host) unless $self->headers->host;
-    }
-
-    # Proxy-Authorization header
-    if ((my $proxy = $self->proxy) && !$self->headers->proxy_authorization) {
-
-        # Basic proxy authorization
-        if (my $userinfo = $proxy->userinfo) {
-            my $auth = b("$userinfo")->b64_encode;
-            $self->headers->proxy_authorization("Basic $auth");
-        }
     }
 
     return $self;

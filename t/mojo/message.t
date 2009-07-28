@@ -328,12 +328,11 @@ $req->method('GET');
 $req->url->parse('http://127.0.0.1/foo/bar');
 $req->headers->expect('100-continue');
 $req->body("Hello World!\n");
-$req->proxy('http://foo:bar@127.0.0.1:8080');
+$req->proxy('127.0.0.2:8080');
 is($req->build,
         "GET http://127.0.0.1/foo/bar HTTP/1.1\x0d\x0a"
       . "Expect: 100-continue\x0d\x0a"
       . "Host: 127.0.0.1\x0d\x0a"
-      . "Proxy-Authorization: Basic Zm9vOmJhcg==\x0d\x0a"
       . "Content-Length: 13\x0d\x0a\x0d\x0a"
       . "Hello World!\n");
 

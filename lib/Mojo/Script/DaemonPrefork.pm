@@ -18,7 +18,7 @@ __PACKAGE__->attr('usage', default => <<"EOF");
 usage: $0 daemon_prefork [OPTIONS]
 
 These options are available:
-  --clients <limit>       Set maximum number of concurrent clients per child,
+  --clients <number>      Set maximum number of concurrent clients per child,
                           defaults to 1.
   --daemonize             Daemonize process.
   --group <name>          Set group name for child processes.

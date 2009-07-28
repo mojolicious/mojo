@@ -200,7 +200,6 @@ sub walk_stack {
     my ($self, $c) = @_;
 
     # Walk the stack
-    my $hit;
     for my $field (@{$c->match->stack}) {
 
         # Don't cache errors
@@ -219,8 +218,7 @@ sub walk_stack {
         return $e if ref $e;
 
         # Break the chain
-        return $hit unless $e;
-        $hit++;
+        return unless $e;
     }
 
     # Done

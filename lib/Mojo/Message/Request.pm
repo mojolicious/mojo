@@ -120,11 +120,6 @@ sub proxy {
         return $self;
     }
 
-    # Environment
-    elsif (!$self->{proxy} && $ENV{HTTP_PROXY}) {
-        $self->{proxy} = Mojo::URL->new($ENV{HTTP_PROXY});
-    }
-
     return $self->{proxy};
 }
 

@@ -21,7 +21,6 @@ These options are available:
   --clients <limit>       Set maximum number of concurrent clients, defaults
                           to 1000.
   --group <name>          Set group name of process.
-  --help                  Display this message and exit.
   --keepalive <seconds>   Set keep-alive timeout, defaults to 15.
   --port <port>           Set port to start daemon on, defaults to 3000.
   --queue <size>          Set listen queue size, defaults to SOMAXCONN.
@@ -43,7 +42,6 @@ sub run {
         \@options,
         'clients=i'   => sub { $daemon->max_clients($_[1]) },
         'group=s'     => sub { $daemon->group($_[1]) },
-        'help'        => sub { $self->help },
         'keepalive=i' => sub { $daemon->keep_alive_timeout($_[1]) },
         'port=i'      => sub { $daemon->port($_[1]) },
         'queue=i'     => sub { $daemon->listen_queue_size($_[1]) },

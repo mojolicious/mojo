@@ -19,7 +19,6 @@ usage: $0 cgi [OPTIONS]
 
 These options are available:
   --nph    Enable non-parsed-header mode.
-  --help   Display this message and exit.
 EOF
 
 # Hi, Super Nintendo Chalmers!
@@ -29,11 +28,7 @@ sub run {
 
     # Options
     my @options = @_ ? @_ : @ARGV;
-    GetOptionsFromArray(
-        \@options,
-        'help' => sub { $self->help },
-        'nph'  => sub { $cgi->nph(1) }
-    );
+    GetOptionsFromArray(\@options, 'nph' => sub { $cgi->nph(1) });
 
     # Run
     $cgi->run;

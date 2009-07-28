@@ -22,7 +22,6 @@ These options are available:
                           defaults to 1.
   --daemonize             Daemonize process.
   --group <name>          Set group name for child processes.
-  --help                  Display this message and exit.
   --idle <seconds>        Set time processes have to be idle before being
                           killed, defaults to 30.
   --interval <seconds>    Set interval for process maintainance, defaults to
@@ -58,7 +57,6 @@ sub run {
         'clients=i'   => sub { $daemon->max_clients($_[1]) },
         'daemonize'   => \$daemonize,
         'group=s'     => sub { $daemon->group($_[1]) },
-        'help'        => sub { $self->help },
         'idle=i'      => sub { $daemon->idle_timeout($_[1]) },
         'interval=i'  => sub { $daemon->cleanup_interval($_[1]) },
         'keepalive=i' => sub { $daemon->keep_alive_timeout($_[1]) },

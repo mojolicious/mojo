@@ -20,13 +20,13 @@ usage: $0 daemon [OPTIONS]
 These options are available:
   --clients <number>      Set maximum number of concurrent clients, defaults
                           to 1000.
-  --group <name>          Set group name of process.
+  --group <name>          Set group name for process.
   --keepalive <seconds>   Set keep-alive timeout, defaults to 15.
-  --port <port>           Set port to start daemon on, defaults to 3000.
+  --port <port>           Set port to start listening on, defaults to 3000.
   --queue <size>          Set listen queue size, defaults to SOMAXCONN.
   --requests <number>     Set the maximum number of requests per keep-alive
                           connection, defaults to 100.
-  --user <name>           Set user name of process.
+  --user <name>           Set user name for process.
 EOF
 
 

@@ -20,9 +20,9 @@ usage: $0 daemon_prefork [OPTIONS]
 These options are available:
   --clients <number>      Set maximum number of concurrent clients per child,
                           defaults to 1.
-  --daemonize             Daemonize process.
-  --group <name>          Set group name for child processes.
-  --idle <seconds>        Set time processes can be idle without getting
+  --daemonize             Daemonize parent.
+  --group <name>          Set group name for children.
+  --idle <seconds>        Set time children can be idle without getting
                           killed, defaults to 30.
   --interval <seconds>    Set interval for process maintainance, defaults to
                           15.
@@ -32,15 +32,14 @@ These options are available:
   --minspare <number>     Set minimum amount of idle children, defaults to 5.
   --pid <path>            Set path to pid file, defaults to a random
                           temporary file.
-  --port <port>           Set port to start daemon on, defaults to 3000.
+  --port <port>           Set port to start listening on, defaults to 3000.
   --queue <size>          Set listen queue size, defaults to SOMAXCONN.
   --requests <number>     Set maximum number of requests per keep-alive
                           connection, defaults to 100.
-  --servers <number>      Set maximum number of child processes, defaults to
-                          100.
+  --servers <number>      Set maximum number of children, defaults to 100.
   --start <number>        Set number of children to spawn at startup,
                           defaults to 5.
-  --user <name>           Set user name for child processes.
+  --user <name>           Set user name for children.
 EOF
 
 # Dear Mr. President, there are too many states nowadays.

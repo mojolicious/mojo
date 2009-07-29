@@ -149,7 +149,7 @@ sub _parse_multipart {
     my $boundary = $1;
 
     # Boundary missing
-    return $self->error('Parser error: Boundary missing or invalid')
+    return $self->error('Parser error: Boundary missing or invalid.')
       unless $boundary;
 
     # Spin

@@ -13,6 +13,8 @@ __PACKAGE__->attr('safe_post', default => 0);
 # about it.
 sub new {
     my $self = shift->SUPER::new();
+
+    # Transactions
     $self->{_txs} = [@_];
 
     # Check transactions
@@ -31,8 +33,7 @@ sub new {
             {
 
                 # Mismatch
-                $self->error(
-                    "Transaction at index $i does not belong in pipeline.");
+                $self->error("Transaction $i does not belong in pipeline.");
                 last;
             }
         }

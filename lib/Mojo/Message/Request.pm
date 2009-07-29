@@ -268,7 +268,7 @@ sub _parse_start_line {
                 $self->buffer->empty;
             }
         }
-        else { $self->error('Parser error: Invalid request line') }
+        else { $self->error('Parser error: Invalid request line.') }
     }
 }
 

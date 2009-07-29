@@ -21,6 +21,7 @@ sub add_chunk {
     $self->raw_length($self->raw_length + length $chunk);
 
     # Store
+    $self->{_buffer} ||= '';
     $self->{_buffer} .= $chunk;
 
     return $self;
@@ -30,7 +31,7 @@ sub contains {
     my ($self, $chunk) = @_;
 
     # Search
-    return index $self->{_buffer}, $chunk;
+    return index $self->{_buffer} || '', $chunk;
 }
 
 sub empty {
@@ -38,6 +39,7 @@ sub empty {
 
     # Cleanup
     my $buffer = $self->{_buffer};
+    my $x      = '';
     $self->{_buffer} = '';
 
     return $buffer;
@@ -47,7 +49,7 @@ sub get_line {
     my $self = shift;
 
     # No full line in buffer
-    return unless $self->{_buffer} =~ /\x0d?\x0a/;
+    return unless ($self->{_buffer} || '') =~ /\x0d?\x0a/;
 
     # Locate line ending
     my $pos = index $self->{_buffer}, "\x0a";
@@ -59,11 +61,7 @@ sub get_line {
     return $line;
 }
 
-sub length {
-    my $self = shift;
-    $self->{_buffer} ||= '';
-    return length $self->{_buffer};
-}
+sub length { length(shift->{_buffer} || '') }
 
 sub remove {
     my ($self, $length, $chunk) = @_;
@@ -111,11 +109,6 @@ L<Mojo::Buffer> implements the following attributes.
 
 L<Mojo::Buffer> inherits all methods from L<Mojo::Base> and implements
 the following new ones.
-
-=head2 C<new>
-
-    my $buffer = Mojo::Buffer->new;
-    my $buffer = Mojo::Buffer->new('foobarbaz');
 
 =head2 C<add_chunk>
 

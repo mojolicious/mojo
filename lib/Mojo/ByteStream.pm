@@ -309,35 +309,24 @@ sub import {
 
 sub new {
     my $self = shift->SUPER::new();
-    $self->{bytestream} = $_[0] if defined $_[0];
+    $self->{bytestream} = defined $_[0] ? $_[0] : '';
     return $self;
 }
 
 sub b64_decode {
     my $self = shift;
-
-    # Shortcut
-    return $self unless defined $self->{bytestream};
-
     $self->{bytestream} = MIME::Base64::decode_base64($self->{bytestream});
     return $self;
 }
 
 sub b64_encode {
     my $self = shift;
-
-    # Shortcut
-    return $self unless defined $self->{bytestream};
-
     $self->{bytestream} = MIME::Base64::encode_base64($self->{bytestream});
     return $self;
 }
 
 sub camelize {
     my $self = shift;
-
-    # Shortcut
-    return $self unless defined $self->{bytestream};
 
     # Split
     my @words = split /_/, $self->{bytestream};
@@ -360,9 +349,7 @@ sub decamelize {
     my $self = shift;
 
     # Shortcut
-    return $self
-      if !defined $self->{bytestream}
-          || $self->{bytestream} !~ /^[A-Z]+/;
+    return $self if $self->{bytestream} !~ /^[A-Z]+/;
 
     # Split
     my @words;
@@ -381,7 +368,6 @@ sub decode {
     my ($self, $encoding) = @_;
 
     # Shortcut
-    return $self unless defined $self->{bytestream};
     return $self unless $encoding;
 
     $self->{bytestream} = Encode::decode($encoding, $self->{bytestream});
@@ -392,7 +378,6 @@ sub encode {
     my ($self, $encoding) = @_;
 
     # Shortcut
-    return $self unless defined $self->{bytestream};
     return $self unless $encoding;
 
     $self->{bytestream} = Encode::encode($encoding, $self->{bytestream});
@@ -401,9 +386,6 @@ sub encode {
 
 sub html_escape {
     my $self = shift;
-
-    # Shortcut
-    return $self unless defined $self->{bytestream};
 
     # Character semantics
     no bytes;
@@ -426,9 +408,6 @@ sub html_escape {
 sub html_unescape {
     my $self = shift;
 
-    # Shortcut
-    return $self unless defined $self->{bytestream};
-
     # Unescape
     $self->{bytestream} =~ s/
         &(?:
@@ -444,46 +423,28 @@ sub html_unescape {
     return $self->decode('utf8');
 }
 
-sub length {
-    my $self = shift;
-    $self->{bytestream} = '' unless defined $self->{bytestream};
-    return length $self->{bytestream};
-}
+sub length { length shift->{bytestream} }
 
 sub md5_sum {
     my $self = shift;
-
-    # Shortcut
-    return $self unless defined $self->{bytestream};
-
     $self->{bytestream} = Digest::MD5::md5_hex($self->{bytestream});
     return $self;
 }
 
 sub qp_decode {
     my $self = shift;
-
-    # Shortcut
-    return $self unless defined $self->{bytestream};
-
     $self->{bytestream} = MIME::QuotedPrint::decode_qp($self->{bytestream});
     return $self;
 }
 
 sub qp_encode {
     my $self = shift;
-
-    # Shortcut
-    return $self unless defined $self->{bytestream};
-
     $self->{bytestream} = MIME::QuotedPrint::encode_qp($self->{bytestream});
     return $self;
 }
 
 sub quote {
     my $self = shift;
-
-    $self->{bytestream} = '' unless defined $self->{bytestream};
 
     # Escape
     $self->{bytestream} =~ s/([\"\\])/\\$1/g;
@@ -498,7 +459,6 @@ sub unquote {
     my $self = shift;
 
     # Not quoted
-    return $self unless defined $self->{bytestream};
     return $self unless $self->{bytestream} =~ /^\".*\"$/g;
 
     # Unquote
@@ -513,9 +473,6 @@ sub unquote {
 sub url_escape {
     my $self = shift;
 
-    # Shortcut
-    return $self unless defined $self->{bytestream};
-
     # Default to unreserved characters
     my $pattern = shift || 'A-Za-z0-9\-\.\_\~';
 
@@ -528,9 +485,6 @@ sub url_escape {
 sub url_sanitize {
     my $self = shift;
 
-    # Shortcut
-    return $self unless defined $self->{bytestream};
-
     # Uppercase hex values and unescape unreserved characters
     $self->{bytestream} =~ s/%([0-9A-Fa-f]{2})/_sanitize($1)/ge;
 
@@ -539,9 +493,6 @@ sub url_sanitize {
 
 sub url_unescape {
     my $self = shift;
-
-    # Shortcut
-    return $self unless defined $self->{bytestream};
 
     # Unescape
     $self->{bytestream} =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge;

@@ -81,12 +81,6 @@ my (%ORDERED_HEADERS, %NORMALCASE_HEADERS);
     }
 }
 
-sub new {
-    my $self = shift->SUPER::new(@_);
-    $self->{_headers} = {};
-    return $self;
-}
-
 sub add {
     my $self = shift;
     my $name = shift;
@@ -101,9 +95,6 @@ sub add {
         $NORMALCASE_HEADERS{$lcname} = $name;
     }
     $name = $lcname;
-
-    # Initialize header
-    $self->{_headers}->{$name} ||= [];
 
     # Filter values
     my @values;
@@ -121,6 +112,7 @@ sub add {
     }
 
     # Add line
+    $self->{_headers} ||= {};
     push @{$self->{_headers}->{$name}}, @values;
 
     return $self;
@@ -166,6 +158,7 @@ sub header {
 
     # Get
     my $headers;
+    return unless $self->{_headers};
     return unless $headers = $self->{_headers}->{lc $name};
 
     # String
@@ -192,6 +185,7 @@ sub names {
     my $self = shift;
 
     # Names
+    return [] unless $self->{_headers};
     my @names = keys %{$self->{_headers}};
 
     # Sort
@@ -258,6 +252,7 @@ sub remove {
     my ($self, $name) = @_;
 
     # Delete
+    return $self unless $self->{_headers};
     delete $self->{_headers}->{lc $name};
 
     return $self;
@@ -388,10 +383,6 @@ implements the following new ones.
 
 L<Mojo::Headers> inherits all methods from L<Mojo::Stateful> and implements
 the following new ones.
-
-=head2 C<new>
-
-    my $headers = Mojo::Headers->new;
 
 =head2 C<add>
 

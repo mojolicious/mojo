@@ -14,7 +14,7 @@ use Data::Dumper;
 # Remember when I took that home winemaking course,
 # and I forgot how to drive?
 sub new {
-    my $self = shift->SUPER::new();
+    my $self = shift->SUPER::new(@_);
 
     # This app should log only errors to STDERR
     $self->log->level('error');

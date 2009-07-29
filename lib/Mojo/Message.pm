@@ -16,8 +16,7 @@ use Mojo::File::Memory;
 use Mojo::Parameters;
 use Mojo::Upload;
 
-__PACKAGE__->attr('buffer', default => sub { Mojo::Buffer->new });
-__PACKAGE__->attr([qw/parser_progress_cb/]);
+__PACKAGE__->attr('buffer',  default => sub { Mojo::Buffer->new });
 __PACKAGE__->attr('content', default => sub { Mojo::Content->new });
 __PACKAGE__->attr([qw/major_version minor_version/], default => 1);
 
@@ -161,8 +160,6 @@ sub build_start_line {
     return $startline;
 }
 
-sub builder_progress_cb { shift->content->builder_progress_cb(@_) }
-
 sub cookie {
     my ($self, $name) = @_;
 
@@ -215,8 +212,7 @@ sub get_header_chunk {
     my $self = shift;
 
     # Progress
-    $self->builder_progress_cb->($self, 'headers', @_)
-      if $self->builder_progress_cb;
+    $self->progress_cb->($self, 'headers', @_) if $self->progress_cb;
 
     # HTTP 0.9 has no headers
     return '' if $self->version eq '0.9';
@@ -231,8 +227,7 @@ sub get_start_line_chunk {
     my ($self, $offset) = @_;
 
     # Progress
-    $self->builder_progress_cb->($self, 'start_line', $offset)
-      if $self->builder_progress_cb;
+    $self->progress_cb->($self, 'start_line', $offset) if $self->progress_cb;
 
     my $copy = $self->_build_start_line;
     return substr($copy, $offset, 4096);
@@ -282,12 +277,14 @@ sub parse_until_body {
     return $self->_parse(1);
 }
 
+sub progress_cb { shift->content->progress_cb(@_) }
+
 sub _parse {
     my $self = shift;
     my $until_body = @_ ? shift : 0;
 
     # Progress
-    $self->parser_progress_cb->($self) if $self->parser_progress_cb;
+    $self->progress_cb->($self) if $self->progress_cb;
 
     # Content
     if ($self->is_state(qw/content done done_with_leftovers/)) {
@@ -484,14 +481,6 @@ implements the following new ones.
     my $buffer = $message->buffer;
     $message   = $message->buffer(Mojo::Buffer->new);
 
-=head2 C<builder_progress_cb>
-
-    my $cb   = $message->builder_progress_cb;
-    $message = $message->builder_progress_cb(sub {
-        my $self = shift;
-        print '+';
-    });
-
 =head2 C<content>
 
     my $content = $message->content;
@@ -516,10 +505,10 @@ implements the following new ones.
     my $minor_version = $message->minor_version;
     $message          = $message->minor_version(1);
 
-=head2 C<parser_progress_cb>
+=head2 C<progress_cb>
 
-    my $cb   = $message->parser_progress_cb;
-    $message = $message->parser_progress_cb(sub {
+    my $cb   = $message->progress_cb;
+    $message = $message->progress_cb(sub {
         my $self = shift;
         print '+';
     });

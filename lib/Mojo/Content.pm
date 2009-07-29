@@ -19,7 +19,7 @@ use constant MAX_MEMORY_SIZE => $ENV{MOJO_MAX_MEMORY_SIZE} || 10240;
 
 __PACKAGE__->attr([qw/buffer filter_buffer/],
     default => sub { Mojo::Buffer->new });
-__PACKAGE__->attr([qw/body_cb filter builder_progress_cb/]);
+__PACKAGE__->attr([qw/body_cb filter progress_cb/]);
 __PACKAGE__->attr('file',    default => sub { Mojo::File::Memory->new });
 __PACKAGE__->attr('headers', default => sub { Mojo::Headers->new });
 __PACKAGE__->attr([qw/raw_header_length relaxed/], default => 0);
@@ -84,8 +84,7 @@ sub get_body_chunk {
     my ($self, $offset) = @_;
 
     # Progress
-    $self->builder_progress_cb->($self, 'body', $offset)
-      if $self->builder_progress_cb;
+    $self->progress_cb->($self, 'body', $offset) if $self->progress_cb;
 
     # Body generator
     return $self->body_cb->($self, $offset) if $self->body_cb;
@@ -303,10 +302,10 @@ implements the following new ones.
     my $buffer = $content->buffer;
     $content   = $content->buffer(Mojo::Buffer->new);
 
-=head2 C<builder_progress_cb>
+=head2 C<progress_cb>
 
-    my $cb   = $content->builder_progress_cb;
-    $content = $content->builder_progress_cb(sub {
+    my $cb   = $content->progress_cb;
+    $content = $content->progress_cb(sub {
         my $self = shift;
         print '+';
     });

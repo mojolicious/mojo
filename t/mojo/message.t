@@ -368,7 +368,7 @@ $req->headers->transfer_encoding('chunked');
 my $counter  = 1;
 my $chunked  = Mojo::Filter::Chunked->new;
 my $counter2 = 0;
-$req->builder_progress_cb(sub { $counter2++ });
+$req->progress_cb(sub { $counter2++ });
 $req->body(
     sub {
         my $self  = shift;
@@ -789,7 +789,7 @@ is($req->build,
 # Parse full HTTP 1.0 request with cookies
 $req     = Mojo::Message::Request->new;
 $counter = 0;
-$req->parser_progress_cb(sub { $counter++ });
+$req->progress_cb(sub { $counter++ });
 $req->parse('GET /foo/bar/baz.html?fo');
 $req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
 $req->parse('-Type: text/');

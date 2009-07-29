@@ -23,7 +23,7 @@ sub add_chunk {
     return $self;
 }
 
-sub contains { index(shift->{content}, shift) >= 0 ? 1 : 0 }
+sub contains { index shift->{content}, shift }
 
 sub copy_to { shift->_write_to_file(@_) }
 
@@ -41,9 +41,12 @@ sub slurp { shift->content }
 
 sub _write_to_file {
     my ($self, $path) = @_;
+
+    # Write
     my $file = IO::File->new;
     $file->open("> $path") or croak qq/Can't' open file "$path": $!/;
     $file->syswrite($self->{content});
+
     return $self;
 }
 
@@ -87,7 +90,7 @@ the following new ones.
 
 =head2 C<contains>
 
-    my $contains = $file->contains('random string');
+    my $position = $file->contains('random string');
 
 =head2 C<copy_to>
 

@@ -6,6 +6,7 @@ use strict;
 use warnings;
 
 use base 'Mojo::Filter';
+use bytes;
 
 # Here's to alcohol, the cause of—and solution to—all life's problems.
 sub build {
@@ -59,13 +60,15 @@ sub parse {
     }
 
     # Got a chunk (we ignore the chunk extension)
-    my $filter = $self->input_buffer;
-    while ($filter->{buffer} =~ /^(([\da-fA-F]+).*\x0d?\x0a)/) {
+    my $filter  = $self->input_buffer;
+    my $content = $filter->to_string;
+    while ($content =~ /^(([\da-fA-F]+).*\x0d?\x0a)/) {
+        my $header = $1;
         my $length = hex($2);
 
         # Last chunk
         if ($length == 0) {
-            $filter->{buffer} =~ s/^$1//;
+            $filter->remove(length $header);
             $self->state('trailing_headers');
             last;
         }
@@ -74,12 +77,19 @@ sub parse {
         else {
 
             # We have a whole chunk
-            if (length $filter->{buffer} >= (length($1) + $length)) {
-                $filter->{buffer} =~ s/^$1//;
+            if (length $content >= (length($header) + $length)) {
+
+                # Remove header
+                $content =~ s/^$header//;
+                $filter->remove(length $header);
+
+                # Remove payload
+                substr $content, 0, $length, '';
                 $self->output_buffer->add_chunk($filter->remove($length));
 
                 # Remove newline at end of chunk
-                $filter->{buffer} =~ s/^\x0d?\x0a//;
+                $content =~ s/^(\x0d?\x0a)//;
+                $filter->remove(length $1) if $1;
             }
 
             # Not a whole chunk, need to wait for more data

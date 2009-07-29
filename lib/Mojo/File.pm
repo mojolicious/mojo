@@ -48,8 +48,9 @@ __PACKAGE__->attr(
             my $sum = b(time . rand(999999999))->md5_sum;
             $file = "$base.$sum";
         }
-
         $self->path($file);
+
+        # Enable automatic cleanup
         $self->cleanup(1);
 
         # Open for read/write access
@@ -61,6 +62,8 @@ __PACKAGE__->attr(
 sub DESTROY {
     my $self = shift;
     my $file = $self->path;
+
+    # Cleanup
     unlink $file if $self->cleanup && -f $file;
 }
 
@@ -96,7 +99,7 @@ sub contains {
         $offset += $read;
         $window .= $buffer;
         my $pos = index $window, $bytestream;
-        return 1 if $pos >= 0;
+        return $pos if $pos >= 0;
         substr $window, 0, $read, '';
     }
 
@@ -106,8 +109,11 @@ sub contains {
 sub copy_to {
     my ($self, $path) = @_;
     my $src = $self->path;
+
+    # Copy
     File::Copy::copy($src, $path)
       or croak qq/Can't copy file "$src" to "$path": $!/;
+
     return $self;
 }
 
@@ -125,6 +131,7 @@ sub get_chunk {
 sub length {
     my $self = shift;
 
+    # File size
     my $file = $self->path;
     return -s $file if $file;
 
@@ -134,8 +141,11 @@ sub length {
 sub move_to {
     my ($self, $path) = @_;
     my $src = $self->path;
+
+    # Move
     File::Copy::move($src, $path)
       or croak qq/Can't move file "$src" to "$path": $!/;
+
     return $self;
 }
 
@@ -167,6 +177,9 @@ Mojo::File - File
 
     my $file = Mojo::File->new;
     $file->add_chunk('World!');
+    print $file->slurp;
+
+    my $file = Mojo::File->new(path => '/foo/bar.txt');
     print $file->slurp;
 
 =head1 DESCRIPTION
@@ -203,7 +216,7 @@ following new ones.
 
 =head2 C<contains>
 
-    my $contains = $file->contains('random string');
+    my $position = $file->contains('random string');
 
 =head2 C<copy_to>
 

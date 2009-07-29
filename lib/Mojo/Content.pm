@@ -70,7 +70,12 @@ sub build_headers {
 
 sub body_contains {
     my ($self, $chunk) = @_;
-    return $self->file->contains($chunk);
+
+    # Found
+    return 1 if $self->file->contains($chunk) >= 0;
+
+    # Not found
+    return 0;
 }
 
 sub body_length { shift->file->length }
@@ -203,7 +208,7 @@ sub parse_until_body {
 
     # Parser started
     if ($self->is_state('start')) {
-        my $length            = length($self->filter_buffer->{buffer});
+        my $length            = $self->filter_buffer->length;
         my $raw_length        = $self->filter_buffer->raw_length;
         my $raw_header_length = $raw_length - $length;
         $self->raw_header_length($raw_header_length);
@@ -236,7 +241,7 @@ sub _parse_headers {
     $self->headers->buffer($self->filter_buffer);
     $self->headers->parse;
 
-    my $length            = length($self->headers->buffer->{buffer});
+    my $length            = $self->headers->buffer->length;
     my $raw_length        = $self->headers->buffer->raw_length;
     my $raw_header_length = $raw_length - $length;
 

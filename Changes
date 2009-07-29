@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension Mojo.
 
 0.991243 2009-07-28 00:00:00
         - Made proxy support more portable.
+        - Cleaned up internal Mojo APIs.
 
 0.991242 2009-07-27 00:00:00
         - Cleaned up the whole script system, this change is mostly backwards

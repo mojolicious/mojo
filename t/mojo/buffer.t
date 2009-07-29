@@ -36,6 +36,6 @@ is($b->get_line, 'rst', 'first call to get_line returns first line');
 is($b->get_line, undef,
     'get_line returns undef when there are no more newlines');
 
-$b = Mojo::Buffer->new('abc');
+$b = Mojo::Buffer->new->add_chunk('abc');
 is("$b",          'abc', 'buffer object stringifies');
 is($b->to_string, 'abc', 'buffer stringifies via to_string');

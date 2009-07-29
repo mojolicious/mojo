@@ -328,7 +328,7 @@ $req->method('GET');
 $req->url->parse('http://127.0.0.1/foo/bar');
 $req->headers->expect('100-continue');
 $req->body("Hello World!\n");
-$req->proxy('127.0.0.2:8080');
+$req->proxy('http://127.0.0.2:8080');
 is($req->build,
         "GET http://127.0.0.1/foo/bar HTTP/1.1\x0d\x0a"
       . "Expect: 100-continue\x0d\x0a"

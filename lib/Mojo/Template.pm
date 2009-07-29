@@ -279,7 +279,7 @@ sub render_file {
 
     # Open file
     my $file = IO::File->new;
-    $file->open("< $path") || croak "Can't open template '$path': $!";
+    $file->open("< $path") or croak "Can't open template '$path': $!";
 
     # Slurp file
     my $tmpl = '';

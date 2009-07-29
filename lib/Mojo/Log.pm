@@ -21,8 +21,7 @@ __PACKAGE__->attr(
         # Open
         my $file = IO::File->new;
         my $path = $self->path;
-        $file->open(">> $path")
-          || croak qq/Couldn't open log file "$path": $!/;
+        $file->open(">> $path") or croak qq/Can't open log file "$path": $!/;
         return $file;
     }
 );

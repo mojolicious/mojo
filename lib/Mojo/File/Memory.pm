@@ -42,7 +42,7 @@ sub slurp { shift->content }
 sub _write_to_file {
     my ($self, $path) = @_;
     my $file = IO::File->new;
-    $file->open("> $path") or croak qq/Couldn't open file "$path": $!/;
+    $file->open("> $path") or croak qq/Can't' open file "$path": $!/;
     $file->syswrite($self->{content});
     return $self;
 }

@@ -65,7 +65,7 @@ sub new {
     if (my $e = Mojo::Loader->new->load($class)) {
         $self->log->error(
             ref $e
-            ? qq/Couldn't load context class "$class": $e/
+            ? qq/Can't load context class "$class": $e/
             : qq/Context class "$class" doesn't exist./
         );
     }

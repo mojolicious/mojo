@@ -107,7 +107,7 @@ sub copy_to {
     my ($self, $path) = @_;
     my $src = $self->path;
     File::Copy::copy($src, $path)
-      || croak qq/Couldn't copy file "$src" to "$path": $!/;
+      or croak qq/Can't copy file "$src" to "$path": $!/;
     return $self;
 }
 
@@ -135,7 +135,7 @@ sub move_to {
     my ($self, $path) = @_;
     my $src = $self->path;
     File::Copy::move($src, $path)
-      || croak qq/Couldn't move file "$src" to "$path": $!/;
+      or croak qq/Can't move file "$src" to "$path": $!/;
     return $self;
 }
 

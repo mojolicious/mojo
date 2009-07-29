@@ -134,10 +134,10 @@ sub leftovers {
 }
 
 sub parse {
-    my $self = shift;
+    my ($self, $chunk) = @_;
 
     # Buffer
-    $self->filter_buffer->add_chunk(join '', @_) if @_;
+    $self->filter_buffer->add_chunk($chunk);
 
     # Parse headers
     $self->parse_until_body;
@@ -201,10 +201,10 @@ sub parse {
 }
 
 sub parse_until_body {
-    my $self = shift;
+    my ($self, $chunk) = @_;
 
     # Buffer
-    $self->filter_buffer->add_chunk(join '', @_) if @_;
+    $self->filter_buffer->add_chunk($chunk);
 
     # Parser started
     if ($self->is_state('start')) {

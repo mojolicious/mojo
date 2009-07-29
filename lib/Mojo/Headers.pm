@@ -210,8 +210,10 @@ sub names {
 }
 
 sub parse {
-    my $self = shift;
-    $self->buffer->add_chunk(join '', @_) if @_;
+    my ($self, $chunk) = @_;
+
+    # Buffer
+    $self->buffer->add_chunk($chunk);
 
     # Parse headers
     $self->state('headers') if $self->is_state('start');

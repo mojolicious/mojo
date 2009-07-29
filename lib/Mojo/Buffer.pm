@@ -14,6 +14,9 @@ __PACKAGE__->attr('raw_length', default => 0);
 sub add_chunk {
     my ($self, $chunk) = @_;
 
+    # Shortcut
+    return $self unless $chunk;
+
     # Raw length
     $self->raw_length($self->raw_length + length $chunk);
 
@@ -102,7 +105,7 @@ L<Mojo::Buffer> implements the following attributes.
 =head2 C<raw_length>
 
     my $length = $buffer->raw_length;
-    $buffer    = $buffer->raw_length;
+    $buffer    = $buffer->raw_length(23);
 
 =head1 METHODS
 

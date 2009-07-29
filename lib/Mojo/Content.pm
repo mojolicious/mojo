@@ -75,7 +75,7 @@ sub body_contains {
     return 1 if $self->file->contains($chunk) >= 0;
 
     # Not found
-    return 0;
+    return;
 }
 
 sub body_length { shift->file->length }

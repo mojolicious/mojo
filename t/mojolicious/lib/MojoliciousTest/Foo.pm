@@ -28,7 +28,7 @@ sub stage1 {
 
     # Fail
     $self->render(text => 'Go away!');
-    return 0;
+    return;
 }
 
 sub stage2 { shift->render(text => 'Welcome aboard!') }

@@ -18,7 +18,7 @@ use Mojo::ByteStream 'b';
 
 use constant TMPDIR => $ENV{MOJO_TMPDIR} || File::Spec->tmpdir;
 
-__PACKAGE__->attr('cleanup');
+__PACKAGE__->attr([qw/cleanup path/]);
 __PACKAGE__->attr(
     'handle',
     default => sub {
@@ -64,16 +64,8 @@ sub DESTROY {
     unlink $file if $self->cleanup && -f $file;
 }
 
-# Hi, Super Nintendo Chalmers!
-sub new {
-    my $self = shift->SUPER::new();
-    $self->add_chunk(join '', @_) if @_;
-    return $self;
-}
-
 sub add_chunk {
-    my $self = shift;
-    my $chunk = join '', @_;
+    my ($self, $chunk) = @_;
 
     # Shortcut
     return unless $chunk;
@@ -147,19 +139,6 @@ sub move_to {
     return $self;
 }
 
-sub path {
-    my ($self, $file) = @_;
-
-    # Set
-    if ($file) {
-        $self->{path} = $file;
-        return $self;
-    }
-
-    # Get
-    return $self->{path};
-}
-
 sub slurp {
     my $self = shift;
 
@@ -186,7 +165,7 @@ Mojo::File - File
 
     use Mojo::File;
 
-    my $file = Mojo::File->new('Hello!');
+    my $file = Mojo::File->new;
     $file->add_chunk('World!');
     print $file->slurp;
 
@@ -217,10 +196,6 @@ L<Mojo::File> implements the following attributes.
 
 L<Mojo::File> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
-
-=head2 C<new>
-
-    my $file = Mojo::File->new('Hello World!');
 
 =head2 C<add_chunk>
 

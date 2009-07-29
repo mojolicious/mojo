@@ -58,7 +58,7 @@ Mojo::File::Memory - In-Memory File
 
     use Mojo::File::Memory;
 
-    my $file = Mojo::File::Memory->new('Hello!');
+    my $file = Mojo::File::Memory->new;
     $file->add_chunk('World!');
     print $file->slurp;
 
@@ -80,10 +80,6 @@ implements the following new ones.
 
 L<Mojo::File::Memory> inherits all methods from L<Mojo::File> and implements
 the following new ones.
-
-=head2 C<new>
-
-    my $file = Mojo::File::Memory->new('foo bar');
 
 =head2 C<add_chunk>
 

@@ -57,9 +57,11 @@ Mojo - The Web In A Box!
     sub handler {
         my ($self, $tx) = @_;
 
+        # Request
         my $method = $tx->req->method;
         my $path   = $tx->req->url->path;
 
+        # Response
         $tx->res->headers->content_type('text/plain');
         $tx->res->body("$method request for $path!");
     }

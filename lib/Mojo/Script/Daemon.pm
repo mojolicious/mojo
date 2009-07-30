@@ -9,7 +9,7 @@ use base 'Mojo::Script';
 
 use Mojo::Server::Daemon;
 
-use Getopt::Long 'GetOptionsFromArray';
+use Getopt::Long 'GetOptions';
 
 __PACKAGE__->attr('description', default => <<'EOF');
 Start application with HTTP 1.1 backend.
@@ -37,9 +37,8 @@ sub run {
     my $daemon = Mojo::Server::Daemon->new;
 
     # Options
-    my @options = @_ ? @_ : @ARGV;
-    GetOptionsFromArray(
-        \@options,
+    @ARGV = @_ if @_;
+    GetOptions(
         'clients=i'   => sub { $daemon->max_clients($_[1]) },
         'group=s'     => sub { $daemon->group($_[1]) },
         'keepalive=i' => sub { $daemon->keep_alive_timeout($_[1]) },

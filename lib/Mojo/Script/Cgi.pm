@@ -9,7 +9,7 @@ use base 'Mojo::Script';
 
 use Mojo::Server::CGI;
 
-use Getopt::Long 'GetOptionsFromArray';
+use Getopt::Long 'GetOptions';
 
 __PACKAGE__->attr('description', default => <<'EOF');
 Start application with CGI backend.
@@ -27,8 +27,8 @@ sub run {
     my $cgi  = Mojo::Server::CGI->new;
 
     # Options
-    my @options = @_ ? @_ : @ARGV;
-    GetOptionsFromArray(\@options, 'nph' => sub { $cgi->nph(1) });
+    @ARGV = @_ if @_;
+    GetOptions('nph' => sub { $cgi->nph(1) });
 
     # Run
     $cgi->run;

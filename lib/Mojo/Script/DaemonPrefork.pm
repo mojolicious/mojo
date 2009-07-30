@@ -9,7 +9,7 @@ use base 'Mojo::Script';
 
 use Mojo::Server::Daemon::Prefork;
 
-use Getopt::Long 'GetOptionsFromArray';
+use Getopt::Long 'GetOptions';
 
 __PACKAGE__->attr('description', default => <<'EOF');
 Start application with preforking HTTP 1.1 backend.
@@ -51,9 +51,8 @@ sub run {
 
     # Options
     my $daemonize;
-    my @options = @_ ? @_ : @ARGV;
-    GetOptionsFromArray(
-        \@options,
+    @ARGV = @_ if @_;
+    GetOptions(
         'clients=i'   => sub { $daemon->max_clients($_[1]) },
         'daemonize'   => \$daemonize,
         'group=s'     => sub { $daemon->group($_[1]) },

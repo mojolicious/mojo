@@ -228,7 +228,6 @@ This page was generated from the template
 to reload the page or
 <a href="/index.html">here</a>
 to move forward to a static page.
-
 __END__
 =head1 NAME
 

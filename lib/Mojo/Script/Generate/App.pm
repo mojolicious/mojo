@@ -94,7 +94,6 @@ use warnings;
 use Test::More tests => 1;
 
 use_ok('<%= $class %>');
-
 __END__
 =head1 NAME
 

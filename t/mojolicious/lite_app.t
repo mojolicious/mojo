@@ -165,7 +165,7 @@ $client->process_app('Mojolicious::Lite', $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-like($tx->res->body, qr/Yea baby! with layout\n$/);
+is($tx->res->body,                            "Yea baby! with layout\n");
 
 __DATA__
 @@ index.html.eplite

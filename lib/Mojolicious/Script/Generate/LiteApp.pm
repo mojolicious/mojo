@@ -58,7 +58,6 @@ Yea baby!
         <%= $self->render_inner %>
     </body>
 </html>
-
 __END__
 =head1 NAME
 

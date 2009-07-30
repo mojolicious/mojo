@@ -20,6 +20,7 @@ __PACKAGE__->attr(
             jpeg => 'image/jpeg',
             jpg  => 'image/jpeg',
             js   => 'application/x-javascript',
+            json => 'application/json',
             png  => 'image/png',
             tar  => 'application/x-tar',
             txt  => 'text/plain',

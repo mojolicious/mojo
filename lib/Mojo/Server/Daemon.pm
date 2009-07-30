@@ -37,6 +37,7 @@ sub listen {
     );
     my $address = $self->address;
     $options{LocalAddr} = $address if $address;
+    $address ||= '127.0.0.1';
 
     # Create socket
     $self->{listen} ||= IO::Socket::INET->new(%options)
@@ -46,10 +47,10 @@ sub listen {
     $self->{listen}->blocking(0);
 
     # Log
-    $self->app->log->info("Server started (http://127.0.0.1:$port)");
+    $self->app->log->info("Server started (http://$address:$port)");
 
     # Friendly message
-    print "Server available at http://127.0.0.1:$port.\n";
+    print "Server available at http://$address:$port.\n";
 }
 
 # 40 dollars!? This better be the best damn beer ever..

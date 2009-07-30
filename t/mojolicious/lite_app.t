@@ -29,10 +29,8 @@ get '/foo' => sub {
 };
 
 # GET /layout
-get '/layout' => sub {
-    my $self = shift;
-    $self->render(text => 'Yea baby!', layout => 'layout');
-};
+get '/layout' =>
+  sub { shift->render(text => 'Yea baby!', layout => 'layout') };
 
 # POST /template
 post '/template' => 'index';

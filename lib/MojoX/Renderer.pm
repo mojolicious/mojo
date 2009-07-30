@@ -64,7 +64,6 @@ sub render {
 
         # Fix
         $template = File::Spec->catfile('layouts', $layout);
-        $template =~ s|\\|/|g if $^O eq 'MSWin32';
         return unless $template = $self->_fix_template($c, $template);
 
         # Render
@@ -158,6 +157,9 @@ sub _fix_template {
     # Handler precedence
     $self->precedence([sort keys %{$self->handler}])
       unless $self->precedence;
+
+    # Make sure we are portable
+    $template = File::Spec->catfile(split '/', $template) if $template;
 
     # Format
     return unless $template = $self->_fix_format($c, $template);

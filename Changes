@@ -4,6 +4,8 @@ This file documents the revision history for Perl extension Mojo.
         - Made proxy support more portable.
         - Simplified progress callbacks.
         - Cleaned up internal Mojo APIs.
+        - Fixed layouts on win32 and made templates portable, "/" is now the
+          separator on all platforms. (charsbar)
         - Fixed dependency on Getopt::Long 2.38. (kevinold)
 
 0.991242 2009-07-27 00:00:00

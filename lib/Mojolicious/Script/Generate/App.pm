@@ -87,7 +87,7 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 use lib "$FindBin::Bin/../lib";
 
-$ENV{MOJO_APP} = '<%= $class %>';
+$ENV{MOJO_APP} ||= '<%= $class %>';
 
 # Check if Mojo is installed
 eval 'use Mojolicious::Scripts';

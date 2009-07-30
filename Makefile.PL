@@ -14,7 +14,7 @@ use ExtUtils::MakeMaker;
 my $mm = $ExtUtils::MakeMaker::VERSION;
 
 # We only use core modules, so you shouldn't have to install anything besides
-# Perl 5.8!
+# Perl 5.8.1!
 WriteMakefile(
     NAME         => 'Mojo',
     VERSION_FROM => 'lib/Mojo.pm',
@@ -61,8 +61,9 @@ WriteMakefile(
         'IO::Socket'            => 0,
         'MIME::Base64'          => 0,
         'MIME::QuotedPrint'     => 0,
+        'perl'                  => '5.008001',
         'POSIX'                 => 0,
-        'Test::Builder::Module' => 0,
+        'Test::Builder'         => 0,
         'Test::Harness'         => 0,
         'Test::More'            => 0,
         'Time::HiRes'           => 0

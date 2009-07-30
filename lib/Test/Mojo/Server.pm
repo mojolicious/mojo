@@ -14,7 +14,7 @@ use FindBin;
 use IO::Socket::INET;
 use Mojo::Home;
 use Mojo::Script;
-use Test::Builder::Module;
+use Test::Builder;
 
 __PACKAGE__->attr([qw/command pid port/]);
 __PACKAGE__->attr('executable', default => 'mojo');

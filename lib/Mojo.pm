@@ -152,6 +152,8 @@ Sebastian Riedel, C<sri@cpan.org>.
 
 In alphabetical order:
 
+Adam Kennedy
+
 Anatoly Sharifulin
 
 Andreas Koenig

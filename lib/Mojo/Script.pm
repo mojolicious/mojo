@@ -103,7 +103,7 @@ sub get_data {
     my $content = join '', <$d>;
 
     # Ignore everything after __END__
-    $content =~ s/\n__END__\n.*$//g;
+    $content =~ s/\n__END__\n.*//s;
 
     # Split
     my @data = split /^@@\s+(.+)\s*\r?\n/m, $content;

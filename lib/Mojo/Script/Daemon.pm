@@ -18,6 +18,7 @@ __PACKAGE__->attr('usage', default => <<"EOF");
 usage: $0 daemon [OPTIONS]
 
 These options are available:
+  --address <address>     Set local host bind address.
   --clients <number>      Set maximum number of concurrent clients, defaults
                           to 1000.
   --group <name>          Set group name for process.
@@ -39,13 +40,14 @@ sub run {
     # Options
     @ARGV = @_ if @_;
     GetOptions(
+        'address=s'   => sub { $daemon->address($_[1]) },
         'clients=i'   => sub { $daemon->max_clients($_[1]) },
         'group=s'     => sub { $daemon->group($_[1]) },
         'keepalive=i' => sub { $daemon->keep_alive_timeout($_[1]) },
         'port=i'      => sub { $daemon->port($_[1]) },
         'queue=i'     => sub { $daemon->listen_queue_size($_[1]) },
         'requests=i'  => sub { $daemon->max_keep_alive_requests($_[1]) },
-        'user=s'      => sub { $daemon->user($_[1]) },
+        'user=s'      => sub { $daemon->user($_[1]) }
     );
 
     # Run

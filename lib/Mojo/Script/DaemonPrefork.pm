@@ -18,6 +18,7 @@ __PACKAGE__->attr('usage', default => <<"EOF");
 usage: $0 daemon_prefork [OPTIONS]
 
 These options are available:
+  --address <address>     Set local host bind address.
   --clients <number>      Set maximum number of concurrent clients per child,
                           defaults to 1.
   --daemonize             Daemonize parent.
@@ -53,6 +54,7 @@ sub run {
     my $daemonize;
     @ARGV = @_ if @_;
     GetOptions(
+        'address=s'   => sub { $daemon->address($_[1]) },
         'clients=i'   => sub { $daemon->max_clients($_[1]) },
         'daemonize'   => \$daemonize,
         'group=s'     => sub { $daemon->group($_[1]) },

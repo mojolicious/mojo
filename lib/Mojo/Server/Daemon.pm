@@ -12,7 +12,7 @@ use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
 use IO::Socket;
 use Mojo::Pipeline;
 
-__PACKAGE__->attr([qw/group user/]);
+__PACKAGE__->attr([qw/address group user/]);
 __PACKAGE__->attr('keep_alive_timeout',      default => 15);
 __PACKAGE__->attr('listen_queue_size',       default => SOMAXCONN);
 __PACKAGE__->attr('max_clients',             default => 1000);
@@ -26,15 +26,21 @@ sub accept_unlock {1}
 sub listen {
     my $self = shift;
 
-    # Create socket
-    my $port = $self->port;
-    $self->{listen} ||= IO::Socket::INET->new(
+    # Options
+    my $port    = $self->port;
+    my %options = (
         Listen    => $self->listen_queue_size,
         LocalPort => $port,
         Proto     => 'tcp',
         ReuseAddr => 1,
         Type      => SOCK_STREAM
-    ) or croak "Can't create listen socket: $!";
+    );
+    my $address = $self->address;
+    $options{LocalAddr} = $address if $address;
+
+    # Create socket
+    $self->{listen} ||= IO::Socket::INET->new(%options)
+      or croak "Can't create listen socket: $!";
 
     # Non blocking
     $self->{listen}->blocking(0);
@@ -442,6 +448,11 @@ L<Mojo::Server::Daemon> is a simple and portable async io based HTTP server.
 
 L<Mojo::Server::Daemon> inherits all attributes from L<Mojo::Server> and
 implements the following new ones.
+
+=head2 C<address>
+
+    my $address = $daemon->address;
+    $daemon     = $daemon->address('127.0.0.1');
 
 =head2 C<group>
 

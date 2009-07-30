@@ -5,6 +5,7 @@ This file documents the revision history for Perl extension Mojo.
         - Made proxy support more portable.
         - Simplified progress callbacks.
         - Cleaned up internal Mojo APIs.
+        - Added local host bin address support to Mojo::Server::Daemon.
         - Fixed layouts on win32 and made templates portable, "/" is now the
           separator on all platforms. (charsbar)
         - Fixed dependency on Getopt::Long 2.38. (kevinold)

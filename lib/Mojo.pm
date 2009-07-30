@@ -52,21 +52,27 @@ Mojo - The Web In A Box!
 
     use base 'Mojo';
 
+    # All the complexities of CGI, FastCGI and HTTP get reduced to a
+    # single method call!
     sub handler {
         my ($self, $tx) = @_;
 
-        # Hello world!
+        my $method = $tx->req->method;
+        my $path   = $tx->req->url->path;
+
         $tx->res->headers->content_type('text/plain');
-        $tx->res->body('Congratulations, your Mojo is working!');
+        $tx->res->body("$method request for $path!");
     }
 
 =head1 DESCRIPTION
 
-L<Mojo> is a collection of libraries and example web frameworks for web
-framework developers.
+L<Mojo> provides a minimal interface between web servers and Perl web
+frameworks.
 
-If you are searching for a higher level MVC web framework you should take a
-look at L<Mojolicious> and L<Mojolicious::Lite>.
+Also included in the distribution are two MVC web frameworks named
+L<Mojolicious> and L<Mojolicious::Lite>.
+
+Currently there are no requirements besides Perl 5.8.1.
 
     .------------------------------------------------------------.
     |                                                            |
@@ -80,11 +86,6 @@ look at L<Mojolicious> and L<Mojolicious::Lite>.
     .------------------. .------------------. .------------------.
     |        CGI       | |      FastCGI     | |     HTTP 1.1     |
     '------------------' '------------------' '------------------'
-
-Don't be scared by the amount of different modules in the distribution, they
-are all very loosely coupled.
-You can just pick the ones you like and ignore the rest, there is no
-tradeoff.
 
 For userfriendly documentation see L<Mojo::Manual>.
 

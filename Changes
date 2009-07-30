@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojo.
 
+0.991244 2009-07-30 00:00:00
+        - Fixed package.
+
 0.991243 2009-07-28 00:00:00
         - Made eplite ignore everything after __END__.
         - Made proxy support more portable.

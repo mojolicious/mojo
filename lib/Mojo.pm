@@ -66,7 +66,7 @@ L<Mojo> is a collection of libraries and example web frameworks for web
 framework developers.
 
 If you are searching for a higher level MVC web framework you should take a
-look at L<Mojolicious>.
+look at L<Mojolicious> and L<Mojolicious::Lite>.
 
     .------------------------------------------------------------.
     |                                                            |

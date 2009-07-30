@@ -30,15 +30,14 @@ sub render {
             my $endpoint = $self->match->endpoint;
 
             # Use endpoint name as default template
-            if ($endpoint && $endpoint->name) {
-                $self->stash(template => $endpoint->name);
-            }
+            $self->stash(template => $endpoint->name)
+              if $endpoint && $endpoint->name;
         }
 
         # Normal default template
         else {
-            $self->stash->{template} = join '/', split(/-/, $controller),
-              $action;
+            $self->stash(
+                template => join('/', split(/-/, $controller), $action));
         }
     }
 

@@ -58,48 +58,6 @@ sub run {
 }
 
 1;
-
-=head1 NAME
-
-Mojolicious::Script::Generate::App - App Generator Script
-
-=head1 SYNOPSIS
-
-    use Mojo::Script::Generate::App;
-
-    my $app = Mojo::Script::Generate::App->new;
-    $app->run(@ARGV);
-
-=head1 DESCRIPTION
-
-L<Mojo::Script::Generate::App> is a application generator.
-
-=head1 ATTRIBUTES
-
-L<Mojolicious::Script::Generate::App> inherits all attributes from
-L<Mojo::Script> and implements the following new ones.
-
-=head2 C<description>
-
-    my $description = $app->description;
-    $app            = $app->description('Foo!');
-
-=head2 C<usage>
-
-    my $usage = $app->usage;
-    $app      = $app->usage('Foo!');
-
-=head1 METHODS
-
-L<Mojolicious::Script::Generate::App> inherits all methods from
-L<Mojo::Script> and implements the following new ones.
-
-=head2 C<run>
-
-    $app->run(@ARGV);
-
-=cut
-
 __DATA__
 @@ 404
 <!doctype html>
@@ -270,3 +228,45 @@ This page was generated from the template
 to reload the page or
 <a href="/index.html">here</a>
 to move forward to a static page.
+
+__END__
+=head1 NAME
+
+Mojolicious::Script::Generate::App - App Generator Script
+
+=head1 SYNOPSIS
+
+    use Mojo::Script::Generate::App;
+
+    my $app = Mojo::Script::Generate::App->new;
+    $app->run(@ARGV);
+
+=head1 DESCRIPTION
+
+L<Mojo::Script::Generate::App> is a application generator.
+
+=head1 ATTRIBUTES
+
+L<Mojolicious::Script::Generate::App> inherits all attributes from
+L<Mojo::Script> and implements the following new ones.
+
+=head2 C<description>
+
+    my $description = $app->description;
+    $app            = $app->description('Foo!');
+
+=head2 C<usage>
+
+    my $usage = $app->usage;
+    $app      = $app->usage('Foo!');
+
+=head1 METHODS
+
+L<Mojolicious::Script::Generate::App> inherits all methods from
+L<Mojo::Script> and implements the following new ones.
+
+=head2 C<run>
+
+    $app->run(@ARGV);
+
+=cut

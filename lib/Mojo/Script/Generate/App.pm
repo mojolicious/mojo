@@ -39,48 +39,6 @@ sub run {
 }
 
 1;
-
-=head1 NAME
-
-Mojo::Script::Generate::App - Application Generator Script
-
-=head1 SYNOPSIS
-
-    use Mojo::Script::Generate::App;
-
-    my $app = Mojo::Script::Generate::App->new;
-    $app->run(@ARGV);
-
-=head1 DESCRIPTION
-
-L<Mojo::Script::Generate::App> is a application generator.
-
-=head1 ATTRIBUTES
-
-L<Mojo::Script::Generate::App> inherits all attributes from L<Mojo::Scripts>
-and implements the following new ones.
-
-=head2 C<description>
-
-    my $description = $app->description;
-    $app            = $app->description('Foo!');
-
-=head2 C<usage>
-
-    my $usage = $app->usage;
-    $app      = $app->usage('Foo!');
-
-=head1 METHODS
-
-L<Mojo::Script::Generate::App> inherits all methods from L<Mojo::Script> and
-implements the following new ones.
-
-=head2 C<run>
-
-    $app = $app->run(@ARGV);
-
-=cut
-
 __DATA__
 @@ mojo
 % my $class = shift;
@@ -136,3 +94,45 @@ use warnings;
 use Test::More tests => 1;
 
 use_ok('<%= $class %>');
+
+__END__
+=head1 NAME
+
+Mojo::Script::Generate::App - Application Generator Script
+
+=head1 SYNOPSIS
+
+    use Mojo::Script::Generate::App;
+
+    my $app = Mojo::Script::Generate::App->new;
+    $app->run(@ARGV);
+
+=head1 DESCRIPTION
+
+L<Mojo::Script::Generate::App> is a application generator.
+
+=head1 ATTRIBUTES
+
+L<Mojo::Script::Generate::App> inherits all attributes from L<Mojo::Scripts>
+and implements the following new ones.
+
+=head2 C<description>
+
+    my $description = $app->description;
+    $app            = $app->description('Foo!');
+
+=head2 C<usage>
+
+    my $usage = $app->usage;
+    $app      = $app->usage('Foo!');
+
+=head1 METHODS
+
+L<Mojo::Script::Generate::App> inherits all methods from L<Mojo::Script> and
+implements the following new ones.
+
+=head2 C<run>
+
+    $app = $app->run(@ARGV);
+
+=cut

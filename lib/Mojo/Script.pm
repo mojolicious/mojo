@@ -99,8 +99,14 @@ sub get_data {
     # Reset
     seek $d, 0, 0;
 
+    # Slurp
+    my $content = join '', <$d>;
+
+    # Ignore everything after __END__
+    $content =~ s/\n__END__\n.*$//g;
+
     # Split
-    my @data = split /^@@\s+(.+)\s*\r?\n/m, join '', <$d>;
+    my @data = split /^@@\s+(.+)\s*\r?\n/m, $content;
 
     # Remove split garbage
     shift @data;

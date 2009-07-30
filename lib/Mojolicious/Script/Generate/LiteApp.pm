@@ -28,7 +28,38 @@ sub run {
 }
 
 1;
+__DATA__
+@@ liteapp
+%% my $class = shift;
+#!/usr/bin/env perl
 
+use Mojolicious::Lite;
+
+get '/' => 'index';
+
+get '/:groovy' => sub {
+    my $self = shift;
+    $self->render(text => $self->stash('groovy'));
+};
+
+shagadelic;
+<%%= '__DATA__' %%>
+
+<%%= '@@ index.html.eplite' %%>
+% my $self = shift;
+% $self->stash(layout => 'funky');
+Yea baby!
+
+<%%= '@@ layouts/funky.html.eplite' %%>
+% my $self = shift;
+<!html>
+    <head><title>Funky!</title></head>
+    <body>
+        <%= $self->render_inner %>
+    </body>
+</html>
+
+__END__
 =head1 NAME
 
 Mojolicious::Script::Generate::LiteApp - Lite App Generator Script
@@ -69,34 +100,3 @@ L<Mojo::Script> and implements the following new ones.
     $app->run(@ARGV);
 
 =cut
-
-__DATA__
-@@ liteapp
-%% my $class = shift;
-#!/usr/bin/env perl
-
-use Mojolicious::Lite;
-
-get '/' => 'index';
-
-get '/:groovy' => sub {
-    my $self = shift;
-    $self->render(text => $self->stash('groovy'));
-};
-
-shagadelic;
-<%%= '__DATA__' %%>
-
-<%%= '@@ index.html.eplite' %%>
-% my $self = shift;
-% $self->stash(layout => 'funky');
-Yea baby!
-
-<%%= '@@ layouts/funky.html.eplite' %%>
-% my $self = shift;
-<!html>
-    <head><title>Funky!</title></head>
-    <body>
-        <%= $self->render_inner %>
-    </body>
-</html>

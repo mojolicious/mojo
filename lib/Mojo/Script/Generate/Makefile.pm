@@ -29,7 +29,40 @@ sub run {
 }
 
 1;
+__DATA__
+@@ makefile
+% my ($class, $path, $name) = @_;
+#!/usr/bin/env perl
 
+use 5.008001;
+
+use strict;
+use warnings;
+
+# Son, when you participate in sporting events,
+# it's not whether you win or lose, it's how drunk you get.
+use ExtUtils::MakeMaker;
+
+WriteMakefile(
+    NAME         => '<%= $class %>',
+    VERSION_FROM => 'lib/<%= $path %>',
+    AUTHOR       => 'A Good Programmer <nospam@cpan.org>',
+    EXE_FILES => ['script/<%= $name %>'],
+    PREREQ_PM => { 'Mojo' => '0.9003' },
+    test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t'}
+);
+
+# Devel::Cover support
+sub MY::postamble {
+    qq/
+testcover :
+\t cover -delete && \\
+   HARNESS_PERL_SWITCHES=-MDevel::Cover \$(MAKE) test && \\
+   cover
+/
+}
+
+__END__
 =head1 NAME
 
 Mojo::Script::Generate::Makefile - Makefile Generator Script
@@ -70,36 +103,3 @@ and implements the following new ones.
     $makefile = $makefile->run(@ARGV);
 
 =cut
-
-__DATA__
-@@ makefile
-% my ($class, $path, $name) = @_;
-#!/usr/bin/env perl
-
-use 5.008001;
-
-use strict;
-use warnings;
-
-# Son, when you participate in sporting events,
-# it's not whether you win or lose, it's how drunk you get.
-use ExtUtils::MakeMaker;
-
-WriteMakefile(
-    NAME         => '<%= $class %>',
-    VERSION_FROM => 'lib/<%= $path %>',
-    AUTHOR       => 'A Good Programmer <nospam@cpan.org>',
-    EXE_FILES => ['script/<%= $name %>'],
-    PREREQ_PM => { 'Mojo' => '0.9003' },
-    test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t'}
-);
-
-# Devel::Cover support
-sub MY::postamble {
-    qq/
-testcover :
-\t cover -delete && \\
-   HARNESS_PERL_SWITCHES=-MDevel::Cover \$(MAKE) test && \\
-   cover
-/
-}

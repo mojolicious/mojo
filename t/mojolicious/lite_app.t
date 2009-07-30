@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 48;
+use Test::More tests => 52;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -26,6 +26,12 @@ app->log->level('error');
 get '/foo' => sub {
     my $self = shift;
     $self->render(text => 'Yea baby!');
+};
+
+# GET /layout
+get '/layout' => sub {
+    my $self = shift;
+    $self->render(text => 'Yea baby!', layout => 'layout');
 };
 
 # POST /template
@@ -155,6 +161,17 @@ is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 is($tx->res->body,                            'baz');
 
+# GET /layout
+$tx = Mojo::Transaction->new_get('/layout');
+$client->process_app('Mojolicious::Lite', $tx);
+is($tx->res->code,                            200);
+is($tx->res->headers->server,                 'Mojo (Perl)');
+is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+like($tx->res->body, qr/Yea baby! with layout/);
+
 __DATA__
 @@ index.html.eplite
 %= something()
+
+@@ layouts/layout.html.eplite
+<%= shift->render_inner %> with layout

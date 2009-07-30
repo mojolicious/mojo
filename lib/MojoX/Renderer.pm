@@ -64,6 +64,7 @@ sub render {
 
         # Fix
         $template = File::Spec->catfile('layouts', $layout);
+        $template =~ s|\\|/|g if $^O eq 'MSWin32';
         return unless $template = $self->_fix_template($c, $template);
 
         # Render

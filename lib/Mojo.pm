@@ -245,6 +245,6 @@ Copyright (C) 2008-2009, Sebastian Riedel.
 =head1 LICENSE
 
 This program is free software, you can redistribute it and/or modify it under
-the same terms as Perl 5.10.
+the terms of the Artistic License version 2.0.
 
 =cut

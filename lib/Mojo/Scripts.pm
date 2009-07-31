@@ -26,6 +26,9 @@ __PACKAGE__->attr('namespaces', default => sub { ['Mojo::Script'] });
 sub run {
     my ($self, $name, @args) = @_;
 
+    # Check ARGV
+    ($name, @args) = @ARGV if !$name && @ARGV;
+
     # Run script
     if ($name && ($name ne 'help' || $args[0])) {
 

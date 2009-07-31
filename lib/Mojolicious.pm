@@ -9,6 +9,7 @@ use base 'Mojo';
 
 use Mojo::Loader;
 use Mojolicious::Renderer;
+use Mojolicious::Scripts;
 use MojoX::Dispatcher::Routes;
 use MojoX::Dispatcher::Static;
 use MojoX::Types;
@@ -132,6 +133,20 @@ sub handler {
 # This will run for each request
 sub process { shift->dispatch(@_) }
 
+# Start script system
+sub start {
+    my $class = shift;
+
+    # We can be called on class or instance
+    $class = ref $class || $class;
+
+    # We are the application
+    $ENV{MOJO_APP} ||= $class;
+
+    # Start script system
+    Mojolicious::Scripts->new->run(@_);
+}
+
 # This will run once at startup
 sub startup { }
 
@@ -215,6 +230,11 @@ new ones.
 =head2 C<process>
 
     $mojo->process($c);
+
+=head2 C<start>
+
+    Mojolicious->start;
+    Mojolicious->start('daemon');
 
 =head2 C<startup>
 

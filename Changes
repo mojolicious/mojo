@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojo.
 
+0.991245 2009-07-31 00:00:00
+        - Simplified script system startup.
+
 0.991244 2009-07-30 00:00:00
         - Fixed package.
 

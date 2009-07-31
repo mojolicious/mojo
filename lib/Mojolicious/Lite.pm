@@ -9,7 +9,6 @@ use base 'Mojolicious';
 
 use File::Spec;
 use FindBin;
-use Mojolicious::Scripts;
 
 # Singleton
 my $APP;
@@ -84,10 +83,10 @@ sub import {
     *{"${caller}::shagadelic"} = sub {
 
         # We are the app in a lite environment
-        $ENV{MOJO_APP} = 'Mojolicious::Lite';
+        $ENV{MOJO_APP} ||= 'Mojolicious::Lite';
 
-        # Start script system
-        Mojolicious::Scripts->new->run(@_ ? @_ : @ARGV);
+        # Start
+        Mojolicious::Lite->start(@_);
     };
 }
 

@@ -12,13 +12,14 @@ require Carp;
 
 use Mojo::Home;
 use Mojo::Log;
+use Mojo::Scripts;
 use Mojo::Transaction;
 
 __PACKAGE__->attr('home', default => sub { Mojo::Home->new });
 __PACKAGE__->attr('log',  default => sub { Mojo::Log->new });
 
 # Oh, so they have internet on computers now!
-our $VERSION = '0.991244';
+our $VERSION = '0.991245';
 
 sub new {
     my $self = shift->SUPER::new(@_);
@@ -40,6 +41,20 @@ sub build_tx {
 }
 
 sub handler { Carp::croak('Method "handler" not implemented in subclass') }
+
+# Start script system
+sub start {
+    my $class = shift;
+
+    # We can be called on class or instance
+    $class = ref $class || $class;
+
+    # We are the application
+    $ENV{MOJO_APP} ||= $class;
+
+    # Start script system
+    Mojo::Scripts->new->run(@_);
+}
 
 1;
 __END__
@@ -121,6 +136,11 @@ new ones.
 =head2 C<handler>
 
     $tx = $mojo->handler($tx);
+
+=head2 C<start>
+
+    Mojo->start;
+    Mojo->start('daemon');
 
 =head1 SUPPORT
 

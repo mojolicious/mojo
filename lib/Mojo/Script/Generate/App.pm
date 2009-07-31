@@ -54,18 +54,17 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 use lib "$FindBin::Bin/../lib";
 
-$ENV{MOJO_APP} ||= '<%= $class %>';
-
 # Check if Mojo is installed
-eval 'use Mojo::Scripts';
+eval 'use Mojo';
 die <<EOF if $@;
 It looks like you don't have the Mojo Framework installed.
 Please visit http://mojolicious.org for detailed installation instructions.
 
 EOF
 
-# Start the script system
-Mojo::Scripts->new->run(@ARGV);
+# Start application
+use <%= $class %>;
+<%= $class %>->start;
 @@ appclass
 % my $class = shift;
 package <%= $class %>;

@@ -7,9 +7,7 @@ use warnings;
 
 use base 'Mojo::Base';
 
-# No imports to make subclassing a bit easier
-require Carp;
-
+use Carp 'croak';
 use Mojo::Home;
 use Mojo::Log;
 use Mojo::Scripts;
@@ -40,7 +38,7 @@ sub build_tx {
     return $tx;
 }
 
-sub handler { Carp::croak('Method "handler" not implemented in subclass') }
+sub handler { croak 'Method "handler" not implemented in subclass' }
 
 # Start script system
 sub start {

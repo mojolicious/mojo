@@ -1,0 +1,27 @@
+Mojo provides a minimal interface between web servers and Perl web
+frameworks.
+
+Also included in the distribution are two MVC web frameworks named
+Mojolicious and Mojolicious::Lite.
+
+Currently there are no requirements besides Perl 5.8.1.
+
+    .------------------------------------------------------------.
+    |                                                            |
+    |   Application  .-------------------------------------------'
+    |                | .-------------------. .-------------------.
+    |                | |    Mojolicious    | | Mojolicious::Lite |
+    '----------------' '-------------------' '-------------------'
+    .------------------------------------------------------------.
+    |                           Mojo                             |
+    '------------------------------------------------------------'
+    .------------------. .------------------. .------------------.
+    |        CGI       | |      FastCGI     | |     HTTP 1.1     |
+    '------------------' '------------------' '------------------'
+
+Just run the following commands to install Mojo.
+
+    perl Makefile.PL
+    make
+    make test
+    make install

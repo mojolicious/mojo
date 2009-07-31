@@ -18,6 +18,7 @@ my $mm = $ExtUtils::MakeMaker::VERSION;
 WriteMakefile(
     NAME         => 'Mojo',
     VERSION_FROM => 'lib/Mojo.pm',
+    ABSTRACT     => 'Web Framework',
     AUTHOR       => 'Sebastian Riedel <sri@cpan.org>',
 
     ($mm < 6.3002 ? () : ('LICENSE' => 'perl')),
@@ -49,6 +50,7 @@ WriteMakefile(
         'Data::Dumper'          => 0,
         'Digest::MD5'           => 0,
         'Encode'                => 0,
+        'ExtUtils::MakeMaker'   => 0,
         'File::Basename'        => 0,
         'File::Copy'            => 0,
         'File::Path'            => 0,

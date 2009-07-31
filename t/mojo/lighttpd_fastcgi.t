@@ -23,15 +23,34 @@ plan tests => 7;
 use_ok('Mojo::Server::FastCGI');
 
 # Setup
-my $server     = Test::Mojo::Server->new;
-my $port       = $server->generate_port_ok;
-my $executable = $server->find_executable_ok;
-my $dir        = File::Temp::tempdir();
-my $config     = File::Spec->catfile($dir, 'fcgi.config');
-my $mt         = Mojo::Template->new;
+my $server = Test::Mojo::Server->new;
+my $port   = $server->generate_port_ok;
+my $dir    = File::Temp::tempdir();
+my $config = File::Spec->catfile($dir, 'fcgi.config');
+my $mt     = Mojo::Template->new;
 
-$mt->render_to_file(<<'EOF', $config, $dir, $port, $executable);
-% my ($dir, $port, $executable) = @_;
+# FastCGI setup
+my $fcgi = File::Spec->catfile($dir, 'test.fcgi');
+$mt->render_to_file(<<'EOF', $fcgi);
+#!<%= $^X %>
+
+use strict;
+use warnings;
+
+% use FindBin;
+use lib '<%= "$FindBin::Bin/../../lib" %>';
+
+use Mojo::Server::FastCGI;
+
+Mojo::Server::FastCGI->new->run;
+
+1;
+EOF
+chmod 0777, $fcgi;
+ok(-x $fcgi);
+
+$mt->render_to_file(<<'EOF', $config, $dir, $port, $fcgi);
+% my ($dir, $port, $fcgi) = @_;
 % use File::Spec::Functions 'catfile';
 server.modules = (
     "mod_access",
@@ -52,7 +71,7 @@ fastcgi.server = (
         "FastCgiTest" => (
             "socket"          => "<%= catfile $dir, 'test.socket' %>",
             "check-local"     => "disable",
-            "bin-path"        => "<%= $executable %> fastcgi",
+            "bin-path"        => "<%= $fcgi %> fastcgi",
             "min-procs"       => 1,
             "max-procs"       => 1,
             "idle-timeout"    => 20

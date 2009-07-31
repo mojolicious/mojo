@@ -143,8 +143,8 @@ sub start {
     # We are the application
     $ENV{MOJO_APP} ||= $class;
 
-    # Start script system
-    Mojolicious::Scripts->new->run(@_);
+    # Start!
+    Mojolicious::Scripts->start(@_);
 }
 
 # This will run once at startup

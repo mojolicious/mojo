@@ -26,9 +26,6 @@ __PACKAGE__->attr('namespaces', default => sub { ['Mojo::Script'] });
 sub run {
     my ($self, $name, @args) = @_;
 
-    # Check ARGV
-    ($name, @args) = @ARGV if !$name && @ARGV;
-
     # Run script
     if ($name && ($name ne 'help' || $args[0])) {
 
@@ -121,6 +118,16 @@ sub run {
     return $self;
 }
 
+sub start {
+    my $self = shift;
+
+    # Arguments
+    my @args = @_ ? @_ : @ARGV;
+
+    # Run
+    ref $self ? $self->run(@args) : $self->new->run(@args);
+}
+
 1;
 __END__
 
@@ -162,6 +169,12 @@ following new ones.
 
 =head2 C<run>
 
+    $scripts = $scripts->run;
     $scripts = $scripts->run(@ARGV);
+
+=head2 C<start>
+
+    Mojo::Scripts->start;
+    Mojo::Scripts->start(@ARGV);
 
 =cut

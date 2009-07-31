@@ -52,8 +52,8 @@ sub start {
     # We are the application
     $ENV{MOJO_APP} ||= $class;
 
-    # Start script system
-    Mojo::Scripts->new->run(@_);
+    # Start!
+    Mojo::Scripts->start(@_);
 }
 
 1;

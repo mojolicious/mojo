@@ -25,4 +25,4 @@ Please visit http://mojolicious.org for detailed installation instructions.
 EOF
 
 # Start the script system
-Mojolicious::Scripts->new->run(@ARGV);
+Mojolicious::Scripts->start;

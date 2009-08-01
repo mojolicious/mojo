@@ -26,7 +26,7 @@ $server->start_daemon_prefork_ok;
 my $port   = $server->port;
 my $tx     = Mojo::Transaction->new_get("http://127.0.0.1:$port/");
 my $client = Mojo::Client->new;
-$client->process_all($tx);
+$client->process($tx);
 is($tx->res->code, 200);
 like($tx->res->body, qr/Mojo is working/);
 

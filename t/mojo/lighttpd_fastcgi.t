@@ -87,7 +87,7 @@ $server->start_server_ok;
 # Request
 my $tx     = Mojo::Transaction->new_get("http://127.0.0.1:$port/test/");
 my $client = Mojo::Client->new;
-$client->process_all($tx);
+$client->process($tx);
 is($tx->res->code, 200);
 like($tx->res->body, qr/Mojo is working/);
 

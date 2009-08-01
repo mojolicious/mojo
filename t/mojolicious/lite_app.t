@@ -61,8 +61,8 @@ post '/bar/:test' => {test => 'default'} => sub {
 
 # Oh Fry, I love you more than the moon, and the stars,
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
-my $client = Mojo::Client->new;
 my $app    = Mojolicious::Lite->new;
+my $client = Mojo::Client->new;
 
 # GET /foo
 my $tx = Mojo::Transaction->new_get('/foo');

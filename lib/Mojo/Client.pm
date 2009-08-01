@@ -277,10 +277,9 @@ sub spin_app {
     if ($client->is_state('start')) {
 
         # Daemon start
-        my %options;
-        $options{app} = $app if ref $app;
-        $options{app_class} = $app_class;
-        my $daemon = Mojo::Server->new(%options);
+        my $daemon = Mojo::Server->new;
+        $daemon->app($app) if ref $app;
+        $daemon->app_class($app_class);
 
         # Client connecting
         $client->client_connect;

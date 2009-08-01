@@ -33,7 +33,7 @@ $tx->req->body(
         return $chunked->build($chunk);
     }
 );
-$client->process_all($tx);
+$client->process($tx);
 ok($tx->is_done);
 
 # Parallel async io
@@ -67,14 +67,14 @@ $tx = Mojo::Transaction->new_get('http://labs.kraih.com');
 ok(!$tx->kept_alive);
 
 # First time, new connection
-$client->process_all($tx);
+$client->process($tx);
 ok($tx->is_done);
 ok(!$tx->kept_alive);
 
 # Second time, reuse connection
 $tx = Mojo::Transaction->new_get('http://labs.kraih.com');
 ok(!$tx->kept_alive);
-$client->process_all($tx);
+$client->process($tx);
 ok($tx->is_done);
 ok($tx->kept_alive);
 ok($tx->local_address);
@@ -117,7 +117,7 @@ like($tx2->res->content->file->slurp, qr/Mojolicious/);
 # Pipelined head
 $tx  = Mojo::Transaction->new_head('http://labs.kraih.com/blog/');
 $tx2 = Mojo::Transaction->new_get('http://mojolicious.org');
-$client->process_all(Mojo::Pipeline->new($tx, $tx2));
+$client->process(Mojo::Pipeline->new($tx, $tx2));
 ok($tx->is_done);
 ok($tx2->is_done);
 is($tx->res->code,  200);

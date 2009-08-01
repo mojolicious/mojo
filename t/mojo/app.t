@@ -35,11 +35,12 @@ my $logger = Mojo::Log->new;
 my $app = Mojo->new({log => $logger});
 is($app->log, $logger);
 
+$app = Mojo::HelloWorld->new;
 my $client = Mojo::Client->new;
 
 # Normal request
 my $tx = Mojo::Transaction->new_get('/1/');
-$client->process_app('Mojo::HelloWorld', $tx);
+$client->process_app($app, $tx);
 is($tx->res->code, 200);
 like($tx->res->body, qr/^Congratulations/);
 
@@ -47,7 +48,7 @@ like($tx->res->body, qr/^Congratulations/);
 $tx = Mojo::Transaction->new_post('/2/');
 $tx->req->headers->expect('100-continue');
 $tx->req->body('foo bar baz' x 128);
-$client->process_app('Mojo::HelloWorld', $tx);
+$client->process_app($app, $tx);
 is($tx->res->code, 200);
 like($tx->res->body, qr/^Congratulations/);
 

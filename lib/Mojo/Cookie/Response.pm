@@ -9,26 +9,6 @@ use base 'Mojo::Cookie';
 
 use Mojo::ByteStream 'b';
 
-# Fields have values
-use constant RE_COOKIE_FIELDS => qr/
-    \A (
-          Comment
-        | Domain
-        | expires
-        | HttpOnly   # IE6 FF3 Opera 9.5
-        | Max-Age
-        | Path
-        | Port
-        | Secure
-        | Version
-    ) \z
-/xmsi;
-
-# Flags don't have values
-use constant RE_COOKIE_FLAGS => qr/
-    \A (?: Secure | HttpOnly ) \z
-/xmsi;
-
 # Remember the time he ate my goldfish?
 # And you lied and said I never had goldfish.
 # Then why did I have the bowl Bart? Why did I have the bowl?
@@ -51,10 +31,29 @@ sub parse {
                 next;
             }
 
-            # Field or flag?
-            if (my @match = $name =~ RE_COOKIE_FIELDS) {
+            # Field
+            if (my @match =
+                $name =~ /
+                    (
+                      Comment
+                    | Domain
+                    | expires
+                    | HttpOnly   # IE6 FF3 Opera 9.5
+                    | Max-Age
+                    | Path
+                    | Port
+                    | Secure
+                    | Version
+                    )
+            /xmsi
+              )
+            {
+
+                # Underscore
                 (my $id = lc $match[0]) =~ tr/-/_/d;
-                $cookies[-1]->$id($id =~ RE_COOKIE_FLAGS ? 1 : $value);
+
+                # Flag?
+                $cookies[-1]->$id($id =~ /(?:Secure|HttpOnly)/i ? 1 : $value);
             }
         }
     }

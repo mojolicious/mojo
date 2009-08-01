@@ -24,6 +24,8 @@ __PACKAGE__->attr('file',    default => sub { Mojo::File::Memory->new });
 __PACKAGE__->attr('headers', default => sub { Mojo::Headers->new });
 __PACKAGE__->attr([qw/raw_header_length relaxed/], default => 0);
 
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
+
 sub build_body {
     my $self = shift;
 
@@ -98,7 +100,7 @@ sub get_header_chunk {
 
     # Normal headers
     my $copy = $self->_build_headers;
-    return substr($copy, $offset, 4096);
+    return substr($copy, $offset, CHUNK_SIZE);
 }
 
 sub has_leftovers {

@@ -13,6 +13,8 @@ use IO::File;
 
 __PACKAGE__->attr('content', default => sub {''});
 
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
+
 # There's your giraffe, little girl.
 # I'm a boy.
 # That's the spirit. Never give up.
@@ -30,7 +32,7 @@ sub copy_to { shift->_write_to_file(@_) }
 sub get_chunk {
     my ($self, $offset) = @_;
     my $copy = $self->content;
-    return substr $copy, $offset, 4096;
+    return substr $copy, $offset, CHUNK_SIZE;
 }
 
 sub length { length(shift->{content} || '') }

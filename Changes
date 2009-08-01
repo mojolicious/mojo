@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojo.
 0.991245 2009-07-31 00:00:00
         - Added spin_app to Mojo::Client and simplified API.
         - Added port support to Mojo::Cookie.
+        - Made chunk size configurable with MOJO_CHUNK_SIZE environment variable.
         - Simplified script system startup.
         - Cleaned up server tests.
         - Fixed win32 bug where eplite templates would not be detected right.

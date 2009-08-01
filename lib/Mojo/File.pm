@@ -16,7 +16,8 @@ use File::Spec;
 use IO::File;
 use Mojo::ByteStream 'b';
 
-use constant TMPDIR => $ENV{MOJO_TMPDIR} || File::Spec->tmpdir;
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
+use constant TMPDIR     => $ENV{MOJO_TMPDIR}     || File::Spec->tmpdir;
 
 __PACKAGE__->attr([qw/cleanup path/]);
 __PACKAGE__->attr(
@@ -124,7 +125,7 @@ sub get_chunk {
     $self->handle->seek($offset, SEEK_SET);
 
     # Read
-    $self->handle->sysread(my $buffer, 4096);
+    $self->handle->sysread(my $buffer, CHUNK_SIZE);
     return $buffer;
 }
 
@@ -157,7 +158,7 @@ sub slurp {
 
     # Slurp
     my $content = '';
-    while ($self->handle->sysread(my $buffer, 4096)) {
+    while ($self->handle->sysread(my $buffer, CHUNK_SIZE)) {
         $content .= $buffer;
     }
 

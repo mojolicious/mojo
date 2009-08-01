@@ -11,6 +11,8 @@ use IO::Poll 'POLLIN';
 
 __PACKAGE__->attr('nph', default => 0);
 
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
+
 # Lisa, you're a Buddhist, so you believe in reincarnation.
 # Eventually, Snowball will be reborn as a higher lifeform... like a snowman.
 sub run {
@@ -33,7 +35,7 @@ sub run {
         $poll->poll(0);
         my @readers = $poll->handles(POLLIN);
         last unless @readers;
-        my $read = STDIN->sysread(my $buffer, 4096, 0);
+        my $read = STDIN->sysread(my $buffer, CHUNK_SIZE, 0);
         $req->parse($buffer);
     }
 

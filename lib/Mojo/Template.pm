@@ -25,6 +25,8 @@ __PACKAGE__->attr('tree',            default => sub { [] });
 __PACKAGE__->attr('tag_start',       default => '<%');
 __PACKAGE__->attr('tag_end',         default => '%>');
 
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
+
 sub build {
     my $self = shift;
 
@@ -283,7 +285,7 @@ sub render_file {
 
     # Slurp file
     my $tmpl = '';
-    while ($file->sysread(my $buffer, 4096, 0)) {
+    while ($file->sysread(my $buffer, CHUNK_SIZE, 0)) {
         $tmpl .= $buffer;
     }
 

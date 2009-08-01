@@ -16,6 +16,8 @@ use Socket;
 __PACKAGE__->attr('continue_timeout',   default => 5);
 __PACKAGE__->attr('keep_alive_timeout', default => 15);
 
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
+
 sub connect {
     my ($self, $tx) = @_;
 
@@ -258,7 +260,7 @@ sub spin {
 
         # Read chunk
         my $buffer;
-        my $read = $connection->sysread($buffer, 1024, 0);
+        my $read = $connection->sysread($buffer, CHUNK_SIZE, 0);
         $tx->error("Can't read from socket: $!") unless defined $read;
         return 1 if $tx->has_error;
 

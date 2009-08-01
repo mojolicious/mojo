@@ -19,6 +19,8 @@ __PACKAGE__->attr('max_clients',             default => 1000);
 __PACKAGE__->attr('max_keep_alive_requests', default => 100);
 __PACKAGE__->attr('port',                    default => 3000);
 
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
+
 sub accept_lock {1}
 
 sub accept_unlock {1}
@@ -342,7 +344,7 @@ sub _read {
     my $p = $connection->{pipeline};
 
     # Read request
-    my $read = $socket->sysread(my $buffer, 4096, 0);
+    my $read = $socket->sysread(my $buffer, CHUNK_SIZE, 0);
 
     # Read error
     unless (defined $read && $buffer) {

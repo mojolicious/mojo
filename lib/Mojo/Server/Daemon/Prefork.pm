@@ -30,6 +30,8 @@ __PACKAGE__->attr(
     }
 );
 
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
+
 # Marge? Since I'm not talking to Lisa,
 # would you please ask her to pass me the syrup?
 # Dear, please pass your father the syrup, Lisa.
@@ -273,7 +275,7 @@ sub _read_messages {
     $self->{_child_poll}->poll(1);
     my @readers = $self->{_child_poll}->handles(POLLIN);
     if (@readers) {
-        return unless $self->{_child_read}->sysread(my $buffer, 4096);
+        return unless $self->{_child_read}->sysread(my $buffer, CHUNK_SIZE);
         $self->{_buffer} .= $buffer;
     }
 

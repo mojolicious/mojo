@@ -15,6 +15,7 @@ use Mojo::File::Memory;
 use Mojo::Content::MultiPart;
 use Mojo::Headers;
 
+use constant CHUNK_SIZE      => $ENV{MOJO_CHUNK_SIZE}      || 4096;
 use constant MAX_MEMORY_SIZE => $ENV{MOJO_MAX_MEMORY_SIZE} || 10240;
 
 __PACKAGE__->attr([qw/buffer filter_buffer/],
@@ -23,8 +24,6 @@ __PACKAGE__->attr([qw/body_cb filter progress_cb/]);
 __PACKAGE__->attr('file',    default => sub { Mojo::File::Memory->new });
 __PACKAGE__->attr('headers', default => sub { Mojo::Headers->new });
 __PACKAGE__->attr([qw/raw_header_length relaxed/], default => 0);
-
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
 
 sub build_body {
     my $self = shift;

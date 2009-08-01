@@ -13,6 +13,8 @@ use IO::File;
 use Mojo::ByteStream;
 use Mojo::Template::Exception;
 
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
+
 __PACKAGE__->attr('code',         default => '');
 __PACKAGE__->attr('comment_mark', default => '#');
 __PACKAGE__->attr([qw/compiled namespace/]);
@@ -24,8 +26,6 @@ __PACKAGE__->attr('template',        default => '');
 __PACKAGE__->attr('tree',            default => sub { [] });
 __PACKAGE__->attr('tag_start',       default => '<%');
 __PACKAGE__->attr('tag_end',         default => '%>');
-
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
 
 sub build {
     my $self = shift;

@@ -7,14 +7,14 @@ use warnings;
 
 use base 'Mojo::Server::Daemon';
 
-use constant DEBUG => $ENV{MOJO_SERVER_DEBUG} || 0;
-
 use Carp 'croak';
 use Fcntl ':flock';
 use IO::File;
 use IO::Poll 'POLLIN';
 use IO::Socket;
 use POSIX qw/setsid WNOHANG/;
+
+use constant DEBUG => $ENV{MOJO_SERVER_DEBUG} || 0;
 
 __PACKAGE__->attr('cleanup_interval',                    default => 15);
 __PACKAGE__->attr('idle_timeout',                        default => 30);

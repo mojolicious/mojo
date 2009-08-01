@@ -9,9 +9,9 @@ use base 'Mojo::Server';
 
 use IO::Poll 'POLLIN';
 
-__PACKAGE__->attr('nph', default => 0);
-
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
+
+__PACKAGE__->attr('nph', default => 0);
 
 # Lisa, you're a Buddhist, so you believe in reincarnation.
 # Eventually, Snowball will be reborn as a higher lifeform... like a snowman.

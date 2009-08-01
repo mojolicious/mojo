@@ -7,14 +7,14 @@ use warnings;
 
 use base 'Mojo::Base';
 
-use constant DEBUG => $ENV{MOJO_SERVER_DEBUG} || 0;
-
 use File::Spec;
 use FindBin;
 use IO::Socket::INET;
 use Mojo::Home;
 use Mojo::Script;
 use Test::Builder;
+
+use constant DEBUG => $ENV{MOJO_SERVER_DEBUG} || 0;
 
 __PACKAGE__->attr([qw/command pid port/]);
 __PACKAGE__->attr('executable', default => 'mojo');

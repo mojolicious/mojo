@@ -16,11 +16,11 @@ use Mojo::File::Memory;
 use Mojo::Parameters;
 use Mojo::Upload;
 
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
+
 __PACKAGE__->attr('buffer',  default => sub { Mojo::Buffer->new });
 __PACKAGE__->attr('content', default => sub { Mojo::Content->new });
 __PACKAGE__->attr([qw/major_version minor_version/], default => 1);
-
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
 
 # I'll keep it short and sweet. Family. Religion. Friendship.
 # These are the three demons you must slay if you wish to succeed in

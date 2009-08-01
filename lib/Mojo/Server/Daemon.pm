@@ -12,14 +12,14 @@ use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
 use IO::Socket;
 use Mojo::Pipeline;
 
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
+
 __PACKAGE__->attr([qw/address group user/]);
 __PACKAGE__->attr('keep_alive_timeout',      default => 15);
 __PACKAGE__->attr('listen_queue_size',       default => SOMAXCONN);
 __PACKAGE__->attr('max_clients',             default => 1000);
 __PACKAGE__->attr('max_keep_alive_requests', default => 100);
 __PACKAGE__->attr('port',                    default => 3000);
-
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
 
 sub accept_lock {1}
 

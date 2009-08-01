@@ -13,10 +13,10 @@ use Mojo::Pipeline;
 use Mojo::Server;
 use Socket;
 
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
+
 __PACKAGE__->attr('continue_timeout',   default => 5);
 __PACKAGE__->attr('keep_alive_timeout', default => 15);
-
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
 
 sub connect {
     my ($self, $tx) = @_;

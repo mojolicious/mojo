@@ -102,6 +102,9 @@ sub get_data {
     # Slurp
     my $content = join '', <$d>;
 
+    # Ignore everything before __DATA__ (windows will seek to start of file)
+    $content =~ s/^__DATA__\n//s;
+
     # Ignore everything after __END__
     $content =~ s/__END__\n.*$//s;
 

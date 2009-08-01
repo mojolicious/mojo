@@ -104,6 +104,9 @@ sub new {
             # Prepare
             unless ($r->{_mt_cache}->{$path}) {
 
+                # Portable templates
+                $teamplate = join '/', File::Spec->splitdir($template);
+
                 # Data
                 my $d = Mojo::Script->new->get_data($template, $class);
                 unless ($d) {

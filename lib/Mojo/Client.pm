@@ -36,7 +36,7 @@ sub connect {
     # State machine
     $tx->client_connect;
 
-    return $tx;
+    return $self;
 }
 
 sub disconnect {
@@ -49,7 +49,7 @@ sub disconnect {
       ? $self->deposit_connection("$scheme:$host:$port", $tx->connection)
       : $tx->connection(undef);
 
-    return $tx;
+    return $self;
 }
 
 sub deposit_connection {
@@ -87,83 +87,41 @@ sub open_connection {
     return $connection;
 }
 
-sub prepare_app {
-    my ($self, $class, $client) = @_;
-
-    # Remote server (nothing to prepare)
-    return if $ENV{MOJO_REMOTE_APP};
-
-    # Daemon start
-    my $daemon = Mojo::Server->new(app_class => $class);
-
-    # Client connecting
-    $client->client_connect;
-    $client->client_connected;
-
-    # Server accepting
-    my $server = 
-        Mojo::Pipeline->new->server_accept($daemon->build_tx_cb->($daemon));
-
-    # store
-    $client->connection($server);
-    $server->connection($daemon);
-
-    return;
-}
-
 # Marge, I'm going to Moe's. Send the kids to the neighbors,
 # I'm coming back loaded!
 sub process {
-    my ($self, @transactions) = @_;
-
-    # Parallel async io main loop... woot!
-    while (1) { last if $self->spin(@transactions) }
-
-    # Done
-    return @transactions;
+    my $self = shift;
+    while (1) { last if $self->spin(@_) }
+    return $self;
 }
 
 sub process_all {
     my ($self, @transactions) = @_;
 
-    my @finished;
-
     # Process until all transactions are finished
+    my @progress = @transactions;
     while (1) {
 
         # Process
-        my @done = $self->process(@transactions);
-        @transactions = ();
+        $self->process(@progress);
 
         # Check
-        for my $tx (@done) {
-            $tx->is_finished
-              ? push(@finished,     $tx)
-              : push(@transactions, $tx);
+        @progress = ();
+        for my $tx (@transactions) {
+            push @progress, $tx unless $tx->is_finished;
         }
 
         # Done
-        last unless @transactions;
+        last unless @progress;
     }
 
-    return @finished;
+    return $self;
 }
 
 sub process_app {
-    my ($self, $class, $client) = @_;
-
-    $self->prepare_app($class, $client);
-
-    if (my $authority = $ENV{MOJO_REMOTE_APP}) {
-        $client->req->url->authority($authority);
-        return $self->process($client);
-    }
-
-    while (1) {
-      last unless $self->spin_app($client);
-    }
-
-    return $client;
+    my $self = shift;
+    while (1) { last if $self->spin_app(@_) }
+    return $self;
 }
 
 sub spin {
@@ -312,8 +270,28 @@ sub spin {
 }
 
 sub spin_app {
-    my ($self, $client) = @_;
+    my ($self, $class, $client) = @_;
 
+    # Prepare
+    if ($client->is_state('start')) {
+
+        # Daemon start
+        my $daemon = Mojo::Server->new(app_class => $class);
+
+        # Client connecting
+        $client->client_connect;
+        $client->client_connected;
+
+        # Server accepting
+        my $server =
+          Mojo::Pipeline->new->server_accept($daemon->build_tx_cb->($daemon));
+
+        # Store
+        $client->connection($server);
+        $server->connection($daemon);
+    }
+
+    # Server
     my $server = $client->connection;
     my $daemon = $server->connection;
 
@@ -369,13 +347,15 @@ sub spin_app {
             # Handle
             $self->_handle_app($daemon, $server);
         }
+    }
 
-        return 1;
-    }
-    else {
-        return 0;
-    }
+    # Done
+    return 1 if $client->is_finished;
+
+    # More to do
+    return;
 }
+
 sub test_connection {
     my ($self, $connection) = @_;
 
@@ -493,11 +473,11 @@ following new ones.
 
 =head2 C<connect>
 
-    $tx = $client->connect($tx);
+    $client = $client->connect($tx);
 
 =head2 C<disconnect>
 
-    $tx = $client->disconnect($tx);
+    $client = $client->disconnect($tx);
 
 =head2 C<deposit_connection>
 
@@ -509,19 +489,23 @@ following new ones.
 
 =head2 C<process>
 
-    @transactions = $client->process(@transactions);
+    $client = $client->process(@transactions);
 
 =head2 C<process_all>
 
-    @transactions = $client->process_all(@transactions);
+    $client = $client->process_all(@transactions);
 
 =head2 C<process_app>
 
-    $tx = $client->process_app('MyApp', $tx);
+    $client = $client->process_app('MyApp', $tx);
 
 =head2 C<spin>
 
     my $done = $client->spin(@transactions);
+
+=head2 C<spin_app>
+
+    my $done = $client->spin_app('MyApp', $tx);
 
 =head2 C<test_connection>
 

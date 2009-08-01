@@ -87,6 +87,30 @@ sub open_connection {
     return $connection;
 }
 
+sub prepare_app {
+    my ($self, $class, $client) = @_;
+
+    # Remote server (nothing to prepare)
+    return if $ENV{MOJO_REMOTE_APP};
+
+    # Daemon start
+    my $daemon = Mojo::Server->new(app_class => $class);
+
+    # Client connecting
+    $client->client_connect;
+    $client->client_connected;
+
+    # Server accepting
+    my $server = 
+        Mojo::Pipeline->new->server_accept($daemon->build_tx_cb->($daemon));
+
+    # store
+    $client->connection($server);
+    $server->connection($daemon);
+
+    return;
+}
+
 # Marge, I'm going to Moe's. Send the kids to the neighbors,
 # I'm coming back loaded!
 sub process {
@@ -128,75 +152,15 @@ sub process_all {
 sub process_app {
     my ($self, $class, $client) = @_;
 
-    # Remote server
+    $self->prepare_app($class, $client);
+
     if (my $authority = $ENV{MOJO_REMOTE_APP}) {
         $client->req->url->authority($authority);
         return $self->process($client);
     }
 
-    # Daemon start
-    my $daemon = Mojo::Server->new(app_class => $class);
-
-    # Client connecting
-    $client->client_connect;
-    $client->client_connected;
-
-    # Server accepting
-    my $server =
-      Mojo::Pipeline->new->server_accept($daemon->build_tx_cb->($daemon));
-
-    # Exchange
-    while ($client->is_writing || $server->is_writing) {
-
-        # Client writing?
-        if ($client->is_writing) {
-
-            # Client grabs chunk
-            my $buffer = $client->client_get_chunk || '';
-
-            # Client write and server read
-            $server->server_read($buffer);
-
-            # Client written
-            $client->client_written(length $buffer);
-        }
-
-        # Spin both
-        $client->client_spin;
-        $server->server_spin;
-
-        # Server writing?
-        if ($server->is_writing) {
-
-            # Server grabs chunk
-            my $buffer = $server->server_get_chunk || '';
-
-            # Server write and client read
-            $client->client_read($buffer);
-
-            # Server written
-            $server->server_written(length $buffer);
-        }
-
-        # Handle
-        $self->_handle_app($daemon, $server);
-
-        # Spin both
-        $server->server_spin;
-        $client->client_spin;
-
-        # Server takes care of leftovers
-        if (my $leftovers = $server->server_leftovers) {
-
-            # Server adds transaction
-            $server->server_accept($daemon->build_tx_cb->($daemon));
-
-            # Server reads leftovers
-            $server->server_read($leftovers);
-
-            # Handle
-            $self->_handle_app($daemon, $server);
-        }
+    while (1) {
+      last unless $self->spin_app($client);
     }
 
     return $client;
@@ -347,6 +311,71 @@ sub spin {
     return $done;
 }
 
+sub spin_app {
+    my ($self, $client) = @_;
+
+    my $server = $client->connection;
+    my $daemon = $server->connection;
+
+    # Exchange
+    if ($client->is_writing || $server->is_writing) {
+
+        # Client writing?
+        if ($client->is_writing) {
+
+            # Client grabs chunk
+            my $buffer = $client->client_get_chunk || '';
+
+            # Client write and server read
+            $server->server_read($buffer);
+
+            # Client written
+            $client->client_written(length $buffer);
+        }
+
+        # Spin both
+        $client->client_spin;
+        $server->server_spin;
+
+        # Server writing?
+        if ($server->is_writing) {
+
+            # Server grabs chunk
+            my $buffer = $server->server_get_chunk || '';
+
+            # Server write and client read
+            $client->client_read($buffer);
+
+            # Server written
+            $server->server_written(length $buffer);
+        }
+
+        # Handle
+        $self->_handle_app($daemon, $server);
+
+        # Spin both
+        $server->server_spin;
+        $client->client_spin;
+
+        # Server takes care of leftovers
+        if (my $leftovers = $server->server_leftovers) {
+
+            # Server adds transaction
+            $server->server_accept($daemon->build_tx_cb->($daemon));
+
+            # Server reads leftovers
+            $server->server_read($leftovers);
+
+            # Handle
+            $self->_handle_app($daemon, $server);
+        }
+
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
 sub test_connection {
     my ($self, $connection) = @_;
 

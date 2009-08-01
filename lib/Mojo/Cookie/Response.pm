@@ -12,14 +12,15 @@ use Mojo::ByteStream 'b';
 # Fields have values
 use constant RE_COOKIE_FIELDS => qr/
     \A (
-          Version
-        | Path
+          Comment
         | Domain
-        | Max-Age
         | expires
-        | Secure
         | HttpOnly   # IE6 FF3 Opera 9.5
-        | Comment
+        | Max-Age
+        | Path
+        | Port
+        | Secure
+        | Version
     ) \z
 /xmsi;
 
@@ -36,7 +37,7 @@ sub parse {
     my @cookies;
 
     for my $knot ($self->_tokenize($string)) {
-      PARSE: for my $i (0 .. $#{$knot}) {
+        for my $i (0 .. $#{$knot}) {
             my ($name, $value) = @{$knot->[$i]};
 
             # Value might be quoted
@@ -47,7 +48,7 @@ sub parse {
                 push @cookies, Mojo::Cookie::Response->new;
                 $cookies[-1]->name($name);
                 $cookies[-1]->value($value);
-                next PARSE;
+                next;
             }
 
             # Field or flag?
@@ -77,6 +78,7 @@ sub to_string {
     if (defined(my $expires = $self->expires)) {
         $cookie .= "; expires=$expires";
     }
+    if (my $port     = $self->port)     { $cookie .= qq/; Port="$port"/ }
     if (my $secure   = $self->secure)   { $cookie .= "; Secure" }
     if (my $httponly = $self->httponly) { $cookie .= "; HttpOnly" }
     if (my $comment  = $self->comment)  { $cookie .= "; Comment=$comment" }

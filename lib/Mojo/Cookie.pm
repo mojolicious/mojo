@@ -13,7 +13,7 @@ use Mojo::ByteStream 'b';
 use Mojo::Date;
 
 __PACKAGE__->attr(
-    [qw/comment domain httponly name path secure value version/]);
+    [qw/comment domain httponly name path port secure value version/]);
 
 # My Homer is not a communist.
 # He may be a liar, a pig, an idiot, a communist, but he is not a porn star.
@@ -151,6 +151,11 @@ L<Mojo::Cookie> implements the following attributes.
 
     my $path = $cookie->path;
     $cookie  = $cookie->path('/test');
+
+=head2 C<port>
+
+    my $port = $cookie->port;
+    $cookie  = $cookie->port('80 8080');
 
 =head2 C<secure>
 

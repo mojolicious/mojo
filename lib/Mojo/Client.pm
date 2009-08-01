@@ -270,13 +270,17 @@ sub spin {
 }
 
 sub spin_app {
-    my ($self, $class, $client) = @_;
+    my ($self, $app, $client) = @_;
 
     # Prepare
+    my $app_class = ref $app || $app;
     if ($client->is_state('start')) {
 
         # Daemon start
-        my $daemon = Mojo::Server->new(app_class => $class);
+        my %options;
+        $options{app} = $app if ref $app;
+        $options{app_class} = $app_class;
+        my $daemon = Mojo::Server->new(%options);
 
         # Client connecting
         $client->client_connect;
@@ -294,6 +298,13 @@ sub spin_app {
     # Server
     my $server = $client->connection;
     my $daemon = $server->connection;
+
+    # Check class
+    if ($app_class ne $daemon->app_class) {
+        my $class = $daemon->app_class;
+        $client->error(qq/Application "$app_class" does not match "$class"./);
+        return 1;
+    }
 
     # Exchange
     if ($client->is_writing || $server->is_writing) {
@@ -497,6 +508,7 @@ following new ones.
 
 =head2 C<process_app>
 
+    $client = $client->process_app($app, $tx);
     $client = $client->process_app('MyApp', $tx);
 
 =head2 C<spin>
@@ -505,6 +517,7 @@ following new ones.
 
 =head2 C<spin_app>
 
+    my $done = $client->spin_app($app, $tx);
     my $done = $client->spin_app('MyApp', $tx);
 
 =head2 C<test_connection>

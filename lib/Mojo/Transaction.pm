@@ -445,7 +445,7 @@ sub server_spin {
 
             # Continue
             if ($self->res->code == 100) {
-                $self->_new_response;
+                $self->res($self->res->new);
             }
 
             # Don't continue

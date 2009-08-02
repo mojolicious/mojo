@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojo.
 
+0.991246 2009-08-01 00:00:00
+        - Fixed typo.
+
 0.991245 2009-07-31 00:00:00
         - Added spin_app to Mojo::Client and simplified API.
         - Added port support to Mojo::Cookie.

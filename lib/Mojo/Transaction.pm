@@ -504,6 +504,7 @@ sub _builder {
     return $self;
 }
 
+# Replace client response after receiving 100 Continue
 sub _new_response {
     my $self = shift;
 

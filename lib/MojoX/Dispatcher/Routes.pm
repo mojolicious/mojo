@@ -12,8 +12,7 @@ use Mojo::Loader;
 use Mojo::Loader::Exception;
 
 __PACKAGE__->attr('disallow',
-    default =>
-      sub { [qw/new app attr render render_partial req res stash url_for/] });
+    default => sub { [qw/new app attr render req res stash tx/] });
 __PACKAGE__->attr('namespace');
 
 # Hey. What kind of party is this? There's no booze and only one hooker.

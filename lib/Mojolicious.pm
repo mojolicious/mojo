@@ -44,6 +44,9 @@ sub new {
     $self->renderer->root($self->home->rel_dir('templates'));
     $self->static->root($self->home->rel_dir('public'));
 
+    # Disallow
+    push @{$self->routes->disallow}, qw/render_inner render_partial url_for/;
+
     # Mode
     my $mode = $self->mode;
 

@@ -12,7 +12,7 @@ use base 'Mojolicious::Controller';
 sub test {
     my $self = shift;
     $self->res->headers->header('X-Bender', 'Kiss my shiny metal ass!');
-    $self->render(text => $self->ctx->url_for);
+    $self->render(text => $self->url_for);
 }
 
 1;

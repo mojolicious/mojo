@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojo';
 
-use Mojo::Loader;
+use Mojolicious::Controller;
 use Mojolicious::Renderer;
 use Mojolicious::Scripts;
 use MojoX::Dispatcher::Routes;
@@ -15,7 +15,6 @@ use MojoX::Dispatcher::Static;
 use MojoX::Types;
 use Time::HiRes ();
 
-__PACKAGE__->attr('ctx_class', default => 'Mojolicious::Context');
 __PACKAGE__->attr('mode',
     default => sub { ($ENV{MOJO_MODE} || 'development') });
 __PACKAGE__->attr('renderer', default => sub { Mojolicious::Renderer->new });
@@ -61,23 +60,7 @@ sub new {
     eval { $self->startup(@_) };
     $self->log->error("Startup failed: $@") if $@;
 
-    # Load context class
-    my $class = $self->ctx_class;
-    if (my $e = Mojo::Loader->new->load($class)) {
-        $self->log->error(
-            ref $e
-            ? qq/Can't load context class "$class": $e/
-            : qq/Context class "$class" doesn't exist./
-        );
-    }
-
     return $self;
-}
-
-# The context builder
-sub build_ctx {
-    my $self = shift;
-    return $self->ctx_class->new(app => $self, tx => shift);
 }
 
 # The default dispatchers with exception handling
@@ -119,8 +102,10 @@ sub handler {
     # Start timer
     my $start = [Time::HiRes::gettimeofday()];
 
-    # Build context and process
-    eval { $self->process($self->build_ctx($tx)) };
+    # Build default controller and process
+    eval {
+        $self->process(Mojolicious::Controller->new(app => $self, tx => $tx));
+    };
     $self->log->error("Processing request failed: $@") if $@;
 
     # End timer
@@ -214,10 +199,6 @@ new ones.
 =head2 C<new>
 
     my $mojo = Mojolicious->new;
-
-=head2 C<build_ctx>
-
-    my $c = $mojo->build_ctx($tx);
 
 =head2 C<dispatch>
 

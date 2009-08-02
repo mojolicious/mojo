@@ -115,7 +115,17 @@ sub dispatch_controller {
 
     # Dispatch
     my $continue;
-    eval { $continue = $class->new(ctx => $c)->$method($c) };
+    eval {
+
+        # Instantiate
+        my $new = $class->new($c);
+
+        # Call action
+        $continue = $new->$method;
+
+        # Copy stash
+        $c->stash($new->stash);
+    };
 
     # Success!
     return 1 if $continue;
@@ -251,7 +261,7 @@ and implements the follwing the ones.
 
     my $disallow = $dispatcher->disallow;
     $dispatcher  = $dispatcher->disallow(
-        [qw/new attr ctx render req res stash/]
+        [qw/new attr tx render req res stash/]
     );
 
 =head2 C<namespace>
@@ -267,7 +277,7 @@ implements the follwing the ones.
 =head2 C<dispatch>
 
     my $e = $dispatcher->dispatch(
-        MojoX::Dispatcher::Routes::Context->new
+        MojoX::Dispatcher::Routes::Controller->new
     );
 
 =head2 C<dispatch_callback>

@@ -16,8 +16,7 @@ sub index { shift->stash(layout => 'default', msg => 'Hello World!') }
 sub something {
     my $self = shift;
     $self->res->headers->header('X-Bender', 'Kiss my shiny metal ass!');
-    $self->render(
-        text => $self->ctx->url_for('something', something => '42'));
+    $self->render(text => $self->url_for('something', something => '42'));
 }
 
 sub stage1 {
@@ -38,9 +37,9 @@ sub syntaxerror { shift->render(template => 'syntaxerror.html.epl') }
 sub templateless { shift->render(handler => 'test') }
 
 sub test {
-    my ($self, $c) = @_;
-    $c->res->headers->header('X-Bender', 'Kiss my shiny metal ass!');
-    $c->render(text => $c->url_for(controller => 'bar'));
+    my $self = shift;
+    $self->res->headers->header('X-Bender', 'Kiss my shiny metal ass!');
+    $self->render(text => $self->url_for(controller => 'bar'));
 }
 
 sub willdie { die 'for some reason' }

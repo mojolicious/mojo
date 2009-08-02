@@ -29,7 +29,7 @@ use base 'Mojolicious::Controller';
 sub bar {
     my $self = shift;
     $self->res->headers->header('X-Bender', 'Kiss my shiny metal ass!');
-    $self->render(text => $self->ctx->url_for);
+    $self->render(text => $self->url_for);
 }
 
 sub eplite_template {

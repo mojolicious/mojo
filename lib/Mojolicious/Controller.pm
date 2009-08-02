@@ -7,22 +7,77 @@ use warnings;
 
 use base 'MojoX::Dispatcher::Routes::Controller';
 
-# Well, at least here you'll be treated with dignity.
-# Now strip naked and get on the probulator.
-sub app { shift->ctx->app }
+# Space: It seems to go on and on forever...
+# but then you get to the end and a gorilla starts throwing barrels at you.
+sub render {
+    my $self = shift;
 
-sub render { shift->ctx->render(@_) }
+    # Merge args with stash
+    my $args = ref $_[0] ? $_[0] : {@_};
+    $self->{stash} = {%{$self->stash}, %$args};
 
-# Bodies are for hookers and fat people.
-sub render_partial { shift->ctx->render_partial(@_) }
+    # Template
+    unless ($self->stash->{template}) {
 
-sub req { shift->ctx->req }
+        # Default template
+        my $controller = $self->stash->{controller};
+        my $action     = $self->stash->{action};
 
-sub res { shift->ctx->res }
+        # Try the route name if we don't have controller and action
+        unless ($controller && $action) {
+            my $endpoint = $self->match->endpoint;
 
-sub stash { shift->ctx->stash(@_) }
+            # Use endpoint name as default template
+            $self->stash(template => $endpoint->name)
+              if $endpoint && $endpoint->name;
+        }
 
-sub url_for { shift->ctx->url_for(@_) }
+        # Normal default template
+        else {
+            $self->stash(
+                template => join('/', split(/-/, $controller), $action));
+        }
+    }
+
+    # Format
+    $self->stash->{format} ||= 'html';
+
+    # Render
+    return $self->app->renderer->render($self);
+}
+
+# Wow, there's a million aliens! I've never seen something so mind-blowing!
+# Ooh, a reception table with muffins!
+sub render_inner { delete shift->stash->{inner_template} }
+
+# I'm finally richer than those snooty ATM machines.
+sub render_partial {
+    my $self = shift;
+    local $self->stash->{partial} = 1;
+    return $self->render(@_);
+}
+
+# It would never work out, Fry. You're a male, I'm a female.
+# We're just too different.
+sub url_for {
+    my $self = shift;
+
+    # Make sure we have a match for named routes
+    $self->match(MojoX::Routes::Match->new->endpoint($self->app->routes))
+      unless $self->match;
+
+    # Use match or root
+    my $url = $self->match->url_for(@_);
+
+    # Base
+    $url->base($self->tx->req->url->base->clone);
+
+    # Fix paths
+    unshift @{$url->path->parts}, @{$url->base->path->parts};
+    $url->base->path->parts([]);
+
+    return $url;
+}
 
 1;
 __END__
@@ -39,46 +94,35 @@ Mojolicious::Controller - Controller Base Class
 
 L<Mojolicous::Controller> is a controller base class.
 
+=head1 ATTRIBUTES
+
+L<Mojolicious::Controller> inherits all attributes from
+L<MojoX::Dispatcher::Routes::Controller>.
+
 =head1 METHODS
 
 L<Mojolicious::Controller> inherits all methods from
 L<MojoX::Dispatcher::Routes::Controller> and implements the following new
 ones.
 
-=head2 C<app>
-
-    my $app = $controller->app;
-
 =head2 C<render>
 
-    $controller->render;
-    $controller->render(action => 'foo');
+    $c->render;
+    $c->render(action => 'foo');
+
+=head2 C<render_inner>
+
+    my $output = $c->render_inner;
 
 =head2 C<render_partial>
 
-    my $output = $controller->render_partial;
-    my $output = $controller->render_partial(action => 'foo');
-
-=head2 C<req>
-
-    my $req = $controller->req;
-
-=head2 C<res>
-
-    my $res = $controller->res;
-
-=head2 C<stash>
-
-    my $stash   = $controller->stash;
-    my $foo     = $controller->stash('foo');
-    $controller = $controller->stash({foo => 'bar'});
-    $controller = $controller->stash(foo => 'bar');
+    my $output = $c->render_partial;
+    my $output = $c->render_partial(action => 'foo');
 
 =head2 C<url_for>
 
-    my $url = $controller->url_for;
-    my $url = $controller->url_for(controller => 'bar', action => 'baz');
-    my $url =
-      $controller->url_for('named', controller => 'bar', action => 'baz');
+    my $url = $c->url_for;
+    my $url = $c->url_for(controller => 'bar', action => 'baz');
+    my $url = $c->url_for('named', controller => 'bar', action => 'baz');
 
 =cut

@@ -8,12 +8,12 @@ use warnings;
 use Test::More tests => 3;
 
 use Mojo;
-use MojoX::Context;
+use MojoX::Dispatcher::Routes::Controller;
 use MojoX::Renderer;
 
 # Actually, she wasn't really my girlfriend,
 # she just lived nextdoor and never closed her curtains.
-my $c = MojoX::Context->new(app => Mojo->new);
+my $c = MojoX::Dispatcher::Routes::Controller->new(app => Mojo->new);
 $c->app->log->path(undef);
 $c->app->log->level('fatal');
 my $r = MojoX::Renderer->new(default_format => 'debug');

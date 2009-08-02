@@ -28,6 +28,7 @@ sub add_handler {
     return $self;
 }
 
+# Bodies are for hookers and fat people.
 sub render {
     my ($self, $c) = @_;
 
@@ -116,6 +117,8 @@ sub _fix_format {
     return $template;
 }
 
+# Well, at least here you'll be treated with dignity.
+# Now strip naked and get on the probulator.
 sub _fix_handler {
     my ($self, $c, $template) = @_;
 

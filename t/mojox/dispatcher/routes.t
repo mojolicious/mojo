@@ -12,12 +12,12 @@ use base 'MojoX::Dispatcher::Routes::Controller';
 sub bar  {1}
 sub home {1}
 
-package Test::Context;
+package Test::Controller;
 
 use strict;
 use warnings;
 
-use base 'MojoX::Dispatcher::Routes::Context';
+use base 'MojoX::Dispatcher::Routes::Controller';
 
 __PACKAGE__->attr('render_called');
 
@@ -43,7 +43,7 @@ use Mojo;
 use Mojo::Transaction;
 use MojoX::Dispatcher::Routes;
 
-my $c = Test::Context->new(app => Mojo->new);
+my $c = Test::Controller->new(app => Mojo->new);
 
 # Silence
 $c->app->log->path(undef);

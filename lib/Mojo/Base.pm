@@ -16,7 +16,7 @@ sub new {
 
     # Instantiate
     return bless
-      exists $_[0] ? exists $_[1] ? {@_} : $_[0] : {},
+      exists $_[0] ? exists $_[1] ? {@_} : {%{$_[0]}} : {},
       ref $class || $class;
 }
 

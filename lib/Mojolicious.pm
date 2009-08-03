@@ -117,7 +117,7 @@ sub handler {
 
     # Build default controller and process
     eval {
-        $self->process($self->controller_class->new(tx => $tx)->app($self));
+        $self->process($self->controller_class->new(app => $self, tx => $tx));
     };
     $self->log->error("Processing request failed: $@") if $@;
 

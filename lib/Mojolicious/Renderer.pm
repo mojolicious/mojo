@@ -29,11 +29,10 @@ sub new {
             $r->{_mt_cache} ||= {};
 
             # Shortcut
-            unless (-r $path || $r->{_mt_cache}->{$path}) {
-                $c->app->log->error(
-                    qq/Template "$template" missing or not readable./);
-                return;
-            }
+            $c->app->log->error(
+                qq/Template "$template" missing or not readable./)
+              and return
+              unless -r $path || $r->{_mt_cache}->{$path};
 
             # Check cache
             my $mt = $r->{_mt_cache}->{$path};
@@ -103,14 +102,12 @@ sub new {
 
                 # Data
                 my $d = Mojo::Script->new->get_data($template, $class);
-                unless ($d) {
 
-                    # Nothing found
-                    $c->app->log->debug(
-                        qq/Template "$template" not found in class "$class"./
-                    );
-                    return;
-                }
+                # Nothing found
+                $c->app->log->debug(
+                    qq/Template "$template" not found in class "$class"./)
+                  and return
+                  unless $d;
 
                 # Template
                 my $t = Mojo::Template->new;

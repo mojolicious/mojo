@@ -39,7 +39,7 @@ get '/' => 'index';
 
 get '/:groovy' => sub {
     my $self = shift;
-    $self->render(text => $self->stash('groovy'));
+    $self->render_text($self->stash('groovy'));
 };
 
 shagadelic;

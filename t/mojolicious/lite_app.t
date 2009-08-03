@@ -25,12 +25,11 @@ app->log->level('error');
 # GET /foo
 get '/foo' => sub {
     my $self = shift;
-    $self->render(text => 'Yea baby!');
+    $self->render_text('Yea baby!');
 };
 
 # GET /layout
-get '/layout' =>
-  sub { shift->render(text => 'Yea baby!', layout => 'layout') };
+get '/layout' => sub { shift->render_text('Yea baby!', layout => 'layout') };
 
 # POST /template
 post '/template' => 'index';
@@ -38,25 +37,25 @@ post '/template' => 'index';
 # * /something
 any '/something' => sub {
     my $self = shift;
-    $self->render(text => something());
+    $self->render_text(something());
 };
 
 # GET|POST /something/else
 any [qw/get post/] => '/something/else' => sub {
     my $self = shift;
-    $self->render(text => 'Yay!');
+    $self->render_text('Yay!');
 };
 
 # GET /regex/*
 get '/regex/:test' => [test => qr/\d+/] => sub {
     my $self = shift;
-    $self->render(text => $self->stash('test'));
+    $self->render_text($self->stash('test'));
 };
 
 # POST /bar/*
 post '/bar/:test' => {test => 'default'} => sub {
     my $self = shift;
-    $self->render(text => $self->stash('test'));
+    $self->render_text($self->stash('test'));
 };
 
 # Oh Fry, I love you more than the moon, and the stars,

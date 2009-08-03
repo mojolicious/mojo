@@ -109,7 +109,7 @@ Mojolicious::Lite - Micro Web Framework
     # Route with placeholder
     get '/:foo' => sub {
         my $self = shift;
-        $self->render(text => 'Yea baby!');
+        $self->render_text('Yea baby!');
     };
 
     # Start the Mojolicious script system
@@ -127,7 +127,7 @@ A minimal application looks like this.
 
     get '/' => sub {
         my $self = shift;
-        $self->render(text => 'Yea baby!');
+        $self->render_text('Yea baby!');
     };
 
     shagadelic;
@@ -165,7 +165,7 @@ placeholders.
     # /foo
     get '/foo' => sub {
         my $self = shift;
-        $self->render(text => 'Yea baby!');
+        $self->render_text('Yea baby!');
     };
 
 All routes can have a name associated with them, this allows automatic
@@ -211,14 +211,14 @@ C<.> separator occurs, results will be stored by name in the C<stash>.
     get '/foo/:bar' => sub {
         my $self = shift;
         my $bar  = $self->stash('bar');
-        $self->render(text => "Our :bar placeholder matched $bar");
+        $self->render_text("Our :bar placeholder matched $bar");
     };
 
     # /*something/foo
     get '/(:bar)something/foo' => sub {
         my $self = shift;
         my $bar  = $self->stash('bar');
-        $self->render(text => "Our :bar placeholder matched $bar");
+        $self->render_text("Our :bar placeholder matched $bar");
     };
 
 Relaxed placeholders allow matching of everything until a C</> occurs.
@@ -249,21 +249,21 @@ C</> and C<.>.
 Routes can be restricted to specific request methods.
 
     # GET /bye
-    get '/bye' => sub { shift->render(text => 'Bye!') };
+    get '/bye' => sub { shift->render_text('Bye!') };
 
     # POST /bye
-    post '/bye' => sub { shift->render(text => 'Bye!') };
+    post '/bye' => sub { shift->render_text('Bye!') };
 
     # GET|POST|DELETE /bye
     any [qw/get post delete/] => '/bye' => sub {
-        shift->render(text => 'Bye!');
+        shift->render_text('Bye!');
     };
 
     # /baz
     any '/baz' => sub {
         my $self   = shift;
         my $method = $self->req->method;
-        $self->render(text => "You called /baz with $method");
+        $self->render_text("You called /baz with $method");
     };
 
 All placeholders get compiled to a regex internally, with regex constraints
@@ -273,7 +273,7 @@ this process can be easily customized.
     any '/:bar' => [bar => qr/\d+/] => sub {
         my $self = shift;
         my $bar  = $self->stash('bar');
-        $self->render(text => "Our :bar placeholder matched $bar");
+        $self->render_text("Our :bar placeholder matched $bar");
     };
 
 Routes allow default values to make placeholders optional.
@@ -409,7 +409,7 @@ For more control the L<Mojolicious> instance can be accessed directly.
     app->log->level('error');
     app->routes->route('/foo/:bar')->via('get')->to(callback => sub {
         my $self = shift;
-        $self->render(text => 'Hello Mojo!');
+        $self->render_text('Hello Mojo!');
     });
 
 In case a lite app needs to grow, lite and real L<Mojolicous> applications
@@ -418,14 +418,12 @@ can be easily mixed to make the transition process very smooth.
     package MyApp::Foo;
     use base 'Mojolicious::Controller';
 
-    sub index {
-        shift->render(text => 'It works!');
-    }
+    sub index { shift->render_text('It works!') }
 
     package main;
     use Mojolicious::Lite;
 
-    get '/bar' => sub { shift->render(text => 'This too!') };
+    get '/bar' => sub { shift->render_text('This too!') };
 
     app->routes->namespace('MyApp');
     app->routes->route('/foo/:action')->via('get')

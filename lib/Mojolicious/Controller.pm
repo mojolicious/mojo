@@ -60,6 +60,12 @@ sub render_partial {
     return $self->render(@_);
 }
 
+sub render_text {
+    my $self = shift;
+    $self->stash->{text} = shift;
+    return $self->render(@_);
+}
+
 # It would never work out, Fry. You're a male, I'm a female.
 # We're just too different.
 sub url_for {
@@ -130,6 +136,11 @@ ones.
 
     my $output = $c->render_partial;
     my $output = $c->render_partial(action => 'foo');
+
+=head2 C<render_text>
+
+    $c->render_text('Hello World!');
+    $c->render_text('Hello World', layout => 'green');
 
 =head2 C<url_for>
 

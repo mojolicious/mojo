@@ -12,7 +12,7 @@ use base 'Mojolicious::Controller';
 sub index {
     my $self = shift;
     $self->res->headers->header('X-Bender', 'Kiss my shiny metal ass!');
-    $self->render(text => "No class works!");
+    $self->render_text("No class works!");
 }
 
 1;

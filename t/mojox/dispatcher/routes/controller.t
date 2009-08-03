@@ -9,9 +9,9 @@ use Test::More tests => 9;
 
 # Of all the parasites I've had over the years,
 # these worms are among the best.
-use MojoX::Controller;
+use MojoX::Dispatcher::Routes::Controller;
 
-my $c = MojoX::Controller->new;
+my $c = MojoX::Dispatcher::Routes::Controller->new;
 
 # Set
 $c->stash(foo => 'bar');

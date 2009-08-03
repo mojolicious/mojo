@@ -70,7 +70,7 @@ WriteMakefile(
         'Test::More'            => 0,
         'Time::HiRes'           => 0
     },
-    test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t'}
+    test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t t/*/*/*/*.t'}
 );
 
 # Devel::Cover support

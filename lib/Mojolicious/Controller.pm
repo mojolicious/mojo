@@ -12,6 +12,10 @@ use base 'MojoX::Dispatcher::Routes::Controller';
 sub render {
     my $self = shift;
 
+    # Template as single argument?
+    $self->stash->{template} = shift
+      if (@_ % 2 && !ref $_[0]) || (!@_ % 2 && ref $_[1]);
+
     # Merge args with stash
     my $args = ref $_[0] ? $_[0] : {@_};
     $self->{stash} = {%{$self->stash}, %$args};
@@ -108,11 +112,15 @@ ones.
 
     $c->render;
     $c->render(controller => 'foo', action => 'bar');
+    $c->render({controller => 'foo', action => 'bar'});
     $c->render(text => 'Hello!');
     $c->render(template => 'index');
     $c->render(template => 'foo/index');
     $c->render(template => 'index', format => 'html', handler => 'epl');
     $c->render(handler => 'something');
+    $c->render('foo/bar');
+    $c->render('foo/bar', format => 'html');
+    $c->render('foo/bar', {format => 'html'});
 
 =head2 C<render_inner>
 

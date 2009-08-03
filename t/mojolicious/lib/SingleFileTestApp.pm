@@ -34,7 +34,7 @@ sub bar {
 
 sub eplite_template {
     shift->render(
-        template     => 'index',
+        'index',
         handler      => 'eplite',
         eplite_class => 'SingleFileTestApp::Foo'
     );

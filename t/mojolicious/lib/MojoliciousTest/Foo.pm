@@ -33,11 +33,7 @@ sub stage1 {
 sub stage2 { shift->render(text => 'Welcome aboard!') }
 
 sub syntaxerror {
-    shift->render(
-        template => 'syntaxerror',
-        format   => 'html',
-        handler  => 'epl'
-    );
+    shift->render('syntaxerror', format => 'html', handler => 'epl');
 }
 
 sub templateless { shift->render(handler => 'test') }

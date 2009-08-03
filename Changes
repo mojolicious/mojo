@@ -14,6 +14,7 @@ This file documents the revision history for Perl extension Mojo.
           The following forms are required now.
               $c->render;
               $c->render(controller => 'foo', action => 'bar');
+              $c->render({controller => 'foo', action => 'bar'});
               $c->render(text => 'Hello!');
               $c->render(template => 'index');
               $c->render(template => 'foo/index');
@@ -23,6 +24,9 @@ This file documents the revision history for Perl extension Mojo.
                   handler  => 'epl'
               );
               $c->render(handler => 'something');
+              $c->render('foo/bar');
+              $c->render('foo/bar', format => 'html');
+              $c->render('foo/bar', {format => 'html'});
           For renderers the stash will no longer get an updated template,
           instead a new argument will be passed along.
               {template => 'foo/bar', format => 'html', handler => 'epl'}

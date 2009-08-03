@@ -116,9 +116,11 @@ sub handler {
     my $start = [Time::HiRes::gettimeofday()];
 
     # Build default controller and process
-    my $c = $self->controller_class->new(tx => $tx);
-    $c->app($self);
-    eval { $self->process($c) };
+    eval {
+        my $c = $self->controller_class->new(tx => $tx);
+        $c->app($self);
+        $self->process($c);
+    };
     $self->log->error("Processing request failed: $@") if $@;
 
     # End timer

@@ -109,7 +109,7 @@ is("$url",
         'http://acme.s3.amazonaws.com'
       . '/mojo%2Fg%2B%2B-4%2E2_4%2E2%2E3-2ubuntu7_i386%2Edeb');
 
-# Clone (Advanced)
+# Clone (advanced)
 $url = Mojo::URL->new(
     'http://sri:foobar@kraih.com:8080/test/index.html?monkey=biz&foo=1#23');
 my $clone = $url->clone;
@@ -126,5 +126,5 @@ is($clone->fragment, '23');
 is("$clone",
     'http://sri:foobar@kraih.com:8080/test/index.html?monkey=biz&foo=1#23');
 $clone->path('/index.xml');
-is("$clone", 'http://sri:foobar@kraih.com:8080/index.xml?monkey=biz&foo=1#23');
-
+is("$clone",
+    'http://sri:foobar@kraih.com:8080/index.xml?monkey=biz&foo=1#23');

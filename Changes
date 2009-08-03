@@ -6,12 +6,8 @@ This file documents the revision history for Perl extension Mojo.
           The template argument can no longer contain format or handler.
               $c->render(template => 'foo.html.epl')
           becomes
-              $c->render(
-                  template => 'foo',
-                  format   => 'html',
-                  handler  => 'epl'
-              )
-          The following forms are required now.
+              $c->render('foo', format => 'html', handler => 'epl')
+          The following forms are available now.
               $c->render;
               $c->render(controller => 'foo', action => 'bar');
               $c->render({controller => 'foo', action => 'bar'});

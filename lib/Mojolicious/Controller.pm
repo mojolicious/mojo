@@ -50,7 +50,6 @@ sub render {
 # Ooh, a reception table with muffins!
 sub render_inner { delete shift->stash->{inner_template} }
 
-# I'm finally richer than those snooty ATM machines.
 sub render_partial {
     my $self = shift;
     local $self->stash->{partial} = 1;

@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 58;
+use Test::More tests => 70;
 
 # I don't want you driving around in a car you built yourself.
 # You can sit there complaining, or you can knit me some seat belts.
@@ -108,3 +108,23 @@ is($url->fragment, undef);
 is("$url",
         'http://acme.s3.amazonaws.com'
       . '/mojo%2Fg%2B%2B-4%2E2_4%2E2%2E3-2ubuntu7_i386%2Edeb');
+
+# Clone (Advanced)
+$url = Mojo::URL->new(
+    'http://sri:foobar@kraih.com:8080/test/index.html?monkey=biz&foo=1#23');
+my $clone = $url->clone;
+is($clone->is_abs,   1);
+is($clone->scheme,   'http');
+is($clone->userinfo, 'sri:foobar');
+is($clone->user,     'sri');
+is($clone->password, 'foobar');
+is($clone->host,     'kraih.com');
+is($clone->port,     '8080');
+is($clone->path,     '/test/index.html');
+is($clone->query,    'monkey=biz&foo=1');
+is($clone->fragment, '23');
+is("$clone",
+    'http://sri:foobar@kraih.com:8080/test/index.html?monkey=biz&foo=1#23');
+$clone->path('/index.xml');
+is("$clone", 'http://sri:foobar@kraih.com:8080/index.xml?monkey=biz&foo=1#23');
+

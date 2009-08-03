@@ -10,12 +10,12 @@ use base 'Mojo::Base';
 use Mojo::URL;
 use MojoX::Routes::Match;
 use MojoX::Routes::Pattern;
+use Scalar::Util 'weaken';
 
 use constant DEBUG => $ENV{MOJOX_ROUTES_DEBUG} || 0;
 
-__PACKAGE__->attr([qw/block inline name/]);
+__PACKAGE__->attr([qw/block inline name parent/]);
 __PACKAGE__->attr('children', default => sub { [] });
-__PACKAGE__->attr('parent',   weak    => 1);
 __PACKAGE__->attr('pattern',  default => sub { MojoX::Routes::Pattern->new });
 
 sub new {
@@ -127,6 +127,7 @@ sub route {
 
     # We are the parent
     $route->parent($self);
+    weaken $route->{parent};
 
     # Add to tree
     push @{$self->children}, $route;

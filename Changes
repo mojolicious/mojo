@@ -26,14 +26,15 @@ This file documents the revision history for Perl extension Mojo.
           For renderers the stash will no longer get an updated template,
           instead a new argument will be passed along.
               {template => 'foo/bar', format => 'html', handler => 'epl'}
-        - Unified context and controller in Mojolicious, this change is not
-          backwards compatible!
+        - Simplified context and controller in Mojolicious, this change is
+          not backwards compatible!
           If you've been using a custom context object you'll now have to use
           a custom controller base class.
           The new controller_class attribute can now be used to set the
           default controller in Mojolicious.
           There is also no $c argument anymore actions get called with, since
           everything is in $self now.
+        - Simplified Mojo::Base.
         - Cleaned up Mojo::Transaction.
 
 0.991246 2009-08-01 00:00:00

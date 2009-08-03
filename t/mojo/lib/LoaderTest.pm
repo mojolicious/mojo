@@ -13,8 +13,7 @@ use base 'Mojo::Base';
 __PACKAGE__->attr('bananas', chained => 0);
 __PACKAGE__->attr([qw/ears eyes/], default => sub {2});
 __PACKAGE__->attr('figs', chained => 0, default => 0);
-__PACKAGE__->attr('friend', {chained => 0, weak    => 1});
-__PACKAGE__->attr('heads',  {chained => 0, default => 1});
+__PACKAGE__->attr('heads', {chained => 0, default => 1});
 __PACKAGE__->attr('name', chained => 0);
 
 1;

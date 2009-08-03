@@ -35,7 +35,6 @@ sub attr {
 
     my $chained = exists $args->{chained} ? delete $args->{chained} : 1;
     my $default = delete $args->{default};
-    my $weak    = delete $args->{weak};
 
     undef $args;
 
@@ -56,16 +55,6 @@ sub attr {
 
         # Header
         my $code = "sub {\n";
-
-        # Warning gets optimized away
-        unless ($ENV{MOJO_BASE_OPTIMIZE}) {
-
-            # Check invocant
-            $code .= "${ws}Carp::confess(q/";
-            $code
-              .= qq/Attribute "$attr" has to be called on an object, not a class/;
-            $code .= "/)\n  ${ws}unless ref \$_[0];\n";
-        }
 
         # No value
         $code .= "${ws}if (\@_ == 1) {\n";
@@ -90,9 +79,8 @@ sub attr {
         }
         $code .= "$ws}\n";
 
-
         # Store argument optimized
-        if (!$weak && !$chained) {
+        unless ($chained) {
             $code .= "${ws}return \$_[0]->{'$attr'} = \$_[1];\n";
         }
 
@@ -101,11 +89,8 @@ sub attr {
             $code .= "$ws\$_[0]->{'$attr'} = \$_[1];\n";
         }
 
-        # Weaken
-        $code .= "${ws}Scalar::Util::weaken(\$_[0]->{'$attr'});\n" if $weak;
-
-        # Return value or instance for chained/weak
-        if ($chained || $weak) {
+        # Return value or instance for chained
+        if ($chained) {
             $code .= "${ws}return ";
             $code .= $chained ? '$_[0]' : "\$_[0]->{'$attr'}";
             $code .= ";\n";
@@ -146,19 +131,16 @@ Mojo::Base - Minimal Base Class For Mojo Projects
         chained => 0,
         default => sub { 2 }
     );
-    __PACKAGE__->attr('trailer', weak => 1);
 
     package main;
     use Car;
 
     my $bmw = Car->new;
     print $bmw->doors;
-    print $bmw->passengers(5)->doors;
+    print $bmw->doors(5)->doors;
 
     my $mercedes = Car->new(driver => 'Sebastian');
-    print $mercedes->passengers(7)->passengers;
-
-    $mercedes->trailer(Trailer->new);
+    print $mercedes->passengers(7);
 
 =head1 DESCRIPTION
 
@@ -185,7 +167,7 @@ For debugging you can set the C<MOJO_BASE_DEBUG> environment variable.
         default => 'foo'}
     );
 
-Currently there are three options supported.
+Currently there are two options supported.
 
     chained: Whenever you call an attribute with arguments the instance
              is returned instead of the value. (This will be activated by
@@ -195,7 +177,5 @@ Currently there are three options supported.
              Note that the default value is "lazy", which means it only
              gets assigned to the instance when the attribute has been
              called.
-    weak:    Weakens the attribute value, use to avoid memory leaks with
-             circular references.
 
 =cut

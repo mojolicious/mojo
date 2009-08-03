@@ -5,12 +5,10 @@
 use strict;
 use warnings;
 
-use Test::More tests => 505;
+use Test::More tests => 405;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
-
-use Scalar::Util 'isweak';
 
 # I've done everything the Bible says,
 # even the stuff that contradicts the other stuff!
@@ -48,12 +46,9 @@ for my $i (101 .. 150) {
     $y ? is($monkeys->[$i]->heads, 3) : is($monkeys->[$i]->heads, 1);
 }
 
-# "chained", "weak" and coderef "default" support
+# "chained" and coderef "default" support
 for my $i (151 .. 200) {
     $monkeys->[$i] = LoaderTest->new;
-    $monkeys->[$i]->friend($monkeys->[$i]);
-    ok(isweak $monkeys->[$i]->{friend});
-    is($monkeys->[$i]->friend,        $monkeys->[$i]);
     is($monkeys->[$i]->ears,          2);
     is($monkeys->[$i]->ears(6)->ears, 6);
     is($monkeys->[$i]->eyes,          2);

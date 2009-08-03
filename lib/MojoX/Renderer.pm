@@ -28,13 +28,6 @@ sub add_handler {
     return $self;
 }
 
-sub rel_template {
-    my ($self, $template, $format, $handler) = @_;
-    $template ||= '';
-    return File::Spec->catfile($self->root, split '/', $template)
-      . ".$format.$handler";
-}
-
 # Bodies are for hookers and fat people.
 sub render {
     my ($self, $c) = @_;
@@ -115,6 +108,22 @@ sub render {
     return 1;
 }
 
+sub template_name {
+    my ($self, $options) = @_;
+
+    my $template = $options->{template} || '';
+    my $format   = $options->{format};
+    my $handler  = $options->{handler};
+
+    return "$template.$format.$handler";
+}
+
+sub template_path {
+    my $self = shift;
+    return File::Spec->catfile($self->root, split '/',
+        $self->template_name(shift));
+}
+
 # Well, at least here you'll be treated with dignity.
 # Now strip naked and get on the probulator.
 sub _detect_handler {
@@ -128,10 +137,12 @@ sub _detect_handler {
       unless $self->precedence;
 
     # Try all
+    my $options = {template => $template, format => $format};
     for my $ext (@{$self->precedence}) {
 
         # Found
-        return $ext if -r $self->rel_template($template, $format, $ext);
+        $options->{handler} = $ext;
+        return $ext if -r $self->template_path($options);
     }
 
     # Nothing found
@@ -213,15 +224,27 @@ follwing the ones.
 
     $renderer = $renderer->add_handler(epl => sub { ... });
 
-=head2 C<rel_template>
-
-    my $path = $renderer->rel_template('foo/bar', 'html', 'epl');
-
 =head2 C<render>
 
     my $success  = $renderer->render($c);
 
     $c->stash->{partial} = 1;
     my $output = $renderer->render($c);
+
+=head2 C<template_name>
+
+    my $template = $renderer->template_path({
+        template => 'foo/bar',
+        format   => 'html',
+        handler  => 'epl'
+    });
+
+=head2 C<template_path>
+
+    my $path = $renderer->template_name({
+        template => 'foo/bar',
+        format   => 'html',
+        handler  => 'epl'
+    });
 
 =cut

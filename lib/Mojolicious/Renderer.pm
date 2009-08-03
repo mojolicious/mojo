@@ -22,10 +22,8 @@ sub new {
             my ($r, $c, $output, $options) = @_;
 
             # Template
-            my $format   = $options->{format};
-            my $handler  = $options->{handler};
-            my $template = $options->{template};
-            my $path     = $r->rel_template($template, $format, $handler);
+            my $template = $r->template_name($options);
+            my $path     = $r->template_path($options);
 
             # Initialize cache
             $r->{_mt_cache} ||= {};
@@ -91,10 +89,8 @@ sub new {
             my ($r, $c, $output, $options) = @_;
 
             # Template
-            my $format   = $options->{format};
-            my $handler  = $options->{handler};
-            my $template = $options->{template};
-            my $path     = $r->rel_template($template, $format, $handler);
+            my $template = $r->template_name($options);
+            my $path     = $r->template_path($options);
 
             # Class
             my $class =
@@ -106,9 +102,7 @@ sub new {
             unless ($r->{_mt_cache}->{$path}) {
 
                 # Data
-                my $d =
-                  Mojo::Script->new->get_data("$template.$format.$handler",
-                    $class);
+                my $d = Mojo::Script->new->get_data($template, $class);
                 unless ($d) {
 
                     # Nothing found

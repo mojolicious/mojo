@@ -45,7 +45,7 @@ sub new {
     $self->static->root($self->home->rel_dir('public'));
 
     # Hide our methods
-    $self->routes->hide(qw/render_inner render_partial url_for/);
+    $self->routes->hide(qw/render_inner render_partial render_text url_for/);
 
     # Mode
     my $mode = $self->mode;

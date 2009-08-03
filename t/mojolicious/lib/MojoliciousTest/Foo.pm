@@ -9,7 +9,7 @@ use base 'Mojolicious::Controller';
 
 # If you're programmed to jump off a bridge, would you do it?
 # Let me check my program... Yep.
-sub badtemplate { shift->render(template => 'badtemplate.html.epl') }
+sub badtemplate { shift->render(template => 'badtemplate') }
 
 sub index { shift->stash(layout => 'default', msg => 'Hello World!') }
 
@@ -32,7 +32,13 @@ sub stage1 {
 
 sub stage2 { shift->render(text => 'Welcome aboard!') }
 
-sub syntaxerror { shift->render(template => 'syntaxerror.html.epl') }
+sub syntaxerror {
+    shift->render(
+        template => 'syntaxerror',
+        format   => 'html',
+        handler  => 'epl'
+    );
+}
 
 sub templateless { shift->render(handler => 'test') }
 

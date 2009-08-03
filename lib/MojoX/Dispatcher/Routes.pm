@@ -11,7 +11,7 @@ use Mojo::ByteStream 'b';
 use Mojo::Loader;
 use Mojo::Loader::Exception;
 
-__PACKAGE__->attr('disallow',
+__PACKAGE__->attr('hidden',
     default => sub { [qw/new app attr render req res stash tx/] });
 __PACKAGE__->attr('namespace');
 
@@ -176,10 +176,10 @@ sub generate_method {
     # Field
     my $field = $c->match->captures;
 
-    # Prepare disallow
-    unless ($self->{_disallow}) {
-        $self->{_disallow} = {};
-        $self->{_disallow}->{$_}++ for @{$self->disallow};
+    # Prepare hidden
+    unless ($self->{_hidden}) {
+        $self->{_hidden} = {};
+        $self->{_hidden}->{$_}++ for @{$self->hidden};
     }
 
     my $method = $field->{method};
@@ -188,8 +188,8 @@ sub generate_method {
     # Shortcut
     return unless $method;
 
-    # Shortcut for disallowed methods
-    return if $self->{_disallow}->{$method};
+    # Shortcut for hidden methods
+    return if $self->{_hidden}->{$method};
     return if index($method, '_') == 0;
 
     # Invalid
@@ -197,6 +197,8 @@ sub generate_method {
 
     return $method;
 }
+
+sub hide { push @{shift->hidden}, @_ }
 
 sub render {
     my ($self, $c) = @_;
@@ -256,10 +258,10 @@ L<MojoX::Dispatcher::Routes> is a dispatcher based on L<MojoX::Routes>.
 L<MojoX::Dispatcher::Routes> inherits all attributes from L<MojoX::Routes>
 and implements the follwing the ones.
 
-=head2 C<disallow>
+=head2 C<hidden>
 
-    my $disallow = $dispatcher->disallow;
-    $dispatcher  = $dispatcher->disallow(
+    my $hidden  = $dispatcher->hidden;
+    $dispatcher = $dispatcher->hidden(
         [qw/new attr tx render req res stash/]
     );
 
@@ -294,6 +296,10 @@ implements the follwing the ones.
 =head2 C<generate_method>
 
     my $method = $dispatcher->genrate_method($c);
+
+=head2 C<hide>
+
+    $dispatcher = $dispatcher->hide('new');
 
 =head2 C<render>
 

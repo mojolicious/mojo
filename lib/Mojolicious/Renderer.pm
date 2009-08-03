@@ -19,12 +19,13 @@ sub new {
     # Epl
     $self->add_handler(
         epl => sub {
-            my ($r, $c, $output) = @_;
+            my ($r, $c, $output, $options) = @_;
 
             # Template
-            my $template = $c->stash->{template};
-            my $path =
-              File::Spec->catfile($c->app->renderer->root, $template);
+            my $format   = $options->{format};
+            my $handler  = $options->{handler};
+            my $template = $options->{template};
+            my $path     = $r->rel_template($template, $format, $handler);
 
             # Initialize cache
             $r->{_mt_cache} ||= {};
@@ -70,7 +71,8 @@ sub new {
                     $c->res->body(
                         $c->render(
                             partial  => 1,
-                            template => 'exception.html'
+                            template => 'exception',
+                            format   => 'html'
                         )
                     );
 
@@ -86,10 +88,13 @@ sub new {
     # Eplite
     $self->add_handler(
         eplite => sub {
-            my ($r, $c, $output) = @_;
+            my ($r, $c, $output, $options) = @_;
 
             # Template
-            my $template = $c->stash->{template};
+            my $format   = $options->{format};
+            my $handler  = $options->{handler};
+            my $template = $options->{template};
+            my $path     = $r->rel_template($template, $format, $handler);
 
             # Class
             my $class =
@@ -97,18 +102,13 @@ sub new {
               || $ENV{MOJO_EPLITE_CLASS}
               || 'main';
 
-            # Path
-            my $path =
-              File::Spec->catfile($c->app->renderer->root, $template);
-
             # Prepare
             unless ($r->{_mt_cache}->{$path}) {
 
-                # Portable templates
-                $template = join '/', File::Spec->splitdir($template);
-
                 # Data
-                my $d = Mojo::Script->new->get_data($template, $class);
+                my $d =
+                  Mojo::Script->new->get_data("$template.$format.$handler",
+                    $class);
                 unless ($d) {
 
                     # Nothing found
@@ -127,7 +127,7 @@ sub new {
             }
 
             # Render
-            return $r->handler->{epl}->($r, $c, $output);
+            return $r->handler->{epl}->($r, $c, $output, $options);
         }
     );
 

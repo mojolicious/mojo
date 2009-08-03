@@ -19,7 +19,7 @@ Currently there are no requirements besides Perl 5.8.1.
     |        CGI       | |      FastCGI     | |     HTTP 1.1     |
     '------------------' '------------------' '------------------'
 
-Just run the following commands to install Mojo.
+To install this module type the following:
 
     perl Makefile.PL
     make

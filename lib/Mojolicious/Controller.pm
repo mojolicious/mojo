@@ -108,7 +108,12 @@ ones.
 =head2 C<render>
 
     $c->render;
-    $c->render(action => 'foo');
+    $c->render(controller => 'foo', action => 'bar');
+    $c->render(text => 'Hello!');
+    $c->render(template => 'index');
+    $c->render(template => 'foo/index');
+    $c->render(template => 'index', format => 'html', handler => 'epl');
+    $c->render(handler => 'something');
 
 =head2 C<render_inner>
 

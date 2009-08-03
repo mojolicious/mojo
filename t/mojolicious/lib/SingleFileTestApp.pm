@@ -34,14 +34,16 @@ sub bar {
 
 sub eplite_template {
     shift->render(
-        template     => 'index.html.eplite',
+        template     => 'index',
+        handler      => 'eplite',
         eplite_class => 'SingleFileTestApp::Foo'
     );
 }
 
 sub eplite_template2 {
     shift->stash(
-        template     => 'too.html.eplite',
+        template     => 'too',
+        handler      => 'eplite',
         eplite_class => 'SingleFileTestApp::Foo'
     );
 }

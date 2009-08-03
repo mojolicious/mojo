@@ -28,6 +28,13 @@ sub add_handler {
     return $self;
 }
 
+sub rel_template {
+    my ($self, $template, $format, $handler) = @_;
+    $template ||= '';
+    return File::Spec->catfile($self->root, split '/', $template)
+      . ".$format.$handler";
+}
+
 # Bodies are for hookers and fat people.
 sub render {
     my ($self, $c) = @_;
@@ -38,37 +45,58 @@ sub render {
     # Partial?
     my $partial = delete $c->stash->{partial};
 
-    my ($output, $template);
+    # Template
+    my $template = delete $c->stash->{template};
+
+    # Format
+    my $format = $c->stash->{format} || 'html';
+
+    # Handler
+    my $handler = $c->stash->{handler};
+
+    my $options =
+      {template => $template, format => $format, handler => $handler};
+    my $output;
 
     # Text
     if (my $text = delete $c->stash->{text}) {
         $output = $text;
-        $template =
-          $self->_fix_template($c, delete $c->stash->{template} || '');
         $c->stash->{inner_template} = $output if $c->stash->{layout};
     }
 
-    # Template
-    elsif ($template = delete $c->stash->{template}) {
+    # Template or templateless handler
+    elsif ($template || $handler) {
 
-        # Fix
-        return unless $template = $self->_fix_template($c, $template);
+        # Handler
+        $options->{handler} ||= $self->_detect_handler($template, $format)
+          || $self->default_handler;
 
         # Render
-        if ($self->_render_template($c, $template, \$output)) {
-            $c->stash->{inner_template} = $output if $c->stash->{layout};
-        }
+        return unless $self->_render_template($c, \$output, $options);
+
+        # Layout?
+        $c->stash->{inner_template} = $output if $c->stash->{layout};
     }
 
     # Layout
     if (my $layout = delete $c->stash->{layout}) {
 
+        # Handler
+        $handler =
+             $c->stash->{handler}
+          || $self->_detect_handler($template, $format)
+          || $self->default_handler;
+        $options->{handler} = $handler;
+
+        # Format
+        $format = $c->stash->{format} || 'html';
+        $options->{format} = $format;
+
         # Fix
-        $template = File::Spec->catfile('layouts', $layout);
-        return unless $template = $self->_fix_template($c, $template);
+        $options->{template} = "layouts/$layout";
 
         # Render
-        $self->_render_template($c, $template, \$output);
+        $self->_render_template($c, \$output, $options);
     }
 
     # Partial
@@ -79,10 +107,6 @@ sub render {
     $res->code(200) unless $res->code;
     $res->body($output) unless $res->body;
 
-    # Extract format
-    $template =~ /\.(\w+)(?:\.\w+)?$/;
-    my $format = $1;
-
     # Type
     my $type = $self->types->type($format) || 'text/plain';
     $res->headers->content_type($type) unless $res->headers->content_type;
@@ -91,110 +115,44 @@ sub render {
     return 1;
 }
 
-sub _detect_default_handler {
-    my $self = shift;
-    return 1
-      if $self->default_handler && -f File::Spec->catfile($self->root, shift);
-}
-
-sub _fix_format {
-    my ($self, $c, $template) = @_;
-
-    # Format ok
-    return $template if $template =~ /\.\w+(?:\.\w+)?$/;
-
-    my $format = $c->stash->{format};
-
-    # Append format
-    if ($format) { $template .= ".$format" }
-
-    # Missing format
-    else {
-        $c->app->log->debug('Template format missing.');
-        return;
-    }
-
-    return $template;
-}
-
 # Well, at least here you'll be treated with dignity.
 # Now strip naked and get on the probulator.
-sub _fix_handler {
-    my ($self, $c, $template) = @_;
+sub _detect_handler {
+    my ($self, $template, $format) = @_;
 
-    # Handler ok
-    return $template if $template =~ /\.\w+\.\w+$/;
-
-    my $handler = $c->stash->{handler};
-
-    # Append handler
-    if ($handler) { $template .= ".$handler" }
-
-    # Detect
-    elsif (!$self->_detect_default_handler($template)) {
-        for my $ext (@{$self->precedence}) {
-
-            # Try
-            my $t = "$template.$ext";
-            if (-r File::Spec->catfile($self->root, $t)) {
-                $c->app->log->debug(qq/Template found "$t"./);
-                return $t;
-            }
-        }
-
-        # Try the default handler if nothing else matches
-        my $default = $self->default_handler;
-        return "$template.$default" if $default;
-
-        # Nothing found
-        $c->app->log->debug(qq/Template not found "$template.*"./);
-        return;
-    }
-
-    return $template;
-}
-
-sub _fix_template {
-    my ($self, $c, $template) = @_;
+    # Shortcut
+    return unless $template || $format;
 
     # Handler precedence
     $self->precedence([sort keys %{$self->handler}])
       unless $self->precedence;
 
-    # Make sure we are portable
-    $template = File::Spec->catfile(split '/', $template) if $template;
+    # Try all
+    for my $ext (@{$self->precedence}) {
 
-    # Format
-    return unless $template = $self->_fix_format($c, $template);
+        # Found
+        return $ext if -r $self->rel_template($template, $format, $ext);
+    }
 
-    # Handler
-    return unless $template = $self->_fix_handler($c, $template);
-
-    return $template;
+    # Nothing found
+    return;
 }
 
 sub _render_template {
-    my ($self, $c, $template, $output) = @_;
-
-    # Nothing to do
-    return unless $template;
-
-    # Extract handler
-    $template =~ /\.\w+\.(\w+)$/;
-    my $handler = $c->stash->{handler} || $1 || $self->default_handler;
+    my ($self, $c, $output, $options) = @_;
 
     # Renderer
-    my $r = $self->handler->{$handler};
+    my $handler  = $options->{handler};
+    my $renderer = $self->handler->{$handler};
 
     # No handler
-    unless ($r) {
+    unless ($renderer) {
         $c->app->log->error(qq/No handler for "$handler" available./);
         return;
     }
 
     # Render
-    local $c->stash->{template} = $template;
-    return unless $r->($self, $c, $output);
+    return unless $renderer->($self, $c, $output, $options);
 
     # Success!
     return 1;
@@ -218,6 +176,8 @@ MojoX::Renderer - Renderer
 L<MojoX::Renderer> is a MIME type based renderer.
 
 =head2 ATTRIBUTES
+
+L<MojoX::Types> implements the follwing attributes.
 
 =head2 C<default_handler>
 
@@ -252,6 +212,10 @@ follwing the ones.
 =head2 C<add_handler>
 
     $renderer = $renderer->add_handler(epl => sub { ... });
+
+=head2 C<rel_template>
+
+    my $path = $renderer->rel_template('foo/bar', 'html', 'epl');
 
 =head2 C<render>
 

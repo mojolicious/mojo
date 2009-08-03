@@ -381,7 +381,11 @@ directory.
     # /external
     any '/external' => sub {
         my $self = shift;
-        $self->render(template => 'foo/bar.html.epl');
+        $self->render(
+            template => 'foo/bar',
+            format   => 'html',
+            handler  => 'epl'
+        );
     };
 
 Static files will be automatically served from the C<public> directory if it

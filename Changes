@@ -32,6 +32,8 @@ This file documents the revision history for Perl extension Mojo.
           a custom controller base class.
           The new controller_class attribute can now be used to set the
           default controller in Mojolicious.
+          There is also no $c argument anymore actions get called with, since
+          everything is in $self now.
         - Cleaned up Mojo::Transaction.
 
 0.991246 2009-08-01 00:00:00

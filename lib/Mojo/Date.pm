@@ -98,9 +98,9 @@ sub parse {
     return $self;
 }
 
-sub to_string {
-    my $self = shift;
-    my $epoch = shift || $self->{epoch};
+sub to_array {
+    my $self  = shift;
+    my $epoch = $self->epoch;
 
     $epoch = time unless defined $epoch;
 
@@ -109,12 +109,17 @@ sub to_string {
     my $days   = [qw/Sun Mon Tue Wed Thu Fri Sat/];
     my $months = [qw/Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec/];
 
+    return [
+        $days->[$wday], $mday,   $months->[$month], $year + 1900,
+        $hour,          $minute, $second
+    ];
+}
+
+sub to_string {
+    my $self = shift;
+
     # Format
-    return sprintf(
-        "%s, %02d %s %04d %02d:%02d:%02d GMT",
-        $days->[$wday], $mday, $months->[$month], $year + 1900,
-        $hour, $minute, $second
-    );
+    return sprintf("%s, %02d %s %04d %02d:%02d:%02d GMT", @{$self->to_array});
 }
 
 1;
@@ -169,6 +174,10 @@ Parsable formats include:
     - RFC 822/1123 (Sun, 06 Nov 1994 08:49:37 GMT)
     - RFC 850/1036 (Sunday, 06-Nov-94 08:49:37 GMT)
     - ANSI C asctime() (Sun Nov  6 08:49:37 1994)
+
+=head2 C<to_array>
+
+    my $array = $date->to_array;
 
 =head2 C<to_string>
 

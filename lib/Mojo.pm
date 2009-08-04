@@ -216,7 +216,7 @@ Marcus Ramberg
 
 Mark Stosberg
 
-Maxym Komar
+Maksym Komar
 
 Pascal Gaudette
 

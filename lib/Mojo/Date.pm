@@ -12,6 +12,20 @@ require Time::Local;
 
 __PACKAGE__->attr('epoch');
 
+# Days and months
+my @DAYS   = qw/Sun Mon Tue Wed Thu Fri Sat/;
+my @MONTHS = qw/Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec/;
+
+# Reverse months
+my %MONTHS;
+{
+    my $i = 0;
+    for my $month (@MONTHS) {
+        $MONTHS{$month} = $i;
+        $i++;
+    }
+}
+
 sub new {
     my $self = shift->SUPER::new();
     $self->parse(@_);
@@ -23,37 +37,54 @@ sub new {
 # Or the dogs with bees in their mouths and when they bark they shoot bees at
 # you?
 sub parse {
-    my ($self, $date) = @_;
+    my $self = shift;
 
+    # Instantiate if needed
     $self = $self->new unless ref $self;
 
     # Shortcut
-    return unless defined $date;
+    return $self unless @_;
 
-    # epoch - 784111777
-    if ($date =~ /^\d+$/) {
-        $self->epoch($date);
-        return $self;
+    my $date;
+
+    # String
+    unless (ref $_[0] || defined $_[1]) {
+        $date = shift;
+
+        # epoch - 784111777
+        if ($date =~ /^\d+$/) {
+            $self->epoch($date);
+            return $self;
+        }
+
+        # Remove spaces, weekdays and timezone
+        $date =~ s/^\s+//;
+        my $re = join '|', @DAYS;
+        $date =~ s/^(?:$re)[a-z]*,?\s*//i;
+        $date =~ s/GMT\s*$//i;
+        $date =~ s/\s+$//;
     }
 
-    # Remove spaces, weekdays and timezone
-    $date =~ s/^\s+//;
-    $date =~ s/^(?:Sun|Mon|Tue|Wed|Thu|Fri|Sat)[a-z]*,?\s*//i;
-    $date =~ s/GMT\s*$//i;
-    $date =~ s/\s+$//;
+    # Hash
+    else { $date = ref $_[0] ? $_[0] : {@_} }
 
     my ($day, $month, $year, $hour, $minute, $second);
-    my $months = {};
-    my $i      = 0;
-    for my $m (qw/Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec/) {
-        $months->{$m} = $i;
-        $i++;
+
+    # Hash
+    if (ref $date) {
+        $month = $date->{month} || 1;
+        $month -= 1;
+        $day    = $date->{day}    || 1;
+        $year   = $date->{year}   || 0;
+        $hour   = $date->{hour}   || 0;
+        $minute = $date->{minute} || 0;
+        $second = $date->{second} || 0;
     }
 
     # RFC822/1123 - Sun, 06 Nov 1994 08:49:37 GMT
-    if ($date =~ /^(\d+)\s+(\w+)\s+(\d+)\s+(\d+):(\d+):(\d+)$/) {
+    elsif ($date =~ /^(\d+)\s+(\w+)\s+(\d+)\s+(\d+):(\d+):(\d+)$/) {
         $day    = $1;
-        $month  = $months->{$2};
+        $month  = $MONTHS{$2};
         $year   = $3;
         $hour   = $4;
         $minute = $5;
@@ -63,7 +94,7 @@ sub parse {
     # RFC850/1036 - Sunday, 06-Nov-94 08:49:37 GMT
     elsif ($date =~ /^(\d+)-(\w+)-(\d+)\s+(\d+):(\d+):(\d+)$/) {
         $day    = $1;
-        $month  = $months->{$2};
+        $month  = $MONTHS{$2};
         $year   = $3;
         $hour   = $4;
         $minute = $5;
@@ -72,7 +103,7 @@ sub parse {
 
     # ANSI C asctime() - Sun Nov  6 08:49:37 1994
     elsif ($date =~ /^(\w+)\s+(\d+)\s+(\d+):(\d+):(\d+)\s+(\d+)$/) {
-        $month  = $months->{$1};
+        $month  = $MONTHS{$1};
         $day    = $2;
         $hour   = $3;
         $minute = $4;
@@ -81,7 +112,7 @@ sub parse {
     }
 
     # Invalid format
-    else {return}
+    else { return $self }
 
     my $epoch;
 
@@ -91,14 +122,14 @@ sub parse {
           Time::Local::timegm($second, $minute, $hour, $day, $month, $year);
     };
 
-    return if $@ || $epoch < 0;
+    return $self if $@ || $epoch < 0;
 
     $self->epoch($epoch);
 
     return $self;
 }
 
-sub to_array {
+sub to_hash {
     my $self  = shift;
     my $epoch = $self->epoch;
 
@@ -106,20 +137,26 @@ sub to_array {
 
     my ($second, $minute, $hour, $mday, $month, $year, $wday) = gmtime $epoch;
 
-    my $days   = [qw/Sun Mon Tue Wed Thu Fri Sat/];
-    my $months = [qw/Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec/];
-
-    return [
-        $days->[$wday], $mday,   $months->[$month], $year + 1900,
-        $hour,          $minute, $second
-    ];
+    return {
+        day         => $mday,
+        day_name    => $DAYS[$wday],
+        day_of_week => $wday,
+        hour        => $hour,
+        minute      => $minute,
+        month       => $month + 1,
+        month_name  => $MONTHS[$month],
+        second      => $second,
+        year        => $year + 1900
+    };
 }
 
 sub to_string {
     my $self = shift;
 
     # Format
-    return sprintf("%s, %02d %s %04d %02d:%02d:%02d GMT", @{$self->to_array});
+    return sprintf("%s, %02d %s %04d %02d:%02d:%02d GMT",
+        @{$self->to_hash}
+          {qw/day_name day month_name year hour minute second/});
 }
 
 1;
@@ -163,6 +200,8 @@ following new ones.
 =head2 C<new>
 
     my $date = Mojo::Date->new($string);
+    my $date - Mojo::Date->new(year => 2009, month => 1, day => 1);
+    my $date - Mojo::Date->new({year => 2009, month => 1, day => 1});
 
 =head2 C<parse>
 
@@ -175,9 +214,9 @@ Parsable formats include:
     - RFC 850/1036 (Sunday, 06-Nov-94 08:49:37 GMT)
     - ANSI C asctime() (Sun Nov  6 08:49:37 1994)
 
-=head2 C<to_array>
+=head2 C<to_hash>
 
-    my $array = $date->to_array;
+    my $hash = $date->to_hash;
 
 =head2 C<to_string>
 

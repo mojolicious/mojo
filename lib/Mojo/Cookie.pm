@@ -20,7 +20,7 @@ __PACKAGE__->attr(
 sub expires {
     my ($self, $expires) = @_;
     if (defined $expires) {
-        $self->{expires} = Mojo::Date->parse($expires) unless ref $expires;
+        $self->{expires} = Mojo::Date->new($expires) unless ref $expires;
     }
     return $self->{expires};
 }
@@ -28,7 +28,7 @@ sub expires {
 sub max_age {
     my ($self, $max_age) = @_;
     if (defined $max_age) {
-        $self->{max_age} = Mojo::Date->parse("$max_age");
+        $self->{max_age} = Mojo::Date->new("$max_age");
     }
     return $self->{max_age} ? $self->{max_age}->epoch : undef;
 }

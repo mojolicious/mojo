@@ -39,9 +39,6 @@ sub new {
 sub parse {
     my $self = shift;
 
-    # Instantiate if needed
-    $self = $self->new unless ref $self;
-
     # Shortcut
     return $self unless @_;
 

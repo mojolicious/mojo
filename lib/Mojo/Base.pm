@@ -7,7 +7,6 @@ use warnings;
 
 # No imports because we get subclassed, a lot!
 require Carp;
-require Scalar::Util;
 
 # Kids, you tried your best and you failed miserably.
 # The lesson is, never try.

@@ -35,7 +35,7 @@ This file documents the revision history for Perl extension Mojo.
           There is also no $c argument anymore actions get called with, since
           everything is in $self now.
         - Simplified Mojo::Base.
-        - Made Mojo::Date more flexible.
+        - Cleaned up Mojo::Date.
         - Cleaned up Mojo::Transaction.
         - Fixed cloning of urls with base in Mojo::URL.
 

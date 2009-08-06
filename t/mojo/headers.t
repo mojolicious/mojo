@@ -62,17 +62,17 @@ EOF
 is($headers->state, 'headers');
 ok(!defined($headers->content_type));
 ok(!defined($headers->parse(<<EOF)));
-Connection: close
+X-Bender: Kiss my shiny
 EOF
 is($headers->state, 'headers');
 ok(!defined($headers->connection));
 is(ref $headers->parse(<<EOF), 'Mojo::Buffer');
-Connection: keep-alive
+X-Bender: metal ass!
 
 EOF
-is($headers->state,        'done');
-is($headers->content_type, 'text/plain');
-is($headers->connection,   'keep-alive');
+is($headers->state,              'done');
+is($headers->content_type,       'text/plain');
+is($headers->header('X-Bender'), 'Kiss my shiny, metal ass!');
 
 # Filter unallowed characters
 $headers = Mojo::Headers->new;

@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 312;
+use Test::More tests => 316;
 
 use Mojo::Filter::Chunked;
 use Mojo::Headers;
@@ -734,7 +734,7 @@ is($cookies->[0]->path,        '/test');
 is($res->cookie('foo')->value, 'bar');
 is($res->cookie('foo')->path,  '/test');
 
-# Build & parse HTTP 1.1 response with 2 cookies
+# Build and parse HTTP 1.1 response with 2 cookies
 $res = Mojo::Message::Response->new;
 $res->code(404);
 $res->headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
@@ -756,23 +756,19 @@ is($res->build,
       . "Content-Length: 0\x0d\x0a"
       . "Set-Cookie: foo=bar; Version=1; Path=/foobar\x0d\x0a"
       . "Set-Cookie: bar=baz; Version=1; Path=/test/23\x0d\x0a\x0d\x0a");
-
-my $res_string = $res->build;
-$res = Mojo::Message::Response->new;
-$res->parse($res_string);
-
-is($res->state,                   'done');
-is($res->code,                    404);
-is($res->major_version,           1);
-is($res->minor_version,           1);
-is($res->headers->content_length, 0);
-$cookies = $res->cookies;
-is(defined $res->cookie('foo'), 1);
-is(defined $res->cookie('bar'), 1);
-# is($res->cookie('foo')->path,  '/foobar');
-# is($res->cookie('bar')->value, 'baz');
-# is($res->cookie('bar')->path,  '/test/23');
-
+my $res2 = Mojo::Message::Response->new;
+$res2->parse($res->build);
+is($res2->state,                   'done');
+is($res2->code,                    404);
+is($res2->major_version,           1);
+is($res2->minor_version,           1);
+is($res2->headers->content_length, 0);
+is(defined $res2->cookie('foo'),   1);
+is(defined $res2->cookie('bar'),   1);
+is($res2->cookie('foo')->path,     '/foobar');
+is($res2->cookie('foo')->value,    'bar');
+is($res2->cookie('bar')->path,     '/test/23');
+is($res2->cookie('bar')->value,    'baz');
 
 # Build full HTTP 1.1 request with cookies
 $req = Mojo::Message::Request->new;

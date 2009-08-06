@@ -38,6 +38,7 @@ This file documents the revision history for Perl extension Mojo.
         - Cleaned up Mojo::Date.
         - Cleaned up Mojo::Transaction.
         - Fixed cloning of urls with base in Mojo::URL.
+        - Fixed parsing of multiple headers and cookies with same name.
 
 0.991246 2009-08-01 00:00:00
         - Fixed typo.

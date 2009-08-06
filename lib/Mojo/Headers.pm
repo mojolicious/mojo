@@ -233,7 +233,7 @@ sub parse {
 
             # Store headers
             for (my $i = 0; $i < @{$self->{__headers}}; $i += 2) {
-                $self->header($self->{__headers}->[$i],
+                $self->add($self->{__headers}->[$i],
                     $self->{__headers}->[$i + 1]);
             }
 

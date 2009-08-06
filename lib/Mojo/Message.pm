@@ -175,7 +175,7 @@ sub cookie {
             my $cname = $cookie->name;
 
             # Multiple cookies with same name
-            if (exists $cookies->{$name}) {
+            if (exists $cookies->{$cname}) {
                 $cookies->{$cname} = [$cookies->{$cname}]
                   unless ref $cookies->{$cname} eq 'ARRAY';
                 push @{$cookies->{$cname}}, $cookie;
@@ -189,10 +189,13 @@ sub cookie {
         $self->{_cookies} = $cookies;
     }
 
+    # Multiple?
     my @cookies =
       ref $self->{_cookies}->{$name} eq 'ARRAY'
       ? @{$self->{_cookies}->{$name}}
       : ($self->{_cookies}->{$name});
+
+    # Context?
     return wantarray ? @cookies : $cookies[0];
 }
 

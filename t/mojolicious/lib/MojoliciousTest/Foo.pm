@@ -11,7 +11,13 @@ use base 'Mojolicious::Controller';
 # Let me check my program... Yep.
 sub badtemplate { shift->render(template => 'badtemplate') }
 
-sub index { shift->stash(layout => 'default', msg => 'Hello World!') }
+sub index {
+    shift->stash(
+        layout  => 'default',
+        handler => 'xpl',
+        msg     => 'Hello World!'
+    );
+}
 
 sub something {
     my $self = shift;

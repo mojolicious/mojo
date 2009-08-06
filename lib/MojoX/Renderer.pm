@@ -10,7 +10,7 @@ use base 'Mojo::Base';
 use File::Spec;
 use MojoX::Types;
 
-__PACKAGE__->attr([qw/default_handler precedence/]);
+__PACKAGE__->attr('default_handler');
 __PACKAGE__->attr('handler', default => sub { {} });
 __PACKAGE__->attr('types',   default => sub { MojoX::Types->new });
 __PACKAGE__->attr('root',    default => '/');
@@ -61,8 +61,7 @@ sub render {
     elsif ($template || $handler) {
 
         # Handler
-        $options->{handler} ||= $self->_detect_handler($template, $format)
-          || $self->default_handler;
+        $options->{handler} ||= $self->default_handler;
 
         # Render
         return unless $self->_render_template($c, \$output, $options);
@@ -75,10 +74,7 @@ sub render {
     if (my $layout = delete $c->stash->{layout}) {
 
         # Handler
-        $handler =
-             $c->stash->{handler}
-          || $self->_detect_handler($template, $format)
-          || $self->default_handler;
+        $handler = $c->stash->{handler} || $self->default_handler;
         $options->{handler} = $handler;
 
         # Format
@@ -126,29 +122,6 @@ sub template_path {
 
 # Well, at least here you'll be treated with dignity.
 # Now strip naked and get on the probulator.
-sub _detect_handler {
-    my ($self, $template, $format) = @_;
-
-    # Shortcut
-    return unless $template || $format;
-
-    # Handler precedence
-    $self->precedence([sort keys %{$self->handler}])
-      unless $self->precedence;
-
-    # Try all
-    my $options = {template => $template, format => $format};
-    for my $ext (@{$self->precedence}) {
-
-        # Found
-        $options->{handler} = $ext;
-        return $ext if -r $self->template_path($options);
-    }
-
-    # Nothing found
-    return;
-}
-
 sub _render_template {
     my ($self, $c, $output, $options) = @_;
 
@@ -199,11 +172,6 @@ L<MojoX::Types> implements the follwing attributes.
 
     my $handler = $renderer->handler;
     $renderer   = $renderer->handler({epl => sub { ... }});
-
-=head2 C<precedence>
-
-    my $precedence = $renderer->precedence;
-    $renderer      = $renderer->precedence(qw/epl tt mason/);
 
 =head2 C<types>
 

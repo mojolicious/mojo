@@ -5,6 +5,8 @@ This file documents the revision history for Perl extension Mojo.
           will have to rename all your eplite templates to epl.
         - Simplified MojoX::Renderer, this change is not backwards
           compatible!
+          Handler can no longer be detected, that means "default_handler" or
+          the "handler" argument are required.
           The template argument can no longer contain format or handler.
               $c->render(template => 'foo.html.epl')
           becomes

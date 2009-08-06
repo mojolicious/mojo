@@ -378,6 +378,8 @@ directory.
     # /external
     any '/external' => sub {
         my $self = shift;
+
+        # templates/foo/bar.html.epl
         $self->render(template => 'foo/bar');
     };
 

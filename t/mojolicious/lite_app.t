@@ -168,10 +168,10 @@ is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 is($tx->res->body,                            "Yea baby! with layout\n");
 
 __DATA__
-@@ index.html.eplite
+@@ index.html.epl
 %= something()
 
-@@ layouts/layout.html.eplite
+@@ layouts/layout.html.epl
 <%= shift->render_inner %> with layout
 
 __END__

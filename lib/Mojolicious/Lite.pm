@@ -28,9 +28,6 @@ sub import {
     # Initialize app
     $APP = $class->new;
 
-    # Renderer
-    $APP->renderer->default_handler('eplite');
-
     # Route generator
     my $route = sub {
         my $methods = shift;

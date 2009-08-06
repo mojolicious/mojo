@@ -217,16 +217,16 @@ is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 like($tx->res->body, qr/Same old in green Seems to work!/);
 
-# SingleFileTestApp::Foo::eplite_template
-$tx = Mojo::Transaction->new_get('/foo/eplite_template');
+# SingleFileTestApp::Foo::data_template
+$tx = Mojo::Transaction->new_get('/foo/data_template');
 $client->process_app('SingleFileTestApp', $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 is($tx->res->body,                            "23 works!\n");
 
-# SingleFileTestApp::Foo::eplite_template
-$tx = Mojo::Transaction->new_get('/foo/eplite_template2');
+# SingleFileTestApp::Foo::data_template
+$tx = Mojo::Transaction->new_get('/foo/data_template2');
 $client->process_app('SingleFileTestApp', $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');

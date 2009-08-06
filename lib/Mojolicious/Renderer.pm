@@ -28,12 +28,6 @@ sub new {
             # Initialize cache
             $r->{_mt_cache} ||= {};
 
-            # Shortcut
-            $c->app->log->error(
-                qq/Template "$template" missing or not readable./)
-              and return
-              unless -r $path || $r->{_mt_cache}->{$path};
-
             # Check cache
             my $mt = $r->{_mt_cache}->{$path};
 
@@ -44,8 +38,34 @@ sub new {
             else {
 
                 # Initialize
-                $mt = $r->{_mt_cache}->{$path} = Mojo::Template->new;
-                $$output = $mt->render_file($path, $c);
+                $mt = Mojo::Template->new;
+
+                # Class
+                my $class =
+                     $c->stash->{epl_class}
+                  || $ENV{MOJO_EPL_CLASS}
+                  || 'main';
+
+                # Try DATA section
+                if (my $d = Mojo::Script->new->get_data($template, $class)) {
+                    $mt->namespace($class);
+                    $$output = $mt->render($d, $c);
+                }
+
+                # Try template
+                else {
+
+                    # Exists and readable?
+                    $c->app->log->error(
+                        qq/Template "$template" missing or not readable./)
+                      and return
+                      unless -r $path;
+
+                    $$output = $mt->render_file($path, $c);
+                }
+
+                # Cache
+                $r->{_mt_cache}->{$path} = $mt;
             }
 
             # Exception
@@ -79,46 +99,6 @@ sub new {
 
             # Success or exception?
             return ref $$output ? 0 : 1;
-        }
-    );
-
-    # Eplite
-    $self->add_handler(
-        eplite => sub {
-            my ($r, $c, $output, $options) = @_;
-
-            # Template
-            my $template = $r->template_name($options);
-            my $path     = $r->template_path($options);
-
-            # Class
-            my $class =
-                 delete $c->stash->{eplite_class}
-              || $ENV{MOJO_EPLITE_CLASS}
-              || 'main';
-
-            # Prepare
-            unless ($r->{_mt_cache}->{$path}) {
-
-                # Data
-                my $d = Mojo::Script->new->get_data($template, $class);
-
-                # Nothing found
-                $c->app->log->debug(
-                    qq/Template "$template" not found in class "$class"./)
-                  and return
-                  unless $d;
-
-                # Template
-                my $t = Mojo::Template->new;
-                $t->namespace($class);
-                $t->parse($d);
-                $t->build;
-                $r->{_mt_cache}->{$path} = $t;
-            }
-
-            # Render
-            return $r->handler->{epl}->($r, $c, $output, $options);
         }
     );
 

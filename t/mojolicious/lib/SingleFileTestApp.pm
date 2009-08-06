@@ -32,27 +32,19 @@ sub bar {
     $self->render_text($self->url_for);
 }
 
-sub eplite_template {
-    shift->render(
-        'index',
-        handler      => 'eplite',
-        eplite_class => 'SingleFileTestApp::Foo'
-    );
+sub data_template {
+    shift->render('index', epl_class => 'SingleFileTestApp::Foo');
 }
 
-sub eplite_template2 {
-    shift->stash(
-        template     => 'too',
-        handler      => 'eplite',
-        eplite_class => 'SingleFileTestApp::Foo'
-    );
+sub data_template2 {
+    shift->stash(template => 'too', epl_class => 'SingleFileTestApp::Foo');
 }
 
 sub index { shift->stash(template => 'withlayout', msg => 'works great!') }
 
 1;
 __DATA__
-@@ index.html.eplite
+@@ index.html.epl
 <%= 20 + 3 %> works!
-@@ too.html.eplite
+@@ too.html.epl
 This one works too!

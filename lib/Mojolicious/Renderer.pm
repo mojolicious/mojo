@@ -22,8 +22,8 @@ sub new {
             my ($r, $c, $output, $options) = @_;
 
             # Template
-            my $template = $r->template_name($options);
-            my $path     = $r->template_path($options);
+            my $t    = $r->template_name($options);
+            my $path = $r->template_path($options);
 
             # Initialize cache
             $r->{_mt_cache} ||= {};
@@ -46,22 +46,20 @@ sub new {
                   || $ENV{MOJO_EPL_CLASS}
                   || 'main';
 
+                # Try template
+                if (-r $path) { $$output = $mt->render_file($path, $c) }
+
                 # Try DATA section
-                if (my $d = Mojo::Script->new->get_data($template, $class)) {
+                elsif (my $d = Mojo::Script->new->get_data($t, $class)) {
                     $mt->namespace($class);
                     $$output = $mt->render($d, $c);
                 }
 
-                # Try template
+                # No template
                 else {
-
-                    # Exists and readable?
                     $c->app->log->error(
-                        qq/Template "$template" missing or not readable./)
-                      and return
-                      unless -r $path;
-
-                    $$output = $mt->render_file($path, $c);
+                        qq/Template "$t" missing or not readable./)
+                      and return;
                 }
 
                 # Cache
@@ -74,7 +72,7 @@ sub new {
                 $$output = '';
 
                 # Log
-                $c->app->log->error(qq/Template error in "$template": $e/);
+                $c->app->log->error(qq/Template error in "$t": $e/);
 
                 # Development mode
                 if ($c->app->mode eq 'development') {

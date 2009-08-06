@@ -176,10 +176,10 @@ template detection and back referencing with C<url_for>.
 
     __DATA__
 
-    @@ index.html.eplite
+    @@ index.html.epl
     <a href="<%= shift->url_for('foo') %>">Foo</a>.
 
-    @@ foo.html.eplite
+    @@ foo.html.epl
     <a href="<%= shift->url_for('index') %>">Home</a>.
 
 Templates can have layouts.
@@ -192,10 +192,10 @@ Templates can have layouts.
 
     __DATA__
 
-    @@ with_layout.html.eplite
+    @@ with_layout.html.epl
     We've got content!
 
-    @@ layouts/green.html.eplite
+    @@ layouts/green.html.epl
     <!html>
         <head><title>Green!</title></head>
         <body><%= shift->render_inner %></body>
@@ -227,7 +227,7 @@ Relaxed placeholders allow matching of everything until a C</> occurs.
 
     __DATA__
 
-    @@ groovy.html.eplite
+    @@ groovy.html.epl
     Your name is <%= shift->stash('you') %>.
 
 Wildcard placeholders allow matching absolutely everything, including
@@ -240,7 +240,7 @@ C</> and C<.>.
 
     __DATA__
 
-    @@ groovy.html.eplite
+    @@ groovy.html.epl
     Your name is <%= shift->stash('you') %>.
 
 Routes can be restricted to specific request methods.
@@ -283,7 +283,7 @@ Routes allow default values to make placeholders optional.
 
     __DATA__
 
-    @@ groovy.txt.eplite
+    @@ groovy.txt.epl
     % my $self = shift;
     My name is <%= $self->stash('name') %>.
 
@@ -296,7 +296,7 @@ All those features can be easily used together.
 
     __DATA__
 
-    @@ welcome.html.eplite
+    @@ welcome.html.epl
     % my $self = shift;
     Stuff is <%= $self->stash('stuff') %>.
     Query param name is <%= $self->req->param('name') %>.
@@ -326,7 +326,7 @@ multiple features at once.
     shagadelic;
     __DATA__
 
-    @@ index.html.eplite
+    @@ index.html.epl
     % my $self = shift;
     % $self->stash(layout => 'funky');
     Who is groovy?
@@ -335,15 +335,15 @@ multiple features at once.
         <input type="submit" value="Woosh!">
     </form>
 
-    @@ welcome.html.eplite
+    @@ welcome.html.epl
     % my $self = shift;
     <%= $self->stash('groovy') %> is groovy!
     <%= $self->render_partial(template => 'menu') %>
 
-    @@ menu.html.eplite
+    @@ menu.html.epl
     <a href="<%= shift->url_for('index') %>">Try again</a>
 
-    @@ layouts/funky.html.eplite
+    @@ layouts/funky.html.epl
     % my $self = shift;
     <!html>
         <head><title>Funky!</title></head>
@@ -363,13 +363,13 @@ Formats can be automatically detected by looking at file extensions.
 
     __DATA__
 
-    @@ detected.html.eplite
+    @@ detected.html.epl
     <!html>
         <head><title>Detected!</title></head>
         <body>HTML was detected.</body>
     </html>
 
-    @@ detected.txt.eplite
+    @@ detected.txt.epl
     TXT was detected.
 
 External templates will be searched by the renderer in a C<templates>

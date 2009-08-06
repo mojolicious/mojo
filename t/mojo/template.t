@@ -243,7 +243,7 @@ $output = $mt->render(<<'EOF');
 EOF
 is($output, "<html>2222</html>\\\\\\\n");
 
-# HTML escape
+# XML escape
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 <html><%== '<html>' %>

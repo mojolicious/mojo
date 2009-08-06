@@ -66,7 +66,7 @@ sub build {
             # Expression that needs to be escaped
             if ($type eq 'escp') {
                 $lines[-1]
-                  .= "\$_M .= Mojo::ByteStream->new($value)->html_escape;";
+                  .= "\$_M .= Mojo::ByteStream->new($value)->xml_escape;";
             }
         }
     }
@@ -387,11 +387,11 @@ like that.
 
     <% Inline Perl %>
     <%= Perl expression, replaced with result %>
-    <%== Perl expression, replaced with HTML escaped result %>
+    <%== Perl expression, replaced with XML escaped result %>
     <%# Comment, useful for debugging %>
     % Perl line
     %= Perl expression line, replaced with result
-    %== Perl expression line, replaced with HTML escaped result
+    %== Perl expression line, replaced with XML escaped result
     %# Comment line, useful for debugging
 
 L<Mojo::Template> templates work just like Perl subs (actually they get

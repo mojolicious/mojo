@@ -500,6 +500,21 @@ sub url_unescape {
     return $self;
 }
 
+sub xml_escape {
+    my $self = shift;
+
+    # Replace "&", "<", ">", """ and "'"
+    for ($self->{bytestream}) {
+        s/&/&amp;/g;
+        s/</&lt;/g;
+        s/>/&gt;/g;
+        s/"/&quot;/g;
+        s/'/&apos;/g;
+    }
+
+    return $self;
+}
+
 # Helper for url_sanitize
 sub _sanitize {
     my $hex = shift;
@@ -556,6 +571,7 @@ Mojo::ByteStream - ByteStream
     $stream->url_escape;
     $stream->url_sanitize;
     $stream->url_unescape;
+    $stream->xml_escape;
 
     my $length = $stream->length;
 
@@ -662,5 +678,9 @@ the following new ones.
 =head2 C<url_unescape>
 
     $stream = $stream->url_unescape;
+
+=head2 C<xml_escape>
+
+    $stream = $stream->xml_escape;
 
 =cut

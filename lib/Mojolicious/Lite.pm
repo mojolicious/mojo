@@ -187,7 +187,7 @@ Templates can have layouts.
     # GET /with_layout
     get '/with_layout' => sub {
         my $self = shift;
-        $self->render(template => 'with_layout', layout => 'green');
+        $self->render('with_layout', layout => 'green');
     };
 
     __DATA__
@@ -222,7 +222,7 @@ Relaxed placeholders allow matching of everything until a C</> occurs.
 
     # GET /hello/*
     get '/hello/(.you)' => sub {
-        shift->render(template => 'groovy');
+        shift->render('groovy');
     };
 
     __DATA__
@@ -235,7 +235,7 @@ C</> and C<.>.
 
     # /hello/*
     get '/hello/(*you)' => sub {
-        shift->render(template => 'groovy');
+        shift->render('groovy');
     };
 
     __DATA__
@@ -278,7 +278,7 @@ Routes allow default values to make placeholders optional.
     # /hello/*
     get '/hello/:name' => {name => 'Sebastian'} => sub {
         my $self = shift;
-        $self->render(template => 'groovy', format => 'txt');
+        $self->render('groovy', format => 'txt');
     };
 
     __DATA__
@@ -291,7 +291,7 @@ All those features can be easily used together.
 
     # /everything/*?name=*
     get '/everything/:stuff' => [stuff => qr/\d+/] => {stuff => 23} => sub {
-        shift->render(template => 'welcome');
+        shift->render('welcome');
     };
 
     __DATA__
@@ -338,7 +338,7 @@ multiple features at once.
     @@ welcome.html.epl
     % my $self = shift;
     <%= $self->stash('groovy') %> is groovy!
-    <%= $self->render_partial(template => 'menu') %>
+    <%= $self->render_partial('menu') %>
 
     @@ menu.html.epl
     <a href="<%= shift->url_for('index') %>">Try again</a>
@@ -358,7 +358,7 @@ Formats can be automatically detected by looking at file extensions.
     # /detection.txt
     get '/detection' => sub {
         my $self = shift;
-        $self->render(template => 'detected');
+        $self->render('detected');
     };
 
     __DATA__
@@ -380,7 +380,7 @@ directory.
         my $self = shift;
 
         # templates/foo/bar.html.epl
-        $self->render(template => 'foo/bar');
+        $self->render('foo/bar');
     };
 
 Static files will be automatically served from the C<public> directory if it

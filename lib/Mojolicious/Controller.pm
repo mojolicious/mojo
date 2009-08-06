@@ -43,9 +43,6 @@ sub render {
         }
     }
 
-    # Format
-    $self->stash->{format} ||= 'html';
-
     # Render
     return $self->app->renderer->render($self);
 }

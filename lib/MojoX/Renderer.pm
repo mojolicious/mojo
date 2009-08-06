@@ -10,6 +10,7 @@ use base 'Mojo::Base';
 use File::Spec;
 use MojoX::Types;
 
+__PACKAGE__->attr('default_format', default => 'html');
 __PACKAGE__->attr('default_handler');
 __PACKAGE__->attr('handler', default => sub { {} });
 __PACKAGE__->attr('types',   default => sub { MojoX::Types->new });
@@ -42,7 +43,7 @@ sub render {
     my $template = delete $c->stash->{template};
 
     # Format
-    my $format = $c->stash->{format} || 'html';
+    my $format = $c->stash->{format} || $self->default_format;
 
     # Handler
     my $handler = $c->stash->{handler};
@@ -78,7 +79,7 @@ sub render {
         $options->{handler} = $handler;
 
         # Format
-        $format = $c->stash->{format} || 'html';
+        $format = $c->stash->{format} || $self->default_format;
         $options->{format} = $format;
 
         # Fix
@@ -162,6 +163,11 @@ L<MojoX::Renderer> is a MIME type based renderer.
 =head2 ATTRIBUTES
 
 L<MojoX::Types> implements the follwing attributes.
+
+=head2 C<default_format>
+
+    my $default = $renderer->default_format;
+    $renderer   = $renderer->default_format('html');
 
 =head2 C<default_handler>
 

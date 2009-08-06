@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 316;
+use Test::More tests => 319;
 
 use Mojo::Filter::Chunked;
 use Mojo::Headers;
@@ -734,7 +734,7 @@ is($cookies->[0]->path,        '/test');
 is($res->cookie('foo')->value, 'bar');
 is($res->cookie('foo')->path,  '/test');
 
-# Build and parse HTTP 1.1 response with 2 cookies
+# Build and parse HTTP 1.1 response with 3 cookies
 $res = Mojo::Message::Response->new;
 $res->code(404);
 $res->headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
@@ -750,12 +750,20 @@ $res->cookies(
         path  => '/test/23'
     )
 );
+$res->headers->set_cookie2(
+    Mojo::Cookie::Response->new(
+        name  => 'baz',
+        value => 'yada',
+        path  => '/foobar'
+    )
+);
 is($res->build,
         "HTTP/1.1 404 Not Found\x0d\x0a"
       . "Date: Sun, 17 Aug 2008 16:27:35 GMT\x0d\x0a"
       . "Content-Length: 0\x0d\x0a"
       . "Set-Cookie: foo=bar; Version=1; Path=/foobar\x0d\x0a"
-      . "Set-Cookie: bar=baz; Version=1; Path=/test/23\x0d\x0a\x0d\x0a");
+      . "Set-Cookie: bar=baz; Version=1; Path=/test/23\x0d\x0a"
+      . "Set-Cookie2: baz=yada; Version=1; Path=/foobar\x0d\x0a\x0d\x0a");
 my $res2 = Mojo::Message::Response->new;
 $res2->parse($res->build);
 is($res2->state,                   'done');
@@ -764,9 +772,12 @@ is($res2->major_version,           1);
 is($res2->minor_version,           1);
 is($res2->headers->content_length, 0);
 is(defined $res2->cookie('foo'),   1);
+is(defined $res2->cookie('baz'),   1);
 is(defined $res2->cookie('bar'),   1);
 is($res2->cookie('foo')->path,     '/foobar');
 is($res2->cookie('foo')->value,    'bar');
+is($res2->cookie('baz')->path,     '/foobar');
+is($res2->cookie('baz')->value,    'yada');
 is($res2->cookie('bar')->path,     '/test/23');
 is($res2->cookie('bar')->value,    'baz');
 

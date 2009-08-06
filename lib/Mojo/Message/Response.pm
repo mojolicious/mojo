@@ -83,17 +83,18 @@ sub cookies {
     }
 
     # Set-Cookie2
+    my $cookies = [];
     if (my $cookie2 = $self->headers->set_cookie2) {
-        return Mojo::Cookie::Response->parse($cookie2);
+        push @$cookies, @{Mojo::Cookie::Response->parse($cookie2)};
     }
 
     # Set-Cookie
-    elsif (my $cookie = $self->headers->set_cookie) {
-        return Mojo::Cookie::Response->parse($cookie);
+    if (my $cookie = $self->headers->set_cookie) {
+        push @$cookies, @{Mojo::Cookie::Response->parse($cookie)};
     }
 
     # No cookies
-    return [];
+    return $cookies;
 }
 
 sub default_message { $MESSAGES{$_[1] || $_[0]->code || 200} }

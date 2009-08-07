@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 79;
+use Test::More tests => 75;
 
 # I don't want you driving around in a car you built yourself.
 # You can sit there complaining, or you can knit me some seat belts.
@@ -23,8 +23,6 @@ $url = Mojo::URL->new(
 is($url->is_abs,   1);
 is($url->scheme,   'http');
 is($url->userinfo, 'sri:foobar');
-is($url->user,     'sri');
-is($url->password, 'foobar');
 is($url->host,     'kraih.com');
 is($url->port,     '8080');
 is($url->path,     '/test/index.html');
@@ -116,8 +114,6 @@ my $clone = $url->clone;
 is($clone->is_abs,   1);
 is($clone->scheme,   'http');
 is($clone->userinfo, 'sri:foobar');
-is($clone->user,     'sri');
-is($clone->password, 'foobar');
 is($clone->host,     'kraih.com');
 is($clone->port,     '8080');
 is($clone->path,     '/test/index.html');
@@ -137,7 +133,7 @@ $clone = $url->clone;
 is("$url",                    '/test/index.html');
 is($clone->is_abs,            undef);
 is($clone->scheme,            undef);
-is($clone->host,              '');
+is($clone->host,              undef);
 is($clone->base->scheme,      'http');
 is($clone->base->host,        '127.0.0.1');
 is($clone->path,              '/test/index.html');

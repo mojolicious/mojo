@@ -41,7 +41,7 @@ This file documents the revision history for Perl extension Mojo.
         - Simplified Mojo::Base.
         - Cleaned up Mojo::Date.
         - Cleaned up Mojo::Transaction.
-        - Removed address method Mojo::URL.
+        - Removed address, password and user methods from Mojo::URL.
         - Fixed cloning of urls with base in Mojo::URL.
         - Fixed parsing of multiple headers and cookies with same name.
 

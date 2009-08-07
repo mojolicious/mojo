@@ -12,7 +12,7 @@ use Mojo::ByteStream 'b';
 use Mojo::Parameters;
 use Mojo::Path;
 
-__PACKAGE__->attr([qw/fragment host password port scheme user/]);
+__PACKAGE__->attr([qw/fragment host port scheme userinfo/]);
 __PACKAGE__->attr('base', default => sub { Mojo::URL->new });
 
 # RFC 3986
@@ -50,17 +50,19 @@ sub authority {
             $port = $2;
         }
 
-        $self->userinfo($userinfo);
-        $self->host($host);
+        $self->userinfo($userinfo ? b($userinfo)->url_unescape : undef);
+        $self->host($host         ? b($host)->url_unescape     : undef);
         $self->port($port);
 
         return $self;
     }
 
     # *( unreserved / pct-encoded / sub-delims )
-    my $host     = b($self->host)->url_escape("$UNRESERVED$SUBDELIM");
-    my $port     = $self->port;
-    my $userinfo = $self->userinfo;
+    my $host = b($self->host)->url_escape("$UNRESERVED$SUBDELIM");
+    my $port = $self->port;
+
+    # *( unreserved / pct-encoded / sub-delims / ":" )
+    my $userinfo = b($self->userinfo)->url_escape("$UNRESERVED$SUBDELIM\:");
 
     # Format
     $authority .= "$userinfo\@" if $userinfo;
@@ -220,33 +222,6 @@ sub to_string {
     return $url;
 }
 
-sub userinfo {
-    my ($self, $userinfo) = @_;
-
-    # Set
-    if (defined $userinfo) {
-        my $user     = $userinfo;
-        my $password = '';
-
-        if ($user =~ /^([^\:]*)\:(.*)$/) {
-            $user     = $1;
-            $password = $2;
-        }
-
-        $self->user(b($user)->url_unescape->to_string);
-        $self->password(b($password)->url_unescape->to_string);
-
-        return $self;
-    }
-
-    # *( unreserved / pct-encoded / sub-delims / ":" )
-    my $user     = b($self->user)->url_escape("$UNRESERVED$SUBDELIM\:");
-    my $password = b($self->password)->url_escape("$UNRESERVED$SUBDELIM\:");
-
-    # Format
-    return $user ? "$user:$password" : undef;
-}
-
 1;
 __END__
 
@@ -264,8 +239,6 @@ Mojo::URL - Uniform Resource Locator
     );
     print $url->scheme;
     print $url->userinfo;
-    print $url->user;
-    print $url->password;
     print $url->host;
     print $url->port;
     print $url->path;
@@ -311,11 +284,6 @@ L<Mojo::URL> implements the following attributes.
     my $host = $url->host;
     $url     = $url->host('127.0.0.1');
 
-=head2 C<password>
-
-    my $password = $url->password;
-    $url         = $url->password('pass;w0rd');
-
 =head2 C<port>
 
     my $port = $url->port;
@@ -325,11 +293,6 @@ L<Mojo::URL> implements the following attributes.
 
     my $scheme = $url->scheme;
     $url       = $url->scheme('http');
-
-=head2 C<user>
-
-    my $user = $url->user;
-    $url     = $url->user('root');
 
 =head2 C<userinfo>
 

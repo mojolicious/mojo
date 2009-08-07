@@ -17,27 +17,6 @@ sub new {
     # Transactions
     $self->{_txs} = [@_];
 
-    # Check transactions
-    if (@{$self->{_txs}}) {
-        my ($scheme, $host, $address, $port) = $self->client_info;
-
-        for my $i (0 .. $#{$self->{_txs}}) {
-
-            my ($tx_scheme, $tx_host, $tx_address, $tx_port) =
-              $self->{_txs}->[$i]->client_info;
-
-            # Check
-            unless ($scheme eq $tx_scheme
-                && ($host eq $tx_host || $address eq $tx_address)
-                && $port eq $tx_port)
-            {
-
-                # Mismatch
-                $self->error("Transaction $i does not belong in pipeline.");
-                last;
-            }
-        }
-    }
     return $self;
 }
 

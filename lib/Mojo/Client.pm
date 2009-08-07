@@ -22,7 +22,13 @@ sub connect {
     my ($self, $tx) = @_;
 
     # Info
-    my ($scheme, $host, $address, $port) = $tx->client_info;
+    my ($scheme, $host, $port) = $tx->client_info;
+
+    # Address
+    my $address =
+        $host =~ /\b(?:\d{1,3}\.){3}\d{1,3}\b/
+      ? $host
+      : inet_ntoa(inet_aton($host));
 
     # Try to get a cached connection
     my $connection = $self->withdraw_connection("$scheme:$host:$port");
@@ -44,7 +50,7 @@ sub connect {
 sub disconnect {
     my ($self, $tx) = @_;
 
-    my ($scheme, $host, $address, $port) = $tx->client_info;
+    my ($scheme, $host, $port) = $tx->client_info;
 
     # Deposit connection for later or kill socket
     $tx->keep_alive

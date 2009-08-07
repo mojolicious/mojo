@@ -11,7 +11,6 @@ use overload '""' => sub { shift->to_string }, fallback => 1;
 use Mojo::ByteStream 'b';
 use Mojo::Parameters;
 use Mojo::Path;
-use Socket;
 
 __PACKAGE__->attr([qw/fragment host password port scheme user/]);
 __PACKAGE__->attr('base', default => sub { Mojo::URL->new });
@@ -28,29 +27,6 @@ sub new {
     my $self = shift->SUPER::new();
     $self->parse(@_);
     return $self;
-}
-
-sub address {
-    my ($self, $address) = @_;
-
-    # Set
-    if ($address) {
-        $self->{address} = $address;
-        $self->host($address) unless $self->host;
-        return $self;
-    }
-
-    # Cached
-    return $self->{address} if $self->{address};
-
-    # Resolve
-    my $host = $self->host;
-    $self->{address} =
-        $host =~ /\b(?:\d{1,3}\.){3}\d{1,3}\b/
-      ? $host
-      : inet_ntoa(inet_aton($host));
-
-    return $self->{address};
 }
 
 sub authority {
@@ -369,11 +345,6 @@ following new ones.
 
     my $url = Mojo::URL->new;
     my $url = Mojo::URL->new('http://127.0.0.1:3000/foo?f=b&baz=2#foo');
-
-=head2 C<address>
-
-    my $address = $url->address;
-    $url        = $url->address('127.0.0.1');
 
 =head2 C<clone>
 

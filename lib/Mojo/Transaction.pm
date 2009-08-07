@@ -85,20 +85,18 @@ sub client_get_chunk {
 sub client_info {
     my $self = shift;
 
-    my $scheme  = $self->req->url->scheme;
-    my $host    = $self->req->url->host;
-    my $address = $self->req->url->address;
-    my $port    = $self->req->url->port || 80;
+    my $scheme = $self->req->url->scheme;
+    my $host   = $self->req->url->host;
+    my $port   = $self->req->url->port || 80;
 
     # Proxy
     if (my $proxy = $self->req->proxy) {
-        $scheme  = $proxy->scheme;
-        $host    = $proxy->host;
-        $address = $proxy->address;
-        $port    = $proxy->port || 80;
+        $scheme = $proxy->scheme;
+        $host   = $proxy->host;
+        $port   = $proxy->port || 80;
     }
 
-    return ($scheme, $host, $address, $port);
+    return ($scheme, $host, $port);
 }
 
 sub client_leftovers {
@@ -629,7 +627,7 @@ implements the following new ones.
 
 =head2 C<client_info>
 
-    my ($scheme, $host, $address, $port) = $tx->client_info;
+    my ($scheme, $host, $port) = $tx->client_info;
 
 =head2 C<client_leftovers>
 

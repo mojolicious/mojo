@@ -9,7 +9,7 @@ use Test::More;
 
 plan skip_all => 'set TEST_PIPELINE to enable this test'
   unless $ENV{TEST_PIPELINE};
-plan tests => 40;
+plan tests => 34;
 
 # Are we there yet?
 # No
@@ -105,22 +105,6 @@ ok($tx1->is_done);
 ok($tx2->is_done);
 is($tx1->res->code, 200);
 is($tx2->res->code, 500);
-
-# Bad Pipeline (host)
-$tx1  = Mojo::Transaction->new_get("http://127.0.0.1:3000/7/");
-$tx2  = Mojo::Transaction->new_get("http://labs.kraih.com:3000/8/");
-$pipe = Mojo::Pipeline->new($tx1, $tx2);
-ok($pipe->has_error);
-is($tx1->state, 'start');
-is($tx2->state, 'start');
-
-# Bad Pipeline (port)
-$tx1  = Mojo::Transaction->new_get("http://labs.kraih.com/7/");
-$tx2  = Mojo::Transaction->new_get("http://labs.kraih.com:3000/8/");
-$pipe = Mojo::Pipeline->new($tx1, $tx2);
-ok($pipe->has_error);
-is($tx1->state, 'start');
-is($tx2->state, 'start');
 
 # Unexpected 1xx response
 $tx1  = Mojo::Transaction->new_head("http://127.0.0.1:3000/9/");

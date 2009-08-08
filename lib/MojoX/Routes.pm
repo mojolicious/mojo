@@ -43,12 +43,12 @@ sub match {
     return unless $match;
 
     # Match object
-    $match = MojoX::Routes::Match->new($match, @_)
+    $match = MojoX::Routes::Match->new($match)
       unless ref $match && $match->isa('MojoX::Routes::Match');
 
     # Request method
     if (my $methods = $self->{_methods}) {
-        my $m = lc $match->method;
+        my $m = lc $match->tx->req->method;
         return unless $methods->{$m};
     }
 

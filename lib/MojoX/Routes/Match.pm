@@ -10,21 +10,16 @@ use base 'Mojo::Base';
 use Mojo::URL;
 
 __PACKAGE__->attr('captures', default => sub { {} });
-__PACKAGE__->attr('endpoint');
-__PACKAGE__->attr('method', default => sub {'get'});
-__PACKAGE__->attr('path',   default => sub {'/'});
-__PACKAGE__->attr('stack',  default => sub { [] });
+__PACKAGE__->attr([qw/endpoint tx/]);
+__PACKAGE__->attr('path',  default => sub {'/'});
+__PACKAGE__->attr('stack', default => sub { [] });
 
 # I'm Bender, baby, please insert liquor!
 sub new {
     my $self = shift->SUPER::new();
-
-    # Method and path
-    if ($_[1]) { $self->method($_[0])->path($_[1]) }
-
-    # Path only
-    else { $self->path($_[0]) }
-
+    my $tx   = shift;
+    $self->tx($tx);
+    $self->path($tx->req->url->path->to_string);
     return $self;
 }
 
@@ -142,11 +137,6 @@ L<MojoX::Routes::Match> implements the following attributes.
     my $endpoint = $match->endpoint;
     $match       = $match->endpoint(1);
 
-=head2 C<method>
-
-    my $method = $match->method;
-    $match     = $match->method('get');
-
 =head2 C<path>
 
     my $path = $match->path;
@@ -157,6 +147,11 @@ L<MojoX::Routes::Match> implements the following attributes.
     my $stack = $match->stack;
     $match    = $match->stack([{foo => 'bar'}]);
 
+=head2 C<tx>
+
+    my $tx = $match->tx;
+    $match = $match->tx(Mojo::Transaction->new);
+
 =head1 METHODS
 
 L<MojoX::Routes::Match> inherits all methods from L<Mojo::Base> and
@@ -165,7 +160,7 @@ implements the follwing the ones.
 =head2 C<new>
 
     my $match = MojoX::Routes::Match->new;
-    my $match = MojoX::Routes::Match->new('/foo/bar');
+    my $match = MojoX::Routes::Match->new(Mojo::Transaction->new);
 
 =head2 C<is_path_empty>
 

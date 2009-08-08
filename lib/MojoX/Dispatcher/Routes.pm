@@ -20,7 +20,7 @@ sub dispatch {
     my ($self, $c) = @_;
 
     # Match
-    my $match = $self->match($c->req->method, $c->req->url->path->to_string);
+    my $match = $self->match($c->tx);
     $c->match($match);
 
     # No match

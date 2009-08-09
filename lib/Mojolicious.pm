@@ -115,9 +115,7 @@ sub handler {
     }
 
     # Build default controller and process
-    eval {
-        $self->process($self->controller_class->new(app => $self, tx => $tx));
-    };
+    eval { $self->process($class->new(app => $self, tx => $tx)) };
     $self->log->error("Processing request failed: $@") if $@;
 
     # End timer

@@ -30,7 +30,7 @@ __PACKAGE__->attr('app_class',
 __PACKAGE__->attr(
     'build_tx_cb',
     default => sub {
-        return sub {
+        sub {
             my $self = shift;
 
             # Reload
@@ -46,7 +46,7 @@ __PACKAGE__->attr(
 __PACKAGE__->attr(
     'continue_handler_cb',
     default => sub {
-        return sub {
+        sub {
             my ($self, $tx) = @_;
             if ($self->app->can('continue_handler')) {
                 $self->app->continue_handler($tx);

@@ -371,7 +371,7 @@ multiple features at once.
         </body>
     </html>
 
-Conditions such as C<agent> allow even more powerful route constraints.
+Conditions such as C<agent> allow even more powerful route constructs.
 
     # /foo
     get '/foo' => (agent => qr/Firefox/) => sub {

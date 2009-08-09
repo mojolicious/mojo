@@ -25,25 +25,56 @@ sub run {
     die "Application has no routes.\n" unless $app->can('routes');
 
     # Walk
-    $self->_walk($_, 0) for @{$app->routes->children};
+    my $routes = [];
+    $self->_walk($_, 0, $routes) for @{$app->routes->children};
+
+    # Draw
+    $self->_draw($routes);
 
     return $self;
 }
 
-sub _walk {
-    my ($self, $node, $depth) = @_;
+sub _draw {
+    my ($self, $routes) = @_;
 
-    # Show
+    # Length
+    my $length = 0;
+    for my $node (@$routes) {
+        my $l = length $node->[0];
+        $length = $l if $l > $length;
+    }
+
+    # Draw
+    foreach my $node (@$routes) {
+
+        # Regex
+        $node->[1]->pattern->_compile;
+        my $regex = $node->[1]->pattern->regex;
+
+        # Padding
+        my $name = $node->[0];
+        my $padding = ' ' x ($length - length $name);
+
+        # Print
+        print "$name$padding   $regex\n";
+    }
+}
+
+sub _walk {
+    my ($self, $node, $depth, $routes) = @_;
+
+    # Line
     my $pattern = $node->pattern->pattern;
     my $name    = $node->name;
-    my $line    = ' ' x ($depth * 2);
+    my $line    = ' ' x ($depth * 4);
     $line .= $pattern;
-    $line .= " -> $name" if $name;
-    print "$line\n";
+
+    # Store
+    push @$routes, [$line, $node];
 
     # Walk
     $depth++;
-    $self->_walk($_, $depth) for @{$node->children};
+    $self->_walk($_, $depth, $routes) for @{$node->children};
     $depth--;
 }
 

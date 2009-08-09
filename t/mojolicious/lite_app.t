@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 52;
+use Test::More tests => 60;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -57,6 +57,12 @@ post '/bar/:test' => {test => 'default'} => sub {
     my $self = shift;
     $self->render_text($self->stash('test'));
 };
+
+# GET /firefox/*
+get '/firefox/:stuff' => (agent => qr/Firefox/) => sub {
+    my $self = shift;
+    $self->render_text($self->url_for('foxy', stuff => 'foo'));
+} => 'foxy';
 
 # Oh Fry, I love you more than the moon, and the stars,
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
@@ -166,6 +172,22 @@ is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 is($tx->res->body,                            "Yea baby! with layout\n");
+
+# GET /firefox
+$tx = Mojo::Transaction->new_get('/firefox/bar', 'User-Agent' => 'Firefox');
+$client->process_app($app, $tx);
+is($tx->res->code,                            200);
+is($tx->res->headers->server,                 'Mojo (Perl)');
+is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+is($tx->res->body,                            '/firefox/foo');
+
+# GET /firefox
+$tx = Mojo::Transaction->new_get('/firefox/bar', 'User-Agent' => 'Explorer');
+$client->process_app($app, $tx);
+is($tx->res->code,                            404);
+is($tx->res->headers->server,                 'Mojo (Perl)');
+is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+like($tx->res->body, qr/File Not Found/);
 
 __DATA__
 @@ index.html.epl

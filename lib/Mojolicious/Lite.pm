@@ -30,17 +30,28 @@ sub import {
 
     # Route generator
     my $route = sub {
-        my $methods = shift;
+        my ($methods, @args) = @_;
 
         my ($cb, $constraints, $defaults, $name, $pattern);
+        my $conditions = [];
 
         # Route information
-        for my $arg (@_) {
+        my $condition;
+        while (my $arg = shift @args) {
+
+            # Condition can be everything
+            if ($condition) {
+                push @$conditions, $condition => $arg;
+                $condition = undef;
+            }
 
             # First scalar is the pattern
-            if (!ref $arg && !$pattern) { $pattern = $arg }
+            elsif (!ref $arg && !$pattern) { $pattern = $arg }
 
-            # Second scalar is the route name
+            # Scalar
+            elsif (!ref $arg && @args) { $condition = $arg }
+
+            # Last scalar is the route name
             elsif (!ref $arg) { $name = $arg }
 
             # Callback
@@ -62,8 +73,8 @@ sub import {
         $defaults = {%$defaults, callback => $cb};
 
         # Create route
-        $APP->routes->route($pattern, {@$constraints})->via($methods)
-          ->to($defaults)->name($name);
+        $APP->routes->route($pattern, {@$constraints})->over($conditions)
+          ->via($methods)->to($defaults)->name($name);
     };
 
     # Prepare exports
@@ -167,6 +178,7 @@ placeholders.
 
 All routes can have a name associated with them, this allows automatic
 template detection and back referencing with C<url_for>.
+Names are always the last argument.
 
     # /
     get '/' => 'index';
@@ -174,10 +186,17 @@ template detection and back referencing with C<url_for>.
     # /foo
     get '/foo' => 'foo';
 
+    # /bar
+    get '/bar' => sub {
+        my $self = shift;
+        $self->render_text('Hi!')
+    } => 'bar';
+
     __DATA__
 
     @@ index.html.epl
     <a href="<%= shift->url_for('foo') %>">Foo</a>.
+    <a href="<%= shift->url_for('bar') %>">Bar</a>.
 
     @@ foo.html.epl
     <a href="<%= shift->url_for('index') %>">Home</a>.
@@ -351,6 +370,18 @@ multiple features at once.
             <%= $self->render_inner %>
         </body>
     </html>
+
+Conditions such as C<agent> allow more powerful routes constraints.
+
+    # /foo
+    get '/foo' => (agent => qr/Firefox/) => sub {
+        shift->render_text('Congratulations, you are using a cool browser!');
+    }
+
+    # /foo
+    get '/foo' => (agent => qr/Internet Explorer/) => sub {
+        shift->render_text('Dude, you really need to upgrade to Firefox!');
+    }
 
 Formats can be automatically detected by looking at file extensions.
 

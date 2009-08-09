@@ -15,12 +15,45 @@ use Scalar::Util 'weaken';
 use constant DEBUG => $ENV{MOJOX_ROUTES_DEBUG} || 0;
 
 __PACKAGE__->attr([qw/block inline name parent/]);
-__PACKAGE__->attr('children', default => sub { [] });
-__PACKAGE__->attr('pattern',  default => sub { MojoX::Routes::Pattern->new });
+__PACKAGE__->attr([qw/children conditions/], default => sub { [] });
+__PACKAGE__->attr('dictionary',              default => sub { {} });
+__PACKAGE__->attr('pattern', default => sub { MojoX::Routes::Pattern->new });
 
 sub new {
     my $self = shift->SUPER::new();
+
+    # Parse
     $self->parse(@_);
+
+    # Method condition
+    $self->add_condition(
+        method => sub {
+            my ($r, $tx, $captures, $methods) = @_;
+
+            # Methods?
+            return unless $methods && ref $methods eq 'ARRAY';
+
+            # Match
+            for my $method (@$methods) {
+                return $captures if $method eq lc $tx->req->method;
+            }
+
+            # Nothing
+            return;
+        }
+    );
+
+    return $self;
+}
+
+sub add_condition {
+    my $self = shift;
+
+    # Merge
+    my $dictionary = ref $_[0] ? $_[0] : {@_};
+    $dictionary = {%{$self->dictionary}, %$dictionary};
+    $self->dictionary($dictionary);
+
     return $self;
 }
 
@@ -43,13 +76,27 @@ sub match {
     return unless $match;
 
     # Match object
-    $match = MojoX::Routes::Match->new($match)
+    $match = MojoX::Routes::Match->new($match)->dictionary($self->dictionary)
       unless ref $match && $match->isa('MojoX::Routes::Match');
 
-    # Request method
-    if (my $methods = $self->{_methods}) {
-        my $m = lc $match->tx->req->method;
-        return unless $methods->{$m};
+    # Conditions
+    for (my $i = 0; $i < @{$self->conditions}; $i += 2) {
+        my $name      = $self->conditions->[$i];
+        my $value     = $self->conditions->[$i + 1];
+        my $condition = $self->dictionary->{$name};
+
+        # No condition
+        return unless $condition;
+
+        # Match
+        my $captures =
+          $condition->($self, $match->tx, $match->captures, $value);
+
+        # Matched?
+        return unless $captures && ref $captures eq 'HASH';
+
+        # Merge captures
+        $match->captures($captures);
     }
 
     # Path
@@ -108,6 +155,19 @@ sub match {
     $match->endpoint($self) if $self->is_endpoint && $match->is_path_empty;
 
     return $match;
+}
+
+sub over {
+    my $self = shift;
+
+    # Shortcut
+    return $self unless @_;
+
+    # Conditions
+    my $conditions = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
+    $self->conditions($conditions);
+
+    return $self;
 }
 
 sub parse {
@@ -186,8 +246,8 @@ sub via {
     # Shortcut
     return $self unless @$methods;
 
-    # Cache
-    $self->{_methods} = {map { lc $_ => 1 } @$methods};
+    # Condition
+    push @{$self->conditions}, method => [map { lc $_ } @$methods];
 
     return $self;
 }
@@ -225,6 +285,16 @@ L<MojoX::Routes> implements the following attributes.
     my $children = $routes->children;
     $routes      = $routes->children([MojoX::Routes->new]);
 
+=head2 C<conditions>
+
+    my $conditions  = $routes->conditions;
+    $routes         = $routes->conditions([foo => qr/\w+/]);
+
+=head2 C<dictionary>
+
+    my $dictionary = $routes->dictionary;
+    $routes        = $routes->dictionary({foo => sub { ... }});
+
 =head2 C<inline>
 
     my $inline = $routes->inline;
@@ -255,6 +325,10 @@ follwing the ones.
     my $routes = MojoX::Routes->new;
     my $routes = MojoX::Routes->new('/:controller/:action');
 
+=head2 C<add_condition>
+
+    $routes = $routes->add_condition(foo => sub { ... });
+
 =head2 C<bridge>
 
     my $bridge = $routes->bridge;
@@ -275,6 +349,11 @@ follwing the ones.
     $match = $routes->match($match);
     my $match = $routes->match('/foo/bar');
     my $match = $routes->match(get => '/foo/bar');
+
+=head2 C<over>
+
+    $routes = $routes->over(foo => qr/\w+/);
+    $routes = $routes->over({foo => qr/\w+/});
 
 =head2 C<parse>
 

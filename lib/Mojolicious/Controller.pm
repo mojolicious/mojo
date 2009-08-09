@@ -47,8 +47,6 @@ sub render {
     return $self->app->renderer->render($self);
 }
 
-# Wow, there's a million aliens! I've never seen something so mind-blowing!
-# Ooh, a reception table with muffins!
 sub render_inner { delete shift->stash->{inner_template} }
 
 sub render_partial {

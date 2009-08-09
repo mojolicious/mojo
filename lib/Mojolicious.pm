@@ -7,9 +7,9 @@ use warnings;
 
 use base 'Mojo';
 
+use Mojolicious::Dispatcher;
 use Mojolicious::Renderer;
 use Mojolicious::Scripts;
-use MojoX::Dispatcher::Routes;
 use MojoX::Dispatcher::Static;
 use MojoX::Types;
 use Time::HiRes ();
@@ -18,8 +18,7 @@ __PACKAGE__->attr('controller_class', default => 'Mojolicious::Controller');
 __PACKAGE__->attr('mode',
     default => sub { ($ENV{MOJO_MODE} || 'development') });
 __PACKAGE__->attr('renderer', default => sub { Mojolicious::Renderer->new });
-__PACKAGE__->attr('routes',
-    default => sub { MojoX::Dispatcher::Routes->new });
+__PACKAGE__->attr('routes', default => sub { Mojolicious::Dispatcher->new });
 __PACKAGE__->attr('static',
     default => sub { MojoX::Dispatcher::Static->new });
 __PACKAGE__->attr('types', default => sub { MojoX::Types->new });

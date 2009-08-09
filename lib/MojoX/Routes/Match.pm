@@ -9,7 +9,7 @@ use base 'Mojo::Base';
 
 use Mojo::URL;
 
-__PACKAGE__->attr('captures', default => sub { {} });
+__PACKAGE__->attr([qw/captures dictionary/], default => sub { {} });
 __PACKAGE__->attr([qw/endpoint tx/]);
 __PACKAGE__->attr('path',  default => sub {'/'});
 __PACKAGE__->attr('stack', default => sub { [] });
@@ -132,10 +132,15 @@ L<MojoX::Routes::Match> implements the following attributes.
     my $captures = $match->captures;
     $match       = $match->captures({foo => 'bar'});
 
+=head2 C<dictionary>
+
+    my $dictionary = $match->dictionary;
+    $match         = $match->dictionary({foo => sub { ... }});
+
 =head2 C<endpoint>
 
     my $endpoint = $match->endpoint;
-    $match       = $match->endpoint(1);
+    $match       = $match->endpoint(MojoX::Routes->new);
 
 =head2 C<path>
 

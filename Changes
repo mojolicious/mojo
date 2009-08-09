@@ -38,6 +38,7 @@ This file documents the revision history for Perl extension Mojo.
           default controller in Mojolicious.
           There is also no $c argument anymore actions get called with, since
           everything is in $self now.
+        - Added conditions to MojoX::Routes.
         - Simplified Mojo::Base.
         - Cleaned up Mojo::Date.
         - Cleaned up Mojo::Transaction.

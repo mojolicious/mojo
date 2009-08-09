@@ -39,9 +39,11 @@ This file documents the revision history for Perl extension Mojo.
           There is also no $c argument anymore actions get called with, since
           everything is in $self now.
         - Added conditions to MojoX::Routes.
+        - Added routes script to Mojolicious.
         - Simplified Mojo::Base.
         - Cleaned up Mojo::Date.
         - Cleaned up Mojo::Transaction.
+        - Made build_tx a callback named build_tx_cb in Mojo.
         - Removed address, password and user methods from Mojo::URL.
         - Fixed cloning of urls with base in Mojo::URL.
         - Fixed parsing of multiple headers and cookies with same name.

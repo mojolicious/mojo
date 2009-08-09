@@ -13,6 +13,16 @@ use Mojo::Log;
 use Mojo::Scripts;
 use Mojo::Transaction;
 
+__PACKAGE__->attr(
+    'build_tx_cb',
+    default => sub {
+        sub {
+            my $tx = Mojo::Transaction->new;
+            $tx->res->headers->header('X-Powered-By' => 'Mojo (Perl)');
+            return $tx;
+          }
+    }
+);
 __PACKAGE__->attr('home', default => sub { Mojo::Home->new });
 __PACKAGE__->attr('log',  default => sub { Mojo::Log->new });
 
@@ -30,12 +40,6 @@ sub new {
       if -w $self->home->rel_file('log');
 
     return $self;
-}
-
-sub build_tx {
-    my $tx = Mojo::Transaction->new;
-    $tx->res->headers->header('X-Powered-By' => 'Mojo (Perl)');
-    return $tx;
 }
 
 sub handler { croak 'Method "handler" not implemented in subclass' }
@@ -108,6 +112,11 @@ For userfriendly documentation see L<Mojo::Manual>.
 
 L<Mojo> implements the following attributes.
 
+=head2 C<build_tx_cb>
+
+    my $cb = $mojo->build_tx_cb;
+    $mojo  = $mojo->build_tx_cb(sub { ... });
+
 =head2 C<home>
 
     my $home = $mojo->home;
@@ -126,10 +135,6 @@ new ones.
 =head2 C<new>
 
     my $mojo = Mojo->new;
-
-=head2 C<build_tx>
-
-    my $tx = $mojo->build_tx;
 
 =head2 C<handler>
 

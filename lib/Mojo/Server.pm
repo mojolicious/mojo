@@ -39,7 +39,7 @@ __PACKAGE__->attr(
                 delete $self->{app};
             }
 
-            return $self->app->build_tx;
+            return $self->app->build_tx_cb->($self->app);
           }
     }
 );

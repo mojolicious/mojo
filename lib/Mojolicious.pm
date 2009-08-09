@@ -62,16 +62,6 @@ sub new {
     eval { $self->startup(@_) };
     $self->log->error("Startup failed: $@") if $@;
 
-    # Load controller class
-    my $class = $self->controller_class;
-    if (my $e = Mojo::Loader->load($class)) {
-        $self->log->error(
-            ref $e
-            ? qq/Can't load controller class "$class": $e/
-            : qq/Controller class "$class" doesn't exist./
-        );
-    }
-
     return $self;
 }
 
@@ -113,6 +103,16 @@ sub handler {
 
     # Start timer
     my $start = [Time::HiRes::gettimeofday()];
+
+    # Load controller class
+    my $class = $self->controller_class;
+    if (my $e = Mojo::Loader->load($class)) {
+        $self->log->error(
+            ref $e
+            ? qq/Can't load controller class "$class": $e/
+            : qq/Controller class "$class" doesn't exist./
+        );
+    }
 
     # Build default controller and process
     eval {

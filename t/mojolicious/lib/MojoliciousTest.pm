@@ -57,7 +57,7 @@ sub startup {
     # /staged - authentication with bridges
     my $b =
       $r->bridge('/staged')->to(controller => 'foo', action => 'stage1');
-    $b->route->to(controller => 'foo', action => 'stage2');
+    $b->route->to(action => 'stage2');
 
     # /*/* - the default route
     $r->route('/(controller)/(action)')->to(action => 'index');

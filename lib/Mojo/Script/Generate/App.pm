@@ -44,8 +44,6 @@ __DATA__
 % my $class = shift;
 #!/usr/bin/env perl
 
-# Copyright (C) 2008-2009, Sebastian Riedel.
-
 use strict;
 use warnings;
 

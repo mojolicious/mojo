@@ -113,6 +113,10 @@ sub interpret {
     # Shortcut
     return unless $compiled;
 
+    # Catch warnings
+    local $SIG{__WARN__} =
+      sub { warn Mojo::Template::Exception->new(shift, $self->template) };
+
     # Catch errors
     local $SIG{__DIE__} =
       sub { die Mojo::Template::Exception->new(shift, $self->template) };

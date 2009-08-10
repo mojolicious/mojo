@@ -44,6 +44,7 @@ This file documents the revision history for Perl extension Mojo.
         - Cleaned up Mojo::Date.
         - Cleaned up Mojo::Transaction.
         - Made build_tx a callback named build_tx_cb in Mojo.
+        - Made the exception template a bit more fault tolerant.
         - Removed address, password and user methods from Mojo::URL.
         - Fixed cloning of urls with base in Mojo::URL.
         - Fixed parsing of multiple headers and cookies with same name.

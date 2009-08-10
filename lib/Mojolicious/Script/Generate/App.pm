@@ -177,7 +177,7 @@ like($tx->res->content->file->slurp, qr/Mojolicious Web Framework/i);
 % use Data::Dumper ();
 % my $self = shift;
 % my $s = $self->stash;
-% my $e = delete $s->{exception};
+% my $e = $self->stash('exception');
 % delete $s->{inner_template};
 <!html>
 <head><title>Exception</title></head>
@@ -187,13 +187,13 @@ like($tx->res->content->file->slurp, qr/Mojolicious Web Framework/i);
         <pre><%= $e->message %></pre>
         <pre>
 % for my $line (@{$e->lines_before}) {
-    <%= $line->[0] %>: <%== $line->[1] %>
+<%= $line->[0] %>: <%== $line->[1] %>
 % }
 % if ($e->line->[0]) {
-    <b><%= $e->line->[0] %>: <%== $e->line->[1] %></b>
+<b><%= $e->line->[0] %>: <%== $e->line->[1] %></b>
 % }
 % for my $line (@{$e->lines_after}) {
-    <%= $line->[0] %>: <%== $line->[1] %>
+<%= $line->[0] %>: <%== $line->[1] %>
 % }
         </pre>
         <pre>
@@ -202,11 +202,12 @@ like($tx->res->content->file->slurp, qr/Mojolicious Web Framework/i);
 % }
         </pre>
         <pre>
+% delete $s->{exception};
 %== Data::Dumper->new([$s])->Indent(1)->Terse(1)->Dump
+% $s->{exception} = $e;
         </pre>
     </body>
 </html>
-% $s->{exception} = $e;
 @@ layout
 % my $self = shift;
 <!doctype html>

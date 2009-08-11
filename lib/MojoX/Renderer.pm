@@ -13,8 +13,9 @@ use MojoX::Types;
 __PACKAGE__->attr(default_format => 'html');
 __PACKAGE__->attr('default_handler');
 __PACKAGE__->attr(handler => sub { {} });
-__PACKAGE__->attr(types   => sub { MojoX::Types->new });
-__PACKAGE__->attr(root    => '/');
+__PACKAGE__->attr(layout_prefix => 'layouts');
+__PACKAGE__->attr(types         => sub { MojoX::Types->new });
+__PACKAGE__->attr(root          => '/');
 
 # This is not how Xmas is supposed to be.
 # In my day Xmas was about bringing people together, not blowing them apart.
@@ -83,7 +84,7 @@ sub render {
         $options->{format} = $format;
 
         # Fix
-        $options->{template} = "layouts/$layout";
+        $options->{template} = $self->layout_prefix . "/$layout";
 
         # Render
         $self->_render_template($c, \$output, $options);

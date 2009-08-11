@@ -10,6 +10,8 @@ use base 'Mojo::Transaction';
 __PACKAGE__->attr(safe_post => 0);
 __PACKAGE__->attr(transactions => sub { [] });
 
+__PACKAGE__->attr('_all_written');
+
 # No children have ever meddled with the Republican Party and lived to tell
 # about it.
 sub new {
@@ -123,10 +125,10 @@ sub client_spin {
     $_->client_spin for @{$self->transactions};
 
     # Transaction finished
-    if (!$self->{_all_written} && $self->_writer->is_state('read_response')) {
+    if (!$self->_all_written && $self->_writer->is_state('read_response')) {
 
         # All written
-        $self->{_all_written} = 1 unless $self->_next_writer;
+        $self->_all_written(1) unless $self->_next_writer;
     }
 
     # Inherit state
@@ -306,7 +308,7 @@ sub _client_inherit_state {
 
         # State
         $self->state(
-              $self->{_all_written}
+              $self->_all_written
             ? $self->_reader->state
             : $self->_writer->state
         );

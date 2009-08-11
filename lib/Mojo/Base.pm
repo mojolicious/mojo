@@ -23,7 +23,12 @@ sub new {
 # so we optimize them by compiling our own code, don't be scared, we have
 # tests for every single case
 sub attr {
-    my ($class, $attrs, $default) = @_;
+    my $class   = shift;
+    my $attrs   = shift;
+    my $default = shift;
+
+    # Check for more arguments
+    Carp::croak('Attribute generator called with too many arguments') if @_;
 
     # Shortcut
     return unless $class && $attrs;

@@ -21,26 +21,22 @@ __PACKAGE__->attr(executable => 'mojo');
 __PACKAGE__->attr(home       => sub { Mojo::Home->new });
 __PACKAGE__->attr(timeout    => 5);
 
+__PACKAGE__->attr(_builder => sub { Test::Builder->new });
+__PACKAGE__->attr('_server');
+
 # Hello, my name is Barney Gumble, and I'm an alcoholic.
 # Mr Gumble, this is a girl scouts meeting.
 # Is it, or is it you girls can't admit that you have a problem?
-sub new {
-    my $self = shift->SUPER::new(@_);
-    $self->{_tb} = Test::Builder->new;
-    return $self;
-}
-
 sub find_executable_ok {
     my ($self, $desc) = @_;
-    my $tb   = $self->{_tb};
     my $path = $self->_find_executable;
-    $tb->ok($path ? 1 : 0, $desc);
+    $self->_builder->ok($path ? 1 : 0, $desc);
     return $path;
 }
 
 sub generate_port_ok {
     my ($self, $desc) = @_;
-    my $tb = $self->{_tb};
+    my $tb = $self->_builder;
 
     my $port = $self->_generate_port;
     if ($port) {
@@ -54,7 +50,7 @@ sub generate_port_ok {
 
 sub server_ok {
     my ($self, $desc) = @_;
-    my $tb = $self->{_tb};
+    my $tb = $self->_builder;
 
     # Not running
     unless ($self->port) {
@@ -69,7 +65,7 @@ sub server_ok {
 
 sub start_daemon_ok {
     my ($self, $desc) = @_;
-    my $tb = $self->{_tb};
+    my $tb = $self->_builder;
 
     # Port
     my $port = $self->port || $self->_generate_port;
@@ -87,7 +83,7 @@ sub start_daemon_ok {
 
 sub start_daemon_prefork_ok {
     my ($self, $desc) = @_;
-    my $tb = $self->{_tb};
+    my $tb = $self->_builder;
 
     # Port
     my $port = $self->port || $self->_generate_port;
@@ -105,7 +101,7 @@ sub start_daemon_prefork_ok {
 
 sub start_server_ok {
     my ($self, $desc) = @_;
-    my $tb = $self->{_tb};
+    my $tb = $self->_builder;
 
     # Start server
     my $pid = $self->_start_server;
@@ -136,7 +132,7 @@ sub start_server_ok {
 
 sub start_server_untested_ok {
     my ($self, $desc) = @_;
-    my $tb = $self->{_tb};
+    my $tb = $self->_builder;
 
     # Start server
     my $pid = $self->_start_server($desc);
@@ -150,7 +146,7 @@ sub start_server_untested_ok {
 
 sub stop_server_ok {
     my ($self, $desc) = @_;
-    my $tb = $self->{_tb};
+    my $tb = $self->_builder;
 
     # Running?
     unless ($self->pid && kill 0, $self->pid) {
@@ -160,7 +156,7 @@ sub stop_server_ok {
 
     # Debug
     if (DEBUG) {
-        sysread $self->{_server}, my $buffer, 4096;
+        sysread $self->_server, my $buffer, 4096;
         warn "\nSERVER STDOUT: $buffer\n";
     }
 
@@ -197,7 +193,7 @@ sub _check_server {
         return 1;
     }
     else {
-        $self->{_tb}->diag("Server check failed: $!") if $diag;
+        $self->_builder->diag("Server check failed: $!") if $diag;
         return;
     }
 }
@@ -250,7 +246,7 @@ sub _generate_port {
 
 sub _start_server {
     my $self = shift;
-    my $tb   = $self->{_tb};
+    my $tb   = $self->_builder;
 
     my $command = $self->command;
     warn "\nSERVER COMMAND: $command\n" if DEBUG;
@@ -265,7 +261,7 @@ sub _start_server {
         return;
     }
 
-    $self->{_server}->blocking(0);
+    $self->_server->blocking(0);
 
     return $pid;
 }
@@ -275,9 +271,9 @@ sub _stop_server {
 
     # Kill server portable
     kill $^O eq 'MSWin32' ? 'KILL' : 'INT', $self->pid;
-    close $self->{_server};
+    close $self->_server;
     $self->pid(undef);
-    undef $self->{_server};
+    $self->_server(undef);
 }
 
 1;

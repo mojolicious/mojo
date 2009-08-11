@@ -12,6 +12,9 @@ use Mojo::Buffer;
 
 __PACKAGE__->attr(buffer => sub { Mojo::Buffer->new });
 
+__PACKAGE__->attr(_buffer  => sub { [] });
+__PACKAGE__->attr(_headers => sub { {} });
+
 my @GENERAL_HEADERS = qw/
   Cache-Control
   Connection
@@ -112,8 +115,7 @@ sub add {
     }
 
     # Add line
-    $self->{_headers} ||= {};
-    push @{$self->{_headers}->{$name}}, @values;
+    push @{$self->_headers->{$name}}, @values;
 
     return $self;
 }
@@ -158,8 +160,7 @@ sub header {
 
     # Get
     my $headers;
-    return unless $self->{_headers};
-    return unless $headers = $self->{_headers}->{lc $name};
+    return unless $headers = $self->_headers->{lc $name};
 
     # String
     unless (wantarray) {
@@ -185,8 +186,7 @@ sub names {
     my $self = shift;
 
     # Names
-    return [] unless $self->{_headers};
-    my @names = keys %{$self->{_headers}};
+    my @names = keys %{$self->_headers};
 
     # Sort
     @names = sort {
@@ -211,7 +211,6 @@ sub parse {
 
     # Parse headers
     $self->state('headers') if $self->is_state('start');
-    $self->{__headers} ||= [];
     while (1) {
 
         # Line
@@ -220,26 +219,25 @@ sub parse {
 
         # New header
         if ($line =~ /^(\S+)\s*:\s*(.*)/) {
-            push @{$self->{__headers}}, $1, $2;
+            push @{$self->_buffer}, $1, $2;
         }
 
         # Multiline
-        elsif (@{$self->{__headers}} && $line =~ s/^\s+//) {
-            $self->{__headers}->[-1] .= " " . $line;
+        elsif (@{$self->_buffer} && $line =~ s/^\s+//) {
+            $self->_buffer->[-1] .= " " . $line;
         }
 
         # Empty line
         else {
 
             # Store headers
-            for (my $i = 0; $i < @{$self->{__headers}}; $i += 2) {
-                $self->add($self->{__headers}->[$i],
-                    $self->{__headers}->[$i + 1]);
+            for (my $i = 0; $i < @{$self->_buffer}; $i += 2) {
+                $self->add($self->_buffer->[$i], $self->_buffer->[$i + 1]);
             }
 
             # Done
             $self->done;
-            delete $self->{__headers};
+            $self->_buffer([]);
             return $self->buffer;
         }
     }
@@ -250,11 +248,7 @@ sub proxy_authorization { shift->header('Proxy-Authorization', @_) }
 
 sub remove {
     my ($self, $name) = @_;
-
-    # Delete
-    return $self unless $self->{_headers};
-    delete $self->{_headers}->{lc $name};
-
+    delete $self->_headers->{lc $name};
     return $self;
 }
 
@@ -293,6 +287,11 @@ L<Mojo::Headers> is a container and parser for HTTP headers.
 
 L<Mojo::Headers> inherits all attributes from L<Mojo::Stateful> and
 implements the following new ones.
+
+=head2 C<buffer>
+
+    my $buffer = $headers->buffer;
+    $headers   = $headers->buffer(Mojo::Buffer->new);
 
 =head2 C<connection>
 

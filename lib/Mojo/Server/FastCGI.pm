@@ -13,6 +13,8 @@ use IO::Socket;
 
 use constant DEBUG => $ENV{MOJO_SERVER_DEBUG} || 0;
 
+__PACKAGE__->attr('_listen');
+
 # Roles
 my @ROLES = qw/RESPONDER  AUTHORIZER FILTER/;
 my %ROLE_NUMBERS;
@@ -54,7 +56,7 @@ sub accept_connection {
     my $self = shift;
 
     # Listen socket?
-    unless ($self->{_listen}) {
+    unless ($self->_listen) {
         my $listen = IO::Socket->new;
 
         # Open
@@ -63,7 +65,7 @@ sub accept_connection {
             return;
         }
 
-        $self->{_listen} = $listen;
+        $self->_listen($listen);
     }
 
     # Debug
@@ -71,7 +73,7 @@ sub accept_connection {
 
     # Accept
     my $connection;
-    unless ($connection = $self->{_listen}->accept) {
+    unless ($connection = $self->_listen->accept) {
         $self->app->log->error("Can't accept FastCGI connection: $!");
         return;
     }

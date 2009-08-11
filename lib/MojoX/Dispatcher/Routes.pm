@@ -15,6 +15,9 @@ __PACKAGE__->attr(hidden => sub { [qw/new app attr render req res stash tx/] }
 );
 __PACKAGE__->attr('namespace');
 
+__PACKAGE__->attr('_hidden');
+__PACKAGE__->attr(_loaded => sub { {} });
+
 # Hey. What kind of party is this? There's no booze and only one hooker.
 sub dispatch {
     my ($self, $c) = @_;
@@ -85,8 +88,7 @@ sub dispatch_controller {
     $c->app->log->debug(qq/Dispatching "${class}::$method"./);
 
     # Load class
-    $self->{_loaded} ||= {};
-    unless ($self->{_loaded}->{$class}) {
+    unless ($self->_loaded->{$class}) {
 
         # Load
         if (my $e = Mojo::Loader->load($class)) {
@@ -100,7 +102,7 @@ sub dispatch_controller {
         }
 
         # Loaded
-        $self->{_loaded}->{$class}++;
+        $self->_loaded->{$class}++;
     }
 
     # Not a conroller
@@ -177,9 +179,9 @@ sub generate_method {
     my $field = $c->match->captures;
 
     # Prepare hidden
-    unless ($self->{_hidden}) {
-        $self->{_hidden} = {};
-        $self->{_hidden}->{$_}++ for @{$self->hidden};
+    unless ($self->_hidden) {
+        $self->_hidden({});
+        $self->_hidden->{$_}++ for @{$self->hidden};
     }
 
     my $method = $field->{method};
@@ -189,7 +191,7 @@ sub generate_method {
     return unless $method;
 
     # Shortcut for hidden methods
-    return if $self->{_hidden}->{$method};
+    return if $self->_hidden->{$method};
     return if index($method, '_') == 0;
 
     # Invalid

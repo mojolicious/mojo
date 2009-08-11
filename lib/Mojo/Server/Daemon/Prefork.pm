@@ -29,6 +29,10 @@ __PACKAGE__->attr(
     }
 );
 
+__PACKAGE__->attr(_child_poll => sub { IO::Poll->new });
+__PACKAGE__->attr([qw/_child_read _child_write _cleanup _lock _spawn/]);
+__PACKAGE__->attr(_children => sub { {} });
+
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
 
 # Marge? Since I'm not talking to Lisa,
@@ -50,35 +54,30 @@ sub accept_lock {
 
     # Idle
     if ($blocking) {
-        $self->{_child_write}->syswrite("$$ idle\n")
+        $self->_child_write->syswrite("$$ idle\n")
           or croak "Can't write to parent: $!";
     }
 
     # Lock
     my $lock =
       $blocking
-      ? flock($self->{_lock}, LOCK_EX)
-      : flock($self->{_lock}, LOCK_EX | LOCK_NB);
+      ? flock($self->_lock, LOCK_EX)
+      : flock($self->_lock, LOCK_EX | LOCK_NB);
 
     # Busy
     if ($lock) {
-        $self->{_child_write}->syswrite("$$ busy\n")
+        $self->_child_write->syswrite("$$ busy\n")
           or croak "Can't write to parent: $!";
     }
 
     return $lock;
 }
 
-sub accept_unlock {
-    my $self = shift;
-
-    # Unlock
-    flock($self->{_lock}, LOCK_UN);
-}
+sub accept_unlock { flock(shift->_lock, LOCK_UN) }
 
 sub child {
     my $self = shift;
-    do { $self->spin } while keys %{$self->{_connections}};
+    do { $self->spin } while keys %{$self->_connections};
 }
 
 sub daemonize {
@@ -113,8 +112,7 @@ sub run {
     # Pipe for child communication
     pipe($self->{_child_read}, $self->{_child_write})
       or croak "Can't create pipe: $!";
-    $self->{_child_poll} = IO::Poll->new;
-    $self->{_child_poll}->mask($self->{_child_read}, POLLIN);
+    $self->_child_poll->mask($self->_child_read, POLLIN);
 
     # Create pid file
     $self->_create_pid_file;
@@ -136,8 +134,8 @@ sub run {
     $self->_spawn_child for (1 .. $self->start_servers);
 
     # We try to make spawning and killing as smooth as possible
-    $self->{_cleanup} = time + $self->cleanup_interval;
-    $self->{_spawn}   = 1;
+    $self->_cleanup(time + $self->cleanup_interval);
+    $self->_spawn(1);
 
     # Mainloop
     while (!$done) {
@@ -152,8 +150,8 @@ sub run {
 
 sub _cleanup_children {
     my $self = shift;
-    for my $pid (keys %{$self->{_children}}) {
-        delete $self->{_children}->{$pid} unless kill 0, $pid;
+    for my $pid (keys %{$self->_children}) {
+        delete $self->_children->{$pid} unless kill 0, $pid;
     }
 }
 
@@ -189,13 +187,13 @@ sub _kill_children {
     my $self = shift;
 
     # Close pipe
-    delete $self->{_child_read};
+    $self->_child_read(undef);
 
     # Kill all children
-    while (%{$self->{_children}}) {
+    while (%{$self->_children}) {
 
         # Die die die
-        for my $pid (keys %{$self->{_children}}) {
+        for my $pid (keys %{$self->_children}) {
             $self->app->log->debug("Killing prefork child $pid.") if DEBUG;
             kill 'TERM', $pid;
         }
@@ -216,28 +214,28 @@ sub _manage_children {
 
     # Make sure we have enough idle processes
     my @idle = sort { $a <=> $b }
-      grep { ($self->{_children}->{$_}->{state} || '') eq 'idle' }
-      keys %{$self->{_children}};
+      grep { ($self->_children->{$_}->{state} || '') eq 'idle' }
+      keys %{$self->_children};
 
     # Debug
     if (DEBUG) {
         my $idle  = @idle;
-        my $total = keys %{$self->{_children}};
-        my $spawn = $self->{_spawn};
+        my $total = keys %{$self->_children};
+        my $spawn = $self->_spawn;
         $self->app->log->debug(
             "$idle of $total children idle, 1 listen (spawn $spawn).");
     }
 
     # Need more children
     if (@idle < $self->min_spare_servers) {
-        for (1 .. $self->{_spawn}) {
-            last if $self->max_servers <= keys %{$self->{_children}};
+        for (1 .. $self->_spawn) {
+            last if $self->max_servers <= keys %{$self->_children};
             $self->_spawn_child;
         }
 
         # Spawn counter
-        $self->{_spawn} = $self->{_spawn} * 2;
-        $self->{_spawn} = 8 if $self->{_spawn} > 8;
+        $self->_spawn($self->_spawn * 2);
+        $self->_spawn(8) if $self->_spawn > 8;
     }
 
     # Too many children
@@ -246,56 +244,54 @@ sub _manage_children {
         # Kill one at a time
         my $timeout = time - $self->idle_timeout;
         for my $idle (@idle) {
-            next unless $timeout > $self->{_children}->{$idle}->{time};
+            next unless $timeout > $self->_children->{$idle}->{time};
             kill 'HUP', $idle;
             $self->app->log->debug("Prefork child $idle stopped.") if DEBUG;
 
             # Spawn counter
-            $self->{_spawn} = $self->{_spawn} / 2 if $self->{_spawn} >= 2;
+            $self->_spawn($self->_spawn / 2) if $self->_spawn >= 2;
 
             last;
         }
     }
 
     # Remove dead child processes every 30 seconds
-    if (time > $self->{_cleanup}) {
+    if (time > $self->_cleanup) {
         $self->_cleanup_children;
-        $self->{_cleanup} = time + $self->cleanup_interval;
+        $self->_cleanup(time + $self->cleanup_interval);
     }
 }
 
 sub _read_messages {
     my $self = shift;
 
-    # Initialize
-    $self->{_buffer} ||= '';
-
     # Read messages
-    $self->{_child_poll}->poll(1);
-    my @readers = $self->{_child_poll}->handles(POLLIN);
+    $self->_child_poll->poll(1);
+    my @readers = $self->_child_poll->handles(POLLIN);
+    my $buffer  = '';
     if (@readers) {
-        return unless $self->{_child_read}->sysread(my $buffer, CHUNK_SIZE);
-        $self->{_buffer} .= $buffer;
+        return unless $self->_child_read->sysread(my $chunk, CHUNK_SIZE);
+        $buffer .= $chunk;
     }
 
     # Parse messages
     my $pos = 0;
-    while (length $self->{_buffer}) {
+    while (length $buffer) {
 
         # Full message?
-        $pos = index $self->{_buffer}, "\n";
+        $pos = index $buffer, "\n";
         last if $pos < 0;
 
         # Parse
-        my $message = substr $self->{_buffer}, 0, $pos + 1, '';
+        my $message = substr $buffer, 0, $pos + 1, '';
         next unless $message =~ /^(\d+)\ (\w+)\n$/;
         my $pid   = $1;
         my $state = $2;
 
         # Update status
-        if ($state eq 'done') { delete $self->{_children}->{$pid} }
+        if ($state eq 'done') { delete $self->_children->{$pid} }
         else {
-            $self->{_children}->{$pid} = {
+            $self->_children->{$pid} = {
                 state => $state,
                 time  => time
             };
@@ -307,7 +303,7 @@ sub _reap_child {
     my $self = shift;
     while ((my $child = waitpid(-1, WNOHANG)) > 0) {
         $self->app->log->debug("Prefork child $child died.") if DEBUG;
-        delete $self->{_children}->{$child};
+        delete $self->_children->{$child};
     }
 }
 
@@ -319,8 +315,7 @@ sub _spawn_child {
 
     # Parent takes care of child
     if ($child) {
-        $self->{_children} ||= {};
-        $self->{_children}->{$child} = {state => 'idle', time => time};
+        $self->_children->{$child} = {state => 'idle', time => time};
     }
 
     # Child signal handlers
@@ -334,12 +329,12 @@ sub _spawn_child {
         $self->app->log->debug('Prefork child started.') if DEBUG;
 
         # No need for child reader
-        close(delete $self->{_child_read});
-        delete $self->{_child_poll};
+        close($self->_child_read);
+        $self->_child_poll(undef);
 
         # Lockfile
         my $lock = $self->pid_file;
-        $self->{_lock} = IO::File->new($lock, O_RDWR)
+        $self->_lock(IO::File->new($lock, O_RDWR))
           or croak "Can't open lock file $lock: $!";
 
         # Parent will send a SIGHUP when there are too many children idle
@@ -355,10 +350,10 @@ sub _spawn_child {
         }
 
         # Done
-        $self->{_child_write}->syswrite("$$ done\n")
+        $self->_child_write->syswrite("$$ done\n")
           or croak "Can't write to parent: $!";
-        delete $self->{_child_write};
-        delete $self->{_lock};
+        $self->_child_write(undef);
+        $self->_lock(undef);
         exit 0;
     }
 

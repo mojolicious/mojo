@@ -10,6 +10,8 @@ use base 'MojoX::Renderer';
 use File::Spec;
 use Mojo::Template;
 
+__PACKAGE__->attr(_epl_cache => sub { {} });
+
 # What do you want?
 # I'm here to kick your ass!
 # Wishful thinking. We have long since evolved beyond the need for asses.
@@ -25,11 +27,8 @@ sub new {
             my $t    = $r->template_name($options);
             my $path = $r->template_path($options);
 
-            # Initialize cache
-            $r->{_mt_cache} ||= {};
-
             # Check cache
-            my $mt = $r->{_mt_cache}->{$path};
+            my $mt = $r->_epl_cache->{$path};
 
             # Interpret again
             if ($mt) { $$output = $mt->interpret($c) }
@@ -63,7 +62,7 @@ sub new {
                 }
 
                 # Cache
-                $r->{_mt_cache}->{$path} = $mt;
+                $r->_epl_cache->{$path} = $mt;
             }
 
             # Exception

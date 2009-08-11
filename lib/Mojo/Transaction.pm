@@ -16,6 +16,9 @@ __PACKAGE__->attr(continue_timeout => 5);
 __PACKAGE__->attr(req              => sub { Mojo::Message::Request->new });
 __PACKAGE__->attr(res              => sub { Mojo::Message::Response->new });
 
+__PACKAGE__->attr([qw/_continue _started/]);
+__PACKAGE__->attr([qw/_offset _to_write/] => 0);
+
 # What's a wedding?  Webster's dictionary describes it as the act of removing
 # weeds from one's garden.
 sub client_connect {
@@ -45,12 +48,12 @@ sub client_connected {
     my $self = shift;
 
     # We might have to handle 100 Continue
-    $self->{_continue} = $self->continue_timeout
+    $self->_continue($self->continue_timeout)
       if ($self->req->headers->expect || '') =~ /100-continue/;
 
     # Ready for next state
     $self->state('write_start_line');
-    $self->{_to_write} = $self->req->start_line_length;
+    $self->_to_write($self->req->start_line_length);
 
     return $self;
 }
@@ -62,7 +65,7 @@ sub client_get_chunk {
 
     # Body
     if ($self->is_state('write_body')) {
-        $chunk = $self->req->get_body_chunk($self->{_offset} || 0);
+        $chunk = $self->req->get_body_chunk($self->_offset);
 
         # End
         if (defined $chunk && !length $chunk) {
@@ -72,11 +75,11 @@ sub client_get_chunk {
     }
 
     # Headers
-    $chunk = $self->req->get_header_chunk($self->{_offset} || 0)
+    $chunk = $self->req->get_header_chunk($self->_offset)
       if $self->is_state('write_headers');
 
     # Start line
-    $chunk = $self->req->get_start_line_chunk($self->{_offset} || 0)
+    $chunk = $self->req->get_start_line_chunk($self->_offset)
       if $self->is_state('write_start_line');
 
     return $chunk;
@@ -132,7 +135,7 @@ sub client_read {
         {
             $self->_new_response;
             $self->continued(1);
-            $self->{_continue} = 0;
+            $self->_continue(0);
         }
 
         # We got something else
@@ -204,46 +207,46 @@ sub client_spin {
     $self->error('Response error.') if $self->res->has_error;
 
     # Make sure we don't wait longer than 5 seconds for a 100 Continue
-    if ($self->{_continue}) {
-        my $continue = $self->{_continue};
-        $self->{_started} ||= time;
-        $continue -= time - $self->{_started};
+    if ($self->_continue) {
+        my $continue = $self->_continue;
+        $self->_started(time) unless $self->_started;
+        $continue -= time - $self->_started;
         $continue = 0 if $continue < 0;
-        $self->{_continue} = $continue;
+        $self->_continue($continue);
     }
 
     # Request start line written
     if ($self->is_state('write_start_line')) {
-        if ($self->{_to_write} <= 0) {
+        if ($self->_to_write <= 0) {
             $self->state('write_headers');
-            $self->{_offset}   = 0;
-            $self->{_to_write} = $self->req->header_length;
+            $self->_offset(0);
+            $self->_to_write($self->req->header_length);
         }
     }
 
     # Request headers written
     if ($self->is_state('write_headers')) {
-        if ($self->{_to_write} <= 0) {
+        if ($self->_to_write <= 0) {
 
-            $self->{_continue}
+            $self->_continue
               ? $self->state('read_continue')
               : $self->state('write_body');
-            $self->{_offset}   = 0;
-            $self->{_to_write} = $self->req->body_length;
+            $self->_offset(0);
+            $self->_to_write($self->req->body_length);
 
             # Chunked
-            $self->{_to_write} = 1 if $self->req->is_chunked;
+            $self->_to_write(1) if $self->req->is_chunked;
         }
     }
 
     # 100 Continue timeout
     if ($self->is_state('read_continue')) {
-        $self->state('write_body') unless $self->{_continue};
+        $self->state('write_body') unless $self->_continue;
     }
 
     # Request body written
     if ($self->is_state('write_body')) {
-        $self->state('read_response') if $self->{_to_write} <= 0;
+        $self->state('read_response') if $self->_to_write <= 0;
     }
 
     return $self;
@@ -253,11 +256,11 @@ sub client_written {
     my ($self, $written) = @_;
 
     # Written
-    $self->{_to_write} -= $written;
-    $self->{_offset} += $written;
+    $self->_to_write($self->_to_write - $written);
+    $self->_offset($self->_offset + $written);
 
     # Chunked
-    $self->{_to_write} = 1
+    $self->_to_write(1)
       if $self->req->is_chunked && $self->is_state('write_body');
 
     return $self;
@@ -327,7 +330,7 @@ sub server_get_chunk {
 
     # Body
     if ($self->is_state('write_body')) {
-        $chunk = $self->res->get_body_chunk($self->{_offset} || 0);
+        $chunk = $self->res->get_body_chunk($self->_offset);
 
         # End
         if (defined $chunk && !length $chunk) {
@@ -339,11 +342,11 @@ sub server_get_chunk {
     }
 
     # Headers
-    $chunk = $self->res->get_header_chunk($self->{_offset} || 0)
+    $chunk = $self->res->get_header_chunk($self->_offset)
       if $self->is_state('write_headers');
 
     # Start line
-    $chunk = $self->res->get_start_line_chunk($self->{_offset} || 0)
+    $chunk = $self->res->get_start_line_chunk($self->_offset)
       if $self->is_state('write_start_line');
 
     return $chunk;
@@ -384,9 +387,6 @@ sub server_spin {
 
     my $self = shift;
 
-    # Initialize
-    $self->{_to_write} ||= 0;
-
     # Writing
     if ($self->is_state('write')) {
 
@@ -402,18 +402,18 @@ sub server_spin {
 
         # Ready for next state
         $self->state('write_start_line');
-        $self->{_to_write} = $self->res->start_line_length;
+        $self->_to_write($self->res->start_line_length);
     }
 
     # Response start line
-    if ($self->is_state('write_start_line') && $self->{_to_write} <= 0) {
+    if ($self->is_state('write_start_line') && $self->_to_write <= 0) {
         $self->state('write_headers');
-        $self->{_offset}   = 0;
-        $self->{_to_write} = $self->res->header_length;
+        $self->_offset(0);
+        $self->_to_write($self->res->header_length);
     }
 
     # Response headers
-    if ($self->is_state('write_headers') && $self->{_to_write} <= 0) {
+    if ($self->is_state('write_headers') && $self->_to_write <= 0) {
 
         if ($self->req->method eq 'HEAD') {
 
@@ -425,16 +425,16 @@ sub server_spin {
         else {
 
             $self->state('write_body');
-            $self->{_offset}   = 0;
-            $self->{_to_write} = $self->res->body_length;
+            $self->_offset(0);
+            $self->_to_write($self->res->body_length);
 
             # Chunked
-            $self->{_to_write} = 1 if $self->res->is_chunked;
+            $self->_to_write(1) if $self->res->is_chunked;
         }
     }
 
     # Response body
-    if ($self->is_state('write_body') && $self->{_to_write} <= 0) {
+    if ($self->is_state('write_body') && $self->_to_write <= 0) {
 
         # Continue done
         if (defined $self->continued && $self->continued == 0) {
@@ -465,15 +465,15 @@ sub server_written {
     my ($self, $written) = @_;
 
     # Written
-    $self->{_to_write} -= $written;
-    $self->{_offset} += $written;
+    $self->_to_write($self->_to_write - $written);
+    $self->_offset($self->_offset + $written);
 
     # Chunked
-    $self->{_to_write} = 1
+    $self->_to_write(1)
       if $self->res->is_chunked && $self->is_state('write_body');
 
     # Done early
-    if ($self->is_state('write_body') && $self->{_to_write} <= 0) {
+    if ($self->is_state('write_body') && $self->_to_write <= 0) {
         $self->req->is_state('done_with_leftovers')
           ? $self->state('done_with_leftovers')
           : $self->state('done');

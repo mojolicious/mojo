@@ -22,6 +22,8 @@ __PACKAGE__->attr(buffer  => sub { Mojo::Buffer->new });
 __PACKAGE__->attr(content => sub { Mojo::Content->new });
 __PACKAGE__->attr([qw/major_version minor_version/] => 1);
 
+__PACKAGE__->attr([qw/_body_params _cookies _uploads/]);
+
 # I'll keep it short and sweet. Family. Religion. Friendship.
 # These are the three demons you must slay if you wish to succeed in
 # business.
@@ -71,7 +73,7 @@ sub body_params {
     my $self = shift;
 
     # Cached
-    return $self->{_body_params} if $self->{_body_params};
+    return $self->_body_params if $self->_body_params;
 
     my $params = Mojo::Parameters->new;
 
@@ -84,8 +86,6 @@ sub body_params {
         # Parse
         my $raw = $self->content->file->slurp;
         $params->parse($raw);
-
-        return $params;
     }
 
     # "multipart/formdata"
@@ -103,7 +103,7 @@ sub body_params {
     }
 
     # Cache
-    return $self->{_body_params} = $params;
+    return $self->_body_params($params)->_body_params;
 }
 
 sub build {
@@ -169,7 +169,7 @@ sub cookie {
     return unless $name;
 
     # Map
-    unless ($self->{_cookies}) {
+    unless ($self->_cookies) {
         my $cookies = {};
         for my $cookie (@{$self->cookies}) {
             my $cname = $cookie->name;
@@ -186,14 +186,14 @@ sub cookie {
         }
 
         # Cache
-        $self->{_cookies} = $cookies;
+        $self->_cookies($cookies);
     }
 
     # Multiple?
     my @cookies =
-      ref $self->{_cookies}->{$name} eq 'ARRAY'
-      ? @{$self->{_cookies}->{$name}}
-      : ($self->{_cookies}->{$name});
+      ref $self->_cookies->{$name} eq 'ARRAY'
+      ? @{$self->_cookies->{$name}}
+      : ($self->_cookies->{$name});
 
     # Context?
     return wantarray ? @cookies : $cookies[0];
@@ -332,7 +332,7 @@ sub upload {
     return unless $name;
 
     # Map
-    unless ($self->{_uploads}) {
+    unless ($self->_uploads) {
         my $uploads = {};
         for my $upload (@{$self->uploads}) {
             my $uname = $upload->name;
@@ -349,13 +349,13 @@ sub upload {
         }
 
         # Cache
-        $self->{_uploads} = $uploads;
+        $self->_uploads($uploads);
     }
 
     my @uploads =
-      ref $self->{_uploads}->{$name} eq 'ARRAY'
-      ? @{$self->{_uploads}->{$name}}
-      : ($self->{_uploads}->{$name});
+      ref $self->_uploads->{$name} eq 'ARRAY'
+      ? @{$self->_uploads->{$name}}
+      : ($self->_uploads->{$name});
     return wantarray ? @uploads : $uploads[0];
 }
 

@@ -18,6 +18,8 @@ use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
 __PACKAGE__->attr(continue_timeout   => 5);
 __PACKAGE__->attr(keep_alive_timeout => 15);
 
+__PACKAGE__->attr(_connections => sub { [] });
+
 sub connect {
     my ($self, $tx) = @_;
 
@@ -66,11 +68,9 @@ sub deposit_connection {
     # Drop connections after 30 seconds from queue
     $timeout ||= $self->keep_alive_timeout;
 
-    $self->{_connections} ||= [];
-
     # Store socket if it is in a good state
     if ($self->test_connection($connection)) {
-        push @{$self->{_connections}}, [$name, $connection, time + $timeout];
+        push @{$self->_connections}, [$name, $connection, time + $timeout];
         return 1;
     }
     return;
@@ -388,14 +388,11 @@ sub test_connection {
 sub withdraw_connection {
     my ($self, $match) = @_;
 
-    # Shortcut
-    return unless $self->{_connections};
-
     my $result;
     my @connections;
 
     # Check all connections for name, timeout and if they are still alive
-    for my $conn (@{$self->{_connections}}) {
+    for my $conn (@{$self->_connections}) {
         my ($name, $connection, $timeout) = @{$conn};
 
         # Found
@@ -408,7 +405,7 @@ sub withdraw_connection {
         else { push(@connections, $conn) if time < $timeout }
     }
 
-    $self->{_connections} = \@connections;
+    $self->_connections(\@connections);
     return $result;
 }
 

@@ -21,6 +21,10 @@ __PACKAGE__->attr(max_clients             => 1000);
 __PACKAGE__->attr(max_keep_alive_requests => 100);
 __PACKAGE__->attr(port                    => 3000);
 
+__PACKAGE__->attr(_accepted                   => sub { [] });
+__PACKAGE__->attr([qw/_connections _reverse/] => sub { {} });
+__PACKAGE__->attr(_poll                       => sub { IO::Poll->new });
+
 sub accept_lock {1}
 
 sub accept_unlock {1}
@@ -108,16 +112,13 @@ sub setuidgid {
 sub spin {
     my $self = shift;
 
-    # Default poll instance
-    $self->{_poll} ||= IO::Poll->new;
-
     # Prepare
     $self->_prepare_connections;
     $self->_prepare_transactions;
     $self->_prepare_poll;
 
     # Poll
-    my $poll = $self->{_poll};
+    my $poll = $self->_poll;
     $poll->poll(5);
     my @readers = $poll->handles(POLLIN | POLLHUP | POLLERR);
     my @writers = $poll->handles(POLLOUT);
@@ -140,12 +141,12 @@ sub _drop_connection {
     my ($self, $name) = @_;
 
     # Cleanup
-    $self->{_poll}->remove($self->{_connections}->{$name}->{socket});
-    close $self->{_connections}->{$name}->{socket};
+    $self->_poll->remove($self->_connections->{$name}->{socket});
+    close $self->_connections->{$name}->{socket};
 
     # Remove
-    delete $self->{_reverse}->{$self->{_connections}->{$name}};
-    delete $self->{_connections}->{$name};
+    delete $self->_reverse->{$self->_connections->{$name}};
+    delete $self->_connections->{$name};
 }
 
 sub _handle {
@@ -175,13 +176,9 @@ sub _handle {
 sub _prepare_connections {
     my $self = shift;
 
-    # Initialize
-    $self->{_accepted}    ||= [];
-    $self->{_connections} ||= {};
-
     # Accept
     my @accepted = ();
-    for my $accept (@{$self->{_accepted}}) {
+    for my $accept (@{$self->_accepted}) {
 
         # Not yet connected
         unless ($accept->{socket}->connected) {
@@ -192,19 +189,19 @@ sub _prepare_connections {
         # Connected
         $accept->{socket}->blocking(0);
         next unless my $name = $self->_socket_name($accept->{socket});
-        $self->{_reverse}->{$accept->{socket}} = $name;
-        $self->{_connections}->{$name} = $accept;
+        $self->_reverse->{$accept->{socket}} = $name;
+        $self->_connections->{$name} = $accept;
     }
 
     # Accepted
-    $self->{_accepted} = [@accepted];
+    $self->_accepted([@accepted]);
 }
 
 sub _prepare_poll {
     my $self = shift;
 
-    my $poll    = $self->{_poll};
-    my $clients = keys %{$self->{_connections}};
+    my $poll    = $self->_poll;
+    my $clients = keys %{$self->_connections};
 
     # Add listen socket if we get the lock on it
     if (($clients < $self->max_clients) && $self->accept_lock(!$clients)) {
@@ -215,8 +212,8 @@ sub _prepare_poll {
     else { $poll->remove($self->{listen}) }
 
     # Sort read/write handles and timeouts
-    for my $name (keys %{$self->{_connections}}) {
-        my $connection = $self->{_connections}->{$name};
+    for my $name (keys %{$self->_connections}) {
+        my $connection = $self->_connections->{$name};
 
         # Transaction
         my $p = $connection->{pipeline};
@@ -253,8 +250,8 @@ sub _prepare_transactions {
     my $self = shift;
 
     # Prepare transactions
-    for my $name (keys %{$self->{_connections}}) {
-        my $connection = $self->{_connections}->{$name};
+    for my $name (keys %{$self->_connections}) {
+        my $connection = $self->_connections->{$name};
 
         # Cleanup dead connection
         unless ($connection->{socket}->connected) {
@@ -310,7 +307,7 @@ sub _read {
         $socket = $socket->accept;
         $self->accept_unlock;
         return unless $socket;
-        push @{$self->{_accepted}},
+        push @{$self->_accepted},
           {requests => 0, socket => $socket, time => time};
         return 1;
     }
@@ -318,7 +315,7 @@ sub _read {
     return unless my $name = $self->_socket_name($socket);
 
     # No pipeline yet
-    my $connection = $self->{_connections}->{$name};
+    my $connection = $self->_connections->{$name};
     unless ($connection->{pipeline}) {
 
         # New pipeline
@@ -373,7 +370,7 @@ sub _socket_name {
     my ($self, $s) = @_;
 
     # Cache
-    return $self->{_reverse}->{$s} if $self->{_reverse}->{$s};
+    return $self->_reverse->{$s} if $self->_reverse->{$s};
 
     # Connected?
     return unless $s->connected;
@@ -397,7 +394,7 @@ sub _write {
         # Shortcut
         next unless $name = $self->_socket_name($socket);
 
-        my $connection = $self->{_connections}->{$name};
+        my $connection = $self->_connections->{$name};
         $p = $connection->{pipeline};
 
         # Get chunk
@@ -425,7 +422,7 @@ sub _write {
     $p->server_written($written);
 
     # Time
-    $self->{_connections}->{$name}->{time} = time;
+    $self->_connections->{$name}->{time} = time;
 }
 
 1;

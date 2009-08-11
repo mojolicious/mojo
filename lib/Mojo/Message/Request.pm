@@ -139,10 +139,11 @@ sub _parse_env {
     my ($self, $env) = @_;
     $env ||= \%ENV;
 
+    # Headers
     for my $name (keys %{$env}) {
         my $value = $env->{$name};
 
-        # Headers
+        # Header
         if ($name =~ s/^HTTP_//i) {
             $name =~ s/_/-/g;
             $self->headers->header($name, $value);
@@ -163,60 +164,86 @@ sub _parse_env {
                 $self->url->base->port($port);
             }
         }
+    }
 
-        # Content-Type is a special case on some servers
-        elsif ($name eq 'CONTENT_TYPE') {
-            $self->headers->content_type($value);
-        }
+    # Content-Type is a special case on some servers
+    if (my $value = $env->{CONTENT_TYPE}) {
+        $self->headers->content_type($value);
+    }
 
-        # Content-Length is a special case on some servers
-        elsif ($name eq 'CONTENT_LENGTH') {
-            $self->headers->content_length($value);
-        }
+    # Content-Length is a special case on some servers
+    if (my $value = $env->{CONTENT_LENGTH}) {
+        $self->headers->content_length($value);
+    }
 
-        # Path is a special case on some servers
-        elsif ($name eq 'REQUEST_URI') {
-            $self->url->parse($value);
-        }
+    # Path is a special case on some servers
+    if (my $value = $env->{REQUEST_URI}) { $self->url->parse($value) }
 
-        # Query
-        elsif ($name eq 'QUERY_STRING') {
-            $self->url->query->parse($value);
-        }
+    # Query
+    if (my $value = $env->{QUERY_STRING}) { $self->url->query->parse($value) }
 
-        # Method
-        elsif ($name eq 'REQUEST_METHOD') { $self->method($value) }
+    # Method
+    if (my $value = $env->{REQUEST_METHOD}) { $self->method($value) }
 
-        # Base path
-        elsif ($name eq 'SCRIPT_NAME') {
+    # Scheme/Version
+    if (my $value = $env->{SERVER_PROTOCOL}) {
+        $value =~ /^([^\/]*)\/*(.*)$/;
+        $self->url->scheme($1)       if $1;
+        $self->url->base->scheme($1) if $1;
+        $self->version($2)           if $2;
+    }
 
-            # Make sure there is a trailing slash (important for merging)
-            $value .= '/' unless $value =~ /\/$/;
+    # Base path
+    if (my $value = $env->{SCRIPT_NAME}) {
 
-            $self->url->base->path->parse($value);
-        }
+        # Make sure there is a trailing slash (important for merging)
+        $value .= '/' unless $value =~ /\/$/;
 
-        # Scheme/Version
-        elsif ($name eq 'SERVER_PROTOCOL') {
-            $value =~ /^([^\/]*)\/*(.*)$/;
-            $self->url->scheme($1)       if $1;
-            $self->url->base->scheme($1) if $1;
-            $self->version($2)           if $2;
-        }
+        $self->url->base->path->parse($value);
     }
 
     # Path
-    if (my $value = $env->{PATH_INFO}) {
+    if (my $value = $env->{PATH_INFO}) { $self->url->path->parse($value) }
+
+    # Fix paths
+    my $base = $self->url->base->path->to_string;
+    my $path = $self->url->path->to_string;
+
+    # IIS is so fucked up, nobody should ever have to use it...
+    my $software = $env->{SERVER_SOFTWARE} || '';
+    if ($software =~ /IIS\/\d+/ && $base =~ /^$path\/?$/) {
+
+        # This is a horrible hack, just like IIS itself
+        if (my $t = $env->{PATH_TRANSLATED}) {
+            my @p = split /\//,    $path;
+            my @t = split /\\\\?/, $t;
+
+            # Try to generate correct PATH_INFO and SCRIPT_NAME
+            my @n;
+            while ($p[$#p] eq $t[$#t]) {
+                pop @t;
+                unshift @n, pop @p;
+            }
+            unshift @n, '', '';
+
+            $base = join '/', @p;
+            $path = join '/', @n;
+
+            $self->url->base->path->parse($base);
+            $self->url->path->parse($path);
+        }
+    }
+
+    # Fix paths for normal screwed up CGI environments
+    if ($path && $base) {
 
         # Remove SCRIPT_NAME prefix if it's there
-        my $base = $self->url->base->path->to_string;
-        $value =~ s/^$base//;
+        $path =~ s/^$base//;
 
         # Make sure we have a leading slash
-        $value = "/$value" unless $value =~ /^\//;
+        $path = "/$path" unless $path =~ /^\//;
 
-        # Parse
-        $self->url->path->parse($value);
+        $self->url->path->parse($path);
     }
 
     # There won't be a start line or header when you parse environment

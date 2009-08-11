@@ -14,8 +14,8 @@ __PACKAGE__->attr(default_format => 'html');
 __PACKAGE__->attr('default_handler');
 __PACKAGE__->attr(handler => sub { {} });
 __PACKAGE__->attr(layout_prefix => 'layouts');
-__PACKAGE__->attr(types         => sub { MojoX::Types->new });
 __PACKAGE__->attr(root          => '/');
+__PACKAGE__->attr(types         => sub { MojoX::Types->new });
 
 # This is not how Xmas is supposed to be.
 # In my day Xmas was about bringing people together, not blowing them apart.

@@ -180,6 +180,11 @@ L<MojoX::Types> implements the follwing attributes.
     my $handler = $renderer->handler;
     $renderer   = $renderer->handler({epl => sub { ... }});
 
+=head2 C<layout_prefix>
+
+    my $prefix = $renderer->layout_prefix;
+    $renderer  = $renderer->layout_prefix('layouts');
+
 =head2 C<root>
 
    my $root  = $renderer->root;

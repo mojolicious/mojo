@@ -11,6 +11,7 @@ use File::stat;
 use File::Spec;
 use Mojo::Content;
 use Mojo::File;
+use Mojo::Path;
 use MojoX::Types;
 
 __PACKAGE__->attr([qw/prefix root/]);
@@ -20,13 +21,16 @@ __PACKAGE__->attr(types => sub { MojoX::Types->new });
 sub dispatch {
     my ($self, $c) = @_;
 
+    # Path
+    my $path = $c->req->url->path->clone->canonicalize->to_string;
+
     # Prefix
     if (my $prefix = $self->prefix) {
-        return 1 unless $c->req->url->path =~ /^$prefix.*/;
+        return 1 unless $path =~ s/^$prefix//;
     }
 
-    # Path
-    my @parts = @{$c->req->url->path->clone->canonicalize->parts};
+    # Parts
+    my @parts = @{Mojo::Path->parse($path)->parts};
 
     # Shortcut
     return 1 unless @parts;

@@ -11,6 +11,7 @@ __PACKAGE__->attr(safe_post => 0);
 __PACKAGE__->attr(transactions => sub { [] });
 
 __PACKAGE__->attr('_all_written');
+__PACKAGE__->attr([qw/_reader _writer/] => 0);
 
 # No children have ever meddled with the Republican Party and lived to tell
 # about it.
@@ -32,10 +33,6 @@ sub client_info {
 
 sub client_connect {
     my $self = shift;
-
-    # Initialize
-    $self->{_writer} = 0;
-    $self->{_reader} = 0;
 
     # Connect all
     $_->client_connect for @{$self->transactions};
@@ -71,23 +68,23 @@ sub client_get_chunk {
     my $self = shift;
 
     # Get chunk from current writer
-    return $self->_writer->client_get_chunk;
+    return $self->_current_writer->client_get_chunk;
 }
 
 sub client_read {
     my ($self, $chunk) = @_;
 
     # Read with current reader
-    $self->_reader->client_read($chunk);
+    $self->_current_reader->client_read($chunk);
 
     # Transaction finished
-    while ($self->_reader->is_finished) {
+    while ($self->_current_reader->is_finished) {
 
         # All done
         unless ($self->_next_reader) {
 
-            $self->{_reader} = $#{$self->transactions};
-            $self->{_writer} = $#{$self->transactions};
+            $self->_reader($#{$self->transactions});
+            $self->_writer($#{$self->transactions});
 
             $self->done;
             return $self;
@@ -95,7 +92,7 @@ sub client_read {
 
         # Check for leftovers
         if (my $leftovers = $self->client_leftovers) {
-            $self->_reader->client_read($leftovers);
+            $self->_current_reader->client_read($leftovers);
         }
     }
 
@@ -109,7 +106,7 @@ sub client_leftovers {
     my $self = shift;
 
     # Previous reader
-    my $previous = $self->{_reader} - 1;
+    my $previous = $self->_reader - 1;
 
     # No previous reader
     return unless $previous >= 0;
@@ -125,7 +122,8 @@ sub client_spin {
     $_->client_spin for @{$self->transactions};
 
     # Transaction finished
-    if (!$self->_all_written && $self->_writer->is_state('read_response')) {
+    my $writer = $self->_current_writer;
+    if (!$self->_all_written && $writer->is_state('read_response')) {
 
         # All written
         $self->_all_written(1) unless $self->_next_writer;
@@ -141,7 +139,7 @@ sub client_written {
     my ($self, $length) = @_;
 
     # Written
-    $self->_writer->client_written($length);
+    $self->_current_writer->client_written($length);
 
     return $self;
 }
@@ -161,16 +159,16 @@ sub is_writing {
     # received)
     return
       if $writing
-          && $self->_reader != $self->_writer
-          && $self->_writer->req->method eq 'POST';
+          && $self->_current_reader != $self->_current_writer
+          && $self->_current_writer->req->method eq 'POST';
 
     return $writing;
 }
 
 sub keep_alive {
     my $self = shift;
-    return $self->transactions->[$self->{_writer}]
-      ? $self->transactions->[$self->{_writer}]->keep_alive(@_)
+    return $self->transactions->[$self->_writer]
+      ? $self->transactions->[$self->_writer]->keep_alive(@_)
       : $self->transactions->[-1]->keep_alive(@_);
 }
 
@@ -202,8 +200,7 @@ sub server_accept {
     push @{$self->transactions}, $tx;
 
     # Initialize
-    $self->{_writer} ||= 0;
-    $self->{_reader} = $#{$self->transactions};
+    $self->_reader($#{$self->transactions});
 
     # Inherit state
     $self->_server_inherit_state;
@@ -215,7 +212,7 @@ sub server_get_chunk {
     my $self = shift;
 
     # Get chunk from current writer
-    return $self->_writer->server_get_chunk;
+    return $self->_current_writer->server_get_chunk;
 }
 
 sub server_handled {
@@ -252,13 +249,13 @@ sub server_read {
     my $self = shift;
 
     # Request without a transaction
-    unless ($self->_reader) {
+    unless ($self->_current_reader) {
         $self->error('Request without a transaction!');
         return $self;
     }
 
     # Normal request
-    $self->_reader->server_read(@_);
+    $self->_current_reader->server_read(@_);
 
     # Inherit state
     $self->_server_inherit_state;
@@ -273,13 +270,15 @@ sub server_spin {
     $_->server_spin for @{$self->transactions};
 
     # Next reader?
-    if ($self->_reader && $self->_reader->req->is_finished) {
+    my $reader = $self->_current_reader;
+    if ($reader && $reader->req->is_finished) {
         $self->_next_reader
-          unless $self->_reader->is_state(qw/handle_request handle_continue/);
+          unless $reader->is_state(qw/handle_request handle_continue/);
     }
 
     # Next writer
-    $self->_next_writer if $self->_writer && $self->_writer->is_finished;
+    $self->_next_writer
+      if $self->_current_writer && $self->_current_writer->is_finished;
 
     # Inherit state
     $self->_server_inherit_state;
@@ -288,13 +287,13 @@ sub server_spin {
 }
 
 # Current reader
-sub server_tx { shift->_reader }
+sub server_tx { shift->_current_reader }
 
 sub server_written {
     my $self = shift;
 
     # Written
-    $self->_writer->server_written(@_);
+    $self->_current_writer->server_written(@_);
 
     return $self;
 }
@@ -309,27 +308,42 @@ sub _client_inherit_state {
         # State
         $self->state(
               $self->_all_written
-            ? $self->_reader->state
-            : $self->_writer->state
+            ? $self->_current_reader->state
+            : $self->_current_writer->state
         );
         $self->state('read_response')
           if $self->is_state('done_with_leftovers');
 
         # Error
-        $self->error('Transaction error.') if $self->_reader->has_error;
+        $self->error('Transaction error.')
+          if $self->_current_reader->has_error;
     }
 
     return $self;
+}
+
+sub _current_reader {
+    my $self = shift;
+
+    # Current reader
+    return $self->transactions->[$self->_reader];
+}
+
+sub _current_writer {
+    my $self = shift;
+
+    # Current writer
+    return $self->transactions->[$self->_writer];
 }
 
 sub _next_reader {
     my $self = shift;
 
     # Next
-    $self->{_reader}++;
+    $self->_reader($self->_reader + 1);
 
     # No reader
-    return unless $self->transactions->[$self->{_reader}];
+    return unless $self->transactions->[$self->_reader];
 
     # Found
     return 1;
@@ -339,20 +353,13 @@ sub _next_writer {
     my $self = shift;
 
     # Next
-    $self->{_writer}++;
+    $self->_writer($self->_writer + 1);
 
     # No writer
-    return unless $self->transactions->[$self->{_writer}];
+    return unless $self->transactions->[$self->_writer];
 
     # Found
     return 1;
-}
-
-sub _reader {
-    my $self = shift;
-
-    # Current reader
-    return $self->transactions->[$self->{_reader}];
 }
 
 # We are always in reading mode according to RFC, so writing has priority
@@ -360,24 +367,18 @@ sub _server_inherit_state {
     my $self = shift;
 
     # Handler first
-    if ($self->_reader && $self->_reader->state =~ /^handle_/) {
-        $self->state($self->_reader->state);
+    my $reader = $self->_current_reader;
+    if ($reader && $reader->state =~ /^handle_/) {
+        $self->state($reader->state);
         return $self;
     }
 
     # Inherit state
-    $self->_writer
-      ? $self->state($self->_writer->state)
+    $self->_current_writer
+      ? $self->state($self->_current_writer->state)
       : $self->state('done');
 
     return $self;
-}
-
-sub _writer {
-    my $self = shift;
-
-    # Current writer
-    return $self->transactions->[$self->{_writer}];
 }
 
 1;

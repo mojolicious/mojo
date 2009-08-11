@@ -26,9 +26,9 @@ my $tx1  = Mojo::Transaction->new_get("http://127.0.0.1:3000/1/");
 my $tx2  = Mojo::Transaction->new_get("http://127.0.0.1:3000/2/");
 my $pipe = Mojo::Pipeline->new($tx1, $tx2);
 $_->state('read_response') for @{$pipe->transactions};
-$pipe->{_reader}      = 0;
-$pipe->{_writer}      = 2;
-$pipe->{_all_written} = 1;
+$pipe->_reader(0);
+$pipe->_writer(2);
+$pipe->_all_written(1);
 my $responses = <<EOF;
 HTTP/1.1 204 OK
 Connection: Keep-Alive
@@ -54,10 +54,10 @@ $tx1  = Mojo::Transaction->new_get("http://127.0.0.1:3000/3/");
 $tx2  = Mojo::Transaction->new_head("http://127.0.0.1:3000/4/");
 $pipe = Mojo::Pipeline->new($tx1, $tx2);
 $_->state('read_response') for @{$pipe->transactions};
-$pipe->{_reader}      = 0;
-$pipe->{_writer}      = 2;
-$pipe->{_all_written} = 1;
-$responses            = <<EOF;
+$pipe->_reader(0);
+$pipe->_writer(2);
+$pipe->_all_written(1);
+$responses = <<EOF;
 HTTP/1.1 404 Not Found
 Connection: Keep-Alive
 Date: Tue, 09 Jun 2009 18:24:14 GMT
@@ -81,10 +81,10 @@ $tx1  = Mojo::Transaction->new_head("http://127.0.0.1:3000/5/");
 $tx2  = Mojo::Transaction->new_get("http://127.0.0.1:3000/6/");
 $pipe = Mojo::Pipeline->new($tx1, $tx2);
 $_->state('read_response') for @{$pipe->transactions};
-$pipe->{_reader}      = 0;
-$pipe->{_writer}      = 2;
-$pipe->{_all_written} = 1;
-$responses            = <<EOF;
+$pipe->_reader(0);
+$pipe->_writer(2);
+$pipe->_all_written(1);
+$responses = <<EOF;
 HTTP/1.1 200 OK
 Connection: Keep-Alive
 Date: Tue, 09 Jun 2009 18:24:14 GMT
@@ -111,10 +111,10 @@ $tx1  = Mojo::Transaction->new_head("http://127.0.0.1:3000/9/");
 $tx2  = Mojo::Transaction->new_get("http://127.0.0.1:3000/10/");
 $pipe = Mojo::Pipeline->new($tx1, $tx2);
 $_->state('read_response') for @{$pipe->transactions};
-$pipe->{_reader}      = 0;
-$pipe->{_writer}      = 2;
-$pipe->{_all_written} = 1;
-$responses            = <<EOF;
+$pipe->_reader(0);
+$pipe->_writer(2);
+$pipe->_all_written(1);
+$responses = <<EOF;
 HTTP/1.1 151 Weird
 
 HTTP/1.1 152 Weirder
@@ -142,10 +142,10 @@ $tx1  = Mojo::Transaction->new_head("http://127.0.0.1:3000/11/");
 $tx2  = Mojo::Transaction->new_get("http://127.0.0.1:3000/12/");
 $pipe = Mojo::Pipeline->new($tx1, $tx2);
 $_->state('read_response') for @{$pipe->transactions};
-$pipe->{_reader}      = 0;
-$pipe->{_writer}      = 2;
-$pipe->{_all_written} = 1;
-$responses            = <<EOF;
+$pipe->_reader(0);
+$pipe->_writer(2);
+$pipe->_all_written(1);
+$responses = <<EOF;
 HTTP/1.1 200 OK
 Connection: Keep-Alive
 Date: Tue, 09 Jun 2009 18:24:14 GMT
@@ -173,10 +173,10 @@ $tx1  = Mojo::Transaction->new_get("http://127.0.0.1:3000/13/");
 $tx2  = Mojo::Transaction->new_get("http://127.0.0.1:3000/14/");
 $pipe = Mojo::Pipeline->new($tx1, $tx2);
 $_->state('read_response') for @{$pipe->transactions};
-$pipe->{_reader}      = 0;
-$pipe->{_writer}      = 2;
-$pipe->{_all_written} = 1;
-$responses            = <<EOF;
+$pipe->_reader(0);
+$pipe->_writer(2);
+$pipe->_all_written(1);
+$responses = <<EOF;
 HTTP/1.1 151 Weird
 
 HTTP/1.1 200 OK
@@ -211,9 +211,9 @@ $pipe = Mojo::Pipeline->new($tx1, $tx2, $tx3);
 $pipe->transactions->[$_]->state('read_response')
   for 0 .. $#{$pipe->transactions} - 1;
 $pipe->transactions->[2]->state('write_start_line');
-$pipe->{_reader} = 0;
-$pipe->{_writer} = 2;
-$responses       = <<EOF;
+$pipe->_reader(0);
+$pipe->_writer(2);
+$responses = <<EOF;
 HTTP/1.1 200 OK
 Connection: Keep-Alive
 Date: Tue, 09 Jun 2009 18:24:14 GMT

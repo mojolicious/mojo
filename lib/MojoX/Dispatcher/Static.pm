@@ -14,7 +14,7 @@ use Mojo::File;
 use MojoX::Types;
 
 __PACKAGE__->attr([qw/prefix root/]);
-__PACKAGE__->attr('types', default => sub { MojoX::Types->new });
+__PACKAGE__->attr(types => sub { MojoX::Types->new });
 
 # Valentine's Day's coming? Aw crap! I forgot to get a girlfriend again!
 sub dispatch {

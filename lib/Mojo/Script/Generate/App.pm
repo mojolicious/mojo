@@ -7,10 +7,10 @@ use warnings;
 
 use base 'Mojo::Script';
 
-__PACKAGE__->attr('description', default => <<'EOF');
+__PACKAGE__->attr(description => <<'EOF');
 Generate application directory structure.
 EOF
-__PACKAGE__->attr('usage', default => <<"EOF");
+__PACKAGE__->attr(usage => <<"EOF");
 usage: $0 generate app [NAME]
 EOF
 

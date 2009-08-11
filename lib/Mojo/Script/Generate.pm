@@ -7,21 +7,20 @@ use warnings;
 
 use base 'Mojo::Scripts';
 
-__PACKAGE__->attr('description', default => <<'EOF');
+__PACKAGE__->attr(description => <<'EOF');
 Generate files and directories from templates.
 EOF
-__PACKAGE__->attr('hint', default => <<"EOF");
+__PACKAGE__->attr(hint => <<"EOF");
 
 See '$0 generate help GENERATOR' for more information on a specific generator.
 EOF
-__PACKAGE__->attr('message', default => <<"EOF");
+__PACKAGE__->attr(message => <<"EOF");
 usage: $0 generate GENERATOR [OPTIONS]
 
 These generators are currently available:
 EOF
-__PACKAGE__->attr('namespaces',
-    default => sub { ['Mojo::Script::Generate'] });
-__PACKAGE__->attr('usage', default => <<"EOF");
+__PACKAGE__->attr(namespaces => sub { ['Mojo::Script::Generate'] });
+__PACKAGE__->attr(usage => <<"EOF");
 usage: $0 generate GENERATOR [OPTIONS]
 EOF
 

@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojo::Transaction';
 
-__PACKAGE__->attr('safe_post', default => 0);
+__PACKAGE__->attr(safe_post => 0);
 
 # No children have ever meddled with the Republican Party and lived to tell
 # about it.

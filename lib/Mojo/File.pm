@@ -21,8 +21,7 @@ use constant TMPDIR     => $ENV{MOJO_TMPDIR}     || File::Spec->tmpdir;
 
 __PACKAGE__->attr([qw/cleanup path/]);
 __PACKAGE__->attr(
-    'handle',
-    default => sub {
+    handle => sub {
         my $self   = shift;
         my $handle = IO::File->new;
 

@@ -13,7 +13,7 @@ use Mojo::Parameters;
 use Mojo::Path;
 
 __PACKAGE__->attr([qw/fragment host port scheme userinfo/]);
-__PACKAGE__->attr('base', default => sub { Mojo::URL->new });
+__PACKAGE__->attr(base => sub { Mojo::URL->new });
 
 # RFC 3986
 our $UNRESERVED = 'A-Za-z0-9\-\.\_\~';

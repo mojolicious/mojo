@@ -11,7 +11,7 @@ use bytes;
 use Mojo::ByteStream 'b';
 use Mojo::File;
 
-__PACKAGE__->attr('parts', default => sub { [] });
+__PACKAGE__->attr(parts => sub { [] });
 
 sub body_contains {
     my ($self, $chunk) = @_;

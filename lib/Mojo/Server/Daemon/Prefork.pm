@@ -16,15 +16,14 @@ use POSIX qw/setsid WNOHANG/;
 
 use constant DEBUG => $ENV{MOJO_SERVER_DEBUG} || 0;
 
-__PACKAGE__->attr('cleanup_interval',                    default => 15);
-__PACKAGE__->attr('idle_timeout',                        default => 30);
-__PACKAGE__->attr('max_clients',                         default => 1);
-__PACKAGE__->attr('max_servers',                         default => 100);
-__PACKAGE__->attr('max_spare_servers',                   default => 10);
-__PACKAGE__->attr([qw/min_spare_servers start_servers/], default => 5);
+__PACKAGE__->attr(cleanup_interval                      => 15);
+__PACKAGE__->attr(idle_timeout                          => 30);
+__PACKAGE__->attr(max_clients                           => 1);
+__PACKAGE__->attr(max_servers                           => 100);
+__PACKAGE__->attr(max_spare_servers                     => 10);
+__PACKAGE__->attr([qw/min_spare_servers start_servers/] => 5);
 __PACKAGE__->attr(
-    'pid_file',
-    default => sub {
+    pid_file => sub {
         return File::Spec->catfile(File::Spec->splitdir(File::Spec->tmpdir),
             'mojo_prefork.pid');
     }

@@ -7,8 +7,8 @@ use warnings;
 
 use base 'Mojo::Scripts';
 
-__PACKAGE__->attr('namespaces',
-    default => sub { [qw/Mojolicious::Script Mojo::Script/] });
+__PACKAGE__->attr(namespaces => sub { [qw/Mojolicious::Script Mojo::Script/] }
+);
 
 # One day a man has everything, the next day he blows up a $400 billion
 # space station, and the next day he has nothing. It makes you think.

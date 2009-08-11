@@ -12,11 +12,11 @@ use base 'Mojo::Base';
 # When I first heard that Marge was joining the police academy,
 # I thought it would be fun and zany, like that movie Spaceballs.
 # But instead it was dark and disturbing. Like that movie... Police Academy.
-__PACKAGE__->attr('bananas', chained => 0);
-__PACKAGE__->attr([qw/ears eyes/], default => sub {2});
-__PACKAGE__->attr('figs', chained => 0, default => 0);
-__PACKAGE__->attr('heads', {chained => 0, default => 1});
-__PACKAGE__->attr('name', chained => 0);
+__PACKAGE__->attr('bananas');
+__PACKAGE__->attr([qw/ears eyes/] => sub {2});
+__PACKAGE__->attr(figs            => 0);
+__PACKAGE__->attr(heads           => 1);
+__PACKAGE__->attr('name');
 
 package main;
 
@@ -53,7 +53,7 @@ my $y = 1;
 for my $i (101 .. 150) {
     $y = !$y;
     $monkeys->[$i] = BaseTest->new;
-    is($monkeys->[$i]->name('foobarbaz'), 'foobarbaz');
+    is(ref $monkeys->[$i]->name('foobarbaz'), 'BaseTest');
     $monkeys->[$i]->heads('3') if $y;
     $y ? is($monkeys->[$i]->heads, 3) : is($monkeys->[$i]->heads, 1);
 }

@@ -16,10 +16,10 @@ use Carp 'croak';
 use Mojo::ByteStream 'b';
 use Mojo::Template;
 
-__PACKAGE__->attr('description', default => 'No description.');
-__PACKAGE__->attr('quiet',       default => 0);
-__PACKAGE__->attr('renderer',    default => sub { Mojo::Template->new });
-__PACKAGE__->attr('usage',       default => "usage: $0\n");
+__PACKAGE__->attr(description => 'No description.');
+__PACKAGE__->attr(quiet       => 0);
+__PACKAGE__->attr(renderer    => sub { Mojo::Template->new });
+__PACKAGE__->attr(usage       => "usage: $0\n");
 
 sub chmod_file {
     my ($self, $path, $mod) = @_;

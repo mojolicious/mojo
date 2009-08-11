@@ -1,6 +1,11 @@
 This file documents the revision history for Perl extension Mojo.
 
 0.991247 2009-08-01 00:00:00
+        - Removed unused features from Mojo::Base and simplified API, this
+          change is not backwards compatible!
+              __PACKAGE__->attr('foo', default => 'bar');
+          becomes
+              __PACKAGE__->attr(foo => 'bar');
         - Merged eplite and epl, this change is not backwards compatible, you
           will have to rename all your eplite templates to epl.
         - Simplified MojoX::Renderer, this change is not backwards

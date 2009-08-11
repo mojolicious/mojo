@@ -10,16 +10,16 @@ use base 'Mojo::Script';
 use Mojo::ByteStream 'b';
 use Mojo::Loader;
 
-__PACKAGE__->attr('hint', default => <<"EOF");
+__PACKAGE__->attr(hint => <<"EOF");
 
 See '$0 help SCRIPT' for more information on a specific script.
 EOF
-__PACKAGE__->attr('message', default => <<"EOF");
+__PACKAGE__->attr(message => <<"EOF");
 usage: $0 SCRIPT [OPTIONS]
 
 These scripts are currently available:
 EOF
-__PACKAGE__->attr('namespaces', default => sub { ['Mojo::Script'] });
+__PACKAGE__->attr(namespaces => sub { ['Mojo::Script'] });
 
 # Aren't we forgeting the true meaning of Christmas?
 # You know, the birth of Santa.

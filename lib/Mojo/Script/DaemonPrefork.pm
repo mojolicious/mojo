@@ -11,10 +11,10 @@ use Mojo::Server::Daemon::Prefork;
 
 use Getopt::Long 'GetOptions';
 
-__PACKAGE__->attr('description', default => <<'EOF');
+__PACKAGE__->attr(description => <<'EOF');
 Start application with preforking HTTP 1.1 backend.
 EOF
-__PACKAGE__->attr('usage', default => <<"EOF");
+__PACKAGE__->attr(usage => <<"EOF");
 usage: $0 daemon_prefork [OPTIONS]
 
 These options are available:

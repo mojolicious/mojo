@@ -10,11 +10,11 @@ use base 'Mojo::Base';
 use File::Spec;
 use MojoX::Types;
 
-__PACKAGE__->attr('default_format', default => 'html');
+__PACKAGE__->attr(default_format => 'html');
 __PACKAGE__->attr('default_handler');
-__PACKAGE__->attr('handler', default => sub { {} });
-__PACKAGE__->attr('types',   default => sub { MojoX::Types->new });
-__PACKAGE__->attr('root',    default => '/');
+__PACKAGE__->attr(handler => sub { {} });
+__PACKAGE__->attr(types   => sub { MojoX::Types->new });
+__PACKAGE__->attr(root    => '/');
 
 # This is not how Xmas is supposed to be.
 # In my day Xmas was about bringing people together, not blowing them apart.

@@ -7,8 +7,7 @@ use warnings;
 
 use base 'Mojo::Base';
 
-__PACKAGE__->attr('app', weak => 1);
-__PACKAGE__->attr([qw/match tx/]);
+__PACKAGE__->attr([qw/app match tx/]);
 
 # Just make a simple cake. And this time, if someone's going to jump out of
 # it make sure to put them in *after* you cook it.

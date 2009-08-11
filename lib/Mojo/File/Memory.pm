@@ -13,7 +13,7 @@ use IO::File;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
 
-__PACKAGE__->attr('content', default => sub {''});
+__PACKAGE__->attr(content => sub {''});
 
 # There's your giraffe, little girl.
 # I'm a boy.

@@ -8,8 +8,7 @@ use warnings;
 use base 'Mojo::Base';
 
 __PACKAGE__->attr(
-    'types',
-    default => sub {
+    types => sub {
         return {
             atom => 'application/atom+xml',
             css  => 'text/css',

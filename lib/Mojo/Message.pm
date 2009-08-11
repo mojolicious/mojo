@@ -18,9 +18,9 @@ use Mojo::Upload;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
 
-__PACKAGE__->attr('buffer',  default => sub { Mojo::Buffer->new });
-__PACKAGE__->attr('content', default => sub { Mojo::Content->new });
-__PACKAGE__->attr([qw/major_version minor_version/], default => 1);
+__PACKAGE__->attr(buffer  => sub { Mojo::Buffer->new });
+__PACKAGE__->attr(content => sub { Mojo::Content->new });
+__PACKAGE__->attr([qw/major_version minor_version/] => 1);
 
 # I'll keep it short and sweet. Family. Religion. Friendship.
 # These are the three demons you must slay if you wish to succeed in

@@ -12,10 +12,10 @@ use FindBin;
 use File::Spec;
 use Test::Harness;
 
-__PACKAGE__->attr('description', default => <<'EOF');
+__PACKAGE__->attr(description => <<'EOF');
 Run unit tests.
 EOF
-__PACKAGE__->attr('usage', default => <<"EOF");
+__PACKAGE__->attr(usage => <<"EOF");
 usage: $0 test [TESTS]
 EOF
 

@@ -8,9 +8,8 @@ use warnings;
 use base 'Mojo::Base';
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
-__PACKAGE__->attr([qw/line lines_before lines_after stack/],
-    default => sub { [] });
-__PACKAGE__->attr('message', default => 'Exception!');
+__PACKAGE__->attr([qw/line lines_before lines_after stack/] => sub { [] });
+__PACKAGE__->attr(message => 'Exception!');
 
 # Attempted murder? Now honestly, what is that?
 # Do they give a Nobel Prize for attempted chemistry?

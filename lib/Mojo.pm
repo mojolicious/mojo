@@ -14,8 +14,7 @@ use Mojo::Scripts;
 use Mojo::Transaction;
 
 __PACKAGE__->attr(
-    'build_tx_cb',
-    default => sub {
+    build_tx_cb => sub {
         sub {
             my $tx = Mojo::Transaction->new;
             $tx->res->headers->header('X-Powered-By' => 'Mojo (Perl)');
@@ -23,8 +22,8 @@ __PACKAGE__->attr(
           }
     }
 );
-__PACKAGE__->attr('home', default => sub { Mojo::Home->new });
-__PACKAGE__->attr('log',  default => sub { Mojo::Log->new });
+__PACKAGE__->attr(home => sub { Mojo::Home->new });
+__PACKAGE__->attr(log  => sub { Mojo::Log->new });
 
 # Oh, so they have internet on computers now!
 our $VERSION = '0.991247';

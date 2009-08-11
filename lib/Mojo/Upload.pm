@@ -11,9 +11,9 @@ use Carp 'croak';
 use Mojo::File;
 use Mojo::Headers;
 
-__PACKAGE__->attr('file', default => sub { Mojo::File->new });
+__PACKAGE__->attr(file => sub { Mojo::File->new });
 __PACKAGE__->attr([qw/filename name/]);
-__PACKAGE__->attr('headers', default => sub { Mojo::Headers->new });
+__PACKAGE__->attr(headers => sub { Mojo::Headers->new });
 
 # B-6
 # You sunk my scrabbleship!

@@ -13,7 +13,7 @@ use FindBin;
 use Mojo::Loader;
 use Mojo::Script;
 
-__PACKAGE__->attr('app_class', default => 'Mojo::HelloWorld');
+__PACKAGE__->attr(app_class => 'Mojo::HelloWorld');
 
 # I'm normally not a praying man, but if you're up there,
 # please save me Superman.

@@ -10,8 +10,8 @@ use base 'Mojo::Message';
 use Mojo::Cookie::Request;
 use Mojo::Parameters;
 
-__PACKAGE__->attr('method', default => 'GET');
-__PACKAGE__->attr('url', default => sub { Mojo::URL->new });
+__PACKAGE__->attr(method => 'GET');
+__PACKAGE__->attr(url => sub { Mojo::URL->new });
 
 sub cookies {
     my $self = shift;

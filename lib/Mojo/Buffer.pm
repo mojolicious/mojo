@@ -9,7 +9,7 @@ use base 'Mojo::Base';
 use overload '""' => sub { shift->to_string }, fallback => 1;
 use bytes;
 
-__PACKAGE__->attr('raw_length', default => 0);
+__PACKAGE__->attr(raw_length => 0);
 
 sub add_chunk {
     my ($self, $chunk) = @_;

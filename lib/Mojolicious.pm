@@ -14,14 +14,12 @@ use MojoX::Dispatcher::Static;
 use MojoX::Types;
 use Time::HiRes ();
 
-__PACKAGE__->attr('controller_class', default => 'Mojolicious::Controller');
-__PACKAGE__->attr('mode',
-    default => sub { ($ENV{MOJO_MODE} || 'development') });
-__PACKAGE__->attr('renderer', default => sub { Mojolicious::Renderer->new });
-__PACKAGE__->attr('routes', default => sub { Mojolicious::Dispatcher->new });
-__PACKAGE__->attr('static',
-    default => sub { MojoX::Dispatcher::Static->new });
-__PACKAGE__->attr('types', default => sub { MojoX::Types->new });
+__PACKAGE__->attr(controller_class => 'Mojolicious::Controller');
+__PACKAGE__->attr(mode => sub { ($ENV{MOJO_MODE} || 'development') });
+__PACKAGE__->attr(renderer => sub { Mojolicious::Renderer->new });
+__PACKAGE__->attr(routes   => sub { Mojolicious::Dispatcher->new });
+__PACKAGE__->attr(static   => sub { MojoX::Dispatcher::Static->new });
+__PACKAGE__->attr(types    => sub { MojoX::Types->new });
 
 # It's just like the story of the grasshopper and the octopus.
 # All year long, the grasshopper kept burying acorns for the winter,

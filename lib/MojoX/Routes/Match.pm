@@ -9,10 +9,10 @@ use base 'Mojo::Base';
 
 use Mojo::URL;
 
-__PACKAGE__->attr([qw/captures dictionary/], default => sub { {} });
+__PACKAGE__->attr([qw/captures dictionary/] => sub { {} });
 __PACKAGE__->attr([qw/endpoint tx/]);
-__PACKAGE__->attr('path',  default => sub {'/'});
-__PACKAGE__->attr('stack', default => sub { [] });
+__PACKAGE__->attr(path  => sub {'/'});
+__PACKAGE__->attr(stack => sub { [] });
 
 # I'm Bender, baby, please insert liquor!
 sub new {

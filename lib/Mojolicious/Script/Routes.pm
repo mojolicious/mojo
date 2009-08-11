@@ -9,10 +9,10 @@ use base 'Mojo::Script';
 
 use Mojo::Server;
 
-__PACKAGE__->attr('description', default => <<'EOF');
+__PACKAGE__->attr(description => <<'EOF');
 Show available routes.
 EOF
-__PACKAGE__->attr('usage', default => <<"EOF");
+__PACKAGE__->attr(usage => <<"EOF");
 usage: $0 routes
 EOF
 

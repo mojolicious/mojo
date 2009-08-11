@@ -11,8 +11,8 @@ use Mojo::ByteStream 'b';
 use Mojo::Loader;
 use Mojo::Loader::Exception;
 
-__PACKAGE__->attr('hidden',
-    default => sub { [qw/new app attr render req res stash tx/] });
+__PACKAGE__->attr(hidden => sub { [qw/new app attr render req res stash tx/] }
+);
 __PACKAGE__->attr('namespace');
 
 # Hey. What kind of party is this? There's no booze and only one hooker.

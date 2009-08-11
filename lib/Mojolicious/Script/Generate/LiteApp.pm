@@ -7,10 +7,10 @@ use warnings;
 
 use base 'Mojo::Script';
 
-__PACKAGE__->attr('description', default => <<'EOF');
+__PACKAGE__->attr(description => <<'EOF');
 Generate a minimalistic web application.
 EOF
-__PACKAGE__->attr('usage', default => <<"EOF");
+__PACKAGE__->attr(usage => <<"EOF");
 usage: $0 generate lite_app [NAME]
 EOF
 

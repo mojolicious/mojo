@@ -13,8 +13,7 @@ use Mojo::Loader;
 use constant RELOAD => $ENV{MOJO_RELOAD} || 0;
 
 __PACKAGE__->attr(
-    'app',
-    default => sub {
+    app => sub {
         my $self = shift;
 
         # Load
@@ -25,11 +24,9 @@ __PACKAGE__->attr(
         return $self->app_class->new;
     }
 );
-__PACKAGE__->attr('app_class',
-    default => sub { $ENV{MOJO_APP} ||= 'Mojo::HelloWorld' });
+__PACKAGE__->attr(app_class => sub { $ENV{MOJO_APP} ||= 'Mojo::HelloWorld' });
 __PACKAGE__->attr(
-    'build_tx_cb',
-    default => sub {
+    build_tx_cb => sub {
         sub {
             my $self = shift;
 
@@ -44,8 +41,7 @@ __PACKAGE__->attr(
     }
 );
 __PACKAGE__->attr(
-    'continue_handler_cb',
-    default => sub {
+    continue_handler_cb => sub {
         sub {
             my ($self, $tx) = @_;
             if ($self->app->can('continue_handler')) {
@@ -62,8 +58,7 @@ __PACKAGE__->attr(
     }
 );
 __PACKAGE__->attr(
-    'handler_cb',
-    default => sub {
+    handler_cb => sub {
         sub { shift->app->handler(shift) }
     }
 );

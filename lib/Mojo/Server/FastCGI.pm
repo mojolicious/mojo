@@ -138,6 +138,7 @@ sub read_request {
 
     # Slurp
     my $parambuffer = '';
+    my $env         = {};
     while (($type, $id, $body) = $self->read_record($connection)) {
 
         # Wrong id
@@ -163,7 +164,8 @@ sub read_request {
                 my $name  = substr $parambuffer, 0, $nlen, '';
                 my $value = substr $parambuffer, 0, $vlen, '';
 
-                $tx->req->parse({$name => $value});
+                # Environment
+                $env->{$name} = $value;
 
                 # Debug
                 $self->app->log->debug(qq/FastCGI param: $name - "$value"./)
@@ -177,6 +179,12 @@ sub read_request {
 
         # Stdin
         elsif ($type eq 'STDIN') {
+
+            # Environment
+            if (keys %$env) {
+                $req->parse($env);
+                $env = {};
+            }
 
             # EOF?
             last unless $body;

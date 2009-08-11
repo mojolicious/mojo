@@ -8,6 +8,7 @@ use warnings;
 use base 'Mojo::Transaction';
 
 __PACKAGE__->attr(safe_post => 0);
+__PACKAGE__->attr(transactions => sub { [] });
 
 # No children have ever meddled with the Republican Party and lived to tell
 # about it.
@@ -15,14 +16,16 @@ sub new {
     my $self = shift->SUPER::new();
 
     # Transactions
-    $self->{_txs} = [@_];
+    $self->transactions([@_]);
 
     return $self;
 }
 
 sub client_info {
     my $self = shift;
-    return $self->{_txs}->[0] ? $self->{_txs}->[0]->client_info(@_) : undef;
+    return $self->transactions->[0]
+      ? $self->transactions->[0]->client_info(@_)
+      : undef;
 }
 
 sub client_connect {
@@ -33,7 +36,7 @@ sub client_connect {
     $self->{_reader} = 0;
 
     # Connect all
-    $_->client_connect for @{$self->{_txs}};
+    $_->client_connect for @{$self->transactions};
     $self->state('connect');
 
     return $self;
@@ -43,7 +46,7 @@ sub client_connected {
     my $self = shift;
 
     # All connected
-    for my $tx (@{$self->{_txs}}) {
+    for my $tx (@{$self->transactions}) {
 
         # Connected
         $tx->client_connected;
@@ -81,8 +84,8 @@ sub client_read {
         # All done
         unless ($self->_next_reader) {
 
-            $self->{_reader} = $#{$self->{_txs}};
-            $self->{_writer} = $#{$self->{_txs}};
+            $self->{_reader} = $#{$self->transactions};
+            $self->{_writer} = $#{$self->transactions};
 
             $self->done;
             return $self;
@@ -110,14 +113,14 @@ sub client_leftovers {
     return unless $previous >= 0;
 
     # Leftovers
-    return $self->{_txs}->[$previous]->client_leftovers;
+    return $self->transactions->[$previous]->client_leftovers;
 }
 
 sub client_spin {
     my $self = shift;
 
     # Spin all
-    $_->client_spin for @{$self->{_txs}};
+    $_->client_spin for @{$self->transactions};
 
     # Transaction finished
     if (!$self->{_all_written} && $self->_writer->is_state('read_response')) {
@@ -141,7 +144,7 @@ sub client_written {
     return $self;
 }
 
-sub continued { shift->{_txs}->[-1]->continued }
+sub continued { shift->transactions->[-1]->continued }
 
 sub is_writing {
     my $self = shift;
@@ -164,20 +167,20 @@ sub is_writing {
 
 sub keep_alive {
     my $self = shift;
-    return $self->{_txs}->[$self->{_writer}]
-      ? $self->{_txs}->[$self->{_writer}]->keep_alive(@_)
-      : $self->{_txs}->[-1]->keep_alive(@_);
+    return $self->transactions->[$self->{_writer}]
+      ? $self->transactions->[$self->{_writer}]->keep_alive(@_)
+      : $self->transactions->[-1]->keep_alive(@_);
 }
 
 sub req {
     my @req;
-    push @req, $_->req for @{shift->{_txs}};
+    push @req, $_->req for @{shift->transactions};
     return \@req;
 }
 
 sub res {
     my @res;
-    push @res, $_->res for @{shift->{_txs}};
+    push @res, $_->res for @{shift->transactions};
     return \@res;
 }
 
@@ -194,11 +197,11 @@ sub server_accept {
 
     # Accept
     $tx->server_accept;
-    push @{$self->{_txs}}, $tx;
+    push @{$self->transactions}, $tx;
 
     # Initialize
     $self->{_writer} ||= 0;
-    $self->{_reader} = $#{$self->{_txs}};
+    $self->{_reader} = $#{$self->transactions};
 
     # Inherit state
     $self->_server_inherit_state;
@@ -229,7 +232,7 @@ sub server_leftovers {
     my $self = shift;
 
     # Last Transaction
-    my $last = $self->{_txs}->[-1];
+    my $last = $self->transactions->[-1];
 
     # No leftovers
     return unless $last->req->is_state('done_with_leftovers');
@@ -265,7 +268,7 @@ sub server_spin {
     my $self = shift;
 
     # Spin all
-    $_->server_spin for @{$self->{_txs}};
+    $_->server_spin for @{$self->transactions};
 
     # Next reader?
     if ($self->_reader && $self->_reader->req->is_finished) {
@@ -324,7 +327,7 @@ sub _next_reader {
     $self->{_reader}++;
 
     # No reader
-    return unless $self->{_txs}->[$self->{_reader}];
+    return unless $self->transactions->[$self->{_reader}];
 
     # Found
     return 1;
@@ -337,7 +340,7 @@ sub _next_writer {
     $self->{_writer}++;
 
     # No writer
-    return unless $self->{_txs}->[$self->{_writer}];
+    return unless $self->transactions->[$self->{_writer}];
 
     # Found
     return 1;
@@ -347,7 +350,7 @@ sub _reader {
     my $self = shift;
 
     # Current reader
-    return $self->{_txs}->[$self->{_reader}];
+    return $self->transactions->[$self->{_reader}];
 }
 
 # We are always in reading mode according to RFC, so writing has priority
@@ -372,7 +375,7 @@ sub _writer {
     my $self = shift;
 
     # Current writer
-    return $self->{_txs}->[$self->{_writer}];
+    return $self->transactions->[$self->{_writer}];
 }
 
 1;
@@ -417,6 +420,11 @@ implements the following new ones.
 
     my $safe_post = $p->safe_post;
     $p            = $p->safe_post(1);
+
+=head2 C<transactions>
+
+    my $transactions = $p->transactions;
+    $p               = $p->transactions([Mojo::Transaction->new]);
 
 =head1 METHODS
 

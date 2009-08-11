@@ -33,11 +33,14 @@ sub bar {
 }
 
 sub data_template {
-    shift->render('index', epl_class => 'SingleFileTestApp::Foo');
+    shift->render('index', template_class => 'SingleFileTestApp::Foo');
 }
 
 sub data_template2 {
-    shift->stash(template => 'too', epl_class => 'SingleFileTestApp::Foo');
+    shift->stash(
+        template       => 'too',
+        template_class => 'SingleFileTestApp::Foo'
+    );
 }
 
 sub index { shift->stash(template => 'withlayout', msg => 'works great!') }

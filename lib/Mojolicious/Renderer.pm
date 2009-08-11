@@ -42,8 +42,8 @@ sub new {
 
                 # Class
                 my $class =
-                     $c->stash->{epl_class}
-                  || $ENV{MOJO_EPL_CLASS}
+                     $c->stash->{template_class}
+                  || $ENV{MOJO_TEMPLATE_CLASS}
                   || 'main';
 
                 # Try template

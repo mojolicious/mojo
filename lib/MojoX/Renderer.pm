@@ -180,15 +180,15 @@ L<MojoX::Types> implements the follwing attributes.
     my $handler = $renderer->handler;
     $renderer   = $renderer->handler({epl => sub { ... }});
 
-=head2 C<types>
-
-    my $types = $renderer->types;
-    $renderer = $renderer->types(MojoX::Types->new);
-
 =head2 C<root>
 
    my $root  = $renderer->root;
    $renderer = $renderer->root('/foo/bar/templates');
+
+=head2 C<types>
+
+    my $types = $renderer->types;
+    $renderer = $renderer->types(MojoX::Types->new);
 
 =head1 METHODS
 

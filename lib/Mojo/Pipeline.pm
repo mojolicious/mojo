@@ -324,15 +324,11 @@ sub _client_inherit_state {
 
 sub _current_reader {
     my $self = shift;
-
-    # Current reader
     return $self->transactions->[$self->_reader];
 }
 
 sub _current_writer {
     my $self = shift;
-
-    # Current writer
     return $self->transactions->[$self->_writer];
 }
 

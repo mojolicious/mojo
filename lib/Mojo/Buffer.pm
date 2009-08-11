@@ -21,8 +21,8 @@ sub add_chunk {
     $self->raw_length($self->raw_length + length $chunk);
 
     # Store
-    $self->{_buffer} ||= '';
-    $self->{_buffer} .= $chunk;
+    $self->{buffer} ||= '';
+    $self->{buffer} .= $chunk;
 
     return $self;
 }
@@ -31,16 +31,16 @@ sub contains {
     my ($self, $chunk) = @_;
 
     # Search
-    return index $self->{_buffer} || '', $chunk;
+    return index $self->{buffer} || '', $chunk;
 }
 
 sub empty {
     my $self = shift;
 
     # Cleanup
-    my $buffer = $self->{_buffer};
+    my $buffer = $self->{buffer};
     my $x      = '';
-    $self->{_buffer} = '';
+    $self->{buffer} = '';
 
     return $buffer;
 }
@@ -49,19 +49,19 @@ sub get_line {
     my $self = shift;
 
     # No full line in buffer
-    return unless ($self->{_buffer} || '') =~ /\x0d?\x0a/;
+    return unless ($self->{buffer} || '') =~ /\x0d?\x0a/;
 
     # Locate line ending
-    my $pos = index $self->{_buffer}, "\x0a";
+    my $pos = index $self->{buffer}, "\x0a";
 
     # Extract line and ending
-    my $line = substr $self->{_buffer}, 0, $pos + 1, '';
+    my $line = substr $self->{buffer}, 0, $pos + 1, '';
     $line =~ s/(\x0d?\x0a)\z//;
 
     return $line;
 }
 
-sub length { length(shift->{_buffer} || '') }
+sub length { length(shift->{buffer} || '') }
 
 sub remove {
     my ($self, $length, $chunk) = @_;
@@ -70,11 +70,11 @@ sub remove {
     $chunk ||= '';
 
     # Extract and replace
-    $self->{_buffer} ||= '';
-    return substr $self->{_buffer}, 0, $length, $chunk;
+    $self->{buffer} ||= '';
+    return substr $self->{buffer}, 0, $length, $chunk;
 }
 
-sub to_string { shift->{_buffer} || '' }
+sub to_string { shift->{buffer} || '' }
 
 1;
 __END__

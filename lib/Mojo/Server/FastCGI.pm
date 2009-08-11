@@ -165,6 +165,10 @@ sub read_request {
 
                 $tx->req->parse({$name => $value});
 
+                # Debug
+                $self->app->log->debug(qq/FastCGI param: $name - "$value"./)
+                  if DEBUG;
+
                 # Store connection information
                 $tx->remote_address($value) if $name =~ /REMOTE_ADDR/i;
                 $tx->local_port($value)     if $name =~ /SERVER_PORT/i;

@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojo.
 
-0.991247 2009-08-01 00:00:00
+0.991247 2009-08-11 00:00:00
         - Removed unused features from Mojo::Base and simplified API, this
           change is not backwards compatible!
               __PACKAGE__->attr('foo', default => 'bar');
@@ -13,25 +13,25 @@ This file documents the revision history for Perl extension Mojo.
           Handler can no longer be detected, that means "default_handler" or
           the "handler" argument are required.
           The template argument can no longer contain format or handler.
-              $c->render(template => 'foo.html.epl')
+              $self->render(template => 'foo.html.epl')
           becomes
-              $c->render('foo', format => 'html', handler => 'epl')
+              $self->render('foo', format => 'html', handler => 'epl')
           The following forms are available now.
-              $c->render;
-              $c->render(controller => 'foo', action => 'bar');
-              $c->render({controller => 'foo', action => 'bar'});
-              $c->render(text => 'Hello!');
-              $c->render(template => 'index');
-              $c->render(template => 'foo/index');
-              $c->render(
+              $self->render;
+              $self->render(controller => 'foo', action => 'bar');
+              $self->render({controller => 'foo', action => 'bar'});
+              $self->render(text => 'Hello!');
+              $self->render(template => 'index');
+              $self->render(template => 'foo/index');
+              $self->render(
                   template => 'index',
                   format   => 'html',
                   handler  => 'epl'
               );
-              $c->render(handler => 'something');
-              $c->render('foo/bar');
-              $c->render('foo/bar', format => 'html');
-              $c->render('foo/bar', {format => 'html'});
+              $self->render(handler => 'something');
+              $self->render('foo/bar');
+              $self->render('foo/bar', format => 'html');
+              $self->render('foo/bar', {format => 'html'});
           For renderers the stash will no longer get an updated template,
           instead a new argument will be passed along.
               {template => 'foo/bar', format => 'html', handler => 'epl'}

@@ -9,8 +9,8 @@ use base 'Mojo::Base';
 
 use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
 use IO::Socket::INET;
-use Mojo::Pipeline;
 use Mojo::Server;
+use Mojo::Transaction::Pipeline;
 use Socket;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
@@ -206,7 +206,7 @@ sub spin {
         my $connection = $tx->connection;
 
         # We always try to read as suggested by RFC 2616 for HTTP 1.1 clients
-        $tx->is_writing
+        $tx->client_is_writing
           ? $poll->mask($connection, POLLIN | POLLOUT)
           : $poll->mask($connection, POLLIN);
 
@@ -294,8 +294,8 @@ sub spin_app {
         $client->client_connected;
 
         # Server accepting
-        my $server =
-          Mojo::Pipeline->new->server_accept($daemon->build_tx_cb->($daemon));
+        my $server = Mojo::Transaction::Pipeline->new->server_accept(
+            $daemon->build_tx_cb->($daemon));
 
         # Store
         $client->connection($server);
@@ -314,10 +314,10 @@ sub spin_app {
     }
 
     # Exchange
-    if ($client->is_writing || $server->is_writing) {
+    if ($client->client_is_writing || $server->server_is_writing) {
 
         # Client writing?
-        if ($client->is_writing) {
+        if ($client->client_is_writing) {
 
             # Client grabs chunk
             my $buffer = $client->client_get_chunk || '';
@@ -334,7 +334,7 @@ sub spin_app {
         $server->server_spin;
 
         # Server writing?
-        if ($server->is_writing) {
+        if ($server->server_is_writing) {
 
             # Server grabs chunk
             my $buffer = $server->server_get_chunk || '';
@@ -454,9 +454,9 @@ Mojo::Client - Client
 =head1 SYNOPSIS
 
     use Mojo::Client;
-    use Mojo::Transaction;
+    use Mojo::Transaction::Single;
 
-    my $tx = Mojo::Transaction->new;
+    my $tx = Mojo::Transaction::Single->new;
     $tx->req->method('GET');
     $tx->req->url->parse('http://cpan.org');
 

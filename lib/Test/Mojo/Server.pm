@@ -285,7 +285,6 @@ Test::Mojo::Server - Server Tests
 
 =head1 SYNOPSIS
 
-    use Mojo::Transaction;
     use Mojo::Test::Server;
 
     my $server = Test::Mojo::Server->new;

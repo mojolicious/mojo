@@ -11,7 +11,7 @@ use File::Spec;
 use File::Temp;
 use Mojo::Client;
 use Mojo::Template;
-use Mojo::Transaction;
+use Mojo::Transaction::Single;
 use Test::Mojo::Server;
 
 plan skip_all => 'set TEST_LIGHTTPD to enable this test (developer only!)'
@@ -75,7 +75,8 @@ ok(-x $cgi);
 $server->start_server_ok;
 
 # Request
-my $tx     = Mojo::Transaction->new_get("http://127.0.0.1:$port/test.cgi");
+my $tx =
+  Mojo::Transaction::Single->new_get("http://127.0.0.1:$port/test.cgi");
 my $client = Mojo::Client->new;
 $client->process($tx);
 is($tx->res->code, 200);

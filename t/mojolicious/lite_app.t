@@ -13,7 +13,7 @@ use Test::More tests => 60;
 # Well, ok but I don't want people thinking we're robosexuals,
 # so if anyone asks you're my debugger.
 use Mojo::Client;
-use Mojo::Transaction;
+use Mojo::Transaction::Single;
 use Mojolicious::Lite;
 
 # Something
@@ -70,7 +70,7 @@ my $app    = Mojolicious::Lite->new;
 my $client = Mojo::Client->new;
 
 # GET /foo
-my $tx = Mojo::Transaction->new_get('/foo');
+my $tx = Mojo::Transaction::Single->new_get('/foo');
 $client->process_app($app, $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
@@ -78,7 +78,7 @@ is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 is($tx->res->body,                            'Yea baby!');
 
 # POST /template
-$tx = Mojo::Transaction->new_post('/template');
+$tx = Mojo::Transaction::Single->new_post('/template');
 $client->process_app($app, $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
@@ -86,7 +86,7 @@ is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 is($tx->res->body,                            'Just works!');
 
 # GET /something
-$tx = Mojo::Transaction->new_get('/something');
+$tx = Mojo::Transaction::Single->new_get('/something');
 $client->process_app($app, $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
@@ -94,7 +94,7 @@ is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 is($tx->res->body,                            'Just works!');
 
 # POST /something
-$tx = Mojo::Transaction->new_post('/something');
+$tx = Mojo::Transaction::Single->new_post('/something');
 $client->process_app($app, $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
@@ -102,7 +102,7 @@ is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 is($tx->res->body,                            'Just works!');
 
 # DELETE /something
-$tx = Mojo::Transaction->new_delete('/something');
+$tx = Mojo::Transaction::Single->new_delete('/something');
 $client->process_app($app, $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
@@ -110,7 +110,7 @@ is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 is($tx->res->body,                            'Just works!');
 
 # GET /something/else
-$tx = Mojo::Transaction->new_get('/something/else');
+$tx = Mojo::Transaction::Single->new_get('/something/else');
 $client->process_app($app, $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
@@ -118,7 +118,7 @@ is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 is($tx->res->body,                            'Yay!');
 
 # POST /something/else
-$tx = Mojo::Transaction->new_post('/something/else');
+$tx = Mojo::Transaction::Single->new_post('/something/else');
 $client->process_app($app, $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
@@ -126,7 +126,7 @@ is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 is($tx->res->body,                            'Yay!');
 
 # DELETE /something/else
-$tx = Mojo::Transaction->new_delete('/something/else');
+$tx = Mojo::Transaction::Single->new_delete('/something/else');
 $client->process_app($app, $tx);
 is($tx->res->code,                            404);
 is($tx->res->headers->server,                 'Mojo (Perl)');
@@ -134,7 +134,7 @@ is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 like($tx->res->body, qr/File Not Found/);
 
 # GET /regex/23
-$tx = Mojo::Transaction->new_get('/regex/23');
+$tx = Mojo::Transaction::Single->new_get('/regex/23');
 $client->process_app($app, $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
@@ -142,7 +142,7 @@ is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 is($tx->res->body,                            '23');
 
 # GET /regex/foo
-$tx = Mojo::Transaction->new_get('/regex/foo');
+$tx = Mojo::Transaction::Single->new_get('/regex/foo');
 $client->process_app($app, $tx);
 is($tx->res->code,                            404);
 is($tx->res->headers->server,                 'Mojo (Perl)');
@@ -150,7 +150,7 @@ is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 like($tx->res->body, qr/File Not Found/);
 
 # POST /bar
-$tx = Mojo::Transaction->new_post('/bar');
+$tx = Mojo::Transaction::Single->new_post('/bar');
 $client->process_app($app, $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
@@ -158,7 +158,7 @@ is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 is($tx->res->body,                            'default');
 
 # GET /bar/baz
-$tx = Mojo::Transaction->new_post('/bar/baz');
+$tx = Mojo::Transaction::Single->new_post('/bar/baz');
 $client->process_app($app, $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
@@ -166,7 +166,7 @@ is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 is($tx->res->body,                            'baz');
 
 # GET /layout
-$tx = Mojo::Transaction->new_get('/layout');
+$tx = Mojo::Transaction::Single->new_get('/layout');
 $client->process_app($app, $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
@@ -174,7 +174,8 @@ is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 is($tx->res->body,                            "Yea baby! with layout\n");
 
 # GET /firefox
-$tx = Mojo::Transaction->new_get('/firefox/bar', 'User-Agent' => 'Firefox');
+$tx = Mojo::Transaction::Single->new_get('/firefox/bar',
+    'User-Agent' => 'Firefox');
 $client->process_app($app, $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
@@ -182,7 +183,8 @@ is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 is($tx->res->body,                            '/firefox/foo');
 
 # GET /firefox
-$tx = Mojo::Transaction->new_get('/firefox/bar', 'User-Agent' => 'Explorer');
+$tx = Mojo::Transaction::Single->new_get('/firefox/bar',
+    'User-Agent' => 'Explorer');
 $client->process_app($app, $tx);
 is($tx->res->code,                            404);
 is($tx->res->headers->server,                 'Mojo (Perl)');

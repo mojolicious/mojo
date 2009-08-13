@@ -18,16 +18,14 @@ plan tests => 34;
 # Are we there yet?
 # No
 # ...Where are we going?
-use_ok('Mojo::Pipeline');
-use_ok('Mojo::Transaction');
+use_ok('Mojo::Transaction::Pipeline');
+use_ok('Mojo::Transaction::Single');
 
 # Vanilla Pipeline
-my $tx1  = Mojo::Transaction->new_get("http://127.0.0.1:3000/1/");
-my $tx2  = Mojo::Transaction->new_get("http://127.0.0.1:3000/2/");
-my $pipe = Mojo::Pipeline->new($tx1, $tx2);
-$_->state('read_response') for @{$pipe->transactions};
-$pipe->_reader(0);
-$pipe->_writer(2);
+my $tx1  = Mojo::Transaction::Single->new_get("http://127.0.0.1:3000/1/");
+my $tx2  = Mojo::Transaction::Single->new_get("http://127.0.0.1:3000/2/");
+my $pipe = Mojo::Transaction::Pipeline->new($tx1, $tx2);
+$_->state('read_response') for @{$pipe->active};
 $pipe->_all_written(1);
 my $responses = <<EOF;
 HTTP/1.1 204 OK
@@ -50,12 +48,10 @@ is($tx1->res->code, 204);
 is($tx2->res->code, 200);
 
 # HEAD request
-$tx1  = Mojo::Transaction->new_get("http://127.0.0.1:3000/3/");
-$tx2  = Mojo::Transaction->new_head("http://127.0.0.1:3000/4/");
-$pipe = Mojo::Pipeline->new($tx1, $tx2);
-$_->state('read_response') for @{$pipe->transactions};
-$pipe->_reader(0);
-$pipe->_writer(2);
+$tx1  = Mojo::Transaction::Single->new_get("http://127.0.0.1:3000/3/");
+$tx2  = Mojo::Transaction::Single->new_head("http://127.0.0.1:3000/4/");
+$pipe = Mojo::Transaction::Pipeline->new($tx1, $tx2);
+$_->state('read_response') for @{$pipe->active};
 $pipe->_all_written(1);
 $responses = <<EOF;
 HTTP/1.1 404 Not Found
@@ -77,12 +73,10 @@ is($tx1->res->code, 404);
 is($tx2->res->code, 200);
 
 # HEAD request followed by regular request
-$tx1  = Mojo::Transaction->new_head("http://127.0.0.1:3000/5/");
-$tx2  = Mojo::Transaction->new_get("http://127.0.0.1:3000/6/");
-$pipe = Mojo::Pipeline->new($tx1, $tx2);
-$_->state('read_response') for @{$pipe->transactions};
-$pipe->_reader(0);
-$pipe->_writer(2);
+$tx1  = Mojo::Transaction::Single->new_head("http://127.0.0.1:3000/5/");
+$tx2  = Mojo::Transaction::Single->new_get("http://127.0.0.1:3000/6/");
+$pipe = Mojo::Transaction::Pipeline->new($tx1, $tx2);
+$_->state('read_response') for @{$pipe->active};
 $pipe->_all_written(1);
 $responses = <<EOF;
 HTTP/1.1 200 OK
@@ -107,12 +101,10 @@ is($tx1->res->code, 200);
 is($tx2->res->code, 500);
 
 # Unexpected 1xx response
-$tx1  = Mojo::Transaction->new_head("http://127.0.0.1:3000/9/");
-$tx2  = Mojo::Transaction->new_get("http://127.0.0.1:3000/10/");
-$pipe = Mojo::Pipeline->new($tx1, $tx2);
-$_->state('read_response') for @{$pipe->transactions};
-$pipe->_reader(0);
-$pipe->_writer(2);
+$tx1  = Mojo::Transaction::Single->new_head("http://127.0.0.1:3000/9/");
+$tx2  = Mojo::Transaction::Single->new_get("http://127.0.0.1:3000/10/");
+$pipe = Mojo::Transaction::Pipeline->new($tx1, $tx2);
+$_->state('read_response') for @{$pipe->active};
 $pipe->_all_written(1);
 $responses = <<EOF;
 HTTP/1.1 151 Weird
@@ -138,12 +130,10 @@ is($tx1->res->code, 200);
 is($tx2->res->code, 204);
 
 # Unexpected 1xx response (variation)
-$tx1  = Mojo::Transaction->new_head("http://127.0.0.1:3000/11/");
-$tx2  = Mojo::Transaction->new_get("http://127.0.0.1:3000/12/");
-$pipe = Mojo::Pipeline->new($tx1, $tx2);
-$_->state('read_response') for @{$pipe->transactions};
-$pipe->_reader(0);
-$pipe->_writer(2);
+$tx1  = Mojo::Transaction::Single->new_head("http://127.0.0.1:3000/11/");
+$tx2  = Mojo::Transaction::Single->new_get("http://127.0.0.1:3000/12/");
+$pipe = Mojo::Transaction::Pipeline->new($tx1, $tx2);
+$_->state('read_response') for @{$pipe->active};
 $pipe->_all_written(1);
 $responses = <<EOF;
 HTTP/1.1 200 OK
@@ -169,12 +159,10 @@ is($tx1->res->code, 200);
 is($tx2->res->code, 204);
 
 # Unexpected 1xx response (other variation)
-$tx1  = Mojo::Transaction->new_get("http://127.0.0.1:3000/13/");
-$tx2  = Mojo::Transaction->new_get("http://127.0.0.1:3000/14/");
-$pipe = Mojo::Pipeline->new($tx1, $tx2);
-$_->state('read_response') for @{$pipe->transactions};
-$pipe->_reader(0);
-$pipe->_writer(2);
+$tx1  = Mojo::Transaction::Single->new_get("http://127.0.0.1:3000/13/");
+$tx2  = Mojo::Transaction::Single->new_get("http://127.0.0.1:3000/14/");
+$pipe = Mojo::Transaction::Pipeline->new($tx1, $tx2);
+$_->state('read_response') for @{$pipe->active};
 $pipe->_all_written(1);
 $responses = <<EOF;
 HTTP/1.1 151 Weird
@@ -203,16 +191,14 @@ is($tx1->res->code, 200);
 is($tx2->res->code, 204);
 
 # Safe POST
-$tx1 = Mojo::Transaction->new_get("http://127.0.0.1:3000/15/");
-$tx2 = Mojo::Transaction->new_get("http://127.0.0.1:3000/16/");
-my $tx3 = Mojo::Transaction->new_post('http://127.0.0.1:3000/17/');
+$tx1 = Mojo::Transaction::Single->new_get("http://127.0.0.1:3000/15/");
+$tx2 = Mojo::Transaction::Single->new_get("http://127.0.0.1:3000/16/");
+my $tx3 = Mojo::Transaction::Single->new_post('http://127.0.0.1:3000/17/');
 $tx3->req->body('foo bar baz' x 10);
-$pipe = Mojo::Pipeline->new($tx1, $tx2, $tx3);
-$pipe->transactions->[$_]->state('read_response')
-  for 0 .. $#{$pipe->transactions} - 1;
-$pipe->transactions->[2]->state('write_start_line');
-$pipe->_reader(0);
-$pipe->_writer(2);
+$pipe = Mojo::Transaction::Pipeline->new($tx1, $tx2, $tx3);
+$pipe->active->[$_]->state('read_response') for 0 .. $#{$pipe->active} - 1;
+$pipe->active->[2]->state('write_start_line');
+$pipe->_current(2);
 $responses = <<EOF;
 HTTP/1.1 200 OK
 Connection: Keep-Alive
@@ -224,6 +210,6 @@ Content-length: 5
 EOF
 $pipe->client_read($responses);
 $pipe->safe_post(1);
-ok(!$pipe->is_writing);
+ok(!$pipe->client_is_writing);
 $pipe->safe_post(0);
-ok($pipe->is_writing);
+ok($pipe->client_is_writing);

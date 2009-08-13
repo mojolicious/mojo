@@ -8,8 +8,8 @@ use warnings;
 use Test::More;
 
 use Mojo::Client;
-use Mojo::Pipeline;
-use Mojo::Transaction;
+use Mojo::Transaction::Pipeline;
+use Mojo::Transaction::Single;
 use Test::Mojo::Server;
 
 plan skip_all => 'set TEST_DAEMON to enable this test (developer only!)'
@@ -36,13 +36,13 @@ my $client = Mojo::Client->new;
 $client->continue_timeout(60);
 
 # Pipelined with 100 Continue
-my $tx  = Mojo::Transaction->new_get("http://127.0.0.1:$port/1/");
-my $tx2 = Mojo::Transaction->new_get("http://127.0.0.1:$port/2/");
+my $tx  = Mojo::Transaction::Single->new_get("http://127.0.0.1:$port/1/");
+my $tx2 = Mojo::Transaction::Single->new_get("http://127.0.0.1:$port/2/");
 $tx2->req->headers->expect('100-continue');
 $tx2->req->body('foo bar baz');
-my $tx3 = Mojo::Transaction->new_get("http://127.0.0.1:$port/3/");
-my $tx4 = Mojo::Transaction->new_get("http://127.0.0.1:$port/4/");
-$client->process(Mojo::Pipeline->new($tx, $tx2, $tx3, $tx4));
+my $tx3 = Mojo::Transaction::Single->new_get("http://127.0.0.1:$port/3/");
+my $tx4 = Mojo::Transaction::Single->new_get("http://127.0.0.1:$port/4/");
+$client->process(Mojo::Transaction::Pipeline->new($tx, $tx2, $tx3, $tx4));
 ok($tx->is_done);
 ok($tx2->is_done);
 ok($tx3->is_done);
@@ -56,7 +56,7 @@ like($tx2->res->content->file->slurp, qr/Mojo is working/);
 
 # 100 Continue request
 $tx =
-  Mojo::Transaction->new_get("http://127.0.0.1:$port/5/",
+  Mojo::Transaction::Single->new_get("http://127.0.0.1:$port/5/",
     Expect => '100-continue');
 $tx->req->body('Hello Mojo!');
 $client->process($tx);
@@ -66,7 +66,7 @@ like($tx->res->headers->connection, qr/Keep-Alive/i);
 like($tx->res->body,                qr/Mojo is working/);
 
 # Second keep alive request
-$tx = Mojo::Transaction->new_get("http://127.0.0.1:$port/6/");
+$tx = Mojo::Transaction::Single->new_get("http://127.0.0.1:$port/6/");
 $client->process($tx);
 is($tx->res->code,  200);
 is($tx->kept_alive, 1);
@@ -74,7 +74,7 @@ like($tx->res->headers->connection, qr/Keep-Alive/i);
 like($tx->res->body,                qr/Mojo is working/);
 
 # Third keep alive request
-$tx = Mojo::Transaction->new_get("http://127.0.0.1:$port/7/");
+$tx = Mojo::Transaction::Single->new_get("http://127.0.0.1:$port/7/");
 $client->process($tx);
 is($tx->res->code,  200);
 is($tx->kept_alive, 1);
@@ -82,9 +82,9 @@ like($tx->res->headers->connection, qr/Keep-Alive/i);
 like($tx->res->body,                qr/Mojo is working/);
 
 # Pipelined
-$tx  = Mojo::Transaction->new_get("http://127.0.0.1:$port/8/");
-$tx2 = Mojo::Transaction->new_get("http://127.0.0.1:$port/9/");
-$client->process(Mojo::Pipeline->new($tx, $tx2));
+$tx  = Mojo::Transaction::Single->new_get("http://127.0.0.1:$port/8/");
+$tx2 = Mojo::Transaction::Single->new_get("http://127.0.0.1:$port/9/");
+$client->process(Mojo::Transaction::Pipeline->new($tx, $tx2));
 ok($tx->is_done);
 ok($tx2->is_done);
 is($tx->res->code,  200);

@@ -1,6 +1,15 @@
 This file documents the revision history for Perl extension Mojo.
 
 0.991247 2009-08-11 00:00:00
+        - This release contains many substantial changes that are not
+          backwards compatible, but good news is that it's supposed to be the
+          last major feature breaking release before 1.0. ;)
+          Older releases of Mojo did contain additional Mojo::Script::* and
+          Mojolicious::Script::* modules that are obsolete now and might
+          break this version if they are still present on your system.
+          Because of this we highly suggest that you
+          DELETE ALL MODULES IN THE "Mojo" AND "Mojolicious" NAMESPACE
+          MANUALLY!!!
         - Removed unused features from Mojo::Base and simplified API, this
           change is not backwards compatible!
               __PACKAGE__->attr('foo', default => 'bar');
@@ -43,6 +52,10 @@ This file documents the revision history for Perl extension Mojo.
           default controller in Mojolicious.
           There is also no $c argument anymore actions get called with, since
           everything is in $self now.
+        - Refactored and renamed Mojo::Transaction and Mojo::Pipeline, this
+          change is not backwards compatible!
+              Mojo::Transaction -> Mojo::Transaction::Single
+              Mojo::Pipeline -> Mojo::Transaction::Pipeline
         - Added conditions to MojoX::Routes.
         - Added routes script to Mojolicious.
         - Simplified Mojo::Base.

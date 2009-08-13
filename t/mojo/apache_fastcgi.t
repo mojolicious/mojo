@@ -11,7 +11,7 @@ use File::Spec;
 use File::Temp;
 use Mojo::Client;
 use Mojo::Template;
-use Mojo::Transaction;
+use Mojo::Transaction::Single;
 use Test::Mojo::Server;
 
 plan skip_all => 'set TEST_APACHE to enable this test (developer only!)'
@@ -77,7 +77,7 @@ $server->command("/usr/sbin/httpd -X -f $config");
 $server->start_server_ok;
 
 # Request
-my $tx     = Mojo::Transaction->new_get("http://127.0.0.1:$port/");
+my $tx     = Mojo::Transaction::Single->new_get("http://127.0.0.1:$port/");
 my $client = Mojo::Client->new;
 $client->process($tx);
 is($tx->res->code, 200);

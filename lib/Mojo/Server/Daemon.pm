@@ -10,7 +10,7 @@ use base 'Mojo::Server';
 use Carp 'croak';
 use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
 use IO::Socket;
-use Mojo::Pipeline;
+use Mojo::Transaction::Pipeline;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
 
@@ -240,7 +240,7 @@ sub _prepare_poll {
         }
 
         # We always try to read as sugegsted by the HTTP spec
-        $p->is_writing
+        $p->server_is_writing
           ? $poll->mask($p->connection, POLLIN | POLLOUT)
           : $poll->mask($p->connection, POLLIN);
     }
@@ -320,7 +320,8 @@ sub _read {
 
         # New pipeline
         my $p = $connection->{pipeline}
-          ||= Mojo::Pipeline->new->server_accept($self->build_tx_cb->($self));
+          ||= Mojo::Transaction::Pipeline->new->server_accept(
+            $self->build_tx_cb->($self));
         $p->connection($socket);
         $connection->{requests}++;
         $p->kept_alive(1) if $connection->{requests} > 1;

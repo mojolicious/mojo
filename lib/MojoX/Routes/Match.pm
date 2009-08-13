@@ -155,7 +155,7 @@ L<MojoX::Routes::Match> implements the following attributes.
 =head2 C<tx>
 
     my $tx = $match->tx;
-    $match = $match->tx(Mojo::Transaction->new);
+    $match = $match->tx(Mojo::Transaction::Single->new);
 
 =head1 METHODS
 
@@ -165,7 +165,7 @@ implements the follwing the ones.
 =head2 C<new>
 
     my $match = MojoX::Routes::Match->new;
-    my $match = MojoX::Routes::Match->new(Mojo::Transaction->new);
+    my $match = MojoX::Routes::Match->new(Mojo::Transaction::Single->new);
 
 =head2 C<is_path_empty>
 

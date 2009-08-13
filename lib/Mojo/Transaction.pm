@@ -14,6 +14,7 @@ __PACKAGE__->attr([qw/local_address local_port remote_address remote_port/]);
 __PACKAGE__->attr(continue_timeout => 5);
 __PACKAGE__->attr(keep_alive       => 0);
 
+# Please don't eat me! I have a wife and kids. Eat them!
 sub client_connect {
     croak 'Method "client_connect" not implemented by subclass';
 }

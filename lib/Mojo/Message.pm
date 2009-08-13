@@ -263,7 +263,6 @@ sub param {
     return $self->{body_params}->param(@_);
 }
 
-# Please don't eat me! I have a wife and kids. Eat them!
 sub parse {
     my ($self, $chunk) = @_;
 

@@ -498,7 +498,7 @@ is($res->major_version,           1);
 is($res->minor_version,           1);
 is($res->headers->content_type,   'text/plain');
 is($res->headers->content_length, 13);
-is($res->content->body_length,    13);
+is($res->content->body_size,      13);
 
 # Parse HTTP 1.1 multipart response
 $res = Mojo::Message::Response->new;

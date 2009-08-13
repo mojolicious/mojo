@@ -22,7 +22,19 @@ __PACKAGE__->attr(asset => sub { Mojo::Asset::Memory->new });
 __PACKAGE__->attr([qw/buffer filter_buffer/] => sub { Mojo::Buffer->new });
 __PACKAGE__->attr([qw/body_cb filter progress_cb/]);
 __PACKAGE__->attr(headers => sub { Mojo::Headers->new });
-__PACKAGE__->attr([qw/raw_header_length relaxed/] => 0);
+__PACKAGE__->attr([qw/raw_header_size relaxed/] => 0);
+
+sub body_contains {
+    my ($self, $chunk) = @_;
+
+    # Found
+    return 1 if $self->asset->contains($chunk) >= 0;
+
+    # Not found
+    return;
+}
+
+sub body_size { shift->asset->size }
 
 sub build_body {
     my $self = shift;
@@ -68,18 +80,6 @@ sub build_headers {
     return $headers;
 }
 
-sub body_contains {
-    my ($self, $chunk) = @_;
-
-    # Found
-    return 1 if $self->asset->contains($chunk) >= 0;
-
-    # Not found
-    return;
-}
-
-sub body_length { shift->asset->size }
-
 sub get_body_chunk {
     my ($self, $offset) = @_;
 
@@ -107,7 +107,7 @@ sub has_leftovers {
     return;
 }
 
-sub header_length { length shift->build_headers }
+sub header_size { length shift->build_headers }
 
 sub is_chunked {
     my $self = shift;
@@ -188,7 +188,7 @@ sub parse {
         $self->asset->add_chunk($self->buffer->remove($need)) if $need > 0;
 
         # Done
-        $self->done if $length <= $self->raw_body_length;
+        $self->done if $length <= $self->raw_body_size;
     }
 
     # With leftovers, maybe pipelined
@@ -208,9 +208,9 @@ sub parse_until_body {
     # Parser started
     if ($self->is_state('start')) {
         my $length            = $self->filter_buffer->size;
-        my $raw_length        = $self->filter_buffer->raw_length;
+        my $raw_length        = $self->filter_buffer->raw_size;
         my $raw_header_length = $raw_length - $length;
-        $self->raw_header_length($raw_header_length);
+        $self->raw_header_size($raw_header_length);
         $self->state('headers');
     }
 
@@ -220,10 +220,10 @@ sub parse_until_body {
     return $self;
 }
 
-sub raw_body_length {
+sub raw_body_size {
     my $self          = shift;
-    my $length        = $self->filter_buffer->raw_length;
-    my $header_length = $self->raw_header_length;
+    my $length        = $self->filter_buffer->raw_size;
+    my $header_length = $self->raw_header_size;
     return $length - $header_length;
 }
 
@@ -241,10 +241,10 @@ sub _parse_headers {
     $self->headers->parse;
 
     my $length            = $self->headers->buffer->size;
-    my $raw_length        = $self->headers->buffer->raw_length;
+    my $raw_length        = $self->headers->buffer->raw_size;
     my $raw_header_length = $raw_length - $length;
 
-    $self->raw_header_length($raw_header_length);
+    $self->raw_header_size($raw_header_length);
 
     # Make sure we don't waste memory
     if ($self->asset->isa('Mojo::Asset::Memory')) {
@@ -298,9 +298,9 @@ implements the following new ones.
         return $chunk;
     });
 
-=head2 C<body_length>
+=head2 C<body_size>
 
-    my $body_length = $content->body_length;
+    my $size = $content->body_size;
 
 =head2 C<buffer>
 
@@ -320,22 +320,22 @@ implements the following new ones.
     my $filter_buffer = $content->filter_buffer;
     $content          = $content->filter_buffer(Mojo::Buffer->new);
 
-=head2 C<header_length>
+=head2 C<header_size>
 
-    my $header_length = $content->header_length;
+    my $size = $content->header_size;
 
 =head2 C<headers>
 
     my $headers = $content->headers;
     $content    = $content->headers(Mojo::Headers->new);
 
-=head2 C<raw_header_length>
+=head2 C<raw_header_size>
 
-    my $raw_header_length = $content->raw_header_length;
+    my $size = $content->raw_header_size;
 
-=head2 C<raw_body_length>
+=head2 C<raw_body_size>
 
-    my $raw_body_length = $content->raw_body_length;
+    my $size = $content->raw_body_size;
 
 =head2 C<relaxed>
 
@@ -347,6 +347,10 @@ implements the following new ones.
 L<Mojo::Content> inherits all methods from L<Mojo::Stateful> and implements
 the following new ones.
 
+=head2 C<body_contains>
+
+    my $found = $content->body_contains;
+
 =head2 C<build_body>
 
     my $string = $content->build_body;
@@ -354,10 +358,6 @@ the following new ones.
 =head2 C<build_headers>
 
     my $string = $content->build_headers;
-
-=head2 C<body_contains>
-
-    my $found = $content->body_contains;
 
 =head2 C<get_body_chunk>
 

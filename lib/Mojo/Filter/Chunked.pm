@@ -118,7 +118,7 @@ sub _remove_chunked_encoding {
     $encoding
       ? $self->headers->transfer_encoding($encoding)
       : $self->headers->remove('Transfer-Encoding');
-    $self->headers->content_length($self->output_buffer->raw_length);
+    $self->headers->content_length($self->output_buffer->raw_size);
 }
 
 1;

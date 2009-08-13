@@ -9,7 +9,7 @@ use base 'Mojo::Base';
 use overload '""' => sub { shift->to_string }, fallback => 1;
 use bytes;
 
-__PACKAGE__->attr(raw_length => 0);
+__PACKAGE__->attr(raw_size => 0);
 
 sub add_chunk {
     my ($self, $chunk) = @_;
@@ -18,7 +18,7 @@ sub add_chunk {
     return $self unless $chunk;
 
     # Raw length
-    $self->raw_length($self->raw_length + length $chunk);
+    $self->raw_size($self->raw_size + length $chunk);
 
     # Store
     $self->{buffer} ||= '';
@@ -100,10 +100,10 @@ L<Mojo::Buffer> is a simple in-memory buffer.
 
 L<Mojo::Buffer> implements the following attributes.
 
-=head2 C<raw_length>
+=head2 C<raw_size>
 
-    my $length = $buffer->raw_length;
-    $buffer    = $buffer->raw_length(23);
+    my $size = $buffer->raw_size;
+    $buffer  = $buffer->raw_size(23);
 
 =head1 METHODS
 

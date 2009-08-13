@@ -51,7 +51,7 @@ sub client_connected {
 
     # Ready for next state
     $self->state('write_start_line');
-    $self->_to_write($self->req->start_line_length);
+    $self->_to_write($self->req->start_line_size);
 
     return $self;
 }
@@ -218,7 +218,7 @@ sub client_spin {
         if ($self->_to_write <= 0) {
             $self->state('write_headers');
             $self->_offset(0);
-            $self->_to_write($self->req->header_length);
+            $self->_to_write($self->req->header_size);
         }
     }
 
@@ -230,7 +230,7 @@ sub client_spin {
               ? $self->state('read_continue')
               : $self->state('write_body');
             $self->_offset(0);
-            $self->_to_write($self->req->body_length);
+            $self->_to_write($self->req->body_size);
 
             # Chunked
             $self->_to_write(1) if $self->req->is_chunked;
@@ -396,14 +396,14 @@ sub server_spin {
 
         # Ready for next state
         $self->state('write_start_line');
-        $self->_to_write($self->res->start_line_length);
+        $self->_to_write($self->res->start_line_size);
     }
 
     # Response start line
     if ($self->is_state('write_start_line') && $self->_to_write <= 0) {
         $self->state('write_headers');
         $self->_offset(0);
-        $self->_to_write($self->res->header_length);
+        $self->_to_write($self->res->header_size);
     }
 
     # Response headers
@@ -420,7 +420,7 @@ sub server_spin {
 
             $self->state('write_body');
             $self->_offset(0);
-            $self->_to_write($self->res->body_length);
+            $self->_to_write($self->res->body_size);
 
             # Chunked
             $self->_to_write(1) if $self->res->is_chunked;

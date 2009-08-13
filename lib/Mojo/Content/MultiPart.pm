@@ -9,7 +9,6 @@ use base 'Mojo::Content';
 use bytes;
 
 use Mojo::ByteStream 'b';
-use Mojo::File;
 
 __PACKAGE__->attr(parts => sub { [] });
 
@@ -182,7 +181,7 @@ sub _parse_multipart_body {
 
     # Make sure we have enough buffer to detect end boundary
     if ($pos < 0) {
-        my $length = $self->buffer->length - (length($boundary) + 8);
+        my $length = $self->buffer->size - (length($boundary) + 8);
         return unless $length > 0;
 
         # Store chunk

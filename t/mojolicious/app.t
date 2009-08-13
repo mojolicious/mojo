@@ -157,7 +157,7 @@ is($tx->res->code,                            200);
 is($tx->res->headers->content_type,           'text/plain');
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-like($tx->res->content->file->slurp, qr/Hello Mojo from a static file!/);
+like($tx->res->content->asset->slurp, qr/Hello Mojo from a static file!/);
 $ENV{MOJO_MODE} = $backup;
 
 # Check Last-Modified header for static files
@@ -178,7 +178,7 @@ is($tx->res->headers->content_length,
     $stat->size, 'Content-Length is set correctly');
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-like($tx->res->content->file->slurp,
+like($tx->res->content->asset->slurp,
     qr/Hello Mojo from a development static file!/);
 $ENV{MOJO_MODE} = $backup;
 

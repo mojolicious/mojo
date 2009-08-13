@@ -13,7 +13,7 @@ use Mojo::Headers;
 # When will I learn?
 # The answer to life's problems aren't at the bottom of a bottle,
 # they're on TV!
-use_ok('Mojo::File');
+use_ok('Mojo::Asset::File');
 use_ok('Mojo::Content');
 use_ok('Mojo::Content::MultiPart');
 use_ok('Mojo::Cookie::Request');
@@ -102,8 +102,8 @@ is($req->minor_version,           1);
 is($req->url,                     '/foo/bar/baz.html?foo=13#23');
 is($req->headers->content_length, 13);
 is($req->headers->content_type,   'text/plain');
-is($req->content->file->length,   13);
-is($req->content->file->slurp,    'abcdabcdefghi');
+is($req->content->asset->size,    13);
+is($req->content->asset->slurp,   'abcdabcdefghi');
 
 # Parse HTTP 1.1 "x-application-urlencoded"
 $req = Mojo::Message::Request->new;
@@ -117,8 +117,8 @@ is($req->major_version,         1);
 is($req->minor_version,         1);
 is($req->url,                   '/foo/bar/baz.html?foo=13#23');
 is($req->headers->content_type, 'x-application-urlencoded');
-is($req->content->file->length, 26);
-is($req->content->file->slurp,  'foo=bar& tset=23+;&foo=bar');
+is($req->content->asset->size,  26);
+is($req->content->asset->slurp, 'foo=bar& tset=23+;&foo=bar');
 is($req->body_params,           'foo=bar&+tset=23+&foo=bar');
 is_deeply($req->body_params->to_hash->{foo}, [qw/bar bar/]);
 is_deeply($req->body_params->to_hash->{' tset'}, '23 ');
@@ -136,8 +136,8 @@ is($req->major_version,         1);
 is($req->minor_version,         1);
 is($req->url,                   '/foo/bar/baz.html?foo=13#23');
 is($req->headers->content_type, 'application/x-www-form-urlencoded');
-is($req->content->file->length, 26);
-is($req->content->file->slurp,  'foo=bar&+tset=23+;&foo=bar');
+is($req->content->asset->size,  26);
+is($req->content->asset->slurp, 'foo=bar&+tset=23+;&foo=bar');
 is($req->body_params,           'foo=bar&+tset=23+&foo=bar');
 is_deeply($req->body_params->to_hash->{foo}, [qw/bar bar/]);
 is_deeply($req->body_params->to_hash->{' tset'}, '23 ');
@@ -174,8 +174,8 @@ is($req->headers->content_type,         'text/plain');
 is($req->headers->header('X-Trailer1'), 'test');
 is($req->headers->header('X-Trailer2'), '123');
 is($req->headers->content_length,       13);
-is($req->content->file->length,         13);
-is($req->content->file->slurp,          'abcdabcdefghi');
+is($req->content->asset->size,          13);
+is($req->content->asset->slurp,         'abcdabcdefghi');
 
 # Parse HTTP 1.1 chunked request with trailing headers (different variation)
 $req = Mojo::Message::Request->new;
@@ -198,8 +198,8 @@ ok(!defined $req->headers->transfer_encoding);
 is($req->headers->content_type,        'text/plain');
 is($req->headers->header('X-Trailer'), '777');
 is($req->headers->content_length,      13);
-is($req->content->file->length,        13);
-is($req->content->file->slurp,         'abcdabcdefghi');
+is($req->content->asset->size,         13);
+is($req->content->asset->slurp,        'abcdabcdefghi');
 
 # Parse HTTP 1.1 chunked request with trailing headers (different variation)
 $req = Mojo::Message::Request->new;
@@ -223,8 +223,8 @@ is($req->headers->content_type,         'text/plain');
 is($req->headers->header('X-Trailer1'), 'test');
 is($req->headers->header('X-Trailer2'), '123');
 is($req->headers->content_length,       13);
-is($req->content->file->length,         13);
-is($req->content->file->slurp,          'abcdabcdefghi');
+is($req->content->asset->size,          13);
+is($req->content->asset->slurp,         'abcdabcdefghi');
 
 # Parse HTTP 1.1 chunked request with trailing headers (no Trailer header)
 $req = Mojo::Message::Request->new;
@@ -247,8 +247,8 @@ is($req->headers->content_type,         'text/plain');
 is($req->headers->header('X-Trailer1'), 'test');
 is($req->headers->header('X-Trailer2'), '123');
 is($req->headers->content_length,       13);
-is($req->content->file->length,         13);
-is($req->content->file->slurp,          'abcdabcdefghi');
+is($req->content->asset->size,          13);
+is($req->content->asset->slurp,         'abcdabcdefghi');
 
 # Parse HTTP 1.1 multipart request
 $req = Mojo::Message::Request->new;
@@ -277,16 +277,16 @@ is($req->minor_version, 1);
 is($req->url,           '/foo/bar/baz.html?foo13#23');
 is($req->query_params,  'foo13');
 like($req->headers->content_type, qr/multipart\/form-data/);
-is(ref $req->content->parts->[0],          'Mojo::Content');
-is(ref $req->content->parts->[1],          'Mojo::Content');
-is(ref $req->content->parts->[2],          'Mojo::Content');
-is($req->content->parts->[0]->file->slurp, "hallo welt test123\n");
+is(ref $req->content->parts->[0],           'Mojo::Content');
+is(ref $req->content->parts->[1],           'Mojo::Content');
+is(ref $req->content->parts->[2],           'Mojo::Content');
+is($req->content->parts->[0]->asset->slurp, "hallo welt test123\n");
 is_deeply($req->body_params->to_hash->{text1}, "hallo welt test123\n");
 is_deeply($req->body_params->to_hash->{text2}, '');
-is($req->upload('upload')->filename,     'hello.pl');
-is(ref $req->upload('upload')->file,     'Mojo::File');
-is($req->upload('upload')->file->length, 69);
-ok($req->upload('upload')->copy_to('MOJO_TMP.txt'));
+is($req->upload('upload')->filename,    'hello.pl');
+is(ref $req->upload('upload')->asset,   'Mojo::Asset::File');
+is($req->upload('upload')->asset->size, 69);
+ok($req->upload('upload')->move_to('MOJO_TMP.txt'));
 is((unlink 'MOJO_TMP.txt'), 1);
 
 # Build minimal HTTP 1.1 request
@@ -343,9 +343,9 @@ $req->url->parse('http://127.0.0.1/foo/bar');
 $req->content(Mojo::Content::MultiPart->new);
 $req->headers->content_type('multipart/mixed; boundary=7am1X');
 push @{$req->content->parts}, Mojo::Content->new;
-$req->content->parts->[-1]->file->add_chunk('Hallo Welt lalalala!');
+$req->content->parts->[-1]->asset->add_chunk('Hallo Welt lalalala!');
 my $content = Mojo::Content->new;
-$content->file->add_chunk("lala\nfoobar\nperl rocks\n");
+$content->asset->add_chunk("lala\nfoobar\nperl rocks\n");
 $content->headers->content_type('text/plain');
 push @{$req->content->parts}, $content;
 is($req->build,
@@ -526,10 +526,10 @@ is($res->message,       'OK');
 is($res->major_version, 1);
 is($res->minor_version, 1);
 ok($res->headers->content_type =~ /multipart\/form-data/);
-is(ref $res->content->parts->[0],          'Mojo::Content');
-is(ref $res->content->parts->[1],          'Mojo::Content');
-is(ref $res->content->parts->[2],          'Mojo::Content');
-is($res->content->parts->[0]->file->slurp, "hallo welt test123\n");
+is(ref $res->content->parts->[0],           'Mojo::Content');
+is(ref $res->content->parts->[1],           'Mojo::Content');
+is(ref $res->content->parts->[2],           'Mojo::Content');
+is($res->content->parts->[0]->asset->slurp, "hallo welt test123\n");
 
 # Build HTTP 1.1 response start line with minimal headers
 $res = Mojo::Message::Response->new;
@@ -577,10 +577,11 @@ $res->content(Mojo::Content::MultiPart->new);
 $res->code(200);
 $res->headers->content_type('multipart/mixed; boundary=7am1X');
 $res->headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
-push @{$res->content->parts}, Mojo::Content->new(file => Mojo::File->new);
-$res->content->parts->[-1]->file->add_chunk('Hallo Welt lalalalalala!');
+push @{$res->content->parts},
+  Mojo::Content->new(asset => Mojo::Asset::File->new);
+$res->content->parts->[-1]->asset->add_chunk('Hallo Welt lalalalalala!');
 $content = Mojo::Content->new;
-$content->file->add_chunk("lala\nfoobar\nperl rocks\n");
+$content->asset->add_chunk("lala\nfoobar\nperl rocks\n");
 $content->headers->content_type('text/plain');
 push @{$res->content->parts}, $content;
 is($res->build,

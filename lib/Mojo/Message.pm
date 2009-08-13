@@ -10,9 +10,9 @@ use overload '""' => sub { shift->to_string }, fallback => 1;
 use bytes;
 
 use Carp 'croak';
+use Mojo::Asset::Memory;
 use Mojo::Buffer;
 use Mojo::Content;
-use Mojo::File::Memory;
 use Mojo::Parameters;
 use Mojo::Upload;
 
@@ -55,10 +55,10 @@ sub body {
 
         # Get/Set content
         elsif ($content) {
-            $self->content->file(Mojo::File::Memory->new);
-            $self->content->file->add_chunk($content);
+            $self->content->asset(Mojo::Asset::Memory->new);
+            $self->content->asset->add_chunk($content);
         }
-        return $self->content->file->slurp;
+        return $self->content->asset->slurp;
     }
 
     $self->content($content);
@@ -84,7 +84,7 @@ sub body_params {
     {
 
         # Parse
-        my $raw = $self->content->file->slurp;
+        my $raw = $self->content->asset->slurp;
         $params->parse($raw);
     }
 
@@ -98,7 +98,7 @@ sub body_params {
             my $filename = $data->[1];
             my $part     = $data->[2];
 
-            $params->append($name, $part->file->slurp) unless $filename;
+            $params->append($name, $part->asset->slurp) unless $filename;
         }
     }
 
@@ -376,7 +376,7 @@ sub uploads {
 
         my $upload = Mojo::Upload->new;
         $upload->name($name);
-        $upload->file($part->file);
+        $upload->asset($part->asset);
         $upload->filename($filename);
         $upload->headers($part->headers);
 

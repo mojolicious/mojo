@@ -217,7 +217,7 @@ sub to_string {
     $url .= lc "$scheme://" if $scheme && $authority;
     $url .= "$authority$path";
     $url .= "?$query" if @{$query->params};
-    $url .= "#$fragment" if $fragment->length;
+    $url .= "#$fragment" if $fragment->size;
 
     return $url;
 }

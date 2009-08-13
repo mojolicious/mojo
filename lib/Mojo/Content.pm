@@ -8,19 +8,19 @@ use warnings;
 use base 'Mojo::Stateful';
 use bytes;
 
+use Mojo::Asset::File;
+use Mojo::Asset::Memory;
 use Mojo::Buffer;
 use Mojo::Filter::Chunked;
-use Mojo::File;
-use Mojo::File::Memory;
 use Mojo::Content::MultiPart;
 use Mojo::Headers;
 
 use constant CHUNK_SIZE      => $ENV{MOJO_CHUNK_SIZE}      || 4096;
 use constant MAX_MEMORY_SIZE => $ENV{MOJO_MAX_MEMORY_SIZE} || 10240;
 
+__PACKAGE__->attr(asset => sub { Mojo::Asset::Memory->new });
 __PACKAGE__->attr([qw/buffer filter_buffer/] => sub { Mojo::Buffer->new });
 __PACKAGE__->attr([qw/body_cb filter progress_cb/]);
-__PACKAGE__->attr(file    => sub { Mojo::File::Memory->new });
 __PACKAGE__->attr(headers => sub { Mojo::Headers->new });
 __PACKAGE__->attr([qw/raw_header_length relaxed/] => 0);
 
@@ -72,13 +72,13 @@ sub body_contains {
     my ($self, $chunk) = @_;
 
     # Found
-    return 1 if $self->file->contains($chunk) >= 0;
+    return 1 if $self->asset->contains($chunk) >= 0;
 
     # Not found
     return;
 }
 
-sub body_length { shift->file->length }
+sub body_length { shift->asset->size }
 
 sub get_body_chunk {
     my ($self, $offset) = @_;
@@ -90,7 +90,7 @@ sub get_body_chunk {
     return $self->body_cb->($self, $offset) if $self->body_cb;
 
     # Normal content
-    return $self->file->get_chunk($offset);
+    return $self->asset->get_chunk($offset);
 }
 
 sub get_header_chunk {
@@ -103,7 +103,7 @@ sub get_header_chunk {
 
 sub has_leftovers {
     my $self = shift;
-    return 1 if $self->buffer->length || $self->filter_buffer->length;
+    return 1 if $self->buffer->size || $self->filter_buffer->size;
     return;
 }
 
@@ -126,7 +126,7 @@ sub leftovers {
 
     # Chunked leftovers are in the filter buffer, and so are those from a
     # HEAD request
-    return $self->filter_buffer->to_string if $self->filter_buffer->length;
+    return $self->filter_buffer->to_string if $self->filter_buffer->size;
 
     # Normal leftovers
     return $self->buffer->to_string;
@@ -176,7 +176,7 @@ sub parse {
 
     # Chunked body or relaxed content
     if ($self->is_chunked || $self->relaxed) {
-        $self->file->add_chunk($self->buffer->empty);
+        $self->asset->add_chunk($self->buffer->empty);
     }
 
     # Normal body
@@ -184,8 +184,8 @@ sub parse {
 
         # Slurp
         my $length = $self->headers->content_length || 0;
-        my $need = $length - $self->file->length;
-        $self->file->add_chunk($self->buffer->remove($need)) if $need > 0;
+        my $need = $length - $self->asset->size;
+        $self->asset->add_chunk($self->buffer->remove($need)) if $need > 0;
 
         # Done
         $self->done if $length <= $self->raw_body_length;
@@ -207,7 +207,7 @@ sub parse_until_body {
 
     # Parser started
     if ($self->is_state('start')) {
-        my $length            = $self->filter_buffer->length;
+        my $length            = $self->filter_buffer->size;
         my $raw_length        = $self->filter_buffer->raw_length;
         my $raw_header_length = $raw_length - $length;
         $self->raw_header_length($raw_header_length);
@@ -240,15 +240,15 @@ sub _parse_headers {
     $self->headers->buffer($self->filter_buffer);
     $self->headers->parse;
 
-    my $length            = $self->headers->buffer->length;
+    my $length            = $self->headers->buffer->size;
     my $raw_length        = $self->headers->buffer->raw_length;
     my $raw_header_length = $raw_length - $length;
 
     $self->raw_header_length($raw_header_length);
 
     # Make sure we don't waste memory
-    if ($self->file->isa('Mojo::File::Memory')) {
-        $self->file(Mojo::File->new)
+    if ($self->asset->isa('Mojo::Asset::Memory')) {
+        $self->asset(Mojo::Asset::File->new)
           if !$self->headers->content_length
               || $self->headers->content_length > MAX_MEMORY_SIZE;
     }
@@ -278,6 +278,11 @@ L<Mojo::Content> is a container for HTTP content.
 
 L<Mojo::Content> inherits all attributes from L<Mojo::Stateful> and
 implements the following new ones.
+
+=head2 C<asset>
+
+    my $asset = $content->asset;
+    $content  = $content->asset(Mojo::Asset::Memory->new);
 
 =head2 C<body_cb>
 
@@ -309,11 +314,6 @@ implements the following new ones.
         my $self = shift;
         print '+';
     });
-
-=head2 C<file>
-
-    my $file = $content->file;
-    $content = $content->file(Mojo::File::Memory->new);
 
 =head2 C<filter_buffer>
 

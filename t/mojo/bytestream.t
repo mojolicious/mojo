@@ -82,11 +82,11 @@ is($stream->md5_sum, 'ab07acbb1e496801937adfa772424bf7');
 
 # length
 $stream = b('foo bar baz');
-is($stream->length, 11);
+is($stream->size, 11);
 
 # "0"
 $stream = b('0');
-is($stream->length,    1);
+is($stream->size,      1);
 is($stream->to_string, '0');
 
 # html_escape

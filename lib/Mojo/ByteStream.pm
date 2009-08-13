@@ -423,8 +423,6 @@ sub html_unescape {
     return $self->decode('utf8');
 }
 
-sub length { length shift->{bytestream} }
-
 sub md5_sum {
     my $self = shift;
     $self->{bytestream} = Digest::MD5::md5_hex($self->{bytestream});
@@ -452,6 +450,8 @@ sub quote {
 
     return $self;
 }
+
+sub size { length shift->{bytestream} }
 
 sub to_string { shift->{bytestream} }
 
@@ -573,7 +573,7 @@ Mojo::ByteStream - ByteStream
     $stream->url_unescape;
     $stream->xml_escape;
 
-    my $length = $stream->length;
+    my $size = $stream->size;
 
     my $stream2 = $stream->clone;
     print $stream2->to_string;
@@ -638,10 +638,6 @@ the following new ones.
 
     $stream = $stream->html_unescape;
 
-=head2 C<length>
-
-    my $length = $stream->length;
-
 =head2 C<md5_sum>
 
     $stream = $stream->md5_sum;
@@ -657,6 +653,10 @@ the following new ones.
 =head2 C<quote>
 
     $stream = $stream->quote;
+
+=head2 C<size>
+
+    my $size = $stream->size;
 
 =head2 C<to_string>
 

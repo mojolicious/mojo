@@ -172,7 +172,7 @@ $client->process_app('<%= $class %>', $tx);
 # Test response
 is($tx->res->code, 200);
 is($tx->res->headers->content_type, 'text/html');
-like($tx->res->content->file->slurp, qr/Mojolicious Web Framework/i);
+like($tx->res->content->asset->slurp, qr/Mojolicious Web Framework/i);
 @@ exception
 % use Data::Dumper ();
 % my $self = shift;

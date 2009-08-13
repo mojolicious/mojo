@@ -52,7 +52,7 @@ is($tx2->res->code, 200);
 is($tx2->continued, 1);
 is($tx3->res->code, 200);
 is($tx4->res->code, 200);
-like($tx2->res->content->file->slurp, qr/Mojo is working/);
+like($tx2->res->content->asset->slurp, qr/Mojo is working/);
 
 # 100 Continue request
 $tx =
@@ -89,7 +89,7 @@ ok($tx->is_done);
 ok($tx2->is_done);
 is($tx->res->code,  200);
 is($tx2->res->code, 200);
-like($tx2->res->content->file->slurp, qr/Mojo is working/);
+like($tx2->res->content->asset->slurp, qr/Mojo is working/);
 
 # Stop
 $server->stop_server_ok;

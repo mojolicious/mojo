@@ -8,10 +8,10 @@ use warnings;
 use base 'Mojo::Base';
 
 use Carp 'croak';
-use Mojo::File;
+use Mojo::Asset::File;
 use Mojo::Headers;
 
-__PACKAGE__->attr(file => sub { Mojo::File->new });
+__PACKAGE__->attr(asset => sub { Mojo::Asset::File->new });
 __PACKAGE__->attr([qw/filename name/]);
 __PACKAGE__->attr(headers => sub { Mojo::Headers->new });
 
@@ -19,13 +19,11 @@ __PACKAGE__->attr(headers => sub { Mojo::Headers->new });
 # You sunk my scrabbleship!
 # This game makes no sense.
 # Tell that to the good men who just lost their lives... SEMPER-FI!
-sub copy_to { shift->file->copy_to(@_) }
+sub move_to { shift->asset->move_to(@_) }
 
-sub length { shift->file->length }
+sub size { shift->asset->size }
 
-sub move_to { shift->file->move_to(@_) }
-
-sub slurp { shift->file->slurp }
+sub slurp { shift->asset->slurp }
 
 1;
 __END__
@@ -40,7 +38,7 @@ Mojo::Upload - Upload
 
     my $upload = Mojo::Upload->new;
     print $upload->filename;
-    $upload->copy_to('/foo/bar.txt');
+    $upload->move_to('/foo/bar/baz.txt');
 
 =head1 DESCRIPTION
 
@@ -50,19 +48,15 @@ L<Mojo::Upload> is a container for uploads.
 
 L<Mojo::Upload> implements the following attributes.
 
-=head2 C<file>
+=head2 C<asset>
 
-    my $file = $upload->file;
-    $upload  = $upload->file(Mojo::File->new);
+    my $asset = $upload->asset;
+    $upload   = $upload->asset(Mojo::Asset::File->new);
 
 =head2 C<filename>
 
     my $filename = $upload->filename;
     $upload      = $upload->filename('foo.txt');
-
-=head2 C<length>
-
-    my $length = $upload->length;
 
 =head2 C<headers>
 
@@ -79,16 +73,16 @@ L<Mojo::Upload> implements the following attributes.
 L<Mojo::Upload> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 C<copy_to>
-
-    $upload->copy_to('/foo/bar/baz.txt');
-
 =head2 C<move_to>
 
     $upload->move_to('/foo/bar/baz.txt');
 
+=head2 C<size>
+
+    my $size = $upload->size;
+
 =head2 C<slurp>
 
-    my $content = $upload->slurp;
+    my $string = $upload->slurp;
 
 =cut

@@ -94,7 +94,7 @@ ok($tx3->is_done);
 is($tx->res->code,  301);
 is($tx2->res->code, 200);
 is($tx3->res->code, 200);
-like($tx2->res->content->file->slurp, qr/Mojolicious/);
+like($tx2->res->content->asset->slurp, qr/Mojolicious/);
 
 # Pipelined with 100 Continue
 $tx  = Mojo::Transaction::Single->new_get('http://labs.kraih.com');
@@ -113,7 +113,7 @@ is($tx2->res->code, 200);
 is($tx2->continued, 1);
 is($tx3->res->code, 200);
 is($tx4->res->code, 301);
-like($tx2->res->content->file->slurp, qr/Mojolicious/);
+like($tx2->res->content->asset->slurp, qr/Mojolicious/);
 
 # Pipelined head
 $tx  = Mojo::Transaction::Single->new_head('http://labs.kraih.com/blog/');
@@ -123,4 +123,4 @@ ok($tx->is_done);
 ok($tx2->is_done);
 is($tx->res->code,  200);
 is($tx2->res->code, 200);
-like($tx2->res->content->file->slurp, qr/Mojolicious/);
+like($tx2->res->content->asset->slurp, qr/Mojolicious/);

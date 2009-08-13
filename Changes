@@ -56,6 +56,10 @@ This file documents the revision history for Perl extension Mojo.
           change is not backwards compatible!
               Mojo::Transaction -> Mojo::Transaction::Single
               Mojo::Pipeline -> Mojo::Transaction::Pipeline
+        - Refactored and renamed Mojo::File and Mojo::File::Memory, this
+          change is not backwards compatible!
+              Mojo::File -> Mojo::Asset::File
+              Mojo::File::Memory -> Mojo::Asset::Memory
         - Added conditions to MojoX::Routes.
         - Added routes script to Mojolicious.
         - Simplified Mojo::Base.

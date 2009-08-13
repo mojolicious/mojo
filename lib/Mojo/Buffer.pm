@@ -61,8 +61,6 @@ sub get_line {
     return $line;
 }
 
-sub length { length(shift->{buffer} || '') }
-
 sub remove {
     my ($self, $length, $chunk) = @_;
 
@@ -73,6 +71,8 @@ sub remove {
     $self->{buffer} ||= '';
     return substr $self->{buffer}, 0, $length, $chunk;
 }
+
+sub size { length(shift->{buffer} || '') }
 
 sub to_string { shift->{buffer} || '' }
 
@@ -126,14 +126,14 @@ the following new ones.
 
    my $line = $buffer->get_line;
 
-=head2 C<length>
-
-    my $length = $buffer->length;
-
 =head2 C<remove>
 
     my $chunk = $buffer->remove(4);
     my $chunk = $buffer->remove(4, 'abcd');
+
+=head2 C<size>
+
+    my $size = $buffer->size;
 
 =head2 C<to_string>
 

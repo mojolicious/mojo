@@ -121,10 +121,6 @@ implements the following new ones.
     my $asset = $content->asset;
     $content  = $content->asset(Mojo::Asset::Memory->new);
 
-=head2 C<body_size>
-
-    my $size = $content->body_size;
-
 =head2 C<relaxed>
 
     my $relaxed = $content->relaxed;
@@ -138,6 +134,10 @@ implements the following new ones.
 =head2 C<body_contains>
 
     my $found = $content->body_contains;
+
+=head2 C<body_size>
+
+    my $size = $content->body_size;
 
 =head2 C<get_body_chunk>
 

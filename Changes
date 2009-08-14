@@ -74,6 +74,7 @@ This file documents the revision history for Perl extension Mojo.
         - Removed address, password and user methods from Mojo::URL.
         - Fixed Microsoft IIS CGI and FastCGI environment support.
         - Fixed prefix handling in MojoX::Dispatcher::Static.
+        - Fixed max_age in Mojo::Cookie.
         - Fixed cloning of urls with base in Mojo::URL.
         - Fixed parsing of multiple headers and cookies with same name.
 

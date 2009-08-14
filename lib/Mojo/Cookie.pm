@@ -13,7 +13,8 @@ use Mojo::ByteStream 'b';
 use Mojo::Date;
 
 __PACKAGE__->attr(
-    [qw/comment domain httponly name path port secure value version/]);
+    [qw/comment domain httponly max_age name path port secure value version/]
+);
 
 # My Homer is not a communist.
 # He may be a liar, a pig, an idiot, a communist, but he is not a porn star.
@@ -23,14 +24,6 @@ sub expires {
         $self->{expires} = Mojo::Date->new($expires) unless ref $expires;
     }
     return $self->{expires};
-}
-
-sub max_age {
-    my ($self, $max_age) = @_;
-    if (defined $max_age) {
-        $self->{max_age} = Mojo::Date->new("$max_age");
-    }
-    return $self->{max_age} ? $self->{max_age}->epoch : undef;
 }
 
 sub to_string { croak 'Method "to_string" not implemented by subclass' }
@@ -140,7 +133,7 @@ L<Mojo::Cookie> implements the following attributes.
 =head2 C<max_age>
 
     my $max_age = $cookie->max_age;
-    $cookie     = $cookie->max_age(time + 60);
+    $cookie     = $cookie->max_age(60);
 
 =head2 C<name>
 

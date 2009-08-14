@@ -21,6 +21,10 @@ __PACKAGE__->attr(
         my $file = IO::File->new;
         my $path = $self->path;
         $file->open(">> $path") or croak qq/Can't open log file "$path": $!/;
+
+        # utf8
+        $file->binmode(':utf8');
+
         return $file;
     }
 );

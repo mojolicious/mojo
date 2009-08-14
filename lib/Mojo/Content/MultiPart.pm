@@ -203,7 +203,7 @@ sub _parse_multipart_boundary {
     # Begin
     if ($self->buffer->contains("\x0d\x0a--$boundary\x0d\x0a") == 0) {
         $self->buffer->remove(length($boundary) + 6);
-        push @{$self->parts}, Mojo::Content->new(relaxed => 1);
+        push @{$self->parts}, Mojo::Content::Single->new(relaxed => 1);
         $self->state('multipart_body');
         return 1;
     }

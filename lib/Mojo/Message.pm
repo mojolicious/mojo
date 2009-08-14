@@ -12,14 +12,14 @@ use bytes;
 use Carp 'croak';
 use Mojo::Asset::Memory;
 use Mojo::Buffer;
-use Mojo::Content;
+use Mojo::Content::Single;
 use Mojo::Parameters;
 use Mojo::Upload;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
 
 __PACKAGE__->attr(buffer  => sub { Mojo::Buffer->new });
-__PACKAGE__->attr(content => sub { Mojo::Content->new });
+__PACKAGE__->attr(content => sub { Mojo::Content::Single->new });
 __PACKAGE__->attr([qw/major_version minor_version/] => 1);
 
 __PACKAGE__->attr([qw/_body_params _cookies _uploads/]);
@@ -484,7 +484,7 @@ implements the following new ones.
 =head2 C<content>
 
     my $content = $message->content;
-    $message    = $message->content(Mojo::Content->new);
+    $message    = $message->content(Mojo::Content::Single->new);
 
 =head2 C<headers>
 

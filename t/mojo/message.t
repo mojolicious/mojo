@@ -14,7 +14,7 @@ use Mojo::Headers;
 # The answer to life's problems aren't at the bottom of a bottle,
 # they're on TV!
 use_ok('Mojo::Asset::File');
-use_ok('Mojo::Content');
+use_ok('Mojo::Content::Single');
 use_ok('Mojo::Content::MultiPart');
 use_ok('Mojo::Cookie::Request');
 use_ok('Mojo::Cookie::Response');
@@ -277,9 +277,9 @@ is($req->minor_version, 1);
 is($req->url,           '/foo/bar/baz.html?foo13#23');
 is($req->query_params,  'foo13');
 like($req->headers->content_type, qr/multipart\/form-data/);
-is(ref $req->content->parts->[0],           'Mojo::Content');
-is(ref $req->content->parts->[1],           'Mojo::Content');
-is(ref $req->content->parts->[2],           'Mojo::Content');
+is(ref $req->content->parts->[0],           'Mojo::Content::Single');
+is(ref $req->content->parts->[1],           'Mojo::Content::Single');
+is(ref $req->content->parts->[2],           'Mojo::Content::Single');
 is($req->content->parts->[0]->asset->slurp, "hallo welt test123\n");
 is_deeply($req->body_params->to_hash->{text1}, "hallo welt test123\n");
 is_deeply($req->body_params->to_hash->{text2}, '');
@@ -342,9 +342,9 @@ $req->method('GET');
 $req->url->parse('http://127.0.0.1/foo/bar');
 $req->content(Mojo::Content::MultiPart->new);
 $req->headers->content_type('multipart/mixed; boundary=7am1X');
-push @{$req->content->parts}, Mojo::Content->new;
+push @{$req->content->parts}, Mojo::Content::Single->new;
 $req->content->parts->[-1]->asset->add_chunk('Hallo Welt lalalala!');
-my $content = Mojo::Content->new;
+my $content = Mojo::Content::Single->new;
 $content->asset->add_chunk("lala\nfoobar\nperl rocks\n");
 $content->headers->content_type('text/plain');
 push @{$req->content->parts}, $content;
@@ -526,9 +526,9 @@ is($res->message,       'OK');
 is($res->major_version, 1);
 is($res->minor_version, 1);
 ok($res->headers->content_type =~ /multipart\/form-data/);
-is(ref $res->content->parts->[0],           'Mojo::Content');
-is(ref $res->content->parts->[1],           'Mojo::Content');
-is(ref $res->content->parts->[2],           'Mojo::Content');
+is(ref $res->content->parts->[0],           'Mojo::Content::Single');
+is(ref $res->content->parts->[1],           'Mojo::Content::Single');
+is(ref $res->content->parts->[2],           'Mojo::Content::Single');
 is($res->content->parts->[0]->asset->slurp, "hallo welt test123\n");
 
 # Build HTTP 1.1 response start line with minimal headers
@@ -578,9 +578,9 @@ $res->code(200);
 $res->headers->content_type('multipart/mixed; boundary=7am1X');
 $res->headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
 push @{$res->content->parts},
-  Mojo::Content->new(asset => Mojo::Asset::File->new);
+  Mojo::Content::Single->new(asset => Mojo::Asset::File->new);
 $res->content->parts->[-1]->asset->add_chunk('Hallo Welt lalalalalala!');
-$content = Mojo::Content->new;
+$content = Mojo::Content::Single->new;
 $content->asset->add_chunk("lala\nfoobar\nperl rocks\n");
 $content->headers->content_type('text/plain');
 push @{$res->content->parts}, $content;

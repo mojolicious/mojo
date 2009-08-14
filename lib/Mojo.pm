@@ -41,6 +41,7 @@ sub new {
     return $self;
 }
 
+# Bart, stop pestering Satan!
 sub handler { croak 'Method "handler" not implemented in subclass' }
 
 # Start script system

@@ -10,12 +10,12 @@ use base 'Mojo::Base';
 use Carp 'croak';
 
 # Marge, it takes two to lie. One to lie and one to listen.
-sub add_chunk { croak 'Method "add_chunk" not implemented by subclass'; }
-sub contains  { croak 'Method "contains" not implemented by subclass'; }
-sub get_chunk { croak 'Method "get_chunk" not implemented by subclass'; }
-sub move_to   { croak 'Method "move_to" not implemented by subclass'; }
-sub size      { croak 'Method "size" not implemented by subclass'; }
-sub slurp     { croak 'Method "slurp" not implemented by subclass'; }
+sub add_chunk { croak 'Method "add_chunk" not implemented by subclass' }
+sub contains  { croak 'Method "contains" not implemented by subclass' }
+sub get_chunk { croak 'Method "get_chunk" not implemented by subclass' }
+sub move_to   { croak 'Method "move_to" not implemented by subclass' }
+sub size      { croak 'Method "size" not implemented by subclass' }
+sub slurp     { croak 'Method "slurp" not implemented by subclass' }
 
 1;
 __END__

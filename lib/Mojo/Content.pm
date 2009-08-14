@@ -6,36 +6,26 @@ use strict;
 use warnings;
 
 use base 'Mojo::Stateful';
-use bytes;
 
-use Mojo::Asset::File;
-use Mojo::Asset::Memory;
+use Carp 'croak';
 use Mojo::Buffer;
 use Mojo::Filter::Chunked;
-use Mojo::Content::MultiPart;
 use Mojo::Headers;
 
-use constant CHUNK_SIZE      => $ENV{MOJO_CHUNK_SIZE}      || 4096;
-use constant MAX_MEMORY_SIZE => $ENV{MOJO_MAX_MEMORY_SIZE} || 10240;
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
 
-__PACKAGE__->attr(asset => sub { Mojo::Asset::Memory->new });
-__PACKAGE__->attr([qw/buffer filter_buffer/] => sub { Mojo::Buffer->new });
 __PACKAGE__->attr([qw/body_cb filter progress_cb/]);
-__PACKAGE__->attr(headers => sub { Mojo::Headers->new });
-__PACKAGE__->attr([qw/raw_header_size relaxed/] => 0);
+__PACKAGE__->attr([qw/buffer filter_buffer/] => sub { Mojo::Buffer->new });
+__PACKAGE__->attr(headers                    => sub { Mojo::Headers->new });
+__PACKAGE__->attr(raw_header_size            => 0);
 
 sub body_contains {
-    my ($self, $chunk) = @_;
-
-    # Found
-    return 1 if $self->asset->contains($chunk) >= 0;
-
-    # Not found
-    return;
+    croak 'Method "body_contains" not implemented by subclass';
 }
 
-sub body_size { shift->asset->size }
+sub body_size { croak 'Method "body_size" not implemented by subclass' }
 
+# Operator! Give me the number for 911!
 sub build_body {
     my $self = shift;
 
@@ -81,16 +71,7 @@ sub build_headers {
 }
 
 sub get_body_chunk {
-    my ($self, $offset) = @_;
-
-    # Progress
-    $self->progress_cb->($self, 'body', $offset) if $self->progress_cb;
-
-    # Body generator
-    return $self->body_cb->($self, $offset) if $self->body_cb;
-
-    # Normal content
-    return $self->asset->get_chunk($offset);
+    croak 'Method "get_body_chunk" not implemented by subclass';
 }
 
 sub get_header_chunk {
@@ -164,38 +145,6 @@ sub parse {
     # Not chunked, pass through
     else { $self->buffer($self->filter_buffer) }
 
-    # Content needs to be upgraded to multipart
-    if ($self->is_multipart) {
-
-        # Shortcut
-        return $self if $self->isa('Mojo::Content::MultiPart');
-
-        # Need to upgrade
-        return Mojo::Content::MultiPart->new($self)->parse;
-    }
-
-    # Chunked body or relaxed content
-    if ($self->is_chunked || $self->relaxed) {
-        $self->asset->add_chunk($self->buffer->empty);
-    }
-
-    # Normal body
-    else {
-
-        # Slurp
-        my $length = $self->headers->content_length || 0;
-        my $need = $length - $self->asset->size;
-        $self->asset->add_chunk($self->buffer->remove($need)) if $need > 0;
-
-        # Done
-        $self->done if $length <= $self->raw_body_size;
-    }
-
-    # With leftovers, maybe pipelined
-    if ($self->is_done) {
-        $self->state('done_with_leftovers') if $self->has_leftovers;
-    }
-
     return $self;
 }
 
@@ -245,14 +194,6 @@ sub _parse_headers {
     my $raw_header_length = $raw_length - $length;
 
     $self->raw_header_size($raw_header_length);
-
-    # Make sure we don't waste memory
-    if ($self->asset->isa('Mojo::Asset::Memory')) {
-        $self->asset(Mojo::Asset::File->new)
-          if !$self->headers->content_length
-              || $self->headers->content_length > MAX_MEMORY_SIZE;
-    }
-
     $self->state('body') if $self->headers->is_done;
 }
 
@@ -261,28 +202,20 @@ __END__
 
 =head1 NAME
 
-Mojo::Content - Content
+Mojo::Content - HTTP Content Base Class
 
 =head1 SYNOPSIS
 
-    use Mojo::Content;
-
-    my $content = Mojo::Content->new;
-    $content->parse("Content-Length: 12\r\n\r\nHello World!");
+    use base 'Mojo::Content';
 
 =head1 DESCRIPTION
 
-L<Mojo::Content> is a container for HTTP content.
+L<Mojo::Content> is a HTTP content base class.
 
 =head1 ATTRIBUTES
 
 L<Mojo::Content> inherits all attributes from L<Mojo::Stateful> and
 implements the following new ones.
-
-=head2 C<asset>
-
-    my $asset = $content->asset;
-    $content  = $content->asset(Mojo::Asset::Memory->new);
 
 =head2 C<body_cb>
 
@@ -298,14 +231,25 @@ implements the following new ones.
         return $chunk;
     });
 
-=head2 C<body_size>
-
-    my $size = $content->body_size;
-
 =head2 C<buffer>
 
     my $buffer = $content->buffer;
     $content   = $content->buffer(Mojo::Buffer->new);
+
+=head2 C<filter>
+
+    my $filter = $content->filter;
+    $content   = $content->filter(Mojo::Filter::Chunked->new);
+
+=head2 C<filter_buffer>
+
+    my $filter_buffer = $content->filter_buffer;
+    $content          = $content->filter_buffer(Mojo::Buffer->new);
+
+=head2 C<headers>
+
+    my $headers = $content->headers;
+    $content    = $content->headers(Mojo::Headers->new);
 
 =head2 C<progress_cb>
 
@@ -315,32 +259,9 @@ implements the following new ones.
         print '+';
     });
 
-=head2 C<filter_buffer>
-
-    my $filter_buffer = $content->filter_buffer;
-    $content          = $content->filter_buffer(Mojo::Buffer->new);
-
-=head2 C<header_size>
-
-    my $size = $content->header_size;
-
-=head2 C<headers>
-
-    my $headers = $content->headers;
-    $content    = $content->headers(Mojo::Headers->new);
-
 =head2 C<raw_header_size>
 
     my $size = $content->raw_header_size;
-
-=head2 C<raw_body_size>
-
-    my $size = $content->raw_body_size;
-
-=head2 C<relaxed>
-
-    my $relaxed = $content->relaxed;
-    $content    = $content->relaxed(1);
 
 =head1 METHODS
 
@@ -349,7 +270,11 @@ the following new ones.
 
 =head2 C<body_contains>
 
-    my $found = $content->body_contains;
+    my $found = $content->body_contains('foo bar baz');
+
+=head2 C<body_size>
+
+    my $size = $content->body_size;
 
 =head2 C<build_body>
 
@@ -370,6 +295,10 @@ the following new ones.
 =head2 C<has_leftovers>
 
     my $leftovers = $content->has_leftovers;
+
+=head2 C<header_size>
+
+    my $size = $content->header_size;
 
 =head2 C<is_chunked>
 
@@ -392,5 +321,9 @@ the following new ones.
     $content = $content->parse_until_body(
         "Content-Length: 12\r\n\r\nHello World!"
     );
+
+=head2 C<raw_body_size>
+
+    my $size = $content->raw_body_size;
 
 =cut

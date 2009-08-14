@@ -10,7 +10,7 @@ use base 'Mojo::Base';
 use File::stat;
 use File::Spec;
 use Mojo::Asset::File;
-use Mojo::Content;
+use Mojo::Content::Single;
 use Mojo::Path;
 use MojoX::Types;
 
@@ -81,7 +81,7 @@ sub serve {
             }
 
             $res->content(
-                Mojo::Content->new(
+                Mojo::Content::Single->new(
                     asset   => Mojo::Asset::File->new,
                     headers => $res->headers
                 )
@@ -140,7 +140,8 @@ sub serve_error {
         $c->app->log->debug(qq/Serving error file "$rel"./);
 
         # File
-        $res->content(Mojo::Content->new(asset => Mojo::Asset::File->new));
+        $res->content(
+            Mojo::Content::Single->new(asset => Mojo::Asset::File->new));
         $res->content->asset->path($path);
 
         # Extension

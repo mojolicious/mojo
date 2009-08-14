@@ -2,8 +2,8 @@ This file documents the revision history for Perl extension Mojo.
 
 0.991247 2009-08-11 00:00:00
         - This release contains many substantial changes that are not
-          backwards compatible, but good news is that it's supposed to be the
-          last major feature breaking release before 1.0. ;)
+          backwards compatible, but good news is that it's also the last
+          major feature breaking release before 1.0. ;)
           Older releases of Mojo did contain additional Mojo::Script::* and
           Mojolicious::Script::* modules that are obsolete now and might
           break this version if they are still present on your system.

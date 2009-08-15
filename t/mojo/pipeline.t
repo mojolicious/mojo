@@ -215,7 +215,6 @@ $pipe->safe_post(0);
 ok($pipe->client_is_writing);
 
 # Premature connection close
-
 $tx1  = Mojo::Transaction::Single->new_get("http://127.0.0.1:3000/18/");
 $tx2  = Mojo::Transaction::Single->new_get("http://127.0.0.1:3000/19/");
 $tx3  = Mojo::Transaction::Single->new_get("http://127.0.0.1:3000/20/");
@@ -242,8 +241,8 @@ ok(!$tx3->is_done);
 is($tx1->res->code, 204);
 is($tx2->res->code, 200);
 ok(!$pipe->keep_alive);
-is($pipe->state, 'read_response');
-is($tx3->state, 'read_response');
+is($pipe->state,              'read_response');
+is($tx3->state,               'read_response');
 is(scalar @{$pipe->finished}, 2);
-is(scalar @{$pipe->active}, 1);
+is(scalar @{$pipe->active},   1);
 is(scalar @{$pipe->inactive}, 0);

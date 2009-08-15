@@ -313,10 +313,9 @@ sub spin_app {
         return 1;
     }
 
-    # Make sure $server has a transaction ready to handle data
-    unless ($server->_current_active) {
-            $server->server_accept($daemon->build_tx_cb->($daemon));
-    }
+    # Make sure the server has a transaction ready to handle incoming data
+    $server->server_accept($daemon->build_tx_cb->($daemon))
+      unless $server->server_tx;
 
     # Exchange
     if ($client->client_is_writing || $server->server_is_writing) {
@@ -369,19 +368,15 @@ sub spin_app {
 
             # Handle
             $self->_handle_app($daemon, $server);
-
         }
-
     }
 
     # Done
     return 1 if $client->is_finished;
 
-    # Check for server closing the connection
-    if ($server->is_done && !$server->keep_alive) {
-       $client->error("Server closed connection");
-       return 1;
-    }
+    # Check if server closed the connection
+    $client->error('Server closed connection.') and return 1
+      if $server->is_done && !$server->keep_alive;
 
     # More to do
     return;

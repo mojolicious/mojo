@@ -62,11 +62,10 @@ is($tx->res->code,                417);
 is($tx->res->headers->connection, 'Close');
 
 # Regular pipeline
-my $tx1 = Mojo::Transaction::Single->new_get('/4/');
-my $tx2 = Mojo::Transaction::Single->new_get('/5/');
+my $tx1  = Mojo::Transaction::Single->new_get('/4/');
+my $tx2  = Mojo::Transaction::Single->new_get('/5/');
 my $pipe = Mojo::Transaction::Pipeline->new($tx1, $tx2);
 $client->process_app('ContinueHandlerTest', $pipe);
-
 ok($pipe->is_done);
 ok($pipe->keep_alive);
 ok($tx1->is_done);
@@ -74,20 +73,17 @@ ok($tx2->is_done);
 is(scalar @{$pipe->finished}, 2);
 
 # Interrupted pipeline
-
 $tx1 = Mojo::Transaction::Single->new_get('/6/');
 $tx2 = Mojo::Transaction::Single->new_post('/7/');
 $tx2->req->headers->expect('100-continue');
 $tx2->req->body('bar baz foo' x 128);
 my $tx3 = Mojo::Transaction::Single->new_get('/8/');
 $pipe = Mojo::Transaction::Pipeline->new($tx1, $tx2, $tx3);
-
 $client->process_app('ContinueHandlerTest', $pipe);
-
 ok($pipe->is_finished);
 ok($pipe->has_error);
 ok($tx1->is_done);
 ok($tx2->is_done);
 ok(!$tx3->is_done);
 is(scalar @{$pipe->finished}, 2);
-is(scalar @{$pipe->active}, 1);
+is(scalar @{$pipe->active},   1);

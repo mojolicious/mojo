@@ -9,7 +9,7 @@ use Test::More;
 
 plan skip_all => 'set TEST_PIPELINE to enable this test'
   unless $ENV{TEST_PIPELINE};
-plan tests => 34;
+plan tests => 45;
 
 # Are we there yet?
 # No
@@ -213,3 +213,37 @@ $pipe->safe_post(1);
 ok(!$pipe->client_is_writing);
 $pipe->safe_post(0);
 ok($pipe->client_is_writing);
+
+# Premature connection close
+
+$tx1  = Mojo::Transaction::Single->new_get("http://127.0.0.1:3000/18/");
+$tx2  = Mojo::Transaction::Single->new_get("http://127.0.0.1:3000/19/");
+$tx3  = Mojo::Transaction::Single->new_get("http://127.0.0.1:3000/20/");
+$pipe = Mojo::Transaction::Pipeline->new($tx1, $tx2, $tx3);
+$_->state('read_response') for @{$pipe->active};
+$pipe->_all_written(1);
+$responses = <<EOF;
+HTTP/1.1 204 OK
+Connection: Keep-Alive
+Date: Tue, 09 Jun 2009 18:24:14 GMT
+
+HTTP/1.1 200 OK
+Connection: Close
+Date: Tue, 09 Jun 2009 18:24:14 GMT
+Content-Type: text/plain
+Content-length: 5
+
+1234
+EOF
+$pipe->client_read($responses);
+ok($tx1->is_done);
+ok($tx2->is_done);
+ok(!$tx3->is_done);
+is($tx1->res->code, 204);
+is($tx2->res->code, 200);
+ok(!$pipe->keep_alive);
+is($pipe->state, 'read_response');
+is($tx3->state, 'read_response');
+is(scalar @{$pipe->finished}, 2);
+is(scalar @{$pipe->active}, 1);
+is(scalar @{$pipe->inactive}, 0);

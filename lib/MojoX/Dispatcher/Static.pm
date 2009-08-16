@@ -21,7 +21,7 @@ __PACKAGE__->attr(types => sub { MojoX::Types->new });
 sub dispatch {
     my ($self, $c) = @_;
 
-    # Path
+    # Canonical path
     my $path = $c->req->url->path->clone->canonicalize->to_string;
 
     # Prefix
@@ -32,11 +32,11 @@ sub dispatch {
     # Parts
     my @parts = @{Mojo::Path->parse($path)->parts};
 
-    # Prevent directory traversal
-    return 1 if grep { $_ eq '..' } @parts;
-
     # Shortcut
     return 1 unless @parts;
+
+    # Prevent directory traversal
+    return 1 if $parts[0] eq '..';
 
     # Serve static file
     return $self->serve($c, File::Spec->catfile(@parts));

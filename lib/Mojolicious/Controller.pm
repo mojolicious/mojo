@@ -61,8 +61,6 @@ sub render_text {
     return $self->render(@_);
 }
 
-# It would never work out, Fry. You're a male, I'm a female.
-# We're just too different.
 sub url_for {
     my $self = shift;
 

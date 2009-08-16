@@ -235,6 +235,8 @@ Robert Hicks
 
 Shu Cho
 
+Stanis Trendelenburg
+
 Uwe Voelker
 
 Viacheslav Tikhanovskii

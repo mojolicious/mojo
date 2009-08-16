@@ -447,9 +447,7 @@ sub _socket_name {
     # Generate
     return
         unpack('H*', $s->sockaddr)
-      . $s->sockport
-      . unpack('H*', $s->peeraddr)
-      . $s->peerport;
+      . $s->sockport;
 }
 
 1;

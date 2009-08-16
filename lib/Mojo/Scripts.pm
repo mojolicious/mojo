@@ -27,7 +27,7 @@ sub run {
     my ($self, $name, @args) = @_;
 
     # Run script
-    if ($name && ($name ne 'help' || $args[0])) {
+    if ($name && $name =~ /^\w+$/ && ($name ne 'help' || $args[0])) {
 
         # Help?
         my $help = $name eq 'help' ? 1 : 0;

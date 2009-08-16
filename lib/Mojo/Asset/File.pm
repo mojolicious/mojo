@@ -121,6 +121,7 @@ sub move_to {
 
     # Close handle
     close $self->handle;
+    $self->handle(undef);
 
     # Move
     File::Copy::move($src, $path)

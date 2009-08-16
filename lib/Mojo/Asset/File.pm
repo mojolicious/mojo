@@ -130,6 +130,9 @@ sub move_to {
     # Set new path
     $self->path($path);
 
+    # Don't clean up a moved file
+    $self->cleanup(0);
+
     return $self;
 }
 

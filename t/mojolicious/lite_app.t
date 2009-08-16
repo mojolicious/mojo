@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 60;
+use Test::More tests => 64;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -63,6 +63,9 @@ get '/firefox/:stuff' => (agent => qr/Firefox/) => sub {
     my $self = shift;
     $self->render_text($self->url_for('foxy', stuff => 'foo'));
 } => 'foxy';
+
+# POST /utf8
+post '/utf8' => 'form';
 
 # Oh Fry, I love you more than the moon, and the stars,
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
@@ -191,9 +194,22 @@ is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 like($tx->res->body, qr/File Not Found/);
 
+# POST /utf8
+$tx = Mojo::Transaction::Single->new_post('/utf8');
+$tx->req->headers->content_type('application/x-www-form-urlencoded');
+$tx->req->body('name=%D0%92%D1%8F%D1%87%D0%B5%D1%81%D0%BB%D0%B0%D0%B2');
+$client->process_app($app, $tx);
+is($tx->res->code,                            200);
+is($tx->res->headers->server,                 'Mojo (Perl)');
+is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+is($tx->res->body,                            "Вячеслав\n");
+
 __DATA__
 @@ index.html.epl
 %= something()
+
+@@ form.html.epl
+<%= shift->req->param('name') %>
 
 @@ layouts/layout.html.epl
 <%= shift->render_inner %> with layout

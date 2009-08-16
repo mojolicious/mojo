@@ -32,6 +32,9 @@ sub dispatch {
     # Parts
     my @parts = @{Mojo::Path->parse($path)->parts};
 
+    # Prevent directory traversal
+    return 1 if grep { $_ eq '..' } @parts;
+
     # Shortcut
     return 1 unless @parts;
 

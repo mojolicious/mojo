@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 109;
+use Test::More tests => 113;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -160,6 +160,16 @@ is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 like($tx->res->content->asset->slurp, qr/Hello Mojo from a static file!/);
 $ENV{MOJO_MODE} = $backup;
 
+# Try to access a file which is not under the web root via path
+# traversal in production mode
+$backup = $ENV{MOJO_MODE} || '';
+$ENV{MOJO_MODE} = 'production';
+$tx = Mojo::Transaction::Single->new_get('../../mojolicious/secret.txt');
+$client->process_app('MojoliciousTest', $tx);
+is($tx->res->code, 404);
+unlike($tx->res->content->asset->slurp, qr/Secret file/);
+$ENV{MOJO_MODE} = $backup;
+
 # Check Last-Modified header for static files
 my $path  = File::Spec->catdir($FindBin::Bin, 'public_dev', 'hello.txt');
 my $stat  = stat($path);
@@ -180,6 +190,16 @@ is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 like($tx->res->content->asset->slurp,
     qr/Hello Mojo from a development static file!/);
+$ENV{MOJO_MODE} = $backup;
+
+# Try to access a file which is not under the web root via path
+# traversal in development mode
+$backup = $ENV{MOJO_MODE} || '';
+$ENV{MOJO_MODE} = 'development';
+$tx = Mojo::Transaction::Single->new_get('../../mojolicious/secret.txt');
+$client->process_app('MojoliciousTest', $tx);
+is($tx->res->code, 404);
+unlike($tx->res->content->asset->slurp, qr/Secret file/);
 $ENV{MOJO_MODE} = $backup;
 
 # Check If-Modified-Since

@@ -203,7 +203,7 @@ like($tx->res->content->asset->slurp, qr/Mojolicious Web Framework/i);
         </pre>
         <pre>
 % delete $s->{exception};
-%== Data::Dumper->new([$s])->Indent(1)->Terse(1)->Dump
+%== Data::Dumper->new([$s])->Maxdepth(2)->Indent(1)->Terse(1)->Dump
 % $s->{exception} = $e;
         </pre>
     </body>

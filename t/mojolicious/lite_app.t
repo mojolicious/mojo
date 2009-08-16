@@ -205,14 +205,16 @@ $client->process_app($app, $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body, b("Вячеслав\n")->encode('utf8')->to_string);
+is($tx->res->body,
+    b("Вячеслав Тихановский\n")->encode('utf8')
+      ->to_string);
 
 __DATA__
 @@ index.html.epl
 %= something()
 
 @@ form.html.epl
-<%= shift->req->param('name') %>
+<%= shift->req->param('name') %> Тихановский
 
 @@ layouts/layout.html.epl
 <%= shift->render_inner %> with layout

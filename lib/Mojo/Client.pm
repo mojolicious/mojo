@@ -445,9 +445,7 @@ sub _socket_name {
     my ($self, $s) = @_;
 
     # Generate
-    return
-        unpack('H*', $s->sockaddr)
-      . $s->sockport;
+    return unpack('H*', $s->sockaddr) . $s->sockport;
 }
 
 1;

@@ -119,9 +119,15 @@ sub move_to {
     my ($self, $path) = @_;
     my $src = $self->path;
 
+    # Close handle
+    close $self->handle;
+
     # Move
     File::Copy::move($src, $path)
       or croak qq/Can't move file "$src" to "$path": $!/;
+
+    # Set new path
+    $self->path($path);
 
     return $self;
 }

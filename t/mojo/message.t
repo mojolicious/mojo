@@ -7,6 +7,8 @@ use warnings;
 
 use Test::More tests => 390;
 
+use File::Spec;
+use File::Temp;
 use Mojo::Filter::Chunked;
 use Mojo::Headers;
 
@@ -286,8 +288,10 @@ is_deeply($req->body_params->to_hash->{text2}, '');
 is($req->upload('upload')->filename,    'hello.pl');
 is(ref $req->upload('upload')->asset,   'Mojo::Asset::File');
 is($req->upload('upload')->asset->size, 69);
-ok($req->upload('upload')->move_to('MOJO_TMP.txt'));
-is((unlink 'MOJO_TMP.txt'), 1);
+my $file =
+  File::Spec->catfile(File::Temp::tempdir(), ("MOJO_TMP." . time . ".txt"));
+ok($req->upload('upload')->move_to($file));
+is((unlink $file), 1);
 
 # Build minimal HTTP 1.1 request
 $req = Mojo::Message::Request->new;

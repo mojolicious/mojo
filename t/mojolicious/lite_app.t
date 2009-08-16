@@ -14,6 +14,7 @@ use Test::More tests => 64;
 # Yeah ever since I was six.
 # Well, ok but I don't want people thinking we're robosexuals,
 # so if anyone asks you're my debugger.
+use Mojo::ByteStream 'b';
 use Mojo::Client;
 use Mojo::Transaction::Single;
 use Mojolicious::Lite;
@@ -204,7 +205,7 @@ $client->process_app($app, $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,                            "Вячеслав\n");
+is($tx->res->body, b("Вячеслав\n")->encode('utf8')->to_string);
 
 __DATA__
 @@ index.html.epl

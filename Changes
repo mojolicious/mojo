@@ -66,6 +66,7 @@ This file documents the revision history for Perl extension Mojo.
         - Added conditions to MojoX::Routes.
         - Added routes script to Mojolicious.
         - Simplified Mojo::Base.
+        - Simplified exceptions.
         - Changed Mojo::Log to default to utf8 when writing to a file.
         - Cleaned up Mojo::Date.
         - Cleaned up Mojo::Transaction.

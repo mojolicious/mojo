@@ -8,8 +8,8 @@ use warnings;
 use base 'MojoX::Routes';
 
 use Mojo::ByteStream 'b';
+use Mojo::Exception;
 use Mojo::Loader;
-use Mojo::Loader::Exception;
 
 __PACKAGE__->attr(
     controller_base_class => 'MojoX::Dispatcher::Routes::Controller');
@@ -56,7 +56,7 @@ sub dispatch_callback {
     $c->app->log->debug(qq/Dispatching callback./);
 
     # Catch errors
-    local $SIG{__DIE__} = sub { die Mojo::Loader::Exception->new(shift) };
+    local $SIG{__DIE__} = sub { die Mojo::Exception->new(shift) };
 
     # Dispatch
     my $continue;
@@ -112,7 +112,7 @@ sub dispatch_controller {
       unless $class->isa($self->controller_base_class);
 
     # Catch errors
-    local $SIG{__DIE__} = sub { die Mojo::Loader::Exception->new(shift) };
+    local $SIG{__DIE__} = sub { die Mojo::Exception->new(shift) };
 
     # Dispatch
     my $continue;

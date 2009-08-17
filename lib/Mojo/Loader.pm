@@ -10,7 +10,7 @@ use base 'Mojo::Base';
 use Carp 'carp';
 use File::Basename;
 use File::Spec;
-use Mojo::Loader::Exception;
+use Mojo::Exception;
 use Mojo::Script;
 
 use constant DEBUG => $ENV{MOJO_LOADER_DEBUG} || 0;
@@ -48,7 +48,7 @@ sub load {
         return 1 if $@ =~ /^Can't locate $path in \@INC/;
 
         # Real error
-        return Mojo::Loader::Exception->new($@);
+        return Mojo::Exception->new($@);
     }
 
     return;
@@ -84,7 +84,7 @@ sub reload {
             eval { require $key };
 
             # Catch
-            return Mojo::Loader::Exception->new($@) if $@;
+            return Mojo::Exception->new($@) if $@;
 
             $STATS->{$file} = $mtime;
         }

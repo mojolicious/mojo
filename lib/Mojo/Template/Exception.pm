@@ -5,30 +5,15 @@ package Mojo::Template::Exception;
 use strict;
 use warnings;
 
-use base 'Mojo::Base';
-use overload '""' => sub { shift->to_string }, fallback => 1;
+use base 'Mojo::Exception';
 
-__PACKAGE__->attr([qw/line lines_before lines_after stack/] => sub { [] });
-__PACKAGE__->attr(message => 'Exception!');
-
-# Attempted murder? Now honestly, what is that?
-# Do they give a Nobel Prize for attempted chemistry?
+# You killed zombie Flanders!
+# He was a zombie?
 sub new {
-    my $self = shift->SUPER::new();
-
-    # Message
-    $self->message(shift);
-
-    # Stack
-    my $i = 1;
-    while (my ($p, $f, $l) = caller($i++)) {
-
-        # Stack
-        push @{$self->stack}, [$p, $f, $l];
-    }
+    my $self = shift->SUPER::new(@_);
 
     # Lines
-    my $lines = shift;
+    my $lines = $_[1];
 
     # Shortcut
     return $self unless $lines;
@@ -60,87 +45,6 @@ sub new {
     return $self;
 }
 
-sub parse_context {
-    my ($self, $lines, $line) = @_;
-
-    # Context
-    my $code = $lines->[$line - 1];
-    chomp $code;
-    $self->line([$line, $code]);
-
-    # -2
-    my $previous_line = $line - 3;
-    $code = $previous_line >= 0 ? $lines->[$previous_line] : undef;
-    if (defined $code) {
-        chomp $code;
-        push @{$self->lines_before}, [$line - 2, $code];
-    }
-
-    # -1
-    $previous_line = $line - 2;
-    $code = $previous_line >= 0 ? $lines->[$previous_line] : undef;
-    if (defined $code) {
-        chomp $code;
-        push @{$self->lines_before}, [$line - 1, $code];
-    }
-
-    # +1
-    my $next_line = $line;
-    $code = $next_line >= 0 ? $lines->[$next_line] : undef;
-    if (defined $code) {
-        chomp $code;
-        push @{$self->lines_after}, [$line + 1, $code];
-    }
-
-    # +2
-    $next_line = $line + 1;
-    $code = $next_line >= 0 ? $lines->[$next_line] : undef;
-    if (defined $code) {
-        chomp $code;
-        push @{$self->lines_after}, [$line + 2, $code];
-    }
-
-    return $self;
-}
-
-sub to_string {
-    my $self = shift;
-
-    my $string = '';
-
-    # Header
-    $string .= ('Error around line ' . $self->line->[0] . ".\n")
-      if $self->line->[0];
-
-    # Before
-    for my $line (@{$self->lines_before}) {
-        $string .= $line->[0] . ': ' . $line->[1] . "\n";
-    }
-
-    # Line
-    $string .= ($self->line->[0] . ': ' . $self->line->[1] . "\n")
-      if $self->line->[0];
-
-    # After
-    for my $line (@{$self->lines_after}) {
-        $string .= $line->[0] . ': ' . $line->[1] . "\n";
-    }
-
-    # Stack
-    if (@{$self->stack} && $ENV{MOJO_EXCEPTION_VERBOSE}) {
-        for my $frame (@{$self->stack}) {
-            my $file = $frame->[1];
-            my $line = $frame->[2];
-            $string .= "$file: $line\n";
-        }
-    }
-
-    # Message
-    $string .= $self->message if $self->message;
-
-    return $string;
-}
-
 1;
 __END__
 
@@ -159,49 +63,15 @@ L<Mojo::Template::Exception> is a container for template exceptions.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Template::Exception> implements the following attributes.
-
-=head2 C<line>
-
-    my $line = $e->line;
-    $e       = $e->line([3, 'foo']);
-
-=head2 C<lines_after>
-
-    my $lines = $e->lines_after;
-    $e        = $e->lines_after([[1, 'bar'], [2, 'baz']]);
-
-=head2 C<lines_before>
-
-    my $lines = $e->lines_before;
-    $e        = $e->lines_before([[4, 'bar'], [5, 'baz']]);
-
-=head2 C<message>
-
-    my $message = $e->message;
-    $e          = $e->message('oops!');
-
-=head2 C<stack>
-
-    my $stack = $e->stack;
-    $e        = $e->stack([['Foo::Bar', '/foo/bar.pl', 23]]);
+L<Mojo::Template::Exception> inherits all attributes from L<Mojo::Exception>.
 
 =head1 METHODS
 
-L<Mojo::Template::Exception> inherits all methods from L<Mojo::Base> and
+L<Mojo::Template::Exception> inherits all methods from L<Mojo::Exception> and
 implements the following new ones.
 
 =head2 C<new>
 
-    my $e = Mojo::Loader::Exception->new('Oops!', $template);
-
-=head2 C<parse_context>
-
-    $e = $e->parse_context($lines, $line);
-
-=head2 C<to_string>
-
-    my $string = $e->to_string;
-    my $string = "$e";
+    my $e = Mojo::Template::Exception->new('Oops!', $template);
 
 =cut

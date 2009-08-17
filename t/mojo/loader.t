@@ -27,7 +27,7 @@ use_ok('Mojo::Loader');
 # Exception
 my $loader = Mojo::Loader->new;
 my $e      = $loader->load('LoaderException');
-is(ref $e, 'Mojo::Loader::Exception');
+is(ref $e, 'Mojo::Exception');
 like($e->message, qr/Missing right curly/);
 is($e->lines_before->[0]->[0], 13);
 is($e->lines_before->[0]->[1], 'foo {');

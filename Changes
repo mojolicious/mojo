@@ -71,6 +71,7 @@ This file documents the revision history for Perl extension Mojo.
         - Cleaned up Mojo::Transaction.
         - Made build_tx a callback named build_tx_cb in Mojo.
         - Made the exception template a bit more fault tolerant.
+        - Made controller base class configurable in MojoX::Dispatcher::Routes.
         - Removed address, password and user methods from Mojo::URL.
         - Fixed Microsoft IIS CGI and FastCGI environment support.
         - Fixed prefix handling in MojoX::Dispatcher::Static.

@@ -11,6 +11,8 @@ use Mojo::ByteStream 'b';
 use Mojo::Loader;
 use Mojo::Loader::Exception;
 
+__PACKAGE__->attr(
+    controller_base_class => 'MojoX::Dispatcher::Routes::Controller');
 __PACKAGE__->attr(hidden => sub { [qw/new app attr render req res stash tx/] }
 );
 __PACKAGE__->attr('namespace');
@@ -105,11 +107,9 @@ sub dispatch_controller {
         $self->_loaded->{$class}++;
     }
 
-    # Not a conroller
-    unless ($class->isa('MojoX::Dispatcher::Routes::Controller')) {
-        $c->app->log->debug(qq/"$class" is not a controller./);
-        return;
-    }
+    # Not a controller
+    $c->app->log->debug(qq/"$class" is not a controller./) and return
+      unless $class->isa($self->controller_base_class);
 
     # Catch errors
     local $SIG{__DIE__} = sub { die Mojo::Loader::Exception->new(shift) };
@@ -259,6 +259,13 @@ L<MojoX::Dispatcher::Routes> is a dispatcher based on L<MojoX::Routes>.
 
 L<MojoX::Dispatcher::Routes> inherits all attributes from L<MojoX::Routes>
 and implements the follwing the ones.
+
+=head2 C<controller_base_class>
+
+    my $base    = $dispatcher->controller_base_class;
+    $dispatcher = $dispatcher->controller_base_class(
+        'MojoX::Dispatcher::Routes::Controller'
+    );
 
 =head2 C<hidden>
 

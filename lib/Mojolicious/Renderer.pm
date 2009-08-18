@@ -8,6 +8,7 @@ use warnings;
 use base 'MojoX::Renderer';
 
 use File::Spec;
+use Mojo::Command;
 use Mojo::Template;
 
 __PACKAGE__->attr(_epl_cache => sub { {} });
@@ -49,7 +50,7 @@ sub new {
                 if (-r $path) { $$output = $mt->render_file($path, $c) }
 
                 # Try DATA section
-                elsif (my $d = Mojo::Script->new->get_data($t, $class)) {
+                elsif (my $d = Mojo::Command->new->get_data($t, $class)) {
                     $mt->namespace($class);
                     $$output = $mt->render($d, $c);
                 }

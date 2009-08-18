@@ -1,11 +1,11 @@
 # Copyright (C) 2008-2009, Sebastian Riedel.
 
-package Mojolicious::Script::Routes;
+package Mojolicious::Command::Routes;
 
 use strict;
 use warnings;
 
-use base 'Mojo::Script';
+use base 'Mojo::Command';
 
 use Mojo::Server;
 
@@ -83,22 +83,22 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Script::Routes - Routes Script
+Mojolicious::Command::Routes - Routes Command
 
 =head1 SYNOPSIS
 
-    use Mojolicious::Script::Routes;
+    use Mojolicious::Command::Routes;
 
-    my $routes = Mojolicious::Script::Routes->new;
+    my $routes = Mojolicious::Command::Routes->new;
     $routes->run(@ARGV);
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Script::Routes> is a routes script.
+L<Mojolicious::Command::Routes> is a routes script.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Script::Routes> inherits all attributes from L<Mojo::Script>
+L<Mojolicious::Command::Routes> inherits all attributes from L<Mojo::Command>
 and implements the following new ones.
 
 =head2 C<description>
@@ -113,8 +113,8 @@ and implements the following new ones.
 
 =head1 METHODS
 
-L<Mojolicious::Script::Routes> inherits all methods from L<Mojo::Script> and
-implements the following new ones.
+L<Mojolicious::Command::Routes> inherits all methods from L<Mojo::Command>
+and implements the following new ones.
 
 =head2 C<run>
 

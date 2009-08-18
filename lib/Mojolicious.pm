@@ -7,9 +7,9 @@ use warnings;
 
 use base 'Mojo';
 
+use Mojolicious::Commands;
 use Mojolicious::Dispatcher;
 use Mojolicious::Renderer;
-use Mojolicious::Scripts;
 use MojoX::Dispatcher::Static;
 use MojoX::Types;
 use Time::HiRes ();
@@ -126,7 +126,7 @@ sub handler {
 # This will run for each request
 sub process { shift->dispatch(@_) }
 
-# Start script system
+# Start command system
 sub start {
     my $class = shift;
 
@@ -137,7 +137,7 @@ sub start {
     $ENV{MOJO_APP} ||= $class;
 
     # Start!
-    Mojolicious::Scripts->start(@_);
+    Mojolicious::Commands->start(@_);
 }
 
 # This will run once at startup

@@ -1,11 +1,11 @@
 # Copyright (C) 2008-2009, Sebastian Riedel.
 
-package Mojolicious::Script::Generate::App;
+package Mojolicious::Command::Generate::App;
 
 use strict;
 use warnings;
 
-use base 'Mojo::Script';
+use base 'Mojo::Command';
 
 __PACKAGE__->attr(description => <<'EOF');
 Generate application directory structure.
@@ -229,23 +229,23 @@ to move forward to a static page.
 __END__
 =head1 NAME
 
-Mojolicious::Script::Generate::App - App Generator Script
+Mojolicious::Command::Generate::App - App Generator Command
 
 =head1 SYNOPSIS
 
-    use Mojo::Script::Generate::App;
+    use Mojolicious::Command::Generate::App;
 
-    my $app = Mojo::Script::Generate::App->new;
+    my $app = Mojolicious::Command::Generate::App->new;
     $app->run(@ARGV);
 
 =head1 DESCRIPTION
 
-L<Mojo::Script::Generate::App> is a application generator.
+L<Mojolicious::Command::Generate::App> is a application generator.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Script::Generate::App> inherits all attributes from
-L<Mojo::Script> and implements the following new ones.
+L<Mojolicious::Command::Generate::App> inherits all attributes from
+L<Mojo::Command> and implements the following new ones.
 
 =head2 C<description>
 
@@ -259,8 +259,8 @@ L<Mojo::Script> and implements the following new ones.
 
 =head1 METHODS
 
-L<Mojolicious::Script::Generate::App> inherits all methods from
-L<Mojo::Script> and implements the following new ones.
+L<Mojolicious::Command::Generate::App> inherits all methods from
+L<Mojo::Command> and implements the following new ones.
 
 =head2 C<run>
 

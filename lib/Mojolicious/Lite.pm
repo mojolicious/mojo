@@ -120,7 +120,7 @@ Mojolicious::Lite - Micro Web Framework
         $self->render_text('Yea baby!');
     };
 
-    # Start the Mojolicious script system
+    # Start the Mojolicious command system
     shagadelic;
 
 =head1 DESCRIPTION
@@ -140,11 +140,11 @@ A minimal application looks like this.
 
     shagadelic;
 
-There is also a helper script to generate a small example application.
+There is also a helper command to generate a small example application.
 
     % mojolicious generate lite_app
 
-All the normal L<Mojolicious> script options are available from the command
+All the normal L<Mojolicious> command options are available from the command
 line.
 
     % ./myapp.pl daemon
@@ -162,7 +162,7 @@ line.
     % ./myapp.pl fastcgi
     ...Blocking FastCGI main loop...
 
-The shagadelic call that starts the L<Mojolicious> script system can be
+The shagadelic call that starts the L<Mojolicious> command system can be
 customized to override normal C<@ARGV> use.
 
     shagadelic('cgi');

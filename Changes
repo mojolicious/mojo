@@ -10,6 +10,10 @@ This file documents the revision history for Perl extension Mojo.
           Because of this we highly suggest that you
           DELETE ALL MODULES IN THE "Mojo" AND "Mojolicious" NAMESPACE
           MANUALLY!!!
+        - Mojo::Script has been renamed to Mojo::Command, this change is not
+          backwards compatible!
+          You will have to regenerate application scripts or replace
+          "Mojo(licious)::Script" with "Mojo(licious)::Command".
         - Removed unused features from Mojo::Base and simplified API, this
           change is not backwards compatible!
               __PACKAGE__->attr('foo', default => 'bar');

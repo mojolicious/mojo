@@ -10,8 +10,8 @@ use overload '""' => sub { shift->to_string }, fallback => 1;
 
 use File::Spec;
 use FindBin;
+use Mojo::Command;
 use Mojo::Loader;
-use Mojo::Script;
 
 __PACKAGE__->attr(app_class => 'Mojo::HelloWorld');
 
@@ -37,7 +37,7 @@ sub detect {
     if ($class) {
 
         # Load?
-        my $file = Mojo::Script->class_to_path($class);
+        my $file = Mojo::Command->class_to_path($class);
         unless ($INC{$file}) {
             if (my $e = Mojo::Loader->load($class)) { die $e if ref $e }
         }

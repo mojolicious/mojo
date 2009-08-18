@@ -1,32 +1,32 @@
 # Copyright (C) 2008-2009, Sebastian Riedel.
 
-package Mojo::Scripts;
+package Mojo::Commands;
 
 use strict;
 use warnings;
 
-use base 'Mojo::Script';
+use base 'Mojo::Command';
 
 use Mojo::ByteStream 'b';
 use Mojo::Loader;
 
 __PACKAGE__->attr(hint => <<"EOF");
 
-See '$0 help SCRIPT' for more information on a specific script.
+See '$0 help COMMAND' for more information on a specific command.
 EOF
 __PACKAGE__->attr(message => <<"EOF");
-usage: $0 SCRIPT [OPTIONS]
+usage: $0 COMMAND [OPTIONS]
 
-These scripts are currently available:
+These commands are currently available:
 EOF
-__PACKAGE__->attr(namespaces => sub { ['Mojo::Script'] });
+__PACKAGE__->attr(namespaces => sub { ['Mojo::Command'] });
 
 # Aren't we forgeting the true meaning of Christmas?
 # You know, the birth of Santa.
 sub run {
     my ($self, $name, @args) = @_;
 
-    # Run script
+    # Run command
     if ($name && $name =~ /^\w+$/ && ($name ne 'help' || $args[0])) {
 
         # Help?
@@ -55,19 +55,19 @@ sub run {
             last;
         }
 
-        # Script missing
-        die qq/Script "$name" missing, maybe you need to install it?\n/
+        # Command missing
+        die qq/Command "$name" missing, maybe you need to install it?\n/
           unless $module;
 
         # Run
-        my $script = $module->new;
-        $help ? $script->help : $script->run(@args);
+        my $command = $module->new;
+        $help ? $command->help : $command->run(@args);
         return $self;
     }
 
     # Try all namspaces
-    my $scripts = [];
-    my $seen    = {};
+    my $commands = [];
+    my $seen     = {};
     for my $namespace (@{$self->namespaces}) {
 
         # Search
@@ -79,10 +79,10 @@ sub run {
             if (my $e = Mojo::Loader->load($module)) { die $e }
 
             # Seen?
-            my $script = $module;
-            $script =~ s/^$namespace\:://;
-            push @$scripts, [$script => $module] unless $seen->{$script};
-            $seen->{$script} = 1;
+            my $command = $module;
+            $command =~ s/^$namespace\:://;
+            push @$commands, [$command => $module] unless $seen->{$command};
+            $seen->{$command} = 1;
         }
     }
 
@@ -92,22 +92,22 @@ sub run {
     # Make list
     my $list   = [];
     my $length = 0;
-    foreach my $script (@$scripts) {
+    foreach my $command (@$commands) {
 
         # Generate name
-        my $name = $script->[0];
+        my $name = $command->[0];
         $name = b($name)->decamelize;
 
         # Add to list
         my $l = length $name;
         $length = $l if $l > $length;
-        push @$list, [$name, $script->[1]->new->description];
+        push @$list, [$name, $command->[1]->new->description];
     }
 
     # Print list
-    foreach my $script (@$list) {
-        my $name        = $script->[0];
-        my $description = $script->[1];
+    foreach my $command (@$list) {
+        my $name        = $command->[0];
+        my $description = $command->[1];
         my $padding     = ' ' x ($length - length $name);
         print "  $name$padding   $description";
     }
@@ -133,48 +133,48 @@ __END__
 
 =head1 NAME
 
-Mojo::Scripts - Scripts
+Mojo::Commands - Commands
 
 =head1 SYNOPSIS
 
-    use Mojo::Scripts;
+    use Mojo::Commands;
 
-    my $scripts = Mojo::Scripts->new;
-    $scripts->run(@ARGV);
+    my $commands = Mojo::Commands->new;
+    $commands->run(@ARGV);
 
 =head1 DESCRIPTION
 
-L<Mojo::Scripts> is the interactive script interface to the L<Mojo>
+L<Mojo::Commands> is the interactive command interface to the L<Mojo>
 framework.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Scripts> inherits all attributes from L<Mojo::Script> and implements
-the following new ones.
+L<Mojo::Commands> inherits all attributes from L<Mojo::Command> and
+implements the following new ones.
 
 =head2 C<message>
 
-    my $message = $scripts->message;
-    my $scripts = $scripts->message('Hello World!');
+    my $message  = $commands->message;
+    my $commands = $commands->message('Hello World!');
 
 =head2 C<namespaces>
 
-    my $namespaces = $scripts->namespaces;
-    my $scripts    = $scripts->namespaces(['Mojo::Script']);
+    my $namespaces = $commands->namespaces;
+    my $commands   = $commands->namespaces(['Mojo::Command']);
 
 =head1 METHODS
 
-L<Mojo::Scripts> inherits all methods from L<Mojo::Script> and implements the
-following new ones.
+L<Mojo::Commands> inherits all methods from L<Mojo::Command> and implements
+the following new ones.
 
 =head2 C<run>
 
-    $scripts = $scripts->run;
-    $scripts = $scripts->run(@ARGV);
+    $commands = $commands->run;
+    $commands = $commands->run(@ARGV);
 
 =head2 C<start>
 
-    Mojo::Scripts->start;
-    Mojo::Scripts->start(@ARGV);
+    Mojo::Commands->start;
+    Mojo::Commands->start(@ARGV);
 
 =cut

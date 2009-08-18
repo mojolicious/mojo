@@ -1,6 +1,6 @@
 # Copyright (C) 2008-2009, Sebastian Riedel.
 
-package Mojo::Script;
+package Mojo::Command;
 
 use strict;
 use warnings;
@@ -224,11 +224,11 @@ __END__
 
 =head1 NAME
 
-Mojo::Script - Script Base Class
+Mojo::Command - Command Base Class
 
 =head1 SYNOPSIS
 
-    use base 'Mojo::Script';
+    use base 'Mojo::Command';
 
     sub run {
         my $self = shift;
@@ -245,95 +245,95 @@ Mojo::Script - Script Base Class
 
 =head1 DESCRIPTION
 
-L<Mojo::Script> is a base class for scripts.
+L<Mojo::Command> is a base class for commands.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Script> implements the following attributes.
+L<Mojo::Command> implements the following attributes.
 
 =head2 C<description>
 
-    my $description = $script->description;
-    $script         = $script->description('Foo!');
+    my $description = $command->description;
+    $command        = $command->description('Foo!');
 
 =head2 C<quiet>
 
-    my $quiet = $script->quiet;
-    $script   = $script->quiet(1);
+    my $quiet = $command->quiet;
+    $command  = $command->quiet(1);
 
 =head2 C<usage>
 
-    my $usage = $script->usage;
-    $script   = $script->usage('Foo!');
+    my $usage = $command->usage;
+    $command  = $command->usage('Foo!');
 
 =head1 METHODS
 
-L<Mojo::Script> inherits all methods from L<Mojo::Base> and implements the
+L<Mojo::Command> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
 =head2 C<chmod_file>
 
-    $script = $script->chmod_file('/foo/bar.txt', 0644);
+    $command = $command->chmod_file('/foo/bar.txt', 0644);
 
 =head2 C<chmod_rel_file>
 
-    $script = $script->chmod_rel_file('foo/bar.txt', 0644);
+    $command = $command->chmod_rel_file('foo/bar.txt', 0644);
 
 =head2 C<class_to_file>
 
-    my $file = $script->class_to_file('Foo::Bar');
+    my $file = $command->class_to_file('Foo::Bar');
 
 =head2 C<class_to_path>
 
-    my $path = $script->class_to_path('Foo::Bar');
+    my $path = $command->class_to_path('Foo::Bar');
 
 =head2 C<create_dir>
 
-    $script = $script->create_dir('/foo/bar/baz');
+    $command = $command->create_dir('/foo/bar/baz');
 
 =head2 C<create_rel_dir>
 
-    $script = $script->create_rel_dir('foo/bar/baz');
+    $command = $command->create_rel_dir('foo/bar/baz');
 
 =head2 C<get_data>
 
-    my $data = $script->get_data('foo_bar');
+    my $data = $command->get_data('foo_bar');
 
 =head2 C<help>
 
-    $script->help;
+    $command->help;
 
 =head2 C<rel_dir>
 
-    my $path = $script->rel_dir('foo/bar');
+    my $path = $command->rel_dir('foo/bar');
 
 =head2 C<rel_file>
 
-    my $path = $script->rel_file('foo/bar.txt');
+    my $path = $command->rel_file('foo/bar.txt');
 
 =head2 C<render_data>
 
-    my $data = $script->render_data('foo_bar', @arguments);
+    my $data = $command->render_data('foo_bar', @arguments);
 
 =head2 C<render_to_file>
 
-    $script = $script->render_to_file('foo_bar', '/foo/bar.txt');
+    $command = $command->render_to_file('foo_bar', '/foo/bar.txt');
 
 =head2 C<render_to_rel_file>
 
-    $script = $script->render_to_rel_file('foo_bar', 'foo/bar.txt');
-    $script = $script->render_to_rel_file('foo_bar', 'foo/bar.txt');
+    $command = $command->render_to_rel_file('foo_bar', 'foo/bar.txt');
+    $command = $command->render_to_rel_file('foo_bar', 'foo/bar.txt');
 
 =head2 C<run>
 
-    $script = $script->run(@ARGV);
+    $command = $command->run(@ARGV);
 
 =head2 C<write_file>
 
-    $script = $script->write_file('/foo/bar.txt', 'Hello World!');
+    $command = $command->write_file('/foo/bar.txt', 'Hello World!');
 
 =head2 C<write_rel_file>
 
-    $script = $script->write_rel_file('foo/bar.txt', 'Hello World!');
+    $command = $command->write_rel_file('foo/bar.txt', 'Hello World!');
 
 =cut

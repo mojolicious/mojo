@@ -1,11 +1,11 @@
 # Copyright (C) 2008-2009, Sebastian Riedel.
 
-package Mojo::Script::DaemonPrefork;
+package Mojo::Command::DaemonPrefork;
 
 use strict;
 use warnings;
 
-use base 'Mojo::Script';
+use base 'Mojo::Command';
 
 use Mojo::Server::Daemon::Prefork;
 
@@ -85,24 +85,24 @@ __END__
 
 =head1 NAME
 
-Mojo::Script::DaemonPrefork - Prefork Daemon Script
+Mojo::Command::DaemonPrefork - Prefork Daemon Command
 
 =head1 SYNOPSIS
 
-    use Mojo::Script::Daemon::Prefork;
+    use Mojo::Command::Daemon::Prefork;
 
-    my $daemon = Mojo::Script::Daemon::Prefork->new;
+    my $daemon = Mojo::Command::Daemon::Prefork->new;
     $daemon->run(@ARGV);
 
 =head1 DESCRIPTION
 
-L<Mojo::Script::Daemon::Prefork> is a script interface to
+L<Mojo::Command::Daemon::Prefork> is a command interface to
 L<Mojo::Server::Daemon::Prefork>.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Script::Daemon::Prefork> inherits all attributes from L<Mojo::Script>
-and implements the following new ones.
+L<Mojo::Command::Daemon::Prefork> inherits all attributes from
+L<Mojo::Command> and implements the following new ones.
 
 =head2 C<description>
 
@@ -116,7 +116,7 @@ and implements the following new ones.
 
 =head1 METHODS
 
-L<Mojo::Script::Daemon::Prefork> inherits all methods from L<Mojo::Script>
+L<Mojo::Command::Daemon::Prefork> inherits all methods from L<Mojo::Command>
 and implements the following new ones.
 
 =head2 C<run>

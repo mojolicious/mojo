@@ -1,11 +1,11 @@
 # Copyright (C) 2008-2009, Sebastian Riedel.
 
-package Mojo::Script::Test;
+package Mojo::Command::Test;
 
 use strict;
 use warnings;
 
-use base 'Mojo::Script';
+use base 'Mojo::Command';
 
 use Cwd;
 use FindBin;
@@ -71,22 +71,22 @@ __END__
 
 =head1 NAME
 
-Mojo::Script::Test - Test Script
+Mojo::Command::Test - Test Command
 
 =head1 SYNOPSIS
 
-    use Mojo::Script::Test;
+    use Mojo::Command::Test;
 
-    my $test = Mojo::Script::Test->new;
+    my $test = Mojo::Command::Test->new;
     $test->run(@ARGV);
 
 =head1 DESCRIPTION
 
-L<Mojo::Script::Test> is a test script.
+L<Mojo::Command::Test> is a test script.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Script::Test> inherits all attributes from L<Mojo::Script> and
+L<Mojo::Command::Test> inherits all attributes from L<Mojo::Command> and
 implements the following new ones.
 
 =head2 C<description>
@@ -101,7 +101,7 @@ implements the following new ones.
 
 =head1 METHODS
 
-L<Mojo::Script::Test> inherits all methods from L<Mojo::Script> and
+L<Mojo::Command::Test> inherits all methods from L<Mojo::Command> and
 implements the following new ones.
 
 =head2 C<run>

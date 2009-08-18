@@ -8,9 +8,9 @@ use warnings;
 use base 'Mojo::Base';
 
 use Carp 'croak';
+use Mojo::Commands;
 use Mojo::Home;
 use Mojo::Log;
-use Mojo::Scripts;
 use Mojo::Transaction::Single;
 
 __PACKAGE__->attr(
@@ -44,7 +44,7 @@ sub new {
 # Bart, stop pestering Satan!
 sub handler { croak 'Method "handler" not implemented in subclass' }
 
-# Start script system
+# Start command system
 sub start {
     my $class = shift;
 
@@ -55,7 +55,7 @@ sub start {
     $ENV{MOJO_APP} ||= $class;
 
     # Start!
-    Mojo::Scripts->start(@_);
+    Mojo::Commands->start(@_);
 }
 
 1;

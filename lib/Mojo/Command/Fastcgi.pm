@@ -1,11 +1,11 @@
 # Copyright (C) 2008-2009, Sebastian Riedel.
 
-package Mojo::Script::Fastcgi;
+package Mojo::Command::Fastcgi;
 
 use strict;
 use warnings;
 
-use base 'Mojo::Script';
+use base 'Mojo::Command';
 
 use Mojo::Server::FastCGI;
 
@@ -27,22 +27,22 @@ __END__
 
 =head1 NAME
 
-Mojo::Script::Fastcgi - FastCGI Script
+Mojo::Command::Fastcgi - FastCGI Command
 
 =head1 SYNOPSIS
 
-    use Mojo::Script::Fastcgi;
+    use Mojo::Command::Fastcgi;
 
-    my $fastcgi = Mojo::Script::Fastcgi->new;
+    my $fastcgi = Mojo::Command::Fastcgi->new;
     $fastcgi->run(@ARGV);
 
 =head1 DESCRIPTION
 
-L<Mojo::Script::Fastcgi> is a script interface to L<Mojo::Server::FastCGI>.
+L<Mojo::Command::Fastcgi> is a command interface to L<Mojo::Server::FastCGI>.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Script::FastCGI> inherits all attributes from L<Mojo::Script> and
+L<Mojo::Command::FastCGI> inherits all attributes from L<Mojo::Command> and
 implements the following new ones.
 
 =head2 C<description>
@@ -57,7 +57,7 @@ implements the following new ones.
 
 =head1 METHODS
 
-L<Mojo::Script::Fastcgi> inherits all methods from L<Mojo::Script> and
+L<Mojo::Command::Fastcgi> inherits all methods from L<Mojo::Command> and
 implements the following new ones.
 
 =head2 C<run>

@@ -17,12 +17,12 @@ use lib "$FindBin::Bin/../lib";
 use lib join '/', File::Spec->splitdir(getcwd), 'lib';
 
 # Check if Mojo is installed
-eval 'use Mojo::Scripts';
+eval 'use Mojo::Commands';
 die <<EOF if $@;
 It looks like you don't have the Mojo Framework installed.
 Please visit http://mojolicious.org for detailed installation instructions.
 
 EOF
 
-# Start the script system
-Mojo::Scripts->start;
+# Start the command system
+Mojo::Commands->start;

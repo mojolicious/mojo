@@ -1,11 +1,11 @@
 # Copyright (C) 2008-2009, Sebastian Riedel.
 
-package Mojo::Script::Generate::Makefile;
+package Mojo::Command::Generate::Makefile;
 
 use strict;
 use warnings;
 
-use base 'Mojo::Script';
+use base 'Mojo::Command';
 
 __PACKAGE__->attr(description => <<'EOF');
 Generate Makefile.PL.
@@ -64,23 +64,23 @@ testcover :
 __END__
 =head1 NAME
 
-Mojo::Script::Generate::Makefile - Makefile Generator Script
+Mojo::Command::Generate::Makefile - Makefile Generator Command
 
 =head1 SYNOPSIS
 
-    use Mojo::Script::Generate::Makefile;
+    use Mojo::Command::Generate::Makefile;
 
-    my $makefile = Mojo::Script::Generate::Makefile->new;
+    my $makefile = Mojo::Command::Generate::Makefile->new;
     $makefile->run(@ARGV);
 
 =head1 DESCRIPTION
 
-L<Mojo::Script::Generate::Makefile> is a makefile generator.
+L<Mojo::Command::Generate::Makefile> is a makefile generator.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Script::Generate::Makefile> inherits all attributes from
-L<Mojo::Scripts> and implements the following new ones.
+L<Mojo::Command::Generate::Makefile> inherits all attributes from
+L<Mojo::Command> and implements the following new ones.
 
 =head2 C<description>
 
@@ -94,8 +94,8 @@ L<Mojo::Scripts> and implements the following new ones.
 
 =head1 METHODS
 
-L<Mojo::Script::Generate::Makefile> inherits all methods from L<Mojo::Script>
-and implements the following new ones.
+L<Mojo::Command::Generate::Makefile> inherits all methods from
+L<Mojo::Command> and implements the following new ones.
 
 =head2 C<run>
 

@@ -10,8 +10,8 @@ use base 'Mojo::Base';
 use Carp 'carp';
 use File::Basename;
 use File::Spec;
+use Mojo::Command;
 use Mojo::Exception;
-use Mojo::Script;
 
 use constant DEBUG => $ENV{MOJO_LOADER_DEBUG} || 0;
 
@@ -44,7 +44,7 @@ sub load {
     if ($@) {
 
         # Exists?
-        my $path = Mojo::Script->class_to_path($module);
+        my $path = Mojo::Command->class_to_path($module);
         return 1 if $@ =~ /^Can't locate $path in \@INC/;
 
         # Real error

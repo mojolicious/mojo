@@ -1,11 +1,11 @@
 # Copyright (C) 2008-2009, Sebastian Riedel.
 
-package Mojo::Script::Cgi;
+package Mojo::Command::Cgi;
 
 use strict;
 use warnings;
 
-use base 'Mojo::Script';
+use base 'Mojo::Command';
 
 use Mojo::Server::CGI;
 
@@ -41,22 +41,22 @@ __END__
 
 =head1 NAME
 
-Mojo::Script::Cgi - CGI Script
+Mojo::Command::Cgi - CGI Command
 
 =head1 SYNOPSIS
 
-    use Mojo::Script::CGI;
+    use Mojo::Command::CGI;
 
-    my $cgi = Mojo::Script::CGI->new;
+    my $cgi = Mojo::Command::CGI->new;
     $cgi->run(@ARGV);
 
 =head1 DESCRIPTION
 
-L<Mojo::Script::Cgi> is a script interface to L<Mojo::Server::CGI>.
+L<Mojo::Command::Cgi> is a command interface to L<Mojo::Server::CGI>.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Script::Cgi> inherits all attributes from L<Mojo::Script> and
+L<Mojo::Command::Cgi> inherits all attributes from L<Mojo::Command> and
 implements the following new ones.
 
 =head2 C<description>
@@ -71,7 +71,7 @@ implements the following new ones.
 
 =head1 METHODS
 
-L<Mojo::Script::Cgi> inherits all methods from L<Mojo::Script> and implements
+L<Mojo::Command::Cgi> inherits all methods from L<Mojo::Command> and implements
 the following new ones.
 
 =head2 C<run>

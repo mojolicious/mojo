@@ -10,8 +10,8 @@ use base 'Mojo::Base';
 use File::Spec;
 use FindBin;
 use IO::Socket::INET;
+use Mojo::Command;
 use Mojo::Home;
-use Mojo::Script;
 use Test::Builder;
 
 use constant DEBUG => $ENV{MOJO_SERVER_DEBUG} || 0;
@@ -203,7 +203,7 @@ sub _find_executable {
 
     # Find
     my @base = File::Spec->splitdir($FindBin::Bin);
-    my $name = Mojo::Script->new->class_to_path($self->home->app_class);
+    my $name = Mojo::Command->new->class_to_path($self->home->app_class);
     my @uplevel;
     my $path;
     for (1 .. 5) {

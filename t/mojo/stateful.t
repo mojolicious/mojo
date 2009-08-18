@@ -52,4 +52,4 @@ ok($stateful->is_finished);
 # Unknown error
 $stateful = Mojo::Stateful->new;
 $stateful->state('error');
-is($stateful->error, 'Unknown Error');
+is($stateful->error, 'Unknown Error.');

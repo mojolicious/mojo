@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojo.
 
-0.991247 2009-08-11 00:00:00
+0.991250 2009-08-18 00:00:00
         - This release contains many substantial changes that are not
           backwards compatible, but good news is that it's also the last
           major feature breaking release before 1.0. ;)
@@ -13,7 +13,7 @@ This file documents the revision history for Perl extension Mojo.
         - Mojo::Script has been renamed to Mojo::Command, this change is not
           backwards compatible!
           You will have to regenerate application scripts or replace
-          "Mojo(licious)::Script" with "Mojo(licious)::Command".
+          "Mojo(licious)::Script" with "Mojo(licious)::Command" manually.
         - Removed unused features from Mojo::Base and simplified API, this
           change is not backwards compatible!
               __PACKAGE__->attr('foo', default => 'bar');

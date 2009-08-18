@@ -8,8 +8,8 @@ This file documents the revision history for Perl extension Mojo.
           Mojolicious::Script::* modules that are obsolete now and might
           break this version if they are still present on your system.
           Because of this we highly suggest that you
-          DELETE ALL MODULES IN THE "Mojo" AND "Mojolicious" NAMESPACE
-          MANUALLY!!!
+          DELETE ALL MODULES IN THE "Mojo", "MojoX" AND "Mojolicious"
+          NAMESPACES MANUALLY!!!
         - Mojo::Script has been renamed to Mojo::Command, this change is not
           backwards compatible!
           You will have to regenerate application scripts or replace

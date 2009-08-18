@@ -266,7 +266,6 @@ Content-length: 5
 
 EOF
 $pipe->client_read($responses);
-
 ok($tx1->is_done);
 ok(!$tx2->is_done);
 ok($tx2->has_error);

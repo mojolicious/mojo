@@ -387,9 +387,7 @@ sub _server_inherit_state {
         $self->error('Transaction error: ' . $self->_first_active->error)
           if $self->_first_active->has_error;
     }
-    else {
-        $self->state('done');
-    }
+    else { $self->state('done') }
 
     return $self;
 }

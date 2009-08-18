@@ -35,7 +35,7 @@ is($result->{controller}, 'foo');
 is($result->{action},     'bar');
 is($result->{id},         203);
 $result = $pattern->match('/test/foo/bar/baz');
-is($result, undef);
+is_deeply($result, undef);
 is( $pattern->render(
         controller => 'zzz',
         action     => 'index',

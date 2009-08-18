@@ -84,7 +84,14 @@ sub client_read {
     # Transaction finished
     while ($self->_first_active->is_finished) {
 
-        # All done
+        # Check for errors
+        if ($self->_first_active->has_error) {
+            $self->error('Transaction Error: ' . $self->_first_active->error);
+            $self->_inactivate_first;
+            return $self;
+        }
+
+        # All done?
         $self->done and return $self unless $self->_inactivate_first;
 
         # Check for leftovers
@@ -283,7 +290,8 @@ sub _client_inherit_state {
           if $self->is_state('done_with_leftovers');
 
         # Error
-        $self->error('Transaction error.') if $self->_first_active->has_error;
+        $self->error('Transaction error: ' . $self->_first_active->error)
+          if $self->_first_active->has_error;
     }
 
     return $self;
@@ -374,9 +382,14 @@ sub _server_inherit_state {
     }
 
     # Inherit state
-    $self->_first_active
-      ? $self->state($self->_first_active->state)
-      : $self->state('done');
+    if ($self->_first_active) {
+        $self->state($self->_first_active->state);
+        $self->error('Transaction error: ' . $self->_first_active->error)
+          if $self->_first_active->has_error;
+    }
+    else {
+        $self->state('done');
+    }
 
     return $self;
 }

@@ -20,7 +20,7 @@ sub error {
     return $self->{error} = $message;
 }
 
-sub has_error { defined shift->{error} }
+sub has_error { shift->state eq 'error' }
 
 sub is_done { shift->state eq 'done' }
 

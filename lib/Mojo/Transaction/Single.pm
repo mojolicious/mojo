@@ -189,6 +189,7 @@ sub client_read {
 
                 # Inherit state
                 $self->state($self->res->state);
+                $self->error($self->res->error) if $self->res->has_error;
                 last;
             }
         }

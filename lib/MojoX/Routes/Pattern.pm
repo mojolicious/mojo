@@ -34,7 +34,7 @@ sub match {
     my $result = $self->shape_match(\$path);
 
     # Endpoint?
-    return $result unless $path;
+    return $result if !$path || $path eq '/';
 
     # Partial or no match
     return;
@@ -99,7 +99,8 @@ sub render {
 
         $string = "$rendered$string";
     }
-    return $string;
+
+    return $string || '/';
 }
 
 sub shape_match {

@@ -15,7 +15,10 @@ sub done { shift->state('done') }
 
 sub error {
     my ($self, $message) = @_;
-    return $self->{error} unless $message;
+    if (!$message) {
+        return ($self->{error} || 'Unknown Error') if $self->has_error;
+        return undef;
+    }
     $self->state('error');
     return $self->{error} = $message;
 }

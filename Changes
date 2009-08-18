@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojo.
 
+0.991251 2009-08-18 00:00:00
+        - Fixed typo.
+
 0.991250 2009-08-18 00:00:00
         - This release contains many substantial changes that are not
           backwards compatible, but good news is that it's also the last

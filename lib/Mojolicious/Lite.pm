@@ -195,8 +195,9 @@ Names are always the last argument.
     __DATA__
 
     @@ index.html.epl
-    <a href="<%= shift->url_for('foo') %>">Foo</a>.
-    <a href="<%= shift->url_for('bar') %>">Bar</a>.
+    % my $self = shift;
+    <a href="<%= $self->url_for('foo') %>">Foo</a>.
+    <a href="<%= $self->url_for('bar') %>">Bar</a>.
 
     @@ foo.html.epl
     <a href="<%= shift->url_for('index') %>">Home</a>.

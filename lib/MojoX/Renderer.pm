@@ -47,7 +47,7 @@ sub render {
     my $format = $c->stash->{format} || $self->default_format;
 
     # Handler
-    my $handler = $c->stash->{handler};
+    my $handler = $c->stash->{handler} || $self->default_handler;
 
     my $options =
       {template => $template, format => $format, handler => $handler};
@@ -61,9 +61,6 @@ sub render {
 
     # Template or templateless handler
     elsif ($template || $handler) {
-
-        # Handler
-        $options->{handler} ||= $self->default_handler;
 
         # Render
         return unless $self->_render_template($c, \$output, $options);

@@ -4,6 +4,7 @@ This file documents the revision history for Perl extension Mojo.
         - Fixed undefined value in If-Modified-Since check in
           MojoX::Dispatcher::Routes.
         - Fixed MojoX::Routes::Pattern::match. (trendels)
+        - Fixed default_handler in MojoX::Renderer. (sharifulin)
         - Fixed typo.
 
 0.991250 2009-08-18 00:00:00

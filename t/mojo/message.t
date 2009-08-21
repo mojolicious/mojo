@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 390;
+use Test::More tests => 398;
 
 use File::Spec;
 use File::Temp;
@@ -877,6 +877,27 @@ is($req->major_version,   '1');
 is($req->body,            'hello=world');
 is_deeply($req->param('hello'), 'world');
 is($req->url->to_abs->to_string, 'http://localhost/test/index.cgi');
+
+# Parse Apache 2.2.9 like CGI environment variables (root without PATH_INFO)
+$req = Mojo::Message::Request->new;
+$req->parse(
+    SCRIPT_NAME     => '/cgi-bin/bootylicious/bootylicious.pl',
+    HTTP_CONNECTION => 'keep-alive',
+    HTTP_HOST       => 'getbootylicious.org',
+    REQUEST_METHOD  => 'GET',
+    QUERY_STRING    => '',
+    REQUEST_URI     => '/cgi-bin/bootylicious/bootylicious.pl',
+    SERVER_PROTOCOL => 'HTTP/1.1',
+);
+is($req->state,           'done');
+is($req->method,          'GET');
+is($req->url->host,       'getbootylicious.org');
+is($req->url->path,       '/');
+is($req->url->base->path, '/cgi-bin/bootylicious/bootylicious.pl/');
+is($req->minor_version,   '1');
+is($req->major_version,   '1');
+is($req->url->to_abs->to_string,
+    'http://getbootylicious.org/cgi-bin/bootylicious/bootylicious.pl');
 
 # Parse response with cookie
 $res = Mojo::Message::Response->new;

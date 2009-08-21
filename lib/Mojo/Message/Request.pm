@@ -239,11 +239,21 @@ sub _parse_env {
     # Fix paths for normal screwed up CGI environments
     if ($path && $base) {
 
+        # Path ends with a slash?
+        my $slash;
+        $slash = 1 if $path =~ /\/$/;
+
+        # Make sure path has a slash, because base has one
+        $path .= '/' unless $slash;
+
         # Remove SCRIPT_NAME prefix if it's there
         $path =~ s/^$base//;
 
+        # Remove unwanted trailing slash
+        $path =~ s/\/$// unless $slash;
+
         # Make sure we have a leading slash
-        $path = "/$path" unless $path =~ /^\//;
+        $path = "/$path" if $path && $path !~ /^\//;
 
         $self->url->path->parse($path);
     }

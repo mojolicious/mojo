@@ -23,7 +23,7 @@ __PACKAGE__->attr(
         $file->open(">> $path") or croak qq/Can't open log file "$path": $!/;
 
         # utf8
-        $file->binmode(':utf8');
+        binmode $file, ':utf8';
 
         return $file;
     }

@@ -6,6 +6,7 @@ This file documents the revision history for Perl extension Mojo.
         - Fixed MojoX::Routes::Pattern::match. (trendels)
         - Fixed default_handler in MojoX::Renderer. (sharifulin)
         - Fixed special Apache CGI environment cases.
+        - Fixed Mojo::Log to work with older versions of Perl.
         - Fixed typo.
 
 0.991250 2009-08-18 00:00:00

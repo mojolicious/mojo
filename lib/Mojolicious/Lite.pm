@@ -330,7 +330,7 @@ multiple features at once.
 
     get '/' => 'index';
 
-    post '/form' => 'form' => sub {
+    post '/form' => sub {
         my $self = shift;
 
         my $groovy = $self->req->param('groovy') || 'Austin Powers';
@@ -341,7 +341,7 @@ multiple features at once.
             layout   => 'funky',
             groovy   => $groovy
         );
-    };
+    } => 'form';
 
     shagadelic;
     __DATA__

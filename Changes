@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojo.
 
 0.991251 2009-08-18 00:00:00
+        - Fixed continue timeout handling in Mojo::Transaction::Simple.
         - Fixed undefined value in If-Modified-Since check in
           MojoX::Dispatcher::Routes.
         - Fixed MojoX::Routes::Pattern::match. (trendels)

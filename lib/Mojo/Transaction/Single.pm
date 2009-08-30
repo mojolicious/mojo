@@ -14,8 +14,9 @@ __PACKAGE__->attr('continued');
 __PACKAGE__->attr(req => sub { Mojo::Message::Request->new });
 __PACKAGE__->attr(res => sub { Mojo::Message::Response->new });
 
-__PACKAGE__->attr([qw/_continue _started/]);
+__PACKAGE__->attr('_continue');
 __PACKAGE__->attr([qw/_offset _to_write/] => 0);
+__PACKAGE__->attr(_started => sub {time});
 
 # What's a wedding?  Webster's dictionary describes it as the act of removing
 # weeds from one's garden.
@@ -208,8 +209,7 @@ sub client_spin {
     # Make sure we don't wait longer than 5 seconds for a 100 Continue
     if ($self->_continue) {
         my $continue = $self->_continue;
-        $self->_started(time) unless $self->_started;
-        $continue -= time - $self->_started;
+        $continue = $self->continue_timeout - (time - $self->_started);
         $continue = 0 if $continue < 0;
         $self->_continue($continue);
     }

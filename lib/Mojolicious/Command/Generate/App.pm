@@ -60,14 +60,14 @@ sub run {
 1;
 __DATA__
 @@ 404
-<!doctype html>
+<!doctype html><html>
     <head><title>File Not Found</title></head>
     <body>
         <h2>File Not Found</h2>
     </body>
 </html>
 @@ 500
-<!doctype html>
+<!doctype html><html>
     <head><title>Internal Server Error</title></head>
     <body>
         <h2>Internal Server Error</h2>
@@ -140,7 +140,7 @@ sub welcome {
 
 1;
 @@ static
-<!doctype html>
+<!doctype html><html>
     <head><title>Welcome to the Mojolicious Web Framework!</title></head>
     <body>
         <h2>Welcome to the Mojolicious Web Framework!</h2>
@@ -179,7 +179,7 @@ like($tx->res->content->asset->slurp, qr/Mojolicious Web Framework/i);
 % my $s = $self->stash;
 % my $e = $self->stash('exception');
 % delete $s->{inner_template};
-<!html>
+<!doctype html><html>
 <head><title>Exception</title></head>
     <body>
         This page was generated from the template
@@ -210,7 +210,7 @@ like($tx->res->content->asset->slurp, qr/Mojolicious Web Framework/i);
 </html>
 @@ layout
 % my $self = shift;
-<!doctype html>
+<!doctype html><html>
     <head><title>Welcome</title></head>
     <body>
         <%= $self->render_inner %>

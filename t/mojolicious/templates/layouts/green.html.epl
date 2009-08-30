@@ -2,7 +2,7 @@
 %# And then the battle is not so bad?
 %# Oh, right. I forgot about the battle.
 % my $self = shift;
-<!html>
+<!doctype html><html>
 <head></head>
 <body>
 Same old in green <%= $self->render_inner %>

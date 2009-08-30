@@ -5,6 +5,7 @@ This file documents the revision history for Perl extension Mojo.
           MojoX::Dispatcher::Routes.
         - Fixed MojoX::Routes::Pattern::match. (trendels)
         - Fixed default_handler in MojoX::Renderer. (sharifulin)
+        - Fixed HTML5 tags. (xantus)
         - Fixed special Apache CGI environment cases.
         - Fixed Mojo::Log to work with older versions of Perl.
         - Fixed typo.

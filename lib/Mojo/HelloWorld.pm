@@ -52,7 +52,7 @@ sub _diag {
     if ($path =~ m|^/diag[/]?$|) {
         $tx->res->headers->content_type('text/html');
         $tx->res->body(<<'EOF');
-<!doctype html>
+<!doctype html><html>
   <head><title>Mojo Diagnostics</title></head>
   <body>
     <a href="/diag/dump_env">Dump Environment Variables</a><br />

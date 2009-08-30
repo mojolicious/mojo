@@ -52,7 +52,7 @@ Yea baby!
 
 <%%= '@@ layouts/funky.html.epl' %%>
 % my $self = shift;
-<!html>
+<!doctype html><html>
     <head><title>Funky!</title></head>
     <body>
         <%= $self->render_inner %>

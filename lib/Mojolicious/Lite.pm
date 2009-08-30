@@ -216,7 +216,7 @@ Templates can have layouts.
     We've got content!
 
     @@ layouts/green.html.epl
-    <!html>
+    <!doctype html><html>
         <head><title>Green!</title></head>
         <body><%= shift->render_inner %></body>
     </html>
@@ -365,7 +365,7 @@ multiple features at once.
 
     @@ layouts/funky.html.epl
     % my $self = shift;
-    <!html>
+    <!doctype html><html>
         <head><title>Funky!</title></head>
         <body>
             <%= $self->render_inner %>
@@ -396,7 +396,7 @@ Formats can be automatically detected by looking at file extensions.
     __DATA__
 
     @@ detected.html.epl
-    <!html>
+    <!doctype html><html>
         <head><title>Detected!</title></head>
         <body>HTML was detected.</body>
     </html>

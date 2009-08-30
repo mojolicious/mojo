@@ -165,7 +165,7 @@ sub serve_error {
 
         $res->headers->content_type('text/html');
         $res->body(<<'EOF');
-<!doctype html>
+<!doctype html><html>
     <head><title>File Not Found</title></head>
     <body>
         <h2>File Not Found</h2>
@@ -182,7 +182,7 @@ EOF
 
         $res->headers->content_type('text/html');
         $res->body(<<'EOF');
-<!doctype html>
+<!doctype html><html>
     <head><title>Internal Server Error</title></head>
     <body>
         <h2>Internal Server Error</h2>

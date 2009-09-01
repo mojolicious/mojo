@@ -50,7 +50,7 @@ sub parse {
             {
 
                 # Underscore
-                (my $id = lc $match[0]) =~ tr/-/_/d;
+                (my $id = lc $match[0]) =~ tr/-/_/;
 
                 # Flag?
                 $cookies[-1]->$id($id =~ /(?:Secure|HttpOnly)/i ? 1 : $value);

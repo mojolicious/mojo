@@ -102,7 +102,7 @@ sub read_record {
     $body = undef unless $clen;
 
     # Ignore padding bytes
-    $body = $plen ? substr($body, $clen, 0, '') : $body;
+    $body = $plen ? substr($body, 0, $clen, '') : $body;
 
     # Debug
     if (DEBUG) {

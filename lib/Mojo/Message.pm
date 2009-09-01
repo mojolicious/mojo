@@ -62,11 +62,14 @@ sub body {
     $self->body_cb(undef);
     $self->content->asset(Mojo::Asset::Memory->new);
 
+    # Shortcut
+    return $self unless defined $content;
+
     # Callback
-    if ($content && ref $content eq 'CODE') { $self->body_cb($content) }
+    if (ref $content eq 'CODE') { $self->body_cb($content) }
 
     # Set text content
-    elsif ($content) { $self->content->asset->add_chunk($content) }
+    elsif (length $content) { $self->content->asset->add_chunk($content) }
 
     return $self;
 }

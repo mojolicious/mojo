@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 408;
+use Test::More tests => 409;
 
 use File::Spec;
 use File::Temp;
@@ -1079,6 +1079,8 @@ $req->body(sub { });
 is(ref $req->body, 'CODE');
 $req->body(undef);
 is($req->body, undef);
+$req->body(0);
+is($req->body, 0);
 $req->body(sub { });
 is(ref $req->body, 'CODE');
 $req->body('hello!');

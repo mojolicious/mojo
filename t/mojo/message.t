@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 398;
+use Test::More tests => 408;
 
 use File::Spec;
 use File::Temp;
@@ -1064,6 +1064,29 @@ is($req->method,        'GET');
 is($req->major_version, 1);
 is($req->minor_version, 1);
 is($req->url,           '/perldoc?Mojo::Message::Request');
+
+# Body helper
+$req = Mojo::Message::Request->new;
+$req->body('hi there!');
+is($req->body, 'hi there!');
+$req->body('');
+is($req->body, undef);
+$req->body('hi there!');
+is($req->body, 'hi there!');
+$req->body(undef);
+is($req->body, undef);
+$req->body(sub { });
+is(ref $req->body, 'CODE');
+$req->body(undef);
+is($req->body, undef);
+$req->body(sub { });
+is(ref $req->body, 'CODE');
+$req->body('hello!');
+is($req->body,    'hello!');
+is($req->body_cb, undef);
+$req->content(Mojo::Content::MultiPart->new);
+$req->body('hi!');
+is($req->body, 'hi!');
 
 # Version management
 my $m = Mojo::Message->new;

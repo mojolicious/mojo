@@ -42,27 +42,33 @@ sub at_least_version {
 }
 
 sub body {
-    my ($self, $content) = @_;
+    my $self = shift;
 
-    # Plain old content
-    unless ($self->is_multipart) {
+    # Downgrade multipart content
+    $self->content(Mojo::Content::Single->new)
+      if $self->content->isa('Mojo::Content::MultiPart');
 
-        # Callback
-        if ($content && ref $content eq 'CODE') {
-            $self->body_cb($content);
-            return $content;
-        }
-
-        # Get/Set content
-        elsif ($content) {
-            $self->content->asset(Mojo::Asset::Memory->new);
-            $self->content->asset->add_chunk($content);
-        }
-        return $self->content->asset->slurp;
+    # Get
+    unless (@_) {
+        return $self->body_cb
+          ? $self->body_cb
+          : return $self->content->asset->slurp;
     }
 
-    $self->content($content);
-    return $self->content;
+    # New content
+    my $content = shift;
+
+    # Cleanup
+    $self->body_cb(undef);
+    $self->content->asset(Mojo::Asset::Memory->new);
+
+    # Callback
+    if ($content && ref $content eq 'CODE') { $self->body_cb($content) }
+
+    # Set text content
+    elsif ($content) { $self->content->asset->add_chunk($content) }
+
+    return $self;
 }
 
 sub body_cb { shift->content->body_cb(@_) }

@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 409;
+use Test::More tests => 412;
 
 use File::Spec;
 use File::Temp;
@@ -968,6 +968,37 @@ is($res2->cookie('baz')->path,     '/foobar');
 is($res2->cookie('baz')->value,    'yada');
 is($res2->cookie('bar')->path,     '/test/23');
 is($res2->cookie('bar')->value,    'baz');
+
+# Build response with coderef callback (make sure its called)
+$res = Mojo::Message::Response->new;
+$res->code(200);
+$res->headers->content_length(10);
+$res->body(sub {
+  die "Body coderef was called properly\n";
+});
+eval { $res->get_body_chunk(0) };
+is($@, "Body coderef was called properly\n");
+
+# Build response with coderef callback (consistency calls)
+$res = Mojo::Message::Response->new;
+my $body = 'I is here';
+$res->headers->content_length(length($body));
+$res->body(sub {
+  my ($cnt, $offset) = @_;
+  return substr($body, $offset, 1);
+});
+my $full = '';
+my $count = 0;
+my $offset = 0;
+while (1) {
+  my $chunk = $res->get_body_chunk($offset);
+  last unless length($chunk);
+  $full .= $chunk;
+  $offset = length($full);
+  $count++;
+}
+is($count, length($body));
+is($full, $body);
 
 # Build full HTTP 1.1 request with cookies
 $req = Mojo::Message::Request->new;

@@ -123,17 +123,11 @@ sub spin {
     my @readers = $poll->handles(POLLIN | POLLHUP | POLLERR);
     my @writers = $poll->handles(POLLOUT);
 
-    # Make a random decision about reading or writing
-    my $do = -1;
-    $do = 0 if @readers;
-    $do = 1 if @writers;
-    $do = int(rand(3)) - 1 if @readers && @writers;
-
     # Read
-    if ($do == 0) { $self->_read(\@readers) }
+    $self->_read($_) for @readers;
 
     # Write
-    elsif ($do == 1) { $self->_write(\@writers) }
+    $self->_write($_) for @writers;
 
 }
 
@@ -298,9 +292,7 @@ sub _prepare_transactions {
 }
 
 sub _read {
-    my ($self, $sockets) = @_;
-
-    my $socket = $sockets->[0];
+    my ($self, $socket) = @_;
 
     # Accept
     unless ($socket->connected) {
@@ -312,6 +304,7 @@ sub _read {
         return 1;
     }
 
+    # Name
     return unless my $name = $self->_socket_name($socket);
 
     # No pipeline yet
@@ -385,31 +378,16 @@ sub _socket_name {
 }
 
 sub _write {
-    my ($self, $sockets) = @_;
+    my ($self, $socket) = @_;
 
-    my ($name, $p, $chunk);
+    # Name
+    return unless my $name = $self->_socket_name($socket);
 
-    # Check for content
-    for my $socket (sort { int(rand(3)) - 1 } @$sockets) {
+    # Pipeline
+    return unless my $p = $self->_connections->{$name}->{pipeline};
 
-        # Shortcut
-        next unless $name = $self->_socket_name($socket);
-
-        my $connection = $self->_connections->{$name};
-        $p = $connection->{pipeline};
-
-        # Get chunk
-        $chunk = $p->server_get_chunk;
-
-        # Content generator ready?
-        last if defined $chunk;
-    }
-
-    # No name
-    return unless $name;
-
-    # Nothing to write
-    return unless $chunk;
+    # Get chunk
+    return unless my $chunk = $p->server_get_chunk;
 
     # Connected?
     return unless $p->connection->connected;

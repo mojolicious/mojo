@@ -221,58 +221,11 @@ sub spin {
     my @readers = $poll->handles(POLLIN | POLLHUP | POLLERR);
     my @writers = $poll->handles(POLLOUT);
 
-    # Make a random decision about reading or writing
-    my $do = -1;
-    $do = 0 if @readers;
-    $do = 1 if @writers;
-    $do = int(rand(3)) - 1 if @readers && @writers;
-
     # Write
-    if ($do == 1) {
-
-        my ($tx, $chunk);
-
-        # Check for content randomly
-        for my $connection (sort { int(rand(3)) - 1 } @writers) {
-
-            my $name = $self->_socket_name($connection);
-            $tx = $transaction{$name};
-
-            # Get chunk
-            $chunk = $tx->client_get_chunk;
-
-            # Content generator ready?
-            last if defined $chunk;
-        }
-
-        # Nothing to write
-        return $done unless $chunk;
-
-        # Write chunk
-        my $written = $tx->connection->syswrite($chunk, length $chunk);
-        $tx->error("Can't write to socket: $!") unless defined $written;
-        return 1 if $tx->has_error;
-
-        # Written
-        $tx->client_written($written);
-    }
+    $self->_write($_) and $done++ for @writers;
 
     # Read
-    elsif ($do == 0) {
-
-        my $connection = $readers[rand(@readers)];
-        my $name       = $self->_socket_name($connection);
-        my $tx         = $transaction{$name};
-
-        # Read chunk
-        my $buffer;
-        my $read = $connection->sysread($buffer, CHUNK_SIZE, 0);
-        $tx->error("Can't read from socket: $!") unless defined $read;
-        return 1 if $tx->has_error;
-
-        # Parse
-        $tx->client_read($buffer);
-    }
+    $self->_read($_) and $done++ for @readers;
 
     return $done;
 }
@@ -441,11 +394,51 @@ sub _handle_app {
     }
 }
 
+sub _read {
+    my ($self, $socket) = @_;
+
+    # Name
+    my $name = $self->_socket_name($socket);
+
+    # Transaction
+    my $tx = $transaction{$name};
+
+    # Read chunk
+    my $buffer;
+    my $read = $socket->sysread($buffer, CHUNK_SIZE, 0);
+    $tx->error("Can't read from socket: $!") unless defined $read;
+    return 1 if $tx->has_error;
+
+    # Parse
+    $tx->client_read($buffer);
+}
+
 sub _socket_name {
     my ($self, $s) = @_;
 
     # Generate
     return unpack('H*', $s->sockaddr) . $s->sockport;
+}
+
+sub _write {
+    my ($self, $socket) = @_;
+
+    # Name
+    my $name = $self->_socket_name($socket);
+
+    # Transaction
+    my $tx = $transaction{$name};
+
+    # Get chunk
+    return unless my $chunk = $tx->client_get_chunk;
+
+    # Write chunk
+    my $written = $tx->connection->syswrite($chunk, length $chunk);
+    $tx->error("Can't write to socket: $!") unless defined $written;
+    return 1 if $tx->has_error;
+
+    # Written
+    $tx->client_written($written);
 }
 
 1;

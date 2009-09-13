@@ -120,15 +120,12 @@ sub spin {
     # Poll
     my $poll = $self->_poll;
     $poll->poll(5);
-    my @readers = $poll->handles(POLLIN | POLLHUP | POLLERR);
-    my @writers = $poll->handles(POLLOUT);
 
     # Read
-    $self->_read($_) for @readers;
+    $self->_read($_) for $poll->handles(POLLIN | POLLHUP | POLLERR);
 
     # Write
-    $self->_write($_) for @writers;
-
+    $self->_write($_) for $poll->handles(POLLOUT);
 }
 
 sub _drop_connection {

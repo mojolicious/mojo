@@ -5,6 +5,7 @@ This file documents the revision history for Perl extension Mojo.
         - Fixed padding byte handling in Mojo::Server::FastCGI.
           (Jaroslav Muhin)
         - Fixed typo.
+        - Added callback tests. (melo)
 
 0.991251 2009-08-18 00:00:00
         - Fixed continue timeout handling in Mojo::Transaction::Simple.

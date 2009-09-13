@@ -372,7 +372,8 @@ sub _server_inherit_state {
 
     # Keep alive?
     $self->keep_alive($self->_first_active->keep_alive)
-      if $self->_first_active;
+      if $self->_first_active
+          && !$self->_first_active->req->is_state('start');
 
     # Handler first
     my $reader = $self->_current_active;

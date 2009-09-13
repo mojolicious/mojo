@@ -53,16 +53,18 @@ use lib "$FindBin::Bin/../lib";
 use lib "$FindBin::Bin/../../lib";
 
 # Check if Mojo is installed
-eval 'use Mojo';
+eval 'use Mojo::Commands';
 die <<EOF if $@;
 It looks like you don't have the Mojo Framework installed.
 Please visit http://mojolicious.org for detailed installation instructions.
 
 EOF
 
-# Start application
-use <%= $class %>;
-<%= $class %>->start;
+# Application
+$ENV{MOJO_APP} ||= '<%= $class %>';
+
+# Start commands
+Mojo::Commands->start;
 @@ appclass
 % my $class = shift;
 package <%= $class %>;

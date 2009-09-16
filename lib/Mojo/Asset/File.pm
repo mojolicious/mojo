@@ -92,12 +92,13 @@ sub contains {
     my $offset = $read;
 
     # Moving window search
-    while ($offset < $self->size) {
+    while ($offset <= $self->size) {
         $read = $self->handle->sysread($buffer, length($bytestream));
         $offset += $read;
         $window .= $buffer;
         my $pos = index $window, $bytestream;
         return $pos if $pos >= 0;
+        return if $read == 0;
         substr $window, 0, $read, '';
     }
 

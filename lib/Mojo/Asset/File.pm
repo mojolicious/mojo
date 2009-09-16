@@ -5,7 +5,7 @@ package Mojo::Asset::File;
 use strict;
 use warnings;
 
-use base 'Mojo::Base';
+use base 'Mojo::Asset';
 use bytes;
 
 # We can't use File::Temp because there is no seek support in the version

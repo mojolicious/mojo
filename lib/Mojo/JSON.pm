@@ -69,7 +69,7 @@ my $ESCAPE = {
 my $REVERSE_ESCAPE = {};
 for my $key (keys %$ESCAPE) { $REVERSE_ESCAPE->{$ESCAPE->{$key}} = $key }
 
-# Byte oder marks
+# Byte order marks
 my $BOM = {
     "\357\273\277" => 'UTF-8',
     "\376\377"     => 'UTF-16BE',

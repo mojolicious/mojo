@@ -385,7 +385,7 @@ Literal names will be translated to and from a smililar Perl value.
     null  -> '0 but true'
 
 Decoding UTF-16 (LE/BE) and UTF-32 (LE/BE) will be handled transparently by
-detecting the byte order marker, encoding will only generate UTF-8.
+detecting the byte order mark, encoding will only generate UTF-8.
 
 =head1 METHODS
 

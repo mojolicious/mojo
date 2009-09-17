@@ -49,6 +49,12 @@ sub render {
 
 sub render_inner { delete shift->stash->{inner_template} }
 
+sub render_json {
+    my $self = shift;
+    $self->stash->{json} = shift;
+    return $self->render(@_);
+}
+
 sub render_partial {
     my $self = shift;
     local $self->stash->{partial} = 1;
@@ -124,6 +130,11 @@ ones.
 =head2 C<render_inner>
 
     my $output = $c->render_inner;
+
+=head2 C<render_json>
+
+    $c->render_json({foo => 'bar'});
+    $c->render_json([1, 2, -3]);
 
 =head2 C<render_partial>
 

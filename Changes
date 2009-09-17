@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojo.
 
 0.991252 2009-09-01 00:00:00
+        - Added native JSON support.
         - Fixed a design flaw in Mojo::Server::Daemon and made it about 20
           times faster.
         - Fixed a similar design flaw in Mojo::Client.

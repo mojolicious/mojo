@@ -8,6 +8,7 @@ use warnings;
 use base 'Mojo::Base';
 
 use File::Spec;
+use Mojo::JSON;
 use MojoX::Types;
 
 __PACKAGE__->attr(default_format => 'html');
@@ -19,6 +20,26 @@ __PACKAGE__->attr(types         => sub { MojoX::Types->new });
 
 # This is not how Xmas is supposed to be.
 # In my day Xmas was about bringing people together, not blowing them apart.
+sub new {
+    my $self = shift->SUPER::new(@_);
+
+    # JSON
+    $self->add_handler(
+        json => sub {
+            my ($r, $c, $output) = @_;
+            $$output = Mojo::JSON->new->encode(delete $c->stash->{json});
+        }
+    );
+
+    # Text
+    $self->add_handler(
+        text => sub {
+            my ($r, $c, $output) = @_;
+            $$output = delete $c->stash->{text};
+        }
+    );
+}
+
 sub add_handler {
     my $self = shift;
 
@@ -54,8 +75,15 @@ sub render {
     my $output;
 
     # Text
-    if (my $text = delete $c->stash->{text}) {
-        $output = $text;
+    if ($c->stash->{text}) {
+        $self->handler->{text}->($self, $c, \$output);
+        $c->stash->{inner_template} = $output if $c->stash->{layout};
+    }
+
+    # JSON
+    elsif ($c->stash->{json}) {
+        $self->handler->{json}->($self, $c, \$output);
+        $format = 'json';
         $c->stash->{inner_template} = $output if $c->stash->{layout};
     }
 
@@ -196,6 +224,10 @@ L<MojoX::Types> implements the follwing attributes.
 
 L<MojoX::Types> inherits all methods from L<Mojo::Base> and implements the
 follwing the ones.
+
+=head2 C<new>
+
+    my $renderer = MojoX::Renderer->new;
 
 =head2 C<add_handler>
 

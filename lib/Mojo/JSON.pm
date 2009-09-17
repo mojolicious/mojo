@@ -378,7 +378,7 @@ not blessed references.
     [1, -2, 3]     -> [1, -2, 3]
     {"foo": "bar"} -> {foo => 'bar'}
 
-Literal names will be translated to and from a smililar Perl value.
+Literal names will be translated to and from a similar Perl value.
 
     true  -> '\1'
     false -> undef

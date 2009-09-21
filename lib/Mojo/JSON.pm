@@ -9,6 +9,8 @@ use base 'Mojo::Base';
 
 use Mojo::ByteStream 'b';
 
+__PACKAGE__->attr('error');
+
 # Regex
 my $WHITESPACE_RE  = qr/[\x20\x09\x0a\x0d]*/;
 my $ARRAY_BEGIN_RE = qr/^$WHITESPACE_RE\[/;
@@ -90,13 +92,27 @@ sub decode {
     # Shortcut
     return unless $string;
 
+    # Cleanup
+    $self->error(undef);
+
     # Detect and decode unicode
     my $encoding = 'UTF-8';
     if ($string =~ s/$BOM_RE//) { $encoding = $BOM->{$1} }
     $string = b($string)->decode($encoding)->to_string;
 
     # Decode
-    return unless my $result = $self->_decode_values(\$string);
+    my $result = $self->_decode_values(\$string);
+
+    # Exception
+    return if $self->error;
+
+    # Bad input
+    unless (ref $result->[0]) {
+        $self->error('JSON text has to be a serialized object or array.');
+        return undef;
+    }
+
+    # Done
     return $result->[0];
 }
 
@@ -131,11 +147,12 @@ sub _decode_array {
         }
 
         # Invalid format
-        else {last}
+        else { return $self->_exception($ref) }
 
     }
 
-    return $array;
+    # Exception
+    return $self->_exception($ref, 'Missing right square bracket');
 }
 
 sub _decode_names {
@@ -192,11 +209,12 @@ sub _decode_object {
         }
 
         # Invalid format
-        else {last}
+        else { return $self->_exception($ref) }
 
     }
 
-    return $hash;
+    # Exception
+    return $self->_exception($ref, 'Missing right curly bracket');
 }
 
 sub _decode_string {
@@ -353,6 +371,22 @@ sub _unescape {
     return;
 }
 
+sub _exception {
+    my ($self, $ref, $error) = @_;
+
+    # Message
+    $error ||= 'Syntax error';
+
+    # Context
+    my $context = substr $$ref, 0, 25;
+    $context = "\"$context\"" if $context;
+    $context ||= 'end of file';
+
+    # Error
+    $self->error(qq/$error near $context./);
+    return undef;
+}
+
 1;
 __END__
 
@@ -386,6 +420,15 @@ Literal names will be translated to and from a similar Perl value.
 
 Decoding UTF-16 (LE/BE) and UTF-32 (LE/BE) will be handled transparently by
 detecting the byte order mark, encoding will only generate UTF-8.
+
+=head1 ATTRIBUTES
+
+L<Mojo::JSON> implements the following attributes.
+
+=head2 C<error>
+
+    my $error = $json->error;
+    $json     = $json->error('Oops!');
 
 =head1 METHODS
 

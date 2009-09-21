@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 56;
+use Test::More tests => 72;
 
 use Mojo::ByteStream 'b';
 
@@ -164,3 +164,21 @@ is_deeply($array, ['\1']);
 # Decode UTF-32BE
 $array = $json->decode(b("\x{feff}[true]")->encode('UTF-32BE'));
 is_deeply($array, ['\1']);
+
+# Errors
+is($json->decode('[[]'),    undef);
+is($json->error,            'Missing right square bracket near end of file.');
+is($json->decode('{{}'),    undef);
+is($json->error,            'Missing right curly bracket near end of file.');
+is($json->decode('[[]...'), undef);
+is($json->error,            'Syntax error near "...".');
+is($json->decode('{{}...'), undef);
+is($json->error,            'Syntax error near "...".');
+is($json->decode('[nan]'),  undef);
+is($json->error,            'Syntax error near "nan]".');
+is($json->decode('["foo]'), undef);
+is($json->error,            'Syntax error near ""foo]".');
+is($json->decode('false'),  undef);
+is($json->error,      'JSON text has to be a serialized object or array.');
+is($json->decode(''), undef);
+is($json->error,      'JSON text has to be a serialized object or array.');

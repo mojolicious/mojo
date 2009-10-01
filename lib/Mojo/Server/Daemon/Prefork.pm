@@ -320,7 +320,8 @@ sub _spawn_child {
 
     # Child signal handlers
     else {
-        $SIG{HUP} = $SIG{INT} = $SIG{CHLD} = $SIG{TERM} = sub { exit 0 }
+        $SIG{HUP} = $SIG{INT} = $SIG{TERM} = sub { exit 0 };
+        $SIG{CHLD} = 'DEFAULT';
     }
 
     # Do child stuff

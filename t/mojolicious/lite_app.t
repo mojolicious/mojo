@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 72;
+use Test::More tests => 76;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -73,6 +73,10 @@ post '/utf8' => 'form';
 
 # GET /json
 get '/json' => sub { shift->render_json({foo => [1, -2, 3, 'bar']}) };
+
+# GET /autostash
+get '/autostash' => sub { shift->render(handler => 'ep', foo => 'bar') } =>
+  'autostash';
 
 # Oh Fry, I love you more than the moon, and the stars,
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
@@ -226,6 +230,14 @@ is($hash->{foo}->[1], -2);
 is($hash->{foo}->[2], 3);
 is($hash->{foo}->[3], 'bar');
 
+# GET /autostash
+$tx = Mojo::Transaction::Single->new_get('/autostash');
+$client->process_app($app, $tx);
+is($tx->res->code,                            200);
+is($tx->res->headers->server,                 'Mojo (Perl)');
+is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+is($tx->res->body,                            "layouted bar\n");
+
 __DATA__
 @@ index.html.epl
 %= something()
@@ -235,6 +247,13 @@ __DATA__
 
 @@ layouts/layout.html.epl
 <%= shift->render_inner %> with layout
+
+@@ autostash.html.ep
+% $layout = 'layout';
+%= $foo
+
+@@ layouts/layout.html.ep
+layouted <%= $inner_template %>
 
 __END__
 This is not a template!

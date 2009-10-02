@@ -2,6 +2,8 @@ This file documents the revision history for Perl extension Mojo.
 
 0.991252 2009-09-01 00:00:00
         - Added native JSON support.
+        - Added more designer friendly .ep templates to Mojolicious.
+        - Added callback tests. (melo)
         - Fixed a case where Mojo::Server::Daemon and Mojo::Client were too
           defensive and made them in turn 20 times faster.
         - Fixed keep alive problem in Mojo::Transaction::Pipeline.
@@ -14,7 +16,6 @@ This file documents the revision history for Perl extension Mojo.
         - Fixed generated scripts. (Yuki Kimoto)
         - Fixed CHLD signal handler for prefork children. (sharifulin)
         - Fixed typo.
-        - Added callback tests. (melo)
 
 0.991251 2009-08-18 00:00:00
         - Fixed continue timeout handling in Mojo::Transaction::Simple.

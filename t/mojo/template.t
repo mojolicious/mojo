@@ -25,7 +25,7 @@ package main;
 use strict;
 use warnings;
 
-use Test::More tests => 63;
+use Test::More tests => 67;
 
 use File::Spec;
 use File::Temp;
@@ -251,6 +251,28 @@ $output = $mt->render(<<'EOF');
 </html>
 EOF
 is($output, "<html>&lt;html&gt;\n&amp;lt;</html>\n");
+
+# Prepending code
+$mt = Mojo::Template->new;
+$mt->prepend('my $foo = shift; my $bar = "something\nelse"');
+$output = $mt->render(<<'EOF', 23);
+<%= $foo %>
+%= $bar
+EOF
+is($output, "23\nsomething\nelse");
+$mt = Mojo::Template->new;
+$mt->prepend(
+    q/{no warnings 'redefine'; no strict 'refs'; *foo = sub { 23 }}/);
+$output = $mt->render('<%= foo() %>');
+is($output, "23\n");
+$output = $mt->render('%= foo()');
+is($output, 23);
+
+# Appending code
+$mt = Mojo::Template->new;
+$mt->append('$_M = "FOO!"');
+$output = $mt->render('23');
+is($output, "FOO!");
 
 # Multiline comment
 $mt     = Mojo::Template->new;

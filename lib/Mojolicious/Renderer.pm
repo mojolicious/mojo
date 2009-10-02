@@ -8,6 +8,7 @@ use warnings;
 use base 'MojoX::Renderer';
 
 use File::Spec;
+use Mojo::ByteStream 'b';
 use Mojo::Command;
 use Mojo::Template;
 
@@ -25,20 +26,21 @@ sub new {
             my ($r, $c, $output, $options) = @_;
 
             # Template
-            my $t    = $r->template_name($options);
-            my $path = $r->template_path($options);
+            my $t     = $r->template_name($options);
+            my $path  = $r->template_path($options);
+            my $cache = $options->{cache} || $path;
 
             # Check cache
-            my $mt = $r->_epl_cache->{$path};
+            my $mt = $r->_epl_cache->{$cache};
 
             # Interpret again
-            if ($mt) { $$output = $mt->interpret($c) }
+            if ($mt && $mt->compiled) { $$output = $mt->interpret($c) }
 
             # No cache
             else {
 
                 # Initialize
-                $mt = Mojo::Template->new;
+                $mt ||= Mojo::Template->new;
 
                 # Class
                 my $class =
@@ -63,7 +65,7 @@ sub new {
                 }
 
                 # Cache
-                $r->_epl_cache->{$path} = $mt;
+                $r->_epl_cache->{$cache} = $mt;
             }
 
             # Exception
@@ -97,6 +99,51 @@ sub new {
 
             # Success or exception?
             return ref $$output ? 0 : 1;
+        }
+    );
+
+    # Ep
+    $self->add_handler(
+        ep => sub {
+            my ($r, $c, $output, $options) = @_;
+
+            # Generate name
+            my $path  = $r->template_path($options);
+            my $list  = join ', ', sort keys %{$c->stash};
+            my $cache = $options->{cache} = b($list)->md5_sum->to_string;
+
+            # Stash defaults
+            $c->stash->{layout} ||= undef;
+
+            # Cache
+            unless ($r->_epl_cache->{$cache}) {
+
+                # Debug
+                $c->app->log->debug(
+                    qq/Caching template "$path" with stash "$list"./);
+
+                # Initialize
+                my $mt = $r->_epl_cache->{$cache} = Mojo::Template->new;
+                $mt->namespace("Mojo::Template::$cache");
+
+                # Stash
+                my $prepend = 'my $self = shift;';
+                my $append  = '';
+                for my $var (keys %{$c->stash}) {
+                    next unless $var =~ /^\w+$/;
+                    $prepend .= " my \$$var = \$self->stash->{'$var'};";
+                    $append  .= " \$self->stash->{'$var'} = \$$var;";
+                }
+
+                # Prepend
+                $mt->prepend($prepend);
+
+                # Append
+                $mt->append($append);
+            }
+
+            # Render with epl
+            return $r->handler->{epl}->($r, $c, $output, $options);
         }
     );
 

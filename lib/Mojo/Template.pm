@@ -15,8 +15,8 @@ use Mojo::Template::Exception;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
 
-__PACKAGE__->attr(code         => '');
-__PACKAGE__->attr(comment_mark => '#');
+__PACKAGE__->attr([qw/append code prepend/] => '');
+__PACKAGE__->attr(comment_mark              => '#');
 __PACKAGE__->attr([qw/compiled namespace/]);
 __PACKAGE__->attr(encoding        => 'utf8');
 __PACKAGE__->attr(escape_mark     => '=');
@@ -72,10 +72,13 @@ sub build {
     }
 
     # Wrap
+    my $prepend   = $self->prepend;
+    my $append    = $self->append;
     my $namespace = $self->namespace || ref $self;
     $lines[0] ||= '';
-    $lines[0] = qq/package $namespace; sub { my \$_M = '';/ . $lines[0];
-    $lines[-1] .= q/return $_M; };/;
+    $lines[0] =
+      qq/package $namespace; sub { my \$_M = ''; $prepend;/ . $lines[0];
+    $lines[-1] .= qq/$append; return \$_M; };/;
 
     $self->code(join "\n", @lines);
     return $self;
@@ -467,6 +470,11 @@ build a wrapper around it.
 
 L<Mojo::Template> implements the following attributes.
 
+=head2 C<append>
+
+    my $code = $mt->append;
+    $mt      = $mt->append('warn "Processed template"');
+
 =head2 C<code>
 
     my $code = $mt->code;
@@ -501,6 +509,11 @@ L<Mojo::Template> implements the following attributes.
 
     my $namespace = $mt->namespace;
     $mt           = $mt->namespace('main');
+
+=head2 C<prepend>
+
+    my $code = $mt->prepend;
+    $mt      = $mt->prepend('my $self = shift;');
 
 =head2 C<template>
 

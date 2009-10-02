@@ -241,6 +241,8 @@ Shu Cho
 
 Stanis Trendelenburg
 
+Tatsuhiko Miyagawa
+
 Uwe Voelker
 
 Viacheslav Tikhanovskii

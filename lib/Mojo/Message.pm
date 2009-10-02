@@ -211,10 +211,12 @@ sub cookie {
 sub fix_headers {
     my $self = shift;
 
-    # Content-Length header is required in HTTP 1.0 messages
+    # Content-Length header is required in HTTP 1.0 messages if there's a
+    # body
     if ($self->at_least_version('1.0') && !$self->is_chunked) {
-        $self->headers->content_length($self->body_size)
-          unless $self->headers->content_length;
+        my $size = $self->body_size;
+        $self->headers->content_length($size)
+          if $size && !$self->headers->content_length;
     }
 
     return $self;

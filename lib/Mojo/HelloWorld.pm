@@ -75,10 +75,10 @@ sub _chunked_params {
     $tx->res->headers->transfer_encoding('chunked');
 
     # Chunks
-    my $hash  = $tx->req->params->to_hash;
-    my $array = [];
-    for my $key (sort keys %$hash) {
-        push @$array, $hash->{$key};
+    my $params = $tx->req->params->to_hash;
+    my $chunks = [];
+    for my $key (sort keys %$params) {
+        push @$chunks, $params->{$key};
     }
 
     # Callback
@@ -87,7 +87,7 @@ sub _chunked_params {
     $tx->res->body(
         sub {
             my $self = shift;
-            my $chunk = $array->[$counter] || '';
+            my $chunk = $chunks->[$counter] || '';
             $counter++;
             return $chunked->build($chunk);
         }

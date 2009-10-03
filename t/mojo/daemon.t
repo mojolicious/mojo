@@ -110,7 +110,7 @@ is($tx2->continued, 1);
 is($tx3->res->code, 200);
 is($tx4->res->code, 200);
 like($tx2->res->content->asset->slurp, qr/Mojo is working/);
-is($tx3->res->content->asset->slurp, 'a=foob=12');
+is($tx3->res->content->asset->slurp, 'foo12');
 
 # Stop
 $server->stop_server_ok;

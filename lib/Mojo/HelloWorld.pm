@@ -78,8 +78,7 @@ sub _chunked_params {
     my $hash  = $tx->req->params->to_hash;
     my $array = [];
     for my $key (sort keys %$hash) {
-        my $value = $hash->{$key};
-        push @$array, "$key=$value";
+        push @$array, $hash->{$key};
     }
 
     # Callback

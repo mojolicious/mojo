@@ -14,7 +14,7 @@ use Test::Mojo::Server;
 
 plan skip_all => 'set TEST_DAEMON to enable this test (developer only!)'
   unless $ENV{TEST_DAEMON};
-plan tests => 31;
+plan tests => 42;
 
 # Daddy, I'm scared. Too scared to even wet my pants.
 # Just relax and it'll come, son.
@@ -90,6 +90,27 @@ ok($tx2->is_done);
 is($tx->res->code,  200);
 is($tx2->res->code, 200);
 like($tx2->res->content->asset->slurp, qr/Mojo is working/);
+
+# Pipelined with 100 Continue and a chunked response
+$tx  = Mojo::Transaction::Single->new_get("http://127.0.0.1:$port/10/");
+$tx2 = Mojo::Transaction::Single->new_get("http://127.0.0.1:$port/11/");
+$tx2->req->headers->expect('100-continue');
+$tx2->req->body('foo bar baz');
+$tx3 = Mojo::Transaction::Single->new_get(
+    "http://127.0.0.1:$port/diag/chunked_params?a=foo&b=12");
+$tx4 = Mojo::Transaction::Single->new_get("http://127.0.0.1:$port/13/");
+$client->process(Mojo::Transaction::Pipeline->new($tx, $tx2, $tx3, $tx4));
+ok($tx->is_done);
+ok($tx2->is_done);
+ok($tx3->is_done);
+ok($tx4->is_done);
+is($tx->res->code,  200);
+is($tx2->res->code, 200);
+is($tx2->continued, 1);
+is($tx3->res->code, 200);
+is($tx4->res->code, 200);
+like($tx2->res->content->asset->slurp, qr/Mojo is working/);
+is($tx3->res->content->asset->slurp, 'a=foob=12');
 
 # Stop
 $server->stop_server_ok;

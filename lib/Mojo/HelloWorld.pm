@@ -8,6 +8,7 @@ use warnings;
 use base 'Mojo';
 
 use Data::Dumper;
+use Mojo::Filter::Chunked;
 
 # How is education supposed to make me feel smarter? Besides,
 # every time I learn something new, it pushes some old stuff out of my brain.
@@ -39,10 +40,11 @@ sub _diag {
 
     # Dispatch
     my $path = $tx->req->url->path;
-    $self->_dump_env($tx)    if $path =~ m|^/diag/dump_env|;
-    $self->_dump_params($tx) if $path =~ m|^/diag/dump_params|;
-    $self->_dump_tx($tx)     if $path =~ m|^/diag/dump_tx|;
-    $self->_dump_url($tx)    if $path =~ m|^/diag/dump_url|;
+    $self->_chunked_params($tx) if $path =~ m|^/diag/chunked_params|;
+    $self->_dump_env($tx)       if $path =~ m|^/diag/dump_env|;
+    $self->_dump_params($tx)    if $path =~ m|^/diag/dump_params|;
+    $self->_dump_tx($tx)        if $path =~ m|^/diag/dump_tx|;
+    $self->_dump_url($tx)       if $path =~ m|^/diag/dump_url|;
 
     # Defaults
     $tx->res->headers->content_type('text/plain')
@@ -55,6 +57,7 @@ sub _diag {
 <!doctype html><html>
   <head><title>Mojo Diagnostics</title></head>
   <body>
+    <a href="/diag/chunked_params">Chunked Request Parameters</a><br />
     <a href="/diag/dump_env">Dump Environment Variables</a><br />
     <a href="/diag/dump_params">Dump Request Parameters</a><br />
     <a href="/diag/dump_tx">Dump Transaction</a><br />
@@ -63,6 +66,33 @@ sub _diag {
 </html>
 EOF
     }
+}
+
+sub _chunked_params {
+    my ($self, $tx) = @_;
+
+    # Chunked
+    $tx->res->headers->transfer_encoding('chunked');
+
+    # Chunks
+    my $hash  = $tx->req->params->to_hash;
+    my $array = [];
+    for my $key (sort keys %$hash) {
+        my $value = $hash->{$key};
+        push @$array, "$key=$value";
+    }
+
+    # Callback
+    my $counter = 0;
+    my $chunked = Mojo::Filter::Chunked->new;
+    $tx->res->body(
+        sub {
+            my $self = shift;
+            my $chunk = $array->[$counter] || '';
+            $counter++;
+            return $chunked->build($chunk);
+        }
+    );
 }
 
 sub _dump_env {

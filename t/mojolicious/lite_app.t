@@ -247,7 +247,7 @@ $client->process_app($app, $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body, '/helper(Mozilla/5.0 (compatible; Mojo; Perl))');
+is($tx->res->body, '/template(Mozilla/5.0 (compatible; Mojo; Perl))');
 
 # GET /helper
 $tx =
@@ -256,7 +256,7 @@ $client->process_app($app, $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,                            '/helper(Explorer)');
+is($tx->res->body,                            '/template(Explorer)');
 
 __DATA__
 @@ index.html.epl
@@ -276,7 +276,7 @@ Just works!\
 layouted <%= $inner_template %>
 
 @@ helper.html.ep
-%= url_for 'helper'
+%= url_for 'index'
 (<%= agent %>)\
 
 __END__

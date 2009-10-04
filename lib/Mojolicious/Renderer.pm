@@ -12,6 +12,8 @@ use Mojo::ByteStream 'b';
 use Mojo::Command;
 use Mojo::Template;
 
+__PACKAGE__->attr(helper => sub { {} });
+
 __PACKAGE__->attr(_epl_cache => sub { {} });
 
 # What do you want?
@@ -20,7 +22,7 @@ __PACKAGE__->attr(_epl_cache => sub { {} });
 sub new {
     my $self = shift->SUPER::new(@_);
 
-    # Epl
+    # Add "epl" handler
     $self->add_handler(
         epl => sub {
             my ($r, $c, $output, $options) = @_;
@@ -53,7 +55,6 @@ sub new {
 
                 # Try DATA section
                 elsif (my $d = Mojo::Command->new->get_data($t, $class)) {
-                    $mt->namespace($class);
                     $$output = $mt->render($d, $c);
                 }
 
@@ -102,7 +103,7 @@ sub new {
         }
     );
 
-    # Ep
+    # Add "ep" handler
     $self->add_handler(
         ep => sub {
             my ($r, $c, $output, $options) = @_;
@@ -126,9 +127,24 @@ sub new {
                 my $mt = $r->_epl_cache->{$cache} = Mojo::Template->new;
                 $mt->namespace("Mojo::Template::$cache");
 
-                # Stash
+                # Self
                 my $prepend = 'my $self = shift;';
-                my $append  = '';
+
+                # Be a bit more relaxed for helpers
+                $prepend .= q/no strict 'refs'; no warnings 'redefine';/;
+
+                # Helpers
+                for my $name (sort keys %{$self->helper}) {
+                    $prepend .= "sub $name;";
+                    $prepend .= " *$name = sub { \$self->app->renderer";
+                    $prepend .= "->helper->{'$name'}->(\$self, \@_) };";
+                }
+
+                # Be less relaxed for everything else
+                $prepend .= q/use strict; use warnings;/;
+
+                # Stash
+                my $append = '';
                 for my $var (keys %{$c->stash}) {
                     next unless $var =~ /^\w+$/;
                     $prepend .= " my \$$var = \$self->stash->{'$var'};";
@@ -147,8 +163,22 @@ sub new {
         }
     );
 
+    # Add "url_for" helper
+    $self->add_helper(url_for => sub { shift->url_for(@_) });
+
     # Set default handler to "epl"
     $self->default_handler('epl');
+
+    return $self;
+}
+
+sub add_helper {
+    my $self = shift;
+
+    # Merge
+    my $helper = ref $_[0] ? $_[0] : {@_};
+    $helper = {%{$self->helper}, %$helper};
+    $self->helper($helper);
 
     return $self;
 }
@@ -172,7 +202,13 @@ L<Mojolicous::Renderer> is the default L<Mojolicious> renderer.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Renderer> inherits all attributes from L<MojoX::Renderer>.
+L<Mojolicious::Renderer> inherits all attributes from L<MojoX::Renderer> and
+implements the following new ones.
+
+=head2 C<helper>
+
+    my $helper = $renderer->helper;
+    $renderer  = $renderer->helper({url_for => sub { ... }});
 
 =head1 METHODS
 
@@ -182,5 +218,9 @@ implements the following new ones.
 =head2 C<new>
 
     my $renderer = Mojolicious::Renderer->new;
+
+=head2 C<add_helper>
+
+    $renderer = $renderer->add_helper(url_for => sub { ... });
 
 =cut

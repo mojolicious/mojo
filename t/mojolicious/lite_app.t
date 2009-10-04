@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 78;
+use Test::More tests => 86;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -19,9 +19,6 @@ use Mojo::Client;
 use Mojo::JSON;
 use Mojo::Transaction::Single;
 use Mojolicious::Lite;
-
-# Something
-sub something {'Just works!'}
 
 # Silence
 app->log->level('error');
@@ -41,7 +38,7 @@ post '/template' => 'index';
 # * /something
 any '/something' => sub {
     my $self = shift;
-    $self->render_text(something());
+    $self->render_text('Just works!');
 };
 
 # GET|POST /something/else
@@ -77,6 +74,10 @@ get '/json' => sub { shift->render_json({foo => [1, -2, 3, 'bar']}) };
 # GET /autostash
 get '/autostash' => sub { shift->render(handler => 'ep', foo => 'bar') } =>
   'autostash';
+
+# GET /helper
+get '/helper' => sub { shift->render(handler => 'ep') } => 'helper';
+app->renderer->add_helper(agent => sub { shift->req->headers->user_agent });
 
 # Oh Fry, I love you more than the moon, and the stars,
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
@@ -240,9 +241,26 @@ is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 is($tx->res->body,                            "layouted bar\n");
 
+# GET /helper
+$tx = Mojo::Transaction::Single->new_get('/helper');
+$client->process_app($app, $tx);
+is($tx->res->code,                            200);
+is($tx->res->headers->server,                 'Mojo (Perl)');
+is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+is($tx->res->body, '/helper(Mozilla/5.0 (compatible; Mojo; Perl))');
+
+# GET /helper
+$tx =
+  Mojo::Transaction::Single->new_get('/helper', 'User-Agent' => 'Explorer');
+$client->process_app($app, $tx);
+is($tx->res->code,                            200);
+is($tx->res->headers->server,                 'Mojo (Perl)');
+is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+is($tx->res->body,                            '/helper(Explorer)');
+
 __DATA__
 @@ index.html.epl
-%= something()
+Just works!\
 
 @@ form.html.epl
 <%= shift->req->param('name') %> Тихановский
@@ -256,6 +274,10 @@ __DATA__
 
 @@ layouts/layout.html.ep
 layouted <%= $inner_template %>
+
+@@ helper.html.ep
+%= url_for 'helper'
+(<%= agent %>)\
 
 __END__
 This is not a template!

@@ -4,6 +4,8 @@ This file documents the revision history for Perl extension Mojo.
         - Added native JSON support.
         - Added more designer friendly .ep templates to Mojolicious.
         - Added callback tests. (melo)
+        - Added support for MOJO_CHUNK_SIZE=1. (melo)
+        - Fixed body callbacks to get automatic buffering.
         - Fixed a case where Mojo::Server::Daemon and Mojo::Client were too
           defensive and made them in turn 20 times faster.
         - Fixed keep alive problem in Mojo::Transaction::Pipeline.

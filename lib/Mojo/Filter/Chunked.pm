@@ -62,7 +62,7 @@ sub parse {
     # Got a chunk (we ignore the chunk extension)
     my $filter  = $self->input_buffer;
     my $content = $filter->to_string;
-    while ($content =~ /^(([\da-fA-F]+).*\x0d?\x0a)/) {
+    while ($content =~ /^((?:\x0d?\x0a)?([\da-fA-F]+).*\x0d?\x0a)/) {
         my $header = $1;
         my $length = hex($2);
 

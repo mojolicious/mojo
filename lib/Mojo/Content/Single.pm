@@ -36,7 +36,7 @@ sub get_body_chunk {
     $self->progress_cb->($self, 'body', $offset) if $self->progress_cb;
 
     # Body generator
-    return $self->body_cb->($self, $offset) if $self->body_cb;
+    return $self->generate_body_chunk($offset) if $self->body_cb;
 
     # Normal content
     return $self->asset->get_chunk($offset);

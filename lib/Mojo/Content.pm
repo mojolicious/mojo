@@ -6,6 +6,7 @@ use strict;
 use warnings;
 
 use base 'Mojo::Stateful';
+use bytes;
 
 use Carp 'croak';
 use Mojo::Buffer;
@@ -18,6 +19,8 @@ __PACKAGE__->attr([qw/body_cb filter progress_cb/]);
 __PACKAGE__->attr([qw/buffer filter_buffer/] => sub { Mojo::Buffer->new });
 __PACKAGE__->attr(headers                    => sub { Mojo::Headers->new });
 __PACKAGE__->attr(raw_header_size            => 0);
+
+__PACKAGE__->attr('_eof');
 
 sub body_contains {
     croak 'Method "body_contains" not implemented by subclass';
@@ -68,6 +71,38 @@ sub build_headers {
     }
 
     return $headers;
+}
+
+sub generate_body_chunk {
+    my ($self, $offset) = @_;
+
+    # Shortcut
+    return '' unless $self->body_cb;
+
+    # Remove written
+    my $written = $offset - ($self->buffer->raw_size - $self->buffer->size);
+    $self->buffer->remove($written);
+
+    # Enough in buffer?
+    if (!$self->_eof && $self->buffer->size < CHUNK_SIZE) {
+
+        # Generate
+        my $chunk = $self->body_cb->($self, $self->buffer->raw_size);
+
+        # EOF
+        if (defined $chunk && !length $chunk) { $self->_eof(1) }
+
+        # Buffer chunk
+        else { $self->buffer->add_chunk($chunk) }
+    }
+
+    # Get chunk
+    my $chunk = $self->buffer->get(CHUNK_SIZE);
+
+    # Pause or EOF
+    return $self->_eof ? '' : undef unless length $chunk;
+
+    return $chunk;
 }
 
 sub get_body_chunk {
@@ -283,6 +318,10 @@ the following new ones.
 =head2 C<build_headers>
 
     my $string = $content->build_headers;
+
+=head2 C<generate_body_chunk>
+
+    my $chunk = $content->generate_body_chunk(0);
 
 =head2 C<get_body_chunk>
 

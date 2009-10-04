@@ -6,6 +6,7 @@ use strict;
 use warnings;
 
 use base 'Mojo::Server';
+use bytes;
 
 use IO::Poll 'POLLIN';
 

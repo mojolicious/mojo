@@ -5,7 +5,9 @@
 use strict;
 use warnings;
 
-use Test::More tests => 412;
+use utf8;
+
+use Test::More tests => 427;
 
 use File::Spec;
 use File::Temp;
@@ -77,6 +79,40 @@ is($req->minor_version,           0);
 is($req->url,                     '/foo/bar/baz.html?foo=13#23');
 is($req->headers->content_type,   'text/plain');
 is($req->headers->content_length, 27);
+
+# Parse full HTTP 1.0 request with zero chunk
+$req = Mojo::Message::Request->new;
+$req->parse('GET /foo/bar/baz.html?fo');
+$req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
+$req->parse('-Type: text/');
+$req->parse("plain\x0d\x0aContent-Length: 27\x0d\x0a\x0d\x0aHell");
+$req->parse("o World!\n123");
+$req->parse('0');
+$req->parse("\nlalalala\n");
+is($req->state,                   'done');
+is($req->method,                  'GET');
+is($req->major_version,           1);
+is($req->minor_version,           0);
+is($req->url,                     '/foo/bar/baz.html?foo=13#23');
+is($req->headers->content_type,   'text/plain');
+is($req->headers->content_length, 27);
+
+# Parse full HTTP 1.0 request with utf8 form input
+$req = Mojo::Message::Request->new;
+$req->parse('GET /foo/bar/baz.html?fo');
+$req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
+$req->parse('-Type: application/');
+$req->parse("x-www-form-urlencoded\x0d\x0aContent-Length: 53");
+$req->parse("\x0d\x0a\x0d\x0a");
+$req->parse('name=%D0%92%D1%8F%D1%87%D0%B5%D1%81%D0%BB%D0%B0%D0%B2');
+is($req->state,                   'done');
+is($req->method,                  'GET');
+is($req->major_version,           1);
+is($req->minor_version,           0);
+is($req->url,                     '/foo/bar/baz.html?foo=13#23');
+is($req->headers->content_type,   'application/x-www-form-urlencoded');
+is($req->headers->content_length, 53);
+is($req->param('name'),           'Вячеслав');
 
 # Parse HTTP 0.9 request
 $req = Mojo::Message::Request->new;
@@ -388,7 +424,7 @@ is($req->build,
       . "\x0d\x0af\x0d\x0a"
       . "hello world2!\n\n"
       . "\x0d\x0a0\x0d\x0a\x0d\x0a");
-is($counter2, 6);
+ok($counter2);
 
 # Build HTTP 1.1 chunked request with trailing headers
 $req = Mojo::Message::Request->new;
@@ -1089,15 +1125,15 @@ $req = Mojo::Message::Request->new;
 $req->body('hi there!');
 is($req->body, 'hi there!');
 $req->body('');
-is($req->body, undef);
+is($req->body, '');
 $req->body('hi there!');
 is($req->body, 'hi there!');
 $req->body(undef);
-is($req->body, undef);
+is($req->body, '');
 $req->body(sub { });
 is(ref $req->body, 'CODE');
 $req->body(undef);
-is($req->body, undef);
+is($req->body, '');
 $req->body(0);
 is($req->body, 0);
 $req->body(sub { });

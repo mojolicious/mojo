@@ -6,6 +6,7 @@ use strict;
 use warnings;
 
 use base 'Mojo::Server';
+use bytes;
 
 use Carp 'croak';
 use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
@@ -335,7 +336,7 @@ sub _read {
     my $read = $socket->sysread(my $buffer, CHUNK_SIZE, 0);
 
     # Read error
-    unless (defined $read && $buffer) {
+    unless (defined $read && defined $buffer) {
         $self->_drop_connection($name);
         return 1;
     }
@@ -384,7 +385,8 @@ sub _write {
     return unless my $p = $self->_connections->{$name}->{pipeline};
 
     # Get chunk
-    return unless my $chunk = $p->server_get_chunk;
+    my $chunk = $p->server_get_chunk;
+    return unless defined $chunk;
 
     # Connected?
     return unless $p->connection->connected;

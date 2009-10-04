@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 76;
+use Test::More tests => 78;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -213,6 +213,8 @@ $client->process_app($app, $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+is($tx->res->headers->content_type,           'text/html');
+is($tx->res->headers->content_length,         40);
 is($tx->res->body, b(<<EOF)->encode('utf8')->to_string);
 Вячеслав Тихановский
 EOF

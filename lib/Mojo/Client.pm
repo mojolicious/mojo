@@ -229,10 +229,10 @@ sub spin {
         my $tx = $transaction{$name};
 
         # Get chunk
-        next unless my $chunk = $tx->client_get_chunk;
+        my $chunk = $tx->client_get_chunk;
 
         # Nothing to write
-        next unless $chunk;
+        next unless defined $chunk && length $chunk;
 
         # Write chunk
         my $written = $tx->connection->syswrite($chunk, length $chunk);
@@ -312,7 +312,8 @@ sub spin_app {
         if ($client->client_is_writing) {
 
             # Client grabs chunk
-            my $buffer = $client->client_get_chunk || '';
+            my $buffer = $client->client_get_chunk;
+            $buffer = '' unless defined $buffer;
 
             # Client write and server read
             $server->server_read($buffer);
@@ -329,7 +330,8 @@ sub spin_app {
         if ($server->server_is_writing) {
 
             # Server grabs chunk
-            my $buffer = $server->server_get_chunk || '';
+            my $buffer = $server->server_get_chunk;
+            $buffer = '' unless defined $buffer;
 
             # Server write and client read
             $client->client_read($buffer);

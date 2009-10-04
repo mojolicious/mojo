@@ -74,7 +74,7 @@ sub add_chunk {
     $self->handle->seek(0, SEEK_END);
 
     # Store
-    $chunk ||= '';
+    $chunk = '' unless defined $chunk;
     $self->handle->syswrite($chunk, length $chunk);
 
     return $self;

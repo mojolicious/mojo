@@ -121,7 +121,7 @@ sub parse {
     my ($self, $chunk) = @_;
 
     # Buffer
-    $self->buffer->add_chunk($chunk) if $chunk;
+    $self->buffer->add_chunk($chunk) if defined $chunk;
 
     return $self->_parse(0);
 }

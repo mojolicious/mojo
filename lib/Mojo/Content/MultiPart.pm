@@ -84,7 +84,7 @@ sub get_body_chunk {
     my ($self, $offset) = @_;
 
     # Body generator
-    return $self->body_cb->($self, $offset) if $self->body_cb;
+    return $self->generate_body_chunk($offset) if $self->body_cb;
 
     # Multipart
     my $boundary        = $self->build_boundary;

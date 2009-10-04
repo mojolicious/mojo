@@ -278,13 +278,13 @@ sub parse {
     my ($self, $chunk) = @_;
 
     # Buffer
-    $self->buffer->add_chunk($chunk) if $chunk;
+    $self->buffer->add_chunk($chunk) if defined $chunk;
 
     return $self->_parse(0);
 }
 
 sub parse_until_body {
-    my ($self, $chunk) = @);
+    my ($self, $chunk) = @_;
 
     # Buffer
     $self->buffer->add_chunk($chunk);
@@ -293,43 +293,6 @@ sub parse_until_body {
 }
 
 sub progress_cb { shift->content->progress_cb(@_) }
-
-sub _parse {
-    my $self = shift;
-    my $until_body = @_ ? shift : 0;
-
-    # Progress
-    $self->progress_cb->($self) if $self->progress_cb;
-
-    # Content
-    if ($self->is_state(qw/content done done_with_leftovers/)) {
-        my $content = $self->content;
-
-        # HTTP 0.9 has no headers
-        $content->state('body') if $self->version eq '0.9';
-
-        # Parse
-        $content->filter_buffer($self->buffer);
-
-        # Until body
-        if ($until_body) { $self->content($content->parse_until_body) }
-
-        # Whole message
-        else { $self->content($content->parse) }
-
-        # HTTP 0.9 has no defined length
-        $content->state('done') if $self->version eq '0.9';
-    }
-
-    # Done
-    $self->done if $self->content->is_done;
-
-    # Done with leftovers, maybe pipelined
-    $self->state('done_with_leftovers')
-      if $self->content->is_state('done_with_leftovers');
-
-    return $self;
-}
 
 sub start_line_size { length shift->build_start_line }
 
@@ -419,6 +382,43 @@ sub version {
 
 sub _build_start_line {
     croak 'Method "_build_start_line" not implemented by subclass';
+}
+
+sub _parse {
+    my $self = shift;
+    my $until_body = @_ ? shift : 0;
+
+    # Progress
+    $self->progress_cb->($self) if $self->progress_cb;
+
+    # Content
+    if ($self->is_state(qw/content done done_with_leftovers/)) {
+        my $content = $self->content;
+
+        # HTTP 0.9 has no headers
+        $content->state('body') if $self->version eq '0.9';
+
+        # Parse
+        $content->filter_buffer($self->buffer);
+
+        # Until body
+        if ($until_body) { $self->content($content->parse_until_body) }
+
+        # Whole message
+        else { $self->content($content->parse) }
+
+        # HTTP 0.9 has no defined length
+        $content->state('done') if $self->version eq '0.9';
+    }
+
+    # Done
+    $self->done if $self->content->is_done;
+
+    # Done with leftovers, maybe pipelined
+    $self->state('done_with_leftovers')
+      if $self->content->is_state('done_with_leftovers');
+
+    return $self;
 }
 
 sub _parse_formdata {

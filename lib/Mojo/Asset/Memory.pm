@@ -16,16 +16,21 @@ use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
 # There's your giraffe, little girl.
 # I'm a boy.
 # That's the spirit. Never give up.
+sub new {
+    my $self = shift->SUPER::new(@_);
+    $self->{content} = '';
+    return $self;
+}
+
 sub add_chunk {
     my ($self, $chunk) = @_;
-    $self->{content} ||= '';
     $self->{content} .= $chunk;
     return $self;
 }
 
 sub contains { index shift->{content}, shift }
 
-sub get_chunk { substr((shift->{content} || ''), shift, CHUNK_SIZE) }
+sub get_chunk { substr shift->{content}, shift, CHUNK_SIZE }
 
 sub move_to {
     my ($self, $path) = @_;
@@ -38,7 +43,7 @@ sub move_to {
     return $self;
 }
 
-sub size { length(shift->{content} || '') }
+sub size { length shift->{content} }
 
 sub slurp { shift->{content} }
 
@@ -65,6 +70,10 @@ L<Mojo::Asset::Memory> is a container for in-memory assets.
 
 L<Mojo::Asset::Memory> inherits all methods from L<Mojo::Asset> and
 implements the following new ones.
+
+=head2 C<new>
+
+    my $asset = Mojo::Asset::Memory->new;
 
 =head2 C<add_chunk>
 

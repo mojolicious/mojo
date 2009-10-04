@@ -11,45 +11,46 @@ use bytes;
 
 __PACKAGE__->attr(raw_size => 0);
 
+sub new {
+    my $self = shift->SUPER::new(@_);
+    $self->{buffer} = '';
+    return $self;
+}
+
 sub add_chunk {
     my ($self, $chunk) = @_;
 
     # Shortcut
-    return $self unless $chunk;
+    return $self unless defined $chunk;
 
     # Raw length
     $self->raw_size($self->raw_size + length $chunk);
 
     # Store
-    $self->{buffer} ||= '';
     $self->{buffer} .= $chunk;
 
     return $self;
 }
 
-sub contains {
-    my ($self, $chunk) = @_;
-
-    # Search
-    return index $self->{buffer} || '', $chunk;
-}
+sub contains { index shift->{buffer}, shift }
 
 sub empty {
     my $self = shift;
 
     # Cleanup
     my $buffer = $self->{buffer};
-    my $x      = '';
     $self->{buffer} = '';
 
     return $buffer;
 }
 
+sub get { substr shift->{buffer}, 0, shift }
+
 sub get_line {
     my $self = shift;
 
     # No full line in buffer
-    return unless ($self->{buffer} || '') =~ /\x0d?\x0a/;
+    return unless $self->{buffer} =~ /\x0d?\x0a/;
 
     # Locate line ending
     my $pos = index $self->{buffer}, "\x0a";
@@ -65,16 +66,15 @@ sub remove {
     my ($self, $length, $chunk) = @_;
 
     # Chunk to replace?
-    $chunk ||= '';
+    $chunk = '' unless defined $chunk;
 
     # Extract and replace
-    $self->{buffer} ||= '';
     return substr $self->{buffer}, 0, $length, $chunk;
 }
 
-sub size { length(shift->{buffer} || '') }
+sub size { length shift->{buffer} }
 
-sub to_string { shift->{buffer} || '' }
+sub to_string { shift->{buffer} }
 
 1;
 __END__
@@ -110,6 +110,10 @@ L<Mojo::Buffer> implements the following attributes.
 L<Mojo::Buffer> inherits all methods from L<Mojo::Base> and implements
 the following new ones.
 
+=head2 C<new>
+
+    my $buffer = Mojo::Buffer->new;
+
 =head2 C<add_chunk>
 
     $buffer = $buffer->add_chunk('foo');
@@ -121,6 +125,10 @@ the following new ones.
 =head2 C<empty>
 
     my $chunk = $buffer->empty;
+
+=head2 C<get>
+
+    my $chunk = $buffer->get(4);
 
 =head2 C<get_line>
 

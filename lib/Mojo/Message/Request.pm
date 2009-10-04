@@ -74,7 +74,8 @@ sub parse {
     else                { $env = $_[0] if ref $_[0] eq 'HASH' }
 
     # Parse CGI like environment or add chunk
-    $env ? $self->_parse_env($env) : $self->buffer->add_chunk(shift);
+    my $chunk = shift;
+    $env ? $self->_parse_env($env) : $self->buffer->add_chunk($chunk);
 
     # Start line
     $self->_parse_start_line if $self->is_state('start');

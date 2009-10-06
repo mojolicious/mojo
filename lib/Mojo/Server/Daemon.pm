@@ -336,7 +336,7 @@ sub _read {
     my $read = $socket->sysread(my $buffer, CHUNK_SIZE, 0);
 
     # Read error
-    unless (defined $read && defined $buffer) {
+    unless (defined $read && defined $buffer && length $buffer) {
         $self->_drop_connection($name);
         return 1;
     }
@@ -386,7 +386,7 @@ sub _write {
 
     # Get chunk
     my $chunk = $p->server_get_chunk;
-    return unless defined $chunk;
+    return unless defined $chunk && length $chunk;
 
     # Connected?
     return unless $p->connection->connected;

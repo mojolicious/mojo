@@ -111,7 +111,8 @@ sub new {
             # Generate name
             my $path  = $r->template_path($options);
             my $list  = join ', ', sort keys %{$c->stash};
-            my $cache = $options->{cache} = b($list)->md5_sum->to_string;
+            my $cache = $options->{cache} =
+              b("$path($list)")->md5_sum->to_string;
 
             # Stash defaults
             $c->stash->{layout} ||= undef;
@@ -135,6 +136,7 @@ sub new {
 
                 # Helpers
                 for my $name (sort keys %{$self->helper}) {
+                    next unless $name =~ /^\w+$/;
                     $prepend .= "sub $name;";
                     $prepend .= " *$name = sub { \$self->app->renderer";
                     $prepend .= "->helper->{'$name'}->(\$self, \@_) };";

@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 86;
+use Test::More tests => 89;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -78,6 +78,9 @@ get '/autostash' => sub { shift->render(handler => 'ep', foo => 'bar') } =>
 # GET /helper
 get '/helper' => sub { shift->render(handler => 'ep') } => 'helper';
 app->renderer->add_helper(agent => sub { shift->req->headers->user_agent });
+
+# GET /eperror
+get '/eperror' => sub { shift->render(handler => 'ep') } => 'eperror';
 
 # Oh Fry, I love you more than the moon, and the stars,
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
@@ -258,6 +261,16 @@ is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 is($tx->res->body,                            '/template(Explorer)');
 
+# GET /eperror
+my $level = $app->log->level;
+$app->log->level('fatal');
+$tx = Mojo::Transaction::Single->new_get('/eperror');
+$client->process_app($app, $tx);
+$app->log->level($level);
+is($tx->res->code,                            500);
+is($tx->res->headers->server,                 'Mojo (Perl)');
+is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+
 __DATA__
 @@ index.html.epl
 Just works!\
@@ -278,6 +291,9 @@ layouted <%= $inner_template %>
 @@ helper.html.ep
 %= url_for 'index'
 (<%= agent %>)\
+
+@@ eperror.html.ep
+%= $c->foo('bar');
 
 __END__
 This is not a template!

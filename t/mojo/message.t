@@ -333,7 +333,9 @@ is((unlink $file), 1);
 $req = Mojo::Message::Request->new;
 $req->method('GET');
 $req->url->parse('http://127.0.0.1/');
-is($req->build, "GET / HTTP/1.1\x0d\x0a" . "Host: 127.0.0.1\x0d\x0a\x0d\x0a");
+is($req->build,
+        "GET / HTTP/1.1\x0d\x0a"
+      . "Host: 127.0.0.1\x0d\x0aContent-Length: 0\x0d\x0a\x0d\x0a");
 
 # Build HTTP 1.1 start line and header
 $req = Mojo::Message::Request->new;
@@ -343,7 +345,7 @@ $req->headers->expect('100-continue');
 is($req->build,
         "GET /foo/bar HTTP/1.1\x0d\x0a"
       . "Expect: 100-continue\x0d\x0a"
-      . "Host: 127.0.0.1\x0d\x0a\x0d\x0a");
+      . "Host: 127.0.0.1\x0d\x0aContent-Length: 0\x0d\x0a\x0d\x0a");
 
 # Build full HTTP 1.1 request
 $req = Mojo::Message::Request->new;
@@ -573,7 +575,8 @@ $res->code(404);
 $res->headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
 is($res->build,
         "HTTP/1.1 404 Not Found\x0d\x0a"
-      . "Date: Sun, 17 Aug 2008 16:27:35 GMT\x0d\x0a\x0d\x0a");
+      . "Date: Sun, 17 Aug 2008 16:27:35 GMT\x0d\x0a"
+      . "Content-Length: 0\x0d\x0a\x0d\x0a");
 
 # Build HTTP 1.1 response start line and header
 $res = Mojo::Message::Response->new;
@@ -583,7 +586,8 @@ $res->headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
 is($res->build,
         "HTTP/1.1 200 OK\x0d\x0a"
       . "Connection: keep-alive\x0d\x0a"
-      . "Date: Sun, 17 Aug 2008 16:27:35 GMT\x0d\x0a\x0d\x0a");
+      . "Date: Sun, 17 Aug 2008 16:27:35 GMT\x0d\x0a"
+      . "Content-Length: 0\x0d\x0a\x0d\x0a");
 
 # Build full HTTP 1.1 response
 $res = Mojo::Message::Response->new;
@@ -978,6 +982,7 @@ $res->headers->set_cookie2(
 is($res->build,
         "HTTP/1.1 404 Not Found\x0d\x0a"
       . "Date: Sun, 17 Aug 2008 16:27:35 GMT\x0d\x0a"
+      . "Content-Length: 0\x0d\x0a"
       . "Set-Cookie: foo=bar; Version=1; Path=/foobar\x0d\x0a"
       . "Set-Cookie: bar=baz; Version=1; Path=/test/23\x0d\x0a"
       . "Set-Cookie2: baz=yada; Version=1; Path=/foobar\x0d\x0a\x0d\x0a");
@@ -987,7 +992,7 @@ is($res2->state,                   'done');
 is($res2->code,                    404);
 is($res2->major_version,           1);
 is($res2->minor_version,           1);
-is($res2->headers->content_length, undef);
+is($res2->headers->content_length, 0);
 is(defined $res2->cookie('foo'),   1);
 is(defined $res2->cookie('baz'),   1);
 is(defined $res2->cookie('bar'),   1);

@@ -168,6 +168,9 @@ sub new {
         }
     );
 
+    # Add "content" helper
+    $self->add_helper(content => sub { shift->render_inner(@_) });
+
     # Add "url_for" helper
     $self->add_helper(url_for => sub { shift->url_for(@_) });
 

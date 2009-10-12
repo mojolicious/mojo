@@ -6,6 +6,7 @@ This file documents the revision history for Perl extension Mojo.
         - Added helper support for .ep templates.
         - Added callback tests. (melo)
         - Added support for MOJO_CHUNK_SIZE=1. (melo)
+        - Updated Mojolicious lite_app generator to use .ep templates.
         - Fixed body callbacks to get automatic buffering.
         - Fixed a case where Mojo::Server::Daemon and Mojo::Client were too
           defensive and made them in turn 20 times faster.

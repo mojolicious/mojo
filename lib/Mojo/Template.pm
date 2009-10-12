@@ -54,9 +54,7 @@ sub build {
             }
 
             # Code
-            if ($type eq 'code') {
-                $lines[-1] .= "$value";
-            }
+            if ($type eq 'code') { $lines[-1] .= "$value" }
 
             # Expression
             if ($type eq 'expr' || $type eq 'escp') {

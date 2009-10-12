@@ -284,11 +284,11 @@ Just works!\
 <%= shift->render_inner %> with layout
 
 @@ autostash.html.ep
-% $layout = 'layout';
+% layout 'layout';
 %= $foo
 
 @@ layouts/layout.html.ep
-layouted <%= $inner_template %>
+layouted <%== content %>
 
 @@ helper.html.ep
 %== '<br/>'

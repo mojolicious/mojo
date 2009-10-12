@@ -149,18 +149,13 @@ sub new {
                 $prepend .= q/use strict; use warnings;/;
 
                 # Stash
-                my $append = '';
                 for my $var (keys %{$c->stash}) {
                     next unless $var =~ /^\w+$/;
                     $prepend .= " my \$$var = \$self->stash->{'$var'};";
-                    $append  .= " \$self->stash->{'$var'} = \$$var;";
                 }
 
                 # Prepend
                 $mt->prepend($prepend);
-
-                # Append
-                $mt->append($append);
             }
 
             # Render with epl
@@ -170,6 +165,9 @@ sub new {
 
     # Add "content" helper
     $self->add_helper(content => sub { shift->render_inner(@_) });
+
+    # Add "layout" helper
+    $self->add_helper(layout => sub { shift->stash(layout => @_) });
 
     # Add "url_for" helper
     $self->add_helper(url_for => sub { shift->url_for(@_) });

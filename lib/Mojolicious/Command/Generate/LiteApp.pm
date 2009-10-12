@@ -48,7 +48,7 @@ shagadelic;
 <%%= '__DATA__' %%>
 
 <%%= '@@ index.html.ep' %%>
-% $layout = 'funky';
+% layout 'funky';
 Yea baby!
 
 <%%= '@@ layouts/funky.html.ep' %%>

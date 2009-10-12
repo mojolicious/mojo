@@ -37,11 +37,11 @@ sub append {
     for (@_) {
         my $value = defined $_ ? "$_" : '';
 
-        # We replace whitespace with "+"
-        $value =~ s/\ /\+/g;
-
         # *( pchar / "/" / "?" ) with the exception of ";", "&" and "="
         $value = b($value)->url_escape($Mojo::URL::PARAM)->to_string;
+
+        # We replace whitespace with "+"
+        $value =~ s/\%20/\+/g;
 
         # Append
         push @{$self->params}, $value;
@@ -68,12 +68,6 @@ sub param {
     my $self = shift;
     my $name = shift;
 
-    # We replace whitespace with "+"
-    $name =~ s/\ /\+/g;
-
-    # *( pchar / "/" / "?" ) with the exception of ";", "&" and "="
-    $name = b($name)->url_escape($Mojo::URL::PARAM);
-
     # Cleanup
     $self->remove($name) if defined $_[0];
 
@@ -81,6 +75,12 @@ sub param {
     for my $value (@_) {
         $self->append($name, $value);
     }
+
+    # *( pchar / "/" / "?" ) with the exception of ";", "&" and "="
+    $name = b($name)->url_escape($Mojo::URL::PARAM);
+
+    # We replace whitespace with "+"
+    $name =~ s/\%20/\+/g;
 
     # List
     my @values;
@@ -143,11 +143,11 @@ sub remove {
 
     $name = '' unless defined $name;
 
-    # We replace whitespace with "+"
-    $name =~ s/\ /\+/g;
-
     # *( pchar / "/" / "?" ) with the exception of ";", "&" and "="
     $name = b($name)->url_escape($Mojo::URL::PARAM);
+
+    # We replace whitespace with "+"
+    $name =~ s/\%20/\+/g;
 
     # Remove
     my $params = $self->params;
@@ -208,29 +208,6 @@ sub to_string {
     for (my $i = 0; $i < @$params; $i += 2) {
         my $name  = $params->[$i];
         my $value = $params->[$i + 1];
-
-        # We replace whitespace with "+"
-        $name =~ s/\ /\+/g;
-
-        # Value is optional
-        if (defined $value) {
-
-            # We replace whitespace with "+"
-            $value =~ s/\ /\+/g;
-
-            # *( pchar / "/" / "?" ) with the exception of ";", "&" and "="
-            $value = b($value)->url_escape($Mojo::URL::PARAM);
-
-            # *( pchar / "/" / "?" ) with the exception of ";", "&" and "="
-            $name = b($name)->url_escape($Mojo::URL::PARAM);
-        }
-
-        # No value
-        else {
-
-            # *( pchar / "/" / "?" )
-            $name = b($name)->url_escape($Mojo::URL::PCHAR);
-        }
 
         push @params, defined $value ? "$name=$value" : "$name";
     }

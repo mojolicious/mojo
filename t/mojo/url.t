@@ -58,10 +58,11 @@ is($url->userinfo, 'sri:foobar');
 is($url->host,     'kraih.com');
 is($url->port,     '8080');
 is($url->path,     '');
-is($url->query,    '_monkeybiz%3B&_monkey;23');
-is_deeply($url->query->params, ['_monkeybiz%3B&_monkey;23', undef]);
+is($url->query,    '_monkeybiz%3B%26_monkey%3B23');
+is_deeply($url->query->params, ['_monkeybiz;&_monkey;23', undef]);
 is($url->fragment, '23');
-is("$url", 'http://sri:foobar@kraih.com:8080?_monkeybiz%3B&_monkey;23#23');
+is("$url",
+    'http://sri:foobar@kraih.com:8080?_monkeybiz%3B%26_monkey%3B23#23');
 
 # Relative
 $url = Mojo::URL->new('http://sri:foobar@kraih.com:8080/foo?foo=bar#23');

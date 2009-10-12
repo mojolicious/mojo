@@ -94,7 +94,7 @@ sub parse {
         $string =~ s/\+/\ /g;
 
         # Unescape
-        $string  = b($string)->url_unescape->to_string;
+        $string = b($string)->url_unescape->to_string;
 
         $self->params([$string, undef]);
         return $self;
@@ -106,17 +106,18 @@ sub parse {
     # W3C suggests to also accept ";" as a separator
     for my $pair (split /[\&\;]+/, $string) {
 
+        # Parse
         $pair =~ /^([^\=]*)(?:=(.*))?$/;
-
         my $name  = $1;
         my $value = $2;
 
-        $name =~ s/\+/\ /g;
+        # Replace "+" with whitespace
+        $name  =~ s/\+/\ /g;
         $value =~ s/\+/\ /g;
 
         # Unescape
         $name  = b($name)->url_unescape->to_string;
-        $value  = b($value)->url_unescape->to_string;
+        $value = b($value)->url_unescape->to_string;
 
         push @{$self->params}, $name, $value;
     }
@@ -132,12 +133,8 @@ sub remove {
     # Remove
     my $params = $self->params;
     for (my $i = 0; $i < @$params;) {
-        if ($params->[$i] eq $name) {
-            splice @$params, $i, 2;
-        }
-        else {
-            $i += 2;
-        }
+        if ($params->[$i] eq $name) { splice @$params, $i, 2 }
+        else                        { $i += 2 }
     }
     $self->params($params);
 
@@ -185,7 +182,7 @@ sub to_string {
         $name = b($name)->url_escape($Mojo::URL::PARAM);
         $value = b($value)->url_escape($Mojo::URL::PARAM) if $value;
 
-        # We replace whitespace with "+"
+        # Replace whitespace with "+"
         $name =~ s/\%20/\+/g;
         $value =~ s/\%20/\+/g if $value;
 

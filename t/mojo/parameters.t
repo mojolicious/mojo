@@ -87,7 +87,7 @@ $params = Mojo::Parameters->new('foo=%2B');
 is($params->param('foo'), '+');
 is_deeply($params->to_hash, {foo => '+'});
 $params->param('foo ' => 'a');
-is($params->to_string,"foo=%2B&foo+=a");
+is($params->to_string, "foo=%2B&foo+=a");
 $params->remove('foo ');
 is_deeply($params->to_hash, {foo => '+'});
 $params->append('1 2', '3+3');

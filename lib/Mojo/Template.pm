@@ -15,17 +15,17 @@ use Mojo::Template::Exception;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
 
+__PACKAGE__->attr([qw/auto_escape compiled namespace/]);
 __PACKAGE__->attr([qw/append code prepend/] => '');
 __PACKAGE__->attr(comment_mark              => '#');
-__PACKAGE__->attr([qw/compiled namespace/]);
-__PACKAGE__->attr(encoding        => 'utf8');
-__PACKAGE__->attr(escape_mark     => '=');
-__PACKAGE__->attr(expression_mark => '=');
-__PACKAGE__->attr(line_start      => '%');
-__PACKAGE__->attr(template        => '');
-__PACKAGE__->attr(tree            => sub { [] });
-__PACKAGE__->attr(tag_start       => '<%');
-__PACKAGE__->attr(tag_end         => '%>');
+__PACKAGE__->attr(encoding                  => 'utf8');
+__PACKAGE__->attr(escape_mark               => '=');
+__PACKAGE__->attr(expression_mark           => '=');
+__PACKAGE__->attr(line_start                => '%');
+__PACKAGE__->attr(template                  => '');
+__PACKAGE__->attr(tree => sub { [] });
+__PACKAGE__->attr(tag_start => '<%');
+__PACKAGE__->attr(tag_end   => '%>');
 
 sub build {
     my $self = shift;
@@ -59,14 +59,17 @@ sub build {
             }
 
             # Expression
-            if ($type eq 'expr') {
-                $lines[-1] .= "\$_M .= $value;";
-            }
+            if ($type eq 'expr' || $type eq 'escp') {
 
-            # Expression that needs to be escaped
-            if ($type eq 'escp') {
-                $lines[-1]
-                  .= "\$_M .= Mojo::ByteStream->new($value)->xml_escape;";
+                # Escaped
+                my $a = $self->auto_escape;
+                if (($type eq 'escp' && !$a) || ($type eq 'expr' && $a)) {
+                    $lines[-1]
+                      .= "\$_M .= Mojo::ByteStream->new($value)->xml_escape;";
+                }
+
+                # Raw
+                else { $lines[-1] .= "\$_M .= $value;" }
             }
         }
     }
@@ -469,6 +472,11 @@ build a wrapper around it.
 =head1 ATTRIBUTES
 
 L<Mojo::Template> implements the following attributes.
+
+=head2 C<auto_escape>
+
+    my $auto_escape = $mt->auto_escape;
+    $mt             = $mt->auto_escape(1);
 
 =head2 C<append>
 

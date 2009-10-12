@@ -128,6 +128,9 @@ sub new {
                 my $mt = $r->_epl_cache->{$cache} = Mojo::Template->new;
                 $mt->namespace("Mojo::Template::$cache");
 
+                # Auto escape by default to prevent XSS attacks
+                $mt->auto_escape(1);
+
                 # Self
                 my $prepend = 'my $self = shift;';
 

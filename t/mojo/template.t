@@ -25,7 +25,7 @@ package main;
 use strict;
 use warnings;
 
-use Test::More tests => 67;
+use Test::More tests => 68;
 
 use File::Spec;
 use File::Temp;
@@ -251,6 +251,17 @@ $output = $mt->render(<<'EOF');
 </html>
 EOF
 is($output, "<html>&lt;html&gt;\n&amp;lt;</html>\n");
+
+# XML auto escape
+$mt = Mojo::Template->new;
+$mt->auto_escape(1);
+$output = $mt->render(<<'EOF');
+<html><%= '<html>' %>
+%= '&lt;'
+%== '&lt;'
+</html>
+EOF
+is($output, "<html>&lt;html&gt;\n&amp;lt;&lt;</html>\n");
 
 # Prepending code
 $mt = Mojo::Template->new;

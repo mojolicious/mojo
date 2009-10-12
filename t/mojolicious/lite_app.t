@@ -77,7 +77,8 @@ get '/autostash' => sub { shift->render(handler => 'ep', foo => 'bar') } =>
 
 # GET /helper
 get '/helper' => sub { shift->render(handler => 'ep') } => 'helper';
-app->renderer->add_helper(agent => sub { shift->req->headers->user_agent });
+app->renderer->add_helper(
+    agent => sub { scalar shift->req->headers->user_agent });
 
 # GET /eperror
 get '/eperror' => sub { shift->render(handler => 'ep') } => 'eperror';
@@ -250,7 +251,8 @@ $client->process_app($app, $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body, '/template(Mozilla/5.0 (compatible; Mojo; Perl))');
+is($tx->res->body,
+    '<br/>&lt;.../template(Mozilla/5.0 (compatible; Mojo; Perl))');
 
 # GET /helper
 $tx =
@@ -259,7 +261,7 @@ $client->process_app($app, $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,                            '/template(Explorer)');
+is($tx->res->body, '<br/>&lt;.../template(Explorer)');
 
 # GET /eperror
 my $level = $app->log->level;
@@ -289,6 +291,8 @@ Just works!\
 layouted <%= $inner_template %>
 
 @@ helper.html.ep
+%== '<br/>'
+%= '<...'
 %= url_for 'index'
 (<%= agent %>)\
 

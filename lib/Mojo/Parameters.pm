@@ -34,18 +34,8 @@ sub new {
 sub append {
     my $self = shift;
 
-    for (@_) {
-        my $value = defined $_ ? "$_" : '';
-
-        # *( pchar / "/" / "?" ) with the exception of ";", "&" and "="
-        $value = b($value)->url_escape($Mojo::URL::PARAM)->to_string;
-
-        # We replace whitespace with "+"
-        $value =~ s/\%20/\+/g;
-
-        # Append
-        push @{$self->params}, $value;
-    }
+    # Append
+    push @{$self->params}, map { defined $_ ? "$_" : '' } @_;
 
     return $self;
 }
@@ -76,27 +66,11 @@ sub param {
         $self->append($name, $value);
     }
 
-    # *( pchar / "/" / "?" ) with the exception of ";", "&" and "="
-    $name = b($name)->url_escape($Mojo::URL::PARAM);
-
-    # We replace whitespace with "+"
-    $name =~ s/\%20/\+/g;
-
     # List
     my @values;
     my $params = $self->params;
     for (my $i = 0; $i < @$params; $i += 2) {
         push @values, $params->[$i + 1] if $params->[$i] eq $name;
-    }
-
-    # Unescape
-    for (my $i = 0; $i <= $#values; $i++) {
-
-        # We replace "+" with whitespace
-        $values[$i] =~ s/\+/\ /g if $values[$i];
-
-        # *( pchar / "/" / "?" ) with the exception of ";", "&" and "="
-        $values[$i] = b($values[$i])->url_unescape->to_string;
     }
 
     return wantarray ? @values : $values[0];
@@ -117,6 +91,11 @@ sub parse {
 
     # Detect query string without key/value pairs
     if ($string !~ /\=/) {
+        $string =~ s/\+/\ /g;
+
+        # Unescape
+        $string  = b($string)->url_unescape->to_string;
+
         $self->params([$string, undef]);
         return $self;
     }
@@ -132,6 +111,13 @@ sub parse {
         my $name  = $1;
         my $value = $2;
 
+        $name =~ s/\+/\ /g;
+        $value =~ s/\+/\ /g;
+
+        # Unescape
+        $name  = b($name)->url_unescape->to_string;
+        $value  = b($value)->url_unescape->to_string;
+
         push @{$self->params}, $name, $value;
     }
 
@@ -142,12 +128,6 @@ sub remove {
     my ($self, $name) = @_;
 
     $name = '' unless defined $name;
-
-    # *( pchar / "/" / "?" ) with the exception of ";", "&" and "="
-    $name = b($name)->url_escape($Mojo::URL::PARAM);
-
-    # We replace whitespace with "+"
-    $name =~ s/\%20/\+/g;
 
     # Remove
     my $params = $self->params;
@@ -173,14 +153,6 @@ sub to_hash {
     for (my $i = 0; $i < @$params; $i += 2) {
         my $name  = $params->[$i];
         my $value = $params->[$i + 1];
-
-        # We replace "+" with whitepsace
-        $name =~ s/\+/\ /g;
-        $value =~ s/\+/\ /g if $value;
-
-        # Unescape
-        $name  = b($name)->url_unescape->to_string;
-        $value = b($value)->url_unescape->to_string;
 
         # Array
         if (exists $params{$name}) {
@@ -208,6 +180,14 @@ sub to_string {
     for (my $i = 0; $i < @$params; $i += 2) {
         my $name  = $params->[$i];
         my $value = $params->[$i + 1];
+
+        # *( pchar / "/" / "?" ) with the exception of ";", "&" and "="
+        $name = b($name)->url_escape($Mojo::URL::PARAM);
+        $value = b($value)->url_escape($Mojo::URL::PARAM) if $value;
+
+        # We replace whitespace with "+"
+        $name =~ s/\%20/\+/g;
+        $value =~ s/\%20/\+/g if $value;
 
         push @params, defined $value ? "$name=$value" : "$name";
     }

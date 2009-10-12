@@ -21,7 +21,7 @@ is($params->to_string, 'foo=b%3Bar;baz=23');
 is("$params",          'foo=b%3Bar;baz=23');
 
 # Append
-is_deeply($params->params, ['foo', 'b%3Bar', 'baz', 23]);
+is_deeply($params->params, ['foo', 'b;ar', 'baz', 23]);
 $params->append('a', 4, 'a', 5, 'b', 6, 'b', 7);
 is($params->to_string, "foo=b%3Bar;baz=23;a=4;a=5;b=6;b=7");
 

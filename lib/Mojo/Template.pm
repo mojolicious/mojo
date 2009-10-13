@@ -62,8 +62,7 @@ sub build {
                 # Escaped
                 my $a = $self->auto_escape;
                 if (($type eq 'escp' && !$a) || ($type eq 'expr' && $a)) {
-                    $lines[-1]
-                      .= "\$_M .= Mojo::ByteStream->new($value)->xml_escape;";
+                    $lines[-1] .= "\$_M .= escape $value;";
                 }
 
                 # Raw
@@ -72,13 +71,19 @@ sub build {
         }
     }
 
+    # Escape helper
+    my $escape = q/no strict 'refs'; no warnings 'redefine'; sub escape; /;
+    $escape .= q/*escape = sub { Mojo::ByteStream->new($_[0])->xml_escape->/;
+    $escape .= q/to_string };/;
+    $escape .= q/use strict; use warnings;/;
+
     # Wrap
     my $prepend   = $self->prepend;
     my $append    = $self->append;
     my $namespace = $self->namespace || ref $self;
     $lines[0] ||= '';
-    $lines[0] =
-      qq/package $namespace; sub { my \$_M = ''; $prepend;/ . $lines[0];
+    $lines[0] = qq/package $namespace; sub { my \$_M = ''; $escape; $prepend;/
+      . $lines[0];
     $lines[-1] .= qq/$append; return \$_M; };/;
 
     $self->code(join "\n", @lines);

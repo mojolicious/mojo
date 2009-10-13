@@ -503,6 +503,9 @@ sub url_unescape {
 sub xml_escape {
     my $self = shift;
 
+    # Character semantics
+    no bytes;
+
     # Replace "&", "<", ">", """ and "'"
     for ($self->{bytestream}) {
         s/&/&amp;/g;

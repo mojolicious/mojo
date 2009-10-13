@@ -5,10 +5,12 @@
 use strict;
 use warnings;
 
+use utf8;
+
 # Homer, we're going to ask you a few simple yes or no questions.
 # Do you understand?
 # Yes. *lie dectector blows up*
-use Test::More tests => 30;
+use Test::More tests => 32;
 
 use_ok('Mojo::ByteStream', 'b');
 
@@ -121,3 +123,11 @@ is("$stream", '/usr/local/lib/perl5/site_perl/5.10.0/Mojo/ByteStream.pm');
 # xml_escape
 $stream = b(qq/la<f>\nbar"baz"'yada\n'&lt;la/)->xml_escape;
 is("$stream", "la&lt;f&gt;\nbar&quot;baz&quot;&apos;yada\n&apos;&amp;lt;la");
+
+# utf8 xml_escape with nothing to escape
+$stream = b(qq/привет/)->xml_escape;
+is("$stream", "привет");
+
+# utf8 xml_escape
+$stream = b(qq/привет<foo>/)->xml_escape;
+is("$stream", "привет&lt;foo&gt;");

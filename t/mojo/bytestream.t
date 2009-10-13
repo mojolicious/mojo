@@ -112,7 +112,8 @@ $stream = b("foobar<baz>&\"\x{152}")->html_escape;
 is("$stream", 'foobar&lt;baz&gt;&amp;&quot;&OElig;');
 
 # utf8 html_unescape
-$stream = b('foobar&lt;baz&gt;&#x26;&#34;&OElig;')->html_unescape;
+$stream =
+  b('foobar&lt;baz&gt;&#x26;&#34;&OElig;')->decode('utf8')->html_unescape;
 is("$stream", "foobar<baz>&\"\x{152}");
 
 # html_escape (path)

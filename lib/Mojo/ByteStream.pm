@@ -419,8 +419,7 @@ sub html_unescape {
         ;
     /_unescape($1, $2, $3)/gex;
 
-    # utf8
-    return $self->decode('utf8');
+    return $self;
 }
 
 sub md5_sum {

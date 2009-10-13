@@ -125,9 +125,9 @@ $stream = b(qq/la<f>\nbar"baz"'yada\n'&lt;la/)->xml_escape;
 is("$stream", "la&lt;f&gt;\nbar&quot;baz&quot;&apos;yada\n&apos;&amp;lt;la");
 
 # utf8 xml_escape with nothing to escape
-$stream = b(qq/привет/)->xml_escape;
-is("$stream", "привет");
+$stream = b('привет')->xml_escape;
+is("$stream", 'привет');
 
 # utf8 xml_escape
-$stream = b(qq/привет<foo>/)->xml_escape;
-is("$stream", "привет&lt;foo&gt;");
+$stream = b('привет<foo>')->xml_escape;
+is("$stream", 'привет&lt;foo&gt;');

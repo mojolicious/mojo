@@ -37,7 +37,7 @@ package main;
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More tests => 13;
 
 use Mojo;
 use Mojo::Transaction::Single;
@@ -77,4 +77,15 @@ $c->tx(Mojo::Transaction::Single->new_post('/foo/hello%20there'));
 is($d->dispatch($c), undef);
 is_deeply($c->stash,
     {controller => 'foo', action => 'bar', capture => 'hello there'});
+ok($c->render_called);
+
+# Escaping utf8
+$c->reset_state;
+$c->tx(
+    Mojo::Transaction::Single->new_post(
+        '/foo/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82')
+);
+is($d->dispatch($c), undef);
+is_deeply($c->stash,
+    {controller => 'foo', action => 'bar', capture => 'привет'});
 ok($c->render_called);

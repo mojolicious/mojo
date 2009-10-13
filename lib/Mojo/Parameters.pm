@@ -86,9 +86,6 @@ sub parse {
     # Clear
     $self->params([]);
 
-    # utf8
-    $string = b($string)->decode('utf8')->to_string;
-
     # Detect query string without key/value pairs
     if ($string !~ /\=/) {
         $string =~ s/\+/\ /g;

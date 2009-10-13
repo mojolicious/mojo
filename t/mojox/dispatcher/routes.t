@@ -37,6 +37,8 @@ package main;
 use strict;
 use warnings;
 
+use utf8;
+
 use Test::More tests => 13;
 
 use Mojo;

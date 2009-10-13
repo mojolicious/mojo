@@ -12,6 +12,7 @@ use bytes;
 use Carp 'croak';
 use Mojo::Asset::Memory;
 use Mojo::Buffer;
+use Mojo::ByteStream 'b';
 use Mojo::Content::Single;
 use Mojo::Parameters;
 use Mojo::Upload;
@@ -92,6 +93,7 @@ sub body_params {
 
         # Parse
         my $raw = $self->content->asset->slurp;
+        $raw = b($raw)->decode('utf8')->to_string;
         $params->parse($raw);
     }
 

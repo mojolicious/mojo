@@ -10,7 +10,7 @@ use utf8;
 # Homer, we're going to ask you a few simple yes or no questions.
 # Do you understand?
 # Yes. *lie dectector blows up*
-use Test::More tests => 32;
+use Test::More tests => 33;
 
 use_ok('Mojo::ByteStream', 'b');
 
@@ -132,3 +132,7 @@ is("$stream", 'привет');
 # utf8 xml_escape
 $stream = b('привет<foo>')->xml_escape;
 is("$stream", 'привет&lt;foo&gt;');
+
+# Decode invalid utf8
+$stream = b("\x{1000}")->decode('utf8');
+is("$stream", '');

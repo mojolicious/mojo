@@ -142,10 +142,15 @@ sub build {
 sub connection          { shift->header('Connection',          @_) }
 sub content_disposition { shift->header('Content-Disposition', @_) }
 sub content_length      { shift->header('Content-Length',      @_) }
-sub content_type        { shift->header('Content-Type',        @_) }
-sub cookie              { shift->header('Cookie',              @_) }
-sub date                { shift->header('Date',                @_) }
-sub expect              { shift->header('Expect',              @_) }
+
+sub content_transfer_encoding {
+    shift->header('Content-Transfer-Encoding', @_);
+}
+
+sub content_type { shift->header('Content-Type', @_) }
+sub cookie       { shift->header('Cookie',       @_) }
+sub date         { shift->header('Date',         @_) }
+sub expect       { shift->header('Expect',       @_) }
 
 # Will you be my mommy? You smell like dead bunnies...
 sub header {
@@ -307,6 +312,11 @@ implements the following new ones.
 
     my $content_length = $headers->content_length;
     $headers           = $headers->content_length(4000);
+
+=head2 C<content_transfer_encoding>
+
+    my $encoding = $headers->content_transfer_encoding;
+    $headers     = $headers->content_transfer_encoding('foo');
 
 =head2 C<content_type>
 

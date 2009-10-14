@@ -84,21 +84,22 @@ sub body_params {
     return $self->_body_params if $self->_body_params;
 
     my $params = Mojo::Parameters->new;
+    my $type = $self->headers->content_type || '';
+
+    # Charset
+    $type =~ /charset=\"?(\S+)\"?/;
+    my $charset = $1 || 'utf8';
 
     # "x-application-urlencoded" and "application/x-www-form-urlencoded"
-    my $content_type = $self->headers->content_type || '';
-    if ($content_type
-        =~ /(?:x-application|application\/x-www-form)-urlencoded/i)
-    {
+    if ($type =~ /(?:x-application|application\/x-www-form)-urlencoded/i) {
 
         # Parse
-        my $raw = $self->content->asset->slurp;
-        $raw = b($raw)->decode('utf8')->to_string;
-        $params->parse($raw);
+        my $raw = $self->content->asset->slurp || '';
+        $params->parse(b($raw)->decode($charset)->to_string);
     }
 
     # "multipart/formdata"
-    elsif ($content_type =~ /multipart\/form-data/i) {
+    elsif ($type =~ /multipart\/form-data/i) {
         my $formdata = $self->_parse_formdata;
 
         # Formdata
@@ -107,7 +108,13 @@ sub body_params {
             my $filename = $data->[1];
             my $part     = $data->[2];
 
-            $params->append($name, $part->asset->slurp) unless $filename;
+            # Form field
+            unless ($filename) {
+                my $raw = $part->asset->slurp;
+                $raw = b($raw)->decode($charset)->to_string
+                  unless $part->headers->content_transfer_encoding;
+                $params->append($name, $raw);
+            }
         }
     }
 

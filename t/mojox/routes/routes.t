@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 109;
+use Test::More tests => 113;
 
 use Mojo::Transaction::Single;
 
@@ -64,6 +64,9 @@ $r->route('/format')
 
 # /format2.html
 $r->route('/format2.html')->to(controller => 'you', action => 'hello');
+
+# /format2.json
+$r->route('/format2.json')->to(controller => 'you', action => 'hello_json');
 
 # /articles
 # /articles.html
@@ -235,6 +238,11 @@ is($match->stack->[0]->{controller}, 'you');
 is($match->stack->[0]->{action},     'hello');
 is($match->stack->[0]->{format},     'html');
 is($match->url_for,                  '/format2.html');
+$match = $r->match(Mojo::Transaction::Single->new_get('/format2.json'));
+is($match->stack->[0]->{controller}, 'you');
+is($match->stack->[0]->{action},     'hello_json');
+is($match->stack->[0]->{format},     'json');
+is($match->url_for,                  '/format2.json');
 
 # Request methods
 $match = $r->match(Mojo::Transaction::Single->new_get('/method/get.html'));

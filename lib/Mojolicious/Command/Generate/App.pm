@@ -223,7 +223,7 @@ like($tx->res->content->asset->slurp, qr/Mojolicious Web Framework/i);
 This page was generated from the template
 "templates/example/welcome.html.ep" and the layout
 "templates/layouts/default.html.ep",
-<a href="<%= url_for %>">click here</a>
+<a href="<%== url_for %>">click here</a>
 to reload the page or
 <a href="/index.html">here</a>
 to move forward to a static page.

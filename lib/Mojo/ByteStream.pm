@@ -370,7 +370,15 @@ sub decode {
     # Shortcut
     return $self unless $encoding;
 
-    $self->{bytestream} = Encode::decode($encoding, $self->{bytestream});
+    # Try decoding
+    eval {
+        $self->{bytestream} =
+          Encode::decode($encoding, $self->{bytestream}, 1);
+    };
+
+    # Failed
+    $self->{bytestream} = '' if $@;
+
     return $self;
 }
 

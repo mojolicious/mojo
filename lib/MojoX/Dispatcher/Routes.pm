@@ -32,11 +32,7 @@ sub dispatch {
     return 1 unless $match && @{$match->stack};
 
     # Initialize stash with captures
-    my %captures = %{$match->captures};
-    foreach my $key (keys %captures) {
-        $captures{$key} = $captures{$key};
-    }
-    $c->stash({%captures});
+    $c->stash($match->captures);
 
     # Walk the stack
     my $e = $self->walk_stack($c);

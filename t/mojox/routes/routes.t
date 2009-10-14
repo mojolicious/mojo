@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 113;
+use Test::More tests => 123;
 
 use Mojo::Transaction::Single;
 
@@ -67,6 +67,12 @@ $r->route('/format2.html')->to(controller => 'you', action => 'hello');
 
 # /format2.json
 $r->route('/format2.json')->to(controller => 'you', action => 'hello_json');
+
+# /format3/*.html
+$r->route('/format3/:foo.html')->to(controller => 'me', action => 'bye');
+
+# /format3/*.json
+$r->route('/format3/:foo.json')->to(controller => 'me', action => 'bye_json');
 
 # /articles
 # /articles.html
@@ -243,6 +249,18 @@ is($match->stack->[0]->{controller}, 'you');
 is($match->stack->[0]->{action},     'hello_json');
 is($match->stack->[0]->{format},     'json');
 is($match->url_for,                  '/format2.json');
+$match = $r->match(Mojo::Transaction::Single->new_get('/format3/baz.html'));
+is($match->stack->[0]->{controller}, 'me');
+is($match->stack->[0]->{action},     'bye');
+is($match->stack->[0]->{format},     'html');
+is($match->stack->[0]->{foo},        'baz');
+is($match->url_for,                  '/format3/baz.html');
+$match = $r->match(Mojo::Transaction::Single->new_get('/format3/baz.json'));
+is($match->stack->[0]->{controller}, 'me');
+is($match->stack->[0]->{action},     'bye_json');
+is($match->stack->[0]->{format},     'json');
+is($match->stack->[0]->{foo},        'baz');
+is($match->url_for,                  '/format3/baz.json');
 
 # Request methods
 $match = $r->match(Mojo::Transaction::Single->new_get('/method/get.html'));

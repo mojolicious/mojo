@@ -18,6 +18,7 @@ This file documents the revision history for Perl extension Mojo.
         - Fixed body helper in Mojo::Message and added tests. (vti)
         - Fixed padding byte handling in Mojo::Server::FastCGI.
           (Jaroslav Muhin)
+        - Fixed a few small parser bugs in MojoX::Routes and added tests.
         - Fixed Mojo::Asset::File and added tests. (Yuki Kimoto)
         - Fixed generated scripts. (Yuki Kimoto)
         - Fixed CHLD signal handler for prefork children. (sharifulin)

@@ -38,6 +38,10 @@ sub startup {
     # Routes
     my $r = $self->routes;
 
+    # /stash_config
+    $r->route('/stash_config')
+      ->to(controller => 'foo', action => 'config', config => {test => 123});
+
     # /test4 - named route for url_for
     $r->route('/test4/:something')
       ->to(controller => 'foo', action => 'something', something => 23)

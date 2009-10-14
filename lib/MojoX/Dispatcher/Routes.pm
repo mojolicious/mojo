@@ -34,8 +34,7 @@ sub dispatch {
     # Initialize stash with captures
     my %captures = %{$match->captures};
     foreach my $key (keys %captures) {
-        $captures{$key} =
-          b($captures{$key})->decode('utf8')->url_unescape->to_string;
+        $captures{$key} = $captures{$key};
     }
     $c->stash({%captures});
 

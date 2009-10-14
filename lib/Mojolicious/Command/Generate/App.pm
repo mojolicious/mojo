@@ -50,11 +50,11 @@ sub run {
     $self->renderer->tag_start('<%%');
     $self->renderer->tag_end('%%>');
     $self->render_to_rel_file('exception',
-        "$name/templates/exception.html.epl");
+        "$name/templates/exception.html.ep");
     $self->render_to_rel_file('layout',
-        "$name/templates/layouts/default.html.epl");
+        "$name/templates/layouts/default.html.ep");
     $self->render_to_rel_file('welcome',
-        "$name/templates/example/welcome.html.epl");
+        "$name/templates/example/welcome.html.ep");
 }
 
 1;
@@ -111,6 +111,9 @@ use base 'Mojolicious';
 sub startup {
     my $self = shift;
 
+    # Default to ".ep" templates
+    $self->renderer->default_handler('ep');
+
     # Routes
     my $r = $self->routes;
 
@@ -133,11 +136,8 @@ use base 'Mojolicious::Controller';
 sub welcome {
     my $self = shift;
 
-    # Render template "example/welcome.html.epl" with message and layout
-    $self->render(
-        layout  => 'default',
-        message => 'Welcome to the Mojolicious Web Framework!'
-    );
+    # Render template "example/welcome.html.ep" with message
+    $self->render(message => 'Welcome to the Mojolicious Web Framework!');
 }
 
 1;
@@ -177,54 +177,53 @@ is($tx->res->headers->content_type, 'text/html');
 like($tx->res->content->asset->slurp, qr/Mojolicious Web Framework/i);
 @@ exception
 % use Data::Dumper ();
-% my $self = shift;
 % my $s = $self->stash;
 % my $e = $self->stash('exception');
 % delete $s->{inner_template};
+% delete $s->{exception};
+% my $dump = Data::Dumper->new([$s])->Maxdepth(2)->Indent(1)->Terse(1)->Dump;
+% $s->{exception} = $e;
 <!doctype html><html>
 <head><title>Exception</title></head>
     <body>
         This page was generated from the template
-        "templates/exception.html.epl".
+        "templates/exception.html.ep".
         <pre><%= $e->message %></pre>
         <pre>
 % for my $line (@{$e->lines_before}) {
-<%= $line->[0] %>: <%== $line->[1] %>
+<%= $line->[0] %>: <%= $line->[1] %>
 % }
 % if ($e->line->[0]) {
-<b><%= $e->line->[0] %>: <%== $e->line->[1] %></b>
+<b><%= $e->line->[0] %>: <%= $e->line->[1] %></b>
 % }
 % for my $line (@{$e->lines_after}) {
-<%= $line->[0] %>: <%== $line->[1] %>
+<%= $line->[0] %>: <%= $line->[1] %>
 % }
         </pre>
         <pre>
 % for my $frame (@{$e->stack}) {
-<%== $frame->[1] %>: <%= $frame->[2] %>
+<%= $frame->[1] %>: <%= $frame->[2] %>
 % }
         </pre>
         <pre>
-% delete $s->{exception};
-%== Data::Dumper->new([$s])->Maxdepth(2)->Indent(1)->Terse(1)->Dump
-% $s->{exception} = $e;
+%= $dump
         </pre>
     </body>
 </html>
 @@ layout
-% my $self = shift;
 <!doctype html><html>
     <head><title>Welcome</title></head>
     <body>
-        <%= $self->render_inner %>
+        <%== content %>
     </body>
 </html>
 @@ welcome
-% my $self = shift;
-<h2><%= $self->stash('message') %></h2>
+% layout 'default';
+<h2><%= $message %></h2>
 This page was generated from the template
-"templates/example/welcome.html.epl" and the layout
-"templates/layouts/default.html.epl",
-<a href="<%= $self->url_for %>">click here</a>
+"templates/example/welcome.html.ep" and the layout
+"templates/layouts/default.html.ep",
+<a href="<%= url_for %>">click here</a>
 to reload the page or
 <a href="/index.html">here</a>
 to move forward to a static page.

@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 113;
+use Test::More tests => 117;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -279,3 +279,11 @@ is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 is($tx->res->body,                            'Go away!');
+
+# MojoliciousTest::Foo::config
+$tx = Mojo::Transaction::Single->new_get('/stash_config');
+$client->process_app('MojoliciousTest', $tx);
+is($tx->res->code,                            200);
+is($tx->res->headers->server,                 'Mojo (Perl)');
+is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+is($tx->res->body,                            '123');

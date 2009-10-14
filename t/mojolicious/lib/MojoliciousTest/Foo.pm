@@ -11,6 +11,11 @@ use base 'Mojolicious::Controller';
 # Let me check my program... Yep.
 sub badtemplate { shift->render(template => 'badtemplate') }
 
+sub config {
+    my $self = shift;
+    $self->render_text($self->stash('config')->{test});
+}
+
 sub index {
     shift->stash(
         layout  => 'default',

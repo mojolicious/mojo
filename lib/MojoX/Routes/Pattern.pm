@@ -9,6 +9,8 @@ use base 'Mojo::Base';
 
 use constant DEBUG => $ENV{MOJOX_ROUTES_DEBUG} || 0;
 
+use Mojo::ByteStream 'b';
+
 __PACKAGE__->attr(defaults => sub { {} });
 __PACKAGE__->attr([qw/format pattern regex/]);
 __PACKAGE__->attr(quote_end      => ')');
@@ -132,9 +134,15 @@ sub shape_match {
         # Merge captures
         my $result = {%{$self->defaults}};
         for my $symbol (@{$self->symbols}) {
+
+            # No captures
             last unless @captures;
+
+            # Decode and unescape
             my $capture = shift @captures;
-            $result->{$symbol} = $capture if $capture;
+            $result->{$symbol} =
+              b($capture)->decode('utf8')->url_unescape->to_string
+              if $capture;
         }
         return $result;
     }

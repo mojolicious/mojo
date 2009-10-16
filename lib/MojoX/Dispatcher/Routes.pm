@@ -39,10 +39,7 @@ sub dispatch {
     return $e if $e;
 
     # Render
-    $self->render($c);
-
-    # All seems ok
-    return;
+    return $self->render($c);
 }
 
 sub dispatch_callback {
@@ -202,7 +199,10 @@ sub render {
     my ($self, $c) = @_;
 
     # Render
-    $c->render unless $c->stash->{rendered};
+    return !$c->render unless $c->stash->{rendered};
+
+    # Nothing to render
+    return;
 }
 
 sub walk_stack {

@@ -53,10 +53,10 @@ Yea baby!
 
 <%%= '@@ layouts/funky.html.ep' %%>
 <!doctype html><html>
-    <head><title>Funky!</title></head>
-    <body>
-        <%== content %>
-    </body>
+  <head><title>Funky!</title></head>
+  <body>
+    <%== content %>
+  </body>
 </html>
 __END__
 =head1 NAME

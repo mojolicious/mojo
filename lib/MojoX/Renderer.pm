@@ -13,10 +13,11 @@ use MojoX::Types;
 
 __PACKAGE__->attr(default_format => 'html');
 __PACKAGE__->attr('default_handler');
-__PACKAGE__->attr(handler => sub { {} });
-__PACKAGE__->attr(layout_prefix => 'layouts');
-__PACKAGE__->attr(root          => '/');
-__PACKAGE__->attr(types         => sub { MojoX::Types->new });
+__PACKAGE__->attr(default_status => 200);
+__PACKAGE__->attr(handler        => sub { {} });
+__PACKAGE__->attr(layout_prefix  => 'layouts');
+__PACKAGE__->attr(root           => '/');
+__PACKAGE__->attr(types          => sub { MojoX::Types->new });
 
 # This is not how Xmas is supposed to be.
 # In my day Xmas was about bringing people together, not blowing them apart.
@@ -120,7 +121,8 @@ sub render {
 
     # Response
     my $res = $c->res;
-    $res->code(200) unless $res->code;
+    $res->code($c->stash('status') || $self->default_status)
+      unless $res->code;
     $res->body($output) unless $res->body;
 
     # Type
@@ -199,6 +201,11 @@ L<MojoX::Types> implements the follwing attributes.
 
     my $default = $renderer->default_handler;
     $renderer   = $renderer->default_handler('epl');
+
+=head2 C<default_status>
+
+    my $default = $renderer->default_status;
+    $renderer   = $renderer->default_status(404);
 
 =head2 C<handler>
 

@@ -194,13 +194,12 @@ Names are always the last argument.
 
     __DATA__
 
-    @@ index.html.epl
-    % my $self = shift;
-    <a href="<%= $self->url_for('foo') %>">Foo</a>.
-    <a href="<%= $self->url_for('bar') %>">Bar</a>.
+    @@ index.html.ep
+    <a href="<%= url_for 'foo' %>">Foo</a>.
+    <a href="<%= url_for 'bar' %>">Bar</a>.
 
-    @@ foo.html.epl
-    <a href="<%= shift->url_for('index') %>">Home</a>.
+    @@ foo.html.ep
+    <a href="<%= url_for 'index' %>">Home</a>.
 
 Templates can have layouts.
 
@@ -212,13 +211,13 @@ Templates can have layouts.
 
     __DATA__
 
-    @@ with_layout.html.epl
+    @@ with_layout.html.ep
     We've got content!
 
-    @@ layouts/green.html.epl
+    @@ layouts/green.html.ep
     <!doctype html><html>
-        <head><title>Green!</title></head>
-        <body><%= shift->render_inner %></body>
+      <head><title>Green!</title></head>
+      <body><%== content %></body>
     </html>
 
 Route placeholders allow capturing parts of a request path until a C</> or
@@ -247,8 +246,8 @@ Relaxed placeholders allow matching of everything until a C</> occurs.
 
     __DATA__
 
-    @@ groovy.html.epl
-    Your name is <%= shift->stash('you') %>.
+    @@ groovy.html.ep
+    Your name is <%= $you %>.
 
 Wildcard placeholders allow matching absolutely everything, including
 C</> and C<.>.
@@ -260,8 +259,8 @@ C</> and C<.>.
 
     __DATA__
 
-    @@ groovy.html.epl
-    Your name is <%= shift->stash('you') %>.
+    @@ groovy.html.ep
+    Your name is <%= $you %>.
 
 Routes can be restricted to specific request methods.
 
@@ -303,9 +302,8 @@ Routes allow default values to make placeholders optional.
 
     __DATA__
 
-    @@ groovy.txt.epl
-    % my $self = shift;
-    My name is <%= $self->stash('name') %>.
+    @@ groovy.txt.ep
+    My name is <%= $name %>.
 
 All those features can be easily used together.
 
@@ -316,10 +314,9 @@ All those features can be easily used together.
 
     __DATA__
 
-    @@ welcome.html.epl
-    % my $self = shift;
-    Stuff is <%= $self->stash('stuff') %>.
-    Query param name is <%= $self->req->param('name') %>.
+    @@ welcome.html.ep
+    Stuff is <%= $stuff %>.
+    Query param name is <%= param 'name' %>.
 
 Here's a fully functional example for a html form handling application using
 multiple features at once.
@@ -346,30 +343,27 @@ multiple features at once.
     shagadelic;
     __DATA__
 
-    @@ index.html.epl
-    % my $self = shift;
-    % $self->stash(layout => 'funky');
+    @@ index.html.ep
+    % layout 'funky');
     Who is groovy?
-    <form action="<%= $self->url_for('form') %>" method="POST">
+    <form action="<%= url_for 'form' %>" method="POST">
         <input type="text" name="groovy" />
         <input type="submit" value="Woosh!">
     </form>
 
-    @@ welcome.html.epl
-    % my $self = shift;
-    <%= $self->stash('groovy') %> is groovy!
-    <%= $self->render_partial('menu') %>
+    @@ welcome.html.ep
+    <%= $groovy %> is groovy!
+    <%== $self->render_partial('menu') %>
 
-    @@ menu.html.epl
-    <a href="<%= shift->url_for('index') %>">Try again</a>
+    @@ menu.html.ep
+    <a href="<%= url_for 'index' %>">Try again</a>
 
-    @@ layouts/funky.html.epl
-    % my $self = shift;
+    @@ layouts/funky.html.ep
     <!doctype html><html>
-        <head><title>Funky!</title></head>
-        <body>
-            <%= $self->render_inner %>
-        </body>
+      <head><title>Funky!</title></head>
+      <body>
+        <%== content %>
+      </body>
     </html>
 
 Conditions such as C<agent> allow even more powerful route constructs.
@@ -395,13 +389,13 @@ Formats can be automatically detected by looking at file extensions.
 
     __DATA__
 
-    @@ detected.html.epl
+    @@ detected.html.ep
     <!doctype html><html>
-        <head><title>Detected!</title></head>
-        <body>HTML was detected.</body>
+      <head><title>Detected!</title></head>
+      <body>HTML was detected.</body>
     </html>
 
-    @@ detected.txt.epl
+    @@ detected.txt.ep
     TXT was detected.
 
 External templates will be searched by the renderer in a C<templates>
@@ -411,7 +405,7 @@ directory.
     any '/external' => sub {
         my $self = shift;
 
-        # templates/foo/bar.html.epl
+        # templates/foo/bar.html.ep
         $self->render('foo/bar');
     };
 

@@ -41,14 +41,14 @@ sub run {
     $self->create_rel_dir("$name/log");
 
     # Static
-    $self->render_to_rel_file('404',    "$name/public/404.html");
-    $self->render_to_rel_file('500',    "$name/public/500.html");
     $self->render_to_rel_file('static', "$name/public/index.html");
 
     # Layout and Templates
     $self->renderer->line_start('%%');
     $self->renderer->tag_start('<%%');
     $self->renderer->tag_end('%%>');
+    $self->render_to_rel_file('not_found',
+        "$name/templates/not_found.html.ep");
     $self->render_to_rel_file('exception',
         "$name/templates/exception.html.ep");
     $self->render_to_rel_file('layout',
@@ -59,20 +59,6 @@ sub run {
 
 1;
 __DATA__
-@@ 404
-<!doctype html><html>
-    <head><title>File Not Found</title></head>
-    <body>
-        <h2>File Not Found</h2>
-    </body>
-</html>
-@@ 500
-<!doctype html><html>
-    <head><title>Internal Server Error</title></head>
-    <body>
-        <h2>Internal Server Error</h2>
-    </body>
-</html>
 @@ mojo
 % my $class = shift;
 #!/usr/bin/env perl
@@ -143,13 +129,12 @@ sub welcome {
 1;
 @@ static
 <!doctype html><html>
-    <head><title>Welcome to the Mojolicious Web Framework!</title></head>
-    <body>
-        <h2>Welcome to the Mojolicious Web Framework!</h2>
-        This is the static document "public/index.html",
-        <a href="/">click here</a>
-        to get back to the start.
-    </body>
+  <head><title>Welcome to the Mojolicious Web Framework!</title></head>
+  <body>
+    <h2>Welcome to the Mojolicious Web Framework!</h2>
+    This is the static document "public/index.html",
+    <a href="/">click here</a> to get back to the start.
+  </body>
 </html>
 @@ test
 % my $class = shift;
@@ -175,7 +160,17 @@ $client->process_app('<%= $class %>', $tx);
 is($tx->res->code, 200);
 is($tx->res->headers->content_type, 'text/html');
 like($tx->res->content->asset->slurp, qr/Mojolicious Web Framework/i);
+@@ not_found
+<!doctype html><html>
+  <head><title>Not Found</title></head>
+  <body>
+    The page you were requesting
+    "<%= $self->req->url->path || '/' %>"
+    could not be found.
+  </body>
+</html>
 @@ exception
+<!doctype html><html>
 % use Data::Dumper ();
 % my $s = $self->stash;
 % my $e = $self->stash('exception');
@@ -183,39 +178,49 @@ like($tx->res->content->asset->slurp, qr/Mojolicious Web Framework/i);
 % delete $s->{exception};
 % my $dump = Data::Dumper->new([$s])->Maxdepth(2)->Indent(1)->Terse(1)->Dump;
 % $s->{exception} = $e;
-<!doctype html><html>
-<head><title>Exception</title></head>
-    <body>
+  <head>
+	<title>Exception</title>
+	<style type="text/css">
+	  body {
+		font: 0.9em Verdana, "Bitstream Vera Sans", sans-serif;
+	  }
+	  .snippet {
+        font: 115% Monaco, "Courier New", monospace;
+	  }
+	</style>
+  </head>
+  <body>
+    <% if ($self->app->mode eq 'development') { %>
+	  <div>
         This page was generated from the template
         "templates/exception.html.ep".
-        <pre><%= $e->message %></pre>
-        <pre>
-% for my $line (@{$e->lines_before}) {
-<%= $line->[0] %>: <%= $line->[1] %>
-% }
-% if ($e->line->[0]) {
-<b><%= $e->line->[0] %>: <%= $e->line->[1] %></b>
-% }
-% for my $line (@{$e->lines_after}) {
-<%= $line->[0] %>: <%= $line->[1] %>
-% }
-        </pre>
-        <pre>
-% for my $frame (@{$e->stack}) {
-<%= $frame->[1] %>: <%= $frame->[2] %>
-% }
-        </pre>
-        <pre>
-%= $dump
-        </pre>
-    </body>
+      </div>
+      <div class="snippet"><pre><%= $e->message %></pre></div>
+      <div>
+        <% for my $line (@{$e->lines_before}) { %>
+          <div class="snippet"><%= $line->[0] %>: <%= $line->[1] %></div>
+        <% } %>
+        <% if ($e->line->[0]) { %>
+          <div class="snippet">
+	        <b><%= $e->line->[0] %>: <%= $e->line->[1] %></b>
+	      </div>
+        <% } %>
+        <% for my $line (@{$e->lines_after}) { %>
+          <div class="snippet"><%= $line->[0] %>: <%= $line->[1] %></div>
+        <% } %>
+      </div>
+      <div class="snippet"><pre><%= $dump %></pre></div>
+    <% } else { %>
+      <div>A server error occured, please try gain later.</div>
+    <% } %>
+  </body>
 </html>
 @@ layout
 <!doctype html><html>
-    <head><title>Welcome</title></head>
-    <body>
-        <%== content %>
-    </body>
+  <head><title>Welcome</title></head>
+  <body>
+    <%== content %>
+  </body>
 </html>
 @@ welcome
 % layout 'default';

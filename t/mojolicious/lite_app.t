@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 89;
+use Test::More tests => 90;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -150,7 +150,7 @@ $client->process_app($app, $tx);
 is($tx->res->code,                            404);
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-like($tx->res->body, qr/File Not Found/);
+like($tx->res->body, qr/Oops!/);
 
 # GET /regex/23
 $tx = Mojo::Transaction::Single->new_get('/regex/23');
@@ -166,7 +166,7 @@ $client->process_app($app, $tx);
 is($tx->res->code,                            404);
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-like($tx->res->body, qr/File Not Found/);
+like($tx->res->body, qr/Oops!/);
 
 # POST /bar
 $tx = Mojo::Transaction::Single->new_post('/bar');
@@ -208,7 +208,7 @@ $client->process_app($app, $tx);
 is($tx->res->code,                            404);
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-like($tx->res->body, qr/File Not Found/);
+like($tx->res->body, qr/Oops!/);
 
 # POST /utf8
 $tx = Mojo::Transaction::Single->new_post('/utf8');
@@ -238,12 +238,12 @@ is($hash->{foo}->[2], 3);
 is($hash->{foo}->[3], 'bar');
 
 # GET /autostash
-$tx = Mojo::Transaction::Single->new_get('/autostash');
+$tx = Mojo::Transaction::Single->new_get('/autostash?bar=23');
 $client->process_app($app, $tx);
 is($tx->res->code,                            200);
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,                            "layouted bar\n");
+is($tx->res->body,                            "layouted bar23\n");
 
 # GET /helper
 $tx = Mojo::Transaction::Single->new_get('/helper');
@@ -272,8 +272,12 @@ $app->log->level($level);
 is($tx->res->code,                            500);
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+like($tx->res->body, qr/Internal Server Error/);
 
 __DATA__
+@@ not_found.html.epl
+Oops!
+
 @@ index.html.epl
 Just works!\
 
@@ -286,6 +290,7 @@ Just works!\
 @@ autostash.html.ep
 % layout 'layout';
 %= $foo
+%= param 'bar'
 
 @@ layouts/layout.html.ep
 layouted <%== content %>

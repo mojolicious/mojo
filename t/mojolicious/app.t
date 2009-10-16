@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 117;
+use Test::More tests => 121;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -142,10 +142,10 @@ $backup = $ENV{MOJO_MODE} || '';
 $ENV{MOJO_MODE} = 'production';
 $tx = Mojo::Transaction::Single->new_get('/foo/syntaxerror');
 $client->process_app('MojoliciousTest', $tx);
-is($tx->res->code,                            200);
+is($tx->res->code,                            500);
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,                            '');
+like($tx->res->body, qr/Internal Server Error/);
 $ENV{MOJO_MODE} = $backup;
 
 # Static file /hello.txt in a production mode
@@ -263,6 +263,14 @@ is($tx->res->headers->header('X-Bender'),     'Kiss my shiny metal ass!');
 is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 is($tx->res->body,                            '/foo/bar');
+
+# SingleFileTestApp::Baz::does_not_exist
+$tx = Mojo::Transaction::Single->new_get('/baz/does_not_exist');
+$client->process_app('SingleFileTestApp', $tx);
+is($tx->res->code,                            404);
+is($tx->res->headers->server,                 'Mojo (Perl)');
+is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+like($tx->res->body, qr/File Not Found/);
 
 # MojoliciousTestController::Foo::stage2
 $tx = Mojo::Transaction::Single->new_get('/staged', 'X-Pass' => 1);

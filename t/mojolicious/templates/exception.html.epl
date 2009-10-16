@@ -1,2 +1,8 @@
 %# Sweet Zombie Jesus!
-%= shift->stash('exception')->message
+% my $self = shift;
+% if ($self->app->mode eq 'development') {
+%= $self->stash('exception')->message
+% }
+% else {
+Internal Server Error
+% }

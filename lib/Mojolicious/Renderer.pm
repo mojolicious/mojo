@@ -77,25 +77,13 @@ sub new {
                 # Log
                 $c->app->log->error(qq/Template error in "$t": $e/);
 
-                # Development mode
-                if ($c->app->mode eq 'development') {
-
-                    # Exception template failed
-                    return if $c->stash->{exception};
-
-                    # Render exception template
-                    $c->stash(exception => $e);
-                    $c->res->code(500);
-                    $c->res->body(
-                        $c->render(
-                            partial  => 1,
-                            template => 'exception',
-                            format   => 'html'
-                        )
-                    );
-
-                    return 1;
-                }
+                # Render exception template
+                $c->render(
+                    template  => 'exception',
+                    format    => 'html',
+                    status    => 500,
+                    exception => $e
+                ) or $c->app->static->serve_505($c);
             }
 
             # Success or exception?
@@ -168,6 +156,9 @@ sub new {
 
     # Add "layout" helper
     $self->add_helper(layout => sub { shift->stash(layout => @_) });
+
+    # Add "param" helper
+    $self->add_helper(param => sub { shift->req->param(@_) });
 
     # Add "url_for" helper
     $self->add_helper(url_for => sub { shift->url_for(@_) });

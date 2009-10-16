@@ -463,7 +463,7 @@ is($req->build,
 
 # Status code and message
 my $res = Mojo::Message::Response->new;
-is($res->code,            200);
+is($res->code,            undef);
 is($res->default_message, 'OK');
 is($res->message,         undef);
 $res->message('Test');

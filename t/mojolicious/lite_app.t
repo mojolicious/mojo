@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 90;
+use Test::More tests => 94;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -67,6 +67,12 @@ get '/firefox/:stuff' => (agent => qr/Firefox/) => sub {
 
 # POST /utf8
 post '/utf8' => 'form';
+
+# POST /malformed_UTF-8
+post '/malformed_utf8' => sub {
+    my $c = shift;
+    $c->render_text(Mojo::URL->new($c->req->param('foo')));
+};
 
 # GET /json
 get '/json' => sub { shift->render_json({foo => [1, -2, 3, 'bar']}) };
@@ -224,6 +230,19 @@ is($tx->res->body, b(<<EOF)->encode('UTF-8')->to_string);
 Вячеслав Тихановский
 EOF
 
+# POST /malformed_utf8
+my $level = $app->log->level;
+$app->log->level('fatal');
+$tx = Mojo::Transaction::Single->new_post('/malformed_utf8');
+$tx->req->headers->content_type('application/x-www-form-urlencoded');
+$tx->req->body('foo=%E1');
+$client->process_app($app, $tx);
+$app->log->level($level);
+is($tx->res->code,                            200);
+is($tx->res->headers->server,                 'Mojo (Perl)');
+is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+is($tx->res->body,                            '');
+
 # GET /json
 $tx = Mojo::Transaction::Single->new_get('/json');
 $client->process_app($app, $tx);
@@ -264,7 +283,7 @@ is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 is($tx->res->body, '<br/>&lt;.../template(Explorer)');
 
 # GET /eperror
-my $level = $app->log->level;
+$level = $app->log->level;
 $app->log->level('fatal');
 $tx = Mojo::Transaction::Single->new_get('/eperror');
 $client->process_app($app, $tx);

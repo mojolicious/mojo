@@ -569,8 +569,8 @@ Mojo::ByteStream - ByteStream
     $stream->decamelize;
     $stream->b64_encode;
     $stream->b64_decode;
-    $stream->encode('utf8');
-    $stream->decode('utf8');
+    $stream->encode('UTF-8');
+    $stream->decode('UTF-8');
     $stream->html_escape;
     $stream->html_unescape;
     $stream->md5_sum;
@@ -590,7 +590,7 @@ Mojo::ByteStream - ByteStream
 
     # Chained
     my $stream = Mojo::ByteStream->new('foo bar baz')->quote;
-    $stream = $stream->unquote->encode('utf8)->b64_encode;
+    $stream = $stream->unquote->encode('UTF-8)->b64_encode;
     print "$stream";
 
     # Constructor alias

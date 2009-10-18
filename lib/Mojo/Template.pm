@@ -18,7 +18,7 @@ use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
 __PACKAGE__->attr([qw/auto_escape compiled namespace/]);
 __PACKAGE__->attr([qw/append code prepend/] => '');
 __PACKAGE__->attr(comment_mark              => '#');
-__PACKAGE__->attr(encoding                  => 'utf8');
+__PACKAGE__->attr(encoding                  => 'UTF-8');
 __PACKAGE__->attr(escape_mark               => '=');
 __PACKAGE__->attr(expression_mark           => '=');
 __PACKAGE__->attr(line_start                => '%');
@@ -499,7 +499,7 @@ L<Mojo::Template> implements the following attributes.
 =head2 C<encoding>
 
     my $encoding = $mt->encoding;
-    $mt          = $mt->encoding('utf8');
+    $mt          = $mt->encoding('UTF-8');
 
 =head2 C<escape_mark>
 

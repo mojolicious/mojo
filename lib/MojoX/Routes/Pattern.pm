@@ -141,7 +141,7 @@ sub shape_match {
             # Decode and unescape
             my $capture = shift @captures;
             $result->{$symbol} =
-              b($capture)->decode('utf8')->url_unescape->to_string
+              b($capture)->url_unescape->decode('UTF-8')->to_string
               if $capture;
         }
         return $result;

@@ -35,11 +35,11 @@ $stream = b("Zm9vYmFyJCVeJjMyMTc=\n");
 is($stream->b64_decode, 'foobar$%^&3217');
 
 # utf8 b64_encode
-$stream = b("foo\x{df}\x{0100}bar%23\x{263a}")->encode('utf8')->b64_encode;
+$stream = b("foo\x{df}\x{0100}bar%23\x{263a}")->encode('UTF-8')->b64_encode;
 is("$stream", "Zm9vw5/EgGJhciUyM+KYug==\n");
 
 # utf8 b64_decode
-$stream = b("Zm9vw5/EgGJhciUyM+KYug==\n")->b64_decode->decode('utf8');
+$stream = b("Zm9vw5/EgGJhciUyM+KYug==\n")->b64_decode->decode('UTF-8');
 is("$stream", "foo\x{df}\x{0100}bar%23\x{263a}");
 
 # url_escape
@@ -51,11 +51,11 @@ $stream = b('business%3B23');
 is($stream->url_unescape, 'business;23');
 
 # utf8 url_escape
-$stream = b("foo\x{df}\x{0100}bar\x{263a}")->encode('utf8')->url_escape;
+$stream = b("foo\x{df}\x{0100}bar\x{263a}")->encode('UTF-8')->url_escape;
 is("$stream", 'foo%C3%9F%C4%80bar%E2%98%BA');
 
 # utf8 url_unescape
-$stream = b('foo%C3%9F%C4%80bar%E2%98%BA')->url_unescape->decode('utf8');
+$stream = b('foo%C3%9F%C4%80bar%E2%98%BA')->url_unescape->decode('UTF-8');
 is("$stream", "foo\x{df}\x{0100}bar\x{263a}");
 
 # url_sanitize
@@ -113,7 +113,7 @@ is("$stream", 'foobar&lt;baz&gt;&amp;&quot;&OElig;');
 
 # utf8 html_unescape
 $stream =
-  b('foobar&lt;baz&gt;&#x26;&#34;&OElig;')->decode('utf8')->html_unescape;
+  b('foobar&lt;baz&gt;&#x26;&#34;&OElig;')->decode('UTF-8')->html_unescape;
 is("$stream", "foobar<baz>&\"\x{152}");
 
 # html_escape (path)
@@ -134,5 +134,5 @@ $stream = b('привет<foo>')->xml_escape;
 is("$stream", 'привет&lt;foo&gt;');
 
 # Decode invalid utf8
-$stream = b("\x{1000}")->decode('utf8');
+$stream = b("\x{1000}")->decode('UTF-8');
 is("$stream", '');

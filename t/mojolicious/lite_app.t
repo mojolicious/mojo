@@ -220,7 +220,7 @@ is($tx->res->headers->server,                 'Mojo (Perl)');
 is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
 is($tx->res->headers->content_type,           'text/html');
 is($tx->res->headers->content_length,         40);
-is($tx->res->body, b(<<EOF)->encode('utf8')->to_string);
+is($tx->res->body, b(<<EOF)->encode('UTF-8')->to_string);
 Вячеслав Тихановский
 EOF
 

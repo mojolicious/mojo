@@ -12,7 +12,6 @@ use bytes;
 use Carp 'croak';
 use Mojo::Asset::Memory;
 use Mojo::Buffer;
-use Mojo::ByteStream 'b';
 use Mojo::Content::Single;
 use Mojo::Parameters;
 use Mojo::Upload;
@@ -88,14 +87,13 @@ sub body_params {
 
     # Charset
     $type =~ /charset=\"?(\S+)\"?/;
-    my $charset = $1 || 'utf8';
+    $params->charset($1) if $1;
 
     # "x-application-urlencoded" and "application/x-www-form-urlencoded"
     if ($type =~ /(?:x-application|application\/x-www-form)-urlencoded/i) {
 
         # Parse
-        my $raw = $self->content->asset->slurp || '';
-        $params->parse(b($raw)->decode($charset)->to_string);
+        $params->parse($self->content->asset->slurp);
     }
 
     # "multipart/formdata"
@@ -109,12 +107,7 @@ sub body_params {
             my $part     = $data->[2];
 
             # Form field
-            unless ($filename) {
-                my $raw = $part->asset->slurp;
-                $raw = b($raw)->decode($charset)->to_string
-                  unless $part->headers->content_transfer_encoding;
-                $params->append($name, $raw);
-            }
+            $params->append($name, $part->asset->slurp) unless $filename;
         }
     }
 

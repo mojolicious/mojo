@@ -11,8 +11,9 @@ use overload '""' => sub { shift->to_string }, fallback => 1;
 use Mojo::ByteStream 'b';
 use Mojo::URL;
 
+__PACKAGE__->attr(charset        => 'UTF-8');
 __PACKAGE__->attr(pair_separator => '&');
-__PACKAGE__->attr(params => sub { [] });
+__PACKAGE__->attr(params         => sub { [] });
 
 # Yeah, Moe, that team sure did suck last night. They just plain sucked!
 # I've seen teams suck before,
@@ -91,7 +92,7 @@ sub parse {
         $string =~ s/\+/\ /g;
 
         # Unescape
-        $string = b($string)->url_unescape->to_string;
+        $string = b($string)->url_unescape->decode($self->charset)->to_string;
 
         $self->params([$string, undef]);
         return $self;
@@ -113,8 +114,8 @@ sub parse {
         $value =~ s/\+/\ /g;
 
         # Unescape
-        $name  = b($name)->url_unescape->to_string;
-        $value = b($value)->url_unescape->to_string;
+        $name  = b($name)->url_unescape->decode($self->charset)->to_string;
+        $value = b($value)->url_unescape->decode($self->charset)->to_string;
 
         push @{$self->params}, $name, $value;
     }
@@ -211,6 +212,11 @@ L<Mojo::Parameters> is a container for form parameters.
 =head1 ATTRIBUTES
 
 L<Mojo::Parameters> implements the following attributes.
+
+=head2 C<charset>
+
+    my $charset = $params->charset;
+    $params     = $params->charset('UTF-8');
 
 =head2 C<pair_separator>
 

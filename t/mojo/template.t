@@ -25,7 +25,7 @@ package main;
 use strict;
 use warnings;
 
-use Test::More tests => 69;
+use Test::More tests => 70;
 
 use File::Spec;
 use File::Temp;
@@ -275,6 +275,14 @@ is($output, <<'EOF');
   &apos;foo&apos; =&gt; 23
 }
 EOF
+
+# Complicated XML auto escape
+$mt = Mojo::Template->new;
+$mt->auto_escape(1);
+$output = $mt->render(<<'EOF');
+<html><%= '<html>' for 1 .. 3 %></html>
+EOF
+is($output, "<html>&lt;html&gt;&lt;html&gt;&lt;html&gt;</html>\n");
 
 # Prepending code
 $mt = Mojo::Template->new;

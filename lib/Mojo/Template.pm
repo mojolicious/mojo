@@ -62,7 +62,7 @@ sub build {
                 # Escaped
                 my $a = $self->auto_escape;
                 if (($type eq 'escp' && !$a) || ($type eq 'expr' && $a)) {
-                    $lines[-1] .= "\$_M .= escape($value);";
+                    $lines[-1] .= "\$_M .= escape +$value;";
                 }
 
                 # Raw

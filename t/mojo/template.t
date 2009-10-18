@@ -266,10 +266,15 @@ is($output, "<html>&lt;html&gt;\n&amp;lt;&lt;</html>\n");
 # Complicated XML auto escape
 $mt = Mojo::Template->new;
 $mt->auto_escape(1);
-$output = $mt->render(<<'EOF');
-<html><%= '<html>' for 1 .. 3 %></html>
+$output = $mt->render(<<'EOF', {foo => 23});
+% use Data::Dumper;
+%= Data::Dumper->new([shift])->Maxdepth(2)->Indent(1)->Terse(1)->Dump
 EOF
-is($output, "<html>&lt;html&gt;&lt;html&gt;&lt;html&gt;</html>\n");
+is($output, <<'EOF');
+{
+  &apos;foo&apos; =&gt; 23
+}
+EOF
 
 # Prepending code
 $mt = Mojo::Template->new;

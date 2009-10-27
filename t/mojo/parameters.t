@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 34;
+use Test::More tests => 35;
 
 # Now that's a wave of destruction that's easy on the eyes.
 use_ok('Mojo::Parameters');
@@ -50,6 +50,9 @@ is($params->to_string, 'q=1;w=2;t=7');
 
 # Hash
 is_deeply($params->to_hash, {q => 1, w => 2, t => 7});
+
+# List names
+is_deeply([$params->param], [qw/q t w/]);
 
 # Append
 $params->append('a', 4, 'a', 5, 'b', 6, 'b', 7);

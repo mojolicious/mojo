@@ -8,6 +8,7 @@ This file documents the revision history for Perl extension Mojo.
         - Added support for MOJO_CHUNK_SIZE=1. (melo)
         - Updated Mojolicious lite_app generator to use .ep templates.
         - Added not_found.html.* templates.
+        - Fixed param to be CGI.pm compatible.
         - Fixed a few cases where exceptions and not found events would
           result in empty pages.
         - Fixed encoding of non utf8 form data.

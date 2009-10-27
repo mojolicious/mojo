@@ -59,6 +59,9 @@ sub param {
     my $self = shift;
     my $name = shift;
 
+    # List names
+    return sort keys %{$self->to_hash} unless $name;
+
     # Cleanup
     $self->remove($name) if defined $_[0];
 
@@ -67,7 +70,7 @@ sub param {
         $self->append($name, $value);
     }
 
-    # List
+    # List values
     my @values;
     my $params = $self->params;
     for (my $i = 0; $i < @$params; $i += 2) {

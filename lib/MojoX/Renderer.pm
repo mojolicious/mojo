@@ -77,15 +77,25 @@ sub render {
 
     # Text
     if ($c->stash->{text}) {
+
+        # Render
         $self->handler->{text}->($self, $c, \$output);
-        $c->stash->{inner_template} = $output if $c->stash->{layout};
+
+        # Layout?
+        $c->stash->{inner_template} = $output
+          if $c->stash->{layout} && !$partial;
     }
 
     # JSON
     elsif ($c->stash->{json}) {
+
+        # Render
         $self->handler->{json}->($self, $c, \$output);
         $format = 'json';
-        $c->stash->{inner_template} = $output if $c->stash->{layout};
+
+        # Layout?
+        $c->stash->{inner_template} = $output
+          if $c->stash->{layout} && !$partial;
     }
 
     # Template or templateless handler
@@ -95,11 +105,12 @@ sub render {
         return unless $self->_render_template($c, \$output, $options);
 
         # Layout?
-        $c->stash->{inner_template} = $output if $c->stash->{layout};
+        $c->stash->{inner_template} = $output
+          if $c->stash->{layout} && !$partial;
     }
 
     # Layout
-    if (my $layout = delete $c->stash->{layout}) {
+    if (!$partial && (my $layout = delete $c->stash->{layout})) {
 
         # Handler
         $handler = $c->stash->{handler} || $self->default_handler;

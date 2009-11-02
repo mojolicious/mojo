@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 94;
+use Test::More tests => 98;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -25,6 +25,16 @@ app->log->level('error');
 
 # Test with lite templates
 app->renderer->default_handler('epl');
+
+# GET /outerlayout
+get '/outerlayout' => sub {
+    my $self = shift;
+    $self->render(
+        template => 'outerlayout',
+        layout   => 'layout',
+        handler  => 'ep'
+    );
+};
 
 # GET /foo
 get '/foo' => sub {
@@ -96,6 +106,17 @@ get '/eperror' => sub { shift->render(handler => 'ep') } => 'eperror';
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
 my $app = Mojolicious::Lite->new;
 my $client = Mojo::Client->new(app => $app);
+
+# GET /outerlayout
+$client->get(
+    '/outerlayout' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body, "layouted Hello\nthere!\n\n\n");
+    }
+)->process;
 
 # GET /foo
 $client->get(
@@ -366,6 +387,13 @@ $client->get(
 $app->log->level($level);
 
 __DATA__
+@@ outerlayout.html.ep
+Hello
+<%== $self->render_partial('outermenu') %>
+
+@@ outermenu.html.ep
+there!
+
 @@ not_found.html.epl
 Oops!
 

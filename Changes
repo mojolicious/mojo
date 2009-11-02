@@ -25,6 +25,7 @@ This file documents the revision history for Perl extension Mojo.
         - Fixed param to be CGI.pm compatible.
         - Fixed a few cases where exceptions and not found events would
           result in empty pages.
+        - Fixed layouts with partial templates.
         - Fixed encoding of non utf8 form data.
         - Fixed body callbacks to get automatic buffering.
         - Fixed a case where Mojo::Server::Daemon and Mojo::Client were too

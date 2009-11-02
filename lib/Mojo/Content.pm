@@ -19,7 +19,9 @@ __PACKAGE__->attr([qw/body_cb filter progress_cb/]);
 __PACKAGE__->attr([qw/buffer filter_buffer/] => sub { Mojo::Buffer->new });
 __PACKAGE__->attr(headers                    => sub { Mojo::Headers->new });
 __PACKAGE__->attr(raw_header_size            => 0);
+__PACKAGE__->attr(relaxed                    => 0);
 
+__PACKAGE__->attr(_body_size => 0);
 __PACKAGE__->attr('_eof');
 
 sub body_contains {
@@ -180,6 +182,38 @@ sub parse {
     # Not chunked, pass through
     else { $self->buffer($self->filter_buffer) }
 
+    # Custom body parser
+    if (my $cb = $self->body_cb) {
+
+        # Chunked or relaxed content
+        if ($self->is_chunked || $self->relaxed) {
+            $self->$cb($self->buffer->empty);
+        }
+
+        # Normal content
+        else {
+
+            # Need
+            my $length = $self->headers->content_length || 0;
+            my $need = $length - $self->_body_size;
+
+            # Slurp
+            if ($need > 0) {
+                my $chunk = $self->buffer->remove($need);
+                $self->_body_size($self->_body_size + length $chunk);
+                $self->$cb($chunk);
+            }
+
+            # Done
+            $self->done if $length <= $self->raw_body_size;
+        }
+    }
+
+    # Leftovers
+    if ($self->is_done) {
+        $self->state('done_with_leftovers') if $self->has_leftovers;
+    }
+
     return $self;
 }
 
@@ -293,6 +327,11 @@ implements the following new ones.
         my $self = shift;
         print '+';
     });
+
+=head2 C<relaxed>
+
+    my $relaxed = $content->relaxed;
+    $content    = $content->relaxed(1);
 
 =head2 C<raw_header_size>
 

@@ -15,7 +15,6 @@ use Mojo::Content::MultiPart;
 use constant MAX_MEMORY_SIZE => $ENV{MOJO_MAX_MEMORY_SIZE} || 10240;
 
 __PACKAGE__->attr(asset => sub { Mojo::Asset::Memory->new });
-__PACKAGE__->attr(relaxed => 0);
 
 sub body_contains {
     my ($self, $chunk) = @_;
@@ -48,8 +47,8 @@ sub parse {
     # Parse headers and filter body
     $self->SUPER::parse(@_);
 
-    # Still parsing headers
-    return $self if $self->is_state('headers');
+    # Still parsing headers or using a custom body parser
+    return $self if $self->is_state('headers') || $self->body_cb;
 
     # Make sure we don't waste memory
     if ($self->asset->isa('Mojo::Asset::Memory')) {
@@ -120,11 +119,6 @@ implements the following new ones.
 
     my $asset = $content->asset;
     $content  = $content->asset(Mojo::Asset::Memory->new);
-
-=head2 C<relaxed>
-
-    my $relaxed = $content->relaxed;
-    $content    = $content->relaxed(1);
 
 =head1 METHODS
 

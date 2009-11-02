@@ -20,6 +20,7 @@ This file documents the revision history for Perl extension Mojo.
         - Added callback tests. (melo)
         - Added support for MOJO_CHUNK_SIZE=1. (melo)
         - Added not_found.html.* templates.
+        - Added input streaming support to Mojo::Content.
         - Updated Mojolicious lite_app generator to use .ep templates.
         - Fixed param to be CGI.pm compatible.
         - Fixed a few cases where exceptions and not found events would

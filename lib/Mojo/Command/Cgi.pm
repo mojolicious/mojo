@@ -33,7 +33,7 @@ sub run {
     # Run
     $cgi->run;
 
-    return shift;
+    return $self;
 }
 
 1;

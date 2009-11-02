@@ -20,154 +20,204 @@ use Mojo::Transaction::Single;
 # Amy's rich, she's probably got other characteristics...
 use_ok('MojoliciousTest');
 
-my $client = Mojo::Client->new;
+my $client = Mojo::Client->new(app => 'MojoliciousTest');
 
 # SyntaxError::foo (syntax error in controller)
-my $tx = Mojo::Transaction::Single->new_get('/syntax_error/foo');
-$client->process_app('MojoliciousTest', $tx);
-is($tx->res->code,                            500);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-like($tx->res->body, qr/Missing right curly/);
+$client->get(
+    '/syntax_error/foo' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            500);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        like($tx->res->body, qr/Missing right curly/);
+    }
+)->process;
 
 # Foo::syntaxerror (syntax error in template)
-$tx = Mojo::Transaction::Single->new_get('/foo/syntaxerror');
-$client->process_app('MojoliciousTest', $tx);
-is($tx->res->code,                            500);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-like($tx->res->body, qr/^Missing right curly/);
+$client->get(
+    '/foo/syntaxerror' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            500);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        like($tx->res->body, qr/^Missing right curly/);
+    }
+)->process;
 
 # Foo::badtemplate (template missing)
-$tx = Mojo::Transaction::Single->new_get('/foo/badtemplate');
-$client->process_app('MojoliciousTest', $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,                            '');
+$client->get(
+    '/foo/badtemplate' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            '');
+    }
+)->process;
 
 # Foo::test
-$tx =
-  Mojo::Transaction::Single->new_get('/foo/test', 'X-Test' => 'Hi there!');
-$client->process_app('MojoliciousTest', $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->header('X-Bender'),     'Kiss my shiny metal ass!');
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-like($tx->res->body, qr/\/bar\/test/);
+$client->get(
+    '/foo/test' => ('X-Test' => 'Hi there!') => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                        200);
+        is($tx->res->headers->header('X-Bender'), 'Kiss my shiny metal ass!');
+        is($tx->res->headers->server,             'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        like($tx->res->body, qr/\/bar\/test/);
+    }
+)->process;
 
 # Foo::index
-$tx = Mojo::Transaction::Single->new_get('/foo', 'X-Test' => 'Hi there!');
-$client->process_app('MojoliciousTest', $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->content_type,           'text/html');
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-like($tx->res->body, qr/<body>\n23Hello Mojo from the template \/foo! He/);
+$client->get(
+    '/foo' => ('X-Test' => 'Hi there!') => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->content_type,           'text/html');
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        like($tx->res->body,
+            qr/<body>\n23Hello Mojo from the template \/foo! He/);
+    }
+)->process;
 
 # Foo::Bar::index
-$tx = Mojo::Transaction::Single->new_get('/foo-bar', 'X-Test' => 'Hi there!');
-$client->process_app('MojoliciousTest', $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->content_type,           'text/html');
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-like($tx->res->body, qr/Hello Mojo from the other template \/foo-bar!/);
+$client->get(
+    '/foo-bar' => ('X-Test' => 'Hi there!') => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->content_type,           'text/html');
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        like($tx->res->body,
+            qr/Hello Mojo from the other template \/foo-bar!/);
+    }
+)->process;
 
 # Foo::something
-$tx = Mojo::Transaction::Single->new_get('/test4', 'X-Test' => 'Hi there!');
-$client->process_app('MojoliciousTest', $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,                            '/test4/42');
+$client->get(
+    '/test4' => ('X-Test' => 'Hi there!') => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            '/test4/42');
+    }
+)->process;
 
 # Foo::templateless
-$tx = Mojo::Transaction::Single->new_get('/foo/templateless',
-    'X-Test' => 'Hi there!');
-$client->process_app('MojoliciousTest', $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-like($tx->res->body, qr/Hello Mojo from a templateless renderer!/);
+$client->get(
+    '/foo/templateless' => ('X-Test' => 'Hi there!') => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        like($tx->res->body, qr/Hello Mojo from a templateless renderer!/);
+    }
+)->process;
 
 # Foo::withlayout
-$tx = Mojo::Transaction::Single->new_get('/foo/withlayout',
-    'X-Test' => 'Hi there!');
-$client->process_app('MojoliciousTest', $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-like($tx->res->body, qr/Same old in green Seems to work!/);
+$client->get(
+    '/foo/withlayout' => ('X-Test' => 'Hi there!') => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        like($tx->res->body, qr/Same old in green Seems to work!/);
+    }
+)->process;
 
 # MojoliciousTest2::Foo::test
-$tx = Mojo::Transaction::Single->new_get('/test2', 'X-Test' => 'Hi there!');
-$client->process_app('MojoliciousTest', $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->header('X-Bender'),     'Kiss my shiny metal ass!');
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-like($tx->res->body, qr/\/test2/);
+$client->get(
+    '/test2' => ('X-Test' => 'Hi there!') => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                        200);
+        is($tx->res->headers->header('X-Bender'), 'Kiss my shiny metal ass!');
+        is($tx->res->headers->server,             'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        like($tx->res->body, qr/\/test2/);
+    }
+)->process;
 
 # MojoliciousTestController::index
-$tx = Mojo::Transaction::Single->new_get('/test3', 'X-Test' => 'Hi there!');
-$client->process_app('MojoliciousTest', $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->header('X-Bender'),     'Kiss my shiny metal ass!');
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-like($tx->res->body, qr/No class works!/);
+$client->get(
+    '/test3' => ('X-Test' => 'Hi there!') => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                        200);
+        is($tx->res->headers->header('X-Bender'), 'Kiss my shiny metal ass!');
+        is($tx->res->headers->server,             'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        like($tx->res->body, qr/No class works!/);
+    }
+)->process;
 
 # 404
-$tx = Mojo::Transaction::Single->new_get('/', 'X-Test' => 'Hi there!');
-$client->process_app('MojoliciousTest', $tx);
-is($tx->res->code,                            404);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-like($tx->res->body, qr/File Not Found/);
+$client->get(
+    '/' => ('X-Test' => 'Hi there!') => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            404);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        like($tx->res->body, qr/File Not Found/);
+    }
+)->process;
 
 # SyntaxError::foo in production mode (syntax error in controller)
 my $backup = $ENV{MOJO_MODE} || '';
 $ENV{MOJO_MODE} = 'production';
-$tx = Mojo::Transaction::Single->new_get('/syntax_error/foo');
-$client->process_app('MojoliciousTest', $tx);
-is($tx->res->code,                            500);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-like($tx->res->body, qr/Internal Server Error/);
+$client->get(
+    '/syntax_error/foo' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            500);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        like($tx->res->body, qr/Internal Server Error/);
+    }
+)->process;
 $ENV{MOJO_MODE} = $backup;
 
 # Foo::syntaxerror in production mode (syntax error in template)
 $backup = $ENV{MOJO_MODE} || '';
 $ENV{MOJO_MODE} = 'production';
-$tx = Mojo::Transaction::Single->new_get('/foo/syntaxerror');
-$client->process_app('MojoliciousTest', $tx);
-is($tx->res->code,                            500);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-like($tx->res->body, qr/Internal Server Error/);
+$client->get(
+    '/foo/syntaxerror' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            500);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        like($tx->res->body, qr/Internal Server Error/);
+    }
+)->process;
 $ENV{MOJO_MODE} = $backup;
 
 # Static file /hello.txt in a production mode
 $backup = $ENV{MOJO_MODE} || '';
 $ENV{MOJO_MODE} = 'production';
-$tx = Mojo::Transaction::Single->new_get('/hello.txt');
-$client->process_app('MojoliciousTest', $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->content_type,           'text/plain');
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-like($tx->res->content->asset->slurp, qr/Hello Mojo from a static file!/);
+$client->get(
+    '/hello.txt' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->content_type,           'text/plain');
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        like(
+            $tx->res->content->asset->slurp,
+            qr/Hello Mojo from a static file!/
+        );
+    }
+)->process;
 $ENV{MOJO_MODE} = $backup;
 
 # Try to access a file which is not under the web root via path
 # traversal in production mode
 $backup = $ENV{MOJO_MODE} || '';
 $ENV{MOJO_MODE} = 'production';
-$tx = Mojo::Transaction::Single->new_get('../../mojolicious/secret.txt');
-$client->process_app('MojoliciousTest', $tx);
-is($tx->res->code, 404);
-unlike($tx->res->content->asset->slurp, qr/Secret file/);
+$client->get(
+    '../../mojolicious/secret.txt' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code, 404);
+        unlike($tx->res->content->asset->slurp, qr/Secret file/);
+    }
+)->process;
 $ENV{MOJO_MODE} = $backup;
 
 # Check Last-Modified header for static files
@@ -178,38 +228,46 @@ my $mtime = Mojo::Date->new(stat($path)->mtime)->to_string;
 # Static file /hello.txt in a development mode
 $backup = $ENV{MOJO_MODE} || '';
 $ENV{MOJO_MODE} = 'development';
-$tx = Mojo::Transaction::Single->new_get('/hello.txt');
-$client->process_app('MojoliciousTest', $tx);
-is($tx->res->code,                  200);
-is($tx->res->headers->content_type, 'text/plain');
-is($tx->res->headers->header('Last-Modified'),
-    $mtime, 'Last-Modified header is set correctly');
-is($tx->res->headers->content_length,
-    $stat->size, 'Content-Length is set correctly');
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-like($tx->res->content->asset->slurp,
-    qr/Hello Mojo from a development static file!/);
+$client->get(
+    '/hello.txt' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                  200);
+        is($tx->res->headers->content_type, 'text/plain');
+        is($tx->res->headers->header('Last-Modified'),
+            $mtime, 'Last-Modified header is set correctly');
+        is($tx->res->headers->content_length,
+            $stat->size, 'Content-Length is set correctly');
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        like($tx->res->content->asset->slurp,
+            qr/Hello Mojo from a development static file!/);
+    }
+)->process;
 $ENV{MOJO_MODE} = $backup;
 
 # Try to access a file which is not under the web root via path
 # traversal in development mode
 $backup = $ENV{MOJO_MODE} || '';
 $ENV{MOJO_MODE} = 'development';
-$tx = Mojo::Transaction::Single->new_get('../../mojolicious/secret.txt');
-$client->process_app('MojoliciousTest', $tx);
-is($tx->res->code, 404);
-unlike($tx->res->content->asset->slurp, qr/Secret file/);
+$client->get(
+    '../../mojolicious/secret.txt' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code, 404);
+        unlike($tx->res->content->asset->slurp, qr/Secret file/);
+    }
+)->process;
 $ENV{MOJO_MODE} = $backup;
 
 # Check If-Modified-Since
 $ENV{MOJO_MODE} = 'development';
-$tx = Mojo::Transaction::Single->new_get('/hello.txt');
-$tx->req->headers->header('If-Modified-Since', $mtime);
-$client->process_app('MojoliciousTest', $tx);
-is($tx->res->code, 304, 'Setting If-Modified-Since triggers 304');
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+$client->get(
+    '/hello.txt' => ('If-Modified-Since' => $mtime) => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code, 304, 'Setting If-Modified-Since triggers 304');
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+    }
+)->process;
 $ENV{MOJO_MODE} = $backup;
 
 # Make sure we can override attributes with constructor arguments
@@ -218,80 +276,114 @@ is($app->mode, 'test');
 
 # Persistent error
 $app = MojoliciousTest->new;
-$tx  = Mojo::Transaction::Single->new_get('/foo');
+my $tx = Mojo::Transaction::Single->new;
+$tx->req->method('GET');
+$tx->req->url->parse('/foo');
 $app->handler($tx);
 is($tx->res->code, 200);
 like($tx->res->body, qr/Hello Mojo from the template \/foo! Hello World!/);
-$tx = Mojo::Transaction::Single->new_get('/foo/willdie');
+$tx = Mojo::Transaction::Single->new;
+$tx->req->method('GET');
+$tx->req->url->parse('/foo/willdie');
 $app->handler($tx);
 is($tx->res->code, 500);
 like($tx->res->body, qr/Foo\.pm/);
-$tx = Mojo::Transaction::Single->new_get('/foo');
+$tx = Mojo::Transaction::Single->new;
+$tx->req->method('GET');
+$tx->req->url->parse('/foo');
 $app->handler($tx);
 is($tx->res->code, 200);
 like($tx->res->body, qr/Hello Mojo from the template \/foo! Hello World!/);
 
+$client = Mojo::Client->new(app => 'SingleFileTestApp');
+
 # SingleFileTestApp::Foo::index
-$tx = Mojo::Transaction::Single->new_get('/foo');
-$client->process_app('SingleFileTestApp', $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-like($tx->res->body, qr/Same old in green Seems to work!/);
+$client->get(
+    '/foo' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        like($tx->res->body, qr/Same old in green Seems to work!/);
+    }
+)->process;
 
 # SingleFileTestApp::Foo::data_template
-$tx = Mojo::Transaction::Single->new_get('/foo/data_template');
-$client->process_app('SingleFileTestApp', $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,                            "23 works!\n");
+$client->get(
+    '/foo/data_template' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            "23 works!\n");
+    }
+)->process;
 
 # SingleFileTestApp::Foo::data_template
-$tx = Mojo::Transaction::Single->new_get('/foo/data_template2');
-$client->process_app('SingleFileTestApp', $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,                            "This one works too!\n");
+$client->get(
+    '/foo/data_template2' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body, "This one works too!\n");
+    }
+)->process;
 
 # SingleFileTestApp::Foo::bar
-$tx = Mojo::Transaction::Single->new_get('/foo/bar');
-$client->process_app('SingleFileTestApp', $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->header('X-Bender'),     'Kiss my shiny metal ass!');
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,                            '/foo/bar');
+$client->get(
+    '/foo/bar' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                        200);
+        is($tx->res->headers->header('X-Bender'), 'Kiss my shiny metal ass!');
+        is($tx->res->headers->server,             'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            '/foo/bar');
+    }
+)->process;
 
 # SingleFileTestApp::Baz::does_not_exist
-$tx = Mojo::Transaction::Single->new_get('/baz/does_not_exist');
-$client->process_app('SingleFileTestApp', $tx);
-is($tx->res->code,                            404);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-like($tx->res->body, qr/File Not Found/);
+$client->get(
+    '/baz/does_not_exist' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            404);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        like($tx->res->body, qr/File Not Found/);
+    }
+)->process;
+
+$client = Mojo::Client->new(app => 'MojoliciousTest');
 
 # MojoliciousTestController::Foo::stage2
-$tx = Mojo::Transaction::Single->new_get('/staged', 'X-Pass' => 1);
-$client->process_app('MojoliciousTest', $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,                            'Welcome aboard!');
+$client->get(
+    '/staged' => ('X-Pass' => 1) => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            'Welcome aboard!');
+    }
+)->process;
 
 # MojoliciousTestController::Foo::stage1
-$tx = Mojo::Transaction::Single->new_get('/staged');
-$client->process_app('MojoliciousTest', $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,                            'Go away!');
+$client->get(
+    '/staged' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            'Go away!');
+    }
+)->process;
 
 # MojoliciousTest::Foo::config
-$tx = Mojo::Transaction::Single->new_get('/stash_config');
-$client->process_app('MojoliciousTest', $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,                            '123');
+$client->get(
+    '/stash_config' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            '123');
+    }
+)->process;

@@ -299,12 +299,6 @@ sub keep_alive {
     return $self->{keep_alive};
 }
 
-sub new_delete { shift->_builder('DELETE', @_) }
-sub new_get    { shift->_builder('GET',    @_) }
-sub new_head   { shift->_builder('HEAD',   @_) }
-sub new_post   { shift->_builder('POST',   @_) }
-sub new_put    { shift->_builder('PUT',    @_) }
-
 sub server_accept {
     my $self = shift;
 
@@ -477,26 +471,6 @@ sub server_written {
     return $self;
 }
 
-sub _builder {
-    my $class = shift;
-    my $self  = $class->new;
-    my $req   = $self->req;
-
-    # Method
-    $req->method(shift);
-
-    # URL
-    $req->url->parse(shift);
-
-    # Headers
-    my $headers = ref $_[0] eq 'HASH' ? $_[0] : {@_};
-    for my $name (keys %$headers) {
-        $req->headers->header($name, $headers->{$name});
-    }
-
-    return $self;
-}
-
 # Replace client response after receiving 100 Continue
 sub _new_response {
     my $self = shift;
@@ -604,51 +578,6 @@ and implements the following new ones.
 =head2 C<client_written>
 
     $tx = $tx->client_written($length);
-
-=head2 C<new_delete>
-
-    my $tx = Mojo::Transaction::Single->new_delete('http://127.0.0.1',
-        User-Agent => 'Mojo'
-    );
-    my $tx = Mojo::Transaction::Single->new_delete('http://127.0.0.1', {
-        User-Agent => 'Mojo'
-    });
-
-=head2 C<new_get>
-
-    my $tx = Mojo::Transaction::Single->new_get('http://127.0.0.1',
-        User-Agent => 'Mojo'
-    );
-    my $tx = Mojo::Transaction::Single->new_get('http://127.0.0.1', {
-        User-Agent => 'Mojo'
-    });
-
-=head2 C<new_head>
-
-    my $tx = Mojo::Transaction::Single->new_head('http://127.0.0.1',
-        User-Agent => 'Mojo'
-    );
-    my $tx = Mojo::Transaction::Single->new_head('http://127.0.0.1', {
-        User-Agent => 'Mojo'
-    });
-
-=head2 C<new_post>
-
-    my $tx = Mojo::Transaction::Single::Single->new_post('http://127.0.0.1',
-        User-Agent => 'Mojo'
-    );
-    my $tx = Mojo::Transaction::Single::Single->new_post('http://127.0.0.1', {
-        User-Agent => 'Mojo'
-    });
-
-=head2 C<new_put>
-
-    my $tx = Mojo::Transaction::Single->new_put('http://127.0.0.1',
-        User-Agent => 'Mojo'
-    );
-    my $tx = Mojo::Transaction::Single->new_put('http://127.0.0.1', {
-        User-Agent => 'Mojo'
-    });
 
 =head2 C<server_accept>
 

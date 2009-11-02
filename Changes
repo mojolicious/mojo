@@ -1,13 +1,26 @@
 This file documents the revision history for Perl extension Mojo.
 
-0.991252 2009-09-01 00:00:00
+0.999901 2009-09-01 00:00:00
+        - Added new Mojo::Client, because the old one had bugs that prevented
+          proper scaling and could not be fixed otherwise.
+          Note that this change is not backwards compatible, the decision to
+          make it so close to the 1.0 release was not easy but the bugs were
+          simply too serious.
         - Added native JSON support.
         - Added more designer friendly .ep templates to Mojolicious.
+          The default template format for your application can be controlled
+          with the default_handler attribute of the mojolicious renderer.
+              Mojolicious (in the startup method):
+                  $self->renderer->default_handler('epl');
+                  $self->renderer->default_handler('ep');
+	          Mojolicious::Lite:
+	              app->renderer->default_handler('epl');
+	              app->renderer->default_handler('ep');
         - Added helper support for .ep templates.
         - Added callback tests. (melo)
         - Added support for MOJO_CHUNK_SIZE=1. (melo)
-        - Updated Mojolicious lite_app generator to use .ep templates.
         - Added not_found.html.* templates.
+        - Updated Mojolicious lite_app generator to use .ep templates.
         - Fixed param to be CGI.pm compatible.
         - Fixed a few cases where exceptions and not found events would
           result in empty pages.

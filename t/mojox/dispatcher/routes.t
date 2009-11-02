@@ -60,14 +60,20 @@ $d->route('/foo/(capture)')->to(controller => 'foo', action => 'bar');
 
 # 404 clean stash
 $c->reset_state;
-$c->tx(Mojo::Transaction::Single->new_post('/not_found'));
+my $tx = Mojo::Transaction::Single->new;
+$tx->req->method('GET');
+$tx->req->url->parse('/not_found');
+$c->tx($tx);
 is($d->dispatch($c), 1);
 is_deeply($c->stash, {});
 ok(!$c->render_called);
 
 # No escaping
 $c->reset_state;
-$c->tx(Mojo::Transaction::Single->new_post('/foo/hello'));
+$tx = Mojo::Transaction::Single->new;
+$tx->req->method('POST');
+$tx->req->url->parse('/foo/hello');
+$c->tx($tx);
 is($d->dispatch($c), '');
 is_deeply($c->stash,
     {controller => 'foo', action => 'bar', capture => 'hello'});
@@ -75,7 +81,10 @@ ok($c->render_called);
 
 # Escaping
 $c->reset_state;
-$c->tx(Mojo::Transaction::Single->new_post('/foo/hello%20there'));
+$tx = Mojo::Transaction::Single->new;
+$tx->req->method('GET');
+$tx->req->url->parse('/foo/hello%20there');
+$c->tx($tx);
 is($d->dispatch($c), '');
 is_deeply($c->stash,
     {controller => 'foo', action => 'bar', capture => 'hello there'});
@@ -83,10 +92,10 @@ ok($c->render_called);
 
 # Escaping utf8
 $c->reset_state;
-$c->tx(
-    Mojo::Transaction::Single->new_post(
-        '/foo/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82')
-);
+$tx = Mojo::Transaction::Single->new;
+$tx->req->method('GET');
+$tx->req->url->parse('/foo/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82');
+$c->tx($tx);
 is($d->dispatch($c), '');
 is_deeply($c->stash,
     {controller => 'foo', action => 'bar', capture => 'привет'});

@@ -27,6 +27,9 @@ sub new {
 sub handler {
     my ($self, $tx) = @_;
 
+    # Default to 200
+    $tx->res->code(200);
+
     # Dispatch to diagnostics functions
     return $self->_diag($tx) if $tx->req->url->path =~ m|^/diag|;
 

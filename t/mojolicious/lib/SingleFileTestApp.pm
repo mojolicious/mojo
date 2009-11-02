@@ -15,6 +15,9 @@ sub startup {
     $self->log->path(undef);
     $self->log->level('fatal');
 
+    # Default handler
+    $self->renderer->default_handler('epl');
+
     # /*/* - the default route
     $self->routes->route('/:controller/:action')->to(action => 'index');
 }

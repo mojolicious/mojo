@@ -23,8 +23,10 @@ my $server = Test::Mojo::Server->new;
 $server->start_daemon_prefork_ok;
 
 # Request
-my $port   = $server->port;
-my $tx     = Mojo::Transaction::Single->new_get("http://127.0.0.1:$port/");
+my $port = $server->port;
+my $tx   = Mojo::Transaction::Single->new;
+$tx->req->method('GET');
+$tx->req->url->parse("http://127.0.0.1:$port/");
 my $client = Mojo::Client->new;
 $client->process($tx);
 is($tx->res->code, 200);

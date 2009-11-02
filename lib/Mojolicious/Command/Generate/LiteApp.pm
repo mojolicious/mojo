@@ -35,8 +35,6 @@ __DATA__
 
 use Mojolicious::Lite;
 
-app->renderer->default_handler('ep');
-
 get '/' => 'index';
 
 get '/:groovy' => sub {

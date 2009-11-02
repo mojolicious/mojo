@@ -9,7 +9,7 @@ use Test::More;
 
 plan skip_all => 'set TEST_CLIENT to enable this test'
   unless $ENV{TEST_CLIENT};
-plan tests => 40;
+plan tests => 52;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -17,9 +17,50 @@ use_ok('Mojo::Client');
 use_ok('Mojo::Transaction::Pipeline');
 use_ok('Mojo::Transaction::Single');
 
-# Chunked request
 my $client = Mojo::Client->new;
-my $tx     = Mojo::Transaction::Single->new_get('http://google.com');
+
+# Simple request
+$client->get(
+    'http://kraih.com' => sub {
+        my ($self, $tx) = @_;
+        is($tx->req->method, 'GET');
+        is($tx->req->url,    'http://kraih.com');
+        is($tx->res->code,   200);
+    }
+)->process;
+
+# Simple parallel requests with keep alive
+$client->get(
+    'http://labs.kraih.com' => sub {
+        my ($self, $tx) = @_;
+        is($tx->req->method, 'GET');
+        is($tx->req->url,    'http://labs.kraih.com');
+        is($tx->res->code,   301);
+    }
+);
+$client->get(
+    'http://kraih.com' => sub {
+        my ($self, $tx) = @_;
+        is($tx->req->method, 'GET');
+        is($tx->req->url,    'http://kraih.com');
+        is($tx->res->code,   200);
+        is($tx->kept_alive,  1);
+    }
+);
+$client->get(
+    'http://mojolicious.org' => sub {
+        my ($self, $tx) = @_;
+        is($tx->req->method, 'GET');
+        is($tx->req->url,    'http://mojolicious.org');
+        is($tx->res->code,   200);
+    }
+);
+$client->process;
+
+# Custom chunked request without callback
+my $tx = Mojo::Transaction::Single->new;
+$tx->req->method('GET');
+$tx->req->url->parse('http://google.com');
 $tx->req->headers->transfer_encoding('chunked');
 my $counter = 1;
 my $chunked = Mojo::Filter::Chunked->new;
@@ -36,59 +77,53 @@ $tx->req->body(
 $client->process($tx);
 ok($tx->is_done);
 
-# Parallel async io
-$tx =
-  Mojo::Transaction::Single->new_post('http://kraih.com',
-    Expect => '100-continue');
-$tx->req->body('foo bar baz');
-my $tx2 =
-  Mojo::Transaction::Single->new_get('http://labs.kraih.com',
-    Expect => '100-continue');
-$tx2->req->body('foo bar baz');
-my @transactions = ($tx, $tx2);
-
-while (1) {
-    $client->spin(@transactions);
-    my @buffer;
-    while (my $transaction = shift @transactions) {
-        unless ($transaction->is_finished) {
-            push @buffer, $transaction;
-        }
+# Custom requests with keep alive
+$tx = Mojo::Transaction::Single->new;
+$tx->req->method('GET');
+$tx->req->url->parse('http://labs.kraih.com');
+ok(!$tx->kept_alive);
+$client->queue(
+    $tx => sub {
+        my ($self, $tx) = @_;
+        ok($tx->is_done);
+        ok($tx->kept_alive);
     }
-    push @transactions, @buffer;
-    last unless @transactions;
-}
-is($tx->res->code,  200);
-is($tx->continued,  1);
-is($tx2->res->code, 301);
-is($tx2->continued, 1);
-
-# Test keep-alive
-$tx = Mojo::Transaction::Single->new_get('http://labs.kraih.com');
-ok(!$tx->kept_alive);
-
-# First time, new connection
-$client->process($tx);
+);
+$client->process;
 ok($tx->is_done);
+$tx = Mojo::Transaction::Single->new;
+$tx->req->method('GET');
+$tx->req->url->parse('http://labs.kraih.com');
 ok(!$tx->kept_alive);
-
-# Second time, reuse connection
-$tx = Mojo::Transaction::Single->new_get('http://labs.kraih.com');
-ok(!$tx->kept_alive);
-$client->process($tx);
+$client->process(
+    $tx => sub {
+        my ($self, $tx) = @_;
+        ok($tx->is_done);
+        ok($tx->kept_alive);
+        ok($tx->local_address);
+        ok($tx->local_port > 0);
+        is($tx->remote_address, '88.198.25.164');
+        is($tx->remote_port,    80);
+    }
+);
 ok($tx->is_done);
-ok($tx->kept_alive);
-ok($tx->local_address);
-ok($tx->local_port > 0);
-is($tx->remote_address, '88.198.25.164');
-is($tx->remote_port,    80);
 
-# Pipelined
-$tx  = Mojo::Transaction::Single->new_get('http://labs.kraih.com');
-$tx2 = Mojo::Transaction::Single->new_get('http://mojolicious.org');
-my $tx3 = Mojo::Transaction::Single->new_get('http://kraih.com');
-$client->process_all(Mojo::Transaction::Pipeline->new($tx, $tx2), $tx3);
-ok($tx->is_done);
+# Custom pipelined requests
+$tx = Mojo::Transaction::Single->new;
+$tx->req->method('GET');
+$tx->req->url->parse('http://labs.kraih.com');
+my $tx2 = Mojo::Transaction::Single->new;
+$tx2->req->method('GET');
+$tx2->req->url->parse('http://mojolicious.org');
+my $tx3 = Mojo::Transaction::Single->new;
+$tx3->req->method('GET');
+$tx3->req->url->parse('http://kraih.com');
+$client->process(
+    (Mojo::Transaction::Pipeline->new($tx, $tx2), $tx3) => sub {
+        my ($self, $tx) = @_;
+        ok($tx->is_done);
+    }
+);
 ok($tx2->is_done);
 ok($tx3->is_done);
 is($tx->res->code,  301);
@@ -96,14 +131,40 @@ is($tx2->res->code, 200);
 is($tx3->res->code, 200);
 like($tx2->res->content->asset->slurp, qr/Mojolicious/);
 
-# Pipelined with 100 Continue
-$tx  = Mojo::Transaction::Single->new_get('http://labs.kraih.com');
-$tx2 = Mojo::Transaction::Single->new_get('http://mojolicious.org');
+# Custom pipelined HEAD request
+$tx = Mojo::Transaction::Single->new;
+$tx->req->method('HEAD');
+$tx->req->url->parse('http://labs.kraih.com/blog/');
+$tx2 = Mojo::Transaction::Single->new;
+$tx2->req->method('GET');
+$tx2->req->url->parse('http://mojolicious.org');
+$client->process(
+    Mojo::Transaction::Pipeline->new($tx, $tx2) => sub {
+        my ($self, $tx) = @_;
+        ok($tx->is_done);
+    }
+);
+ok($tx2->is_done);
+is($tx->res->code,  200);
+is($tx2->res->code, 200);
+like($tx2->res->content->asset->slurp, qr/Mojolicious/);
+
+# Custom pipelined requests with 100 Continue
+$tx = Mojo::Transaction::Single->new;
+$tx->req->method('GET');
+$tx->req->url->parse('http://labs.kraih.com');
+$tx2 = Mojo::Transaction::Single->new;
+$tx2->req->method('GET');
+$tx2->req->url->parse('http://mojolicious.org');
 $tx2->req->headers->expect('100-continue');
 $tx2->req->body('foo bar baz');
-$tx3 = Mojo::Transaction::Single->new_get('http://labs.kraih.com/blog/');
-my $tx4 = Mojo::Transaction::Single->new_get('http://labs.kraih.com/blog');
-$client->process_all(Mojo::Transaction::Pipeline->new($tx, $tx2, $tx3, $tx4));
+$tx3 = Mojo::Transaction::Single->new;
+$tx3->req->method('GET');
+$tx3->req->url->parse('http://labs.kraih.com/blog/');
+my $tx4 = Mojo::Transaction::Single->new;
+$tx4->req->method('GET');
+$tx4->req->url->parse('http://labs.kraih.com/blog');
+$client->process(Mojo::Transaction::Pipeline->new($tx, $tx2, $tx3, $tx4));
 ok($tx->is_done);
 ok($tx2->is_done);
 ok($tx3->is_done);
@@ -113,14 +174,4 @@ is($tx2->res->code, 200);
 is($tx2->continued, 1);
 is($tx3->res->code, 200);
 is($tx4->res->code, 301);
-like($tx2->res->content->asset->slurp, qr/Mojolicious/);
-
-# Pipelined head
-$tx  = Mojo::Transaction::Single->new_head('http://labs.kraih.com/blog/');
-$tx2 = Mojo::Transaction::Single->new_get('http://mojolicious.org');
-$client->process(Mojo::Transaction::Pipeline->new($tx, $tx2));
-ok($tx->is_done);
-ok($tx2->is_done);
-is($tx->res->code,  200);
-is($tx2->res->code, 200);
 like($tx2->res->content->asset->slurp, qr/Mojolicious/);

@@ -6,276 +6,119 @@ use strict;
 use warnings;
 
 use base 'Mojo::Base';
+use bytes;
 
-use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
-use IO::Socket::INET;
+use Mojo::IOLoop;
 use Mojo::Server;
 use Mojo::Transaction::Pipeline;
+use Mojo::Transaction::Single;
 use Socket;
 
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
-
+__PACKAGE__->attr([qw/app default_cb/]);
 __PACKAGE__->attr(continue_timeout   => 5);
+__PACKAGE__->attr(ioloop             => sub { Mojo::IOLoop->new });
 __PACKAGE__->attr(keep_alive_timeout => 15);
 
-__PACKAGE__->attr(_connections => sub { [] });
+__PACKAGE__->attr([qw/_app_queue _cache/] => sub { [] });
+__PACKAGE__->attr(_connections            => sub { {} });
+__PACKAGE__->attr([qw/_finite _queued/]   => 0);
 
-sub connect {
-    my ($self, $tx) = @_;
+sub new {
+    my $self = shift->SUPER::new(@_);
 
-    # Info
-    my ($scheme, $host, $port) = $tx->client_info;
+    # Connect callback
+    $self->ioloop->connect_cb(
+        sub {
+            my ($loop, $c) = @_;
 
-    # Address
-    my $address =
-        $host =~ /\b(?:\d{1,3}\.){3}\d{1,3}\b/
-      ? $host
-      : inet_ntoa(inet_aton($host));
-
-    # Try to get a cached connection
-    my $connection = $self->withdraw_connection("$scheme:$host:$port");
-    $tx->kept_alive(1) if $connection;
-
-    # Non blocking connect
-    unless ($connection) {
-        $connection = $self->open_connection($scheme, $address, $port);
-        $tx->{_connect_timeout} = time + 5;
-    }
-    $tx->connection($connection);
-
-    # State machine
-    $tx->client_connect;
-
-    return $self;
-}
-
-sub disconnect {
-    my ($self, $tx) = @_;
-
-    my ($scheme, $host, $port) = $tx->client_info;
-
-    # Deposit connection for later or kill socket
-    $tx->keep_alive
-      ? $self->deposit_connection("$scheme:$host:$port", $tx->connection)
-      : $tx->connection(undef);
-
-    return $self;
-}
-
-sub deposit_connection {
-    my ($self, $name, $connection, $timeout) = @_;
-
-    # Drop connections after 30 seconds from queue
-    $timeout ||= $self->keep_alive_timeout;
-
-    # Store socket if it is in a good state
-    if ($self->test_connection($connection)) {
-        push @{$self->_connections}, [$name, $connection, time + $timeout];
-        return 1;
-    }
-    return;
-}
-
-sub open_connection {
-    my ($self, $scheme, $address, $port) = @_;
-
-    # New connection
-    my $connection = IO::Socket::INET->new(
-        Proto => 'tcp',
-        Type  => SOCK_STREAM
+            # Connected
+            $self->_connect($c);
+        }
     );
 
-    # Non blocking
-    $connection->blocking(0);
-
-    # Connect
-    my $sin = sockaddr_in($port, inet_aton($address));
-    $connection->connect($sin);
-
-    return $connection;
+    return $self;
 }
 
-# Marge, I'm going to Moe's. Send the kids to the neighbors,
-# I'm coming back loaded!
+sub delete { shift->_build_tx('DELETE', @_) }
+sub get    { shift->_build_tx('GET',    @_) }
+sub head   { shift->_build_tx('HEAD',   @_) }
+sub post   { shift->_build_tx('POST',   @_) }
+
 sub process {
     my $self = shift;
-    while (1) { last if $self->spin(@_) }
-    return $self;
-}
 
-sub process_all {
-    my ($self, @transactions) = @_;
+    # Queue transactions
+    $self->queue(@_) if @_;
 
-    # Process until all transactions are finished
-    my @progress = @transactions;
-    while (1) {
+    # Process app
+    return $self->_app_process if $self->app;
 
-        # Process
-        $self->process(@progress);
+    # Loop is finite
+    $self->_finite(1);
 
-        # Check
-        @progress = ();
-        for my $tx (@transactions) {
-            push @progress, $tx unless $tx->is_finished;
-        }
+    # Start IOLoop
+    $self->ioloop->start;
 
-        # Done
-        last unless @progress;
-    }
+    # Cleanup
+    $self->_finite(undef);
 
     return $self;
 }
 
-sub process_app {
+sub put { shift->_build_tx('PUT', @_) }
+
+sub queue {
     my $self = shift;
-    while (1) { last if $self->spin_app(@_) }
+
+    # Callback
+    my $cb = pop @_ if ref $_[-1] && ref $_[-1] eq 'CODE';
+
+    # Queue transactions
+    $self->_queue($_, $cb) for @_;
+
     return $self;
 }
 
-sub spin {
-    my ($self, @transactions) = @_;
+sub _app_handle {
+    my ($self, $daemon, $server) = @_;
 
-    # Name to transaction map for fast lookups
-    my %transaction;
+    # Handle continue
+    if ($server->is_state('handle_continue')) {
 
-    # Prepare
-    my $done;
-    for my $tx (@transactions) {
+        # Continue handler
+        $daemon->continue_handler_cb->($daemon, $server->server_tx);
 
-        # Sanity check
-        if ($tx->has_error) {
-            $done++;
-            next;
-        }
-
-        # Connect transaction
-        $self->connect($tx) if $tx->is_state('start');
-
-        # Check connect status
-        if (!$tx->connection->connected) {
-            if (time > $tx->{_connect_timeout}) {
-                $tx->error("Couldn't connect to peer before timeout.");
-                $done++;
-            }
-            next;
-        }
-
-        # Connected
-        elsif ($tx->is_state('connect')) {
-
-            # Timeout
-            $tx->continue_timeout($self->continue_timeout);
-
-            # Store connection information
-            my ($lport, $laddr) = sockaddr_in(getsockname($tx->connection));
-            $tx->local_address(inet_ntoa($laddr));
-            $tx->local_port($lport);
-            my ($rport, $raddr) = sockaddr_in(getpeername($tx->connection));
-            $tx->remote_address(inet_ntoa($raddr));
-            $tx->remote_port($rport);
-
-            # State machine
-            $tx->client_connected;
-        }
-
-        # State machine
-        $tx->client_spin;
-
-        # Map
-        my $name = $self->_socket_name($tx->connection);
-        $transaction{$name} = $tx;
-
-        # Done?
-        if ($tx->is_done) {
-            $done++;
-
-            # Disconnect
-            $self->disconnect($tx) if $tx->is_done;
-        }
-    }
-    return 1 if $done;
-
-    # Sort read/write sockets
-    my $poll    = IO::Poll->new;
-    my $waiting = 0;
-    for my $tx (@transactions) {
-
-        # Not yet connected
-        next if $tx->is_state('connect');
-
-        my $connection = $tx->connection;
-
-        # We always try to read as suggested by RFC 2616 for HTTP 1.1 clients
-        $tx->client_is_writing
-          ? $poll->mask($connection, POLLIN | POLLOUT)
-          : $poll->mask($connection, POLLIN);
-
-        $waiting++;
+        # Handled
+        $server->server_handled;
     }
 
-    # No sockets ready yet
-    return unless $waiting;
+    # Handle request
+    if ($server->is_state('handle_request')) {
 
-    # Poll
-    $poll->poll(5);
+        # Handler
+        $daemon->handler_cb->($daemon, $server->server_tx);
 
-    # Write
-    for my $connection ($poll->handles(POLLOUT)) {
-
-        # Name
-        my $name = $self->_socket_name($connection);
-
-        # Transaction
-        my $tx = $transaction{$name};
-
-        # Get chunk
-        my $chunk = $tx->client_get_chunk;
-
-        # Nothing to write
-        next unless defined $chunk && length $chunk;
-
-        # Write chunk
-        my $written = $tx->connection->syswrite($chunk, length $chunk);
-        $tx->error("Can't write to socket: $!") unless defined $written;
-        $done++ and next if $tx->has_error;
-
-        # Written
-        $tx->client_written($written);
+        # Handled
+        $server->server_handled;
     }
-
-    # Read
-    for my $connection ($poll->handles(POLLIN | POLLHUP | POLLERR)) {
-
-        # Name
-        my $name = $self->_socket_name($connection);
-
-        # Transaction
-        my $tx = $transaction{$name};
-
-        # Read chunk
-        my $buffer;
-        my $read = $connection->sysread($buffer, CHUNK_SIZE, 0);
-        $tx->error("Can't read from socket: $!") unless defined $read;
-        $done++ and next if $tx->has_error;
-
-        # Parse
-        $tx->client_read($buffer);
-    }
-
-    return $done;
 }
 
-sub spin_app {
-    my ($self, $app, $client) = @_;
+sub _app_process {
+    my $self = shift;
 
-    # Prepare
-    my $app_class = ref $app || $app;
-    if ($client->is_state('start')) {
+    # Process queued transactions
+    while (my $queued = shift @{$self->_app_queue}) {
+
+        # Transaction
+        my $client = $queued->[0];
+
+        # App
+        my $app = $self->app;
 
         # Daemon start
         my $daemon = Mojo::Server->new;
         $daemon->app($app) if ref $app;
-        $daemon->app_class($app_class);
+        $daemon->app_class(ref $app || $app);
 
         # Client connecting
         $client->client_connect;
@@ -285,21 +128,21 @@ sub spin_app {
         my $server = Mojo::Transaction::Pipeline->new->server_accept(
             $daemon->build_tx_cb->($daemon));
 
-        # Store
-        $client->connection($server);
-        $server->connection($daemon);
+        # Spin
+        while (1) { last if $self->_app_spin($client, $server, $daemon) }
+
+        # Callback
+        my $cb = $queued->[1] || $self->default_cb;
+
+        # Execute callback
+        $self->$cb($client) if $cb;
     }
 
-    # Server
-    my $server = $client->connection;
-    my $daemon = $server->connection;
+    return $self;
+}
 
-    # Check class
-    if ($app_class ne $daemon->app_class) {
-        my $class = $daemon->app_class;
-        $client->error(qq/Application "$app_class" does not match "$class"./);
-        return 1;
-    }
+sub _app_spin {
+    my ($self, $client, $server, $daemon) = @_;
 
     # Make sure the server has a transaction ready to handle incoming data
     $server->server_accept($daemon->build_tx_cb->($daemon))
@@ -341,7 +184,7 @@ sub spin_app {
         }
 
         # Handle
-        $self->_handle_app($daemon, $server);
+        $self->_app_handle($daemon, $server);
 
         # Spin both
         $server->server_spin;
@@ -357,7 +200,7 @@ sub spin_app {
             $server->server_read($leftovers);
 
             # Handle
-            $self->_handle_app($daemon, $server);
+            $self->_app_handle($daemon, $server);
         }
     }
 
@@ -372,70 +215,262 @@ sub spin_app {
     return;
 }
 
-sub test_connection {
-    my ($self, $connection) = @_;
+sub _build_tx {
+    my $self = shift;
 
-    # There are garbage bytes on the socket or peer closed the connection
-    my $poll = IO::Poll->new;
-    $poll->mask($connection, POLLIN);
-    $poll->poll(0);
-    my @readers = $poll->handles(POLLIN | POLLHUP | POLLERR);
-    return @readers ? 0 : 1;
-}
+    # New transaction
+    my $tx = Mojo::Transaction::Single->new;
 
-sub withdraw_connection {
-    my ($self, $match) = @_;
+    # Request
+    my $req = $tx->req;
 
-    my $result;
-    my @connections;
+    # Method
+    $req->method(shift);
 
-    # Check all connections for name, timeout and if they are still alive
-    for my $conn (@{$self->_connections}) {
-        my ($name, $connection, $timeout) = @{$conn};
+    # URL
+    $req->url->parse(shift);
 
-        # Found
-        if ($match eq $name) {
-            $result = $connection
-              if (time < $timeout) && $self->test_connection($connection);
-        }
+    # Callback
+    my $cb = pop @_ if ref $_[-1] && ref $_[-1] eq 'CODE';
 
-        # Check time
-        else { push(@connections, $conn) if time < $timeout }
+    # Headers
+    my $headers = ref $_[0] eq 'HASH' ? $_[0] : {@_};
+    for my $name (keys %$headers) {
+        $req->headers->header($name, $headers->{$name});
     }
 
-    $self->_connections(\@connections);
-    return $result;
+    # Queue transaction with callback
+    $self->queue($tx, $cb);
 }
 
-sub _handle_app {
-    my ($self, $daemon, $server) = @_;
+sub _connect {
+    my ($self, $c) = @_;
 
-    # Handle continue
-    if ($server->is_state('handle_continue')) {
+    # Transaction
+    my $tx = $self->_connections->{$c}->{tx};
 
-        # Continue handler
-        $daemon->continue_handler_cb->($daemon, $server->server_tx);
+    # Connected
+    $tx->client_connected;
 
-        # Handled
-        $server->server_handled;
-    }
+    # Store connection information in transaction
+    my ($laddr, $lport) = $self->ioloop->local_info($c);
+    $tx->local_address($laddr);
+    $tx->local_port($lport);
+    my ($raddr, $rport) = $self->ioloop->remote_info($c);
+    $tx->remote_address($raddr);
+    $tx->remote_port($rport);
 
-    # Handle request
-    if ($server->is_state('handle_request')) {
+    # Keep alive timeout
+    $self->ioloop->connection_timeout($c => $self->keep_alive_timeout);
 
-        # Handler
-        $daemon->handler_cb->($daemon, $server->server_tx);
-
-        # Handled
-        $server->server_handled;
-    }
+    # Socket callbacks
+    $self->ioloop->error_cb($c => sub { $self->_error(@_) });
+    $self->ioloop->hup_cb($c => sub { $self->_hup(@_) });
+    $self->ioloop->read_cb($c => sub { $self->_read(@_) });
+    $self->ioloop->write_cb($c => sub { $self->_write(@_) });
 }
 
-sub _socket_name {
-    my ($self, $s) = @_;
+sub _deposit {
+    my ($self, $name, $c) = @_;
 
-    # Generate
-    return unpack('H*', $s->sockaddr) . $s->sockport;
+    # Deposit socket
+    push @{$self->_cache}, [$name, $c];
+}
+
+sub _drop {
+    my ($self, $c) = @_;
+
+    # Keep connection alive
+    if (my $tx = $self->_connections->{$c}->{tx}) {
+
+        # Read only
+        $self->ioloop->not_writing($c);
+
+        # Deposit
+        my ($scheme, $host, $port) = $tx->client_info;
+        $self->_deposit("$scheme:$host:$port", $c) if $tx->keep_alive;
+    }
+
+    # Connection close
+    else {
+        $self->ioloop->drop($c);
+        $self->_withdraw($c);
+    }
+
+    # Drop connection
+    delete $self->_connections->{$c};
+}
+
+sub _error {
+    my ($self, $loop, $c, $error) = @_;
+
+    # Transaction
+    if (my $tx = $self->_connections->{$c}->{tx}) {
+
+        # Add error message
+        $tx->error($error);
+    }
+
+    # Finish
+    $self->_finish($c);
+}
+
+sub _finish {
+    my ($self, $c) = @_;
+
+    # Transaction
+    my $tx = $self->_connections->{$c}->{tx};
+
+    # Get callback
+    my $cb = $self->_connections->{$c}->{cb} || $self->default_cb;
+
+    # Transaction still in progress
+    if ($tx) {
+
+        # Callback
+        $self->$cb($tx) if $cb && $tx;
+
+        # Counter
+        $self->_queued($self->_queued - 1) if $tx;
+    }
+
+    # Drop
+    $self->_drop($c);
+
+    # Stop IOLoop
+    $self->ioloop->stop if $self->_finite && !$self->_queued;
+}
+
+sub _hup {
+    my ($self, $loop, $c) = @_;
+
+    # Transaction
+    if (my $tx = $self->_connections->{$c}->{tx}) {
+
+        # Add error message
+        $tx->error('Connection closed.');
+    }
+
+    # Finish
+    $self->_finish($c);
+}
+
+sub _queue {
+    my ($self, $tx, $cb) = @_;
+
+    # Add to app queue
+    push @{$self->_app_queue}, [$tx, $cb] and return if $self->app;
+
+    # Info
+    my ($scheme, $host, $port) = $tx->client_info;
+
+    # Cached connection
+    if (my $c = $self->_withdraw("$scheme:$host:$port")) {
+
+        # Writing
+        $self->ioloop->writing($c);
+
+        # Kept alive
+        $tx->kept_alive(1);
+
+        # Add new connection
+        $self->_connections->{$c} = {cb => $cb, tx => $tx};
+
+        # Connected
+        $self->_connect($c);
+    }
+
+    # New connection
+    else {
+
+        # Address
+        my $address =
+            $host =~ /\b(?:\d{1,3}\.){3}\d{1,3}\b/
+          ? $host
+          : inet_ntoa(inet_aton($host));
+
+        # Connect
+        my $c = $self->ioloop->connect(address => $address, port => $port);
+
+        # Add new connection
+        $self->_connections->{$c} = {cb => $cb, tx => $tx};
+    }
+
+    # Counter
+    $self->_queued($self->_queued + 1);
+}
+
+sub _read {
+    my ($self, $loop, $c, $chunk) = @_;
+
+    # Transaction
+    if (my $tx = $self->_connections->{$c}->{tx}) {
+
+        # Read
+        $tx->client_read($chunk);
+
+        # Spin
+        $self->_spin($c);
+    }
+
+    # Corrupted connection
+    else { $self->_drop($c) }
+}
+
+sub _spin {
+    my ($self, $c) = @_;
+
+    # Transaction
+    my $tx = $self->_connections->{$c}->{tx};
+
+    # State machine
+    $tx->client_spin;
+
+    # Finished?
+    return $self->_finish($c) if $tx->is_finished;
+
+    # Writing?
+    $tx->client_is_writing
+      ? $self->ioloop->writing($c)
+      : $self->ioloop->not_writing($c);
+}
+
+sub _withdraw {
+    my ($self, $name) = @_;
+
+    # Withdraw socket
+    my $found;
+    my @cache;
+    for my $cached (@{$self->_cache}) {
+
+        # Search for name or reference
+        $found = $cached->[1] and next
+          if ref $name ? $cached->[1] : $cached->[0] eq $name;
+
+        # Cache again
+        push @cache, $cached;
+    }
+    $self->_cache(\@cache);
+
+    return $found;
+}
+
+sub _write {
+    my ($self, $loop, $c) = @_;
+
+    # Transaction
+    my $tx = $self->_connections->{$c}->{tx};
+
+    # Get chunk
+    my $chunk = $tx->client_get_chunk;
+
+    # Consider it written
+    $tx->client_written(length $chunk) if defined $chunk;
+
+    # Spin
+    $self->_spin($c);
+
+    return $chunk;
 }
 
 1;
@@ -448,14 +483,14 @@ Mojo::Client - Client
 =head1 SYNOPSIS
 
     use Mojo::Client;
-    use Mojo::Transaction::Single;
-
-    my $tx = Mojo::Transaction::Single->new;
-    $tx->req->method('GET');
-    $tx->req->url->parse('http://cpan.org');
 
     my $client = Mojo::Client->new;
-    $client->process($tx);
+    $client->get(
+        'http://kraih.com' => sub {
+            my ($self, $tx) = @_;
+            print $tx->res->code;
+        }
+    )->process;
 
 =head1 DESCRIPTION
 
@@ -465,10 +500,25 @@ L<Mojo::Client> is a full featured async io HTTP 1.1 client.
 
 L<Mojo::Client> implements the following attributes.
 
+=head2 C<app>
+
+    my $app = $client->app;
+    $client = $client->app(Mojolicious::Lite->new);
+
 =head2 C<continue_timeout>
 
     my $timeout = $client->continue_timeout;
     $client     = $client->continue_timeout(5);
+
+=head2 C<default_cb>
+
+    my $cb  = $client->default_cb;
+    $client = $client->default_cb(sub {...});
+
+=head2 C<ioloop>
+
+    my $loop = $client->ioloop;
+    $client  = $client->ioloop(Mojo::IOLoop->new);
 
 =head2 C<keep_alive_timeout>
 
@@ -480,50 +530,54 @@ L<Mojo::Client> implements the following attributes.
 L<Mojo::Client> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 C<connect>
+=head2 C<new>
 
-    $client = $client->connect($tx);
+    my $client = Mojo::Client->new;
 
-=head2 C<disconnect>
+=head2 C<delete>
 
-    $client = $client->disconnect($tx);
+    $client = $client->delete('http://kraih.com' => sub {...});
+    $client = $client->delete(
+      'http://kraih.com' => (Connection => 'close') => sub {...}
+    );
 
-=head2 C<deposit_connection>
+=head2 C<get>
 
-    $client->deposit_connection($name, $connection, $timeout);
+    $client = $client->get('http://kraih.com' => sub {...});
+    $client = $client->get(
+      'http://kraih.com' => (Connection => 'close') => sub {...}
+    );
 
-=head2 C<open_connection>
+=head2 C<head>
 
-    my $connection = $client->open_connection($scheme, $address, $port);
+    $client = $client->head('http://kraih.com' => sub {...});
+    $client = $client->head(
+      'http://kraih.com' => (Connection => 'close') => sub {...}
+    );
+
+=head2 C<post>
+
+    $client = $client->post('http://kraih.com' => sub {...});
+    $client = $client->post(
+      'http://kraih.com' => (Connection => 'close') => sub {...}
+    );
 
 =head2 C<process>
 
+    $client = $client->process;
     $client = $client->process(@transactions);
+    $client = $client->process(@transactions => sub {...});
 
-=head2 C<process_all>
+=head2 C<put>
 
-    $client = $client->process_all(@transactions);
+    $client = $client->put('http://kraih.com' => sub {...});
+    $client = $client->put(
+      'http://kraih.com' => (Connection => 'close') => sub {...}
+    );
 
-=head2 C<process_app>
+=head2 C<queue>
 
-    $client = $client->process_app($app, $tx);
-    $client = $client->process_app('MyApp', $tx);
-
-=head2 C<spin>
-
-    my $done = $client->spin(@transactions);
-
-=head2 C<spin_app>
-
-    my $done = $client->spin_app($app, $tx);
-    my $done = $client->spin_app('MyApp', $tx);
-
-=head2 C<test_connection>
-
-    my $alive = $client->test_connection($connection);
-
-=head2 C<withdraw_connection>
-
-    my $connection = $client->withdraw_connection($name);
+    $client = $client->queue(@transactions);
+    $client = $client->queue(@transactions => sub {...});
 
 =cut

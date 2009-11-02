@@ -78,12 +78,14 @@ sub new {
                 $c->app->log->error(qq/Template error in "$t": $e/);
 
                 # Render exception template
-                $c->render(
+                my $options = {
                     template  => 'exception',
                     format    => 'html',
                     status    => 500,
                     exception => $e
-                ) or $c->app->static->serve_505($c);
+                };
+                $c->app->static->serve_505($c)
+                  if $c->stash->{exception} || !$c->render($options);
             }
 
             # Success or exception?
@@ -163,8 +165,8 @@ sub new {
     # Add "url_for" helper
     $self->add_helper(url_for => sub { shift->url_for(@_) });
 
-    # Set default handler to "epl"
-    $self->default_handler('epl');
+    # Set default handler
+    $self->default_handler('ep');
 
     return $self;
 }

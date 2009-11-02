@@ -23,6 +23,9 @@ use Mojolicious::Lite;
 # Silence
 app->log->level('error');
 
+# Test with lite templates
+app->renderer->default_handler('epl');
+
 # GET /foo
 get '/foo' => sub {
     my $self = shift;
@@ -91,207 +94,276 @@ get '/eperror' => sub { shift->render(handler => 'ep') } => 'eperror';
 
 # Oh Fry, I love you more than the moon, and the stars,
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
-my $app    = Mojolicious::Lite->new;
-my $client = Mojo::Client->new;
+my $app = Mojolicious::Lite->new;
+my $client = Mojo::Client->new(app => $app);
 
 # GET /foo
-my $tx = Mojo::Transaction::Single->new_get('/foo');
-$client->process_app($app, $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,                            'Yea baby!');
+$client->get(
+    '/foo' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            'Yea baby!');
+    }
+)->process;
 
 # POST /template
-$tx = Mojo::Transaction::Single->new_post('/template');
-$client->process_app($app, $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,                            'Just works!');
+$client->post(
+    '/template' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            'Just works!');
+    }
+)->process;
 
 # GET /something
-$tx = Mojo::Transaction::Single->new_get('/something');
-$client->process_app($app, $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,                            'Just works!');
+$client->get(
+    '/something' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            'Just works!');
+    }
+)->process;
 
 # POST /something
-$tx = Mojo::Transaction::Single->new_post('/something');
-$client->process_app($app, $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,                            'Just works!');
+$client->post(
+    '/something' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            'Just works!');
+    }
+)->process;
 
 # DELETE /something
-$tx = Mojo::Transaction::Single->new_delete('/something');
-$client->process_app($app, $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,                            'Just works!');
+$client->delete(
+    '/something' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            'Just works!');
+    }
+)->process;
 
 # GET /something/else
-$tx = Mojo::Transaction::Single->new_get('/something/else');
-$client->process_app($app, $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,                            'Yay!');
+$client->get(
+    '/something/else' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            'Yay!');
+    }
+)->process;
 
 # POST /something/else
-$tx = Mojo::Transaction::Single->new_post('/something/else');
-$client->process_app($app, $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,                            'Yay!');
+$client->post(
+    '/something/else' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            'Yay!');
+    }
+)->process;
 
 # DELETE /something/else
-$tx = Mojo::Transaction::Single->new_delete('/something/else');
-$client->process_app($app, $tx);
-is($tx->res->code,                            404);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-like($tx->res->body, qr/Oops!/);
+$client->delete(
+    '/something/else' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            404);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        like($tx->res->body, qr/Oops!/);
+    }
+)->process;
 
 # GET /regex/23
-$tx = Mojo::Transaction::Single->new_get('/regex/23');
-$client->process_app($app, $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,                            '23');
+$client->get(
+    '/regex/23' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            '23');
+    }
+)->process;
 
 # GET /regex/foo
-$tx = Mojo::Transaction::Single->new_get('/regex/foo');
-$client->process_app($app, $tx);
-is($tx->res->code,                            404);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-like($tx->res->body, qr/Oops!/);
+$client->get(
+    '/regex/foo' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            404);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        like($tx->res->body, qr/Oops!/);
+    }
+)->process;
 
 # POST /bar
-$tx = Mojo::Transaction::Single->new_post('/bar');
-$client->process_app($app, $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,                            'default');
+$client->post(
+    '/bar' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            'default');
+    }
+)->process;
 
-# GET /bar/baz
-$tx = Mojo::Transaction::Single->new_post('/bar/baz');
-$client->process_app($app, $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,                            'baz');
+# POST /bar/baz
+$client->post(
+    '/bar/baz' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            'baz');
+    }
+)->process;
 
 # GET /layout
-$tx = Mojo::Transaction::Single->new_get('/layout');
-$client->process_app($app, $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,                            "Yea baby! with layout\n");
+$client->get(
+    '/layout' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body, "Yea baby! with layout\n");
+    }
+)->process;
 
 # GET /firefox
-$tx = Mojo::Transaction::Single->new_get('/firefox/bar',
-    'User-Agent' => 'Firefox');
-$client->process_app($app, $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,                            '/firefox/foo');
+$client->get(
+    '/firefox/bar' => ('User-Agent' => 'Firefox') => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            '/firefox/foo');
+    }
+)->process;
 
 # GET /firefox
-$tx = Mojo::Transaction::Single->new_get('/firefox/bar',
-    'User-Agent' => 'Explorer');
-$client->process_app($app, $tx);
-is($tx->res->code,                            404);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-like($tx->res->body, qr/Oops!/);
+$client->get(
+    '/firefox/bar' => ('User-Agent' => 'Explorer') => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            404);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        like($tx->res->body, qr/Oops!/);
+    }
+)->process;
 
 # POST /utf8
-$tx = Mojo::Transaction::Single->new_post('/utf8');
+my $tx = Mojo::Transaction::Single->new;
+$tx->req->method('POST');
+$tx->req->url->parse('/utf8');
 $tx->req->headers->content_type('application/x-www-form-urlencoded');
 $tx->req->body('name=%D0%92%D1%8F%D1%87%D0%B5%D1%81%D0%BB%D0%B0%D0%B2');
-$client->process_app($app, $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->headers->content_type,           'text/html');
-is($tx->res->headers->content_length,         40);
-is($tx->res->body, b(<<EOF)->encode('UTF-8')->to_string);
+$client->queue(
+    $tx => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->headers->content_type,           'text/html');
+        is($tx->res->headers->content_length,         40);
+        is($tx->res->body, b(<<EOF)->encode('UTF-8')->to_string);
 Вячеслав Тихановский
 EOF
+    }
+)->process;
 
 # POST /malformed_utf8
 my $level = $app->log->level;
 $app->log->level('fatal');
-$tx = Mojo::Transaction::Single->new_post('/malformed_utf8');
+$tx = Mojo::Transaction::Single->new;
+$tx->req->method('POST');
+$tx->req->url->parse('/malformed_utf8');
 $tx->req->headers->content_type('application/x-www-form-urlencoded');
 $tx->req->body('foo=%E1');
-$client->process_app($app, $tx);
+$client->queue(
+    $tx => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            '');
+    }
+)->process;
 $app->log->level($level);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,                            '');
 
 # GET /json
-$tx = Mojo::Transaction::Single->new_get('/json');
-$client->process_app($app, $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->headers->content_type,           'application/json');
-my $hash = Mojo::JSON->new->decode($tx->res->body);
-is($hash->{foo}->[0], 1);
-is($hash->{foo}->[1], -2);
-is($hash->{foo}->[2], 3);
-is($hash->{foo}->[3], 'bar');
+$client->get(
+    '/json' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->headers->content_type,           'application/json');
+        my $hash = Mojo::JSON->new->decode($tx->res->body);
+        is($hash->{foo}->[0], 1);
+        is($hash->{foo}->[1], -2);
+        is($hash->{foo}->[2], 3);
+        is($hash->{foo}->[3], 'bar');
+    }
+)->process;
 
 # GET /autostash
-$tx = Mojo::Transaction::Single->new_get('/autostash?bar=23');
-$client->process_app($app, $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,                            "layouted bar23\n");
+$client->get(
+    '/autostash?bar=23' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            "layouted bar23\n");
+    }
+)->process;
 
 # GET /helper
-$tx = Mojo::Transaction::Single->new_get('/helper');
-$client->process_app($app, $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body,
-    '<br/>&lt;.../template(Mozilla/5.0 (compatible; Mojo; Perl))');
+$client->get(
+    '/helper' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,
+            '<br/>&lt;.../template(Mozilla/5.0 (compatible; Mojo; Perl))');
+    }
+)->process;
 
 # GET /helper
-$tx =
-  Mojo::Transaction::Single->new_get('/helper', 'User-Agent' => 'Explorer');
-$client->process_app($app, $tx);
-is($tx->res->code,                            200);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-is($tx->res->body, '<br/>&lt;.../template(Explorer)');
+$client->get(
+    '/helper' => ('User-Agent' => 'Explorer') => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body, '<br/>&lt;.../template(Explorer)');
+    }
+)->process;
 
 # GET /eperror
 $level = $app->log->level;
 $app->log->level('fatal');
-$tx = Mojo::Transaction::Single->new_get('/eperror');
-$client->process_app($app, $tx);
+$client->get(
+    '/eperror' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            500);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        like($tx->res->body, qr/Internal Server Error/);
+    }
+)->process;
 $app->log->level($level);
-is($tx->res->code,                            500);
-is($tx->res->headers->server,                 'Mojo (Perl)');
-is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-like($tx->res->body, qr/Internal Server Error/);
 
 __DATA__
 @@ not_found.html.epl

@@ -97,9 +97,6 @@ use base 'Mojolicious';
 sub startup {
     my $self = shift;
 
-    # Default to ".ep" templates
-    $self->renderer->default_handler('ep');
-
     # Routes
     my $r = $self->routes;
 

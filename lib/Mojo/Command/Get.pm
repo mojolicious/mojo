@@ -27,6 +27,10 @@ sub run {
     # Client
     my $client = Mojo::Client->new;
 
+    # Application
+    $client->app($ENV{MOJO_APP} || 'Mojo::HelloWorld')
+      unless $url =~ /^http:\/\//;
+
     # Transaction
     my $tx = Mojo::Transaction::Single->new;
     $tx->req->method('GET');

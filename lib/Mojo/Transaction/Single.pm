@@ -10,7 +10,7 @@ use base 'Mojo::Transaction';
 use Mojo::Message::Request;
 use Mojo::Message::Response;
 
-__PACKAGE__->attr('continued');
+__PACKAGE__->attr([qw/continued handler_cb continue_handler_cb/]);
 __PACKAGE__->attr(req => sub { Mojo::Message::Request->new });
 __PACKAGE__->attr(res => sub { Mojo::Message::Response->new });
 
@@ -20,11 +20,8 @@ __PACKAGE__->attr(_started => sub {time});
 
 # What's a wedding?  Webster's dictionary describes it as the act of removing
 # weeds from one's garden.
-sub client_connect {
+sub client_connected {
     my $self = shift;
-
-    # Connect
-    $self->state('connect');
 
     # Connection header
     unless ($self->req->headers->connection) {
@@ -39,12 +36,6 @@ sub client_connect {
     # We identify ourself
     $self->req->headers->user_agent('Mozilla/5.0 (compatible; Mojo; Perl)')
       unless $self->req->headers->user_agent;
-
-    return $self;
-}
-
-sub client_connected {
-    my $self = shift;
 
     # We might have to handle 100 Continue
     $self->_continue($self->continue_timeout)
@@ -80,6 +71,15 @@ sub client_get_chunk {
     # Start line
     $chunk = $self->req->get_start_line_chunk($self->_offset)
       if $self->is_state('write_start_line');
+
+    # Written
+    my $written = defined $chunk ? length $chunk : 0;
+    $self->_to_write($self->_to_write - $written);
+    $self->_offset($self->_offset + $written);
+
+    # Chunked
+    $self->_to_write(1)
+      if $self->req->is_chunked && $self->is_state('write_body');
 
     return $chunk;
 }
@@ -251,20 +251,6 @@ sub client_spin {
     return $self;
 }
 
-sub client_written {
-    my ($self, $written) = @_;
-
-    # Written
-    $self->_to_write($self->_to_write - $written);
-    $self->_offset($self->_offset + $written);
-
-    # Chunked
-    $self->_to_write(1)
-      if $self->req->is_chunked && $self->is_state('write_body');
-
-    return $self;
-}
-
 sub keep_alive {
     my ($self, $keep_alive) = @_;
 
@@ -299,19 +285,6 @@ sub keep_alive {
     return $self->{keep_alive};
 }
 
-sub server_accept {
-    my $self = shift;
-
-    # Reading
-    $self->state('read');
-
-    # We identify ourself
-    $self->res->headers->server('Mojo (Perl)')
-      unless $self->res->headers->server;
-
-    return $self;
-}
-
 sub server_get_chunk {
     my $self = shift;
 
@@ -338,16 +311,23 @@ sub server_get_chunk {
     $chunk = $self->res->get_start_line_chunk($self->_offset)
       if $self->is_state('write_start_line');
 
+    # Written
+    my $written = defined $chunk ? length $chunk : 0;
+    $self->_to_write($self->_to_write - $written);
+    $self->_offset($self->_offset + $written);
+
+    # Chunked
+    $self->_to_write(1)
+      if $self->res->is_chunked && $self->is_state('write_body');
+
+    # Done early
+    if ($self->is_state('write_body') && $self->_to_write <= 0) {
+        $self->req->is_state('done_with_leftovers')
+          ? $self->state('done_with_leftovers')
+          : $self->state('done');
+    }
+
     return $chunk;
-}
-
-sub server_handled {
-    my $self = shift;
-
-    # Handled and writing now
-    $self->state('write');
-
-    return $self;
 }
 
 sub server_read {
@@ -359,22 +339,38 @@ sub server_read {
     # Expect 100 Continue?
     if ($self->req->content->is_state('body') && !defined $self->continued) {
         if (($self->req->headers->expect || '') =~ /100-continue/i) {
-            $self->state('handle_continue');
+
+            # Writing
+            $self->state('write');
+
+            # Continue handler callback
+            $self->continue_handler_cb->($self);
             $self->continued(0);
         }
     }
 
     # EOF
     if ((length $chunk == 0) || $self->req->is_finished) {
-        $self->state('handle_request');
+
+        # Writing
+        $self->state('write');
+
+        # Handler callback
+        $self->handler_cb->($self);
     }
 
     return $self;
 }
 
 sub server_spin {
-
     my $self = shift;
+
+    # We identify ourself
+    $self->res->headers->server('Mojo (Perl)')
+      unless $self->res->headers->server;
+
+    # Reading
+    $self->state('read') if $self->is_state('start');
 
     # Writing
     if ($self->is_state('write')) {
@@ -450,27 +446,6 @@ sub server_spin {
     return $self;
 }
 
-sub server_written {
-    my ($self, $written) = @_;
-
-    # Written
-    $self->_to_write($self->_to_write - $written);
-    $self->_offset($self->_offset + $written);
-
-    # Chunked
-    $self->_to_write(1)
-      if $self->res->is_chunked && $self->is_state('write_body');
-
-    # Done early
-    if ($self->is_state('write_body') && $self->_to_write <= 0) {
-        $self->req->is_state('done_with_leftovers')
-          ? $self->state('done_with_leftovers')
-          : $self->state('done');
-    }
-
-    return $self;
-}
-
 # Replace client response after receiving 100 Continue
 sub _new_response {
     my $self = shift;
@@ -522,10 +497,20 @@ L<Mojo::Transaction::Single> is a container for HTTP transactions.
 L<Mojo::Transaction::Single> inherits all attributes from
 L<Mojo::Transaction> and implements the following new ones.
 
+=head2 C<continue_handler_cb>
+
+    my $cb = $tx->continue_handler_cb;
+    $tx    = $tx->continue_handler_cb(sub {...});
+
 =head2 C<continued>
 
     my $continued = $tx->continued;
     $tx           = $tx->continued(1);
+
+=head2 C<handler_cb>
+
+    my $cb = $tx->handler_cb;
+    $tx    = $tx->handler_cb(sub {...});
 
 =head2 C<keep_alive>
 
@@ -546,10 +531,6 @@ L<Mojo::Transaction> and implements the following new ones.
 
 L<Mojo::Transaction::Single> inherits all methods from L<Mojo::Transaction>
 and implements the following new ones.
-
-=head2 C<client_connect>
-
-    $tx = $tx->client_connect;
 
 =head2 C<client_connected>
 
@@ -575,21 +556,9 @@ and implements the following new ones.
 
     $tx = $tx->client_spin;
 
-=head2 C<client_written>
-
-    $tx = $tx->client_written($length);
-
-=head2 C<server_accept>
-
-    $tx = $tx->server_accept;
-
 =head2 C<server_get_chunk>
 
     my $chunk = $tx->server_get_chunk;
-
-=head2 C<server_handled>
-
-    $tx = $tx->server_handled;
 
 =head2 C<server_read>
 
@@ -598,9 +567,5 @@ and implements the following new ones.
 =head2 C<server_spin>
 
     $tx = $tx->server_spin;
-
-=head2 C<server_written>
-
-    $tx = $tx->server_written($bytes);
 
 =cut

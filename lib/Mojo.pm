@@ -8,6 +8,7 @@ use warnings;
 use base 'Mojo::Base';
 
 use Carp 'croak';
+use Mojo::Client;
 use Mojo::Commands;
 use Mojo::Home;
 use Mojo::Log;
@@ -22,8 +23,9 @@ __PACKAGE__->attr(
           }
     }
 );
-__PACKAGE__->attr(home => sub { Mojo::Home->new });
-__PACKAGE__->attr(log  => sub { Mojo::Log->new });
+__PACKAGE__->attr(client => sub { Mojo::Client->new });
+__PACKAGE__->attr(home   => sub { Mojo::Home->new });
+__PACKAGE__->attr(log    => sub { Mojo::Log->new });
 
 # Oh, so they have internet on computers now!
 our $VERSION = '0.999901';
@@ -116,6 +118,11 @@ L<Mojo> implements the following attributes.
 
     my $cb = $mojo->build_tx_cb;
     $mojo  = $mojo->build_tx_cb(sub { ... });
+
+=head2 C<client>
+
+    my $client = $mojo->client;
+    $mojo      = $mojo->client(Mojo::Client->new);
 
 =head2 C<home>
 

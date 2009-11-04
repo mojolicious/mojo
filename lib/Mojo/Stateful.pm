@@ -9,7 +9,7 @@ use base 'Mojo::Base';
 
 # Don't kid yourself, Jimmy. If a cow ever got the chance,
 # he'd eat you and everyone you care about!
-__PACKAGE__->attr(state => 'start');
+__PACKAGE__->attr('state_cb');
 
 sub done { shift->state('done') }
 
@@ -40,6 +40,28 @@ sub is_state {
     return;
 }
 
+sub state {
+    my ($self, $state) = @_;
+
+    # Default
+    $self->{state} ||= 'start';
+
+    # Get
+    return $self->{state} unless $state;
+
+    # Old state
+    my $old = $self->{state};
+
+    # New state
+    $self->{state} = $state;
+
+    # Callback
+    my $cb = $self->state_cb;
+    $self->$cb($old, $state) if $cb;
+
+    return $self;
+}
+
 1;
 __END__
 
@@ -59,10 +81,10 @@ L<Mojo::Stateful> is a base class for state keeping instances.
 
 L<Mojo::Stateful> implements the following attributes.
 
-=head2 C<state>
+=head2 C<state_cb>
 
-   my $state = $stateful->state;
-   $stateful = $stateful->state('writing');
+   my $cb    = $stateful->state_cb;
+   $stateful = $stateful->state_cb(sub {...});
 
 =head1 METHODS
 
@@ -94,5 +116,10 @@ following new ones.
 
     my $is_state = $stateful->is_state('writing');
     my $is_state = $stateful->is_state(qw/error reading writing/);
+
+=head2 C<state>
+
+    my $state = $stateful->state;
+    $stateful = $stateful->state('writing');
 
 =cut

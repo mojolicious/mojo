@@ -48,6 +48,7 @@ sub _diag {
     $self->_dump_params($tx)    if $path =~ m|^/diag/dump_params|;
     $self->_dump_tx($tx)        if $path =~ m|^/diag/dump_tx|;
     $self->_dump_url($tx)       if $path =~ m|^/diag/dump_url|;
+    $self->_proxy($tx)          if $path =~ m|^/diag/proxy|;
 
     # Defaults
     $tx->res->headers->content_type('text/plain')
@@ -64,7 +65,8 @@ sub _diag {
     <a href="/diag/dump_env">Dump Environment Variables</a><br />
     <a href="/diag/dump_params">Dump Request Parameters</a><br />
     <a href="/diag/dump_tx">Dump Transaction</a><br />
-    <a href="/diag/dump_url">Dump Request URL</a>
+    <a href="/diag/dump_url">Dump Request URL</a><br />
+    <a href="/diag/proxy">Proxy</a>
   </body>
 </html>
 EOF
@@ -115,6 +117,50 @@ sub _dump_tx {
 sub _dump_url {
     my ($self, $tx) = @_;
     $tx->res->body(Dumper $tx->req->url);
+}
+
+sub _proxy {
+    my ($self, $tx) = @_;
+
+    # Proxy
+    if (my $url = $tx->req->param('url')) {
+
+        # Pause transaction
+        $tx->pause;
+
+        # Fetch
+        $self->client->get(
+            $url => sub {
+                my ($self, $tx2) = @_;
+
+                # Resume transaction
+                $tx->resume;
+
+                # Pass through content
+                $tx->res->headers->content_type(
+                    $tx2->res->headers->content_type);
+                $tx->res->body($tx2->res->content->asset->slurp);
+            }
+        )->process;
+
+        return;
+    }
+
+    # Form
+    my $url = $tx->req->url->clone;
+    $url->path('/diag/proxy');
+    $tx->res->headers->content_type('text/html');
+    $tx->res->body(<<"EOF");
+<!doctype html><html>
+  <head><title>Mojo Diagnostics</title></head>
+  <body>
+    <form action="$url" method="GET">
+      <input type="text" name="url" value="http://"/>
+      <input type="submit" value="Fetch" />
+    </form>
+  </body>
+</html>
+EOF
 }
 
 1;

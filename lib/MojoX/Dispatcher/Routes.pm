@@ -199,7 +199,10 @@ sub render {
     my ($self, $c) = @_;
 
     # Render
-    return !$c->render unless $c->stash->{rendered};
+    return !$c->render
+      unless $c->stash->{rendered}
+          || $c->res->code
+          || $c->tx->is_state('paused');
 
     # Nothing to render
     return;

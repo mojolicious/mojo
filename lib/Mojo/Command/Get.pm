@@ -10,18 +10,29 @@ use base 'Mojo::Command';
 use Mojo::Client;
 use Mojo::Transaction::Single;
 
+use Getopt::Long 'GetOptions';
+
 __PACKAGE__->attr(description => <<'EOF');
 Get file from URL.
 EOF
 __PACKAGE__->attr(usage => <<"EOF");
 usage: $0 get [URL]
+
+These options are available:
+  --headers    Print response headers to STDERR.
 EOF
 
 # I hope this has taught you kids a lesson: kids never learn.
 sub run {
-    my ($self, $url) = @_;
+    my $self = shift;
+
+    # Options
+    @ARGV = @_ if @_;
+    my $headers = 0;
+    GetOptions('headers' => sub { $headers = 1 });
 
     # URL
+    my $url = shift;
     die $self->usage unless $url;
 
     # Client
@@ -35,7 +46,14 @@ sub run {
     my $tx = Mojo::Transaction::Single->new;
     $tx->req->method('GET');
     $tx->req->url->parse($url);
-    $tx->res->body(sub { print $_[1] });
+    $tx->res->body(
+        sub {
+            my ($tx, $chunk) = @_;
+            print STDERR $tx->headers->to_string . "\n\n" if $headers;
+            print $chunk;
+            $headers = 0;
+        }
+    );
 
     # Request
     $client->process($tx);

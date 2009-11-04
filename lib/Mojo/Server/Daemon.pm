@@ -124,19 +124,8 @@ sub _create_pipeline {
     my $conn = $self->_connections->{$c};
 
     # New pipeline
-    my $p = Mojo::Transaction::Pipeline->new->server_accept(
-        $self->build_tx_cb->($self));
+    my $p = Mojo::Transaction::Pipeline->new;
     $p->connection($c);
-
-    # New request on the connection
-    $conn->{requests}++;
-
-    # Kept alive if we have more than one request on the connection
-    $p->kept_alive(1) if $conn->{requests} > 1;
-
-    # Last keep alive request?
-    $p->server_tx->res->headers->connection('Close')
-      if $conn->{requests} >= $self->max_keep_alive_requests;
 
     # Store connection information in pipeline
     my ($laddr, $lport) = $self->ioloop->local_info($c);
@@ -145,6 +134,54 @@ sub _create_pipeline {
     my ($raddr, $rport) = $self->ioloop->remote_info($c);
     $p->remote_address($raddr);
     $p->remote_port($rport);
+
+    # State change callback
+    $p->state_cb(
+        sub {
+
+            # Finish
+            if ($p->is_finished) {
+
+                # Close connection
+                if (!$conn->{pipeline}->keep_alive) {
+                    $self->_drop($c);
+                    $self->ioloop->drop($c);
+                }
+
+                # End pipeline
+                else { delete $conn->{pipeline} }
+            }
+
+            # Writing?
+            $p->server_is_writing
+              ? $self->ioloop->writing($c)
+              : $self->ioloop->not_writing($c);
+        }
+    );
+
+    # Transaction builder callback
+    $p->build_tx_cb(
+        sub {
+
+            # Build transaction
+            my $tx = $self->build_tx_cb->($self);
+
+            # Handler callback
+            $tx->handler_cb(sub { $self->handler_cb->($self, $tx); });
+
+            # Continue handler callback
+            $tx->continue_handler_cb(
+                sub { $self->continue_handler_cb->($self, $tx) });
+
+            return $tx;
+        }
+    );
+
+    # New request on the connection
+    $conn->{requests}++;
+
+    # Kept alive if we have more than one request on the connection
+    $p->kept_alive(1) if $conn->{requests} > 1;
 
     return $p;
 }
@@ -177,31 +214,8 @@ sub _read {
     my $p = $self->_connections->{$c}->{pipeline}
       ||= $self->_create_pipeline($c);
 
-    # Need a new transaction?
-    unless ($p->server_tx) {
-
-        # New transaction
-        my $tx = $self->build_tx_cb->($self);
-
-        # Add to pipeline
-        $p->server_accept($tx);
-    }
-
     # Read
     $p->server_read($chunk);
-
-    # Spin
-    $self->_spin($c);
-}
-
-sub _spin {
-    my ($self, $c) = @_;
-
-    # Pipeline
-    my $p = $self->_connections->{$c}->{pipeline};
-
-    # Handle
-    $self->_handle($p);
 
     # State machine
     $p->server_spin;
@@ -209,39 +223,14 @@ sub _spin {
     # Add transactions to the pipe for leftovers
     if (my $leftovers = $p->server_leftovers) {
 
-        # New transaction
-        my $tx = $self->build_tx_cb->($self);
-
-        # Add to pipeline
-        $p->server_accept($tx);
-
         # Read leftovers
         $p->server_read($leftovers);
-
-        # Handle
-        $self->_handle($p);
     }
 
-    # Finish
-    elsif ($p->is_finished) {
-
-        # Connection
-        my $conn = $self->_connections->{$c};
-
-        # Finish connection
-        if (!$conn->{pipeline}->keep_alive) {
-            $self->_drop($c);
-            $self->ioloop->drop($c);
-        }
-
-        # Finish pipeline
-        else { delete $conn->{pipeline} }
-    }
-
-    # Writing?
-    $p->server_is_writing
-      ? $self->ioloop->writing($c)
-      : $self->ioloop->not_writing($c);
+    # Last keep alive request?
+    $p->server_tx->res->headers->connection('Close')
+      if $self->_connections->{$c}->{requests}
+          >= $self->max_keep_alive_requests;
 }
 
 sub _write {
@@ -253,37 +242,10 @@ sub _write {
     # Get chunk
     my $chunk = $p->server_get_chunk;
 
-    # Consider it written
-    $p->server_written(length $chunk) if defined $chunk;
-
-    # Spin
-    $self->_spin($c);
+    # State machine
+    $p->server_spin;
 
     return $chunk;
-}
-
-sub _handle {
-    my ($self, $p) = @_;
-
-    # Handle continue
-    if ($p->is_state('handle_continue')) {
-
-        # Continue handler
-        $self->continue_handler_cb->($self, $p->server_tx);
-
-        # Handled
-        $p->server_handled;
-    }
-
-    # Handle request
-    if ($p->is_state('handle_request')) {
-
-        # Handler
-        $self->handler_cb->($self, $p->server_tx);
-
-        # Handled
-        $p->server_handled;
-    }
 }
 
 1;

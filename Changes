@@ -22,6 +22,8 @@ This file documents the revision history for Perl extension Mojo.
         - Added not_found.html.* templates.
         - Added input streaming support to Mojo::Content.
         - Updated Mojolicious lite_app generator to use .ep templates.
+        - Fixed many bugs in the HTTP 1.1 state machine and added the ability
+          to pause transactions.
         - Fixed param to be CGI.pm compatible.
         - Fixed a few cases where exceptions and not found events would
           result in empty pages.

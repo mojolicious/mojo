@@ -79,30 +79,6 @@ sub queue {
     return $self;
 }
 
-sub _app_handle {
-    my ($self, $daemon, $server) = @_;
-
-    # Handle continue
-    if ($server->is_state('handle_continue')) {
-
-        # Continue handler
-        $daemon->continue_handler_cb->($daemon, $server->server_tx);
-
-        # Handled
-        $server->server_handled;
-    }
-
-    # Handle request
-    if ($server->is_state('handle_request')) {
-
-        # Handler
-        $daemon->handler_cb->($daemon, $server->server_tx);
-
-        # Handled
-        $server->server_handled;
-    }
-}
-
 sub _app_process {
     my $self = shift;
 
@@ -121,12 +97,28 @@ sub _app_process {
         $daemon->app_class(ref $app || $app);
 
         # Client connecting
-        $client->client_connect;
         $client->client_connected;
 
         # Server accepting
-        my $server = Mojo::Transaction::Pipeline->new->server_accept(
-            $daemon->build_tx_cb->($daemon));
+        my $server = Mojo::Transaction::Pipeline->new;
+
+        # Transaction builder callback
+        $server->build_tx_cb(
+            sub {
+
+                # Build transaction
+                my $tx = $daemon->build_tx_cb->($daemon);
+
+                # Handler callback
+                $tx->handler_cb(sub { $daemon->handler_cb->($daemon, $tx); });
+
+                # Continue handler callback
+                $tx->continue_handler_cb(
+                    sub { $daemon->continue_handler_cb->($daemon, $tx) });
+
+                return $tx;
+            }
+        );
 
         # Spin
         while (1) { last if $self->_app_spin($client, $server, $daemon) }
@@ -144,10 +136,6 @@ sub _app_process {
 sub _app_spin {
     my ($self, $client, $server, $daemon) = @_;
 
-    # Make sure the server has a transaction ready to handle incoming data
-    $server->server_accept($daemon->build_tx_cb->($daemon))
-      unless $server->server_tx;
-
     # Exchange
     if ($client->client_is_writing || $server->server_is_writing) {
 
@@ -160,9 +148,6 @@ sub _app_spin {
 
             # Client write and server read
             $server->server_read($buffer);
-
-            # Client written
-            $client->client_written(length $buffer);
         }
 
         # Spin both
@@ -178,13 +163,7 @@ sub _app_spin {
 
             # Server write and client read
             $client->client_read($buffer);
-
-            # Server written
-            $server->server_written(length $buffer);
         }
-
-        # Handle
-        $self->_app_handle($daemon, $server);
 
         # Spin both
         $server->server_spin;
@@ -193,14 +172,8 @@ sub _app_spin {
         # Server takes care of leftovers
         if (my $leftovers = $server->server_leftovers) {
 
-            # Server adds transaction
-            $server->server_accept($daemon->build_tx_cb->($daemon));
-
             # Server reads leftovers
             $server->server_read($leftovers);
-
-            # Handle
-            $self->_app_handle($daemon, $server);
         }
     }
 
@@ -365,7 +338,8 @@ sub _queue {
     my ($scheme, $host, $port) = $tx->client_info;
 
     # Cached connection
-    if (my $c = $self->_withdraw("$scheme:$host:$port")) {
+    my $c;
+    if ($c = $self->_withdraw("$scheme:$host:$port")) {
 
         # Writing
         $self->ioloop->writing($c);
@@ -390,11 +364,25 @@ sub _queue {
           : inet_ntoa(inet_aton($host));
 
         # Connect
-        my $c = $self->ioloop->connect(address => $address, port => $port);
+        $c = $self->ioloop->connect(address => $address, port => $port);
 
         # Add new connection
         $self->_connections->{$c} = {cb => $cb, tx => $tx};
     }
+
+    # State change callback
+    $tx->state_cb(
+        sub {
+
+            # Finished?
+            return $self->_finish($c) if $tx->is_finished;
+
+            # Writing?
+            $tx->client_is_writing
+              ? $self->ioloop->writing($c)
+              : $self->ioloop->not_writing($c);
+        }
+    );
 
     # Counter
     $self->_queued($self->_queued + 1);
@@ -409,30 +397,12 @@ sub _read {
         # Read
         $tx->client_read($chunk);
 
-        # Spin
-        $self->_spin($c);
+        # State machine
+        $tx->client_spin;
     }
 
     # Corrupted connection
     else { $self->_drop($c) }
-}
-
-sub _spin {
-    my ($self, $c) = @_;
-
-    # Transaction
-    my $tx = $self->_connections->{$c}->{tx};
-
-    # State machine
-    $tx->client_spin;
-
-    # Finished?
-    return $self->_finish($c) if $tx->is_finished;
-
-    # Writing?
-    $tx->client_is_writing
-      ? $self->ioloop->writing($c)
-      : $self->ioloop->not_writing($c);
 }
 
 sub _withdraw {
@@ -464,11 +434,8 @@ sub _write {
     # Get chunk
     my $chunk = $tx->client_get_chunk;
 
-    # Consider it written
-    $tx->client_written(length $chunk) if defined $chunk;
-
-    # Spin
-    $self->_spin($c);
+    # State machine
+    $tx->client_spin;
 
     return $chunk;
 }

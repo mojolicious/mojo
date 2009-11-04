@@ -14,11 +14,9 @@ __PACKAGE__->attr([qw/local_address local_port remote_address remote_port/]);
 __PACKAGE__->attr(continue_timeout => 5);
 __PACKAGE__->attr(keep_alive       => 0);
 
-# Please don't eat me! I have a wife and kids. Eat them!
-sub client_connect {
-    croak 'Method "client_connect" not implemented by subclass';
-}
+__PACKAGE__->attr('_real_state');
 
+# Please don't eat me! I have a wife and kids. Eat them!
 sub client_connected {
     croak 'Method "client_connected" not implemented by subclass';
 }
@@ -38,20 +36,36 @@ sub client_leftovers {
 sub client_read { croak 'Method "client_read" not implemented by subclass' }
 sub client_spin { croak 'Method "client_spin" not implemented by subclass' }
 
-sub client_written {
-    croak 'Method "client_written" not implemented by subclass';
+sub pause {
+    my $self = shift;
+
+    # Already paused
+    return $self if $self->_real_state;
+
+    # Save state
+    $self->_real_state($self->state);
+
+    # Pause
+    $self->state('paused');
+
+    return $self;
 }
 
-sub server_accept {
-    croak 'Method "server_accept" not implemented by subclass';
+sub resume {
+    my $self = shift;
+
+    # Not paused
+    return unless my $state = $self->_real_state;
+
+    # Resume
+    $self->_real_state(undef);
+    $self->state($state);
+
+    return $self;
 }
 
 sub server_get_chunk {
     croak 'Method "server_get_chunk" not implemented by subclass';
-}
-
-sub server_handled {
-    croak 'Method "server_handled" not implemented by subclass';
 }
 
 sub server_is_writing { shift->_is_writing }
@@ -64,12 +78,8 @@ sub server_read { croak 'Method "server_read" not implemented by subclass' }
 sub server_spin { croak 'Method "server_spin" not implemented by subclass' }
 sub server_tx   { croak 'Method "server_tx" not implemented by subclass' }
 
-sub server_written {
-    croak 'Method "server_written" not implemented by subclass';
-}
-
 sub _is_writing {
-    shift->is_state(qw/write_start_line write_headers write_body/);
+    shift->is_state(qw/write write_start_line write_headers write_body/);
 }
 
 1;
@@ -137,10 +147,6 @@ implements the following new ones.
 L<Mojo::Transaction> inherits all methods from L<Mojo::Stateful> and
 implements the following new ones.
 
-=head2 C<client_connect>
-
-    $tx = $tx->client_connect;
-
 =head2 C<client_connected>
 
     $tx = $tx->client_connected;
@@ -169,21 +175,17 @@ implements the following new ones.
 
     $tx = $tx->client_spin;
 
-=head2 C<client_written>
+=head2 C<pause>
 
-    $tx = $tx->client_written($length);
+    $tx = $tx->pause;
 
-=head2 C<server_accept>
+=head2 C<resume>
 
-    $tx = $tx->server_accept($tx);
+    $tx = $tx->resume;
 
 =head2 C<server_get_chunk>
 
     my $chunk = $tx->server_get_chunk;
-
-=head2 C<server_handled>
-
-    $tx = $tx->server_handled;
 
 =head2 C<server_is_writing>
 
@@ -204,9 +206,5 @@ implements the following new ones.
 =head2 C<server_tx>
 
     my $tx = $tx->server_tx;
-
-=head2 C<server_written>
-
-    $tx = $tx->server_written($bytes);
 
 =cut

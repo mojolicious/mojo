@@ -202,7 +202,7 @@ sub render {
     return !$c->render
       unless $c->stash->{rendered}
           || $c->res->code
-          || $c->tx->is_state('paused');
+          || $c->tx->is_paused;
 
     # Nothing to render
     return;

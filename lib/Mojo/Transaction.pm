@@ -36,6 +36,8 @@ sub client_leftovers {
 sub client_read { croak 'Method "client_read" not implemented by subclass' }
 sub client_spin { croak 'Method "client_spin" not implemented by subclass' }
 
+sub is_paused { shift->is_state('paused') }
+
 sub pause {
     my $self = shift;
 
@@ -174,6 +176,10 @@ implements the following new ones.
 =head2 C<client_spin>
 
     $tx = $tx->client_spin;
+
+=head2 C<is_paused>
+
+    my $paused = $tx->is_paused;
 
 =head2 C<pause>
 

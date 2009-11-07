@@ -42,7 +42,9 @@ sub new {
     $self->static->root($self->home->rel_dir('public'));
 
     # Hide our methods
-    $self->routes->hide(qw/render_inner render_partial render_text url_for/);
+    $self->routes->hide(qw/client pause redirect_to render_json/);
+    $self->routes->hide(qw/render_inner render_partial render_text resume/);
+    $self->routes->hide('url_for');
 
     # Mode
     my $mode = $self->mode;

@@ -7,8 +7,39 @@ use warnings;
 
 use base 'MojoX::Dispatcher::Routes::Controller';
 
+use Mojo::URL;
+
 # Space: It seems to go on and on forever...
 # but then you get to the end and a gorilla starts throwing barrels at you.
+sub client { shift->app->client }
+
+sub pause { shift->tx->pause }
+
+sub redirect_to {
+    my ($self, $target) = @_;
+
+    # Prepare location
+    my $base     = $self->req->url->base->clone;
+    my $location = Mojo::URL->new->base($base);
+
+    # Path
+    if ($target =~ /^\//) { $location->path($target) }
+
+    # URL
+    elsif ($target =~ /^\w+\:\/\//) { $location = $target }
+
+    # Named
+    else { $location = $self->url_for($target) }
+
+    # Code
+    $self->res->code(302);
+
+    # Location header
+    $self->res->headers->location($location);
+
+    return $self;
+}
+
 sub render {
     my $self = shift;
 
@@ -67,6 +98,8 @@ sub render_text {
     return $self->render(@_);
 }
 
+sub resume { shift->tx->resume }
+
 sub url_for {
     my $self = shift;
 
@@ -113,6 +146,20 @@ L<Mojolicious::Controller> inherits all methods from
 L<MojoX::Dispatcher::Routes::Controller> and implements the following new
 ones.
 
+=head2 C<client>
+
+    my $client = $c->client;
+
+=head2 C<pause>
+
+    $c->pause;
+
+=head2 C<redirect_to>
+
+    $c = $c->redirect_to('named');
+    $c = $c->redirect_to('/path');
+    $c = $c->redirect_to('http://127.0.0.1/foo/bar');
+
 =head2 C<render>
 
     $c->render;
@@ -145,6 +192,10 @@ ones.
 
     $c->render_text('Hello World!');
     $c->render_text('Hello World', layout => 'green');
+
+=head2 C<resume>
+
+    $c->resume;
 
 =head2 C<url_for>
 

@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 98;
+use Test::More tests => 117;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -102,10 +102,39 @@ app->renderer->add_helper(
 # GET /eperror
 get '/eperror' => sub { shift->render(handler => 'ep') } => 'eperror';
 
+# GET /subrequest
+get '/subrequest' => sub {
+    my $self = shift;
+    $self->pause;
+    $self->client->post(
+        '/template' => sub {
+            my ($client, $tx) = @_;
+            $self->resume;
+            $self->render_text($tx->res->body);
+        }
+    )->process;
+};
+
+# GET /redirect_url
+get '/redirect_url' => sub {
+    shift->redirect_to('http://127.0.0.1/foo')->render_text('Redirecting!');
+};
+
+# GET /redirect_path
+get '/redirect_path' => sub {
+    shift->redirect_to('/foo/bar')->render_text('Redirecting!');
+};
+
+# GET /redirect_named
+get '/redirect_named' => sub {
+    shift->redirect_to('index')->render_text('Redirecting!');
+};
+
 # Oh Fry, I love you more than the moon, and the stars,
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
 my $app = Mojolicious::Lite->new;
 my $client = Mojo::Client->new(app => $app);
+$app->client($client);
 
 # GET /outerlayout
 $client->get(
@@ -385,6 +414,53 @@ $client->get(
     }
 )->process;
 $app->log->level($level);
+
+# GET /subrequest
+$client->get(
+    '/subrequest' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            'Just works!');
+    }
+)->process;
+
+# GET /redirect_url
+$client->get(
+    '/redirect_url' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            302);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->headers->location,               'http://127.0.0.1/foo');
+        is($tx->res->body,                            'Redirecting!');
+    }
+)->process;
+
+# GET /redirect_path
+$client->get(
+    '/redirect_path' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            302);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->headers->location,               '/foo/bar');
+        is($tx->res->body,                            'Redirecting!');
+    }
+)->process;
+
+# GET /redirect_named
+$client->get(
+    '/redirect_named' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            302);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->headers->location,               '/template');
+        is($tx->res->body,                            'Redirecting!');
+    }
+)->process;
 
 __DATA__
 @@ outerlayout.html.ep

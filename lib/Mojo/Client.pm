@@ -15,8 +15,8 @@ use Mojo::Transaction::Single;
 use Socket;
 
 __PACKAGE__->attr([qw/app default_cb/]);
-__PACKAGE__->attr(continue_timeout   => 5);
-__PACKAGE__->attr(ioloop             => sub { Mojo::IOLoop->new });
+__PACKAGE__->attr([qw/continue_timeout max_keep_alive_connections/] => 5);
+__PACKAGE__->attr(ioloop => sub { Mojo::IOLoop->new });
 __PACKAGE__->attr(keep_alive_timeout => 15);
 
 __PACKAGE__->attr([qw/_app_queue _cache/] => sub { [] });
@@ -246,6 +246,10 @@ sub _connect {
 sub _deposit {
     my ($self, $name, $c) = @_;
 
+    # Limit keep alive connections
+    $self->_drop(shift @{$self->_cache})
+      while @{$self->_cache} >= $self->max_keep_alive_connections;
+
     # Deposit socket
     push @{$self->_cache}, [$name, $c];
 }
@@ -415,7 +419,7 @@ sub _withdraw {
 
         # Search for name or reference
         $found = $cached->[1] and next
-          if ref $name ? $cached->[1] : $cached->[0] eq $name;
+          if $cached->[1] eq $name || $cached->[0] eq $name;
 
         # Cache again
         push @cache, $cached;
@@ -491,6 +495,11 @@ L<Mojo::Client> implements the following attributes.
 
     my $keep_alive_timeout = $client->keep_alive_timeout;
     $client                = $client->keep_alive_timeout(15);
+
+=head2 C<max_keep_alive_connections>
+
+    my $max_keep_alive_connections = $client->max_keep_alive_connections;
+    $client                        = $client->max_keep_alive_connections(5);
 
 =head1 METHODS
 

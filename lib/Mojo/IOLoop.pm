@@ -135,8 +135,14 @@ sub local_info {
 sub not_writing {
     my ($self, $socket) = @_;
 
+    # Chunk still in buffer
+    my $buffer = $self->_connections->{$socket}->{buffer};
+    if ($buffer && $buffer->size) {
+        $self->_connections->{$socket}->{read_only} = 1;
+    }
+
     # Not writing
-    $self->_poll->mask($socket, POLLIN);
+    else { $self->_poll->mask($socket, POLLIN) }
 
     # Time
     $self->_connections->{$socket}->{time} = time;
@@ -297,6 +303,27 @@ sub _hup {
     $self->$event($socket);
 }
 
+sub _prepare {
+    my $self = shift;
+
+    # Check timeouts
+    for my $socket (keys %{$self->_connections}) {
+
+        # Read only
+        $self->not_writing($socket)
+          if delete $self->_connections->{$socket}->{read_only};
+
+        # Timeout
+        my $timeout = $self->_connections->{$socket}->{timeout} || 15;
+
+        # Last active
+        my $time = $self->_connections->{$socket}->{time} ||= time;
+
+        # HUP
+        $self->_hup($socket) if (time - $time) >= $timeout;
+    }
+}
+
 sub _read {
     my ($self, $socket) = @_;
 
@@ -362,8 +389,8 @@ sub _spin {
     # Connect
     $self->_connect;
 
-    # Timeout
-    $self->_timeout;
+    # Prepare
+    $self->_prepare;
 
     # Poll
     $poll->poll($self->timeout);
@@ -381,23 +408,6 @@ sub _spin {
     $self->_write($_) for $poll->handles(POLLOUT);
 }
 
-sub _timeout {
-    my $self = shift;
-
-    # Check timeouts
-    for my $socket (keys %{$self->_connections}) {
-
-        # Timeout
-        my $timeout = $self->_connections->{$socket}->{timeout} || 15;
-
-        # Last active
-        my $time = $self->_connections->{$socket}->{time} ||= time;
-
-        # HUP
-        $self->_hup($socket) if (time - $time) >= $timeout;
-    }
-}
-
 sub _write {
     my ($self, $socket) = @_;
 
@@ -408,7 +418,7 @@ sub _write {
     my $buffer = $c->{buffer};
 
     # Not enough bytes in buffer
-    unless ($buffer->size >= CHUNK_SIZE) {
+    unless ($buffer->size >= CHUNK_SIZE && $c->{read_only}) {
 
         # Get write callback
         return unless my $event = $c->{write};

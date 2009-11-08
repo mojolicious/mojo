@@ -238,7 +238,7 @@ sub _write {
     my ($self, $loop, $id) = @_;
 
     # Pipeline
-    my $p = $self->_connections->{$id}->{pipeline};
+    return unless my $p = $self->_connections->{$id}->{pipeline};
 
     # Get chunk
     my $chunk = $p->server_get_chunk;

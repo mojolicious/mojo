@@ -427,14 +427,18 @@ sub _write {
     # Buffer
     my $buffer = $c->{buffer};
 
-    # Not enough bytes in buffer
-    unless ($buffer->size >= CHUNK_SIZE && $c->{read_only}) {
+    # Try to fill the buffer before writing
+    while ($buffer->size < CHUNK_SIZE && !$c->{read_only}) {
 
-        # Get write callback
+        # No write callback
         return unless my $event = $c->{write};
 
         # Write callback
-        $buffer->add_chunk($self->$event($id));
+        my $chunk = $self->$event($id);
+        $buffer->add_chunk($chunk);
+
+        # Done for now
+        last unless defined $chunk && length $chunk;
     }
 
     # Try to write whole buffer

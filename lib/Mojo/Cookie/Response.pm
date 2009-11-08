@@ -9,6 +9,22 @@ use base 'Mojo::Cookie';
 
 use Mojo::ByteStream 'b';
 
+# Regex
+my $FIELD_RE = qr/
+    (
+      Comment
+    | Domain
+    | expires
+    | HttpOnly   # IE6 FF3 Opera 9.5
+    | Max-Age
+    | Path
+    | Port
+    | Secure
+    | Version
+    )
+/xmsi;
+my $FLAG_RE = qr/(?:Secure|HttpOnly)/i;
+
 # Remember the time he ate my goldfish?
 # And you lied and said I never had goldfish.
 # Then why did I have the bowl Bart? Why did I have the bowl?
@@ -32,28 +48,13 @@ sub parse {
             }
 
             # Field
-            if (my @match =
-                $name =~ /
-                    (
-                      Comment
-                    | Domain
-                    | expires
-                    | HttpOnly   # IE6 FF3 Opera 9.5
-                    | Max-Age
-                    | Path
-                    | Port
-                    | Secure
-                    | Version
-                    )
-            /xmsi
-              )
-            {
+            if (my @match = $name =~ /$FIELD_RE/) {
 
                 # Underscore
                 (my $id = lc $match[0]) =~ tr/-/_/;
 
                 # Flag?
-                $cookies[-1]->$id($id =~ /(?:Secure|HttpOnly)/i ? 1 : $value);
+                $cookies[-1]->$id($id =~ /$FLAG_RE/ ? 1 : $value);
             }
         }
     }

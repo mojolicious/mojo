@@ -153,6 +153,20 @@ sub parse {
     my $escp_mark  = quotemeta $self->escape_mark;
     my $expr_mark  = quotemeta $self->expression_mark;
 
+    my $mixed_re = qr/
+        (
+        $tag_start$expr_mark$escp_mark   # Escaped expression
+        |
+        $tag_start$expr_mark             # Expression
+        |
+        $tag_start$cmnt_mark             # Comment
+        |
+        $tag_start                       # Code
+        |
+        $tag_end                         # End
+        )
+    /x;
+
     # Tokenize
     my $state                = 'text';
     my $multiline_expression = 0;
@@ -207,22 +221,7 @@ sub parse {
 
         # Mixed line
         my @token;
-        for my $token (
-            split /
-            (
-                $tag_start$expr_mark$escp_mark   # Escaped expression
-            |
-                $tag_start$expr_mark             # Expression
-            |
-                $tag_start$cmnt_mark             # Comment
-            |
-                $tag_start                       # Code
-            |
-                $tag_end                         # End
-            )
-        /x, $line
-          )
-        {
+        for my $token (split /$mixed_re/, $line) {
 
             # Garbage
             next unless $token;

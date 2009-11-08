@@ -16,6 +16,23 @@ __PACKAGE__->attr(
     [qw/comment domain httponly max_age name path port secure value version/]
 );
 
+# Regex
+my $COOKIE_SEPARATOR_RE = qr/^\s*\,\s*/;
+my $EXPIRES_RE          = qr/^([^\;]+)\s*/;
+my $NAME_RE             = qr/
+    ^\s*           # Start
+    ([^\=\;\,]+)   # Relaxed Netscape token, allowing whitespace
+    \s*\=?\s*      # '=' (optional)
+/x;
+my $SEPARATOR_RE = qr/^\s*\;\s*/;
+my $STRING_RE    = qr/^([^\;\,]+)\s*/;
+my $VALUE_RE     = qr/
+    ^\s*               # Start
+    (\"                # Quote
+    (!:\\(!:\\\")?)*   # Value
+    \")                # Quote
+/x;
+
 # My Homer is not a communist.
 # He may be a liar, a pig, an idiot, a communist, but he is not a porn star.
 sub expires {
@@ -35,46 +52,29 @@ sub _tokenize {
     while ($string) {
 
         # Name
-        if ($string =~ s/
-            ^\s*           # Start
-            ([^\=\;\,]+)   # Relaxed Netscape token, allowing whitespace
-            \s*\=?\s*      # '=' (optional)
-        //x
-          )
-        {
+        if ($string =~ s/$NAME_RE//) {
 
             my $name = $1;
             my $value;
 
             # Quoted value
-            if ($string =~ s/
-                ^\s*               # Start
-                (\"                # Quote
-                (!:\\(!:\\\")?)*   # Value
-                \")                # Quote
-            //x
-              )
-            {
-                $value = b($1)->unquote;
-            }
+            if ($string =~ s/$VALUE_RE//) { $value = b($1)->unquote }
 
             # "expires" is a special case, thank you Netscape...
-            elsif ($name =~ /expires/i && $string =~ s/^([^\;]+)\s*//) {
+            elsif ($name =~ /expires/i && $string =~ s/$EXPIRES_RE//) {
                 $value = $1;
             }
 
             # Unquoted string
-            elsif ($string =~ s/^([^\;\,]+)\s*//) {
-                $value = $1;
-            }
+            elsif ($string =~ s/$STRING_RE//) { $value = $1 }
 
             push @token, [$name, $value];
 
             # Separator
-            $string =~ s/^\s*\;\s*//;
+            $string =~ s/$SEPARATOR_RE//;
 
             # Cookie separator
-            if ($string =~ s/^\s*\,\s*//) {
+            if ($string =~ s/$COOKIE_SEPARATOR_RE//) {
                 push @tree, [@token];
                 @token = ();
             }

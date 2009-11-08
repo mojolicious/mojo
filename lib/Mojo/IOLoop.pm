@@ -431,14 +431,16 @@ sub _write {
     while ($buffer->size < CHUNK_SIZE && !$c->{read_only}) {
 
         # No write callback
-        return unless my $event = $c->{write};
+        last unless my $event = $c->{write};
 
         # Write callback
         my $chunk = $self->$event($id);
-        $buffer->add_chunk($chunk);
 
         # Done for now
         last unless defined $chunk && length $chunk;
+
+        # Add to buffer
+        $buffer->add_chunk($chunk);
     }
 
     # Try to write whole buffer

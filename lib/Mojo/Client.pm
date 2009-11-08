@@ -29,10 +29,10 @@ sub new {
     # Connect callback
     $self->ioloop->connect_cb(
         sub {
-            my ($loop, $c) = @_;
+            my ($loop, $id) = @_;
 
             # Connected
-            $self->_connect($c);
+            $self->_connect($id);
         }
     );
 
@@ -217,89 +217,91 @@ sub _build_tx {
 }
 
 sub _connect {
-    my ($self, $c) = @_;
+    my ($self, $id) = @_;
 
     # Transaction
-    my $tx = $self->_connections->{$c}->{tx};
+    my $tx = $self->_connections->{$id}->{tx};
 
     # Connected
     $tx->client_connected;
 
     # Store connection information in transaction
-    my ($laddr, $lport) = $self->ioloop->local_info($c);
+    my ($laddr, $lport) = $self->ioloop->local_info($id);
     $tx->local_address($laddr);
     $tx->local_port($lport);
-    my ($raddr, $rport) = $self->ioloop->remote_info($c);
+    my ($raddr, $rport) = $self->ioloop->remote_info($id);
     $tx->remote_address($raddr);
     $tx->remote_port($rport);
 
     # Keep alive timeout
-    $self->ioloop->connection_timeout($c => $self->keep_alive_timeout);
+    $self->ioloop->connection_timeout($id => $self->keep_alive_timeout);
 
-    # Socket callbacks
-    $self->ioloop->error_cb($c => sub { $self->_error(@_) });
-    $self->ioloop->hup_cb($c => sub { $self->_hup(@_) });
-    $self->ioloop->read_cb($c => sub { $self->_read(@_) });
-    $self->ioloop->write_cb($c => sub { $self->_write(@_) });
+    # Callbacks
+    $self->ioloop->error_cb($id => sub { $self->_error(@_) });
+    $self->ioloop->hup_cb($id => sub { $self->_hup(@_) });
+    $self->ioloop->read_cb($id => sub { $self->_read(@_) });
+    $self->ioloop->write_cb($id => sub { $self->_write(@_) });
 }
 
 sub _deposit {
-    my ($self, $name, $c) = @_;
+    my ($self, $name, $id) = @_;
 
     # Limit keep alive connections
-    $self->_drop(shift @{$self->_cache})
-      while @{$self->_cache} >= $self->max_keep_alive_connections;
+    while (@{$self->_cache} >= $self->max_keep_alive_connections) {
+        my $cached = shift @{$self->_cache};
+        $self->_drop($cached->[1]);
+    }
 
-    # Deposit socket
-    push @{$self->_cache}, [$name, $c];
+    # Deposit
+    push @{$self->_cache}, [$name, $id];
 }
 
 sub _drop {
-    my ($self, $c) = @_;
+    my ($self, $id) = @_;
 
     # Keep connection alive
-    if (my $tx = $self->_connections->{$c}->{tx}) {
+    if (my $tx = $self->_connections->{$id}->{tx}) {
 
         # Read only
-        $self->ioloop->not_writing($c);
+        $self->ioloop->not_writing($id);
 
         # Deposit
         my ($scheme, $host, $port) = $tx->client_info;
-        $self->_deposit("$scheme:$host:$port", $c) if $tx->keep_alive;
+        $self->_deposit("$scheme:$host:$port", $id) if $tx->keep_alive;
     }
 
     # Connection close
     else {
-        $self->ioloop->drop($c);
-        $self->_withdraw($c);
+        $self->ioloop->drop($id);
+        $self->_withdraw($id);
     }
 
     # Drop connection
-    delete $self->_connections->{$c};
+    delete $self->_connections->{$id};
 }
 
 sub _error {
-    my ($self, $loop, $c, $error) = @_;
+    my ($self, $loop, $id, $error) = @_;
 
     # Transaction
-    if (my $tx = $self->_connections->{$c}->{tx}) {
+    if (my $tx = $self->_connections->{$id}->{tx}) {
 
         # Add error message
         $tx->error($error);
     }
 
     # Finish
-    $self->_finish($c);
+    $self->_finish($id);
 }
 
 sub _finish {
-    my ($self, $c) = @_;
+    my ($self, $id) = @_;
 
     # Transaction
-    my $tx = $self->_connections->{$c}->{tx};
+    my $tx = $self->_connections->{$id}->{tx};
 
     # Get callback
-    my $cb = $self->_connections->{$c}->{cb} || $self->default_cb;
+    my $cb = $self->_connections->{$id}->{cb} || $self->default_cb;
 
     # Transaction still in progress
     if ($tx) {
@@ -312,24 +314,24 @@ sub _finish {
     }
 
     # Drop
-    $self->_drop($c);
+    $self->_drop($id);
 
     # Stop IOLoop
     $self->ioloop->stop if $self->_finite && !$self->_queued;
 }
 
 sub _hup {
-    my ($self, $loop, $c) = @_;
+    my ($self, $loop, $id) = @_;
 
     # Transaction
-    if (my $tx = $self->_connections->{$c}->{tx}) {
+    if (my $tx = $self->_connections->{$id}->{tx}) {
 
         # Add error message
         $tx->error('Connection closed.');
     }
 
     # Finish
-    $self->_finish($c);
+    $self->_finish($id);
 }
 
 sub _queue {
@@ -342,20 +344,20 @@ sub _queue {
     my ($scheme, $host, $port) = $tx->client_info;
 
     # Cached connection
-    my $c;
-    if ($c = $self->_withdraw("$scheme:$host:$port")) {
+    my $id;
+    if ($id = $self->_withdraw("$scheme:$host:$port")) {
 
         # Writing
-        $self->ioloop->writing($c);
+        $self->ioloop->writing($id);
 
         # Kept alive
         $tx->kept_alive(1);
 
         # Add new connection
-        $self->_connections->{$c} = {cb => $cb, tx => $tx};
+        $self->_connections->{$id} = {cb => $cb, tx => $tx};
 
         # Connected
-        $self->_connect($c);
+        $self->_connect($id);
     }
 
     # New connection
@@ -368,10 +370,16 @@ sub _queue {
           : inet_ntoa(inet_aton($host));
 
         # Connect
-        $c = $self->ioloop->connect(address => $address, port => $port);
+        $id = $self->ioloop->connect(address => $address, port => $port);
+
+        # Error
+        unless (defined $id) {
+            $tx->error("Couldn't connect.");
+            return $self->$cb($tx);
+        }
 
         # Add new connection
-        $self->_connections->{$c} = {cb => $cb, tx => $tx};
+        $self->_connections->{$id} = {cb => $cb, tx => $tx};
     }
 
     # State change callback
@@ -379,12 +387,12 @@ sub _queue {
         sub {
 
             # Finished?
-            return $self->_finish($c) if $tx->is_finished;
+            return $self->_finish($id) if $tx->is_finished;
 
             # Writing?
             $tx->client_is_writing
-              ? $self->ioloop->writing($c)
-              : $self->ioloop->not_writing($c);
+              ? $self->ioloop->writing($id)
+              : $self->ioloop->not_writing($id);
         }
     );
 
@@ -393,10 +401,10 @@ sub _queue {
 }
 
 sub _read {
-    my ($self, $loop, $c, $chunk) = @_;
+    my ($self, $loop, $id, $chunk) = @_;
 
     # Transaction
-    if (my $tx = $self->_connections->{$c}->{tx}) {
+    if (my $tx = $self->_connections->{$id}->{tx}) {
 
         # Read
         $tx->client_read($chunk);
@@ -406,18 +414,18 @@ sub _read {
     }
 
     # Corrupted connection
-    else { $self->_drop($c) }
+    else { $self->_drop($id) }
 }
 
 sub _withdraw {
     my ($self, $name) = @_;
 
-    # Withdraw socket
+    # Withdraw
     my $found;
     my @cache;
     for my $cached (@{$self->_cache}) {
 
-        # Search for name or reference
+        # Search for name or id
         $found = $cached->[1] and next
           if $cached->[1] eq $name || $cached->[0] eq $name;
 
@@ -430,10 +438,10 @@ sub _withdraw {
 }
 
 sub _write {
-    my ($self, $loop, $c) = @_;
+    my ($self, $loop, $id) = @_;
 
     # Transaction
-    my $tx = $self->_connections->{$c}->{tx};
+    my $tx = $self->_connections->{$id}->{tx};
 
     # Get chunk
     my $chunk = $tx->client_get_chunk;

@@ -43,50 +43,54 @@ sub connect {
     my $args = ref $_[0] ? $_[0] : {@_};
 
     # New connection
-    my $new = IO::Socket::INET->new(
+    my $socket = IO::Socket::INET->new(
         Proto => 'tcp',
         Type  => SOCK_STREAM
-    );
+    ) or return undef;
 
     # Non blocking
-    $new->blocking(0);
+    $socket->blocking(0);
 
     # Connect
     my $sin = sockaddr_in($args->{port} || 80, inet_aton($args->{address}));
-    $new->connect($sin);
+    $socket->connect($sin);
 
     # Connecting
-    push @{$self->_connecting}, [$new, time];
+    push @{$self->_connecting}, [$socket, time];
 
-    return $new;
+    return "$socket";
 }
 
 sub connection_timeout {
-    my ($self, $socket, $timeout) = @_;
-    $self->_connections->{$socket}->{timeout} = $timeout and return $self
+    my ($self, $id, $timeout) = @_;
+    $self->_connections->{$id}->{timeout} = $timeout and return $self
       if $timeout;
-    return $self->_connections->{$socket}->{timeout};
+    return $self->_connections->{$id}->{timeout};
 }
 
 sub drop {
-    my ($self, $socket) = @_;
+    my ($self, $id) = @_;
 
     # Client counter
     $self->clients($self->clients - 1)
-      if $self->_connections->{$socket}->{client};
+      if $self->_connections->{$id}->{client};
 
     # Server counter
     $self->servers($self->servers - 1)
-      if $self->_connections->{$socket}->{server};
+      if $self->_connections->{$id}->{server};
 
-    # Remove socket from poll
-    $self->_poll->remove($socket);
+    # Socket
+    if (my $socket = $self->_connections->{$id}->{socket}) {
+
+        # Remove socket from poll
+        $self->_poll->remove($socket);
+
+        # Close socket
+        close $socket;
+    }
 
     # Remove connection
-    delete $self->_connections->{$socket};
-
-    # Close socket
-    close $socket;
+    delete $self->_connections->{$id};
 
     return $self;
 }
@@ -127,32 +131,36 @@ sub listen {
 }
 
 sub local_info {
-    my ($self, $socket) = @_;
-    my ($port, $addr)   = sockaddr_in(getsockname($socket));
+    my ($self, $id) = @_;
+    my ($port, $addr) =
+      sockaddr_in(getsockname($self->_connections->{$id}->{socket}));
     return (inet_ntoa($addr), $port);
 }
 
 sub not_writing {
-    my ($self, $socket) = @_;
+    my ($self, $id) = @_;
 
     # Chunk still in buffer
-    my $buffer = $self->_connections->{$socket}->{buffer};
+    my $buffer = $self->_connections->{$id}->{buffer};
     if ($buffer && $buffer->size) {
-        $self->_connections->{$socket}->{read_only} = 1;
+        $self->_connections->{$id}->{read_only} = 1;
     }
 
     # Not writing
-    else { $self->_poll->mask($socket, POLLIN) }
+    elsif (my $socket = $self->_connections->{$id}->{socket}) {
+        $self->_poll->mask($socket, POLLIN);
+    }
 
     # Time
-    $self->_connections->{$socket}->{time} = time;
+    $self->_connections->{$id}->{time} = time;
 }
 
 sub read_cb { shift->_add_event('read', @_) }
 
 sub remote_info {
-    my ($self, $socket) = @_;
-    my ($port, $addr)   = sockaddr_in(getpeername($socket));
+    my ($self, $id) = @_;
+    my ($port, $addr) =
+      sockaddr_in(getpeername($self->_connections->{$id}->{socket}));
     return (inet_ntoa($addr), $port);
 }
 
@@ -178,13 +186,15 @@ sub stop { shift->_running(0) }
 sub write_cb { shift->_add_event('write', @_) }
 
 sub writing {
-    my ($self, $socket) = @_;
+    my ($self, $id) = @_;
 
     # Writing
-    $self->_poll->mask($socket, POLLIN | POLLOUT);
+    if (my $socket = $self->_connections->{$id}->{socket}) {
+        $self->_poll->mask($socket, POLLIN | POLLOUT);
+    }
 
     # Time
-    $self->_connections->{$socket}->{time} = time;
+    $self->_connections->{$id}->{time} = time;
 }
 
 sub _accept {
@@ -195,13 +205,13 @@ sub _accept {
     for my $accept (@{$self->_accepted}) {
 
         # New socket
-        my $new = $accept->[0];
+        my $socket = $accept->[0];
 
         # Not yet
-        unless ($new->connected) {
+        unless ($socket->connected) {
 
             # Timeout
-            $self->_error($new, 'Accept timeout.') and next
+            $self->_error("$socket", 'Accept timeout.') and next
               if time - $accept->[1] < $self->accept_timeout;
 
             # Another try
@@ -210,19 +220,19 @@ sub _accept {
         }
 
         # Non blocking
-        $new->blocking(0);
+        $socket->blocking(0);
 
         # Add socket to poll
-        $self->not_writing($new);
+        $self->not_writing("$socket");
     }
     $self->_accepted(\@accepted);
 }
 
 sub _add_event {
-    my ($self, $event, $socket, $cb) = @_;
+    my ($self, $event, $id, $cb) = @_;
 
     # Add event callback to connection
-    $self->_connections->{$socket}->{$event} = $cb;
+    $self->_connections->{$id}->{$event} = $cb;
 
     return $self;
 }
@@ -235,13 +245,13 @@ sub _connect {
     for my $connect (@{$self->_connecting}) {
 
         # New socket
-        my $new = $connect->[0];
+        my $socket = $connect->[0];
 
         # Not yet connected
-        if (!$new->connected) {
+        if (!$socket->connected) {
 
             # Timeout
-            $self->_error($new, 'Connect timeout.') and next
+            $self->_error("$socket", 'Connect timeout.') and next
               if time - $connect->[1] > $self->connect_timeout;
 
             # Another try
@@ -252,30 +262,30 @@ sub _connect {
         else {
 
             # Add connection
-            $self->_connections->{$new} =
-              {buffer => Mojo::Buffer->new, server => 1};
+            $self->_connections->{$socket} =
+              {buffer => Mojo::Buffer->new, server => 1, socket => $socket};
 
             # Server counter
             $self->servers($self->servers + 1);
 
             # Connect callback
-            $self->connect_cb->($self, $new);
+            $self->connect_cb->($self, "$socket");
 
             # Add socket to poll
-            $self->writing($new);
+            $self->writing("$socket");
         }
     }
     $self->_connecting(\@connecting);
 }
 
 sub _error {
-    my ($self, $socket, $error) = @_;
+    my ($self, $id, $error) = @_;
 
     # Get error callback
-    my $event = $self->_connections->{$socket}->{error};
+    my $event = $self->_connections->{$id}->{error};
 
     # Cleanup
-    $self->drop($socket);
+    $self->drop($id);
 
     # No event
     return unless $event;
@@ -284,65 +294,65 @@ sub _error {
     $error ||= 'Connection error on poll layer.';
 
     # Error callback
-    $self->$event($socket, $error);
+    $self->$event($id, $id);
 }
 
 sub _hup {
-    my ($self, $socket) = @_;
+    my ($self, $id) = @_;
 
     # Get hup callback
-    my $event = $self->_connections->{$socket}->{hup};
+    my $event = $self->_connections->{$id}->{hup};
 
     # Cleanup
-    $self->drop($socket);
+    $self->drop($id);
 
     # No event
     return unless $event;
 
     # HUP callback
-    $self->$event($socket);
+    $self->$event($id);
 }
 
 sub _prepare {
     my $self = shift;
 
     # Check timeouts
-    for my $socket (keys %{$self->_connections}) {
+    for my $id (keys %{$self->_connections}) {
 
         # Read only
-        $self->not_writing($socket)
-          if delete $self->_connections->{$socket}->{read_only};
+        $self->not_writing($id)
+          if delete $self->_connections->{$id}->{read_only};
 
         # Timeout
-        my $timeout = $self->_connections->{$socket}->{timeout} || 15;
+        my $timeout = $self->_connections->{$id}->{timeout} || 15;
 
         # Last active
-        my $time = $self->_connections->{$socket}->{time} ||= time;
+        my $time = $self->_connections->{$id}->{time} ||= time;
 
         # HUP
-        $self->_hup($socket) if (time - $time) >= $timeout;
+        $self->_hup($id) if (time - $time) >= $timeout;
     }
 }
 
 sub _read {
-    my ($self, $socket) = @_;
+    my ($self, $id) = @_;
 
     # New connection
-    if ($self->_listen && $socket eq $self->_listen) {
+    if ($self->_listen && $id eq $self->_listen) {
 
         # Accept
-        my $new = $socket->accept;
-        push @{$self->_accepted}, [$new, time];
+        my $socket = $self->_listen->accept or return;
+        push @{$self->_accepted}, [$socket, time];
 
         # Add connection
-        $self->_connections->{$new} =
-          {buffer => Mojo::Buffer->new, client => 1};
+        $self->_connections->{$socket} =
+          {buffer => Mojo::Buffer->new, client => 1, socket => $socket};
 
         # Client counter
         $self->clients($self->clients + 1);
 
         # Accept callback
-        $self->accept_cb->($self, $new);
+        $self->accept_cb->($self, "$socket");
 
         # Unlock
         $self->unlock_cb->($self);
@@ -351,20 +361,20 @@ sub _read {
     }
 
     # Conenction
-    my $c = $self->_connections->{$socket};
+    my $c = $self->_connections->{$id};
 
     # Read chunk
-    my $read = $socket->sysread(my $buffer, CHUNK_SIZE, 0);
+    my $read = $c->{socket}->sysread(my $buffer, CHUNK_SIZE, 0);
 
     # Read error
-    return $self->_error($socket)
+    return $self->_error($id)
       unless defined $read && defined $buffer && length $buffer;
 
     # Get read callback
     return unless my $event = $c->{read};
 
     # Read callback
-    $self->$event($socket, $buffer);
+    $self->$event($id, $buffer);
 
     # Time
     $c->{time} = time;
@@ -379,7 +389,7 @@ sub _spin {
       if $self->_listen && $self->clients < $self->max_clients;
     my $cs = keys %{$self->_connections};
     if ($listening && $self->lock_cb->($self, !$cs)) {
-        $self->not_writing($self->_listen);
+        $poll->mask($self->_listen, POLLIN);
     }
     elsif ($self->_listen) { $poll->remove($self->_listen) }
 
@@ -396,23 +406,23 @@ sub _spin {
     $poll->poll($self->timeout);
 
     # Error
-    $self->_error($_) for $poll->handles(POLLERR);
+    $self->_error("$_") for $poll->handles(POLLERR);
 
     # HUP
-    $self->_hup($_) for $poll->handles(POLLHUP);
+    $self->_hup("$_") for $poll->handles(POLLHUP);
 
     # Read
-    $self->_read($_) for $poll->handles(POLLIN);
+    $self->_read("$_") for $poll->handles(POLLIN);
 
     # Write
-    $self->_write($_) for $poll->handles(POLLOUT);
+    $self->_write("$_") for $poll->handles(POLLOUT);
 }
 
 sub _write {
-    my ($self, $socket) = @_;
+    my ($self, $id) = @_;
 
     # Conenction
-    my $c = $self->_connections->{$socket};
+    my $c = $self->_connections->{$id};
 
     # Buffer
     my $buffer = $c->{buffer};
@@ -424,17 +434,17 @@ sub _write {
         return unless my $event = $c->{write};
 
         # Write callback
-        $buffer->add_chunk($self->$event($socket));
+        $buffer->add_chunk($self->$event($id));
     }
 
     # Try to write whole buffer
     my $chunk = $buffer->to_string;
 
     # Write
-    my $written = $socket->syswrite($chunk, length $chunk);
+    my $written = $c->{socket}->syswrite($chunk, length $chunk);
 
     # Write error
-    return $self->_error($socket) unless defined $written;
+    return $self->_error($id) unless defined $written;
 
     # Remove written chunk from buffer
     $buffer->remove($written);
@@ -460,22 +470,22 @@ Mojo::IOLoop - IO Loop
 
     # Accept connections
     $loop->accept_cb(sub {
-        my ($self, $c) = @_;
+        my ($self, $id) = @_;
 
         # Incoming data
-        $self->read_cb($c => sub {
-            my ($self, $c, $chunk) = @_;
+        $self->read_cb($id => sub {
+            my ($self, $id, $chunk) = @_;
 
             # Got some data, time to write
-            $self->writing($c);
+            $self->writing($id);
         });
 
         # Ready to write
-        $self->write_cb($c => sub {
-            my ($self, $c) = @_;
+        $self->write_cb($id => sub {
+            my ($self, $id) = @_;
 
             # Back to reading only
-            $self->not_writing($c);
+            $self->not_writing($id);
 
             # The loop will take care of buffering for us
             return 'HTTP/1.1 200 OK';
@@ -561,20 +571,20 @@ following new ones.
 
 =head2 C<connection_timeout>
 
-    my $timeout = $loop->connection_timeout($c);
-    $loop       = $loop->connection_timeout($c => 45);
+    my $timeout = $loop->connection_timeout($id);
+    $loop       = $loop->connection_timeout($id => 45);
 
 =head2 C<drop>
 
-    $loop = $loop->drop($c);
+    $loop = $loop->drop($id);
 
 =head2 C<error_cb>
 
-    $loop = $loop->error_cb($c => sub { ... });
+    $loop = $loop->error_cb($id => sub { ... });
 
 =head2 C<hup_cb>
 
-    $loop = $loop->hup_cb($c => sub { ... });
+    $loop = $loop->hup_cb($id => sub { ... });
 
 =head2 C<listen>
 
@@ -583,19 +593,19 @@ following new ones.
 
 =head2 C<local_info>
 
-    my ($address, $port) = $loop->local_info($c);
+    my ($address, $port) = $loop->local_info($id);
 
 =head2 C<not_writing>
 
-    $loop->not_writing($c);
+    $loop->not_writing($id);
 
 =head2 C<read_cb>
 
-    $loop = $loop->read_cb($c => sub { ... });
+    $loop = $loop->read_cb($id => sub { ... });
 
 =head2 C<remote_info>
 
-    my ($address, $port) = $loop->remote_info($c);
+    my ($address, $port) = $loop->remote_info($id);
 
 =head2 C<start>
 
@@ -607,10 +617,10 @@ following new ones.
 
 =head2 C<write_cb>
 
-    $loop = $loop->write_cb($c => sub { ... });
+    $loop = $loop->write_cb($id => sub { ... });
 
 =head2 C<writing>
 
-    $loop->writing($c);
+    $loop->writing($id);
 
 =cut

@@ -53,19 +53,19 @@ sub prepare_ioloop {
     # Accept callback
     $self->ioloop->accept_cb(
         sub {
-            my ($loop, $c) = @_;
+            my ($loop, $id) = @_;
 
             # Add new connection
-            $self->_connections->{$c} = {};
+            $self->_connections->{$id} = {};
 
             # Keep alive timeout
-            $loop->connection_timeout($c => $self->keep_alive_timeout);
+            $loop->connection_timeout($id => $self->keep_alive_timeout);
 
-            # Socket callbacks
-            $loop->error_cb($c => sub { $self->_error(@_) });
-            $loop->hup_cb($c => sub { $self->_hup(@_) });
-            $loop->read_cb($c => sub { $self->_read(@_) });
-            $loop->write_cb($c => sub { $self->_write(@_) });
+            # Callbacks
+            $loop->error_cb($id => sub { $self->_error(@_) });
+            $loop->hup_cb($id => sub { $self->_hup(@_) });
+            $loop->read_cb($id => sub { $self->_read(@_) });
+            $loop->write_cb($id => sub { $self->_write(@_) });
         }
     );
 }
@@ -118,20 +118,20 @@ sub setuidgid {
 }
 
 sub _create_pipeline {
-    my ($self, $c) = @_;
+    my ($self, $id) = @_;
 
     # Connection
-    my $conn = $self->_connections->{$c};
+    my $conn = $self->_connections->{$id};
 
     # New pipeline
     my $p = Mojo::Transaction::Pipeline->new;
-    $p->connection($c);
+    $p->connection($id);
 
     # Store connection information in pipeline
-    my ($laddr, $lport) = $self->ioloop->local_info($c);
+    my ($laddr, $lport) = $self->ioloop->local_info($id);
     $p->local_address($laddr);
     $p->local_port($lport);
-    my ($raddr, $rport) = $self->ioloop->remote_info($c);
+    my ($raddr, $rport) = $self->ioloop->remote_info($id);
     $p->remote_address($raddr);
     $p->remote_port($rport);
 
@@ -144,8 +144,8 @@ sub _create_pipeline {
 
                 # Close connection
                 if (!$conn->{pipeline}->keep_alive) {
-                    $self->_drop($c);
-                    $self->ioloop->drop($c);
+                    $self->_drop($id);
+                    $self->ioloop->drop($id);
                 }
 
                 # End pipeline
@@ -154,8 +154,8 @@ sub _create_pipeline {
 
             # Writing?
             $p->server_is_writing
-              ? $self->ioloop->writing($c)
-              : $self->ioloop->not_writing($c);
+              ? $self->ioloop->writing($id)
+              : $self->ioloop->not_writing($id);
         }
     );
 
@@ -187,32 +187,32 @@ sub _create_pipeline {
 }
 
 sub _drop {
-    my ($self, $c) = @_;
+    my ($self, $id) = @_;
 
     # Drop connection
-    delete $self->_connections->{$c};
+    delete $self->_connections->{$id};
 }
 
 sub _error {
-    my ($self, $loop, $c, $error) = @_;
+    my ($self, $loop, $id, $error) = @_;
 
-    # Drop socket
-    $self->_drop($c);
+    # Drop
+    $self->_drop($id);
 }
 
 sub _hup {
-    my ($self, $loop, $c) = @_;
+    my ($self, $loop, $id) = @_;
 
-    # Drop socket
-    $self->_drop($c);
+    # Drop
+    $self->_drop($id);
 }
 
 sub _read {
-    my ($self, $loop, $c, $chunk) = @_;
+    my ($self, $loop, $id, $chunk) = @_;
 
     # Pipeline
-    my $p = $self->_connections->{$c}->{pipeline}
-      ||= $self->_create_pipeline($c);
+    my $p = $self->_connections->{$id}->{pipeline}
+      ||= $self->_create_pipeline($id);
 
     # Read
     $p->server_read($chunk);
@@ -229,15 +229,16 @@ sub _read {
 
     # Last keep alive request?
     $p->server_tx->res->headers->connection('Close')
-      if $self->_connections->{$c}->{requests}
+      if $p->server_tx
+          && $self->_connections->{$id}->{requests}
           >= $self->max_keep_alive_requests;
 }
 
 sub _write {
-    my ($self, $loop, $c) = @_;
+    my ($self, $loop, $id) = @_;
 
     # Pipeline
-    my $p = $self->_connections->{$c}->{pipeline};
+    my $p = $self->_connections->{$id}->{pipeline};
 
     # Get chunk
     my $chunk = $p->server_get_chunk;

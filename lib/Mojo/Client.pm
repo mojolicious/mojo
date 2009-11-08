@@ -374,8 +374,10 @@ sub _queue {
 
         # Error
         unless (defined $id) {
-            $tx->error("Couldn't connect.");
-            return $self->$cb($tx);
+            $tx->error("Couldn't create connection.");
+            $cb ||= $self->default_cb;
+            $self->$cb($tx) if $cb;
+            return;
         }
 
         # Add new connection

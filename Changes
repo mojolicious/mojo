@@ -21,7 +21,7 @@ This file documents the revision history for Perl extension Mojo.
         - Added support for MOJO_CHUNK_SIZE=1. (melo)
         - Added not_found.html.* templates.
         - Added input streaming support to Mojo::Content.
-        - Added client, pause, redirect_to and resume to
+        - Added client, param, pause, redirect_to and resume to
           Mojolicious::Controller.
         - Updated Mojolicious lite_app generator to use .ep templates.
         - Fixed many bugs in the HTTP 1.1 state machine and added the ability

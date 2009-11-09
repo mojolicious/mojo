@@ -13,6 +13,8 @@ use Mojo::URL;
 # but then you get to the end and a gorilla starts throwing barrels at you.
 sub client { shift->app->client }
 
+sub param { shift->tx->req->param(@_) }
+
 sub pause { shift->tx->pause }
 
 sub redirect_to {
@@ -149,6 +151,11 @@ ones.
 =head2 C<client>
 
     my $client = $c->client;
+
+=head2 C<param>
+
+    my $param  = $c->param('foo');
+    my @params = $c->param('foo');
 
 =head2 C<pause>
 

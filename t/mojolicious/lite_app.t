@@ -84,7 +84,7 @@ post '/utf8' => 'form';
 # POST /malformed_UTF-8
 post '/malformed_utf8' => sub {
     my $c = shift;
-    $c->render_text(Mojo::URL->new($c->req->param('foo')));
+    $c->render_text(Mojo::URL->new($c->param('foo')));
 };
 
 # GET /json
@@ -477,7 +477,7 @@ Oops!
 Just works!\
 
 @@ form.html.epl
-<%= shift->req->param('name') %> Тихановский
+<%= shift->param('name') %> Тихановский
 
 @@ layouts/layout.html.epl
 <%= shift->render_inner %> with layout

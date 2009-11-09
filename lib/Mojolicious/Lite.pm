@@ -330,7 +330,7 @@ multiple features at once.
     post '/form' => sub {
         my $self = shift;
 
-        my $groovy = $self->req->param('groovy') || 'Austin Powers';
+        my $groovy = $self->param('groovy') || 'Austin Powers';
         $groovy =~ s/[^\w\s]+//g;
 
         $self->render(

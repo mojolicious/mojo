@@ -294,7 +294,7 @@ sub _error {
     $error ||= 'Connection error on poll layer.';
 
     # Error callback
-    $self->$event($id, $id);
+    $self->$event($id, $error);
 }
 
 sub _hup {

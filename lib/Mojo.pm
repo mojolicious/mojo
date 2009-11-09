@@ -186,6 +186,8 @@ In alphabetical order:
 
 Adam Kennedy
 
+Adriano Ferreira
+
 Anatoly Sharifulin
 
 Andreas Koenig

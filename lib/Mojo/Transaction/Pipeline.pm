@@ -94,7 +94,8 @@ sub client_get_chunk {
     my $self = shift;
 
     # Get chunk from current writer
-    return $self->_current_active->client_get_chunk;
+    return $self->_current_active->client_get_chunk if $self->_current_active;
+    return;
 }
 
 sub client_info { @{shift->_info} }

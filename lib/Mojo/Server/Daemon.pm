@@ -154,7 +154,7 @@ sub _create_pipeline {
                 # Close connection
                 if (!$conn->{pipeline}->keep_alive) {
                     $self->_drop($id);
-                    $self->ioloop->drop($id);
+                    $self->ioloop->finish($id);
                 }
 
                 # End pipeline

@@ -290,7 +290,7 @@ sub _drop {
 
     # Connection close
     else {
-        $self->ioloop->drop($id);
+        $self->ioloop->finish($id);
         $self->_withdraw($id);
     }
 

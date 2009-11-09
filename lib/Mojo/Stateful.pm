@@ -18,7 +18,8 @@ sub error {
 
     # Get
     if (!$message) {
-        return ($self->{error} || 'Unknown Error.') if $self->has_error;
+        return ($self->{error} || 'Unknown state machine error.')
+          if $self->has_error;
         return undef;
     }
 

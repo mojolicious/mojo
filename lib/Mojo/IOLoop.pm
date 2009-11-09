@@ -96,7 +96,17 @@ sub drop {
 }
 
 sub error_cb { shift->_add_event('error', @_) }
-sub hup_cb   { shift->_add_event('hup',   @_) }
+
+sub finish {
+    my ($self, $id) = @_;
+
+    # Finish connection once buffer is empty
+    $self->_connections->{$id}->{finish} = 1;
+
+    return $self;
+}
+
+sub hup_cb { shift->_add_event('hup', @_) }
 
 # Fat Tony is a cancer on this fair city!
 # He is the cancer and I am the… uh… what cures cancer?
@@ -317,17 +327,24 @@ sub _prepare {
     my $self = shift;
 
     # Check timeouts
-    for my $id (keys %{$self->_connections}) {
+    my $c = $self->_connections;
+    for my $id (keys %$c) {
+
+        # Drop if buffer is empty
+        $self->drop($id)
+          and next
+          if $c->{$id}->{finish}
+              && $c->{$id}->{buffer}
+              && !$c->{$id}->{buffer}->size;
 
         # Read only
-        $self->not_writing($id)
-          if delete $self->_connections->{$id}->{read_only};
+        $self->not_writing($id) if delete $c->{$id}->{read_only};
 
         # Timeout
-        my $timeout = $self->_connections->{$id}->{timeout} || 15;
+        my $timeout = $c->{$id}->{timeout} || 15;
 
         # Last active
-        my $time = $self->_connections->{$id}->{time} ||= time;
+        my $time = $c->{$id}->{time} ||= time;
 
         # HUP
         $self->_hup($id) if (time - $time) >= $timeout;
@@ -428,7 +445,7 @@ sub _write {
     my $buffer = $c->{buffer};
 
     # Try to fill the buffer before writing
-    while ($buffer->size < CHUNK_SIZE && !$c->{read_only}) {
+    while ($buffer->size < CHUNK_SIZE && !$c->{read_only} && !$c->{finish}) {
 
         # No write callback
         last unless my $event = $c->{write};
@@ -587,6 +604,10 @@ following new ones.
 =head2 C<error_cb>
 
     $loop = $loop->error_cb($id => sub { ... });
+
+=head2 C<finish>
+
+    $loop = $loop->finish($id);
 
 =head2 C<hup_cb>
 

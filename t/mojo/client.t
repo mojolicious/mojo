@@ -9,7 +9,7 @@ use Test::More;
 
 plan skip_all => 'set TEST_CLIENT to enable this test'
   unless $ENV{TEST_CLIENT};
-plan tests => 52;
+plan tests => 55;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -18,6 +18,16 @@ use_ok('Mojo::Transaction::Pipeline');
 use_ok('Mojo::Transaction::Single');
 
 my $client = Mojo::Client->new;
+
+# Custom non keep alive request
+my $tx = Mojo::Transaction::Single->new;
+$tx->req->method('GET');
+$tx->req->url->parse('http://kraih.com');
+$tx->req->headers->connection('close');
+$client->process($tx);
+is($tx->state,     'done');
+is($tx->res->code, 200);
+like($tx->res->headers->connection, qr/close/i);
 
 # Simple request
 $client->get(
@@ -58,7 +68,7 @@ $client->get(
 $client->process;
 
 # Custom chunked request without callback
-my $tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::Single->new;
 $tx->req->method('GET');
 $tx->req->url->parse('http://google.com');
 $tx->req->headers->transfer_encoding('chunked');

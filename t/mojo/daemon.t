@@ -14,7 +14,7 @@ use Test::Mojo::Server;
 
 plan skip_all => 'set TEST_DAEMON to enable this test (developer only!)'
   unless $ENV{TEST_DAEMON};
-plan tests => 42;
+plan tests => 46;
 
 # Daddy, I'm scared. Too scared to even wet my pants.
 # Just relax and it'll come, son.
@@ -35,8 +35,19 @@ my $port = $server->port;
 my $client = Mojo::Client->new;
 $client->continue_timeout(60);
 
-# Pipelined with 100 Continue
+# Single request without keep alive
 my $tx = Mojo::Transaction::Single->new;
+$tx->req->method('GET');
+$tx->req->url->parse("http://127.0.0.1:$port/0/");
+$tx->req->headers->connection('close');
+$client->process($tx);
+is($tx->state,     'done');
+is($tx->res->code, 200);
+like($tx->res->headers->connection, qr/close/i);
+like($tx->res->body,                qr/Mojo is working/);
+
+# Pipelined with 100 Continue
+$tx = Mojo::Transaction::Single->new;
 $tx->req->method('GET');
 $tx->req->url->parse("http://127.0.0.1:$port/1/");
 my $tx2 = Mojo::Transaction::Single->new;

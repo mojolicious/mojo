@@ -12,6 +12,7 @@ use Mojo::IOLoop;
 use Mojo::Server;
 use Mojo::Transaction::Pipeline;
 use Mojo::Transaction::Single;
+use Scalar::Util qw/isweak weaken/;
 use Socket;
 
 __PACKAGE__->attr([qw/app default_cb/]);
@@ -23,8 +24,16 @@ __PACKAGE__->attr([qw/_app_queue _cache/] => sub { [] });
 __PACKAGE__->attr(_connections            => sub { {} });
 __PACKAGE__->attr([qw/_finite _queued/]   => 0);
 
-sub new {
-    my $self = shift->SUPER::new(@_);
+sub delete { shift->_build_tx('DELETE', @_) }
+sub get    { shift->_build_tx('GET',    @_) }
+sub head   { shift->_build_tx('HEAD',   @_) }
+sub post   { shift->_build_tx('POST',   @_) }
+
+sub process {
+    my $self = shift;
+
+    # Weaken
+    weaken $self;
 
     # Connect callback
     $self->ioloop->connect_cb(
@@ -35,17 +44,6 @@ sub new {
             $self->_connect($id);
         }
     );
-
-    return $self;
-}
-
-sub delete { shift->_build_tx('DELETE', @_) }
-sub get    { shift->_build_tx('GET',    @_) }
-sub head   { shift->_build_tx('HEAD',   @_) }
-sub post   { shift->_build_tx('POST',   @_) }
-
-sub process {
-    my $self = shift;
 
     # Queue transactions
     $self->queue(@_) if @_;
@@ -110,11 +108,28 @@ sub _app_process {
                 my $tx = $daemon->build_tx_cb->($daemon);
 
                 # Handler callback
-                $tx->handler_cb(sub { $daemon->handler_cb->($daemon, $tx); });
+                $tx->handler_cb(
+                    sub {
+
+                        # Weaken
+                        weaken $tx unless isweak $tx;
+
+                        # Handler
+                        $daemon->handler_cb->($daemon, $tx);
+                    }
+                );
 
                 # Continue handler callback
                 $tx->continue_handler_cb(
-                    sub { $daemon->continue_handler_cb->($daemon, $tx) });
+                    sub {
+
+                        # Weaken
+                        weaken $tx;
+
+                        # Handler
+                        $daemon->continue_handler_cb->($daemon, $tx);
+                    }
+                );
 
                 return $tx;
             }
@@ -235,6 +250,9 @@ sub _connect {
 
     # Keep alive timeout
     $self->ioloop->connection_timeout($id => $self->keep_alive_timeout);
+
+    # Weaken
+    weaken $self;
 
     # Callbacks
     $self->ioloop->error_cb($id => sub { $self->_error(@_) });
@@ -383,6 +401,10 @@ sub _queue {
         # Add new connection
         $self->_connections->{$id} = {cb => $cb, tx => $tx};
     }
+
+    # Weaken
+    weaken $self;
+    weaken $tx;
 
     # State change callback
     $tx->state_cb(

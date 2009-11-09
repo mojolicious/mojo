@@ -11,6 +11,7 @@ use bytes;
 use Carp 'croak';
 use Mojo::IOLoop;
 use Mojo::Transaction::Pipeline;
+use Scalar::Util qw/isweak weaken/;
 
 __PACKAGE__->attr([qw/address group listen_queue_size user/]);
 __PACKAGE__->attr(ioloop => sub { Mojo::IOLoop->new });
@@ -49,6 +50,9 @@ sub prepare_ioloop {
 
     # Max clients
     $self->ioloop->max_clients($self->max_clients);
+
+    # Weaken
+    weaken $self;
 
     # Accept callback
     $self->ioloop->accept_cb(
@@ -135,9 +139,14 @@ sub _create_pipeline {
     $p->remote_address($raddr);
     $p->remote_port($rport);
 
+    # Weaken
+    weaken $self;
+    weaken $conn;
+
     # State change callback
     $p->state_cb(
         sub {
+            my $p = shift;
 
             # Finish
             if ($p->is_finished) {
@@ -167,11 +176,28 @@ sub _create_pipeline {
             my $tx = $self->build_tx_cb->($self);
 
             # Handler callback
-            $tx->handler_cb(sub { $self->handler_cb->($self, $tx); });
+            $tx->handler_cb(
+                sub {
+
+                    # Weaken
+                    weaken $tx unless isweak $tx;
+
+                    # Handler
+                    $self->handler_cb->($self, $tx);
+                }
+            );
 
             # Continue handler callback
             $tx->continue_handler_cb(
-                sub { $self->continue_handler_cb->($self, $tx) });
+                sub {
+
+                    # Weaken
+                    weaken $tx;
+
+                    # Continue handler
+                    $self->continue_handler_cb->($self, $tx);
+                }
+            );
 
             return $tx;
         }

@@ -8,6 +8,7 @@ use warnings;
 use base 'Mojo::Transaction';
 
 use Mojo::Transaction::Single;
+use Scalar::Util qw/isweak weaken/;
 
 __PACKAGE__->attr([qw/active finished inactive/] => sub { [] });
 __PACKAGE__->attr(
@@ -32,6 +33,11 @@ sub new {
         # State change callback
         $tx->state_cb(
             sub {
+
+                # Weaken
+                weaken $self unless isweak $self;
+
+                # Not finished
                 unless ($self->is_finished) {
 
                     # State
@@ -316,9 +322,15 @@ sub _new_tx {
     $tx->remote_address($self->remote_address);
     $tx->remote_port($self->remote_port);
 
+    # Weaken
+    weaken $self;
+
     # State change callback
     $tx->state_cb(
         sub {
+
+            # Shortcut
+            return unless $self;
 
             # Keep alive?
             $self->keep_alive($self->_first_active->keep_alive)

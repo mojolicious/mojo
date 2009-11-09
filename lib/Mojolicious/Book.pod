@@ -7,7 +7,7 @@ Mojolicious::Book - Modern Web Development With Perl And Mojolicious
 =head1 STATUS
 
 This book is currently being written, to get status updates and/or read
-early drafts you can visit L<http://labs.kraih.org> and
-L<http://twitter.com/kraih>.
+early drafts you can visit L<http://labs.kraih.org>,
+L<http://twitter.com/kraih> and L<http://github.com/kraih/mojo/>.
 
 =cut

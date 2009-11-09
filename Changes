@@ -23,6 +23,7 @@ This file documents the revision history for Perl extension Mojo.
         - Added input streaming support to Mojo::Content.
         - Added client, param, pause, redirect_to and resume to
           Mojolicious::Controller.
+        - Renamed Mojo::Manual to Mojolicious::Book.
         - Updated Mojolicious lite_app generator to use .ep templates.
         - Fixed many bugs in the HTTP 1.1 state machine and added the ability
           to pause transactions.

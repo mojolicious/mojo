@@ -108,7 +108,7 @@ Currently there are no requirements besides Perl 5.8.1.
     |        CGI       | |      FastCGI     | |     HTTP 1.1     |
     '------------------' '------------------' '------------------'
 
-For userfriendly documentation see L<Mojo::Manual>.
+For user friendly documentation see L<Mojolicious::Book>.
 
 =head1 ATTRIBUTES
 

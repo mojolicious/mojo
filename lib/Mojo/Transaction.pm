@@ -78,7 +78,6 @@ sub server_leftovers {
 
 sub server_read { croak 'Method "server_read" not implemented by subclass' }
 sub server_spin { croak 'Method "server_spin" not implemented by subclass' }
-sub server_tx   { croak 'Method "server_tx" not implemented by subclass' }
 
 sub _is_writing {
     shift->is_state(qw/write write_start_line write_headers write_body/);
@@ -159,7 +158,7 @@ implements the following new ones.
 
 =head2 C<client_info>
 
-    my @info = $tx->client_info;
+    my $info = $tx->client_info;
 
 =head2 C<client_is_writing>
 
@@ -208,9 +207,5 @@ implements the following new ones.
 =head2 C<server_spin>
 
     $tx = $tx->server_spin;
-
-=head2 C<server_tx>
-
-    my $tx = $tx->server_tx;
 
 =cut

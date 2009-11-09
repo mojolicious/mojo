@@ -20,7 +20,7 @@ __PACKAGE__->attr(safe_post => 0);
 
 __PACKAGE__->attr('_all_written');
 __PACKAGE__->attr(_current => 0);
-__PACKAGE__->attr(_info => sub { [] });
+__PACKAGE__->attr(_info => sub { {} });
 
 # No children have ever meddled with the Republican Party and lived to tell
 # about it.
@@ -62,7 +62,7 @@ sub new {
     }
 
     # Cache client info
-    $self->_info([$self->active->[0]->client_info]) if @_;
+    $self->_info($self->active->[0]->client_info) if @_;
 
     return $self;
 }
@@ -98,7 +98,7 @@ sub client_get_chunk {
     return;
 }
 
-sub client_info { @{shift->_info} }
+sub client_info { shift->_info }
 
 sub client_is_writing {
     my $self = shift;
@@ -441,7 +441,7 @@ and implements the following new ones.
 
 =head2 C<client_info>
 
-    my @info = $p->client_info;
+    my $info = $p->client_info;
 
 =head2 C<client_is_writing>
 

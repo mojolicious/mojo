@@ -144,7 +144,7 @@ sub local_info {
     my ($self, $id) = @_;
     my ($port, $addr) =
       sockaddr_in(getsockname($self->_connections->{$id}->{socket}));
-    return (inet_ntoa($addr), $port);
+    return {address => inet_ntoa($addr), port => $port};
 }
 
 sub not_writing {
@@ -171,7 +171,7 @@ sub remote_info {
     my ($self, $id) = @_;
     my ($port, $addr) =
       sockaddr_in(getpeername($self->_connections->{$id}->{socket}));
-    return (inet_ntoa($addr), $port);
+    return {address => inet_ntoa($addr), port => $port};
 }
 
 sub start {
@@ -620,7 +620,7 @@ following new ones.
 
 =head2 C<local_info>
 
-    my ($address, $port) = $loop->local_info($id);
+    my $info = $loop->local_info($id);
 
 =head2 C<not_writing>
 
@@ -632,7 +632,7 @@ following new ones.
 
 =head2 C<remote_info>
 
-    my ($address, $port) = $loop->remote_info($id);
+    my $info = $loop->remote_info($id);
 
 =head2 C<start>
 

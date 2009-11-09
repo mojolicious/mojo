@@ -241,12 +241,12 @@ sub _connect {
     $tx->client_connected;
 
     # Store connection information in transaction
-    my ($laddr, $lport) = $self->ioloop->local_info($id);
-    $tx->local_address($laddr);
-    $tx->local_port($lport);
-    my ($raddr, $rport) = $self->ioloop->remote_info($id);
-    $tx->remote_address($raddr);
-    $tx->remote_port($rport);
+    my $local = $self->ioloop->local_info($id);
+    $tx->local_address($local->{address});
+    $tx->local_port($local->{port});
+    my $remote = $self->ioloop->remote_info($id);
+    $tx->remote_address($remote->{address});
+    $tx->remote_port($remote->{port});
 
     # Keep alive timeout
     $self->ioloop->connection_timeout($id => $self->keep_alive_timeout);
@@ -284,7 +284,10 @@ sub _drop {
         $self->ioloop->not_writing($id);
 
         # Deposit
-        my ($scheme, $host, $port) = $tx->client_info;
+        my $info   = $tx->client_info;
+        my $host   = $info->{host};
+        my $port   = $info->{port};
+        my $scheme = $info->{scheme};
         $self->_deposit("$scheme:$host:$port", $id) if $tx->keep_alive;
     }
 
@@ -359,7 +362,10 @@ sub _queue {
     push @{$self->_app_queue}, [$tx, $cb] and return if $self->app;
 
     # Info
-    my ($scheme, $host, $port) = $tx->client_info;
+    my $info   = $tx->client_info;
+    my $host   = $info->{host};
+    my $port   = $info->{port};
+    my $scheme = $info->{scheme};
 
     # Cached connection
     my $id;

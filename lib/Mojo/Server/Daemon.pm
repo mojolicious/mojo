@@ -132,12 +132,12 @@ sub _create_pipeline {
     $p->connection($id);
 
     # Store connection information in pipeline
-    my ($laddr, $lport) = $self->ioloop->local_info($id);
-    $p->local_address($laddr);
-    $p->local_port($lport);
-    my ($raddr, $rport) = $self->ioloop->remote_info($id);
-    $p->remote_address($raddr);
-    $p->remote_port($rport);
+    my $local = $self->ioloop->local_info($id);
+    $p->local_address($local->{address});
+    $p->local_port($local->{port});
+    my $remote = $self->ioloop->remote_info($id);
+    $p->remote_address($remote->{address});
+    $p->remote_port($remote->{port});
 
     # Weaken
     weaken $self;

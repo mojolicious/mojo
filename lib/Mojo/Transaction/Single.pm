@@ -98,7 +98,7 @@ sub client_info {
         $port   = $proxy->port || 80;
     }
 
-    return ($scheme, $host, $port);
+    return {host => $host, port => $port, scheme => $scheme};
 }
 
 sub client_leftovers {
@@ -542,7 +542,7 @@ and implements the following new ones.
 
 =head2 C<client_info>
 
-    my ($scheme, $host, $port) = $tx->client_info;
+    my $info = $tx->client_info;
 
 =head2 C<client_leftovers>
 

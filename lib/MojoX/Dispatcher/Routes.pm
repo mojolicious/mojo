@@ -10,7 +10,6 @@ use base 'MojoX::Routes';
 use Mojo::ByteStream 'b';
 use Mojo::Exception;
 use Mojo::Loader;
-use Scalar::Util qw/isweak weaken/;
 
 __PACKAGE__->attr(
     controller_base_class => 'MojoX::Dispatcher::Routes::Controller');
@@ -51,9 +50,6 @@ sub dispatch_callback {
 
     # Catch errors
     local $SIG{__DIE__} = sub { die Mojo::Exception->new(shift) };
-
-    # Weaken
-    weaken $c unless isweak $c;
 
     # Dispatch
     my $continue;
@@ -119,7 +115,7 @@ sub dispatch_controller {
         my $new = $class->new($c);
 
         # Call action
-        $continue = $self->_action($new, $method);
+        $continue = $new->$method;
 
         # Copy stash
         $c->stash($new->stash);
@@ -239,16 +235,6 @@ sub walk_stack {
 
     # Done
     return;
-}
-
-sub _action {
-    my ($self, $new, $method) = @_;
-
-    # Weaken
-    weaken $new;
-
-    # Action
-    $new->$method;
 }
 
 1;

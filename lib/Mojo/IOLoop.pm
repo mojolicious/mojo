@@ -212,7 +212,7 @@ sub _accept {
 
             # Timeout
             $self->_error("$socket", 'Accept timeout.') and next
-              if time - $accept->[1] < $self->accept_timeout;
+              if time - $accept->[1] > $self->accept_timeout;
 
             # Another try
             push @accepted, $accept;

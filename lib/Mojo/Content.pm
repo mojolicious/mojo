@@ -99,7 +99,7 @@ sub generate_body_chunk {
     }
 
     # Get chunk
-    my $chunk = $self->buffer->get(CHUNK_SIZE);
+    my $chunk = $self->buffer->to_string;
 
     # Pause or EOF
     return $self->_eof ? '' : undef unless length $chunk;

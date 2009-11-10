@@ -44,8 +44,6 @@ sub empty {
     return $buffer;
 }
 
-sub get { substr shift->{buffer}, 0, shift }
-
 sub get_line {
     my $self = shift;
 
@@ -125,10 +123,6 @@ the following new ones.
 =head2 C<empty>
 
     my $chunk = $buffer->empty;
-
-=head2 C<get>
-
-    my $chunk = $buffer->get(4);
 
 =head2 C<get_line>
 

@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojo.
 
+0.999902 2009-11-01 00:00:00
+        - Fixed typos.
+
 0.999901 2009-09-01 00:00:00
         - Added new Mojo::Client, because the old one had bugs that prevented
           proper scaling and could not be fixed otherwise.

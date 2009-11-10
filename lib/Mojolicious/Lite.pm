@@ -353,7 +353,7 @@ multiple features at once.
 
     @@ welcome.html.ep
     <%= $groovy %> is groovy!
-    <%== $self->render_partial('menu') %>
+    <%== include 'menu' %>
 
     @@ menu.html.ep
     <a href="<%= url_for 'index' %>">Try again</a>

@@ -465,7 +465,7 @@ $client->get(
 __DATA__
 @@ outerlayout.html.ep
 Hello
-<%== $self->render_partial('outermenu') %>
+<%== include 'outermenu' %>
 
 @@ outermenu.html.ep
 there!

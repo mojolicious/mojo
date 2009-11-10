@@ -156,6 +156,9 @@ sub new {
     # Add "content" helper
     $self->add_helper(content => sub { shift->render_inner(@_) });
 
+    # Add "include" helper
+    $self->add_helper(include => sub { shift->render_partial(@_) });
+
     # Add "layout" helper
     $self->add_helper(layout => sub { shift->stash(layout => @_) });
 

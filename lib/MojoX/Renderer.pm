@@ -152,9 +152,10 @@ sub render {
 sub template_name {
     my ($self, $options) = @_;
 
-    my $template = $options->{template} || '';
-    my $format   = $options->{format};
-    my $handler  = $options->{handler};
+    # Template?
+    return unless my $template = $options->{template} || '';
+    return unless my $format   = $options->{format};
+    return unless my $handler  = $options->{handler};
 
     return "$template.$format.$handler";
 }

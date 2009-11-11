@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojo.
 
 0.999903 2009-11-10 00:00:00
+        - Added ladders to Mojolicious::Lite, they are like bridges but lite.
         - Added encoding support to renderer. (likhatskiy)
 
 0.999902 2009-11-01 00:00:00

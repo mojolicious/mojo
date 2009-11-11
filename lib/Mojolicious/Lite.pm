@@ -10,8 +10,9 @@ use base 'Mojolicious';
 use File::Spec;
 use FindBin;
 
-# Singleton
+# Singletons
 my $APP;
+my $ROUTES;
 
 # It's the future, my parents, my co-workers, my girlfriend,
 # I'll never see any of them ever again... YAHOOO!
@@ -27,6 +28,9 @@ sub import {
 
     # Initialize app
     $APP = $class->new;
+
+    # Initialize routes
+    $ROUTES = $APP->routes;
 
     # Route generator
     my $route = sub {
@@ -72,8 +76,14 @@ sub import {
         $defaults ||= {};
         $defaults = {%$defaults, callback => $cb};
 
+        # Create bridge
+        return $ROUTES =
+          $APP->routes->bridge($pattern, {@$constraints})->over($conditions)
+          ->to($defaults)->name($name)
+          if !ref $methods && $methods eq 'ladder';
+
         # Create route
-        $APP->routes->route($pattern, {@$constraints})->over($conditions)
+        $ROUTES->route($pattern, {@$constraints})->over($conditions)
           ->via($methods)->to($defaults)->name($name);
     };
 
@@ -82,10 +92,11 @@ sub import {
     no strict 'refs';
 
     # Export
-    *{"${caller}::app"}  = sub {$APP};
-    *{"${caller}::any"}  = sub { $route->(ref $_[0] ? shift : [], @_) };
-    *{"${caller}::get"}  = sub { $route->('get', @_) };
-    *{"${caller}::post"} = sub { $route->('post', @_) };
+    *{"${caller}::app"}    = sub {$APP};
+    *{"${caller}::any"}    = sub { $route->(ref $_[0] ? shift : [], @_) };
+    *{"${caller}::get"}    = sub { $route->('get', @_) };
+    *{"${caller}::ladder"} = sub { $route->('ladder', @_) };
+    *{"${caller}::post"}   = sub { $route->('post', @_) };
 
     # Shagadelic!
     *{"${caller}::shagadelic"} = sub {

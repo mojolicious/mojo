@@ -28,8 +28,8 @@ sub new {
             my ($r, $c, $output, $options) = @_;
 
             # Template
-            my $t     = $r->template_name($options);
-            my $path  = $r->template_path($options);
+            return unless my $t    = $r->template_name($options);
+            return unless my $path = $r->template_path($options);
             my $cache = $options->{cache} || $path;
 
             # Check cache

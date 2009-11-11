@@ -8,11 +8,12 @@ use warnings;
 use base 'Mojo::Base';
 
 use File::Spec;
+use Mojo::ByteStream 'b';
 use Mojo::JSON;
 use MojoX::Types;
 
 __PACKAGE__->attr(default_format => 'html');
-__PACKAGE__->attr('default_handler');
+__PACKAGE__->attr([qw/default_handler encoding/]);
 __PACKAGE__->attr(default_status => 200);
 __PACKAGE__->attr(handler        => sub { {} });
 __PACKAGE__->attr(layout_prefix  => 'layouts');
@@ -130,6 +131,10 @@ sub render {
     # Partial
     return $output if $partial;
 
+    # Encoding
+    $output = b($output)->encode($self->encoding)->to_string
+      if $self->encoding;
+
     # Response
     my $res = $c->res;
     $res->code($c->stash('status') || $self->default_status)
@@ -217,6 +222,11 @@ L<MojoX::Types> implements the follwing attributes.
 
     my $default = $renderer->default_status;
     $renderer   = $renderer->default_status(404);
+
+=head2 C<encoding>
+
+    my $encoding = $renderer->encoding;
+    $renderer    = $renderer->encoding('koi8-r');
 
 =head2 C<handler>
 

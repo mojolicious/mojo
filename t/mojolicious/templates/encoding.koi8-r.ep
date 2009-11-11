@@ -1,0 +1,4 @@
+%# That young man fills me with hope. Plus some other emotions which are weird and
+%# deeply confusing.
+% my $foo = 'Этот человек наполняет меня надеждой. Ну, и некоторыми другими глубокими и приводящими в замешательство эмоциями.';
+<%= $foo %>

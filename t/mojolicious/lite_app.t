@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 117;
+use Test::More tests => 122;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -128,6 +128,14 @@ get '/redirect_path' => sub {
 # GET /redirect_named
 get '/redirect_named' => sub {
     shift->redirect_to('index')->render_text('Redirecting!');
+};
+
+# GET /koi8-r
+app->types->type('koi8-r' => 'text/html; charset=koi8-r');
+get '/koi8-r' => sub {
+    app->renderer->encoding('koi8-r');
+    shift->render('encoding', format => 'koi8-r', handler => 'ep');
+    app->renderer->encoding(undef);
 };
 
 # Oh Fry, I love you more than the moon, and the stars,
@@ -459,6 +467,21 @@ $client->get(
         is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
         is($tx->res->headers->location,               '/template');
         is($tx->res->body,                            'Redirecting!');
+    }
+)->process;
+
+# GET /koi8-r
+$client->get(
+    '/koi8-r' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->headers->content_type, 'text/html; charset=koi8-r');
+        is(b($tx->res->body)->decode('koi8-r'),
+            "Этот человек наполняет меня надеждой."
+              . " Ну, и некоторыми другими глубокими и приводящими в"
+              . " замешательство эмоциями.\n");
     }
 )->process;
 

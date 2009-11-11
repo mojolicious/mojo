@@ -44,6 +44,9 @@ sub new {
                 # Initialize
                 $mt ||= Mojo::Template->new;
 
+                # Encoding
+                $mt->encoding($self->encoding) if $self->encoding;
+
                 # Class
                 my $class =
                      $c->stash->{template_class}

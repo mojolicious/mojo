@@ -170,7 +170,7 @@ $client->get(
         is($tx->res->code,                            200);
         is($tx->res->headers->server,                 'Mojo (Perl)');
         is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body, "layouted Hello\nthere!\n\n\n");
+        is($tx->res->body, "layouted Hello\n[\n  1,\n  2\n]\nthere!\n\n\n");
     }
 )->process;
 
@@ -545,7 +545,7 @@ Hello
 <%== include 'outermenu' %>
 
 @@ outermenu.html.ep
-there!
+<%= dumper [1, 2] %>there!
 
 @@ not_found.html.epl
 Oops!

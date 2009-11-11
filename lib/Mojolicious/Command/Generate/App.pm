@@ -168,12 +168,11 @@ like($tx->res->content->asset->slurp, qr/Mojolicious Web Framework/i);
 </html>
 @@ exception
 <!doctype html><html>
-% use Data::Dumper ();
 % my $s = $self->stash;
 % my $e = $self->stash('exception');
 % delete $s->{inner_template};
 % delete $s->{exception};
-% my $dump = Data::Dumper->new([$s])->Maxdepth(2)->Indent(1)->Terse(1)->Dump;
+% my $dump = dumper $s;
 % $s->{exception} = $e;
   <head>
 	<title>Exception</title>

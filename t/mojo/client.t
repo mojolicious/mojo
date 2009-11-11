@@ -9,15 +9,29 @@ use Test::More;
 
 plan skip_all => 'set TEST_CLIENT to enable this test'
   unless $ENV{TEST_CLIENT};
-plan tests => 55;
+plan tests => 57;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
 use_ok('Mojo::Client');
+use_ok('Mojo::IOLoop');
 use_ok('Mojo::Transaction::Pipeline');
 use_ok('Mojo::Transaction::Single');
 
+# Make sure clients dont taint the ioloop
+my $ioloop = Mojo::IOLoop->new;
 my $client = Mojo::Client->new;
+$client->get(
+    'http://kraih.com' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code, 200);
+    }
+)->process;
+$client = undef;
+$ioloop->start;
+
+# Fresh client
+$client = Mojo::Client->new;
 
 # Custom non keep alive request
 my $tx = Mojo::Transaction::Single->new;

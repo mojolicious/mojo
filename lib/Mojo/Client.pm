@@ -24,6 +24,22 @@ __PACKAGE__->attr([qw/_app_queue _cache/] => sub { [] });
 __PACKAGE__->attr(_connections            => sub { {} });
 __PACKAGE__->attr([qw/_finite _queued/]   => 0);
 
+# Make sure we leave a clean ioloop behind
+sub DESTROY {
+    my $self = shift;
+
+    # Cleanup active connections
+    for my $id (keys %{$self->_connections}) {
+        $self->ioloop->drop($id);
+    }
+
+    # Cleanup keep alive connections
+    for my $cached (@{$self->_cache}) {
+        my $id = $cached->[1];
+        $self->ioloop->drop($id);
+    }
+}
+
 sub delete { shift->_build_tx('DELETE', @_) }
 sub get    { shift->_build_tx('GET',    @_) }
 sub head   { shift->_build_tx('HEAD',   @_) }
@@ -54,7 +70,7 @@ sub process {
     # Loop is finite
     $self->_finite(1);
 
-    # Start IOLoop
+    # Start ioloop
     $self->ioloop->start;
 
     # Cleanup
@@ -337,7 +353,7 @@ sub _finish {
     # Drop
     $self->_drop($id);
 
-    # Stop IOLoop
+    # Stop ioloop
     $self->ioloop->stop if $self->_finite && !$self->_queued;
 }
 

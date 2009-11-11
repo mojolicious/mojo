@@ -419,6 +419,10 @@ sub _spin {
     # Prepare
     $self->_prepare;
 
+    # Nothing to do
+    return $self->_running(0)
+      unless $poll->handles || $self->_listen || @{$self->_connecting};
+
     # Poll
     $poll->poll($self->timeout);
 

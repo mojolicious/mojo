@@ -3,6 +3,8 @@ This file documents the revision history for Perl extension Mojo.
 0.999902 2009-11-01 00:00:00
         - Added include helper.
         - Optimized buffering a bit.
+        - Fixed a case where multiple clients would taint the shared ioloop.
+          (ferreira)
         - Fixed typos.
 
 0.999901 2009-09-01 00:00:00

@@ -106,7 +106,7 @@ sub parent {
     # Unlock callback
     $self->ioloop->unlock_cb(sub { flock($self->_lock, LOCK_UN) });
 
-    # Prepare IOLoop
+    # Prepare ioloop
     $self->prepare_ioloop;
 }
 

@@ -82,7 +82,7 @@ sub run {
     # User and group
     $self->setuidgid;
 
-    # Prepare IOLoop
+    # Prepare ioloop
     $self->prepare_ioloop;
 
     # Start loop

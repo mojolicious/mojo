@@ -17,9 +17,9 @@ use IO::File;
 use Mojo::ByteStream 'b';
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
-use constant TMPDIR     => $ENV{MOJO_TMPDIR}     || File::Spec->tmpdir;
 
 __PACKAGE__->attr([qw/cleanup path/]);
+__PACKAGE__->attr(tmpdir => sub { $ENV{MOJO_TMPDIR} || File::Spec->tmpdir });
 __PACKAGE__->attr(
     handle => sub {
         my $self   = shift;
@@ -42,7 +42,7 @@ __PACKAGE__->attr(
         }
 
         # Generate temporary file
-        my $base = File::Spec->catfile(TMPDIR, 'mojo.tmp');
+        my $base = File::Spec->catfile($self->tmpdir, 'mojo.tmp');
         $file = $base;
         while (-e $file) {
             my $sum = b(time . rand(999999999))->md5_sum;
@@ -202,6 +202,11 @@ L<Mojo::Asset::File> implements the following attributes.
 
     my $path = $asset->path;
     $asset   = $asset->path('/foo/bar/baz.txt');
+
+=head2 C<tmpdir>
+
+    my $tmpdir = $asset->tmpdir;
+    $asset     = $asset->tmpdir('/tmp');
 
 =head1 METHODS
 

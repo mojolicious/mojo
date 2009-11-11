@@ -4,6 +4,7 @@ This file documents the revision history for Perl extension Mojo.
         - Added ladders to Mojolicious::Lite, they are like bridges but lite.
         - Added encoding support to renderer. (likhatskiy)
         - Added dumper helper.
+        - Made tmpdir in Mojo::Asset::File configurable.
 
 0.999902 2009-11-01 00:00:00
         - Added include helper.

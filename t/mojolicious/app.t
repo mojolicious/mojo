@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 121;
+use Test::More tests => 106;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -161,73 +161,12 @@ $client->get(
     }
 )->process;
 
-# SyntaxError::foo in production mode (syntax error in controller)
-my $backup = $ENV{MOJO_MODE} || '';
-$ENV{MOJO_MODE} = 'production';
-$client->get(
-    '/syntax_error/foo' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            500);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        like($tx->res->body, qr/Internal Server Error/);
-    }
-)->process;
-$ENV{MOJO_MODE} = $backup;
-
-# Foo::syntaxerror in production mode (syntax error in template)
-$backup = $ENV{MOJO_MODE} || '';
-$ENV{MOJO_MODE} = 'production';
-$client->get(
-    '/foo/syntaxerror' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            500);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        like($tx->res->body, qr/Internal Server Error/);
-    }
-)->process;
-$ENV{MOJO_MODE} = $backup;
-
-# Static file /hello.txt in a production mode
-$backup = $ENV{MOJO_MODE} || '';
-$ENV{MOJO_MODE} = 'production';
-$client->get(
-    '/hello.txt' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->content_type,           'text/plain');
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        like(
-            $tx->res->content->asset->slurp,
-            qr/Hello Mojo from a static file!/
-        );
-    }
-)->process;
-$ENV{MOJO_MODE} = $backup;
-
-# Try to access a file which is not under the web root via path
-# traversal in production mode
-$backup = $ENV{MOJO_MODE} || '';
-$ENV{MOJO_MODE} = 'production';
-$client->get(
-    '../../mojolicious/secret.txt' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code, 404);
-        unlike($tx->res->content->asset->slurp, qr/Secret file/);
-    }
-)->process;
-$ENV{MOJO_MODE} = $backup;
-
 # Check Last-Modified header for static files
 my $path  = File::Spec->catdir($FindBin::Bin, 'public_dev', 'hello.txt');
 my $stat  = stat($path);
 my $mtime = Mojo::Date->new(stat($path)->mtime)->to_string;
 
-# Static file /hello.txt in a development mode
-$backup = $ENV{MOJO_MODE} || '';
-$ENV{MOJO_MODE} = 'development';
+# Static file /hello.txt
 $client->get(
     '/hello.txt' => sub {
         my ($self, $tx) = @_;
@@ -243,12 +182,9 @@ $client->get(
             qr/Hello Mojo from a development static file!/);
     }
 )->process;
-$ENV{MOJO_MODE} = $backup;
 
 # Try to access a file which is not under the web root via path
-# traversal in development mode
-$backup = $ENV{MOJO_MODE} || '';
-$ENV{MOJO_MODE} = 'development';
+# traversal
 $client->get(
     '../../mojolicious/secret.txt' => sub {
         my ($self, $tx) = @_;
@@ -256,10 +192,8 @@ $client->get(
         unlike($tx->res->content->asset->slurp, qr/Secret file/);
     }
 )->process;
-$ENV{MOJO_MODE} = $backup;
 
 # Check If-Modified-Since
-$ENV{MOJO_MODE} = 'development';
 $client->get(
     '/hello.txt' => ('If-Modified-Since' => $mtime) => sub {
         my ($self, $tx) = @_;
@@ -268,7 +202,6 @@ $client->get(
         is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
     }
 )->process;
-$ENV{MOJO_MODE} = $backup;
 
 # Make sure we can override attributes with constructor arguments
 my $app = MojoliciousTest->new({mode => 'test'});

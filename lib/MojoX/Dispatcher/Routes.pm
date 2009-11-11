@@ -114,11 +114,15 @@ sub dispatch_controller {
         # Instantiate
         my $new = $class->new($c);
 
-        # Call action
-        $continue = $new->$method;
+        # Get action
+        if (my $code = $new->can($method)) {
 
-        # Copy stash
-        $c->stash($new->stash);
+            # Call action
+            $continue = $new->$code;
+
+            # Copy stash
+            $c->stash($new->stash);
+        }
     };
 
     # Success!

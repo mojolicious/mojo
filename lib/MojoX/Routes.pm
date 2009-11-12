@@ -219,8 +219,9 @@ sub url_for {
     my ($self, $url, $values) = @_;
 
     # Path prefix
-    my $path = $url->path->to_string;
-    $path = $self->pattern->render($values) . $path;
+    my $path   = $url->path->to_string;
+    my $prefix = $self->pattern->render($values);
+    $path = $prefix . $path unless $prefix eq '/';
 
     # Make sure there is always a root
     $path = '/' if !$path && !$self->parent;

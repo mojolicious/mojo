@@ -114,9 +114,6 @@ sub shape_match {
         warn "    [$$pathref] -> [$pattern]\n";
     }
 
-    # Nothing to match
-    return $self->defaults unless $self->tree->[1];
-
     # Compile on demand
     $self->_compile unless $self->regex;
 

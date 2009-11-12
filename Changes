@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojo.
 
+0.999905 2009-11-11 00:00:00
+        - Fixed routes bug that prevented the root from having formats.
+
 0.999904 2009-11-10 00:00:00
         - Cleaned up examples.
 

@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 136;
+use Test::More tests => 148;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -25,6 +25,12 @@ app->log->level('error');
 
 # Test with lite templates
 app->renderer->default_handler('epl');
+
+# GET /
+get '/' => 'root';
+
+# GET /root
+get '/root.html' => 'root_path';
 
 # GET /outerlayout
 get '/outerlayout' => sub {
@@ -162,6 +168,39 @@ get '/with_ladder_too' => sub {
 my $app = Mojolicious::Lite->new;
 my $client = Mojo::Client->new(app => $app);
 $app->client($client);
+
+# GET /
+$client->get(
+    '/' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            "/root.html");
+    }
+)->process;
+
+# GET /root
+$client->get(
+    '/root.html' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            "/.html");
+    }
+)->process;
+
+# GET /.html
+$client->get(
+    '/.html' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            "/root.html");
+    }
+)->process;
 
 # GET /outerlayout
 $client->get(
@@ -540,6 +579,12 @@ $client->get(
 )->process;
 
 __DATA__
+@@ root.html.epl
+%== shift->url_for('root_path')
+
+@@ root_path.html.epl
+%== shift->url_for('root');
+
 @@ outerlayout.html.ep
 Hello
 <%== include 'outermenu' %>

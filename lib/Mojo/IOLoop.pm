@@ -334,8 +334,7 @@ sub _prepare {
         $self->drop($id)
           and next
           if $c->{$id}->{finish}
-              && $c->{$id}->{buffer}
-              && !$c->{$id}->{buffer}->size;
+              && (!$c->{$id}->{buffer} || !$c->{$id}->{buffer}->size);
 
         # Read only
         $self->not_writing($id) if delete $c->{$id}->{read_only};

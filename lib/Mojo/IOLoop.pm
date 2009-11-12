@@ -105,7 +105,7 @@ sub finish {
 
     # Finish connection now
     $self->drop($id) and return $self
-      unless $c->{$id}->{buffer} && $c->{$id}->{buffer}->size;
+      if !$c->{$id}->{buffer} || !$c->{$id}->{buffer}->size;
 
     # Finish connection once buffer is empty
     $self->_connections->{$id}->{finish} = 1;

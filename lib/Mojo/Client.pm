@@ -28,6 +28,9 @@ __PACKAGE__->attr([qw/_finite _queued/]   => 0);
 sub DESTROY {
     my $self = shift;
 
+    # Shortcut
+    return unless $self->ioloop;
+
     # Cleanup active connections
     for my $id (keys %{$self->_connections}) {
         $self->ioloop->drop($id);
@@ -487,15 +490,21 @@ sub _write {
     my ($self, $loop, $id) = @_;
 
     # Transaction
-    my $tx = $self->_connections->{$id}->{tx};
+    if (my $tx = $self->_connections->{$id}->{tx}) {
 
-    # Get chunk
-    my $chunk = $tx->client_get_chunk;
+        # Get chunk
+        my $chunk = $tx->client_get_chunk;
 
-    # State machine
-    $tx->client_spin;
+        # State machine
+        $tx->client_spin;
 
-    return $chunk;
+        return $chunk;
+    }
+
+    # Corrupted connection
+    else { $self->_drop($id) }
+
+    return;
 }
 
 1;

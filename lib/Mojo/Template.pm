@@ -368,11 +368,9 @@ Mojo::Template - Perlish Templates!
 
     # Simple
     my $output = $mt->render(<<'EOF');
-    <html>
-      <head></head>
-      <body>
-        Time: <%= localtime(time) %>
-      </body>
+    <!doctype html><html>
+        <head><title>Simple</title></head>
+        <body>Time: <%= localtime(time) %></body>
     </html>
     EOF
     print $output;

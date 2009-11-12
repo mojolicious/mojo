@@ -126,12 +126,12 @@ sub welcome {
 1;
 @@ static
 <!doctype html><html>
-  <head><title>Welcome to the Mojolicious Web Framework!</title></head>
-  <body>
-    <h2>Welcome to the Mojolicious Web Framework!</h2>
-    This is the static document "public/index.html",
-    <a href="/">click here</a> to get back to the start.
-  </body>
+    <head><title>Welcome to the Mojolicious Web Framework!</title></head>
+    <body>
+        <h2>Welcome to the Mojolicious Web Framework!</h2>
+        This is the static document "public/index.html",
+        <a href="/">click here</a> to get back to the start.
+    </body>
 </html>
 @@ test
 % my $class = shift;
@@ -159,12 +159,12 @@ is($tx->res->headers->content_type, 'text/html');
 like($tx->res->content->asset->slurp, qr/Mojolicious Web Framework/i);
 @@ not_found
 <!doctype html><html>
-  <head><title>Not Found</title></head>
-  <body>
-    The page you were requesting
-    "<%= $self->req->url->path || '/' %>"
-    could not be found.
-  </body>
+    <head><title>Not Found</title></head>
+    <body>
+        The page you were requesting
+        "<%= $self->req->url->path || '/' %>"
+        could not be found.
+    </body>
 </html>
 @@ exception
 <!doctype html><html>
@@ -174,49 +174,51 @@ like($tx->res->content->asset->slurp, qr/Mojolicious Web Framework/i);
 % delete $s->{exception};
 % my $dump = dumper $s;
 % $s->{exception} = $e;
-  <head>
-	<title>Exception</title>
-	<style type="text/css">
-	  body {
-		font: 0.9em Verdana, "Bitstream Vera Sans", sans-serif;
-	  }
-	  .snippet {
-        font: 115% Monaco, "Courier New", monospace;
-	  }
-	</style>
-  </head>
-  <body>
-    <% if ($self->app->mode eq 'development') { %>
-	  <div>
-        This page was generated from the template
-        "templates/exception.html.ep".
-      </div>
-      <div class="snippet"><pre><%= $e->message %></pre></div>
-      <div>
-        <% for my $line (@{$e->lines_before}) { %>
-          <div class="snippet"><%= $line->[0] %>: <%= $line->[1] %></div>
+    <head>
+	    <title>Exception</title>
+	    <style type="text/css">
+	        body {
+		        font: 0.9em Verdana, "Bitstream Vera Sans", sans-serif;
+	        }
+	        .snippet {
+                font: 115% Monaco, "Courier New", monospace;
+	        }
+	    </style>
+    </head>
+    <body>
+        <% if ($self->app->mode eq 'development') { %>
+	        <div>
+                This page was generated from the template
+                "templates/exception.html.ep".
+            </div>
+            <div class="snippet"><pre><%= $e->message %></pre></div>
+            <div>
+                <% for my $line (@{$e->lines_before}) { %>
+                    <div class="snippet">
+                        <%= $line->[0] %>: <%= $line->[1] %>
+                    </div>
+                <% } %>
+                <% if ($e->line->[0]) { %>
+                    <div class="snippet">
+	                    <b><%= $e->line->[0] %>: <%= $e->line->[1] %></b>
+	                </div>
+                <% } %>
+                <% for my $line (@{$e->lines_after}) { %>
+                    <div class="snippet">
+                        <%= $line->[0] %>: <%= $line->[1] %>
+                    </div>
+                <% } %>
+            </div>
+            <div class="snippet"><pre><%= $dump %></pre></div>
+        <% } else { %>
+            <div>Page temporarily unavailable, please come back later.</div>
         <% } %>
-        <% if ($e->line->[0]) { %>
-          <div class="snippet">
-	        <b><%= $e->line->[0] %>: <%= $e->line->[1] %></b>
-	      </div>
-        <% } %>
-        <% for my $line (@{$e->lines_after}) { %>
-          <div class="snippet"><%= $line->[0] %>: <%= $line->[1] %></div>
-        <% } %>
-      </div>
-      <div class="snippet"><pre><%= $dump %></pre></div>
-    <% } else { %>
-      <div>A server error occured, please try gain later.</div>
-    <% } %>
-  </body>
+    </body>
 </html>
 @@ layout
 <!doctype html><html>
-  <head><title>Welcome</title></head>
-  <body>
-    <%== content %>
-  </body>
+    <head><title>Welcome</title></head>
+    <body><%== content %></body>
 </html>
 @@ welcome
 % layout 'default';

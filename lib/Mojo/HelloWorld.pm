@@ -59,15 +59,15 @@ sub _diag {
         $tx->res->headers->content_type('text/html');
         $tx->res->body(<<'EOF');
 <!doctype html><html>
-  <head><title>Mojo Diagnostics</title></head>
-  <body>
-    <a href="/diag/chunked_params">Chunked Request Parameters</a><br />
-    <a href="/diag/dump_env">Dump Environment Variables</a><br />
-    <a href="/diag/dump_params">Dump Request Parameters</a><br />
-    <a href="/diag/dump_tx">Dump Transaction</a><br />
-    <a href="/diag/dump_url">Dump Request URL</a><br />
-    <a href="/diag/proxy">Proxy</a>
-  </body>
+    <head><title>Mojo Diagnostics</title></head>
+    <body>
+        <a href="/diag/chunked_params">Chunked Request Parameters</a><br />
+        <a href="/diag/dump_env">Dump Environment Variables</a><br />
+        <a href="/diag/dump_params">Dump Request Parameters</a><br />
+        <a href="/diag/dump_tx">Dump Transaction</a><br />
+        <a href="/diag/dump_url">Dump Request URL</a><br />
+        <a href="/diag/proxy">Proxy</a>
+    </body>
 </html>
 EOF
     }
@@ -152,13 +152,13 @@ sub _proxy {
     $tx->res->headers->content_type('text/html');
     $tx->res->body(<<"EOF");
 <!doctype html><html>
-  <head><title>Mojo Diagnostics</title></head>
-  <body>
-    <form action="$url" method="GET">
-      <input type="text" name="url" value="http://"/>
-      <input type="submit" value="Fetch" />
-    </form>
-  </body>
+    <head><title>Mojo Diagnostics</title></head>
+    <body>
+        <form action="$url" method="GET">
+            <input type="text" name="url" value="http://"/>
+            <input type="submit" value="Fetch" />
+        </form>
+    </body>
 </html>
 EOF
 }

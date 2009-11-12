@@ -227,8 +227,8 @@ Templates can have layouts.
 
     @@ layouts/green.html.ep
     <!doctype html><html>
-      <head><title>Green!</title></head>
-      <body><%== content %></body>
+        <head><title>Green!</title></head>
+        <body><%== content %></body>
     </html>
 
 Route placeholders allow capturing parts of a request path until a C</> or
@@ -371,10 +371,9 @@ multiple features at once.
 
     @@ layouts/funky.html.ep
     <!doctype html><html>
-      <head><title>Funky!</title></head>
-      <body>
-        <%== content %>
-      </body>
+        <head><title>Funky!</title></head>
+        <body><%== content %>
+        </body>
     </html>
 
 Conditions such as C<agent> allow even more powerful route constructs.
@@ -402,8 +401,8 @@ Formats can be automatically detected by looking at file extensions.
 
     @@ detected.html.ep
     <!doctype html><html>
-      <head><title>Detected!</title></head>
-      <body>HTML was detected.</body>
+        <head><title>Detected!</title></head>
+        <body>HTML was detected.</body>
     </html>
 
     @@ detected.txt.ep

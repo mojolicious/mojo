@@ -50,7 +50,7 @@ sub parse {
     return $self unless $pattern;
 
     # Format
-    $pattern =~ /\.([^\/]+)$/;
+    $pattern =~ /\.([^\/\)]+)$/;
     $self->format($1) if $1;
 
     # Requirements

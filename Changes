@@ -2,6 +2,8 @@ This file documents the revision history for Perl extension Mojo.
 
 0.999907 2009-11-11 00:00:00
         - Fixed another connection close bug in ioloop.
+        - Fixed relaxed placeholder format handling in
+          MojoX::Routes::Pattern.
 
 0.999906 2009-11-11 00:00:00
         - Fixed connection close bug in ioloop.

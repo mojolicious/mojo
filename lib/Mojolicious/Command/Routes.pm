@@ -64,7 +64,7 @@ sub _walk {
     my ($self, $node, $depth, $routes) = @_;
 
     # Line
-    my $pattern = $node->pattern->pattern;
+    my $pattern = $node->pattern->pattern || '/';
     my $name    = $node->name;
     my $line    = ' ' x ($depth * 4);
     $line .= $pattern;

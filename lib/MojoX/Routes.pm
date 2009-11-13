@@ -149,7 +149,7 @@ sub match {
         $match->path($path);
 
         # Reset stack
-        $match->stack($snapshot);
+        $self->parent ? $match->stack($snapshot) : $match->stack([]);
     }
 
     $match->endpoint($self) if $self->is_endpoint && $match->is_path_empty;

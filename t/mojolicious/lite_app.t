@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 148;
+use Test::More tests => 164;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -162,6 +162,25 @@ get '/with_ladder_too' => sub {
     my $self = shift;
     $self->render_text('Ladders are cool too!');
 };
+
+ladder sub {
+    my $self = shift;
+
+    # Authenticated
+    my $name = $self->param('name') || '';
+    return 1 if $name eq 'Bender';
+
+    # Not authenticated
+    $self->render('param_auth_denied');
+    return;
+};
+
+# GET /param_auth
+get '/param_auth' => 'param_auth';
+
+# GET /param_auth/too
+get '/param_auth/too' =>
+  sub { shift->render_text('You could be Bender too!') };
 
 # Oh Fry, I love you more than the moon, and the stars,
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
@@ -578,7 +597,57 @@ $client->get(
     }
 )->process;
 
+# GET /param_auth
+$client->get(
+    '/param_auth' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            "Not Bender!\n");
+    }
+)->process;
+
+# GET /param_auth?name=Bender
+$client->get(
+    '/param_auth?name=Bender' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            "Bender!\n");
+    }
+)->process;
+
+# GET /param_auth/too
+$client->get(
+    '/param_auth/too' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            "Not Bender!\n");
+    }
+)->process;
+
+# GET /param_auth/too?name=Bender
+$client->get(
+    '/param_auth/too?name=Bender' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body, 'You could be Bender too!');
+    }
+)->process;
+
 __DATA__
+@@ param_auth.html.epl
+Bender!
+
+@@ param_auth_denied.html.epl
+Not Bender!
+
 @@ root.html.epl
 %== shift->url_for('root_path')
 

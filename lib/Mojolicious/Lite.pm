@@ -76,6 +76,9 @@ sub import {
         $defaults ||= {};
         $defaults = {%$defaults, callback => $cb};
 
+        # Name
+        $name ||= '';
+
         # Create bridge
         return $ROUTES =
           $APP->routes->bridge($pattern, {@$constraints})->over($conditions)
@@ -375,6 +378,38 @@ multiple features at once.
         <body><%== content %>
         </body>
     </html>
+
+Ladders can be used to share code between multiple routes and for
+authentication.
+All routes following a ladder are only evaluated if the ladder returns a
+true value.
+
+    use Mojolicious::Lite;
+
+    # Authenticate based on name parameter
+    ladder sub {
+        my $self = shift;
+
+        # Authenticated
+        my $name = $self->param('name') || '';
+        return 1 if $name eq 'Bender';
+
+        # Not authenticated
+        $self->render('denied');
+        return;
+    };
+
+    # GET / (with ladder authentication)
+    get '/' => 'index';
+
+    shagadelic;
+    __DATA__;
+
+    @@ denied.html.ep
+    You are not Bender, permission denied!
+
+    @@ index.html.ep
+    Hi Bender!
 
 Conditions such as C<agent> allow even more powerful route constructs.
 

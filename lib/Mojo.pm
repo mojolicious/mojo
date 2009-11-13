@@ -108,7 +108,8 @@ Currently there are no requirements besides Perl 5.8.1.
     |        CGI       | |      FastCGI     | |     HTTP 1.1     |
     '------------------' '------------------' '------------------'
 
-For user friendly documentation see L<Mojolicious::Book>.
+For user friendly documentation see L<Mojolicious::Book> and
+L<Mojolicious::Lite>.
 
 =head1 ATTRIBUTES
 

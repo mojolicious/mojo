@@ -89,7 +89,7 @@ sub new {
                     status    => 500,
                     exception => $e
                 };
-                $c->app->static->serve_505($c)
+                $c->app->static->serve_500($c)
                   if $c->stash->{exception} || !$c->render($options);
             }
 

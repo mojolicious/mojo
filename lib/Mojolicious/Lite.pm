@@ -379,8 +379,8 @@ multiple features at once.
         </body>
     </html>
 
-Ladders can be used to share code between multiple routes and for
-authentication.
+Ladders can be used for authentication and to share code between multiple
+routes.
 All routes following a ladder are only evaluated if the ladder returns a
 true value.
 

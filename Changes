@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension Mojo.
 
 0.999909 2009-11-11 00:00:00
         - Cleaned up tutorial.
+        - FIxed renderer exception bug. (yuki-kimoto)
 
 0.999908 2009-11-11 00:00:00
         - Fixed bridges/ladders and added tests.

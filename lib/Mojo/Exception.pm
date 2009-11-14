@@ -29,20 +29,28 @@ sub new {
         push @{$self->stack}, [$p, $f, $l];
     }
 
-    # Context
-    if ($self->message =~ /at\s+(.+)\s+line\s+(\d+)/) {
-        my $file = $1;
-        my $line = $2;
-
+    # File name and Line where execption ocuured
+    my $message = $self->message;
+    my @message_infos;
+    while ($message =~ /at\s+(.+)\s+line\s+(\d+)/g) {
+        push @message_infos, {file => $1, line => $2};
+    }
+    
+    foreach my $message_info (reverse @message_infos) {
+        # Tail message info
+        my $file = $message_info->{file};
+        my $line = $message_info->{line};
+        
         # Readable?
         if (-r $file) {
-
             # Slurp
             my $handle = IO::File->new("< $file");
             my @lines  = <$handle>;
 
             # Line
             $self->parse_context(\@lines, $line);
+            
+            last;
         }
     }
 

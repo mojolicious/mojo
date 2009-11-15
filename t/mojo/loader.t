@@ -45,6 +45,7 @@ Error around line 15.
 oops!
 EOF
 
+# Complicated exception
 $loader = Mojo::Loader->new;
 $e      = $loader->load('LoaderException2');
 is(ref $e, 'Mojo::Exception');
@@ -55,10 +56,10 @@ is($e->lines_before->[1]->[0], 7);
 is($e->lines_before->[1]->[1], '');
 is($e->line->[0],              8);
 is($e->line->[1],              'LoaderException2_2::throw_error();');
-is($e->lines_after->[0]->[0], 9);
-is($e->lines_after->[0]->[1], '');
-is($e->lines_after->[1]->[0], 10);
-is($e->lines_after->[1]->[1], '1;');
+is($e->lines_after->[0]->[0],  9);
+is($e->lines_after->[0]->[1],  '');
+is($e->lines_after->[1]->[0],  10);
+is($e->lines_after->[1]->[1],  '1;');
 $e->message("oops!\n");
 $e->stack([]);
 is("$e", <<'EOF');

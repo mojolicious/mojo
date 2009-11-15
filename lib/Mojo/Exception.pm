@@ -29,27 +29,31 @@ sub new {
         push @{$self->stack}, [$p, $f, $l];
     }
 
-    # File name and Line where execption ocuured
+    # Trace name and line
     my $message = $self->message;
-    my @message_infos;
+    my @trace;
     while ($message =~ /at\s+(.+)\s+line\s+(\d+)/g) {
-        push @message_infos, {file => $1, line => $2};
+        push @trace, {file => $1, line => $2};
     }
-    
-    foreach my $message_info (reverse @message_infos) {
-        # Tail message info
-        my $file = $message_info->{file};
-        my $line = $message_info->{line};
-        
+
+    # Frames
+    foreach my $frame (reverse @trace) {
+
+        # Frame
+        my $file = $frame->{file};
+        my $line = $frame->{line};
+
         # Readable?
         if (-r $file) {
+
             # Slurp
             my $handle = IO::File->new("< $file");
             my @lines  = <$handle>;
 
             # Line
             $self->parse_context(\@lines, $line);
-            
+
+            # Done
             last;
         }
     }

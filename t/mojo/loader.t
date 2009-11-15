@@ -11,7 +11,7 @@ use Test::More;
 if ($INC{'Devel/Cover.pm'}) {
     plan skip_all => "Loader tests don't play nice with Devel::Cover";
 }
-else { plan tests => 16 }
+else { plan tests => 29 }
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -42,6 +42,32 @@ Error around line 15.
 13: foo {
 14: 
 15: 1;
+oops!
+EOF
+
+$loader = Mojo::Loader->new;
+$e      = $loader->load('LoaderException2');
+is(ref $e, 'Mojo::Exception');
+like($e->message, qr/Exception/);
+is($e->lines_before->[0]->[0], 6);
+is($e->lines_before->[0]->[1], 'use strict;');
+is($e->lines_before->[1]->[0], 7);
+is($e->lines_before->[1]->[1], '');
+is($e->line->[0],              8);
+is($e->line->[1],              'LoaderException2_2::throw_error();');
+is($e->lines_after->[0]->[0], 9);
+is($e->lines_after->[0]->[1], '');
+is($e->lines_after->[1]->[0], 10);
+is($e->lines_after->[1]->[1], '1;');
+$e->message("oops!\n");
+$e->stack([]);
+is("$e", <<'EOF');
+Error around line 8.
+6: use strict;
+7: 
+8: LoaderException2_2::throw_error();
+9: 
+10: 1;
 oops!
 EOF
 

@@ -106,7 +106,7 @@ sub url_for {
     my $self = shift;
 
     # Make sure we have a match for named routes
-    $self->match(MojoX::Routes::Match->new->endpoint($self->app->routes))
+    $self->match(MojoX::Routes::Match->new->root($self->app->routes))
       unless $self->match;
 
     # Use match or root

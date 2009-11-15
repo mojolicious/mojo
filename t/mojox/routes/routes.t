@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 123;
+use Test::More tests => 124;
 
 use Mojo::Transaction::Single;
 
@@ -369,3 +369,10 @@ is($match->stack->[0]->{controller}, undef);
 is($match->stack->[0]->{action},     undef);
 is($match->stack->[0]->{format},     undef);
 is($match->url_for,                  '');
+
+# Not found
+$tx = Mojo::Transaction::Single->new;
+$tx->req->method('GET');
+$tx->req->url->parse('/not_found');
+$match = $r->match($tx);
+is($match->url_for('test_edit', controller => 'foo'), '/foo/test/edit');

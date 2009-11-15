@@ -79,6 +79,9 @@ sub match {
     $match = MojoX::Routes::Match->new($match)->dictionary($self->dictionary)
       unless ref $match && $match->isa('MojoX::Routes::Match');
 
+    # Root
+    $match->root($self) unless $match->root;
+
     # Conditions
     for (my $i = 0; $i < @{$self->conditions}; $i += 2) {
         my $name      = $self->conditions->[$i];

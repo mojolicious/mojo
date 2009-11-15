@@ -10,7 +10,7 @@ use base 'Mojo::Base';
 use Mojo::URL;
 
 __PACKAGE__->attr([qw/captures dictionary/] => sub { {} });
-__PACKAGE__->attr([qw/endpoint tx/]);
+__PACKAGE__->attr([qw/endpoint root tx/]);
 __PACKAGE__->attr(path  => sub {'/'});
 __PACKAGE__->attr(stack => sub { [] });
 
@@ -72,14 +72,8 @@ sub url_for {
     # Named
     if ($name) {
 
-        # Find root
-        my $stop = $endpoint;
-        while ($stop->parent) {
-            $stop = $stop->parent;
-        }
-
         # Find endpoint
-        my @children = ($stop);
+        my @children = ($self->root);
         while (my $child = shift @children) {
 
             if (($child->name || '') eq $name) {
@@ -146,6 +140,11 @@ L<MojoX::Routes::Match> implements the following attributes.
 
     my $path = $match->path;
     $match   = $match->path('/foo/bar/baz');
+
+=head2 C<root>
+
+    my $root = $match->root;
+    $match   = $match->root($routes);
 
 =head2 C<stack>
 

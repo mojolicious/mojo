@@ -81,7 +81,7 @@ my $BOM = {
 };
 my $BOM_RE;
 {
-    my $bom = join '|', keys %$BOM;
+    my $bom = join '|', reverse sort keys %$BOM;
     $BOM_RE = qr/^($bom)/;
 }
 

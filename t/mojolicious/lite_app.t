@@ -133,7 +133,7 @@ get '/redirect_path' => sub {
 
 # GET /redirect_named
 get '/redirect_named' => sub {
-    shift->redirect_to('index')->render_text('Redirecting!');
+    shift->redirect_to('index', format => 'txt')->render_text('Redirecting!');
 };
 
 # GET /koi8-r
@@ -542,7 +542,7 @@ $client->get(
         is($tx->res->code,                            302);
         is($tx->res->headers->server,                 'Mojo (Perl)');
         is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->headers->location,               '/template');
+        is($tx->res->headers->location,               '/template.txt');
         is($tx->res->body,                            'Redirecting!');
     }
 )->process;

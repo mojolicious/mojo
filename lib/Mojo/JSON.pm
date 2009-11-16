@@ -107,10 +107,9 @@ sub decode {
     return if $self->error;
 
     # Bad input
-    unless (ref $result->[0]) {
-        $self->error('JSON text has to be a serialized object or array.');
-        return undef;
-    }
+    $self->error('JSON text has to be a serialized object or array.')
+      and return
+      unless ref $result->[0];
 
     # Done
     return $result->[0];
@@ -383,8 +382,7 @@ sub _exception {
     $context ||= 'end of file';
 
     # Error
-    $self->error(qq/$error near $context./);
-    return undef;
+    $self->error(qq/$error near $context./) and return;
 }
 
 1;

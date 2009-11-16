@@ -46,7 +46,7 @@ sub connect {
     my $socket = IO::Socket::INET->new(
         Proto => 'tcp',
         Type  => SOCK_STREAM
-    ) or return undef;
+    ) or return;
 
     # Non blocking
     $socket->blocking(0);

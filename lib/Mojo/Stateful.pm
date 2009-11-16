@@ -20,7 +20,7 @@ sub error {
     if (!$message) {
         return ($self->{error} || 'Unknown state machine error.')
           if $self->has_error;
-        return undef;
+        return;
     }
 
     # Set

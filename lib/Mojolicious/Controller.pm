@@ -18,7 +18,8 @@ sub param { shift->tx->req->param(@_) }
 sub pause { shift->tx->pause }
 
 sub redirect_to {
-    my ($self, $target) = @_;
+    my $self   = shift;
+    my $target = shift;
 
     # Prepare location
     my $base     = $self->req->url->base->clone;
@@ -31,7 +32,7 @@ sub redirect_to {
     elsif ($target =~ /^\w+\:\/\//) { $location = $target }
 
     # Named
-    else { $location = $self->url_for($target) }
+    else { $location = $self->url_for($target, @_) }
 
     # Code
     $self->res->code(302);
@@ -164,6 +165,7 @@ ones.
 =head2 C<redirect_to>
 
     $c = $c->redirect_to('named');
+    $c = $c->redirect_to('named', foo => 'bar');
     $c = $c->redirect_to('/path');
     $c = $c->redirect_to('http://127.0.0.1/foo/bar');
 

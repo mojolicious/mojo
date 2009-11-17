@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension Mojo.
 
 0.999911 2009-11-14 00:00:00
         - Excluded Mojo::ByteStream objects from auto escaping.
+        - Fixed Mojolicious default app tests. (yuki-kimoto)
 
 0.999910 2009-11-14 00:00:00
         - Fixed url_for without endpoint bug.

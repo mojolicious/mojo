@@ -72,10 +72,18 @@ sub build {
     }
 
     # Escape helper
-    my $escape = q/no strict 'refs'; no warnings 'redefine'; sub escape; /;
-    $escape .= q/*escape = sub { Mojo::ByteStream->new($_[0])->xml_escape->/;
-    $escape .= q/to_string };/;
-    $escape .= q/use strict; use warnings;/;
+    my $escape = <<'EOF';
+no strict 'refs'; no warnings 'redefine';
+sub escape;
+*escape = sub {
+    my $v = shift;
+    ref $v && ref $v eq 'Mojo::ByteStream'
+      ? "$v"
+      : Mojo::ByteStream->new($v)->xml_escape->to_string;
+};
+use strict; use warnings;
+EOF
+    $escape =~ s/\n//g;
 
     # Wrap
     my $prepend   = $self->prepend;

@@ -228,7 +228,8 @@ $client->get(
         is($tx->res->code,                            200);
         is($tx->res->headers->server,                 'Mojo (Perl)');
         is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body, "layouted Hello\n[\n  1,\n  2\n]\nthere!\n\n\n");
+        is($tx->res->body,
+            "layouted Hello\n[\n  1,\n  2\n]\nthere<br/>!\n\n\n");
     }
 )->process;
 
@@ -656,10 +657,10 @@ Not Bender!
 
 @@ outerlayout.html.ep
 Hello
-<%== include 'outermenu' %>
+<%= include 'outermenu' %>
 
 @@ outermenu.html.ep
-<%= dumper [1, 2] %>there!
+<%= dumper [1, 2] %>there<br/>!
 
 @@ not_found.html.epl
 Oops!

@@ -27,6 +27,20 @@ __PACKAGE__->attr(tree => sub { [] });
 __PACKAGE__->attr(tag_start => '<%');
 __PACKAGE__->attr(tag_end   => '%>');
 
+# Escape helper
+my $ESCAPE = <<'EOF';
+no strict 'refs'; no warnings 'redefine';
+sub escape;
+*escape = sub {
+    my $v = shift;
+    ref $v && ref $v eq 'Mojo::ByteStream'
+      ? "$v"
+      : Mojo::ByteStream->new($v)->xml_escape->to_string;
+};
+use strict; use warnings;
+EOF
+$ESCAPE =~ s/\n//g;
+
 sub build {
     my $self = shift;
 
@@ -71,26 +85,12 @@ sub build {
         }
     }
 
-    # Escape helper
-    my $escape = <<'EOF';
-no strict 'refs'; no warnings 'redefine';
-sub escape;
-*escape = sub {
-    my $v = shift;
-    ref $v && ref $v eq 'Mojo::ByteStream'
-      ? "$v"
-      : Mojo::ByteStream->new($v)->xml_escape->to_string;
-};
-use strict; use warnings;
-EOF
-    $escape =~ s/\n//g;
-
     # Wrap
     my $prepend   = $self->prepend;
     my $append    = $self->append;
     my $namespace = $self->namespace || ref $self;
     $lines[0] ||= '';
-    $lines[0] = qq/package $namespace; sub { my \$_M = ''; $escape; $prepend;/
+    $lines[0] = qq/package $namespace; sub { my \$_M = ''; $ESCAPE; $prepend;/
       . $lines[0];
     $lines[-1] .= qq/$append; return \$_M; };/;
 

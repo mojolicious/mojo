@@ -146,17 +146,16 @@ use Test::More tests => 4;
 
 use_ok('<%= $class %>');
 
-# Prepare client and transaction
-my $client = Mojo::Client->new;
-my $tx     = Mojo::Transaction::Single->new_get('/');
-
-# Process request
-$client->process_app('<%= $class %>', $tx);
-
-# Test response
-is($tx->res->code, 200);
-is($tx->res->headers->content_type, 'text/html');
-like($tx->res->content->asset->slurp, qr/Mojolicious Web Framework/i);
+# Test
+my $client = Mojo::Client->new(app => '<%= $class %>');
+$client->get(
+    '/' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code, 200);
+        is($tx->res->headers->content_type, 'text/html');
+        like($tx->res->content->asset->slurp, qr/Mojolicious Web Framework/i);
+    }
+)->process;
 @@ not_found
 <!doctype html><html>
     <head><title>Not Found</title></head>

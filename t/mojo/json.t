@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 73;
+use Test::More tests => 84;
 
 use Mojo::ByteStream 'b';
 
@@ -27,12 +27,21 @@ $array = $json->decode('[1]');
 is_deeply($array, [1]);
 $array = $json->decode('[ -122.026020 ]');
 is_deeply($array, ['-122.026020']);
+$array = $json->decode('[0.0]');
+isa_ok($array, 'ARRAY');
+cmp_ok($array->[0], '==', 0);
+$array = $json->decode('[0e0]');
+isa_ok($array, 'ARRAY');
+cmp_ok($array->[0], '==', 0);
 $array = $json->decode('[1,-2]');
 is_deeply($array, [1, -2]);
 $array = $json->decode('[10e12 , [2 ]]');
 is_deeply($array, ['10e12', [2]]);
 $array = $json->decode('[37.7668 , [ 20 ]] ');
 is_deeply($array, [37.7668, [20]]);
+$array = $json->decode('[1e3]');
+isa_ok($array, 'ARRAY');
+cmp_ok($array->[0], '==', 1e3);
 
 # Decode name
 $array = $json->decode('[true]');
@@ -43,6 +52,8 @@ $array = $json->decode('[true, false]');
 is_deeply($array, ['\1', undef]);
 
 # Decode string
+$array = $json->decode('[" "]');
+is_deeply($array, [' ']);
 $array = $json->decode('["hello world!"]');
 is_deeply($array, ['hello world!']);
 $array = $json->decode('["hello\nworld!"]');
@@ -51,6 +62,12 @@ $array = $json->decode('["hello\t\"world!"]');
 is_deeply($array, ["hello\t\"world!"]);
 $array = $json->decode('["hello\u0152world\u0152!"]');
 is_deeply($array, ["hello\x{0152}world\x{0152}!"]);
+$array = $json->decode('["0."]');
+is_deeply($array, ['0.']);
+$array = $json->decode('[" 0"]');
+is_deeply($array, [' 0']);
+$array = $json->decode('["1"]');
+is_deeply($array, ['1']);
 
 # Decode object
 my $hash = $json->decode('{}');
@@ -108,6 +125,8 @@ $string = $json->encode(["hello\t\"world!"]);
 is($string, '["hello\t\"world!"]');
 $string = $json->encode(["hello\x{0003}\x{0152}world\x{0152}!"]);
 is(b($string)->decode('UTF-8'), "[\"hello\\u0003\x{0152}world\x{0152}!\"]");
+$string = $json->encode(["123abc"]);
+is($string, '["123abc"]');
 
 # Encode object
 $string = $json->encode({});

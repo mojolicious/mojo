@@ -338,7 +338,7 @@ sub _encode_values {
     return 'null' if $value eq '0 but true';
 
     # Number
-    return $value if $value =~ /$NUMBER_RE/;
+    return $value if $value =~ /$NUMBER_RE$/;
 
     # String
     return $self->_encode_string($value);

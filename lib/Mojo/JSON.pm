@@ -237,10 +237,14 @@ sub _decode_values {
     my ($self, $ref) = @_;
 
     # Number
-    if (my $number = $self->_decode_number($ref)) { return [$number] }
+    if (defined(my $number = $self->_decode_number($ref))) {
+        return [$number];
+    }
 
     # String
-    elsif (my $string = $self->_decode_string($ref)) { return [$string] }
+    elsif (defined(my $string = $self->_decode_string($ref))) {
+        return [$string];
+    }
 
     # Name
     elsif (my $name = $self->_decode_names($ref)) {

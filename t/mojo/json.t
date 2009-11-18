@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 72;
+use Test::More tests => 73;
 
 use Mojo::ByteStream 'b';
 
@@ -21,6 +21,8 @@ $array = $json->decode('[ [ ]]');
 is_deeply($array, [[]]);
 
 # Decode number
+$array = $json->decode('[0]');
+is_deeply($array, [0], 'decode [0]');
 $array = $json->decode('[1]');
 is_deeply($array, [1]);
 $array = $json->decode('[ -122.026020 ]');

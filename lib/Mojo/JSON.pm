@@ -72,18 +72,19 @@ my $REVERSE_ESCAPE = {};
 for my $key (keys %$ESCAPE) { $REVERSE_ESCAPE->{$ESCAPE->{$key}} = $key }
 
 # Byte order marks
-my $BOM = {
-    "\357\273\277" => 'UTF-8',
-    "\376\377"     => 'UTF-16BE',
-    "\377\376"     => 'UTF-16LE',
-    "\377\376\0\0" => 'UTF-32LE',
-    "\0\0\376\377" => 'UTF-32BE'
-};
-my $BOM_RE;
-{
-    my $bom = join '|', reverse sort keys %$BOM;
-    $BOM_RE = qr/^($bom)/;
-}
+my $BOM_RE = qr/
+    (?:
+    \357\273\277   # UTF-8
+    |
+    \377\376\0\0   # UTF-32LE
+    |
+    \0\0\376\377   # UTF-32BE
+    |
+    \376\377       # UTF-16BE
+    |
+    \377\376       # UTF-16LE
+    )
+/x;
 
 # Unicode encoding detection
 my $UTF_PATTERNS = {
@@ -103,11 +104,13 @@ sub decode {
     # Cleanup
     $self->error(undef);
 
+    # Remove BOM
+    $string =~ s/$BOM_RE//g;
+
     # Detect and decode unicode
     my $encoding = 'UTF-8';
-    $string =~ s/$BOM_RE//g;
     for my $pattern (keys %$UTF_PATTERNS) {
-        if ($string =~ /^$pattern/){
+        if ($string =~ /^$pattern/) {
             $encoding = $UTF_PATTERNS->{$pattern};
             last;
         }

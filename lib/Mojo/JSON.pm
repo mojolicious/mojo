@@ -85,6 +85,14 @@ my $BOM_RE;
     $BOM_RE = qr/^($bom)/;
 }
 
+# Unicode encoding detection
+my $UTF_PATTERNS = {
+    "\0\0\0[^\0]"    => 'UTF-32BE',
+    "\0[^\0]\0[^\0]" => 'UTF-16BE',
+    "[^\0]\0\0\0"    => 'UTF-32LE',
+    "[^\0]\0[^\0]\0" => 'UTF-16LE'
+};
+
 # Hey...That's not the wallet inspector...
 sub decode {
     my ($self, $string) = @_;
@@ -97,7 +105,13 @@ sub decode {
 
     # Detect and decode unicode
     my $encoding = 'UTF-8';
-    if ($string =~ s/$BOM_RE//) { $encoding = $BOM->{$1} }
+    $string =~ s/$BOM_RE//g;
+    for my $pattern (keys %$UTF_PATTERNS) {
+        if ($string =~ /^$pattern/){
+            $encoding = $UTF_PATTERNS->{$pattern};
+            last;
+        }
+    }
     $string = b($string)->decode($encoding)->to_string;
 
     # Decode

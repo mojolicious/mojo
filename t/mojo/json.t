@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 84;
+use Test::More tests => 88;
 
 use Mojo::ByteStream 'b';
 
@@ -185,6 +185,22 @@ is_deeply($array, ['\1']);
 # Decode UTF-32BE
 $array = $json->decode(b("\x{feff}[true]")->encode('UTF-32BE'));
 is_deeply($array, ['\1']);
+
+# Decode UTF-16LE without BOM
+$array = $json->decode(b("[\"\\ud800\\udf46\"]")->encode('UTF-16LE'));
+is_deeply($array, ["\x{10346}"]);
+
+# Decode UTF-16BE without BOM
+$array = $json->decode(b("[\"\\ud800\\udf46\"]")->encode('UTF-16BE'));
+is_deeply($array, ["\x{10346}"]);
+
+# Decode UTF-32LE without BOM
+$array = $json->decode(b("[\"\\ud800\\udf46\"]")->encode('UTF-32LE'));
+is_deeply($array, ["\x{10346}"]);
+
+# Decode UTF-32BE without BOM
+$array = $json->decode(b("[\"\\ud800\\udf46\"]")->encode('UTF-32BE'));
+is_deeply($array, ["\x{10346}"]);
 
 # Errors
 is($json->decode('[[]'),    undef);

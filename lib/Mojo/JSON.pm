@@ -11,6 +11,10 @@ use Mojo::ByteStream 'b';
 
 __PACKAGE__->attr('error');
 
+# Literal names
+our $FALSE = Mojo::JSON::_Bool->new(0);
+our $TRUE  = Mojo::JSON::_Bool->new(1);
+
 # Regex
 my $WHITESPACE_RE  = qr/[\x20\x09\x0a\x0d]*/;
 my $ARRAY_BEGIN_RE = qr/^$WHITESPACE_RE\[/;
@@ -118,7 +122,7 @@ sub decode {
     $string = b($string)->decode($encoding)->to_string;
 
     # Decode
-    my $result = $self->_decode_values(\$string);
+    my $result = $self->_decode_structure(\$string);
 
     # Exception
     return if $self->error;
@@ -141,6 +145,10 @@ sub encode {
     # Unicode
     return b($string)->encode('UTF-8')->to_string;
 }
+
+sub false {$FALSE}
+
+sub true {$TRUE}
 
 sub _decode_array {
     my ($self, $ref) = @_;
@@ -250,6 +258,23 @@ sub _decode_string {
     return;
 }
 
+sub _decode_structure {
+    my ($self, $ref) = @_;
+
+    # Object
+    if ($$ref =~ s/$OBJECT_BEGIN_RE//) {
+        return [$self->_decode_object($ref)];
+    }
+
+    # Array
+    elsif ($$ref =~ s/$ARRAY_BEGIN_RE//) {
+        return [$self->_decode_array($ref)];
+    }
+
+    # Nothing
+    return;
+}
+
 sub _decode_values {
     my ($self, $ref) = @_;
 
@@ -267,29 +292,19 @@ sub _decode_values {
     elsif (my $name = $self->_decode_names($ref)) {
 
         # "false"
-        if ($name eq 'false') { $name = undef }
+        if ($name eq 'false') { $name = $FALSE }
 
         # "null"
-        elsif ($name eq 'null') { $name = '0 but true' }
+        elsif ($name eq 'null') { $name = undef }
 
         # "true"
-        elsif ($name eq 'true') { $name = '\1' }
+        elsif ($name eq 'true') { $name = $TRUE }
 
         return [$name];
     }
 
-    # Object
-    elsif ($$ref =~ s/$OBJECT_BEGIN_RE//) {
-        return [$self->_decode_object($ref)];
-    }
-
-    # Array
-    elsif ($$ref =~ s/$ARRAY_BEGIN_RE//) {
-        return [$self->_decode_array($ref)];
-    }
-
-    # Nothing
-    return;
+    # Object or array
+    return $self->_decode_structure($ref);
 }
 
 sub _encode_array {
@@ -345,14 +360,14 @@ sub _encode_values {
         return $self->_encode_object($value) if $ref eq 'HASH';
     }
 
+    # "null"
+    return 'null' unless defined $value;
+
     # "false"
-    return 'false' unless defined $value;
+    return 'false' if ref $value eq 'Mojo::JSON::_Bool' && !$value;
 
     # "true"
-    return 'true' if $value eq '\1';
-
-    # "null"
-    return 'null' if $value eq '0 but true';
+    return 'true' if ref $value eq 'Mojo::JSON::_Bool' && $value;
 
     # Number
     return $value if $value =~ /$NUMBER_RE$/;
@@ -406,6 +421,22 @@ sub _exception {
     $self->error(qq/$error near $context./) and return;
 }
 
+# Emulate boolean type
+package Mojo::JSON::_Bool;
+
+use strict;
+use warnings;
+
+use base 'Mojo::Base';
+use overload (
+    '0+' => sub { $_[0]->_value },
+    '""' => sub { $_[0]->_value },
+);
+
+__PACKAGE__->attr('_value');
+
+sub new { shift->SUPER::new(_value => shift) }
+
 1;
 __END__
 
@@ -431,14 +462,15 @@ not blessed references.
     [1, -2, 3]     -> [1, -2, 3]
     {"foo": "bar"} -> {foo => 'bar'}
 
-Literal names will be translated to and from a similar Perl value.
+Literal names will be translated to and from L<Mojo::JSON> constants or a
+2similar native Perl value.
 
-    true  -> '\1'
-    false -> undef
-    null  -> '0 but true'
+    true  -> Mojo::JSON->true
+    false -> Mojo::JSON->false
+    null  -> undef
 
-Decoding UTF-16 (LE/BE) and UTF-32 (LE/BE) will be handled transparently by
-detecting the byte order mark, encoding will only generate UTF-8.
+Decoding UTF-16 (LE/BE) and UTF-32 (LE/BE) will be handled transparently,
+encoding will only generate UTF-8.
 
 =head1 ATTRIBUTES
 
@@ -462,5 +494,15 @@ following new ones.
 =head2 C<encode>
 
     my $string = $json->encode({foo => 'bar'});
+
+=head2 C<false>
+
+    my $false = Mojo::JSON->false;
+    my $false = $json->false;
+
+=head2 C<true>
+
+    my $true = Mojo::JSON->true;
+    my $true = $json->true;
 
 =cut

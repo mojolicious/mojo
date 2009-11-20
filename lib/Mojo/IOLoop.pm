@@ -31,7 +31,7 @@ __PACKAGE__->attr(_poll                       => sub { IO::Poll->new });
 __PACKAGE__->attr([qw/_listen _running/]);
 
 # Singleton
-my $LOOP;
+our $LOOP;
 
 # Instantiate singleton
 sub new { $LOOP ||= shift->SUPER::new(@_) }

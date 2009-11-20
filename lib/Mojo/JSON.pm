@@ -463,7 +463,7 @@ not blessed references.
     {"foo": "bar"} -> {foo => 'bar'}
 
 Literal names will be translated to and from L<Mojo::JSON> constants or a
-2similar native Perl value.
+similar native Perl value.
 
     true  -> Mojo::JSON->true
     false -> Mojo::JSON->false

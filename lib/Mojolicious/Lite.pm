@@ -231,7 +231,37 @@ Templates can have layouts.
     @@ layouts/green.html.ep
     <!doctype html><html>
         <head><title>Green!</title></head>
-        <body><%== content %></body>
+        <body><%= content %></body>
+    </html>
+
+Templates can also extend each other.
+
+    # GET /
+    get '/' => 'first';
+
+    __DATA__
+
+    @@ first.html.ep
+    % extends 'second';
+    %{= content header =>
+        <title>Howdy!</title>
+    %}
+    Hello world!
+
+    @@ second.html.ep
+    % layout 'third';
+    %{= content header =>
+        <title>Welcome!</title>
+    %}
+
+    @@ layouts/third.html.ep
+    <!doctype html><html>
+        <head>
+            <%{= content header => %>
+                <title>Hi there!</title>
+            <%}%>
+        </head>
+        <body><%= content %></body>
     </html>
 
 Route placeholders allow capturing parts of a request path until a C</> or
@@ -367,7 +397,7 @@ multiple features at once.
 
     @@ welcome.html.ep
     <%= $groovy %> is groovy!
-    <%== include 'menu' %>
+    <%= include 'menu' %>
 
     @@ menu.html.ep
     <a href="<%= url_for 'index' %>">Try again</a>
@@ -375,7 +405,7 @@ multiple features at once.
     @@ layouts/funky.html.ep
     <!doctype html><html>
         <head><title>Funky!</title></head>
-        <body><%== content %>
+        <body><%= content %>
         </body>
     </html>
 

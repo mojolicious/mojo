@@ -262,7 +262,7 @@ Templates can also extend each other.
     <!doctype html><html>
         <head>
             <%{= content header => %>
-                <title>Hi there!</title>
+                <title>Lame default title...</title>
             <%}%>
         </head>
         <body><%= content %></body>

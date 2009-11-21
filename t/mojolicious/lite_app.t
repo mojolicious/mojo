@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 164;
+use Test::More tests => 176;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -31,6 +31,24 @@ get '/' => 'root';
 
 # GET /root
 get '/root.html' => 'root_path';
+
+# GET /template_inheritance
+get '/template_inheritance' => sub {
+    shift->render(template => 'template_inheritance', handler => 'ep');
+};
+
+# GET /layout_without_inheritance
+get '/layout_without_inheritance' => sub {
+    shift->render(
+        template => 'layouts/template_inheritance',
+        handler  => 'ep'
+    );
+};
+
+# GET /double_inheritance
+get '/double_inheritance' => sub {
+    shift->render(template => 'double_inheritance', handler => 'ep');
+};
 
 # GET /outerlayout
 get '/outerlayout' => sub {
@@ -218,6 +236,43 @@ $client->get(
         is($tx->res->headers->server,                 'Mojo (Perl)');
         is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
         is($tx->res->body,                            "/root.html");
+    }
+)->process;
+
+# GET /template_inheritance
+$client->get(
+    '/template_inheritance' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,
+                "<title>Welcome</title>\nSidebar!\n"
+              . "Hello World!\nDefault footer!\n");
+    }
+)->process;
+
+# GET /layout_without_inheritance
+$client->get(
+    '/layout_without_inheritance' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,
+            "Default header!\nDefault sidebar!\nDefault footer!\n");
+    }
+)->process;
+
+# GET /double_inheritance
+$client->get(
+    '/double_inheritance' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,
+            "<title>Welcome</title>\nSidebar too!\nDefault footer!\n");
     }
 )->process;
 
@@ -643,6 +698,34 @@ $client->get(
 )->process;
 
 __DATA__
+@@ template_inheritance.html.ep
+% layout 'template_inheritance';
+%{ content header =>
+<title>Welcome</title>
+%}
+%{ content sidebar =>
+Sidebar!
+%}
+Hello World!
+
+@@ layouts/template_inheritance.html.ep
+%{= content header =>
+Default header!
+%}
+%{= content sidebar =>
+Default sidebar!
+%}
+%= content
+%{= content footer =>
+Default footer!
+%}
+
+@@ double_inheritance.html.ep
+% extends 'template_inheritance';
+%{ content sidebar =>
+Sidebar too!
+%}
+
 @@ param_auth.html.epl
 Bender!
 

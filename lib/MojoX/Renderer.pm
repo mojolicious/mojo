@@ -59,6 +59,7 @@ sub render {
 
     # We got called
     $c->stash->{rendered} = 1;
+    $c->stash->{content} ||= {};
 
     # Partial?
     my $partial = delete $c->stash->{partial};
@@ -82,9 +83,9 @@ sub render {
         # Render
         $self->handler->{text}->($self, $c, \$output);
 
-        # Layout?
-        $c->stash->{inner_template} = $output
-          if $c->stash->{layout} && !$partial;
+        # Extends?
+        $c->stash->{content}->{content} = b("$output")
+          if ($c->stash->{extends} || $c->stash->{layout}) && !$partial;
     }
 
     # JSON
@@ -94,9 +95,9 @@ sub render {
         $self->handler->{json}->($self, $c, \$output);
         $format = 'json';
 
-        # Layout?
-        $c->stash->{inner_template} = $output
-          if $c->stash->{layout} && !$partial;
+        # Extends?
+        $c->stash->{content}->{content} = b("$output")
+          if ($c->stash->{extends} || $c->stash->{layout}) && !$partial;
     }
 
     # Template or templateless handler
@@ -105,13 +106,13 @@ sub render {
         # Render
         return unless $self->_render_template($c, \$output, $options);
 
-        # Layout?
-        $c->stash->{inner_template} = $output
-          if $c->stash->{layout} && !$partial;
+        # Extends?
+        $c->stash->{content}->{content} = b("$output")
+          if ($c->stash->{extends} || $c->stash->{layout}) && !$partial;
     }
 
-    # Layout
-    if (!$partial && (my $layout = delete $c->stash->{layout})) {
+    # Extends
+    while (!$partial && (my $extends = $self->_extends($c))) {
 
         # Handler
         $handler = $c->stash->{handler} || $self->default_handler;
@@ -121,8 +122,8 @@ sub render {
         $format = $c->stash->{format} || $self->default_format;
         $options->{format} = $format;
 
-        # Fix
-        $options->{template} = $self->layout_prefix . "/$layout";
+        # Template
+        $options->{template} = $extends;
 
         # Render
         $self->_render_template($c, \$output, $options);
@@ -164,6 +165,18 @@ sub template_path {
     my $self = shift;
     return File::Spec->catfile($self->root, split '/',
         $self->template_name(shift));
+}
+
+sub _extends {
+    my ($self, $c) = @_;
+
+    # Layout
+    $c->stash->{extends}
+      ||= ($self->layout_prefix . '/' . delete $c->stash->{layout})
+      if $c->stash->{layout};
+
+    # Extends
+    return delete $c->stash->{extends};
 }
 
 # Well, at least here you'll be treated with dignity.

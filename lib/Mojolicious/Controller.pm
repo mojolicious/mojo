@@ -83,7 +83,18 @@ sub render {
 }
 
 sub render_inner {
-    Mojo::ByteStream->new(delete shift->stash->{inner_template});
+    my ($self, $name, $content) = @_;
+
+    # Initialize
+    $self->stash->{content} ||= {};
+    $name ||= 'content';
+
+    # Set
+    $self->stash->{content}->{$name} ||= Mojo::ByteStream->new("$content")
+      if $content;
+
+    # Get
+    return $self->stash->{content}->{$name};
 }
 
 sub render_json {
@@ -189,6 +200,8 @@ ones.
 =head2 C<render_inner>
 
     my $output = $c->render_inner;
+    my $output = $c->render_inner('content');
+    my $output = $c->render_inner(content => 'Hello world!');
 
 =head2 C<render_json>
 

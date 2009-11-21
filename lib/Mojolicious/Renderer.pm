@@ -169,6 +169,9 @@ sub new {
         }
     );
 
+    # Add "extends" helper
+    $self->add_helper(extends => sub { shift->stash(extends => @_) });
+
     # Add "include" helper
     $self->add_helper(include => sub { shift->render_partial(@_) });
 

@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojo.
 
 0.999911 2009-11-14 00:00:00
+        - Added template inheritance to Mojolicious.
         - Added block and capturing support to Mojo::Template.
         - Excluded Mojo::ByteStream objects from auto escaping.
         - Fixed literal name handling in Mojo::JSON. (rsp)

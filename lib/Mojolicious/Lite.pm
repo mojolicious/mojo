@@ -239,6 +239,9 @@ Templates can also extend each other.
     # GET /
     get '/' => 'first';
 
+    # GET /second
+    get '/second' => 'second';
+
     __DATA__
 
     @@ first.html.ep

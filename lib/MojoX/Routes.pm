@@ -152,7 +152,11 @@ sub match {
         $match->path($path);
 
         # Reset stack
-        $self->parent ? $match->stack($snapshot) : $match->stack([]);
+        if ($self->parent) { $match->stack($snapshot) }
+        else {
+            $match->captures({});
+            $match->stack([]);
+        }
     }
 
     $match->endpoint($self) if $self->is_endpoint && $match->is_path_empty;

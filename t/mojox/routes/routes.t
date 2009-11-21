@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 124;
+use Test::More tests => 130;
 
 use Mojo::Transaction::Single;
 
@@ -14,6 +14,12 @@ use_ok('MojoX::Routes');
 
 # Routes
 my $r = MojoX::Routes->new;
+
+# /clean
+$r->route('/clean')->to(clean => 1);
+
+# /clean/too
+$r->route('/clean/too')->to(something => 1);
 
 # /*/test
 my $test = $r->route('/:controller/test')->to(action => 'test');
@@ -114,11 +120,27 @@ $r->route('/method/post')->via('post')
 $r->route('/method/post_get')->via(qw/POST get/)
   ->to(controller => 'method', action => 'post_get');
 
-# Real world example using most features at once
+# Make sure stash stays clean
 my $tx = Mojo::Transaction::Single->new;
 $tx->req->method('GET');
-$tx->req->url->parse('/articles.html');
+$tx->req->url->parse('/clean');
 my $match = $r->match($tx);
+is($match->stack->[0]->{clean},     1);
+is($match->stack->[0]->{something}, undef);
+is($match->url_for,                 '/clean');
+$tx = Mojo::Transaction::Single->new;
+$tx->req->method('GET');
+$tx->req->url->parse('/clean/too');
+$match = $r->match($tx);
+is($match->stack->[0]->{clean},     undef);
+is($match->stack->[0]->{something}, 1);
+is($match->url_for,                 '/clean/too');
+
+# Real world example using most features at once
+$tx = Mojo::Transaction::Single->new;
+$tx->req->method('GET');
+$tx->req->url->parse('/articles.html');
+$match = $r->match($tx);
 is($match->stack->[0]->{controller}, 'articles');
 is($match->stack->[0]->{action},     'index');
 is($match->stack->[0]->{format},     'html');

@@ -17,6 +17,8 @@ use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
 
 __PACKAGE__->attr([qw/auto_escape compiled namespace/]);
 __PACKAGE__->attr([qw/append code prepend/] => '');
+__PACKAGE__->attr(capture_end               => '}');
+__PACKAGE__->attr(capture_start             => '{');
 __PACKAGE__->attr(comment_mark              => '#');
 __PACKAGE__->attr(encoding                  => 'UTF-8');
 __PACKAGE__->attr(escape_mark               => '=');
@@ -46,6 +48,7 @@ sub build {
 
     # Compile
     my @lines;
+    my $cpst;
     for my $line (@{$self->tree}) {
 
         # New line
@@ -55,7 +58,19 @@ sub build {
             my $value = $line->[$j + 1];
 
             # Need to fix line ending?
+            $value ||= '';
             my $newline = chomp $value;
+
+            # Capture end
+            if ($type eq 'cpen') {
+
+                # End block
+                $lines[-1] .= '$_M }';
+
+                # No following code
+                my $next = $line->[$j + 3];
+                $lines[-1] .= ';' unless defined $next && length $next;
+            }
 
             # Text
             if ($type eq 'text') {
@@ -76,11 +91,28 @@ sub build {
                 # Escaped
                 my $a = $self->auto_escape;
                 if (($type eq 'escp' && !$a) || ($type eq 'expr' && $a)) {
-                    $lines[-1] .= "\$_M .= escape +$value;";
+                    $lines[-1] .= "\$_M .= escape";
+                    $lines[-1] .= " +$value" if length $value;
                 }
 
                 # Raw
-                else { $lines[-1] .= "\$_M .= $value;" }
+                else { $lines[-1] .= "\$_M .= $value" }
+
+                # Append semicolon
+                $lines[-1] .= ';' unless $cpst;
+            }
+
+            # Capture started
+            if ($cpst) {
+                $lines[-1] .= $cpst;
+                $cpst = undef;
+            }
+
+            # Capture start
+            if ($type eq 'cpst') {
+
+                # Start block
+                $cpst = " do { my \$_M = ''; ";
             }
         }
     }
@@ -154,56 +186,87 @@ sub parse {
     delete $self->{tree};
 
     # Tags
-    my $line_start = quotemeta $self->line_start;
-    my $tag_start  = quotemeta $self->tag_start;
-    my $tag_end    = quotemeta $self->tag_end;
-    my $cmnt_mark  = quotemeta $self->comment_mark;
-    my $escp_mark  = quotemeta $self->escape_mark;
-    my $expr_mark  = quotemeta $self->expression_mark;
+    my $line_start    = quotemeta $self->line_start;
+    my $tag_start     = quotemeta $self->tag_start;
+    my $tag_end       = quotemeta $self->tag_end;
+    my $cmnt          = quotemeta $self->comment_mark;
+    my $escp          = quotemeta $self->escape_mark;
+    my $expr          = quotemeta $self->expression_mark;
+    my $capture_start = quotemeta $self->capture_start;
+    my $capture_end   = quotemeta $self->capture_end;
 
     my $mixed_re = qr/
         (
-        $tag_start$expr_mark$escp_mark   # Escaped expression
+        $tag_start$capture_end$expr$escp     # Escaped expression (end)
         |
-        $tag_start$expr_mark             # Expression
+        $tag_start$capture_start$expr$escp   # Escaped expression (start)
         |
-        $tag_start$cmnt_mark             # Comment
+        $tag_start$expr$escp                 # Escaped expression
         |
-        $tag_start                       # Code
+        $tag_start$capture_end$expr          # Expression (end)
         |
-        $tag_end                         # End
+        $tag_start$capture_start$expr        # Expression (start)
+        |
+        $tag_start$expr                      # Expression
+        |
+        $tag_start$capture_end$cmnt          # Comment (end)
+        |
+        $tag_start$capture_start$cmnt        # Comment (start)
+        |
+        $tag_start$cmnt                      # Comment
+        |
+        $tag_start$capture_end               # Code (end)
+        |
+        $tag_start$capture_start             # Code (start)
+        |
+        $tag_start                           # Code
+        |
+        $tag_end                             # End
         )
     /x;
+
+    my $token_capture_re =
+      qr/^($tag_start|$tag_end)($capture_end|$capture_start)/;
 
     # Tokenize
     my $state                = 'text';
     my $multiline_expression = 0;
+    my @capture_token;
     for my $line (split /\n/, $tmpl) {
+        my @capture;
 
-        # Perl line without return value
-        if ($line =~ /^$line_start\s+(.+)$/) {
-            push @{$self->tree}, ['code', $1];
-            $multiline_expression = 0;
-            next;
+        # Perl line with capture end or start
+        if ($line =~ /^$line_start($capture_end|$capture_start)/) {
+            my $capture = $1;
+            $line =~ s/^($line_start)$capture/$1/;
+            @capture =
+              ("\\$capture" eq $capture_end ? 'cpen' : 'cpst', undef);
         }
 
         # Perl line with return value that needs to be escaped
-        if ($line =~ /^$line_start$expr_mark$escp_mark\s+(.+)$/) {
-            push @{$self->tree}, ['escp', $1];
+        if ($line =~ /^$line_start$expr$escp(.+)?$/) {
+            push @{$self->tree}, [@capture, 'escp', $1];
             $multiline_expression = 0;
             next;
         }
 
         # Perl line with return value
-        if ($line =~ /^$line_start$expr_mark\s+(.+)$/) {
-            push @{$self->tree}, ['expr', $1];
+        if ($line =~ /^$line_start$expr(.+)?$/) {
+            push @{$self->tree}, [@capture, 'expr', $1];
             $multiline_expression = 0;
             next;
         }
 
         # Comment line, dummy token needed for line count
-        if ($line =~ /^$line_start$cmnt_mark\s+(.+)$/) {
-            push @{$self->tree}, [];
+        if ($line =~ /^$line_start$cmnt(.+)?$/) {
+            push @{$self->tree}, [@capture];
+            $multiline_expression = 0;
+            next;
+        }
+
+        # Perl line without return value
+        if ($line =~ /^$line_start(.+)?$/) {
+            push @{$self->tree}, [@capture, 'code', $1];
             $multiline_expression = 0;
             next;
         }
@@ -231,8 +294,14 @@ sub parse {
         my @token;
         for my $token (split /$mixed_re/, $line) {
 
-            # Garbage
-            next unless $token;
+            # Perl token with capture end or start
+            if ($token =~ /$token_capture_re/) {
+                my $tag     = $1;
+                my $capture = $2;
+                $token =~ s/^($tag)$capture/$tag/;
+                @capture_token =
+                  ("\\$capture" eq $capture_end ? 'cpen' : 'cpst', undef);
+            }
 
             # End
             if ($token =~ /^$tag_end$/) {
@@ -244,15 +313,15 @@ sub parse {
             elsif ($token =~ /^$tag_start$/) { $state = 'code' }
 
             # Comment
-            elsif ($token =~ /^$tag_start$cmnt_mark$/) { $state = 'cmnt' }
+            elsif ($token =~ /^$tag_start$cmnt$/) { $state = 'cmnt' }
 
             # Expression
-            elsif ($token =~ /^$tag_start$expr_mark$/) {
+            elsif ($token =~ /^$tag_start$expr$/) {
                 $state = 'expr';
             }
 
             # Expression that needs to be escaped
-            elsif ($token =~ /^$tag_start$expr_mark$escp_mark$/) {
+            elsif ($token =~ /^$tag_start$expr$escp$/) {
                 $state = 'escp';
             }
 
@@ -268,7 +337,8 @@ sub parse {
                 $multiline_expression = 1 if $state eq 'expr';
 
                 # Store value
-                push @token, $state, $token;
+                push @token, @capture_token, $state, $token;
+                @capture_token = ();
             }
         }
         push @{$self->tree}, \@token;
@@ -404,13 +474,33 @@ Like preprocessing a config file, generating text from heredocs and stuff
 like that.
 
     <% Inline Perl %>
-    <%= Perl expression, replaced with result %>
-    <%== Perl expression, replaced with XML escaped result %>
+    <%= Perl expression, replaced with result or XML escaped result
+        (depending on auto_escape attribute) %>
+    <%== Perl expression, replaced with result or XML escaped result
+         (depending on auto_escape attribute) %>
     <%# Comment, useful for debugging %>
     % Perl line
-    %= Perl expression line, replaced with result
-    %== Perl expression line, replaced with XML escaped result
+    %= Perl expression line, replaced with result or XML escaped result
+       (depending on auto_escape attribute)
+    %== Perl expression line,    replaced with result or XML escaped result
+        (depending on auto_escape attribute)
     %# Comment line, useful for debugging
+
+L<Mojo::ByteStream> objects are excluded from automatic escaping.
+You can capture the result of a whole template block for reuse later.
+
+    <%{ my $result = %>
+    This will be assigned.
+    <%}%>
+    <%{= my $result = %>
+    This will be assigned and passed through.
+    <%}%>
+    %{ my $result =
+    This will be assigned.
+    %}
+    %{= my $result =
+    This will be assigned and passed through.
+    %}
 
 L<Mojo::Template> templates work just like Perl subs (actually they get
 compiled to a Perl sub internally).
@@ -490,6 +580,16 @@ L<Mojo::Template> implements the following attributes.
 
     my $code = $mt->append;
     $mt      = $mt->append('warn "Processed template"');
+
+=head2 C<capture_end>
+
+    my $capture_end = $mt->capture_end;
+    $mt             = $mt->capture_end('}');
+
+=head2 C<capture_start>
+
+    my $capture_start = $mt->capture_start;
+    $mt               = $mt->capture_start('{');
 
 =head2 C<code>
 

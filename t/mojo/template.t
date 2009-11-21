@@ -25,7 +25,7 @@ package main;
 use strict;
 use warnings;
 
-use Test::More tests => 70;
+use Test::More tests => 77;
 
 use File::Spec;
 use File::Temp;
@@ -35,9 +35,68 @@ use FindBin;
 # like God must feel when he's holding a gun.
 use_ok('Mojo::Template');
 
-# Strict
+# Expression block
 my $mt     = Mojo::Template->new;
 my $output = $mt->render(<<'EOF');
+%{=
+<html>
+%}
+EOF
+is($output, "<html>\n");
+
+# Escaped expression block
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+%{==
+<html>
+%}
+EOF
+is($output, "&lt;html&gt;\n");
+
+# Captured escaped expression block
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+%{== my $result =
+<html>
+%}
+%= $result
+EOF
+is($output, "&lt;html&gt;\n<html>\n");
+
+# Capture lines
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+%{ my $result = escape
+<html>
+%}
+%= $result
+EOF
+is($output, "&lt;html&gt;\n");
+
+# Capture tags
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+<%{ my $result = escape %><html><%}%><%= $result %>
+EOF
+is($output, "&lt;html&gt;\n");
+
+# Capture tags with appended code
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+<%{ my $result = escape( %><html><%} ); %><%= $result %>
+EOF
+is($output, "&lt;html&gt;\n");
+
+# Nested capture tags
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+<%{ my $result = %><%{= escape %><html><%}%><%}%><%= $result %>
+EOF
+is($output, "&lt;html&gt;\n");
+
+# Strict
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
 % $foo = 1;
 EOF
 is(ref $output, 'Mojo::Template::Exception');
@@ -190,7 +249,6 @@ $mt->parse(<<'EOF');
 %# This is a comment!
 % my $i = 2;
 %= $i * 2
-%
 </html>
 EOF
 $mt->build;
@@ -201,7 +259,7 @@ ok(!defined($mt->compiled));
 $mt->compile;
 is(ref($mt->compiled), 'CODE');
 $output = $mt->interpret(2);
-is($output, "<html foo=\"bar\">\n3 test 4 lala \n4\%\n</html>\n");
+is($output, "<html foo=\"bar\">\n3 test 4 lala \n4\</html>\n");
 
 # Arguments
 $mt = Mojo::Template->new;

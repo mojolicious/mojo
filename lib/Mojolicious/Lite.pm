@@ -249,13 +249,14 @@ Templates can also extend each other.
     %{= content header =>
         <title>Howdy!</title>
     %}
-    Hello world!
+    First!
 
     @@ second.html.ep
     % layout 'third';
     %{= content header =>
         <title>Welcome!</title>
     %}
+    Second!
 
     @@ layouts/third.html.ep
     <!doctype html><html>

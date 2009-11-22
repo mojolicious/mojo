@@ -7,7 +7,8 @@ use warnings;
 
 use Test::More;
 
-plan skip_all => 'set TEST_CLIENT to enable this test'
+plan skip_all =>
+  'set TEST_CLIENT to enable this test (internet connection required!)'
   unless $ENV{TEST_CLIENT};
 plan tests => 63;
 

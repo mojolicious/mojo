@@ -365,6 +365,15 @@ sub _finish {
     # Transaction
     my $tx = $c->{tx};
 
+    # Redirects
+    my $r = $c->{redirects} || 0;
+
+    # History
+    my $h = $c->{history} || [];
+
+    # Drop old connection so we can reuse it
+    $self->_drop($id);
+
     # Transaction still in progress
     if ($tx) {
 
@@ -372,19 +381,14 @@ sub _finish {
         $self->_queued($self->_queued - 1);
 
         # Redirect?
-        my $r = $c->{redirects} || 0;
         my $max = $self->max_redirects;
         if ($r < $max && (my $new = $self->_redirect($tx))) {
-
-            # Drop old connection so we can reuse it
-            $self->_drop($id);
 
             # Queue redirected request
             my $nid = $self->_queue($new, $c->{cb});
 
             # Create new conenction
             my $nc = $self->_connections->{$nid};
-            my $h = $c->{history} || [];
             push @$h, $tx;
             $nc->{history}   = $h;
             $nc->{redirects} = $r + 1;
@@ -403,9 +407,6 @@ sub _finish {
             $self->$cb($tx, $c->{history}) if $cb;
         }
     }
-
-    # Drop
-    $self->_drop($id);
 
     # Stop ioloop
     $self->ioloop->stop if $self->_finite && !$self->_queued;

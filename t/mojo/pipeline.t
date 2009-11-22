@@ -5,11 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More;
-
-plan skip_all => 'set TEST_PIPELINE to enable this test'
-  unless $ENV{TEST_PIPELINE};
-plan tests => 54;
+use Test::More tests => 54;
 
 # Are we there yet?
 # No

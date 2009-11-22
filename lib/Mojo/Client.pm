@@ -19,6 +19,7 @@ __PACKAGE__->attr([qw/app default_cb/]);
 __PACKAGE__->attr([qw/continue_timeout max_keep_alive_connections/] => 5);
 __PACKAGE__->attr(ioloop => sub { Mojo::IOLoop->new });
 __PACKAGE__->attr(keep_alive_timeout => 15);
+__PACKAGE__->attr(max_redirects      => 0);
 
 __PACKAGE__->attr([qw/_app_queue _cache/] => sub { [] });
 __PACKAGE__->attr(_connections            => sub { {} });
@@ -103,7 +104,7 @@ sub _app_process {
     while (my $queued = shift @{$self->_app_queue}) {
 
         # Transaction
-        my $client = $queued->[0];
+        my $client = $queued->{tx};
 
         # App
         my $app = $self->app;
@@ -157,11 +158,32 @@ sub _app_process {
         # Spin
         while (1) { last if $self->_app_spin($client, $server, $daemon) }
 
-        # Callback
-        my $cb = $queued->[1] || $self->default_cb;
+        # Redirect?
+        my $r = $queued->{redirects} || 0;
+        my $max = $self->max_redirects;
+        if ($r < $max && (my $tx = $self->_redirect($client))) {
 
-        # Execute callback
-        $self->$cb($client) if $cb;
+            # Queue redirected request
+            my $h = $queued->{history} || [];
+            push @$h, $client;
+            my $new = {
+                cb        => $queued->{cb},
+                history   => $h,
+                redirects => $r + 1,
+                tx        => $tx
+            };
+            push @{$self->_app_queue}, $new;
+        }
+
+        # Callback
+        else {
+
+            # Get callback
+            my $cb = $queued->{cb} || $self->default_cb;
+
+            # Execute callback
+            $self->$cb($client, $queued->{history}) if $cb;
+        }
     }
 
     return $self;
@@ -337,20 +359,41 @@ sub _error {
 sub _finish {
     my ($self, $id) = @_;
 
-    # Transaction
-    my $tx = $self->_connections->{$id}->{tx};
+    # Connection
+    my $c = $self->_connections->{$id};
 
-    # Get callback
-    my $cb = $self->_connections->{$id}->{cb} || $self->default_cb;
+    # Transaction
+    my $tx = $c->{tx};
 
     # Transaction still in progress
     if ($tx) {
 
+        # Redirect?
+        my $r = $c->{redirects} || 0;
+        my $max = $self->max_redirects;
+        if ($r < $max && (my $new = $self->_redirect($tx))) {
+
+            # Queue redirected request
+            my $nid = $self->_queue($new, $c->{cb});
+            my $nc  = $self->_connections->{$nid};
+            my $h   = $c->{history} || [];
+            push @$h, $tx;
+            $nc->{history}   = $h;
+            $nc->{redirects} = $r + 1;
+        }
+
         # Callback
-        $self->$cb($tx) if $cb && $tx;
+        else {
+
+            # Get callback
+            my $cb = $c->{cb} || $self->default_cb;
+
+            # Callback
+            $self->$cb($tx, $c->{history}) if $cb;
+        }
 
         # Counter
-        $self->_queued($self->_queued - 1) if $tx;
+        $self->_queued($self->_queued - 1);
     }
 
     # Drop
@@ -378,7 +421,9 @@ sub _queue {
     my ($self, $tx, $cb) = @_;
 
     # Add to app queue
-    push @{$self->_app_queue}, [$tx, $cb] and return if $self->app;
+    push @{$self->_app_queue}, {cb => $cb, redirects => 0, tx => $tx}
+      and return
+      if $self->app;
 
     # Info
     my $info   = $tx->client_info;
@@ -447,6 +492,8 @@ sub _queue {
 
     # Counter
     $self->_queued($self->_queued + 1);
+
+    return $id;
 }
 
 sub _read {
@@ -464,6 +511,28 @@ sub _read {
 
     # Corrupted connection
     else { $self->_drop($id) }
+}
+
+sub _redirect {
+    my ($self, $tx) = @_;
+
+    # Code
+    return unless $tx->res->is_status_class('300');
+    return if $tx->res->code == 305;
+
+    # Location
+    return unless my $location = $tx->res->headers->location;
+
+    # Method
+    my $method = $tx->req->method;
+    $method = 'GET' unless $method =~ /^GET|HEAD$/i;
+
+    # New transaction
+    my $new = Mojo::Transaction::Single->new;
+    $new->req->method($method);
+    $new->req->url->parse($location);
+
+    return $new;
 }
 
 sub _withdraw {
@@ -563,6 +632,11 @@ L<Mojo::Client> implements the following attributes.
 
     my $max_keep_alive_connections = $client->max_keep_alive_connections;
     $client                        = $client->max_keep_alive_connections(5);
+
+=head2 C<max_redirects>
+
+    my $max_redirects = $client->max_redirects;
+    $client           = $client->max_redirects(3);
 
 =head1 METHODS
 

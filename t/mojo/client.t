@@ -9,7 +9,7 @@ use Test::More;
 
 plan skip_all => 'set TEST_CLIENT to enable this test'
   unless $ENV{TEST_CLIENT};
-plan tests => 57;
+plan tests => 63;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -80,6 +80,21 @@ $client->get(
     }
 );
 $client->process;
+
+# Simple requests with redirect
+$client->max_redirects(3);
+$client->get(
+    'http://labs.kraih.com' => sub {
+        my ($self, $tx, $h) = @_;
+        is($tx->req->method,     'GET');
+        is($tx->req->url,        'http://labs.kraih.com/blog/');
+        is($tx->res->code,       200);
+        is($h->[0]->req->method, 'GET');
+        is($h->[0]->req->url,    'http://labs.kraih.com');
+        is($h->[0]->res->code,   301);
+    }
+)->process;
+$client->max_redirects(0);
 
 # Custom chunked request without callback
 $tx = Mojo::Transaction::Single->new;

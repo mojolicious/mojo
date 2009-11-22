@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 176;
+use Test::More tests => 186;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -31,6 +31,9 @@ get '/' => 'root';
 
 # GET /root
 get '/root.html' => 'root_path';
+
+# GET /template.txt
+get '/template.txt' => 'template';
 
 # GET /template_inheritance
 get '/template_inheritance' => sub {
@@ -603,6 +606,25 @@ $client->get(
     }
 )->process;
 
+# GET /redirect_named (with redirecting enabled in client)
+$client->max_redirects(3);
+$client->get(
+    '/redirect_named' => sub {
+        my ($self, $tx, $h) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->headers->location,               undef);
+        is($tx->res->body,                            "Redirect works!\n");
+        is($h->[0]->res->code,                        302);
+        is($h->[0]->res->headers->server,             'Mojo (Perl)');
+        is($h->[0]->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($h->[0]->res->headers->location,               '/template.txt');
+        is($h->[0]->res->body,                            'Redirecting!');
+    }
+)->process;
+$client->max_redirects(0);
+
 # GET /koi8-r
 $client->get(
     '/koi8-r' => sub {
@@ -698,6 +720,9 @@ $client->get(
 )->process;
 
 __DATA__
+@@ template.txt.epl
+Redirect works!
+
 @@ template_inheritance.html.ep
 % layout 'template_inheritance';
 %{ content header =>

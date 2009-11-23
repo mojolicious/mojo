@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 186;
+use Test::More tests => 194;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -16,6 +16,7 @@ use Test::More tests => 186;
 # so if anyone asks you're my debugger.
 use Mojo::ByteStream 'b';
 use Mojo::Client;
+use Mojo::Cookie::Response;
 use Mojo::JSON;
 use Mojo::Transaction::Single;
 use Mojolicious::Lite;
@@ -61,6 +62,26 @@ get '/outerlayout' => sub {
         layout   => 'layout',
         handler  => 'ep'
     );
+};
+
+# GET /session_cookie
+get '/session_cookie' => sub {
+    my $self = shift;
+    $self->render_text('Cookie set!');
+    $self->res->cookies(
+        Mojo::Cookie::Response->new(
+            path  => '/session_cookie',
+            name  => 'session',
+            value => '23'
+        )
+    );
+};
+
+# GET /session_cookie/2
+get '/session_cookie/2' => sub {
+    my $self  = shift;
+    my $value = $self->req->cookie('session')->value;
+    $self->render_text("Session is $value!");
 };
 
 # GET /foo
@@ -288,6 +309,28 @@ $client->get(
         is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
         is($tx->res->body,
             "layouted Hello\n[\n  1,\n  2\n]\nthere<br/>!\n\n\n");
+    }
+)->process;
+
+# GET /session_cookie
+$client->get(
+    'http://kraih.com/session_cookie' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            'Cookie set!');
+    }
+)->process;
+
+# GET /session_cookie/2
+$client->get(
+    'http://kraih.com/session_cookie/2' => sub {
+        my ($self, $tx) = @_;
+        is($tx->res->code,                            200);
+        is($tx->res->headers->server,                 'Mojo (Perl)');
+        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
+        is($tx->res->body,                            'Session is 23!');
     }
 )->process;
 

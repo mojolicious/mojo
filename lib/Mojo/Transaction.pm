@@ -38,6 +38,8 @@ sub client_spin { croak 'Method "client_spin" not implemented by subclass' }
 
 sub is_paused { shift->is_state('paused') }
 
+sub is_pipeline { return shift->isa('Mojo::Transaction::Pipeline') ? 1 : 0 }
+
 sub pause {
     my $self = shift;
 
@@ -179,6 +181,10 @@ implements the following new ones.
 =head2 C<is_paused>
 
     my $paused = $tx->is_paused;
+
+=head2 C<is_pipeline>
+
+    my $is_pipeline = $tx->is_pipeline;
 
 =head2 C<pause>
 

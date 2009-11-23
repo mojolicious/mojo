@@ -8,6 +8,9 @@ use warnings;
 use base 'Mojo::Cookie';
 
 use Mojo::ByteStream 'b';
+use Mojo::Date;
+
+__PACKAGE__->attr([qw/comment domain httponly max_age port secure/]);
 
 # Regex
 my $FIELD_RE = qr/
@@ -24,6 +27,14 @@ my $FIELD_RE = qr/
     )
 /xmsi;
 my $FLAG_RE = qr/(?:Secure|HttpOnly)/i;
+
+sub expires {
+    my ($self, $expires) = @_;
+    if (defined $expires) {
+        $self->{expires} = Mojo::Date->new($expires) unless ref $expires;
+    }
+    return $self->{expires};
+}
 
 # Remember the time he ate my goldfish?
 # And you lied and said I never had goldfish.
@@ -109,7 +120,43 @@ L<Mojo::Cookie::Response> is a generic container for HTTP response cookies.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Cookie::Response> inherits all attributes from L<Mojo::Cookie>.
+L<Mojo::Cookie::Response> inherits all attributes from L<Mojo::Cookie> and
+implements the followign new ones.
+
+=head2 C<comment>
+
+    my $comment = $cookie->comment;
+    $cookie     = $cookie->comment('test 123');
+
+=head2 C<domain>
+
+    my $domain = $cookie->domain;
+    $cookie    = $cookie->domain('localhost');
+
+=head2 C<expires>
+
+    my $expires = $cookie->expires;
+    $cookie     = $cookie->expires(time + 60);
+
+=head2 C<httponly>
+
+    my $httponly = $cookie->httponly;
+    $cookie      = $cookie->httponly(1);
+
+=head2 C<max_age>
+
+    my $max_age = $cookie->max_age;
+    $cookie     = $cookie->max_age(60);
+
+=head2 C<port>
+
+    my $port = $cookie->port;
+    $cookie  = $cookie->port('80 8080');
+
+=head2 C<secure>
+
+    my $secure = $cookie->secure;
+    $cookie    = $cookie->secure(1);
 
 =head1 METHODS
 

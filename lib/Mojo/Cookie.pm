@@ -10,11 +10,8 @@ use overload '""' => sub { shift->to_string }, fallback => 1;
 
 use Carp 'croak';
 use Mojo::ByteStream 'b';
-use Mojo::Date;
 
-__PACKAGE__->attr(
-    [qw/comment domain httponly max_age name path port secure value version/]
-);
+__PACKAGE__->attr([qw/name path value version/]);
 
 # Regex
 my $COOKIE_SEPARATOR_RE = qr/^\s*\,\s*/;
@@ -35,14 +32,6 @@ my $VALUE_RE     = qr/
 
 # My Homer is not a communist.
 # He may be a liar, a pig, an idiot, a communist, but he is not a porn star.
-sub expires {
-    my ($self, $expires) = @_;
-    if (defined $expires) {
-        $self->{expires} = Mojo::Date->new($expires) unless ref $expires;
-    }
-    return $self->{expires};
-}
-
 sub to_string { croak 'Method "to_string" not implemented by subclass' }
 
 sub _tokenize {
@@ -110,31 +99,6 @@ L<Mojo::Cookie> is a cookie base class.
 
 L<Mojo::Cookie> implements the following attributes.
 
-=head2 C<comment>
-
-    my $comment = $cookie->comment;
-    $cookie     = $cookie->comment('test 123');
-
-=head2 C<domain>
-
-    my $domain = $cookie->domain;
-    $cookie    = $cookie->domain('localhost');
-
-=head2 C<expires>
-
-    my $expires = $cookie->expires;
-    $cookie     = $cookie->expires(time + 60);
-
-=head2 C<httponly>
-
-    my $httponly = $cookie->httponly;
-    $cookie      = $cookie->httponly(1);
-
-=head2 C<max_age>
-
-    my $max_age = $cookie->max_age;
-    $cookie     = $cookie->max_age(60);
-
 =head2 C<name>
 
     my $name = $cookie->name;
@@ -144,16 +108,6 @@ L<Mojo::Cookie> implements the following attributes.
 
     my $path = $cookie->path;
     $cookie  = $cookie->path('/test');
-
-=head2 C<port>
-
-    my $port = $cookie->port;
-    $cookie  = $cookie->port('80 8080');
-
-=head2 C<secure>
-
-    my $secure = $cookie->secure;
-    $cookie    = $cookie->secure(1);
 
 =head2 C<value>
 

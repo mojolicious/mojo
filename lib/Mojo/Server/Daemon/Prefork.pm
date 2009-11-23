@@ -50,6 +50,32 @@ use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
 # Lisa, tell your mother to get off my case.
 # Uhhh, dad, Lisa's the one you're not talking to.
 # Bart, go to your room.
+sub accept_lock {
+    my ($self, $blocking) = @_;
+
+    # Idle
+    if ($blocking) {
+        $self->_child_write->syswrite("$$ idle\n")
+          or croak "Can't write to parent: $!";
+    }
+
+    # Lock
+    my $lock =
+      $blocking
+      ? flock($self->_lock, LOCK_EX)
+      : flock($self->_lock, LOCK_EX | LOCK_NB);
+
+    # Busy
+    if ($lock) {
+        $self->_child_write->syswrite("$$ busy\n")
+          or croak "Can't write to parent: $!";
+    }
+
+    return $lock;
+}
+
+sub accept_unlock { flock(shift->_lock, LOCK_UN) }
+
 sub child { shift->ioloop->start }
 
 sub daemonize {
@@ -77,34 +103,10 @@ sub parent {
     my $self = shift;
 
     # Lock callback
-    $self->ioloop->lock_cb(
-        sub {
-            my ($loop, $blocking) = @_;
-
-            # Idle
-            if ($blocking) {
-                $self->_child_write->syswrite("$$ idle\n")
-                  or croak "Can't write to parent: $!";
-            }
-
-            # Lock
-            my $lock =
-              $blocking
-              ? flock($self->_lock, LOCK_EX)
-              : flock($self->_lock, LOCK_EX | LOCK_NB);
-
-            # Busy
-            if ($lock) {
-                $self->_child_write->syswrite("$$ busy\n")
-                  or croak "Can't write to parent: $!";
-            }
-
-            return $lock;
-        }
-    );
+    $self->ioloop->lock_cb(sub { $self->accept_lock($_[1]) });
 
     # Unlock callback
-    $self->ioloop->unlock_cb(sub { flock($self->_lock, LOCK_UN) });
+    $self->ioloop->unlock_cb(sub { $self->accept_unlock });
 
     # Prepare ioloop
     $self->prepare_ioloop;
@@ -436,6 +438,14 @@ L<Mojo::Server::Daemon> and implements the following new ones.
 
 L<Mojo::Server::Daemon::Prefork> inherits all methods from
 L<Mojo::Server::Daemon> and implements the following new ones.
+
+=head2 C<accept_lock>
+
+    my $lock = $daemon->accept_lock($blocking);
+
+=head2 C<accept_unlock>
+
+    $daemon->accept_unlock;
 
 =head2 C<child>
 

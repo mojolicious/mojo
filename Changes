@@ -11,6 +11,7 @@ This file documents the revision history for Perl extension Mojo.
         - Fixed unicode detection in Mojo::JSON. (rsp)
         - Fixed multiple small bugs in Mojo::JSON. (rsp)
         - Fixed Mojolicious default app tests. (yuki-kimoto)
+        - Fixed Mojo::Server::FCGI compatibility.
 
 0.999910 2009-11-14 00:00:00
         - Fixed url_for without endpoint bug.

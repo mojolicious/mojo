@@ -140,22 +140,15 @@ sub welcome {
 use strict;
 use warnings;
 
-use Mojo::Client;
-use Mojo::Transaction::Single;
-use Test::More tests => 4;
+use Test::More tests => 5;
+use Test::Mojo;
 
 use_ok('<%= $class %>');
 
 # Test
-my $client = Mojo::Client->new(app => '<%= $class %>');
-$client->get(
-    '/' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code, 200);
-        is($tx->res->headers->content_type, 'text/html');
-        like($tx->res->content->asset->slurp, qr/Mojolicious Web Framework/i);
-    }
-)->process;
+my $t = Test::Mojo->new(app => '<%= $class %>');
+$t->get_ok('/')->status_is(200)->content_type_is(Server => 'text/html')
+  ->content_like(qr/Mojolicious Web Framework/i);
 @@ not_found
 <!doctype html><html>
     <head><title>Not Found</title></head>

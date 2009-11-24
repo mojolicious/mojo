@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 194;
+use Test::More tests => 228;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -20,6 +20,7 @@ use Mojo::Cookie::Response;
 use Mojo::JSON;
 use Mojo::Transaction::Single;
 use Mojolicious::Lite;
+use Test::Mojo;
 
 # Silence
 app->log->level('error');
@@ -229,253 +230,110 @@ get '/param_auth/too' =>
 my $app = Mojolicious::Lite->new;
 my $client = Mojo::Client->new(app => $app);
 $app->client($client);
+my $t = Test::Mojo->new;
 
 # GET /
-$client->get(
-    '/' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body,                            "/root.html");
-    }
-)->process;
+$t->get_ok('/')->status_is(200)->header_is(Server => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_is('/root.html');
 
 # GET /root
-$client->get(
-    '/root.html' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body,                            "/.html");
-    }
-)->process;
+$t->get_ok('/root.html')->status_is(200)->header_is(Server => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_is('/.html');
 
 # GET /.html
-$client->get(
-    '/.html' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body,                            "/root.html");
-    }
-)->process;
+$t->get_ok('/.html')->status_is(200)->header_is(Server => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_is('/root.html');
 
 # GET /template_inheritance
-$client->get(
-    '/template_inheritance' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body,
-                "<title>Welcome</title>\nSidebar!\n"
-              . "Hello World!\nDefault footer!\n");
-    }
-)->process;
+$t->get_ok('/template_inheritance')->status_is(200)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')
+  ->content_is(
+    "<title>Welcome</title>\nSidebar!\nHello World!\nDefault footer!\n");
 
 # GET /layout_without_inheritance
-$client->get(
-    '/layout_without_inheritance' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body,
-            "Default header!\nDefault sidebar!\nDefault footer!\n");
-    }
-)->process;
+$t->get_ok('/layout_without_inheritance')->status_is(200)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')
+  ->content_is("Default header!\nDefault sidebar!\nDefault footer!\n");
 
 # GET /double_inheritance
-$client->get(
-    '/double_inheritance' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body,
-            "<title>Welcome</title>\nSidebar too!\nDefault footer!\n");
-    }
-)->process;
+$t->get_ok('/double_inheritance')->status_is(200)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')
+  ->content_is("<title>Welcome</title>\nSidebar too!\nDefault footer!\n");
 
 # GET /outerlayout
-$client->get(
-    '/outerlayout' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body,
-            "layouted Hello\n[\n  1,\n  2\n]\nthere<br/>!\n\n\n");
-    }
-)->process;
+$t->get_ok('/outerlayout')->status_is(200)->header_is(Server => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')
+  ->content_is("layouted Hello\n[\n  1,\n  2\n]\nthere<br/>!\n\n\n");
 
 # GET /session_cookie
-$client->get(
-    'http://kraih.com/session_cookie' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body,                            'Cookie set!');
-    }
-)->process;
+$t->get_ok('http://kraih.com/session_cookie')->status_is(200)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_is('Cookie set!');
 
 # GET /session_cookie/2
-$client->get(
-    'http://kraih.com/session_cookie/2' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body,                            'Session is 23!');
-    }
-)->process;
+$t->get_ok('http://kraih.com/session_cookie/2')->status_is(200)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_is('Session is 23!');
 
 # GET /foo
-$client->get(
-    '/foo' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body,                            'Yea baby!');
-    }
-)->process;
+$t->get_ok('/foo')->status_is(200)->header_is(Server => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_is('Yea baby!');
 
 # POST /template
-$client->post(
-    '/template' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body,                            'Just works!');
-    }
-)->process;
+$t->post_ok('/template')->status_is(200)->header_is(Server => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_is('Just works!');
 
 # GET /something
-$client->get(
-    '/something' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body,                            'Just works!');
-    }
-)->process;
+$t->get_ok('/something')->status_is(200)->header_is(Server => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_is('Just works!');
 
 # POST /something
-$client->post(
-    '/something' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body,                            'Just works!');
-    }
-)->process;
+$t->post_ok('/something')->status_is(200)->header_is(Server => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_is('Just works!');
 
 # DELETE /something
-$client->delete(
-    '/something' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body,                            'Just works!');
-    }
-)->process;
+$t->delete_ok('/something')->status_is(200)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_is('Just works!');
 
 # GET /something/else
-$client->get(
-    '/something/else' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body,                            'Yay!');
-    }
-)->process;
+$t->get_ok('/something/else')->status_is(200)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_is('Yay!');
 
 # POST /something/else
-$client->post(
-    '/something/else' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body,                            'Yay!');
-    }
-)->process;
+$t->post_ok('/something/else')->status_is(200)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_is('Yay!');
 
 # DELETE /something/else
-$client->delete(
-    '/something/else' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            404);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        like($tx->res->body, qr/Oops!/);
-    }
-)->process;
+$t->delete_ok('/something/else')->status_is(404)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_like(qr/Oops!/);
 
 # GET /regex/23
-$client->get(
-    '/regex/23' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body,                            '23');
-    }
-)->process;
+$t->get_ok('/regex/23')->status_is(200)->header_is(Server => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_is('23');
 
 # GET /regex/foo
-$client->get(
-    '/regex/foo' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            404);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        like($tx->res->body, qr/Oops!/);
-    }
-)->process;
+$t->get_ok('/regex/foo')->status_is(404)->header_is(Server => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_like(qr/Oops!/);
 
 # POST /bar
-$client->post(
-    '/bar' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body,                            'default');
-    }
-)->process;
+$t->post_ok('/bar')->status_is(200)->header_is(Server => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_is('default');
 
 # POST /bar/baz
-$client->post(
-    '/bar/baz' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body,                            'baz');
-    }
-)->process;
+$t->post_ok('/bar/baz')->status_is(200)->header_is(Server => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_is('baz');
 
 # GET /layout
-$client->get(
-    '/layout' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body, "Yea baby! with layout\n");
-    }
-)->process;
+$t->get_ok('/layout')->status_is(200)->header_is(Server => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')
+  ->content_is("Yea baby! with layout\n");
 
 # GET /firefox
 $client->get(
@@ -555,27 +413,15 @@ $client->get(
 )->process;
 
 # GET /autostash
-$client->get(
-    '/autostash?bar=23' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body,                            "layouted bar23\n");
-    }
-)->process;
+$t->get_ok('/autostash?bar=23')->status_is(200)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')
+  ->content_is("layouted bar23\n");
 
 # GET /helper
-$client->get(
-    '/helper' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body,
-            '<br/>&lt;.../template(Mozilla/5.0 (compatible; Mojo; Perl))');
-    }
-)->process;
+$t->get_ok('/helper')->status_is(200)->header_is(Server => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')
+  ->content_is('<br/>&lt;.../template(Mozilla/5.0 (compatible; Mojo; Perl))');
 
 # GET /helper
 $client->get(
@@ -591,63 +437,32 @@ $client->get(
 # GET /eperror
 $level = $app->log->level;
 $app->log->level('fatal');
-$client->get(
-    '/eperror' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            500);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        like($tx->res->body, qr/Internal Server Error/);
-    }
-)->process;
+$t->get_ok('/eperror')->status_is(500)->header_is(Server => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')
+  ->content_like(qr/Internal Server Error/);
 $app->log->level($level);
 
 # GET /subrequest
-$client->get(
-    '/subrequest' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body,                            'Just works!');
-    }
-)->process;
+$t->get_ok('/subrequest')->status_is(200)->header_is(Server => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_is('Just works!');
 
 # GET /redirect_url
-$client->get(
-    '/redirect_url' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            302);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->headers->location,               'http://127.0.0.1/foo');
-        is($tx->res->body,                            'Redirecting!');
-    }
-)->process;
+$t->get_ok('/redirect_url')->status_is(302)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')
+  ->header_is(Location => 'http://127.0.0.1/foo')->content_is('Redirecting!');
 
 # GET /redirect_path
-$client->get(
-    '/redirect_path' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            302);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->headers->location,               '/foo/bar');
-        is($tx->res->body,                            'Redirecting!');
-    }
-)->process;
+$t->get_ok('/redirect_path')->status_is(302)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')
+  ->header_is(Location       => '/foo/bar')->content_is('Redirecting!');
 
 # GET /redirect_named
-$client->get(
-    '/redirect_named' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            302);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->headers->location,               '/template.txt');
-        is($tx->res->body,                            'Redirecting!');
-    }
-)->process;
+$t->get_ok('/redirect_named')->status_is(302)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')
+  ->header_is(Location       => '/template.txt')->content_is('Redirecting!');
 
 # GET /redirect_named (with redirecting enabled in client)
 $client->max_redirects(3);
@@ -708,59 +523,29 @@ $client->get(
 )->process;
 
 # GET /with_ladder_too
-$client->get(
-    '/with_ladder_too' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            404);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        like($tx->res->body, qr/Oops!/);
-    }
-)->process;
+$t->get_ok('/with_ladder_too')->status_is(404)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_like(qr/Oops!/);
 
 # GET /param_auth
-$client->get(
-    '/param_auth' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body,                            "Not Bender!\n");
-    }
-)->process;
+$t->get_ok('/param_auth')->status_is(200)->header_is(Server => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_is("Not Bender!\n");
 
 # GET /param_auth?name=Bender
-$client->get(
-    '/param_auth?name=Bender' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body,                            "Bender!\n");
-    }
-)->process;
+$t->get_ok('/param_auth?name=Bender')->status_is(200)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_is("Bender!\n");
 
 # GET /param_auth/too
-$client->get(
-    '/param_auth/too' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body,                            "Not Bender!\n");
-    }
-)->process;
+$t->get_ok('/param_auth/too')->status_is(200)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_is("Not Bender!\n");
 
 # GET /param_auth/too?name=Bender
-$client->get(
-    '/param_auth/too?name=Bender' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body, 'You could be Bender too!');
-    }
-)->process;
+$t->get_ok('/param_auth/too?name=Bender')->status_is(200)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')
+  ->content_is('You could be Bender too!');
 
 __DATA__
 @@ template.txt.epl

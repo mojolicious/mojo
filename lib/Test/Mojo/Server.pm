@@ -268,7 +268,7 @@ Test::Mojo::Server - Server Tests
 
 =head1 SYNOPSIS
 
-    use Mojo::Test::Server;
+    use Test::Mojo::Server;
 
     my $server = Test::Mojo::Server->new;
     $server->start_daemon_ok;
@@ -276,12 +276,12 @@ Test::Mojo::Server - Server Tests
 
 =head1 DESCRIPTION
 
-L<Mojo::Test::Server> is a test harness for developers of L<Mojo> server
-bindings.
+L<Test::Mojo::Server> is a collection of testing helpers specifically for
+developers of L<Mojo> server bindings.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Test::Server> implements the following attribute.
+L<Test::Mojo::Server> implements the following attributes.
 
 =head2 C<command>
 
@@ -314,12 +314,12 @@ L<Mojo::Test::Server> implements the following attribute.
 
 =head1 METHODS
 
-L<Mojo::Test::Server> inherits all methods from L<Mojo::Base> and implements
+L<Test::Mojo::Server> inherits all methods from L<Mojo::Base> and implements
 the following new ones.
 
 =head2 C<new>
 
-    my $server = Mojo::Test::Server->new;
+    my $server = Test::Mojo::Server->new;
 
 =head2 C<find_executable_ok>
 

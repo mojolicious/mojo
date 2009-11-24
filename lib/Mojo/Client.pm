@@ -54,19 +54,6 @@ sub post   { shift->_build_tx('POST',   @_) }
 sub process {
     my $self = shift;
 
-    # Weaken
-    weaken $self;
-
-    # Connect callback
-    $self->ioloop->connect_cb(
-        sub {
-            my ($loop, $id) = @_;
-
-            # Connected
-            $self->_connect($id);
-        }
-    );
-
     # Queue transactions
     $self->queue(@_) if @_;
 
@@ -483,6 +470,17 @@ sub _queue {
     my $port   = $info->{port};
     my $scheme = $info->{scheme};
 
+    # Weaken
+    weaken $self;
+
+    # Connect callback
+    my $connected = sub {
+        my ($loop, $id) = @_;
+
+        # Connected
+        $self->_connect($id);
+    };
+
     # Cached connection
     my $id;
     if ($id = $self->_withdraw("$scheme:$host:$port")) {
@@ -510,7 +508,11 @@ sub _queue {
           : inet_ntoa(inet_aton($host));
 
         # Connect
-        $id = $self->ioloop->connect(address => $address, port => $port);
+        $id = $self->ioloop->connect(
+            address => $address,
+            port    => $port,
+            cb      => $connected
+        );
 
         # Error
         unless (defined $id) {
@@ -525,7 +527,6 @@ sub _queue {
     }
 
     # Weaken
-    weaken $self;
     weaken $tx;
 
     # State change callback

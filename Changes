@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojo.
 
+0.999912 2009-11-24 00:00:00
+        - Improved ioloop performance. (gbarr)
+
 0.999911 2009-11-14 00:00:00
         - Added template inheritance to Mojolicious.
         - Added block and capturing support to Mojo::Template.

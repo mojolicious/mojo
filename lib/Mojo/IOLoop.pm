@@ -16,7 +16,7 @@ use Mojo::Buffer;
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
 
 __PACKAGE__->attr(
-    [qw/accept_cb connect_cb lock_cb unlock_cb/] => sub {
+    [qw/accept_cb lock_cb unlock_cb/] => sub {
         sub {1}
     }
 );
@@ -56,8 +56,13 @@ sub connect {
     $socket->connect($sin);
 
     # Add connection
-    $self->_connections->{$socket} =
-      {buffer => Mojo::Buffer->new, socket => $socket, connecting => 1, connect_start => time};
+    $self->_connections->{$socket} = {
+        buffer        => Mojo::Buffer->new,
+        socket        => $socket,
+        connect_cb    => $args->{cb},
+        connecting    => 1,
+        connect_start => time
+    };
 
     # Connecting counter
     $self->connecting($self->connecting + 1);
@@ -264,8 +269,9 @@ sub _connect {
     # Connecting
     my $c = $self->_connections;
     for my $id (keys %$c) {
-        my $connect = $c->{$id};
 
+        # Connecting?
+        my $connect = $c->{$id};
         next unless $connect->{connecting};
 
         # New socket
@@ -294,7 +300,8 @@ sub _connect {
             $self->servers($self->servers + 1);
 
             # Connect callback
-            $self->connect_cb->($self, "$socket");
+            my $cb = $connect->{connect_cb};
+            $self->$cb("$socket") if $cb;
         }
     }
 }
@@ -560,15 +567,15 @@ L<Mojo::IOLoop> implements the following attributes.
     my $clients = $loop->clients;
     $loop       = $loop->clients(25);
 
-=head2 C<connect_cb>
-
-    my $cb = $loop->connect_cb;
-    $loop  = $loop->connect_cb(sub { ... });
-
 =head2 C<connect_timeout>
 
     my $timeout = $loop->connect_timeout;
     $loop       = $loop->connect_timeout(5);
+
+=head2 C<connecting>
+
+    my $connecting = $loop->connecting;
+    $loop          = $loop->connecting(25);
 
 =head2 C<lock_cb>
 

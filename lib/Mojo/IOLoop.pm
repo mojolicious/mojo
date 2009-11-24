@@ -21,13 +21,13 @@ __PACKAGE__->attr(
     }
 );
 __PACKAGE__->attr([qw/accept_timeout connect_timeout/] => 5);
-__PACKAGE__->attr([qw/clients servers/]                => 0);
+__PACKAGE__->attr([qw/clients servers connecting/]     => 0);
 __PACKAGE__->attr(max_clients                          => 1000);
 __PACKAGE__->attr(timeout                              => '0.25');
 
-__PACKAGE__->attr([qw/_accepted _connecting/] => sub { [] });
-__PACKAGE__->attr(_connections                => sub { {} });
-__PACKAGE__->attr(_poll                       => sub { IO::Poll->new });
+__PACKAGE__->attr(_accepted    => sub { [] });
+__PACKAGE__->attr(_connections => sub { {} });
+__PACKAGE__->attr(_poll        => sub { IO::Poll->new });
 __PACKAGE__->attr([qw/_listen _running/]);
 
 # Singleton
@@ -55,8 +55,15 @@ sub connect {
     my $sin = sockaddr_in($args->{port} || 80, inet_aton($args->{address}));
     $socket->connect($sin);
 
-    # Connecting
-    push @{$self->_connecting}, [$socket, time];
+    # Add connection
+    $self->_connections->{$socket} =
+      {buffer => Mojo::Buffer->new, socket => $socket, connecting => 1, connect_start => time};
+
+    # Connecting counter
+    $self->connecting($self->connecting + 1);
+
+    # Add socket to poll
+    $self->writing("$socket");
 
     return "$socket";
 }
@@ -78,6 +85,10 @@ sub drop {
     # Server counter
     $self->servers($self->servers - 1)
       if $self->_connections->{$id}->{server};
+
+    # Connecting counter
+    $self->connecting($self->connecting - 1)
+      if $self->_connections->{$id}->{connecting};
 
     # Socket
     if (my $socket = $self->_connections->{$id}->{socket}) {
@@ -251,41 +262,41 @@ sub _connect {
     my $self = shift;
 
     # Connecting
-    my @connecting;
-    for my $connect (@{$self->_connecting}) {
+    my $c = $self->_connections;
+    for my $id (keys %$c) {
+        my $connect = $c->{$id};
+
+        next unless $connect->{connecting};
 
         # New socket
-        my $socket = $connect->[0];
+        my $socket = $connect->{socket};
 
         # Not yet connected
         if (!$socket->connected) {
 
             # Timeout
-            $self->_error("$socket", 'Connect timeout.') and next
-              if time - $connect->[1] > $self->connect_timeout;
+            if (time - $connect->{connect_start} > $self->connect_timeout) {
+                $self->_error("$socket", 'Connect timeout.');
+                $self->drop($id);
+            }
 
-            # Another try
-            push @connecting, $connect;
         }
 
         # Connected
         else {
 
-            # Add connection
-            $self->_connections->{$socket} =
-              {buffer => Mojo::Buffer->new, server => 1, socket => $socket};
+            # Connected counter
+            $connect->{connecting} = 0;
+            $self->connecting($self->connecting - 1);
 
             # Server counter
+            $connect->{server} = 1;
             $self->servers($self->servers + 1);
 
             # Connect callback
             $self->connect_cb->($self, "$socket");
-
-            # Add socket to poll
-            $self->writing("$socket");
         }
     }
-    $self->_connecting(\@connecting);
 }
 
 sub _error {
@@ -413,14 +424,14 @@ sub _spin {
     $self->_accept;
 
     # Connect
-    $self->_connect;
+    $self->_connect if $self->connecting;
 
     # Prepare
     $self->_prepare;
 
     # Nothing to do
     return $self->_running(0)
-      unless $poll->handles || $self->_listen || @{$self->_connecting};
+      unless $poll->handles || $self->_listen || $self->connecting;
 
     # Poll
     $poll->poll($self->timeout);
@@ -441,8 +452,11 @@ sub _spin {
 sub _write {
     my ($self, $id) = @_;
 
-    # Conenction
+    # Connection
     my $c = $self->_connections->{$id};
+
+    # Connect has just completed
+    return if $c->{connecting};
 
     # Buffer
     my $buffer = $c->{buffer};

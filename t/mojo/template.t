@@ -25,7 +25,7 @@ package main;
 use strict;
 use warnings;
 
-use Test::More tests => 77;
+use Test::More tests => 84;
 
 use File::Spec;
 use File::Temp;
@@ -35,9 +35,44 @@ use FindBin;
 # like God must feel when he's holding a gun.
 use_ok('Mojo::Template');
 
-# Expression block
+# Trim line
 my $mt     = Mojo::Template->new;
-my $output = $mt->render(<<'EOF');
+my $output = $mt->render("    <%= 'test' =%> \n");
+is($output, 'test');
+
+# Trim line (with expression)
+$mt     = Mojo::Template->new;
+$output = $mt->render("<%= '123' %><%= 'test' =%>\n");
+is($output, '123test');
+
+# Trim lines
+$mt     = Mojo::Template->new;
+$output = $mt->render(" foo    \n    <%= 'test' =%>\n foo\n");
+is($output, " footestfoo\n");
+
+# Trim lines (at start of line)
+$mt     = Mojo::Template->new;
+$output = $mt->render("    \n<%= 'test' =%>\n    ");
+is($output, 'test');
+
+# Trim lines (multiple lines)
+$mt     = Mojo::Template->new;
+$output = $mt->render(" bar\n foo\n    <%= 'test' =%>\n foo\n bar\n");
+is($output, " bar\n footestfoo\n bar\n");
+
+# Trim lines (multiple empty lines)
+$mt     = Mojo::Template->new;
+$output = $mt->render("    \n<%= 'test' =%>\n    ");
+is($output, 'test');
+
+# Trim expression tags
+$mt     = Mojo::Template->new;
+$output = $mt->render('    <%{= =%><html><%} =%>    ');
+is($output, '<html>');
+
+# Expression block
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
 %{=
 <html>
 %}

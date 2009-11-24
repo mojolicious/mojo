@@ -24,10 +24,11 @@ __PACKAGE__->attr(encoding                  => 'UTF-8');
 __PACKAGE__->attr(escape_mark               => '=');
 __PACKAGE__->attr(expression_mark           => '=');
 __PACKAGE__->attr(line_start                => '%');
+__PACKAGE__->attr(tag_start                 => '<%');
+__PACKAGE__->attr(tag_end                   => '%>');
 __PACKAGE__->attr(template                  => '');
 __PACKAGE__->attr(tree => sub { [] });
-__PACKAGE__->attr(tag_start => '<%');
-__PACKAGE__->attr(tag_end   => '%>');
+__PACKAGE__->attr(trim_mark => '=');
 
 # Escape helper
 my $ESCAPE = <<'EOF';
@@ -69,7 +70,7 @@ sub build {
 
                 # No following code
                 my $next = $line->[$j + 3];
-                $lines[-1] .= ';' unless defined $next && length $next;
+                $lines[-1] .= ';' if !defined $next || $next =~ /^\s*$/;
             }
 
             # Text
@@ -192,6 +193,7 @@ sub parse {
     my $cmnt          = quotemeta $self->comment_mark;
     my $escp          = quotemeta $self->escape_mark;
     my $expr          = quotemeta $self->expression_mark;
+    my $trim          = quotemeta $self->trim_mark;
     my $capture_start = quotemeta $self->capture_start;
     my $capture_end   = quotemeta $self->capture_end;
 
@@ -221,6 +223,8 @@ sub parse {
         |
         $tag_start                           # Code
         |
+        $trim$tag_end                    # Trim end
+        |
         $tag_end                             # End
         )
     /x;
@@ -232,6 +236,7 @@ sub parse {
     my $state                = 'text';
     my $multiline_expression = 0;
     my @capture_token;
+    my $trimming = 0;
     for my $line (split /\n/, $tmpl) {
         my @capture;
 
@@ -294,6 +299,9 @@ sub parse {
         my @token;
         for my $token (split /$mixed_re/, $line) {
 
+            # Done trimming
+            $trimming = 0 if $trimming && $state ne 'text';
+
             # Perl token with capture end or start
             if ($token =~ /$token_capture_re/) {
                 my $tag     = $1;
@@ -304,7 +312,23 @@ sub parse {
             }
 
             # End
-            if ($token =~ /^$tag_end$/) {
+            if ($token =~ /^$tag_end|($trim$tag_end)$/) {
+
+                # Trim previous text
+                if ($1) {
+                    $trimming = 1;
+
+                    # Trim current line
+                    unless ($self->_trim_line(\@token, 4)) {
+
+                        # Trim previous lines
+                        for my $l (reverse @{$self->tree}) {
+                            last if $self->_trim_line($l);
+                        }
+                    }
+                }
+
+                # Back to business as usual
                 $state                = 'text';
                 $multiline_expression = 0;
             }
@@ -327,6 +351,18 @@ sub parse {
 
             # Value
             else {
+
+                # Trimming
+                if ($trimming) {
+                    if ($token =~ s/^(\s+)//) {
+
+                        # Convert whitespace text to line noise
+                        push @token, 'code', $1;
+
+                        # Done with trimming
+                        $trimming = 0 if length $token;
+                    }
+                }
 
                 # Comments are ignored
                 next if $state eq 'cmnt';
@@ -416,6 +452,37 @@ sub render_to_file {
     return $self->_write_file($path, $output);
 }
 
+sub _trim_line {
+    my ($self, $line, $offset) = @_;
+
+    # Walk line backwards
+    $offset ||= 2;
+    for (my $j = @$line - $offset; $j >= 0; $j -= 2) {
+
+        # Skip capture start
+        next if $line->[$j] eq 'cpst';
+
+        # Only trim text
+        return 1 unless $line->[$j] eq 'text';
+
+        # Trim
+        my $value = $line->[$j + 1];
+        if ($line->[$j + 1] =~ s/(\s+)$//) {
+
+            # Value
+            $value = $line->[$j + 1];
+
+            # Convert whitespace text to line noise
+            splice @$line, $j, 0, 'code', $1;
+        }
+
+        # Text left
+        return 1 if length $value;
+    }
+
+    return;
+}
+
 sub _write_file {
     my ($self, $path, $output) = @_;
 
@@ -485,6 +552,10 @@ like that.
     %== Perl expression line,    replaced with result or XML escaped result
         (depending on auto_escape attribute)
     %# Comment line, useful for debugging
+
+Whitespace characters around tags can be trimmed with a special tag ending.
+
+    <%= All whitespace characters around this expression will be trimmed =%>
 
 L<Mojo::ByteStream> objects are excluded from automatic escaping.
 You can capture the result of a whole template block for reuse later.
@@ -631,6 +702,16 @@ L<Mojo::Template> implements the following attributes.
     my $code = $mt->prepend;
     $mt      = $mt->prepend('my $self = shift;');
 
+=head2 C<tag_start>
+
+    my $tag_start = $mt->tag_start;
+    $mt           = $mt->tag_start('<%');
+
+=head2 C<tag_end>
+
+    my $tag_end = $mt->tag_end;
+    $mt         = $mt->tag_end('%>');
+
 =head2 C<template>
 
     my $template = $mt->template;
@@ -641,15 +722,10 @@ L<Mojo::Template> implements the following attributes.
     my $tree = $mt->tree;
     $mt      = $mt->tree($tree);
 
-=head2 C<tag_start>
+=head2 C<trim_mark>
 
-    my $tag_start = $mt->tag_start;
-    $mt           = $mt->tag_start('<%');
-
-=head2 C<tag_end>
-
-    my $tag_end = $mt->tag_end;
-    $mt         = $mt->tag_end('%>');
+    my $trim_mark = $mt->trim_mark;
+    $mt           = $mt->trim_mark('-');
 
 =head1 METHODS
 

@@ -207,10 +207,10 @@ Test::Mojo - Testing Mojo!
       ->status_is(200)
       ->content_like(qr/Perl.+taro/);
 
-    $t->get_ok('/something')
+    $t->delete_ok('/something')
       ->status_is(200)
       ->header_is('X-Powered-By' => 'Mojo (Perl)')
-      ->content_like(qr/Hello!/, 'welcome message!');
+      ->content_is('Hello world!');
 
 =head1 DESCRIPTION
 

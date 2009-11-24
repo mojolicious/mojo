@@ -30,12 +30,15 @@ __PACKAGE__->attr('_server');
 sub find_executable_ok {
     my ($self, $desc) = @_;
     my $path = $self->_find_executable;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     Test::More::ok($path ? 1 : 0, $desc);
     return $path;
 }
 
 sub generate_port_ok {
     my ($self, $desc) = @_;
+
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     my $port = $self->_generate_port;
     if ($port) {
@@ -50,6 +53,8 @@ sub generate_port_ok {
 sub server_ok {
     my ($self, $desc) = @_;
 
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
     # Not running
     unless ($self->port) {
         return Test::More::ok(0, $desc);
@@ -62,6 +67,8 @@ sub server_ok {
 
 sub start_daemon_ok {
     my ($self, $desc) = @_;
+
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     # Port
     my $port = $self->port || $self->_generate_port;
@@ -80,6 +87,8 @@ sub start_daemon_ok {
 sub start_daemon_prefork_ok {
     my ($self, $desc) = @_;
 
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
     # Port
     my $port = $self->port || $self->_generate_port;
     return Test::More::ok(0, $desc) unless $port;
@@ -96,6 +105,8 @@ sub start_daemon_prefork_ok {
 
 sub start_server_ok {
     my ($self, $desc) = @_;
+
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     # Start server
     my $pid = $self->_start_server;
@@ -126,6 +137,8 @@ sub start_server_ok {
 sub start_server_untested_ok {
     my ($self, $desc) = @_;
 
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
     # Start server
     my $pid = $self->_start_server($desc);
     return Test::More::ok(0, $desc) unless $pid;
@@ -138,6 +151,8 @@ sub start_server_untested_ok {
 
 sub stop_server_ok {
     my ($self, $desc) = @_;
+
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     # Running?
     unless ($self->pid && kill 0, $self->pid) {

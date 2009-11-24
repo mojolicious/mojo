@@ -197,7 +197,7 @@ Test::Mojo - Testing Mojo!
 =head1 SYNOPSIS
 
     use Test::Mojo;
-    my $t = Test::Mojo->new(app => MyApp->new);
+    my $t = Test::Mojo->new(app => 'MyApp');
 
     $t->get_ok('/welcome')
       ->status_is(200)

@@ -495,7 +495,7 @@ exists.
     % mv something.js public/something.js
 
 Testing your application is as easy as creating a C<t> directory and filling
-it with normal Perl unit tests.
+it with normal Perl unit tests like C<t/funky.t>.
 
     use Test::More tests => 3;
     use Test::Mojo;

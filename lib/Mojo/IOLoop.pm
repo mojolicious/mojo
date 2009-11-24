@@ -613,8 +613,16 @@ following new ones.
 
 =head2 C<connect>
 
-    my $c = $loop->connect(address => '127.0.0.1', port => 3000);
-    my $c = $loop->connect({address => '127.0.0.1', port => 3000});
+    my $c = $loop->connect(
+        address => '127.0.0.1',
+        port    => 3000,
+        cb      => sub {...}
+    );
+    my $c = $loop->connect({
+        address => '127.0.0.1',
+        port    => 3000,
+        cb      => sub {...}
+    });
 
 =head2 C<connection_timeout>
 

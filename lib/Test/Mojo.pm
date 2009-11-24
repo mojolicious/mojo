@@ -11,7 +11,8 @@ use Mojo::Client;
 
 require Test::More;
 
-__PACKAGE__->attr(app => sub { Mojolicious::Lite->new });
+__PACKAGE__->attr(app       => sub { Mojolicious::Lite->new });
+__PACKAGE__->attr(redirects => sub { [] });
 __PACKAGE__->attr('tx');
 __PACKAGE__->attr(max_redirects => 0);
 
@@ -114,7 +115,10 @@ sub post_ok { shift->_request_ok('post', @_) }
 
 # Hey, I asked for ketchup! I'm eatin' salad here!
 sub post_form_ok {
-    my ($self, $url, $form, $desc) = @_;
+    my ($self, $url, $form, $headers, $desc) = @_;
+
+    # Description
+    $desc = $headers unless ref $headers;
 
     # Client
     my $client = $self->_client;
@@ -141,8 +145,15 @@ sub post_form_ok {
     $tx->req->headers->content_type('application/x-www-form-urlencoded');
     $tx->req->body($params->to_string);
 
+    # Headers
+    $headers ||= {};
+    for my $name (keys %$headers) {
+        $tx->req->headers->header($name, $headers->{$name});
+    }
+
     # Request
-    $client->queue($tx, sub { $self->tx($_[1]) })->process;
+    $client->queue($tx, sub { $self->tx($_[1]) and $self->redirects($_[2]) })
+      ->process;
 
     # Test
     local $Test::Builder::Level = $Test::Builder::Level + 1;
@@ -170,7 +181,11 @@ sub status_is {
 
 # Are you sure this is the Sci-Fi Convention? It's full of nerds!
 sub _request_ok {
-    my ($self, $method, $url, $desc) = @_;
+    my ($self, $method, $url, $headers, $desc) = @_;
+
+    # Description
+    $desc = $headers unless ref $headers;
+    $headers ||= {};
 
     # Client
     my $client = $self->_client;
@@ -178,7 +193,8 @@ sub _request_ok {
     $client->max_redirects($self->max_redirects);
 
     # Request
-    $client->$method($url, sub { $self->tx($_[1]) })->process;
+    $client->$method($url, $headers,
+        sub { $self->tx($_[1]) and $self->redirects($_[2]) })->process;
 
     # Test
     local $Test::Builder::Level = $Test::Builder::Level + 2;
@@ -226,6 +242,11 @@ L<Test::Mojo> implements the following attributes.
     my $app = $t->app;
     $t      = $t->app(MyApp->new);
 
+=head2 C<redirects>
+
+    my $redirects = $t->redirects;
+    $t            = $t->redirects([]);
+
 =head2 C<tx>
 
     my $tx = $t->tx;
@@ -264,17 +285,23 @@ following new ones.
 =head2 C<delete_ok>
 
     $t = $t->delete_ok('/foo');
+    $t = $t->delete_ok('/foo', {Expect => '100-continue'});
     $t = $t->delete_ok('/foo', 'request worked!');
+    $t = $t->delete_ok('/foo', {Expect => '100-continue'}, 'request worked!');
 
 =head2 C<get_ok>
 
     $t = $t->get_ok('/foo');
+    $t = $t->get_ok('/foo', {Expect => '100-continue'});
     $t = $t->get_ok('/foo', 'request worked!');
+    $t = $t->get_ok('/foo', {Expect => '100-continue'}, 'request worked!');
 
 =head2 C<head_ok>
 
     $t = $t->head_ok('/foo');
+    $t = $t->head_ok('/foo', {Expect => '100-continue'});
     $t = $t->head_ok('/foo', 'request worked!');
+    $t = $t->head_ok('/foo', {Expect => '100-continue'}, 'request worked!');
 
 =head2 C<header_is>
 
@@ -289,17 +316,28 @@ following new ones.
 =head2 C<post_ok>
 
     $t = $t->post_ok('/foo');
+    $t = $t->post_ok('/foo', {Expect => '100-continue'});
     $t = $t->post_ok('/foo', 'request worked!');
+    $t = $t->post_ok('/foo', {Expect => '100-continue'}, 'request worked!');
 
 =head2 C<post_form_ok>
 
-    $t = $t->post_form_ok('/foo', {test => 123});
+    $t = $t->post_form_ok('/foo' => {test => 123});
+    $t = $t->post_form_ok('/foo', {test => 123}, {Expect => '100-continue'});
     $t = $t->post_form_ok('/foo', {test => 123}, 'request worked!');
+    $t = $t->post_form_ok(
+        '/foo',
+        {test   => 123},
+        {Expect => '100-continue'},
+        'request worked!'
+    );
 
 =head2 C<put_ok>
 
     $t = $t->put_ok('/foo');
+    $t = $t->put_ok('/foo', {Expect => '100-continue'});
     $t = $t->put_ok('/foo', 'request worked!');
+    $t = $t->put_ok('/foo', {Expect => '100-continue'}, 'request worked!');
 
 =head2 C<status_is>
 

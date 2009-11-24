@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 228;
+use Test::More tests => 237;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -336,51 +336,28 @@ $t->get_ok('/layout')->status_is(200)->header_is(Server => 'Mojo (Perl)')
   ->content_is("Yea baby! with layout\n");
 
 # GET /firefox
-$client->get(
-    '/firefox/bar' => ('User-Agent' => 'Firefox') => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body,                            '/firefox/foo');
-    }
-)->process;
+$t->get_ok('/firefox/bar', {'User-Agent' => 'Firefox'})->status_is(200)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_is('/firefox/foo');
 
 # GET /firefox
-$client->get(
-    '/firefox/bar' => ('User-Agent' => 'Explorer') => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            404);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        like($tx->res->body, qr/Oops!/);
-    }
-)->process;
+$t->get_ok('/firefox/bar', {'User-Agent' => 'Explorer'})->status_is(404)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_like(qr/Oops!/);
 
 # POST /utf8
-my $tx = Mojo::Transaction::Single->new;
-$tx->req->method('POST');
-$tx->req->url->parse('/utf8');
-$tx->req->headers->content_type('application/x-www-form-urlencoded');
-$tx->req->body('name=%D0%92%D1%8F%D1%87%D0%B5%D1%81%D0%BB%D0%B0%D0%B2');
-$client->queue(
-    $tx => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->headers->content_type,           'text/html');
-        is($tx->res->headers->content_length,         40);
-        is($tx->res->body, b(<<EOF)->encode('UTF-8')->to_string);
-Вячеслав Тихановский
-EOF
-    }
-)->process;
+$t->post_form_ok('/utf8',
+    {name => b('Вячеслав')->encode('UTF-8')->to_string})
+  ->status_is(200)->header_is(Server => 'Mojo (Perl)')
+  ->header_is('X-Powered-By'   => 'Mojo (Perl)')
+  ->header_is('Content-Length' => 40)->content_type_is('text/html')
+  ->content_is(b("Вячеслав Тихановский\n")->encode('UTF-8')
+      ->to_string);
 
 # POST /malformed_utf8
 my $level = $app->log->level;
 $app->log->level('fatal');
-$tx = Mojo::Transaction::Single->new;
+my $tx = Mojo::Transaction::Single->new;
 $tx->req->method('POST');
 $tx->req->url->parse('/malformed_utf8');
 $tx->req->headers->content_type('application/x-www-form-urlencoded');
@@ -397,20 +374,14 @@ $client->queue(
 $app->log->level($level);
 
 # GET /json
-$client->get(
-    '/json' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->headers->content_type,           'application/json');
-        my $hash = Mojo::JSON->new->decode($tx->res->body);
-        is($hash->{foo}->[0], 1);
-        is($hash->{foo}->[1], -2);
-        is($hash->{foo}->[2], 3);
-        is($hash->{foo}->[3], 'bar');
-    }
-)->process;
+$t->get_ok('/json')->status_is(200)->header_is(Server => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')
+  ->content_type_is('application/json');
+my $hash = Mojo::JSON->new->decode($t->tx->res->body);
+is($hash->{foo}->[0], 1);
+is($hash->{foo}->[1], -2);
+is($hash->{foo}->[2], 3);
+is($hash->{foo}->[3], 'bar');
 
 # GET /autostash
 $t->get_ok('/autostash?bar=23')->status_is(200)
@@ -424,15 +395,10 @@ $t->get_ok('/helper')->status_is(200)->header_is(Server => 'Mojo (Perl)')
   ->content_is('<br/>&lt;.../template(Mozilla/5.0 (compatible; Mojo; Perl))');
 
 # GET /helper
-$client->get(
-    '/helper' => ('User-Agent' => 'Explorer') => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body, '<br/>&lt;.../template(Explorer)');
-    }
-)->process;
+$t->get_ok('/helper', {'User-Agent' => 'Explorer'})->status_is(200)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')
+  ->content_is('<br/>&lt;.../template(Explorer)');
 
 # GET /eperror
 $level = $app->log->level;
@@ -465,62 +431,37 @@ $t->get_ok('/redirect_named')->status_is(302)
   ->header_is(Location       => '/template.txt')->content_is('Redirecting!');
 
 # GET /redirect_named (with redirecting enabled in client)
-$client->max_redirects(3);
-$client->get(
-    '/redirect_named' => sub {
-        my ($self, $tx, $h) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->headers->location,               undef);
-        is($tx->res->body,                            "Redirect works!\n");
-        is($h->[0]->res->code,                        302);
-        is($h->[0]->res->headers->server,             'Mojo (Perl)');
-        is($h->[0]->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($h->[0]->res->headers->location,               '/template.txt');
-        is($h->[0]->res->body,                            'Redirecting!');
-    }
-)->process;
-$client->max_redirects(0);
+$t->max_redirects(3);
+$t->get_ok('/redirect_named')->status_is(200)
+  ->header_is(Server => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->header_is(Location => undef)
+  ->content_is("Redirect works!\n");
+$t->max_redirects(0);
+Test::Mojo->new(tx => $t->redirects->[0])->status_is(302)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')
+  ->header_is(Location       => '/template.txt')->content_is('Redirecting!');
 
 # GET /koi8-r
-$client->get(
-    '/koi8-r' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->headers->content_type, 'text/html; charset=koi8-r');
-        is(b($tx->res->body)->decode('koi8-r'),
-            "Этот человек наполняет меня надеждой."
-              . " Ну, и некоторыми другими глубокими и приводящими в"
-              . " замешательство эмоциями.\n");
-    }
-)->process;
+$t->get_ok('/koi8-r')->status_is(200)->header_is(Server => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')
+  ->content_type_is('text/html; charset=koi8-r');
+is(b($t->tx->res->body)->decode('koi8-r'),
+    "Этот человек наполняет меня надеждой."
+      . " Ну, и некоторыми другими глубокими и приводящими в"
+      . " замешательство эмоциями.\n");
 
 # GET /with_ladder
-$client->get(
-    '/with_ladder' => ('X-Bender' => 'Rodriguez') => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Ladder'),     '23');
-        is($tx->res->body,                            'Ladders are cool!');
-    }
-)->process;
+$t->get_ok('/with_ladder', {'X-Bender' => 'Rodriguez'})->status_is(200)
+  ->header_is(Server => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->header_is('X-Ladder' => 23)
+  ->content_is('Ladders are cool!');
 
 # GET /with_ladder_too
-$client->get(
-    '/with_ladder_too' => ('X-Bender' => 'Rodriguez') => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Ladder'),     '23');
-        is($tx->res->body, 'Ladders are cool too!');
-    }
-)->process;
+$t->get_ok('/with_ladder_too', {'X-Bender' => 'Rodriguez'})->status_is(200)
+  ->header_is(Server => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->header_is('X-Ladder' => 23)
+  ->content_is('Ladders are cool too!');
 
 # GET /with_ladder_too
 $t->get_ok('/with_ladder_too')->status_is(404)

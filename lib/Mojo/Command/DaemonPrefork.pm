@@ -68,6 +68,7 @@ sub run {
         'queue=i'     => sub { $daemon->listen_queue_size($_[1]) },
         'requests=i'  => sub { $daemon->max_keep_alive_requests($_[1]) },
         'servers=i'   => sub { $daemon->max_servers($_[1]) },
+        'start=i'     => sub { $daemon->start_servers($_[1]) },
         'user=s'      => sub { $daemon->user($_[1]) }
     );
 

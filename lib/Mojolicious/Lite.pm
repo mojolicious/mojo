@@ -494,6 +494,22 @@ exists.
     % mkdir public
     % mv something.js public/something.js
 
+Testing your application is as easy as creating a C<t> directory and filling
+it with normal Perl unit tests.
+
+    use Test::More tests => 3;
+    use Test::Mojo;
+
+    use FindBin;
+    require "$FindBin::Bin/../myapp.pl";
+
+    my $t = Test::Mojo->new;
+    $t->get_ok('/')->status_is(200)->content_like(qr/Funky!/);
+
+Run all unit tests with the C<test> command.
+
+    % ./myapp.pl test
+
 To disable debug messages later in a production setup you can change the
 L<Mojolicious> mode, default will be C<development>.
 

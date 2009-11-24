@@ -5,76 +5,46 @@
 use strict;
 use warnings;
 
-use Test::More tests => 20;
+use Test::More tests => 26;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use Mojo::Client;
+use Test::Mojo;
 
 # This concludes the part of the tour where you stay alive.
 use_ok('MojoliciousTest');
 
-my $client = Mojo::Client->new(app => 'MojoliciousTest');
+my $t = Test::Mojo->new(app => 'MojoliciousTest');
 
 my $backup = $ENV{MOJO_MODE} || '';
 $ENV{MOJO_MODE} = 'production';
 
 # Foo::bar in production mode (non existing action)
-$client->get(
-    '/foo/bar' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            404);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        like($tx->res->body, qr/Not Found/);
-    }
-)->process;
+$t->get_ok('/foo/bar')->status_is(404)->header_is(Server => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_like(qr/Not Found/);
 
 # SyntaxError::foo in production mode (syntax error in controller)
-$client->get(
-    '/syntax_error/foo' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            500);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        like($tx->res->body, qr/Internal Server Error/);
-    }
-)->process;
+$t->get_ok('/syntax_error/foo')->status_is(500)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')
+  ->content_like(qr/Internal Server Error/);
 
 # Foo::syntaxerror in production mode (syntax error in template)
-$client->get(
-    '/foo/syntaxerror' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            500);
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        like($tx->res->body, qr/Internal Server Error/);
-    }
-)->process;
+$t->get_ok('/foo/syntaxerror')->status_is(500)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')
+  ->content_like(qr/Internal Server Error/);
 
 # Static file /hello.txt in production mode
-$client->get(
-    '/hello.txt' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code,                            200);
-        is($tx->res->headers->content_type,           'text/plain');
-        is($tx->res->headers->server,                 'Mojo (Perl)');
-        is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        like(
-            $tx->res->content->asset->slurp,
-            qr/Hello Mojo from a static file!/
-        );
-    }
-)->process;
+$t->get_ok('/hello.txt')->status_is(200)->header_is(Server => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')
+  ->content_like(qr/Hello Mojo from a static file!/);
 
 # Try to access a file which is not under the web root via path
 # traversal in production mode
-$client->get(
-    '../../mojolicious/secret.txt' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code, 404);
-        unlike($tx->res->content->asset->slurp, qr/Secret file/);
-    }
-)->process;
+$t->get_ok('../../mojolicious/secret.txt')->status_is(404)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_like(qr/Not Found/);
+
 $ENV{MOJO_MODE} = $backup;

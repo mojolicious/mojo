@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 22;
+use Test::More tests => 24;
 
 # Hello, my name is Mr. Burns. I believe you have a letter for me.
 # Okay Mr. Burns, what’s your first name.
@@ -90,3 +90,28 @@ is($cookies[0]->value, '23');
 is($cookies[1]->name,  'this');
 is($cookies[1]->value, 'that');
 is($cookies[2],        undef);
+
+$jar = Mojo::CookieJar->new;
+$jar->add(
+    Mojo::Cookie::Response->new(
+        domain => 'kraih.com',
+        path   => '/foo',
+        name   => 'foo',
+        value  => 'bar1'
+    )
+);
+
+$jar->add(
+    Mojo::Cookie::Response->new(
+        domain => 'kraih.com',
+        path   => '/foo',
+        name   => 'foo',
+        value  => 'bar2'
+    )
+);
+
+@cookies = $jar->find(Mojo::URL->new('http://kraih.com/foo'));
+is(scalar @cookies, 1);
+is($cookies[0]->value, 'bar2');
+
+

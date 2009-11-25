@@ -50,7 +50,7 @@ sub add {
 
             # Unique cookie id
             my $opath = $old->path;
-            my $oname = $old->path;
+            my $oname = $old->name;
 
             push @new, $old unless $opath eq $path && $oname eq $name;
         }

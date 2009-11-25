@@ -91,6 +91,7 @@ is($cookies[1]->name,  'this');
 is($cookies[1]->value, 'that');
 is($cookies[2],        undef);
 
+# Replace cookie
 $jar = Mojo::CookieJar->new;
 $jar->add(
     Mojo::Cookie::Response->new(
@@ -100,7 +101,6 @@ $jar->add(
         value  => 'bar1'
     )
 );
-
 $jar->add(
     Mojo::Cookie::Response->new(
         domain => 'kraih.com',
@@ -109,9 +109,6 @@ $jar->add(
         value  => 'bar2'
     )
 );
-
 @cookies = $jar->find(Mojo::URL->new('http://kraih.com/foo'));
-is(scalar @cookies, 1);
 is($cookies[0]->value, 'bar2');
-
-
+is($cookies[1],        undef);

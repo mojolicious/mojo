@@ -85,6 +85,14 @@ get '/session_cookie/2' => sub {
     $self->render_text("Session is $value!");
 };
 
+# GET /session_cookie/3
+get '/session_cookie/3' => sub {
+    my $self  = shift;
+    my $session = $self->req->cookie('session');
+    my $value = $session ? $session->value : 'nothing';
+    $self->render_text("Session is $value!");
+};
+
 # GET /foo
 get '/foo' => sub {
     my $self = shift;
@@ -277,6 +285,18 @@ $t->get_ok('http://kraih.com/session_cookie')->status_is(200)
 $t->get_ok('http://kraih.com/session_cookie/2')->status_is(200)
   ->header_is(Server         => 'Mojo (Perl)')
   ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_is('Session is 23!');
+
+# GET /session_cookie/3
+$t->get_ok('http://kraih.com/session_cookie/3')->status_is(200)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_is('Session is 23!');
+
+# GET /session_cookie/3 after Reset session
+$t->reset_session;
+ok(!$t->tx);
+$t->get_ok('http://kraih.com/session_cookie/3')->status_is(200)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_is('Session is nothing!');
 
 # GET /foo
 $t->get_ok('/foo')->status_is(200)->header_is(Server => 'Mojo (Perl)')

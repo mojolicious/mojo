@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Mojo.
 
 0.999913 2009-11-24 00:00:00
+        - Added automatic content decoding to content helpers in Test::Mojo.
+        - Added json test helper to Test::Mojo.
         - Added the ability to reset a test session in Test::Mojo.
           (yuki-kimoto)
         - Fixed a cookiejar bug and added tests. (yuki-kimoto)

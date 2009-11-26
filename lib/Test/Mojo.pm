@@ -167,11 +167,15 @@ sub put_ok { shift->_request_ok('put', @_) }
 
 sub reset_session {
     my $self = shift;
-    
-    # Create new client
+
+    # Client
     $self->_client(Mojo::Client->new);
+    $self->_client->app($self->app);
+    $self->_client->max_redirects($self->max_redirects);
+
+    # Transaction
     $self->tx(undef);
-    
+
     return $self;
 }
 
@@ -348,6 +352,10 @@ following new ones.
     $t = $t->put_ok('/foo', {Expect => '100-continue'});
     $t = $t->put_ok('/foo', 'request worked!');
     $t = $t->put_ok('/foo', {Expect => '100-continue'}, 'request worked!');
+
+=head2 C<reset_session>
+
+    $t = $t->reset_session;
 
 =head2 C<status_is>
 

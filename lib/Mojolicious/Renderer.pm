@@ -66,8 +66,16 @@ sub new {
                 # No template
                 else {
                     $c->app->log->error(
-                        qq/Template "$t" missing or not readable./)
-                      and return;
+                        qq/Template "$t" missing or not readable./);
+                    my $options = {
+                        template  => 'not_found',
+                        format    => 'html',
+                        status    => 404,
+                        not_found => 1
+                    };
+                    $c->app->static->serve_404($c)
+                      if $c->stash->{not_found} || !$c->render($options);
+                    return;
                 }
 
                 # Cache

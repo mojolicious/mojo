@@ -35,9 +35,10 @@ $t->get_ok('/foo/syntaxerror')->status_is(500)
   ->content_like(qr/^Missing right curly/);
 
 # Foo::badtemplate (template missing)
-$t->get_ok('/foo/badtemplate')->status_is(200)
+$t->get_ok('/foo/badtemplate')->status_is(404)
   ->header_is(Server         => 'Mojo (Perl)')
-  ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_is('');
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')
+  ->content_like(qr/File Not Found/);
 
 # Foo::test
 $t->get_ok('/foo/test', {'X-Test' => 'Hi there!'})->status_is(200)

@@ -5,6 +5,8 @@ This file documents the revision history for Perl extension Mojo.
         - Added json test helper to Test::Mojo.
         - Added the ability to reset a test session in Test::Mojo.
           (yuki-kimoto)
+        - Fixed Mojolicious::Renderer to always default to rendering a 404
+          error.
         - Fixed a cookiejar bug and added tests. (yuki-kimoto)
 
 0.999912 2009-11-24 00:00:00

@@ -165,6 +165,16 @@ sub post_form_ok {
 # WHO IS FONZY!?! Don't they teach you anything at school?
 sub put_ok { shift->_request_ok('put', @_) }
 
+sub reset_session {
+    my $self = shift;
+    
+    # Create new client
+    $self->_client(Mojo::Client->new);
+    $self->tx(undef);
+    
+    return $self;
+}
+
 # Internet! Is that thing still around?
 sub status_is {
     my ($self, $status, $desc) = @_;

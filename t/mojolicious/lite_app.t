@@ -360,8 +360,7 @@ $t->get_ok('/firefox/bar', {'User-Agent' => 'Explorer'})->status_is(404)
   ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_like(qr/Oops!/);
 
 # POST /utf8
-$t->post_form_ok('/utf8',
-    {name => b('Вячеслав')->encode('UTF-8')->to_string})
+$t->post_form_ok('/utf8', 'UTF-8' => {name => 'Вячеслав'})
   ->status_is(200)->header_is(Server => 'Mojo (Perl)')
   ->header_is('X-Powered-By'   => 'Mojo (Perl)')
   ->header_is('Content-Length' => 40)->content_type_is('text/html')

@@ -131,9 +131,23 @@ sub post_ok { shift->_request_ok('post', @_) }
 
 # Hey, I asked for ketchup! I'm eatin' salad here!
 sub post_form_ok {
-    my ($self, $url, $form, $headers, $desc) = @_;
+    my $self = shift;
+
+    # URL
+    my $url = shift;
+
+    # Encoding
+    my $encoding = shift;
+
+    # Form
+    my $form = ref $encoding ? $encoding : shift;
+    $encoding = undef if ref $encoding;
+
+    # Headers
+    my $headers = shift;
 
     # Description
+    my $desc = shift;
     $desc = $headers unless ref $headers;
 
     # Client
@@ -147,11 +161,22 @@ sub post_form_ok {
 
         # Array
         if (ref $form->{$name} eq 'ARRAY') {
-            $params->append($_, $form->{$_}) for @{$form->{$name}};
+            for my $value (@{$form->{$name}}) {
+                $params->append($name,
+                    $encoding
+                    ? b($value)->encode($encoding)->to_string
+                    : $value);
+            }
         }
 
         # Single value
-        else { $params->append($name, $form->{$name}) }
+        else {
+            my $value = $form->{$name};
+            $params->append($name,
+                $encoding
+                ? b($value)->encode($encoding)->to_string
+                : $value);
+        }
     }
 
     # Transaction
@@ -372,10 +397,25 @@ following new ones.
 =head2 C<post_form_ok>
 
     $t = $t->post_form_ok('/foo' => {test => 123});
+    $t = $t->post_form_ok('/foo' => 'UTF-8' => {test => 123});
     $t = $t->post_form_ok('/foo', {test => 123}, {Expect => '100-continue'});
-    $t = $t->post_form_ok('/foo', {test => 123}, 'request worked!');
     $t = $t->post_form_ok(
         '/foo',
+        'UTF-8',
+        {test => 123},
+        {Expect => '100-continue'}
+    );
+    $t = $t->post_form_ok('/foo', {test => 123}, 'request worked!');
+    $t = $t->post_form_ok('/foo', 'UTF-8', {test => 123}, 'request worked!');
+    $t = $t->post_form_ok(
+        '/foo',
+        {test   => 123},
+        {Expect => '100-continue'},
+        'request worked!'
+    );
+    $t = $t->post_form_ok(
+        '/foo',
+        'UTF-8',s
         {test   => 123},
         {Expect => '100-continue'},
         'request worked!'

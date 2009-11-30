@@ -28,7 +28,7 @@ __PACKAGE__->attr(home   => sub { Mojo::Home->new });
 __PACKAGE__->attr(log    => sub { Mojo::Log->new });
 
 # Oh, so they have internet on computers now!
-our $VERSION = '0.999913';
+our $VERSION = '0.999914';
 
 sub new {
     my $self = shift->SUPER::new(@_);

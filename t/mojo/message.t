@@ -961,16 +961,8 @@ $res = Mojo::Message::Response->new;
 $res->code(404);
 $res->headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
 $res->cookies(
-    Mojo::Cookie::Response->new(
-        name  => 'foo',
-        value => 'bar',
-        path  => '/foobar'
-    ),
-    Mojo::Cookie::Response->new(
-        name  => 'bar',
-        value => 'baz',
-        path  => '/test/23'
-    )
+    {name => 'foo', value => 'bar', path => '/foobar'},
+    {name => 'bar', value => 'baz', path => '/test/23'}
 );
 $res->headers->set_cookie2(
     Mojo::Cookie::Response->new(

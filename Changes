@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension Mojo.
 
 0.999914 2009-11-24 00:00:00
         - Added encoding support to post_form_ok in Test::Mojo.
+        - Made cookies easier to set.
 
 0.999913 2009-11-24 00:00:00
         - Added automatic content decoding to content helpers in Test::Mojo.

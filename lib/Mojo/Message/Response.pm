@@ -76,6 +76,8 @@ sub cookies {
         $self->headers->remove('Set-Cookie');
         $self->headers->remove('Set-Cookie2');
         for my $cookie (@_) {
+            $cookie = Mojo::Cookie::Response->new($cookie)
+              if ref $cookie eq 'HASH';
             $self->headers->add('Set-Cookie', "$cookie");
         }
         return $self;
@@ -258,6 +260,7 @@ implements the following new ones.
 
     my $cookies = $res->cookies;
     $res        = $res->cookies(Mojo::Cookie::Response->new);
+    $req        = $req->cookies({name => 'foo', value => 'bar'});
 
 =head2 C<default_message>
 

@@ -18,7 +18,7 @@ __PACKAGE__->attr('_params');
 sub cookies {
     my $self = shift;
 
-    # Replace cookies
+    # Add cookies
     if (@_) {
         my $cookies = shift;
         $cookies = Mojo::Cookie::Request->new($cookies)
@@ -29,7 +29,7 @@ sub cookies {
               if ref $cookie eq 'HASH';
             $cookies .= "; $cookie";
         }
-        $self->headers->header('Cookie', $cookies);
+        $self->headers->add('Cookie', $cookies);
         return $self;
     }
 

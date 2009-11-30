@@ -30,9 +30,17 @@ my $FLAG_RE = qr/(?:Secure|HttpOnly)/i;
 
 sub expires {
     my ($self, $expires) = @_;
-    if (defined $expires) {
-        $self->{expires} = Mojo::Date->new($expires) unless ref $expires;
-    }
+
+    # Set
+    $self->{expires} = $expires if defined $expires;
+
+    # Shortcut
+    return unless defined $self->{expires};
+
+    # Upgrade
+    $self->{expires} = Mojo::Date->new($self->{expires})
+      unless ref $self->{expires};
+
     return $self->{expires};
 }
 

@@ -71,10 +71,8 @@ my %MESSAGES = (
 sub cookies {
     my $self = shift;
 
-    # Replace cookies
+    # Add cookies
     if (@_) {
-        $self->headers->remove('Set-Cookie');
-        $self->headers->remove('Set-Cookie2');
         for my $cookie (@_) {
             $cookie = Mojo::Cookie::Response->new($cookie)
               if ref $cookie eq 'HASH';

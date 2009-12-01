@@ -23,7 +23,7 @@ sub body_contains {
     return 1 if $self->asset->contains($chunk) >= 0;
 
     # Not found
-    return;
+    return 0;
 }
 
 sub body_size { shift->asset->size }

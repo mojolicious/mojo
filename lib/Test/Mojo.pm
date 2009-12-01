@@ -84,8 +84,6 @@ sub delete_ok { shift->_request_ok('delete', @_) }
 sub get_ok    { shift->_request_ok('get',    @_) }
 sub head_ok   { shift->_request_ok('head',   @_) }
 
-# No matter how good you are at something,
-# there's always about a million people better than you.
 sub header_is {
     my ($self, $name, $value, $desc) = @_;
 

@@ -237,7 +237,6 @@ sub _get_content {
     my ($self, $tx) = @_;
 
     # Charset
-    $DB::single = 1;
     ($tx->res->headers->content_type || '') =~ /charset=\"?([^"\s]+)\"?/;
     my $charset = $1;
 

@@ -15,7 +15,10 @@ __PACKAGE__->attr(
         my $self = shift;
 
         # Need a log file
-        return \*STDERR unless $self->path;
+        unless ($self->path) {
+            binmode(STDERR, ":utf8");
+            return \*STDERR;
+        }
 
         # Open
         my $file = IO::File->new;

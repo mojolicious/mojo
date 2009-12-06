@@ -201,7 +201,7 @@ sub post_form_ok {
     return $self;
 }
 
-# WHO IS FONZY!? !Don't they teach you anything at school
+# WHO IS FONZY!?! Don't they teach you anything at school?
 sub put_ok { shift->_request_ok('put', @_) }
 
 sub reset_session {
@@ -219,7 +219,6 @@ sub reset_session {
 }
 
 # Internet! Is that thing still around?
-
 sub status_is {
     my ($self, $status, $desc) = @_;
 

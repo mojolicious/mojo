@@ -16,7 +16,7 @@ __PACKAGE__->attr(
 
         # Need a log file
         unless ($self->path) {
-            binmode(STDERR, ":utf8");
+            binmode STDERR, ':utf8';
             return \*STDERR;
         }
 

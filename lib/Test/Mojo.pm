@@ -412,7 +412,7 @@ following new ones.
     );
     $t = $t->post_form_ok(
         '/foo',
-        'UTF-8',s
+        'UTF-8',
         {test   => 123},
         {Expect => '100-continue'},
         'request worked!'

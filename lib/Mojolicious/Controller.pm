@@ -14,6 +14,19 @@ use Mojo::URL;
 # but then you get to the end and a gorilla starts throwing barrels at you.
 sub client { shift->app->client }
 
+sub helper {
+    my $self = shift;
+
+    # Name
+    return unless my $name = shift;
+
+    # Helper
+    return unless my $helper = $self->app->renderer->helper->{$name};
+
+    # Run
+    return $self->$helper(@_);
+}
+
 sub param { shift->tx->req->param(@_) }
 
 sub pause { shift->tx->pause }
@@ -166,6 +179,11 @@ ones.
 =head2 C<client>
 
     my $client = $c->client;
+
+=head2 C<helper>
+
+    $c->helper('foo');
+    $c->helper(foo => 23);
 
 =head2 C<param>
 

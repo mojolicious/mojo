@@ -561,7 +561,7 @@ Just works!\
 <%= shift->render_inner %> with layout
 
 @@ autostash.html.ep
-% layout 'layout';
+% $self->helper(layout => 'layout');
 %= $foo
 %= param 'bar'
 

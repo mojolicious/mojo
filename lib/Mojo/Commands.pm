@@ -155,12 +155,12 @@ implements the following new ones.
 =head2 C<message>
 
     my $message  = $commands->message;
-    my $commands = $commands->message('Hello World!');
+    $commands    = $commands->message('Hello World!');
 
 =head2 C<namespaces>
 
     my $namespaces = $commands->namespaces;
-    my $commands   = $commands->namespaces(['Mojo::Command']);
+    $commands      = $commands->namespaces(['Mojo::Command']);
 
 =head1 METHODS
 

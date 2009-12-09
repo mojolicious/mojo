@@ -16,6 +16,7 @@ __PACKAGE__->attr(default_format => 'html');
 __PACKAGE__->attr([qw/default_handler encoding/]);
 __PACKAGE__->attr(default_status => 200);
 __PACKAGE__->attr(handler        => sub { {} });
+__PACKAGE__->attr(helper         => sub { {} });
 __PACKAGE__->attr(layout_prefix  => 'layouts');
 __PACKAGE__->attr(root           => '/');
 __PACKAGE__->attr(types          => sub { MojoX::Types->new });
@@ -49,6 +50,17 @@ sub add_handler {
     my $handler = ref $_[0] ? $_[0] : {@_};
     $handler = {%{$self->handler}, %$handler};
     $self->handler($handler);
+
+    return $self;
+}
+
+sub add_helper {
+    my $self = shift;
+
+    # Merge
+    my $helper = ref $_[0] ? $_[0] : {@_};
+    $helper = {%{$self->helper}, %$helper};
+    $self->helper($helper);
 
     return $self;
 }
@@ -247,6 +259,11 @@ L<MojoX::Types> implements the follwing attributes.
     my $handler = $renderer->handler;
     $renderer   = $renderer->handler({epl => sub { ... }});
 
+=head2 C<helper>
+
+    my $helper = $renderer->helper;
+    $renderer  = $renderer->helper({url_for => sub { ... }});
+
 =head2 C<layout_prefix>
 
     my $prefix = $renderer->layout_prefix;
@@ -274,6 +291,10 @@ follwing the ones.
 =head2 C<add_handler>
 
     $renderer = $renderer->add_handler(epl => sub { ... });
+
+=head2 C<add_helper>
+
+    $renderer = $renderer->add_helper(url_for => sub { ... });
 
 =head2 C<render>
 

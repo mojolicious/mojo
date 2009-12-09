@@ -8,16 +8,17 @@ use warnings;
 use base 'Mojo';
 
 use Mojolicious::Commands;
-use Mojolicious::Dispatcher;
-use Mojolicious::Renderer;
+use Mojolicious::Plugins;
+use MojoX::Dispatcher::Routes;
 use MojoX::Dispatcher::Static;
+use MojoX::Renderer;
 use MojoX::Types;
-use Time::HiRes ();
 
 __PACKAGE__->attr(controller_class => 'Mojolicious::Controller');
 __PACKAGE__->attr(mode => sub { ($ENV{MOJO_MODE} || 'development') });
-__PACKAGE__->attr(renderer => sub { Mojolicious::Renderer->new });
-__PACKAGE__->attr(routes   => sub { Mojolicious::Dispatcher->new });
+__PACKAGE__->attr(plugins  => sub { Mojolicious::Plugins->new });
+__PACKAGE__->attr(renderer => sub { MojoX::Renderer->new });
+__PACKAGE__->attr(routes   => sub { MojoX::Dispatcher::Routes->new });
 __PACKAGE__->attr(static   => sub { MojoX::Dispatcher::Static->new });
 __PACKAGE__->attr(types    => sub { MojoX::Types->new });
 
@@ -53,6 +54,13 @@ sub new {
     $self->log->path($self->home->rel_file("log/$mode.log"))
       if -w $self->home->rel_file('log');
 
+    # Plugins
+    $self->plugin('agent_condition');
+    $self->plugin('default_helpers');
+    $self->plugin('epl_renderer');
+    $self->plugin('ep_renderer');
+    $self->plugin('request_timer');
+
     # Run mode
     $mode = $mode . '_mode';
     eval { $self->$mode } if $self->can($mode);
@@ -68,6 +76,9 @@ sub new {
 # The default dispatchers with exception handling
 sub dispatch {
     my ($self, $c) = @_;
+
+    # Hook
+    $self->plugins->run_hook(before_dispatch => $c);
 
     # New request
     my $path = $c->req->url->path;
@@ -98,14 +109,14 @@ sub dispatch {
             status   => 404
         ) or $self->static->serve_404($c);
     }
+
+    # Hook
+    $self->plugins->run_hook(after_dispatch => $c);
 }
 
 # Bite my shiny metal ass!
 sub handler {
     my ($self, $tx) = @_;
-
-    # Start timer
-    my $start = [Time::HiRes::gettimeofday()];
 
     # Load controller class
     my $class = $self->controller_class;
@@ -120,12 +131,11 @@ sub handler {
     # Build default controller and process
     eval { $self->process($class->new(app => $self, tx => $tx)) };
     $self->log->error("Processing request failed: $@") if $@;
+}
 
-    # End timer
-    my $elapsed = sprintf '%f',
-      Time::HiRes::tv_interval($start, [Time::HiRes::gettimeofday()]);
-    my $rps = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
-    $self->log->debug("Request took $elapsed seconds ($rps/s).");
+sub plugin {
+    my $self = shift;
+    $self->plugins->load_plugin($self, @_);
 }
 
 # This will run for each request
@@ -185,6 +195,11 @@ following new ones.
     my $mode = $mojo->mode;
     $mojo    = $mojo->mode('production');
 
+=head2 C<plugins>
+
+    my $plugins = $mojo->plugins;
+    $mojo       = $mojo->plugins(Mojolicious::Plugins->new);
+
 =head2 C<renderer>
 
     my $renderer = $mojo->renderer;
@@ -221,6 +236,12 @@ new ones.
 =head2 C<handler>
 
     $tx = $mojo->handler($tx);
+
+=head2 C<plugin>
+
+    $mojo->plugin('something');
+    $mojo->plugin('something', foo => 23);
+    $mojo->plugin('something', {foo => 23});
 
 =head2 C<process>
 

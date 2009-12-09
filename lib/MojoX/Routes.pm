@@ -192,6 +192,9 @@ sub route {
     # New route
     my $route = $self->new(@_);
 
+    # Inherit conditions
+    $route->add_condition($self->dictionary);
+
     # We are the parent
     $route->parent($self);
     weaken $route->{parent};

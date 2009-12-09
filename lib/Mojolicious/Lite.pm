@@ -99,6 +99,7 @@ sub import {
     *{"${caller}::any"}    = sub { $route->(ref $_[0] ? shift : [], @_) };
     *{"${caller}::get"}    = sub { $route->('get', @_) };
     *{"${caller}::ladder"} = sub { $route->('ladder', @_) };
+    *{"${caller}::plugin"} = sub { $APP->plugin(@_) };
     *{"${caller}::post"}   = sub { $route->('post', @_) };
 
     # Shagadelic!

@@ -261,6 +261,9 @@ sub _decode_string {
 sub _decode_structure {
     my ($self, $ref) = @_;
 
+    # Shortcut
+    return unless $$ref;
+
     # Object
     if ($$ref =~ s/$OBJECT_BEGIN_RE//) {
         return [$self->_decode_object($ref)];

@@ -27,8 +27,6 @@ sub helper {
     return $self->$helper(@_);
 }
 
-sub param { shift->tx->req->param(@_) }
-
 sub pause { shift->tx->pause }
 
 sub redirect_to {
@@ -184,11 +182,6 @@ ones.
 
     $c->helper('foo');
     $c->helper(foo => 23);
-
-=head2 C<param>
-
-    my $param  = $c->param('foo');
-    my @params = $c->param('foo');
 
 =head2 C<pause>
 

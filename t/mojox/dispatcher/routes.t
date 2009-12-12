@@ -39,7 +39,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 13;
+use Test::More tests => 31;
 
 use Mojo;
 use Mojo::Transaction::Single;
@@ -74,9 +74,14 @@ $tx = Mojo::Transaction::Single->new;
 $tx->req->method('POST');
 $tx->req->url->parse('/foo/hello');
 $c->tx($tx);
-is($d->dispatch($c), '');
-is_deeply($c->stash,
-    {controller => 'foo', action => 'bar', capture => 'hello'});
+is($d->dispatch($c),        '');
+is($c->stash->{controller}, 'foo');
+is($c->stash->{action},     'bar');
+is($c->stash->{capture},    'hello');
+is(ref $c->stash->{params}, 'Mojo::Parameters');
+is($c->param('controller'), 'foo');
+is($c->param('action'),     'bar');
+is($c->param('capture'),    'hello');
 ok($c->render_called);
 
 # Escaping
@@ -85,9 +90,14 @@ $tx = Mojo::Transaction::Single->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/foo/hello%20there');
 $c->tx($tx);
-is($d->dispatch($c), '');
-is_deeply($c->stash,
-    {controller => 'foo', action => 'bar', capture => 'hello there'});
+is($d->dispatch($c),        '');
+is($c->stash->{controller}, 'foo');
+is($c->stash->{action},     'bar');
+is($c->stash->{capture},    'hello there');
+is(ref $c->stash->{params}, 'Mojo::Parameters');
+is($c->param('controller'), 'foo');
+is($c->param('action'),     'bar');
+is($c->param('capture'),    'hello there');
 ok($c->render_called);
 
 # Escaping utf8
@@ -96,7 +106,12 @@ $tx = Mojo::Transaction::Single->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/foo/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82');
 $c->tx($tx);
-is($d->dispatch($c), '');
-is_deeply($c->stash,
-    {controller => 'foo', action => 'bar', capture => 'привет'});
+is($d->dispatch($c),        '');
+is($c->stash->{controller}, 'foo');
+is($c->stash->{action},     'bar');
+is($c->stash->{capture},    'привет');
+is(ref $c->stash->{params}, 'Mojo::Parameters');
+is($c->param('controller'), 'foo');
+is($c->param('action'),     'bar');
+is($c->param('capture'),    'привет');
 ok($c->render_called);

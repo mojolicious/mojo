@@ -270,7 +270,8 @@ Templates can also extend each other.
     </html>
 
 Route placeholders allow capturing parts of a request path until a C</> or
-C<.> separator occurs, results will be stored by name in the C<stash>.
+C<.> separator occurs, results will be stored by name in the C<stash> and
+C<param>.
 
     # /foo/*
     get '/foo/:bar' => sub {
@@ -282,7 +283,7 @@ C<.> separator occurs, results will be stored by name in the C<stash>.
     # /*something/foo
     get '/(:bar)something/foo' => sub {
         my $self = shift;
-        my $bar  = $self->stash('bar');
+        my $bar  = $self->param('bar');
         $self->render_text("Our :bar placeholder matched $bar");
     };
 
@@ -337,7 +338,7 @@ this process can be easily customized.
     # /*
     any '/:bar' => [bar => qr/\d+/] => sub {
         my $self = shift;
-        my $bar  = $self->stash('bar');
+        my $bar  = $self->param('bar');
         $self->render_text("Our :bar placeholder matched $bar");
     };
 

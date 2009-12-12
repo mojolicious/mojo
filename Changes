@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojo.
 
+0.999915 2009-12-10 00:00:00
+        - Added routes captures to params in Mojolicious.
+
 0.999914 2009-11-24 00:00:00
         - Added the Mojolicious plugin system.
         - Added helper method to Mojolicious::Controller.

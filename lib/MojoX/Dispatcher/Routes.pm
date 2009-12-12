@@ -34,6 +34,10 @@ sub dispatch {
     # Initialize stash with captures
     $c->stash($match->captures);
 
+    # Prepare params
+    $c->stash->{params} = $c->tx->req->params->clone;
+    $c->stash->{params}->append(%{$match->captures});
+
     # Walk the stack
     my $e = $self->walk_stack($c);
     return $e if $e;

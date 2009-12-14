@@ -119,10 +119,17 @@ sub body_params {
                 $charset = $1 if $1;
             }
 
-            # Form field
+            # Value
             my $value = $part->asset->slurp;
-            $params->append($name,
-                $charset ? b($value)->decode($charset)->to_string : $value);
+
+            # Try to decode
+            if ($charset) {
+                my $backup = $value;
+                $value = b($value)->decode($charset)->to_string;
+                $value = $backup unless defined $value;
+            }
+
+            $params->append($name, $value);
         }
     }
 

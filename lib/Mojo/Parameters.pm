@@ -98,12 +98,16 @@ sub parse {
         $string =~ s/\+/\ /g;
 
         # Unescape
-        $string = b($string)->url_unescape;
+        $string = b($string)->url_unescape->to_string;
 
-        # Decode
-        $string->decode($charset) if $charset;
+        # Try to decode
+        if ($charset) {
+            my $backup = $string;
+            $string = b($string)->decode($charset)->to_string;
+            $string = $backup unless defined $string;
+        }
 
-        $self->params([$string->to_string, undef]);
+        $self->params([$string, undef]);
         return $self;
     }
 
@@ -123,13 +127,20 @@ sub parse {
         $value =~ s/\+/\ /g;
 
         # Unescape
-        $name  = b($name)->url_unescape;
-        $value = b($value)->url_unescape;
+        $name  = b($name)->url_unescape->to_string;
+        $value = b($value)->url_unescape->to_string;
 
-        # Decode
-        $name->decode($charset) and $value->decode($charset) if $charset;
+        # Try to decode
+        if ($charset) {
+            my $nbackup = $name;
+            my $vbackup = $value;
+            $name  = b($name)->decode($charset)->to_string;
+            $value = b($value)->decode($charset)->to_string;
+            $name  = $nbackup unless defined $name;
+            $value = $vbackup unless defined $value;
+        }
 
-        push @{$self->params}, $name->to_string, $value->to_string;
+        push @{$self->params}, $name, $value;
     }
 
     return $self;

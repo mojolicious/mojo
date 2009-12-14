@@ -377,7 +377,7 @@ sub decode {
     };
 
     # Failed
-    $self->{bytestream} = '' if $@;
+    $self->{bytestream} = undef if $@;
 
     return $self;
 }

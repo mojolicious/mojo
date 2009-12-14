@@ -135,4 +135,4 @@ is("$stream", 'привет&lt;foo&gt;');
 
 # Decode invalid utf8
 $stream = b("\x{1000}")->decode('UTF-8');
-is("$stream", '');
+is($stream->to_string, undef);

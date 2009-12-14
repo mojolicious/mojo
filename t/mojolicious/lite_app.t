@@ -381,7 +381,7 @@ $client->queue(
         is($tx->res->code,                            200);
         is($tx->res->headers->server,                 'Mojo (Perl)');
         is($tx->res->headers->header('X-Powered-By'), 'Mojo (Perl)');
-        is($tx->res->body,                            '');
+        is($tx->res->body,                            '%E1');
     }
 )->process;
 $app->log->level($level);

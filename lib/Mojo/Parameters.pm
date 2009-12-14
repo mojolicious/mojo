@@ -90,14 +90,20 @@ sub parse {
     # Clear
     $self->params([]);
 
+    # Charset
+    my $charset = $self->charset;
+
     # Detect query string without key/value pairs
     if ($string !~ /\=/) {
         $string =~ s/\+/\ /g;
 
         # Unescape
-        $string = b($string)->url_unescape->decode($self->charset)->to_string;
+        $string = b($string)->url_unescape;
 
-        $self->params([$string, undef]);
+        # Decode
+        $string->decode($charset) if $charset;
+
+        $self->params([$string->to_string, undef]);
         return $self;
     }
 
@@ -117,10 +123,13 @@ sub parse {
         $value =~ s/\+/\ /g;
 
         # Unescape
-        $name  = b($name)->url_unescape->decode($self->charset)->to_string;
-        $value = b($value)->url_unescape->decode($self->charset)->to_string;
+        $name  = b($name)->url_unescape;
+        $value = b($value)->url_unescape;
 
-        push @{$self->params}, $name, $value;
+        # Decode
+        $name->decode($charset) and $value->decode($charset) if $charset;
+
+        push @{$self->params}, $name->to_string, $value->to_string;
     }
 
     return $self;

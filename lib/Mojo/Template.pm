@@ -270,7 +270,7 @@ sub parse {
         }
 
         # Perl line without return value
-        if ($line =~ /^$line_start(.+)?$/) {
+        if ($line =~ /^$line_start([^\>]{1}.*)?$/) {
             push @{$self->tree}, [@capture, 'code', $1];
             $multiline_expression = 0;
             next;
@@ -541,16 +541,12 @@ Like preprocessing a config file, generating text from heredocs and stuff
 like that.
 
     <% Inline Perl %>
-    <%= Perl expression, replaced with result or XML escaped result
-        (depending on auto_escape attribute) %>
-    <%== Perl expression, replaced with result or XML escaped result
-         (depending on auto_escape attribute) %>
+    <%= Perl expression, replaced with result %>
+    <%== Perl expression, replaced with XML escaped result %>
     <%# Comment, useful for debugging %>
     % Perl line
-    %= Perl expression line, replaced with result or XML escaped result
-       (depending on auto_escape attribute)
-    %== Perl expression line,    replaced with result or XML escaped result
-        (depending on auto_escape attribute)
+    %= Perl expression line, replaced with result
+    %== Perl expression line, replaced with XML escaped result
     %# Comment line, useful for debugging
 
 Whitespace characters around tags can be trimmed with a special tag ending.

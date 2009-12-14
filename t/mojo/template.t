@@ -25,7 +25,7 @@ package main;
 use strict;
 use warnings;
 
-use Test::More tests => 85;
+use Test::More tests => 86;
 
 use File::Spec;
 use File::Temp;
@@ -444,6 +444,14 @@ $output = $mt->render(<<'EOF');
 %>\
 EOF
 is($output, '2222');
+
+# Scoped scalar
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+% my $foo = 'bar';
+<%= $foo %>
+EOF
+is($output, "bar\n");
 
 # Different tags and line start
 $mt = Mojo::Template->new;

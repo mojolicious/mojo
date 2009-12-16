@@ -107,7 +107,7 @@ Mojo::Server::PSGI - PSGI Server
 
     # myapp.psgi
     use Mojo::Server::PSGI;
-    my $psgi = Mojo::Server::PSGI->new->app_class('MyApp');
+    my $psgi = Mojo::Server::PSGI->new(app_class => 'MyApp');
     my $app  = sub { $psgi->run(@_) };
 
 =head1 DESCRIPTION

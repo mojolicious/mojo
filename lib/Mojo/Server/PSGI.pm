@@ -122,6 +122,6 @@ implements the following new ones.
 
 =head2 C<run>
 
-    $psgi->run;
+    my $res = $psgi->run($env);
 
 =cut

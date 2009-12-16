@@ -42,7 +42,7 @@ $t->get_ok('/foo/badtemplate')->status_is(404)
 
 # Foo::test
 $t->get_ok('/foo/test', {'X-Test' => 'Hi there!'})->status_is(200)
-  ->header_is('X-Bender'     => 'Kiss my shiny metal ass!')
+  ->header_is('X-Bender'     => 'Bite my shiny metal ass!')
   ->header_is(Server         => 'Mojo (Perl)')
   ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_like(qr/\/bar\/test/);
 
@@ -77,13 +77,13 @@ $t->get_ok('/foo/withlayout', {'X-Test' => 'Hi there!'})->status_is(200)
 
 # MojoliciousTest2::Foo::test
 $t->get_ok('/test2', {'X-Test' => 'Hi there!'})->status_is(200)
-  ->header_is('X-Bender'     => 'Kiss my shiny metal ass!')
+  ->header_is('X-Bender'     => 'Bite my shiny metal ass!')
   ->header_is(Server         => 'Mojo (Perl)')
   ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_like(qr/\/test2/);
 
 # MojoliciousTestController::index
 $t->get_ok('/test3', {'X-Test' => 'Hi there!'})->status_is(200)
-  ->header_is('X-Bender'     => 'Kiss my shiny metal ass!')
+  ->header_is('X-Bender'     => 'Bite my shiny metal ass!')
   ->header_is(Server         => 'Mojo (Perl)')
   ->header_is('X-Powered-By' => 'Mojo (Perl)')
   ->content_like(qr/No class works!/);
@@ -163,7 +163,7 @@ $t->get_ok('/foo/data_template2')->status_is(200)
 
 # SingleFileTestApp::Foo::bar
 $t->get_ok('/foo/bar')->status_is(200)
-  ->header_is('X-Bender'     => 'Kiss my shiny metal ass!')
+  ->header_is('X-Bender'     => 'Bite my shiny metal ass!')
   ->header_is(Server         => 'Mojo (Perl)')
   ->header_is('X-Powered-By' => 'Mojo (Perl)')->content_is('/foo/bar');
 

@@ -26,7 +26,7 @@ sub index {
 
 sub something {
     my $self = shift;
-    $self->res->headers->header('X-Bender', 'Kiss my shiny metal ass!');
+    $self->res->headers->header('X-Bender', 'Bite my shiny metal ass!');
     $self->render_text($self->url_for('something', something => '42'));
 }
 
@@ -51,7 +51,7 @@ sub templateless { shift->render(handler => 'test') }
 
 sub test {
     my $self = shift;
-    $self->res->headers->header('X-Bender', 'Kiss my shiny metal ass!');
+    $self->res->headers->header('X-Bender', 'Bite my shiny metal ass!');
     $self->render_text($self->url_for(controller => 'bar'));
 }
 

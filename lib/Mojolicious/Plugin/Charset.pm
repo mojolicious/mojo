@@ -1,23 +1,33 @@
-package Mojolicious::Plugin::I18n;
+# Copyright (C) 2008-2009, Sebastian Riedel.
+
+package Mojolicious::Plugin::Charset;
 
 use strict;
 use warnings;
+
 use base 'Mojolicious::Plugin';
 
+# Shut up friends. My internet browser heard us saying the word Fry and it
+# found a movie about Philip J. Fry for us.
+# It also opened my calendar to Friday and ordered me some french fries.
 sub register {
     my ($self, $app, $conf) = @_;
 
+    # Config
     $conf ||= {};
 
+    # Set charset
     $app->plugins->add_hook(
         before_dispatch => sub {
             my ($self, $c) = @_;
 
+            # Got a charset
             if (my $charset = $conf->{charset}) {
-                # We need to do this before we clone params
+
+                # This has to be done before params are cloned
                 $c->tx->req->default_charset($charset);
 
-                # We should add charset to text/html content type
+                # Add charset to text/html content type
                 my $type = $c->app->types->type('html');
                 unless ($type =~ /charset=/) {
                     $type .= ";charset=$charset";
@@ -27,9 +37,10 @@ sub register {
 
             # Allow defined but blank encoding to suppress unwanted
             # conversion
-            my $encoding = (defined $conf->{encoding})
-                ? $conf->{encoding}
-                : $conf->{charset};
+            my $encoding =
+              defined $conf->{encoding}
+              ? $conf->{encoding}
+              : $conf->{charset};
             $c->app->renderer->encoding($encoding) if $encoding;
         }
     );
@@ -40,23 +51,24 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::I18n - Internationalization
+Mojolicious::Plugin::Charset - Charset Plugin
 
 =head1 SYNOPSIS
 
     # Mojolicious
-    $self->plugin('i18n', { charset => 'Shift_JIS' });
+    $self->plugin(charset => {charset => 'Shift_JIS'});
 
     # Mojolicious::Lite
-    plugin 'i18n', { charset => 'Shift_JIS' };
+    plugin charset => {charset => 'Shift_JIS'};
 
 =head1 DESCRIPTION
 
-L<Mojolicous::Plugin::I18n> is a plugin to set charset and encoding.
+L<Mojolicous::Plugin::Charset> is a plugin to easily set the default charset
+and encoding on all layers of L<Mojolicious>.
 
 =head1 METHODS
 
-L<Mojolicious::Plugin::I18n> inherits all methods from
+L<Mojolicious::Plugin::Charset> inherits all methods from
 L<Mojolicious::Plugin> and implements the following new ones.
 
 =head2 C<register>

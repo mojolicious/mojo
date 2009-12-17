@@ -6,6 +6,7 @@ This file documents the revision history for Perl extension Mojo.
         - Added native PSGI support.
         - Made param decoding more defensive and allow malformed data to pass
           through for debugging.
+        - Fixed makefile and app generators.
         - Fixed a case where an ending tag would be interpreted as a line
           start in Mojo::Template.
         - Fixed multipart charset handling and added the ability to disable

@@ -147,7 +147,7 @@ use_ok('<%= $class %>');
 
 # Test
 my $t = Test::Mojo->new(app => '<%= $class %>');
-$t->get_ok('/')->status_is(200)->content_type_is(Server => 'text/html')
+$t->get_ok('/')->status_is(200)->content_type_is('text/html')
   ->content_like(qr/Mojolicious Web Framework/i);
 @@ not_found
 <!doctype html><html>

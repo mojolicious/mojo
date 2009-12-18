@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 427;
+use Test::More tests => 447;
 
 use File::Spec;
 use File::Temp;
@@ -79,6 +79,27 @@ is($req->minor_version,           0);
 is($req->url,                     '/foo/bar/baz.html?foo=13#23');
 is($req->headers->content_type,   'text/plain');
 is($req->headers->content_length, 27);
+
+# Parse full HTTP 1.0 request (behind reverse proxy)
+my $backup = $ENV{MOJO_REVERSE_PROXY};
+$ENV{MOJO_REVERSE_PROXY} = 1;
+$req = Mojo::Message::Request->new;
+$req->parse('GET /foo/bar/baz.html?fo');
+$req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
+$req->parse('-Type: text/');
+$req->parse("plain\x0d\x0aContent-Length: 27\x0d\x0a");
+$req->parse("Host: localhost\x0d\x0a");
+$req->parse("X-Forwarded-For: kraih.com, mojolicious.org\x0d\x0a\x0d\x0a");
+$req->parse("Hello World!\n1234\nlalalala\n");
+is($req->state,         'done');
+is($req->method,        'GET');
+is($req->major_version, 1);
+is($req->minor_version, 0);
+is($req->url,           '/foo/bar/baz.html?foo=13#23');
+is($req->url->to_abs,   'http://mojolicious.org/foo/bar/baz.html?foo=13#23');
+is($req->headers->content_type,   'text/plain');
+is($req->headers->content_length, 27);
+$ENV{MOJO_REVERSE_PROXY} = $backup;
 
 # Parse full HTTP 1.0 request with zero chunk
 $req = Mojo::Message::Request->new;
@@ -785,6 +806,38 @@ is($req->major_version,   '1');
 is($req->body,            'Hello World');
 is($req->url->to_abs->to_string,
     'http://localhost:8080/test/index.cgi/foo/bar?lalala=23&bar=baz');
+
+# Parse Lighttpd like CGI environment variables and a body
+# (behind reverse proxy)
+$backup                  = $ENV{MOJO_REVERSE_PROXY};
+$ENV{MOJO_REVERSE_PROXY} = 1;
+$req                     = Mojo::Message::Request->new;
+$req->parse(
+    HTTP_CONTENT_LENGTH  => 11,
+    HTTP_EXPECT          => '100-continue',
+    HTTP_X_FORWARDED_FOR => 'mojolicious.org',
+    PATH_INFO            => '/test/index.cgi/foo/bar',
+    QUERY_STRING         => 'lalala=23&bar=baz',
+    REQUEST_METHOD       => 'POST',
+    SCRIPT_NAME          => '/test/index.cgi',
+    HTTP_HOST            => 'localhost:8080',
+    SERVER_PROTOCOL      => 'HTTP/1.0'
+);
+$req->parse('Hello World');
+is($req->state,           'done');
+is($req->method,          'POST');
+is($req->headers->expect, '100-continue');
+is($req->url->path,       '/foo/bar');
+is($req->url->base->path, '/test/index.cgi/');
+is($req->url->host,       'localhost');
+is($req->url->port,       8080);
+is($req->url->query,      'lalala=23&bar=baz');
+is($req->minor_version,   '0');
+is($req->major_version,   '1');
+is($req->body,            'Hello World');
+is($req->url->to_abs->to_string,
+    'http://mojolicious.org/test/index.cgi/foo/bar?lalala=23&bar=baz');
+$ENV{MOJO_REVERSE_PROXY} = $backup;
 
 # Parse Apache like CGI environment variables and a body
 $req = Mojo::Message::Request->new;

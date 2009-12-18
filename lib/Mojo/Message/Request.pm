@@ -92,6 +92,21 @@ sub parse {
     # Fix things we only know after parsing headers
     unless ($self->is_state(qw/start headers/)) {
 
+        # Reverse proxy
+        my $forwarded = $self->headers->header('X-Forwarded-For');
+        if ($ENV{MOJO_REVERSE_PROXY} && $forwarded) {
+
+            # Host
+            $forwarded =~ /([^,\s]+)$/;
+            if (my $host = $1) {
+                $self->url->base->host($host);
+
+                # Port
+                my $port = $self->headers->header('X-Forwarded-Port');
+                $self->url->base->port($port);
+            }
+        }
+
         # Base URL
         $self->url->base->scheme('http') unless $self->url->base->scheme;
         if (!$self->url->base->authority && $self->headers->host) {

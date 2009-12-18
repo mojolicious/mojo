@@ -4,6 +4,7 @@ This file documents the revision history for Perl extension Mojo.
         - Added routes captures to params in Mojolicious.
         - Added charset plugin to Mojolicious. (charsbar)
         - Added native PSGI support.
+        - Added simple reverse proxy support with tests.
         - Made param decoding more defensive and allow malformed data to pass
           through for debugging.
         - Fixed makefile and app generators.

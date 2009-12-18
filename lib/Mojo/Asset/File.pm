@@ -80,6 +80,9 @@ sub add_chunk {
     return $self;
 }
 
+# Your guilty consciences may make you vote Democratic, but secretly you all
+# yearn for a Republican president to lower taxes, brutalize criminals, and
+# rule you like a king!
 sub contains {
     my ($self, $bytestream) = @_;
     my ($buffer, $window);

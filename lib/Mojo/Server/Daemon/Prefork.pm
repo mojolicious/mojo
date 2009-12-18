@@ -23,15 +23,9 @@ __PACKAGE__->attr(max_clients                           => 1);
 __PACKAGE__->attr(max_servers                           => 100);
 __PACKAGE__->attr(max_spare_servers                     => 10);
 __PACKAGE__->attr([qw/min_spare_servers start_servers/] => 5);
-__PACKAGE__->attr(
-    pid_file => sub {
-        return File::Spec->catfile(File::Spec->splitdir(File::Spec->tmpdir),
-            'mojo_prefork.pid');
-    }
-);
 
 __PACKAGE__->attr(_child_poll => sub { IO::Poll->new });
-__PACKAGE__->attr([qw/_child_read _child_write _cleanup _lock _spawn/]);
+__PACKAGE__->attr([qw/_child_read _child_write _cleanup _spawn/]);
 __PACKAGE__->attr(_children => sub { {} });
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
@@ -74,8 +68,6 @@ sub accept_lock {
     return $lock;
 }
 
-sub accept_unlock { flock(shift->_lock, LOCK_UN) }
-
 sub child { shift->ioloop->start }
 
 sub daemonize {
@@ -102,12 +94,6 @@ sub daemonize {
 sub parent {
     my $self = shift;
 
-    # Lock callback
-    $self->ioloop->lock_cb(sub { $self->accept_lock($_[1]) });
-
-    # Unlock callback
-    $self->ioloop->unlock_cb(sub { $self->accept_unlock });
-
     # Prepare ioloop
     $self->prepare_ioloop;
 }
@@ -123,8 +109,8 @@ sub run {
       or croak "Can't create pipe: $!";
     $self->_child_poll->mask($self->_child_read, POLLIN);
 
-    # Create pid file
-    $self->_create_pid_file;
+    # Prepare environment
+    $self->prepare_environment;
 
     # Parent signals
     my $done = 0;
@@ -162,34 +148,6 @@ sub _cleanup_children {
     for my $pid (keys %{$self->_children}) {
         delete $self->_children->{$pid} unless kill 0, $pid;
     }
-}
-
-sub _create_pid_file {
-    my $self = shift;
-
-    my $file = $self->pid_file;
-
-    # PID file
-    my $fh;
-    if (-e $file) {
-        $fh = IO::File->new("< $file")
-          or croak qw/Can't open PID file "$file": $!/;
-        my $pid = <$fh>;
-        warn "Server already running with PID $pid.\n" if kill 0, $pid;
-        warn "Removing PID file for defunct server process $pid.\n";
-        warn qw/Can't unlink PID file "$file".\n/
-          unless -w $file && unlink $file;
-    }
-
-    # Create new PID file
-    $fh = IO::File->new($file, O_WRONLY | O_CREAT | O_EXCL, 0644)
-      or croak "Can't create PID file $file";
-
-    # PID
-    print $fh $$;
-    close $fh;
-
-    return $$;
 }
 
 sub _kill_children {
@@ -342,11 +300,6 @@ sub _spawn_child {
         close($self->_child_read);
         $self->_child_poll(undef);
 
-        # Lockfile
-        my $lock = $self->pid_file;
-        $self->_lock(IO::File->new($lock, O_RDWR))
-          or croak "Can't open lock file $lock: $!";
-
         # Parent will send a SIGHUP when there are too many children idle
         my $done = 0;
         $SIG{HUP} = sub { $done++ };
@@ -363,7 +316,6 @@ sub _spawn_child {
         $self->_child_write->syswrite("$$ done\n")
           or croak "Can't write to parent: $!";
         $self->_child_write(undef);
-        $self->_lock(undef);
         exit 0;
     }
 
@@ -424,11 +376,6 @@ L<Mojo::Server::Daemon> and implements the following new ones.
     my $min_spare_servers = $daemon->min_spare_servers;
     $daemon               = $daemon->min_spare_servers(5);
 
-=head2 C<pid_file>
-
-    my $pid_file = $daemon->pid_file;
-    $daemon      = $daemon->pid_file('/tmp/Mojo_daemon_prefork.pid');
-
 =head2 C<start_servers>
 
     my $start_servers = $daemon->start_servers;
@@ -442,10 +389,6 @@ L<Mojo::Server::Daemon> and implements the following new ones.
 =head2 C<accept_lock>
 
     my $lock = $daemon->accept_lock($blocking);
-
-=head2 C<accept_unlock>
-
-    $daemon->accept_unlock;
 
 =head2 C<child>
 

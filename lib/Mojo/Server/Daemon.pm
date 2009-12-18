@@ -9,21 +9,77 @@ use base 'Mojo::Server';
 use bytes;
 
 use Carp 'croak';
+use Fcntl ':flock';
+use File::Spec;
+use IO::File;
 use Mojo::IOLoop;
 use Mojo::Transaction::Pipeline;
 use Scalar::Util qw/isweak weaken/;
 
 __PACKAGE__->attr([qw/address file group listen_queue_size user/]);
 __PACKAGE__->attr(ioloop => sub { Mojo::IOLoop->new });
-__PACKAGE__->attr(keep_alive_timeout      => 15);
+__PACKAGE__->attr(keep_alive_timeout => 15);
+__PACKAGE__->attr(
+    lock_file => sub {
+        return File::Spec->catfile(File::Spec->splitdir(File::Spec->tmpdir),
+            'mojo_daemon.lock');
+    }
+);
 __PACKAGE__->attr(max_clients             => 1000);
 __PACKAGE__->attr(max_keep_alive_requests => 100);
-__PACKAGE__->attr(port                    => 3000);
+__PACKAGE__->attr(
+    pid_file => sub {
+        return File::Spec->catfile(File::Spec->splitdir(File::Spec->tmpdir),
+            'mojo_daemon.pid');
+    }
+);
+__PACKAGE__->attr(port => 3000);
 
 __PACKAGE__->attr(_connections => sub { {} });
+__PACKAGE__->attr('_lock');
+
+sub accept_lock {
+    my ($self, $blocking) = @_;
+
+    # Lock
+    my $lock =
+      $blocking
+      ? flock($self->_lock, LOCK_EX)
+      : flock($self->_lock, LOCK_EX | LOCK_NB);
+
+    return $lock;
+}
+
+sub accept_unlock { flock(shift->_lock, LOCK_UN) }
+
+sub prepare_environment {
+    my $self = shift;
+
+    # Create pid file
+    $self->_create_pid_file;
+
+    # Create lock file
+    $self->_create_lock_file;
+
+    # Signals
+    $SIG{INT} = $SIG{TERM} = sub {
+
+        # Remove PID file
+        unlink $self->pid_file;
+
+        # End
+        exit 0;
+    };
+}
 
 sub prepare_ioloop {
     my $self = shift;
+
+    # Lock callback
+    $self->ioloop->lock_cb(sub { $self->accept_lock($_[1]) });
+
+    # Unlock callback
+    $self->ioloop->unlock_cb(sub { $self->accept_unlock });
 
     my $options = {};
 
@@ -86,6 +142,9 @@ sub run {
     # User and group
     $self->setuidgid;
 
+    # Prepare environment
+    $self->prepare_environment;
+
     # Prepare ioloop
     $self->prepare_ioloop;
 
@@ -123,6 +182,52 @@ sub setuidgid {
     }
 
     return $self;
+}
+
+sub _create_lock_file {
+    my $self = shift;
+
+    my $file = $self->lock_file;
+
+    # Create lock file
+    unless (-e $file) {
+        my $fh = IO::File->new($file, O_WRONLY | O_CREAT | O_EXCL, 0644)
+          or croak qq/Can't create lock file "$file"/;
+        print $fh 'mojo';
+        close $fh;
+    }
+
+    # Lockfile
+    $self->_lock(IO::File->new($file, O_RDWR))
+      or croak qq/Can't open lock file "$file": $!/;
+}
+
+sub _create_pid_file {
+    my $self = shift;
+
+    my $file = $self->pid_file;
+
+    # PID file
+    my $fh;
+    if (-e $file) {
+        $fh = IO::File->new("< $file")
+          or croak qq/Can't open PID file "$file": $!/;
+        my $pid = <$fh>;
+        warn "Server already running with PID $pid.\n" if kill 0, $pid;
+        warn "Removing PID file for defunct server process $pid.\n";
+        warn qq/Can't unlink PID file "$file".\n/
+          unless -w $file && unlink $file;
+    }
+
+    # Create new PID file
+    $fh = IO::File->new($file, O_WRONLY | O_CREAT | O_EXCL, 0644)
+      or croak qq/Can't create PID file "$file"/;
+
+    # PID
+    print $fh $$;
+    close $fh;
+
+    return $$;
 }
 
 sub _create_pipeline {
@@ -333,6 +438,11 @@ implements the following new ones.
     my $listen_queue_size = $daemon->listen_queue_zise;
     $daemon               = $daemon->listen_queue_zise(128);
 
+=head2 C<lock_file>
+
+    my $lock_file = $daemon->lock_file;
+    $daemon       = $daemon->lock_file('/tmp/mojo_daemon.lock');
+
 =head2 C<max_clients>
 
     my $max_clients = $daemon->max_clients;
@@ -342,6 +452,11 @@ implements the following new ones.
 
     my $max_keep_alive_requests = $daemon->max_keep_alive_requests;
     $daemon                     = $daemon->max_keep_alive_requests(100);
+
+=head2 C<pid_file>
+
+    my $pid_file = $daemon->pid_file;
+    $daemon      = $daemon->pid_file('/tmp/mojo_daemon.pid');
 
 =head2 C<port>
 
@@ -357,6 +472,14 @@ implements the following new ones.
 
 L<Mojo::Server::Daemon> inherits all methods from L<Mojo::Server> and
 implements the following new ones.
+
+=head2 C<accept_lock>
+
+    my $lock = $daemon->accept_lock($blocking);
+
+=head2 C<accept_unlock>
+
+    $daemon->accept_unlock;
 
 =head2 C<prepare_ioloop>
 

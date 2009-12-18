@@ -22,6 +22,7 @@ These options are available:
   --clients <number>      Set maximum number of concurrent clients per child,
                           defaults to 1.
   --daemonize             Daemonize parent.
+  --file <path>           Set path to UNIX domain socket.
   --group <name>          Set group name for children.
   --idle <seconds>        Set time children can be idle without getting
                           killed, defaults to 30.
@@ -57,6 +58,7 @@ sub run {
         'address=s'   => sub { $daemon->address($_[1]) },
         'clients=i'   => sub { $daemon->max_clients($_[1]) },
         'daemonize'   => \$daemonize,
+        'file=s'      => sub { $daemon->file($_[1]) },
         'group=s'     => sub { $daemon->group($_[1]) },
         'idle=i'      => sub { $daemon->idle_timeout($_[1]) },
         'interval=i'  => sub { $daemon->cleanup_interval($_[1]) },

@@ -134,18 +134,36 @@ sub listen {
 
     # Options
     my %options = (
-        Listen    => $args->{queue_size} || SOMAXCONN,
-        LocalPort => $args->{port}       || 3000,
-        Proto     => 'tcp',
-        ReuseAddr => 1,
-        Type      => SOCK_STREAM
+        Listen => $args->{queue_size} || SOMAXCONN,
+        Type => SOCK_STREAM
     );
-    my $address = $args->{address};
-    $options{LocalAddr} = $address if $address;
 
-    # Create socket
-    my $listen = IO::Socket::INET->new(%options)
-      or croak "Can't create listen socket: $!";
+    # Listen on UNIX domain socket
+    my $listen;
+    if (my $file = $args->{file}) {
+
+        # Options
+        $options{Local} = $file;
+
+        # Create socket
+        $listen = IO::Socket::UNIX->new(%options)
+          or croak "Can't create listen socket: $!";
+    }
+
+    # Listen on port
+    else {
+
+        # Options
+        my $address = $args->{address};
+        $options{LocalAddr} = $address if $address;
+        $options{LocalPort} = $args->{port} || 3000;
+        $options{Proto}     = 'tcp';
+        $options{ReuseAddr} = 1;
+
+        # Create socket
+        $listen = IO::Socket::INET->new(%options)
+          or croak "Can't create listen socket: $!";
+    }
 
     # Non blocking
     $listen->blocking(0);

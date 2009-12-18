@@ -21,6 +21,7 @@ These options are available:
   --address <address>     Set local host bind address.
   --clients <number>      Set maximum number of concurrent clients, defaults
                           to 1000.
+  --file <path>           Set path to UNIX domain socket.
   --group <name>          Set group name for process.
   --keepalive <seconds>   Set keep-alive timeout, defaults to 15.
   --port <port>           Set port to start listening on, defaults to 3000.
@@ -42,6 +43,7 @@ sub run {
     GetOptions(
         'address=s'   => sub { $daemon->address($_[1]) },
         'clients=i'   => sub { $daemon->max_clients($_[1]) },
+        'file=s'      => sub { $daemon->file($_[1]) },
         'group=s'     => sub { $daemon->group($_[1]) },
         'keepalive=i' => sub { $daemon->keep_alive_timeout($_[1]) },
         'port=i'      => sub { $daemon->port($_[1]) },

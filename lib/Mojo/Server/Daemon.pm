@@ -13,7 +13,7 @@ use Mojo::IOLoop;
 use Mojo::Transaction::Pipeline;
 use Scalar::Util qw/isweak weaken/;
 
-__PACKAGE__->attr([qw/address group listen_queue_size user/]);
+__PACKAGE__->attr([qw/address file group listen_queue_size user/]);
 __PACKAGE__->attr(ioloop => sub { Mojo::IOLoop->new });
 __PACKAGE__->attr(keep_alive_timeout      => 15);
 __PACKAGE__->attr(max_clients             => 1000);
@@ -26,6 +26,9 @@ sub prepare_ioloop {
     my $self = shift;
 
     my $options = {};
+
+    # File
+    my $file = $options->{file} = $self->file;
 
     # Address
     my $address = $self->address;
@@ -43,10 +46,11 @@ sub prepare_ioloop {
     $self->ioloop->listen($options);
 
     # Log
-    $self->app->log->info("Server started (http://$address:$port)");
+    my $started = $file ? $file : "http://$address:$port";
+    $self->app->log->info("Server started ($started)");
 
     # Friendly message
-    print "Server available at http://$address:$port.\n";
+    print "Server available at $started.\n";
 
     # Max clients
     $self->ioloop->max_clients($self->max_clients);
@@ -303,6 +307,11 @@ implements the following new ones.
 
     my $address = $daemon->address;
     $daemon     = $daemon->address('127.0.0.1');
+
+=head2 C<file>
+
+    my $file = $daemon->file;
+    $daemon  = $daemon->file('/tmp/mojo.sock');
 
 =head2 C<group>
 

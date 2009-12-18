@@ -10,7 +10,7 @@ use base 'Mojo::Stateful';
 use Carp 'croak';
 
 __PACKAGE__->attr([qw/connection kept_alive/]);
-__PACKAGE__->attr([qw/local_address local_port remote_address remote_port/]);
+__PACKAGE__->attr([qw/local_address local_port remote_port/]);
 __PACKAGE__->attr(continue_timeout => 5);
 __PACKAGE__->attr(keep_alive       => 0);
 
@@ -53,6 +53,23 @@ sub pause {
     $self->state('paused');
 
     return $self;
+}
+
+sub remote_address {
+    my ($self, $address) = @_;
+
+    # Set
+    if ($address) {
+        $self->{remote_address} = $address;
+
+        # Activate reverse proxy support for local requests
+        $ENV{MOJO_REVERSE_PROXY} ||= 1 if $address eq '127.0.0.1';
+
+        return $self;
+    }
+
+    # Get
+    return $self->{remote_address};
 }
 
 sub resume {

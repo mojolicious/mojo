@@ -158,7 +158,7 @@ sub prepare_pid_file {
         # Remove PID file
         unlink $self->pid_file;
 
-        # End
+        # Done
         exit 0;
     };
 }

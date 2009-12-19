@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 245;
+use Test::More tests => 252;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -361,6 +361,14 @@ $t->get_ok('/firefox/bar', {'User-Agent' => 'Explorer'})->status_is(404)
 
 # POST /utf8
 $t->post_form_ok('/utf8', 'UTF-8' => {name => 'Вячеслав'})
+  ->status_is(200)->header_is(Server => 'Mojo (Perl)')
+  ->header_is('X-Powered-By'   => 'Mojo (Perl)')
+  ->header_is('Content-Length' => 40)->content_type_is('text/html')
+  ->content_is(b("Вячеслав Тихановский\n")->encode('UTF-8')
+      ->to_string);
+
+$t->post_form_ok('/utf8', 'UTF-8' => {name => 'Вячеслав'},
+                 {'Content-Type' => 'multipart/form-data'})
   ->status_is(200)->header_is(Server => 'Mojo (Perl)')
   ->header_is('X-Powered-By'   => 'Mojo (Perl)')
   ->header_is('Content-Length' => 40)->content_type_is('text/html')

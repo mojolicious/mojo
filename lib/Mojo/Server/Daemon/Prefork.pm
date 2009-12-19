@@ -54,10 +54,7 @@ sub accept_lock {
     }
 
     # Lock
-    my $lock =
-      $blocking
-      ? flock($self->_lock, LOCK_EX)
-      : flock($self->_lock, LOCK_EX | LOCK_NB);
+    my $lock = $self->SUPER::accept_lock($blocking);
 
     # Busy
     if ($lock) {
@@ -101,6 +98,9 @@ sub parent {
 sub run {
     my $self = shift;
 
+    # PID file
+    $self->prepare_pid_file;
+
     # No windows support
     die "Prefork daemon not available for Windows.\n" if $^O eq 'MSWin32';
 
@@ -108,9 +108,6 @@ sub run {
     pipe($self->{_child_read}, $self->{_child_write})
       or croak "Can't create pipe: $!";
     $self->_child_poll->mask($self->_child_read, POLLIN);
-
-    # Prepare environment
-    $self->prepare_environment;
 
     # Parent signals
     my $done = 0;
@@ -285,8 +282,13 @@ sub _spawn_child {
         $self->_children->{$child} = {state => 'idle', time => time};
     }
 
-    # Child signal handlers
+    # Child
     else {
+
+        # Prepare environment
+        $self->prepare_lock_file;
+
+        # Signal handlers
         $SIG{HUP} = $SIG{INT} = $SIG{TERM} = sub { exit 0 };
         $SIG{CHLD} = 'DEFAULT';
     }

@@ -14,6 +14,7 @@ use IO::Socket;
 use Mojo::Buffer;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
+use constant KQUEUE => $ENV{MOJO_POLL} ? 0 : eval { require IO::KQueue; 1 };
 
 __PACKAGE__->attr(
     [qw/accept_cb lock_cb unlock_cb/] => sub {
@@ -25,10 +26,15 @@ __PACKAGE__->attr([qw/clients servers connecting/]     => 0);
 __PACKAGE__->attr(max_clients                          => 1000);
 __PACKAGE__->attr(timeout                              => '0.25');
 
-__PACKAGE__->attr(_accepted    => sub { [] });
-__PACKAGE__->attr(_connections => sub { {} });
-__PACKAGE__->attr(_poll        => sub { IO::Poll->new });
-__PACKAGE__->attr([qw/_listen _running/]);
+__PACKAGE__->attr(_accepted               => sub { [] });
+__PACKAGE__->attr([qw/_connections _fds/] => sub { {} });
+__PACKAGE__->attr([qw/_listen _listening _running/]);
+__PACKAGE__->attr(
+    _loop => sub {
+        return IO::KQueue->new if KQUEUE;
+        return IO::Poll->new;
+    }
+);
 
 # Singleton
 our $LOOP;
@@ -64,6 +70,10 @@ sub connect {
         connect_start => time
     };
 
+    # File descriptor
+    my $fd = fileno($socket);
+    $self->_fds->{$fd} = "$socket";
+
     # Connecting counter
     $self->connecting($self->connecting + 1);
 
@@ -98,8 +108,23 @@ sub drop {
     # Socket
     if (my $socket = $self->_connections->{$id}->{socket}) {
 
+        # Remove file descriptor
+        my $fd = fileno($socket);
+        delete $self->_fds->{$fd};
+
+        # Remove socket from kqueue
+        if (KQUEUE) {
+            my $writing = $self->_connections->{$id}->{writing};
+            $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_READ(),
+                IO::KQueue::EV_DELETE())
+              if defined $writing;
+            $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_WRITE(),
+                IO::KQueue::EV_DELETE())
+              if $writing;
+        }
+
         # Remove socket from poll
-        $self->_poll->remove($socket);
+        else { $self->_loop->remove($socket) }
 
         # Close socket
         close $socket;
@@ -171,6 +196,10 @@ sub listen {
     # Add listen socket
     $self->_listen($listen);
 
+    # File descriptor
+    my $fd = fileno($listen);
+    $self->_fds->{$fd} = "$listen";
+
     return $self;
 }
 
@@ -192,7 +221,22 @@ sub not_writing {
 
     # Not writing
     elsif (my $socket = $self->_connections->{$id}->{socket}) {
-        $self->_poll->mask($socket, POLLIN);
+
+        # KQueue
+        if (KQUEUE) {
+            my $fd      = fileno($socket);
+            my $writing = $self->_connections->{$id}->{writing};
+            $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_READ(),
+                IO::KQueue::EV_ADD())
+              unless defined $writing;
+            $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_WRITE(),
+                IO::KQueue::EV_DELETE())
+              if $writing;
+            $self->_connections->{$id}->{writing} = 0;
+        }
+
+        # Poll
+        else { $self->_loop->mask($socket, POLLIN) }
     }
 
     # Time
@@ -218,8 +262,10 @@ sub start {
     $SIG{PIPE} = 'IGNORE';
     $SIG{HUP} = sub { $self->_running(0) };
 
-    # Mainloop
+    # Running
     $self->_running(1);
+
+    # Mainloop
     $self->_spin while $self->_running;
 
     return $self;
@@ -234,7 +280,22 @@ sub writing {
 
     # Writing
     if (my $socket = $self->_connections->{$id}->{socket}) {
-        $self->_poll->mask($socket, POLLIN | POLLOUT);
+
+        # KQueue
+        if (KQUEUE) {
+            my $fd      = fileno($socket);
+            my $writing = $self->_connections->{$id}->{writing};
+            $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_READ(),
+                IO::KQueue::EV_ADD())
+              unless defined $writing;
+            $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_WRITE(),
+                IO::KQueue::EV_ADD())
+              unless $writing;
+            $self->_connections->{$id}->{writing} = 1;
+        }
+
+        # Poll
+        else { $self->_loop->mask($socket, POLLIN | POLLOUT) }
     }
 
     # Time
@@ -359,8 +420,23 @@ sub _hup {
     $self->$event($id);
 }
 
+sub _is_listening {
+    my $self = shift;
+    return 1
+      if $self->_listen
+          && $self->clients < $self->max_clients
+          && $self->lock_cb->($self, !keys %{$self->_connections});
+    return 0;
+}
+
 sub _prepare {
     my $self = shift;
+
+    # Accept
+    $self->_accept;
+
+    # Connect
+    $self->_connect if $self->connecting;
 
     # Check timeouts
     my $c = $self->_connections;
@@ -369,8 +445,8 @@ sub _prepare {
         # Drop if buffer is empty
         $self->drop($id)
           and next
-          if $c->{$id}->{finish}
-              && (!$c->{$id}->{buffer} || !$c->{$id}->{buffer}->size);
+          if $c->{$id}->{finish} && (!$c->{$id}->{buffer}
+                  || !$c->{$id}->{buffer}->size);
 
         # Read only
         $self->not_writing($id) if delete $c->{$id}->{read_only};
@@ -384,6 +460,14 @@ sub _prepare {
         # HUP
         $self->_hup($id) if (time - $time) >= $timeout;
     }
+
+    # Nothing to do
+    return $self->_running(0)
+      unless keys %{$self->_connections}
+          || $self->_listen
+          || $self->connecting;
+
+    return;
 }
 
 sub _read {
@@ -397,8 +481,15 @@ sub _read {
         push @{$self->_accepted}, [$socket, time];
 
         # Add connection
-        $self->_connections->{$socket} =
-          {buffer => Mojo::Buffer->new, client => 1, socket => $socket};
+        $self->_connections->{$socket} = {
+            buffer => Mojo::Buffer->new,
+            client => 1,
+            socket => $socket
+        };
+
+        # File descriptor
+        my $fd = fileno($socket);
+        $self->_fds->{$fd} = "$socket";
 
         # Client counter
         $self->clients($self->clients + 1);
@@ -408,6 +499,18 @@ sub _read {
 
         # Unlock
         $self->unlock_cb->($self);
+
+        # Remove listen socket from kqueue
+        if (KQUEUE) {
+            $self->_loop->EV_SET(fileno($self->_listen),
+                IO::KQueue::EVFILT_READ(), IO::KQueue::EV_DELETE());
+        }
+
+        # Remove listen socket from poll
+        else { $self->_loop->remove($self->_listen) }
+
+        # Not listening anymore
+        $self->_listening(0);
 
         return;
     }
@@ -436,42 +539,61 @@ sub _spin {
     my $self = shift;
 
     # Listening?
-    my $poll      = $self->_poll;
-    my $listening = 1
-      if $self->_listen && $self->clients < $self->max_clients;
-    my $cs = keys %{$self->_connections};
-    if ($listening && $self->lock_cb->($self, !$cs)) {
-        $poll->mask($self->_listen, POLLIN);
+    if (!$self->_listening && $self->_is_listening) {
+        my $fd = fileno($self->_listen);
+        KQUEUE
+          ? $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_READ(),
+            IO::KQueue::EV_ADD())
+          : $self->_loop->mask($self->_listen, POLLIN);
+        $self->_listening(1);
     }
-    elsif ($self->_listen) { $poll->remove($self->_listen) }
-
-    # Accept
-    $self->_accept;
-
-    # Connect
-    $self->_connect if $self->connecting;
 
     # Prepare
-    $self->_prepare;
+    return if $self->_prepare;
 
-    # Nothing to do
-    return $self->_running(0)
-      unless $poll->handles || $self->_listen || $self->connecting;
+    # KQueue
+    if (KQUEUE) {
+        my $kq  = $self->_loop;
+        my @ret = $kq->kevent($self->timeout);
+
+        # Events
+        for my $kev (@ret) {
+            my ($fd, $filter, $flags, $fflags) = @$kev;
+
+            # Id
+            my $id = $self->_fds->{$fd};
+            next unless $id;
+
+            # Read
+            $self->_read($id) if $filter == IO::KQueue::EVFILT_READ();
+
+            # Write
+            $self->_write($id) if $filter == IO::KQueue::EVFILT_WRITE();
+
+            if ($flags == IO::KQueue::EV_EOF()) {
+                if   ($fflags) { $self->_error($id) }
+                else           { $self->_hup($id) }
+            }
+        }
+    }
 
     # Poll
-    $poll->poll($self->timeout);
+    else {
+        my $poll = $self->_loop;
+        $poll->poll($self->timeout);
 
-    # Error
-    $self->_error("$_") for $poll->handles(POLLERR);
+        # Error
+        $self->_error("$_") for $poll->handles(POLLERR);
 
-    # HUP
-    $self->_hup("$_") for $poll->handles(POLLHUP);
+        # HUP
+        $self->_hup("$_") for $poll->handles(POLLHUP);
 
-    # Read
-    $self->_read("$_") for $poll->handles(POLLIN);
+        # Read
+        $self->_read("$_") for $poll->handles(POLLIN);
 
-    # Write
-    $self->_write("$_") for $poll->handles(POLLOUT);
+        # Write
+        $self->_write("$_") for $poll->handles(POLLOUT);
+    }
 }
 
 sub _write {
@@ -487,7 +609,10 @@ sub _write {
     my $buffer = $c->{buffer};
 
     # Try to fill the buffer before writing
-    while ($buffer->size < CHUNK_SIZE && !$c->{read_only} && !$c->{finish}) {
+    while ($buffer->size < CHUNK_SIZE
+        && !$c->{read_only}
+        && !$c->{finish})
+    {
 
         # No write callback
         last unless my $event = $c->{write};

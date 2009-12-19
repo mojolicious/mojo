@@ -42,35 +42,13 @@ sub accept_lock {
     my ($self, $blocking) = @_;
 
     # Lock
-    my $lock =
-      $blocking
-      ? flock($self->_lock, LOCK_EX)
-      : flock($self->_lock, LOCK_EX | LOCK_NB);
+    my $flags = $blocking ? LOCK_EX : LOCK_EX | LOCK_NB;
+    my $lock = flock($self->_lock, $flags);
 
     return $lock;
 }
 
 sub accept_unlock { flock(shift->_lock, LOCK_UN) }
-
-sub prepare_environment {
-    my $self = shift;
-
-    # Create pid file
-    $self->_create_pid_file;
-
-    # Create lock file
-    $self->_create_lock_file;
-
-    # Signals
-    $SIG{INT} = $SIG{TERM} = sub {
-
-        # Remove PID file
-        unlink $self->pid_file;
-
-        # End
-        exit 0;
-    };
-}
 
 sub prepare_ioloop {
     my $self = shift;
@@ -101,12 +79,16 @@ sub prepare_ioloop {
     # Listen
     $self->ioloop->listen($options);
 
+    # Event loop
+    my $loop = 'poll';
+    $loop = 'kqueue' if Mojo::IOLoop::KQUEUE();
+
     # Log
     my $started = $file ? $file : "http://$address:$port";
-    $self->app->log->info("Server started ($started)");
+    $self->app->log->info("Server ($loop) started ($started)");
 
     # Friendly message
-    print "Server available at $started.\n";
+    print "Server ($loop) available at $started.\n";
 
     # Max clients
     $self->ioloop->max_clients($self->max_clients);
@@ -134,6 +116,53 @@ sub prepare_ioloop {
     );
 }
 
+sub prepare_lock_file {
+    my $self = shift;
+
+    my $file = $self->lock_file;
+
+    # Create lock file
+    my $fh = IO::File->new("> $file")
+      or croak qq/Can't open lock file "$file"/;
+    $self->_lock($fh);
+}
+
+sub prepare_pid_file {
+    my $self = shift;
+
+    my $file = $self->pid_file;
+
+    # PID file
+    my $fh;
+    if (-e $file) {
+        $fh = IO::File->new("< $file")
+          or croak qq/Can't open PID file "$file": $!/;
+        my $pid = <$fh>;
+        warn "Server already running with PID $pid.\n" if kill 0, $pid;
+        warn "Removing PID file for defunct server process $pid.\n";
+        warn qq/Can't unlink PID file "$file".\n/
+          unless -w $file && unlink $file;
+    }
+
+    # Create new PID file
+    $fh = IO::File->new($file, O_WRONLY | O_CREAT | O_EXCL, 0644)
+      or croak qq/Can't create PID file "$file"/;
+
+    # PID
+    print $fh $$;
+    close $fh;
+
+    # Signals
+    $SIG{INT} = $SIG{TERM} = sub {
+
+        # Remove PID file
+        unlink $self->pid_file;
+
+        # End
+        exit 0;
+    };
+}
+
 # 40 dollars!? This better be the best damn beer ever..
 # *drinks beer* You got lucky.
 sub run {
@@ -142,8 +171,11 @@ sub run {
     # User and group
     $self->setuidgid;
 
-    # Prepare environment
-    $self->prepare_environment;
+    # Prepare PID file
+    $self->prepare_pid_file;
+
+    # Prepare lock file
+    $self->prepare_lock_file;
 
     # Prepare ioloop
     $self->prepare_ioloop;
@@ -182,52 +214,6 @@ sub setuidgid {
     }
 
     return $self;
-}
-
-sub _create_lock_file {
-    my $self = shift;
-
-    my $file = $self->lock_file;
-
-    # Create lock file
-    unless (-e $file) {
-        my $fh = IO::File->new($file, O_WRONLY | O_CREAT | O_EXCL, 0644)
-          or croak qq/Can't create lock file "$file"/;
-        print $fh 'mojo';
-        close $fh;
-    }
-
-    # Lockfile
-    $self->_lock(IO::File->new($file, O_RDWR))
-      or croak qq/Can't open lock file "$file": $!/;
-}
-
-sub _create_pid_file {
-    my $self = shift;
-
-    my $file = $self->pid_file;
-
-    # PID file
-    my $fh;
-    if (-e $file) {
-        $fh = IO::File->new("< $file")
-          or croak qq/Can't open PID file "$file": $!/;
-        my $pid = <$fh>;
-        warn "Server already running with PID $pid.\n" if kill 0, $pid;
-        warn "Removing PID file for defunct server process $pid.\n";
-        warn qq/Can't unlink PID file "$file".\n/
-          unless -w $file && unlink $file;
-    }
-
-    # Create new PID file
-    $fh = IO::File->new($file, O_WRONLY | O_CREAT | O_EXCL, 0644)
-      or croak qq/Can't create PID file "$file"/;
-
-    # PID
-    print $fh $$;
-    close $fh;
-
-    return $$;
 }
 
 sub _create_pipeline {
@@ -484,6 +470,14 @@ implements the following new ones.
 =head2 C<prepare_ioloop>
 
     $daemon->prepare_ioloop;
+
+=head2 C<prepare_lock_file>
+
+    $daemon->prepare_lock_file;
+
+=head2 C<prepare_pid_file>
+
+    $daemon->prepare_pid_file;
 
 =head2 C<run>
 

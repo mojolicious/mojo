@@ -30,7 +30,7 @@ __PACKAGE__->attr(
         if ($file) {
 
             # New file
-            my $mode = '+>';
+            my $mode = '+>>';
 
             # File exists
             $mode = '<' if -s $file;

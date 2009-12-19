@@ -29,6 +29,8 @@ These options are available:
   --interval <seconds>    Set interval for process maintainance, defaults to
                           15.
   --keepalive <seconds>   Set keep-alive timeout, defaults to 15.
+  --lock <path>           Set path to lock file, defaults to a random
+                          temporary file.
   --maxspare <number>     Set maximum amount of idle children, defaults to
                           10.
   --minspare <number>     Set minimum amount of idle children, defaults to 5.
@@ -63,6 +65,7 @@ sub run {
         'idle=i'      => sub { $daemon->idle_timeout($_[1]) },
         'interval=i'  => sub { $daemon->cleanup_interval($_[1]) },
         'keepalive=i' => sub { $daemon->keep_alive_timeout($_[1]) },
+        'lock'        => sub { $daemon->lock_file($_[1]) },
         'maxspare=i'  => sub { $daemon->max_spare_servers($_[1]) },
         'minspare=i'  => sub { $daemon->min_spare_servers($_[1]) },
         'pid=s'       => sub { $daemon->pid_file($_[1]) },

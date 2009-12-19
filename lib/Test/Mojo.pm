@@ -9,7 +9,10 @@ use base 'Mojo::Base';
 
 use Mojo::ByteStream 'b';
 use Mojo::Client;
+use Mojo::Content::MultiPart;
+use Mojo::Content::Single;
 use Mojo::JSON;
+use Mojo::Parameters;
 
 require Test::More;
 
@@ -181,28 +184,18 @@ sub post_form_ok {
     my $tx = Mojo::Transaction::Single->new;
     $tx->req->method('POST');
     $tx->req->url->parse($url);
-    
-    # Body
-    my $body;
-    if ($headers && ($headers->{'Content-Type'} || '') eq 'multipart/form-data') {
-        my $content_type;
-        my $content_length;
-        
-        # Build multipart/form body
-        ($body, $content_type, $content_length)
-          = $self->_build_multipart_body($params, $encoding);
-        
-        # Content-Type
-        $headers->{'Content-Type'}   = $content_type;
-        
-        # Content-Length
-        $headers->{'Content-Length'} = $content_length;
+
+    # Multipart
+    my $type = $headers->{'Content-Type'} || '';
+    if ($type eq 'multipart/form-data') {
+        $self->_build_multipart_post($tx, $params, $encoding);
     }
+
+    # Urlencoded
     else {
         $tx->req->headers->content_type('application/x-www-form-urlencoded');
-        $body = $params->to_string
+        $tx->req->body($params->to_string);
     }
-    $tx->req->body($body);
 
     # Headers
     $headers ||= {};
@@ -220,68 +213,6 @@ sub post_form_ok {
 
     return $self;
 }
-
-sub _build_multipart_body {
-    my ($self, $params, $encoding) = @_;
-    
-    # Form data
-    my $form = $params->to_hash;
-    
-    # Parts
-    my @parts;
-    foreach my $name (sort keys %$form) {
-        
-        # Content
-        my $part = Mojo::Content::Single->new;
-        
-        # Content-Disposition
-        $part->headers->content_disposition(qq{form-data; name="$name"});
-        
-        # Content-Type
-        my $content_type = 'text/plain';
-        $content_type .= qq{ ;charset=$encoding} if $encoding;
-        $part->headers->content_type($content_type);
-        
-        # Value
-        my $value = ref $form->{$name} eq 'ARRAY'
-                  ? join ',', @{$form->{$name}}
-                  : $form->{$name};
-        
-        # Content-Length
-        use bytes;
-        $part->headers->content_length(length $value);
-        
-        # Add Value
-        $part->asset->add_chunk($value);
-        
-        # Push part
-        push @parts, $part;
-    }
-
-    
-    # MultiPart content
-    my $content = Mojo::Content::MultiPart->new;
-    $content->headers->content_type('multipart/form-data');
-    $content->parts(\@parts);
-    
-    # Build body
-    my $body = '';
-    my $offset = 0;
-        
-    while(my $chunk = $content->get_body_chunk($offset)) {
-        $body .= $chunk;
-        $offset += length $chunk;
-    }
-    
-    # Content-Type
-    my $content_type   = $content->headers->content_type;
-    
-    # Content-Length
-    my $content_length = $content->body_size;
-    
-    return ($body, $content_type, $content_length);
-}
-
 
 # WHO IS FONZY!?! Don't they teach you anything at school?
 sub put_ok { shift->_request_ok('put', @_) }
@@ -312,6 +243,46 @@ sub status_is {
     Test::More::is($tx->res->code, $status, $desc);
 
     return $self;
+}
+
+sub _build_multipart_post {
+    my ($self, $tx, $params, $encoding) = @_;
+
+    # Formdata
+    my $form = $params->to_hash;
+
+    # Parts
+    my @parts;
+    foreach my $name (sort keys %$form) {
+
+        # Part
+        my $part = Mojo::Content::Single->new;
+
+        # Content-Disposition
+        $part->headers->content_disposition(qq/form-data; name="$name"/);
+
+        # Content-Type
+        my $type = 'text/plain';
+        $type .= qq/;charset=$encoding/ if $encoding;
+        $part->headers->content_type($type);
+
+        # Value
+        my $value =
+          ref $form->{$name} eq 'ARRAY'
+          ? join ',', @{$form->{$name}}
+          : $form->{$name};
+        $part->asset->add_chunk($value);
+
+        push @parts, $part;
+    }
+
+    # Multipart content
+    my $content = Mojo::Content::MultiPart->new;
+    $content->headers->content_type('multipart/form-data');
+    $content->parts(\@parts);
+
+    # Add content to transaction
+    $tx->req->content($content);
 }
 
 sub _get_content {

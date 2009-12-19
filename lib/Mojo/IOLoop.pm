@@ -23,8 +23,8 @@ __PACKAGE__->attr(
 );
 __PACKAGE__->attr([qw/accept_timeout connect_timeout/] => 5);
 __PACKAGE__->attr([qw/clients servers connecting/]     => 0);
-__PACKAGE__->attr(max_clients                          => '0.25');
-__PACKAGE__->attr(timeout                              => 3);
+__PACKAGE__->attr(max_clients                          => 1000);
+__PACKAGE__->attr(timeout                              => '0.25');
 
 __PACKAGE__->attr(_accepted               => sub { [] });
 __PACKAGE__->attr([qw/_connections _fds/] => sub { {} });

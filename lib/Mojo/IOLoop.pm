@@ -36,6 +36,8 @@ __PACKAGE__->attr([qw/_connections _fds/] => sub { {} });
 __PACKAGE__->attr([qw/_listen _listening _running/]);
 __PACKAGE__->attr(
     _loop => sub {
+
+        # Initialize as late as possible because kqueues don't survive a fork
         return IO::KQueue->new if KQUEUE;
         return IO::EPoll->new  if EPOLL;
         return IO::Poll->new;
@@ -556,11 +558,19 @@ sub _spin {
     # Listening?
     if (!$self->_listening && $self->_is_listening) {
         my $fd = fileno($self->_listen);
+
+        # KQueue
         $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_READ(),
             IO::KQueue::EV_ADD())
           if KQUEUE;
+
+        # EPoll
         $self->_loop->mask($self->_listen, IO::EPoll::POLLIN()) if EPOLL;
+
+        # Poll
         $self->_loop->mask($self->_listen, POLLIN) unless KQUEUE || EPOLL;
+
+        # Listening
         $self->_listening(1);
     }
 
@@ -643,10 +653,7 @@ sub _write {
     my $buffer = $c->{buffer};
 
     # Try to fill the buffer before writing
-    while ($buffer->size < CHUNK_SIZE
-        && !$c->{read_only}
-        && !$c->{finish})
-    {
+    while ($buffer->size < CHUNK_SIZE && !$c->{read_only} && !$c->{finish}) {
 
         # No write callback
         last unless my $event = $c->{write};
@@ -724,6 +731,7 @@ Mojo::IOLoop - IO Loop
 
 L<Mojo::IOLoop> is a general purpose IO loop for TCP clients and servers,
 easy to subclass and extend.
+L<IO::Poll>, L<IO::KQueue> and L<IO::EPoll> are supported transparently.
 
 =head2 ATTRIBUTES
 

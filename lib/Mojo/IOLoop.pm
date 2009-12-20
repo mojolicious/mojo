@@ -580,7 +580,7 @@ sub _spin {
     # KQueue
     if (KQUEUE) {
         my $kq  = $self->_loop;
-        my @ret = $kq->kevent($self->timeout * 1000);
+        my @ret = $kq->kevent($self->timeout * 10);
 
         # Events
         for my $kev (@ret) {

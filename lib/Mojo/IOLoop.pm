@@ -16,7 +16,7 @@ use Mojo::Buffer;
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
 use constant EPOLL => ($ENV{MOJO_POLL} || $ENV{MOJO_KQUEUE})
   ? 0
-  : eval { require IO::EPoll; 1 };
+  : eval { require IO::Epoll; 1 };
 use constant KQUEUE => ($ENV{MOJO_POLL} || $ENV{MOJO_EPOLL})
   ? 0
   : eval { require IO::KQueue; 1 };
@@ -39,7 +39,7 @@ __PACKAGE__->attr(
 
         # Initialize as late as possible because kqueues don't survive a fork
         return IO::KQueue->new if KQUEUE;
-        return IO::EPoll->new  if EPOLL;
+        return IO::Epoll->new  if EPOLL;
         return IO::Poll->new;
     }
 );
@@ -243,8 +243,8 @@ sub not_writing {
             $self->_connections->{$id}->{writing} = 0;
         }
 
-        # EPoll
-        elsif (EPOLL) { $self->_loop->mask($socket, IO::EPoll::POLLIN()) }
+        # Epoll
+        elsif (EPOLL) { $self->_loop->mask($socket, IO::Epoll::POLLIN()) }
 
         # Poll
         else { $self->_loop->mask($socket, POLLIN) }
@@ -305,10 +305,10 @@ sub writing {
             $self->_connections->{$id}->{writing} = 1;
         }
 
-        # EPoll
+        # Epoll
         elsif (EPOLL) {
             $self->_loop->mask($socket,
-                IO::EPoll::POLLIN() | IO::EPoll::POLLOUT());
+                IO::Epoll::POLLIN() | IO::Epoll::POLLOUT());
         }
 
         # Poll
@@ -564,8 +564,8 @@ sub _spin {
             IO::KQueue::EV_ADD())
           if KQUEUE;
 
-        # EPoll
-        $self->_loop->mask($self->_listen, IO::EPoll::POLLIN()) if EPOLL;
+        # Epoll
+        $self->_loop->mask($self->_listen, IO::Epoll::POLLIN()) if EPOLL;
 
         # Poll
         $self->_loop->mask($self->_listen, POLLIN) unless KQUEUE || EPOLL;
@@ -603,7 +603,7 @@ sub _spin {
         }
     }
 
-    # EPoll
+    # Epoll
     elsif (EPOLL) {
         my $epoll = $self->_loop;
         $epoll->poll($self->timeout);
@@ -731,7 +731,7 @@ Mojo::IOLoop - IO Loop
 
 L<Mojo::IOLoop> is a general purpose IO loop for TCP clients and servers,
 easy to subclass and extend.
-L<IO::Poll>, L<IO::KQueue> and L<IO::EPoll> are supported transparently.
+L<IO::Poll>, L<IO::KQueue> and L<IO::Epoll> are supported transparently.
 
 =head2 ATTRIBUTES
 

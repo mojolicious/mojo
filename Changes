@@ -6,7 +6,8 @@ This file documents the revision history for Perl extension Mojo.
         - Added native PSGI support.
         - Added simple reverse proxy support with tests.
         - Added UNIX domain socket support to daemon and prefork daemon.
-        - Added transparent kqueue support to daemon and prefork daemon.
+        - Added transparent kqueue and epoll support to daemon and prefork
+          daemon.
         - Added multipart post support to Test::Mojo. (yuki-kimoto)
         - Made param decoding more defensive and allow malformed data to pass
           through for debugging.

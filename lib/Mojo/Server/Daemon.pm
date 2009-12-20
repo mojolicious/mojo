@@ -82,6 +82,7 @@ sub prepare_ioloop {
     # Event loop
     my $loop = 'poll';
     $loop = 'kqueue' if Mojo::IOLoop::KQUEUE();
+    $loop = 'epoll'  if Mojo::IOLoop::EPOLL();
 
     # Log
     my $started = $file ? $file : "http://$address:$port";

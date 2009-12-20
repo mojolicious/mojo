@@ -14,7 +14,12 @@ use IO::Socket;
 use Mojo::Buffer;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
-use constant KQUEUE => $ENV{MOJO_POLL} ? 0 : eval { require IO::KQueue; 1 };
+use constant EPOLL => ($ENV{MOJO_POLL} || $ENV{MOJO_KQUEUE})
+  ? 0
+  : eval { require IO::EPoll; 1 };
+use constant KQUEUE => ($ENV{MOJO_POLL} || $ENV{MOJO_EPOLL})
+  ? 0
+  : eval { require IO::KQueue; 1 };
 
 __PACKAGE__->attr(
     [qw/accept_cb lock_cb unlock_cb/] => sub {
@@ -32,6 +37,7 @@ __PACKAGE__->attr([qw/_listen _listening _running/]);
 __PACKAGE__->attr(
     _loop => sub {
         return IO::KQueue->new if KQUEUE;
+        return IO::EPoll->new  if EPOLL;
         return IO::Poll->new;
     }
 );
@@ -123,7 +129,7 @@ sub drop {
               if $writing;
         }
 
-        # Remove socket from poll
+        # Remove socket from poll or epoll
         else { $self->_loop->remove($socket) }
 
         # Close socket
@@ -235,6 +241,9 @@ sub not_writing {
             $self->_connections->{$id}->{writing} = 0;
         }
 
+        # EPoll
+        elsif (EPOLL) { $self->_loop->mask($socket, IO::EPoll::POLLIN()) }
+
         # Poll
         else { $self->_loop->mask($socket, POLLIN) }
     }
@@ -292,6 +301,12 @@ sub writing {
                 IO::KQueue::EV_ADD())
               unless $writing;
             $self->_connections->{$id}->{writing} = 1;
+        }
+
+        # EPoll
+        elsif (EPOLL) {
+            $self->_loop->mask($socket,
+                IO::EPoll::POLLIN() | IO::EPoll::POLLOUT());
         }
 
         # Poll
@@ -506,7 +521,7 @@ sub _read {
                 IO::KQueue::EVFILT_READ(), IO::KQueue::EV_DELETE());
         }
 
-        # Remove listen socket from poll
+        # Remove listen socket from poll or epoll
         else { $self->_loop->remove($self->_listen) }
 
         # Not listening anymore
@@ -541,10 +556,11 @@ sub _spin {
     # Listening?
     if (!$self->_listening && $self->_is_listening) {
         my $fd = fileno($self->_listen);
-        KQUEUE
-          ? $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_READ(),
+        $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_READ(),
             IO::KQueue::EV_ADD())
-          : $self->_loop->mask($self->_listen, POLLIN);
+          if KQUEUE;
+        $self->_loop->mask($self->_listen, IO::EPoll::POLLIN()) if EPOLL;
+        $self->_loop->mask($self->_listen, POLLIN) unless KQUEUE || EPOLL;
         $self->_listening(1);
     }
 
@@ -575,6 +591,24 @@ sub _spin {
                 else           { $self->_hup($id) }
             }
         }
+    }
+
+    # EPoll
+    elsif (EPOLL) {
+        my $epoll = $self->_loop;
+        $epoll->poll($self->timeout);
+
+        # Error
+        $self->_error("$_") for $epoll->handles(IO::Epoll::POLLERR());
+
+        # HUP
+        $self->_hup("$_") for $epoll->handles(IO::Epoll::POLLHUP());
+
+        # Read
+        $self->_read("$_") for $epoll->handles(IO::Epoll::POLLIN());
+
+        # Write
+        $self->_write("$_") for $epoll->handles(IO::Epoll::POLLOUT());
     }
 
     # Poll

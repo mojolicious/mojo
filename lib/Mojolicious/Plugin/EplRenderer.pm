@@ -39,8 +39,7 @@ sub register {
                 $mt ||= Mojo::Template->new;
 
                 # Encoding
-                $mt->encoding($app->renderer->encoding)
-                  if $app->renderer->encoding;
+                $mt->encoding($r->encoding) if $r->encoding;
 
                 # Class
                 my $class =
@@ -58,6 +57,7 @@ sub register {
 
                 # No template
                 else {
+
                     $c->app->log->error(
                         qq/Template "$t" missing or not readable./);
                     my $options = {

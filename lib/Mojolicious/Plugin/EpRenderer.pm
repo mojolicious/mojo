@@ -52,7 +52,7 @@ sub register {
                 $prepend .= q/no strict 'refs'; no warnings 'redefine';/;
 
                 # Helpers
-                for my $name (sort keys %{$app->renderer->helper}) {
+                for my $name (sort keys %{$r->helper}) {
                     next unless $name =~ /^\w+$/;
                     $prepend .= "sub $name;";
                     $prepend .= " *$name = sub { \$self->app->renderer";

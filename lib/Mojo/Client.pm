@@ -349,19 +349,36 @@ sub _error {
 }
 
 sub _fetch_cookies {
-    my ($self, $tx) = @_;
+    my ($self, $p) = @_;
 
     # Shortcut
     return unless $self->cookie_jar;
 
     # Pipeline
-    if ($tx->is_pipeline) {
-        $_->req->cookies($self->cookie_jar->find($_->req->url))
-          for @{$tx->active};
+    if ($p->is_pipeline) {
+
+        # Find cookies for all transactions
+        for my $tx (@{$p->active}) {
+
+            # URL
+            my $url = $tx->req->url->clone;
+            if (my $host = $tx->req->headers->host) { $url->host($host) }
+
+            # Find
+            $tx->req->cookies($self->cookie_jar->find($url));
+        }
     }
 
     # Single
-    else { $tx->req->cookies($self->cookie_jar->find($tx->req->url)) }
+    else {
+
+        # URL
+        my $url = $p->req->url->clone;
+        if (my $host = $p->req->headers->host) { $url->host($host) }
+
+        # Find
+        $p->req->cookies($self->cookie_jar->find($p->req->url));
+    }
 }
 
 sub _finish {

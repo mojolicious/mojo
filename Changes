@@ -7,6 +7,9 @@ This file documents the revision history for Perl extension Mojo.
         - Added simple reverse proxy support with tests.
         - Added UNIX domain socket support to daemons.
         - Added transparent kqueue and epoll support to daemons and client.
+        - Added simpler way to define default controller and action for a
+          route.
+              $r->route('/foo')->to('mycontroller#myaction');
         - Added multipart post support to Test::Mojo. (yuki-kimoto)
         - Made param decoding more defensive and allow malformed data to pass
           through for debugging.

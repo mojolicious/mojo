@@ -211,8 +211,45 @@ sub to {
     # Shortcut
     return $self unless @_;
 
+    # Single argument
+    my ($defaults, $shortcut);
+    if (@_ == 1) {
+
+        # Hash
+        $defaults = shift if ref $_[0] eq 'HASH';
+        $shortcut = shift if $_[0];
+    }
+
+    # Multiple arguments
+    else {
+
+        # Odd
+        if (@_ % 2) {
+            $shortcut = shift;
+            $defaults = {@_};
+        }
+
+        # Even
+        else {
+
+            # Shortcut and defaults
+            if (ref $_[1] eq 'HASH') {
+                $shortcut = shift;
+                $defaults = shift;
+            }
+
+            # Just defaults
+            else { $defaults = {@_} }
+        }
+    }
+
+    # Controller and action
+    if ($shortcut && $shortcut =~ /^(\w+)\#(\w+)$/) {
+        $defaults->{controller} = $1;
+        $defaults->{action}     = $2;
+    }
+
     # Defaults
-    my $defaults = ref $_[0] eq 'HASH' ? $_[0] : {@_};
     $self->pattern->defaults($defaults);
 
     return $self;
@@ -350,6 +387,9 @@ follwing the ones.
     my $to  = $routes->to;
     $routes = $routes->to(action => 'foo');
     $routes = $routes->to({action => 'foo'});
+    $routes = $routes->to('controller#action');
+    $routes = $routes->to('controller#action', foo => 'bar');
+    $routes = $routes->to('controller#action', {foo => 'bar'});
 
 =head2 C<is_endpoint>
 

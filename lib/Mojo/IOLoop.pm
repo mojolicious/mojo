@@ -66,7 +66,7 @@ sub connect {
     $socket->blocking(0);
 
     # Connect
-    my $sin = sockaddr_in($args->{port} || 80, inet_aton($args->{address}));
+    my $sin = sockaddr_in($args->{port} || 80, inet_aton($args->{host}));
     $socket->connect($sin);
 
     # Add connection

@@ -501,17 +501,11 @@ sub _queue {
     # New connection
     else {
 
-        # Address
-        my $address =
-            $host =~ /\b(?:\d{1,3}\.){3}\d{1,3}\b/
-          ? $host
-          : inet_ntoa(inet_aton($host));
-
         # Connect
         $id = $self->ioloop->connect(
-            address => $address,
-            port    => $port,
-            cb      => $connected
+            host => $host,
+            port => $port,
+            cb   => $connected
         );
 
         # Error

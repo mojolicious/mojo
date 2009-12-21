@@ -175,10 +175,11 @@ Mojolicious - Web Framework
     sub startup {
         my $self = shift;
 
+        # Routes
         my $r = $self->routes;
 
-        $r->route('/:controller/:action')
-          ->to(controller => 'foo', action => 'bar');
+        # Default route
+        $r->route('/:controller/:action/:id')->to('foo#bar', id => 1);
     }
 
 =head1 DESCRIPTION

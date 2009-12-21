@@ -544,8 +544,7 @@ can be easily mixed to make the transition process very smooth.
     get '/bar' => sub { shift->render_text('This too!') };
 
     app->routes->namespace('MyApp');
-    app->routes->route('/foo/:action')->via('get')
-      ->to(controller => 'foo', action => index);
+    app->routes->route('/foo/:action')->via('get')->to('foo#index');
 
     shagadelic;
 

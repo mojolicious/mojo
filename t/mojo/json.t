@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 92;
+use Test::More tests => 94;
 
 use Mojo::ByteStream 'b';
 
@@ -211,6 +211,12 @@ $array = [undef, 0, 1, '', $json->true, $json->false];
 $string = $json->encode($array);
 ok($string);
 is_deeply($json->decode($string), $array);
+
+# Real world roundtrip
+$string = $json->encode({foo => 'c:\progra~1\mozill~1\firefox.exe'});
+is($string, '{"foo":"c:\\\\progra~1\\\\mozill~1\\\\firefox.exe"}');
+$hash = $json->decode($string);
+is_deeply($hash, {foo => 'c:\progra~1\mozill~1\firefox.exe'});
 
 # Errors
 is($json->decode('[[]'),    undef);

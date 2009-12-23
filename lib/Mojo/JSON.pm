@@ -63,14 +63,14 @@ my $VALUE_SEPARATOR_RE = qr/^$WHITESPACE_RE\,/;
 
 # Escaped special character map
 my $ESCAPE = {
-    '\"' => "\x22",
-    '\\' => "\x5c",
-    '\/' => "\x2f",
-    '\b' => "\x8",
-    '\f' => "\xC",
-    '\n' => "\xA",
-    '\r' => "\xD",
-    '\t' => "\x9"
+    '\"'   => "\x22",
+    '\\\\' => "\x5c",
+    '\/'   => "\x2f",
+    '\b'   => "\x8",
+    '\f'   => "\xC",
+    '\n'   => "\xA",
+    '\r'   => "\xD",
+    '\t'   => "\x9"
 };
 my $REVERSE_ESCAPE = {};
 for my $key (keys %$ESCAPE) { $REVERSE_ESCAPE->{$ESCAPE->{$key}} = $key }

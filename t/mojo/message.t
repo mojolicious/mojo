@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 447;
+use Test::More tests => 448;
 
 use File::Spec;
 use File::Temp;
@@ -685,6 +685,7 @@ is($req->body,            'hello=world');
 is_deeply($req->param('hello'), 'world');
 is($req->url->to_abs->to_string,
     'http://localhost:8080/foo/bar?lalala=23&bar=baz');
+is($req->env->{HTTP_EXPECT}, '100-continue');
 
 # Parse IIS 6.0 like CGI environment variables and a body (root)
 $req = Mojo::Message::Request->new;

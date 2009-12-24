@@ -10,6 +10,7 @@ use base 'Mojo::Message';
 use Mojo::Cookie::Request;
 use Mojo::Parameters;
 
+__PACKAGE__->attr(env => sub { {} });
 __PACKAGE__->attr(method => 'GET');
 __PACKAGE__->attr(url => sub { Mojo::URL->new });
 
@@ -162,6 +163,9 @@ sub _build_start_line {
 sub _parse_env {
     my ($self, $env) = @_;
     $env ||= \%ENV;
+
+    # Make environment accessible
+    $self->env($env);
 
     # Headers
     for my $name (keys %{$env}) {
@@ -360,6 +364,11 @@ L<Mojo::Message::Request> is a container for HTTP requests.
 
 L<Mojo::Message::Request> inherits all attributes from L<Mojo::Message> and
 implements the following new ones.
+
+=head2 C<env>
+
+    my $env = $req->env;
+    $req    = $req->env({});
 
 =head2 C<method>
 

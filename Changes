@@ -11,6 +11,7 @@ This file documents the revision history for Perl extension Mojo.
           route.
               $r->route('/foo')->to('mycontroller#myaction');
         - Added multipart post support to Test::Mojo. (yuki-kimoto)
+        - Added env attribute to Mojo::Message::Request.
         - Made param decoding more defensive and allow malformed data to pass
           through for debugging.
         - Reduced Mojolicious log output outside of development mode.

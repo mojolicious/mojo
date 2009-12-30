@@ -91,6 +91,9 @@ sub dispatch {
     # Try to find a static file
     my $e = $self->static->dispatch($c);
 
+    # Hook
+    $self->plugins->run_hook(after_static_dispatch => $c);
+
     # Use routes if we don't have a response yet
     $e = $self->routes->dispatch($c) if $e;
 

@@ -7,7 +7,6 @@ use warnings;
 
 use base 'Mojolicious::Plugin';
 
-use Mojo::Command;
 use Mojo::Template;
 
 # Clever things make people feel stupid and unexpected things make them feel
@@ -41,33 +40,19 @@ sub register {
                 # Encoding
                 $mt->encoding($r->encoding) if $r->encoding;
 
-                # Class
-                my $class =
-                     $c->stash->{template_class}
-                  || $ENV{MOJO_TEMPLATE_CLASS}
-                  || 'main';
-
                 # Try template
                 if (-r $path) { $$output = $mt->render_file($path, $c) }
 
                 # Try DATA section
-                elsif (my $d = Mojo::Command->new->get_data($t, $class)) {
+                elsif (my $d = $r->get_inline_template($c, $t)) {
                     $$output = $mt->render($d, $c);
                 }
 
                 # No template
                 else {
-
                     $c->app->log->error(
                         qq/Template "$t" missing or not readable./);
-                    my $options = {
-                        template  => 'not_found',
-                        format    => 'html',
-                        status    => 404,
-                        not_found => 1
-                    };
-                    $c->app->static->serve_404($c)
-                      if $c->stash->{not_found} || !$c->render($options);
+                    $c->render_not_found;
                     return;
                 }
 
@@ -79,19 +64,8 @@ sub register {
             if (ref $$output) {
                 my $e = $$output;
                 $$output = '';
-
-                # Log
                 $c->app->log->error(qq/Template error in "$t": $e/);
-
-                # Render exception template
-                my $options = {
-                    template  => 'exception',
-                    format    => 'html',
-                    status    => 500,
-                    exception => $e
-                };
-                $c->app->static->serve_500($c)
-                  if $c->stash->{exception} || !$c->render($options);
+                $c->render_exception($e);
             }
 
             # Success or exception?

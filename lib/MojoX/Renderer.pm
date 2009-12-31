@@ -9,6 +9,7 @@ use base 'Mojo::Base';
 
 use File::Spec;
 use Mojo::ByteStream 'b';
+use Mojo::Command;
 use Mojo::JSON;
 use MojoX::Types;
 
@@ -63,6 +64,19 @@ sub add_helper {
     $self->helper($helper);
 
     return $self;
+}
+
+sub get_inline_template {
+    my ($self, $c, $template) = @_;
+
+    # Class
+    my $class =
+         $c->stash->{template_class}
+      || $ENV{MOJO_TEMPLATE_CLASS}
+      || 'main';
+
+    # Get
+    return Mojo::Command->new->get_data($template, $class);
 }
 
 # Bodies are for hookers and fat people.
@@ -295,6 +309,10 @@ follwing the ones.
 =head2 C<add_helper>
 
     $renderer = $renderer->add_helper(url_for => sub { ... });
+
+=head2 C<get_inline_template>
+
+    my $template = $renderer->get_inline_template($c, 'foo.html.ep');
 
 =head2 C<render>
 

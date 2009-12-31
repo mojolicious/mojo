@@ -42,10 +42,11 @@ sub new {
     $self->renderer->root($self->home->rel_dir('templates'));
     $self->static->root($self->home->rel_dir('public'));
 
-    # Hide our methods
+    # Hide own controller methods
     $self->routes->hide(qw/client helper param pause redirect_to/);
-    $self->routes->hide(qw/render_json render_inner render_partial/);
-    $self->routes->hide(qw/render_text resume url_for/);
+    $self->routes->hide(qw/render_exception render_json render_inner/);
+    $self->routes->hide(qw/render_not_found render_partial render_text/);
+    $self->routes->hide(qw/resume url_for/);
 
     # Mode
     my $mode = $self->mode;
@@ -98,23 +99,10 @@ sub dispatch {
     $e = $self->routes->dispatch($c) if $e;
 
     # Exception
-    if (ref $e) {
-        $c->render(
-            template  => 'exception',
-            format    => 'html',
-            status    => 500,
-            exception => $e
-        ) or $self->static->serve_500($c);
-    }
+    if (ref $e) { $c->render_exception($e) }
 
     # Nothing found
-    elsif ($e) {
-        $c->render(
-            template => 'not_found',
-            format   => 'html',
-            status   => 404
-        ) or $self->static->serve_404($c);
-    }
+    elsif ($e) { $c->render_not_found }
 
     # Hook
     $self->plugins->run_hook(after_dispatch => $c);

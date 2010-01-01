@@ -45,7 +45,7 @@ sub authority {
 
         # Port
         my $port = undef;
-        if ($host =~ /^(.*)\:([^\:]*)$/) {
+        if ($host =~ /^(.*)\:(\d*)$/) {
             $host = $1;
             $port = $2;
         }

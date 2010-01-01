@@ -79,17 +79,20 @@ sub prepare_ioloop {
     # Listen
     $self->ioloop->listen($options);
 
-    # Event loop
-    my $loop = 'poll';
-    $loop = 'kqueue' if Mojo::IOLoop::KQUEUE();
-    $loop = 'epoll'  if Mojo::IOLoop::EPOLL();
+    # Features
+    my @features;
+    push @features, 'kqueue' if Mojo::IOLoop::KQUEUE();
+    push @features, 'epoll'  if Mojo::IOLoop::EPOLL();
+    push @features, 'ipv6'   if Mojo::IOLoop::IPV6();
+    my $features = join ', ', @features;
+    $features = " ($features)" if $features;
 
     # Log
     my $started = $file ? $file : "http://$address:$port";
-    $self->app->log->info("Server ($loop) started ($started)");
+    $self->app->log->info("Server$features started ($started)");
 
     # Friendly message
-    print "Server ($loop) available at $started.\n";
+    print "Server$features available at $started.\n";
 
     # Max clients
     $self->ioloop->max_clients($self->max_clients);

@@ -45,7 +45,7 @@ sub authority {
 
         # Port
         my $port = undef;
-        if ($host =~ /^([^\:]*)\:(.*)$/) {
+        if ($host =~ /^(.*)\:([^\:]*)$/) {
             $host = $1;
             $port = $2;
         }
@@ -58,8 +58,9 @@ sub authority {
         return $self;
     }
 
-    # *( unreserved / pct-encoded / sub-delims )
-    my $host = b($self->host)->url_escape("$UNRESERVED$SUBDELIM");
+    # *( unreserved / pct-encoded / sub-delims ), extended with "[" and "]"
+    # to support IPv6
+    my $host = b($self->host)->url_escape("$UNRESERVED$SUBDELIM\[\]");
     my $port = $self->port;
 
     # *( unreserved / pct-encoded / sub-delims / ":" )

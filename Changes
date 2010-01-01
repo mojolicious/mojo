@@ -5,6 +5,7 @@ This file documents the revision history for Perl extension Mojo.
         - Added charset plugin to Mojolicious. (charsbar)
         - Added native PSGI support.
         - Added simple reverse proxy support with tests.
+        - Added IPv6 support.
         - Added UNIX domain socket support to daemons.
         - Added transparent kqueue and epoll support to daemons and client.
         - Added simpler way to define default controller and action for a

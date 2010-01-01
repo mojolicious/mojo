@@ -17,6 +17,9 @@ use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
 use constant EPOLL => ($ENV{MOJO_POLL} || $ENV{MOJO_KQUEUE})
   ? 0
   : eval { require IO::Epoll; 1 };
+use constant IPV6 => $ENV{MOJO_NO_IPV6}
+  ? 0
+  : eval { require IO::Socket::INET6; 1 };
 use constant KQUEUE => ($ENV{MOJO_POLL} || $ENV{MOJO_EPOLL})
   ? 0
   : eval { require IO::KQueue; 1 };
@@ -57,17 +60,14 @@ sub connect {
     my $args = ref $_[0] ? $_[0] : {@_};
 
     # New connection
-    my $socket = IO::Socket::INET->new(
-        Proto => 'tcp',
-        Type  => SOCK_STREAM
+    my $class = IPV6 ? 'IO::Socket::INET6' : 'IO::Socket::INET';
+    my $socket = $class->new(
+        Blocking => 0,
+        PeerAddr => $args->{host},
+        PeerPort => $args->{port} || 80,
+        Proto    => 'tcp',
+        Type     => SOCK_STREAM
     ) or return;
-
-    # Non blocking
-    $socket->blocking(0);
-
-    # Connect
-    my $sin = sockaddr_in($args->{port} || 80, inet_aton($args->{host}));
-    $socket->connect($sin);
 
     # Add connection
     $self->_connections->{$socket} = {
@@ -167,8 +167,9 @@ sub listen {
 
     # Options
     my %options = (
-        Listen => $args->{queue_size} || SOMAXCONN,
-        Type => SOCK_STREAM
+        Blocking => 0,
+        Listen   => $args->{queue_size} || SOMAXCONN,
+        Type     => SOCK_STREAM
     );
 
     # Listen on UNIX domain socket
@@ -194,12 +195,10 @@ sub listen {
         $options{ReuseAddr} = 1;
 
         # Create socket
-        $listen = IO::Socket::INET->new(%options)
+        my $class = IPV6 ? 'IO::Socket::INET6' : 'IO::Socket::INET';
+        $listen = $class->new(%options)
           or croak "Can't create listen socket: $!";
     }
-
-    # Non blocking
-    $listen->blocking(0);
 
     # Add listen socket
     $self->_listen($listen);
@@ -213,9 +212,8 @@ sub listen {
 
 sub local_info {
     my ($self, $id) = @_;
-    my ($port, $addr) =
-      sockaddr_in(getsockname($self->_connections->{$id}->{socket}));
-    return {address => inet_ntoa($addr), port => $port};
+    my $socket = $self->_connections->{$id}->{socket};
+    return {address => $socket->sockhost, port => $socket->sockport};
 }
 
 sub not_writing {
@@ -258,9 +256,8 @@ sub read_cb { shift->_add_event('read', @_) }
 
 sub remote_info {
     my ($self, $id) = @_;
-    my ($port, $addr) =
-      sockaddr_in(getpeername($self->_connections->{$id}->{socket}));
-    return {address => inet_ntoa($addr), port => $port};
+    my $socket = $self->_connections->{$id}->{socket};
+    return {address => $socket->peerhost, port => $socket->peerport};
 }
 
 sub start {

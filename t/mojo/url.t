@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 75;
+use Test::More tests => 81;
 
 # I don't want you driving around in a car you built yourself.
 # You can sit there complaining, or you can knit me some seat belts.
@@ -139,3 +139,12 @@ is($clone->base->scheme,      'http');
 is($clone->base->host,        '127.0.0.1');
 is($clone->path,              '/test/index.html');
 is($clone->to_abs->to_string, 'http://127.0.0.1/test/index.html');
+
+# IPv6
+$url = Mojo::URL->new('http://[::1]:3000/');
+is($url->is_abs, 1);
+is($url->scheme, 'http');
+is($url->host,   '[::1]');
+is($url->port,   3000);
+is($url->path,   '/');
+is("$url",       'http://[::1]:3000/');

@@ -14,18 +14,29 @@ use IO::Socket;
 use Mojo::Buffer;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
+
+# Epoll support requires IO::Epoll
 use constant EPOLL => ($ENV{MOJO_POLL} || $ENV{MOJO_KQUEUE})
   ? 0
   : eval { require IO::Epoll; 1 };
+
+# IPv6 support requires IO::Socket::INET6
 use constant IPV6 => $ENV{MOJO_NO_IPV6}
   ? 0
   : eval { require IO::Socket::INET6; 1 };
+
+# KQueue support requires IO::KQueue
 use constant KQUEUE => ($ENV{MOJO_POLL} || $ENV{MOJO_EPOLL})
   ? 0
   : eval { require IO::KQueue; 1 };
 
+# SSL support requires IO::Socket::SSL
+use constant SSL => $ENV{MOJO_NO_SSL}
+  ? 0
+  : eval { require IO::Socket::SSL; 1 };
+
 __PACKAGE__->attr(
-    [qw/accept_cb lock_cb unlock_cb/] => sub {
+    [qw/lock_cb unlock_cb/] => sub {
         sub {1}
     }
 );
@@ -34,9 +45,9 @@ __PACKAGE__->attr([qw/clients servers connecting/]     => 0);
 __PACKAGE__->attr(max_clients                          => 1000);
 __PACKAGE__->attr(timeout                              => '0.25');
 
-__PACKAGE__->attr(_accepted               => sub { [] });
-__PACKAGE__->attr([qw/_connections _fds/] => sub { {} });
-__PACKAGE__->attr([qw/_listen _listening _running/]);
+__PACKAGE__->attr(_accepted                       => sub { [] });
+__PACKAGE__->attr([qw/_connections _fds _listen/] => sub { {} });
+__PACKAGE__->attr([qw/_listening _running/]);
 __PACKAGE__->attr(
     _loop => sub {
 
@@ -195,13 +206,16 @@ sub listen {
         $options{ReuseAddr} = 1;
 
         # Create socket
-        my $class = IPV6 ? 'IO::Socket::INET6' : 'IO::Socket::INET';
+        my $class =
+            SSL && $args->{ssl} ? 'IO::Socket::SSL'
+          : IPV6 ? 'IO::Socket::INET6'
+          :        'IO::Socket::INET';
         $listen = $class->new(%options)
           or croak "Can't create listen socket: $!";
     }
 
     # Add listen socket
-    $self->_listen($listen);
+    $self->_listen->{$listen} = {socket => $listen, cb => $args->{cb}};
 
     # File descriptor
     my $fd = fileno($listen);
@@ -437,7 +451,7 @@ sub _hup {
 sub _is_listening {
     my $self = shift;
     return 1
-      if $self->_listen
+      if keys %{$self->_listen}
           && $self->clients < $self->max_clients
           && $self->lock_cb->($self, !keys %{$self->_connections});
     return 0;
@@ -478,7 +492,7 @@ sub _prepare {
     # Nothing to do
     return $self->_running(0)
       unless keys %{$self->_connections}
-          || $self->_listen
+          || keys %{$self->_listen}
           || $self->connecting;
 
     return;
@@ -487,11 +501,21 @@ sub _prepare {
 sub _read {
     my ($self, $id) = @_;
 
-    # New connection
-    if ($self->_listen && $id eq $self->_listen) {
+    # New connection?
+    my $listen;
+    for my $li (keys %{$self->_listen}) {
+        my $l = $self->_listen->{$li}->{socket};
+        if ($id eq $l) {
+            $listen = $l;
+            last;
+        }
+    }
+
+    # Accept new connection
+    if ($listen) {
 
         # Accept
-        my $socket = $self->_listen->accept or return;
+        my $socket = $listen->accept or return;
         push @{$self->_accepted}, [$socket, time];
 
         # Add connection
@@ -509,19 +533,24 @@ sub _read {
         $self->clients($self->clients + 1);
 
         # Accept callback
-        $self->accept_cb->($self, "$socket");
+        $self->_listen->{$listen}->{cb}->($self, "$socket");
 
         # Unlock
         $self->unlock_cb->($self);
 
-        # Remove listen socket from kqueue
-        if (KQUEUE) {
-            $self->_loop->EV_SET(fileno($self->_listen),
-                IO::KQueue::EVFILT_READ(), IO::KQueue::EV_DELETE());
-        }
+        # Remove listen sockets
+        for my $li (keys %{$self->_listen}) {
+            my $l = $self->_listen->{$li}->{socket};
 
-        # Remove listen socket from poll or epoll
-        else { $self->_loop->remove($self->_listen) }
+            # Remove listen socket from kqueue
+            if (KQUEUE) {
+                $self->_loop->EV_SET(fileno($l), IO::KQueue::EVFILT_READ(),
+                    IO::KQueue::EV_DELETE());
+            }
+
+            # Remove listen socket from poll or epoll
+            else { $self->_loop->remove($l) }
+        }
 
         # Not listening anymore
         $self->_listening(0);
@@ -554,18 +583,23 @@ sub _spin {
 
     # Listening?
     if (!$self->_listening && $self->_is_listening) {
-        my $fd = fileno($self->_listen);
 
-        # KQueue
-        $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_READ(),
-            IO::KQueue::EV_ADD())
-          if KQUEUE;
+        # Add listen sockets
+        for my $l (keys %{$self->_listen}) {
+            my $listen = $self->_listen->{$l}->{socket};
+            my $fd     = fileno($listen);
 
-        # Epoll
-        $self->_loop->mask($self->_listen, IO::Epoll::POLLIN()) if EPOLL;
+            # KQueue
+            $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_READ(),
+                IO::KQueue::EV_ADD())
+              if KQUEUE;
 
-        # Poll
-        $self->_loop->mask($self->_listen, POLLIN) unless KQUEUE || EPOLL;
+            # Epoll
+            $self->_loop->mask($listen, IO::Epoll::POLLIN()) if EPOLL;
+
+            # Poll
+            $self->_loop->mask($listen, POLLIN) unless KQUEUE || EPOLL;
+        }
 
         # Listening
         $self->_listening(1);
@@ -694,31 +728,31 @@ Mojo::IOLoop - IO Loop
 
     # Create loop and listen on port 3000
     my $loop = Mojo::IOLoop->new;
-    $loop->listen(port => 3000);
-
-    # Accept connections
-    $loop->accept_cb(sub {
-        my ($self, $id) = @_;
-
-        # Incoming data
-        $self->read_cb($id => sub {
-            my ($self, $id, $chunk) = @_;
-
-            # Got some data, time to write
-            $self->writing($id);
-        });
-
-        # Ready to write
-        $self->write_cb($id => sub {
+    $loop->listen(
+        port => 3000,
+        cb   => sub {
             my ($self, $id) = @_;
 
-            # Back to reading only
-            $self->not_writing($id);
+            # Incoming data
+            $self->read_cb($id => sub {
+                my ($self, $id, $chunk) = @_;
 
-            # The loop will take care of buffering for us
-            return 'HTTP/1.1 200 OK';
-        });
-    });
+                # Got some data, time to write
+                $self->writing($id);
+            });
+
+            # Ready to write
+            $self->write_cb($id => sub {
+                my ($self, $id) = @_;
+
+                # Back to reading only
+                $self->not_writing($id);
+
+                # The loop will take care of buffering for us
+                return 'HTTP/1.1 200 OK';
+            });
+        }
+    );
 
     # Start and stop loop
     $loop->start;
@@ -733,11 +767,6 @@ L<IO::Poll>, L<IO::KQueue> and L<IO::Epoll> are supported transparently.
 =head2 ATTRIBUTES
 
 L<Mojo::IOLoop> implements the following attributes.
-
-=head2 C<accept_cb>
-
-    my $cb = $loop->accept_cb;
-    $loop  = $loop->accept_cb(sub { ... });
 
 =head2 C<accept_timeout>
 

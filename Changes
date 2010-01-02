@@ -6,13 +6,20 @@ This file documents the revision history for Perl extension Mojo.
         - Added native PSGI support.
         - Added simple reverse proxy support with tests.
         - Added IPv6 support.
+        - Added SSL support.
         - Added UNIX domain socket support to daemons.
         - Added transparent kqueue and epoll support to daemons and client.
+        - Added support for listening to multiple locations to the daemons.
+              mojo daemon --listen http:127.0.0.1:3000
+              mojo daemon --listen http:127.0.0.1:3000,file:/tmp/my.sock
+              mojo daemon --listen http:*:3000,http:*:3001,http:*:3002
+              mojo daemon --listen http:[::1]:3000,https:*:3001
         - Added simpler way to define default controller and action for a
           route.
               $r->route('/foo')->to('mycontroller#myaction');
         - Added multipart post support to Test::Mojo. (yuki-kimoto)
         - Added env attribute to Mojo::Message::Request.
+        - Added version command.
         - Made param decoding more defensive and allow malformed data to pass
           through for debugging.
         - Reduced Mojolicious log output outside of development mode.

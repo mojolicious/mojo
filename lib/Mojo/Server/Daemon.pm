@@ -16,7 +16,7 @@ use Mojo::IOLoop;
 use Mojo::Transaction::Pipeline;
 use Scalar::Util qw/isweak weaken/;
 
-__PACKAGE__->attr([qw/address file group listen_queue_size user/]);
+__PACKAGE__->attr([qw/group listen listen_queue_size user/]);
 __PACKAGE__->attr(ioloop => sub { Mojo::IOLoop->new });
 __PACKAGE__->attr(keep_alive_timeout => 15);
 __PACKAGE__->attr(
@@ -33,7 +33,6 @@ __PACKAGE__->attr(
             'mojo_daemon.pid');
     }
 );
-__PACKAGE__->attr(port => 3000);
 
 __PACKAGE__->attr(_connections => sub { {} });
 __PACKAGE__->attr('_lock');
@@ -59,65 +58,12 @@ sub prepare_ioloop {
     # Unlock callback
     $self->ioloop->unlock_cb(sub { $self->accept_unlock });
 
-    my $options = {};
-
-    # File
-    my $file = $options->{file} = $self->file;
-
-    # Address
-    my $address = $self->address;
-    $options->{address} = $address if $address;
-    $address ||= '127.0.0.1';
-
-    # Port
-    my $port = $options->{port} = $self->port;
-
-    # Listen queue size
-    my $queue = $self->listen_queue_size;
-    $options->{queue_size} = $queue if $queue;
-
     # Listen
-    $self->ioloop->listen($options);
-
-    # Features
-    my @features;
-    push @features, 'kqueue' if Mojo::IOLoop::KQUEUE();
-    push @features, 'epoll'  if Mojo::IOLoop::EPOLL();
-    push @features, 'ipv6'   if Mojo::IOLoop::IPV6();
-    my $features = join ', ', @features;
-    $features = " ($features)" if $features;
-
-    # Log
-    my $started = $file ? $file : "http://$address:$port";
-    $self->app->log->info("Server$features started ($started)");
-
-    # Friendly message
-    print "Server$features available at $started.\n";
+    my $listen = $self->listen || 'http:*:3000';
+    $self->_listen($_) for split ',', $listen;
 
     # Max clients
     $self->ioloop->max_clients($self->max_clients);
-
-    # Weaken
-    weaken $self;
-
-    # Accept callback
-    $self->ioloop->accept_cb(
-        sub {
-            my ($loop, $id) = @_;
-
-            # Add new connection
-            $self->_connections->{$id} = {};
-
-            # Keep alive timeout
-            $loop->connection_timeout($id => $self->keep_alive_timeout);
-
-            # Callbacks
-            $loop->error_cb($id => sub { $self->_error(@_) });
-            $loop->hup_cb($id => sub { $self->_hup(@_) });
-            $loop->read_cb($id => sub { $self->_read(@_) });
-            $loop->write_cb($id => sub { $self->_write(@_) });
-        }
-    );
 }
 
 sub prepare_lock_file {
@@ -143,7 +89,6 @@ sub prepare_pid_file {
           or croak qq/Can't open PID file "$file": $!/;
         my $pid = <$fh>;
         warn "Server already running with PID $pid.\n" if kill 0, $pid;
-        warn "Removing PID file for defunct server process $pid.\n";
         warn qq/Can't unlink PID file "$file".\n/
           unless -w $file && unlink $file;
     }
@@ -274,6 +219,12 @@ sub _create_pipeline {
             # Build transaction
             my $tx = $self->build_tx_cb->($self);
 
+            # SSL
+            if ($conn->{ssl}) {
+                $tx->req->url->scheme('https');
+                $tx->req->url->base->scheme('https');
+            }
+
             # Handler callback
             $tx->handler_cb(
                 sub {
@@ -330,6 +281,64 @@ sub _hup {
 
     # Drop
     $self->_drop($id);
+}
+
+sub _listen {
+    my ($self, $listen) = @_;
+
+    # Shortcut
+    return unless $listen;
+
+    # Options
+    my $options = {};
+
+    # UNIX domain socket
+    if ($listen =~ /^file\:(.+)$/) { $options->{file} = $1 }
+
+    # Internet socket
+    elsif ($listen =~ /^(http(?:s)?)\:(.+)\:(\d+)$/) {
+        $options->{ssl} = 1 if $1 eq 'https';
+        $options->{address} = $2 unless $2 eq '*';
+        $options->{port} = $3;
+    }
+
+    # Listen queue size
+    my $queue = $self->listen_queue_size;
+    $options->{queue_size} = $queue if $queue;
+
+    # Weaken
+    weaken $self;
+
+    # Accept callback
+    $options->{cb} = sub {
+        my ($loop, $id) = @_;
+
+        # Add new connection
+        $self->_connections->{$id} = {ssl => $options->{ssl} ? 1 : 0};
+
+        # Keep alive timeout
+        $loop->connection_timeout($id => $self->keep_alive_timeout);
+
+        # Callbacks
+        $loop->error_cb($id => sub { $self->_error(@_) });
+        $loop->hup_cb($id => sub { $self->_hup(@_) });
+        $loop->read_cb($id => sub { $self->_read(@_) });
+        $loop->write_cb($id => sub { $self->_write(@_) });
+    };
+
+    # Listen
+    $self->ioloop->listen($options);
+
+    # Log
+    my $file    = $options->{file};
+    my $address = $options->{address} || 'localhost';
+    my $port    = $options->{port};
+    my $scheme  = $options->{ssl} ? 'https' : 'http';
+    my $started = $file ? $file : "$scheme://$address:$port";
+    $self->app->log->info("Server listening ($started)");
+
+    # Friendly message
+    print "Server available at $started.\n";
 }
 
 sub _read {
@@ -398,16 +407,6 @@ L<Mojo::Server::Daemon> is a simple and portable async io based HTTP server.
 L<Mojo::Server::Daemon> inherits all attributes from L<Mojo::Server> and
 implements the following new ones.
 
-=head2 C<address>
-
-    my $address = $daemon->address;
-    $daemon     = $daemon->address('127.0.0.1');
-
-=head2 C<file>
-
-    my $file = $daemon->file;
-    $daemon  = $daemon->file('/tmp/mojo.sock');
-
 =head2 C<group>
 
     my $group = $daemon->group;
@@ -422,6 +421,11 @@ implements the following new ones.
 
     my $keep_alive_timeout = $daemon->keep_alive_timeout;
     $daemon                = $daemon->keep_alive_timeout(15);
+
+=head2 C<listen>
+
+    my $listen = $daemon->listen;
+    $daemon    = $daemon->listen('https:localhost:3000,file:/my.sock');
 
 =head2 C<listen_queue_size>
 
@@ -447,11 +451,6 @@ implements the following new ones.
 
     my $pid_file = $daemon->pid_file;
     $daemon      = $daemon->pid_file('/tmp/mojo_daemon.pid');
-
-=head2 C<port>
-
-    my $port = $daemon->port;
-    $daemon  = $daemon->port(3000);
 
 =head2 C<user>
 

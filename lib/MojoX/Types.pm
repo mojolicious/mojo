@@ -21,6 +21,7 @@ __PACKAGE__->attr(
             jpg  => 'image/jpeg',
             js   => 'application/x-javascript',
             json => 'application/json',
+            mp3  => 'audio/mpeg',
             png  => 'image/png',
             rss  => 'application/rss+xml',
             tar  => 'application/x-tar',

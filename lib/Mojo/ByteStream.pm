@@ -274,10 +274,7 @@ my %ENTITIES = (
 );
 
 # Reverse entities for html_escape
-my %REVERSE_ENTITIES;
-while (my ($name, $value) = each %ENTITIES) {
-    $REVERSE_ENTITIES{$value} = $name;
-}
+my %REVERSE_ENTITIES = reverse %ENTITIES;
 
 # Unreserved character map for url_sanitize
 my %UNRESERVED;

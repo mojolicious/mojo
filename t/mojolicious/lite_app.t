@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 252;
+use Test::More tests => 273;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -507,6 +507,26 @@ $t->get_ok('/param_auth/too?name=Bender')->status_is(200)
   ->header_is(Server         => 'Mojo (Perl)')
   ->header_is('X-Powered-By' => 'Mojo (Perl)')
   ->content_is('You could be Bender too!');
+
+# GET /hello.txt (static file)
+$t->get_ok('/hello.txt')->status_is(200)->header_is(Server => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojo (Perl)')
+  ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 30)
+  ->content_is('Hello Mojo from a static file!');
+
+# GET /hello.txt (partial static file)
+$t->get_ok('/hello.txt', {'Range' => 'bytes=2-8'})->status_is(206)
+  ->header_is(Server          => 'Mojo (Perl)')
+  ->header_is('X-Powered-By'  => 'Mojo (Perl)')
+  ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 7)
+  ->content_is('llo Moj');
+
+# GET /hello.txt (partial static file)
+$t->get_ok('/hello.txt', {'Range' => 'bytes=0-8'})->status_is(206)
+  ->header_is(Server          => 'Mojo (Perl)')
+  ->header_is('X-Powered-By'  => 'Mojo (Perl)')
+  ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 9)
+  ->content_is('Hello Moj');
 
 __DATA__
 @@ template.txt.epl

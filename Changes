@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojo.
 
-0.999915 2009-12-10 00:00:00
+0.999915 2010-01-10 00:00:00
         - Added routes captures to params in Mojolicious.
         - Added charset plugin to Mojolicious. (charsbar)
         - Added native PSGI support.
@@ -20,6 +20,7 @@ This file documents the revision history for Perl extension Mojo.
               $r->route('/foo')->to('mycontroller#myaction');
         - Added multipart post support to Test::Mojo. (yuki-kimoto)
         - Added env attribute to Mojo::Message::Request.
+        - Added range support to MojoX::Dispatcher::Static. (xantus)
         - Added version command.
         - Made param decoding more defensive and allow malformed data to pass
           through for debugging.

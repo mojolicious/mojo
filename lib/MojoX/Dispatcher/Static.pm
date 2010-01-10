@@ -84,13 +84,43 @@ sub serve {
                 }
             }
 
+            $res->code(200);
+
+            # Partial content
+            my $size = $stat->size;
+            my ($start, $end) = (0, $size - 1 || 0);
+            if (my $range = $req->headers->header('Range')) {
+                if ($range =~ m/^bytes=(\d+)\-(\d+)?/ && $1 <= $end) {
+                    $start = $1;
+                    $end = $2 if $2 && $2 <= $end;
+                    $res->code(206);
+                    $res->headers->header('Content-Length',
+                        $end - $start + 1);
+                    $res->headers->header('Content-Range',
+                        "bytes $start-$end/$size");
+                    $c->app->log->debug("Range request: $start-$end/$size.");
+                }
+                else {
+
+                    # Not satisfiable
+                    $res->code(416);
+                    return;
+                }
+            }
+
+            # Content
             $res->content(
                 Mojo::Content::Single->new(
-                    asset   => Mojo::Asset::File->new,
+                    asset => Mojo::Asset::File->new(
+                        start_range => $start,
+                        end_range   => $end
+                    ),
                     headers => $res->headers
                 )
             );
-            $res->code(200);
+
+            # Accept ranges
+            $res->headers->header('Accept-Ranges', 'bytes');
 
             # Last modified
             $res->headers->header('Last-Modified',

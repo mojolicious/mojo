@@ -6,6 +6,8 @@ use strict;
 use warnings;
 
 use base 'Mojo::Base';
+use Carp 'croak';
+
 
 use Mojo::URL;
 
@@ -72,18 +74,21 @@ sub url_for {
     # Named
     if ($name) {
 
+        my $found=0;
         # Find endpoint
         my @children = ($self->root);
         while (my $child = shift @children) {
 
             if (($child->name || '') eq $name) {
                 $endpoint = $child;
+                $found++;                
                 last;
             }
 
             # Append
             push @children, @{$child->children};
         }
+        croak qq/Route "$name" used in url_for does not exist/ unless $found;
     }
 
     # Merge values

@@ -15,6 +15,7 @@ use IO::File;
 use Mojo::IOLoop;
 use Mojo::Transaction::Pipeline;
 use Scalar::Util qw/isweak weaken/;
+use Sys::Hostname 'hostname';
 
 __PACKAGE__->attr([qw/group listen listen_queue_size user/]);
 __PACKAGE__->attr(ioloop => sub { Mojo::IOLoop->new });
@@ -296,10 +297,12 @@ sub _listen {
     if ($listen =~ /^file\:(.+)$/) { $options->{file} = $1 }
 
     # Internet socket
-    elsif ($listen =~ /^(http(?:s)?)\:(.+)\:(\d+)$/) {
+    elsif ($listen =~ /^(http(?:s)?)\:(.+)\:(\d+)(?:\:(.*)\:(.*))?$/) {
         $options->{ssl} = 1 if $1 eq 'https';
-        $options->{address} = $2 unless $2 eq '*';
-        $options->{port} = $3;
+        $options->{address}  = $2 unless $2 eq '*';
+        $options->{port}     = $3;
+        $options->{ssl_cert} = $4 if $4;
+        $options->{ssl_key}  = $5 if $5;
     }
 
     # Listen queue size
@@ -331,7 +334,7 @@ sub _listen {
 
     # Log
     my $file    = $options->{file};
-    my $address = $options->{address} || 'localhost';
+    my $address = $options->{address} || hostname;
     my $port    = $options->{port};
     my $scheme  = $options->{ssl} ? 'https' : 'http';
     my $started = $file ? $file : "$scheme://$address:$port";

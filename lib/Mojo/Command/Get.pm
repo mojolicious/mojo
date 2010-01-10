@@ -40,7 +40,7 @@ sub run {
 
     # Application
     $client->app($ENV{MOJO_APP} || 'Mojo::HelloWorld')
-      unless $url =~ /^http:\/\//;
+      unless $url =~ /^\w+:\/\//;
 
     # Transaction
     my $tx = Mojo::Transaction::Single->new;
@@ -57,6 +57,10 @@ sub run {
 
     # Request
     $client->process($tx);
+
+    # Error
+    my $error = $tx->error;
+    print "Error: $error\n" if $error;
 
     return $self;
 }

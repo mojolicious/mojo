@@ -16,7 +16,7 @@ use Mojo::Transaction::Single;
 use Scalar::Util qw/isweak weaken/;
 use Socket;
 
-__PACKAGE__->attr([qw/app default_cb/]);
+__PACKAGE__->attr([qw/app default_cb ssl_ca_file ssl_verify_cb/]);
 __PACKAGE__->attr([qw/continue_timeout max_keep_alive_connections/] => 5);
 __PACKAGE__->attr(cookie_jar => sub { Mojo::CookieJar->new });
 __PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->new });
@@ -522,7 +522,10 @@ sub _queue {
         $id = $self->ioloop->connect(
             host => $host,
             port => $port,
-            cb   => $connected
+            ssl  => $scheme eq 'https' ? 1 : 0,
+            ssl_ca_file => $self->ssl_ca_file || $ENV{MOJO_CA_FILE},
+            ssl_verify_cb => $self->ssl_verify_cb,
+            cb            => $connected
         );
 
         # Error
@@ -725,6 +728,16 @@ L<Mojo::Client> implements the following attributes.
 
     my $max_redirects = $client->max_redirects;
     $client           = $client->max_redirects(3);
+
+=head2 C<ssl_ca_file>
+
+    my $ssl_ca_file = $client->ssl_ca_file;
+    $client         = $client->ssl_ca_file('/etc/ssl/cacerts.pem');
+
+=head2 C<ssl_verify_cb>
+
+    my $ssl_verify_cb = $client->ssl_verify_cb;
+    $client           = $client->ssl_verify_cb(sub {...});
 
 =head1 METHODS
 

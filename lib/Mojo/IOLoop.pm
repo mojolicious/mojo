@@ -70,15 +70,28 @@ sub connect {
     # Arguments
     my $args = ref $_[0] ? $_[0] : {@_};
 
-    # New connection
-    my $class = IPV6 ? 'IO::Socket::INET6' : 'IO::Socket::INET';
-    my $socket = $class->new(
-        Blocking => 0,
+    # Options (SSL only works blocking)
+    my %options = (
+        Blocking => $args->{ssl} ? 1 : 0,
         PeerAddr => $args->{host},
-        PeerPort => $args->{port} || 80,
+        PeerPort => $args->{port} || ($args->{ssl} ? 443 : 80),
         Proto    => 'tcp',
         Type     => SOCK_STREAM
-    ) or return;
+    );
+
+    # SSL certificate verification
+    if ($args->{ssl} && $args->{ssl_ca_file}) {
+        $options{SSL_ca_file}         = $args->{ssl_ca_file};
+        $options{SSL_verify_mode}     = 0x01;
+        $options{SSL_verify_callback} = $args->{ssl_verify_cb};
+    }
+
+    # New connection
+    my $class =
+        SSL && $args->{ssl} ? 'IO::Socket::SSL'
+      : IPV6 ? 'IO::Socket::INET6'
+      :        'IO::Socket::INET';
+    my $socket = $class->new(%options) or return;
 
     # Add connection
     $self->_connections->{$socket} = {
@@ -176,18 +189,18 @@ sub listen {
     # Arguments
     my $args = ref $_[0] ? $_[0] : {@_};
 
-    # Options
+    # Options (SSL only works blocking)
     my %options = (
-        Blocking => 0,
-        Listen   => $args->{queue_size} || SOMAXCONN,
-        Type     => SOCK_STREAM
+        Blocking => $args->{ssl} ? 1 : 0,
+        Listen => $args->{queue_size} || SOMAXCONN,
+        Type => SOCK_STREAM
     );
 
     # Listen on UNIX domain socket
     my $listen;
     if (my $file = $args->{file}) {
 
-        # Options
+        # Path
         $options{Local} = $file;
 
         # Create socket
@@ -198,12 +211,16 @@ sub listen {
     # Listen on port
     else {
 
-        # Options
+        # Socket options
         my $address = $args->{address};
         $options{LocalAddr} = $address if $address;
         $options{LocalPort} = $args->{port} || 3000;
         $options{Proto}     = 'tcp';
         $options{ReuseAddr} = 1;
+        my $cert = $args->{ssl_cert};
+        $options{SSL_cert_file} = $cert if $cert;
+        my $key = $args->{ssl_key};
+        $options{SSL_key_file} = $key if $key;
 
         # Create socket
         my $class =

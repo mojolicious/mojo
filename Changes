@@ -13,7 +13,8 @@ This file documents the revision history for Perl extension Mojo.
               mojo daemon --listen http:127.0.0.1:3000
               mojo daemon --listen http:127.0.0.1:3000,file:/tmp/my.sock
               mojo daemon --listen http:*:3000,http:*:3001,http:*:3002
-              mojo daemon --listen http:[::1]:3000,https:*:3001
+              mojo daemon --listen http:[::1]:3000
+              mojo daemon --listen https:*:3001:/foo/server.crt:/foo/server.key
         - Added simpler way to define default controller and action for a
           route.
               $r->route('/foo')->to('mycontroller#myaction');

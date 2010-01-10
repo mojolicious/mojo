@@ -89,14 +89,17 @@ sub client_info {
 
     my $scheme = $self->req->url->scheme;
     my $host   = $self->req->url->host;
-    my $port   = $self->req->url->port || 80;
+    my $port   = $self->req->url->port;
 
     # Proxy
     if (my $proxy = $self->req->proxy) {
         $scheme = $proxy->scheme;
         $host   = $proxy->host;
-        $port   = $proxy->port || 80;
+        $port   = $proxy->port;
     }
+
+    # Default port
+    $port ||= $scheme eq 'https' ? 443 : 80;
 
     return {host => $host, port => $port, scheme => $scheme};
 }

@@ -99,6 +99,7 @@ sub client_info {
     }
 
     # Default port
+    $scheme ||= 'http';
     $port ||= $scheme eq 'https' ? 443 : 80;
 
     return {host => $host, port => $port, scheme => $scheme};

@@ -241,6 +241,8 @@ Mark Stosberg
 
 Maksym Komar
 
+Maxim Vuets
+
 Mirko Westermeier
 
 Pascal Gaudette

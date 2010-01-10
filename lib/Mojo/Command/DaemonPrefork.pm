@@ -63,7 +63,7 @@ sub run {
         'interval=i'  => sub { $daemon->cleanup_interval($_[1]) },
         'keepalive=i' => sub { $daemon->keep_alive_timeout($_[1]) },
         'listen=s'    => sub { $daemon->listen($_[1]) },
-        'lock'        => sub { $daemon->lock_file($_[1]) },
+        'lock=s'      => sub { $daemon->lock_file($_[1]) },
         'maxspare=i'  => sub { $daemon->max_spare_servers($_[1]) },
         'minspare=i'  => sub { $daemon->min_spare_servers($_[1]) },
         'pid=s'       => sub { $daemon->pid_file($_[1]) },

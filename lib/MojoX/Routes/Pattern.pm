@@ -50,8 +50,7 @@ sub parse {
     return $self unless $pattern;
 
     # Format
-    $pattern =~ /\.([^\/\)]+)$/;
-    $self->format($1) if $1;
+    if ($pattern =~ /\.([^\/\)]+)$/) { $self->format($1) }
 
     # Requirements
     my $reqs = ref $_[0] eq 'HASH' ? $_[0] : {@_};

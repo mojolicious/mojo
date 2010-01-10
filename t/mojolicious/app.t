@@ -60,7 +60,7 @@ $t->get_ok('/foo-bar', {'X-Test' => 'Hi there!'})->status_is(200)
   ->content_like(qr/Hello Mojo from the other template \/foo-bar!/);
 
 # Foo::something
-$t->get_ok('/test4', {'X-Test' => 'Hi there!'})->status_is(200)
+$t->get_ok('/somethingtest', {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server         => 'Mojo (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('/test4/42');

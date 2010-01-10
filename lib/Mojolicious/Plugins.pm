@@ -69,7 +69,8 @@ sub load_plugin {
         return $self;
     }
 
-    return $self;
+    # Not found
+    die qq/Plugin "$name" missing, maybe you need to install it?\n/;
 }
 
 sub run_hook {

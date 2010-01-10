@@ -34,6 +34,7 @@ This file documents the revision history for Perl extension Mojo.
         - Fixed multipart charset handling and added the ability to disable
           param decoding.
         - Fixed format detection bug. (marcus)
+        - Fixed named url_for test. (marcus)
 
 0.999914 2009-11-24 00:00:00
         - Added the Mojolicious plugin system.

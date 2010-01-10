@@ -46,6 +46,7 @@ sub startup {
     $r->route('/test4/:something')->to('foo#something', something => 23)
       ->name('something');
 
+    # /somethingtest - refer to another route with url_for
     $r->route('/somethingtest')->to('foo#something');
 
     # /test3 - no class, just a namespace

@@ -809,7 +809,8 @@ Mojo::IOLoop - IO Loop
 
 L<Mojo::IOLoop> is a general purpose IO loop for TCP clients and servers,
 easy to subclass and extend.
-L<IO::Poll>, L<IO::KQueue> and L<IO::Epoll> are supported transparently.
+L<IO::Poll>, L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::INET6> and
+L<IO::Socket::SSL> are supported transparently.
 
 =head2 ATTRIBUTES
 

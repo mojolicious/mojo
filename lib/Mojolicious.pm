@@ -207,12 +207,12 @@ following new ones.
 =head2 C<renderer>
 
     my $renderer = $mojo->renderer;
-    $mojo        = $mojo->renderer(Mojolicious::Renderer->new);
+    $mojo        = $mojo->renderer(MojoX::Renderer->new);
 
 =head2 C<routes>
 
     my $routes = $mojo->routes;
-    $mojo      = $mojo->routes(Mojolicious::Dispatcher->new);
+    $mojo      = $mojo->routes(MojoX::Dispatcher::Routes->new);
 
 =head2 C<static>
 

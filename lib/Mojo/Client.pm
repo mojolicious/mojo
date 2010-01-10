@@ -257,7 +257,7 @@ sub _build_tx {
     # Headers
     my $headers = ref $_[0] eq 'HASH' ? $_[0] : {@_};
     for my $name (keys %$headers) {
-        $req->headers->header($name, $headers->{$name});
+        $req->headers->header($name => $headers->{$name});
     }
 
     # Queue transaction with callback

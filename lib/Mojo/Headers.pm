@@ -139,18 +139,18 @@ sub build {
     return length $headers ? $headers : undef;
 }
 
-sub connection          { shift->header('Connection',          @_) }
-sub content_disposition { shift->header('Content-Disposition', @_) }
-sub content_length      { shift->header('Content-Length',      @_) }
+sub connection          { shift->header(Connection            => @_) }
+sub content_disposition { shift->header('Content-Disposition' => @_) }
+sub content_length      { shift->header('Content-Length'      => @_) }
 
 sub content_transfer_encoding {
-    shift->header('Content-Transfer-Encoding', @_);
+    shift->header('Content-Transfer-Encoding' => @_);
 }
 
-sub content_type { shift->header('Content-Type', @_) }
-sub cookie       { shift->header('Cookie',       @_) }
-sub date         { shift->header('Date',         @_) }
-sub expect       { shift->header('Expect',       @_) }
+sub content_type { shift->header('Content-Type' => @_) }
+sub cookie       { shift->header(Cookie         => @_) }
+sub date         { shift->header(Date           => @_) }
+sub expect       { shift->header(Expect         => @_) }
 
 # Will you be my mommy? You smell like dead bunnies...
 sub header {
@@ -184,8 +184,8 @@ sub header {
     return @$headers;
 }
 
-sub host     { shift->header('Host',     @_) }
-sub location { shift->header('Location', @_) }
+sub host     { shift->header(Host     => @_) }
+sub location { shift->header(Location => @_) }
 
 sub names {
     my $self = shift;
@@ -249,7 +249,7 @@ sub parse {
     return;
 }
 
-sub proxy_authorization { shift->header('Proxy-Authorization', @_) }
+sub proxy_authorization { shift->header('Proxy-Authorization' => @_) }
 
 sub remove {
     my ($self, $name) = @_;
@@ -257,16 +257,16 @@ sub remove {
     return $self;
 }
 
-sub server      { shift->header('Server',      @_) }
-sub set_cookie  { shift->header('Set-Cookie',  @_) }
-sub set_cookie2 { shift->header('Set-Cookie2', @_) }
-sub status      { shift->header('Status',      @_) }
+sub server      { shift->header(Server        => @_) }
+sub set_cookie  { shift->header('Set-Cookie'  => @_) }
+sub set_cookie2 { shift->header('Set-Cookie2' => @_) }
+sub status      { shift->header(Status        => @_) }
 
 sub to_string { shift->build(@_) }
 
-sub trailer           { shift->header('Trailer',           @_) }
-sub transfer_encoding { shift->header('Transfer-Encoding', @_) }
-sub user_agent        { shift->header('User-Agent',        @_) }
+sub trailer           { shift->header(Trailer             => @_) }
+sub transfer_encoding { shift->header('Transfer-Encoding' => @_) }
+sub user_agent        { shift->header('User-Agent'        => @_) }
 
 1;
 __END__
@@ -409,7 +409,7 @@ the following new ones.
 
     my $string = $headers->header('Content-Type');
     my @lines  = $headers->header('Content-Type');
-    $headers   = $headers->header('Content-Type', 'text/plain');
+    $headers   = $headers->header('Content-Type' => 'text/plain');
 
 =head2 C<names>
 

@@ -94,10 +94,10 @@ sub serve {
                     $start = $1;
                     $end = $2 if $2 && $2 <= $end;
                     $res->code(206);
-                    $res->headers->header('Content-Length',
-                        $end - $start + 1);
-                    $res->headers->header('Content-Range',
-                        "bytes $start-$end/$size");
+                    $res->headers->header(
+                        'Content-Length' => $end - $start + 1);
+                    $res->headers->header(
+                        'Content-Range' => "bytes $start-$end/$size");
                     $c->app->log->debug("Range request: $start-$end/$size.");
                 }
                 else {
@@ -120,11 +120,11 @@ sub serve {
             );
 
             # Accept ranges
-            $res->headers->header('Accept-Ranges', 'bytes');
+            $res->headers->header('Accept-Ranges' => 'bytes');
 
             # Last modified
-            $res->headers->header('Last-Modified',
-                Mojo::Date->new($stat->mtime));
+            $res->headers->header(
+                'Last-Modified' => Mojo::Date->new($stat->mtime));
 
             $res->headers->content_type($type);
             $res->content->asset->path($path);

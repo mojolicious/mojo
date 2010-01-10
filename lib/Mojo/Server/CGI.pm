@@ -71,7 +71,7 @@ sub run {
     # Status
     if (my $code = $res->code) {
         my $message = $res->message || $res->default_message;
-        $res->headers->header('Status', "$code $message") unless $self->nph;
+        $res->headers->header(Status => "$code $message") unless $self->nph;
     }
 
     # Response headers

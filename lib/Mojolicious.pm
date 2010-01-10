@@ -31,6 +31,21 @@ __PACKAGE__->attr(types    => sub { MojoX::Types->new });
 sub new {
     my $self = shift->SUPER::new(@_);
 
+    # Transaction builder
+    $self->build_tx_cb(
+        sub {
+
+            # Build
+            my $tx = Mojo::Transaction::Single->new;
+            $tx->res->headers->header('X-Powered-By' => 'Mojolicious (Perl)');
+
+            # Hook
+            $self->plugins->run_hook(after_build_tx => $tx);
+
+            return $tx;
+        }
+    );
+
     # Namespace
     $self->routes->namespace(ref $self);
 

@@ -200,7 +200,7 @@ sub post_form_ok {
     # Headers
     $headers ||= {};
     for my $name (keys %$headers) {
-        $tx->req->headers->header($name, $headers->{$name});
+        $tx->req->headers->header($name => $headers->{$name});
     }
 
     # Request

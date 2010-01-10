@@ -22,6 +22,7 @@ This file documents the revision history for Perl extension Mojo.
         - Added env attribute to Mojo::Message::Request.
         - Added range support to MojoX::Dispatcher::Static. (xantus)
         - Added version command.
+        - Added after_build_tx plugin hook.
         - Made param decoding more defensive and allow malformed data to pass
           through for debugging.
         - Reduced Mojolicious log output outside of development mode.

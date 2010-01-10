@@ -22,12 +22,6 @@ __PACKAGE__->attr(routes   => sub { MojoX::Dispatcher::Routes->new });
 __PACKAGE__->attr(static   => sub { MojoX::Dispatcher::Static->new });
 __PACKAGE__->attr(types    => sub { MojoX::Types->new });
 
-# It's just like the story of the grasshopper and the octopus.
-# All year long, the grasshopper kept burying acorns for the winter,
-# while the octopus mooched off his girlfriend and watched TV.
-# But then the winter came, and the grasshopper died,
-# and the octopus ate all his acorns.
-# And also he got a racecar. Is any of this getting through to you?
 sub new {
     my $self = shift->SUPER::new(@_);
 
@@ -37,7 +31,6 @@ sub new {
 
             # Build
             my $tx = Mojo::Transaction::Single->new;
-            $tx->res->headers->header('X-Powered-By' => 'Mojolicious (Perl)');
 
             # Hook
             $self->plugins->run_hook(after_build_tx => $tx);
@@ -76,6 +69,7 @@ sub new {
     $self->plugin('epl_renderer');
     $self->plugin('ep_renderer');
     $self->plugin('request_timer');
+    $self->plugin('powered_by');
 
     # Run mode
     $mode = $mode . '_mode';

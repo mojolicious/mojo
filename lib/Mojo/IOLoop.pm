@@ -93,6 +93,9 @@ sub connect {
       :        'IO::Socket::INET';
     my $socket = $class->new(%options) or return;
 
+    # Non blocking
+    $socket->blocking(0);
+
     # Add connection
     $self->_connections->{$socket} = {
         buffer        => Mojo::Buffer->new,
@@ -743,8 +746,10 @@ Mojo::IOLoop - IO Loop
 
     use Mojo::IOLoop;
 
-    # Create loop and listen on port 3000
+    # Create loop
     my $loop = Mojo::IOLoop->new;
+
+    # Listen on port 3000
     $loop->listen(
         port => 3000,
         cb   => sub {
@@ -770,6 +775,31 @@ Mojo::IOLoop - IO Loop
             });
         }
     );
+
+    # Connect to port 3000 with SSL activated
+    my $id = $loop->connect(host => 'localhost', port => 3000, ssl => 1);
+
+    # Loop starts writing
+    $loop->writing($id);
+
+    # Writing request
+    $loop->write_cb($id => sub {
+        my ($self, $id) = @_;
+
+        # Back to reading only
+        $self->not_writing($id);
+
+        # The loop will take care of buffering for us
+        return "GET / HTTP/1.1\r\n\r\n";
+    });
+
+    # Reading response
+    $loop->read_cb($id => sub {
+        my ($self, $id, $chunk) = @_;
+
+        # Time to write more
+        $self->writing($id);
+    });
 
     # Start and stop loop
     $loop->start;

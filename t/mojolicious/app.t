@@ -65,10 +65,12 @@ $t->get_ok('/somethingtest', {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('/test4/42');
 
+# Foo::url_for_missing
 $t->get_ok('/something_missing', {'X-Test' => 'Hi there!'})->status_is(500)
   ->header_is(Server         => 'Mojo (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/Route "something_missing" used in url_for does not exist/);
+  ->content_like(
+    qr/Route "something_missing" used in url_for does not exist/);
 
 # Foo::templateless
 $t->get_ok('/foo/templateless', {'X-Test' => 'Hi there!'})->status_is(200)

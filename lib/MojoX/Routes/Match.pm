@@ -6,9 +6,8 @@ use strict;
 use warnings;
 
 use base 'Mojo::Base';
+
 use Carp 'croak';
-
-
 use Mojo::URL;
 
 __PACKAGE__->attr([qw/captures dictionary/] => sub { {} });
@@ -74,14 +73,15 @@ sub url_for {
     # Named
     if ($name) {
 
-        my $found=0;
         # Find endpoint
+        my $found    = 0;
         my @children = ($self->root);
         while (my $child = shift @children) {
 
+            # Match
             if (($child->name || '') eq $name) {
                 $endpoint = $child;
-                $found++;                
+                $found++;
                 last;
             }
 

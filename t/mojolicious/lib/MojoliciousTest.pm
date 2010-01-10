@@ -48,8 +48,9 @@ sub startup {
 
     # /somethingtest - refer to another route with url_for
     $r->route('/somethingtest')->to('foo#something');
-    $r->route('/something_missing')->to('foo#uri_for_missing');
 
+    # /something_missing - refer to a non existing route with url_for
+    $r->route('/something_missing')->to('foo#url_for_missing');
 
     # /test3 - no class, just a namespace
     $r->route('/test3')

@@ -30,9 +30,10 @@ sub something {
     $self->render_text($self->url_for('something', something => '42'));
 }
 
-sub uri_for_missing {
+sub url_for_missing {
     my $self = shift;
-    $self->render_text($self->url_for('something_missing', something => '42'));    
+    $self->render_text(
+        $self->url_for('something_missing', something => '42'));
 }
 
 sub stage1 {

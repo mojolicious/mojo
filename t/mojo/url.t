@@ -5,7 +5,9 @@
 use strict;
 use warnings;
 
-use Test::More tests => 81;
+use utf8;
+
+use Test::More tests => 94;
 
 # I don't want you driving around in a car you built yourself.
 # You can sit there complaining, or you can knit me some seat belts.
@@ -148,3 +150,22 @@ is($url->host,   '[::1]');
 is($url->port,   3000);
 is($url->path,   '/');
 is("$url",       'http://[::1]:3000/');
+
+# IDNA
+$url = Mojo::URL->new('http://bücher.ch:3000/foo');
+is($url->is_abs, 1);
+is($url->scheme, 'http');
+is($url->host,   'bücher.ch');
+is($url->ihost,  'xn--bcher-kva.ch');
+is($url->port,   3000);
+is($url->path,   '/foo');
+is("$url",       'http://bücher.ch:3000/foo');
+
+# IDNA (snowman)
+$url = Mojo::URL->new('http://☃.net/');
+is($url->is_abs, 1);
+is($url->scheme, 'http');
+is($url->host,   '☃.net');
+is($url->ihost,  'xn--n3h.net');
+is($url->path,   '/');
+is("$url",       'http://☃.net/');

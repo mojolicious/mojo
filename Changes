@@ -1,12 +1,9 @@
 This file documents the revision history for Perl extension Mojo.
 
 0.999915 2010-01-10 00:00:00
-        - Added routes captures to params in Mojolicious.
-        - Added charset plugin to Mojolicious. (charsbar)
-        - Added native PSGI support.
-        - Added simple reverse proxy support with tests.
         - Added IPv6 support.
         - Added SSL/TLS support.
+        - Added IDNA support.
         - Added UNIX domain socket support to daemons.
         - Added transparent kqueue and epoll support to daemons and client.
         - Added support for listening to multiple locations to the daemons.
@@ -15,6 +12,10 @@ This file documents the revision history for Perl extension Mojo.
               mojo daemon --listen http:*:3000,http:*:3001,http:*:3002
               mojo daemon --listen http:[::1]:3000
               mojo daemon --listen https:*:3001:/foo/server.crt:/foo/server.key
+        - Added routes captures to params in Mojolicious.
+        - Added native PSGI support.
+        - Added charset plugin to Mojolicious. (charsbar)
+        - Added simple reverse proxy support with tests.
         - Added simpler way to define default controller and action for a
           route.
               $r->route('/foo')->to('mycontroller#myaction');

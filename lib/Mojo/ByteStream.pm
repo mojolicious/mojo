@@ -16,6 +16,18 @@ require Encode;
 require MIME::Base64;
 require MIME::QuotedPrint;
 
+# Punycode bootstring parameters
+use constant PUNYCODE_BASE         => 36;
+use constant PUNYCODE_TMIN         => 1;
+use constant PUNYCODE_TMAX         => 26;
+use constant PUNYCODE_SKEW         => 38;
+use constant PUNYCODE_DAMP         => 700;
+use constant PUNYCODE_INITIAL_BIAS => 72;
+use constant PUNYCODE_INITIAL_N    => 128;
+
+# Punycode delimiter
+my $DELIMITER = chr 0x2D;
+
 # XHTML 1.0 entities for html_unescape
 my %ENTITIES = (
     Aacute   => 193,
@@ -440,6 +452,160 @@ sub md5_sum {
     return $self;
 }
 
+sub punycode_decode {
+    my $self = shift;
+
+    # Character semantics
+    no bytes;
+
+    # Input
+    my $input = $self->{bytestream};
+
+    # Defaults
+    my $n    = PUNYCODE_INITIAL_N;
+    my $i    = 0;
+    my $bias = PUNYCODE_INITIAL_BIAS;
+    my @output;
+
+    # Delimiter?
+    if ($input =~ s/(.*)$DELIMITER//os) { push @output, split //, $1 }
+
+    # Decode
+    while (length $input) {
+        my $oldi = $i;
+        my $w    = 1;
+
+        # Base to infinity in steps of base
+        for (my $k = PUNYCODE_BASE; 1; $k += PUNYCODE_BASE) {
+
+            # Digit
+            my $digit = ord substr $input, 0, 1, '';
+            $digit =
+              $digit < 0x40 ? $digit + (26 - 0x30) : ($digit & 0x1f) - 1;
+
+            $i += $digit * $w;
+            my $t = $k - $bias;
+            $t =
+                $t < PUNYCODE_TMIN ? PUNYCODE_TMIN
+              : $t > PUNYCODE_TMAX ? PUNYCODE_TMAX
+              :                      $t;
+
+            # Break
+            last if $digit < $t;
+
+            $w *= (PUNYCODE_BASE - $t);
+        }
+
+        # Bias
+        $bias = _adapt($i - $oldi, @output + 1, $oldi == 0);
+
+        $n += $i / (@output + 1);
+        $i = $i % (@output + 1);
+
+        # Insert
+        splice @output, $i, 0, chr($n);
+
+        # Increment
+        $i++;
+    }
+
+    # Output
+    $self->{bytestream} = join '', @output;
+
+    return $self;
+}
+
+sub punycode_encode {
+    my $self = shift;
+
+    # Character semantics
+    no bytes;
+
+    # Input
+    my $input  = $self->{bytestream};
+    my $output = $input;
+    my $length = length $input;
+
+    # Remove non basic characters
+    $output =~ s/[^\x00-\x7f]+//ogs;
+
+    # Non basic characters in input?
+    my $h = my $b = length $output;
+    $output .= $DELIMITER if $b > 0;
+
+    # Split input
+    my @input = map ord, split //, $input;
+    my @chars = sort grep { $_ >= PUNYCODE_INITIAL_N } @input;
+
+    # Defaults
+    my $n     = PUNYCODE_INITIAL_N;
+    my $delta = 0;
+    my $bias  = PUNYCODE_INITIAL_BIAS;
+
+    # Encode
+    for my $m (@chars) {
+
+        # Basic character
+        next if $m < $n;
+
+        # Delta
+        $delta += ($m - $n) * ($h + 1);
+
+        # Walk all code points in order
+        $n = $m;
+        for (my $i = 0; $i < $length; $i++) {
+            my $c = $input[$i];
+
+            # Basic character?
+            $delta++ if $c < $n;
+
+            # Non basic character
+            if ($c == $n) {
+                my $q = $delta;
+
+                # Base to infinity in steps of base
+                for (my $k = PUNYCODE_BASE; 1; $k += PUNYCODE_BASE) {
+                    my $t = $k - $bias;
+                    $t =
+                        $t < PUNYCODE_TMIN ? PUNYCODE_TMIN
+                      : $t > PUNYCODE_TMAX ? PUNYCODE_TMAX
+                      :                      $t;
+
+                    # Break
+                    last if $q < $t;
+
+                    # Code point for digit "t"
+                    my $o = $t + (($q - $t) % (PUNYCODE_BASE - $t));
+                    $output .= chr $o + ($o < 26 ? 0x61 : 0x30 - 26);
+
+                    $q = ($q - $t) / (PUNYCODE_BASE - $t);
+                }
+
+                # Code point for digit "q"
+                $output .= chr $q + ($q < 26 ? 0x61 : 0x30 - 26);
+
+                # Bias
+                $bias = _adapt($delta, $h + 1, $h == $b);
+
+                # Reset delta
+                $delta = 0;
+
+                # Increment
+                $h++;
+            }
+        }
+
+        # Increment
+        $delta++;
+        $n++;
+    }
+
+    # Output
+    $self->{bytestream} = $output;
+
+    return $self;
+}
+
 # Old people don't need companionship.
 # They need to be isolated and studied so it can be determined what nutrients
 # they have that might be extracted for our personal use.
@@ -532,6 +698,25 @@ sub xml_escape {
     return $self;
 }
 
+# Punycode helper
+sub _adapt {
+    my ($delta, $numpoints, $firsttime) = @_;
+
+    # Delta
+    $delta = $firsttime ? $delta / PUNYCODE_DAMP : $delta / 2;
+    $delta += $delta / $numpoints;
+
+    my $k = 0;
+    while ($delta > ((PUNYCODE_BASE - PUNYCODE_TMIN) * PUNYCODE_TMAX) / 2) {
+        $delta /= PUNYCODE_BASE - PUNYCODE_TMIN;
+        $k += PUNYCODE_BASE;
+    }
+
+    return $k
+      + ( ((PUNYCODE_BASE - PUNYCODE_TMIN + 1) * $delta)
+        / ($delta + PUNYCODE_SKEW));
+}
+
 # Helper for url_sanitize
 sub _sanitize {
     my $hex = shift;
@@ -589,6 +774,8 @@ Mojo::ByteStream - ByteStream
     $stream->url_sanitize;
     $stream->url_unescape;
     $stream->xml_escape;
+    $stream->punycode_encode;
+    $stream->punycode_decode;
 
     my $size = $stream->size;
 
@@ -658,6 +845,14 @@ the following new ones.
 =head2 C<md5_sum>
 
     $stream = $stream->md5_sum;
+
+=head2 C<punycode_decode>
+
+    $stream = $stream->punycode_decode;
+
+=head2 C<punycode_encode>
+
+    $stream = $stream->punycode_encode;
 
 =head2 C<qp_decode>
 

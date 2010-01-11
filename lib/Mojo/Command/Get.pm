@@ -7,6 +7,7 @@ use warnings;
 
 use base 'Mojo::Command';
 
+use Mojo::ByteStream 'b';
 use Mojo::Client;
 use Mojo::Transaction::Single;
 
@@ -34,6 +35,7 @@ sub run {
     # URL
     my $url = shift;
     die $self->usage unless $url;
+    $url = b($url)->decode('UTF-8')->to_string;
 
     # Client
     my $client = Mojo::Client->new;

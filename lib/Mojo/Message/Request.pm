@@ -50,7 +50,7 @@ sub fix_headers {
 
     # Host header is required in HTTP 1.1 requests
     if ($self->at_least_version('1.1')) {
-        my $host = $self->url->host;
+        my $host = $self->url->ihost;
         my $port = $self->url->port;
         $host .= ":$port" if $port;
         $self->headers->host($host) unless $self->headers->host;

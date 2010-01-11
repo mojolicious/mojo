@@ -6,7 +6,7 @@ This file documents the revision history for Perl extension Mojo.
         - Added native PSGI support.
         - Added simple reverse proxy support with tests.
         - Added IPv6 support.
-        - Added SSL support.
+        - Added SSL/TLS support.
         - Added UNIX domain socket support to daemons.
         - Added transparent kqueue and epoll support to daemons and client.
         - Added support for listening to multiple locations to the daemons.

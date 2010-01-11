@@ -36,9 +36,9 @@ sub run {
     my $ipv6 =
       Mojo::IOLoop::IPV6() ? $IO::Socket::INET6::VERSION : 'not installed';
 
-    # SSL
-    my $ssl =
-      Mojo::IOLoop::SSL() ? $IO::Socket::SSL::VERSION : 'not installed';
+    # TLS
+    my $tls =
+      Mojo::IOLoop::TLS() ? $IO::Socket::SSL::VERSION : 'not installed';
 
     print <<"EOF";
 CORE
@@ -49,7 +49,7 @@ OPTIONAL
   IO::Epoll         ($epoll)
   IO::KQueue        ($kqueue)
   IO::Socket::INET6 ($ipv6)
-  IO::Socket::SSL   ($ssl)
+  IO::Socket::SSL   ($tls)
 EOF
 
     return $self;

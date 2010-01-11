@@ -16,7 +16,7 @@ use Mojo::Transaction::Single;
 use Scalar::Util qw/isweak weaken/;
 use Socket;
 
-__PACKAGE__->attr([qw/app default_cb ssl_ca_file ssl_verify_cb/]);
+__PACKAGE__->attr([qw/app default_cb tls_ca_file tls_verify_cb/]);
 __PACKAGE__->attr([qw/continue_timeout max_keep_alive_connections/] => 5);
 __PACKAGE__->attr(cookie_jar => sub { Mojo::CookieJar->new });
 __PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->new });
@@ -520,12 +520,12 @@ sub _queue {
 
         # Connect
         $id = $self->ioloop->connect(
+            cb   => $connected,
             host => $host,
             port => $port,
-            ssl  => $scheme eq 'https' ? 1 : 0,
-            ssl_ca_file => $self->ssl_ca_file || $ENV{MOJO_CA_FILE},
-            ssl_verify_cb => $self->ssl_verify_cb,
-            cb            => $connected
+            tls  => $scheme eq 'https' ? 1 : 0,
+            tls_ca_file => $self->tls_ca_file || $ENV{MOJO_CA_FILE},
+            tls_verify_cb => $self->tls_verify_cb
         );
 
         # Error
@@ -729,15 +729,15 @@ L<Mojo::Client> implements the following attributes.
     my $max_redirects = $client->max_redirects;
     $client           = $client->max_redirects(3);
 
-=head2 C<ssl_ca_file>
+=head2 C<tls_ca_file>
 
-    my $ssl_ca_file = $client->ssl_ca_file;
-    $client         = $client->ssl_ca_file('/etc/ssl/cacerts.pem');
+    my $tls_ca_file = $client->tls_ca_file;
+    $client         = $client->tls_ca_file('/etc/tls/cacerts.pem');
 
-=head2 C<ssl_verify_cb>
+=head2 C<tls_verify_cb>
 
-    my $ssl_verify_cb = $client->ssl_verify_cb;
-    $client           = $client->ssl_verify_cb(sub {...});
+    my $tls_verify_cb = $client->tls_verify_cb;
+    $client           = $client->tls_verify_cb(sub {...});
 
 =head1 METHODS
 

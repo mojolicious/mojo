@@ -30,8 +30,8 @@ use constant KQUEUE => ($ENV{MOJO_POLL} || $ENV{MOJO_EPOLL})
   ? 0
   : eval { require IO::KQueue; 1 };
 
-# SSL support requires IO::Socket::SSL
-use constant SSL => $ENV{MOJO_NO_SSL}
+# TLS support requires IO::Socket::SSL
+use constant TLS => $ENV{MOJO_NO_TLS}
   ? 0
   : eval { require IO::Socket::SSL; 1 };
 
@@ -70,25 +70,25 @@ sub connect {
     # Arguments
     my $args = ref $_[0] ? $_[0] : {@_};
 
-    # Options (SSL only works blocking)
+    # Options (TLS only works blocking)
     my %options = (
-        Blocking => $args->{ssl} ? 1 : 0,
+        Blocking => $args->{tls} ? 1 : 0,
         PeerAddr => $args->{host},
-        PeerPort => $args->{port} || ($args->{ssl} ? 443 : 80),
+        PeerPort => $args->{port} || ($args->{tls} ? 443 : 80),
         Proto    => 'tcp',
         Type     => SOCK_STREAM
     );
 
-    # SSL certificate verification
-    if ($args->{ssl} && $args->{ssl_ca_file}) {
-        $options{SSL_ca_file}         = $args->{ssl_ca_file};
+    # TLS certificate verification
+    if ($args->{tls} && $args->{tls_ca_file}) {
+        $options{SSL_ca_file}         = $args->{tls_ca_file};
         $options{SSL_verify_mode}     = 0x01;
-        $options{SSL_verify_callback} = $args->{ssl_verify_cb};
+        $options{SSL_verify_callback} = $args->{tls_verify_cb};
     }
 
     # New connection
     my $class =
-        SSL && $args->{ssl} ? 'IO::Socket::SSL'
+        TLS && $args->{tls} ? 'IO::Socket::SSL'
       : IPV6 ? 'IO::Socket::INET6'
       :        'IO::Socket::INET';
     my $socket = $class->new(%options) or return;
@@ -192,9 +192,9 @@ sub listen {
     # Arguments
     my $args = ref $_[0] ? $_[0] : {@_};
 
-    # Options (SSL only works blocking)
+    # Options (TLS only works blocking)
     my %options = (
-        Blocking => $args->{ssl} ? 1 : 0,
+        Blocking => $args->{tls} ? 1 : 0,
         Listen => $args->{queue_size} || SOMAXCONN,
         Type => SOCK_STREAM
     );
@@ -220,14 +220,14 @@ sub listen {
         $options{LocalPort} = $args->{port} || 3000;
         $options{Proto}     = 'tcp';
         $options{ReuseAddr} = 1;
-        my $cert = $args->{ssl_cert};
+        my $cert = $args->{tls_cert};
         $options{SSL_cert_file} = $cert if $cert;
-        my $key = $args->{ssl_key};
+        my $key = $args->{tls_key};
         $options{SSL_key_file} = $key if $key;
 
         # Create socket
         my $class =
-            SSL && $args->{ssl} ? 'IO::Socket::SSL'
+            TLS && $args->{tls} ? 'IO::Socket::SSL'
           : IPV6 ? 'IO::Socket::INET6'
           :        'IO::Socket::INET';
         $listen = $class->new(%options)
@@ -776,8 +776,8 @@ Mojo::IOLoop - IO Loop
         }
     );
 
-    # Connect to port 3000 with SSL activated
-    my $id = $loop->connect(host => 'localhost', port => 3000, ssl => 1);
+    # Connect to port 3000 with TLS activated
+    my $id = $loop->connect(host => 'localhost', port => 3000, tls => 1);
 
     # Loop starts writing
     $loop->writing($id);

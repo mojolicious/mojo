@@ -220,8 +220,8 @@ sub _create_pipeline {
             # Build transaction
             my $tx = $self->build_tx_cb->($self);
 
-            # SSL
-            if ($conn->{ssl}) {
+            # TLS
+            if ($conn->{tls}) {
                 $tx->req->url->scheme('https');
                 $tx->req->url->base->scheme('https');
             }
@@ -298,11 +298,11 @@ sub _listen {
 
     # Internet socket
     elsif ($listen =~ /^(http(?:s)?)\:(.+)\:(\d+)(?:\:(.*)\:(.*))?$/) {
-        $options->{ssl} = 1 if $1 eq 'https';
+        $options->{tls} = 1 if $1 eq 'https';
         $options->{address}  = $2 unless $2 eq '*';
         $options->{port}     = $3;
-        $options->{ssl_cert} = $4 if $4;
-        $options->{ssl_key}  = $5 if $5;
+        $options->{tls_cert} = $4 if $4;
+        $options->{tls_key}  = $5 if $5;
     }
 
     # Listen queue size
@@ -317,7 +317,7 @@ sub _listen {
         my ($loop, $id) = @_;
 
         # Add new connection
-        $self->_connections->{$id} = {ssl => $options->{ssl} ? 1 : 0};
+        $self->_connections->{$id} = {tls => $options->{tls} ? 1 : 0};
 
         # Keep alive timeout
         $loop->connection_timeout($id => $self->keep_alive_timeout);
@@ -336,7 +336,7 @@ sub _listen {
     my $file    = $options->{file};
     my $address = $options->{address} || hostname;
     my $port    = $options->{port};
-    my $scheme  = $options->{ssl} ? 'https' : 'http';
+    my $scheme  = $options->{tls} ? 'https' : 'http';
     my $started = $file ? $file : "$scheme://$address:$port";
     $self->app->log->info("Server listening ($started)");
 

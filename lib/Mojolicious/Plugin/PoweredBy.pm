@@ -39,7 +39,7 @@ Mojolicious::Plugin::PoweredBy - Powered By Plugin
 
     # Mojolicious
     $self->plugin('powered_by');
-    $self->plugin(powered_by => ('MyApp 1.0'));
+    $self->plugin(powered_by => (name => 'MyApp 1.0'));
 
     # Mojolicious::Lite
     plugin 'powered_by';

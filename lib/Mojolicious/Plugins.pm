@@ -87,6 +87,20 @@ sub run_hook {
     return $self;
 }
 
+sub run_hook_reverse {
+    my $self = shift;
+
+    # Shortcut
+    my $name = shift;
+    return $self unless $name;
+    return unless $self->hooks->{$name};
+
+    # Run
+    $self->$_(@_) for reverse @{$self->hooks->{$name}};
+
+    return $self;
+}
+
 1;
 __END__
 
@@ -135,5 +149,10 @@ implements the following new ones.
 
     $plugins = $plugins->run_hook('foo');
     $plugins = $plugins->run_hook(foo => 123);
+
+=head2 C<run_hook_reverse>
+
+    $plugins = $plugins->run_hook_reverse('foo');
+    $plugins = $plugins->run_hook_reverse(foo => 123);
 
 =cut

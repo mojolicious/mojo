@@ -33,7 +33,7 @@ sub new {
             my $tx = Mojo::Transaction::Single->new;
 
             # Hook
-            $self->plugins->run_hook(after_build_tx => $tx);
+            $self->plugins->run_hook_reverse(after_build_tx => $tx);
 
             return $tx;
         }
@@ -100,7 +100,7 @@ sub dispatch {
     my $e = $self->static->dispatch($c);
 
     # Hook
-    $self->plugins->run_hook(after_static_dispatch => $c);
+    $self->plugins->run_hook_reverse(after_static_dispatch => $c);
 
     # Use routes if we don't have a response yet
     $e = $self->routes->dispatch($c) if $e;
@@ -112,7 +112,7 @@ sub dispatch {
     elsif ($e) { $c->render_not_found }
 
     # Hook
-    $self->plugins->run_hook(after_dispatch => $c);
+    $self->plugins->run_hook_reverse(after_dispatch => $c);
 }
 
 # Bite my shiny metal ass!

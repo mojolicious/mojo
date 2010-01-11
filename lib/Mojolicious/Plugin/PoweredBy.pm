@@ -14,10 +14,10 @@ use base 'Mojolicious::Plugin';
 # and the octopus ate all his acorns.
 # And also he got a racecar. Is any of this getting through to you?
 sub register {
-    my ($self, $app, $name) = @_;
+    my ($self, $app, $args) = @_;
 
     # Name
-    $name ||= 'Mojolicious (Perl)';
+    my $name = $args->{name} || 'Mojolicious (Perl)';
 
     # Add header
     $app->plugins->add_hook(
@@ -39,11 +39,11 @@ Mojolicious::Plugin::PoweredBy - Powered By Plugin
 
     # Mojolicious
     $self->plugin('powered_by');
-    $self->plugin(powered_by => 'MyApp 1.0');
+    $self->plugin(powered_by => ('MyApp 1.0'));
 
     # Mojolicious::Lite
     plugin 'powered_by';
-    plugin powered_by => 'MyApp 1.0';
+    plugin powered_by => (name => 'MyApp 1.0');
 
 =head1 DESCRIPTION
 

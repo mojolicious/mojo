@@ -73,15 +73,13 @@ sub new {
 
     # Run mode
     $mode = $mode . '_mode';
-    eval { $self->$mode } if $self->can($mode);
-    $self->log->error(qq/Mode "$mode" failed: $@/) if $@;
+    $self->$mode(@_) if $self->can($mode);
 
     # Reduced log output outside of development mode
     $self->log->level('error') unless $mode eq 'development';
 
     # Startup
-    eval { $self->startup(@_) };
-    $self->log->error("Startup failed: $@") if $@;
+    $self->startup(@_);
 
     return $self;
 }

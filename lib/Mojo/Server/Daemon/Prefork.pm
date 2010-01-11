@@ -304,15 +304,16 @@ sub _spawn_child {
 
         # Parent will send a SIGHUP when there are too many children idle
         my $done = 0;
-        $SIG{HUP} = sub { $done++ };
+        $SIG{HUP} = sub {
+            $self->ioloop->stop;
+            $done++;
+        };
 
         # User and group
         $self->setuidgid;
 
         # Spin
-        while (!$done) {
-            $self->child;
-        }
+        while (!$done) { $self->child }
 
         # Done
         $self->_child_write->syswrite("$$ done\n")

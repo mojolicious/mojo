@@ -60,7 +60,15 @@ __PACKAGE__->attr(
 our $LOOP;
 
 # Instantiate singleton
-sub new { $LOOP ||= shift->SUPER::new(@_) }
+sub new {
+    my $self = $LOOP ||= shift->SUPER::new(@_);
+
+    # Signals
+    $SIG{PIPE} = 'IGNORE';
+    $SIG{HUP} = sub { $self->_running(0) };
+
+    return $self;
+}
 
 sub connect {
     my $self = shift;
@@ -296,10 +304,6 @@ sub start {
 
     # Already running?
     return if $self->_running;
-
-    # Signals
-    $SIG{PIPE} = 'IGNORE';
-    $SIG{HUP} = sub { $self->_running(0) };
 
     # Running
     $self->_running(1);

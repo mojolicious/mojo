@@ -29,6 +29,7 @@ This file documents the revision history for Perl extension Mojo.
         - Made param decoding more defensive and allow malformed data to pass
           through for debugging.
         - Reduced Mojolicious log output outside of development mode.
+        - Fixed prefork daemon signal handling.
         - Fixed backslash encoding bug in Mojo::JSON.
         - Fixed memory leaks in Mojolicious plugins. (sharifulin)
         - Fixed makefile and app generators.

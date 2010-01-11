@@ -364,7 +364,7 @@ sub decamelize {
 
     # Split
     my @words;
-    push @words, $1 while ($self->{bytestream} =~ s/([A-Z]+[^A-Z]*)//);
+    push @words, $1 while ($self->{bytestream} =~ s/([A-Z]{1}[^A-Z]*)//);
 
     # Case
     @words = map {lc} @words;

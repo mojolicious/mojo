@@ -10,7 +10,7 @@ use utf8;
 # Homer, we're going to ask you a few simple yes or no questions.
 # Do you understand?
 # Yes. *lie dectector blows up*
-use Test::More tests => 35;
+use Test::More tests => 37;
 
 use_ok('Mojo::ByteStream', 'b');
 
@@ -19,12 +19,16 @@ my $stream = b('foo_bar_baz');
 is($stream->camelize, 'FooBarBaz');
 $stream = b('FooBarBaz');
 is($stream->camelize, 'Foobarbaz');
+$stream = b('foo_b_b');
+is($stream->camelize, 'FooBB');
 
 # decamelize
 $stream = b('FooBarBaz');
 is($stream->decamelize, 'foo_bar_baz');
 $stream = b('foo_bar_baz');
 is($stream->decamelize, 'foo_bar_baz');
+$stream = b('FooBB');
+is($stream->decamelize, 'foo_b_b');
 
 # b64_encode
 $stream = b('foobar$%^&3217');

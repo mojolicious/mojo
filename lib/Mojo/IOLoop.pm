@@ -13,7 +13,7 @@ use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
 use IO::Socket;
 use Mojo::Buffer;
 
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 8192;
 
 # Epoll support requires IO::Epoll
 use constant EPOLL => ($ENV{MOJO_POLL} || $ENV{MOJO_KQUEUE})
@@ -41,12 +41,10 @@ __PACKAGE__->attr(
     }
 );
 __PACKAGE__->attr([qw/accept_timeout connect_timeout/] => 5);
-__PACKAGE__->attr([qw/clients servers connecting/]     => 0);
-__PACKAGE__->attr(max_clients                          => 1000);
+__PACKAGE__->attr(max_connections                      => 1000);
 __PACKAGE__->attr(timeout                              => '0.25');
 
-__PACKAGE__->attr(_accepted                       => sub { [] });
-__PACKAGE__->attr([qw/_connections _fds _listen/] => sub { {} });
+__PACKAGE__->attr([qw/_connections _fds _listen _timers/] => sub { {} });
 __PACKAGE__->attr([qw/_listening _running/]);
 __PACKAGE__->attr(
     _loop => sub {
@@ -70,7 +68,7 @@ sub connect {
     # Arguments
     my $args = ref $_[0] ? $_[0] : {@_};
 
-    # Options (TLS only works blocking)
+    # Options (TLS handshake only works blocking)
     my %options = (
         Blocking => $args->{tls} ? 1 : 0,
         PeerAddr => $args->{host},
@@ -96,21 +94,26 @@ sub connect {
     # Non blocking
     $socket->blocking(0);
 
+    # Timeout
+    my $id = $self->timer(
+        after => $self->connect_timeout,
+        cb    => sub {
+            shift->_error("$socket", 'Connect timeout.');
+        }
+    );
+
     # Add connection
     $self->_connections->{$socket} = {
         buffer        => Mojo::Buffer->new,
-        socket        => $socket,
         connect_cb    => $args->{cb},
+        connect_timer => $id,
         connecting    => 1,
-        connect_start => time
+        socket        => $socket
     };
 
     # File descriptor
     my $fd = fileno($socket);
     $self->_fds->{$fd} = "$socket";
-
-    # Connecting counter
-    $self->connecting($self->connecting + 1);
 
     # Add socket to poll
     $self->writing("$socket");
@@ -128,20 +131,17 @@ sub connection_timeout {
 sub drop {
     my ($self, $id) = @_;
 
-    # Client counter
-    $self->clients($self->clients - 1)
-      if $self->_connections->{$id}->{client};
+    # Drop timer?
+    if ($self->_timers->{$id}) {
+        delete $self->_timers->{$id};
+        return $self;
+    }
 
-    # Server counter
-    $self->servers($self->servers - 1)
-      if $self->_connections->{$id}->{server};
-
-    # Connecting counter
-    $self->connecting($self->connecting - 1)
-      if $self->_connections->{$id}->{connecting};
+    # Delete connection
+    my $c = delete $self->_connections->{$id};
 
     # Socket
-    if (my $socket = $self->_connections->{$id}->{socket}) {
+    if (my $socket = $c->{socket}) {
 
         # Remove file descriptor
         my $fd = fileno($socket);
@@ -149,7 +149,7 @@ sub drop {
 
         # Remove socket from kqueue
         if (KQUEUE) {
-            my $writing = $self->_connections->{$id}->{writing};
+            my $writing = $c->{writing};
             $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_READ(),
                 IO::KQueue::EV_DELETE())
               if defined $writing;
@@ -164,9 +164,6 @@ sub drop {
         # Close socket
         close $socket;
     }
-
-    # Remove connection
-    delete $self->_connections->{$id};
 
     return $self;
 }
@@ -192,7 +189,7 @@ sub listen {
     # Arguments
     my $args = ref $_[0] ? $_[0] : {@_};
 
-    # Options (TLS only works blocking)
+    # Options (TLS handshake only works blocking)
     my %options = (
         Blocking => $args->{tls} ? 1 : 0,
         Listen => $args->{queue_size} || SOMAXCONN,
@@ -253,37 +250,37 @@ sub local_info {
 sub not_writing {
     my ($self, $id) = @_;
 
+    # Active
+    $self->_active($id);
+
+    # Connection
+    my $c = $self->_connections->{$id};
+
     # Chunk still in buffer
-    my $buffer = $self->_connections->{$id}->{buffer};
-    if ($buffer && $buffer->size) {
-        $self->_connections->{$id}->{read_only} = 1;
+    my $buffer = $c->{buffer};
+    return $c->{read_only} = 1 if $buffer && $buffer->size;
+
+    # Socket
+    return unless my $socket = $c->{socket};
+
+    # KQueue
+    if (KQUEUE) {
+        my $fd      = fileno($socket);
+        my $writing = $c->{writing};
+        $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_READ(),
+            IO::KQueue::EV_ADD())
+          unless defined $writing;
+        $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_WRITE(),
+            IO::KQueue::EV_DELETE())
+          if $writing;
+        $c->{writing} = 0;
     }
 
-    # Not writing
-    elsif (my $socket = $self->_connections->{$id}->{socket}) {
+    # Epoll
+    elsif (EPOLL) { $self->_loop->mask($socket, IO::Epoll::POLLIN()) }
 
-        # KQueue
-        if (KQUEUE) {
-            my $fd      = fileno($socket);
-            my $writing = $self->_connections->{$id}->{writing};
-            $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_READ(),
-                IO::KQueue::EV_ADD())
-              unless defined $writing;
-            $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_WRITE(),
-                IO::KQueue::EV_DELETE())
-              if $writing;
-            $self->_connections->{$id}->{writing} = 0;
-        }
-
-        # Epoll
-        elsif (EPOLL) { $self->_loop->mask($socket, IO::Epoll::POLLIN()) }
-
-        # Poll
-        else { $self->_loop->mask($socket, POLLIN) }
-    }
-
-    # Time
-    $self->_connections->{$id}->{time} = time;
+    # Poll
+    else { $self->_loop->mask($socket, POLLIN) }
 }
 
 sub read_cb { shift->_add_event('read', @_) }
@@ -315,70 +312,133 @@ sub start {
 
 sub stop { shift->_running(0) }
 
+sub timer {
+    my $self = shift;
+
+    # Arguments
+    my $args = ref $_[0] ? $_[0] : {@_};
+
+    # Started
+    $args->{started} = time;
+
+    # Add timer
+    $self->_timers->{"$args"} = $args;
+
+    return "$args";
+}
+
 sub write_cb { shift->_add_event('write', @_) }
 
 sub writing {
     my ($self, $id) = @_;
 
-    # Writing
-    if (my $socket = $self->_connections->{$id}->{socket}) {
+    # Active
+    $self->_active($id);
 
-        # KQueue
-        if (KQUEUE) {
-            my $fd      = fileno($socket);
-            my $writing = $self->_connections->{$id}->{writing};
-            $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_READ(),
-                IO::KQueue::EV_ADD())
-              unless defined $writing;
-            $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_WRITE(),
-                IO::KQueue::EV_ADD())
-              unless $writing;
-            $self->_connections->{$id}->{writing} = 1;
-        }
+    # Connection
+    my $c = $self->_connections->{$id};
 
-        # Epoll
-        elsif (EPOLL) {
-            $self->_loop->mask($socket,
-                IO::Epoll::POLLIN() | IO::Epoll::POLLOUT());
-        }
+    # Socket
+    return unless my $socket = $c->{socket};
 
-        # Poll
-        else { $self->_loop->mask($socket, POLLIN | POLLOUT) }
+    # KQueue
+    if (KQUEUE) {
+        my $fd      = fileno($socket);
+        my $writing = $c->{writing};
+        $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_READ(),
+            IO::KQueue::EV_ADD())
+          unless defined $writing;
+        $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_WRITE(),
+            IO::KQueue::EV_ADD())
+          unless $writing;
+        $c->{writing} = 1;
     }
 
-    # Time
-    $self->_connections->{$id}->{time} = time;
+    # Epoll
+    elsif (EPOLL) {
+        $self->_loop->mask($socket,
+            IO::Epoll::POLLIN() | IO::Epoll::POLLOUT());
+    }
+
+    # Poll
+    else { $self->_loop->mask($socket, POLLIN | POLLOUT) }
 }
 
 sub _accept {
-    my $self = shift;
+    my ($self, $listen) = @_;
 
-    # Accepted?
-    my @accepted;
-    for my $accept (@{$self->_accepted}) {
+    # Accept
+    my $socket = $listen->accept or return;
 
-        # New socket
-        my $socket = $accept->[0];
+    # Timeout
+    my $id = $self->timer(
+        after => $self->accept_timeout,
+        cb    => sub {
+            shift->_error("$socket", 'Accept timeout.');
+        }
+    );
 
-        # Not yet
-        unless ($socket->connected) {
+    # Add connection
+    $self->_connections->{$socket} = {
+        accept_timer => $id,
+        accepting    => 1,
+        buffer       => Mojo::Buffer->new,
+        socket       => $socket
+    };
 
-            # Timeout
-            $self->_error("$socket", 'Accept timeout.') and next
-              if time - $accept->[1] > $self->accept_timeout;
+    # File descriptor
+    my $fd = fileno($socket);
+    $self->_fds->{$fd} = "$socket";
 
-            # Another try
-            push @accepted, $accept;
-            next;
+    # Accept callback
+    $self->_listen->{$listen}->{cb}->($self, "$socket");
+
+    # Unlock
+    $self->unlock_cb->($self);
+
+    # Remove listen sockets
+    for my $l (keys %{$self->_listen}) {
+        my $socket = $self->_listen->{$l}->{socket};
+
+        # Remove listen socket from kqueue
+        if (KQUEUE) {
+            $self->_loop->EV_SET(fileno($socket), IO::KQueue::EVFILT_READ(),
+                IO::KQueue::EV_DELETE());
         }
 
-        # Non blocking
-        $socket->blocking(0);
-
-        # Add socket to poll
-        $self->not_writing("$socket");
+        # Remove listen socket from poll or epoll
+        else { $self->_loop->remove($socket) }
     }
-    $self->_accepted(\@accepted);
+
+    # Not listening anymore
+    $self->_listening(0);
+}
+
+sub _accepting {
+    my ($self, $id) = @_;
+
+    # Connection
+    my $c = $self->_connections->{$id};
+
+    # Connected?
+    return unless $c->{socket}->connected;
+
+    # Accepted
+    delete $c->{accepting};
+
+    # Remove timeout
+    $self->drop(delete $c->{accept_timer});
+
+    # Non blocking
+    $c->{socket}->blocking(0);
+
+    # Add socket to poll
+    $self->not_writing($id);
+}
+
+sub _active {
+    my ($self, $id) = @_;
+    return $self->_connections->{$id}->{active} = time;
 }
 
 sub _add_event {
@@ -390,47 +450,24 @@ sub _add_event {
     return $self;
 }
 
-sub _connect {
-    my $self = shift;
+sub _connecting {
+    my ($self, $id) = @_;
 
-    # Connecting
-    my $c = $self->_connections;
-    for my $id (keys %$c) {
+    # Connection
+    my $c = $self->_connections->{$id};
 
-        # Connecting?
-        my $connect = $c->{$id};
-        next unless $connect->{connecting};
+    # Not yet connected
+    return unless $c->{socket}->connected;
 
-        # New socket
-        my $socket = $connect->{socket};
+    # Connected
+    delete $c->{connecting};
 
-        # Not yet connected
-        if (!$socket->connected) {
+    # Remove timeout
+    $self->drop(delete $c->{connect_timer});
 
-            # Timeout
-            if (time - $connect->{connect_start} > $self->connect_timeout) {
-                $self->_error("$socket", 'Connect timeout.');
-                $self->drop($id);
-            }
-
-        }
-
-        # Connected
-        else {
-
-            # Connected counter
-            $connect->{connecting} = 0;
-            $self->connecting($self->connecting - 1);
-
-            # Server counter
-            $connect->{server} = 1;
-            $self->servers($self->servers + 1);
-
-            # Connect callback
-            my $cb = $connect->{connect_cb};
-            $self->$cb("$socket") if $cb;
-        }
-    }
+    # Connect callback
+    my $cb = $c->{connect_cb};
+    $self->$cb($id) if $cb;
 }
 
 sub _error {
@@ -472,7 +509,7 @@ sub _is_listening {
     my $self = shift;
     return 1
       if keys %{$self->_listen}
-          && $self->clients < $self->max_clients
+          && keys %{$self->_connections} < $self->max_connections
           && $self->lock_cb->($self, !keys %{$self->_connections});
     return 0;
 }
@@ -480,30 +517,30 @@ sub _is_listening {
 sub _prepare {
     my $self = shift;
 
-    # Accept
-    $self->_accept;
+    # Prepare
+    for my $id (keys %{$self->_connections}) {
 
-    # Connect
-    $self->_connect if $self->connecting;
+        # Connection
+        my $c = $self->_connections->{$id};
 
-    # Check timeouts
-    my $c = $self->_connections;
-    for my $id (keys %$c) {
+        # Accepting?
+        $self->_accepting($id) if $c->{accepting};
+
+        # Connecting?
+        $self->_connecting($id) if $c->{connecting};
 
         # Drop if buffer is empty
-        $self->drop($id)
-          and next
-          if $c->{$id}->{finish} && (!$c->{$id}->{buffer}
-                  || !$c->{$id}->{buffer}->size);
+        $self->drop($id) and next
+          if $c->{finish} && (!$c->{buffer} || !$c->{buffer}->size);
 
         # Read only
-        $self->not_writing($id) if delete $c->{$id}->{read_only};
+        $self->not_writing($id) if delete $c->{read_only};
 
         # Timeout
-        my $timeout = $c->{$id}->{timeout} || 15;
+        my $timeout = $c->{timeout} || 15;
 
         # Last active
-        my $time = $c->{$id}->{time} ||= time;
+        my $time = $c->{active} || $self->_active($id);
 
         # HUP
         $self->_hup($id) if (time - $time) >= $timeout;
@@ -511,9 +548,7 @@ sub _prepare {
 
     # Nothing to do
     return $self->_running(0)
-      unless keys %{$self->_connections}
-          || keys %{$self->_listen}
-          || $self->connecting;
+      unless keys %{$self->_connections} || keys %{$self->_listen};
 
     return;
 }
@@ -521,64 +556,20 @@ sub _prepare {
 sub _read {
     my ($self, $id) = @_;
 
-    # New connection?
+    # Listen socket? (new connection)
     my $listen;
-    for my $li (keys %{$self->_listen}) {
-        my $l = $self->_listen->{$li}->{socket};
-        if ($id eq $l) {
-            $listen = $l;
+    for my $l (keys %{$self->_listen}) {
+        my $socket = $self->_listen->{$l}->{socket};
+        if ($id eq $socket) {
+            $listen = $socket;
             last;
         }
     }
 
     # Accept new connection
-    if ($listen) {
+    return $self->_accept($listen) if $listen;
 
-        # Accept
-        my $socket = $listen->accept or return;
-        push @{$self->_accepted}, [$socket, time];
-
-        # Add connection
-        $self->_connections->{$socket} = {
-            buffer => Mojo::Buffer->new,
-            client => 1,
-            socket => $socket
-        };
-
-        # File descriptor
-        my $fd = fileno($socket);
-        $self->_fds->{$fd} = "$socket";
-
-        # Client counter
-        $self->clients($self->clients + 1);
-
-        # Accept callback
-        $self->_listen->{$listen}->{cb}->($self, "$socket");
-
-        # Unlock
-        $self->unlock_cb->($self);
-
-        # Remove listen sockets
-        for my $li (keys %{$self->_listen}) {
-            my $l = $self->_listen->{$li}->{socket};
-
-            # Remove listen socket from kqueue
-            if (KQUEUE) {
-                $self->_loop->EV_SET(fileno($l), IO::KQueue::EVFILT_READ(),
-                    IO::KQueue::EV_DELETE());
-            }
-
-            # Remove listen socket from poll or epoll
-            else { $self->_loop->remove($l) }
-        }
-
-        # Not listening anymore
-        $self->_listening(0);
-
-        return;
-    }
-
-    # Conenction
+    # Connection
     my $c = $self->_connections->{$id};
 
     # Read chunk
@@ -588,14 +579,12 @@ sub _read {
     return $self->_error($id)
       unless defined $read && defined $buffer && length $buffer;
 
-    # Get read callback
+    # Callback
     return unless my $event = $c->{read};
-
-    # Read callback
     $self->$event($id, $buffer);
 
-    # Time
-    $c->{time} = time;
+    # Active
+    $self->_active($id);
 }
 
 sub _spin {
@@ -689,6 +678,42 @@ sub _spin {
         # Write
         $self->_write("$_") for $poll->handles(POLLOUT);
     }
+
+    # Timers
+    $self->_timer;
+}
+
+sub _timer {
+    my $self = shift;
+
+    # Timers
+    for my $id (keys %{$self->_timers}) {
+        my $t = $self->_timers->{$id};
+
+        # Timer
+        my $run = 0;
+        if (defined $t->{after} && $t->{after} <= time - $t->{started}) {
+
+            # Done
+            delete $t->{after};
+            $run++;
+        }
+
+        # Recurring
+        elsif (!defined $t->{after} && defined $t->{interval}) {
+            $t->{last} ||= 0;
+            $run++ if $t->{last} + $t->{interval} <= time;
+        }
+
+        # Callback
+        if ((my $cb = $t->{cb}) && $run) {
+            $self->$cb("$t");
+            $t->{last} = time;
+        }
+
+        # Continue?
+        $self->drop($id) unless defined $t->{after} || defined $t->{interval};
+    }
 }
 
 sub _write {
@@ -731,8 +756,8 @@ sub _write {
     # Remove written chunk from buffer
     $buffer->remove($written);
 
-    # Time
-    $c->{time} = time;
+    # Active
+    $self->_active($id);
 }
 
 1;
@@ -801,6 +826,17 @@ Mojo::IOLoop - IO Loop
         $self->writing($id);
     });
 
+    # Add a timer
+    $loop->timer(after => 5, cb => sub {
+        my $self = shift;
+        $self->drop($id);
+    });
+
+    # Add another timer
+    $loop->timer(interval => 3, cb => sub {
+        print "Timer is running again!\n";
+    });
+
     # Start and stop loop
     $loop->start;
     $loop->stop;
@@ -821,35 +857,20 @@ L<Mojo::IOLoop> implements the following attributes.
     my $timeout = $loop->accept_timeout;
     $loop       = $loop->accept_timeout(5);
 
-=head2 C<clients>
-
-    my $clients = $loop->clients;
-    $loop       = $loop->clients(25);
-
 =head2 C<connect_timeout>
 
     my $timeout = $loop->connect_timeout;
     $loop       = $loop->connect_timeout(5);
-
-=head2 C<connecting>
-
-    my $connecting = $loop->connecting;
-    $loop          = $loop->connecting(25);
 
 =head2 C<lock_cb>
 
     my $cb = $loop->lock_cb;
     $loop  = $loop->lock_cb(sub { ... });
 
-=head2 C<max_clients>
+=head2 C<max_connections>
 
-    my $max = $loop->max_clients;
-    $loop   = $loop->max_clients(1000);
-
-=head2 C<servers>
-
-    my $servers = $loop->servers;
-    $loop       = $loop->servers(25);
+    my $max = $loop->max_connections;
+    $loop   = $loop->max_connections(1000);
 
 =head2 C<unlock_cb>
 
@@ -932,6 +953,11 @@ following new ones.
 =head2 C<stop>
 
     $loop->stop;
+
+=head2 C<timer>
+
+    my $id = $loop->timer(after => 5, cb => sub {...});
+    my $id = $loop->timer(interval => 5, cb => sub {...});
 
 =head2 C<write_cb>
 

@@ -17,7 +17,7 @@ use Mojo::Content::Single;
 use Mojo::Parameters;
 use Mojo::Upload;
 
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 8192;
 
 __PACKAGE__->attr(buffer  => sub { Mojo::Buffer->new });
 __PACKAGE__->attr(content => sub { Mojo::Content::Single->new });

@@ -16,7 +16,7 @@ use File::Spec;
 use IO::File;
 use Mojo::ByteStream 'b';
 
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 8192;
 
 __PACKAGE__->attr([qw/cleanup path end_range/]);
 __PACKAGE__->attr(start_range => 0);

@@ -64,7 +64,7 @@ sub prepare_ioloop {
     $self->_listen($_) for split ',', $listen;
 
     # Max clients
-    $self->ioloop->max_clients($self->max_clients);
+    $self->ioloop->max_connections($self->max_clients);
 }
 
 sub prepare_lock_file {

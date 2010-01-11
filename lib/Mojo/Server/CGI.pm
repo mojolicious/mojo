@@ -10,7 +10,7 @@ use bytes;
 
 use IO::Poll 'POLLIN';
 
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 8192;
 
 __PACKAGE__->attr(nph => 0);
 

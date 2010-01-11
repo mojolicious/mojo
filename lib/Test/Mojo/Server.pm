@@ -161,7 +161,7 @@ sub stop_server_ok {
 
     # Debug
     if (DEBUG) {
-        sysread $self->_server, my $buffer, 4096;
+        sysread $self->_server, my $buffer, 8192;
         warn "\nSERVER STDOUT: $buffer\n";
     }
 

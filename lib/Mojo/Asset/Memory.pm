@@ -11,7 +11,7 @@ use bytes;
 use Carp 'croak';
 use IO::File;
 
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 8192;
 
 # There's your giraffe, little girl.
 # I'm a boy.

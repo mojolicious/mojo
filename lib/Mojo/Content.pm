@@ -13,7 +13,7 @@ use Mojo::Buffer;
 use Mojo::Filter::Chunked;
 use Mojo::Headers;
 
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 8192;
 
 __PACKAGE__->attr([qw/body_cb filter progress_cb/]);
 __PACKAGE__->attr([qw/buffer filter_buffer/] => sub { Mojo::Buffer->new });

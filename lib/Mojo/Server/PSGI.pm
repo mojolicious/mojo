@@ -8,7 +8,7 @@ use warnings;
 use base 'Mojo::Server';
 use bytes;
 
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 8192;
 
 # Things aren't as happy as they used to be down here at the unemployment
 # office.

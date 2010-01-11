@@ -28,7 +28,7 @@ __PACKAGE__->attr(_child_poll => sub { IO::Poll->new });
 __PACKAGE__->attr([qw/_child_read _child_write _cleanup _spawn/]);
 __PACKAGE__->attr(_children => sub { {} });
 
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 4096;
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 8192;
 
 # Marge? Since I'm not talking to Lisa,
 # would you please ask her to pass me the syrup?

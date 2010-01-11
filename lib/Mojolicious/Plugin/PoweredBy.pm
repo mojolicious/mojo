@@ -14,13 +14,16 @@ use base 'Mojolicious::Plugin';
 # and the octopus ate all his acorns.
 # And also he got a racecar. Is any of this getting through to you?
 sub register {
-    my ($self, $app) = @_;
+    my ($self, $app, $name) = @_;
+
+    # Name
+    $name ||= 'Mojolicious (Perl)';
 
     # Add header
     $app->plugins->add_hook(
         after_build_tx => sub {
             my ($self, $tx) = @_;
-            $tx->res->headers->header('X-Powered-By' => 'Mojolicious (Perl)');
+            $tx->res->headers->header('X-Powered-By' => $name);
         }
     );
 }
@@ -36,14 +39,16 @@ Mojolicious::Plugin::PoweredBy - Powered By Plugin
 
     # Mojolicious
     $self->plugin('powered_by');
+    $self->plugin(powered_by => 'MyApp 1.0');
 
     # Mojolicious::Lite
     plugin 'powered_by';
+    plugin powered_by => 'MyApp 1.0';
 
 =head1 DESCRIPTION
 
 L<Mojolicous::Plugin::PoweredBy> is a plugin that adds an C<X-Powered-By>
-header.
+header which defaults to C<Mojolicious (Perl)>.
 
 =head1 METHODS
 

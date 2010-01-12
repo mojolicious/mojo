@@ -177,11 +177,11 @@ customized to override normal C<@ARGV> use.
 
     shagadelic('cgi');
 
-Your application will automatically reload itself if you set the
-C<MOJO_RELOAD> environment variable, so you don't have to restart the server
-after every change.
+Your application will automatically reload itself if you set the C<--reload>
+option, so you don't have to restart the server after every change.
 
-    % MOJO_RELOAD=1 ./myapp.pl daemon
+    % ./myapp.pl daemon --reload
+    Server available at http://127.0.0.1:3000.
 
 Routes are basically just fancy paths that can contain different kinds of
 placeholders.

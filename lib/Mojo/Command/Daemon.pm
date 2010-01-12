@@ -29,6 +29,8 @@ These options are available:
   --pid <path>            Set path to pid file, defaults to a random
                           temporary file.
   --queue <size>          Set listen queue size, defaults to SOMAXCONN.
+  --reload                Automatically reload application when the source
+                          code changes.
   --requests <number>     Set the maximum number of requests per keep-alive
                           connection, defaults to 100.
   --user <name>           Set user name for process.
@@ -51,6 +53,7 @@ sub run {
         'lock=s'      => sub { $daemon->lock_file($_[1]) },
         'pid=s'       => sub { $daemon->pid_file($_[1]) },
         'queue=i'     => sub { $daemon->listen_queue_size($_[1]) },
+        reload        => sub { $daemon->reload(1) },
         'requests=i'  => sub { $daemon->max_keep_alive_requests($_[1]) },
         'user=s'      => sub { $daemon->user($_[1]) }
     );

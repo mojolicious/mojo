@@ -37,6 +37,8 @@ These options are available:
   --pid <path>            Set path to pid file, defaults to a random
                           temporary file.
   --queue <size>          Set listen queue size, defaults to SOMAXCONN.
+  --reload                Automatically reload application when the source
+                          code changes.
   --requests <number>     Set maximum number of requests per keep-alive
                           connection, defaults to 100.
   --servers <number>      Set maximum number of children, defaults to 100.
@@ -57,7 +59,7 @@ sub run {
     @ARGV = @_ if @_;
     GetOptions(
         'clients=i'   => sub { $daemon->max_clients($_[1]) },
-        'daemonize'   => \$daemonize,
+        daemonize     => \$daemonize,
         'group=s'     => sub { $daemon->group($_[1]) },
         'idle=i'      => sub { $daemon->idle_timeout($_[1]) },
         'interval=i'  => sub { $daemon->cleanup_interval($_[1]) },
@@ -68,6 +70,7 @@ sub run {
         'minspare=i'  => sub { $daemon->min_spare_servers($_[1]) },
         'pid=s'       => sub { $daemon->pid_file($_[1]) },
         'queue=i'     => sub { $daemon->listen_queue_size($_[1]) },
+        reload        => sub { $daemon->reload(1) },
         'requests=i'  => sub { $daemon->max_keep_alive_requests($_[1]) },
         'servers=i'   => sub { $daemon->max_servers($_[1]) },
         'start=i'     => sub { $daemon->start_servers($_[1]) },

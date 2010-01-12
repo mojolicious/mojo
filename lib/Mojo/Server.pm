@@ -10,8 +10,6 @@ use base 'Mojo::Base';
 use Carp 'croak';
 use Mojo::Loader;
 
-use constant RELOAD => $ENV{MOJO_RELOAD} || 0;
-
 __PACKAGE__->attr(
     app => sub {
         my $self = shift;
@@ -35,7 +33,7 @@ __PACKAGE__->attr(
             my $self = shift;
 
             # Reload
-            if (RELOAD) {
+            if ($self->reload) {
                 if (my $e = Mojo::Loader->reload) { warn $e }
                 delete $self->{app};
             }
@@ -66,6 +64,7 @@ __PACKAGE__->attr(
         sub { shift->app->handler(shift) }
     }
 );
+__PACKAGE__->attr(reload => sub { $ENV{MOJO_RELOAD} || 0 });
 
 # Are you saying you're never going to eat any animal again? What about bacon?
 # No.
@@ -136,6 +135,11 @@ L<Mojo::Server> implements the following attributes.
     $server     = $server->handler_cb(sub {
         my ($self, $tx) = @_;
     });
+
+=head2 C<reload>
+
+    my $reload = $server->reload;
+    $server    = $server->reload(1);
 
 =head1 METHODS
 

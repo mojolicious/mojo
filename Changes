@@ -2,6 +2,8 @@ This file documents the revision history for Perl extension Mojo.
 
 0.999915 2010-01-10 00:00:00
         - MOJO_RELOAD=1 now works with Mojolicious::Lite, have fun!
+        - Added --reload flag to all server bindings as an alternative to
+          MOJO_RELOAD=1.
         - Added IPv6 support.
         - Added SSL/TLS support.
         - Added IDNA support.

@@ -25,6 +25,8 @@ This file documents the revision history for Perl extension Mojo.
         - Added version command.
         - Added after_build_tx plugin hook.
         - Added timer support to Mojo::IOLoop.
+        - Added the ability to run multiple parallel ioloops that block each
+          other.
         - Made all Mojolicious after_* plugin hooks run in reverse order.
         - Made param decoding more defensive and allow malformed data to pass
           through for debugging.

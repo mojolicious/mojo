@@ -19,7 +19,7 @@ use Socket;
 __PACKAGE__->attr([qw/app default_cb tls_ca_file tls_verify_cb/]);
 __PACKAGE__->attr([qw/continue_timeout max_keep_alive_connections/] => 5);
 __PACKAGE__->attr(cookie_jar => sub { Mojo::CookieJar->new });
-__PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->new });
+__PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->singleton });
 __PACKAGE__->attr(keep_alive_timeout => 15);
 __PACKAGE__->attr(max_redirects      => 0);
 

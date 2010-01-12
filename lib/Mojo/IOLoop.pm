@@ -59,13 +59,11 @@ __PACKAGE__->attr(
 # Singleton
 our $LOOP;
 
-# Instantiate singleton
 sub new {
-    my $self = $LOOP ||= shift->SUPER::new(@_);
+    my $self = shift->SUPER::new(@_);
 
-    # Signals
+    # Ignore pipe
     $SIG{PIPE} = 'IGNORE';
-    $SIG{HUP} = sub { $self->_running(0) };
 
     return $self;
 }
@@ -298,6 +296,8 @@ sub remote_info {
     my $socket = $self->_connections->{$id}->{socket};
     return {address => $socket->peerhost, port => $socket->peerport};
 }
+
+sub singleton { $LOOP ||= shift->new(@_) }
 
 sub start {
     my $self = shift;
@@ -949,6 +949,10 @@ following new ones.
 =head2 C<remote_info>
 
     my $info = $loop->remote_info($id);
+
+=head2 C<singleton>
+
+    my $loop = Mojo::IOLoop->singleton;
 
 =head2 C<start>
 

@@ -18,7 +18,7 @@ use Scalar::Util qw/isweak weaken/;
 use Sys::Hostname 'hostname';
 
 __PACKAGE__->attr([qw/group listen listen_queue_size user/]);
-__PACKAGE__->attr(ioloop => sub { Mojo::IOLoop->new });
+__PACKAGE__->attr(ioloop => sub { Mojo::IOLoop->singleton });
 __PACKAGE__->attr(keep_alive_timeout => 15);
 __PACKAGE__->attr(
     lock_file => sub {
@@ -65,6 +65,9 @@ sub prepare_ioloop {
 
     # Max clients
     $self->ioloop->max_connections($self->max_clients);
+
+    # Stop ioloop on HUP
+    $SIG{HUP} = sub { $self->ioloop->stop };
 }
 
 sub prepare_lock_file {

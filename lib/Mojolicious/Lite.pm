@@ -25,6 +25,9 @@ sub import {
     # Initialize app
     my $app = $class->new;
 
+    # Default template class
+    $app->renderer->default_template_class($class);
+
     # Initialize routes
     my $routes = $app->routes;
 

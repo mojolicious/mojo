@@ -14,7 +14,7 @@ use Mojo::JSON;
 use MojoX::Types;
 
 __PACKAGE__->attr(default_format => 'html');
-__PACKAGE__->attr([qw/default_handler encoding/]);
+__PACKAGE__->attr([qw/default_handler default_template_class encoding/]);
 __PACKAGE__->attr(default_status => 200);
 __PACKAGE__->attr(handler        => sub { {} });
 __PACKAGE__->attr(helper         => sub { {} });
@@ -73,6 +73,7 @@ sub get_inline_template {
     my $class =
          $c->stash->{template_class}
       || $ENV{MOJO_TEMPLATE_CLASS}
+      || $self->default_template_class
       || 'main';
 
     # Get
@@ -262,6 +263,11 @@ L<MojoX::Types> implements the follwing attributes.
 
     my $default = $renderer->default_status;
     $renderer   = $renderer->default_status(404);
+
+=head2 C<default_template_class>
+
+    my $default = $renderer->default_template_class;
+    $renderer   = $renderer->default_template_class('main');
 
 =head2 C<encoding>
 

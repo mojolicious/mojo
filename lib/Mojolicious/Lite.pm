@@ -25,9 +25,6 @@ sub import {
     # Initialize app
     my $app = $class->new;
 
-    # Default template class
-    $app->renderer->default_template_class($class);
-
     # Initialize routes
     my $routes = $app->routes;
 
@@ -92,6 +89,9 @@ sub import {
     # Prepare exports
     my $caller = caller;
     no strict 'refs';
+
+    # Default template class
+    $app->renderer->default_template_class($caller);
 
     # Export
     *{"${caller}::app"}    = sub {$app};

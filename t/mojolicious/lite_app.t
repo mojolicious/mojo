@@ -228,9 +228,8 @@ get '/param_auth/too' =>
 
 # Oh Fry, I love you more than the moon, and the stars,
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
-my $app = Mojolicious::Lite->new;
-my $client = Mojo::Client->new(app => $app);
-$app->client($client);
+my $client = Mojo::Client->new(app => app);
+app->client($client);
 my $t = Test::Mojo->new;
 
 # GET /
@@ -393,8 +392,8 @@ $t->post_form_ok(
       ->to_string);
 
 # POST /malformed_utf8
-my $level = $app->log->level;
-$app->log->level('fatal');
+my $level = app->log->level;
+app->log->level('fatal');
 my $tx = Mojo::Transaction::Single->new;
 $tx->req->method('POST');
 $tx->req->url->parse('/malformed_utf8');
@@ -409,7 +408,7 @@ $client->queue(
         is($tx->res->body,                            '%E1');
     }
 )->process;
-$app->log->level($level);
+app->log->level($level);
 
 # GET /json
 $t->get_ok('/json')->status_is(200)->header_is(Server => 'Mojo (Perl)')
@@ -435,12 +434,12 @@ $t->get_ok('/helper', {'User-Agent' => 'Explorer'})->status_is(200)
   ->content_is('<br/>&lt;.../template(Explorer)');
 
 # GET /eperror
-$level = $app->log->level;
-$app->log->level('fatal');
+$level = app->log->level;
+app->log->level('fatal');
 $t->get_ok('/eperror')->status_is(500)->header_is(Server => 'Mojo (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/Internal Server Error/);
-$app->log->level($level);
+app->log->level($level);
 
 # GET /subrequest
 $t->get_ok('/subrequest')->status_is(200)->header_is(Server => 'Mojo (Perl)')

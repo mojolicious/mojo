@@ -16,7 +16,7 @@ use Mojo::Parameters;
 
 require Test::More;
 
-__PACKAGE__->attr(app       => sub { Mojolicious::Lite->new });
+__PACKAGE__->attr(app => sub { return $ENV{MOJO_APP} if ref $ENV{MOJO_APP} });
 __PACKAGE__->attr(redirects => sub { [] });
 __PACKAGE__->attr('tx');
 __PACKAGE__->attr(max_redirects => 0);

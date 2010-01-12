@@ -10,10 +10,6 @@ use base 'Mojolicious';
 use File::Spec;
 use FindBin;
 
-# Singletons
-my $APP;
-my $ROUTES;
-
 # It's the future, my parents, my co-workers, my girlfriend,
 # I'll never see any of them ever again... YAHOOO!
 sub import {
@@ -27,10 +23,10 @@ sub import {
     $ENV{MOJO_HOME} ||= File::Spec->catdir(split '/', $FindBin::Bin);
 
     # Initialize app
-    $APP = $class->new;
+    my $app = $class->new;
 
     # Initialize routes
-    $ROUTES = $APP->routes;
+    my $routes = $app->routes;
 
     # Route generator
     my $route = sub {
@@ -80,13 +76,13 @@ sub import {
         $name ||= '';
 
         # Create bridge
-        return $ROUTES =
-          $APP->routes->bridge($pattern, {@$constraints})->over($conditions)
+        return $routes =
+          $app->routes->bridge($pattern, {@$constraints})->over($conditions)
           ->to($defaults)->name($name)
           if !ref $methods && $methods eq 'ladder';
 
         # Create route
-        $ROUTES->route($pattern, {@$constraints})->over($conditions)
+        $routes->route($pattern, {@$constraints})->over($conditions)
           ->via($methods)->to($defaults)->name($name);
     };
 
@@ -95,27 +91,19 @@ sub import {
     no strict 'refs';
 
     # Export
-    *{"${caller}::app"}    = sub {$APP};
+    *{"${caller}::app"}    = sub {$app};
     *{"${caller}::any"}    = sub { $route->(ref $_[0] ? shift : [], @_) };
     *{"${caller}::get"}    = sub { $route->('get', @_) };
     *{"${caller}::ladder"} = sub { $route->('ladder', @_) };
-    *{"${caller}::plugin"} = sub { $APP->plugin(@_) };
+    *{"${caller}::plugin"} = sub { $app->plugin(@_) };
     *{"${caller}::post"}   = sub { $route->('post', @_) };
 
+    # We are most likely the app in a lite environment
+    $ENV{MOJO_APP} ||= $app;
+
     # Shagadelic!
-    *{"${caller}::shagadelic"} = sub {
-
-        # We are the app in a lite environment
-        $ENV{MOJO_APP} ||= 'Mojolicious::Lite';
-
-        # Start
-        Mojolicious::Lite->start(@_);
-    };
+    *{"${caller}::shagadelic"} = sub { Mojolicious::Lite->start(@_) };
 }
-
-# Steven Hawking, aren't you that guy who invented gravity?
-# Sure, why not.
-sub new { $APP || shift->SUPER::new(@_) }
 
 1;
 __END__
@@ -554,11 +542,6 @@ L<Mojolicious::Lite> inherits all attributes from L<Mojolicious>.
 
 =head1 METHODS
 
-L<Mojolicious::Lite> inherits all methods from L<Mojolicious> and implements
-the following new ones.
-
-=head2 C<new>
-
-    my $mojo = Mojolicious::Lite->new;
+L<Mojolicious::Lite> inherits all methods from L<Mojolicious>.
 
 =cut

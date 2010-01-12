@@ -14,6 +14,8 @@ This file documents the revision history for Perl extension Mojo.
               mojo daemon --listen https:*:3001:/foo/server.crt:/foo/server.key
         - Added routes captures to params in Mojolicious.
         - Added native PSGI support.
+        - Added the ability to have multiple Mojolicious::Lite apps at once.
+          (Mojolicious::Lite is not a singleton anymore!)
         - Added charset plugin to Mojolicious. (charsbar)
         - Added simple reverse proxy support with tests.
         - Added simpler way to define default controller and action for a

@@ -16,6 +16,9 @@ __PACKAGE__->attr(
     app => sub {
         my $self = shift;
 
+        # App in environment
+        return $ENV{MOJO_APP} if ref $ENV{MOJO_APP};
+
         # Load
         if (my $e = Mojo::Loader->load($self->app_class)) {
             die $e if ref $e;
@@ -24,7 +27,8 @@ __PACKAGE__->attr(
         return $self->app_class->new;
     }
 );
-__PACKAGE__->attr(app_class => sub { $ENV{MOJO_APP} ||= 'Mojo::HelloWorld' });
+__PACKAGE__->attr(app_class =>
+      sub { ref $ENV{MOJO_APP} || $ENV{MOJO_APP} || 'Mojo::HelloWorld' });
 __PACKAGE__->attr(
     build_tx_cb => sub {
         sub {

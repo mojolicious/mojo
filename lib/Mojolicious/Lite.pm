@@ -10,6 +10,9 @@ use base 'Mojolicious';
 use File::Spec;
 use FindBin;
 
+# Make reloading work
+BEGIN { $INC{$0} = $0 }
+
 # It's the future, my parents, my co-workers, my girlfriend,
 # I'll never see any of them ever again... YAHOOO!
 sub import {
@@ -89,6 +92,7 @@ sub import {
     # Prepare exports
     my $caller = caller;
     no strict 'refs';
+    no warnings 'redefine';
 
     # Default template class
     $app->renderer->default_template_class($caller);
@@ -102,7 +106,7 @@ sub import {
     *{"${caller}::post"}   = sub { $route->('post', @_) };
 
     # We are most likely the app in a lite environment
-    $ENV{MOJO_APP} ||= $app;
+    $ENV{MOJO_APP} = $app;
 
     # Shagadelic!
     *{"${caller}::shagadelic"} = sub { Mojolicious::Lite->start(@_) };

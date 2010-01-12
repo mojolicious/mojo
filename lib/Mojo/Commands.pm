@@ -26,6 +26,10 @@ __PACKAGE__->attr(namespaces => sub { ['Mojo::Command'] });
 sub run {
     my ($self, $name, @args) = @_;
 
+    # Don't run commands if we are reloading
+    return $self if $ENV{MOJO_COMMANDS_DONE};
+    $ENV{MOJO_COMMANDS_DONE} ||= 1;
+
     # Run command
     if ($name && $name =~ /^\w+$/ && ($name ne 'help' || $args[0])) {
 

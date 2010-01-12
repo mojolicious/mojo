@@ -62,7 +62,7 @@ our $LOOP;
 sub new {
     my $self = shift->SUPER::new(@_);
 
-    # Ignore pipe
+    # Ignore PIPE signal
     $SIG{PIPE} = 'IGNORE';
 
     return $self;

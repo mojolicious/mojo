@@ -66,7 +66,7 @@ sub prepare_ioloop {
     # Max clients
     $self->ioloop->max_connections($self->max_clients);
 
-    # Stop ioloop on HUP
+    # Stop ioloop on HUP signal
     $SIG{HUP} = sub { $self->ioloop->stop };
 }
 

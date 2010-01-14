@@ -33,6 +33,7 @@ This file documents the revision history for Perl extension Mojo.
         - Added the ability to run multiple parallel ioloops that block each
           other.
         - Added default_template_class attribute to MojoX::Renderer.
+        - Added render_static method to Mojolicious::Controller.
         - Made all Mojolicious after_* plugin hooks run in reverse order.
         - Made param decoding more defensive and allow malformed data to pass
           through for debugging.

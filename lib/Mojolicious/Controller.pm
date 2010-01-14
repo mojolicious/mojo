@@ -148,6 +148,11 @@ sub render_partial {
     return Mojo::ByteStream->new($self->render(@_));
 }
 
+sub render_static {
+    my $self = shift;
+    $self->app->static->serve($self, @_);
+}
+
 sub render_text {
     my $self = shift;
     $self->stash->{text} = shift;
@@ -259,6 +264,10 @@ ones.
 
     my $output = $c->render_partial;
     my $output = $c->render_partial(action => 'foo');
+
+=head2 C<render_static>
+
+    $c->render_static('images/logo.png');
 
 =head2 C<render_text>
 

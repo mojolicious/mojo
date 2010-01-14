@@ -53,8 +53,8 @@ sub new {
     # Hide own controller methods
     $self->routes->hide(qw/client helper param pause redirect_to/);
     $self->routes->hide(qw/render_exception render_json render_inner/);
-    $self->routes->hide(qw/render_not_found render_partial render_text/);
-    $self->routes->hide(qw/resume url_for/);
+    $self->routes->hide(qw/render_not_found render_partial render_static/);
+    $self->routes->hide(qw/render_text resume url_for/);
 
     # Mode
     my $mode = $self->mode;

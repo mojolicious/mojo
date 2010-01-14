@@ -188,6 +188,9 @@ get '/koi8-r' => sub {
     app->renderer->encoding(undef);
 };
 
+# GET /hello3.txt
+get '/hello3.txt' => sub { shift->render_static('hello2.txt') };
+
 ladder sub {
     my $self = shift;
     return unless $self->req->headers->header('X-Bender');
@@ -553,14 +556,14 @@ $t->get_ok('/hello.txt', {'Range' => 'bytes=0-0'})->status_is(206)
   ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 1)
   ->content_is('H');
 
-# GET /hello2.txt (single byte file)
-$t->get_ok('/hello2.txt')->status_is(200)->header_is(Server => 'Mojo (Perl)')
+# GET /hello3.txt (render_static and single byte file)
+$t->get_ok('/hello3.txt')->status_is(200)->header_is(Server => 'Mojo (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 1)
   ->content_is('X');
 
-# GET /hello2.txt (partial single byte file)
-$t->get_ok('/hello2.txt', {'Range' => 'bytes=0-0'})->status_is(206)
+# GET /hello3.txt (render_static and partial single byte file)
+$t->get_ok('/hello3.txt', {'Range' => 'bytes=0-0'})->status_is(206)
   ->header_is(Server          => 'Mojo (Perl)')
   ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
   ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 1)

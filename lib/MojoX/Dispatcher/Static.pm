@@ -30,7 +30,7 @@ sub dispatch {
     }
 
     # Parts
-    my @parts = @{Mojo::Path->parse($path)->parts};
+    my @parts = @{Mojo::Path->new->parse($path)->parts};
 
     # Shortcut
     return 1 unless @parts;

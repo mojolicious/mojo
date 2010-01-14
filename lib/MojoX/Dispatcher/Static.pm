@@ -94,7 +94,7 @@ sub serve {
             if (my $range = $req->headers->header('Range')) {
                 if ($range =~ m/^bytes=(\d+)\-(\d+)?/ && $1 <= $end) {
                     $start = $1;
-                    $end = $2 if $2 && $2 <= $end;
+                    $end = $2 if defined $2 && $2 <= $end;
                     $res->code(206);
                     $res->headers->header(
                         'Content-Length' => $end - $start + 1);

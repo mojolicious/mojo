@@ -90,7 +90,7 @@ sub contains {
 
     # Seek to start
     $self->handle->seek($self->start_range, SEEK_SET);
-    my $end = $self->end_range ? $self->end_range : $self->size;
+    my $end = defined $self->end_range ? $self->end_range : $self->size;
     my $rlen = length($bytestream) * 2;
     if ($rlen > $end - $self->start_range) {
         $rlen = $end - $self->start_range;
@@ -104,7 +104,7 @@ sub contains {
     # Moving window search
     my $range = $self->end_range;
     while ($offset <= $end) {
-        if ($range) {
+        if (defined $range) {
             $readlen = $end + 1 - $offset;
             return if $readlen <= 0;
         }
@@ -130,7 +130,7 @@ sub get_chunk {
     my $buffer;
 
     # Range support
-    if ($end) {
+    if (defined $end) {
         my $chunk = $end + 1 - $off;
         return '' if $chunk <= 0;
         $chunk = CHUNK_SIZE if $chunk > CHUNK_SIZE;

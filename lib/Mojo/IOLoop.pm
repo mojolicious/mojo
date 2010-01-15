@@ -623,8 +623,12 @@ sub _spin {
 
     # KQueue
     if (KQUEUE) {
-        my $kq  = $self->_loop;
-        my @ret = $kq->kevent($self->timeout * 10);
+        my $kq = $self->_loop;
+
+        # Catch interrupted system call errors
+        my @ret;
+        eval { @ret = $kq->kevent($self->timeout * 10) };
+        die "KQueue error: $@" if $@;
 
         # Events
         for my $kev (@ret) {

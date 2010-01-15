@@ -50,6 +50,9 @@ sub run {
                 die $e;
             }
 
+            # Module is a command?
+            next unless $try->can('new') && $try->can('run');
+
             # Found
             $module = $try;
             last;

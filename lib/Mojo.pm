@@ -87,13 +87,16 @@ Mojo - The Web In A Box!
 
 =head1 DESCRIPTION
 
-L<Mojo> provides a minimal interface between web servers and Perl web
-frameworks.
+L<Mojo> provides a flexible interface between web servers and Perl web
+frameworks. It is a good basis for implementing your own framework.
 
-Also included in the distribution are two MVC web frameworks named
-L<Mojolicious> and L<Mojolicious::Lite>.
+Also included in the distribution are a MVC web framework named
+L<Mojolicious>. It also supports a single file mode using 
+L<Mojolicious::Lite>.
 
-Currently there are no requirements besides Perl 5.8.1.
+Currently this distribution has no requirements besides Perl 5.8.1.
+
+=head2 
 
     .------------------------------------------------------------.
     |                                                            |
@@ -120,20 +123,31 @@ L<Mojo> implements the following attributes.
     my $cb = $mojo->build_tx_cb;
     $mojo  = $mojo->build_tx_cb(sub { ... });
 
-=head2 C<client>
-
-    my $client = $mojo->client;
-    $mojo      = $mojo->client(Mojo::Client->new);
+Build a new transaction. By default, it builds a new 
+L<Mojo::Transaction::Single>. 
 
 =head2 C<home>
 
     my $home = $mojo->home;
     $mojo    = $mojo->home(Mojo::Home->new);
 
+The home directory of your Mojo application. The object stringifies to
+the path. See L<Mojo::Home> for details about home detection.
+
 =head2 C<log>
 
     my $log = $mojo->log;
     $mojo   = $mojo->log(Mojo::Log->new);
+    
+The log object of your Mojo application. See L<Mojo::Log> for more 
+information.
+
+=head2 C<client>
+
+    my $client = $mojo->client;
+    $mojo      = $mojo->client(Mojo::Client->new);
+
+A HTTP 1.1 Client for use in your applications. L<Mojo::Client> by default.
 
 =head1 METHODS
 
@@ -144,14 +158,23 @@ new ones.
 
     my $mojo = Mojo->new;
 
+Construct a new Mojo application. Will automatically detect your home
+directory and set up logging to 'log/mojo.log' if there' a log directory.
+
 =head2 C<handler>
 
     $tx = $mojo->handler($tx);
+
+The handler should be implemented in your framwork. It get called on 
+each new transaction.
 
 =head2 C<start>
 
     Mojo->start;
     Mojo->start('daemon');
+
+Start the application. See the L<Mojo::Commands::start> for more 
+information.
 
 =head1 SUPPORT
 

@@ -7,75 +7,86 @@ use warnings;
 
 use base 'Mojolicious::Plugin';
 
+require File::Basename;
+require File::Spec;
+
 use Mojo::JSON;
 use Mojo::Template;
-use File::Basename ();
-use File::Spec     ();
 
+# And so we say goodbye to our beloved pet, Nibbler, who's gone to a place
+# where I, too, hope one day to go. The toilet.
 sub register {
     my ($self, $app, $conf) = @_;
 
     # Config
     $conf ||= {};
 
+    # File
     my $file = $conf->{file};
-
-    # Default configuration file
     unless ($file) {
 
-        # Get the app script basename
+        # Basename
         $file = File::Basename::basename($0);
 
-        # Remove .pl and .p6 extentions
-        $file =~ s/\.p(?:l|6)$//i;
+        # Remove .pl, .p6 and .t extentions
+        $file =~ s/(?:\.p(?:l|6))|\.t$//i;
 
         # Default extension
         $file .= '.json';
     }
 
-    # Make path absolute unless otherwise
+    # Absolute?
     $file = $app->home->rel_file($file)
       unless File::Spec->file_name_is_absolute($file);
 
-    die "Configuration file '$file' not found" unless -e $file;
+    # Exists?
+    die qq/Configuration file "$file" missing, maybe you need to create it?\n/
+      unless -e $file;
 
-    $app->log->debug("Reading configuration file '$file'");
+    # Debug
+    $app->log->debug(qq/Reading configuration file "$file"./);
 
+    # Slurp UTF-8 file
     open FILE, "<:encoding(UTF-8)", $file
-      or die "Can't read configuration file '$file': $!";
+      or die qq/Couldn't open configuration file "$file": $!/;
     my $config = do { local $/; <FILE> };
     close FILE;
 
-    # $app
+    # Instance
     my $prepend = 'my $app = shift;';
 
     # Be less strict
     $prepend .= q/no strict 'refs'; no warnings 'redefine';/;
 
-    # app() helper
+    # Helper
     $prepend .= "sub app; *app = sub { \$app };";
 
     # Be strict again
     $prepend .= q/use strict; use warnings;/;
 
+    # Template
     my $mt = Mojo::Template->new;
     $mt->prepend($prepend);
 
-    # Render through template engine first
+    # Render
     $config = $mt->render($config, $app);
 
+    # Parse
     my $json = Mojo::JSON->new;
     $config = $json->decode($config);
-    die "Can't parse configuration: " . $json->error
-      if !$config && $json->error;
+    my $error = $json->error;
+    die qq/Couldn't parse configuration file "$file": $error/
+      if !$config && $error;
 
-    # Add config to the stash
+    # Stash key
     my $stash_key = $conf->{stash_key} || 'config';
 
+    # Add hook
     $app->plugins->add_hook(
         before_dispatch => sub {
             my ($self, $c) = @_;
 
+            # Add configuration to stash
             $c->stash($stash_key => $config);
         }
     );
@@ -90,9 +101,9 @@ Mojolicious::Plugin::JsonConfig - JSON Configuration Plugin
 
 =head1 SYNOPSIS
 
-    # Given configuration
+    # myapp.json
     {
-        "foo"       : "bar"
+        "foo"       : "bar",
         "music_dir" : "<%= app->home->rel_dir('music') %>"
     }
 
@@ -102,11 +113,10 @@ Mojolicious::Plugin::JsonConfig - JSON Configuration Plugin
     # Mojolicious::Lite
     plugin 'json_config';
 
-    # Reads myapp.json by default on startup and puts it into the stash
-    # ('config' key is default)
+    # Reads myapp.json by default and puts the parsed version into the stash
     my $config = $self->stash('config');
 
-    # or with options
+    # Everything can be customized with options
     plugin 'json_config' => {
         file      => '/etc/myapp.conf',
         stash_key => 'conf'
@@ -114,12 +124,12 @@ Mojolicious::Plugin::JsonConfig - JSON Configuration Plugin
 
 =head1 DESCRIPTION
 
-L<Mojolicous::Plugin::JsonConfig> is a JSON configuration plugin that first is
-parsed by L<Mojo::Template> and then by L<Mojo::JSON>.
+L<Mojolicous::Plugin::JsonConfig> is a JSON configuration plugin that
+preprocesses it's input with L<Mojo::Template>.
 
-To get to the application object L<$app> variable or L<app> helper can be used.
+The application object can be accessed via C<$app> or the C<app> helper.
 
-=head1 CONFIGURATION OPTIONS
+=head1 OPTIONS
 
 =head2 C<file>
 
@@ -127,8 +137,7 @@ To get to the application object L<$app> variable or L<app> helper can be used.
     plugin 'json_config' => {file => 'myapp.conf'};
     plugin 'json_config' => {file => '/etc/foo.json'};
 
-By default C<myapp.json> file is searched under the current application home
-directory.
+By default C<myapp.json> is searched in the application home directory.
 
 =head2 C<stash_key>
 

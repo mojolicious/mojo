@@ -81,6 +81,11 @@ sub register {
     # Stash key
     my $stash_key = $conf->{stash_key} || 'config';
 
+    # Merge
+    if ($conf->{default}) {
+        $config = {%{$conf->{default}}, %$config};
+    }
+
     # Add hook
     $app->plugins->add_hook(
         before_dispatch => sub {
@@ -132,6 +137,12 @@ preprocesses it's input with L<Mojo::Template>.
 
 The application object can be accessed via C<$app> or the C<app> helper.
 
+Configuration is also returned after loading the plugin. This way it can be
+accessed on application startup.
+
+    # Mojolicious::Lite
+    my $config = plugin 'json_config';
+
 =head1 OPTIONS
 
 =head2 C<file>
@@ -146,6 +157,11 @@ By default C<myapp.json> is searched in the application home directory.
 
     # Mojolicious::Lite
     plugin 'json_config' => {stash_key => 'conf'};
+
+=head2 C<default>
+
+    # Mojolicious::Lite
+    plugin 'json_config' => {default => {foo => 'bar'}};
 
 =head1 METHODS
 

@@ -66,10 +66,7 @@ sub load_plugin {
         next unless $module->can('new') && $module->can('register');
 
         # Register
-        my $plugin = $module->new->register($app, $args);
-
-        # Done
-        return $self;
+        return $module->new->register($app, $args);
     }
 
     # Not found

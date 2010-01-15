@@ -90,6 +90,9 @@ sub register {
             $c->stash($stash_key => $config);
         }
     );
+
+    # Return configuration
+    return $config;
 }
 
 1;

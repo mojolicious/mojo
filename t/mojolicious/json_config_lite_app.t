@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 # Oh, I always feared he might run off like this.
 # Why, why, why didn't I break his legs?
@@ -14,7 +14,8 @@ use Mojolicious::Lite;
 use Test::Mojo;
 
 # Load plugin
-plugin 'json_config';
+my $config = plugin 'json_config';
+is($config->{foo}, 'bar');
 
 # Silence
 app->log->level('error');

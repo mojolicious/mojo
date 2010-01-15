@@ -82,9 +82,7 @@ sub register {
     my $stash_key = $conf->{stash_key} || 'config';
 
     # Merge
-    if ($conf->{default}) {
-        $config = {%{$conf->{default}}, %$config};
-    }
+    $config = {%{$conf->{default}}, %$config} if $conf->{default};
 
     # Add hook
     $app->plugins->add_hook(
@@ -125,7 +123,7 @@ Mojolicious::Plugin::JsonConfig - JSON Configuration Plugin
     my $config = $self->stash('config');
 
     # Everything can be customized with options
-    plugin 'json_config' => {
+    my $config = plugin 'json_config' => {
         file      => '/etc/myapp.conf',
         stash_key => 'conf'
     };
@@ -137,13 +135,12 @@ preprocesses it's input with L<Mojo::Template>.
 
 The application object can be accessed via C<$app> or the C<app> helper.
 
-Configuration is also returned after loading the plugin. This way it can be
-accessed on application startup.
+=head1 OPTIONS
+
+=head2 C<default>
 
     # Mojolicious::Lite
-    my $config = plugin 'json_config';
-
-=head1 OPTIONS
+    plugin 'json_config' => {default => {foo => 'bar'}};
 
 =head2 C<file>
 
@@ -157,11 +154,6 @@ By default C<myapp.json> is searched in the application home directory.
 
     # Mojolicious::Lite
     plugin 'json_config' => {stash_key => 'conf'};
-
-=head2 C<default>
-
-    # Mojolicious::Lite
-    plugin 'json_config' => {default => {foo => 'bar'}};
 
 =head1 METHODS
 

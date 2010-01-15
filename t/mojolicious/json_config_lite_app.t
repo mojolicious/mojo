@@ -16,7 +16,7 @@ use Test::Mojo;
 # Load plugin
 my $config =
   plugin json_config => {default => {foo => 'baz', hello => 'there'}};
-is($config->{foo}, 'bar');
+is($config->{foo},   'bar');
 is($config->{hello}, 'there');
 
 # Silence

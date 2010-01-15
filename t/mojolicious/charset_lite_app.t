@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 15;
+use Test::More tests => 19;
 
 # In the game of chess you can never let your adversary see your pieces.
 use Mojo::ByteStream 'b';
@@ -30,6 +30,8 @@ post '/' => sub {
     $self->render_text("foo: " . $self->param('foo'));
 };
 
+get '/json' => sub { shift->render_json({test => $yatta}) };
+
 my $t = Test::Mojo->new;
 
 # Plain old ASCII
@@ -48,6 +50,10 @@ $t->post_form_ok('/', 'shift_jis', {foo => $yatta})->status_is(200)
 # and those in separate files in Shift_JIS (Mojo will do the decoding)
 $t->get_ok('/')->status_is(200)->content_type_like(qr/Shift_JIS/)
   ->content_like(qr/$yatta/);
+
+# JSON data
+$t->get_ok('/json')->status_is(200)->content_type_is('application/json')
+  ->json_content_is({test => $yatta});
 
 __DATA__
 @@ index.html.ep

@@ -30,18 +30,20 @@ sub new {
     # JSON
     $self->add_handler(
         json => sub {
-            my ($r, $c, $output) = @_;
-            $$output = Mojo::JSON->new->encode(delete $c->stash->{json});
+            my ($r, $c, $output, $options) = @_;
+            $$output = Mojo::JSON->new->encode($options->{json});
         }
     );
 
     # Text
     $self->add_handler(
         text => sub {
-            my ($r, $c, $output) = @_;
-            $$output = delete $c->stash->{text};
+            my ($r, $c, $output, $options) = @_;
+            $$output = $options->{text};
         }
     );
+
+    return $self;
 }
 
 sub add_handler {
@@ -100,15 +102,21 @@ sub render {
     # Handler
     my $handler = $c->stash->{handler} || $self->default_handler;
 
+    # Text
+    my $text = delete $c->stash->{text};
+
+    # JSON
+    my $json = delete $c->stash->{json};
+
     my $options =
       {template => $template, format => $format, handler => $handler};
     my $output;
 
     # Text
-    if ($c->stash->{text}) {
+    if (defined $text) {
 
         # Render
-        $self->handler->{text}->($self, $c, \$output);
+        $self->handler->{text}->($self, $c, \$output, {text => $text});
 
         # Extends?
         $c->stash->{content}->{content} = b("$output")
@@ -116,10 +124,10 @@ sub render {
     }
 
     # JSON
-    elsif ($c->stash->{json}) {
+    elsif (defined $json) {
 
         # Render
-        $self->handler->{json}->($self, $c, \$output);
+        $self->handler->{json}->($self, $c, \$output, {json => $json});
         $format = 'json';
 
         # Extends?
@@ -159,9 +167,9 @@ sub render {
     # Partial
     return $output if $partial;
 
-    # Encoding
+    # Encoding (JSON is already encoded)
     $output = b($output)->encode($self->encoding)->to_string
-      if $self->encoding;
+      if $self->encoding && !$json;
 
     # Response
     my $res = $c->res;

@@ -36,6 +36,9 @@ __PACKAGE__->attr(
             if ($self->reload) {
                 if (my $e = Mojo::Loader->reload) { warn $e }
                 delete $self->{app};
+
+                # Reset if this reload was triggered by a USR1 signal
+                $self->reload(0) if $self->reload == 2;
             }
 
             return $self->app->build_tx_cb->($self->app);
@@ -73,6 +76,15 @@ __PACKAGE__->attr(reload => sub { $ENV{MOJO_RELOAD} || 0 });
 # Pork chops?
 # Dad, those all come from the same animal.
 # Heh heh heh. Ooh, yeah, right, Lisa. A wonderful, magical animal.
+sub new {
+    my $self = shift->SUPER::new(@_);
+
+    # Reload on USR1 signal
+    $SIG{USR1} = sub { $self->reload(2) };
+
+    return $self;
+}
+
 sub run { croak 'Method "run" not implemented by subclass' }
 
 1;
@@ -145,6 +157,10 @@ L<Mojo::Server> implements the following attributes.
 
 L<Mojo::Server> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
+
+=head2 C<new>
+
+    my $server = Mojo::Server->new;
 
 =head2 C<run>
 

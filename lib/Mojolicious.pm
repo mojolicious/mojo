@@ -129,8 +129,17 @@ sub handler {
         );
     }
 
+    # Embedded application?
+    my $stash = {};
+    if ($tx->can('stash')) {
+        $stash = $tx->stash;
+        $tx    = $tx->tx;
+    }
+
     # Build default controller and process
-    eval { $self->process($class->new(app => $self, tx => $tx)) };
+    eval {
+        $self->process($class->new(app => $self, stash => $stash, tx => $tx));
+    };
     $self->log->error("Processing request failed: $@") if $@;
 }
 

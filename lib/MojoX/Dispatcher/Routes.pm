@@ -46,6 +46,52 @@ sub dispatch {
     return $self->render($c);
 }
 
+sub dispatch_app {
+    my ($self, $c) = @_;
+
+    # Debug
+    $c->app->log->debug(qq/Dispatching application./);
+
+    # Catch errors
+    local $SIG{__DIE__} = sub { die Mojo::Exception->new(shift) };
+
+    # Prepare new path and base path for embedded application
+    my $opath  = $c->req->url->path;
+    my $obpath = $c->req->url->base->path;
+    if (my $path = $c->match->captures->{path}) {
+
+        # Make sure new path starts with a slash
+        $path = "/$path" unless $path =~ /^\//;
+
+        # Generate new base path
+        my $bpath = "$opath$obpath";
+        $bpath =~ s/$path$//;
+
+        # Set new path and base path
+        $c->req->url->path($path);
+        $c->req->url->base->path($bpath);
+    }
+
+    # Dispatch
+    my $continue;
+    eval { $continue = $c->match->captures->{app}->handler($c) };
+
+    # Reset path and base path
+    $c->req->url->path($opath);
+    $c->req->url->base->path($obpath);
+
+    # Success!
+    return 1 if $continue;
+
+    # Callback error
+    if ($@) {
+        $c->app->log->error($@);
+        return $@;
+    }
+
+    return;
+}
+
 sub dispatch_callback {
     my ($self, $c) = @_;
 
@@ -230,9 +276,9 @@ sub walk_stack {
 
         # Dispatch
         my $e =
-            $field->{callback}
-          ? $self->dispatch_callback($c)
-          : $self->dispatch_controller($c);
+            $field->{callback} ? $self->dispatch_callback($c)
+          : $field->{app}      ? $self->dispatch_app($c)
+          :                      $self->dispatch_controller($c);
 
         # Exception
         return $e if ref $e;
@@ -296,6 +342,10 @@ implements the follwing the ones.
     my $e = $dispatcher->dispatch(
         MojoX::Dispatcher::Routes::Controller->new
     );
+
+=head2 C<dispatch_app>
+
+    my $e = $dispatcher->dispatch_app($c);
 
 =head2 C<dispatch_callback>
 

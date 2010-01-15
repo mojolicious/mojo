@@ -17,7 +17,11 @@ use Mojolicious::Lite;
 app->log->level('error');
 
 # GET /hello (embedded)
-get '/hello' => sub { shift->render_text('Hello from the embedded app!') };
+get '/hello' => sub {
+    my $self = shift;
+    my $name = $self->stash('name');
+    $self->render_text("Hello from the $name app!");
+};
 
 package main;
 
@@ -31,7 +35,8 @@ app->log->level('error');
 get '/hello' => sub { shift->render_text('Hello from the main app!') };
 
 # /hello/* (dispatch to embedded app)
-app->routes->route('/hello/(*path)')->to(app => EmbeddedTestApp::app());
+app->routes->route('/hello/(*path)')
+  ->to(app => EmbeddedTestApp::app(), name => 'embedded');
 
 my $t = Test::Mojo->new;
 

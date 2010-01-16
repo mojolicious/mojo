@@ -18,9 +18,14 @@ sub new {
     # Shortcut
     return $self unless $lines;
 
+    # Cleanup message
+    my $message = $self->message;
+    $message =~ s/\(eval\s+\d+\)/template/;
+    $self->message($message);
+
     # Parse message
     my $line;
-    $line = $1 if $self->message =~ /at\s+\(eval\s+\d+\)\s+line\s+(\d+)/;
+    $line = $1 if $self->message =~ /at\s+template\s+line\s+(\d+)/;
 
     # Caller
     my $caller = (caller)[0];

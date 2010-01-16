@@ -156,12 +156,13 @@ sub from_hash {
     my $self = shift;
     my $hash = shift;
 
-    # Special case: empty hash deletes all headers
+    # Empty hash deletes all headers
     if (keys %{$hash} == 0) {
-        $self->remove($_) for @{$self->names};
+        $self->_headers({});
         return $self;
     }
 
+    # Merge
     foreach my $header (keys %{$hash}) {
         my $value = $hash->{$header};
         $self->add($header => ref $value eq 'ARRAY' ? @$value : $value);
@@ -281,24 +282,24 @@ sub set_cookie2 { shift->header('Set-Cookie2' => @_) }
 sub status      { shift->header(Status        => @_) }
 
 sub to_hash {
-    my $self = shift;
+    my $self   = shift;
     my %params = @_;
 
+    # Build
     my $hash = {};
     foreach my $header (@{$self->names}) {
-        my $headers;
+
+        # Header
         my @headers = $self->header($header);
 
-        if ($params{arrayref}) {
-            $hash->{$header} = [@headers];
-        }
+        # Nested arrayrefs
+        if ($params{arrayref}) { $hash->{$header} = [@headers] }
+
+        # Flat arrayref
         else {
 
-            # Replace single value arrayrefs by strings
-            foreach my $h (@headers) {
-                $h = $h->[0] if @$h == 1;
-            }
-
+            # Turn single value arrayrefs into strings
+            foreach my $h (@headers) { $h = $h->[0] if @$h == 1 }
             $hash->{$header} = @headers > 1 ? [@headers] : $headers[0];
         }
     }
@@ -449,6 +450,10 @@ the following new ones.
     my $string = $headers->to_string;
     my $string = "$headers";
 
+=head2 C<from_hash>
+
+    $headers = $headers->from_hash({'Content-Type' => 'text/html'});
+
 =head2 C<header>
 
     my $string = $headers->header('Content-Type');
@@ -467,16 +472,9 @@ the following new ones.
 
     $headers = $headers->remove('Content-Type');
 
-=head2 C<from_hash>
-
-    $headers = $headers->from_hash({'Content-Type' => 'text/html'});
-
 =head2 C<to_hash>
 
-    # Return strings for single values and arrayrefs for multi
-    $hashref = $headers->to_hash;
-
-    # Return arrayref always
-    $hashref = $headers->to_hash(arrayref => 1);
+    my $hash = $headers->to_hash;
+    my $hash = $headers->to_hash(arrayref => 1);
 
 =cut

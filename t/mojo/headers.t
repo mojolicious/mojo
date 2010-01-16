@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 # Remember, you can always find East by staring directly at the sun.
-use Test::More tests => 32;
+use Test::More tests => 38;
 
 # So, have a merry Christmas, a happy Hanukkah, a kwaazy Kwanza,
 # a tip-top Tet, and a solemn, dignified, Ramadan.
@@ -29,21 +29,15 @@ is("$headers",
         "Connection: close\x0d\x0a"
       . "Expect: continue-100\x0d\x0a"
       . "Content-Type: text/html");
-is_deeply(
-    $headers->to_hash,
-    {   Connection     => 'close',
-        Expect         => 'continue-100',
-        'Content-Type' => 'text/html'
-    }
-);
-is_deeply(
-    $headers->to_hash(arrayref => 1),
-    {   Connection     => [['close']],
-        Expect         => [['continue-100']],
-        'Content-Type' => [['text/html']]
-    }
-);
-is_deeply($headers->names, [qw/Connection Expect Content-Type/]);
+my $hash = $headers->to_hash;
+is($hash->{Connection},     'close');
+is($hash->{Expect},         'continue-100');
+is($hash->{'Content-Type'}, 'text/html');
+$hash = $headers->to_hash(arrayref => 1);
+is_deeply($hash->{Connection},     [['close']]);
+is_deeply($hash->{Expect},         [['continue-100']]);
+is_deeply($hash->{'Content-Type'}, [['text/html']]);
+is_deeply($headers->names,         [qw/Connection Expect Content-Type/]);
 
 # Multiline values
 $headers = Mojo::Headers->new;
@@ -85,18 +79,12 @@ is_deeply($headers->to_hash, {});
 $headers = Mojo::Headers->new;
 $headers->from_hash(
     {'X-Test' => [[23, 24], ['single line'], [25, 26]], 'X-Test2' => 'foo'});
-is_deeply(
-    $headers->to_hash,
-    {   'X-Test' => [[23, 24], 'single line', [25, 26]],
-        'X-Test2' => 'foo'
-    }
-);
-is_deeply(
-    $headers->to_hash(arrayref => 1),
-    {   'X-Test' => [[23, 24], ['single line'], [25, 26]],
-        'X-Test2' => [['foo']]
-    }
-);
+$hash = $headers->to_hash;
+is_deeply($hash->{'X-Test'}, [[23, 24], 'single line', [25, 26]]);
+is_deeply($hash->{'X-Test2'}, 'foo');
+$hash = $headers->to_hash(arrayref => 1);
+is_deeply($hash->{'X-Test'}, [[23, 24], ['single line'], [25, 26]]);
+is_deeply($hash->{'X-Test2'}, [['foo']]);
 
 # Headers in chunks
 $headers = Mojo::Headers->new;

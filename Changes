@@ -39,6 +39,7 @@ This file documents the revision history for Perl extension Mojo.
         - Added json_config plugin to Mojolicious. (vti)
         - Added the ability to reload the application and (graceful) restart
           all children to the prefork daemon.
+        - Added to_hash and from_hash methods to Mojo::Headers. (vti)
         - Made all Mojolicious after_* plugin hooks run in reverse order.
         - Made param decoding more defensive and allow malformed data to pass
           through for debugging.

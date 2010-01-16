@@ -17,9 +17,7 @@ __PACKAGE__->attr(usage => <<"EOF");
 usage: $0 fastcgi [OPTIONS]
 
 These options are available:
-  --mode <mode>   Set application mode, defaults to development.
-  --reload        Automatically reload application when the source code
-                  changes.
+  --reload   Automatically reload application when the source code changes.
 EOF
 
 # Oh boy! Sleep! That's when I'm a Viking!
@@ -29,10 +27,7 @@ sub run {
 
     # Options
     @ARGV = @_ if @_;
-    GetOptions(
-        'mode=s' => sub { $ENV{MOJO_MODE} = $_[1] },
-        reload => sub { $fastcgi->reload(1) }
-    );
+    GetOptions(reload => sub { $fastcgi->reload(1) });
 
     # Run
     $fastcgi->run;

@@ -26,6 +26,7 @@ These options are available:
                           listen on, defaults to http:*:3000.
   --lock <path>           Set path to lock file, defaults to a random
                           temporary file.
+  --mode <mode>           Set application mode, defaults to development.
   --pid <path>            Set path to pid file, defaults to a random
                           temporary file.
   --queue <size>          Set listen queue size, defaults to SOMAXCONN.
@@ -51,6 +52,7 @@ sub run {
         'keepalive=i' => sub { $daemon->keep_alive_timeout($_[1]) },
         'listen=s'    => sub { $daemon->listen($_[1]) },
         'lock=s'      => sub { $daemon->lock_file($_[1]) },
+        'mode=s'      => sub { $ENV{MOJO_MODE} = $_[1] },
         'pid=s'       => sub { $daemon->pid_file($_[1]) },
         'queue=i'     => sub { $daemon->listen_queue_size($_[1]) },
         reload        => sub { $daemon->reload(1) },

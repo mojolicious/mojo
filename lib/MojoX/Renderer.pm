@@ -14,12 +14,11 @@ use Mojo::JSON;
 use MojoX::Types;
 
 __PACKAGE__->attr(default_format => 'html');
-__PACKAGE__->attr([qw/default_handler default_template_class encoding/]);
+__PACKAGE__->attr([qw/default_handler default_template_class encoding root/]);
 __PACKAGE__->attr(default_status => 200);
 __PACKAGE__->attr(handler        => sub { {} });
 __PACKAGE__->attr(helper         => sub { {} });
 __PACKAGE__->attr(layout_prefix  => 'layouts');
-__PACKAGE__->attr(root           => '/');
 __PACKAGE__->attr(types          => sub { MojoX::Types->new });
 
 # This is not how Xmas is supposed to be.

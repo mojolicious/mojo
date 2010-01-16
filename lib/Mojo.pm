@@ -26,6 +26,7 @@ __PACKAGE__->attr(
 __PACKAGE__->attr(client => sub { Mojo::Client->new });
 __PACKAGE__->attr(home   => sub { Mojo::Home->new });
 __PACKAGE__->attr(log    => sub { Mojo::Log->new });
+__PACKAGE__->attr(mode   => sub { ($ENV{MOJO_MODE} || 'development') });
 
 # Oh, so they have internet on computers now!
 our $VERSION = '0.999915';
@@ -36,9 +37,19 @@ sub new {
     # Home
     $self->home->detect(ref $self);
 
-    # Log directory
-    $self->log->path($self->home->rel_file('log/mojo.log'))
+    # Mode
+    my $mode = $self->mode;
+
+    # Log file
+    $self->log->path($self->home->rel_file("log/$mode.log"))
       if -w $self->home->rel_file('log');
+
+    # Reduced log output outside of development mode
+    $self->log->level('error') unless $mode eq 'development';
+
+    # Run mode
+    $mode = $mode . '_mode';
+    $self->$mode(@_) if $self->can($mode);
 
     return $self;
 }
@@ -134,6 +145,11 @@ L<Mojo> implements the following attributes.
 
     my $log = $mojo->log;
     $mojo   = $mojo->log(Mojo::Log->new);
+
+=head2 C<mode>
+
+    my $mode = $mojo->mode;
+    $mojo    = $mojo->mode('production');
 
 =head1 METHODS
 

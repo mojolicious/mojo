@@ -13,14 +13,14 @@ use FindBin;
 use Mojolicious::Lite;
 use Test::Mojo;
 
+# Silence
+app->log->level('error');
+
 # Load plugin
 my $config =
   plugin json_config => {default => {foo => 'baz', hello => 'there'}};
 is($config->{foo},   'bar');
 is($config->{hello}, 'there');
-
-# Silence
-app->log->level('error');
 
 # GET /
 get '/' => 'index';

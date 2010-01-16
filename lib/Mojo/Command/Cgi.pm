@@ -18,8 +18,10 @@ __PACKAGE__->attr(usage => <<"EOF");
 usage: $0 cgi [OPTIONS]
 
 These options are available:
-  --nph      Enable non-parsed-header mode.
-  --reload   Automatically reload application when the source code changes.
+  --mode <mode>   Set application mode, defaults to development.
+  --nph           Enable non-parsed-header mode.
+  --reload        Automatically reload application when the source code
+                  changes.
 EOF
 
 # Hi, Super Nintendo Chalmers!
@@ -30,8 +32,9 @@ sub run {
     # Options
     @ARGV = @_ if @_;
     GetOptions(
-        nph    => sub { $cgi->nph(1) },
-        reload => sub { $cgi->reload(1) }
+        'mode=s' => sub { $ENV{MOJO_MODE} = $_[1] },
+        nph      => sub { $cgi->nph(1) },
+        reload   => sub { $cgi->reload(1) }
     );
 
     # Run

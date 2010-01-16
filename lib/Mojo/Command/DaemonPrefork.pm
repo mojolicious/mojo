@@ -34,6 +34,7 @@ These options are available:
   --maxspare <number>     Set maximum amount of idle children, defaults to
                           10.
   --minspare <number>     Set minimum amount of idle children, defaults to 5.
+  --mode <mode>           Set application mode, defaults to development.
   --pid <path>            Set path to pid file, defaults to a random
                           temporary file.
   --queue <size>          Set listen queue size, defaults to SOMAXCONN.
@@ -68,13 +69,14 @@ sub run {
         'lock=s'      => sub { $daemon->lock_file($_[1]) },
         'maxspare=i'  => sub { $daemon->max_spare_servers($_[1]) },
         'minspare=i'  => sub { $daemon->min_spare_servers($_[1]) },
-        'pid=s'       => sub { $daemon->pid_file($_[1]) },
-        'queue=i'     => sub { $daemon->listen_queue_size($_[1]) },
-        reload        => sub { $daemon->reload(1) },
-        'requests=i'  => sub { $daemon->max_keep_alive_requests($_[1]) },
-        'servers=i'   => sub { $daemon->max_servers($_[1]) },
-        'start=i'     => sub { $daemon->start_servers($_[1]) },
-        'user=s'      => sub { $daemon->user($_[1]) }
+        'mode=s' => sub { $ENV{MOJO_MODE} = $_[1] },
+        'pid=s' => sub { $daemon->pid_file($_[1]) },
+        'queue=i'    => sub { $daemon->listen_queue_size($_[1]) },
+        reload       => sub { $daemon->reload(1) },
+        'requests=i' => sub { $daemon->max_keep_alive_requests($_[1]) },
+        'servers=i'  => sub { $daemon->max_servers($_[1]) },
+        'start=i'    => sub { $daemon->start_servers($_[1]) },
+        'user=s'     => sub { $daemon->user($_[1]) }
     );
 
     # Daemonize

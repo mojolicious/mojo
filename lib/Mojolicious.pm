@@ -15,12 +15,11 @@ use MojoX::Renderer;
 use MojoX::Types;
 
 __PACKAGE__->attr(controller_class => 'Mojolicious::Controller');
-__PACKAGE__->attr(mode => sub { ($ENV{MOJO_MODE} || 'development') });
-__PACKAGE__->attr(plugins  => sub { Mojolicious::Plugins->new });
-__PACKAGE__->attr(renderer => sub { MojoX::Renderer->new });
-__PACKAGE__->attr(routes   => sub { MojoX::Dispatcher::Routes->new });
-__PACKAGE__->attr(static   => sub { MojoX::Dispatcher::Static->new });
-__PACKAGE__->attr(types    => sub { MojoX::Types->new });
+__PACKAGE__->attr(plugins          => sub { Mojolicious::Plugins->new });
+__PACKAGE__->attr(renderer         => sub { MojoX::Renderer->new });
+__PACKAGE__->attr(routes           => sub { MojoX::Dispatcher::Routes->new });
+__PACKAGE__->attr(static           => sub { MojoX::Dispatcher::Static->new });
+__PACKAGE__->attr(types            => sub { MojoX::Types->new });
 
 sub new {
     my $self = shift->SUPER::new(@_);
@@ -40,28 +39,23 @@ sub new {
     );
 
     # Namespace
-    $self->routes->namespace(ref $self);
+    $self->routes->namespace(ref $self) unless $self->routes->namespace;
 
     # Types
     $self->renderer->types($self->types);
     $self->static->types($self->types);
 
     # Root
-    $self->renderer->root($self->home->rel_dir('templates'));
-    $self->static->root($self->home->rel_dir('public'));
+    $self->renderer->root($self->home->rel_dir('templates'))
+      unless $self->renderer->root;
+    $self->static->root($self->home->rel_dir('public'))
+      unless $self->static->root;
 
     # Hide own controller methods
     $self->routes->hide(qw/client helper param pause redirect_to/);
     $self->routes->hide(qw/render_exception render_json render_inner/);
     $self->routes->hide(qw/render_not_found render_partial render_static/);
     $self->routes->hide(qw/render_text resume url_for/);
-
-    # Mode
-    my $mode = $self->mode;
-
-    # Log file
-    $self->log->path($self->home->rel_file("log/$mode.log"))
-      if -w $self->home->rel_file('log');
 
     # Plugins
     $self->plugin('agent_condition');
@@ -70,13 +64,6 @@ sub new {
     $self->plugin('ep_renderer');
     $self->plugin('request_timer');
     $self->plugin('powered_by');
-
-    # Run mode
-    $mode = $mode . '_mode';
-    $self->$mode(@_) if $self->can($mode);
-
-    # Reduced log output outside of development mode
-    $self->log->level('error') unless $mode eq 'development';
 
     # Startup
     $self->startup(@_);
@@ -200,11 +187,6 @@ L<Mojolicious::Lite>.
 
 L<Mojolicious> inherits all attributes from L<Mojo> and implements the
 following new ones.
-
-=head2 C<mode>
-
-    my $mode = $mojo->mode;
-    $mojo    = $mojo->mode('production');
 
 =head2 C<plugins>
 

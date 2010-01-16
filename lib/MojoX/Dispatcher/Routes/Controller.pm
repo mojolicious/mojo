@@ -9,14 +9,12 @@ use base 'Mojo::Base';
 
 __PACKAGE__->attr([qw/app match tx/]);
 
+# Just make a simple cake. And this time, if someone's going to jump out of
+# it make sure to put them in *after* you cook it.
 sub param {
     my $self = shift;
     return $self->stash->{params} ? $self->stash->{params}->param(@_) : undef;
 }
-
-# Just make a simple cake. And this time, if someone's going to jump out of
-# it make sure to put them in *after* you cook it.
-sub render { }
 
 # If we don't go back there and make that event happen,
 # the entire universe will be destroyed...
@@ -85,10 +83,6 @@ L<Mojo::Base> and implements the following new ones.
 
     my $param  = $c->param('foo');
     my @params = $c->param('foo');
-
-=head2 C<render>
-
-    $c->render;
 
 =head2 C<req>
 

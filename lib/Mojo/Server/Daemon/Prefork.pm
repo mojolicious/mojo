@@ -113,6 +113,15 @@ sub run {
     my $done = 0;
     $SIG{INT} = $SIG{TERM} = sub { $done++ };
     $SIG{CHLD} = sub { $self->_reap_child };
+    $SIG{USR1} = sub {
+
+        # Reload app
+        delete $self->{app};
+        $self->app;
+
+        # Bring all children to a greceful shutdown
+        kill 'HUP', $_ for keys %{$self->_children};
+    };
 
     # Preload application
     $self->app;
@@ -302,10 +311,10 @@ sub _spawn_child {
         close($self->_child_read);
         $self->_child_poll(undef);
 
-        # Parent will send a SIGHUP when there are too many children idle
+        # Parent will send a HUP signal when there are too many children idle
         my $done = 0;
         $SIG{HUP} = sub {
-            $self->ioloop->stop;
+            $self->ioloop->shutdown;
             $done++;
         };
 

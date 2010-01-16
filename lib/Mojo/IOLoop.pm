@@ -297,6 +297,9 @@ sub remote_info {
     return {address => $socket->peerhost, port => $socket->peerport};
 }
 
+# Slowly shutdown and don't accept new connections
+sub shutdown { shift->max_connections(0) }
+
 sub singleton { $LOOP ||= shift->new(@_) }
 
 sub start {
@@ -552,7 +555,9 @@ sub _prepare {
 
     # Nothing to do
     return $self->_running(0)
-      unless keys %{$self->_connections} || keys %{$self->_listen};
+      unless keys %{$self->_connections}
+          || $self->_listening
+          || ($self->max_connections > 0 && keys %{$self->_listen});
 
     return;
 }
@@ -953,6 +958,10 @@ following new ones.
 =head2 C<remote_info>
 
     my $info = $loop->remote_info($id);
+
+=head2 C<shutdown>
+
+    $loop->shutdown;
 
 =head2 C<singleton>
 

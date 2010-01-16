@@ -152,6 +152,24 @@ sub cookie       { shift->header(Cookie         => @_) }
 sub date         { shift->header(Date           => @_) }
 sub expect       { shift->header(Expect         => @_) }
 
+sub from_hash {
+    my $self = shift;
+    my $hash = shift;
+
+    # Special case: empty hash deletes all headers
+    if (keys %{$hash} == 0) {
+        $self->remove($_) for @{$self->names};
+        return $self;
+    }
+
+    foreach my $header (keys %{$hash}) {
+        my $value = $hash->{$header};
+        $self->add($header => ref $value eq 'ARRAY' ? @$value : $value);
+    }
+
+    return $self;
+}
+
 # Will you be my mommy? You smell like dead bunnies...
 sub header {
     my $self = shift;
@@ -261,6 +279,32 @@ sub server      { shift->header(Server        => @_) }
 sub set_cookie  { shift->header('Set-Cookie'  => @_) }
 sub set_cookie2 { shift->header('Set-Cookie2' => @_) }
 sub status      { shift->header(Status        => @_) }
+
+sub to_hash {
+    my $self = shift;
+    my %params = @_;
+
+    my $hash = {};
+    foreach my $header (@{$self->names}) {
+        my $headers;
+        my @headers = $self->header($header);
+
+        if ($params{arrayref}) {
+            $hash->{$header} = [@headers];
+        }
+        else {
+
+            # Replace single value arrayrefs by strings
+            foreach my $h (@headers) {
+                $h = $h->[0] if @$h == 1;
+            }
+
+            $hash->{$header} = @headers > 1 ? [@headers] : $headers[0];
+        }
+    }
+
+    return $hash;
+}
 
 sub to_string { shift->build(@_) }
 
@@ -422,5 +466,17 @@ the following new ones.
 =head2 C<remove>
 
     $headers = $headers->remove('Content-Type');
+
+=head2 C<from_hash>
+
+    $headers = $headers->from_hash({'Content-Type' => 'text/html'});
+
+=head2 C<to_hash>
+
+    # Return strings for single values and arrayrefs for multi
+    $hashref = $headers->to_hash;
+
+    # Return arrayref always
+    $hashref = $headers->to_hash(arrayref => 1);
 
 =cut

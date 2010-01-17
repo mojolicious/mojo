@@ -28,7 +28,7 @@ These options are available:
                           15.
   --keepalive <seconds>   Set keep-alive timeout, defaults to 15.
   --listen <locations>    Set a comma separated list of locations you want to
-                          listen on, defaults to http:*:3000.
+                          listen on, defaults to http://*:3000.
   --lock <path>           Set path to lock file, defaults to a random
                           temporary file.
   --maxspare <number>     Set maximum amount of idle children, defaults to

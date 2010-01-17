@@ -15,14 +15,15 @@ __PACKAGE__->attr(buffer => sub { Mojo::Buffer->new });
 __PACKAGE__->attr(_buffer  => sub { [] });
 __PACKAGE__->attr(_headers => sub { {} });
 
+# Upgrade header has to go first for WebSocket
 my @GENERAL_HEADERS = qw/
+  Upgrade
   Cache-Control
   Connection
   Date
   Pragma
   Trailer
   Transfer-Encoding
-  Upgrade
   Via
   Warning
   /;
@@ -70,12 +71,16 @@ my @ENTITY_HEADERS = qw/
   Expires
   Last-Modified
   /;
+my @WEBSOCKET_HEADERS =
+  qw/Origin WebSocket-Origin WebSocket-Location WebSocket-Protocol/;
 
 my (%ORDERED_HEADERS, %NORMALCASE_HEADERS);
 {
-    my $i = 1;
-    my @headers = (@GENERAL_HEADERS, @REQUEST_HEADERS, @RESPONSE_HEADERS,
-        @ENTITY_HEADERS);
+    my $i       = 1;
+    my @headers = (
+        @GENERAL_HEADERS, @REQUEST_HEADERS, @RESPONSE_HEADERS,
+        @ENTITY_HEADERS,  @WEBSOCKET_HEADERS
+    );
     for my $name (@headers) {
         my $lowercase = lc $name;
         $ORDERED_HEADERS{$lowercase}    = $i;
@@ -227,6 +232,8 @@ sub names {
     return \@headers;
 }
 
+sub origin { shift->header(Origin => @_) }
+
 sub parse {
     my ($self, $chunk) = @_;
 
@@ -309,9 +316,14 @@ sub to_hash {
 
 sub to_string { shift->build(@_) }
 
-sub trailer           { shift->header(Trailer             => @_) }
-sub transfer_encoding { shift->header('Transfer-Encoding' => @_) }
-sub user_agent        { shift->header('User-Agent'        => @_) }
+sub trailer            { shift->header(Trailer              => @_) }
+sub transfer_encoding  { shift->header('Transfer-Encoding'  => @_) }
+sub upgrade            { shift->header(Upgrade              => @_) }
+sub user_agent         { shift->header('User-Agent'         => @_) }
+sub websocket_location { shift->header('WebSocket-Location' => @_) }
+sub websocket_origin   { shift->header('WebSocket-Origin'   => @_) }
+sub websocket_protocol { shift->header('WebSocket-Protocol' => @_) }
+
 
 1;
 __END__
@@ -393,6 +405,11 @@ implements the following new ones.
     my $location = $headers->location;
     $headers     = $headers->location('http://127.0.0.1/foo');
 
+=head2 C<origin>
+
+    my $origin = $headers->origin;
+    $headers   = $headers->origin('http://example.com');
+
 =head2 C<proxy_authorization>
 
     my $proxy_authorization = $headers->proxy_authorization;
@@ -428,10 +445,30 @@ implements the following new ones.
     my $transfer_encoding = $headers->transfer_encoding;
     $headers              = $headers->transfer_encoding('chunked');
 
+=head2 C<upgrade>
+
+    my $upgrade = $headers->upgrade;
+    $headers    = $headers->upgrade('WebSocket');
+
 =head2 C<user_agent>
 
     my $user_agent = $headers->user_agent;
     $headers       = $headers->user_agent('Mojo/1.0');
+
+=head2 C<websocket_location>
+
+    my $location = $headers->websocket_location;
+    $headers     = $headers->websocket_location('ws://example.com/demo');
+
+=head2 C<websocket_origin>
+
+    my $origin = $headers->websocket_origin;
+    $headers   = $headers->websocket_origin('http://example.com');
+
+=head2 C<websocket_protocol>
+
+    my $protocol = $headers->websocket_protocol;
+    $headers     = $headers->websocket_protocol('sample');
 
 =head1 METHODS
 

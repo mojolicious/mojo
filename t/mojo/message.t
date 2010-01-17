@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 448;
+use Test::More tests => 470;
 
 use File::Spec;
 use File::Temp;
@@ -51,6 +51,25 @@ is($req->method,        'GET');
 is($req->major_version, 1);
 is($req->minor_version, 1);
 is($req->url,           '/');
+
+# Parse WebSocket handshake request
+$req = Mojo::Message::Request->new;
+$req->parse("GET /demo HTTP/1.1\x0d\x0a");
+$req->parse("Upgrade: WebSocket\x0d\x0a");
+$req->parse("Connection: Upgrade\x0d\x0a");
+$req->parse("Host: example.com\x0d\x0a");
+$req->parse("Origin: http://example.com\x0d\x0a");
+$req->parse("WebSocket-Protocol: sample\x0d\x0a\x0d\x0a");
+is($req->state,                       'done');
+is($req->method,                      'GET');
+is($req->major_version,               1);
+is($req->minor_version,               1);
+is($req->url,                         '/demo');
+is($req->headers->upgrade,            'WebSocket');
+is($req->headers->connection,         'Upgrade');
+is($req->headers->host,               'example.com');
+is($req->headers->origin,             'http://example.com');
+is($req->headers->websocket_protocol, 'sample');
 
 # Parse HTTP 1.0 start line and headers, no body
 $req = Mojo::Message::Request->new;
@@ -380,6 +399,23 @@ is($req->build,
       . "Host: 127.0.0.1\x0d\x0a"
       . "Content-Length: 13\x0d\x0a\x0d\x0a"
       . "Hello World!\n");
+
+# Build WebSocket handshake request
+$req = Mojo::Message::Request->new;
+$req->method('GET');
+$req->url->parse('http://example.com/demo');
+$req->headers->upgrade('WebSocket');
+$req->headers->connection('Upgrade');
+$req->headers->origin('http://example.com');
+$req->headers->websocket_protocol('sample');
+is($req->build,
+        "GET /demo HTTP/1.1\x0d\x0a"
+      . "Upgrade: WebSocket\x0d\x0a"
+      . "Connection: Upgrade\x0d\x0a"
+      . "Host: example.com\x0d\x0a"
+      . "Content-Length: 0\x0d\x0a"
+      . "Origin: http://example.com\x0d\x0a"
+      . "WebSocket-Protocol: sample\x0d\x0a\x0d\x0a");
 
 # Build full HTTP 1.1 proxy request
 $req = Mojo::Message::Request->new;
@@ -1009,6 +1045,45 @@ is($cookies->[0]->version,     1);
 is($cookies->[0]->path,        '/test');
 is($res->cookie('foo')->value, 'bar');
 is($res->cookie('foo')->path,  '/test');
+
+# Parse WebSocket handshake response
+$res = Mojo::Message::Response->new;
+$res->parse("HTTP/1.1 101 Web Socket Protocol Handshake\x0d\x0a");
+$res->parse("Upgrade: WebSocket\x0d\x0a");
+$res->parse("Connection: Upgrade\x0d\x0a");
+$res->parse("WebSocket-Origin: http://example.com\x0d\x0a");
+$res->parse("WebSocket-Location: ws://example.com/demo\x0d\x0a");
+$res->parse("WebSocket-Protocol: sample\x0d\x0a\x0d\x0a");
+is($res->state,                       'done');
+is($res->code,                        101);
+is($res->message,                     'Web Socket Protocol Handshake');
+is($res->major_version,               1);
+is($res->minor_version,               1);
+is($res->headers->upgrade,            'WebSocket');
+is($res->headers->connection,         'Upgrade');
+is($res->headers->websocket_origin,   'http://example.com');
+is($res->headers->websocket_location, 'ws://example.com/demo');
+is($res->headers->websocket_protocol, 'sample');
+
+# Build WebSocket handshake response
+$res = Mojo::Message::Response->new;
+$res->code(101);
+$res->message('Web Socket Protocol Handshake');
+$res->headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
+$res->headers->upgrade('WebSocket');
+$res->headers->connection('Upgrade');
+$res->headers->websocket_origin('http://example.com');
+$res->headers->websocket_location('ws://example.com/demo');
+$res->headers->websocket_protocol('sample');
+is($res->build,
+        "HTTP/1.1 101 Web Socket Protocol Handshake\x0d\x0a"
+      . "Upgrade: WebSocket\x0d\x0a"
+      . "Connection: Upgrade\x0d\x0a"
+      . "Date: Sun, 17 Aug 2008 16:27:35 GMT\x0d\x0a"
+      . "Content-Length: 0\x0d\x0a"
+      . "WebSocket-Origin: http://example.com\x0d\x0a"
+      . "WebSocket-Location: ws://example.com/demo\x0d\x0a"
+      . "WebSocket-Protocol: sample\x0d\x0a\x0d\x0a");
 
 # Build and parse HTTP 1.1 response with 3 cookies
 $res = Mojo::Message::Response->new;

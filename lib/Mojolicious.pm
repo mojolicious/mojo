@@ -275,7 +275,7 @@ Responsible for tracking the types of content you want to serve in your
 application, by default a L<MojoX::Types> object.
 You can easily register new types.
 
-    $mojo->types->type(pdf => 'application/pdf');
+    $mojo->types->type(vti => 'help/vampire');
 
 =head1 METHODS
 

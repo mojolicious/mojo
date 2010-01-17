@@ -36,7 +36,8 @@ sub register {
     $app->renderer->add_helper(layout => sub { shift->stash(layout => @_) });
 
     # Add "param" helper
-    $app->renderer->add_helper(param => sub { shift->req->param(@_) });
+    $app->renderer->add_helper(param =>
+          sub { wantarray ? (shift->param(@_)) : scalar shift->param(@_); });
 
     # Add "url_for" helper
     $app->renderer->add_helper(url_for => sub { shift->url_for(@_) });

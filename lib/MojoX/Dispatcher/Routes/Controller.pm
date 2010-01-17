@@ -7,13 +7,26 @@ use warnings;
 
 use base 'Mojo::Base';
 
+require Carp;
+require Scalar::Util;
+
 __PACKAGE__->attr([qw/app match tx/]);
 
 # Just make a simple cake. And this time, if someone's going to jump out of
 # it make sure to put them in *after* you cook it.
 sub param {
     my $self = shift;
-    return $self->stash->{params} ? $self->stash->{params}->param(@_) : undef;
+
+    # Parameters
+    my $params = $self->stash->{params};
+    Carp::croak(
+        qq/Stash value "params" is not a valid "Mojo::Parameters" object./)
+      unless ref $params
+          && Scalar::Util::blessed($params)
+          && $params->isa('Mojo::Parameters');
+
+    # Values
+    return wantarray ? ($params->param(@_)) : scalar $params->param(@_);
 }
 
 # If we don't go back there and make that event happen,

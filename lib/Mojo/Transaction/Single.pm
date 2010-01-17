@@ -210,7 +210,8 @@ sub client_spin {
     $self->error('Request error.')  if $self->req->has_error;
     $self->error('Response error.') if $self->res->has_error;
 
-    # Make sure we don't wait longer than 5 seconds for a 100 Continue
+    # Make sure we don't wait longer than the set time for a 100 Continue
+    # (defaults to 5 seconds)
     if ($self->_continue) {
         my $continue = $self->_continue;
         $continue = $self->continue_timeout - (time - $self->_started);

@@ -30,7 +30,7 @@ Mojo::Asset - Asset Base Class
 
 =head1 DESCRIPTION
 
-L<Mojo::Asset> is a asset base class.
+L<Mojo::Asset> is an abstract base class for assets.
 
 =head1 METHODS
 

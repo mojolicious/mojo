@@ -324,7 +324,6 @@ sub websocket_location { shift->header('WebSocket-Location' => @_) }
 sub websocket_origin   { shift->header('WebSocket-Origin'   => @_) }
 sub websocket_protocol { shift->header('WebSocket-Protocol' => @_) }
 
-
 1;
 __END__
 
@@ -355,120 +354,168 @@ implements the following new ones.
     my $buffer = $headers->buffer;
     $headers   = $headers->buffer(Mojo::Buffer->new);
 
+The Buffer to use for header parsing, by default a L<Mojo::Buffer> object.
+
 =head2 C<connection>
 
     my $connection = $headers->connection;
     $headers       = $headers->connection('close');
+
+Shortcut for the C<Connection> header.
 
 =head2 C<content_disposition>
 
     my $content_disposition = $headers->content_disposition;
     $headers                = $headers->content_disposition('foo');
 
+Shortcut for the C<Content-Disposition> header.
+
 =head2 C<content_length>
 
     my $content_length = $headers->content_length;
     $headers           = $headers->content_length(4000);
+
+Shortcut for the C<Content-Length> header.
 
 =head2 C<content_transfer_encoding>
 
     my $encoding = $headers->content_transfer_encoding;
     $headers     = $headers->content_transfer_encoding('foo');
 
+Shortcut for the C<Content-Transfer-Encoding> header.
+
 =head2 C<content_type>
 
     my $content_type = $headers->content_type;
     $headers         = $headers->content_type('text/plain');
+
+Shortcut for the C<Content-Type> header.
 
 =head2 C<cookie>
 
     my $cookie = $headers->cookie;
     $headers   = $headers->cookie('$Version=1; f=b; $Path=/');
 
+Shortcut for the C<Cookie> header.
+
 =head2 C<date>
 
     my $date = $headers->date;
     $headers = $headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
+
+Shortcut for the C<Date> header.
 
 =head2 C<expect>
 
     my $expect = $headers->expect;
     $headers   = $headers->expect('100-continue');
 
+Shortcut for the C<Expect> header.
+
 =head2 C<host>
 
     my $host = $headers->host;
     $headers = $headers->host('127.0.0.1');
+
+Shortcut for the C<Host> header.
 
 =head2 C<location>
 
     my $location = $headers->location;
     $headers     = $headers->location('http://127.0.0.1/foo');
 
+Shortcut for the C<Location> header.
+
 =head2 C<origin>
 
     my $origin = $headers->origin;
     $headers   = $headers->origin('http://example.com');
+
+Shortcut for the C<Origin> header.
 
 =head2 C<proxy_authorization>
 
     my $proxy_authorization = $headers->proxy_authorization;
     $headers = $headers->proxy_authorization('Basic Zm9vOmJhcg==');
 
+Shortcut for the C<Proxy-Authorization> header.
+
 =head2 C<server>
 
     my $server = $headers->server;
     $headers   = $headers->server('Mojo');
+
+Shortcut for the C<Server> header.
 
 =head2 C<set_cookie>
 
     my $set_cookie = $headers->set_cookie;
     $headers       = $headers->set_cookie('f=b; Version=1; Path=/');
 
+Shortcut for the C<Set-Cookie> header.
+
 =head2 C<set_cookie2>
 
     my $set_cookie2 = $headers->set_cookie2;
     $headers        = $headers->set_cookie2('f=b; Version=1; Path=/');
+
+Shortcut for the C<Set-Cookie2> header.
 
 =head2 C<status>
 
     my $status = $headers->status;
     $headers   = $headers->status('200 OK');
 
+Shortcut for the C<Status> header.
+
 =head2 C<trailer>
 
     my $trailer = $headers->trailer;
     $headers    = $headers->trailer('X-Foo');
+
+Shortcut for the C<Trailer> header.
 
 =head2 C<transfer_encoding>
 
     my $transfer_encoding = $headers->transfer_encoding;
     $headers              = $headers->transfer_encoding('chunked');
 
+Shortcut for the C<Transfer-Encoding> header.
+
 =head2 C<upgrade>
 
     my $upgrade = $headers->upgrade;
     $headers    = $headers->upgrade('WebSocket');
+
+Shortcut for the C<Upgrade> header.
 
 =head2 C<user_agent>
 
     my $user_agent = $headers->user_agent;
     $headers       = $headers->user_agent('Mojo/1.0');
 
+Shortcut for the C<User-Agent> header.
+
 =head2 C<websocket_location>
 
     my $location = $headers->websocket_location;
     $headers     = $headers->websocket_location('ws://example.com/demo');
+
+Shortcut for the C<WebSocket-Location> header.
 
 =head2 C<websocket_origin>
 
     my $origin = $headers->websocket_origin;
     $headers   = $headers->websocket_origin('http://example.com');
 
+Shortcut for the C<WebSocket-Origin> header.
+
 =head2 C<websocket_protocol>
 
     my $protocol = $headers->websocket_protocol;
     $headers     = $headers->websocket_protocol('sample');
+
+Shortcut for the C<WebSocket-Protocol> header.
 
 =head1 METHODS
 
@@ -479,6 +526,8 @@ the following new ones.
 
     $headers = $headers->add('Content-Type', 'text/plain');
 
+Add one or more header lines.
+
 =head2 C<to_string>
 
 =head2 C<build>
@@ -487,9 +536,13 @@ the following new ones.
     my $string = $headers->to_string;
     my $string = "$headers";
 
+Format headers suitable for HTTP 1.1 messages.
+
 =head2 C<from_hash>
 
     $headers = $headers->from_hash({'Content-Type' => 'text/html'});
+
+Parse headers from a hash.
 
 =head2 C<header>
 
@@ -497,21 +550,34 @@ the following new ones.
     my @lines  = $headers->header('Content-Type');
     $headers   = $headers->header('Content-Type' => 'text/plain');
 
+Get or replace the current header values.
+Note that this method is context sensitive and will turn all header lines
+into a single one in scalar context.
+
 =head2 C<names>
 
     my $names = $headers->names;
+
+Generate a list of all currently defined headers.
 
 =head2 C<parse>
 
     my $success = $headers->parse("Content-Type: text/foo\n\n");
 
+Parse formatted headers.
+
 =head2 C<remove>
 
     $headers = $headers->remove('Content-Type');
+
+Remove a header.
 
 =head2 C<to_hash>
 
     my $hash = $headers->to_hash;
     my $hash = $headers->to_hash(arrayref => 1);
+
+Format headers as a hash.
+Nested arrayrefs to represent multi line values are optional.
 
 =cut

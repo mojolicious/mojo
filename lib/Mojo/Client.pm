@@ -792,6 +792,13 @@ Mojo::Client - Client
 
 L<Mojo::Client> is a full featured async io HTTP 1.1 client.
 
+It implements the most common HTTP verbs.
+If you need something more custom you can create your own
+L<Mojo::Transaction::Single> or L<Mojo::Trasaction::Pipeline> objects and
+C<queue> them.
+All of the verbs take an optional set of headers as a hash or hash reference,
+as well as an optional callback sub reference.
+
 =head1 ATTRIBUTES
 
 L<Mojo::Client> implements the following attributes.
@@ -799,52 +806,87 @@ L<Mojo::Client> implements the following attributes.
 =head2 C<app>
 
     my $app = $client->app;
-    $client = $client->app(Mojolicious::Lite->new);
+    $client = $client->app(MyApp->new);
+
+A Mojo application to associate this client with.
+If set, requests will be processed in this application.
 
 =head2 C<continue_timeout>
 
     my $timeout = $client->continue_timeout;
     $client     = $client->continue_timeout(5);
 
+Time to wait for a 100 continue in seconds, defaults to C<5>.
+
 =head2 C<cookie_jar>
 
     my $cookie_jar = $client->cookie_jar;
     $client        = $client->cookie_jar(Mojo::CookieJar->new);
+
+Cookie jar to use for this clients requests, by default a L<Mojo::CookieJar>
+object.
 
 =head2 C<default_cb>
 
     my $cb  = $client->default_cb;
     $client = $client->default_cb(sub {...});
 
+A default callback to use if your request does not specify a callback.
+
+    $client->default_cb(sub {
+        my ($self, $tx) = @_;
+    });
+
 =head2 C<ioloop>
 
     my $loop = $client->ioloop;
     $client  = $client->ioloop(Mojo::IOLoop->new);
+
+Loop object to use for io operations, by default it will use the global
+L<Mojo::IOLoop> singleton.
+You can force the client to block on C<process> by creating a new loop
+object.
 
 =head2 C<keep_alive_timeout>
 
     my $keep_alive_timeout = $client->keep_alive_timeout;
     $client                = $client->keep_alive_timeout(15);
 
+Timeout in seconds for keep alive between requests, defaults to C<15>.
+
 =head2 C<max_keep_alive_connections>
 
     my $max_keep_alive_connections = $client->max_keep_alive_connections;
     $client                        = $client->max_keep_alive_connections(5);
+
+Maximum number of keep alive connections that the client will retain before
+it starts closing the oldest cached ones, defaults to C<5>.
 
 =head2 C<max_redirects>
 
     my $max_redirects = $client->max_redirects;
     $client           = $client->max_redirects(3);
 
+Maximum number of redirects the client will follow before it fails, defaults
+to C<3>.
+
 =head2 C<tls_ca_file>
 
     my $tls_ca_file = $client->tls_ca_file;
     $client         = $client->tls_ca_file('/etc/tls/cacerts.pem');
 
+TLS certificate authority file to use, defaults to the MOJO_CA_FILE
+environment variable.
+Note that L<IO::Socket::SSL> must be installed for HTTPS support.
+
 =head2 C<tls_verify_cb>
 
     my $tls_verify_cb = $client->tls_verify_cb;
     $client           = $client->tls_verify_cb(sub {...});
+
+Callback to verify your TLS connection, by default the client will accept
+most certificates.
+Note that L<IO::Socket::SSL> must be installed for HTTPS support.
 
 =head1 METHODS
 
@@ -855,12 +897,17 @@ following new ones.
 
     my $client = Mojo::Client->new;
 
+Build a new Mojo::Client.
+As usual, you can pass any of the attributes above to the constructor.
+
 =head2 C<delete>
 
     $client = $client->delete('http://kraih.com' => sub {...});
     $client = $client->delete(
       'http://kraih.com' => (Connection => 'close') => sub {...}
     );
+
+Send a HTTP C<DELETE> request.
 
 =head2 C<get>
 
@@ -869,6 +916,8 @@ following new ones.
       'http://kraih.com' => (Connection => 'close') => sub {...}
     );
 
+Send a HTTP C<GET> request.
+
 =head2 C<head>
 
     $client = $client->head('http://kraih.com' => sub {...});
@@ -876,12 +925,16 @@ following new ones.
       'http://kraih.com' => (Connection => 'close') => sub {...}
     );
 
+Send a HTTP C<HEAD> request.
+
 =head2 C<post>
 
     $client = $client->post('http://kraih.com' => sub {...});
     $client = $client->post(
       'http://kraih.com' => (Connection => 'close') => sub {...}
     );
+
+Send a HTTP C<POST> request.
 
 =head2 C<post_form>
 
@@ -906,11 +959,16 @@ following new ones.
         sub {...}
     );
 
+Send a HTTP C<POST> request with form data.
+
 =head2 C<process>
 
     $client = $client->process;
     $client = $client->process(@transactions);
     $client = $client->process(@transactions => sub {...});
+
+Process all queued transactions.
+Will be blocking unless you have a global shared ioloop.
 
 =head2 C<put>
 
@@ -919,9 +977,13 @@ following new ones.
       'http://kraih.com' => (Connection => 'close') => sub {...}
     );
 
+Send a HTTP C<PUT> request.
+
 =head2 C<queue>
 
     $client = $client->queue(@transactions);
     $client = $client->queue(@transactions => sub {...});
+
+Queue a list of transactions for processing.
 
 =cut

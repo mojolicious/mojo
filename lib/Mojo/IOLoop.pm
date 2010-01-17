@@ -947,7 +947,7 @@ possible.
 
 Open a TCP connection to a remote host.
 IPv6 support depends on L<IO::Socket::INET6> and TLS support on
-L<IO::SOcket::SSL>.
+L<IO::Socket::SSL>.
 
 =head2 C<connection_timeout>
 
@@ -996,7 +996,7 @@ Callback to be invoked if the connection gets closed.
 
 Create a new listen socket.
 IPv6 support depends on L<IO::Socket::INET6> and TLS support on
-L<IO::SOcket::SSL>.
+L<IO::Socket::SSL>.
 
 =head2 C<local_info>
 

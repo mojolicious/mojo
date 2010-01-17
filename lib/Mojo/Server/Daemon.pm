@@ -297,10 +297,10 @@ sub _listen {
     my $options = {};
 
     # UNIX domain socket
-    if ($listen =~ /^file\:\/\/(.+)$/) { $options->{file} = $1 }
+    if ($listen =~ /^file\:\/\/\/(.+)$/) { $options->{file} = $1 }
 
     # Internet socket
-    elsif ($listen =~ /^(http(?:s)?)\:\/\/(.+)\:(\d+)(?:\;(.*)\;(.*))?$/) {
+    elsif ($listen =~ /^(http(?:s)?)\:\/\/(.+)\:(\d+)(?:\:(.*)\:(.*))?$/) {
         $options->{tls} = 1 if $1 eq 'https';
         $options->{address}  = $2 unless $2 eq '*';
         $options->{port}     = $3;

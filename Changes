@@ -16,7 +16,7 @@ This file documents the revision history for Perl extension Mojo.
               mojo daemon --listen http://127.0.0.1:3000,file:///tmp/my.sock
               mojo daemon --listen http://*:3000,http://*:3001,http://*:3002
               mojo daemon --listen http://[::1]:3000
-              mojo daemon --listen https://*:3001;/foo/server.crt;/foo/server.key
+              mojo daemon --listen https://*:3001:/foo/server.crt:/foo/server.key
         - Added routes captures to params in Mojolicious.
         - Added native PSGI support.
         - Added the ability to have multiple Mojolicious::Lite apps at once.

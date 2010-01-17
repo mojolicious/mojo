@@ -870,30 +870,48 @@ L<Mojo::IOLoop> implements the following attributes.
     my $timeout = $loop->accept_timeout;
     $loop       = $loop->accept_timeout(5);
 
+Maximum time in seconds a connection can take to be accepted before being
+dropped, defaults to C<5>.
+
 =head2 C<connect_timeout>
 
     my $timeout = $loop->connect_timeout;
     $loop       = $loop->connect_timeout(5);
+
+Maximum time in seconds a conenction can take to be connected before being
+dropped, defaults to C<5>.
 
 =head2 C<lock_cb>
 
     my $cb = $loop->lock_cb;
     $loop  = $loop->lock_cb(sub { ... });
 
+A locking callback that decides if this loop is allowed to listen for new
+incoming connections, used to sync multiple server processes.
+
 =head2 C<max_connections>
 
     my $max = $loop->max_connections;
     $loop   = $loop->max_connections(1000);
+
+The maximum number of connections this loop is allowed to handle before
+stopping to accept new incoming connections, defaults to C<1000>.
 
 =head2 C<unlock_cb>
 
     my $cb = $loop->unlock_cb;
     $loop  = $loop->unlock_cb(sub { ... });
 
+A callback to free the listen lock, called after accepting a new connection
+and used to sync multiple server processes.
+
 =head2 C<timeout>
 
     my $timeout = $loop->timeout;
     $loop       = $loop->timeout(5);
+
+Maximum time in seconds our loop waits for new events to happen, defaults to
+C<0.25>.
 
 =head1 METHODS
 
@@ -903,6 +921,10 @@ following new ones.
 =head2 C<new>
 
     my $loop = Mojo::IOLoop->new;
+
+Build a new loop object.
+Multiple of these will block each other, so use C<singleton> instead if
+possible.
 
 =head2 C<connect>
 
@@ -916,76 +938,132 @@ following new ones.
         port    => 3000,
         cb      => sub {...}
     });
+    my $id = $loop->connect({
+        address => '[::1]',
+        port    => 443,
+        tls     => 1,
+        cb      => sub {...}
+    });
+
+Open a TCP connection to a remote host.
+IPv6 support depends on L<IO::Socket::INET6> and TLS support on
+L<IO::SOcket::SSL>.
 
 =head2 C<connection_timeout>
 
     my $timeout = $loop->connection_timeout($id);
     $loop       = $loop->connection_timeout($id => 45);
 
+Maximum amount of time in seconds a connection can be inactive before being
+dropped.
+
 =head2 C<drop>
 
     $loop = $loop->drop($id);
+
+Drop a connection or timer immediately.
 
 =head2 C<error_cb>
 
     $loop = $loop->error_cb($id => sub { ... });
 
+Callback to be invoked if an error event happens on the connection.
+
 =head2 C<finish>
 
     $loop = $loop->finish($id);
+
+Drop a connection gracefully by allowing it to finish writing all data in
+it's write buffer.
 
 =head2 C<hup_cb>
 
     $loop = $loop->hup_cb($id => sub { ... });
 
+Callback to be invoked if the connection gets closed.
+
 =head2 C<listen>
 
     $loop->listen(port => 3000);
     $loop->listen({port => 3000});
+    $loop->listen(file => '/foo/myapp.sock');
+    $loop->listen(
+        port     => 443,
+        tls      => 1,
+        tls_cert => '/foo/server.cert',
+        tls_key  => '/foo/server.key'
+    );
+
+Create a new listen socket.
+IPv6 support depends on L<IO::Socket::INET6> and TLS support on
+L<IO::SOcket::SSL>.
 
 =head2 C<local_info>
 
     my $info = $loop->local_info($id);
 
+Get local information about a connection.
+
 =head2 C<not_writing>
 
     $loop->not_writing($id);
+
+Activate read only mode for a connection.
 
 =head2 C<read_cb>
 
     $loop = $loop->read_cb($id => sub { ... });
 
+Callback to be invoked if new data arrives on the connection.
+
 =head2 C<remote_info>
 
     my $info = $loop->remote_info($id);
+
+Get remote information about a connection.
 
 =head2 C<shutdown>
 
     $loop->shutdown;
 
+Stop the loop gracefully by not accepting any new connections but not
+interrupting existing ones.
+
 =head2 C<singleton>
 
     my $loop = Mojo::IOLoop->singleton;
+
+The global loop object.
 
 =head2 C<start>
 
     $loop->start;
 
+Start the loop, this will block until the loop is finished.
+
 =head2 C<stop>
 
     $loop->stop;
 
+Stop the loop immediately.
+
 =head2 C<timer>
 
     my $id = $loop->timer(after => 5, cb => sub {...});
-    my $id = $loop->timer(interval => 5, cb => sub {...});
+    my $id = $loop->timer({interval => 5, cb => sub {...}});
+
+Create a new timer, invoking the callback afer a given amount of seconds.
 
 =head2 C<write_cb>
 
     $loop = $loop->write_cb($id => sub { ... });
 
+Callback to be invoked if new data can be written to the connection.
+
 =head2 C<writing>
 
     $loop->writing($id);
+
+Activate read/write mode for a connection.
 
 =cut

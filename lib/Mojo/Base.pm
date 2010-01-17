@@ -124,7 +124,7 @@ Mojo::Base - Minimal Base Class For Mojo Projects
 
 =head1 DESCRIPTION
 
-L<Mojo::Base> is a minimalistic base class for L<Mojo> projects.
+L<Mojo::Base> is a simple base class for L<Mojo> projects.
 
 =head1 METHODS
 
@@ -134,6 +134,9 @@ L<Mojo::Base> is a minimalistic base class for L<Mojo> projects.
     my $instance = BaseSubClass->new(name => 'value');
     my $instance = BaseSubClass->new({name => 'value'});
 
+This base class provides a basic object constructor.
+You can pass it either a hash or a hash reference with attribute values.
+
 =head2 C<attr>
 
     __PACKAGE__->attr('name');
@@ -142,5 +145,12 @@ L<Mojo::Base> is a minimalistic base class for L<Mojo> projects.
     __PACKAGE__->attr(name => sub { ... });
     __PACKAGE__->attr([qw/name1 name2 name3/] => 'foo');
     __PACKAGE__->attr([qw/name1 name2 name3/] => sub { ... });
+
+Create attributes.
+An arrayref can be used to create more than one attribute.
+Pass an optional second argument to set a default value, it should be a
+constant or a sub reference.
+The sub reference will be excuted at accessor read time if there's no set
+value.
 
 =cut

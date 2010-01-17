@@ -41,6 +41,12 @@ implements the following new ones.
     my $namespaces = $commands->namespaces;
     $commands      = $commands->namespaces(['Mojolicious::Commands']);
 
+Namespaces to run commands from, defaults to L<Mojo::Command> and
+L<Mojolicious::Command>.
+Your application might add to this in order to implement local actions.
+
+    push @{$commands->namespaces}, 'MyApp::Command';
+
 =head1 METHODS
 
 L<Mojolicious::Commands> inherits all methods from L<Mojo::Commands>.

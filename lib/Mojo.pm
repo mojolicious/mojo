@@ -87,16 +87,16 @@ Mojo - The Web In A Box!
 
 =head1 DESCRIPTION
 
-L<Mojo> provides a flexible interface between web servers and Perl web
-frameworks. It is a good basis for implementing your own framework.
+L<Mojo> provides a flexible runtime environment for Perl web frameworks.
+It is a great basis for implementing your own framework.
 
-Also included in the distribution are a MVC web framework named
-L<Mojolicious>. It also supports a single file mode using 
+Also included in the distribution is an MVC web framework named
+L<Mojolicious>, which also supports a simplified single file mode through
 L<Mojolicious::Lite>.
 
 Currently this distribution has no requirements besides Perl 5.8.1.
 
-=head2 
+=head2 The Mojo Stack
 
     .------------------------------------------------------------.
     |                                                            |
@@ -111,7 +111,7 @@ Currently this distribution has no requirements besides Perl 5.8.1.
     |        CGI       | |      FastCGI     | |     HTTP 1.1     |
     '------------------' '------------------' '------------------'
 
-For user friendly documentation see L<Mojolicious::Book> and
+For documentation on the included frameworks see L<Mojolicious::Book> and
 L<Mojolicious::Lite>.
 
 =head1 ATTRIBUTES
@@ -123,31 +123,31 @@ L<Mojo> implements the following attributes.
     my $cb = $mojo->build_tx_cb;
     $mojo  = $mojo->build_tx_cb(sub { ... });
 
-Build a new transaction. By default, it builds a new 
-L<Mojo::Transaction::Single>. 
-
-=head2 C<home>
-
-    my $home = $mojo->home;
-    $mojo    = $mojo->home(Mojo::Home->new);
-
-The home directory of your Mojo application. The object stringifies to
-the path. See L<Mojo::Home> for details about home detection.
-
-=head2 C<log>
-
-    my $log = $mojo->log;
-    $mojo   = $mojo->log(Mojo::Log->new);
-    
-The log object of your Mojo application. See L<Mojo::Log> for more 
-information.
+The transaction builder callback, by default it builds a
+L<Mojo::Transaction::Single> object.
 
 =head2 C<client>
 
     my $client = $mojo->client;
     $mojo      = $mojo->client(Mojo::Client->new);
 
-A HTTP 1.1 Client for use in your applications. L<Mojo::Client> by default.
+A full featured HTTP 1.1 client for use in your applications, by default a
+L<Mojo::Client> object.
+
+=head2 C<home>
+
+    my $home = $mojo->home;
+    $mojo    = $mojo->home(Mojo::Home->new);
+
+The home directory of your application, by default a L<Mojo::Home> object
+which stringifies to the actual path.
+
+=head2 C<log>
+
+    my $log = $mojo->log;
+    $mojo   = $mojo->log(Mojo::Log->new);
+    
+The logging layer of your application, by a L<Mojo::Log> object.
 
 =head1 METHODS
 
@@ -158,23 +158,27 @@ new ones.
 
     my $mojo = Mojo->new;
 
-Construct a new Mojo application. Will automatically detect your home
-directory and set up logging to 'log/mojo.log' if there' a log directory.
+Build a new Mojo application.
+Will automatically detect your home directory and set up logging to
+C<log/mojo.log> if there's a log directory.
 
 =head2 C<handler>
 
     $tx = $mojo->handler($tx);
 
-The handler should be implemented in your framwork. It get called on 
-each new transaction.
+The handler is the main entry point to your application or framework and
+will be called for each new transaction.
+
+    sub handler {
+        my ($self, $tx) = @_;
+    }
 
 =head2 C<start>
 
     Mojo->start;
     Mojo->start('daemon');
 
-Start the application. See the L<Mojo::Commands::start> for more 
-information.
+Start the L<Mojo::Commands> command line interface for your application.
 
 =head1 SUPPORT
 

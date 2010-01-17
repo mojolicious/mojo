@@ -66,13 +66,20 @@ L<MojoX::Dispatcher::Routes::Controller> implements the following attributes.
     my $app = $c->app;
     $c      = $c->app(MojoSubclass->new);
 
+A reference back to the application that dispatched to this controller.
+
 =head2 C<match>
 
     my $match = $c->match;
 
+A L<MojoX::Routes::Match> object containing the routes results for the
+current request.
+
 =head2 C<tx>
 
     my $tx = $c->tx;
+
+The transaction that is currently being processed.
 
 =head1 METHODS
 
@@ -88,9 +95,15 @@ L<Mojo::Base> and implements the following new ones.
 
     my $req = $c->req;
 
+Alias for C<$c->tx->req>.
+Usually refers to a L<Mojo::Message::Request> object.
+
 =head2 C<res>
 
     my $res = $c->res;
+
+Alias for C<$c->tx->res>.
+Usually refers to a L<Mojo::Message::Response> object.
 
 =head2 C<stash>
 

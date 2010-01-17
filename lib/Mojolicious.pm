@@ -191,9 +191,9 @@ Mojolicious - Web Framework
 
 =head1 DESCRIPTION
 
-L<Mojolicous> is a MVC web framework built upon L<Mojo>.
+L<Mojolicous> is a full stack MVC web framework built upon L<Mojo>.
 
-For userfriendly documentation see L<Mojolicious::Book> and
+For more user friendly documentation see L<Mojolicious::Book> and
 L<Mojolicious::Lite>.
 
 =head1 ATTRIBUTES
@@ -206,30 +206,76 @@ following new ones.
     my $mode = $mojo->mode;
     $mojo    = $mojo->mode('production');
 
+The operating mode for your application.
+It defaults to the value of the environment variable C<MOJO_MODE> or
+C<development>.
+Mojo will name the log file after the current mode and modes other than
+C<development> will result in limited log output.
+
+If you want to add per-mode logic to your application, you can add a sub
+to your application named C<mode_$mode>.
+
+    sub mode_development {
+        my $self = shift;
+    }
+
+    sub mode_production {
+        my $self = shift;
+    }
+
 =head2 C<plugins>
 
     my $plugins = $mojo->plugins;
     $mojo       = $mojo->plugins(Mojolicious::Plugins->new);
+
+The plugin loader, by default a L<Mojolicious::Plugins> object.
+You can usually leave this alone, see L<Mojolicious::Plugin> if you want to
+write a plugin.
 
 =head2 C<renderer>
 
     my $renderer = $mojo->renderer;
     $mojo        = $mojo->renderer(MojoX::Renderer->new);
 
+Used in your application to render content, by default a L<MojoX::Renderer>
+object.
+The two main renderer plugins L<Mojolicious::Plugin::EpRenderer> and
+L<Mojolicious::Plugin::EplRenderer> contain more specific information.
+
 =head2 C<routes>
 
     my $routes = $mojo->routes;
     $mojo      = $mojo->routes(MojoX::Dispatcher::Routes->new);
+
+The routes dispatcher, by default a L<MojoX::Dispatcher::Routes> object.
+You use this in your startup method to define the url endpoints for your
+application.
+
+    sub startup {
+        my $self = shift;
+
+        my $r = $self->routes;
+        $r->route('/:controller/:action')->to('test#welcome');
+    }
 
 =head2 C<static>
 
     my $static = $mojo->static;
     $mojo      = $mojo->static(MojoX::Dispatcher::Static->new);
 
+For serving static assets from your C<public> directory, by default a
+L<MojoX::Dispatcher::Static> object.
+
 =head2 C<types>
 
     my $types = $mojo->types;
-    $mojo     = $mojo->types(MojoX::Types->new)
+    $mojo     = $mojo->types(MojoX::Types->new);
+
+Responsible for tracking the types of content you want to serve in your
+application, by default a L<MojoX::Types> object.
+You can easily register new types.
+
+    $mojo->types->type(pdf => 'application/pdf');
 
 =head1 METHODS
 
@@ -240,13 +286,23 @@ new ones.
 
     my $mojo = Mojolicious->new;
 
+Build a new Mojolicious application.
+Will automatically detect your home directory and set up logging based on
+your current operating mode.
+Also sets up the renderer, static dispatcher and a default set of plugins.
+
 =head2 C<dispatch>
 
     $mojo->dispatch($c);
 
+The heart of every Mojolicious application, calls the static and routes
+dispatchers for every request.
+
 =head2 C<handler>
 
     $tx = $mojo->handler($tx);
+
+Sets up the default controller and calls process for every request.
 
 =head2 C<plugin>
 
@@ -254,17 +310,39 @@ new ones.
     $mojo->plugin('something', foo => 23);
     $mojo->plugin('something', {foo => 23});
 
+Load a plugin.
+
 =head2 C<process>
 
     $mojo->process($c);
+
+This method can be overloaded to do logic on a per request basis, by default
+just calls dispatch.
+Generally you will use a plugin or controller instead of this, consider it
+the sledgehammer in your toolbox.
+
+    sub process {
+        my ($self, $c) = @_;
+        $self->dispatch($c);
+    }
 
 =head2 C<start>
 
     Mojolicious->start;
     Mojolicious->start('daemon');
 
+Start the L<Mojolicious::Commands> command line interface for your
+application.
+
 =head2 C<startup>
 
-    $mojo->startup($tx);
+    $mojo->startup;
+
+This is your main hook into the application, it will be called at application
+startup.
+
+    sub startup {
+        my $self = shift;
+    }
 
 =cut

@@ -66,8 +66,9 @@ sub process {
     # Start ioloop
     $self->ioloop->start;
 
-    # Cleanup
-    $self->_finite(undef);
+    # Cleanup if we are the last queued
+    # (process might have been called multiple times)
+    $self->_finite(undef) unless $self->_queued;
 
     return $self;
 }

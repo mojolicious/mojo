@@ -255,10 +255,7 @@ sub _build_tx {
     my $cb = pop @_ if ref $_[-1] && ref $_[-1] eq 'CODE';
 
     # Headers
-    my $headers = ref $_[0] eq 'HASH' ? $_[0] : {@_};
-    for my $name (keys %$headers) {
-        $req->headers->header($name => $headers->{$name});
-    }
+    $req->headers->from_hash(ref $_[0] eq 'HASH' ? $_[0] : {@_});
 
     # Queue transaction with callback
     $self->queue($tx, $cb);

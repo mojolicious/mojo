@@ -147,7 +147,7 @@ which stringifies to the actual path.
     my $log = $mojo->log;
     $mojo   = $mojo->log(Mojo::Log->new);
     
-The logging layer of your application, by a L<Mojo::Log> object.
+The logging layer of your application, by default a L<Mojo::Log> object.
 
 =head1 METHODS
 

@@ -79,7 +79,7 @@ sub start_daemon_ok {
     return Test::More::ok(0, $desc) unless $path;
 
     # Prepare command
-    $self->command(qq/$^X "$path" daemon --listen http:*:$port/);
+    $self->command(qq/$^X "$path" daemon --listen http:\/\/*:$port/);
 
     return $self->start_server_ok($desc);
 }
@@ -98,7 +98,7 @@ sub start_daemon_prefork_ok {
     return Test::More::ok(0, $desc) unless $path;
 
     # Prepare command
-    $self->command(qq/$^X "$path" daemon_prefork http:*:$port/);
+    $self->command(qq/$^X "$path" daemon_prefork http:\/\/*:$port/);
 
     return $self->start_server_ok($desc);
 }

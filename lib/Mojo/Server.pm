@@ -111,7 +111,7 @@ Mojo::Server - HTTP Server Base Class
 
 =head1 DESCRIPTION
 
-L<Mojo::Server> is a HTTP server base class.
+L<Mojo::Server> is an abstract HTTP server base class.
 
 =head1 ATTRIBUTES
 

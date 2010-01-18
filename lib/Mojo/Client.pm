@@ -338,6 +338,7 @@ sub _build_multipart_post {
 
     # Multipart content
     my $content = Mojo::Content::MultiPart->new;
+    $content->headers($tx->req->headers);
     $content->headers->content_type('multipart/form-data');
     $content->parts(\@parts);
 

@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 470;
+use Test::More tests => 482;
 
 use File::Spec;
 use File::Temp;
@@ -925,6 +925,33 @@ is($req->url->path,       '/foo/bar');
 is($req->url->base->path, '/test/index.cgi/');
 is($req->minor_version,   '0');
 is($req->major_version,   '1');
+is($req->is_secure,       undef);
+is($req->body,            'hello=world');
+is_deeply($req->param('hello'), 'world');
+is($req->url->to_abs->to_string, 'http://localhost/test/index.cgi/foo/bar');
+
+# Parse Apache 2.2.11 like CGI environment variables and a body (HTTPS)
+$req = Mojo::Message::Request->new;
+$req->parse(
+    CONTENT_LENGTH  => 11,
+    CONTENT_TYPE    => 'application/x-www-form-urlencoded',
+    PATH_INFO       => '/foo/bar',
+    QUERY_STRING    => '',
+    REQUEST_METHOD  => 'GET',
+    SCRIPT_NAME     => '/test/index.cgi',
+    HTTP_HOST       => 'localhost',
+    HTTPS           => 'on',
+    SERVER_PROTOCOL => 'HTTP/1.0'
+);
+$req->parse('hello=world');
+is($req->state,           'done');
+is($req->method,          'GET');
+is($req->url->host,       'localhost');
+is($req->url->path,       '/foo/bar');
+is($req->url->base->path, '/test/index.cgi/');
+is($req->minor_version,   '0');
+is($req->major_version,   '1');
+is($req->is_secure,       1);
 is($req->body,            'hello=world');
 is_deeply($req->param('hello'), 'world');
 is($req->url->to_abs->to_string, 'http://localhost/test/index.cgi/foo/bar');

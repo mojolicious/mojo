@@ -59,6 +59,17 @@ sub fix_headers {
     return $self;
 }
 
+sub is_secure {
+    my $self = shift;
+
+    # Secure?
+    return 1
+      if $self->url->base->scheme eq 'https' || $self->url->scheme eq 'https';
+
+    # Not secure
+    return;
+}
+
 sub param {
     my $self = shift;
     $self->_params($self->params) unless $self->_params;
@@ -220,6 +231,9 @@ sub _parse_env {
         $self->url->base->scheme($1) if $1;
         $self->version($2)           if $2;
     }
+
+    # HTTPS
+    if ($env->{HTTPS}) { $self->url->scheme('https') }
 
     # Base path
     if (my $value = $env->{SCRIPT_NAME}) {
@@ -402,6 +416,10 @@ implements the following new ones.
 =head2 C<fix_headers>
 
     $req = $req->fix_headers;
+
+=head2 C<is_secure>
+
+    my $secure = $req->is_secure;
 
 =head2 C<param>
 

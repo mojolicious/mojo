@@ -79,8 +79,9 @@ __PACKAGE__->attr(reload => sub { $ENV{MOJO_RELOAD} || 0 });
 sub new {
     my $self = shift->SUPER::new(@_);
 
-    # Reload on USR1 signal
-    $SIG{USR1} = sub { $self->reload(2) };
+    # Reload on USR1 signal (does not work on Windows)
+    $SIG{USR1} = sub { $self->reload(2) }
+      unless $^O eq 'MSWin32';
 
     return $self;
 }

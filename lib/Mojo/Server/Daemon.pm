@@ -60,7 +60,7 @@ sub prepare_ioloop {
     $self->ioloop->unlock_cb(sub { $self->accept_unlock });
 
     # Listen
-    my $listen = $self->listen || 'http:*:3000';
+    my $listen = $self->listen || 'http://*:3000';
     $self->_listen($_) for split ',', $listen;
 
     # Max clients

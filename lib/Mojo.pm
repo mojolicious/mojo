@@ -158,7 +158,7 @@ new ones.
 
     my $mojo = Mojo->new;
 
-Build a new Mojo application.
+Construct a new L<Mojo> application.
 Will automatically detect your home directory and set up logging to
 C<log/mojo.log> if there's a log directory.
 

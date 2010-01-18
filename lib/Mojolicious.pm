@@ -286,7 +286,7 @@ new ones.
 
     my $mojo = Mojolicious->new;
 
-Build a new Mojolicious application.
+Construct a new L<Mojolicious> application.
 Will automatically detect your home directory and set up logging based on
 your current operating mode.
 Also sets up the renderer, static dispatcher and a default set of plugins.

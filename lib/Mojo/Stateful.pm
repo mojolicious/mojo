@@ -77,7 +77,7 @@ Mojo::Stateful - Stateful Base Class
 
 =head1 DESCRIPTION
 
-L<Mojo::Stateful> is a base class for state keeping instances.
+L<Mojo::Stateful> is an abstract base class for state keeping objects.
 
 =head1 ATTRIBUTES
 
@@ -88,6 +88,8 @@ L<Mojo::Stateful> implements the following attributes.
    my $cb    = $stateful->state_cb;
    $stateful = $stateful->state_cb(sub {...});
 
+Callback that will be invoked whenever the state of this object changes.
+
 =head1 METHODS
 
 L<Mojo::Stateful> inherits all methods from L<Mojo::Base> and implements the
@@ -97,31 +99,47 @@ following new ones.
 
     $stateful = $stateful->done;
 
+Shortcut for setting the current state to C<done>.
+
 =head2 C<error>
 
     my $error = $stateful->error;
     $stateful = $stateful->error('Parser error: test 123');
 
+Shortcut for setting the current state to C<error>, also accepts an optional
+error message.
+
 =head2 C<has_error>
 
     my $has_error = $stateful->has_error;
+
+Check if an error occured.
 
 =head2 C<is_done>
 
     my $done = $stateful->is_done;
 
+Check if the state machine is C<done>.
+
 =head2 C<is_finished>
 
     my $finished = $stateful->is_finished;
+
+Check if the state machine is finished, this includes the states C<done>,
+C<done_with_leftovers> and C<error>.
 
 =head2 C<is_state>
 
     my $is_state = $stateful->is_state('writing');
     my $is_state = $stateful->is_state(qw/error reading writing/);
 
+Check if the state machine is currently in a specific state.
+
 =head2 C<state>
 
     my $state = $stateful->state;
     $stateful = $stateful->state('writing');
+
+The current state.
 
 =cut

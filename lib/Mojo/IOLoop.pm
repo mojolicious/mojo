@@ -922,7 +922,7 @@ following new ones.
 
     my $loop = Mojo::IOLoop->new;
 
-Build a new loop object.
+Construct a new L<Mojo::IOLoop> object.
 Multiple of these will block each other, so use C<singleton> instead if
 possible.
 

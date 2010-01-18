@@ -897,7 +897,7 @@ following new ones.
 
     my $client = Mojo::Client->new;
 
-Build a new Mojo::Client.
+Construct a new L<Mojo::Client> object.
 As usual, you can pass any of the attributes above to the constructor.
 
 =head2 C<delete>

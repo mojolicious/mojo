@@ -245,7 +245,7 @@ Mojo::Command - Command Base Class
 
 =head1 DESCRIPTION
 
-L<Mojo::Command> is a base class for commands.
+L<Mojo::Command> is an abstract base class for commands.
 
 =head1 ATTRIBUTES
 

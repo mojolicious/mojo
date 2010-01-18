@@ -491,7 +491,7 @@ Mojo::Message - Message Base Class
 
 =head1 DESCRIPTION
 
-L<Mojo::Message> is a base class for HTTP messages.
+L<Mojo::Message> is an abstract base class for HTTP messages.
 
 =head1 ATTRIBUTES
 

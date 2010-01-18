@@ -24,7 +24,7 @@ Mojolicious::Plugin - Plugin Base Class
 
 =head1 DESCRIPTION
 
-L<Mojolicous::Plugin> is a base class for L<Mojolicious> plugins.
+L<Mojolicous::Plugin> is an abstract base class for L<Mojolicious> plugins.
 
 =head1 METHODS
 

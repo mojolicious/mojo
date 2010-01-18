@@ -35,7 +35,7 @@ Mojo::Filter - Filter Base Class
 
 =head1 DESCRIPTION
 
-L<Mojo::Filter> is a base class for HTTP filters.
+L<Mojo::Filter> is an abstract base class for HTTP filters.
 
 =head1 ATTRIBUTES
 

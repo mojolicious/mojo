@@ -9,10 +9,7 @@ use base 'Mojo::Base';
 
 use Mojo::ByteStream 'b';
 use Mojo::Client;
-use Mojo::Content::MultiPart;
-use Mojo::Content::Single;
 use Mojo::JSON;
-use Mojo::Parameters;
 
 require Test::More;
 
@@ -134,78 +131,17 @@ sub post_ok { shift->_request_ok('post', @_) }
 sub post_form_ok {
     my $self = shift;
 
-    # URL
-    my $url = shift;
-
-    # Encoding
-    my $encoding = shift;
-
-    # Form
-    my $form = ref $encoding ? $encoding : shift;
-    $encoding = undef if ref $encoding;
-
-    # Headers
-    my $headers = shift;
-
     # Description
-    my $desc = shift;
-    $desc = $headers unless ref $headers;
+    my $desc = ref $_[-1] ? undef : pop @_;
 
     # Client
     my $client = $self->_client;
     $client->app($self->app);
     $client->max_redirects($self->max_redirects);
 
-    # Parameters
-    my $params = Mojo::Parameters->new;
-    for my $name (sort keys %$form) {
-
-        # Array
-        if (ref $form->{$name} eq 'ARRAY') {
-            for my $value (@{$form->{$name}}) {
-                $params->append($name,
-                    $encoding
-                    ? b($value)->encode($encoding)->to_string
-                    : $value);
-            }
-        }
-
-        # Single value
-        else {
-            my $value = $form->{$name};
-            $params->append($name,
-                $encoding
-                ? b($value)->encode($encoding)->to_string
-                : $value);
-        }
-    }
-
-    # Transaction
-    my $tx = Mojo::Transaction::Single->new;
-    $tx->req->method('POST');
-    $tx->req->url->parse($url);
-
-    # Multipart
-    my $type = $headers->{'Content-Type'} || '';
-    if ($type eq 'multipart/form-data') {
-        $self->_build_multipart_post($tx, $params, $encoding);
-    }
-
-    # Urlencoded
-    else {
-        $tx->req->headers->content_type('application/x-www-form-urlencoded');
-        $tx->req->body($params->to_string);
-    }
-
-    # Headers
-    $headers ||= {};
-    for my $name (keys %$headers) {
-        $tx->req->headers->header($name => $headers->{$name});
-    }
-
     # Request
-    $client->queue($tx, sub { $self->tx($_[1]) and $self->redirects($_[2]) })
-      ->process;
+    $client->post_form(@_,
+        sub { $self->tx($_[1]) and $self->redirects($_[2]) })->process;
 
     # Test
     local $Test::Builder::Level = $Test::Builder::Level + 1;
@@ -243,46 +179,6 @@ sub status_is {
     Test::More::is($tx->res->code, $status, $desc);
 
     return $self;
-}
-
-sub _build_multipart_post {
-    my ($self, $tx, $params, $encoding) = @_;
-
-    # Formdata
-    my $form = $params->to_hash;
-
-    # Parts
-    my @parts;
-    foreach my $name (sort keys %$form) {
-
-        # Part
-        my $part = Mojo::Content::Single->new;
-
-        # Content-Disposition
-        $part->headers->content_disposition(qq/form-data; name="$name"/);
-
-        # Content-Type
-        my $type = 'text/plain';
-        $type .= qq/;charset=$encoding/ if $encoding;
-        $part->headers->content_type($type);
-
-        # Value
-        my $value =
-          ref $form->{$name} eq 'ARRAY'
-          ? join ',', @{$form->{$name}}
-          : $form->{$name};
-        $part->asset->add_chunk($value);
-
-        push @parts, $part;
-    }
-
-    # Multipart content
-    my $content = Mojo::Content::MultiPart->new;
-    $content->headers->content_type('multipart/form-data');
-    $content->parts(\@parts);
-
-    # Add content to transaction
-    $tx->req->content($content);
 }
 
 sub _get_content {

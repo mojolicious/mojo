@@ -8,8 +8,12 @@ use warnings;
 use base 'Mojo::Base';
 use bytes;
 
+use Mojo::ByteStream 'b';
+use Mojo::Content::MultiPart;
+use Mojo::Content::Single;
 use Mojo::CookieJar;
 use Mojo::IOLoop;
+use Mojo::Parameters;
 use Mojo::Server;
 use Mojo::Transaction::Pipeline;
 use Mojo::Transaction::Single;
@@ -50,6 +54,70 @@ sub delete { shift->_build_tx('DELETE', @_) }
 sub get    { shift->_build_tx('GET',    @_) }
 sub head   { shift->_build_tx('HEAD',   @_) }
 sub post   { shift->_build_tx('POST',   @_) }
+
+sub post_form {
+    my $self = shift;
+
+    # URL
+    my $url = shift;
+
+    # Callback
+    my $cb = pop @_ if ref $_[-1] && ref $_[-1] eq 'CODE';
+
+    # Encoding
+    my $encoding = shift;
+
+    # Form
+    my $form = ref $encoding ? $encoding : shift;
+    $encoding = undef if ref $encoding;
+
+    # Parameters
+    my $params = Mojo::Parameters->new;
+    for my $name (sort keys %$form) {
+
+        # Array
+        if (ref $form->{$name} eq 'ARRAY') {
+            for my $value (@{$form->{$name}}) {
+                $params->append($name,
+                    $encoding
+                    ? b($value)->encode($encoding)->to_string
+                    : $value);
+            }
+        }
+
+        # Single value
+        else {
+            my $value = $form->{$name};
+            $params->append($name,
+                $encoding
+                ? b($value)->encode($encoding)->to_string
+                : $value);
+        }
+    }
+
+    # Transaction
+    my $tx = Mojo::Transaction::Single->new;
+    $tx->req->method('POST');
+    $tx->req->url->parse($url);
+
+    # Headers
+    $tx->req->headers->from_hash(ref $_[0] eq 'HASH' ? $_[0] : {@_});
+
+    # Multipart
+    my $type = $tx->req->headers->content_type || '';
+    if ($type eq 'multipart/form-data') {
+        $self->_build_multipart_post($tx, $params, $encoding);
+    }
+
+    # Urlencoded
+    else {
+        $tx->req->headers->content_type('application/x-www-form-urlencoded');
+        $tx->req->body($params->to_string);
+    }
+
+    # Queue transaction with callback
+    $self->queue($tx, $cb);
+}
 
 sub process {
     my $self = shift;
@@ -235,6 +303,46 @@ sub _app_spin {
 
     # More to do
     return;
+}
+
+sub _build_multipart_post {
+    my ($self, $tx, $params, $encoding) = @_;
+
+    # Formdata
+    my $form = $params->to_hash;
+
+    # Parts
+    my @parts;
+    foreach my $name (sort keys %$form) {
+
+        # Part
+        my $part = Mojo::Content::Single->new;
+
+        # Content-Disposition
+        $part->headers->content_disposition(qq/form-data; name="$name"/);
+
+        # Content-Type
+        my $type = 'text/plain';
+        $type .= qq/;charset=$encoding/ if $encoding;
+        $part->headers->content_type($type);
+
+        # Value
+        my $value =
+          ref $form->{$name} eq 'ARRAY'
+          ? join ',', @{$form->{$name}}
+          : $form->{$name};
+        $part->asset->add_chunk($value);
+
+        push @parts, $part;
+    }
+
+    # Multipart content
+    my $content = Mojo::Content::MultiPart->new;
+    $content->headers->content_type('multipart/form-data');
+    $content->parts(\@parts);
+
+    # Add content to transaction
+    $tx->req->content($content);
 }
 
 sub _build_tx {
@@ -772,6 +880,29 @@ following new ones.
     $client = $client->post('http://kraih.com' => sub {...});
     $client = $client->post(
       'http://kraih.com' => (Connection => 'close') => sub {...}
+    );
+
+=head2 C<post_form>
+
+    $client = $client->post_form('/foo' => {test => 123}, sub {...});
+    $client = $client->post_form(
+        '/foo',
+        'UTF-8',
+        {test => 123},
+        sub {...}
+    );
+    $client = $client->post_form(
+        '/foo',
+        {test => 123},
+        {Expect => '100-continue'},
+        sub {...}
+    );
+    $client = $client->post_form(
+        '/foo',
+        'UTF-8',
+        {test => 123},
+        {Expect => '100-continue'},
+        sub {...}
     );
 
 =head2 C<process>

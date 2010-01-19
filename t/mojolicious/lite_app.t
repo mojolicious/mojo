@@ -238,7 +238,7 @@ my $t = Test::Mojo->new;
 # GET /
 $t->get_ok('/')->status_is(200)->header_is(Server => 'Mojo (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('/root.html');
+  ->content_is('/root.html/root.html/root.html/root.html/root.html');
 
 # GET /root
 $t->get_ok('/root.html')->status_is(200)->header_is(Server => 'Mojo (Perl)')
@@ -247,7 +247,7 @@ $t->get_ok('/root.html')->status_is(200)->header_is(Server => 'Mojo (Perl)')
 # GET /.html
 $t->get_ok('/.html')->status_is(200)->header_is(Server => 'Mojo (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('/root.html');
+  ->content_is('/root.html/root.html/root.html/root.html/root.html');
 
 # GET /template_inheritance
 $t->get_ok('/template_inheritance')->status_is(200)
@@ -608,7 +608,12 @@ Bender!
 Not Bender!
 
 @@ root.html.epl
-%== shift->url_for('root_path')
+% my $self = shift;
+%== $self->url_for('root_path')
+%== $self->url_for('root_path')
+%== $self->url_for('root_path')
+%== $self->url_for('root_path')
+%== $self->url_for('root_path')
 
 @@ root_path.html.epl
 %== shift->url_for('root');

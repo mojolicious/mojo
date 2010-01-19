@@ -7,6 +7,7 @@ use warnings;
 
 use base 'Mojo::Base';
 
+use Carp 'croak';
 use Mojo::URL;
 use MojoX::Routes::Match;
 use MojoX::Routes::Pattern;
@@ -18,6 +19,8 @@ __PACKAGE__->attr([qw/block inline name parent/]);
 __PACKAGE__->attr([qw/children conditions/] => sub { [] });
 __PACKAGE__->attr(dictionary                => sub { {} });
 __PACKAGE__->attr(pattern => sub { MojoX::Routes::Pattern->new });
+
+__PACKAGE__->attr(_cache => sub { {} });
 
 sub new {
     my $self = shift->SUPER::new();
@@ -58,6 +61,28 @@ sub add_condition {
 }
 
 sub bridge { shift->route(@_)->inline(1) }
+
+sub find_route {
+    my ($self, $name) = @_;
+
+    # Cached?
+    if (my $cached = $self->_cache->{$name}) { return $cached }
+
+    # Find endpoint
+    my @children = ($self);
+    while (my $child = shift @children) {
+
+        # Match
+        return $self->_cache->{$name} = $child
+          if ($child->name || '') eq $name;
+
+        # Append
+        push @children, @{$child->children};
+    }
+
+    # Not found
+    croak qq/Route "$name" used in url_for does not exist/;
+}
 
 sub is_endpoint {
     my $self = shift;
@@ -382,14 +407,9 @@ follwing the ones.
     my $bridge = $routes->bridge;
     my $bridge = $routes->bridge('/:controller/:action');
 
-=head2 C<to>
+=head2 C<find_route>
 
-    my $to  = $routes->to;
-    $routes = $routes->to(action => 'foo');
-    $routes = $routes->to({action => 'foo'});
-    $routes = $routes->to('controller#action');
-    $routes = $routes->to('controller#action', foo => 'bar');
-    $routes = $routes->to('controller#action', {foo => 'bar'});
+    my $route = $routes->find_route('some_route');
 
 =head2 C<is_endpoint>
 
@@ -413,6 +433,15 @@ follwing the ones.
 =head2 C<route>
 
     my $route = $routes->route('/:c/:a', a => qr/\w+/);
+
+=head2 C<to>
+
+    my $to  = $routes->to;
+    $routes = $routes->to(action => 'foo');
+    $routes = $routes->to({action => 'foo'});
+    $routes = $routes->to('controller#action');
+    $routes = $routes->to('controller#action', foo => 'bar');
+    $routes = $routes->to('controller#action', {foo => 'bar'});
 
 =head2 C<to_string>
 

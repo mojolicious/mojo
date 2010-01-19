@@ -19,8 +19,6 @@ __PACKAGE__->attr([qw/children conditions/] => sub { [] });
 __PACKAGE__->attr(dictionary                => sub { {} });
 __PACKAGE__->attr(pattern => sub { MojoX::Routes::Pattern->new });
 
-__PACKAGE__->attr(_cache => sub { {} });
-
 sub new {
     my $self = shift->SUPER::new();
 
@@ -64,16 +62,12 @@ sub bridge { shift->route(@_)->inline(1) }
 sub find_route {
     my ($self, $name) = @_;
 
-    # Cached?
-    if (my $cached = $self->_cache->{$name}) { return $cached }
-
     # Find endpoint
     my @children = ($self);
     while (my $child = shift @children) {
 
         # Match
-        return $self->_cache->{$name} = $child
-          if ($child->name || '') eq $name;
+        return $child if ($child->name || '') eq $name;
 
         # Append
         push @children, @{$child->children};

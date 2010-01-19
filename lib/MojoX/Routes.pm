@@ -7,7 +7,6 @@ use warnings;
 
 use base 'Mojo::Base';
 
-use Carp 'croak';
 use Mojo::URL;
 use MojoX::Routes::Match;
 use MojoX::Routes::Pattern;
@@ -81,7 +80,7 @@ sub find_route {
     }
 
     # Not found
-    croak qq/Route "$name" used in url_for does not exist/;
+    return;
 }
 
 sub is_endpoint {

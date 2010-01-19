@@ -7,6 +7,7 @@ use warnings;
 
 use base 'Mojo::Base';
 
+use Carp 'croak';
 use Mojo::URL;
 
 __PACKAGE__->attr([qw/captures dictionary/] => sub { {} });
@@ -70,7 +71,10 @@ sub url_for {
     }
 
     # Named
-    $endpoint = $self->root->find_route($name) if $name;
+    if ($name) {
+        croak qq/Route "$name" used in url_for does not exist/
+          unless $endpoint = $self->root->find_route($name);
+    }
 
     # Merge values
     $values = {%{$self->captures}, %$values};

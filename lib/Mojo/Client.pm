@@ -136,7 +136,7 @@ sub process {
 
     # Cleanup if we are the last queued
     # (process might have been called multiple times)
-    $self->_finite(undef) unless $self->_queued;
+    $self->_finite(undef) if $self->_queued <= 1;
 
     return $self;
 }

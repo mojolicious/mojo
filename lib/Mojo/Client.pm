@@ -125,6 +125,9 @@ sub process {
     # Queue transactions
     $self->queue(@_) if @_;
 
+    # Already running
+    return $self if $self->_finite;
+
     # Process app
     return $self->_app_process if $self->app;
 
@@ -132,11 +135,10 @@ sub process {
     $self->_finite(1);
 
     # Start ioloop
-    unless ($self->ioloop->start) {
+    $self->ioloop->start;
 
-        # Loop already running
-        $self->_finite(undef) unless $self->_queued;
-    }
+    # Loop is not finite if it's still running
+    $self->_finite(undef);
 
     return $self;
 }

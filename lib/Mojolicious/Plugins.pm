@@ -82,7 +82,7 @@ sub run_hook {
     return unless $self->hooks->{$name};
 
     # Run
-    $self->$_(@_) for @{$self->hooks->{$name}};
+    for my $hook (@{$self->hooks->{$name}}) { $self->$hook(@_) }
 
     return $self;
 }
@@ -96,7 +96,7 @@ sub run_hook_reverse {
     return unless $self->hooks->{$name};
 
     # Run
-    $self->$_(@_) for reverse @{$self->hooks->{$name}};
+    for my $hook (reverse @{$self->hooks->{$name}}) { $self->$hook(@_) }
 
     return $self;
 }

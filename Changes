@@ -63,6 +63,7 @@ This file documents the revision history for Perl extension Mojo.
         - Fixed plugins and commands to work with multiple namespaces and
           reloading.
         - Fixed multiple process calls in Mojo::Client.
+        - Fixed a routes parser bug.
 
 0.999914 2009-11-24 00:00:00
         - Added the Mojolicious plugin system.

@@ -230,7 +230,7 @@ sub to {
     return $self unless @_;
 
     # Single argument
-    my ($defaults, $shortcut);
+    my ($shortcut, $defaults);
     if (@_ == 1) {
 
         # Hash
@@ -262,13 +262,13 @@ sub to {
     }
 
     # Controller and action
-    if ($shortcut && $shortcut =~ /^(\w+)\#(\w+)$/) {
+    if ($shortcut && $shortcut =~ /^([\w\-]+)\#(\w+)$/) {
         $defaults->{controller} = $1;
         $defaults->{action}     = $2;
     }
 
     # Defaults
-    $self->pattern->defaults($defaults);
+    $self->pattern->defaults($defaults) if $defaults;
 
     return $self;
 }

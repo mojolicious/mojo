@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 130;
+use Test::More tests => 134;
 
 use Mojo::Transaction::Single;
 
@@ -119,6 +119,9 @@ $r->route('/method/post')->via('post')
 # POST|GET /method/post_get
 $r->route('/method/post_get')->via(qw/POST get/)
   ->to(controller => 'method', action => 'post_get');
+
+# /simple/form
+$r->route('/simple/form')->to('test-test#test');
 
 # Make sure stash stays clean
 my $tx = Mojo::Transaction::Single->new;
@@ -398,3 +401,13 @@ $tx->req->method('GET');
 $tx->req->url->parse('/not_found');
 $match = $r->match($tx);
 is($match->url_for('test_edit', controller => 'foo'), '/foo/test/edit');
+
+# Simplified form
+$tx = Mojo::Transaction::Single->new;
+$tx->req->method('GET');
+$tx->req->url->parse('/simple/form');
+$match = $r->match($tx);
+is($match->stack->[0]->{controller}, 'test-test');
+is($match->stack->[0]->{action},     'test');
+is($match->stack->[0]->{format},     undef);
+is($match->url_for,                  '/simple/form');

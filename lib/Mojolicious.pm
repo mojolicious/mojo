@@ -28,6 +28,7 @@ sub new {
     # Transaction builder
     $self->build_tx_cb(
         sub {
+            my $self = shift;
 
             # Build
             my $tx = Mojo::Transaction::Single->new;

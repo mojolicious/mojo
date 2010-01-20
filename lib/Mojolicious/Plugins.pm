@@ -114,9 +114,10 @@ Mojolicious::Plugins - Plugins
 
 =head1 DESCRIPTION
 
-L<Mojolicous::Plugins> is a the plugin manager for L<Mojolicious>. In your 
-application you will usually use it to load plugins. To implement your own 
-plugin, see L<Mojolicious::Plugin> and the add_hook method below.
+L<Mojolicous::Plugins> is the plugin manager of L<Mojolicious>.
+In your application you will usually use it to load plugins.
+To implement your own plugins see L<Mojolicious::Plugin> and the C<add_hook>
+method below.
 
 =head2 ATTRIBUTES
 
@@ -127,15 +128,16 @@ L<Mojolicious::Plugins> implements the following attributes.
     my $hooks = $plugins->hooks;
     $plugins  = $plugins->hooks({foo => [sub {...}]});
 
-Hash reference to all the hooks that has been registered by loaded plugins.
+Hash reference containing all hooks that have been registered by loaded
+plugins.
 
 =head2 C<namespaces>
 
     my $namespaces = $plugins->namespaces;
     $plugins       = $plugins->namespaces(['Mojolicious::Plugin']);
 
-Namespaces to look for plugins in. You could update this to load
-plugins from your application.
+Namespaces to load plugins from.
+You can add more namespaces to load application specific plugins.
 
 =head1 METHODS
 
@@ -146,36 +148,35 @@ implements the following new ones.
 
     $plugins = $plugins->add_hook(event => sub {...});
 
-Hook into an event. Mojolicious supports a set of events
-documented below. Note that after_* runs in reverse order.
+Hook into an event.
+The following events are available.
+(Note that C<after_*> hooks run in reverse order)
 
 =over 4
 
-=item before_dispatch $c
+=item before_dispatch
 
-Run before L<MojoX::Dispatcher::Routes> determines what action
-to run. Passed context.
+Runs before the dispatchers determines what action to run. (Passed context)
 
-=item after_dispatch $c
+=item after_dispatch
 
-Run after L<MojoX::Dispatcher::Routes> determines what action
-to run. Passed context.
+Runs after the dispatchers determines what action to run. (Passed context)
 
+=item after_static_dispatch
 
-=item after_static_dispatch $c
+Runs after the static dispatcher determines if a static file should be
+served.
 
-Run before L<MojoX::Dispatcher::Static> determines if a static
-file should be served. 
+=item after_build_tx
 
-=item after_build_tx $tx
-
-Run after the transaction is built. This even before the HTTP parser starts.
-One example usage would be for adding a upload progress bar. 
+Runs right after the transaction is built and before the HTTP message gets
+parsed.
+One usage case would be upload progress bars.
 
 =back
 
-You could also add custom events by using run_hook or run_hook reverse
-to trigger hooks from your own application.
+You could also add custom events by using C<run_hook> and C<run_hook_reverse>
+in your application.
 
 =head2 C<load_plugin>
 
@@ -183,27 +184,21 @@ to trigger hooks from your own application.
     $plugins = $plugins->load_plugin($app, 'something', foo => 23);
     $plugins = $plugins->load_plugin($app, 'something', {foo => 23});
 
-Used to load a plugin. Will try to find a plugin based on the configured
-namespaces, load it, then check that it can do register. Will then call
-register to let the plugin set itself up. the optional arguments hash are
-passed to register.
-
+Load a plugin from the configured namespaces and run C<register>.
+Optional arguments are passed to register.
 
 =head2 C<run_hook>
 
     $plugins = $plugins->run_hook('foo');
     $plugins = $plugins->run_hook(foo => 123);
 
-Runs a given hook. Called from L<Mojolicious> or to set up your custom
-hooks.
+Runs a hook.
 
 =head2 C<run_hook_reverse>
 
     $plugins = $plugins->run_hook_reverse('foo');
     $plugins = $plugins->run_hook_reverse(foo => 123);
 
-Runs a given hook in reverse order. Called from L<Mojolicious> or to set up 
-your custom hooks.
-
+Runs a hook in reverse order.
 
 =cut

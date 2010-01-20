@@ -114,7 +114,9 @@ Mojolicious::Plugins - Plugins
 
 =head1 DESCRIPTION
 
-L<Mojolicous::Plugins> is a container for L<Mojolicious> plugins.
+L<Mojolicous::Plugins> is a the plugin manager for L<Mojolicious>. In your 
+application you will usually use it to load plugins. To implement your own 
+plugin, see L<Mojolicious::Plugin> and the add_hook method below.
 
 =head2 ATTRIBUTES
 

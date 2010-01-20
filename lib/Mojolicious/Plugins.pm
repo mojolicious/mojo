@@ -125,10 +125,15 @@ L<Mojolicious::Plugins> implements the following attributes.
     my $hooks = $plugins->hooks;
     $plugins  = $plugins->hooks({foo => [sub {...}]});
 
+Hash reference to all the hooks that has been registered by loaded plugins.
+
 =head2 C<namespaces>
 
     my $namespaces = $plugins->namespaces;
     $plugins       = $plugins->namespaces(['Mojolicious::Plugin']);
+
+Namespaces to look for plugins in. You could update this to load
+plugins from your application.
 
 =head1 METHODS
 
@@ -137,7 +142,38 @@ implements the following new ones.
 
 =head2 C<add_hook>
 
-    $plugins = $plugins->add_hook(foo => sub {...});
+    $plugins = $plugins->add_hook(event => sub {...});
+
+Hook into an event. Mojolicious supports a set of events
+documented below. Note that after_* runs in reverse order.
+
+=over 4
+
+=item before_dispatch $c
+
+Run before L<MojoX::Dispatcher::Routes> determines what action
+to run. Passed context.
+
+=item after_dispatch $c
+
+Run after L<MojoX::Dispatcher::Routes> determines what action
+to run. Passed context.
+
+
+=item after_static_dispatch $c
+
+Run before L<MojoX::Dispatcher::Static> determines if a static
+file should be served. 
+
+=item after_build_tx $tx
+
+Run after the transaction is built. This even before the HTTP parser starts.
+One example usage would be for adding a upload progress bar. 
+
+=back
+
+You could also add custom events by using run_hook or run_hook reverse
+to trigger hooks from your own application.
 
 =head2 C<load_plugin>
 
@@ -145,14 +181,27 @@ implements the following new ones.
     $plugins = $plugins->load_plugin($app, 'something', foo => 23);
     $plugins = $plugins->load_plugin($app, 'something', {foo => 23});
 
+Used to load a plugin. Will try to find a plugin based on the configured
+namespaces, load it, then check that it can do register. Will then call
+register to let the plugin set itself up. the optional arguments hash are
+passed to register.
+
+
 =head2 C<run_hook>
 
     $plugins = $plugins->run_hook('foo');
     $plugins = $plugins->run_hook(foo => 123);
 
+Runs a given hook. Called from L<Mojolicious> or to set up your custom
+hooks.
+
 =head2 C<run_hook_reverse>
 
     $plugins = $plugins->run_hook_reverse('foo');
     $plugins = $plugins->run_hook_reverse(foo => 123);
+
+Runs a given hook in reverse order. Called from L<Mojolicious> or to set up 
+your custom hooks.
+
 
 =cut

@@ -34,5 +34,10 @@ the following new ones.
 =head2 C<register>
 
     $plugin->register;
+    
+This method will be called by L<Mojolicious::Plugins> at startup time. Your 
+plugin should use this to hook into the application. For instace this by 
+adding handlers or helpers  to the L<MojoX::Renderer>, or it could use the
+add_hooks method of L<Mojolicious::Plugins> to hook into the request flow.
 
 =cut

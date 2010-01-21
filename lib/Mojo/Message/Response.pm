@@ -12,6 +12,17 @@ use Mojo::Date;
 
 __PACKAGE__->attr([qw/code message/]);
 
+# Start line regex
+my $START_LINE_RE = qr/
+    ^\s*               # Start
+    HTTP\/(\d)\.(\d)   # Version
+    \s+                # Whitespace
+    (\d\d\d)           # Code
+    \s+                # Whitespace
+    ([\w\s]+)          # Message
+    $                  # End
+/x;
+
 # Umarked codes are from RFC 2616 (mostly taken from LWP)
 my %MESSAGES = (
     100 => 'Continue',
@@ -190,17 +201,7 @@ sub _parse_start_line {
     # We have a full HTTP 1.0+ response line
     my $line = $buffer->get_line;
     if (defined $line) {
-        if ($line =~ /
-            ^\s*              # Start
-            HTTP\/(\d)\.(\d)  # Version
-            \s+               # Whitespace
-            (\d\d\d)          # Code
-            \s+               # Whitespace
-            ([\w\s]+)         # Message
-            $                 # End
-        /x
-          )
-        {
+        if ($line =~ /$START_LINE_RE/) {
             $self->major_version($1);
             $self->minor_version($2);
             $self->code($3);

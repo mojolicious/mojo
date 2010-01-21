@@ -294,6 +294,8 @@ Uwe Voelker
 
 Viacheslav Tikhanovskii
 
+Yaroslav Korshak
+
 Yuki Kimoto
 
 =head1 COPYRIGHT AND LICENSE

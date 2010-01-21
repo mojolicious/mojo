@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 134;
+use Test::More tests => 166;
 
 use Mojo::Transaction::Single;
 
@@ -131,6 +131,7 @@ my $match = $r->match($tx);
 is($match->stack->[0]->{clean},     1);
 is($match->stack->[0]->{something}, undef);
 is($match->url_for,                 '/clean');
+is(@{$match->stack},                1);
 $tx = Mojo::Transaction::Single->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/clean/too');
@@ -138,6 +139,7 @@ $match = $r->match($tx);
 is($match->stack->[0]->{clean},     undef);
 is($match->stack->[0]->{something}, 1);
 is($match->url_for,                 '/clean/too');
+is(@{$match->stack},                1);
 
 # Real world example using most features at once
 $tx = Mojo::Transaction::Single->new;
@@ -148,6 +150,7 @@ is($match->stack->[0]->{controller}, 'articles');
 is($match->stack->[0]->{action},     'index');
 is($match->stack->[0]->{format},     'html');
 is($match->url_for,                  '/articles.html');
+is(@{$match->stack},                 1);
 $tx = Mojo::Transaction::Single->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/articles/1.html');
@@ -157,6 +160,7 @@ is($match->stack->[0]->{action},     'load');
 is($match->stack->[0]->{id},         '1');
 is($match->stack->[0]->{format},     'html');
 is($match->url_for,                  '/articles/1.html');
+is(@{$match->stack},                 1);
 $tx = Mojo::Transaction::Single->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/articles/1/edit');
@@ -166,6 +170,7 @@ is($match->stack->[1]->{action},     'edit');
 is($match->stack->[1]->{format},     'html');
 is($match->url_for,                  '/articles/1/edit.html');
 is($match->url_for('articles_delete', format => undef), '/articles/1/delete');
+is(@{$match->stack}, 2);
 $tx = Mojo::Transaction::Single->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/articles/1/delete');
@@ -174,6 +179,7 @@ is($match->stack->[1]->{controller}, 'articles');
 is($match->stack->[1]->{action},     'delete');
 is($match->stack->[1]->{format},     undef);
 is($match->url_for,                  '/articles/1/delete');
+is(@{$match->stack},                 2);
 
 # Root
 $tx = Mojo::Transaction::Single->new;
@@ -185,6 +191,7 @@ is($match->captures->{action},       'world');
 is($match->stack->[0]->{controller}, 'hello');
 is($match->stack->[0]->{action},     'world');
 is($match->url_for,                  '/');
+is(@{$match->stack},                 1);
 
 # Path and captures
 $tx = Mojo::Transaction::Single->new;
@@ -196,6 +203,7 @@ is($match->captures->{action},       'edit');
 is($match->stack->[0]->{controller}, 'foo');
 is($match->stack->[0]->{action},     'edit');
 is($match->url_for,                  '/foo/test/edit');
+is(@{$match->stack},                 1);
 
 # Optional captures in sub route with requirement
 $tx = Mojo::Transaction::Single->new;
@@ -209,6 +217,7 @@ is($match->stack->[0]->{controller}, 'bar');
 is($match->stack->[0]->{action},     'delete');
 is($match->stack->[0]->{id},         22);
 is($match->url_for,                  '/bar/test/delete/22');
+is(@{$match->stack},                 1);
 
 # Defaults in sub route
 $tx = Mojo::Transaction::Single->new;
@@ -222,6 +231,7 @@ is($match->stack->[0]->{controller}, 'bar');
 is($match->stack->[0]->{action},     'delete');
 is($match->stack->[0]->{id},         23);
 is($match->url_for,                  '/bar/test/delete');
+is(@{$match->stack},                 1);
 
 # Chained routes
 $tx = Mojo::Transaction::Single->new;
@@ -233,6 +243,7 @@ is($match->stack->[1]->{controller}, 'index');
 is($match->stack->[2]->{controller}, 'baz');
 is($match->captures->{controller},   'baz');
 is($match->url_for,                  '/test2/foo');
+is(@{$match->stack},                 3);
 $tx = Mojo::Transaction::Single->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/test2/bar');
@@ -242,6 +253,7 @@ is($match->stack->[1]->{controller}, 'index');
 is($match->stack->[2]->{controller}, 'lalala');
 is($match->captures->{controller},   'lalala');
 is($match->url_for,                  '/test2/bar');
+is(@{$match->stack},                 3);
 
 # Waypoints
 $tx = Mojo::Transaction::Single->new;
@@ -251,6 +263,7 @@ $match = $r->match($tx);
 is($match->stack->[0]->{controller}, 's');
 is($match->stack->[0]->{action},     'l');
 is($match->url_for,                  '/test3');
+is(@{$match->stack},                 1);
 $tx = Mojo::Transaction::Single->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/test3/');
@@ -258,6 +271,7 @@ $match = $r->match($tx);
 is($match->stack->[0]->{controller}, 's');
 is($match->stack->[0]->{action},     'l');
 is($match->url_for,                  '/test3');
+is(@{$match->stack},                 1);
 $tx = Mojo::Transaction::Single->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/test3/edit');
@@ -265,6 +279,7 @@ $match = $r->match($tx);
 is($match->stack->[0]->{controller}, 's');
 is($match->stack->[0]->{action},     'edit');
 is($match->url_for,                  '/test3/edit');
+is(@{$match->stack},                 1);
 
 # Named url_for
 $tx = Mojo::Transaction::Single->new;
@@ -274,6 +289,7 @@ $match = $r->match($tx);
 is($match->url_for, '/test3');
 is($match->url_for('test_edit', controller => 'foo'), '/foo/test/edit');
 is($match->url_for('test_edit', {controller => 'foo'}), '/foo/test/edit');
+is(@{$match->stack}, 1);
 
 # Wildcards
 $tx = Mojo::Transaction::Single->new;
@@ -284,6 +300,7 @@ is($match->stack->[0]->{controller}, 'wild');
 is($match->stack->[0]->{action},     'card');
 is($match->stack->[0]->{wildcard},   'hello/there');
 is($match->url_for,                  '/wildcards/1/hello/there');
+is(@{$match->stack},                 1);
 $tx = Mojo::Transaction::Single->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/wildcards/2/hello/there');
@@ -292,6 +309,7 @@ is($match->stack->[0]->{controller}, 'card');
 is($match->stack->[0]->{action},     'wild');
 is($match->stack->[0]->{wildcard},   'hello/there');
 is($match->url_for,                  '/wildcards/2/hello/there');
+is(@{$match->stack},                 1);
 $tx = Mojo::Transaction::Single->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/wildcards/3/hello/there/foo');
@@ -300,6 +318,7 @@ is($match->stack->[0]->{controller}, 'very');
 is($match->stack->[0]->{action},     'dangerous');
 is($match->stack->[0]->{wildcard},   'hello/there');
 is($match->url_for,                  '/wildcards/3/hello/there/foo');
+is(@{$match->stack},                 1);
 
 # Format
 $tx = Mojo::Transaction::Single->new;
@@ -310,6 +329,7 @@ is($match->stack->[0]->{controller}, 'hello');
 is($match->stack->[0]->{action},     'you');
 is($match->stack->[0]->{format},     'html');
 is($match->url_for,                  '/format.html');
+is(@{$match->stack},                 1);
 $tx = Mojo::Transaction::Single->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/format.html');
@@ -318,6 +338,7 @@ is($match->stack->[0]->{controller}, 'hello');
 is($match->stack->[0]->{action},     'you');
 is($match->stack->[0]->{format},     'html');
 is($match->url_for,                  '/format.html');
+is(@{$match->stack},                 1);
 $tx = Mojo::Transaction::Single->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/format2.html');
@@ -326,6 +347,7 @@ is($match->stack->[0]->{controller}, 'you');
 is($match->stack->[0]->{action},     'hello');
 is($match->stack->[0]->{format},     'html');
 is($match->url_for,                  '/format2.html');
+is(@{$match->stack},                 1);
 $tx = Mojo::Transaction::Single->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/format2.json');
@@ -334,6 +356,7 @@ is($match->stack->[0]->{controller}, 'you');
 is($match->stack->[0]->{action},     'hello_json');
 is($match->stack->[0]->{format},     'json');
 is($match->url_for,                  '/format2.json');
+is(@{$match->stack},                 1);
 $tx = Mojo::Transaction::Single->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/format3/baz.html');
@@ -343,6 +366,7 @@ is($match->stack->[0]->{action},     'bye');
 is($match->stack->[0]->{format},     'html');
 is($match->stack->[0]->{foo},        'baz');
 is($match->url_for,                  '/format3/baz.html');
+is(@{$match->stack},                 1);
 $tx = Mojo::Transaction::Single->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/format3/baz.json');
@@ -352,6 +376,7 @@ is($match->stack->[0]->{action},     'bye_json');
 is($match->stack->[0]->{format},     'json');
 is($match->stack->[0]->{foo},        'baz');
 is($match->url_for,                  '/format3/baz.json');
+is(@{$match->stack},                 1);
 
 # Request methods
 $tx = Mojo::Transaction::Single->new;
@@ -362,6 +387,7 @@ is($match->stack->[0]->{controller}, 'method');
 is($match->stack->[0]->{action},     'get');
 is($match->stack->[0]->{format},     'html');
 is($match->url_for,                  '/method/get.html');
+is(@{$match->stack},                 1);
 $tx = Mojo::Transaction::Single->new;
 $tx->req->method('POST');
 $tx->req->url->parse('/method/post');
@@ -370,6 +396,7 @@ is($match->stack->[0]->{controller}, 'method');
 is($match->stack->[0]->{action},     'post');
 is($match->stack->[0]->{format},     undef);
 is($match->url_for,                  '/method/post');
+is(@{$match->stack},                 1);
 $tx = Mojo::Transaction::Single->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/method/post_get');
@@ -378,6 +405,7 @@ is($match->stack->[0]->{controller}, 'method');
 is($match->stack->[0]->{action},     'post_get');
 is($match->stack->[0]->{format},     undef);
 is($match->url_for,                  '/method/post_get');
+is(@{$match->stack},                 1);
 $tx = Mojo::Transaction::Single->new;
 $tx->req->method('POST');
 $tx->req->url->parse('/method/post_get');
@@ -386,6 +414,7 @@ is($match->stack->[0]->{controller}, 'method');
 is($match->stack->[0]->{action},     'post_get');
 is($match->stack->[0]->{format},     undef);
 is($match->url_for,                  '/method/post_get');
+is(@{$match->stack},                 1);
 $tx = Mojo::Transaction::Single->new;
 $tx->req->method('DELETE');
 $tx->req->url->parse('/method/post_get');
@@ -394,6 +423,7 @@ is($match->stack->[0]->{controller}, undef);
 is($match->stack->[0]->{action},     undef);
 is($match->stack->[0]->{format},     undef);
 is($match->url_for,                  '');
+is(@{$match->stack},                 1);
 
 # Not found
 $tx = Mojo::Transaction::Single->new;
@@ -401,6 +431,7 @@ $tx->req->method('GET');
 $tx->req->url->parse('/not_found');
 $match = $r->match($tx);
 is($match->url_for('test_edit', controller => 'foo'), '/foo/test/edit');
+is(@{$match->stack}, 0);
 
 # Simplified form
 $tx = Mojo::Transaction::Single->new;
@@ -411,3 +442,4 @@ is($match->stack->[0]->{controller}, 'test-test');
 is($match->stack->[0]->{action},     'test');
 is($match->stack->[0]->{format},     undef);
 is($match->url_for,                  '/simple/form');
+is(@{$match->stack},                 1);

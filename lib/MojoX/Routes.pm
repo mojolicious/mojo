@@ -145,15 +145,13 @@ sub match {
       if $self->pattern->format;
 
     # Update stack
-    if ($self->inline || ($self->is_endpoint && $match->is_path_empty)) {
-        push @{$match->stack}, $captures;
-    }
+    push @{$match->stack}, $captures
+      if $self->inline || ($self->is_endpoint && $match->is_path_empty);
 
     # Waypoint match
     if ($self->block && $match->is_path_empty) {
-        push @{$match->stack}, $captures;
         $match->endpoint($self);
-        return $self;
+        return $match;
     }
 
     # Match children

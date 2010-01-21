@@ -23,6 +23,8 @@ __PACKAGE__->attr(buffer  => sub { Mojo::Buffer->new });
 __PACKAGE__->attr(content => sub { Mojo::Content::Single->new });
 __PACKAGE__->attr(default_charset                   => 'UTF-8');
 __PACKAGE__->attr([qw/major_version minor_version/] => 1);
+__PACKAGE__->attr(max_line_size => $ENV{MOJO_MAX_LINE_SIZE} || 24576);
+__PACKAGE__->attr(max_message_size => $ENV{MOJO_MAX_MESSAGE_SIZE} || 524288);
 
 __PACKAGE__->attr([qw/_body_params _cookies _uploads/]);
 
@@ -416,6 +418,18 @@ sub _parse {
     # Progress
     $self->progress_cb->($self) if $self->progress_cb;
 
+    # Start line and headers
+    if ($self->is_state(qw/start headers/)) {
+
+        # Check line size
+        $self->error('Maximum line size exceeded.')
+          if $self->buffer->size > $self->max_line_size;
+    }
+
+    # Check message size
+    $self->error('Maximum message size exceeded.')
+      if $self->buffer->raw_size > $self->max_message_size;
+
     # Content
     if ($self->is_state(qw/content done done_with_leftovers/)) {
         my $content = $self->content;
@@ -536,6 +550,16 @@ implements the following new ones.
 
     my $major_version = $message->major_version;
     $message          = $message->major_version(1);
+
+=head2 C<max_line_size>
+
+    my $max_line_size = $message->max_line_size;
+    $message          = $message->max_line_size(500);
+
+=head2 C<max_message_size>
+
+    my $max_message_size = $message->max_message_size;
+    $message             = $message->max_message_size(50000);
 
 =head2 C<minor_version>
 

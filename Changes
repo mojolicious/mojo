@@ -43,6 +43,7 @@ This file documents the revision history for Perl extension Mojo.
         - Added to_hash and from_hash methods to Mojo::Headers. (vti)
         - Added post_form method to Mojo::Client.
         - Added find_route method to MojoX::Routes.
+        - Added buffer size limits to the message parser.
         - Made all Mojolicious after_* plugin hooks run in reverse order.
         - Made param decoding more defensive and allow malformed data to pass
           through for debugging.

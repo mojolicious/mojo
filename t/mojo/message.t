@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 482;
+use Test::More tests => 486;
 
 use File::Spec;
 use File::Temp;
@@ -83,6 +83,20 @@ is($req->minor_version,           0);
 is($req->url,                     '/foo/bar/baz.html');
 is($req->headers->content_type,   'text/plain');
 is($req->headers->content_length, 0);
+
+# Parse HTTP 1.0 start line and headers, no body (with line size limit)
+$req = Mojo::Message::Request->new;
+$req->max_line_size(5);
+$req->parse('GET /foo/bar/baz.html HTTP/1');
+is($req->state, 'error');
+is($req->error, 'Maximum line size exceeded.');
+
+# Parse HTTP 1.0 start line and headers, no body (with message size limit)
+$req = Mojo::Message::Request->new;
+$req->max_message_size(5);
+$req->parse('GET /foo/bar/baz.html HTTP/1');
+is($req->state, 'error');
+is($req->error, 'Maximum message size exceeded.');
 
 # Parse full HTTP 1.0 request
 $req = Mojo::Message::Request->new;

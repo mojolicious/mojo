@@ -292,7 +292,7 @@ Tatsuhiko Miyagawa
 
 Uwe Voelker
 
-Viacheslav Tikhanovskii
+Viacheslav Tykhanovskyi
 
 Yaroslav Korshak
 

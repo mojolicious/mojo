@@ -156,22 +156,41 @@ The following events are available.
 
 =item before_dispatch
 
-Runs before the dispatchers determines what action to run. (Passed context)
+Runs before the dispatchers determines what action to run.
+(Passed the default controller instance)
+
+    $plugins->add_hook(before_dispatch => sub {
+        my ($self, $c) = @_;
+    });
 
 =item after_dispatch
 
-Runs after the dispatchers determines what action to run. (Passed context)
+Runs after the dispatchers determines what action to run.
+(Passed the default controller instance)
+
+    $plugins->add_hook(after_dispatch => sub {
+        my ($self, $c) = @_;
+    });
 
 =item after_static_dispatch
 
 Runs after the static dispatcher determines if a static file should be
-served.
+served. (Passed the default controller instance)
+
+    $plugins->add_hook(after_static_dispatch => sub {
+        my ($self, $c) = @_;
+    })
 
 =item after_build_tx
 
 Runs right after the transaction is built and before the HTTP message gets
 parsed.
 One usage case would be upload progress bars.
+(Passed the transaction instance)
+
+    $plugins->add_hook(after_build_tx => sub {
+        my ($self, $tx) = @_;
+    })
 
 =back
 

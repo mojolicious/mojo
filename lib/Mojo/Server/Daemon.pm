@@ -401,7 +401,7 @@ Mojo::Server::Daemon - HTTP Server
     use Mojo::Server::Daemon;
 
     my $daemon = Mojo::Server::Daemon->new;
-    $daemon->port(8080);
+    $daemon->listen('http://*:8080');
     $daemon->run;
 
 =head1 DESCRIPTION

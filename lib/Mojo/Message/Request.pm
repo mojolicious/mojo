@@ -209,8 +209,6 @@ sub _parse_env {
                     $port = $2;
                 }
 
-                $self->url->host($host);
-                $self->url->port($port);
                 $self->url->base->host($host);
                 $self->url->base->port($port);
             }

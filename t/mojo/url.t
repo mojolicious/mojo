@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 94;
+use Test::More tests => 96;
 
 # I don't want you driving around in a car you built yourself.
 # You can sit there complaining, or you can knit me some seat belts.
@@ -169,3 +169,13 @@ is($url->host,   '☃.net');
 is($url->ihost,  'xn--n3h.net');
 is($url->path,   '/');
 is("$url",       'http://☃.net/');
+
+# Already absolute
+$url = Mojo::URL->new('http://foo.com/');
+is($url->to_abs, 'http://foo.com/');
+
+# Already relative
+$url = Mojo::URL->new('http://sri:foobar@kraih.com:8080/foo?foo=bar#23');
+$url->base->parse('http://sri:foobar@kraih.com:8080/');
+my $url2 = $url->to_rel;
+is($url->to_rel, '/foo?foo=bar#23');

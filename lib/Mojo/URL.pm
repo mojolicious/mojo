@@ -183,6 +183,9 @@ sub to_abs {
 
     my $abs = $self->clone;
 
+    # Already absolute
+    return $abs if $abs->is_abs;
+
     # Add scheme and authority
     $abs->scheme($base->scheme);
     $abs->authority($base->authority);
@@ -206,6 +209,9 @@ sub to_rel {
     my $base = shift || $self->base->clone;
 
     my $rel = $self->clone;
+
+    # Already relative
+    return $rel unless $rel->is_abs;
 
     # Different locations
     return $rel

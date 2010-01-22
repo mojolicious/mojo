@@ -214,13 +214,13 @@ Mojo will name the log file after the current mode and modes other than
 C<development> will result in limited log output.
 
 If you want to add per mode logic to your application, you can add a sub
-to your application named C<mode_$mode>.
+to your application named C<$mode_mode>.
 
-    sub mode_development {
+    sub development_mode {
         my $self = shift;
     }
 
-    sub mode_production {
+    sub production_mode {
         my $self = shift;
     }
 

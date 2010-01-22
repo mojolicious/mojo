@@ -63,6 +63,26 @@ Mojolicious::Plugin::DefaultHelpers - Default Helpers Plugin
 L<Mojolicous::Plugin::DefaultHelpers> is a collection of renderer helpers for
 L<Mojolicious>.
 
+=head2 HELPERS
+
+=over 4
+
+=item content
+
+=item dumper
+
+=item extends
+
+=item include
+
+=item layout
+
+=item param
+
+=item url_for
+
+=back
+
 =head1 METHODS
 
 L<Mojolicious::Plugin::DefaultHelpers> inherits all methods from
@@ -71,5 +91,7 @@ L<Mojolicious::Plugin> and implements the following new ones.
 =head2 C<register>
 
     $plugin->register;
+    
+Register the plugin with L<Mojolicious::Plugins>.
 
 =cut

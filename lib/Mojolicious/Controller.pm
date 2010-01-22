@@ -194,7 +194,9 @@ Mojolicious::Controller - Controller Base Class
 
 =head1 DESCRIPTION
 
-L<Mojolicous::Controller> is a controller base class.
+L<Mojolicous::Controller> is the base class for your Mojolicious controllers. 
+It is also the default controller class for L<Mojolicious> unless you
+set controller_class in your application.
 
 =head1 ATTRIBUTES
 
@@ -210,6 +212,8 @@ ones.
 =head2 C<client>
 
     my $client = $c->client;
+    
+Shortcut for ->app->client. See L<MojoX:Client>.
 
 =head2 C<helper>
 
@@ -241,9 +245,20 @@ ones.
     $c->render('foo/bar', format => 'html');
     $c->render('foo/bar', {format => 'html'});
 
+This is a wrapper around the L<MojoX::Renderer> to utilize the functionality
+provided by the Mojolicous framework. It will set a default template to use, 
+based on the controller and action name, or falling back to the route name
+if those are not available. To override, you can call it with a hash of
+options as normal, or pass in a single first argument to use as template
+before the hash/hashref of options.
+
 =head2 C<render_exception>
 
     $c->render_exception($e);
+
+render the exception template (exception.html.$handler). Will set the status
+code to 500 internal server error. Takes a L<Mojo::Exception> object. Will
+fall back to a rendering a 500 using the static handler if rendering fails.
 
 =head2 C<render_inner>
 
@@ -256,32 +271,53 @@ ones.
     $c->render_json({foo => 'bar'});
     $c->render_json([1, 2, -3]);
 
+Render a structure as JSON. Just sets the structure as reserved stash
+keyword 'json' and passes on to L<MojoX::Renderer>.
+
 =head2 C<render_not_found>
 
     $c->render_not_found;
+    
+Render the 404 not found template (not_found.html.$handler). Also set
+the response status code to 404.
 
 =head2 C<render_partial>
 
     my $output = $c->render_partial;
     my $output = $c->render_partial(action => 'foo');
+    
+Render a template without the wrapper. Just sets the structure as reserved 
+stash keyword 'partial' and passes on to L<MojoX::Renderer>. 'partial' will 
+not be set after the call.
 
 =head2 C<render_static>
 
     $c->render_static('images/logo.png');
+
+Render a static asset using L<MojoX::Dispatcher::Static>.
 
 =head2 C<render_text>
 
     $c->render_text('Hello World!');
     $c->render_text('Hello World', layout => 'green');
 
+Render the givent content as plain/text. Just sets the structure as reserved 
+stash keyword 'text' and passes on to L<MojoX::Renderer>. 'text' will 
+not be set after the call.
+
 =head2 C<resume>
 
     $c->resume;
+
+Resume the transaction. Alias to ->tx->resume. See L<Mojo::Transaction> for
+more information.
 
 =head2 C<url_for>
 
     my $url = $c->url_for;
     my $url = $c->url_for(controller => 'bar', action => 'baz');
     my $url = $c->url_for('named', controller => 'bar', action => 'baz');
+
+Generate a URL for another controller action
 
 =cut

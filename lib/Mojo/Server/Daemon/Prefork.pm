@@ -48,24 +48,24 @@ sub accept_lock {
     my ($self, $blocking) = @_;
 
     # Idle
-    if ($blocking) {
-        $self->_child_write->syswrite("$$ idle\n")
-          or croak "Can't write to parent: $!";
-    }
+    $self->child_status('idle') if $blocking;
 
     # Lock
     my $lock = $self->SUPER::accept_lock($blocking);
 
     # Busy
-    if ($lock) {
-        $self->_child_write->syswrite("$$ busy\n")
-          or croak "Can't write to parent: $!";
-    }
+    $self->child_status('busy') if $lock;
 
     return $lock;
 }
 
 sub child { shift->ioloop->start }
+
+sub child_status {
+    my ($self, $status) = @_;
+    $self->_child_write->syswrite("$$ $status\n")
+      or croak "Can't write to parent: $!";
+}
 
 sub daemonize {
     my $self = shift;
@@ -325,8 +325,7 @@ sub _spawn_child {
         while (!$done) { $self->child }
 
         # Done
-        $self->_child_write->syswrite("$$ done\n")
-          or croak "Can't write to parent: $!";
+        $self->child_status('done');
         $self->_child_write(undef);
         exit 0;
     }
@@ -405,6 +404,10 @@ L<Mojo::Server::Daemon> and implements the following new ones.
 =head2 C<child>
 
     $daemon->child;
+
+=head2 C<child_status>
+
+    $daemon->child_status('idle');
 
 =head2 C<daemonize>
 

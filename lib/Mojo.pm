@@ -284,6 +284,8 @@ Randal Schwartz
 
 Robert Hicks
 
+Sergey Zasenko
+
 Shu Cho
 
 Stanis Trendelenburg

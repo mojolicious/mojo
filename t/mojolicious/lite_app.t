@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 294;
+use Test::More tests => 306;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -28,6 +28,9 @@ app->log->level('error');
 # Test with lite templates
 app->renderer->default_handler('epl');
 
+# Header condition plugin
+plugin 'header_condition';
+
 # GET /
 get '/' => 'root';
 
@@ -36,6 +39,18 @@ get '/root.html' => 'root_path';
 
 # GET /template.txt
 get '/template.txt' => 'template';
+
+# GET /with/header/condition
+get '/with/header/condition' => (headers => {'X-Secret-Header' => 'bar'}) =>
+  'with_header_condition';
+
+# POST /with/header/condition
+post '/with/header/condition' => (headers => {'X-Secret-Header' => 'bar'}) =>
+  sub {
+    my $self = shift;
+    $self->render_text(
+        'foo ' . $self->req->headers->header('X-Secret-Header'));
+  };
 
 # GET /template_inheritance
 get '/template_inheritance' => sub {
@@ -248,6 +263,21 @@ $t->get_ok('/root.html')->status_is(200)->header_is(Server => 'Mojo (Perl)')
 $t->get_ok('/.html')->status_is(200)->header_is(Server => 'Mojo (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('/root.html/root.html/root.html/root.html/root.html');
+
+# GET /with/header/condition
+$t->get_ok('/with/header/condition', {'X-Secret-Header' => 'bar'})
+  ->status_is(200)->content_like(qr/^Test ok/);
+
+# GET /with/header/condition (not found)
+$t->get_ok('/with/header/condition')->status_is(404)->content_like(qr/Oops!/);
+
+# POST /with/header/condition
+$t->post_ok('/with/header/condition', {'X-Secret-Header' => 'bar'}, 'bar')
+  ->status_is(200)->content_is('foo bar');
+
+# POST /with/header/condition (not found)
+$t->post_ok('/with/header/condition', {}, 'bar')->status_is(404)
+  ->content_like(qr/Oops!/);
 
 # GET /template_inheritance
 $t->get_ok('/template_inheritance')->status_is(200)
@@ -572,6 +602,9 @@ $t->get_ok('/hello3.txt', {'Range' => 'bytes=0-0'})->status_is(206)
 __DATA__
 @@ template.txt.epl
 Redirect works!
+
+@@ with_header_condition.html.epl
+Test ok
 
 @@ template_inheritance.html.ep
 % layout 'template_inheritance';

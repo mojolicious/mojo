@@ -69,17 +69,31 @@ L<Mojolicious>.
 
 =item content
 
+Insert content into a layout template.
+
 =item dumper
+
+Dump a Perl data structure using L<Data::Dumper>.
 
 =item extends
 
+Extend a template.
+
 =item include
+
+Include a partial template.
 
 =item layout
 
+Render this template with a layout.
+
 =item param
 
+Access request parameters and routes captures.
+
 =item url_for
+
+Generate URLs.
 
 =back
 
@@ -92,6 +106,6 @@ L<Mojolicious::Plugin> and implements the following new ones.
 
     $plugin->register;
     
-Register the plugin with L<Mojolicious::Plugins>.
+Register the helpers.
 
 =cut

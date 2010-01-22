@@ -10,6 +10,8 @@ use base 'MojoX::Dispatcher::Routes::Controller';
 use Mojo::ByteStream;
 use Mojo::URL;
 
+require Carp;
+
 # Space: It seems to go on and on forever...
 # but then you get to the end and a gorilla starts throwing barrels at you.
 sub client { shift->app->client }
@@ -21,10 +23,11 @@ sub helper {
     return unless my $name = shift;
 
     # Helper
-    return unless my $helper = $self->app->renderer->helper->{$name};
+    Carp::croak(qq/Helper "$name" not found./)
+      unless my $helper = $self->app->renderer->helper->{$name};
 
     # Run
-    return $self->$helper(@_);
+    return wantarray ? ($self->$helper(@_)) : scalar $self->$helper(@_);
 }
 
 sub pause { shift->tx->pause }
@@ -194,9 +197,10 @@ Mojolicious::Controller - Controller Base Class
 
 =head1 DESCRIPTION
 
-L<Mojolicous::Controller> is the base class for your Mojolicious controllers. 
-It is also the default controller class for L<Mojolicious> unless you
-set controller_class in your application.
+L<Mojolicous::Controller> is the base class for your L<Mojolicious>
+controllers.
+It is also the default controller class for L<Mojolicious> unless you set
+C<controller_class> in your application.
 
 =head1 ATTRIBUTES
 
@@ -213,16 +217,23 @@ ones.
 
     my $client = $c->client;
     
-Shortcut for ->app->client. See L<MojoX:Client>.
+A L<Mojo::Client> prepared for the current environment.
 
 =head2 C<helper>
 
     $c->helper('foo');
     $c->helper(foo => 23);
 
+Directly call a L<Mojolicious> helper, see
+L<Mojolicious::Plugin::DefaultHelpers> for a list of helpers that are always
+available.
+
 =head2 C<pause>
 
     $c->pause;
+
+Pause transaction associated with this request, used for asynchronous web
+applications.
 
 =head2 C<redirect_to>
 
@@ -230,6 +241,8 @@ Shortcut for ->app->client. See L<MojoX:Client>.
     $c = $c->redirect_to('named', foo => 'bar');
     $c = $c->redirect_to('/path');
     $c = $c->redirect_to('http://127.0.0.1/foo/bar');
+
+Prepare a redirect response.
 
 =head2 C<render>
 
@@ -245,20 +258,21 @@ Shortcut for ->app->client. See L<MojoX:Client>.
     $c->render('foo/bar', format => 'html');
     $c->render('foo/bar', {format => 'html'});
 
-This is a wrapper around the L<MojoX::Renderer> to utilize the functionality
-provided by the Mojolicous framework. It will set a default template to use, 
-based on the controller and action name, or falling back to the route name
-if those are not available. To override, you can call it with a hash of
-options as normal, or pass in a single first argument to use as template
-before the hash/hashref of options.
+This is a wrapper around L<MojoX::Renderer> exposing pretty much all
+functionality provided by it.
+It will set a default template to use based on the controller and action name
+or fall back to the route name.
+You can call it with a hash of options which can be preceded by an optional
+template name.
 
 =head2 C<render_exception>
 
     $c->render_exception($e);
 
-render the exception template (exception.html.$handler). Will set the status
-code to 500 internal server error. Takes a L<Mojo::Exception> object. Will
-fall back to a rendering a 500 using the static handler if rendering fails.
+Render the exception template C<exception.html.$handler>.
+Will set the status code to C<500> meaning C<Internal Server Error>.
+Takes a L<Mojo::Exception> object and will fall back to a rendering a static
+C<500> page using L<MojoX::Renderer::Static>.
 
 =head2 C<render_inner>
 
@@ -266,29 +280,30 @@ fall back to a rendering a 500 using the static handler if rendering fails.
     my $output = $c->render_inner('content');
     my $output = $c->render_inner(content => 'Hello world!');
 
+Contains partial rendered templates, used for the renderers C<layout> and
+C<extends> features.
+
 =head2 C<render_json>
 
     $c->render_json({foo => 'bar'});
     $c->render_json([1, 2, -3]);
 
-Render a structure as JSON. Just sets the structure as reserved stash
-keyword 'json' and passes on to L<MojoX::Renderer>.
+Render a data structure as JSON.
 
 =head2 C<render_not_found>
 
     $c->render_not_found;
     
-Render the 404 not found template (not_found.html.$handler). Also set
-the response status code to 404.
+Render the not found template C<not_found.html.$handler>.
+Also sets the response status code to C<404>, will fall back to a rendering a
+static C<404> page using L<MojoX::Renderer::Static>.
 
 =head2 C<render_partial>
 
     my $output = $c->render_partial;
     my $output = $c->render_partial(action => 'foo');
     
-Render a template without the wrapper. Just sets the structure as reserved 
-stash keyword 'partial' and passes on to L<MojoX::Renderer>. 'partial' will 
-not be set after the call.
+Same as C<render> but returns the rendered result.
 
 =head2 C<render_static>
 
@@ -301,16 +316,14 @@ Render a static asset using L<MojoX::Dispatcher::Static>.
     $c->render_text('Hello World!');
     $c->render_text('Hello World', layout => 'green');
 
-Render the givent content as plain/text. Just sets the structure as reserved 
-stash keyword 'text' and passes on to L<MojoX::Renderer>. 'text' will 
-not be set after the call.
+Render the givent content as plain text.
 
 =head2 C<resume>
 
     $c->resume;
 
-Resume the transaction. Alias to ->tx->resume. See L<Mojo::Transaction> for
-more information.
+Resume transaction associated with this request, used for asynchronous web
+applications.
 
 =head2 C<url_for>
 
@@ -318,6 +331,6 @@ more information.
     my $url = $c->url_for(controller => 'bar', action => 'baz');
     my $url = $c->url_for('named', controller => 'bar', action => 'baz');
 
-Generate a URL for another controller action
+Generate a L<Mojo::URL> for the current or a named route.
 
 =cut

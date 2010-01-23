@@ -972,7 +972,7 @@ dropped.
 
     $loop = $loop->drop($id);
 
-Drop a connection or timer immediately.
+Drop a connection, listen socket or timer immediately.
 
 =head2 C<error_cb>
 

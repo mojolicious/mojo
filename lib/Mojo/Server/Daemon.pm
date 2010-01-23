@@ -36,7 +36,21 @@ __PACKAGE__->attr(
 );
 
 __PACKAGE__->attr(_connections => sub { {} });
+__PACKAGE__->attr(_listening   => sub { [] });
 __PACKAGE__->attr('_lock');
+
+sub DESTROY {
+    my $self = shift;
+
+    # Shortcut
+    return unless $self->ioloop;
+
+    # Cleanup connections
+    for my $id (keys %{$self->_connections}) { $self->ioloop->drop($id) }
+
+    # Cleanup listen sockets
+    for my $id (@{$self->_listening}) { $self->ioloop->drop($id) }
+}
 
 sub accept_lock {
     my ($self, $blocking) = @_;
@@ -59,15 +73,15 @@ sub prepare_ioloop {
     # Unlock callback
     $self->ioloop->unlock_cb(sub { $self->accept_unlock });
 
+    # Stop ioloop on HUP signal
+    $SIG{HUP} = sub { $self->ioloop->stop };
+
     # Listen
     my $listen = $self->listen || 'http://*:3000';
     $self->_listen($_) for split ',', $listen;
 
     # Max clients
     $self->ioloop->max_connections($self->max_clients);
-
-    # Stop ioloop on HUP signal
-    $SIG{HUP} = sub { $self->ioloop->stop };
 }
 
 sub prepare_lock_file {
@@ -333,7 +347,8 @@ sub _listen {
     };
 
     # Listen
-    $self->ioloop->listen($options);
+    my $id = $self->ioloop->listen($options);
+    push @{$self->_listening}, $id;
 
     # Log
     my $file    = $options->{file};

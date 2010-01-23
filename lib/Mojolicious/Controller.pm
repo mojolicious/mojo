@@ -234,6 +234,9 @@ available.
 
 Pause transaction associated with this request, used for asynchronous web
 applications.
+Note that automatic rendering and some plugins that do state changing
+operations inside the C<after_dispatch> hook won't work if you pause a
+transaction.
 
 =head2 C<redirect_to>
 

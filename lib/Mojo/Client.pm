@@ -8,13 +8,14 @@ use warnings;
 use base 'Mojo::Base';
 use bytes;
 
+use IO::Socket::INET;
 use Mojo::ByteStream 'b';
 use Mojo::Content::MultiPart;
 use Mojo::Content::Single;
 use Mojo::CookieJar;
 use Mojo::IOLoop;
 use Mojo::Parameters;
-use Mojo::Server;
+use Mojo::Server::Daemon;
 use Mojo::Transaction::Pipeline;
 use Mojo::Transaction::Single;
 use Scalar::Util qw/isweak weaken/;
@@ -27,9 +28,10 @@ __PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->singleton });
 __PACKAGE__->attr(keep_alive_timeout => 15);
 __PACKAGE__->attr(max_redirects      => 0);
 
-__PACKAGE__->attr([qw/_app_queue _cache/] => sub { [] });
-__PACKAGE__->attr(_connections            => sub { {} });
-__PACKAGE__->attr([qw/_finite _queued/]   => 0);
+__PACKAGE__->attr(_cache       => sub { [] });
+__PACKAGE__->attr(_connections => sub { {} });
+__PACKAGE__->attr([qw/_finite _queued/] => 0);
+__PACKAGE__->attr('_port');
 
 # Make sure we leave a clean ioloop behind
 sub DESTROY {
@@ -51,9 +53,31 @@ sub DESTROY {
 }
 
 sub delete { shift->_build_tx('DELETE', @_) }
-sub get    { shift->_build_tx('GET',    @_) }
-sub head   { shift->_build_tx('HEAD',   @_) }
-sub post   { shift->_build_tx('POST',   @_) }
+
+sub generate_port {
+    my $self = shift;
+
+    # Ports
+    my $port = 1 . int(rand 10) . int(rand 10) . int(rand 10) . int(rand 10);
+    while ($port++ < 30000) {
+
+        # Try port
+        return $port
+          if IO::Socket::INET->new(
+            Listen    => 5,
+            LocalAddr => '127.0.0.1',
+            LocalPort => $port,
+            Proto     => 'tcp'
+          );
+    }
+
+    # Nothing
+    return;
+}
+
+sub get  { shift->_build_tx('GET',  @_) }
+sub head { shift->_build_tx('HEAD', @_) }
+sub post { shift->_build_tx('POST', @_) }
 
 sub post_form {
     my $self = shift;
@@ -128,9 +152,6 @@ sub process {
     # Already running
     return $self if $self->_finite;
 
-    # Process app
-    return $self->_app_process if $self->app;
-
     # Loop is finite
     $self->_finite(1);
 
@@ -151,160 +172,13 @@ sub queue {
     # Callback
     my $cb = pop @_ if ref $_[-1] && ref $_[-1] eq 'CODE';
 
+    # Embedded server
+    $self->_prepare_server if $self->app;
+
     # Queue transactions
     $self->_queue($_, $cb) for @_;
 
     return $self;
-}
-
-sub _app_process {
-    my $self = shift;
-
-    # Process queued transactions
-    while (my $queued = shift @{$self->_app_queue}) {
-
-        # Transaction
-        my $client = $queued->{tx};
-
-        # App
-        my $app = $self->app;
-
-        # Daemon start
-        my $daemon = Mojo::Server->new;
-        $daemon->app($app) if ref $app;
-        $daemon->app_class(ref $app || $app);
-
-        # Client connecting
-        $client->client_connected;
-
-        # Server accepting
-        my $server = Mojo::Transaction::Pipeline->new;
-
-        # Transaction builder callback
-        $server->build_tx_cb(
-            sub {
-
-                # Build transaction
-                my $tx = $daemon->build_tx_cb->($daemon);
-
-                # Handler callback
-                $tx->handler_cb(
-                    sub {
-
-                        # Weaken
-                        weaken $tx unless isweak $tx;
-
-                        # Handler
-                        $daemon->handler_cb->($daemon, $tx);
-                    }
-                );
-
-                # Continue handler callback
-                $tx->continue_handler_cb(
-                    sub {
-
-                        # Weaken
-                        weaken $tx;
-
-                        # Handler
-                        $daemon->continue_handler_cb->($daemon, $tx);
-                    }
-                );
-
-                return $tx;
-            }
-        );
-
-        # Spin
-        while (1) { last if $self->_app_spin($client, $server, $daemon) }
-
-        # Cookies to the jar
-        $self->_store_cookies($client);
-
-        # Redirect?
-        my $r = $queued->{redirects} || 0;
-        my $max = $self->max_redirects;
-        if ($r < $max && (my $tx = $self->_redirect($client))) {
-
-            # Queue redirected request
-            my $h = $queued->{history} || [];
-            push @$h, $client;
-            my $new = {
-                cb        => $queued->{cb},
-                history   => $h,
-                redirects => $r + 1,
-                tx        => $tx
-            };
-            push @{$self->_app_queue}, $new;
-        }
-
-        # Callback
-        else {
-
-            # Get callback
-            my $cb = $queued->{cb} || $self->default_cb;
-
-            # Execute callback
-            $self->$cb($client, $queued->{history}) if $cb;
-        }
-    }
-
-    return $self;
-}
-
-sub _app_spin {
-    my ($self, $client, $server, $daemon) = @_;
-
-    # Exchange
-    if ($client->client_is_writing || $server->server_is_writing) {
-
-        # Client writing?
-        if ($client->client_is_writing) {
-
-            # Client grabs chunk
-            my $buffer = $client->client_get_chunk;
-            $buffer = '' unless defined $buffer;
-
-            # Client write and server read
-            $server->server_read($buffer);
-        }
-
-        # Spin both
-        $client->client_spin;
-        $server->server_spin;
-
-        # Server writing?
-        if ($server->server_is_writing) {
-
-            # Server grabs chunk
-            my $buffer = $server->server_get_chunk;
-            $buffer = '' unless defined $buffer;
-
-            # Server write and client read
-            $client->client_read($buffer);
-        }
-
-        # Spin both
-        $server->server_spin;
-        $client->client_spin;
-
-        # Server takes care of leftovers
-        if (my $leftovers = $server->server_leftovers) {
-
-            # Server reads leftovers
-            $server->server_read($leftovers);
-        }
-    }
-
-    # Done
-    return 1 if $client->is_finished;
-
-    # Check if server closed the connection
-    $client->error('Server closed connection.') and return 1
-      if $server->is_done && !$server->keep_alive;
-
-    # More to do
-    return;
 }
 
 sub _build_multipart_post {
@@ -579,16 +453,45 @@ sub _hup {
     $self->_finish($id);
 }
 
+sub _prepare_server {
+    my $self = shift;
+
+    # Server already prepared
+    return if $self->_port;
+
+    # Server
+    my $server = Mojo::Server::Daemon->new;
+    my $port   = $self->generate_port;
+    die "Couldn't find a free TCP port for testing.\n" unless $port;
+    $self->_port($port);
+    $server->listen("http://*:$port");
+    ref $self->app
+      ? $server->app($self->app)
+      : $server->app_class($self->app);
+    $server->prepare_lock_file;
+    $server->prepare_ioloop;
+}
+
 sub _queue {
     my ($self, $tx, $cb) = @_;
 
+    # Embedded server
+    if ($self->app) {
+        my @active = $tx->is_pipeline ? @{$tx->active} : $tx;
+        for my $active (@active) {
+            my $url = $active->req->url->to_abs;
+            $url->scheme('http');
+            $url->host('localhost');
+            $url->port($self->_port);
+            $active->req->url($url);
+        }
+        $tx->client_info(
+            {scheme => 'http', host => 'localhost', port => $self->_port})
+          if $tx->is_pipeline;
+    }
+
     # Cookies from the jar
     $self->_fetch_cookies($tx);
-
-    # Add to app queue
-    push @{$self->_app_queue}, {cb => $cb, redirects => 0, tx => $tx}
-      and return
-      if $self->app;
 
     # Info
     my $info   = $tx->client_info;
@@ -910,6 +813,12 @@ As usual, you can pass any of the attributes above to the constructor.
     );
 
 Send a HTTP C<DELETE> request.
+
+=head2 C<generate_port>
+
+    my $port = $client->generate_port;
+
+Find a free TCP port.
 
 =head2 C<get>
 

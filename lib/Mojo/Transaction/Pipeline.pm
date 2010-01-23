@@ -98,7 +98,7 @@ sub client_get_chunk {
     return;
 }
 
-sub client_info { shift->_info }
+sub client_info { shift->_info(@_) }
 
 sub client_is_writing {
     my $self = shift;
@@ -442,6 +442,7 @@ and implements the following new ones.
 =head2 C<client_info>
 
     my $info = $p->client_info;
+    $p       = $p->client_info({host => 'localhost'});
 
 =head2 C<client_is_writing>
 

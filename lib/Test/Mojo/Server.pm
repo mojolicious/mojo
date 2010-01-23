@@ -10,6 +10,7 @@ use base 'Mojo::Base';
 use File::Spec;
 use FindBin;
 use IO::Socket::INET;
+use Mojo::Client;
 use Mojo::Command;
 use Mojo::Home;
 
@@ -17,9 +18,10 @@ require Test::More;
 
 use constant DEBUG => $ENV{MOJO_SERVER_DEBUG} || 0;
 
-__PACKAGE__->attr([qw/command pid port/]);
+__PACKAGE__->attr([qw/command pid/]);
 __PACKAGE__->attr(executable => 'mojo');
 __PACKAGE__->attr(home       => sub { Mojo::Home->new });
+__PACKAGE__->attr(port       => sub { Mojo::Client->new->generate_port });
 __PACKAGE__->attr(timeout    => 5);
 
 __PACKAGE__->attr('_server');
@@ -40,7 +42,7 @@ sub generate_port_ok {
 
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    my $port = $self->_generate_port;
+    my $port = Mojo::Client->new->generate_port;
     if ($port) {
         Test::More::ok(1, $desc);
         return $port;
@@ -71,7 +73,7 @@ sub start_daemon_ok {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     # Port
-    my $port = $self->port || $self->_generate_port;
+    my $port = $self->port;
     return Test::More::ok(0, $desc) unless $port;
 
     # Path
@@ -90,7 +92,7 @@ sub start_daemon_prefork_ok {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     # Port
-    my $port = $self->port || $self->_generate_port;
+    my $port = $self->port;
     return Test::More::ok(0, $desc) unless $port;
 
     # Path
@@ -225,24 +227,6 @@ sub _find_executable {
     return $path if -f $path;
 
     # Not found
-    return;
-}
-
-sub _generate_port {
-    my $self = shift;
-
-    # Try ports
-    my $port = 1 . int(rand 10) . int(rand 10) . int(rand 10) . int(rand 10);
-    while ($port++ < 30000) {
-        my $server = IO::Socket::INET->new(
-            Listen    => 5,
-            LocalAddr => '127.0.0.1',
-            LocalPort => $port,
-            Proto     => 'tcp'
-        );
-        return $self->port($port)->port;
-    }
-
     return;
 }
 

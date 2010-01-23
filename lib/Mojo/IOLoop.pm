@@ -146,6 +146,17 @@ sub drop {
     # Delete connection
     my $c = delete $self->_connections->{$id};
 
+    # Delete listen socket
+    if (!$c && ($c = delete $self->_listen->{$id})) {
+
+        # Not listening
+        return $self unless $self->_listening;
+
+        # Make sure lock is free
+        $self->_listening(0);
+        $self->unlock_cb->($self);
+    }
+
     # Socket
     if (my $socket = $c->{socket}) {
 
@@ -244,7 +255,7 @@ sub listen {
     my $fd = fileno($listen);
     $self->_fds->{$fd} = "$listen";
 
-    return $self;
+    return "$listen";
 }
 
 sub local_info {
@@ -984,10 +995,10 @@ Callback to be invoked if the connection gets closed.
 
 =head2 C<listen>
 
-    $loop->listen(port => 3000);
-    $loop->listen({port => 3000});
-    $loop->listen(file => '/foo/myapp.sock');
-    $loop->listen(
+    my $id = $loop->listen(port => 3000);
+    my $id = $loop->listen({port => 3000});
+    my $id = $loop->listen(file => '/foo/myapp.sock');
+    my $id = $loop->listen(
         port     => 443,
         tls      => 1,
         tls_cert => '/foo/server.cert',

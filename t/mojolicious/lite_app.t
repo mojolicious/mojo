@@ -249,6 +249,7 @@ get '/param_auth/too' =>
 my $client = Mojo::Client->new(app => app);
 app->client($client);
 my $t = Test::Mojo->new;
+$t->client($client);
 
 # GET /
 $t->get_ok('/')->status_is(200)->header_is(Server => 'Mojo (Perl)')
@@ -304,19 +305,19 @@ $t->get_ok('/outerlayout')->status_is(200)->header_is(Server => 'Mojo (Perl)')
   ->content_is("layouted Hello\n[\n  1,\n  2\n]\nthere<br/>!\n\n\n");
 
 # GET /session_cookie
-$t->get_ok('http://kraih.com/session_cookie')->status_is(200)
+$t->get_ok('/session_cookie')->status_is(200)
   ->header_is(Server         => 'Mojo (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('Cookie set!');
 
 # GET /session_cookie/2
-$t->get_ok('http://kraih.com/session_cookie/2')->status_is(200)
+$t->get_ok('/session_cookie/2')->status_is(200)
   ->header_is(Server         => 'Mojo (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('Session is 23!');
 
 # GET /session_cookie/2 (retry)
-$t->get_ok('http://kraih.com/session_cookie/2')->status_is(200)
+$t->get_ok('/session_cookie/2')->status_is(200)
   ->header_is(Server         => 'Mojo (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('Session is 23!');
@@ -324,7 +325,7 @@ $t->get_ok('http://kraih.com/session_cookie/2')->status_is(200)
 # GET /session_cookie/2 (session reset)
 $t->reset_session;
 ok(!$t->tx);
-$t->get_ok('http://kraih.com/session_cookie/2')->status_is(200)
+$t->get_ok('/session_cookie/2')->status_is(200)
   ->header_is(Server         => 'Mojo (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('Session is missing!');

@@ -14,11 +14,10 @@ use Mojo::JSON;
 require Test::More;
 
 __PACKAGE__->attr(app => sub { return $ENV{MOJO_APP} if ref $ENV{MOJO_APP} });
+__PACKAGE__->attr(client    => sub { Mojo::Client->new });
 __PACKAGE__->attr(redirects => sub { [] });
 __PACKAGE__->attr('tx');
 __PACKAGE__->attr(max_redirects => 0);
-
-__PACKAGE__->attr(_client => sub { Mojo::Client->new });
 
 # Ooh, a graduate student huh?
 # How come you guys can go to the moon but can't make my shoes smell good?
@@ -135,7 +134,7 @@ sub post_form_ok {
     my $desc = ref $_[-1] ? undef : pop @_;
 
     # Client
-    my $client = $self->_client;
+    my $client = $self->client;
     $client->app($self->app);
     $client->max_redirects($self->max_redirects);
 
@@ -157,9 +156,8 @@ sub reset_session {
     my $self = shift;
 
     # Client
-    $self->_client(Mojo::Client->new);
-    $self->_client->app($self->app);
-    $self->_client->max_redirects($self->max_redirects);
+    $self->client->cookie_jar->empty;
+    $self->client->max_redirects($self->max_redirects);
 
     # Transaction
     $self->tx(undef);
@@ -203,7 +201,7 @@ sub _request_ok {
     $headers ||= {};
 
     # Client
-    my $client = $self->_client;
+    my $client = $self->client;
     $client->app($self->app);
     $client->max_redirects($self->max_redirects);
 
@@ -256,6 +254,11 @@ L<Test::Mojo> implements the following attributes.
 
     my $app = $t->app;
     $t      = $t->app(MyApp->new);
+
+=head2 C<client>
+
+    my $client = $t->client;
+    $t         = $t->client(Mojo::Client->new);
 
 =head2 C<redirects>
 

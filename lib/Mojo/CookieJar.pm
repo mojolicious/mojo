@@ -63,6 +63,8 @@ sub add {
     return $self;
 }
 
+sub empty { shift->_jar({}) }
+
 sub find {
     my ($self, $url) = @_;
 
@@ -75,7 +77,7 @@ sub find {
 
     # Find
     my @found;
-    while ($domain =~ /[^\.]+\.[^\.]+$/) {
+    while ($domain =~ /[^\.]+\.[^\.]+|localhost$/) {
 
         # Nothing
         next unless my $jar = $self->_jar->{$domain};
@@ -152,6 +154,10 @@ following new ones.
 =head2 C<add>
 
     $jar = $jar->add(@cookies);
+
+=head2 C<empty>
+
+    $jar->empty;
 
 =head2 C<find>
 

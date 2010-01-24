@@ -68,6 +68,14 @@ __PACKAGE__->attr(
     }
 );
 __PACKAGE__->attr(reload => sub { $ENV{MOJO_RELOAD} || 0 });
+__PACKAGE__->attr(
+    websocket_handshake_cb => sub {
+        sub {
+            my $self = shift;
+            return $self->app->websocket_handshake_cb->($self->app, @_);
+          }
+    }
+);
 
 # Are you saying you're never going to eat any animal again? What about bacon?
 # No.
@@ -153,6 +161,13 @@ L<Mojo::Server> implements the following attributes.
 
     my $reload = $server->reload;
     $server    = $server->reload(1);
+
+=head2 C<websocket_handshake_cb>
+
+    my $handshake = $server->websocket_handshake_cb;
+    $server       = $server->websocket_handshake_cb(sub {
+        my ($self, $tx) = @_;
+    });
 
 =head1 METHODS
 

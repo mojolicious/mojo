@@ -40,6 +40,8 @@ sub is_paused { shift->is_state('paused') }
 
 sub is_pipeline { return shift->isa('Mojo::Transaction::Pipeline') ? 1 : 0 }
 
+sub is_websocket { return shift->isa('Mojo::Transaction::WebSocket') ? 1 : 0 }
+
 sub pause {
     my $self = shift;
 
@@ -202,6 +204,10 @@ implements the following new ones.
 =head2 C<is_pipeline>
 
     my $is_pipeline = $tx->is_pipeline;
+
+=head2 C<is_websocket>
+
+    my $is_websocket = $tx->is_websocket;
 
 =head2 C<pause>
 

@@ -7,8 +7,21 @@ Mojolicious::Book - The Definitive Guide To Mojolicious
 =head1 STATUS
 
 This book is currently being written, to get status updates and/or read early
-drafts you can visit L<http://labs.kraih.com>,
-L<http://twitter.com/kraih> and L<http://github.com/kraih/mojo/> or join the
-official IRC channel C<#mojo> on C<irc.perl.org>.
+drafts you can visit L<http://labs.kraih.com>, L<http://twitter.com/kraih>
+and L<http://github.com/kraih/mojo/> or join the official IRC channel
+C<#mojo> on C<irc.perl.org>.
+
+=head1 CHAPTERS
+
+New chapters will be added one by one, so keep a close eye on this.
+
+=over 4
+
+=item L<Mojolicious::Book::CodingGuidelines>
+
+Coding guidelines and mission statement.
+A must read for developers and contributors!
+
+=back
 
 =cut

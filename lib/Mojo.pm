@@ -13,6 +13,7 @@ use Mojo::Commands;
 use Mojo::Home;
 use Mojo::Log;
 use Mojo::Transaction::Single;
+use Mojo::Transaction::WebSocket;
 
 __PACKAGE__->attr(
     build_tx_cb => sub {
@@ -26,6 +27,28 @@ __PACKAGE__->attr(
 __PACKAGE__->attr(client => sub { Mojo::Client->new });
 __PACKAGE__->attr(home   => sub { Mojo::Home->new });
 __PACKAGE__->attr(log    => sub { Mojo::Log->new });
+__PACKAGE__->attr(
+    websocket_handshake_cb => sub {
+        sub {
+            my ($self, $tx) = @_;
+
+            # Handshake response
+            my $res = $tx->res;
+            $res->code(101);
+            $res->message('Web Socket Protocol Handshake');
+            $res->headers->upgrade('WebSocket');
+            $res->headers->connection('Upgrade');
+            my $scheme =
+              $tx->req->url->to_abs->scheme eq 'https' ? 'wss' : 'ws';
+            $res->headers->websocket_location(
+                $tx->req->url->to_abs->scheme($scheme)->to_string);
+            $res->headers->websocket_origin($tx->req->headers->origin);
+
+            # WenSocket transaction
+            return Mojo::Transaction::WebSocket->new(req => $tx->req);
+          }
+    }
+);
 
 # Oh, so they have internet on computers now!
 our $VERSION = '0.999915';
@@ -148,6 +171,15 @@ which stringifies to the actual path.
     $mojo   = $mojo->log(Mojo::Log->new);
     
 The logging layer of your application, by default a L<Mojo::Log> object.
+
+=head2 C<websocket_handshake_cb>
+
+    my $cb = $mojo->websocket_handshake_cb;
+    $mojo  = $mojo->websocket_handshake_cb(sub { ... });
+
+The websocket handshake callback, by default it builds a
+L<Mojo::Transaction::WebSocket> object and handles the response for the
+handshake request.
 
 =head1 METHODS
 

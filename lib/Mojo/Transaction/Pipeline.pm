@@ -442,7 +442,7 @@ and implements the following new ones.
 =head2 C<client_info>
 
     my $info = $p->client_info;
-    $p       = $p->client_info({host => 'localhost'});
+    $p       = $p->client_info({address => 'localhost'});
 
 =head2 C<client_is_writing>
 

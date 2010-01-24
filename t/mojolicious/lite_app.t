@@ -174,8 +174,8 @@ get '/subrequest' => sub {
     $self->client->post(
         '/template' => sub {
             my ($client, $tx) = @_;
-            $self->resume;
             $self->render_text($tx->res->body);
+            $self->finish;
         }
     )->process;
 };

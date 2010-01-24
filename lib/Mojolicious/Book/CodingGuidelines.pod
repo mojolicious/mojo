@@ -1,0 +1,81 @@
+# Copyright (C) 2008-2010, Sebastian Riedel.
+
+=head1 NAME
+
+Mojolicious::Book::CodingGuidelines - Coding Guidelines
+
+=head1 OVERVIEW
+
+This document describes the coding guidelines that are the foundations
+of L<Mojo> and L<Mojolicious> development.
+
+Please don't send patches unless you agree with them.
+
+=head1 MISSION STATEMENT
+
+L<Mojo> is a runtime environment for Perl web frameworks.
+It provides all the basic tools and helpers needed to write simple web
+applications and higher level web frameworks such as L<Mojolicious> and
+L<Mojolicious::Lite>.
+
+All components should be reusable in other projects and in a UNIXish way
+only loosely coupled.
+
+Especially for people new to Perl it should be as easy as possible to
+install Mojo and get started.
+Writing web applications can be one of the most fun ways to learn a language!
+
+For developers of other web frameworks it should be possible to reuse all the
+infrastructure and just consider the higher levels of the L<Mojo>
+distribution an example application.
+
+=head1 RULES
+
+=over 4
+
+Keep it simple, no magic unless absolutely necessary.
+
+Code should be written with a Perl6 port in mind.
+
+No refactoring unless a very important feature absolutely depends on it.
+
+It's not a feature without a test.
+
+A feature is only needed when the majority of the userbase benefits from it.
+
+Features may not be changed without being deprecated for at least one major
+release.
+
+Deprecating a feature should be avoided at all costs.
+
+Only add prereqs if absolutely necessary.
+
+Domain specific languages should be avoided in favor of Perl'ish solutions.
+
+No inline POD.
+
+Documentation belongs to the book, module POD is just an API reference.
+
+Lines should not be longer than 78 characters and we indent with 4
+whitespaces.
+
+Code should be run through L<Perl::Tidy> with the included C<.perltidyrc>.
+
+No spaghetti code.
+
+Code should be organized in blocks and those blocks should be commented.
+
+Comments should be funny if possible.
+
+Every file should contain at least one quote from C<The Simpsons> or
+C<Futurama>.
+
+No names outside of the CREDITS section of Mojo.pm.
+
+No Elitism.
+
+Peace!
+
+=back
+
+=cut

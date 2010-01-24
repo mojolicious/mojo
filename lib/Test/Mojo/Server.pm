@@ -10,8 +10,8 @@ use base 'Mojo::Base';
 use File::Spec;
 use FindBin;
 use IO::Socket::INET;
-use Mojo::Client;
 use Mojo::Command;
+use Mojo::IOLoop;
 use Mojo::Home;
 
 require Test::More;
@@ -20,9 +20,9 @@ use constant DEBUG => $ENV{MOJO_SERVER_DEBUG} || 0;
 
 __PACKAGE__->attr([qw/command pid/]);
 __PACKAGE__->attr(executable => 'mojo');
-__PACKAGE__->attr(home       => sub { Mojo::Home->new });
-__PACKAGE__->attr(port       => sub { Mojo::Client->new->generate_port });
-__PACKAGE__->attr(timeout    => 5);
+__PACKAGE__->attr(home => sub { Mojo::Home->new });
+__PACKAGE__->attr(port    => sub { Mojo::IOLoop->singleton->generate_port });
+__PACKAGE__->attr(timeout => 5);
 
 __PACKAGE__->attr('_server');
 
@@ -42,7 +42,7 @@ sub generate_port_ok {
 
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    my $port = Mojo::Client->new->generate_port;
+    my $port = Mojo::IOLoop->singleton->generate_port;
     if ($port) {
         Test::More::ok(1, $desc);
         return $port;

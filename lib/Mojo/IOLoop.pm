@@ -77,7 +77,7 @@ sub connect {
     # Options (TLS handshake only works blocking)
     my %options = (
         Blocking => $args->{tls} ? 1 : 0,
-        PeerAddr => $args->{host},
+        PeerAddr => $args->{address},
         PeerPort => $args->{port} || ($args->{tls} ? 443 : 80),
         Proto    => 'tcp',
         Type     => SOCK_STREAM
@@ -100,22 +100,24 @@ sub connect {
     # Non blocking
     $socket->blocking(0);
 
-    # Timeout
-    my $id = $self->timer(
-        after => $self->connect_timeout,
-        cb    => sub {
-            shift->_error("$socket", 'Connect timeout.');
-        }
-    );
-
     # Add connection
     $self->_connections->{$socket} = {
-        buffer        => Mojo::Buffer->new,
-        connect_cb    => $args->{cb},
-        connect_timer => $id,
-        connecting    => 1,
-        socket        => $socket
+        buffer     => Mojo::Buffer->new,
+        connect_cb => $args->{cb},
+        connecting => 1,
+        socket     => $socket
     };
+
+    # Timeout
+    my $id = $self->timer(
+        "$socket" => (
+            after => $self->connect_timeout,
+            cb    => sub {
+                shift->_error("$socket", 'Connect timeout.');
+            }
+        )
+    );
+    $self->_connections->{$socket}->{connect_timer} = $id;
 
     # File descriptor
     my $fd = fileno($socket);
@@ -139,6 +141,16 @@ sub drop {
 
     # Drop timer?
     if ($self->_timers->{$id}) {
+        my $c = $self->_timers->{$id}->{connection};
+
+        # Cleanup connection
+        my @timers;
+        for my $timer (@{$self->_connections->{$c}->{timers}}) {
+            next if $timer eq $id;
+            push @timers, $timer;
+        }
+        $self->_connections->{$c}->{timers} = \@timers;
+
         delete $self->_timers->{$id};
         return $self;
     }
@@ -152,13 +164,17 @@ sub drop {
         # Not listening
         return $self unless $self->_listening;
 
-        # Make sure lock is free
+        # Not listening anymore
         $self->_listening(0);
-        $self->unlock_cb->($self);
     }
 
     # Socket
     if (my $socket = $c->{socket}) {
+
+        # Cleanup timers
+        if (my $timers = $c->{timers}) {
+            for my $timer (@$timers) { $self->drop($timer) }
+        }
 
         # Remove file descriptor
         my $fd = fileno($socket);
@@ -194,6 +210,27 @@ sub finish {
     $self->_connections->{$id}->{finish} = 1;
 
     return $self;
+}
+
+sub generate_port {
+    my $self = shift;
+
+    # Ports
+    my $port = 1 . int(rand 10) . int(rand 10) . int(rand 10) . int(rand 10);
+    while ($port++ < 30000) {
+
+        # Try port
+        return $port
+          if IO::Socket::INET->new(
+            Listen    => 5,
+            LocalAddr => '127.0.0.1',
+            LocalPort => $port,
+            Proto     => 'tcp'
+          );
+    }
+
+    # Nothing
+    return;
 }
 
 sub hup_cb { shift->_add_event('hup', @_) }
@@ -332,6 +369,7 @@ sub stop { shift->_running(0) }
 
 sub timer {
     my $self = shift;
+    my $id   = shift;
 
     # Arguments
     my $args = ref $_[0] ? $_[0] : {@_};
@@ -339,8 +377,18 @@ sub timer {
     # Started
     $args->{started} = time;
 
+    # Connection
+    $args->{connection} = $id;
+
+    # Connection doesn't exist
+    return unless $self->_connections->{$id};
+
     # Add timer
     $self->_timers->{"$args"} = $args;
+
+    # Bind timer to connection
+    my $timers = $self->_connections->{$id}->{timers} ||= [];
+    push @{$timers}, "$args";
 
     return "$args";
 }
@@ -388,21 +436,23 @@ sub _accept {
     # Accept
     my $socket = $listen->accept or return;
 
-    # Timeout
-    my $id = $self->timer(
-        after => $self->accept_timeout,
-        cb    => sub {
-            shift->_error("$socket", 'Accept timeout.');
-        }
-    );
-
     # Add connection
     $self->_connections->{$socket} = {
-        accept_timer => $id,
-        accepting    => 1,
-        buffer       => Mojo::Buffer->new,
-        socket       => $socket
+        accepting => 1,
+        buffer    => Mojo::Buffer->new,
+        socket    => $socket
     };
+
+    # Timeout
+    my $id = $self->timer(
+        "$socket" => (
+            after => $self->accept_timeout,
+            cb    => sub {
+                shift->_error("$socket", 'Accept timeout.');
+            }
+        )
+    );
+    $self->_connections->{$socket}->{accept_timer} = $id;
 
     # File descriptor
     my $fd = fileno($socket);
@@ -731,7 +781,7 @@ sub _timer {
 
         # Callback
         if ((my $cb = $t->{cb}) && $run) {
-            $self->$cb("$t");
+            $self->$cb("$t", $t->{connection});
             $t->{last} = time;
         }
 
@@ -826,7 +876,7 @@ Mojo::IOLoop - IO Loop
     );
 
     # Connect to port 3000 with TLS activated
-    my $id = $loop->connect(host => 'localhost', port => 3000, tls => 1);
+    my $id = $loop->connect(address => 'localhost', port => 3000, tls => 1);
 
     # Loop starts writing
     $loop->writing($id);
@@ -851,15 +901,15 @@ Mojo::IOLoop - IO Loop
     });
 
     # Add a timer
-    $loop->timer(after => 5, cb => sub {
-        my $self = shift;
-        $self->drop($id);
-    });
+    $loop->timer($id => (after => 5, cb => sub {
+        my ($self, $tid, $cid) = @_;
+        $self->drop($cid);
+    }));
 
     # Add another timer
-    $loop->timer(interval => 3, cb => sub {
+    $loop->timer($id => (interval => 3, cb => sub {
         print "Timer is running again!\n";
-    });
+    }));
 
     # Start and stop loop
     $loop->start;
@@ -987,6 +1037,12 @@ Callback to be invoked if an error event happens on the connection.
 Drop a connection gracefully by allowing it to finish writing all data in
 it's write buffer.
 
+=head2 C<generate_port>
+
+    my $port = $loop->generate_port;
+
+Find a free TCP port.
+
 =head2 C<hup_cb>
 
     $loop = $loop->hup_cb($id => sub { ... });
@@ -1060,8 +1116,8 @@ Stop the loop immediately.
 
 =head2 C<timer>
 
-    my $id = $loop->timer(after => 5, cb => sub {...});
-    my $id = $loop->timer({interval => 5, cb => sub {...}});
+    my $id = $loop->timer($id => (after => 5, cb => sub {...}));
+    my $id = $loop->timer($id => {interval => 5, cb => sub {...}}));
 
 Create a new timer, invoking the callback afer a given amount of seconds.
 

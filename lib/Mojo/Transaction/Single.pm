@@ -9,8 +9,9 @@ use base 'Mojo::Transaction';
 
 use Mojo::Message::Request;
 use Mojo::Message::Response;
+use Mojo::Transaction::WebSocket;
 
-__PACKAGE__->attr([qw/continued handler_cb continue_handler_cb/]);
+__PACKAGE__->attr([qw/continue_handler_cb continued handler_cb upgrade_cb/]);
 __PACKAGE__->attr(req => sub { Mojo::Message::Request->new });
 __PACKAGE__->attr(res => sub { Mojo::Message::Response->new });
 
@@ -102,7 +103,7 @@ sub client_info {
     $scheme ||= 'http';
     $port ||= $scheme eq 'https' ? 443 : 80;
 
-    return {host => $host, port => $port, scheme => $scheme};
+    return {address => $host, port => $port, scheme => $scheme};
 }
 
 sub client_leftovers {
@@ -360,8 +361,12 @@ sub server_read {
         # Writing
         $self->state('write');
 
+        # Upgrade callback
+        my $ws;
+        $ws = $self->upgrade_cb->($self) if $self->req->headers->upgrade;
+
         # Handler callback
-        $self->handler_cb->($self);
+        $self->handler_cb->($ws ? ($ws, $self) : $self);
     }
 
     return $self;
@@ -531,6 +536,11 @@ L<Mojo::Transaction> and implements the following new ones.
 
     my $res = $tx->res;
     $tx     = $tx->res(Mojo::Message::Response->new);
+
+=head2 C<upgrade_cb>
+
+    my $cb = $tx->upgrade_cb;
+    $tx    = $tx->upgrade_cb(sub {...});
 
 =head1 METHODS
 

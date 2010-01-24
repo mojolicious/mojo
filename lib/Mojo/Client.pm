@@ -8,7 +8,6 @@ use warnings;
 use base 'Mojo::Base';
 use bytes;
 
-use IO::Socket::INET;
 use Mojo::ByteStream 'b';
 use Mojo::Content::MultiPart;
 use Mojo::Content::Single;
@@ -18,8 +17,7 @@ use Mojo::Parameters;
 use Mojo::Server::Daemon;
 use Mojo::Transaction::Pipeline;
 use Mojo::Transaction::Single;
-use Scalar::Util qw/isweak weaken/;
-use Socket;
+use Scalar::Util 'weaken';
 
 __PACKAGE__->attr([qw/app default_cb tls_ca_file tls_verify_cb/]);
 __PACKAGE__->attr([qw/continue_timeout max_keep_alive_connections/] => 5);
@@ -53,27 +51,6 @@ sub DESTROY {
 }
 
 sub delete { shift->_build_tx('DELETE', @_) }
-
-sub generate_port {
-    my $self = shift;
-
-    # Ports
-    my $port = 1 . int(rand 10) . int(rand 10) . int(rand 10) . int(rand 10);
-    while ($port++ < 30000) {
-
-        # Try port
-        return $port
-          if IO::Socket::INET->new(
-            Listen    => 5,
-            LocalAddr => '127.0.0.1',
-            LocalPort => $port,
-            Proto     => 'tcp'
-          );
-    }
-
-    # Nothing
-    return;
-}
 
 sub get  { shift->_build_tx('GET',  @_) }
 sub head { shift->_build_tx('HEAD', @_) }
@@ -300,11 +277,11 @@ sub _drop {
         $self->ioloop->not_writing($id);
 
         # Deposit
-        my $info   = $tx->client_info;
-        my $host   = $info->{host};
-        my $port   = $info->{port};
-        my $scheme = $info->{scheme};
-        $self->_deposit("$scheme:$host:$port", $id) if $tx->keep_alive;
+        my $info    = $tx->client_info;
+        my $address = $info->{address};
+        my $port    = $info->{port};
+        my $scheme  = $info->{scheme};
+        $self->_deposit("$scheme:$address:$port", $id) if $tx->keep_alive;
     }
 
     # Connection close
@@ -461,13 +438,15 @@ sub _prepare_server {
 
     # Server
     my $server = Mojo::Server::Daemon->new;
-    my $port   = $self->generate_port;
+    my $port   = $self->ioloop->generate_port;
     die "Couldn't find a free TCP port for testing.\n" unless $port;
     $self->_port($port);
     $server->listen("http://*:$port");
     ref $self->app
       ? $server->app($self->app)
       : $server->app_class($self->app);
+    $server->app->client->app($server->app);
+    $server->lock_file($server->lock_file . '.test');
     $server->prepare_lock_file;
     $server->prepare_ioloop;
 }
@@ -480,24 +459,25 @@ sub _queue {
         my @active = $tx->is_pipeline ? @{$tx->active} : $tx;
         for my $active (@active) {
             my $url = $active->req->url->to_abs;
+            next if $url->host;
             $url->scheme('http');
             $url->host('localhost');
             $url->port($self->_port);
             $active->req->url($url);
         }
         $tx->client_info(
-            {scheme => 'http', host => 'localhost', port => $self->_port})
-          if $tx->is_pipeline;
+            {scheme => 'http', address => 'localhost', port => $self->_port})
+          if $tx->is_pipeline && !$tx->client_info->{address};
     }
 
     # Cookies from the jar
     $self->_fetch_cookies($tx);
 
     # Info
-    my $info   = $tx->client_info;
-    my $host   = $info->{host};
-    my $port   = $info->{port};
-    my $scheme = $info->{scheme};
+    my $info    = $tx->client_info;
+    my $address = $info->{address};
+    my $port    = $info->{port};
+    my $scheme  = $info->{scheme};
 
     # Weaken
     weaken $self;
@@ -512,7 +492,7 @@ sub _queue {
 
     # Cached connection
     my $id;
-    if ($id = $self->_withdraw("$scheme:$host:$port")) {
+    if ($id = $self->_withdraw("$scheme:$address:$port")) {
 
         # Writing
         $self->ioloop->writing($id);
@@ -532,10 +512,10 @@ sub _queue {
 
         # Connect
         $id = $self->ioloop->connect(
-            cb   => $connected,
-            host => $host,
-            port => $port,
-            tls  => $scheme eq 'https' ? 1 : 0,
+            cb      => $connected,
+            address => $address,
+            port    => $port,
+            tls     => $scheme eq 'https' ? 1 : 0,
             tls_ca_file => $self->tls_ca_file || $ENV{MOJO_CA_FILE},
             tls_verify_cb => $self->tls_verify_cb
         );
@@ -813,12 +793,6 @@ As usual, you can pass any of the attributes above to the constructor.
     );
 
 Send a HTTP C<DELETE> request.
-
-=head2 C<generate_port>
-
-    my $port = $client->generate_port;
-
-Find a free TCP port.
 
 =head2 C<get>
 

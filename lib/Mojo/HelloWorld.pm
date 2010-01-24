@@ -28,10 +28,13 @@ sub handler {
     my ($self, $tx) = @_;
 
     # Default to 200
-    $tx->res->code(200);
+    $tx->res->code(200) unless $tx->is_websocket;
 
     # Dispatch to diagnostics functions
     return $self->_diag($tx) if $tx->req->url->path =~ m|^/diag|;
+
+    # WebSocket?
+    return if $tx->is_websocket;
 
     # Hello world!
     $tx->res->headers->content_type('text/plain');
@@ -43,12 +46,13 @@ sub _diag {
 
     # Dispatch
     my $path = $tx->req->url->path;
-    $self->_chunked_params($tx) if $path =~ m|^/diag/chunked_params|;
-    $self->_dump_env($tx)       if $path =~ m|^/diag/dump_env|;
-    $self->_dump_params($tx)    if $path =~ m|^/diag/dump_params|;
-    $self->_dump_tx($tx)        if $path =~ m|^/diag/dump_tx|;
-    $self->_dump_url($tx)       if $path =~ m|^/diag/dump_url|;
-    $self->_proxy($tx)          if $path =~ m|^/diag/proxy|;
+    $self->_chunked_params($tx)   if $path =~ m|^/diag/chunked_params|;
+    $self->_dump_env($tx)         if $path =~ m|^/diag/dump_env|;
+    $self->_dump_params($tx)      if $path =~ m|^/diag/dump_params|;
+    $self->_dump_tx($tx)          if $path =~ m|^/diag/dump_tx|;
+    $self->_dump_url($tx)         if $path =~ m|^/diag/dump_url|;
+    $self->_proxy($tx)            if $path =~ m|^/diag/proxy|;
+    return $self->_websocket($tx) if $path =~ m|^/diag/websocket|;
 
     # Defaults
     $tx->res->headers->content_type('text/plain')
@@ -66,7 +70,8 @@ sub _diag {
         <a href="/diag/dump_params">Dump Request Parameters</a><br />
         <a href="/diag/dump_tx">Dump Transaction</a><br />
         <a href="/diag/dump_url">Dump Request URL</a><br />
-        <a href="/diag/proxy">Proxy</a>
+        <a href="/diag/proxy">Proxy</a><br />
+        <a href="/diag/websocket">WebSocket</a>
     </body>
 </html>
 EOF
@@ -147,7 +152,7 @@ sub _proxy {
     }
 
     # Form
-    my $url = $tx->req->url->clone;
+    my $url = $tx->req->url->to_abs;
     $url->path('/diag/proxy');
     $tx->res->headers->content_type('text/html');
     $tx->res->body(<<"EOF");
@@ -158,6 +163,50 @@ sub _proxy {
             <input type="text" name="url" value="http://"/>
             <input type="submit" value="Fetch" />
         </form>
+    </body>
+</html>
+EOF
+}
+
+sub _websocket {
+    my ($self, $tx) = @_;
+
+    # WebSocket request
+    if ($tx->is_websocket) {
+        return $tx->receive_message(
+            sub {
+                my ($tx, $message) = @_;
+                return unless $message eq 'test 123';
+                $tx->send_message("Congratulations, your Mojo is working!");
+                $tx->send_message("With WebSocket support!");
+            }
+        );
+    }
+
+    # WebSocket example
+    my $url = $tx->req->url->to_abs;
+    $url->scheme('ws');
+    $url->path('/diag/websocket');
+    $tx->res->headers->content_type('text/html');
+    $tx->res->body(<<"EOF");
+<!doctype html><html>
+    <head>
+        <title>Mojo Diagnostics</title>
+        <script language="javascript">
+            ws = new WebSocket("$url");
+            function wsmessage(event) {
+                data = event.data;
+                alert(data);
+            }
+            function wsopen(event) {
+                ws.send("test 123");
+            }
+            ws.onmessage = wsmessage;
+            ws.onopen = wsopen;
+        </script>
+    </head>
+    <body>
+        Testing WebSocket support, you should see two popups if it works.
     </body>
 </html>
 EOF

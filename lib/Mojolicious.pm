@@ -52,7 +52,7 @@ sub new {
     $self->static->root($self->home->rel_dir('public'));
 
     # Hide own controller methods
-    $self->routes->hide(qw/client helper param pause redirect_to/);
+    $self->routes->hide(qw/client finish helper param pause redirect_to/);
     $self->routes->hide(qw/render_exception render_json render_inner/);
     $self->routes->hide(qw/render_not_found render_partial render_static/);
     $self->routes->hide(qw/render_text resume url_for/);
@@ -113,7 +113,8 @@ sub dispatch {
     elsif ($e) { $c->render_not_found }
 
     # Hook
-    $self->plugins->run_hook_reverse(after_dispatch => $c);
+    $self->plugins->run_hook_reverse(after_dispatch => $c)
+      unless $c->tx->is_paused;
 }
 
 # Bite my shiny metal ass!

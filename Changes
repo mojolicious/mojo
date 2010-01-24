@@ -7,7 +7,9 @@ This file documents the revision history for Perl extension Mojo.
           MOJO_RELOAD=1.
         - Changed the testing framework to always run real world tests with
           daemon and TCP connections.
+        - Started working on the Mojolicious book.
         - Started adding reference documentation. (marcus)
+        - Added WebSocket support.
         - Added IPv6 support.
         - Added SSL/TLS support.
         - Added IDNA support.
@@ -48,6 +50,7 @@ This file documents the revision history for Perl extension Mojo.
         - Added buffer size limits to the message parser.
         - Added child_status method to Mojo::Server::Daemon::Prefork. (und3f)
         - Added header_condition plugin to Mojolicious. (xantus)
+        - Added finish method to Mojolicious::Controller.
         - Made all Mojolicious after_* plugin hooks run in reverse order.
         - Made param decoding more defensive and allow malformed data to pass
           through for debugging.

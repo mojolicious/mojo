@@ -16,6 +16,19 @@ require Carp;
 # but then you get to the end and a gorilla starts throwing barrels at you.
 sub client { shift->app->client }
 
+sub finish {
+    my $self = shift;
+
+    # Resume
+    $self->resume;
+
+    # Render
+    $self->app->routes->render($self);
+
+    # Hook
+    $self->app->plugins->run_hook_reverse(after_dispatch => $self);
+}
+
 sub helper {
     my $self = shift;
 
@@ -218,6 +231,14 @@ ones.
     my $client = $c->client;
     
 A L<Mojo::Client> prepared for the current environment.
+
+=head2 C<finish>
+
+    $c->finish;
+
+Similar to C<resume> but will also trigger automatic rendering and the
+C<after_dispatch> plugin hook, which would normally get disabled once a
+request gets paused.
 
 =head2 C<helper>
 

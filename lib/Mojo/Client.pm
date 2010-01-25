@@ -279,15 +279,6 @@ sub _connect {
 
     # Keep alive timeout
     $self->ioloop->connection_timeout($id => $self->keep_alive_timeout);
-
-    # Weaken
-    weaken $self;
-
-    # Callbacks
-    $self->ioloop->error_cb($id => sub { $self->_error(@_) });
-    $self->ioloop->hup_cb($id => sub { $self->_hup(@_) });
-    $self->ioloop->read_cb($id => sub { $self->_read(@_) });
-    $self->ioloop->write_cb($id => sub { $self->_write(@_) });
 }
 
 sub _deposit {
@@ -585,6 +576,12 @@ sub _queue {
             $self->$cb($tx) if $cb;
             return;
         }
+
+        # Callbacks
+        $self->ioloop->error_cb($id => sub { $self->_error(@_) });
+        $self->ioloop->hup_cb($id => sub { $self->_hup(@_) });
+        $self->ioloop->read_cb($id => sub { $self->_read(@_) });
+        $self->ioloop->write_cb($id => sub { $self->_write(@_) });
 
         # Add new connection
         $self->_connections->{$id} = {cb => $cb, tx => $tx};

@@ -648,7 +648,7 @@ sub _read {
     my $read = $c->{socket}->sysread(my $buffer, CHUNK_SIZE, 0);
 
     # Read error
-    return $self->_error($id)
+    return $self->_error($id, $!)
       unless defined $read && defined $buffer && length $buffer;
 
     # Callback
@@ -725,7 +725,7 @@ sub _spin {
         $epoll->poll($self->timeout);
 
         # Error
-        $self->_error("$_") for $epoll->handles(IO::Epoll::POLLERR());
+        $self->_error("$_", $!) for $epoll->handles(IO::Epoll::POLLERR());
 
         # HUP
         $self->_hup("$_") for $epoll->handles(IO::Epoll::POLLHUP());
@@ -743,7 +743,7 @@ sub _spin {
         $poll->poll($self->timeout);
 
         # Error
-        $self->_error("$_") for $poll->handles(POLLERR);
+        $self->_error("$_", $!) for $poll->handles(POLLERR);
 
         # HUP
         $self->_hup("$_") for $poll->handles(POLLHUP);
@@ -827,7 +827,7 @@ sub _write {
     my $written = $c->{socket}->syswrite($chunk, length $chunk);
 
     # Write error
-    return $self->_error($id) unless defined $written;
+    return $self->_error($id, $!) unless defined $written;
 
     # Remove written chunk from buffer
     $buffer->remove($written);

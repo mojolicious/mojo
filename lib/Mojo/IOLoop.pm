@@ -143,13 +143,15 @@ sub drop {
     if ($self->_timers->{$id}) {
         my $c = $self->_timers->{$id}->{connection};
 
-        # Cleanup connection
-        my @timers;
-        for my $timer (@{$self->_connections->{$c}->{timers}}) {
-            next if $timer eq $id;
-            push @timers, $timer;
+        # Cleanup connection only if it exists
+        if ($self->_connections->{$c}) {
+            my @timers;
+            for my $timer (@{$self->_connections->{$c}->{timers}}) {
+                next if $timer eq $id;
+                push @timers, $timer;
+            }
+            $self->_connections->{$c}->{timers} = \@timers;
         }
-        $self->_connections->{$c}->{timers} = \@timers;
 
         delete $self->_timers->{$id};
         return $self;

@@ -17,7 +17,7 @@ __PACKAGE__->attr(handshake => sub { Mojo::Transaction::Single->new });
 __PACKAGE__->attr([qw/read_buffer write_buffer/] => sub { Mojo::Buffer->new }
 );
 __PACKAGE__->attr(
-    recv_msg => sub {
+    receive_message => sub {
         sub { }
     }
 );
@@ -45,7 +45,7 @@ sub remote_port    { shift->handshake->remote_port }
 sub req            { shift->handshake->req(@_) }
 sub res            { shift->handshake->res(@_) }
 
-sub send_msg {
+sub send_message {
     my ($self, $message) = @_;
 
     # Encode
@@ -89,7 +89,9 @@ sub server_read {
         $message =~ s/[\xff]$//;
 
         # Callback
-        $self->recv_msg->($self, b($message)->decode('UTF-8')->to_string);
+        $self->receive_message->(
+            $self, b($message)->decode('UTF-8')->to_string
+        );
     }
 }
 
@@ -127,14 +129,14 @@ The original handshake transaction.
 
 Buffer for incoming data.
 
-=head2 C<recv_msg>
+=head2 C<receive_message>
 
-    my $cb = $ws->recv_msg;
-    $ws    = $ws->recv_msg(sub {...});
+    my $cb = $ws->receive_message;
+    $ws    = $ws->receive_message(sub {...});
 
 The callback that receives decoded messages one by one.
 
-    $ws->recv_msg(sub {
+    $ws->receive_message(sub {
         my ($self, $message) = @_;
     });
 
@@ -210,9 +212,9 @@ The original handshake request.
 
 The original handshake response.
 
-=head2 C<send_msg>
+=head2 C<send_message>
 
-    $ws->send_msg('Hi there!');
+    $ws->send_message('Hi there!');
 
 Send a message over the WebSocket, encoding and framing will be handled
 transparently.

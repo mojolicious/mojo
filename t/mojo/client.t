@@ -87,14 +87,14 @@ $client->websocket(
     'ws://websockets.org:8787' => sub {
         my ($self, $ws) = @_;
         is($ws->is_websocket, 1);
-        $ws->recv_msg(
+        $ws->receive_message(
             sub {
                 my ($ws, $message) = @_;
                 is($message, 'echo: hi there!');
                 $ws->finish;
             }
         );
-        $ws->send_msg('hi there!');
+        $ws->send_message('hi there!');
     }
 )->process;
 

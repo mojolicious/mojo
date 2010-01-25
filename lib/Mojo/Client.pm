@@ -17,6 +17,7 @@ use Mojo::Parameters;
 use Mojo::Server::Daemon;
 use Mojo::Transaction::Pipeline;
 use Mojo::Transaction::Single;
+use Mojo::Transaction::WebSocket;
 use Scalar::Util 'weaken';
 
 __PACKAGE__->attr([qw/app default_cb tls_ca_file tls_verify_cb/]);
@@ -156,6 +157,41 @@ sub queue {
     $self->_queue($_, $cb) for @_;
 
     return $self;
+}
+
+sub websocket {
+    my $self = shift;
+
+    # New WebSocket
+    my $tx = Mojo::Transaction::Single->new;
+
+    # Request
+    my $req = $tx->req;
+    $req->method('GET');
+
+    # URL
+    $req->url->parse(shift);
+
+    # Scheme
+    if (my $scheme = $req->url->to_abs->scheme) {
+        $scheme = $scheme eq 'wss' ? 'https' : 'http';
+        $req->url($req->url->to_abs->scheme($scheme));
+    }
+
+    # Callback
+    my $cb = pop @_ if ref $_[-1] && ref $_[-1] eq 'CODE';
+
+    # Headers
+    my $h = $req->headers;
+    $h->from_hash(ref $_[0] eq 'HASH' ? $_[0] : {@_});
+
+    # Default headers
+    $h->upgrade('WebSocket')       unless $h->upgrade;
+    $h->connection('Upgrade')      unless $h->connection;
+    $h->websocket_protocol('mojo') unless $h->websocket_protocol;
+
+    # Queue
+    $self->queue($tx, $cb);
 }
 
 sub _build_multipart_post {
@@ -350,14 +386,29 @@ sub _finish {
     # Transaction
     my $tx = $c->{tx};
 
+    # Just drop WebSockets
+    if ($tx && $tx->is_websocket) {
+        $tx = undef;
+        $self->_queued($self->_queued - 1);
+        delete $self->_connections->{$id};
+        $self->_drop($id);
+    }
+
+    # Normal transaction
+    else {
+
+        # WebSocket upgrade?
+        $self->_upgrade($id) if $tx;
+
+        # Drop old connection so we can reuse it
+        $self->_drop($id) unless $tx && $c->{tx}->is_websocket;
+    }
+
     # Redirects
     my $r = $c->{redirects} || 0;
 
     # History
     my $h = $c->{history} || [];
-
-    # Drop old connection so we can reuse it
-    $self->_drop($id);
 
     # Transaction still in progress
     if ($tx) {
@@ -366,7 +417,7 @@ sub _finish {
         $self->_store_cookies($tx);
 
         # Counter
-        $self->_queued($self->_queued - 1);
+        $self->_queued($self->_queued - 1) unless $c->{tx}->is_websocket;
 
         # Redirect?
         my $max = $self->max_redirects;
@@ -392,7 +443,7 @@ sub _finish {
             my $cb = $c->{cb} || $self->default_cb;
 
             # Callback
-            $self->$cb($tx, $c->{history}) if $cb;
+            $self->$cb($c->{tx}, $c->{history}) if $cb;
         }
     }
 
@@ -470,6 +521,13 @@ sub _queue {
           if $tx->is_pipeline && !$tx->client_info->{address};
     }
 
+    # Make sure WebSocket requests have an origin header
+    unless ($tx->is_pipeline) {
+        my $req = $tx->req;
+        $req->headers->origin($req->url)
+          if $req->headers->upgrade && !$req->headers->origin;
+    }
+
     # Cookies from the jar
     $self->_fetch_cookies($tx);
 
@@ -532,12 +590,10 @@ sub _queue {
         $self->_connections->{$id} = {cb => $cb, tx => $tx};
     }
 
-    # Weaken
-    weaken $tx;
-
     # State change callback
     $tx->state_cb(
         sub {
+            my $tx = shift;
 
             # Finished?
             return $self->_finish($id) if $tx->is_finished;
@@ -563,6 +619,9 @@ sub _read {
 
         # Read
         $tx->client_read($chunk);
+
+        # WebSocket?
+        return if $tx->is_websocket;
 
         # State machine
         $tx->client_spin;
@@ -613,6 +672,46 @@ sub _store_cookies {
     }
 }
 
+sub _upgrade {
+    my ($self, $id) = @_;
+
+    # Connection
+    my $c = $self->_connections->{$id};
+
+    # Transaction
+    my $tx = $c->{tx};
+
+    # Pipeline?
+    return if $tx->is_pipeline;
+
+    # No handshake
+    return unless $tx->req->headers->upgrade;
+
+    # Handshake failed?
+    return unless $tx->res->code == 101;
+
+    # Start new WebSocket
+    $c->{tx} = Mojo::Transaction::WebSocket->new(handshake => $tx);
+
+    # Weaken
+    weaken $self;
+
+    # State change callback
+    $c->{tx}->state_cb(
+        sub {
+            my $tx = shift;
+
+            # Finished?
+            return $self->_finish($id) if $tx->is_finished;
+
+            # Writing?
+            $tx->client_is_writing
+              ? $self->ioloop->writing($id)
+              : $self->ioloop->not_writing($id);
+        }
+    );
+}
+
 sub _withdraw {
     my ($self, $name) = @_;
 
@@ -641,6 +740,9 @@ sub _write {
 
         # Get chunk
         my $chunk = $tx->client_get_chunk;
+
+        # WebSocket?
+        return $chunk if $tx->is_websocket;
 
         # State machine
         $tx->client_spin;
@@ -789,7 +891,7 @@ As usual, you can pass any of the attributes above to the constructor.
 
     $client = $client->delete('http://kraih.com' => sub {...});
     $client = $client->delete(
-      'http://kraih.com' => (Connection => 'close') => sub {...}
+        'http://kraih.com' => (Connection => 'close') => sub {...}
     );
 
 Send a HTTP C<DELETE> request.
@@ -798,7 +900,7 @@ Send a HTTP C<DELETE> request.
 
     $client = $client->get('http://kraih.com' => sub {...});
     $client = $client->get(
-      'http://kraih.com' => (Connection => 'close') => sub {...}
+        'http://kraih.com' => (Connection => 'close') => sub {...}
     );
 
 Send a HTTP C<GET> request.
@@ -807,7 +909,7 @@ Send a HTTP C<GET> request.
 
     $client = $client->head('http://kraih.com' => sub {...});
     $client = $client->head(
-      'http://kraih.com' => (Connection => 'close') => sub {...}
+        'http://kraih.com' => (Connection => 'close') => sub {...}
     );
 
 Send a HTTP C<HEAD> request.
@@ -816,7 +918,7 @@ Send a HTTP C<HEAD> request.
 
     $client = $client->post('http://kraih.com' => sub {...});
     $client = $client->post(
-      'http://kraih.com' => (Connection => 'close') => sub {...}
+        'http://kraih.com' => (Connection => 'close') => sub {...}
     );
 
 Send a HTTP C<POST> request.
@@ -859,7 +961,7 @@ Will be blocking unless you have a global shared ioloop.
 
     $client = $client->put('http://kraih.com' => sub {...});
     $client = $client->put(
-      'http://kraih.com' => (Connection => 'close') => sub {...}
+        'http://kraih.com' => (Connection => 'close') => sub {...}
     );
 
 Send a HTTP C<PUT> request.
@@ -870,5 +972,14 @@ Send a HTTP C<PUT> request.
     $client = $client->queue(@transactions => sub {...});
 
 Queue a list of transactions for processing.
+
+=head2 C<websocket>
+
+    $client = $client->websocket('ws://localhost:3000' => sub {...});
+    $client = $client->websocket(
+        'ws://localhost:3000' => ('User-Agent' => 'Agent 1.0') => sub {...}
+    );
+
+Open a WebSocket connection with transparent handshake.
 
 =cut

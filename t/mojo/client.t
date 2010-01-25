@@ -10,7 +10,7 @@ use Test::More;
 plan skip_all =>
   'set TEST_CLIENT to enable this test (internet connection required!)'
   unless $ENV{TEST_CLIENT};
-plan tests => 63;
+plan tests => 65;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -81,6 +81,22 @@ $client->get(
     }
 );
 $client->process;
+
+# Websocket request
+$client->websocket(
+    'ws://websockets.org:8787' => sub {
+        my ($self, $ws) = @_;
+        is($ws->is_websocket, 1);
+        $ws->recv_msg(
+            sub {
+                my ($ws, $msg) = @_;
+                is($msg, 'echo: hi there!');
+                $ws->finish;
+            }
+        );
+        $ws->send_msg('hi there!');
+    }
+)->process;
 
 # Simple requests with redirect
 $client->max_redirects(3);

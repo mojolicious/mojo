@@ -173,12 +173,12 @@ sub _websocket {
 
     # WebSocket request
     if ($tx->is_websocket) {
-        return $tx->receive_message(
+        $tx->send_msg("Congratulations, your Mojo is working!");
+        return $tx->recv_msg(
             sub {
                 my ($tx, $message) = @_;
                 return unless $message eq 'test 123';
-                $tx->send_message("Congratulations, your Mojo is working!");
-                $tx->send_message("With WebSocket support!");
+                $tx->send_msg("With WebSocket support!");
             }
         );
     }

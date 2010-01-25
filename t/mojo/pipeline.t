@@ -119,9 +119,9 @@ $pipe = Mojo::Transaction::Pipeline->new($tx, $tx2);
 $_->state('read_response') for @{$pipe->active};
 $pipe->_all_written(1);
 $responses = <<EOF;
-HTTP/1.1 151 Weird
+HTTP/1.1 100 Weird
 
-HTTP/1.1 152 Weirder
+HTTP/1.1 100 Weirder
 
 HTTP/1.1 200 OK
 Connection: Keep-Alive
@@ -158,9 +158,9 @@ Date: Tue, 09 Jun 2009 18:24:14 GMT
 Content-Type: text/plain
 Content-length: 2000
 
-HTTP/1.1 151 Weird
+HTTP/1.1 100 Weird
 
-HTTP/1.1 152 Weirder
+HTTP/1.1 100 Weirder
 
 HTTP/1.1 204 OK
 Connection: Keep-Alive
@@ -185,7 +185,7 @@ $pipe = Mojo::Transaction::Pipeline->new($tx, $tx2);
 $_->state('read_response') for @{$pipe->active};
 $pipe->_all_written(1);
 $responses = <<EOF;
-HTTP/1.1 151 Weird
+HTTP/1.1 100 Weird
 
 HTTP/1.1 200 OK
 Connection: Keep-Alive
@@ -194,9 +194,9 @@ Content-Type: text/plain
 Content-length: 5
 
 1234
-HTTP/1.1 152 Weirder
+HTTP/1.1 100 Weirder
 
-HTTP/1.1 169 Weirdest
+HTTP/1.1 100 Weirdest
 
 HTTP/1.1 204 OK
 Connection: Keep-Alive

@@ -45,7 +45,7 @@ __PACKAGE__->attr(
             $res->headers->websocket_origin($tx->req->headers->origin);
 
             # WenSocket transaction
-            return Mojo::Transaction::WebSocket->new(req => $tx->req);
+            return Mojo::Transaction::WebSocket->new(handshake => $tx);
           }
     }
 );

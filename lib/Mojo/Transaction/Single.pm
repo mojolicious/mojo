@@ -182,14 +182,11 @@ sub client_read {
         # Parse
         $self->res->parse($chunk);
 
+        # Finished
         while ($self->res->is_finished) {
 
             # Check for unexpected 100
-            if (   $self->res->is_state(qw/done done_with_leftovers/)
-                && $self->res->is_status_class(100))
-            {
-                $self->_new_response;
-            }
+            if (($self->res->code || '') eq '100') { $self->_new_response }
 
             else {
 

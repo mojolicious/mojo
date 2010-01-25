@@ -23,7 +23,8 @@ sub run {
     my $self = shift;
 
     # Mojo
-    my $mojo = $Mojo::VERSION;
+    my $mojo     = $Mojo::VERSION;
+    my $codename = $Mojo::CODENAME;
 
     # Epoll
     my $epoll = Mojo::IOLoop::EPOLL() ? $IO::Epoll::VERSION : 'not installed';
@@ -43,7 +44,7 @@ sub run {
     print <<"EOF";
 CORE
   Perl ($])
-  Mojo ($mojo)
+  Mojo ($mojo $codename)
 
 OPTIONAL
   IO::Epoll         ($epoll)

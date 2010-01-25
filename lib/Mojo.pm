@@ -51,7 +51,8 @@ __PACKAGE__->attr(
 );
 
 # Oh, so they have internet on computers now!
-our $VERSION = '0.999915';
+our $CODENAME = 'Snowman';
+our $VERSION  = '0.999920';
 
 sub new {
     my $self = shift->SUPER::new(@_);

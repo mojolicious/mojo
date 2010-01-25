@@ -73,12 +73,12 @@ sub new {
     $self->plugin('request_timer');
     $self->plugin('powered_by');
 
+    # Reduced log output outside of development mode
+    $self->log->level('error') unless $mode eq 'development';
+
     # Run mode
     $mode = $mode . '_mode';
     $self->$mode(@_) if $self->can($mode);
-
-    # Reduced log output outside of development mode
-    $self->log->level('error') unless $mode eq 'development';
 
     # Startup
     $self->startup(@_);

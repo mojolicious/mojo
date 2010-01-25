@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 135;
+use Test::More tests => 136;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -15,6 +15,7 @@ use File::Spec;
 use Mojo::Date;
 use Mojo::Transaction::Single;
 use Test::Mojo;
+use Mojolicious;
 
 # Congratulations Fry, you've snagged the perfect girlfriend.
 # Amy's rich, she's probably got other characteristics...
@@ -128,8 +129,12 @@ $t->get_ok('/hello.txt', {'If-Modified-Since' => $mtime})->status_is(304)
   ->header_is(Server         => 'Mojo (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('');
 
+# Check develpment mode log level
+my $app = Mojolicious->new;
+is($app->log->level, 'debug');
+
 # Make sure we can override attributes with constructor arguments
-my $app = MojoliciousTest->new({mode => 'test'});
+$app = MojoliciousTest->new({mode => 'test'});
 is($app->mode, 'test');
 
 # Persistent error

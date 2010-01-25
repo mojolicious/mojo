@@ -44,7 +44,7 @@ sub run {
     print <<"EOF";
 CORE
   Perl ($])
-  Mojo ($mojo $codename)
+  Mojo ($mojo, $codename)
 
 OPTIONAL
   IO::Epoll         ($epoll)

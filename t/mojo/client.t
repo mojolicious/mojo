@@ -89,8 +89,8 @@ $client->websocket(
         is($ws->is_websocket, 1);
         $ws->recv_msg(
             sub {
-                my ($ws, $msg) = @_;
-                is($msg, 'echo: hi there!');
+                my ($ws, $message) = @_;
+                is($message, 'echo: hi there!');
                 $ws->finish;
             }
         );

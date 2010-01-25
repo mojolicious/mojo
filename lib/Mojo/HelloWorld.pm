@@ -193,20 +193,25 @@ sub _websocket {
     <head>
         <title>Mojo Diagnostics</title>
         <script language="javascript">
-            ws = new WebSocket("$url");
-            function wsmessage(event) {
-                data = event.data;
-                alert(data);
+            if ("WebSocket" in window) {
+                ws = new WebSocket("$url");
+                function wsmessage(event) {
+                    data = event.data;
+                    alert(data);
+                }
+                function wsopen(event) {
+                    ws.send("test 123");
+                }
+                ws.onmessage = wsmessage;
+                ws.onopen = wsopen;
             }
-            function wsopen(event) {
-                ws.send("test 123");
+            else {
+                alert("Sorry, your browser does not support WebSockets.");
             }
-            ws.onmessage = wsmessage;
-            ws.onopen = wsopen;
         </script>
     </head>
     <body>
-        Testing WebSocket support, you should see two popups if it works.
+        Testing WebSocket, please make sure you have JavaScript enabled.
     </body>
 </html>
 EOF

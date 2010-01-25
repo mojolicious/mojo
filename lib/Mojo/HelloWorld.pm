@@ -206,7 +206,7 @@ sub _websocket {
                 ws.onopen = wsopen;
             }
             else {
-                alert("Sorry, your browser does not support WebSockets.");
+                alert("Sorry, your browser does not support WebSocket.");
             }
         </script>
     </head>

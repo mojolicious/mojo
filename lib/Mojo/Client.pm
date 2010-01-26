@@ -59,7 +59,7 @@ sub finish {
     my $self = shift;
 
     # WebSocket?
-    croak 'No WebSocket connection finish.' unless $self->tx->is_websocket;
+    croak 'No WebSocket connection to finish.' unless $self->tx->is_websocket;
 
     # Finish
     $self->tx->finish;

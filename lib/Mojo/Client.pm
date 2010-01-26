@@ -8,6 +8,7 @@ use warnings;
 use base 'Mojo::Base';
 use bytes;
 
+use Carp 'croak';
 use Mojo::ByteStream 'b';
 use Mojo::Content::MultiPart;
 use Mojo::Content::Single;
@@ -26,6 +27,7 @@ __PACKAGE__->attr(cookie_jar => sub { Mojo::CookieJar->new });
 __PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->singleton });
 __PACKAGE__->attr(keep_alive_timeout => 15);
 __PACKAGE__->attr(max_redirects      => 0);
+__PACKAGE__->attr('tx');
 
 __PACKAGE__->attr(_cache       => sub { [] });
 __PACKAGE__->attr(_connections => sub { {} });
@@ -52,6 +54,16 @@ sub DESTROY {
 }
 
 sub delete { shift->_build_tx('DELETE', @_) }
+
+sub finish {
+    my $self = shift;
+
+    # WebSocket?
+    croak 'No WebSocket connection finish.' unless $self->tx->is_websocket;
+
+    # Finish
+    $self->tx->finish;
+}
 
 sub get  { shift->_build_tx('GET',  @_) }
 sub head { shift->_build_tx('HEAD', @_) }
@@ -157,6 +169,42 @@ sub queue {
     $self->_queue($_, $cb) for @_;
 
     return $self;
+}
+
+sub receive_message {
+    my $self = shift;
+
+    # WebSocket?
+    croak 'No WebSocket connection to receive messages from.'
+      unless $self->tx->is_websocket;
+
+    # Callback
+    my $cb = shift;
+
+    # Transaction
+    my $tx = $self->tx;
+
+    # Weaken
+    weaken $self;
+    weaken $tx;
+
+    # Receive
+    $tx->receive_message(
+        sub { shift; local $self->{tx} = $tx; $self->$cb(@_) });
+}
+
+sub req { shift->tx->req(@_) }
+sub res { shift->tx->res(@_) }
+
+sub send_message {
+    my $self = shift;
+
+    # WebSocket?
+    croak 'No WebSocket connection to send message to.'
+      unless $self->tx->is_websocket;
+
+    # Send
+    $self->tx->send_message(@_);
 }
 
 sub websocket {
@@ -434,7 +482,9 @@ sub _finish {
             my $cb = $c->{cb} || $self->default_cb;
 
             # Callback
-            $self->$cb($c->{tx}, $c->{history}) if $cb;
+            $tx = $c->{tx};
+            local $self->{tx} = $tx;
+            $self->$cb($tx, $c->{history}) if $cb;
         }
     }
 
@@ -767,8 +817,8 @@ Mojo::Client - Client
     my $client = Mojo::Client->new;
     $client->get(
         'http://kraih.com' => sub {
-            my ($self, $tx) = @_;
-            print $tx->res->code;
+            my $self = shift;
+            print $self->res->code;
         }
     )->process;
 
@@ -872,6 +922,12 @@ Callback to verify your TLS connection, by default the client will accept
 most certificates.
 Note that L<IO::Socket::SSL> must be installed for HTTPS support.
 
+=head2 C<tx>
+
+    $client->tx;
+
+The last finished transaction, only available from callbacks.
+
 =head1 METHODS
 
 L<Mojo::Client> inherits all methods from L<Mojo::Base> and implements the
@@ -892,6 +948,12 @@ As usual, you can pass any of the attributes above to the constructor.
     );
 
 Send a HTTP C<DELETE> request.
+
+=head2 C<finish>
+
+    $client->finish;
+
+Finish the WebSocket connection, only available from callbacks.
 
 =head2 C<get>
 
@@ -969,6 +1031,36 @@ Send a HTTP C<PUT> request.
     $client = $client->queue(@transactions => sub {...});
 
 Queue a list of transactions for processing.
+
+=head2 C<receive_message>
+
+    $client->receive_message(sub {...});
+
+Receive messages via WebSocket, only available from callbacks.
+
+    $client->receive_message(sub {
+        my ($self, $message) = @_;
+    });
+
+=head2 C<req>
+
+    my $req = $client->req;
+
+The request object of the last finished transaction, only available from
+callbacks.
+
+=head2 C<res>
+
+    my $res = $client->res;
+
+The response object of the last finished transaction, only available from
+callbacks.
+
+=head2 C<send_message>
+
+    $client->send_message('Hi there!');
+
+Send a message via WebSocket, only available from callbacks.
 
 =head2 C<websocket>
 

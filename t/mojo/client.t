@@ -24,8 +24,8 @@ my $ioloop = Mojo::IOLoop->new;
 my $client = Mojo::Client->new;
 $client->get(
     'http://kraih.com' => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code, 200);
+        my $self = shift;
+        is($self->res->code, 200);
     }
 )->process;
 $client = undef;
@@ -47,37 +47,37 @@ like($tx->res->headers->connection, qr/close/i);
 # Simple request
 $client->get(
     'http://kraih.com' => sub {
-        my ($self, $tx) = @_;
-        is($tx->req->method, 'GET');
-        is($tx->req->url,    'http://kraih.com');
-        is($tx->res->code,   200);
+        my $self = shift;
+        is($self->req->method, 'GET');
+        is($self->req->url,    'http://kraih.com');
+        is($self->res->code,   200);
     }
 )->process;
 
 # Simple parallel requests with keep alive
 $client->get(
     'http://labs.kraih.com' => sub {
-        my ($self, $tx) = @_;
-        is($tx->req->method, 'GET');
-        is($tx->req->url,    'http://labs.kraih.com');
-        is($tx->res->code,   301);
+        my $self = shift;
+        is($self->req->method, 'GET');
+        is($self->req->url,    'http://labs.kraih.com');
+        is($self->res->code,   301);
     }
 );
 $client->get(
     'http://kraih.com' => sub {
-        my ($self, $tx) = @_;
-        is($tx->req->method, 'GET');
-        is($tx->req->url,    'http://kraih.com');
-        is($tx->res->code,   200);
-        is($tx->kept_alive,  1);
+        my $self = shift;
+        is($self->req->method,    'GET');
+        is($self->req->url,       'http://kraih.com');
+        is($self->res->code,      200);
+        is($self->tx->kept_alive, 1);
     }
 );
 $client->get(
     'http://mojolicious.org' => sub {
-        my ($self, $tx) = @_;
-        is($tx->req->method, 'GET');
-        is($tx->req->url,    'http://mojolicious.org');
-        is($tx->res->code,   200);
+        my $self = shift;
+        is($self->req->method, 'GET');
+        is($self->req->url,    'http://mojolicious.org');
+        is($self->res->code,   200);
     }
 );
 $client->process;
@@ -85,16 +85,16 @@ $client->process;
 # Websocket request
 $client->websocket(
     'ws://websockets.org:8787' => sub {
-        my ($self, $ws) = @_;
-        is($ws->is_websocket, 1);
-        $ws->receive_message(
+        my $self = shift;
+        is($self->tx->is_websocket, 1);
+        $self->receive_message(
             sub {
-                my ($ws, $message) = @_;
+                my ($self, $message) = @_;
                 is($message, 'echo: hi there!');
-                $ws->finish;
+                $self->finish;
             }
         );
-        $ws->send_message('hi there!');
+        $self->send_message('hi there!');
     }
 )->process;
 

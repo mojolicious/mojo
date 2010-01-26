@@ -43,6 +43,19 @@ sub new {
         }
     );
 
+    # WebSocket condition
+    $self->add_condition(
+        websocket => sub {
+            my ($r, $tx, $captures) = @_;
+
+            # WebSocket
+            return $captures if $tx->is_websocket;
+
+            # Not a WebSocket
+            return;
+        }
+    );
+
     return $self;
 }
 
@@ -318,6 +331,15 @@ sub via {
 
 sub waypoint { shift->route(@_)->block(1) }
 
+sub websocket {
+    my $self = shift;
+
+    # Condition
+    push @{$self->conditions}, websocket => 1;
+
+    return $self;
+}
+
 1;
 __END__
 
@@ -452,5 +474,9 @@ follwing the ones.
 =head2 C<waypoint>
 
     my $route = $routes->waypoint('/:c/:a', a => qr/\w+/);
+
+=head2 C<websocket>
+
+    $route->websocket;
 
 =cut

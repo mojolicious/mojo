@@ -22,6 +22,9 @@ sub finish {
     # Resume
     $self->resume;
 
+    # Finish WebSocket
+    return $self->tx->finish if $self->tx->is_websocket;
+
     # Render
     $self->app->routes->render($self);
 
@@ -44,6 +47,20 @@ sub helper {
 }
 
 sub pause { shift->tx->pause }
+
+sub receive_message {
+    my $self = shift;
+
+    # WebSocket?
+    Carp::croak('No WebSocket connection to receive messages from.')
+      unless $self->tx->is_websocket;
+
+    # Callback
+    my $cb = shift;
+
+    # Receive
+    $self->tx->receive_message(sub { shift; $self->$cb(@_) });
+}
 
 sub redirect_to {
     my $self   = shift;
@@ -177,6 +194,17 @@ sub render_text {
 
 sub resume { shift->tx->resume }
 
+sub send_message {
+    my $self = shift;
+
+    # WebSocket?
+    Carp::croak('No WebSocket connection to send message to.')
+      unless $self->tx->is_websocket;
+
+    # Send
+    $self->tx->send_message(@_);
+}
+
 sub url_for {
     my $self = shift;
 
@@ -239,6 +267,7 @@ A L<Mojo::Client> prepared for the current environment.
 Similar to C<resume> but will also trigger automatic rendering and the
 C<after_dispatch> plugin hook, which would normally get disabled once a
 request gets paused.
+For WebSockets it will gracefully end the connection.
 
 =head2 C<helper>
 
@@ -258,6 +287,17 @@ applications.
 Note that automatic rendering and some plugins that do state changing
 operations inside the C<after_dispatch> hook won't work if you pause a
 transaction.
+
+=head2 C<receive_message>
+
+    $c->receive_message(sub {...});
+
+Receive messages via WebSocket, only works if there is currently a WebSocket
+connection in progress.
+
+    $c->receive_message(sub {
+        my ($self, $message) = @_
+    });
 
 =head2 C<redirect_to>
 
@@ -348,6 +388,13 @@ Render the givent content as plain text.
 
 Resume transaction associated with this request, used for asynchronous web
 applications.
+
+=head2 C<send_message>
+
+    $c->send_message('Hi there!');
+
+Send a message via WebSocket, only works if there is currently a WebSocket
+connection in progress.
 
 =head2 C<url_for>
 

@@ -173,8 +173,8 @@ get '/subrequest' => sub {
     $self->pause;
     $self->client->post(
         '/template' => sub {
-            my ($client, $tx) = @_;
-            $self->render_text($tx->res->body);
+            my $client = shift;
+            $self->render_text($client->res->body);
             $self->finish;
         }
     )->process;

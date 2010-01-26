@@ -78,9 +78,9 @@ $server->start_server_ok;
 my $client = Mojo::Client->new;
 $client->get(
     "http://127.0.0.1:$port/cgi-bin/test.cgi" => sub {
-        my ($self, $tx) = @_;
-        is($tx->res->code, 200);
-        like($tx->res->body, qr/Mojo is working/);
+        my $self = shift;
+        is($self->res->code, 200);
+        like($self->res->body, qr/Mojo is working/);
     }
 )->process;
 

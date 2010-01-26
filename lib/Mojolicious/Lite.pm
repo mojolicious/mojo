@@ -84,9 +84,19 @@ sub import {
           ->to($defaults)->name($name)
           if !ref $methods && $methods eq 'ladder';
 
+        # WebSocket?
+        my $websocket = 1 if !ref $methods && $methods eq 'websocket';
+        $methods = [] if $websocket;
+
         # Create route
-        $routes->route($pattern, {@$constraints})->over($conditions)
+        my $route =
+          $routes->route($pattern, {@$constraints})->over($conditions)
           ->via($methods)->to($defaults)->name($name);
+
+        # WebSocket
+        $route->websocket if $websocket;
+
+        return $route;
     };
 
     # Prepare exports
@@ -98,12 +108,13 @@ sub import {
     $app->renderer->default_template_class($caller);
 
     # Export
-    *{"${caller}::app"}    = sub {$app};
-    *{"${caller}::any"}    = sub { $route->(ref $_[0] ? shift : [], @_) };
-    *{"${caller}::get"}    = sub { $route->('get', @_) };
-    *{"${caller}::ladder"} = sub { $route->('ladder', @_) };
-    *{"${caller}::plugin"} = sub { $app->plugin(@_) };
-    *{"${caller}::post"}   = sub { $route->('post', @_) };
+    *{"${caller}::app"}       = sub {$app};
+    *{"${caller}::any"}       = sub { $route->(ref $_[0] ? shift : [], @_) };
+    *{"${caller}::get"}       = sub { $route->('get', @_) };
+    *{"${caller}::ladder"}    = sub { $route->('ladder', @_) };
+    *{"${caller}::plugin"}    = sub { $app->plugin(@_) };
+    *{"${caller}::post"}      = sub { $route->('post', @_) };
+    *{"${caller}::websocket"} = sub { $route->('websocket', @_) };
 
     # We are most likely the app in a lite environment
     $ENV{MOJO_APP} = $app;

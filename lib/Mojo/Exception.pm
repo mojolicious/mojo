@@ -10,7 +10,7 @@ use overload '""' => sub { shift->to_string }, fallback => 1;
 
 use IO::File;
 
-__PACKAGE__->attr([qw/line lines_before lines_after stack/] => sub { [] });
+__PACKAGE__->attr([qw/line lines_before lines_after/] => sub { [] });
 __PACKAGE__->attr(message => 'Exception!');
 
 # Attempted murder? Now honestly, what is that?
@@ -20,14 +20,6 @@ sub new {
 
     # Message
     $self->message(shift);
-
-    # Stack
-    my $i = 1;
-    while (my ($p, $f, $l) = caller($i++)) {
-
-        # Stack
-        push @{$self->stack}, [$p, $f, $l];
-    }
 
     # Trace name and line
     my $message = $self->message;
@@ -108,43 +100,7 @@ sub parse_context {
     return $self;
 }
 
-sub to_string {
-    my $self = shift;
-
-    my $string = '';
-
-    # Header
-    $string .= ('Error around line ' . $self->line->[0] . ".\n")
-      if $self->line->[0];
-
-    # Before
-    for my $line (@{$self->lines_before}) {
-        $string .= $line->[0] . ': ' . $line->[1] . "\n";
-    }
-
-    # Line
-    $string .= ($self->line->[0] . ': ' . $self->line->[1] . "\n")
-      if $self->line->[0];
-
-    # After
-    for my $line (@{$self->lines_after}) {
-        $string .= $line->[0] . ': ' . $line->[1] . "\n";
-    }
-
-    # Stack
-    if (@{$self->stack} && $ENV{MOJO_EXCEPTION_VERBOSE}) {
-        for my $frame (@{$self->stack}) {
-            my $file = $frame->[1];
-            my $line = $frame->[2];
-            $string .= "$file: $line\n";
-        }
-    }
-
-    # Message
-    $string .= $self->message if $self->message;
-
-    return $string;
-}
+sub to_string { shift->message }
 
 1;
 __END__
@@ -185,11 +141,6 @@ L<Mojo::Exception> implements the following attributes.
 
     my $message = $e->message;
     $e          = $e->message('Oops!');
-
-=head2 C<stack>
-
-    my $stack = $e->stack;
-    $e        = $e->stack([['Foo::Bar', '/foo/bar.pl', 23]]);
 
 =head1 METHODS
 

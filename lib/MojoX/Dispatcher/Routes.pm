@@ -52,9 +52,6 @@ sub dispatch_app {
     # Debug
     $c->app->log->debug(qq/Dispatching application./);
 
-    # Catch errors
-    local $SIG{__DIE__} = sub { die Mojo::Exception->new(shift) };
-
     # Prepare new path and base path for embedded application
     my $opath  = $c->req->url->path;
     my $obpath = $c->req->url->base->path;
@@ -85,8 +82,9 @@ sub dispatch_app {
 
     # Callback error
     if ($@) {
-        $c->app->log->error($@);
-        return $@;
+        my $e = Mojo::Exception->new($@);
+        $c->app->log->error($e);
+        return $e;
     }
 
     return;
@@ -98,9 +96,6 @@ sub dispatch_callback {
     # Debug
     $c->app->log->debug(qq/Dispatching callback./);
 
-    # Catch errors
-    local $SIG{__DIE__} = sub { die Mojo::Exception->new(shift) };
-
     # Dispatch
     my $continue;
     my $cb = $c->match->captures->{callback};
@@ -111,8 +106,9 @@ sub dispatch_callback {
 
     # Callback error
     if ($@) {
-        $c->app->log->error($@);
-        return $@;
+        my $e = Mojo::Exception->new($@);
+        $c->app->log->error($e);
+        return $e;
     }
 
     return;
@@ -154,9 +150,6 @@ sub dispatch_controller {
     $c->app->log->debug(qq/"$class" is not a controller./) and return
       unless $class->isa($self->controller_base_class);
 
-    # Catch errors
-    local $SIG{__DIE__} = sub { die Mojo::Exception->new(shift) };
-
     # Dispatch
     my $continue;
     eval {
@@ -180,8 +173,9 @@ sub dispatch_controller {
 
     # Controller error
     if ($@) {
-        $c->app->log->error($@);
-        return $@;
+        my $e = Mojo::Exception->new($@);
+        $c->app->log->error($e);
+        return $e;
     }
 
     return;

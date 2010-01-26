@@ -35,15 +35,7 @@ is($e->lines_before->[1]->[0], 14);
 is($e->lines_before->[1]->[1], '');
 is($e->line->[0],              15);
 is($e->line->[1],              "1;");
-$e->message("oops!\n");
-$e->stack([]);
-is("$e", <<'EOF');
-Error around line 15.
-13: foo {
-14: 
-15: 1;
-oops!
-EOF
+like("$e", qr/Missing right curly/);
 
 # Complicated exception
 $loader = Mojo::Loader->new;
@@ -60,17 +52,7 @@ is($e->lines_after->[0]->[0],  9);
 is($e->lines_after->[0]->[1],  '');
 is($e->lines_after->[1]->[0],  10);
 is($e->lines_after->[1]->[1],  '1;');
-$e->message("oops!\n");
-$e->stack([]);
-is("$e", <<'EOF');
-Error around line 8.
-6: use strict;
-7: 
-8: LoaderException2_2::throw_error();
-9: 
-10: 1;
-oops!
-EOF
+like("$e", qr/Exception/);
 
 $loader = Mojo::Loader->new;
 my $modules = $loader->search('LoaderTest');

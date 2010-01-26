@@ -6,8 +6,6 @@ This file documents the revision history for Perl extension Mojo.
         - Allow reloading to be triggered once by a USR1 signal.
         - Added --reload flag to all server bindings as an alternative to
           MOJO_RELOAD=1.
-        - Changed the testing framework to always run real world tests with
-          daemon and TCP connections.
         - Started working on the Mojolicious book.
         - Started adding reference documentation. (marcus)
         - Added WebSocket support.
@@ -53,6 +51,9 @@ This file documents the revision history for Perl extension Mojo.
         - Added header_condition plugin to Mojolicious. (xantus)
         - Added finish method to Mojolicious::Controller.
         - Added WebSocket support to Mojolicious and Mojolicious::Lite.
+        - Changed the testing framework to always run real world tests with
+          daemon and TCP connections.
+        - Changed exceptions to stay out of your way as much as possible.
         - Made all Mojolicious after_* plugin hooks run in reverse order.
         - Made param decoding more defensive and allow malformed data to pass
           through for debugging.

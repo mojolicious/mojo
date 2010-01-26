@@ -18,30 +18,16 @@ sub new {
     # Shortcut
     return $self unless $lines;
 
-    # Cleanup message
+    # Cleanup plain messages
     my $message = $self->message;
-    $message =~ s/\(eval\s+\d+\)/template/;
-    $self->message($message);
+    unless (ref $message) {
+        $message =~ s/\(eval\s+\d+\)/template/;
+        $self->message($message);
+    }
 
     # Parse message
     my $line;
     $line = $1 if $self->message =~ /at\s+template\s+line\s+(\d+)/;
-
-    # Caller
-    my $caller = (caller)[0];
-
-    # Search template in callstack
-    for my $frame (@{$self->stack}) {
-
-        my ($p, $f, $l) = @$frame;
-
-        # Try to find template
-        if ($p eq $caller && $f =~ /^\(eval\s+\d+\)$/ && !$line) {
-
-            # Done
-            $line = $l;
-        }
-    }
 
     # Context
     my @lines = split /\n/, $lines;

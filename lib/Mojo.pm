@@ -225,7 +225,7 @@ Start the L<Mojo::Commands> command line interface for your application.
 
 =head2 Mailing-List
 
-    http://lists.kraih.com/listinfo/mojo
+    http://groups.google.com/group/mojolicious
 
 =head1 DEVELOPMENT
 

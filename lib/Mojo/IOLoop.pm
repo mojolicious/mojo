@@ -1122,6 +1122,8 @@ Stop the loop immediately.
     my $id = $loop->timer($id => {interval => 5, cb => sub {...}}));
 
 Create a new timer, invoking the callback afer a given amount of seconds.
+Note that timers are bound to connections and will get destroyed together
+with them.
 
 =head2 C<write_cb>
 

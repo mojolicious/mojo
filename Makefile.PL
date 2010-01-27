@@ -31,7 +31,7 @@ WriteMakefile(
                     homepage => 'http://mojolicious.org',
                     license  => 'http://dev.perl.org/licenses/',
                     MailingList =>
-                      'http://lists.kraih.com/cgi-bin/mailman/listinfo',
+                      'http://groups.google.com/group/mojolicious',
                     repository => 'http://github.com/kraih/mojo/tree/master'
                 },
                 no_index => {directory => [qw/t/]}

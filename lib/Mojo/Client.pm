@@ -301,6 +301,9 @@ sub _build_tx {
     # Callback
     my $cb = pop @_ if ref $_[-1] && ref $_[-1] eq 'CODE';
 
+    # Body
+    $req->body(pop @_) if @_ & 1 == 1;
+
     # Headers
     $req->headers->from_hash(ref $_[0] eq 'HASH' ? $_[0] : {@_});
 
@@ -578,17 +581,6 @@ sub _queue {
     my $port    = $info->{port};
     my $scheme  = $info->{scheme};
 
-    # Weaken
-    weaken $self;
-
-    # Connect callback
-    my $connected = sub {
-        my ($loop, $id) = @_;
-
-        # Connected
-        $self->_connect($id);
-    };
-
     # Cached connection
     my $id;
     if ($id = $self->_withdraw("$scheme:$address:$port")) {
@@ -611,7 +603,12 @@ sub _queue {
 
         # Connect
         $id = $self->ioloop->connect(
-            cb      => $connected,
+            cb => sub {
+                my ($loop, $id) = @_;
+
+                # Connected
+                $self->_connect($id);
+            },
             address => $address,
             port    => $port,
             tls     => $scheme eq 'https' ? 1 : 0,
@@ -979,6 +976,15 @@ Send a HTTP C<HEAD> request.
     $client = $client->post(
         'http://kraih.com' => (Connection => 'close') => sub {...}
     );
+    $client = $client->post(
+        'http://kraih.com',
+        (Connection => 'close'),
+        'message body',
+        sub {...}
+    );
+    $client = $client->post(
+        'http://kraih.com' => (Connection => 'close') => 'Hi!' => sub {...}
+    );
 
 Send a HTTP C<POST> request.
 
@@ -1021,6 +1027,9 @@ Will be blocking unless you have a global shared ioloop.
     $client = $client->put('http://kraih.com' => sub {...});
     $client = $client->put(
         'http://kraih.com' => (Connection => 'close') => sub {...}
+    );
+    $client = $client->put(
+        'http://kraih.com' => (Connection => 'close') => 'Hi!' => sub {...}
     );
 
 Send a HTTP C<PUT> request.

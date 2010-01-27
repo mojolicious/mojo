@@ -194,11 +194,14 @@ sub _get_content {
 
 # Are you sure this is the Sci-Fi Convention? It's full of nerds!
 sub _request_ok {
-    my ($self, $method, $url, $headers, $desc) = @_;
+    my ($self, $method, $url, $headers, $body, $desc) = @_;
 
-    # Description
-    $desc = $headers unless ref $headers;
-    $headers ||= {};
+    # No headers
+    $desc = pop @_ if !ref $_[-1] and @_ > 3;
+
+    # Body and description
+    $body = $headers if !ref $headers and @_ == 4;
+    $headers = {} if !ref $headers;
 
     # Client
     my $client = $self->client;
@@ -206,7 +209,7 @@ sub _request_ok {
     $client->max_redirects($self->max_redirects);
 
     # Request
-    $client->$method($url, $headers,
+    $client->$method($url, %$headers, $body,
         sub { $self->tx($_[1]) and $self->redirects($_[2]) })->process;
 
     # Test
@@ -342,6 +345,13 @@ following new ones.
     $t = $t->post_ok('/foo', {Expect => '100-continue'});
     $t = $t->post_ok('/foo', 'request worked!');
     $t = $t->post_ok('/foo', {Expect => '100-continue'}, 'request worked!');
+    $t = $t->post_ok('/foo', 'Hi there!', 'request worked!');
+    $t = $t->post_ok(
+        '/foo',
+        {Expect => '100-continue'},
+        'Hi there!',
+        'request worked!'
+    );
 
 =head2 C<post_form_ok>
 

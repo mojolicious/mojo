@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 306;
+use Test::More tests => 312;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -51,6 +51,22 @@ post '/with/header/condition' => (headers => {'X-Secret-Header' => 'bar'}) =>
     $self->render_text(
         'foo ' . $self->req->headers->header('X-Secret-Header'));
   };
+
+# POST /with/body/and/desc
+post '/with/body/and/desc' => sub {
+    my $self = shift;
+    return if $self->req->body ne 'body';
+    $self->render_text('bar');
+};
+
+# POST /with/body/and/headers/desc
+post '/with/body/and/headers/desc' => sub {
+    my $self = shift;
+    return
+      if $self->req->headers->header('with') ne 'header'
+          || $self->req->body ne 'body';
+    $self->render_text('bar');
+};
 
 # GET /template_inheritance
 get '/template_inheritance' => sub {
@@ -279,6 +295,14 @@ $t->post_ok('/with/header/condition', {'X-Secret-Header' => 'bar'}, 'bar')
 # POST /with/header/condition (not found)
 $t->post_ok('/with/header/condition', {}, 'bar')->status_is(404)
   ->content_like(qr/Oops!/);
+
+# POST /with/body/and/desc
+$t->post_ok('/with/body/and/desc', 'body', 'desc')->status_is(200)
+  ->content_is('bar');
+
+# POST /with/body/and/headers/and/desc
+$t->post_ok('/with/body/and/headers/desc', {with => 'header'}, 'body', 'desc')
+  ->status_is(200)->content_is('bar');
 
 # GET /template_inheritance
 $t->get_ok('/template_inheritance')->status_is(200)

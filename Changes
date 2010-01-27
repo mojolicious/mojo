@@ -51,6 +51,7 @@ This file documents the revision history for Perl extension Mojo.
         - Added header_condition plugin to Mojolicious. (xantus)
         - Added finish method to Mojolicious::Controller.
         - Added WebSocket support to Mojolicious and Mojolicious::Lite.
+        - Added message body support to Mojo::Client api. (tempire)
         - Changed the testing framework to always run real world tests with
           daemon and TCP connections.
         - Changed exceptions to stay out of your way as much as possible.

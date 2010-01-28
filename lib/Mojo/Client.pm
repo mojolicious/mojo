@@ -28,6 +28,7 @@ __PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->singleton });
 __PACKAGE__->attr(keep_alive_timeout => 15);
 __PACKAGE__->attr(max_redirects      => 0);
 __PACKAGE__->attr('tx');
+__PACKAGE__->attr(websocket_timeout => 300);
 
 __PACKAGE__->attr(_cache       => sub { [] });
 __PACKAGE__->attr(_connections => sub { {} });
@@ -737,6 +738,9 @@ sub _upgrade {
     # Start new WebSocket
     $c->{tx} = Mojo::Transaction::WebSocket->new(handshake => $tx);
 
+    # Upgrade connection timeout
+    $self->ioloop->connection_timeout($id, $self->websocket_timeout);
+
     # Weaken
     weaken $self;
 
@@ -924,6 +928,13 @@ Note that L<IO::Socket::SSL> must be installed for HTTPS support.
     $client->tx;
 
 The last finished transaction, only available from callbacks.
+
+=head2 C<websocket_timeout>
+
+    my $websocket_timeout = $client->websocket_timeout;
+    $client               = $client->websocket_timeout(300);
+
+Timeout in seconds for WebSockets to be idle, defaults to C<300>.
 
 =head1 METHODS
 

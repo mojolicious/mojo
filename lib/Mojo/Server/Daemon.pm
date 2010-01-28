@@ -35,6 +35,7 @@ __PACKAGE__->attr(
             'mojo_daemon.pid');
     }
 );
+__PACKAGE__->attr(websocket_timeout => 300);
 
 __PACKAGE__->attr(_connections => sub { {} });
 __PACKAGE__->attr(_listening   => sub { [] });
@@ -275,6 +276,10 @@ sub _create_pipeline {
                     # WebSocket handshake handler
                     my $ws = $conn->{websocket} =
                       $self->websocket_handshake_cb->($self, $tx);
+
+                    # Upgrade connection timeout
+                    $self->ioloop->connection_timeout($id,
+                        $self->websocket_timeout);
 
                     # State change callback
                     $ws->state_cb(
@@ -525,6 +530,13 @@ implements the following new ones.
 
     my $user = $daemon->user;
     $daemon  = $daemon->user('web');
+
+=head2 C<websocket_timeout>
+
+    my $websocket_timeout = $server->websocket_timeout;
+    $server               = $server->websocket_timeout(300);
+
+Timeout in seconds for WebSockets to be idle, defaults to C<300>.
 
 =head1 METHODS
 

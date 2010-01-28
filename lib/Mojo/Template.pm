@@ -11,7 +11,7 @@ use Carp 'croak';
 use Encode qw/decode encode/;
 use IO::File;
 use Mojo::ByteStream;
-use Mojo::Template::Exception;
+use Mojo::Exception;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 8192;
 
@@ -142,7 +142,7 @@ sub compile {
     my $compiled = eval $code;
 
     # Exception
-    return Mojo::Template::Exception->new($@, $self->template) if $@;
+    return Mojo::Exception->new($@, $self->template)->verbose(1) if $@;
 
     $self->compiled($compiled);
     return;
@@ -163,13 +163,9 @@ sub interpret {
     # Shortcut
     return unless $compiled;
 
-    # Catch warnings
-    local $SIG{__WARN__} =
-      sub { warn Mojo::Template::Exception->new(shift, $self->template) };
-
     # Interpret
     my $output = eval { $compiled->(@_) };
-    $output = Mojo::Template::Exception->new($@, $self->template) if $@;
+    $output = Mojo::Exception->new($@, $self->template)->verbose(1) if $@;
 
     return $output;
 }
@@ -603,17 +599,15 @@ newline you can escape the backslash with another backslash.
 
 Templates get compiled to Perl code internally, this can make debugging a bit
 tricky.
-But L<Mojo::Template> will return L<Mojo::Template::Exception> objects that
-stringify to error messages with context.
+But L<Mojo::Template> will return L<Mojo::Exception> objects that stringify
+to error messages with context.
 
-    Error around line 4.
+    Bareword "xx" not allowed while "strict subs" in use at template line 4.
     2: </head>
     3: <body>
     4: % my $i = 2; xx
     5: %= $i * 2
     6: </body>
-    Bareword "xx" not allowed while "strict subs" in use at (eval 13)
-    line 4.
 
 L<Mojo::Template> does not support caching by itself, but you can easily
 build a wrapper around it.

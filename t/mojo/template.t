@@ -25,7 +25,7 @@ package main;
 use strict;
 use warnings;
 
-use Test::More tests => 85;
+use Test::More tests => 86;
 
 use File::Spec;
 use File::Temp;
@@ -134,7 +134,7 @@ $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 % $foo = 1;
 EOF
-is(ref $output, 'Mojo::Template::Exception');
+is(ref $output, 'Mojo::Exception');
 like($output->message, qr/^Global symbol "\$foo" requires/);
 
 # Importing into a template
@@ -161,7 +161,7 @@ test
 %= 1 + 1
 test
 EOF
-is(ref $output, 'Mojo::Template::Exception');
+is(ref $output, 'Mojo::Exception');
 like($output->message, qr/^Missing right curly or square bracket/);
 is($output->lines_before->[0]->[0], 3);
 is($output->lines_before->[0]->[1], '% {');
@@ -180,7 +180,7 @@ test
 %= 1 + 1
 test
 EOF
-is(ref $output, 'Mojo::Template::Exception');
+is(ref $output, 'Mojo::Exception');
 like($output->message, qr/ohoh/);
 is($output->lines_before->[0]->[0], 19);
 is($output->lines_before->[0]->[1], 'use warnings;');
@@ -194,7 +194,7 @@ is($output->lines_after->[1]->[0],  23);
 is($output->lines_after->[1]->[1],  'package main;');
 like("$output", qr/ohoh/);
 
-# Excpetion in template
+# Exception in template
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 test
@@ -203,7 +203,7 @@ test
 %= 1 + 1
 test
 EOF
-is(ref $output, 'Mojo::Template::Exception');
+is(ref $output, 'Mojo::Exception');
 like($output->message, qr/oops\!/);
 is($output->lines_before->[0]->[0], 1);
 is($output->lines_before->[0]->[1], 'test');
@@ -216,6 +216,27 @@ is($output->lines_after->[0]->[1],  '%= 1 + 1');
 is($output->lines_after->[1]->[0],  5);
 is($output->lines_after->[1]->[1],  'test');
 like("$output", qr/oops\!/);
+
+# Exception in nested template
+$mt = Mojo::Template->new;
+$mt->tag_start('[$-');
+$mt->tag_end('-$]');
+$mt->line_start('$-');
+$output = $mt->render(<<'EOF');
+test
+$- my $mt = Mojo::Template->new;
+[$- my $output = $mt->render(<<'EOT');
+%= bar
+EOT
+$-= $output
+-$]
+EOF
+is($output, <<'EOF');
+test
+Bareword "bar" not allowed while "strict subs" in use at template line 1.
+1: %= bar
+
+EOF
 
 # Control structures
 $mt     = Mojo::Template->new;

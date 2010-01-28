@@ -12,6 +12,7 @@ use IO::File;
 
 __PACKAGE__->attr([qw/line lines_before lines_after/] => sub { [] });
 __PACKAGE__->attr(message => 'Exception!');
+__PACKAGE__->attr(verbose => sub { $ENV{MOJO_EXCEPTION_VERBOSE} || 0 });
 
 # Attempted murder? Now honestly, what is that?
 # Do they give a Nobel Prize for attempted chemistry?
@@ -43,18 +44,69 @@ sub new {
             my @lines  = <$handle>;
 
             # Line
-            $self->parse_context(\@lines, $line);
+            $self->_parse_context(\@lines, $line);
 
             # Done
             last;
         }
     }
 
+    # Parse specific file?
+    my $lines = shift;
+    return $self unless $lines;
+
+    # Cleanup plain messages
+    unless (ref $message) {
+        $message =~ s/\(eval\s+\d+\)/template/;
+        $self->message($message);
+    }
+
+    # Parse message
+    my $line;
+    $line = $1 if $self->message =~ /at\s+template\s+line\s+(\d+)/;
+
+    # Context
+    my @lines = split /\n/, $lines;
+    $self->_parse_context(\@lines, $line) if $line;
+
     return $self;
 }
 
-sub parse_context {
+# You killed zombie Flanders!
+# He was a zombie?
+sub to_string {
+    my $self = shift;
+
+    # Verbose?
+    return $self->message unless $self->verbose;
+
+    my $string = '';
+
+    # Message
+    $string .= $self->message if $self->message;
+
+    # Before
+    for my $line (@{$self->lines_before}) {
+        $string .= $line->[0] . ': ' . $line->[1] . "\n";
+    }
+
+    # Line
+    $string .= ($self->line->[0] . ': ' . $self->line->[1] . "\n")
+      if $self->line->[0];
+
+    # After
+    for my $line (@{$self->lines_after}) {
+        $string .= $line->[0] . ': ' . $line->[1] . "\n";
+    }
+
+    return $string;
+}
+
+sub _parse_context {
     my ($self, $lines, $line) = @_;
+
+    # Wrong file
+    return unless defined $lines->[$line - 1];
 
     # Context
     my $code = $lines->[$line - 1];
@@ -100,14 +152,12 @@ sub parse_context {
     return $self;
 }
 
-sub to_string { shift->message }
-
 1;
 __END__
 
 =head1 NAME
 
-Mojo::Exception - Exception
+Mojo::Exception - Exceptions With Context
 
 =head1 SYNOPSIS
 
@@ -116,7 +166,7 @@ Mojo::Exception - Exception
 
 =head1 DESCRIPTION
 
-L<Mojo::Exception> is a container for exceptions.
+L<Mojo::Exception> is a container for exceptions with context information.
 
 =head1 ATTRIBUTES
 
@@ -142,6 +192,11 @@ L<Mojo::Exception> implements the following attributes.
     my $message = $e->message;
     $e          = $e->message('Oops!');
 
+=head2 C<verbose>
+
+    my $verbose = $e->verbose;
+    $e          = $e->verbose(1);
+
 =head1 METHODS
 
 L<Mojo::Exception> inherits all methods from L<Mojo::Base> and implements the
@@ -150,10 +205,7 @@ following new ones.
 =head2 C<new>
 
     my $e = Mojo::Exception->new('Oops!');
-
-=head2 C<parse_context>
-
-    $e = $e->parse_context($lines, $line);
+    my $e = Mojo::Exception->new('Oops!', $file);
 
 =head2 C<to_string>
 

@@ -96,12 +96,13 @@ sub connect {
       : IPV6 ? 'IO::Socket::INET6'
       :        'IO::Socket::INET';
     my $socket = $class->new(%options) or return;
+    my $id = "$socket";
 
     # Non blocking
     $socket->blocking(0);
 
     # Add connection
-    $self->_connections->{$socket} = {
+    $self->_connections->{$id} = {
         buffer     => Mojo::Buffer->new,
         connect_cb => $args->{cb},
         connecting => 1,
@@ -109,24 +110,21 @@ sub connect {
     };
 
     # Timeout
-    my $id = $self->timer(
-        "$socket" => (
+    $self->_connections->{$id}->{connect_timer} = $self->timer(
+        $id => (
             after => $self->connect_timeout,
-            cb    => sub {
-                shift->_error("$socket", 'Connect timeout.');
-            }
+            cb    => sub { shift->_error($id, 'Connect timeout.') }
         )
     );
-    $self->_connections->{$socket}->{connect_timer} = $id;
 
     # File descriptor
-    my $fd = fileno($socket);
-    $self->_fds->{$fd} = "$socket";
+    my $fd = fileno $socket;
+    $self->_fds->{$fd} = $id;
 
     # Add socket to poll
-    $self->writing("$socket");
+    $self->writing($id);
 
-    return "$socket";
+    return $id;
 }
 
 sub connection_timeout {
@@ -141,18 +139,23 @@ sub drop {
 
     # Drop timer?
     if ($self->_timers->{$id}) {
-        my $c = $self->_timers->{$id}->{connection};
 
-        # Cleanup connection only if it exists
-        if ($self->_connections->{$c}) {
+        # Connection for timer
+        my $cid = $self->_timers->{$id}->{connection};
+
+        # Connection exists?
+        if (my $c = $self->_connections->{$cid}) {
+
+            # Cleanup
             my @timers;
-            for my $timer (@{$self->_connections->{$c}->{timers}}) {
+            for my $timer (@{$c->{timers}}) {
                 next if $timer eq $id;
                 push @timers, $timer;
             }
-            $self->_connections->{$c}->{timers} = \@timers;
+            $c->{timers} = \@timers;
         }
 
+        # Drop
         delete $self->_timers->{$id};
         return $self;
     }
@@ -160,7 +163,7 @@ sub drop {
     # Delete connection
     my $c = delete $self->_connections->{$id};
 
-    # Delete listen socket
+    # Drop listen socket?
     if (!$c && ($c = delete $self->_listen->{$id})) {
 
         # Not listening
@@ -170,20 +173,22 @@ sub drop {
         $self->_listening(0);
     }
 
-    # Socket
+    # Drop socket?
     if (my $socket = $c->{socket}) {
 
         # Cleanup timers
         if (my $timers = $c->{timers}) {
-            for my $timer (@$timers) { $self->drop($timer) }
+            for my $tid (@$timers) { $self->drop($tid) }
         }
 
         # Remove file descriptor
-        my $fd = fileno($socket);
+        my $fd = fileno $socket;
         delete $self->_fds->{$fd};
 
         # Remove socket from kqueue
         if (KQUEUE) {
+
+            # Writing?
             my $writing = $c->{writing};
             $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_READ(),
                 IO::KQueue::EV_DELETE())
@@ -253,14 +258,14 @@ sub listen {
     );
 
     # Listen on UNIX domain socket
-    my $listen;
+    my $socket;
     if (my $file = $args->{file}) {
 
         # Path
         $options{Local} = $file;
 
         # Create socket
-        $listen = IO::Socket::UNIX->new(%options)
+        $socket = IO::Socket::UNIX->new(%options)
           or croak "Can't create listen socket: $!";
     }
 
@@ -283,18 +288,19 @@ sub listen {
             TLS && $args->{tls} ? 'IO::Socket::SSL'
           : IPV6 ? 'IO::Socket::INET6'
           :        'IO::Socket::INET';
-        $listen = $class->new(%options)
+        $socket = $class->new(%options)
           or croak "Can't create listen socket: $!";
     }
+    my $id = "$socket";
 
     # Add listen socket
-    $self->_listen->{$listen} = {socket => $listen, cb => $args->{cb}};
+    $self->_listen->{$id} = {socket => $socket, cb => $args->{cb}};
 
     # File descriptor
-    my $fd = fileno($listen);
-    $self->_fds->{$fd} = "$listen";
+    my $fd = fileno $socket;
+    $self->_fds->{$fd} = $id;
 
-    return "$listen";
+    return $id;
 }
 
 sub local_info {
@@ -321,7 +327,9 @@ sub not_writing {
 
     # KQueue
     if (KQUEUE) {
-        my $fd      = fileno($socket);
+        my $fd = fileno $socket;
+
+        # Writing?
         my $writing = $c->{writing};
         $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_READ(),
             IO::KQueue::EV_ADD())
@@ -329,6 +337,8 @@ sub not_writing {
         $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_WRITE(),
             IO::KQueue::EV_DELETE())
           if $writing;
+
+        # Not writing anymore
         $c->{writing} = 0;
     }
 
@@ -384,15 +394,16 @@ sub timer {
 
     # Connection doesn't exist
     return unless $self->_connections->{$id};
+    my $tid = "$args";
 
     # Add timer
-    $self->_timers->{"$args"} = $args;
+    $self->_timers->{$tid} = $args;
 
     # Bind timer to connection
     my $timers = $self->_connections->{$id}->{timers} ||= [];
-    push @{$timers}, "$args";
+    push @{$timers}, $tid;
 
-    return "$args";
+    return $tid;
 }
 
 sub write_cb { shift->_add_event('write', @_) }
@@ -411,7 +422,9 @@ sub writing {
 
     # KQueue
     if (KQUEUE) {
-        my $fd      = fileno($socket);
+        my $fd = fileno $socket;
+
+        # Writing?
         my $writing = $c->{writing};
         $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_READ(),
             IO::KQueue::EV_ADD())
@@ -419,6 +432,8 @@ sub writing {
         $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_WRITE(),
             IO::KQueue::EV_ADD())
           unless $writing;
+
+        # Writing
         $c->{writing} = 1;
     }
 
@@ -437,47 +452,45 @@ sub _accept {
 
     # Accept
     my $socket = $listen->accept or return;
+    my $id = "$socket";
 
     # Add connection
-    $self->_connections->{$socket} = {
+    $self->_connections->{$id} = {
         accepting => 1,
         buffer    => Mojo::Buffer->new,
         socket    => $socket
     };
 
     # Timeout
-    my $id = $self->timer(
-        "$socket" => (
+    $self->_connections->{$socket}->{accept_timer} = $self->timer(
+        $id => (
             after => $self->accept_timeout,
-            cb    => sub {
-                shift->_error("$socket", 'Accept timeout.');
-            }
+            cb    => sub { shift->_error($id, 'Accept timeout.') }
         )
     );
-    $self->_connections->{$socket}->{accept_timer} = $id;
 
     # File descriptor
-    my $fd = fileno($socket);
-    $self->_fds->{$fd} = "$socket";
+    my $fd = fileno $socket;
+    $self->_fds->{$fd} = $id;
 
     # Accept callback
-    $self->_listen->{$listen}->{cb}->($self, "$socket");
+    $self->_listen->{$listen}->{cb}->($self, $id);
 
     # Unlock
     $self->unlock_cb->($self);
 
     # Remove listen sockets
-    for my $l (keys %{$self->_listen}) {
-        my $socket = $self->_listen->{$l}->{socket};
+    for my $lid (keys %{$self->_listen}) {
+        my $listen = $self->_listen->{$lid}->{socket};
 
         # Remove listen socket from kqueue
         if (KQUEUE) {
-            $self->_loop->EV_SET(fileno($socket), IO::KQueue::EVFILT_READ(),
-                IO::KQueue::EV_DELETE());
+            $self->_loop->EV_SET(fileno $listen,
+                IO::KQueue::EVFILT_READ(), IO::KQueue::EV_DELETE());
         }
 
         # Remove listen socket from poll or epoll
-        else { $self->_loop->remove($socket) }
+        else { $self->_loop->remove($listen) }
     }
 
     # Not listening anymore
@@ -553,7 +566,7 @@ sub _error {
     return unless $event;
 
     # Default error
-    $error ||= 'Connection error on poll layer.';
+    $error ||= 'Unknown error, connection closed.';
 
     # Error callback
     $self->$event($id, $error);
@@ -630,8 +643,8 @@ sub _read {
 
     # Listen socket? (new connection)
     my $listen;
-    for my $l (keys %{$self->_listen}) {
-        my $socket = $self->_listen->{$l}->{socket};
+    for my $lid (keys %{$self->_listen}) {
+        my $socket = $self->_listen->{$lid}->{socket};
         if ($id eq $socket) {
             $listen = $socket;
             last;
@@ -666,9 +679,9 @@ sub _spin {
     if (!$self->_listening && $self->_is_listening) {
 
         # Add listen sockets
-        for my $l (keys %{$self->_listen}) {
-            my $listen = $self->_listen->{$l}->{socket};
-            my $fd     = fileno($listen);
+        for my $lid (keys %{$self->_listen}) {
+            my $socket = $self->_listen->{$lid}->{socket};
+            my $fd     = fileno $socket;
 
             # KQueue
             $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_READ(),
@@ -676,10 +689,10 @@ sub _spin {
               if KQUEUE;
 
             # Epoll
-            $self->_loop->mask($listen, IO::Epoll::POLLIN()) if EPOLL;
+            $self->_loop->mask($socket, IO::Epoll::POLLIN()) if EPOLL;
 
             # Poll
-            $self->_loop->mask($listen, POLLIN) unless KQUEUE || EPOLL;
+            $self->_loop->mask($socket, POLLIN) unless KQUEUE || EPOLL;
         }
 
         # Listening
@@ -712,6 +725,7 @@ sub _spin {
             # Write
             $self->_write($id) if $filter == IO::KQueue::EVFILT_WRITE();
 
+            # Error
             if ($flags == IO::KQueue::EV_EOF()) {
                 if   ($fflags) { $self->_error($id) }
                 else           { $self->_hup($id) }

@@ -114,7 +114,7 @@ Mojo - The Web In A Box!
 L<Mojo> provides a flexible runtime environment for Perl web frameworks.
 It is a great basis for implementing your own framework.
 
-Also included in the distribution is an MVC web framework named
+Also included in the distribution is an amazing MVC web framework named
 L<Mojolicious>, which also supports a simplified single file mode through
 L<Mojolicious::Lite>.
 

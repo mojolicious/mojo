@@ -1,23 +1,24 @@
-Mojo provides a minimal interface between web servers and Perl web
-frameworks.
+Mojo provides a flexible runtime environment for Perl web frameworks.
+It is a great basis for implementing your own framework.
 
-Also included in the distribution are two MVC web frameworks named
-Mojolicious and Mojolicious::Lite.
+Also included in the distribution is an MVC web framework named
+Mojolicious, which also supports a simplified single file mode through
+Mojolicious::Lite.
 
-Currently there are no requirements besides Perl 5.8.1.
+Currently this distribution has no requirements besides Perl 5.8.1.
 
-    .------------------------------------------------------------.
-    |                                                            |
-    |   Application  .-------------------------------------------'
-    |                | .-------------------. .-------------------.
-    |                | |    Mojolicious    | | Mojolicious::Lite |
-    '----------------' '-------------------' '-------------------'
-    .------------------------------------------------------------.
-    |                           Mojo                             |
-    '------------------------------------------------------------'
-    .------------------. .------------------. .------------------.
-    |        CGI       | |      FastCGI     | |     HTTP 1.1     |
-    '------------------' '------------------' '------------------'
+    .---------------------------------------------------------------.
+    |                                                               |
+    |   Application  .----------------------------------------------'
+    |                | .--------------------. .---------------------.
+    |                | |     Mojolicious    | |  Mojolicious::Lite  |
+    '----------------' '--------------------' '---------------------'
+    .---------------------------------------------------------------.
+    |                             Mojo                              |
+    '---------------------------------------------------------------'
+    .-------. .-----------. .--------. .------------. .-------------.
+    |  CGI  | |  FastCGI  | |  PSGI  | |  HTTP 1.1  | |  WebSocket  |
+    '-------' '-----------' '--------' '------------' '-------------'
 
 To install this module type the following:
 

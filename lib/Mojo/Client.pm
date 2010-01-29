@@ -21,7 +21,7 @@ use Mojo::Transaction::Single;
 use Mojo::Transaction::WebSocket;
 use Scalar::Util 'weaken';
 
-__PACKAGE__->attr([qw/app default_cb tls_ca_file tls_verify_cb/]);
+__PACKAGE__->attr([qw/default_cb tls_ca_file tls_verify_cb/]);
 __PACKAGE__->attr([qw/continue_timeout max_keep_alive_connections/] => 5);
 __PACKAGE__->attr(cookie_jar => sub { Mojo::CookieJar->new });
 __PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->singleton });
@@ -33,7 +33,9 @@ __PACKAGE__->attr(websocket_timeout => 300);
 __PACKAGE__->attr(_cache       => sub { [] });
 __PACKAGE__->attr(_connections => sub { {} });
 __PACKAGE__->attr([qw/_finite _queued/] => 0);
-__PACKAGE__->attr('_port');
+
+# Global application, port and server for testing
+my ($APP, $PORT, $SERVER);
 
 # Make sure we leave a clean ioloop behind
 sub DESTROY {
@@ -52,6 +54,15 @@ sub DESTROY {
         my $id = $cached->[1];
         $self->ioloop->drop($id);
     }
+}
+
+sub app {
+    my ($self, $app) = @_;
+    if ($app) {
+        $APP = $app;
+        return $self;
+    }
+    return $APP;
 }
 
 sub delete { shift->_build_tx('DELETE', @_) }
@@ -164,7 +175,7 @@ sub queue {
     my $cb = pop @_ if ref $_[-1] && ref $_[-1] eq 'CODE';
 
     # Embedded server
-    $self->_prepare_server if $self->app;
+    $self->_prepare_server if $APP;
 
     # Queue transactions
     $self->_queue($_, $cb) for @_;
@@ -529,41 +540,38 @@ sub _hup {
 sub _prepare_server {
     my $self = shift;
 
-    # Server already prepared or another server running
-    $self->_port($ENV{MOJO_CLIENT_SERVER_PORT}) unless $self->_port;
-    return if $self->_port;
-
     # Server
-    my $server = Mojo::Server::Daemon->new;
-    my $port = $ENV{MOJO_CLIENT_SERVER_PORT} = $self->ioloop->generate_port;
-    die "Couldn't find a free TCP port for testing.\n" unless $port;
-    $self->_port($port);
-    $server->listen("http://*:$port");
-    ref $self->app
-      ? $server->app($self->app)
-      : $server->app_class($self->app);
-    $server->app->client->app($server->app);
-    $server->lock_file($server->lock_file . '.test');
-    $server->prepare_lock_file;
-    $server->prepare_ioloop;
+    unless ($PORT) {
+        $SERVER = Mojo::Server::Daemon->new(silent => 1);
+        $PORT = $self->ioloop->generate_port;
+        die "Couldn't find a free TCP port for testing.\n" unless $PORT;
+        $SERVER->listen("http://*:$PORT");
+        $SERVER->lock_file($SERVER->lock_file . '.test');
+        $SERVER->prepare_lock_file;
+        $SERVER->prepare_ioloop;
+    }
+
+    # Application
+    delete $SERVER->{app};
+    ref $APP ? $SERVER->app($APP) : $SERVER->app_class($APP);
 }
 
 sub _queue {
     my ($self, $tx, $cb) = @_;
 
     # Embedded server
-    if ($self->app) {
+    if ($APP) {
         my @active = $tx->is_pipeline ? @{$tx->active} : $tx;
         for my $active (@active) {
             my $url = $active->req->url->to_abs;
             next if $url->host;
             $url->scheme('http');
             $url->host('localhost');
-            $url->port($self->_port);
+            $url->port($PORT);
             $active->req->url($url);
         }
         $tx->client_info(
-            {scheme => 'http', address => 'localhost', port => $self->_port})
+            {scheme => 'http', address => 'localhost', port => $PORT})
           if $tx->is_pipeline && !$tx->client_info->{address};
     }
 
@@ -839,14 +847,6 @@ as well as an optional callback sub reference.
 
 L<Mojo::Client> implements the following attributes.
 
-=head2 C<app>
-
-    my $app = $client->app;
-    $client = $client->app(MyApp->new);
-
-A Mojo application to associate this client with.
-If set, requests will be processed in this application.
-
 =head2 C<continue_timeout>
 
     my $timeout = $client->continue_timeout;
@@ -948,6 +948,14 @@ following new ones.
 
 Construct a new L<Mojo::Client> object.
 As usual, you can pass any of the attributes above to the constructor.
+
+=head2 C<app>
+
+    my $app = $client->app;
+    $client = $client->app(MyApp->new);
+
+A Mojo application to associate this client with.
+If set, local requests will be processed in this application.
 
 =head2 C<delete>
 

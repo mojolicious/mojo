@@ -18,7 +18,7 @@ use Mojo::Transaction::WebSocket;
 use Scalar::Util 'weaken';
 use Sys::Hostname 'hostname';
 
-__PACKAGE__->attr([qw/group listen listen_queue_size user/]);
+__PACKAGE__->attr([qw/group listen listen_queue_size silent user/]);
 __PACKAGE__->attr(ioloop => sub { Mojo::IOLoop->singleton });
 __PACKAGE__->attr(keep_alive_timeout => 15);
 __PACKAGE__->attr(
@@ -393,7 +393,7 @@ sub _listen {
     $self->app->log->info("Server listening ($started)");
 
     # Friendly message
-    print "Server available at $started.\n";
+    print "Server available at $started.\n" unless $self->silent;
 }
 
 sub _read {
@@ -525,6 +525,11 @@ implements the following new ones.
 
     my $pid_file = $daemon->pid_file;
     $daemon      = $daemon->pid_file('/tmp/mojo_daemon.pid');
+
+=head2 C<silent>
+
+    my $silent = $daemon->silent;
+    $daemon    = $daemon->silent(1);
 
 =head2 C<user>
 

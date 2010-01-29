@@ -268,10 +268,8 @@ get '/param_auth/too' =>
 
 # Oh Fry, I love you more than the moon, and the stars,
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
-my $client = Mojo::Client->new(app => app);
-app->client($client);
-my $t = Test::Mojo->new;
-$t->client($client);
+my $client = app->client;
+my $t      = Test::Mojo->new;
 
 # GET /
 $t->get_ok('/')->status_is(200)->header_is(Server => 'Mojo (Perl)')

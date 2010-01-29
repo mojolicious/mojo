@@ -34,7 +34,7 @@ websocket '/' => sub {
 };
 
 # New client
-my $client = Mojo::Client->new(app => app);
+my $client = Mojo::Client->new->app(app);
 
 # WebSocket /
 $client->websocket(

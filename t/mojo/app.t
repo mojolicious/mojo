@@ -42,7 +42,7 @@ my $app = Mojo->new({log => $logger});
 is($app->log, $logger);
 
 $app = Mojo::HelloWorld->new;
-my $client = Mojo::Client->new(app => $app);
+my $client = Mojo::Client->new->app($app);
 
 # Normal request
 my $tx = Mojo::Transaction::Single->new;
@@ -63,7 +63,7 @@ $client->process($tx);
 is($tx->res->code, 200);
 like($tx->res->body, qr/^Congratulations/);
 
-$client = Mojo::Client->new(app => 'ContinueHandlerTest');
+$client = Mojo::Client->new->app('ContinueHandlerTest');
 
 # Continue handler not returning 100 Continue
 $tx = Mojo::Transaction::Single->new;

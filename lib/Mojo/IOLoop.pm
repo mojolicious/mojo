@@ -185,6 +185,9 @@ sub drop {
         my $fd = fileno $socket;
         delete $self->_fds->{$fd};
 
+        # Shortcut
+        return $self unless $self->_loop;
+
         # Remove socket from kqueue
         if (KQUEUE) {
 

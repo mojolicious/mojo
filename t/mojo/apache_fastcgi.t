@@ -30,7 +30,7 @@ my $mt     = Mojo::Template->new;
 # FastCGI setup
 my $fcgi = File::Spec->catfile($dir, 'test.fcgi');
 $mt->render_to_file(<<'EOF', $fcgi);
-#!<%= $^X %>
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
@@ -72,7 +72,7 @@ Alias / <%= $fcgi %>/
 EOF
 
 # Start
-$server->command("/usr/sbin/httpd -X -f $config");
+$server->command("/usr/sbin/httpd -X -f '$config'");
 $server->start_server_ok;
 
 # Request

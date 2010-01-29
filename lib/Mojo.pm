@@ -95,8 +95,8 @@ Mojo - The Web In A Box!
 
     use base 'Mojo';
 
-    # All the complexities of CGI, FastCGI and HTTP get reduced to a
-    # single method call!
+    # All the complexities of CGI, FastCGI, PSGI, HTTP and WebSocket get
+    # reduced to a single method call!
     sub handler {
         my ($self, $tx) = @_;
 
@@ -111,16 +111,39 @@ Mojo - The Web In A Box!
 
 =head1 DESCRIPTION
 
-L<Mojo> provides a flexible runtime environment for Perl web frameworks.
-It is a great basis for implementing your own framework.
+Back in the early days of the web there was this wonderful Perl library
+called L<CGI>, many people only learned Perl because of it.
+It was simple enough to get started without knowing much about the language
+and powerful enough to keep you going, learning by doing was much fun.
+While most of the techniques used are outdated now, the idea behind it is
+not.
+L<Mojo> is a new attempt at implementing this idea using state of the art
+technology.
 
-Also included in the distribution is an amazing MVC web framework named
-L<Mojolicious>, which also supports a simplified single file mode through
+=head2 Features
+
+=over 4
+
+Very clean and Object Oriented pure Perl API without any hidden magic and no
+requirements besides Perl 5.8.1.
+
+Full stack HTTP 1.1 and WebSocket client/server implementation with IPv6 and
+TLS support.
+
+Builtin async IO and prefork web server with epoll and kqueue support,
+perfect for embedding.
+
+CGI, FastCGI and L<PSGI> support.
+
+Also included in the distribution is an amazing MVC web framework called
+L<Mojolicious>, which supports a simplified single file mode through
 L<Mojolicious::Lite>.
 
-Currently this distribution has no requirements besides Perl 5.8.1.
+=back
 
-=head2 The Mojo Stack
+And much more for you to discover!
+
+=head2 Architecture
 
     .---------------------------------------------------------------.
     |                                                               |

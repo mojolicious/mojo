@@ -1,11 +1,32 @@
-Mojo provides a flexible runtime environment for Perl web frameworks.
-It is a great basis for implementing your own framework.
+Back in the early days of the web there was this wonderful Perl library called
+CGI, many people only learned Perl because of it.
+It was simple enough to get started without knowing much about the language
+and powerful enough to keep you going, learning by doing was much fun.
+While most of the techniques used are outdated now, the idea behind it is
+not.
+Mojo is a new attempt at implementing this idea using state of the art
+technology.
 
-Also included in the distribution is an amazing MVC web framework named
-Mojolicious, which also supports a simplified single file mode through
-Mojolicious::Lite.
+Features:
 
-Currently this distribution has no requirements besides Perl 5.8.1.
+    * Very clean and Object Oriented pure Perl API without any hidden magic
+      and no requirements besides Perl 5.8.1.
+
+    * Full stack HTTP 1.1 and WebSocket client/server implementation with
+      IPv6 and TLS support.
+
+    * Builtin async IO and prefork web server with epoll and kqueue support,
+      perfect for embedding.
+
+    * CGI, FastCGI and PSGI support.
+
+    * Also included in the distribution is an amazing MVC web framework
+      called Mojolicious, which supports a simplified single file mode
+      through Mojolicious::Lite.
+
+    And much more for you to discover!
+
+Architecture:
 
     .---------------------------------------------------------------.
     |                                                               |

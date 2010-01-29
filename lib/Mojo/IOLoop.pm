@@ -770,10 +770,10 @@ sub _spin {
     }
 
     # Timers
-    $self->_timer;
+    $self->_timing;
 }
 
-sub _timer {
+sub _timing {
     my $self = shift;
 
     # Timers

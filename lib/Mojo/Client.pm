@@ -529,12 +529,13 @@ sub _hup {
 sub _prepare_server {
     my $self = shift;
 
-    # Server already prepared
+    # Server already prepared or another server running
+    $self->_port($ENV{MOJO_CLIENT_SERVER_PORT}) unless $self->_port;
     return if $self->_port;
 
     # Server
     my $server = Mojo::Server::Daemon->new;
-    my $port   = $self->ioloop->generate_port;
+    my $port = $ENV{MOJO_CLIENT_SERVER_PORT} = $self->ioloop->generate_port;
     die "Couldn't find a free TCP port for testing.\n" unless $port;
     $self->_port($port);
     $server->listen("http://*:$port");

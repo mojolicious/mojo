@@ -1,7 +1,7 @@
 This file documents the revision history for Perl extension Mojo.
 
 0.999920 2010-01-24 00:00:00
-        - Code name "Snowman".
+        - Code name "Snowman", this is a major release!
         - MOJO_RELOAD=1 now works with Mojolicious::Lite, have fun!
         - Allow reloading to be triggered once by a USR1 signal.
         - Added --reload flag to all server bindings as an alternative to

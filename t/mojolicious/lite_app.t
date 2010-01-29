@@ -648,11 +648,12 @@ Sidebar!
 Hello World!
 
 @@ layouts/template_inheritance.html.ep
+% stash foo => 'Default';
 %{= content header =>
 Default header!
 %}
 %{= content sidebar =>
-Default sidebar!
+<%= stash 'foo' %> sidebar!
 %}
 %= content
 %{= content footer =>

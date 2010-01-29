@@ -39,6 +39,9 @@ sub register {
     $app->renderer->add_helper(param =>
           sub { wantarray ? (shift->param(@_)) : scalar shift->param(@_); });
 
+    # Add "stash" helper
+    $app->renderer->add_helper(stash => sub { shift->stash(@_) });
+
     # Add "url_for" helper
     $app->renderer->add_helper(url_for => sub { shift->url_for(@_) });
 }
@@ -90,6 +93,10 @@ Render this template with a layout.
 =item param
 
 Access request parameters and routes captures.
+
+=item stash
+
+Access stash values.
 
 =item url_for
 

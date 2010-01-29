@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 20;
+use Test::More tests => 22;
 
 use_ok('Mojo::Asset::File');
 
@@ -33,6 +33,8 @@ is($file->contains('cdef'),  1);
 ok(!$file->contains('db'));
 
 # Range support (ab[cdefghi]jk)
+my $backup = $ENV{MOJO_CHUNK_SIZE} || '';
+$ENV{MOJO_CHUNK_SIZE} = 1024;
 $file = Mojo::Asset::File->new(start_range => 2, end_range => 8);
 $file->add_chunk('abcdefghijk');
 is($file->contains(''),        0);
@@ -47,6 +49,12 @@ $chunk = $file->get_chunk(1);
 is($chunk, 'defghi');
 $chunk = $file->get_chunk(5);
 is($chunk, 'hi');
+$ENV{MOJO_CHUNK_SIZE} = 1;
+$chunk = $file->get_chunk(0);
+is($chunk, 'c');
+$chunk = $file->get_chunk(5);
+is($chunk, 'h');
+$ENV{MOJO_CHUNK_SIZE} = $backup;
 
 # Range support (empty)
 $file = Mojo::Asset::File->new;

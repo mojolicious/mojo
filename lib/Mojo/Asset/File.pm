@@ -16,8 +16,6 @@ use File::Spec;
 use IO::File;
 use Mojo::ByteStream 'b';
 
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 8192;
-
 __PACKAGE__->attr([qw/cleanup path end_range/]);
 __PACKAGE__->attr(start_range => 0);
 __PACKAGE__->attr(tmpdir => sub { $ENV{MOJO_TMPDIR} || File::Spec->tmpdir });
@@ -129,14 +127,17 @@ sub get_chunk {
     my $end = $self->end_range;
     my $buffer;
 
+    # Chunk size
+    my $size = $ENV{MOJO_CHUNK_SIZE} || 8192;
+
     # Range support
     if (defined $end) {
         my $chunk = $end + 1 - $off;
         return '' if $chunk <= 0;
-        $chunk = CHUNK_SIZE if $chunk > CHUNK_SIZE;
+        $chunk = $size if $chunk > $size;
         $self->handle->sysread($buffer, $chunk);
     }
-    else { $self->handle->sysread($buffer, CHUNK_SIZE) }
+    else { $self->handle->sysread($buffer, $size) }
 
     return $buffer;
 }
@@ -180,9 +181,7 @@ sub slurp {
 
     # Slurp
     my $content = '';
-    while ($self->handle->sysread(my $buffer, CHUNK_SIZE)) {
-        $content .= $buffer;
-    }
+    while ($self->handle->sysread(my $buffer, 8192)) { $content .= $buffer }
 
     return $content;
 }

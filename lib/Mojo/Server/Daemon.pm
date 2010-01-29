@@ -185,11 +185,11 @@ sub setuidgid {
     return $self;
 }
 
-sub _create_pipeline {
+sub _build_pipeline {
     my ($self, $id) = @_;
 
     # Connection
-    my $conn = $self->_connections->{$id};
+    my $c = $self->_connections->{$id};
 
     # New pipeline
     my $p = Mojo::Transaction::Pipeline->new;
@@ -205,7 +205,7 @@ sub _create_pipeline {
 
     # Weaken
     weaken $self;
-    weaken $conn;
+    weaken $c;
 
     # State change callback
     $p->state_cb(
@@ -216,13 +216,13 @@ sub _create_pipeline {
             if ($p->is_finished) {
 
                 # Close connection
-                if (!$conn->{pipeline}->keep_alive && !$conn->{websocket}) {
+                if (!$c->{pipeline}->keep_alive && !$c->{websocket}) {
                     $self->_drop($id);
                     $self->ioloop->finish($id);
                 }
 
                 # End pipeline
-                else { delete $conn->{pipeline} }
+                else { delete $c->{pipeline} }
             }
 
             # Writing?
@@ -233,85 +233,85 @@ sub _create_pipeline {
     );
 
     # Transaction builder callback
-    $p->build_tx_cb(
+    $p->build_tx_cb(sub { $self->_build_tx($id, $c, @_) });
+
+    # New request on the connection
+    $c->{requests}++;
+
+    # Kept alive if we have more than one request on the connection
+    $p->kept_alive(1) if $c->{requests} > 1;
+
+    return $p;
+}
+
+sub _build_tx {
+    my ($self, $id, $c) = @_;
+
+    # Build transaction
+    my $tx = $self->build_tx_cb->($self);
+
+    # TLS
+    if ($c->{tls}) {
+        $tx->req->url->scheme('https');
+        $tx->req->url->base->scheme('https');
+    }
+
+    # Handler callback
+    $tx->handler_cb(
         sub {
+            my $tx = shift;
 
-            # Build transaction
-            my $tx = $self->build_tx_cb->($self);
-
-            # TLS
-            if ($conn->{tls}) {
-                $tx->req->url->scheme('https');
-                $tx->req->url->base->scheme('https');
-            }
-
-            # Handler callback
-            $tx->handler_cb(
-                sub {
-                    my $tx = shift;
-
-                    # Handler
-                    $self->handler_cb->($self, $tx);
-                }
-            );
-
-            # Continue handler callback
-            $tx->continue_handler_cb(
-                sub {
-                    my $tx = shift;
-
-                    # Continue handler
-                    $self->continue_handler_cb->($self, $tx);
-                }
-            );
-
-            # Upgrade callback
-            $tx->upgrade_cb(
-                sub {
-                    my $tx = shift;
-
-                    # WebSocket?
-                    return unless $tx->req->headers->upgrade =~ /WebSocket/i;
-
-                    # WebSocket handshake handler
-                    my $ws = $conn->{websocket} =
-                      $self->websocket_handshake_cb->($self, $tx);
-
-                    # Upgrade connection timeout
-                    $self->ioloop->connection_timeout($id,
-                        $self->websocket_timeout);
-
-                    # State change callback
-                    $ws->state_cb(
-                        sub {
-                            my $ws = shift;
-
-                            # Finish
-                            if ($ws->is_finished) {
-                                $self->_drop($id);
-                                $self->ioloop->finish($id);
-                            }
-
-                            # Writing?
-                            $ws->server_is_writing
-                              ? $self->ioloop->writing($id)
-                              : $self->ioloop->not_writing($id);
-                        }
-                    );
-                }
-            );
-
-            return $tx;
+            # Handler
+            $self->handler_cb->($self, $tx);
         }
     );
 
-    # New request on the connection
-    $conn->{requests}++;
+    # Continue handler callback
+    $tx->continue_handler_cb(
+        sub {
+            my $tx = shift;
 
-    # Kept alive if we have more than one request on the connection
-    $p->kept_alive(1) if $conn->{requests} > 1;
+            # Continue handler
+            $self->continue_handler_cb->($self, $tx);
+        }
+    );
 
-    return $p;
+    # Upgrade callback
+    $tx->upgrade_cb(
+        sub {
+            my $tx = shift;
+
+            # WebSocket?
+            return unless $tx->req->headers->upgrade =~ /WebSocket/i;
+
+            # WebSocket handshake handler
+            my $ws = $c->{websocket} =
+              $self->websocket_handshake_cb->($self, $tx);
+
+            # Upgrade connection timeout
+            $self->ioloop->connection_timeout($id, $self->websocket_timeout);
+
+            # State change callback
+            $ws->state_cb(
+                sub {
+                    my $ws = shift;
+
+                    # Finish
+                    if ($ws->is_finished) {
+                        $self->_drop($id);
+                        $self->ioloop->finish($id);
+                    }
+
+                    # Writing?
+                    $ws->server_is_writing
+                      ? $self->ioloop->writing($id)
+                      : $self->ioloop->not_writing($id);
+                }
+            );
+        }
+    );
+
+    return $tx;
 }
 
 sub _drop {
@@ -405,9 +405,8 @@ sub _read {
     # WebSocket
     $tx ||= $self->_connections->{$id}->{websocket};
 
-    # Create pipeline
-    $tx = $self->_connections->{$id}->{pipeline} =
-      $self->_create_pipeline($id)
+    # Pipeline
+    $tx = $self->_connections->{$id}->{pipeline} = $self->_build_pipeline($id)
       unless $tx;
 
     # Read

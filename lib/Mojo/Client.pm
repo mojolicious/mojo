@@ -21,14 +21,13 @@ use Mojo::Transaction::Single;
 use Mojo::Transaction::WebSocket;
 use Scalar::Util 'weaken';
 
-__PACKAGE__->attr([qw/default_cb tls_ca_file tls_verify_cb/]);
+__PACKAGE__->attr([qw/default_cb tls_ca_file tls_verify_cb tx/]);
 __PACKAGE__->attr([qw/continue_timeout max_keep_alive_connections/] => 5);
 __PACKAGE__->attr(cookie_jar => sub { Mojo::CookieJar->new });
 __PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->singleton });
 __PACKAGE__->attr(keep_alive_timeout => 15);
 __PACKAGE__->attr(max_redirects      => 0);
-__PACKAGE__->attr('tx');
-__PACKAGE__->attr(websocket_timeout => 300);
+__PACKAGE__->attr(websocket_timeout  => 300);
 
 __PACKAGE__->attr(_cache       => sub { [] });
 __PACKAGE__->attr(_connections => sub { {} });
@@ -492,11 +491,7 @@ sub _finish {
 
         # Callback
         else {
-
-            # Get callback
             my $cb = $c->{cb} || $self->default_cb;
-
-            # Callback
             $tx = $c->{tx};
             local $self->{tx} = $tx;
             $self->$cb($tx, $c->{history}) if $cb;
@@ -561,6 +556,8 @@ sub _queue {
 
     # Embedded server
     if ($APP) {
+
+        # Check all transactions for local requests
         my @active = $tx->is_pipeline ? @{$tx->active} : $tx;
         for my $active (@active) {
             my $url = $active->req->url->to_abs;
@@ -570,6 +567,8 @@ sub _queue {
             $url->port($PORT);
             $active->req->url($url);
         }
+
+        # Update client info for pipeline
         $tx->client_info(
             {scheme => 'http', address => 'localhost', port => $PORT})
           if $tx->is_pipeline && !$tx->client_info->{address};

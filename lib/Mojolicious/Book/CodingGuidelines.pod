@@ -48,6 +48,9 @@ release.
 
 Deprecating a feature should be avoided at all costs.
 
+A major release can be version number independent and is signaled by a new
+unique code name.
+
 Only add prereqs if absolutely necessary.
 
 Domain specific languages should be avoided in favor of Perl'ish solutions.

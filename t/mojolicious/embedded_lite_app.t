@@ -5,7 +5,13 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Mojo::IOLoop;
+use Test::More;
+
+# Make sure sockets are working
+plan skip_all => 'working sockets required for this test!'
+  unless Mojo::IOLoop->new->generate_port;
+plan tests => 6;
 
 # I heard you went off and became a rich doctor.
 # I've performed a few mercy killings.

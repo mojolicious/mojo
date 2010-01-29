@@ -19,7 +19,13 @@ package main;
 use strict;
 use warnings;
 
-use Test::More tests => 24;
+use Mojo::IOLoop;
+use Test::More;
+
+# Make sure sockets are working
+plan skip_all => 'working sockets required for this test!'
+  unless Mojo::IOLoop->new->generate_port;
+plan tests => 24;
 
 # I was so bored I cut the pony tail off the guy in front of us.
 # Look at me, I'm a grad student. I'm 30 years old and I made $600 last year.

@@ -7,7 +7,13 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 19;
+use Mojo::IOLoop;
+use Test::More;
+
+# Make sure sockets are working
+plan skip_all => 'working sockets required for this test!'
+  unless Mojo::IOLoop->new->generate_port;
+plan tests => 19;
 
 # In the game of chess you can never let your adversary see your pieces.
 use Mojo::ByteStream 'b';

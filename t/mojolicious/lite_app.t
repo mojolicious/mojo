@@ -7,7 +7,13 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 312;
+use Mojo::IOLoop;
+use Test::More;
+
+# Make sure sockets are working
+plan skip_all => 'working sockets required for this test!'
+  unless Mojo::IOLoop->new->generate_port;
+plan tests => 312;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?

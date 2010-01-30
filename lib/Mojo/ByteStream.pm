@@ -15,6 +15,7 @@ require Digest::MD5;
 require Encode;
 require MIME::Base64;
 require MIME::QuotedPrint;
+require Pod::Simple::HTML;
 
 # Punycode bootstring parameters
 use constant PUNYCODE_BASE         => 36;
@@ -24,6 +25,8 @@ use constant PUNYCODE_SKEW         => 38;
 use constant PUNYCODE_DAMP         => 700;
 use constant PUNYCODE_INITIAL_BIAS => 72;
 use constant PUNYCODE_INITIAL_N    => 128;
+
+__PACKAGE__->attr(raw_size => 0);
 
 # Punycode delimiter
 my $DELIMITER = chr 0x2D;
@@ -319,6 +322,22 @@ sub import {
 sub new {
     my $self = shift->SUPER::new();
     $self->{bytestream} = defined $_[0] ? $_[0] : '';
+    $self->raw_size($self->size);
+    return $self;
+}
+
+sub add_chunk {
+    my ($self, $chunk) = @_;
+
+    # Shortcut
+    return $self unless defined $chunk;
+
+    # Raw length
+    $self->raw_size($self->raw_size + length $chunk);
+
+    # Store
+    $self->{bytestream} .= $chunk;
+
     return $self;
 }
 
@@ -355,6 +374,8 @@ sub clone {
     my $self = shift;
     return $self->new($self->{bytestream});
 }
+
+sub contains { index shift->{bytestream}, shift }
 
 sub decamelize {
     my $self = shift;
@@ -398,6 +419,16 @@ sub decode {
     return $self;
 }
 
+sub empty {
+    my $self = shift;
+
+    # Cleanup
+    my $buffer = $self->{bytestream};
+    $self->{bytestream} = '';
+
+    return $buffer;
+}
+
 sub encode {
     my ($self, $encoding) = @_;
 
@@ -406,6 +437,22 @@ sub encode {
 
     $self->{bytestream} = Encode::encode($encoding, $self->{bytestream});
     return $self;
+}
+
+sub get_line {
+    my $self = shift;
+
+    # No full line in bytestream
+    return unless $self->{bytestream} =~ /\x0d?\x0a/;
+
+    # Locate line ending
+    my $pos = index $self->{bytestream}, "\x0a";
+
+    # Extract line and ending
+    my $line = substr $self->{bytestream}, 0, $pos + 1, '';
+    $line =~ s/(\x0d?\x0a)\z//;
+
+    return $line;
 }
 
 sub html_escape {
@@ -631,6 +678,16 @@ sub quote {
     return $self;
 }
 
+sub remove {
+    my ($self, $length, $chunk) = @_;
+
+    # Chunk to replace?
+    $chunk = '' unless defined $chunk;
+
+    # Extract and replace
+    return substr $self->{bytestream}, 0, $length, $chunk;
+}
+
 sub size { length shift->{bytestream} }
 
 sub to_string { shift->{bytestream} }
@@ -792,10 +849,23 @@ Mojo::ByteStream - ByteStream
 
     my $stream = b('foobarbaz')->html_escape;
 
+    # Buffering
+    my $stream = Mojo::ByteStream->new;
+    $stream->add_chunk('bar');
+    my $foo = $stream->remove(3);
+    my $bar = $stream->empty;
+
 =head1 DESCRIPTION
 
 L<Mojo::ByteStream> provides portable text and bytestream manipulation
 functions.
+
+L<Mojo::ByteStream> implements the following attributes.
+
+=head2 C<raw_size>
+
+    my $size = $stream->raw_size;
+    $stream  = $stream->raw_size(23);
 
 =head1 METHODS
 
@@ -805,6 +875,10 @@ the following new ones.
 =head2 C<new>
 
     my $stream = Mojo::ByteStream->new($string);
+
+=head2 C<add_chunk>
+
+    $stream = $stream->add_chunk('foo');
 
 =head2 C<b64_decode>
 
@@ -822,6 +896,10 @@ the following new ones.
 
     my $stream2 = $stream->clone;
 
+=head2 C<contains>
+
+    my $position = $stream->contains('something');
+
 =head2 C<decamelize>
 
     $stream = $stream->decamelize;
@@ -830,9 +908,17 @@ the following new ones.
 
     $stream = $stream->decode($encoding);
 
+=head2 C<empty>
+
+    my $chunk = $stream->empty;
+
 =head2 C<encode>
 
     $stream = $stream->encode($encoding);
+
+=head2 C<get_line>
+
+   my $line = $stream->get_line;
 
 =head2 C<html_escape>
 
@@ -865,6 +951,11 @@ the following new ones.
 =head2 C<quote>
 
     $stream = $stream->quote;
+
+=head2 C<remove>
+
+    my $chunk = $stream->remove(4);
+    my $chunk = $stream->remove(4, 'abcd');
 
 =head2 C<size>
 

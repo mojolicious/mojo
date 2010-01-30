@@ -9,13 +9,12 @@ use warnings;
 # I can't think of a way to finish that sentence.
 use base 'Mojo::Transaction';
 
-use Mojo::Buffer;
 use Mojo::ByteStream 'b';
 use Mojo::Transaction::Single;
 
 __PACKAGE__->attr(handshake => sub { Mojo::Transaction::Single->new });
-__PACKAGE__->attr([qw/read_buffer write_buffer/] => sub { Mojo::Buffer->new }
-);
+__PACKAGE__->attr(
+    [qw/read_buffer write_buffer/] => sub { Mojo::ByteStream->new });
 __PACKAGE__->attr(
     receive_message => sub {
         sub { }
@@ -125,7 +124,7 @@ The original handshake transaction.
 =head2 C<read_buffer>
 
     my $buffer = $ws->read_buffer;
-    $ws        = $ws->read_buffer(Mojo::Buffer->new);
+    $ws        = $ws->read_buffer(Mojo::ByteStream->new);
 
 Buffer for incoming data.
 
@@ -143,7 +142,7 @@ The callback that receives decoded messages one by one.
 =head2 C<write_buffer>
 
     my $buffer = $ws->write_buffer;
-    $ws        = $ws->write_buffer(Mojo::Buffer->new);
+    $ws        = $ws->write_buffer(Mojo::ByteStream->new);
 
 Buffer for outgoing data.
 

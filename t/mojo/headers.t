@@ -57,7 +57,7 @@ is($string, "23, 24, single line, 25, 26");
 
 # Parse headers
 $headers = Mojo::Headers->new;
-is(ref $headers->parse(<<'EOF'), 'Mojo::Buffer');
+is(ref $headers->parse(<<'EOF'), 'Mojo::ByteStream');
 Content-Type: text/plain
 Expect: 100-continue
 
@@ -98,7 +98,7 @@ X-Bender: Bite my shiny
 EOF
 is($headers->state, 'headers');
 ok(!defined($headers->connection));
-is(ref $headers->parse(<<EOF), 'Mojo::Buffer');
+is(ref $headers->parse(<<EOF), 'Mojo::ByteStream');
 X-Bender: metal ass!
 
 EOF

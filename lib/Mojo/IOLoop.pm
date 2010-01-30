@@ -11,7 +11,7 @@ use bytes;
 use Carp 'croak';
 use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
 use IO::Socket;
-use Mojo::Buffer;
+use Mojo::ByteStream;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 8192;
 
@@ -103,7 +103,7 @@ sub connect {
 
     # Add connection
     $self->_connections->{$id} = {
-        buffer     => Mojo::Buffer->new,
+        buffer     => Mojo::ByteStream->new,
         connect_cb => $args->{cb},
         connecting => 1,
         socket     => $socket
@@ -460,7 +460,7 @@ sub _accept {
     # Add connection
     $self->_connections->{$id} = {
         accepting => 1,
-        buffer    => Mojo::Buffer->new,
+        buffer    => Mojo::ByteStream->new,
         socket    => $socket
     };
 

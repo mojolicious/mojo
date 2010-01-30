@@ -9,17 +9,18 @@ use base 'Mojo::Stateful';
 use bytes;
 
 use Carp 'croak';
-use Mojo::Buffer;
+use Mojo::ByteStream;
 use Mojo::Filter::Chunked;
 use Mojo::Headers;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 8192;
 
 __PACKAGE__->attr([qw/body_cb filter progress_cb/]);
-__PACKAGE__->attr([qw/buffer filter_buffer/] => sub { Mojo::Buffer->new });
-__PACKAGE__->attr(headers                    => sub { Mojo::Headers->new });
-__PACKAGE__->attr(raw_header_size            => 0);
-__PACKAGE__->attr(relaxed                    => 0);
+__PACKAGE__->attr([qw/buffer filter_buffer/] => sub { Mojo::ByteStream->new }
+);
+__PACKAGE__->attr(headers => sub { Mojo::Headers->new });
+__PACKAGE__->attr(raw_header_size => 0);
+__PACKAGE__->attr(relaxed         => 0);
 
 __PACKAGE__->attr(_body_size => 0);
 __PACKAGE__->attr('_eof');
@@ -303,7 +304,7 @@ implements the following new ones.
 =head2 C<buffer>
 
     my $buffer = $content->buffer;
-    $content   = $content->buffer(Mojo::Buffer->new);
+    $content   = $content->buffer(Mojo::ByteStream->new);
 
 =head2 C<filter>
 
@@ -313,7 +314,7 @@ implements the following new ones.
 =head2 C<filter_buffer>
 
     my $filter_buffer = $content->filter_buffer;
-    $content          = $content->filter_buffer(Mojo::Buffer->new);
+    $content          = $content->filter_buffer(Mojo::ByteStream->new);
 
 =head2 C<headers>
 

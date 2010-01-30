@@ -8,9 +8,9 @@ use warnings;
 use base 'Mojo::Stateful';
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
-use Mojo::Buffer;
+use Mojo::ByteStream;
 
-__PACKAGE__->attr(buffer => sub { Mojo::Buffer->new });
+__PACKAGE__->attr(buffer => sub { Mojo::ByteStream->new });
 
 __PACKAGE__->attr(_buffer  => sub { [] });
 __PACKAGE__->attr(_headers => sub { {} });
@@ -352,9 +352,10 @@ implements the following new ones.
 =head2 C<buffer>
 
     my $buffer = $headers->buffer;
-    $headers   = $headers->buffer(Mojo::Buffer->new);
+    $headers   = $headers->buffer(Mojo::ByteStream->new);
 
-The Buffer to use for header parsing, by default a L<Mojo::Buffer> object.
+The Buffer to use for header parsing, by default a L<Mojo::ByteStream>
+object.
 
 =head2 C<connection>
 

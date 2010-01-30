@@ -8,12 +8,12 @@ use warnings;
 use base 'Mojo::Stateful';
 
 use Carp 'croak';
-use Mojo::Buffer;
+use Mojo::ByteStream;
 use Mojo::Headers;
 
 __PACKAGE__->attr(headers => sub { Mojo::Headers->new });
 __PACKAGE__->attr(
-    [qw/input_buffer output_buffer/] => sub { Mojo::Buffer->new });
+    [qw/input_buffer output_buffer/] => sub { Mojo::ByteStream->new });
 
 # Quick Smithers. Bring the mind eraser device!
 # You mean the revolver, sir?
@@ -50,17 +50,17 @@ the following new ones.
 =head2 C<input_buffer>
 
     my $input_buffer = $filter->input_buffer;
-    $filter          = $filter->input_buffer(Mojo::Buffer->new);
+    $filter          = $filter->input_buffer(Mojo::ByteStream->new);
 
 =head2 C<output_buffer>
 
     my $output_buffer = $filter->output_buffer;
-    $filter           = $filter->output_buffer(Mojo::Buffer->new);
+    $filter           = $filter->output_buffer(Mojo::ByteStream->new);
 
 =head1 METHODS
 
-L<Mojo::Filter> inherits all methods from L<Mojo::Stateful> and implements the
-following new ones.
+L<Mojo::Filter> inherits all methods from L<Mojo::Stateful> and implements
+the following new ones.
 
 =head2 C<build>
 

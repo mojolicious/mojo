@@ -11,7 +11,6 @@ use bytes;
 
 use Carp 'croak';
 use Mojo::Asset::Memory;
-use Mojo::Buffer;
 use Mojo::ByteStream 'b';
 use Mojo::Content::Single;
 use Mojo::Parameters;
@@ -19,7 +18,7 @@ use Mojo::Upload;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 8192;
 
-__PACKAGE__->attr(buffer  => sub { Mojo::Buffer->new });
+__PACKAGE__->attr(buffer  => sub { Mojo::ByteStream->new });
 __PACKAGE__->attr(content => sub { Mojo::Content::Single->new });
 __PACKAGE__->attr(default_charset                   => 'UTF-8');
 __PACKAGE__->attr([qw/major_version minor_version/] => 1);
@@ -529,7 +528,7 @@ implements the following new ones.
 =head2 C<buffer>
 
     my $buffer = $message->buffer;
-    $message   = $message->buffer(Mojo::Buffer->new);
+    $message   = $message->buffer(Mojo::ByteStream->new);
 
 =head2 C<content>
 

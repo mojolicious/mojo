@@ -10,12 +10,48 @@ use utf8;
 # Homer, we're going to ask you a few simple yes or no questions.
 # Do you understand?
 # Yes. *lie dectector blows up*
-use Test::More tests => 37;
+use Test::More tests => 53;
 
 use_ok('Mojo::ByteStream', 'b');
 
+# Empty
+my $stream = Mojo::ByteStream->new;
+is($stream->size,     0);
+is($stream->raw_size, 0);
+
+# Chunk
+$stream->add_chunk("line1\nline2");
+is($stream->size,     11);
+is($stream->raw_size, 11);
+
+# Clean
+my $buffer = $stream->empty;
+is($stream->size,     0);
+is($stream->raw_size, 11);
+is($buffer,           "line1\nline2");
+
+# Add
+$stream->add_chunk("first\nsec");
+is($stream->size,     9);
+is($stream->raw_size, 20);
+
+# Remove
+$buffer = $stream->remove(2);
+is($buffer,           'fi');
+is($stream->size,     7);
+is($stream->raw_size, 20);
+
+# Get
+is($stream->get_line, 'rst');
+is($stream->get_line, undef);
+
+# Stringify
+$stream = Mojo::ByteStream->new->add_chunk('abc');
+is("$stream",          'abc');
+is($stream->to_string, 'abc');
+
 # camelize
-my $stream = b('foo_bar_baz');
+$stream = b('foo_bar_baz');
 is($stream->camelize, 'FooBarBaz');
 $stream = b('FooBarBaz');
 is($stream->camelize, 'Foobarbaz');

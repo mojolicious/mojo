@@ -135,8 +135,8 @@ Mojo::Filter::Chunked - Chunked Filter
     my $chunked = Mojo::Filter::Chunked->new;
 
     $chunked->headers(Mojo::Headers->new);
-    $chunked->input_buffer(Mojo::Buffer->new);
-    $chunked->output_buffer(Mojo::Buffer->new);
+    $chunked->input_buffer(Mojo::ByteStream->new);
+    $chunked->output_buffer(Mojo::ByteStream->new);
 
     $chunked->input_buffer->add_chunk("6\r\nHello!")
     $chunked->parse;

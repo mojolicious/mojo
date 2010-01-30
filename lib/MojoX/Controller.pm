@@ -16,7 +16,6 @@ __PACKAGE__->attr([qw/app tx/]);
 sub req { shift->tx->req }
 sub res { shift->tx->res }
 
-# This is my first visit to the Galaxy of Terror and I'd like it to be a pleasant one.
 sub stash {
     my $self = shift;
 

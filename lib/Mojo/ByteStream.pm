@@ -15,7 +15,6 @@ require Digest::MD5;
 require Encode;
 require MIME::Base64;
 require MIME::QuotedPrint;
-require Pod::Simple::HTML;
 
 # Punycode bootstring parameters
 use constant PUNYCODE_BASE         => 36;

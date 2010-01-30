@@ -86,8 +86,8 @@ sub create_rel_dir {
     $self->create_dir($path);
 }
 
-sub get_data {
-    my ($self, $data, $class) = @_;
+sub get_all_data {
+    my ($self, $class) = @_;
     $class ||= ref $self;
 
     # Handle
@@ -115,12 +115,22 @@ sub get_data {
     shift @data;
 
     # Find data
+    my $all = {};
     while (@data) {
         my ($name, $content) = splice @data, 0, 2;
-        return $content if $name eq $data;
+        $all->{$name} = $content;
     }
 
-    return;
+    return $all;
+}
+
+sub get_data {
+    my ($self, $data, $class) = @_;
+
+    # All data
+    my $all = $self->get_all_data($class);
+
+    return $all->{$data};
 }
 
 sub help {
@@ -295,9 +305,15 @@ following new ones.
 
     $command = $command->create_rel_dir('foo/bar/baz');
 
+=head2 C<get_all_data>
+
+    my $all = $command->get_all_data;
+    my $all = $command->get_all_data('Some::Class');
+
 =head2 C<get_data>
 
     my $data = $command->get_data('foo_bar');
+    my $data = $command->get_data('foo_bar', 'Some::Class');
 
 =head2 C<help>
 

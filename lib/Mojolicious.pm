@@ -22,6 +22,9 @@ __PACKAGE__->attr(routes   => sub { MojoX::Dispatcher::Routes->new });
 __PACKAGE__->attr(static   => sub { MojoX::Dispatcher::Static->new });
 __PACKAGE__->attr(types    => sub { MojoX::Types->new });
 
+our $CODENAME = 'Snowman';
+our $VERSION  = '0.999920';
+
 sub new {
     my $self = shift->SUPER::new(@_);
 
@@ -176,9 +179,12 @@ __END__
 
 =head1 NAME
 
-Mojolicious - Web Framework
+Mojolicious - The Web In A Box!
 
 =head1 SYNOPSIS
+
+    # Mojolicious Application
+    package MyApp;
 
     use base 'Mojolicious';
 
@@ -189,12 +195,70 @@ Mojolicious - Web Framework
         my $r = $self->routes;
 
         # Default route
-        $r->route('/:controller/:action/:id')->to('foo#bar', id => 1);
+        $r->route('/:controller/:action/:id')->to('foo#welcome');
     }
+
+    # Mojolicious controller
+    package MyApp::Foo;
+
+    use base 'Mojolicious::Controller';
+
+    # Say hello
+    sub welcome {
+        my $self = shift;
+        $self->render_text('Hi there!');
+    }
+
+    # Say goodbye from a template (foo/bye.html.ep)
+    sub bye { shift->render }
 
 =head1 DESCRIPTION
 
-L<Mojolicous> is a full stack MVC web framework built upon L<Mojo>.
+Back in the early days of the web there was this wonderful Perl library
+called L<CGI>, many people only learned Perl because of it.
+It was simple enough to get started without knowing much about the language
+and powerful enough to keep you going, learning by doing was much fun.
+While most of the techniques used are outdated now, the idea behind it is
+not.
+L<Mojo> is a new attempt at implementing this idea using state of the art
+technology.
+
+=head2 Features
+
+=over 4
+
+An amazing MVC web framework called L<Mojolicious>, which supports a
+simplified single file mode through L<Mojolicious::Lite>.
+
+Very clean and Object Oriented pure Perl API without any hidden magic and no
+requirements besides Perl 5.8.1.
+
+Full stack HTTP 1.1 and WebSocket client/server implementation with IPv6 and
+TLS support.
+
+Builtin async IO and prefork web server with epoll and kqueue support,
+perfect for embedding.
+
+CGI, FastCGI and L<PSGI> support.
+
+=back
+
+And much more for you to discover!
+
+=head2 Architecture
+
+    .---------------------------------------------------------------.
+    |                                                               |
+    |   Application  .----------------------------------------------'
+    |                | .--------------------. .---------------------.
+    |                | |     Mojolicious    | |  Mojolicious::Lite  |
+    '----------------' '--------------------' '---------------------'
+    .---------------------------------------------------------------.
+    |                             Mojo                              |
+    '---------------------------------------------------------------'
+    .-------. .-----------. .--------. .------------. .-------------.
+    |  CGI  | |  FastCGI  | |  PSGI  | |  HTTP 1.1  | |  WebSocket  |
+    '-------' '-----------' '--------' '------------' '-------------'
 
 For more user friendly documentation see L<Mojolicious::Book> and
 L<Mojolicious::Lite>.
@@ -347,5 +411,130 @@ startup.
     sub startup {
         my $self = shift;
     }
+
+=head1 SUPPORT
+
+=head2 Web
+
+    http://mojolicious.org
+
+=head2 IRC
+
+    #mojo on irc.perl.org
+
+=head2 Mailing-List
+
+    http://groups.google.com/group/mojolicious
+
+=head1 DEVELOPMENT
+
+=head2 Repository
+
+    http://github.com/kraih/mojo/commits/master
+
+=head1 AUTHOR
+
+Sebastian Riedel, C<sri@cpan.org>.
+
+=head1 CREDITS
+
+In alphabetical order:
+
+Adam Kennedy
+
+Adriano Ferreira
+
+Alexey Likhatskiy
+
+Anatoly Sharifulin
+
+Andre Vieth
+
+Andreas Koenig
+
+Andy Grundman
+
+Aristotle Pagaltzis
+
+Ask Bjoern Hansen
+
+Audrey Tang
+
+Breno G. de Oliveira
+
+Burak Gursoy
+
+Ch Lamprecht
+
+Christian Hansen
+
+David Davis
+
+Gisle Aas
+
+Glen Hinkle
+
+Graham Barr
+
+James Duncan
+
+Jaroslav Muhin
+
+Jesse Vincent
+
+Kazuhiro Shibuya
+
+Kevin Old
+
+Lars Balker Rasmussen
+
+Leon Brocard
+
+Maik Fischer
+
+Marcus Ramberg
+
+Mark Stosberg
+
+Maksym Komar
+
+Maxim Vuets
+
+Mirko Westermeier
+
+Pascal Gaudette
+
+Pedro Melo
+
+Pierre-Yves Ritschard
+
+Rafal Pocztarski
+
+Randal Schwartz
+
+Robert Hicks
+
+Sergey Zasenko
+
+Shu Cho
+
+Stanis Trendelenburg
+
+Tatsuhiko Miyagawa
+
+Uwe Voelker
+
+Viacheslav Tykhanovskyi
+
+Yaroslav Korshak
+
+Yuki Kimoto
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2008-2010, Sebastian Riedel.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Artistic License version 2.0.
 
 =cut

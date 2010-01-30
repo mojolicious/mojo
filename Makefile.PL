@@ -16,9 +16,9 @@ my $mm = $ExtUtils::MakeMaker::VERSION;
 # We only use core modules, so you shouldn't have to install anything besides
 # Perl 5.8.1!
 WriteMakefile(
-    NAME         => 'Mojo',
-    VERSION_FROM => 'lib/Mojo.pm',
-    ABSTRACT     => 'Web Framework',
+    NAME         => 'Mojolicious',
+    VERSION_FROM => 'lib/Mojolicious.pm',
+    ABSTRACT     => 'The Web In A Box!',
     AUTHOR       => 'Sebastian Riedel <sri@cpan.org>',
 
     ($mm < 6.3002 ? () : ('LICENSE' => 'artistic_2')),

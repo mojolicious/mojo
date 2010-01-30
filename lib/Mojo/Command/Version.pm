@@ -7,8 +7,8 @@ use warnings;
 
 use base 'Mojo::Command';
 
-use Mojo;
 use Mojo::IOLoop;
+use Mojolicious;
 
 __PACKAGE__->attr(description => <<'EOF');
 Show versions of installed modules.
@@ -23,8 +23,8 @@ sub run {
     my $self = shift;
 
     # Mojo
-    my $mojo     = $Mojo::VERSION;
-    my $codename = $Mojo::CODENAME;
+    my $mojo     = $Mojolicious::VERSION;
+    my $codename = $Mojolicious::CODENAME;
 
     # Epoll
     my $epoll = Mojo::IOLoop::EPOLL() ? $IO::Epoll::VERSION : 'not installed';
@@ -43,8 +43,8 @@ sub run {
 
     print <<"EOF";
 CORE
-  Perl ($])
-  Mojo ($mojo, $codename)
+  Perl        ($])
+  Mojolicious ($mojo, $codename)
 
 OPTIONAL
   IO::Epoll         ($epoll)

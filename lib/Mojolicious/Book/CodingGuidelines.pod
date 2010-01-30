@@ -15,18 +15,17 @@ Please don't send patches unless you agree with them.
 
 L<Mojo> is a runtime environment for Perl web frameworks.
 It provides all the basic tools and helpers needed to write simple web
-applications and higher level web frameworks such as L<Mojolicious> and
-L<Mojolicious::Lite>.
+applications and higher level web frameworks such as L<Mojolicious>.
 
 All components should be reusable in other projects and in a UNIXish way
 only loosely coupled.
 
 Especially for people new to Perl it should be as easy as possible to
-install Mojo and get started.
+install Mojolicious and get started.
 Writing web applications can be one of the most fun ways to learn a language!
 
 For developers of other web frameworks it should be possible to reuse all the
-infrastructure and just consider the higher levels of the L<Mojo>
+infrastructure and just consider the higher levels of the L<Mojolicious>
 distribution an example application.
 
 =head1 RULES

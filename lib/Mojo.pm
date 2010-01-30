@@ -112,7 +112,8 @@ Mojo - The Box!
 =head1 DESCRIPTION
 
 Mojo provides a flexible runtime environment for Perl web frameworks.
-It is a great basis for implementing your own framework.
+It provides all the basic tools and helpers needed to write simple web
+applications and higher level web frameworks such as L<Mojolicious>.
 
 See L<Mojolicious> for more!
 

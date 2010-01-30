@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 97;
+use Test::More tests => 98;
 
 # I don't want you driving around in a car you built yourself.
 # You can sit there complaining, or you can knit me some seat belts.
@@ -52,6 +52,8 @@ $url->query(monkey => 'foo');
 is("$url", 'http://sri:foobar@kraih.com:8080?monkey=foo#23');
 $url->query('foo');
 is("$url", 'http://sri:foobar@kraih.com:8080?foo#23');
+$url->query('foo=bar');
+is("$url", 'http://sri:foobar@kraih.com:8080?foo%3Dbar#23');
 
 # Query string
 $url = Mojo::URL->new(

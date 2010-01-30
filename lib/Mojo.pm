@@ -124,6 +124,9 @@ technology.
 
 =over 4
 
+An amazing MVC web framework called L<Mojolicious>, which supports a
+simplified single file mode through L<Mojolicious::Lite>.
+
 Very clean and Object Oriented pure Perl API without any hidden magic and no
 requirements besides Perl 5.8.1.
 
@@ -134,10 +137,6 @@ Builtin async IO and prefork web server with epoll and kqueue support,
 perfect for embedding.
 
 CGI, FastCGI and L<PSGI> support.
-
-Also included in the distribution is an amazing MVC web framework called
-L<Mojolicious>, which supports a simplified single file mode through
-L<Mojolicious::Lite>.
 
 =back
 

@@ -29,13 +29,16 @@ plugin charset => {charset => 'Shift_JIS'};
 # Silence
 app->log->level('error');
 
+# GET /
 get '/' => 'index';
 
+# POST /
 post '/' => sub {
     my $self = shift;
     $self->render_text("foo: " . $self->param('foo'));
 };
 
+# GET /json
 get '/json' => sub { shift->render_json({test => $yatta}) };
 
 my $t = Test::Mojo->new;

@@ -167,9 +167,13 @@ sub query {
 
     # Set
     if (@_) {
+
+        # Multiple values
         if (@_ > 1) {
             $self->{query} = Mojo::Parameters->new(ref $_[0] ? @{$_[0]} : @_);
         }
+
+        # Single value
         else {
             $self->{query} =
               !ref $_[0] ? Mojo::Parameters->new->append($_[0]) : $_[0];

@@ -167,8 +167,9 @@ sub query {
 
     # Set
     if (@_) {
-        $self->{query} =
-          @_ > 1 ? Mojo::Parameters->new(ref $_[0] ? @{$_[0]} : @_) : $_[0];
+        $self->{query} = @_ > 1 || !ref $_[0]
+          ? Mojo::Parameters->new(ref $_[0] ? @{$_[0]} : @_)
+          : $_[0];
         return $self;
     }
 

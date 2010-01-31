@@ -1170,6 +1170,9 @@ Path to the TLS key file.
     my $info = $loop->local_info($id);
 
 Get local information about a connection.
+
+    my $address = $info->{address};
+
 These values are to be expected in the returned hash reference.
 
 =over 4
@@ -1206,6 +1209,9 @@ Callback to be invoked if new data arrives on the connection.
     my $info = $loop->remote_info($id);
 
 Get remote information about a connection.
+
+    my $address = $info->{address};
+
 These values are to be expected in the returned hash reference.
 
 =over 4

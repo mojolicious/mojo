@@ -678,8 +678,8 @@ sub _read {
       unless defined $read && defined $buffer && length $buffer;
 
     # Callback
-    return unless my $event = $c->{read};
-    $self->$event($id, $buffer);
+    my $event = $c->{read};
+    $self->$event($id, $buffer) if $event;
 
     # Active
     $self->_active($id);
@@ -861,7 +861,7 @@ sub _write {
     $buffer->remove($written);
 
     # Active
-    $self->_active($id);
+    $self->_active($id) if $written;
 }
 
 1;

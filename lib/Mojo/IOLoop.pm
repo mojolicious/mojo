@@ -936,10 +936,12 @@ Mojo::IOLoop - IO Loop
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop> is a general purpose IO loop for TCP clients and servers,
-easy to subclass and extend.
-L<IO::Poll>, L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::INET6> and
-L<IO::Socket::SSL> are supported transparently.
+L<Mojo::IOLoop> is a very minimalistic event loop that has been reduced to
+the absolute minimal feature set required to build solid and scalable TCP
+clients and servers, easy to extend and replace with alternative
+implementations.
+Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::INET6> and
+L<IO::Socket::SSL> are supported transparently and used if installed.
 
 =head2 ATTRIBUTES
 
@@ -1029,6 +1031,36 @@ Open a TCP connection to a remote host.
 IPv6 support depends on L<IO::Socket::INET6> and TLS support on
 L<IO::Socket::SSL>.
 
+These options are currently available.
+
+=over 4
+
+=item C<address>
+
+Address or host name of the peer to connect to.
+
+=item C<cb>
+
+Callback to be invoked once the connection is established.
+
+=item C<port>
+
+Port to connect to.
+
+=item C<tls>
+
+Enable TLS.
+
+=item C<tls_ca_file>
+
+CA file to use for TLS.
+
+=item C<tls_verify_cb>
+
+Callback to invoke for TLS verification.
+
+=back
+
 =head2 C<connection_timeout>
 
     my $timeout = $loop->connection_timeout($id);
@@ -1083,6 +1115,44 @@ Callback to be invoked if the connection gets closed.
 Create a new listen socket.
 IPv6 support depends on L<IO::Socket::INET6> and TLS support on
 L<IO::Socket::SSL>.
+
+These options are currently available.
+
+=over 4
+
+=item C<address>
+
+Local address to listen on, defaults to all.
+
+=item C<cb>
+
+Callback to invoke for each accepted connection.
+
+=item C<file>
+
+A unix domain socket to listen on.
+
+=item C<port>
+
+Port to listen on.
+
+=item C<queue_size>
+
+Maximum queue size, defaults to C<SOMAXCONN>.
+
+=item C<tls>
+
+Enable TLS.
+
+=item C<tls_cert>
+
+Path to the TLS cert file.
+
+=item C<tls_key>
+
+Path to the TLS key file.
+
+=back
 
 =head2 C<local_info>
 
@@ -1141,6 +1211,24 @@ Stop the loop immediately.
 Create a new timer, invoking the callback afer a given amount of seconds.
 Note that timers are bound to connections and will get destroyed together
 with them.
+
+These options are currently available.
+
+=over 4
+
+=item C<after>
+
+Start timer after this exact amount of seconds.
+
+=item C<cb>
+
+Callback to invoke.
+
+=item C<interval>
+
+Interval in seconds to run timer recurringly.
+
+=back
 
 =head2 C<write_cb>
 

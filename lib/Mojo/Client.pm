@@ -741,7 +741,7 @@ sub _upgrade {
     return unless $tx->req->headers->upgrade;
 
     # Handshake failed?
-    return unless $tx->res->code == 101;
+    return unless $tx->res->code eq '101';
 
     # Start new WebSocket
     $c->{tx} = Mojo::Transaction::WebSocket->new(handshake => $tx);

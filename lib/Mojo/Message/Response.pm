@@ -19,7 +19,7 @@ my $START_LINE_RE = qr/
     \s+                # Whitespace
     (\d\d\d)           # Code
     \s+                # Whitespace
-    ([\w\s]+)          # Message
+    ([\w\'\s]+)        # Message (with "I'm a teapot" support)
     $                  # End
 /x;
 
@@ -146,17 +146,6 @@ sub parse_until_body {
     return $self->_parse(1);
 }
 
-sub _parse {
-    my $self = shift;
-    my $until_body = @_ ? shift : 0;
-
-    # Start line
-    $self->_parse_start_line if $self->is_state('start');
-
-    # Pass through
-    return $self->SUPER::_parse($until_body);
-}
-
 sub _build_start_line {
     my $self    = shift;
     my $version = $self->version;
@@ -168,6 +157,17 @@ sub _build_start_line {
     my $code    = $self->code    || 200;
     my $message = $self->message || $self->default_message;
     return "HTTP/$version $code $message\x0d\x0a";
+}
+
+sub _parse {
+    my $self = shift;
+    my $until_body = @_ ? shift : 0;
+
+    # Start line
+    $self->_parse_start_line if $self->is_state('start');
+
+    # Pass through
+    return $self->SUPER::_parse($until_body);
 }
 
 # Weaseling out of things is important to learn.

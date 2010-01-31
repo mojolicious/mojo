@@ -11,7 +11,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 2;
+plan tests => 5;
 
 # Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
 # Well, that’s love for you.
@@ -33,13 +33,14 @@ websocket '/' => sub {
     );
 };
 
-# New client
+# WebSocket /foo
+websocket '/foo' => sub { shift->res->code('403')->message("i'm a teapot") };
+
 my $client = Mojo::Client->new->app(app);
 
 # WebSocket /
 $client->websocket(
-    '/',
-    sub {
+    '/' => sub {
         my $self = shift;
         $self->receive_message(
             sub {
@@ -49,5 +50,15 @@ $client->websocket(
             }
         );
         $self->send_message('test1');
+    }
+)->process;
+
+# WebSocket /foo (forbidden)
+$client->websocket(
+    '/foo' => sub {
+        my $self = shift;
+        is($self->tx->is_websocket, 0);
+        is($self->res->code,        403);
+        is($self->res->message,     "i'm a teapot");
     }
 )->process;

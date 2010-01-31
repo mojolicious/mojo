@@ -111,7 +111,10 @@ sub dispatch {
     $e = $self->routes->dispatch($c) if $e;
 
     # Exception
-    if (ref $e) { $c->render_exception($e) }
+    if (ref $e) {
+        $c->resume if $c->tx->is_paused;
+        $c->render_exception($e);
+    }
 
     # Nothing found
     elsif ($e) { $c->render_not_found }

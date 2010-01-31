@@ -1043,8 +1043,9 @@ possible.
         cb      => sub {...}
     });
 
-Open a TCP connection to a remote host.
-IPv6 support depends on L<IO::Socket::INET6> and TLS support on
+Open a TCP connection to a remote host, IPv6 will be used automatically if
+available.
+Note that IPv6 support depends on L<IO::Socket::INET6> and TLS support on
 L<IO::Socket::SSL>.
 
 These options are currently available.
@@ -1123,8 +1124,8 @@ Callback to be invoked if the connection gets closed.
         tls_key  => '/foo/server.key'
     );
 
-Create a new listen socket.
-IPv6 support depends on L<IO::Socket::INET6> and TLS support on
+Create a new listen socket, IPv6 will be used automatically if available.
+Note that IPv6 support depends on L<IO::Socket::INET6> and TLS support on
 L<IO::Socket::SSL>.
 
 These options are currently available.

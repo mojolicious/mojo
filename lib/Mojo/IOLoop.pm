@@ -875,6 +875,9 @@ Mojo::IOLoop - IO Loop
         cb   => sub {
             my ($self, $id) = @_;
 
+            # Start read only when accepting a new connection
+            $self->not_writing($id);
+
             # Incoming data
             $self->read_cb($id => sub {
                 my ($self, $id, $chunk) = @_;
@@ -980,8 +983,9 @@ incoming connections, used to sync multiple server processes.
 
 The maximum number of connections this loop is allowed to handle before
 stopping to accept new incoming connections, defaults to C<1000>.
-Setting this value to C<0> will make this loop stop accepting new connections
-and allow it to shutdown gracefully without interrupting existing ones.
+Setting the value to C<0> will make this loop stop accepting new connections
+and allow it to shutdown gracefully without interrupting existing
+connections.
 
 =head2 C<unlock_cb>
 
@@ -1091,7 +1095,7 @@ Callback to be invoked if an error event happens on the connection.
 
     my $port = $loop->generate_port;
 
-Find a free TCP port.
+Find a free TCP port, this is a utility function primarily used for tests.
 
 =head2 C<hup_cb>
 
@@ -1158,12 +1162,26 @@ Path to the TLS key file.
     my $info = $loop->local_info($id);
 
 Get local information about a connection.
+These values are to be expected in the returned hash reference.
+
+=over 4
+
+=item C<address>
+
+The local address.
+
+=item C<port>
+
+The local port.
+
+=back
 
 =head2 C<not_writing>
 
     $loop->not_writing($id);
 
 Activate read only mode for a connection.
+Note that connections have no mode after they are created.
 
 =head2 C<read_cb>
 
@@ -1171,17 +1189,35 @@ Activate read only mode for a connection.
 
 Callback to be invoked if new data arrives on the connection.
 
+    $loop->read_cb($id => sub {
+        my ($loop, $id, $chunk) = @_;
+    });
+
 =head2 C<remote_info>
 
     my $info = $loop->remote_info($id);
 
 Get remote information about a connection.
+These values are to be expected in the returned hash reference.
+
+=over 4
+
+=item C<address>
+
+The remote address.
+
+=item C<port>
+
+The remote port.
+
+=back
 
 =head2 C<singleton>
 
     my $loop = Mojo::IOLoop->singleton;
 
-The global loop object.
+The global loop object, used to access a single shared loop instance from
+everywhere inside the process.
 
 =head2 C<start>
 
@@ -1194,7 +1230,8 @@ immediately if the loop is already running.
 
     $loop->stop;
 
-Stop the loop immediately.
+Stop the loop immediately, this will not interrupt any existing connections
+and the loop can be restarted by running C<start> again.
 
 =head2 C<timer>
 
@@ -1229,7 +1266,7 @@ Interval in seconds to run timer recurringly.
 
 Callback to be invoked if new data can be written to the connection.
 The callback should return a chunk of data which will be buffered inside the
-loop to guarantee save writing.
+loop to guarantee safe writing.
 
     $loop->write_ab($id => sub {
         my ($loop, $id) = @_;
@@ -1241,5 +1278,6 @@ loop to guarantee save writing.
     $loop->writing($id);
 
 Activate read/write mode for a connection.
+Note that connections have no mode after they are created.
 
 =cut

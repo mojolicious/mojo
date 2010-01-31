@@ -220,8 +220,8 @@ It was simple enough to get started without knowing much about the language
 and powerful enough to keep you going, learning by doing was much fun.
 While most of the techniques used are outdated now, the idea behind it is
 not.
-L<Mojo> is a new attempt at implementing this idea using state of the art
-technology.
+L<Mojolicious> is a new attempt at implementing this idea using state of the
+art technology.
 
 =head2 Features
 

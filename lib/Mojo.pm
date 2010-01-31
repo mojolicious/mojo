@@ -35,7 +35,6 @@ __PACKAGE__->attr(
             # Handshake response
             my $res = $tx->res;
             $res->code(101);
-            $res->message('Web Socket Protocol Handshake');
             $res->headers->upgrade('WebSocket');
             $res->headers->connection('Upgrade');
             my $scheme =

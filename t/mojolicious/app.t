@@ -35,7 +35,8 @@ $t->get_ok('/syntax_error/foo')->status_is(500)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/Missing right curly/);
 
-# Foo::exceptionduringpausedtransaction (syntax error in controller during paused transaction)
+# Foo::exceptionduringpausedtransaction
+# (syntax error in controller during paused transaction)
 $t->get_ok('/foo/exceptionduringpausedtransaction')->status_is(500)
   ->header_is(Server         => 'Mojo (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')

@@ -216,19 +216,22 @@ sub _build_pipeline {
             if ($p->is_finished) {
 
                 # Successful WebSocket upgrade?
-                my $websocket =
+                my $upgraded =
                   ($c->{websocket} && $c->{websocket}->res->code eq '101')
                   ? 1
                   : 0;
 
                 # Close connection
-                if (!$c->{pipeline}->keep_alive && !$websocket) {
+                if (!$c->{pipeline}->keep_alive && !$upgraded) {
                     $self->_drop($id);
                     $self->ioloop->drop($id);
                 }
 
-                # End pipeline
-                else { delete $c->{pipeline} }
+                # Cleanup connection
+                else {
+                    delete $c->{pipeline};
+                    delete $c->{websocket} unless $upgraded;
+                }
             }
 
             # Writing?

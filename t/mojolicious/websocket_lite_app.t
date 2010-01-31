@@ -11,7 +11,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 5;
+plan tests => 8;
 
 # Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
 # Well, that’s love for you.
@@ -19,7 +19,7 @@ use Mojolicious::Lite;
 use Mojo::Client;
 
 # Silence
-app->log->level('error');
+app->log->level('fatal');
 
 # WebSocket /
 websocket '/' => sub {
@@ -32,6 +32,9 @@ websocket '/' => sub {
         }
     );
 };
+
+# WebSocket /dead
+websocket '/dead' => sub { die 'i see dead processes' };
 
 # WebSocket /foo
 websocket '/foo' => sub { shift->res->code('403')->message("i'm a teapot") };
@@ -50,6 +53,16 @@ $client->websocket(
             }
         );
         $self->send_message('test1');
+    }
+)->process;
+
+# WebSocket /dead (dies)
+$client->websocket(
+    '/dead' => sub {
+        my $self = shift;
+        is($self->tx->is_websocket, 0);
+        is($self->res->code,        500);
+        is($self->res->message,     'Internal Server Error');
     }
 )->process;
 

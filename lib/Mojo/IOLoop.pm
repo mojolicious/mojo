@@ -12,6 +12,7 @@ use Carp 'croak';
 use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
 use IO::Socket;
 use Mojo::ByteStream;
+use Socket qw/IPPROTO_TCP TCP_NODELAY/;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 8192;
 
@@ -100,6 +101,9 @@ sub connect {
 
     # Non blocking
     $socket->blocking(0);
+
+    # Disable Nagle's algorithm
+    setsockopt $socket, IPPROTO_TCP, TCP_NODELAY, 1;
 
     # Add connection
     $self->_connections->{$id} = {
@@ -224,7 +228,8 @@ sub listen {
     my $id = "$socket";
 
     # Add listen socket
-    $self->_listen->{$id} = {socket => $socket, cb => $args->{cb}};
+    $self->_listen->{$id} =
+      {cb => $args->{cb}, file => $args->{file} ? 1 : 0, socket => $socket};
 
     # File descriptor
     my $fd = fileno $socket;
@@ -395,6 +400,10 @@ sub _accept {
             cb    => sub { shift->_error($id, 'Accept timeout.') }
         )
     );
+
+    # Disable Nagle's algorithm
+    setsockopt($socket, IPPROTO_TCP, TCP_NODELAY, 1)
+      unless $self->_listen->{$listen}->{file};
 
     # File descriptor
     my $fd = fileno $socket;

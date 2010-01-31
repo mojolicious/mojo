@@ -975,6 +975,14 @@ dropped, defaults to C<5>.
 
 A locking callback that decides if this loop is allowed to listen for new
 incoming connections, used to sync multiple server processes.
+The callback should return true or false.
+
+    $loop->lock_cb(sub {
+        my $loop = shift;
+
+        # Got the lock, listen for new connections
+        return 1;
+    });
 
 =head2 C<max_connections>
 

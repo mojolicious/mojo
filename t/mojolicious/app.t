@@ -11,7 +11,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 136;
+plan tests => 141;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -34,6 +34,12 @@ $t->get_ok('/syntax_error/foo')->status_is(500)
   ->header_is(Server         => 'Mojo (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/Missing right curly/);
+
+# Foo::exceptionduringpausedtransaction (syntax error in controller during paused transaction)
+$t->get_ok('/foo/exceptionduringpausedtransaction')->status_is(500)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_like(qr/Exception/);
 
 # Foo::syntaxerror (syntax error in template)
 $t->get_ok('/foo/syntaxerror')->status_is(500)

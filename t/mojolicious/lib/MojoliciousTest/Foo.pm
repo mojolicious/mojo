@@ -53,6 +53,8 @@ sub syntaxerror {
     shift->render('syntaxerror', format => 'html', handler => 'epl');
 }
 
+sub exceptionduringpausedtransaction { shift->pause; die 'Exception'; }
+
 sub templateless { shift->render(handler => 'test') }
 
 sub test {

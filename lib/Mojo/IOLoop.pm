@@ -971,7 +971,7 @@ dropped, defaults to C<5>.
 =head2 C<lock_cb>
 
     my $cb = $loop->lock_cb;
-    $loop  = $loop->lock_cb(sub { ... });
+    $loop  = $loop->lock_cb(sub {...});
 
 A locking callback that decides if this loop is allowed to listen for new
 incoming connections, used to sync multiple server processes.
@@ -998,7 +998,7 @@ connections.
 =head2 C<unlock_cb>
 
     my $cb = $loop->unlock_cb;
-    $loop  = $loop->unlock_cb(sub { ... });
+    $loop  = $loop->unlock_cb(sub {...});
 
 A callback to free the listen lock, called after accepting a new connection
 and used to sync multiple server processes.
@@ -1095,7 +1095,7 @@ data in it's write buffer.
 
 =head2 C<error_cb>
 
-    $loop = $loop->error_cb($id => sub { ... });
+    $loop = $loop->error_cb($id => sub {...});
 
 Callback to be invoked if an error event happens on the connection.
 
@@ -1107,7 +1107,7 @@ Find a free TCP port, this is a utility function primarily used for tests.
 
 =head2 C<hup_cb>
 
-    $loop = $loop->hup_cb($id => sub { ... });
+    $loop = $loop->hup_cb($id => sub {...});
 
 Callback to be invoked if the connection gets closed.
 
@@ -1196,12 +1196,14 @@ Note that connections have no mode after they are created.
 
 =head2 C<read_cb>
 
-    $loop = $loop->read_cb($id => sub { ... });
+    $loop = $loop->read_cb($id => sub {...});
 
 Callback to be invoked if new data arrives on the connection.
 
     $loop->read_cb($id => sub {
         my ($loop, $id, $chunk) = @_;
+
+        # Process chunk
     });
 
 =head2 C<remote_info>
@@ -1276,7 +1278,7 @@ Interval in seconds to run timer recurringly.
 
 =head2 C<write_cb>
 
-    $loop = $loop->write_cb($id => sub { ... });
+    $loop = $loop->write_cb($id => sub {...});
 
 Callback to be invoked if new data can be written to the connection.
 The callback should return a chunk of data which will be buffered inside the

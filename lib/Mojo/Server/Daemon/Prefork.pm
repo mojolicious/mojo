@@ -314,7 +314,7 @@ sub _spawn_child {
         # Parent will send a HUP signal when there are too many children idle
         my $done = 0;
         $SIG{HUP} = sub {
-            $self->ioloop->shutdown;
+            $self->ioloop->max_connections(0);
             $done++;
         };
 

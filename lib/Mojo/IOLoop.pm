@@ -287,9 +287,6 @@ sub remote_info {
     return {address => $socket->peerhost, port => $socket->peerport};
 }
 
-# Slowly shutdown and don't accept new connections
-sub shutdown { shift->max_connections(0) }
-
 sub singleton { $LOOP ||= shift->new(@_) }
 
 sub start {
@@ -983,6 +980,8 @@ incoming connections, used to sync multiple server processes.
 
 The maximum number of connections this loop is allowed to handle before
 stopping to accept new incoming connections, defaults to C<1000>.
+Setting this value to C<0> will make this loop stop accepting new connections
+and allow it to shutdown gracefully without interrupting existing ones.
 
 =head2 C<unlock_cb>
 
@@ -1178,13 +1177,6 @@ Callback to be invoked if new data arrives on the connection.
 
 Get remote information about a connection.
 
-=head2 C<shutdown>
-
-    $loop->shutdown;
-
-Stop the loop gracefully by not accepting any new connections but not
-interrupting existing ones.
-
 =head2 C<singleton>
 
     my $loop = Mojo::IOLoop->singleton;
@@ -1195,7 +1187,8 @@ The global loop object.
 
     $loop->start;
 
-Start the loop, this will block until the loop is finished.
+Start the loop, this will block until the loop is finished or return
+immediately if the loop is already running.
 
 =head2 C<stop>
 
@@ -1235,6 +1228,13 @@ Interval in seconds to run timer recurringly.
     $loop = $loop->write_cb($id => sub { ... });
 
 Callback to be invoked if new data can be written to the connection.
+The callback should return a chunk of data which will be buffered inside the
+loop to guarantee save writing.
+
+    $loop->write_ab($id => sub {
+        my ($loop, $id) = @_;
+        return 'Data to be buffered by the loop!';
+    });
 
 =head2 C<writing>
 

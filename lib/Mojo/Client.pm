@@ -375,7 +375,7 @@ sub _drop {
 
     # Connection close
     else {
-        $self->ioloop->finish($id);
+        $self->ioloop->drop($id);
         $self->_withdraw($id);
     }
 

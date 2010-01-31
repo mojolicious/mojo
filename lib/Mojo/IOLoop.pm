@@ -137,90 +137,17 @@ sub connection_timeout {
 sub drop {
     my ($self, $id) = @_;
 
-    # Drop timer?
-    if ($self->_timers->{$id}) {
-
-        # Connection for timer
-        my $cid = $self->_timers->{$id}->{connection};
-
-        # Connection exists?
-        if (my $c = $self->_connections->{$cid}) {
-
-            # Cleanup
-            my @timers;
-            for my $timer (@{$c->{timers}}) {
-                next if $timer eq $id;
-                push @timers, $timer;
-            }
-            $c->{timers} = \@timers;
-        }
-
-        # Drop
-        delete $self->_timers->{$id};
+    # Finish connection once buffer is empty
+    if (my $c = $self->_connections->{$id}) {
+        $self->_connections->{$id}->{finish} = 1;
         return $self;
     }
 
-    # Delete connection
-    my $c = delete $self->_connections->{$id};
-
-    # Drop listen socket?
-    if (!$c && ($c = delete $self->_listen->{$id})) {
-
-        # Not listening
-        return $self unless $self->_listening;
-
-        # Not listening anymore
-        $self->_listening(0);
-    }
-
-    # Drop socket?
-    if (my $socket = $c->{socket}) {
-
-        # Cleanup timers
-        if (my $timers = $c->{timers}) {
-            for my $tid (@$timers) { $self->drop($tid) }
-        }
-
-        # Remove file descriptor
-        my $fd = fileno $socket;
-        delete $self->_fds->{$fd};
-
-        # Shortcut
-        return $self unless $self->_loop;
-
-        # Remove socket from kqueue
-        if (KQUEUE) {
-
-            # Writing?
-            my $writing = $c->{writing};
-            $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_READ(),
-                IO::KQueue::EV_DELETE())
-              if defined $writing;
-            $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_WRITE(),
-                IO::KQueue::EV_DELETE())
-              if $writing;
-        }
-
-        # Remove socket from poll or epoll
-        else { $self->_loop->remove($socket) }
-
-        # Close socket
-        close $socket;
-    }
-
-    return $self;
+    # Drop
+    return $self->_drop($id);
 }
 
 sub error_cb { shift->_add_event('error', @_) }
-
-sub finish {
-    my ($self, $id) = @_;
-
-    # Finish connection once buffer is empty
-    $self->_connections->{$id}->{finish} = 1;
-
-    return $self;
-}
 
 sub generate_port {
     my $self = shift;
@@ -513,7 +440,7 @@ sub _accepting {
     delete $c->{accepting};
 
     # Remove timeout
-    $self->drop(delete $c->{accept_timer});
+    $self->_drop(delete $c->{accept_timer});
 
     # Non blocking
     $c->{socket}->blocking(0);
@@ -549,11 +476,88 @@ sub _connecting {
     delete $c->{connecting};
 
     # Remove timeout
-    $self->drop(delete $c->{connect_timer});
+    $self->_drop(delete $c->{connect_timer});
 
     # Connect callback
     my $cb = $c->{connect_cb};
     $self->$cb($id) if $cb;
+}
+
+sub _drop {
+    my ($self, $id) = @_;
+
+    # Drop timer?
+    if ($self->_timers->{$id}) {
+
+        # Connection for timer
+        my $cid = $self->_timers->{$id}->{connection};
+
+        # Connection exists?
+        if (my $c = $self->_connections->{$cid}) {
+
+            # Cleanup
+            my @timers;
+            for my $timer (@{$c->{timers}}) {
+                next if $timer eq $id;
+                push @timers, $timer;
+            }
+            $c->{timers} = \@timers;
+        }
+
+        # Drop
+        delete $self->_timers->{$id};
+        return $self;
+    }
+
+    # Delete connection
+    my $c = delete $self->_connections->{$id};
+
+    # Drop listen socket?
+    if (!$c && ($c = delete $self->_listen->{$id})) {
+
+        # Not listening
+        return $self unless $self->_listening;
+
+        # Not listening anymore
+        $self->_listening(0);
+    }
+
+    # Drop socket?
+    if (my $socket = $c->{socket}) {
+
+        # Cleanup timers
+        if (my $timers = $c->{timers}) {
+            for my $tid (@$timers) { $self->_drop($tid) }
+        }
+
+        # Remove file descriptor
+        my $fd = fileno $socket;
+        delete $self->_fds->{$fd};
+
+        # Shortcut
+        return $self unless $self->_loop;
+
+        # Remove socket from kqueue
+        if (KQUEUE) {
+
+            # Writing?
+            my $writing = $c->{writing};
+            $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_READ(),
+                IO::KQueue::EV_DELETE())
+              if defined $writing;
+            $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_WRITE(),
+                IO::KQueue::EV_DELETE())
+              if $writing;
+        }
+
+        # Remove socket from poll or epoll
+        else { $self->_loop->remove($socket) }
+
+        # Close socket
+        close $socket;
+    }
+
+    return $self;
 }
 
 sub _error {
@@ -563,7 +567,7 @@ sub _error {
     my $event = $self->_connections->{$id}->{error};
 
     # Cleanup
-    $self->drop($id);
+    $self->_drop($id);
 
     # No event
     return unless $event;
@@ -582,7 +586,7 @@ sub _hup {
     my $event = $self->_connections->{$id}->{hup};
 
     # Cleanup
-    $self->drop($id);
+    $self->_drop($id);
 
     # No event
     return unless $event;
@@ -616,7 +620,7 @@ sub _prepare {
         $self->_connecting($id) if $c->{connecting};
 
         # Drop if buffer is empty
-        $self->drop($id) and next
+        $self->_drop($id) and next
           if $c->{finish} && (!$c->{buffer} || !$c->{buffer}->size);
 
         # Read only
@@ -805,7 +809,8 @@ sub _timing {
         }
 
         # Continue?
-        $self->drop($id) unless defined $t->{after} || defined $t->{interval};
+        $self->_drop($id)
+          unless defined $t->{after} || defined $t->{interval};
     }
 }
 
@@ -1074,19 +1079,14 @@ dropped.
     $loop = $loop->drop($id);
 
 Drop a connection, listen socket or timer immediately.
+Connections will be dropped gracefully by allowing them to finish writing all
+data in it's write buffer.
 
 =head2 C<error_cb>
 
     $loop = $loop->error_cb($id => sub { ... });
 
 Callback to be invoked if an error event happens on the connection.
-
-=head2 C<finish>
-
-    $loop = $loop->finish($id);
-
-Drop a connection gracefully by allowing it to finish writing all data in
-it's write buffer.
 
 =head2 C<generate_port>
 

@@ -218,7 +218,7 @@ sub _build_pipeline {
                 # Close connection
                 if (!$c->{pipeline}->keep_alive && !$c->{websocket}) {
                     $self->_drop($id);
-                    $self->ioloop->finish($id);
+                    $self->ioloop->drop($id);
                 }
 
                 # End pipeline
@@ -299,7 +299,7 @@ sub _build_tx {
                     # Finish
                     if ($ws->is_finished) {
                         $self->_drop($id);
-                        $self->ioloop->finish($id);
+                        $self->ioloop->drop($id);
                     }
 
                     # Writing?

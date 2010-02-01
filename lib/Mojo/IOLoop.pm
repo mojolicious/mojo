@@ -586,7 +586,7 @@ sub _error {
     $self->_event($event, $id, $error);
 }
 
-# Failed events should not kill the daemon
+# Failed events should not kill everything
 sub _event {
     my $self  = shift;
     my $event = shift;

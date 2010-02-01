@@ -240,7 +240,8 @@ sub listen {
 
 sub local_info {
     my ($self, $id) = @_;
-    my $socket = $self->_connections->{$id}->{socket};
+    return {} unless my $c      = $self->_connections->{$id};
+    return {} unless my $socket = $c->{socket};
     return {address => $socket->sockhost, port => $socket->sockport};
 }
 
@@ -288,7 +289,8 @@ sub read_cb { shift->_add_event('read', @_) }
 
 sub remote_info {
     my ($self, $id) = @_;
-    my $socket = $self->_connections->{$id}->{socket};
+    return {} unless my $c      = $self->_connections->{$id};
+    return {} unless my $socket = $c->{socket};
     return {address => $socket->peerhost, port => $socket->peerport};
 }
 

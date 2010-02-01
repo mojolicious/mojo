@@ -143,6 +143,9 @@ sub render {
 sub render_exception {
     my ($self, $e) = @_;
 
+    # Resume for exceptions
+    $self->resume if $self->tx->is_paused;
+
     # Render exception template
     my $options = {
         template  => 'exception',

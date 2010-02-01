@@ -413,10 +413,10 @@ sub _accept {
 
     # Accept callback
     my $cb = $self->_listen->{$listen}->{cb};
-    $self->_event($cb, $id) if $cb;
+    $self->_event('accept', $cb, $id) if $cb;
 
-    # Unlock
-    $self->_event($self->unlock_cb);
+    # Unlock callback
+    $self->_callback('unlock', $self->unlock_cb);
 
     # Remove listen sockets
     for my $lid (keys %{$self->_listen}) {
@@ -472,6 +472,21 @@ sub _add_event {
     return $self;
 }
 
+# Failed callbacks should not kill everything
+sub _callback {
+    my $self  = shift;
+    my $event = shift;
+    my $cb    = shift;
+
+    # Invoke callback
+    my $value = eval { $self->$cb(@_) };
+
+    # Callback error
+    warn qq/Callback "$event" failed: $@/ if $@;
+
+    return $value;
+}
+
 sub _connecting {
     my ($self, $id) = @_;
 
@@ -489,7 +504,7 @@ sub _connecting {
 
     # Connect callback
     my $cb = $c->{connect_cb};
-    $self->_event($cb, $id) if $cb;
+    $self->_event('connect', $cb, $id) if $cb;
 }
 
 sub _drop {
@@ -585,15 +600,27 @@ sub _error {
     $error ||= 'Unknown error, connection closed.';
 
     # Error callback
-    $self->_event($event, $id, $error);
+    $self->_event('error', $event, $id, $error);
 }
 
 # Failed events should not kill everything
 sub _event {
     my $self  = shift;
     my $event = shift;
-    my $value = eval { $self->$event(@_) };
-    warn "Event failed: $@" if $@;
+    my $cb    = shift;
+    my $id    = shift;
+
+    # Invoke callback
+    my $value = eval { $self->$cb($id, @_) };
+
+    # Event error
+    if ($@) {
+        my $message = qq/Event "$event" failed for connection "$id": $@/;
+        ($event eq 'error' || $event eq 'timer')
+          ? ($self->_drop($id) and warn $message)
+          : $self->_error($id, $message);
+    }
+
     return $value;
 }
 
@@ -610,7 +637,7 @@ sub _hup {
     return unless $event;
 
     # HUP callback
-    $self->_event($event, $id);
+    $self->_event('hup', $event, $id);
 }
 
 sub _is_listening {
@@ -618,7 +645,8 @@ sub _is_listening {
     return 1
       if keys %{$self->_listen}
           && keys %{$self->_connections} < $self->max_connections
-          && $self->_event($self->lock_cb, !keys %{$self->_connections});
+          && $self->_callback('lock', $self->lock_cb,
+              !keys %{$self->_connections});
     return 0;
 }
 
@@ -691,7 +719,7 @@ sub _read {
 
     # Callback
     my $event = $c->{read};
-    $self->_event($event, $id, $buffer) if $event;
+    $self->_event('read', $event, $id, $buffer) if $event;
 
     # Active
     $self->_active($id);
@@ -822,7 +850,7 @@ sub _timing {
 
         # Callback
         if ((my $cb = $t->{cb}) && $run) {
-            $self->_event($cb, "$t", $t->{connection});
+            $self->_event('timer', $cb, $t->{connection}, "$t");
             $t->{last} = time;
         }
 
@@ -851,7 +879,7 @@ sub _write {
         last unless my $event = $c->{write};
 
         # Write callback
-        my $chunk = $self->_event($event, $id);
+        my $chunk = $self->_event('write', $event, $id);
 
         # Done for now
         last unless defined $chunk && length $chunk;
@@ -947,7 +975,7 @@ Mojo::IOLoop - IO Loop
 
     # Add a timer
     $loop->timer($id => (after => 5, cb => sub {
-        my ($self, $tid, $cid) = @_;
+        my ($self, $cid, $tid) = @_;
         $self->drop($cid);
     }));
 

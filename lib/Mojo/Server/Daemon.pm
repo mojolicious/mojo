@@ -333,8 +333,8 @@ sub _drop {
 sub _error {
     my ($self, $loop, $id, $error) = @_;
 
-    # Log error
-    $self->app->log->error("Daemon error: $error");
+    # Log error in debug mode
+    $self->app->log->debug("Daemon error: $error");
 
     # Drop
     $self->_drop($id);

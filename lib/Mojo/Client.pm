@@ -398,8 +398,8 @@ sub _error {
         $tx->error($error);
     }
 
-    # Log error
-    $SERVER->app->log->error("Client error: $error") if $SERVER;
+    # Log error in debug mode
+    $SERVER->app->log->debug("Client error: $error") if $SERVER;
 
     # Finish
     $self->_finish($id);

@@ -59,21 +59,7 @@ sub receive_message {
     my $cb = shift;
 
     # Receive
-    $self->tx->receive_message(
-        sub {
-            my $tx = shift;
-
-            # Callback
-            eval { $self->$cb(@_) };
-
-            # Callback failed, finish WebSocket
-            if ($@) {
-                $self->app->log->error(
-                    "Receiving WebSocket message failed: $@");
-                $self->finish;
-            }
-        }
-    );
+    $self->tx->receive_message(sub { shift and $self->$cb(@_) });
 }
 
 sub redirect_to {

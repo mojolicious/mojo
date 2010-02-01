@@ -33,6 +33,9 @@ __PACKAGE__->attr(_cache       => sub { [] });
 __PACKAGE__->attr(_connections => sub { {} });
 __PACKAGE__->attr([qw/_finite _queued/] => 0);
 
+# Singleton
+our $CLIENT;
+
 # Global application, port and server for testing
 my ($APP, $PORT, $SERVER);
 
@@ -206,6 +209,8 @@ sub receive_message {
 
 sub req { shift->tx->req(@_) }
 sub res { shift->tx->res(@_) }
+
+sub singleton { $CLIENT ||= shift->new(@_) }
 
 sub send_message {
     my $self = shift;
@@ -946,7 +951,8 @@ following new ones.
     my $client = Mojo::Client->new;
 
 Construct a new L<Mojo::Client> object.
-As usual, you can pass any of the attributes above to the constructor.
+Use C<singleton> if you want to share keep alive connections and cookies with
+other clients
 
 =head2 C<app>
 
@@ -1083,6 +1089,13 @@ callbacks.
 
 The response object of the last finished transaction, only available from
 callbacks.
+
+=head2 C<singleton>
+
+    my $client = Mojo::Client->singleton;
+
+The global client object, used to access a single shared client instance from
+everywhere inside the process.
 
 =head2 C<send_message>
 

@@ -24,7 +24,7 @@ __PACKAGE__->attr(
           }
     }
 );
-__PACKAGE__->attr(client => sub { Mojo::Client->new });
+__PACKAGE__->attr(client => sub { Mojo::Client->singleton });
 __PACKAGE__->attr(home   => sub { Mojo::Home->new });
 __PACKAGE__->attr(log    => sub { Mojo::Log->new });
 __PACKAGE__->attr(

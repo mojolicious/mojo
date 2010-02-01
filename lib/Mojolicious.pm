@@ -97,9 +97,9 @@ sub dispatch {
     $self->plugins->run_hook(before_dispatch => $c);
 
     # New request
-    my $path = $c->req->url->path;
-    $path ||= '/';
-    $self->log->debug(qq/*** Request for "$path". ***/);
+    my $path = $c->req->url->path           || '/';
+    my $ua   = $c->req->headers->user_agent || 'Anonymojo';
+    $self->log->debug(qq/*** Request for "$path" from "$ua". ***/);
 
     # Try to find a static file
     my $e = $self->static->dispatch($c);

@@ -410,10 +410,11 @@ sub _accept {
     $self->_fds->{$fd} = $id;
 
     # Accept callback
-    $self->_listen->{$listen}->{cb}->($self, $id);
+    my $cb = $self->_listen->{$listen}->{cb};
+    $self->_event($cb, $id) if $cb;
 
     # Unlock
-    $self->unlock_cb->($self);
+    $self->_event($self->unlock_cb);
 
     # Remove listen sockets
     for my $lid (keys %{$self->_listen}) {
@@ -486,7 +487,7 @@ sub _connecting {
 
     # Connect callback
     my $cb = $c->{connect_cb};
-    $self->$cb($id) if $cb;
+    $self->_event($cb, $id) if $cb;
 }
 
 sub _drop {
@@ -582,7 +583,16 @@ sub _error {
     $error ||= 'Unknown error, connection closed.';
 
     # Error callback
-    $self->$event($id, $error);
+    $self->_event($event, $id, $error);
+}
+
+# Failed events should not kill the daemon
+sub _event {
+    my $self  = shift;
+    my $event = shift;
+    my $value = eval { $self->$event(@_) };
+    warn "Event failed: $@" if $@;
+    return $value;
 }
 
 sub _hup {
@@ -598,7 +608,7 @@ sub _hup {
     return unless $event;
 
     # HUP callback
-    $self->$event($id);
+    $self->_event($event, $id);
 }
 
 sub _is_listening {
@@ -606,7 +616,7 @@ sub _is_listening {
     return 1
       if keys %{$self->_listen}
           && keys %{$self->_connections} < $self->max_connections
-          && $self->lock_cb->($self, !keys %{$self->_connections});
+          && $self->_event($self->lock_cb, !keys %{$self->_connections});
     return 0;
 }
 
@@ -679,7 +689,7 @@ sub _read {
 
     # Callback
     my $event = $c->{read};
-    $self->$event($id, $buffer) if $event;
+    $self->_event($event, $id, $buffer) if $event;
 
     # Active
     $self->_active($id);
@@ -810,7 +820,7 @@ sub _timing {
 
         # Callback
         if ((my $cb = $t->{cb}) && $run) {
-            $self->$cb("$t", $t->{connection});
+            $self->_event($cb, "$t", $t->{connection});
             $t->{last} = time;
         }
 
@@ -839,7 +849,7 @@ sub _write {
         last unless my $event = $c->{write};
 
         # Write callback
-        my $chunk = $self->$event($id);
+        my $chunk = $self->_event($event, $id);
 
         # Done for now
         last unless defined $chunk && length $chunk;

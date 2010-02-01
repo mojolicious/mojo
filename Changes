@@ -67,6 +67,7 @@ This file documents the revision history for Perl extension Mojo.
         - Made all Mojolicious after_* plugin hooks run in reverse order.
         - Made param decoding more defensive and allow malformed data to pass
           through for debugging.
+        - Made Mojo::IOLoop very hard to kill.
         - Reduced Mojolicious log output outside of development mode.
         - Polished Mojo::Client api.
         - Fixed connect error handling in Mojo::Client.

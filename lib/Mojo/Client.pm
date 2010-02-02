@@ -328,6 +328,71 @@ sub _build_tx {
 }
 
 sub _connect {
+    my ($self, $tx, $cb) = @_;
+
+    # Info
+    my $info    = $tx->client_info;
+    my $address = $info->{address};
+    my $port    = $info->{port};
+    my $scheme  = $info->{scheme};
+
+    # Cached connection
+    my $id;
+    if ($id = $self->_withdraw("$scheme:$address:$port")) {
+
+        # Writing
+        $self->ioloop->writing($id);
+
+        # Kept alive
+        $tx->kept_alive(1);
+
+        # Add new connection
+        $self->_connections->{$id} = {cb => $cb, tx => $tx};
+
+        # Connected
+        $self->_connected($id);
+    }
+
+    # New connection
+    else {
+
+        # Connect
+        $id = $self->ioloop->connect(
+            cb => sub {
+                my ($loop, $id) = @_;
+
+                # Connected
+                $self->_connected($id);
+            },
+            address => $address,
+            port    => $port,
+            tls     => $scheme eq 'https' ? 1 : 0,
+            tls_ca_file => $self->tls_ca_file || $ENV{MOJO_CA_FILE},
+            tls_verify_cb => $self->tls_verify_cb
+        );
+
+        # Error
+        unless (defined $id) {
+            $tx->error("Couldn't create connection.");
+            $cb ||= $self->default_cb;
+            $self->$cb($tx) if $cb;
+            return;
+        }
+
+        # Callbacks
+        $self->ioloop->error_cb($id => sub { $self->_error(@_) });
+        $self->ioloop->hup_cb($id => sub { $self->_hup(@_) });
+        $self->ioloop->read_cb($id => sub { $self->_read(@_) });
+        $self->ioloop->write_cb($id => sub { $self->_write(@_) });
+
+        # Add new connection
+        $self->_connections->{$id} = {cb => $cb, tx => $tx};
+    }
+
+    return $id;
+}
+
+sub _connected {
     my ($self, $id) = @_;
 
     # Transaction
@@ -465,12 +530,6 @@ sub _finish {
         $self->_drop($id) unless $tx && $c->{tx}->is_websocket;
     }
 
-    # Redirects
-    my $r = $c->{redirects} || 0;
-
-    # History
-    my $h = $c->{history} || [];
-
     # Transaction still in progress
     if ($tx) {
 
@@ -480,25 +539,8 @@ sub _finish {
         # Counter
         $self->_queued($self->_queued - 1) unless $c->{tx}->is_websocket;
 
-        # Redirect?
-        my $max = $self->max_redirects;
-        if ($r < $max && (my $new = $self->_redirect($tx))) {
-
-            # Queue redirected request
-            my $nid = $self->_queue($new, $c->{cb});
-
-            # Create new conenction
-            my $nc = $self->_connections->{$nid};
-            push @$h, $tx;
-            $nc->{history}   = $h;
-            $nc->{redirects} = $r + 1;
-
-            # Done
-            return;
-        }
-
-        # Callback
-        else {
+        # Done?
+        unless ($self->_redirect($c, $tx)) {
             my $cb = $c->{cb} || $self->default_cb;
             $tx = $c->{tx};
             local $self->{tx} = $tx;
@@ -592,64 +634,8 @@ sub _queue {
     # Cookies from the jar
     $self->_fetch_cookies($tx);
 
-    # Info
-    my $info    = $tx->client_info;
-    my $address = $info->{address};
-    my $port    = $info->{port};
-    my $scheme  = $info->{scheme};
-
-    # Cached connection
-    my $id;
-    if ($id = $self->_withdraw("$scheme:$address:$port")) {
-
-        # Writing
-        $self->ioloop->writing($id);
-
-        # Kept alive
-        $tx->kept_alive(1);
-
-        # Add new connection
-        $self->_connections->{$id} = {cb => $cb, tx => $tx};
-
-        # Connected
-        $self->_connect($id);
-    }
-
-    # New connection
-    else {
-
-        # Connect
-        $id = $self->ioloop->connect(
-            cb => sub {
-                my ($loop, $id) = @_;
-
-                # Connected
-                $self->_connect($id);
-            },
-            address => $address,
-            port    => $port,
-            tls     => $scheme eq 'https' ? 1 : 0,
-            tls_ca_file => $self->tls_ca_file || $ENV{MOJO_CA_FILE},
-            tls_verify_cb => $self->tls_verify_cb
-        );
-
-        # Error
-        unless (defined $id) {
-            $tx->error("Couldn't create connection.");
-            $cb ||= $self->default_cb;
-            $self->$cb($tx) if $cb;
-            return;
-        }
-
-        # Callbacks
-        $self->ioloop->error_cb($id => sub { $self->_error(@_) });
-        $self->ioloop->hup_cb($id => sub { $self->_hup(@_) });
-        $self->ioloop->read_cb($id => sub { $self->_read(@_) });
-        $self->ioloop->write_cb($id => sub { $self->_write(@_) });
-
-        # Add new connection
-        $self->_connections->{$id} = {cb => $cb, tx => $tx};
-    }
+    # Connect
+    return unless my $id = $self->_connect($tx, $cb);
 
     # State change callback
     $tx->state_cb(
@@ -693,7 +679,10 @@ sub _read {
 }
 
 sub _redirect {
-    my ($self, $tx) = @_;
+    my ($self, $c, $tx) = @_;
+
+    # Pipeline
+    return if $tx->is_pipeline;
 
     # Code
     return unless $tx->res->is_status_class('300');
@@ -706,12 +695,30 @@ sub _redirect {
     my $method = $tx->req->method;
     $method = 'GET' unless $method =~ /^GET|HEAD$/i;
 
+    # Max redirects?
+    my $r = $c->{redirects} || 0;
+    my $max = $self->max_redirects;
+    return unless $r < $max;
+
     # New transaction
     my $new = Mojo::Transaction::Single->new;
     $new->req->method($method);
     $new->req->url->parse($location);
 
-    return $new;
+    # History
+    my $h = $c->{history} || [];
+
+    # Queue redirected request
+    my $nid = $self->_queue($new, $c->{cb});
+
+    # Create new conenction
+    my $nc = $self->_connections->{$nid};
+    push @$h, $tx;
+    $nc->{history}   = $h;
+    $nc->{redirects} = $r + 1;
+
+    # Redirecting
+    return 1;
 }
 
 sub _store_cookies {

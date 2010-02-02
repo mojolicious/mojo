@@ -31,7 +31,7 @@ sub handler {
     $tx->res->code(200) unless $tx->is_websocket;
 
     # Dispatch to diagnostics functions
-    return $self->_diag($tx) if $tx->req->url->path =~ m|^/diag|;
+    return $self->_diag($tx) if index($tx->req->url->path, '/diag') == 0;
 
     # WebSocket?
     return if $tx->is_websocket;
@@ -44,24 +44,28 @@ sub handler {
 sub _diag {
     my ($self, $tx) = @_;
 
-    # Dispatch
+    # Path
     my $path = $tx->req->url->path;
-    $self->_chunked_params($tx)   if $path =~ m|^/diag/chunked_params|;
-    $self->_dump_env($tx)         if $path =~ m|^/diag/dump_env|;
-    $self->_dump_params($tx)      if $path =~ m|^/diag/dump_params|;
-    $self->_dump_tx($tx)          if $path =~ m|^/diag/dump_tx|;
-    $self->_dump_url($tx)         if $path =~ m|^/diag/dump_url|;
-    $self->_proxy($tx)            if $path =~ m|^/diag/proxy|;
-    return $self->_websocket($tx) if $path =~ m|^/diag/websocket|;
+    $path =~ s/^\/diag//;
+
+    # WebSocket
+    return $self->_websocket($tx) if $path =~ /^\/websocket/;
 
     # Defaults
     $tx->res->headers->content_type('text/plain')
       unless $tx->res->headers->content_type;
 
+    # Dispatch
+    return $self->_chunked_params($tx) if $path =~ /^\/chunked_params/;
+    return $self->_dump_env($tx)       if $path =~ /^\/dump_env/;
+    return $self->_dump_params($tx)    if $path =~ /^\/dump_params/;
+    return $self->_dump_tx($tx)        if $path =~ /^\/dump_tx/;
+    return $self->_dump_url($tx)       if $path =~ /^\/dump_url/;
+    return $self->_proxy($tx)          if $path =~ /^\/proxy/;
+
     # List
-    if ($path =~ m|^/diag[/]?$|) {
-        $tx->res->headers->content_type('text/html');
-        $tx->res->body(<<'EOF');
+    $tx->res->headers->content_type('text/html');
+    $tx->res->body(<<'EOF');
 <!doctype html><html>
     <head><title>Mojo Diagnostics</title></head>
     <body>
@@ -75,7 +79,6 @@ sub _diag {
     </body>
 </html>
 EOF
-    }
 }
 
 sub _chunked_params {

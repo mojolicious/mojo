@@ -909,7 +909,7 @@ __END__
 
 =head1 NAME
 
-Mojo::IOLoop - IO Loop
+Mojo::IOLoop - Minimalistic Event Loop For TCP Clients And Servers
 
 =head1 SYNOPSIS
 

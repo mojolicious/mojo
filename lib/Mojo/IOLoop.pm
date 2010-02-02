@@ -1027,7 +1027,7 @@ incoming connections, used to sync multiple server processes.
 The callback should return true or false.
 
     $loop->lock_cb(sub {
-        my $loop = shift;
+        my ($loop, $blocking) = @_;
 
         # Got the lock, listen for new connections
         return 1;
@@ -1139,7 +1139,7 @@ dropped.
 
     $loop = $loop->drop($id);
 
-Drop a connection, listen socket or timer immediately.
+Drop a connection, listen socket or timer.
 Connections will be dropped gracefully by allowing them to finish writing all
 data in it's write buffer.
 

@@ -832,7 +832,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Client - Client
+Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
 
 =head1 SYNOPSIS
 
@@ -848,7 +848,8 @@ Mojo::Client - Client
 
 =head1 DESCRIPTION
 
-L<Mojo::Client> is a full featured async io HTTP 1.1 client.
+L<Mojo::Client> is a full featured async io HTTP 1.1 and WebSocket client
+with C<IPv6>, C<TLS>, C<epoll> and C<kqueue> support.
 
 It implements the most common HTTP verbs.
 If you need something more custom you can create your own
@@ -856,6 +857,9 @@ L<Mojo::Transaction::Single> or L<Mojo::Trasaction::Pipeline> objects and
 C<queue> them.
 All of the verbs take an optional set of headers as a hash or hash reference,
 as well as an optional callback sub reference.
+
+Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::INET6> and
+L<IO::Socket::SSL> are supported transparently and used if installed.
 
 =head1 ATTRIBUTES
 

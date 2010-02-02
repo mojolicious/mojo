@@ -272,7 +272,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Content - HTTP Content Base Class
+Mojo::Content - HTTP 1.1 Content Base Class
 
 =head1 SYNOPSIS
 
@@ -280,7 +280,7 @@ Mojo::Content - HTTP Content Base Class
 
 =head1 DESCRIPTION
 
-L<Mojo::Content> is a HTTP content base class.
+L<Mojo::Content> is an abstract base class for HTTP 1.1 content.
 
 =head1 ATTRIBUTES
 

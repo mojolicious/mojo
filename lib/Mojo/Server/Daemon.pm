@@ -473,7 +473,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Server::Daemon - HTTP Server
+Mojo::Server::Daemon - Async IO HTTP 1.1 And WebSocket Server
 
 =head1 SYNOPSIS
 
@@ -485,7 +485,11 @@ Mojo::Server::Daemon - HTTP Server
 
 =head1 DESCRIPTION
 
-L<Mojo::Server::Daemon> is a simple and portable async io based HTTP server.
+L<Mojo::Server::Daemon> is a full featured async io HTTP 1.1 and WebSocket
+server with C<IPv6>, C<TLS>, C<epoll> and C<kqueue> support.
+
+Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::INET6> and
+L<IO::Socket::SSL> are supported transparently and used if installed.
 
 =head1 ATTRIBUTES
 

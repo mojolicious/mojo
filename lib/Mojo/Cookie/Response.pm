@@ -110,7 +110,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Cookie::Response - Response Cookies
+Mojo::Cookie::Response - HTTP 1.1 Response Cookie Container
 
 =head1 SYNOPSIS
 
@@ -124,7 +124,7 @@ Mojo::Cookie::Response - Response Cookies
 
 =head1 DESCRIPTION
 
-L<Mojo::Cookie::Response> is a generic container for HTTP response cookies.
+L<Mojo::Cookie::Response> is a container for HTTP 1.1 response cookies.
 
 =head1 ATTRIBUTES
 

@@ -338,7 +338,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Server::Daemon::Prefork - Prefork HTTP Server
+Mojo::Server::Daemon::Prefork - Preforking HTTP 1.1 And WebSocket Server
 
 =head1 SYNOPSIS
 
@@ -350,7 +350,12 @@ Mojo::Server::Daemon::Prefork - Prefork HTTP Server
 
 =head1 DESCRIPTION
 
-L<Mojo::Daemon::Prefork> is a simple prefork HTTP server.
+L<Mojo::Server::Daemon::Prefork> is a full featured preforking HTTP 1.1 and
+WebSocket server with C<IPv6>, C<TLS>, C<epoll>, C<kqueue> and optional async
+io support.
+
+Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::INET6> and
+L<IO::Socket::SSL> are supported transparently and used if installed.
 
 =head1 ATTRIBUTES
 

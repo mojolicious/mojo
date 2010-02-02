@@ -27,7 +27,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Filter - Filter Base Class
+Mojo::Filter - HTTP 1.1 Filter Base Class
 
 =head1 SYNOPSIS
 
@@ -35,7 +35,7 @@ Mojo::Filter - Filter Base Class
 
 =head1 DESCRIPTION
 
-L<Mojo::Filter> is an abstract base class for HTTP filters.
+L<Mojo::Filter> is an abstract base class for HTTP 1.1 filters.
 
 =head1 ATTRIBUTES
 

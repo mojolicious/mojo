@@ -240,7 +240,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Content::MultiPart - MultiPart Content
+Mojo::Content::MultiPart - HTTP 1.1 MultiPart Content Container
 
 =head1 SYNOPSIS
 
@@ -252,7 +252,7 @@ Mojo::Content::MultiPart - MultiPart Content
 
 =head1 DESCRIPTION
 
-L<Mojo::Content::MultiPart> is a container for HTTP multipart content.
+L<Mojo::Content::MultiPart> is a container for HTTP 1.1 multipart content.
 
 =head1 ATTRIBUTES
 

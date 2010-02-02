@@ -97,7 +97,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Content::Single - HTTP Content
+Mojo::Content::Single - HTTP 1.1 Content Container
 
 =head1 SYNOPSIS
 
@@ -108,7 +108,7 @@ Mojo::Content::Single - HTTP Content
 
 =head1 DESCRIPTION
 
-L<Mojo::Content::Single> is a container for HTTP content.
+L<Mojo::Content::Single> is a container for HTTP 1.1 content.
 
 =head1 ATTRIBUTES
 

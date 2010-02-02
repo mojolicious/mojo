@@ -30,7 +30,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Upload - Upload
+Mojo::Upload - Upload Container
 
 =head1 SYNOPSIS
 

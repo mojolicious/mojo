@@ -75,7 +75,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Cookie::Request - Request Cookies
+Mojo::Cookie::Request - HTTP 1.1 Request Cookie Container
 
 =head1 SYNOPSIS
 
@@ -89,7 +89,7 @@ Mojo::Cookie::Request - Request Cookies
 
 =head1 DESCRIPTION
 
-L<Mojo::Cookie::Request> is a generic container for HTTP request cookies.
+L<Mojo::Cookie::Request> is a container for HTTP 1.1 request cookies.
 
 =head1 ATTRIBUTES
 

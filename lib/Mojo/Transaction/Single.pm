@@ -482,7 +482,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Transaction::Single - HTTP Transaction Container
+Mojo::Transaction::Single - HTTP 1.1 Transaction Container
 
 =head1 SYNOPSIS
 
@@ -497,7 +497,7 @@ Mojo::Transaction::Single - HTTP Transaction Container
 
 =head1 DESCRIPTION
 
-L<Mojo::Transaction::Single> is a container for HTTP transactions.
+L<Mojo::Transaction::Single> is a container for HTTP 1.1 transactions.
 
 =head1 ATTRIBUTES
 

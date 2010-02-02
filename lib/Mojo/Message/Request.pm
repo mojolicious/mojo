@@ -357,7 +357,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Message::Request - Request
+Mojo::Message::Request - HTTP 1.1 Request Container
 
 =head1 SYNOPSIS
 
@@ -373,7 +373,7 @@ Mojo::Message::Request - Request
 
 =head1 DESCRIPTION
 
-L<Mojo::Message::Request> is a container for HTTP requests.
+L<Mojo::Message::Request> is a container for HTTP 1.1 requests.
 
 =head1 ATTRIBUTES
 

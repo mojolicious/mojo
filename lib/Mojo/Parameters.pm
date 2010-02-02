@@ -219,7 +219,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Parameters - Parameters
+Mojo::Parameters - Parameter Container
 
 =head1 SYNOPSIS
 

@@ -541,11 +541,11 @@ like that.
     %== Perl expression line, replaced with XML escaped result
     %# Comment line, useful for debugging
 
+L<Mojo::ByteStream> objects are excluded from automatic escaping.
 Whitespace characters around tags can be trimmed with a special tag ending.
 
     <%= All whitespace characters around this expression will be trimmed =%>
 
-L<Mojo::ByteStream> objects are excluded from automatic escaping.
 You can capture the result of a whole template block for reuse later.
 
     <%{ my $result = %>

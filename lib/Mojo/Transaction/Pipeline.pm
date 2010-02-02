@@ -378,7 +378,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Transaction::Pipeline - Pipelined HTTP Transaction Container
+Mojo::Transaction::Pipeline - Pipelined HTTP 1.1 Transaction Container
 
 =head1 SYNOPSIS
 
@@ -387,7 +387,7 @@ Mojo::Transaction::Pipeline - Pipelined HTTP Transaction Container
 
 =head1 DESCRIPTION
 
-L<Mojo::Transaction::Pipeline> is a container for pipelined HTTP
+L<Mojo::Transaction::Pipeline> is a container for pipelined HTTP 1.1
 transactions.
 
 =head1 ATTRIBUTES

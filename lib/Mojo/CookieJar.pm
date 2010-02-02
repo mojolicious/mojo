@@ -126,7 +126,7 @@ __END__
 
 =head1 NAME
 
-Mojo::CookieJar - CookieJar
+Mojo::CookieJar - Cookie Jar For HTTP 1.1 User Agents
 
 =head1 SYNOPSIS
 
@@ -135,7 +135,7 @@ Mojo::CookieJar - CookieJar
 
 =head1 DESCRIPTION
 
-L<Mojo::CookieJar> is a minimalistic cookie jar for HTTP user agents.
+L<Mojo::CookieJar> is a minimalistic cookie jar for HTTP 1.1 user agents.
 
 =head1 ATTRIBUTES
 

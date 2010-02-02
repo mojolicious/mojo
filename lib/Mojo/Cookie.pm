@@ -85,7 +85,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Cookie - Cookie Base Class
+Mojo::Cookie - HTTP 1.1 Cookie Base Class
 
 =head1 SYNOPSIS
 
@@ -93,7 +93,7 @@ Mojo::Cookie - Cookie Base Class
 
 =head1 DESCRIPTION
 
-L<Mojo::Cookie> is a cookie base class.
+L<Mojo::Cookie> is an abstract base class for HTTP 1.1 cookies.
 
 =head1 ATTRIBUTES
 

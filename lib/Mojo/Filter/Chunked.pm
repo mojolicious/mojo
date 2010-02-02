@@ -126,7 +126,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Filter::Chunked - Chunked Filter
+Mojo::Filter::Chunked - HTTP 1.1 Chunked Filter
 
 =head1 SYNOPSIS
 
@@ -146,7 +146,8 @@ Mojo::Filter::Chunked - Chunked Filter
 
 =head1 DESCRIPTION
 
-L<Mojo::Filter::Chunked> is a filter for the chunked transfer encoding.
+L<Mojo::Filter::Chunked> is a filter for the HTTP 1.1 chunked transfer
+encoding.
 
 =head1 ATTRIBUTES
 

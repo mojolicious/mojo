@@ -496,7 +496,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Message - Message Base Class
+Mojo::Message - HTTP 1.1 Message Base Class
 
 =head1 SYNOPSIS
 
@@ -504,7 +504,7 @@ Mojo::Message - Message Base Class
 
 =head1 DESCRIPTION
 
-L<Mojo::Message> is an abstract base class for HTTP messages.
+L<Mojo::Message> is an abstract base class for HTTP 1.1 messages.
 
 =head1 ATTRIBUTES
 

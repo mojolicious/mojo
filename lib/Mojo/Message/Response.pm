@@ -217,7 +217,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Message::Response - Response
+Mojo::Message::Response - HTTP 1.1 Response Container
 
 =head1 SYNOPSIS
 
@@ -234,7 +234,7 @@ Mojo::Message::Response - Response
 
 =head1 DESCRIPTION
 
-L<Mojo::Message::Response> is a container for HTTP responses.
+L<Mojo::Message::Response> is a container for HTTP 1.1 responses.
 
 =head1 ATTRIBUTES
 

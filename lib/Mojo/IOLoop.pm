@@ -254,9 +254,10 @@ sub not_writing {
     # Connection
     my $c = $self->_connections->{$id};
 
-    # Chunk still in buffer
+    # Chunk still in buffer or called from write event
     my $buffer = $c->{buffer};
-    return $c->{read_only} = 1 if $buffer && $buffer->size;
+    return $c->{read_only} = 1
+      if $c->{protected} || ($buffer && $buffer->size);
 
     # Socket
     return unless my $socket = $c->{socket};
@@ -879,7 +880,9 @@ sub _write {
         last unless my $event = $c->{write};
 
         # Write callback
+        $c->{protected} = 1;
         my $chunk = $self->_event('write', $event, $id);
+        delete $c->{protected};
 
         # Done for now
         last unless defined $chunk && length $chunk;

@@ -249,9 +249,7 @@ sub parse {
         last unless defined $line;
 
         # New header
-        if ($line =~ /^(\S+)\s*:\s*(.*)/) {
-            push @{$self->_buffer}, $1, $2;
-        }
+        if ($line =~ /^(\S+)\s*:\s*(.*)/) { push @{$self->_buffer}, $1, $2 }
 
         # Multiline
         elsif (@{$self->_buffer} && $line =~ s/^\s+//) {

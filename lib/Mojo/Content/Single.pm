@@ -12,8 +12,6 @@ use Mojo::Asset::File;
 use Mojo::Asset::Memory;
 use Mojo::Content::MultiPart;
 
-use constant MAX_MEMORY_SIZE => $ENV{MOJO_MAX_MEMORY_SIZE} || 10240;
-
 __PACKAGE__->attr(asset => sub { Mojo::Asset::Memory->new });
 
 sub body_contains {
@@ -54,7 +52,8 @@ sub parse {
     if ($self->asset->isa('Mojo::Asset::Memory')) {
         $self->asset(Mojo::Asset::File->new)
           if !$self->headers->content_length
-              || $self->headers->content_length > MAX_MEMORY_SIZE;
+              || $self->headers->content_length
+              > ($ENV{MOJO_MAX_MEMORY_SIZE} || 10240);
     }
 
     # Content needs to be upgraded to multipart

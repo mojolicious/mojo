@@ -61,6 +61,7 @@ This file documents the revision history for Perl extension Mojo.
         - Added POD renderer plugin to Mojolicious. (vti)
         - Added inflate command to Mojolicious. (vti, korshak)
         - Added singleton support to Mojo::Client.
+        - Improved HTTP 1.1 state machine.
         - Improved exception handling in Mojo::Client, Mojo::Server::Daemon
           and Mojo::IOLoop.
         - Disabled Nagle's algorithm in Mojo::IOLoop.
@@ -79,6 +80,7 @@ This file documents the revision history for Perl extension Mojo.
         - Fixed prefork daemon signal handling.
         - Fixed backslash encoding bug in Mojo::JSON.
         - Fixed memory leaks in Mojolicious plugins. (sharifulin)
+        - Fixed memory leaks in .ep templates. (vti)
         - Fixed makefile and app generators.
         - Fixed a case where an ending tag would be interpreted as a line
           start in Mojo::Template.

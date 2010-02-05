@@ -21,91 +21,6 @@ __PACKAGE__->attr(_started => sub {time});
 
 # What's a wedding?  Webster's dictionary describes it as the act of removing
 # weeds from one's garden.
-sub client_connected {
-    my $self = shift;
-
-    # Connection header
-    unless ($self->req->headers->connection) {
-        if ($self->keep_alive || $self->kept_alive) {
-            $self->req->headers->connection('Keep-Alive');
-        }
-        else {
-            $self->req->headers->connection('Close');
-        }
-    }
-
-    # We identify ourself
-    $self->req->headers->user_agent('Mozilla/5.0 (compatible; Mojo; Perl)')
-      unless $self->req->headers->user_agent;
-
-    # We might have to handle 100 Continue
-    $self->_continue($self->continue_timeout)
-      if ($self->req->headers->expect || '') =~ /100-continue/;
-
-    # Ready for next state
-    $self->state('write_start_line');
-    $self->_to_write($self->req->start_line_size);
-
-    return $self;
-}
-
-sub client_get_chunk {
-    my $self = shift;
-
-    my $chunk;
-
-    # Body
-    if ($self->is_state('write_body')) {
-        $chunk = $self->req->get_body_chunk($self->_offset);
-
-        # End
-        if (defined $chunk && !length $chunk) {
-            $self->state('read_response');
-            return;
-        }
-    }
-
-    # Headers
-    $chunk = $self->req->get_header_chunk($self->_offset)
-      if $self->is_state('write_headers');
-
-    # Start line
-    $chunk = $self->req->get_start_line_chunk($self->_offset)
-      if $self->is_state('write_start_line');
-
-    # Written
-    my $written = defined $chunk ? length $chunk : 0;
-    $self->_to_write($self->_to_write - $written);
-    $self->_offset($self->_offset + $written);
-
-    # Chunked
-    $self->_to_write(1)
-      if $self->req->is_chunked && $self->is_state('write_body');
-
-    return $chunk;
-}
-
-sub client_info {
-    my $self = shift;
-
-    my $scheme = $self->req->url->scheme;
-    my $host   = $self->req->url->ihost;
-    my $port   = $self->req->url->port;
-
-    # Proxy
-    if (my $proxy = $self->req->proxy) {
-        $scheme = $proxy->scheme;
-        $host   = $proxy->ihost;
-        $port   = $proxy->port;
-    }
-
-    # Default port
-    $scheme ||= 'http';
-    $port ||= $scheme eq 'https' ? 443 : 80;
-
-    return {address => $host, port => $port, scheme => $scheme};
-}
-
 sub client_leftovers {
     my $self = shift;
 
@@ -176,6 +91,10 @@ sub client_read {
                     last;
                 }
             }
+
+            # Spin
+            $self->_client_spin;
+
             return $self;
         }
 
@@ -198,15 +117,215 @@ sub client_read {
         }
     }
 
+    # Spin
+    $self->_client_spin;
+
     return $self;
 }
 
-sub client_spin {
+sub client_write {
+    my $self = shift;
+
+    my $chunk;
+
+    # Body
+    if ($self->is_state('write_body')) {
+        $chunk = $self->req->get_body_chunk($self->_offset);
+
+        # End
+        if (defined $chunk && !length $chunk) {
+            $self->state('read_response');
+            $self->_client_spin;
+            return;
+        }
+    }
+
+    # Headers
+    $chunk = $self->req->get_header_chunk($self->_offset)
+      if $self->is_state('write_headers');
+
+    # Start line
+    $chunk = $self->req->get_start_line_chunk($self->_offset)
+      if $self->is_state('write_start_line');
+
+    # Written
+    my $written = defined $chunk ? length $chunk : 0;
+    $self->_to_write($self->_to_write - $written);
+    $self->_offset($self->_offset + $written);
+
+    # Chunked
+    $self->_to_write(1)
+      if $self->req->is_chunked && $self->is_state('write_body');
+
+    # Spin
+    $self->_client_spin;
+
+    return $chunk;
+}
+
+sub keep_alive {
+    my ($self, $keep_alive) = @_;
+
+    if ($keep_alive) {
+        $self->{keep_alive} = $keep_alive;
+        return $self;
+    }
+
+    my $req = $self->req;
+    my $res = $self->res;
+
+    # No keep alive for 0.9
+    $self->{keep_alive} ||= 0
+      if ($req->version eq '0.9') || ($res->version eq '0.9');
+
+    # No keep alive for 1.0
+    $self->{keep_alive} ||= 0
+      if ($req->version eq '1.0') || ($res->version eq '1.0');
+
+    # Keep alive?
+    $self->{keep_alive} = 1
+      if ($req->headers->connection || '') =~ /keep-alive/i
+      or ($res->headers->connection || '') =~ /keep-alive/i;
+
+    # Close?
+    $self->{keep_alive} = 0
+      if ($req->headers->connection || '') =~ /close/i
+      or ($res->headers->connection || '') =~ /close/i;
+
+    # Default
+    $self->{keep_alive} = 1 unless defined $self->{keep_alive};
+    return $self->{keep_alive};
+}
+
+sub server_leftovers {
+    my $self = shift;
+
+    # No leftovers
+    return unless $self->req->is_state('done_with_leftovers');
+
+    # Leftovers
+    my $leftovers = $self->req->leftovers;
+
+    # Done
+    $self->req->done;
+
+    return $leftovers;
+}
+
+sub server_read {
+    my ($self, $chunk) = @_;
+
+    # Parse
+    $self->req->parse($chunk);
+
+    # Expect 100 Continue?
+    if ($self->req->content->is_state('body') && !defined $self->continued) {
+        if (($self->req->headers->expect || '') =~ /100-continue/i) {
+
+            # Writing
+            $self->state('write');
+
+            # Continue handler callback
+            $self->continue_handler_cb->($self);
+            $self->continued(0);
+        }
+    }
+
+    # EOF
+    if ((length $chunk == 0) || $self->req->is_finished) {
+
+        # Writing
+        $self->state('write');
+
+        # Upgrade callback
+        my $ws;
+        $ws = $self->upgrade_cb->($self) if $self->req->headers->upgrade;
+
+        # Handler callback
+        $self->handler_cb->($ws ? ($ws, $self) : $self);
+    }
+
+    # Spin
+    $self->_server_spin;
+
+    return $self;
+}
+
+sub server_write {
+    my $self = shift;
+
+    my $chunk;
+
+    # Body
+    if ($self->is_state('write_body')) {
+        $chunk = $self->res->get_body_chunk($self->_offset);
+
+        # End
+        if (defined $chunk && !length $chunk) {
+            $self->req->is_state('done_with_leftovers')
+              ? $self->state('done_with_leftovers')
+              : $self->state('done');
+            return;
+        }
+    }
+
+    # Headers
+    $chunk = $self->res->get_header_chunk($self->_offset)
+      if $self->is_state('write_headers');
+
+    # Start line
+    $chunk = $self->res->get_start_line_chunk($self->_offset)
+      if $self->is_state('write_start_line');
+
+    # Written
+    my $written = defined $chunk ? length $chunk : 0;
+    $self->_to_write($self->_to_write - $written);
+    $self->_offset($self->_offset + $written);
+
+    # Chunked
+    $self->_to_write(1)
+      if $self->res->is_chunked && $self->is_state('write_body');
+
+    # Done early
+    if ($self->is_state('write_body') && $self->_to_write <= 0) {
+        $self->req->is_state('done_with_leftovers')
+          ? $self->state('done_with_leftovers')
+          : $self->state('done');
+    }
+
+    # Spin
+    $self->_server_spin;
+
+    return $chunk;
+}
+
+sub _client_spin {
     my $self = shift;
 
     # Check for request/response errors
     $self->error('Request error.')  if $self->req->has_error;
     $self->error('Response error.') if $self->res->has_error;
+
+    if ($self->is_state('start')) {
+
+        # Connection header
+        unless ($self->req->headers->connection) {
+            if ($self->keep_alive || $self->kept_alive) {
+                $self->req->headers->connection('Keep-Alive');
+            }
+            else {
+                $self->req->headers->connection('Close');
+            }
+        }
+
+        # We might have to handle 100 Continue
+        $self->_continue($self->continue_timeout)
+          if ($self->req->headers->expect || '') =~ /100-continue/;
+
+        # Ready for next state
+        $self->state('write_start_line');
+        $self->_to_write($self->req->start_line_size);
+    }
 
     # Make sure we don't wait longer than the set time for a 100 Continue
     # (defaults to 5 seconds)
@@ -254,122 +373,31 @@ sub client_spin {
     return $self;
 }
 
-sub keep_alive {
-    my ($self, $keep_alive) = @_;
-
-    if ($keep_alive) {
-        $self->{keep_alive} = $keep_alive;
-        return $self;
-    }
-
-    my $req = $self->req;
-    my $res = $self->res;
-
-    # No keep alive for 0.9
-    $self->{keep_alive} ||= 0
-      if ($req->version eq '0.9') || ($res->version eq '0.9');
-
-    # No keep alive for 1.0
-    $self->{keep_alive} ||= 0
-      if ($req->version eq '1.0') || ($res->version eq '1.0');
-
-    # Keep alive?
-    $self->{keep_alive} = 1
-      if ($req->headers->connection || '') =~ /keep-alive/i
-      or ($res->headers->connection || '') =~ /keep-alive/i;
-
-    # Close?
-    $self->{keep_alive} = 0
-      if ($req->headers->connection || '') =~ /close/i
-      or ($res->headers->connection || '') =~ /close/i;
-
-    # Default
-    $self->{keep_alive} = 1 unless defined $self->{keep_alive};
-    return $self->{keep_alive};
-}
-
-sub server_get_chunk {
+# Replace client response after receiving 100 Continue
+sub _new_response {
     my $self = shift;
 
-    my $chunk;
+    # 1 is special case for HEAD
+    my $until_body = @_ ? shift : 0;
 
-    # Body
-    if ($self->is_state('write_body')) {
-        $chunk = $self->res->get_body_chunk($self->_offset);
+    my $new = $self->res->new;
 
-        # End
-        if (defined $chunk && !length $chunk) {
-            $self->req->is_state('done_with_leftovers')
-              ? $self->state('done_with_leftovers')
-              : $self->state('done');
-            return;
-        }
+    # Check for leftovers in old response
+    if ($self->res->has_leftovers) {
+
+        $until_body
+          ? $new->parse_until_body($self->res->leftovers)
+          : $new->parse($self->res->leftovers);
+
+        $new->is_finished
+          ? $self->state($new->state)
+          : $self->state('read_response');
     }
 
-    # Headers
-    $chunk = $self->res->get_header_chunk($self->_offset)
-      if $self->is_state('write_headers');
-
-    # Start line
-    $chunk = $self->res->get_start_line_chunk($self->_offset)
-      if $self->is_state('write_start_line');
-
-    # Written
-    my $written = defined $chunk ? length $chunk : 0;
-    $self->_to_write($self->_to_write - $written);
-    $self->_offset($self->_offset + $written);
-
-    # Chunked
-    $self->_to_write(1)
-      if $self->res->is_chunked && $self->is_state('write_body');
-
-    # Done early
-    if ($self->is_state('write_body') && $self->_to_write <= 0) {
-        $self->req->is_state('done_with_leftovers')
-          ? $self->state('done_with_leftovers')
-          : $self->state('done');
-    }
-
-    return $chunk;
+    $self->res($new);
 }
 
-sub server_read {
-    my ($self, $chunk) = @_;
-
-    # Parse
-    $self->req->parse($chunk);
-
-    # Expect 100 Continue?
-    if ($self->req->content->is_state('body') && !defined $self->continued) {
-        if (($self->req->headers->expect || '') =~ /100-continue/i) {
-
-            # Writing
-            $self->state('write');
-
-            # Continue handler callback
-            $self->continue_handler_cb->($self);
-            $self->continued(0);
-        }
-    }
-
-    # EOF
-    if ((length $chunk == 0) || $self->req->is_finished) {
-
-        # Writing
-        $self->state('write');
-
-        # Upgrade callback
-        my $ws;
-        $ws = $self->upgrade_cb->($self) if $self->req->headers->upgrade;
-
-        # Handler callback
-        $self->handler_cb->($ws ? ($ws, $self) : $self);
-    }
-
-    return $self;
-}
-
-sub server_spin {
+sub _server_spin {
     my $self = shift;
 
     # We identify ourself
@@ -453,30 +481,6 @@ sub server_spin {
     return $self;
 }
 
-# Replace client response after receiving 100 Continue
-sub _new_response {
-    my $self = shift;
-
-    # 1 is special case for HEAD
-    my $until_body = @_ ? shift : 0;
-
-    my $new = $self->res->new;
-
-    # Check for leftovers in old response
-    if ($self->res->has_leftovers) {
-
-        $until_body
-          ? $new->parse_until_body($self->res->leftovers)
-          : $new->parse($self->res->leftovers);
-
-        $new->is_finished
-          ? $self->state($new->state)
-          : $self->state('read_response');
-    }
-
-    $self->res($new);
-}
-
 1;
 __END__
 
@@ -497,7 +501,8 @@ Mojo::Transaction::Single - HTTP 1.1 Transaction Container
 
 =head1 DESCRIPTION
 
-L<Mojo::Transaction::Single> is a container for HTTP 1.1 transactions.
+L<Mojo::Transaction::Single> is a container and state machine for HTTP 1.1
+transactions.
 
 =head1 ATTRIBUTES
 
@@ -544,18 +549,6 @@ L<Mojo::Transaction> and implements the following new ones.
 L<Mojo::Transaction::Single> inherits all methods from L<Mojo::Transaction>
 and implements the following new ones.
 
-=head2 C<client_connected>
-
-    $tx = $tx->client_connected;
-
-=head2 C<client_get_chunk>
-
-    my $chunk = $tx->client_get_chunk;
-
-=head2 C<client_info>
-
-    my $info = $tx->client_info;
-
 =head2 C<client_leftovers>
 
     my $leftovers = $tx->client_leftovers;
@@ -564,20 +557,20 @@ and implements the following new ones.
 
     $tx = $tx->client_read($chunk);
 
-=head2 C<client_spin>
+=head2 C<client_write>
 
-    $tx = $tx->client_spin;
+    my $chunk = $tx->client_write;
 
-=head2 C<server_get_chunk>
+=head2 C<server_leftovers>
 
-    my $chunk = $tx->server_get_chunk;
+    my $leftovers = $tx->server_leftovers;
 
 =head2 C<server_read>
 
     $tx = $tx->server_read($chunk);
 
-=head2 C<server_spin>
+=head2 C<server_write>
 
-    $tx = $tx->server_spin;
+    my $chunk = $tx->server_write;
 
 =cut

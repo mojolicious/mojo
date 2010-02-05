@@ -48,6 +48,9 @@ sub register {
                 # Self
                 my $prepend = 'my $self = shift;';
 
+                # Weaken
+                $prepend .= q/use Scalar::Util 'weaken'; weaken $self;/;
+
                 # Be a bit more relaxed for helpers
                 $prepend .= q/no strict 'refs'; no warnings 'redefine';/;
 

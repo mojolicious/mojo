@@ -10,13 +10,12 @@ use Test::More;
 plan skip_all =>
   'set TEST_CLIENT to enable this test (internet connection required!)'
   unless $ENV{TEST_CLIENT};
-plan tests => 74;
+plan tests => 75;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
 use_ok('Mojo::Client');
 use_ok('Mojo::IOLoop');
-use_ok('Mojo::Transaction::Pipeline');
 use_ok('Mojo::Transaction::Single');
 
 # Make sure clients dont taint the ioloop
@@ -199,9 +198,11 @@ my $tx3 = Mojo::Transaction::Single->new;
 $tx3->req->method('GET');
 $tx3->req->url->parse('http://www.apache.org');
 $client->process(
-    (Mojo::Transaction::Pipeline->new($tx, $tx2), $tx3) => sub {
+    ([$tx, $tx2], $tx3) => sub {
         my ($self, $tx) = @_;
-        ok($tx->is_done);
+        return ok($tx->is_done) unless ref $tx eq 'ARRAY';
+        ok($tx->[0]->is_done);
+        ok($tx->[1]->is_done);
     }
 );
 ok($tx2->is_done);
@@ -219,9 +220,10 @@ $tx2 = Mojo::Transaction::Single->new;
 $tx2->req->method('GET');
 $tx2->req->url->parse('http://www.apache.org');
 $client->process(
-    Mojo::Transaction::Pipeline->new($tx, $tx2) => sub {
-        my ($self, $tx) = @_;
-        ok($tx->is_done);
+    [$tx, $tx2] => sub {
+        my ($self, $p) = @_;
+        ok($p->[0]->is_done);
+        ok($p->[1]->is_done);
     }
 );
 ok($tx2->is_done);
@@ -244,7 +246,7 @@ $tx3->req->url->parse('http://www.apache.org');
 my $tx4 = Mojo::Transaction::Single->new;
 $tx4->req->method('GET');
 $tx4->req->url->parse('http://www.apache.org');
-$client->process(Mojo::Transaction::Pipeline->new($tx, $tx2, $tx3, $tx4));
+$client->process([$tx, $tx2, $tx3, $tx4]);
 ok($tx->is_done);
 ok($tx2->is_done);
 ok($tx3->is_done);

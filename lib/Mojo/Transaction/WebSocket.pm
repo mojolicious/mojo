@@ -23,9 +23,9 @@ __PACKAGE__->attr(
 
 __PACKAGE__->attr(_finished => 0);
 
-sub client_get_chunk { shift->server_get_chunk(@_) }
-sub client_read      { shift->server_read(@_) }
-sub connection       { shift->handshake->connection(@_) }
+sub client_read  { shift->server_read(@_) }
+sub client_write { shift->server_write(@_) }
+sub connection   { shift->handshake->connection(@_) }
 
 sub finish {
     my $self = shift;
@@ -36,6 +36,8 @@ sub finish {
     # Finished
     $self->state('done');
 }
+
+sub is_websocket {1}
 
 sub local_address  { shift->handshake->local_address }
 sub local_port     { shift->handshake->local_port }
@@ -55,18 +57,6 @@ sub send_message {
 
     # Writing
     $self->state('write');
-}
-
-sub server_get_chunk {
-    my $self = shift;
-
-    # Not writing anymore
-    unless ($self->write_buffer->size) {
-        $self->_finished ? $self->state('done') : $self->state('read');
-    }
-
-    # Empty buffer
-    return $self->write_buffer->empty;
 }
 
 # Being eaten by crocodile is just like going to sleep... in a giant blender.
@@ -94,6 +84,18 @@ sub server_read {
     }
 }
 
+sub server_write {
+    my $self = shift;
+
+    # Not writing anymore
+    unless ($self->write_buffer->size) {
+        $self->_finished ? $self->state('done') : $self->state('read');
+    }
+
+    # Empty buffer
+    return $self->write_buffer->empty;
+}
+
 1;
 __END__
 
@@ -107,7 +109,8 @@ Mojo::Transaction::WebSocket - WebSocket Transaction Container
 
 =head1 DESCRIPTION
 
-L<Mojo::Transaction::WebSocket> is a container for WebSocket transactions.
+L<Mojo::Transaction::WebSocket> is a container and state machine for
+WebSocket transactions.
 
 =head1 ATTRIBUTES
 
@@ -151,17 +154,17 @@ Buffer for outgoing data.
 L<Mojo::Transaction::WebSocket> inherits all methods from
 L<Mojo::Transaction> and implements the following new ones.
 
-=head2 C<client_get_chunk>
-
-    my $chunk = $ws->client_get_chunk;
-
-Raw WebSocket data to write, only used by clients.
-
 =head2 C<client_read>
 
     $ws->client_read($data);
 
 Read raw WebSocket data, only used by clients.
+
+=head2 C<client_write>
+
+    my $chunk = $ws->client_write;
+
+Raw WebSocket data to write, only used by clients.
 
 =head2 C<connection>
 
@@ -175,27 +178,33 @@ The connection this websocket is using.
 
 Finish the WebSocket connection gracefully.
 
+=head2 C<is_websocket>
+
+    my $is_websocket = $ws->is_websocket;
+
+True.
+
 =head2 C<local_address>
 
-    my $local_address = $tx->local_address;
+    my $local_address = $ws->local_address;
 
 The local address of this WebSocket.
 
 =head2 C<local_port>
 
-    my $local_port = $tx->local_port;
+    my $local_port = $ws->local_port;
 
 The local port of this WebSocket.
 
 =head2 C<remote_address>
 
-    my $remote_address = $tx->remote_address;
+    my $remote_address = $ws->remote_address;
 
 The remote address of this WebSocket.
 
 =head2 C<remote_port>
 
-    my $remote_port = $tx->remote_port;
+    my $remote_port = $ws->remote_port;
 
 The remote port of this WebSocket.
 
@@ -218,16 +227,16 @@ The original handshake response.
 Send a message over the WebSocket, encoding and framing will be handled
 transparently.
 
-=head2 C<server_get_chunk>
-
-    my $chunk = $ws->server_get_chunk;
-
-Raw WebSocket data to write, only used by servers.
-
 =head2 C<server_read>
 
     $ws->server_read($data);
 
 Read raw WebSocket data, only used by servers.
+
+=head2 C<server_write>
+
+    my $chunk = $ws->server_write;
+
+Raw WebSocket data to write, only used by servers.
 
 =cut

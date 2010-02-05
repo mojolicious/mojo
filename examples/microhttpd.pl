@@ -19,7 +19,7 @@ my $loop = Mojo::IOLoop->new;
 # Buffer for incoming data
 my $buffer = {};
 
-# Create listen socket on port 3000
+# Minimal ioloop example demonstrating how to cheat at HTTP benchmarks :)
 $loop->listen(
     port => 3000,
     cb   => sub {
@@ -39,7 +39,7 @@ $loop->listen(
                 # Append chunk to buffer
                 $buffer->{$id} .= $chunk;
 
-                # Check if we got a full HTTP request
+                # Check if we got start line and headers (no body support)
                 if ($buffer->{$id} =~ /\x0d?\x0a\x0d?\x0a$/) {
 
                     # Clean buffer
@@ -60,6 +60,7 @@ $loop->listen(
                 $loop->not_writing($id);
 
                 # Write a minimal HTTP response
+                # (not spec compliant but benchmarks won't care)
                 return
                     "HTTP/1.1 200 OK\x0d\x0a"
                   . "Connection: keep-alive\x0d\x0aContent-Length: 11\x0d\x0a\x0d\x0a"

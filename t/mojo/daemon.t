@@ -8,7 +8,6 @@ use warnings;
 use Test::More;
 
 use Mojo::Client;
-use Mojo::Transaction::Pipeline;
 use Mojo::Transaction::Single;
 use Test::Mojo::Server;
 
@@ -61,7 +60,7 @@ $tx3->req->url->parse("http://127.0.0.1:$port/3/");
 my $tx4 = Mojo::Transaction::Single->new;
 $tx4->req->method('GET');
 $tx4->req->url->parse("http://127.0.0.1:$port/4/");
-$client->process(Mojo::Transaction::Pipeline->new($tx, $tx2, $tx3, $tx4));
+$client->process([$tx, $tx2, $tx3, $tx4]);
 ok($tx->is_done);
 ok($tx2->is_done);
 ok($tx3->is_done);
@@ -112,7 +111,7 @@ $tx->req->url->parse("http://127.0.0.1:$port/8/");
 $tx2 = Mojo::Transaction::Single->new;
 $tx2->req->method('GET');
 $tx2->req->url->parse("http://127.0.0.1:$port/9/");
-$client->process(Mojo::Transaction::Pipeline->new($tx, $tx2));
+$client->process([$tx, $tx2]);
 ok($tx->is_done);
 ok($tx2->is_done);
 is($tx->res->code,  200);
@@ -135,7 +134,7 @@ $tx3->req->url->parse(
 $tx4 = Mojo::Transaction::Single->new;
 $tx4->req->method('GET');
 $tx4->req->url->parse("http://127.0.0.1:$port/13/");
-$client->process(Mojo::Transaction::Pipeline->new($tx, $tx2, $tx3, $tx4));
+$client->process([$tx, $tx2, $tx3, $tx4]);
 ok($tx->is_done);
 ok($tx2->is_done);
 ok($tx3->is_done);

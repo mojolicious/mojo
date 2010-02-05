@@ -13,8 +13,6 @@ use Fcntl ':flock';
 use File::Spec;
 use IO::File;
 use Mojo::IOLoop;
-use Mojo::Transaction::Pipeline;
-use Mojo::Transaction::WebSocket;
 use Scalar::Util 'weaken';
 use Sys::Hostname 'hostname';
 
@@ -185,85 +183,34 @@ sub setuidgid {
     return $self;
 }
 
-sub _build_pipeline {
-    my ($self, $id) = @_;
-
-    # Connection
-    my $c = $self->_connections->{$id};
-
-    # New pipeline
-    my $p = Mojo::Transaction::Pipeline->new;
-    $p->connection($id);
-
-    # Store connection information in pipeline
-    my $local = $self->ioloop->local_info($id);
-    $p->local_address($local->{address});
-    $p->local_port($local->{port});
-    my $remote = $self->ioloop->remote_info($id);
-    $p->remote_address($remote->{address});
-    $p->remote_port($remote->{port});
-
-    # Weaken
-    weaken $self;
-    weaken $c;
-
-    # State change callback
-    $p->state_cb(
-        sub {
-            my $p = shift;
-
-            # Finish
-            if ($p->is_finished) {
-
-                # Successful WebSocket upgrade?
-                my $upgraded =
-                  ($c->{websocket} && $c->{websocket}->res->code eq '101')
-                  ? 1
-                  : 0;
-
-                # Close connection
-                if (!$c->{pipeline}->keep_alive && !$upgraded) {
-                    $self->_drop($id);
-                    $self->ioloop->drop($id);
-                }
-
-                # Cleanup connection
-                else {
-                    delete $c->{pipeline};
-                    delete $c->{websocket} unless $upgraded;
-                }
-            }
-
-            # Writing?
-            $p->server_is_writing
-              ? $self->ioloop->writing($id)
-              : $self->ioloop->not_writing($id);
-        }
-    );
-
-    # Transaction builder callback
-    $p->build_tx_cb(sub { $self->_build_tx($id, $c, @_) });
-
-    # New request on the connection
-    $c->{requests}++;
-
-    # Kept alive if we have more than one request on the connection
-    $p->kept_alive(1) if $c->{requests} > 1;
-
-    return $p;
-}
-
 sub _build_tx {
     my ($self, $id, $c) = @_;
 
     # Build transaction
     my $tx = $self->build_tx_cb->($self);
 
+    # Connection
+    $tx->connection($id);
+
+    # Store connection information
+    my $local = $self->ioloop->local_info($id);
+    $tx->local_address($local->{address});
+    $tx->local_port($local->{port});
+    my $remote = $self->ioloop->remote_info($id);
+    $tx->remote_address($remote->{address});
+    $tx->remote_port($remote->{port});
+
     # TLS
     if ($c->{tls}) {
         $tx->req->url->scheme('https');
         $tx->req->url->base->scheme('https');
     }
+
+    # Weaken
+    weaken $self;
+
+    # State change callback
+    $tx->state_cb(sub { $self->_state($id, @_) });
 
     # Handler callback
     $tx->handler_cb(
@@ -286,39 +233,13 @@ sub _build_tx {
     );
 
     # Upgrade callback
-    $tx->upgrade_cb(
-        sub {
-            my $tx = shift;
+    $tx->upgrade_cb(sub { $self->_upgrade($id, @_) });
 
-            # WebSocket?
-            return unless $tx->req->headers->upgrade =~ /WebSocket/i;
+    # New request on the connection
+    $c->{requests}++;
 
-            # WebSocket handshake handler
-            my $ws = $c->{websocket} =
-              $self->websocket_handshake_cb->($self, $tx);
-
-            # Upgrade connection timeout
-            $self->ioloop->connection_timeout($id, $self->websocket_timeout);
-
-            # State change callback
-            $ws->state_cb(
-                sub {
-                    my $ws = shift;
-
-                    # Finish
-                    if ($ws->is_finished) {
-                        $self->_drop($id);
-                        $self->ioloop->drop($id);
-                    }
-
-                    # Writing?
-                    $ws->server_is_writing
-                      ? $self->ioloop->writing($id)
-                      : $self->ioloop->not_writing($id);
-                }
-            );
-        }
-    );
+    # Kept alive if we have more than one request on the connection
+    $tx->kept_alive(1) if $c->{requests} > 1;
 
     return $tx;
 }
@@ -411,59 +332,108 @@ sub _listen {
 sub _read {
     my ($self, $loop, $id, $chunk) = @_;
 
-    # Pipeline?
-    my $tx = $self->_connections->{$id}->{pipeline};
+    # Connection
+    my $c = $self->_connections->{$id};
 
-    # WebSocket
-    $tx ||= $self->_connections->{$id}->{websocket};
+    # Transaction
+    my $tx = $c->{transaction} || $c->{websocket};
 
-    # Pipeline
-    $tx = $self->_connections->{$id}->{pipeline} = $self->_build_pipeline($id)
-      unless $tx;
+    # New transaction
+    $tx = $c->{transaction} = $self->_build_tx($id) unless $tx;
 
     # Read
     $tx->server_read($chunk);
 
-    # WebSocket?
-    return if $tx->is_websocket;
+    # Last keep alive request?
+    $tx->res->headers->connection('Close')
+      if ($c->{requests} || 0) >= $self->max_keep_alive_requests;
+}
 
-    # State machine
-    $tx->server_spin;
+sub _state {
+    my ($self, $id, $tx) = @_;
 
-    # Add transactions to the pipe for leftovers
-    if (my $leftovers = $tx->server_leftovers) {
+    # Finish
+    if ($tx->is_finished) {
 
-        # Read leftovers
-        $tx->server_read($leftovers);
+        # Connection
+        my $c = $self->_connections->{$id};
+
+        # Successful WebSocket upgrade?
+        my $upgraded = 0;
+        $upgraded = 1
+          if $c->{websocket} && $c->{websocket}->res->code eq '101';
+
+        # Close connection
+        if (!$tx->keep_alive && !$upgraded) {
+            $self->_drop($id);
+            $self->ioloop->drop($id);
+        }
+
+        # Cleanup connection
+        else {
+            delete $c->{transaction};
+            delete $c->{websocket} unless $upgraded;
+
+            # Leftovers
+            if (defined(my $leftovers = $tx->server_leftovers)) {
+                $tx = $c->{transaction} = $self->_build_tx($id, $c);
+                $tx->server_read($leftovers);
+            }
+        }
     }
 
-    # Last keep alive request?
-    $tx->server_tx->res->headers->connection('Close')
-      if $tx->server_tx
-          && $self->_connections->{$id}->{requests}
-          >= $self->max_keep_alive_requests;
+    # Writing?
+    return $tx->client_is_writing
+      ? $self->ioloop->writing($id)
+      : $self->ioloop->not_writing($id);
+}
+
+sub _upgrade {
+    my ($self, $id, $tx) = @_;
+
+    # WebSocket?
+    return unless $tx->req->headers->upgrade =~ /WebSocket/i;
+
+    # Connection
+    my $c = $self->_connections->{$id};
+
+    # WebSocket handshake handler
+    my $ws = $c->{websocket} = $self->websocket_handshake_cb->($self, $tx);
+
+    # Upgrade connection timeout
+    $self->ioloop->connection_timeout($id, $self->websocket_timeout);
+
+    # State change callback
+    $ws->state_cb(
+        sub {
+            my $ws = shift;
+
+            # Writing
+            return $self->ioloop->writing($id) if $ws->server_is_writing;
+
+            # Finish
+            if ($ws->is_finished) {
+                $self->_drop($id);
+                $self->ioloop->drop($id);
+            }
+
+            # Not writing
+            $self->ioloop->not_writing($id);
+        }
+    );
 }
 
 sub _write {
     my ($self, $loop, $id) = @_;
 
-    # Pipeline
-    my $tx = $self->_connections->{$id}->{pipeline};
+    # Connection
+    my $c = $self->_connections->{$id};
 
-    # WebSocket
-    $tx ||= $self->_connections->{$id}->{websocket};
-
-    # No transaction
-    return unless $tx;
+    # Transaction
+    return unless my $tx = $c->{transaction} || $c->{websocket};
 
     # Get chunk
-    my $chunk = $tx->server_get_chunk;
-
-    # WebSocket?
-    return $chunk if $tx->is_websocket;
-
-    # State machine
-    $tx->server_spin;
+    my $chunk = $tx->server_write;
 
     return $chunk;
 }

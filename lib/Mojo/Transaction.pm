@@ -17,30 +17,18 @@ __PACKAGE__->attr(keep_alive       => 0);
 __PACKAGE__->attr('_real_state');
 
 # Please don't eat me! I have a wife and kids. Eat them!
-sub client_connected {
-    croak 'Method "client_connected" not implemented by subclass';
-}
-
-sub client_get_chunk {
-    croak 'Method "client_get_chunk" not implemented by subclass';
-}
-
-sub client_info { croak 'Method "client_info" not implemented by subclass' }
-
 sub client_is_writing { shift->_is_writing }
 
 sub client_leftovers {
     croak 'Method "client_leftovers" not implemented by subclass';
 }
 
-sub client_read { croak 'Method "client_read" not implemented by subclass' }
-sub client_spin { croak 'Method "client_spin" not implemented by subclass' }
+sub client_read  { croak 'Method "client_read" not implemented by subclass' }
+sub client_write { croak 'Method "client_write" not implemented by subclass' }
 
 sub is_paused { shift->is_state('paused') }
 
-sub is_pipeline { return shift->isa('Mojo::Transaction::Pipeline') ? 1 : 0 }
-
-sub is_websocket { return shift->isa('Mojo::Transaction::WebSocket') ? 1 : 0 }
+sub is_websocket {0}
 
 sub pause {
     my $self = shift;
@@ -87,10 +75,6 @@ sub resume {
     return $self;
 }
 
-sub server_get_chunk {
-    croak 'Method "server_get_chunk" not implemented by subclass';
-}
-
 sub server_is_writing { shift->_is_writing }
 
 sub server_leftovers {
@@ -98,10 +82,12 @@ sub server_leftovers {
 }
 
 sub server_read { croak 'Method "server_read" not implemented by subclass' }
-sub server_spin { croak 'Method "server_spin" not implemented by subclass' }
+
+sub server_write { croak 'Method "server_write" not implemented by subclass' }
 
 sub _is_writing {
-    shift->is_state(qw/write write_start_line write_headers write_body/);
+    shift->is_state(
+        qw/start write write_start_line write_headers write_body/);
 }
 
 1;
@@ -170,18 +156,6 @@ implements the following new ones.
 L<Mojo::Transaction> inherits all methods from L<Mojo::Stateful> and
 implements the following new ones.
 
-=head2 C<client_connected>
-
-    $tx = $tx->client_connected;
-
-=head2 C<client_get_chunk>
-
-    my $chunk = $tx->client_get_chunk;
-
-=head2 C<client_info>
-
-    my $info = $tx->client_info;
-
 =head2 C<client_is_writing>
 
     my $writing = $tx->client_is_writing;
@@ -194,17 +168,13 @@ implements the following new ones.
 
     $tx = $tx->client_read($chunk);
 
-=head2 C<client_spin>
+=head2 C<client_write>
 
-    $tx = $tx->client_spin;
+    my $chunk = $tx->client_write;
 
 =head2 C<is_paused>
 
     my $paused = $tx->is_paused;
-
-=head2 C<is_pipeline>
-
-    my $is_pipeline = $tx->is_pipeline;
 
 =head2 C<is_websocket>
 
@@ -218,10 +188,6 @@ implements the following new ones.
 
     $tx = $tx->resume;
 
-=head2 C<server_get_chunk>
-
-    my $chunk = $tx->server_get_chunk;
-
 =head2 C<server_is_writing>
 
     my $writing = $tx->server_is_writing;
@@ -234,8 +200,8 @@ implements the following new ones.
 
     $tx = $tx->server_read($chunk);
 
-=head2 C<server_spin>
+=head2 C<server_write>
 
-    $tx = $tx->server_spin;
+    my $chunk = $tx->server_write;
 
 =cut

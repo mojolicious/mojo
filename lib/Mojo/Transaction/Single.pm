@@ -9,7 +9,6 @@ use base 'Mojo::Transaction';
 
 use Mojo::Message::Request;
 use Mojo::Message::Response;
-use Mojo::Transaction::WebSocket;
 
 __PACKAGE__->attr([qw/continue_handler_cb continued handler_cb upgrade_cb/]);
 __PACKAGE__->attr(req => sub { Mojo::Message::Request->new });

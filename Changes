@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojo.
 0.999920 2010-01-30 00:00:00
         - Code name "Snowman", this is a major release, which means
           deprecation policies apply.
+          (See also "perldoc Mojolicious::Book::CodingGuidelines")
         - Renamed distribution from Mojo to Mojolicious.
         - Deprecated $VERSION in Mojo, new $VERSION lives in Mojolicious.
           Make sure to update your modules depending on Mojo to depend on

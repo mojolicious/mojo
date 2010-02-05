@@ -95,16 +95,15 @@ __END__
 
 =head1 NAME
 
-Mojo::Transaction - HTTP 1.1 Transaction Base Class
+Mojo::Transaction - Transaction Base Class
 
 =head1 SYNOPSIS
 
-    use base 'Mojo::transaction';
+    use base 'Mojo::Transaction';
 
 =head1 DESCRIPTION
 
-L<Mojo::Transaction> is an abstract base class for HTTP 1.1 and WebSocket
-transactions.
+L<Mojo::Transaction> is an abstract base class for transactions.
 
 =head1 ATTRIBUTES
 

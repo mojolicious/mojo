@@ -1,0 +1,33 @@
+# Copyright (C) 2008-2010, Sebastian Riedel.
+
+=head1 NAME
+
+Mojolicious::Book::FAQ - Frequently Asked Questions
+
+=head1 OVERVIEW
+
+This document contains the most frequently asked questions about
+L<Mojolicious> together with the right answers.
+
+=head1 QUESTIONS
+
+=head2 I think i have found a bug, what should i do now?
+
+Prepare a test case demonstrating the bug, you are not expected to fix it
+yourself, but you'll have to make sure the developers can replicate your
+problem.
+Sending in your whole application generally does more harm than good, the
+C<t> directory of this distribution has many good examples for how to do it
+right.
+Writing a test is usually the hardest part of fixing a bug, so the better
+your test case the faster it can be fixed. ;)
+
+Now you are ready to contact the developers via GitHub
+(http://github.com/kraih/mojo), mailing list
+(L<http://groups.google.com/group/mojolicious>) or IRC
+(C<#mojo> on C<irc.perl.org>).
+
+If you decide to fix the bug yourself make sure to take a look at
+L<Mojolicious::Book::CodingGuidelines> too.
+
+=cut

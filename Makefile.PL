@@ -32,7 +32,7 @@ WriteMakefile(
                     license  => 'http://dev.perl.org/licenses/',
                     MailingList =>
                       'http://groups.google.com/group/mojolicious',
-                    repository => 'http://github.com/kraih/mojo/tree/master'
+                    repository => 'http://github.com/kraih/mojo'
                 },
                 no_index => {directory => [qw/t/]}
             },

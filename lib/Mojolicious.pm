@@ -449,7 +449,7 @@ startup.
 
 =head2 Repository
 
-    http://github.com/kraih/mojo/commits/master
+    http://github.com/kraih/mojo
 
 =head1 AUTHOR
 

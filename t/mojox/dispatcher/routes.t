@@ -42,7 +42,7 @@ use utf8;
 use Test::More tests => 31;
 
 use Mojo;
-use Mojo::Transaction::Single;
+use Mojo::Transaction::HTTP;
 use MojoX::Dispatcher::Routes;
 
 my $c = Test::Controller->new(app => Mojo->new);
@@ -60,7 +60,7 @@ $d->route('/foo/(capture)')->to(controller => 'foo', action => 'bar');
 
 # 404 clean stash
 $c->reset_state;
-my $tx = Mojo::Transaction::Single->new;
+my $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/not_found');
 $c->tx($tx);
@@ -70,7 +70,7 @@ ok(!$c->render_called);
 
 # No escaping
 $c->reset_state;
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('POST');
 $tx->req->url->parse('/foo/hello');
 $c->tx($tx);
@@ -86,7 +86,7 @@ ok($c->render_called);
 
 # Escaping
 $c->reset_state;
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/foo/hello%20there');
 $c->tx($tx);
@@ -102,7 +102,7 @@ ok($c->render_called);
 
 # Escaping utf8
 $c->reset_state;
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/foo/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82');
 $c->tx($tx);

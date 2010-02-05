@@ -140,7 +140,7 @@ L<Mojo::Server> implements the following attributes.
     my $btx = $server->build_tx_cb;
     $server = $server->build_tx_cb(sub {
         my $self = shift;
-        return Mojo::Transaction::Single->new;
+        return Mojo::Transaction::HTTP->new;
     });
 
 =head2 C<continue_handler_cb>

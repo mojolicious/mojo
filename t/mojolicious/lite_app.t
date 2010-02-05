@@ -24,7 +24,7 @@ use Mojo::ByteStream 'b';
 use Mojo::Client;
 use Mojo::Cookie::Response;
 use Mojo::JSON;
-use Mojo::Transaction::Single;
+use Mojo::Transaction::HTTP;
 use Mojolicious::Lite;
 use Test::Mojo;
 
@@ -456,7 +456,7 @@ $t->post_form_ok(
 # POST /malformed_utf8
 my $level = app->log->level;
 app->log->level('fatal');
-my $tx = Mojo::Transaction::Single->new;
+my $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('POST');
 $tx->req->url->parse('/malformed_utf8');
 $tx->req->headers->content_type('application/x-www-form-urlencoded');

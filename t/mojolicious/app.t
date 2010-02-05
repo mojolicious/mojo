@@ -19,7 +19,7 @@ use lib "$FindBin::Bin/lib";
 use File::stat;
 use File::Spec;
 use Mojo::Date;
-use Mojo::Transaction::Single;
+use Mojo::Transaction::HTTP;
 use Test::Mojo;
 use Mojolicious;
 
@@ -152,19 +152,19 @@ is($app->mode, 'test');
 
 # Persistent error
 $app = MojoliciousTest->new;
-my $tx = Mojo::Transaction::Single->new;
+my $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/foo');
 $app->handler($tx);
 is($tx->res->code, 200);
 like($tx->res->body, qr/Hello Mojo from the template \/foo! Hello World!/);
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/foo/willdie');
 $app->handler($tx);
 is($tx->res->code, 500);
 like($tx->res->body, qr/Foo\.pm/);
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/foo');
 $app->handler($tx);

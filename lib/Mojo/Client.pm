@@ -16,7 +16,7 @@ use Mojo::CookieJar;
 use Mojo::IOLoop;
 use Mojo::Parameters;
 use Mojo::Server::Daemon;
-use Mojo::Transaction::Single;
+use Mojo::Transaction::HTTP;
 use Mojo::Transaction::WebSocket;
 use Scalar::Util 'weaken';
 
@@ -134,7 +134,7 @@ sub post_form {
     }
 
     # Transaction
-    my $tx = Mojo::Transaction::Single->new;
+    my $tx = Mojo::Transaction::HTTP->new;
     $tx->req->method('POST');
     $tx->req->url->parse($url);
 
@@ -261,7 +261,7 @@ sub websocket {
     my $self = shift;
 
     # New WebSocket
-    my $tx = Mojo::Transaction::Single->new;
+    my $tx = Mojo::Transaction::HTTP->new;
 
     # Request
     my $req = $tx->req;
@@ -337,7 +337,7 @@ sub _build_tx {
     my $self = shift;
 
     # New transaction
-    my $tx = Mojo::Transaction::Single->new;
+    my $tx = Mojo::Transaction::HTTP->new;
 
     # Request
     my $req = $tx->req;
@@ -724,7 +724,7 @@ sub _redirect {
     return unless $r < $max;
 
     # New transaction
-    my $new = Mojo::Transaction::Single->new;
+    my $new = Mojo::Transaction::HTTP->new;
     $new->req->method($method);
     $new->req->url->parse($location);
 
@@ -938,8 +938,7 @@ with C<IPv6>, C<TLS>, C<epoll> and C<kqueue> support.
 
 It implements the most common HTTP verbs.
 If you need something more custom you can create your own
-L<Mojo::Transaction::Single> or L<Mojo::Trasaction::Pipeline> objects and
-C<queue> them.
+L<Mojo::Transaction::HTTP> objects and C<queue> them.
 All of the verbs take an optional set of headers as a hash or hash reference,
 as well as an optional callback sub reference.
 

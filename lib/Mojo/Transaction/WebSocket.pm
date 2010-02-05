@@ -10,9 +10,9 @@ use warnings;
 use base 'Mojo::Transaction';
 
 use Mojo::ByteStream 'b';
-use Mojo::Transaction::Single;
+use Mojo::Transaction::HTTP;
 
-__PACKAGE__->attr(handshake => sub { Mojo::Transaction::Single->new });
+__PACKAGE__->attr(handshake => sub { Mojo::Transaction::HTTP->new });
 __PACKAGE__->attr(
     [qw/read_buffer write_buffer/] => sub { Mojo::ByteStream->new });
 __PACKAGE__->attr(
@@ -120,7 +120,7 @@ L<Mojo::Transaction> and implements the following new ones.
 =head2 C<handshake>
 
     my $handshake = $ws->handshake;
-    $ws           = $ws->handshake(Mojo::Transaction::Single->new);
+    $ws           = $ws->handshake(Mojo::Transaction::HTTP->new);
 
 The original handshake transaction.
 

@@ -8,7 +8,7 @@ use warnings;
 use Test::More;
 
 use Mojo::Client;
-use Mojo::Transaction::Single;
+use Mojo::Transaction::HTTP;
 use Test::Mojo::Server;
 
 plan skip_all => 'set TEST_PREFORK to enable this test (developer only!)'
@@ -24,7 +24,7 @@ $server->start_daemon_prefork_ok;
 
 # Request
 my $port = $server->port;
-my $tx   = Mojo::Transaction::Single->new;
+my $tx   = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse("http://127.0.0.1:$port/");
 my $client = Mojo::Client->new;

@@ -16,7 +16,7 @@ plan tests => 75;
 # of being a jerk".
 use_ok('Mojo::Client');
 use_ok('Mojo::IOLoop');
-use_ok('Mojo::Transaction::Single');
+use_ok('Mojo::Transaction::HTTP');
 
 # Make sure clients dont taint the ioloop
 my $ioloop = Mojo::IOLoop->new;
@@ -34,7 +34,7 @@ $ioloop->start;
 $client = Mojo::Client->new;
 
 # Custom non keep alive request
-my $tx = Mojo::Transaction::Single->new;
+my $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('http://cpan.org');
 $tx->req->headers->connection('close');
@@ -138,7 +138,7 @@ $client->get(
 $client->max_redirects(0);
 
 # Custom chunked request without callback
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('http://www.google.com');
 $tx->req->headers->transfer_encoding('chunked');
@@ -158,7 +158,7 @@ $client->process($tx);
 ok($tx->is_done);
 
 # Custom requests with keep alive
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('http://www.apache.org');
 ok(!$tx->kept_alive);
@@ -171,7 +171,7 @@ $client->queue(
 );
 $client->process;
 ok($tx->is_done);
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('http://www.apache.org');
 ok(!$tx->kept_alive);
@@ -188,13 +188,13 @@ $client->process(
 ok($tx->is_done);
 
 # Custom pipelined requests
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('http://www.apache.org');
-my $tx2 = Mojo::Transaction::Single->new;
+my $tx2 = Mojo::Transaction::HTTP->new;
 $tx2->req->method('GET');
 $tx2->req->url->parse('http://www.apache.org');
-my $tx3 = Mojo::Transaction::Single->new;
+my $tx3 = Mojo::Transaction::HTTP->new;
 $tx3->req->method('GET');
 $tx3->req->url->parse('http://www.apache.org');
 $client->process(
@@ -213,10 +213,10 @@ is($tx3->res->code, 200);
 like($tx2->res->content->asset->slurp, qr/Apache/);
 
 # Custom pipelined HEAD request
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('HEAD');
 $tx->req->url->parse('http://www.apache.org');
-$tx2 = Mojo::Transaction::Single->new;
+$tx2 = Mojo::Transaction::HTTP->new;
 $tx2->req->method('GET');
 $tx2->req->url->parse('http://www.apache.org');
 $client->process(
@@ -232,18 +232,18 @@ is($tx2->res->code, 200);
 like($tx2->res->content->asset->slurp, qr/Apache/);
 
 # Custom pipelined requests with 100 Continue
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('http://www.apache.org');
-$tx2 = Mojo::Transaction::Single->new;
+$tx2 = Mojo::Transaction::HTTP->new;
 $tx2->req->method('GET');
 $tx2->req->url->parse('http://www.apache.org');
 $tx2->req->headers->expect('100-continue');
 $tx2->req->body('foo bar baz');
-$tx3 = Mojo::Transaction::Single->new;
+$tx3 = Mojo::Transaction::HTTP->new;
 $tx3->req->method('GET');
 $tx3->req->url->parse('http://www.apache.org');
-my $tx4 = Mojo::Transaction::Single->new;
+my $tx4 = Mojo::Transaction::HTTP->new;
 $tx4->req->method('GET');
 $tx4->req->url->parse('http://www.apache.org');
 $client->process([$tx, $tx2, $tx3, $tx4]);

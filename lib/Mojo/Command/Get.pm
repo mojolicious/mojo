@@ -9,7 +9,7 @@ use base 'Mojo::Command';
 
 use Mojo::ByteStream 'b';
 use Mojo::Client;
-use Mojo::Transaction::Single;
+use Mojo::Transaction::HTTP;
 
 use Getopt::Long 'GetOptions';
 
@@ -45,7 +45,7 @@ sub run {
       unless $url =~ /^\w+:\/\//;
 
     # Transaction
-    my $tx = Mojo::Transaction::Single->new;
+    my $tx = Mojo::Transaction::HTTP->new;
     $tx->req->method('GET');
     $tx->req->url->parse($url);
     $tx->res->body(

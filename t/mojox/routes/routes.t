@@ -7,7 +7,7 @@ use warnings;
 
 use Test::More tests => 166;
 
-use Mojo::Transaction::Single;
+use Mojo::Transaction::HTTP;
 
 # They're not very heavy, but you don't hear me not complaining.
 use_ok('MojoX::Routes');
@@ -124,7 +124,7 @@ $r->route('/method/post_get')->via(qw/POST get/)
 $r->route('/simple/form')->to('test-test#test');
 
 # Make sure stash stays clean
-my $tx = Mojo::Transaction::Single->new;
+my $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/clean');
 my $match = $r->match($tx);
@@ -132,7 +132,7 @@ is($match->stack->[0]->{clean},     1);
 is($match->stack->[0]->{something}, undef);
 is($match->url_for,                 '/clean');
 is(@{$match->stack},                1);
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/clean/too');
 $match = $r->match($tx);
@@ -142,7 +142,7 @@ is($match->url_for,                 '/clean/too');
 is(@{$match->stack},                1);
 
 # Real world example using most features at once
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/articles.html');
 $match = $r->match($tx);
@@ -151,7 +151,7 @@ is($match->stack->[0]->{action},     'index');
 is($match->stack->[0]->{format},     'html');
 is($match->url_for,                  '/articles.html');
 is(@{$match->stack},                 1);
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/articles/1.html');
 $match = $r->match($tx);
@@ -161,7 +161,7 @@ is($match->stack->[0]->{id},         '1');
 is($match->stack->[0]->{format},     'html');
 is($match->url_for,                  '/articles/1.html');
 is(@{$match->stack},                 1);
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/articles/1/edit');
 $match = $r->match($tx);
@@ -171,7 +171,7 @@ is($match->stack->[1]->{format},     'html');
 is($match->url_for,                  '/articles/1/edit.html');
 is($match->url_for('articles_delete', format => undef), '/articles/1/delete');
 is(@{$match->stack}, 2);
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/articles/1/delete');
 $match = $r->match($tx);
@@ -182,7 +182,7 @@ is($match->url_for,                  '/articles/1/delete');
 is(@{$match->stack},                 2);
 
 # Root
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/');
 $match = $r->match($tx);
@@ -194,7 +194,7 @@ is($match->url_for,                  '/');
 is(@{$match->stack},                 1);
 
 # Path and captures
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/foo/test/edit');
 $match = $r->match($tx);
@@ -206,7 +206,7 @@ is($match->url_for,                  '/foo/test/edit');
 is(@{$match->stack},                 1);
 
 # Optional captures in sub route with requirement
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/bar/test/delete/22');
 $match = $r->match($tx);
@@ -220,7 +220,7 @@ is($match->url_for,                  '/bar/test/delete/22');
 is(@{$match->stack},                 1);
 
 # Defaults in sub route
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/bar/test/delete');
 $match = $r->match($tx);
@@ -234,7 +234,7 @@ is($match->url_for,                  '/bar/test/delete');
 is(@{$match->stack},                 1);
 
 # Chained routes
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/test2/foo');
 $match = $r->match($tx);
@@ -244,7 +244,7 @@ is($match->stack->[2]->{controller}, 'baz');
 is($match->captures->{controller},   'baz');
 is($match->url_for,                  '/test2/foo');
 is(@{$match->stack},                 3);
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/test2/bar');
 $match = $r->match($tx);
@@ -256,7 +256,7 @@ is($match->url_for,                  '/test2/bar');
 is(@{$match->stack},                 3);
 
 # Waypoints
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/test3');
 $match = $r->match($tx);
@@ -264,7 +264,7 @@ is($match->stack->[0]->{controller}, 's');
 is($match->stack->[0]->{action},     'l');
 is($match->url_for,                  '/test3');
 is(@{$match->stack},                 1);
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/test3/');
 $match = $r->match($tx);
@@ -272,7 +272,7 @@ is($match->stack->[0]->{controller}, 's');
 is($match->stack->[0]->{action},     'l');
 is($match->url_for,                  '/test3');
 is(@{$match->stack},                 1);
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/test3/edit');
 $match = $r->match($tx);
@@ -282,7 +282,7 @@ is($match->url_for,                  '/test3/edit');
 is(@{$match->stack},                 1);
 
 # Named url_for
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/test3');
 $match = $r->match($tx);
@@ -292,7 +292,7 @@ is($match->url_for('test_edit', {controller => 'foo'}), '/foo/test/edit');
 is(@{$match->stack}, 1);
 
 # Wildcards
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/wildcards/1/hello/there');
 $match = $r->match($tx);
@@ -301,7 +301,7 @@ is($match->stack->[0]->{action},     'card');
 is($match->stack->[0]->{wildcard},   'hello/there');
 is($match->url_for,                  '/wildcards/1/hello/there');
 is(@{$match->stack},                 1);
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/wildcards/2/hello/there');
 $match = $r->match($tx);
@@ -310,7 +310,7 @@ is($match->stack->[0]->{action},     'wild');
 is($match->stack->[0]->{wildcard},   'hello/there');
 is($match->url_for,                  '/wildcards/2/hello/there');
 is(@{$match->stack},                 1);
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/wildcards/3/hello/there/foo');
 $match = $r->match($tx);
@@ -321,7 +321,7 @@ is($match->url_for,                  '/wildcards/3/hello/there/foo');
 is(@{$match->stack},                 1);
 
 # Format
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/format');
 $match = $r->match($tx);
@@ -330,7 +330,7 @@ is($match->stack->[0]->{action},     'you');
 is($match->stack->[0]->{format},     'html');
 is($match->url_for,                  '/format.html');
 is(@{$match->stack},                 1);
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/format.html');
 $match = $r->match($tx);
@@ -339,7 +339,7 @@ is($match->stack->[0]->{action},     'you');
 is($match->stack->[0]->{format},     'html');
 is($match->url_for,                  '/format.html');
 is(@{$match->stack},                 1);
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/format2.html');
 $match = $r->match($tx);
@@ -348,7 +348,7 @@ is($match->stack->[0]->{action},     'hello');
 is($match->stack->[0]->{format},     'html');
 is($match->url_for,                  '/format2.html');
 is(@{$match->stack},                 1);
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/format2.json');
 $match = $r->match($tx);
@@ -357,7 +357,7 @@ is($match->stack->[0]->{action},     'hello_json');
 is($match->stack->[0]->{format},     'json');
 is($match->url_for,                  '/format2.json');
 is(@{$match->stack},                 1);
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/format3/baz.html');
 $match = $r->match($tx);
@@ -367,7 +367,7 @@ is($match->stack->[0]->{format},     'html');
 is($match->stack->[0]->{foo},        'baz');
 is($match->url_for,                  '/format3/baz.html');
 is(@{$match->stack},                 1);
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/format3/baz.json');
 $match = $r->match($tx);
@@ -379,7 +379,7 @@ is($match->url_for,                  '/format3/baz.json');
 is(@{$match->stack},                 1);
 
 # Request methods
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/method/get.html');
 $match = $r->match($tx);
@@ -388,7 +388,7 @@ is($match->stack->[0]->{action},     'get');
 is($match->stack->[0]->{format},     'html');
 is($match->url_for,                  '/method/get.html');
 is(@{$match->stack},                 1);
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('POST');
 $tx->req->url->parse('/method/post');
 $match = $r->match($tx);
@@ -397,7 +397,7 @@ is($match->stack->[0]->{action},     'post');
 is($match->stack->[0]->{format},     undef);
 is($match->url_for,                  '/method/post');
 is(@{$match->stack},                 1);
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/method/post_get');
 $match = $r->match($tx);
@@ -406,7 +406,7 @@ is($match->stack->[0]->{action},     'post_get');
 is($match->stack->[0]->{format},     undef);
 is($match->url_for,                  '/method/post_get');
 is(@{$match->stack},                 1);
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('POST');
 $tx->req->url->parse('/method/post_get');
 $match = $r->match($tx);
@@ -415,7 +415,7 @@ is($match->stack->[0]->{action},     'post_get');
 is($match->stack->[0]->{format},     undef);
 is($match->url_for,                  '/method/post_get');
 is(@{$match->stack},                 1);
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('DELETE');
 $tx->req->url->parse('/method/post_get');
 $match = $r->match($tx);
@@ -426,7 +426,7 @@ is($match->url_for,                  '');
 is(@{$match->stack},                 1);
 
 # Not found
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/not_found');
 $match = $r->match($tx);
@@ -434,7 +434,7 @@ is($match->url_for('test_edit', controller => 'foo'), '/foo/test/edit');
 is(@{$match->stack}, 0);
 
 # Simplified form
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/simple/form');
 $match = $r->match($tx);

@@ -34,7 +34,7 @@ sub new {
             my $self = shift;
 
             # Build
-            my $tx = Mojo::Transaction::Single->new;
+            my $tx = Mojo::Transaction::HTTP->new;
 
             # Hook
             $self->plugins->run_hook_reverse(after_build_tx => $tx);

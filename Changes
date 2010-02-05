@@ -8,6 +8,8 @@ This file documents the revision history for Perl extension Mojo.
         - Deprecated $VERSION in Mojo, new $VERSION lives in Mojolicious.
           Make sure to update your modules depending on Mojo to depend on
           Mojolicious in the future.
+        - Deprecated Mojo::Transaction::Single, make sure to update all old
+          code to use Mojo::Transaction::HTTP instead.
         - MOJO_RELOAD=1 now works with Mojolicious::Lite, have fun!
         - Allow reloading to be triggered once by a USR1 signal.
         - Added --reload flag to all server bindings as an alternative to

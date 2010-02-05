@@ -12,13 +12,13 @@ use Mojo::Client;
 use Mojo::Commands;
 use Mojo::Home;
 use Mojo::Log;
-use Mojo::Transaction::Single;
+use Mojo::Transaction::HTTP;
 use Mojo::Transaction::WebSocket;
 
 __PACKAGE__->attr(
     build_tx_cb => sub {
         sub {
-            my $tx = Mojo::Transaction::Single->new;
+            my $tx = Mojo::Transaction::HTTP->new;
             $tx->res->headers->header('X-Powered-By' => 'Mojo (Perl)');
             return $tx;
           }
@@ -50,6 +50,7 @@ __PACKAGE__->attr(
 );
 
 # DEPRECATED in Snowman!
+# Use $Mojolicious::VERSION instead.
 our $VERSION = '0.999920';
 
 # Oh, so they have internet on computers now!
@@ -129,7 +130,7 @@ L<Mojo> implements the following attributes.
     $mojo  = $mojo->build_tx_cb(sub { ... });
 
 The transaction builder callback, by default it builds a
-L<Mojo::Transaction::Single> object.
+L<Mojo::Transaction::HTTP> object.
 
 =head2 C<client>
 

@@ -229,11 +229,11 @@ Mojo::HelloWorld - Hello World!
 
 =head1 SYNOPSIS
 
-    use Mojo::Transaction::Single;
+    use Mojo::Transaction::HTTP;
     use Mojo::HelloWorld;
 
     my $hello = Mojo::HelloWorld->new;
-    my $tx = $hello->handler(Mojo::Transaction::Single->new);
+    my $tx = $hello->handler(Mojo::Transaction::HTTP->new);
 
 =head1 DESCRIPTION
 

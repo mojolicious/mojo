@@ -1,4 +1,4 @@
-This file documents the revision history for Perl extension Mojo.
+This file documents the revision history for Perl extension Mojolicious.
 
 0.999920 2010-01-30 00:00:00
         - Code name "Snowman", this is a major release, which means
@@ -14,8 +14,6 @@ This file documents the revision history for Perl extension Mojo.
         - Allow reloading to be triggered once by a USR1 signal.
         - Added --reload flag to all server bindings as an alternative to
           MOJO_RELOAD=1.
-        - Started working on the Mojolicious book.
-        - Started adding reference documentation. (marcus)
         - Added WebSocket support.
         - Added IPv6 support.
         - Added SSL/TLS support.
@@ -64,6 +62,8 @@ This file documents the revision history for Perl extension Mojo.
         - Added POD renderer plugin to Mojolicious. (vti)
         - Added inflate command to Mojolicious. (vti, korshak)
         - Added singleton support to Mojo::Client.
+        - Started working on the Mojolicious book.
+        - Started adding reference documentation. (marcus)
         - Improved HTTP 1.1 state machine.
         - Improved exception handling in Mojo::Client, Mojo::Server::Daemon
           and Mojo::IOLoop.

@@ -9,8 +9,8 @@ technology.
 
 Features:
 
-    * An amazing MVC web framework called Mojolicious, which supports a
-      simplified single file mode through Mojolicious::Lite.
+    * An amazing MVC web framework supporting a simplified single file mode
+      through Mojolicious::Lite.
 
     * Very clean and Object Oriented pure Perl API without any hidden magic
       and no requirements besides Perl 5.8.1.
@@ -22,6 +22,8 @@ Features:
       perfect for embedding.
 
     * CGI, FastCGI and PSGI support.
+
+    * Fresh code, based upon years of experience developing Catalyst.
 
     And much more for you to discover!
 

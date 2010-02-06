@@ -108,4 +108,8 @@ implements the following new ones.
 
     $test = $test->run(@ARGV);
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

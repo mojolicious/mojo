@@ -508,4 +508,8 @@ following new ones.
     my $true = Mojo::JSON->true;
     my $true = $json->true;
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

@@ -169,4 +169,8 @@ implements the follwing the ones.
     my $url = $match->url_for('named', foo => 'bar');
     my $url = $match->url_for('named', {foo => 'bar'});
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

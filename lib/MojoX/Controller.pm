@@ -99,4 +99,8 @@ Non persistent data storage and exchange.
     my $foo = $c->stash->{foo};
     delete $c->stash->{foo};
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

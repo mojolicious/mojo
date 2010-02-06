@@ -426,4 +426,8 @@ L<Mojo::Server::Daemon> and implements the following new ones.
 
     $daemon->run;
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

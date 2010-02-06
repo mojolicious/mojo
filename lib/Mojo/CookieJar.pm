@@ -163,4 +163,8 @@ following new ones.
 
     my @cookies = $jar->find($url);
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

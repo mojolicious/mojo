@@ -407,4 +407,8 @@ connection in progress.
 
 Generate a L<Mojo::URL> for the current or a named route.
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

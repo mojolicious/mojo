@@ -1225,4 +1225,8 @@ Send a message via WebSocket, only available from callbacks.
 
 Open a WebSocket connection with transparent handshake.
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

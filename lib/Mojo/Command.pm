@@ -352,4 +352,8 @@ following new ones.
 
     $command = $command->write_rel_file('foo/bar.txt', 'Hello World!');
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

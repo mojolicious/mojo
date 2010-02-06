@@ -142,4 +142,8 @@ Check if the state machine is currently in a specific state.
 
 The current state.
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

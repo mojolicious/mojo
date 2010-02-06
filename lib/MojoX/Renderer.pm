@@ -409,4 +409,8 @@ and C<handler>.
 Builds a full template path based on an options hash with C<template>,
 C<format> and C<handler>.
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

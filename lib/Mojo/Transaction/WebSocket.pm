@@ -239,4 +239,8 @@ Read raw WebSocket data, only used by servers.
 
 Raw WebSocket data to write, only used by servers.
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

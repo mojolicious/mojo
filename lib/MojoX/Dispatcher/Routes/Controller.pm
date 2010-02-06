@@ -67,4 +67,8 @@ L<MojoX::Controller> and implements the following new ones.
 
 Request parameters and routes captures.
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

@@ -763,4 +763,8 @@ following new ones.
         $template, $output_file, @arguments
     );
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

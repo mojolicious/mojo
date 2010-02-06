@@ -396,4 +396,8 @@ following new ones.
     $t = $t->status_is(200);
     $t = $t->status_is(200, 'right status!');
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

@@ -568,4 +568,8 @@ L<Mojolicious::Lite> inherits all attributes from L<Mojolicious>.
 
 L<Mojolicious::Lite> inherits all methods from L<Mojolicious>.
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

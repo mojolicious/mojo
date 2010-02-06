@@ -290,4 +290,8 @@ implements the follwing the ones.
     my $success = $dispatcher->serve_error($c, 404);
     my $success = $dispatcher->serve_error($c, 404, '404.html');
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

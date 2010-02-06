@@ -47,4 +47,8 @@ L<Mojo::Command::Generate> and implements the following new ones.
 L<Mojolicious::Command::Generate> inherits all methods from
 L<Mojo::Command::Generate>.
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

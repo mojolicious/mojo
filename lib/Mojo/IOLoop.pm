@@ -1350,4 +1350,8 @@ loop to guarantee safe writing.
 Activate read/write mode for a connection.
 Note that connections have no mode after they are created.
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

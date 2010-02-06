@@ -288,4 +288,8 @@ implements the following new ones.
 
     $content = $content->parse('Content-Type: multipart/mixed');
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

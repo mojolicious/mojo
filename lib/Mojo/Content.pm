@@ -405,4 +405,8 @@ the following new ones.
 
     my $size = $content->raw_body_size;
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

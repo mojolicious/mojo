@@ -82,4 +82,8 @@ the following new ones.
 
     $cgi = $cgi->run(@ARGV);
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

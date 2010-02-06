@@ -94,4 +94,8 @@ L<Mojo::Command> and implements the following new ones.
 
     $app->run(@ARGV);
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

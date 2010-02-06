@@ -212,4 +212,8 @@ following new ones.
     my $string = $e->to_string;
     my $string = "$e";
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

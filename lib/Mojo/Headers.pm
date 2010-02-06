@@ -579,4 +579,8 @@ Remove a header.
 Format headers as a hash.
 Nested arrayrefs to represent multi line values are optional.
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

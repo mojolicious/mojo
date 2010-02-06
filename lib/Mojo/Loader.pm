@@ -174,4 +174,8 @@ following new ones.
 
     my $modules = $loader->search('MyApp::Namespace');
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

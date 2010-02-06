@@ -271,4 +271,8 @@ the following new ones.
 
     my $string = $file->slurp;
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

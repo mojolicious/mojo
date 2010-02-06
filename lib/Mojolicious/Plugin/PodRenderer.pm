@@ -97,4 +97,8 @@ L<Mojolicious::Plugin> and implements the following new ones.
 
 Register the renderer.
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

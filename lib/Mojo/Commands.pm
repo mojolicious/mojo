@@ -184,4 +184,8 @@ the following new ones.
     Mojo::Commands->start;
     Mojo::Commands->start(@ARGV);
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

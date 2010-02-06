@@ -101,4 +101,8 @@ L<Mojo::Command> and implements the following new ones.
 
     $makefile = $makefile->run(@ARGV);
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

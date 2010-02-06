@@ -41,4 +41,8 @@ your plugin should use this to hook into the application.
 For instace by adding handlers and helpers to the renderer or using the
 C<add_hooks> method of L<Mojolicious::Plugins> to hook into the request flow.
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

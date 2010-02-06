@@ -51,4 +51,8 @@ Your application might add to this in order to implement local actions.
 
 L<Mojolicious::Commands> inherits all methods from L<Mojo::Commands>.
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

@@ -369,4 +369,8 @@ implements the follwing the ones.
 
     my $e = $dispatcher->walk_stack($c);
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

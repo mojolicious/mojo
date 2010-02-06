@@ -81,4 +81,8 @@ follwing the ones.
     my $type = $types->type('png');
     $types   = $types->type(png => 'image/png');
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

@@ -695,4 +695,8 @@ the following new ones.
     my $version = $message->version;
     $message    = $message->version('1.1');
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

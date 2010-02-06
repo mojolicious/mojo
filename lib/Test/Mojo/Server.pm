@@ -354,4 +354,8 @@ the following new ones.
 
     $server->stop_server_ok('server stopped');
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

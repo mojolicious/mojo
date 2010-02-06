@@ -35,4 +35,8 @@ L<Mojo::Transaction::HTTP>.
 L<Mojo::Transaction::Single> inherits all methods from
 L<Mojo::Transaction::HTTP>.
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

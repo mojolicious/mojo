@@ -985,4 +985,8 @@ the following new ones.
 
     $stream = $stream->xml_escape;
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

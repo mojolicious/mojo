@@ -179,4 +179,8 @@ implements the following new ones.
 
     my $chunk = $tx->server_write;
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

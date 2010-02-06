@@ -13,8 +13,8 @@ on C<irc.perl.org>.
 
 =head1 TUTORIAL
 
-A really fun way to get started developing web applications as fast as
-possible is the tutorial in L<Mojolicious::Lite>, you should take a look.
+A really fast and fun way to get started developing web applications with
+Mojolicious is the tutorial in L<Mojolicious::Lite>, you should take a look.
 
 =head1 CHAPTERS
 

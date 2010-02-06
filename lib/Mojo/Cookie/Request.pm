@@ -116,4 +116,8 @@ implements the following new ones.
 
     my $string = $cookie->to_string_with_prefix;
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

@@ -140,4 +140,8 @@ implements the following new ones.
 
     $content = $content->parse("Content-Length: 12\r\n\r\nHello World!");
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

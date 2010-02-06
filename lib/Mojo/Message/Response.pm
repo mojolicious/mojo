@@ -282,4 +282,8 @@ implements the following new ones.
 
     $res = $res->parse_until_body('HTTP/1.1 200 OK');
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

@@ -438,4 +438,8 @@ implements the following new ones.
     $req      = $req->proxy('http://foo:bar@127.0.0.1:3000');
     $req      = $req->proxy( Mojo::URL->new('http://127.0.0.1:3000')  );
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

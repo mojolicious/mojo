@@ -153,4 +153,8 @@ constant or a sub reference.
 The sub reference will be excuted at accessor read time if there's no set
 value.
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

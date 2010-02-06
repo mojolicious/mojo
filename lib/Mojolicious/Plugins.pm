@@ -220,4 +220,8 @@ Runs a hook.
 
 Runs a hook in reverse order.
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

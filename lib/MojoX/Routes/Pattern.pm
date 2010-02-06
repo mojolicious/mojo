@@ -417,4 +417,8 @@ implements the follwing the ones.
 
     my $result = $pattern->shape_match(\$path);
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

@@ -185,4 +185,8 @@ following new ones.
 
     $log = $log->warn('Dont do that Dave...');
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

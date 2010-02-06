@@ -463,4 +463,8 @@ implements the following new ones.
 
     $fcgi->write_response($tx);
 
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+
 =cut

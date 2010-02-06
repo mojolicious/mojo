@@ -198,8 +198,8 @@ sub template_name {
 
 sub template_path {
     my $self = shift;
-    return File::Spec->catfile($self->root, split '/',
-        $self->template_name(shift));
+    return unless my $name = $self->template_name(shift);
+    return File::Spec->catfile($self->root, split '/', $name);
 }
 
 sub _extends {

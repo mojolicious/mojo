@@ -101,6 +101,7 @@ This file documents the revision history for Perl extension Mojolicious.
           times on a Mojo::URL object. (vti)
         - Fixed development mode log level. (ka2u)
         - Fixed query string support in Mojo::URL. (vti)
+        - Fixed rendering without template name.
 
 0.999914 2009-11-24 00:00:00
         - Added the Mojolicious plugin system.

@@ -11,6 +11,11 @@ drafts you can visit L<http://labs.kraih.com>, L<http://twitter.com/kraih>
 and L<http://github.com/kraih/mojo> or join the official IRC channel C<#mojo>
 on C<irc.perl.org>.
 
+=head1 TUTORIAL
+
+A really fun way to get started developing web applications as fast as
+possible is the tutorial in L<Mojolicious::Lite>, you should take a look.
+
 =head1 CHAPTERS
 
 New chapters will be added one by one, so keep a close eye on this.

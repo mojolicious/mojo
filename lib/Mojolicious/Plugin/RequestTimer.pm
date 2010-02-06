@@ -18,7 +18,7 @@ sub register {
     $app->plugins->add_hook(
         before_dispatch => sub {
             my ($self, $c) = @_;
-            $c->stash(started => [Time::HiRes::gettimeofday()]);
+            $c->stash('mojo.started' => [Time::HiRes::gettimeofday()]);
         }
     );
 
@@ -26,7 +26,7 @@ sub register {
     $app->plugins->add_hook(
         after_dispatch => sub {
             my ($self, $c) = @_;
-            return unless my $started = $c->stash('started');
+            return unless my $started = $c->stash('mojo.started');
             my $elapsed = sprintf '%f',
               Time::HiRes::tv_interval($started,
                 [Time::HiRes::gettimeofday()]);

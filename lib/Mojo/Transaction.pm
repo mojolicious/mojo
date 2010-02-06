@@ -17,18 +17,17 @@ __PACKAGE__->attr(keep_alive       => 0);
 __PACKAGE__->attr('_real_state');
 
 # Please don't eat me! I have a wife and kids. Eat them!
-sub client_is_writing { shift->_is_writing }
-
-sub client_leftovers {
-    croak 'Method "client_leftovers" not implemented by subclass';
-}
-
 sub client_read  { croak 'Method "client_read" not implemented by subclass' }
 sub client_write { croak 'Method "client_write" not implemented by subclass' }
 
 sub is_paused { shift->is_state('paused') }
 
 sub is_websocket {0}
+
+sub is_writing {
+    shift->is_state(
+        qw/start write write_start_line write_headers write_body/);
+}
 
 sub pause {
     my $self = shift;
@@ -75,20 +74,9 @@ sub resume {
     return $self;
 }
 
-sub server_is_writing { shift->_is_writing }
-
-sub server_leftovers {
-    croak 'Method "server_leftovers" not implemented by subclass';
-}
-
 sub server_read { croak 'Method "server_read" not implemented by subclass' }
 
 sub server_write { croak 'Method "server_write" not implemented by subclass' }
-
-sub _is_writing {
-    shift->is_state(
-        qw/start write write_start_line write_headers write_body/);
-}
 
 1;
 __END__
@@ -155,14 +143,6 @@ implements the following new ones.
 L<Mojo::Transaction> inherits all methods from L<Mojo::Stateful> and
 implements the following new ones.
 
-=head2 C<client_is_writing>
-
-    my $writing = $tx->client_is_writing;
-
-=head2 C<client_leftovers>
-
-    my $leftovers = $tx->client_leftovers;
-
 =head2 C<client_read>
 
     $tx = $tx->client_read($chunk);
@@ -179,6 +159,10 @@ implements the following new ones.
 
     my $is_websocket = $tx->is_websocket;
 
+=head2 C<is_writing>
+
+    my $writing = $tx->is_writing;
+
 =head2 C<pause>
 
     $tx = $tx->pause;
@@ -186,14 +170,6 @@ implements the following new ones.
 =head2 C<resume>
 
     $tx = $tx->resume;
-
-=head2 C<server_is_writing>
-
-    my $writing = $tx->server_is_writing;
-
-=head2 C<server_leftovers>
-
-    my $leftovers = $tx->server_leftovers;
 
 =head2 C<server_read>
 

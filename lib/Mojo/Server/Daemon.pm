@@ -383,7 +383,7 @@ sub _state {
     }
 
     # Writing?
-    return $tx->client_is_writing
+    return $tx->is_writing
       ? $self->ioloop->writing($id)
       : $self->ioloop->not_writing($id);
 }
@@ -409,7 +409,7 @@ sub _upgrade {
             my $ws = shift;
 
             # Writing
-            return $self->ioloop->writing($id) if $ws->server_is_writing;
+            return $self->ioloop->writing($id) if $ws->is_writing;
 
             # Finish
             if ($ws->is_finished) {

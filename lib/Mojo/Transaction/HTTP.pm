@@ -40,7 +40,7 @@ sub client_read {
     my $read = length $chunk;
 
     # Buffer early response, most likely an error
-    $self->res->buffer->add_chunk($chunk) if $self->client_is_writing;
+    $self->res->buffer->add_chunk($chunk) if $self->is_writing;
 
     # Read 100 Continue
     if ($self->is_state('read_continue')) {
@@ -414,9 +414,7 @@ sub _server_spin {
             if ($self->keep_alive) {
                 $self->res->headers->connection('Keep-Alive');
             }
-            else {
-                $self->res->headers->connection('Close');
-            }
+            else { $self->res->headers->connection('Close') }
         }
 
         # Ready for next state
@@ -461,9 +459,7 @@ sub _server_spin {
             $self->state('read');
 
             # Continue
-            if ($self->res->code == 100) {
-                $self->res($self->res->new);
-            }
+            if ($self->res->code == 100) { $self->res($self->res->new) }
 
             # Don't continue
             else { $self->done }

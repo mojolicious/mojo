@@ -757,7 +757,7 @@ sub _state {
         return $self->_finish($id) if $tx->is_finished;
 
         # Writing?
-        return $tx->client_is_writing
+        return $tx->is_writing
           ? $self->ioloop->writing($id)
           : $self->ioloop->not_writing($id);
     }
@@ -786,7 +786,7 @@ sub _state {
     my $current = $c->{writer};
     $current = $c->{reader} unless $c->{tx}->[$c->{writer}];
 
-    return $c->{tx}->[$current]->client_is_writing
+    return $c->{tx}->[$current]->is_writing
       ? $self->ioloop->writing($id)
       : $self->ioloop->not_writing($id);
 }
@@ -863,7 +863,7 @@ sub _upgrade {
             return $self->_finish($id) if $tx->is_finished;
 
             # Writing?
-            $tx->client_is_writing
+            $tx->is_writing
               ? $self->ioloop->writing($id)
               : $self->ioloop->not_writing($id);
         }

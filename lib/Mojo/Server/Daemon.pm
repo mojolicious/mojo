@@ -456,7 +456,8 @@ Mojo::Server::Daemon - Async IO HTTP 1.1 And WebSocket Server
 =head1 DESCRIPTION
 
 L<Mojo::Server::Daemon> is a full featured async io HTTP 1.1 and WebSocket
-server with C<IPv6>, C<TLS>, C<epoll> and C<kqueue> support.
+server with C<IPv6>, C<TLS>, C<epoll>, C<kqueue>, hot deployment and UNIX
+domain socket sharing support.
 
 Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::INET6> and
 L<IO::Socket::SSL> are supported transparently and used if installed.

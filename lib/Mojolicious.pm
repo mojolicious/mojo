@@ -236,8 +236,8 @@ requirements besides Perl 5.8.1.
 Full stack HTTP 1.1 and WebSocket client/server implementation with IPv6 and
 TLS support.
 
-Builtin async IO and prefork web server with epoll and kqueue support,
-perfect for embedding.
+Builtin async IO and prefork web server with epoll, kqueue, hot deployment
+and UNIX domain socket sharing support, perfect for embedding.
 
 CGI, FastCGI and L<PSGI> support.
 

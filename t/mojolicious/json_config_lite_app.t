@@ -11,7 +11,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 5;
+plan tests => 7;
 
 # Oh, I always feared he might run off like this.
 # Why, why, why didn't I break his legs?
@@ -35,6 +35,14 @@ my $t = Test::Mojo->new;
 
 # GET /
 $t->get_ok('/')->status_is(200)->content_like(qr/bar/);
+
+# No file, default only
+$config =
+  plugin json_config => {file => 'nonexisted', default => {foo => 'qux'}};
+is($config->{foo}, 'qux');
+
+# No file, no default
+ok(not eval { plugin json_config => {file => 'nonexisted'}; });
 
 __DATA__
 @@ index.html.ep

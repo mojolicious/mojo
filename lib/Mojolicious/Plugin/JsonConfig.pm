@@ -39,44 +39,61 @@ sub register {
     $file = $app->home->rel_file($file)
       unless File::Spec->file_name_is_absolute($file);
 
-    # Exists?
-    die qq/Configuration file "$file" missing, maybe you need to create it?\n/
-      unless -e $file;
+    # Upcoming config
+    my $config = {};
 
-    # Debug
-    $app->log->debug(qq/Reading configuration file "$file"./);
+    # Read if exists
+    if (-e $file) {
 
-    # Slurp UTF-8 file
-    open FILE, "<:encoding(UTF-8)", $file
-      or die qq/Couldn't open configuration file "$file": $!/;
-    my $config = do { local $/; <FILE> };
-    close FILE;
+        # Debug
+        $app->log->debug(qq/Reading configuration file "$file"./);
 
-    # Instance
-    my $prepend = 'my $app = shift;';
+        # Slurp UTF-8 file
+        open FILE, "<:encoding(UTF-8)", $file
+          or die qq/Couldn't open configuration file "$file": $!/;
+        $config = do { local $/; <FILE> };
+        close FILE;
 
-    # Be less strict
-    $prepend .= q/no strict 'refs'; no warnings 'redefine';/;
+        # Instance
+        my $prepend = 'my $app = shift;';
 
-    # Helper
-    $prepend .= "sub app; *app = sub { \$app };";
+        # Be less strict
+        $prepend .= q/no strict 'refs'; no warnings 'redefine';/;
 
-    # Be strict again
-    $prepend .= q/use strict; use warnings;/;
+        # Helper
+        $prepend .= "sub app; *app = sub { \$app };";
 
-    # Template
-    my $mt = Mojo::Template->new;
-    $mt->prepend($prepend);
+        # Be strict again
+        $prepend .= q/use strict; use warnings;/;
 
-    # Render
-    $config = $mt->render($config, $app);
+        # Template
+        my $mt = Mojo::Template->new;
+        $mt->prepend($prepend);
 
-    # Parse
-    my $json = Mojo::JSON->new;
-    $config = $json->decode($config);
-    my $error = $json->error;
-    die qq/Couldn't parse configuration file "$file": $error/
-      if !$config && $error;
+        # Render
+        $config = $mt->render($config, $app);
+
+        # Parse
+        my $json = Mojo::JSON->new;
+        $config = $json->decode($config);
+        my $error = $json->error;
+        die qq/Couldn't parse configuration file "$file": $error/
+          if !$config && $error;
+    }
+
+    # Check default otherwise
+    else {
+
+        # File or default is required
+        unless ($conf->{default}) {
+            die qq/Configuration file "$file" missing, /,
+              qq/maybe you need to create it?\n/;
+        }
+
+        # Warn
+        $app->log->debug(
+            qq/Configuration file "$file" missing, using default config/);
+    }
 
     # Stash key
     my $stash_key = $conf->{stash_key} || 'config';

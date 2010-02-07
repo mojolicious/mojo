@@ -273,9 +273,9 @@ sub to {
     }
 
     # Controller and action
-    if ($shortcut && $shortcut =~ /^([\w\-]+)\#(\w+)$/) {
-        $defaults->{controller} = $1;
-        $defaults->{action}     = $2;
+    if ($shortcut && $shortcut =~ /^([\w\-]+)?\#(\w+)?$/) {
+        $defaults->{controller} = $1 if defined $1;
+        $defaults->{action}     = $2 if defined $2;
     }
 
     # Defaults

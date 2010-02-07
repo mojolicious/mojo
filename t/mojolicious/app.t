@@ -11,7 +11,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 141;
+plan tests => 156;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -218,3 +218,17 @@ $t->get_ok('/staged')->status_is(200)->header_is(Server => 'Mojo (Perl)')
 $t->get_ok('/stash_config')->status_is(200)
   ->header_is(Server         => 'Mojo (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('123');
+
+# Sweet shortcuts to controller#action
+$t->get_ok('/shortcut/ctrl-act')->status_is(200)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('ctrl-act');
+$t->get_ok('/shortcut/ctrl')->status_is(200)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('ctrl');
+$t->get_ok('/shortcut/act')->status_is(200)
+  ->header_is(Server         => 'Mojo (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('act');

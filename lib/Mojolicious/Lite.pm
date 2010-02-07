@@ -247,7 +247,8 @@ Templates can have layouts.
         <body><%= content %></body>
     </html>
 
-Templates can also extend each other.
+Templates can also pass around blocks of captured content and extend each
+other.
 
     # GET /
     get '/' => 'first';

@@ -35,6 +35,10 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added simpler way to define default controller and action for a
           route.
               $r->route('/foo')->to('mycontroller#myaction');
+        - Added simple way to define default controller or action for a
+          route. (mvuets)
+              $r->route('/foo/:controller')->to('#myaction');
+              $r->route('/foo/:action')->to('mycontroller#');
         - Added multipart post support to Test::Mojo. (yuki-kimoto)
         - Added env attribute to Mojo::Message::Request.
         - Added range support to MojoX::Dispatcher::Static. (xantus)

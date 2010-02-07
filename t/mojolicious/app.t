@@ -219,16 +219,13 @@ $t->get_ok('/stash_config')->status_is(200)
   ->header_is(Server         => 'Mojo (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('123');
 
-# Sweet shortcuts to controller#action
+# Shortcuts to controller#action
 $t->get_ok('/shortcut/ctrl-act')->status_is(200)
   ->header_is(Server         => 'Mojo (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('ctrl-act');
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('ctrl-act');
 $t->get_ok('/shortcut/ctrl')->status_is(200)
   ->header_is(Server         => 'Mojo (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('ctrl');
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('ctrl');
 $t->get_ok('/shortcut/act')->status_is(200)
   ->header_is(Server         => 'Mojo (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('act');
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('act');

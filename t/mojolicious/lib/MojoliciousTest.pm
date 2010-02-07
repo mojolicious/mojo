@@ -68,15 +68,15 @@ sub startup {
       $r->bridge('/staged')->to(controller => 'foo', action => 'stage1');
     $b->route->to(action => 'stage2');
 
-    # /shortcut/ctrl-act
+    # /shortcut/act
     # /shortcut/ctrl
-    # /shortcut/act - sweet shortcuts to controller#action
+    # /shortcut/ctrl-act - Shortcuts to controller#action
     $r->route('/shortcut/ctrl-act')
-        ->to('foo#config', config => {test => 'ctrl-act'});
+      ->to('foo#config', config => {test => 'ctrl-act'});
     $r->route('/shortcut/ctrl')
-        ->to('foo#',    action     => 'config', config => {test => 'ctrl'});
+      ->to('foo#', action => 'config', config => {test => 'ctrl'});
     $r->route('/shortcut/act')
-        ->to('#config', controller => 'foo',    config => {test => 'act'});
+      ->to('#config', controller => 'foo', config => {test => 'act'});
 
     # /*/* - the default route
     $r->route('/(controller)/(action)')->to(action => 'index');

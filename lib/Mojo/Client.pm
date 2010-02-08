@@ -505,8 +505,9 @@ sub _error {
         for my $tx (ref $tx eq 'ARRAY' ? @$tx : ($tx)) { $tx->error($error) }
     }
 
-    # Log error in debug mode
-    $LOG->debug("Client error: $error") if $LOG;
+    # Log error in debug mode and warn without logger
+    my $message = "Client error: $error";
+    $LOG ? $LOG->debug($message) : warn $message;
 
     # Finish
     $self->_finish($id);

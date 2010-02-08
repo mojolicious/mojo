@@ -18,7 +18,7 @@ use Mojo::Template;
 sub register {
     my ($self, $app, $conf) = @_;
 
-    # Config
+    # Plugin config
     $conf ||= {};
 
     # File
@@ -35,64 +35,24 @@ sub register {
         $file .= '.json';
     }
 
-    # Absolute?
+    # Absolute path
     $file = $app->home->rel_file($file)
       unless File::Spec->file_name_is_absolute($file);
 
-    # Upcoming config
+    # Read config file
     my $config = {};
+    if (-e $file) { $config = $self->_read_config($file, $app) }
 
-    # Read if exists
-    if (-e $file) {
-
-        # Debug
-        $app->log->debug(qq/Reading configuration file "$file"./);
-
-        # Slurp UTF-8 file
-        open FILE, "<:encoding(UTF-8)", $file
-          or die qq/Couldn't open configuration file "$file": $!/;
-        $config = do { local $/; <FILE> };
-        close FILE;
-
-        # Instance
-        my $prepend = 'my $app = shift;';
-
-        # Be less strict
-        $prepend .= q/no strict 'refs'; no warnings 'redefine';/;
-
-        # Helper
-        $prepend .= "sub app; *app = sub { \$app };";
-
-        # Be strict again
-        $prepend .= q/use strict; use warnings;/;
-
-        # Template
-        my $mt = Mojo::Template->new;
-        $mt->prepend($prepend);
-
-        # Render
-        $config = $mt->render($config, $app);
-
-        # Parse
-        my $json = Mojo::JSON->new;
-        $config = $json->decode($config);
-        my $error = $json->error;
-        die qq/Couldn't parse configuration file "$file": $error/
-          if !$config && $error;
-    }
-
-    # Check default otherwise
+    # Check for default
     else {
 
-        # File or default is required
-        unless ($conf->{default}) {
-            die qq/Configuration file "$file" missing, /,
-              qq/maybe you need to create it?\n/;
-        }
+        # All missing
+        die qq/Config file "$file" missing, maybe you need to create it?\n/
+          unless $conf->{default};
 
-        # Warn
+        # Debug
         $app->log->debug(
-            qq/Configuration file "$file" missing, using default config/);
+            qq/Config file "$file" missing, using default config./);
     }
 
     # Stash key
@@ -106,12 +66,49 @@ sub register {
         before_dispatch => sub {
             my ($self, $c) = @_;
 
-            # Add configuration to stash
+            # Stash
             $c->stash($stash_key => $config);
         }
     );
 
-    # Return configuration
+    return $config;
+}
+
+sub _read_config {
+    my ($self, $file, $app) = @_;
+
+    # Debug
+    $app->log->debug(qq/Reading config file "$file"./);
+
+    # Slurp UTF-8 file
+    open FILE, "<:encoding(UTF-8)", $file
+      or die qq/Couldn't open config file "$file": $!/;
+    my $encoded = do { local $/; <FILE> };
+    close FILE;
+
+    # Instance
+    my $prepend = 'my $app = shift;';
+
+    # Be less strict
+    $prepend .= q/no strict 'refs'; no warnings 'redefine';/;
+
+    # Helper
+    $prepend .= "sub app; *app = sub { \$app };";
+
+    # Be strict again
+    $prepend .= q/use strict; use warnings;/;
+
+    # Render
+    my $mt = Mojo::Template->new;
+    $mt->prepend($prepend);
+    $encoded = $mt->render($encoded, $app);
+
+    # Parse
+    my $json   = Mojo::JSON->new;
+    my $config = $json->decode($encoded);
+    my $error  = $json->error;
+    die qq/Couldn't parse config file "$file": $error/ if !$config && $error;
+
     return $config;
 }
 

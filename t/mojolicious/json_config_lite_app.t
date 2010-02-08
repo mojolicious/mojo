@@ -36,12 +36,12 @@ my $t = Test::Mojo->new;
 # GET /
 $t->get_ok('/')->status_is(200)->content_like(qr/bar/);
 
-# No file, default only
+# No config file, default only
 $config =
   plugin json_config => {file => 'nonexisted', default => {foo => 'qux'}};
 is($config->{foo}, 'qux');
 
-# No file, no default
+# No config file, no default
 ok(not eval { plugin json_config => {file => 'nonexisted'}; });
 
 __DATA__

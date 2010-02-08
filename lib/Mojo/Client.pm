@@ -607,7 +607,7 @@ sub _fix_cookies {
     return @cookies;
 }
 
-sub _hup { shift->_error(@_, 'Connection closed.') }
+sub _hup { shift->_error(@_) }
 
 sub _prepare_server {
     my $self = shift;

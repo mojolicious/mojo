@@ -40,7 +40,7 @@ __END__
 
 =head1 NAME
 
-MojoX::Controller - Controller
+MojoX::Controller - Controller Base Class
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ MojoX::Controller - Controller
 
 =head1 DESCRIPTION
 
-L<MojoX::Controller> is a controllers base class.
+L<MojoX::Controller> is an abstract controllers base class.
 
 =head2 ATTRIBUTES
 

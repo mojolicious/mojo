@@ -318,17 +318,19 @@ __END__
 
 =head1 NAME
 
-MojoX::Routes::Pattern - Pattern
+MojoX::Routes::Pattern - Routes Pattern
 
 =head1 SYNOPSIS
 
     use MojoX::Routes::Pattern;
 
+    # New pattern object
     my $pattern = MojoX::Routes::Pattern->new;
 
 =head1 DESCRIPTION
 
-L<MojoX::Routes::Pattern> is a route pattern container.
+L<MojoX::Routes::Pattern> is a container for routes pattern which are used to
+match paths against.
 
 =head2 ATTRIBUTES
 
@@ -339,55 +341,77 @@ L<MojoX::Routes::Pattern> implements the following attributes.
     my $defaults = $pattern->defaults;
     $pattern     = $pattern->defaults({foo => 'bar'});
 
+Default parameters.
+
 =head2 C<pattern>
 
     my $pattern = $pattern->pattern;
     $pattern    = $pattern->pattern('/(foo)/(bar)');
+
+Raw unparsed pattern.
 
 =head2 C<quote_end>
 
     my $quote = $pattern->quote_end;
     $pattern  = $pattern->quote_end(']');
 
+Character indicating the end of a quoted placeholder, defaults to C<)>.
+
 =head2 C<quote_start>
 
     my $quote = $pattern->quote_start;
     $pattern  = $pattern->quote_start('[');
+
+Character indicating the start of a quoted placeholder, defaults to C<(>.
 
 =head2 C<regex>
 
     my $regex = $pattern->regex;
     $pattern  = $pattern->regex(qr/\/foo/);
 
+Pattern in compiled regex form.
+
 =head2 C<relaxed_start>
 
     my $relaxed = $pattern->relaxed_start;
     $pattern    = $pattern->relaxed_start('*');
+
+Character indicating a relaxed placeholder, defaults to C<.>.
 
 =head2 C<reqs>
 
     my $reqs = $pattern->reqs;
     $pattern = $pattern->reqs({foo => qr/\w+/});
 
+Regex constraints.
+
 =head2 C<symbol_start>
 
     my $symbol = $pattern->symbol_start;
     $pattern   = $pattern->symbol_start(':');
+
+Character indicating a placeholder, defaults to C<:>.
 
 =head2 C<symbols>
 
     my $symbols = $pattern->symbols;
     $pattern    = $pattern->symbols(['foo', 'bar']);
 
+Placeholder names.
+
 =head2 C<tree>
 
     my $tree = $pattern->tree;
     $pattern = $pattern->tree([ ... ]);
 
+Pattern in parsed form.
+
 =head2 C<wildcard_start>
 
     my $wildcard = $pattern->wildcard_start;
     $pattern     = $pattern->wildcard_start('*');
+
+Character indicating the start of a wildcard placeholder, defaults to C<*>.
 
 =head1 METHODS
 
@@ -400,22 +424,32 @@ implements the follwing the ones.
         action => qr/\w+/
     );
 
+Construct a new pattern object.
+
 =head2 C<match>
 
     my $result = $pattern->match('/foo/bar');
 
+Match pattern against a path.
+
 =head2 C<parse>
 
     $pattern = $pattern->parse('/(controller)/(action)', action => qr/\w+/);
+
+Parse a raw pattern.
 
 =head2 C<render>
 
     my $string = $pattern->render(action => 'foo');
     my $string = $pattern->render({action => 'foo'});
 
+Render pattern into a path with paramters.
+
 =head2 C<shape_match>
 
     my $result = $pattern->shape_match(\$path);
+
+Match pattern against a path and remove matching parts.
 
 =head1 SEE ALSO
 

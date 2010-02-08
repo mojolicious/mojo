@@ -50,13 +50,20 @@ __END__
 
 =head1 NAME
 
-MojoX::Types - Types
+MojoX::Types - MIME Types
 
 =head1 SYNOPSIS
 
     use MojoX::Types;
 
+    # New type list
     my $types = MojoX::Types->new;
+
+    # Get MIME type for ".png"
+    my $type = $types->type('png');
+
+    # Add MIME type for ".foo"
+    $types->type(foo => 'mojo/foo');
 
 =head1 DESCRIPTION
 
@@ -71,6 +78,8 @@ L<MojoX::Types> implements the following attributes.
     my $map = $types->types;
     $types  = $types->types({png => 'image/png'});
 
+List of MIME types.
+
 =head1 METHODS
 
 L<MojoX::Types> inherits all methods from L<Mojo::Base> and implements the
@@ -80,6 +89,8 @@ follwing the ones.
 
     my $type = $types->type('png');
     $types   = $types->type(png => 'image/png');
+
+Get or set MIME type for file extension.
 
 =head1 SEE ALSO
 

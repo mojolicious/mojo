@@ -345,17 +345,48 @@ __END__
 
 =head1 NAME
 
-MojoX::Routes - Routes
+MojoX::Routes - Always Find Your Destination With Routes
 
 =head1 SYNOPSIS
 
     use MojoX::Routes;
 
-    my $routes = MojoX::Routes->new;
+    # New routes tree
+    my $r = MojoX::Routes->new;
+
+    # Normal route matching "/articles" with parameters "controller" and
+    # "action"
+    $r->route('/articles')->to(controller => 'article', action => 'list');
+
+    # Route with a placeholder matching everything but "/" and "."
+    $r->route('/:controller')->to(action => 'list');
+
+    # Route with a placeholder and regex constraint
+    $r->route('/articles/:id', id => qr/\d+/)
+      ->to(controller => 'article', action => 'view');
+
+    # Route with an optional parameter "year"
+    $r->route('/archive/:year')
+      ->to(controller => 'archive', action => 'list', year => undef);
+
+    # Nested route for two actions sharing the same "controller" paramater
+    my $books = $r->route('/books/:id')->to(controller => 'book');
+    $books->route('/edit')->to(action => 'edit');
+    $books->route('/delete')->to(action => 'delete');
+
+    # Bridges can be used to chain multiple routes
+    $r->bridge->to(controller => 'foo', action =>'auth')
+      ->route('/blog')->to(action => 'list');
+
+    # Waypoints are similar to bridges and nested routes but can also match
+    # if they are not the actual endpoint of the whole route
+    my $b = $r->waypoint('/books')->to(controller => 'books', action => 'list');
+    $b->route('/:id', id => qr/\d+/)->to(action => 'view');
 
 =head1 DESCRIPTION
 
-L<MojoX::Routes> is a routes implementation.
+L<MojoX::Routes> is a very powerful implementation of the famous routes
+pattern and the core of the L<Mojolicious> web framework.
 
 =head2 ATTRIBUTES
 
@@ -363,43 +394,61 @@ L<MojoX::Routes> implements the following attributes.
 
 =head2 C<block>
 
-    my $block = $routes->block;
-    $routes   = $routes->block(1);
+    my $block = $r->block;
+    $r        = $r->block(1);
+
+Allow this route to match even if it's not an endpoint, used for waypoints.
 
 =head2 C<children>
 
-    my $children = $routes->children;
-    $routes      = $routes->children([MojoX::Routes->new]);
+    my $children = $r->children;
+    $r           = $r->children([MojoX::Routes->new]);
+
+The children of this routes object, used for nesting routes.
 
 =head2 C<conditions>
 
-    my $conditions  = $routes->conditions;
-    $routes         = $routes->conditions([foo => qr/\w+/]);
+    my $conditions  = $r->conditions;
+    $r              = $r->conditions([foo => qr/\w+/]);
+
+Contains condition parameters for this route, used for C<over>.
 
 =head2 C<dictionary>
 
-    my $dictionary = $routes->dictionary;
-    $routes        = $routes->dictionary({foo => sub { ... }});
+    my $dictionary = $r->dictionary;
+    $r             = $r->dictionary({foo => sub { ... }});
+
+Contains all available conditions for this route.
+There are currently two conditions built in, C<method> and C<websocket>.
 
 =head2 C<inline>
 
-    my $inline = $routes->inline;
-    $routes    = $routes->inline(1);
+    my $inline = $r->inline;
+    $r         = $r->inline(1);
+
+Allow C<bridge> semantics for this route.
 
 =head2 C<name>
 
-    my $name = $routes->name;
-    $routes  = $routes->name('foo');
+    my $name = $r->name;
+    $r       = $r->name('foo');
+
+The name of this route.
 
 =head2 C<parent>
 
-    my $parent = $routes->parent;
-    $routes    = $routes->parent(MojoX::Routes->new);
+    my $parent = $r->parent;
+    $r         = $r->parent(MojoX::Routes->new);
+
+The parent of this route, used for nesting routes.
 
 =head2 C<pattern>
 
-    my $pattern = $routes->pattern;
-    $routes     = $routes->pattern(MojoX::Routes::Pattern->new);
+    my $pattern = $r->pattern;
+    $r          = $r->pattern(MojoX::Routes::Pattern->new);
+
+Pattern for this route, by default a L<MojoX::Routes::Pattern> object and
+used for matching.
 
 =head1 METHODS
 
@@ -408,76 +457,106 @@ follwing the ones.
 
 =head2 C<new>
 
-    my $routes = MojoX::Routes->new;
-    my $routes = MojoX::Routes->new('/:controller/:action');
+    my $r = MojoX::Routes->new;
+    my $r = MojoX::Routes->new('/:controller/:action');
+
+Construct a new route object.
 
 =head2 C<add_condition>
 
-    $routes = $routes->add_condition(foo => sub { ... });
+    $r = $r->add_condition(foo => sub { ... });
+
+Add a new condition for this route.
 
 =head2 C<bridge>
 
-    my $bridge = $routes->bridge;
-    my $bridge = $routes->bridge('/:controller/:action');
+    my $bridge = $r->bridge;
+    my $bridge = $r->bridge('/:controller/:action');
+
+Add a new bridge to this route as a nested child.
 
 =head2 C<find_route>
 
-    my $route = $routes->find_route('some_route');
+    my $route = $r->find_route('some_route');
+
+Find a route by name in the whole routes tree.
 
 =head2 C<is_endpoint>
 
-    my $is_endpoint = $routes->is_endpoint;
+    my $is_endpoint = $r->is_endpoint;
+
+Returns true if this route qualifies as an endpoint.
 
 =head2 C<match>
 
-    $match = $routes->match($match);
-    my $match = $routes->match('/foo/bar');
-    my $match = $routes->match(get => '/foo/bar');
+    $match = $r->match($match);
+    my $match = $r->match(Mojo::Transaction::HTTP->new);
+
+Match the whole routes tree against a L<MojoX::Routes::Match> or
+L<Mojo::Transaction::HTTP> object.
 
 =head2 C<over>
 
-    $routes = $routes->over(foo => qr/\w+/);
-    $routes = $routes->over({foo => qr/\w+/});
+    $r = $r->over(foo => qr/\w+/);
+    $r = $r->over({foo => qr/\w+/});
+
+Apply condition parameters to this route.
 
 =head2 C<parse>
 
-    $routes = $routes->parse('/:controller/:action');
+    $r = $r->parse('/:controller/:action');
+
+Parse a pattern.
 
 =head2 C<route>
 
-    my $route = $routes->route('/:c/:a', a => qr/\w+/);
+    my $route = $r->route('/:c/:a', a => qr/\w+/);
+
+Add a new nested child to this route.
 
 =head2 C<to>
 
-    my $to  = $routes->to;
-    $routes = $routes->to(action => 'foo');
-    $routes = $routes->to({action => 'foo'});
-    $routes = $routes->to('controller#action');
-    $routes = $routes->to('controller#action', foo => 'bar');
-    $routes = $routes->to('controller#action', {foo => 'bar'});
+    my $to  = $r->to;
+    $r = $r->to(action => 'foo');
+    $r = $r->to({action => 'foo'});
+    $r = $r->to('controller#action');
+    $r = $r->to('controller#action', foo => 'bar');
+    $r = $r->to('controller#action', {foo => 'bar'});
+
+Set default parameters for this route.
 
 =head2 C<to_string>
 
-    my $string = $routes->to_string;
+    my $string = $r->to_string;
+
+Stringifies the whole route.
 
 =head2 C<url_for>
 
-    my $url = $routes->url_for($url);
-    my $url = $routes->url_for($url, {foo => 'bar'});
+    my $url = $r->url_for($url);
+    my $url = $r->url_for($url, {foo => 'bar'});
+
+Render route with parameters into a L<Mojo::URL> object.
 
 =head2 C<via>
 
-    $routes = $routes->via('get');
-    $routes = $routes->via(qw/get post/);
-    $routes = $routes->via([qw/get post/]);
+    $r = $r->via('get');
+    $r = $r->via(qw/get post/);
+    $r = $r->via([qw/get post/]);
+
+Apply C<method> constraint to this route.
 
 =head2 C<waypoint>
 
-    my $route = $routes->waypoint('/:c/:a', a => qr/\w+/);
+    my $route = $r->waypoint('/:c/:a', a => qr/\w+/);
+
+Add a waypoint to this route as nested child.
 
 =head2 C<websocket>
 
     $route->websocket;
+
+Apply C<websocket> constraint to this route.
 
 =head1 SEE ALSO
 

@@ -95,17 +95,18 @@ __END__
 
 =head1 NAME
 
-MojoX::Routes::Match - Match
+MojoX::Routes::Match - Routes Match
 
 =head1 SYNOPSIS
 
     use MojoX::Routes::Match;
 
+    # New match object
     my $match = MojoX::Routes::Match->new;
 
 =head1 DESCRIPTION
 
-L<MojoX::Routes::Match> is a match container.
+L<MojoX::Routes::Match> is a container for routes matches.
 
 =head2 ATTRIBUTES
 
@@ -116,35 +117,49 @@ L<MojoX::Routes::Match> implements the following attributes.
     my $captures = $match->captures;
     $match       = $match->captures({foo => 'bar'});
 
+Captured parameters.
+
 =head2 C<dictionary>
 
     my $dictionary = $match->dictionary;
     $match         = $match->dictionary({foo => sub { ... }});
+
+All available routes conditions.
 
 =head2 C<endpoint>
 
     my $endpoint = $match->endpoint;
     $match       = $match->endpoint(MojoX::Routes->new);
 
+The routes endpoint that actually matched.
+
 =head2 C<path>
 
     my $path = $match->path;
     $match   = $match->path('/foo/bar/baz');
+
+Remaining path that didn't match yet, used while matching.
 
 =head2 C<root>
 
     my $root = $match->root;
     $match   = $match->root($routes);
 
+The root of the routes tree.
+
 =head2 C<stack>
 
     my $stack = $match->stack;
     $match    = $match->stack([{foo => 'bar'}]);
 
+Captured parameters with nesting history.
+
 =head2 C<tx>
 
     my $tx = $match->tx;
     $match = $match->tx(Mojo::Transaction::HTTP->new);
+
+Transaction object used for matching.
 
 =head1 METHODS
 
@@ -156,9 +171,13 @@ implements the follwing the ones.
     my $match = MojoX::Routes::Match->new;
     my $match = MojoX::Routes::Match->new(Mojo::Transaction::HTTP->new);
 
+Construct a new match object.
+
 =head2 C<is_path_empty>
 
     my $result = $match->is_path_empty;
+
+Returns true if the path to match against is empty.
 
 =head2 C<url_for>
 
@@ -168,6 +187,8 @@ implements the follwing the ones.
     my $url = $match->url_for('named');
     my $url = $match->url_for('named', foo => 'bar');
     my $url = $match->url_for('named', {foo => 'bar'});
+
+Render matching route with parameters into a L<Mojo::URL> object.
 
 =head1 SEE ALSO
 

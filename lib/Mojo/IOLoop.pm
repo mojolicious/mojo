@@ -309,6 +309,9 @@ sub start {
     # Mainloop
     $self->_spin while $self->_running;
 
+    # Cleanup before stopping
+    $self->_spin;
+
     return $self;
 }
 

@@ -513,9 +513,6 @@ sub _error {
     # Log
     $error ? $LOG->error($message) : $LOG->debug($message) if $LOG;
 
-    # Real error
-    die $error if $error;
-
     # Finish
     $self->_finish($id);
 }

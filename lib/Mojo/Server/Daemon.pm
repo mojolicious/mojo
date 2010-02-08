@@ -367,7 +367,7 @@ sub _state {
           if $c->{websocket} && $c->{websocket}->res->code eq '101';
 
         # Close connection
-        if (!$tx->keep_alive && !$upgraded) {
+        if ($tx->req->has_error || (!$tx->keep_alive && !$upgraded)) {
             $self->_drop($id);
             $self->ioloop->drop($id);
         }

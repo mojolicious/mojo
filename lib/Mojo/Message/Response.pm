@@ -124,7 +124,8 @@ sub fix_headers {
 
 sub is_status_class {
     my ($self, $class) = @_;
-    return 1 if ($self->code >= $class && $self->code < ($class + 100));
+    return unless my $code = $self->code;
+    return 1 if ($code >= $class && $code < ($class + 100));
     return;
 }
 

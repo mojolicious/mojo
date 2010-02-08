@@ -214,12 +214,25 @@ sub server_leftovers {
 sub server_read {
     my ($self, $chunk) = @_;
 
+    # Request
+    my $req = $self->req;
+
     # Parse
-    $self->req->parse($chunk);
+    $req->parse($chunk);
+
+    # Parser error
+    if ($req->has_error) {
+
+        # Request entity too large
+        if ($req->error =~ /^Maximum (?:message|line) size exceeded.$/) {
+            $self->res->code(413);
+            $self->state('write');
+        }
+    }
 
     # Expect 100 Continue?
-    if ($self->req->content->is_state('body') && !defined $self->continued) {
-        if (($self->req->headers->expect || '') =~ /100-continue/i) {
+    if ($req->content->is_state('body') && !defined $self->continued) {
+        if (($req->headers->expect || '') =~ /100-continue/i) {
 
             # Writing
             $self->state('write');
@@ -231,14 +244,14 @@ sub server_read {
     }
 
     # EOF
-    if ((length $chunk == 0) || $self->req->is_finished) {
+    if ((length $chunk == 0) || $req->is_finished) {
 
         # Writing
         $self->state('write');
 
         # Upgrade callback
         my $ws;
-        $ws = $self->upgrade_cb->($self) if $self->req->headers->upgrade;
+        $ws = $self->upgrade_cb->($self) if $req->headers->upgrade;
 
         # Handler callback
         $self->handler_cb->($ws ? ($ws, $self) : $self);

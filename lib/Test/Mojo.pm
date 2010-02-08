@@ -196,11 +196,11 @@ sub _get_content {
 sub _request_ok {
     my ($self, $method, $url, $headers, $body, $desc) = @_;
 
-    # No headers
-    $desc = pop @_ if !ref $_[-1] and @_ > 3;
-
-    # Body and description
-    $body = $headers if !ref $headers and @_ == 4;
+    # Body without headers
+    if (!ref $headers && @_ > 3) {
+        $desc = $body;
+        $body = $headers;
+    }
     $headers = {} if !ref $headers;
 
     # Client
@@ -307,22 +307,40 @@ following new ones.
 
     $t = $t->delete_ok('/foo');
     $t = $t->delete_ok('/foo', {Expect => '100-continue'});
-    $t = $t->delete_ok('/foo', 'request worked!');
-    $t = $t->delete_ok('/foo', {Expect => '100-continue'}, 'request worked!');
+    $t = $t->delete_ok('/foo', 'Hi there!');
+    $t = $t->delete_ok('/foo', {Expect => '100-continue'}, 'Hi there!');
+    $t = $t->delete_ok(
+       '/foo',
+       {Expect => '100-continue'},
+       'Hi there!',
+       'request worked!'
+    );
 
 =head2 C<get_ok>
 
     $t = $t->get_ok('/foo');
     $t = $t->get_ok('/foo', {Expect => '100-continue'});
-    $t = $t->get_ok('/foo', 'request worked!');
-    $t = $t->get_ok('/foo', {Expect => '100-continue'}, 'request worked!');
+    $t = $t->get_ok('/foo', 'Hi there!');
+    $t = $t->get_ok('/foo', {Expect => '100-continue'}, 'Hi there!');
+    $t = $t->get_ok(
+        '/foo',
+        {Expect => '100-continue'},
+        'Hi there!',
+        'request worked!'
+    );
 
 =head2 C<head_ok>
 
     $t = $t->head_ok('/foo');
     $t = $t->head_ok('/foo', {Expect => '100-continue'});
-    $t = $t->head_ok('/foo', 'request worked!');
-    $t = $t->head_ok('/foo', {Expect => '100-continue'}, 'request worked!');
+    $t = $t->head_ok('/foo', 'Hi there!');
+    $t = $t->head_ok('/foo', {Expect => '100-continue'}, 'Hi there!');
+    $t = $t->head_ok(
+        '/foo',
+        {Expect => '100-continue'},
+        'Hi there!',
+        'request worked!'
+    );
 
 =head2 C<header_is>
 
@@ -343,8 +361,8 @@ following new ones.
 
     $t = $t->post_ok('/foo');
     $t = $t->post_ok('/foo', {Expect => '100-continue'});
-    $t = $t->post_ok('/foo', 'request worked!');
-    $t = $t->post_ok('/foo', {Expect => '100-continue'}, 'request worked!');
+    $t = $t->post_ok('/foo', 'Hi there!');
+    $t = $t->post_ok('/foo', {Expect => '100-continue'}, 'Hi there!');
     $t = $t->post_ok('/foo', 'Hi there!', 'request worked!');
     $t = $t->post_ok(
         '/foo',
@@ -364,28 +382,34 @@ following new ones.
         {test => 123},
         {Expect => '100-continue'}
     );
-    $t = $t->post_form_ok('/foo', {test => 123}, 'request worked!');
-    $t = $t->post_form_ok('/foo', 'UTF-8', {test => 123}, 'request worked!');
+    $t = $t->post_form_ok('/foo', {test => 123}, 'Hi there!');
+    $t = $t->post_form_ok('/foo', 'UTF-8', {test => 123}, 'Hi there!');
     $t = $t->post_form_ok(
         '/foo',
         {test   => 123},
         {Expect => '100-continue'},
-        'request worked!'
+        'Hi there!'
     );
     $t = $t->post_form_ok(
         '/foo',
         'UTF-8',
         {test   => 123},
         {Expect => '100-continue'},
-        'request worked!'
+        'Hi there!'
     );
 
 =head2 C<put_ok>
 
     $t = $t->put_ok('/foo');
     $t = $t->put_ok('/foo', {Expect => '100-continue'});
-    $t = $t->put_ok('/foo', 'request worked!');
-    $t = $t->put_ok('/foo', {Expect => '100-continue'}, 'request worked!');
+    $t = $t->put_ok('/foo', 'Hi there!');
+    $t = $t->put_ok('/foo', {Expect => '100-continue'}, 'Hi there!');
+    $t = $t->put_ok(
+        '/foo',
+        {Expect => '100-continue'},
+        'Hi there!',
+        'request worked!'
+    );
 
 =head2 C<reset_session>
 

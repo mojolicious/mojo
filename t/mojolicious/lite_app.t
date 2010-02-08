@@ -13,7 +13,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 312;
+plan tests => 318;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -275,6 +275,17 @@ my $t      = Test::Mojo->new;
 $t->get_ok('/')->status_is(200)->header_is(Server => 'Mojo (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('/root.html/root.html/root.html/root.html/root.html');
+
+# GET / (with body)
+my $content = '1234' x 1024;
+$t->get_ok('/', $content)->status_is(200)
+  ->content_is('/root.html/root.html/root.html/root.html/root.html');
+
+# GET / (with body and max message size)
+my $backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
+$ENV{MOJO_MAX_MESSAGE_SIZE} = 1024;
+$t->get_ok('/', $content)->status_is(413)->content_is('');
+$ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
 
 # GET /root
 $t->get_ok('/root.html')->status_is(200)->header_is(Server => 'Mojo (Perl)')

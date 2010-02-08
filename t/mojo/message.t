@@ -86,17 +86,21 @@ is($req->headers->content_length, 0);
 
 # Parse HTTP 1.0 start line and headers, no body (with line size limit)
 $req = Mojo::Message::Request->new;
-$req->max_line_size(5);
+my $backup = $ENV{MOJO_MAX_LINE_SIZE};
+$ENV{MOJO_MAX_LINE_SIZE} = 5;
 $req->parse('GET /foo/bar/baz.html HTTP/1');
 is($req->state, 'error');
 is($req->error, 'Maximum line size exceeded.');
+$ENV{MOJO_MAX_LINE_SIZE} = $backup;
 
 # Parse HTTP 1.0 start line and headers, no body (with message size limit)
-$req = Mojo::Message::Request->new;
-$req->max_message_size(5);
+$req                        = Mojo::Message::Request->new;
+$backup                     = $ENV{MOJO_MAX_MESSAGE_SIZE};
+$ENV{MOJO_MAX_MESSAGE_SIZE} = 5;
 $req->parse('GET /foo/bar/baz.html HTTP/1');
 is($req->state, 'error');
 is($req->error, 'Maximum message size exceeded.');
+$ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
 
 # Parse full HTTP 1.0 request
 $req = Mojo::Message::Request->new;
@@ -114,9 +118,9 @@ is($req->headers->content_type,   'text/plain');
 is($req->headers->content_length, 27);
 
 # Parse full HTTP 1.0 request (behind reverse proxy)
-my $backup = $ENV{MOJO_REVERSE_PROXY};
+$backup                  = $ENV{MOJO_REVERSE_PROXY};
 $ENV{MOJO_REVERSE_PROXY} = 1;
-$req = Mojo::Message::Request->new;
+$req                     = Mojo::Message::Request->new;
 $req->parse('GET /foo/bar/baz.html?fo');
 $req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
 $req->parse('-Type: text/');

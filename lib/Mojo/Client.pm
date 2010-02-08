@@ -498,16 +498,23 @@ sub _drop {
 sub _error {
     my ($self, $loop, $id, $error) = @_;
 
+    # Error message
+    my $message = $error || 'Unknown connection error, probably harmless.';
+
     # Transaction
     if (my $tx = $self->_connections->{$id}->{tx}) {
 
         # Add error message to all transactions
-        for my $tx (ref $tx eq 'ARRAY' ? @$tx : ($tx)) { $tx->error($error) }
+        for my $tx (ref $tx eq 'ARRAY' ? @$tx : ($tx)) {
+            $tx->error($message);
+        }
     }
 
-    # Log error in debug mode and warn without logger
-    my $message = "Client error: $error";
-    $LOG ? $LOG->debug($message) : warn $message;
+    # Log
+    $error ? $LOG->error($message) : $LOG->debug($message) if $LOG;
+
+    # Real error
+    die $error if $error;
 
     # Finish
     $self->_finish($id);

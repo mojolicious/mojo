@@ -597,9 +597,6 @@ sub _error {
     # No event
     return unless $event;
 
-    # Default error
-    $error ||= 'Unknown error, connection closed.';
-
     # Error callback
     $self->_event('error', $event, $id, $error);
 }

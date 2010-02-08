@@ -254,8 +254,11 @@ sub _drop {
 sub _error {
     my ($self, $loop, $id, $error) = @_;
 
-    # Log error in debug mode
-    $self->app->log->debug("Daemon error: $error");
+    # Log
+    my $log = $self->app->log;
+    $error
+      ? $log->error($error)
+      : $log->debug('Unknown connection error, probably harmless.');
 
     # Drop
     $self->_drop($id);

@@ -33,7 +33,7 @@ sub handler {
     # Dispatch to diagnostics functions
     return $self->_diag($tx) if index($tx->req->url->path, '/diag') == 0;
 
-    # WebSocket?
+    # WebSocket
     return if $tx->is_websocket;
 
     # Hello world!

@@ -71,7 +71,7 @@ sub delete { shift->_build_tx('DELETE', @_) }
 sub finish {
     my $self = shift;
 
-    # WebSocket?
+    # WebSocket
     croak 'No WebSocket connection to finish.'
       if ref $self->tx eq 'ARRAY' && !$self->tx->is_websocket;
 
@@ -198,7 +198,7 @@ sub queue {
 sub receive_message {
     my $self = shift;
 
-    # WebSocket?
+    # WebSocket
     croak 'No WebSocket connection to receive messages from.'
       if ref $self->tx eq 'ARRAY' && !$self->tx->is_websocket;
 
@@ -220,7 +220,7 @@ sub receive_message {
 sub req {
     my $self = shift;
 
-    # Pipeline?
+    # Pipeline
     croak 'Method "req" not supported for pipelines.'
       if ref $self->tx eq 'ARRAY';
 
@@ -230,7 +230,7 @@ sub req {
 sub res {
     my $self = shift;
 
-    # Pipeline?
+    # Pipeline
     croak 'Method "res" not supported for pipelines.'
       if ref $self->tx eq 'ARRAY';
 
@@ -242,7 +242,7 @@ sub singleton { $CLIENT ||= shift->new(@_) }
 sub send_message {
     my $self = shift;
 
-    # WebSocket?
+    # WebSocket
     croak 'No WebSocket connection to send message to.'
       if ref $self->tx eq 'ARRAY' && !$self->tx->is_websocket;
 
@@ -364,7 +364,7 @@ sub _build_tx {
 sub _connect {
     my ($self, $tx, $cb) = @_;
 
-    # Pipeline?
+    # Pipeline
     my $pipeline = ref $tx eq 'ARRAY' ? 1 : 0;
 
     # Info
@@ -542,7 +542,7 @@ sub _finish {
     # Transaction
     my $tx = $c->{tx};
 
-    # Pipeline?
+    # Pipeline
     my $pipeline = ref $tx eq 'ARRAY' ? 1 : 0;
 
     # Drop WebSockets
@@ -556,7 +556,7 @@ sub _finish {
     # Normal transaction
     else {
 
-        # WebSocket upgrade?
+        # WebSocket upgrade
         $self->_upgrade($id) if $tx;
 
         # Drop old connection so we can reuse it
@@ -575,7 +575,7 @@ sub _finish {
         $self->_queued($self->_queued - 1)
           unless $c->{tx} && !$pipeline && $c->{tx}->is_websocket;
 
-        # Done?
+        # Done
         unless ($self->_redirect($c, $tx)) {
             my $cb = $c->{cb} || $self->default_cb;
             $tx = $c->{tx};
@@ -628,7 +628,7 @@ sub _prepare_server {
 sub _queue {
     my ($self, $tx, $cb) = @_;
 
-    # Pipeline?
+    # Pipeline
     my $pipeline = ref $tx eq 'ARRAY' ? 1 : 0;
 
     # Log
@@ -723,7 +723,7 @@ sub _redirect {
     my $method = $tx->req->method;
     $method = 'GET' unless $method =~ /^GET|HEAD$/i;
 
-    # Max redirects?
+    # Max redirects
     my $r = $c->{redirects} || 0;
     my $max = $self->max_redirects;
     return unless $r < $max;
@@ -761,7 +761,7 @@ sub _state {
         # Finished
         return $self->_finish($id) if $tx->is_finished;
 
-        # Writing?
+        # Writing
         return $tx->is_writing
           ? $self->ioloop->writing($id)
           : $self->ioloop->not_writing($id);
@@ -843,7 +843,7 @@ sub _upgrade {
     # No handshake
     return unless $tx->req->headers->upgrade;
 
-    # Handshake failed?
+    # Handshake failed
     return unless $tx->res->code eq '101';
 
     # Start new WebSocket
@@ -864,10 +864,10 @@ sub _upgrade {
         sub {
             my $tx = shift;
 
-            # Finished?
+            # Finished
             return $self->_finish($id) if $tx->is_finished;
 
-            # Writing?
+            # Writing
             $tx->is_writing
               ? $self->ioloop->writing($id)
               : $self->ioloop->not_writing($id);

@@ -90,7 +90,7 @@ sub render {
     $c->stash->{rendered} = 1;
     $c->stash->{content} ||= {};
 
-    # Partial?
+    # Partial
     my $partial = delete $c->stash->{partial};
 
     # Template
@@ -118,7 +118,7 @@ sub render {
         # Render
         $self->handler->{text}->($self, $c, \$output, {text => $text});
 
-        # Extends?
+        # Extends
         $c->stash->{content}->{content} = b("$output")
           if ($c->stash->{extends} || $c->stash->{layout}) && !$partial;
     }
@@ -130,7 +130,7 @@ sub render {
         $self->handler->{json}->($self, $c, \$output, {json => $json});
         $format = 'json';
 
-        # Extends?
+        # Extends
         $c->stash->{content}->{content} = b("$output")
           if ($c->stash->{extends} || $c->stash->{layout}) && !$partial;
     }
@@ -141,7 +141,7 @@ sub render {
         # Render
         return unless $self->_render_template($c, \$output, $options);
 
-        # Extends?
+        # Extends
         $c->stash->{content}->{content} = b("$output")
           if ($c->stash->{extends} || $c->stash->{layout}) && !$partial;
     }
@@ -188,7 +188,7 @@ sub render {
 sub template_name {
     my ($self, $options) = @_;
 
-    # Template?
+    # Template
     return unless my $template = $options->{template} || '';
     return unless my $format   = $options->{format};
     return unless my $handler  = $options->{handler};

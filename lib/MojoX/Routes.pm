@@ -30,7 +30,7 @@ sub new {
         method => sub {
             my ($r, $tx, $captures, $methods) = @_;
 
-            # Methods?
+            # Methods
             return unless $methods && ref $methods eq 'ARRAY';
 
             # Match
@@ -126,7 +126,7 @@ sub match {
         my $captures =
           $condition->($self, $match->tx, $match->captures, $value);
 
-        # Matched?
+        # Matched
         return unless $captures && ref $captures eq 'HASH';
 
         # Merge captures

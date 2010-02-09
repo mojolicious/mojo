@@ -72,7 +72,7 @@ sub parse {
                 # Underscore
                 (my $id = lc $match[0]) =~ tr/-/_/;
 
-                # Flag?
+                # Flag
                 $cookies[-1]->$id($id =~ /$FLAG_RE/ ? 1 : $value);
             }
         }

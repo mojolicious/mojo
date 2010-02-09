@@ -20,7 +20,7 @@ sub build {
 
     my $chunk_length = length $chunk;
 
-    # Trailing headers?
+    # Trailing headers
     my $headers = ref $chunk && $chunk->isa('Mojo::Headers') ? 1 : 0;
 
     my $formatted = '';

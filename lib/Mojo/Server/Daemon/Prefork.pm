@@ -250,7 +250,7 @@ sub _read_messages {
     my $pos = 0;
     while (length $buffer) {
 
-        # Full message?
+        # Full message
         $pos = index $buffer, "\n";
         last if $pos < 0;
 

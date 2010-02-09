@@ -353,7 +353,7 @@ sub _encode_string {
 sub _encode_values {
     my ($self, $value) = @_;
 
-    # Reference?
+    # Reference
     if (my $ref = ref $value) {
 
         # Array

@@ -132,7 +132,7 @@ sub build {
     my @headers;
     for my $name (@{$self->names}) {
 
-        # Multiline value?
+        # Multiline value
         for my $values ($self->header($name)) {
             my $value = join "\x0d\x0a ", @$values;
             push @headers, "$name: $value";

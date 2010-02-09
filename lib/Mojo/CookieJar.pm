@@ -86,7 +86,7 @@ sub find {
         my @new;
         for my $cookie (@$jar) {
 
-            # Session cookie?
+            # Session cookie
             my $session =
               defined $cookie->max_age && $cookie->max_age > 0 ? 1 : 0;
             if ($cookie->expires || !$session) {

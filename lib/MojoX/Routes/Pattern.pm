@@ -35,7 +35,7 @@ sub match {
     # Match
     my $result = $self->shape_match(\$path);
 
-    # Endpoint?
+    # Endpoint
     return $result if !$path || $path eq '/';
 
     # Partial or no match
@@ -226,7 +226,7 @@ sub _tokenize {
     my $quoted = 0;
     while (length(my $char = substr $pattern, 0, 1, '')) {
 
-        # Inside a symbol?
+        # Inside a symbol
         my $symbol = 0;
         $symbol = 1
           if $state eq 'relaxed'

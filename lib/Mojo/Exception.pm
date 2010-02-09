@@ -36,7 +36,7 @@ sub new {
         my $file = $frame->{file};
         my $line = $frame->{line};
 
-        # Readable?
+        # Readable
         if (-r $file) {
 
             # Slurp
@@ -51,7 +51,7 @@ sub new {
         }
     }
 
-    # Parse specific file?
+    # Parse specific file
     my $lines = shift;
     return $self unless $lines;
 
@@ -77,7 +77,7 @@ sub new {
 sub to_string {
     my $self = shift;
 
-    # Verbose?
+    # Verbose
     return $self->message unless $self->verbose;
 
     my $string = '';

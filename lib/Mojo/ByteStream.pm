@@ -513,7 +513,7 @@ sub punycode_decode {
     my $bias = PUNYCODE_INITIAL_BIAS;
     my @output;
 
-    # Delimiter?
+    # Delimiter
     if ($input =~ s/(.*)$DELIMITER//os) { push @output, split //, $1 }
 
     # Decode
@@ -575,7 +575,7 @@ sub punycode_encode {
     # Remove non basic characters
     $output =~ s/[^\x00-\x7f]+//ogs;
 
-    # Non basic characters in input?
+    # Non basic characters in input
     my $h = my $b = length $output;
     $output .= $DELIMITER if $b > 0;
 
@@ -602,7 +602,7 @@ sub punycode_encode {
         for (my $i = 0; $i < $length; $i++) {
             my $c = $input[$i];
 
-            # Basic character?
+            # Basic character
             $delta++ if $c < $n;
 
             # Non basic character
@@ -680,7 +680,7 @@ sub quote {
 sub remove {
     my ($self, $length, $chunk) = @_;
 
-    # Chunk to replace?
+    # Chunk to replace
     $chunk = '' unless defined $chunk;
 
     # Extract and replace

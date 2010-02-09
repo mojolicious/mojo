@@ -18,7 +18,7 @@ sub register {
         headers => sub {
             my ($r, $tx, $captures, $patterns) = @_;
 
-            # Patterns?
+            # Patterns
             return unless $patterns && ref $patterns eq 'HASH';
 
             # Match

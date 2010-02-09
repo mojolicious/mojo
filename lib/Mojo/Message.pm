@@ -221,13 +221,13 @@ sub cookie {
         $self->_cookies($cookies);
     }
 
-    # Multiple?
+    # Multiple
     my @cookies =
       ref $self->_cookies->{$name} eq 'ARRAY'
       ? @{$self->_cookies->{$name}}
       : ($self->_cookies->{$name});
 
-    # Context?
+    # Context
     return wantarray ? @cookies : $cookies[0];
 }
 
@@ -471,7 +471,7 @@ sub _parse_formdata {
     push @parts, $content;
     while (my $part = shift @parts) {
 
-        # Multipart?
+        # Multipart
         if ($part->is_multipart) {
             unshift @parts, @{$part->parts};
             next;

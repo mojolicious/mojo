@@ -17,7 +17,7 @@ sub register {
         agent => sub {
             my ($r, $tx, $captures, $pattern) = @_;
 
-            # Pattern?
+            # Pattern
             return unless $pattern && ref $pattern eq 'Regexp';
 
             # Match

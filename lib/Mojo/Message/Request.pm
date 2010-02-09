@@ -74,7 +74,7 @@ sub fix_headers {
 sub is_secure {
     my $self = shift;
 
-    # Secure?
+    # Secure
     return 1
       if $self->url->base->scheme eq 'https' || $self->url->scheme eq 'https';
 
@@ -98,7 +98,7 @@ sub params {
 sub parse {
     my $self = shift;
 
-    # CGI like environment?
+    # CGI like environment
     my $env;
     if   (exists $_[1]) { $env = {@_} }
     else                { $env = $_[0] if ref $_[0] eq 'HASH' }
@@ -289,7 +289,7 @@ sub _parse_env {
     # Fix paths for normal screwed up CGI environments
     if ($path && $base) {
 
-        # Path ends with a slash?
+        # Path ends with a slash
         my $slash;
         $slash = 1 if $path =~ /\/$/;
 

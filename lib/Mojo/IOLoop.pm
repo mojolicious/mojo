@@ -266,7 +266,7 @@ sub not_writing {
     if (KQUEUE) {
         my $fd = fileno $socket;
 
-        # Writing?
+        # Writing
         my $writing = $c->{writing};
         $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_READ(),
             IO::KQueue::EV_ADD())
@@ -300,7 +300,7 @@ sub singleton { $LOOP ||= shift->new(@_) }
 sub start {
     my $self = shift;
 
-    # Already running?
+    # Already running
     return if $self->_running;
 
     # Running
@@ -362,7 +362,7 @@ sub writing {
     if (KQUEUE) {
         my $fd = fileno $socket;
 
-        # Writing?
+        # Writing
         my $writing = $c->{writing};
         $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_READ(),
             IO::KQueue::EV_ADD())
@@ -446,7 +446,7 @@ sub _accepting {
     # Connection
     my $c = $self->_connections->{$id};
 
-    # Connected?
+    # Connected
     return unless $c->{socket}->connected;
 
     # Accepted
@@ -514,13 +514,13 @@ sub _connecting {
 sub _drop {
     my ($self, $id) = @_;
 
-    # Drop timer?
+    # Drop timer
     if ($self->_timers->{$id}) {
 
         # Connection for timer
         my $cid = $self->_timers->{$id}->{connection};
 
-        # Connection exists?
+        # Connection exists
         if (my $c = $self->_connections->{$cid}) {
 
             # Cleanup
@@ -540,7 +540,7 @@ sub _drop {
     # Delete connection
     my $c = delete $self->_connections->{$id};
 
-    # Drop listen socket?
+    # Drop listen socket
     if (!$c && ($c = delete $self->_listen->{$id})) {
 
         # Not listening
@@ -550,7 +550,7 @@ sub _drop {
         $self->_listening(0);
     }
 
-    # Drop socket?
+    # Drop socket
     if (my $socket = $c->{socket}) {
 
         # Cleanup timers
@@ -568,7 +568,7 @@ sub _drop {
         # Remove socket from kqueue
         if (KQUEUE) {
 
-            # Writing?
+            # Writing
             my $writing = $c->{writing};
             $self->_loop->EV_SET($fd, IO::KQueue::EVFILT_READ(),
                 IO::KQueue::EV_DELETE())
@@ -660,10 +660,10 @@ sub _prepare {
         # Connection
         my $c = $self->_connections->{$id};
 
-        # Accepting?
+        # Accepting
         $self->_accepting($id) if $c->{accepting};
 
-        # Connecting?
+        # Connecting
         $self->_connecting($id) if $c->{connecting};
 
         # Drop if buffer is empty
@@ -695,7 +695,7 @@ sub _prepare {
 sub _read {
     my ($self, $id) = @_;
 
-    # Listen socket? (new connection)
+    # Listen socket (new connection)
     my $listen;
     for my $lid (keys %{$self->_listen}) {
         my $socket = $self->_listen->{$lid}->{socket};
@@ -729,7 +729,7 @@ sub _read {
 sub _spin {
     my $self = shift;
 
-    # Listening?
+    # Listening
     if (!$self->_listening && $self->_is_listening) {
 
         # Add listen sockets
@@ -855,7 +855,7 @@ sub _timing {
             $t->{last} = time;
         }
 
-        # Continue?
+        # Continue
         $self->_drop($id)
           unless defined $t->{after} || defined $t->{interval};
     }

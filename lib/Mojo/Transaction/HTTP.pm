@@ -74,7 +74,7 @@ sub client_read {
                     $self->_new_response(1);
                 }
 
-                # Leftovers?
+                # Leftovers
                 elsif ($self->res->has_leftovers) {
                     $self->res->state('done_with_leftovers');
                     $self->state('done_with_leftovers');
@@ -178,12 +178,12 @@ sub keep_alive {
     $self->{keep_alive} ||= 0
       if ($req->version eq '1.0') || ($res->version eq '1.0');
 
-    # Keep alive?
+    # Keep alive
     $self->{keep_alive} = 1
       if ($req->headers->connection || '') =~ /keep-alive/i
       or ($res->headers->connection || '') =~ /keep-alive/i;
 
-    # Close?
+    # Close
     $self->{keep_alive} = 0
       if ($req->headers->connection || '') =~ /close/i
       or ($res->headers->connection || '') =~ /close/i;
@@ -249,7 +249,7 @@ sub server_read {
         $self->handler_cb->($ws ? ($ws, $self) : $self);
     }
 
-    # Expect 100 Continue?
+    # Expect 100 Continue
     elsif ($req->content->is_state('body') && !defined $self->continued) {
         if (($req->headers->expect || '') =~ /100-continue/i) {
 

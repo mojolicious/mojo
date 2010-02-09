@@ -84,7 +84,7 @@ sub import {
           ->to($defaults)->name($name)
           if !ref $methods && $methods eq 'ladder';
 
-        # WebSocket?
+        # WebSocket
         my $websocket = 1 if !ref $methods && $methods eq 'websocket';
         $methods = [] if $websocket;
 

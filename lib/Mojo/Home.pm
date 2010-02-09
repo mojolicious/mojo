@@ -36,7 +36,7 @@ sub detect {
     # Try to find home from lib directory
     if ($class) {
 
-        # Load?
+        # Load
         my $file = Mojo::Command->class_to_path($class);
         unless ($INC{$file}) {
             if (my $e = Mojo::Loader->load($class)) { die $e if ref $e }

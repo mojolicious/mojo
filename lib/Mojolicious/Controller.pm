@@ -51,7 +51,7 @@ sub pause { shift->tx->pause }
 sub receive_message {
     my $self = shift;
 
-    # WebSocket?
+    # WebSocket check
     Carp::croak('No WebSocket connection to receive messages from.')
       unless $self->tx->is_websocket;
 
@@ -91,7 +91,7 @@ sub redirect_to {
 sub render {
     my $self = shift;
 
-    # Template as single argument?
+    # Template as single argument
     $self->stash->{template} = shift
       if (@_ % 2 && !ref $_[0]) || (!@_ % 2 && ref $_[1]);
 
@@ -200,7 +200,7 @@ sub resume { shift->tx->resume }
 sub send_message {
     my $self = shift;
 
-    # WebSocket?
+    # WebSocket check
     Carp::croak('No WebSocket connection to send message to.')
       unless $self->tx->is_websocket;
 

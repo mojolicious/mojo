@@ -58,7 +58,7 @@ sub build {
             my $type  = $line->[$j];
             my $value = $line->[$j + 1];
 
-            # Need to fix line ending?
+            # Need to fix line ending
             $value ||= '';
             my $newline = chomp $value;
 
@@ -268,7 +268,7 @@ sub parse {
             next;
         }
 
-        # Escaped line ending?
+        # Escaped line ending
         if ($line =~ /(\\+)$/) {
             my $length = length $1;
 

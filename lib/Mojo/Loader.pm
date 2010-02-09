@@ -34,7 +34,7 @@ sub load {
     # Shortcut
     return 1 unless $module;
 
-    # Already loaded?
+    # Already loaded
     return if $module->can('isa');
 
     # Try
@@ -43,7 +43,7 @@ sub load {
     # Catch
     if ($@) {
 
-        # Exists?
+        # Exists
         my $path = Mojo::Command->class_to_path($module);
         return 1 if $@ =~ /^Can't locate $path in \@INC/;
 
@@ -64,7 +64,7 @@ sub reload {
         # Startup time as default
         $STATS->{$file} = $^T unless defined $STATS->{$file};
 
-        # Modified?
+        # Modified
         if ($mtime > $STATS->{$file}) {
 
             # Debug

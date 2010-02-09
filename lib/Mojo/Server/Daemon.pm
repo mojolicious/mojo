@@ -347,7 +347,7 @@ sub _read {
     # Read
     $tx->server_read($chunk);
 
-    # Last keep alive request?
+    # Last keep alive request
     $tx->res->headers->connection('Close')
       if ($c->{requests} || 0) >= $self->max_keep_alive_requests;
 }
@@ -361,7 +361,7 @@ sub _state {
         # Connection
         my $c = $self->_connections->{$id};
 
-        # Successful WebSocket upgrade?
+        # Successful WebSocket upgrade
         my $upgraded = 0;
         $upgraded = 1
           if $c->{websocket} && $c->{websocket}->res->code eq '101';
@@ -385,7 +385,7 @@ sub _state {
         }
     }
 
-    # Writing?
+    # Writing
     return $tx->is_writing
       ? $self->ioloop->writing($id)
       : $self->ioloop->not_writing($id);
@@ -394,7 +394,7 @@ sub _state {
 sub _upgrade {
     my ($self, $id, $tx) = @_;
 
-    # WebSocket?
+    # WebSocket
     return unless $tx->req->headers->upgrade =~ /WebSocket/i;
 
     # Connection

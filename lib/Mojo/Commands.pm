@@ -29,7 +29,7 @@ sub run {
     # Run command
     if ($name && $name =~ /^\w+$/ && ($name ne 'help' || $args[0])) {
 
-        # Help?
+        # Help
         my $help = $name eq 'help' ? 1 : 0;
         $name = shift @args if $help;
 
@@ -50,7 +50,7 @@ sub run {
                 die $e;
             }
 
-            # Module is a command?
+            # Module is a command
             next unless $try->can('new') && $try->can('run');
 
             # Found
@@ -81,7 +81,7 @@ sub run {
             # Load
             if (my $e = Mojo::Loader->load($module)) { die $e }
 
-            # Seen?
+            # Seen
             my $command = $module;
             $command =~ s/^$namespace\:://;
             push @$commands, [$command => $module] unless $seen->{$command};

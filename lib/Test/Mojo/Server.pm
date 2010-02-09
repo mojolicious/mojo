@@ -156,7 +156,7 @@ sub stop_server_ok {
 
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    # Running?
+    # Running
     unless ($self->pid && kill 0, $self->pid) {
         return Test::More::ok(0, $desc);
     }
@@ -240,7 +240,7 @@ sub _start_server {
     my $pid = open($self->{_server}, "$command |");
     $self->pid($pid);
 
-    # Process started?
+    # Process started
     return unless $pid;
 
     $self->_server->blocking(0);

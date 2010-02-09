@@ -55,7 +55,7 @@ my %TYPE_NUMBERS;
 sub accept_connection {
     my $self = shift;
 
-    # Listen socket?
+    # Listen socket
     unless ($self->_listen) {
         my $listen = IO::Socket->new;
 
@@ -188,7 +188,7 @@ sub read_request {
                 $env = {};
             }
 
-            # EOF?
+            # EOF
             last unless $body;
 
             # Chunk
@@ -263,7 +263,7 @@ sub write_records {
     my $offset = 0;
     while (($length > 0) || $empty) {
 
-        # Need to split content?
+        # Need to split content
         my $len = $length > 32 * 1024 ? 32 * 1024 : $length;
         my $padlen = (8 - ($len % 8)) % 8;
 

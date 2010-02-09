@@ -158,7 +158,7 @@ sub _parse_multipart {
     # Spin
     while (1) {
 
-        # Done?
+        # Done
         last if $self->is_state('done', 'error');
 
         # Preamble

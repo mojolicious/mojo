@@ -68,7 +68,7 @@ sub register {
                 $c->render_exception($e);
             }
 
-            # Success or exception?
+            # Success or exception
             return ref $$output ? 0 : 1;
         }
     );

@@ -135,7 +135,7 @@ sub handler {
         );
     }
 
-    # Embedded application?
+    # Embedded application
     my $stash = {};
     if ($tx->can('stash')) {
         $stash = $tx->stash;

@@ -86,7 +86,7 @@ sub generate_body_chunk {
     my $written = $offset - ($self->buffer->raw_size - $self->buffer->size);
     $self->buffer->remove($written);
 
-    # Enough in buffer?
+    # Fill buffer
     if (!$self->_eof && $self->buffer->size < CHUNK_SIZE) {
 
         # Generate

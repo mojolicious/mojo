@@ -13,7 +13,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 318;
+plan tests => 321;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -22,6 +22,8 @@ plan tests => 318;
 # so if anyone asks you're my debugger.
 use Mojo::ByteStream 'b';
 use Mojo::Client;
+use Mojo::Content::MultiPart;
+use Mojo::Content::Single;
 use Mojo::Cookie::Response;
 use Mojo::JSON;
 use Mojo::Transaction::HTTP;
@@ -45,6 +47,15 @@ get '/root.html' => 'root_path';
 
 # GET /template.txt
 get '/template.txt' => 'template';
+
+# POST /upload
+post '/upload' => sub {
+    my $self = shift;
+    if (my $u = $self->req->upload('file')) {
+        my $body = $self->res->body || '';
+        $self->render_text($body . $u->filename . $u->size);
+    }
+};
 
 # GET /with/header/condition
 get '/with/header/condition' => (headers => {'X-Secret-Header' => 'bar'}) =>
@@ -296,6 +307,30 @@ $t->get_ok('/.html')->status_is(200)->header_is(Server => 'Mojo (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('/root.html/root.html/root.html/root.html/root.html');
 
+# POST /upload (huge upload)
+$backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
+$ENV{MOJO_MAX_MESSAGE_SIZE} = 1073741824;
+my $tx   = Mojo::Transaction::HTTP->new;
+my $part = Mojo::Content::Single->new;
+$part->headers->content_disposition(
+    qq/form-data; name="file"; filename="foo.jpg"/);
+my $type = 'image/jpeg';
+$part->headers->content_type($type);
+my $chunk = 1 x 1024 x 1024;
+$part->asset->add_chunk($chunk);
+$content = Mojo::Content::MultiPart->new;
+$content->headers($tx->req->headers);
+$content->headers->content_type('multipart/form-data');
+$content->parts([$part]);
+$tx->req->method('POST');
+$tx->req->url->parse('/upload');
+$tx->req->content($content);
+$client->process($tx);
+is($tx->state,     'done');
+is($tx->res->code, 200);
+is($tx->res->body, 'foo.jpg1048576');
+$ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
+
 # GET /with/header/condition
 $t->get_ok('/with/header/condition', {'X-Secret-Header' => 'bar'})
   ->status_is(200)->content_like(qr/^Test ok/);
@@ -467,7 +502,7 @@ $t->post_form_ok(
 # POST /malformed_utf8
 my $level = app->log->level;
 app->log->level('fatal');
-my $tx = Mojo::Transaction::HTTP->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('POST');
 $tx->req->url->parse('/malformed_utf8');
 $tx->req->headers->content_type('application/x-www-form-urlencoded');

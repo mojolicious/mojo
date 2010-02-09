@@ -9,7 +9,6 @@ use base 'Mojo::Server::Daemon';
 use bytes;
 
 use Carp 'croak';
-use Fcntl ':flock';
 use IO::File;
 use IO::Poll 'POLLIN';
 use IO::Socket;

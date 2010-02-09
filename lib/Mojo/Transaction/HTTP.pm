@@ -226,8 +226,13 @@ sub server_read {
         # Request entity too large
         if ($req->error =~ /^Maximum (?:message|line) size exceeded.$/) {
             $self->res->code(413);
-            $self->state('write');
         }
+
+        # Bad request
+        else { $self->res->code(400) }
+
+        # Write
+        $self->state('write');
     }
 
     # Expect 100 Continue?

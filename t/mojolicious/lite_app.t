@@ -332,7 +332,7 @@ is($tx->res->code, 200);
 is($tx->res->body, 'called, foo.jpg1048576');
 $ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
 
-# POST /upload (huge upload without appropriate message size)
+# POST /upload (huge upload without appropriate max message size)
 $backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
 $ENV{MOJO_MAX_MESSAGE_SIZE} = 524288;
 my $backup2 = app->log->level;

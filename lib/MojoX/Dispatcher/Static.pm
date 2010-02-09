@@ -233,15 +233,19 @@ MojoX::Dispatcher::Static - Serve Static Files
 
     use MojoX::Dispatcher::Static;
 
+    # New dispatcher
     my $dispatcher = MojoX::Dispatcher::Static->new(
-            prefix => '/images',
-            root   => '/ftp/pub/images'
+        prefix => '/images',
+        root   => '/ftp/pub/images'
     );
+
+    # Dispatch
     my $success = $dispatcher->dispatch($c);
 
 =head1 DESCRIPTION
 
-L<MojoX::Dispatcher::Static> is a dispatcher for static files.
+L<MojoX::Dispatcher::Static> is a dispatcher for static files with C<RANGE>
+and C<IF-MODIFIED-SINCE> support.
 
 =head2 ATTRIBUTES
 
@@ -252,15 +256,21 @@ L<MojoX::Dispatcher::Static> implements the following attributes.
     my $prefix  = $dispatcher->prefix;
     $dispatcher = $dispatcher->prefix('/static');
 
+Prefix path to remove from incoming paths before dispatching.
+
 =head2 C<types>
 
     my $types   = $dispatcher->types;
     $dispatcher = $dispatcher->types(MojoX::Types->new);
 
+MIME types, by default a L<MojoX::Types> object.
+
 =head2 C<root>
 
     my $root    = $dispatcher->root;
     $dispatcher = $dispatcher->root('/foo/bar/files');
+
+Directory to serve static files from.
 
 =head1 METHODS
 
@@ -271,24 +281,34 @@ implements the follwing the ones.
 
     my $success = $dispatcher->dispatch($c);
 
+Dispatch a L<MojoX::Controller> object.
+
 =head2 C<serve>
 
     my $success = $dispatcher->serve($c, 'foo/bar.html');
+
+Serve a specific file.
 
 =head2 C<serve_404>
 
     my $success = $dispatcher->serve_404($c);
     my $success = $dispatcher->serve_404($c, '404.html');
 
+Serve a C<404> error page, guaranteed to render at least a default page.
+
 =head2 C<serve_500>
 
     my $success = $dispatcher->serve_500($c);
     my $success = $dispatcher->serve_500($c, '500.html');
 
+Serve a C<500> error page, guaranteed to render at least a default page.
+
 =head2 C<serve_error>
 
     my $success = $dispatcher->serve_error($c, 404);
     my $success = $dispatcher->serve_error($c, 404, '404.html');
+
+Serve error page, guaranteed to render at least a default page.
 
 =head1 SEE ALSO
 

@@ -43,7 +43,7 @@ __PACKAGE__->attr(
                 $tx->req->url->to_abs->scheme($scheme)->to_string);
             $res->headers->websocket_origin($tx->req->headers->origin);
 
-            # WenSocket transaction
+            # WebSocket transaction
             return Mojo::Transaction::WebSocket->new(handshake => $tx);
           }
     }

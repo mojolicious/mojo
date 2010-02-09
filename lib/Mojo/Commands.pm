@@ -21,7 +21,7 @@ These commands are currently available:
 EOF
 __PACKAGE__->attr(namespaces => sub { ['Mojo::Command'] });
 
-# Aren't we forgeting the true meaning of Christmas?
+# Aren't we forgetting the true meaning of Christmas?
 # You know, the birth of Santa.
 sub run {
     my ($self, $name, @args) = @_;

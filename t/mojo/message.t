@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 486;
+use Test::More tests => 492;
 
 use File::Spec;
 use File::Temp;
@@ -593,6 +593,21 @@ is($res->major_version,           1);
 is($res->minor_version,           0);
 is($res->headers->content_type,   'text/plain');
 is($res->headers->content_length, 27);
+
+# Parse HTTP 1.1 response (413 error in one big chunk)
+$res = Mojo::Message::Response->new;
+$res->parse("HTTP/1.1 413 Request Entity Too Large\x0d\x0a"
+      . "Connection: Close\x0d\x0a"
+      . "Date: Tue, 09 Feb 2010 16:34:51 GMT\x0d\x0a"
+      . "Server: Mojo (Perl)\x0d\x0a"
+      . "Content-Length: 0\x0d\x0a"
+      . "X-Powered-By: Mojolicious (Perl)\x0d\x0a\x0d\x0a");
+is($res->state,                   'done');
+is($res->code,                    413);
+is($res->message,                 'Request Entity Too Large');
+is($res->major_version,           1);
+is($res->minor_version,           1);
+is($res->headers->content_length, 0);
 
 # Parse HTTP 1.1 chunked response
 $res = Mojo::Message::Response->new;

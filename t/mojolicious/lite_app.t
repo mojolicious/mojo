@@ -13,7 +13,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 321;
+plan tests => 324;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -51,9 +51,11 @@ get '/template.txt' => 'template';
 # POST /upload
 post '/upload' => sub {
     my $self = shift;
+    $self->stash(rendered => 1);
+    my $body = $self->res->body || '';
+    $self->res->body("called, $body");
     if (my $u = $self->req->upload('file')) {
-        my $body = $self->res->body || '';
-        $self->render_text($body . $u->filename . $u->size);
+        $self->res->body($self->res->body . $u->filename . $u->size);
     }
 };
 
@@ -307,15 +309,14 @@ $t->get_ok('/.html')->status_is(200)->header_is(Server => 'Mojo (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('/root.html/root.html/root.html/root.html/root.html');
 
-# POST /upload (huge upload)
+# POST /upload (huge upload with appropriate max message size)
 $backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
 $ENV{MOJO_MAX_MESSAGE_SIZE} = 1073741824;
 my $tx   = Mojo::Transaction::HTTP->new;
 my $part = Mojo::Content::Single->new;
 $part->headers->content_disposition(
     qq/form-data; name="file"; filename="foo.jpg"/);
-my $type = 'image/jpeg';
-$part->headers->content_type($type);
+$part->headers->content_type('image/jpeg');
 my $chunk = 1 x 1024 x 1024;
 $part->asset->add_chunk($chunk);
 $content = Mojo::Content::MultiPart->new;
@@ -328,7 +329,33 @@ $tx->req->content($content);
 $client->process($tx);
 is($tx->state,     'done');
 is($tx->res->code, 200);
-is($tx->res->body, 'foo.jpg1048576');
+is($tx->res->body, 'called, foo.jpg1048576');
+$ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
+
+# POST /upload (huge upload without appropriate message size)
+$backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
+$ENV{MOJO_MAX_MESSAGE_SIZE} = 524288;
+my $backup2 = app->log->level;
+app->log->level('fatal');
+$tx   = Mojo::Transaction::HTTP->new;
+$part = Mojo::Content::Single->new;
+$part->headers->content_disposition(
+    qq/form-data; name="file"; filename="foo.jpg"/);
+$part->headers->content_type('image/jpeg');
+$chunk = 1 x 1024 x 1024;
+$part->asset->add_chunk($chunk);
+$content = Mojo::Content::MultiPart->new;
+$content->headers($tx->req->headers);
+$content->headers->content_type('multipart/form-data');
+$content->parts([$part]);
+$tx->req->method('POST');
+$tx->req->url->parse('/upload');
+$tx->req->content($content);
+$client->process($tx);
+is($tx->state,     'done');
+is($tx->res->code, 413);
+is($tx->res->body, '');
+app->log->level($backup2);
 $ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
 
 # GET /with/header/condition

@@ -39,9 +39,6 @@ sub client_read {
     # Length
     my $read = length $chunk;
 
-    # Buffer early response, most likely an error
-    $self->res->buffer->add_chunk($chunk) if $self->is_writing;
-
     # Read 100 Continue
     if ($self->is_state('read_continue')) {
         $self->res->done if $read == 0;
@@ -64,7 +61,7 @@ sub client_read {
     }
 
     # Read response
-    elsif ($self->is_state('read_response')) {
+    else {
         $self->done if $read == 0;
 
         # HEAD request is special case
@@ -218,7 +215,7 @@ sub server_read {
     my $req = $self->req;
 
     # Parse
-    $req->parse($chunk);
+    $req->parse($chunk) unless $req->has_error;
 
     # Parser error
     if ($req->has_error) {
@@ -231,25 +228,15 @@ sub server_read {
         # Bad request
         else { $self->res->code(400) }
 
+        # Close connection
+        $self->res->headers->connection('Close');
+
         # Write
         $self->state('write');
     }
 
-    # Expect 100 Continue?
-    if ($req->content->is_state('body') && !defined $self->continued) {
-        if (($req->headers->expect || '') =~ /100-continue/i) {
-
-            # Writing
-            $self->state('write');
-
-            # Continue handler callback
-            $self->continue_handler_cb->($self);
-            $self->continued(0);
-        }
-    }
-
     # EOF
-    if ((length $chunk == 0) || $req->is_finished) {
+    elsif ((length $chunk == 0) || $req->is_finished) {
 
         # Writing
         $self->state('write');
@@ -260,6 +247,19 @@ sub server_read {
 
         # Handler callback
         $self->handler_cb->($ws ? ($ws, $self) : $self);
+    }
+
+    # Expect 100 Continue?
+    elsif ($req->content->is_state('body') && !defined $self->continued) {
+        if (($req->headers->expect || '') =~ /100-continue/i) {
+
+            # Writing
+            $self->state('write');
+
+            # Continue handler callback
+            $self->continue_handler_cb->($self);
+            $self->continued(0);
+        }
     }
 
     # Spin

@@ -43,7 +43,7 @@ __PACKAGE__->attr(
 );
 __PACKAGE__->attr([qw/accept_timeout connect_timeout/] => 5);
 __PACKAGE__->attr(max_connections                      => 1000);
-__PACKAGE__->attr(timeout                              => '0.25');
+__PACKAGE__->attr(timeout                              => '0.1');
 
 __PACKAGE__->attr([qw/_connections _fds _listen _timers/] => sub { {} });
 __PACKAGE__->attr([qw/_listening _running/]);
@@ -762,7 +762,7 @@ sub _spin {
 
         # Catch interrupted system call errors
         my @ret;
-        eval { @ret = $kq->kevent($self->timeout * 10) };
+        eval { @ret = $kq->kevent($self->timeout * 50) };
         die "KQueue error: $@" if $@;
 
         # Events

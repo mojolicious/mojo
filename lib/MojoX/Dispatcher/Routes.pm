@@ -10,6 +10,7 @@ use base 'MojoX::Routes';
 use Mojo::ByteStream 'b';
 use Mojo::Exception;
 use Mojo::Loader;
+use MojoX::Routes::Match;
 
 __PACKAGE__->attr(
     controller_base_class => 'MojoX::Dispatcher::Routes::Controller');
@@ -25,28 +26,31 @@ sub dispatch {
     my ($self, $c) = @_;
 
     # Match
-    my $match = $self->match($c->tx);
-    $c->match($match);
+    my $m = MojoX::Routes::Match->new($c->tx);
+    $m->match($self);
+    $c->match($m);
 
     # No match
-    return 1 unless $match && @{$match->stack};
+    return 1 unless $m && @{$m->stack};
 
     # Initialize stash with captures
-    $c->stash($match->captures);
+    $c->stash($m->captures);
 
     # Prepare params
     $c->stash->{params} = $c->tx->req->params->clone;
-    $c->stash->{params}->append(%{$match->captures});
+    $c->stash->{params}->append(%{$m->captures});
 
     # Walk the stack
-    my $e = $self->walk_stack($c);
+    my $e = $self->_walk_stack($c);
     return $e if $e;
 
     # Render
-    return $self->render($c);
+    return $self->_render($c);
 }
 
-sub dispatch_app {
+sub hide { push @{shift->hidden}, @_ }
+
+sub _dispatch_app {
     my ($self, $c) = @_;
 
     # Debug
@@ -90,7 +94,7 @@ sub dispatch_app {
     return;
 }
 
-sub dispatch_callback {
+sub _dispatch_callback {
     my ($self, $c) = @_;
 
     # Debug
@@ -114,15 +118,15 @@ sub dispatch_callback {
     return;
 }
 
-sub dispatch_controller {
+sub _dispatch_controller {
     my ($self, $c) = @_;
 
     # Method
-    my $method = $self->generate_method($c);
+    my $method = $self->_generate_method($c);
     return unless $method;
 
     # Class
-    my $class = $self->generate_class($c);
+    my $class = $self->_generate_class($c);
     return unless $class;
 
     # Debug
@@ -181,7 +185,7 @@ sub dispatch_controller {
     return;
 }
 
-sub generate_class {
+sub _generate_class {
     my ($self, $c) = @_;
 
     # Field
@@ -213,7 +217,7 @@ sub generate_class {
     return $class;
 }
 
-sub generate_method {
+sub _generate_method {
     my ($self, $c) = @_;
 
     # Field
@@ -241,9 +245,7 @@ sub generate_method {
     return $method;
 }
 
-sub hide { push @{shift->hidden}, @_ }
-
-sub render {
+sub _render {
     my ($self, $c) = @_;
 
     # Render
@@ -256,7 +258,7 @@ sub render {
     return;
 }
 
-sub walk_stack {
+sub _walk_stack {
     my ($self, $c) = @_;
 
     # Walk the stack
@@ -270,9 +272,9 @@ sub walk_stack {
 
         # Dispatch
         my $e =
-            $field->{callback} ? $self->dispatch_callback($c)
-          : $field->{app}      ? $self->dispatch_app($c)
-          :                      $self->dispatch_controller($c);
+            $field->{callback} ? $self->_dispatch_callback($c)
+          : $field->{app}      ? $self->_dispatch_app($c)
+          :                      $self->_dispatch_controller($c);
 
         # Exception
         return $e if ref $e;
@@ -296,11 +298,15 @@ MojoX::Dispatcher::Routes - Routes Dispatcher
 
     use MojoX::Dispatcher::Routes;
 
+    # New dispatcher
     my $dispatcher = MojoX::Dispatcher::Routes->new;
+
+    # Dispatch
+    $dispatcher->dispatch(MojoX::Dispatcher::Routes::Controller->new);
 
 =head1 DESCRIPTION
 
-L<MojoX::Dispatcher::Routes> is a dispatcher based on L<MojoX::Routes>.
+L<MojoX::Dispatcher::Routes> is a L<MojoX::Routes> based dispatcher.
 
 =head2 ATTRIBUTES
 
@@ -314,6 +320,9 @@ and implements the follwing the ones.
         'MojoX::Dispatcher::Routes::Controller'
     );
 
+Base class used to identify controllers, defaults to
+L<MojoX::Dispatcher::Routes::Controller>.
+
 =head2 C<hidden>
 
     my $hidden  = $dispatcher->hidden;
@@ -321,10 +330,14 @@ and implements the follwing the ones.
         [qw/new attr tx render req res stash/]
     );
 
+Methods and attributes that are hidden from the dispatcher.
+
 =head2 C<namespace>
 
     my $namespace = $dispatcher->namespace;
     $dispatcher   = $dispatcher->namespace('Foo::Bar::Controller');
+
+Namespace to search for controllers.
 
 =head1 METHODS
 
@@ -337,37 +350,13 @@ implements the follwing the ones.
         MojoX::Dispatcher::Routes::Controller->new
     );
 
-=head2 C<dispatch_app>
-
-    my $e = $dispatcher->dispatch_app($c);
-
-=head2 C<dispatch_callback>
-
-    my $e = $dispatcher->dispatch_callback($c);
-
-=head2 C<dispatch_controller>
-
-    my $e = $dispatcher->dispatch_controller($c);
-
-=head2 C<generate_class>
-
-    my $class = $dispatcher->generate_class($c);
-
-=head2 C<generate_method>
-
-    my $method = $dispatcher->genrate_method($c);
+Match routes and dispatch.
 
 =head2 C<hide>
 
     $dispatcher = $dispatcher->hide('new');
 
-=head2 C<render>
-
-    $dispatcher->render($c);
-
-=head2 C<walk_stack>
-
-    my $e = $dispatcher->walk_stack($c);
+Hide method or attribute from the dispatcher.
 
 =head1 SEE ALSO
 

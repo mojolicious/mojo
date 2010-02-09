@@ -8,7 +8,6 @@ use warnings;
 use base 'Mojo::Base';
 
 use Mojo::URL;
-use MojoX::Routes::Match;
 use MojoX::Routes::Pattern;
 use Scalar::Util 'weaken';
 
@@ -72,125 +71,12 @@ sub add_condition {
 
 sub bridge { shift->route(@_)->inline(1) }
 
-sub find_route {
-    my ($self, $name) = @_;
-
-    # Find endpoint
-    my @children = ($self);
-    while (my $child = shift @children) {
-
-        # Match
-        return $child if ($child->name || '') eq $name;
-
-        # Append
-        push @children, @{$child->children};
-    }
-
-    # Not found
-    return;
-}
-
 sub is_endpoint {
     my $self = shift;
     return   if $self->inline;
     return 1 if $self->block;
     return   if @{$self->children};
     return 1;
-}
-
-# Life can be hilariously cruel.
-sub match {
-    my $self  = shift;
-    my $match = shift;
-
-    # Shortcut
-    return unless $match;
-
-    # Match object
-    $match = MojoX::Routes::Match->new($match)->dictionary($self->dictionary)
-      unless ref $match && $match->isa('MojoX::Routes::Match');
-
-    # Root
-    $match->root($self) unless $match->root;
-
-    # Conditions
-    for (my $i = 0; $i < @{$self->conditions}; $i += 2) {
-        my $name      = $self->conditions->[$i];
-        my $value     = $self->conditions->[$i + 1];
-        my $condition = $self->dictionary->{$name};
-
-        # No condition
-        return unless $condition;
-
-        # Match
-        my $captures =
-          $condition->($self, $match->tx, $match->captures, $value);
-
-        # Matched
-        return unless $captures && ref $captures eq 'HASH';
-
-        # Merge captures
-        $match->captures($captures);
-    }
-
-    # Path
-    my $path = $match->path;
-
-    # Match
-    my $captures = $self->pattern->shape_match(\$path);
-
-    $match->path($path);
-
-    return unless $captures;
-
-    # Merge captures
-    $captures = {%{$match->captures}, %$captures};
-    $match->captures($captures);
-
-    # Format
-    if ($self->is_endpoint && !$self->pattern->format) {
-        if ($path =~ /^\.([^\/]+)$/) {
-            $match->captures->{format} = $1;
-            $match->path('');
-        }
-    }
-    $match->captures->{format} = $self->pattern->format
-      if $self->pattern->format;
-
-    # Update stack
-    push @{$match->stack}, $captures
-      if $self->inline || ($self->is_endpoint && $match->is_path_empty);
-
-    # Waypoint match
-    if ($self->block && $match->is_path_empty) {
-        $match->endpoint($self);
-        return $match;
-    }
-
-    # Match children
-    my $snapshot = [@{$match->stack}];
-    for my $child (@{$self->children}) {
-
-        # Match
-        $child->match($match);
-
-        # Endpoint found
-        return $match if $match->endpoint;
-
-        # Reset path
-        $match->path($path);
-
-        # Reset stack
-        if ($self->parent) { $match->stack($snapshot) }
-        else {
-            $match->captures({});
-            $match->stack([]);
-        }
-    }
-
-    $match->endpoint($self) if $self->is_endpoint && $match->is_path_empty;
-
-    return $match;
 }
 
 sub over {
@@ -213,6 +99,27 @@ sub parse {
     $self->pattern->parse(@_);
 
     return $self;
+}
+
+sub render {
+    my ($self, $path, $values) = @_;
+
+    # Path prefix
+    my $prefix = $self->pattern->render($values);
+    $path = $prefix . $path unless $prefix eq '/';
+
+    # Make sure there is always a root
+    $path = '/' if !$path && !$self->parent;
+
+    # Format
+    if ((my $format = $values->{format}) && !$self->parent) {
+        $path .= ".$format" unless $path =~ /\.[^\/]+$/;
+    }
+
+    # Parent
+    $path = $self->parent->render($path, $values) if $self->parent;
+
+    return $path;
 }
 
 sub route {
@@ -289,29 +196,6 @@ sub to_string {
     my $pattern = $self->parent ? $self->parent->to_string : '';
     $pattern .= $self->pattern->pattern if $self->pattern->pattern;
     return $pattern;
-}
-
-sub url_for {
-    my ($self, $url, $values) = @_;
-
-    # Path prefix
-    my $path   = $url->path->to_string;
-    my $prefix = $self->pattern->render($values);
-    $path = $prefix . $path unless $prefix eq '/';
-
-    # Make sure there is always a root
-    $path = '/' if !$path && !$self->parent;
-
-    # Format
-    if ((my $format = $values->{format}) && !$self->parent) {
-        $path .= ".$format" unless $path =~ /\.[^\/]+$/;
-    }
-
-    $url->path->parse($path);
-
-    $self->parent->url_for($url, $values) if $self->parent;
-
-    return $url;
 }
 
 sub via {
@@ -475,25 +359,11 @@ Add a new condition for this route.
 
 Add a new bridge to this route as a nested child.
 
-=head2 C<find_route>
-
-    my $route = $r->find_route('some_route');
-
-Find a route by name in the whole routes tree.
-
 =head2 C<is_endpoint>
 
     my $is_endpoint = $r->is_endpoint;
 
 Returns true if this route qualifies as an endpoint.
-
-=head2 C<match>
-
-    $match = $r->match($match);
-    my $match = $r->match(Mojo::Transaction::HTTP->new);
-
-Match the whole routes tree against a L<MojoX::Routes::Match> or
-L<Mojo::Transaction::HTTP> object.
 
 =head2 C<over>
 
@@ -507,6 +377,13 @@ Apply condition parameters to this route.
     $r = $r->parse('/:controller/:action');
 
 Parse a pattern.
+
+=head2 C<render>
+
+    my $path = $r->render($path);
+    my $path = $r->render($path, {foo => 'bar'});
+
+Render route with parameters into a path.
 
 =head2 C<route>
 
@@ -530,13 +407,6 @@ Set default parameters for this route.
     my $string = $r->to_string;
 
 Stringifies the whole route.
-
-=head2 C<url_for>
-
-    my $url = $r->url_for($url);
-    my $url = $r->url_for($url, {foo => 'bar'});
-
-Render route with parameters into a L<Mojo::URL> object.
 
 =head2 C<via>
 

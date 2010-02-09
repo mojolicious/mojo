@@ -64,10 +64,10 @@ sub parse {
 }
 
 sub render {
-    my $self = shift;
+    my ($self, $values) = @_;
 
     # Merge values with defaults
-    my $values = ref $_[0] eq 'HASH' ? $_[0] : {@_};
+    $values ||= {};
     $values = {%{$self->defaults}, %$values};
 
     my $string   = '';
@@ -440,8 +440,7 @@ Parse a raw pattern.
 
 =head2 C<render>
 
-    my $string = $pattern->render(action => 'foo');
-    my $string = $pattern->render({action => 'foo'});
+    my $path = $pattern->render({action => 'foo'});
 
 Render pattern into a path with paramters.
 

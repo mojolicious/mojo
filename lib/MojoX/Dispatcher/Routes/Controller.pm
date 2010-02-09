@@ -50,7 +50,7 @@ L<MojoX::Dispatcher::Routes::Controller> implements the following attributes.
 
 =head2 C<match>
 
-    my $match = $c->match;
+    my $m = $c->match;
 
 A L<MojoX::Routes::Match> object containing the routes results for the
 current request.

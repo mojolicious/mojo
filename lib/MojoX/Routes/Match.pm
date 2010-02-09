@@ -10,24 +10,108 @@ use base 'Mojo::Base';
 use Carp 'croak';
 use Mojo::URL;
 
-__PACKAGE__->attr([qw/captures dictionary/] => sub { {} });
+__PACKAGE__->attr(captures => sub { {} });
 __PACKAGE__->attr([qw/endpoint root tx/]);
-__PACKAGE__->attr(path  => sub {'/'});
 __PACKAGE__->attr(stack => sub { [] });
+
+__PACKAGE__->attr(_path => sub {'/'});
 
 # I'm Bender, baby, please insert liquor!
 sub new {
     my $self = shift->SUPER::new();
     my $tx   = shift;
     $self->tx($tx);
-    $self->path($tx->req->url->path->to_string);
+    $self->_path($tx->req->url->path->to_string);
     return $self;
 }
 
-sub is_path_empty {
-    my $self = shift;
-    return 1 if !length $self->path || $self->path eq '/';
-    return;
+# Life can be hilariously cruel.
+sub match {
+    my ($self, $r) = @_;
+
+    # Shortcut
+    return unless $r;
+
+    # Root
+    $self->root($r) unless $self->root;
+
+    # Conditions
+    for (my $i = 0; $i < @{$r->conditions}; $i += 2) {
+        my $name      = $r->conditions->[$i];
+        my $value     = $r->conditions->[$i + 1];
+        my $condition = $r->dictionary->{$name};
+
+        # No condition
+        return unless $condition;
+
+        # Match
+        my $captures = $condition->($r, $self->tx, $self->captures, $value);
+
+        # Matched
+        return unless $captures && ref $captures eq 'HASH';
+
+        # Merge captures
+        $self->captures($captures);
+    }
+
+    # Path
+    my $path = $self->_path;
+
+    # Match
+    my $captures = $r->pattern->shape_match(\$path);
+
+    $self->_path($path);
+
+    # Shaped path
+    return unless $captures;
+
+    # Merge captures
+    $captures = {%{$self->captures}, %$captures};
+    $self->captures($captures);
+
+    # Format
+    if ($r->is_endpoint && !$r->pattern->format) {
+        if ($path =~ /^\.([^\/]+)$/) {
+            $self->captures->{format} = $1;
+            $self->_path('');
+        }
+    }
+    $self->captures->{format} = $r->pattern->format if $r->pattern->format;
+
+    # Update stack
+    push @{$self->stack}, $captures
+      if $r->inline || ($r->is_endpoint && $self->_is_path_empty);
+
+    # Waypoint match
+    if ($r->block && $self->_is_path_empty) {
+        $self->endpoint($r);
+        return $self;
+    }
+
+    # Match children
+    my $snapshot = [@{$self->stack}];
+    for my $child (@{$r->children}) {
+
+        # Match
+        $self->match($child);
+
+        # Endpoint found
+        return $self if $self->endpoint;
+
+        # Reset path
+        $self->_path($path);
+
+        # Reset stack
+        if ($r->parent) { $self->stack($snapshot) }
+        else {
+            $self->captures({});
+            $self->stack([]);
+        }
+    }
+
+    $self->endpoint($r) if $r->is_endpoint && $self->_is_path_empty;
+
+    return $self;
 }
 
 sub url_for {
@@ -73,7 +157,7 @@ sub url_for {
     # Named
     if ($name) {
         croak qq/Route "$name" used in url_for does not exist/
-          unless $endpoint = $self->root->find_route($name);
+          unless $endpoint = $self->_find_route($name);
     }
 
     # Merge values
@@ -85,9 +169,34 @@ sub url_for {
     return $url unless $endpoint;
 
     # Render
-    $endpoint->url_for($url, $values);
+    my $path = $endpoint->render($url->path->to_string, $values);
+    $url->path->parse($path);
 
     return $url;
+}
+
+sub _find_route {
+    my ($self, $name) = @_;
+
+    # Find endpoint
+    my @children = ($self->root);
+    while (my $child = shift @children) {
+
+        # Match
+        return $child if ($child->name || '') eq $name;
+
+        # Append
+        push @children, @{$child->children};
+    }
+
+    # Not found
+    return;
+}
+
+sub _is_path_empty {
+    my $self = shift;
+    return 1 if !length $self->_path || $self->_path eq '/';
+    return;
 }
 
 1;
@@ -95,18 +204,21 @@ __END__
 
 =head1 NAME
 
-MojoX::Routes::Match - Routes Match
+MojoX::Routes::Match - Routes Visitor
 
 =head1 SYNOPSIS
 
     use MojoX::Routes::Match;
 
     # New match object
-    my $match = MojoX::Routes::Match->new;
+    my $m = MojoX::Routes::Match->new($tx);
+
+    # Match
+    $m->match($routes);
 
 =head1 DESCRIPTION
 
-L<MojoX::Routes::Match> is a container for routes matches.
+L<MojoX::Routes::Match> is a visitor for L<MojoX::Routes> structures.
 
 =head2 ATTRIBUTES
 
@@ -114,50 +226,36 @@ L<MojoX::Routes::Match> implements the following attributes.
 
 =head2 C<captures>
 
-    my $captures = $match->captures;
-    $match       = $match->captures({foo => 'bar'});
+    my $captures = $m->captures;
+    $m           = $m->captures({foo => 'bar'});
 
 Captured parameters.
 
-=head2 C<dictionary>
-
-    my $dictionary = $match->dictionary;
-    $match         = $match->dictionary({foo => sub { ... }});
-
-All available routes conditions.
-
 =head2 C<endpoint>
 
-    my $endpoint = $match->endpoint;
-    $match       = $match->endpoint(MojoX::Routes->new);
+    my $endpoint = $m->endpoint;
+    $m           = $m->endpoint(MojoX::Routes->new);
 
 The routes endpoint that actually matched.
 
-=head2 C<path>
-
-    my $path = $match->path;
-    $match   = $match->path('/foo/bar/baz');
-
-Remaining path that didn't match yet, used while matching.
-
 =head2 C<root>
 
-    my $root = $match->root;
-    $match   = $match->root($routes);
+    my $root = $m->root;
+    $m       = $m->root($routes);
 
 The root of the routes tree.
 
 =head2 C<stack>
 
-    my $stack = $match->stack;
-    $match    = $match->stack([{foo => 'bar'}]);
+    my $stack = $m->stack;
+    $m        = $m->stack([{foo => 'bar'}]);
 
 Captured parameters with nesting history.
 
 =head2 C<tx>
 
-    my $tx = $match->tx;
-    $match = $match->tx(Mojo::Transaction::HTTP->new);
+    my $tx = $m->tx;
+    $m     = $m->tx(Mojo::Transaction::HTTP->new);
 
 Transaction object used for matching.
 
@@ -168,25 +266,25 @@ implements the follwing the ones.
 
 =head2 C<new>
 
-    my $match = MojoX::Routes::Match->new;
-    my $match = MojoX::Routes::Match->new(Mojo::Transaction::HTTP->new);
+    my $m = MojoX::Routes::Match->new;
+    my $m = MojoX::Routes::Match->new(Mojo::Transaction::HTTP->new);
 
 Construct a new match object.
 
-=head2 C<is_path_empty>
+=head2 C<match>
 
-    my $result = $match->is_path_empty;
+    $m->match(MojoX::Routes->new);
 
-Returns true if the path to match against is empty.
+Match against a routes tree.
 
 =head2 C<url_for>
 
-    my $url = $match->url_for;
-    my $url = $match->url_for(foo => 'bar');
-    my $url = $match->url_for({foo => 'bar'});
-    my $url = $match->url_for('named');
-    my $url = $match->url_for('named', foo => 'bar');
-    my $url = $match->url_for('named', {foo => 'bar'});
+    my $url = $m->url_for;
+    my $url = $m->url_for(foo => 'bar');
+    my $url = $m->url_for({foo => 'bar'});
+    my $url = $m->url_for('named');
+    my $url = $m->url_for('named', foo => 'bar');
+    my $url = $m->url_for('named', {foo => 'bar'});
 
 Render matching route with parameters into a L<Mojo::URL> object.
 

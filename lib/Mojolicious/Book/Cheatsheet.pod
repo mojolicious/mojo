@@ -87,7 +87,7 @@ Maximum size for HTTP messages in bytes, defaults to C<524288>.
 
 =head2 C<MOJO_MODE>
 
-Run mode for L<Mojolicious> application, should contain a valid mode like
+Run mode for the L<Mojolicious> application, should contain a valid mode like
 C<development> or C<production>.
 
     MOJO_MODE=development
@@ -131,8 +131,8 @@ Enable reverse proxy support for L<Mojolicious> application.
 
 =head2 C<MOJO_TEMPLATE_CLASS>
 
-Class the L<Mojolicious> renderer should use to find templates in the C<DATA>
-section, defaults to C<main>.
+Class the L<Mojolicious> renderer should use to find C<DATA> templates,
+defaults to C<main>.
 
     MOJO_TEMPLATE_CLASS=MyApp
 

@@ -36,8 +36,8 @@ sub is_done { shift->state eq 'done' }
 sub is_finished { shift->is_state(qw/done done_with_leftovers error/) }
 
 sub is_state {
-    my $self  = shift;
-    my $state = $self->state;
+    my $self = shift;
+    my $state = $self->{state} || 'start';
     $_ eq $state and return 1 for @_;
     return;
 }

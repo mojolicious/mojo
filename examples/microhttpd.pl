@@ -83,6 +83,7 @@ $loop->listen(
 print <<'EOF';
 Starting server on port 3000.
 Try something like "ab -c 30 -n 10000 -k http://127.0.0.1:3000/" for testing.
+On a recent MacBook 13" this should result in about 10k req/s.
 EOF
 
 # Start loop

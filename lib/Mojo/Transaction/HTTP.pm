@@ -262,56 +262,144 @@ sub server_read {
         }
     }
 
-    # Spin
-    $self->_server_spin;
-
     return $self;
 }
 
 sub server_write {
     my $self = shift;
 
-    my $chunk;
+    # Chunk
+    my $chunk = '';
 
-    # Body
-    if ($self->is_state('write_body')) {
-        $chunk = $self->res->get_body_chunk($self->_offset);
+    # Offsets
+    my $offset   = $self->_offset;
+    my $to_write = $self->_to_write;
 
-        # End
-        if (defined $chunk && !length $chunk) {
-            $self->req->is_state('done_with_leftovers')
-              ? $self->state('done_with_leftovers')
-              : $self->state('done');
-            return;
+    # Writing
+    if ($self->is_state('write')) {
+
+        # Connection header
+        unless ($self->res->headers->connection) {
+            if ($self->keep_alive) {
+                $self->res->headers->connection('Keep-Alive');
+            }
+            else { $self->res->headers->connection('Close') }
+        }
+
+        # Ready for next state
+        $self->state('write_start_line');
+        $to_write = $self->res->start_line_size;
+    }
+
+    # Start line
+    if ($self->is_state('write_start_line')) {
+        my $buffer = $self->res->get_start_line_chunk($offset);
+
+        # Written
+        my $written = defined $buffer ? length $buffer : 0;
+        $to_write = $to_write - $written;
+        $offset   = $offset + $written;
+
+        # Append
+        $chunk .= $buffer;
+
+        # Done
+        if ($to_write <= 0) {
+            $self->state('write_headers');
+            $offset   = 0;
+            $to_write = $self->res->header_size;
         }
     }
 
     # Headers
-    $chunk = $self->res->get_header_chunk($self->_offset)
-      if $self->is_state('write_headers');
+    if ($self->is_state('write_headers')) {
+        my $buffer = $self->res->get_header_chunk($offset);
 
-    # Start line
-    $chunk = $self->res->get_start_line_chunk($self->_offset)
-      if $self->is_state('write_start_line');
+        # Written
+        my $written = defined $buffer ? length $buffer : 0;
+        $to_write = $to_write - $written;
+        $offset   = $offset + $written;
 
-    # Written
-    my $written = defined $chunk ? length $chunk : 0;
-    $self->_to_write($self->_to_write - $written);
-    $self->_offset($self->_offset + $written);
+        # Append
+        $chunk .= $buffer;
 
-    # Chunked
-    $self->_to_write(1)
-      if $self->res->is_chunked && $self->is_state('write_body');
+        # Done
+        if ($to_write <= 0) {
 
-    # Done early
-    if ($self->is_state('write_body') && $self->_to_write <= 0) {
-        $self->req->is_state('done_with_leftovers')
-          ? $self->state('done_with_leftovers')
-          : $self->state('done');
+            # HEAD request
+            if ($self->req->method eq 'HEAD') {
+
+                # Don't send body if request method is HEAD
+                $self->req->is_state('done_with_leftovers')
+                  ? $self->state('done_with_leftovers')
+                  : $self->state('done');
+            }
+
+            # Body
+            else {
+                $self->state('write_body');
+                $offset   = 0;
+                $to_write = $self->res->body_size;
+
+                # Chunked
+                $to_write = 1 if $self->res->is_chunked;
+            }
+        }
     }
 
-    # Spin
-    $self->_server_spin;
+    # Body
+    if ($self->is_state('write_body')) {
+
+        # 100 Continue
+        if ($to_write <= 0) {
+
+            # Continue done
+            if (defined $self->continued && $self->continued == 0) {
+                $self->continued(1);
+                $self->state('read');
+
+                # Continue
+                if ($self->res->code == 100) { $self->res($self->res->new) }
+
+                # Don't continue
+                else { $self->done }
+            }
+
+            # Everything done
+            elsif (!defined $self->continued) {
+                $self->req->is_state('done_with_leftovers')
+                  ? $self->state('done_with_leftovers')
+                  : $self->state('done');
+            }
+
+        }
+
+        # Normal body
+        else {
+            my $buffer = $self->res->get_body_chunk($offset);
+
+            # Written
+            my $written = defined $buffer ? length $buffer : 0;
+            $to_write = $to_write - $written;
+            $offset   = $offset + $written;
+
+            # Append
+            $chunk .= $buffer;
+
+            # Chunked
+            $to_write = 1 if $self->res->is_chunked;
+
+            # Done
+            $self->req->is_state('done_with_leftovers')
+              ? $self->state('done_with_leftovers')
+              : $self->state('done')
+              if $to_write <= 0 || (defined $buffer && !length $buffer);
+        }
+    }
+
+    # Offsets
+    $self->_offset($offset);
+    $self->_to_write($to_write);
 
     return $chunk;
 }
@@ -330,9 +418,7 @@ sub _client_spin {
             if ($self->keep_alive || $self->kept_alive) {
                 $self->req->headers->connection('Keep-Alive');
             }
-            else {
-                $self->req->headers->connection('Close');
-            }
+            else { $self->req->headers->connection('Close') }
         }
 
         # We might have to handle 100 Continue
@@ -412,86 +498,6 @@ sub _new_response {
     }
 
     $self->res($new);
-}
-
-sub _server_spin {
-    my $self = shift;
-
-    # We identify ourself
-    $self->res->headers->server('Mojo (Perl)')
-      unless $self->res->headers->server;
-
-    # Reading
-    $self->state('read') if $self->is_state('start');
-
-    # Writing
-    if ($self->is_state('write')) {
-
-        # Connection header
-        unless ($self->res->headers->connection) {
-            if ($self->keep_alive) {
-                $self->res->headers->connection('Keep-Alive');
-            }
-            else { $self->res->headers->connection('Close') }
-        }
-
-        # Ready for next state
-        $self->state('write_start_line');
-        $self->_to_write($self->res->start_line_size);
-    }
-
-    # Response start line
-    if ($self->is_state('write_start_line') && $self->_to_write <= 0) {
-        $self->state('write_headers');
-        $self->_offset(0);
-        $self->_to_write($self->res->header_size);
-    }
-
-    # Response headers
-    if ($self->is_state('write_headers') && $self->_to_write <= 0) {
-
-        if ($self->req->method eq 'HEAD') {
-
-            # Don't send body if request method is HEAD
-            $self->req->is_state('done_with_leftovers')
-              ? $self->state('done_with_leftovers')
-              : $self->state('done');
-        }
-        else {
-
-            $self->state('write_body');
-            $self->_offset(0);
-            $self->_to_write($self->res->body_size);
-
-            # Chunked
-            $self->_to_write(1) if $self->res->is_chunked;
-        }
-    }
-
-    # Response body
-    if ($self->is_state('write_body') && $self->_to_write <= 0) {
-
-        # Continue done
-        if (defined $self->continued && $self->continued == 0) {
-            $self->continued(1);
-            $self->state('read');
-
-            # Continue
-            if ($self->res->code == 100) { $self->res($self->res->new) }
-
-            # Don't continue
-            else { $self->done }
-        }
-
-        # Everything done
-        elsif (!defined $self->continued) {
-            $self->req->is_state('done_with_leftovers')
-              ? $self->state('done_with_leftovers')
-              : $self->state('done');
-        }
-    }
-
-    return $self;
 }
 
 1;

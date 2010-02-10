@@ -22,6 +22,19 @@ __PACKAGE__->attr('_hidden');
 __PACKAGE__->attr(_loaded => sub { {} });
 
 # Hey. What kind of party is this? There's no booze and only one hooker.
+sub auto_render {
+    my ($self, $c) = @_;
+
+    # Render
+    return !$c->render
+      unless $c->stash->{rendered}
+          || $c->res->code
+          || $c->tx->is_paused;
+
+    # Nothing to render
+    return;
+}
+
 sub dispatch {
     my ($self, $c) = @_;
 
@@ -45,7 +58,7 @@ sub dispatch {
     return $e if $e;
 
     # Render
-    return $self->_render($c);
+    return $self->auto_render($c);
 }
 
 sub hide { push @{shift->hidden}, @_ }
@@ -245,19 +258,6 @@ sub _generate_method {
     return $method;
 }
 
-sub _render {
-    my ($self, $c) = @_;
-
-    # Render
-    return !$c->render
-      unless $c->stash->{rendered}
-          || $c->res->code
-          || $c->tx->is_paused;
-
-    # Nothing to render
-    return;
-}
-
 sub _walk_stack {
     my ($self, $c) = @_;
 
@@ -343,6 +343,12 @@ Namespace to search for controllers.
 
 L<MojoX::Dispatcher::Routes> inherits all methods from L<MojoX::Routes> and
 implements the follwing the ones.
+
+=head2 C<auto_render>
+
+    $dispatcher->auto_render(MojoX::Dispatcher::Routes::Controller->new);
+
+Automatic rendering.
 
 =head2 C<dispatch>
 

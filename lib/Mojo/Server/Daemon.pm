@@ -189,6 +189,9 @@ sub _build_tx {
     # Build transaction
     my $tx = $self->build_tx_cb->($self);
 
+    # Identify
+    $tx->res->headers->server('Mojo (Perl)');
+
     # Connection
     $tx->connection($id);
 

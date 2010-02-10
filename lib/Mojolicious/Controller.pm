@@ -26,7 +26,7 @@ sub finish {
     return $self->tx->finish if $self->tx->is_websocket;
 
     # Render
-    $self->app->routes->render($self);
+    $self->app->routes->auto_render($self);
 
     # Hook
     $self->app->plugins->run_hook_reverse(after_dispatch => $self);

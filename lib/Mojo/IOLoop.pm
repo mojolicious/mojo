@@ -874,18 +874,14 @@ sub _write {
     my $buffer = $c->{buffer};
 
     # Try to fill the buffer before writing
-    while ($buffer->size < CHUNK_SIZE && !$c->{read_only} && !$c->{finish}) {
-
-        # No write callback
-        last unless my $event = $c->{write};
+    my $more = !$c->{read_only} && !$c->{finish} ? 1 : 0;
+    my $event = $c->{write};
+    if ($more && $event && $buffer->size < CHUNK_SIZE) {
 
         # Write callback
         $c->{protected} = 1;
         my $chunk = $self->_event('write', $event, $id);
         delete $c->{protected};
-
-        # Done for now
-        last unless defined $chunk && length $chunk;
 
         # Add to buffer
         $buffer->add_chunk($chunk);

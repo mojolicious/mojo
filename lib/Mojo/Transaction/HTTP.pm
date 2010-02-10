@@ -45,9 +45,8 @@ sub client_read {
         $self->res->parse($chunk);
 
         # We got a 100 Continue response
-        if (   $self->res->is_state(qw/done done_with_leftovers/)
-            && $self->res->code == 100)
-        {
+        my $done = $self->res->is_state(qw/done done_with_leftovers/);
+        if ($done && $self->res->code == 100) {
             $self->_new_response;
             $self->continued(1);
             $self->_continue(0);
@@ -64,7 +63,7 @@ sub client_read {
     else {
         $self->done if $read == 0;
 
-        # HEAD request is special case
+        # HEAD response
         if ($self->req->method eq 'HEAD') {
             $self->res->parse_until_body($chunk);
             while ($self->res->content->is_state('body')) {
@@ -82,39 +81,52 @@ sub client_read {
                 }
 
                 # Done
-                else {
-                    $self->done;
-                    last;
-                }
+                else { $self->done and last }
             }
-
-            # Spin
-            $self->_client_spin;
-
-            return $self;
         }
 
-        # Parse
-        $self->res->parse($chunk);
+        # Normal response
+        else {
 
-        # Finished
-        while ($self->res->is_finished) {
+            # Parse
+            $self->res->parse($chunk);
 
-            # Check for unexpected 100
-            if (($self->res->code || '') eq '100') { $self->_new_response }
+            # Finished
+            while ($self->res->is_finished) {
 
-            else {
+                # Check for unexpected 100
+                if (($self->res->code || '') eq '100') {
+                    $self->_new_response;
+                }
 
-                # Inherit state
-                $self->state($self->res->state);
-                $self->error($self->res->error) if $self->res->has_error;
-                last;
+                else {
+
+                    # Inherit state
+                    $self->state($self->res->state);
+                    $self->error($self->res->error) if $self->res->has_error;
+                    last;
+                }
             }
         }
     }
 
-    # Spin
-    $self->_client_spin;
+    # Check for request/response errors
+    $self->error('Request error.')  if $self->req->has_error;
+    $self->error('Response error.') if $self->res->has_error;
+
+    # Make sure we don't wait longer than the set time for a 100 Continue
+    # (defaults to 5 seconds)
+    if ($self->_continue) {
+        my $continue = $self->_continue;
+        $continue = $self->continue_timeout - (time - $self->_started);
+        $continue = 0 if $continue < 0;
+        $self->_continue($continue);
+    }
+
+    # 100 Continue timeout
+    if ($self->is_state('read_continue')) {
+        $self->state('write_body') unless $self->_continue;
+    }
 
     return $self;
 }
@@ -122,39 +134,103 @@ sub client_read {
 sub client_write {
     my $self = shift;
 
-    my $chunk;
+    # Chunk
+    my $chunk = '';
 
-    # Body
-    if ($self->is_state('write_body')) {
-        $chunk = $self->req->get_body_chunk($self->_offset);
+    # Offsets
+    my $offset   = $self->_offset;
+    my $to_write = $self->_to_write;
 
-        # End
-        if (defined $chunk && !length $chunk) {
-            $self->state('read_response');
-            $self->_client_spin;
-            return;
+    # Writing
+    if ($self->is_state('start')) {
+
+        # Connection header
+        unless ($self->req->headers->connection) {
+            if ($self->keep_alive || $self->kept_alive) {
+                $self->req->headers->connection('Keep-Alive');
+            }
+            else { $self->req->headers->connection('Close') }
+        }
+
+        # We might have to handle 100 Continue
+        $self->_continue($self->continue_timeout)
+          if ($self->req->headers->expect || '') =~ /100-continue/;
+
+        # Ready for next state
+        $self->state('write_start_line');
+        $to_write = $self->req->start_line_size;
+    }
+
+    # Start line
+    if ($self->is_state('write_start_line')) {
+        my $buffer = $self->req->get_start_line_chunk($offset);
+
+        # Written
+        my $written = defined $buffer ? length $buffer : 0;
+        $to_write = $to_write - $written;
+        $offset   = $offset + $written;
+
+        $chunk .= $buffer;
+
+        # Done
+        if ($to_write <= 0) {
+            $self->state('write_headers');
+            $offset   = 0;
+            $to_write = $self->req->header_size;
         }
     }
 
     # Headers
-    $chunk = $self->req->get_header_chunk($self->_offset)
-      if $self->is_state('write_headers');
+    if ($self->is_state('write_headers')) {
+        my $buffer = $self->req->get_header_chunk($offset);
 
-    # Start line
-    $chunk = $self->req->get_start_line_chunk($self->_offset)
-      if $self->is_state('write_start_line');
+        # Written
+        my $written = defined $buffer ? length $buffer : 0;
+        $to_write = $to_write - $written;
+        $offset   = $offset + $written;
 
-    # Written
-    my $written = defined $chunk ? length $chunk : 0;
-    $self->_to_write($self->_to_write - $written);
-    $self->_offset($self->_offset + $written);
+        $chunk .= $buffer;
 
-    # Chunked
-    $self->_to_write(1)
-      if $self->req->is_chunked && $self->is_state('write_body');
+        # Done
+        if ($to_write <= 0) {
 
-    # Spin
-    $self->_client_spin;
+            $self->_continue
+              ? $self->state('read_continue')
+              : $self->state('write_body');
+            $offset   = 0;
+            $to_write = $self->req->body_size;
+
+            # Chunked
+            $to_write = 1 if $self->req->is_chunked;
+        }
+    }
+
+    # Body
+    if ($self->is_state('write_body')) {
+        my $buffer = $self->req->get_body_chunk($offset);
+
+        # Written
+        my $written = defined $buffer ? length $buffer : 0;
+        $to_write = $to_write - $written;
+        $offset   = $offset + $written;
+
+        $chunk .= $buffer;
+
+        # End
+        if (defined $buffer && !length $buffer) {
+            $self->state('read_response');
+        }
+
+        # Chunked
+        $to_write = 1 if $self->req->is_chunked;
+
+        # Done
+        $self->state('read_response') if $to_write <= 0;
+    }
+
+    # Offsets
+    $self->_offset($offset);
+    $self->_to_write($to_write);
 
     return $chunk;
 }
@@ -402,78 +478,6 @@ sub server_write {
     $self->_to_write($to_write);
 
     return $chunk;
-}
-
-sub _client_spin {
-    my $self = shift;
-
-    # Check for request/response errors
-    $self->error('Request error.')  if $self->req->has_error;
-    $self->error('Response error.') if $self->res->has_error;
-
-    if ($self->is_state('start')) {
-
-        # Connection header
-        unless ($self->req->headers->connection) {
-            if ($self->keep_alive || $self->kept_alive) {
-                $self->req->headers->connection('Keep-Alive');
-            }
-            else { $self->req->headers->connection('Close') }
-        }
-
-        # We might have to handle 100 Continue
-        $self->_continue($self->continue_timeout)
-          if ($self->req->headers->expect || '') =~ /100-continue/;
-
-        # Ready for next state
-        $self->state('write_start_line');
-        $self->_to_write($self->req->start_line_size);
-    }
-
-    # Make sure we don't wait longer than the set time for a 100 Continue
-    # (defaults to 5 seconds)
-    if ($self->_continue) {
-        my $continue = $self->_continue;
-        $continue = $self->continue_timeout - (time - $self->_started);
-        $continue = 0 if $continue < 0;
-        $self->_continue($continue);
-    }
-
-    # Request start line written
-    if ($self->is_state('write_start_line')) {
-        if ($self->_to_write <= 0) {
-            $self->state('write_headers');
-            $self->_offset(0);
-            $self->_to_write($self->req->header_size);
-        }
-    }
-
-    # Request headers written
-    if ($self->is_state('write_headers')) {
-        if ($self->_to_write <= 0) {
-
-            $self->_continue
-              ? $self->state('read_continue')
-              : $self->state('write_body');
-            $self->_offset(0);
-            $self->_to_write($self->req->body_size);
-
-            # Chunked
-            $self->_to_write(1) if $self->req->is_chunked;
-        }
-    }
-
-    # 100 Continue timeout
-    if ($self->is_state('read_continue')) {
-        $self->state('write_body') unless $self->_continue;
-    }
-
-    # Request body written
-    if ($self->is_state('write_body')) {
-        $self->state('read_response') if $self->_to_write <= 0;
-    }
-
-    return $self;
 }
 
 # Replace client response after receiving 100 Continue

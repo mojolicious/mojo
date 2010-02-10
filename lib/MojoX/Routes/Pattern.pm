@@ -187,7 +187,7 @@ sub _compile {
             elsif ($op eq 'symbol') { $compiled = '([^\/\.]+)' }
 
             # Wildcard
-            elsif ($op eq 'wildcard') { $compiled = '(.*)' }
+            elsif ($op eq 'wildcard') { $compiled = '(.+)' }
 
             my $req = $self->reqs->{$name};
             $compiled = "($req)" if $req;

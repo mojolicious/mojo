@@ -13,7 +13,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 324;
+plan tests => 334;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -57,6 +57,18 @@ post '/upload' => sub {
     if (my $u = $self->req->upload('file')) {
         $self->res->body($self->res->body . $u->filename . $u->size);
     }
+};
+
+# GET /foo_relaxed/*
+get '/foo_relaxed/(.test)' => sub {
+    my $self = shift;
+    $self->render_text($self->stash('test'));
+};
+
+# GET /foo_wildcard/*
+get '/foo_wildcard/(*test)' => sub {
+    my $self = shift;
+    $self->render_text($self->stash('test'));
 };
 
 # GET /with/header/condition
@@ -357,6 +369,18 @@ is($tx->res->code, 413);
 is($tx->res->body, '');
 app->log->level($backup2);
 $ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
+
+# GET /foo_relaxed/123
+$t->get_ok('/foo_relaxed/123')->status_is(200)->content_is('123');
+
+# GET /foo_relaxed
+$t->get_ok('/foo_relaxed/')->status_is(404);
+
+# GET /foo_wildcard/123
+$t->get_ok('/foo_wildcard/123')->status_is(200)->content_is('123');
+
+# GET /foo_wildcard
+$t->get_ok('/foo_wildcard/')->status_is(404);
 
 # GET /with/header/condition
 $t->get_ok('/with/header/condition', {'X-Secret-Header' => 'bar'})

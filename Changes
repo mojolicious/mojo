@@ -108,6 +108,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed query string support in Mojo::URL. (vti)
         - Fixed rendering without template name.
         - Fixed large file upload bug. (vti, sharifulin)
+        - Fixed a small inconsistency between relaxed and wildcared
+          plaeholders.
 
 0.999914 2009-11-24 00:00:00
         - Added the Mojolicious plugin system.

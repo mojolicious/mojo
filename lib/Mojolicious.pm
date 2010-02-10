@@ -253,12 +253,33 @@ Web development for humans, making hard things possible and everything fun.
 
     use Mojolicious::Lite;
 
-    get '/' => sub {
+    get '/time' => 'clock';
+
+    websocket '/echo' => sub {
         my $self = shift;
-        $self->render_text('Hello Mojo!');
+        $self->receive_message(
+            sub {
+                my ($self, $message) = @_;
+                $self->send_message("echo: $message");
+            }
+        );
+    };
+
+    get '/:name' => sub {
+        my $self = shift;
+        my $name = $self->param('name') || 'Mojo';
+        $self->render_text("Hello $name!");
     };
 
     shagadelic;
+    __DATA__
+
+    @@ clock.html.ep
+    % my ($second, $minute, $hour) = (localtime(time))[0, 1, 2];
+    The time is <%= $hour %>:<%= $minute %>:<%= $second %>.
+
+For more user friendly documentation see L<Mojolicious::Book> and
+L<Mojolicious::Lite>.
 
 =head2 Architecture
 
@@ -280,9 +301,6 @@ Web development for humans, making hard things possible and everything fun.
     .-------. .-----------. .--------. .------------. .-------------.
     |  CGI  | |  FastCGI  | |  PSGI  | |  HTTP 1.1  | |  WebSocket  |
     '-------' '-----------' '--------' '------------' '-------------'
-
-For more user friendly documentation see L<Mojolicious::Book> and
-L<Mojolicious::Lite>.
 
 =head1 ATTRIBUTES
 

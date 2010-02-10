@@ -109,7 +109,7 @@ sub decode {
     $self->error(undef);
 
     # Remove BOM
-    $string =~ s/$BOM_RE//g;
+    $string =~ s/$BOM_RE//go;
 
     # Detect and decode unicode
     my $encoding = 'UTF-8';
@@ -160,10 +160,10 @@ sub _decode_array {
     while ($$ref) {
 
         # Separator
-        next if $$ref =~ s/$VALUE_SEPARATOR_RE//;
+        next if $$ref =~ s/$VALUE_SEPARATOR_RE//o;
 
         # End
-        return $array if $$ref =~ s/$ARRAY_END_RE//;
+        return $array if $$ref =~ s/$ARRAY_END_RE//o;
 
         # Value
         if (my $values = $self->_decode_values($ref)) {
@@ -183,7 +183,7 @@ sub _decode_names {
     my ($self, $ref) = @_;
 
     # Name found
-    if ($$ref =~ s/$NAMES_RE//) { return $1 }
+    if ($$ref =~ s/$NAMES_RE//o) { return $1 }
 
     # No number
     return;
@@ -193,7 +193,7 @@ sub _decode_number {
     my ($self, $ref) = @_;
 
     # Number found
-    if ($$ref =~ s/$NUMBER_RE//) { return $1 }
+    if ($$ref =~ s/$NUMBER_RE//o) { return $1 }
 
     # No number
     return;
@@ -210,13 +210,13 @@ sub _decode_object {
     while ($$ref) {
 
         # Name separator
-        next if $$ref =~ s/$NAME_SEPARATOR_RE//;
+        next if $$ref =~ s/$NAME_SEPARATOR_RE//o;
 
         # Value separator
-        next if $$ref =~ s/$VALUE_SEPARATOR_RE//;
+        next if $$ref =~ s/$VALUE_SEPARATOR_RE//o;
 
         # End
-        return $hash if $$ref =~ s/$OBJECT_END_RE//;
+        return $hash if $$ref =~ s/$OBJECT_END_RE//o;
 
         # Value
         if (my $values = $self->_decode_values($ref)) {
@@ -245,7 +245,7 @@ sub _decode_string {
     my ($self, $ref) = @_;
 
     # String
-    if ($$ref =~ s/$STRING_RE//) {
+    if ($$ref =~ s/$STRING_RE//o) {
         my $string = $1;
 
         # Unescape
@@ -265,12 +265,12 @@ sub _decode_structure {
     return unless $$ref;
 
     # Object
-    if ($$ref =~ s/$OBJECT_BEGIN_RE//) {
+    if ($$ref =~ s/$OBJECT_BEGIN_RE//o) {
         return [$self->_decode_object($ref)];
     }
 
     # Array
-    elsif ($$ref =~ s/$ARRAY_BEGIN_RE//) {
+    elsif ($$ref =~ s/$ARRAY_BEGIN_RE//o) {
         return [$self->_decode_array($ref)];
     }
 
@@ -373,7 +373,7 @@ sub _encode_values {
     return 'true' if ref $value eq 'Mojo::JSON::_Bool' && $value;
 
     # Number
-    return $value if $value =~ /$NUMBER_RE$/;
+    return $value if $value =~ m/$NUMBER_RE$/o;
 
     # String
     return $self->_encode_string($value);

@@ -41,29 +41,29 @@ sub _tokenize {
     while ($string) {
 
         # Name
-        if ($string =~ s/$NAME_RE//) {
+        if ($string =~ s/$NAME_RE//o) {
 
             my $name = $1;
             my $value;
 
             # Quoted value
-            if ($string =~ s/$VALUE_RE//) { $value = b($1)->unquote }
+            if ($string =~ s/$VALUE_RE//o) { $value = b($1)->unquote }
 
             # "expires" is a special case, thank you Netscape...
-            elsif ($name =~ /expires/i && $string =~ s/$EXPIRES_RE//) {
+            elsif ($name =~ /expires/i && $string =~ s/$EXPIRES_RE//o) {
                 $value = $1;
             }
 
             # Unquoted string
-            elsif ($string =~ s/$STRING_RE//) { $value = $1 }
+            elsif ($string =~ s/$STRING_RE//o) { $value = $1 }
 
             push @token, [$name, $value];
 
             # Separator
-            $string =~ s/$SEPARATOR_RE//;
+            $string =~ s/$SEPARATOR_RE//o;
 
             # Cookie separator
-            if ($string =~ s/$COOKIE_SEPARATOR_RE//) {
+            if ($string =~ s/$COOKIE_SEPARATOR_RE//o) {
                 push @tree, [@token];
                 @token = ();
             }

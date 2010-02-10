@@ -15,6 +15,9 @@ __PACKAGE__->attr(buffer => sub { Mojo::ByteStream->new });
 __PACKAGE__->attr(_buffer  => sub { [] });
 __PACKAGE__->attr(_headers => sub { {} });
 
+# Filter regex
+my $FILTER_RE = qr/[[:cntrl:]\(\|\)\<\>\@\,\;\:\\\"\/\[\]\?\=\{\}\s]/;
+
 # Upgrade header has to go first for WebSocket
 my @GENERAL_HEADERS = qw/
   Upgrade
@@ -95,7 +98,7 @@ sub add {
 
     # Filter illegal characters from header name
     # (1*<any CHAR except CTLs or separators>)
-    $name =~ s/[[:cntrl:]\(\|\)\<\>\@\,\;\:\\\"\/\[\]\?\=\{\}\s]//g;
+    $name =~ s/$FILTER_RE//go;
 
     # Make sure we have a normal case entry for name
     my $lcname = lc $name;
@@ -241,35 +244,39 @@ sub parse {
     $self->buffer->add_chunk($chunk);
 
     # Parse headers
+    my $buffer  = $self->buffer;
+    my $headers = $self->_buffer;
     $self->state('headers') if $self->is_state('start');
     while (1) {
 
         # Line
-        my $line = $self->buffer->get_line;
+        my $line = $buffer->get_line;
         last unless defined $line;
 
         # New header
-        if ($line =~ /^(\S+)\s*:\s*(.*)/) { push @{$self->_buffer}, $1, $2 }
+        if ($line =~ /^(\S+)\s*:\s*(.*)/) { push @$headers, $1, $2 }
 
         # Multiline
-        elsif (@{$self->_buffer} && $line =~ s/^\s+//) {
-            $self->_buffer->[-1] .= " " . $line;
+        elsif (@$headers && $line =~ s/^\s+//) {
+            $headers->[-1] .= " " . $line;
         }
 
         # Empty line
         else {
 
             # Store headers
-            for (my $i = 0; $i < @{$self->_buffer}; $i += 2) {
-                $self->add($self->_buffer->[$i], $self->_buffer->[$i + 1]);
+            for (my $i = 0; $i < @$headers; $i += 2) {
+                $self->add($headers->[$i], $headers->[$i + 1]);
             }
 
             # Done
             $self->done;
             $self->_buffer([]);
-            return $self->buffer;
+            return $buffer;
         }
     }
+    $self->_buffer($headers);
+
     return;
 }
 

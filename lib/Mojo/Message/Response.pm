@@ -202,7 +202,7 @@ sub _parse_start_line {
     # We have a full HTTP 1.0+ response line
     my $line = $buffer->get_line;
     if (defined $line) {
-        if ($line =~ /$START_LINE_RE/) {
+        if ($line =~ m/$START_LINE_RE/o) {
             $self->major_version($1);
             $self->minor_version($2);
             $self->code($3);

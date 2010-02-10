@@ -328,7 +328,7 @@ sub _parse_start_line {
 
     # We have a (hopefully) full request line
     if (defined $line) {
-        if ($line =~ /$START_LINE_RE/) {
+        if ($line =~ m/$START_LINE_RE/o) {
             $self->method($1);
             $self->url->parse($2);
 

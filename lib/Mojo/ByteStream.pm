@@ -321,7 +321,7 @@ sub import {
 sub new {
     my $self = shift->SUPER::new();
     $self->{bytestream} = defined $_[0] ? $_[0] : '';
-    $self->raw_size($self->size);
+    $self->{raw_size} = length $self->{bytestream};
     return $self;
 }
 
@@ -332,7 +332,7 @@ sub add_chunk {
     return $self unless defined $chunk;
 
     # Raw length
-    $self->raw_size($self->raw_size + length $chunk);
+    $self->{raw_size} = $self->{raw_size} + length $chunk;
 
     # Store
     $self->{bytestream} .= $chunk;
@@ -449,7 +449,7 @@ sub get_line {
 
     # Extract line and ending
     my $line = substr $self->{bytestream}, 0, $pos + 1, '';
-    $line =~ s/(\x0d?\x0a)\z//;
+    $line =~ s/\x0d?\x0a$//;
 
     return $line;
 }

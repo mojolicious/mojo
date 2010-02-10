@@ -1018,7 +1018,7 @@ to C<3>.
     my $tls_ca_file = $client->tls_ca_file;
     $client         = $client->tls_ca_file('/etc/tls/cacerts.pem');
 
-TLS certificate authority file to use, defaults to the MOJO_CA_FILE
+TLS certificate authority file to use, defaults to the C<MOJO_CA_FILE>
 environment variable.
 Note that L<IO::Socket::SSL> must be installed for HTTPS support.
 

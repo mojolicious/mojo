@@ -420,7 +420,7 @@ sub _parse {
 
         # Check line size
         $self->error('Maximum line size exceeded.')
-          if $self->buffer->size > ($ENV{MOJO_MAX_LINE_SIZE} || 24576);
+          if $self->buffer->size > ($ENV{MOJO_MAX_LINE_SIZE} || 10240);
     }
 
     # Check message size

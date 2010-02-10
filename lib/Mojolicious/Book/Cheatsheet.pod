@@ -1,0 +1,146 @@
+# Copyright (C) 2008-2010, Sebastian Riedel.
+
+=head1 NAME
+
+Mojolicious::Book::Cheatsheet - Reference
+
+=head1 OVERVIEW
+
+This document contains a concise all-purpose reference.
+
+=head1 ENVIRONMENT VARIABLES
+
+Many parts of L<Mojolicious> can be tuned with environment variables.
+Debug environment variables are excluded because they are for developer use
+only.
+
+=head2 C<MOJO_APP>
+
+Decides which L<Mojolicious> or L<Mojo> application will be used, should
+always contain a class name like C<MyApp>.
+
+    MOJO_APP=MyApp
+
+=head2 C<MOJO_CA_FILE>
+
+The path to the TLS CA authority file, should always contain a path like
+C</etc/tls/cacerts.pem>.
+Note that L<IO::Socket::SSL> must be installed for TLS support.
+
+    MOJO_CA_FILE=/etc/tls/cacerts.pem
+
+=head2 C<MOJO_CHUNK_SIZE>
+
+Chunk size used for IO operations in bytes, a bigger chunk size speeds up IO
+operations but will also use more memory.
+
+    MOJO_CHUNK_SIZE=1024
+
+=head2 C<MOJO_EPOLL>
+
+Force epoll mainloop for IO operations.
+Note that L<IO::Epoll> must be installed for epoll support.
+
+    MOJO_EPOLL=1
+
+=head2 C<MOJO_HOME>
+
+Home directory for the L<Mojolicious> application, should always contain a
+path like C</home/sri/myapp>.
+
+    MOJO_HOME=/home/sri/myapp
+
+=head2 C<MOJO_KQUEUE>
+
+Force kqueue mainloop for IO operations.
+Note that L<IO::KQueue> must be installed for kqueue support.
+
+    MOJO_KQUEUE=1
+
+=head2 C<MOJO_LOG_LEVEL>
+
+Log level for the L<Mojolicious> application, should contain a valid log
+level like C<debug> or C<error>.
+
+    MOJO_LOG_LEVEL=debug
+    MOJO_LOG_LEVEL=error
+
+=head2 C<MOJO_MAX_LINE_SIZE>
+
+Maximum line size for HTTP message start lines and headers in bytes, defaults
+to C<10240>.
+
+    MOJO_MAX_LINE_SIZE=2048
+
+=head2 C<MOJO_MAX_MEMORY_SIZE>
+
+Maximum size in bytes for HTTP content to keep in memory, bigger content will
+be written to temporary files, defaults to C<24576>.
+
+    MOJO_MAX_MEMORY_SIZE=2048
+
+=head2 C<MOJO_MAX_MESSAGE_SIZE>
+
+Maximum size for HTTP messages in bytes, defaults to C<524288>.
+
+    MOJO_MAX_MESSAGE_SIZE=1024
+
+=head2 C<MOJO_MODE>
+
+Run mode for L<Mojolicious> application, should contain a valid mode like
+C<development> or C<production>.
+
+    MOJO_MODE=development
+    MOJO_MODE=production
+
+=head2 C<MOJO_NO_IPV6>
+
+Disable IPv6 support, this might result in slightly better performance and
+less memory use.
+Note that L<IO::Socket::INET6> must be installed for IPv6 support.
+
+    MOJO_NO_IPV6=1
+
+=head2 C<MOJO_NO_TLS>
+
+Disable TLS support, this might result in slightly better performance and
+less memory use.
+Note that L<IO::Socket::SSL> must be installed for TLS support.
+
+    MOJO_NO_TLS=1
+
+=head2 C<MOJO_POLL>
+
+Force poll mainloop for IO operations, this should only be used for testing
+since other mainloops are generally faster and scale better.
+
+    MOJO_POLL=1
+
+=head2 C<MOJO_RELOAD>
+
+Enable L<Mojolicious> application reloading, changes to your application will
+be detected automatically so you don't have to restart the server manually.
+
+    MOJO_RELOAD=1
+
+=head2 C<MOJO_REVERSE_PROXY>
+
+Enable reverse proxy support for L<Mojolicious> application.
+
+    MOJO_REVERSE_PROXY=1
+
+=head2 C<MOJO_TEMPLATE_CLASS>
+
+Class the L<Mojolicious> renderer should use to find templates in the C<DATA>
+section, defaults to C<main>.
+
+    MOJO_TEMPLATE_CLASS=MyApp
+
+=head2 C<MOJO_TMPDIR>
+
+Directory for temporary files like huge uploads, by default a random platform
+specific temporary directory will be used.
+
+    MOJO_TMPDIR=/tmp/mojo
+
+=cut

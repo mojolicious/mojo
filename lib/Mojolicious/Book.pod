@@ -22,9 +22,13 @@ New chapters will be added one by one, so keep a close eye on this.
 
 =over 4
 
+=item L<Mojolicious::Book::Cheatsheet>
+
+A concise all-purpose reference.
+
 =item L<Mojolicious::Book::FAQ>
 
-If you have a question this is the first place to look.
+Frequently asked questions with the right answers.
 
 =item L<Mojolicious::Book::CodingGuidelines>
 

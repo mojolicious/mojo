@@ -53,7 +53,7 @@ sub parse {
         $self->asset(Mojo::Asset::File->new)
           if !$self->headers->content_length
               || $self->headers->content_length
-              > ($ENV{MOJO_MAX_MEMORY_SIZE} || 10240);
+              > ($ENV{MOJO_MAX_MEMORY_SIZE} || 24576);
     }
 
     # Content needs to be upgraded to multipart

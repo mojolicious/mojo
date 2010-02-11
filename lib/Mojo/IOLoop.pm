@@ -766,6 +766,7 @@ sub _spin {
         die "KQueue error: $@" if $@;
 
         # Events
+        my (@error, @hup, @read, @write);
         for my $kev (@ret) {
             my ($fd, $filter, $flags, $fflags) = @$kev;
 
@@ -773,18 +774,30 @@ sub _spin {
             my $id = $self->_fds->{$fd};
             next unless $id;
 
-            # Read
-            $self->_read($id) if $filter == IO::KQueue::EVFILT_READ();
-
             # Error
             if ($flags == IO::KQueue::EV_EOF()) {
-                if   ($fflags) { $self->_error($id) }
-                else           { $self->_hup($id) }
+                if   ($fflags) { push @error, $id }
+                else           { push @hup,   $id }
             }
 
+            # Read
+            push @read, $id if $filter == IO::KQueue::EVFILT_READ();
+
             # Write
-            $self->_write($id) if $filter == IO::KQueue::EVFILT_WRITE();
+            push @write, $id if $filter == IO::KQueue::EVFILT_WRITE();
         }
+
+        # Error
+        $self->_error($_) for @error;
+
+        # HUP
+        $self->_hup($_) for @hup;
+
+        # Read
+        $self->_read($_) for @read;
+
+        # Write
+        $self->_write($_) for @write;
     }
 
     # Epoll

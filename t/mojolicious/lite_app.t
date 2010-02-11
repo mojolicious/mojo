@@ -13,7 +13,6 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-
 plan tests => 337;
 
 # Wait you're the only friend I have...

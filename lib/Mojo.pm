@@ -17,11 +17,7 @@ use Mojo::Transaction::WebSocket;
 
 __PACKAGE__->attr(
     build_tx_cb => sub {
-        sub {
-            my $tx = Mojo::Transaction::HTTP->new;
-            $tx->res->headers->header('X-Powered-By' => 'Mojo (Perl)');
-            return $tx;
-          }
+        sub { return Mojo::Transaction::HTTP->new }
     }
 );
 __PACKAGE__->attr(client => sub { Mojo::Client->singleton });

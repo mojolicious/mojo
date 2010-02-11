@@ -673,7 +673,8 @@ sub _queue {
     for my $t ($pipeline ? @$tx : ($tx)) {
 
         # We identify ourself
-        $t->req->headers->user_agent('Mozilla/5.0 (compatible; Mojo; Perl)')
+        $t->req->headers->user_agent(
+            'Mozilla/5.0 (compatible; Mojolicious; Perl)')
           unless $t->req->headers->user_agent;
 
         # State change callback

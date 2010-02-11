@@ -190,7 +190,7 @@ sub _build_tx {
     my $tx = $self->build_tx_cb->($self);
 
     # Identify
-    $tx->res->headers->server('Mojo (Perl)');
+    $tx->res->headers->server('Mojolicious (Perl)');
 
     # Connection
     $tx->connection($id);

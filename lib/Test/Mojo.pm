@@ -241,7 +241,7 @@ Test::Mojo - Testing Mojo!
 
     $t->delete_ok('/something')
       ->status_is(200)
-      ->header_is('X-Powered-By' => 'Mojo (Perl)')
+      ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
       ->content_is('Hello world!');
 
 =head1 DESCRIPTION

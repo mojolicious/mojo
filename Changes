@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 0.999922 2010-02-11 00:00:00
+        - Fixed identification headers.
         - Fixed typos.
 
 0.999921 2010-02-11 00:00:00

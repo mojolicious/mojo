@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+0.999921 2010-02-11 00:00:00
+        - Fixed a small kqueue bug.
+
 0.999920 2010-02-11 00:00:00
         - Code name "Snowman", this is a major release, which means
           deprecation policies apply.

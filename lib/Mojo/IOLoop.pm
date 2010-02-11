@@ -901,6 +901,7 @@ sub _write {
     }
 
     # Try to write whole buffer
+    return unless defined $buffer;
     my $chunk = $buffer->to_string;
 
     # Write

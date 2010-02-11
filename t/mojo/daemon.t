@@ -28,11 +28,8 @@ is($daemon->max_clients, $max + 10);
 # Start
 my $server = Test::Mojo::Server->new;
 $server->start_daemon_ok;
-
-my $port = $server->port;
-
+my $port   = $server->port;
 my $client = Mojo::Client->new;
-$client->continue_timeout(60);
 
 # Single request without keep alive
 my $tx = Mojo::Transaction::HTTP->new;

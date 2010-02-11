@@ -21,7 +21,7 @@ use Mojo::Transaction::WebSocket;
 use Scalar::Util 'weaken';
 
 __PACKAGE__->attr([qw/default_cb tls_ca_file tls_verify_cb tx/]);
-__PACKAGE__->attr([qw/continue_timeout max_keep_alive_connections/] => 5);
+__PACKAGE__->attr([qw/max_keep_alive_connections/] => 5);
 __PACKAGE__->attr(cookie_jar => sub { Mojo::CookieJar->new });
 __PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->singleton });
 __PACKAGE__->attr(keep_alive_timeout => 15);
@@ -953,13 +953,6 @@ L<IO::Socket::SSL> are supported transparently and used if installed.
 =head1 ATTRIBUTES
 
 L<Mojo::Client> implements the following attributes.
-
-=head2 C<continue_timeout>
-
-    my $timeout = $client->continue_timeout;
-    $client     = $client->continue_timeout(5);
-
-Time to wait for a 100 continue in seconds, defaults to C<5>.
 
 =head2 C<cookie_jar>
 

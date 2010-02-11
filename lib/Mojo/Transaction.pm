@@ -11,8 +11,7 @@ use Carp 'croak';
 
 __PACKAGE__->attr([qw/connection kept_alive/]);
 __PACKAGE__->attr([qw/local_address local_port remote_port/]);
-__PACKAGE__->attr(continue_timeout => 5);
-__PACKAGE__->attr(keep_alive       => 0);
+__PACKAGE__->attr(keep_alive => 0);
 
 __PACKAGE__->attr('_real_state');
 
@@ -102,11 +101,6 @@ implements the following new ones.
 
     my $connection = $tx->connection;
     $tx            = $tx->connection($connection);
-
-=head2 C<continue_timeout>
-
-    my $continue_timeout = $tx->continue_timeout;
-    $tx                  = $tx->continue_timeout(3);
 
 =head2 C<keep_alive>
 

@@ -13,7 +13,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 334;
+plan tests => 333;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -306,12 +306,6 @@ my $content = '1234' x 1024;
 $t->get_ok('/', $content)->status_is(200)
   ->content_is('/root.html/root.html/root.html/root.html/root.html');
 
-# GET / (with body and max message size)
-my $backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
-$ENV{MOJO_MAX_MESSAGE_SIZE} = 1024;
-$t->get_ok('/', $content)->status_is(413)->content_is('');
-$ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
-
 # GET /root
 $t->get_ok('/root.html')->status_is(200)->header_is(Server => 'Mojo (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('/.html');
@@ -321,6 +315,15 @@ $t->get_ok('/.html')->status_is(200)->header_is(Server => 'Mojo (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('/root.html/root.html/root.html/root.html/root.html');
 
+# GET / (with body and max message size)
+my $backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
+$ENV{MOJO_MAX_MESSAGE_SIZE} = 1024;
+my $backup2 = app->log->level;
+app->log->level('fatal');
+$t->get_ok('/', $content)->status_is(413)->content_is('');
+app->log->level($backup2);
+$ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
+
 # POST /upload (huge upload with appropriate max message size)
 $backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
 $ENV{MOJO_MAX_MESSAGE_SIZE} = 1073741824;
@@ -329,8 +332,7 @@ my $part = Mojo::Content::Single->new;
 $part->headers->content_disposition(
     qq/form-data; name="file"; filename="foo.jpg"/);
 $part->headers->content_type('image/jpeg');
-my $chunk = 1 x 1024 x 1024;
-$part->asset->add_chunk($chunk);
+$part->asset->add_chunk('1234' x 1024);
 $content = Mojo::Content::MultiPart->new;
 $content->headers($tx->req->headers);
 $content->headers->content_type('multipart/form-data');
@@ -341,21 +343,20 @@ $tx->req->content($content);
 $client->process($tx);
 is($tx->state,     'done');
 is($tx->res->code, 200);
-is($tx->res->body, 'called, foo.jpg1048576');
+is($tx->res->body, 'called, foo.jpg4096');
 $ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
 
 # POST /upload (huge upload without appropriate max message size)
 $backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
-$ENV{MOJO_MAX_MESSAGE_SIZE} = 524288;
-my $backup2 = app->log->level;
+$ENV{MOJO_MAX_MESSAGE_SIZE} = 2048;
+$backup2 = app->log->level;
 app->log->level('fatal');
 $tx   = Mojo::Transaction::HTTP->new;
 $part = Mojo::Content::Single->new;
 $part->headers->content_disposition(
     qq/form-data; name="file"; filename="foo.jpg"/);
 $part->headers->content_type('image/jpeg');
-$chunk = 1 x 1024 x 1024;
-$part->asset->add_chunk($chunk);
+$part->asset->add_chunk('1234' x 1024);
 $content = Mojo::Content::MultiPart->new;
 $content->headers($tx->req->headers);
 $content->headers->content_type('multipart/form-data');
@@ -364,7 +365,6 @@ $tx->req->method('POST');
 $tx->req->url->parse('/upload');
 $tx->req->content($content);
 $client->process($tx);
-is($tx->state,     'done');
 is($tx->res->code, 413);
 is($tx->res->body, '');
 app->log->level($backup2);

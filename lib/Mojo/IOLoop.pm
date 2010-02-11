@@ -776,14 +776,14 @@ sub _spin {
             # Read
             $self->_read($id) if $filter == IO::KQueue::EVFILT_READ();
 
-            # Write
-            $self->_write($id) if $filter == IO::KQueue::EVFILT_WRITE();
-
             # Error
             if ($flags == IO::KQueue::EV_EOF()) {
                 if   ($fflags) { $self->_error($id) }
                 else           { $self->_hup($id) }
             }
+
+            # Write
+            $self->_write($id) if $filter == IO::KQueue::EVFILT_WRITE();
         }
     }
 

@@ -215,7 +215,7 @@ sub parse {
         |
         $tag_start                           # Code
         |
-        $trim$tag_end                    # Trim end
+        $trim$tag_end                        # Trim end
         |
         $tag_end                             # End
         )

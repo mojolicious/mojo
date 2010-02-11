@@ -1348,7 +1348,7 @@ Callback to be invoked if new data can be written to the connection.
 The callback should return a chunk of data which will be buffered inside the
 loop to guarantee safe writing.
 
-    $loop->write_ab($id => sub {
+    $loop->write_cb($id => sub {
         my ($loop, $id) = @_;
         return 'Data to be buffered by the loop!';
     });

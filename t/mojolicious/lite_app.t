@@ -13,7 +13,8 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 334;
+
+plan tests => 337;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -290,6 +291,15 @@ get '/param_auth' => 'param_auth';
 # GET /param_auth/too
 get '/param_auth/too' =>
   sub { shift->render_text('You could be Bender too!') };
+
+ladder sub {
+    shift->stash(_name => 'Bender');
+    return 1;
+};
+
+# GET /bridge2stash
+get '/bridge2stash' =>
+  sub { shift->render(template => 'bridge2stash', handler => 'ep'); };
 
 # Oh Fry, I love you more than the moon, and the stars,
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
@@ -743,6 +753,9 @@ $t->get_ok('/hello3.txt', {'Range' => 'bytes=0-0'})->status_is(206)
   ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 1)
   ->content_is('X');
 
+# GET /bridge2stash
+$t->get_ok('/bridge2stash')->status_is(200)->content_is("Bender too!\n");
+
 __DATA__
 @@ template.txt.epl
 Redirect works!
@@ -831,6 +844,9 @@ layouted <%== content %>
 
 @@ eperror.html.ep
 %= $c->foo('bar');
+
+@@ bridge2stash.html.ep
+<%= stash('_name') %> too!
 
 __END__
 This is not a template!

@@ -23,7 +23,7 @@ __PACKAGE__->attr(static   => sub { MojoX::Dispatcher::Static->new });
 __PACKAGE__->attr(types    => sub { MojoX::Types->new });
 
 our $CODENAME = 'Snowman';
-our $VERSION  = '0.999921';
+our $VERSION  = '0.999922';
 
 sub new {
     my $self = shift->SUPER::new(@_);
@@ -183,7 +183,7 @@ Mojolicious - The Web In A Box!
 
 =head1 SYNOPSIS
 
-    # Mojolicious Application
+    # Mojolicious application
     package MyApp;
 
     use base 'Mojolicious';

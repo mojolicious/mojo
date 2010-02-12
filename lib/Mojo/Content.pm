@@ -83,24 +83,25 @@ sub generate_body_chunk {
     return '' unless $self->body_cb;
 
     # Remove written
-    my $written = $offset - ($self->buffer->raw_size - $self->buffer->size);
-    $self->buffer->remove($written);
+    my $buffer = $self->buffer;
+    my $written = $offset - ($buffer->raw_size - $buffer->size);
+    $buffer->remove($written);
 
     # Fill buffer
-    if (!$self->_eof && $self->buffer->size < CHUNK_SIZE) {
+    if (!$self->_eof && $buffer->size < CHUNK_SIZE) {
 
         # Generate
-        my $chunk = $self->body_cb->($self, $self->buffer->raw_size);
+        my $chunk = $self->body_cb->($self, $buffer->raw_size);
 
         # EOF
         if (defined $chunk && !length $chunk) { $self->_eof(1) }
 
         # Buffer chunk
-        else { $self->buffer->add_chunk($chunk) }
+        else { $buffer->add_chunk($chunk) }
     }
 
     # Get chunk
-    my $chunk = $self->buffer->to_string;
+    my $chunk = $buffer->to_string;
 
     # Pause or EOF
     return $self->_eof ? '' : undef unless length $chunk;
@@ -155,7 +156,8 @@ sub parse {
     my ($self, $chunk) = @_;
 
     # Buffer
-    $self->filter_buffer->add_chunk($chunk);
+    my $fbuffer = $self->filter_buffer;
+    $fbuffer->add_chunk($chunk);
 
     # Parse headers
     $self->parse_until_body;
@@ -170,7 +172,7 @@ sub parse {
         $self->filter(
             Mojo::Filter::Chunked->new(
                 headers       => $self->headers,
-                input_buffer  => $self->filter_buffer,
+                input_buffer  => $fbuffer,
                 output_buffer => $self->buffer
             )
         ) unless $self->filter;
@@ -181,7 +183,7 @@ sub parse {
     }
 
     # Not chunked, pass through
-    else { $self->buffer($self->filter_buffer) }
+    else { $self->buffer($fbuffer) }
 
     # Custom body parser
     if (my $cb = $self->body_cb) {
@@ -222,12 +224,13 @@ sub parse_until_body {
     my ($self, $chunk) = @_;
 
     # Buffer
-    $self->filter_buffer->add_chunk($chunk);
+    my $fbuffer = $self->filter_buffer;
+    $fbuffer->add_chunk($chunk);
 
     # Parser started
     if ($self->is_state('start')) {
-        my $length            = $self->filter_buffer->size;
-        my $raw_length        = $self->filter_buffer->raw_size;
+        my $length            = $fbuffer->size;
+        my $raw_length        = $fbuffer->raw_size;
         my $raw_header_length = $raw_length - $length;
         $self->raw_header_size($raw_header_length);
         $self->state('headers');
@@ -256,15 +259,17 @@ sub _build_headers {
 sub _parse_headers {
     my $self = shift;
 
-    $self->headers->buffer($self->filter_buffer);
-    $self->headers->parse;
+    my $headers = $self->headers;
+    $headers->buffer($self->filter_buffer);
+    $headers->parse;
 
-    my $length            = $self->headers->buffer->size;
-    my $raw_length        = $self->headers->buffer->raw_size;
+    my $buffer            = $headers->buffer;
+    my $length            = $buffer->size;
+    my $raw_length        = $buffer->raw_size;
     my $raw_header_length = $raw_length - $length;
 
     $self->raw_header_size($raw_header_length);
-    $self->state('body') if $self->headers->is_done;
+    $self->state('body') if $headers->is_done;
 }
 
 1;

@@ -62,6 +62,7 @@ sub parse {
     # Got a chunk (we ignore the chunk extension)
     my $filter  = $self->input_buffer;
     my $content = $filter->to_string;
+    my $buffer  = $self->output_buffer;
     while ($content =~ /^((?:\x0d?\x0a)?([\da-fA-F]+).*\x0d?\x0a)/) {
         my $header = $1;
         my $length = hex($2);
@@ -85,7 +86,7 @@ sub parse {
 
                 # Remove payload
                 substr $content, 0, $length, '';
-                $self->output_buffer->add_chunk($filter->remove($length));
+                $buffer->add_chunk($filter->remove($length));
 
                 # Remove newline at end of chunk
                 $content =~ s/^(\x0d?\x0a)//;
@@ -102,10 +103,11 @@ sub parse {
 }
 
 sub _parse_trailing_headers {
-    my $self = shift;
-    $self->headers->state('headers');
-    $self->headers->parse;
-    if ($self->headers->is_done) {
+    my $self    = shift;
+    my $headers = $self->headers;
+    $headers->state('headers');
+    $headers->parse;
+    if ($headers->is_done) {
         $self->_remove_chunked_encoding;
         $self->done;
     }
@@ -113,12 +115,13 @@ sub _parse_trailing_headers {
 
 sub _remove_chunked_encoding {
     my $self     = shift;
-    my $encoding = $self->headers->transfer_encoding;
+    my $headers  = $self->headers;
+    my $encoding = $headers->transfer_encoding;
     $encoding =~ s/,?\s*chunked//ig;
     $encoding
-      ? $self->headers->transfer_encoding($encoding)
-      : $self->headers->remove('Transfer-Encoding');
-    $self->headers->content_length($self->output_buffer->raw_size);
+      ? $headers->transfer_encoding($encoding)
+      : $headers->remove('Transfer-Encoding');
+    $headers->content_length($self->output_buffer->raw_size);
 }
 
 1;

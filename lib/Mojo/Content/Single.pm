@@ -50,10 +50,9 @@ sub parse {
 
     # Make sure we don't waste memory
     if ($self->asset->isa('Mojo::Asset::Memory')) {
+        my $length = $self->headers->content_length;
         $self->asset(Mojo::Asset::File->new)
-          if !$self->headers->content_length
-              || $self->headers->content_length
-              > ($ENV{MOJO_MAX_MEMORY_SIZE} || 24576);
+          if !$length || $length > ($ENV{MOJO_MAX_MEMORY_SIZE} || 24576);
     }
 
     # Content needs to be upgraded to multipart
@@ -76,8 +75,9 @@ sub parse {
 
         # Slurp
         my $length = $self->headers->content_length || 0;
-        my $need = $length - $self->asset->size;
-        $self->asset->add_chunk($self->buffer->remove($need)) if $need > 0;
+        my $asset  = $self->asset;
+        my $need   = $length - $asset->size;
+        $asset->add_chunk($self->buffer->remove($need)) if $need > 0;
 
         # Done
         $self->done if $length <= $self->raw_body_size;

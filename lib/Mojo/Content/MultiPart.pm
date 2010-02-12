@@ -53,7 +53,9 @@ sub build_boundary {
     my $self = shift;
 
     # Check for existing boundary
-    ($self->headers->content_type || '') =~ /boundary=\"?([^\s\"]+)\"?/i;
+    my $headers = $self->headers;
+    my $type = $headers->content_type || '';
+    $type =~ /boundary=\"?([^\s\"]+)\"?/i;
     my $boundary = $1;
     return $boundary if $boundary;
 
@@ -72,10 +74,10 @@ sub build_boundary {
     }
 
     # Add boundary to Content-Type header
-    ($self->headers->content_type || '') =~ /^(.*multipart\/[^;]+)(.*)$/;
+    $type =~ /^(.*multipart\/[^;]+)(.*)$/;
     my $before = $1 || 'multipart/mixed';
     my $after  = $2 || '';
-    $self->headers->content_type("$before; boundary=$boundary$after");
+    $headers->content_type("$before; boundary=$boundary$after");
 
     return $boundary;
 }
@@ -96,8 +98,9 @@ sub get_body_chunk {
       if $length > $offset;
 
     # Parts
-    for (my $i = 0; $i < @{$self->parts}; $i++) {
-        my $part = $self->parts->[$i];
+    my $parts = $self->parts;
+    for (my $i = 0; $i < @$parts; $i++) {
+        my $part = $parts->[$i];
 
         # Headers
         my $header_length = $part->header_size;
@@ -116,7 +119,7 @@ sub get_body_chunk {
 
             # Last boundary
             return substr "\x0d\x0a--$boundary--", $offset - $length
-              if $#{$self->parts} == $i;
+              if $#{$parts} == $i;
 
             # Middle boundary
             return substr "\x0d\x0a--$boundary\x0d\x0a", $offset - $length;
@@ -181,21 +184,22 @@ sub _parse_multipart {
 sub _parse_multipart_body {
     my ($self, $boundary) = @_;
 
-    my $pos = $self->buffer->contains("\x0d\x0a--$boundary");
+    my $buffer = $self->buffer;
+    my $pos    = $buffer->contains("\x0d\x0a--$boundary");
 
     # Make sure we have enough buffer to detect end boundary
     if ($pos < 0) {
-        my $length = $self->buffer->size - (length($boundary) + 8);
+        my $length = $buffer->size - (length($boundary) + 8);
         return unless $length > 0;
 
         # Store chunk
-        my $chunk = $self->buffer->remove($length);
+        my $chunk = $buffer->remove($length);
         $self->parts->[-1] = $self->parts->[-1]->parse($chunk);
         return;
     }
 
     # Store chunk
-    my $chunk = $self->buffer->remove($pos);
+    my $chunk = $buffer->remove($pos);
     $self->parts->[-1] = $self->parts->[-1]->parse($chunk);
     $self->state('multipart_boundary');
     return 1;
@@ -205,8 +209,9 @@ sub _parse_multipart_boundary {
     my ($self, $boundary) = @_;
 
     # Begin
-    if ($self->buffer->contains("\x0d\x0a--$boundary\x0d\x0a") == 0) {
-        $self->buffer->remove(length($boundary) + 6);
+    my $buffer = $self->buffer;
+    if ($buffer->contains("\x0d\x0a--$boundary\x0d\x0a") == 0) {
+        $buffer->remove(length($boundary) + 6);
         push @{$self->parts}, Mojo::Content::Single->new(relaxed => 1);
         $self->state('multipart_body');
         return 1;
@@ -214,8 +219,8 @@ sub _parse_multipart_boundary {
 
     # End
     my $end = "\x0d\x0a--$boundary--";
-    if ($self->buffer->contains($end) == 0) {
-        $self->buffer->remove(length $end);
+    if ($buffer->contains($end) == 0) {
+        $buffer->remove(length $end);
         $self->done;
     }
 
@@ -226,9 +231,10 @@ sub _parse_multipart_preamble {
     my ($self, $boundary) = @_;
 
     # Replace preamble with CRLF
-    my $pos = $self->buffer->contains("--$boundary");
+    my $buffer = $self->buffer;
+    my $pos    = $buffer->contains("--$boundary");
     unless ($pos < 0) {
-        $self->buffer->remove($pos, "\x0d\x0a");
+        $buffer->remove($pos, "\x0d\x0a");
         $self->state('multipart_boundary');
         return 1;
     }

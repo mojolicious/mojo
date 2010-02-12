@@ -160,6 +160,9 @@ sub serve_error {
 
     my $res = $c->res;
 
+    # Render once
+    return if ($res->code || '') eq $code;
+
     # Code
     $res->code($code);
 

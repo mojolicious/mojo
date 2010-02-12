@@ -275,7 +275,7 @@ sub _list_templates {
 
     # Read directory
     my (@files, @dirs);
-    opendir DIR, $dir;
+    opendir DIR, $dir or return [];
     for my $file (readdir DIR) {
 
         # Hidden file

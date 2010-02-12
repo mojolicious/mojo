@@ -883,9 +883,8 @@ sub _write {
     # Connect has just completed
     return if $c->{connecting};
 
-    # Check connection
-    my $socket = $c->{socket};
-    return unless $socket && $socket->connected;
+    # Socket
+    return unless my $socket = $c->{socket};
 
     # Buffer
     my $buffer = $c->{buffer};
@@ -908,6 +907,7 @@ sub _write {
     my $chunk = $buffer->to_string;
 
     # Write
+    return unless $socket->connected;
     my $written = $socket->syswrite($chunk, length $chunk);
 
     # Write error

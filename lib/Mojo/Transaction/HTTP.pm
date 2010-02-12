@@ -245,7 +245,6 @@ sub keep_alive {
         $self->{keep_alive} = $keep_alive;
         return $self;
     }
-    return $self->{keep_alive} if defined $self->{keep_alive};
 
     # Request and response
     my $req = $self->req;
@@ -253,16 +252,25 @@ sub keep_alive {
 
     # No keep alive for 0.9 and 1.0
     my $version = $req->version;
-    return if $version eq '0.9' || $version eq '1.0';
+    $self->{keep_alive} ||= 0 if $req->version eq '0.9' || $version eq '1.0';
     $version = $res->version;
-    return if $version eq '0.9' || $version eq '1.0';
+    $self->{keep_alive} ||= 0 if $version eq '0.9' || $version eq '1.0';
+
+    # Connection headers
+    my $reqc = $req->headers->connection || '';
+    my $resc = $res->headers->connection || '';
+
+    # Keep alive
+    $self->{keep_alive} = 1
+      if $reqc =~ /^keep-alive$/i || $resc =~ /^keep-alive$/i;
 
     # Close
-    return if ($req->headers->connection || '') =~ /close/i;
-    return if ($res->headers->connection || '') =~ /close/i;
+    $self->{keep_alive} = 0 if $reqc =~ /^close$/i || $resc =~ /^close$/i;
 
     # Default
-    return 1;
+    $self->{keep_alive} = 1 unless defined $self->{keep_alive};
+
+    return $self->{keep_alive};
 }
 
 sub server_leftovers {

@@ -65,7 +65,8 @@ sub fix_headers {
         my $host = $self->url->ihost;
         my $port = $self->url->port;
         $host .= ":$port" if $port;
-        $self->headers->host($host) unless $self->headers->host;
+        my $headers = $self->headers;
+        $headers->host($host) unless $headers->host;
     }
 
     return $self;
@@ -75,8 +76,8 @@ sub is_secure {
     my $self = shift;
 
     # Secure
-    return 1
-      if $self->url->base->scheme eq 'https' || $self->url->scheme eq 'https';
+    my $url = $self->url;
+    return 1 if $url->base->scheme eq 'https' || $url->scheme eq 'https';
 
     # Not secure
     return;
@@ -117,25 +118,26 @@ sub parse {
     unless ($self->is_state(qw/start headers/)) {
 
         # Reverse proxy
-        my $forwarded = $self->headers->header('X-Forwarded-For');
+        my $headers   = $self->headers;
+        my $forwarded = $headers->header('X-Forwarded-For');
+        my $base      = $self->url->base;
         if ($ENV{MOJO_REVERSE_PROXY} && $forwarded) {
 
             # Host
             $forwarded =~ /([^,\s]+)$/;
             if (my $host = $1) {
-                $self->url->base->host($host);
+                $base->host($host);
 
                 # Port
-                my $port = $self->headers->header('X-Forwarded-Port');
-                $self->url->base->port($port);
+                my $port = $headers->header('X-Forwarded-Port');
+                $base->port($port);
             }
         }
 
         # Base URL
-        $self->url->base->scheme('http') unless $self->url->base->scheme;
-        if (!$self->url->base->authority && $self->headers->host) {
-            my $host = $self->headers->host;
-            $self->url->base->authority($host);
+        $base->scheme('http') unless $base->scheme;
+        if (!$base->authority && (my $host = $headers->host)) {
+            $base->authority($host);
         }
     }
 
@@ -165,22 +167,23 @@ sub query_params { shift->url->query }
 sub _build_start_line {
     my $self = shift;
 
+    # Path
+    my $url   = $self->url;
+    my $path  = $url->path;
+    my $query = $url->query->to_string;
+    $path .= "?$query" if $query;
+    $path = "/$path" unless $path =~ /^\//;
+    $path = $url if $self->proxy;
+
+    # Method and version
     my $method  = $self->method;
     my $version = $self->version;
 
-    # Request url
-    my $url   = $self->url->path;
-    my $query = $self->url->query->to_string;
-
-    $url .= "?$query" if $query;
-    $url = "/$url" unless $url =~ /^\//;
-    $url = $self->url if $self->proxy;
-
     # HTTP 0.9
-    return "$method $url\x0d\x0a" if $version eq '0.9';
+    return "$method $path\x0d\x0a" if $version eq '0.9';
 
     # HTTP 1.0 and above
-    return "$method $url HTTP/$version\x0d\x0a";
+    return "$method $path HTTP/$version\x0d\x0a";
 }
 
 sub _parse_env {
@@ -319,11 +322,11 @@ sub _parse_env {
 sub _parse_start_line {
     my $self = shift;
 
-    my $line = $self->buffer->get_line;
-
     # Ignore any leading empty lines
+    my $buffer = $self->buffer;
+    my $line   = $buffer->get_line;
     while ((defined $line) && ($line =~ m/^\s*$/)) {
-        $line = $self->buffer->get_line;
+        $line = $buffer->get_line;
     }
 
     # We have a (hopefully) full request line
@@ -345,7 +348,7 @@ sub _parse_start_line {
 
                 # HTTP 0.9 has no headers or body and does not support
                 # pipelining
-                $self->buffer->empty;
+                $buffer->empty;
             }
         }
         else { $self->error('Parser error: Invalid request line.') }

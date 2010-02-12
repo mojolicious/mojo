@@ -94,13 +94,14 @@ sub cookies {
     }
 
     # Set-Cookie2
+    my $headers = $self->headers;
     my $cookies = [];
-    if (my $cookie2 = $self->headers->set_cookie2) {
+    if (my $cookie2 = $headers->set_cookie2) {
         push @$cookies, @{Mojo::Cookie::Response->parse($cookie2)};
     }
 
     # Set-Cookie
-    if (my $cookie = $self->headers->set_cookie) {
+    if (my $cookie = $headers->set_cookie) {
         push @$cookies, @{Mojo::Cookie::Response->parse($cookie)};
     }
 
@@ -116,8 +117,8 @@ sub fix_headers {
     $self->SUPER::fix_headers(@_);
 
     # Date header is required in responses
-    $self->headers->date(Mojo::Date->new->to_string)
-      unless $self->headers->date;
+    my $headers = $self->headers;
+    $headers->date(Mojo::Date->new->to_string) unless $headers->date;
 
     return $self;
 }
@@ -125,7 +126,7 @@ sub fix_headers {
 sub is_status_class {
     my ($self, $class) = @_;
     return unless my $code = $self->code;
-    return 1 if ($code >= $class && $code < ($class + 100));
+    return 1 if $code >= $class && $code < ($class + 100);
     return;
 }
 
@@ -148,7 +149,9 @@ sub parse_until_body {
 }
 
 sub _build_start_line {
-    my $self    = shift;
+    my $self = shift;
+
+    # Version
     my $version = $self->version;
 
     # HTTP 0.9 has no start line

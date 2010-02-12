@@ -416,16 +416,17 @@ sub _parse {
     $self->progress_cb->($self) if $self->progress_cb;
 
     # Start line and headers
+    my $buffer = $self->buffer;
     if ($self->is_state(qw/start headers/)) {
 
         # Check line size
         $self->error('Maximum line size exceeded.')
-          if $self->buffer->size > ($ENV{MOJO_MAX_LINE_SIZE} || 10240);
+          if $buffer->size > ($ENV{MOJO_MAX_LINE_SIZE} || 10240);
     }
 
     # Check message size
     $self->error('Maximum message size exceeded.')
-      if $self->buffer->raw_size > ($ENV{MOJO_MAX_MESSAGE_SIZE} || 524288);
+      if $buffer->raw_size > ($ENV{MOJO_MAX_MESSAGE_SIZE} || 524288);
 
     # Content
     if ($self->is_state(qw/content done done_with_leftovers/)) {
@@ -435,7 +436,7 @@ sub _parse {
         $content->state('body') if $self->version eq '0.9';
 
         # Parse
-        $content->filter_buffer($self->buffer);
+        $content->filter_buffer($buffer);
 
         # Until body
         if ($until_body) { $self->content($content->parse_until_body) }

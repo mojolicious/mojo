@@ -142,7 +142,8 @@ sub drop {
     my ($self, $id) = @_;
 
     # Finish connection once buffer is empty
-    if (my $c = $self->_connections->{$id}) {
+    my $c = $self->_connections->{$id};
+    if ($c && (($c->{buffer} && $c->{buffer}->size)) || $c->{protected}) {
         $self->_connections->{$id}->{finish} = 1;
         return $self;
     }
@@ -666,10 +667,6 @@ sub _prepare {
         # Connecting
         $self->_connecting($id) if $c->{connecting};
 
-        # Drop if buffer is empty
-        $self->_drop($id) and next
-          if $c->{finish} && (!$c->{buffer} || !$c->{buffer}->size);
-
         # Read only
         $self->not_writing($id) if delete $c->{read_only};
 
@@ -710,9 +707,6 @@ sub _read {
 
     # Connection
     my $c = $self->_connections->{$id};
-
-    # Finishing
-    return if $c->{finish};
 
     # Read chunk
     my $read = $c->{socket}->sysread(my $buffer, CHUNK_SIZE, 0);
@@ -886,9 +880,6 @@ sub _write {
     # Connect has just completed
     return if $c->{connecting};
 
-    # Socket
-    return unless my $socket = $c->{socket};
-
     # Buffer
     my $buffer = $c->{buffer};
 
@@ -910,14 +901,16 @@ sub _write {
     my $chunk = $buffer->to_string;
 
     # Write
-    return unless $socket->connected;
-    my $written = $socket->syswrite($chunk, length $chunk);
+    my $written = $c->{socket}->syswrite($chunk, length $chunk);
 
     # Write error
     return $self->_error($id, $!) unless defined $written;
 
     # Remove written chunk from buffer
     $buffer->remove($written);
+
+    # Drop once buffer is empty
+    $self->_drop($id) if $c->{finish} && (!$buffer || !$buffer->size);
 
     # Active
     $self->_active($id) if $written;

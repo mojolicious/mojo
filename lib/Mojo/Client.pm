@@ -506,7 +506,7 @@ sub _error {
 
         # Add error message to all transactions
         for my $tx (ref $tx eq 'ARRAY' ? @$tx : ($tx)) {
-            $tx->error($message);
+            $tx->error($message) unless $tx->is_finished;
         }
     }
 

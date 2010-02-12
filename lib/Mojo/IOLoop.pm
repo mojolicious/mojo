@@ -667,6 +667,10 @@ sub _prepare {
         # Connecting
         $self->_connecting($id) if $c->{connecting};
 
+        # Drop once buffer is empty
+        $self->_drop($id) and next
+          if $c->{finish} && (!ref $c->{buffer} || !$c->{buffer}->size);
+
         # Read only
         $self->not_writing($id) if delete $c->{read_only};
 
@@ -897,20 +901,21 @@ sub _write {
         $buffer->add_chunk($chunk);
     }
 
+    # Socket
+    return unless my $socket = $c->{socket};
+    return unless $socket->connected;
+
     # Try to write whole buffer
     my $chunk = $buffer->to_string;
 
     # Write
-    my $written = $c->{socket}->syswrite($chunk, length $chunk);
+    my $written = $socket->syswrite($chunk, length $chunk);
 
     # Write error
     return $self->_error($id, $!) unless defined $written;
 
     # Remove written chunk from buffer
     $buffer->remove($written);
-
-    # Drop once buffer is empty
-    $self->_drop($id) if $c->{finish} && (!$buffer || !$buffer->size);
 
     # Active
     $self->_active($id) if $written;

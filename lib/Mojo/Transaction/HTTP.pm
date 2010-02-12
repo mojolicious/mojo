@@ -149,12 +149,10 @@ sub client_write {
     if ($self->is_state('start')) {
 
         # Connection header
-        unless ($req->headers->connection) {
-            if ($self->keep_alive || $self->kept_alive) {
-                $req->headers->connection('Keep-Alive');
-            }
-            else { $req->headers->connection('Close') }
+        if ($self->keep_alive || $self->kept_alive) {
+            $req->headers->connection('Keep-Alive');
         }
+        else { $req->headers->connection('Close') }
 
         # We might have to handle 100 Continue
         $self->_continue($self->continue_timeout)
@@ -242,36 +240,29 @@ sub client_write {
 sub keep_alive {
     my ($self, $keep_alive) = @_;
 
+    # Custom
     if ($keep_alive) {
         $self->{keep_alive} = $keep_alive;
         return $self;
     }
+    return $self->{keep_alive} if defined $self->{keep_alive};
 
     # Request and response
     my $req = $self->req;
     my $res = $self->res;
 
-    # No keep alive for 0.9
-    $self->{keep_alive} ||= 0
-      if ($req->version eq '0.9') || ($res->version eq '0.9');
-
-    # No keep alive for 1.0
-    $self->{keep_alive} ||= 0
-      if ($req->version eq '1.0') || ($res->version eq '1.0');
-
-    # Keep alive
-    $self->{keep_alive} = 1
-      if ($req->headers->connection || '') =~ /keep-alive/i
-      or ($res->headers->connection || '') =~ /keep-alive/i;
+    # No keep alive for 0.9 and 1.0
+    my $version = $req->version;
+    return if $version eq '0.9' || $version eq '1.0';
+    $version = $res->version;
+    return if $version eq '0.9' || $version eq '1.0';
 
     # Close
-    $self->{keep_alive} = 0
-      if ($req->headers->connection || '') =~ /close/i
-      or ($res->headers->connection || '') =~ /close/i;
+    return if ($req->headers->connection || '') =~ /close/i;
+    return if ($res->headers->connection || '') =~ /close/i;
 
     # Default
-    $self->{keep_alive} = 1 unless defined $self->{keep_alive};
-    return $self->{keep_alive};
+    return 1;
 }
 
 sub server_leftovers {
@@ -375,10 +366,9 @@ sub server_write {
     if ($self->is_state('write')) {
 
         # Connection header
-        unless ($res->headers->connection) {
-            if ($self->keep_alive) { $res->headers->connection('Keep-Alive') }
-            else                   { $res->headers->connection('Close') }
-        }
+        my $headers = $res->headers;
+        if   ($self->keep_alive) { $headers->connection('Keep-Alive') }
+        else                     { $headers->connection('Close') }
 
         # Ready for next state
         $self->state('write_start_line');

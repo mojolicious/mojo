@@ -787,17 +787,17 @@ sub _spin {
             push @write, $id if $filter == IO::KQueue::EVFILT_WRITE();
         }
 
-        # Error
-        $self->_error($_) for @error;
-
-        # HUP
-        $self->_hup($_) for @hup;
-
         # Read
         $self->_read($_) for @read;
 
         # Write
         $self->_write($_) for @write;
+
+        # Error
+        $self->_error($_) for @error;
+
+        # HUP
+        $self->_hup($_) for @hup;
     }
 
     # Epoll
@@ -805,17 +805,17 @@ sub _spin {
         my $epoll = $self->_loop;
         $epoll->poll($self->timeout);
 
-        # Error
-        $self->_error("$_", $!) for $epoll->handles(IO::Epoll::POLLERR());
-
-        # HUP
-        $self->_hup("$_") for $epoll->handles(IO::Epoll::POLLHUP());
-
         # Read
         $self->_read("$_") for $epoll->handles(IO::Epoll::POLLIN());
 
         # Write
         $self->_write("$_") for $epoll->handles(IO::Epoll::POLLOUT());
+
+        # Error
+        $self->_error("$_", $!) for $epoll->handles(IO::Epoll::POLLERR());
+
+        # HUP
+        $self->_hup("$_") for $epoll->handles(IO::Epoll::POLLHUP());
     }
 
     # Poll
@@ -823,17 +823,17 @@ sub _spin {
         my $poll = $self->_loop;
         $poll->poll($self->timeout);
 
-        # Error
-        $self->_error("$_", $!) for $poll->handles(POLLERR);
-
-        # HUP
-        $self->_hup("$_") for $poll->handles(POLLHUP);
-
         # Read
         $self->_read("$_") for $poll->handles(POLLIN);
 
         # Write
         $self->_write("$_") for $poll->handles(POLLOUT);
+
+        # Error
+        $self->_error("$_", $!) for $poll->handles(POLLERR);
+
+        # HUP
+        $self->_hup("$_") for $poll->handles(POLLHUP);
     }
 
     # Timers
@@ -883,6 +883,10 @@ sub _write {
     # Connect has just completed
     return if $c->{connecting};
 
+    # Check connection
+    my $socket = $c->{socket};
+    return unless $socket && $socket->connected;
+
     # Buffer
     my $buffer = $c->{buffer};
 
@@ -901,11 +905,10 @@ sub _write {
     }
 
     # Try to write whole buffer
-    return unless defined $buffer;
     my $chunk = $buffer->to_string;
 
     # Write
-    my $written = $c->{socket}->syswrite($chunk, length $chunk);
+    my $written = $socket->syswrite($chunk, length $chunk);
 
     # Write error
     return $self->_error($id, $!) unless defined $written;

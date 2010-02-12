@@ -711,6 +711,9 @@ sub _read {
     # Connection
     my $c = $self->_connections->{$id};
 
+    # Finishing
+    return if $c->{finish};
+
     # Read chunk
     my $read = $c->{socket}->sysread(my $buffer, CHUNK_SIZE, 0);
 

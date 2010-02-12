@@ -15,12 +15,16 @@ use MojoX::Types;
 
 __PACKAGE__->attr(default_format => 'html');
 __PACKAGE__->attr([qw/default_handler default_template_class encoding/]);
-__PACKAGE__->attr(default_status => 200);
-__PACKAGE__->attr(handler        => sub { {} });
-__PACKAGE__->attr(helper         => sub { {} });
-__PACKAGE__->attr(layout_prefix  => 'layouts');
-__PACKAGE__->attr(root           => '/');
-__PACKAGE__->attr(types          => sub { MojoX::Types->new });
+__PACKAGE__->attr(default_status   => 200);
+__PACKAGE__->attr(detect_templates => 1);
+__PACKAGE__->attr(handler          => sub { {} });
+__PACKAGE__->attr(helper           => sub { {} });
+__PACKAGE__->attr(layout_prefix    => 'layouts');
+__PACKAGE__->attr(root             => '/');
+__PACKAGE__->attr(types            => sub { MojoX::Types->new });
+
+__PACKAGE__->attr(_inline_templates => sub { {} });
+__PACKAGE__->attr('_templates');
 
 # This is not how Xmas is supposed to be.
 # In my day Xmas was about bringing people together, not blowing them apart.
@@ -70,16 +74,8 @@ sub add_helper {
 
 sub get_inline_template {
     my ($self, $c, $template) = @_;
-
-    # Class
-    my $class =
-         $c->stash->{template_class}
-      || $ENV{MOJO_TEMPLATE_CLASS}
-      || $self->default_template_class
-      || 'main';
-
-    # Get
-    return Mojo::Command->new->get_data($template, $class);
+    return Mojo::Command->new->get_data($template,
+        $self->_detect_template_class($c->stash));
 }
 
 # Bodies are for hookers and fat people.
@@ -100,7 +96,7 @@ sub render {
     my $format = $c->stash->{format} || $self->default_format;
 
     # Handler
-    my $handler = $c->stash->{handler} || $self->default_handler;
+    my $handler = $c->stash->{handler};
 
     # Text
     my $text = delete $c->stash->{text};
@@ -136,7 +132,7 @@ sub render {
     }
 
     # Template or templateless handler
-    elsif ($template || $handler) {
+    else {
 
         # Render
         return unless $self->_render_template($c, \$output, $options);
@@ -150,7 +146,7 @@ sub render {
     while (!$partial && (my $extends = $self->_extends($c))) {
 
         # Handler
-        $handler = $c->stash->{handler} || $self->default_handler;
+        $handler = $c->stash->{handler};
         $options->{handler} = $handler;
 
         # Format
@@ -190,16 +186,62 @@ sub template_name {
 
     # Template
     return unless my $template = $options->{template} || '';
-    return unless my $format   = $options->{format};
-    return unless my $handler  = $options->{handler};
 
-    return "$template.$format.$handler";
+    # Format
+    return unless my $format = $options->{format};
+
+    # Handler
+    my $handler = $options->{handler};
+
+    # File
+    my $file = "$template.$format";
+    $file = "$file.$handler" if $handler;
+
+    return $file;
 }
 
 sub template_path {
     my $self = shift;
     return unless my $name = $self->template_name(shift);
     return File::Spec->catfile($self->root, split '/', $name);
+}
+
+sub _detect_handler {
+    my ($self, $options) = @_;
+
+    # Disabled
+    return unless $self->detect_templates;
+
+    # Template class
+    my $class = $self->_detect_template_class;
+
+    # Templates
+    my $templates = $self->_templates;
+    unless ($templates) {
+        $templates = $self->_list_templates;
+        $self->_templates($templates);
+    }
+
+    # Inline templates
+    my $inline = $self->_inline_templates->{$class}
+      ||= $self->_list_inline_templates($class);
+
+    # Detect
+    return unless my $file = $self->template_name($options);
+    for my $template (@$templates, @$inline) {
+        if ($template =~ /^$file\.(\w+)$/) { return $1 }
+    }
+
+    return;
+}
+
+sub _detect_template_class {
+    my ($self, $options) = @_;
+    return
+         $options->{template_class}
+      || $ENV{MOJO_TEMPLATE_CLASS}
+      || $self->default_template_class
+      || 'main';
 }
 
 sub _extends {
@@ -214,13 +256,64 @@ sub _extends {
     return delete $c->stash->{extends};
 }
 
+sub _list_inline_templates {
+    my ($self, $class) = @_;
+
+    # Get all
+    my $all = Mojo::Command->new->get_all_data($class);
+
+    # List
+    return [keys %$all];
+}
+
+sub _list_templates {
+    my ($self, $dir) = @_;
+
+    # Root
+    my $root = $self->root;
+    $dir ||= $root;
+
+    # Read directory
+    my (@files, @dirs);
+    opendir DIR, $dir;
+    for my $file (readdir DIR) {
+
+        # Hidden file
+        next if $file =~ /^\./;
+
+        # File
+        my $path = File::Spec->catfile($dir, $file);
+        if (-f $path) {
+            $path = File::Spec->abs2rel($path, $root);
+            push @files, $path;
+            next;
+        }
+
+        # Directory
+        push @dirs, $path if -d $path;
+    }
+    closedir DIR;
+
+    # Walk directories
+    for my $path (@dirs) {
+        my $new = $self->_list_templates($path);
+        push @files, @$new;
+    }
+
+    return [sort @files];
+}
+
 # Well, at least here you'll be treated with dignity.
 # Now strip naked and get on the probulator.
 sub _render_template {
     my ($self, $c, $output, $options) = @_;
 
     # Renderer
-    my $handler  = $options->{handler};
+    my $handler =
+         $options->{handler}
+      || $self->_detect_handler($options)
+      || $self->default_handler;
+    $options->{handler} = $handler;
     my $renderer = $self->handler->{$handler};
 
     # No handler
@@ -300,6 +393,16 @@ The default status to set when rendering content, defaults to C<200>.
 
 The renderer will use this class to look for templates in the C<__DATA__>
 section.
+
+=head2 C<detect_templates>
+
+    my $detect = $renderer->detect_templates;
+    $renderer  = $renderer->detect_templates(1);
+
+Template auto detection, the renderer will try to select the right template
+and renderer automatically.
+A very powerful alternative to C<default_handler> that allows parallel use of
+multiple template systems.
 
 =head2 C<encoding>
 

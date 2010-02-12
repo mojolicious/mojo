@@ -21,6 +21,9 @@ use Mojo::Client;
 # Silence
 app->log->level('fatal');
 
+# Avoid exception template
+app->renderer->root(app->home->rel_dir('public'));
+
 # WebSocket /
 websocket '/' => sub {
     my $self = shift;

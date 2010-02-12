@@ -49,9 +49,7 @@ sub stage1 {
 
 sub stage2 { shift->render_text('Welcome aboard!') }
 
-sub syntaxerror {
-    shift->render('syntaxerror', format => 'html', handler => 'epl');
-}
+sub syntaxerror { shift->render('syntaxerror', format => 'html') }
 
 sub exceptionduringpausedtransaction { shift->pause and die 'Exception' }
 

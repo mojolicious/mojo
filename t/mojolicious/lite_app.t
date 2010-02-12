@@ -100,9 +100,8 @@ post '/with/body/and/headers/desc' => sub {
 };
 
 # GET /template_inheritance
-get '/template_inheritance' => sub {
-    shift->render(template => 'template_inheritance', handler => 'ep');
-};
+get '/template_inheritance' =>
+  sub { shift->render(template => 'template_inheritance') };
 
 # GET /layout_without_inheritance
 get '/layout_without_inheritance' => sub {
@@ -113,9 +112,8 @@ get '/layout_without_inheritance' => sub {
 };
 
 # GET /double_inheritance
-get '/double_inheritance' => sub {
-    shift->render(template => 'double_inheritance', handler => 'ep');
-};
+get '/double_inheritance' =>
+  sub { shift->render(template => 'double_inheritance') };
 
 # GET /outerlayout
 get '/outerlayout' => sub {
@@ -155,7 +153,9 @@ get '/foo' => sub {
 };
 
 # GET /layout
-get '/layout' => sub { shift->render_text('Yea baby!', layout => 'layout') };
+get '/layout' => sub {
+    shift->render_text('Yea baby!', layout => 'layout', handler => 'epl');
+};
 
 # POST /template
 post '/template' => 'index';

@@ -2,7 +2,7 @@ This file documents the revision history for Perl extension Mojolicious.
 
 0.999922 2010-02-11 00:00:00
         - Added template detection again, you can now just mix multiple
-          template formats and the renderer will automatically pick the right
+          template engines and the renderer will automatically pick the right
           template.
           So you don't have to use the "handler" argument anymore, even
           though it's still available and overrides auto detection.

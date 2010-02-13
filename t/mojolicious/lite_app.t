@@ -13,7 +13,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 337;
+plan tests => 336;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -344,7 +344,6 @@ $tx->req->method('POST');
 $tx->req->url->parse('/upload');
 $tx->req->content($content);
 $client->process($tx);
-is($tx->state,     'done');
 is($tx->res->code, 413);
 is($tx->res->body, '');
 app->log->level($backup2);

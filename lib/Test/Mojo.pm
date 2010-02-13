@@ -214,7 +214,7 @@ sub _request_ok {
 
     # Test
     local $Test::Builder::Level = $Test::Builder::Level + 2;
-    Test::More::ok($self->tx->is_done, $desc);
+    Test::More::ok($self->tx->is_finished, $desc);
 
     return $self;
 }

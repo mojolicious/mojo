@@ -8,6 +8,7 @@ use warnings;
 use base 'MojoX::Dispatcher::Routes::Controller';
 
 use Mojo::ByteStream;
+use Mojo::Exception;
 use Mojo::URL;
 
 require Carp;
@@ -128,6 +129,9 @@ sub render {
 
 sub render_exception {
     my ($self, $e) = @_;
+
+    # Exception
+    $e = Mojo::Exception->new($e) unless ref $e;
 
     # Resume for exceptions
     $self->resume if $self->tx->is_paused;
@@ -338,8 +342,8 @@ template name.
 
 Render the exception template C<exception.html.$handler>.
 Will set the status code to C<500> meaning C<Internal Server Error>.
-Takes a L<Mojo::Exception> object and will fall back to a rendering a static
-C<500> page using L<MojoX::Renderer::Static>.
+Takes a L<Mojo::Exception> object or error message and will fall back to
+rendering a static C<500> page using L<MojoX::Renderer::Static>.
 
 =head2 C<render_inner>
 
@@ -362,7 +366,7 @@ Render a data structure as JSON.
     $c->render_not_found;
     
 Render the not found template C<not_found.html.$handler>.
-Also sets the response status code to C<404>, will fall back to a rendering a
+Also sets the response status code to C<404>, will fall back to rendering a
 static C<404> page using L<MojoX::Renderer::Static>.
 
 =head2 C<render_partial>

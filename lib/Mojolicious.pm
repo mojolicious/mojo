@@ -230,14 +230,17 @@ art technology.
 An amazing MVC web framework supporting a simplified single file mode through
 L<Mojolicious::Lite>.
 
-Very clean and Object Oriented pure Perl API without any hidden magic and no
-requirements besides Perl 5.8.1.
+Very clean, portable and Object Oriented pure Perl API without any hidden
+magic and no requirements besides Perl 5.8.1.
 
-Full stack HTTP 1.1 and WebSocket client/server implementation with IPv6 and
-TLS support.
+Powerful out of the box with a testing framework, Perl-ish templates, JSON
+and first class Unicode support.
 
-Builtin async IO and prefork web server with epoll, kqueue, hot deployment
-and UNIX domain socket sharing support, perfect for embedding.
+Full stack HTTP 1.1 and WebSocket client/server implementation with IPv6,
+TLS, IDNA, pipelining, chunking and multipart support.
+
+Builtin async IO and prefork web server supporting epoll, kqueue, hot
+deployment and UNIX domain socket sharing, perfect for embedding.
 
 CGI, FastCGI and L<PSGI> support.
 

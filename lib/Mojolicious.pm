@@ -233,9 +233,6 @@ L<Mojolicious::Lite>.
 Very clean, portable and Object Oriented pure Perl API without any hidden
 magic and no requirements besides Perl 5.8.1.
 
-Powerful out of the box with a testing framework, Perl-ish templates, JSON
-and first class Unicode support.
-
 Full stack HTTP 1.1 and WebSocket client/server implementation with IPv6,
 TLS, IDNA, pipelining, chunking and multipart support.
 
@@ -246,9 +243,8 @@ CGI, FastCGI and L<PSGI> support.
 
 Fresh code, based upon years of experience developing Catalyst.
 
-=back
-
-And much more for you to discover!
+Powerful out of the box with a testing framework, Perl-ish templates, JSON,
+first class Unicode support and much more for you to discover!
 
 =head2 Simplicity
 

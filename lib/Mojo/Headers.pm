@@ -92,6 +92,8 @@ my (%ORDERED_HEADERS, %NORMALCASE_HEADERS);
     }
 }
 
+sub accept_language { shift->header('Accept-Language' => @_) }
+
 sub add {
     my $self = shift;
     my $name = shift;
@@ -361,6 +363,11 @@ implements the following new ones.
 
 The Buffer to use for header parsing, by default a L<Mojo::ByteStream>
 object.
+
+=head2 C<accept_language>
+
+    my $accept_language = $headers->accept_language;
+    $headers            = $headers->accept_language('de, en');
 
 =head2 C<connection>
 

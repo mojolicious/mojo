@@ -25,6 +25,12 @@ sub load {
 
     # Thaw
     my $session = thaw $value;
+
+    # Expiration
+    return unless my $expires = delete $session->{expires};
+    return unless $expires > time;
+
+    # Content
     return unless keys %$session;
     $c->stash->{session} = $session;
 
@@ -43,6 +49,9 @@ sub store {
     delete $session->{_flash};
     delete $session->{flash} unless keys %{$session->{flash}};
 
+    # Expiration
+    my $expires = $session->{expires} ||= time + $self->default_expiration;
+
     # Freeze
     my $value = freeze $session;
 
@@ -51,8 +60,7 @@ sub store {
     $value =~ s/\n//g;
 
     # Session cookie
-    $c->signed_cookie($self->cookie_name, $value)
-      ->expires(time + $self->default_expiration);
+    $c->signed_cookie($self->cookie_name, $value)->expires($expires);
 }
 
 1;

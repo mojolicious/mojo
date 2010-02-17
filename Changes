@@ -1,15 +1,15 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 0.999922 2010-02-11 00:00:00
-        - Added session support to Mojolicious.
-        - Added signed cookie support to Mojolicious.
-        - Added I18N support to Mojolicious. (vti, memowe)
+        - Added session support.
+        - Added signed cookie support.
+        - Added I18N support. (vti, memowe)
         - Added template detection again, you can now just mix multiple
           template engines and the renderer will automatically pick the right
           template.
           So you don't have to use the "handler" argument anymore, even
           though it's still available and overrides auto detection.
-        - Added Flash Policy Server example.
+        - Added Flash Policy Server example. (xantus)
         - Removed hot deployment support for Windows because of
           incompatibilities between Active Perl and Strawberry Perl.
         - Fixed multiple epoll bugs.

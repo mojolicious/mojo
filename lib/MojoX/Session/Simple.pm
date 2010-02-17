@@ -75,8 +75,10 @@ MojoX::Session::Simple - Simple Sessions
 
 =head1 DESCRIPTION
 
-L<MojoX::Session::Simple> is a very simple cookie based session
+L<MojoX::Session::Simple> is a very simple signed cookie based session
 implementation.
+All data gets stored on the client side, but is protected from unwanted
+changes with a signature.
 
 =head2 ATTRIBUTES
 

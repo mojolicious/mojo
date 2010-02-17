@@ -10,7 +10,7 @@ use base 'Mojo::Base';
 use Mojo::ByteStream 'b';
 use Storable qw/freeze thaw/;
 
-__PACKAGE__->attr(cookie_name        => 'session');
+__PACKAGE__->attr(cookie_name        => 'mojolicious');
 __PACKAGE__->attr(default_expiration => 3600);
 
 # Bender, quit destroying the universe!
@@ -68,7 +68,7 @@ __END__
 
 =head1 NAME
 
-MojoX::Session::Simple - Simple Sessions
+MojoX::Session::Simple - Simple Signed Cookie Based Sessions
 
 =head1 SYNOPSIS
 
@@ -97,14 +97,16 @@ L<MojoX::Session::Simple> implements the following attributes.
     my $name = $session->cookie_name;
     $session = $session->cookie_name('session');
 
-Name of the signed cookie used to store session data, defaults to C<session>.
+Name of the signed cookie used to store session data, defaults to
+C<mojolicious>.
 
 =head2 C<default_expiration>
 
     my $time = $session->default_expiration;
     $session = $session->default_expiration(3600);
 
-Time in seconds from now for the session to expire, defaults to C<3600>.
+Time for the session to expire in seconds from now, defaults to C<3600>.
+The expiration timeout gets refreshed for every request.
 
 =head1 METHODS
 

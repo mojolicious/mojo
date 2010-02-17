@@ -458,7 +458,7 @@ sub hmac_md5_sum {
     my ($self, $secret) = @_;
 
     #Secret
-    $secret ||= 'MojoliciousRockz!';
+    $secret ||= 'Very unsecure!';
     $secret = _md5_sum($secret) if length $secret > 64;
 
     # HMAC

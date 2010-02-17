@@ -454,6 +454,22 @@ sub get_line {
     return $line;
 }
 
+sub hmac_md5_sum {
+    my ($self, $secret) = @_;
+
+    #Secret
+    $secret ||= 'MojoliciousRockz!';
+    $secret = _md5_sum($secret) if length $secret > 64;
+
+    # HMAC
+    my $ipad = $secret ^ (chr(0x36) x 64);
+    my $opad = $secret ^ (chr(0x5c) x 64);
+    $self->{bytestream} =
+      _md5_sum($opad . _md5_sum($ipad . $self->{bytestream}));
+
+    return $self;
+}
+
 sub html_escape {
     my $self = shift;
 
@@ -754,7 +770,7 @@ sub xml_escape {
     return $self;
 }
 
-# Punycode helper
+# Helper for punycode
 sub _adapt {
     my ($delta, $numpoints, $firsttime) = @_;
 
@@ -772,6 +788,9 @@ sub _adapt {
       + ( ((PUNYCODE_BASE - PUNYCODE_TMIN + 1) * $delta)
         / ($delta + PUNYCODE_SKEW));
 }
+
+# Helper for hmac_md5_sum
+sub _md5_sum { Mojo::ByteStream->new(shift)->md5_sum->to_string }
 
 # Helper for url_sanitize
 sub _sanitize {
@@ -819,6 +838,7 @@ Mojo::ByteStream - ByteStream
     $stream->b64_decode;
     $stream->encode('UTF-8');
     $stream->decode('UTF-8');
+    $stream->hmac_md5_sum('secret');
     $stream->html_escape;
     $stream->html_unescape;
     $stream->md5_sum;
@@ -917,7 +937,11 @@ the following new ones.
 
 =head2 C<get_line>
 
-   my $line = $stream->get_line;
+    my $line = $stream->get_line;
+
+=head2 C<hmac_md5_sum>
+
+    $stream = $stream->hmac_md5_sum($secret);
 
 =head2 C<html_escape>
 

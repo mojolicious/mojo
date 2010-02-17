@@ -32,7 +32,10 @@ sub expires {
     my ($self, $expires) = @_;
 
     # Set
-    $self->{expires} = $expires if defined $expires;
+    if (defined $expires) {
+        $self->{expires} = $expires;
+        return $self;
+    }
 
     # Shortcut
     return unless defined $self->{expires};
@@ -141,11 +144,6 @@ implements the followign new ones.
     my $domain = $cookie->domain;
     $cookie    = $cookie->domain('localhost');
 
-=head2 C<expires>
-
-    my $expires = $cookie->expires;
-    $cookie     = $cookie->expires(time + 60);
-
 =head2 C<httponly>
 
     my $httponly = $cookie->httponly;
@@ -170,6 +168,11 @@ implements the followign new ones.
 
 L<Mojo::Cookie::Response> inherits all methods from L<Mojo::Cookie> and
 implements the following new ones.
+
+=head2 C<expires>
+
+    my $expires = $cookie->expires;
+    $cookie     = $cookie->expires(time + 60);
 
 =head2 C<parse>
 

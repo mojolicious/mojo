@@ -5,7 +5,7 @@ package MojoX::Dispatcher::Routes::Controller;
 use strict;
 use warnings;
 
-use base 'MojoX::Controller';
+use base 'MojoX::Session::Simple::Controller';
 
 require Carp;
 require Scalar::Util;
@@ -46,7 +46,8 @@ L<MojoX::Dispatcher::Routes::Controller> is a controller base class.
 
 =head1 ATTRIBUTES
 
-L<MojoX::Dispatcher::Routes::Controller> implements the following attributes.
+L<MojoX::Dispatcher::Routes::Controller> inherits all attributes from
+L<MojoX::Session::Simple::Controller> implements the following attributes.
 
 =head2 C<match>
 
@@ -58,7 +59,7 @@ current request.
 =head1 METHODS
 
 L<MojoX::Dispatcher::Routes::Controller> inherits all methods from
-L<MojoX::Controller> and implements the following new ones.
+L<MojoX::Session::Simple::Controller> and implements the following new ones.
 
 =head2 C<param>
 

@@ -8,13 +8,97 @@ use warnings;
 # Scalpel... blood bucket... priest.
 use base 'Mojo::Base';
 
+use Mojo::ByteStream;
+use Mojo::Cookie::Response;
+
 __PACKAGE__->attr([qw/app tx/]);
 
 # If we don't go back there and make that event happen,
 # the entire universe will be destroyed...
 # And as an environmentalist, I'm against that.
+sub cookie {
+    my ($self, $name, $value) = @_;
+
+    # Shortcut
+    return unless $name;
+
+    # Response cookie
+    if (defined $value) {
+
+        # Cookie too big
+        $self->app->log->error(qq/Cookie "$name" is bigger than 4096 bytes./)
+          if length $value > 4096;
+
+        # Create new cookie
+        my $cookie =
+          Mojo::Cookie::Response->new(name => $name, value => $value);
+        $self->res->cookies($cookie);
+        return $cookie;
+    }
+
+    # Request cookie
+    unless (wantarray) {
+        return unless my $cookie = $self->req->cookie($name);
+        return $cookie->value;
+    }
+
+    # Request cookies
+    my @cookies = $self->req->cookie($name);
+    return map { $_->value } @cookies;
+}
+
 sub req { shift->tx->req }
 sub res { shift->tx->res }
+
+sub signed_cookie {
+    my ($self, $name, $value) = @_;
+
+    # Shortcut
+    return unless $name;
+
+    # Secret
+    my $secret = $self->app->secret;
+
+    # Response cookie
+    if (defined $value) {
+
+        # Sign value
+        my $signature =
+          Mojo::ByteStream->new($value)->hmac_md5_sum($secret)->to_string;
+        $value = $value .= "--$signature";
+
+        # Create cookie
+        my $cookie = $self->cookie($name, $value);
+        return $cookie;
+    }
+
+    # Request cookies
+    my @values = $self->cookie($name);
+    my @results;
+    for my $value (@values) {
+
+        # Check signature
+        if ($value =~ s/\-\-([^\-]+)$//) {
+            my $signature = $1;
+            my $check =
+              Mojo::ByteStream->new($value)->hmac_md5_sum($secret)->to_string;
+
+            # Verified
+            if ($signature eq $check) { push @results, $value }
+
+            # Bad cookie
+            else {
+                $self->app->log->debug(
+                    qq/Bad signed cookie "$name", possible hacking attempt./);
+            }
+        }
+
+        # Not signed
+        else { $self->app->log->debug(qq/Cookie "$name" not signed./) }
+    }
+
+    return wantarray ? @results : $results[0];
+}
 
 sub stash {
     my $self = shift;
@@ -72,6 +156,16 @@ The transaction that is currently being processed.
 L<MojoX::Controller> inherits all methods from L<Mojo::Base> and implements
 the following new ones.
 
+=head2 C<cookie>
+
+    my $cookie = $c->cookie(foo => 'bar');
+    my $value  = $c->cookie('foo');
+    my @values = $c->cookie('foo');
+
+Access request cookie values and create new response cookies.
+
+    $c->cookie(foo => 'bar')->expires(time + 360);
+
 =head2 C<req>
 
     my $req = $c->req;
@@ -85,6 +179,16 @@ Usually refers to a L<Mojo::Message::Request> object.
 
 Alias for C<$c->tx->res>.
 Usually refers to a L<Mojo::Message::Response> object.
+
+=head2 C<signed_cookie>
+
+    my $cookie = $c->signed_cookie(foo => 'bar');
+    my $value  = $c->signed_cookie('foo');
+    my @values = $c->signed_cookie('foo');
+
+Access signed request cookie values and create new signed response cookies.
+
+    $c->signed_cookie(foo => 'bar')->expires(time + 360);
 
 =head2 C<stash>
 

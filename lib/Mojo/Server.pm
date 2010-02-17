@@ -87,9 +87,9 @@ __PACKAGE__->attr(
 sub new {
     my $self = shift->SUPER::new(@_);
 
-    # Reload on USR1 or WINCH (win32) signal
-    my $signal = $^O eq 'MSWin32' ? 'WINCH' : 'USR1';
-    $SIG{$signal} = sub { $self->reload(2) };
+    # Reload on USR1 signal (does not work on win32)
+    $SIG{USR1} = sub { $self->reload(2) }
+      if $^O ne 'MSWin32';
 
     return $self;
 }

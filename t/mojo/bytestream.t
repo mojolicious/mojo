@@ -10,7 +10,7 @@ use utf8;
 # Homer, we're going to ask you a few simple yes or no questions.
 # Do you understand?
 # Yes. *lie dectector blows up*
-use Test::More tests => 53;
+use Test::More tests => 56;
 
 use_ok('Mojo::ByteStream', 'b');
 
@@ -130,6 +130,14 @@ is($stream->size, 11);
 $stream = b('0');
 is($stream->size,      1);
 is($stream->to_string, '0');
+
+# hmac_md5_sum
+is(b('some secret message')->hmac_md5_sum('secret'),
+    '5a7dcc4c407032ad10758abdda017f7b');
+is(b('some other message')->hmac_md5_sum('secret'),
+    '9ab78f427440259a33abb088d4400526');
+is(b('some secret message')->hmac_md5_sum('secret'),
+    '5a7dcc4c407032ad10758abdda017f7b');
 
 # html_escape
 $stream = b('foobar<baz>');

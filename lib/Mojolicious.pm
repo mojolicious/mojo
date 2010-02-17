@@ -12,6 +12,7 @@ use Mojolicious::Plugins;
 use MojoX::Dispatcher::Routes;
 use MojoX::Dispatcher::Static;
 use MojoX::Renderer;
+use MojoX::Session::Simple;
 use MojoX::Types;
 
 __PACKAGE__->attr(controller_class => 'Mojolicious::Controller');
@@ -19,8 +20,10 @@ __PACKAGE__->attr(mode => sub { ($ENV{MOJO_MODE} || 'development') });
 __PACKAGE__->attr(plugins  => sub { Mojolicious::Plugins->new });
 __PACKAGE__->attr(renderer => sub { MojoX::Renderer->new });
 __PACKAGE__->attr(routes   => sub { MojoX::Dispatcher::Routes->new });
-__PACKAGE__->attr(static   => sub { MojoX::Dispatcher::Static->new });
-__PACKAGE__->attr(types    => sub { MojoX::Types->new });
+__PACKAGE__->attr(secret  => 'MojoliciousRocks1234!');
+__PACKAGE__->attr(session => sub { MojoX::Session::Simple->new });
+__PACKAGE__->attr(static  => sub { MojoX::Dispatcher::Static->new });
+__PACKAGE__->attr(types   => sub { MojoX::Types->new });
 
 our $CODENAME = 'Snowman';
 our $VERSION  = '0.999922';
@@ -55,11 +58,11 @@ sub new {
     $self->static->root($self->home->rel_dir('public'));
 
     # Hide own controller methods
-    $self->routes->hide(qw/client finish helper param pause/);
+    $self->routes->hide(qw/client cookie finish flash helper param pause/);
     $self->routes->hide(qw/receive_message redirect_to render_exception/);
     $self->routes->hide(qw/render_json render_inner render_not_found/);
     $self->routes->hide(qw/render_partial render_static render_text resume/);
-    $self->routes->hide(qw/send_message url_for/);
+    $self->routes->hide(qw/send_message session signed_cookie url_for/);
 
     # Mode
     my $mode = $self->mode;
@@ -93,6 +96,9 @@ sub new {
 sub dispatch {
     my ($self, $c) = @_;
 
+    # Session
+    $self->session->load($c);
+
     # Hook
     $self->plugins->run_hook(before_dispatch => $c);
 
@@ -116,9 +122,15 @@ sub dispatch {
     # Nothing found
     elsif ($e) { $c->render_not_found }
 
-    # Hook
-    $self->plugins->run_hook_reverse(after_dispatch => $c)
-      unless $c->tx->is_paused;
+    # Paused
+    unless ($c->tx->is_paused) {
+
+        # Hook
+        $self->plugins->run_hook_reverse(after_dispatch => $c);
+
+        # Session
+        $self->session->store($c);
+    }
 }
 
 # Bite my shiny metal ass!
@@ -365,6 +377,14 @@ application.
         my $r = $self->routes;
         $r->route('/:controller/:action')->to('test#welcome');
     }
+
+=head2 C<secret>
+
+    my $secret = $mojo->secret;
+    $mojo      = $mojo->secret('passw0rd');
+
+A secret passphrase used for signed cookies and the like, has a very unsecure
+default, so you should change it!
 
 =head2 C<static>
 

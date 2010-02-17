@@ -407,7 +407,7 @@ multiple features at once.
     __DATA__
 
     @@ index.html.ep
-    % layout 'funky');
+    % layout 'funky';
     Who is groovy?
     <form action="<%= url_for 'form' %>" method="POST">
         <input type="text" name="groovy" />

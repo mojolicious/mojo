@@ -599,7 +599,7 @@ sub _error {
     $self->_drop($id);
 
     # No event
-    return unless $event;
+    warn "Unhandled event error: $error" and return unless $event;
 
     # Error callback
     $self->_event('error', $event, $id, $error);

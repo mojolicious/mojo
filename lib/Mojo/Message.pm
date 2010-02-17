@@ -222,10 +222,9 @@ sub cookie {
     }
 
     # Multiple
-    my @cookies =
-      ref $self->_cookies->{$name} eq 'ARRAY'
-      ? @{$self->_cookies->{$name}}
-      : ($self->_cookies->{$name});
+    my $cookies = $self->_cookies->{$name};
+    my @cookies;
+    @cookies = ref $cookies eq 'ARRAY' ? @$cookies : ($cookies) if $cookies;
 
     # Context
     return wantarray ? @cookies : $cookies[0];
@@ -349,10 +348,11 @@ sub upload {
         $self->_uploads($uploads);
     }
 
-    my @uploads =
-      ref $self->_uploads->{$name} eq 'ARRAY'
-      ? @{$self->_uploads->{$name}}
-      : ($self->_uploads->{$name});
+    # Multiple
+    my $uploads = $self->_uploads->{$name};
+    my @uploads;
+    @uploads = ref $uploads eq 'ARRAY' ? @$uploads : ($uploads) if $uploads;
+
     return wantarray ? @uploads : $uploads[0];
 }
 

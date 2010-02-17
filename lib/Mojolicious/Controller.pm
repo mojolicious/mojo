@@ -31,6 +31,9 @@ sub finish {
 
     # Hook
     $self->app->plugins->run_hook_reverse(after_dispatch => $self);
+
+    # Session
+    $self->app->session->store($self);
 }
 
 sub helper {

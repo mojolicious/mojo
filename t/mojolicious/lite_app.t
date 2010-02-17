@@ -13,7 +13,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 336;
+plan tests => 342;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -292,7 +292,11 @@ get '/param_auth/too' =>
   sub { shift->render_text('You could be Bender too!') };
 
 ladder sub {
-    shift->stash(_name => 'Bender');
+    my $self = shift;
+    $self->stash(_name => 'Bender');
+    $self->cookie(foo => 'bar')->expires(time + 60);
+    $self->signed_cookie(bar => 'baz')->expires(time + 120);
+    $self->cookie(bad => 'bar--12345678');
     return 1;
 };
 
@@ -752,7 +756,16 @@ $t->get_ok('/hello3.txt', {'Range' => 'bytes=0-0'})->status_is(206)
   ->content_is('X');
 
 # GET /bridge2stash
-$t->get_ok('/bridge2stash')->status_is(200)->content_is("Bender too!\n");
+$t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
+  ->content_is("Bender too!!!!!!!\n");
+
+# GET /bridge2stash (with cookies, session and flash)
+$t->get_ok('/bridge2stash')->status_is(200)
+  ->content_is("Bender too!bar!baz!!bar--12345678!sri!vti!\n");
+
+# GET /bridge2stash (with cookies and session but no flash)
+$t->get_ok('/bridge2stash')->status_is(200)
+  ->content_is("Bender too!bar!baz!!bar--12345678!sri!!\n");
 
 __DATA__
 @@ template.txt.epl
@@ -844,7 +857,12 @@ layouted <%== content %>
 %= $c->foo('bar');
 
 @@ bridge2stash.html.ep
-<%= stash('_name') %> too!
+<%= stash('_name') %> too!<%= $self->cookie('foo') %>!\
+<%= $self->signed_cookie('bar')%>!<%= $self->signed_cookie('bad')%>!\
+<%= $self->cookie('bad') %>!<%= $self->session('foo')%>!\
+<%= $self->flash('foo') %>!
+% $self->session(foo => 'sri');
+% $self->flash(foo => 'vti') if $self->req->headers->header('X-Flash');
 
 __END__
 This is not a template!

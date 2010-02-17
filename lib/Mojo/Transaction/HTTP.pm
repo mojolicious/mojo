@@ -149,10 +149,13 @@ sub client_write {
     if ($self->is_state('start')) {
 
         # Connection header
-        if ($self->keep_alive || $self->kept_alive) {
-            $req->headers->connection('Keep-Alive');
+        my $headers = $req->headers;
+        unless ($headers->connection) {
+            if ($self->keep_alive || $self->kept_alive) {
+                $headers->connection('Keep-Alive');
+            }
+            else { $headers->connection('Close') }
         }
-        else { $req->headers->connection('Close') }
 
         # We might have to handle 100 Continue
         $self->_continue($self->continue_timeout)
@@ -375,8 +378,10 @@ sub server_write {
 
         # Connection header
         my $headers = $res->headers;
-        if   ($self->keep_alive) { $headers->connection('Keep-Alive') }
-        else                     { $headers->connection('Close') }
+        unless ($headers->connection) {
+            if   ($self->keep_alive) { $headers->connection('Keep-Alive') }
+            else                     { $headers->connection('Close') }
+        }
 
         # Ready for next state
         $self->state('write_start_line');

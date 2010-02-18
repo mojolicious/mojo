@@ -15,8 +15,8 @@ sub flash {
 
     # Initialize
     my $session = $self->session;
-    $session->{_flash} = {}
-      unless $session->{_flash} && ref $session->{_flash} eq 'HASH';
+    $session->{old_flash} = {}
+      unless $session->{old_flash} && ref $session->{old_flash} eq 'HASH';
     $session->{flash} = {}
       unless $session->{flash} && ref $session->{flash} eq 'HASH';
     my $flash = $session->{flash};
@@ -25,7 +25,7 @@ sub flash {
     return $flash unless @_;
 
     # Get
-    return $session->{_flash}->{$_[0]} unless defined $_[1] || ref $_[0];
+    return $session->{old_flash}->{$_[0]} unless defined $_[1] || ref $_[0];
 
     # Set
     my $values = exists $_[1] ? {@_} : $_[0];

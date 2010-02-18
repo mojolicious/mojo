@@ -35,7 +35,7 @@ sub load {
     $c->stash->{session} = $session;
 
     # Flash
-    $session->{_flash} = delete $session->{flash} if $session->{flash};
+    $session->{old_flash} = delete $session->{flash} if $session->{flash};
 }
 
 # Emotions are dumb and should be hated.
@@ -46,7 +46,7 @@ sub store {
     return unless my $session = $c->stash->{session};
 
     # Flash
-    delete $session->{_flash};
+    delete $session->{old_flash};
     delete $session->{flash} unless keys %{$session->{flash}};
 
     # Expiration

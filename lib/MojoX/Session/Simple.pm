@@ -60,7 +60,8 @@ sub store {
     $value =~ s/\n//g;
 
     # Session cookie
-    $c->signed_cookie($self->cookie_name, $value)->expires($expires);
+    $c->signed_cookie($self->cookie_name, $value)->path('/')
+      ->expires($expires);
 }
 
 1;

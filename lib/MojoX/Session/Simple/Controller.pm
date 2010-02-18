@@ -87,7 +87,7 @@ L<MojoX::Controller>.
 =head1 METHODS
 
 L<MojoX::Session::Simple::Controller> inherits all methods from
-L<MojoX::Controller> and implements the following the ones.
+L<MojoX::Controller> and implements the following ones.
 
 =head2 C<flash>
 

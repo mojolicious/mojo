@@ -337,7 +337,7 @@ used for matching.
 =head1 METHODS
 
 L<MojoX::Routes> inherits all methods from L<Mojo::Base> and implements the
-following the ones.
+following ones.
 
 =head2 C<new>
 

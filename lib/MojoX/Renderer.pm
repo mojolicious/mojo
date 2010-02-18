@@ -449,7 +449,7 @@ L<MojoX::Types> object to use for looking up MIME types.
 =head1 METHODS
 
 L<MojoX::Renderer> inherits all methods from L<Mojo::Base> and implements the
-following the ones.
+following ones.
 
 =head2 C<new>
 

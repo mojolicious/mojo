@@ -416,7 +416,7 @@ Character indicating the start of a wildcard placeholder, defaults to C<*>.
 =head1 METHODS
 
 L<MojoX::Routes::Pattern> inherits all methods from L<Mojo::Base> and
-implements the following the ones.
+implements the following ones.
 
 =head2 C<new>
 

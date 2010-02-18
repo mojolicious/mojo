@@ -262,7 +262,7 @@ Transaction object used for matching.
 =head1 METHODS
 
 L<MojoX::Routes::Match> inherits all methods from L<Mojo::Base> and
-implements the follwing the ones.
+implements the following the ones.
 
 =head2 C<new>
 

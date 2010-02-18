@@ -349,7 +349,7 @@ It turns your stashed data structures into content.
 
 =head2 ATTRIBUTES
 
-L<MojoX::Types> implements the follwing attributes.
+L<MojoX::Types> implements the following attributes.
 
 =head2 C<default_format>
 
@@ -449,7 +449,7 @@ L<MojoX::Types> object to use for looking up MIME types.
 =head1 METHODS
 
 L<MojoX::Renderer> inherits all methods from L<Mojo::Base> and implements the
-follwing the ones.
+following the ones.
 
 =head2 C<new>
 

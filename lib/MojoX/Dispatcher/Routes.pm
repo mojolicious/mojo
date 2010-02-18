@@ -311,7 +311,7 @@ L<MojoX::Dispatcher::Routes> is a L<MojoX::Routes> based dispatcher.
 =head2 ATTRIBUTES
 
 L<MojoX::Dispatcher::Routes> inherits all attributes from L<MojoX::Routes>
-and implements the follwing the ones.
+and implements the following the ones.
 
 =head2 C<controller_base_class>
 
@@ -342,7 +342,7 @@ Namespace to search for controllers.
 =head1 METHODS
 
 L<MojoX::Dispatcher::Routes> inherits all methods from L<MojoX::Routes> and
-implements the follwing the ones.
+implements the following the ones.
 
 =head2 C<auto_render>
 

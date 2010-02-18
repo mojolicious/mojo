@@ -111,7 +111,7 @@ The expiration timeout gets refreshed for every request.
 =head1 METHODS
 
 L<MojoX::Session::Simple> inherits all methods from L<Mojo::Base> and
-implements the follwing the ones.
+implements the following the ones.
 
 =head2 C<load>
 

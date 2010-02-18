@@ -13,7 +13,7 @@ __PACKAGE__->attr([qw/connection kept_alive/]);
 __PACKAGE__->attr([qw/local_address local_port remote_port/]);
 __PACKAGE__->attr(keep_alive => 0);
 
-__PACKAGE__->attr('_real_state');
+__PACKAGE__->attr([qw/_forwarded_for _real_state/]);
 
 # Please don't eat me! I have a wife and kids. Eat them!
 sub client_read  { croak 'Method "client_read" not implemented by subclass' }
@@ -56,9 +56,30 @@ sub remote_address {
         return $self;
     }
 
+    # Reverse proxy
+    if ($ENV{MOJO_REVERSE_PROXY}) {
+
+        # Forwarded
+        my $forwarded = $self->_forwarded_for;
+        return $forwarded if $forwarded;
+
+        # Reverse proxy
+        if ($forwarded = $self->req->headers->header('X-Forwarded-For')) {
+
+            # Real address
+            if ($forwarded =~ /([^,\s]+)$/) {
+                $self->_forwarded_for($1);
+                return $1;
+            }
+        }
+    }
+
     # Get
     return $self->{remote_address};
 }
+
+sub req { croak 'Method "req" not implemented by subclass' }
+sub res { croak 'Method "res" not implemented by subclass' }
 
 sub resume {
     my $self = shift;
@@ -73,8 +94,7 @@ sub resume {
     return $self;
 }
 
-sub server_read { croak 'Method "server_read" not implemented by subclass' }
-
+sub server_read  { croak 'Method "server_read" not implemented by subclass' }
 sub server_write { croak 'Method "server_write" not implemented by subclass' }
 
 1;
@@ -160,6 +180,14 @@ implements the following new ones.
 =head2 C<pause>
 
     $tx = $tx->pause;
+
+=head2 C<req>
+
+    my $req = $tx->req;
+
+=head2 C<res>
+
+    my $res = $tx->res;
 
 =head2 C<resume>
 

@@ -13,7 +13,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 345;
+plan tests => 348;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -47,6 +47,12 @@ get '/root.html' => 'root_path';
 
 # GET /template.txt
 get '/template.txt' => 'template';
+
+# GET /address
+get '/address' => sub {
+    my $self = shift;
+    $self->render_text($self->tx->remote_address);
+};
 
 # POST /upload
 post '/upload' => sub {
@@ -329,8 +335,15 @@ $t->get_ok('/.html')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('/root.html/root.html/root.html/root.html/root.html');
 
+# GET /address (reverse proxy)
+my $backup = $ENV{MOJO_REVERSE_PROXY};
+$ENV{MOJO_REVERSE_PROXY} = 1;
+$t->get_ok('/address', {'X-Forwarded-For' => '192.168.2.2, 192.168.2.1'})
+  ->status_is(200)->content_is('192.168.2.1');
+$ENV{MOJO_REVERSE_PROXY} = $backup;
+
 # POST /upload (huge upload without appropriate max message size)
-my $backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
+$backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
 $ENV{MOJO_MAX_MESSAGE_SIZE} = 2048;
 my $backup2 = app->log->level;
 app->log->level('fatal');

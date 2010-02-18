@@ -13,19 +13,23 @@ use base 'MojoX::Controller';
 sub flash {
     my $self = shift;
 
+    # Get
+    my $session = $self->stash->{session};
+    if ($_[0] && !defined $_[1] && !ref $_[0]) {
+        return unless $session && ref $session eq 'HASH';
+        return unless my $flash = $session->{old_flash};
+        return unless ref $flash eq 'HASH';
+        return $flash->{$_[0]};
+    }
+
     # Initialize
-    my $session = $self->session;
-    $session->{old_flash} = {}
-      unless $session->{old_flash} && ref $session->{old_flash} eq 'HASH';
-    $session->{flash} = {}
-      unless $session->{flash} && ref $session->{flash} eq 'HASH';
+    $session = $self->session;
     my $flash = $session->{flash};
+    $flash = {} unless $flash && ref $flash eq 'HASH';
+    $session->{flash} = $flash;
 
     # Hash
     return $flash unless @_;
-
-    # Get
-    return $session->{old_flash}->{$_[0]} unless defined $_[1] || ref $_[0];
 
     # Set
     my $values = exists $_[1] ? {@_} : $_[0];
@@ -38,17 +42,20 @@ sub flash {
 sub session {
     my $self = shift;
 
-    # Initialize
-    my $stash = $self->stash;
-    $stash->{session} = {}
-      unless $stash->{session} && ref $stash->{session} eq 'HASH';
+    # Get
+    my $stash   = $self->stash;
     my $session = $stash->{session};
+    if ($_[0] && !defined $_[1] && !ref $_[0]) {
+        return unless $session && ref $session eq 'HASH';
+        return $session->{$_[0]};
+    }
+
+    # Initialize
+    $session = {} unless $session && ref $session eq 'HASH';
+    $stash->{session} = $session;
 
     # Hash
     return $session unless @_;
-
-    # Get
-    return $session->{$_[0]} unless defined $_[1] || ref $_[0];
 
     # Set
     my $values = exists $_[1] ? {@_} : $_[0];

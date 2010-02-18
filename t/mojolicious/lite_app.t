@@ -761,11 +761,11 @@ $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
 
 # GET /bridge2stash (with cookies, session and flash)
 $t->get_ok('/bridge2stash')->status_is(200)
-  ->content_is("Bender too!bar!baz!!bar--12345678!sri!vti!\n");
+  ->content_is("Bender too!bar!baz!!bar--12345678!session!flash!\n");
 
 # GET /bridge2stash (with cookies and session but no flash)
 $t->get_ok('/bridge2stash' => {'X-Flash2' => 1})->status_is(200)
-  ->content_is("Bender too!bar!baz!!bar--12345678!sri!!\n");
+  ->content_is("Bender too!bar!baz!!bar--12345678!session!!\n");
 
 # GET /bridge2stash (with cookies and session cleared)
 $t->get_ok('/bridge2stash')->status_is(200)
@@ -865,8 +865,8 @@ layouted <%== content %>
 <%= $self->signed_cookie('bar')%>!<%= $self->signed_cookie('bad')%>!\
 <%= $self->cookie('bad') %>!<%= $self->session('foo')%>!\
 <%= $self->flash('foo') %>!
-% $self->session(foo => 'sri');
-% $self->flash(foo => 'vti') if $self->req->headers->header('X-Flash');
+% $self->session(foo => 'session');
+% $self->flash(foo => 'flash') if $self->req->headers->header('X-Flash');
 % $self->stash->{session} = {} if $self->req->headers->header('X-Flash2');
 
 __END__

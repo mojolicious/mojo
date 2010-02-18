@@ -13,7 +13,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 342;
+plan tests => 345;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -764,8 +764,12 @@ $t->get_ok('/bridge2stash')->status_is(200)
   ->content_is("Bender too!bar!baz!!bar--12345678!sri!vti!\n");
 
 # GET /bridge2stash (with cookies and session but no flash)
-$t->get_ok('/bridge2stash')->status_is(200)
+$t->get_ok('/bridge2stash' => {'X-Flash2' => 1})->status_is(200)
   ->content_is("Bender too!bar!baz!!bar--12345678!sri!!\n");
+
+# GET /bridge2stash (with cookies and session cleared)
+$t->get_ok('/bridge2stash')->status_is(200)
+  ->content_is("Bender too!bar!baz!!bar--12345678!!!\n");
 
 __DATA__
 @@ template.txt.epl
@@ -863,6 +867,7 @@ layouted <%== content %>
 <%= $self->flash('foo') %>!
 % $self->session(foo => 'sri');
 % $self->flash(foo => 'vti') if $self->req->headers->header('X-Flash');
+% $self->stash->{session} = {} if $self->req->headers->header('X-Flash2');
 
 __END__
 This is not a template!

@@ -293,10 +293,10 @@ get '/param_auth/too' =>
 
 ladder sub {
     my $self = shift;
-    $self->stash(_name => 'Bender');
-    $self->cookie(foo => 'bar')->expires(time + 60);
-    $self->signed_cookie(bar => 'baz')->expires(time + 120);
-    $self->cookie(bad => 'bar--12345678');
+    $self->stash(_name => 'stash');
+    $self->cookie(foo => 'cookie')->expires(time + 60);
+    $self->signed_cookie(bar => 'signed cookie')->expires(time + 120);
+    $self->cookie(bad => 'bad cookie--12345678');
     return 1;
 };
 
@@ -757,19 +757,21 @@ $t->get_ok('/hello3.txt', {'Range' => 'bytes=0-0'})->status_is(206)
 
 # GET /bridge2stash
 $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
-  ->content_is("Bender too!!!!!!!\n");
+  ->content_is("stash too!!!!!!!\n");
 
 # GET /bridge2stash (with cookies, session and flash)
 $t->get_ok('/bridge2stash')->status_is(200)
-  ->content_is("Bender too!bar!baz!!bar--12345678!session!flash!\n");
+  ->content_is(
+    "stash too!cookie!signed cookie!!bad cookie--12345678!session!flash!\n");
 
 # GET /bridge2stash (with cookies and session but no flash)
 $t->get_ok('/bridge2stash' => {'X-Flash2' => 1})->status_is(200)
-  ->content_is("Bender too!bar!baz!!bar--12345678!session!!\n");
+  ->content_is(
+    "stash too!cookie!signed cookie!!bad cookie--12345678!session!!\n");
 
 # GET /bridge2stash (with cookies and session cleared)
 $t->get_ok('/bridge2stash')->status_is(200)
-  ->content_is("Bender too!bar!baz!!bar--12345678!!!\n");
+  ->content_is("stash too!cookie!signed cookie!!bad cookie--12345678!!!\n");
 
 __DATA__
 @@ template.txt.epl

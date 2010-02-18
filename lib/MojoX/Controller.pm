@@ -17,7 +17,7 @@ __PACKAGE__->attr([qw/app tx/]);
 # the entire universe will be destroyed...
 # And as an environmentalist, I'm against that.
 sub cookie {
-    my ($self, $name, $value) = @_;
+    my ($self, $name, $value, $options) = @_;
 
     # Shortcut
     return unless $name;
@@ -30,8 +30,12 @@ sub cookie {
           if length $value > 4096;
 
         # Create new cookie
-        my $cookie =
-          Mojo::Cookie::Response->new(name => $name, value => $value);
+        $options ||= {};
+        my $cookie = Mojo::Cookie::Response->new(
+            name  => $name,
+            value => $value,
+            %$options
+        );
         $self->res->cookies($cookie);
         return $cookie;
     }
@@ -51,7 +55,7 @@ sub req { shift->tx->req }
 sub res { shift->tx->res }
 
 sub signed_cookie {
-    my ($self, $name, $value) = @_;
+    my ($self, $name, $value, $options) = @_;
 
     # Shortcut
     return unless $name;
@@ -68,7 +72,7 @@ sub signed_cookie {
         $value = $value .= "--$signature";
 
         # Create cookie
-        my $cookie = $self->cookie($name, $value);
+        my $cookie = $self->cookie($name, $value, $options);
         return $cookie;
     }
 
@@ -158,13 +162,12 @@ the following new ones.
 
 =head2 C<cookie>
 
-    my $cookie = $c->cookie(foo => 'bar');
+    my $c      = $c->cookie(foo => 'bar');
+    $c         = $c->cookie(foo => 'bar', {path => '/'});
     my $value  = $c->cookie('foo');
     my @values = $c->cookie('foo');
 
 Access request cookie values and create new response cookies.
-
-    $c->cookie(foo => 'bar')->expires(time + 360);
 
 =head2 C<req>
 
@@ -182,13 +185,12 @@ Usually refers to a L<Mojo::Message::Response> object.
 
 =head2 C<signed_cookie>
 
-    my $cookie = $c->signed_cookie(foo => 'bar');
+    $c         = $c->signed_cookie(foo => 'bar');
+    $c         = $c->signed_cookie(foo => 'bar', {path => '/'});
     my $value  = $c->signed_cookie('foo');
     my @values = $c->signed_cookie('foo');
 
 Access signed request cookie values and create new signed response cookies.
-
-    $c->signed_cookie(foo => 'bar')->expires(time + 360);
 
 =head2 C<stash>
 

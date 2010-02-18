@@ -770,21 +770,22 @@ $t->get_ok('/hello3.txt', {'Range' => 'bytes=0-0'})->status_is(206)
 
 # GET /bridge2stash
 $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
-  ->content_is("stash too!!!!!!!\n");
+  ->content_is("stash too!!!!!!!!\n");
 
 # GET /bridge2stash (with cookies, session and flash)
 $t->get_ok('/bridge2stash')->status_is(200)
   ->content_is(
-    "stash too!cookie!signed cookie!!bad cookie--12345678!session!flash!\n");
+    "stash too!cookie!signed cookie!!bad cookie--12345678!session!flash!/!\n"
+  );
 
 # GET /bridge2stash (with cookies and session but no flash)
 $t->get_ok('/bridge2stash' => {'X-Flash2' => 1})->status_is(200)
   ->content_is(
-    "stash too!cookie!signed cookie!!bad cookie--12345678!session!!\n");
+    "stash too!cookie!signed cookie!!bad cookie--12345678!session!!/!\n");
 
 # GET /bridge2stash (with cookies and session cleared)
 $t->get_ok('/bridge2stash')->status_is(200)
-  ->content_is("stash too!cookie!signed cookie!!bad cookie--12345678!!!\n");
+  ->content_is("stash too!cookie!signed cookie!!bad cookie--12345678!!!/!\n");
 
 __DATA__
 @@ template.txt.epl
@@ -876,10 +877,11 @@ layouted <%== content %>
 %= $c->foo('bar');
 
 @@ bridge2stash.html.ep
+% my $cookie = $self->req->cookie('mojolicious');
 <%= stash('_name') %> too!<%= $self->cookie('foo') %>!\
 <%= $self->signed_cookie('bar')%>!<%= $self->signed_cookie('bad')%>!\
 <%= $self->cookie('bad') %>!<%= $self->session('foo')%>!\
-<%= $self->flash('foo') %>!
+<%= $self->flash('foo') %>!<%= $cookie->path if $cookie %>!
 % $self->session(foo => 'session');
 % $self->flash(foo => 'flash') if $self->req->headers->header('X-Flash');
 % $self->stash->{session} = {} if $self->req->headers->header('X-Flash2');

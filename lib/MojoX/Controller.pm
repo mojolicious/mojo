@@ -37,7 +37,7 @@ sub cookie {
             %$options
         );
         $self->res->cookies($cookie);
-        return $cookie;
+        return $self;
     }
 
     # Request cookie
@@ -162,7 +162,7 @@ the following new ones.
 
 =head2 C<cookie>
 
-    my $c      = $c->cookie(foo => 'bar');
+    $c         = $c->cookie(foo => 'bar');
     $c         = $c->cookie(foo => 'bar', {path => '/'});
     my $value  = $c->cookie('foo');
     my @values = $c->cookie('foo');

@@ -89,10 +89,10 @@ sub find {
             # Session cookie
             my $session =
               defined $cookie->max_age && $cookie->max_age > 0 ? 1 : 0;
-            if ($cookie->expires || !$session) {
+            if ($cookie->expires && !$session) {
 
                 # Expired
-                next if $cookie->expires && time > $cookie->expires->epoch;
+                next if time > ($cookie->expires->epoch || 0);
             }
 
             # Port

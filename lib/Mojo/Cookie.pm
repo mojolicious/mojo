@@ -15,7 +15,7 @@ __PACKAGE__->attr([qw/name path value version/]);
 
 # Regex
 my $COOKIE_SEPARATOR_RE = qr/^\s*\,\s*/;
-my $EXPIRES_RE          = qr/^([^\;]+)\s*/;
+my $EXPIRES_RE          = qr/^([^\;\,]+\,?[^\;\,]+)\s*/;
 my $NAME_RE             = qr/
     ^\s*           # Start
     ([^\=\;\,]+)   # Relaxed Netscape token, allowing whitespace

@@ -300,9 +300,9 @@ get '/param_auth/too' =>
 ladder sub {
     my $self = shift;
     $self->stash(_name => 'stash');
-    $self->cookie(foo => 'cookie')->expires(time + 60);
-    $self->signed_cookie(bar => 'signed cookie')->expires(time + 120);
-    $self->cookie(bad => 'bad cookie--12345678');
+    $self->cookie(foo => 'cookie', {expires => (time + 60)});
+    $self->signed_cookie(bar => 'signed_cookie', {expires => (time + 120)});
+    $self->cookie(bad => 'bad_cookie--12345678');
     return 1;
 };
 
@@ -775,17 +775,17 @@ $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
 # GET /bridge2stash (with cookies, session and flash)
 $t->get_ok('/bridge2stash')->status_is(200)
   ->content_is(
-    "stash too!cookie!signed cookie!!bad cookie--12345678!session!flash!/!\n"
+    "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!flash!/!\n"
   );
 
 # GET /bridge2stash (with cookies and session but no flash)
 $t->get_ok('/bridge2stash' => {'X-Flash2' => 1})->status_is(200)
   ->content_is(
-    "stash too!cookie!signed cookie!!bad cookie--12345678!session!!/!\n");
+    "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!!/!\n");
 
 # GET /bridge2stash (with cookies and session cleared)
 $t->get_ok('/bridge2stash')->status_is(200)
-  ->content_is("stash too!cookie!signed cookie!!bad cookie--12345678!!!/!\n");
+  ->content_is("stash too!cookie!signed_cookie!!bad_cookie--12345678!!!/!\n");
 
 __DATA__
 @@ template.txt.epl

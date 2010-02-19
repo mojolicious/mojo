@@ -147,15 +147,21 @@ L<Mojo::Path> implements the following attributes.
     my $leading_slash = $path->leading_slash;
     $path             = $path->leading_slash(1);
 
+Path has a leading slash.
+
 =head2 C<parts>
 
     my $parts = $path->parts;
     $path     = $path->parts(qw/foo bar baz/);
 
+The path parts.
+
 =head2 C<trailing_slash>
 
     my $trailing_slash = $path->trailing_slash;
     $path              = $path->trailing_slash(1);
+
+Path has a trailing slash.
 
 =head1 METHODS
 
@@ -167,25 +173,37 @@ following new ones.
     my $path = Mojo::Path->new;
     my $path = Mojo::Path->new('/foo/bar%3B/baz.html');
 
+Construct a new L<Mojo::Path> object.
+
 =head2 C<append>
 
     $path = $path->append(qw/foo bar/);
+
+Append parts to path.
 
 =head2 C<canonicalize>
 
     $path = $path->canonicalize;
 
+Canonicalize path.
+
 =head2 C<clone>
 
     my $clone = $path->clone;
+
+Clone path.
 
 =head2 C<parse>
 
     $path = $path->parse('/foo/bar%3B/baz.html');
 
+Parse path.
+
 =head2 C<to_string>
 
     my $string = $path->to_string;
+
+Turn path into a string.
 
 =head1 SEE ALSO
 

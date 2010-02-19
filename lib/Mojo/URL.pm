@@ -319,35 +319,49 @@ L<Mojo::URL> implements the following attributes.
     my $authority = $url->autority;
     $url          = $url->authority('root:pass%3Bw0rd@localhost:8080');
 
+URL authority.
+
 =head2 C<base>
 
     my $base = $url->base;
     $url     = $url->base(Mojo::URL->new);
+
+Base of this URL.
 
 =head2 C<fragment>
 
     my $fragment = $url->fragment;
     $url         = $url->fragment('foo');
 
+URL fragment.
+
 =head2 C<host>
 
     my $host = $url->host;
     $url     = $url->host('127.0.0.1');
+
+URL host.
 
 =head2 C<port>
 
     my $port = $url->port;
     $url     = $url->port(8080);
 
+URL port.
+
 =head2 C<scheme>
 
     my $scheme = $url->scheme;
     $url       = $url->scheme('http');
 
+URL scheme.
+
 =head2 C<userinfo>
 
     my $userinfo = $url->userinfo;
     $url         = $url->userinfo('root:pass%3Bw0rd');
+
+URL userinfo.
 
 =head1 METHODS
 
@@ -359,28 +373,40 @@ following new ones.
     my $url = Mojo::URL->new;
     my $url = Mojo::URL->new('http://127.0.0.1:3000/foo?f=b&baz=2#foo');
 
+Construct a new L<Mojo::URL> object.
+
 =head2 C<clone>
 
     my $url2 = $url->clone;
+
+Clone URL.
 
 =head2 C<ihost>
 
     my $ihost = $url->ihost;
     $url      = $url->ihost('xn--bcher-kva.ch');
 
+IDNA host.
+
 =head2 C<is_abs>
 
     my $is_abs = $url->is_abs;
 
+Check if URL is absolute.
+
 =head2 C<parse>
 
     $url = $url->parse('http://127.0.0.1:3000/foo/bar?fo=o&baz=23#foo');
+
+Parse URL.
 
 =head2 C<path>
 
     my $path = $url->path;
     $url     = $url->path('/foo/bar');
     $url     = $url->path(Mojo::Path->new);
+
+URL path.
 
 =head2 C<query>
 
@@ -389,19 +415,27 @@ following new ones.
     $url      = $url->query([name => 'value']);
     $url      = $url->query(Mojo::Parameters->new);
 
+URL query.
+
 =head2 C<to_abs>
 
     my $abs = $url->to_abs;
     my $abs = $url->to_abs(Mojo::URL->new('http://kraih.com/foo'));
+
+Turn relative URL into an absolute one.
 
 =head2 C<to_rel>
 
     my $rel = $url->to_rel;
     my $rel = $url->to_rel(Mojo::URL->new('http://kraih.com/foo'));
 
+Turn absolute URL into a relative one.
+
 =head2 C<to_string>
 
     my $string = $url->to_string;
+
+Turn URL into a string.
 
 =head1 SEE ALSO
 

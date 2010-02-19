@@ -53,20 +53,28 @@ L<Mojo::Upload> implements the following attributes.
     my $asset = $upload->asset;
     $upload   = $upload->asset(Mojo::Asset::File->new);
 
+Asset containing the uploaded data.
+
 =head2 C<filename>
 
     my $filename = $upload->filename;
     $upload      = $upload->filename('foo.txt');
+
+Name of the uploaded file.
 
 =head2 C<headers>
 
     my $headers = $upload->headers;
     $upload     = $upload->headers(Mojo::Headers->new);
 
+Headers for upload.
+
 =head2 C<name>
 
     my $name = $upload->name;
     $upload  = $upload->name('foo');
+
+Name of the upload.
 
 =head1 METHODS
 
@@ -77,13 +85,19 @@ following new ones.
 
     $upload->move_to('/foo/bar/baz.txt');
 
+Move uploaded data to a specific file.
+
 =head2 C<size>
 
     my $size = $upload->size;
 
+Size of upload in bytes.
+
 =head2 C<slurp>
 
     my $string = $upload->slurp;
+
+Read all upload data at once.
 
 =head1 SEE ALSO
 

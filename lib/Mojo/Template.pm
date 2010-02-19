@@ -633,85 +633,141 @@ L<Mojo::Template> implements the following attributes.
     my $auto_escape = $mt->auto_escape;
     $mt             = $mt->auto_escape(1);
 
+Activate automatic XML escaping.
+
 =head2 C<append>
 
     my $code = $mt->append;
     $mt      = $mt->append('warn "Processed template"');
+
+Append Perl code to compiled template.
 
 =head2 C<capture_end>
 
     my $capture_end = $mt->capture_end;
     $mt             = $mt->capture_end('}');
 
+Character indicating the end of a capture block, defaults to C<}>.
+
+    %{ $foo =
+        Some data!
+    %}
+
 =head2 C<capture_start>
 
     my $capture_start = $mt->capture_start;
     $mt               = $mt->capture_start('{');
+
+Character indicating the start of a capture block, defaults to C<{>.
+
+    <%{ my $foo = %>
+        Some data!
+    <%}%>
 
 =head2 C<code>
 
     my $code = $mt->code;
     $mt      = $mt->code($code);
 
+Compiled template code.
+
 =head2 C<comment_mark>
 
     my $comment_mark = $mt->comment_mark;
     $mt              = $mt->comment_mark('#');
+
+Character indicating the start of a comment, defaults to C<#>.
+
+    <%# This is a comment %>
 
 =head2 C<encoding>
 
     my $encoding = $mt->encoding;
     $mt          = $mt->encoding('UTF-8');
 
+Encoding used for template files.
+
 =head2 C<escape_mark>
 
     my $escape_mark = $mt->escape_mark;
     $mt             = $mt->escape_mark('=');
+
+Character indicating the start of an escaped expression, defaults to C<=>.
+
+    <%== $foo %>
 
 =head2 C<expression_mark>
 
     my $expression_mark = $mt->expression_mark;
     $mt                 = $mt->expression_mark('=');
 
+Character indicating the start of an expression, defaults to C<=>.
+
+    <%= $foo %>
+
 =head2 C<line_start>
 
     my $line_start = $mt->line_start;
     $mt            = $mt->line_start('%');
+
+Character indicating the start of a code line, defaults to C<%>.
+
+    % $foo = 23;
 
 =head2 C<namespace>
 
     my $namespace = $mt->namespace;
     $mt           = $mt->namespace('main');
 
+Namespace used to compile templates.
+
 =head2 C<prepend>
 
     my $code = $mt->prepend;
     $mt      = $mt->prepend('my $self = shift;');
+
+Prepend Perl code to compiled template.
 
 =head2 C<tag_start>
 
     my $tag_start = $mt->tag_start;
     $mt           = $mt->tag_start('<%');
 
+Characters indicating the start of a tag, defaults to C<E<lt>%>.
+
+    <% $foo = 23; %>
+
 =head2 C<tag_end>
 
     my $tag_end = $mt->tag_end;
     $mt         = $mt->tag_end('%>');
+
+Characters indicating the end of a tag, defaults to C<%E<gt>>.
+
+    <%= $foo %>
 
 =head2 C<template>
 
     my $template = $mt->template;
     $mt          = $mt->template($template);
 
+Raw template.
+
 =head2 C<tree>
 
     my $tree = $mt->tree;
     $mt      = $mt->tree($tree);
 
+Parsed tree.
+
 =head2 C<trim_mark>
 
     my $trim_mark = $mt->trim_mark;
     $mt           = $mt->trim_mark('-');
+
+Character activating automatic whitespace trimming, defaults to C<=>.
+
+    <%= $foo =%>
 
 =head1 METHODS
 
@@ -722,32 +778,46 @@ following new ones.
 
     my $mt = Mojo::Template->new;
 
+Construct a new L<Mojo::Template> object.
+
 =head2 C<build>
 
     $mt = $mt->build;
 
+Build template.
+
 =head2 C<compile>
 
     my $exception = $mt->compile;
+
+Compile template.
 
 =head2 C<interpret>
 
     my $output = $mt->interpret;
     my $output = $mt->interpret(@arguments);
 
+Interpret template.
+
 =head2 C<parse>
 
     $mt = $mt->parse($template);
+
+Parse template.
 
 =head2 C<render>
 
     my $output = $mt->render($template);
     my $output = $mt->render($template, @arguments);
 
+Render template.
+
 =head2 C<render_file>
 
     my $output = $mt->render_file($template_file);
     my $output = $mt->render_file($template_file, @arguments);
+
+Render template file.
 
 =head2 C<render_file_to_file>
 
@@ -756,12 +826,16 @@ following new ones.
         $template_file, $output_file, @arguments
     );
 
+Render template file to a specific file.
+
 =head2 C<render_to_file>
 
     my $exception = $mt->render_to_file($template, $output_file);
     my $exception = $mt->render_to_file(
         $template, $output_file, @arguments
     );
+
+Render template to a specific file.
 
 =head1 SEE ALSO
 

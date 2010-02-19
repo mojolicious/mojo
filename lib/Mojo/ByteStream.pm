@@ -532,7 +532,7 @@ sub punycode_decode {
     # Delimiter
     if ($input =~ s/(.*)$DELIMITER//os) { push @output, split //, $1 }
 
-    # Decode
+    # Decode (direct translation of RFC 3492)
     while (length $input) {
         my $oldi = $i;
         my $w    = 1;
@@ -604,7 +604,7 @@ sub punycode_encode {
     my $delta = 0;
     my $bias  = PUNYCODE_INITIAL_BIAS;
 
-    # Encode
+    # Encode (direct translation of RFC 3492)
     for my $m (@chars) {
 
         # Basic character
@@ -879,12 +879,16 @@ Mojo::ByteStream - ByteStream
 L<Mojo::ByteStream> provides portable text and bytestream manipulation
 functions.
 
+=head1 ATTRIBUTES
+
 L<Mojo::ByteStream> implements the following attributes.
 
 =head2 C<raw_size>
 
     my $size = $stream->raw_size;
     $stream  = $stream->raw_size(23);
+
+Raw bytestream size in bytes.
 
 =head1 METHODS
 
@@ -895,119 +899,187 @@ the following new ones.
 
     my $stream = Mojo::ByteStream->new($string);
 
+Construct a new L<Mojo::ByteStream> object.
+
 =head2 C<add_chunk>
 
     $stream = $stream->add_chunk('foo');
+
+Add chunk of data to bytestream.
 
 =head2 C<b64_decode>
 
     $stream = $stream->b64_decode;
 
+Base 64 decode bytestream.
+
 =head2 C<b64_encode>
 
     $stream = $stream->b64_encode;
+
+Base 64 encode bytestream.
 
 =head2 C<camelize>
 
     $stream = $stream->camelize;
 
+Camelize bytestream.
+
+    foo_bar -> FooBar
+
 =head2 C<clone>
 
     my $stream2 = $stream->clone;
+
+Clone bytestream.
 
 =head2 C<contains>
 
     my $position = $stream->contains('something');
 
+Check if bytestream contains a specific string.
+
 =head2 C<decamelize>
 
     $stream = $stream->decamelize;
+
+Decamelize bytestream.
+
+    FooBar -> foo_bar
 
 =head2 C<decode>
 
     $stream = $stream->decode($encoding);
 
+Decode bytestream.
+
+    $stream->decode('UTF-8')->to_string;
+
 =head2 C<empty>
 
     my $chunk = $stream->empty;
+
+Empty bytestream.
 
 =head2 C<encode>
 
     $stream = $stream->encode($encoding);
 
+Encode bytestream.
+
+    $stream->encode('UTF-8')->to_string;
+
 =head2 C<get_line>
 
     my $line = $stream->get_line;
+
+Extract a whole line from start of bytestream.
+Lines are expected to end with C<0x0d 0x0a> or C<0x0a>.
 
 =head2 C<hmac_md5_sum>
 
     $stream = $stream->hmac_md5_sum($secret);
 
+Turn bytestream into HMAC-MD5 checksum of old content.
+
 =head2 C<html_escape>
 
     $stream = $stream->html_escape;
+
+HTML escape bytestream.
 
 =head2 C<html_unescape>
 
     $stream = $stream->html_unescape;
 
+HTML unescape bytestream.
+
 =head2 C<md5_sum>
 
     $stream = $stream->md5_sum;
+
+Turn bytestream into MD5 checksum of old content.
 
 =head2 C<punycode_decode>
 
     $stream = $stream->punycode_decode;
 
+Punycode decode bytestream.
+
 =head2 C<punycode_encode>
 
     $stream = $stream->punycode_encode;
+
+Punycode encode bytestream.
 
 =head2 C<qp_decode>
 
     $stream = $stream->qp_decode;
 
+Quoted Printable decode bytestream.
+
 =head2 C<qp_encode>
 
     $stream = $stream->qp_encode;
 
+Quoted Printable encode bytestream.
+
 =head2 C<quote>
 
     $stream = $stream->quote;
+
+Quote bytestream.
 
 =head2 C<remove>
 
     my $chunk = $stream->remove(4);
     my $chunk = $stream->remove(4, 'abcd');
 
+Remove a specific number of bytes from bytestream.
+
 =head2 C<size>
 
     my $size = $stream->size;
+
+Size of bytestream.
 
 =head2 C<to_string>
 
     my $string = $stream->to_string;
 
+Stringify bytestream.
+
 =head2 C<unquote>
 
     $stream = $stream->unquote;
+
+Unquote bytestream.
 
 =head2 C<url_escape>
 
     $stream = $stream->url_escape;
     $stream = $stream->url_escape('A-Za-z0-9\-\.\_\~');
 
+URL escape bytestream.
+
 =head2 C<url_sanitize>
 
     $stream = $stream->url_sanitize;
+
+URL sanitize bytestream.
 
 =head2 C<url_unescape>
 
     $stream = $stream->url_unescape;
 
+URL unescape bytestream.
+
 =head2 C<xml_escape>
 
     $stream = $stream->xml_escape;
+
+XML escape bytestream, this is a much faster version of C<html_escape>
+escaping only the characters C<&>, C<E<lt>>, C<E<gt>>, C<"> and C<'>.
 
 =head1 SEE ALSO
 

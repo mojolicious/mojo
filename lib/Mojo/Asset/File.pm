@@ -217,30 +217,42 @@ L<Mojo::Asset::File> implements the following attributes.
     my $cleanup = $asset->cleanup;
     $asset      = $asset->cleanup(1);
 
+Delete file automatically once it's not used anymore.
+
 =head2 C<end_range>
 
     my $end = $asset->end_range;
     $asset  = $asset->end_range(8);
+
+Pretend file ends earlier.
 
 =head2 C<handle>
 
     my $handle = $asset->handle;
     $asset     = $asset->handle(IO::File->new);
 
+Actual file handle.
+
 =head2 C<path>
 
     my $path = $asset->path;
     $asset   = $asset->path('/foo/bar/baz.txt');
+
+Actual file path.
 
 =head2 C<start_range>
 
     my $start = $asset->start_range;
     $asset    = $asset->start_range(0);
 
+Pretend file starts later.
+
 =head2 C<tmpdir>
 
     my $tmpdir = $asset->tmpdir;
     $asset     = $asset->tmpdir('/tmp');
+
+Temporary directory.
 
 =head1 METHODS
 
@@ -251,25 +263,37 @@ the following new ones.
 
     $asset = $asset->add_chunk('foo bar baz');
 
+Add chunk of data to asset.
+
 =head2 C<contains>
 
     my $position = $asset->contains('bar');
+
+Check if asset contains a specific string.
 
 =head2 C<get_chunk>
 
     my $chunk = $asset->get_chunk($offset);
 
+Get chunk of data starting from a specific position.
+
 =head2 C<move_to>
 
     $asset = $asset->move_to('/foo/bar/baz.txt');
+
+Move asset data into a specific file.
 
 =head2 C<size>
 
     my $size = $asset->size;
 
+Size of asset data in bytes.
+
 =head2 C<slurp>
 
     my $string = $file->slurp;
+
+Read all asset data at once.
 
 =head1 SEE ALSO
 

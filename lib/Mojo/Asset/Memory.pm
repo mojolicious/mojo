@@ -75,29 +75,43 @@ implements the following new ones.
 
     my $asset = Mojo::Asset::Memory->new;
 
+Construct a new L<Mojo::Asset::Memory> object.
+
 =head2 C<add_chunk>
 
     $asset = $asset->add_chunk('foo bar baz');
+
+Add chunk of data to asset.
 
 =head2 C<contains>
 
     my $position = $asset->contains('bar');
 
+Check if asset contains a specific string.
+
 =head2 C<get_chunk>
 
     my $chunk = $asset->get_chunk($offset);
+
+Get chunk of data starting from a specific position.
 
 =head2 C<move_to>
 
     $asset = $asset->move_to('/foo/bar/baz.txt');
 
+Move asset data into a specific file.
+
 =head2 C<size>
 
     my $size = $asset->size;
 
+Size of asset data in bytes.
+
 =head2 C<slurp>
 
     my $string = $file->slurp;
+
+Read all asset data at once.
 
 =head1 SEE ALSO
 

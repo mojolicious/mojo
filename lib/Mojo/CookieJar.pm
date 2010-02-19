@@ -146,6 +146,8 @@ L<Mojo::CookieJar> implements the following attributes.
     my $max_cookie_size = $jar->max_cookie_size;
     $jar                = $jar->max_cookie_size(4096);
 
+Maximum size of cookies in bytes.
+
 =head1 METHODS
 
 L<Mojo::CookieJar> inherits all methods from L<Mojo::Base> and implements the
@@ -155,13 +157,19 @@ following new ones.
 
     $jar = $jar->add(@cookies);
 
+Add multiple cookies to the jar.
+
 =head2 C<empty>
 
     $jar->empty;
 
+Empty the jar.
+
 =head2 C<find>
 
     my @cookies = $jar->find($url);
+
+Find cookies in the jar.
 
 =head1 SEE ALSO
 

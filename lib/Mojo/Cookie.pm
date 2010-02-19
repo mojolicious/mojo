@@ -57,6 +57,7 @@ sub _tokenize {
             # Unquoted string
             elsif ($string =~ s/$STRING_RE//o) { $value = $1 }
 
+            # Token
             push @token, [$name, $value];
 
             # Separator
@@ -104,20 +105,28 @@ L<Mojo::Cookie> implements the following attributes.
     my $name = $cookie->name;
     $cookie  = $cookie->name('foo');
 
+Cookie name.
+
 =head2 C<path>
 
     my $path = $cookie->path;
     $cookie  = $cookie->path('/test');
+
+Cookie path.
 
 =head2 C<value>
 
     my $value = $cookie->value;
     $cookie   = $cookie->value('/test');
 
+Cookie value.
+
 =head2 C<version>
 
     my $version = $cookie->version;
     $cookie     = $cookie->version(1);
+
+Cookie version.
 
 =head1 METHODS
 
@@ -127,6 +136,8 @@ following new ones.
 =head2 C<to_string>
 
     my $string = $cookie->to_string;
+
+Render cookie.
 
 =head1 SEE ALSO
 

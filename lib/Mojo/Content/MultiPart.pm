@@ -22,13 +22,13 @@ sub body_contains {
         $found += 1 if $headers =~ /$chunk/g;
         $found += $part->body_contains($chunk);
     }
+
+    # Found
     return $found ? 1 : 0;
 }
 
 sub body_size {
     my $self = shift;
-
-    my $length = 0;
 
     # Check for Content-Lenght header
     my $content_length = $self->headers->content_length;
@@ -39,10 +39,17 @@ sub body_size {
 
     # Calculate length of whole body
     my $boundary_length = length($boundary) + 6;
+    my $length          = 0;
     $length += $boundary_length;
     for my $part (@{$self->parts}) {
+
+        # Header
         $length += $part->header_size;
+
+        # Body
         $length += $part->body_size;
+
+        # Boundary
         $length += $boundary_length;
     }
 
@@ -149,7 +156,7 @@ sub parse {
 sub _parse_multipart {
     my $self = shift;
 
-    # We need a boundary
+    # Need a boundary
     $self->headers->content_type
       =~ /.*boundary=\"*([a-zA-Z0-9\'\(\)\,\.\:\?\-\_\+\/]+).*/;
     my $boundary = $1;
@@ -158,7 +165,7 @@ sub _parse_multipart {
     return $self->error('Parser error: Boundary missing or invalid.')
       unless $boundary;
 
-    # Spin
+    # Parse
     while (1) {
 
         # Done
@@ -184,10 +191,9 @@ sub _parse_multipart {
 sub _parse_multipart_body {
     my ($self, $boundary) = @_;
 
+    # Whole part in buffer
     my $buffer = $self->buffer;
     my $pos    = $buffer->contains("\x0d\x0a--$boundary");
-
-    # Make sure we have enough buffer to detect end boundary
     if ($pos < 0) {
         my $length = $buffer->size - (length($boundary) + 8);
         return unless $length > 0;
@@ -208,19 +214,23 @@ sub _parse_multipart_body {
 sub _parse_multipart_boundary {
     my ($self, $boundary) = @_;
 
-    # Begin
+    # Boundary begins
     my $buffer = $self->buffer;
     if ($buffer->contains("\x0d\x0a--$boundary\x0d\x0a") == 0) {
         $buffer->remove(length($boundary) + 6);
+
+        # New part
         push @{$self->parts}, Mojo::Content::Single->new(relaxed => 1);
         $self->state('multipart_body');
         return 1;
     }
 
-    # End
+    # Boundary ends
     my $end = "\x0d\x0a--$boundary--";
     if ($buffer->contains($end) == 0) {
         $buffer->remove(length $end);
+
+        # Done
         $self->done;
     }
 
@@ -230,14 +240,18 @@ sub _parse_multipart_boundary {
 sub _parse_multipart_preamble {
     my ($self, $boundary) = @_;
 
-    # Replace preamble with CRLF
+    # Replace preamble with carriage return and line feed
     my $buffer = $self->buffer;
     my $pos    = $buffer->contains("--$boundary");
     unless ($pos < 0) {
         $buffer->remove($pos, "\x0d\x0a");
+
+        # Parse boundary
         $self->state('multipart_boundary');
         return 1;
     }
+
+    # No boundary yet
     return;
 }
 
@@ -269,6 +283,8 @@ and implements the following new ones.
 
     my $parts = $content->parts;
 
+Content parts embedded in this multipart content.
+
 =head1 METHODS
 
 L<Mojo::Content::MultiPart> inherits all methods from L<Mojo::Content> and
@@ -278,21 +294,31 @@ implements the following new ones.
 
     my $found = $content->body_contains('foobarbaz');
 
+Check if content parts contain a specific string.
+
 =head2 C<body_size>
 
     my $size = $content->body_size;
+
+Content size in bytes.
 
 =head2 C<build_boundary>
 
     my $boundary = $content->build_boundary;
 
+Generate a suitable boundary for content.
+
 =head2 C<get_body_chunk>
 
     my $chunk = $content->get_body_chunk(0);
 
+Get a chunk of content starting from a specfic position.
+
 =head2 C<parse>
 
     $content = $content->parse('Content-Type: multipart/mixed');
+
+Parse content.
 
 =head1 SEE ALSO
 

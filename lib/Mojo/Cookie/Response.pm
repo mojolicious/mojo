@@ -89,21 +89,37 @@ sub to_string {
 
     return '' unless $self->name;
 
+    # Version
     my $cookie = sprintf "%s=%s; Version=%d",
       $self->name, $self->value, ($self->version || 1);
 
+    # Domain
     if (my $domain = $self->domain) { $cookie .= "; Domain=$domain" }
-    if (my $path   = $self->path)   { $cookie .= "; Path=$path" }
+
+    # Path
+    if (my $path = $self->path) { $cookie .= "; Path=$path" }
+
+    # Max-Age
     if (defined(my $max_age = $self->max_age)) {
         $cookie .= "; Max-Age=$max_age";
     }
+
+    # Expires
     if (defined(my $expires = $self->expires)) {
         $cookie .= "; expires=$expires";
     }
-    if (my $port     = $self->port)     { $cookie .= qq/; Port="$port"/ }
-    if (my $secure   = $self->secure)   { $cookie .= "; Secure" }
+
+    # Port
+    if (my $port = $self->port) { $cookie .= qq/; Port="$port"/ }
+
+    # Secure
+    if (my $secure = $self->secure) { $cookie .= "; Secure" }
+
+    # HttpOnly
     if (my $httponly = $self->httponly) { $cookie .= "; HttpOnly" }
-    if (my $comment  = $self->comment)  { $cookie .= "; Comment=$comment" }
+
+    # Comment
+    if (my $comment = $self->comment) { $cookie .= "; Comment=$comment" }
 
     return $cookie;
 }
@@ -139,30 +155,42 @@ implements the followign new ones.
     my $comment = $cookie->comment;
     $cookie     = $cookie->comment('test 123');
 
+Cookie comment.
+
 =head2 C<domain>
 
     my $domain = $cookie->domain;
     $cookie    = $cookie->domain('localhost');
+
+Cookie domain.
 
 =head2 C<httponly>
 
     my $httponly = $cookie->httponly;
     $cookie      = $cookie->httponly(1);
 
+HTTP only flag.
+
 =head2 C<max_age>
 
     my $max_age = $cookie->max_age;
     $cookie     = $cookie->max_age(60);
+
+Max age for cookie in seconds.
 
 =head2 C<port>
 
     my $port = $cookie->port;
     $cookie  = $cookie->port('80 8080');
 
+Cookie port.
+
 =head2 C<secure>
 
     my $secure = $cookie->secure;
     $cookie    = $cookie->secure(1);
+
+Secure flag.
 
 =head1 METHODS
 
@@ -174,13 +202,19 @@ implements the following new ones.
     my $expires = $cookie->expires;
     $cookie     = $cookie->expires(time + 60);
 
+Expiration for cookie in seconds.
+
 =head2 C<parse>
 
     my @cookies = $cookie->parse('f=b; Version=1; Path=/');
 
+Parse cookie.
+
 =head2 C<to_string>
 
     my $string = $cookie->to_string;
+
+Render cookie.
 
 =head1 SEE ALSO
 

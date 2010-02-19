@@ -123,7 +123,11 @@ sub get_header_chunk {
 
 sub has_leftovers {
     my $self = shift;
+
+    # Leftovers
     return 1 if $self->buffer->size || $self->filter_buffer->size;
+
+    # Empty buffer
     return;
 }
 
@@ -131,12 +135,16 @@ sub header_size { length shift->build_headers }
 
 sub is_chunked {
     my $self = shift;
+
+    # Chunked
     my $encoding = $self->headers->transfer_encoding || '';
     return $encoding =~ /chunked/i ? 1 : 0;
 }
 
 sub is_multipart {
     my $self = shift;
+
+    # Multipart
     my $type = $self->headers->content_type || '';
     return $type =~ /multipart/i ? 1 : 0;
 }
@@ -229,10 +237,14 @@ sub parse_until_body {
 
     # Parser started
     if ($self->is_state('start')) {
+
+        # Update size
         my $length            = $fbuffer->size;
         my $raw_length        = $fbuffer->raw_size;
         my $raw_header_length = $raw_length - $length;
         $self->raw_header_size($raw_header_length);
+
+        # Headers
         $self->state('headers');
     }
 
@@ -243,32 +255,42 @@ sub parse_until_body {
 }
 
 sub raw_body_size {
-    my $self          = shift;
+    my $self = shift;
+
+    # Calculate
     my $length        = $self->filter_buffer->raw_size;
     my $header_length = $self->raw_header_size;
     return $length - $header_length;
 }
 
 sub _build_headers {
-    my $self    = shift;
+    my $self = shift;
+
+    # Build
     my $headers = $self->headers->to_string;
+
+    # Empty
     return "\x0d\x0a" unless $headers;
+
     return "$headers\x0d\x0a\x0d\x0a";
 }
 
 sub _parse_headers {
     my $self = shift;
 
+    # Parse
     my $headers = $self->headers;
     $headers->buffer($self->filter_buffer);
     $headers->parse;
 
+    # Update size
     my $buffer            = $headers->buffer;
     my $length            = $buffer->size;
     my $raw_length        = $buffer->raw_size;
     my $raw_header_length = $raw_length - $length;
-
     $self->raw_header_size($raw_header_length);
+
+    # Done
     $self->state('body') if $headers->is_done;
 }
 
@@ -306,25 +328,35 @@ implements the following new ones.
         return $chunk;
     });
 
+Content generator callback.
+
 =head2 C<buffer>
 
     my $buffer = $content->buffer;
     $content   = $content->buffer(Mojo::ByteStream->new);
+
+Parser buffer.
 
 =head2 C<filter>
 
     my $filter = $content->filter;
     $content   = $content->filter(Mojo::Filter::Chunked->new);
 
+Input filter.
+
 =head2 C<filter_buffer>
 
     my $filter_buffer = $content->filter_buffer;
     $content          = $content->filter_buffer(Mojo::ByteStream->new);
 
+Input buffer for filtering.
+
 =head2 C<headers>
 
     my $headers = $content->headers;
     $content    = $content->headers(Mojo::Headers->new);
+
+The headers.
 
 =head2 C<progress_cb>
 
@@ -334,14 +366,20 @@ implements the following new ones.
         print '+';
     });
 
+Progress reporting callback.
+
 =head2 C<relaxed>
 
     my $relaxed = $content->relaxed;
     $content    = $content->relaxed(1);
 
+Activate relaxed filtering for HTTP 0.9.
+
 =head2 C<raw_header_size>
 
     my $size = $content->raw_header_size;
+
+Raw size of headers.
 
 =head1 METHODS
 
@@ -352,53 +390,79 @@ the following new ones.
 
     my $found = $content->body_contains('foo bar baz');
 
+Check if content contains a specific string.
+
 =head2 C<body_size>
 
     my $size = $content->body_size;
+
+Content size in bytes.
 
 =head2 C<build_body>
 
     my $string = $content->build_body;
 
+Render whole body.
+
 =head2 C<build_headers>
 
     my $string = $content->build_headers;
+
+Render all headers.
 
 =head2 C<generate_body_chunk>
 
     my $chunk = $content->generate_body_chunk(0);
 
+Generate content from C<body_cb>.
+
 =head2 C<get_body_chunk>
 
     my $chunk = $content->get_body_chunk(0);
+
+Get a chunk of content starting from a specfic position.
 
 =head2 C<get_header_chunk>
 
     my $chunk = $content->get_header_chunk(13);
 
+Get a chunk of the headers starting from a specfic position.
+
 =head2 C<has_leftovers>
 
     my $leftovers = $content->has_leftovers;
+
+Check if there are leftovers in the buffer.
 
 =head2 C<header_size>
 
     my $size = $content->header_size;
 
+Size of headers.
+
 =head2 C<is_chunked>
 
     my $chunked = $content->is_chunked;
+
+Chunked transfer encoding.
 
 =head2 C<is_multipart>
 
     my $multipart = $content->is_multipart;
 
+Multipart content.
+
 =head2 C<leftovers>
 
     my $bytes = $content->leftovers;
 
+Leftovers for next HTTP message in buffer.
+
 =head2 C<parse>
 
     $content = $content->parse("Content-Length: 12\r\n\r\nHello World!");
+
+Parse content.
 
 =head2 C<parse_until_body>
 
@@ -406,9 +470,13 @@ the following new ones.
         "Content-Length: 12\r\n\r\nHello World!"
     );
 
+Parse and stop after headers.
+
 =head2 C<raw_body_size>
 
     my $size = $content->raw_body_size;
+
+Raw size of body.
 
 =head1 SEE ALSO
 

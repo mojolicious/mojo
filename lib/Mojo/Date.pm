@@ -155,6 +155,8 @@ L<Mojo::Date> implements the following attributes.
     my $epoch = $date->epoch;
     $date     = $date->epoch(784111777);
 
+Epoch seconds.
+
 =head1 METHODS
 
 L<Mojo::Date> inherits all methods from L<Mojo::Base> and implements the

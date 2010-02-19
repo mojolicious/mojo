@@ -18,9 +18,11 @@ sub parse {
     my @cookies;
     my $version = 1;
 
+    # Walk tree
     for my $knot ($self->_tokenize($string)) {
         for my $token (@{$knot}) {
 
+            # Token
             my ($name, $value) = @{$token};
 
             # Value might be quoted
@@ -47,6 +49,8 @@ sub parse {
 
 sub prefix {
     my $self = shift;
+
+    # Prefix
     my $version = $self->version || 1;
     return "\$Version=$version";
 }
@@ -57,6 +61,7 @@ sub to_string {
     # Shortcut
     return '' unless $self->name;
 
+    # Render
     my $cookie = $self->name . '=' . $self->value;
     if (my $path = $self->path) { $cookie .= "; \$Path=$path" }
 
@@ -64,7 +69,9 @@ sub to_string {
 }
 
 sub to_string_with_prefix {
-    my $self   = shift;
+    my $self = shift;
+
+    # Render with prefix
     my $prefix = $self->prefix;
     my $cookie = $self->to_string;
     return "$prefix; $cookie";
@@ -104,17 +111,25 @@ implements the following new ones.
 
     my @cookies = $cookie->parse('$Version=1; f=b; $Path=/');
 
+Parse cookie.
+
 =head2 C<prefix>
 
     my $prefix = $cookie->prefix;
+
+Prefix for cookies.
 
 =head2 C<to_string>
 
     my $string = $cookie->to_string;
 
+Render cookie.
+
 =head2 C<to_string_with_prefix>
 
     my $string = $cookie->to_string_with_prefix;
+
+Render cookie with prefix.
 
 =head1 SEE ALSO
 

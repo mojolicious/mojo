@@ -117,6 +117,8 @@ L<Mojo::Home> implements the following attributes.
     my $class = $home->app_class;
     $home     = $home->app_class('Foo::Bar');
 
+Application class.
+
 =head1 METHODS
 
 L<Mojo::Home> inherits all methods from L<Mojo::Base> and implements the
@@ -127,26 +129,38 @@ following new ones.
     $home = $home->detect;
     $home = $home->detect('My::App');
 
+Detect home directory from application class.
+
 =head2 C<lib_dir>
 
     my $path = $home->lib_dir;
+
+Path to C<lib> directory.
 
 =head2 C<parse>
 
     $home = $home->parse('/foo/bar');
 
+Parse path.
+
 =head2 C<rel_dir>
 
     my $path = $home->rel_dir('foo/bar');
+
+Generate absolute path for relative directory.
 
 =head2 C<rel_file>
 
     my $path = $home->rel_file('foo/bar.html');
 
+Generate absolute path for relative file.
+
 =head2 C<to_string>
 
     my $string = $home->to_string;
     my $string = "$home";
+
+Home directory.
 
 =head1 SEE ALSO
 

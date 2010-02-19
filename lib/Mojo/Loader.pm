@@ -162,17 +162,25 @@ following new ones.
     my $loader = Mojo::Loader->new;
     my $loader = Mojo::Loader->new('MyApp::Namespace');
 
+Construct a new L<Mojo::Loader> object.
+
 =head2 C<load>
 
     my $e = $loader->load('Foo::Bar');
+
+Load a class.
 
 =head2 C<reload>
 
     my $e = Mojo::Loader->reload;
 
+Reload all Perl files with changes.
+
 =head2 C<search>
 
     my $modules = $loader->search('MyApp::Namespace');
+
+Search modules in a namespace.
 
 =head1 SEE ALSO
 

@@ -122,15 +122,21 @@ L<Mojo::Log> implements the following attributes.
     my $handle = $log->handle;
     $log       = $log->handle(IO::File->new);
 
+Logfile handle.
+
 =head2 C<level>
 
     my $level = $log->level;
     $log      = $log->level('debug');
 
+Log level.
+
 =head2 C<path>
 
     my $path = $log->path
     $log     = $log->path('/var/log/mojo.log');
+
+Logfile path.
 
 =head1 METHODS
 
@@ -141,49 +147,73 @@ following new ones.
 
     $log = $log->debug('You screwed up, but thats ok');
 
+Log debug message.
+
 =head2 C<error>
 
     $log = $log->error('You really screwed up this time');
+
+Log error message.
 
 =head2 C<fatal>
 
     $log = $log->fatal('Its over...');
 
+Log fatal message.
+
 =head2 C<info>
 
     $log = $log->info('You are bad, but you prolly know already');
+
+Log info message.
 
 =head2 C<is_level>
 
     my $is = $log->is_level('debug');
 
+Check log level.
+
 =head2 C<is_debug>
 
     my $is = $log->is_debug;
+
+Check for debug log level.
 
 =head2 C<is_error>
 
     my $is = $log->is_error;
 
+Check for error log level.
+
 =head2 C<is_fatal>
 
     my $is = $log->is_fatal;
+
+Check for fatal log level.
 
 =head2 C<is_info>
 
     my $is = $log->is_info;
 
+Check for info log level.
+
 =head2 C<is_warn>
 
     my $is = $log->is_warn;
+
+Check for warn log level.
 
 =head2 C<log>
 
     $log = $log->log(debug => 'This should work');
 
+Log a message.
+
 =head2 C<warn>
 
     $log = $log->warn('Dont do that Dave...');
+
+Log warn message.
 
 =head1 SEE ALSO
 

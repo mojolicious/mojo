@@ -484,6 +484,8 @@ L<Mojo::JSON> implements the following attributes.
     my $error = $json->error;
     $json     = $json->error('Oops!');
 
+Parser errors.
+
 =head1 METHODS
 
 L<Mojo::JSON> inherits all methods from L<Mojo::Base> and implements the
@@ -494,19 +496,27 @@ following new ones.
     my $array = $json->decode('[1, 2, 3]');
     my $hash  = $json->decode('{"foo": "bar"}');
 
+Decode JSON string.
+
 =head2 C<encode>
 
     my $string = $json->encode({foo => 'bar'});
+
+Encode Perl structure.
 
 =head2 C<false>
 
     my $false = Mojo::JSON->false;
     my $false = $json->false;
 
+False value, used because Perl has no native equivalent.
+
 =head2 C<true>
 
     my $true = Mojo::JSON->true;
     my $true = $json->true;
+
+True value, used because Perl has no native equivalent.
 
 =head1 SEE ALSO
 

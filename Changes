@@ -10,6 +10,7 @@ This file documents the revision history for Perl extension Mojolicious.
           So you don't have to use the "handler" argument anymore, even
           though it's still available and overrides auto detection.
         - Added Flash Policy Server example. (xantus)
+        - Added more reference docs.
         - Removed hot deployment support for Windows because of
           incompatibilities between Active Perl and Strawberry Perl.
         - Fixed multiple epoll bugs.

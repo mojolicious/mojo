@@ -40,11 +40,11 @@ my $res = $app->($env);
 # Response
 is($res->[0],      200);
 is($res->[1]->[0], 'Date');
-ok($res->[1]->[1]->[0]);
-is($res->[1]->[2],      'Content-Length');
-is($res->[1]->[3]->[0], 104);
-is($res->[1]->[4],      'Content-Type');
-is($res->[1]->[5]->[0], 'text/plain');
+ok($res->[1]->[1]);
+is($res->[1]->[2], 'Content-Length');
+is($res->[1]->[3], 104);
+is($res->[1]->[4], 'Content-Type');
+is($res->[1]->[5], 'text/plain');
 my $params = '';
 while (defined(my $chunk = $res->[2]->getline)) { $params .= $chunk }
 $params = eval "my $params";

@@ -47,9 +47,8 @@ sub run {
     my $headers = $res->content->headers;
     my @headers;
     for my $name (@{$headers->names}) {
-        for my $value ($headers->header($name)) {
-            push @headers, $name => $value;
-        }
+        my $value = $headers->header($name);
+        push @headers, $name => $value;
     }
 
     # Response body

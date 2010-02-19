@@ -55,7 +55,7 @@ sub class_to_file {
 sub class_to_path {
     my ($self, $class) = @_;
 
-    # Class to path
+    # Class to path (work with unix paths everywhere internally)
     my $path = join '/', split /::/, $class;
 
     return "$path.pm";
@@ -202,7 +202,7 @@ sub run { croak 'Method "run" not implemented by subclass' }
 sub write_file {
     my ($self, $path, $data) = @_;
 
-    # Directory
+    # Directory (expect an OS-dependent path from rel_file() )
     my @parts = File::Spec->splitdir($path);
     pop @parts;
     my $dir = File::Spec->catdir(@parts);
@@ -257,6 +257,13 @@ Mojo::Command - Command Base Class
 
 L<Mojo::Command> is an abstract base class for commands.
 
+Mojo commands are available as arguments to the C<mojo> and
+C<mojolicious> commands, application scripts (C<< script/appname >>)
+and Mojolicious::Lite applications.
+
+See L<Mojo::Commands> for an overview of command syntax and use as
+well as information on how to implement sub-commands.
+
 =head1 ATTRIBUTES
 
 L<Mojo::Command> implements the following attributes.
@@ -266,15 +273,21 @@ L<Mojo::Command> implements the following attributes.
     my $description = $command->description;
     $command        = $command->description('Foo!');
 
+Used in help messages and commands listings.
+
 =head2 C<quiet>
 
     my $quiet = $command->quiet;
     $command  = $command->quiet(1);
 
+Do not print messages to STDOUT as you go.
+
 =head2 C<usage>
 
     my $usage = $command->usage;
     $command  = $command->usage('Foo!');
+
+Usage and argument description for help messages.
 
 =head1 METHODS
 
@@ -285,75 +298,154 @@ following new ones.
 
     $command = $command->chmod_file('/foo/bar.txt', 0644);
 
+Portably change mode and permissions of a file or directory. Arguments are unix-style.
+
+
 =head2 C<chmod_rel_file>
 
     $command = $command->chmod_rel_file('foo/bar.txt', 0644);
+
+A relative-path version of C<chmod_file>.
 
 =head2 C<class_to_file>
 
     my $file = $command->class_to_file('Foo::Bar');
 
+Converts a class name to a suitable file name for a script. Used for
+code generation. See L<Mojo::Command:Generate::App> for an example.
+
 =head2 C<class_to_path>
 
     my $path = $command->class_to_path('Foo::Bar');
+
+Convert class hierarchy to a unix-like path.
 
 =head2 C<create_dir>
 
     $command = $command->create_dir('/foo/bar/baz');
 
+Portably create a directory using an absolute path argument.
+
 =head2 C<create_rel_dir>
 
     $command = $command->create_rel_dir('foo/bar/baz');
+
+A relative-path version of C<crete_dir>.
 
 =head2 C<get_all_data>
 
     my $all = $command->get_all_data;
     my $all = $command->get_all_data('Some::Class');
 
+Loads data from the C<__DATA__> section of the file. Defaults to the
+class of the C<$command> object. Returns a hashref. Used to process
+templates from C<__DATA__> sections.
+
 =head2 C<get_data>
 
     my $data = $command->get_data('foo_bar');
     my $data = $command->get_data('foo_bar', 'Some::Class');
 
+Uses C<get_all_data> and returns only the selected hash key.
+
 =head2 C<help>
 
     $command->help;
+
+Prints C<usage> attribute.
 
 =head2 C<rel_dir>
 
     my $path = $command->rel_dir('foo/bar');
 
+Portably builds an absolute path for a directory from the current working
+directory and a relative path argument.
+
 =head2 C<rel_file>
 
     my $path = $command->rel_file('foo/bar.txt');
+
+The same, for a file.
 
 =head2 C<render_data>
 
     my $data = $command->render_data('foo_bar', @arguments);
 
+Uses a renderer to process the template C<'foo_bar'> with C<@arguments>.
+
 =head2 C<render_to_file>
 
     $command = $command->render_to_file('foo_bar', '/foo/bar.txt');
 
+The same, with output to a file.
+
 =head2 C<render_to_rel_file>
 
     $command = $command->render_to_rel_file('foo_bar', 'foo/bar.txt');
-    $command = $command->render_to_rel_file('foo_bar', 'foo/bar.txt');
+
+The same, with output to a file with a relative path.
 
 =head2 C<run>
 
     $command = $command->run(@ARGV);
 
+Virtual method for execution of the command. To be implemented by the
+command subclass.
+
 =head2 C<write_file>
 
     $command = $command->write_file('/foo/bar.txt', 'Hello World!');
+
+Portably write text to a file.
 
 =head2 C<write_rel_file>
 
     $command = $command->write_rel_file('foo/bar.txt', 'Hello World!');
 
+Portably write text to a file with a relative path.
+
+=head1 IMPLEMENTING A COMMAND
+
+    package Mojo::Command::<command_name_capitalized>;
+    
+    use strict;
+    use warnings;
+    
+    use base 'Mojo::Command';
+    
+    use Getopt::Long 'GetOptions';
+    
+    __PACKAGE__->attr(description => <<'EOF');
+    <Command description here>
+    EOF
+    __PACKAGE__->attr(usage => <<"EOF");
+    usage: $0 <command name> <arguments>
+    
+    These options are available:
+      --<option>    <description>
+    EOF
+    
+    # <suitable Futurama comment here>
+    sub run {
+        my $self = shift;
+    
+        # Options
+        @ARGV = @_ if @_;
+        GetOptions('<option>' => sub { $<option> = 1 });
+    
+        <perform action>
+    }
+
+Note that the L<Mojo::Commands> C<start> method should call your
+command after taking care of getting the arguments from @ARGV.
+
+See L<Mojo::Command::Get> for an example of interaction with the
+application and L<Mojo::Command:Generate::Makefile> for an example of
+simple file generation and using templates.
+
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+L<Mojo::Commands> for sub-commands, L<Mojolicious>,
+L<Mojolicious::Book>, L<http://mojolicious.org>.
 
 =cut

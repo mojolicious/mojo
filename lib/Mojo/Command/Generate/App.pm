@@ -107,7 +107,7 @@ Mojo::Command::Generate::App - Application Generator Command
 
 =head1 DESCRIPTION
 
-L<Mojo::Command::Generate::App> is a application generator.
+L<Mojo::Command::Generate::App> is an application generator.
 
 =head1 ATTRIBUTES
 

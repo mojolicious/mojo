@@ -47,15 +47,21 @@ the following new ones.
     my $headers = $filter->headers;
     $filter     = $filter->headers(Mojo::Headers->new);
 
+The headers.
+
 =head2 C<input_buffer>
 
     my $input_buffer = $filter->input_buffer;
     $filter          = $filter->input_buffer(Mojo::ByteStream->new);
 
+Input buffer for filtering.
+
 =head2 C<output_buffer>
 
     my $output_buffer = $filter->output_buffer;
     $filter           = $filter->output_buffer(Mojo::ByteStream->new);
+
+Output buffer for filtering.
 
 =head1 METHODS
 
@@ -66,9 +72,13 @@ the following new ones.
 
     my $formatted = $filter->build('Hello World!');
 
+Build filtered content.
+
 =head2 C<parse>
 
     $filter = $filter->parse;
+
+Filter content.
 
 =head1 SEE ALSO
 

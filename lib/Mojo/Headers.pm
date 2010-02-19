@@ -369,6 +369,8 @@ object.
     my $accept_language = $headers->accept_language;
     $headers            = $headers->accept_language('de, en');
 
+Shortcut for the C<Accept-Language> header.
+
 =head2 C<connection>
 
     my $connection = $headers->connection;

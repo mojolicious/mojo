@@ -177,25 +177,35 @@ L<Mojo::Exception> implements the following attributes.
     my $line = $e->line;
     $e       = $e->line([3, 'foo']);
 
+The line where the exception occured.
+
 =head2 C<lines_after>
 
     my $lines = $e->lines_after;
     $e        = $e->lines_after([[1, 'bar'], [2, 'baz']]);
+
+Lines after the line where the exception occured.
 
 =head2 C<lines_before>
 
     my $lines = $e->lines_before;
     $e        = $e->lines_before([[4, 'bar'], [5, 'baz']]);
 
+Lines before the line where the exception occured.
+
 =head2 C<message>
 
     my $message = $e->message;
     $e          = $e->message('Oops!');
 
+Exception message.
+
 =head2 C<verbose>
 
     my $verbose = $e->verbose;
     $e          = $e->verbose(1);
+
+Activate verbose rendering.
 
 =head1 METHODS
 
@@ -207,10 +217,14 @@ following new ones.
     my $e = Mojo::Exception->new('Oops!');
     my $e = Mojo::Exception->new('Oops!', $file);
 
+Construct a new L<Mojo::Exception> object.
+
 =head2 C<to_string>
 
     my $string = $e->to_string;
     my $string = "$e";
+
+Render exception with context.
 
 =head1 SEE ALSO
 

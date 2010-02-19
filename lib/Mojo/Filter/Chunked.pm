@@ -23,9 +23,8 @@ sub build {
     # Trailing headers
     my $headers = ref $chunk && $chunk->isa('Mojo::Headers') ? 1 : 0;
 
-    my $formatted = '';
-
     # End
+    my $formatted = '';
     if ($headers || ($chunk_length == 0)) {
         $self->done;
 
@@ -59,7 +58,7 @@ sub parse {
         return $self;
     }
 
-    # Got a chunk (we ignore the chunk extension)
+    # New chunk (ignore the chunk extension)
     my $filter  = $self->input_buffer;
     my $content = $filter->to_string;
     my $buffer  = $self->output_buffer;
@@ -77,7 +76,7 @@ sub parse {
         # Read chunk
         else {
 
-            # We have a whole chunk
+            # Whole chunk
             if (length $content >= (length($header) + $length)) {
 
                 # Remove header
@@ -93,7 +92,7 @@ sub parse {
                 $filter->remove(length $1) if $1;
             }
 
-            # Not a whole chunk, need to wait for more data
+            # Not a whole chunk, wait for more data
             else {last}
         }
     }
@@ -103,10 +102,14 @@ sub parse {
 }
 
 sub _parse_trailing_headers {
-    my $self    = shift;
+    my $self = shift;
+
+    # Parse
     my $headers = $self->headers;
     $headers->state('headers');
     $headers->parse;
+
+    # Done
     if ($headers->is_done) {
         $self->_remove_chunked_encoding;
         $self->done;
@@ -114,7 +117,9 @@ sub _parse_trailing_headers {
 }
 
 sub _remove_chunked_encoding {
-    my $self     = shift;
+    my $self = shift;
+
+    # Remove encoding
     my $headers  = $self->headers;
     my $encoding = $headers->transfer_encoding;
     $encoding =~ s/,?\s*chunked//ig;
@@ -165,9 +170,13 @@ implements the following new ones.
 
     my $formatted = $filter->build('Hello World!');
 
+Build chunked content.
+
 =head2 C<parse>
 
     $filter = $filter->parse;
+
+Filter chunked content.
 
 =head1 SEE ALSO
 

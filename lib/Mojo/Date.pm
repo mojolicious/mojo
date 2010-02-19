@@ -167,6 +167,8 @@ following new ones.
     my $date = Mojo::Date->new;
     my $date = Mojo::Date->new($string);
 
+Construct a new L<Mojo::Date> object.
+
 =head2 C<parse>
 
     $date = $date->parse('Sun Nov  6 08:49:37 1994');
@@ -181,6 +183,8 @@ Parsable formats include:
 =head2 C<to_string>
 
     my $string = $date->to_string;
+
+Render date suitable for HTTP 1.1 messages.
 
 =head1 SEE ALSO
 

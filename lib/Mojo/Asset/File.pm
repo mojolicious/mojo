@@ -70,7 +70,7 @@ sub add_chunk {
     my ($self, $chunk) = @_;
 
     # Seek to end
-    $self->handle->seek(0, SEEK_END);
+    $self->handle->sysseek(0, SEEK_END);
 
     # Store
     $chunk = '' unless defined $chunk;
@@ -87,7 +87,7 @@ sub contains {
     my ($buffer, $window);
 
     # Seek to start
-    $self->handle->seek($self->start_range, SEEK_SET);
+    $self->handle->sysseek($self->start_range, SEEK_SET);
     my $end = defined $self->end_range ? $self->end_range : $self->size;
     my $rlen = length($bytestream) * 2;
     if ($rlen > $end - $self->start_range) {
@@ -123,7 +123,7 @@ sub get_chunk {
 
     # Seek to start
     my $off = $offset + $self->start_range;
-    $self->handle->seek($off, SEEK_SET);
+    $self->handle->sysseek($off, SEEK_SET);
     my $end = $self->end_range;
     my $buffer;
 
@@ -177,7 +177,7 @@ sub slurp {
     my $self = shift;
 
     # Seek to start
-    $self->handle->seek(0, SEEK_SET);
+    $self->handle->sysseek(0, SEEK_SET);
 
     # Slurp
     my $content = '';

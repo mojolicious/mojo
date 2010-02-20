@@ -424,7 +424,7 @@ sub _connect {
 
         # Callbacks
         $self->ioloop->error_cb($id => sub { $self->_error(@_) });
-        $self->ioloop->hup_cb($id => sub { $self->_hup(@_) });
+        $self->ioloop->hup_cb($id => sub { $self->_error(@_) });
         $self->ioloop->read_cb($id => sub { $self->_read(@_) });
         $self->ioloop->write_cb($id => sub { $self->_write(@_) });
 
@@ -603,8 +603,6 @@ sub _fix_cookies {
 
     return @cookies;
 }
-
-sub _hup { shift->_error(@_) }
 
 sub _prepare_server {
     my $self = shift;

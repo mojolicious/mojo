@@ -33,10 +33,11 @@ ok(!$stateful->is_finished);
 # Errors
 ok(!defined($stateful->error));
 ok(!$stateful->has_error);
+$stateful->state_cb(sub { $stateful->{error} .= '123' });
 $stateful->error('Oops');
 ok($stateful->error);
 ok($stateful->has_error);
-is($stateful->error, 'Oops');
+is($stateful->error, 'Oops123');
 is($stateful->state, 'error');
 ok($stateful->is_state(qw/error another/));
 ok(!$stateful->is_done);

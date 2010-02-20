@@ -24,8 +24,8 @@ sub error {
     }
 
     # Set
-    $self->state('error');
     $self->{error} = $message;
+    $self->state('error');
     return $self;
 }
 

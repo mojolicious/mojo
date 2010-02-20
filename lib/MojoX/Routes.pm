@@ -11,8 +11,6 @@ use Mojo::URL;
 use MojoX::Routes::Pattern;
 use Scalar::Util 'weaken';
 
-use constant DEBUG => $ENV{MOJOX_ROUTES_DEBUG} || 0;
-
 __PACKAGE__->attr([qw/block inline name parent/]);
 __PACKAGE__->attr([qw/children conditions/] => sub { [] });
 __PACKAGE__->attr(dictionary                => sub { {} });

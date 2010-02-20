@@ -367,35 +367,50 @@ L<Mojo::Server::Daemon> and implements the following new ones.
     my $cleanup_interval = $daemon->cleanup_interval;
     $daemon              = $daemon->cleanup_interval(15);
 
+Cleanup interval for workers in seconds, defaults to C<15>.
+
 =head2 C<idle_timeout>
 
     my $idle_timeout = $daemon->idle_timeout;
     $daemon          = $daemon->idle_timeout(30);
+
+Timeout for workers to be idle in seconds, defaults to C<30>.
 
 =head2 C<max_clients>
 
     my $max_clients = $daemon->max_clients;
     $daemon         = $daemon->max_clients(1);
 
+Maximum number of parallel client connections handled by worker, defaults to
+C<1>.
+
 =head2 C<max_servers>
 
     my $max_servers = $daemon->max_servers;
     $daemon         = $daemon->max_servers(100);
+
+Maximum number of active workers, defaults to C<100>.
 
 =head2 C<max_spare_servers>
 
     my $max_spare_servers = $daemon->max_spare_servers;
     $daemon               = $daemon->max_spare_servers(10);
 
+Maximum number of idle workers, default to C<10>.
+
 =head2 C<min_spare_servers>
 
     my $min_spare_servers = $daemon->min_spare_servers;
     $daemon               = $daemon->min_spare_servers(5);
 
+Minimal number of idle workers, defaults to C<5>.
+
 =head2 C<start_servers>
 
     my $start_servers = $daemon->start_servers;
     $daemon           = $daemon->start_servers(5);
+
+Number of workers to spawn at server startup, defaults to C<5>.
 
 =head1 METHODS
 
@@ -406,25 +421,37 @@ L<Mojo::Server::Daemon> and implements the following new ones.
 
     my $lock = $daemon->accept_lock($blocking);
 
+Try to get the accept lock.
+
 =head2 C<child>
 
     $daemon->child;
+
+Worker process.
 
 =head2 C<child_status>
 
     $daemon->child_status('idle');
 
+Change status for worker process.
+
 =head2 C<daemonize>
 
     $daemon->daemonize;
+
+Daemonize manager process.
 
 =head2 C<parent>
 
     $daemon->parent;
 
+Manager process.
+
 =head2 C<run>
 
     $daemon->run;
+
+Start server.
 
 =head1 SEE ALSO
 

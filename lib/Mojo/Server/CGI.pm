@@ -146,6 +146,8 @@ implements the following new ones.
     my $nph = $cgi->nph;
     $cgi    = $cgi->nph(1);
 
+Activate non parsed header mode.
+
 =head1 METHODS
 
 L<Mojo::Server::CGI> inherits all methods from L<Mojo::Server> and
@@ -154,6 +156,8 @@ implements the following new ones.
 =head2 C<run>
 
     $cgi->run;
+
+Process CGI.
 
 =head1 SEE ALSO
 

@@ -123,6 +123,8 @@ implements the following new ones.
 
     my $res = $psgi->run($env);
 
+Start PSGI.
+
 =head1 SEE ALSO
 
 L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.

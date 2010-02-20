@@ -478,55 +478,77 @@ implements the following new ones.
     my $group = $daemon->group;
     $daemon   = $daemon->group('users');
 
+Group for server process.
+
 =head2 C<ioloop>
 
     my $loop = $daemon->ioloop;
     $daemon  = $daemon->ioloop(Mojo::IOLoop->new);
+
+Event loop for server IO, defaults to the global L<Mojo::IOLoop> singleton.
 
 =head2 C<keep_alive_timeout>
 
     my $keep_alive_timeout = $daemon->keep_alive_timeout;
     $daemon                = $daemon->keep_alive_timeout(15);
 
+Timeout for keep alive connections in seconds, defaults to C<15>.
+
 =head2 C<listen>
 
     my $listen = $daemon->listen;
-    $daemon    = $daemon->listen('https:localhost:3000,file:/my.sock');
+    $daemon    = $daemon->listen('https://localhost:3000,file:/my.sock');
+
+Ports and files to listen on, defaults to C<http://*:3000>.
 
 =head2 C<listen_queue_size>
 
     my $listen_queue_size = $daemon->listen_queue_zise;
     $daemon               = $daemon->listen_queue_zise(128);
 
+Listen queue size, defaults to C<SOMAXCONN>.
+
 =head2 C<lock_file>
 
     my $lock_file = $daemon->lock_file;
     $daemon       = $daemon->lock_file('/tmp/mojo_daemon.lock');
+
+Path to lock file, defaults to a random temporary file.
 
 =head2 C<max_clients>
 
     my $max_clients = $daemon->max_clients;
     $daemon         = $daemon->max_clients(1000);
 
+Maximum number of parallel client connections, defaults to C<1000>.
+
 =head2 C<max_keep_alive_requests>
 
     my $max_keep_alive_requests = $daemon->max_keep_alive_requests;
     $daemon                     = $daemon->max_keep_alive_requests(100);
+
+Maximum number of keep alive requests per connection, defaults to C<100>.
 
 =head2 C<pid_file>
 
     my $pid_file = $daemon->pid_file;
     $daemon      = $daemon->pid_file('/tmp/mojo_daemon.pid');
 
+Path to process id file, defaults to a random temporary file.
+
 =head2 C<silent>
 
     my $silent = $daemon->silent;
     $daemon    = $daemon->silent(1);
 
+Disable console messages.
+
 =head2 C<user>
 
     my $user = $daemon->user;
     $daemon  = $daemon->user('web');
+
+User for the server process.
 
 =head2 C<websocket_timeout>
 
@@ -544,29 +566,43 @@ implements the following new ones.
 
     my $lock = $daemon->accept_lock($blocking);
 
+Try to get the accept lock.
+
 =head2 C<accept_unlock>
 
     $daemon->accept_unlock;
+
+Free the accept lock.
 
 =head2 C<prepare_ioloop>
 
     $daemon->prepare_ioloop;
 
+Prepare event loop.
+
 =head2 C<prepare_lock_file>
 
     $daemon->prepare_lock_file;
+
+Prepare the lock file.
 
 =head2 C<prepare_pid_file>
 
     $daemon->prepare_pid_file;
 
+Prepare process id file.
+
 =head2 C<run>
 
     $daemon->run;
 
+Start server.
+
 =head2 C<setuidgid>
 
     $daemon->setuidgid;
+
+Set user and group for process.
 
 =head1 SEE ALSO
 

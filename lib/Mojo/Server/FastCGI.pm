@@ -427,41 +427,61 @@ implements the following new ones.
 
     my $c = $fcgi->accept_connection;
 
+Accept FastCGI connection.
+
 =head2 C<read_record>
 
     my ($type, $id, $body) = $fcgi->read_record($c);
+
+Parse FastCGI record.
 
 =head2 C<read_request>
 
     my $tx = $fcgi->read_request($c);
 
+Parse FastCGI request.
+
 =head2 C<role_name>
 
     my $name = $fcgi->role_name(3);
+
+FastCGI role name.
 
 =head2 C<role_number>
 
     my $number = $fcgi->role_number('FILTER');
 
+FastCGI role number.
+
 =head2 C<run>
 
     $fcgi->run;
+
+Start FastCGI.
 
 =head2 C<type_name>
 
     my $name = $fcgi->type_name(5);
 
+FastCGI type name.
+
 =head2 C<type_number>
 
     my $number = $fcgi->type_number('STDIN');
+
+FastCGI type number.
 
 =head2 C<write_records>
 
     $fcgi->write_record($c, 'STDOUT', $id, 'HTTP/1.1 200 OK');
 
+Write FastCGI record.
+
 =head2 C<write_response>
 
     $fcgi->write_response($tx);
+
+Write FastCGI response.
 
 =head1 SEE ALSO
 

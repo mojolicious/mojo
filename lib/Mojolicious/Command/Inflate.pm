@@ -76,10 +76,14 @@ L<Mojo::Command> and implements the following new ones.
     my $description = $inflate->description;
     $inflate        = $inflate->description('Foo!');
 
+Short description of this command, used for the command list.
+
 =head2 C<usage>
 
     my $usage = $inflate->usage;
     $inflate  = $inflate->usage('Foo!');
+
+Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
@@ -89,6 +93,8 @@ and implements the following new ones.
 =head2 C<run>
 
     $inflate = $inflate->run(@ARGV);
+
+Run this command.
 
 =head1 SEE ALSO
 

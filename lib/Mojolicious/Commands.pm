@@ -24,12 +24,60 @@ Mojolicious::Commands - Commands
 
     use Mojo::Commands;
 
+    # Command line interface
     my $commands = Mojolicious::Commands->new;
     $commands->run(@ARGV);
 
 =head1 DESCRIPTION
 
-L<Mojolicous::Commands> is a interactive command interface.
+L<Mojolicous::Commands> is the interactive command line interface to the
+L<Mojolicious> framework.
+It will automatically detect available commands in the
+L<Mojolicious::Command> namespace.
+
+These commands are available by default in addition to the commands listed in
+L<Mojo::Commands>.
+
+=over 4
+
+=item C<generate>
+
+    mojolicious generate
+    mojolicious generate help
+
+List available generator commands with short descriptions.
+
+    mojolicious generate help <generator>
+
+List available options for generator command with short descriptions.
+
+=item C<generate app>
+
+    mojolicious generate app <AppName>
+
+Generate application directory structure for a fully functional
+L<Mojolicious> application.
+
+=item C<generate lite_app>
+
+    mojolicious generate lite_app
+
+Generate a fully functional L<Mojolicious::Lite> application.
+
+=item C<inflate>
+
+    myapp.pl inflate
+
+Turn embedded files from the C<__DATA__> section into real files.
+
+=item C<routes>
+
+    myapp.pl routes
+    script/myapp routes
+
+List application routes.
+
+=back
 
 =head1 ATTRIBUTES
 
@@ -41,11 +89,8 @@ implements the following new ones.
     my $namespaces = $commands->namespaces;
     $commands      = $commands->namespaces(['Mojolicious::Commands']);
 
-Namespaces to run commands from, defaults to L<Mojo::Command> and
+Namespaces to search for available commands, defaults to L<Mojo::Command> and
 L<Mojolicious::Command>.
-Your application might add to this in order to implement local actions.
-
-    push @{$commands->namespaces}, 'MyApp::Command';
 
 =head1 METHODS
 

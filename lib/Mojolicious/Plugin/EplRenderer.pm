@@ -103,7 +103,7 @@ L<Mojolicious::Plugin> and implements the following new ones.
 
     $plugin->register;
 
-Register the renderer.
+Register renderer in L<Mojolicious> application.
 
 =head1 SEE ALSO
 

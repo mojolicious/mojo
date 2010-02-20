@@ -42,6 +42,9 @@ L<Mojo::Command::Generate> and implements the following new ones.
         ['Mojolicious::Command::Generate']
     );
 
+Namespaces to search for available generator commands, defaults to
+L<Mojo::Command::Generate> and L<Mojolicious::Command::Generate>.
+
 =head1 METHODS
 
 L<Mojolicious::Command::Generate> inherits all methods from

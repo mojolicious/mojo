@@ -188,7 +188,7 @@ List available options for generator command with short descriptions.
 
     mojo generate app <AppName>
 
-Generate application directory strucure for a fully functional L<Mojo>
+Generate application directory structure for a fully functional L<Mojo>
 application.
 
 =item C<generate makefile>

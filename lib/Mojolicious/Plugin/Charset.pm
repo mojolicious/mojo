@@ -75,6 +75,8 @@ L<Mojolicious::Plugin> and implements the following new ones.
 
     $plugin->register;
 
+Register plugin hooks in L<Mojolicious> application.
+
 =head1 SEE ALSO
 
 L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.

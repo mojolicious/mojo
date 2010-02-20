@@ -122,35 +122,49 @@ implements the following new ones.
     my $connection = $tx->connection;
     $tx            = $tx->connection($connection);
 
+Connection identifier or socket.
+
 =head2 C<keep_alive>
 
     my $keep_alive = $tx->keep_alive;
     $tx            = $tx->keep_alive(1);
+
+Connection can be kept alive.
 
 =head2 C<kept_alive>
 
     my $kept_alive = $tx->kept_alive;
     $tx            = $tx->kept_alive(1);
 
+Connection has been kept alive.
+
 =head2 C<local_address>
 
     my $local_address = $tx->local_address;
     $tx               = $tx->local_address($address);
+
+Local interface address.
 
 =head2 C<local_port>
 
     my $local_port = $tx->local_port;
     $tx            = $tx->local_port($port);
 
+Local interface port.
+
 =head2 C<remote_address>
 
     my $remote_address = $tx->remote_address;
     $tx                = $tx->remote_address($address);
 
+Remote interface address.
+
 =head2 C<remote_port>
 
     my $remote_port = $tx->remote_port;
     $tx             = $tx->remote_port($port);
+
+Remote interface port.
 
 =head1 METHODS
 
@@ -161,45 +175,67 @@ implements the following new ones.
 
     $tx = $tx->client_read($chunk);
 
+Read and process client data.
+
 =head2 C<client_write>
 
     my $chunk = $tx->client_write;
+
+Write client data.
 
 =head2 C<is_paused>
 
     my $paused = $tx->is_paused;
 
+Check if transaction is paused.
+
 =head2 C<is_websocket>
 
     my $is_websocket = $tx->is_websocket;
+
+Check if transaction is a WebSocket.
 
 =head2 C<is_writing>
 
     my $writing = $tx->is_writing;
 
+Check if transaction is writing.
+
 =head2 C<pause>
 
     $tx = $tx->pause;
+
+Pause transaction, it can still read but writing is disabled while paused.
 
 =head2 C<req>
 
     my $req = $tx->req;
 
+Transaction request.
+
 =head2 C<res>
 
     my $res = $tx->res;
+
+Transaction response.
 
 =head2 C<resume>
 
     $tx = $tx->resume;
 
+Resume transaction.
+
 =head2 C<server_read>
 
     $tx = $tx->server_read($chunk);
 
+Read and process server data.
+
 =head2 C<server_write>
 
     my $chunk = $tx->server_write;
+
+Write server data.
 
 =head1 SEE ALSO
 

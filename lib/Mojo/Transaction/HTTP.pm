@@ -559,40 +559,56 @@ and implements the following new ones.
     my $cb = $tx->continue_handler_cb;
     $tx    = $tx->continue_handler_cb(sub {...});
 
+Callback to handle C<100 Continue> requests.
+
 =head2 C<continue_timeout>
 
     my $timeout = $tx->continue_timeout;
     $tx         = $tx->continue_timeout(3);
+
+Timeout for C<100 Continue> requests.
 
 =head2 C<continued>
 
     my $continued = $tx->continued;
     $tx           = $tx->continued(1);
 
+Transaction was continued.
+
 =head2 C<handler_cb>
 
     my $cb = $tx->handler_cb;
     $tx    = $tx->handler_cb(sub {...});
+
+Handler callback.
 
 =head2 C<keep_alive>
 
     my $keep_alive = $tx->keep_alive;
     $tx            = $tx->keep_alive(1);
 
+Connection can be kept alive.
+
 =head2 C<req>
 
     my $req = $tx->req;
     $tx     = $tx->req(Mojo::Message::Request->new);
+
+HTTP 1.1 request.
 
 =head2 C<res>
 
     my $res = $tx->res;
     $tx     = $tx->res(Mojo::Message::Response->new);
 
+HTTP 1.1 response.
+
 =head2 C<upgrade_cb>
 
     my $cb = $tx->upgrade_cb;
     $tx    = $tx->upgrade_cb(sub {...});
+
+WebSocket upgrade callback.
 
 =head1 METHODS
 
@@ -603,25 +619,37 @@ implements the following new ones.
 
     my $leftovers = $tx->client_leftovers;
 
+Leftovers from the client response, used for pipelining.
+
 =head2 C<client_read>
 
     $tx = $tx->client_read($chunk);
+
+Read and process client data.
 
 =head2 C<client_write>
 
     my $chunk = $tx->client_write;
 
+Write client data.
+
 =head2 C<server_leftovers>
 
     my $leftovers = $tx->server_leftovers;
+
+Leftovers from the server request, used for pipelining.
 
 =head2 C<server_read>
 
     $tx = $tx->server_read($chunk);
 
+Read and process server data.
+
 =head2 C<server_write>
 
     my $chunk = $tx->server_write;
+
+Write server data.
 
 =head1 SEE ALSO
 

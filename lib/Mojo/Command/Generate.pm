@@ -55,20 +55,29 @@ implements the following new ones.
     my $description = $generator->description;
     $generator      = $generator->description('Foo!');
 
+Short description of this command, used for the command list.
+
 =head2 C<hint>
 
     my $hint   = $generator->hint;
     $generator = $generator->hint('Foo!');
+
+Short hint shown after listing available generator commands.
 
 =head2 C<message>
 
     my $message = $generator->message;
     $generator  = $generator->message('Bar!');
 
+Short usage message shown before listing available generator commands.
+
 =head2 C<namespaces>
 
     my $namespaces = $generator->namespaces;
     $generator     = $generator->namespaces(['Mojo::Command::Generate']);
+
+Namespaces to search for available generator commands, defaults to
+L<Mojo::Command::Generate>.
 
 =head1 METHODS
 

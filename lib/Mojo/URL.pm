@@ -319,7 +319,7 @@ L<Mojo::URL> implements the following attributes.
     my $authority = $url->autority;
     $url          = $url->authority('root:pass%3Bw0rd@localhost:8080');
 
-URL authority.
+Authority part of this URL.
 
 =head2 C<base>
 
@@ -333,35 +333,35 @@ Base of this URL.
     my $fragment = $url->fragment;
     $url         = $url->fragment('foo');
 
-URL fragment.
+Fragment part of this URL.
 
 =head2 C<host>
 
     my $host = $url->host;
     $url     = $url->host('127.0.0.1');
 
-URL host.
+Host part of this URL.
 
 =head2 C<port>
 
     my $port = $url->port;
     $url     = $url->port(8080);
 
-URL port.
+Port part of this URL.
 
 =head2 C<scheme>
 
     my $scheme = $url->scheme;
     $url       = $url->scheme('http');
 
-URL scheme.
+Scheme part of this URL.
 
 =head2 C<userinfo>
 
     my $userinfo = $url->userinfo;
     $url         = $url->userinfo('root:pass%3Bw0rd');
 
-URL userinfo.
+Userinfo part of this URL.
 
 =head1 METHODS
 
@@ -379,14 +379,14 @@ Construct a new L<Mojo::URL> object.
 
     my $url2 = $url->clone;
 
-Clone URL.
+Clone this URL.
 
 =head2 C<ihost>
 
     my $ihost = $url->ihost;
     $url      = $url->ihost('xn--bcher-kva.ch');
 
-IDNA host.
+Host part of this URL in punycode format.
 
 =head2 C<is_abs>
 
@@ -406,7 +406,7 @@ Parse URL.
     $url     = $url->path('/foo/bar');
     $url     = $url->path(Mojo::Path->new);
 
-URL path.
+Path part of this URL, defaults to a L<Mojo::Path> object.
 
 =head2 C<query>
 
@@ -415,7 +415,7 @@ URL path.
     $url      = $url->query([name => 'value']);
     $url      = $url->query(Mojo::Parameters->new);
 
-URL query.
+Query part of this URL, defaults to a L<Mojo::Parameters> object.
 
 =head2 C<to_abs>
 

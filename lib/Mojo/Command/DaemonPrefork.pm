@@ -115,10 +115,14 @@ L<Mojo::Command> and implements the following new ones.
     my $description = $daemon->description;
     $daemon         = $daemon->description('Foo!');
 
+Short description of this command, used for the command list.
+
 =head2 C<usage>
 
     my $usage = $daemon->usage;
     $daemon   = $daemon->usage('Foo!');
+
+Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
@@ -128,6 +132,8 @@ and implements the following new ones.
 =head2 C<run>
 
     $daemon = $daemon->run(@ARGV);
+
+Run this command.
 
 =head1 SEE ALSO
 

@@ -68,10 +68,14 @@ implements the following new ones.
     my $description = $cgi->description;
     $cgi            = $cgi->description('Foo!');
 
+Short description of this command, used for the command list.
+
 =head2 C<usage>
 
     my $usage = $cgi->usage;
     $cgi      = $cgi->usage('Foo!');
+
+Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
@@ -81,6 +85,8 @@ the following new ones.
 =head2 C<run>
 
     $cgi = $cgi->run(@ARGV);
+
+Run this command.
 
 =head1 SEE ALSO
 

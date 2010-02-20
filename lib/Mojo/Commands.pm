@@ -146,130 +146,140 @@ Mojo::Commands - Commands
 
     use Mojo::Commands;
 
+    # Command line interface
     my $commands = Mojo::Commands->new;
     $commands->run(@ARGV);
 
 =head1 DESCRIPTION
 
-L<Mojo::Commands> is the interactive command interface to the L<Mojo>
+L<Mojo::Commands> is the interactive command line interface to the L<Mojo>
 framework.
+It will automatically detect available commands in the L<Mojo::Command>
+namespace.
+Commands are implemented by subclassing L<Mojo::Command>.
 
-L<Mojo::Commands> calls commands, usually implemented as
-L<Mojo::Command>, and is itself derived from C<Mojo::Command>. This
-means that a command can be implemented based on L<Mojo::Commands> and
-provide sub-commans (see L<Mojo::Command::Generate> for an example).
-
-Follwing is a list of Interaciteve commands and short descriptions in Mojolicious:
+These commands are available by default.
 
 =over 4
 
-=item * B<overview and help>
+=item C<help>
 
-    mojo[licious]
-    mojo[licious] help
+    mojo
+    mojo help
 
-Prints a usage statement and lists available commands and short
-descriptions (C<description> attribute).
+List available commands with short descriptions.
 
-    mojo[licious] help <command>
+    mojo help <command>
 
-Prints short usage for the command (C<usage> attribute).
+List available options for the command with short descriptions.
 
-=item * B<code generation overview and help>
+=item C<generate>
 
-    mojo[licious] generate
-    mojo[licious] generate help
+    mojo generate
+    mojo generate help
 
-Prints a usage statement, lists available generator commands and
-prints the C<hint> attribute (how to get help on a generator).
+List available generator commands with short descriptions.
 
-    mojo[licious] generate help <generator>
+    mojo generate help <generator>
 
-Prints short usage for the command (C<usage> attribute) for the
-generator specified.
+List available options for generator command with short descriptions.
 
-=item * B<code generation>
+=item C<generate app>
 
-    mojo[licious] generate app <App_name>
+    mojo generate app <AppName>
 
-Generates application directory structure (scaffolding) for a full
-Mojolicious application.
-
-In the scaffolding, a subdirectory C<script> will be created with a
-script named after the application. This script can be used to run the
-application and to run other commands as described bellow.
-
-    mojolicious generate lite_app <App_name>
-
-Generates a minimalistic single-file contained L<Mojolicious::Lite>
-application. The generated script contains the application and the
-command interface, so it can be used to run the application and to run
-other commands as described bellow.
-
-=item * B<application startup>
-
-    <script> daemon          <options>
-    <script> daemon_prefork  <options>
-    <script> cgi             <options>
-    <script> fastcgi         <options>
-
-Start the application with a stand-alone HTTP 1.1 backend, a prefork
-HTTP 1.1 backend, a CGI (where the application handles a single
-request and quites) or a FASTCGI backend (where the application runs persistently).
-
-See application help for options.
-
-Note that there is no command for running under C<mod_perl>, you need
-L<Mojo::Apache2> (possibly outdated) from CPAN for that.
-
-=item * B<application interaction>
-
-   <script> get <URL> [--headers]
-
-The C<get> command performs a complete request/response process,
-actually starting the HTTP 1.1 server backend of the appliation and requesting
-the URL with the built-in HTTP client, optionaly printing the headers
-from the response.
-
-   <script> test
-
-Runs tests in the standard C<./t>. A full Mojolicious application
-generated with the default generator conains an example test:
-C<./t/basic.t>.
-
-=item * B<general info and services>
-
-   <script> version
-   <script> generate makfile
-   <script> generate psgi
-
-Reports the versions of modules used, generates a C<Makefile.PL> and a
-C<.psgi> file (Perl Web Server Gateway Interface description) for the
+Generate application directory strucure for a fully functional L<Mojo>
 application.
 
-=back
+=item C<generate makefile>
 
+    script/myapp generate makefile
+
+Generate C<Makefile.PL> file for application.
+
+=item C<generate psgi>
+
+    script/myapp generate psgi
+
+Generate C<myapp.psgi> file for application.
+
+=item C<cgi>
+
+    mojo cgi
+    script/myapp cgi
+
+Start application with CGI backend.
+
+=item C<daemon>
+
+    mojo cgi
+    script/myapp daemon
+
+Start application with standalone HTTP 1.1 server backend.
+
+=item C<daemon_prefork>
+
+    mojo daemon_prefork
+    script/myapp daemon_prefork
+
+Start application with preforking standalone HTTP 1.1 server backend.
+
+=item C<fastcgi>
+
+    mojo fastcgi
+    script/myapp fastcgi
+
+Start application with FastCGI backend.
+
+=item C<get>
+
+   mojo get http://mojolicious.org
+   script/myapp get /foo
+
+Perform GET request to remote host or local application.
+
+=item C<test>
+
+   mojo test
+   script/myapp test
+   script/myapp test t/foo.t
+
+Runs application tests from the C<t> directory.
+
+=item C<version>
+
+    mojo version
+
+List version information for installed core and optional modules, very useful
+for debugging.
+
+=back
 
 =head1 ATTRIBUTES
 
 L<Mojo::Commands> inherits all attributes from L<Mojo::Command> and
 implements the following new ones.
 
+=head2 C<hint>
+
+    my $hint  = $commands->hint;
+    $commands = $commands->hint('Foo!');
+
+Short hint shown after listing available commands.
+
 =head2 C<message>
 
     my $message  = $commands->message;
     $commands    = $commands->message('Hello World!');
 
-Overview message to print when called with no command to
-execute. Usually set to a short usage statement and a list of
-available commands.
+Short usage message shown before listing available commands.
 
 =head2 C<namespaces>
 
     my $namespaces = $commands->namespaces;
     $commands      = $commands->namespaces(['Mojo::Command']);
 
-Namespaces to search for available commands.
+Namespaces to search for available commands, defaults to L<Mojo::Command>.
 
 =head1 METHODS
 
@@ -281,14 +291,14 @@ the following new ones.
     $commands = $commands->run;
     $commands = $commands->run(@ARGV);
 
-Loads the proper modules and executes the command. Also handles the C<help> request.
+Load and run commands.
 
 =head2 C<start>
 
     Mojo::Commands->start;
     Mojo::Commands->start(@ARGV);
 
-Intializatizes the module and calls $self->run(@_ ? @_ : @ARGV) unless reloading.
+Start the command line interface.
 
 =head1 SEE ALSO
 

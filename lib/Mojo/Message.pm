@@ -524,35 +524,49 @@ implements the following new ones.
         return $chunk;
     });
 
+Content generator callback.
+
 =head2 C<buffer>
 
     my $buffer = $message->buffer;
     $message   = $message->buffer(Mojo::ByteStream->new);
+
+Input buffer for parsing.
 
 =head2 C<content>
 
     my $content = $message->content;
     $message    = $message->content(Mojo::Content::Single->new);
 
+Content container, defaults to a L<Mojo::Content::Single> object.
+
 =head2 C<default_charset>
 
     my $charset = $message->default_charset;
     $message    = $message->default_charset('UTF-8');
+
+Default charset used for form data parsing.
 
 =head2 C<headers>
 
     my $headers = $message->headers;
     $message    = $message->headers(Mojo::Headers->new);
 
+Header container, defaults to a L<Mojo::Headers> object.
+
 =head2 C<major_version>
 
     my $major_version = $message->major_version;
     $message          = $message->major_version(1);
 
+Major version, defaults to C<1>.
+
 =head2 C<minor_version>
 
     my $minor_version = $message->minor_version;
     $message          = $message->minor_version(1);
+
+Minor version, defaults to C<1>.
 
 =head2 C<progress_cb>
 
@@ -562,6 +576,8 @@ implements the following new ones.
         print '+';
     });
 
+Progress callback.
+
 =head1 METHODS
 
 L<Mojo::Message> inherits all methods from L<Mojo::Stateful> and implements
@@ -570,6 +586,8 @@ the following new ones.
 =head2 C<at_least_version>
 
     my $success = $message->at_least_version('1.1');
+
+Check if message is at least a specific version.
 
 =head2 C<body>
 
@@ -586,13 +604,19 @@ the following new ones.
         return $chunk;
     });
 
+Helper for simplified content access.
+
 =head2 C<body_params>
 
     my $params = $message->body_params;
 
+C<POST> parameters.
+
 =head2 C<body_size>
 
     my $size = $message->body_size;
+
+Size of the body.
 
 =head2 C<to_string>
 
@@ -600,89 +624,131 @@ the following new ones.
 
     my $string = $message->build;
 
+Render whole message.
+
 =head2 C<build_body>
 
     my $string = $message->build_body;
+
+Render whole body.
 
 =head2 C<build_headers>
 
     my $string = $message->build_headers;
 
+Render all headers.
+
 =head2 C<build_start_line>
 
     my $string = $message->build_start_line;
+
+Render start line.
 
 =head2 C<cookie>
 
     my $cookie  = $message->cookie('foo');
     my @cookies = $message->cookie('foo');
 
+Access message cookies.
+
 =head2 C<fix_headers>
 
     $message = $message->fix_headers;
+
+Make sure message has all required headers for the current HTTP version.
 
 =head2 C<get_body_chunk>
 
     my $string = $message->get_body_chunk($offset);
 
+Get a chunk of body data starting from a specific position.
+
 =head2 C<get_header_chunk>
 
     my $string = $message->get_header_chunk($offset);
+
+Get a chunk of header data, starting from a specific position.
 
 =head2 C<get_start_line_chunk>
 
     my $string = $message->get_start_line_chunk($offset);
 
+Get a chunk of start line data starting from a specific position.
+
 =head2 C<has_leftovers>
 
     my $leftovers = $message->has_leftovers;
+
+CHeck if message parser has leftover data in the buffer.
 
 =head2 C<header_size>
 
     my $size = $message->header_size;
 
+Size of headers.
+
 =head2 C<is_chunked>
 
     my $chunked = $message->is_chunked;
+
+Check if message content is chunked.
 
 =head2 C<is_multipart>
 
     my $multipart = $message->is_multipart;
 
+Check if message content is multipart.
+
 =head2 C<leftovers>
 
     my $bytes = $message->leftovers;
+
+Remove leftover data from the parser buffer.
 
 =head2 C<param>
 
     my $param  = $message->param('foo');
     my @params = $message->param('foo');
 
+Access C<GET> and C<POST> parameters.
+
 =head2 C<parse>
 
     $message = $message->parse('HTTP/1.1 200 OK...');
+
+Parse message chunk.
 
 =head2 C<parse_until_body>
 
     $message = $message->parse_until_body('HTTP/1.1 200 OK...');
 
+Parse message chunk until the body is reached.
+
 =head2 C<start_line_size>
 
     my $size = $message->start_line_size;
+
+Size of the start line.
 
 =head2 C<upload>
 
     my $upload  = $message->upload('foo');
     my @uploads = $message->upload('foo');
 
+Access file uploads.
+
 =head2 C<uploads>
 
     my $uploads = $message->uploads;
+
+All file uploads.
 
 =head2 C<version>
 
     my $version = $message->version;
     $message    = $message->version('1.1');
+
+HTTP version of message.
 
 =head1 SEE ALSO
 

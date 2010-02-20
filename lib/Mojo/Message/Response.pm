@@ -250,10 +250,14 @@ and implements the following new ones.
     my $code = $res->code;
     $res     = $res->code(200);
 
+HTTP response code.
+
 =head2 C<message>
 
     my $message = $res->message;
     $res        = $res->message('OK');
+
+HTTP response message.
 
 =head1 METHODS
 
@@ -266,25 +270,37 @@ implements the following new ones.
     $res        = $res->cookies(Mojo::Cookie::Response->new);
     $req        = $req->cookies({name => 'foo', value => 'bar'});
 
+Access response cookies.
+
 =head2 C<default_message>
 
     my $message = $res->default_message;
+
+Generate default response message for code.
 
 =head2 C<fix_headers>
 
     $res = $res->fix_headers;
 
+Make sure message has all required headers for the current HTTP version.
+
 =head2 C<is_status_class>
 
     my $is_2xx = $res->is_status_class(200);
+
+Check response status class.
 
 =head2 C<parse>
 
     $res = $res->parse('HTTP/1.1 200 OK');
 
+Parse HTTP response chunk.
+
 =head2 C<parse_until_body>
 
     $res = $res->parse_until_body('HTTP/1.1 200 OK');
+
+Parse HTTP response chunk until the body is reached.
 
 =head1 SEE ALSO
 

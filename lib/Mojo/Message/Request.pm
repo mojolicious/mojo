@@ -372,23 +372,33 @@ implements the following new ones.
     my $env = $req->env;
     $req    = $req->env({});
 
+Direct access to the environment hash if available.
+
 =head2 C<method>
 
     my $method = $req->method;
     $req       = $req->method('GET');
 
+HTTP request method.
+
 =head2 C<params>
 
     my $params = $req->params;
+
+All C<GET> and C<POST> parameters, defaults to a L<Mojo::Parameters> object.
 
 =head2 C<query_params>
 
     my $params = $req->query_params;
 
+All C<GET> parameters, defaults to a L<Mojo::Parameters> object.
+
 =head2 C<url>
 
     my $url = $req->url;
     $req    = $req->url(Mojo::URL->new);
+
+HTTP request URL, defaults to a L<Mojo::URL> object.
 
 =head1 METHODS
 
@@ -401,17 +411,26 @@ implements the following new ones.
     $req        = $req->cookies(Mojo::Cookie::Request->new);
     $req        = $req->cookies({name => 'foo', value => 'bar'});
 
+Access request cookies.
+
 =head2 C<fix_headers>
 
     $req = $req->fix_headers;
+
+Make sure message has all required headers for the current HTTP version.
 
 =head2 C<is_secure>
 
     my $secure = $req->is_secure;
 
+Check if connection is secure.
+
 =head2 C<param>
 
     my $param = $req->param('foo');
+
+Access C<GET> and C<POST> parameters, defaults to a L<Mojo::Parameters>
+object.
 
 =head2 C<parse>
 
@@ -419,11 +438,15 @@ implements the following new ones.
     $req = $req->parse(REQUEST_METHOD => 'GET');
     $req = $req->parse({REQUEST_METHOD => 'GET'});
 
+Parse HTTP request chunks or environment hash.
+
 =head2 C<proxy>
 
     my $proxy = $req->proxy;
     $req      = $req->proxy('http://foo:bar@127.0.0.1:3000');
-    $req      = $req->proxy( Mojo::URL->new('http://127.0.0.1:3000')  );
+    $req      = $req->proxy(Mojo::URL->new('http://127.0.0.1:3000'));
+
+Proxy URL for message.
 
 =head1 SEE ALSO
 

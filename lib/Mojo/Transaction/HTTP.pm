@@ -374,7 +374,8 @@ sub server_write {
     my $res = $self->res;
 
     # Writing
-    if ($self->is_state('write')) {
+    my $state = $self->state;
+    if ($state eq 'write') {
 
         # Connection header
         my $headers = $res->headers;
@@ -384,12 +385,12 @@ sub server_write {
         }
 
         # Ready for next state
-        $self->state('write_start_line');
+        $state = 'write_start_line';
         $write = $res->start_line_size;
     }
 
     # Start line
-    if ($self->is_state('write_start_line')) {
+    if ($state eq 'write_start_line') {
         my $buffer = $res->get_start_line_chunk($offset);
 
         # Written
@@ -402,14 +403,14 @@ sub server_write {
 
         # Done
         if ($write <= 0) {
-            $self->state('write_headers');
+            $state  = 'write_headers';
             $offset = 0;
             $write  = $res->header_size;
         }
     }
 
     # Headers
-    if ($self->is_state('write_headers')) {
+    if ($state eq 'write_headers') {
         my $buffer = $res->get_header_chunk($offset);
 
         # Written
@@ -427,14 +428,15 @@ sub server_write {
             if ($req->method eq 'HEAD') {
 
                 # Don't send body if request method is HEAD
-                $req->is_state('done_with_leftovers')
-                  ? $self->state('done_with_leftovers')
-                  : $self->state('done');
+                $state =
+                  $req->is_state('done_with_leftovers')
+                  ? 'done_with_leftovers'
+                  : 'done';
             }
 
             # Body
             else {
-                $self->state('write_body');
+                $state  = 'write_body';
                 $offset = 0;
                 $write  = $res->body_size;
 
@@ -445,7 +447,7 @@ sub server_write {
     }
 
     # Body
-    if ($self->is_state('write_body')) {
+    if ($state eq 'write_body') {
 
         # 100 Continue
         if ($write <= 0) {
@@ -453,20 +455,21 @@ sub server_write {
             # Continue done
             if (defined $self->continued && $self->continued == 0) {
                 $self->continued(1);
-                $self->state('read');
+                $state = 'read';
 
                 # Continue
                 if ($res->code == 100) { $self->res($res->new) }
 
                 # Don't continue
-                else { $self->done }
+                else { $state = 'done' }
             }
 
             # Everything done
             elsif (!defined $self->continued) {
-                $req->is_state('done_with_leftovers')
-                  ? $self->state('done_with_leftovers')
-                  : $self->state('done');
+                $state =
+                  $req->is_state('done_with_leftovers')
+                  ? 'done_with_leftovers'
+                  : 'done';
             }
 
         }
@@ -487,12 +490,14 @@ sub server_write {
             $write = 1 if $res->is_chunked;
 
             # Done
-            $req->is_state('done_with_leftovers')
-              ? $self->state('done_with_leftovers')
-              : $self->state('done')
+            $state =
+              $req->is_state('done_with_leftovers')
+              ? 'done_with_leftovers'
+              : 'done'
               if $write <= 0 || (defined $buffer && !length $buffer);
         }
     }
+    $self->state($state);
 
     # Offsets
     $self->_offset($offset);

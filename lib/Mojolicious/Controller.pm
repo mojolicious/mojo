@@ -20,11 +20,17 @@ sub client { shift->app->client }
 sub finish {
     my $self = shift;
 
+    # Check
+    my $paused = $self->tx->is_paused;
+
     # Resume
-    $self->resume;
+    $self->resume if $paused;
 
     # Finish WebSocket
     return $self->tx->finish if $self->tx->is_websocket;
+
+    # Don't run hooks twice
+    return unless $paused;
 
     # Render
     $self->app->routes->auto_render($self);

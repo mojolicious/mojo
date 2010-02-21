@@ -146,7 +146,8 @@ sub client_write {
     my $req = $self->req;
 
     # Writing
-    if ($self->is_state('start')) {
+    my $state = $self->state;
+    if ($state eq 'start') {
 
         # Connection header
         my $headers = $req->headers;
@@ -162,12 +163,12 @@ sub client_write {
           if ($req->headers->expect || '') =~ /100-continue/;
 
         # Ready for next state
-        $self->state('write_start_line');
+        $state = 'write_start_line';
         $write = $req->start_line_size;
     }
 
     # Start line
-    if ($self->is_state('write_start_line')) {
+    if ($state eq 'write_start_line') {
         my $buffer = $req->get_start_line_chunk($offset);
 
         # Written
@@ -179,14 +180,14 @@ sub client_write {
 
         # Done
         if ($write <= 0) {
-            $self->state('write_headers');
+            $state  = 'write_headers';
             $offset = 0;
             $write  = $req->header_size;
         }
     }
 
     # Headers
-    if ($self->is_state('write_headers')) {
+    if ($state eq 'write_headers') {
         my $buffer = $req->get_header_chunk($offset);
 
         # Written
@@ -199,9 +200,7 @@ sub client_write {
         # Done
         if ($write <= 0) {
 
-            $self->_continue
-              ? $self->state('read_continue')
-              : $self->state('write_body');
+            $state  = $self->_continue ? 'read_continue' : 'write_body';
             $offset = 0;
             $write  = $req->body_size;
 
@@ -211,7 +210,7 @@ sub client_write {
     }
 
     # Body
-    if ($self->is_state('write_body')) {
+    if ($state eq 'write_body') {
         my $buffer = $req->get_body_chunk($offset);
 
         # Written
@@ -222,16 +221,15 @@ sub client_write {
         $chunk .= $buffer;
 
         # End
-        if (defined $buffer && !length $buffer) {
-            $self->state('read_response');
-        }
+        $state = 'read_response' if defined $buffer && !length $buffer;
 
         # Chunked
         $write = 1 if $req->is_chunked;
 
         # Done
-        $self->state('read_response') if $write <= 0;
+        $state = 'read_response' if $write <= 0;
     }
+    $self->state($state);
 
     # Offsets
     $self->_offset($offset);

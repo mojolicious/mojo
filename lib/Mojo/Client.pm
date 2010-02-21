@@ -540,14 +540,15 @@ sub _finish {
     my $c = $self->_connections->{$id};
 
     # Transaction
-    my $tx = $c->{tx};
+    my $old = $c->{tx};
 
     # Pipeline
-    my $pipeline = ref $tx eq 'ARRAY' ? 1 : 0;
+    my $pipeline = ref $old eq 'ARRAY' ? 1 : 0;
 
     # Drop WebSockets
-    if ($tx && !$pipeline && $tx->is_websocket) {
-        $tx = undef;
+    my $new;
+    if ($old && !$pipeline && $old->is_websocket) {
+        $old = undef;
         $self->_queued($self->_queued - 1);
         delete $self->_connections->{$id};
         $self->_drop($id);
@@ -557,28 +558,26 @@ sub _finish {
     else {
 
         # WebSocket upgrade
-        $self->_upgrade($id) if $tx;
+        $new = $self->_upgrade($id) if $old;
 
         # Drop old connection so we can reuse it
-        my $websocket = 0;
-        $websocket = 1 if $c->{tx} && !$pipeline && $c->{tx}->is_websocket;
-        $self->_drop($id) unless $tx && $websocket;
+        $self->_drop($id) unless $new;
     }
 
     # Finish normal transaction
-    if ($tx) {
+    if ($old) {
 
         # Cookies to the jar
-        for my $tx ($pipeline ? @$tx : ($tx)) { $self->_store_cookies($tx) }
+        for my $tx ($pipeline ? @$old : ($old)) { $self->_store_cookies($tx) }
 
         # Counter
-        $self->_queued($self->_queued - 1)
-          unless $c->{tx} && !$pipeline && $c->{tx}->is_websocket;
+        $self->_queued($self->_queued - 1) unless $new && !$pipeline;
 
         # Done
-        unless ($self->_redirect($c, $tx)) {
+        unless ($self->_redirect($c, $old)) {
             my $cb = $c->{cb} || $self->default_cb;
-            $tx = $c->{tx};
+            my $tx = $new;
+            $tx ||= $old;
             local $self->{tx} = $tx;
             $self->$cb($tx, $c->{history}) if $cb;
         }
@@ -834,19 +833,19 @@ sub _upgrade {
     my $c = $self->_connections->{$id};
 
     # Transaction
-    my $tx = $c->{tx};
+    my $old = $c->{tx};
 
     # Pipeline
-    return if ref $tx eq 'ARRAY';
+    return if ref $old eq 'ARRAY';
 
     # No handshake
-    return unless $tx->req->headers->upgrade;
+    return unless $old->req->headers->upgrade;
 
     # Handshake failed
-    return unless $tx->res->code eq '101';
+    return unless $old->res->code eq '101';
 
     # Start new WebSocket
-    $c->{tx} = Mojo::Transaction::WebSocket->new(handshake => $tx);
+    my $new = $c->{tx} = Mojo::Transaction::WebSocket->new(handshake => $old);
 
     # Cleanup connection
     delete $c->{reader};
@@ -859,7 +858,7 @@ sub _upgrade {
     weaken $self;
 
     # State change callback
-    $c->{tx}->state_cb(
+    $new->state_cb(
         sub {
             my $tx = shift;
 
@@ -872,6 +871,8 @@ sub _upgrade {
               : $self->ioloop->not_writing($id);
         }
     );
+
+    return $new;
 }
 
 sub _withdraw {

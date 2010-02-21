@@ -122,15 +122,27 @@ sub dispatch {
     # Nothing found
     elsif ($e) { $c->render_not_found }
 
+    # Finish
+    $self->finish($c);
+}
+
+sub finish {
+    my ($self, $c) = @_;
+
+    # Already finished
+    return if $c->stash->{finished};
+
     # Paused
-    unless ($c->tx->is_paused) {
+    return if $c->tx->is_paused;
 
-        # Hook
-        $self->plugins->run_hook_reverse(after_dispatch => $c);
+    # Hook
+    $self->plugins->run_hook_reverse(after_dispatch => $c);
 
-        # Session
-        $self->session->store($c);
-    }
+    # Session
+    $self->session->store($c);
+
+    # Finished
+    $c->stash->{finished} = 1;
 }
 
 # Bite my shiny metal ass!
@@ -425,6 +437,12 @@ Also sets up the renderer, static dispatcher and a default set of plugins.
 
 The heart of every Mojolicious application, calls the static and routes
 dispatchers for every request.
+
+=head2 C<finish>
+
+    $mojo->finish($c);
+
+Clean up after processing a request, usually called automatically.
 
 =head2 C<handler>
 

@@ -432,11 +432,9 @@ use warnings;
 
 use base 'Mojo::Base';
 use overload (
-    '0+' => sub { $_[0]->_value },
-    '""' => sub { $_[0]->_value },
+    '0+' => sub { $_[0]->{_value} },
+    '""' => sub { $_[0]->{_value} }
 );
-
-__PACKAGE__->attr('_value');
 
 sub new { shift->SUPER::new(_value => shift) }
 

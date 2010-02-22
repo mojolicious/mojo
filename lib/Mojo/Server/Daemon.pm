@@ -35,10 +35,6 @@ __PACKAGE__->attr(
 );
 __PACKAGE__->attr(websocket_timeout => 300);
 
-__PACKAGE__->attr(_connections => sub { {} });
-__PACKAGE__->attr(_listening   => sub { [] });
-__PACKAGE__->attr('_lock');
-
 sub DESTROY {
     my $self = shift;
 
@@ -46,10 +42,12 @@ sub DESTROY {
     return unless $self->ioloop;
 
     # Cleanup connections
-    for my $id (keys %{$self->_connections}) { $self->ioloop->drop($id) }
+    my $cs = $self->{_cs} || {};
+    for my $id (keys %$cs) { $self->ioloop->drop($id) }
 
     # Cleanup listen sockets
-    for my $id (@{$self->_listening}) { $self->ioloop->drop($id) }
+    return unless my $listen = $self->{_listen};
+    for my $id (@$listen) { $self->ioloop->drop($id) }
 }
 
 sub accept_lock {
@@ -57,12 +55,12 @@ sub accept_lock {
 
     # Lock
     my $flags = $blocking ? LOCK_EX : LOCK_EX | LOCK_NB;
-    my $lock = flock($self->_lock, $flags);
+    my $lock = flock($self->{_lock}, $flags);
 
     return $lock;
 }
 
-sub accept_unlock { flock(shift->_lock, LOCK_UN) }
+sub accept_unlock { flock(shift->{_lock}, LOCK_UN) }
 
 sub prepare_ioloop {
     my $self = shift;
@@ -92,7 +90,7 @@ sub prepare_lock_file {
     # Create lock file
     my $fh = IO::File->new("> $file")
       or croak qq/Can't open lock file "$file"/;
-    $self->_lock($fh);
+    $self->{_lock} = $fh;
 }
 
 sub prepare_pid_file {
@@ -251,7 +249,7 @@ sub _drop {
     my ($self, $id) = @_;
 
     # Drop connection
-    delete $self->_connections->{$id};
+    delete $self->{_cs}->{$id};
 }
 
 sub _error {
@@ -307,7 +305,7 @@ sub _listen {
         my ($loop, $id) = @_;
 
         # Add new connection
-        $self->_connections->{$id} = {tls => $options->{tls} ? 1 : 0};
+        $self->{_cs}->{$id} = {tls => $options->{tls} ? 1 : 0};
 
         # Keep alive timeout
         $loop->connection_timeout($id => $self->keep_alive_timeout);
@@ -321,7 +319,8 @@ sub _listen {
 
     # Listen
     my $id = $self->ioloop->listen($options);
-    push @{$self->_listening}, $id;
+    $self->{_listen} ||= [];
+    push @{$self->{_listen}}, $id;
 
     # Log
     my $file    = $options->{file};
@@ -339,7 +338,7 @@ sub _read {
     my ($self, $loop, $id, $chunk) = @_;
 
     # Connection
-    my $c = $self->_connections->{$id};
+    my $c = $self->{_cs}->{$id};
 
     # Transaction
     my $tx = $c->{transaction} || $c->{websocket};
@@ -362,7 +361,7 @@ sub _state {
     if ($tx->is_finished) {
 
         # Connection
-        my $c = $self->_connections->{$id};
+        my $c = $self->{_cs}->{$id};
 
         # Successful WebSocket upgrade
         my $upgraded = 0;
@@ -401,7 +400,7 @@ sub _upgrade {
     return unless $tx->req->headers->upgrade =~ /WebSocket/i;
 
     # Connection
-    my $c = $self->_connections->{$id};
+    my $c = $self->{_cs}->{$id};
 
     # WebSocket handshake handler
     my $ws = $c->{websocket} = $self->websocket_handshake_cb->($self, $tx);
@@ -433,7 +432,7 @@ sub _write {
     my ($self, $loop, $id) = @_;
 
     # Connection
-    my $c = $self->_connections->{$id};
+    my $c = $self->{_cs}->{$id};
 
     # Transaction
     return unless my $tx = $c->{transaction} || $c->{websocket};

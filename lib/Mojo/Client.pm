@@ -28,10 +28,6 @@ __PACKAGE__->attr(keep_alive_timeout => 15);
 __PACKAGE__->attr(max_redirects      => 0);
 __PACKAGE__->attr(websocket_timeout  => 300);
 
-__PACKAGE__->attr(_cache       => sub { [] });
-__PACKAGE__->attr(_connections => sub { {} });
-__PACKAGE__->attr([qw/_finite _queued/] => 0);
-
 # Singleton
 our $CLIENT;
 
@@ -43,17 +39,19 @@ sub DESTROY {
     my $self = shift;
 
     # Shortcut
-    return unless $self->ioloop;
+    return unless my $loop = $self->ioloop;
 
     # Cleanup active connections
-    for my $id (keys %{$self->_connections}) {
-        $self->ioloop->drop($id);
+    my $cs = $self->{_cs} || {};
+    for my $id (keys %$cs) {
+        $loop->drop($id);
     }
 
     # Cleanup keep alive connections
-    for my $cached (@{$self->_cache}) {
+    my $cache = $self->{_cache} || [];
+    for my $cached (@$cache) {
         my $id = $cached->[1];
-        $self->ioloop->drop($id);
+        $loop->drop($id);
     }
 }
 
@@ -164,16 +162,16 @@ sub process {
     $self->queue(@_) if @_;
 
     # Already running
-    return $self if $self->_finite;
+    return $self if $self->{_finite};
 
     # Loop is finite
-    $self->_finite(1);
+    $self->{_finite} = 1;
 
     # Start ioloop
     $self->ioloop->start;
 
     # Loop is not finite if it's still running
-    $self->_finite(undef);
+    delete $self->{_finite};
 
     return $self;
 }
@@ -379,7 +377,7 @@ sub _connect {
         $self->ioloop->writing($id);
 
         # Add new connection
-        $self->_connections->{$id} = {cb => $cb, tx => $tx};
+        $self->{_cs}->{$id} = {cb => $cb, tx => $tx};
 
         # Kept alive first transaction
         $tx = $pipeline ? $tx->[0] : $tx;
@@ -429,7 +427,7 @@ sub _connect {
         $self->ioloop->write_cb($id => sub { $self->_write(@_) });
 
         # Add new connection
-        $self->_connections->{$id} = {cb => $cb, tx => $tx};
+        $self->{_cs}->{$id} = {cb => $cb, tx => $tx};
     }
 
     return $id;
@@ -439,7 +437,7 @@ sub _connected {
     my ($self, $id) = @_;
 
     # Prepare transactions
-    my $tx = $self->_connections->{$id}->{tx};
+    my $tx = $self->{_cs}->{$id}->{tx};
     for my $tx (ref $tx eq 'ARRAY' ? @$tx : ($tx)) {
 
         # Store connection information in transaction
@@ -459,20 +457,21 @@ sub _deposit {
     my ($self, $name, $id) = @_;
 
     # Limit keep alive connections
-    while (@{$self->_cache} >= $self->max_keep_alive_connections) {
-        my $cached = shift @{$self->_cache};
+    my $cache = $self->{_cache} ||= [];
+    while (@$cache >= $self->max_keep_alive_connections) {
+        my $cached = shift @$cache;
         $self->_drop($cached->[1]);
     }
 
     # Deposit
-    push @{$self->_cache}, [$name, $id];
+    push @$cache, [$name, $id];
 }
 
 sub _drop {
     my ($self, $id) = @_;
 
     # Keep connection alive
-    if (my $tx = $self->_connections->{$id}->{tx}) {
+    if (my $tx = $self->{_cs}->{$id}->{tx}) {
 
         # Read only
         $self->ioloop->not_writing($id);
@@ -492,7 +491,7 @@ sub _drop {
     }
 
     # Drop connection
-    delete $self->_connections->{$id};
+    delete $self->{_cs}->{$id};
 }
 
 sub _error {
@@ -502,7 +501,7 @@ sub _error {
     my $message = $error || 'Unknown connection error, probably harmless.';
 
     # Transaction
-    if (my $tx = $self->_connections->{$id}->{tx}) {
+    if (my $tx = $self->{_cs}->{$id}->{tx}) {
 
         # Add error message to all transactions
         for my $tx (ref $tx eq 'ARRAY' ? @$tx : ($tx)) {
@@ -537,7 +536,7 @@ sub _finish {
     my ($self, $id) = @_;
 
     # Connection
-    my $c = $self->_connections->{$id};
+    my $c = $self->{_cs}->{$id};
 
     # Transaction
     my $old = $c->{tx};
@@ -549,8 +548,8 @@ sub _finish {
     my $new;
     if ($old && !$pipeline && $old->is_websocket) {
         $old = undef;
-        $self->_queued($self->_queued - 1);
-        delete $self->_connections->{$id};
+        $self->{_queued} -= 1;
+        delete $self->{_cs}->{$id};
         $self->_drop($id);
     }
 
@@ -571,7 +570,7 @@ sub _finish {
         for my $tx ($pipeline ? @$old : ($old)) { $self->_store_cookies($tx) }
 
         # Counter
-        $self->_queued($self->_queued - 1) unless $new && !$pipeline;
+        $self->{_queued} -= 1 unless $new && !$pipeline;
 
         # Done
         unless ($self->_redirect($c, $old)) {
@@ -584,7 +583,7 @@ sub _finish {
     }
 
     # Stop ioloop
-    $self->ioloop->stop if $self->_finite && !$self->_queued;
+    $self->ioloop->stop if $self->{_finite} && !$self->{_queued};
 }
 
 sub _fix_cookies {
@@ -658,7 +657,7 @@ sub _queue {
 
     # Pipeline
     if ($pipeline) {
-        my $c = $self->_connections->{$id};
+        my $c = $self->{_cs}->{$id};
         $c->{writer} = 0;
         $c->{reader} = 0;
     }
@@ -679,7 +678,8 @@ sub _queue {
     }
 
     # Counter
-    $self->_queued($self->_queued + 1);
+    $self->{_queued} ||= 0;
+    $self->{_queued} += 1;
 
     return $id;
 }
@@ -688,7 +688,7 @@ sub _read {
     my ($self, $loop, $id, $chunk) = @_;
 
     # Connection
-    my $c = $self->_connections->{$id};
+    my $c = $self->{_cs}->{$id};
 
     # Transaction
     if (my $tx = $c->{tx}) {
@@ -738,7 +738,7 @@ sub _redirect {
     my $nid = $self->_queue($new, $c->{cb});
 
     # Create new conenction
-    my $nc = $self->_connections->{$nid};
+    my $nc = $self->{_cs}->{$nid};
     push @$h, $tx;
     $nc->{history}   = $h;
     $nc->{redirects} = $r + 1;
@@ -751,7 +751,7 @@ sub _state {
     my ($self, $id, $tx) = @_;
 
     # Connection
-    my $c = $self->_connections->{$id};
+    my $c = $self->{_cs}->{$id};
 
     # Normal transaction
     unless (ref $c->{tx} eq 'ARRAY') {
@@ -830,7 +830,7 @@ sub _upgrade {
     my ($self, $id) = @_;
 
     # Connection
-    my $c = $self->_connections->{$id};
+    my $c = $self->{_cs}->{$id};
 
     # Transaction
     my $old = $c->{tx};
@@ -881,7 +881,8 @@ sub _withdraw {
     # Withdraw
     my $found;
     my @cache;
-    for my $cached (@{$self->_cache}) {
+    my $cache = $self->{_cache} || [];
+    for my $cached (@$cache) {
 
         # Search for name or id
         $found = $cached->[1] and next
@@ -890,7 +891,7 @@ sub _withdraw {
         # Cache again
         push @cache, $cached;
     }
-    $self->_cache(\@cache);
+    $self->{_cache} = \@cache;
 
     return $found;
 }
@@ -899,7 +900,7 @@ sub _write {
     my ($self, $loop, $id) = @_;
 
     # Connection
-    my $c = $self->_connections->{$id};
+    my $c = $self->{_cs}->{$id};
 
     # Transaction
     if (my $tx = $c->{tx}) {

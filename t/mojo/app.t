@@ -25,7 +25,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 20;
+plan tests => 23;
 
 # I was so bored I cut the pony tail off the guy in front of us.
 # Look at me, I'm a grad student. I'm 30 years old and I made $600 last year.
@@ -72,6 +72,7 @@ $tx->req->url->parse('/3/');
 $tx->req->headers->expect('100-continue');
 $tx->req->body('bar baz foo' x 128);
 $client->process($tx);
+ok(defined $tx->connection);
 is($tx->res->code,                417);
 is($tx->res->headers->connection, 'Close');
 
@@ -83,6 +84,8 @@ my $tx2 = Mojo::Transaction::HTTP->new;
 $tx2->req->method('GET');
 $tx2->req->url->parse('/5/');
 $client->process([$tx, $tx2]);
+ok(defined $tx->connection);
+ok(defined $tx2->connection);
 ok($tx->is_done);
 ok($tx2->is_done);
 

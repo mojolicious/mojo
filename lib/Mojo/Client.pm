@@ -447,6 +447,7 @@ sub _connected {
         my $remote = $self->ioloop->remote_info($id);
         $tx->remote_address($remote->{address});
         $tx->remote_port($remote->{port});
+        $tx->connection($id);
     }
 
     # Keep alive timeout

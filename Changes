@@ -15,6 +15,7 @@ This file documents the revision history for Perl extension Mojolicious.
           incompatibilities between Active Perl and Strawberry Perl.
         - Fixed a bug where WebSocket servers could not directly start
           sending messages.
+        - Fixed connection id handling in Mojo::Client.
         - Fixed multiple epoll bugs.
         - Fixed Mojo::IOLoop connection check.
         - Fixed identification headers.

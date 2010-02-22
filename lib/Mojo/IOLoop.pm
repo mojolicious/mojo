@@ -349,6 +349,9 @@ sub writing {
     # Connection
     my $c = $self->{_cs}->{$id};
 
+    # Writing again
+    delete $c->{read_only};
+
     # Socket
     return unless my $socket = $c->{socket};
 

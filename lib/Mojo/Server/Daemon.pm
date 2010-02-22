@@ -379,6 +379,10 @@ sub _state {
             delete $c->{transaction};
             delete $c->{websocket} unless $upgraded;
 
+            # Allow early writing from the server side
+            return $self->ioloop->writing($id)
+              if $upgraded && $c->{websocket}->is_writing;
+
             # Leftovers
             if (defined(my $leftovers = $tx->server_leftovers)) {
                 $tx = $c->{transaction} = $self->_build_tx($id, $c);

@@ -22,9 +22,6 @@ __PACKAGE__->attr(headers => sub { Mojo::Headers->new });
 __PACKAGE__->attr(raw_header_size => 0);
 __PACKAGE__->attr(relaxed         => 0);
 
-__PACKAGE__->attr(_body_size => 0);
-__PACKAGE__->attr('_eof');
-
 sub body_contains {
     croak 'Method "body_contains" not implemented by subclass';
 }
@@ -88,13 +85,13 @@ sub generate_body_chunk {
     $buffer->remove($written);
 
     # Fill buffer
-    if (!$self->_eof && $buffer->size < CHUNK_SIZE) {
+    if (!$self->{_eof} && $buffer->size < CHUNK_SIZE) {
 
         # Generate
         my $chunk = $self->body_cb->($self, $buffer->raw_size);
 
         # EOF
-        if (defined $chunk && !length $chunk) { $self->_eof(1) }
+        if (defined $chunk && !length $chunk) { $self->{_eof} = 1 }
 
         # Buffer chunk
         else { $buffer->add_chunk($chunk) }
@@ -104,7 +101,7 @@ sub generate_body_chunk {
     my $chunk = $buffer->to_string;
 
     # Pause or EOF
-    return $self->_eof ? '' : undef unless length $chunk;
+    return $self->{_eof} ? '' : undef unless length $chunk;
 
     return $chunk;
 }
@@ -206,12 +203,12 @@ sub parse {
 
             # Need
             my $length = $self->headers->content_length || 0;
-            my $need = $length - $self->_body_size;
+            my $need = $length - ($self->{_size} || 0);
 
             # Slurp
             if ($need > 0) {
                 my $chunk = $self->buffer->remove($need);
-                $self->_body_size($self->_body_size + length $chunk);
+                $self->{_size} = $self->{_size} + length $chunk;
                 $self->$cb($chunk);
             }
 

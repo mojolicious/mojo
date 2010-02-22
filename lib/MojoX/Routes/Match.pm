@@ -14,14 +14,12 @@ __PACKAGE__->attr(captures => sub { {} });
 __PACKAGE__->attr([qw/endpoint root tx/]);
 __PACKAGE__->attr(stack => sub { [] });
 
-__PACKAGE__->attr(_path => sub {'/'});
-
 # I'm Bender, baby, please insert liquor!
 sub new {
     my $self = shift->SUPER::new();
     my $tx   = shift;
     $self->tx($tx);
-    $self->_path($tx->req->url->path->to_string);
+    $self->{_path} = $tx->req->url->path->to_string;
     return $self;
 }
 
@@ -55,12 +53,12 @@ sub match {
     }
 
     # Path
-    my $path = $self->_path;
+    my $path = $self->{_path};
 
     # Match
     my $captures = $r->pattern->shape_match(\$path);
 
-    $self->_path($path);
+    $self->{_path} = $path;
 
     # Shaped path
     return unless $captures;
@@ -73,7 +71,7 @@ sub match {
     if ($r->is_endpoint && !$r->pattern->format) {
         if ($path =~ /^\.([^\/]+)$/) {
             $self->captures->{format} = $1;
-            $self->_path('');
+            $self->{_path} = '';
         }
     }
     $self->captures->{format} = $r->pattern->format if $r->pattern->format;
@@ -99,7 +97,7 @@ sub match {
         return $self if $self->endpoint;
 
         # Reset path
-        $self->_path($path);
+        $self->{_path} = $path;
 
         # Reset stack
         if ($r->parent) { $self->stack($snapshot) }
@@ -195,7 +193,7 @@ sub _find_route {
 
 sub _is_path_empty {
     my $self = shift;
-    return 1 if !length $self->_path || $self->_path eq '/';
+    return 1 if !length $self->{_path} || $self->{_path} eq '/';
     return;
 }
 

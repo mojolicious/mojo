@@ -15,10 +15,6 @@ __PACKAGE__->attr(continue_timeout => 5);
 __PACKAGE__->attr(req              => sub { Mojo::Message::Request->new });
 __PACKAGE__->attr(res              => sub { Mojo::Message::Response->new });
 
-__PACKAGE__->attr([qw/_continue _handled/]);
-__PACKAGE__->attr([qw/_offset _write/] => 0);
-__PACKAGE__->attr(_started => sub {time});
-
 # What's a wedding?  Webster's dictionary describes it as the act of removing
 # weeds from one's garden.
 sub client_leftovers {
@@ -54,7 +50,7 @@ sub client_read {
         if ($done && $res->code == 100) {
             $self->_new_response;
             $self->continued(1);
-            $self->_continue(0);
+            $self->{_continue} = 0;
         }
 
         # We got something else
@@ -117,16 +113,17 @@ sub client_read {
 
     # Make sure we don't wait longer than the set time for a 100 Continue
     # (defaults to 5 seconds)
-    if ($self->_continue) {
-        my $continue = $self->_continue;
-        $continue = $self->continue_timeout - (time - $self->_started);
+    if ($self->{_continue}) {
+        my $continue = $self->{_continue};
+        my $started = $self->{_started} ||= time;
+        $continue = $self->continue_timeout - (time - $started);
         $continue = 0 if $continue < 0;
-        $self->_continue($continue);
+        $self->{_continue} = $continue;
     }
 
     # 100 Continue timeout
     if ($self->is_state('read_continue')) {
-        $self->state('write_body') unless $self->_continue;
+        $self->state('write_body') unless $self->{_continue};
     }
 
     return $self;
@@ -139,8 +136,8 @@ sub client_write {
     my $chunk = '';
 
     # Offsets
-    my $offset = $self->_offset;
-    my $write  = $self->_write;
+    my $offset = $self->{_offset} ||= 0;
+    my $write  = $self->{_write}  ||= 0;
 
     # Request
     my $req = $self->req;
@@ -159,7 +156,7 @@ sub client_write {
         }
 
         # We might have to handle 100 Continue
-        $self->_continue($self->continue_timeout)
+        $self->{_continue} = $self->continue_timeout
           if ($req->headers->expect || '') =~ /100-continue/;
 
         # Ready for next state
@@ -200,7 +197,7 @@ sub client_write {
         # Done
         if ($write <= 0) {
 
-            $state  = $self->_continue ? 'read_continue' : 'write_body';
+            $state  = $self->{_continue} ? 'read_continue' : 'write_body';
             $offset = 0;
             $write  = $req->body_size;
 
@@ -232,8 +229,8 @@ sub client_write {
     $self->state($state);
 
     # Offsets
-    $self->_offset($offset);
-    $self->_write($write);
+    $self->{_offset} = $offset;
+    $self->{_write}  = $write;
 
     return $chunk;
 }
@@ -303,7 +300,7 @@ sub server_read {
     $req->parse($chunk) unless $req->has_error;
 
     # Parser error
-    my $handled = $self->_handled;
+    my $handled = $self->{_handled};
     if ($req->has_error && !$handled) {
 
         # Request entity too large
@@ -321,7 +318,7 @@ sub server_read {
         $self->state('write');
 
         # Protect handler from incoming pipelined requests
-        $self->_handled(1);
+        $self->{_handled} = 1;
     }
 
     # EOF
@@ -338,7 +335,7 @@ sub server_read {
         $self->handler_cb->($ws ? ($ws, $self) : $self);
 
         # Protect handler from incoming pipelined requests
-        $self->_handled(1);
+        $self->{_handled} = 1;
     }
 
     # Expect 100 Continue
@@ -364,8 +361,8 @@ sub server_write {
     my $chunk = '';
 
     # Offsets
-    my $offset = $self->_offset;
-    my $write  = $self->_write;
+    my $offset = $self->{_offset} ||= 0;
+    my $write  = $self->{_write}  ||= 0;
 
     # Request and response
     my $req = $self->req;
@@ -498,8 +495,8 @@ sub server_write {
     $self->state($state);
 
     # Offsets
-    $self->_offset($offset);
-    $self->_write($write);
+    $self->{_offset} = $offset;
+    $self->{_write}  = $write;
 
     return $chunk;
 }

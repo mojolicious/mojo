@@ -23,9 +23,6 @@ __PACKAGE__->attr(layout_prefix    => 'layouts');
 __PACKAGE__->attr(root             => '/');
 __PACKAGE__->attr(types            => sub { MojoX::Types->new });
 
-__PACKAGE__->attr(_inline_templates => sub { {} });
-__PACKAGE__->attr('_templates');
-
 # This is not how Xmas is supposed to be.
 # In my day Xmas was about bringing people together, not blowing them apart.
 sub new {
@@ -216,14 +213,14 @@ sub _detect_handler {
     my $class = $self->_detect_template_class;
 
     # Templates
-    my $templates = $self->_templates;
+    my $templates = $self->{_templates};
     unless ($templates) {
         $templates = $self->_list_templates;
-        $self->_templates($templates);
+        $self->{_templates} = $templates;
     }
 
     # Inline templates
-    my $inline = $self->_inline_templates->{$class}
+    my $inline = $self->{_inline_templates}->{$class}
       ||= $self->_list_inline_templates($class);
 
     # Detect

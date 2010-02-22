@@ -12,9 +12,6 @@ use Mojo::Cookie::Request;
 
 __PACKAGE__->attr(max_cookie_size => 4096);
 
-__PACKAGE__->attr(_jar => sub { {} });
-__PACKAGE__->attr(_size => 0);
-
 # I can't help but feel this is all my fault.
 # It was those North Korean fortune cookies - they were so insulting.
 # "You are a coward."
@@ -42,11 +39,11 @@ sub add {
         next if length $cookie->value > $self->max_cookie_size;
 
         # Initialize
-        $self->_jar->{$domain} ||= [];
+        $self->{_jar}->{$domain} ||= [];
 
         # Check if we already have the same cookie
         my @new;
-        for my $old (@{$self->_jar->{$domain}}) {
+        for my $old (@{$self->{_jar}->{$domain}}) {
 
             # Unique cookie id
             my $opath = $old->path;
@@ -57,13 +54,13 @@ sub add {
 
         # Add
         push @new, $cookie;
-        $self->_jar->{$domain} = \@new;
+        $self->{_jar}->{$domain} = \@new;
     }
 
     return $self;
 }
 
-sub empty { shift->_jar({}) }
+sub empty { shift->{_jar} = {} }
 
 sub find {
     my ($self, $url) = @_;
@@ -80,7 +77,7 @@ sub find {
     while ($domain =~ /[^\.]+\.[^\.]+|localhost$/) {
 
         # Nothing
-        next unless my $jar = $self->_jar->{$domain};
+        next unless my $jar = $self->{_jar}->{$domain};
 
         # Look inside
         my @new;
@@ -112,7 +109,7 @@ sub find {
             # Not expired
             push @new, $cookie;
         }
-        $self->_jar->{$domain} = \@new;
+        $self->{_jar}->{$domain} = \@new;
     }
 
     # Remove leading dot or part

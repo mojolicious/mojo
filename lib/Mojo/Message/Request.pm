@@ -14,8 +14,6 @@ __PACKAGE__->attr(env => sub { {} });
 __PACKAGE__->attr(method => 'GET');
 __PACKAGE__->attr(url => sub { Mojo::URL->new });
 
-__PACKAGE__->attr('_params');
-
 # Start line regex
 my $START_LINE_RE = qr/
     ^\s*                                                         # Start
@@ -85,8 +83,8 @@ sub is_secure {
 
 sub param {
     my $self = shift;
-    $self->_params($self->params) unless $self->_params;
-    return $self->_params->param(@_);
+    $self->{_params} = $self->params unless $self->{_params};
+    return $self->{_params}->param(@_);
 }
 
 sub params {

@@ -21,8 +21,6 @@ __PACKAGE__->attr(
     }
 );
 
-__PACKAGE__->attr(_finished => 0);
-
 sub client_read  { shift->server_read(@_) }
 sub client_write { shift->server_write(@_) }
 sub connection   { shift->handshake->connection(@_) }
@@ -31,7 +29,7 @@ sub finish {
     my $self = shift;
 
     # Still writing
-    return $self->_finished(1) if $self->write_buffer->size;
+    return $self->{_finished} = 1 if $self->write_buffer->size;
 
     # Finished
     $self->state('done');
@@ -89,7 +87,7 @@ sub server_write {
 
     # Not writing anymore
     unless ($self->write_buffer->size) {
-        $self->_finished ? $self->state('done') : $self->state('read');
+        $self->{_finished} ? $self->state('done') : $self->state('read');
     }
 
     # Empty buffer

@@ -23,8 +23,6 @@ __PACKAGE__->attr(content => sub { Mojo::Content::Single->new });
 __PACKAGE__->attr(default_charset                   => 'UTF-8');
 __PACKAGE__->attr([qw/major_version minor_version/] => 1);
 
-__PACKAGE__->attr([qw/_body_params _cookies _uploads/]);
-
 # I'll keep it short and sweet. Family. Religion. Friendship.
 # These are the three demons you must slay if you wish to succeed in
 # business.
@@ -81,7 +79,7 @@ sub body_params {
     my $self = shift;
 
     # Cached
-    return $self->_body_params if $self->_body_params;
+    return $self->{_body_params} if $self->{_body_params};
 
     my $params = Mojo::Parameters->new;
     my $type = $self->headers->content_type || '';
@@ -133,7 +131,7 @@ sub body_params {
     }
 
     # Cache
-    return $self->_body_params($params)->_body_params;
+    return $self->{_body_params} = $params;
 }
 
 sub body_size { shift->content->body_size }
@@ -201,7 +199,7 @@ sub cookie {
     return unless $name;
 
     # Map
-    unless ($self->_cookies) {
+    unless ($self->{_cookies}) {
         my $cookies = {};
         for my $cookie (@{$self->cookies}) {
             my $cname = $cookie->name;
@@ -218,11 +216,11 @@ sub cookie {
         }
 
         # Cache
-        $self->_cookies($cookies);
+        $self->{_cookies} = $cookies;
     }
 
     # Multiple
-    my $cookies = $self->_cookies->{$name};
+    my $cookies = $self->{_cookies}->{$name};
     my @cookies;
     @cookies = ref $cookies eq 'ARRAY' ? @$cookies : ($cookies) if $cookies;
 
@@ -328,7 +326,7 @@ sub upload {
     return unless $name;
 
     # Map
-    unless ($self->_uploads) {
+    unless ($self->{_uploads}) {
         my $uploads = {};
         for my $upload (@{$self->uploads}) {
             my $uname = $upload->name;
@@ -345,11 +343,11 @@ sub upload {
         }
 
         # Cache
-        $self->_uploads($uploads);
+        $self->{_uploads} = $uploads;
     }
 
     # Multiple
-    my $uploads = $self->_uploads->{$name};
+    my $uploads = $self->{_uploads}->{$name};
     my @uploads;
     @uploads = ref $uploads eq 'ARRAY' ? @$uploads : ($uploads) if $uploads;
 

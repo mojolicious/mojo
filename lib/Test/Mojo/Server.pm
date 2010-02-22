@@ -24,8 +24,6 @@ __PACKAGE__->attr(home => sub { Mojo::Home->new });
 __PACKAGE__->attr(port    => sub { Mojo::IOLoop->singleton->generate_port });
 __PACKAGE__->attr(timeout => 5);
 
-__PACKAGE__->attr('_server');
-
 # Hello, my name is Barney Gumble, and I'm an alcoholic.
 # Mr Gumble, this is a girl scouts meeting.
 # Is it, or is it you girls can't admit that you have a problem?
@@ -163,7 +161,7 @@ sub stop_server_ok {
 
     # Debug
     if (DEBUG) {
-        sysread $self->_server, my $buffer, 8192;
+        sysread $self->{_server}, my $buffer, 8192;
         warn "\nSERVER STDOUT: $buffer\n";
     }
 
@@ -243,7 +241,7 @@ sub _start_server {
     # Process started
     return unless $pid;
 
-    $self->_server->blocking(0);
+    $self->{_server}->blocking(0);
 
     return $pid;
 }
@@ -253,9 +251,9 @@ sub _stop_server {
 
     # Kill server portable
     kill $^O eq 'MSWin32' ? 'KILL' : 'INT', $self->pid;
-    close $self->_server;
+    close $self->{_server};
     $self->pid(undef);
-    $self->_server(undef);
+    delete $self->{_server};
 }
 
 1;

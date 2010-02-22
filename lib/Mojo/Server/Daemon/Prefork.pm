@@ -23,10 +23,6 @@ __PACKAGE__->attr(max_servers                           => 100);
 __PACKAGE__->attr(max_spare_servers                     => 10);
 __PACKAGE__->attr([qw/min_spare_servers start_servers/] => 5);
 
-__PACKAGE__->attr(_child_poll => sub { IO::Poll->new });
-__PACKAGE__->attr([qw/_child_read _child_write _cleanup _spawn/]);
-__PACKAGE__->attr(_children => sub { {} });
-
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 8192;
 
 # Marge? Since I'm not talking to Lisa,
@@ -62,7 +58,7 @@ sub child { shift->ioloop->start }
 
 sub child_status {
     my ($self, $status) = @_;
-    $self->_child_write->syswrite("$$ $status\n")
+    $self->{_child_write}->syswrite("$$ $status\n")
       or croak "Can't write to parent: $!";
 }
 
@@ -106,7 +102,8 @@ sub run {
     # Pipe for child communication
     pipe($self->{_child_read}, $self->{_child_write})
       or croak "Can't create pipe: $!";
-    $self->_child_poll->mask($self->_child_read, POLLIN);
+    $self->{_child_poll} = IO::Poll->new;
+    $self->{_child_poll}->mask($self->{_child_read}, POLLIN);
 
     # Parent signals
     my $done = 0;
@@ -119,7 +116,8 @@ sub run {
         $self->app;
 
         # Bring all children to a greceful shutdown
-        kill 'HUP', $_ for keys %{$self->_children};
+        my $children = $self->{_children} || {};
+        kill 'HUP', $_ for keys %$children;
     };
 
     # Preload application
@@ -134,8 +132,8 @@ sub run {
     $self->_spawn_child for (1 .. $self->start_servers);
 
     # We try to make spawning and killing as smooth as possible
-    $self->_cleanup(time + $self->cleanup_interval);
-    $self->_spawn(1);
+    $self->{_cleanup} = time + $self->cleanup_interval;
+    $self->{_spawn}   = 1;
 
     # Mainloop
     while (!$done) {
@@ -150,7 +148,8 @@ sub run {
 
 sub _cleanup_children {
     my $self = shift;
-    for my $pid (keys %{$self->_children}) {
+    my $children = $self->{_children} || {};
+    for my $pid (keys %$children) {
         delete $self->_children->{$pid} unless kill 0, $pid;
     }
 }
@@ -159,13 +158,14 @@ sub _kill_children {
     my $self = shift;
 
     # Close pipe
-    $self->_child_read(undef);
+    $self->{_child_read} = undef;
 
     # Kill all children
-    while (%{$self->_children}) {
+    my $children = $self->{_children} || {};
+    while (%$children) {
 
         # Die die die
-        for my $pid (keys %{$self->_children}) {
+        for my $pid (keys %$children) {
             $self->app->log->debug("Killing prefork child $pid.") if DEBUG;
             kill 'TERM', $pid;
         }
@@ -185,29 +185,30 @@ sub _manage_children {
     my $self = shift;
 
     # Make sure we have enough idle processes
+    my $children = $self->{_children} || {};
     my @idle = sort { $a <=> $b }
-      grep { ($self->_children->{$_}->{state} || '') eq 'idle' }
-      keys %{$self->_children};
+      grep { ($children->{$_}->{state} || '') eq 'idle' }
+      keys %$children;
 
     # Debug
     if (DEBUG) {
         my $idle  = @idle;
-        my $total = keys %{$self->_children};
-        my $spawn = $self->_spawn;
+        my $total = keys %$children;
+        my $spawn = $self->{_spawn};
         $self->app->log->debug(
             "$idle of $total children idle, 1 listen (spawn $spawn).");
     }
 
     # Need more children
     if (@idle < $self->min_spare_servers) {
-        for (1 .. $self->_spawn) {
-            last if $self->max_servers <= keys %{$self->_children};
+        for (1 .. $self->{_spawn}) {
+            last if $self->max_servers <= keys %$children;
             $self->_spawn_child;
         }
 
         # Spawn counter
-        $self->_spawn($self->_spawn * 2);
-        $self->_spawn(8) if $self->_spawn > 8;
+        $self->{_spawn} = $self->{_spawn} * 2;
+        $self->{_spawn} = 8 if $self->{_spawn} > 8;
     }
 
     # Too many children
@@ -216,21 +217,21 @@ sub _manage_children {
         # Kill one at a time
         my $timeout = time - $self->idle_timeout;
         for my $idle (@idle) {
-            next unless $timeout > $self->_children->{$idle}->{time};
+            next unless $timeout > $children->{$idle}->{time};
             kill 'HUP', $idle;
             $self->app->log->debug("Prefork child $idle stopped.") if DEBUG;
 
             # Spawn counter
-            $self->_spawn($self->_spawn / 2) if $self->_spawn >= 2;
+            $self->{_spawn} = $self->_spawn / 2 if $self->{_spawn} >= 2;
 
             last;
         }
     }
 
     # Remove dead child processes every 30 seconds
-    if (time > $self->_cleanup) {
+    if (time > $self->{_cleanup}) {
         $self->_cleanup_children;
-        $self->_cleanup(time + $self->cleanup_interval);
+        $self->{_cleanup} = time + $self->cleanup_interval;
     }
 }
 
@@ -238,11 +239,12 @@ sub _read_messages {
     my $self = shift;
 
     # Read messages
-    $self->_child_poll->poll(1);
-    my @readers = $self->_child_poll->handles(POLLIN);
+    my $poll = $self->{_child_poll};
+    $poll->poll(1);
+    my @readers = $poll->handles(POLLIN);
     my $buffer  = '';
     if (@readers) {
-        return unless $self->_child_read->sysread(my $chunk, CHUNK_SIZE);
+        return unless $self->{_child_read}->sysread(my $chunk, CHUNK_SIZE);
         $buffer .= $chunk;
     }
 
@@ -261,9 +263,9 @@ sub _read_messages {
         my $state = $2;
 
         # Update status
-        if ($state eq 'done') { delete $self->_children->{$pid} }
+        if ($state eq 'done') { delete $self->{_children}->{$pid} }
         else {
-            $self->_children->{$pid} = {
+            $self->{_children}->{$pid} = {
                 state => $state,
                 time  => time
             };
@@ -275,7 +277,7 @@ sub _reap_child {
     my $self = shift;
     while ((my $child = waitpid(-1, WNOHANG)) > 0) {
         $self->app->log->debug("Prefork child $child died.") if DEBUG;
-        delete $self->_children->{$child};
+        delete $self->{_children}->{$child};
     }
 }
 
@@ -287,7 +289,7 @@ sub _spawn_child {
 
     # Parent takes care of child
     if ($child) {
-        $self->_children->{$child} = {state => 'idle', time => time};
+        $self->{_children}->{$child} = {state => 'idle', time => time};
     }
 
     # Child
@@ -307,8 +309,8 @@ sub _spawn_child {
         $self->app->log->debug('Prefork child started.') if DEBUG;
 
         # No need for child reader
-        close($self->_child_read);
-        $self->_child_poll(undef);
+        close($self->{_child_read});
+        delete $self->{_child_poll};
 
         # Parent will send a HUP signal when there are too many children idle
         my $done = 0;
@@ -325,7 +327,7 @@ sub _spawn_child {
 
         # Done
         $self->child_status('done');
-        $self->_child_write(undef);
+        delete $self->{_child_write};
         exit 0;
     }
 

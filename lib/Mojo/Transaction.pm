@@ -13,8 +13,6 @@ __PACKAGE__->attr([qw/connection kept_alive/]);
 __PACKAGE__->attr([qw/local_address local_port remote_port/]);
 __PACKAGE__->attr(keep_alive => 0);
 
-__PACKAGE__->attr([qw/_forwarded_for _real_state/]);
-
 # Please don't eat me! I have a wife and kids. Eat them!
 sub client_read  { croak 'Method "client_read" not implemented by subclass' }
 sub client_write { croak 'Method "client_write" not implemented by subclass' }
@@ -32,10 +30,10 @@ sub pause {
     my $self = shift;
 
     # Already paused
-    return $self if $self->_real_state;
+    return $self if $self->{_real_state};
 
     # Save state
-    $self->_real_state($self->state);
+    $self->{_real_state} = $self->state;
 
     # Pause
     $self->state('paused');
@@ -60,7 +58,7 @@ sub remote_address {
     if ($ENV{MOJO_REVERSE_PROXY}) {
 
         # Forwarded
-        my $forwarded = $self->_forwarded_for;
+        my $forwarded = $self->{_forwarded_for};
         return $forwarded if $forwarded;
 
         # Reverse proxy
@@ -68,7 +66,7 @@ sub remote_address {
 
             # Real address
             if ($forwarded =~ /([^,\s]+)$/) {
-                $self->_forwarded_for($1);
+                $self->{_forwarded_for} = $1;
                 return $1;
             }
         }
@@ -85,10 +83,10 @@ sub resume {
     my $self = shift;
 
     # Not paused
-    return unless my $state = $self->_real_state;
+    return unless my $state = $self->{_real_state};
 
     # Resume
-    $self->_real_state(undef);
+    delete $self->{_real_state};
     $self->state($state);
 
     return $self;

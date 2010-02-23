@@ -202,7 +202,8 @@ sub parse {
 
             # Need
             my $length = $self->headers->content_length || 0;
-            my $need = $length - ($self->{_size} || 0);
+            $self->{_size} ||= 0;
+            my $need = $length - $self->{_size};
 
             # Slurp
             if ($need > 0) {

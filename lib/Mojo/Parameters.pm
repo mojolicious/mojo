@@ -123,8 +123,8 @@ sub parse {
         my $value = $2;
 
         # Replace "+" with whitespace
-        $name  =~ s/\+/\ /g;
-        $value =~ s/\+/\ /g;
+        $name  =~ s/\+/\ /g if $name;
+        $value =~ s/\+/\ /g if $value;
 
         # Unescape
         $name  = b($name)->url_unescape->to_string;

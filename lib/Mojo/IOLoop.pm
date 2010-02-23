@@ -707,8 +707,11 @@ sub _read {
     # Connection
     my $c = $self->{_cs}->{$id};
 
+    # Socket
+    return unless defined(my $socket = $c->{socket});
+
     # Read chunk
-    my $read = $c->{socket}->sysread(my $buffer, CHUNK_SIZE, 0);
+    my $read = $socket->sysread(my $buffer, CHUNK_SIZE, 0);
 
     # Read error
     return $self->_error($id, $!)
@@ -752,6 +755,9 @@ sub _spin {
     # Prepare
     return if $self->_prepare;
 
+    # Events
+    my (@error, @hup, @read, @write);
+
     # KQueue
     my $loop = $self->{_loop};
     if (KQUEUE) {
@@ -762,7 +768,6 @@ sub _spin {
         die "KQueue error: $@" if $@;
 
         # Events
-        my (@error, @hup, @read, @write);
         for my $kev (@ret) {
             my ($fd, $filter, $flags, $fflags) = @$kev;
 
@@ -782,18 +787,6 @@ sub _spin {
             # Write
             push @write, $id if $filter == KQUEUE_WRITE;
         }
-
-        # Read
-        $self->_read($_) for @read;
-
-        # Write
-        $self->_write($_) for @write;
-
-        # Error
-        $self->_error($_) for @error;
-
-        # HUP
-        $self->_hup($_) for @hup;
     }
 
     # Epoll
@@ -801,16 +794,16 @@ sub _spin {
         $loop->poll($self->timeout);
 
         # Read
-        $self->_read("$_") for $loop->handles(EPOLL_POLLIN);
+        push @read, $_ for $loop->handles(EPOLL_POLLIN);
 
         # Write
-        $self->_write("$_") for $loop->handles(EPOLL_POLLOUT);
+        push @write, $_ for $loop->handles(EPOLL_POLLOUT);
 
         # Error
-        $self->_error("$_", $!) for $loop->handles(EPOLL_POLLERR);
+        push @error, $_ for $loop->handles(EPOLL_POLLERR);
 
         # HUP
-        $self->_hup("$_") for $loop->handles(EPOLL_POLLHUP);
+        push @hup, $_ for $loop->handles(EPOLL_POLLHUP);
     }
 
     # Poll
@@ -818,17 +811,29 @@ sub _spin {
         $loop->poll($self->timeout);
 
         # Read
-        $self->_read("$_") for $loop->handles(POLLIN);
+        push @read, $_ for $loop->handles(POLLIN);
 
         # Write
-        $self->_write("$_") for $loop->handles(POLLOUT);
+        push @write, $_ for $loop->handles(POLLOUT);
 
         # Error
-        $self->_error("$_", $!) for $loop->handles(POLLERR);
+        push @error, $_ for $loop->handles(POLLERR);
 
         # HUP
-        $self->_hup("$_") for $loop->handles(POLLHUP);
+        push @hup, $_ for $loop->handles(POLLHUP);
     }
+
+    # Read
+    $self->_read($_) for @read;
+
+    # Write
+    $self->_write($_) for @write;
+
+    # Error
+    $self->_error($_) for @error;
+
+    # HUP
+    $self->_hup($_) for @hup;
 
     # Timers
     $self->_timing;

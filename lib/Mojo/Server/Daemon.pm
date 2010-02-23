@@ -42,15 +42,15 @@ sub DESTROY {
     my $self = shift;
 
     # Shortcut
-    return unless $self->ioloop;
+    return unless my $loop = $self->ioloop;
 
     # Cleanup connections
     my $cs = $self->{_cs} || {};
-    for my $id (keys %$cs) { $self->ioloop->drop($id) }
+    for my $id (keys %$cs) { $loop->drop($id) }
 
     # Cleanup listen sockets
     return unless my $listen = $self->{_listen};
-    for my $id (@$listen) { $self->ioloop->drop($id) }
+    for my $id (@$listen) { $loop->drop($id) }
 }
 
 sub accept_lock {
@@ -69,20 +69,21 @@ sub prepare_ioloop {
     my $self = shift;
 
     # Lock callback
-    $self->ioloop->lock_cb(sub { $self->accept_lock($_[1]) });
+    my $loop = $self->ioloop;
+    $loop->lock_cb(sub { $self->accept_lock($_[1]) });
 
     # Unlock callback
-    $self->ioloop->unlock_cb(sub { $self->accept_unlock });
+    $loop->unlock_cb(sub { $self->accept_unlock });
 
     # Stop ioloop on HUP signal
-    $SIG{HUP} = sub { $self->ioloop->stop };
+    $SIG{HUP} = sub { $loop->stop };
 
     # Listen
     my $listen = $self->listen || 'http://*:3000';
     $self->_listen($_) for split ',', $listen;
 
     # Max clients
-    $self->ioloop->max_connections($self->max_clients);
+    $loop->max_connections($self->max_clients);
 }
 
 sub prepare_lock_file {
@@ -197,17 +198,19 @@ sub _build_tx {
     $tx->connection($id);
 
     # Store connection information
-    my $local = $self->ioloop->local_info($id);
+    my $loop  = $self->ioloop;
+    my $local = $loop->local_info($id);
     $tx->local_address($local->{address});
     $tx->local_port($local->{port});
-    my $remote = $self->ioloop->remote_info($id);
+    my $remote = $loop->remote_info($id);
     $tx->remote_address($remote->{address});
     $tx->remote_port($remote->{port});
 
     # TLS
     if ($c->{tls}) {
-        $tx->req->url->scheme('https');
-        $tx->req->url->base->scheme('https');
+        my $url = $tx->req->url;
+        $url->scheme('https');
+        $url->base->scheme('https');
     }
 
     # Weaken

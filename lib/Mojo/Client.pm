@@ -437,21 +437,24 @@ sub _connected {
     my ($self, $id) = @_;
 
     # Prepare transactions
-    my $tx = $self->{_cs}->{$id}->{tx};
+    my $loop = $self->ioloop;
+    my $tx   = $self->{_cs}->{$id}->{tx};
     for my $tx (ref $tx eq 'ARRAY' ? @$tx : ($tx)) {
 
+        # Connection
+        $tx->connection($id);
+
         # Store connection information in transaction
-        my $local = $self->ioloop->local_info($id);
+        my $local = $loop->local_info($id);
         $tx->local_address($local->{address});
         $tx->local_port($local->{port});
-        my $remote = $self->ioloop->remote_info($id);
+        my $remote = $loop->remote_info($id);
         $tx->remote_address($remote->{address});
         $tx->remote_port($remote->{port});
-        $tx->connection($id);
     }
 
     # Keep alive timeout
-    $self->ioloop->connection_timeout($id => $self->keep_alive_timeout);
+    $loop->connection_timeout($id => $self->keep_alive_timeout);
 }
 
 sub _deposit {

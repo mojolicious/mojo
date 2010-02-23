@@ -13,6 +13,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added more reference docs.
         - Removed hot deployment support for Windows because of
           incompatibilities between Active Perl and Strawberry Perl.
+        - Made process id and lock file defaults more userfriendly in
+          Mojo::Server::Daemon.
         - Fixed a bug where WebSocket servers could not directly start
           sending messages.
         - Fixed connection id handling in Mojo::Client.

@@ -6,7 +6,6 @@ use strict;
 use warnings;
 
 use base 'Mojo::Server::Daemon';
-use bytes;
 
 use Carp 'croak';
 use IO::File;

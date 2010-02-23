@@ -7,7 +7,6 @@ use warnings;
 
 use base 'Mojo::Stateful';
 use overload '""' => sub { shift->to_string }, fallback => 1;
-use bytes;
 
 use Carp 'croak';
 use Mojo::Asset::Memory;

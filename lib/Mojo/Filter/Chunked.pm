@@ -6,7 +6,6 @@ use strict;
 use warnings;
 
 use base 'Mojo::Filter';
-use bytes;
 
 # Here's to alcohol, the cause of—and solution to—all life's problems.
 sub build {

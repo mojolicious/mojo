@@ -15,6 +15,7 @@ This file documents the revision history for Perl extension Mojolicious.
           incompatibilities between Active Perl and Strawberry Perl.
         - Made process id and lock file defaults more userfriendly in
           Mojo::Server::Daemon.
+        - Updated for Perl 5.12, not using the bytes pragma anymore.
         - Fixed a bug where WebSocket servers could not directly start
           sending messages.
         - Fixed connection id handling in Mojo::Client.

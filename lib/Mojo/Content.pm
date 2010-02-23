@@ -6,7 +6,6 @@ use strict;
 use warnings;
 
 use base 'Mojo::Stateful';
-use bytes;
 
 use Carp 'croak';
 use Mojo::ByteStream;

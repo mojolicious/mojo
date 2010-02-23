@@ -6,7 +6,6 @@ use strict;
 use warnings;
 
 use base 'Mojo::Base';
-use bytes;
 
 use Carp 'croak';
 use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;

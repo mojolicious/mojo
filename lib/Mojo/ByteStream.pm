@@ -7,7 +7,6 @@ use warnings;
 
 use base 'Mojo::Base';
 use overload '""' => sub { shift->to_string }, fallback => 1;
-use bytes;
 
 # These are core modules since 5.8, no need for pure-Perl implementations
 # (even though they would be simple)
@@ -473,9 +472,6 @@ sub hmac_md5_sum {
 sub html_escape {
     my $self = shift;
 
-    # Character semantics
-    no bytes;
-
     my $escaped = '';
     for (1 .. length $self->{bytestream}) {
 
@@ -516,9 +512,6 @@ sub md5_sum {
 
 sub punycode_decode {
     my $self = shift;
-
-    # Character semantics
-    no bytes;
 
     # Input
     my $input = $self->{bytestream};
@@ -579,9 +572,6 @@ sub punycode_decode {
 
 sub punycode_encode {
     my $self = shift;
-
-    # Character semantics
-    no bytes;
 
     # Input
     my $input  = $self->{bytestream};
@@ -754,9 +744,6 @@ sub url_unescape {
 
 sub xml_escape {
     my $self = shift;
-
-    # Character semantics
-    no bytes;
 
     # Replace "&", "<", ">", """ and "'"
     for ($self->{bytestream}) {

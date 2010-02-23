@@ -6,7 +6,6 @@ use strict;
 use warnings;
 
 use base 'Mojo::Content';
-use bytes;
 
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;

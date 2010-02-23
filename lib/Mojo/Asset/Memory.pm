@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use base 'Mojo::Asset';
-use bytes;
+use utf8;
 
 use Carp 'croak';
 use IO::File;
@@ -24,6 +24,7 @@ sub new {
 
 sub add_chunk {
     my ($self, $chunk) = @_;
+    utf8::encode($chunk) if utf8::is_utf8($chunk);
     $self->{content} .= $chunk;
     return $self;
 }

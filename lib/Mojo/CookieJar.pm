@@ -6,7 +6,6 @@ use strict;
 use warnings;
 
 use base 'Mojo::Base';
-use bytes;
 
 use Mojo::Cookie::Request;
 

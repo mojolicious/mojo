@@ -222,7 +222,7 @@ sub _manage_children {
             $self->app->log->debug("Prefork child $idle stopped.") if DEBUG;
 
             # Spawn counter
-            $self->{_spawn} = $self->_spawn / 2 if $self->{_spawn} >= 2;
+            $self->{_spawn} = $self->{_spawn} / 2 if $self->{_spawn} >= 2;
 
             last;
         }

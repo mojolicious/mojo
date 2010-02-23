@@ -8,6 +8,7 @@ use warnings;
 use base 'Mojo::Base';
 
 use Carp 'croak';
+use Errno qw/EAGAIN EWOULDBLOCK/;
 use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
 use IO::Socket;
 use Mojo::ByteStream;
@@ -713,9 +714,18 @@ sub _read {
     # Read chunk
     my $read = $socket->sysread(my $buffer, CHUNK_SIZE, 0);
 
-    # Read error
-    return $self->_error($id, $!)
-      unless defined $read && defined $buffer && length $buffer;
+    # Error
+    unless (defined $read) {
+
+        # Retry
+        return if $! == EAGAIN || $! == EWOULDBLOCK;
+
+        # Read error
+        return $self->_error($id, $!);
+    }
+
+    # EOF
+    return $self->_hup($id) if $read == 0;
 
     # Callback
     my $event = $c->{read};
@@ -912,8 +922,15 @@ sub _write {
     # Write
     my $written = $socket->syswrite($chunk, length $chunk);
 
-    # Write error
-    return $self->_error($id, $!) unless defined $written;
+    # Error
+    unless (defined $written) {
+
+        # Retry
+        return if $! == EAGAIN || $! == EWOULDBLOCK;
+
+        # Write error
+        return $self->_error($id, $!);
+    }
 
     # Remove written chunk from buffer
     $buffer->remove($written);

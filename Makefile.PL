@@ -50,6 +50,7 @@ WriteMakefile(
         'Data::Dumper'          => 0,
         'Digest::MD5'           => 0,
         'Encode'                => 0,
+        'Errno'                 => 0,
         'ExtUtils::MakeMaker'   => 0,
         'File::Basename'        => 0,
         'File::Copy'            => 0,

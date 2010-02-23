@@ -6,7 +6,6 @@ use strict;
 use warnings;
 
 use base 'Mojo::Asset';
-use utf8;
 
 use Carp 'croak';
 use IO::File;

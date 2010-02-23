@@ -6,7 +6,6 @@ use strict;
 use warnings;
 
 use base 'Mojo::Asset';
-use utf8;
 
 # We can't use File::Temp because there is no seek support in the version
 # shipped with Perl 5.8

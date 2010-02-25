@@ -10,7 +10,9 @@ use base 'Mojo::Base';
 use Mojo::ByteStream 'b';
 use Storable qw/freeze thaw/;
 
+__PACKAGE__->attr('cookie_domain');
 __PACKAGE__->attr(cookie_name        => 'mojolicious');
+__PACKAGE__->attr(cookie_path        => '/');
 __PACKAGE__->attr(default_expiration => 3600);
 
 # Bender, quit destroying the universe!
@@ -52,6 +54,11 @@ sub store {
     # Expiration
     my $expires = $session->{expires} ||= time + $self->default_expiration;
 
+    # Options
+    my $options = {expires => $expires, path => $self->cookie_path};
+    my $domain = $self->cookie_domain;
+    $options->{domain} = $domain if $domain;
+
     # Freeze
     my $value = freeze $session;
 
@@ -60,8 +67,7 @@ sub store {
     $value =~ s/\n//g;
 
     # Session cookie
-    $c->signed_cookie($self->cookie_name, $value,
-        {expires => $expires, path => '/'});
+    $c->signed_cookie($self->cookie_name, $value, $options);
 }
 
 1;
@@ -93,6 +99,13 @@ changes with a signature.
 
 L<MojoX::Session::Simple> implements the following attributes.
 
+=head2 C<cookie_domain>
+
+    my $domain = $session->cookie_domain;
+    $session   = $session->cookie_domain('.example.com');
+
+Domain for session cookie, not defined by default.
+
 =head2 C<cookie_name>
 
     my $name = $session->cookie_name;
@@ -100,6 +113,13 @@ L<MojoX::Session::Simple> implements the following attributes.
 
 Name of the signed cookie used to store session data, defaults to
 C<mojolicious>.
+
+=head2 C<cookie_path>
+
+    my $path = $session->cookie_path;
+    $session = $session->cookie_path('/foo');
+
+Path for session cookie, defaults to C</>.
 
 =head2 C<default_expiration>
 

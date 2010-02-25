@@ -11,7 +11,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 156;
+plan tests => 160;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -231,3 +231,8 @@ $t->get_ok('/shortcut/ctrl')->status_is(200)
 $t->get_ok('/shortcut/act')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('act');
+
+# Session with domain
+$t->get_ok('/foo/session')->status_is(200)
+  ->header_like('Set-Cookie' => qr/; Domain=\.example\.com/)
+  ->content_is('Bender rockzzz!');

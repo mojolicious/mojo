@@ -35,6 +35,9 @@ sub startup {
     # Default handler
     $self->renderer->default_handler('epl');
 
+    # Session domain
+    $self->session->cookie_domain('.example.com');
+
     # Routes
     my $r = $self->routes;
 
@@ -70,13 +73,16 @@ sub startup {
 
     # /shortcut/act
     # /shortcut/ctrl
-    # /shortcut/ctrl-act - Shortcuts to controller#action
+    # /shortcut/ctrl-act - shortcuts to controller#action
     $r->route('/shortcut/ctrl-act')
       ->to('foo#config', config => {test => 'ctrl-act'});
     $r->route('/shortcut/ctrl')
       ->to('foo#', action => 'config', config => {test => 'ctrl'});
     $r->route('/shortcut/act')
       ->to('#config', controller => 'foo', config => {test => 'act'});
+
+    # /foo/session - session cookie with domain
+    $r->route('/foo/session')->to('foo#session_domain');
 
     # /*/* - the default route
     $r->route('/(controller)/(action)')->to(action => 'index');

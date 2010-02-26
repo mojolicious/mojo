@@ -81,7 +81,7 @@ L<MojoX::Session::Cookie::Controller> is a controller base class.
 
 =head2 ATTRIBUTES
 
-L<MojoX::Session::Cookie::Cotnroller> inherits all attributes from
+L<MojoX::Session::Cookie::Controller> inherits all attributes from
 L<MojoX::Controller>.
 
 =head1 METHODS

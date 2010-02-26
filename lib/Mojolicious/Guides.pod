@@ -2,14 +2,14 @@
 
 =head1 NAME
 
-Mojolicious::Guides - The Definitive Guide To Mojolicious
+Mojolicious::Guides - Mojolicious Guide To The Galaxy
 
-=head1 STATUS
+=head1 DON'T PANIC!
 
-This book is currently being written, to get status updates and/or read early
-drafts you can visit L<http://labs.kraih.com>, L<http://twitter.com/kraih>
-and L<http://github.com/kraih/mojo> or join the official IRC channel C<#mojo>
-on C<irc.perl.org>.
+These guides are currently being written, to get status updates and/or read
+early drafts you can visit L<http://labs.kraih.com>,
+L<http://twitter.com/kraih> and L<http://github.com/kraih/mojo> or join the
+official IRC channel C<#mojo> on C<irc.perl.org>.
 
 =head1 TUTORIAL
 

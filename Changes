@@ -12,6 +12,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added Flash Policy Server example. (xantus)
         - Added more reference docs.
         - Added .gitignore generator command. (marcus)
+        - Added automatic CGI/FastCGI environment detection to
+          Mojo::Commands.
         - Renamed Mojolicious::Book to Mojolicious::Guides.
         - Removed hot deployment support for Windows because of
           incompatibilities between Active Perl and Strawberry Perl.

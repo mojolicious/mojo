@@ -26,6 +26,9 @@ __PACKAGE__->attr(namespaces => sub { ['Mojo::Command'] });
 sub run {
     my ($self, $name, @args) = @_;
 
+    # Try to detect environment
+    $name = $self->_detect unless $name;
+
     # Run command
     if ($name && $name =~ /^\w+$/ && ($name ne 'help' || $args[0])) {
 
@@ -133,6 +136,19 @@ sub start {
 
     # Run
     ref $self ? $self->run(@args) : $self->new->run(@args);
+}
+
+sub _detect {
+    my $self = shift;
+
+    # CGI
+    return 'cgi' if defined $ENV{PATH_INFO};
+
+    # FastCGI
+    return 'fastcgi' unless defined $ENV{PATH};
+
+    # Nothing
+    return;
 }
 
 1;

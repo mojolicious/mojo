@@ -173,7 +173,7 @@ just work without commands.
     % ./myapp.pl daemon
     Server available at http://127.0.0.1:3000.
 
-    % ./myapp.pl daemon 8080
+    % ./myapp.pl daemon --listen http://*:8080
     Server available at http://127.0.0.1:8080.
 
     % ./myapp.pl daemon_prefork

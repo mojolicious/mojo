@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Mojolicious::Book - The Definitive Guide To Mojolicious
+Mojolicious::Guides - The Definitive Guide To Mojolicious
 
 =head1 STATUS
 
@@ -16,21 +16,21 @@ on C<irc.perl.org>.
 A really fast and fun way to get started developing web applications with
 Mojolicious is the tutorial in L<Mojolicious::Lite>, you should take a look.
 
-=head1 CHAPTERS
+=head1 GUIDES
 
-New chapters will be added one by one, so keep a close eye on this.
+New guides will be added one by one, so keep a close eye on this.
 
 =over 4
 
-=item L<Mojolicious::Book::Cheatsheet>
+=item L<Mojolicious::Guides::Cheatsheet>
 
 A concise all-purpose reference.
 
-=item L<Mojolicious::Book::FAQ>
+=item L<Mojolicious::Guides::FAQ>
 
 Frequently asked questions with the right answers.
 
-=item L<Mojolicious::Book::CodingGuidelines>
+=item L<Mojolicious::Guides::CodingGuidelines>
 
 Coding guidelines and mission statement.
 A must read for developers and contributors!

@@ -304,7 +304,7 @@ Web development for humans, making hard things possible and everything fun.
     % my ($second, $minute, $hour) = (localtime(time))[0, 1, 2];
     The time is <%= $hour %>:<%= $minute %>:<%= $second %>.
 
-For more user friendly documentation see L<Mojolicious::Book> and
+For more user friendly documentation see L<Mojolicious::Guides> and
 L<Mojolicious::Lite>.
 
 =head2 Architecture

@@ -62,8 +62,8 @@ Simplicity:
         % my ($second, $minute, $hour) = (localtime(time))[0, 1, 2];
         The time is <%= $hour %>:<%= $minute %>:<%= $second %>.
 
-    For more user friendly documentation see "perldoc Mojolicious::Book" and
-    "perldoc Mojolicious::Lite".
+    For more user friendly documentation see "perldoc Mojolicious::Guides"
+    and "perldoc Mojolicious::Lite".
 
 Architecture:
 

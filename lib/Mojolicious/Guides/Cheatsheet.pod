@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Mojolicious::Book::Cheatsheet - Reference
+Mojolicious::Guides::Cheatsheet - Reference
 
 =head1 OVERVIEW
 
@@ -17,7 +17,8 @@ only.
 =head2 C<MOJO_APP>
 
 Decides which L<Mojolicious> or L<Mojo> application will be used, should
-always contain a class name like C<MyApp>.
+always contain a class name like C<MyApp>, usually defaults to
+L<Mojo::HelloWorld>.
 
     MOJO_APP=MyApp
 

@@ -285,29 +285,41 @@ L<Test::Mojo::Server> implements the following attributes.
     my $command = $server->command;
     $server     = $server->command("lighttpd -D -f $config");
 
+Command for external server start.
+
 =head2 C<executable>
 
     my $script = $server->executable;
     $server    = $server->executable('mojo');
+
+L<Mojo> executable name.
 
 =head2 C<home>
 
     my $home = $server->home;
     $server  = $server->home(Mojo::Home->new);
 
+Home for application.
+
 =head2 C<pid>
 
     my $pid = $server->pid;
+
+Process id for external server.
 
 =head2 C<port>
 
     my $port = $server->port;
     $server  = $server->port(3000);
 
+Server port.
+
 =head2 C<timeout>
 
     my $timeout = $server->timeout;
     $server     = $server->timeout(5);
+
+Timeout for external server startup.
 
 =head1 METHODS
 
@@ -318,10 +330,14 @@ the following new ones.
 
     my $server = Test::Mojo::Server->new;
 
+Construct a new L<Test::Mojo::Server> object.
+
 =head2 C<find_executable_ok>
 
     my $path = $server->find_executable_ok;
     my $path = $server->find_executable_ok('executable found');
+
+Try to find L<Mojo> executable.
 
 =head2 C<generate_port_ok>
 
@@ -332,28 +348,40 @@ the following new ones.
 
     $server->server_ok('server running');
 
+Check if server is still running.
+
 =head2 C<start_daemon_ok>
 
     my $port = $server->start_daemon_ok('daemon test');
+
+Start external L<Mojo::Server::Daemon> server.
 
 =head2 C<start_daemon_prefork_ok>
 
     my $port = $server->start_daemon_prefork_ok('prefork daemon test');
 
+Start external L<Mojo::Server::Daemon::Prefork> server.
+
 =head2 C<start_server_ok>
 
     my $port = $server->start_server_ok('server test');
+
+Start external server.
 
 =head2 C<start_server_untested_ok>
 
     my $port = $server->start_server_untested_ok('server test');
 
+Start external server without testing the port.
+
 =head2 C<stop_server_ok>
 
     $server->stop_server_ok('server stopped');
 
+Stop external server.
+
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
 
 =cut

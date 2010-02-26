@@ -1070,6 +1070,6 @@ escaping only the characters C<&>, C<E<lt>>, C<E<gt>>, C<"> and C<'>.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
 
 =cut

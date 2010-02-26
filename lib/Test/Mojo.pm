@@ -258,25 +258,35 @@ L<Test::Mojo> implements the following attributes.
     my $app = $t->app;
     $t      = $t->app(MyApp->new);
 
+Application to be tested.
+
 =head2 C<client>
 
     my $client = $t->client;
     $t         = $t->client(Mojo::Client->new);
+
+Client used for testing.
 
 =head2 C<redirects>
 
     my $redirects = $t->redirects;
     $t            = $t->redirects([]);
 
+History of redirected requests.
+
 =head2 C<tx>
 
     my $tx = $t->tx;
     $t     = $t->tx(Mojo::Transaction::Simple->new);
 
+Current transaction.
+
 =head2 C<max_redirects>
 
     my $max_redirects = $t->max_redirects;
     $t                = $t->max_redirects(3);
+
+Maximum number of redirects, defaults to C<0>.
 
 =head1 METHODS
 
@@ -288,20 +298,28 @@ following new ones.
     $t = $t->content_is('working!');
     $t = $t->content_is('working!', 'right content!');
 
+Check response content for exact match.
+
 =head2 C<content_like>
 
     $t = $t->content_like(qr/working!/);
     $t = $t->content_like(qr/working!/, 'right content!');
+
+Check response content for similar match.
 
 =head2 C<content_type_is>
 
     $t = $t->content_type_is('text/html');
     $t = $t->content_type_is('text/html', 'right content type!');
 
+Check response content type for exact match.
+
 =head2 C<content_type_like>
 
     $t = $t->content_type_like(qr/text/);
     $t = $t->content_type_like(qr/text/, 'right content type!');
+
+Check response content type for similar match.
 
 =head2 C<delete_ok>
 
@@ -316,6 +334,8 @@ following new ones.
        'request worked!'
     );
 
+Perform a C<DELETE> request.
+
 =head2 C<get_ok>
 
     $t = $t->get_ok('/foo');
@@ -328,6 +348,8 @@ following new ones.
         'Hi there!',
         'request worked!'
     );
+
+Perform a C<GET> request.
 
 =head2 C<head_ok>
 
@@ -342,20 +364,28 @@ following new ones.
         'request worked!'
     );
 
+Perform a C<HEAD> request.
+
 =head2 C<header_is>
 
     $t = $t->header_is(Expect => '100-continue');
     $t = $t->header_is(Expect => '100-continue', 'right header!');
+
+Check response header for exact match.
 
 =head2 C<header_like>
 
     $t = $t->header_like(Expect => qr/100-continue/);
     $t = $t->header_like(Expect => qr/100-continue/, 'right header!');
 
+Check response header for similar match.
+
 =head2 C<json_content_is>
 
     $t = $t->json_content_is([1, 2, 3]);
     $t = $t->json_content_is([1, 2, 3], 'right content!');
+
+Check response content for JSON data.
 
 =head2 C<post_ok>
 
@@ -370,6 +400,8 @@ following new ones.
         'Hi there!',
         'request worked!'
     );
+
+Perform a C<POST> request.
 
 =head2 C<post_form_ok>
 
@@ -398,6 +430,8 @@ following new ones.
         'Hi there!'
     );
 
+Submit a C<POST> form.
+
 =head2 C<put_ok>
 
     $t = $t->put_ok('/foo');
@@ -411,17 +445,23 @@ following new ones.
         'request worked!'
     );
 
+Perform a C<PUT> request.
+
 =head2 C<reset_session>
 
     $t = $t->reset_session;
+
+Reset user agent session.
 
 =head2 C<status_is>
 
     $t = $t->status_is(200);
     $t = $t->status_is(200, 'right status!');
 
+Check response status for exact match.
+
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
 
 =cut

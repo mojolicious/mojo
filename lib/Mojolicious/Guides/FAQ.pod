@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Mojolicious::Book::FAQ - Frequently Asked Questions
+Mojolicious::Guides::FAQ - Frequently Asked Questions
 
 =head1 OVERVIEW
 
@@ -28,6 +28,6 @@ Now you are ready to contact the developers via GitHub
 (C<#mojo> on C<irc.perl.org>).
 
 If you decide to fix the bug yourself make sure to take a look at
-L<Mojolicious::Book::CodingGuidelines> too.
+L<Mojolicious::Guides::CodingGuidelines> too.
 
 =cut

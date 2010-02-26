@@ -179,6 +179,6 @@ Filter chunked content.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
 
 =cut

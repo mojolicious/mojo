@@ -193,6 +193,6 @@ Start the L<Mojo::Commands> command line interface for your application.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Book>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
 
 =cut

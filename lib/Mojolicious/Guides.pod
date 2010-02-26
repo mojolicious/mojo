@@ -7,9 +7,9 @@ Mojolicious::Guides - Mojolicious Guide To The Galaxy
 =head1 DON'T PANIC!
 
 These guides are currently being written, to get status updates and/or read
-early drafts you can visit L<http://labs.kraih.com>,
-L<http://twitter.com/kraih> and L<http://github.com/kraih/mojo> or join the
-official IRC channel C<#mojo> on C<irc.perl.org>.
+early drafts you can visit L<http://kraih.com>, L<http://twitter.com/kraih>
+and L<http://github.com/kraih/mojo> or join the official IRC channel C<#mojo>
+on C<irc.perl.org>.
 
 =head1 TUTORIAL
 
@@ -18,7 +18,7 @@ Mojolicious is the tutorial in L<Mojolicious::Lite>, you should take a look.
 
 =head1 GUIDES
 
-New guides will be added one by one, so keep a close eye on this.
+New guides will be added over time, so keep a close eye on this.
 
 =over 4
 

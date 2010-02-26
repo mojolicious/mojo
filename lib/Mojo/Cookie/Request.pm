@@ -109,9 +109,9 @@ implements the following new ones.
 
 =head2 C<parse>
 
-    my @cookies = $cookie->parse('$Version=1; f=b; $Path=/');
+    my $cookies = $cookie->parse('$Version=1; f=b; $Path=/');
 
-Parse cookie.
+Parse cookies.
 
 =head2 C<prefix>
 

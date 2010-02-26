@@ -206,9 +206,9 @@ Expiration for cookie in seconds.
 
 =head2 C<parse>
 
-    my @cookies = $cookie->parse('f=b; Version=1; Path=/');
+    my $cookies = $cookie->parse('f=b; Version=1; Path=/');
 
-Parse cookie.
+Parse cookies.
 
 =head2 C<to_string>
 

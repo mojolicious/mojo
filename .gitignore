@@ -1,7 +1,11 @@
-.DS_Store
-blib
-Makefile
-Makefile.old
-pm_to_blib
+.*
+!.gitignore
+!.perltidyrc
 *~
-*.bak
+blib
+Makefile*
+!Makefile.PL
+META.yml
+MANIFEST*
+!MANIFEST.SKIP
+pm_to_blib

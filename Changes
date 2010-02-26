@@ -11,6 +11,7 @@ This file documents the revision history for Perl extension Mojolicious.
           though it's still available and overrides auto detection.
         - Added Flash Policy Server example. (xantus)
         - Added more reference docs.
+        - Added .gitignore generator command. (marcus)
         - Removed hot deployment support for Windows because of
           incompatibilities between Active Perl and Strawberry Perl.
         - Made process id and lock file defaults more userfriendly in

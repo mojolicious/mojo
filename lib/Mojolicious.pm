@@ -12,7 +12,7 @@ use Mojolicious::Plugins;
 use MojoX::Dispatcher::Routes;
 use MojoX::Dispatcher::Static;
 use MojoX::Renderer;
-use MojoX::Session::Simple;
+use MojoX::Session::Cookie;
 use MojoX::Types;
 
 __PACKAGE__->attr(controller_class => 'Mojolicious::Controller');
@@ -21,7 +21,7 @@ __PACKAGE__->attr(plugins  => sub { Mojolicious::Plugins->new });
 __PACKAGE__->attr(renderer => sub { MojoX::Renderer->new });
 __PACKAGE__->attr(routes   => sub { MojoX::Dispatcher::Routes->new });
 __PACKAGE__->attr(secret  => 'You really should change this!');
-__PACKAGE__->attr(session => sub { MojoX::Session::Simple->new });
+__PACKAGE__->attr(session => sub { MojoX::Session::Cookie->new });
 __PACKAGE__->attr(static  => sub { MojoX::Dispatcher::Static->new });
 __PACKAGE__->attr(types   => sub { MojoX::Types->new });
 

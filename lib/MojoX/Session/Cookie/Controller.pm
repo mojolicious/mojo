@@ -1,6 +1,6 @@
 # Copyright (C) 2008-2010, Sebastian Riedel.
 
-package MojoX::Session::Simple::Controller;
+package MojoX::Session::Cookie::Controller;
 
 use strict;
 use warnings;
@@ -69,24 +69,24 @@ __END__
 
 =head1 NAME
 
-MojoX::Session::Simple::Controller - Controller Base Class
+MojoX::Session::Cookie::Controller - Controller Base Class
 
 =head1 SYNOPSIS
 
-    use base 'MojoX::Session::Simple::Controller';
+    use base 'MojoX::Session::Cookie::Controller';
 
 =head1 DESCRIPTION
 
-L<MojoX::Session::Simple::Controller> is a controller base class.
+L<MojoX::Session::Cookie::Controller> is a controller base class.
 
 =head2 ATTRIBUTES
 
-L<MojoX::Session::Simple::Cotnroller> inherits all attributes from
+L<MojoX::Session::Cookie::Cotnroller> inherits all attributes from
 L<MojoX::Controller>.
 
 =head1 METHODS
 
-L<MojoX::Session::Simple::Controller> inherits all methods from
+L<MojoX::Session::Cookie::Controller> inherits all methods from
 L<MojoX::Controller> and implements the following ones.
 
 =head2 C<flash>

@@ -86,7 +86,7 @@ is($req->headers->content_length, 0);
 
 # Parse HTTP 1.0 start line and headers, no body (with line size limit)
 $req = Mojo::Message::Request->new;
-my $backup = $ENV{MOJO_MAX_LINE_SIZE};
+my $backup = $ENV{MOJO_MAX_LINE_SIZE} || '';
 $ENV{MOJO_MAX_LINE_SIZE} = 5;
 $req->parse('GET /foo/bar/baz.html HTTP/1');
 is($req->state, 'error');
@@ -95,7 +95,7 @@ $ENV{MOJO_MAX_LINE_SIZE} = $backup;
 
 # Parse HTTP 1.0 start line and headers, no body (with message size limit)
 $req                        = Mojo::Message::Request->new;
-$backup                     = $ENV{MOJO_MAX_MESSAGE_SIZE};
+$backup                     = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
 $ENV{MOJO_MAX_MESSAGE_SIZE} = 5;
 $req->parse('GET /foo/bar/baz.html HTTP/1');
 is($req->state, 'error');

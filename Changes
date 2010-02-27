@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+0.999923 2010-02-27 00:00:00
+        - Improved PSGI support and added "psgi" command.
+
 0.999922 2010-02-11 00:00:00
         - Added session support.
         - Added signed cookie support.

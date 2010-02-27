@@ -47,7 +47,7 @@ __PACKAGE__->attr(
 
 # DEPRECATED in Snowman!
 # Use $Mojolicious::VERSION instead.
-our $VERSION = '0.999922';
+our $VERSION = '0.999923';
 
 # Oh, so they have internet on computers now!
 sub new {
@@ -80,7 +80,7 @@ sub start {
     $ENV{MOJO_APP} ||= $class;
 
     # Start!
-    Mojo::Commands->start(@_);
+    return Mojo::Commands->start(@_);
 }
 
 1;

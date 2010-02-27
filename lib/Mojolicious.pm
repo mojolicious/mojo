@@ -26,7 +26,7 @@ __PACKAGE__->attr(static  => sub { MojoX::Dispatcher::Static->new });
 __PACKAGE__->attr(types   => sub { MojoX::Types->new });
 
 our $CODENAME = 'Snowman';
-our $VERSION  = '0.999922';
+our $VERSION  = '0.999923';
 
 sub new {
     my $self = shift->SUPER::new(@_);
@@ -192,7 +192,7 @@ sub start {
     $ENV{MOJO_APP} ||= $class;
 
     # Start!
-    Mojolicious::Commands->start(@_);
+    return Mojolicious::Commands->start(@_);
 }
 
 # This will run once at startup

@@ -70,8 +70,7 @@ sub run {
 
         # Run
         my $command = $module->new;
-        $help ? $command->help : $command->run(@args);
-        return $self;
+        return $help ? $command->help : $command->run(@args);
     }
 
     # Try all namspaces
@@ -138,7 +137,7 @@ sub start {
     my @args = @_ ? @_ : @ARGV;
 
     # Run
-    ref $self ? $self->run(@args) : $self->new->run(@args);
+    return ref $self ? $self->run(@args) : $self->new->run(@args);
 }
 
 sub _detect {
@@ -307,8 +306,8 @@ the following new ones.
 
 =head2 C<run>
 
-    $commands = $commands->run;
-    $commands = $commands->run(@ARGV);
+    $commands->run;
+    $commands->run(@ARGV);
 
 Load and run commands.
 

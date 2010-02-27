@@ -7,6 +7,7 @@ This file documents the revision history for Perl extension Mojolicious.
           though.
           That means "plackup myapp.pl" and "plackup script/myapp" should
           just work.
+        - Fixed typos.
 
 0.999922 2010-02-11 00:00:00
         - Added session support.

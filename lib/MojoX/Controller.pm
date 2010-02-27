@@ -191,6 +191,7 @@ Usually refers to a L<Mojo::Message::Response> object.
     my @values = $c->signed_cookie('foo');
 
 Access signed request cookie values and create new signed response cookies.
+Cookies failing signature verification will be automatically discarded.
 
 =head2 C<stash>
 

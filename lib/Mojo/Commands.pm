@@ -18,7 +18,7 @@ __PACKAGE__->attr(message => <<"EOF");
 usage: $0 COMMAND [OPTIONS]
 
 Tip: CGI, FastCGI and PSGI environments can be automatically detected very
-     often, and also work without commands.
+     often and work without commands.
 
 These commands are currently available:
 EOF

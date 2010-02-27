@@ -143,6 +143,9 @@ sub start {
 sub _detect {
     my $self = shift;
 
+    # PSGI (Plack only for now)
+    return 'psgi' if defined $ENV{PLACK_ENV};
+
     # CGI
     return 'cgi' if defined $ENV{PATH_INFO};
 

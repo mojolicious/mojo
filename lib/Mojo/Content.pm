@@ -304,7 +304,8 @@ Mojo::Content - HTTP 1.1 Content Base Class
 
 =head1 DESCRIPTION
 
-L<Mojo::Content> is an abstract base class for HTTP 1.1 content.
+L<Mojo::Content> is an abstract base class for HTTP 1.1 content as described
+in RFC 2616.
 
 =head1 ATTRIBUTES
 

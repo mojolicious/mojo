@@ -143,7 +143,8 @@ Mojo::Cookie::Response - HTTP 1.1 Response Cookie Container
 
 =head1 DESCRIPTION
 
-L<Mojo::Cookie::Response> is a container for HTTP 1.1 response cookies.
+L<Mojo::Cookie::Response> is a container for HTTP 1.1 response cookies as
+described in RFC 2965.
 
 =head1 ATTRIBUTES
 

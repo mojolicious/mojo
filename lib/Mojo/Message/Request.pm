@@ -358,7 +358,8 @@ Mojo::Message::Request - HTTP 1.1 Request Container
 
 =head1 DESCRIPTION
 
-L<Mojo::Message::Request> is a container for HTTP 1.1 requests.
+L<Mojo::Message::Request> is a container for HTTP 1.1 requests as described
+in RFC 2616.
 
 =head1 ATTRIBUTES
 

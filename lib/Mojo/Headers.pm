@@ -280,6 +280,7 @@ sub parse {
 }
 
 sub proxy_authorization { shift->header('Proxy-Authorization' => @_) }
+sub referer { shift->header(Referer => @_) }
 
 sub remove {
     my ($self, $name) = @_;
@@ -451,6 +452,13 @@ Shortcut for the C<Origin> header.
     $headers = $headers->proxy_authorization('Basic Zm9vOmJhcg==');
 
 Shortcut for the C<Proxy-Authorization> header.
+
+=head2 C<referer>
+
+    my $referer = $headers->referer;
+    $headers    = $headers->referer('http://mojolicious.org');
+
+Shortcut for the C<Referer> header.
 
 =head2 C<server>
 

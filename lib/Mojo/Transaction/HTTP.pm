@@ -547,7 +547,7 @@ Mojo::Transaction::HTTP - HTTP 1.1 Transaction Container
 =head1 DESCRIPTION
 
 L<Mojo::Transaction::HTTP> is a container and state machine for HTTP 1.1
-transactions.
+transactions as described in RFC 2616.
 
 =head1 ATTRIBUTES
 

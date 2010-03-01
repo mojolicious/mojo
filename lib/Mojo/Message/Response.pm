@@ -238,7 +238,8 @@ Mojo::Message::Response - HTTP 1.1 Response Container
 
 =head1 DESCRIPTION
 
-L<Mojo::Message::Response> is a container for HTTP 1.1 responses.
+L<Mojo::Message::Response> is a container for HTTP 1.1 responses as described
+in RFC 2616.
 
 =head1 ATTRIBUTES
 

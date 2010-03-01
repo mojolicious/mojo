@@ -35,7 +35,8 @@ Mojo::Filter - HTTP 1.1 Filter Base Class
 
 =head1 DESCRIPTION
 
-L<Mojo::Filter> is an abstract base class for HTTP 1.1 filters.
+L<Mojo::Filter> is an abstract base class for HTTP 1.1 filters as described
+in RFC 2616.
 
 =head1 ATTRIBUTES
 

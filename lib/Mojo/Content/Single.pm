@@ -108,7 +108,8 @@ Mojo::Content::Single - HTTP 1.1 Content Container
 
 =head1 DESCRIPTION
 
-L<Mojo::Content::Single> is a container for HTTP 1.1 content.
+L<Mojo::Content::Single> is a container for HTTP 1.1 content as described in
+RFC 2616.
 
 =head1 ATTRIBUTES
 

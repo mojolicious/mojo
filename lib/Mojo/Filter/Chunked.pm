@@ -154,7 +154,7 @@ Mojo::Filter::Chunked - HTTP 1.1 Chunked Filter
 =head1 DESCRIPTION
 
 L<Mojo::Filter::Chunked> is a filter for the HTTP 1.1 chunked transfer
-encoding.
+encoding as described in RFC 2616.
 
 =head1 ATTRIBUTES
 

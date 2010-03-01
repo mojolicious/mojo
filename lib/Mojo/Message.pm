@@ -500,7 +500,8 @@ Mojo::Message - HTTP 1.1 Message Base Class
 
 =head1 DESCRIPTION
 
-L<Mojo::Message> is an abstract base class for HTTP 1.1 messages.
+L<Mojo::Message> is an abstract base class for HTTP 1.1 messages as described
+in RFC 2616 and RFC 2388.
 
 =head1 ATTRIBUTES
 

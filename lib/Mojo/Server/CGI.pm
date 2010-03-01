@@ -133,7 +133,7 @@ Mojo::Server::CGI - CGI Server
 
 =head1 DESCRIPTION
 
-L<Mojo::Server::CGI> is a simple and portable CGI implementation.
+L<Mojo::Server::CGI> is a simple and portable implementation of RFC 3875.
 
 =head1 ATTRIBUTES
 

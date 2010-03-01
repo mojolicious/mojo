@@ -140,7 +140,7 @@ Mojo::Date - HTTP 1.1 Date Container
 =head1 DESCRIPTION
 
 L<Mojo::Date> implements HTTP 1.1 date and time functions according to
-RFC2616.
+RFC 2616.
 
     Sun, 06 Nov 1994 08:49:37 GMT  ; RFC 822, updated by RFC 1123
     Sunday, 06-Nov-94 08:49:37 GMT ; RFC 850, obsoleted by RFC 1036

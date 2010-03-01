@@ -991,13 +991,13 @@ Turn bytestream into MD5 checksum of old content.
 
     $stream = $stream->punycode_decode;
 
-Punycode decode bytestream.
+Punycode decode bytestream, as described in RFC 3492.
 
 =head2 C<punycode_encode>
 
     $stream = $stream->punycode_encode;
 
-Punycode encode bytestream.
+Punycode encode bytestream, as described in RFC 3492.
 
 =head2 C<qp_decode>
 

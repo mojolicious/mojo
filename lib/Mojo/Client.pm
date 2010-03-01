@@ -17,6 +17,7 @@ use Mojo::Parameters;
 use Mojo::Server::Daemon;
 use Mojo::Transaction::HTTP;
 use Mojo::Transaction::WebSocket;
+use Mojo::URL;
 use Scalar::Util 'weaken';
 
 __PACKAGE__->attr([qw/default_cb tls_ca_file tls_verify_cb tx/]);
@@ -108,25 +109,20 @@ sub post_form {
 
     # Parameters
     my $params = Mojo::Parameters->new;
+    $params->charset($encoding) if defined $encoding;
     for my $name (sort keys %$form) {
 
         # Array
         if (ref $form->{$name} eq 'ARRAY') {
             for my $value (@{$form->{$name}}) {
-                $params->append($name,
-                    $encoding
-                    ? b($value)->encode($encoding)->to_string
-                    : $value);
+                $params->append($name, $value);
             }
         }
 
         # Single value
         else {
             my $value = $form->{$name};
-            $params->append($name,
-                $encoding
-                ? b($value)->encode($encoding)->to_string
-                : $value);
+            $params->append($name, $value);
         }
     }
 
@@ -303,19 +299,19 @@ sub _build_multipart_post {
         my $part = Mojo::Content::Single->new;
 
         # Content-Disposition
-        $part->headers->content_disposition(qq/form-data; name="$name"/);
+        my $escaped = b($name);
+        $escaped->encode($encoding) if $encoding;
+        $escaped = $escaped->url_escape($Mojo::URL::PARAM)->to_string;
+        $part->headers->content_disposition(qq/form-data; name="$escaped"/);
 
         # Content-Type
         my $type = 'text/plain';
         $type .= qq/;charset=$encoding/ if $encoding;
         $part->headers->content_type($type);
 
-        # Value
-        my $value =
-          ref $form->{$name} eq 'ARRAY'
-          ? join ',', @{$form->{$name}}
-          : $form->{$name};
-        $part->asset->add_chunk($value);
+        # Values
+        my $f = $form->{$name};
+        $part->asset->add_chunk(join(',', ref $f ? @$f : ($f)));
 
         push @parts, $part;
     }

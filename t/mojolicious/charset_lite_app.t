@@ -48,7 +48,7 @@ $t->post_form_ok('/', {foo => 'yatta'})->status_is(200)
   ->content_is('foo: yatta');
 
 # Send raw Shift_JIS octets (like browsers do)
-$t->post_form_ok('/', {foo => $yatta_sjis})->status_is(200)
+$t->post_form_ok('/', '', {foo => $yatta_sjis})->status_is(200)
   ->content_type_like(qr/Shift_JIS/)->content_like(qr/$yatta/);
 
 # Send as string

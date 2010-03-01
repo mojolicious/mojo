@@ -195,13 +195,15 @@ sub to_string {
 
     # Format
     my @params;
+    my $charset = $self->charset;
     for (my $i = 0; $i < @$params; $i += 2) {
         my $name  = $params->[$i];
         my $value = $params->[$i + 1];
 
         # *( pchar / "/" / "?" ) with the exception of ";", "&" and "="
-        $name = b($name)->url_escape($Mojo::URL::PARAM);
-        $value = b($value)->url_escape($Mojo::URL::PARAM) if $value;
+        $name  = b($name)->encode($charset)->url_escape($Mojo::URL::PARAM);
+        $value = b($value)->encode($charset)->url_escape($Mojo::URL::PARAM)
+          if $value;
 
         # Replace whitespace with "+"
         $name =~ s/\%20/\+/g;

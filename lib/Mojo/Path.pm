@@ -109,7 +109,8 @@ sub to_string {
     for my $part (@{$self->parts}) {
 
         # *( pchar / "/" / "?" )
-        push @path, b($part)->url_escape($Mojo::URL::PCHAR)->to_string;
+        push @path,
+          b($part)->encode('UTF-8')->url_escape($Mojo::URL::PCHAR)->to_string;
     }
 
     # Format

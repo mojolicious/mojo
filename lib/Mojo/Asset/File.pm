@@ -73,7 +73,7 @@ sub add_chunk {
 
     # Store
     $chunk = '' unless defined $chunk;
-    utf8::encode($chunk) if utf8::is_utf8($chunk);
+    utf8::encode $chunk if utf8::is_utf8 $chunk;
     $self->handle->syswrite($chunk, length $chunk);
 
     return $self;

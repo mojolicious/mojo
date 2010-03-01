@@ -44,7 +44,7 @@ my @REQUEST_HEADERS = qw/
   Max-Forwards
   Proxy-Authorization
   Range
-  Referrer
+  Referer
   TE
   User-Agent
   /;
@@ -280,7 +280,7 @@ sub parse {
 }
 
 sub proxy_authorization { shift->header('Proxy-Authorization' => @_) }
-sub referrer { shift->header(Referrer => @_) }
+sub referer { shift->header(Referer => @_) }
 
 sub remove {
     my ($self, $name) = @_;
@@ -453,12 +453,12 @@ Shortcut for the C<Origin> header.
 
 Shortcut for the C<Proxy-Authorization> header.
 
-=head2 C<referrer>
+=head2 C<referer>
 
-    my $referrer = $headers->referrer;
-    $headers     = $headers->referrer('http://mojolicious.org');
+    my $referer = $headers->referer;
+    $headers    = $headers->referer('http://mojolicious.org');
 
-Shortcut for the C<Referrer> header.
+Shortcut for the C<Referer> header.
 
 =head2 C<server>
 

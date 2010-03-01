@@ -108,7 +108,7 @@ Mojo::Transaction::WebSocket - WebSocket Transaction Container
 =head1 DESCRIPTION
 
 L<Mojo::Transaction::WebSocket> is a container and state machine for
-WebSocket transactions.
+WebSocket transactions as described in C<The Web Socket protocol>.
 
 =head1 ATTRIBUTES
 

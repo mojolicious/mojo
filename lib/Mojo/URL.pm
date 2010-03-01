@@ -62,7 +62,7 @@ sub authority {
 
     # *( unreserved / pct-encoded / sub-delims ), extended with "[" and "]"
     # to support IPv6
-    my $host = b($self->host)->url_escape("$UNRESERVED$SUBDELIM\[\]");
+    my $host = $self->ihost;
     my $port = $self->port;
 
     # *( unreserved / pct-encoded / sub-delims / ":" )

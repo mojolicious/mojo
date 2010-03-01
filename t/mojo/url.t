@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 102;
+use Test::More tests => 111;
 
 use Mojo::ByteStream 'b';
 
@@ -165,7 +165,7 @@ is($url->host,   'bücher.ch');
 is($url->ihost,  'xn--bcher-kva.ch');
 is($url->port,   3000);
 is($url->path,   '/foo');
-is("$url",       'http://bücher.ch:3000/foo');
+is("$url",       'http://xn--bcher-kva.ch:3000/foo');
 
 # IDNA (snowman)
 $url = Mojo::URL->new('http://☃.net/');
@@ -174,7 +174,7 @@ is($url->scheme, 'http');
 is($url->host,   '☃.net');
 is($url->ihost,  'xn--n3h.net');
 is($url->path,   '/');
-is("$url",       'http://☃.net/');
+is("$url",       'http://xn--n3h.net/');
 
 # Already absolute
 $url = Mojo::URL->new('http://foo.com/');
@@ -193,3 +193,23 @@ is($url->path->parts->[0], 'привет');
 is($url->path,             '/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82/');
 is($url->query, 'q=%D1%88%D0%B0%D1%80%D0%B8%D1%84%D1%83%D0%BB%D0%B8%D0%BD');
 is($url->query->param('q'), 'шарифулин');
+
+# IRI/IDNA
+$url = Mojo::URL->new(
+    'http://☃.net/привет/привет/?привет=шарифулин'
+);
+is($url->is_abs, 1);
+is($url->scheme, 'http');
+is($url->host,   '☃.net');
+is($url->ihost,  'xn--n3h.net');
+is($url->path,
+        '/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82'
+      . '/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82/');
+is($url->path->parts->[0],             'привет');
+is($url->path->parts->[1],             'привет');
+is($url->query->param('привет'), 'шарифулин');
+is("$url",
+        'http://xn--n3h.net/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82'
+      . '/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82/'
+      . '?%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82='
+      . '%D1%88%D0%B0%D1%80%D0%B8%D1%84%D1%83%D0%BB%D0%B8%D0%BD');

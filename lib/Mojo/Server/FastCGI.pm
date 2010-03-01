@@ -409,7 +409,8 @@ Mojo::Server::FastCGI - FastCGI Server
 
 =head1 DESCRIPTION
 
-L<Mojo::Server::FastCGI> is a portable pure-Perl FastCGI implementation.
+L<Mojo::Server::FastCGI> is a portable pure-Perl FastCGI implementation as
+described in the C<FastCGI Specification>.
 
 =head1 ATTRIBUTES
 

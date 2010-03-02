@@ -51,20 +51,20 @@ sub run {
     }
 
     # Response body
-    my $body = Mojo::Server::PSGI::Handle->new(res => $res);
+    my $body = Mojo::Server::PSGI::_Handle->new(_res => $res);
 
     return [$status, \@headers, $body];
 }
 
-package Mojo::Server::PSGI::Handle;
+package Mojo::Server::PSGI::_Handle;
 
 use strict;
 use warnings;
 
 use base 'Mojo::Base';
 
-__PACKAGE__->attr(offset => 0);
-__PACKAGE__->attr('res');
+__PACKAGE__->attr(_offset => 0);
+__PACKAGE__->attr('_res');
 
 sub close { }
 
@@ -72,9 +72,9 @@ sub getline {
     my $self = shift;
 
     # Blocking read
-    my $offset = $self->offset;
+    my $offset = $self->_offset;
     while (1) {
-        my $chunk = $self->res->get_body_chunk($offset);
+        my $chunk = $self->_res->get_body_chunk($offset);
 
         # No content yet, try again
         unless (defined $chunk) {
@@ -87,7 +87,7 @@ sub getline {
 
         # Content
         $offset += length $chunk;
-        $self->offset($offset);
+        $self->_offset($offset);
         return $chunk;
     }
 

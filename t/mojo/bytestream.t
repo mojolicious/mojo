@@ -75,7 +75,7 @@ $stream = b("Zm9vYmFyJCVeJjMyMTc=\n");
 is($stream->b64_decode, 'foobar$%^&3217');
 
 # utf8 b64_encode
-$stream = b("foo\x{df}\x{0100}bar%23\x{263a}")->encode('UTF-8')->b64_encode;
+$stream = b("foo\x{df}\x{0100}bar%23\x{263a}")->b64_encode;
 is("$stream", "Zm9vw5/EgGJhciUyM+KYug==\n");
 
 # utf8 b64_decode
@@ -91,7 +91,7 @@ $stream = b('business%3B23');
 is($stream->url_unescape, 'business;23');
 
 # utf8 url_escape
-$stream = b("foo\x{df}\x{0100}bar\x{263a}")->encode('UTF-8')->url_escape;
+$stream = b("foo\x{df}\x{0100}bar\x{263a}")->url_escape;
 is("$stream", 'foo%C3%9F%C4%80bar%E2%98%BA');
 
 # utf8 url_unescape

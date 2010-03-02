@@ -347,6 +347,7 @@ sub b64_decode {
 
 sub b64_encode {
     my $self = shift;
+    utf8::encode $self->{bytestream} if utf8::is_utf8 $self->{bytestream};
     $self->{bytestream} = MIME::Base64::encode_base64($self->{bytestream});
     return $self;
 }
@@ -669,6 +670,7 @@ sub qp_decode {
 
 sub qp_encode {
     my $self = shift;
+    utf8::encode $self->{bytestream} if utf8::is_utf8 $self->{bytestream};
     $self->{bytestream} = MIME::QuotedPrint::encode_qp($self->{bytestream});
     return $self;
 }
@@ -719,6 +721,7 @@ sub url_escape {
     my $pattern = shift || 'A-Za-z0-9\-\.\_\~';
 
     # Escape
+    utf8::encode $self->{bytestream} if utf8::is_utf8 $self->{bytestream};
     $self->{bytestream} =~ s/([^$pattern])/sprintf('%%%02X',ord($1))/ge;
 
     return $self;

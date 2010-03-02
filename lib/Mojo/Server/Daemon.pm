@@ -10,7 +10,6 @@ use base 'Mojo::Server';
 use Carp 'croak';
 use Fcntl ':flock';
 use File::Spec;
-use File::Temp;
 use IO::File;
 use Mojo::Command;
 use Mojo::IOLoop;
@@ -23,7 +22,7 @@ __PACKAGE__->attr(keep_alive_timeout => 15);
 __PACKAGE__->attr(
     lock_file => sub {
         my $self = shift;
-        return File::Spec->catfile(File::Spec->splitdir(File::Temp::tempdir),
+        return File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
             Mojo::Command->class_to_file(ref $self->app) . '.lock');
     }
 );
@@ -32,7 +31,7 @@ __PACKAGE__->attr(max_keep_alive_requests => 100);
 __PACKAGE__->attr(
     pid_file => sub {
         my $self = shift;
-        return File::Spec->catfile(File::Spec->splitdir(File::Temp::tempdir),
+        return File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
             Mojo::Command->class_to_file(ref $self->app) . '.pid');
     }
 );

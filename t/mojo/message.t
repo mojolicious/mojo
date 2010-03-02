@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 492;
+use Test::More tests => 494;
 
 use File::Spec;
 use File::Temp;
@@ -137,6 +137,7 @@ is($req->headers->content_length, 27);
 
 # Parse full HTTP 1.0 request with zero chunk
 $req = Mojo::Message::Request->new;
+$req->finish_cb(sub { is($_[0]->state, 'done') });
 $req->parse('GET /foo/bar/baz.html?fo');
 $req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
 $req->parse('-Type: text/');
@@ -404,6 +405,7 @@ is($req->build,
 
 # Build full HTTP 1.1 request
 $req = Mojo::Message::Request->new;
+$req->finish_cb(sub { is($_[0]->state, 'start') });
 $req->method('GET');
 $req->url->parse('http://127.0.0.1/foo/bar');
 $req->headers->expect('100-continue');

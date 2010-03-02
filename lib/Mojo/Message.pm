@@ -19,7 +19,8 @@ use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 8192;
 
 __PACKAGE__->attr(buffer  => sub { Mojo::ByteStream->new });
 __PACKAGE__->attr(content => sub { Mojo::Content::Single->new });
-__PACKAGE__->attr(default_charset                   => 'UTF-8');
+__PACKAGE__->attr(default_charset => 'UTF-8');
+__PACKAGE__->attr([qw/finish_cb progress_cb/]);
 __PACKAGE__->attr([qw/major_version minor_version/] => 1);
 
 # I'll keep it short and sweet. Family. Religion. Friendship.
@@ -155,7 +156,17 @@ sub build {
 # It cost 80 million dollars to make.
 # How do you sleep at night?
 # On top of a pile of money, with many beautiful women.
-sub build_body { shift->content->build_body(@_) }
+sub build_body {
+    my $self = shift;
+
+    # Body
+    my $body = $self->content->build_body(@_);
+
+    # Finished
+    if (my $cb = $self->finish_cb) { $self->$cb }
+
+    return $body;
+}
 
 sub build_headers {
     my $self = shift;
@@ -242,13 +253,28 @@ sub fix_headers {
     return $self;
 }
 
-sub get_body_chunk { shift->content->get_body_chunk(@_) }
+sub get_body_chunk {
+    my $self = shift;
+
+    # Progress
+    if (my $cb = $self->progress_cb) { $self->$cb('body', @_) }
+
+    # Chunk
+    if (defined(my $chunk = $self->content->get_body_chunk(@_))) {
+        return $chunk;
+    }
+
+    # Finished
+    if (my $cb = $self->finish_cb) { $self->$cb }
+
+    return;
+}
 
 sub get_header_chunk {
     my $self = shift;
 
     # Progress
-    $self->progress_cb->($self, 'headers', @_) if $self->progress_cb;
+    if (my $cb = $self->progress_cb) { $self->$cb('headers', @_) }
 
     # HTTP 0.9 has no headers
     return '' if $self->version eq '0.9';
@@ -263,7 +289,7 @@ sub get_start_line_chunk {
     my ($self, $offset) = @_;
 
     # Progress
-    $self->progress_cb->($self, 'start_line', $offset) if $self->progress_cb;
+    if (my $cb = $self->progress_cb) { $self->$cb('start_line', @_) }
 
     my $copy = $self->_build_start_line;
     return substr($copy, $offset, CHUNK_SIZE);
@@ -311,8 +337,6 @@ sub parse_until_body {
 
     return $self->_parse(1);
 }
-
-sub progress_cb { shift->content->progress_cb(@_) }
 
 sub start_line_size { length shift->build_start_line }
 
@@ -410,7 +434,7 @@ sub _parse {
     my $until_body = @_ ? shift : 0;
 
     # Progress
-    $self->progress_cb->($self) if $self->progress_cb;
+    if (my $cb = $self->progress_cb) { $self->$cb }
 
     # Start line and headers
     my $buffer = $self->buffer;
@@ -451,6 +475,9 @@ sub _parse {
     # Done with leftovers, maybe pipelined
     $self->state('done_with_leftovers')
       if $self->content->is_state('done_with_leftovers');
+
+    # Finished
+    if ((my $cb = $self->finish_cb) && $self->is_finished) { $self->$cb }
 
     return $self;
 }
@@ -544,6 +571,15 @@ Content container, defaults to a L<Mojo::Content::Single> object.
     $message    = $message->default_charset('UTF-8');
 
 Default charset used for form data parsing.
+
+=head2 C<finish_cb>
+
+    my $cb   = $message->finish_cb;
+    $message = $message->finish_cb(sub {
+        my $self = shift;
+    });
+
+Callback called after message building or parsing is finished.
 
 =head2 C<headers>
 

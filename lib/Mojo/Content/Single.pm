@@ -28,9 +28,6 @@ sub body_size { shift->asset->size }
 sub get_body_chunk {
     my ($self, $offset) = @_;
 
-    # Progress
-    $self->progress_cb->($self, 'body', $offset) if $self->progress_cb;
-
     # Body generator
     return $self->generate_body_chunk($offset) if $self->body_cb;
 

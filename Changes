@@ -8,6 +8,7 @@ This file documents the revision history for Perl extension Mojolicious.
           That means "plackup myapp.pl" and "plackup script/myapp" should
           just work.
         - Added referrer method to Mojo::Headers. (esskar)
+        - Added finish_cb callback to Mojo::Message.
         - Removed bundled RFCs.
         - Fixed IRI handling. (sharifulin)
         - Fixed mixed IRI/IDNA handling.

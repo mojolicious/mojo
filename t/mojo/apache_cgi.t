@@ -25,7 +25,7 @@ use_ok('Mojo::Server::CGI');
 # Apache setup
 my $server = Test::Mojo::Server->new;
 my $port   = $server->generate_port_ok;
-my $dir    = File::Temp::tempdir();
+my $dir    = File::Temp::tempdir;
 my $config = File::Spec->catfile($dir, 'cgi.config');
 my $mt     = Mojo::Template->new;
 

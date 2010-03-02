@@ -11,6 +11,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Removed bundled RFCs.
         - Fixed IRI handling. (sharifulin)
         - Fixed mixed IRI/IDNA handling.
+        - Fixed tmpdir detection.
         - Fixed typos.
 
 0.999922 2010-02-11 00:00:00

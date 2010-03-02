@@ -23,7 +23,7 @@ use_ok('Mojo::Server::FastCGI');
 # Setup
 my $server = Test::Mojo::Server->new;
 my $port   = $server->generate_port_ok;
-my $dir    = File::Temp::tempdir();
+my $dir    = File::Temp::tempdir;
 my $config = File::Spec->catfile($dir, 'fcgi.config');
 my $mt     = Mojo::Template->new;
 

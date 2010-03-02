@@ -380,7 +380,7 @@ is($req->upload('upload')->filename,    'hello.pl');
 is(ref $req->upload('upload')->asset,   'Mojo::Asset::File');
 is($req->upload('upload')->asset->size, 69);
 my $file =
-  File::Spec->catfile(File::Temp::tempdir(), ("MOJO_TMP." . time . ".txt"));
+  File::Spec->catfile(File::Temp::tempdir, ("MOJO_TMP." . time . ".txt"));
 ok($req->upload('upload')->move_to($file));
 is((unlink $file), 1);
 

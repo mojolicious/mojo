@@ -69,7 +69,7 @@ ok(LoaderTest::C->can('new'));
 
 # Reload
 my $file = IO::File->new;
-my $dir  = File::Temp::tempdir();
+my $dir  = File::Temp::tempdir;
 my $path = File::Spec->catfile($dir, 'MojoTestReloader.pm');
 $file->open("> $path");
 $file->syswrite("package MojoTestReloader;\nsub test { 23 }\n1;");

@@ -64,8 +64,10 @@ post '/upload' => sub {
     $self->stash(rendered => 1);
     my $body = $self->res->body || '';
     $self->res->body("called, $body");
-    if (my $u = $self->req->upload('file')) {
-        $self->res->body($self->res->body . $u->filename . $u->size);
+    if (my $u = $self->req->upload('Вячеслав')) {
+        my $file = $u->filename;
+        utf8::encode $file;
+        $self->res->body($self->res->body . $file . $u->size);
     }
 };
 
@@ -353,8 +355,9 @@ my $backup2 = app->log->level;
 app->log->level('fatal');
 my $tx   = Mojo::Transaction::HTTP->new;
 my $part = Mojo::Content::Single->new;
+my $name = b('Вячеслав')->url_escape;
 $part->headers->content_disposition(
-    qq/form-data; name="file"; filename="foo.jpg"/);
+    qq/form-data; name="$name"; filename="$name.jpg"/);
 $part->headers->content_type('image/jpeg');
 $part->asset->add_chunk('1234' x 1024);
 my $content = Mojo::Content::MultiPart->new;
@@ -375,8 +378,9 @@ $backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
 $ENV{MOJO_MAX_MESSAGE_SIZE} = 1073741824;
 $tx                         = Mojo::Transaction::HTTP->new;
 $part                       = Mojo::Content::Single->new;
+$name                       = b('Вячеслав')->url_escape;
 $part->headers->content_disposition(
-    qq/form-data; name="file"; filename="foo.jpg"/);
+    qq/form-data; name="$name"; filename="$name.jpg"/);
 $part->headers->content_type('image/jpeg');
 $part->asset->add_chunk('1234' x 1024);
 $content = Mojo::Content::MultiPart->new;
@@ -389,7 +393,8 @@ $tx->req->content($content);
 $client->process($tx);
 is($tx->state,     'done');
 is($tx->res->code, 200);
-is($tx->res->body, 'called, foo.jpg4096');
+is(b($tx->res->body)->decode('UTF-8')->to_string,
+    'called, Вячеслав.jpg4096');
 $ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
 
 # GET / (with body and max message size)

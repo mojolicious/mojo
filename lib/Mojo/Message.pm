@@ -104,27 +104,10 @@ sub body_params {
         for my $data (@$formdata) {
             my $name     = $data->[0];
             my $filename = $data->[1];
-            my $part     = $data->[2];
+            my $value    = $data->[2];
 
             # File
             next if $filename;
-
-            # Charset
-            my $charset;
-            if (my $type = $part->headers->content_type) {
-                $type =~ /charset=\"?(\S+)\"?/;
-                $charset = $1 if $1;
-            }
-
-            # Value
-            my $value = $part->asset->slurp;
-
-            # Try to decode
-            if ($charset) {
-                my $backup = $value;
-                $value = b($value)->decode($charset)->to_string;
-                $value = $backup unless defined $value;
-            }
 
             $params->append($name, $value);
         }
@@ -491,6 +474,13 @@ sub _parse_formdata {
     my $content = $self->content;
     return \@formdata unless $content->is_multipart;
 
+    # Default charset
+    my $default = $self->default_charset;
+    if (my $type = $self->headers->content_type) {
+        $type =~ /charset=\"?(\S+)\"?/;
+        $default = $1 if $1;
+    }
+
     # Walk the tree
     my @parts;
     push @parts, $content;
@@ -502,13 +492,43 @@ sub _parse_formdata {
             next;
         }
 
+        # Charset
+        my $charset = $default;
+        if (my $type = $part->headers->content_type) {
+            $type =~ /charset=\"?(\S+)\"?/;
+            $charset = $1 if $1;
+        }
+
         # "Content-Disposition"
         my $disposition = $part->headers->content_disposition;
         next unless $disposition;
         my ($name)     = $disposition =~ /\ name="?([^\";]+)"?/;
         my ($filename) = $disposition =~ /\ filename="?([^\"]*)"?/;
+        my $value      = $part;
 
-        push @formdata, [$name, $filename, $part];
+        # Unescape
+        $name     = b($name)->url_unescape->to_string;
+        $filename = b($filename)->url_unescape->to_string;
+
+        # Decode
+        if ($charset) {
+            my $backup = $name;
+            $name     = b($name)->decode($charset)->to_string;
+            $name     = $backup unless defined $name;
+            $backup   = $filename;
+            $filename = b($filename)->decode($charset)->to_string;
+            $filename = $backup unless defined $filename;
+        }
+
+        # Form value
+        unless ($filename) {
+            $value = $part->asset->slurp;
+            my $backup = $value;
+            $value = b($value)->decode($charset)->to_string if $charset;
+            $value = $backup unless defined $value;
+        }
+
+        push @formdata, [$name, $filename, $value];
     }
 
     return \@formdata;

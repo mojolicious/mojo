@@ -311,9 +311,9 @@ sub _build_multipart_post {
 
         # Values
         my $f = $form->{$name};
-        my @f = ref $f ? @$f : ($f);
-        @f = map { b($_)->encode($encoding)->to_string } @f if $encoding;
-        $part->asset->add_chunk(join ',', @f);
+        my $chunk = join ',', ref $f ? @$f : ($f);
+        $chunk = b($chunk)->encode($encoding)->to_string if $encoding;
+        $part->asset->add_chunk($chunk);
 
         push @parts, $part;
     }

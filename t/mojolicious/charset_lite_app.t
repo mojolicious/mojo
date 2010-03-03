@@ -17,7 +17,7 @@ BEGIN { $ENV{MOJO_TMPDIR} ||= File::Temp::tempdir }
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 19;
+plan tests => 27;
 
 # In the game of chess you can never let your adversary see your pieces.
 use Mojo::ByteStream 'b';
@@ -55,9 +55,25 @@ $t->post_form_ok('/', {foo => 'yatta'})->status_is(200)
 $t->post_form_ok('/', '', {foo => $yatta_sjis})->status_is(200)
   ->content_type_like(qr/Shift_JIS/)->content_like(qr/$yatta/);
 
+# Send raw Shift_JIS octets (like browsers do, multipart message)
+$t->post_form_ok(
+    '/', '',
+    {foo            => $yatta_sjis},
+    {'Content-Type' => 'multipart/form-data'}
+  )->status_is(200)->content_type_like(qr/Shift_JIS/)
+  ->content_like(qr/$yatta/);
+
 # Send as string
 $t->post_form_ok('/', 'shift_jis', {foo => $yatta})->status_is(200)
   ->content_type_like(qr/Shift_JIS/)->content_like(qr/$yatta/);
+
+# Send as string (multipart message)
+$t->post_form_ok(
+    '/', 'shift_jis',
+    {foo            => $yatta},
+    {'Content-Type' => 'multipart/form-data'}
+  )->status_is(200)->content_type_like(qr/Shift_JIS/)
+  ->content_like(qr/$yatta/);
 
 # Templates in the DATA section should be written in UTF-8,
 # and those in separate files in Shift_JIS (Mojo will do the decoding)

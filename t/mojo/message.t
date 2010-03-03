@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 494;
+use Test::More tests => 548;
 
 use File::Spec;
 use File::Temp;
@@ -1283,6 +1283,209 @@ $req->parse("POST /example/testform_handler HTTP/1.1\x0d\x0a"
       . "\x0d\x0a");
 is($req->is_done, 1);
 is_deeply($req->param('Vorname'), 'T');
+
+# Google Chrome multipart/form-data request
+$req = Mojo::Message::Request->new;
+$req->parse("POST / HTTP/1.0\x0d\x0a"
+      . "Host: 127.0.0.1:10002\x0d\x0a"
+      . "Connection: close\x0d\x0a"
+      . "User-Agent: Mozilla/5.0 (X11; U; Linux x86_64; en-US) AppleWebKit/5"
+      . "32.9 (KHTML, like Gecko) Chrome/5.0.307.11 Safari/532.9\x0d\x0a"
+      . "Referer: http://example.org/\x0d\x0a"
+      . "Content-Length: 819\x0d\x0a"
+      . "Cache-Control: max-age=0\x0d\x0a"
+      . "Origin: http://example.org\x0d\x0a"
+      . "Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryY"
+      . "GjwdkpB6ZLCZQbX\x0d\x0a"
+      . "Accept: application/xml,application/xhtml+xml,text/html;q=0.9,text/"
+      . "plain;q=0.8,image/png,*/*;q=0.5\x0d\x0a"
+      . "Accept-Encoding: gzip,deflate,sdch\x0d\x0a"
+      . "Cookie: mojolicious=BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQ"
+      . "AAAB1c2VyBp6FjksAAAAABwAAAGV4cGlyZXM=--1641adddfe885276cda0deb7475f"
+      . "153a\x0d\x0a"
+      . "Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4\x0d\x0a"
+      . "Accept-Charset: windows-1251,utf-8;q=0.7,*;q=0.3\x0d\x0a\x0d\x0a"
+      . "------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
+      . "Content-Disposition: form-data; name=\"fname\"\x0d\x0a\x0d\x0a"
+      . "Иван"
+      . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
+      . "Content-Disposition: form-data; name=\"sname\"\x0d\x0a\x0d\x0a"
+      . "Иванов"
+      . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
+      . "Content-Disposition: form-data; name=\"sex\"\x0d\x0a\x0d\x0a"
+      . "мужской"
+      . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
+      . "Content-Disposition: form-data; name=\"bdate\"\x0d\x0a\x0d\x0a"
+      . "16.02.1987"
+      . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
+      . "Content-Disposition: form-data; name=\"phone\"\x0d\x0a\x0d\x0a"
+      . "1234567890"
+      . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
+      . "Content-Disposition: form-data; name=\"avatar\"; filename=\"аватар."
+      . "jpg\"\x0d\x0a"
+      . "Content-Type: image/jpeg\x0d\x0a\x0d\x0a" . "1234"
+      . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
+      . "Content-Disposition: form-data; name=\"submit\"\x0d\x0a\x0d\x0a"
+      . "Сохранить"
+      . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX--\x0d\x0a");
+is($req->is_done,       1);
+is($req->state,         'done');
+is($req->method,        'POST');
+is($req->major_version, 1);
+is($req->minor_version, 0);
+is($req->url,           '/');
+is($req->cookie('mojolicious')->value,
+    'BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQAAAB1c2VyBp6FjksAAAAABwA'
+      . 'AAGV4cGlyZXM=--1641adddfe885276cda0deb7475f153a');
+like($req->headers->content_type, qr/multipart\/form-data/);
+is($req->param('fname'), 'Иван');
+is($req->param('sname'), 'Иванов');
+is($req->param('sex'),   'мужской');
+is($req->param('bdate'), '16.02.1987');
+is($req->param('phone'), '1234567890');
+my $upload = $req->upload('avatar');
+is($upload->isa('Mojo::Upload'),   1);
+is($upload->headers->content_type, 'image/jpeg');
+is($upload->filename,              'аватар.jpg');
+is($upload->size,                  4);
+is($upload->slurp,                 '1234');
+
+# Firefox multipart/form-data request
+$req = Mojo::Message::Request->new;
+$req->parse("POST / HTTP/1.0\x0d\x0a"
+      . "Host: 127.0.0.1:10002\x0d\x0a"
+      . "Connection: close\x0d\x0a"
+      . "User-Agent: Mozilla/5.0 (X11; U; Linux x86_64; ru; rv:1.9.1.8) Geck"
+      . "o/20100214 Ubuntu/9.10 (karmic) Firefox/3.5.8\x0d\x0a"
+      . "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q"
+      . "=0.8\x0d\x0a"
+      . "Accept-Language: ru,en-us;q=0.7,en;q=0.3\x0d\x0a"
+      . "Accept-Encoding: gzip,deflate\x0d\x0a"
+      . "Accept-Charset: windows-1251,utf-8;q=0.7,*;q=0.7\x0d\x0a"
+      . "Referer: http://example.org/\x0d\x0a"
+      . "Cookie: mojolicious=BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQ"
+      . "AAAB1c2VyBiWFjksAAAAABwAAAGV4cGlyZXM=--cd933a37999e0fa8d7804205e891"
+      . "93a7\x0d\x0a"
+      . "Content-Type: multipart/form-data; boundary=-----------------------"
+      . "----213090722714721300002030499922\x0d\x0a"
+      . "Content-Length: 971\x0d\x0a\x0d\x0a"
+      . "-----------------------------213090722714721300002030499922\x0d\x0a"
+      . "Content-Disposition: form-data; name=\"fname\"\x0d\x0a\x0d\x0a"
+      . "Иван"
+      . "\x0d\x0a-----------------------------213090722714721300002030499922"
+      . "\x0d\x0a"
+      . "Content-Disposition: form-data; name=\"sname\"\x0d\x0a\x0d\x0a"
+      . "Иванов"
+      . "\x0d\x0a-----------------------------213090722714721300002030499922"
+      . "\x0d\x0a"
+      . "Content-Disposition: form-data; name=\"sex\"\x0d\x0a\x0d\x0a"
+      . "мужской"
+      . "\x0d\x0a-----------------------------213090722714721300002030499922"
+      . "\x0d\x0a"
+      . "Content-Disposition: form-data; name=\"bdate\"\x0d\x0a\x0d\x0a"
+      . "16.02.1987"
+      . "\x0d\x0a-----------------------------213090722714721300002030499922"
+      . "\x0d\x0a"
+      . "Content-Disposition: form-data; name=\"phone\"\x0d\x0a\x0d\x0a"
+      . "1234567890"
+      . "\x0d\x0a-----------------------------213090722714721300002030499922"
+      . "\x0d\x0a"
+      . "Content-Disposition: form-data; name=\"avatar\"; filename=\"аватар."
+      . "jpg\"\x0d\x0a"
+      . "Content-Type: image/jpeg\x0d\x0a\x0d\x0a" . "1234"
+      . "\x0d\x0a-----------------------------213090722714721300002030499922"
+      . "\x0d\x0a"
+      . "Content-Disposition: form-data; name=\"submit\"\x0d\x0a\x0d\x0a"
+      . "Сохранить"
+      . "\x0d\x0a-----------------------------2130907227147213000020304999"
+      . "22--");
+is($req->is_done,       1);
+is($req->state,         'done');
+is($req->method,        'POST');
+is($req->major_version, 1);
+is($req->minor_version, 0);
+is($req->url,           '/');
+is($req->cookie('mojolicious')->value,
+    'BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQAAAB1c2VyBiWFjksAAAAABwA'
+      . 'AAGV4cGlyZXM=--cd933a37999e0fa8d7804205e89193a7');
+like($req->headers->content_type, qr/multipart\/form-data/);
+is($req->param('fname'), 'Иван');
+is($req->param('sname'), 'Иванов');
+is($req->param('sex'),   'мужской');
+is($req->param('bdate'), '16.02.1987');
+is($req->param('phone'), '1234567890');
+$upload = $req->upload('avatar');
+is($upload->isa('Mojo::Upload'),   1);
+is($upload->headers->content_type, 'image/jpeg');
+is($upload->filename,              'аватар.jpg');
+is($upload->size,                  4);
+is($upload->slurp,                 '1234');
+
+# Opera multipart/form-data request
+$req = Mojo::Message::Request->new;
+$req->parse("POST / HTTP/1.0\x0d\x0a"
+      . "Host: 127.0.0.1:10002\x0d\x0a"
+      . "Connection: close\x0d\x0a"
+      . "User-Agent: Opera/9.80 (X11; Linux x86_64; U; ru) Presto/2.2.15 Ver"
+      . "sion/10.10\x0d\x0a"
+      . "Accept: text/html, application/xml;q=0.9, application/xhtml+xml, im"
+      . "age/png, image/jpeg, image/gif, image/x-xbitmap, */*;q=0.1\x0d\x0a"
+      . "Accept-Language: ru-RU,ru;q=0.9,en;q=0.8\x0d\x0a"
+      . "Accept-Charset: iso-8859-1, utf-8, utf-16, *;q=0.1\x0d\x0a"
+      . "Accept-Encoding: deflate, gzip, x-gzip, identity, *;q=0\x0d\x0a"
+      . "Referer: http://example.org/\x0d\x0a"
+      . "Cookie: mojolicious=BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQ"
+      . "AAAB1c2VyBhaIjksAAAAABwAAAGV4cGlyZXM=--78a58a94f98ae5b75a489be1189f"
+      . "2672\x0d\x0a"
+      . "Cookie2: \$Version=1\x0d\x0a"
+      . "TE: deflate, gzip, chunked, identity, trailers\x0d\x0a"
+      . "Content-Length: 771\x0d\x0a"
+      . "Content-Type: multipart/form-data; boundary=----------IWq9cR9mYYG66"
+      . "8xwSn56f0\x0d\x0a\x0d\x0a"
+      . "------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
+      . "Content-Disposition: form-data; name=\"fname\"\x0d\x0a\x0d\x0a"
+      . "Иван"
+      . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
+      . "Content-Disposition: form-data; name=\"sname\"\x0d\x0a\x0d\x0a"
+      . "Иванов"
+      . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
+      . "Content-Disposition: form-data; name=\"sex\"\x0d\x0a\x0d\x0a"
+      . "мужской"
+      . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
+      . "Content-Disposition: form-data; name=\"bdate\"\x0d\x0a\x0d\x0a"
+      . "16.02.1987"
+      . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
+      . "Content-Disposition: form-data; name=\"phone\"\x0d\x0a\x0d\x0a"
+      . "1234567890"
+      . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
+      . "Content-Disposition: form-data; name=\"avatar\"; filename=\"аватар."
+      . "jpg\"\x0d\x0a"
+      . "Content-Type: image/jpeg\x0d\x0a\x0d\x0a" . "1234"
+      . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
+      . "Content-Disposition: form-data; name=\"submit\"\x0d\x0a\x0d\x0a"
+      . "Сохранить"
+      . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0--");
+is($req->is_done,       1);
+is($req->state,         'done');
+is($req->method,        'POST');
+is($req->major_version, 1);
+is($req->minor_version, 0);
+is($req->url,           '/');
+is($req->cookie('mojolicious')->value,
+    'BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQAAAB1c2VyBhaIjksAAAAABwA'
+      . 'AAGV4cGlyZXM=--78a58a94f98ae5b75a489be1189f2672');
+like($req->headers->content_type, qr/multipart\/form-data/);
+is($req->param('fname'), 'Иван');
+is($req->param('sname'), 'Иванов');
+is($req->param('sex'),   'мужской');
+is($req->param('bdate'), '16.02.1987');
+is($req->param('phone'), '1234567890');
+$upload = $req->upload('avatar');
+is($upload->isa('Mojo::Upload'),   1);
+is($upload->headers->content_type, 'image/jpeg');
+is($upload->filename,              'аватар.jpg');
+is($upload->size,                  4);
+is($upload->slurp,                 '1234');
 
 # Parse ~ in URL
 $req = Mojo::Message::Request->new;

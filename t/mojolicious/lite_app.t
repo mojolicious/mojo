@@ -65,9 +65,7 @@ post '/upload' => sub {
     my $body = $self->res->body || '';
     $self->res->body("called, $body");
     if (my $u = $self->req->upload('Вячеслав')) {
-        my $file = $u->filename;
-        utf8::encode $file;
-        $self->res->body($self->res->body . $file . $u->size);
+        $self->res->body($self->res->body . $u->filename . $u->size);
     }
 };
 

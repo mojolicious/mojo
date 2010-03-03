@@ -522,10 +522,16 @@ sub _parse_formdata {
 
         # Form value
         unless ($filename) {
+
+            # Slurp
             $value = $part->asset->slurp;
-            my $backup = $value;
-            $value = b($value)->decode($charset)->to_string if $charset;
-            $value = $backup unless defined $value;
+
+            # Decode
+            if ($charset && !$part->headers->content_transfer_encoding) {
+                my $backup = $value;
+                $value = b($value)->decode($charset)->to_string;
+                $value = $backup unless defined $value;
+            }
         }
 
         push @formdata, [$name, $filename, $value];

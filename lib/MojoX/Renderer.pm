@@ -28,6 +28,14 @@ __PACKAGE__->attr(types            => sub { MojoX::Types->new });
 sub new {
     my $self = shift->SUPER::new(@_);
 
+    # Data
+    $self->add_handler(
+        data => sub {
+            my ($r, $c, $output, $options) = @_;
+            $$output = $options->{data};
+        }
+    );
+
     # JSON
     $self->add_handler(
         json => sub {
@@ -95,11 +103,14 @@ sub render {
     # Handler
     my $handler = $c->stash->{handler};
 
-    # Text
-    my $text = delete $c->stash->{text};
+    # Data
+    my $data = delete $c->stash->{data};
 
     # JSON
     my $json = delete $c->stash->{json};
+
+    # Text
+    my $text = delete $c->stash->{text};
 
     my $options =
       {template => $template, format => $format, handler => $handler};
@@ -110,6 +121,17 @@ sub render {
 
         # Render
         $self->handler->{text}->($self, $c, \$output, {text => $text});
+
+        # Extends
+        $c->stash->{content}->{content} = b("$output")
+          if ($c->stash->{extends} || $c->stash->{layout}) && !$partial;
+    }
+
+    # Data
+    elsif (defined $data) {
+
+        # Render
+        $self->handler->{data}->($self, $c, \$output, {data => $data});
 
         # Extends
         $c->stash->{content}->{content} = b("$output")
@@ -162,7 +184,7 @@ sub render {
 
     # Encoding (JSON is already encoded)
     $output = b($output)->encode($self->encoding)->to_string
-      if $self->encoding && !$json;
+      if $self->encoding && !$json && !$data;
 
     # Response
     my $res = $c->res;

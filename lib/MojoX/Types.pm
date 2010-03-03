@@ -11,6 +11,7 @@ __PACKAGE__->attr(
     types => sub {
         return {
             atom => 'application/atom+xml',
+            bin  => 'application/octet-stream',
             css  => 'text/css',
             gif  => 'image/gif',
             gz   => 'application/gzip',

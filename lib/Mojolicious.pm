@@ -59,10 +59,11 @@ sub new {
 
     # Hide own controller methods
     $self->routes->hide(qw/client cookie finish flash helper param pause/);
-    $self->routes->hide(qw/receive_message redirect_to render_exception/);
-    $self->routes->hide(qw/render_json render_inner render_not_found/);
-    $self->routes->hide(qw/render_partial render_static render_text resume/);
-    $self->routes->hide(qw/send_message session signed_cookie url_for/);
+    $self->routes->hide(qw/receive_message redirect_to render render_data/);
+    $self->routes->hide(qw/render_exception render_inner render_json/);
+    $self->routes->hide(qw/render_not_found render_partial render_static/);
+    $self->routes->hide(qw/render_text resume send_message session/);
+    $self->routes->hide(qw/signed_cookie url_for/);
 
     # Mode
     my $mode = $self->mode;

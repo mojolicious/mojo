@@ -9,6 +9,7 @@ This file documents the revision history for Perl extension Mojolicious.
           just work.
         - Added referrer method to Mojo::Headers. (esskar)
         - Added finish_cb callback to Mojo::Message.
+        - Added render_data method to Mojolicious::Controller.
         - Removed bundled RFCs.
         - Fixed multipart form encoding and decoding.
         - Fixed IRI handling. (sharifulin)

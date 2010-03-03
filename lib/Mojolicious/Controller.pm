@@ -127,6 +127,12 @@ sub render {
     return $self->app->renderer->render($self);
 }
 
+sub render_data {
+    my $self = shift;
+    $self->stash->{data} = shift;
+    return $self->render(@_);
+}
+
 sub render_exception {
     my ($self, $e) = @_;
 
@@ -335,6 +341,12 @@ It will set a default template to use based on the controller and action name
 or fall back to the route name.
 You can call it with a hash of options which can be preceded by an optional
 template name.
+
+=head2 C<render_data>
+
+    $c->render_data($bits);
+
+Render binary data and prevent text encoding.
 
 =head2 C<render_exception>
 

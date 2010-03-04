@@ -543,6 +543,10 @@ like that.
 
 Automatic escaping behavior can be reversed with the C<auto_escape>
 attribute, this is the default in L<Mojolicious> C<.ep> templates.
+
+    <%= Perl expression, replaced with XML escaped result %>
+    <%== Perl expression, replaced with result %>
+
 L<Mojo::ByteStream> objects are always excluded from automatic escaping.
 Whitespace characters around tags can be trimmed with a special tag ending.
 

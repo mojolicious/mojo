@@ -541,7 +541,9 @@ like that.
     %== Perl expression line, replaced with XML escaped result
     %# Comment line, useful for debugging
 
-L<Mojo::ByteStream> objects are excluded from automatic escaping.
+Automatic escaping behavior can be reversed with the C<auto_escape>
+attribute, this is the default in L<Mojolicious> C<.ep> templates.
+L<Mojo::ByteStream> objects are always excluded from automatic escaping.
 Whitespace characters around tags can be trimmed with a special tag ending.
 
     <%= All whitespace characters around this expression will be trimmed =%>

@@ -347,7 +347,7 @@ sub _build_tx {
     my $cb = pop @_ if ref $_[-1] && ref $_[-1] eq 'CODE';
 
     # Body
-    $req->body(pop @_) if @_ & 1 == 1;
+    $req->body(pop @_) if @_ & 1 == 1 || ref $_[-2] eq 'HASH';
 
     # Headers
     $req->headers->from_hash(ref $_[0] eq 'HASH' ? $_[0] : {@_});

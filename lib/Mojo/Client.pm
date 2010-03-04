@@ -20,19 +20,16 @@ use Mojo::Transaction::WebSocket;
 use Mojo::URL;
 use Scalar::Util 'weaken';
 
-__PACKAGE__->attr([qw/default_cb tls_ca_file tls_verify_cb tx/]);
-__PACKAGE__->attr([qw/max_keep_alive_connections/] => 5);
+__PACKAGE__->attr([qw/app log tls_ca_file tls_verify_cb tx/]);
 __PACKAGE__->attr(cookie_jar => sub { Mojo::CookieJar->new });
-__PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->singleton });
-__PACKAGE__->attr(keep_alive_timeout => 15);
-__PACKAGE__->attr(max_redirects      => 0);
-__PACKAGE__->attr(websocket_timeout  => 300);
+__PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->new });
+__PACKAGE__->attr(keep_alive_timeout         => 15);
+__PACKAGE__->attr(max_keep_alive_connections => 5);
+__PACKAGE__->attr(max_redirects              => 0);
+__PACKAGE__->attr(websocket_timeout          => 300);
 
 # Singleton
 our $CLIENT;
-
-# Global application, log, port and server for testing
-my ($APP, $LOG, $PORT, $SERVER);
 
 # Make sure we leave a clean ioloop behind
 sub DESTROY {
@@ -55,13 +52,41 @@ sub DESTROY {
     }
 }
 
-sub app {
-    my ($self, $app) = @_;
-    if ($app) {
-        $APP = $app;
-        return $self;
+sub async {
+    my $self = shift;
+
+    # Already async
+    return $self if $self->{_async} || !Mojo::IOLoop->singleton->is_running;
+
+    # Async
+    unless ($self->{async}) {
+
+        # Clone
+        my $clone = $self->{async} = $self->clone;
+        $clone->{_async} = 1;
+
+        # Singleton
+        $clone->ioloop(Mojo::IOLoop->singleton);
     }
-    return $APP;
+
+    return $self->{async};
+}
+
+sub clone {
+    my $self = shift;
+
+    # Clone
+    my $clone = $self->new;
+    $clone->app($self->app);
+    $clone->cookie_jar($self->cookie_jar);
+    $clone->keep_alive_timeout($self->keep_alive_timeout);
+    $clone->max_keep_alive_connections($self->max_keep_alive_connections);
+    $clone->max_redirects($self->max_redirects);
+    $clone->tls_ca_file($self->tls_ca_file);
+    $clone->tls_verify_cb($self->tls_verify_cb);
+    $clone->websocket_timeout($self->websocket_timeout);
+
+    return $clone;
 }
 
 sub delete { shift->_build_tx('DELETE', @_) }
@@ -79,16 +104,6 @@ sub finish {
 
 sub get  { shift->_build_tx('GET',  @_) }
 sub head { shift->_build_tx('HEAD', @_) }
-
-sub log {
-    my ($self, $log) = @_;
-    if ($log) {
-        $LOG = $log;
-        return $self;
-    }
-    return $LOG;
-}
-
 sub post { shift->_build_tx('POST', @_) }
 
 sub post_form {
@@ -153,20 +168,23 @@ sub post_form {
 sub process {
     my $self = shift;
 
-    # Queue transactions
+    # Queue
     $self->queue(@_) if @_;
+    my $queue = $self->{_queue} || [];
 
     # Already running
-    return $self if $self->{_finite};
-
-    # Loop is finite
-    $self->{_finite} = 1;
+    if (!$self->{_async} && $self->{_queued}) {
+        my $clone = $self->clone;
+        for my $job (@$queue) { $clone->queue(@$job) }
+        return $clone->process;
+    }
+    else {
+        for my $job (@$queue) { $self->_queue(@$job) }
+    }
+    $self->{_queue} = [];
 
     # Start ioloop
     $self->ioloop->start;
-
-    # Loop is not finite if it's still running
-    delete $self->{_finite};
 
     return $self;
 }
@@ -179,11 +197,9 @@ sub queue {
     # Callback
     my $cb = pop @_ if ref $_[-1] && ref $_[-1] eq 'CODE';
 
-    # Embedded server
-    $self->_prepare_server if $APP;
-
     # Queue transactions
-    $self->_queue($_, $cb) for @_;
+    my $queue = $self->{_queue} ||= [];
+    push @$queue, [$_, $cb] for @_;
 
     return $self;
 }
@@ -411,7 +427,6 @@ sub _connect {
             }
 
             # Callback
-            $cb ||= $self->default_cb;
             $self->$cb($tx) if $cb;
 
             return;
@@ -511,7 +526,8 @@ sub _error {
     }
 
     # Log
-    $error ? $LOG->error($message) : $LOG->debug($message) if $LOG;
+    my $log = $self->log;
+    $error ? $log->error($message) : $log->debug($message) if $log;
 
     # Finish
     $self->_finish($id);
@@ -575,7 +591,7 @@ sub _finish {
 
         # Done
         unless ($self->_redirect($c, $old)) {
-            my $cb = $c->{cb} || $self->default_cb;
+            my $cb = $c->{cb};
             my $tx = $new;
             $tx ||= $old;
             local $self->{tx} = $tx;
@@ -584,7 +600,7 @@ sub _finish {
     }
 
     # Stop ioloop
-    $self->ioloop->stop if $self->{_finite} && !$self->{_queued};
+    $self->ioloop->stop if !$self->{_async} && !$self->{_queued};
 }
 
 sub _fix_cookies {
@@ -607,40 +623,44 @@ sub _prepare_server {
     my $self = shift;
 
     # Server
-    unless ($PORT) {
-        $SERVER = Mojo::Server::Daemon->new(silent => 1);
-        $PORT = $self->ioloop->generate_port;
-        die "Couldn't find a free TCP port for testing.\n" unless $PORT;
-        $SERVER->listen("http://*:$PORT");
-        $SERVER->lock_file($SERVER->lock_file . '.test');
-        $SERVER->prepare_lock_file;
-        $SERVER->prepare_ioloop;
+    unless ($self->{_port}) {
+        my $server = $self->{_server} =
+          Mojo::Server::Daemon->new(ioloop => $self->ioloop, silent => 1);
+        my $port = $self->{_port} = $self->ioloop->generate_port;
+        die "Couldn't find a free TCP port for testing.\n" unless $port;
+        $server->listen("http://*:$port");
+        $server->prepare_ioloop;
     }
 
     # Application
-    delete $SERVER->{app};
-    ref $APP ? $SERVER->app($APP) : $SERVER->app_class($APP);
+    my $server = $self->{_server};
+    delete $server->{app};
+    my $app = $self->app;
+    ref $app ? $server->app($app) : $server->app_class($app);
 }
 
 sub _queue {
     my ($self, $tx, $cb) = @_;
 
+    # Embedded server
+    $self->_prepare_server if $self->app;
+
     # Pipeline
     my $pipeline = ref $tx eq 'ARRAY' ? 1 : 0;
 
     # Log
-    $LOG ||= $SERVER->app->log if $SERVER;
+    $self->log($self->{_server}->app->log) if $self->{_server} && !$self->log;
 
     # Prepare all transactions
     for my $tx ($pipeline ? @$tx : ($tx)) {
 
         # Embedded server
-        if ($APP) {
+        if ($self->app) {
             my $url = $tx->req->url->to_abs;
             next if $url->host;
             $url->scheme('http');
             $url->host('localhost');
-            $url->port($PORT);
+            $url->port($self->{_port});
             $tx->req->url($url);
         }
 
@@ -956,6 +976,14 @@ L<IO::Socket::SSL> are supported transparently and used if installed.
 
 L<Mojo::Client> implements the following attributes.
 
+=head2 C<app>
+
+    my $app = $client->app;
+    $client = $client->app(MyApp->new);
+
+A Mojo application to associate this client with.
+If set, local requests will be processed in this application.
+
 =head2 C<cookie_jar>
 
     my $cookie_jar = $client->cookie_jar;
@@ -963,17 +991,6 @@ L<Mojo::Client> implements the following attributes.
 
 Cookie jar to use for this clients requests, by default a L<Mojo::CookieJar>
 object.
-
-=head2 C<default_cb>
-
-    my $cb  = $client->default_cb;
-    $client = $client->default_cb(sub {...});
-
-A default callback to use if your request does not specify a callback.
-
-    $client->default_cb(sub {
-        my ($self, $tx) = @_;
-    });
 
 =head2 C<ioloop>
 
@@ -991,6 +1008,14 @@ object.
     $client                = $client->keep_alive_timeout(15);
 
 Timeout in seconds for keep alive between requests, defaults to C<15>.
+
+=head2 C<log>
+
+    my $log = $client->log;
+    $client = $client->log(Mojo::Log->new);
+
+A L<Mojo::Log> object used for logging, by default the application log will
+be used.
 
 =head2 C<max_keep_alive_connections>
 
@@ -1052,13 +1077,23 @@ Construct a new L<Mojo::Client> object.
 Use C<singleton> if you want to share keep alive connections and cookies with
 other clients
 
-=head2 C<app>
+=head2 C<async>
 
-    my $app = $client->app;
-    $client = $client->app(MyApp->new);
+    my $async = $client->async;
 
-A Mojo application to associate this client with.
-If set, local requests will be processed in this application.
+Clone client instance and start using the global L<Mojo::IOLoop>
+asynchronously.
+
+    $client->async->get('http://mojolicious.org' => sub {
+        my $self = shift;
+        print $self->res->body;
+    })->process;
+
+=head2 C<clone>
+
+    my $clone = $client->clone;
+
+Clone client instance.
 
 =head2 C<delete>
 
@@ -1092,14 +1127,6 @@ Send a HTTP C<GET> request.
     );
 
 Send a HTTP C<HEAD> request.
-
-=head2 C<log>
-
-    my $log = $client->log;
-    $client = $client->log(Mojo::Log->new);
-
-A L<Mojo::Log> object used for logging, by default the application log will
-be used.
 
 =head2 C<post>
 

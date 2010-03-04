@@ -173,6 +173,8 @@ sub generate_port {
 
 sub hup_cb { shift->_add_event('hup', @_) }
 
+sub is_running { shift->{_running} }
+
 # Fat Tony is a cancer on this fair city!
 # He is the cancer and I am the… uh… what cures cancer?
 sub listen {
@@ -555,18 +557,19 @@ sub _drop {
         delete $self->{_fds}->{$fd};
 
         # Remove socket from kqueue
-        my $loop = $self->{_loop};
-        if (KQUEUE) {
+        if (my $loop = $self->{_loop}) {
+            if (KQUEUE) {
 
-            # Writing
-            my $writing = $c->{writing};
-            $loop->EV_SET($fd, KQUEUE_READ, KQUEUE_DELETE)
-              if defined $writing;
-            $loop->EV_SET($fd, KQUEUE_WRITE, KQUEUE_DELETE) if $writing;
+                # Writing
+                my $writing = $c->{writing};
+                $loop->EV_SET($fd, KQUEUE_READ, KQUEUE_DELETE)
+                  if defined $writing;
+                $loop->EV_SET($fd, KQUEUE_WRITE, KQUEUE_DELETE) if $writing;
+            }
+
+            # Remove socket from poll or epoll
+            else { $loop->remove($socket) }
         }
-
-        # Remove socket from poll or epoll
-        else { $loop->remove($socket) }
 
         # Close socket
         close $socket;
@@ -1196,6 +1199,12 @@ Find a free TCP port, this is a utility function primarily used for tests.
     $loop = $loop->hup_cb($id => sub {...});
 
 Callback to be invoked if the connection gets closed.
+
+=head2 C<is_running>
+
+    my $running = $loop->is_running;
+
+Check if loop is running.
 
 =head2 C<listen>
 

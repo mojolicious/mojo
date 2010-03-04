@@ -67,14 +67,8 @@ sub accept_unlock { flock(shift->{_lock}, LOCK_UN) }
 sub prepare_ioloop {
     my $self = shift;
 
-    # Lock callback
-    my $loop = $self->ioloop;
-    $loop->lock_cb(sub { $self->accept_lock($_[1]) });
-
-    # Unlock callback
-    $loop->unlock_cb(sub { $self->accept_unlock });
-
     # Stop ioloop on HUP signal
+    my $loop = $self->ioloop;
     $SIG{HUP} = sub { $loop->stop };
 
     # Listen
@@ -88,18 +82,25 @@ sub prepare_ioloop {
 sub prepare_lock_file {
     my $self = shift;
 
-    my $file = $self->lock_file;
+    return unless my $file = $self->lock_file;
 
     # Create lock file
     my $fh = IO::File->new("> $file")
       or croak qq/Can't open lock file "$file"/;
     $self->{_lock} = $fh;
+
+    # Lock callback
+    my $loop = $self->ioloop;
+    $loop->lock_cb(sub { $self->accept_lock($_[1]) });
+
+    # Unlock callback
+    $loop->unlock_cb(sub { $self->accept_unlock });
 }
 
 sub prepare_pid_file {
     my $self = shift;
 
-    my $file = $self->pid_file;
+    return unless my $file = $self->pid_file;
 
     # PID file
     my $fh;

@@ -66,7 +66,7 @@ $client->get(
 )->process;
 
 # Simple request with headers and body
-$client->get(
+$client->async->get(
     'http://www.apache.org' => (Expect => '100-continue') => 'Hi there!' =>
       sub {
         my $self = shift;

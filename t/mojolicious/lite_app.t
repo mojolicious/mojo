@@ -17,7 +17,7 @@ BEGIN { $ENV{MOJO_TMPDIR} ||= File::Temp::tempdir }
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 348;
+plan tests => 358;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -229,6 +229,35 @@ get '/subrequest' => sub {
     my $self = shift;
     $self->pause;
     $self->client->post(
+        '/template' => sub {
+            my $client = shift;
+            $self->render_text($client->res->body);
+            $self->finish;
+        }
+    )->process;
+};
+
+# GET /subrequest_sync
+get '/subrequest_sync' => sub {
+    my $self = shift;
+    $self->client->post(
+        '/template' => sub {
+            my $client = shift;
+            $client->post(
+                '/template' => sub {
+                    my $client = shift;
+                    $self->render_text($client->res->body);
+                }
+            )->process;
+        }
+    )->process;
+};
+
+# GET /subrequest_async
+get '/subrequest_async' => sub {
+    my $self = shift;
+    $self->pause;
+    $self->client->async->post(
         '/template' => sub {
             my $client = shift;
             $self->render_text($client->res->body);
@@ -647,6 +676,18 @@ app->log->level($level);
 
 # GET /subrequest
 $t->get_ok('/subrequest')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('Just works!');
+
+# GET /subrequest_sync
+$t->get_ok('/subrequest_sync')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('Just works!');
+
+# GET /subrequest_async
+$t->get_ok('/subrequest_async')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('Just works!');

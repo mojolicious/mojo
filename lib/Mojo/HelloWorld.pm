@@ -133,11 +133,29 @@ sub _proxy {
     # Proxy
     if (my $url = $tx->req->param('url')) {
 
+        # Fetch
+        $self->client->get(
+            $url => sub {
+                my ($self, $tx2) = @_;
+
+                # Pass through content
+                $tx->res->headers->content_type(
+                    $tx2->res->headers->content_type);
+                $tx->res->body($tx2->res->content->asset->slurp);
+            }
+        )->process;
+
+        return;
+    }
+
+    # Async proxy
+    if (my $url = $tx->req->param('async_url')) {
+
         # Pause transaction
         $tx->pause;
 
         # Fetch
-        $self->client->get(
+        $self->client->async->get(
             $url => sub {
                 my ($self, $tx2) = @_;
 
@@ -162,8 +180,15 @@ sub _proxy {
 <!doctype html><html>
     <head><title>Mojo Diagnostics</title></head>
     <body>
+        Sync:
         <form action="$url" method="GET">
             <input type="text" name="url" value="http://"/>
+            <input type="submit" value="Fetch" />
+        </form>
+        <br />
+        Async:
+        <form action="$url" method="GET">
+            <input type="text" name="async_url" value="http://"/>
             <input type="submit" value="Fetch" />
         </form>
     </body>

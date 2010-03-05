@@ -190,6 +190,9 @@ sub read_request {
 
             # Chunk
             $req->parse($body);
+
+            # Error
+            return $tx if $req->has_error;
         }
     }
 

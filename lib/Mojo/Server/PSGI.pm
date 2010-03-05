@@ -31,6 +31,7 @@ sub run {
         my $read = $env->{'psgi.input'}->read(my $buffer, CHUNK_SIZE, 0);
         last if $read == 0;
         $req->parse($buffer);
+        last if $req->has_error;
     }
 
     # Handle

@@ -20,10 +20,10 @@ __PACKAGE__->attr(mode => sub { ($ENV{MOJO_MODE} || 'development') });
 __PACKAGE__->attr(plugins  => sub { Mojolicious::Plugins->new });
 __PACKAGE__->attr(renderer => sub { MojoX::Renderer->new });
 __PACKAGE__->attr(routes   => sub { MojoX::Dispatcher::Routes->new });
-__PACKAGE__->attr(secret  => 'You really should change this!');
-__PACKAGE__->attr(session => sub { MojoX::Session::Cookie->new });
-__PACKAGE__->attr(static  => sub { MojoX::Dispatcher::Static->new });
-__PACKAGE__->attr(types   => sub { MojoX::Types->new });
+__PACKAGE__->attr(secret   => sub { ref shift });
+__PACKAGE__->attr(session  => sub { MojoX::Session::Cookie->new });
+__PACKAGE__->attr(static   => sub { MojoX::Dispatcher::Static->new });
+__PACKAGE__->attr(types    => sub { MojoX::Types->new });
 
 our $CODENAME = 'Snowman';
 our $VERSION  = '0.999923';
@@ -402,8 +402,8 @@ application.
     my $secret = $mojo->secret;
     $mojo      = $mojo->secret('passw0rd');
 
-A secret passphrase used for signed cookies and the like, has a very unsecure
-default, so you should change it!!!
+A secret passphrase used for signed cookies and the like, defaults to the
+application name which is not very secure, so you should change it!!!
 
 =head2 C<static>
 

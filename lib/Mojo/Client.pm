@@ -1103,8 +1103,8 @@ other clients
 
     my $async = $client->async;
 
-Clone client instance and start using the global L<Mojo::IOLoop> singleton
-asynchronously.
+Clone client instance and start using the global shared L<Mojo::IOLoop>
+singleton.
 
     $client->async->get('http://mojolicious.org' => sub {
         my $self = shift;

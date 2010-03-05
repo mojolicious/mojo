@@ -298,6 +298,12 @@ Web development for humans, making hard things possible and everything fun.
         $self->render_text("Hello $name!");
     };
 
+    get '/fetch' => sub {
+        my $self = shift;
+        $self->render_data(
+            $self->client->get('http://mojolicious.org')->res->body);
+    };
+
     shagadelic;
     __DATA__
 

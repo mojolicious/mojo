@@ -55,6 +55,12 @@ Simplicity:
             $self->render_text("Hello $name!");
         };
 
+        get '/fetch' => sub {
+            my $self = shift;
+            $self->render_data(
+                $self->client->get('http://mojolicious.org')->res->body);
+        };
+
         shagadelic;
         __DATA__
 

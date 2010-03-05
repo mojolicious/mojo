@@ -61,7 +61,7 @@ sub run {
     $client->process($tx);
 
     # Error
-    print qq/Couldn't fetch "$url".\n/ if $tx->has_error;
+    print qq/Couldn't open page "$url".\n/ if $tx->has_error;
 
     return $self;
 }

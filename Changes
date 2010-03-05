@@ -5,6 +5,7 @@ This file documents the revision history for Perl extension Mojolicious.
           massively improves usability!
               my $tx = $client->get('http://mojolicious.org');
               print $client->get('http://search.cpan.org')->res->body;
+              my $tx = $client->post_form('http://kraih.com', {q => 'mojo'});
         - Improved PSGI support and added "psgi" command.
         - Added automatic environment detection for Plack based servers,
           there is no technical way to detect all PSGI compliant servers yet

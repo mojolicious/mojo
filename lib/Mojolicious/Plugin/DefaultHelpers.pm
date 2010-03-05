@@ -29,6 +29,9 @@ sub register {
     $app->renderer->add_helper(extends => sub { shift->stash(extends => @_) }
     );
 
+    # Add "flash" helper
+    $app->renderer->add_helper(flash => sub { shift->flash(@_) });
+
     # Add "include" helper
     $app->renderer->add_helper(include => sub { shift->render_partial(@_) });
 
@@ -38,6 +41,9 @@ sub register {
     # Add "param" helper
     $app->renderer->add_helper(param =>
           sub { wantarray ? (shift->param(@_)) : scalar shift->param(@_); });
+
+    # Add "session" helper
+    $app->renderer->add_helper(session => sub { shift->session(@_) });
 
     # Add "stash" helper
     $app->renderer->add_helper(stash => sub { shift->stash(@_) });
@@ -82,6 +88,10 @@ Dump a Perl data structure using L<Data::Dumper>.
 
 Extend a template.
 
+=item flash
+
+Access flash values.
+
 =item include
 
 Include a partial template.
@@ -93,6 +103,10 @@ Render this template with a layout.
 =item param
 
 Access request parameters and routes captures.
+
+=item session
+
+Access session values.
 
 =item stash
 

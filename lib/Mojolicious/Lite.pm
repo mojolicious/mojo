@@ -504,6 +504,7 @@ Signed cookie based sessions just work as soon as you start using them.
         my $pass = $self->param('pass') || '';
         return $self->render unless $name eq 'sebastian' && $pass eq '1234';
         $self->session(name => $name);
+        $self->flash(message => 'Thanks for logging in!');
         $self->redirect_to('index');
     } => 'login';
 
@@ -543,7 +544,10 @@ Signed cookie based sessions just work as soon as you start using them.
 
     @@ index.html.ep
     % layout 'default';
-    Welcome <%= $session->{name} %>!<br />
+    <% if (my $message = flash 'message' ) { %>
+        <b><%= $message %></b><br />
+    <% } %>
+    Welcome <%= session 'name' %>!<br />
     <a href="<%= url_for 'logout' %>">Logout</a>
 
 A full featured HTTP 1.1 and WebSocket client is built right in.

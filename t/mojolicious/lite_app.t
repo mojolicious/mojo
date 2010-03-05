@@ -57,10 +57,10 @@ get '/address' => sub {
 # POST /upload
 post '/upload' => sub {
     my $self = shift;
-    $self->stash(rendered => 1);
     my $body = $self->res->body || '';
     $self->res->body("called, $body");
     if (my $u = $self->req->upload('Вячеслав')) {
+        $self->stash(rendered => 1);
         $self->res->body($self->res->body . $u->filename . $u->size);
     }
 };
@@ -432,7 +432,8 @@ $backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
 $ENV{MOJO_MAX_MESSAGE_SIZE} = 1024;
 $backup2 = app->log->level;
 app->log->level('fatal');
-$t->get_ok('/', '1234' x 1024)->status_is(413)->content_is('');
+$t->get_ok('/', '1234' x 1024)->status_is(413)
+  ->content_is('/root.html/root.html/root.html/root.html/root.html');
 app->log->level($backup2);
 $ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
 

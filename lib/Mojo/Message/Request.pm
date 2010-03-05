@@ -333,7 +333,7 @@ sub _parse_start_line {
                 $buffer->empty;
             }
         }
-        else { $self->error('Parser error: Invalid request line.') }
+        else { $self->error(400) }
     }
 }
 

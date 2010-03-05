@@ -437,9 +437,7 @@ sub _connect {
         unless (defined $id) {
 
             # Update all transactions
-            for my $tx ($pipeline ? @$tx : ($tx)) {
-                $tx->error("Couldn't create connection.");
-            }
+            for my $tx ($pipeline ? @$tx : ($tx)) { $tx->error(500) }
 
             # Callback
             $self->$cb($tx) if $cb;
@@ -528,21 +526,18 @@ sub _drop {
 sub _error {
     my ($self, $loop, $id, $error) = @_;
 
-    # Error message
-    my $message = $error || 'Unknown connection error, probably harmless.';
-
     # Transaction
     if (my $tx = $self->{_cs}->{$id}->{tx}) {
 
         # Add error message to all transactions
         for my $tx (ref $tx eq 'ARRAY' ? @$tx : ($tx)) {
-            $tx->error($message) unless $tx->is_finished;
+            $tx->error(500) unless $tx->is_finished;
         }
     }
 
     # Log
     my $log = $self->log;
-    $error ? $log->error($message) : $log->debug($message) if $log;
+    $log->error($error) if $error && $log;
 
     # Finish
     $self->_finish($id);

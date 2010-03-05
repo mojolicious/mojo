@@ -33,11 +33,11 @@ ok(!$stateful->is_finished);
 # Errors
 ok(!defined($stateful->error));
 ok(!$stateful->has_error);
-$stateful->state_cb(sub { $stateful->{error} .= '123' });
-$stateful->error('Oops');
+$stateful->state_cb(sub { $stateful->{error} .= '13' });
+$stateful->error('4');
 ok($stateful->error);
 ok($stateful->has_error);
-is($stateful->error, 'Oops123');
+is($stateful->error, '413');
 is($stateful->state, 'error');
 ok($stateful->is_state(qw/error another/));
 ok(!$stateful->is_done);
@@ -53,4 +53,4 @@ ok($stateful->is_finished);
 # Unknown error
 $stateful = Mojo::Stateful->new;
 $stateful->state('error');
-is($stateful->error, 'Unknown state machine error.');
+is($stateful->error, 500);

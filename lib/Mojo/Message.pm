@@ -424,12 +424,12 @@ sub _parse {
     if ($self->is_state(qw/start headers/)) {
 
         # Check line size
-        $self->error('Maximum line size exceeded.')
+        $self->error(413)
           if $buffer->size > ($ENV{MOJO_MAX_LINE_SIZE} || 10240);
     }
 
     # Check message size
-    $self->error('Maximum message size exceeded.')
+    $self->error(413)
       if $buffer->raw_size > ($ENV{MOJO_MAX_MESSAGE_SIZE} || 524288);
 
     # Content

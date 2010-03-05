@@ -262,10 +262,7 @@ sub _error {
     my ($self, $loop, $id, $error) = @_;
 
     # Log
-    my $log = $self->app->log;
-    $error
-      ? $log->error($error)
-      : $log->debug('Unknown connection error, probably harmless.');
+    $self->app->log->error($error) if $error;
 
     # Drop
     $self->_drop($id);

@@ -18,8 +18,7 @@ sub error {
 
     # Get
     if (!$message) {
-        return ($self->{error} || 'Unknown state machine error.')
-          if $self->has_error;
+        return ($self->{error} || 500) if $self->has_error;
         return;
     }
 
@@ -104,10 +103,9 @@ Shortcut for setting the current state to C<done>.
 =head2 C<error>
 
     my $error = $stateful->error;
-    $stateful = $stateful->error('Parser error: test 123');
+    $stateful = $stateful->error(500);
 
-Shortcut for setting the current state to C<error>, also accepts an optional
-error message.
+Shortcut for setting the current state to C<error>.
 
 =head2 C<has_error>
 

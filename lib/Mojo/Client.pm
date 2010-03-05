@@ -56,20 +56,21 @@ sub async {
     my $self = shift;
 
     # Already async
-    return $self if $self->{_async} || !Mojo::IOLoop->singleton->is_running;
+    my $singleton = Mojo::IOLoop->singleton;
+    return $self if $self->{_is_async} || !$singleton->is_running;
 
     # Async
-    unless ($self->{async}) {
+    unless ($self->{_async}) {
 
         # Clone
-        my $clone = $self->{async} = $self->clone;
-        $clone->{_async} = 1;
+        my $clone = $self->{_async} = $self->clone;
+        $clone->{_is_async} = 1;
 
         # Singleton
-        $clone->ioloop(Mojo::IOLoop->singleton);
+        $clone->ioloop($singleton);
     }
 
-    return $self->{async};
+    return $self->{_async};
 }
 
 sub clone {
@@ -161,6 +162,12 @@ sub post_form {
         $tx->req->body($params->to_string);
     }
 
+    # Quick process
+    if (!$cb && !$self->{_is_async}) {
+        $self->process($tx);
+        return $tx;
+    }
+
     # Queue transaction with callback
     $self->queue($tx, $cb);
 }
@@ -171,17 +178,19 @@ sub process {
     # Queue
     $self->queue(@_) if @_;
     my $queue = $self->{_queue} || [];
+    $self->{_queue} = [];
 
     # Already running
-    if (!$self->{_async} && $self->{_queued}) {
+    if (!$self->{_is_async} && $self->{_queued}) {
         my $clone = $self->clone;
         for my $job (@$queue) { $clone->queue(@$job) }
         return $clone->process;
     }
+
+    # Process
     else {
         for my $job (@$queue) { $self->_queue(@$job) }
     }
-    $self->{_queue} = [];
 
     # Start ioloop
     $self->ioloop->start;
@@ -199,7 +208,7 @@ sub queue {
 
     # Queue transactions
     my $queue = $self->{_queue} ||= [];
-    push @$queue, [$_, $cb] for @_;
+    for my $tx (@_) { push @$queue, [$tx, $cb] if $tx }
 
     return $self;
 }
@@ -367,6 +376,12 @@ sub _build_tx {
 
     # Headers
     $req->headers->from_hash(ref $_[0] eq 'HASH' ? $_[0] : {@_});
+
+    # Quick process
+    if (!$cb && !$self->{_is_async}) {
+        $self->process($tx);
+        return $tx;
+    }
 
     # Queue transaction with callback
     $self->queue($tx, $cb);
@@ -600,7 +615,7 @@ sub _finish {
     }
 
     # Stop ioloop
-    $self->ioloop->stop if !$self->{_async} && !$self->{_queued};
+    $self->ioloop->stop if !$self->{_is_async} && !$self->{_queued};
 }
 
 sub _fix_cookies {
@@ -949,14 +964,23 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
 =head1 SYNOPSIS
 
     use Mojo::Client;
-
     my $client = Mojo::Client->new;
+
+    $client->async->get(
+        'http://kraih.com' => sub {
+            my $self = shift;
+            print $self->res->code;
+        }
+    )->process;
+
     $client->get(
         'http://kraih.com' => sub {
             my $self = shift;
             print $self->res->code;
         }
     )->process;
+
+    print $client->post('http://mojolicious.org')->res->body;
 
 =head1 DESCRIPTION
 
@@ -997,10 +1021,8 @@ object.
     my $loop = $client->ioloop;
     $client  = $client->ioloop(Mojo::IOLoop->new);
 
-Loop object to use for io operations, by default it will use the global
-L<Mojo::IOLoop> singleton.
-You can force the client to block on C<process> by creating a new loop
-object.
+Loop object to use for io operations, by default a L<Mojo::IOLoop> obkect
+will be used.
 
 =head2 C<keep_alive_timeout>
 
@@ -1081,7 +1103,7 @@ other clients
 
     my $async = $client->async;
 
-Clone client instance and start using the global L<Mojo::IOLoop>
+Clone client instance and start using the global L<Mojo::IOLoop> singleton
 asynchronously.
 
     $client->async->get('http://mojolicious.org' => sub {
@@ -1097,9 +1119,17 @@ Clone client instance.
 
 =head2 C<delete>
 
+    my $tx  = $client->delete('http://kraih.com');
+    my $tx  = $client->delete('http://kraih.com' => (Connection => 'close'));
+    my $tx  = $client->delete(
+        'http://kraih.com' => (Connection => 'close') => 'Hi!'
+    );
     $client = $client->delete('http://kraih.com' => sub {...});
     $client = $client->delete(
         'http://kraih.com' => (Connection => 'close') => sub {...}
+    );
+    $client = $client->delete(
+        'http://kraih.com' => (Connection => 'close') => 'Hi!' => sub {...}
     );
 
 Send a HTTP C<DELETE> request.
@@ -1112,24 +1142,45 @@ Finish the WebSocket connection, only available from callbacks.
 
 =head2 C<get>
 
+    my $tx  = $client->get('http://kraih.com');
+    my $tx  = $client->get('http://kraih.com' => (Connection => 'close'));
+    my $tx  = $client->get(
+        'http://kraih.com' => (Connection => 'close') => 'Hi!'
+    );
     $client = $client->get('http://kraih.com' => sub {...});
     $client = $client->get(
         'http://kraih.com' => (Connection => 'close') => sub {...}
+    );
+    $client = $client->get(
+        'http://kraih.com' => (Connection => 'close') => 'Hi!' => sub {...}
     );
 
 Send a HTTP C<GET> request.
 
 =head2 C<head>
 
+    my $tx  = $client->head('http://kraih.com');
+    my $tx  = $client->head('http://kraih.com' => (Connection => 'close'));
+    my $tx  = $client->head(
+        'http://kraih.com' => (Connection => 'close') => 'Hi!'
+    );
     $client = $client->head('http://kraih.com' => sub {...});
     $client = $client->head(
         'http://kraih.com' => (Connection => 'close') => sub {...}
+    );
+    $client = $client->head(
+        'http://kraih.com' => (Connection => 'close') => 'Hi!' => sub {...}
     );
 
 Send a HTTP C<HEAD> request.
 
 =head2 C<post>
 
+    my $tx  = $client->post('http://kraih.com');
+    my $tx  = $client->post('http://kraih.com' => (Connection => 'close'));
+    my $tx  = $client->post(
+        'http://kraih.com' => (Connection => 'close') => 'Hi!'
+    );
     $client = $client->post('http://kraih.com' => sub {...});
     $client = $client->post(
         'http://kraih.com' => (Connection => 'close') => sub {...}
@@ -1148,21 +1199,38 @@ Send a HTTP C<POST> request.
 
 =head2 C<post_form>
 
+    my $tx  = $client->post_form('http://kraih.com/foo' => {test => 123});
+    my $tx  = $client->post_form(
+        'http://kraih.com/foo'
+        'UTF-8',
+        {test => 123}
+    );
+    my $tx  = $client->post_form(
+        'http://kraih.com/foo',
+        {test => 123},
+        {Expect => '100-continue'}
+    );
+    my $tx  = $client->post_form(
+        'http://kraih.com/foo',
+        'UTF-8',
+        {test => 123},
+        {Expect => '100-continue'}
+    );
     $client = $client->post_form('/foo' => {test => 123}, sub {...});
     $client = $client->post_form(
-        '/foo',
+        'http://kraih.com/foo',
         'UTF-8',
         {test => 123},
         sub {...}
     );
     $client = $client->post_form(
-        '/foo',
+        'http://kraih.com/foo',
         {test => 123},
         {Expect => '100-continue'},
         sub {...}
     );
     $client = $client->post_form(
-        '/foo',
+        'http://kraih.com/foo',
         'UTF-8',
         {test => 123},
         {Expect => '100-continue'},
@@ -1178,10 +1246,16 @@ Send a HTTP C<POST> request with form data.
     $client = $client->process(@transactions => sub {...});
 
 Process all queued transactions.
-Will be blocking unless you have a global shared ioloop.
+Will be blocking unless you have a global shared ioloop and use the C<async>
+method.
 
 =head2 C<put>
 
+    my $tx  = $client->put('http://kraih.com');
+    my $tx  = $client->put('http://kraih.com' => (Connection => 'close'));
+    my $tx  = $client->put(
+        'http://kraih.com' => (Connection => 'close') => 'Hi!'
+    );
     $client = $client->put('http://kraih.com' => sub {...});
     $client = $client->put(
         'http://kraih.com' => (Connection => 'close') => sub {...}

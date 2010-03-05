@@ -7,17 +7,13 @@ use warnings;
 
 use utf8;
 
-use File::Temp;
 use Mojo::IOLoop;
 use Test::More;
-
-# Use a clean temporary directory
-BEGIN { $ENV{MOJO_TMPDIR} ||= File::Temp::tempdir }
 
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 358;
+plan tests => 363;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -235,6 +231,13 @@ get '/subrequest' => sub {
             $self->finish;
         }
     )->process;
+};
+
+# GET /subrequest_simple
+get '/subrequest_simple' => sub {
+    my $self = shift;
+    my $tx   = $self->client->post('/template');
+    $self->render_text($tx->res->body);
 };
 
 # GET /subrequest_sync
@@ -676,6 +679,12 @@ app->log->level($level);
 
 # GET /subrequest
 $t->get_ok('/subrequest')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('Just works!');
+
+# GET /subrequest_simple
+$t->get_ok('/subrequest_simple')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('Just works!');

@@ -7,12 +7,8 @@ use warnings;
 
 use utf8;
 
-use File::Temp;
 use Mojo::IOLoop;
 use Test::More;
-
-# Use a clean temporary directory
-BEGIN { $ENV{MOJO_TMPDIR} ||= File::Temp::tempdir }
 
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'

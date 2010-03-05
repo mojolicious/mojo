@@ -10,7 +10,7 @@ use Test::More;
 plan skip_all =>
   'set TEST_CLIENT to enable this test (internet connection required!)'
   unless $ENV{TEST_CLIENT};
-plan tests => 75;
+plan tests => 81;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -54,16 +54,22 @@ $client->get(
 )->process;
 
 # Simple request with body
-$client->get(
-    'http://www.apache.org' => 'Hi there!' => sub {
-        my $self = shift;
-        is($self->req->method,                  'GET');
-        is($self->req->url,                     'http://www.apache.org');
-        is($self->req->headers->content_length, 9);
-        is($self->req->body,                    'Hi there!');
-        is($self->res->code,                    200);
-    }
-)->process;
+$tx = $client->get('http://www.apache.org' => 'Hi there!');
+is($tx->req->method,                  'GET');
+is($tx->req->url,                     'http://www.apache.org');
+is($tx->req->headers->content_length, 9);
+is($tx->req->body,                    'Hi there!');
+is($tx->res->code,                    200);
+
+# Simple form post
+$tx = $client->post_form(
+    'http://search.cpan.org/search' => {query => 'mojolicious'});
+is($tx->req->method,                  'POST');
+is($tx->req->url,                     'http://search.cpan.org/search');
+is($tx->req->headers->content_length, 17);
+is($tx->req->body,                    'query=mojolicious');
+like($tx->res->body, qr/Mojolicious/);
+is($tx->res->code, 200);
 
 # Simple request with headers and body
 $client->async->get(

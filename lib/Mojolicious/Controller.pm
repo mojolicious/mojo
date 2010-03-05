@@ -272,8 +272,15 @@ ones.
     my $client = $c->client;
     
 A L<Mojo::Client> prepared for the current environment.
-Note that you'll have to use C<pause> and C<finish> to support asynchronous
-environments such as the L<Mojolicious> daemon.
+
+    my $tx = $self->client->get('http://mojolicious.org');
+
+    $self->client->get('http://mojolicious.org' => sub {
+        my $client = shift;
+        $self->render_data($client->res->body);
+    });
+
+For asynchronous processing you can use C<pause> and C<finish>.
 
     $self->pause;
     $self->client->get('http://mojolicious.org' => sub {

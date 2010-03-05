@@ -189,9 +189,11 @@ sub render {
     # Response
     my $res = $c->res;
     my $req = $c->req;
-    $res->code($req->error) if $req->has_error;
-    $res->code($c->stash('status') || $self->default_status)
-      unless $res->code;
+    unless ($res->code) {
+        $req->has_error
+          ? $res->code($req->error)
+          : $res->code($c->stash('status') || $self->default_status);
+    }
     $res->body($output) unless $res->body;
 
     # Type

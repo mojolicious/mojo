@@ -494,6 +494,26 @@ Formats can be automatically detected by looking at file extensions.
     @@ detected.txt.ep
     TXT was detected.
 
+A full featured HTTP 1.1 and WebSocket client is built right in.
+Especially in combination with L<Mojo::JSON> this can be a very powerful
+tool.
+
+    get '/test' => sub {
+        my $self = shift;
+        $self->render_data(
+            $self->client->get('http://mojolicious.org')->res->body);
+    };
+
+WebSocket applications have never been this easy before.
+
+    websocket '/echo' => sub {
+        my $self = shift;
+        $self->receive_message(sub {
+            my ($self, $message) = @_;
+            $self->send_message("echo: $message");
+        });
+    };
+
 External templates will be searched by the renderer in a C<templates>
 directory.
 

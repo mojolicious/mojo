@@ -275,15 +275,17 @@ A L<Mojo::Client> prepared for the current environment.
 
     my $tx = $self->client->get('http://mojolicious.org');
 
+    $self->client->post_form('http://kraih.com/login' => {user => 'mojo'});
+
     $self->client->get('http://mojolicious.org' => sub {
         my $client = shift;
         $self->render_data($client->res->body);
     });
 
-For asynchronous processing you can use C<pause> and C<finish>.
+For async processing you can use C<pause> and C<finish>.
 
     $self->pause;
-    $self->client->get('http://mojolicious.org' => sub {
+    $self->client->async->get('http://mojolicious.org' => sub {
         my $client = shift;
         $self->render_data($client->res->body);
         $self->finish;
@@ -311,7 +313,7 @@ available.
 
     $c->pause;
 
-Pause transaction associated with this request, used for asynchronous web
+Pause transaction associated with this request, used for async web
 applications.
 Note that automatic rendering and some plugins that do state changing
 operations inside the C<after_dispatch> hook won't work if you pause a
@@ -422,7 +424,7 @@ See C<render_data> for an alternative without encoding.
 
     $c->resume;
 
-Resume transaction associated with this request, used for asynchronous web
+Resume transaction associated with this request, used for async web
 applications.
 
 =head2 C<send_message>

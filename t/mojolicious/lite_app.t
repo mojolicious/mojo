@@ -938,8 +938,8 @@ layouted <%== content %>
 % my $cookie = $self->req->cookie('mojolicious');
 <%= stash('_name') %> too!<%= $self->cookie('foo') %>!\
 <%= $self->signed_cookie('bar')%>!<%= $self->signed_cookie('bad')%>!\
-<%= $self->cookie('bad') %>!<%= $self->session('foo')%>!\
-<%= $self->flash('foo') %>!<%= $cookie->path if $cookie %>!
+<%= $self->cookie('bad') %>!<%= session 'foo' %>!\
+<%= flash 'foo' %>!<%= $cookie->path if $cookie %>!
 % $self->session(foo => 'session');
 % $self->flash(foo => 'flash') if $self->req->headers->header('X-Flash');
 % $self->stash->{session} = {} if $self->req->headers->header('X-Flash2');

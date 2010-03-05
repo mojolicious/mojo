@@ -494,7 +494,11 @@ Formats can be automatically detected by looking at file extensions.
     @@ detected.txt.ep
     TXT was detected.
 
-Signed cookie based sessions just work as soon as you start using them.
+Signed cookie based sessions just work out of the box as soon as you start
+using them.
+The C<flash> can be used to store values that will only be available for one
+request, this is very useful in combination with C<redirect_to> as shown
+below.
 
     use Mojolicious::Lite;
 

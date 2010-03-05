@@ -37,7 +37,6 @@ sub run {
         last unless @readers;
         my $read = STDIN->sysread(my $buffer, CHUNK_SIZE, 0);
         $req->parse($buffer);
-        last if $req->has_error;
     }
 
     # Handle

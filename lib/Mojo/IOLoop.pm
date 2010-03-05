@@ -1204,7 +1204,10 @@ Callback to be invoked if the connection gets closed.
 
     my $running = $loop->is_running;
 
-Check if loop is running.
+Check if loop is running, very useful for checking if the global shared
+C<singleton> is running.
+
+    exit unless Mojo::IOLoop->singleton->is_running;
 
 =head2 C<listen>
 

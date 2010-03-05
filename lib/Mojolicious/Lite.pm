@@ -494,6 +494,58 @@ Formats can be automatically detected by looking at file extensions.
     @@ detected.txt.ep
     TXT was detected.
 
+Signed cookie based sessions just work as soon as you start using them.
+
+    use Mojolicious::Lite;
+
+    get '/login' => sub {
+        my $self = shift;
+        my $name = $self->param('name') || '';
+        my $pass = $self->param('pass') || '';
+        return $self->render unless $name eq 'sebastian' && $pass eq '1234';
+        $self->session(name => $name);
+        $self->redirect_to('index');
+    } => 'login';
+
+    get '/' => sub {
+        my $self = shift;
+        return $self->redirect_to('login') unless $self->session('name');
+        $self->render;
+    } => 'index';
+
+    get '/logout' => sub {
+        my $self = shift;
+        $self->session(expires => 1);
+        $self->redirect_to('index');
+    } => 'logout';
+
+    shagadelic;
+    __DATA__
+
+    @@ layouts/default.html.ep
+    <!doctype html><html>
+        <head><title>Mojolicious rocks!</title></head>
+        <body><%= content %></body>
+    </html>
+
+    @@ login.html.ep
+    % layout 'default';
+    <form action="<%= url_for %>">
+        <% if (param 'name') { %>
+            <b>Wrong name or password, please try again.</b><br />
+        <% } %>
+        Name:<br />
+        <input type="text" name="name" value="<%= param 'name' %>" /><br />
+        Password:<br />
+        <input type="text" name="pass" value="<%= param 'pass' %>" /><br />
+        <input type="submit" value="Login"/>
+    </form>
+
+    @@ index.html.ep
+    % layout 'default';
+    Welcome <%= $session->{name} %>!<br />
+    <a href="<%= url_for 'logout' %>">Logout</a>
+
 A full featured HTTP 1.1 and WebSocket client is built right in.
 Especially in combination with L<Mojo::JSON> this can be a very powerful
 tool.

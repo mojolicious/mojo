@@ -317,6 +317,9 @@ sub server_read {
         # Write
         $self->state('write');
 
+        # Handler callback
+        $self->handler_cb->($self);
+
         # Protect handler from incoming pipelined requests
         $self->{_handled} = 1;
     }

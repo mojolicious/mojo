@@ -399,7 +399,7 @@ $tx->req->url->parse('/upload');
 $tx->req->content($content);
 $client->process($tx);
 is($tx->res->code, 413);
-is($tx->res->body, '');
+is($tx->res->body, 'called, ');
 app->log->level($backup2);
 $ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
 

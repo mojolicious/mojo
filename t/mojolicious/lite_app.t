@@ -733,14 +733,14 @@ Test::Mojo->new(tx => $t->redirects->[0])->status_is(302)
   ->header_is(Location       => '/template.txt')->content_is('Redirecting!');
 
 # GET /koi8-r
+my $koi8 =
+    'Этот человек наполняет меня надеждой.'
+  . ' Ну, и некоторыми другими глубокими и приводящими в'
+  . ' замешательство эмоциями.';
 $t->get_ok('/koi8-r')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_type_is('text/html; charset=koi8-r')
-  ->content_is(
-    "Этот человек наполняет меня надеждой."
-      . " Ну, и некоторыми другими глубокими и приводящими в"
-      . " замешательство эмоциями.\n");
+  ->content_type_is('text/html; charset=koi8-r')->content_like(qr/^$koi8/);
 
 # GET /with_ladder
 $t->get_ok('/with_ladder', {'X-Bender' => 'Rodriguez'})->status_is(200)

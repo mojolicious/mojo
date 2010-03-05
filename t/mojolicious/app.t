@@ -65,7 +65,7 @@ $t->get_ok('/foo/test', {'X-Test' => 'Hi there!'})->status_is(200)
 $t->get_ok('/foo', {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/<body>\n23Hello Mojo from the template \/foo! He/);
+  ->content_like(qr/<body>\s+23Hello Mojo from the template \/foo! He/);
 
 # Foo::Bar::index
 $t->get_ok('/foo-bar', {'X-Test' => 'Hi there!'})->status_is(200)

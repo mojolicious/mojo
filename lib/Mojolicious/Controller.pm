@@ -280,7 +280,7 @@ A L<Mojo::Client> prepared for the current environment.
     $self->client->get('http://mojolicious.org' => sub {
         my $client = shift;
         $self->render_data($client->res->body);
-    });
+    })->process;
 
 For async processing you can use C<pause> and C<finish>.
 
@@ -289,7 +289,7 @@ For async processing you can use C<pause> and C<finish>.
         my $client = shift;
         $self->render_data($client->res->body);
         $self->finish;
-    });
+    })->process;
 
 =head2 C<finish>
 

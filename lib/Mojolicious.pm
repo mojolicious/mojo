@@ -292,16 +292,16 @@ Web development for humans, making hard things possible and everything fun.
         );
     };
 
-    get '/:name' => sub {
-        my $self = shift;
-        my $name = $self->param('name') || 'Mojo';
-        $self->render_text("Hello $name!");
-    };
-
     get '/fetch' => sub {
         my $self = shift;
         $self->render_data(
             $self->client->get('http://mojolicious.org')->res->body);
+    };
+
+    post '/:name' => sub {
+        my $self = shift;
+        my $name = $self->param('name') || 'Mojo';
+        $self->render_text("Hello $name!");
     };
 
     shagadelic;

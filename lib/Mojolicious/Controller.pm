@@ -287,22 +287,22 @@ ones.
     
 A L<Mojo::Client> prepared for the current environment.
 
-    my $tx = $self->client->get('http://mojolicious.org');
+    my $tx = $c->client->get('http://mojolicious.org');
 
-    $self->client->post_form('http://kraih.com/login' => {user => 'mojo'});
+    $c->client->post_form('http://kraih.com/login' => {user => 'mojo'});
 
-    $self->client->get('http://mojolicious.org' => sub {
+    $c->client->get('http://mojolicious.org' => sub {
         my $client = shift;
-        $self->render_data($client->res->body);
+        $c->render_data($client->res->body);
     })->process;
 
 For async processing you can use C<pause> and C<finish>.
 
-    $self->pause;
-    $self->client->async->get('http://mojolicious.org' => sub {
+    $c->pause;
+    $c->client->async->get('http://mojolicious.org' => sub {
         my $client = shift;
-        $self->render_data($client->res->body);
-        $self->finish;
+        $c->render_data($client->res->body);
+        $c->finish;
     })->process;
 
 =head2 C<finish>

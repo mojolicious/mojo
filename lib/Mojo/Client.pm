@@ -96,7 +96,7 @@ sub finish {
     my $self = shift;
 
     # WebSocket
-    croak 'No WebSocket connection to finish.'
+    croak 'No WebSocket connection to finish'
       if ref $self->tx eq 'ARRAY' && !$self->tx->is_websocket;
 
     # Finish
@@ -217,7 +217,7 @@ sub receive_message {
     my $self = shift;
 
     # WebSocket
-    croak 'No WebSocket connection to receive messages from.'
+    croak 'No WebSocket connection to receive messages from'
       if ref $self->tx eq 'ARRAY' && !$self->tx->is_websocket;
 
     # Callback
@@ -239,7 +239,7 @@ sub req {
     my $self = shift;
 
     # Pipeline
-    croak 'Method "req" not supported for pipelines.'
+    croak 'Method "req" not supported for pipelines'
       if ref $self->tx eq 'ARRAY';
 
     $self->tx->req(@_);
@@ -249,7 +249,7 @@ sub res {
     my $self = shift;
 
     # Pipeline
-    croak 'Method "res" not supported for pipelines.'
+    croak 'Method "res" not supported for pipelines'
       if ref $self->tx eq 'ARRAY';
 
     $self->tx->res(@_);
@@ -261,7 +261,7 @@ sub send_message {
     my $self = shift;
 
     # WebSocket
-    croak 'No WebSocket connection to send message to.'
+    croak 'No WebSocket connection to send message to'
       if ref $self->tx eq 'ARRAY' && !$self->tx->is_websocket;
 
     # Send

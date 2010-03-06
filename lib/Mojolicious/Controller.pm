@@ -40,7 +40,7 @@ sub helper {
     return unless my $name = shift;
 
     # Helper
-    Carp::croak(qq/Helper "$name" not found./)
+    Carp::croak(qq/Helper "$name" not found/)
       unless my $helper = $self->app->renderer->helper->{$name};
 
     # Run
@@ -53,7 +53,7 @@ sub receive_message {
     my $self = shift;
 
     # WebSocket check
-    Carp::croak('No WebSocket connection to receive messages from.')
+    Carp::croak('No WebSocket connection to receive messages from')
       unless $self->tx->is_websocket;
 
     # Callback
@@ -211,7 +211,7 @@ sub send_message {
     my $self = shift;
 
     # WebSocket check
-    Carp::croak('No WebSocket connection to send message to.')
+    Carp::croak('No WebSocket connection to send message to')
       unless $self->tx->is_websocket;
 
     # Send

@@ -254,6 +254,9 @@ sub _build_tx {
 sub _drop {
     my ($self, $id) = @_;
 
+    # WebSocket
+    if (my $ws = $self->{_cs}->{$id}->{websocket}) { $ws->server_close }
+
     # Drop connection
     delete $self->{_cs}->{$id};
 }

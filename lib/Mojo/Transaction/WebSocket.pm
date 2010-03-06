@@ -12,15 +12,16 @@ use base 'Mojo::Transaction';
 use Mojo::ByteStream 'b';
 use Mojo::Transaction::HTTP;
 
-__PACKAGE__->attr(handshake => sub { Mojo::Transaction::HTTP->new });
 __PACKAGE__->attr(
-    [qw/read_buffer write_buffer/] => sub { Mojo::ByteStream->new });
-__PACKAGE__->attr(
-    receive_message => sub {
+    [qw/finished receive_message/] => sub {
         sub { }
     }
 );
+__PACKAGE__->attr(handshake => sub { Mojo::Transaction::HTTP->new });
 
+__PACKAGE__->attr([qw/_read _write/] => sub { Mojo::ByteStream->new });
+
+sub client_close { shift->server_close(@_) }
 sub client_read  { shift->server_read(@_) }
 sub client_write { shift->server_write(@_) }
 sub connection   { shift->handshake->connection(@_) }
@@ -29,7 +30,7 @@ sub finish {
     my $self = shift;
 
     # Still writing
-    return $self->{_finished} = 1 if $self->write_buffer->size;
+    return $self->{_finished} = 1 if $self->_write->size;
 
     # Finished
     $self->state('done');
@@ -51,10 +52,17 @@ sub send_message {
     $message = b($message)->encode('UTF-8')->to_string;
 
     # Add to buffer with framing
-    $self->write_buffer->add_chunk("\x00$message\xff");
+    $self->_write->add_chunk("\x00$message\xff");
 
     # Writing
     $self->state('write');
+}
+
+sub server_close {
+    my $self = shift;
+
+    # Connection finished
+    $self->finished->($self);
 }
 
 # Being eaten by crocodile is just like going to sleep... in a giant blender.
@@ -62,7 +70,7 @@ sub server_read {
     my ($self, $chunk) = @_;
 
     # Add chunk
-    my $buffer = $self->read_buffer;
+    my $buffer = $self->_read;
     $buffer->add_chunk($chunk);
 
     # Full frames
@@ -86,12 +94,12 @@ sub server_write {
     my $self = shift;
 
     # Not writing anymore
-    unless ($self->write_buffer->size) {
+    unless ($self->_write->size) {
         $self->{_finished} ? $self->state('done') : $self->state('read');
     }
 
     # Empty buffer
-    return $self->write_buffer->empty;
+    return $self->_write->empty;
 }
 
 1;
@@ -115,19 +123,23 @@ WebSocket transactions as described in C<The Web Socket protocol>.
 L<Mojo::Transaction::WebSocket> inherits all attributes from
 L<Mojo::Transaction> and implements the following new ones.
 
+=head2 C<finished>
+
+    my $cb = $ws->finished;
+    $ws    = $ws->finsihed(sub {...});
+
+Callback signaling that peer finished the connection.
+
+    $ws->finsihed(sub {
+        my $self = shift;
+    });
+
 =head2 C<handshake>
 
     my $handshake = $ws->handshake;
     $ws           = $ws->handshake(Mojo::Transaction::HTTP->new);
 
 The original handshake transaction.
-
-=head2 C<read_buffer>
-
-    my $buffer = $ws->read_buffer;
-    $ws        = $ws->read_buffer(Mojo::ByteStream->new);
-
-Buffer for incoming data.
 
 =head2 C<receive_message>
 
@@ -140,17 +152,16 @@ The callback that receives decoded messages one by one.
         my ($self, $message) = @_;
     });
 
-=head2 C<write_buffer>
-
-    my $buffer = $ws->write_buffer;
-    $ws        = $ws->write_buffer(Mojo::ByteStream->new);
-
-Buffer for outgoing data.
-
 =head1 METHODS
 
 L<Mojo::Transaction::WebSocket> inherits all methods from
 L<Mojo::Transaction> and implements the following new ones.
+
+=head2 C<client_close>
+
+    $ws->client_close;
+
+Connection got closed.
 
 =head2 C<client_read>
 
@@ -224,6 +235,12 @@ The original handshake response.
 
 Send a message over the WebSocket, encoding and framing will be handled
 transparently.
+
+=head2 C<server_close>
+
+    $ws->server_close;
+
+Connection got closed.
 
 =head2 C<server_read>
 

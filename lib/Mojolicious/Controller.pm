@@ -33,6 +33,20 @@ sub finish {
     $self->app->finish($self);
 }
 
+sub finished {
+    my $self = shift;
+
+    # WebSocket check
+    Carp::croak('No WebSocket connection in progress')
+      unless $self->tx->is_websocket;
+
+    # Callback
+    my $cb = shift;
+
+    # Connection finished
+    $self->tx->finished(sub { shift and $self->$cb(@_) });
+}
+
 sub helper {
     my $self = shift;
 
@@ -300,6 +314,17 @@ C<after_dispatch> plugin hook, which would normally get disabled once a
 request gets paused.
 For WebSockets it will gracefully end the connection.
 
+=head2 C<finished>
+
+    $c->finished(sub {...});
+
+Callback signaling that peer finished the WebSocket connection, only works if
+there is currently a WebSocket connection in progress.
+
+    $c->finished(sub {
+        my $self = shift;
+    });
+
 =head2 C<helper>
 
     $c->helper('foo');
@@ -327,7 +352,7 @@ Receive messages via WebSocket, only works if there is currently a WebSocket
 connection in progress.
 
     $c->receive_message(sub {
-        my ($self, $message) = @_
+        my ($self, $message) = @_;
     });
 
 =head2 C<redirect_to>

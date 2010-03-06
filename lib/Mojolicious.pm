@@ -68,12 +68,12 @@ sub new {
     $self->static->root($self->home->rel_dir('public'));
 
     # Hide own controller methods
-    $self->routes->hide(qw/client cookie finish flash helper param pause/);
-    $self->routes->hide(qw/receive_message redirect_to render render_data/);
-    $self->routes->hide(qw/render_exception render_inner render_json/);
-    $self->routes->hide(qw/render_not_found render_partial render_static/);
-    $self->routes->hide(qw/render_text resume send_message session/);
-    $self->routes->hide(qw/signed_cookie url_for/);
+    $self->routes->hide(qw/client cookie finish finished flash helper/);
+    $self->routes->hide(qw/param pause receive_message redirect_to render/);
+    $self->routes->hide(qw/render_data render_exception render_inner/);
+    $self->routes->hide(qw/render_json render_not_found render_partial/);
+    $self->routes->hide(qw/render_static render_text resume send_message/);
+    $self->routes->hide(qw/session signed_cookie url_for/);
 
     # Mode
     my $mode = $self->mode;

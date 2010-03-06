@@ -103,6 +103,27 @@ sub finish {
     $self->tx->finish;
 }
 
+sub finished {
+    my $self = shift;
+
+    # WebSocket
+    croak 'No WebSocket connection in progress'
+      if ref $self->tx eq 'ARRAY' && !$self->tx->is_websocket;
+
+    # Callback
+    my $cb = shift;
+
+    # Transaction
+    my $tx = $self->tx;
+
+    # Weaken
+    weaken $self;
+    weaken $tx;
+
+    # Connection finished
+    $tx->finished(sub { shift; local $self->{tx} = $tx; $self->$cb(@_) });
+}
+
 sub get  { shift->_build_tx('GET',  @_) }
 sub head { shift->_build_tx('HEAD', @_) }
 sub post { shift->_build_tx('POST', @_) }
@@ -574,6 +595,7 @@ sub _finish {
     # Drop WebSockets
     my $new;
     if ($old && !$pipeline && $old->is_websocket) {
+        $old->client_close;
         $old = undef;
         $self->{_queued} -= 1;
         delete $self->{_cs}->{$id};
@@ -1134,6 +1156,17 @@ Send a HTTP C<DELETE> request.
     $client->finish;
 
 Finish the WebSocket connection, only available from callbacks.
+
+=head2 C<finished>
+
+    $client->finished(sub {...});
+
+Callback signaling that peer finished the WebSocket connection, only
+available from callbacks.
+
+    $client->finished(sub {
+        my $self = shift;
+    });
 
 =head2 C<get>
 

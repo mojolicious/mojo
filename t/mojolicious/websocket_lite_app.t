@@ -11,7 +11,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 11;
+plan tests => 13;
 
 # Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
 # Well, that’s love for you.
@@ -27,11 +27,14 @@ app->renderer->root(app->home->rel_dir('public'));
 # WebSocket /
 websocket '/' => sub {
     my $self = shift;
+    my $flag = 0;
+    $self->finished(sub { is($flag, 24) });
     $self->receive_message(
         sub {
             my ($self, $message) = @_;
             is($message, 'test1');
             $self->send_message('test2');
+            $flag = 24;
         }
     );
 };
@@ -88,11 +91,14 @@ $client->websocket(
 $client->websocket(
     '/early_start' => sub {
         my $self = shift;
+        my $flag = 0;
+        $self->finished(sub { is($flag, 23) });
         $self->receive_message(
             sub {
                 my ($self, $message) = @_;
                 is($message, 'test1');
                 $self->send_message('test2');
+                $flag = 23;
             }
         );
     }

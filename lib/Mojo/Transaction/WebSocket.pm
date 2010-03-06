@@ -19,8 +19,6 @@ __PACKAGE__->attr(
 );
 __PACKAGE__->attr(handshake => sub { Mojo::Transaction::HTTP->new });
 
-__PACKAGE__->attr([qw/_read _write/] => sub { Mojo::ByteStream->new });
-
 sub client_close { shift->server_close(@_) }
 sub client_read  { shift->server_read(@_) }
 sub client_write { shift->server_write(@_) }
@@ -30,7 +28,7 @@ sub finish {
     my $self = shift;
 
     # Still writing
-    return $self->{_finished} = 1 if $self->_write->size;
+    return $self->{_finished} = 1 if $self->{_write} && $self->{_write}->size;
 
     # Finished
     $self->state('done');
@@ -52,7 +50,8 @@ sub send_message {
     $message = b($message)->encode('UTF-8')->to_string;
 
     # Add to buffer with framing
-    $self->_write->add_chunk("\x00$message\xff");
+    my $write = $self->{_write} ||= Mojo::ByteStream->new;
+    $write->add_chunk("\x00$message\xff");
 
     # Writing
     $self->state('write');
@@ -70,7 +69,7 @@ sub server_read {
     my ($self, $chunk) = @_;
 
     # Add chunk
-    my $buffer = $self->_read;
+    my $buffer = $self->{_read} ||= Mojo::ByteStream->new;
     $buffer->add_chunk($chunk);
 
     # Full frames
@@ -94,12 +93,13 @@ sub server_write {
     my $self = shift;
 
     # Not writing anymore
-    unless ($self->_write->size) {
+    my $write = $self->{_write} ||= Mojo::ByteStream->new;
+    unless ($write->size) {
         $self->{_finished} ? $self->state('done') : $self->state('read');
     }
 
     # Empty buffer
-    return $self->_write->empty;
+    return $write->empty;
 }
 
 1;

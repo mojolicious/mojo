@@ -15,7 +15,6 @@ plan tests => 7;
 
 # Oh, I always feared he might run off like this.
 # Why, why, why didn't I break his legs?
-use FindBin;
 use Mojolicious::Lite;
 use Test::Mojo;
 

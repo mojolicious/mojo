@@ -19,16 +19,21 @@ EOF
 # This is my first visit to the Galaxy of Terror and I'd like it to be a
 # pleasant one.
 sub register {
-    my ($self, $app) = @_;
+    my ($self, $app, $conf) = @_;
+
+    # Config
+    $conf ||= {};
+    my $name       = $conf->{name}       || 'pod';
+    my $preprocess = $conf->{preprocess} || 'ep';
 
     # Add "pod" handler
     $app->renderer->add_handler(
-        pod => sub {
+        $name => sub {
             my ($r, $c, $output, $options) = @_;
 
             # Preprocess with ep and then render
             $$output = $self->_pod_to_html($$output)
-              if $r->handler->{ep}->($r, $c, $output, $options);
+              if $r->handler->{$preprocess}->($r, $c, $output, $options);
         }
     );
 
@@ -74,17 +79,33 @@ Mojolicious::Plugin::PodRenderer - POD Renderer Plugin
 
     # Mojolicious
     $self->plugin('pod_renderer');
+    $self->plugin(pod_renderer => {name => 'foo'});
+    $self->plugin(pod_renderer => {preprocess => 'epl'});
     $self->render('some_template', handler => 'pod');
     <%= pod_to_html "=head1 TEST\n\nC<123>" %>
 
     # Mojolicious::Lite
     plugin 'pod_renderer';
+    plugin pod_renderer => {name => 'foo'};
+    plugin pod_renderer => {preprocess => 'epl'};
     $self->render('some_template', handler => 'pod');
     <%= pod_to_html "=head1 TEST\n\nC<123>" %>
 
 =head1 DESCRIPTION
 
 L<Mojolicous::Plugin::PodRenderer> is a renderer for true Perl hackers, rawr!
+
+=head1 OPTIONS
+
+=head2 C<name>
+
+    # Mojolicious::Lite
+    plugin pod_renderer => {name => 'foo'};
+
+=head2 C<preprocess>
+
+    # Mojolicious::Lite
+    plugin pod_renderer => {preprocess => 'epl'};
 
 =head1 METHODS
 

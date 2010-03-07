@@ -14,11 +14,19 @@ use Mojo::Template;
 # I'm here to kick your ass!
 # Wishful thinking. We have long since evolved beyond the need for asses.
 sub register {
-    my ($self, $app) = @_;
+    my ($self, $app, $conf) = @_;
+
+    # Config
+    $conf ||= {};
+    my $name     = $conf->{name}     || 'ep';
+    my $template = $conf->{template} || {};
+
+    # Auto escape by default to prevent XSS attacks
+    $template->{auto_escape} = 1 unless defined $template->{auto_escape};
 
     # Add "ep" handler
     $app->renderer->add_handler(
-        ep => sub {
+        $name => sub {
             my ($r, $c, $output, $options) = @_;
 
             # Generate name
@@ -39,11 +47,9 @@ sub register {
                     qq/Caching template "$path" with stash "$list"./);
 
                 # Initialize
-                my $mt = $r->{_epl_cache}->{$cache} = Mojo::Template->new;
-                $mt->namespace("Mojo::Template::$cache");
-
-                # Auto escape by default to prevent XSS attacks
-                $mt->auto_escape(1);
+                $template->{namespace} ||= "Mojo::Template::$cache";
+                my $mt = $r->{_epl_cache}->{$cache} =
+                  Mojo::Template->new($template);
 
                 # Self
                 my $prepend = 'my $self = shift;';
@@ -98,9 +104,13 @@ Mojolicious::Plugin::EpRenderer - EP Renderer Plugin
 
     # Mojolicious
     $self->plugin('ep_renderer');
+    $self->plugin(ep_renderer => {name => 'foo'});
+    $self->plugin(ep_renderer => {template => {line_start => '.'}});
 
     # Mojolicious::Lite
     plugin 'ep_renderer';
+    plugin ep_renderer => {name => 'foo'};
+    plugin ep_renderer => {template => {line_start => '.'}};
 
 =head1 DESCRIPTION
 
@@ -114,6 +124,18 @@ It is based on L<Mojo::Template>, but extends it with some convenient syntax
 sugar designed specifically for L<Mojolicious>.
 It supports L<Mojolicious> template helpers and exposes the stash directly as
 perl variables.
+
+=head1 OPTIONS
+
+=head2 C<name>
+
+    # Mojolicious::Lite
+    plugin ep_renderer => {name => 'foo'};
+
+=head2 C<template>
+
+    # Mojolicious::Lite
+    plugin ep_renderer => {template => {line_start => '.'}};
 
 =head1 METHODS
 

@@ -271,9 +271,9 @@ sub _extends {
     my ($self, $c) = @_;
 
     # Layout
-    $c->stash->{extends}
-      ||= ($self->layout_prefix . '/' . delete $c->stash->{layout})
-      if $c->stash->{layout};
+    if (my $layout = delete $c->stash->{layout}) {
+        $c->stash->{extends} ||= $self->layout_prefix . '/' . $layout;
+    }
 
     # Extends
     return delete $c->stash->{extends};

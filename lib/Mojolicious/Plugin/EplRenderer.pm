@@ -22,7 +22,7 @@ sub register {
             # Template
             return unless my $t    = $r->template_name($options);
             return unless my $path = $r->template_path($options);
-            my $cache = $options->{cache} || $path;
+            my $cache = delete $options->{cache} || $path;
 
             # Check cache
             $r->{_epl_cache} ||= {};

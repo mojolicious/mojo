@@ -41,7 +41,8 @@ sub register {
 
     # Read config file
     my $config = {};
-    if (-e $file) { $config = $self->_read_config($file, $app) }
+    my $template = $conf->{template} || {};
+    if (-e $file) { $config = $self->_read_config($file, $template, $app) }
 
     # Check for default
     else {
@@ -75,7 +76,7 @@ sub register {
 }
 
 sub _read_config {
-    my ($self, $file, $app) = @_;
+    my ($self, $file, $template, $app) = @_;
 
     # Debug
     $app->log->debug(qq/Reading config file "$file"./);
@@ -99,7 +100,7 @@ sub _read_config {
     $prepend .= q/use strict; use warnings;/;
 
     # Render
-    my $mt = Mojo::Template->new;
+    my $mt = Mojo::Template->new($template);
     $mt->prepend($prepend);
     $encoded = $mt->render($encoded, $app);
 
@@ -137,7 +138,7 @@ Mojolicious::Plugin::JsonConfig - JSON Configuration Plugin
     my $config = $self->stash('config');
 
     # Everything can be customized with options
-    my $config = plugin 'json_config' => {
+    my $config = plugin json_config => {
         file      => '/etc/myapp.conf',
         stash_key => 'conf'
     };
@@ -154,20 +155,25 @@ The application object can be accessed via C<$app> or the C<app> helper.
 =head2 C<default>
 
     # Mojolicious::Lite
-    plugin 'json_config' => {default => {foo => 'bar'}};
+    plugin json_config => {default => {foo => 'bar'}};
 
 =head2 C<file>
 
     # Mojolicious::Lite
-    plugin 'json_config' => {file => 'myapp.conf'};
-    plugin 'json_config' => {file => '/etc/foo.json'};
+    plugin json_config => {file => 'myapp.conf'};
+    plugin json_config => {file => '/etc/foo.json'};
 
 By default C<myapp.json> is searched in the application home directory.
 
 =head2 C<stash_key>
 
     # Mojolicious::Lite
-    plugin 'json_config' => {stash_key => 'conf'};
+    plugin json_config => {stash_key => 'conf'};
+
+=head2 C<template>
+
+    # Mojolicious::Lite
+    plugin json_config => {template => {line_start => '.'}};
 
 =head1 METHODS
 

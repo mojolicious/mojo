@@ -304,7 +304,7 @@ sub parse {
             }
 
             # End
-            if ($token =~ /^$tag_end|($trim$tag_end)$/) {
+            if ($token =~ /^$tag_end|($trim$tag_end)$/ && $state ne 'text') {
 
                 # Trim previous text
                 if ($1) {
@@ -328,9 +328,6 @@ sub parse {
             # Code
             elsif ($token =~ /^$tag_start$/) { $state = 'code' }
 
-            # Comment
-            elsif ($token =~ /^$tag_start$cmnt$/) { $state = 'cmnt' }
-
             # Expression
             elsif ($token =~ /^$tag_start$expr$/) {
                 $state = 'expr';
@@ -340,6 +337,9 @@ sub parse {
             elsif ($token =~ /^$tag_start$expr$escp$/) {
                 $state = 'escp';
             }
+
+            # Comment
+            elsif ($token =~ /^$tag_start$cmnt$/) { $state = 'cmnt' }
 
             # Value
             else {

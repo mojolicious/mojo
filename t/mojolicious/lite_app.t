@@ -59,6 +59,7 @@ post '/upload' => sub {
     my $self = shift;
     my $body = $self->res->body || '';
     $self->res->body("called, $body");
+    return if $self->req->has_error;
     if (my $u = $self->req->upload('Вячеслав')) {
         $self->stash(rendered => 1);
         $self->res->body($self->res->body . $u->filename . $u->size);

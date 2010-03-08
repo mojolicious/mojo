@@ -30,7 +30,7 @@ Features:
       JSON, I18N, first class Unicode support and much more for you to
       discover!
 
-Simplicity:
+Duct Tape For The HTML5 Web:
 
     Web development for humans, making hard things possible and everything
     fun.
@@ -71,7 +71,7 @@ Simplicity:
     For more user friendly documentation see "perldoc Mojolicious::Guides"
     and "perldoc Mojolicious::Lite".
 
-Architecture:
+The Cake:
 
     .---------------------------------------------------------------.
     |                             Fun!                              |

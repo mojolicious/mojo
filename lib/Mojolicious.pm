@@ -36,7 +36,7 @@ __PACKAGE__->attr(static  => sub { MojoX::Dispatcher::Static->new });
 __PACKAGE__->attr(types   => sub { MojoX::Types->new });
 
 our $CODENAME = 'Snowman';
-our $VERSION  = '0.999923';
+our $VERSION  = '0.999924';
 
 sub new {
     my $self = shift->SUPER::new(@_);
@@ -284,7 +284,7 @@ I18N, first class Unicode support and much more for you to discover!
 
 =back
 
-=head2 Simplicity
+=head2 Duct Tape For The HTML5 Web
 
 Web development for humans, making hard things possible and everything fun.
 
@@ -324,7 +324,7 @@ Web development for humans, making hard things possible and everything fun.
 For more user friendly documentation see L<Mojolicious::Guides> and
 L<Mojolicious::Lite>.
 
-=head2 Architecture
+=head2 The Cake
 
     .---------------------------------------------------------------.
     |                             Fun!                              |

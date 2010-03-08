@@ -11,7 +11,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 11;
+plan tests => 14;
 
 # Pizza delivery for...
 # I. C. Weiner. Aww... I always thought by this stage in my life I'd be the
@@ -24,6 +24,8 @@ app->log->level('error');
 
 # Twinkle template syntax
 my $twinkle = {
+    capture_end     => '-',
+    capture_start   => '+',
     escape_mark     => '*',
     expression_mark => '*',
     line_start      => '**',
@@ -44,6 +46,9 @@ is($config->{test}, 23);
 # GET /
 get '/' => {name => '<sebastian>'} => 'index';
 
+# GET /advanced
+get '/advanced' => 'advanced';
+
 # GET /docs
 get '/docs' => {codename => 'snowman'} => 'docs';
 
@@ -54,6 +59,10 @@ my $t = Test::Mojo->new;
 
 # GET /
 $t->get_ok('/')->status_is(200)->content_like(qr/testHello <sebastian>!123/);
+
+# GET /advanced
+$t->get_ok('/advanced')->status_is(200)
+  ->content_is('&lt;escape me&gt;123423');
 
 # GET /docs
 $t->get_ok('/docs')->status_is(200)->content_like(qr/<h3>snowman<\/h3>/);
@@ -68,6 +77,14 @@ Hello **** $name **!\
 
 @@ layouts/twinkle.html.ep
 test<%= content %>123\
+
+@@ advanced.html.twinkle
+*** '<escape me>'
+** my $numbers = [1 .. 4];
+ ** for my $i (@$numbers) { ***
+ *** $i ***
+ ** } ***
+ **+ my $foo = *** 23 **-*** *** $foo ***
 
 @@ docs.html.pod
 <%= '=head3 ' . $codename %>

@@ -191,13 +191,9 @@ sub parse {
 
     my $mixed_re = qr/
         (
-        $tag_start$capture_end$expr$escp     # Escaped expression (end)
-        |
         $tag_start$capture_start$expr$escp   # Escaped expression (start)
         |
         $tag_start$expr$escp                 # Escaped expression
-        |
-        $tag_start$capture_end$expr          # Expression (end)
         |
         $tag_start$capture_start$expr        # Expression (start)
         |
@@ -296,15 +292,15 @@ sub parse {
 
             # Perl token with capture end or start
             if ($token =~ /$token_capture_re/) {
-                my $tag     = $1;
-                my $capture = $2;
-                $token =~ s/^($tag)$capture/$tag/;
+                my $tag     = quotemeta $1;
+                my $capture = quotemeta $2;
+                $token =~ s/^($tag)$capture/$1/;
                 @capture_token =
-                  ("\\$capture" eq $capture_end ? 'cpen' : 'cpst', undef);
+                  ($capture eq $capture_end ? 'cpen' : 'cpst', undef);
             }
 
             # End
-            if ($token =~ /^$tag_end|($trim$tag_end)$/ && $state ne 'text') {
+            if ($state ne 'text' && $token =~ /^($trim$tag_end)|$tag_end$/) {
 
                 # Trim previous text
                 if ($1) {
@@ -451,8 +447,8 @@ sub _trim_line {
     $offset ||= 2;
     for (my $j = @$line - $offset; $j >= 0; $j -= 2) {
 
-        # Skip capture start
-        next if $line->[$j] eq 'cpst';
+        # Skip capture
+        next if $line->[$j] eq 'cpst' || $line->[$j] eq 'cpen';
 
         # Only trim text
         return 1 unless $line->[$j] eq 'text';

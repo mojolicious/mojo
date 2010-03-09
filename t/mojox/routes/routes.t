@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 167;
+use Test::More tests => 177;
 
 use Mojo::Transaction::HTTP;
 
@@ -319,6 +319,26 @@ is($m->stack->[0]->{controller}, 'very');
 is($m->stack->[0]->{action},     'dangerous');
 is($m->stack->[0]->{wildcard},   'hello/there');
 is($m->url_for,                  '/wildcards/3/hello/there/foo');
+is(@{$m->stack},                 1);
+
+# Escaped
+$tx = Mojo::Transaction::HTTP->new;
+$tx->req->method('GET');
+$tx->req->url->parse('/wildcards/1/http://www.google.com');
+$m = MojoX::Routes::Match->new($tx)->match($r);
+is($m->stack->[0]->{controller}, 'wild');
+is($m->stack->[0]->{action},     'card');
+is($m->stack->[0]->{wildcard},   'http:/www.google.com');
+is($m->url_for,                  '/wildcards/1/http:/www.google.com');
+is(@{$m->stack},                 1);
+$tx = Mojo::Transaction::HTTP->new;
+$tx->req->method('GET');
+$tx->req->url->parse('/wildcards/1/http%3A%2F%2Fwww.google.com');
+$m = MojoX::Routes::Match->new($tx)->match($r);
+is($m->stack->[0]->{controller}, 'wild');
+is($m->stack->[0]->{action},     'card');
+is($m->stack->[0]->{wildcard},   'http://www.google.com');
+is($m->url_for,                  '/wildcards/1/http:/www.google.com');
 is(@{$m->stack},                 1);
 
 # Format

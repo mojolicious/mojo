@@ -31,8 +31,10 @@ sub new {
             return unless $methods && ref $methods eq 'ARRAY';
 
             # Match
+            my $m = lc $tx->req->method;
+            $m = 'get' if $m eq 'head';
             for my $method (@$methods) {
-                return $captures if $method eq lc $tx->req->method;
+                return $captures if $method eq $m;
             }
 
             # Nothing

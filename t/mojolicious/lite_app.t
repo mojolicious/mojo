@@ -844,7 +844,7 @@ $t->get_ok('/bridge2stash' => {'X-Flash2' => 1})->status_is(200)
 
 # GET /bridge2stash (with cookies and session cleared)
 $t->get_ok('/bridge2stash')->status_is(200)
-  ->content_is("stash too!cookie!signed_cookie!!bad_cookie--12345678!!!/!\n");
+  ->content_is("stash too!cookie!signed_cookie!!bad_cookie--12345678!!!!\n");
 
 __DATA__
 @@ template.txt.epl

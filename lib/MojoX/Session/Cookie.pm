@@ -51,20 +51,30 @@ sub store {
     delete $session->{old_flash};
     delete $session->{flash} unless keys %{$session->{flash}};
 
-    # Expiration
-    my $expires = $session->{expires} ||= time + $self->default_expiration;
+    # Default to expiring session
+    my $expires = 1;
+    my $value   = '';
+
+    # Actual session data
+    my $default = delete $session->{expires};
+    if (keys %$session) {
+
+        # Expiration
+        $expires = $session->{expires} = $default
+          ||= time + $self->default_expiration;
+
+        # Freeze
+        $value = freeze $session;
+
+        # Encode
+        $value = b($value)->b64_encode->to_string;
+        $value =~ s/\n//g;
+    }
 
     # Options
     my $options = {expires => $expires, path => $self->cookie_path};
     my $domain = $self->cookie_domain;
     $options->{domain} = $domain if $domain;
-
-    # Freeze
-    my $value = freeze $session;
-
-    # Encode
-    $value = b($value)->b64_encode->to_string;
-    $value =~ s/\n//g;
 
     # Session cookie
     $c->signed_cookie($self->cookie_name, $value, $options);

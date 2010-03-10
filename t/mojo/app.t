@@ -39,7 +39,7 @@ use_ok('Mojo::HelloWorld');
 # Logger
 my $logger = Mojo::Log->new;
 my $app = Mojo->new({log => $logger});
-is($app->log, $logger);
+is($app->log, $logger, 'right logger');
 
 $app = Mojo::HelloWorld->new;
 my $client = Mojo::Client->new->app($app);
@@ -49,9 +49,9 @@ my $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/1/');
 $client->process($tx);
-ok($tx->keep_alive);
-is($tx->res->code, 200);
-like($tx->res->body, qr/^Congratulations/);
+ok($tx->keep_alive, 'will be kept alive');
+is($tx->res->code, 200, 'right status');
+like($tx->res->body, qr/^Congratulations/, 'right content');
 
 # Post request expecting a 100 Continue
 $tx = Mojo::Transaction::HTTP->new;
@@ -60,8 +60,8 @@ $tx->req->url->parse('/2/');
 $tx->req->headers->expect('100-continue');
 $tx->req->body('foo bar baz' x 128);
 $client->process($tx);
-is($tx->res->code, 200);
-like($tx->res->body, qr/^Congratulations/);
+is($tx->res->code, 200, 'right status');
+like($tx->res->body, qr/^Congratulations/, 'right content');
 
 $client = Mojo::Client->new->app('ContinueHandlerTest');
 
@@ -72,9 +72,9 @@ $tx->req->url->parse('/3/');
 $tx->req->headers->expect('100-continue');
 $tx->req->body('bar baz foo' x 128);
 $client->process($tx);
-ok(defined $tx->connection);
-is($tx->res->code,                417);
-is($tx->res->headers->connection, 'Close');
+ok(defined $tx->connection, 'has connection id');
+is($tx->res->code,                417,     'right status');
+is($tx->res->headers->connection, 'Close', 'right content');
 
 # Regular pipeline
 $tx = Mojo::Transaction::HTTP->new;
@@ -84,10 +84,10 @@ my $tx2 = Mojo::Transaction::HTTP->new;
 $tx2->req->method('GET');
 $tx2->req->url->parse('/5/');
 $client->process([$tx, $tx2]);
-ok(defined $tx->connection);
-ok(defined $tx2->connection);
-ok($tx->is_done);
-ok($tx2->is_done);
+ok(defined $tx->connection,  'has connection id');
+ok(defined $tx2->connection, 'has connection id');
+ok($tx->is_done,             'state is done');
+ok($tx2->is_done,            'state is done');
 
 # Interrupted pipeline
 $tx = Mojo::Transaction::HTTP->new;
@@ -102,9 +102,9 @@ my $tx3 = Mojo::Transaction::HTTP->new;
 $tx3->req->method('GET');
 $tx3->req->url->parse('/8/');
 $client->process([$tx, $tx2, $tx3]);
-ok($tx->is_finished);
-ok(!$tx->has_error);
-ok($tx2->is_finished);
-ok(!$tx2->has_error);
-ok($tx3->is_finished);
-ok($tx3->has_error);
+ok($tx->is_finished,  'state is finished');
+ok(!$tx->has_error,   'has no errors');
+ok($tx2->is_finished, 'state is finished');
+ok(!$tx2->has_error,  'has no errors');
+ok($tx3->is_finished, 'state is finished');
+ok($tx3->has_error,   'has error');

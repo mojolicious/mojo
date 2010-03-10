@@ -24,7 +24,7 @@ use_ok('Mojo::Server::CGI');
 
 # Apache setup
 my $server = Test::Mojo::Server->new;
-my $port   = $server->generate_port_ok;
+my $port   = $server->generate_port_ok('found free port');
 my $dir    = File::Temp::tempdir;
 my $config = File::Spec->catfile($dir, 'cgi.config');
 my $mt     = Mojo::Template->new;
@@ -69,20 +69,20 @@ Mojo::Server::CGI->new->run;
 1;
 EOF
 chmod 0777, $cgi;
-ok(-x $cgi);
+ok(-x $cgi, 'script is executable');
 
 # Start
-$server->start_server_ok;
+$server->start_server_ok('server started');
 
 # Request
 my $client = Mojo::Client->new;
 $client->get(
     "http://127.0.0.1:$port/cgi-bin/test.cgi" => sub {
         my $self = shift;
-        is($self->res->code, 200);
-        like($self->res->body, qr/Mojo is working/);
+        is($self->res->code, 200, 'right status');
+        like($self->res->body, qr/Mojo is working/, 'right content');
     }
 )->process;
 
 # Stop
-$server->stop_server_ok;
+$server->stop_server_ok('server stopped');

@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojolicious.
 0.999924 2010-03-08 00:00:00
         - Added more routes tests. (doubi)
         - Cleaned up documentation.
+        - Cleaned up tests.
         - Relaxed Mojo::Server::CGI read timeout.
         - Fixed Mojolicious sessions to remove the session cookie immediately
           if it's not needed anymore. (ask)

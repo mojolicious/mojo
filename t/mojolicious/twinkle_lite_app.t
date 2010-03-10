@@ -11,6 +11,8 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
+plan skip_all => 'Perl 5.10 required for this test!'
+  unless eval { require Pod::Simple::HTML; 1 };
 plan tests => 14;
 
 # Pizza delivery for...

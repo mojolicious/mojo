@@ -32,7 +32,7 @@ sub run {
     my $poll = IO::Poll->new;
     $poll->mask(\*STDIN, POLLIN);
     while (!$req->is_finished) {
-        $poll->poll(0);
+        $poll->poll(1);
         my @readers = $poll->handles(POLLIN);
         last unless @readers;
         my $read = STDIN->sysread(my $buffer, CHUNK_SIZE, 0);

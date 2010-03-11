@@ -23,7 +23,7 @@ my %ROLE_NUMBERS;
     }
 }
 
-#Types
+# Types
 my @TYPES = qw/
   BEGIN_REQUEST
   ABORT_REQUEST

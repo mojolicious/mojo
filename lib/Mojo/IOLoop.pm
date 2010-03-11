@@ -383,9 +383,12 @@ sub _accept {
 
     # Accept
     my $socket = $listen->accept or return;
-    my $id = "$socket";
+
+    # Unlock callback
+    $self->_callback('unlock', $self->unlock_cb);
 
     # Add connection
+    my $id = "$socket";
     my $c = $self->{_cs}->{$id} = {
         accepting => 1,
         buffer    => Mojo::ByteStream->new,
@@ -411,9 +414,6 @@ sub _accept {
     # Accept callback
     my $cb = $self->{_listen}->{$listen}->{cb};
     $self->_event('accept', $cb, $id) if $cb;
-
-    # Unlock callback
-    $self->_callback('unlock', $self->unlock_cb);
 
     # Remove listen sockets
     $listen = $self->{_listen} || {};
@@ -683,11 +683,12 @@ sub _prepare {
 
     # Nothing to do
     my $listen = $self->{_listen} || {};
-    return delete $self->{_running}
+    delete $self->{_running}
       unless keys %{$self->{_cs}}
           || $self->{_listening}
           || ($self->max_connections > 0 && keys %$listen);
 
+    return 1 unless $self->{_running};
     return;
 }
 

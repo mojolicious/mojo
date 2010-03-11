@@ -18,6 +18,7 @@ use constant DEBUG => $ENV{MOJO_SERVER_DEBUG} || 0;
 __PACKAGE__->attr(cleanup_interval                      => 15);
 __PACKAGE__->attr(idle_timeout                          => 30);
 __PACKAGE__->attr(max_clients                           => 1);
+__PACKAGE__->attr(max_requests                          => 1000);
 __PACKAGE__->attr(max_servers                           => 100);
 __PACKAGE__->attr(max_spare_servers                     => 10);
 __PACKAGE__->attr([qw/min_spare_servers start_servers/] => 5);
@@ -313,16 +314,16 @@ sub _spawn_child {
 
         # Parent will send a HUP signal when there are too many children idle
         my $done = 0;
-        $SIG{HUP} = sub {
-            $self->ioloop->max_connections(0);
-            $done++;
-        };
+        $SIG{HUP} = sub { $self->ioloop->max_connections(0) };
 
         # User and group
         $self->setuidgid;
 
         # Spin
-        while (!$done) { $self->child }
+        while (!$done) {
+            $self->child;
+            $done++ if $self->ioloop->max_connections <= 0;
+        }
 
         # Done
         $self->child_status('done');
@@ -384,6 +385,14 @@ Timeout for workers to be idle in seconds, defaults to C<30>.
 
 Maximum number of parallel client connections handled by worker, defaults to
 C<1>.
+
+=head2 C<max_requests>
+
+    my $max_requests = $daemon->max_requests;
+    $daemon          = $daemon->max_requests(1);
+
+Maximum number of requests a worker process is allowed to handle, defaults to
+C<1000>.
 
 =head2 C<max_servers>
 

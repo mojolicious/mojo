@@ -212,8 +212,7 @@ sub _parse_basic_auth {
     return unless $header =~ /Basic (.+)$/;
 
     # Decode
-    my $auth = $1;
-    return b($auth)->b64_decode->to_string;
+    return b($1)->b64_decode->to_string;
 }
 
 sub _parse_env {

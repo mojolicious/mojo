@@ -90,6 +90,7 @@ my (%ORDERED_HEADERS, %NORMALCASE_HEADERS);
 }
 
 sub accept_language { shift->header('Accept-Language' => @_) }
+sub authorization   { shift->header('Authorization'   => @_) }
 
 sub add {
     my $self = shift;
@@ -279,8 +280,9 @@ sub parse {
     return;
 }
 
+sub proxy_authenticate  { shift->header('Proxy-Authenticate'  => @_) }
 sub proxy_authorization { shift->header('Proxy-Authorization' => @_) }
-sub referrer { shift->header(Referer => @_) }
+sub referrer            { shift->header(Referer               => @_) }
 
 sub remove {
     my ($self, $name) = @_;
@@ -328,6 +330,7 @@ sub user_agent         { shift->header('User-Agent'         => @_) }
 sub websocket_location { shift->header('WebSocket-Location' => @_) }
 sub websocket_origin   { shift->header('WebSocket-Origin'   => @_) }
 sub websocket_protocol { shift->header('WebSocket-Protocol' => @_) }
+sub www_authenticate   { shift->header('WWW-Authenticate'   => @_) }
 
 1;
 __END__
@@ -362,12 +365,40 @@ implements the following new ones.
 The Buffer to use for header parsing, by default a L<Mojo::ByteStream>
 object.
 
+=head1 METHODS
+
+L<Mojo::Headers> inherits all methods from L<Mojo::Stateful> and implements
+the following new ones.
+
 =head2 C<accept_language>
 
     my $accept_language = $headers->accept_language;
     $headers            = $headers->accept_language('de, en');
 
 Shortcut for the C<Accept-Language> header.
+
+=head2 C<add>
+
+    $headers = $headers->add('Content-Type', 'text/plain');
+
+Add one or more header lines.
+
+=head2 C<authorization>
+
+    my $authorization = $headers->authorization;
+    $headers          = $headers->authorization('Basic Zm9vOmJhcg==');
+
+Shortcut for the C<Authorization> header.
+
+=head2 C<to_string>
+
+=head2 C<build>
+
+    my $string = $headers->build;
+    my $string = $headers->to_string;
+    my $string = "$headers";
+
+Format headers suitable for HTTP 1.1 messages.
 
 =head2 C<connection>
 
@@ -425,6 +456,22 @@ Shortcut for the C<Date> header.
 
 Shortcut for the C<Expect> header.
 
+=head2 C<from_hash>
+
+    $headers = $headers->from_hash({'Content-Type' => 'text/html'});
+
+Parse headers from a hash.
+
+=head2 C<header>
+
+    my $string = $headers->header('Content-Type');
+    my @lines  = $headers->header('Content-Type');
+    $headers   = $headers->header('Content-Type' => 'text/plain');
+
+Get or replace the current header values.
+Note that this method is context sensitive and will turn all header lines
+into a single one in scalar context.
+
 =head2 C<host>
 
     my $host = $headers->host;
@@ -439,12 +486,31 @@ Shortcut for the C<Host> header.
 
 Shortcut for the C<Location> header.
 
+=head2 C<names>
+
+    my $names = $headers->names;
+
+Generate a list of all currently defined headers.
+
 =head2 C<origin>
 
     my $origin = $headers->origin;
     $headers   = $headers->origin('http://example.com');
 
 Shortcut for the C<Origin> header.
+
+=head2 C<parse>
+
+    my $success = $headers->parse("Content-Type: text/foo\n\n");
+
+Parse formatted headers.
+
+=head2 C<proxy_authenticate>
+
+    my $authenticate = $headers->proxy_authenticate;
+    $headers         = $headers->proxy_authenticate('Basic "realm"');
+
+Shortcut for the C<Proxy-Authenticate> header.
 
 =head2 C<proxy_authorization>
 
@@ -460,6 +526,12 @@ Shortcut for the C<Proxy-Authorization> header.
 
 Shortcut for the C<Referer> header, there was a typo in RFC 2068 which
 resulted in C<Referer> becoming an official header.
+
+=head2 C<remove>
+
+    $headers = $headers->remove('Content-Type');
+
+Remove a header.
 
 =head2 C<server>
 
@@ -488,6 +560,14 @@ Shortcut for the C<Set-Cookie2> header.
     $headers   = $headers->status('200 OK');
 
 Shortcut for the C<Status> header.
+
+=head2 C<to_hash>
+
+    my $hash = $headers->to_hash;
+    my $hash = $headers->to_hash(arrayref => 1);
+
+Format headers as a hash.
+Nested arrayrefs to represent multi line values are optional.
 
 =head2 C<trailer>
 
@@ -538,68 +618,12 @@ Shortcut for the C<WebSocket-Origin> header.
 
 Shortcut for the C<WebSocket-Protocol> header.
 
-=head1 METHODS
+=head2 C<www_authenticate>
 
-L<Mojo::Headers> inherits all methods from L<Mojo::Stateful> and implements
-the following new ones.
+    my $authenticate = $headers->www_authenticate;
+    $headers         = $headers->www_authenticate('Basic "realm"');
 
-=head2 C<add>
-
-    $headers = $headers->add('Content-Type', 'text/plain');
-
-Add one or more header lines.
-
-=head2 C<to_string>
-
-=head2 C<build>
-
-    my $string = $headers->build;
-    my $string = $headers->to_string;
-    my $string = "$headers";
-
-Format headers suitable for HTTP 1.1 messages.
-
-=head2 C<from_hash>
-
-    $headers = $headers->from_hash({'Content-Type' => 'text/html'});
-
-Parse headers from a hash.
-
-=head2 C<header>
-
-    my $string = $headers->header('Content-Type');
-    my @lines  = $headers->header('Content-Type');
-    $headers   = $headers->header('Content-Type' => 'text/plain');
-
-Get or replace the current header values.
-Note that this method is context sensitive and will turn all header lines
-into a single one in scalar context.
-
-=head2 C<names>
-
-    my $names = $headers->names;
-
-Generate a list of all currently defined headers.
-
-=head2 C<parse>
-
-    my $success = $headers->parse("Content-Type: text/foo\n\n");
-
-Parse formatted headers.
-
-=head2 C<remove>
-
-    $headers = $headers->remove('Content-Type');
-
-Remove a header.
-
-=head2 C<to_hash>
-
-    my $hash = $headers->to_hash;
-    my $hash = $headers->to_hash(arrayref => 1);
-
-Format headers as a hash.
-Nested arrayrefs to represent multi line values are optional.
+Shortcut for the C<WWW-Authenticate> header.
 
 =head1 SEE ALSO
 

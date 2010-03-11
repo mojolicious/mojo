@@ -251,6 +251,7 @@ sub _build_tx {
     if (my $max = $self->max_requests) {
         $self->{_requests} ||= 0;
         if (++$self->{_requests} >= $max) {
+            for my $id (@{$self->{_listen}}) { $loop->drop($id) }
             $self->max_keep_alive_requests(1);
             $self->ioloop->max_connections(0);
         }

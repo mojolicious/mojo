@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 29;
+use Test::More tests => 30;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -60,6 +60,9 @@ $loader->load($_) for @modules;
 ok(LoaderTest::A->can('new'));
 ok(LoaderTest::B->can('new'));
 ok(LoaderTest::C->can('new'));
+
+# Load unrelated class
+ok($loader->load('LoaderTest'));
 
 # Reload
 my $file = IO::File->new;

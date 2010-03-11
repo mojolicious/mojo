@@ -35,7 +35,7 @@ sub load {
     return 1 unless $module;
 
     # Already loaded
-    return if $module->can('isa');
+    return if $module->can('new');
 
     # Try
     eval "require $module";
@@ -168,7 +168,8 @@ Construct a new L<Mojo::Loader> object.
 
     my $e = $loader->load('Foo::Bar');
 
-Load a class.
+Load a class, note that classes are checked for a C<new> method to see if
+they are already loaded.
 
 =head2 C<reload>
 

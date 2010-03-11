@@ -10,6 +10,7 @@ This file documents the revision history for Perl extension Mojolicious.
           if it's not needed anymore. (ask)
         - Fixed routes method condition to consider GET and HEAD equal.
         - Fixed test requiring Perl 5.10.
+        - Fixed a loader bug. (mvuets)
 
 0.999923 2010-03-07 00:00:00
         - Made Mojo::Client sync by default with optional async support, this

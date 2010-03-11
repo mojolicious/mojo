@@ -36,8 +36,8 @@ These options are available:
   --reload                       Automatically reload application when the
                                  source code changes.
   --requests <number>            Set the maximum number of requests the
-                                 daemon is allowed to handle, defaults to
-                                 100.
+                                 daemon is allowed to handle, not used by
+                                 default.
   --user <name>                  Set user name for process.
 EOF
 

@@ -44,8 +44,8 @@ These options are available:
   --reload                       Automatically reload application when the
                                  source code changes.
   --requests <number>            Set maximum number of requests a worker
-                                 process is allowed to handle, not used by
-                                 default.
+                                 process is allowed to handle, defaults to
+                                 1000.
   --servers <number>             Set maximum number of children, defaults to
                                  100.
   --start <number>               Set number of children to spawn at startup,

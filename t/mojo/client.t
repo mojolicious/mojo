@@ -24,7 +24,7 @@ my $client = Mojo::Client->new;
 $client->get(
     'http://cpan.org' => sub {
         my $self = shift;
-        is($self->res->code, 301);
+        is($self->res->code, 301, 'right status');
     }
 )->process;
 $client = undef;
@@ -39,48 +39,48 @@ $tx->req->method('GET');
 $tx->req->url->parse('http://cpan.org');
 $tx->req->headers->connection('close');
 $client->process($tx);
-is($tx->state,     'done');
-is($tx->res->code, 301);
-like($tx->res->headers->connection, qr/close/i);
+is($tx->state,     'done', 'right state');
+is($tx->res->code, 301,    'right status');
+like($tx->res->headers->connection, qr/close/i, 'right "Connection" header');
 
 # Simple request
 $client->get(
     'http://cpan.org' => sub {
         my $self = shift;
-        is($self->req->method, 'GET');
-        is($self->req->url,    'http://cpan.org');
-        is($self->res->code,   301);
+        is($self->req->method, 'GET',             'rigth method');
+        is($self->req->url,    'http://cpan.org', 'right url');
+        is($self->res->code,   301,               'right status');
     }
 )->process;
 
 # Simple request with body
 $tx = $client->get('http://www.apache.org' => 'Hi there!');
-is($tx->req->method,                  'GET');
-is($tx->req->url,                     'http://www.apache.org');
-is($tx->req->headers->content_length, 9);
-is($tx->req->body,                    'Hi there!');
-is($tx->res->code,                    200);
+is($tx->req->method, 'GET', 'right method');
+is($tx->req->url, 'http://www.apache.org', 'right url');
+is($tx->req->headers->content_length, 9,           'right content length');
+is($tx->req->body,                    'Hi there!', 'right content');
+is($tx->res->code,                    200,         'right status');
 
 # Simple form post
 $tx = $client->post_form(
     'http://search.cpan.org/search' => {query => 'mojolicious'});
-is($tx->req->method,                  'POST');
-is($tx->req->url,                     'http://search.cpan.org/search');
-is($tx->req->headers->content_length, 17);
-is($tx->req->body,                    'query=mojolicious');
-like($tx->res->body, qr/Mojolicious/);
-is($tx->res->code, 200);
+is($tx->req->method, 'POST', 'right method');
+is($tx->req->url, 'http://search.cpan.org/search', 'right url');
+is($tx->req->headers->content_length, 17, 'right content length');
+is($tx->req->body, 'query=mojolicious', 'right content');
+like($tx->res->body, qr/Mojolicious/, 'right content');
+is($tx->res->code, 200, 'right status');
 
 # Simple request with headers and body
 $client->async->get(
     'http://www.apache.org' => (Expect => '100-continue') => 'Hi there!' =>
       sub {
         my $self = shift;
-        is($self->req->method, 'GET');
-        is($self->req->url,    'http://www.apache.org');
-        is($self->req->body,   'Hi there!');
-        is($self->res->code,   200);
-        ok($self->tx->continued);
+        is($self->req->method, 'GET',                   'right method');
+        is($self->req->url,    'http://www.apache.org', 'right url');
+        is($self->req->body,   'Hi there!',             'right content');
+        is($self->res->code,   200,                     'right status');
+        ok($self->tx->continued, 'request was continued');
     }
 )->process;
 
@@ -88,26 +88,26 @@ $client->async->get(
 $client->get(
     'http://google.com' => sub {
         my $self = shift;
-        is($self->req->method, 'GET');
-        is($self->req->url,    'http://google.com');
-        is($self->res->code,   301);
+        is($self->req->method, 'GET',               'right method');
+        is($self->req->url,    'http://google.com', 'right url');
+        is($self->res->code,   301,                 'right status');
     }
 );
 $client->get(
     'http://www.apache.org' => sub {
         my $self = shift;
-        is($self->req->method,    'GET');
-        is($self->req->url,       'http://www.apache.org');
-        is($self->res->code,      200);
-        is($self->tx->kept_alive, 1);
+        is($self->req->method, 'GET',                   'right method');
+        is($self->req->url,    'http://www.apache.org', 'right url');
+        is($self->res->code,   200,                     'right status');
+        is($self->tx->kept_alive, 1, 'connection was kept alive');
     }
 );
 $client->get(
     'http://www.google.de' => sub {
         my $self = shift;
-        is($self->req->method, 'GET');
-        is($self->req->url,    'http://www.google.de');
-        is($self->res->code,   200);
+        is($self->req->method, 'GET',                  'right method');
+        is($self->req->url,    'http://www.google.de', 'right url');
+        is($self->res->code,   200,                    'right status');
     }
 );
 $client->process;
@@ -116,11 +116,11 @@ $client->process;
 $client->websocket(
     'ws://websockets.org:8787' => sub {
         my $self = shift;
-        is($self->tx->is_websocket, 1);
+        is($self->tx->is_websocket, 1, 'websocket transaction');
         $self->receive_message(
             sub {
                 my ($self, $message) = @_;
-                is($message, 'echo: hi there!');
+                is($message, 'echo: hi there!', 'right message');
                 $self->finish;
             }
         );
@@ -133,12 +133,12 @@ $client->max_redirects(3);
 $client->get(
     'http://www.google.com' => sub {
         my ($self, $tx, $h) = @_;
-        is($tx->req->method,     'GET');
-        is($tx->req->url,        'http://www.google.de/');
-        is($tx->res->code,       200);
-        is($h->[0]->req->method, 'GET');
-        is($h->[0]->req->url,    'http://www.google.com');
-        is($h->[0]->res->code,   302);
+        is($tx->req->method,     'GET',                   'right method');
+        is($tx->req->url,        'http://www.google.de/', 'right url');
+        is($tx->res->code,       200,                     'right status');
+        is($h->[0]->req->method, 'GET',                   'right method');
+        is($h->[0]->req->url,    'http://www.google.com', 'right url');
+        is($h->[0]->res->code,   302,                     'right status');
     }
 )->process;
 $client->max_redirects(0);
@@ -161,37 +161,37 @@ $tx->req->body(
     }
 );
 $client->process($tx);
-ok($tx->is_done);
+ok($tx->is_done, 'right state');
 
 # Custom requests with keep alive
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('http://www.apache.org');
-ok(!$tx->kept_alive);
+ok(!$tx->kept_alive, 'connection was not kept alive');
 $client->queue(
     $tx => sub {
         my ($self, $tx) = @_;
-        ok($tx->is_done);
-        ok($tx->kept_alive);
+        ok($tx->is_done,    'right state');
+        ok($tx->kept_alive, 'connection was kept alive');
     }
 );
 $client->process;
-ok($tx->is_done);
+ok($tx->is_done, 'rigth state');
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('http://www.apache.org');
-ok(!$tx->kept_alive);
+ok(!$tx->kept_alive, 'connection was not kept alive');
 $client->process(
     $tx => sub {
         my ($self, $tx) = @_;
-        ok($tx->is_done);
-        ok($tx->kept_alive);
-        ok($tx->local_address);
-        ok($tx->local_port > 0);
-        is($tx->remote_port, 80);
+        ok($tx->is_done,        'right state');
+        ok($tx->kept_alive,     'connection was kept alive');
+        ok($tx->local_address,  'has local address');
+        ok($tx->local_port > 0, 'has local port');
+        is($tx->remote_port, 80, 'right remote port');
     }
 );
-ok($tx->is_done);
+ok($tx->is_done, 'right state');
 
 # Custom pipelined requests
 $tx = Mojo::Transaction::HTTP->new;
@@ -207,16 +207,16 @@ $client->process(
     ([$tx, $tx2], $tx3) => sub {
         my ($self, $tx) = @_;
         return ok($tx->is_done) unless ref $tx eq 'ARRAY';
-        ok($tx->[0]->is_done);
-        ok($tx->[1]->is_done);
+        ok($tx->[0]->is_done, 'right state');
+        ok($tx->[1]->is_done, 'right state');
     }
 );
-ok($tx2->is_done);
-ok($tx3->is_done);
-is($tx->res->code,  200);
-is($tx2->res->code, 200);
-is($tx3->res->code, 200);
-like($tx2->res->content->asset->slurp, qr/Apache/);
+ok($tx2->is_done, 'right state');
+ok($tx3->is_done, 'right state');
+is($tx->res->code,  200, 'right status');
+is($tx2->res->code, 200, 'rigth status');
+is($tx3->res->code, 200, 'right status');
+like($tx2->res->content->asset->slurp, qr/Apache/, 'right content');
 
 # Custom pipelined HEAD request
 $tx = Mojo::Transaction::HTTP->new;
@@ -228,14 +228,14 @@ $tx2->req->url->parse('http://www.apache.org');
 $client->process(
     [$tx, $tx2] => sub {
         my ($self, $p) = @_;
-        ok($p->[0]->is_done);
-        ok($p->[1]->is_done);
+        ok($p->[0]->is_done, 'right state');
+        ok($p->[1]->is_done, 'right state');
     }
 );
-ok($tx2->is_done);
-is($tx->res->code,  200);
-is($tx2->res->code, 200);
-like($tx2->res->content->asset->slurp, qr/Apache/);
+ok($tx2->is_done, 'right state');
+is($tx->res->code,  200, 'right status');
+is($tx2->res->code, 200, 'right status');
+like($tx2->res->content->asset->slurp, qr/Apache/, 'right content');
 
 # Custom pipelined requests with 100 Continue
 $tx = Mojo::Transaction::HTTP->new;
@@ -253,13 +253,13 @@ my $tx4 = Mojo::Transaction::HTTP->new;
 $tx4->req->method('GET');
 $tx4->req->url->parse('http://www.apache.org');
 $client->process([$tx, $tx2, $tx3, $tx4]);
-ok($tx->is_done);
-ok($tx2->is_done);
-ok($tx3->is_done);
-ok($tx4->is_done);
-is($tx->res->code,  200);
-is($tx2->res->code, 200);
-is($tx2->continued, 1);
-is($tx3->res->code, 200);
-is($tx4->res->code, 200);
-like($tx2->res->content->asset->slurp, qr/Apache/);
+ok($tx->is_done,  'right state');
+ok($tx2->is_done, 'right state');
+ok($tx3->is_done, 'right state');
+ok($tx4->is_done, 'right state');
+is($tx->res->code,  200, 'right status');
+is($tx2->res->code, 200, 'right status');
+is($tx2->continued, 1,   'transaction was continued');
+is($tx3->res->code, 200, 'right status');
+is($tx4->res->code, 200, 'right status');
+like($tx2->res->content->asset->slurp, qr/Apache/, 'right content');

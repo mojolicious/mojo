@@ -16,4 +16,4 @@ my $cgi = Mojo::Server::CGI->new;
 
 # Test closed STDOUT
 close(STDOUT);
-ok(not defined $cgi->run);
+ok((not defined $cgi->run), 'working with closed STDOUT');

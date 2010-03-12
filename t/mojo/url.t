@@ -17,199 +17,225 @@ use_ok('Mojo::URL');
 
 # Simple
 my $url = Mojo::URL->new('HtTp://Kraih.Com');
-is($url->scheme, 'HtTp');
-is($url->host,   'Kraih.Com');
-is("$url",       'http://kraih.com');
+is($url->scheme, 'HtTp',             'right scheme');
+is($url->host,   'Kraih.Com',        'right host');
+is("$url",       'http://kraih.com', 'right format');
 
 # Advanced
 $url = Mojo::URL->new(
     'http://sri:foobar@kraih.com:8080/test/index.html?monkey=biz&foo=1#23');
-is($url->is_abs,   1);
-is($url->scheme,   'http');
-is($url->userinfo, 'sri:foobar');
-is($url->host,     'kraih.com');
-is($url->port,     '8080');
-is($url->path,     '/test/index.html');
-is($url->query,    'monkey=biz&foo=1');
-is($url->fragment, '23');
+is($url->is_abs,   1,                  'is absolute');
+is($url->scheme,   'http',             'right scheme');
+is($url->userinfo, 'sri:foobar',       'right userinfo');
+is($url->host,     'kraih.com',        'right host');
+is($url->port,     '8080',             'right port');
+is($url->path,     '/test/index.html', 'right path');
+is($url->query,    'monkey=biz&foo=1', 'right query');
+is($url->fragment, '23',               'right fragment');
 is("$url",
-    'http://sri:foobar@kraih.com:8080/test/index.html?monkey=biz&foo=1#23');
+    'http://sri:foobar@kraih.com:8080/test/index.html?monkey=biz&foo=1#23',
+    'right format');
 $url->path('/index.xml');
-is("$url", 'http://sri:foobar@kraih.com:8080/index.xml?monkey=biz&foo=1#23');
+is("$url", 'http://sri:foobar@kraih.com:8080/index.xml?monkey=biz&foo=1#23',
+    'right format');
 
 # Parameters
 $url = Mojo::URL->new(
     'http://sri:foobar@kraih.com:8080?_monkey=biz%3B&_monkey=23#23');
-is($url->is_abs,   1);
-is($url->scheme,   'http');
-is($url->userinfo, 'sri:foobar');
-is($url->host,     'kraih.com');
-is($url->port,     '8080');
-is($url->path,     '');
-is($url->query,    '_monkey=biz%3B&_monkey=23');
-is_deeply($url->query->to_hash, {_monkey => ['biz;', 23]});
-is($url->fragment, '23');
-is("$url", 'http://sri:foobar@kraih.com:8080?_monkey=biz%3B&_monkey=23#23');
+is($url->is_abs,   1,                           'is absolute');
+is($url->scheme,   'http',                      'right scheme');
+is($url->userinfo, 'sri:foobar',                'right userinfo');
+is($url->host,     'kraih.com',                 'right host');
+is($url->port,     '8080',                      'right port');
+is($url->path,     '',                          'no path');
+is($url->query,    '_monkey=biz%3B&_monkey=23', 'right query');
+is_deeply($url->query->to_hash, {_monkey => ['biz;', 23]}, 'right structure');
+is($url->fragment, '23', 'right fragment');
+is("$url", 'http://sri:foobar@kraih.com:8080?_monkey=biz%3B&_monkey=23#23',
+    'right format');
 $url->query(monkey => 'foo');
-is("$url", 'http://sri:foobar@kraih.com:8080?monkey=foo#23');
+is("$url", 'http://sri:foobar@kraih.com:8080?monkey=foo#23', 'right format');
 $url->query('foo');
-is("$url", 'http://sri:foobar@kraih.com:8080?foo#23');
+is("$url", 'http://sri:foobar@kraih.com:8080?foo#23', 'right format');
 $url->query('foo=bar');
-is("$url", 'http://sri:foobar@kraih.com:8080?foo%3Dbar#23');
+is("$url", 'http://sri:foobar@kraih.com:8080?foo%3Dbar#23', 'right format');
 
 # Query string
 $url = Mojo::URL->new(
     'http://sri:foobar@kraih.com:8080?_monkeybiz%3B&_monkey;23#23');
-is($url->is_abs,   1);
-is($url->scheme,   'http');
-is($url->userinfo, 'sri:foobar');
-is($url->host,     'kraih.com');
-is($url->port,     '8080');
-is($url->path,     '');
-is($url->query,    '_monkeybiz%3B%26_monkey%3B23');
-is_deeply($url->query->params, ['_monkeybiz;&_monkey;23', undef]);
-is($url->fragment, '23');
-is("$url",
-    'http://sri:foobar@kraih.com:8080?_monkeybiz%3B%26_monkey%3B23#23');
+is($url->is_abs,   1,                              'is absolute');
+is($url->scheme,   'http',                         'right scheme');
+is($url->userinfo, 'sri:foobar',                   'right userinfo');
+is($url->host,     'kraih.com',                    'right host');
+is($url->port,     '8080',                         'right port');
+is($url->path,     '',                             'no path');
+is($url->query,    '_monkeybiz%3B%26_monkey%3B23', 'right query');
+is_deeply(
+    $url->query->params,
+    ['_monkeybiz;&_monkey;23', undef],
+    'right structure'
+);
+is($url->fragment, '23', 'right fragment');
+is("$url", 'http://sri:foobar@kraih.com:8080?_monkeybiz%3B%26_monkey%3B23#23',
+    'right format');
 
 # Relative
 $url = Mojo::URL->new('http://sri:foobar@kraih.com:8080/foo?foo=bar#23');
 $url->base->parse('http://sri:foobar@kraih.com:8080/');
-is($url->is_abs, 1);
-is($url->to_rel, '/foo?foo=bar#23');
+is($url->is_abs, 1, 'is absolute');
+is($url->to_rel, '/foo?foo=bar#23', 'right relative version');
 
 # Relative with path
 $url = Mojo::URL->new('http://kraih.com/foo/index.html?foo=bar#23');
 $url->base->parse('http://kraih.com/foo/');
 my $rel = $url->to_rel;
-is($rel,         'index.html?foo=bar#23');
-is($rel->is_abs, undef);
-is($rel->to_abs, 'http://kraih.com/foo/index.html?foo=bar#23');
+is($rel, 'index.html?foo=bar#23', 'right format');
+is($rel->is_abs, undef, 'not absolute');
+is( $rel->to_abs,
+    'http://kraih.com/foo/index.html?foo=bar#23',
+    'right absolute version'
+);
 
 # Absolute (base without trailing slash)
 $url = Mojo::URL->new('/foo?foo=bar#23');
 $url->base->parse('http://kraih.com/bar');
-is($url->is_abs, undef);
-is($url->to_abs, 'http://kraih.com/foo?foo=bar#23');
+is($url->is_abs, undef, 'not absolute');
+is($url->to_abs, 'http://kraih.com/foo?foo=bar#23', 'right absolute version');
 
 # Absolute with path
 $url = Mojo::URL->new('../foo?foo=bar#23');
 $url->base->parse('http://kraih.com/bar/baz/');
-is($url->is_abs,         undef);
-is($url->to_abs,         'http://kraih.com/bar/baz/../foo?foo=bar#23');
-is($url->to_abs->to_rel, '../foo?foo=bar#23');
-is($url->to_abs->base,   'http://kraih.com/bar/baz/');
+is($url->is_abs, undef, 'not absolute');
+is( $url->to_abs,
+    'http://kraih.com/bar/baz/../foo?foo=bar#23',
+    'right absolute version'
+);
+is($url->to_abs->to_rel, '../foo?foo=bar#23', 'right relative version');
+is($url->to_abs->base, 'http://kraih.com/bar/baz/', 'right base');
 
 # Real world tests
 $url = Mojo::URL->new('http://acme.s3.amazonaws.com'
       . '/mojo%2Fg%2B%2B-4%2E2_4%2E2%2E3-2ubuntu7_i386%2Edeb');
-is($url->is_abs,   1);
-is($url->scheme,   'http');
-is($url->userinfo, undef);
-is($url->host,     'acme.s3.amazonaws.com');
-is($url->port,     undef);
-is($url->path,     '/mojo%2Fg%2B%2B-4%2E2_4%2E2%2E3-2ubuntu7_i386%2Edeb');
-ok(!$url->query);
-is_deeply($url->query->to_hash, {});
-is($url->fragment, undef);
-is("$url",
-        'http://acme.s3.amazonaws.com'
-      . '/mojo%2Fg%2B%2B-4%2E2_4%2E2%2E3-2ubuntu7_i386%2Edeb');
+is($url->is_abs,   1,                       'is absolute');
+is($url->scheme,   'http',                  'right scheme');
+is($url->userinfo, undef,                   'no userinfo');
+is($url->host,     'acme.s3.amazonaws.com', 'right host');
+is($url->port,     undef,                   'no port');
+is($url->path, '/mojo%2Fg%2B%2B-4%2E2_4%2E2%2E3-2ubuntu7_i386%2Edeb',
+    'right path');
+ok(!$url->query, 'no query');
+is_deeply($url->query->to_hash, {}, 'right structure');
+is($url->fragment, undef, 'no fragment');
+is( "$url",
+    'http://acme.s3.amazonaws.com'
+      . '/mojo%2Fg%2B%2B-4%2E2_4%2E2%2E3-2ubuntu7_i386%2Edeb',
+    'right format'
+);
 
 # Clone (advanced)
 $url = Mojo::URL->new(
     'http://sri:foobar@kraih.com:8080/test/index.html?monkey=biz&foo=1#23');
 my $clone = $url->clone;
-is($clone->is_abs,   1);
-is($clone->scheme,   'http');
-is($clone->userinfo, 'sri:foobar');
-is($clone->host,     'kraih.com');
-is($clone->port,     '8080');
-is($clone->path,     '/test/index.html');
-is($clone->query,    'monkey=biz&foo=1');
-is($clone->fragment, '23');
+is($clone->is_abs,   1,                  'is absolute');
+is($clone->scheme,   'http',             'right scheme');
+is($clone->userinfo, 'sri:foobar',       'right userinfo');
+is($clone->host,     'kraih.com',        'right host');
+is($clone->port,     '8080',             'right port');
+is($clone->path,     '/test/index.html', 'right path');
+is($clone->query,    'monkey=biz&foo=1', 'right query');
+is($clone->fragment, '23',               'right fragment');
 is("$clone",
-    'http://sri:foobar@kraih.com:8080/test/index.html?monkey=biz&foo=1#23');
+    'http://sri:foobar@kraih.com:8080/test/index.html?monkey=biz&foo=1#23',
+    'right format');
 $clone->path('/index.xml');
-is("$clone",
-    'http://sri:foobar@kraih.com:8080/index.xml?monkey=biz&foo=1#23');
+is("$clone", 'http://sri:foobar@kraih.com:8080/index.xml?monkey=biz&foo=1#23',
+    'right format');
 
 # Clone (with base)
 $url = Mojo::URL->new('/test/index.html');
 $url->base->parse('http://127.0.0.1');
-is("$url", '/test/index.html');
+is("$url", '/test/index.html', 'right format');
 $clone = $url->clone;
-is("$url",                    '/test/index.html');
-is($clone->is_abs,            undef);
-is($clone->scheme,            undef);
-is($clone->host,              undef);
-is($clone->base->scheme,      'http');
-is($clone->base->host,        '127.0.0.1');
-is($clone->path,              '/test/index.html');
-is($clone->to_abs->to_string, 'http://127.0.0.1/test/index.html');
+is("$url",               '/test/index.html', 'right format');
+is($clone->is_abs,       undef,              'not absolute');
+is($clone->scheme,       undef,              'no scheme');
+is($clone->host,         undef,              'no host');
+is($clone->base->scheme, 'http',             'right base scheme');
+is($clone->base->host,   '127.0.0.1',        'right base host');
+is($clone->path,         '/test/index.html', 'right path');
+is( $clone->to_abs->to_string,
+    'http://127.0.0.1/test/index.html',
+    'right absolute version'
+);
 
 # IPv6
 $url = Mojo::URL->new('http://[::1]:3000/');
-is($url->is_abs, 1);
-is($url->scheme, 'http');
-is($url->host,   '[::1]');
-is($url->port,   3000);
-is($url->path,   '/');
-is("$url",       'http://[::1]:3000/');
+is($url->is_abs, 1,                    'is absolute');
+is($url->scheme, 'http',               'right scheme');
+is($url->host,   '[::1]',              'right host');
+is($url->port,   3000,                 'right port');
+is($url->path,   '/',                  'right path');
+is("$url",       'http://[::1]:3000/', 'right format');
 
 # IDNA
 $url = Mojo::URL->new('http://bücher.ch:3000/foo');
-is($url->is_abs, 1);
-is($url->scheme, 'http');
-is($url->host,   'bücher.ch');
-is($url->ihost,  'xn--bcher-kva.ch');
-is($url->port,   3000);
-is($url->path,   '/foo');
-is("$url",       'http://xn--bcher-kva.ch:3000/foo');
+is($url->is_abs, 1,                  'is absolute');
+is($url->scheme, 'http',             'right scheme');
+is($url->host,   'bücher.ch',       'right host');
+is($url->ihost,  'xn--bcher-kva.ch', 'right internationalized host');
+is($url->port,   3000,               'right port');
+is($url->path,   '/foo',             'right path');
+is("$url", 'http://xn--bcher-kva.ch:3000/foo', 'right format');
 
 # IDNA (snowman)
 $url = Mojo::URL->new('http://☃.net/');
-is($url->is_abs, 1);
-is($url->scheme, 'http');
-is($url->host,   '☃.net');
-is($url->ihost,  'xn--n3h.net');
-is($url->path,   '/');
-is("$url",       'http://xn--n3h.net/');
+is($url->is_abs, 1,                     'is absolute');
+is($url->scheme, 'http',                'right scheme');
+is($url->host,   '☃.net',             'right host');
+is($url->ihost,  'xn--n3h.net',         'right internationalized host');
+is($url->path,   '/',                   'right path');
+is("$url",       'http://xn--n3h.net/', 'right format');
 
 # Already absolute
 $url = Mojo::URL->new('http://foo.com/');
-is($url->to_abs, 'http://foo.com/');
+is($url->to_abs, 'http://foo.com/', 'right absolute version');
 
 # Already relative
 $url = Mojo::URL->new('http://sri:foobar@kraih.com:8080/foo?foo=bar#23');
 $url->base->parse('http://sri:foobar@kraih.com:8080/');
 my $url2 = $url->to_rel;
-is($url->to_rel, '/foo?foo=bar#23');
+is($url->to_rel, '/foo?foo=bar#23', 'right relative version');
 
 # IRI
 $url =
   Mojo::URL->new('http://sharifulin.ru/привет/?q=шарифулин');
-is($url->path->parts->[0], 'привет');
-is($url->path,             '/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82/');
-is($url->query, 'q=%D1%88%D0%B0%D1%80%D0%B8%D1%84%D1%83%D0%BB%D0%B8%D0%BD');
-is($url->query->param('q'), 'шарифулин');
+is($url->path->parts->[0], 'привет', 'right path part');
+is($url->path, '/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82/', 'right path');
+is($url->query, 'q=%D1%88%D0%B0%D1%80%D0%B8%D1%84%D1%83%D0%BB%D0%B8%D0%BD',
+    'right query');
+is($url->query->param('q'), 'шарифулин', 'right query value');
 
 # IRI/IDNA
 $url = Mojo::URL->new(
     'http://☃.net/привет/привет/?привет=шарифулин'
 );
-is($url->is_abs, 1);
-is($url->scheme, 'http');
-is($url->host,   '☃.net');
-is($url->ihost,  'xn--n3h.net');
-is($url->path,
-        '/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82'
-      . '/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82/');
-is($url->path->parts->[0],             'привет');
-is($url->path->parts->[1],             'привет');
-is($url->query->param('привет'), 'шарифулин');
-is("$url",
-        'http://xn--n3h.net/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82'
+is($url->is_abs, 1,             'is absolute');
+is($url->scheme, 'http',        'right scheme');
+is($url->host,   '☃.net',     'right host');
+is($url->ihost,  'xn--n3h.net', 'right internationalized host');
+is( $url->path,
+    '/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82'
+      . '/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82/',
+    'right host'
+);
+is($url->path->parts->[0], 'привет', 'right path part');
+is($url->path->parts->[1], 'привет', 'right path part');
+is($url->query->param('привет'),
+    'шарифулин', 'right query value');
+is( "$url",
+    'http://xn--n3h.net/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82'
       . '/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82/'
       . '?%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82='
-      . '%D1%88%D0%B0%D1%80%D0%B8%D1%84%D1%83%D0%BB%D0%B8%D0%BD');
+      . '%D1%88%D0%B0%D1%80%D0%B8%D1%84%D1%83%D0%BB%D0%B8%D0%BD',
+    'right format'
+);

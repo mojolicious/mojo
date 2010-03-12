@@ -34,17 +34,21 @@ my $env = {
     'psgi.run_once'     => 0
 };
 my $res = $app->($env);
-is($res->[0],      200);
-is($res->[1]->[0], 'Date');
-ok($res->[1]->[1]);
-is($res->[1]->[2], 'Content-Length');
-is($res->[1]->[3], 104);
-is($res->[1]->[4], 'Content-Type');
-is($res->[1]->[5], 'text/plain');
+is($res->[0],      200,    'right status');
+is($res->[1]->[0], 'Date', 'right header name');
+ok($res->[1]->[1], 'right header value');
+is($res->[1]->[2], 'Content-Length', 'right header name');
+is($res->[1]->[3], 104,              'right header value');
+is($res->[1]->[4], 'Content-Type',   'right header name');
+is($res->[1]->[5], 'text/plain',     'right header value');
 my $params = '';
 while (defined(my $chunk = $res->[2]->getline)) { $params .= $chunk }
 $params = eval "my $params";
-is_deeply($params, {bar => 'baz', hello => 'world', lalala => 23});
+is_deeply(
+    $params,
+    {bar => 'baz', hello => 'world', lalala => 23},
+    'right structure'
+);
 
 # Command
 $content = 'world=hello';
@@ -68,14 +72,18 @@ $env = {
 };
 $app = Mojo::Command::Psgi->new->run;
 $res = $app->($env);
-is($res->[0],      200);
-is($res->[1]->[0], 'Date');
-ok($res->[1]->[1]);
-is($res->[1]->[2], 'Content-Length');
-is($res->[1]->[3], 104);
-is($res->[1]->[4], 'Content-Type');
-is($res->[1]->[5], 'text/plain');
+is($res->[0],      200,    'right status');
+is($res->[1]->[0], 'Date', 'right header name');
+ok($res->[1]->[1], 'right header value');
+is($res->[1]->[2], 'Content-Length', 'right header name');
+is($res->[1]->[3], 104,              'right header value');
+is($res->[1]->[4], 'Content-Type',   'right header name');
+is($res->[1]->[5], 'text/plain',     'right header value');
 $params = '';
 while (defined(my $chunk = $res->[2]->getline)) { $params .= $chunk }
 $params = eval "my $params";
-is_deeply($params, {bar => 'baz', world => 'hello', lalala => 23});
+is_deeply(
+    $params,
+    {bar => 'baz', world => 'hello', lalala => 23},
+    'right structure'
+);

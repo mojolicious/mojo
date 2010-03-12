@@ -309,7 +309,7 @@ Mojo::URL - Uniform Resource Locator
 =head1 DESCRIPTION
 
 L<Mojo::URL> implements a subset of RFC 3986 and RFC 3987 for Uniform
-Resource Locators.
+Resource Locators with support for IDNA and IRIs.
 
 =head1 ATTRIBUTES
 

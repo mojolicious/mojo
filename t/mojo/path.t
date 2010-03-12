@@ -12,5 +12,5 @@ use Test::More tests => 3;
 use_ok('Mojo::Path');
 
 my $path = Mojo::Path->new;
-is($path->parse('/path')->to_string,   '/path');
-is($path->parse('/path/0')->to_string, '/path/0');
+is($path->parse('/path')->to_string,   '/path',   'right path');
+is($path->parse('/path/0')->to_string, '/path/0', 'right path');

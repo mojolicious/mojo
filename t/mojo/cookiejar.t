@@ -26,9 +26,9 @@ $jar->add(
     )
 );
 my @cookies = $jar->find(Mojo::URL->new('http://kraih.com/foo'));
-is($cookies[0]->name,  'foo');
-is($cookies[0]->value, 'bar');
-is($cookies[1],        undef);
+is($cookies[0]->name,  'foo', 'right name');
+is($cookies[0]->value, 'bar', 'right value');
+is($cookies[1],        undef, 'no second cookie');
 
 # Huge cookie
 $jar->add(
@@ -40,9 +40,9 @@ $jar->add(
     )
 );
 @cookies = $jar->find(Mojo::URL->new('http://kraih.com/foo'));
-is($cookies[0]->name,  'foo');
-is($cookies[0]->value, 'bar');
-is($cookies[1],        undef);
+is($cookies[0]->name,  'foo', 'right name');
+is($cookies[0]->value, 'bar', 'right value');
+is($cookies[1],        undef, 'no second cookie');
 
 # Expired cookie
 my $expired = Mojo::Cookie::Response->new(
@@ -54,9 +54,9 @@ my $expired = Mojo::Cookie::Response->new(
 $expired->expires(time - 1);
 $jar->add($expired);
 @cookies = $jar->find(Mojo::URL->new('http://labs.kraih.com/foo'));
-is($cookies[0]->name,  'foo');
-is($cookies[0]->value, 'bar');
-is($cookies[1],        undef);
+is($cookies[0]->name,  'foo', 'right name');
+is($cookies[0]->value, 'bar', 'right value');
+is($cookies[1],        undef, 'no second cookie');
 
 # Multiple cookies
 $jar->add(
@@ -69,11 +69,11 @@ $jar->add(
     )
 );
 @cookies = $jar->find(Mojo::URL->new('http://labs.kraih.com/foo'));
-is($cookies[0]->name,  'baz');
-is($cookies[0]->value, '23');
-is($cookies[1]->name,  'foo');
-is($cookies[1]->value, 'bar');
-is($cookies[2],        undef);
+is($cookies[0]->name,  'baz', 'right name');
+is($cookies[0]->value, '23',  'right value');
+is($cookies[1]->name,  'foo', 'right name');
+is($cookies[1]->value, 'bar', 'right value');
+is($cookies[2],        undef, 'no third cookie');
 
 # Multiple cookies with leading dot
 $jar->add(
@@ -85,11 +85,11 @@ $jar->add(
     )
 );
 @cookies = $jar->find(Mojo::URL->new('http://labs.kraih.com/fo'));
-is($cookies[0]->name,  'baz');
-is($cookies[0]->value, '23');
-is($cookies[1]->name,  'this');
-is($cookies[1]->value, 'that');
-is($cookies[2],        undef);
+is($cookies[0]->name,  'baz',  'right name');
+is($cookies[0]->value, '23',   'right value');
+is($cookies[1]->name,  'this', 'right name');
+is($cookies[1]->value, 'that', 'right value');
+is($cookies[2],        undef,  'no third cookie');
 
 # Replace cookie
 $jar = Mojo::CookieJar->new;
@@ -110,5 +110,5 @@ $jar->add(
     )
 );
 @cookies = $jar->find(Mojo::URL->new('http://kraih.com/foo'));
-is($cookies[0]->value, 'bar2');
-is($cookies[1],        undef);
+is($cookies[0]->value, 'bar2', 'right value');
+is($cookies[1],        undef,  'no second cookie');

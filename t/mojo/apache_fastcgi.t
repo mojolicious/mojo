@@ -13,6 +13,8 @@ use Mojo::Client;
 use Mojo::Template;
 use Test::Mojo::Server;
 
+# Mac OS X only test
+plan skip_all => 'Mac OS X required for this test!' unless $^O eq 'darwin';
 plan skip_all => 'set TEST_APACHE to enable this test (developer only!)'
   unless $ENV{TEST_APACHE};
 plan tests => 7;

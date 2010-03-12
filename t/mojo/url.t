@@ -109,7 +109,7 @@ is($url->userinfo, undef);
 is($url->host,     'acme.s3.amazonaws.com');
 is($url->port,     undef);
 is($url->path,     '/mojo%2Fg%2B%2B-4%2E2_4%2E2%2E3-2ubuntu7_i386%2Edeb');
-is($url->query,    undef);
+ok(!$url->query);
 is_deeply($url->query->to_hash, {});
 is($url->fragment, undef);
 is("$url",

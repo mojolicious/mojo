@@ -23,11 +23,11 @@ use_ok('Mojo::Server::Daemon');
 my $daemon = Mojo::Server::Daemon->new;
 my $max    = $daemon->max_clients;
 $daemon = Mojo::Server::Daemon->new(max_clients => $max + 10);
-is($daemon->max_clients, $max + 10);
+is($daemon->max_clients, $max + 10, 'right max clients value');
 
 # Start
 my $server = Test::Mojo::Server->new;
-$server->start_daemon_ok;
+$server->start_daemon_ok('server started');
 my $port   = $server->port;
 my $client = Mojo::Client->new;
 
@@ -37,10 +37,10 @@ $tx->req->method('GET');
 $tx->req->url->parse("http://127.0.0.1:$port/0/");
 $tx->req->headers->connection('close');
 $client->process($tx);
-is($tx->state,     'done');
-is($tx->res->code, 200);
-like($tx->res->headers->connection, qr/close/i);
-like($tx->res->body,                qr/Mojo is working/);
+is($tx->state,     'done', 'right state');
+is($tx->res->code, 200,    'right status');
+like($tx->res->headers->connection, qr/close/i, 'right "Connection" header');
+like($tx->res->body, qr/Mojo is working/, 'right content');
 
 # Pipelined with 100 Continue
 $tx = Mojo::Transaction::HTTP->new;
@@ -58,16 +58,16 @@ my $tx4 = Mojo::Transaction::HTTP->new;
 $tx4->req->method('GET');
 $tx4->req->url->parse("http://127.0.0.1:$port/4/");
 $client->process([$tx, $tx2, $tx3, $tx4]);
-ok($tx->is_done);
-ok($tx2->is_done);
-ok($tx3->is_done);
-ok($tx4->is_done);
-is($tx->res->code,  200);
-is($tx2->res->code, 200);
-is($tx2->continued, 1);
-is($tx3->res->code, 200);
-is($tx4->res->code, 200);
-like($tx2->res->content->asset->slurp, qr/Mojo is working/);
+ok($tx->is_done,  'state is done');
+ok($tx2->is_done, 'state is done');
+ok($tx3->is_done, 'state is done');
+ok($tx4->is_done, 'state is done');
+is($tx->res->code,  200, 'right status');
+is($tx2->res->code, 200, 'right status');
+is($tx2->continued, 1,   'transaction was continued');
+is($tx3->res->code, 200, 'right status');
+is($tx4->res->code, 200, 'right status');
+like($tx2->res->content->asset->slurp, qr/Mojo is working/, 'right content');
 
 # 100 Continue request
 $tx = Mojo::Transaction::HTTP->new;
@@ -76,30 +76,33 @@ $tx->req->url->parse("http://127.0.0.1:$port/5/");
 $tx->req->headers->expect('100-continue');
 $tx->req->body('Hello Mojo!');
 $client->process($tx);
-is($tx->res->code, 200);
-is($tx->continued, 1);
-like($tx->res->headers->connection, qr/Keep-Alive/i);
-like($tx->res->body,                qr/Mojo is working/);
+is($tx->res->code, 200, 'right status');
+is($tx->continued, 1,   'transaction was continued');
+like($tx->res->headers->connection,
+    qr/Keep-Alive/i, 'right "Connection" header');
+like($tx->res->body, qr/Mojo is working/, 'right content');
 
 # Second keep alive request
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse("http://127.0.0.1:$port/6/");
 $client->process($tx);
-is($tx->res->code,  200);
-is($tx->kept_alive, 1);
-like($tx->res->headers->connection, qr/Keep-Alive/i);
-like($tx->res->body,                qr/Mojo is working/);
+is($tx->res->code,  200, 'right status');
+is($tx->kept_alive, 1,   'connection was kept alive');
+like($tx->res->headers->connection,
+    qr/Keep-Alive/i, 'right "Connection" header');
+like($tx->res->body, qr/Mojo is working/, 'right content');
 
 # Third keep alive request
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse("http://127.0.0.1:$port/7/");
 $client->process($tx);
-is($tx->res->code,  200);
-is($tx->kept_alive, 1);
-like($tx->res->headers->connection, qr/Keep-Alive/i);
-like($tx->res->body,                qr/Mojo is working/);
+is($tx->res->code,  200, 'right status');
+is($tx->kept_alive, 1,   'connection was kept alive');
+like($tx->res->headers->connection,
+    qr/Keep-Alive/i, 'right "Connection" header');
+like($tx->res->body, qr/Mojo is working/, 'right content');
 
 # Pipelined
 $tx = Mojo::Transaction::HTTP->new;
@@ -109,11 +112,11 @@ $tx2 = Mojo::Transaction::HTTP->new;
 $tx2->req->method('GET');
 $tx2->req->url->parse("http://127.0.0.1:$port/9/");
 $client->process([$tx, $tx2]);
-ok($tx->is_done);
-ok($tx2->is_done);
-is($tx->res->code,  200);
-is($tx2->res->code, 200);
-like($tx2->res->content->asset->slurp, qr/Mojo is working/);
+ok($tx->is_done,  'state is done');
+ok($tx2->is_done, 'state is done');
+is($tx->res->code,  200, 'right status');
+is($tx2->res->code, 200, 'right status');
+like($tx2->res->content->asset->slurp, qr/Mojo is working/, 'right content');
 
 # Pipelined with 100 Continue and a chunked response
 $tx = Mojo::Transaction::HTTP->new;
@@ -132,17 +135,17 @@ $tx4 = Mojo::Transaction::HTTP->new;
 $tx4->req->method('GET');
 $tx4->req->url->parse("http://127.0.0.1:$port/13/");
 $client->process([$tx, $tx2, $tx3, $tx4]);
-ok($tx->is_done);
-ok($tx2->is_done);
-ok($tx3->is_done);
-ok($tx4->is_done);
-is($tx->res->code,  200);
-is($tx2->res->code, 200);
-is($tx2->continued, 1);
-is($tx3->res->code, 200);
-is($tx4->res->code, 200);
-like($tx2->res->content->asset->slurp, qr/Mojo is working/);
-is($tx3->res->content->asset->slurp, 'foo12');
+ok($tx->is_done,  'state is done');
+ok($tx2->is_done, 'state is done');
+ok($tx3->is_done, 'state is done');
+ok($tx4->is_done, 'state is done');
+is($tx->res->code,  200, 'right status');
+is($tx2->res->code, 200, 'right status');
+is($tx2->continued, 1,   'transaction was continued');
+is($tx3->res->code, 200, 'right status');
+is($tx4->res->code, 200, 'right status');
+like($tx2->res->content->asset->slurp, qr/Mojo is working/, 'right content');
+is($tx3->res->content->asset->slurp, 'foo12', 'right content');
 
 # Stop
-$server->stop_server_ok;
+$server->stop_server_ok('server stopped');

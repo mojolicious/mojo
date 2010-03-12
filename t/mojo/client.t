@@ -161,7 +161,7 @@ $tx->req->body(
     }
 );
 $client->process($tx);
-ok($tx->is_done, 'right state');
+ok($tx->is_done, 'state is done');
 
 # Custom requests with keep alive
 $tx = Mojo::Transaction::HTTP->new;
@@ -171,7 +171,7 @@ ok(!$tx->kept_alive, 'connection was not kept alive');
 $client->queue(
     $tx => sub {
         my ($self, $tx) = @_;
-        ok($tx->is_done,    'right state');
+        ok($tx->is_done,    'state is done');
         ok($tx->kept_alive, 'connection was kept alive');
     }
 );
@@ -184,14 +184,14 @@ ok(!$tx->kept_alive, 'connection was not kept alive');
 $client->process(
     $tx => sub {
         my ($self, $tx) = @_;
-        ok($tx->is_done,        'right state');
+        ok($tx->is_done,        'state is done');
         ok($tx->kept_alive,     'connection was kept alive');
         ok($tx->local_address,  'has local address');
         ok($tx->local_port > 0, 'has local port');
         is($tx->remote_port, 80, 'right remote port');
     }
 );
-ok($tx->is_done, 'right state');
+ok($tx->is_done, 'state is done');
 
 # Custom pipelined requests
 $tx = Mojo::Transaction::HTTP->new;
@@ -207,12 +207,12 @@ $client->process(
     ([$tx, $tx2], $tx3) => sub {
         my ($self, $tx) = @_;
         return ok($tx->is_done) unless ref $tx eq 'ARRAY';
-        ok($tx->[0]->is_done, 'right state');
-        ok($tx->[1]->is_done, 'right state');
+        ok($tx->[0]->is_done, 'state is done');
+        ok($tx->[1]->is_done, 'state is done');
     }
 );
-ok($tx2->is_done, 'right state');
-ok($tx3->is_done, 'right state');
+ok($tx2->is_done, 'state is done');
+ok($tx3->is_done, 'state is done');
 is($tx->res->code,  200, 'right status');
 is($tx2->res->code, 200, 'rigth status');
 is($tx3->res->code, 200, 'right status');
@@ -228,11 +228,11 @@ $tx2->req->url->parse('http://www.apache.org');
 $client->process(
     [$tx, $tx2] => sub {
         my ($self, $p) = @_;
-        ok($p->[0]->is_done, 'right state');
-        ok($p->[1]->is_done, 'right state');
+        ok($p->[0]->is_done, 'state is done');
+        ok($p->[1]->is_done, 'state is done');
     }
 );
-ok($tx2->is_done, 'right state');
+ok($tx2->is_done, 'state is done');
 is($tx->res->code,  200, 'right status');
 is($tx2->res->code, 200, 'right status');
 like($tx2->res->content->asset->slurp, qr/Apache/, 'right content');
@@ -253,10 +253,10 @@ my $tx4 = Mojo::Transaction::HTTP->new;
 $tx4->req->method('GET');
 $tx4->req->url->parse('http://www.apache.org');
 $client->process([$tx, $tx2, $tx3, $tx4]);
-ok($tx->is_done,  'right state');
-ok($tx2->is_done, 'right state');
-ok($tx3->is_done, 'right state');
-ok($tx4->is_done, 'right state');
+ok($tx->is_done,  'state is done');
+ok($tx2->is_done, 'state is done');
+ok($tx3->is_done, 'state is done');
+ok($tx4->is_done, 'state is done');
 is($tx->res->code,  200, 'right status');
 is($tx2->res->code, 200, 'right status');
 is($tx2->continued, 1,   'transaction was continued');

@@ -20,7 +20,7 @@ use_ok('Mojo::Server::Daemon::Prefork');
 
 # Start
 my $server = Test::Mojo::Server->new;
-$server->start_daemon_prefork_ok;
+$server->start_daemon_prefork_ok('server started');
 
 # Request
 my $port = $server->port;
@@ -29,8 +29,8 @@ $tx->req->method('GET');
 $tx->req->url->parse("http://127.0.0.1:$port/");
 my $client = Mojo::Client->new;
 $client->process($tx);
-is($tx->res->code, 200);
-like($tx->res->body, qr/Mojo is working/);
+is($tx->res->code, 200, 'right status');
+like($tx->res->body, qr/Mojo is working/, 'right content');
 
 # Stop
-$server->stop_server_ok;
+$server->stop_server_ok('server stopped');

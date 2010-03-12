@@ -21,48 +21,52 @@ use_ok('Mojo::Loader');
 # Exception
 my $loader = Mojo::Loader->new;
 my $e      = $loader->load('LoaderException');
-is(ref $e, 'Mojo::Exception');
-like($e->message, qr/Missing right curly/);
-is($e->lines_before->[0]->[0], 13);
-is($e->lines_before->[0]->[1], 'foo {');
-is($e->lines_before->[1]->[0], 14);
-is($e->lines_before->[1]->[1], '');
-is($e->line->[0],              15);
-is($e->line->[1],              "1;");
-like("$e", qr/Missing right curly/);
+is(ref $e, 'Mojo::Exception', 'right object');
+like($e->message, qr/Missing right curly/, 'right message');
+is($e->lines_before->[0]->[0], 13,      'right line');
+is($e->lines_before->[0]->[1], 'foo {', 'right value');
+is($e->lines_before->[1]->[0], 14,      'right line');
+is($e->lines_before->[1]->[1], '',      'right value');
+is($e->line->[0],              15,      'right line');
+is($e->line->[1],              "1;",    'right value');
+like("$e", qr/Missing right curly/, 'right message');
 
 # Complicated exception
 $loader = Mojo::Loader->new;
 $e      = $loader->load('LoaderException2');
-is(ref $e, 'Mojo::Exception');
-like($e->message, qr/Exception/);
-is($e->lines_before->[0]->[0], 6);
-is($e->lines_before->[0]->[1], 'use strict;');
-is($e->lines_before->[1]->[0], 7);
-is($e->lines_before->[1]->[1], '');
-is($e->line->[0],              8);
-is($e->line->[1],              'LoaderException2_2::throw_error();');
-is($e->lines_after->[0]->[0],  9);
-is($e->lines_after->[0]->[1],  '');
-is($e->lines_after->[1]->[0],  10);
-is($e->lines_after->[1]->[1],  '1;');
-like("$e", qr/Exception/);
+is(ref $e, 'Mojo::Exception', 'right object');
+like($e->message, qr/Exception/, 'right message');
+is($e->lines_before->[0]->[0], 6,             'right line');
+is($e->lines_before->[0]->[1], 'use strict;', 'right value');
+is($e->lines_before->[1]->[0], 7,             'right line');
+is($e->lines_before->[1]->[1], '',            'right value');
+is($e->line->[0],              8,             'right line');
+is($e->line->[1], 'LoaderException2_2::throw_error();', 'right value');
+is($e->lines_after->[0]->[0], 9,    'right line');
+is($e->lines_after->[0]->[1], '',   'right value');
+is($e->lines_after->[1]->[0], 10,   'right line');
+is($e->lines_after->[1]->[1], '1;', 'right value');
+like("$e", qr/Exception/, 'right message');
 
 $loader = Mojo::Loader->new;
 my $modules = $loader->search('LoaderTest');
 my @modules = sort @$modules;
 
 # Search
-is_deeply(\@modules, [qw/LoaderTest::A LoaderTest::B LoaderTest::C/]);
+is_deeply(
+    \@modules,
+    [qw/LoaderTest::A LoaderTest::B LoaderTest::C/],
+    'found the right modules'
+);
 
 # Load
 $loader->load($_) for @modules;
-ok(LoaderTest::A->can('new'));
-ok(LoaderTest::B->can('new'));
-ok(LoaderTest::C->can('new'));
+ok(LoaderTest::A->can('new'), 'loaded successfully');
+ok(LoaderTest::B->can('new'), 'loaded successfully');
+ok(LoaderTest::C->can('new'), 'loaded successfully');
 
 # Load unrelated class
-ok($loader->load('LoaderTest'));
+ok($loader->load('LoaderTest'), 'loaded successfully');
 
 # Reload
 my $file = IO::File->new;
@@ -73,10 +77,10 @@ $file->syswrite("package MojoTestReloader;\nsub test { 23 }\n1;");
 $file->close;
 push @INC, $dir;
 require MojoTestReloader;
-is(MojoTestReloader::test(), 23);
+is(MojoTestReloader::test(), 23, 'loaded successfully');
 sleep 2;
 $file->open("> $path");
 $file->syswrite("package MojoTestReloader;\nsub test { 26 }\n1;");
 $file->close;
 Mojo::Loader->reload;
-is(MojoTestReloader::test(), 26);
+is(MojoTestReloader::test(), 26, 'reloaded successfully');

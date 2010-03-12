@@ -138,6 +138,9 @@ sub prepare_pid_file {
 sub run {
     my $self = shift;
 
+    # Prepare ioloop
+    $self->prepare_ioloop;
+
     # User and group
     $self->setuidgid;
 
@@ -146,9 +149,6 @@ sub run {
 
     # Prepare lock file
     $self->prepare_lock_file;
-
-    # Prepare ioloop
-    $self->prepare_ioloop;
 
     # Start loop
     $self->ioloop->start;

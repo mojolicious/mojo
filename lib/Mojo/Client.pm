@@ -20,7 +20,7 @@ use Mojo::Transaction::WebSocket;
 use Mojo::URL;
 use Scalar::Util 'weaken';
 
-__PACKAGE__->attr([qw/app log tls_ca_file tls_verify_cb tx/]);
+__PACKAGE__->attr([qw/app log proxy tls_ca_file tls_verify_cb tx/]);
 __PACKAGE__->attr(cookie_jar => sub { Mojo::CookieJar->new });
 __PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->new });
 __PACKAGE__->attr(keep_alive_timeout         => 15);
@@ -229,7 +229,12 @@ sub queue {
 
     # Queue transactions
     my $queue = $self->{_queue} ||= [];
-    for my $tx (@_) { push @$queue, [$tx, $cb] if $tx }
+    my $proxy = $self->proxy;
+    for my $tx (@_) {
+        next unless $tx;
+        $tx->req->proxy($proxy) if $proxy;
+        push @$queue, [$tx, $cb];
+    }
 
     return $self;
 }

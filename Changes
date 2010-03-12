@@ -4,6 +4,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added request limit support to the daemons.
         - Added basic authorization and proxy authorization support to
           Mojo::Message::Request. (esskar)
+        - Added proxy support to client.
         - Added more routes tests. (doubi)
         - Cleaned up documentation.
         - Cleaned up tests.

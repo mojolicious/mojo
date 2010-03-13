@@ -9,26 +9,17 @@ use base 'Mojo::Command';
 
 use Mojo::Server::PSGI;
 
-use Getopt::Long 'GetOptions';
-
 __PACKAGE__->attr(description => <<'EOF');
 Start application with PSGI backend.
 EOF
 __PACKAGE__->attr(usage => <<"EOF");
-usage: $0 psgi [OPTIONS]
-
-These options are available:
-  --reload   Automatically reload application when the source code changes.
+usage: $0 psgi
 EOF
 
 # D’oh.
 sub run {
     my $self = shift;
     my $psgi = Mojo::Server::PSGI->new;
-
-    # Options
-    @ARGV = @_ if @_;
-    GetOptions(reload => sub { $psgi->reload(1) });
 
     # Return app callback
     return sub { $psgi->run(@_) };
@@ -46,7 +37,7 @@ Mojo::Command::Psgi - PSGI Command
     use Mojo::Command::Psgi;
 
     my $psgi = Mojo::Command::Psgi->new;
-    my $app = $psgi->run(@ARGV);
+    my $app = $psgi->run;
 
 =head1 DESCRIPTION
 
@@ -78,7 +69,7 @@ implements the following new ones.
 
 =head2 C<run>
 
-    my $app = $psgi->run(@ARGV);
+    my $app = $psgi->run;
 
 Run this command.
 

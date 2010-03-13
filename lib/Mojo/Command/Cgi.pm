@@ -19,7 +19,6 @@ usage: $0 cgi [OPTIONS]
 
 These options are available:
   --nph      Enable non-parsed-header mode.
-  --reload   Automatically reload application when the source code changes.
 EOF
 
 # Hi, Super Nintendo Chalmers!
@@ -29,10 +28,7 @@ sub run {
 
     # Options
     @ARGV = @_ if @_;
-    GetOptions(
-        nph    => sub { $cgi->nph(1) },
-        reload => sub { $cgi->reload(1) }
-    );
+    GetOptions(nph => sub { $cgi->nph(1) });
 
     # Run
     $cgi->run;

@@ -7,27 +7,19 @@ use warnings;
 
 use base 'Mojo::Command';
 
-use Getopt::Long 'GetOptions';
 use Mojo::Server::FastCGI;
 
 __PACKAGE__->attr(description => <<'EOF');
 Start application with FastCGI backend.
 EOF
 __PACKAGE__->attr(usage => <<"EOF");
-usage: $0 fastcgi [OPTIONS]
-
-These options are available:
-  --reload   Automatically reload application when the source code changes.
+usage: $0 fastcgi
 EOF
 
 # Oh boy! Sleep! That's when I'm a Viking!
 sub run {
     my $self    = shift;
     my $fastcgi = Mojo::Server::FastCGI->new;
-
-    # Options
-    @ARGV = @_ if @_;
-    GetOptions(reload => sub { $fastcgi->reload(1) });
 
     # Run
     $fastcgi->run;
@@ -47,7 +39,7 @@ Mojo::Command::Fastcgi - FastCGI Command
     use Mojo::Command::Fastcgi;
 
     my $fastcgi = Mojo::Command::Fastcgi->new;
-    $fastcgi->run(@ARGV);
+    $fastcgi->run;
 
 =head1 DESCRIPTION
 
@@ -79,7 +71,7 @@ implements the following new ones.
 
 =head2 C<run>
 
-    $fastcgi = $fastcgi->run(@ARGV);
+    $fastcgi = $fastcgi->run;
 
 Run this command.
 

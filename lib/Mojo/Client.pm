@@ -20,8 +20,7 @@ use Mojo::Transaction::WebSocket;
 use Mojo::URL;
 use Scalar::Util 'weaken';
 
-__PACKAGE__->attr(
-    [qw/app http_proxy https_proxy log tls_ca_file tls_verify_cb tx/]);
+__PACKAGE__->attr([qw/app log tls_ca_file tls_verify_cb tx/]);
 __PACKAGE__->attr(cookie_jar => sub { Mojo::CookieJar->new });
 __PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->new });
 __PACKAGE__->attr(keep_alive_timeout         => 15);
@@ -230,27 +229,7 @@ sub queue {
 
     # Queue transactions
     my $queue = $self->{_queue} ||= [];
-    my $http  = $self->http_proxy;
-    my $https = $self->https_proxy;
-    for my $tx (@_) {
-        next unless $tx;
-
-        # HTTP proxy
-        if ($http) {
-            my $req = $tx->req;
-            my $scheme = $req->url->scheme || '';
-            $req->proxy($http) if $scheme eq 'http';
-        }
-
-        # HTTPS proxy
-        elsif ($https) {
-            my $req = $tx->req;
-            my $scheme = $req->url->scheme || '';
-            $req->proxy($https) if $scheme eq 'https';
-        }
-
-        push @$queue, [$tx, $cb];
-    }
+    for my $tx (@_) { push @$queue, [$tx, $cb] if $tx }
 
     return $self;
 }
@@ -1053,20 +1032,6 @@ If set, local requests will be processed in this application.
 
 Cookie jar to use for this clients requests, by default a L<Mojo::CookieJar>
 object.
-
-=head2 C<http_proxy>
-
-    my $proxy = $client->http_proxy;
-    $client   = $client->http_proxy('http://foo:bar@127.0.0.1:3000');
-
-Proxy server to use for HTTP requests.
-
-=head2 C<https_proxy>
-
-    my $proxy = $client->https_proxy;
-    $client   = $client->https_proxy('https://foo:bar@127.0.0.1:3000');
-
-Proxy server to use for HTTPS requests.
 
 =head2 C<ioloop>
 

@@ -9,7 +9,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Cleaned up documentation.
         - Cleaned up tests.
         - Relaxed Mojo::Server::CGI read timeout.
-        - Fixed PSGI environment auto detection.
+        - Fixed PSGI environment auto detection and removed .psgi file
+          generator since it has become obsolete.
         - Fixed Mojolicious sessions to remove the session cookie immediately
           if it's not needed anymore. (ask)
         - Fixed routes method condition to consider GET and HEAD equal.

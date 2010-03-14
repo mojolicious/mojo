@@ -81,26 +81,10 @@ sub connect {
         Type     => SOCK_STREAM
     );
 
-    # TLS certificate verification
-    if ($args->{tls} && $args->{tls_ca_file}) {
-        $options{SSL_ca_file}         = $args->{tls_ca_file};
-        $options{SSL_verify_mode}     = 0x01;
-        $options{SSL_verify_callback} = $args->{tls_verify_cb};
-    }
-
     # New connection
-    my $class =
-        TLS && $args->{tls} ? 'IO::Socket::SSL'
-      : IPV6 ? 'IO::Socket::INET6'
-      :        'IO::Socket::INET';
+    my $class = IPV6 ? 'IO::Socket::INET6' : 'IO::Socket::INET';
     my $socket = $class->new(%options) or return;
     my $id = "$socket";
-
-    # Non blocking
-    $socket->blocking(0);
-
-    # Disable Nagle's algorithm
-    setsockopt $socket, IPPROTO_TCP, TCP_NODELAY, 1;
 
     # Add connection
     my $c = $self->{_cs}->{$id} = {
@@ -109,6 +93,19 @@ sub connect {
         connecting => 1,
         socket     => $socket
     };
+
+    # Start TLS
+    if ($args->{tls}) {
+        my $old = $id;
+        $id = $self->start_tls($id => $args);
+        $self->drop($old) && return unless $id;
+    }
+
+    # Non blocking
+    $socket->blocking(0);
+
+    # Disable Nagle's algorithm
+    setsockopt $socket, IPPROTO_TCP, TCP_NODELAY, 1;
 
     # Timeout
     $c->{connect_timer} = $self->timer(
@@ -309,6 +306,46 @@ sub start {
     $self->_spin while $self->{_running};
 
     return $self;
+}
+
+sub start_tls {
+    my $self = shift;
+    my $id   = shift;
+
+    # Shortcut
+    return unless TLS;
+
+    # Arguments
+    my $args = ref $_[0] ? $_[0] : {@_};
+
+    # TLS certificate verification
+    my %options = (Timeout => $self->connect_timeout);
+    if ($args->{tls_ca_file}) {
+        $options{SSL_ca_file}         = $args->{tls_ca_file};
+        $options{SSL_verify_mode}     = 0x01;
+        $options{SSL_verify_callback} = $args->{tls_verify_cb};
+    }
+
+    # Connection
+    return unless my $c = $self->{_cs}->{$id};
+
+    # Socket
+    return unless my $socket = $c->{socket};
+
+    # Start
+    $socket->blocking(1);
+    return unless my $new = IO::Socket::SSL->start_SSL($socket, %options);
+    $socket->blocking(0);
+
+    # Upgrade
+    $c->{socket} = $new;
+    $self->{_cs}->{$new} = delete $self->{_cs}->{$id};
+    for my $timer (@{$c->{timers}}) {
+        next unless my $t = $self->{_timers}->{$timer};
+        $t->{connection} = "$new";
+    }
+
+    return "$new";
 }
 
 sub stop { delete shift->{_running} }
@@ -1339,6 +1376,28 @@ everywhere inside the process.
 
 Start the loop, this will block until the loop is finished or return
 immediately if the loop is already running.
+
+=head2 C<start_tls>
+
+    my $id = $loop->start_tls($id);
+    my $id = $loop->start_tls($id => {tls_ca_file => '/etc/tls/cacerts.pem'});
+
+Start new TLS connection inside old connection.
+Note that TLS support depends on L<IO::Socket::SSL>.
+
+These options are currently available.
+
+=over 4
+
+=item C<tls_ca_file>
+
+CA file to use for TLS.
+
+=item C<tls_verify_cb>
+
+Callback to invoke for TLS verification.
+
+=back
 
 =head2 C<stop>
 

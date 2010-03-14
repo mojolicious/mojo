@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 557;
+use Test::More tests => 564;
 
 use File::Spec;
 use File::Temp;
@@ -403,6 +403,20 @@ is($req->url->base->userinfo, 'Aladdin:open sesame');
 is($req->url,                 'http://127.0.0.1/foo/bar');
 is($req->proxy->userinfo,     'Aladdin:open sesame');
 
+# Parse full HTTP 1.1 proxy connect request with basic authorization
+$req = Mojo::Message::Request->new;
+$req->parse("CONNECT 127.0.0.1:3000 HTTP/1.1\x0d\x0a");
+$req->parse("Host: 127.0.0.1\x0d\x0a");
+$req->parse(
+    "Proxy-Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==\x0d\x0a");
+$req->parse("Content-Length: 0\x0d\x0a\x0d\x0a");
+is($req->state,           'done');
+is($req->method,          'CONNECT');
+is($req->major_version,   1);
+is($req->minor_version,   1);
+is($req->url,             '127.0.0.1:3000');
+is($req->proxy->userinfo, 'Aladdin:open sesame');
+
 # Build minimal HTTP 1.1 request
 $req = Mojo::Message::Request->new;
 $req->method('GET');
@@ -481,6 +495,18 @@ is($req->build,
       . "Proxy-Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==\x0d\x0a"
       . "Content-Length: 13\x0d\x0a\x0d\x0a"
       . "Hello World!\n");
+
+# Build full HTTP 1.1 proxy connect request with basic authorization
+$req = Mojo::Message::Request->new;
+$req->method('CONNECT');
+$req->url->parse('http://Aladdin:open%20sesame@127.0.0.1:3000/foo/bar');
+$req->proxy('http://Aladdin:open%20sesame@127.0.0.2:8080');
+is($req->build,
+        "CONNECT 127.0.0.1:3000 HTTP/1.1\x0d\x0a"
+      . "Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==\x0d\x0a"
+      . "Host: 127.0.0.1:3000\x0d\x0a"
+      . "Proxy-Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==\x0d\x0a"
+      . "Content-Length: 0\x0d\x0a\x0d\x0a");
 
 # Build HTTP 1.1 multipart request
 $req = Mojo::Message::Request->new;

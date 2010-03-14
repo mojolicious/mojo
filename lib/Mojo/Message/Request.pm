@@ -189,13 +189,22 @@ sub _build_start_line {
 
     # Proxy
     if ($self->proxy) {
-        $url = $url->clone;
-        $url->userinfo(undef);
-        $path = $url;
+        my $clone = $url = $url->clone;
+        $clone->userinfo(undef);
+        $path = $clone;
     }
 
-    # Method and version
-    my $method  = $self->method;
+    # Method
+    my $method = $self->method;
+
+    # CONNECT
+    if ($method eq 'CONNECT') {
+        my $host = $url->host;
+        my $port = $url->port || ($url->scheme eq 'https' ? '443' : '80');
+        $path = "$host:$port";
+    }
+
+    # Version
     my $version = $self->version;
 
     # HTTP 0.9
@@ -362,7 +371,10 @@ sub _parse_start_line {
     if (defined $line) {
         if ($line =~ m/$START_LINE_RE/o) {
             $self->method($1);
-            $self->url->parse($2);
+            my $url = $self->url;
+            $self->method eq 'CONNECT'
+              ? $url->authority($2)
+              : $url->parse($2);
 
             # HTTP 0.9 is identified by the missing version
             if (defined $3 && defined $4) {

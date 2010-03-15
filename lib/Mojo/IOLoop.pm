@@ -275,7 +275,7 @@ sub not_writing {
     return unless my $socket = $c->{socket};
 
     # KQueue
-    my $loop = $self->{_loop} ||= $self->_loop;
+    my $loop = $self->{_loop} ||= $self->_build_loop;
     if (KQUEUE) {
         my $fd = fileno $socket;
 
@@ -322,7 +322,7 @@ sub start {
     $self->{_running} = 1;
 
     # Loop
-    $self->{_loop} ||= $self->_loop;
+    $self->{_loop} ||= $self->_build_loop;
 
     # Mainloop
     $self->_spin while $self->{_running};
@@ -399,7 +399,7 @@ sub writing {
     return unless my $socket = $c->{socket};
 
     # KQueue
-    my $loop = $self->{_loop} ||= $self->_loop;
+    my $loop = $self->{_loop} ||= $self->_build_loop;
     if (KQUEUE) {
         my $fd = fileno $socket;
 
@@ -494,6 +494,19 @@ sub _add_event {
     return $self;
 }
 
+# Initialize as late as possible because kqueues don't survive a fork
+sub _build_loop {
+
+    # "kqueue"
+    return IO::KQueue->new if KQUEUE;
+
+    # "epoll"
+    return IO::Epoll->new if EPOLL;
+
+    # "poll"
+    return IO::Poll->new;
+}
+
 sub _drop_immediately {
     my ($self, $id) = @_;
 
@@ -577,19 +590,6 @@ sub _hup {
 
     # HUP callback
     $self->_run_event('hup', $event, $id);
-}
-
-# Initialize as late as possible because kqueues don't survive a fork
-sub _loop {
-
-    # "kqueue"
-    return IO::KQueue->new if KQUEUE;
-
-    # "epoll"
-    return IO::Epoll->new if EPOLL;
-
-    # "poll"
-    return IO::Poll->new;
 }
 
 sub _prepare {

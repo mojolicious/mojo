@@ -8,6 +8,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Cleaned up documentation.
         - Cleaned up tests.
         - Relaxed Mojo::Server::CGI read timeout.
+        - Fixed ioloop timers to actually work and added tests.
         - Fixed PSGI environment auto detection and removed .psgi file
           generator since it has become obsolete.
         - Fixed Mojolicious sessions to remove the session cookie immediately

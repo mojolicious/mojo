@@ -109,10 +109,8 @@ sub connect {
 
     # Timeout
     $c->{connect_timer} = $self->timer(
-        $id => (
-            after => $self->connect_timeout,
-            cb    => sub { shift->_error($id, 'Connect timeout.') }
-        )
+        after => $self->connect_timeout,
+        cb    => sub { shift->_error($id, 'Connect timeout.') }
     );
 
     # File descriptor
@@ -340,10 +338,6 @@ sub start_tls {
     # Upgrade
     $c->{socket} = $new;
     $self->{_cs}->{$new} = delete $self->{_cs}->{$id};
-    for my $timer (@{$c->{timers}}) {
-        next unless my $t = $self->{_timers}->{$timer};
-        $t->{connection} = "$new";
-    }
 
     return "$new";
 }
@@ -352,7 +346,6 @@ sub stop { delete shift->{_running} }
 
 sub timer {
     my $self = shift;
-    my $id   = shift;
 
     # Arguments
     my $args = ref $_[0] ? $_[0] : {@_};
@@ -360,21 +353,11 @@ sub timer {
     # Started
     $args->{started} = time;
 
-    # Connection
-    $args->{connection} = $id;
-
-    # Connection doesn't exist
-    return unless my $c = $self->{_cs}->{$id};
-    my $tid = "$args";
-
     # Add timer
-    $self->{_ts}->{$tid} = $args;
+    my $id = "$args";
+    $self->{_ts}->{$id} = $args;
 
-    # Bind timer to connection
-    my $timers = $c->{timers} ||= [];
-    push @{$timers}, $tid;
-
-    return $tid;
+    return $id;
 }
 
 sub write_cb { shift->_add_event('write', @_) }
@@ -434,10 +417,8 @@ sub _accept {
 
     # Timeout
     $c->{accept_timer} = $self->timer(
-        $id => (
-            after => $self->accept_timeout,
-            cb    => sub { shift->_error($id, 'Accept timeout.') }
-        )
+        after => $self->accept_timeout,
+        cb    => sub { shift->_error($id, 'Accept timeout.') }
     );
 
     # Disable Nagle's algorithm
@@ -548,21 +529,6 @@ sub _drop {
     # Drop timer
     if ($self->{_ts}->{$id}) {
 
-        # Connection for timer
-        my $cid = $self->{_ts}->{$id}->{connection};
-
-        # Connection exists
-        if (my $c = $self->{_cs}->{$cid}) {
-
-            # Cleanup
-            my @timers;
-            for my $timer (@{$c->{timers}}) {
-                next if $timer eq $id;
-                push @timers, $timer;
-            }
-            $c->{timers} = \@timers;
-        }
-
         # Drop
         delete $self->{_ts}->{$id};
         return $self;
@@ -583,11 +549,6 @@ sub _drop {
 
     # Drop socket
     if (my $socket = $c->{socket}) {
-
-        # Cleanup timers
-        if (my $timers = $c->{timers}) {
-            for my $tid (@$timers) { $self->_drop($tid) }
-        }
 
         # Remove file descriptor
         my $fd = fileno $socket;
@@ -644,7 +605,7 @@ sub _event {
     # Event error
     if ($@) {
         my $message = qq/Event "$event" failed for connection "$id": $@/;
-        ($event eq 'error' || $event eq 'timer')
+        $event eq 'error'
           ? ($self->_drop($id) and warn $message)
           : $self->_error($id, $message);
     }
@@ -722,6 +683,7 @@ sub _prepare {
     my $listen = $self->{_listen} || {};
     delete $self->{_running}
       unless keys %{$self->{_cs}}
+          || keys %{$self->{_ts}}
           || $self->{_listening}
           || ($self->max_connections > 0 && keys %$listen);
 
@@ -887,10 +849,10 @@ sub _spin {
     $self->_hup($_) for @hup;
 
     # Timers
-    $self->_timing;
+    $self->_timer;
 }
 
-sub _timing {
+sub _timer {
     my $self = shift;
 
     # Timers
@@ -901,29 +863,15 @@ sub _timing {
         my $t = $ts->{$id};
 
         # Timer
-        my $run = 0;
-        if (defined $t->{after} && $t->{after} <= time - $t->{started}) {
+        my $after = $t->{after} || 0;
+        if ($after <= time - $t->{started}) {
 
-            # Done
-            delete $t->{after};
-            $run++;
+            # Callback
+            if (my $cb = $t->{cb}) { $self->_callback('timer', $cb) }
+
+            # Drop
+            $self->_drop($id);
         }
-
-        # Recurring
-        elsif (!defined $t->{after} && defined $t->{interval}) {
-            $t->{last} ||= 0;
-            $run++ if $t->{last} + $t->{interval} <= time;
-        }
-
-        # Callback
-        if ((my $cb = $t->{cb}) && $run) {
-            $self->_event('timer', $cb, $t->{connection}, "$t");
-            $t->{last} = time;
-        }
-
-        # Continue
-        $self->_drop($id)
-          unless defined $t->{after} || defined $t->{interval};
     }
 }
 
@@ -1050,15 +998,10 @@ Mojo::IOLoop - Minimalistic Event Loop For TCP Clients And Servers
     });
 
     # Add a timer
-    $loop->timer($id => (after => 5, cb => sub {
-        my ($self, $cid, $tid) = @_;
-        $self->drop($cid);
-    }));
-
-    # Add another timer
-    $loop->timer($id => (interval => 3, cb => sub {
-        print "Timer is running again!\n";
-    }));
+    $loop->timer(after => 5, cb => sub {
+        my $self = shift;
+        $self->drop($id);
+    });
 
     # Start and stop loop
     $loop->start;
@@ -1408,12 +1351,10 @@ and the loop can be restarted by running C<start> again.
 
 =head2 C<timer>
 
-    my $id = $loop->timer($id => (after => 5, cb => sub {...}));
-    my $id = $loop->timer($id => {interval => 5, cb => sub {...}}));
+    my $id = $loop->timer(after => 5, cb => sub {...});
+    my $id = $loop->timer({after => 5, cb => sub {...}});
 
 Create a new timer, invoking the callback afer a given amount of seconds.
-Note that timers are bound to connections and will get destroyed together
-with them.
 
 These options are currently available.
 
@@ -1426,10 +1367,6 @@ Start timer after this exact amount of seconds.
 =item C<cb>
 
 Callback to invoke.
-
-=item C<interval>
-
-Interval in seconds to run timer recurringly.
 
 =back
 

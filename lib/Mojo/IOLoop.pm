@@ -46,7 +46,7 @@ use constant TLS => $ENV{MOJO_NO_TLS}
   : eval { require IO::Socket::SSL; 1 };
 
 __PACKAGE__->attr(
-    [qw/lock_cb unlock_cb/] => sub {
+    [qw/lock_cb tick_cb unlock_cb/] => sub {
         sub {1}
     }
 );
@@ -295,6 +295,124 @@ sub not_writing {
     else { $loop->mask($socket, POLLIN) }
 }
 
+sub one_tick {
+    my $self = shift;
+
+    # Listening
+    if (!$self->{_listening} && $self->_should_listen) {
+
+        # Add listen sockets
+        my $listen = $self->{_listen} || {};
+        my $loop = $self->{_loop};
+        for my $lid (keys %$listen) {
+            my $socket = $listen->{$lid}->{socket};
+            my $fd     = fileno $socket;
+
+            # KQueue
+            $loop->EV_SET($fd, KQUEUE_READ, KQUEUE_ADD) if KQUEUE;
+
+            # Epoll
+            $loop->mask($socket, EPOLL_POLLIN) if EPOLL;
+
+            # Poll
+            $loop->mask($socket, POLLIN) unless KQUEUE || EPOLL;
+        }
+
+        # Listening
+        $self->{_listening} = 1;
+    }
+
+    # Prepare
+    return if $self->_prepare;
+
+    # Events
+    my (@error, @hup, @read, @write);
+
+    # KQueue
+    my $loop = $self->{_loop};
+    if (KQUEUE) {
+
+        # Catch interrupted system call errors
+        my @ret;
+        eval { @ret = $loop->kevent(1000 * $self->timeout) };
+        die "KQueue error: $@" if $@;
+
+        # Events
+        for my $kev (@ret) {
+            my ($fd, $filter, $flags, $fflags) = @$kev;
+
+            # Id
+            my $id = $self->{_fds}->{$fd};
+            next unless $id;
+
+            # Error
+            if ($flags == KQUEUE_EOF) {
+                if   ($fflags) { push @error, $id }
+                else           { push @hup,   $id }
+            }
+
+            # Read
+            push @read, $id if $filter == KQUEUE_READ;
+
+            # Write
+            push @write, $id if $filter == KQUEUE_WRITE;
+        }
+    }
+
+    # Epoll
+    elsif (EPOLL) {
+        $loop->poll($self->timeout);
+
+        # Read
+        push @read, $_ for $loop->handles(EPOLL_POLLIN);
+
+        # Write
+        push @write, $_ for $loop->handles(EPOLL_POLLOUT);
+
+        # Error
+        push @error, $_ for $loop->handles(EPOLL_POLLERR);
+
+        # HUP
+        push @hup, $_ for $loop->handles(EPOLL_POLLHUP);
+    }
+
+    # Poll
+    else {
+        $loop->poll($self->timeout);
+
+        # Read
+        push @read, $_ for $loop->handles(POLLIN);
+
+        # Write
+        push @write, $_ for $loop->handles(POLLOUT);
+
+        # Error
+        push @error, $_ for $loop->handles(POLLERR);
+
+        # HUP
+        push @hup, $_ for $loop->handles(POLLHUP);
+    }
+
+    # Read
+    $self->_read($_) for @read;
+
+    # Write
+    $self->_write($_) for @write;
+
+    # Error
+    $self->_error($_) for @error;
+
+    # HUP
+    $self->_hup($_) for @hup;
+
+    # Timers
+    $self->_timer;
+
+    # Tick callback
+    my $cb = $self->tick_cb;
+    $self->_run_callback('tick', $cb) if $cb;
+}
+
 sub read_cb { shift->_add_event('read', @_) }
 
 sub remote_info {
@@ -325,7 +443,7 @@ sub start {
     $self->{_loop} ||= $self->_build_loop;
 
     # Mainloop
-    $self->_spin while $self->{_running};
+    $self->one_tick while $self->{_running};
 
     return $self;
 }
@@ -794,120 +912,6 @@ sub _should_listen {
     return 1;
 }
 
-sub _spin {
-    my $self = shift;
-
-    # Listening
-    if (!$self->{_listening} && $self->_should_listen) {
-
-        # Add listen sockets
-        my $listen = $self->{_listen} || {};
-        my $loop = $self->{_loop};
-        for my $lid (keys %$listen) {
-            my $socket = $listen->{$lid}->{socket};
-            my $fd     = fileno $socket;
-
-            # KQueue
-            $loop->EV_SET($fd, KQUEUE_READ, KQUEUE_ADD) if KQUEUE;
-
-            # Epoll
-            $loop->mask($socket, EPOLL_POLLIN) if EPOLL;
-
-            # Poll
-            $loop->mask($socket, POLLIN) unless KQUEUE || EPOLL;
-        }
-
-        # Listening
-        $self->{_listening} = 1;
-    }
-
-    # Prepare
-    return if $self->_prepare;
-
-    # Events
-    my (@error, @hup, @read, @write);
-
-    # KQueue
-    my $loop = $self->{_loop};
-    if (KQUEUE) {
-
-        # Catch interrupted system call errors
-        my @ret;
-        eval { @ret = $loop->kevent(1000 * $self->timeout) };
-        die "KQueue error: $@" if $@;
-
-        # Events
-        for my $kev (@ret) {
-            my ($fd, $filter, $flags, $fflags) = @$kev;
-
-            # Id
-            my $id = $self->{_fds}->{$fd};
-            next unless $id;
-
-            # Error
-            if ($flags == KQUEUE_EOF) {
-                if   ($fflags) { push @error, $id }
-                else           { push @hup,   $id }
-            }
-
-            # Read
-            push @read, $id if $filter == KQUEUE_READ;
-
-            # Write
-            push @write, $id if $filter == KQUEUE_WRITE;
-        }
-    }
-
-    # Epoll
-    elsif (EPOLL) {
-        $loop->poll($self->timeout);
-
-        # Read
-        push @read, $_ for $loop->handles(EPOLL_POLLIN);
-
-        # Write
-        push @write, $_ for $loop->handles(EPOLL_POLLOUT);
-
-        # Error
-        push @error, $_ for $loop->handles(EPOLL_POLLERR);
-
-        # HUP
-        push @hup, $_ for $loop->handles(EPOLL_POLLHUP);
-    }
-
-    # Poll
-    else {
-        $loop->poll($self->timeout);
-
-        # Read
-        push @read, $_ for $loop->handles(POLLIN);
-
-        # Write
-        push @write, $_ for $loop->handles(POLLOUT);
-
-        # Error
-        push @error, $_ for $loop->handles(POLLERR);
-
-        # HUP
-        push @hup, $_ for $loop->handles(POLLHUP);
-    }
-
-    # Read
-    $self->_read($_) for @read;
-
-    # Write
-    $self->_write($_) for @write;
-
-    # Error
-    $self->_error($_) for @error;
-
-    # HUP
-    $self->_hup($_) for @hup;
-
-    # Timers
-    $self->_timer;
-}
-
 sub _timer {
     my $self = shift;
 
@@ -989,7 +993,7 @@ __END__
 
 =head1 NAME
 
-Mojo::IOLoop - Minimalistic Event Loop For TCP Clients And Servers
+Mojo::IOLoop - Minimalistic Reactor For TCP Clients And Servers
 
 =head1 SYNOPSIS
 
@@ -1065,10 +1069,9 @@ Mojo::IOLoop - Minimalistic Event Loop For TCP Clients And Servers
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop> is a very minimalistic event loop that has been reduced to
-the absolute minimal feature set required to build solid and scalable TCP
-clients and servers, easy to extend and replace with alternative
-implementations.
+L<Mojo::IOLoop> is a very minimalistic reactor that has been reduced to the
+absolute minimal feature set required to build solid and scalable TCP clients
+and servers, easy to extend and replace with alternative implementations.
 
 Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::INET6> and
 L<IO::Socket::SSL> are supported transparently and used if installed.
@@ -1120,13 +1123,12 @@ Setting the value to C<0> will make this loop stop accepting new connections
 and allow it to shutdown gracefully without interrupting existing
 connections.
 
-=head2 C<unlock_cb>
+=head2 C<tick_cb>
 
-    my $cb = $loop->unlock_cb;
-    $loop  = $loop->unlock_cb(sub {...});
+    my $cb = $loop->tick_cb;
+    $loop  = $loop->tick_cb(sub {...});
 
-A callback to free the listen lock, called after accepting a new connection
-and used to sync multiple server processes.
+Callback to be invoked on every reactor tick.
 
 =head2 C<timeout>
 
@@ -1135,6 +1137,14 @@ and used to sync multiple server processes.
 
 Maximum time in seconds our loop waits for new events to happen, defaults to
 C<0.25>.
+
+=head2 C<unlock_cb>
+
+    my $cb = $loop->unlock_cb;
+    $loop  = $loop->unlock_cb(sub {...});
+
+A callback to free the listen lock, called after accepting a new connection
+and used to sync multiple server processes.
 
 =head1 METHODS
 
@@ -1327,6 +1337,12 @@ The local port.
 
 Activate read only mode for a connection.
 Note that connections have no mode after they are created.
+
+=head2 C<one_tick>
+
+    $loop->one_tick;
+
+Run reactor for exactly one tick.
 
 =head2 C<read_cb>
 

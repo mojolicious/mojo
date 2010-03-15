@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 use_ok('Mojo::IOLoop');
 
@@ -14,6 +14,10 @@ use_ok('Mojo::IOLoop');
 # besides occasionally wearing the underwear,
 # which as we discussed, is strictly a comfort thing.
 my $loop = Mojo::IOLoop->new;
+
+# Ticks
+my $ticks = 0;
+$loop->tick_cb(sub { $ticks++ });
 
 # Timer
 my $flag = 0;
@@ -29,4 +33,11 @@ $loop->timer(
     }
 );
 
+# Start
 $loop->start;
+
+# Another tick
+$loop->one_tick;
+
+# Ticks
+ok($ticks > 3, 'more than three ticks');

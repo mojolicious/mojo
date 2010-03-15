@@ -1128,7 +1128,8 @@ connections.
     my $cb = $loop->tick_cb;
     $loop  = $loop->tick_cb(sub {...});
 
-Callback to be invoked on every reactor tick.
+Callback to be invoked on every reactor tick, this for example allows you to
+run multiple reactors next to each other.
 
 =head2 C<timeout>
 

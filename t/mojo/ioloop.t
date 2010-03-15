@@ -24,7 +24,7 @@ $loop->timer(
         $self->timer(
             after => 1,
             cb    => sub {
-                is($flag, 23);
+                is($flag, 23, 'recursive timer works');
             }
         );
         $flag = 23;

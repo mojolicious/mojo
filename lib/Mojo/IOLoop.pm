@@ -125,18 +125,33 @@ sub connect {
 
 sub connection_timeout {
     my ($self, $id, $timeout) = @_;
-    $self->{_cs}->{$id}->{timeout} = $timeout and return $self if $timeout;
-    return $self->{_cs}->{$id}->{timeout};
+
+    # Connection
+    return unless my $c = $self->{_cs}->{$id};
+
+    # Timeout
+    $c->{timeout} = $timeout and return $self if $timeout;
+
+    return $c->{timeout};
 }
 
 sub drop {
     my ($self, $id) = @_;
 
-    # Finish connection once buffer is empty
-    my $c = $self->{_cs}->{$id};
-    if ($c && (($c->{buffer} && $c->{buffer}->size) || $c->{protected})) {
-        $c->{finish} = 1;
-        return $self;
+    # Connection
+    if (my $c = $self->{_cs}->{$id}) {
+
+        # Protected connection
+        my $protected = $c->{protected} || 0;
+
+        # Finish connection once buffer is empty
+        if (my $buffer = $c->{buffer}) { $protected = 1 if $buffer->size }
+
+        # Delay connection drop
+        if ($protected) {
+            $c->{finish} = 1;
+            return $self;
+        }
     }
 
     # Drop
@@ -212,10 +227,8 @@ sub listen {
         $options{SSL_key_file} = $key if $key;
 
         # Create socket
-        my $class =
-            TLS && $args->{tls} ? 'IO::Socket::SSL'
-          : IPV6 ? 'IO::Socket::INET6'
-          :        'IO::Socket::INET';
+        my $class = IPV6 ? 'IO::Socket::INET6' : 'IO::Socket::INET';
+        $class = 'IO::Socket::SSL' if TLS && $args->{tls};
         $socket = $class->new(%options)
           or croak "Can't create listen socket: $!";
     }
@@ -234,30 +247,36 @@ sub listen {
 
 sub local_info {
     my ($self, $id) = @_;
-    return {} unless my $c      = $self->{_cs}->{$id};
+
+    # Connection
+    return {} unless my $c = $self->{_cs}->{$id};
+
+    # Socket
     return {} unless my $socket = $c->{socket};
+
+    # Info
     return {address => $socket->sockhost, port => $socket->sockport};
 }
 
 sub not_writing {
     my ($self, $id) = @_;
 
-    # Active
-    $self->_active($id);
-
     # Connection
-    my $c = $self->{_cs}->{$id};
+    return unless my $c = $self->{_cs}->{$id};
 
-    # Chunk still in buffer or called from write event
-    my $buffer = $c->{buffer};
-    return $c->{read_only} = 1
-      if $c->{protected} || ($buffer && $buffer->size);
+    # Activity
+    $self->_activity($id);
+
+    # Chunk still in buffer or protected
+    my $protected = $c->{protected} || 0;
+    if (my $buffer = $c->{buffer}) { $protected = 1 if $buffer->size }
+    return $c->{read_only} = 1 if $protected;
 
     # Socket
     return unless my $socket = $c->{socket};
 
     # KQueue
-    my $loop = $self->{_loop} ||= $self->_new_loop;
+    my $loop = $self->{_loop} ||= $self->_loop;
     if (KQUEUE) {
         my $fd = fileno $socket;
 
@@ -281,8 +300,14 @@ sub read_cb { shift->_add_event('read', @_) }
 
 sub remote_info {
     my ($self, $id) = @_;
-    return {} unless my $c      = $self->{_cs}->{$id};
+
+    # Connection
+    return {} unless my $c = $self->{_cs}->{$id};
+
+    # Socket
     return {} unless my $socket = $c->{socket};
+
+    # Info
     return {address => $socket->peerhost, port => $socket->peerport};
 }
 
@@ -298,7 +323,7 @@ sub start {
     $self->{_running} = 1;
 
     # Loop
-    $self->{_loop} ||= $self->_new_loop;
+    $self->{_loop} ||= $self->_loop;
 
     # Mainloop
     $self->_spin while $self->{_running};
@@ -365,8 +390,8 @@ sub write_cb { shift->_add_event('write', @_) }
 sub writing {
     my ($self, $id) = @_;
 
-    # Active
-    $self->_active($id);
+    # Activity
+    $self->_activity($id);
 
     # Connection
     my $c = $self->{_cs}->{$id};
@@ -378,7 +403,7 @@ sub writing {
     return unless my $socket = $c->{socket};
 
     # KQueue
-    my $loop = $self->{_loop} ||= $self->_new_loop;
+    my $loop = $self->{_loop} ||= $self->_loop;
     if (KQUEUE) {
         my $fd = fileno $socket;
 
@@ -405,7 +430,7 @@ sub _accept {
     my $socket = $listen->accept or return;
 
     # Unlock callback
-    $self->_callback('unlock', $self->unlock_cb);
+    $self->_run_callback('unlock', $self->unlock_cb);
 
     # Add connection
     my $id = "$socket";
@@ -431,7 +456,7 @@ sub _accept {
 
     # Accept callback
     my $cb = $self->{_listen}->{$listen}->{cb};
-    $self->_event('accept', $cb, $id) if $cb;
+    $self->_run_event('accept', $cb, $id) if $cb;
 
     # Remove listen sockets
     $listen = $self->{_listen} || {};
@@ -452,75 +477,26 @@ sub _accept {
     delete $self->{_listening};
 }
 
-sub _accepting {
+sub _activity {
     my ($self, $id) = @_;
 
     # Connection
-    my $c = $self->{_cs}->{$id};
+    return unless my $c = $self->{_cs}->{$id};
 
-    # Connected
-    return unless $c->{socket}->connected;
-
-    # Accepted
-    delete $c->{accepting};
-
-    # Remove timeout
-    $self->_drop(delete $c->{accept_timer});
-
-    # Non blocking
-    $c->{socket}->blocking(0);
-
-    # Add socket to poll
-    $self->not_writing($id);
-}
-
-sub _active {
-    my ($self, $id) = @_;
-    return $self->{_cs}->{$id}->{active} = time;
+    # Activity
+    return $c->{active} = time;
 }
 
 sub _add_event {
     my ($self, $event, $id, $cb) = @_;
 
-    # Add event callback to connection
-    $self->{_cs}->{$id}->{$event} = $cb;
+    # Connection
+    return unless my $c = $self->{_cs}->{$id};
+
+    # Add event callback
+    $c->{$event} = $cb if $cb;
 
     return $self;
-}
-
-# Failed callbacks should not kill everything
-sub _callback {
-    my $self  = shift;
-    my $event = shift;
-    my $cb    = shift;
-
-    # Invoke callback
-    my $value = eval { $self->$cb(@_) };
-
-    # Callback error
-    warn qq/Callback "$event" failed: $@/ if $@;
-
-    return $value;
-}
-
-sub _connecting {
-    my ($self, $id) = @_;
-
-    # Connection
-    my $c = $self->{_cs}->{$id};
-
-    # Not yet connected
-    return unless $c->{socket}->connected;
-
-    # Connected
-    delete $c->{connecting};
-
-    # Remove timeout
-    $self->_drop(delete $c->{connect_timer});
-
-    # Connect callback
-    my $cb = $c->{connect_cb};
-    $self->_event('connect', $cb, $id) if $cb;
 }
 
 sub _drop {
@@ -589,28 +565,7 @@ sub _error {
     warn "Unhandled event error: $error" and return unless $event;
 
     # Error callback
-    $self->_event('error', $event, $id, $error);
-}
-
-# Failed events should not kill everything
-sub _event {
-    my $self  = shift;
-    my $event = shift;
-    my $cb    = shift;
-    my $id    = shift;
-
-    # Invoke callback
-    my $value = eval { $self->$cb($id, @_) };
-
-    # Event error
-    if ($@) {
-        my $message = qq/Event "$event" failed for connection "$id": $@/;
-        $event eq 'error'
-          ? ($self->_drop($id) and warn $message)
-          : $self->_error($id, $message);
-    }
-
-    return $value;
+    $self->_run_event('error', $event, $id, $error);
 }
 
 sub _hup {
@@ -626,24 +581,19 @@ sub _hup {
     return unless $event;
 
     # HUP callback
-    $self->_event('hup', $event, $id);
-}
-
-sub _is_listening {
-    my $self   = shift;
-    my $cs     = $self->{_cs};
-    my $listen = $self->{_listen} || {};
-    return 1
-      if keys %$listen
-          && keys %$cs < $self->max_connections
-          && $self->_callback('lock', $self->lock_cb, !keys %$cs);
-    return;
+    $self->_run_event('hup', $event, $id);
 }
 
 # Initialize as late as possible because kqueues don't survive a fork
-sub _new_loop {
+sub _loop {
+
+    # "kqueue"
     return IO::KQueue->new if KQUEUE;
-    return IO::Epoll->new  if EPOLL;
+
+    # "epoll"
+    return IO::Epoll->new if EPOLL;
+
+    # "poll"
     return IO::Poll->new;
 }
 
@@ -651,20 +601,23 @@ sub _prepare {
     my $self = shift;
 
     # Prepare
-    for my $id (keys %{$self->{_cs}}) {
-
-        # Connection
-        my $c = $self->{_cs}->{$id};
+    while (my ($id, $c) = each %{$self->{_cs}}) {
 
         # Accepting
-        $self->_accepting($id) if $c->{accepting};
+        $self->_prepare_accept($id) if $c->{accepting};
 
         # Connecting
-        $self->_connecting($id) if $c->{connecting};
+        $self->_prepare_connect($id) if $c->{connecting};
 
-        # Drop once buffer is empty
-        $self->_drop($id) and next
-          if $c->{finish} && (!ref $c->{buffer} || !$c->{buffer}->size);
+        # Connection needs to be finished
+        if ($c->{finish}) {
+
+            # Buffer empty
+            unless ($c->{buffer} && !$c->{buffer}->size) {
+                $self->_drop($id);
+                next;
+            }
+        }
 
         # Read only
         $self->not_writing($id) if delete $c->{read_only};
@@ -673,22 +626,77 @@ sub _prepare {
         my $timeout = $c->{timeout} || 15;
 
         # Last active
-        my $time = $c->{active} || $self->_active($id);
+        my $time = $c->{active} || $self->_activity($id);
 
         # HUP
         $self->_hup($id) if (time - $time) >= $timeout;
     }
 
     # Nothing to do
-    my $listen = $self->{_listen} || {};
-    delete $self->{_running}
-      unless keys %{$self->{_cs}}
-          || keys %{$self->{_ts}}
-          || $self->{_listening}
-          || ($self->max_connections > 0 && keys %$listen);
+    my $running = 0;
 
-    return 1 unless $self->{_running};
+    # Connections
+    my $listen = $self->{_listen} || {};
+    if (keys %{$self->{_cs}}) { $running = 1 }
+
+    # Timers
+    elsif (keys %{$self->{_ts}}) { $running = 1 }
+
+    # Listening
+    elsif ($self->{_listening}) { $running = 1 }
+
+    # Listen sockets
+    elsif ($self->max_connections > 0 && keys %$listen) { $running = 1 }
+
+    # Stopped
+    unless ($running) {
+        delete $self->{_running};
+        return 1;
+    }
+
     return;
+}
+
+sub _prepare_accept {
+    my ($self, $id) = @_;
+
+    # Connection
+    my $c = $self->{_cs}->{$id};
+
+    # Connected
+    return unless $c->{socket}->connected;
+
+    # Accepted
+    delete $c->{accepting};
+
+    # Remove timeout
+    $self->_drop(delete $c->{accept_timer});
+
+    # Non blocking
+    $c->{socket}->blocking(0);
+
+    # Add socket to poll
+    $self->not_writing($id);
+}
+
+sub _prepare_connect {
+    my ($self, $id) = @_;
+
+    # Connection
+    my $c = $self->{_cs}->{$id};
+
+    # Not yet connected
+    return unless $c->{socket}->connected;
+
+    # Connected
+    delete $c->{connecting};
+
+    # Remove timeout
+    $self->_drop(delete $c->{connect_timer});
+
+    # Connect callback
+    my $cb = $c->{connect_cb};
+    $self->_run_event('connect', $cb, $id) if $cb;
 }
 
 sub _read {
@@ -732,17 +740,70 @@ sub _read {
 
     # Callback
     my $event = $c->{read};
-    $self->_event('read', $event, $id, $buffer) if $event;
+    $self->_run_event('read', $event, $id, $buffer) if $event;
 
     # Active
-    $self->_active($id);
+    $self->_activity($id);
+}
+
+# Failed callbacks should not kill everything
+sub _run_callback {
+    my $self  = shift;
+    my $event = shift;
+    my $cb    = shift;
+
+    # Invoke callback
+    my $value = eval { $self->$cb(@_) };
+
+    # Callback error
+    warn qq/Callback "$event" failed: $@/ if $@;
+
+    return $value;
+}
+
+# Failed events should not kill everything
+sub _run_event {
+    my $self  = shift;
+    my $event = shift;
+    my $cb    = shift;
+    my $id    = shift;
+
+    # Invoke callback
+    my $value = eval { $self->$cb($id, @_) };
+
+    # Event error
+    if ($@) {
+        my $message = qq/Event "$event" failed for connection "$id": $@/;
+        $event eq 'error'
+          ? ($self->_drop($id) and warn $message)
+          : $self->_error($id, $message);
+    }
+
+    return $value;
+}
+
+sub _should_listen {
+    my $self = shift;
+
+    # Listen sockets
+    my $listen = $self->{_listen} || {};
+    return unless keys %$listen;
+
+    # Connections
+    my $cs = $self->{_cs};
+    return unless keys %$cs < $self->max_connections;
+
+    # Lock
+    return unless $self->_run_callback('lock', $self->lock_cb, !keys %$cs);
+
+    return 1;
 }
 
 sub _spin {
     my $self = shift;
 
     # Listening
-    if (!$self->{_listening} && $self->_is_listening) {
+    if (!$self->{_listening} && $self->_should_listen) {
 
         # Add listen sockets
         my $listen = $self->{_listen} || {};
@@ -867,7 +928,7 @@ sub _timer {
         if ($after <= time - $t->{started}) {
 
             # Callback
-            if (my $cb = $t->{cb}) { $self->_callback('timer', $cb) }
+            if (my $cb = $t->{cb}) { $self->_run_callback('timer', $cb) }
 
             # Drop
             $self->_drop($id);
@@ -894,7 +955,7 @@ sub _write {
 
         # Write callback
         $c->{protected} = 1;
-        my $chunk = $self->_event('write', $event, $id);
+        my $chunk = $self->_run_event('write', $event, $id);
         delete $c->{protected};
 
         # Add to buffer
@@ -924,8 +985,8 @@ sub _write {
     # Remove written chunk from buffer
     $buffer->remove($written);
 
-    # Active
-    $self->_active($id) if $written;
+    # Activity
+    $self->_activity($id) if $written;
 }
 
 1;

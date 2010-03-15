@@ -155,7 +155,7 @@ sub drop {
     }
 
     # Drop
-    return $self->_drop($id);
+    return $self->_drop_immediately($id);
 }
 
 sub error_cb { shift->_add_event('error', @_) }
@@ -499,7 +499,7 @@ sub _add_event {
     return $self;
 }
 
-sub _drop {
+sub _drop_immediately {
     my ($self, $id) = @_;
 
     # Drop timer
@@ -559,7 +559,7 @@ sub _error {
     my $event = $self->{_cs}->{$id}->{error};
 
     # Cleanup
-    $self->_drop($id);
+    $self->_drop_immediately($id);
 
     # No event
     warn "Unhandled event error: $error" and return unless $event;
@@ -575,7 +575,7 @@ sub _hup {
     my $event = $self->{_cs}->{$id}->{hup};
 
     # Cleanup
-    $self->_drop($id);
+    $self->_drop_immediately($id);
 
     # No event
     return unless $event;
@@ -614,7 +614,7 @@ sub _prepare {
 
             # Buffer empty
             unless ($c->{buffer} && !$c->{buffer}->size) {
-                $self->_drop($id);
+                $self->_drop_immediately($id);
                 next;
             }
         }
@@ -670,7 +670,7 @@ sub _prepare_accept {
     delete $c->{accepting};
 
     # Remove timeout
-    $self->_drop(delete $c->{accept_timer});
+    $self->_drop_immediately(delete $c->{accept_timer});
 
     # Non blocking
     $c->{socket}->blocking(0);
@@ -692,7 +692,7 @@ sub _prepare_connect {
     delete $c->{connecting};
 
     # Remove timeout
-    $self->_drop(delete $c->{connect_timer});
+    $self->_drop_immediately(delete $c->{connect_timer});
 
     # Connect callback
     my $cb = $c->{connect_cb};
@@ -775,7 +775,7 @@ sub _run_event {
     if ($@) {
         my $message = qq/Event "$event" failed for connection "$id": $@/;
         $event eq 'error'
-          ? ($self->_drop($id) and warn $message)
+          ? ($self->_drop_immediately($id) and warn $message)
           : $self->_error($id, $message);
     }
 
@@ -931,7 +931,7 @@ sub _timer {
             if (my $cb = $t->{cb}) { $self->_run_callback('timer', $cb) }
 
             # Drop
-            $self->_drop($id);
+            $self->_drop_immediately($id);
         }
     }
 }

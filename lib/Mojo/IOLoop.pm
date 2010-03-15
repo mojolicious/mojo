@@ -108,10 +108,9 @@ sub connect {
     setsockopt $socket, IPPROTO_TCP, TCP_NODELAY, 1;
 
     # Timeout
-    $c->{connect_timer} = $self->timer(
-        after => $self->connect_timeout,
-        cb    => sub { shift->_error($id, 'Connect timeout.') }
-    );
+    $c->{connect_timer} =
+      $self->timer($self->connect_timeout =>
+          sub { shift->_error($id, 'Connect timeout.') });
 
     # File descriptor
     my $fd = fileno $socket;
@@ -370,17 +369,14 @@ sub start_tls {
 sub stop { delete shift->{_running} }
 
 sub timer {
-    my $self = shift;
+    my ($self, $after, $cb) = @_;
 
-    # Arguments
-    my $args = ref $_[0] ? $_[0] : {@_};
-
-    # Started
-    $args->{started} = time;
+    # Timer
+    my $timer = {after => $after, cb => $cb, started => time};
 
     # Add timer
-    my $id = "$args";
-    $self->{_ts}->{$id} = $args;
+    my $id = "$timer";
+    $self->{_ts}->{$id} = $timer;
 
     return $id;
 }
@@ -441,10 +437,9 @@ sub _accept {
     };
 
     # Timeout
-    $c->{accept_timer} = $self->timer(
-        after => $self->accept_timeout,
-        cb    => sub { shift->_error($id, 'Accept timeout.') }
-    );
+    $c->{accept_timer} =
+      $self->timer($self->accept_timeout, =>
+          sub { shift->_error($id, 'Accept timeout.') });
 
     # Disable Nagle's algorithm
     setsockopt($socket, IPPROTO_TCP, TCP_NODELAY, 1)
@@ -1059,7 +1054,7 @@ Mojo::IOLoop - Minimalistic Event Loop For TCP Clients And Servers
     });
 
     # Add a timer
-    $loop->timer(after => 5, cb => sub {
+    $loop->timer(5 => sub {
         my $self = shift;
         $self->drop($id);
     });
@@ -1412,24 +1407,9 @@ and the loop can be restarted by running C<start> again.
 
 =head2 C<timer>
 
-    my $id = $loop->timer(after => 5, cb => sub {...});
-    my $id = $loop->timer({after => 5, cb => sub {...}});
+    my $id = $loop->timer(5 => sub {...});
 
 Create a new timer, invoking the callback afer a given amount of seconds.
-
-These options are currently available.
-
-=over 4
-
-=item C<after>
-
-Start timer after this exact amount of seconds.
-
-=item C<cb>
-
-Callback to invoke.
-
-=back
 
 =head2 C<write_cb>
 

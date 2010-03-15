@@ -18,12 +18,10 @@ my $loop = Mojo::IOLoop->new;
 # Timer
 my $flag = 0;
 $loop->timer(
-    after => 1,
-    cb    => sub {
+    1 => sub {
         my $self = shift;
         $self->timer(
-            after => 1,
-            cb    => sub {
+            1 => sub {
                 is($flag, 23, 'recursive timer works');
             }
         );

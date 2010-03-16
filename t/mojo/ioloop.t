@@ -40,4 +40,4 @@ $loop->start;
 $loop->one_tick;
 
 # Ticks
-ok($ticks > 3, 'more than three ticks');
+ok($ticks > 2, 'more than two ticks');

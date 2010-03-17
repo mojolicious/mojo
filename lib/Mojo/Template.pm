@@ -555,7 +555,7 @@ Whitespace characters around tags can be trimmed with a special tag ending.
     <%= All whitespace characters around this expression will be trimmed =%>
 
 You can capture whole template blocks for reuse later, the C<block> helper
-allows you to render those blocks on demand.
+allows you to render these blocks on demand.
 
     <%{ my $block = %>
         <% my $name = shift; =%>

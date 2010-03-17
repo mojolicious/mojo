@@ -18,7 +18,7 @@ my $loop = Mojo::IOLoop->new;
 # Connection buffer
 my $c = {};
 
-# Minimal HTTPS proxy server to test TLS tunneling
+# Minimal connect proxy server to test TLS tunneling
 $loop->listen(
     port => 3000,
     cb   => sub {
@@ -135,7 +135,7 @@ $loop->listen(
 ) or die "Couldn't create listen socket!\n";
 
 print <<'EOF';
-Starting HTTPS proxy on port 3000.
+Starting connect proxy on port 3000.
 For testing use something like "HTTPS_PROXY=https://127.0.0.1:3000".
 EOF
 

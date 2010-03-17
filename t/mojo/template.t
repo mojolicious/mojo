@@ -25,7 +25,7 @@ package main;
 use strict;
 use warnings;
 
-use Test::More tests => 86;
+use Test::More tests => 88;
 
 use File::Spec;
 use File::Temp;
@@ -67,31 +67,33 @@ is($output, 'test');
 
 # Trim expression tags
 $mt     = Mojo::Template->new;
-$output = $mt->render('    <%{= =%><html><%} =%>    ');
+$output = $mt->render('    <%{= block =%><html><%} =%>    ');
 is($output, '<html>');
 
 # Expression block
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-%{=
+%{ my $block =
 <html>
 %}
+%= $block->()
 EOF
 is($output, "<html>\n");
 
 # Escaped expression block
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-%{==
+%{ my $block =
 <html>
 %}
+%== $block->()
 EOF
 is($output, "&lt;html&gt;\n");
 
 # Captured escaped expression block
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-%{== my $result =
+%{== my $result = block
 <html>
 %}
 %= $result
@@ -101,7 +103,7 @@ is($output, "&lt;html&gt;\n<html>\n");
 # Capture lines
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-%{ my $result = escape
+%{ my $result = escape block
 <html>
 %}
 %= $result
@@ -111,23 +113,53 @@ is($output, "&lt;html&gt;\n");
 # Capture tags
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<%{ my $result = escape %><html><%}%><%= $result %>
+<%{ my $result = escape block%><html><%}%><%= $result %>
 EOF
 is($output, "&lt;html&gt;\n");
 
 # Capture tags with appended code
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<%{ my $result = escape( %><html><%} ); %><%= $result %>
+<%{ my $result = escape( block %><html><%} ); %><%= $result %>
 EOF
 is($output, "&lt;html&gt;\n");
 
 # Nested capture tags
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<%{ my $result = %><%{= escape %><html><%}%><%}%><%= $result %>
+<%{ my $result = block %><%{= escape block %><html><%}%><%}%><%= $result %>
 EOF
 is($output, "&lt;html&gt;\n");
+
+# Advanced capturing
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+%{ my $block =
+% my $name = shift;
+Hello <%= $name %>.
+%}
+%= block $block, 'Baerbel'
+%= block $block, 'Wolfgang'
+EOF
+is($output, <<EOF);
+Hello Baerbel.
+Hello Wolfgang.
+EOF
+
+# Advanced capturing with tags
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+<%{ my $block = =%>
+    <% my $name = shift; =%>
+    Hello <%= $name %>.
+<%}=%>
+<%= block $block, 'Sebastian' %>
+<%= block $block, 'Sara' %>
+EOF
+is($output, <<EOF);
+Hello Sebastian.
+Hello Sara.
+EOF
 
 # Strict
 $mt     = Mojo::Template->new;

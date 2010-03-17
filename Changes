@@ -6,6 +6,7 @@ This file documents the revision history for Perl extension Mojolicious.
           Mojo::Message::Request. (esskar)
         - Added tick callback to Mojo::IOLoop to make mixing multiple event
           loops trivial.
+        - Added the ability to pass arguments to Mojo::Template blocks.
         - Added more routes tests. (doubi)
         - Cleaned up documentation.
         - Cleaned up tests.

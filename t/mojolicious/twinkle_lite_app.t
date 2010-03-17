@@ -86,7 +86,7 @@ test<%= content %>123\
  ** for my $i (@$numbers) { ***
  *** $i ***
  ** } ***
- **+ my $foo = *** 23 **-*** *** $foo ***
+ **+ my $foo = block *** 23 **-*** *** $foo ***
 
 @@ docs.html.pod
 <%= '=head3 ' . $codename %>

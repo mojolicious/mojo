@@ -171,15 +171,18 @@ sub render_inner {
     my ($self, $name, $content) = @_;
 
     # Initialize
-    $self->stash->{content} ||= {};
+    my $stash = $self->stash;
+    $stash->{content} ||= {};
     $name ||= 'content';
 
     # Set
-    $self->stash->{content}->{$name} ||= Mojo::ByteStream->new("$content")
-      if $content;
+    $stash->{content}->{$name} ||= $content if $content;
 
     # Get
-    return $self->stash->{content}->{$name};
+    $content = $stash->{content}->{$name};
+    my $result = ref $content eq 'CODE' ? $content->() : $content;
+    $result ||= '';
+    return Mojo::ByteStream->new("$result");
 }
 
 sub render_json {
@@ -405,6 +408,7 @@ rendering a static C<500> page using L<MojoX::Renderer::Static>.
     my $output = $c->render_inner;
     my $output = $c->render_inner('content');
     my $output = $c->render_inner(content => 'Hello world!');
+    my $output = $c->render_inner(content => sub { 'Hello world!' });
 
 Contains partial rendered templates, used for the renderers C<layout> and
 C<extends> features.

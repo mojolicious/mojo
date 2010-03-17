@@ -30,9 +30,11 @@ __PACKAGE__->attr(template                  => '');
 __PACKAGE__->attr(tree => sub { [] });
 __PACKAGE__->attr(trim_mark => '=');
 
-# Escape helper
-my $ESCAPE = <<'EOF';
+# Helpers
+my $HELPERS = <<'EOF';
 no strict 'refs'; no warnings 'redefine';
+sub block;
+*block = sub { shift->(@_) };
 sub escape;
 *escape = sub {
     my $v = shift;
@@ -42,7 +44,7 @@ sub escape;
 };
 use strict; use warnings;
 EOF
-$ESCAPE =~ s/\n//g;
+$HELPERS =~ s/\n//g;
 
 sub build {
     my $self = shift;
@@ -66,7 +68,7 @@ sub build {
             if ($type eq 'cpen') {
 
                 # End block
-                $lines[-1] .= '$_M }';
+                $lines[-1] .= 'return $_M }';
 
                 # No following code
                 my $next = $line->[$j + 3];
@@ -113,7 +115,7 @@ sub build {
             if ($type eq 'cpst') {
 
                 # Start block
-                $cpst = " do { my \$_M = ''; ";
+                $cpst = " sub { shift; my \$_M = ''; ";
             }
         }
     }
@@ -123,7 +125,8 @@ sub build {
     my $append    = $self->append;
     my $namespace = $self->namespace || ref $self;
     $lines[0] ||= '';
-    $lines[0] = qq/package $namespace; sub { my \$_M = ''; $ESCAPE; $prepend;/
+    $lines[0] =
+      qq/package $namespace; sub { my \$_M = ''; $HELPERS; $prepend;/
       . $lines[0];
     $lines[-1] .= qq/$append; return \$_M; };/;
 
@@ -551,20 +554,22 @@ Whitespace characters around tags can be trimmed with a special tag ending.
 
     <%= All whitespace characters around this expression will be trimmed =%>
 
-You can capture the result of a whole template block for reuse later.
+You can capture whole template blocks for reuse later, the C<block> helper
+allows you to render those blocks on demand.
 
-    <%{ my $result = %>
-    This will be assigned.
+    <%{ my $block = %>
+        <% my $name = shift; =%>
+        Hello <%= $name %>.
     <%}%>
-    <%{= my $result = %>
-    This will be assigned and passed through.
-    <%}%>
-    %{ my $result =
-    This will be assigned.
+    <%= block $block, 'Sebastian' %>
+    <%= block $block, 'Sara' %>
+
+    %{ my $block =
+    % my $name = shift;
+    Hello <%= $name %>.
     %}
-    %{= my $result =
-    This will be assigned and passed through.
-    %}
+    %= block $block, 'Baerbel'
+    %= block $block, 'Wolfgang'
 
 L<Mojo::Template> templates work just like Perl subs (actually they get
 compiled to a Perl sub internally).
@@ -654,7 +659,7 @@ Append Perl code to compiled template.
 
 Character indicating the end of a capture block, defaults to C<}>.
 
-    %{ $foo =
+    %{ $block =
         Some data!
     %}
 
@@ -665,7 +670,7 @@ Character indicating the end of a capture block, defaults to C<}>.
 
 Character indicating the start of a capture block, defaults to C<{>.
 
-    <%{ my $foo = %>
+    <%{ my $block = %>
         Some data!
     <%}%>
 

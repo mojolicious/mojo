@@ -258,7 +258,7 @@ Template blocks can be reused like functions in Perl scripts.
 
     @@ block.html.ep
     %{ my $link =
-        <% my ($url, $name) = @_; =%>
+        <% my ($url, $name) = @_; %>
         Try <a href="<%= $url %>"><%= $name %></a>!
     %}
     <!doctype html><html>

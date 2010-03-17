@@ -257,10 +257,10 @@ Template blocks can be reused like functions in Perl scripts.
     __DATA__
 
     @@ block.html.ep
-    <%{ my $link = %>
+    %{ my $link =
         <% my ($url, $name) = @_; =%>
         Try <a href="<%= $url %>"><%= $name %></a>!
-    <%}%>
+    %}
     <!doctype html><html>
         <head><title>Sebastians Frameworks!</title></head>
         <body>

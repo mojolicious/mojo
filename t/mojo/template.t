@@ -25,7 +25,7 @@ package main;
 use strict;
 use warnings;
 
-use Test::More tests => 88;
+use Test::More tests => 89;
 
 use File::Spec;
 use File::Temp;
@@ -159,6 +159,24 @@ EOF
 is($output, <<EOF);
 Hello Sebastian.
 Hello Sara.
+EOF
+
+# Block loop
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+% my $i = 2;
+<%{= block %>
+    <%= $i++ %>
+<%} for 1 .. 3; %>
+EOF
+is($output, <<EOF);
+
+    2
+
+    3
+
+    4
+
 EOF
 
 # Strict

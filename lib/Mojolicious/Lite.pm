@@ -281,28 +281,19 @@ other.
     __DATA__
 
     @@ first.html.ep
-    % extends 'second';
-    %{ content header =>
-        <title>Howdy!</title>
-    %}
-    First!
+    <!doctype html><html>
+        <head><%{= content header => %><title>Hi!</title><%}%></head>
+        <body><%{= content body => %>First page!<%}%></body>
+    </html>
 
     @@ second.html.ep
-    % layout 'third';
+    % extends 'first';
     %{ content header =>
-        <title>Welcome!</title>
+    <title>Howdy!</title>
     %}
-    Second!
-
-    @@ layouts/third.html.ep
-    <!doctype html><html>
-        <head>
-            <%{= content header => %>
-                <title>Lame default title...</title>
-            <%}%>
-        </head>
-        <body><%= content %></body>
-    </html>
+    %{ content body =>
+    Second page!
+    %}
 
 Route placeholders allow capturing parts of a request path until a C</> or
 C<.> separator occurs, results will be stored by name in the C<stash> and

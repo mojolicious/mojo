@@ -249,6 +249,26 @@ Templates can have layouts.
         <body><%= content %></body>
     </html>
 
+Template blocks can be reused like functions in Perl scripts.
+
+    # GET /with_block
+    get '/with_block' => 'block';
+
+    __DATA__
+
+    @@ block.html.ep
+    <%{ my $link = %>
+        <% my ($url, $name) = @_; =%>
+        Try <a href="<%= $url %>"><%= $name %></a>!
+    <%}%>
+    <!doctype html><html>
+        <head><title>Sebastians Frameworks!</title></head>
+        <body>
+            <%= block $link, 'http://mojolicious.org', 'Mojolicious' %>
+            <%= block $link, 'http://catalystframework.org', 'Catalyst' %>
+        </body>
+    </html>
+
 Templates can also pass around blocks of captured content and extend each
 other.
 

@@ -554,22 +554,21 @@ Whitespace characters around tags can be trimmed with a special tag ending.
 
     <%= All whitespace characters around this expression will be trimmed =%>
 
-You can capture whole template blocks for reuse later, the C<block> helper
-allows you to render these blocks on demand.
+You can capture whole template blocks for reuse later.
 
     <%{ my $block = %>
         <% my $name = shift; =%>
         Hello <%= $name %>.
     <%}%>
-    <%= block $block, 'Sebastian' %>
-    <%= block $block, 'Sara' %>
+    <%= $block->('Sebastian') %>
+    <%= $block->('Sara') %>
 
     %{ my $block =
     % my $name = shift;
     Hello <%= $name %>.
     %}
-    %= block $block, 'Baerbel'
-    %= block $block, 'Wolfgang'
+    %= $block->('Baerbel')
+    %= $block->('Wolfgang')
 
 L<Mojo::Template> templates work just like Perl subs (actually they get
 compiled to a Perl sub internally).

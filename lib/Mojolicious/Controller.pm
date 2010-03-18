@@ -107,12 +107,14 @@ sub render {
     my $self = shift;
 
     # Template as single argument
-    my $stash    = $self->stash;
-    my $template = shift
-      if (@_ % 2 && !ref $_[0]) || (!@_ % 2 && ref $_[1]);
+    my $stash = $self->stash;
+    my $template;
+    $template = shift if (@_ % 2 && !ref $_[0]) || (!@_ % 2 && ref $_[1]);
 
     # Arguments
     my $args = ref $_[0] ? $_[0] : {@_};
+
+    # Template
     $args->{template} = $template if $template;
 
     # Layout
@@ -241,11 +243,13 @@ sub render_partial {
     my $self = shift;
 
     # Template as single argument
-    my $template = shift
-      if (@_ % 2 && !ref $_[0]) || (!@_ % 2 && ref $_[1]);
+    my $template;
+    $template = shift if (@_ % 2 && !ref $_[0]) || (!@_ % 2 && ref $_[1]);
 
     # Arguments
     my $args = ref $_[0] ? $_[0] : {@_};
+
+    # Template
     $args->{template} = $template if $template;
 
     # Partial

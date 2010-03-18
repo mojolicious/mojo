@@ -117,7 +117,7 @@ sub render {
     # Template
     $args->{template} = $template if $template;
 
-    # Layout
+    # Localize layout and extends for partials
     if (!$stash->{'mojo.render'} && $args->{partial}) {
         $stash->{'mojo.render'} = 1;
         local $stash->{layout}  = undef;

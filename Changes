@@ -7,6 +7,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added tick callback to Mojo::IOLoop to make mixing multiple event
           loops trivial.
         - Added the ability to pass arguments to Mojo::Template blocks.
+        - Added layout support for partial rendering.
         - Added more routes tests. (doubi)
         - Cleaned up documentation.
         - Cleaned up tests.

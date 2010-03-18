@@ -13,7 +13,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 369;
+plan tests => 374;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -127,6 +127,16 @@ get '/outerlayout' => sub {
     my $self = shift;
     $self->render(
         template => 'outerlayout',
+        layout   => 'layout',
+        handler  => 'ep'
+    );
+};
+
+# GET /outerinnerlayout
+get '/outerinnerlayout' => sub {
+    my $self = shift;
+    $self->render(
+        template => 'outerinnerlayout',
         layout   => 'layout',
         handler  => 'ep'
     );
@@ -502,6 +512,13 @@ $t->get_ok('/outerlayout')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("layouted Hello\n[\n  1,\n  2\n]\nthere<br/>!\n\n\n");
+
+# GET /outerinnerlayout
+$t->get_ok('/outerinnerlayout')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is(
+    "layouted Hello\nlayouted [\n  1,\n  2\n]\nthere<br/>!\n\n\n\n");
 
 # GET /session_cookie
 $t->get_ok('/session_cookie')->status_is(200)
@@ -910,6 +927,10 @@ Hello
 
 @@ outermenu.html.ep
 <%= dumper [1, 2] %>there<br/>!
+
+@@ outerinnerlayout.html.ep
+Hello
+<%= include 'outermenu', layout => 'layout' %>
 
 @@ not_found.html.epl
 Oops!

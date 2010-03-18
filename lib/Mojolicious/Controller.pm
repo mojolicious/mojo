@@ -107,19 +107,37 @@ sub render {
     my $self = shift;
 
     # Template as single argument
-    $self->stash->{template} = shift
+    my $stash    = $self->stash;
+    my $template = shift
       if (@_ % 2 && !ref $_[0]) || (!@_ % 2 && ref $_[1]);
 
-    # Merge args with stash
+    # Arguments
     my $args = ref $_[0] ? $_[0] : {@_};
-    $self->{stash} = {%{$self->stash}, %$args};
+    $args->{template} = $template if $template;
+
+    # Layout
+    if (!$stash->{'mojo.render'} && $args->{partial}) {
+        $stash->{'mojo.render'} = 1;
+        local $stash->{layout}  = undef;
+        local $stash->{extends} = undef;
+        return $self->render($args);
+    }
+
+    # Localize render arguments
+    for my $key (keys %$args) {
+        local $stash->{$key} = delete $args->{$key};
+        return $self->render($args);
+    }
+
+    # Render
+    delete $stash->{'mojo.render'};
 
     # Template
-    unless ($self->stash->{template}) {
+    unless ($stash->{template}) {
 
         # Default template
-        my $controller = $self->stash->{controller};
-        my $action     = $self->stash->{action};
+        my $controller = $stash->{controller};
+        my $action     = $stash->{action};
 
         # Try the route name if we don't have controller and action
         unless ($controller && $action) {
@@ -143,8 +161,15 @@ sub render {
 
 sub render_data {
     my $self = shift;
-    $self->stash->{data} = shift;
-    return $self->render(@_);
+    my $data = shift;
+
+    # Arguments
+    my $args = ref $_[0] ? $_[0] : {@_};
+
+    # Data
+    $args->{data} = $data;
+
+    return $self->render($args);
 }
 
 sub render_exception {
@@ -187,8 +212,15 @@ sub render_inner {
 
 sub render_json {
     my $self = shift;
-    $self->stash->{json} = shift;
-    return $self->render(@_);
+    my $json = shift;
+
+    # Arguments
+    my $args = ref $_[0] ? $_[0] : {@_};
+
+    # JSON
+    $args->{json} = $json;
+
+    return $self->render($args);
 }
 
 sub render_not_found {
@@ -207,8 +239,19 @@ sub render_not_found {
 
 sub render_partial {
     my $self = shift;
-    local $self->stash->{partial} = 1;
-    return Mojo::ByteStream->new($self->render(@_));
+
+    # Template as single argument
+    my $template = shift
+      if (@_ % 2 && !ref $_[0]) || (!@_ % 2 && ref $_[1]);
+
+    # Arguments
+    my $args = ref $_[0] ? $_[0] : {@_};
+    $args->{template} = $template if $template;
+
+    # Partial
+    $args->{partial} = 1;
+
+    return Mojo::ByteStream->new($self->render($args));
 }
 
 sub render_static {
@@ -218,8 +261,15 @@ sub render_static {
 
 sub render_text {
     my $self = shift;
-    $self->stash->{text} = shift;
-    return $self->render(@_);
+    my $text = shift;
+
+    # Arguments
+    my $args = ref $_[0] ? $_[0] : {@_};
+
+    # Data
+    $args->{text} = $text;
+
+    return $self->render($args);
 }
 
 sub resume { shift->tx->resume }
@@ -387,6 +437,8 @@ It will set a default template to use based on the controller and action name
 or fall back to the route name.
 You can call it with a hash of options which can be preceded by an optional
 template name.
+Note that all render arguments get localized, so stash values won't be
+changed after the render call.
 
 =head2 C<render_data>
 

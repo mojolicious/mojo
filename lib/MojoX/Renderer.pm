@@ -124,7 +124,7 @@ sub render {
 
         # Extends
         $c->stash->{content}->{content} = b("$output")
-          if ($c->stash->{extends} || $c->stash->{layout}) && !$partial;
+          if ($c->stash->{extends} || $c->stash->{layout});
     }
 
     # Data
@@ -135,7 +135,7 @@ sub render {
 
         # Extends
         $c->stash->{content}->{content} = b("$output")
-          if ($c->stash->{extends} || $c->stash->{layout}) && !$partial;
+          if ($c->stash->{extends} || $c->stash->{layout});
     }
 
     # JSON
@@ -147,7 +147,7 @@ sub render {
 
         # Extends
         $c->stash->{content}->{content} = b("$output")
-          if ($c->stash->{extends} || $c->stash->{layout}) && !$partial;
+          if ($c->stash->{extends} || $c->stash->{layout});
     }
 
     # Template or templateless handler
@@ -158,11 +158,11 @@ sub render {
 
         # Extends
         $c->stash->{content}->{content} = b("$output")
-          if ($c->stash->{extends} || $c->stash->{layout}) && !$partial;
+          if ($c->stash->{extends} || $c->stash->{layout});
     }
 
     # Extends
-    while (!$partial && (my $extends = $self->_extends($c))) {
+    while (my $extends = $self->_extends($c)) {
 
         # Handler
         $handler = $c->stash->{handler};

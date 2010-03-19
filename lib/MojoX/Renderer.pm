@@ -88,33 +88,38 @@ sub render {
     my ($self, $c) = @_;
 
     # We got called
-    $c->stash->{rendered} = 1;
-    $c->stash->{content} ||= {};
+    my $stash = $c->stash;
+    $stash->{rendered} = 1;
+    $stash->{content} ||= {};
 
     # Partial
-    my $partial = delete $c->stash->{partial};
+    my $partial = delete $stash->{partial};
 
     # Template
-    my $template = delete $c->stash->{template};
+    my $template = delete $stash->{template};
 
     # Format
-    my $format = $c->stash->{format} || $self->default_format;
+    my $format = $stash->{format} || $self->default_format;
 
     # Handler
-    my $handler = $c->stash->{handler};
+    my $handler = $stash->{handler};
 
     # Data
-    my $data = delete $c->stash->{data};
+    my $data = delete $stash->{data};
 
     # JSON
-    my $json = delete $c->stash->{json};
+    my $json = delete $stash->{json};
 
     # Text
-    my $text = delete $c->stash->{text};
+    my $text = delete $stash->{text};
 
     my $options =
       {template => $template, format => $format, handler => $handler};
     my $output;
+
+    # Localize extends and layout
+    local $stash->{layout}  = $stash->{layout};
+    local $stash->{extends} = $stash->{extends};
 
     # Text
     if (defined $text) {
@@ -271,12 +276,13 @@ sub _extends {
     my ($self, $c) = @_;
 
     # Layout
-    if (my $layout = delete $c->stash->{layout}) {
-        $c->stash->{extends} ||= $self->layout_prefix . '/' . $layout;
+    my $stash = $c->stash;
+    if (my $layout = delete $stash->{layout}) {
+        $stash->{extends} ||= $self->layout_prefix . '/' . $layout;
     }
 
     # Extends
-    return delete $c->stash->{extends};
+    return delete $stash->{extends};
 }
 
 sub _list_inline_templates {

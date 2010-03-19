@@ -13,7 +13,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 374;
+plan tests => 381;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -131,6 +131,14 @@ get '/outerlayout' => sub {
         handler  => 'ep'
     );
 };
+
+# GET /outerlayouttwo
+get '/outerlayouttwo' => {layout => 'layout'} => sub {
+    my $self = shift;
+    is($self->stash->{layout}, 'layout');
+    $self->render(handler => 'ep');
+    is($self->stash->{layout}, 'layout');
+} => 'outerlayout';
 
 # GET /outerinnerlayout
 get '/outerinnerlayout' => sub {
@@ -509,6 +517,12 @@ $t->get_ok('/double_inheritance')->status_is(200)
 
 # GET /outerlayout
 $t->get_ok('/outerlayout')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("layouted Hello\n[\n  1,\n  2\n]\nthere<br/>!\n\n\n");
+
+# GET /outerlayouttwo
+$t->get_ok('/outerlayouttwo')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("layouted Hello\n[\n  1,\n  2\n]\nthere<br/>!\n\n\n");

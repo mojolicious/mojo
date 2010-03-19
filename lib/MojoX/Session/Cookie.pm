@@ -33,8 +33,9 @@ sub load {
     return unless $expires > time;
 
     # Content
-    return unless $c->stash->{'mojo.session'} = keys %$session;
-    $c->stash->{session} = $session;
+    my $stash = $c->stash;
+    return unless $stash->{'mojo.session'} = keys %$session;
+    $stash->{session} = $session;
 
     # Flash
     $session->{old_flash} = delete $session->{flash} if $session->{flash};
@@ -45,8 +46,9 @@ sub store {
     my ($self, $c) = @_;
 
     # Session
-    return unless my $session = $c->stash->{session};
-    return unless keys %$session || $c->stash->{'mojo.session'};
+    my $stash = $c->stash;
+    return unless my $session = $stash->{session};
+    return unless keys %$session || $stash->{'mojo.session'};
 
     # Flash
     delete $session->{old_flash};

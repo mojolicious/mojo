@@ -21,6 +21,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed routes method condition to consider GET and HEAD equal.
         - Fixed test requiring Perl 5.10.
         - Fixed a loader bug. (mvuets)
+        - Fixed layout and extends scope in MojoX::Renderer. (korshak)
         - Fixed daemons to create listen sockets before changing user and
           group. (xantus)
 

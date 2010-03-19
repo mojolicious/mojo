@@ -215,9 +215,8 @@ sub listen {
     else {
 
         # Socket options
-        my $address = $args->{address};
-        $options{LocalAddr} = $address if $address;
-        $options{LocalPort} = $args->{port} || 3000;
+        $options{LocalAddr} = $args->{address} || '0.0.0.0';
+        $options{LocalPort} = $args->{port}    || 3000;
         $options{Proto}     = 'tcp';
         $options{ReuseAddr} = 1;
         my $cert = $args->{tls_cert};

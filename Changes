@@ -10,6 +10,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added layout support for partial rendering, in addition all render
           arguments are now localized.
         - Added more routes tests. (doubi)
+        - Changed default listen address to 0.0.0.0. (mlineen)
         - Cleaned up documentation.
         - Cleaned up tests.
         - Relaxed Mojo::Server::CGI read timeout.

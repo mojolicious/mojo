@@ -691,7 +691,7 @@ sub _queue {
             my $url = $tx->req->url->to_abs;
             next if $url->host;
             $url->scheme('http');
-            $url->host('127.0.0.1');
+            $url->host('localhost');
             $url->port($self->{_port});
             $tx->req->url($url);
         }

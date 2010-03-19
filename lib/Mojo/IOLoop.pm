@@ -12,7 +12,7 @@ use Errno qw/EAGAIN EWOULDBLOCK/;
 use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
 use IO::Socket;
 use Mojo::ByteStream;
-use Socket qw/IPPROTO_TCP TCP_NODELAY/;
+use Socket qw/INADDR_ANY IPPROTO_TCP TCP_NODELAY/;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 8192;
 
@@ -215,7 +215,7 @@ sub listen {
     else {
 
         # Socket options
-        $options{LocalAddr} = $args->{address} || '0.0.0.0';
+        $options{LocalAddr} = $args->{address} || INADDR_ANY;
         $options{LocalPort} = $args->{port}    || 3000;
         $options{Proto}     = 'tcp';
         $options{ReuseAddr} = 1;

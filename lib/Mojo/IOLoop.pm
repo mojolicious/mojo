@@ -9,6 +9,8 @@ use base 'Mojo::Base';
 
 use Carp 'croak';
 use Errno qw/EAGAIN EWOULDBLOCK/;
+use File::Spec;
+use IO::File;
 use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
 use IO::Socket;
 use Mojo::ByteStream;
@@ -45,6 +47,52 @@ use constant TLS => $ENV{MOJO_NO_TLS}
   ? 0
   : eval { require IO::Socket::SSL; 1 };
 
+# Default TLS cert (20.03.2010)
+# (openssl req -new -x509 -keyout cakey.pem -out cacert.pem -nodes -days 7300)
+use constant CERT => <<EOF;
+-----BEGIN CERTIFICATE-----
+MIIDbzCCAtigAwIBAgIJAM+kFv1MwalmMA0GCSqGSIb3DQEBBQUAMIGCMQswCQYD
+VQQGEwJERTEWMBQGA1UECBMNTmllZGVyc2FjaHNlbjESMBAGA1UEBxMJSGFtYmVy
+Z2VuMRQwEgYDVQQKEwtNb2pvbGljaW91czESMBAGA1UEAxMJbG9jYWxob3N0MR0w
+GwYJKoZIhvcNAQkBFg5rcmFpaEBjcGFuLm9yZzAeFw0xMDAzMjAwMDQ1MDFaFw0z
+MDAzMTUwMDQ1MDFaMIGCMQswCQYDVQQGEwJERTEWMBQGA1UECBMNTmllZGVyc2Fj
+aHNlbjESMBAGA1UEBxMJSGFtYmVyZ2VuMRQwEgYDVQQKEwtNb2pvbGljaW91czES
+MBAGA1UEAxMJbG9jYWxob3N0MR0wGwYJKoZIhvcNAQkBFg5rcmFpaEBjcGFuLm9y
+ZzCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAzu9mOiyUJB2NBuf1lZxViNM2
+VISqRAoaXXGOBa6RgUoVfA/n81RQlgvVA0qCSQHC534DdYRk3CdyJR9UGPuxF8k4
+CckOaHWgcJJsd8H0/q73PjbA5ItIpGTTJNh8WVpFDjHTJmQ5ihwddap4/offJxZD
+dPrMFtw1ZHBRug5tHUECAwEAAaOB6jCB5zAdBgNVHQ4EFgQUo+Re5wuuzVFqH/zV
+cxRGXL0j5K4wgbcGA1UdIwSBrzCBrIAUo+Re5wuuzVFqH/zVcxRGXL0j5K6hgYik
+gYUwgYIxCzAJBgNVBAYTAkRFMRYwFAYDVQQIEw1OaWVkZXJzYWNoc2VuMRIwEAYD
+VQQHEwlIYW1iZXJnZW4xFDASBgNVBAoTC01vam9saWNpb3VzMRIwEAYDVQQDEwls
+b2NhbGhvc3QxHTAbBgkqhkiG9w0BCQEWDmtyYWloQGNwYW4ub3JnggkAz6QW/UzB
+qWYwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQUFAAOBgQCZZcOeAobctD9wtPtO
+40CKHpiGYEM3rh7VvBhjTcVnX6XlLvffIg3uTrVRhzmlEQCZz3O5TsBzfMAVnjYz
+llhwgRF6Xn8ict9L8yKDoGSbw0Q7HaCb8/kOe0uKhcSDUd3PjJU0ZWgc20zcGFA9
+R65bABoJ2vU1rlQFmjs0RT4UcQ==
+-----END CERTIFICATE-----
+EOF
+
+# Default TLS key (20.03.2010)
+# (openssl req -new -x509 -keyout cakey.pem -out cacert.pem -nodes -days 7300)
+use constant KEY => <<EOF;
+-----BEGIN RSA PRIVATE KEY-----
+MIICXAIBAAKBgQDO72Y6LJQkHY0G5/WVnFWI0zZUhKpEChpdcY4FrpGBShV8D+fz
+VFCWC9UDSoJJAcLnfgN1hGTcJ3IlH1QY+7EXyTgJyQ5odaBwkmx3wfT+rvc+NsDk
+i0ikZNMk2HxZWkUOMdMmZDmKHB11qnj+h98nFkN0+swW3DVkcFG6Dm0dQQIDAQAB
+AoGAeLmd8C51tqQu1GqbEc+E7zAZsDE9jDhArWdELfhsFvt7kUdOUN1Nrlv0x9i+
+LY2Dgb44kmTM2suAgjvGulSMOYBGosZcM0w3ES76nmeAVJ1NBFhbZTCJqo9svoD/
+NKdctRflUuvFSWimoui+vj9D5p/4lvAMdBHUWj5FlQsYiOECQQD/FRXtsDetptFu
+Vp8Kw+6bZ5+efcjVfciTp7fQKI2xZ2n1QyloaV4zYXgDC2y3fMYuRigCGrX9XeFX
+oGHGMyYFAkEAz635I8f4WQa/wvyl/SR5agtDVnkJqMHMgOuykytiF8NFbDSkJv+b
+1VfyrWcfK/PVsSGBI67LCMDoP+PZBVOjDQJBAIInoCjH4aEZnYNPb5duojFpjmiw
+helpZQ7yZTgxeRssSUR8IITGPuq4sSPckHyPjg/OfFuWhYXigTjU/Q7EyoECQERT
+Dykna9wWLVZ/+jgLHOq3Y+L6FSRxBc/QO0LRvgblVlygAPVXmLQaqBtGVuoF4WLS
+DANqSR/LH12Nn2NyPa0CQBbzoHgx2i3RncWoq1EeIg2mSMevEcjA6sxgYmsyyzlv
+AnqxHi90n/p912ynLg2SjBq+03GaECeGzC/QqKK2gtA=
+-----END RSA PRIVATE KEY-----
+EOF
+
 __PACKAGE__->attr(
     [qw/lock_cb tick_cb unlock_cb/] => sub {
         sub {1}
@@ -56,6 +104,16 @@ __PACKAGE__->attr(timeout                              => '0.25');
 
 # Singleton
 our $LOOP;
+
+sub DESTROY {
+    my $self = shift;
+
+    # Cleanup temporary cert file
+    if (my $cert = $self->{_cert}) { unlink $cert if -w $cert }
+
+    # Cleanup temporary key file
+    if (my $key = $self->{_key}) { unlink $key if -w $key }
+}
 
 sub new {
     my $self = shift->SUPER::new(@_);
@@ -220,10 +278,13 @@ sub listen {
         $options{LocalPort} = $args->{port} || 3000;
         $options{Proto}     = 'tcp';
         $options{ReuseAddr} = 1;
-        my $cert = $args->{tls_cert};
-        $options{SSL_cert_file} = $cert if $cert;
-        my $key = $args->{tls_key};
-        $options{SSL_key_file} = $key if $key;
+
+        # TLS options
+        if ($args->{tls}) {
+            $options{SSL_cert_file} = $args->{tls_cert}
+              || $self->_prepare_cert;
+            $options{SSL_key_file} = $args->{tls_key} || $self->_prepare_key;
+        }
 
         # Create socket
         my $class = IPV6 ? 'IO::Socket::INET6' : 'IO::Socket::INET';
@@ -792,6 +853,24 @@ sub _prepare_accept {
     $self->not_writing($id);
 }
 
+sub _prepare_cert {
+    my $self = shift;
+
+    # Shortcut
+    my $cert = $self->{_cert};
+    return $cert if $cert && -r $cert;
+
+    # Create temporary TLS cert file
+    $cert = File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
+        'mojocert.pem');
+    my $file = IO::File->new;
+    $file->open("> $cert")
+      or croak qq/Can't create temporary TLS cert file "$cert"/;
+    print $file CERT;
+
+    return $self->{_cert} = $cert;
+}
+
 sub _prepare_connect {
     my ($self, $id) = @_;
 
@@ -810,6 +889,24 @@ sub _prepare_connect {
     # Connect callback
     my $cb = $c->{connect_cb};
     $self->_run_event('connect', $cb, $id) if $cb;
+}
+
+sub _prepare_key {
+    my $self = shift;
+
+    # Shortcut
+    my $key = $self->{_key};
+    return $key if $key && -r $key;
+
+    # Create temporary TLS key file
+    $key = File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
+        'mojokey.pem');
+    my $file = IO::File->new;
+    $file->open("> $key")
+      or croak qq/Can't create temporary TLS key file "$key"/;
+    print $file KEY;
+
+    return $self->{_key} = $key;
 }
 
 sub _read {

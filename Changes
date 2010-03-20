@@ -1,6 +1,10 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 0.999924 2010-03-08 00:00:00
+        - Added default TLS cert and key to Mojo::IOLoop to make HTTPS
+          testing easier.
+          This will now just work.
+              mojo daemon --listen https://*:3000
         - Added request limit support to the daemons.
         - Added basic authorization and proxy authorization support to
           Mojo::Message::Request. (esskar)

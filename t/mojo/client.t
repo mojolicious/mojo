@@ -73,7 +73,7 @@ is($tx->res->code, 200, 'right status');
 
 # Simple request with headers and body
 $client->async->get(
-    'http://www.apache.org' => (Expect => '100-continue') => 'Hi there!' =>
+    'http://www.apache.org' => {Expect => '100-continue'} => 'Hi there!' =>
       sub {
         my $self = shift;
         is($self->req->method, 'GET',                   'right method');

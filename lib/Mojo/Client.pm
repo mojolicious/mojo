@@ -1137,16 +1137,16 @@ Clone client instance.
 =head2 C<delete>
 
     my $tx  = $client->delete('http://kraih.com');
-    my $tx  = $client->delete('http://kraih.com' => (Connection => 'close'));
+    my $tx  = $client->delete('http://kraih.com' => {Connection => 'close'});
     my $tx  = $client->delete(
-        'http://kraih.com' => (Connection => 'close') => 'Hi!'
+        'http://kraih.com' => {Connection => 'close'} => 'Hi!'
     );
     $client = $client->delete('http://kraih.com' => sub {...});
     $client = $client->delete(
-        'http://kraih.com' => (Connection => 'close') => sub {...}
+        'http://kraih.com' => {Connection => 'close'} => sub {...}
     );
     $client = $client->delete(
-        'http://kraih.com' => (Connection => 'close') => 'Hi!' => sub {...}
+        'http://kraih.com' => {Connection => 'close'} => 'Hi!' => sub {...}
     );
 
 Send a HTTP C<DELETE> request.
@@ -1171,16 +1171,16 @@ available from callbacks.
 =head2 C<get>
 
     my $tx  = $client->get('http://kraih.com');
-    my $tx  = $client->get('http://kraih.com' => (Connection => 'close'));
+    my $tx  = $client->get('http://kraih.com' => {Connection => 'close'});
     my $tx  = $client->get(
-        'http://kraih.com' => (Connection => 'close') => 'Hi!'
+        'http://kraih.com' => {Connection => 'close'} => 'Hi!'
     );
     $client = $client->get('http://kraih.com' => sub {...});
     $client = $client->get(
-        'http://kraih.com' => (Connection => 'close') => sub {...}
+        'http://kraih.com' => {Connection => 'close'} => sub {...}
     );
     $client = $client->get(
-        'http://kraih.com' => (Connection => 'close') => 'Hi!' => sub {...}
+        'http://kraih.com' => {Connection => 'close'} => 'Hi!' => sub {...}
     );
 
 Send a HTTP C<GET> request.
@@ -1188,16 +1188,16 @@ Send a HTTP C<GET> request.
 =head2 C<head>
 
     my $tx  = $client->head('http://kraih.com');
-    my $tx  = $client->head('http://kraih.com' => (Connection => 'close'));
+    my $tx  = $client->head('http://kraih.com' => {Connection => 'close'});
     my $tx  = $client->head(
-        'http://kraih.com' => (Connection => 'close') => 'Hi!'
+        'http://kraih.com' => {Connection => 'close'} => 'Hi!'
     );
     $client = $client->head('http://kraih.com' => sub {...});
     $client = $client->head(
-        'http://kraih.com' => (Connection => 'close') => sub {...}
+        'http://kraih.com' => {Connection => 'close'} => sub {...}
     );
     $client = $client->head(
-        'http://kraih.com' => (Connection => 'close') => 'Hi!' => sub {...}
+        'http://kraih.com' => {Connection => 'close'} => 'Hi!' => sub {...}
     );
 
 Send a HTTP C<HEAD> request.
@@ -1205,22 +1205,22 @@ Send a HTTP C<HEAD> request.
 =head2 C<post>
 
     my $tx  = $client->post('http://kraih.com');
-    my $tx  = $client->post('http://kraih.com' => (Connection => 'close'));
+    my $tx  = $client->post('http://kraih.com' => {Connection => 'close'});
     my $tx  = $client->post(
-        'http://kraih.com' => (Connection => 'close') => 'Hi!'
+        'http://kraih.com' => {Connection => 'close'} => 'Hi!'
     );
     $client = $client->post('http://kraih.com' => sub {...});
     $client = $client->post(
-        'http://kraih.com' => (Connection => 'close') => sub {...}
+        'http://kraih.com' => {Connection => 'close'} => sub {...}
     );
     $client = $client->post(
         'http://kraih.com',
-        (Connection => 'close'),
+        {Connection => 'close'},
         'message body',
         sub {...}
     );
     $client = $client->post(
-        'http://kraih.com' => (Connection => 'close') => 'Hi!' => sub {...}
+        'http://kraih.com' => {Connection => 'close'} => 'Hi!' => sub {...}
     );
 
 Send a HTTP C<POST> request.
@@ -1280,16 +1280,16 @@ method.
 =head2 C<put>
 
     my $tx  = $client->put('http://kraih.com');
-    my $tx  = $client->put('http://kraih.com' => (Connection => 'close'));
+    my $tx  = $client->put('http://kraih.com' => {Connection => 'close'});
     my $tx  = $client->put(
-        'http://kraih.com' => (Connection => 'close') => 'Hi!'
+        'http://kraih.com' => {Connection => 'close'} => 'Hi!'
     );
     $client = $client->put('http://kraih.com' => sub {...});
     $client = $client->put(
-        'http://kraih.com' => (Connection => 'close') => sub {...}
+        'http://kraih.com' => {Connection => 'close'} => sub {...}
     );
     $client = $client->put(
-        'http://kraih.com' => (Connection => 'close') => 'Hi!' => sub {...}
+        'http://kraih.com' => {Connection => 'close'} => 'Hi!' => sub {...}
     );
 
 Send a HTTP C<PUT> request.
@@ -1349,7 +1349,7 @@ Send a message via WebSocket, only available from callbacks.
 
     $client = $client->websocket('ws://localhost:3000' => sub {...});
     $client = $client->websocket(
-        'ws://localhost:3000' => ('User-Agent' => 'Agent 1.0') => sub {...}
+        'ws://localhost:3000' => {'User-Agent' => 'Agent 1.0'} => sub {...}
     );
 
 Open a WebSocket connection with transparent handshake.

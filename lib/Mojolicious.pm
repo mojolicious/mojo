@@ -36,7 +36,7 @@ __PACKAGE__->attr(static  => sub { MojoX::Dispatcher::Static->new });
 __PACKAGE__->attr(types   => sub { MojoX::Types->new });
 
 our $CODENAME = 'Snowman';
-our $VERSION  = '0.999924';
+our $VERSION  = '0.999925';
 
 sub new {
     my $self = shift->SUPER::new(@_);

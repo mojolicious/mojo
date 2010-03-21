@@ -1228,6 +1228,12 @@ connections.
 Callback to be invoked on every reactor tick, this for example allows you to
 run multiple reactors next to each other.
 
+    my $loop2 = Mojo::IOLoop->new(timeout => 0);
+    Mojo::IOLoop->singleton->tick_cb(sub { $loop2->one_tick });
+
+Note that the loop timeout can be changed dynamically at any time to adjust
+responsiveness.
+
 =head2 C<timeout>
 
     my $timeout = $loop->timeout;
@@ -1235,6 +1241,7 @@ run multiple reactors next to each other.
 
 Maximum time in seconds our loop waits for new events to happen, defaults to
 C<0.25>.
+Note that a value of C<0> would make the loop non blocking.
 
 =head2 C<unlock_cb>
 

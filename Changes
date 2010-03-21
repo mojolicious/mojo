@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+0.999925 2010-03-21 00:00:00
+        - Improved documentation.
+
 0.999924 2010-03-08 00:00:00
         - Added default TLS cert and key to Mojo::IOLoop to make HTTPS
           testing easier, so "mojo daemon --listen https://*:3000" now just

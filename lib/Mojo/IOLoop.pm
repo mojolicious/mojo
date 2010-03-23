@@ -605,7 +605,7 @@ sub _accept {
     my $socket = $listen->accept or return;
 
     # Unlock callback
-    $self->_run_callback('unlock', $self->unlock_cb);
+    $self->unlock_cb->();
 
     # Add connection
     my $id = "$socket";
@@ -1004,7 +1004,7 @@ sub _should_listen {
     return unless keys %$cs < $self->max_connections;
 
     # Lock
-    return unless $self->_run_callback('lock', $self->lock_cb, !keys %$cs);
+    return unless $self->lock_cb->(!keys %$cs);
 
     return 1;
 }
@@ -1201,6 +1201,7 @@ dropped, defaults to C<5>.
 A locking callback that decides if this loop is allowed to listen for new
 incoming connections, used to sync multiple server processes.
 The callback should return true or false.
+Note that exceptions in this callback are not captured.
 
     $loop->lock_cb(sub {
         my ($loop, $blocking) = @_;
@@ -1250,6 +1251,7 @@ Note that a value of C<0> would make the loop non blocking.
 
 A callback to free the listen lock, called after accepting a new connection
 and used to sync multiple server processes.
+Note that exceptions in this callback are not captured.
 
 =head1 METHODS
 

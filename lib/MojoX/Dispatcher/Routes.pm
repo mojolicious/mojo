@@ -63,9 +63,6 @@ sub hide { push @{shift->hidden}, @_ }
 sub _dispatch_app {
     my ($self, $c) = @_;
 
-    # Debug
-    $c->app->log->debug(qq/Dispatching application./);
-
     # Prepare new path and base path for embedded application
     my $opath  = $c->req->url->path;
     my $obpath = $c->req->url->base->path;
@@ -83,13 +80,47 @@ sub _dispatch_app {
         $c->req->url->base->path($bpath);
     }
 
+    # Load app
+    my $app = $c->match->captures->{app};
+    unless (ref $app && $self->{_loaded}->{$app}) {
+
+        # Debug
+        $c->app->log->debug(qq/Dispatching application "$app"./);
+
+        # Load
+        if (my $e = Mojo::Loader->load($app)) {
+            warn "ERROR!!!!\n\n\n";
+
+            # Doesn't exist
+            return unless ref $e;
+
+            # Error
+            $c->app->log->error($e);
+            return $e;
+        }
+
+        # Loaded
+        $self->{_loaded}->{$app}++;
+    }
+
+    # Debug
+    else { $c->app->log->debug(qq/Dispatching application./) }
+
     # Dispatch
     my $continue;
-    eval { $continue = $c->match->captures->{app}->handler($c) };
+    eval {
+
+        # App
+        $app = $app->new unless ref $app;
+
+        # Handler
+        $continue = $app->handler($c);
+    };
 
     # Reset path and base path
-    $c->req->url->path($opath);
-    $c->req->url->base->path($obpath);
+    my $url = $c->req->url;
+    $url->path($opath);
+    $url->base->path($obpath);
 
     # Success!
     return 1 if $continue;

@@ -58,13 +58,12 @@ app->log->level('error');
 # GET /hello
 get '/hello' => sub { shift->render_text('Hello from the main app!') };
 
+# /bye/* (dispatch to embedded app)
+get '/bye/(*path)' => {app => 'MyTestApp::Test1', name => 'second embedded'};
+
 # /hello/* (dispatch to embedded app)
 app->routes->route('/hello/(*path)')
   ->to(app => EmbeddedTestApp::app(), name => 'embedded');
-
-# /bye/* (dispatch to embedded app)
-app->routes->route('/bye/(*path)')
-  ->to(app => 'MyTestApp::Test1', name => 'second embedded');
 
 my $t = Test::Mojo->new;
 

@@ -89,7 +89,6 @@ sub _dispatch_app {
 
         # Load
         if (my $e = Mojo::Loader->load($app)) {
-            warn "ERROR!!!!\n\n\n";
 
             # Doesn't exist
             return unless ref $e;

@@ -68,12 +68,11 @@ sub import {
         }
 
         # Defaults
-        $cb ||= sub {1};
         $constraints ||= [];
 
-        # Merge
+        # Defaults
         $defaults ||= {};
-        $defaults = {%$defaults, callback => $cb};
+        $defaults = {%$defaults, callback => $cb} if $cb;
 
         # Name
         $name ||= '';

@@ -95,6 +95,7 @@ test<%= content %>123\
  **+ my $foo = block *** 23 **.*** *** $foo ***
 
 @@ docs.html.pod
+% no warnings;
 <%= '=head3 ' . $codename %>
 
 @@ docs2.html.teapod

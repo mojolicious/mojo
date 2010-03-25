@@ -114,10 +114,10 @@ sub stash {
     return $self->{stash} unless @_;
 
     # Get
-    return $self->{stash}->{$_[0]} unless defined $_[1] || ref $_[0];
+    return $self->{stash}->{$_[0]} unless @_ > 1 || ref $_[0];
 
     # Set
-    my $values = exists $_[1] ? {@_} : $_[0];
+    my $values = ref $_[0] ? $_[0] : {@_};
     $self->{stash} = {%{$self->{stash}}, %$values};
 
     return $self;

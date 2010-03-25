@@ -13,7 +13,7 @@ plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
 plan skip_all => 'Perl 5.10 required for this test!'
   unless eval { require Pod::Simple::HTML; 1 };
-plan tests => 14;
+plan tests => 17;
 
 # Pizza delivery for...
 # I. C. Weiner. Aww... I always thought by this stage in my life I'd be the
@@ -57,6 +57,9 @@ get '/docs' => {codename => 'snowman'} => 'docs';
 # GET /docs
 get '/docs2' => {codename => 'snowman'} => 'docs2';
 
+# GET /docs3
+get '/docs3' => sub { shift->stash(codename => undef) } => 'docs';
+
 my $t = Test::Mojo->new;
 
 # GET /
@@ -71,6 +74,9 @@ $t->get_ok('/docs')->status_is(200)->content_like(qr/<h3>snowman<\/h3>/);
 
 # GET /docs2
 $t->get_ok('/docs2')->status_is(200)->content_like(qr/<h2>snowman<\/h2>/);
+
+# GET /docs3
+$t->get_ok('/docs3')->status_is(200)->content_like(qr/<h3><\/h3>/);
 
 __DATA__
 @@ index.html.twinkle

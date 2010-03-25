@@ -458,7 +458,9 @@ sub _connect {
         unless (defined $id) {
 
             # Update all transactions
-            for my $tx ($pipeline ? @$tx : ($tx)) { $tx->error(500) }
+            for my $tx ($pipeline ? @$tx : ($tx)) {
+                $tx->error(500, qq/Couldn't connect./);
+            }
 
             # Callback
             $self->$cb($tx) if $cb;
@@ -552,7 +554,7 @@ sub _error {
 
         # Add error message to all transactions
         for my $tx (ref $tx eq 'ARRAY' ? @$tx : ($tx)) {
-            $tx->error(500) unless $tx->is_finished;
+            $tx->error(500, $error) unless $tx->is_finished;
         }
     }
 

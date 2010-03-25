@@ -14,17 +14,25 @@ __PACKAGE__->attr('state_cb');
 sub done { shift->state('done') }
 
 sub error {
-    my ($self, $message) = @_;
+    my $self = shift;
 
     # Get
-    if (!$message) {
-        return ($self->{error} || 500) if $self->has_error;
-        return;
+    unless (@_) {
+
+        # No error
+        return unless $self->has_error;
+
+        # Default
+        my $error = $self->{error} || [500, 'Unknown error.'];
+
+        # Context
+        return wantarray ? @$error : $error->[0];
     }
 
     # Set
-    $self->{error} = $message;
+    $self->{error} = [@_];
     $self->state('error');
+
     return $self;
 }
 
@@ -102,10 +110,13 @@ Shortcut for setting the current state to C<done>.
 
 =head2 C<error>
 
-    my $error = $stateful->error;
-    $stateful = $stateful->error(500);
+    my $code             = $stateful->error;
+    my ($code, $message) = $stateful->error;
+    $stateful            = $stateful->error(500);
+    $stateful            = $stateful->error(500, 'Parser error.');
 
-Shortcut for setting the current state to C<error>.
+Shortcut for setting the current state to C<error> with C<code> and
+C<message>.
 
 =head2 C<has_error>
 

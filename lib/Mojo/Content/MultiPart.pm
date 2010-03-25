@@ -161,7 +161,7 @@ sub _parse_multipart {
     my $boundary = $1;
 
     # Boundary missing
-    return $self->error(400) unless $boundary;
+    return $self->error(400, 'Multipart boundary missing.') unless $boundary;
 
     # Parse
     while (1) {

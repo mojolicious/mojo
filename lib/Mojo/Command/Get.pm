@@ -61,7 +61,11 @@ sub run {
     $client->process($tx);
 
     # Error
-    print qq/Couldn't open page "$url".\n/ if $tx->has_error;
+    if ($tx->has_error) {
+        my $message = ($tx->error)[1];
+        $message = $message ? " ($message)" : '';
+        print qq/Couldn't open page "$url".$message\n/;
+    }
 
     return $self;
 }

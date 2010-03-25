@@ -392,7 +392,7 @@ sub _parse_start_line {
                 $buffer->empty;
             }
         }
-        else { $self->error(400) }
+        else { $self->error(400, 'Bad request start line.') }
     }
 }
 

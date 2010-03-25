@@ -34,7 +34,7 @@ ok(!$stateful->is_finished, 'state is not finished');
 # Errors
 ok(!defined($stateful->error), 'has no error');
 ok(!$stateful->has_error,      'has no error');
-$stateful->state_cb(sub { $stateful->{error} .= '13' });
+$stateful->state_cb(sub { $stateful->{error}->[0] .= '13' });
 $stateful->error('4');
 ok($stateful->error,     'unknown error');
 ok($stateful->has_error, 'has error');

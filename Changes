@@ -6,6 +6,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved exception handling.
         - Improved documentation.
         - Improved IIS compatibility of the CGI implementation.
+        - Fixed daemons to listen on "::" for IPv6 and "0.0.0.0" for IPv4
+          with a wildcard address.
         - Fixed lock_cb and unlock_cb exceptions to be fatal in Mojo::IOLoop,
           this makes Mojo::Server::Daemon::Prefork much more solid. (ask)
         - Fixed a bug that prevented undef values in the stash. (garu)

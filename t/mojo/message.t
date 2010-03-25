@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 564;
+use Test::More tests => 577;
 
 use File::Spec;
 use File::Temp;
@@ -908,6 +908,36 @@ is($req->body,            'hello=world');
 is_deeply($req->param('hello'), 'world');
 is($req->url->to_abs->to_string,
     'http://localhost:8080/foo/bar/?lalala=23&bar=baz');
+
+# Parse IIS 6.0 like CGI environment variables and a body (root)
+$req = Mojo::Message::Request->new;
+$req->parse(
+    CONTENT_LENGTH  => 11,
+    HTTP_EXPECT     => '100-continue',
+    CONTENT_TYPE    => 'application/x-www-form-urlencoded',
+    PATH_INFO       => '/',
+    PATH_TRANSLATED => 'C:\\FOO\\myapp\\',
+    SERVER_SOFTWARE => 'Microsoft-IIS/6.0',
+    QUERY_STRING    => 'lalala=23&bar=baz',
+    REQUEST_METHOD  => 'POST',
+    SCRIPT_NAME     => '/',
+    HTTP_HOST       => 'localhost:8080',
+    SERVER_PROTOCOL => 'HTTP/1.0'
+);
+$req->parse('hello=world');
+is($req->state,           'done');
+is($req->method,          'POST');
+is($req->headers->expect, '100-continue');
+is($req->url->path,       '/');
+is($req->url->base->path, '/');
+is($req->url->base->host, 'localhost');
+is($req->url->base->port, 8080);
+is($req->url->query,      'lalala=23&bar=baz');
+is($req->minor_version,   '0');
+is($req->major_version,   '1');
+is($req->body,            'hello=world');
+is_deeply($req->param('hello'), 'world');
+is($req->url->to_abs->to_string, 'http://localhost:8080/?lalala=23&bar=baz');
 
 # Parse Lighttpd like CGI environment variables and a body
 $req = Mojo::Message::Request->new;

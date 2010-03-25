@@ -313,7 +313,10 @@ sub _parse_env {
 
             # Try to generate correct PATH_INFO and SCRIPT_NAME
             my @n;
-            while ($p[$#p] eq $t[$#t]) {
+            while (defined(my $p = $p[$#p])) {
+                $p ||= '';
+                my $t = $t[$#t] || '';
+                last unless $p eq $t;
                 pop @t;
                 unshift @n, pop @p;
             }

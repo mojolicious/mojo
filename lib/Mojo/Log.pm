@@ -8,6 +8,7 @@ use warnings;
 use base 'Mojo::Base';
 
 use Carp 'croak';
+use Fcntl ':flock';
 use IO::File;
 
 __PACKAGE__->attr(
@@ -75,8 +76,15 @@ sub log {
     my ($pkg, $line) = (caller())[0, 2];
     ($pkg, $line) = (caller(1))[0, 2] if $pkg eq ref $self;
 
+    # Lock
+    my $handle = $self->handle;
+    flock $handle, LOCK_EX;
+
     # Write
-    $self->handle->syswrite("$time $level $pkg:$line [$$]: $msgs\n");
+    $handle->syswrite("$time $level $pkg:$line [$$]: $msgs\n");
+
+    # Unlock
+    flock $handle, LOCK_UN;
 
     return $self;
 }

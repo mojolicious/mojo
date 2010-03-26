@@ -6,6 +6,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved exception handling.
         - Improved documentation.
         - Improved IIS compatibility of the CGI implementation.
+        - Fixed Mojo::Log to use flock to sync log file writing.
         - Fixed daemons to listen on "::" for IPv6 and "0.0.0.0" for IPv4
           with a wildcard address.
         - Fixed lock_cb and unlock_cb exceptions to be fatal in Mojo::IOLoop,

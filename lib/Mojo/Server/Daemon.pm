@@ -305,8 +305,7 @@ sub _listen {
     # Internet socket
     elsif ($listen =~ /^(http(?:s)?)\:\/\/(.+)\:(\d+)(?:\:(.*)\:(.*))?$/) {
         $options->{tls} = 1 if $1 eq 'https';
-        $options->{address} =
-          $2 eq '*' ? Mojo::IOLoop::IPV6 ? '::' : '0.0.0.0' : $2;
+        $options->{address}  = $2 if $2 ne '*';
         $options->{port}     = $3;
         $options->{tls_cert} = $4 if $4;
         $options->{tls_key}  = $5 if $5;

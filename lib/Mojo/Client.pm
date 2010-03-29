@@ -1040,7 +1040,7 @@ object.
     my $loop = $client->ioloop;
     $client  = $client->ioloop(Mojo::IOLoop->new);
 
-Loop object to use for io operations, by default a L<Mojo::IOLoop> obkect
+Loop object to use for io operations, by default a L<Mojo::IOLoop> object
 will be used.
 
 =head2 C<keep_alive_timeout>

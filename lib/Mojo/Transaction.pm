@@ -245,12 +245,19 @@ Write server data.
 
     my $res = $tx->success;
 
-Return C<res> if transaction was successful and had no connection or parser
-errors.
+Returns the L<Mojo::Message::Response> object (C<res>) if transaction was
+successful and had no connection or parser errors.
 
     if (my $res = $tx->success) {
         print $res->body;
     }
+    else {
+        my ($code, $message) = $tx->error;
+        print "Error $code: $message";
+    }
+
+Error messages can be accessed with the C<error> method of the transaction
+object.
 
 =head1 SEE ALSO
 

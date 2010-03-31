@@ -1360,8 +1360,23 @@ Send a message via WebSocket, only available from callbacks.
 
     my $res = $client->success;
 
-Return C<res> if the last finished transaction was successful and had no
-connection or parser errors, only available from callbacks.
+Returns the L<Mojo::Message::Response> object (C<res>) if the last finished
+transaction was successful and had no connection or parser errors, only
+available from callbacks.
+
+    $client->get('http://mojolicious.org' => sub {
+        my $client = shift;
+        if (my $res = $client->success) {
+            print $res->body;
+        }
+        else {
+            my ($code, $message) = $client->tx->error;
+            print "Error $code: $message";
+        }
+    })->process;
+
+Error messages can be accessed with the C<error> method of the transaction
+object.
 
 =head2 C<websocket>
 

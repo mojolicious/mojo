@@ -987,14 +987,15 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
 
     $client->async->get(
         'http://kraih.com' => sub {
-            my $self = shift;
-            print $self->res->code;
+            my $client = shift;
+            print $client->res->code;
         }
     )->process;
 
     $client->get(
         'http://kraih.com' => sub {
-            if (my $res = $_[1]->success) { print $res->code }
+            my ($client, $tx) = @_;
+            if (my $res = $tx->success) { print $res->code }
         }
     )->process;
 
@@ -1125,8 +1126,8 @@ Clone client instance and start using the global shared L<Mojo::IOLoop>
 singleton.
 
     $client->async->get('http://mojolicious.org' => sub {
-        my $self = shift;
-        print $self->res->body;
+        my $client = shift;
+        print $client->res->body;
     })->process;
 
 =head2 C<clone>
@@ -1166,7 +1167,7 @@ Callback signaling that peer finished the WebSocket connection, only
 available from callbacks.
 
     $client->finished(sub {
-        my $self = shift;
+        my $client = shift;
     });
 
 =head2 C<get>
@@ -1306,7 +1307,7 @@ Note that following redirects and WebSocket upgrades don't work for pipelined
 transactions.
 
     $client->queue([$tx, $tx2] => sub {
-        my ($self, $p) = @_;
+        my ($client, $p) = @_;
     });
 
 =head2 C<receive_message>
@@ -1316,7 +1317,7 @@ transactions.
 Receive messages via WebSocket, only available from callbacks.
 
     $client->receive_message(sub {
-        my ($self, $message) = @_;
+        my ($client, $message) = @_;
     });
 
 =head2 C<req>

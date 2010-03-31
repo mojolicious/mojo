@@ -95,6 +95,12 @@ sub resume {
 sub server_read  { croak 'Method "server_read" not implemented by subclass' }
 sub server_write { croak 'Method "server_write" not implemented by subclass' }
 
+sub success {
+    my $self = shift;
+    return $self->res unless $self->has_error;
+    return;
+}
+
 1;
 __END__
 
@@ -234,6 +240,17 @@ Read and process server data.
     my $chunk = $tx->server_write;
 
 Write server data.
+
+=head2 C<success>
+
+    my $res = $tx->success;
+
+Return C<res> if transaction was successful and had no connection or parser
+errors.
+
+    if (my $res = $tx->success) {
+        print $res->body;
+    }
 
 =head1 SEE ALSO
 

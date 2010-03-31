@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojolicious.
 0.999925 2010-03-21 00:00:00
         - Added the ability to use Mojolicious::Lite apps as Mojolicious
           controllers.
+        - Added success method to Mojo::Transaction and Mojo::Client.
         - Improved exception handling.
         - Improved documentation.
         - Improved IIS compatibility of the CGI implementation.

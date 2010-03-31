@@ -289,16 +289,6 @@ sub send_message {
     $self->tx->send_message(@_);
 }
 
-sub success {
-    my $self = shift;
-
-    # Pipeline
-    croak 'Method "success" not supported for pipelines'
-      if ref $self->tx eq 'ARRAY';
-
-    $self->tx->success(@_);
-}
-
 # Are we there yet?
 # No
 # Are we there yet?
@@ -1004,7 +994,7 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
 
     $client->get(
         'http://kraih.com' => sub {
-            if (my $res = shift->success) { print $res->code }
+            if (my $res = $_[1]->success) { print $res->code }
         }
     )->process;
 
@@ -1355,28 +1345,6 @@ everywhere inside the process.
     $client->send_message('Hi there!');
 
 Send a message via WebSocket, only available from callbacks.
-
-=head2 C<success>
-
-    my $res = $client->success;
-
-Returns the L<Mojo::Message::Response> object (C<res>) if the last finished
-transaction was successful and had no connection or parser errors, only
-available from callbacks.
-
-    $client->get('http://mojolicious.org' => sub {
-        my $client = shift;
-        if (my $res = $client->success) {
-            print $res->body;
-        }
-        else {
-            my ($code, $message) = $client->tx->error;
-            print "Error $code: $message";
-        }
-    })->process;
-
-Error messages can be accessed with the C<error> method of the transaction
-object.
 
 =head2 C<websocket>
 

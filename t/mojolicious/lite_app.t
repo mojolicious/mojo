@@ -246,7 +246,7 @@ get '/subrequest' => sub {
     $self->client->post(
         '/template' => sub {
             my $client = shift;
-            $self->render_text($client->success->body);
+            $self->render_text($client->tx->success->body);
             $self->finish;
         }
     )->process;

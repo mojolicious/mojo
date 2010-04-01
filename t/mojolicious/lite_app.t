@@ -940,7 +940,8 @@ Hello
 <%= include 'outermenu' %>
 
 @@ outermenu.html.ep
-<%= dumper [1, 2] %>there<br/>!
+% stash test => 'there';
+<%= dumper [1, 2] %><%= stash 'test' %><br/>!
 
 @@ outerinnerlayout.html.ep
 Hello

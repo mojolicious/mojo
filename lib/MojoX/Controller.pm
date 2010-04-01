@@ -118,7 +118,9 @@ sub stash {
 
     # Set
     my $values = ref $_[0] ? $_[0] : {@_};
-    $self->{stash} = {%{$self->{stash}}, %$values};
+    for my $key (keys %$values) {
+        $self->{stash}->{$key} = $values->{$key};
+    }
 
     return $self;
 }

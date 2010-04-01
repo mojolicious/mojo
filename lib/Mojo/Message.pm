@@ -676,7 +676,7 @@ C<POST> parameters.
 
     my $size = $message->body_size;
 
-Size of the body.
+Size of the body in bytes.
 
 =head2 C<to_string>
 

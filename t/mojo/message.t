@@ -27,9 +27,6 @@ use_ok('Mojo::Message');
 use_ok('Mojo::Message::Request');
 use_ok('Mojo::Message::Response');
 
-# Test headers() return value
-is( Mojo::Message::Request->new->headers( Mojo::Headers->new )->isa('Mojo::Message::Request'), 1 );
-
 # Parse HTTP 1.1 start line, no headers and body
 my $req = Mojo::Message::Request->new;
 $req->parse("GET / HTTP/1.1\x0d\x0a\x0d\x0a");
@@ -1636,3 +1633,7 @@ ok($m->at_least_version('1.0'),  '1.0 passes at_least_version("1.0")');
 $m = Mojo::Message->new(major_version => 0, minor_version => 9);
 ok(!$m->at_least_version('1.0'), '0.9 fails at_least_version("1.0")');
 ok($m->at_least_version('0.9'),  '0.9 passes at_least_version("0.9")');
+
+# "headers" chaining
+$req = Mojo::Message::Request->new->headers(Mojo::Headers->new);
+is($req->isa('Mojo::Message::Request'), 1);

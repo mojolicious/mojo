@@ -291,13 +291,15 @@ sub header_size {
 
 sub headers {
     my $self = shift;
+
+    # Set
     if (@_) {
         $self->content->headers(@_);
         return $self;
     }
-    else {
-        return $self->content->headers(@_);
-    }
+
+    # Get
+    return $self->content->headers(@_);
 }
 
 sub is_chunked { shift->content->is_chunked }
@@ -616,13 +618,6 @@ Default charset used for form data parsing.
 
 Callback called after message building or parsing is finished.
 
-=head2 C<headers>
-
-    my $headers = $message->headers;
-    $message    = $message->headers(Mojo::Headers->new);
-
-Header container, defaults to a L<Mojo::Headers> object.
-
 =head2 C<major_version>
 
     my $major_version = $message->major_version;
@@ -755,6 +750,13 @@ CHeck if message parser has leftover data in the buffer.
     my $size = $message->header_size;
 
 Size of headers in bytes.
+
+=head2 C<headers>
+
+    my $headers = $message->headers;
+    $message    = $message->headers(Mojo::Headers->new);
+
+Header container, defaults to a L<Mojo::Headers> object.
 
 =head2 C<is_chunked>
 

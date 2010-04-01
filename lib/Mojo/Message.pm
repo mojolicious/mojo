@@ -289,7 +289,16 @@ sub header_size {
     return $self->content->header_size;
 }
 
-sub headers { shift->content->headers(@_) }
+sub headers {
+    my $self = shift;
+    if (@_) {
+        $self->content->headers(@_);
+        return $self;
+    }
+    else {
+        return $self->content->headers(@_);
+    }
+}
 
 sub is_chunked { shift->content->is_chunked }
 

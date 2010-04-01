@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 577;
+use Test::More tests => 578;
 
 use File::Spec;
 use File::Temp;
@@ -26,6 +26,9 @@ use_ok('Mojo::Headers');
 use_ok('Mojo::Message');
 use_ok('Mojo::Message::Request');
 use_ok('Mojo::Message::Response');
+
+# Test headers() return value
+is( Mojo::Message::Request->new->headers( Mojo::Headers->new )->isa('Mojo::Message::Request'), 1 );
 
 # Parse HTTP 1.1 start line, no headers and body
 my $req = Mojo::Message::Request->new;

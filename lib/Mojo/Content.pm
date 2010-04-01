@@ -367,7 +367,7 @@ Activate relaxed filtering for HTTP 0.9.
 
     my $size = $content->raw_header_size;
 
-Raw size of headers.
+Raw size of headers in bytes.
 
 =head1 METHODS
 
@@ -426,7 +426,7 @@ Check if there are leftovers in the buffer.
 
     my $size = $content->header_size;
 
-Size of headers.
+Size of headers in bytes.
 
 =head2 C<is_chunked>
 
@@ -464,7 +464,7 @@ Parse and stop after headers.
 
     my $size = $content->raw_body_size;
 
-Raw size of body.
+Raw size of body in bytes.
 
 =head1 SEE ALSO
 

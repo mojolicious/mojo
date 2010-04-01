@@ -745,7 +745,7 @@ CHeck if message parser has leftover data in the buffer.
 
     my $size = $message->header_size;
 
-Size of headers.
+Size of headers in bytes.
 
 =head2 C<is_chunked>
 
@@ -788,7 +788,7 @@ Parse message chunk until the body is reached.
 
     my $size = $message->start_line_size;
 
-Size of the start line.
+Size of the start line in bytes.
 
 =head2 C<upload>
 

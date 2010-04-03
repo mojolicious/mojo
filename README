@@ -37,6 +37,8 @@ Duct Tape For The HTML5 Web:
 
         use Mojolicious::Lite;
 
+        get '/hello' => sub { shift->render_text('Hello World!') }
+
         get '/time' => 'clock';
 
         websocket '/echo' => sub {

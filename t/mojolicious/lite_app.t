@@ -13,7 +13,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 381;
+plan tests => 386;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -147,6 +147,16 @@ get '/outerinnerlayout' => sub {
         template => 'outerinnerlayout',
         layout   => 'layout',
         handler  => 'ep'
+    );
+};
+
+# GET /withblocklayout
+get '/withblocklayout' => sub {
+    my $self = shift;
+    $self->render(
+        template => 'index',
+        layout   => 'with_block',
+        handler  => 'epl'
     );
 };
 
@@ -533,6 +543,13 @@ $t->get_ok('/outerinnerlayout')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is(
     "layouted Hello\nlayouted [\n  1,\n  2\n]\nthere<br/>!\n\n\n\n");
+
+# GET /withblocklayout
+$t->get_ok('/withblocklayout')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is(
+    "with_block \nOne: one\nTwo: two\n\n");
 
 # GET /session_cookie
 $t->get_ok('/session_cookie')->status_is(200)
@@ -966,6 +983,14 @@ Just works!\
 
 @@ layouts/layout.html.ep
 layouted <%== content %>
+
+@@ layouts/with_block.html.epl
+%{ my $block =
+<% my ($one, $two) = @_; %>
+One: <%= $one %>
+Two: <%= $two %>
+%}
+with_block <%= $block->('one', 'two') %>
 
 @@ helper.html.ep
 %== '<br/>'

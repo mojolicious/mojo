@@ -1017,6 +1017,21 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
         }
     )->process;
 
+    # Websocket request
+    $client->websocket(
+        'ws://websockets.org:8787' => sub {
+            my $client = shift;
+            $client->receive_message(
+                sub {
+                    my ($client, $message) = @_;
+                    print "$message\n";
+                    $client->finish;
+                }
+            );
+            $client->send_message('hi there!');
+        }
+    )->process;
+
 =head1 DESCRIPTION
 
 L<Mojo::Client> is a full featured async io HTTP 1.1 and WebSocket client

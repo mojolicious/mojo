@@ -548,8 +548,7 @@ $t->get_ok('/outerinnerlayout')->status_is(200)
 $t->get_ok('/withblocklayout')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is(
-    "with_block \nOne: one\nTwo: two\n\n");
+  ->content_is("with_block \nOne: one\nTwo: two\n\n");
 
 # GET /session_cookie
 $t->get_ok('/session_cookie')->status_is(200)

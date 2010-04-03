@@ -138,8 +138,8 @@ $output = $mt->render(<<'EOF');
 % my $name = shift;
 Hello <%= $name %>.
 %}
-%= block $block, 'Baerbel'
-%= block $block, 'Wolfgang'
+%= $block->('Baerbel')
+%= $block->('Wolfgang')
 EOF
 is($output, <<EOF);
 Hello Baerbel.
@@ -153,8 +153,8 @@ $output = $mt->render(<<'EOF');
     <% my $name = shift; =%>
     Hello <%= $name %>.
 <%}=%>
-<%= block $block, 'Sebastian' %>
-<%= block $block, 'Sara' %>
+<%= $block->('Sebastian') %>
+<%= $block->('Sara') %>
 EOF
 is($output, <<EOF);
 Hello Sebastian.

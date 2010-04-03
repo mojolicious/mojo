@@ -115,7 +115,7 @@ sub build {
             if ($type eq 'cpst') {
 
                 # Start block
-                $cpst = " sub { shift; my \$_M = ''; ";
+                $cpst = " sub { my \$_M = ''; ";
             }
         }
     }

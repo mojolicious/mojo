@@ -661,8 +661,10 @@ can be easily mixed to make the transition process very smooth.
     app->start;
 
 There is also a helper command to generate a full L<Mojolicious> example that
-will let you explore the similarities between L<Mojolicious::Lite> and
-L<Mojolicious> applications.
+will let you explore the astonishing similarities between
+L<Mojolicious::Lite> and L<Mojolicious> applications.
+Both share about 99% of the same code, so almost everything you learned in
+this tutorial applies there too. :)
 
     % mojolicious generate app
 

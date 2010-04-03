@@ -1001,13 +1001,23 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
         }
     )->process;
 
+    # Grab the latest Mojolicious release :)
+    my $latest = 'http://mojolicious.org/Mojolicious-latest.tar.gz';
+    print $client->get($latest)->success->body;
+
     # Quick JSON request
     my $trends = 'http://search.twitter.com/trends.json';
     print $client->get($trends)->success->json->{trends}->[0]->{url};
 
-    # Quick post with form data
+    # Form post with excepton handling
     my $cpan = 'http://search.cpan.org/search';
-    print $client->post_form($cpan => {q => 'mojo'})->success->body;
+    my $search = {q => 'mojo'};
+    my $tx = $client->post_form($cpan => $search);
+    if (my $res = $tx->success) { print $res->body }
+    else {
+        my ($code, $message) = $tx->error;
+        print "Error: $message";
+    }
 
 =head1 DESCRIPTION
 

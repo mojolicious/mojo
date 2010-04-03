@@ -137,7 +137,8 @@ Mojolicious::Lite - Micro Web Framework
     # Route with placeholder
     get '/:foo' => sub {
         my $self = shift;
-        $self->render_text('Yea baby!');
+        my $foo  = $self->param('foo');
+        $self->render_text("Hello from $foo!");
     };
 
     # Start the Mojolicious command system
@@ -147,16 +148,13 @@ Mojolicious::Lite - Micro Web Framework
 
 L<Mojolicous::Lite> is a micro web framework built around L<Mojolicious>.
 
-A minimal application looks like this.
+A minimal Hello World application looks like this.
 
     #!/usr/bin/env perl
 
     use Mojolicious::Lite;
 
-    get '/' => sub {
-        my $self = shift;
-        $self->render_text('Yea baby!');
-    };
+    get '/' => sub { shift->render_text('Hello World!') };
 
     app->start;
 
@@ -201,7 +199,7 @@ placeholders.
     # /foo
     get '/foo' => sub {
         my $self = shift;
-        $self->render_text('Yea baby!');
+        $self->render_text('Hello World!');
     };
 
 All routes can have a name associated with them, this allows automatic

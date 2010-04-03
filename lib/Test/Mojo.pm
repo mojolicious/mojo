@@ -9,7 +9,6 @@ use base 'Mojo::Base';
 
 use Mojo::ByteStream 'b';
 use Mojo::Client;
-use Mojo::JSON;
 
 require Test::More;
 
@@ -117,8 +116,7 @@ sub json_content_is {
 
     # Test
     local $Test::Builder::Level = $Test::Builder::Level + 1;
-    Test::More::is_deeply(Mojo::JSON->new->decode($tx->res->body),
-        $struct, $desc);
+    Test::More::is_deeply($tx->res->json, $struct, $desc);
 
     return $self;
 }

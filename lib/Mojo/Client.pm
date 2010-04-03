@@ -1001,6 +1001,8 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
 
     print $client->post('http://mojolicious.org')->success->body;
 
+    print $client->get('http://kraih.com/x.json')->success->json->{foo}->[3];
+
 =head1 DESCRIPTION
 
 L<Mojo::Client> is a full featured async io HTTP 1.1 and WebSocket client

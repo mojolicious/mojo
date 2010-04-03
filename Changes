@@ -4,6 +4,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added the ability to use Mojolicious::Lite apps as Mojolicious
           controllers.
         - Added success method to Mojo::Transaction.
+        - Added json method to Mojo::Message.
         - Improved exception handling.
         - Improved documentation.
         - Improved IIS compatibility of the CGI implementation.

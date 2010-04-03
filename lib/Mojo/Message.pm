@@ -12,6 +12,7 @@ use Carp 'croak';
 use Mojo::Asset::Memory;
 use Mojo::ByteStream 'b';
 use Mojo::Content::Single;
+use Mojo::JSON;
 use Mojo::Parameters;
 use Mojo::Upload;
 
@@ -305,6 +306,16 @@ sub headers {
 sub is_chunked { shift->content->is_chunked }
 
 sub is_multipart { shift->content->is_multipart }
+
+sub json {
+    my $self = shift;
+
+    # Multipart
+    return if $self->is_multipart;
+
+    # Decode
+    return Mojo::JSON->new->decode($self->body);
+}
 
 sub leftovers { shift->content->leftovers }
 
@@ -769,6 +780,13 @@ Check if message content is chunked.
     my $multipart = $message->is_multipart;
 
 Check if message content is multipart.
+
+=head2 C<json>
+
+    my $object = $message->json;
+    my $array  = $message->json;
+
+Decode JSON message body directly using L<Mojo::JSON>.
 
 =head2 C<leftovers>
 

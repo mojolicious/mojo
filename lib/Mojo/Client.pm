@@ -985,22 +985,6 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
     use Mojo::Client;
     my $client = Mojo::Client->new;
 
-    # Normal request
-    $client->get(
-        'http://mojolicious.org' => sub {
-            my ($client, $tx) = @_;
-            if (my $res = $tx->success) { print $res->code }
-        }
-    )->process;
-
-    # Async request
-    $client->async->get(
-        'http://kraih.com' => sub {
-            my $client = shift;
-            print $client->res->code;
-        }
-    )->process;
-
     # Grab the latest Mojolicious release :)
     my $latest = 'http://mojolicious.org/Mojolicious-latest.tar.gz';
     print $client->get($latest)->success->body;
@@ -1010,9 +994,9 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
     print $client->get($trends)->success->json->{trends}->[0]->{name};
 
     # Form post with excepton handling
-    my $cpan = 'http://search.cpan.org/search';
+    my $cpan   = 'http://search.cpan.org/search';
     my $search = {q => 'mojo'};
-    my $tx = $client->post_form($cpan => $search);
+    my $tx     = $client->post_form($cpan => $search);
     if (my $res = $tx->success) { print $res->body }
     else {
         my ($code, $message) = $tx->error;
@@ -1024,6 +1008,14 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
     $client->get('http://mojolicious.org' => $callback);
     $client->get('http://search.cpan.org' => $callback);
     $client->process;
+
+    # Async request
+    $client->async->get(
+        'http://kraih.com' => sub {
+            my $client = shift;
+            print $client->res->code;
+        }
+    )->process;
 
 =head1 DESCRIPTION
 

@@ -61,7 +61,7 @@ Duct Tape For The HTML5 Web:
             $self->render_text("Hello $name!");
         };
 
-        shagadelic;
+        app->start;
         __DATA__
 
         @@ clock.html.ep

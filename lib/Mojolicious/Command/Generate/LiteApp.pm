@@ -42,7 +42,7 @@ get '/:groovy' => sub {
     $self->render_text($self->param('groovy'), layout => 'funky');
 };
 
-shagadelic;
+app->start;
 <%%= '__DATA__' %%>
 
 <%%= '@@ index.html.ep' %%>

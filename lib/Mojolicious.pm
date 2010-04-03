@@ -314,7 +314,7 @@ Web development for humans, making hard things possible and everything fun.
         $self->render_text("Hello $name!");
     };
 
-    shagadelic;
+    app->start;
     __DATA__
 
     @@ clock.html.ep

@@ -141,7 +141,7 @@ Mojolicious::Lite - Micro Web Framework
     };
 
     # Start the Mojolicious command system
-    shagadelic;
+    app->start;
 
 =head1 DESCRIPTION
 
@@ -158,7 +158,7 @@ A minimal application looks like this.
         $self->render_text('Yea baby!');
     };
 
-    shagadelic;
+    app->start;
 
 There is also a helper command to generate a small example application.
 
@@ -184,10 +184,10 @@ will just work without commands.
     % ./myapp.pl fastcgi
     ...Blocking FastCGI main loop...
 
-The shagadelic call that starts the L<Mojolicious> command system can be
+The app->start call that starts the L<Mojolicious> command system can be
 customized to override normal C<@ARGV> use.
 
-    shagadelic('cgi');
+    app->start('cgi');
 
 Your application will automatically reload itself if you set the C<--reload>
 option, so you don't have to restart the server after every change.
@@ -415,7 +415,7 @@ multiple features at once.
         );
     } => 'form';
 
-    shagadelic;
+    app->start;
     __DATA__
 
     @@ index.html.ep
@@ -463,7 +463,7 @@ true value.
     # GET / (with ladder authentication)
     get '/' => 'index';
 
-    shagadelic;
+    app->start;
     __DATA__;
 
     @@ denied.html.ep
@@ -533,7 +533,7 @@ request, this is very useful in combination with C<redirect_to>.
         $self->redirect_to('index');
     } => 'logout';
 
-    shagadelic;
+    app->start;
     __DATA__
 
     @@ layouts/default.html.ep
@@ -659,7 +659,7 @@ can be easily mixed to make the transition process very smooth.
     app->routes->namespace('MyApp');
     app->routes->route('/foo/:action')->via('get')->to('foo#index');
 
-    shagadelic;
+    app->start;
 
 =head1 ATTRIBUTES
 

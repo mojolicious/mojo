@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 0.999925 2010-03-21 00:00:00
+        - Switched to app->start instead of shagadelic as default way to
+          start Mojolicious::Lite apps in the documentation.
         - Added the ability to use Mojolicious::Lite apps as Mojolicious
           controllers.
         - Added success method to Mojo::Transaction.

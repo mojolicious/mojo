@@ -1002,12 +1002,12 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
     )->process;
 
     # Quick JSON request
-    my $url = 'http://search.twitter.com/trends.json';
-    print $client->get($url)->success->json->{trends}->[0]->{url};
+    my $trends = 'http://search.twitter.com/trends.json';
+    print $client->get($trends)->success->json->{trends}->[0]->{url};
 
     # Quick post with form data
-    my $url = 'http://search.cpan.org/search';
-    print $client->post_form($url => {q => 'mojo'})->success->body;
+    my $cpan = 'http://search.cpan.org/search';
+    print $client->post_form($cpan => {q => 'mojo'})->success->body;
 
 =head1 DESCRIPTION
 

@@ -985,6 +985,15 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
     use Mojo::Client;
     my $client = Mojo::Client->new;
 
+    # Normal request
+    $client->get(
+        'http://mojolicious.org' => sub {
+            my ($client, $tx) = @_;
+            if (my $res = $tx->success) { print $res->code }
+        }
+    )->process;
+
+    # Async request
     $client->async->get(
         'http://kraih.com' => sub {
             my $client = shift;
@@ -992,16 +1001,13 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
         }
     )->process;
 
-    $client->get(
-        'http://kraih.com' => sub {
-            my ($client, $tx) = @_;
-            if (my $res = $tx->success) { print $res->code }
-        }
-    )->process;
+    # Quick JSON request
+    my $url = 'http://search.twitter.com/trends.json';
+    print $client->get($url)->success->json->{trends}->[0]->{url};
 
-    print $client->post('http://mojolicious.org')->success->body;
-
-    print $client->get('http://kraih.com/x.json')->success->json->{foo}->[3];
+    # Quick post with form data
+    my $url = 'http://search.cpan.org/search';
+    print $client->post_form($url => {q => 'mojo'})->success->body;
 
 =head1 DESCRIPTION
 

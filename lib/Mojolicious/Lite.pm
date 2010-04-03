@@ -148,7 +148,8 @@ Mojolicious::Lite - Micro Web Framework
 
 L<Mojolicous::Lite> is a micro web framework built around L<Mojolicious>.
 
-A minimal Hello World application looks like this.
+A minimal Hello World application looks like this, L<strict> and L<warnings>
+are automatically enabled when you use L<Mojolicious::Lite>.
 
     #!/usr/bin/env perl
 
@@ -658,6 +659,14 @@ can be easily mixed to make the transition process very smooth.
     app->routes->route('/foo/:action')->via('get')->to('foo#index');
 
     app->start;
+
+There is also a helper command to generate a full L<Mojolicious> example that
+will let you explore the similarities between L<Mojolicious::Lite> and
+L<Mojolicious> applications.
+
+    % mojolicious generate app
+
+Have fun!
 
 =head1 ATTRIBUTES
 

@@ -1007,7 +1007,7 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
 
     # Quick JSON request
     my $trends = 'http://search.twitter.com/trends.json';
-    print $client->get($trends)->success->json->{trends}->[0]->{url};
+    print $client->get($trends)->success->json->{trends}->[0]->{name};
 
     # Form post with excepton handling
     my $cpan = 'http://search.cpan.org/search';

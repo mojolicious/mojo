@@ -1019,6 +1019,12 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
         print "Error: $message";
     }
 
+    # Parallel requests
+    my $callback = sub { print shift->res->body };
+    $client->get('http://mojolicious.org' => $callback);
+    $client->get('http://search.cpan.org' => $callback);
+    $client->process;
+
 =head1 DESCRIPTION
 
 L<Mojo::Client> is a full featured async io HTTP 1.1 and WebSocket client

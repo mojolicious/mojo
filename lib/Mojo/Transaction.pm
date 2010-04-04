@@ -246,8 +246,7 @@ Write server data.
     my $res = $tx->success;
 
 Returns the L<Mojo::Message::Response> object (C<res>) if transaction was
-successful and had no connection or parser errors, returns C<undef>
-otherwise.
+successful and had no connection/parser errors or C<undef> otherwise.
 
     if (my $res = $tx->success) {
         print $res->body;

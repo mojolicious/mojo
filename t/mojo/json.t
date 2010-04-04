@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 95;
+use Test::More tests => 97;
 
 use Mojo::ByteStream 'b';
 
@@ -187,6 +187,14 @@ $array = $json->decode(
     b("\x{feff}[\"\\ud800\\udf46\x{feff}\"]")->encode('UTF-16LE'));
 is_deeply($array, ["\x{10346}\x{feff}"],
     'decode \x{feff}[\"\\ud800\\udf46\x{feff}\"]');
+
+# Decode UTF-16LE with missing high surrogate
+$array = $json->decode(b("\x{feff}[\"\\ud800\"]")->encode('UTF-16LE'));
+is_deeply($array, ['\ud800'], 'decode \x{feff}[\"\\ud800\"]');
+
+# Decode UTF-16LE with missing low surrogate
+$array = $json->decode(b("\x{feff}[\"\\udf46\"]")->encode('UTF-16LE'));
+is_deeply($array, ['\udf46'], 'decode \x{feff}[\"\\udf46\"]');
 
 # Decode UTF-16BE with faihu surrogate pair
 $array = $json->decode(b("\x{feff}[\"\\ud800\\udf46\"]")->encode('UTF-16BE'));

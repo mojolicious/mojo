@@ -22,6 +22,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed Mojo::Message::headers chaining. (markstos)
         - Fixed a bug in Mojo::JSON that prevented BOM characters in strings.
           (chansen)
+        - Fixed Mojo::JSON to not unescape broken surrogates. (chansen)
 
 0.999924 2010-03-08 00:00:00
         - Added default TLS cert and key to Mojo::IOLoop to make HTTPS

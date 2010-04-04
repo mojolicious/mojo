@@ -57,7 +57,11 @@ my $UNESCAPE_RE = qr/
     \\u([dD][89abAB][0-9a-fA-F]{2})   # High surrogate
     \\u([dD][c-fC-F][0-9a-fA-F]{2})   # Low surrogate
     |
-    \\u([0-9a-fA-F]{4})               # Unicode character
+    \\u(                              # Unicode character (no surrogates)
+    [0-9A-Ca-cE-Fe-f][0-9A-Fa-f]{3}   # U+0000 - U+CEEE, U+E000 - U+FFFF
+    |
+    [Dd][0-7][0-9A-Fa-f]{2}           # U+D000 - U+D7FF
+    )
 /x;
 my $VALUE_SEPARATOR_RE = qr/^$WHITESPACE_RE\,/;
 

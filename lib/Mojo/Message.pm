@@ -786,7 +786,8 @@ Check if message content is multipart.
     my $object = $message->json;
     my $array  = $message->json;
 
-Decode JSON message body directly using L<Mojo::JSON>.
+Decode JSON message body directly using L<Mojo::JSON> if possible, returns
+C<undef> otherwise.
 
 =head2 C<leftovers>
 

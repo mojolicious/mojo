@@ -109,7 +109,7 @@ sub decode {
     $self->error(undef);
 
     # Remove BOM
-    $string =~ s/$BOM_RE//go;
+    $string =~ s/^$BOM_RE//go;
 
     # Detect and decode unicode
     my $encoding = 'UTF-8';

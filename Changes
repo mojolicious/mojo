@@ -20,6 +20,8 @@ This file documents the revision history for Perl extension Mojolicious.
           this makes Mojo::Server::Daemon::Prefork much more solid. (ask)
         - Fixed a bug that prevented undef values in the stash. (garu)
         - Fixed Mojo::Message::headers chaining. (markstos)
+        - Fixed a bug in Mojo::JSON that prevented BOM characters in strings.
+          (chansen)
 
 0.999924 2010-03-08 00:00:00
         - Added default TLS cert and key to Mojo::IOLoop to make HTTPS

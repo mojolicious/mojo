@@ -218,7 +218,7 @@ MojoX::Routes::Match - Routes Visitor
 
 L<MojoX::Routes::Match> is a visitor for L<MojoX::Routes> structures.
 
-=head2 ATTRIBUTES
+=head1 ATTRIBUTES
 
 L<MojoX::Routes::Match> implements the following attributes.
 

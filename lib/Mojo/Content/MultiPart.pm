@@ -61,8 +61,8 @@ sub build_boundary {
     # Check for existing boundary
     my $headers = $self->headers;
     my $type = $headers->content_type || '';
-    $type =~ /boundary=\"?([^\s\"]+)\"?/i;
-    my $boundary = $1;
+    my $boundary;
+    $type =~ /boundary=\"?([^\s\"]+)\"?/i and $boundary = $1;
     return $boundary if $boundary;
 
     # Generate and check boundary

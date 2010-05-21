@@ -79,7 +79,7 @@ MojoX::Session::Cookie::Controller - Controller Base Class
 
 L<MojoX::Session::Cookie::Controller> is a controller base class.
 
-=head2 ATTRIBUTES
+=head1 ATTRIBUTES
 
 L<MojoX::Session::Cookie::Controller> inherits all attributes from
 L<MojoX::Controller>.

@@ -37,7 +37,7 @@ Duct Tape For The HTML5 Web:
 
         use Mojolicious::Lite;
 
-        get '/hello' => sub { shift->render_text('Hello World!') }
+        get '/hello' => sub { shift->render(text => 'Hello World!') }
 
         get '/time' => 'clock';
 
@@ -53,14 +53,15 @@ Duct Tape For The HTML5 Web:
 
         get '/fetch' => sub {
             my $self = shift;
-            $self->render_data(
-                $self->client->get('http://mojolicious.org')->res->body);
+            $self->render(
+                data => $self->client->get('http://kraih.com')->res->body
+            );
         };
 
-        post '/:name' => sub {
+        post '/:offset' => sub {
             my $self = shift;
-            my $name = $self->param('name') || 'Mojo';
-            $self->render_text("Hello $name!");
+            my $offset = $self->param('offset') || 23;
+            $self->render(json => {list => [0 .. $offset]});
         };
 
         app->start;

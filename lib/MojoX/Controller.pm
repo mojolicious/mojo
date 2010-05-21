@@ -140,7 +140,7 @@ MojoX::Controller - Controller Base Class
 
 L<MojoX::Controller> is an abstract controllers base class.
 
-=head2 ATTRIBUTES
+=head1 ATTRIBUTES
 
 L<MojoX::Controller> implements the following attributes.
 

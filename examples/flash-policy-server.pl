@@ -32,35 +32,21 @@ EOF
 
 # Flash policy server
 $loop->listen(
-    port => 843,
-    cb   => sub {
+    port    => 843,
+    read_cb => sub {
+        my ($loop, $id, $chunk) = @_;
+
+        # Writing
+        $loop->writing($id);
+    },
+    write_cb => sub {
         my ($loop, $id) = @_;
 
-        # Read callback
-        $loop->read_cb(
-            $id => sub {
-                my ($loop, $id, $chunk) = @_;
+        # Finish
+        $loop->drop($id);
 
-                # Writing
-                $loop->writing($id);
-            }
-        );
-
-        # Write callback
-        $loop->write_cb(
-            $id => sub {
-                my ($loop, $id) = @_;
-
-                # Finish
-                $loop->drop($id);
-
-                # Write XML
-                return $xml;
-            }
-        );
-
-        # Reading only
-        $loop->not_writing($id);
+        # Write XML
+        return $xml;
     }
 ) or die "Couldn't create listen socket!\n";
 

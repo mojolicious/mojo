@@ -108,7 +108,7 @@ implementation.
 All data gets stored on the client side, but is protected from unwanted
 changes with a signature.
 
-=head2 ATTRIBUTES
+=head1 ATTRIBUTES
 
 L<MojoX::Session::Cookie> implements the following attributes.
 

@@ -253,7 +253,7 @@ MojoX::Routes - Always Find Your Destination With Routes
     $r->route('/archive/:year')
       ->to(controller => 'archive', action => 'list', year => undef);
 
-    # Nested route for two actions sharing the same "controller" paramater
+    # Nested route for two actions sharing the same "controller" parameter
     my $books = $r->route('/books/:id')->to(controller => 'book');
     $books->route('/edit')->to(action => 'edit');
     $books->route('/delete')->to(action => 'delete');
@@ -272,7 +272,7 @@ MojoX::Routes - Always Find Your Destination With Routes
 L<MojoX::Routes> is a very powerful implementation of the famous routes
 pattern and the core of the L<Mojolicious> web framework.
 
-=head2 ATTRIBUTES
+=head1 ATTRIBUTES
 
 L<MojoX::Routes> implements the following attributes.
 

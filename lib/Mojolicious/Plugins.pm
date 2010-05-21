@@ -119,7 +119,7 @@ In your application you will usually use it to load plugins.
 To implement your own plugins see L<Mojolicious::Plugin> and the C<add_hook>
 method below.
 
-=head2 ATTRIBUTES
+=head1 ATTRIBUTES
 
 L<Mojolicious::Plugins> implements the following attributes.
 

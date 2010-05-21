@@ -26,3 +26,13 @@ EOF
 
 # Start the command system
 Mojolicious::Commands->start;
+
+=head1 NAME
+
+mojolicious - The Mojolicious Command System
+
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+
+=cut

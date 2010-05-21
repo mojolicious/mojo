@@ -39,7 +39,7 @@ get '/' => 'index';
 
 get '/:groovy' => sub {
     my $self = shift;
-    $self->render_text($self->param('groovy'), layout => 'funky');
+    $self->render(text => $self->param('groovy'), layout => 'funky');
 };
 
 app->start;

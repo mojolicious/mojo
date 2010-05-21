@@ -54,7 +54,7 @@ Mojolicious::Plugin::RequestTimer - Request Timer Plugin
 =head1 DESCRIPTION
 
 L<Mojolicous::Plugin::RequestTimer> is a plugin to gather and log request
-timing informations.
+timing information.
 
 =head1 METHODS
 

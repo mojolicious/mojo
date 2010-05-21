@@ -5,13 +5,15 @@
 use strict;
 use warnings;
 
+use utf8;
+
 use Mojo::IOLoop;
 use Test::More;
 
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 7;
+plan tests => 8;
 
 # Oh, I always feared he might run off like this.
 # Why, why, why didn't I break his legs?
@@ -26,6 +28,7 @@ my $config =
   plugin json_config => {default => {foo => 'baz', hello => 'there'}};
 is($config->{foo},   'bar');
 is($config->{hello}, 'there');
+is($config->{utf},   'утф');
 
 # GET /
 get '/' => 'index';

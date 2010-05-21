@@ -93,7 +93,7 @@ sub parse {
         next unless length $part;
 
         # Store
-        push @parts, $part;
+        push @parts, b($part)->url_unescape($Mojo::URL::PCHAR)->to_string;
     }
 
     $self->parts(\@parts);

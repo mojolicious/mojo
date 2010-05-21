@@ -21,7 +21,7 @@ sub register {
     $conf ||= {};
 
     # Namespace
-    my $namespace = $conf->{namespace} || (ref $app . "::I18N");
+    my $namespace = $conf->{namespace} || ((ref $app) . "::I18N");
 
     # Initialize
     eval "package $namespace; use base 'Locale::Maketext'; 1;";

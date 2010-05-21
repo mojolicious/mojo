@@ -21,8 +21,8 @@ my $buffer = {};
 
 # Minimal ioloop example demonstrating how to cheat at HTTP benchmarks :)
 $loop->listen(
-    port => 3000,
-    cb   => sub {
+    port      => 3000,
+    accept_cb => sub {
         my ($loop, $id) = @_;
 
         # Initialize buffer
@@ -30,53 +30,41 @@ $loop->listen(
 
         # Start read only mode
         $loop->not_writing($id);
+    },
+    read_cb => sub {
+        my ($loop, $id, $chunk) = @_;
 
-        # Read callback
-        $loop->read_cb(
-            $id => sub {
-                my ($loop, $id, $chunk) = @_;
+        # Append chunk to buffer
+        $buffer->{$id} .= $chunk;
 
-                # Append chunk to buffer
-                $buffer->{$id} .= $chunk;
+        # Check if we got start line and headers (no body support)
+        if ($buffer->{$id} =~ /\x0d?\x0a\x0d?\x0a$/) {
 
-                # Check if we got start line and headers (no body support)
-                if ($buffer->{$id} =~ /\x0d?\x0a\x0d?\x0a$/) {
+            # Clean buffer
+            delete $buffer->{$id};
 
-                    # Clean buffer
-                    delete $buffer->{$id};
+            # Start read/write mode
+            $loop->writing($id);
+        }
+    },
+    write_cb => sub {
+        my ($loop, $id) = @_;
 
-                    # Start read/write mode
-                    $loop->writing($id);
-                }
-            }
-        );
+        # Start read only mode again
+        $loop->not_writing($id);
 
-        # Write callback
-        $loop->write_cb(
-            $id => sub {
-                my ($loop, $id) = @_;
+        # Write a minimal HTTP response
+        # (not spec compliant but benchmarks won't care)
+        return
+            "HTTP/1.1 200 OK\x0d\x0a"
+          . "Connection: keep-alive\x0d\x0aContent-Length: 11\x0d\x0a\x0d\x0a"
+          . "Hello Mojo!";
+    },
+    error_cb => sub {
+        my ($self, $id) = @_;
 
-                # Start read only mode again
-                $loop->not_writing($id);
-
-                # Write a minimal HTTP response
-                # (not spec compliant but benchmarks won't care)
-                return
-                    "HTTP/1.1 200 OK\x0d\x0a"
-                  . "Connection: keep-alive\x0d\x0aContent-Length: 11\x0d\x0a\x0d\x0a"
-                  . "Hello Mojo!";
-            }
-        );
-
-        # Error callback (clean buffer)
-        $loop->error_cb(
-            $id => sub {
-                my ($self, $id) = @_;
-
-                # Clean buffer
-                delete $buffer->{$id};
-            }
-        );
+        # Clean buffer
+        delete $buffer->{$id};
     }
 ) or die "Couldn't create listen socket!\n";
 

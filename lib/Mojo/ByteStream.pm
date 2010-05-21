@@ -507,6 +507,7 @@ sub html_unescape {
 
 sub md5_sum {
     my $self = shift;
+    utf8::encode $self->{bytestream} if utf8::is_utf8 $self->{bytestream};
     $self->{bytestream} = Digest::MD5::md5_hex($self->{bytestream});
     return $self;
 }

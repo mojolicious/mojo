@@ -107,6 +107,9 @@ sub new {
 sub dispatch {
     my ($self, $c) = @_;
 
+    # Websocket handshake
+    $c->res->code(undef) if $c->tx->is_websocket;
+
     # Session
     $self->session->load($c);
 
@@ -119,19 +122,20 @@ sub dispatch {
     $self->log->debug(qq/*** Request for "$path" from "$ua". ***/);
 
     # Try to find a static file
-    my $e = $self->static->dispatch($c);
+    $self->static->dispatch($c);
 
     # Hook
     $self->plugins->run_hook_reverse(after_static_dispatch => $c);
 
-    # Use routes if we don't have a response yet
-    $e = $self->routes->dispatch($c) if $e;
+    # Routes
+    if ($self->routes->dispatch($c)) {
 
-    # Exception
-    if (ref $e) { $c->render_exception($e) }
+        # Nothing found
+        $c->render_not_found unless $c->res->code;
+    }
 
-    # Nothing found
-    elsif ($e) { $c->render_not_found }
+    # Websocket handshake
+    $c->res->code(101) if !$c->res->code && $c->tx->is_websocket;
 
     # Finish
     $self->finish($c);
@@ -290,7 +294,7 @@ Web development for humans, making hard things possible and everything fun.
 
     use Mojolicious::Lite;
 
-    get '/hello' => sub { shift->render_text('Hello World!') }
+    get '/hello' => sub { shift->render(text => 'Hello World!') }
 
     get '/time' => 'clock';
 
@@ -306,14 +310,15 @@ Web development for humans, making hard things possible and everything fun.
 
     get '/fetch' => sub {
         my $self = shift;
-        $self->render_data(
-            $self->client->get('http://mojolicious.org')->res->body);
+        $self->render(
+            data => $self->client->get('http://kraih.com')->res->body
+        );
     };
 
-    post '/:name' => sub {
+    post '/:offset' => sub {
         my $self = shift;
-        my $name = $self->param('name') || 'Mojo';
-        $self->render_text("Hello $name!");
+        my $offset = $self->param('offset') || 23;
+        $self->render(json => {list => [0 .. $offset]});
     };
 
     app->start;
@@ -572,6 +577,8 @@ Ch Lamprecht
 
 Christian Hansen
 
+Curt Tilmes
+
 David Davis
 
 Dmitry Konstantinov
@@ -582,11 +589,15 @@ Glen Hinkle
 
 Graham Barr
 
+Hideki Yamamura
+
 James Duncan
 
 Jaroslav Muhin
 
 Jesse Vincent
+
+Jonathan Yu
 
 Kazuhiro Shibuya
 

@@ -104,18 +104,18 @@ sub contains {
     while ($offset <= $end) {
         if (defined $range) {
             $readlen = $end + 1 - $offset;
-            return if $readlen <= 0;
+            return -1 if $readlen <= 0;
         }
         $read = $self->handle->sysread($buffer, $readlen);
         $offset += $read;
         $window .= $buffer;
         my $pos = index $window, $bytestream;
         return $pos if $pos >= 0;
-        return if $read == 0;
+        return -1   if $read == 0;
         substr $window, 0, $read, '';
     }
 
-    return;
+    return -1;
 }
 
 sub get_chunk {

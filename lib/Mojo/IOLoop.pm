@@ -93,14 +93,15 @@ AnqxHi90n/p912ynLg2SjBq+03GaECeGzC/QqKK2gtA=
 -----END RSA PRIVATE KEY-----
 EOF
 
+__PACKAGE__->attr([qw/idle_cb tick_cb/]);
+__PACKAGE__->attr([qw/accept_timeout connect_timeout/] => 5);
 __PACKAGE__->attr(
-    [qw/lock_cb tick_cb unlock_cb/] => sub {
+    [qw/lock_cb unlock_cb/] => sub {
         sub {1}
     }
 );
-__PACKAGE__->attr([qw/accept_timeout connect_timeout/] => 5);
-__PACKAGE__->attr(max_connections                      => 1000);
-__PACKAGE__->attr(timeout                              => '0.25');
+__PACKAGE__->attr(max_connections => 1000);
+__PACKAGE__->attr(timeout         => '0.25');
 
 # Singleton
 our $LOOP;
@@ -147,7 +148,7 @@ sub connect {
     # Add connection
     my $c = $self->{_cs}->{$id} = {
         buffer     => Mojo::ByteStream->new,
-        connect_cb => $args->{cb},
+        connect_cb => $args->{connect_cb} || $args->{cb},
         connecting => 1,
         socket     => $socket
     };
@@ -173,6 +174,12 @@ sub connect {
     # File descriptor
     my $fd = fileno $socket;
     $self->{_fds}->{$fd} = $id;
+
+    # Register callbacks
+    for my $name (qw/error_cb hup_cb read_cb write_cb/) {
+        my $cb = $args->{$name};
+        $self->$name($id => $cb) if $cb;
+    }
 
     # Add socket to poll
     $self->writing($id);
@@ -294,8 +301,15 @@ sub listen {
     my $id = "$socket";
 
     # Add listen socket
-    $self->{_listen}->{$id} =
-      {cb => $args->{cb}, file => $args->{file} ? 1 : 0, socket => $socket};
+    $self->{_listen}->{$id} = {
+        accept_cb => $args->{accept_cb} || $args->{cb},
+        error_cb => $args->{error_cb},
+        file => $args->{file} ? 1 : 0,
+        hup_cb   => $args->{hup_cb},
+        read_cb  => $args->{read_cb},
+        socket   => $socket,
+        write_cb => $args->{write_cb}
+    };
 
     # File descriptor
     my $fd = fileno $socket;
@@ -334,36 +348,49 @@ sub not_writing {
     # Socket
     return unless my $socket = $c->{socket};
 
+    # Writing
+    my $writing = $c->{writing};
+
     # KQueue
     my $loop = $self->{_loop} ||= $self->_build_loop;
     if (KQUEUE) {
         my $fd = fileno $socket;
 
         # Writing
-        my $writing = $c->{writing};
         $loop->EV_SET($fd, KQUEUE_READ, KQUEUE_ADD) unless defined $writing;
         $loop->EV_SET($fd, KQUEUE_WRITE, KQUEUE_DELETE) if $writing;
-
-        # Not writing anymore
-        $c->{writing} = 0;
     }
 
-    # Epoll
-    elsif (EPOLL) { $loop->mask($socket, EPOLL_POLLIN) }
+    # Poll and epoll
+    else {
 
-    # Poll
-    else { $loop->mask($socket, POLLIN) }
+        # Not writing anymore
+        if ($writing) {
+            $loop->remove($socket);
+            $writing = undef;
+        }
+
+        # Reading
+        my $mask = EPOLL ? EPOLL_POLLIN : POLLIN;
+        $loop->mask($socket, $mask) unless defined $writing;
+    }
+
+    # Not writing anymore
+    $c->{writing} = 0;
 }
 
 sub one_tick {
-    my $self = shift;
+    my ($self, $timeout) = @_;
+
+    # Timeout
+    $timeout = $self->timeout unless defined $timeout;
 
     # Listening
+    my $loop = $self->{_loop} ||= $self->_build_loop;
     if (!$self->{_listening} && $self->_should_listen) {
 
         # Add listen sockets
         my $listen = $self->{_listen} || {};
-        my $loop = $self->{_loop};
         for my $lid (keys %$listen) {
             my $socket = $listen->{$lid}->{socket};
             my $fd     = fileno $socket;
@@ -383,18 +410,17 @@ sub one_tick {
     }
 
     # Prepare
-    return if $self->_prepare;
+    $self->_prepare;
 
     # Events
     my (@error, @hup, @read, @write);
 
     # KQueue
-    my $loop = $self->{_loop};
     if (KQUEUE) {
 
         # Catch interrupted system call errors
         my @ret;
-        eval { @ret = $loop->kevent(1000 * $self->timeout) };
+        eval { @ret = $loop->kevent(1000 * $timeout) };
         die "KQueue error: $@" if $@;
 
         # Events
@@ -421,7 +447,7 @@ sub one_tick {
 
     # Epoll
     elsif (EPOLL) {
-        $loop->poll($self->timeout);
+        $loop->poll($timeout);
 
         # Read
         push @read, $_ for $loop->handles(EPOLL_POLLIN);
@@ -438,7 +464,7 @@ sub one_tick {
 
     # Poll
     else {
-        $loop->poll($self->timeout);
+        $loop->poll($timeout);
 
         # Read
         push @read, $_ for $loop->handles(POLLIN);
@@ -466,11 +492,18 @@ sub one_tick {
     $self->_hup($_) for @hup;
 
     # Timers
-    $self->_timer;
+    my $timers = $self->_timer;
 
     # Tick callback
-    my $cb = $self->tick_cb;
-    $self->_run_callback('tick', $cb) if $cb;
+    if (my $cb = $self->tick_cb) {
+        $self->_run_callback('tick', $cb);
+    }
+
+    # Idle callback
+    if (my $cb = $self->idle_cb) {
+        $self->_run_callback('idle', $cb)
+          unless @read || @write || @error || @hup || $timers;
+    }
 }
 
 sub read_cb { shift->_add_event('read', @_) }
@@ -576,25 +609,35 @@ sub writing {
     # Socket
     return unless my $socket = $c->{socket};
 
+    # Writing
+    my $writing = $c->{writing};
+
     # KQueue
     my $loop = $self->{_loop} ||= $self->_build_loop;
     if (KQUEUE) {
         my $fd = fileno $socket;
 
         # Writing
-        my $writing = $c->{writing};
         $loop->EV_SET($fd, KQUEUE_READ,  KQUEUE_ADD) unless defined $writing;
         $loop->EV_SET($fd, KQUEUE_WRITE, KQUEUE_ADD) unless $writing;
-
-        # Writing
-        $c->{writing} = 1;
     }
 
-    # Epoll
-    elsif (EPOLL) { $loop->mask($socket, EPOLL_POLLIN | EPOLL_POLLOUT) }
+    # Poll and epoll
+    else {
 
-    # Poll
-    else { $loop->mask($socket, POLLIN | POLLOUT) }
+        # Not writing anymore
+        unless ($writing) {
+            $loop->remove($socket);
+
+            # Writing
+            my $mask =
+              EPOLL ? EPOLL_POLLIN | EPOLL_POLLOUT : POLLIN | POLLOUT;
+            $loop->mask($socket, $mask);
+        }
+    }
+
+    # Writing
+    $c->{writing} = 1;
 }
 
 sub _accept {
@@ -627,8 +670,14 @@ sub _accept {
     my $fd = fileno $socket;
     $self->{_fds}->{$fd} = $id;
 
+    # Register callbacks
+    for my $name (qw/error_cb hup_cb read_cb write_cb/) {
+        my $cb = $self->{_listen}->{$listen}->{$name};
+        $self->$name($id => $cb) if $cb;
+    }
+
     # Accept callback
-    my $cb = $self->{_listen}->{$listen}->{cb};
+    my $cb = $self->{_listen}->{$listen}->{accept_cb};
     $self->_run_event('accept', $cb, $id) if $cb;
 
     # Remove listen sockets
@@ -822,12 +871,7 @@ sub _prepare {
     elsif ($self->max_connections > 0 && keys %$listen) { $running = 1 }
 
     # Stopped
-    unless ($running) {
-        delete $self->{_running};
-        return 1;
-    }
-
-    return;
+    delete $self->{_running} unless $running;
 }
 
 sub _prepare_accept {
@@ -1015,6 +1059,7 @@ sub _timer {
     return unless my $ts = $self->{_ts};
 
     # Check
+    my $count = 0;
     for my $id (keys %$ts) {
         my $t = $ts->{$id};
 
@@ -1023,12 +1068,17 @@ sub _timer {
         if ($after <= time - $t->{started}) {
 
             # Callback
-            if (my $cb = $t->{cb}) { $self->_run_callback('timer', $cb) }
+            if (my $cb = $t->{cb}) {
+                $self->_run_callback('timer', $cb);
+                $count++;
+            }
 
             # Drop
             $self->_drop_immediately($id);
         }
     }
+
+    return $count;
 }
 
 sub _write {
@@ -1101,57 +1151,59 @@ Mojo::IOLoop - Minimalistic Reactor For TCP Clients And Servers
     # Listen on port 3000
     $loop->listen(
         port => 3000,
-        cb   => sub {
+        accept_cb => sub {
             my ($self, $id) = @_;
 
             # Start read only when accepting a new connection
             $self->not_writing($id);
+        },
+        read_cb => sub {
+            my ($self, $id, $chunk) = @_;
 
-            # Incoming data
-            $self->read_cb($id => sub {
-                my ($self, $id, $chunk) = @_;
+            # Process input
+            print $chunk;
 
-                # Got some data, time to write
-                $self->writing($id);
-            });
+            # Got some data, time to write
+            $self->writing($id);
+        },
+        write_cb => sub {
+            my ($self, $id) = @_;
 
-            # Ready to write
-            $self->write_cb($id => sub {
-                my ($self, $id) = @_;
+            # Back to reading only
+            $self->not_writing($id);
 
-                # Back to reading only
-                $self->not_writing($id);
-
-                # The loop will take care of buffering for us
-                return 'HTTP/1.1 200 OK';
-            });
+            # The loop will take care of buffering for us
+            return 'HTTP/1.1 200 OK';
         }
     );
 
     # Connect to port 3000 with TLS activated
-    my $id = $loop->connect(address => 'localhost', port => 3000, tls => 1);
+    my $id = $loop->connect(
+        address => 'localhost',
+        port => 3000,
+        tls => 1,
+        write_cb => sub {
+            my ($self, $id) = @_;
+
+            # Back to reading only
+            $self->not_writing($id);
+
+            # The loop will take care of buffering for us
+            return "GET / HTTP/1.1\r\n\r\n";
+        },
+        read_cb => sub {
+            my ($self, $id, $chunk) = @_;
+
+            # Process input
+            print $chunk;
+
+            # Time to write more
+            $self->writing($id);
+        }
+    );
 
     # Loop starts writing
     $loop->writing($id);
-
-    # Writing request
-    $loop->write_cb($id => sub {
-        my ($self, $id) = @_;
-
-        # Back to reading only
-        $self->not_writing($id);
-
-        # The loop will take care of buffering for us
-        return "GET / HTTP/1.1\r\n\r\n";
-    });
-
-    # Reading response
-    $loop->read_cb($id => sub {
-        my ($self, $id, $chunk) = @_;
-
-        # Time to write more
-        $self->writing($id);
-    });
 
     # Add a timer
     $loop->timer(5 => sub {
@@ -1172,7 +1224,7 @@ and servers.
 Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::INET6> and
 L<IO::Socket::SSL> are supported transparently and used if installed.
 
-=head2 ATTRIBUTES
+=head1 ATTRIBUTES
 
 L<Mojo::IOLoop> implements the following attributes.
 
@@ -1191,6 +1243,13 @@ dropped, defaults to C<5>.
 
 Maximum time in seconds a conenction can take to be connected before being
 dropped, defaults to C<5>.
+
+=head2 C<idle_cb>
+
+    my $cb = $loop->idle_cb;
+    $loop  = $loop->idle_cb(sub {...});
+
+Callback to be invoked on every reactor tick if no events occurred.
 
 =head2 C<lock_cb>
 
@@ -1269,19 +1328,12 @@ possible.
 
     my $id = $loop->connect(
         address => '127.0.0.1',
-        port    => 3000,
-        cb      => sub {...}
+        port    => 3000
     );
-    my $id = $loop->connect({
-        address => '127.0.0.1',
-        port    => 3000,
-        cb      => sub {...}
-    });
     my $id = $loop->connect({
         address => '[::1]',
         port    => 443,
-        tls     => 1,
-        cb      => sub {...}
+        tls     => 1
     });
 
 Open a TCP connection to a remote host, IPv6 will be used automatically if
@@ -1297,13 +1349,25 @@ These options are currently available.
 
 Address or host name of the peer to connect to.
 
-=item C<cb>
+=item C<connect_cb>
 
 Callback to be invoked once the connection is established.
+
+=item C<error_cb>
+
+Callback to be invoked if an error event happens on the connection.
+
+=item C<hup_cb>
+
+Callback to be invoked if the connection gets closed.
 
 =item C<port>
 
 Port to connect to.
+
+=item C<read_cb>
+
+Callback to be invoked if new data arrives on the connection.
 
 =item C<tls>
 
@@ -1316,6 +1380,12 @@ CA file to use for TLS.
 =item C<tls_verify_cb>
 
 Callback to invoke for TLS verification.
+
+=item C<write_cb>
+
+Callback to be invoked if new data can be written to the connection.
+The callback should return a chunk of data which will be buffered inside the
+loop to guarantee safe writing.
 
 =back
 
@@ -1385,13 +1455,21 @@ These options are currently available.
 
 Local address to listen on, defaults to all.
 
-=item C<cb>
+=item C<accept_cb>
 
 Callback to invoke for each accepted connection.
+
+=item C<error_cb>
+
+Callback to be invoked if an error event happens on the connection.
 
 =item C<file>
 
 A unix domain socket to listen on.
+
+=item C<hup_cb>
+
+Callback to be invoked if the connection gets closed.
 
 =item C<port>
 
@@ -1400,6 +1478,10 @@ Port to listen on.
 =item C<queue_size>
 
 Maximum queue size, defaults to C<SOMAXCONN>.
+
+=item C<read_cb>
+
+Callback to be invoked if new data arrives on the connection.
 
 =item C<tls>
 
@@ -1412,6 +1494,12 @@ Path to the TLS cert file.
 =item C<tls_key>
 
 Path to the TLS key file.
+
+=item C<write_cb>
+
+Callback to be invoked if new data can be written to the connection.
+The callback should return a chunk of data which will be buffered inside the
+loop to guarantee safe writing.
 
 =back
 
@@ -1447,6 +1535,8 @@ Note that connections have no mode after they are created.
 =head2 C<one_tick>
 
     $loop->one_tick;
+    $loop->one_tick('0.25');
+    $loop->one_tick(0);
 
 Run reactor for exactly one tick.
 

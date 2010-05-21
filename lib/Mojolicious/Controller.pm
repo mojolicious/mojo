@@ -66,6 +66,9 @@ sub pause { shift->tx->pause }
 sub receive_message {
     my $self = shift;
 
+    # Deactivate auto rendering
+    $self->stash->{rendered} = 1;
+
     # WebSocket check
     Carp::croak('No WebSocket connection to receive messages from')
       unless $self->tx->is_websocket;
@@ -141,19 +144,19 @@ sub render {
         my $controller = $stash->{controller};
         my $action     = $stash->{action};
 
+        # Normal default template
+        if ($controller && $action) {
+            $self->stash(
+                template => join('/', split(/-/, $controller), $action));
+        }
+
         # Try the route name if we don't have controller and action
-        unless ($controller && $action) {
-            my $endpoint = $self->match->endpoint;
+        elsif (my $match = $self->match) {
+            my $endpoint = $match->endpoint;
 
             # Use endpoint name as default template
             $self->stash(template => $endpoint->name)
               if $endpoint && $endpoint->name;
-        }
-
-        # Normal default template
-        else {
-            $self->stash(
-                template => join('/', split(/-/, $controller), $action));
         }
     }
 
@@ -280,6 +283,9 @@ sub resume { shift->tx->resume }
 
 sub send_message {
     my $self = shift;
+
+    # Deactivate auto rendering
+    $self->stash->{rendered} = 1;
 
     # WebSocket check
     Carp::croak('No WebSocket connection to send message to')

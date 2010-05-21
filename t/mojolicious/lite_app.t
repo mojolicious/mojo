@@ -48,10 +48,10 @@ get '/root.html' => 'root_path';
 # GET /template.txt
 get '/template.txt' => 'template';
 
-# GET /address
-get '/address' => sub {
+# GET /0
+get ':number' => [number => qr/0/] => sub {
     my $self = shift;
-    $self->render_text($self->tx->remote_address);
+    $self->render_text($self->tx->remote_address . $self->param('number'));
 };
 
 # POST /upload
@@ -324,26 +324,26 @@ get '/koi8-r' => sub {
 # GET /hello3.txt
 get '/hello3.txt' => sub { shift->render_static('hello2.txt') };
 
-ladder sub {
+under sub {
     my $self = shift;
     return unless $self->req->headers->header('X-Bender');
-    $self->res->headers->header('X-Ladder' => 23);
+    $self->res->headers->header('X-Under' => 23);
     return 1;
 };
 
-# GET /with_ladder
-get '/with_ladder' => sub {
+# GET /with_under
+get '/with_under' => sub {
     my $self = shift;
-    $self->render_text('Ladders are cool!');
+    $self->render_text('Unders are cool!');
 };
 
-# GET /with_ladder_too
-get '/with_ladder_too' => sub {
+# GET /with_under_too
+get '/with_under_too' => sub {
     my $self = shift;
-    $self->render_text('Ladders are cool too!');
+    $self->render_text('Unders are cool too!');
 };
 
-ladder sub {
+under sub {
     my $self = shift;
 
     # Authenticated
@@ -362,7 +362,7 @@ get '/param_auth' => 'param_auth';
 get '/param_auth/too' =>
   sub { shift->render_text('You could be Bender too!') };
 
-ladder sub {
+under sub {
     my $self = shift;
     $self->stash(_name => 'stash');
     $self->cookie(foo => 'cookie', {expires => (time + 60)});
@@ -405,11 +405,11 @@ $t->get_ok('/.html')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('/root.html/root.html/root.html/root.html/root.html');
 
-# GET /address (reverse proxy)
+# GET /0 (reverse proxy)
 my $backup = $ENV{MOJO_REVERSE_PROXY};
 $ENV{MOJO_REVERSE_PROXY} = 1;
-$t->get_ok('/address', {'X-Forwarded-For' => '192.168.2.2, 192.168.2.1'})
-  ->status_is(200)->content_is('192.168.2.1');
+$t->get_ok('/0', {'X-Forwarded-For' => '192.168.2.2, 192.168.2.1'})
+  ->status_is(200)->content_is('192.168.2.10');
 $ENV{MOJO_REVERSE_PROXY} = $backup;
 
 # POST /upload (huge upload without appropriate max message size)
@@ -780,7 +780,7 @@ $t->get_ok('/redirect_named')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->header_is(Location       => undef)->content_is("Redirect works!\n");
 $t->max_redirects(0);
-Test::Mojo->new(tx => $t->redirects->[0])->status_is(302)
+Test::Mojo->new(tx => $t->tx->previous)->status_is(302)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->header_is(Location       => '/template.txt')->content_is('Redirecting!');
@@ -795,20 +795,20 @@ $t->get_ok('/koi8-r')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/html; charset=koi8-r')->content_like(qr/^$koi8/);
 
-# GET /with_ladder
-$t->get_ok('/with_ladder', {'X-Bender' => 'Rodriguez'})->status_is(200)
+# GET /with_under
+$t->get_ok('/with_under', {'X-Bender' => 'Rodriguez'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->header_is('X-Ladder'     => 23)->content_is('Ladders are cool!');
+  ->header_is('X-Under'      => 23)->content_is('Unders are cool!');
 
-# GET /with_ladder_too
-$t->get_ok('/with_ladder_too', {'X-Bender' => 'Rodriguez'})->status_is(200)
+# GET /with_under_too
+$t->get_ok('/with_under_too', {'X-Bender' => 'Rodriguez'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->header_is('X-Ladder'     => 23)->content_is('Ladders are cool too!');
+  ->header_is('X-Under'      => 23)->content_is('Unders are cool too!');
 
-# GET /with_ladder_too
-$t->get_ok('/with_ladder_too')->status_is(404)
+# GET /with_under_too
+$t->get_ok('/with_under_too')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/Oops!/);

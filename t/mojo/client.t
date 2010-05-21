@@ -10,7 +10,7 @@ use Test::More;
 plan skip_all =>
   'set TEST_CLIENT to enable this test (internet connection required!)'
   unless $ENV{TEST_CLIENT};
-plan tests => 81;
+plan tests => 79;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -112,33 +112,17 @@ $client->get(
 );
 $client->process;
 
-# Websocket request
-$client->websocket(
-    'ws://websockets.org:8787' => sub {
-        my $self = shift;
-        is($self->tx->is_websocket, 1, 'websocket transaction');
-        $self->receive_message(
-            sub {
-                my ($self, $message) = @_;
-                is($message, 'echo: hi there!', 'right message');
-                $self->finish;
-            }
-        );
-        $self->send_message('hi there!');
-    }
-)->process;
-
 # Simple requests with redirect
 $client->max_redirects(3);
 $client->get(
     'http://www.google.com' => sub {
-        my ($self, $tx, $h) = @_;
-        is($tx->req->method,     'GET',                   'right method');
-        is($tx->req->url,        'http://www.google.de/', 'right url');
-        is($tx->res->code,       200,                     'right status');
-        is($h->[0]->req->method, 'GET',                   'right method');
-        is($h->[0]->req->url,    'http://www.google.com', 'right url');
-        is($h->[0]->res->code,   302,                     'right status');
+        my ($self, $tx) = @_;
+        is($tx->req->method, 'GET',                   'right method');
+        is($tx->req->url,    'http://www.google.de/', 'right url');
+        is($tx->res->code,   200,                     'right status');
+        is($tx->previous->req->method, 'GET', 'right method');
+        is($tx->previous->req->url, 'http://www.google.com', 'right url');
+        is($tx->previous->res->code, 302, 'right status');
     }
 )->process;
 $client->max_redirects(0);

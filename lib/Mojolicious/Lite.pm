@@ -72,7 +72,7 @@ sub import {
 
         # Defaults
         $defaults ||= {};
-        $defaults = {%$defaults, callback => $cb} if $cb;
+        $defaults = {%$defaults, cb => $cb} if $cb;
 
         # Name
         $name ||= '';
@@ -81,7 +81,7 @@ sub import {
         return $routes =
           $app->routes->bridge($pattern, {@$constraints})->over($conditions)
           ->to($defaults)->name($name)
-          if !ref $methods && $methods eq 'ladder';
+          if !ref $methods && $methods eq 'under';
 
         # WebSocket
         my $websocket = 1 if !ref $methods && $methods eq 'websocket';
@@ -108,12 +108,13 @@ sub import {
 
     # Export
     *{"${caller}::new"} = *{"${caller}::app"} = sub {$app};
-    *{"${caller}::any"}       = sub { $route->(ref $_[0] ? shift : [], @_) };
-    *{"${caller}::get"}       = sub { $route->('get',                  @_) };
-    *{"${caller}::ladder"}    = sub { $route->('ladder',               @_) };
+    *{"${caller}::any"} = sub { $route->(ref $_[0] ? shift : [], @_) };
+    *{"${caller}::get"} = sub { $route->('get', @_) };
+    *{"${caller}::under"} = *{"${caller}::ladder"} =
+      sub { $route->('under', @_) };
     *{"${caller}::plugin"}    = sub { $app->plugin(@_) };
-    *{"${caller}::post"}      = sub { $route->('post',                 @_) };
-    *{"${caller}::websocket"} = sub { $route->('websocket',            @_) };
+    *{"${caller}::post"}      = sub { $route->('post', @_) };
+    *{"${caller}::websocket"} = sub { $route->('websocket', @_) };
 
     # We are most likely the app in a lite environment
     $ENV{MOJO_APP} = $app;
@@ -138,7 +139,7 @@ Mojolicious::Lite - Micro Web Framework
     get '/:foo' => sub {
         my $self = shift;
         my $foo  = $self->param('foo');
-        $self->render_text("Hello from $foo!");
+        $self->render(text => "Hello from $foo!");
     };
 
     # Start the Mojolicious command system
@@ -149,13 +150,15 @@ Mojolicious::Lite - Micro Web Framework
 L<Mojolicous::Lite> is a micro web framework built around L<Mojolicious>.
 
 A minimal Hello World application looks like this, L<strict> and L<warnings>
-are automatically enabled when you use L<Mojolicious::Lite>.
+are automatically enabled and a few functions imported when you use
+L<Mojolicious::Lite>, turning your script into a full featured web
+application.
 
     #!/usr/bin/env perl
 
     use Mojolicious::Lite;
 
-    get '/' => sub { shift->render_text('Hello World!') };
+    get '/' => sub { shift->render(text => 'Hello World!') };
 
     app->start;
 
@@ -183,6 +186,9 @@ will just work without commands.
     % ./myapp.pl fastcgi
     ...Blocking FastCGI main loop...
 
+    % ./myapp.pl
+    ...List of available commands (or automatically detected environment)...
+
 The app->start call that starts the L<Mojolicious> command system can be
 customized to override normal C<@ARGV> use.
 
@@ -200,7 +206,7 @@ placeholders.
     # /foo
     get '/foo' => sub {
         my $self = shift;
-        $self->render_text('Hello World!');
+        $self->render(text => 'Hello World!');
     };
 
 All routes can have a name associated with them, this allows automatic
@@ -216,7 +222,7 @@ Names are always the last argument.
     # /bar
     get '/bar' => sub {
         my $self = shift;
-        $self->render_text('Hi!')
+        $self->render(text => 'Hi!')
     } => 'bar';
 
     __DATA__
@@ -301,14 +307,14 @@ C<param>.
     get '/foo/:bar' => sub {
         my $self = shift;
         my $bar  = $self->stash('bar');
-        $self->render_text("Our :bar placeholder matched $bar");
+        $self->render(text => "Our :bar placeholder matched $bar");
     };
 
     # /*something/foo
     get '/(:bar)something/foo' => sub {
         my $self = shift;
         my $bar  = $self->param('bar');
-        $self->render_text("Our :bar placeholder matched $bar");
+        $self->render(text => "Our :bar placeholder matched $bar");
     };
 
 Relaxed placeholders allow matching of everything until a C</> occurs.
@@ -339,21 +345,21 @@ C</> and C<.>.
 Routes can be restricted to specific request methods.
 
     # GET /bye
-    get '/bye' => sub { shift->render_text('Bye!') };
+    get '/bye' => sub { shift->render(text => 'Bye!') };
 
     # POST /bye
-    post '/bye' => sub { shift->render_text('Bye!') };
+    post '/bye' => sub { shift->render(text => 'Bye!') };
 
     # GET|POST|DELETE /bye
     any [qw/get post delete/] => '/bye' => sub {
-        shift->render_text('Bye!');
+        shift->render(text => 'Bye!');
     };
 
     # /baz
     any '/baz' => sub {
         my $self   = shift;
         my $method = $self->req->method;
-        $self->render_text("You called /baz with $method");
+        $self->render(text => "You called /baz with $method");
     };
 
 All placeholders get compiled to a regex internally, with regex constraints
@@ -363,7 +369,7 @@ this process can be easily customized.
     any '/:bar' => [bar => qr/\d+/] => sub {
         my $self = shift;
         my $bar  = $self->param('bar');
-        $self->render_text("Our :bar placeholder matched $bar");
+        $self->render(text => "Our :bar placeholder matched $bar");
     };
 
 Routes allow default values to make placeholders optional.
@@ -439,15 +445,15 @@ multiple features at once.
         </body>
     </html>
 
-Ladders can be used for authentication and to share code between multiple
-routes.
-All routes following a ladder are only evaluated if the ladder returns a
+Authentication and code shared between multiple routes can be realized easily
+with the C<under> statement.
+All following routes are only evaluated if the C<under> callback returned a
 true value.
 
     use Mojolicious::Lite;
 
     # Authenticate based on name parameter
-    ladder sub {
+    under sub {
         my $self = shift;
 
         # Authenticated
@@ -459,7 +465,7 @@ true value.
         return;
     };
 
-    # GET / (with ladder authentication)
+    # GET / (with authentication)
     get '/' => 'index';
 
     app->start;
@@ -475,12 +481,16 @@ Conditions such as C<agent> allow even more powerful route constructs.
 
     # /foo
     get '/foo' => (agent => qr/Firefox/) => sub {
-        shift->render_text('Congratulations, you are using a cool browser!');
+        shift->render(
+            text => 'Congratulations, you are using a cool browser!'
+        );
     }
 
     # /foo
     get '/foo' => (agent => qr/Internet Explorer/) => sub {
-        shift->render_text('Dude, you really need to upgrade to Firefox!');
+        shift->render(
+            text => 'Dude, you really need to upgrade to Firefox!'
+        );
     }
 
 Formats can be automatically detected by looking at file extensions.
@@ -572,8 +582,9 @@ tool.
 
     get '/test' => sub {
         my $self = shift;
-        $self->render_data(
-            $self->client->get('http://mojolicious.org')->res->body);
+        $self->render(
+            data => $self->client->get('http://mojolicious.org')->res->body
+        );
     };
 
 WebSocket applications have never been this easy before.
@@ -637,9 +648,9 @@ C<log> directory exists.
 For more control the L<Mojolicious> instance can be accessed directly.
 
     app->log->level('error');
-    app->routes->route('/foo/:bar')->via('get')->to(callback => sub {
+    app->routes->route('/foo/:bar')->via('get')->to(cb => sub {
         my $self = shift;
-        $self->render_text('Hello Mojo!');
+        $self->render(text => 'Hello Mojo!');
     });
 
 In case a lite app needs to grow, lite and real L<Mojolicous> applications
@@ -648,12 +659,12 @@ can be easily mixed to make the transition process very smooth.
     package MyApp::Foo;
     use base 'Mojolicious::Controller';
 
-    sub index { shift->render_text('It works!') }
+    sub index { shift->render(text => 'It works!') }
 
     package main;
     use Mojolicious::Lite;
 
-    get '/bar' => sub { shift->render_text('This too!') };
+    get '/bar' => sub { shift->render(text => 'This too!') };
 
     app->routes->namespace('MyApp');
     app->routes->route('/foo/:action')->via('get')->to('foo#index');

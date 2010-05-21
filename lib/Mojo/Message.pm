@@ -452,7 +452,7 @@ sub _parse {
 
     # Check message size
     $self->error(413, 'Maximum message size exceeded.')
-      if $buffer->raw_size > ($ENV{MOJO_MAX_MESSAGE_SIZE} || 524288);
+      if $buffer->raw_size > ($ENV{MOJO_MAX_MESSAGE_SIZE} || 5242880);
 
     # Content
     if ($self->is_state(qw/content done done_with_leftovers/)) {
@@ -788,6 +788,7 @@ Check if message content is multipart.
 
 Decode JSON message body directly using L<Mojo::JSON> if possible, returns
 C<undef> otherwise.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<leftovers>
 

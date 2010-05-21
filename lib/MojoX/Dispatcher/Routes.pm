@@ -35,6 +35,9 @@ sub auto_render {
 sub dispatch {
     my ($self, $c) = @_;
 
+    # Already rendered
+    return if $c->res->code;
+
     # Match
     my $m = MojoX::Routes::Match->new($c->tx);
     $m->match($self);
@@ -47,12 +50,11 @@ sub dispatch {
     $c->stash($m->captures);
 
     # Prepare params
-    $c->stash->{params} = $c->tx->req->params->clone;
-    $c->stash->{params}->append(%{$m->captures});
+    my $p = $c->stash->{params} = $c->tx->req->params->clone;
+    $p->append(%{$m->captures});
 
     # Walk the stack
-    my $e = $self->_walk_stack($c);
-    return $e if $e;
+    return 1 if $self->_walk_stack($c);
 
     # Render
     return $self->auto_render($c);
@@ -142,7 +144,7 @@ sub _dispatch_callback {
 
     # Dispatch
     my $continue;
-    my $cb = $c->match->captures->{callback};
+    my $cb = $c->match->captures->{cb};
     eval { $continue = $cb->($c) };
 
     # Success!
@@ -299,12 +301,15 @@ sub _walk_stack {
 
         # Dispatch
         my $e =
-            $field->{callback} ? $self->_dispatch_callback($c)
-          : $field->{app}      ? $self->_dispatch_app($c)
-          :                      $self->_dispatch_controller($c);
+            $field->{cb}  ? $self->_dispatch_callback($c)
+          : $field->{app} ? $self->_dispatch_app($c)
+          :                 $self->_dispatch_controller($c);
 
         # Exception
-        return $e if ref $e;
+        if (ref $e) {
+            $c->render_exception($e);
+            return 1;
+        }
 
         # Break the chain
         return unless $e;
@@ -335,7 +340,7 @@ MojoX::Dispatcher::Routes - Routes Dispatcher
 
 L<MojoX::Dispatcher::Routes> is a L<MojoX::Routes> based dispatcher.
 
-=head2 ATTRIBUTES
+=head1 ATTRIBUTES
 
 L<MojoX::Dispatcher::Routes> inherits all attributes from L<MojoX::Routes>
 and implements the following ones.

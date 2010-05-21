@@ -91,7 +91,8 @@ sub is_secure {
 
     # Secure
     my $url = $self->url;
-    return 1 if $url->base->scheme eq 'https' || $url->scheme eq 'https';
+    my $scheme = $url->scheme || $url->base->scheme || '';
+    return 1 if $scheme eq 'https';
 
     # Not secure
     return;

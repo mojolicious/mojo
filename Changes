@@ -1,16 +1,21 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-0.999925 2010-03-21 00:00:00
+0.999925 2010-04-30 00:00:00
         - Switched to app->start instead of shagadelic as default way to
           start Mojolicious::Lite apps in the documentation.
         - Made tutorial examples more business friendly.
         - Added the ability to use Mojolicious::Lite apps as Mojolicious
           controllers.
-        - Added success method to Mojo::Transaction.
-        - Added json method to Mojo::Message.
+        - Added EXPERIMENTAL success method to Mojo::Transaction.
+        - Added EXPERIMENTAL json method to Mojo::Message.
+        - Added proxy support to Mojo::Client.
+        - Added the ability to have dispatch plugins.
+        - Added "under" to Mojolicious::Lite.
         - Improved exception handling.
         - Improved documentation.
         - Improved IIS compatibility of the CGI implementation.
+        - Improved routes by making the leading slash optional.
+        - Fixed connection keep alive with epoll.
         - Fixed argument handling of Mojo::Template blocks. (afresh1)
         - Fixed a stash localization bug. (und3f)
         - Fixed Mojo::Log to use flock to sync log file writing.
@@ -23,6 +28,12 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed a bug in Mojo::JSON that prevented BOM characters in strings.
           (chansen)
         - Fixed Mojo::JSON to not unescape broken surrogates. (chansen)
+        - Fixed UTF-8 bug in Mojolicious::Plugin::JsonConfig. (vti)
+        - Fixed multiple path encoding bugs.
+        - Fixed a loader bug.
+        - Fixed reloading of inflated Mojolicious::Lite templates.
+        - Fixed the client transaction builder. (Curt Tilmes)
+        - Fixed typos. (jawnsy)
 
 0.999924 2010-03-08 00:00:00
         - Added default TLS cert and key to Mojo::IOLoop to make HTTPS

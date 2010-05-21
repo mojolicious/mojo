@@ -10,7 +10,7 @@ use base 'Mojo::Stateful';
 use Carp 'croak';
 
 __PACKAGE__->attr([qw/connection kept_alive/]);
-__PACKAGE__->attr([qw/local_address local_port remote_port/]);
+__PACKAGE__->attr([qw/local_address local_port previous remote_port/]);
 __PACKAGE__->attr(keep_alive => 0);
 
 # Please don't eat me! I have a wife and kids. Eat them!
@@ -156,6 +156,13 @@ Local interface address.
 
 Local interface port.
 
+=head2 C<previous>
+
+    my $previous = $tx->previous;
+    $tx          = $tx->previous(Mojo::Transaction->new);
+
+Previous transaction that triggered this followup transaction.
+
 =head2 C<remote_address>
 
     my $remote_address = $tx->remote_address;
@@ -247,6 +254,7 @@ Write server data.
 
 Returns the L<Mojo::Message::Response> object (C<res>) if transaction was
 successful and had no connection/parser errors or C<undef> otherwise.
+Note that this method is EXPERIMENTAL and might change without warning!
 
     if (my $res = $tx->success) {
         print $res->body;

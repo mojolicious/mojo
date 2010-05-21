@@ -38,6 +38,10 @@ sub register {
             # Stash defaults
             $c->stash->{layout} ||= undef;
 
+            # Reload
+            delete $r->{_epl_cache} if $ENV{MOJO_RELOAD};
+            local $ENV{MOJO_RELOAD} = 0 if $ENV{MOJO_RELOAD};
+
             # Cache
             $r->{_epl_cache} ||= {};
             unless ($r->{_epl_cache}->{$cache}) {

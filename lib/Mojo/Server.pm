@@ -33,12 +33,13 @@ __PACKAGE__->attr(
             my $self = shift;
 
             # Reload
-            if ($self->reload) {
+            if (my $reload = $self->reload) {
+                local $ENV{MOJO_RELOAD} = $reload;
                 if (my $e = Mojo::Loader->reload) { warn $e }
                 delete $self->{app};
 
                 # Reset if this reload was triggered by a USR1 signal
-                $self->reload(0) if $self->reload == 2;
+                $self->reload(0) if $reload == 2;
             }
 
             return $self->app->build_tx_cb->($self->app);

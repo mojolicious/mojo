@@ -26,3 +26,15 @@ EOF
 
 # Start the command system
 Mojo::Commands->start;
+
+__END__
+
+=head1 NAME
+
+mojo - The Mojo Command System
+
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+
+=cut

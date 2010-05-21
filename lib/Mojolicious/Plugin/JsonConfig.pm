@@ -103,6 +103,7 @@ sub _read_config {
     my $mt = Mojo::Template->new($template);
     $mt->prepend($prepend);
     $encoded = $mt->render($encoded, $app);
+    utf8::encode $encoded;
 
     # Parse
     my $json   = Mojo::JSON->new;

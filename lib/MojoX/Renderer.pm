@@ -376,7 +376,7 @@ MojoX::Renderer - MIME Type Based Renderer
 L<MojoX::Renderer> is the standard L<Mojolicious> renderer.
 It turns your stashed data structures into content.
 
-=head2 ATTRIBUTES
+=head1 ATTRIBUTES
 
 L<MojoX::Types> implements the following attributes.
 

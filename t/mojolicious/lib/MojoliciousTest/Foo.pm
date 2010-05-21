@@ -69,6 +69,8 @@ sub url_for_missing {
 
 sub willdie { die 'for some reason' }
 
+sub withblock { shift->render(template => 'withblock') }
+
 sub withlayout { shift->stash(template => 'withlayout') }
 
 1;

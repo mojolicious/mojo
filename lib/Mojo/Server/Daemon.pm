@@ -318,8 +318,8 @@ sub _listen {
     # Weaken
     weaken $self;
 
-    # Accept callback
-    $options->{cb} = sub {
+    # Callbacks
+    $options->{accept_cb} = sub {
         my ($loop, $id) = @_;
 
         # Add new connection
@@ -327,13 +327,11 @@ sub _listen {
 
         # Keep alive timeout
         $loop->connection_timeout($id => $self->keep_alive_timeout);
-
-        # Callbacks
-        $loop->error_cb($id => sub { $self->_error(@_) });
-        $loop->hup_cb($id => sub { $self->_hup(@_) });
-        $loop->read_cb($id => sub { $self->_read(@_) });
-        $loop->write_cb($id => sub { $self->_write(@_) });
     };
+    $options->{error_cb} = sub { $self->_error(@_) };
+    $options->{hup_cb}   = sub { $self->_hup(@_) };
+    $options->{read_cb}  = sub { $self->_read(@_) };
+    $options->{write_cb} = sub { $self->_write(@_) };
 
     # Listen
     my $id = $self->ioloop->listen($options);

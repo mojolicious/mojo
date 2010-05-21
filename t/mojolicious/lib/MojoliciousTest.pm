@@ -66,6 +66,9 @@ sub startup {
         method    => 'test'
     );
 
+    # /withblock - template with blocks
+    $r->route('/withblock')->to('foo#withblock');
+
     # /staged - authentication with bridges
     my $b =
       $r->bridge('/staged')->to(controller => 'foo', action => 'stage1');

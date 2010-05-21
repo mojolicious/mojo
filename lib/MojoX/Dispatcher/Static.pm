@@ -21,6 +21,9 @@ __PACKAGE__->attr(types => sub { MojoX::Types->new });
 sub dispatch {
     my ($self, $c) = @_;
 
+    # Already rendered
+    return if $c->res->code;
+
     # Canonical path
     my $path = $c->req->url->path->clone->canonicalize->to_string;
 
@@ -250,7 +253,7 @@ MojoX::Dispatcher::Static - Serve Static Files
 L<MojoX::Dispatcher::Static> is a dispatcher for static files with C<RANGE>
 and C<IF-MODIFIED-SINCE> support.
 
-=head2 ATTRIBUTES
+=head1 ATTRIBUTES
 
 L<MojoX::Dispatcher::Static> implements the following attributes.
 

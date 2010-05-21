@@ -25,6 +25,7 @@ __PACKAGE__->attr(
             mp3  => 'audio/mpeg',
             png  => 'image/png',
             rss  => 'application/rss+xml',
+            svg  => 'image/svg+xml',
             tar  => 'application/x-tar',
             txt  => 'text/plain',
             xml  => 'text/xml',
@@ -70,7 +71,7 @@ MojoX::Types - MIME Types
 
 L<MojoX::Types> is a container for MIME types.
 
-=head2 ATTRIBUTES
+=head1 ATTRIBUTES
 
 L<MojoX::Types> implements the following attributes.
 

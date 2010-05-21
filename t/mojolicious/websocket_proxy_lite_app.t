@@ -5,22 +5,58 @@
 use strict;
 use warnings;
 
-# Use bundled libraries
-use FindBin;
-use lib "$FindBin::Bin/../lib";
-
-# Cheating in a fake fight. That's low.
 use Mojo::IOLoop;
+use Test::More;
 
-# The loop
-my $loop = Mojo::IOLoop->new;
+# Make sure sockets are working
+plan skip_all => 'working sockets required for this test!'
+  unless my $proxy = Mojo::IOLoop->new->generate_port;
+plan tests => 5;
 
-# Connection buffer
+# Your mistletoe is no match for my *tow* missile.
+use Mojo::Client;
+use Mojo::Server::Daemon;
+use Mojolicious::Lite;
+
+# Silence
+app->log->level('fatal');
+
+# GET /
+get '/' => sub { shift->render_text('Hello World!') };
+
+# GET /proxy
+get '/proxy' => sub {
+    my $self = shift;
+    $self->render_text($self->req->url);
+};
+
+# Websocket /test
+websocket '/test' => sub {
+    my $self = shift;
+    my $flag = 0;
+    $self->finished(sub { is($flag, 24) });
+    $self->receive_message(
+        sub {
+            my ($self, $message) = @_;
+            is($message, 'test1');
+            $self->send_message('test2');
+            $flag = 24;
+        }
+    );
+};
+
+# HTTP server for testing
+my $client = Mojo::Client->new;
+my $loop   = $client->ioloop;
+my $server = Mojo::Server::Daemon->new(app => app, ioloop => $loop);
+my $port   = Mojo::IOLoop->new->generate_port;
+$server->listen("http://*:$port");
+$server->prepare_ioloop;
+
+# Connect proxy server for testing
 my $c = {};
-
-# Minimal connect proxy server to test TLS tunneling
 $loop->listen(
-    port    => 3000,
+    port    => $proxy,
     read_cb => sub {
         my ($loop, $client, $chunk) = @_;
         $c->{$client}->{client} ||= '';
@@ -73,14 +109,27 @@ $loop->listen(
           if $c->{$client}->{connection};
         delete $c->{$client};
     }
-) or die "Couldn't create listen socket!\n";
+);
 
-print <<'EOF';
-Starting connect proxy on port 3000.
-For testing use something like "HTTPS_PROXY=https://127.0.0.1:3000".
-EOF
+# GET / (normal request)
+is($client->get("http://localhost:$port/")->success->body, 'Hello World!');
 
-# Start loop
-$loop->start;
+# WebSocket /test (normal websocket)
+$client->websocket(
+    "ws://localhost:$port/test" => sub {
+        my $self = shift;
+        $self->receive_message(
+            sub {
+                my ($self, $message) = @_;
+                is($message, 'test2');
+                $self->finish;
+            }
+        );
+        $self->send_message('test1');
+    }
+)->process;
 
-1;
+# GET http://kraih.com/proxy (proxy request)
+$client->http_proxy("http://localhost:$port");
+is($client->get("http://kraih.com/proxy")->success->body,
+    'http://kraih.com/proxy');

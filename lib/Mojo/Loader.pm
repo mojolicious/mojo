@@ -127,6 +127,7 @@ sub search {
         }
     }
 
+    return unless @$modules;
     return $modules;
 }
 

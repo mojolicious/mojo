@@ -45,9 +45,7 @@ sub run {
       unless $url =~ /^\w+:\/\//;
 
     # Transaction
-    my $tx = Mojo::Transaction::HTTP->new;
-    $tx->req->method('GET');
-    $tx->req->url->parse($url);
+    my $tx = $client->build_tx(GET => $url);
     $tx->res->body(
         sub {
             my ($tx, $chunk) = @_;

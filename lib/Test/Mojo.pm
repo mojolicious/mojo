@@ -13,8 +13,7 @@ use Mojo::Client;
 require Test::More;
 
 __PACKAGE__->attr(app => sub { return $ENV{MOJO_APP} if ref $ENV{MOJO_APP} });
-__PACKAGE__->attr(client    => sub { Mojo::Client->singleton });
-__PACKAGE__->attr(redirects => sub { [] });
+__PACKAGE__->attr(client => sub { Mojo::Client->singleton });
 __PACKAGE__->attr('tx');
 __PACKAGE__->attr(max_redirects => 0);
 
@@ -137,8 +136,7 @@ sub post_form_ok {
     $client->max_redirects($self->max_redirects);
 
     # Request
-    $client->post_form(@_,
-        sub { $self->tx($_[1]) and $self->redirects($_[2]) })->process;
+    $client->post_form(@_, sub { $self->tx($_[1]) })->process;
 
     # Test
     local $Test::Builder::Level = $Test::Builder::Level + 1;
@@ -207,8 +205,8 @@ sub _request_ok {
     $client->max_redirects($self->max_redirects);
 
     # Request
-    $client->$method($url, %$headers, $body,
-        sub { $self->tx($_[1]) and $self->redirects($_[2]) })->process;
+    $client->$method($url, %$headers, $body, sub { $self->tx($_[1]) })
+      ->process;
 
     # Test
     local $Test::Builder::Level = $Test::Builder::Level + 2;
@@ -264,13 +262,6 @@ Application to be tested.
     $t         = $t->client(Mojo::Client->new);
 
 Client used for testing.
-
-=head2 C<redirects>
-
-    my $redirects = $t->redirects;
-    $t            = $t->redirects([]);
-
-History of redirected requests.
 
 =head2 C<tx>
 

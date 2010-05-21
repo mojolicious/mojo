@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 use_ok('Mojo::IOLoop');
 
@@ -36,8 +36,15 @@ $loop->timer(
 # Start
 $loop->start;
 
+# Idle callback
+my $idle = 0;
+$loop->idle_cb(sub { $idle++ });
+
 # Another tick
 $loop->one_tick;
 
 # Ticks
 ok($ticks > 2, 'more than two ticks');
+
+# Idle callback
+is($idle, 1, 'idle_cb was called');

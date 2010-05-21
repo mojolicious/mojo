@@ -24,6 +24,9 @@ sub register {
             return unless my $path = $r->template_path($options);
             my $cache = delete $options->{cache} || $path;
 
+            # Reload
+            delete $r->{_epl_cache} if $ENV{MOJO_RELOAD};
+
             # Check cache
             $r->{_epl_cache} ||= {};
             my $mt = $r->{_epl_cache}->{$cache};

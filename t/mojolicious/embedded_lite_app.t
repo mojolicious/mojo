@@ -11,7 +11,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 9;
+plan tests => 12;
 
 # I heard you went off and became a rich doctor.
 # I've performed a few mercy killings.
@@ -47,6 +47,20 @@ get '/bye' => sub {
     $self->render_text("Bye from the $name app!");
 };
 
+package MyTestApp::Test2;
+
+use Mojolicious::Lite;
+
+# Silence
+app->log->level('error');
+
+# GET / (embedded)
+get '/' => sub {
+    my $self = shift;
+    my $name = $self->stash('name');
+    $self->render_text("Bye from the $name app!");
+};
+
 package main;
 
 use Mojolicious::Lite;
@@ -60,6 +74,10 @@ get '/hello' => sub { shift->render_text('Hello from the main app!') };
 
 # /bye/* (dispatch to embedded app)
 get '/bye/(*path)' => {app => 'MyTestApp::Test1', name => 'second embedded'};
+
+# /third/* (dispatch to embedded app)
+get '/third/(*path)' =>
+  {app => 'MyTestApp::Test2', name => 'third embedded', path => '/'};
 
 # /hello/* (dispatch to embedded app)
 app->routes->route('/hello/(*path)')
@@ -77,3 +95,7 @@ $t->get_ok('/hello/hello')->status_is(200)
 # GET /bye/bye (from embedded app)
 $t->get_ok('/bye/bye')->status_is(200)
   ->content_is('Bye from the second embedded app!');
+
+# GET /third/ (from embedded app)
+$t->get_ok('/third')->status_is(200)
+  ->content_is('Bye from the third embedded app!');

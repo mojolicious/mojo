@@ -1250,6 +1250,7 @@ dropped, defaults to C<5>.
     $loop  = $loop->idle_cb(sub {...});
 
 Callback to be invoked on every reactor tick if no events occurred.
+Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<lock_cb>
 

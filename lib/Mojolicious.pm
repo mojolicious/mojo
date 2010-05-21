@@ -357,6 +357,14 @@ L<Mojolicious::Lite>.
 L<Mojolicious> inherits all attributes from L<Mojo> and implements the
 following new ones.
 
+=head2 C<controller_class>
+
+    my $class = $mojo->controller_class;
+    $mojo     = $mojo->controller_class;
+
+Class to be used for the default controller, defaults to
+L<Mojolicious::Controller>.
+
 =head2 C<mode>
 
     my $mode = $mojo->mode;

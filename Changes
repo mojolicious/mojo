@@ -7,7 +7,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added the ability to use Mojolicious::Lite apps as Mojolicious
           controllers.
         - Added EXPERIMENTAL success method to Mojo::Transaction.
-        - Added EXPERIMENTAL json method to Mojo::Message.
+        - Added EXPERIMENTAL json method and json_class attribute to
+          Mojo::Message.
         - Added EXPERIMENTAL idle_cb attribute to Mojo::IOLoop.
         - Added proxy support to Mojo::Client.
         - Added the ability to have dispatch plugins.

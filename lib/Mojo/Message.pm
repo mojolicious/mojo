@@ -12,7 +12,7 @@ use Carp 'croak';
 use Mojo::Asset::Memory;
 use Mojo::ByteStream 'b';
 use Mojo::Content::Single;
-use Mojo::JSON;
+use Mojo::Loader;
 use Mojo::Parameters;
 use Mojo::Upload;
 
@@ -22,6 +22,7 @@ __PACKAGE__->attr(buffer  => sub { Mojo::ByteStream->new });
 __PACKAGE__->attr(content => sub { Mojo::Content::Single->new });
 __PACKAGE__->attr(default_charset => 'UTF-8');
 __PACKAGE__->attr([qw/finish_cb progress_cb/]);
+__PACKAGE__->attr(json_class                        => 'Mojo::JSON');
 __PACKAGE__->attr([qw/major_version minor_version/] => 1);
 
 # I'll keep it short and sweet. Family. Religion. Friendship.
@@ -313,8 +314,16 @@ sub json {
     # Multipart
     return if $self->is_multipart;
 
+    # Load JSON class
+    my $class = $self->json_class;
+    if (my $e = Mojo::Loader->load($class)) {
+        croak ref $e
+          ? qq/Can't load JSON class "$class": $e/
+          : qq/JSON class "$class" doesn't exist./;
+    }
+
     # Decode
-    return Mojo::JSON->new->decode($self->body);
+    return $class->new->decode($self->body);
 }
 
 sub leftovers { shift->content->leftovers }
@@ -628,6 +637,15 @@ Default charset used for form data parsing.
     });
 
 Callback called after message building or parsing is finished.
+
+=head2 C<json_class>
+
+    my $class = $message->json_class;
+    $message  = $message->json_class('Mojo::JSON');
+
+Class to be used for JSON deserialization with C<json>, defaults to
+L<Mojo::JSON>.
+Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<major_version>
 

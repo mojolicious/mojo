@@ -96,8 +96,8 @@ Have Some Cake
     |  CGI  | |  FastCGI  | |  PSGI  | |  HTTP 1.1  | |  WebSocket  |
     '-------' '-----------' '--------' '------------' '-------------'
 
-To install this module type the following
------------------------------------------
+Installation
+------------
 
     perl Makefile.PL
     make

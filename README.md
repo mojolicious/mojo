@@ -14,7 +14,7 @@ Features
   through Mojolicious::Lite.
 
 * Very clean, portable and Object Oriented pure Perl API without any hidden
-  magic and no requirements besides Perl 5.8.1.
+  magic and no requirements besides Perl 5.8.7.
 
 * Full stack HTTP 1.1 and WebSocket client/server implementation with IPv6,
   TLS, IDNA, pipelining, chunking and multipart support.

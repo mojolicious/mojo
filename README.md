@@ -1,8 +1,5 @@
-Mojolicious README
-==================
-
-Back in the early days of the web there was this wonderful Perl library called
-CGI, many people only learned Perl because of it.
+Back in the early days of the web there was this wonderful Perl library
+called CGI, many people only learned Perl because of it.
 It was simple enough to get started without knowing much about the language
 and powerful enough to keep you going, learning by doing was much fun.
 While most of the techniques used are outdated now, the idea behind it is
@@ -16,11 +13,11 @@ Features
 * An amazing MVC web framework supporting a simplified single file mode
   through Mojolicious::Lite.
 
-* Very clean, portable and Object Oriented pure Perl API without any
-  hidden magic and no requirements besides Perl 5.8.1.
+* Very clean, portable and Object Oriented pure Perl API without any hidden
+  magic and no requirements besides Perl 5.8.1.
 
-* Full stack HTTP 1.1 and WebSocket client/server implementation with
-  IPv6, TLS, IDNA, pipelining, chunking and multipart support.
+* Full stack HTTP 1.1 and WebSocket client/server implementation with IPv6,
+  TLS, IDNA, pipelining, chunking and multipart support.
 
 * Builtin async IO and prefork web server supporting epoll, kqueue, hot
   deployment and UNIX domain socket sharing, perfect for embedding.
@@ -30,15 +27,13 @@ Features
 * Fresh code, based upon years of experience developing Catalyst.
 
 * Powerful out of the box with RESTful routes, plugins, sessions, signed
-  cookies, static file server, testing framework, Perl-ish templates,
-  JSON, I18N, first class Unicode support and much more for you to
-  discover!
+  cookies, static file server, testing framework, Perl-ish templates, JSON,
+  I18N, first class Unicode support and much more for you to discover!
 
 Duct Tape For The HTML5 Web
 ---------------------------
 
-Web development for humans, making hard things possible and everything
-fun.
+Web development for humans, making hard things possible and everything fun.
 
     use Mojolicious::Lite;
 

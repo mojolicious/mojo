@@ -17,6 +17,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved documentation.
         - Improved IIS compatibility of the CGI implementation.
         - Improved routes by making the leading slash optional.
+        - Converted README to markdown. (memowe)
         - Fixed connection keep alive with epoll.
         - Fixed argument handling of Mojo::Template blocks. (afresh1)
         - Fixed a stash localization bug. (und3f)

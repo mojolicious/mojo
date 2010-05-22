@@ -120,7 +120,7 @@ Mojolicious::Plugin::TagHelpers - Tag Helpers Plugin
 
 =head1 DESCRIPTION
 
-L<Mojolicous::Plugin::TagHelpers> is a collection of C<HTML5> tag helpers for
+L<Mojolicous::Plugin::TagHelpers> is a collection of HTML5 tag helpers for
 L<Mojolicious>.
 Note that this module is EXPERIMENTAL and might change without warning!
 
@@ -173,7 +173,7 @@ Generate link to route, path or URL.
 =item script
 
     <%= script '/script.js %>
-    <%{= script %>
+    <%{= script => %>
         var a = 'b';
     <%}%>
 
@@ -183,9 +183,9 @@ Generate script tag.
 
     <%= tag 'div' %>
     <%= tag 'div', id => 'foo' %>
-    <%{= tag 'div' %>Content<%}%>
+    <%{= tag div => %>Content<%}%>
 
-Generate C<HTML5> tag.
+HTML5 tag generator.
 
 =back
 

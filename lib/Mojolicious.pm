@@ -359,7 +359,7 @@ following new ones.
 =head2 C<controller_class>
 
     my $class = $mojo->controller_class;
-    $mojo     = $mojo->controller_class;
+    $mojo     = $mojo->controller_class('Mojolicious::Controller');
 
 Class to be used for the default controller, defaults to
 L<Mojolicious::Controller>.

@@ -74,8 +74,8 @@ Web development for humans, making hard things possible and everything fun.
 For more user friendly documentation see "perldoc Mojolicious::Guides"
 and "perldoc Mojolicious::Lite".
 
-The Cake
---------
+Have Some Cake
+--------------
 
     .---------------------------------------------------------------.
     |                             Fun!                              |

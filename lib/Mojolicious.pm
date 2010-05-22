@@ -331,7 +331,7 @@ Web development for humans, making hard things possible and everything fun.
 For more user friendly documentation see L<Mojolicious::Guides> and
 L<Mojolicious::Lite>.
 
-=head2 The Cake
+=head2 Have Some Cake
 
     .---------------------------------------------------------------.
     |                             Fun!                              |

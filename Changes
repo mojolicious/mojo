@@ -8,6 +8,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Made tutorial examples more business friendly.
         - Added the ability to use Mojolicious::Lite apps as Mojolicious
           controllers.
+        - Added EXPERIMENTAL tag_helper plugin to Mojolicious. (vti)
         - Added EXPERIMENTAL success method to Mojo::Transaction.
         - Added EXPERIMENTAL json method and json_class attribute to
           Mojo::Message.

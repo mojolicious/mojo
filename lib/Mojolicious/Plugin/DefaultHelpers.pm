@@ -126,7 +126,7 @@ L<Mojolicious::Plugin> and implements the following new ones.
 =head2 C<register>
 
     $plugin->register;
-    
+
 Register helpers in L<Mojolicious> application.
 
 =head1 SEE ALSO

@@ -81,27 +81,13 @@ sub receive_message {
 }
 
 sub redirect_to {
-    my $self   = shift;
-    my $target = shift;
-
-    # Prepare location
-    my $base     = $self->req->url->base->clone;
-    my $location = Mojo::URL->new->base($base);
-
-    # Path
-    if ($target =~ /^\//) { $location->path($target) }
-
-    # URL
-    elsif ($target =~ /^\w+\:\/\//) { $location = $target }
-
-    # Named
-    else { $location = $self->url_for($target, @_) }
+    my $self = shift;
 
     # Code
     $self->res->code(302);
 
     # Location header
-    $self->res->headers->location($location);
+    $self->res->headers->location($self->url_for(@_));
 
     return $self;
 }
@@ -297,13 +283,23 @@ sub send_message {
 
 sub url_for {
     my $self = shift;
+    my $target = shift || '';
 
     # Make sure we have a match for named routes
     $self->match(MojoX::Routes::Match->new->root($self->app->routes))
       unless $self->match;
 
+    # Path
+    if ($target =~ /^\//) {
+        my $url = Mojo::URL->new->base($self->req->url->base->clone);
+        return $url->path($target);
+    }
+
+    # URL
+    elsif ($target =~ /^\w+\:\/\//) { return Mojo::URL->new($target) }
+
     # Use match or root
-    my $url = $self->match->url_for(@_);
+    my $url = $self->match->url_for($target, @_);
 
     # Base
     $url->base($self->tx->req->url->base->clone);

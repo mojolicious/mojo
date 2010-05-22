@@ -85,6 +85,7 @@ sub new {
     # Plugins
     $self->plugin('agent_condition');
     $self->plugin('default_helpers');
+    $self->plugin('tag_helpers');
     $self->plugin('epl_renderer');
     $self->plugin('ep_renderer');
     $self->plugin('request_timer');

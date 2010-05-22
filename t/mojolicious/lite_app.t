@@ -13,7 +13,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 386;
+plan tests => 389;
 
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
@@ -53,6 +53,9 @@ get ':number' => [number => qr/0/] => sub {
     my $self = shift;
     $self->render_text($self->tx->remote_address . $self->param('number'));
 };
+
+# GET /tags
+get 'tags' => 'tags';
 
 # POST /upload
 post '/upload' => sub {
@@ -411,6 +414,33 @@ $ENV{MOJO_REVERSE_PROXY} = 1;
 $t->get_ok('/0', {'X-Forwarded-For' => '192.168.2.2, 192.168.2.1'})
   ->status_is(200)->content_is('192.168.2.10');
 $ENV{MOJO_REVERSE_PROXY} = $backup;
+
+# GET /tags
+$t->get_ok('/tags?a=b')->status_is(200)->content_is(<<EOF);
+<foo />
+<foo bar="baz" />
+<foo one="two" three="four">Hello</foo>
+<a href="/path" />
+<a href="http://example.com/" title="Foo" />
+<a href="http://example.com/">Example</a>
+<a href="/template" />
+<form action="/template" method="post"><input name="foo" /></form>
+<form action="/">
+    <label for="foo">Name</label>
+    <input name="foo" />
+</form>
+<input name="a" value="b" />
+<input name="a" value="b" />
+<script src="/script.js" type="text/javascript" />
+<script type="text/javascript">
+    var a = 'b';
+</script>
+<script type="foo">
+    var a = 'b';
+</script>
+<img src="/foo.jpg" />
+<img alt="image" src="/foo.jpg" />
+EOF
 
 # POST /upload (huge upload without appropriate max message size)
 $backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
@@ -899,6 +929,31 @@ $t->get_ok('/bridge2stash')->status_is(200)
   ->content_is("stash too!cookie!signed_cookie!!bad_cookie--12345678!!!!\n");
 
 __DATA__
+@@ tags.html.ep
+<%= tag 'foo' %>
+<%= tag 'foo', bar => 'baz' %>
+<%{= tag 'foo', one => 'two', three => 'four' => %>Hello<%}%>
+<%= link_to '/path' %>
+<%= link_to 'http://example.com/', title => 'Foo' %>
+<%{= link_to 'http://example.com/' => %>Example<%}%>
+<%= link_to 'index' %>
+<%{= form_for 'index', method => 'post' => %><%= input 'foo' %><%}%>
+<%{= form_for '/' => %>
+    <%{= label 'foo' => %>Name<%}%>
+    <%= input 'foo' %>
+<%}%>
+<%= input 'a' %>
+<%= input 'a', value => 'c' %>
+<%= script '/script.js' %>
+<%{= script %>
+    var a = 'b';
+<%}%>
+<%{= script type => 'foo' => %>
+    var a = 'b';
+<%}%>
+<%= img '/foo.jpg' %>
+<%= img '/foo.jpg', alt => 'image' %>
+
 @@ template.txt.epl
 Redirect works!
 

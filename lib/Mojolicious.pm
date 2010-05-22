@@ -311,8 +311,7 @@ Web development for humans, making hard things possible and everything fun.
     get '/fetch' => sub {
         my $self = shift;
         $self->render(
-            data => $self->client->get('http://kraih.com')->res->body
-        );
+            data => $self->client->get('http://kraih.com')->success->body);
     };
 
     post '/:offset' => sub {

@@ -55,7 +55,7 @@ get ':number' => [number => qr/0/] => sub {
 };
 
 # GET /tags
-get 'tags' => 'tags';
+get 'tags/:test' => 'tags';
 
 # POST /upload
 post '/upload' => sub {
@@ -416,7 +416,7 @@ $t->get_ok('/0', {'X-Forwarded-For' => '192.168.2.2, 192.168.2.1'})
 $ENV{MOJO_REVERSE_PROXY} = $backup;
 
 # GET /tags
-$t->get_ok('/tags?a=b')->status_is(200)->content_is(<<EOF);
+$t->get_ok('/tags/lala?a=b')->status_is(200)->content_is(<<EOF);
 <foo />
 <foo bar="baz" />
 <foo one="two" three="four">Hello</foo>
@@ -424,7 +424,11 @@ $t->get_ok('/tags?a=b')->status_is(200)->content_is(<<EOF);
 <a href="http://example.com/" title="Foo" />
 <a href="http://example.com/">Example</a>
 <a href="/template" />
+<a href="/tags/23" title="Foo" />
 <form action="/template" method="post"><input name="foo" /></form>
+<form action="/tags/24" method="post">
+    <input name="foo" />
+</form>
 <form action="/">
     <label for="foo">Name</label>
     <input name="foo" />
@@ -937,7 +941,11 @@ __DATA__
 <%= link_to 'http://example.com/', title => 'Foo' %>
 <%{= link_to 'http://example.com/' => %>Example<%}%>
 <%= link_to 'index' %>
+<%= link_to 'tags', {test => 23}, title => 'Foo' %>
 <%{= form_for 'index', method => 'post' => %><%= input 'foo' %><%}%>
+<%{= form_for 'tags', {test => 24}, method => 'post' => %>
+    <%= input 'foo' %>
+<%}%>
 <%{= form_for '/' => %>
     <%{= label 'foo' => %>Name<%}%>
     <%= input 'foo' %>

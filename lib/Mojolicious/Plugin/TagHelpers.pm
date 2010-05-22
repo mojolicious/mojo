@@ -15,8 +15,17 @@ sub register {
     my ($self, $app) = @_;
 
     # Add "form_for" helper
-    $app->renderer->add_helper(form_for =>
-          sub { $self->_tag('form', action => shift->url_for(shift), @_) });
+    $app->renderer->add_helper(
+        form_for => sub {
+            my $c    = shift;
+            my $name = shift;
+
+            # Captures
+            my $captures = ref $_[0] eq 'HASH' ? shift : {};
+
+            $self->_tag('form', action => $c->url_for($name, $captures), @_);
+        }
+    );
 
     # Add "img" helper
     $app->renderer->add_helper(
@@ -44,7 +53,15 @@ sub register {
 
     # Add "link_to" helper
     $app->renderer->add_helper(
-        link_to => sub { $self->_tag('a', href => shift->url_for(shift), @_) }
+        link_to => sub {
+            my $c    = shift;
+            my $name = shift;
+
+            # Captures
+            my $captures = ref $_[0] eq 'HASH' ? shift : {};
+
+            $self->_tag('a', href => $c->url_for($name, $captures), @_);
+        }
     );
 
     # Add "script" helper
@@ -133,6 +150,9 @@ Note that this module is EXPERIMENTAL and might change without warning!
     <%{= form_for 'login', method => 'post' => %>
         <%= input 'first_name' %>
     <%}%>
+    <%{= form_for login => {foo => 'bar'}, (method => 'post') => %>
+        <%= input 'first_name' %>
+    <%}%>
     <%{= form_for '/login', method => 'post' => %>
         <%= input 'first_name' %>
     <%}%>
@@ -165,6 +185,7 @@ Generate form label.
 =item link_to
 
     <%{= link_to index => %>Home<%}%>
+    <%{= link_to index => {foo => 'bar'}, (class => 'links') => %>Home<%}%>
     <%{= link_to '/path/to/file' => %>File<%}%>
     <%{= link_to 'http://mojolicious.org' => %>Mojolicious<%}%>
 

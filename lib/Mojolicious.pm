@@ -548,6 +548,10 @@ startup.
 
 Sebastian Riedel, C<sri@cpan.org>.
 
+=head1 CORE DEVELOPERS
+
+Viacheslav Tykhanovskyi, C<vti@cpan.org>.
+
 =head1 CREDITS
 
 In alphabetical order:
@@ -653,8 +657,6 @@ Stanis Trendelenburg
 Tatsuhiko Miyagawa
 
 Uwe Voelker
-
-Viacheslav Tykhanovskyi
 
 Yaroslav Korshak
 

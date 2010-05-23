@@ -123,6 +123,8 @@ L<Mojolicous::Plugin::PodRenderer> is a renderer for true Perl hackers, rawr!
 
 Render POD to HTML.
 
+=back
+
 =head1 METHODS
 
 L<Mojolicious::Plugin::PodRenderer> inherits all methods from

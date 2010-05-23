@@ -936,27 +936,27 @@ __DATA__
 @@ tags.html.ep
 <%= tag 'foo' %>
 <%= tag 'foo', bar => 'baz' %>
-<%{= tag 'foo', one => 'two', three => 'four' => %>Hello<%}%>
+<%= tag 'foo', one => 'two', three => 'four' => {%>Hello<%}%>
 <%= link_to '/path' %>
 <%= link_to 'http://example.com/', title => 'Foo' %>
-<%{= link_to 'http://example.com/' => %>Example<%}%>
+<%= link_to 'http://example.com/' => {%>Example<%}%>
 <%= link_to 'index' %>
 <%= link_to 'tags', {test => 23}, title => 'Foo' %>
-<%{= form_for 'index', method => 'post' => %><%= input 'foo' %><%}%>
-<%{= form_for 'tags', {test => 24}, method => 'post' => %>
+<%= form_for 'index', method => 'post' => {%><%= input 'foo' %><%}%>
+<%= form_for 'tags', {test => 24}, method => 'post' => {%>
     <%= input 'foo' %>
 <%}%>
-<%{= form_for '/' => %>
-    <%{= label 'foo' => %>Name<%}%>
+<%= form_for '/' => {%>
+    <%= label 'foo' => {%>Name<%}%>
     <%= input 'foo' %>
 <%}%>
 <%= input 'a' %>
 <%= input 'a', value => 'c' %>
 <%= script '/script.js' %>
-<%{= script %>
+<%= script {%>
     var a = 'b';
 <%}%>
-<%{= script type => 'foo' => %>
+<%= script type => 'foo' => {%>
     var a = 'b';
 <%}%>
 <%= img '/foo.jpg' %>

@@ -286,8 +286,8 @@ other.
 
     @@ first.html.ep
     <!doctype html><html>
-        <head><%{= content header => %><title>Hi!</title><%}%></head>
-        <body><%{= content body => %>First page!<%}%></body>
+        <head><%= content header => {%><title>Hi!</title><%}%></head>
+        <body><%= content body => {%>First page!<%}%></body>
     </html>
 
     @@ second.html.ep

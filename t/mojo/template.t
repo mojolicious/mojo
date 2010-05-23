@@ -25,7 +25,7 @@ package main;
 use strict;
 use warnings;
 
-use Test::More tests => 89;
+use Test::More tests => 94;
 
 use File::Spec;
 use File::Temp;
@@ -117,6 +117,13 @@ $output = $mt->render(<<'EOF');
 EOF
 is($output, "&lt;html&gt;\n");
 
+# Capture tags (alternative)
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+<% my $result = escape block {%><html><%}%><%= $result %>
+EOF
+is($output, "&lt;html&gt;\n");
+
 # Capture tags with appended code
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
@@ -124,10 +131,24 @@ $output = $mt->render(<<'EOF');
 EOF
 is($output, "&lt;html&gt;\n");
 
+# Capture tags with appended code (alternative)
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+<% my $result = escape( block {%><html><%} ); %><%= $result %>
+EOF
+is($output, "&lt;html&gt;\n");
+
 # Nested capture tags
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 <%{ my $result = block %><%{= escape block %><html><%}%><%}%><%= $result %>
+EOF
+is($output, "&lt;html&gt;\n");
+
+# Nested capture tags (alternative)
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+<% my $result = block {%><%= escape block {%><html><%}%><%}%><%= $result %>
 EOF
 is($output, "&lt;html&gt;\n");
 
@@ -159,6 +180,43 @@ EOF
 is($output, <<EOF);
 Hello Sebastian.
 Hello Sara.
+EOF
+
+# Advanced capturing with tags (alternative)
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+<% my $block = ={%>
+    <% my $name = shift; =%>
+    Hello <%= $name %>.
+<%}=%>
+<%= $block->('Sebastian') %>
+<%= $block->('Sara') %>
+EOF
+is($output, <<EOF);
+Hello Sebastian.
+Hello Sara.
+EOF
+
+# More advanced capturing with tags (alternative)
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+<% my
+$block1 = ={%>
+    <% my $name = shift; =%>
+    Hello <%= $name %>.
+<%}=%>
+<% my
+$block2 =
+={%>
+    <% my $name = shift; =%>
+    Bye <%= $name %>.
+<%}=%>
+<%= $block1->('Sebastian') %>
+<%= $block2->('Sara') %>
+EOF
+is($output, <<EOF);
+Hello Sebastian.
+Bye Sara.
 EOF
 
 # Block loop

@@ -214,14 +214,32 @@ sub parse {
         |
         $tag_start                           # Code
         |
+        $trim$capture_start$tag_end          # Trim end (start)
+        |
         $trim$tag_end                        # Trim end
+        |
+        $capture_start$tag_end               # End (start)
         |
         $tag_end                             # End
         )
     /x;
 
+    # Capture regex
     my $token_capture_re =
       qr/^($tag_start|$tag_end)($capture_end|$capture_start)/;
+
+    # Tag end regex
+    my $end_re = qr/
+        ^(
+        $trim$capture_start$tag_end   # Trim end (start)
+        )|(
+        $capture_start$tag_end        # End (start)
+        )|(
+        $trim$tag_end                 # Trim end
+        )|
+        $tag_end                      # End
+        $
+    /x;
 
     # Tokenize
     my $state                = 'text';
@@ -303,10 +321,13 @@ sub parse {
             }
 
             # End
-            if ($state ne 'text' && $token =~ /^($trim$tag_end)|$tag_end$/) {
+            if ($state ne 'text' && $token =~ /$end_re/) {
+
+                # Capture start
+                splice @token, -2, 0, 'cpst', undef if $1 || $2;
 
                 # Trim previous text
-                if ($1) {
+                if ($1 || $3) {
                     $trimming = 1;
 
                     # Trim current line
@@ -556,7 +577,7 @@ Whitespace characters around tags can be trimmed with a special tag ending.
 
 You can capture whole template blocks for reuse later.
 
-    <%{ my $block = %>
+    <% my $block = {%>
         <% my $name = shift; =%>
         Hello <%= $name %>.
     <%}%>
@@ -669,7 +690,7 @@ Character indicating the end of a capture block, defaults to C<}>.
 
 Character indicating the start of a capture block, defaults to C<{>.
 
-    <%{ my $block = %>
+    <% my $block = {%>
         Some data!
     <%}%>
 

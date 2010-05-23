@@ -119,7 +119,7 @@ L<Mojolicous::Plugin::PodRenderer> is a renderer for true Perl hackers, rawr!
 =item pod_to_html
 
     <%= pod_to_html '=head2 lalala' %>
-    <%{= pod_to_html %>=head2 lalala<%}%>
+    <%= pod_to_html {%>=head2 lalala<%}%>
 
 Render POD to HTML.
 

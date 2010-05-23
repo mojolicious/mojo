@@ -1,4 +1,4 @@
-<%{ my $block = %>
+<% my $block = {%>
 <% my $name = shift; =%>
 Hello <%= $name %>.
 <%}%>

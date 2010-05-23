@@ -48,6 +48,9 @@ sub _pod_to_html {
     # Shortcut
     return unless defined $pod;
 
+    # Block
+    $pod = $pod->() if ref $pod eq 'CODE';
+
     # Parser
     my $parser = Pod::Simple::HTML->new;
     $parser->force_title('');
@@ -106,6 +109,19 @@ L<Mojolicous::Plugin::PodRenderer> is a renderer for true Perl hackers, rawr!
 
     # Mojolicious::Lite
     plugin pod_renderer => {preprocess => 'epl'};
+
+=head2 HELPERS
+
+=head2 HELPERS
+
+=over 4
+
+=item pod_to_html
+
+    <%= pod_to_html '=head2 lalala' %>
+    <%{= pod_to_html %>=head2 lalala<%}%>
+
+Render POD to HTML.
 
 =head1 METHODS
 

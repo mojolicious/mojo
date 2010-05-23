@@ -210,7 +210,8 @@ placeholders.
     };
 
 All routes can have a name associated with them, this allows automatic
-template detection and back referencing with C<url_for>.
+template detection and back referencing with C<url_for>, C<link_to> and
+C<form_for>.
 Names are always the last argument.
 
     # /
@@ -228,8 +229,8 @@ Names are always the last argument.
     __DATA__
 
     @@ index.html.ep
-    <a href="<%= url_for 'foo' %>">Foo</a>.
-    <a href="<%= url_for 'bar' %>">Bar</a>.
+    <%= link_to foo => {%>Foo<%}%>.
+    <%= link_to bar => {%>Bar<%}%>.
 
     @@ foo.html.ep
     <a href="<%= url_for 'index' %>">Home</a>.
@@ -263,7 +264,7 @@ Template blocks can be reused like functions in Perl scripts.
     @@ block.html.ep
     <% my $link = {%>
         <% my ($url, $name) = @_; %>
-        Try <a href="<%= $url %>"><%= $name %></a>!
+        Try <%= link_to $url => {%><%= $name %><%}%>!
     <%}%>
     <!doctype html><html>
         <head><title>Sebastians Frameworks!</title></head>
@@ -407,7 +408,7 @@ multiple features at once.
 
     get '/' => 'index';
 
-    post '/form' => sub {
+    post '/test' => sub {
         my $self = shift;
 
         my $groovy = $self->param('groovy') || 'Austin Powers';
@@ -418,7 +419,7 @@ multiple features at once.
             layout   => 'funky',
             groovy   => $groovy
         );
-    } => 'form';
+    } => 'test';
 
     app->start;
     __DATA__
@@ -426,17 +427,17 @@ multiple features at once.
     @@ index.html.ep
     % layout 'funky';
     Who is groovy?
-    <form action="<%= url_for 'form' %>" method="POST">
-        <input type="text" name="groovy" />
-        <input type="submit" value="Woosh!">
-    </form>
+    <%= form_for test => (method => 'post') => {%>
+        <%= input 'groovy', type => 'text' %>
+        <input type="submit" value="Woosh!" />
+    <%}%>
 
     @@ welcome.html.ep
     <%= $groovy %> is groovy!
     <%= include 'menu' %>
 
     @@ menu.html.ep
-    <a href="<%= url_for 'index' %>">Try again</a>
+    <%= link_to index => {%>Try again<%}%>
 
     @@ layouts/funky.html.ep
     <!doctype html><html>
@@ -482,15 +483,13 @@ Conditions such as C<agent> allow even more powerful route constructs.
     # /foo
     get '/foo' => (agent => qr/Firefox/) => sub {
         shift->render(
-            text => 'Congratulations, you are using a cool browser!'
-        );
+            text => 'Congratulations, you are using a cool browser!');
     }
 
     # /foo
     get '/foo' => (agent => qr/Internet Explorer/) => sub {
         shift->render(
-            text => 'Dude, you really need to upgrade to Firefox!'
-        );
+            text => 'Dude, you really need to upgrade to Firefox!');
     }
 
 Formats can be automatically detected by looking at file extensions.
@@ -553,16 +552,16 @@ request, this is very useful in combination with C<redirect_to>.
 
     @@ login.html.ep
     % layout 'default';
-    <form action="<%= url_for %>">
+    <%= form_for login => {%>
         <% if (param 'name') { %>
             <b>Wrong name or password, please try again.</b><br />
         <% } %>
         Name:<br />
-        <input type="text" name="name" value="<%= param 'name' %>" /><br />
+        <%= input name => (type => 'text') %><br />
         Password:<br />
-        <input type="text" name="pass" value="<%= param 'pass' %>" /><br />
-        <input type="submit" value="Login"/>
-    </form>
+        <%= input pass => (type => 'text') %><br />
+        <input type="submit" value="Login" />
+    <%}%>
 
     @@ index.html.ep
     % layout 'default';
@@ -570,7 +569,7 @@ request, this is very useful in combination with C<redirect_to>.
         <b><%= $message %></b><br />
     <% } %>
     Welcome <%= session 'name' %>!<br />
-    <a href="<%= url_for 'logout' %>">Logout</a>
+    <%= link_to logout => {%>Logout<%}%>
 
 Note that you should use a custom C<secret> to make signed cookies really secure.
 
@@ -583,8 +582,7 @@ tool.
     get '/test' => sub {
         my $self = shift;
         $self->render(
-            data => $self->client->get('http://mojolicious.org')->res->body
-        );
+            data => $self->client->get('http://mojolicious.org')->res->body);
     };
 
 WebSocket applications have never been this easy before.

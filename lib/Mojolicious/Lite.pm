@@ -261,10 +261,10 @@ Template blocks can be reused like functions in Perl scripts.
     __DATA__
 
     @@ block.html.ep
-    %{ my $link =
+    <% my $link = {%>
         <% my ($url, $name) = @_; %>
         Try <a href="<%= $url %>"><%= $name %></a>!
-    %}
+    <%}%>
     <!doctype html><html>
         <head><title>Sebastians Frameworks!</title></head>
         <body>
@@ -292,12 +292,12 @@ other.
 
     @@ second.html.ep
     % extends 'first';
-    %{ content header =>
-    <title>Howdy!</title>
-    %}
-    %{ content body =>
-    Second page!
-    %}
+    <% content header => {%>
+        <title>Howdy!</title>
+    <%}%>
+    <% content body => {%>
+        Second page!
+    <%}%>
 
 Route placeholders allow capturing parts of a request path until a C</> or
 C<.> separator occurs, results will be stored by name in the C<stash> and

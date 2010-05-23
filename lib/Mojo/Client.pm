@@ -8,6 +8,8 @@ use warnings;
 use base 'Mojo::Base';
 
 use Carp 'croak';
+use Mojo::Asset::File;
+use Mojo::Asset::Memory;
 use Mojo::ByteStream 'b';
 use Mojo::Content::MultiPart;
 use Mojo::Content::Single;

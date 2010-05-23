@@ -192,13 +192,13 @@ sub render_inner {
     $name ||= 'content';
 
     # Set
-    $stash->{content}->{$name} ||= $content if $content;
+    $stash->{content}->{$name}
+      ||= ref $content eq 'CODE' ? $content->() : $content
+      if $content;
 
     # Get
-    $content = $stash->{content}->{$name};
-    my $result = ref $content eq 'CODE' ? $content->() : $content;
-    $result ||= '';
-    return Mojo::ByteStream->new("$result");
+    $content = $stash->{content}->{$name} || '';
+    return Mojo::ByteStream->new("$content");
 }
 
 sub render_json {

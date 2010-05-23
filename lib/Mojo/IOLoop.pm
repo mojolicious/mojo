@@ -257,6 +257,9 @@ sub listen {
     # Arguments
     my $args = ref $_[0] ? $_[0] : {@_};
 
+    # TLS check
+    croak "IO::Socket::SSL required for TLS support" if $args->{tls} && !TLS;
+
     # Options (TLS handshake only works blocking)
     my %options = (
         Blocking => $args->{tls} ? 1 : 0,

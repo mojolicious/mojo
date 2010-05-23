@@ -14,7 +14,6 @@ use IO::File;
 use Mojo::Command;
 use Mojo::IOLoop;
 use Scalar::Util 'weaken';
-use Sys::Hostname 'hostname';
 
 __PACKAGE__->attr(
     [qw/group listen listen_queue_size max_requests silent user/]);
@@ -339,15 +338,10 @@ sub _listen {
     push @{$self->{_listen}}, $id;
 
     # Log
-    my $file    = $options->{file};
-    my $address = $options->{address} || hostname;
-    my $port    = $options->{port};
-    my $scheme  = $options->{tls} ? 'https' : 'http';
-    my $started = $file ? $file : "$scheme://$address:$port";
-    $self->app->log->info("Server listening ($started)");
+    $self->app->log->info("Server listening ($listen)");
 
     # Friendly message
-    print "Server available at $started.\n" unless $self->silent;
+    print "Server available at $listen.\n" unless $self->silent;
 }
 
 sub _read {

@@ -17,6 +17,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added proxy support to Mojo::Client.
         - Added the ability to have dispatch plugins.
         - Added "under" to Mojolicious::Lite.
+        - Added file upload support to Mojo::Client. (yko)
         - Improved exception handling.
         - Improved documentation.
         - Improved IIS compatibility of the CGI implementation.

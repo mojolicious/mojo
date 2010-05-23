@@ -90,6 +90,7 @@ sub build_form_tx {
     # Parameters
     my $params = Mojo::Parameters->new;
     $params->charset($encoding) if defined $encoding;
+    my $multipart;
     for my $name (sort keys %$form) {
 
         # Array
@@ -97,6 +98,36 @@ sub build_form_tx {
             for my $value (@{$form->{$name}}) {
                 $params->append($name, $value);
             }
+        }
+
+        # Hash
+        elsif (ref $form->{$name} eq 'HASH') {
+            my $hash = $form->{$name};
+
+            # Enforce "multipart/form-data"
+            $multipart = 1;
+
+            # File
+            if (my $file = $hash->{file}) {
+
+                # Upgrade
+                $file = $hash->{file} = Mojo::Asset::File->new(path => $file)
+                  unless ref $file;
+
+                # Filename
+                $hash->{filename} ||= $file->path if $file->can('path');
+            }
+
+            # Memory
+            elsif (defined(my $content = delete $hash->{content})) {
+                $hash->{file} = Mojo::Asset::Memory->new->add_chunk($content);
+            }
+
+            # Content-Type
+            $hash->{'Content-Type'} ||= 'application/octet-stream';
+
+            # Append
+            push @{$params->params}, $name, $hash;
         }
 
         # Single value
@@ -117,6 +148,7 @@ sub build_form_tx {
     $headers->from_hash(ref $_[0] eq 'HASH' ? $_[0] : {@_});
 
     # Multipart
+    $headers->content_type('multipart/form-data') if $multipart;
     my $type = $headers->content_type || '';
     if ($type eq 'multipart/form-data') {
 
@@ -130,23 +162,51 @@ sub build_form_tx {
             # Part
             my $part = Mojo::Content::Single->new;
 
+            # Headers
+            my $h = $part->headers;
+
+            # Form
+            my $f = $form->{$name};
+
+            # File
+            my $filename;
+            if (ref $f eq 'HASH') {
+
+                # Filename
+                $filename = delete $f->{filename} || $name;
+                $filename = b($filename);
+                $filename->encode($encoding) if $encoding;
+                $filename =
+                  $filename->url_escape($Mojo::URL::PARAM)->to_string;
+
+                # File
+                $part->asset(delete $f->{file});
+
+                # Headers
+                $h->from_hash($f);
+            }
+
+            # Fields
+            else {
+
+                # Values
+                my $chunk = join ',', ref $f ? @$f : ($f);
+                $chunk = b($chunk)->encode($encoding)->to_string if $encoding;
+                $part->asset->add_chunk($chunk);
+
+                # Content-Type
+                my $type = 'text/plain';
+                $type .= qq/;charset=$encoding/ if $encoding;
+                $h->content_type($type);
+            }
+
             # Content-Disposition
             my $escaped = b($name);
             $escaped->encode($encoding) if $encoding;
             $escaped = $escaped->url_escape($Mojo::URL::PARAM)->to_string;
-            my $h = $part->headers;
-            $h->content_disposition(qq/form-data; name="$escaped"/);
-
-            # Content-Type
-            my $type = 'text/plain';
-            $type .= qq/;charset=$encoding/ if $encoding;
-            $h->content_type($type);
-
-            # Values
-            my $f = $form->{$name};
-            my $chunk = join ',', ref $f ? @$f : ($f);
-            $chunk = b($chunk)->encode($encoding)->to_string if $encoding;
-            $part->asset->add_chunk($chunk);
+            my $disposition = qq/form-data; name="$escaped"/;
+            $disposition .= qq/; filename="$filename"/ if $filename;
+            $h->content_disposition($disposition);
 
             push @parts, $part;
         }
@@ -1215,6 +1275,18 @@ singleton.
         {test => 123},
         {Expect => '100-continue'}
     );
+    my $tx = $client->build_form_tx(
+        'http://kraih.com/foo',
+        {file => {file => '/foo/bar.txt'}}
+    );
+    my $tx = $client->build_form_tx(
+        'http://kraih.com/foo',
+        {file => {content => 'lalala'}}
+    );
+    my $tx = $client->build_form_tx(
+        'http://kraih.com/foo',
+        {myzip => {file => $asset, filename => 'foo.zip'}}
+    );
 
 Versatile transaction builder for forms.
 
@@ -1354,6 +1426,18 @@ Send a HTTP C<POST> request.
         {test => 123},
         {Expect => '100-continue'}
     );
+    my $tx = $client->post_form(
+        'http://kraih.com/foo',
+        {file => {file => '/foo/bar.txt'}}
+    );
+    my $tx= $client->post_form(
+        'http://kraih.com/foo',
+        {file => {content => 'lalala'}}
+    );
+    my $tx = $client->post_form(
+        'http://kraih.com/foo',
+        {myzip => {file => $asset, filename => 'foo.zip'}}
+    );
     $client = $client->post_form('/foo' => {test => 123}, sub {...});
     $client = $client->post_form(
         'http://kraih.com/foo',
@@ -1372,6 +1456,21 @@ Send a HTTP C<POST> request.
         'UTF-8',
         {test => 123},
         {Expect => '100-continue'},
+        sub {...}
+    );
+    $client = $client->post_form(
+        'http://kraih.com/foo',
+        {file => {file => '/foo/bar.txt'}},
+        sub {...}
+    );
+    $client = $client->post_form(
+        'http://kraih.com/foo',
+        {file => {content => 'lalala'}},
+        sub {...}
+    );
+    $client = $client->post_form(
+        'http://kraih.com/foo',
+        {myzip => {file => $asset, filename => 'foo.zip'}},
         sub {...}
     );
 

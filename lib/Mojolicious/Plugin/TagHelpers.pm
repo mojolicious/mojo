@@ -147,16 +147,16 @@ Note that this module is EXPERIMENTAL and might change without warning!
 
 =item form_for
 
-    <%{= form_for 'login', method => 'post' => %>
+    <%{= form_for login => (method => 'post') => %>
         <%= input 'first_name' %>
     <%}%>
-    <%{= form_for login => {foo => 'bar'}, (method => 'post') => %>
+    <%{= form_for login => {foo => 'bar'} => (method => 'post') => %>
         <%= input 'first_name' %>
     <%}%>
-    <%{= form_for '/login', method => 'post' => %>
+    <%{= form_for '/login' => (method => 'post') => %>
         <%= input 'first_name' %>
     <%}%>
-    <%{= form_for 'http://mojolicious.org/login', method => 'post' => %>
+    <%{= form_for 'http://mojolicious.org/login' => (method => 'post') => %>
         <%= input 'first_name' %>
     <%}%>
 
@@ -178,14 +178,14 @@ Generate form input element.
 
 =item label
 
-    <%{= label 'first_name' => %>First name<%}%>
+    <%{= label first_name => %>First name<%}%>
 
 Generate form label.
 
 =item link_to
 
     <%{= link_to index => %>Home<%}%>
-    <%{= link_to index => {foo => 'bar'}, (class => 'links') => %>Home<%}%>
+    <%{= link_to index => {foo => 'bar'} => (class => 'links') => %>Home<%}%>
     <%{= link_to '/path/to/file' => %>File<%}%>
     <%{= link_to 'http://mojolicious.org' => %>Mojolicious<%}%>
 
@@ -194,7 +194,7 @@ Generate link to route, path or URL.
 =item script
 
     <%= script '/script.js %>
-    <%{= script => %>
+    <%{= script %>
         var a = 'b';
     <%}%>
 

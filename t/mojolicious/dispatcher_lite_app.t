@@ -25,7 +25,7 @@ app->log->level('error');
 app->plugins->add_hook(
     before_dispatch => sub {
         my ($self, $c) = @_;
-        $c->render_text('works too', status => 205)
+        $c->render_text($c->param('a'), status => 205)
           if $c->req->url->path eq '/custom';
     }
 );
@@ -51,7 +51,7 @@ my $t = Test::Mojo->new;
 $t->get_ok('/')->status_is(200)->content_is('works');
 
 # GET /custom
-$t->get_ok('/custom')->status_is(205)->content_is('works too');
+$t->get_ok('/custom?a=works+too')->status_is(205)->content_is('works too');
 
 # GET /custom_too
 $t->get_ok('/custom_too')->status_is(200)->content_is('this works too');

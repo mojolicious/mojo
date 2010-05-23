@@ -193,7 +193,7 @@ Generate link to route, path or URL.
 
 =item script
 
-    <%= script '/script.js %>
+    <%= script '/script.js' %>
     <%= script {%>
         var a = 'b';
     <%}%>

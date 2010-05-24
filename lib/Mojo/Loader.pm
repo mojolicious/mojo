@@ -158,13 +158,6 @@ L<Mojo::Loader> is a class loader and plugin framework.
 L<Mojo::Loader> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 C<new>
-
-    my $loader = Mojo::Loader->new;
-    my $loader = Mojo::Loader->new('MyApp::Namespace');
-
-Construct a new L<Mojo::Loader> object.
-
 =head2 C<load>
 
     my $e = $loader->load('Foo::Bar');

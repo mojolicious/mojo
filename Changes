@@ -41,6 +41,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed a loader bug.
         - Fixed reloading of inflated Mojolicious::Lite templates.
         - Fixed the client transaction builder. (Curt Tilmes)
+        - Fixed POD. (memowe)
         - Fixed typos. (jawnsy)
 
 0.999924 2010-03-08 00:00:00

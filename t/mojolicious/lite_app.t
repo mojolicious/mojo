@@ -428,6 +428,8 @@ $t->get_ok('/tags/lala?a=b')->status_is(200)->content_is(<<EOF);
 <form action="/template" method="post"><input name="foo" /></form>
 <form action="/tags/24" method="post">
     <input name="foo" />
+    <input name="foo" type="checkbox" />
+    <input checked="checked" name="a" type="checkbox" />
 </form>
 <form action="/">
     <label for="foo">Name</label>
@@ -945,6 +947,8 @@ __DATA__
 <%= form_for 'index', method => 'post' => {%><%= input 'foo' %><%}%>
 <%= form_for 'tags', {test => 24}, method => 'post' => {%>
     <%= input 'foo' %>
+    <%= input 'foo', type => 'checkbox' %>
+    <%= input 'a', type => 'checkbox' %>
 <%}%>
 <%= form_for '/' => {%>
     <%= label 'foo' => {%>Name<%}%>

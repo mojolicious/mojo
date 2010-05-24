@@ -39,7 +39,19 @@ sub register {
 
             # Value
             if (defined(my $p = $c->param($name))) {
-                return $self->_tag('input', name => $name, @_, value => $p);
+
+                # Attributes
+                my %attrs = @_;
+
+                # Checkbox
+                if (($attrs{type} || '') eq 'checkbox') {
+                    $attrs{checked} = 'checked';
+                }
+
+                # Other
+                else { $attrs{value} = $p }
+
+                return $self->_tag('input', name => $name, %attrs);
             }
 
             # Empty tag

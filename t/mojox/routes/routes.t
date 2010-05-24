@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 177;
+use Test::More tests => 184;
 
 use Mojo::Transaction::HTTP;
 
@@ -42,6 +42,9 @@ $test4->route('/foo')->to(controller => 'baz');
 
 # /test2/bar
 $test4->route('/bar')->to(controller => 'lalala');
+
+# /test2/baz
+$test2->route('/baz')->to('just#works');
 
 # /test3
 my $test3 = $r->waypoint('/test3')->to(controller => 's', action => 'l');
@@ -255,6 +258,15 @@ is($m->stack->[2]->{controller}, 'lalala');
 is($m->captures->{controller},   'lalala');
 is($m->url_for,                  '/test2/bar');
 is(@{$m->stack},                 3);
+$tx->req->url->parse('/test2/baz');
+$m = MojoX::Routes::Match->new($tx)->match($r);
+is($m->stack->[0]->{controller}, 'test2');
+is($m->stack->[1]->{controller}, 'just');
+is($m->stack->[1]->{action},     'works');
+is($m->stack->[2],               undef);
+is($m->captures->{controller},   'just');
+is($m->url_for,                  '/test2/baz');
+is(@{$m->stack},                 2);
 
 # Waypoints
 $tx = Mojo::Transaction::HTTP->new;

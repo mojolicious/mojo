@@ -236,18 +236,7 @@ sub _generate_class {
     # Class
     my $class = $field->{class};
     my $controller = $field->{controller} || '';
-    unless ($class) {
-        my @class;
-        for my $part (split /-/, $controller) {
-
-            # Junk
-            next unless $part;
-
-            # Camelize
-            push @class, b($part)->camelize;
-        }
-        $class = join '::', @class;
-    }
+    $class = b($controller)->camelize->to_string unless $class;
 
     # Format
     my $namespace = $field->{namespace} || $self->namespace;

@@ -355,14 +355,22 @@ sub b64_encode {
 sub camelize {
     my $self = shift;
 
-    # Split
-    my @words = split /_/, $self->{bytestream};
+    my @parts;
+    for my $part (split /-/, $self->{bytestream}) {
 
-    # Case
-    @words = map {ucfirst} map {lc} @words;
+        # Junk
+        next unless $part;
 
-    # Join
-    $self->{bytestream} = join '', @words;
+        # Split
+        my @words = split /_/, $part;
+
+        # Case
+        @words = map {ucfirst} map {lc} @words;
+
+        # Camelize
+        push @parts, join '', @words;
+    }
+    $self->{bytestream} = join '::', @parts;
 
     return $self;
 }
@@ -380,17 +388,22 @@ sub decamelize {
     my $self = shift;
 
     # Shortcut
-    return $self if $self->{bytestream} !~ /^[A-Z]+/;
+    return $self if $self->{bytestream} !~ /^[A-Z\:]+/;
 
-    # Split
-    my @words;
-    push @words, $1 while ($self->{bytestream} =~ s/([A-Z]{1}[^A-Z]*)//);
+    my @parts;
+    for my $part (split /\:\:/, $self->{bytestream}) {
 
-    # Case
-    @words = map {lc} @words;
+        # Split
+        my @words;
+        push @words, $1 while ($part =~ s/([A-Z]{1}[^A-Z]*)//);
 
-    # Join
-    $self->{bytestream} = join '_', @words;
+        # Case
+        @words = map {lc} @words;
+
+        # Join
+        push @parts, join '_', @words;
+    }
+    $self->{bytestream} = join '-', @parts;
 
     return $self;
 }

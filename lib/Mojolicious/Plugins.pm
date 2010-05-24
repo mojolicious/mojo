@@ -37,16 +37,7 @@ sub load_plugin {
     # Class
     my $name = shift;
     return unless $name;
-    my @class;
-    for my $part (split /-/, $name) {
-
-        # Junk
-        next unless $part;
-
-        # Camelize
-        push @class, b($part)->camelize;
-    }
-    my $class = join '::', @class;
+    my $class = b($name)->camelize->to_string;
 
     # Arguments
     my $args = ref $_[0] ? $_[0] : {@_};

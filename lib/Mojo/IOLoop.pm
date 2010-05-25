@@ -330,6 +330,9 @@ sub local_info {
     # Socket
     return {} unless my $socket = $c->{socket};
 
+    # UNIX domain socket info
+    return {path => $socket->hostpath} if $socket->can('hostpath');
+
     # Info
     return {address => $socket->sockhost, port => $socket->sockport};
 }
@@ -519,6 +522,9 @@ sub remote_info {
 
     # Socket
     return {} unless my $socket = $c->{socket};
+
+    # UNIX domain socket info
+    return {path => $socket->peerpath} if $socket->can('peerpath');
 
     # Info
     return {address => $socket->peerhost, port => $socket->peerport};

@@ -100,7 +100,7 @@ sub match {
         $self->{_path} = $path;
 
         # Reset stack
-        if ($r->parent) { $self->stack($snapshot) }
+        if ($r->parent) { $self->stack([@$snapshot]) }
         else {
             $self->captures({});
             $self->stack([]);

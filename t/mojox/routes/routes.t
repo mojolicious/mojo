@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 184;
+use Test::More tests => 193;
 
 use Mojo::Transaction::HTTP;
 
@@ -126,6 +126,13 @@ $r->route('/method/post_get')->via(qw/POST get/)
 
 # /simple/form
 $r->route('/simple/form')->to('test-test#test');
+
+# /edge/gift
+my $edge = $r->route('/edge');
+my $auth = $edge->bridge('/auth')->to('auth#check');
+$auth->route('/about/')->to('pref#about');
+$auth->bridge->to('album#allow')->route('/album/create/')->to('album#create');
+$auth->route('/gift/')->to('gift#index');
 
 # Make sure stash stays clean
 my $tx = Mojo::Transaction::HTTP->new;
@@ -476,3 +483,18 @@ is($m->stack->[0]->{action},     'test');
 is($m->stack->[0]->{format},     undef);
 is($m->url_for,                  '/simple/form');
 is(@{$m->stack},                 1);
+
+# Special edge case with nested bridges
+$tx = Mojo::Transaction::HTTP->new;
+$tx->req->method('GET');
+$tx->req->url->parse('/edge/auth/gift');
+$m = MojoX::Routes::Match->new($tx)->match($r);
+is($m->stack->[0]->{controller}, 'auth');
+is($m->stack->[0]->{action},     'check');
+is($m->stack->[0]->{format},     undef);
+is($m->stack->[1]->{controller}, 'gift');
+is($m->stack->[1]->{action},     'index');
+is($m->stack->[1]->{format},     undef);
+is($m->stack->[2],               undef);
+is($m->url_for,                  '/edge/auth/gift');
+is(@{$m->stack},                 2);

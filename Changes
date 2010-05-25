@@ -24,6 +24,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved routes by making the leading slash optional.
         - Converted README to markdown. (memowe)
         - Fixed connection keep alive with epoll.
+        - Fixed bridge bug in MojoX::Routes::Match.
+          (Oleg Zhelo, Dmitry Konstantinov)
         - Fixed argument handling of Mojo::Template blocks. (afresh1)
         - Fixed a stash localization bug. (und3f)
         - Fixed Mojo::Log to use flock to sync log file writing.

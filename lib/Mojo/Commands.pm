@@ -74,7 +74,7 @@ sub run {
         return $help ? $command->help : $command->run(@args);
     }
 
-    # Try all namspaces
+    # Try all namespaces
     my $commands = [];
     my $seen     = {};
     for my $namespace (@{$self->namespaces}) {

@@ -72,6 +72,10 @@ sub register {
             # Captures
             my $captures = ref $_[0] eq 'HASH' ? shift : {};
 
+            # Default content
+            push @_, sub { ucfirst $name }
+              unless defined $_[-1] && ref $_[-1] eq 'CODE';
+
             $self->_tag('a', href => $c->url_for($name, $captures), @_);
         }
     );

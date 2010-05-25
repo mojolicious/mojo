@@ -420,11 +420,11 @@ $t->get_ok('/tags/lala?a=b')->status_is(200)->content_is(<<EOF);
 <foo />
 <foo bar="baz" />
 <foo one="two" three="four">Hello</foo>
-<a href="/path" />
-<a href="http://example.com/" title="Foo" />
+<a href="/path">/path</a>
+<a href="http://example.com/" title="Foo">Foo</a>
 <a href="http://example.com/">Example</a>
-<a href="/template" />
-<a href="/tags/23" title="Foo" />
+<a href="/template">Index</a>
+<a href="/tags/23" title="Foo">Tags</a>
 <form action="/template" method="post"><input name="foo" /></form>
 <form action="/tags/24" method="post">
     <input name="foo" />
@@ -940,7 +940,7 @@ __DATA__
 <%= tag 'foo', bar => 'baz' %>
 <%= tag 'foo', one => 'two', three => 'four' => {%>Hello<%}%>
 <%= link_to '/path' %>
-<%= link_to 'http://example.com/', title => 'Foo' %>
+<%= link_to 'http://example.com/', title => 'Foo', sub { 'Foo' } %>
 <%= link_to 'http://example.com/' => {%>Example<%}%>
 <%= link_to 'index' %>
 <%= link_to 'tags', {test => 23}, title => 'Foo' %>

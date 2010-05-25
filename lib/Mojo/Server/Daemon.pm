@@ -299,7 +299,7 @@ sub _listen {
     my $options = {};
 
     # UNIX domain socket
-    if ($listen =~ /^file\:\/\/\/(.+)$/) { $options->{file} = $1 }
+    if ($listen =~ /^file\:\/\/(.+)$/) { $options->{file} = $1 }
 
     # Internet socket
     elsif ($listen =~ /^(http(?:s)?)\:\/\/(.+)\:(\d+)(?:\:(.*)\:(.*))?$/) {
@@ -510,7 +510,7 @@ Timeout for keep alive connections in seconds, defaults to C<15>.
 =head2 C<listen>
 
     my $listen = $daemon->listen;
-    $daemon    = $daemon->listen('https://localhost:3000,file:/my.sock');
+    $daemon    = $daemon->listen('https://localhost:3000,file:///my.sock');
 
 Ports and files to listen on, defaults to C<http://*:3000>.
 

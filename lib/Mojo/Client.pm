@@ -97,9 +97,7 @@ sub build_form_tx {
 
         # Array
         if (ref $form->{$name} eq 'ARRAY') {
-            for my $value (@{$form->{$name}}) {
-                $params->append($name, $value);
-            }
+            $params->append($name, $_) for @{$form->{$name}};
         }
 
         # Hash
@@ -133,10 +131,7 @@ sub build_form_tx {
         }
 
         # Single value
-        else {
-            my $value = $form->{$name};
-            $params->append($name, $value);
-        }
+        else { $params->append($name, $form->{$name}) }
     }
 
     # New transaction
@@ -291,8 +286,7 @@ sub finish {
     my $tx = $self->tx;
 
     # WebSocket
-    croak 'No WebSocket connection to finish'
-      if ref $tx eq 'ARRAY' && !$tx->is_websocket;
+    croak 'Transaction is not a WebSocket' unless $tx->is_websocket;
 
     # Finish
     $tx->finish;
@@ -301,15 +295,14 @@ sub finish {
 sub finished {
     my $self = shift;
 
+    # Transaction
+    my $tx = $self->tx;
+
     # WebSocket
-    croak 'No WebSocket connection in progress'
-      if ref $self->tx eq 'ARRAY' && !$self->tx->is_websocket;
+    croak 'Transaction is not a WebSocket' unless $tx->is_websocket;
 
     # Callback
     my $cb = shift;
-
-    # Transaction
-    my $tx = $self->tx;
 
     # Weaken
     weaken $self;
@@ -344,20 +337,17 @@ sub process {
 
     # Queue
     $self->queue(@_) if @_;
-    my $queue = $self->{_queue} || [];
-    $self->{_queue} = [];
+    my $queue = delete $self->{_queue} || [];
 
-    # Already running
+    # Process sync subrequests in new client
     if (!$self->{_is_async} && $self->{_processing}) {
         my $clone = $self->clone;
-        for my $job (@$queue) { $clone->queue(@$job) }
+        $clone->queue(@$_) for @$queue;
         return $clone->process;
     }
 
-    # Process
-    else {
-        for my $job (@$queue) { $self->_prepare_tx(@$job) }
-    }
+    # Add transactions from queue
+    else { $self->_prepare_tx(@$_) for @$queue }
 
     # Start loop
     my $loop = $self->ioloop;
@@ -390,15 +380,14 @@ sub queue {
 sub receive_message {
     my $self = shift;
 
+    # Transaction
+    my $tx = $self->tx;
+
     # WebSocket
-    croak 'No WebSocket connection to receive messages from'
-      if ref $self->tx eq 'ARRAY' && !$self->tx->is_websocket;
+    croak 'Transaction is not a WebSocket' unless $tx->is_websocket;
 
     # Callback
     my $cb = shift;
-
-    # Transaction
-    my $tx = $self->tx;
 
     # Weaken
     weaken $self;
@@ -409,37 +398,22 @@ sub receive_message {
         sub { shift; local $self->{tx} = $tx; $self->$cb(@_) });
 }
 
-sub req {
-    my $self = shift;
-
-    # Pipeline
-    croak 'Method "req" not supported for pipelines'
-      if ref $self->tx eq 'ARRAY';
-
-    $self->tx->req(@_);
-}
-
-sub res {
-    my $self = shift;
-
-    # Pipeline
-    croak 'Method "res" not supported for pipelines'
-      if ref $self->tx eq 'ARRAY';
-
-    $self->tx->res(@_);
-}
+sub req { shift->tx->req(@_) }
+sub res { shift->tx->res(@_) }
 
 sub singleton { $CLIENT ||= shift->new(@_) }
 
 sub send_message {
     my $self = shift;
 
+    # Transaction
+    my $tx = $self->tx;
+
     # WebSocket
-    croak 'No WebSocket connection to send message to'
-      if ref $self->tx eq 'ARRAY' && !$self->tx->is_websocket;
+    croak 'Transaction is not a WebSocket' unless $tx->is_websocket;
 
     # Send
-    $self->tx->send_message(@_);
+    $tx->send_message(@_);
 }
 
 # Are we there yet?
@@ -460,12 +434,14 @@ sub websocket {
     $req->method('GET');
 
     # URL
-    $req->url->parse(shift);
+    my $url = $req->url;
+    $url->parse(shift);
 
     # Scheme
-    if (my $scheme = $req->url->to_abs->scheme) {
+    my $abs = $url->to_abs;
+    if (my $scheme = $abs->scheme) {
         $scheme = $scheme eq 'wss' ? 'https' : 'http';
-        $req->url($req->url->to_abs->scheme($scheme));
+        $req->url($abs->scheme($scheme));
     }
 
     # Callback

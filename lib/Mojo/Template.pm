@@ -126,9 +126,9 @@ sub build {
     my $namespace = $self->namespace || ref $self;
     $lines[0] ||= '';
     $lines[0] =
-      qq/package $namespace; sub { my \$_M = ''; $HELPERS; $prepend;/
+      "package $namespace; sub { my \$_M = ''; $HELPERS; $prepend; do {"
       . $lines[0];
-    $lines[-1] .= qq/$append; return \$_M; };/;
+    $lines[-1] .= qq/$append; \$_M; } };/;
 
     $self->code(join "\n", @lines);
     return $self;

@@ -471,8 +471,10 @@ $mt->prepend('my $foo = shift; my $bar = "something\nelse"');
 $output = $mt->render(<<'EOF', 23);
 <%= $foo %>
 %= $bar
+% my $bar = 23;
+%= $bar
 EOF
-is($output, "23\nsomething\nelse");
+is($output, "23\nsomething\nelse23");
 $mt = Mojo::Template->new;
 $mt->prepend(
     q/{no warnings 'redefine'; no strict 'refs'; *foo = sub { 23 }}/);

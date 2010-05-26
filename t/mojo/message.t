@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 578;
+use Test::More tests => 596;
 
 use File::Spec;
 use File::Temp;
@@ -782,6 +782,60 @@ is($res->build,
       . "Content-Type: text/plain\x0d\x0a\x0d\x0a"
       . "lala\nfoobar\nperl rocks\n"
       . "\x0d\x0a--7am1X--");
+
+# Parse IIS 7.5 like CGI environment (root)
+$req = Mojo::Message::Request->new;
+$req->parse(
+    CONTENT_LENGTH => 0,
+    HTTP_ACCEPT =>
+      'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    CONTENT_TYPE    => '',
+    PATH_INFO       => '/index.pl/',
+    PATH_TRANSLATED => 'C:\\inetpub\\wwwroot\\inprint\\www\\index.pl\\',
+    SERVER_SOFTWARE => 'Microsoft-IIS/7.5',
+    QUERY_STRING    => '',
+    REQUEST_METHOD  => 'GET',
+    SCRIPT_NAME     => '/index.pl',
+    HTTP_HOST       => 'inprint',
+    SERVER_PROTOCOL => 'HTTP/1.1'
+);
+is($req->state,  'done');
+is($req->method, 'GET');
+is($req->headers->header('Accept'),
+    'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8');
+is($req->url->path,       '/');
+is($req->url->base->path, '/index.pl/');
+is($req->url->base->host, 'inprint');
+is($req->url->query,      undef);
+is($req->minor_version,   '1');
+is($req->major_version,   '1');
+
+# Parse IIS 7.5 like CGI environment (with path)
+$req = Mojo::Message::Request->new;
+$req->parse(
+    CONTENT_LENGTH => 0,
+    HTTP_ACCEPT =>
+      'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    CONTENT_TYPE    => '',
+    PATH_INFO       => '/index.pl/foo',
+    PATH_TRANSLATED => 'C:\\inetpub\\wwwroot\\inprint\\www\\index.pl\\foo',
+    SERVER_SOFTWARE => 'Microsoft-IIS/7.5',
+    QUERY_STRING    => '',
+    REQUEST_METHOD  => 'GET',
+    SCRIPT_NAME     => '/index.pl',
+    HTTP_HOST       => 'inprint',
+    SERVER_PROTOCOL => 'HTTP/1.1'
+);
+is($req->state,  'done');
+is($req->method, 'GET');
+is($req->headers->header('Accept'),
+    'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8');
+is($req->url->path,       '/foo');
+is($req->url->base->path, '/index.pl/');
+is($req->url->base->host, 'inprint');
+is($req->url->query,      undef);
+is($req->minor_version,   '1');
+is($req->major_version,   '1');
 
 # Parse IIS 6.0 like CGI environment variables and a body
 $req = Mojo::Message::Request->new;

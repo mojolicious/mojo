@@ -305,7 +305,7 @@ sub _parse_env {
 
     # IIS is so fucked up, nobody should ever have to use it...
     my $software = $env->{SERVER_SOFTWARE} || '';
-    if ($software =~ /IIS\/\d+/ && $base =~ /^$path\/?$/) {
+    if ($software =~ /IIS\/\d+/ && $env->{SCRIPT_NAME} eq $env->{PATH_INFO}) {
 
         # This is a horrible hack, just like IIS itself
         if (my $t = $env->{PATH_TRANSLATED}) {

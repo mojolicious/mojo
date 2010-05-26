@@ -743,7 +743,7 @@ $t->get_ok('/json')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
 $t->get_ok('/autostash?bar=23')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("layouted bar2342\n");
+  ->content_is("layouted bar2342autostash\n");
 
 # GET /helper
 $t->get_ok('/helper')->status_is(200)
@@ -1048,6 +1048,7 @@ Just works!\
 %= param 'bar'
 % my $foo = 42;
 %= $foo
+%= $route
 
 @@ layouts/layout.html.ep
 layouted <%== content %>

@@ -46,12 +46,15 @@ sub dispatch {
     # No match
     return 1 unless $m && @{$m->stack};
 
-    # Initialize stash with captures
-    $c->stash($m->captures);
-
-    # Prepare params
+    # Params
     my $p = $c->stash->{params} = $c->tx->req->params->clone;
     $p->append(%{$m->captures});
+
+    # Route name
+    $c->stash->{route} = $m->endpoint->name;
+
+    # Merge in captures
+    $c->stash({%{$c->stash}, %{$m->captures}});
 
     # Walk the stack
     return 1 if $self->_walk_stack($c);

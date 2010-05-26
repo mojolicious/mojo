@@ -21,7 +21,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved exception handling.
         - Improved documentation.
         - Improved IIS compatibility of the CGI implementation.
-        - Improved routes by making the leading slash optional.
+        - Improved routes by making the leading slash optional and storing
+          route names in the stash.
         - Converted README to markdown. (memowe)
         - Fixed connection keep alive with epoll.
         - Fixed bridge bug in MojoX::Routes::Match.

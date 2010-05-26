@@ -791,12 +791,12 @@ $req->parse(
       'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
     CONTENT_TYPE    => '',
     PATH_INFO       => '/index.pl/',
-    PATH_TRANSLATED => 'C:\\inetpub\\wwwroot\\inprint\\www\\index.pl\\',
+    PATH_TRANSLATED => 'C:\\inetpub\\wwwroot\\test\\www\\index.pl\\',
     SERVER_SOFTWARE => 'Microsoft-IIS/7.5',
     QUERY_STRING    => '',
     REQUEST_METHOD  => 'GET',
     SCRIPT_NAME     => '/index.pl',
-    HTTP_HOST       => 'inprint',
+    HTTP_HOST       => 'test',
     SERVER_PROTOCOL => 'HTTP/1.1'
 );
 is($req->state,  'done');
@@ -805,7 +805,7 @@ is($req->headers->header('Accept'),
     'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8');
 is($req->url->path,       '/');
 is($req->url->base->path, '/index.pl/');
-is($req->url->base->host, 'inprint');
+is($req->url->base->host, 'test');
 is($req->url->query,      undef);
 is($req->minor_version,   '1');
 is($req->major_version,   '1');
@@ -818,12 +818,12 @@ $req->parse(
       'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
     CONTENT_TYPE    => '',
     PATH_INFO       => '/index.pl/foo',
-    PATH_TRANSLATED => 'C:\\inetpub\\wwwroot\\inprint\\www\\index.pl\\foo',
+    PATH_TRANSLATED => 'C:\\inetpub\\wwwroot\\test\\www\\index.pl\\foo',
     SERVER_SOFTWARE => 'Microsoft-IIS/7.5',
     QUERY_STRING    => '',
     REQUEST_METHOD  => 'GET',
     SCRIPT_NAME     => '/index.pl',
-    HTTP_HOST       => 'inprint',
+    HTTP_HOST       => 'test',
     SERVER_PROTOCOL => 'HTTP/1.1'
 );
 is($req->state,  'done');
@@ -832,7 +832,7 @@ is($req->headers->header('Accept'),
     'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8');
 is($req->url->path,       '/foo');
 is($req->url->base->path, '/index.pl/');
-is($req->url->base->host, 'inprint');
+is($req->url->base->host, 'test');
 is($req->url->query,      undef);
 is($req->minor_version,   '1');
 is($req->major_version,   '1');

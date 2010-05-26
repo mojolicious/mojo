@@ -137,13 +137,7 @@ sub render {
         }
 
         # Try the route name if we don't have controller and action
-        elsif (my $match = $self->match) {
-            my $endpoint = $match->endpoint;
-
-            # Use endpoint name as default template
-            $self->stash(template => $endpoint->name)
-              if $endpoint && $endpoint->name;
-        }
+        elsif (my $name = $stash->{route}) { $self->stash(template => $name) }
     }
 
     # Render

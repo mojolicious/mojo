@@ -11,7 +11,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 13;
+plan tests => 10;
 
 # Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
 # Well, that’s love for you.
@@ -25,16 +25,15 @@ app->log->level('fatal');
 app->renderer->root(app->home->rel_dir('public'));
 
 # WebSocket /
+my $flag;
 websocket '/' => sub {
     my $self = shift;
-    my $flag = 0;
-    $self->finished(sub { is($flag, 24) });
+    $self->finished(sub { $flag += 4 });
     $self->receive_message(
         sub {
             my ($self, $message) = @_;
-            is($message, 'test1');
-            $self->send_message('test2');
-            $flag = 24;
+            $self->send_message("${message}test2");
+            $flag = 20;
         }
     );
 };
@@ -46,7 +45,7 @@ websocket '/early_start' => sub {
     $self->receive_message(
         sub {
             my ($self, $message) = @_;
-            is($message, 'test2');
+            $self->send_message("${message}test2");
             $self->finish;
         }
     );
@@ -61,68 +60,75 @@ websocket '/foo' => sub { shift->res->code('403')->message("i'm a teapot") };
 # WebSocket /deadcallback
 websocket '/deadcallback' => sub {
     my $self = shift;
-    $self->receive_message(
-        sub {
-            my ($self, $message) = @_;
-            is($message, 'test1');
-            die 'i see dead callbacks';
-        }
-    );
+    $self->receive_message(sub { die 'i see dead callbacks' });
 };
 
 my $client = Mojo::Client->new->app(app);
 
 # WebSocket /
+my $result;
 $client->websocket(
     '/' => sub {
         my $self = shift;
         $self->receive_message(
             sub {
                 my ($self, $message) = @_;
-                is($message, 'test2');
+                $result = $message;
                 $self->finish;
             }
         );
         $self->send_message('test1');
     }
 )->process;
+is($result, 'test1test2');
+is($flag,   24);
 
 # WebSocket /early_start (server directly sends a message)
+($flag, $result) = undef;
 $client->websocket(
     '/early_start' => sub {
         my $self = shift;
-        my $flag = 0;
-        $self->finished(sub { is($flag, 23) });
+        $self->finished(sub { $flag += 5 });
         $self->receive_message(
             sub {
                 my ($self, $message) = @_;
-                is($message, 'test1');
-                $self->send_message('test2');
-                $flag = 23;
+                $result = $message;
+                $self->send_message('test3');
+                $flag = 18;
             }
         );
     }
 )->process;
+is($flag,   23);
+is($result, 'test3test2');
 
 # WebSocket /dead (dies)
+my ($websocket, $code, $message);
 $client->websocket(
     '/dead' => sub {
         my $self = shift;
-        is($self->tx->is_websocket, 0);
-        is($self->res->code,        500);
-        is($self->res->message,     'Internal Server Error');
+        $websocket = $self->tx->is_websocket;
+        $code      = $self->res->code;
+        $message   = $self->res->message;
     }
 )->process;
+is($websocket, 0);
+is($code,      500);
+is($message,   'Internal Server Error');
 
 # WebSocket /foo (forbidden)
+($websocket, $code, $message) = undef;
 $client->websocket(
     '/foo' => sub {
         my $self = shift;
-        is($self->tx->is_websocket, 0);
-        is($self->res->code,        403);
-        is($self->res->message,     "i'm a teapot");
+        $websocket = $self->tx->is_websocket;
+        $code      = $self->res->code;
+        $message   = $self->res->message;
     }
 )->process;
+is($websocket, 0);
+is($code,      403);
+is($message,   "i'm a teapot");
 
 # WebSocket /deadcallback (dies in callback)
 $client->websocket(

@@ -11,7 +11,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless my $proxy = Mojo::IOLoop->new->generate_port;
-plan tests => 5;
+plan tests => 7;
 
 # Your mistletoe is no match for my *tow* missile.
 use Mojo::Client;
@@ -34,12 +34,10 @@ get '/proxy' => sub {
 websocket '/test' => sub {
     my $self = shift;
     my $flag = 0;
-    $self->finished(sub { is($flag, 24) });
     $self->receive_message(
         sub {
             my ($self, $message) = @_;
-            is($message, 'test1');
-            $self->send_message('test2');
+            $self->send_message("${message}test2");
             $flag = 24;
         }
     );
@@ -55,6 +53,8 @@ $server->prepare_ioloop;
 
 # Connect proxy server for testing
 my $c = {};
+my $connected;
+my ($read, $sent) = 0;
 $loop->listen(
     port    => $proxy,
     read_cb => sub {
@@ -68,6 +68,7 @@ $loop->listen(
         if ($c->{$client}->{client} =~ /\x0d?\x0a\x0d?\x0a$/) {
             my $buffer = delete $c->{$client}->{client};
             if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
+                $connected = "$1:$2";
                 my $server = $loop->connect(
                     address    => $1,
                     port       => $2 || 80,
@@ -84,6 +85,7 @@ $loop->listen(
                     },
                     read_cb => sub {
                         my ($loop, $server, $chunk) = @_;
+                        $read += length $chunk;
                         $c->{$client}->{server} ||= '';
                         $c->{$client}->{server} .= $chunk;
                         $loop->writing($client);
@@ -91,7 +93,9 @@ $loop->listen(
                     write_cb => sub {
                         my ($loop, $server) = @_;
                         $loop->not_writing($server);
-                        return delete $c->{$client}->{client};
+                        my $chunk = delete $c->{$client}->{client} || '';
+                        $sent += length $chunk;
+                        return $chunk;
                     }
                 );
             }
@@ -115,21 +119,44 @@ $loop->listen(
 is($client->get("http://localhost:$port/")->success->body, 'Hello World!');
 
 # WebSocket /test (normal websocket)
+my $result;
 $client->websocket(
     "ws://localhost:$port/test" => sub {
         my $self = shift;
         $self->receive_message(
             sub {
                 my ($self, $message) = @_;
-                is($message, 'test2');
+                $result = $message;
                 $self->finish;
             }
         );
         $self->send_message('test1');
     }
 )->process;
+is($result, 'test1test2');
 
 # GET http://kraih.com/proxy (proxy request)
 $client->http_proxy("http://localhost:$port");
 is($client->get("http://kraih.com/proxy")->success->body,
     'http://kraih.com/proxy');
+
+# WebSocket /test (proxy websocket)
+$client->http_proxy("http://localhost:$proxy");
+$result = undef;
+$client->websocket(
+    "ws://localhost:$port/test" => sub {
+        my $self = shift;
+        $self->receive_message(
+            sub {
+                my ($self, $message) = @_;
+                $result = $message;
+                $self->finish;
+            }
+        );
+        $self->send_message('test1');
+    }
+)->process;
+is($connected, "localhost:$port");
+is($result,    'test1test2');
+ok($read > 25);
+ok($sent > 25);

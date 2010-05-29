@@ -465,6 +465,16 @@ sub websocket {
 sub _connect {
     my ($self, $p, $cb) = @_;
 
+    # Check for specific connection id
+    my $id = $p->[0]->connection;
+
+    # WebSocket proxy
+    if (!$id && ($p->[0]->req->headers->upgrade || '') eq 'WebSocket') {
+
+        # CONNECT required
+        return if $self->_proxy_connect($p, $cb);
+    }
+
     # Info
     my ($scheme, $address, $port) = $self->_pipeline_info($p);
 
@@ -473,8 +483,7 @@ sub _connect {
     $loop->one_tick(0);
 
     # Cached connection
-    my $id;
-    if ($id = $self->_dequeue_connection("$scheme:$address:$port")) {
+    if ($id = $self->_dequeue_connection($id || "$scheme:$address:$port")) {
 
         # Writing
         $loop->writing($id);
@@ -808,6 +817,31 @@ sub _prepare_server {
     delete $server->{app};
     my $app = $self->app;
     ref $app ? $server->app($app) : $server->app_class($app);
+}
+
+sub _proxy_connect {
+    my ($self, $p, $cb) = @_;
+
+    # Proxy
+    return unless my $proxy = $self->http_proxy;
+
+    # CONNECT request
+    my $new = $self->build_tx(CONNECT => $p->[0]->req->url->clone);
+    $new->req->proxy($proxy);
+    $self->_prepare_pipeline(
+        [$new],
+        sub {
+            my ($self, $tx) = @_;
+
+            # Share connection
+            $p->[0]->connection($tx->connection);
+
+            # Queue real pipeline
+            $self->_prepare_pipeline($p, $cb);
+        }
+    );
+
+    return 1;
 }
 
 sub _queue_connection {

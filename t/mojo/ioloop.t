@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
+use Test::More tests => 5;
 
 use_ok('Mojo::IOLoop');
 
@@ -21,20 +21,27 @@ $loop->tick_cb(sub { $ticks++ });
 
 # Timer
 my $flag = 0;
+my $flag2;
 $loop->timer(
     1 => sub {
         my $self = shift;
-        $self->timer(
-            1 => sub {
-                is($flag, 23, 'recursive timer works');
-            }
-        );
+        $self->timer(1 => sub { $flag2 = $flag });
         $flag = 23;
     }
 );
 
+# HiRes timer
+my $hiresflag = 0;
+$loop->timer(0.25 => sub { $hiresflag = 42 });
+
 # Start
 $loop->start;
+
+# Timer
+is($flag, 23, 'recursive timer works');
+
+# HiRes timer
+is($hiresflag, 42, 'hires timer');
 
 # Idle callback
 my $idle = 0;

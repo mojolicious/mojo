@@ -15,6 +15,7 @@ use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
 use IO::Socket;
 use Mojo::ByteStream;
 use Socket qw/IPPROTO_TCP TCP_NODELAY/;
+use Time::HiRes 'time';
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 8192;
 
@@ -1630,6 +1631,7 @@ and the loop can be restarted by running C<start> again.
 =head2 C<timer>
 
     my $id = $loop->timer(5 => sub {...});
+    my $id = $loop->timer(0.25 => sub {...});
 
 Create a new timer, invoking the callback afer a given amount of seconds.
 

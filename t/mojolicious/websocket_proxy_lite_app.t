@@ -11,7 +11,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless my $proxy = Mojo::IOLoop->new->generate_port;
-plan tests => 7;
+plan tests => 9;
 
 # Your mistletoe is no match for my *tow* missile.
 use Mojo::Client;
@@ -54,7 +54,7 @@ $server->prepare_ioloop;
 # Connect proxy server for testing
 my $c = {};
 my $connected;
-my ($read, $sent) = 0;
+my ($read, $sent, $fail) = 0;
 $loop->listen(
     port    => $proxy,
     read_cb => sub {
@@ -69,13 +69,21 @@ $loop->listen(
             my $buffer = delete $c->{$client}->{client};
             if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
                 $connected = "$1:$2";
+                if ($2 == $port + 1) {
+                    $fail = 1;
+                    $2    = $port;
+                }
                 my $server = $loop->connect(
                     address    => $1,
                     port       => $2 || 80,
                     connect_cb => sub {
                         my ($loop, $server) = @_;
                         $c->{$client}->{connection} = $server;
-                        $c->{$client}->{server} = "HTTP/1.1 200 OK\x0d\x0a"
+                        $c->{$client}->{server} =
+                          $fail
+                          ? "HTTP/1.1 404 NOT FOUND\x0d\x0a"
+                          . "Connection: close\x0d\x0a\x0d\x0a"
+                          : "HTTP/1.1 200 OK\x0d\x0a"
                           . "Connection: keep-alive\x0d\x0a\x0d\x0a";
                         $loop->writing($client);
                     },
@@ -160,3 +168,17 @@ is($connected, "localhost:$port");
 is($result,    'test1test2');
 ok($read > 25);
 ok($sent > 25);
+
+# WebSocket /test (proxy websocket with bad target)
+$client->http_proxy("http://localhost:$proxy");
+my $port2 = $port + 1;
+my ($success, $error);
+$client->websocket(
+    "ws://localhost:$port2/test" => sub {
+        my ($self, $tx) = @_;
+        $success = $tx->success;
+        $error   = ($tx->error)[1];
+    }
+)->process;
+is($success, undef);
+is($error,   'Proxy connection failed.');

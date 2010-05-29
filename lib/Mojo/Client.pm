@@ -833,6 +833,13 @@ sub _proxy_connect {
         sub {
             my ($self, $tx) = @_;
 
+            # Failed
+            unless (($tx->res->code || '') eq '200') {
+                $_->error(500, 'Proxy connection failed.') for @$p;
+                $self->$cb(@$p) if $cb;
+                return;
+            }
+
             # Share connection
             $p->[0]->connection($tx->connection);
 

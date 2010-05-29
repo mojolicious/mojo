@@ -801,13 +801,13 @@ $t->get_ok('/redirect_url')->status_is(302)
 $t->get_ok('/redirect_path')->status_is(302)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->header_is(Location       => '/foo/bar')->content_is('Redirecting!');
+  ->header_like(Location => qr/\/foo\/bar$/)->content_is('Redirecting!');
 
 # GET /redirect_named
 $t->get_ok('/redirect_named')->status_is(302)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->header_is(Location       => '/template.txt')->content_is('Redirecting!');
+  ->header_like(Location => qr/\/template.txt$/)->content_is('Redirecting!');
 
 # GET /redirect_named (with redirecting enabled in client)
 $t->max_redirects(3);
@@ -816,10 +816,10 @@ $t->get_ok('/redirect_named')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->header_is(Location       => undef)->content_is("Redirect works!\n");
 $t->max_redirects(0);
-Test::Mojo->new(tx => $t->tx->previous)->status_is(302)
+Test::Mojo->new(tx => $t->tx->previous->[-1])->status_is(302)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->header_is(Location       => '/template.txt')->content_is('Redirecting!');
+  ->header_like(Location => qr/\/template.txt$/)->content_is('Redirecting!');
 
 # GET /koi8-r
 my $koi8 =

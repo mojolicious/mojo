@@ -136,7 +136,7 @@ sub post_form_ok {
     $client->max_redirects($self->max_redirects);
 
     # Request
-    $client->post_form(@_, sub { $self->tx($_[1]) })->process;
+    $client->post_form(@_, sub { $self->tx($_[-1]) })->process;
 
     # Test
     local $Test::Builder::Level = $Test::Builder::Level + 1;
@@ -165,12 +165,9 @@ sub reset_session {
 sub status_is {
     my ($self, $status, $desc) = @_;
 
-    # Transaction
-    my $tx = $self->tx;
-
     # Test
     local $Test::Builder::Level = $Test::Builder::Level + 1;
-    Test::More::is($tx->res->code, $status, $desc);
+    Test::More::is($self->tx->res->code, $status, $desc);
 
     return $self;
 }
@@ -205,7 +202,7 @@ sub _request_ok {
     $client->max_redirects($self->max_redirects);
 
     # Request
-    $client->$method($url, %$headers, $body, sub { $self->tx($_[1]) })
+    $client->$method($url, %$headers, $body, sub { $self->tx($_[-1]) })
       ->process;
 
     # Test

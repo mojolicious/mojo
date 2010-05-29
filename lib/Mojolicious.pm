@@ -56,31 +56,42 @@ sub new {
         }
     );
 
+    # Routes
+    my $r = $self->routes;
+
     # Namespace
-    $self->routes->namespace(ref $self);
+    $r->namespace(ref $self);
+
+    # Renderer
+    my $renderer = $self->renderer;
+
+    # Static
+    my $static = $self->static;
 
     # Types
-    $self->renderer->types($self->types);
-    $self->static->types($self->types);
+    $renderer->types($self->types);
+    $static->types($self->types);
+
+    # Home
+    my $home = $self->home;
 
     # Root
-    $self->renderer->root($self->home->rel_dir('templates'));
-    $self->static->root($self->home->rel_dir('public'));
+    $renderer->root($home->rel_dir('templates'));
+    $static->root($home->rel_dir('public'));
 
     # Hide own controller methods
-    $self->routes->hide(qw/client cookie finish finished flash helper/);
-    $self->routes->hide(qw/param pause receive_message redirect_to render/);
-    $self->routes->hide(qw/render_data render_exception render_inner/);
-    $self->routes->hide(qw/render_json render_not_found render_partial/);
-    $self->routes->hide(qw/render_static render_text resume send_message/);
-    $self->routes->hide(qw/session signed_cookie url_for/);
+    $r->hide(qw/client cookie finish finished flash helper param pause/);
+    $r->hide(qw/receive_message redirect_to render render_data/);
+    $r->hide(qw/render_exception render_inner render_json render_not_found/);
+    $r->hide(qw/render_partial render_static render_text resume/);
+    $r->hide(qw/send_message session signed_cookie url_for/);
 
     # Mode
     my $mode = $self->mode;
 
-    # Log file
-    $self->log->path($self->home->rel_file("log/$mode.log"))
-      if -w $self->home->rel_file('log');
+    # Log
+    $self->log->path($home->rel_file("log/$mode.log"))
+      if -w $home->rel_file('log');
 
     # Plugins
     $self->plugin('agent_condition');

@@ -56,24 +56,14 @@ sub new {
 }
 
 sub add_handler {
-    my $self = shift;
-
-    # Merge
-    my $handler = ref $_[0] ? $_[0] : {@_};
-    $handler = {%{$self->handler}, %$handler};
-    $self->handler($handler);
-
+    my ($self, $name, $cb) = @_;
+    $self->handler->{$name} = $cb;
     return $self;
 }
 
 sub add_helper {
-    my $self = shift;
-
-    # Merge
-    my $helper = ref $_[0] ? $_[0] : {@_};
-    $helper = {%{$self->helper}, %$helper};
-    $self->helper($helper);
-
+    my ($self, $name, $cb) = @_;
+    $self->helper->{$name} = $cb;
     return $self;
 }
 

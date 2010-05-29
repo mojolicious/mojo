@@ -347,7 +347,7 @@ sub process {
     }
 
     # Add transactions from queue
-    else { $self->_prepare_tx(@$_) for @$queue }
+    else { $self->_prepare_pipeline(@$_) for @$queue }
 
     # Start loop
     my $loop = $self->ioloop;
@@ -372,7 +372,9 @@ sub queue {
 
     # Queue transactions
     my $queue = $self->{_queue} ||= [];
-    for my $tx (@_) { push @$queue, [$tx, $cb] if $tx }
+    for my $tx (@_) {
+        push @$queue, [ref $tx eq 'ARRAY' ? $tx : [$tx], $cb] if $tx;
+    }
 
     return $self;
 }
@@ -461,14 +463,10 @@ sub websocket {
 }
 
 sub _connect {
-    my ($self, $tx, $cb) = @_;
-
-    # Pipeline
-    my $pipeline = ref $tx eq 'ARRAY' ? 1 : 0;
+    my ($self, $p, $cb) = @_;
 
     # Info
-    my ($scheme, $address, $port) =
-      $self->_tx_info($pipeline ? $tx->[0] : $tx);
+    my ($scheme, $address, $port) = $self->_pipeline_info($p);
 
     # Cleanup
     my $loop = $self->ioloop;
@@ -482,11 +480,10 @@ sub _connect {
         $loop->writing($id);
 
         # Add new connection
-        $self->{_cs}->{$id} = {cb => $cb, tx => $tx};
+        $self->{_cs}->{$id} = {cb => $cb, p => $p};
 
-        # Kept alive first transaction
-        $tx = $pipeline ? $tx->[0] : $tx;
-        $tx->kept_alive(1);
+        # Kept alive all transactions
+        $_->kept_alive(1) for @$p;
 
         # Connected
         $self->_connected($id);
@@ -502,34 +499,27 @@ sub _connect {
             tls     => $scheme eq 'https' ? 1 : 0,
             tls_ca_file => $self->tls_ca_file || $ENV{MOJO_CA_FILE},
             tls_verify_cb => $self->tls_verify_cb,
-            connect_cb    => sub {
-                my ($loop, $id) = @_;
-
-                # Connected
-                $self->_connected($id);
-            },
-            error_cb => sub { $self->_error(@_) },
-            hup_cb   => sub { $self->_error(@_) },
-            read_cb  => sub { $self->_read(@_) },
-            write_cb => sub { $self->_write(@_) }
+            connect_cb    => sub { $self->_connected($_[1]) },
+            error_cb      => sub { $self->_error(@_) },
+            hup_cb        => sub { $self->_error(@_) },
+            read_cb       => sub { $self->_read(@_) },
+            write_cb      => sub { $self->_write(@_) }
         );
 
         # Error
         unless (defined $id) {
 
             # Update all transactions
-            for my $tx ($pipeline ? @$tx : ($tx)) {
-                $tx->error(500, qq/Couldn't connect./);
-            }
+            $_->error(500, qq/Couldn't connect./) for @$p;
 
             # Callback
-            $self->$cb($tx) if $cb;
+            $self->$cb(@$p) if $cb;
 
             return;
         }
 
         # Add new connection
-        $self->{_cs}->{$id} = {cb => $cb, tx => $tx};
+        $self->{_cs}->{$id} = {cb => $cb, p => $p};
     }
 
     return $id;
@@ -538,10 +528,11 @@ sub _connect {
 sub _connected {
     my ($self, $id) = @_;
 
-    # Prepare transactions
+    # Loop
     my $loop = $self->ioloop;
-    my $tx   = $self->{_cs}->{$id}->{tx};
-    for my $tx (ref $tx eq 'ARRAY' ? @$tx : ($tx)) {
+
+    # Prepare transactions
+    for my $tx (@{$self->{_cs}->{$id}->{p}}) {
 
         # Connection
         $tx->connection($id);
@@ -584,18 +575,15 @@ sub _drop {
     my ($self, $id) = @_;
 
     # Keep connection alive
-    if (my $tx = $self->{_cs}->{$id}->{tx}) {
+    if (my $p = $self->{_cs}->{$id}->{p}) {
 
         # Read only
         $self->ioloop->not_writing($id);
 
-        # Last transaction
-        $tx = ref $tx eq 'ARRAY' ? $tx->[-1] : $tx;
-
         # Deposit
-        my ($scheme, $address, $port) = $self->_tx_info($tx);
+        my ($scheme, $address, $port) = $self->_pipeline_info($p);
         $self->_queue_connection("$scheme:$address:$port", $id)
-          if $tx->keep_alive;
+          if $p->[-1]->keep_alive;
     }
 
     # Connection close
@@ -611,13 +599,11 @@ sub _drop {
 sub _error {
     my ($self, $loop, $id, $error) = @_;
 
-    # Transaction
-    if (my $tx = $self->{_cs}->{$id}->{tx}) {
+    # Pipeline
+    if (my $p = $self->{_cs}->{$id}->{p}) {
 
         # Add error message to all transactions
-        for my $tx (ref $tx eq 'ARRAY' ? @$tx : ($tx)) {
-            $tx->error(500, $error) unless $tx->is_finished;
-        }
+        for my $tx (@$p) { $tx->error(500, $error) unless $tx->is_finished }
     }
 
     # Log
@@ -629,17 +615,24 @@ sub _error {
 }
 
 sub _fetch_cookies {
-    my ($self, $tx) = @_;
+    my ($self, $p) = @_;
 
     # Shortcut
     return unless $self->cookie_jar;
 
-    # URL
-    my $url = $tx->req->url->clone;
-    if (my $host = $tx->req->headers->host) { $url->host($host) }
+    # Fetch cookies for pipeline
+    for my $tx (@$p) {
 
-    # Fetch
-    $tx->req->cookies($self->cookie_jar->find($tx->req->url));
+        # Request
+        my $req = $tx->req;
+
+        # URL
+        my $url = $req->url->clone;
+        if (my $host = $req->headers->host) { $url->host($host) }
+
+        # Fetch
+        $req->cookies($self->cookie_jar->find($url));
+    }
 }
 
 # No children have ever meddled with the Republican Party and lived to tell
@@ -650,23 +643,20 @@ sub _finish {
     # Connection
     my $c = $self->{_cs}->{$id};
 
-    # Transaction
-    my $old = $c->{tx};
-
     # Pipeline
-    my $pipeline = ref $old eq 'ARRAY' ? 1 : 0;
+    my $old = $c->{p};
 
-    # Drop WebSockets
+    # Drop WebSocket
     my $new;
-    if ($old && !$pipeline && $old->is_websocket) {
-        $old->client_close;
+    if ($old && $old->[-1]->is_websocket) {
+        $old->[-1]->client_close;
         $old = undef;
         $self->{_processing} -= 1;
         delete $self->{_cs}->{$id};
         $self->_drop($id);
     }
 
-    # Normal transaction
+    # Upgrade connection to WebSocket
     else {
 
         # WebSocket upgrade
@@ -676,22 +666,23 @@ sub _finish {
         $self->_drop($id) unless $new;
     }
 
-    # Finish normal transaction
+    # Finish pipeline
     if ($old) {
 
         # Cookies to the jar
-        for my $tx ($pipeline ? @$old : ($old)) { $self->_store_cookies($tx) }
+        $self->_store_cookies($old);
 
         # Counter
-        $self->{_processing} -= 1 unless $new && !$pipeline;
+        $self->{_processing} -= 1 unless $new;
 
-        # Done
+        # Redirect
         unless ($self->_redirect($c, $old)) {
+
+            # Callback
             my $cb = $c->{cb};
-            my $tx = $new;
-            $tx ||= $old;
-            local $self->{tx} = $tx;
-            $self->$cb($tx) if $cb;
+            my $p = $new ? [$new] : $old;
+            local $self->{tx} = $p->[-1];
+            $self->$cb(@$p) if $cb;
         }
     }
 
@@ -699,40 +690,50 @@ sub _finish {
     $self->ioloop->stop if !$self->{_is_async} && !$self->{_processing};
 }
 
-sub _prepare_server {
-    my $self = shift;
+sub _pipeline_info {
+    my ($self, $p) = @_;
 
-    # Server
-    unless ($self->{_port}) {
-        my $server = $self->{_server} =
-          Mojo::Server::Daemon->new(ioloop => $self->ioloop, silent => 1);
-        my $port = $self->{_port} = $self->ioloop->generate_port;
-        die "Couldn't find a free TCP port for testing.\n" unless $port;
-        $server->listen("http://*:$port");
-        $server->prepare_ioloop;
+    # First transaction
+    my $tx = $p->[-1];
+
+    # Info
+    my $req    = $tx->req;
+    my $url    = $req->url;
+    my $scheme = $url->scheme;
+    my $host   = $url->ihost;
+    my $port   = $url->port;
+
+    # Check for connect transaction
+    my $connect;
+    my $method = $req->method   || '';
+    my $code   = $tx->res->code || '';
+    $connect = 1 if $method eq 'CONNECT' && $code eq '200';
+
+    # Proxy
+    if ((my $proxy = $req->proxy) && !$connect) {
+        $scheme = $proxy->scheme;
+        $host   = $proxy->ihost;
+        $port   = $proxy->port;
     }
 
-    # Application
-    my $server = $self->{_server};
-    delete $server->{app};
-    my $app = $self->app;
-    ref $app ? $server->app($app) : $server->app_class($app);
+    # Default port
+    $scheme ||= 'http';
+    $port ||= $scheme eq 'https' ? 443 : 80;
+
+    return ($scheme, $host, $port);
 }
 
-sub _prepare_tx {
-    my ($self, $tx, $cb) = @_;
+sub _prepare_pipeline {
+    my ($self, $p, $cb) = @_;
 
     # Embedded server
     $self->_prepare_server if $self->app;
-
-    # Pipeline
-    my $pipeline = ref $tx eq 'ARRAY' ? 1 : 0;
 
     # Log
     $self->log($self->{_server}->app->log) if $self->{_server} && !$self->log;
 
     # Prepare all transactions
-    for my $tx ($pipeline ? @$tx : ($tx)) {
+    for my $tx (@$p) {
 
         # Embedded server
         if ($self->app) {
@@ -759,26 +760,24 @@ sub _prepare_tx {
         # We identify ourself
         $headers->user_agent('Mozilla/5.0 (compatible; Mojolicious; Perl)')
           unless $headers->user_agent;
-
-        # Cookies from the jar
-        $self->_fetch_cookies($tx);
     }
+
+    # Cookies from the jar
+    $self->_fetch_cookies($p);
 
     # Connect
-    return unless my $id = $self->_connect($tx, $cb);
+    return unless my $id = $self->_connect($p, $cb);
 
-    # Pipeline
-    if ($pipeline) {
-        my $c = $self->{_cs}->{$id};
-        $c->{writer} = 0;
-        $c->{reader} = 0;
-    }
+    # Connection
+    my $c = $self->{_cs}->{$id};
+    $c->{writer} = 0;
+    $c->{reader} = 0;
 
     # Weaken
     weaken $self;
 
     # Callbacks
-    for my $tx ($pipeline ? @$tx : ($tx)) {
+    for my $tx (@$p) {
 
         # State change callback
         $tx->state_cb(sub { $self->_state($id, @_) });
@@ -789,6 +788,26 @@ sub _prepare_tx {
     $self->{_processing} += 1;
 
     return $id;
+}
+
+sub _prepare_server {
+    my $self = shift;
+
+    # Server
+    unless ($self->{_port}) {
+        my $server = $self->{_server} =
+          Mojo::Server::Daemon->new(ioloop => $self->ioloop, silent => 1);
+        my $port = $self->{_port} = $self->ioloop->generate_port;
+        die "Couldn't find a free TCP port for testing.\n" unless $port;
+        $server->listen("http://*:$port");
+        $server->prepare_ioloop;
+    }
+
+    # Application
+    my $server = $self->{_server};
+    delete $server->{app};
+    my $app = $self->app;
+    ref $app ? $server->app($app) : $server->app_class($app);
 }
 
 sub _queue_connection {
@@ -824,14 +843,11 @@ sub _read {
     # Connection
     my $c = $self->{_cs}->{$id};
 
-    # Transaction
-    if (my $tx = $c->{tx}) {
-
-        # Pipeline
-        $tx = $c->{tx}->[$c->{reader}] if defined $c->{reader};
+    # Pipeline
+    if (my $p = $c->{p}) {
 
         # Read
-        $tx->client_read($chunk);
+        $p->[$c->{reader}]->client_read($chunk);
     }
 
     # Corrupted connection
@@ -839,10 +855,10 @@ sub _read {
 }
 
 sub _redirect {
-    my ($self, $c, $tx) = @_;
+    my ($self, $c, $p) = @_;
 
-    # Pipeline
-    return if ref $tx eq 'ARRAY';
+    # Transaction
+    my $tx = $p->[-1];
 
     # Code
     return unless $tx->res->is_status_class('300');
@@ -864,10 +880,10 @@ sub _redirect {
     my $new = Mojo::Transaction::HTTP->new;
     $new->req->method($method);
     $new->req->url->parse($location);
-    $new->previous($tx);
+    $new->previous($p);
 
     # Queue redirected request
-    my $nid = $self->_prepare_tx($new, $c->{cb});
+    my $nid = $self->_prepare_pipeline([$new], $c->{cb});
 
     # Create new connection
     $self->{_cs}->{$nid}->{redirects} = $r + 1;
@@ -882,96 +898,61 @@ sub _state {
     # Connection
     my $c = $self->{_cs}->{$id};
 
-    # Normal transaction
-    unless (ref $c->{tx} eq 'ARRAY') {
-
-        # Finished
-        return $self->_finish($id) if $tx->is_finished;
-
-        # Writing
-        return $tx->is_writing
-          ? $self->ioloop->writing($id)
-          : $self->ioloop->not_writing($id);
-    }
-
     # Reader
-    my $reader = $c->{tx}->[$c->{reader}];
+    my $reader = $c->{p}->[$c->{reader}];
     if ($reader && $reader->is_finished) {
         $c->{reader}++;
 
         # Leftovers
         if (defined(my $leftovers = $reader->client_leftovers)) {
-            $reader = $c->{tx}->[$c->{reader}];
+            $reader = $c->{p}->[$c->{reader}];
             $reader->client_read($leftovers);
         }
     }
 
     # Finished
-    return $self->_finish($id) unless $c->{tx}->[$c->{reader}];
+    return $self->_finish($id) unless $c->{p}->[$c->{reader}];
 
     # Writer
-    my $writer = $c->{tx}->[$c->{writer}];
+    my $writer = $c->{p}->[$c->{writer}];
     $c->{writer}++
       if $writer && $writer->is_state('read_response');
 
     # Current
     my $current = $c->{writer};
-    $current = $c->{reader} unless $c->{tx}->[$c->{writer}];
+    $current = $c->{reader} unless $c->{p}->[$c->{writer}];
 
-    return $c->{tx}->[$current]->is_writing
+    return $c->{p}->[$current]->is_writing
       ? $self->ioloop->writing($id)
       : $self->ioloop->not_writing($id);
 }
 
 sub _store_cookies {
-    my ($self, $tx) = @_;
+    my ($self, $p) = @_;
 
     # Shortcut
     return unless $self->cookie_jar;
 
-    # Fix cookies
-    my @cookies = @{$tx->res->cookies};
-    for my $cookie (@cookies) {
+    # Store cookies
+    for my $tx (@$p) {
 
-        # Domain
-        $cookie->domain($tx->req->url->host) unless $cookie->domain;
+        # URL
+        my $url = $tx->req->url;
 
-        # Path
-        $cookie->path($tx->req->url->path) unless $cookie->path;
+        # Fix cookies
+        my @cookies = @{$tx->res->cookies};
+        for my $cookie (@cookies) {
+
+            # Domain
+            $cookie->domain($url->host) unless $cookie->domain;
+
+            # Path
+            $cookie->path($url->path) unless $cookie->path;
+        }
+
+        # Store
+        $self->cookie_jar->add(@cookies);
     }
-
-    # Store
-    $self->cookie_jar->add(@cookies);
-}
-
-sub _tx_info {
-    my ($self, $tx) = @_;
-
-    # Info
-    my $req    = $tx->req;
-    my $url    = $req->url;
-    my $scheme = $url->scheme;
-    my $host   = $url->ihost;
-    my $port   = $url->port;
-
-    # Check for connect transaction
-    my $connect;
-    my $method = $req->method   || '';
-    my $code   = $tx->res->code || '';
-    $connect = 1 if $method eq 'CONNECT' && $code eq '200';
-
-    # Proxy
-    if ((my $proxy = $req->proxy) && !$connect) {
-        $scheme = $proxy->scheme;
-        $host   = $proxy->ihost;
-        $port   = $proxy->port;
-    }
-
-    # Default port
-    $scheme ||= 'http';
-    $port ||= $scheme eq 'https' ? 443 : 80;
-
-    return ($scheme, $host, $port);
 }
 
 sub _upgrade {
@@ -981,10 +962,7 @@ sub _upgrade {
     my $c = $self->{_cs}->{$id};
 
     # Transaction
-    my $old = $c->{tx};
-
-    # Pipeline
-    return if ref $old eq 'ARRAY';
+    my $old = $c->{p}->[-1];
 
     # No handshake
     return unless $old->req->headers->upgrade;
@@ -993,11 +971,12 @@ sub _upgrade {
     return unless ($old->res->code || '') eq '101';
 
     # Start new WebSocket
-    my $new = $c->{tx} = Mojo::Transaction::WebSocket->new(handshake => $old);
+    my $new = Mojo::Transaction::WebSocket->new(handshake => $old);
+    $c->{p} = [$new];
 
     # Cleanup connection
-    delete $c->{reader};
-    delete $c->{writer};
+    $c->{reader} = 0;
+    $c->{writer} = 0;
 
     # Upgrade connection timeout
     $self->ioloop->connection_timeout($id, $self->websocket_timeout);
@@ -1029,14 +1008,11 @@ sub _write {
     # Connection
     my $c = $self->{_cs}->{$id};
 
-    # Transaction
-    if (my $tx = $c->{tx}) {
-
-        # Pipeline
-        $tx = $c->{tx}->[$c->{writer}] if defined $c->{writer};
+    # Pipeline
+    if (my $p = $c->{p}) {
 
         # Get chunk
-        return $tx->client_write;
+        return $p->[$c->{writer}]->client_write;
     }
 
     # Corrupted connection

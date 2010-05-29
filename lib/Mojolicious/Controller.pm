@@ -87,7 +87,7 @@ sub redirect_to {
     $self->res->code(302);
 
     # Location header
-    $self->res->headers->location($self->url_for(@_));
+    $self->res->headers->location($self->url_for(@_)->to_abs);
 
     return $self;
 }

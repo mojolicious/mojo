@@ -563,8 +563,8 @@ sub start_tls {
     my %options = (Timeout => $self->connect_timeout);
 
     # TLS options
+    $options{SSL_startHandshake} = 0 if $args->{tls};
     if ($args->{tls_ca_file}) {
-        $options{SSL_startHandshake}  = 0;
         $options{SSL_ca_file}         = $args->{tls_ca_file};
         $options{SSL_verify_mode}     = 0x01;
         $options{SSL_verify_callback} = $args->{tls_verify_cb};

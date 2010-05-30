@@ -519,7 +519,7 @@ sub _connect {
         unless (defined $id) {
 
             # Update all transactions
-            $_->error(500, qq/Couldn't connect./) for @$p;
+            $_->error(qq/Couldn't connect./, 500) for @$p;
 
             # Callback
             $self->$cb(@$p) if $cb;
@@ -612,7 +612,7 @@ sub _error {
     if (my $p = $self->{_cs}->{$id}->{p}) {
 
         # Add error message to all transactions
-        for my $tx (@$p) { $tx->error(500, $error) unless $tx->is_finished }
+        for my $tx (@$p) { $tx->error($error, 500) unless $tx->is_finished }
     }
 
     # Log
@@ -835,7 +835,7 @@ sub _proxy_connect {
 
             # Failed
             unless (($tx->res->code || '') eq '200') {
-                $_->error(500, 'Proxy connection failed.') for @$p;
+                $_->error('Proxy connection failed.', 500) for @$p;
                 $self->$cb(@$p) if $cb;
                 return;
             }

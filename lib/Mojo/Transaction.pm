@@ -260,7 +260,7 @@ Note that this method is EXPERIMENTAL and might change without warning!
         print $res->body;
     }
     else {
-        my ($code, $message) = $tx->error;
+        my ($message, $code) = $tx->error;
         print "Error $code: $message";
     }
 

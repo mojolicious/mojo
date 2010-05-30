@@ -47,6 +47,8 @@ use constant KQUEUE_WRITE  => KQUEUE ? IO::KQueue::EVFILT_WRITE() : 0;
 use constant TLS => $ENV{MOJO_NO_TLS}
   ? 0
   : eval { require IO::Socket::SSL; 1 };
+use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
+use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
 # Default TLS cert (20.03.2010)
 # (openssl req -new -x509 -keyout cakey.pem -out cacert.pem -nodes -days 7300)
@@ -132,9 +134,9 @@ sub connect {
     # Arguments
     my $args = ref $_[0] ? $_[0] : {@_};
 
-    # Options (TLS handshake only works blocking)
+    # Options
     my %options = (
-        Blocking => $args->{tls} ? 1 : 0,
+        Blocking => 0,
         PeerAddr => $args->{address},
         PeerPort => $args->{port} || ($args->{tls} ? 443 : 80),
         Proto    => 'tcp',
@@ -155,11 +157,7 @@ sub connect {
     };
 
     # Start TLS
-    if ($args->{tls}) {
-        my $old = $id;
-        $id = $self->start_tls($id => $args);
-        $self->drop($old) && return unless $id;
-    }
+    if ($args->{tls}) { return unless $id = $self->start_tls($id => $args) }
 
     # Non blocking
     $socket->blocking(0);
@@ -261,11 +259,11 @@ sub listen {
     # TLS check
     croak "IO::Socket::SSL required for TLS support" if $args->{tls} && !TLS;
 
-    # Options (TLS handshake only works blocking)
+    # Options
     my %options = (
-        Blocking => $args->{tls} ? 1 : 0,
-        Listen => $args->{queue_size} || SOMAXCONN,
-        Type => SOCK_STREAM
+        Blocking => 0,
+        Listen   => $args->{queue_size} || SOMAXCONN,
+        Type     => SOCK_STREAM
     );
 
     # Listen on UNIX domain socket
@@ -289,23 +287,15 @@ sub listen {
         $options{Proto}     = 'tcp';
         $options{ReuseAddr} = 1;
 
-        # TLS options
-        if ($args->{tls}) {
-            $options{SSL_cert_file} = $args->{tls_cert}
-              || $self->_prepare_cert;
-            $options{SSL_key_file} = $args->{tls_key} || $self->_prepare_key;
-        }
-
         # Create socket
         my $class = IPV6 ? 'IO::Socket::INET6' : 'IO::Socket::INET';
-        $class = 'IO::Socket::SSL' if TLS && $args->{tls};
         $socket = $class->new(%options)
           or croak "Can't create listen socket: $!";
     }
     my $id = "$socket";
 
     # Add listen socket
-    $self->{_listen}->{$id} = {
+    my $c = $self->{_listen}->{$id} = {
         accept_cb => $args->{accept_cb} || $args->{cb},
         error_cb => $args->{error_cb},
         file => $args->{file} ? 1 : 0,
@@ -314,6 +304,14 @@ sub listen {
         socket   => $socket,
         write_cb => $args->{write_cb}
     };
+
+    # TLS options
+    $c->{tls} = {
+        SSL_startHandshake => 0,
+        SSL_cert_file      => $args->{tls_cert} || $self->_prepare_cert,
+        SSL_key_file       => $args->{tls_key} || $self->_prepare_key
+      }
+      if $args->{tls};
 
     # File descriptor
     my $fd = fileno $socket;
@@ -556,33 +554,36 @@ sub start_tls {
     my $id   = shift;
 
     # Shortcut
-    return unless TLS;
+    $self->drop($id) and return unless TLS;
 
     # Arguments
     my $args = ref $_[0] ? $_[0] : {@_};
 
-    # TLS certificate verification
+    # Options
     my %options = (Timeout => $self->connect_timeout);
+
+    # TLS options
     if ($args->{tls_ca_file}) {
+        $options{SSL_startHandshake}  = 0;
         $options{SSL_ca_file}         = $args->{tls_ca_file};
         $options{SSL_verify_mode}     = 0x01;
         $options{SSL_verify_callback} = $args->{tls_verify_cb};
     }
 
     # Connection
-    return unless my $c = $self->{_cs}->{$id};
+    $self->drop($id) and return unless my $c = $self->{_cs}->{$id};
 
     # Socket
-    return unless my $socket = $c->{socket};
+    $self->drop($id) and return unless my $socket = $c->{socket};
 
     # Start
-    $socket->blocking(1);
-    return unless my $new = IO::Socket::SSL->start_SSL($socket, %options);
-    $socket->blocking(0);
+    $self->drop($id) and return
+      unless my $new = IO::Socket::SSL->start_SSL($socket, %options);
 
     # Upgrade
-    $c->{socket} = $new;
+    $c->{socket}         = $new;
     $self->{_cs}->{$new} = delete $self->{_cs}->{$id};
+    $c->{tls_connect}    = 1;
 
     return "$new";
 }
@@ -659,6 +660,13 @@ sub _accept {
     # Unlock callback
     $self->unlock_cb->();
 
+    # Listen
+    my $l = $self->{_listen}->{$listen};
+
+    # TLS handshake
+    my $tls = $l->{tls};
+    $socket = IO::Socket::SSL->start_SSL($socket, %$tls) if $tls;
+
     # Add connection
     my $id = "$socket";
     my $c = $self->{_cs}->{$id} = {
@@ -666,6 +674,7 @@ sub _accept {
         buffer    => Mojo::ByteStream->new,
         socket    => $socket
     };
+    $c->{tls_accept} = 1 if $tls;
 
     # Timeout
     $c->{accept_timer} =
@@ -673,8 +682,7 @@ sub _accept {
           sub { shift->_error($id, 'Accept timeout.') });
 
     # Disable Nagle's algorithm
-    setsockopt($socket, IPPROTO_TCP, TCP_NODELAY, 1)
-      unless $self->{_listen}->{$listen}->{file};
+    setsockopt($socket, IPPROTO_TCP, TCP_NODELAY, 1) unless $l->{file};
 
     # File descriptor
     my $fd = fileno $socket;
@@ -682,12 +690,12 @@ sub _accept {
 
     # Register callbacks
     for my $name (qw/error_cb hup_cb read_cb write_cb/) {
-        my $cb = $self->{_listen}->{$listen}->{$name};
+        my $cb = $l->{$name};
         $self->$name($id => $cb) if $cb;
     }
 
     # Accept callback
-    my $cb = $self->{_listen}->{$listen}->{accept_cb};
+    my $cb = $l->{accept_cb};
     $self->_run_event('accept', $cb, $id) if $cb;
 
     # Remove listen sockets
@@ -982,6 +990,12 @@ sub _read {
     # Connection
     my $c = $self->{_cs}->{$id};
 
+    # TLS accept
+    return $self->_tls_accept($id) if $c->{tls_accept};
+
+    # TLS connect
+    return $self->_tls_connect($id) if $c->{tls_connect};
+
     # Socket
     return unless defined(my $socket = $c->{socket});
 
@@ -1091,11 +1105,69 @@ sub _timer {
     return $count;
 }
 
+sub _tls_accept {
+    my ($self, $id) = @_;
+
+    # Connection
+    my $c = $self->{_cs}->{$id};
+
+    # Connected
+    if ($c->{socket}->accept_SSL) {
+        delete $c->{tls_accept};
+        $self->writing($id);
+        return;
+    }
+
+    # Error
+    my $error = $IO::Socket::SSL::SSL_ERROR;
+
+    # Reading
+    if ($error == TLS_READ) { $self->not_writing($id) }
+
+    # Writing
+    elsif ($error == TLS_WRITE) { $self->writing($id) }
+
+    # Real error
+    else { $self->_error($id, $error) }
+}
+
+sub _tls_connect {
+    my ($self, $id) = @_;
+
+    # Connection
+    my $c = $self->{_cs}->{$id};
+
+    # Connected
+    if ($c->{socket}->connect_SSL) {
+        delete $c->{tls_connect};
+        $self->writing($id);
+        return;
+    }
+
+    # Error
+    my $error = $IO::Socket::SSL::SSL_ERROR;
+
+    # Reading
+    if ($error == TLS_READ) { $self->not_writing($id) }
+
+    # Writing
+    elsif ($error == TLS_WRITE) { $self->writing($id) }
+
+    # Real error
+    else { $self->_error($id, $error) }
+}
+
 sub _write {
     my ($self, $id) = @_;
 
     # Connection
     my $c = $self->{_cs}->{$id};
+
+    # TLS accept
+    return $self->_tls_accept($id) if $c->{tls_accept};
+
+    # TLS connect
+    return $self->_tls_connect($id) if $c->{tls_connect};
 
     # Connect has just completed
     return if $c->{connecting};

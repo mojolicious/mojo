@@ -177,7 +177,7 @@ $client->websocket(
     "ws://localhost:$port2/test" => sub {
         my ($self, $tx) = @_;
         $success = $tx->success;
-        $error   = ($tx->error)[1];
+        $error   = $tx->error;
     }
 )->process;
 is($success, undef);

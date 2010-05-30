@@ -186,7 +186,7 @@ sub render {
     my $req = $c->req;
     unless ($res->code) {
         $req->has_error
-          ? $res->code($req->error)
+          ? $res->code(($req->error)[1])
           : $res->code($c->stash('status') || $self->default_status);
     }
     $res->body($output) unless $res->body;

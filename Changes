@@ -14,6 +14,7 @@ This file documents the revision history for Perl extension Mojolicious.
           Mojo::Message.
         - Added EXPERIMENTAL idle_cb attribute to Mojo::IOLoop.
         - Added more perlish block syntax to Mojo::Template.
+        - Added non blocking TLS support to Mojo::IOLoop.
         - Added proxy support to Mojo::Client.
         - Added the ability to have dispatch plugins.
         - Added "under" to Mojolicious::Lite.

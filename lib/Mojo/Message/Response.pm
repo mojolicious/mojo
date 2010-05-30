@@ -212,7 +212,7 @@ sub _parse_start_line {
             $self->message($4);
             $self->state('content');
         }
-        else { $self->error(400, 'Bad response start line.') }
+        else { $self->error('Bad response start line.', 400) }
     }
 }
 

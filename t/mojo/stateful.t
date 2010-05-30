@@ -34,15 +34,16 @@ ok(!$stateful->is_finished, 'state is not finished');
 # Errors
 ok(!defined($stateful->error), 'has no error');
 ok(!$stateful->has_error,      'has no error');
-$stateful->state_cb(sub { $stateful->{error}->[0] .= '13' });
-$stateful->error('4');
-ok($stateful->error,     'unknown error');
+$stateful->state_cb(sub { $stateful->{error}->[0] .= 'st' });
+$stateful->error('te');
 ok($stateful->has_error, 'has error');
-is($stateful->error, '413',   'right error');
+is($stateful->error, 'test',  'right error');
 is($stateful->state, 'error', 'right state');
 ok($stateful->is_state(qw/error another/), 'state is error or another');
 ok(!$stateful->is_done,                    'state is not done');
 ok($stateful->is_finished,                 'state is finished');
+$stateful->error('te', 500);
+is_deeply([$stateful->error], ['test', 500], 'right error and code');
 
 # done
 $stateful->done;
@@ -55,4 +56,4 @@ ok($stateful->is_finished, 'state is finished');
 # Unknown error
 $stateful = Mojo::Stateful->new;
 $stateful->state('error');
-is($stateful->error, 500, 'right error');
+is($stateful->error, 'Unknown error.', 'right error');

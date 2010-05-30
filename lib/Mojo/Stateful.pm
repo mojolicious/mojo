@@ -23,7 +23,7 @@ sub error {
         return unless $self->has_error;
 
         # Default
-        my $error = $self->{error} || [500, 'Unknown error.'];
+        my $error = $self->{error} || ['Unknown error.', 500];
 
         # Context
         return wantarray ? @$error : $error->[0];
@@ -110,10 +110,10 @@ Shortcut for setting the current state to C<done>.
 
 =head2 C<error>
 
-    my $code             = $stateful->error;
-    my ($code, $message) = $stateful->error;
-    $stateful            = $stateful->error(500);
-    $stateful            = $stateful->error(500, 'Parser error.');
+    my $message          = $stateful->error;
+    my ($message, $code) = $stateful->error;
+    $stateful            = $stateful->error('Parser error.');
+    $stateful            = $stateful->error('Parser error.', 500);
 
 Shortcut for setting the current state to C<error> with C<code> and
 C<message>.

@@ -46,6 +46,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed reloading of inflated Mojolicious::Lite templates.
         - Fixed the client transaction builder. (Curt Tilmes)
         - Fixed unix domain socket support. (sharifulin)
+        - Fixed a few regex bugs. (vti)
         - Fixed POD. (memowe)
         - Fixed typos. (jawnsy)
 

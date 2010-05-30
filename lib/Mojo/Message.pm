@@ -88,8 +88,7 @@ sub body_params {
 
     # Charset
     $params->charset($self->default_charset);
-    $type =~ /charset=\"?(\S+)\"?/;
-    $params->charset($1) if $1;
+    $type =~ /charset=\"?(\S+)\"?/ and $params->charset($1);
 
     # "x-application-urlencoded" and "application/x-www-form-urlencoded"
     if ($type =~ /(?:x-application|application\/x-www-form)-urlencoded/i) {
@@ -507,10 +506,8 @@ sub _parse_formdata {
 
     # Default charset
     my $default = $self->default_charset;
-    if (my $type = $self->headers->content_type) {
-        $type =~ /charset=\"?(\S+)\"?/;
-        $default = $1 if $1;
-    }
+    ($self->headers->content_type || '') =~ /charset=\"?(\S+)\"?/
+      and $default = $1;
 
     # Walk the tree
     my @parts;
@@ -525,10 +522,8 @@ sub _parse_formdata {
 
         # Charset
         my $charset = $default;
-        if (my $type = $part->headers->content_type) {
-            $type =~ /charset=\"?(\S+)\"?/;
-            $charset = $1 if $1;
-        }
+        ($part->headers->content_type || '') =~ /charset=\"?(\S+)\"?/
+          and $charset = $1;
 
         # "Content-Disposition"
         my $disposition = $part->headers->content_disposition;

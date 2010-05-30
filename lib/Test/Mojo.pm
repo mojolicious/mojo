@@ -176,8 +176,9 @@ sub _get_content {
     my ($self, $tx) = @_;
 
     # Charset
-    ($tx->res->headers->content_type || '') =~ /charset=\"?([^"\s]+)\"?/;
-    my $charset = $1;
+    my $charset;
+    ($tx->res->headers->content_type || '') =~ /charset=\"?([^"\s]+)\"?/
+      and $charset = $1;
 
     # Content
     return $charset

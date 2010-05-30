@@ -15,6 +15,9 @@ plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
 plan tests => 389;
 
+# Pollution
+123 =~ m/(\d+)/;
+
 # Wait you're the only friend I have...
 # You really want a robot for a friend?
 # Yeah ever since I was six.

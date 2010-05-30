@@ -27,6 +27,9 @@ use_ok('Mojo::Message');
 use_ok('Mojo::Message::Request');
 use_ok('Mojo::Message::Response');
 
+# Pollution
+123 =~ m/(\d+)/;
+
 # Parse HTTP 1.1 start line, no headers and body
 my $req = Mojo::Message::Request->new;
 $req->parse("GET / HTTP/1.1\x0d\x0a\x0d\x0a");

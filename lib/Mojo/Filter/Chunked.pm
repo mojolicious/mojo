@@ -87,8 +87,7 @@ sub parse {
                 $buffer->add_chunk($filter->remove($length));
 
                 # Remove newline at end of chunk
-                $content =~ s/^(\x0d?\x0a)//;
-                $filter->remove(length $1) if $1;
+                $content =~ s/^(\x0d?\x0a)// and $filter->remove(length $1);
             }
 
             # Not a whole chunk, wait for more data

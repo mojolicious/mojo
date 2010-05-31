@@ -33,10 +33,17 @@ sub new {
 }
 
 sub append {
-    my $self = shift;
+    my ($self, @params) = @_;
+
+    # Filter array values
+    for (my $i = 1; $i < @params; $i += 2) {
+        next if ref $params[$i] ne 'ARRAY';
+        push @params, map { ($params[$i - 1], $_) } @{$params[$i]};
+        splice @params, $i - 1, 2;
+    }
 
     # Append
-    push @{$self->params}, map { defined $_ ? "$_" : '' } @_;
+    push @{$self->params}, map { defined $_ ? "$_" : '' } @params;
 
     return $self;
 }

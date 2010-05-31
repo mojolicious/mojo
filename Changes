@@ -42,6 +42,7 @@ This file documents the revision history for Perl extension Mojolicious.
           (chansen)
         - Fixed Mojo::JSON to not unescape broken surrogates. (chansen)
         - Fixed UTF-8 bug in Mojolicious::Plugin::JsonConfig. (vti)
+        - Fixed Mojo::Parameters to accept array values. (konstantinov)
         - Fixed multiple path encoding bugs.
         - Fixed a loader bug.
         - Fixed reloading of inflated Mojolicious::Lite templates.

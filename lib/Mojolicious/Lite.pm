@@ -304,14 +304,18 @@ Route placeholders allow capturing parts of a request path until a C</> or
 C<.> separator occurs, results will be stored by name in the C<stash> and
 C<param>.
 
-    # /foo/*
+    # /foo/* (everything except "/" and ".")
+    # /foo/test
+    # /foo/test123
     get '/foo/:bar' => sub {
         my $self = shift;
         my $bar  = $self->stash('bar');
         $self->render(text => "Our :bar placeholder matched $bar");
     };
 
-    # /*something/foo
+    # /*something/foo (everything except "/" and ".")
+    # /test/foo
+    # /test123/foo
     get '/(:bar)something/foo' => sub {
         my $self = shift;
         my $bar  = $self->param('bar');
@@ -320,8 +324,11 @@ C<param>.
 
 Relaxed placeholders allow matching of everything until a C</> occurs.
 
-    # GET /hello/*
-    get '/hello/(.you)' => sub {
+    # /*/hello (everything except "/")
+    # /test/hello
+    # /test123/hello
+    # /test.123/hello
+    get '/(.you)/hello' => sub {
         shift->render('groovy');
     };
 
@@ -333,7 +340,10 @@ Relaxed placeholders allow matching of everything until a C</> occurs.
 Wildcard placeholders allow matching absolutely everything, including
 C</> and C<.>.
 
-    # /hello/*
+    # /hello/* (everything)
+    # /hello/test
+    # /hello/test123
+    # /hello/test.123/test/123
     get '/hello/(*you)' => sub {
         shift->render('groovy');
     };

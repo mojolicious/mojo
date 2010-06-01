@@ -22,6 +22,7 @@ use Mojo::Transaction::WebSocket;
 use Mojo::URL;
 use Scalar::Util 'weaken';
 
+# You can't let a single bad experience scare you away from drugs.
 __PACKAGE__->attr(
     [qw/app http_proxy https_proxy log tls_ca_file tls_verify_cb tx/]);
 __PACKAGE__->attr(cookie_jar => sub { Mojo::CookieJar->new });
@@ -53,6 +54,8 @@ sub DESTROY {
     }
 }
 
+# Homer, it's easy to criticize.
+# Fun, too.
 sub async {
     my $self = shift;
 
@@ -74,6 +77,7 @@ sub async {
     return $self->{_async};
 }
 
+# Ah, alcohol and night-swimming. It's a winning combination.
 sub build_form_tx {
     my $self = shift;
 
@@ -275,6 +279,8 @@ sub clone {
     return $clone;
 }
 
+# The only thing I asked you to do for this party was put on clothes,
+# and you didn't do it.
 sub delete {
     my $self = shift;
     return $self->_queue_or_process_tx($self->build_tx('DELETE', @_));
@@ -313,6 +319,7 @@ sub finished {
     $tx->finished(sub { shift; local $self->{tx} = $tx; $self->$cb(@_) });
 }
 
+# "What are you lookin' at?" - the innocent words of a drunken child.
 sub get {
     my $self = shift;
     return $self->_queue_or_process_tx($self->build_tx('GET', @_));
@@ -333,6 +340,8 @@ sub post_form {
     return $self->_queue_or_process_tx($self->build_form_tx(@_));
 }
 
+# Olive oil? Asparagus? If your mother wasn't so fancy,
+# we could just shop at the gas station like normal people.
 sub process {
     my $self = shift;
 
@@ -365,6 +374,8 @@ sub put {
     $self->_queue_or_process_tx($self->build_tx('PUT', @_));
 }
 
+# And I gave that man directions, even though I didn't know the way,
+# because that's the kind of guy I am this week.
 sub queue {
     my $self = shift;
 
@@ -406,6 +417,8 @@ sub res { shift->tx->res(@_) }
 
 sub singleton { $CLIENT ||= shift->new(@_) }
 
+# Wow, Barney. You brought a whole beer keg.
+# Yeah... where do I fill it up?
 sub send_message {
     my $self = shift;
 
@@ -463,6 +476,8 @@ sub websocket {
     $self->queue($tx, $cb);
 }
 
+# Where on my badge does it say anything about protecting people?
+# Uh, second word, chief.
 sub _connect {
     my ($self, $p, $cb) = @_;
 
@@ -544,6 +559,8 @@ sub _connect {
     return $id;
 }
 
+# I don't mind being called a liar when I'm lying, or about to lie,
+# or just finished lying, but NOT WHEN I'M TELLING THE TRUTH.
 sub _connected {
     my ($self, $id) = @_;
 
@@ -590,6 +607,8 @@ sub _dequeue_connection {
     return $found;
 }
 
+# Mrs. Simpson, bathroom is not for customers.
+# Please use the crack house across the street.
 sub _drop {
     my ($self, $id) = @_;
 
@@ -744,6 +763,7 @@ sub _pipeline_info {
     return ($scheme, $host, $port);
 }
 
+# It's greeat! We can do *anything* now that Science has invented Magic.
 sub _prepare_pipeline {
     my ($self, $p, $cb) = @_;
 
@@ -821,6 +841,7 @@ sub _prepare_pipeline {
     return $id;
 }
 
+# It's like my dad always said: eventually, everybody gets shot.
 sub _prepare_server {
     my $self = shift;
 
@@ -841,6 +862,7 @@ sub _prepare_server {
     ref $app ? $server->app($app) : $server->app_class($app);
 }
 
+# Hey, Weener Boy... where do you think you'e going?
 sub _proxy_connect {
     my ($self, $p, $cb) = @_;
 
@@ -935,6 +957,8 @@ sub _queue_or_process_tx {
     $self->queue($tx, $cb);
 }
 
+# Have you ever seen that Blue Man Group? Total ripoff of the Smurfs.
+# And the Smurfs, well, they SUCK.
 sub _read {
     my ($self, $loop, $id, $chunk) = @_;
 
@@ -990,6 +1014,8 @@ sub _redirect {
     return 1;
 }
 
+# Oh, I'm in no condition to drive. Wait a minute.
+# I don't have to listen to myself. I'm drunk.
 sub _state {
     my ($self, $id, $tx) = @_;
 
@@ -1053,6 +1079,7 @@ sub _store_cookies {
     }
 }
 
+# Once the government approves something, it's no longer immoral!
 sub _upgrade {
     my ($self, $id) = @_;
 
@@ -1101,6 +1128,7 @@ sub _upgrade {
     return $new;
 }
 
+# Oh well. At least we'll die doing what we love: inhaling molten rock.
 sub _write {
     my ($self, $loop, $id) = @_;
 

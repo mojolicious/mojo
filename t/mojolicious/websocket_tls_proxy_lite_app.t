@@ -13,7 +13,7 @@ plan skip_all => 'IO::Socket::SSL required for this test!'
   unless Mojo::IOLoop::TLS;
 plan skip_all => 'working sockets required for this test!'
   unless my $proxy = Mojo::IOLoop->new->generate_port;
-plan tests => 15;
+plan tests => 16;
 
 # I was a hero to broken robots 'cause I was one of them, but how can I sing
 # about being damaged if I'm not?
@@ -152,7 +152,7 @@ is($result, 'test1test2');
 $client->https_proxy("http://localhost:$proxy");
 is($client->get("https://localhost:$port/")->success->body, 'Hello World!');
 
-# GET http://kraih.com/proxy (proxy request)
+# GET http://kraih.com/proxy (kept alive proxy request)
 $client->https_proxy("http://localhost:$proxy");
 my $tx = $client->build_tx(GET => "https://localhost:$port/");
 $client->process($tx);
@@ -162,9 +162,11 @@ is($tx->kept_alive,    1);
 # WebSocket /test (kept alive proxy websocket)
 $client->https_proxy("http://localhost:$proxy");
 $result = undef;
+my $kept_alive;
 $client->websocket(
     "wss://localhost:$port/test" => sub {
         my $self = shift;
+        $kept_alive = $self->tx->kept_alive;
         $self->receive_message(
             sub {
                 my ($self, $message) = @_;
@@ -175,8 +177,9 @@ $client->websocket(
         $self->send_message('test1');
     }
 )->process;
-is($connected, "localhost:$port");
-is($result,    'test1test2');
+is($kept_alive, 1);
+is($connected,  "localhost:$port");
+is($result,     'test1test2');
 ok($read > 25);
 ok($sent > 25);
 

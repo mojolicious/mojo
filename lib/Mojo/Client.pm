@@ -1071,6 +1071,7 @@ sub _upgrade {
     # Start new WebSocket
     my $new = Mojo::Transaction::WebSocket->new(handshake => $old);
     $c->{p} = [$new];
+    $new->kept_alive($old->kept_alive);
 
     # Cleanup connection
     $c->{reader} = 0;

@@ -13,7 +13,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 30;
+plan tests => 34;
 
 # In the game of chess you can never let your adversary see your pieces.
 use Mojo::ByteStream 'b';
@@ -46,6 +46,9 @@ post '/data' => sub {
 
 # GET /json
 get '/json' => sub { shift->render_json({test => $yatta}) };
+
+# GET /привет/мир
+get '/привет/мир' => sub { shift->render_json({foo => $yatta}) };
 
 my $t = Test::Mojo->new;
 
@@ -88,6 +91,10 @@ $t->post_ok('/data', $yatta_sjis)->status_is(200)->content_is($yatta_sjis);
 # JSON data
 $t->get_ok('/json')->status_is(200)->content_type_is('application/json')
   ->json_content_is({test => $yatta});
+
+# IRI
+$t->get_ok('/привет/мир')->status_is(200)
+  ->content_type_is('application/json')->json_content_is({foo => $yatta});
 
 __DATA__
 @@ index.html.ep

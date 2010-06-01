@@ -22,7 +22,8 @@ use Mojo::Transaction::WebSocket;
 use Mojo::URL;
 use Scalar::Util 'weaken';
 
-__PACKAGE__->attr([qw/app http_proxy log tls_ca_file tls_verify_cb tx/]);
+__PACKAGE__->attr(
+    [qw/app http_proxy https_proxy log tls_ca_file tls_verify_cb tx/]);
 __PACKAGE__->attr(cookie_jar => sub { Mojo::CookieJar->new });
 __PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->new });
 __PACKAGE__->attr(keep_alive_timeout         => 15);
@@ -465,15 +466,11 @@ sub websocket {
 sub _connect {
     my ($self, $p, $cb) = @_;
 
+    # First transaction
+    my $f = $p->[0];
+
     # Check for specific connection id
-    my $id = $p->[0]->connection;
-
-    # WebSocket proxy
-    if (!$id && ($p->[0]->req->headers->upgrade || '') eq 'WebSocket') {
-
-        # CONNECT required
-        return if $self->_proxy_connect($p, $cb);
-    }
+    my $id = $f->connection;
 
     # Info
     my ($scheme, $address, $port) = $self->_pipeline_info($p);
@@ -482,8 +479,14 @@ sub _connect {
     my $loop = $self->ioloop;
     $loop->one_tick(0);
 
+    # CONNECT request
+    my $connect;
+    $connect = 1 if ($f->req->method || '') eq 'CONNECT';
+
     # Cached connection
-    if ($id = $self->_dequeue_connection($id || "$scheme:$address:$port")) {
+    $id = $self->_dequeue_connection($id || "$scheme:$address:$port")
+      unless $connect;
+    if ($id) {
 
         # Writing
         $loop->writing($id);
@@ -500,6 +503,13 @@ sub _connect {
 
     # New connection
     else {
+
+        # TLS/WebSocket proxy
+        if (!$connect) {
+
+            # CONNECT request to proxy required
+            return if $self->_proxy_connect($p, $cb);
+        }
 
         # Connect
         $id = $loop->connect(
@@ -703,10 +713,10 @@ sub _pipeline_info {
     my ($self, $p) = @_;
 
     # First transaction
-    my $tx = $p->[-1];
+    my $f = $p->[-1];
 
     # Info
-    my $req    = $tx->req;
+    my $req    = $f->req;
     my $url    = $req->url;
     my $scheme = $url->scheme;
     my $host   = $url->ihost;
@@ -714,9 +724,11 @@ sub _pipeline_info {
 
     # Check for connect transaction
     my $connect;
-    my $method = $req->method   || '';
-    my $code   = $tx->res->code || '';
-    $connect = 1 if $method eq 'CONNECT' && $code eq '200';
+    my $method = $req->method  || '';
+    my $code   = $f->res->code || '';
+    $connect = 1
+      if ($method eq 'CONNECT' && $code eq '200')
+      || ($method ne 'CONNECT' && $scheme eq 'https');
 
     # Proxy
     if ((my $proxy = $req->proxy) && !$connect) {
@@ -739,7 +751,8 @@ sub _prepare_pipeline {
     $self->_prepare_server if $self->app;
 
     # Log
-    $self->log($self->{_server}->app->log) if $self->{_server} && !$self->log;
+    $self->log($self->{_server}->app->log)
+      if $self->{_server} && !$self->log;
 
     # Prepare all transactions
     for my $tx (@$p) {
@@ -754,17 +767,26 @@ sub _prepare_pipeline {
             $tx->req->url($url);
         }
 
-        # Proxy
+        # Request
         my $req = $tx->req;
+
+        # Scheme
+        my $scheme = $req->url->scheme || '';
+
+        # HTTP proxy
         if (my $proxy = $self->http_proxy) {
-            if (my $scheme = $req->url->scheme) {
-                $req->proxy($proxy) if !$req->proxy && $scheme eq 'http';
-            }
+            $req->proxy($proxy) if !$req->proxy && $scheme eq 'http';
+        }
+
+        # HTTPS proxy
+        if (my $proxy = $self->https_proxy) {
+            $req->proxy($proxy) if !$req->proxy && $scheme eq 'https';
         }
 
         # Make sure WebSocket requests have an origin header
         my $headers = $req->headers;
-        $headers->origin($req->url) if $headers->upgrade && !$headers->origin;
+        $headers->origin($req->url)
+          if $headers->upgrade && !$headers->origin;
 
         # We identify ourself
         $headers->user_agent('Mozilla/5.0 (compatible; Mojolicious; Perl)')
@@ -822,15 +844,25 @@ sub _prepare_server {
 sub _proxy_connect {
     my ($self, $p, $cb) = @_;
 
+    # First transaction
+    my $f = $p->[0];
+
+    # Request
+    my $req = $f->req;
+
     # Proxy
-    return unless my $proxy = $self->http_proxy;
+    return
+      unless ($req->headers->upgrade || '') eq 'WebSocket'
+      || ($req->proxy && ($req->url->scheme || '') eq 'https');
+    return unless my $proxy = $f->req->proxy;
 
     # CONNECT request
-    my $new = $self->build_tx(CONNECT => $p->[0]->req->url->clone);
+    my $new = $self->build_tx(CONNECT => $f->req->url->clone);
     $new->req->proxy($proxy);
+
+    # Prepare
     $self->_prepare_pipeline(
-        [$new],
-        sub {
+        [$new] => sub {
             my ($self, $tx) = @_;
 
             # Failed
@@ -840,8 +872,33 @@ sub _proxy_connect {
                 return;
             }
 
+            # TLS upgrade
+            if ($tx->req->url->scheme eq 'https') {
+
+                # Connection
+                return
+                  unless my $old =
+                      $self->_dequeue_connection($tx->connection);
+
+                # Start TLS
+                my $new = $self->ioloop->start_tls(
+                    $old,
+                    tls_ca_file => $self->tls_ca_file || $ENV{MOJO_CA_FILE},
+                    tls_verify_cb => $self->tls_verify_cb
+                );
+
+                # Cleanup
+                $p->[0]->req->proxy(undef);
+                delete $self->{_cs}->{$old};
+                $tx->connection($new);
+
+                # Queue connection
+                my ($scheme, $address, $port) = $self->_pipeline_info($p);
+                $self->_queue_connection("$scheme:$address:$port", $new);
+            }
+
             # Share connection
-            $p->[0]->connection($tx->connection);
+            $f->connection($tx->connection);
 
             # Queue real pipeline
             $self->_prepare_pipeline($p, $cb);
@@ -1155,6 +1212,13 @@ object.
     $client   = $client->http_proxy('http://sri:secret@127.0.0.1:8080');
 
 Proxy server to use for HTTP and WebSocket requests.
+
+=head2 C<https_proxy>
+
+    my $proxy = $client->https_proxy;
+    $client   = $client->https_proxy('http://sri:secret@127.0.0.1:8080');
+
+Proxy server to use for HTTPS and WebSocket requests.
 
 =head2 C<ioloop>
 

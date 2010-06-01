@@ -156,9 +156,6 @@ sub connect {
         socket     => $socket
     };
 
-    # Start TLS
-    if ($args->{tls}) { return unless $id = $self->start_tls($id => $args) }
-
     # Non blocking
     $socket->blocking(0);
 
@@ -182,6 +179,9 @@ sub connect {
 
     # Add socket to poll
     $self->writing($id);
+
+    # Start TLS
+    if ($args->{tls}) { return unless $id = $self->start_tls($id => $args) }
 
     return $id;
 }
@@ -560,10 +560,8 @@ sub start_tls {
     my $args = ref $_[0] ? $_[0] : {@_};
 
     # Options
-    my %options = (Timeout => $self->connect_timeout);
-
-    # TLS options
-    $options{SSL_startHandshake} = 0 if $args->{tls};
+    my %options =
+      (SSL_startHandshake => 0, Timeout => $self->connect_timeout);
     if ($args->{tls_ca_file}) {
         $options{SSL_ca_file}         = $args->{tls_ca_file};
         $options{SSL_verify_mode}     = 0x01;
@@ -575,10 +573,16 @@ sub start_tls {
 
     # Socket
     $self->drop($id) and return unless my $socket = $c->{socket};
+    my $fd = fileno $socket;
 
     # Start
     $self->drop($id) and return
       unless my $new = IO::Socket::SSL->start_SSL($socket, %options);
+
+    # Update file descriptor
+    delete $self->{_fds}->{$fd};
+    $fd = fileno $new;
+    $self->{_fds}->{$fd} = "$new";
 
     # Upgrade
     $c->{socket}         = $new;
@@ -780,7 +784,7 @@ sub _drop_immediately {
     if (my $socket = $c->{socket}) {
 
         # Remove file descriptor
-        my $fd = fileno $socket;
+        return unless my $fd = fileno $socket;
         delete $self->{_fds}->{$fd};
 
         # Remove socket from kqueue

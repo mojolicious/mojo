@@ -14,7 +14,7 @@ This file documents the revision history for Perl extension Mojolicious.
           Mojo::Message.
         - Added EXPERIMENTAL idle_cb attribute to Mojo::IOLoop.
         - Added more perlish block syntax to Mojo::Template.
-        - Added non blocking TLS support to Mojo::IOLoop.
+        - Added non blocking TLS handshake support to Mojo::IOLoop.
         - Added proxy support to Mojo::Client.
         - Added the ability to have dispatch plugins.
         - Added "under" to Mojolicious::Lite.
@@ -43,6 +43,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed Mojo::JSON to not unescape broken surrogates. (chansen)
         - Fixed UTF-8 bug in Mojolicious::Plugin::JsonConfig. (vti)
         - Fixed Mojo::Parameters to accept array values. (konstantinov)
+        - Fixed IRI routes in Mojolicious.
         - Fixed multiple path encoding bugs.
         - Fixed a loader bug.
         - Fixed reloading of inflated Mojolicious::Lite templates.

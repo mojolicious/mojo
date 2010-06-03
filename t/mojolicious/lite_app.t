@@ -245,7 +245,7 @@ post '/malformed_utf8' => sub {
 };
 
 # GET /json
-get '/json' => sub { shift->render_json({foo => [1, -2, 3, 'bar']}) };
+get '/json' => sub { shift->render_json({foo => [1, -2, 3, 'b☃r']}) };
 
 # GET /autostash
 get '/autostash' => sub { shift->render(handler => 'ep', foo => 'bar') } =>
@@ -749,7 +749,7 @@ app->log->level($level);
 $t->get_ok('/json')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('application/json')
-  ->json_content_is({foo => [1, -2, 3, 'bar']});
+  ->json_content_is({foo => [1, -2, 3, 'b☃r']});
 
 # GET /autostash
 $t->get_ok('/autostash?bar=23')->status_is(200)

@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 596;
+use Test::More tests => 611;
 
 use File::Spec;
 use File::Temp;
@@ -1080,6 +1080,38 @@ is($req->body,            'hello=world');
 is_deeply($req->param('hello'), 'world');
 is($req->url->to_abs->to_string,
     'http://localhost:8080/test/index.cgi/foo/bar?lalala=23&bar=baz');
+
+# Parse Apache 2.2 (win32) like CGI environment variables and a body
+$req = Mojo::Message::Request->new;
+$req->parse(
+    CONTENT_LENGTH  => 87,
+    CONTENT_TYPE    => 'application/x-www-form-urlencoded; charset=UTF-8',
+    PATH_INFO       => '',
+    QUERY_STRING    => '',
+    REQUEST_METHOD  => 'POST',
+    SCRIPT_NAME     => '/index.pl',
+    HTTP_HOST       => 'test1',
+    SERVER_PROTOCOL => 'HTTP/1.1'
+);
+$req->parse('request=&ajax=true&login=test&password=111&');
+$req->parse('edition=db6d8b30-16df-4ecd-be2f-c8194f94e1f4');
+is($req->state,           'done');
+is($req->method,          'POST');
+is($req->url->path,       '');
+is($req->url->base->path, '/index.pl/');
+is($req->url->base->host, 'test1');
+is($req->url->base->port, '');
+is($req->url->query,      undef);
+is($req->minor_version,   '1');
+is($req->major_version,   '1');
+is($req->body,
+        'request=&ajax=true&login=test&password=111&'
+      . 'edition=db6d8b30-16df-4ecd-be2f-c8194f94e1f4');
+is($req->param('ajax'),          'true');
+is($req->param('login'),         'test');
+is($req->param('password'),      '111');
+is($req->param('edition'),       'db6d8b30-16df-4ecd-be2f-c8194f94e1f4');
+is($req->url->to_abs->to_string, 'http://test1/index.pl');
 
 # Parse Apache 2.2.11 like CGI environment variables and a body
 $req = Mojo::Message::Request->new;

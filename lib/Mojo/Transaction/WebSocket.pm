@@ -27,11 +27,11 @@ sub connection   { shift->handshake->connection(@_) }
 sub finish {
     my $self = shift;
 
-    # Still writing
-    return $self->{_finished} = 1 if $self->{_write} && $self->{_write}->size;
+    # Send closing handshake
+    $self->_send_bytes("\xff");
 
-    # Finished
-    $self->state('done');
+    # Finish after writing
+    return $self->{_finished} = 1;
 }
 
 sub is_websocket {1}
@@ -49,12 +49,8 @@ sub send_message {
     # Encode
     $message = b($message)->encode('UTF-8')->to_string;
 
-    # Add to buffer with framing
-    my $write = $self->{_write} ||= Mojo::ByteStream->new;
-    $write->add_chunk("\x00$message\xff");
-
-    # Writing
-    $self->state('write');
+    # Send message with framing
+    $self->_send_bytes("\x00$message\xff");
 }
 
 sub server_close {
@@ -74,6 +70,9 @@ sub server_read {
 
     # Full frames
     while ((my $i = $buffer->contains("\xff")) >= 0) {
+
+        # Closing handshake
+        return $self->finish if $i == 0;
 
         # Frame
         my $message = $buffer->remove($i + 1);
@@ -100,6 +99,17 @@ sub server_write {
 
     # Empty buffer
     return $write->empty;
+}
+
+sub _send_bytes {
+    my ($self, $bytes) = @_;
+
+    # Add to buffer
+    my $write = $self->{_write} ||= Mojo::ByteStream->new;
+    $write->add_chunk($bytes);
+
+    # Writing
+    $self->state('write');
 }
 
 1;

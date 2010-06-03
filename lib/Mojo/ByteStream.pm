@@ -518,6 +518,13 @@ sub html_unescape {
     return $self;
 }
 
+sub md5_bytes {
+    my $self = shift;
+    utf8::encode $self->{bytestream} if utf8::is_utf8 $self->{bytestream};
+    $self->{bytestream} = Digest::MD5::md5($self->{bytestream});
+    return $self;
+}
+
 sub md5_sum {
     my $self = shift;
     utf8::encode $self->{bytestream} if utf8::is_utf8 $self->{bytestream};
@@ -845,6 +852,7 @@ Mojo::ByteStream - ByteStream
     $stream->hmac_md5_sum('secret');
     $stream->html_escape;
     $stream->html_unescape;
+    $stream->md5_bytes;
     $stream->md5_sum;
     $stream->qp_encode;
     $stream->qp_decode;
@@ -997,6 +1005,12 @@ HTML escape bytestream.
     $stream = $stream->html_unescape;
 
 HTML unescape bytestream.
+
+=head2 C<md5_bytes>
+
+    $stream = $stream->md5_bytes;
+
+Turn bytestream into 16 byte MD5 checksum of old content.
 
 =head2 C<md5_sum>
 

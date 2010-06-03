@@ -10,7 +10,7 @@ use utf8;
 # Homer, we're going to ask you a few simple yes or no questions.
 # Do you understand?
 # Yes. *lie dectector blows up*
-use Test::More tests => 58;
+use Test::More tests => 59;
 
 use_ok('Mojo::ByteStream', 'b');
 
@@ -125,6 +125,13 @@ is($stream->quote, '"foo; 23 \"bar"', 'right quoted result');
 # unquote
 $stream = b('"foo 23 \"bar"');
 is($stream->unquote, 'foo 23 "bar', 'right unquoted result');
+
+# md5_bytes
+$stream = b('foo bar baz');
+is( unpack('H*', $stream->md5_bytes),
+    "ab07acbb1e496801937adfa772424bf7",
+    'right 16 byte md5 checksum'
+);
 
 # md5_sum
 $stream = b('foo bar baz');

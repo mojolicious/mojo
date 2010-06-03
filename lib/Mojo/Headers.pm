@@ -15,15 +15,14 @@ __PACKAGE__->attr(buffer => sub { Mojo::ByteStream->new });
 # Filter regex
 my $FILTER_RE = qr/[[:cntrl:]\(\|\)\<\>\@\,\;\:\\\"\/\[\]\?\=\{\}\s]/;
 
-# Upgrade header has to go first for WebSocket
 my @GENERAL_HEADERS = qw/
-  Upgrade
   Cache-Control
   Connection
   Date
   Pragma
   Trailer
   Transfer-Encoding
+  Upgrade
   Via
   Warning
   /;
@@ -71,8 +70,14 @@ my @ENTITY_HEADERS = qw/
   Expires
   Last-Modified
   /;
-my @WEBSOCKET_HEADERS =
-  qw/Origin WebSocket-Origin WebSocket-Location WebSocket-Protocol/;
+my @WEBSOCKET_HEADERS = qw/
+  Origin
+  Sec-WebSocket-Key1
+  Sec-WebSocket-Key2
+  Sec-WebSocket-Origin
+  Sec-WebSocket-Location
+  Sec-WebSocket-Protocol
+  /;
 
 my (%ORDERED_HEADERS, %NORMALCASE_HEADERS);
 {
@@ -323,14 +328,16 @@ sub to_hash {
 
 sub to_string { shift->build(@_) }
 
-sub trailer            { shift->header(Trailer              => @_) }
-sub transfer_encoding  { shift->header('Transfer-Encoding'  => @_) }
-sub upgrade            { shift->header(Upgrade              => @_) }
-sub user_agent         { shift->header('User-Agent'         => @_) }
-sub websocket_location { shift->header('WebSocket-Location' => @_) }
-sub websocket_origin   { shift->header('WebSocket-Origin'   => @_) }
-sub websocket_protocol { shift->header('WebSocket-Protocol' => @_) }
-sub www_authenticate   { shift->header('WWW-Authenticate'   => @_) }
+sub trailer                { shift->header(Trailer                  => @_) }
+sub transfer_encoding      { shift->header('Transfer-Encoding'      => @_) }
+sub upgrade                { shift->header(Upgrade                  => @_) }
+sub user_agent             { shift->header('User-Agent'             => @_) }
+sub sec_websocket_key1     { shift->header('Sec-WebSocket-Key1'     => @_) }
+sub sec_websocket_key2     { shift->header('Sec-WebSocket-Key2'     => @_) }
+sub sec_websocket_location { shift->header('Sec-WebSocket-Location' => @_) }
+sub sec_websocket_origin   { shift->header('Sec-WebSocket-Origin'   => @_) }
+sub sec_websocket_protocol { shift->header('Sec-WebSocket-Protocol' => @_) }
+sub www_authenticate       { shift->header('WWW-Authenticate'       => @_) }
 
 1;
 __END__
@@ -533,6 +540,41 @@ resulted in C<Referer> becoming an official header.
 
 Remove a header.
 
+=head2 C<sec_websocket_key1>
+
+    my $key1 = $headers->sec_websocket_key1;
+    $headers = $headers->sec_websocket_key1('4 @1  46546xW%0l 1 5');
+
+Shortcut for the C<Sec-WebSocket-Key1> header.
+
+=head2 C<sec_websocket_key2>
+
+    my $key2 = $headers->sec_websocket_key2;
+    $headers = $headers->sec_websocket_key2('12998 5 Y3 1  .P00');
+
+Shortcut for the C<Sec-WebSocket-Key2> header.
+
+=head2 C<sec_websocket_location>
+
+    my $location = $headers->sec_websocket_location;
+    $headers     = $headers->sec_websocket_location('ws://example.com/demo');
+
+Shortcut for the C<Sec-WebSocket-Location> header.
+
+=head2 C<sec_websocket_origin>
+
+    my $origin = $headers->sec_websocket_origin;
+    $headers   = $headers->sec_websocket_origin('http://example.com');
+
+Shortcut for the C<Sec-WebSocket-Origin> header.
+
+=head2 C<sec_websocket_protocol>
+
+    my $protocol = $headers->sec_websocket_protocol;
+    $headers     = $headers->sec_websocket_protocol('sample');
+
+Shortcut for the C<Sec-WebSocket-Protocol> header.
+
 =head2 C<server>
 
     my $server = $headers->server;
@@ -596,27 +638,6 @@ Shortcut for the C<Upgrade> header.
     $headers       = $headers->user_agent('Mojo/1.0');
 
 Shortcut for the C<User-Agent> header.
-
-=head2 C<websocket_location>
-
-    my $location = $headers->websocket_location;
-    $headers     = $headers->websocket_location('ws://example.com/demo');
-
-Shortcut for the C<WebSocket-Location> header.
-
-=head2 C<websocket_origin>
-
-    my $origin = $headers->websocket_origin;
-    $headers   = $headers->websocket_origin('http://example.com');
-
-Shortcut for the C<WebSocket-Origin> header.
-
-=head2 C<websocket_protocol>
-
-    my $protocol = $headers->websocket_protocol;
-    $headers     = $headers->websocket_protocol('sample');
-
-Shortcut for the C<WebSocket-Protocol> header.
 
 =head2 C<www_authenticate>
 

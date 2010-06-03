@@ -65,14 +65,11 @@ sub register {
                 $prepend .= q/no strict 'refs'; no warnings 'redefine';/;
 
                 # Helpers
+                $prepend .= 'my $_H = $self->app->renderer->helper;';
                 for my $name (sort keys %{$r->helper}) {
                     next unless $name =~ /^\w+$/;
-                    $prepend .= "sub $name;";
-                    $prepend .= " *$name = sub { ";
-                    $prepend .= "my \$sub = \$self->app->renderer";
-                    $prepend .= "->helper->{'$name'}; return ";
-                    $prepend .= "wantarray ? (\$sub->(\$self, \@_)) : ";
-                    $prepend .= "scalar \$sub->(\$self, \@_) };";
+                    $prepend .= "sub $name; *$name = sub { ";
+                    $prepend .= "return \$_H->{'$name'}->(\$self, \@_) };";
                 }
 
                 # Be less relaxed for everything else

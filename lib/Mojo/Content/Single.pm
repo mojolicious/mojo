@@ -44,9 +44,18 @@ sub parse {
     # Still parsing headers or using a custom body parser
     return $self if $self->is_state('headers') || $self->body_cb;
 
+    # Headers
+    my $headers = $self->headers;
+
+    # WebSocket handshakes have a static Content-Length
+    my $length =
+        $headers->sec_websocket_key1     ? 8
+      : $headers->sec_websocket_location ? 16
+      :                                    undef;
+
     # Don't waste memory
     if ($self->asset->isa('Mojo::Asset::Memory')) {
-        my $length = $self->headers->content_length;
+        $length ||= $self->headers->content_length;
 
         # Upgrade to file storage
         $self->asset(Mojo::Asset::File->new)
@@ -72,9 +81,9 @@ sub parse {
     else {
 
         # Slurp
-        my $length = $self->headers->content_length || 0;
-        my $asset  = $self->asset;
-        my $need   = $length - $asset->size;
+        $length ||= $self->headers->content_length || 0;
+        my $asset = $self->asset;
+        my $need  = $length - $asset->size;
         $asset->add_chunk($self->buffer->remove($need)) if $need > 0;
 
         # Done

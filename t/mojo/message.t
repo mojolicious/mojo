@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 611;
+use Test::More tests => 615;
 
 use File::Spec;
 use File::Temp;
@@ -58,21 +58,27 @@ is($req->url,           '/');
 # Parse WebSocket handshake request
 $req = Mojo::Message::Request->new;
 $req->parse("GET /demo HTTP/1.1\x0d\x0a");
-$req->parse("Upgrade: WebSocket\x0d\x0a");
-$req->parse("Connection: Upgrade\x0d\x0a");
 $req->parse("Host: example.com\x0d\x0a");
-$req->parse("Origin: http://example.com\x0d\x0a");
-$req->parse("WebSocket-Protocol: sample\x0d\x0a\x0d\x0a");
-is($req->state,                       'done');
-is($req->method,                      'GET');
-is($req->major_version,               1);
-is($req->minor_version,               1);
-is($req->url,                         '/demo');
-is($req->headers->upgrade,            'WebSocket');
-is($req->headers->connection,         'Upgrade');
-is($req->headers->host,               'example.com');
-is($req->headers->origin,             'http://example.com');
-is($req->headers->websocket_protocol, 'sample');
+$req->parse("Connection: Upgrade\x0d\x0a");
+$req->parse("Sec-WebSocket-Key2: 12998 5 Y3 1  .P00\x0d\x0a");
+$req->parse("Sec-WebSocket-Protocol: sample\x0d\x0a");
+$req->parse("Upgrade: WebSocket\x0d\x0a");
+$req->parse("Sec-WebSocket-Key1: 4 \@1  46546xW%0l 1 5\x0d\x0a");
+$req->parse("Origin: http://example.com\x0d\x0a\x0d\x0a");
+$req->parse('^n:ds[4U');
+is($req->state,                           'done');
+is($req->method,                          'GET');
+is($req->major_version,                   1);
+is($req->minor_version,                   1);
+is($req->url,                             '/demo');
+is($req->headers->host,                   'example.com');
+is($req->headers->connection,             'Upgrade');
+is($req->headers->sec_websocket_key2,     '12998 5 Y3 1  .P00');
+is($req->headers->sec_websocket_protocol, 'sample');
+is($req->headers->upgrade,                'WebSocket');
+is($req->headers->sec_websocket_key1,     '4 @1  46546xW%0l 1 5');
+is($req->headers->origin,                 'http://example.com');
+is($req->body,                            '^n:ds[4U');
 
 # Parse HTTP 1.0 start line and headers, no body
 $req = Mojo::Message::Request->new;
@@ -456,18 +462,25 @@ is($req->build,
 $req = Mojo::Message::Request->new;
 $req->method('GET');
 $req->url->parse('http://example.com/demo');
-$req->headers->upgrade('WebSocket');
+$req->headers->host('example.com');
 $req->headers->connection('Upgrade');
+$req->headers->sec_websocket_key2('12998 5 Y3 1  .P00');
+$req->headers->sec_websocket_protocol('sample');
+$req->headers->upgrade('WebSocket');
+$req->headers->sec_websocket_key1('4 @1  46546xW%0l 1 5');
 $req->headers->origin('http://example.com');
-$req->headers->websocket_protocol('sample');
+$req->body('^n:ds[4U');
 is($req->build,
         "GET /demo HTTP/1.1\x0d\x0a"
-      . "Upgrade: WebSocket\x0d\x0a"
       . "Connection: Upgrade\x0d\x0a"
+      . "Upgrade: WebSocket\x0d\x0a"
       . "Host: example.com\x0d\x0a"
-      . "Content-Length: 0\x0d\x0a"
+      . "Content-Length: 8\x0d\x0a"
       . "Origin: http://example.com\x0d\x0a"
-      . "WebSocket-Protocol: sample\x0d\x0a\x0d\x0a");
+      . "Sec-WebSocket-Key1: 4 \@1  46546xW%0l 1 5\x0d\x0a"
+      . "Sec-WebSocket-Key2: 12998 5 Y3 1  .P00\x0d\x0a"
+      . "Sec-WebSocket-Protocol: sample\x0d\x0a\x0d\x0a"
+      . '^n:ds[4U');
 
 # Build full HTTP 1.1 proxy request
 $req = Mojo::Message::Request->new;
@@ -1283,42 +1296,45 @@ is($res->cookie('foo')->path,  '/test');
 
 # Parse WebSocket handshake response
 $res = Mojo::Message::Response->new;
-$res->parse("HTTP/1.1 101 Web Socket Protocol Handshake\x0d\x0a");
+$res->parse("HTTP/1.1 101 WebSocket Protocol Handshake\x0d\x0a");
 $res->parse("Upgrade: WebSocket\x0d\x0a");
 $res->parse("Connection: Upgrade\x0d\x0a");
-$res->parse("WebSocket-Origin: http://example.com\x0d\x0a");
-$res->parse("WebSocket-Location: ws://example.com/demo\x0d\x0a");
-$res->parse("WebSocket-Protocol: sample\x0d\x0a\x0d\x0a");
-is($res->state,                       'done');
-is($res->code,                        101);
-is($res->message,                     'Web Socket Protocol Handshake');
-is($res->major_version,               1);
-is($res->minor_version,               1);
-is($res->headers->upgrade,            'WebSocket');
-is($res->headers->connection,         'Upgrade');
-is($res->headers->websocket_origin,   'http://example.com');
-is($res->headers->websocket_location, 'ws://example.com/demo');
-is($res->headers->websocket_protocol, 'sample');
+$res->parse("Sec-WebSocket-Origin: http://example.com\x0d\x0a");
+$res->parse("Sec-WebSocket-Location: ws://example.com/demo\x0d\x0a");
+$res->parse("Sec-WebSocket-Protocol: sample\x0d\x0a\x0d\x0a");
+$res->parse('8jKS\'y:G*Co,Wxa-');
+is($res->state,                           'done');
+is($res->code,                            101);
+is($res->message,                         'WebSocket Protocol Handshake');
+is($res->major_version,                   1);
+is($res->minor_version,                   1);
+is($res->headers->upgrade,                'WebSocket');
+is($res->headers->connection,             'Upgrade');
+is($res->headers->sec_websocket_origin,   'http://example.com');
+is($res->headers->sec_websocket_location, 'ws://example.com/demo');
+is($res->headers->sec_websocket_protocol, 'sample');
+is($res->body,                            '8jKS\'y:G*Co,Wxa-');
 
 # Build WebSocket handshake response
 $res = Mojo::Message::Response->new;
 $res->code(101);
-$res->message('Web Socket Protocol Handshake');
 $res->headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
 $res->headers->upgrade('WebSocket');
 $res->headers->connection('Upgrade');
-$res->headers->websocket_origin('http://example.com');
-$res->headers->websocket_location('ws://example.com/demo');
-$res->headers->websocket_protocol('sample');
+$res->headers->sec_websocket_origin('http://example.com');
+$res->headers->sec_websocket_location('ws://example.com/demo');
+$res->headers->sec_websocket_protocol('sample');
+$res->body('8jKS\'y:G*Co,Wxa-');
 is($res->build,
-        "HTTP/1.1 101 Web Socket Protocol Handshake\x0d\x0a"
-      . "Upgrade: WebSocket\x0d\x0a"
+        "HTTP/1.1 101 WebSocket Protocol Handshake\x0d\x0a"
       . "Connection: Upgrade\x0d\x0a"
       . "Date: Sun, 17 Aug 2008 16:27:35 GMT\x0d\x0a"
-      . "Content-Length: 0\x0d\x0a"
-      . "WebSocket-Origin: http://example.com\x0d\x0a"
-      . "WebSocket-Location: ws://example.com/demo\x0d\x0a"
-      . "WebSocket-Protocol: sample\x0d\x0a\x0d\x0a");
+      . "Upgrade: WebSocket\x0d\x0a"
+      . "Content-Length: 16\x0d\x0a"
+      . "Sec-WebSocket-Origin: http://example.com\x0d\x0a"
+      . "Sec-WebSocket-Location: ws://example.com/demo\x0d\x0a"
+      . "Sec-WebSocket-Protocol: sample\x0d\x0a\x0d\x0a"
+      . '8jKS\'y:G*Co,Wxa-');
 
 # Build and parse HTTP 1.1 response with 3 cookies
 $res = Mojo::Message::Response->new;

@@ -58,7 +58,7 @@ sub helper {
       unless my $helper = $self->app->renderer->helper->{$name};
 
     # Run
-    return wantarray ? ($self->$helper(@_)) : scalar $self->$helper(@_);
+    return $self->$helper(@_);
 }
 
 sub pause { shift->tx->pause }

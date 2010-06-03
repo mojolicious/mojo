@@ -468,12 +468,31 @@ sub websocket {
     $h->from_hash(ref $_[0] eq 'HASH' ? $_[0] : {@_});
 
     # Default headers
-    $h->upgrade('WebSocket')       unless $h->upgrade;
-    $h->connection('Upgrade')      unless $h->connection;
-    $h->websocket_protocol('mojo') unless $h->websocket_protocol;
+    $h->upgrade('WebSocket')           unless $h->upgrade;
+    $h->connection('Upgrade')          unless $h->connection;
+    $h->sec_websocket_protocol('mojo') unless $h->sec_websocket_protocol;
+
+    # Generate challenge
+    $h->sec_websocket_key1($self->_generate_key)
+      unless $h->sec_websocket_key1;
+    $h->sec_websocket_key2($self->_generate_key)
+      unless $h->sec_websocket_key2;
+    $req->body(pack 'N*', int(rand 9999999) + 1, int(rand 9999999) + 1);
 
     # Queue
     $self->queue($tx, $cb);
+}
+
+sub websocket_challenge {
+    my ($self, $key1, $key2, $key3) = @_;
+
+    # Shortcut
+    return unless $key1 && $key2 && $key3;
+
+    # Calculate solution for challenge
+    my $c1 = pack 'N', join('', $key1 =~ /(\d)/g) / ($key1 =~ tr/\ //);
+    my $c2 = pack 'N', join('', $key2 =~ /(\d)/g) / ($key2 =~ tr/\ //);
+    return b("$c1$c2$key3")->md5_bytes->to_string;
 }
 
 # Where on my badge does it say anything about protecting people?
@@ -726,6 +745,31 @@ sub _finish {
 
     # Stop ioloop
     $self->ioloop->stop if !$self->{_is_async} && !$self->{_processing};
+}
+
+sub _generate_key {
+    my $self = shift;
+
+    # Number of spaces
+    my $spaces = int(rand 12) + 1;
+
+    # Number
+    my $number = int(rand 99999) + 10;
+
+    # Key
+    my $key = $number * $spaces;
+
+    # Insert whitespace
+    while ($spaces--) {
+
+        # Random position
+        my $pos = int(rand(length($key) - 2)) + 1;
+
+        # Insert a space at $pos position
+        substr($key, $pos, 0) = ' ';
+    }
+
+    return $key;
 }
 
 sub _pipeline_info {
@@ -1089,11 +1133,27 @@ sub _upgrade {
     # Transaction
     my $old = $c->{p}->[-1];
 
+    # Request
+    my $req = $old->req;
+
+    # Response
+    my $res = $old->res;
+
+    # Headers
+    my $headers = $req->headers;
+
     # No handshake
-    return unless $old->req->headers->upgrade;
+    return unless $req->headers->upgrade;
 
     # Handshake failed
-    return unless ($old->res->code || '') eq '101';
+    return unless ($res->code || '') eq '101';
+
+    # Challenge
+    my $solution =
+      $self->websocket_challenge(scalar $headers->sec_websocket_key1,
+        scalar $headers->sec_websocket_key2, $req->body);
+    $old->error('WebSocket challenge failed.') and return
+      unless $solution eq $res->body;
 
     # Start new WebSocket
     my $new = Mojo::Transaction::WebSocket->new(handshake => $old);
@@ -1650,6 +1710,12 @@ Send a message via WebSocket, only available from callbacks.
     );
 
 Open a WebSocket connection with transparent handshake.
+
+=head2 C<websocket_challenge>
+
+    my $solution = $client->websocket_challenge($key1, $key2, $key3);
+
+Calculate the solution for a websocket challenge.
 
 =head1 SEE ALSO
 

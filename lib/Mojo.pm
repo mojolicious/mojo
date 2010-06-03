@@ -28,16 +28,29 @@ __PACKAGE__->attr(
         sub {
             my ($self, $tx) = @_;
 
-            # Handshake response
+            # Request
+            my $req = $tx->req;
+
+            # Response
             my $res = $tx->res;
+
+            # Handshake
             $res->code(101);
             $res->headers->upgrade('WebSocket');
             $res->headers->connection('Upgrade');
-            my $scheme =
-              $tx->req->url->to_abs->scheme eq 'https' ? 'wss' : 'ws';
-            $res->headers->websocket_location(
+            my $scheme = $req->url->to_abs->scheme eq 'https' ? 'wss' : 'ws';
+            $res->headers->sec_websocket_origin($req->headers->origin);
+            $res->headers->sec_websocket_location(
                 $tx->req->url->to_abs->scheme($scheme)->to_string);
-            $res->headers->websocket_origin($tx->req->headers->origin);
+            $res->headers->sec_websocket_protocol(
+                $req->headers->sec_websocket_protocol);
+            $res->body(
+                $self->client->websocket_challenge(
+                    scalar $req->headers->sec_websocket_key1,
+                    scalar $req->headers->sec_websocket_key2,
+                    $req->body
+                )
+            );
 
             # WebSocket transaction
             return Mojo::Transaction::WebSocket->new(handshake => $tx);

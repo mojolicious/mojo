@@ -1346,7 +1346,7 @@ it starts closing the oldest cached ones, defaults to C<5>.
     $client           = $client->max_redirects(3);
 
 Maximum number of redirects the client will follow before it fails, defaults
-to C<3>.
+to C<0>.
 
 =head2 C<tls_ca_file>
 

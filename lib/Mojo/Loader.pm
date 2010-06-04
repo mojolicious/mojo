@@ -21,10 +21,6 @@ BEGIN {
 
     # Debugger sub tracking
     $^P |= 0x10;
-
-    # Bug in pre-5.8.7 perl
-    # http://rt.perl.org/rt3/Ticket/Display.html?id=35059
-    eval 'sub DB::sub' if $] < 5.008007;
 }
 
 # Homer no function beer well without.

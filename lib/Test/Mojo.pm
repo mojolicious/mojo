@@ -222,7 +222,9 @@ Test::Mojo - Testing Mojo!
 
 =head1 SYNOPSIS
 
+    use Test::More tests => 10;
     use Test::Mojo;
+
     my $t = Test::Mojo->new(app => 'MyApp');
 
     $t->get_ok('/welcome')

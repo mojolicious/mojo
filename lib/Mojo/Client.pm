@@ -1228,6 +1228,10 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
     my $trends = 'http://search.twitter.com/trends.json';
     print $client->get($trends)->success->json->{trends}->[0]->{name};
 
+    # Extract data from HTML and XML resources
+    my $home = 'http://mojolicious.org';
+    print $client->get($home)->success->dom->at('title')->text;
+
     # Form post with excepton handling
     my $cpan   = 'http://search.cpan.org/search';
     my $search = {q => 'mojo'};

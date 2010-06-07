@@ -21,6 +21,7 @@ use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 8192;
 __PACKAGE__->attr(buffer  => sub { Mojo::ByteStream->new });
 __PACKAGE__->attr(content => sub { Mojo::Content::Single->new });
 __PACKAGE__->attr(default_charset => 'UTF-8');
+__PACKAGE__->attr(dom_class       => 'Mojo::DOM');
 __PACKAGE__->attr([qw/finish_cb progress_cb/]);
 __PACKAGE__->attr(json_class                        => 'Mojo::JSON');
 __PACKAGE__->attr([qw/major_version minor_version/] => 1);
@@ -220,6 +221,29 @@ sub cookie {
 
     # Context
     return wantarray ? @cookies : $cookies[0];
+}
+
+sub dom {
+    my $self = shift;
+
+    # Multipart
+    return if $self->is_multipart;
+
+    # Load DOM class
+    my $class = $self->dom_class;
+    if (my $e = Mojo::Loader->load($class)) {
+        croak ref $e
+          ? qq/Can't load DOM class "$class": $e/
+          : qq/DOM class "$class" doesn't exist./;
+    }
+
+    # Charset
+    my $charset = $self->default_charset;
+    ($self->headers->content_type || '') =~ /charset=\"?(\S+)\"?/
+      and $charset = $1;
+
+    # Parse
+    return $class->new(charset => $charset)->parse($self->body);
 }
 
 sub fix_headers {
@@ -624,6 +648,14 @@ Content container, defaults to a L<Mojo::Content::Single> object.
 
 Default charset used for form data parsing.
 
+=head2 C<dom_class>
+
+    my $class = $message->dom_class;
+    $message  = $message->dom_class('Mojo::DOM');
+
+Class to be used for DOM manipulation, defaults to L<Mojo::DOM>.
+Note that this attribute is EXPERIMENTAL and might change without warning!
+
 =head2 C<finish_cb>
 
     my $cb   = $message->finish_cb;
@@ -738,6 +770,13 @@ Render start line.
     my @cookies = $message->cookie('foo');
 
 Access message cookies.
+
+=head2 C<dom>
+
+    my $dom = $message->dom;
+
+Parses content into a L<Mojo::DOM> object.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<fix_headers>
 

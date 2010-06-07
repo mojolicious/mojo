@@ -13,7 +13,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 393;
+plan tests => 394;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -777,6 +777,8 @@ $t->get_ok('/eperror')->status_is(500)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/Internal Server Error/);
+is($client->get('/eperror')->success->dom->at('title')->text,
+    'Internal Server Error');
 app->log->level($level);
 
 # GET /subrequest

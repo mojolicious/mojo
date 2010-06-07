@@ -661,7 +661,7 @@ sub _start {
     my ($self, $start, $attrs, $current) = @_;
 
     # Parent
-    weaken $$current;
+    weaken $$current unless isweak $$current;
 
     # New
     my $new = ['tag', $start, $attrs, $$current];

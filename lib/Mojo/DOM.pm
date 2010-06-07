@@ -45,7 +45,7 @@ my $XML_ATTR_RE = qr/
     ([^=\s]+)         # Key
     (?:="([^"]+)")?   # Value
 /x;
-my $XML_END_RE   = qr/\s*\/\s*(.+)\s*/;
+my $XML_END_RE   = qr/^\s*\/\s*(.+)\s*/;
 my $XML_START_RE = qr/(\S+)\s*(.*)/;
 my $XML_TOKEN_RE = qr/
     ([^<]*)                 # Text

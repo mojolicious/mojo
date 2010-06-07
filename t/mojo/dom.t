@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 44;
+use Test::More tests => 45;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -128,3 +128,9 @@ EOF
 my $div = $dom->search('body > #container > div p[id]');
 is($div->[0]->attributes->{id}, 'foo', 'right id attribute');
 is($div->[1],                   undef, 'no second result');
+
+# Script tag
+$dom->parse(<<EOF);
+<script type="text/javascript" charset="utf-8">alert('lalala');</script>
+EOF
+is($dom->at('script')->text, "alert('lalala');", 'right script content');

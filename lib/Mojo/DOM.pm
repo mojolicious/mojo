@@ -683,7 +683,7 @@ __END__
 
 =head1 NAME
 
-Mojo::DOM - Minimalistic XML DOM With CSS3 Selectors
+Mojo::DOM - Minimalistic XML DOM Parser With CSS3 Selectors
 
 =head1 SYNOPSIS
 
@@ -696,8 +696,8 @@ Mojo::DOM - Minimalistic XML DOM With CSS3 Selectors
 
 =head1 DESCRIPTION
 
-L<Mojo::DOM> is a minimalistic and very relaxed XML DOM parser with partial
-support for CSS3 selectors.
+L<Mojo::DOM> is a minimalistic and very relaxed XML DOM parser with support
+for CSS3 selectors.
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head2 SELECTORS
@@ -712,35 +712,51 @@ Any element.
 
 =item C<E>
 
+    my $title = $dom->at('title');
+
 An element of type C<E>.
 
 =item C<E[foo]>
+
+    my $links = $dom->search('a[href]');
 
 An C<E> element with a C<foo> attribute.
 
 =item C<E[foo="bar"]>
 
+    my $fields = $dom->search('input[name="foo"]');
+
 An C<E> element whose C<foo> attribute value is exactly equal to C<bar>.
 
 =item C<E[foo^="bar"]>
+
+    my $fields = $dom->search('input[name^="f"]');
 
 An C<E> element whose C<foo> attribute value begins exactly with the string
 C<bar>.
 
 =item C<E[foo$="bar"]>
 
+    my $fields = $dom->search('input[name$="o"]');
+
 An C<E> element whose C<foo> attribute value ends exactly with the string
 C<bar>.
 
 =item C<E:root>
 
+    my $root = $dom->at(':root');
+
 An C<E> element, root of the document.
 
 =item C<E F>
 
+    my $headlines = $dom->search('div h1');
+
 An C<F> element descendant of an C<E> element.
 
 =item C<E E<gt> F>
+
+    my $headlines = $dom->search('html > body > div > h1');
 
 An C<F> element child of an C<E> element.
 

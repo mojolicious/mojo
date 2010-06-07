@@ -629,7 +629,8 @@ it with normal Perl unit tests like C<t/funky.t>.
     use Test::Mojo;
 
     use FindBin;
-    require "$FindBin::Bin/../myapp.pl";
+    $ENV{MOJO_HOME} = "$FindBin::Bin/../";
+    require "$ENV{MOJO_HOME}/myapp.pl";
 
     my $t = Test::Mojo->new;
     $t->get_ok('/')->status_is(200)->content_like(qr/Funky!/);

@@ -51,14 +51,15 @@ Web development for humans, making hard things possible and everything fun.
         );
     };
 
-    get '/fetch' => sub {
+    get '/title' => sub {
         my $self = shift;
-        $self->render(
-            data => $self->client->get('http://kraih.com')->success->body);
+        my $url  = $self->param('url');
+        $self->render(text =>
+              $self->client->get($url)->success->dom->at('title')->text);
     };
 
     post '/:offset' => sub {
-        my $self = shift;
+        my $self   = shift;
         my $offset = $self->param('offset') || 23;
         $self->render(json => {list => [0 .. $offset]});
     };

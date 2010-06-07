@@ -60,7 +60,7 @@ __PACKAGE__->attr(
 
 # DEPRECATED in Snowman!
 # Use $Mojolicious::VERSION instead.
-our $VERSION = '0.999925';
+our $VERSION = '0.999926';
 
 # Oh, so they have internet on computers now!
 sub new {

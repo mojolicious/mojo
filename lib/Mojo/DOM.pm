@@ -838,7 +838,7 @@ Search for elements with CSS3 selectors.
 
     my $text = $dom->text;
 
-Extract text content from block.
+Extract text content from element only, not including child elements.
 
 =head2 C<to_xml>
 

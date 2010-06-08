@@ -22,7 +22,7 @@ use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 8192;
 # Epoll support requires IO::Epoll
 use constant EPOLL => ($ENV{MOJO_POLL} || $ENV{MOJO_KQUEUE})
   ? 0
-  : eval { require IO::Epoll; 1 };
+  : eval 'use IO::Epoll 0.02 (); 1';
 use constant EPOLL_POLLERR => EPOLL ? IO::Epoll::POLLERR() : 0;
 use constant EPOLL_POLLHUP => EPOLL ? IO::Epoll::POLLHUP() : 0;
 use constant EPOLL_POLLIN  => EPOLL ? IO::Epoll::POLLIN()  : 0;
@@ -31,12 +31,12 @@ use constant EPOLL_POLLOUT => EPOLL ? IO::Epoll::POLLOUT() : 0;
 # IPv6 support requires IO::Socket::INET6
 use constant IPV6 => $ENV{MOJO_NO_IPV6}
   ? 0
-  : eval { require IO::Socket::INET6; 1 };
+  : eval 'use IO::Socket::INET6 2.64 (); 1';
 
 # KQueue support requires IO::KQueue
 use constant KQUEUE => ($ENV{MOJO_POLL} || $ENV{MOJO_EPOLL})
   ? 0
-  : eval { require IO::KQueue; 1 };
+  : eval 'use IO::KQueue 0.34 (); 1';
 use constant KQUEUE_ADD    => KQUEUE ? IO::KQueue::EV_ADD()       : 0;
 use constant KQUEUE_DELETE => KQUEUE ? IO::KQueue::EV_DELETE()    : 0;
 use constant KQUEUE_EOF    => KQUEUE ? IO::KQueue::EV_EOF()       : 0;
@@ -46,7 +46,7 @@ use constant KQUEUE_WRITE  => KQUEUE ? IO::KQueue::EVFILT_WRITE() : 0;
 # TLS support requires IO::Socket::SSL
 use constant TLS => $ENV{MOJO_NO_TLS}
   ? 0
-  : eval { use IO::Socket::SSL 1.33 (); 1 };
+  : eval 'use IO::Socket::SSL 1.33 (); 1';
 use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 

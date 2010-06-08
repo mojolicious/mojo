@@ -9,6 +9,8 @@ use Mojo::IOLoop;
 use Test::More;
 
 # Make sure sockets are working
+plan skip_all => 'IO::Socket::INET6 2.64 required for this test!'
+  unless Mojo::IOLoop::IPV6;
 plan skip_all => 'IO::Socket::SSL 1.33 required for this test!'
   unless Mojo::IOLoop::TLS;
 plan skip_all => 'working sockets required for this test!'

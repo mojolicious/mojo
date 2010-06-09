@@ -822,9 +822,9 @@ is($req->headers->header('Accept'),
 is($req->url->path,       '/');
 is($req->url->base->path, '/index.pl/');
 is($req->url->base->host, 'test');
-is($req->url->query,      undef);
-is($req->minor_version,   '1');
-is($req->major_version,   '1');
+ok(!$req->url->query);
+is($req->minor_version, '1');
+is($req->major_version, '1');
 
 # Parse IIS 7.5 like CGI environment (with path)
 $req = Mojo::Message::Request->new;
@@ -849,9 +849,9 @@ is($req->headers->header('Accept'),
 is($req->url->path,       '/foo');
 is($req->url->base->path, '/index.pl/');
 is($req->url->base->host, 'test');
-is($req->url->query,      undef);
-is($req->minor_version,   '1');
-is($req->major_version,   '1');
+ok(!$req->url->query);
+is($req->minor_version, '1');
+is($req->major_version, '1');
 
 # Parse IIS 6.0 like CGI environment variables and a body
 $req = Mojo::Message::Request->new;
@@ -1114,9 +1114,9 @@ is($req->url->path,       '');
 is($req->url->base->path, '/index.pl/');
 is($req->url->base->host, 'test1');
 is($req->url->base->port, '');
-is($req->url->query,      undef);
-is($req->minor_version,   '1');
-is($req->major_version,   '1');
+ok(!$req->url->query);
+is($req->minor_version, '1');
+is($req->major_version, '1');
 is($req->body,
         'request=&ajax=true&login=test&password=111&'
       . 'edition=db6d8b30-16df-4ecd-be2f-c8194f94e1f4');

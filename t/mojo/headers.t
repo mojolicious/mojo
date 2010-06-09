@@ -118,7 +118,7 @@ Content-Type: text/plain
 EOF
 is($headers->state, 'headers', 'right state');
 ok(!defined($headers->content_type), 'no value');
-ok(!defined($headers->parse(<<EOF)), 'rigth return value');
+ok(!defined($headers->parse(<<EOF)), 'right return value');
 X-Bender: Bite my shiny
 EOF
 is($headers->state, 'headers', 'right state');

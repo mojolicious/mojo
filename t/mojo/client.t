@@ -56,7 +56,7 @@ $client->get(
         $code   = $self->res->code;
     }
 )->process;
-is($method, 'GET',             'rigth method');
+is($method, 'GET',             'right method');
 is($url,    'http://cpan.org', 'right url');
 is($code,   301,               'right status');
 
@@ -198,7 +198,7 @@ $client->queue(
 $client->process;
 ok($done,        'state is done');
 ok($kept_alive,  'connection was kept alive');
-ok($tx->is_done, 'rigth state');
+ok($tx->is_done, 'right state');
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('http://www.apache.org');
@@ -248,7 +248,7 @@ ok($done3,        'state is done');
 ok($tx2->is_done, 'state is done');
 ok($tx3->is_done, 'state is done');
 is($tx->res->code,  200, 'right status');
-is($tx2->res->code, 200, 'rigth status');
+is($tx2->res->code, 200, 'right status');
 is($tx3->res->code, 200, 'right status');
 like($tx2->res->content->asset->slurp, qr/Apache/, 'right content');
 

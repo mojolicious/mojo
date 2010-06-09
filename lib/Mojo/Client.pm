@@ -1232,7 +1232,7 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
     my $home = 'http://mojolicious.org';
     print $client->get($home)->success->dom->at('title')->text;
 
-    # Form post with excepton handling
+    # Form post with exception handling
     my $cpan   = 'http://search.cpan.org/search';
     my $search = {q => 'mojo'};
     my $tx     = $client->post_form($cpan => $search);

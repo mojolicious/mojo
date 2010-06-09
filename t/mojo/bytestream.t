@@ -52,7 +52,7 @@ is($stream->to_string, 'abc', 'right buffer content');
 
 # camelize
 $stream = b('foo_bar_baz');
-is($stream->camelize, 'FooBarBaz', 'right camlized result');
+is($stream->camelize, 'FooBarBaz', 'right camelized result');
 $stream = b('FooBarBaz');
 is($stream->camelize, 'Foobarbaz', 'right camelized result');
 $stream = b('foo_b_b');

@@ -1238,7 +1238,7 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
     my $tx     = $client->post_form($cpan => $search);
     if (my $res = $tx->success) { print $res->body }
     else {
-        my ($code, $message) = $tx->error;
+        my ($message, $code) = $tx->error;
         print "Error: $message";
     }
 

@@ -9,6 +9,8 @@ use Mojo::IOLoop;
 use Test::More;
 
 # Make sure sockets are working
+plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
+  unless $ENV{TEST_TLS};
 plan skip_all => 'IO::Socket::INET6 2.64 required for this test!'
   unless Mojo::IOLoop::IPV6;
 plan skip_all => 'IO::Socket::SSL 1.33 required for this test!'

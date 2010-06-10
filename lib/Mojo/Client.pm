@@ -359,12 +359,16 @@ sub process {
     # Add transactions from queue
     else { $self->_prepare_pipeline(@$_) for @$queue }
 
-    # Start loop
-    my $loop = $self->ioloop;
-    $loop->start;
+    # Sync
+    unless ($self->{_is_async}) {
 
-    # Cleanup
-    $loop->one_tick(0);
+        # Start loop
+        my $loop = $self->ioloop;
+        $loop->start;
+
+        # Cleanup
+        $loop->one_tick(0);
+    }
 
     return $self;
 }

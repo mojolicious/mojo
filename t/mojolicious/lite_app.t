@@ -45,8 +45,11 @@ plugin 'header_condition';
 # GET /
 get '/' => 'root';
 
-# GET /null
-get '/null' => sub { shift->render_text(0) };
+# GET /null/0
+get '/null/:null' => sub {
+    my $self = shift;
+    $self->render(text => $self->param('null'), layout => 'layout');
+};
 
 # GET /привет/мир
 get '/привет/мир' =>
@@ -407,9 +410,11 @@ $t->head_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
 $t->get_ok('/', '1234' x 1024)->status_is(200)
   ->content_is('/root.html/root.html/root.html/root.html/root.html');
 
-# GET /null
-$t->get_ok('/null')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('0');
+# GET /null/0
+$t->get_ok('/null/0')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_like(qr/layouted 0/);
 
 # GET / (IRI)
 $t->get_ok('/привет/мир')->status_is(200)

@@ -188,10 +188,11 @@ sub render_inner {
     # Set
     $stash->{content}->{$name}
       ||= ref $content eq 'CODE' ? $content->() : $content
-      if $content;
+      if defined $content;
 
     # Get
-    $content = $stash->{content}->{$name} || '';
+    $content = $stash->{content}->{$name};
+    $content = '' unless defined $content;
     return Mojo::ByteStream->new("$content");
 }
 

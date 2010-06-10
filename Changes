@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojolicious.
 0.999926 2010-06-07 00:00:00
         - Added version requirement for all optional dependencies.
         - Improved documentation.
+        - Fixed small renderer bug.
 
 0.999925 2010-06-07 00:00:00
         - Updated WebSocket implementation to draft 76,

@@ -257,7 +257,8 @@ sub listen {
     my $args = ref $_[0] ? $_[0] : {@_};
 
     # TLS check
-    croak "IO::Socket::SSL required for TLS support" if $args->{tls} && !TLS;
+    croak "IO::Socket::SSL 1.33 required for TLS support"
+      if $args->{tls} && !TLS;
 
     # Options
     my %options = (

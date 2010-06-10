@@ -13,7 +13,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 394;
+plan tests => 399;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -44,6 +44,9 @@ plugin 'header_condition';
 
 # GET /
 get '/' => 'root';
+
+# GET /null
+get '/null' => sub { shift->render_text(0) };
 
 # GET /привет/мир
 get '/привет/мир' =>
@@ -403,6 +406,10 @@ $t->head_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
 # GET / (with body)
 $t->get_ok('/', '1234' x 1024)->status_is(200)
   ->content_is('/root.html/root.html/root.html/root.html/root.html');
+
+# GET /null
+$t->get_ok('/null')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('0');
 
 # GET / (IRI)
 $t->get_ok('/привет/мир')->status_is(200)

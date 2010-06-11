@@ -30,8 +30,7 @@ sub run {
     my ($self, $name, @args) = @_;
 
     # Try to detect environment
-    my $detect = $self->_detect;
-    $name = $detect if $detect && !$ENV{MOJO_NO_DETECT};
+    $name = $self->_detect if !$name && !$ENV{MOJO_NO_DETECT};
 
     # Run command
     if ($name && $name =~ /^\w+$/ && ($name ne 'help' || $args[0])) {

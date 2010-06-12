@@ -402,7 +402,7 @@ under sub {
 };
 
 # GET /with_under_count
-get '/with_under_count' => sub { shift->render(text => 'counter') };
+get '/with_under_count' => 'with_under_count';
 
 # Oh Fry, I love you more than the moon, and the stars,
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
@@ -977,7 +977,7 @@ $t->get_ok('/bridge2stash')->status_is(200)
 $t->get_ok('/with_under_count', {'X-Bender' => 'Rodriguez'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->header_is('X-Under'      => 1)->content_is('counter');
+  ->header_is('X-Under'      => 1)->content_is("counter\n");
 
 __DATA__
 @@ tags.html.ep
@@ -1124,6 +1124,9 @@ with_block <%= $block->('one', 'two') %>
 % $self->session(foo => 'session');
 % $self->flash(foo => 'flash') if $self->req->headers->header('X-Flash');
 % $self->stash->{session} = {} if $self->req->headers->header('X-Flash2');
+
+@@ with_under_count.html.ep
+counter
 
 __END__
 This is not a template!

@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojo::Server';
 
-use IO::Poll 'POLLIN';
+use Errno qw/EAGAIN EWOULDBLOCK/;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 8192;
 
@@ -29,13 +29,13 @@ sub run {
     $tx->local_port($ENV{SERVER_PORT});
 
     # Request body
-    my $poll = IO::Poll->new;
-    $poll->mask(\*STDIN, POLLIN);
     while (!$req->is_finished) {
-        $poll->poll(1);
-        my @readers = $poll->handles(POLLIN);
-        last unless @readers;
         my $read = STDIN->sysread(my $buffer, CHUNK_SIZE, 0);
+        unless (defined $read) {
+            next if $! == EAGAIN || $! == EWOULDBLOCK;
+            last;
+        }
+        last unless $read;
         $req->parse($buffer);
     }
 

@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojo::Server';
 
-use IO::Poll 'POLLIN';
+use Errno qw/EAGAIN EWOULDBLOCK/;
 use IO::Socket;
 
 use constant DEBUG => $ENV{MOJO_SERVER_DEBUG} || 0;
@@ -381,16 +381,12 @@ sub _read_chunk {
     # Read
     my $chunk = '';
     while (length $chunk < $length) {
-
-        # We don't wait forever
-        my $poll = IO::Poll->new;
-        $poll->mask($c, POLLIN);
-        $poll->poll(1);
-        my @readers = $poll->handles(POLLIN);
-        return unless @readers;
-
-        # Slurp
-        $c->sysread(my $buffer, $length - length $chunk, 0);
+        my $read = $c->sysread(my $buffer, $length - length $chunk, 0);
+        unless (defined $read) {
+            next if $! == EAGAIN || $! == EWOULDBLOCK;
+            last;
+        }
+        last unless $read;
         $chunk .= $buffer;
     }
 

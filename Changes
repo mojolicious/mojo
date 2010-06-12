@@ -1,7 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 0.999927 2010-06-11 00:00:00
-        - Fixed Mojo::Server::CGI to be more portable.
+        - Fixed Mojo::Server::CGI and Mojo::Server::FastCGI to be more
+          portable.
         - Fixed environment detection.
         - Fixed a tutorial bug. (zoul)
         - Fixed tests to not use any optional modules.

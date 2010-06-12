@@ -22,6 +22,10 @@ New guides will be added over time, so keep a close eye on this.
 
 =over 4
 
+=item L<Mojolicious::Guides::Routing>
+
+Simple and fun introduction to the L<Mojolicious> router.
+
 =item L<Mojolicious::Guides::Cheatsheet>
 
 A concise all-purpose reference.

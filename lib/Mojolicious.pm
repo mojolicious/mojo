@@ -671,6 +671,8 @@ Stanis Trendelenburg
 
 Tatsuhiko Miyagawa
 
+The Perl Foundation
+
 Tomas Znamenacek
 
 Uwe Voelker

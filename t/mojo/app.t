@@ -19,6 +19,9 @@ package main;
 use strict;
 use warnings;
 
+# Disable IPv6
+BEGIN { $ENV{MOJO_NO_IPV6} = 1 }
+
 use Mojo::IOLoop;
 use Test::More;
 

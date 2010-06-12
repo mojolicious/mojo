@@ -7,8 +7,8 @@ use warnings;
 
 use utf8;
 
-# Disable IPv6
-BEGIN { $ENV{MOJO_NO_IPV6} = 1 }
+# Disable epoll, kqueue and IPv6
+BEGIN { $ENV{MOJO_POLL} = $ENV{MOJO_NO_IPV6} = 1 }
 
 use Mojo::IOLoop;
 use Test::More;

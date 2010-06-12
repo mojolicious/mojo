@@ -16,7 +16,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 399;
+plan tests => 405;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -393,6 +393,16 @@ under sub {
 # GET /bridge2stash
 get '/bridge2stash' =>
   sub { shift->render(template => 'bridge2stash', handler => 'ep'); };
+
+# Counter
+my $under = 0;
+under sub {
+    shift->res->headers->header('X-Under' => ++$under);
+    return 1;
+};
+
+# GET /with_under_count
+get '/with_under_count' => sub { shift->render(text => 'counter') };
 
 # Oh Fry, I love you more than the moon, and the stars,
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
@@ -962,6 +972,12 @@ $t->get_ok('/bridge2stash' => {'X-Flash2' => 1})->status_is(200)
 # GET /bridge2stash (with cookies and session cleared)
 $t->get_ok('/bridge2stash')->status_is(200)
   ->content_is("stash too!cookie!signed_cookie!!bad_cookie--12345678!!!!\n");
+
+# GET /with_under_count
+$t->get_ok('/with_under_count', {'X-Bender' => 'Rodriguez'})->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->header_is('X-Under'      => 1)->content_is('counter');
 
 __DATA__
 @@ tags.html.ep

@@ -42,8 +42,8 @@ my $CSS_TOKEN_RE        = qr/
     )?
 /x;
 my $XML_ATTR_RE = qr/
-    ([^=\s]+)         # Key
-    (?:="([^"]+)")?   # Value
+    ([^=\s]+)                             # Key
+    (?:\s*=\s*(?:"([^"]+)"|'([^']+)'))?   # Value
 /x;
 my $XML_END_RE   = qr/^\s*\/\s*(.+)\s*/;
 my $XML_START_RE = qr/(\S+)\s*(.*)/;
@@ -505,12 +505,12 @@ sub _parse_xml {
 
         # End
         if ($tag =~ /$XML_END_RE/) {
-            if (my $end = $1) { $self->_end($end, \$current) }
+            if (my $end = lc $1) { $self->_end($end, \$current) }
         }
 
         # Start
         elsif ($tag =~ /$XML_START_RE/) {
-            my $start = $1;
+            my $start = lc $1;
             my $attr  = $2;
 
             # Attributes
@@ -518,6 +518,7 @@ sub _parse_xml {
             while ($attr =~ /$XML_ATTR_RE/g) {
                 my $key   = $1;
                 my $value = $2;
+                $value = $3 unless defined $value;
 
                 # End
                 next if $key eq '/';

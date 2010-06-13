@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 45;
+use Test::More tests => 48;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -134,3 +134,9 @@ $dom->parse(<<EOF);
 <script type="text/javascript" charset="utf-8">alert('lalala');</script>
 EOF
 is($dom->at('script')->text, "alert('lalala');", 'right script content');
+
+# HTML1 (single quotes, uppercase tags and whitespace in attributes)
+$dom->parse(qq/<DIV id = 'test' foo ='bar' class= "tset">works<\/DIV>/);
+is($dom->at('#test')->text, 'works', 'right text');
+is($dom->at('div')->text,   'works', 'right text');
+is($dom->at('.tset')->text, 'works', 'right text');

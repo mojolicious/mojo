@@ -72,13 +72,10 @@ $loop->listen(
             my $buffer = delete $c->{$client}->{client};
             if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
                 $connected = "$1:$2";
-                if ($2 == $port + 1) {
-                    $fail = 1;
-                    $2    = $port;
-                }
+                $fail = 1 if $2 == $port + 1;
                 my $server = $loop->connect(
                     address    => $1,
-                    port       => $2 || 80,
+                    port       => $fail ? $port : $2,
                     connect_cb => sub {
                         my ($loop, $server) = @_;
                         $c->{$client}->{connection} = $server;

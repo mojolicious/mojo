@@ -31,7 +31,7 @@ use constant EPOLL_POLLOUT => EPOLL ? IO::Epoll::POLLOUT() : 0;
 # IPv6 support requires IO::Socket::INET6
 use constant IPV6 => $ENV{MOJO_NO_IPV6}
   ? 0
-  : eval 'use IO::Socket::INET6 2.64 (); 1';
+  : eval 'use IO::Socket::INET6 (); 1';
 
 # KQueue support requires IO::KQueue
 use constant KQUEUE => ($ENV{MOJO_POLL} || $ENV{MOJO_EPOLL})
@@ -576,6 +576,15 @@ sub start_tls {
     $self->drop($id) and return unless my $socket = $c->{socket};
     my $fd = fileno $socket;
 
+    # Cleanup
+    my $writing = delete $c->{writing};
+    my $loop    = $self->{_loop};
+    if (KQUEUE) {
+        $loop->EV_SET($fd, KQUEUE_READ,  KQUEUE_DELETE) if defined $writing;
+        $loop->EV_SET($fd, KQUEUE_WRITE, KQUEUE_DELETE) if $writing;
+    }
+    else { $loop->remove($socket) if defined $writing }
+
     # Start
     $self->drop($id) and return
       unless my $new = IO::Socket::SSL->start_SSL($socket, %options);
@@ -589,6 +598,7 @@ sub start_tls {
     $c->{socket}         = $new;
     $self->{_cs}->{$new} = delete $self->{_cs}->{$id};
     $c->{tls_connect}    = 1;
+    $self->writing("$new");
 
     return "$new";
 }
@@ -981,13 +991,7 @@ sub _read {
     # Listen socket (new connection)
     my $found;
     my $listen = $self->{_listen} || {};
-    for my $lid (keys %$listen) {
-        my $socket = $listen->{$lid}->{socket};
-        if ($id eq $socket) {
-            $found = $socket;
-            last;
-        }
-    }
+    if (my $l = $listen->{$id}) { $found = $l->{socket} }
 
     # Accept new connection
     return $self->_accept($found) if $found;

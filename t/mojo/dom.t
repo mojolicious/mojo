@@ -5,7 +5,9 @@
 use strict;
 use warnings;
 
-use Test::More tests => 48;
+use utf8;
+
+use Test::More tests => 49;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -58,7 +60,7 @@ $dom->parse(<<EOF);
   <simple class="working">easy</simple>
   <test foo="bar" id="test" />
   <!-- lala -->
-  works&nbsp;well
+  works well
   <![CDATA[ yada yada]]>
   <?boom lalalala ?>
   <a little bit broken>
@@ -76,7 +78,7 @@ is("$dom",               <<EOF,     'stringified right');
   <simple class="working">easy</simple>
   <test foo="bar" id="test" />
   <!-- lala -->
-  works well
+  works well
   <![CDATA[ yada yada]]>
   <?boom lalalala ?>
   <a bit broken little />
@@ -140,3 +142,7 @@ $dom->parse(qq/<DIV id = 'test' foo ='bar' class= "tset">works<\/DIV>/);
 is($dom->at('#test')->text, 'works', 'right text');
 is($dom->at('div')->text,   'works', 'right text');
 is($dom->at('.tset')->text, 'works', 'right text');
+
+# Already decoded unicode snowman
+$dom->charset(undef)->parse('<div id="snowman">☃</div>');
+is($dom->at('#snowman')->text, '☃', 'right text');

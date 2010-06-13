@@ -42,8 +42,8 @@ my $CSS_TOKEN_RE        = qr/
     )?
 /x;
 my $XML_ATTR_RE = qr/
-    ([^=\s]+)                             # Key
-    (?:\s*=\s*(?:"([^"]+)"|'([^']+)'))?   # Value
+    ([^=\s]+)                                   # Key
+    (?:\s*=\s*(?:"([^"]+)"|'([^']+)'|(\S+)))?   # Value
 /x;
 my $XML_END_RE   = qr/^\s*\/\s*(.+)\s*/;
 my $XML_START_RE = qr/(\S+)\s*(.*)/;
@@ -519,6 +519,7 @@ sub _parse_xml {
                 my $key   = $1;
                 my $value = $2;
                 $value = $3 unless defined $value;
+                $value = $4 unless defined $value;
 
                 # End
                 next if $key eq '/';

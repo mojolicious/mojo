@@ -138,7 +138,7 @@ EOF
 is($dom->at('script')->text, "alert('lalala');", 'right script content');
 
 # HTML5 (unquoted values)
-$dom->parse(qq/<div id = test foo ="bar" class= tset>works<\/div>/);
+$dom->parse(qq/<div id = test foo ="bar" class=tset>works<\/div>/);
 is($dom->at('#test')->text,       'works', 'right text');
 is($dom->at('div')->text,         'works', 'right text');
 is($dom->at('[foo="bar"]')->text, 'works', 'right text');

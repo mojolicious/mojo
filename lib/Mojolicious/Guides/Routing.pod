@@ -22,7 +22,7 @@ requests with code generating the appropriate response.
 
     GET /user/show/1 -> $self->render(text => 'Sebastian!');
 
-This backbox is usually called a dispatcher.
+This blackbox is usually called a dispatcher.
 There are many implementations using different strategies to establish these
 connections, but pretty much all are based around mapping the requests path
 to some kind of response generator.
@@ -62,7 +62,7 @@ up to represent paths with placeholders.
 
 The only difference between a static path and the route above is the C<:id>
 placeholder.
-One or more placeholders can be everywhere in the route.
+One or more placeholders can be anywhere in the route.
 
     /user/:action/:id
 

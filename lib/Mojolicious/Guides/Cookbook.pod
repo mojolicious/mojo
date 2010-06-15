@@ -30,4 +30,21 @@ Perl works on.
 
 Another huge advantage is that it supports WebSockets out of the box.
 
+=head1 FUN
+
+Hacks that might not be very useful but are fun! :)
+
+=head2 Hello World
+
+If every byte matters this is the smallest C<Hello World> application you can
+write with L<Mojolicious::Lite>.
+
+    use Mojolicious::Lite;
+    get '/' => {text => 'Hello World!'};
+    app->start;
+
+It works because automatic rendering works even if no actual code gets
+executed by the router, the renderer just picks up the C<text> value from the
+stash.
+
 =cut

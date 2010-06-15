@@ -17,12 +17,12 @@ Essentials every L<Mojolicious> developer should know.
 
 =head2 Dispatcher
 
-The foundation of every web framework is a tiny blackbox connecting incoming
+The foundation of every web framework is a tiny black box connecting incoming
 requests with code generating the appropriate response.
 
     GET /user/show/1 -> $self->render(text => 'Sebastian!');
 
-This blackbox is usually called a dispatcher.
+This black box is usually called a dispatcher.
 There are many implementations using different strategies to establish these
 connections, but pretty much all are based around mapping the requests path
 to some kind of response generator.

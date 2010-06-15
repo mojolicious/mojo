@@ -38,7 +38,25 @@ automatically detect that it is executed as a C<CGI> script.
     <VirtualHost *:80>
         ServerName localhost
         DocumentRoot /home/sri/myapp/public
+
         ScriptAlias /myapp "/home/sri/myapp/script/myapp"
+    </VirtualHost>
+
+=head2 Apache/FastCGI
+
+C<FastCGI> is also supported out of the box and your L<Mojolicious>
+application will automatically detect that it is executed as a C<FastCGI>
+script.
+
+    <VirtualHost *:80>
+        ServerName localhost
+        DocumentRoot /home/sri/myapp/public
+
+        <Location />
+            FastCgiIpcDir /tmp
+            FastCgiServer /home/sri/myapp/script/myapp -processes 10
+        </Location>
+
     </VirtualHost>
 
 =head2 PSGI/Plack
@@ -106,6 +124,6 @@ write with L<Mojolicious::Lite>.
 
 It works because automatic rendering kicks in even if no actual code gets
 executed by the router, the renderer just picks up the C<text> value from the
-stash.
+stash and generates a response.
 
 =cut

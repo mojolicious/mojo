@@ -1103,14 +1103,14 @@ sub _timer {
         my $after = $t->{after} || 0;
         if ($after <= time - $t->{started}) {
 
+            # Drop
+            $self->_drop_immediately($id);
+
             # Callback
             if (my $cb = $t->{cb}) {
                 $self->_run_callback('timer', $cb);
                 $count++;
             }
-
-            # Drop
-            $self->_drop_immediately($id);
         }
     }
 

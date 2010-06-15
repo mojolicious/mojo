@@ -95,7 +95,7 @@ One interesting side effect here is that you can start multiple prefork web
 servers parallel letting them share the same UNIX domain socket and lock
 file.
 This allows something called C<Hot Deployment>, which essentially means zero
-downtime software upgrades.
+downtime software updates.
 
     % ./script/myapp daemon_prefork --listen file:///tmp/myapp.sock\
       --pid /tmp/myapp1.pid --lock /tmp/myapp.lock --daemonize

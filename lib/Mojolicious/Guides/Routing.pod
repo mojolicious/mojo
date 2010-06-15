@@ -466,6 +466,30 @@ This is where conditions come into play, they are basically router plugins.
 The method C<add_condition> registers the new condition in the router while
 C<over> actually applies it to the route.
 
+=head2 WebSockets
+
+You can restrict access to WebSocket handshakes using the C<websocket> method.
+
+    # /ws (WebSocket handshake)
+    $r->route('/echo')->websocket->to(controller => 'foo', action => 'echo');
+
+    # Controller
+    package MyApp::Foo;
+    use base 'Mojolicious::Controller';
+
+    # Action
+    sub echo {
+        my $self = shift;
+        $self->receive_message(
+            sub {
+                my ($self, $message) = @_;
+                $self->send_message("echo: $message");
+            }
+        );
+    }
+
+    1;
+
 =head2 IRIs
 
 IRIs are handled transparently, that means paths are guaranteed to be

@@ -67,9 +67,10 @@ sub accept_unlock { flock(shift->{_lock}, LOCK_UN) }
 sub prepare_ioloop {
     my $self = shift;
 
-    # Stop ioloop on HUP signal
+    # Signals
     my $loop = $self->ioloop;
-    $SIG{HUP} = sub { $loop->stop };
+    $SIG{HUP}  = sub { $loop->stop };
+    $SIG{USR1} = sub { $loop->max_connections(0) };
 
     # Listen
     my $listen = $self->listen || 'http://*:3000';

@@ -46,6 +46,13 @@ such as C<FCGI>, C<SCGI> and C<mod_perl>.
 
     % plackup ./script/myapp -s FCGI -l /tmp/myapp.sock
 
+Because C<plackup> changes C<$0> L<Mojolicious> is not always able to detect
+your applications home directory, if thats the case you can simply use the
+C<MOJO_HOME> environment variable.
+
+    % MOJO_HOME=/home/sri/myapp plackup ./script/myapp
+    HTTP::Server::PSGI: Accepting connections at http://0:5000/
+
 Some server adapters might ask for a C<.psgi> file, if thats the case you can
 just point them at your application script because it will automatically
 act like one if it detects the presence of a C<PLACK_ENV> environment

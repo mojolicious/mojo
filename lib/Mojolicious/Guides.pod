@@ -26,6 +26,10 @@ New guides will be added over time, so keep a close eye on this.
 
 Simple and fun introduction to the L<Mojolicious> router.
 
+=item L<Mojolicious::Guides::Rendering>
+
+Generating content with the L<Mojolicious> renderer.
+
 =item L<Mojolicious::Guides::Cheatsheet>
 
 A concise all-purpose reference.

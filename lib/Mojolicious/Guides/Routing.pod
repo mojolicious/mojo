@@ -166,11 +166,11 @@ C<MyApp::Foo> and call its C<welcome> method.
     use base 'Mojolicious::Controller';
 
     # Action
-    sub bye {
+    sub welcome {
         my $self = shift;
 
         # Render response
-        $self->render(text => 'Good bye!');
+        $self->render(text => 'Hello there!');
     }
 
     1;

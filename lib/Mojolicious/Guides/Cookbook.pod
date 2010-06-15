@@ -83,6 +83,26 @@ The builtin web server of course supports them as well.
     % ./script/myapp daemon_prefork --listen file:///tmp/myapp.sock
     Server available at file:///tmp/myapp.sock.
 
+One interesting side effect here is that you can start multiple prefork web
+servers parallel letting them share the same UNIX domain socket and lock
+file.
+This allows something called C<Hot Deployment>, which essentially means zero
+downtime software upgrades.
+
+    % ./script/myapp daemon_prefork --listen file:///tmp/myapp.sock\
+      --pid /tmp/myapp1.pid --lock /tmp/myapp.lock --daemonize
+    Server available at file:///tmp/myapp.sock.
+
+All you have to do is to update your application code, start a second web
+server instance and after that send a C<USR1> signal to the old instance.
+This will bring down the old web server gracefully, so no active connections
+get interrupted and your users won't notice a thing.
+
+    % ./script/myapp daemon_prefork --listen file:///tmp/myapp.sock\
+      --pid /tmp/myapp2.pid --lock /tmp/myapp.lock --daemonize
+
+    % kill -s USR1 `cat /tmp/myapp1.pid`
+
 =head2 Apache/CGI
 
 C<CGI> is supported out of the box and your L<Mojolicious> application will

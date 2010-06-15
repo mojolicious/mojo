@@ -43,7 +43,7 @@ write with L<Mojolicious::Lite>.
     get '/' => {text => 'Hello World!'};
     app->start;
 
-It works because automatic rendering works even if no actual code gets
+It works because automatic rendering kicks in even if no actual code gets
 executed by the router, the renderer just picks up the C<text> value from the
 stash.
 

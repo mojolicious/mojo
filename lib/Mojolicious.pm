@@ -681,6 +681,8 @@ Yaroslav Korshak
 
 Yuki Kimoto
 
+Zak B. Elep
+
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2008-2010, Sebastian Riedel.

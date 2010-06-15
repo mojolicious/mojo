@@ -28,13 +28,18 @@ Perl works on.
     % ./script/myapp help daemon
     ...List of available options...
 
-Another huge advantage is that it supports WebSockets out of the box.
+Another huge advantage is that it supports TLS and WebSockets out of the box.
+
+    % ./script/myapp daemon --listen https://*:3000
+    Server available at https://*:3000.
 
 =head2 Builtin Preforking Server
 
-To allow scaling with CPUs (cores) and to lower the performance loss of
+To allow scaling with CPUs (cores) and to lower the performance loss from
 blocking APIs the built in web server also has a preforking multi process
-mode that doesn't work on Windows.
+mode.
+It doesn't work on Windows due to UNIX optimizations but is fast and scalable
+enough for large applications.
 
     % ./script/myapp daemon_prefork
     Server available at http://127.0.0.1:3000.

@@ -60,8 +60,7 @@ sub async {
     my $self = shift;
 
     # Already async or async not possible
-    my $singleton = Mojo::IOLoop->singleton;
-    return $self if $self->{_is_async} || !$singleton->is_running;
+    return $self if $self->{_is_async};
 
     # Create async client
     unless ($self->{_async}) {
@@ -70,8 +69,13 @@ sub async {
         my $clone = $self->{_async} = $self->clone;
         $clone->{_is_async} = 1;
 
-        # Make async client use the global ioloop
-        $clone->ioloop($singleton);
+        # Make async client use the global ioloop if available
+        my $singleton = Mojo::IOLoop->singleton;
+        $clone->ioloop($singleton->is_running ? $singleton : $self->ioloop);
+
+        # Inherit test server
+        $clone->{_server} = $self->{_server};
+        $clone->{_port}   = $self->{_port};
     }
 
     return $self->{_async};

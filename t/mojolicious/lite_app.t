@@ -308,13 +308,15 @@ get '/subrequest_sync' => sub {
 get '/subrequest_async' => sub {
     my $self = shift;
     $self->pause;
+    my $test = '';
     $self->client->async->post(
         '/template' => sub {
             my $client = shift;
-            $self->render_text($client->res->body);
+            $self->render_text($client->res->body . $test);
             $self->finish;
         }
     )->process;
+    $test .= 'success';
 };
 
 # GET /redirect_url
@@ -828,7 +830,7 @@ $t->get_ok('/subrequest_sync')->status_is(200)
 $t->get_ok('/subrequest_async')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('Just works!');
+  ->content_is('Just works!success');
 
 # GET /redirect_url
 $t->get_ok('/redirect_url')->status_is(302)

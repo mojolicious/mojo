@@ -16,7 +16,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 405;
+plan tests => 406;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -410,6 +410,19 @@ get '/with_under_count' => 'with_under_count';
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
 my $client = app->client;
 my $t      = Test::Mojo->new;
+
+# Client timer
+my $timer;
+$client->ioloop->timer(
+    '0.1' => sub {
+        $client->async->get(
+            '/' => sub {
+                my $self = shift;
+                $timer = $self->res->body;
+            }
+        )->process;
+    }
+);
 
 # GET /
 $t->get_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
@@ -980,6 +993,10 @@ $t->get_ok('/with_under_count', {'X-Bender' => 'Rodriguez'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->header_is('X-Under'      => 1)->content_is("counter\n");
+
+# Client timer
+$client->ioloop->one_tick('0.1');
+is($timer, '/root.html/root.html/root.html/root.html/root.html');
 
 __DATA__
 @@ tags.html.ep

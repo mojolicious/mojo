@@ -93,8 +93,8 @@ downtime software upgrades.
       --pid /tmp/myapp1.pid --lock /tmp/myapp.lock --daemonize
     Server available at file:///tmp/myapp.sock.
 
-All you have to do is to update your application code, start a second web
-server instance and after that send a C<USR1> signal to the old instance.
+All you have to do is update your application code, start a second web server
+instance and after that send a C<USR1> signal to the old instance.
 This will bring down the old web server gracefully, so no active connections
 get interrupted and your users won't notice a thing.
 

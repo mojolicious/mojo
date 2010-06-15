@@ -52,7 +52,7 @@ script.
         ServerName localhost
         DocumentRoot /home/sri/myapp/public
 
-        <Location />
+        <Location /myapp>
             FastCgiIpcDir /tmp
             FastCgiServer /home/sri/myapp/script/myapp -processes 10
         </Location>
@@ -102,7 +102,7 @@ required for L<Mojolicious> L<PSGI> detection.
             $ENV{MOJO_HOME} = '/home/sri/myapp';
         </Perl>
 
-        <Location />
+        <Location /myapp>
             SetHandler perl-script
             PerlHandler Plack::Handler::Apache2
             PerlSetVar psgi_app /home/sri/myapp/script/myapp

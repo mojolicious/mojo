@@ -1,0 +1,33 @@
+# Copyright (C) 2008-2010, Sebastian Riedel.
+
+=head1 NAME
+
+Mojolicious::Guides::Cookbook - Cookbook
+
+=head1 OVERVIEW
+
+Cooking with L<Mojolicious>, recipes for every taste.
+
+=head1 DEPLOYMENT
+
+Getting L<Mojolicious> and L<Mojolicious::Lite> applications running on
+different platforms.
+
+=head2 Builtin Server
+
+L<Mojolicious> contains a very portable HTTP 1.1 compliant web server.
+It is usally used during development but is solid and fast enough for small
+to mid sized applications.
+
+    % ./script/myapp daemon
+    Server available at http://127.0.0.1:3000.
+
+It has many configuration options and is known to work on every platform
+Perl works on.
+
+    % ./script/myapp help daemon
+    ...List of available options...
+
+Another huge advantage is that it supports WebSockets out of the box.
+
+=cut

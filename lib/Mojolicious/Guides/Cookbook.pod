@@ -58,6 +58,28 @@ just point them at your application script because it will automatically
 act like one if it detects the presence of a C<PLACK_ENV> environment
 variable.
 
+=head2 Apache/mod_perl (PSGI/Plack)
+
+C<mod_perl> is a good example for a L<PSGI> adapter that is used without
+C<plackup>, note that setting the C<PLACK_ENV> environment variable is
+required for L<Mojolicious> L<PSGI> detection.
+
+    <VirtualHost *:80>
+        ServerName localhost
+        DocumentRoot /home/sri/myapp/public
+
+        <Perl>
+            $ENV{PLACK_ENV} = 'production';
+            $ENV{MOJO_HOME} = '/home/sri/myapp';
+        </Perl>
+
+        <Location />
+            SetHandler perl-script
+            PerlHandler Plack::Handler::Apache2
+            PerlSetVar psgi_app /home/sri/myapp/script/myapp
+        </Location>
+    </VirtualHost>
+
 =head1 FUN
 
 Hacks that might not be very useful but are fun! :)

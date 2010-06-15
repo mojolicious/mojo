@@ -890,6 +890,9 @@ sub _prepare {
     # Nothing to do
     my $running = 0;
 
+    # Max connections
+    my $max = $self->max_connections;
+
     # Connections
     my $listen = $self->{_listen} || {};
     if (keys %{$self->{_cs}}) { $running = 1 }
@@ -897,11 +900,11 @@ sub _prepare {
     # Timers
     elsif (keys %{$self->{_ts}}) { $running = 1 }
 
-    # Listening
-    elsif ($self->{_listening}) { $running = 1 }
-
     # Listen sockets
-    elsif ($self->max_connections > 0 && keys %$listen) { $running = 1 }
+    elsif ($max > 0 && keys %$listen) { $running = 1 }
+
+    # Listening
+    elsif (!$running && ($max > 0 && $self->{_listening})) { $running = 1 }
 
     # Stopped
     delete $self->{_running} unless $running;

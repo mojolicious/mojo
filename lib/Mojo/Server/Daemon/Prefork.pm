@@ -106,19 +106,10 @@ sub run {
     $self->{_child_poll}->mask($self->{_child_read}, POLLIN);
 
     # Parent signals
-    my $done = 0;
+    my ($done, $graceful) = 0;
     $SIG{INT} = $SIG{TERM} = sub { $done++ };
     $SIG{CHLD} = sub { $self->_reap_child };
-    $SIG{USR1} = sub {
-
-        # Reload app
-        delete $self->{app};
-        $self->app;
-
-        # Bring all children to a greceful shutdown
-        my $children = $self->{_children} || {};
-        kill 'HUP', $_ for keys %$children;
-    };
+    $SIG{USR1} = sub { $done = $graceful = 1 };
 
     # Preload application
     $self->app;
@@ -142,7 +133,7 @@ sub run {
     }
 
     # Kill em all
-    $self->_kill_children;
+    $self->_kill_children($graceful);
     exit 0;
 }
 
@@ -155,7 +146,7 @@ sub _cleanup_children {
 }
 
 sub _kill_children {
-    my $self = shift;
+    my ($self, $graceful) = @_;
 
     # Close pipe
     $self->{_child_read} = undef;
@@ -167,7 +158,7 @@ sub _kill_children {
         # Die die die
         for my $pid (keys %$children) {
             $self->app->log->debug("Killing prefork child $pid.") if DEBUG;
-            kill 'TERM', $pid;
+            kill $graceful ? 'HUP' : 'TERM', $pid;
         }
 
         # Cleanup

@@ -30,6 +30,17 @@ Perl works on.
 
 Another huge advantage is that it supports WebSockets out of the box.
 
+=head2 Apache/CGI
+
+C<CGI> is supported out of the box and your L<Mojolicious> application will
+automatically detect that it is executed as a C<CGI> script.
+
+    <VirtualHost *:80>
+        ServerName localhost
+        DocumentRoot /home/sri/myapp/public
+        ScriptAlias /myapp "/home/sri/myapp/script/myapp"
+    </VirtualHost>
+
 =head2 PSGI/Plack
 
 L<PSGI> is an interface between Perl web frameworks and web servers, and

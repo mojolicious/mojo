@@ -33,11 +33,14 @@ Another huge advantage is that it supports TLS and WebSockets out of the box.
     % ./script/myapp daemon --listen https://*:3000
     Server available at https://*:3000.
 
+A development certificate for testing purposes is built right in, so it just
+works.
+
 =head2 Builtin Preforking Server
 
-To allow scaling with CPUs (cores) and to lower the performance loss from
-blocking APIs the built in web server also has a preforking multi process
-mode.
+To allow scaling with multiple CPUs (cores) and to lower the performance loss
+from (slow) blocking APIs the built in web server also has a preforking multi
+process mode.
 It doesn't work on Windows due to UNIX optimizations but is fast and scalable
 enough for large applications.
 

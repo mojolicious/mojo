@@ -308,15 +308,15 @@ get '/subrequest_sync' => sub {
 get '/subrequest_async' => sub {
     my $self = shift;
     $self->pause;
-    my $test = '';
+    my $async = '';
     $self->client->async->post(
         '/template' => sub {
             my $client = shift;
-            $self->render_text($client->res->body . $test);
+            $self->render_text($client->res->body . $async);
             $self->finish;
         }
     )->process;
-    $test .= 'success';
+    $async .= 'success!';
 };
 
 # GET /redirect_url
@@ -415,12 +415,14 @@ my $t      = Test::Mojo->new;
 my $timer;
 $client->ioloop->timer(
     '0.1' => sub {
+        my $async = '';
         $client->async->get(
             '/' => sub {
                 my $self = shift;
-                $timer = $self->res->body;
+                $timer = $self->res->body . $async;
             }
         )->process;
+        $async = 'works!';
     }
 );
 
@@ -843,7 +845,7 @@ $t->get_ok('/subrequest_sync')->status_is(200)
 $t->get_ok('/subrequest_async')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('Just works!success');
+  ->content_is('Just works!success!');
 
 # GET /redirect_url
 $t->get_ok('/redirect_url')->status_is(302)
@@ -996,7 +998,7 @@ $t->get_ok('/with_under_count', {'X-Bender' => 'Rodriguez'})->status_is(200)
 
 # Client timer
 $client->ioloop->one_tick('0.1');
-is($timer, '/root.html/root.html/root.html/root.html/root.html');
+is($timer, '/root.html/root.html/root.html/root.html/root.htmlworks!');
 
 __DATA__
 @@ tags.html.ep

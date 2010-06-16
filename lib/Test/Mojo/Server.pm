@@ -19,8 +19,9 @@ require Test::More;
 use constant DEBUG => $ENV{MOJO_SERVER_DEBUG} || 0;
 
 __PACKAGE__->attr([qw/command pid/]);
+__PACKAGE__->attr(delay      => 0.5);
 __PACKAGE__->attr(executable => 'mojo');
-__PACKAGE__->attr(home => sub { Mojo::Home->new });
+__PACKAGE__->attr(home       => sub { Mojo::Home->new });
 __PACKAGE__->attr(port    => sub { Mojo::IOLoop->singleton->generate_port });
 __PACKAGE__->attr(timeout => 5);
 
@@ -184,6 +185,10 @@ sub stop_server_ok {
 sub _check_server {
     my $self = shift;
 
+    # Delay
+    my $delay = $self->delay;
+    sleep $delay if $delay;
+
     # Create socket
     my $server = IO::Socket::INET->new(
         Proto    => 'tcp',
@@ -232,7 +237,6 @@ sub _start_server {
     my $self = shift;
 
     my $command = $self->command;
-    warn "\nSERVER COMMAND: $command\n" if DEBUG;
 
     # Run server
     my $pid = open($self->{_server}, "$command |");
@@ -286,6 +290,13 @@ L<Test::Mojo::Server> implements the following attributes.
     $server     = $server->command("lighttpd -D -f $config");
 
 Command for external server start.
+
+=head2 C<delay>
+
+    my $delay = $server->delay;
+    $server   = $server->delay(2);
+
+Time to wait between server checks in seconds, defaults to C<0.5>.
 
 =head2 C<executable>
 

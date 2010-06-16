@@ -66,7 +66,7 @@ sub dispatch {
 sub hide { push @{shift->hidden}, @_ }
 
 sub _dispatch_app {
-    my ($self, $c, $nested) = @_;
+    my ($self, $c, $staging) = @_;
 
     # Prepare new path and base path for embedded application
     my $opath  = $c->req->url->path;
@@ -137,14 +137,14 @@ sub _dispatch_app {
     }
 
     # Success!
-    return 1 unless $nested;
+    return 1 unless $staging;
     return 1 if $continue;
 
     return;
 }
 
 sub _dispatch_callback {
-    my ($self, $c, $nested) = @_;
+    my ($self, $c, $staging) = @_;
 
     # Debug
     $c->app->log->debug(qq/Dispatching callback./);
@@ -169,14 +169,14 @@ sub _dispatch_callback {
     }
 
     # Success!
-    return 1 unless $nested;
+    return 1 unless $staging;
     return 1 if $continue;
 
     return;
 }
 
 sub _dispatch_controller {
-    my ($self, $c, $nested) = @_;
+    my ($self, $c, $staging) = @_;
 
     # Method
     my $method = $self->_generate_method($c);
@@ -240,7 +240,7 @@ sub _dispatch_controller {
     }
 
     # Success!
-    return 1 unless $nested;
+    return 1 unless $staging;
     return 1 if $continue;
 
     return;
@@ -299,20 +299,17 @@ sub _walk_stack {
     my ($self, $c) = @_;
 
     # Walk the stack
-    my $nested = $#{$c->match->stack};
+    my $staging = $#{$c->match->stack};
     for my $field (@{$c->match->stack}) {
-
-        # Don't cache errors
-        local $@;
 
         # Captures
         $c->match->captures($field);
 
         # Dispatch
         my $e =
-            $field->{cb} ? $self->_dispatch_callback($c, $nested)
-          : $field->{app} ? $self->_dispatch_app($c, $nested)
-          :                 $self->_dispatch_controller($c, $nested);
+            $field->{cb} ? $self->_dispatch_callback($c, $staging)
+          : $field->{app} ? $self->_dispatch_app($c, $staging)
+          :                 $self->_dispatch_controller($c, $staging);
 
         # Exception
         if (ref $e) {

@@ -16,7 +16,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 406;
+plan tests => 411;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -31,6 +31,7 @@ use Mojo::Client;
 use Mojo::Content::MultiPart;
 use Mojo::Content::Single;
 use Mojo::Cookie::Response;
+use Mojo::Filter::Chunked;
 use Mojo::JSON;
 use Mojo::Transaction::HTTP;
 use Mojolicious::Lite;
@@ -52,6 +53,25 @@ get '/' => 'root';
 get '/null/:null' => sub {
     my $self = shift;
     $self->render(text => $self->param('null'), layout => 'layout');
+};
+
+# GET /stream
+get '/stream' => sub {
+    my $self    = shift;
+    my $counter = 0;
+    my $chunks  = ['foo', 'bar'];
+    my $chunked = Mojo::Filter::Chunked->new;
+    $self->res->code(200);
+    $self->res->headers->content_type('text/plain');
+    $self->res->headers->transfer_encoding('chunked');
+    $self->res->body(
+        sub {
+            my $self = shift;
+            my $chunk = $chunks->[$counter] || '';
+            $counter++;
+            return $chunked->build($chunk);
+        }
+    );
 };
 
 # GET /привет/мир
@@ -445,6 +465,11 @@ $t->get_ok('/null/0')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/layouted 0/);
+
+# GET /stream
+$t->get_ok('/stream')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('foobar');
 
 # GET / (IRI)
 $t->get_ok('/привет/мир')->status_is(200)

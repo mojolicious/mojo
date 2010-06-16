@@ -66,7 +66,7 @@ sub dispatch {
 sub hide { push @{shift->hidden}, @_ }
 
 sub _dispatch_app {
-    my ($self, $c) = @_;
+    my ($self, $c, $nested) = @_;
 
     # Prepare new path and base path for embedded application
     my $opath  = $c->req->url->path;
@@ -112,13 +112,16 @@ sub _dispatch_app {
 
     # Dispatch
     my $continue;
-    eval {
+    my $success = eval {
 
         # App
         $app = $app->new unless ref $app;
 
         # Handler
         $continue = $app->handler($c);
+
+        # Success
+        1;
     };
 
     # Reset path and base path
@@ -126,45 +129,54 @@ sub _dispatch_app {
     $url->path($opath);
     $url->base->path($obpath);
 
-    # Success!
-    return 1 if $continue;
-
     # Callback error
-    if ($@) {
+    if (!$success && $@) {
         my $e = Mojo::Exception->new($@);
         $c->app->log->error($e);
         return $e;
     }
 
+    # Success!
+    return 1 unless $nested;
+    return 1 if $continue;
+
     return;
 }
 
 sub _dispatch_callback {
-    my ($self, $c) = @_;
+    my ($self, $c, $nested) = @_;
 
     # Debug
     $c->app->log->debug(qq/Dispatching callback./);
 
     # Dispatch
     my $continue;
-    my $cb = $c->match->captures->{cb};
-    eval { $continue = $cb->($c) };
+    my $cb      = $c->match->captures->{cb};
+    my $success = eval {
 
-    # Success!
-    return 1 if $continue;
+        # Callback
+        $continue = $cb->($c);
+
+        # Success
+        1;
+    };
 
     # Callback error
-    if ($@) {
+    if (!$success && $@) {
         my $e = Mojo::Exception->new($@);
         $c->app->log->error($e);
         return $e;
     }
 
+    # Success!
+    return 1 unless $nested;
+    return 1 if $continue;
+
     return;
 }
 
 sub _dispatch_controller {
-    my ($self, $c) = @_;
+    my ($self, $c, $nested) = @_;
 
     # Method
     my $method = $self->_generate_method($c);
@@ -201,7 +213,7 @@ sub _dispatch_controller {
 
     # Dispatch
     my $continue;
-    eval {
+    my $success = eval {
 
         # Instantiate
         my $new = $class->new($c);
@@ -215,17 +227,21 @@ sub _dispatch_controller {
             # Copy stash
             $c->stash($new->stash);
         }
+
+        # Success
+        1;
     };
 
-    # Success!
-    return 1 if $continue;
-
     # Controller error
-    if ($@) {
+    if (!$success && $@) {
         my $e = Mojo::Exception->new($@);
         $c->app->log->error($e);
         return $e;
     }
+
+    # Success!
+    return 1 unless $nested;
+    return 1 if $continue;
 
     return;
 }
@@ -283,6 +299,7 @@ sub _walk_stack {
     my ($self, $c) = @_;
 
     # Walk the stack
+    my $nested = $#{$c->match->stack};
     for my $field (@{$c->match->stack}) {
 
         # Don't cache errors
@@ -293,9 +310,9 @@ sub _walk_stack {
 
         # Dispatch
         my $e =
-            $field->{cb}  ? $self->_dispatch_callback($c)
-          : $field->{app} ? $self->_dispatch_app($c)
-          :                 $self->_dispatch_controller($c);
+            $field->{cb} ? $self->_dispatch_callback($c, $nested)
+          : $field->{app} ? $self->_dispatch_app($c, $nested)
+          :                 $self->_dispatch_controller($c, $nested);
 
         # Exception
         if (ref $e) {

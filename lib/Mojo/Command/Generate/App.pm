@@ -78,6 +78,7 @@ sub handler {
     my ($self, $tx) = @_;
 
     # Hello world!
+    $tx->res->code(200);
     $tx->res->headers->content_type('text/plain');
     $tx->res->body('Hello Mojo!');
 }

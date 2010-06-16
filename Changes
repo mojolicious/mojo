@@ -14,6 +14,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed a tutorial bug. (zoul)
         - Fixed tests to not use any optional modules.
         - Fixed small Mojolicious::Lite bug. (sharifulin)
+        - Fixed Mojo application generator. (zakame)
 
 0.999926 2010-06-07 00:00:00
         - Added version requirement for all optional dependencies.

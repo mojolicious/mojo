@@ -215,8 +215,8 @@ On the tab C<Home Directory> set C<Local Path> to C<c:\myapp\public>,
 C<Local Path Permission Flags> to C<Read> and C<Log Visits>,
 C<Execute Permissions> to C<Scripts Only>.
 
-Click on the C<Configuration> button and then C<Insert> next to the
-C<Wildcard Application Maps>.
+Click on the C<Configuration> button and then C<Insert>
+(next to C<Wildcard Application Mappings>).
 In the next dialog set C<Executable> to
 C<c:\windows\system32\inetsrv\fcgiext.dll> and uncheck
 C<Verify That Files Exist>.

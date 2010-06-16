@@ -30,7 +30,7 @@ sub run {
     my ($self, $name, @args) = @_;
 
     # Try to detect environment
-    $name = $self->_detect if !$name && !$ENV{MOJO_NO_DETECT};
+    $name = $self->_detect($name) unless $ENV{MOJO_NO_DETECT};
 
     # Run command
     if ($name && $name =~ /^\w+$/ && ($name ne 'help' || $args[0])) {
@@ -142,10 +142,13 @@ sub start {
 }
 
 sub _detect {
-    my $self = shift;
+    my ($self, $name) = @_;
 
     # PSGI (Plack only for now)
     return 'psgi' if defined $ENV{PLACK_ENV};
+
+    # No further detection if we have a name
+    return $name if $name;
 
     # CGI
     return 'cgi' if defined $ENV{PATH_INFO};

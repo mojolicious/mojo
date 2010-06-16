@@ -28,7 +28,7 @@ sub run {
     my $prefix = 'templates';
 
     # Options
-    @ARGV = @_ if @_;
+    local @ARGV = @_ if @_;
     GetOptions(
         'class=s'  => sub { $class  = $_[1] },
         'prefix=s' => sub { $prefix = $_[1] }

@@ -265,7 +265,7 @@ Mojo::Command - Command Base Class
         my $self = shift;
 
         # Handle options
-        @ARGV = @_ if @_;
+        local @ARGV = @_ if @_;
         GetOptions('something' => sub { $something = 1 });
 
         # Magic here! :)

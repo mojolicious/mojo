@@ -28,7 +28,7 @@ sub run {
     my $self = shift;
 
     # Options
-    @ARGV = @_ if @_;
+    local @ARGV = @_ if @_;
     my $headers = 0;
     GetOptions('headers' => sub { $headers = 1 });
 

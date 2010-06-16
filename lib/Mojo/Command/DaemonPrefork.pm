@@ -62,7 +62,7 @@ sub run {
 
     # Options
     my $daemonize;
-    @ARGV = @_ if @_;
+    local @ARGV = @_ if @_;
     GetOptions(
         'clients=i'   => sub { $daemon->max_clients($_[1]) },
         daemonize     => \$daemonize,

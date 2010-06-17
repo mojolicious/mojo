@@ -153,13 +153,14 @@ L<Mojolicious> applications are ridiculously simple to deploy with L<Plack>.
 
 L<Plack> provides many server and protocol adapters for you to choose from
 such as C<FCGI>, C<SCGI> and C<mod_perl>.
+Make sure to run C<plackup> from your applications home directory, otherwise
+libraries might not be found.
 
     % plackup ./script/myapp -s FCGI -l /tmp/myapp.sock
 
-Because C<plackup> changes C<$0> L<Mojolicious> is not always able to detect
-your applications home directory, if thats the case you can simply use the
-C<MOJO_HOME> environment variable, running C<plackup> from the applications
-home directory can also help.
+Because C<plackup> uses a weird trick to load your script L<Mojolicious> is
+not always able to detect the applications home directory, if thats the case
+you can simply use the C<MOJO_HOME> environment variable.
 
     % MOJO_HOME=/home/sri/myapp plackup ./script/myapp
     HTTP::Server::PSGI: Accepting connections at http://0:5000/

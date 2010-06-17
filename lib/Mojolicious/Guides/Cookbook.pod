@@ -158,7 +158,8 @@ such as C<FCGI>, C<SCGI> and C<mod_perl>.
 
 Because C<plackup> changes C<$0> L<Mojolicious> is not always able to detect
 your applications home directory, if thats the case you can simply use the
-C<MOJO_HOME> environment variable.
+C<MOJO_HOME> environment variable, running C<plackup> from the applications
+home directory can also help.
 
     % MOJO_HOME=/home/sri/myapp plackup ./script/myapp
     HTTP::Server::PSGI: Accepting connections at http://0:5000/

@@ -108,7 +108,7 @@ sub _dispatch_app {
         # Connect routes
         my $r = $app->routes;
         unless ($r->parent) {
-            $r->parent($self);
+            $r->parent($c->match->endpoint);
             weaken $r->{parent};
         }
 

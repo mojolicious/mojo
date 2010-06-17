@@ -70,7 +70,8 @@ app->log->level('error');
 get '/' => sub {
     my $self = shift;
     my $name = $self->stash('name');
-    $self->render_text("Bye from the $name app!");
+    my $url  = $self->url_for;
+    $self->render_text("Bye from the $name app! $url!");
 };
 
 package main;
@@ -110,4 +111,4 @@ $t->get_ok('/bye/bye')->status_is(200)
 
 # GET /third/ (from embedded app)
 $t->get_ok('/third')->status_is(200)
-  ->content_is('Bye from the third embedded app!');
+  ->content_is('Bye from the third embedded app! /third!');

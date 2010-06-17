@@ -63,7 +63,7 @@ sub run {
 
     # Error
     if ($tx->has_error) {
-        my $message = ($tx->error)[1];
+        my $message = $tx->error;
         $message = $message ? " ($message)" : '';
         print qq/Couldn't open page "$url".$message\n/;
     }

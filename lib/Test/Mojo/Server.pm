@@ -19,7 +19,7 @@ require Test::More;
 use constant DEBUG => $ENV{MOJO_SERVER_DEBUG} || 0;
 
 __PACKAGE__->attr([qw/command pid/]);
-__PACKAGE__->attr(delay      => 0.5);
+__PACKAGE__->attr(delay      => 1);
 __PACKAGE__->attr(executable => 'mojo');
 __PACKAGE__->attr(home       => sub { Mojo::Home->new });
 __PACKAGE__->attr(port    => sub { Mojo::IOLoop->singleton->generate_port });
@@ -296,7 +296,7 @@ Command for external server start.
     my $delay = $server->delay;
     $server   = $server->delay(2);
 
-Time to wait between server checks in seconds, defaults to C<0.5>.
+Time to wait between server checks in seconds, defaults to C<1>.
 
 =head2 C<executable>
 

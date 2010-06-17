@@ -35,7 +35,7 @@ sub add {
         $cookie->max_age(0) unless $cookie->expires || $cookie->max_age;
 
         # Cookie too big
-        next if length $cookie->value > $self->max_cookie_size;
+        next if (length($cookie->value) || 0) > $self->max_cookie_size;
 
         # Initialize
         $self->{_jar}->{$domain} ||= [];

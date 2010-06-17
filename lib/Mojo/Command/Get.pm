@@ -40,6 +40,9 @@ sub run {
     # Client
     my $client = Mojo::Client->new;
 
+    # Silence
+    $client->log->level('fatal');
+
     # Application
     $client->app($ENV{MOJO_APP} || 'Mojo::HelloWorld')
       unless $url =~ /^\w+:\/\//;

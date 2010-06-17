@@ -15,6 +15,7 @@ use Mojo::Content::MultiPart;
 use Mojo::Content::Single;
 use Mojo::CookieJar;
 use Mojo::IOLoop;
+use Mojo::Log;
 use Mojo::Parameters;
 use Mojo::Server::Daemon;
 use Mojo::Transaction::HTTP;
@@ -24,10 +25,11 @@ use Scalar::Util 'weaken';
 
 # You can't let a single bad experience scare you away from drugs.
 __PACKAGE__->attr(
-    [qw/app http_proxy https_proxy log tls_ca_file tls_verify_cb tx/]);
+    [qw/app http_proxy https_proxy tls_ca_file tls_verify_cb tx/]);
 __PACKAGE__->attr(cookie_jar => sub { Mojo::CookieJar->new });
 __PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->new });
 __PACKAGE__->attr(keep_alive_timeout         => 15);
+__PACKAGE__->attr(log                        => sub { Mojo::Log->new });
 __PACKAGE__->attr(max_keep_alive_connections => 5);
 __PACKAGE__->attr(max_redirects              => 0);
 __PACKAGE__->attr(websocket_timeout          => 300);
@@ -272,6 +274,7 @@ sub clone {
     # Clone
     my $clone = $self->new;
     $clone->app($self->app);
+    $clone->log($self->log);
     $clone->cookie_jar($self->cookie_jar);
     $clone->keep_alive_timeout($self->keep_alive_timeout);
     $clone->max_keep_alive_connections($self->max_keep_alive_connections);
@@ -672,8 +675,7 @@ sub _error {
     }
 
     # Log
-    my $log = $self->log;
-    $log->error($error) if $error && $log;
+    $self->log->error($error) if $error;
 
     # Finish
     $self->_finish($id);
@@ -822,10 +824,6 @@ sub _prepare_pipeline {
     # Embedded server
     $self->_prepare_server if $self->app;
 
-    # Log
-    $self->log($self->{_server}->app->log)
-      if $self->{_server} && !$self->log;
-
     # Prepare all transactions
     for my $tx (@$p) {
 
@@ -912,6 +910,7 @@ sub _prepare_server {
     delete $server->{app};
     my $app = $self->app;
     ref $app ? $server->app($app) : $server->app_class($app);
+    $self->log($server->app->log);
 }
 
 # Hey, Weener Boy... where do you think you'e going?

@@ -47,7 +47,16 @@ app->log->level('error');
 get '/bye' => sub {
     my $self = shift;
     my $name = $self->stash('name');
-    $self->render_text("Bye from the $name app!");
+    $self->pause;
+    my $async = '';
+    $self->client->async->get(
+        '/hello/hello' => sub {
+            my $client = shift;
+            $self->render_text($client->res->body . "$name! $async");
+            $self->finish;
+        }
+    )->process;
+    $async .= 'success!';
 };
 
 package MyTestApp::Test2;
@@ -97,7 +106,7 @@ $t->get_ok('/hello/hello')->status_is(200)
 
 # GET /bye/bye (from embedded app)
 $t->get_ok('/bye/bye')->status_is(200)
-  ->content_is('Bye from the second embedded app!');
+  ->content_is('Hello from the embedded app!second embedded! success!');
 
 # GET /third/ (from embedded app)
 $t->get_ok('/third')->status_is(200)

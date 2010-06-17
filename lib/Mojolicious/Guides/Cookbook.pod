@@ -158,7 +158,7 @@ libraries might not be found.
 
     % plackup ./script/myapp -s FCGI -l /tmp/myapp.sock
 
-Because C<plackup> uses a weird trick to load your script L<Mojolicious> is
+Because C<plackup> uses a weird trick to load your script, L<Mojolicious> is
 not always able to detect the applications home directory, if thats the case
 you can simply use the C<MOJO_HOME> environment variable.
 

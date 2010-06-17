@@ -20,8 +20,8 @@ sub new {
     my $self = shift->SUPER::new();
     my $tx   = shift;
     $self->tx($tx);
-    $self->{_path} =
-      b($tx->req->url->path->to_string)->url_unescape->decode('UTF-8')
+    $self->{_path} = shift
+      || b($tx->req->url->path->to_string)->url_unescape->decode('UTF-8')
       ->to_string;
     return $self;
 }

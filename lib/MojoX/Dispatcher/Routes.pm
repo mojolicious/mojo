@@ -11,6 +11,7 @@ use Mojo::ByteStream 'b';
 use Mojo::Exception;
 use Mojo::Loader;
 use MojoX::Routes::Match;
+use Scalar::Util 'weaken';
 
 __PACKAGE__->attr(
     controller_base_class => 'MojoX::Dispatcher::Routes::Controller');
@@ -32,37 +33,18 @@ sub auto_render {
     return;
 }
 
-sub detour {
-    my ($self, $app) = @_;
-
-    # Load app
-    unless (ref $app) {
-
-        # Load
-        if (my $e = Mojo::Loader->load($app)) {
-
-            # Error
-            die $e if ref $e;
-        }
-
-        # Instantiate
-        $app = $app->new;
-    }
-
-    # Add
-    $self->add_child($app->routes);
-
-    return $self;
-}
-
 sub dispatch {
     my ($self, $c) = @_;
 
     # Already rendered
     return if $c->res->code;
 
+    # Path
+    my $path = $c->stash->{path};
+    $path = "/$path" if defined $path && $path !~ /^\//;
+
     # Match
-    my $m = MojoX::Routes::Match->new($c->tx);
+    my $m = MojoX::Routes::Match->new($c->tx, $path);
     $m->match($self);
     $c->match($m);
 
@@ -87,6 +69,69 @@ sub dispatch {
 }
 
 sub hide { push @{shift->hidden}, @_ }
+
+sub _dispatch_app {
+    my ($self, $c, $staging) = @_;
+
+    # Load app
+    my $app = $c->match->captures->{app};
+    unless (ref $app && $self->{_loaded}->{$app}) {
+
+        # Debug
+        $c->app->log->debug(qq/Dispatching application "$app"./);
+
+        # Load
+        if (my $e = Mojo::Loader->load($app)) {
+
+            # Doesn't exist
+            return unless ref $e;
+
+            # Error
+            $c->app->log->error($e);
+            return $e;
+        }
+
+        # Loaded
+        $self->{_loaded}->{$app}++;
+    }
+
+    # Debug
+    else { $c->app->log->debug(qq/Dispatching application./) }
+
+    # Dispatch
+    my $continue;
+    my $success = eval {
+
+        # App
+        $app = $app->new unless ref $app;
+
+        # Connect routes
+        my $r = $app->routes;
+        unless ($r->parent) {
+            $r->parent($self);
+            weaken $r->{parent};
+        }
+
+        # Handler
+        $continue = $app->handler($c);
+
+        # Success
+        1;
+    };
+
+    # Callback error
+    if (!$success && $@) {
+        my $e = Mojo::Exception->new($@);
+        $c->app->log->error($e);
+        return $e;
+    }
+
+    # Success!
+    return 1 unless $staging;
+    return 1 if $continue;
+
+    return;
+}
 
 sub _dispatch_callback {
     my ($self, $c, $staging) = @_;
@@ -332,14 +377,6 @@ implements the following ones.
     $dispatcher->auto_render(MojoX::Dispatcher::Routes::Controller->new);
 
 Automatic rendering.
-
-=head2 C<detour>
-
-    $dispatcher = $dispatcher->detour($app);
-    $dispatcher = $dispatcher->detour('MyApp');
-
-Embed routes from secondary application.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<dispatch>
 

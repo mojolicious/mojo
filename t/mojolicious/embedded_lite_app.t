@@ -22,14 +22,12 @@ package EmbeddedTestApp;
 
 use Mojolicious::Lite;
 
-# Silence
-app->log->level('error');
-
 # GET /hello (embedded)
 get '/hello' => sub {
     my $self = shift;
     my $name = $self->stash('name');
-    $self->render_text("Hello from the $name app!");
+    my $url  = $self->url_for;
+    $self->render_text("Hello from the $name app! $url!");
 };
 
 # Morbo will now introduce the candidates - Puny Human Number One,
@@ -40,28 +38,24 @@ package MyTestApp::Test1;
 
 use Mojolicious::Lite;
 
-# Silence
-app->log->level('error');
-
-# GET /hello (embedded)
+# GET /bye (embedded)
 get '/bye' => sub {
     my $self = shift;
     my $name = $self->stash('name');
-    $self->render_text("Bye from the $name app!");
+    my $url  = $self->url_for;
+    $self->render_text("Bye from the $name app! $url!");
 };
 
 package MyTestApp::Test2;
 
 use Mojolicious::Lite;
 
-# Silence
-app->log->level('error');
-
 # GET / (embedded)
 get '/' => sub {
     my $self = shift;
     my $name = $self->stash('name');
-    $self->render_text("Bye from the $name app!");
+    my $url  = $self->url_for;
+    $self->render_text("Bye from the $name app! $url!");
 };
 
 package main;
@@ -76,15 +70,16 @@ app->log->level('error');
 get '/hello' => sub { shift->render_text('Hello from the main app!') };
 
 # /bye/* (dispatch to embedded app)
-get '/bye/(*path)' => {app => 'MyTestApp::Test1', name => 'second embedded'};
+my $bye = get '/bye' => {name => 'second embedded'};
+$bye->detour('MyTestApp::Test1');
 
 # /third/* (dispatch to embedded app)
-get '/third/(*path)' =>
-  {app => 'MyTestApp::Test2', name => 'third embedded', path => '/'};
+my $third = get '/third' => {name => 'third embedded'};
+$third->detour('MyTestApp::Test2');
 
 # /hello/* (dispatch to embedded app)
-app->routes->route('/hello/(*path)')
-  ->to(app => EmbeddedTestApp::app(), name => 'embedded');
+app->routes->route('/hello')->to(name => 'embedded')
+  ->detour(EmbeddedTestApp::app());
 
 my $t = Test::Mojo->new;
 
@@ -93,12 +88,12 @@ $t->get_ok('/hello')->status_is(200)->content_is('Hello from the main app!');
 
 # GET /hello/hello (from embedded app)
 $t->get_ok('/hello/hello')->status_is(200)
-  ->content_is('Hello from the embedded app!');
+  ->content_is('Hello from the embedded app! /hello/hello!');
 
 # GET /bye/bye (from embedded app)
 $t->get_ok('/bye/bye')->status_is(200)
-  ->content_is('Bye from the second embedded app!');
+  ->content_is('Bye from the second embedded app! /bye/bye!');
 
-# GET /third/ (from embedded app)
+# GET /third (from embedded app)
 $t->get_ok('/third')->status_is(200)
-  ->content_is('Bye from the third embedded app!');
+  ->content_is('Bye from the third embedded app! /third!');

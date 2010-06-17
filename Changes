@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 0.999927 2010-06-11 00:00:00
+        - Added EXPERIMENTAL detour method to MojoX::Dispatcher::Routes.
         - Added graceful shutdown support to Mojo::Server::Daemon.
         - Added routing guide.
         - Started cookbook.
@@ -12,6 +13,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed async Mojo::Client tests.
         - Fixed HTML1 and HTML5 compatibility of Mojo::DOM.
         - Fixed environment detection.
+        - Fixed Mojolicious application embedding.
         - Fixed a tutorial bug. (zoul)
         - Fixed tests to not use any optional modules.
         - Fixed small Mojolicious::Lite bug. (sharifulin)

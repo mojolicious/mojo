@@ -58,13 +58,24 @@ sub new {
     return $self;
 }
 
-sub add_condition {
-    my $self = shift;
+sub add_child {
+    my ($self, $route) = @_;
 
-    # Merge
-    my $dictionary = ref $_[0] ? $_[0] : {@_};
-    $dictionary = {%{$self->dictionary}, %$dictionary};
-    $self->dictionary($dictionary);
+    # We are the parent
+    $route->parent($self);
+    weaken $route->{parent};
+
+    # Add to tree
+    push @{$self->children}, $route;
+
+    return $self;
+}
+
+sub add_condition {
+    my ($self, $name, $condition) = @_;
+
+    # Add
+    $self->dictionary->{$name} = $condition;
 
     return $self;
 }
@@ -127,16 +138,7 @@ sub route {
 
     # New route
     my $route = $self->new(@_);
-
-    # Inherit conditions
-    $route->add_condition($self->dictionary);
-
-    # We are the parent
-    $route->parent($self);
-    weaken $route->{parent};
-
-    # Add to tree
-    push @{$self->children}, $route;
+    $self->add_child($route);
 
     return $route;
 }
@@ -345,6 +347,12 @@ following ones.
     my $r = MojoX::Routes->new('/:controller/:action');
 
 Construct a new route object.
+
+=head2 C<add_child>
+
+    $r = $r->add_child(MojoX::Route->new);
+
+Add a new child to this route.
 
 =head2 C<add_condition>
 

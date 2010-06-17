@@ -32,6 +32,29 @@ sub auto_render {
     return;
 }
 
+sub detour {
+    my ($self, $app) = @_;
+
+    # Load app
+    unless (ref $app) {
+
+        # Load
+        if (my $e = Mojo::Loader->load($app)) {
+
+            # Error
+            die $e if ref $e;
+        }
+
+        # Instantiate
+        $app = $app->new;
+    }
+
+    # Add
+    $self->add_child($app->routes);
+
+    return $self;
+}
+
 sub dispatch {
     my ($self, $c) = @_;
 
@@ -64,84 +87,6 @@ sub dispatch {
 }
 
 sub hide { push @{shift->hidden}, @_ }
-
-sub _dispatch_app {
-    my ($self, $c, $staging) = @_;
-
-    # Prepare new path and base path for embedded application
-    my $opath  = $c->req->url->path;
-    my $obpath = $c->req->url->base->path;
-    if (my $path = $c->match->captures->{path}) {
-
-        # Make sure new path starts with a slash
-        $path = "/$path" unless $path =~ /^\//;
-
-        # Generate new base path
-        my $bpath = "$opath$obpath";
-        $bpath =~ s/$path$//;
-
-        # Set new path and base path
-        $c->req->url->path($path);
-        $c->req->url->base->path($bpath);
-    }
-
-    # Load app
-    my $app = $c->match->captures->{app};
-    unless (ref $app && $self->{_loaded}->{$app}) {
-
-        # Debug
-        $c->app->log->debug(qq/Dispatching application "$app"./);
-
-        # Load
-        if (my $e = Mojo::Loader->load($app)) {
-
-            # Doesn't exist
-            return unless ref $e;
-
-            # Error
-            $c->app->log->error($e);
-            return $e;
-        }
-
-        # Loaded
-        $self->{_loaded}->{$app}++;
-    }
-
-    # Debug
-    else { $c->app->log->debug(qq/Dispatching application./) }
-
-    # Dispatch
-    my $continue;
-    my $success = eval {
-
-        # App
-        $app = $app->new unless ref $app;
-
-        # Handler
-        $continue = $app->handler($c);
-
-        # Success
-        1;
-    };
-
-    # Reset path and base path
-    my $url = $c->req->url;
-    $url->path($opath);
-    $url->base->path($obpath);
-
-    # Callback error
-    if (!$success && $@) {
-        my $e = Mojo::Exception->new($@);
-        $c->app->log->error($e);
-        return $e;
-    }
-
-    # Success!
-    return 1 unless $staging;
-    return 1 if $continue;
-
-    return;
-}
 
 sub _dispatch_callback {
     my ($self, $c, $staging) = @_;
@@ -387,6 +332,14 @@ implements the following ones.
     $dispatcher->auto_render(MojoX::Dispatcher::Routes::Controller->new);
 
 Automatic rendering.
+
+=head2 C<detour>
+
+    $dispatcher = $dispatcher->detour($app);
+    $dispatcher = $dispatcher->detour('MyApp');
+
+Embed routes from secondary application.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<dispatch>
 

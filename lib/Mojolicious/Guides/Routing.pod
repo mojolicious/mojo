@@ -466,6 +466,43 @@ This is where conditions come into play, they are basically router plugins.
 The method C<add_condition> registers the new condition in the router while
 C<over> actually applies it to the route.
 
+=head2 Embedding Routes (L<Mojolicious::Lite> Controllers)
+
+You can easily embed routes from another application using C<detour>, they
+will be treated as if they had been defined in our application.
+
+    # Application
+    package MyApp;
+    use base 'Mojolicious';
+
+    sub startup {
+        my $self = shift;
+
+        # Routes
+        my $r = $self->routes;
+
+        # Embedded Mojolicious::Lite app
+        $r->route('/foo')->detour('MyApp::Foo');
+    }
+
+    1;
+
+This allows for example the use of the L<Mojolicious::Lite> domain specific
+language in normal L<Mojolicious> controllers, without any performance loss
+or side effects.
+
+    # Controller
+    package MyApp::Foo;
+    use Mojolicious::Lite;
+
+    # Action
+    get '/bar' => sub {
+        my $self = shift;
+        $self->render(text => 'Hello World!');
+    };
+
+    1;
+
 =head2 WebSockets
 
 You can restrict access to WebSocket handshakes using the C<websocket> method.

@@ -33,6 +33,9 @@ sub match {
     # Shortcut
     return unless $r;
 
+    # Dictionary
+    my $dictionary = $self->{_dictionary} ||= $r->dictionary;
+
     # Root
     $self->root($r) unless $self->root;
 
@@ -40,7 +43,7 @@ sub match {
     for (my $i = 0; $i < @{$r->conditions}; $i += 2) {
         my $name      = $r->conditions->[$i];
         my $value     = $r->conditions->[$i + 1];
-        my $condition = $r->dictionary->{$name};
+        my $condition = $dictionary->{$name};
 
         # No condition
         return unless $condition;

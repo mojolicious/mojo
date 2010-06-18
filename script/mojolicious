@@ -27,6 +27,8 @@ EOF
 # Start the command system
 Mojolicious::Commands->start;
 
+__END__
+
 =head1 NAME
 
 mojolicious - The Mojolicious Command System

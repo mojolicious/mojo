@@ -270,8 +270,8 @@ Template blocks can be reused like functions in Perl scripts.
     <!doctype html><html>
         <head><title>Sebastians Frameworks!</title></head>
         <body>
-            <%= $link->('http://mojolicious.org', 'Mojolicious') %>
-            <%= $link->('http://catalystframework.org', 'Catalyst') %>
+            <%== $link->('http://mojolicious.org', 'Mojolicious') %>
+            <%== $link->('http://catalystframework.org', 'Catalyst') %>
         </body>
     </html>
 

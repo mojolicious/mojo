@@ -482,10 +482,10 @@ You can also package your conditions as reusable plugins.
         # Add "werewolf" condition
         $app->routes->add_condition(
             werewolf => sub {
-                my ($r, $tx, $stash) = @_;
+                my ($r, $tx, $stash, $days) = @_;
 
-                # Keep the werewolfs out! (for 4 days after full moon)
-                return if abs(14 - (phase(time))[2]) > 2;
+                # Keep the werewolfs out!
+                return if abs(14 - (phase(time))[2]) > ($days / 2);
 
                 # It's ok, no werewolf
                 return $stash;
@@ -511,8 +511,8 @@ application.
         # Routes
         my $r = $self->routes;
 
-        # /hideout
-        $r->route('/hideout')->over(werewolf => 1)
+        # /hideout (keep them out for 4 days after full moon)
+        $r->route('/hideout')->over(werewolf => 4)
           ->to(controller => 'foo', action => 'bar');
     }
 

@@ -466,6 +466,60 @@ This is where conditions come into play, they are basically router plugins.
 The method C<add_condition> registers the new condition in the router while
 C<over> actually applies it to the route.
 
+=head2 Condition Plugins
+
+You can also package your conditions as reusable plugins.
+
+    # Plugin
+    package Mojolicious::Plugin::AgentCondition;
+    use base 'Mojolicious::Plugin';
+
+    sub register {
+        my ($self, $app) = @_;
+
+        # Add "User-Agent" condition
+        $app->routes->add_condition(
+            agent => sub {
+                my ($r, $tx, $stash, $pattern) = @_;
+
+                # User supplied regular expression
+                return unless $pattern && ref $pattern eq 'Regexp';
+
+                # Match "User-Agent" header and return new stash on success
+                my $agent = $tx->req->headers->user_agent;
+                return $stash if $agent && $agent =~ $pattern;
+
+                # No success
+                return;
+            }
+        );
+    }
+
+    1;
+
+Now just load the plugin and you are ready to use the condition in all your
+application.
+
+    # Application
+    package MyApp;
+    use base 'Mojolicious';
+
+    sub startup {
+        my $self = shift;
+
+        # Plugin
+        $self->plugin('agent_condition');
+
+        # Routes
+        my $r = $self->routes;
+
+        # /firefox_only (Firefox)
+        $r->route('/firefox_only')->over(agent => qr/Firefox/)
+          ->to(controller => 'foo', action => 'bar');
+    }
+
+    1;
+
 =head2 Embedding Applications
 
 You can easily embed whole applications using the C<detour> method, it
@@ -507,6 +561,7 @@ language in normal L<Mojolicious> controllers.
 Embedding L<Mojolicious> applications is easy, but it gets even easier if you
 package the whole thing as a self contained reusable plugin.
 
+    # Plugin
     package Mojolicious::Plugin::MyEmbeddedApp;
     use base 'Mojolicious::Plugin';
 

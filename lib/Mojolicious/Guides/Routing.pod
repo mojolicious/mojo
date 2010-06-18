@@ -471,26 +471,24 @@ C<over> actually applies it to the route.
 You can also package your conditions as reusable plugins.
 
     # Plugin
-    package Mojolicious::Plugin::AgentCondition;
+    package Mojolicious::Plugin::WerewolfCondition;
     use base 'Mojolicious::Plugin';
+
+    use Astro::MoonPhase;
 
     sub register {
         my ($self, $app) = @_;
 
-        # Add "User-Agent" condition
+        # Add "werewolf" condition
         $app->routes->add_condition(
-            agent => sub {
-                my ($r, $tx, $stash, $pattern) = @_;
+            werewolf => sub {
+                my ($r, $tx, $stash) = @_;
 
-                # User supplied regular expression
-                return unless $pattern && ref $pattern eq 'Regexp';
+                # Keep the werewolfs out! (for 4 days after full moon)
+                return if abs(14 - (phase(time))[2]) > 2;
 
-                # Match "User-Agent" header and return new stash on success
-                my $agent = $tx->req->headers->user_agent;
-                return $stash if $agent && $agent =~ $pattern;
-
-                # No success
-                return;
+                # It's ok, no werewolf
+                return $stash;
             }
         );
     }
@@ -508,13 +506,13 @@ application.
         my $self = shift;
 
         # Plugin
-        $self->plugin('agent_condition');
+        $self->plugin('werewolf_condition');
 
         # Routes
         my $r = $self->routes;
 
-        # /firefox_only (Firefox)
-        $r->route('/firefox_only')->over(agent => qr/Firefox/)
+        # /hideout
+        $r->route('/hideout')->over(werewolf => 1)
           ->to(controller => 'foo', action => 'bar');
     }
 

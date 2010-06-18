@@ -43,7 +43,7 @@ use Mojolicious::Lite;
 # Silence
 app->log->level('error');
 
-# GET /hello (embedded)
+# GET /bye (embedded)
 get '/bye' => sub {
     my $self = shift;
     my $name = $self->stash('name');
@@ -86,15 +86,15 @@ app->log->level('error');
 get '/hello' => sub { shift->render_text('Hello from the main app!') };
 
 # /bye/* (dispatch to embedded app)
-get '/bye/(*path)' => {app => 'MyTestApp::Test1', name => 'second embedded'};
+get('/bye' => {name => 'second embedded'})->detour('MyTestApp::Test1');
 
 # /third/* (dispatch to embedded app)
 get '/third/(*path)' =>
   {app => 'MyTestApp::Test2', name => 'third embedded', path => '/'};
 
 # /hello/* (dispatch to embedded app)
-app->routes->route('/hello/(*path)')
-  ->to(app => EmbeddedTestApp::app(), name => 'embedded');
+app->routes->route('/hello')->detour(EmbeddedTestApp::app())
+  ->to(name => 'embedded');
 
 my $t = Test::Mojo->new;
 

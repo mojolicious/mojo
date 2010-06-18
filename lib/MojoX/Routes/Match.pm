@@ -64,10 +64,16 @@ sub match {
     # Match
     my $captures = $r->pattern->shape_match(\$path);
 
+    # No match
+    return unless $captures;
+
+    # Partial
+    if (my $partial = $r->partial) {
+        $captures->{$partial} = $path;
+        $path = '';
+    }
     $self->{_path} = $path;
 
-    # Shaped path
-    return unless $captures;
 
     # Merge captures
     $captures = {%{$self->captures}, %$captures};

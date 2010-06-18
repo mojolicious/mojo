@@ -33,6 +33,18 @@ sub auto_render {
     return;
 }
 
+sub detour {
+    my ($self, $app) = @_;
+
+    # App
+    $self->to(app => $app);
+
+    # Partial
+    $self->partial('path');
+
+    return $self;
+}
+
 sub dispatch {
     my ($self, $c) = @_;
 
@@ -71,7 +83,7 @@ sub dispatch {
 sub hide { push @{shift->hidden}, @_ }
 
 sub _dispatch_app {
-    my ($self, $c, $staging) = @_;
+    my ($self, $c) = @_;
 
     # Load app
     my $app = $c->match->captures->{app};
@@ -99,7 +111,6 @@ sub _dispatch_app {
     else { $c->app->log->debug(qq/Dispatching application./) }
 
     # Dispatch
-    my $continue;
     my $success = eval {
 
         # App
@@ -113,7 +124,7 @@ sub _dispatch_app {
         }
 
         # Handler
-        $continue = $app->handler($c);
+        $app->handler($c);
 
         # Success
         1;
@@ -127,10 +138,7 @@ sub _dispatch_app {
     }
 
     # Success!
-    return 1 unless $staging;
-    return 1 if $continue;
-
-    return;
+    return 1;
 }
 
 sub _dispatch_callback {
@@ -298,7 +306,7 @@ sub _walk_stack {
         # Dispatch
         my $e =
             $field->{cb} ? $self->_dispatch_callback($c, $staging)
-          : $field->{app} ? $self->_dispatch_app($c, $staging)
+          : $field->{app} ? $self->_dispatch_app($c)
           :                 $self->_dispatch_controller($c, $staging);
 
         # Exception
@@ -377,6 +385,14 @@ implements the following ones.
     $dispatcher->auto_render(MojoX::Dispatcher::Routes::Controller->new);
 
 Automatic rendering.
+
+=head2 C<detour>
+
+    $dispatcher = $dispatcher->detour('MyApp');
+    $dispatcher = $dispatcher->detour($app);
+
+Embed application.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<dispatch>
 

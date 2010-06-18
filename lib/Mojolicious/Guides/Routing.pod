@@ -466,13 +466,10 @@ This is where conditions come into play, they are basically router plugins.
 The method C<add_condition> registers the new condition in the router while
 C<over> actually applies it to the route.
 
-=head2 Embedding Applications (C<app> and C<path>)
+=head2 Embedding Applications
 
-You can easily embed whole applications using the C<app> and C<path> stash
-values.
-C<app> has to be a class or L<Mojolicious> application object and C<path>
-needs to contain the new path the embedded application will use for
-redispatching.
+You can easily embed whole applications using the C<detour> method, it
+accepts a L<Mojolicious> application class or instance.
 
     # Application
     package MyApp;
@@ -485,7 +482,7 @@ redispatching.
         my $r = $self->routes;
 
         # Embedded Mojolicious::Lite app under "/foo/*"
-        $r->route('/foo/(*path)')->to(app => 'MyApp::Foo');
+        $r->route('/foo')->detour('MyApp::Foo');
     }
 
     1;

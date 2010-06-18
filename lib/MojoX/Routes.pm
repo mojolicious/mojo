@@ -11,7 +11,7 @@ use Mojo::URL;
 use MojoX::Routes::Pattern;
 use Scalar::Util 'weaken';
 
-__PACKAGE__->attr([qw/block inline name parent/]);
+__PACKAGE__->attr([qw/block inline name parent partial/]);
 __PACKAGE__->attr([qw/children conditions/] => sub { [] });
 __PACKAGE__->attr(dictionary                => sub { {} });
 __PACKAGE__->attr(pattern => sub { MojoX::Routes::Pattern->new });
@@ -187,8 +187,12 @@ sub to {
         $defaults->{action}     = $2 if defined $2;
     }
 
+    # Pattern
+    my $pattern = $self->pattern;
+
     # Defaults
-    $self->pattern->defaults($defaults) if $defaults;
+    my $old = $pattern->defaults;
+    $pattern->defaults({%$old, %$defaults}) if $defaults;
 
     return $self;
 }
@@ -327,6 +331,15 @@ The name of this route.
     $r         = $r->parent(MojoX::Routes->new);
 
 The parent of this route, used for nesting routes.
+
+=head2 C<partial>
+
+    my $partial = $r->partial;
+    $r          = $r->partial('path');
+
+Route has no specific end, remaining characters will be captured with the
+partial name.
+Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<pattern>
 

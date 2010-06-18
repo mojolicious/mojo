@@ -496,7 +496,7 @@ You can also package your conditions as reusable plugins.
     1;
 
 Now just load the plugin and you are ready to use the condition in all your
-application.
+applications.
 
     # Application
     package MyApp;

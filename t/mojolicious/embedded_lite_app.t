@@ -14,11 +14,14 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 12;
+plan tests => 15;
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
 
 # I heard you went off and became a rich doctor.
 # I've performed a few mercy killings.
-package EmbeddedTestApp;
+package TestApp;
 
 use Mojolicious::Lite;
 
@@ -83,7 +86,7 @@ use Test::Mojo;
 app->log->level('error');
 
 # GET /hello
-get '/hello' => sub { shift->render_text('Hello from the main app!') };
+get '/hello' => 'works';
 
 # /bye/* (dispatch to embedded app)
 get('/bye' => {name => 'second embedded'})->detour('MyTestApp::Test1');
@@ -93,13 +96,16 @@ get '/third/(*path)' =>
   {app => 'MyTestApp::Test2', name => 'third embedded', path => '/'};
 
 # /hello/* (dispatch to embedded app)
-app->routes->route('/hello')->detour(EmbeddedTestApp::app())
-  ->to(name => 'embedded');
+app->routes->route('/hello')->detour(TestApp::app())->to(name => 'embedded');
+
+# /just/* (external embedded app)
+get('/just' => {name => 'working'})->detour('EmbeddedTestApp');
 
 my $t = Test::Mojo->new;
 
 # GET /hello (from main app)
-$t->get_ok('/hello')->status_is(200)->content_is('Hello from the main app!');
+$t->get_ok('/hello')->status_is(200)
+  ->content_is("Hello from the main app!\n");
 
 # GET /hello/hello (from embedded app)
 $t->get_ok('/hello/hello')->status_is(200)
@@ -112,3 +118,10 @@ $t->get_ok('/bye/bye')->status_is(200)
 # GET /third/ (from embedded app)
 $t->get_ok('/third')->status_is(200)
   ->content_is('Bye from the third embedded app! /third!');
+
+# GET /just/works (from external embedded app)
+$t->get_ok('/just/works')->status_is(200)->content_is("It is working!\n");
+
+__DATA__
+@@ works.html.ep
+Hello from the main app!

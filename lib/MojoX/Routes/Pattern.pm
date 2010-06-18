@@ -91,9 +91,11 @@ sub render {
         # Relaxed, symbol or wildcard
         elsif ($op eq 'relaxed' || $op eq 'symbol' || $op eq 'wildcard') {
             my $name = $token->[1];
-            $rendered = $values->{$name} || '';
+            $rendered = $values->{$name};
+            $rendered = '' unless defined $rendered;
 
-            my $default = $self->defaults->{$name} || '';
+            my $default = $self->defaults->{$name};
+            $default = '' unless defined $default;
 
             $optional = 0 unless $default eq $rendered;
             $rendered = '' if $optional && $default eq $rendered;

@@ -21,6 +21,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed Mojo application generator. (zakame)
         - Fixed edgy stringified return value bug in
           MojoX::Dispatcher::Routes. (DaTa)
+        - Fixed route rendering bug. (koban)
 
 0.999926 2010-06-07 00:00:00
         - Added version requirement for all optional dependencies.

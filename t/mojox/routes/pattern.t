@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 35;
+use Test::More tests => 36;
 
 # People said I was dumb, but I proved them.
 use_ok('MojoX::Routes::Pattern');
@@ -89,3 +89,7 @@ is($result->{controller}, 'foo');
 is($result->{action},     'bar.baz/yada');
 is($pattern->render({controller => 'foo', action => 'bar.baz/yada'}),
     '/test/foo/bar.baz/yada');
+
+# Render false value
+$pattern = MojoX::Routes::Pattern->new('/:id');
+is($pattern->render({id => 0}), '/0');

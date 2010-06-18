@@ -554,7 +554,7 @@ language in normal L<Mojolicious> controllers.
 
     1;
 
-=head2 Route Plugins
+=head2 Application Plugins
 
 Embedding L<Mojolicious> applications is easy, but it gets even easier if you
 package the whole thing as a self contained reusable plugin.

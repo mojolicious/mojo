@@ -502,6 +502,46 @@ language in normal L<Mojolicious> controllers.
 
     1;
 
+=head2 Route Plugins
+
+Embedding L<Mojolicious> applications is easy, but it gets even easier if you
+package the whole thing as a self contained reusable plugin.
+
+    package Mojolicious::Plugin::MyEmbeddedApp;
+    use base 'Mojolicious::Plugin';
+
+    sub register {
+        my ($self, $app) = @_;
+
+        # Automatically add route
+        $app->routes->route('/foo')->detour(EmbeddedApp::app());
+    }
+
+    package EmbeddedApp;
+    use Mojolicious::Lite;
+
+    get '/bar' => 'bar';
+
+    1;
+    __DATA__
+    @@ bar.html.ep
+    Hello World!
+
+Just load the plugin and you're done.
+
+    # Application
+    package MyApp;
+    use base 'Mojolicious';
+
+    sub startup {
+        my $self = shift;
+
+        # Plugin
+        $self->plugin('my_embedded_app');
+    }
+
+    1;
+
 =head2 WebSockets
 
 You can restrict access to WebSocket handshakes using the C<websocket> method.

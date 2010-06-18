@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 15;
+plan tests => 18;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -62,6 +62,24 @@ get '/bye' => sub {
     $async .= 'success!';
 };
 
+package Mojolicious::Plugin::MyEmbeddedApp;
+use base 'Mojolicious::Plugin';
+
+sub register {
+    my ($self, $app) = @_;
+    $app->routes->route('/foo')
+      ->detour(Mojolicious::Plugin::MyEmbeddedApp::App::app());
+}
+
+package Mojolicious::Plugin::MyEmbeddedApp::App;
+use Mojolicious::Lite;
+
+# Silence
+app->log->level('error');
+
+# GET /bar
+get '/bar' => {text => 'plugin works!'};
+
 package MyTestApp::Test2;
 
 use Mojolicious::Lite;
@@ -85,6 +103,9 @@ use Test::Mojo;
 # Silence
 app->log->level('error');
 
+# /foo/* (plugin app)
+plugin 'my_embedded_app';
+
 # GET /hello
 get '/hello' => 'works';
 
@@ -102,6 +123,9 @@ app->routes->route('/hello')->detour(TestApp::app())->to(name => 'embedded');
 get('/just' => {name => 'working'})->detour('EmbeddedTestApp');
 
 my $t = Test::Mojo->new;
+
+# GET /foo/bar (plugin app)
+$t->get_ok('/foo/bar')->status_is(200)->content_is('plugin works!');
 
 # GET /hello (from main app)
 $t->get_ok('/hello')->status_is(200)

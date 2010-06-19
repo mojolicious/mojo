@@ -14,9 +14,10 @@ use Mojo::JSON;
 use MojoX::Types;
 
 __PACKAGE__->attr(default_format => 'html');
-__PACKAGE__->attr([qw/default_handler default_template_class encoding/]);
+__PACKAGE__->attr([qw/default_handler default_template_class/]);
 __PACKAGE__->attr(default_status   => 200);
 __PACKAGE__->attr(detect_templates => 1);
+__PACKAGE__->attr(encoding         => 'UTF-8');
 __PACKAGE__->attr(handler          => sub { {} });
 __PACKAGE__->attr(helper           => sub { {} });
 __PACKAGE__->attr(layout_prefix    => 'layouts');
@@ -428,7 +429,7 @@ multiple template systems.
     my $encoding = $renderer->encoding;
     $renderer    = $renderer->encoding('koi8-r');
 
-Will encode the content if set.
+Will encode the content if set, defaults to C<UTF-8>.
 
 =head2 C<handler>
 

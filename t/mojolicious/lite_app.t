@@ -46,6 +46,9 @@ app->renderer->default_handler('epl');
 # Header condition plugin
 plugin 'header_condition';
 
+# Default
+app->defaults(default => 23);
+
 # GET /
 get '/' => 'root';
 
@@ -829,13 +832,13 @@ $t->get_ok('/helper')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is(
-    '<br/>&lt;.../template(Mozilla/5.0 (compatible; Mojolicious; Perl))');
+    '23<br/>&lt;.../template(Mozilla/5.0 (compatible; Mojolicious; Perl))');
 
 # GET /helper
 $t->get_ok('/helper', {'User-Agent' => 'Explorer'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('<br/>&lt;.../template(Explorer)');
+  ->content_is('23<br/>&lt;.../template(Explorer)');
 
 # GET /eperror
 $level = app->log->level;
@@ -1153,6 +1156,7 @@ Two: <%= $two %>
 with_block <%= $block->('one', 'two') %>
 
 @@ helper.html.ep
+%= $default
 %== '<br/>'
 %= '<...'
 %= url_for 'index'

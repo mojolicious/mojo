@@ -62,15 +62,8 @@ sub register {
     # Merge
     $config = {%{$conf->{default}}, %$config} if $conf->{default};
 
-    # Add hook
-    $app->plugins->add_hook(
-        before_dispatch => sub {
-            my ($self, $c) = @_;
-
-            # Stash
-            $c->stash($stash_key => $config);
-        }
-    );
+    # Default
+    $app->defaults($stash_key => $config);
 
     return $config;
 }

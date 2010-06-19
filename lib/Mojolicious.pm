@@ -115,6 +115,27 @@ sub new {
     return $self;
 }
 
+sub defaults {
+    my $self = shift;
+
+    # Initialize
+    $self->{defaults} ||= {};
+
+    # Hash
+    return $self->{defaults} unless @_;
+
+    # Get
+    return $self->{defaults}->{$_[0]} unless @_ > 1 || ref $_[0];
+
+    # Set
+    my $values = ref $_[0] ? $_[0] : {@_};
+    for my $key (keys %$values) {
+        $self->{defaults}->{$key} = $values->{$key};
+    }
+
+    return $self;
+}
+
 # The default dispatchers with exception handling
 sub dispatch {
     my ($self, $c) = @_;
@@ -192,6 +213,10 @@ sub handler {
         $stash = $tx->stash;
         $tx    = $tx->tx;
     }
+
+    # Defaults
+    my $defaults = $self->defaults;
+    $stash = {%$stash, %$defaults};
 
     # Build default controller and process
     eval {
@@ -476,6 +501,20 @@ Construct a new L<Mojolicious> application.
 Will automatically detect your home directory and set up logging based on
 your current operating mode.
 Also sets up the renderer, static dispatcher and a default set of plugins.
+
+=head2 C<defaults>
+
+    my $defaults = $mojo->default;
+    my $foo      = $mojo->defaults('foo');
+    $mojo        = $mojo->defaults({foo => 'bar'});
+    $mojo        = $mojo->defaults(foo => 'bar');
+
+Default values for the stash.
+Note that this method is EXPERIMENTAL and might change without warning!
+
+    $mojo->defaults->{foo} = 'bar';
+    my $foo = $mojo->defaults->{foo};
+    delete $mojo->defaults->{foo};
 
 =head2 C<dispatch>
 

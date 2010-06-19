@@ -150,15 +150,16 @@ $client->websocket(
 )->process;
 is($result, 'test1test2');
 
-# GET http://kraih.com/proxy (proxy request)
+# GET /proxy (proxy request)
 $client->https_proxy("http://localhost:$proxy");
-is($client->get("https://localhost:$port/")->success->body, 'Hello World!');
+is($client->get("https://localhost:$port/proxy")->success->body,
+    "https://localhost:$port/proxy");
 
-# GET http://kraih.com/proxy (kept alive proxy request)
+# GET /proxy (kept alive proxy request)
 $client->https_proxy("http://localhost:$proxy");
-my $tx = $client->build_tx(GET => "https://localhost:$port/");
+my $tx = $client->build_tx(GET => "https://localhost:$port/proxy");
 $client->process($tx);
-is($tx->success->body, 'Hello World!');
+is($tx->success->body, "https://localhost:$port/proxy");
 is($tx->kept_alive,    1);
 
 # WebSocket /test (kept alive proxy websocket)

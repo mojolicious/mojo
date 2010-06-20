@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 111;
+use Test::More tests => 113;
 
 use Mojo::ByteStream 'b';
 
@@ -95,6 +95,14 @@ is( $rel->to_abs,
     'http://kraih.com/foo/index.html?foo=bar#23',
     'right absolute version'
 );
+
+# Relative path
+$url = Mojo::URL->new('http://kraih.com/foo/?foo=bar#23');
+$url->path('bar');
+is("$url", 'http://kraih.com/foo/bar?foo=bar#23');
+$url = Mojo::URL->new('http://kraih.com?foo=bar#23');
+$url->path('bar');
+is("$url", 'http://kraih.com/bar?foo=bar#23');
 
 # Absolute (base without trailing slash)
 $url = Mojo::URL->new('/foo?foo=bar#23');

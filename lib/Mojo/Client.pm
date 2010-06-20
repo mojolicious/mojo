@@ -791,7 +791,7 @@ sub _pipeline_info {
     # Info
     my $req    = $f->req;
     my $url    = $req->url;
-    my $scheme = $url->scheme;
+    my $scheme = $url->scheme || 'http';
     my $host   = $url->ihost;
     my $port   = $url->port;
 
@@ -811,7 +811,6 @@ sub _pipeline_info {
     }
 
     # Default port
-    $scheme ||= 'http';
     $port ||= $scheme eq 'https' ? 443 : 80;
 
     return ($scheme, $host, $port);

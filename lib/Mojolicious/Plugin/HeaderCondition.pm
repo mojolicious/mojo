@@ -16,7 +16,7 @@ sub register {
     # Header
     $app->routes->add_condition(
         headers => sub {
-            my ($r, $tx, $stash, $patterns) = @_;
+            my ($r, $tx, $captures, $patterns) = @_;
 
             # Patterns
             return unless $patterns && ref $patterns eq 'HASH';
@@ -37,7 +37,7 @@ sub register {
             }
 
             # Success
-            return $stash if $passed;
+            return $captures if $passed;
 
             # Robot 1-X, save my friends! And Zoidberg!
             return;

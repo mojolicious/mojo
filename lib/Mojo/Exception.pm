@@ -58,15 +58,15 @@ sub new {
 
     # Cleanup plain messages
     unless (ref $message) {
-        my $m = sub {
+        my $filter = sub {
             my $num  = shift;
             my $new  = "template line $num";
             my $line = $lines[$num];
-            $new .= ", near \"$line\"" if $line;
+            $new .= qq/, near "$line"/ if defined $line;
             $new .= '.';
             return $new;
         };
-        $message =~ s/\(eval\s+\d+\) line (\d+).*/$m->($1)/ge;
+        $message =~ s/\(eval\s+\d+\) line (\d+).*/$filter->($1)/ge;
         $self->message($message);
     }
 

@@ -145,7 +145,7 @@ sub connect {
 
     # New connection
     my $class = IPV6 ? 'IO::Socket::INET6' : 'IO::Socket::INET';
-    my $socket = $class->new(%options) or return;
+    return unless my $socket = $class->new(%options);
     my $id = "$socket";
 
     # Add connection

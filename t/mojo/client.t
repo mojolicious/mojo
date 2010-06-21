@@ -10,7 +10,7 @@ use Test::More;
 plan skip_all =>
   'set TEST_CLIENT to enable this test (internet connection required!)'
   unless $ENV{TEST_CLIENT};
-plan tests => 79;
+plan tests => 80;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -35,8 +35,13 @@ is($code, 301, 'right status');
 # Fresh client
 $client = Mojo::Client->new;
 
+# Host does not exist
+my $tx = $client->build_tx(GET => 'http://cdeabcdeffoobarnonexisting.com');
+$client->process($tx);
+is($tx->state, 'error', 'right state');
+
 # Custom non keep alive request
-my $tx = Mojo::Transaction::HTTP->new;
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('http://cpan.org');
 $tx->req->headers->connection('close');
@@ -81,7 +86,7 @@ is($tx->res->code, 200, 'right status');
 # Simple request with headers and body
 my ($body, $continued);
 ($method, $url, $code) = undef;
-$client->async->get(
+$client->get(
     'http://www.apache.org' => {Expect => '100-continue'} => 'Hi there!' =>
       sub {
         my $self = shift;

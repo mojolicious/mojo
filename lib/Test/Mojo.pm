@@ -78,8 +78,19 @@ sub content_type_like {
 # If my plant pollutes the water and poisons the town,
 # by your logic, that would make me a criminal.
 sub delete_ok { shift->_request_ok('delete', @_) }
-sub get_ok    { shift->_request_ok('get',    @_) }
-sub head_ok   { shift->_request_ok('head',   @_) }
+
+sub element_exists {
+    my ($self, $selector, $desc) = @_;
+
+    # Test
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    Test::More::ok($self->tx->res->dom->at($selector), $desc);
+
+    return $self;
+}
+
+sub get_ok  { shift->_request_ok('get',  @_) }
+sub head_ok { shift->_request_ok('head', @_) }
 
 sub header_is {
     my ($self, $name, $value, $desc) = @_;
@@ -168,6 +179,22 @@ sub status_is {
     # Test
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     Test::More::is($self->tx->res->code, $status, $desc);
+
+    return $self;
+}
+
+sub text_is {
+    my ($self, $selector, $value, $desc) = @_;
+
+    # Text
+    my $text;
+    if (my $element = $self->tx->res->dom->at($selector)) {
+        $text = $element->text;
+    }
+
+    # Test
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    Test::More::is($text, $value, $desc);
 
     return $self;
 }
@@ -325,6 +352,13 @@ Check response content type for similar match.
 
 Perform a C<DELETE> request.
 
+=head2 C<element_exists>
+
+    $t = $t->element_exists('div.foo[x=y]');
+    $t = $t->element_exists('html head title', 'has a title');
+
+Checks for existence of the CSS3 selectors XML/HTML element.
+
 =head2 C<get_ok>
 
     $t = $t->get_ok('/foo');
@@ -448,6 +482,13 @@ Reset user agent session.
     $t = $t->status_is(200, 'right status!');
 
 Check response status for exact match.
+
+=head2 C<text_is>
+
+    $t = $t->text_is('div.foo[x=y]' => 'Hello!');
+    $t = $t->text_is('html head title', 'Hello!','right title');
+
+Checks text content of the CSS3 selectors XML/HTML element for exact match.
 
 =head1 SEE ALSO
 

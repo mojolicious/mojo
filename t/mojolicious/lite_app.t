@@ -16,7 +16,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 411;
+plan tests => 412;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -898,7 +898,8 @@ $t->max_redirects(3);
 $t->get_ok('/redirect_named')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->header_is(Location       => undef)->content_is("Redirect works!\n");
+  ->header_is(Location       => undef)->element_exists('#foo')
+  ->text_is('div' => 'Redirect works!');
 $t->max_redirects(0);
 Test::Mojo->new(tx => $t->tx->previous->[-1])->status_is(302)
   ->header_is(Server         => 'Mojolicious (Perl)')
@@ -1061,7 +1062,7 @@ __DATA__
 <%= img '/foo.jpg', alt => 'image' %>
 
 @@ template.txt.epl
-Redirect works!
+<div id="foo">Redirect works!</div>
 
 @@ with_header_condition.html.epl
 Test ok

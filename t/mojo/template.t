@@ -25,7 +25,7 @@ package main;
 use strict;
 use warnings;
 
-use Test::More tests => 94;
+use Test::More tests => 95;
 
 use File::Spec;
 use File::Temp;
@@ -271,6 +271,7 @@ test
 EOF
 is(ref $output, 'Mojo::Exception');
 like($output->message, qr/^Missing right curly or square bracket/);
+like($output->message, qr/syntax error at template line 5.$/);
 is($output->lines_before->[0]->[0], 3);
 is($output->lines_before->[0]->[1], '% {');
 is($output->lines_before->[1]->[0], 4);
@@ -323,7 +324,7 @@ is($output->lines_after->[0]->[0],  4);
 is($output->lines_after->[0]->[1],  '%= 1 + 1');
 is($output->lines_after->[1]->[0],  5);
 is($output->lines_after->[1]->[1],  'test');
-like("$output", qr/oops\!/);
+like("$output", qr/oops\! at template line 3, near "%= 1 \+ 1"./);
 
 # Exception in nested template
 $mt = Mojo::Template->new;

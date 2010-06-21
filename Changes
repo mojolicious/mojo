@@ -9,6 +9,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added relative path support to Mojo::URL. (marcus)
         - Started cookbook.
         - Improved Mojo::Client error logging.
+        - Improved Mojo::Template error messages.
         - Fixed graceful shutdown in Mojo::Server::Daemon::Prefork.
         - Fixed Mojo::Server::CGI and Mojo::Server::FastCGI to be more
           portable.

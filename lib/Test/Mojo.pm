@@ -374,6 +374,7 @@ Perform a C<DELETE> request.
     $t = $t->element_exists('html head title', 'has a title');
 
 Checks for existence of the CSS3 selectors XML/HTML element.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<get_ok>
 
@@ -505,6 +506,7 @@ Check response status for exact match.
     $t = $t->text_is('html head title' => 'Hello!','right title');
 
 Checks text content of the CSS3 selectors XML/HTML element for exact match.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<text_like>
 
@@ -512,6 +514,7 @@ Checks text content of the CSS3 selectors XML/HTML element for exact match.
     $t = $t->text_like('html head title' => qr/Hello/,'right title');
 
 Checks text content of the CSS3 selectors XML/HTML element for similar match.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head1 SEE ALSO
 

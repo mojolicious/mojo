@@ -4,7 +4,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL method defaults to Mojolicious.
         - Added EXPERIMENTAL method detour to MojoX::Dispatcher::Routes.
         - Added EXPERIMENTAL attribute partial to MojoX::Routes.
-        - Added some CSS3 selector tests to Test::Mojo.
+        - Added EXPERIMENTAL CSS3 selector tests to Test::Mojo.
         - Added graceful shutdown support to Mojo::Server::Daemon.
         - Added routing guide.
         - Added relative path support to Mojo::URL. (marcus)

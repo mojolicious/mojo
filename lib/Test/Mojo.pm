@@ -199,6 +199,22 @@ sub text_is {
     return $self;
 }
 
+sub text_like {
+    my ($self, $selector, $regex, $desc) = @_;
+
+    # Text
+    my $text;
+    if (my $element = $self->tx->res->dom->at($selector)) {
+        $text = $element->text;
+    }
+
+    # Test
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    Test::More::like($text, $regex, $desc);
+
+    return $self;
+}
+
 sub _get_content {
     my ($self, $tx) = @_;
 
@@ -486,9 +502,16 @@ Check response status for exact match.
 =head2 C<text_is>
 
     $t = $t->text_is('div.foo[x=y]' => 'Hello!');
-    $t = $t->text_is('html head title', 'Hello!','right title');
+    $t = $t->text_is('html head title' => 'Hello!','right title');
 
 Checks text content of the CSS3 selectors XML/HTML element for exact match.
+
+=head2 C<text_like>
+
+    $t = $t->text_like('div.foo[x=y]' => qr/Hello/);
+    $t = $t->text_like('html head title' => qr/Hello/,'right title');
+
+Checks text content of the CSS3 selectors XML/HTML element for similar match.
 
 =head1 SEE ALSO
 

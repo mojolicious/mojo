@@ -349,7 +349,7 @@ get '/redirect_url' => sub {
 
 # GET /redirect_path
 get '/redirect_path' => sub {
-    shift->redirect_to('/foo/bar')->render_text('Redirecting!');
+    shift->redirect_to('/foo/bar?foo=bar')->render_text('Redirecting!');
 };
 
 # GET /redirect_named
@@ -885,7 +885,8 @@ $t->get_ok('/redirect_url')->status_is(302)
 $t->get_ok('/redirect_path')->status_is(302)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->header_like(Location => qr/\/foo\/bar$/)->content_is('Redirecting!');
+  ->header_like(Location => qr/\/foo\/bar\?foo=bar$/)
+  ->content_is('Redirecting!');
 
 # GET /redirect_named
 $t->get_ok('/redirect_named')->status_is(302)

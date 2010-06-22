@@ -287,7 +287,7 @@ sub url_for {
     # Path
     if ($target =~ /^\//) {
         my $url = Mojo::URL->new->base($self->req->url->base->clone);
-        return $url->path($target);
+        return $url->parse($target);
     }
 
     # URL

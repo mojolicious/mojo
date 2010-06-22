@@ -26,6 +26,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed edgy stringified return value bug in
           MojoX::Dispatcher::Routes. (DaTa)
         - Fixed route rendering bug. (koban)
+        - Fixed small url_for bug.
 
 0.999926 2010-06-07 00:00:00
         - Added version requirement for all optional dependencies.

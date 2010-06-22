@@ -503,7 +503,7 @@ Check response status for exact match.
 =head2 C<text_is>
 
     $t = $t->text_is('div.foo[x=y]' => 'Hello!');
-    $t = $t->text_is('html head title' => 'Hello!','right title');
+    $t = $t->text_is('html head title' => 'Hello!', 'right title');
 
 Checks text content of the CSS3 selectors XML/HTML element for exact match.
 Note that this method is EXPERIMENTAL and might change without warning!
@@ -511,7 +511,7 @@ Note that this method is EXPERIMENTAL and might change without warning!
 =head2 C<text_like>
 
     $t = $t->text_like('div.foo[x=y]' => qr/Hello/);
-    $t = $t->text_like('html head title' => qr/Hello/,'right title');
+    $t = $t->text_like('html head title' => qr/Hello/, 'right title');
 
 Checks text content of the CSS3 selectors XML/HTML element for similar match.
 Note that this method is EXPERIMENTAL and might change without warning!

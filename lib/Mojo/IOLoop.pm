@@ -140,7 +140,8 @@ sub connect {
         PeerAddr => $args->{address},
         PeerPort => $args->{port} || ($args->{tls} ? 443 : 80),
         Proto    => 'tcp',
-        Type     => SOCK_STREAM
+        Type     => SOCK_STREAM,
+        %{$args->{args} || {}}
     );
 
     # New connection
@@ -264,7 +265,8 @@ sub listen {
     my %options = (
         Blocking => 0,
         Listen   => $args->{queue_size} || SOMAXCONN,
-        Type     => SOCK_STREAM
+        Type     => SOCK_STREAM,
+        %{$args->{args} || {}}
     );
 
     # Listen on UNIX domain socket

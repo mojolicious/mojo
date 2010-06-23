@@ -539,9 +539,9 @@ push @{$req->content->parts}, $content;
 is($req->build,
         "GET /foo/bar HTTP/1.1\x0d\x0a"
       . "Host: 127.0.0.1\x0d\x0a"
-      . "Content-Length: 106\x0d\x0a"
+      . "Content-Length: 104\x0d\x0a"
       . "Content-Type: multipart/mixed; boundary=7am1X\x0d\x0a\x0d\x0a"
-      . "\x0d\x0a--7am1X\x0d\x0a\x0d\x0a"
+      . "--7am1X\x0d\x0a\x0d\x0a"
       . "Hallo Welt lalalala!"
       . "\x0d\x0a--7am1X\x0d\x0a"
       . "Content-Type: text/plain\x0d\x0a\x0d\x0a"
@@ -790,9 +790,9 @@ push @{$res->content->parts}, $content;
 is($res->build,
         "HTTP/1.1 200 OK\x0d\x0a"
       . "Date: Sun, 17 Aug 2008 16:27:35 GMT\x0d\x0a"
-      . "Content-Length: 110\x0d\x0a"
+      . "Content-Length: 108\x0d\x0a"
       . "Content-Type: multipart/mixed; boundary=7am1X\x0d\x0a\x0d\x0a"
-      . "\x0d\x0a--7am1X\x0d\x0a\x0d\x0a"
+      . "--7am1X\x0d\x0a\x0d\x0a"
       . 'Hallo Welt lalalalalala!'
       . "\x0d\x0a--7am1X\x0d\x0a"
       . "Content-Type: text/plain\x0d\x0a\x0d\x0a"

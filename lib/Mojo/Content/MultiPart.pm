@@ -39,7 +39,7 @@ sub body_size {
     # Calculate length of whole body
     my $boundary_length = length($boundary) + 6;
     my $length          = 0;
-    $length += $boundary_length;
+    $length += $boundary_length - 2;
     for my $part (@{$self->parts}) {
 
         # Header
@@ -97,11 +97,10 @@ sub get_body_chunk {
     # Multipart
     my $boundary        = $self->build_boundary;
     my $boundary_length = length($boundary) + 6;
-    my $length          = $boundary_length;
+    my $length          = $boundary_length - 2;
 
     # First boundary
-    return substr "\x0d\x0a--$boundary\x0d\x0a", $offset
-      if $length > $offset;
+    return substr "--$boundary\x0d\x0a", $offset if $length > $offset;
 
     # Parts
     my $parts = $self->parts;

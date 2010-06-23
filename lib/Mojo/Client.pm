@@ -678,7 +678,7 @@ sub _error {
     $self->log->error($error) if $error;
 
     # Finished
-    $self->_process_response($id);
+    $self->_handle_response($id);
 }
 
 sub _fetch_cookies {
@@ -725,6 +725,61 @@ sub _generate_key {
     }
 
     return $key;
+}
+
+# No children have ever meddled with the Republican Party and lived to tell
+# about it.
+sub _handle_response {
+    my ($self, $id) = @_;
+
+    # Connection
+    my $c = $self->{_cs}->{$id};
+
+    # Pipeline
+    my $old = $c->{p};
+
+    # Drop WebSocket
+    my $new;
+    if ($old && $old->[-1]->is_websocket) {
+        $old->[-1]->client_close;
+        $old = undef;
+        $self->{_processing} -= 1;
+        delete $self->{_cs}->{$id};
+        $self->_drop($id);
+    }
+
+    # Upgrade connection to WebSocket
+    else {
+
+        # WebSocket upgrade
+        $new = $self->_upgrade($id) if $old;
+
+        # Drop old connection so we can reuse it
+        $self->_drop($id) unless $new;
+    }
+
+    # Finish pipeline
+    if ($old) {
+
+        # Cookies to the jar
+        $self->_store_cookies($old);
+
+        # Counter
+        $self->{_processing} -= 1 unless $new;
+
+        # Redirect
+        unless ($self->_redirect($c, $old)) {
+
+            # Callback
+            my $cb = $c->{cb};
+            my $p = $new ? [$new] : $old;
+            local $self->{tx} = $p->[-1];
+            $self->$cb(@$p) if $cb;
+        }
+    }
+
+    # Stop ioloop
+    $self->ioloop->stop if !$self->{_is_async} && !$self->{_processing};
 }
 
 sub _pipeline_info {
@@ -855,61 +910,6 @@ sub _prepare_server {
     my $app = $self->app;
     ref $app ? $server->app($app) : $server->app_class($app);
     $self->log($server->app->log);
-}
-
-# No children have ever meddled with the Republican Party and lived to tell
-# about it.
-sub _process_response {
-    my ($self, $id) = @_;
-
-    # Connection
-    my $c = $self->{_cs}->{$id};
-
-    # Pipeline
-    my $old = $c->{p};
-
-    # Drop WebSocket
-    my $new;
-    if ($old && $old->[-1]->is_websocket) {
-        $old->[-1]->client_close;
-        $old = undef;
-        $self->{_processing} -= 1;
-        delete $self->{_cs}->{$id};
-        $self->_drop($id);
-    }
-
-    # Upgrade connection to WebSocket
-    else {
-
-        # WebSocket upgrade
-        $new = $self->_upgrade($id) if $old;
-
-        # Drop old connection so we can reuse it
-        $self->_drop($id) unless $new;
-    }
-
-    # Finish pipeline
-    if ($old) {
-
-        # Cookies to the jar
-        $self->_store_cookies($old);
-
-        # Counter
-        $self->{_processing} -= 1 unless $new;
-
-        # Redirect
-        unless ($self->_redirect($c, $old)) {
-
-            # Callback
-            my $cb = $c->{cb};
-            my $p = $new ? [$new] : $old;
-            local $self->{tx} = $p->[-1];
-            $self->$cb(@$p) if $cb;
-        }
-    }
-
-    # Stop ioloop
-    $self->ioloop->stop if !$self->{_is_async} && !$self->{_processing};
 }
 
 # Hey, Weener Boy... where do you think you'e going?
@@ -1085,7 +1085,7 @@ sub _state {
     }
 
     # Finished
-    return $self->_process_response($id) unless $c->{p}->[$c->{reader}];
+    return $self->_handle_response($id) unless $c->{p}->[$c->{reader}];
 
     # Writer
     my $writer = $c->{p}->[$c->{writer}];
@@ -1182,7 +1182,7 @@ sub _upgrade {
             my $tx = shift;
 
             # Finished
-            return $self->_process_response($id) if $tx->is_finished;
+            return $self->_handle_response($id) if $tx->is_finished;
 
             # Writing
             $tx->is_writing

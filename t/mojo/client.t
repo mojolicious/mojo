@@ -5,12 +5,15 @@
 use strict;
 use warnings;
 
+# Disable epoll, kqueue and IPv6
+BEGIN { $ENV{MOJO_POLL} = $ENV{MOJO_NO_IPV6} = $ENV{MOJO_NO_TLS} = 1 }
+
 use Test::More;
 
 plan skip_all =>
   'set TEST_CLIENT to enable this test (internet connection required!)'
   unless $ENV{TEST_CLIENT};
-plan tests => 80;
+plan tests => 81;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -64,6 +67,10 @@ $client->get(
 is($method, 'GET',             'right method');
 is($url,    'http://cpan.org', 'right url');
 is($code,   301,               'right status');
+
+# HTTPS request without TLS support
+$tx = $client->get('https://www.google.com');
+is($tx->has_error, 1, 'request failed');
 
 # Simple request with body
 $tx = $client->get('http://www.apache.org' => 'Hi there!');

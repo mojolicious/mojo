@@ -134,6 +134,9 @@ sub connect {
     # Arguments
     my $args = ref $_[0] ? $_[0] : {@_};
 
+    # TLS check
+    return if $args->{tls} && !TLS;
+
     # Options
     my %options = (
         Blocking => 0,

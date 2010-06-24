@@ -120,7 +120,12 @@ sub DESTROY {
 }
 
 sub new {
-    my $self = shift->SUPER::new(@_);
+    my $class = shift;
+
+    # Build new loop from singleton if possible
+    my $loop = $LOOP;
+    local $LOOP = undef;
+    my $self = $loop ? $loop->new(@_) : $class->SUPER::new(@_);
 
     # Ignore PIPE signal
     $SIG{PIPE} = 'IGNORE';

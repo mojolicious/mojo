@@ -443,6 +443,30 @@ sub send_message {
     $tx->send_message(@_);
 }
 
+# It's like my dad always said: eventually, everybody gets shot.
+sub test_server {
+    my $self = shift;
+
+    # Server
+    unless ($self->{_port}) {
+        my $server = $self->{_server} =
+          Mojo::Server::Daemon->new(ioloop => $self->ioloop, silent => 1);
+        my $port = $self->{_port} = $self->ioloop->generate_port;
+        die "Couldn't find a free TCP port for testing.\n" unless $port;
+        $server->listen("http://*:$port");
+        $server->prepare_ioloop;
+    }
+
+    # Application
+    my $server = $self->{_server};
+    delete $server->{app};
+    my $app = $self->app;
+    ref $app ? $server->app($app) : $server->app_class($app);
+    $self->log($server->app->log);
+
+    return $self->{_port};
+}
+
 # Are we there yet?
 # No
 # Are we there yet?
@@ -820,9 +844,6 @@ sub _pipeline_info {
 sub _prepare_pipeline {
     my ($self, $p, $cb) = @_;
 
-    # Embedded server
-    $self->_prepare_server if $self->app;
-
     # Prepare all transactions
     for my $tx (@$p) {
 
@@ -832,7 +853,7 @@ sub _prepare_pipeline {
             next if $url->host;
             $url->scheme('http');
             $url->host('localhost');
-            $url->port($self->{_port});
+            $url->port($self->test_server);
             $tx->req->url($url);
         }
 
@@ -888,28 +909,6 @@ sub _prepare_pipeline {
     $self->{_processing} += 1;
 
     return $id;
-}
-
-# It's like my dad always said: eventually, everybody gets shot.
-sub _prepare_server {
-    my $self = shift;
-
-    # Server
-    unless ($self->{_port}) {
-        my $server = $self->{_server} =
-          Mojo::Server::Daemon->new(ioloop => $self->ioloop, silent => 1);
-        my $port = $self->{_port} = $self->ioloop->generate_port;
-        die "Couldn't find a free TCP port for testing.\n" unless $port;
-        $server->listen("http://*:$port");
-        $server->prepare_ioloop;
-    }
-
-    # Application
-    my $server = $self->{_server};
-    delete $server->{app};
-    my $app = $self->app;
-    ref $app ? $server->app($app) : $server->app_class($app);
-    $self->log($server->app->log);
 }
 
 # Hey, Weener Boy... where do you think you'e going?
@@ -1711,6 +1710,13 @@ everywhere inside the process.
     $client->send_message('Hi there!');
 
 Send a message via WebSocket, only available from callbacks.
+
+=head2 C<test_server>
+
+    my $port = $client->test_server;
+
+Starts a test server for C<app> if neccessary and returns the port number.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<websocket>
 

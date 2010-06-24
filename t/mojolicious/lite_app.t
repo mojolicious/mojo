@@ -62,7 +62,7 @@ get '/null/:null' => sub {
 get '/stream' => sub {
     my $self    = shift;
     my $counter = 0;
-    my $chunks  = ['foo', 'bar'];
+    my $chunks  = ['foo', 'bar', $self->req->url->to_abs->userinfo];
     my $chunked = Mojo::Filter::Chunked->new;
     $self->res->code(200);
     $self->res->headers->content_type('text/plain');
@@ -469,10 +469,12 @@ $t->get_ok('/null/0')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/layouted 0/);
 
-# GET /stream
-$t->get_ok('/stream')->status_is(200)
+# GET /stream (with basic auth)
+my $port = $t->client->test_server;
+$t->get_ok("http://sri:foo\@localhost:$port/stream")->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('foobar');
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('foobarsri:foo');
 
 # GET / (IRI)
 $t->get_ok('/привет/мир')->status_is(200)

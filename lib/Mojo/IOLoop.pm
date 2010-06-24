@@ -1250,12 +1250,6 @@ Mojo::IOLoop - Minimalistic Reactor For TCP Clients And Servers
     # Listen on port 3000
     $loop->listen(
         port => 3000,
-        accept_cb => sub {
-            my ($self, $id) = @_;
-
-            # Start read only when accepting a new connection
-            $self->not_writing($id);
-        },
         read_cb => sub {
             my ($self, $id, $chunk) = @_;
 
@@ -1630,7 +1624,6 @@ The local port.
     $loop->not_writing($id);
 
 Activate read only mode for a connection.
-Note that connections have no mode after they are created.
 
 =head2 C<one_tick>
 

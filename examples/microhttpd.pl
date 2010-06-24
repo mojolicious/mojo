@@ -27,9 +27,6 @@ $loop->listen(
 
         # Initialize buffer
         $buffer->{$id} = '';
-
-        # Start read only mode
-        $loop->not_writing($id);
     },
     read_cb => sub {
         my ($loop, $id, $chunk) = @_;

@@ -57,7 +57,9 @@ sub accept_lock {
 
     # Lock
     my $flags = $blocking ? LOCK_EX : LOCK_EX | LOCK_NB;
+    warn "SFLOCK: $$\n";
     my $lock = flock($self->{_lock}, $flags);
+    warn "FLOCK: $blocking - $$\n";
 
     return $lock;
 }

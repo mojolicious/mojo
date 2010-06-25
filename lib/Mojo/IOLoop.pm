@@ -480,9 +480,7 @@ sub one_tick {
 
     # Poll
     else {
-
-        # Poll won't block without handles
-        sleep 1 if $loop->poll($timeout) == 0 && !$loop->handles;
+        $loop->poll($timeout);
 
         # Read
         push @read, $_ for $loop->handles(POLLIN);
@@ -685,7 +683,7 @@ sub _accept {
     my $socket = $listen->accept or return;
 
     # Unlock callback
-    $self->unlock_cb->();
+    $self->unlock_cb->($self);
 
     # Listen
     my $l = $self->{_listen}->{$listen};
@@ -1095,7 +1093,7 @@ sub _should_listen {
     return unless keys %$cs < $self->max_connections;
 
     # Lock
-    return unless $self->lock_cb->(!keys %$cs);
+    return unless $self->lock_cb->($self, !keys %$cs);
 
     return 1;
 }

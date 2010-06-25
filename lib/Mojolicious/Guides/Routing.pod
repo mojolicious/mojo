@@ -254,8 +254,8 @@ C<controller#action>.
 During camelization C<-> gets replaced with C<::>, this allows multi level
 C<controller> hierarchies.
 
-    # /bye -> {controller => 'foo-bar', action => 'bye'} -> MyApp::Foo::Bar->bye
-    $r->route('/bye')->to('foo-bar#bye');
+    # / -> {controller => 'foo-bar', action => 'hi'} -> MyApp::Foo::Bar->hi
+    $r->route('/')->to('foo-bar#hi');
 
 =head2 Route To Class (C<namespace>)
 

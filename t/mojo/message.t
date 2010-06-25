@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 615;
+use Test::More tests => 632;
 
 use File::Spec;
 use File::Temp;
@@ -1093,6 +1093,43 @@ is($req->body,            'hello=world');
 is_deeply($req->param('hello'), 'world');
 is($req->url->to_abs->to_string,
     'http://localhost:8080/test/index.cgi/foo/bar?lalala=23&bar=baz');
+
+# Parse Apache like CGI environment variables with basic authorization
+$req = Mojo::Message::Request->new;
+$req->parse(
+    CONTENT_LENGTH           => 11,
+    HTTP_Authorization       => 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
+    HTTP_Proxy_Authorization => 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
+    CONTENT_TYPE             => 'application/x-www-form-urlencoded',
+    HTTP_EXPECT              => '100-continue',
+    PATH_INFO                => '/test/index.cgi/foo/bar',
+    QUERY_STRING             => 'lalala=23&bar=baz',
+    REQUEST_METHOD           => 'POST',
+    SCRIPT_NAME              => '/test/index.cgi',
+    HTTP_HOST                => 'localhost:8080',
+    SERVER_PROTOCOL          => 'HTTP/1.0'
+);
+$req->parse('hello=world');
+is($req->state,           'done');
+is($req->method,          'POST');
+is($req->headers->expect, '100-continue');
+is($req->url->path,       '/foo/bar');
+is($req->url->base->path, '/test/index.cgi/');
+is($req->url->base->host, 'localhost');
+is($req->url->base->port, 8080);
+is($req->url->query,      'lalala=23&bar=baz');
+is($req->minor_version,   '0');
+is($req->major_version,   '1');
+is($req->body,            'hello=world');
+is_deeply($req->param('hello'), 'world');
+is($req->url->to_abs->to_string,
+        'http://Aladdin:open%20sesame@localhost:8080'
+      . '/test/index.cgi/foo/bar?lalala=23&bar=baz');
+is($req->url->base,
+    'http://Aladdin:open%20sesame@localhost:8080/test/index.cgi/');
+is($req->url->base->userinfo, 'Aladdin:open sesame');
+is($req->url,                 '/foo/bar?lalala=23&bar=baz');
+is($req->proxy->userinfo,     'Aladdin:open sesame');
 
 # Parse Apache 2.2 (win32) like CGI environment variables and a body
 $req = Mojo::Message::Request->new;

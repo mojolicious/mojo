@@ -257,7 +257,7 @@ C<controller> hierarchies.
     # /bye -> {controller => 'foo-bar', action => 'bye'} -> MyApp::Foo::Bar->bye
     $r->route('/bye')->to('foo-bar#bye');
 
-=head2 Route To Class (C<namespace>, C<class> and C<method>)
+=head2 Route To Class (C<namespace> and C<method>)
 
 From time to time you might want to dispatch to a controller class following
 a different naming scheme, for this case there are a few extra stash values
@@ -265,18 +265,7 @@ available.
 
     # /bye -> MyApp::Controller::Foo->bye
     $r->route('/bye')
-      ->to(namespace => 'MyApp::Controller', class => 'Foo', method => 'bye');
-
-The C<class> value is entirely optional, so you can just dispatch to a
-specific class using C<namespace>.
-
-    # /bye -> MyApp::Controller::Foo->bye
-    $r->route('/bye')
       ->to(namespace => 'MyApp::Controller::Foo', method => 'bye');
-
-You can also change the default namespace for all routes.
-
-    $r->namespace('MyApp::Controller');
 
 =head2 Route To Callback (C<cb>)
 

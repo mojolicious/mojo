@@ -255,9 +255,11 @@ sub _generate_class {
     my $controller = $field->{controller} || '';
     $class = b($controller)->camelize->to_string unless $class;
 
-    # Format
-    my $namespace = $field->{namespace} || $self->namespace;
-    $class = length $class ? "${namespace}::$class" : $namespace;
+    # Namespace
+    my $namespace = $field->{namespace};
+    $namespace = $self->namespace unless defined $namespace;
+    $class = length $class ? "${namespace}::$class" : $namespace
+      if length $namespace;
 
     # Invalid
     return unless $class =~ /^[a-zA-Z0-9_:]+$/;

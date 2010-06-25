@@ -72,6 +72,13 @@ sub startup {
         method    => 'test'
     );
 
+    # /test6 - no namespace test
+    $r->route('/test6')->to(
+        namespace  => '',
+        controller => 'mojolicious_test2-foo',
+        action     => 'test'
+    );
+
     # /withblock - template with blocks
     $r->route('/withblock')->to('foo#withblock');
 

@@ -66,6 +66,12 @@ sub startup {
         method    => 'test'
     );
 
+    # /test5 - only namespace test
+    $r->route('/test5')->to(
+        namespace => 'MojoliciousTest2::Foo',
+        method    => 'test'
+    );
+
     # /withblock - template with blocks
     $r->route('/withblock')->to('foo#withblock');
 

@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 166;
+plan tests => 172;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -121,6 +121,12 @@ $t->get_ok('/test3', {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/No class works!/);
+
+# MojoliciousTestController::index (only namespace)
+$t->get_ok('/test5', {'X-Test' => 'Hi there!'})->status_is(200)
+  ->header_is('X-Bender'     => 'Bite my shiny metal ass!')
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('/test5');
 
 # 404
 $t->get_ok('/', {'X-Test' => 'Hi there!'})->status_is(404)

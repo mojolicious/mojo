@@ -480,7 +480,9 @@ sub one_tick {
 
     # Poll
     else {
-        $loop->poll($timeout);
+
+        # Poll won't block without handles
+        sleep 1 if $loop->poll($timeout) == 0 && !$loop->handles;
 
         # Read
         push @read, $_ for $loop->handles(POLLIN);

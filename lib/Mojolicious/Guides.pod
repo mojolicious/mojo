@@ -30,6 +30,11 @@ Simple and fun introduction to the L<Mojolicious> router.
 
 Generating content with the L<Mojolicious> renderer.
 
+=item L<Mojolicious::Guides::Growing>
+
+Growing a L<Mojolicious::Lite> prototype to a well designed L<Mojolicious>
+application.
+
 =item L<Mojolicious::Guides::Cheatsheet>
 
 A concise all-purpose reference.

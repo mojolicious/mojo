@@ -127,9 +127,6 @@ allows you to generate the URL of a specific route just from its name.
 
     <%= url_for 'some_route' %>
 
-Other similar helpers allow you for example to generate HTML tags, but more
-about those later.
-
 =head1 BASICS
 
 Most commonly used features every L<Mojolicious> developer should know about.
@@ -224,6 +221,31 @@ These mappings can be easily extended or changed.
     }
 
     1;
+
+=head2 Helpers
+
+Helpers are little functions that are stored in the renderer, not all of them
+are strictly template specific, thats why you can also use the C<helper>
+controller method to call them.
+
+    <%= dumper [1, 2, 3] %>
+
+    my $serialized = $self->helper(dumper => [1, 2, 3]);
+
+The C<dumper> helper will use L<Data::Dumper> to serialize whatever data
+structure you pass it, this can be very useful for debugging.
+We differentiate between C<default helpers> which are more general purpose
+like C<dumper> and C<tag helpers>, which are template specific and mostly
+used to generate C<HTML> tags.
+
+    <%= script '/script.js' %>
+
+    <%= script {%>
+        var a = 'b';
+    <%}%>
+
+The plugins L<Mojolicious::Plugin::DefaultHelpers> and
+L<Mojolicious::Plugin::TagHelpers> contain all of them.
 
 =head2 Layouts
 
@@ -359,29 +381,6 @@ extended templates don't get prefixed with C<layout>.
     <%}%>
 
 This could go on and on to allow a very high level of template reuse.
-
-=head2 Helpers
-
-Helpers are little functions that are stored in the renderer, not all are
-strictly template specific, thats why you can also use the C<helper>
-controller method to access them.
-
-    my $serialized = $self->helper(dumper => [1, 2, 3]);
-
-The C<dumper> helper will use L<Data::Dumper> to serialize whatever data
-structure you pass it.
-We differentiate between default helpers which are more general purpose like
-C<dumper> and tag helpers, which are template specific and used mostly to
-generate C<HTML> tags.
-
-    <%= script '/script.js' %>
-
-    <%= script {%>
-        var a = 'b';
-    <%}%>
-
-The plugins L<Mojolicious::Plugin::DefaultHelpers> and
-L<Mojolicious::Plugin::TagHelpers> contain all of them.
 
 =head1 ADVANCED
 

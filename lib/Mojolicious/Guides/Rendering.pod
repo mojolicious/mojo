@@ -1,0 +1,508 @@
+# Copyright (C) 2008-2010, Sebastian Riedel.
+
+=encoding utf8
+
+=head1 NAME
+
+Mojolicious::Guides::Rendering - Rendering
+
+=head1 OVERVIEW
+
+Generating content with the L<Mojolicious> renderer.
+
+=head1 CONCEPTS
+
+Essentials every L<Mojolicious> developer should know.
+
+=head2 Renderer
+
+The renderer is a tiny black box turning stash data into actual responses
+utilizing multiple template systems and data encoding modules.
+
+    {text => 'Hello!'}                 -> 200 OK, text/plain, 'Hello!'
+    {json => {x => 3}}                 -> 200 OK, application/json, '{"x":3}'
+    {text => 'Oops!', status => '410'} -> 410 Gone, text/plain, 'Oops!'
+
+Templates can be automatically detected if enough information is provided by
+the developer or routes.
+Template names are expected to follow the C<name.format.handler> scheme, with
+C<name> defaulting to C<controller/action> or the route name, C<format>
+defaulting to C<html> and C<handler> to C<ep>.
+
+    {controller => 'users', action => 'list'} -> 'users/list.html.ep'
+    {route => 'foo', format => 'txt'}         -> 'foo.txt.ep'
+    {route => 'foo', handler => 'epl'}        -> 'foo.html.epl'
+
+All templates should be in the C<templates> directory of the application
+or the C<DATA> section of the class C<main>.
+
+    __DATA__
+    @@ time.html.ep
+    <!doctype html><html>
+      <head><title>Time</title></head>
+      <body><%= localtime time %></body>
+    </html>
+
+    @@ hello.txt.ep
+    ...
+
+The renderer can be easily extended to support additional template systems
+with plugins, but more about that later.
+
+=head2 Embedded Perl
+
+L<Mojolicious> includes a minimalistic but very powerful template system out
+of the box called Embedded Perl or C<ep> for short.
+It allows the embedding of Perl code right into actual content using a small
+set of special tags and line start characters.
+
+    <% Inline Perl %>
+    <%= Perl expression, replaced with XML escaped result %>
+    <%== Perl expression, replaced with raw result %>
+    <%# Comment, useful for debugging %>
+    % Perl line
+    %= Perl expression line, replaced with XML escaped result
+    %== Perl expression line, replaced with raw result
+    %# Comment line, useful for debugging
+
+The simplest form is used to insert raw Perl code.
+Tags and lines work pretty much the same, but depending on context one will
+usually look a bit better.
+
+    <% my $i = 10; %>
+    Text before.
+    <% for (1 .. $i) { %>
+    Insert this text 10 times!
+    <% } %>
+    Text after.
+
+    % my $i = 10;
+    Text before.
+    % for (1 .. $i) {
+    Insert this text 10 times!
+    % }
+    Text after.
+
+You can also insert results from actual Perl code using expressions, by
+default the characters C<E<lt>>, C<E<gt>>, C<&>, C<'> and C<"> will be
+escaped to prevent XSS attacks against your application.
+Semicolons get automatically appended to all expressions.
+
+    <%= 'lalala' %>
+    <%== '<p>test</p>' %>
+
+Only L<Mojo::ByteStream> objects are excluded from automatic escaping.
+
+    <%= Mojo::ByteStream->new('<p>test</p>') %>
+
+You can also add an additional equal sign to the end of a tag to have it
+automatically remove all surrounding whitespaces, this allows free indenting
+without ruining the result.
+
+    <% for (1 .. 3) { %>
+        <%= $foo =%>
+    <% } %>
+
+Comment tags and lines are very useful to deactivate code for debugging
+purposes.
+
+    % my $foo = 'lalala';
+    <%# if ($foo) { %>
+        <%= $foo =%>
+    <%# } %>
+
+Stash values that don't have invalid characters in their name get
+automatically initialized as normal variables in the template and the
+controller instance as C<$self>.
+
+    $r->route('/foo/:name')
+      ->to(controller => 'foo', action => 'bar', name => 'tester');
+
+    Hello <%= $name %>.
+
+There are also many built in helper functions such as C<url_for>, which
+allows you to generate the URL of a specific route just from its name.
+
+    $r->route('/foo/:name')->to('foo#bar')->name('some_route');
+
+    <%= url_for 'some_route' %>
+
+Other similar helpers allow you for example to generate HTML tags, but more
+about those later.
+
+=head1 BASICS
+
+Most commonly used features every L<Mojolicious> developer should know about.
+
+=head2 Automatic Rendering
+
+The renderer can be manually started by calling the C<render> controller
+method, but thats usually not neccessary, because it will get automatically
+called if nothing has been rendered after the routes dispatcher finished its
+work.
+This also means you can have routes pointing only to templates without actual
+actions.
+
+    $self->render;
+
+There is one big difference though, by calling C<render> manually you can
+make sure that templates use the current controller instance and not the
+default controller specified in the C<controller_class> attribute of the
+application class.
+
+=head2 Rendering Templates (C<template>)
+
+The renderer will always try to detect the right template but you can also
+use the C<template> stash value to render a specific one.
+
+    $self->render(template => 'foo');
+
+Choosing a specific C<format> and C<handler> is just as easy.
+
+    $self->render(template => 'foo', format => 'txt', handler => 'epl');
+
+Because rendering a specific template is the most common task it also has a
+shortcut.
+
+    $self->render('foo');
+
+All values passed to the C<render> call are only temporarily assigned to the
+stash and get reset again once rendering is finished.
+
+=head2 Rendering Text (C<text>)
+
+Plain text can be rendered with the C<text> stash value, characters get
+automatically encoded to bytes.
+
+    $self->render(text => 'Hello Wörld!');
+
+=head2 Rendering Data (C<data>)
+
+Raw bytes can be rendered with the C<data> stash value, no encoding will be
+performed.
+
+    $self->render(data => $octets);
+
+=head2 Rendering JSON (C<json>)
+
+The C<json> stash value allows you to pass Perl structures to the renderer
+which get directly encoded to JSON.
+
+    $self->render(json => {foo => [1, 'test', 3]});
+
+=head2 Partial Rendering (C<partial>)
+
+Sometimes you might want to access the rendered result, for example to
+generate emails, this can be done using the C<partial> stash value.
+
+    my $html = $self->render('mail', partial => 1);
+
+=head2 Status Code (C<status>)
+
+Response status codes can be changed with the C<status> stash value.
+
+    $self->render(text => 'Oops!', status => 500);
+
+=head2 Content Type (C<format>)
+
+The C<Content-Type> header of the response is actually based on the MIME type
+mapping of the C<format> stash value.
+
+    $self->render(text => 'Hello!', format => 'txt');
+
+These mappings can be easily extended or changed.
+
+    # Application
+    package MyApp;
+    use base 'Mojolicious';
+
+    sub startup {
+        my $self = shift;
+
+        # Add new MIME type
+        $self->types->type(txt => 'text/plain; charset=utf-8');
+    }
+
+    1;
+
+=head2 Layouts
+
+Most of the time when using C<ep> templates you will want to wrap your
+generated content in a HTML skeleton, thanks to layouts thats absolutely
+trivial.
+
+    @@ foo/bar.html.ep
+    % layout 'mylayout';
+    Hello World!
+
+    @@ layouts/mylayout.html.ep
+    <!doctype html><html>
+        <head><title>MyApp!</title></head>
+        <body><%= content %></body>
+    </html>
+
+You just select the right layout template with the C<layout> helper and place
+the result of the current template with the C<content> helper.
+You can also pass along normal stash values to the C<layout> helper.
+
+    @@ foo/bar.html.ep
+    % layout 'mylayout', title => 'Hi there!';
+    Hello World!
+
+    @@ layouts/mylayout.html.ep
+    <!doctype html><html>
+        <head><title><%= $title %></title></head>
+        <body><%= content %></body>
+    </html>
+
+=head2 Including Partial Templates
+
+Like most helpers the C<include> helper is just a shortcut to make your life
+a little easier.
+
+    @@ foo/bar.html.ep
+    <!doctype html><html>
+        <%= include 'header' %>
+        <body>Bar!</body>
+    </html>
+
+    @@ header.html.ep
+    <head><title>Howdy!</title></head>
+
+Instead of C<include> you could also just call C<render> with the C<partial>
+argument.
+
+    @@ foo/bar.html.ep
+    <!doctype html><html>
+        <%= $self->render('header', partial => 1) %>
+        <body>Bar!</body>
+    </html>
+
+    @@ header.html.ep
+    <head><title>Howdy!</title></head>
+
+Of course you can also pass stash values.
+
+    @@ foo/bar.html.ep
+    <!doctype html><html>
+        <%= include 'header', title => 'Hello!' %>
+        <body>Bar!</body>
+    </html>
+
+    @@ header.html.ep
+    <head><title><%= $title %></title></head>
+
+=head2 Reusable Template Blocks
+
+It's never fun to repeat yourself, thats why you can build reusable template
+blocks in C<ep> that work very similar normal Perl functions.
+
+    <% my $block = {%>
+        <% my $name = shift; %>
+        Hello <%= $name %>.
+    <%}%>
+    <%= $block->('Sebastian') %>
+    <%= $block->('Sara') %>
+
+Blocks start with a special opening bracket at the end of the first tag and
+end with a special mini tag containing only the closing bracket, whitespaces
+between bracket and tag ending are not allowed.
+
+=head2 Content Blocks
+
+Blocks and the C<content> helper can also be used to pass whole sections of
+the template to the layout.
+
+   @@ foo/bar.html.ep
+   % layout 'mylayout';
+   <% content header => {%>
+       <title>MyApp!</title>
+   <%}%>
+   Hello World!
+
+   @@ layouts/mylayout.html.ep
+   <!doctype html><html>
+       <head><%= content 'header' %></head>
+       <body><%= content %></body>
+   </html>
+
+=head2 Template Inheritance
+
+Inheritance basically means that layouts can have layouts and using the C<content>
+helper to make whole template sections overloadable.
+The difference between the C<layout> and the C<extends> helper is that
+extended templates don't get prefixed with C<layout>.
+
+    # "<div>First header!First footer!</div>"
+    @@ first.html.ep
+    <div>
+    <%= content header => {%>
+        First header!
+    <%}%>
+    <%= content footer => {%>
+        First footer!
+    <%}%>
+    </div>
+
+    # "<div>Second header!First footer!</div>"
+    @@ second.html.ep
+    % extends 'first';
+    <%= content header => {%>
+        Second header!
+    <%}%>
+
+    # "<div>Second header!Third footer!</div>"
+    @@ third.html.ep
+    % extends 'second';
+    <%= content footer => {%>
+        Third footer!
+    <%}%>
+
+This could go on and on to allow a very high level of template reuse.
+
+=head2 Helpers
+
+Helpers are little functions that are stored in the renderer, not all are
+strictly template specific, thats why you can also use the C<helper>
+controller method to access them.
+
+    my $serialized = $self->helper(dumper => [1, 2, 3]);
+
+The C<dumper> helper will use L<Data::Dumper> to serialize whatever data
+structure you pass it.
+We differentiate between default helpers which are more general purpose like
+C<dumper> and tag helpers, which are template specific and used mostly to
+generate C<HTML> tags.
+
+    <%= script '/script.js' %>
+
+    <%= script {%>
+        var a = 'b';
+    <%}%>
+
+The plugins L<Mojolicious::Plugin::DefaultHelpers> and
+L<Mojolicious::Plugin::TagHelpers> contain all of them.
+
+=head1 ADVANCED
+
+Less commonly used and more powerful features.
+
+=head2 Encoding
+
+Templates stored in files are expected to be C<UTF-8> by default, but that
+can be easily changed.
+
+    # Application
+    package MyApp;
+    use base 'Mojolicious';
+
+    sub startup {
+        my $self = shift;
+
+        # Different encoding
+        $self->renderer->encoding('koi8-r');
+    }
+
+    1;
+
+All templates from the DATA section are bound to the encoding of the Perl
+script, so don't forget to use the L<utf8> pragma if neccessary.
+
+=head2 Inflating DATA Templates
+
+Templates stored in files get preferred over files from the C<DATA> section,
+this allows you to include a default set of templates in your application
+that the user can later customize.
+The C<inflate> command will write all templates from the C<DATA> section into
+actual files in the C<templates> directory.
+
+    % ./myapp.pl inflate
+    ...
+
+=head2 Customizing The Template Syntax
+
+You can easily change the whole template syntax by loading the C<ep_renderer>
+plugin with a custom configuration.
+
+    use Mojolicious::Lite;
+
+    plugin ep_renderer => {
+        name     => 'mustache',
+        template => {
+            tag_start => '{{',
+            tag_end   => '}}'
+        }
+    };
+
+    get '/' => 'index';
+
+    app->start;
+    __DATA__
+
+    @@ index.html.mustache
+    Hello {{= $name }}.
+
+L<Mojo::Template> contains the whole list of available options.
+
+=head2 Adding Helpers
+
+Adding and redefining helpers is very easy, you can use them to do pretty
+much everything.
+
+    use Mojolicious::Lite;
+
+    app->renderer->add_helper(
+        echo => sub {
+            my ($self, $string) = @_;
+            return "ECHO: $string";
+        }
+    );
+
+    get '/' => 'index';
+
+    app->start;
+    __DATA__
+
+    @@ index.html.ep
+    <%= echo 'lalala' %>
+
+=head2 Adding Your Favorite Template System
+
+Maybe you would prefer a different template system than C<ep>, all you have
+to do is add a new C<handler>.
+
+    use Mojolicious::Lite;
+
+    app->renderer->add_handler(
+        mine => sub {
+            my ($r, $c, $output, $options) = @_;
+
+            # Generate relative template path
+            my $name = $r->template_name($options);
+
+            # Try to find approprite template in DATA section
+            my $content = $r->get_inline_template($c, $t);
+
+            # Generate absolute template path
+            my $path = $r->template_path($options);
+
+            # This part is up to you and your template system :)
+            ...
+
+            # Pass the rendered result back to the renderer
+            $$output = 'The rendered result!';
+        }
+    );
+
+    get '/' => 'index';
+
+    app->start;
+    __DATA__
+
+    @@ index.html.mine
+    ...
+
+Since most template systems don't support temlates in the C<DATA> section the
+renderer provides methods to help you with that.
+
+=cut

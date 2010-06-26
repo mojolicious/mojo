@@ -80,7 +80,7 @@ sub start_daemon_ok {
     return Test::More::ok(0, $desc) unless $path;
 
     # Prepare command
-    $self->command([ $^X, $path, 'daemon', '--listen', "http:\/\/*:$port" ]);
+    $self->command([$^X, $path, 'daemon', '--listen', "http:\/\/*:$port"]);
 
     return $self->start_server_ok($desc);
 }
@@ -99,7 +99,8 @@ sub start_daemon_prefork_ok {
     return Test::More::ok(0, $desc) unless $path;
 
     # Prepare command
-    $self->command(qq/$^X "$path" daemon_prefork --listen http:\/\/*:$port/);
+    $self->command(
+        [$^X, $path, 'daemon_prefork', '--listen', "http:\/\/*:$port"]);
 
     return $self->start_server_ok($desc);
 }
@@ -236,8 +237,9 @@ sub _find_executable {
 sub _start_server {
     my $self = shift;
 
+    # Command
     my $command = $self->command;
-    my @command = ref $command eq 'ARRAY' ? @{ $command } : $command;
+    my @command = ref $command eq 'ARRAY' ? @$command : $command;
 
     # Run server
     my $pid = open $self->{_server}, '-|', @command;
@@ -288,7 +290,8 @@ L<Test::Mojo::Server> implements the following attributes.
 =head2 C<command>
 
     my $command = $server->command;
-    $server     = $server->command("lighttpd -D -f $config");
+    $server     = $server->command("/usr/sbin/httpd -X -f 'x.cfg'");
+    $server     = $server->command(['/usr/sbin/httpd', '-X', '-f', 'x.cfg']);
 
 Command for external server start.
 

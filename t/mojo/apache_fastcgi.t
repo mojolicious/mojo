@@ -74,7 +74,7 @@ Alias / <%= $fcgi %>/
 EOF
 
 # Start
-$server->command("/usr/sbin/httpd -X -f '$config'");
+$server->command(['/usr/sbin/httpd', '-X', '-f', $config]);
 $server->start_server_ok('server started');
 
 # Request

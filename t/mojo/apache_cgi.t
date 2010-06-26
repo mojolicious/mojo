@@ -51,7 +51,7 @@ DocumentRoot  <%= $dir %>
 
 ScriptAlias /cgi-bin <%= $dir %>
 EOF
-$server->command("/usr/sbin/httpd -X -f '$config'");
+$server->command(['/usr/sbin/httpd', '-X', '-f', $config]);
 
 # CGI setup
 my $lib = $server->home->lib_dir;

@@ -33,6 +33,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed small url_for bug.
         - Fixed Mojo::IOLoop to not connect to TLS hosts without checking TLS
           support first. (ashleydev)
+        - Fixed Test::Mojo::Server to be more portable. (afresh1)
 
 0.999926 2010-06-07 00:00:00
         - Added version requirement for all optional dependencies.

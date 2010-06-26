@@ -141,7 +141,7 @@ sub _cleanup_children {
     my $self = shift;
     my $children = $self->{_children} || {};
     for my $pid (keys %$children) {
-        delete $self->_children->{$pid} unless kill 0, $pid;
+        delete $self->{_children}->{$pid} unless kill 0, $pid;
     }
 }
 

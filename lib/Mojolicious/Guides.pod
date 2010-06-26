@@ -32,8 +32,8 @@ Generating content with the L<Mojolicious> renderer.
 
 =item L<Mojolicious::Guides::Growing>
 
-Growing a L<Mojolicious::Lite> prototype to a well designed L<Mojolicious>
-application.
+Starting a L<Mojolicious::Lite> prototype from scratch and growing it into a
+well structured L<Mojolicious> application.
 
 =item L<Mojolicious::Guides::Cheatsheet>
 

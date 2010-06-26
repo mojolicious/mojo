@@ -369,14 +369,14 @@ extended templates don't get prefixed with C<layout>.
     # "<div>Second header!First footer!</div>"
     @@ second.html.ep
     % extends 'first';
-    <%= content header => {%>
+    <% content header => {%>
         Second header!
     <%}%>
 
     # "<div>Second header!Third footer!</div>"
     @@ third.html.ep
     % extends 'second';
-    <%= content footer => {%>
+    <% content footer => {%>
         Third footer!
     <%}%>
 

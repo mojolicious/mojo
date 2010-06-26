@@ -80,7 +80,7 @@ sub start_daemon_ok {
     return Test::More::ok(0, $desc) unless $path;
 
     # Prepare command
-    $self->command(qq/$^X "$path" daemon --listen http:\/\/*:$port/);
+    $self->command([ $^X, $path, 'daemon', '--listen', "http:\/\/*:$port" ]);
 
     return $self->start_server_ok($desc);
 }
@@ -237,9 +237,10 @@ sub _start_server {
     my $self = shift;
 
     my $command = $self->command;
+    my @command = ref $command eq 'ARRAY' ? @{ $command } : $command;
 
     # Run server
-    my $pid = open($self->{_server}, "$command |");
+    my $pid = open $self->{_server}, '-|', @command;
     $self->pid($pid);
 
     # Process started

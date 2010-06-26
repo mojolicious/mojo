@@ -326,10 +326,10 @@ blocks in C<ep> that work very similar normal Perl functions.
     <%= $block->('Sebastian') %>
     <%= $block->('Sara') %>
 
-Blocks start with a special opening bracket at the end of the first tag and
-end with a special mini tag containing only the closing bracket.
+Blocks start with an opening bracket in the first tag and end with a mini tag
+containing only the closing bracket.
 Whitespace characters between bracket and tag are not allowed to
-differentiate between normal Perl code and template blocks.
+differentiate between template blocks and normal Perl code.
 
     <% my $block = {%>
         <% my $name = shift; %>
@@ -339,7 +339,7 @@ differentiate between normal Perl code and template blocks.
         <%= $block->('Sebastian') %>
     <% } %>
 
-A naive translation to normal Perl code could look like this.
+A naive translation to equivalent Perl code could look like this.
 
     my $output = '';
     my $block  = sub {

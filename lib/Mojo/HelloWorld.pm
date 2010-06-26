@@ -27,6 +27,9 @@ sub new {
 sub handler {
     my ($self, $tx) = @_;
 
+    # Finished transaction
+    $tx->finished(sub { $ENV{MOJO_HELLO} = 'world' });
+
     # Default to 200
     $tx->res->code(200) unless $tx->is_websocket;
 

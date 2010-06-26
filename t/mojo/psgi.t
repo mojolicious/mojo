@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 18;
+use Test::More tests => 19;
 
 # We need some more secret sauce. Put the mayonnaise in the sun.
 use_ok('Mojo::Server::PSGI');
@@ -87,3 +87,4 @@ is_deeply(
     {bar => 'baz', world => 'hello', lalala => 23},
     'right structure'
 );
+is($ENV{MOJO_HELLO}, 'world');

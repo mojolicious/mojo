@@ -896,6 +896,9 @@ sub _prepare {
         # HUP
         $self->_hup($id) if (time - $time) >= $timeout;
     }
+
+    # Graceful shutdown
+    $self->stop if $self->max_connections == 0 && keys %{$self->{_cs}} == 0;
 }
 
 sub _prepare_accept {

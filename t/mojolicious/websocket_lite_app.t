@@ -83,29 +83,27 @@ $client->websocket(
         $self->send_message('test1');
     }
 )->process;
-$client->ioloop->one_tick(1);
-$client->ioloop->one_tick(1);
 is($result, 'test1test2');
-is($flag,   24);
 
 # WebSocket /early_start (server directly sends a message)
-($flag, $result) = undef;
+my $flag2;
+$result = undef;
 $client->websocket(
     '/early_start' => sub {
         my $self = shift;
-        $self->finished(sub { $flag += 5 });
+        $self->finished(sub { $flag2 += 5 });
         $self->receive_message(
             sub {
                 my ($self, $message) = @_;
                 $result = $message;
                 $self->send_message('test3');
-                $flag = 18;
+                $flag2 = 18;
             }
         );
     }
 )->process;
-is($flag,   23);
 is($result, 'test3test2');
+is($flag2,  23);
 
 # WebSocket /dead (dies)
 my ($websocket, $code, $message);
@@ -142,3 +140,6 @@ $client->websocket(
         $self->send_message('test1');
     }
 )->process;
+
+# Server side "finished" callback
+is($flag, 24);

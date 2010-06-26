@@ -83,7 +83,8 @@ $client->websocket(
         $self->send_message('test1');
     }
 )->process;
-$client->ioloop->one_tick(0);
+$client->ioloop->one_tick(1);
+$client->ioloop->one_tick(1);
 is($result, 'test1test2');
 is($flag,   24);
 

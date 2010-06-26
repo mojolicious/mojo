@@ -328,7 +328,7 @@ blocks in C<ep> that work very similar normal Perl functions.
 
 Blocks start with an opening bracket in the first tag and end with a mini tag
 containing only the closing bracket.
-Whitespace characters between bracket and tag are not allowed to
+Whitespace characters between bracket and tag are not allowed, to
 differentiate between template blocks and normal Perl code.
 
     <% my $block = {%>

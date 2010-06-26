@@ -104,8 +104,12 @@ sub render {
     # Text
     my $text = delete $stash->{text};
 
-    my $options =
-      {template => $template, format => $format, handler => $handler};
+    my $options = {
+        template => $template,
+        format   => $format,
+        handler  => $handler,
+        encoding => $self->encoding
+    };
     my $output;
 
     # Localize extends and layout
@@ -116,7 +120,9 @@ sub render {
     if (defined $text) {
 
         # Render
-        $self->handler->{text}->($self, $c, \$output, {text => $text});
+        $self->handler->{text}->(
+            $self, $c, \$output, {text => $text, encoding => $self->encoding}
+        );
 
         # Extends
         $c->stash->{content}->{content} = b("$output")
@@ -179,8 +185,9 @@ sub render {
     return $output if $partial;
 
     # Encoding (JSON is already encoded)
-    $output = b($output)->encode($self->encoding)->to_string
-      if $self->encoding && !$json && !$data;
+    my $encoding = $options->{encoding};
+    $output = b($output)->encode($encoding)->to_string
+      if $encoding && !$json && !$data;
 
     # Response
     my $res = $c->res;

@@ -1664,8 +1664,8 @@ everywhere inside the process.
 
     $loop->start;
 
-Start the loop, this will block until the loop is finished or return
-immediately if the loop is already running.
+Start the loop, this will block until C<stop> is called or return immediately
+if the loop is already running.
 
 =head2 C<start_tls>
 

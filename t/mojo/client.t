@@ -13,7 +13,7 @@ use Test::More;
 plan skip_all =>
   'set TEST_CLIENT to enable this test (internet connection required!)'
   unless $ENV{TEST_CLIENT};
-plan tests => 81;
+plan tests => 82;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -22,7 +22,7 @@ use_ok('Mojo::IOLoop');
 use_ok('Mojo::Transaction::HTTP');
 
 # Make sure clients dont taint the ioloop
-my $ioloop = Mojo::IOLoop->new;
+my $loop   = Mojo::IOLoop->new;
 my $client = Mojo::Client->new;
 my $code;
 $client->get(
@@ -32,8 +32,12 @@ $client->get(
     }
 )->process;
 $client = undef;
-$ioloop->start;
-is($code, 301, 'right status');
+my $ticks = 0;
+$loop->tick_cb(sub { $ticks++ });
+$loop->idle_cb(sub { shift->stop });
+$loop->start;
+is($ticks, 1,   'loop not tainted');
+is($code,  301, 'right status');
 
 # Fresh client
 $client = Mojo::Client->new;

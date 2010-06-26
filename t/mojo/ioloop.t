@@ -25,7 +25,12 @@ my $flag2;
 $loop->timer(
     1 => sub {
         my $self = shift;
-        $self->timer(1 => sub { $flag2 = $flag });
+        $self->timer(
+            1 => sub {
+                shift->stop;
+                $flag2 = $flag;
+            }
+        );
         $flag = 23;
     }
 );

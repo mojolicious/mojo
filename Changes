@@ -13,6 +13,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved Mojo::Template error messages.
         - Improved generated multipart messages to be 2 bytes shorter.
           (John Kingsley)
+        - Fixed Mojo::IOLoop to not stop unexpectedly.
         - Fixed graceful shutdown in Mojo::Server::Daemon::Prefork.
         - Fixed Mojo::Server::CGI and Mojo::Server::FastCGI to be more
           portable.

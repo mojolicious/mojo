@@ -896,28 +896,6 @@ sub _prepare {
         # HUP
         $self->_hup($id) if (time - $time) >= $timeout;
     }
-
-    # Nothing to do
-    my $running = 0;
-
-    # Max connections
-    my $max = $self->max_connections;
-
-    # Connections
-    my $listen = $self->{_listen} || {};
-    if (keys %{$self->{_cs}}) { $running = 1 }
-
-    # Timers
-    elsif (keys %{$self->{_ts}}) { $running = 1 }
-
-    # Listen sockets
-    elsif ($max > 0 && keys %$listen) { $running = 1 }
-
-    # Listening
-    elsif (!$running && ($max > 0 && $self->{_listening})) { $running = 1 }
-
-    # Stopped
-    delete $self->{_running} unless $running;
 }
 
 sub _prepare_accept {

@@ -16,7 +16,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 34;
+plan tests => 38;
 
 # In the game of chess you can never let your adversary see your pieces.
 use Mojo::ByteStream 'b';
@@ -28,6 +28,15 @@ my $yatta_sjis = b($yatta)->encode('shift_jis')->to_string;
 
 # Charset plugin
 plugin charset => {charset => 'Shift_JIS'};
+
+# UTF-8 text renderer
+app->renderer->add_handler(
+    test => sub {
+        my ($r, $c, $output, $options) = @_;
+        delete $options->{encoding};
+        $$output = b($c->stash->{test})->encode('UTF-8')->to_string;
+    }
+);
 
 # Silence
 app->log->level('error');
@@ -45,6 +54,12 @@ post '/' => sub {
 post '/data' => sub {
     my $self = shift;
     $self->render_data($self->req->body, format => 'bin');
+};
+
+# GET /unicode
+get '/unicode' => sub {
+    my $self = shift;
+    $self->render(test => $yatta, handler => 'test', format => 'txt');
 };
 
 # GET /json
@@ -82,6 +97,10 @@ $t->post_form_ok(
     {'Content-Type' => 'multipart/form-data'}
   )->status_is(200)->content_type_like(qr/Shift_JIS/)
   ->content_like(qr/$yatta/);
+
+# Unicode renderer
+$t->get_ok('/unicode')->status_is(200)->content_type_is('text/plain')
+  ->content_is(b($yatta)->encode('UTF-8')->to_string);
 
 # Templates in the DATA section should be written in UTF-8,
 # and those in separate files in Shift_JIS (Mojo will do the decoding)

@@ -373,10 +373,11 @@ the template to the layout.
 
 =head2 Template Inheritance
 
-Inheritance basically means that layouts can have layouts and using the C<content>
-helper to make whole template sections overloadable.
+Inheritance takes the layout concept above one step further, allowing you to
+use the C<content> helper to overload whole template sections of normal
+templates.
 The difference between the C<layout> and the C<extends> helper is that
-extended templates don't get prefixed with C<layout>.
+extended templates don't get prefixed with C<layout/>.
 
     # "<div>First header!First footer!</div>"
     @@ first.html.ep
@@ -403,7 +404,7 @@ extended templates don't get prefixed with C<layout>.
         Third footer!
     <%}%>
 
-This could go on and on to allow a very high level of template reuse.
+This chain could go on and on to allow a very high level of template reuse.
 
 =head1 ADVANCED
 

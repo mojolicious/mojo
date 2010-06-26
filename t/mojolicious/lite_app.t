@@ -16,7 +16,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 413;
+plan tests => 419;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -75,6 +75,15 @@ get '/stream' => sub {
             return $chunked->build($chunk);
         }
     );
+};
+
+# GET /finished
+my $finished;
+get '/finished' => sub {
+    my $self = shift;
+    $self->finished(sub { $finished += 3 });
+    $finished = 20;
+    $self->render(text => 'so far so good!');
 };
 
 # GET /привет/мир
@@ -475,6 +484,13 @@ $t->get_ok("http://sri:foo\@localhost:$port/stream")->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('foobarsri:foo');
+
+# GET /finished (with finished callback)
+$t->get_ok('/finished')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('so far so good!');
+is($finished, 23);
 
 # GET / (IRI)
 $t->get_ok('/привет/мир')->status_is(200)

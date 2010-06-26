@@ -218,6 +218,8 @@ sub run {
     $self->app;
 
     while (my $c = $self->accept_connection) {
+
+        # Request
         my $tx = $self->read_request($c);
 
         # Error
@@ -232,7 +234,11 @@ sub run {
         # Handle
         $self->handler_cb->($self, $tx);
 
+        # Response
         $self->write_response($tx);
+
+        # Finish transaction
+        $tx->finished->($tx);
     }
 }
 

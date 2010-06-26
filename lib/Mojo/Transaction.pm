@@ -9,8 +9,13 @@ use base 'Mojo::Stateful';
 
 use Carp 'croak';
 
-__PACKAGE__->attr([qw/connection kept_alive/]);
-__PACKAGE__->attr([qw/local_address local_port previous remote_port/]);
+__PACKAGE__->attr([qw/connection kept_alive local_address local_port /]);
+__PACKAGE__->attr([qw/previous remote_port/]);
+__PACKAGE__->attr(
+    finished => sub {
+        sub { }
+    }
+);
 __PACKAGE__->attr(keep_alive => 0);
 
 # Please don't eat me! I have a wife and kids. Eat them!
@@ -92,6 +97,13 @@ sub resume {
     return $self;
 }
 
+sub server_close {
+    my $self = shift;
+
+    # Transaction finished
+    $self->finished->($self);
+}
+
 sub server_read  { croak 'Method "server_read" not implemented by subclass' }
 sub server_write { croak 'Method "server_write" not implemented by subclass' }
 
@@ -127,6 +139,17 @@ implements the following new ones.
     $tx            = $tx->connection($connection);
 
 Connection identifier or socket.
+
+=head2 C<finished>
+
+    my $cb = $tx->finished;
+    $tx    = $tx->finsihed(sub {...});
+
+Callback signaling that the transaction has been finished.
+
+    $tx->finsihed(sub {
+        my $self = shift;
+    });
 
 =head2 C<keep_alive>
 
@@ -235,6 +258,12 @@ Transaction response.
     $tx = $tx->resume;
 
 Resume transaction.
+
+=head2 C<server_close>
+
+    $tx->server_close;
+
+Transaction closed.
 
 =head2 C<server_read>
 

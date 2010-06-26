@@ -371,6 +371,9 @@ sub _state {
     # Finish
     if ($tx->is_finished) {
 
+        # Finish normal transactions
+        $tx->server_close unless $tx->is_websocket;
+
         # Connection
         my $c = $self->{_cs}->{$id};
 

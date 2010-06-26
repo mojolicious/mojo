@@ -115,6 +115,9 @@ sub run {
         $offset += $written;
     }
 
+    # Finish transaction
+    $tx->finished->($tx);
+
     return $res->code;
 }
 

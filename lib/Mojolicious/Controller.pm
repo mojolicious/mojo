@@ -34,16 +34,9 @@ sub finish {
 }
 
 sub finished {
-    my $self = shift;
+    my ($self, $cb) = @_;
 
-    # WebSocket check
-    Carp::croak('No WebSocket connection in progress')
-      unless $self->tx->is_websocket;
-
-    # Callback
-    my $cb = shift;
-
-    # Connection finished
+    # Transaction finished
     $self->tx->finished(sub { shift and $self->$cb(@_) });
 }
 
@@ -372,8 +365,7 @@ For WebSockets it will gracefully end the connection.
 
     $c->finished(sub {...});
 
-Callback signaling that peer finished the WebSocket connection, only works if
-there is currently a WebSocket connection in progress.
+Callback signaling that the transaction has been finished.
 
     $c->finished(sub {
         my $self = shift;

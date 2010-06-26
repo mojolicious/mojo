@@ -13,7 +13,7 @@ use Mojo::ByteStream 'b';
 use Mojo::Transaction::HTTP;
 
 __PACKAGE__->attr(
-    [qw/finished receive_message/] => sub {
+    receive_message => sub {
         sub { }
     }
 );
@@ -51,13 +51,6 @@ sub send_message {
 
     # Send message with framing
     $self->_send_bytes("\x00$message\xff");
-}
-
-sub server_close {
-    my $self = shift;
-
-    # Connection finished
-    $self->finished->($self);
 }
 
 # Being eaten by crocodile is just like going to sleep... in a giant blender.
@@ -132,17 +125,6 @@ WebSocket transactions as described in C<The Web Socket protocol>.
 
 L<Mojo::Transaction::WebSocket> inherits all attributes from
 L<Mojo::Transaction> and implements the following new ones.
-
-=head2 C<finished>
-
-    my $cb = $ws->finished;
-    $ws    = $ws->finsihed(sub {...});
-
-Callback signaling that peer finished the connection.
-
-    $ws->finsihed(sub {
-        my $self = shift;
-    });
 
 =head2 C<handshake>
 
@@ -245,12 +227,6 @@ The original handshake response.
 
 Send a message over the WebSocket, encoding and framing will be handled
 transparently.
-
-=head2 C<server_close>
-
-    $ws->server_close;
-
-Connection got closed.
 
 =head2 C<server_read>
 

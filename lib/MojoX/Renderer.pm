@@ -120,9 +120,7 @@ sub render {
     if (defined $text) {
 
         # Render
-        $self->handler->{text}->(
-            $self, $c, \$output, {text => $text, encoding => $self->encoding}
-        );
+        $self->handler->{text}->($self, $c, \$output, {text => $text});
 
         # Extends
         $c->stash->{content}->{content} = b("$output")

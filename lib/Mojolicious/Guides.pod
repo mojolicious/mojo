@@ -35,13 +35,13 @@ Generating content with the L<Mojolicious> renderer.
 Starting a L<Mojolicious::Lite> prototype from scratch and growing it into a
 well structured L<Mojolicious> application.
 
-=item L<Mojolicious::Guides::Cheatsheet>
-
-A concise all-purpose reference.
-
 =item L<Mojolicious::Guides::Cookbook>
 
 Cooking with L<Mojolicious>, recipes for every taste.
+
+=item L<Mojolicious::Guides::Cheatsheet>
+
+A concise all-purpose reference.
 
 =item L<Mojolicious::Guides::FAQ>
 

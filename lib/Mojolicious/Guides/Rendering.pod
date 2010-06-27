@@ -379,8 +379,8 @@ templates.
 The difference between the C<layout> and the C<extends> helper is that
 extended templates don't get prefixed with C<layout/>.
 
-    # "<div>First header!First footer!</div>"
     @@ first.html.ep
+    %# "<div>First header!First footer!</div>"
     <div>
     <%= content header => {%>
         First header!
@@ -390,15 +390,15 @@ extended templates don't get prefixed with C<layout/>.
     <%}%>
     </div>
 
-    # "<div>Second header!First footer!</div>"
     @@ second.html.ep
+    %# "<div>Second header!First footer!</div>"
     % extends 'first';
     <% content header => {%>
         Second header!
     <%}%>
 
-    # "<div>Second header!Third footer!</div>"
     @@ third.html.ep
+    %# "<div>Second header!Third footer!</div>"
     % extends 'second';
     <% content footer => {%>
         Third footer!

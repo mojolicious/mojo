@@ -286,7 +286,8 @@ post '/malformed_utf8' => sub {
 };
 
 # GET /json
-get '/json' => sub { shift->render_json({foo => [1, -2, 3, 'b☃r']}) };
+get '/json' =>
+  sub { shift->render_json({foo => [1, -2, 3, 'b☃r']}, layout => 'layout') };
 
 # GET /autostash
 get '/autostash' => sub { shift->render(handler => 'ep', foo => 'bar') } =>

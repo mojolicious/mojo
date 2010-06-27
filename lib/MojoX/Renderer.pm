@@ -163,7 +163,7 @@ sub render {
     }
 
     # Extends
-    while (my $extends = $self->_extends($c)) {
+    while ((my $extends = $self->_extends($c)) && !$json && !$data) {
 
         # Handler
         $handler = $c->stash->{handler};

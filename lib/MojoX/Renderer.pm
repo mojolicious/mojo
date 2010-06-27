@@ -499,7 +499,12 @@ See L<Mojolicious::Plugin::EpRenderer> for sample helpers.
 
 =head2 C<get_inline_template>
 
-    my $template = $renderer->get_inline_template($c, 'foo.html.ep');
+    my $template = $renderer->get_inline_template({
+        template       => 'foo/bar',
+        format         => 'html',
+        handler        => 'epl'
+        template_class => 'main'
+    }, 'foo.html.ep');
 
 Get an inline template by name, usually used by handlers.
 

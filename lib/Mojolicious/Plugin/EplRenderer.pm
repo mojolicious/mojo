@@ -47,7 +47,7 @@ sub register {
                 if (-r $path) { $$output = $mt->render_file($path, $c) }
 
                 # Try DATA section
-                elsif (my $d = $r->get_inline_template($c, $t)) {
+                elsif (my $d = $r->get_inline_template($options, $t)) {
                     $$output = $mt->render($d, $c);
                 }
 

@@ -504,7 +504,7 @@ to do is add a new C<handler>.
             my $name = $r->template_name($options);
 
             # Try to find approprite template in DATA section
-            my $content = $r->get_inline_template($c, $t);
+            my $content = $r->get_inline_template($options, $name);
 
             # Generate absolute template path
             my $path = $r->template_path($options);

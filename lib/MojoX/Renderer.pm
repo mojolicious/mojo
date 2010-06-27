@@ -69,9 +69,9 @@ sub add_helper {
 }
 
 sub get_inline_template {
-    my ($self, $c, $template) = @_;
+    my ($self, $options, $template) = @_;
     return Mojo::Command->new->get_data($template,
-        $self->_detect_template_class($c->stash));
+        $self->_detect_template_class($options));
 }
 
 # Bodies are for hookers and fat people.
@@ -105,10 +105,11 @@ sub render {
     my $text = delete $stash->{text};
 
     my $options = {
-        template => $template,
-        format   => $format,
-        handler  => $handler,
-        encoding => $self->encoding
+        template       => $template,
+        format         => $format,
+        handler        => $handler,
+        encoding       => $self->encoding,
+        template_class => $stash->{template_class}
     };
     my $output;
 
@@ -237,7 +238,7 @@ sub _detect_handler {
     return unless $self->detect_templates;
 
     # Template class
-    my $class = $self->_detect_template_class;
+    my $class = $self->_detect_template_class($options);
 
     # Templates
     my $templates = $self->{_templates};

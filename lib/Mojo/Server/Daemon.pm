@@ -201,10 +201,10 @@ sub _build_tx {
     # Store connection information
     my $loop  = $self->ioloop;
     my $local = $loop->local_info($id);
-    $tx->local_address($local->{address});
+    $tx->local_address($local->{address} || '127.0.0.1');
     $tx->local_port($local->{port});
     my $remote = $loop->remote_info($id);
-    $tx->remote_address($remote->{address});
+    $tx->remote_address($remote->{address} || '127.0.0.1');
     $tx->remote_port($remote->{port});
 
     # TLS

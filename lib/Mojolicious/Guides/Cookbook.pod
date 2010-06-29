@@ -161,7 +161,7 @@ libraries might not be found.
 Because C<plackup> uses a weird trick to load your script, L<Mojolicious> is
 not always able to detect the applications home directory, if thats the case
 you can simply use the C<MOJO_HOME> environment variable.
-Also note that C<app-E<lt>start> needs to be the last Perl statement in the
+Also note that C<app-E<gt>start> needs to be the last Perl statement in the
 application script for the same reason.
 
     % MOJO_HOME=/home/sri/myapp plackup ./script/myapp

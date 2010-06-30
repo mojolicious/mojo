@@ -62,7 +62,8 @@ get '/null/:null' => sub {
 get '/stream' => sub {
     my $self    = shift;
     my $counter = 0;
-    my $chunks  = ['foo', 'bar', $self->req->url->to_abs->userinfo];
+    my $chunks  = [qw/foo bar/, $self->req->url->to_abs->userinfo,
+        $self->url_for->to_abs];
     my $chunked = Mojo::Filter::Chunked->new;
     $self->res->code(200);
     $self->res->headers->content_type('text/plain');
@@ -484,7 +485,7 @@ my $port = $t->client->test_server;
 $t->get_ok("http://sri:foo\@localhost:$port/stream")->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('foobarsri:foo');
+  ->content_like(qr/^foobarsri\:foohttp:\/\/localhost\:\d+\/stream$/);
 
 # GET /finished (with finished callback)
 $t->get_ok('/finished')->status_is(200)

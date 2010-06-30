@@ -290,7 +290,10 @@ sub url_for {
     my $url = $self->match->url_for($target, @_);
 
     # Base
-    $url->base($self->tx->req->url->base->clone);
+    unless ($url->is_abs) {
+        $url->base($self->tx->req->url->base->clone);
+        $url->base->userinfo(undef);
+    }
 
     # Fix paths
     unshift @{$url->path->parts}, @{$url->base->path->parts};

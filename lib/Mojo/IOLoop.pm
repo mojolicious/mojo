@@ -368,7 +368,7 @@ sub not_writing {
     my $writing = $c->{writing};
 
     # KQueue
-    my $loop = $self->{_loop} ||= $self->_build_loop;
+    my $loop = $self->_prepare_loop;
     if (KQUEUE) {
         my $fd = fileno $socket;
 
@@ -401,32 +401,14 @@ sub one_tick {
     # Timeout
     $timeout = $self->timeout unless defined $timeout;
 
-    # Listening
-    my $loop = $self->{_loop} ||= $self->_build_loop;
-    if (!$self->{_listening} && $self->_should_listen) {
+    # Prepare listen socket
+    $self->_prepare_listen;
 
-        # Add listen sockets
-        my $listen = $self->{_listen} || {};
-        for my $lid (keys %$listen) {
-            my $socket = $listen->{$lid}->{socket};
-            my $fd     = fileno $socket;
+    # Prepare connections
+    $self->_prepare_connections;
 
-            # KQueue
-            $loop->EV_SET($fd, KQUEUE_READ, KQUEUE_ADD) if KQUEUE;
-
-            # Epoll
-            $loop->mask($socket, EPOLL_POLLIN) if EPOLL;
-
-            # Poll
-            $loop->mask($socket, POLLIN) unless KQUEUE || EPOLL;
-        }
-
-        # Listening
-        $self->{_listening} = 1;
-    }
-
-    # Prepare
-    $self->_prepare;
+    # Loop
+    my $loop = $self->{_loop};
 
     # Events
     my (@error, @hup, @read, @write);
@@ -551,9 +533,6 @@ sub start {
     # Running
     $self->{_running} = 1;
 
-    # Loop
-    $self->{_loop} ||= $self->_build_loop;
-
     # Mainloop
     $self->one_tick while $self->{_running};
 
@@ -649,7 +628,7 @@ sub writing {
     my $writing = $c->{writing};
 
     # KQueue
-    my $loop = $self->{_loop} ||= $self->_build_loop;
+    my $loop = $self->_prepare_loop;
     if (KQUEUE) {
         my $fd = fileno $socket;
 
@@ -764,19 +743,6 @@ sub _add_event {
     return $self;
 }
 
-# Initialize as late as possible because kqueues don't survive a fork
-sub _build_loop {
-
-    # "kqueue"
-    return IO::KQueue->new if KQUEUE;
-
-    # "epoll"
-    return IO::Epoll->new if EPOLL;
-
-    # "poll"
-    return IO::Poll->new;
-}
-
 sub _drop_immediately {
     my ($self, $id) = @_;
 
@@ -862,45 +828,6 @@ sub _hup {
     $self->_run_event('hup', $event, $id);
 }
 
-sub _prepare {
-    my $self = shift;
-
-    # Prepare
-    while (my ($id, $c) = each %{$self->{_cs}}) {
-
-        # Accepting
-        $self->_prepare_accept($id) if $c->{accepting};
-
-        # Connecting
-        $self->_prepare_connect($id) if $c->{connecting};
-
-        # Connection needs to be finished
-        if ($c->{finish}) {
-
-            # Buffer empty
-            unless ($c->{buffer} && !$c->{buffer}->size) {
-                $self->_drop_immediately($id);
-                next;
-            }
-        }
-
-        # Read only
-        $self->not_writing($id) if delete $c->{read_only};
-
-        # Timeout
-        my $timeout = $c->{timeout} || 15;
-
-        # Last active
-        my $time = $c->{active} || $self->_activity($id);
-
-        # HUP
-        $self->_hup($id) if (time - $time) >= $timeout;
-    }
-
-    # Graceful shutdown
-    $self->stop if $self->max_connections == 0 && keys %{$self->{_cs}} == 0;
-}
-
 sub _prepare_accept {
     my ($self, $id) = @_;
 
@@ -961,6 +888,45 @@ sub _prepare_connect {
     $self->_run_event('connect', $cb, $id) if $cb;
 }
 
+sub _prepare_connections {
+    my $self = shift;
+
+    # Connections
+    my $cs = $self->{_cs} ||= {};
+
+    # Prepare
+    while (my ($id, $c) = each %$cs) {
+
+        # Accepting
+        $self->_prepare_accept($id) if $c->{accepting};
+
+        # Connecting
+        $self->_prepare_connect($id) if $c->{connecting};
+
+        # Connection needs to be finished
+        if ($c->{finish}) {
+
+            # Buffer empty
+            unless ($c->{buffer} && !$c->{buffer}->size) {
+                $self->_drop_immediately($id);
+                next;
+            }
+        }
+
+        # Read only
+        $self->not_writing($id) if delete $c->{read_only};
+
+        # Last active
+        my $time = $c->{active} || $self->_activity($id);
+
+        # HUP
+        $self->_hup($id) if (time - $time) >= ($c->{timeout} || 15);
+    }
+
+    # Graceful shutdown
+    $self->stop if $self->max_connections == 0 && keys %$cs == 0;
+}
+
 sub _prepare_key {
     my $self = shift;
 
@@ -977,6 +943,62 @@ sub _prepare_key {
     print $file KEY;
 
     return $self->{_key} = $key;
+}
+
+sub _prepare_listen {
+    my $self = shift;
+
+    # Loop
+    my $loop = $self->_prepare_loop;
+
+    # Already listening
+    return if $self->{_listening};
+
+    # Listen sockets
+    my $listen = $self->{_listen} ||= {};
+    return unless keys %$listen;
+
+    # Connections
+    my $i = keys %{$self->{_cs}};
+    return unless $i < $self->max_connections;
+
+    # Lock
+    return unless $self->lock_cb->($self, !$i);
+
+    # Add listen sockets
+    for my $lid (keys %$listen) {
+        my $socket = $listen->{$lid}->{socket};
+
+        # KQueue
+        if (KQUEUE) { $loop->EV_SET(fileno $socket, KQUEUE_READ, KQUEUE_ADD) }
+
+        # Epoll
+        elsif (EPOLL) { $loop->mask($socket, EPOLL_POLLIN) }
+
+        # Poll
+        else { $loop->mask($socket, POLLIN) }
+    }
+
+    # Listening
+    $self->{_listening} = 1;
+}
+
+sub _prepare_loop {
+    my $self = shift;
+
+    # Already initialized
+    return $self->{_loop} if $self->{_loop};
+
+    # "kqueue"
+    if (KQUEUE) { $self->{_loop} = IO::KQueue->new }
+
+    # "epoll"
+    elsif (EPOLL) { $self->{_loop} = IO::Epoll->new }
+
+    # "poll"
+    else { $self->{_loop} = IO::Poll->new }
+
+    return $self->{_loop};
 }
 
 sub _read {
@@ -1060,23 +1082,6 @@ sub _run_event {
     }
 
     return $value;
-}
-
-sub _should_listen {
-    my $self = shift;
-
-    # Listen sockets
-    my $listen = $self->{_listen} || {};
-    return unless keys %$listen;
-
-    # Connections
-    my $cs = $self->{_cs};
-    return unless keys %$cs < $self->max_connections;
-
-    # Lock
-    return unless $self->lock_cb->($self, !keys %$cs);
-
-    return 1;
 }
 
 sub _timer {

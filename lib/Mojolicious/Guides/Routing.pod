@@ -9,7 +9,7 @@ Mojolicious::Guides::Routing - Routing
 =head1 OVERVIEW
 
 This document contains a simple and fun introduction to the L<Mojolicious>
-router and it's underlying concepts.
+router and its underlying concepts.
 
 =head1 CONCEPTS
 

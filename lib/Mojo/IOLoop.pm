@@ -401,7 +401,7 @@ sub one_tick {
     # Timeout
     $timeout = $self->timeout unless defined $timeout;
 
-    # Prepare listen socket
+    # Prepare listen sockets
     $self->_prepare_listen;
 
     # Prepare connections

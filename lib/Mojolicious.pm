@@ -317,7 +317,7 @@ deployment and UNIX domain socket sharing, perfect for embedding.
 
 CGI, FastCGI and L<PSGI> support.
 
-Fresh code, based upon years of experience developing Catalyst.
+Fresh code based upon years of experience, from the author of L<Catalyst>.
 
 Powerful out of the box with RESTful routes, plugins, sessions, signed
 cookies, static file server, testing framework, Perl-ish templates, JSON,

@@ -230,8 +230,12 @@ Names are always the last argument.
     __DATA__
 
     @@ index.html.ep
-    <%= link_to foo => {%>Foo<%}%>.
-    <%= link_to bar => {%>Bar<%}%>.
+    <%= link_to foo => {%>
+        Foo
+    <%}%>.
+    <%= link_to bar => {%>
+        Bar
+    <%}%>.
 
     @@ foo.html.ep
     <a href="<%= url_for 'index' %>">Home</a>.
@@ -448,7 +452,9 @@ multiple features at once.
     <%= include 'menu' %>
 
     @@ menu.html.ep
-    <%= link_to index => {%>Try again<%}%>
+    <%= link_to index => {%>
+        Try again
+    <%}%>
 
     @@ layouts/funky.html.ep
     <!doctype html><html>
@@ -580,7 +586,9 @@ request, this is very useful in combination with C<redirect_to>.
         <b><%= $message %></b><br />
     <% } %>
     Welcome <%= session 'name' %>!<br />
-    <%= link_to logout => {%>Logout<%}%>
+    <%= link_to logout => {%>
+        Logout
+    <%}%>
 
 Note that you should use a custom C<secret> to make signed cookies really secure.
 

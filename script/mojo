@@ -9,17 +9,16 @@ use Cwd 'getcwd';
 use File::Spec;
 use FindBin;
 
-# Dist
 use lib "$FindBin::Bin/lib";
 use lib "$FindBin::Bin/../lib";
 
-# App
+my $home;
+
 BEGIN {
-    if (my $home = $ENV{MOJO_HOME}) {
-        use lib join '/', File::Spec->splitdir($home), 'lib';
-    }
-    else { use lib join '/', File::Spec->splitdir(getcwd), 'lib' }
+    $home = $ENV{MOJO_HOME};
+    $home = join '/', File::Spec->splitdir($home ? $home : getcwd), 'lib';
 }
+use lib $home;
 
 # Check if Mojo is installed
 eval 'use Mojo::Commands';

@@ -54,7 +54,12 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use lib "$FindBin::Bin/../../lib";
 
-use lib join '/', File::Spec->splitdir(getcwd), 'lib';
+BEGIN {
+    if (my $home = $ENV{MOJO_HOME}) {
+        use lib join '/', File::Spec->splitdir($home), 'lib';
+    }
+    else { use lib join '/', File::Spec->splitdir(getcwd), 'lib' }
+}
 
 # Check if Mojo is installed
 eval 'use Mojo::Commands';

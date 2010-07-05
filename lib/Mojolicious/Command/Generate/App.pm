@@ -66,10 +66,14 @@ __DATA__
 use strict;
 use warnings;
 
+use Cwd 'getcwd';
+use File::Spec;
 use FindBin;
 
 use lib "$FindBin::Bin/../lib";
 use lib "$FindBin::Bin/../../lib";
+
+use lib join '/', File::Spec->splitdir(getcwd), 'lib';
 
 # Check if Mojo is installed
 eval 'use Mojolicious::Commands';

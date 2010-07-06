@@ -70,7 +70,7 @@ ok($loader->load('LoaderTest'), 'loaded successfully');
 
 # Reload
 my $file = IO::File->new;
-my $dir  = File::Temp::tempdir;
+my $dir  = File::Temp::tempdir(CLEANUP => 1);
 my $path = File::Spec->catfile($dir, 'MojoTestReloader.pm');
 $file->open("> $path");
 $file->syswrite("package MojoTestReloader;\nsub test { 23 }\n1;");

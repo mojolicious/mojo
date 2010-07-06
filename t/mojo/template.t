@@ -580,7 +580,7 @@ like($output, qr/23Hello World!/);
 $mt = Mojo::Template->new;
 $mt->tag_start('[$-');
 $mt->tag_end('-$]');
-my $dir = File::Temp::tempdir;
+my $dir = File::Temp::tempdir(CLEANUP => 1);
 $file = File::Spec->catfile($dir, 'test.mt');
 is($mt->render_to_file(<<"EOF", $file), undef);
 <% my \$i = 23; %> foo bar

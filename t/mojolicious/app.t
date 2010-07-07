@@ -106,7 +106,7 @@ $t->get_ok('/foo/withblock.txt', {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/plain')
-  ->content_is("\nHello Baerbel.\nHello Wolfgang.\n");
+  ->content_like(qr/Hello Baerbel\..*Hello Wolfgang\./);
 
 # MojoliciousTest2::Foo::test
 $t->get_ok('/test2', {'X-Test' => 'Hi there!'})->status_is(200)

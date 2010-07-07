@@ -16,7 +16,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 424;
+plan tests => 419;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -500,10 +500,6 @@ $t->get_ok('/привет/мир')->status_is(200)
 is(b($t->tx->res->body)->decode('UTF-8'), 'привет мир');
 
 # GET /root
-$t->get_ok('/root')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('/.html');
-
-# GET /root.html
 $t->get_ok('/root.html')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('/.html');

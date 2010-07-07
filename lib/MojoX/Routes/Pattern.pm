@@ -205,6 +205,9 @@ sub _compile {
     # Not rooted with a slash
     $regex = "$block$regex" if $block;
 
+    # Format
+    $regex =~ s/(\.\w+)([\)\?]*)+$/(?:$1)?$2/ if $self->format;
+
     $regex = qr/^$regex/;
     $self->regex($regex);
 

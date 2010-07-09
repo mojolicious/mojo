@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 58;
+use Test::More tests => 59;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -130,12 +130,19 @@ $dom->parse(<<EOF);
   </body>
 </html>
 EOF
-my $div = $dom->search('body > #container > div p[id]');
-is($div->[0]->attributes->{id}, 'foo', 'right id attribute');
-is($div->[1],                   undef, 'no second result');
+my $p = $dom->search('body > #container > div p[id]');
+is($p->[0]->attributes->{id}, 'foo', 'right id attribute');
+is($p->[1],                   undef, 'no second result');
 my @p;
 $dom->search('p')->each(sub { push @p, $_->attributes->{id} });
 is_deeply(\@p, [qw/foo bar/], 'found all p elements');
+@div = ();
+$dom->search('div')->each(sub { push @div, $_->attributes->{id} });
+is_deeply(
+    \@div,
+    [qw/container header content logo buttons buttons/],
+    'found all div elements'
+);
 
 # Script tag
 $dom->parse(<<EOF);

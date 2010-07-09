@@ -23,6 +23,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed poll + tls support.
         - Fixed async Mojo::Client tests.
         - Fixed HTML1 and HTML5 compatibility of Mojo::DOM.
+        - Fixed a selector bug in Mojo::DOM.
         - Fixed environment detection.
         - Fixed Mojolicious application embedding.
         - Fixed a tutorial bug. (zoul)

@@ -321,6 +321,7 @@ sub _match {
     my ($self, $candidate, $pattern) = @_;
 
     # Parts
+    my $first = 2;
     for my $part (@$pattern) {
 
         # Selectors
@@ -348,6 +349,7 @@ sub _match {
             }
 
             while (1) {
+                $first-- if $first != 0;
 
                 # Next parent
                 return
@@ -358,6 +360,9 @@ sub _match {
 
                 # Compare part to element
                 last if $self->_compare($selector, $current);
+
+                # First selector needs to match
+                return if $first;
 
                 # Parent only
                 if ($parentonly) {

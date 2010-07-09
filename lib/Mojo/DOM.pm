@@ -654,7 +654,8 @@ sub _select {
     @results =
       map { $self->new(charset => $self->charset, tree => $_) } @results;
 
-    return \@results;
+    # Collection
+    return bless \@results, 'Mojo::DOM::_Collection';
 }
 
 # It's not important to talk about who got rich off of whom,
@@ -680,6 +681,23 @@ sub _text {
     push @$$current, ['text', $text];
 }
 
+package Mojo::DOM::_Collection;
+
+sub each {
+    my ($self, $cb) = @_;
+
+    # Shortcut
+    return @$self unless $cb;
+
+    # Iterate
+    for my $e (@$self) {
+        $_ = $e;
+        $_->$cb;
+    }
+
+    return $self;
+}
+
 1;
 __END__
 
@@ -691,10 +709,16 @@ Mojo::DOM - Minimalistic XML DOM Parser With CSS3 Selectors
 
     use Mojo::DOM;
 
+    # Parse
     my $dom = Mojo::DOM->new;
     $dom->parse('<div><div id="a">A</div><div id="b">B</div></div>');
+
+    # Find
     my $b = $dom->at('#b');
     print $b->text;
+
+    # Iterate
+    $dom->search('div[id]')->each(sub { print $_->text });
 
 =head1 DESCRIPTION
 
@@ -835,6 +859,8 @@ Parse XML document.
     my $results = $dom->search('html title');
 
 Search for elements with CSS3 selectors.
+
+    $dom->search('div')->each(sub { print $_->text });
 
 =head2 C<text>
 

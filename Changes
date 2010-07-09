@@ -10,6 +10,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added multiple guides and improved documentation substantially.
         - Added finished callback support for HTTP transactions.
         - Added relative path support to Mojo::URL. (marcus)
+        - Added simple iterator support to Mojo::DOM.
         - Improved Mojo::Client error logging.
         - Improved Mojo::Template error messages.
         - Improved generated multipart messages to be 2 bytes shorter.

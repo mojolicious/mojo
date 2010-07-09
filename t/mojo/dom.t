@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 57;
+use Test::More tests => 58;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -18,6 +18,9 @@ my $dom = Mojo::DOM->new;
 # Simple (basics)
 $dom->parse('<div><div id="a">A</div><div id="b">B</div></div>');
 is($dom->at('#b')->text, 'B', 'right text');
+my @div;
+$dom->search('div[id]')->each(sub { push @div, shift->text });
+is_deeply(\@div, [qw/A B/], 'found all div elements with id');
 
 # Simple nesting (tree structure)
 $dom->parse(<<EOF);

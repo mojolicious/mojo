@@ -715,7 +715,7 @@ Mojo::DOM - Minimalistic XML DOM Parser With CSS3 Selectors
     print $b->text;
 
     # Iterate
-    $dom->search('div[id]')->each(sub { print $_->text });
+    $dom->search('div[id]')->each(sub { print shift->text });
 
 =head1 DESCRIPTION
 
@@ -857,7 +857,7 @@ Parse XML document.
 
 Search for elements with CSS3 selectors.
 
-    $dom->search('div')->each(sub { print $_->text });
+    $dom->search('div')->each(sub { print shift->text });
 
 =head2 C<text>
 

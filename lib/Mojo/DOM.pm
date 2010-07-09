@@ -690,10 +690,7 @@ sub each {
     return @$self unless $cb;
 
     # Iterate
-    for my $e (@$self) {
-        $_ = $e;
-        $_->$cb;
-    }
+    $_->$cb for @$self;
 
     return $self;
 }

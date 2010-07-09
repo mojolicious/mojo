@@ -82,6 +82,9 @@ sub render {
     $stash->{rendered} = 1;
     $stash->{content} ||= {};
 
+    # Partial
+    my $partial = delete $stash->{partial};
+
     # Template
     my $template = delete $stash->{template};
 
@@ -177,9 +180,11 @@ sub render {
     }
 
     # Encoding (JSON is already encoded)
-    my $encoding = $options->{encoding};
-    $output = b($output)->encode($encoding)->to_string
-      if $encoding && !$json && !$data;
+    unless ($partial) {
+        my $encoding = $options->{encoding};
+        $output = b($output)->encode($encoding)->to_string
+          if $encoding && !$json && !$data;
+    }
 
     # Type
     my $type = $self->types->type($format) || 'text/plain';

@@ -134,7 +134,7 @@ sub render {
     }
 
     # Partial
-    my $partial = delete $stash->{partial};
+    my $partial = $stash->{partial};
 
     # Render
     my ($output, $type) = $self->app->renderer->render($self);

@@ -697,7 +697,15 @@ sub each {
     # Iterate
     $_->$cb for @$self;
 
-    return $self;
+    # Find root
+    return unless my $start = $self->[0];
+    my $root = $start->tree;
+    while ($root->[0] eq 'tag') {
+        last unless my $parent = $root->[3];
+        $root = $parent;
+    }
+
+    return $start->new(tree => $root);
 }
 
 1;

@@ -134,15 +134,12 @@ my $p = $dom->search('body > #container > div p[id]');
 is($p->[0]->attributes->{id}, 'foo', 'right id attribute');
 is($p->[1],                   undef, 'no second result');
 my @p;
-$dom->search('p')->each(sub { push @p, $_->attributes->{id} });
-is_deeply(\@p, [qw/foo bar/], 'found all p elements');
 @div = ();
-$dom->search('div')->each(sub { push @div, $_->attributes->{id} });
-is_deeply(
-    \@div,
-    [qw/container header content logo buttons buttons/],
-    'found all div elements'
-);
+$dom->search('div')->each(sub { push @div, $_->attributes->{id} })
+  ->search('p')->each(sub { push @p, $_->attributes->{id} });
+is_deeply(\@p, [qw/foo bar/], 'found all p elements');
+my $ids = [qw/container header content logo buttons buttons/];
+is_deeply(\@div, $ids, 'found all div elements');
 
 # Script tag
 $dom->parse(<<EOF);

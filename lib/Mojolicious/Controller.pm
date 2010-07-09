@@ -133,8 +133,40 @@ sub render {
         elsif (my $name = $stash->{route}) { $self->stash(template => $name) }
     }
 
+    # Partial
+    my $partial = delete $stash->{partial};
+
     # Render
-    return $self->app->renderer->render($self);
+    my ($output, $type) = $self->app->renderer->render($self);
+
+    # Failed
+    return unless defined $output;
+
+    # Partial
+    return $output if $partial;
+
+    # Response
+    my $res = $self->res;
+
+    # Request
+    my $req = $self->req;
+
+    # Status
+    unless ($res->code) {
+        $req->has_error
+          ? $res->code(($req->error)[1])
+          : $res->code($stash->{status} || 200);
+    }
+
+    # Output
+    $res->body($output) unless $res->body;
+
+    # Type
+    my $headers = $res->headers;
+    $headers->content_type($type) unless $headers->content_type;
+
+    # Success
+    return 1;
 }
 
 sub render_data {

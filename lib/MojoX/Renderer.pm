@@ -15,7 +15,6 @@ use MojoX::Types;
 
 __PACKAGE__->attr(default_format => 'html');
 __PACKAGE__->attr([qw/default_handler default_template_class/]);
-__PACKAGE__->attr(default_status   => 200);
 __PACKAGE__->attr(detect_templates => 1);
 __PACKAGE__->attr(encoding         => 'UTF-8');
 __PACKAGE__->attr(handler          => sub { {} });
@@ -82,9 +81,6 @@ sub render {
     my $stash = $c->stash;
     $stash->{rendered} = 1;
     $stash->{content} ||= {};
-
-    # Partial
-    my $partial = delete $stash->{partial};
 
     # Template
     my $template = delete $stash->{template};
@@ -180,30 +176,15 @@ sub render {
         $self->_render_template($c, \$output, $options);
     }
 
-    # Partial
-    return $output if $partial;
-
     # Encoding (JSON is already encoded)
     my $encoding = $options->{encoding};
     $output = b($output)->encode($encoding)->to_string
       if $encoding && !$json && !$data;
 
-    # Response
-    my $res = $c->res;
-    my $req = $c->req;
-    unless ($res->code) {
-        $req->has_error
-          ? $res->code(($req->error)[1])
-          : $res->code($c->stash('status') || $self->default_status);
-    }
-    $res->body($output) unless $res->body;
-
     # Type
     my $type = $self->types->type($format) || 'text/plain';
-    $res->headers->content_type($type) unless $res->headers->content_type;
 
-    # Success!
-    return 1;
+    return ($output, $type);
 }
 
 sub template_name {
@@ -405,13 +386,6 @@ C<Embedded Perl> handled by L<Mojolicious::Plugin::EpRenderer>.
 
 =back
 
-=head2 C<default_status>
-
-    my $default = $renderer->default_status;
-    $renderer   = $renderer->default_status(404);
-
-The default status to set when rendering content, defaults to C<200>.
-
 =head2 C<default_template_class>
 
     my $default = $renderer->default_template_class;
@@ -510,10 +484,7 @@ Get an inline template by name, usually used by handlers.
 
 =head2 C<render>
 
-    my $success = $renderer->render($c);
-
-    $c->stash->{partial} = 1;
-    my $output = $renderer->render($c);
+    my ($output, $type) = $renderer->render($c);
 
 Render output through one of the Mojo renderers.
 This renderer requires some configuration, at the very least you will need to

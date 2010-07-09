@@ -26,26 +26,31 @@ $r->add_handler(
 $c->stash->{format} = 'something';
 
 # Normal rendering
-$c->stash->{partial}  = 1;
 $c->stash->{template} = 'something';
 $c->stash->{handler}  = 'debug';
-is($r->render($c), 'Hello Mojo!', 'normal rendering');
+is_deeply([$r->render($c)], ['Hello Mojo!', 'text/plain'],
+    'normal rendering');
 
 # Normal rendering with layout
-$c->stash->{partial}  = 1;
 $c->stash->{template} = 'something';
 $c->stash->{layout}   = 'something';
 $c->stash->{handler}  = 'debug';
-is($r->render($c), 'Hello Mojo!Hello Mojo!', 'normal rendering with layout');
+is_deeply(
+    [$r->render($c)],
+    ['Hello Mojo!Hello Mojo!', 'text/plain'],
+    'normal rendering with layout'
+);
 is(delete $c->stash->{layout}, 'something');
 
 # Rendering a path with dots
-$c->stash->{partial}  = 1;
 $c->stash->{template} = 'some.path.with.dots/template';
 $c->stash->{handler}  = 'debug';
-is($r->render($c), 'Hello Mojo!', 'rendering a path with dots');
+is_deeply(
+    [$r->render($c)],
+    ['Hello Mojo!', 'text/plain'],
+    'rendering a path with dots'
+);
 
 # Unrecognized handler
-$c->stash->{partial} = 1;
 $c->stash->{handler} = 'not_defined';
 is($r->render($c), undef, 'return undef for unrecognized handler');

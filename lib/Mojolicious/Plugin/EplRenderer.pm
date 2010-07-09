@@ -53,9 +53,7 @@ sub register {
 
                 # No template
                 else {
-                    $c->app->log->error(
-                        qq/Template "$t" missing or not readable./);
-                    $c->render_not_found;
+                    $c->render_not_found($t);
                     return;
                 }
 
@@ -67,7 +65,6 @@ sub register {
             if (ref $$output) {
                 my $e = $$output;
                 $$output = '';
-                $c->app->log->error(qq/Template error in "$t": $e/);
                 $c->render_exception($e);
             }
 

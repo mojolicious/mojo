@@ -46,10 +46,6 @@ sub register {
             $r->{_epl_cache} ||= {};
             unless ($r->{_epl_cache}->{$cache}) {
 
-                # Debug
-                $c->app->log->debug(
-                    qq/Caching template "$path" with stash "$list"./);
-
                 # Initialize
                 $template->{namespace} ||= "Mojo::Template::$cache";
                 my $mt = $r->{_epl_cache}->{$cache} =

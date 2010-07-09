@@ -11,6 +11,9 @@ use base 'Mojo::Base';
 # If we don't go back there and make that event happen,
 # the entire universe will be destroyed...
 # And as an environmentalist, I'm against that.
+sub render_exception { }
+sub render_not_found { }
+
 sub stash {
     my $self = shift;
 
@@ -51,6 +54,18 @@ L<MojoX::Controller> is an abstract controllers base class.
 
 L<MojoX::Controller> inherits all methods from L<Mojo::Base> and implements
 the following new ones.
+
+=head2 C<render_exception>
+
+    $c->render_exception($e);
+
+Turn exception into output.
+
+=head2 C<render_not_found>
+
+    $c->render_not_found;
+
+Default output.
 
 =head2 C<stash>
 

@@ -188,6 +188,9 @@ sub render_exception {
     # Exception
     $e = Mojo::Exception->new($e) unless ref $e;
 
+    # Error
+    $self->app->log->error($e);
+
     # Resume for exceptions
     $self->resume if $self->tx->is_paused;
 
@@ -235,7 +238,10 @@ sub render_json {
 }
 
 sub render_not_found {
-    my $self = shift;
+    my ($self, $resource) = @_;
+
+    # Debug
+    $self->app->log->debug(qq/Resource "$resource" not found./) if $resource;
 
     # Render not found template
     my $options = {
@@ -503,6 +509,7 @@ Render a data structure as JSON.
 =head2 C<render_not_found>
 
     $c->render_not_found;
+    $c->render_not_found($resource);
     
 Render the not found template C<not_found.html.$handler>.
 Also sets the response status code to C<404>, will fall back to rendering a

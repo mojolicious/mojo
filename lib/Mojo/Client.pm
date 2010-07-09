@@ -1237,6 +1237,12 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
     my $home = 'http://mojolicious.org';
     print $client->get($home)->success->dom->at('title')->text;
 
+    # Scrape the latest headlines from a news site
+    my $news = 'http://digg.com';
+    $client->get($news)->success->dom->search("h3 > a.offsite")->each(sub {
+        print shift->text . "\n";
+    });
+
     # Form post with exception handling
     my $cpan   = 'http://search.cpan.org/search';
     my $search = {q => 'mojo'};

@@ -98,6 +98,19 @@ sub is_secure {
     return;
 }
 
+sub is_xhr {
+    my $self = shift;
+
+    # No ajax
+    return unless my $with = $self->headers->header('X-Requested-With');
+
+    # Ajax
+    return 1 if $with =~ /XMLHttpRequest/i;
+
+    # No ajax
+    return;
+}
+
 sub param {
     my $self = shift;
     $self->{_params} = $self->params unless $self->{_params};
@@ -486,6 +499,12 @@ Make sure message has all required headers for the current HTTP version.
     my $secure = $req->is_secure;
 
 Check if connection is secure.
+
+=head2 C<is_xhr>
+
+    my $xhr = $req->is_xhr;
+
+Check C<X-Requested-With> header for C<XMLHttpRequest> value.
 
 =head2 C<param>
 

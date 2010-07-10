@@ -16,7 +16,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 419;
+plan tests => 429;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -56,6 +56,13 @@ get '/' => 'root';
 get '/null/:null' => sub {
     my $self = shift;
     $self->render(text => $self->param('null'), layout => 'layout');
+};
+
+# GET /maybe/ajax
+get '/maybe/ajax' => sub {
+    my $self = shift;
+    return $self->render(text => 'is ajax') if $self->req->is_xhr;
+    $self->render(text => 'not ajax');
 };
 
 # GET /stream
@@ -486,6 +493,16 @@ $t->get_ok("http://sri:foo\@localhost:$port/stream")->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/^foobarsri\:foohttp:\/\/localhost\:\d+\/stream$/);
+
+# GET /maybe/ajax (not ajax)
+$t->get_ok('/maybe/ajax')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('not ajax');
+
+# GET /maybe/ajax (is ajax)
+$t->get_ok('/maybe/ajax', {'X-Requested-With' => 'XMLHttpRequest'})
+  ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('is ajax');
 
 # GET /finished (with finished callback)
 $t->get_ok('/finished')->status_is(200)

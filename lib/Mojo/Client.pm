@@ -998,7 +998,7 @@ sub _queue_or_process_tx {
 
     # Quick process
     if (!$cb && !$self->{_is_async}) {
-        $self->process($tx);
+        $self->process($tx, sub { $tx = $_[1] });
         return $tx;
     }
 

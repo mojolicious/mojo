@@ -41,6 +41,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed Test::Mojo::Server to be more portable. (afresh1)
         - Fixed url_for to not expose userinfo in absolute URLs.
         - Fixed path detection bug in generated scripts. (merlyn)
+        - Fixed a small redirect bug in Mojo::Client.
 
 0.999926 2010-06-07 00:00:00
         - Added version requirement for all optional dependencies.

@@ -13,7 +13,7 @@ use Test::More;
 plan skip_all =>
   'set TEST_CLIENT to enable this test (internet connection required!)'
   unless $ENV{TEST_CLIENT};
-plan tests => 82;
+plan tests => 88;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -176,6 +176,17 @@ is($code,    200,                     'right status');
 is($method2, 'GET',                   'right method');
 is($url2,    'http://www.google.com', 'right url');
 is($code2,   302,                     'right status');
+
+# Simple requests with redirect and no callback
+$client->max_redirects(3);
+$tx = $client->get('http://www.google.com');
+$client->max_redirects(0);
+is($tx->req->method,                'GET',                   'right method');
+is($tx->req->url,                   'http://www.google.de/', 'right url');
+is($tx->res->code,                  200,                     'right status');
+is($tx->previous->[0]->req->method, 'GET',                   'right method');
+is($tx->previous->[0]->req->url,    'http://www.google.com', 'right url');
+is($tx->previous->[0]->res->code,   302,                     'right status');
 
 # Custom chunked request without callback
 $tx = Mojo::Transaction::HTTP->new;

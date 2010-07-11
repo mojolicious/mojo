@@ -66,20 +66,11 @@ __DATA__
 use strict;
 use warnings;
 
-use Cwd 'getcwd';
+use File::Basename 'dirname';
 use File::Spec;
-use FindBin;
 
-use lib "$FindBin::Bin/lib";
-use lib "$FindBin::Bin/../lib";
-
-my $home;
-
-BEGIN {
-    $home = $ENV{MOJO_HOME};
-    $home = join '/', File::Spec->splitdir($home ? $home : getcwd), 'lib';
-}
-use lib $home;
+use lib join '/', File::Spec->splitdir(dirname(__FILE__)), 'lib';
+use lib join '/', File::Spec->splitdir(dirname(__FILE__)), '..', 'lib';
 
 # Check if Mojo is installed
 eval 'use Mojolicious::Commands';

@@ -30,8 +30,11 @@ sub register {
             my $elapsed = sprintf '%f',
               Time::HiRes::tv_interval($started,
                 [Time::HiRes::gettimeofday()]);
-            my $rps = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
-            $c->app->log->debug("Request took $elapsed seconds ($rps/s).");
+            my $rps     = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
+            my $res     = $c->res;
+            my $code    = $res->code;
+            my $message = $res->message || $res->default_message;
+            $c->app->log->debug("$code $message (${elapsed}s, $rps/s).");
         }
     );
 }

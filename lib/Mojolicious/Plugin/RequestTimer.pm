@@ -32,8 +32,8 @@ sub register {
                 [Time::HiRes::gettimeofday()]);
             my $rps     = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
             my $res     = $c->res;
-            my $code    = $res->code;
-            my $message = $res->message || $res->default_message;
+            my $code    = $res->code || 200;
+            my $message = $res->message || $res->default_message($code);
             $c->app->log->debug("$code $message (${elapsed}s, $rps/s).");
         }
     );

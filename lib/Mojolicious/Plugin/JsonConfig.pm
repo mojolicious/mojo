@@ -68,6 +68,19 @@ sub register {
     return $config;
 }
 
+sub _parse_config {
+    my ($self, $encoded, $name) = @_;
+
+    # Parse
+    my $json   = Mojo::JSON->new;
+    my $config = $json->decode($encoded);
+    my $error  = $json->error;
+    die qq/Couldn't parse config "$name": $error/ if !$config && $error;
+    die qq/Invalid config "$name"./ if !$config || ref $config ne 'HASH';
+
+    return $config;
+}
+
 sub _read_config {
     my ($self, $file, $template, $app) = @_;
 
@@ -79,6 +92,14 @@ sub _read_config {
       or die qq/Couldn't open config file "$file": $!/;
     my $encoded = do { local $/; <FILE> };
     close FILE;
+
+    # Process
+    $encoded = $self->_render_config($encoded, $template, $app);
+    return $self->_parse_config($encoded, $file, $app);
+}
+
+sub _render_config {
+    my ($self, $encoded, $template, $app) = @_;
 
     # Instance
     my $prepend = 'my $app = shift;';
@@ -98,14 +119,7 @@ sub _read_config {
     $encoded = $mt->render($encoded, $app);
     utf8::encode $encoded;
 
-    # Parse
-    my $json   = Mojo::JSON->new;
-    my $config = $json->decode($encoded);
-    my $error  = $json->error;
-    die qq/Couldn't parse config file "$file": $error/ if !$config && $error;
-    die qq/Invalid config file "$file"./ if !$config || ref $config ne 'HASH';
-
-    return $config;
+    return $encoded;
 }
 
 1;

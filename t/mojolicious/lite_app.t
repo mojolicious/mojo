@@ -489,7 +489,7 @@ $t->get_ok('/null/0')->status_is(200)
 
 # GET /stream (with basic auth)
 my $port = $t->client->test_server;
-$t->get_ok("http://sri:foo\@localhost:$port/stream")->status_is(200)
+$t->get_ok("http://sri:foo\@localhost:$port/stream?foo=bar")->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/^foobarsri\:foohttp:\/\/localhost\:\d+\/stream$/);

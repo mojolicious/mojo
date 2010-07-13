@@ -32,7 +32,7 @@ sub register {
         $file =~ s/(?:\.p(?:l|6))|\.t$//i;
 
         # Default extension
-        $file .= '.json';
+        $file .= '.' . ($conf->{ext} || 'json');
     }
 
     # Absolute path
@@ -165,6 +165,13 @@ The application object can be accessed via C<$app> or the C<app> helper.
 
     # Mojolicious::Lite
     plugin json_config => {default => {foo => 'bar'}};
+
+=head2 C<ext>
+
+    # Mojolicious::Lite
+    plugin json_config => {ext => 'json'};
+
+File extension of config file, defaults to C<json>.
 
 =head2 C<file>
 

@@ -43,8 +43,8 @@ my $twinkle = {
 plugin ep_renderer => {name => 'twinkle', template => $twinkle};
 plugin 'pod_renderer';
 plugin pod_renderer => {name => 'teapod', preprocess => 'twinkle'};
-my $config =
-  plugin json_config => {default => {foo => 'bar'}, template => $twinkle};
+my $config = plugin json_config =>
+  {default => {foo => 'bar'}, ext => 'conf', template => $twinkle};
 is($config->{foo},  'bar');
 is($config->{test}, 23);
 

@@ -28,7 +28,8 @@ Features
 
 * Powerful out of the box with RESTful routes, plugins, sessions, signed
   cookies, static file server, testing framework, Perl-ish templates, JSON,
-  I18N, first class Unicode support and much more for you to discover!
+  XML parser with CSS3 selectors, I18N, first class Unicode support and much
+  more for you to discover!
 
 Duct Tape For The HTML5 Web
 ---------------------------

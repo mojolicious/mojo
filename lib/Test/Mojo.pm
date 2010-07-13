@@ -9,6 +9,7 @@ use base 'Mojo::Base';
 
 use Mojo::ByteStream 'b';
 use Mojo::Client;
+use Mojo::Message::Response;
 
 require Test::More;
 
@@ -49,14 +50,15 @@ sub content_like {
 # Everybody wears white shirts.
 # I'm not popular enough to be different.
 sub content_type_is {
-    my ($self, $type, $desc) = @_;
+    my ($self, $type) = @_;
 
     # Transaction
     my $tx = $self->tx;
 
     # Test
     local $Test::Builder::Level = $Test::Builder::Level + 1;
-    Test::More::is($tx->res->headers->content_type, $type, $desc);
+    Test::More::is($tx->res->headers->content_type,
+        $type, "Content-Type: $type");
 
     return $self;
 }
@@ -93,14 +95,15 @@ sub get_ok  { shift->_request_ok('get',  @_) }
 sub head_ok { shift->_request_ok('head', @_) }
 
 sub header_is {
-    my ($self, $name, $value, $desc) = @_;
+    my ($self, $name, $value) = @_;
 
     # Transaction
     my $tx = $self->tx;
 
     # Test
     local $Test::Builder::Level = $Test::Builder::Level + 1;
-    Test::More::is($tx->res->headers->header($name), $value, $desc);
+    Test::More::is($tx->res->headers->header($name),
+        $value, "$name: " . ($value ? $value : ''));
 
     return $self;
 }
@@ -137,9 +140,11 @@ sub post_ok { shift->_request_ok('post', @_) }
 # Hey, I asked for ketchup! I'm eatin' salad here!
 sub post_form_ok {
     my $self = shift;
+    my $url  = $_[0];
 
     # Description
-    my $desc = ref $_[-1] ? undef : pop @_;
+    my $desc = "post $url";
+    utf8::encode $desc;
 
     # Client
     my $client = $self->client;
@@ -174,11 +179,15 @@ sub reset_session {
 
 # Internet! Is that thing still around?
 sub status_is {
-    my ($self, $status, $desc) = @_;
+    my ($self, $status) = @_;
+
+    # Description
+    my $message =
+      Mojo::Message::Response->new(code => $status)->default_message;
 
     # Test
     local $Test::Builder::Level = $Test::Builder::Level + 1;
-    Test::More::is($self->tx->res->code, $status, $desc);
+    Test::More::is($self->tx->res->code, $status, "$status $message");
 
     return $self;
 }
@@ -231,13 +240,14 @@ sub _get_content {
 
 # Are you sure this is the Sci-Fi Convention? It's full of nerds!
 sub _request_ok {
-    my ($self, $method, $url, $headers, $body, $desc) = @_;
+    my ($self, $method, $url, $headers, $body) = @_;
+
+    # Description
+    my $desc = "$method $url";
+    utf8::encode $desc;
 
     # Body without headers
-    if (!ref $headers && @_ > 3) {
-        $desc = $body;
-        $body = $headers;
-    }
+    $body = $headers if !ref $headers && @_ > 3;
     $headers = {} if !ref $headers;
 
     # Client
@@ -342,7 +352,6 @@ Check response content for similar match.
 =head2 C<content_type_is>
 
     $t = $t->content_type_is('text/html');
-    $t = $t->content_type_is('text/html', 'right content type!');
 
 Check response content type for exact match.
 
@@ -359,12 +368,6 @@ Check response content type for similar match.
     $t = $t->delete_ok('/foo', {Expect => '100-continue'});
     $t = $t->delete_ok('/foo', 'Hi there!');
     $t = $t->delete_ok('/foo', {Expect => '100-continue'}, 'Hi there!');
-    $t = $t->delete_ok(
-       '/foo',
-       {Expect => '100-continue'},
-       'Hi there!',
-       'request worked!'
-    );
 
 Perform a C<DELETE> request.
 
@@ -382,12 +385,6 @@ Note that this method is EXPERIMENTAL and might change without warning!
     $t = $t->get_ok('/foo', {Expect => '100-continue'});
     $t = $t->get_ok('/foo', 'Hi there!');
     $t = $t->get_ok('/foo', {Expect => '100-continue'}, 'Hi there!');
-    $t = $t->get_ok(
-        '/foo',
-        {Expect => '100-continue'},
-        'Hi there!',
-        'request worked!'
-    );
 
 Perform a C<GET> request.
 
@@ -397,19 +394,12 @@ Perform a C<GET> request.
     $t = $t->head_ok('/foo', {Expect => '100-continue'});
     $t = $t->head_ok('/foo', 'Hi there!');
     $t = $t->head_ok('/foo', {Expect => '100-continue'}, 'Hi there!');
-    $t = $t->head_ok(
-        '/foo',
-        {Expect => '100-continue'},
-        'Hi there!',
-        'request worked!'
-    );
 
 Perform a C<HEAD> request.
 
 =head2 C<header_is>
 
     $t = $t->header_is(Expect => '100-continue');
-    $t = $t->header_is(Expect => '100-continue', 'right header!');
 
 Check response header for exact match.
 
@@ -434,12 +424,6 @@ Check response content for JSON data.
     $t = $t->post_ok('/foo', 'Hi there!');
     $t = $t->post_ok('/foo', {Expect => '100-continue'}, 'Hi there!');
     $t = $t->post_ok('/foo', 'Hi there!', 'request worked!');
-    $t = $t->post_ok(
-        '/foo',
-        {Expect => '100-continue'},
-        'Hi there!',
-        'request worked!'
-    );
 
 Perform a C<POST> request.
 
@@ -478,12 +462,6 @@ Submit a C<POST> form.
     $t = $t->put_ok('/foo', {Expect => '100-continue'});
     $t = $t->put_ok('/foo', 'Hi there!');
     $t = $t->put_ok('/foo', {Expect => '100-continue'}, 'Hi there!');
-    $t = $t->put_ok(
-        '/foo',
-        {Expect => '100-continue'},
-        'Hi there!',
-        'request worked!'
-    );
 
 Perform a C<PUT> request.
 
@@ -496,7 +474,6 @@ Reset user agent session.
 =head2 C<status_is>
 
     $t = $t->status_is(200);
-    $t = $t->status_is(200, 'right status!');
 
 Check response status for exact match.
 

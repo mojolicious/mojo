@@ -49,17 +49,19 @@ my $t = Test::Mojo->new;
 
 # German (detected)
 $t->get_ok('/' => {'Accept-Language' => 'de, en-US'})->status_is(200)
-  ->content_is("hallode\n");
+  ->content_is("hallode\n", 'right content');
 
 # English (detected)
 $t->get_ok('/' => {'Accept-Language' => 'en-US'})->status_is(200)
-  ->content_is("helloen\n");
+  ->content_is("helloen\n", 'right content');
 
 # English (manual)
-$t->get_ok('/english')->status_is(200)->content_is("helloen\n");
+$t->get_ok('/english')->status_is(200)
+  ->content_is("helloen\n", 'right content');
 
 # German (manual)
-$t->get_ok('/german')->status_is(200)->content_is("hallode\n");
+$t->get_ok('/german')->status_is(200)
+  ->content_is("hallode\n", 'right content');
 
 __DATA__
 @@ index.html.ep

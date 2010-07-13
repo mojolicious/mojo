@@ -87,4 +87,4 @@ is_deeply(
     {bar => 'baz', world => 'hello', lalala => 23},
     'right structure'
 );
-is($ENV{MOJO_HELLO}, 'world');
+is($ENV{MOJO_HELLO}, 'world', 'finished callback');

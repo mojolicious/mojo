@@ -83,7 +83,7 @@ $client->websocket(
         $self->send_message('test1');
     }
 )->process;
-is($result, 'test1test2');
+is($result, 'test1test2', 'right result');
 
 # WebSocket /early_start (server directly sends a message)
 my $flag2;
@@ -102,8 +102,8 @@ $client->websocket(
         );
     }
 )->process;
-is($result, 'test3test2');
-is($flag2,  23);
+is($result, 'test3test2', 'right result');
+is($flag2,  23,           'finished callback');
 
 # WebSocket /dead (dies)
 my ($websocket, $code, $message);
@@ -115,9 +115,9 @@ $client->websocket(
         $message   = $self->res->message;
     }
 )->process;
-is($websocket, 0);
-is($code,      500);
-is($message,   'Internal Server Error');
+is($websocket, 0,                       'no websocket');
+is($code,      500,                     'right status');
+is($message,   'Internal Server Error', 'right message');
 
 # WebSocket /foo (forbidden)
 ($websocket, $code, $message) = undef;
@@ -129,9 +129,9 @@ $client->websocket(
         $message   = $self->res->message;
     }
 )->process;
-is($websocket, 0);
-is($code,      403);
-is($message,   "i'm a teapot");
+is($websocket, 0,              'no websocket');
+is($code,      403,            'right status');
+is($message,   "i'm a teapot", 'right message');
 
 # WebSocket /deadcallback (dies in callback)
 $client->websocket(
@@ -142,4 +142,4 @@ $client->websocket(
 )->process;
 
 # Server side "finished" callback
-is($flag, 24);
+is($flag, 24, 'finished callback');

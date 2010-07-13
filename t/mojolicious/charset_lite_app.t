@@ -72,51 +72,58 @@ my $t = Test::Mojo->new;
 
 # Plain old ASCII
 $t->post_form_ok('/', {foo => 'yatta'})->status_is(200)
-  ->content_is('foo: yatta');
+  ->content_is('foo: yatta', 'right content');
 
 # Send raw Shift_JIS octets (like browsers do)
 $t->post_form_ok('/', '', {foo => $yatta_sjis})->status_is(200)
-  ->content_type_like(qr/Shift_JIS/)->content_like(qr/$yatta/);
+  ->content_type_like(qr/Shift_JIS/, 'right "Content-Type" value')
+  ->content_like(qr/$yatta/, 'right content');
 
 # Send raw Shift_JIS octets (like browsers do, multipart message)
 $t->post_form_ok(
     '/', '',
     {foo            => $yatta_sjis},
     {'Content-Type' => 'multipart/form-data'}
-  )->status_is(200)->content_type_like(qr/Shift_JIS/)
-  ->content_like(qr/$yatta/);
+  )->status_is(200)
+  ->content_type_like(qr/Shift_JIS/, 'right "Content-Type" value')
+  ->content_like(qr/$yatta/, 'right content');
 
 # Send as string
 $t->post_form_ok('/', 'shift_jis', {foo => $yatta})->status_is(200)
-  ->content_type_like(qr/Shift_JIS/)->content_like(qr/$yatta/);
+  ->content_type_like(qr/Shift_JIS/, 'right "Content-Type" value')
+  ->content_like(qr/$yatta/, 'right content');
 
 # Send as string (multipart message)
 $t->post_form_ok(
     '/', 'shift_jis',
     {foo            => $yatta},
     {'Content-Type' => 'multipart/form-data'}
-  )->status_is(200)->content_type_like(qr/Shift_JIS/)
-  ->content_like(qr/$yatta/);
+  )->status_is(200)
+  ->content_type_like(qr/Shift_JIS/, 'right "Content-Type" value')
+  ->content_like(qr/$yatta/, 'right content');
 
 # Unicode renderer
 $t->get_ok('/unicode')->status_is(200)->content_type_is('text/plain')
-  ->content_is(b($yatta)->encode('UTF-8')->to_string);
+  ->content_is(b($yatta)->encode('UTF-8')->to_string, 'right content');
 
 # Templates in the DATA section should be written in UTF-8,
 # and those in separate files in Shift_JIS (Mojo will do the decoding)
-$t->get_ok('/')->status_is(200)->content_type_like(qr/Shift_JIS/)
-  ->content_like(qr/$yatta/);
+$t->get_ok('/')->status_is(200)
+  ->content_type_like(qr/Shift_JIS/, 'right "Content-Type" value')
+  ->content_like(qr/$yatta/, 'right content');
 
 # Send and receive raw Shift_JIS octets (like browsers do)
-$t->post_ok('/data', $yatta_sjis)->status_is(200)->content_is($yatta_sjis);
+$t->post_ok('/data', $yatta_sjis)->status_is(200)
+  ->content_is($yatta_sjis, 'right content');
 
 # JSON data
 $t->get_ok('/json')->status_is(200)->content_type_is('application/json')
-  ->json_content_is({test => $yatta});
+  ->json_content_is({test => $yatta}, 'right content');
 
 # IRI
 $t->get_ok('/привет/мир')->status_is(200)
-  ->content_type_is('application/json')->json_content_is({foo => $yatta});
+  ->content_type_is('application/json')
+  ->json_content_is({foo => $yatta}, 'right content');
 
 __DATA__
 @@ index.html.ep

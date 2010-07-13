@@ -51,10 +51,12 @@ get '/custom' => sub { shift->render_text('does not work') };
 my $t = Test::Mojo->new;
 
 # GET /
-$t->get_ok('/')->status_is(200)->content_is('works');
+$t->get_ok('/')->status_is(200)->content_is('works', 'right content');
 
 # GET /custom
-$t->get_ok('/custom?a=works+too')->status_is(205)->content_is('works too');
+$t->get_ok('/custom?a=works+too')->status_is(205)
+  ->content_is('works too', 'right content');
 
 # GET /custom_too
-$t->get_ok('/custom_too')->status_is(200)->content_is('this works too');
+$t->get_ok('/custom_too')->status_is(200)
+  ->content_is('this works too', 'right content');

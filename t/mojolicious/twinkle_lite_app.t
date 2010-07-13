@@ -45,8 +45,8 @@ plugin 'pod_renderer';
 plugin pod_renderer => {name => 'teapod', preprocess => 'twinkle'};
 my $config = plugin json_config =>
   {default => {foo => 'bar'}, ext => 'conf', template => $twinkle};
-is($config->{foo},  'bar');
-is($config->{test}, 23);
+is($config->{foo},  'bar', 'right value');
+is($config->{test}, 23,    'right value');
 
 # GET /
 get '/' => {name => '<sebastian>'} => 'index';
@@ -66,20 +66,24 @@ get '/docs3' => sub { shift->stash(codename => undef) } => 'docs';
 my $t = Test::Mojo->new;
 
 # GET /
-$t->get_ok('/')->status_is(200)->content_like(qr/testHello <sebastian>!123/);
+$t->get_ok('/')->status_is(200)
+  ->content_like(qr/testHello <sebastian>!123/, 'right content');
 
 # GET /advanced
 $t->get_ok('/advanced')->status_is(200)
-  ->content_is('&lt;escape me&gt;123423');
+  ->content_is('&lt;escape me&gt;123423', 'right content');
 
 # GET /docs
-$t->get_ok('/docs')->status_is(200)->content_like(qr/<h3>snowman<\/h3>/);
+$t->get_ok('/docs')->status_is(200)
+  ->content_like(qr/<h3>snowman<\/h3>/, 'right content');
 
 # GET /docs2
-$t->get_ok('/docs2')->status_is(200)->content_like(qr/<h2>snowman<\/h2>/);
+$t->get_ok('/docs2')->status_is(200)
+  ->content_like(qr/<h2>snowman<\/h2>/, 'right content');
 
 # GET /docs3
-$t->get_ok('/docs3')->status_is(200)->content_like(qr/<h3><\/h3>/);
+$t->get_ok('/docs3')->status_is(200)
+  ->content_like(qr/<h3><\/h3>/, 'right content');
 
 __DATA__
 @@ index.html.twinkle

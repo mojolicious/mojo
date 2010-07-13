@@ -42,17 +42,20 @@ my $t = Test::Mojo->new;
 my $file = Mojo::Asset::File->new->add_chunk('lalala');
 $t->post_form_ok('/upload',
     {file => {file => $file, filename => 'x'}, test => 'tset'})
-  ->status_is(200)->content_is('xlalalatsetapplication/octet-stream');
+  ->status_is(200)
+  ->content_is('xlalalatsetapplication/octet-stream', 'right content');
 
 # POST /upload (path)
 $t->post_form_ok('/upload', {file => {file => $file->path}, test => 'foo'})
-  ->status_is(200)->content_like(qr/lalalafooapplication\/octet-stream$/);
+  ->status_is(200)
+  ->content_like(qr/lalalafooapplication\/octet-stream$/, 'right content');
 
 # POST /upload (memory)
 $t->post_form_ok('/upload', {file => {content => 'alalal'}, test => 'tset'})
-  ->status_is(200)->content_is('filealalaltsetapplication/octet-stream');
+  ->status_is(200)
+  ->content_is('filealalaltsetapplication/octet-stream', 'right content');
 
 # POST /upload (memory with headers)
 my $hash = {content => 'alalal', 'Content-Type' => 'foo/bar', 'X-X' => 'Y'};
 $t->post_form_ok('/upload', {file => $hash, test => 'tset'})->status_is(200)
-  ->content_is('filealalaltsetfoo/barY');
+  ->content_is('filealalaltsetfoo/barY', 'right content');

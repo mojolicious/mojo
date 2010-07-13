@@ -286,11 +286,16 @@ sub _generate_method {
     return unless $method;
 
     # Shortcut for hidden methods
-    return if $self->{_hidden}->{$method};
-    return if index($method, '_') == 0;
+    if ($self->{_hidden}->{$method} || index($method, '_') == 0) {
+        $c->app->log->debug(qq/Action "$method" is not allowed./);
+        return;
+    }
 
     # Invalid
-    return unless $method =~ /^[a-zA-Z0-9_:]+$/;
+    unless ($method =~ /^[a-zA-Z0-9_:]+$/) {
+        $c->app->log->debug(qq/Action "$method" is invalid./);
+        return;
+    }
 
     return $method;
 }

@@ -36,109 +36,114 @@ my $t = Test::Mojo->new(app => 'MojoliciousTest');
 $t->get_ok('/syntax_error/foo')->status_is(500)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/Missing right curly/);
+  ->content_like(qr/Missing right curly/, 'right content');
 
 # Foo::exceptionduringpausedtransaction
 # (syntax error in controller during paused transaction)
 $t->get_ok('/foo/exceptionduringpausedtransaction')->status_is(500)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/Exception/);
+  ->content_like(qr/Exception/, 'right content');
 
 # Foo::syntaxerror (syntax error in template)
 $t->get_ok('/foo/syntaxerror')->status_is(500)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/^Missing right curly/);
+  ->content_like(qr/^Missing right curly/, 'right content');
 
 # Foo::badtemplate (template missing)
 $t->get_ok('/foo/badtemplate')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/File Not Found/);
+  ->content_like(qr/File Not Found/, 'right content');
 
 # Foo::test
 $t->get_ok('/foo/test', {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender'     => 'Bite my shiny metal ass!')
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/\/bar\/test/);
+  ->content_like(qr/\/bar\/test/, 'right content');
 
 # Foo::index
 $t->get_ok('/foo', {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/<body>\s+23Hello Mojo from the template \/foo! He/);
+  ->content_like(qr/<body>\s+23Hello Mojo from the template \/foo! He/,
+    'right content');
 
 # Foo::Bar::index
 $t->get_ok('/foo-bar', {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/Hello Mojo from the other template \/foo-bar!/);
+  ->content_like(qr/Hello Mojo from the other template \/foo-bar!/,
+    'right content');
 
 # Foo::something
 $t->get_ok('/somethingtest', {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('/test4/42');
+  ->content_is('/test4/42', 'right content');
 
 # Foo::url_for_missing
 $t->get_ok('/something_missing', {'X-Test' => 'Hi there!'})->status_is(500)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(
-    qr/Route "something_missing" used in url_for does not exist/);
+  ->content_like(qr/Route "something_missing" used in url_for does not exist/,
+    'right content');
 
 # Foo::templateless
 $t->get_ok('/foo/templateless', {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/Hello Mojo from a templateless renderer!/);
+  ->content_like(qr/Hello Mojo from a templateless renderer!/,
+    'right content');
 
 # Foo::withlayout
 $t->get_ok('/foo/withlayout', {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/Same old in green Seems to work!/);
+  ->content_like(qr/Same old in green Seems to work!/, 'right content');
 
 # Foo::withblock
 $t->get_ok('/foo/withblock.txt', {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/plain')
-  ->content_like(qr/Hello Baerbel\.\s+Hello Wolfgang\./);
+  ->content_like(qr/Hello Baerbel\.\s+Hello Wolfgang\./, 'right content');
 
 # MojoliciousTest2::Foo::test
 $t->get_ok('/test2', {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender'     => 'Bite my shiny metal ass!')
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/\/test2/);
+  ->content_like(qr/\/test2/, 'right content');
 
 # MojoliciousTestController::index
 $t->get_ok('/test3', {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender'     => 'Bite my shiny metal ass!')
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/No class works!/);
+  ->content_like(qr/No class works!/, 'right content');
 
 # MojoliciousTestController::index (only namespace)
 $t->get_ok('/test5', {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender'     => 'Bite my shiny metal ass!')
   ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('/test5');
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('/test5', 'right content');
 
 # MojoliciousTestController::index (no namespace)
 $t->get_ok('/test6', {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender'     => 'Bite my shiny metal ass!')
   ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('/test6');
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('/test6', 'right content');
 
 # 404
 $t->get_ok('/', {'X-Test' => 'Hi there!'})->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/File Not Found/);
+  ->content_like(qr/File Not Found/, 'right content');
 
 # Check Last-Modified header for static files
 my $path  = File::Spec->catdir($FindBin::Bin, 'public_dev', 'hello.txt');
@@ -151,27 +156,29 @@ $t->get_ok('/hello.txt')->status_is(200)
   ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
   ->header_is('Last-Modified'  => $mtime)
   ->header_is('Content-Length' => $stat->size)->content_type_is('text/plain')
-  ->content_like(qr/Hello Mojo from a development static file!/);
+  ->content_like(qr/Hello Mojo from a development static file!/,
+    'right content');
 
 # Try to access a file which is not under the web root via path
 # traversal
 $t->get_ok('../../mojolicious/secret.txt')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/File Not Found/);
+  ->content_like(qr/File Not Found/, 'right content');
 
 # Check If-Modified-Since
 $t->get_ok('/hello.txt', {'If-Modified-Since' => $mtime})->status_is(304)
   ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('');
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('', 'right content');
 
 # Check develpment mode log level
 my $app = Mojolicious->new;
-is($app->log->level, 'debug');
+is($app->log->level, 'debug', 'right log level');
 
 # Make sure we can override attributes with constructor arguments
 $app = MojoliciousTest->new({mode => 'test'});
-is($app->mode, 'test');
+is($app->mode, 'test', 'right mode');
 
 # Persistent error
 $app = MojoliciousTest->new;
@@ -179,51 +186,60 @@ my $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/foo');
 $app->handler($tx);
-is($tx->res->code, 200);
-like($tx->res->body, qr/Hello Mojo from the template \/foo! Hello World!/);
+is($tx->res->code, 200, 'right status');
+like(
+    $tx->res->body,
+    qr/Hello Mojo from the template \/foo! Hello World!/,
+    'right content'
+);
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/foo/willdie');
 $app->handler($tx);
-is($tx->res->code, 500);
-like($tx->res->body, qr/Foo\.pm/);
+is($tx->res->code, 500, 'right status');
+like($tx->res->body, qr/Foo\.pm/, 'right content');
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/foo');
 $app->handler($tx);
-is($tx->res->code, 200);
-like($tx->res->body, qr/Hello Mojo from the template \/foo! Hello World!/);
+is($tx->res->code, 200, 'right status');
+like(
+    $tx->res->body,
+    qr/Hello Mojo from the template \/foo! Hello World!/,
+    'right content'
+);
 
 $t = Test::Mojo->new(app => 'SingleFileTestApp');
 
 # SingleFileTestApp::Foo::index
 $t->get_ok('/foo')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/Same old in green Seems to work!/);
+  ->content_like(qr/Same old in green Seems to work!/, 'right content');
 
 # SingleFileTestApp::Foo::data_template
 $t->get_ok('/foo/data_template')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("23 works!\n");
+  ->content_is("23 works!\n", 'right content');
 
 # SingleFileTestApp::Foo::data_template
 $t->get_ok('/foo/data_template2')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("This one works too!\n");
+  ->content_is("This one works too!\n", 'right content');
 
 # SingleFileTestApp::Foo::bar
 $t->get_ok('/foo/bar')->status_is(200)
   ->header_is('X-Bender'     => 'Bite my shiny metal ass!')
   ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('/foo/bar');
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('/foo/bar', 'right content');
 
 # SingleFileTestApp::Baz::does_not_exist
 $t->get_ok('/baz/does_not_exist')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/File Not Found/);
+  ->content_like(qr/File Not Found/, 'right content');
 
 $t = Test::Mojo->new(app => 'MojoliciousTest');
 
@@ -231,34 +247,41 @@ $t = Test::Mojo->new(app => 'MojoliciousTest');
 $t->get_ok('/staged', {'X-Pass' => '1'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('Welcome aboard!');
+  ->content_is('Welcome aboard!', 'right content');
 
 # MojoliciousTestController::Foo::stage1
 $t->get_ok('/staged')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('Go away!');
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('Go away!', 'right content');
 
 # MojoliciousTest::Foo::config
 $t->get_ok('/stash_config')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('123');
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('123', 'right content');
 
 # Shortcuts to controller#action
 $t->get_ok('/shortcut/ctrl-act')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('ctrl-act');
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('ctrl-act', 'right content');
 $t->get_ok('/shortcut/ctrl')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('ctrl');
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('ctrl', 'right content');
 $t->get_ok('/shortcut/act')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('act');
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('act', 'right content');
 
 # Session with domain
-$t->get_ok('/foo/session')->status_is(200)
-  ->header_like('Set-Cookie' => qr/; Domain=\.example\.com/)
-  ->content_is('Bender rockzzz!');
+$t->get_ok('/foo/session')->status_is(200)->header_like(
+    'Set-Cookie' => qr/; Domain=\.example\.com/,
+    'right "Set-Cookie" value'
+)->content_is('Bender rockzzz!', 'right content');
 
 # Mixed formats
 $t->get_ok('/rss.xml')->status_is(200)->content_type_is('application/rss+xml')
-  ->content_is(qq/<?xml version="1.0" encoding="UTF-8"?><rss \/>\n/)
+  ->content_is(qq/<?xml version="1.0" encoding="UTF-8"?><rss \/>\n/,
+    'right content')

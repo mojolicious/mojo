@@ -515,8 +515,8 @@ $req->headers->origin('http://example.com');
 $req->body('^n:ds[4U');
 is( $req->build,
     "GET /demo HTTP/1.1\x0d\x0a"
-      . "Connection: Upgrade\x0d\x0a"
       . "Upgrade: WebSocket\x0d\x0a"
+      . "Connection: Upgrade\x0d\x0a"
       . "Host: example.com\x0d\x0a"
       . "Content-Length: 8\x0d\x0a"
       . "Origin: http://example.com\x0d\x0a"
@@ -1493,10 +1493,10 @@ $res->headers->sec_websocket_location('ws://example.com/demo');
 $res->headers->sec_websocket_protocol('sample');
 $res->body('8jKS\'y:G*Co,Wxa-');
 is( $res->build,
-    "HTTP/1.1 101 WebSocket Protocol Handshake\x0d\x0a"
+    "HTTP/1.1 101 Web Socket Protocol Handshake\x0d\x0a"
+      . "Upgrade: WebSocket\x0d\x0a"
       . "Connection: Upgrade\x0d\x0a"
       . "Date: Sun, 17 Aug 2008 16:27:35 GMT\x0d\x0a"
-      . "Upgrade: WebSocket\x0d\x0a"
       . "Content-Length: 16\x0d\x0a"
       . "Sec-WebSocket-Origin: http://example.com\x0d\x0a"
       . "Sec-WebSocket-Location: ws://example.com/demo\x0d\x0a"

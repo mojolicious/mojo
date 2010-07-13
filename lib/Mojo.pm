@@ -39,18 +39,29 @@ __PACKAGE__->attr(
             $res->headers->upgrade('WebSocket');
             $res->headers->connection('Upgrade');
             my $scheme = $req->url->to_abs->scheme eq 'https' ? 'wss' : 'ws';
-            $res->headers->sec_websocket_origin($req->headers->origin);
-            $res->headers->sec_websocket_location(
-                $tx->req->url->to_abs->scheme($scheme)->to_string);
-            $res->headers->sec_websocket_protocol(
-                $req->headers->sec_websocket_protocol);
-            $res->body(
-                $self->client->websocket_challenge(
-                    scalar $req->headers->sec_websocket_key1,
-                    scalar $req->headers->sec_websocket_key2,
-                    $req->body
-                )
-            );
+            my $location = $tx->req->url->to_abs->scheme($scheme)->to_string;
+            my $origin   = $req->headers->origin;
+
+            # draft 76 WebSocket support
+            if ($req->headers->sec_websocket_key1) {
+                $res->headers->sec_websocket_origin($origin);
+                $res->headers->sec_websocket_location($location);
+                $res->headers->sec_websocket_protocol(
+                    $req->headers->sec_websocket_protocol);
+                $res->body(
+                    $self->client->websocket_challenge(
+                        scalar $req->headers->sec_websocket_key1,
+                        scalar $req->headers->sec_websocket_key2,
+                        $req->body
+                    )
+                );
+            }
+
+            # DEPRECATED!!! draft 75 WebSocket support
+            else {
+                $res->headers->header('WebSocket-Origin',   $origin);
+                $res->headers->header('WebSocket-Location', $location);
+            }
 
             # WebSocket transaction
             return Mojo::Transaction::WebSocket->new(handshake => $tx);

@@ -35,6 +35,7 @@ This file documents the revision history for Perl extension Mojolicious.
           MojoX::Dispatcher::Routes. (DaTa)
         - Fixed route rendering bug. (koban)
         - Fixed route without namespace bug.
+        - Fixed route with mixed format bug. (sharifulin)
         - Fixed small url_for bug.
         - Fixed Mojo::IOLoop to not connect to TLS hosts without checking TLS
           support first. (ashleydev)

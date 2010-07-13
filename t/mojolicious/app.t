@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 178;
+plan tests => 182;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -258,3 +258,7 @@ $t->get_ok('/shortcut/act')->status_is(200)
 $t->get_ok('/foo/session')->status_is(200)
   ->header_like('Set-Cookie' => qr/; Domain=\.example\.com/)
   ->content_is('Bender rockzzz!');
+
+# Mixed formats
+$t->get_ok('/rss.xml')->status_is(200)->content_type_is('application/rss+xml')
+  ->content_is(qq/<?xml version="1.0" encoding="UTF-8"?><rss \/>\n/)

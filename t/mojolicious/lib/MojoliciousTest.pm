@@ -100,6 +100,9 @@ sub startup {
     # /foo/session - session cookie with domain
     $r->route('/foo/session')->to('foo#session_domain');
 
+    # /rss.xml - mixed formats
+    $r->route('/rss.xml')->to('foo#bar', format => 'rss');
+
     # /*/* - the default route
     $r->route('/(controller)/(action)')->to(action => 'index');
 }

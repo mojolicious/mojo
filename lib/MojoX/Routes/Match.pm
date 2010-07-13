@@ -86,7 +86,7 @@ sub match {
             $self->{_path} = '';
         }
     }
-    $self->captures->{format} = $r->pattern->format if $r->pattern->format;
+    $self->captures->{format} ||= $r->pattern->format if $r->pattern->format;
 
     # Update stack
     push @{$self->stack}, $captures

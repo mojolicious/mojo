@@ -1308,6 +1308,9 @@ and servers.
 Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::INET6> and
 L<IO::Socket::SSL> are supported transparently and used if installed.
 
+A TLS certificate and key are also built right in to make writing test
+servers as easy as possible.
+
 =head1 ATTRIBUTES
 
 L<Mojo::IOLoop> implements the following attributes.
@@ -1574,11 +1577,11 @@ Enable TLS.
 
 =item C<tls_cert>
 
-Path to the TLS cert file.
+Path to the TLS cert file, defaulting to a built in test certificate.
 
 =item C<tls_key>
 
-Path to the TLS key file.
+Path to the TLS key file, defaulting to a built in test key.
 
 =item C<write_cb>
 

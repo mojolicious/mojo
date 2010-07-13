@@ -33,7 +33,7 @@ Note that L<IO::Socket::SSL> must be installed for TLS support.
 =head2 C<MOJO_CHUNK_SIZE>
 
 Chunk size used for IO operations in bytes, a bigger chunk size speeds up IO
-operations but will also use more memory.
+operations but will also use more memory, defaults to C<8192>.
 
     MOJO_CHUNK_SIZE=1024
 

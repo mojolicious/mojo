@@ -8,9 +8,7 @@ use warnings;
 use base 'Mojolicious::Plugin';
 
 use I18N::LangTags;
-
-# Core module since Perl 5.8.5
-use constant DETECT => eval { require I18N::LangTags::Detect; 1 };
+use I18N::LangTags::Detect;
 
 # Can we have Bender burgers again?
 # No, the cat shelter’s onto me.
@@ -40,7 +38,7 @@ sub register {
                 I18N::LangTags::Detect->http_accept_langs(
                     scalar $c->req->headers->accept_language
                 )
-            ) if DETECT;
+            );
 
             # Handler
             $c->stash->{i18n} =

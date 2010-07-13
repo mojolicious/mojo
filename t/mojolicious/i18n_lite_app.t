@@ -14,8 +14,6 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan skip_all => 'Perl 5.8.5 required for this test!'
-  unless eval { require I18N::LangTags::Detect; 1 };
 plan tests => 12;
 
 # Aw, he looks like a little insane drunken angel.

@@ -42,7 +42,7 @@ __PACKAGE__->attr(
             my $location = $tx->req->url->to_abs->scheme($scheme)->to_string;
             my $origin   = $req->headers->origin;
 
-            # draft 76 WebSocket support
+            # Draft 76 WebSocket support
             if ($req->headers->sec_websocket_key1) {
                 $res->headers->sec_websocket_origin($origin);
                 $res->headers->sec_websocket_location($location);
@@ -57,7 +57,7 @@ __PACKAGE__->attr(
                 );
             }
 
-            # DEPRECATED!!! draft 75 WebSocket support
+            # DEPRECATED!!! Draft 75 WebSocket support
             else {
                 $res->headers->header('WebSocket-Origin',   $origin);
                 $res->headers->header('WebSocket-Location', $location);

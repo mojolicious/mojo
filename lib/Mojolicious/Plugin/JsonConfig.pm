@@ -169,7 +169,7 @@ The application object can be accessed via C<$app> or the C<app> helper.
 =head2 C<ext>
 
     # Mojolicious::Lite
-    plugin json_config => {ext => 'json'};
+    plugin json_config => {ext => 'conf'};
 
 File extension of config file, defaults to C<json>.
 

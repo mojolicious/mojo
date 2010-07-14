@@ -66,24 +66,20 @@ get '/docs3' => sub { shift->stash(codename => undef) } => 'docs';
 my $t = Test::Mojo->new;
 
 # GET /
-$t->get_ok('/')->status_is(200)
-  ->content_like(qr/testHello <sebastian>!123/, 'right content');
+$t->get_ok('/')->status_is(200)->content_like(qr/testHello <sebastian>!123/);
 
 # GET /advanced
 $t->get_ok('/advanced')->status_is(200)
-  ->content_is('&lt;escape me&gt;123423', 'right content');
+  ->content_is('&lt;escape me&gt;123423');
 
 # GET /docs
-$t->get_ok('/docs')->status_is(200)
-  ->content_like(qr/<h3>snowman<\/h3>/, 'right content');
+$t->get_ok('/docs')->status_is(200)->content_like(qr/<h3>snowman<\/h3>/);
 
 # GET /docs2
-$t->get_ok('/docs2')->status_is(200)
-  ->content_like(qr/<h2>snowman<\/h2>/, 'right content');
+$t->get_ok('/docs2')->status_is(200)->content_like(qr/<h2>snowman<\/h2>/);
 
 # GET /docs3
-$t->get_ok('/docs3')->status_is(200)
-  ->content_like(qr/<h3><\/h3>/, 'right content');
+$t->get_ok('/docs3')->status_is(200)->content_like(qr/<h3><\/h3>/);
 
 __DATA__
 @@ index.html.twinkle

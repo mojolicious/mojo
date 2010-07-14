@@ -125,29 +125,26 @@ get('/just' => {name => 'working'})->detour('EmbeddedTestApp');
 my $t = Test::Mojo->new;
 
 # GET /foo/bar (plugin app)
-$t->get_ok('/foo/bar')->status_is(200)
-  ->content_is('plugin works!', 'right content');
+$t->get_ok('/foo/bar')->status_is(200)->content_is('plugin works!');
 
 # GET /hello (from main app)
 $t->get_ok('/hello')->status_is(200)
-  ->content_is("Hello from the main app!\n", 'right content');
+  ->content_is("Hello from the main app!\n");
 
 # GET /hello/hello (from embedded app)
 $t->get_ok('/hello/hello')->status_is(200)
-  ->content_is('Hello from the embedded app!', 'right content');
+  ->content_is('Hello from the embedded app!');
 
 # GET /bye/bye (from embedded app)
 $t->get_ok('/bye/bye')->status_is(200)
-  ->content_is('Hello from the embedded app!second embedded! success!',
-    'right content');
+  ->content_is('Hello from the embedded app!second embedded! success!');
 
 # GET /third/ (from embedded app)
 $t->get_ok('/third')->status_is(200)
-  ->content_is('Bye from the third embedded app! /third!', 'right content');
+  ->content_is('Bye from the third embedded app! /third!');
 
 # GET /just/works (from external embedded app)
-$t->get_ok('/just/works')->status_is(200)
-  ->content_is("It is working!\n", 'right content');
+$t->get_ok('/just/works')->status_is(200)->content_is("It is working!\n");
 
 __DATA__
 @@ works.html.ep

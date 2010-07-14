@@ -24,7 +24,7 @@ use_ok('Mojo::Server::FastCGI');
 
 # Setup
 my $server = Test::Mojo::Server->new;
-my $port   = $server->generate_port_ok('found free port');
+my $port   = $server->generate_port_ok;
 my $dir    = File::Temp::tempdir(CLEANUP => 1);
 my $config = File::Spec->catfile($dir, 'fcgi.config');
 my $mt     = Mojo::Template->new;
@@ -75,7 +75,7 @@ EOF
 
 # Start
 $server->command(['/usr/sbin/httpd', '-X', '-f', $config]);
-$server->start_server_ok('server started');
+$server->start_server_ok;
 
 # Request
 my $client = Mojo::Client->new;
@@ -88,4 +88,4 @@ $client->get(
 )->process;
 
 # Stop
-$server->stop_server_ok('server stopped');
+$server->stop_server_ok;

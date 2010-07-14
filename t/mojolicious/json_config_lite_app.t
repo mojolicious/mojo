@@ -39,7 +39,7 @@ get '/' => 'index';
 my $t = Test::Mojo->new;
 
 # GET /
-$t->get_ok('/')->status_is(200)->content_like(qr/bar/, 'right content');
+$t->get_ok('/')->status_is(200)->content_like(qr/bar/);
 
 # No config file, default only
 $config =

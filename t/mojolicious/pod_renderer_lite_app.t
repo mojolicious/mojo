@@ -46,18 +46,15 @@ my $t = Test::Mojo->new;
 
 # Simple POD template
 $t->get_ok('/')->status_is(200)
-  ->content_like(qr/<h1>Test123<\/h1>\s+<p>It <code>works<\/code>!<\/p>/,
-    'right content');
+  ->content_like(qr/<h1>Test123<\/h1>\s+<p>It <code>works<\/code>!<\/p>/);
 
 # POD helper
 $t->post_ok('/')->status_is(200)
-  ->content_like(qr/test123\s+<h1>lalala<\/h1>\s+<p><code>test<\/code><\/p>/,
-    'right content');
+  ->content_like(qr/test123\s+<h1>lalala<\/h1>\s+<p><code>test<\/code><\/p>/);
 
 # POD filter
 $t->post_ok('/block')->status_is(200)
-  ->content_like(qr/test321\s+<h2>lalala<\/h2>\s+<p><code>test<\/code><\/p>/,
-    'right content');
+  ->content_like(qr/test321\s+<h2>lalala<\/h2>\s+<p><code>test<\/code><\/p>/);
 
 __DATA__
 

@@ -27,7 +27,7 @@ is($daemon->max_clients, $max + 10, 'right max clients value');
 
 # Start
 my $server = Test::Mojo::Server->new;
-$server->start_daemon_ok('server started');
+$server->start_daemon_ok;
 my $port   = $server->port;
 my $client = Mojo::Client->new;
 
@@ -148,4 +148,4 @@ like($tx2->res->content->asset->slurp, qr/Mojo is working/, 'right content');
 is($tx3->res->content->asset->slurp, 'foo12', 'right content');
 
 # Stop
-$server->stop_server_ok('server stopped');
+$server->stop_server_ok;

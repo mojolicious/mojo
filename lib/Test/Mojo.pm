@@ -23,6 +23,9 @@ __PACKAGE__->attr(max_redirects => 0);
 sub content_is {
     my ($self, $value, $desc) = @_;
 
+    # Description
+    $desc ||= 'exact match for content';
+
     # Transaction
     my $tx = $self->tx;
 
@@ -35,6 +38,9 @@ sub content_is {
 
 sub content_like {
     my ($self, $regex, $desc) = @_;
+
+    # Description
+    $desc ||= 'content is similar';
 
     # Transaction
     my $tx = $self->tx;
@@ -66,6 +72,9 @@ sub content_type_is {
 sub content_type_like {
     my ($self, $regex, $desc) = @_;
 
+    # Description
+    $desc ||= 'Content-Type is similar';
+
     # Transaction
     my $tx = $self->tx;
 
@@ -83,6 +92,9 @@ sub delete_ok { shift->_request_ok('delete', @_) }
 
 sub element_exists {
     my ($self, $selector, $desc) = @_;
+
+    # Description
+    $desc ||= $selector;
 
     # Test
     local $Test::Builder::Level = $Test::Builder::Level + 1;
@@ -111,6 +123,9 @@ sub header_is {
 sub header_like {
     my ($self, $name, $regex, $desc) = @_;
 
+    # Description
+    $desc ||= "$name is similar";
+
     # Transaction
     my $tx = $self->tx;
 
@@ -123,6 +138,9 @@ sub header_like {
 
 sub json_content_is {
     my ($self, $struct, $desc) = @_;
+
+    # Description
+    $desc ||= 'exact match for JSON structure';
 
     # Transaction
     my $tx = $self->tx;
@@ -195,6 +213,9 @@ sub status_is {
 sub text_is {
     my ($self, $selector, $value, $desc) = @_;
 
+    # Description
+    $desc ||= $selector;
+
     # Text
     my $text;
     if (my $element = $self->tx->res->dom->at($selector)) {
@@ -210,6 +231,9 @@ sub text_is {
 
 sub text_like {
     my ($self, $selector, $regex, $desc) = @_;
+
+    # Description
+    $desc ||= $selector;
 
     # Text
     my $text;

@@ -205,14 +205,13 @@ C<action>, but you can generally fill it with whatever data you need to
 generate a response.
 Once dispatched the whole stash content can be changed at any time.
 
-    # Some action
     sub bye {
         my $self = shift;
 
-        # Access message
+        # Get message from stash
         my $message = $self->stash('mymessage');
 
-        # Change message
+        # Change message in stash
         $self->stash(mymessage => 'Welcome!');
     }
 

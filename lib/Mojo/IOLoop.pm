@@ -323,18 +323,6 @@ sub listen {
     my $fd = fileno $socket;
     $self->{_fds}->{$fd} = $id;
 
-    # Loop
-    my $loop = $self->_prepare_loop;
-
-    # KQueue
-    if (KQUEUE) { $loop->EV_SET(fileno $socket, KQUEUE_READ, KQUEUE_ADD) }
-
-    # Epoll
-    elsif (EPOLL) { $loop->mask($socket, EPOLL_POLLIN) }
-
-    # Poll
-    else { $loop->mask($socket, POLLIN) }
-
     return $id;
 }
 
@@ -414,6 +402,25 @@ sub one_tick {
     # Loop
     my $loop = $self->_prepare_loop;
 
+    # Listen
+    unless ($self->{_listening}) {
+        for my $l (values %{$self->{_listen}}) {
+            my $socket = $l->{socket};
+
+            # KQueue
+            if (KQUEUE) {
+                $loop->EV_SET(fileno $socket, KQUEUE_READ, KQUEUE_ADD);
+            }
+
+            # Epoll
+            elsif (EPOLL) { $loop->mask($socket, EPOLL_POLLIN) }
+
+            # Poll
+            else { $loop->mask($socket, POLLIN) }
+        }
+        $self->{_listening} = 1;
+    }
+
     # Events
     my (@error, @hup, @read, @write);
 
@@ -422,8 +429,8 @@ sub one_tick {
 
         # Catch interrupted system call errors
         my @ret;
-        eval { @ret = $loop->kevent(1000 * $timeout) };
-        die "KQueue error: $@" if $@;
+        my $success = eval { @ret = $loop->kevent(1000 * $timeout); 1 };
+        die "KQueue error: $@" if !$success && $@;
 
         # Events
         for my $kev (@ret) {

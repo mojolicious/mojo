@@ -412,7 +412,7 @@ sub one_tick {
     $self->_prepare_connections;
 
     # Loop
-    my $loop = $self->{_loop};
+    my $loop = $self->_prepare_loop;
 
     # Events
     my (@error, @hup, @read, @write);
@@ -571,7 +571,7 @@ sub start_tls {
 
     # Cleanup
     my $writing = delete $c->{writing};
-    my $loop    = $self->{_loop};
+    my $loop    = $self->_prepare_loop;
     if (KQUEUE) {
         $loop->EV_SET($fd, KQUEUE_READ,  KQUEUE_DELETE) if defined $writing;
         $loop->EV_SET($fd, KQUEUE_WRITE, KQUEUE_DELETE) if $writing;
@@ -751,7 +751,7 @@ sub _drop_immediately {
         delete $self->{_fds}->{$fd};
 
         # Remove socket from kqueue
-        if (my $loop = $self->{_loop}) {
+        if (my $loop = $self->_prepare_loop) {
             if (KQUEUE) {
 
                 # Writing

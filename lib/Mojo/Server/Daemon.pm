@@ -8,7 +8,6 @@ use warnings;
 use base 'Mojo::Server';
 
 use Carp 'croak';
-use Fcntl ':flock';
 use File::Spec;
 use IO::File;
 use Mojo::Command;
@@ -18,14 +17,7 @@ use Scalar::Util 'weaken';
 __PACKAGE__->attr(
     [qw/group listen listen_queue_size max_requests silent user/]);
 __PACKAGE__->attr(ioloop => sub { Mojo::IOLoop->singleton });
-__PACKAGE__->attr(keep_alive_timeout => 15);
-__PACKAGE__->attr(
-    lock_file => sub {
-        my $self = shift;
-        return File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
-            Mojo::Command->class_to_file(ref $self->app) . '.lock');
-    }
-);
+__PACKAGE__->attr(keep_alive_timeout      => 15);
 __PACKAGE__->attr(max_clients             => 1000);
 __PACKAGE__->attr(max_keep_alive_requests => 100);
 __PACKAGE__->attr(
@@ -52,18 +44,6 @@ sub DESTROY {
     for my $id (@$listen) { $loop->drop($id) }
 }
 
-sub accept_lock {
-    my ($self, $blocking) = @_;
-
-    # Lock
-    my $flags = $blocking ? LOCK_EX : LOCK_EX | LOCK_NB;
-    my $lock = flock($self->{_lock}, $flags);
-
-    return $lock;
-}
-
-sub accept_unlock { flock(shift->{_lock}, LOCK_UN) }
-
 sub prepare_ioloop {
     my $self = shift;
 
@@ -79,24 +59,6 @@ sub prepare_ioloop {
 
     # Max clients
     $loop->max_connections($self->max_clients);
-}
-
-sub prepare_lock_file {
-    my $self = shift;
-
-    return unless my $file = $self->lock_file;
-
-    # Create lock file
-    my $fh = IO::File->new("> $file")
-      or croak qq/Can't open lock file "$file"/;
-    $self->{_lock} = $fh;
-
-    # Lock callback
-    my $loop = $self->ioloop;
-    $loop->lock_cb(sub { $self->accept_lock($_[1]) });
-
-    # Unlock callback
-    $loop->unlock_cb(sub { $self->accept_unlock });
 }
 
 sub prepare_pid_file {
@@ -147,9 +109,6 @@ sub run {
 
     # Prepare PID file
     $self->prepare_pid_file;
-
-    # Prepare lock file
-    $self->prepare_lock_file;
 
     # Start loop
     $self->ioloop->start;
@@ -526,13 +485,6 @@ Ports and files to listen on, defaults to C<http://*:3000>.
 
 Listen queue size, defaults to C<SOMAXCONN>.
 
-=head2 C<lock_file>
-
-    my $lock_file = $daemon->lock_file;
-    $daemon       = $daemon->lock_file('/tmp/mojo_daemon.lock');
-
-Path to lock file, defaults to a random temporary file.
-
 =head2 C<max_clients>
 
     my $max_clients = $daemon->max_clients;
@@ -588,29 +540,11 @@ Timeout in seconds for WebSockets to be idle, defaults to C<300>.
 L<Mojo::Server::Daemon> inherits all methods from L<Mojo::Server> and
 implements the following new ones.
 
-=head2 C<accept_lock>
-
-    my $lock = $daemon->accept_lock($blocking);
-
-Try to get the accept lock.
-
-=head2 C<accept_unlock>
-
-    $daemon->accept_unlock;
-
-Free the accept lock.
-
 =head2 C<prepare_ioloop>
 
     $daemon->prepare_ioloop;
 
 Prepare event loop.
-
-=head2 C<prepare_lock_file>
-
-    $daemon->prepare_lock_file;
-
-Prepare the lock file.
 
 =head2 C<prepare_pid_file>
 

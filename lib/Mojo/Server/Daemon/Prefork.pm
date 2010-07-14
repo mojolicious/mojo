@@ -39,21 +39,6 @@ use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 8192;
 # Lisa, tell your mother to get off my case.
 # Uhhh, dad, Lisa's the one you're not talking to.
 # Bart, go to your room.
-sub accept_lock {
-    my ($self, $blocking) = @_;
-
-    # Idle
-    $self->child_status('idle') if $blocking;
-
-    # Lock
-    my $lock = $self->SUPER::accept_lock($blocking);
-
-    # Busy
-    $self->child_status('busy') if $lock;
-
-    return $lock;
-}
-
 sub child { shift->ioloop->start }
 
 sub child_status {
@@ -286,9 +271,6 @@ sub _spawn_child {
     # Child
     else {
 
-        # Prepare environment
-        $self->prepare_lock_file;
-
         # Signal handlers
         $SIG{HUP} = $SIG{INT} = $SIG{TERM} = sub { exit 0 };
         $SIG{CHLD} = 'DEFAULT';
@@ -417,12 +399,6 @@ Number of workers to spawn at server startup, defaults to C<5>.
 
 L<Mojo::Server::Daemon::Prefork> inherits all methods from
 L<Mojo::Server::Daemon> and implements the following new ones.
-
-=head2 C<accept_lock>
-
-    my $lock = $daemon->accept_lock($blocking);
-
-Try to get the accept lock.
 
 =head2 C<child>
 

@@ -98,13 +98,8 @@ EOF
 
 __PACKAGE__->attr([qw/idle_cb tick_cb/]);
 __PACKAGE__->attr([qw/accept_timeout connect_timeout/] => 5);
-__PACKAGE__->attr(
-    [qw/lock_cb unlock_cb/] => sub {
-        sub {1}
-    }
-);
-__PACKAGE__->attr(max_connections => 1000);
-__PACKAGE__->attr(timeout         => '0.25');
+__PACKAGE__->attr(max_connections                      => 1000);
+__PACKAGE__->attr(timeout                              => '0.25');
 
 # Singleton
 our $LOOP;
@@ -661,9 +656,6 @@ sub _accept {
     # Accept
     my $socket = $listen->accept or return;
 
-    # Unlock callback
-    $self->unlock_cb->($self);
-
     # Listen
     my $l = $self->{_listen}->{$listen};
 
@@ -961,9 +953,6 @@ sub _prepare_listen {
     # Connections
     my $i = keys %{$self->{_cs}};
     return unless $i < $self->max_connections;
-
-    # Lock
-    return unless $self->lock_cb->($self, !$i);
 
     # Add listen sockets
     for my $lid (keys %$listen) {
@@ -1339,23 +1328,6 @@ dropped, defaults to C<5>.
 Callback to be invoked on every reactor tick if no events occurred.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
-=head2 C<lock_cb>
-
-    my $cb = $loop->lock_cb;
-    $loop  = $loop->lock_cb(sub {...});
-
-A locking callback that decides if this loop is allowed to listen for new
-incoming connections, used to sync multiple server processes.
-The callback should return true or false.
-Note that exceptions in this callback are not captured.
-
-    $loop->lock_cb(sub {
-        my ($loop, $blocking) = @_;
-
-        # Got the lock, listen for new connections
-        return 1;
-    });
-
 =head2 C<max_connections>
 
     my $max = $loop->max_connections;
@@ -1389,15 +1361,6 @@ responsiveness.
 Maximum time in seconds our loop waits for new events to happen, defaults to
 C<0.25>.
 Note that a value of C<0> would make the loop non blocking.
-
-=head2 C<unlock_cb>
-
-    my $cb = $loop->unlock_cb;
-    $loop  = $loop->unlock_cb(sub {...});
-
-A callback to free the listen lock, called after accepting a new connection
-and used to sync multiple server processes.
-Note that exceptions in this callback are not captured.
 
 =head1 METHODS
 

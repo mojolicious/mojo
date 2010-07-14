@@ -18,6 +18,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved Mojo::Template error messages.
         - Improved generated multipart messages to be 2 bytes shorter.
           (John Kingsley)
+        - Fixed Mojo::DOM to support escaped selectors.
         - Fixed json/data rendering with layouts in MojoX::Renderer.
         - Fixed Mojo::IOLoop to not stop unexpectedly.
         - Fixed graceful shutdown in Mojo::Server::Daemon::Prefork.

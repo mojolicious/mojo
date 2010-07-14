@@ -19,11 +19,11 @@ __PACKAGE__->attr(tree => sub { ['root'] });
 # Regex
 my $CSS_ATTR_RE = qr/
     \[
-    (\w+)       # Key
+    (\w+)               # Key
     (?:
-    (\W)?       # Operator
+    (\W)?               # Operator
     =
-    "([^"]+)"   # Value
+    "((?:[^"]|\\")+)"   # Value
     )?
     \]
 /x;
@@ -32,13 +32,13 @@ my $CSS_ELEMENT_RE      = qr/^([^\.\#]+)/;
 my $CSS_ID_RE           = qr/\#([^\#]+)/;
 my $CSS_PSEUDO_CLASS_RE = qr/(?:\:(\w+)(?:\(([^\)]+)\))?)/;
 my $CSS_TOKEN_RE        = qr/
-    (\s*,\s*)?                        # Separator
-    ([\w\.\*\#]+)?                    # Element
-    ((?:\:\w+(?:\([^\)]+\))?)*)?      # Pseudo Class
-    ((?:\[\w+(?:\W?="[^"]+")?\])*)?   # Attributes
+    (\s*,\s*)?                                               # Separator
+    ((?:[\w\.\*\#]|\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}\s?)+)?  # Element
+    ((?:\:\w+(?:\([^\)]+\))?)*)?                             # Pseudo Class
+    ((?:\[\w+(?:\W?="(?:[^"]|\\")+")?\])*)?                  # Attributes
     (?:
     \s*
-    ([\>\+\~])                        # Combinator
+    ([\>\+\~])                                               # Combinator
     )?
 /x;
 my $XML_ATTR_RE = qr/
@@ -278,6 +278,21 @@ sub _compare {
     return 1;
 }
 
+sub _css_unescape {
+    my ($self, $value) = @_;
+
+    # Remove escaped newlines
+    $value =~ s/\\\n//g;
+
+    # Unescape unicode characters
+    $value =~ s/\\([0-9a-fA-F]{1,6})\s?/pack('U', hex $1)/gex;
+
+    # Remove backslash
+    $value =~ s/\\//g;
+
+    return $value;
+}
+
 sub _doctype {
     my ($self, $doctype, $current) = @_;
 
@@ -415,12 +430,15 @@ sub _parse_css {
 
         # Classes
         while ($element =~ /$CSS_CLASS_RE/g) {
-            push @$selector, ['attribute', 'class', qr/(?:^|\W+)$1(?:\W+|$)/];
+            my $class = $self->_css_unescape($1);
+            push @$selector,
+              ['attribute', 'class', qr/(?:^|\W+)$class(?:\W+|$)/];
         }
 
         # ID
         if ($element =~ /$CSS_ID_RE/) {
-            push @$selector, ['attribute', 'id', qr/^$1$/];
+            my $id = $self->_css_unescape($1);
+            push @$selector, ['attribute', 'id', qr/^$id$/];
         }
 
         # Pseudo classes
@@ -441,7 +459,7 @@ sub _parse_css {
             if ($value) {
 
                 # Quote
-                $value = quotemeta $value;
+                $value = quotemeta $self->_css_unescape($value);
 
                 # "^=" (begins with)
                 if ($op eq '^') { $regex = qr/^$value/ }

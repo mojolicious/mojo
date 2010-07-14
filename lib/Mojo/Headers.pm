@@ -255,19 +255,13 @@ sub parse {
     my $buffer = $self->buffer;
     my $headers = $self->{_buffer} || [];
     $self->state('headers') if $self->is_state('start');
-    while (1) {
-
-        # Line
-        my $line = $buffer->get_line;
-        last unless defined $line;
+    while (defined(my $line = $buffer->get_line)) {
 
         # New header
         if ($line =~ /^(\S+)\s*:\s*(.*)/) { push @$headers, $1, $2 }
 
         # Multiline
-        elsif (@$headers && $line =~ s/^\s+//) {
-            $headers->[-1] .= " " . $line;
-        }
+        elsif (@$headers && $line =~ s/^\s+//) { $headers->[-1] .= " $line" }
 
         # Empty line
         else {

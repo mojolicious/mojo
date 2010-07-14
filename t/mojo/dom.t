@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 81;
+use Test::More tests => 96;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -167,7 +167,7 @@ is($dom->at('.tset')->text,       'works', 'right text');
 $dom->charset(undef)->parse('<div id="sno&quot;wman">☃</div>');
 is($dom->at('[id="sno\"wman"]')->text, '☃', 'right text');
 
-# Unicode and escaped id selectors
+# Unicode and escaped selectors
 $dom->parse(
     qq/<p><div id="☃x">Snowman<\/div><div class="x ♥">Heart<\/div><\/p>/);
 is($dom->at("#\\\n\\002603x")->text,               'Snowman', 'right text');
@@ -182,6 +182,13 @@ is($dom->at("p #\\\n\\2603 x")->text,              'Snowman', 'right text');
 is($dom->at(qq/p [id="\\\n\\2603 x"]/)->text,      'Snowman', 'right text');
 is($dom->at(qq/p [id="\\\n\\002603x"]/)->text,     'Snowman', 'right text');
 is($dom->at(qq/p [id="\\\\2603 x"]/)->text,        'Snowman', 'right text');
+is($dom->at('#☃x')->text,                        'Snowman', 'right text');
+is($dom->at('div#☃x')->text,                     'Snowman', 'right text');
+is($dom->at('p div#☃x')->text,                   'Snowman', 'right text');
+is($dom->at('[id^="☃"]')->text,                  'Snowman', 'right text');
+is($dom->at('div[id^="☃"]')->text,               'Snowman', 'right text');
+is($dom->at('p div[id^="☃"]')->text,             'Snowman', 'right text');
+is($dom->at('p > div[id^="☃"]')->text,           'Snowman', 'right text');
 is($dom->at(".\\\n\\002665")->text,                'Heart',   'right text');
 is($dom->at('.\\2665')->text,                      'Heart',   'right text');
 is($dom->at("p .\\\n\\002665")->text,              'Heart',   'right text');
@@ -192,3 +199,11 @@ is($dom->at(qq/[class\$="\\\n\\002665"]/)->text,   'Heart',   'right text');
 is($dom->at(qq/[class\$="\\2665"]/)->text,         'Heart',   'right text');
 is($dom->at('.x')->text,                           'Heart',   'right text');
 is($dom->at('p .x')->text,                         'Heart',   'right text');
+is($dom->at('.♥')->text,                         'Heart',   'right text');
+is($dom->at('p .♥')->text,                       'Heart',   'right text');
+is($dom->at('div.♥')->text,                      'Heart',   'right text');
+is($dom->at('p div.♥')->text,                    'Heart',   'right text');
+is($dom->at('[class$="♥"]')->text,               'Heart',   'right text');
+is($dom->at('div[class$="♥"]')->text,            'Heart',   'right text');
+is($dom->at('p div[class$="♥"]')->text,          'Heart',   'right text');
+is($dom->at('p > div[class$="♥"]')->text,        'Heart',   'right text');

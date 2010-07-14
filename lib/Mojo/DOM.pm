@@ -32,13 +32,13 @@ my $CSS_ELEMENT_RE      = qr/^([^\.\#]+)/;
 my $CSS_ID_RE           = qr/\#([^\#]+)/;
 my $CSS_PSEUDO_CLASS_RE = qr/(?:\:(\w+)(?:\(([^\)]+)\))?)/;
 my $CSS_TOKEN_RE        = qr/
-    (\s*,\s*)?                                               # Separator
-    ((?:[\w\.\*\#]|\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}\s?)+)?  # Element
-    ((?:\:\w+(?:\([^\)]+\))?)*)?                             # Pseudo Class
-    ((?:\[\w+(?:\W?="(?:[^"]|\\")+")?\])*)?                  # Attributes
+    (\s*,\s*)?                                                # Separator
+    ((?:[^\[\\\:\s]|\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}\s?)+)?  # Element
+    ((?:\:\w+(?:\([^\)]+\))?)*)?                              # Pseudo Class
+    ((?:\[\w+(?:\W?="(?:[^"]|\\")+")?\])*)?                   # Attributes
     (?:
     \s*
-    ([\>\+\~])                                               # Combinator
+    ([\>\+\~])                                                # Combinator
     )?
 /x;
 my $XML_ATTR_RE = qr/

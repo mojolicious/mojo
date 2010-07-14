@@ -323,6 +323,18 @@ sub listen {
     my $fd = fileno $socket;
     $self->{_fds}->{$fd} = $id;
 
+    # Loop
+    my $loop = $self->_prepare_loop;
+
+    # KQueue
+    if (KQUEUE) { $loop->EV_SET(fileno $socket, KQUEUE_READ, KQUEUE_ADD) }
+
+    # Epoll
+    elsif (EPOLL) { $loop->mask($socket, EPOLL_POLLIN) }
+
+    # Poll
+    else { $loop->mask($socket, POLLIN) }
+
     return $id;
 }
 
@@ -395,9 +407,6 @@ sub one_tick {
 
     # Timeout
     $timeout = $self->timeout unless defined $timeout;
-
-    # Prepare listen sockets
-    $self->_prepare_listen;
 
     # Prepare connections
     $self->_prepare_connections;
@@ -693,24 +702,6 @@ sub _accept {
     # Accept callback
     my $cb = $l->{accept_cb};
     $self->_run_event('accept', $cb, $id) if $cb;
-
-    # Remove listen sockets
-    $listen = $self->{_listen} || {};
-    my $loop = $self->{_loop};
-    for my $lid (keys %$listen) {
-        my $socket = $listen->{$lid}->{socket};
-
-        # Remove listen socket from kqueue
-        if (KQUEUE) {
-            $loop->EV_SET(fileno $socket, KQUEUE_READ, KQUEUE_DELETE);
-        }
-
-        # Remove listen socket from poll or epoll
-        else { $loop->remove($socket) }
-    }
-
-    # Not listening anymore
-    delete $self->{_listening};
 }
 
 sub _activity {
@@ -750,14 +741,7 @@ sub _drop_immediately {
     my $c = delete $self->{_cs}->{$id};
 
     # Drop listen socket
-    if (!$c && ($c = delete $self->{_listen}->{$id})) {
-
-        # Not listening
-        return $self unless $self->{_listening};
-
-        # Not listening anymore
-        delete $self->{_listening};
-    }
+    return if delete $self->{_listen}->{$id} && !$c;
 
     # Drop socket
     if (my $socket = $c->{socket}) {
@@ -935,41 +919,6 @@ sub _prepare_key {
     print $file KEY;
 
     return $self->{_key} = $key;
-}
-
-sub _prepare_listen {
-    my $self = shift;
-
-    # Loop
-    my $loop = $self->_prepare_loop;
-
-    # Already listening
-    return if $self->{_listening};
-
-    # Listen sockets
-    my $listen = $self->{_listen} ||= {};
-    return unless keys %$listen;
-
-    # Connections
-    my $i = keys %{$self->{_cs}};
-    return unless $i < $self->max_connections;
-
-    # Add listen sockets
-    for my $lid (keys %$listen) {
-        my $socket = $listen->{$lid}->{socket};
-
-        # KQueue
-        if (KQUEUE) { $loop->EV_SET(fileno $socket, KQUEUE_READ, KQUEUE_ADD) }
-
-        # Epoll
-        elsif (EPOLL) { $loop->mask($socket, EPOLL_POLLIN) }
-
-        # Poll
-        else { $loop->mask($socket, POLLIN) }
-    }
-
-    # Listening
-    $self->{_listening} = 1;
 }
 
 sub _prepare_loop {

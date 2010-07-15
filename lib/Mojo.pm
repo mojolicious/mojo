@@ -57,7 +57,8 @@ __PACKAGE__->attr(
                 );
             }
 
-            # DEPRECATED!!! Draft 75 WebSocket support
+            # DEPRECATED in Snowman!
+            # Draft 75 WebSocket support
             else {
                 $res->headers->header('WebSocket-Origin',   $origin);
                 $res->headers->header('WebSocket-Location', $location);
@@ -70,7 +71,7 @@ __PACKAGE__->attr(
 );
 
 # DEPRECATED in Snowman!
-# Use $Mojolicious::VERSION instead.
+# Use $Mojolicious::VERSION instead
 our $VERSION = '0.999927';
 
 # Oh, so they have internet on computers now!

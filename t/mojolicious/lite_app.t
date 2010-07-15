@@ -120,7 +120,7 @@ post '/upload' => sub {
     $self->res->body("called, $body");
     return if $self->req->has_error;
     if (my $u = $self->req->upload('Вячеслав')) {
-        $self->stash(rendered => 1);
+        $self->stash('mojo.rendered' => 1);
         $self->res->body($self->res->body . $u->filename . $u->size);
     }
 };
@@ -1227,8 +1227,9 @@ with_block <%= $block->('one', 'two') %>
 <%= $self->cookie('bad') %>!<%= session 'foo' %>!\
 <%= flash 'foo' %>!<%= $cookie->path if $cookie %>!
 % $self->session(foo => 'session');
-% $self->flash(foo => 'flash') if $self->req->headers->header('X-Flash');
-% $self->stash->{session} = {} if $self->req->headers->header('X-Flash2');
+% my $headers = $self->req->headers;
+% $self->flash(foo => 'flash') if $headers->header('X-Flash');
+% $self->stash->{'mojo.session'} = {} if $headers->header('X-Flash2');
 
 @@ with_under_count.html.ep
 counter

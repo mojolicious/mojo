@@ -161,11 +161,11 @@ $t->get_ok('/')->status_is(200)->content_type_is('text/html')
 @@ exception
 <!doctype html><html>
 % my $s = $self->stash;
-% my $e = $self->stash('exception');
+% my $e = $self->stash('mojo.exception');
 % delete $s->{inner_template};
-% delete $s->{exception};
+% delete $s->{'mojo.exception'};
 % my $dump = dumper $s;
-% $s->{exception} = $e;
+% $s->{'mojo.exception'} = $e;
     <head>
 	    <title>Exception</title>
 	    <style type="text/css">

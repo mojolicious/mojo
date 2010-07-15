@@ -34,8 +34,8 @@ sub load {
 
     # Content
     my $stash = $c->stash;
-    return unless $stash->{'mojo.session'} = keys %$session;
-    $stash->{session} = $session;
+    return unless $stash->{'mojo.active_session'} = keys %$session;
+    $stash->{'mojo.session'} = $session;
 
     # Flash
     $session->{old_flash} = delete $session->{flash} if $session->{flash};
@@ -47,8 +47,8 @@ sub store {
 
     # Session
     my $stash = $c->stash;
-    return unless my $session = $stash->{session};
-    return unless keys %$session || $stash->{'mojo.session'};
+    return unless my $session = $stash->{'mojo.session'};
+    return unless keys %$session || $stash->{'mojo.active_session'};
 
     # Flash
     delete $session->{old_flash};

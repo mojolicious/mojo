@@ -60,7 +60,7 @@ sub receive_message {
     my $self = shift;
 
     # Deactivate auto rendering
-    $self->stash->{rendered} = 1;
+    $self->stash->{'mojo.rendered'} = 1;
 
     # WebSocket check
     Carp::croak('No WebSocket connection to receive messages from')
@@ -198,13 +198,13 @@ sub render_exception {
 
     # Render exception template
     my $options = {
-        template  => 'exception',
-        format    => 'html',
-        status    => 500,
-        exception => $e
+        template         => 'exception',
+        format           => 'html',
+        status           => 500,
+        'mojo.exception' => $e
     };
     $self->app->static->serve_500($self)
-      if $self->stash->{exception} || !$self->render($options);
+      if $self->stash->{'mojo.exception'} || !$self->render($options);
 }
 
 sub render_inner {
@@ -212,16 +212,16 @@ sub render_inner {
 
     # Initialize
     my $stash = $self->stash;
-    $stash->{content} ||= {};
+    $stash->{'mojo.content'} ||= {};
     $name ||= 'content';
 
     # Set
-    $stash->{content}->{$name}
+    $stash->{'mojo.content'}->{$name}
       ||= ref $content eq 'CODE' ? $content->() : $content
       if defined $content;
 
     # Get
-    $content = $stash->{content}->{$name};
+    $content = $stash->{'mojo.content'}->{$name};
     $content = '' unless defined $content;
     return Mojo::ByteStream->new("$content");
 }
@@ -299,7 +299,7 @@ sub send_message {
     my $self = shift;
 
     # Deactivate auto rendering
-    $self->stash->{rendered} = 1;
+    $self->stash->{'mojo.rendered'} = 1;
 
     # WebSocket check
     Carp::croak('No WebSocket connection to send message to')

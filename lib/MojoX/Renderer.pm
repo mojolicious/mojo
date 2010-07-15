@@ -79,8 +79,8 @@ sub render {
 
     # We got called
     my $stash = $c->stash;
-    $stash->{rendered} = 1;
-    $stash->{content} ||= {};
+    $stash->{'mojo.rendered'} = 1;
+    my $content = $stash->{'mojo.content'} ||= {};
 
     # Partial
     my $partial = delete $stash->{partial};
@@ -123,7 +123,7 @@ sub render {
         $self->handler->{text}->($self, $c, \$output, {text => $text});
 
         # Extends
-        $c->stash->{content}->{content} = b("$output")
+        $content->{content} = b("$output")
           if ($c->stash->{extends} || $c->stash->{layout});
     }
 
@@ -134,7 +134,7 @@ sub render {
         $self->handler->{data}->($self, $c, \$output, {data => $data});
 
         # Extends
-        $c->stash->{content}->{content} = b("$output")
+        $content->{content} = b("$output")
           if ($c->stash->{extends} || $c->stash->{layout});
     }
 
@@ -146,7 +146,7 @@ sub render {
         $format = 'json';
 
         # Extends
-        $c->stash->{content}->{content} = b("$output")
+        $content->{content} = b("$output")
           if ($c->stash->{extends} || $c->stash->{layout});
     }
 
@@ -157,7 +157,7 @@ sub render {
         return unless $self->_render_template($c, \$output, $options);
 
         # Extends
-        $c->stash->{content}->{content} = b("$output")
+        $content->{content} = b("$output")
           if ($c->stash->{extends} || $c->stash->{layout});
     }
 

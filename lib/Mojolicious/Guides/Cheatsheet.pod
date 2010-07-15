@@ -8,6 +8,119 @@ Mojolicious::Guides::Cheatsheet - Reference
 
 This document contains a concise all-purpose reference.
 
+=head1 RESERVED STASH VALUES
+
+Besides everything prefixed with C<mojo.> there are a few stash values that
+are reserved for routes and the renderer.
+
+=head2 C<action>
+
+    $r->route('/welcome')->to(action => 'hello');
+
+Action to dispatch to.
+
+=head2 C<app>
+
+    $r->route('/welcome')->to(app => MyApp->new);
+
+Embedded application to dispatch to.
+
+=head2 C<cb>
+
+    $r->route('/welcome')->to(cb => sub {...});
+
+Callback to dispatch to.
+
+=head2 C<class>
+
+    $r->route('/welcome')->to(class => 'Greeting');
+
+Camelized alternative to C<controller>.
+
+=head2 C<controller>
+
+    $r->route('/welcome')->to(controller => 'greetings');
+
+Controller to dispatch to.
+
+=head2 C<data>
+
+    $self->render(data => 'raw bytes');
+
+Turn raw bytes into a response.
+
+=head2 C<extends>
+
+    $self->render(extends => 'template');
+
+Template to extend.
+
+=head2 C<format>
+
+    $self->render(format => 'rss');
+
+Format to render.
+
+=head2 C<handler>
+
+    $self->render(handler => 'ep');
+
+Handler to use for rendering.
+
+=head2 C<json>
+
+    $self->render(json => {foo => 23});
+
+Turn Perl structure into JSON response.
+
+=head2 C<layout>
+
+    $self->render(layout => 'green');
+
+Layout to render.
+
+=head2 C<method>
+
+    $r->route('/welcome')->to(method => 'hello');
+
+Alternative to C<action>.
+
+=head2 C<namespace>
+
+    $r->route('/welcome')->to(namespace => 'TestApp', method => 'lulz');
+
+Namespace to dispatch to.
+
+=head2 C<partial>
+
+    my $result = $self->render(partial => 1);
+
+Return rendering result instead of turning it into a response.
+
+=head2 C<path>
+
+    $r->route('/welcome')->to(path => '/test', app => MyApp->new);
+
+Base path to use for dispatching to embedded applications.
+
+=head2 C<status>
+
+    $self->render(status => 404);
+
+Status code to use for rendered response.
+
+=head2 C<template>
+
+    $self->render(template => 'bye');
+
+Template to render.
+
+=head2 C<text>
+
+    $self->render(text => 'Hello World!');
+
+Turn characters into a response.
+
 =head1 ENVIRONMENT VARIABLES
 
 Many parts of L<Mojolicious> can be tuned with environment variables.

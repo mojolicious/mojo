@@ -54,7 +54,7 @@ sub flash {
     my $self = shift;
 
     # Get
-    my $session = $self->stash->{session};
+    my $session = $self->stash->{'mojo.session'};
     if ($_[0] && !defined $_[1] && !ref $_[0]) {
         return unless $session && ref $session eq 'HASH';
         return unless my $flash = $session->{old_flash};
@@ -87,7 +87,7 @@ sub session {
 
     # Get
     my $stash   = $self->stash;
-    my $session = $stash->{session};
+    my $session = $stash->{'mojo.session'};
     if ($_[0] && !defined $_[1] && !ref $_[0]) {
         return unless $session && ref $session eq 'HASH';
         return $session->{$_[0]};
@@ -95,14 +95,14 @@ sub session {
 
     # Initialize
     $session = {} unless $session && ref $session eq 'HASH';
-    $stash->{session} = $session;
+    $stash->{'mojo.session'} = $session;
 
     # Hash
     return $session unless @_;
 
     # Set
     my $values = exists $_[1] ? {@_} : $_[0];
-    $stash->{session} = {%$session, %$values};
+    $stash->{'mojo.session'} = {%$session, %$values};
 
     return $self;
 }

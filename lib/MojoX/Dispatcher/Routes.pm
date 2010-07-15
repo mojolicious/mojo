@@ -25,7 +25,7 @@ sub auto_render {
 
     # Render
     return !$c->render
-      unless $c->stash->{rendered}
+      unless $c->stash->{'mojo.rendered'}
           || $c->res->code
           || $c->tx->is_paused;
 

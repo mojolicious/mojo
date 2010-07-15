@@ -1197,7 +1197,7 @@ Just works!\
 %= param 'bar'
 % my $foo = 42;
 %= $foo
-%= $route
+%= $self->match->endpoint->name;
 
 @@ layouts/layout.html.ep
 layouted <%== content %>

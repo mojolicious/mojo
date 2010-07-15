@@ -67,9 +67,6 @@ sub dispatch {
     my $p = $c->stash->{'mojo.params'} = $c->tx->req->params->clone;
     $p->append(%{$m->captures});
 
-    # Route name
-    $c->stash->{route} = $m->endpoint->name;
-
     # Merge in captures
     $c->stash({%{$c->stash}, %{$m->captures}});
 

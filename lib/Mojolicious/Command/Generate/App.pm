@@ -159,13 +159,8 @@ $t->get_ok('/')->status_is(200)->content_type_is('text/html')
     </body>
 </html>
 @@ exception
+% my $e = delete $self->stash->{'exception'};
 <!doctype html><html>
-% my $s = $self->stash;
-% my $e = $self->stash('mojo.exception');
-% delete $s->{inner_template};
-% delete $s->{'mojo.exception'};
-% my $dump = dumper $s;
-% $s->{'mojo.exception'} = $e;
     <head>
 	    <title>Exception</title>
 	    <style type="text/css">
@@ -201,7 +196,7 @@ $t->get_ok('/')->status_is(200)->content_type_is('text/html')
                     </div>
                 <% } %>
             </div>
-            <div class="snippet"><pre><%= $dump %></pre></div>
+            <div class="snippet"><pre><%= dumper $self->stash %></pre></div>
         <% } else { %>
             <div>Page temporarily unavailable, please come back later.</div>
         <% } %>

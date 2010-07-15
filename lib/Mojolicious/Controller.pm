@@ -198,13 +198,15 @@ sub render_exception {
 
     # Render exception template
     my $options = {
-        template         => 'exception',
-        format           => 'html',
-        status           => 500,
-        'mojo.exception' => $e
+        template  => 'exception',
+        format    => 'html',
+        status    => 500,
+        exception => $e
     };
-    $self->app->static->serve_500($self)
-      if $self->stash->{'mojo.exception'} || !$self->render($options);
+    my $static = $self->app->static;
+    $static->serve_500($self) if $self->{_exception};
+    local $self->{_exception} = 1;
+    $static->serve_500($self) if !$self->render($options);
 }
 
 sub render_inner {

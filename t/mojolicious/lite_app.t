@@ -1229,7 +1229,7 @@ with_block <%= $block->('one', 'two') %>
 % $self->session(foo => 'session');
 % my $headers = $self->req->headers;
 % $self->flash(foo => 'flash') if $headers->header('X-Flash');
-% $self->stash->{'mojo.session'} = {} if $headers->header('X-Flash2');
+% $self->session(expires => 1) if $headers->header('X-Flash2');
 
 @@ with_under_count.html.ep
 counter

@@ -164,6 +164,35 @@ sub parse {
     $self->tree($self->_parse_xml($xml));
 }
 
+sub replace {
+    my ($self, $new) = @_;
+
+    # Parse
+    $new = ref $new ? $new->tree : $self->_parse_xml($new);
+
+    # Parent
+    my $parent = $self->tree->[3];
+
+    # Replacements
+    my @new;
+    for my $e (@$new[1 .. $#$new]) {
+        $e->[3] = $parent if $e->[0] eq 'tag';
+        push @new, $e;
+    }
+
+    # Find
+    my $i = $parent->[0] eq 'root' ? 1 : 4;
+    for my $e (@$parent[$i .. $#$parent]) {
+        last if $e == $self->tree;
+        $i++;
+    }
+
+    # Replace
+    splice @$parent, $i, 1, @new;
+
+    return $self;
+}
+
 sub search {
     my ($self, $css) = @_;
 
@@ -491,6 +520,7 @@ sub _parse_xml {
     # Decode
     my $charset = $self->charset;
     $xml = b($xml)->decode($charset)->to_string if $charset;
+    return $tree unless $xml;
 
     # Tokenize
     while ($xml =~ /$XML_TOKEN_RE/g) {
@@ -881,6 +911,12 @@ Parent of element.
     $dom = $dom->parse('<foo bar="baz">test</foo>');
 
 Parse XML document.
+
+=head2 C<replace>
+
+    $dom = $dom->replace('<div>test</div>');
+
+Replace elements.
 
 =head2 C<search>
 

@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 99;
+use Test::More tests => 102;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -213,3 +213,13 @@ $dom->parse('<!DOCTYPE H "-/W/D HT 4/E">☃<title class=test>♥</title>☃');
 is($dom->at('title')->text, '♥', 'right text');
 is($dom->at('*')->text,     '♥', 'right text');
 is($dom->at('.test')->text, '♥', 'right text');
+
+# Replace elements
+$dom->parse('<div>foo<p>lalala</p>bar</div>');
+$dom->at('p')->replace('<foo>bar</foo>');
+is("$dom", '<div>foo<foo>bar</foo>bar</div>', 'right text');
+$dom->at('foo')->replace(Mojo::DOM->new->parse('text'));
+is("$dom", '<div>footextbar</div>', 'right text');
+$dom->parse('<div>foo</div><div>bar</div>');
+$dom->search('div')->each(sub { shift->replace('<p>test</p>') });
+is("$dom", '<p>test</p><p>test</p>', 'right text');

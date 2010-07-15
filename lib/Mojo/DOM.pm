@@ -48,17 +48,17 @@ my $XML_ATTR_RE = qr/
 my $XML_END_RE   = qr/^\s*\/\s*(.+)\s*/;
 my $XML_START_RE = qr/(\S+)\s*(.*)/;
 my $XML_TOKEN_RE = qr/
-    ([^<]*)                 # Text
+    ([^<]*)                          # Text
     (?:
-    <\?(\S+.*)\?>           # Processing Instruction
+    <\?(\S+[^(\?>)]*)\?>             # Processing Instruction
     |
-    <\!--(.+)-->            # Comment
+    <\!--([^(-->)*]+)-->             # Comment
     |
-    <\!\[CDATA\[(.*)\]\]>   # CDATA
+    <\!\[CDATA\[([^(\]\]>)]*)\]\]>   # CDATA
     |
-    <\!DOCTYPE(.*)>         # DOCTYPE
+    <\!DOCTYPE([^>]*)>               # DOCTYPE
     |
-    <([^>]+)>               # Tag
+    <([^>]+)>                        # Tag
     )?
 /xi;
 

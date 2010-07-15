@@ -133,7 +133,7 @@ script.
         DocumentRoot /home/sri/myapp/public
 
         FastCgiServer /home/sri/myapp/script/myapp -processes 10
-        ScriptAliasMatch ^/myapp(/.*)$ /home/sri/myapp/script/myapp$1
+        Alias /myapp /home/sri/myapp/script/myapp
     </VirtualHost>
 
 =head2 PSGI/Plack

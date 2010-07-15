@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 102;
+use Test::More tests => 105;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -223,3 +223,13 @@ is("$dom", '<div>footextbar</div>', 'right text');
 $dom->parse('<div>foo</div><div>bar</div>');
 $dom->search('div')->each(sub { shift->replace('<p>test</p>') });
 is("$dom", '<p>test</p><p>test</p>', 'right text');
+
+# Replace element content
+$dom->parse('<div>foo<p>lalala</p>bar</div>');
+$dom->at('p')->replace_content('bar');
+is("$dom", '<div>foo<p>bar</p>bar</div>', 'right text');
+$dom->at('p')->replace_content(Mojo::DOM->new->parse('text'));
+is("$dom", '<div>foo<p>text</p>bar</div>', 'right text');
+$dom->parse('<div>foo</div><div>bar</div>');
+$dom->search('div')->each(sub { shift->replace_content('<p>test</p>') });
+is("$dom", '<div><p>test</p></div><div><p>test</p></div>', 'right text');

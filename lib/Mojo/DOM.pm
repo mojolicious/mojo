@@ -170,8 +170,11 @@ sub replace {
     # Parse
     $new = ref $new ? $new->tree : $self->_parse_xml($new);
 
+    # Tree
+    my $tree = $self->tree;
+
     # Parent
-    my $parent = $self->tree->[3];
+    my $parent = $tree->[3];
 
     # Replacements
     my @new;
@@ -183,12 +186,35 @@ sub replace {
     # Find
     my $i = $parent->[0] eq 'root' ? 1 : 4;
     for my $e (@$parent[$i .. $#$parent]) {
-        last if $e == $self->tree;
+        last if $e == $tree;
         $i++;
     }
 
     # Replace
     splice @$parent, $i, 1, @new;
+
+    return $self;
+}
+
+sub replace_content {
+    my ($self, $new) = @_;
+
+    # Parse
+    $new = ref $new ? $new->tree : $self->_parse_xml($new);
+
+    # Tree
+    my $tree = $self->tree;
+
+    # Replacements
+    my @new;
+    for my $e (@$new[1 .. $#$new]) {
+        $e->[3] = $tree if $e->[0] eq 'tag';
+        push @new, $e;
+    }
+
+    # Replace
+    my $start = $tree->[0] eq 'root' ? 1 : 4;
+    splice @$tree, $start, $#$tree, @new;
 
     return $self;
 }
@@ -917,6 +943,12 @@ Parse XML document.
     $dom = $dom->replace('<div>test</div>');
 
 Replace elements.
+
+=head2 C<replace_content>
+
+    $dom = $dom->replace_content('test');
+
+Replace element content.
 
 =head2 C<search>
 

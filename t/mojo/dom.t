@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 98;
+use Test::More tests => 99;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -209,6 +209,7 @@ is($dom->at('p div[class$="♥"]')->text,          'Heart',   'right text');
 is($dom->at('p > div[class$="♥"]')->text,        'Heart',   'right text');
 
 # Looks remotely like HTML
-$dom->parse('<!DOCTYPE HTM P "-//W3//D HT 4.1//E">☃<title>♥</title>☃');
+$dom->parse('<!DOCTYPE H "-/W/D HT 4/E">☃<title class=test>♥</title>☃');
 is($dom->at('title')->text, '♥', 'right text');
 is($dom->at('*')->text,     '♥', 'right text');
+is($dom->at('.test')->text, '♥', 'right text');

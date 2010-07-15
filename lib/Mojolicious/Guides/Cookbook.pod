@@ -132,11 +132,8 @@ script.
         ServerName localhost
         DocumentRoot /home/sri/myapp/public
 
-        <Location /myapp>
-            FastCgiIpcDir /tmp
-            FastCgiServer /home/sri/myapp/script/myapp -processes 10
-        </Location>
-
+        FastCgiServer /home/sri/myapp/script/myapp -processes 10
+        ScriptAliasMatch ^/myapp(/.*)$ /home/sri/myapp/script/myapp$1
     </VirtualHost>
 
 =head2 PSGI/Plack

@@ -725,6 +725,8 @@ The Perl Foundation
 
 Tomas Znamenacek
 
+Ulrich Kautz
+
 Uwe Voelker
 
 Yaroslav Korshak

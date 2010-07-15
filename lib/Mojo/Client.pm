@@ -1371,7 +1371,7 @@ to C<0>.
     my $relaxed = $client->relaxed;
     $client     = $client->relaxed(1);
 
-Allows talking to broken web servers, but makes the client secure.
+Allows talking to broken web servers, but makes the client less secure.
 
 =head2 C<tls_ca_file>
 

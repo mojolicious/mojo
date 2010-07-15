@@ -7,8 +7,8 @@ use warnings;
 
 use base 'Mojo';
 
-use Data::Dumper;
 use Mojo::Filter::Chunked;
+use Mojo::JSON;
 
 # How is education supposed to make me feel smarter? Besides,
 # every time I learn something new, it pushes some old stuff out of my brain.
@@ -62,8 +62,6 @@ sub _diag {
     return $self->_chunked_params($tx) if $path =~ /^\/chunked_params/;
     return $self->_dump_env($tx)       if $path =~ /^\/dump_env/;
     return $self->_dump_params($tx)    if $path =~ /^\/dump_params/;
-    return $self->_dump_tx($tx)        if $path =~ /^\/dump_tx/;
-    return $self->_dump_url($tx)       if $path =~ /^\/dump_url/;
     return $self->_proxy($tx)          if $path =~ /^\/proxy/;
 
     # List
@@ -112,22 +110,16 @@ sub _chunked_params {
 
 sub _dump_env {
     my ($self, $tx) = @_;
-    $tx->res->body(Dumper \%ENV);
+    my $res = $tx->res;
+    $res->headers->content_type('application/json');
+    $res->body(Mojo::JSON->new->encode(\%ENV));
 }
 
 sub _dump_params {
     my ($self, $tx) = @_;
-    $tx->res->body(Dumper $tx->req->params->to_hash);
-}
-
-sub _dump_tx {
-    my ($self, $tx) = @_;
-    $tx->res->body(Dumper $tx);
-}
-
-sub _dump_url {
-    my ($self, $tx) = @_;
-    $tx->res->body(Dumper $tx->req->url);
+    my $res = $tx->res;
+    $res->headers->content_type('application/json');
+    $res->body(Mojo::JSON->new->encode($tx->req->params->to_hash));
 }
 
 sub _proxy {

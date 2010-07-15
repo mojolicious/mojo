@@ -73,8 +73,6 @@ sub _diag {
         <a href="/diag/chunked_params">Chunked Request Parameters</a><br />
         <a href="/diag/dump_env">Dump Environment Variables</a><br />
         <a href="/diag/dump_params">Dump Request Parameters</a><br />
-        <a href="/diag/dump_tx">Dump Transaction</a><br />
-        <a href="/diag/dump_url">Dump Request URL</a><br />
         <a href="/diag/proxy">Proxy</a><br />
         <a href="/diag/websocket">WebSocket</a>
     </body>

@@ -18,7 +18,7 @@ sub param {
     my $self = shift;
 
     # Parameters
-    my $params = $self->stash->{params} || $self->req->params;
+    my $params = $self->stash->{'mojo.params'} || $self->req->params;
     Carp::croak(qq/Stash value "params" is not a "Mojo::Parameters" object./)
       unless ref $params
           && Scalar::Util::blessed($params)

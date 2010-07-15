@@ -64,7 +64,7 @@ sub dispatch {
     return 1 unless $m && @{$m->stack};
 
     # Params
-    my $p = $c->stash->{params} = $c->tx->req->params->clone;
+    my $p = $c->stash->{'mojo.params'} = $c->tx->req->params->clone;
     $p->append(%{$m->captures});
 
     # Route name

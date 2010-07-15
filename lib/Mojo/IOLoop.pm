@@ -661,7 +661,7 @@ sub _accept {
     # Accept
     my $socket = $listen->accept or return;
 
-    # Unlock callback
+    # Unlock
     $self->unlock_cb->($self);
 
     # Listen

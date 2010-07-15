@@ -96,6 +96,11 @@ AnqxHi90n/p912ynLg2SjBq+03GaECeGzC/QqKK2gtA=
 -----END RSA PRIVATE KEY-----
 EOF
 
+__PACKAGE__->attr(
+    [qw/lock_cb unlock_cb/] => sub {
+        sub {1}
+    }
+);
 __PACKAGE__->attr([qw/idle_cb tick_cb/]);
 __PACKAGE__->attr([qw/accept_timeout connect_timeout/] => 5);
 __PACKAGE__->attr(max_connections                      => 1000);
@@ -396,30 +401,14 @@ sub one_tick {
     # Timeout
     $timeout = $self->timeout unless defined $timeout;
 
+    # Prepare listen sockets
+    $self->_prepare_listen;
+
     # Prepare connections
     $self->_prepare_connections;
 
     # Loop
     my $loop = $self->_prepare_loop;
-
-    # Listen
-    unless ($self->{_listening}) {
-        for my $l (values %{$self->{_listen}}) {
-            my $socket = $l->{socket};
-
-            # KQueue
-            if (KQUEUE) {
-                $loop->EV_SET(fileno $socket, KQUEUE_READ, KQUEUE_ADD);
-            }
-
-            # Epoll
-            elsif (EPOLL) { $loop->mask($socket, EPOLL_POLLIN) }
-
-            # Poll
-            else { $loop->mask($socket, POLLIN) }
-        }
-        $self->{_listening} = 1;
-    }
 
     # Events
     my (@error, @hup, @read, @write);
@@ -672,6 +661,9 @@ sub _accept {
     # Accept
     my $socket = $listen->accept or return;
 
+    # Unlock callback
+    $self->unlock_cb->($self);
+
     # Listen
     my $l = $self->{_listen}->{$listen};
 
@@ -709,6 +701,24 @@ sub _accept {
     # Accept callback
     my $cb = $l->{accept_cb};
     $self->_run_event('accept', $cb, $id) if $cb;
+
+    # Remove listen sockets
+    $listen = $self->{_listen} || {};
+    my $loop = $self->{_loop};
+    for my $lid (keys %$listen) {
+        my $socket = $listen->{$lid}->{socket};
+
+        # Remove listen socket from kqueue
+        if (KQUEUE) {
+            $loop->EV_SET(fileno $socket, KQUEUE_READ, KQUEUE_DELETE);
+        }
+
+        # Remove listen socket from poll or epoll
+        else { $loop->remove($socket) }
+    }
+
+    # Not listening anymore
+    delete $self->{_listening};
 }
 
 sub _activity {
@@ -748,7 +758,14 @@ sub _drop_immediately {
     my $c = delete $self->{_cs}->{$id};
 
     # Drop listen socket
-    return if delete $self->{_listen}->{$id} && !$c;
+    if (!$c && ($c = delete $self->{_listen}->{$id})) {
+
+        # Not listening
+        return $self unless $self->{_listening};
+
+        # Not listening anymore
+        delete $self->{_listening};
+    }
 
     # Drop socket
     if (my $socket = $c->{socket}) {
@@ -926,6 +943,44 @@ sub _prepare_key {
     print $file KEY;
 
     return $self->{_key} = $key;
+}
+
+sub _prepare_listen {
+    my $self = shift;
+
+    # Loop
+    my $loop = $self->_prepare_loop;
+
+    # Already listening
+    return if $self->{_listening};
+
+    # Listen sockets
+    my $listen = $self->{_listen} ||= {};
+    return unless keys %$listen;
+
+    # Connections
+    my $i = keys %{$self->{_cs}};
+    return unless $i < $self->max_connections;
+
+    # Lock
+    return unless $self->lock_cb->($self, !$i);
+
+    # Add listen sockets
+    for my $lid (keys %$listen) {
+        my $socket = $listen->{$lid}->{socket};
+
+        # KQueue
+        if (KQUEUE) { $loop->EV_SET(fileno $socket, KQUEUE_READ, KQUEUE_ADD) }
+
+        # Epoll
+        elsif (EPOLL) { $loop->mask($socket, EPOLL_POLLIN) }
+
+        # Poll
+        else { $loop->mask($socket, POLLIN) }
+    }
+
+    # Listening
+    $self->{_listening} = 1;
 }
 
 sub _prepare_loop {
@@ -1284,6 +1339,23 @@ dropped, defaults to C<5>.
 Callback to be invoked on every reactor tick if no events occurred.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
+=head2 C<lock_cb>
+
+    my $cb = $loop->lock_cb;
+    $loop  = $loop->lock_cb(sub {...});
+
+A locking callback that decides if this loop is allowed to accept new
+incoming connections, used to sync multiple server processes.
+The callback should return true or false.
+Note that exceptions in this callback are not captured.
+
+    $loop->lock_cb(sub {
+        my ($loop, $blocking) = @_;
+
+        # Got the lock, listen for new connections
+        return 1;
+    });
+
 =head2 C<max_connections>
 
     my $max = $loop->max_connections;
@@ -1317,6 +1389,14 @@ responsiveness.
 Maximum time in seconds our loop waits for new events to happen, defaults to
 C<0.25>.
 Note that a value of C<0> would make the loop non blocking.
+
+=head2 C<unlock_cb>
+
+    my $cb = $loop->unlock_cb;
+    $loop  = $loop->unlock_cb(sub {...});
+
+A callback to free the accept lock, used to sync multiple server processes.
+Note that exceptions in this callback are not captured.
 
 =head1 METHODS
 

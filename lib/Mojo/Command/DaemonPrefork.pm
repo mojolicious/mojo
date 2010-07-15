@@ -31,6 +31,8 @@ These options are available:
                                  keep-alive connection, defaults to 100.
   --listen <locations>           Set a comma separated list of locations you
                                  want to listen on, defaults to http://*:3000.
+  --lock <path>                  Set path to lock file, defaults to a random
+                                 temporary file.
   --maxspare <number>            Set maximum amount of idle children,
                                  defaults to 10.
   --minspare <number>            Set minimum amount of idle children,
@@ -71,6 +73,7 @@ sub run {
         'keepaliverequests=i' =>
           sub { $daemon->max_keep_alive_requests($_[1]) },
         'listen=s'   => sub { $daemon->listen($_[1]) },
+        'lock=s'     => sub { $daemon->lock_file($_[1]) },
         'maxspare=i' => sub { $daemon->max_spare_servers($_[1]) },
         'minspare=i' => sub { $daemon->min_spare_servers($_[1]) },
         'pid=s'      => sub { $daemon->pid_file($_[1]) },

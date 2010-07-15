@@ -8,15 +8,25 @@ use warnings;
 use base 'Mojo::Server::Daemon';
 
 use Carp 'croak';
+use Fcntl ':flock';
+use File::Spec;
 use IO::File;
 use IO::Poll 'POLLIN';
 use IO::Socket;
+use Mojo::Command;
 use POSIX qw/setsid WNOHANG/;
 
 use constant DEBUG => $ENV{MOJO_SERVER_DEBUG} || 0;
 
-__PACKAGE__->attr(cleanup_interval                      => 15);
-__PACKAGE__->attr(idle_timeout                          => 30);
+__PACKAGE__->attr(cleanup_interval => 15);
+__PACKAGE__->attr(idle_timeout     => 30);
+__PACKAGE__->attr(
+    lock_file => sub {
+        my $self = shift;
+        return File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
+            Mojo::Command->class_to_file(ref $self->app) . '.lock');
+    }
+);
 __PACKAGE__->attr(max_clients                           => 1);
 __PACKAGE__->attr(max_requests                          => 1000);
 __PACKAGE__->attr(max_servers                           => 100);
@@ -211,6 +221,41 @@ sub _manage_children {
     }
 }
 
+sub _prepare_lock_file {
+    my $self = shift;
+
+    # Shortcut
+    return unless my $file = $self->lock_file;
+
+    # Create lock file
+    my $fh = IO::File->new("> $file")
+      or croak qq/Can't open lock file "$file"/;
+    $self->{_lock} = $fh;
+
+    # Lock callback
+    my $loop = $self->ioloop;
+    $loop->lock_cb(
+        sub {
+            my $blocking = $_[1];
+
+            # Idle
+            $self->child_status('idle') if $blocking;
+
+            # Lock
+            my $flags = $blocking ? LOCK_EX : LOCK_EX | LOCK_NB;
+            my $lock = flock($self->{_lock}, $flags);
+
+            # Busy
+            $self->child_status('busy') if $lock;
+
+            return $lock;
+        }
+    );
+
+    # Unlock callback
+    $loop->unlock_cb(sub { flock($self->{_lock}, LOCK_UN) });
+}
+
 sub _read_messages {
     my $self = shift;
 
@@ -270,6 +315,9 @@ sub _spawn_child {
 
     # Child
     else {
+
+        # Prepare environment
+        $self->_prepare_lock_file;
 
         # Signal handlers
         $SIG{HUP} = $SIG{INT} = $SIG{TERM} = sub { exit 0 };
@@ -350,6 +398,13 @@ Cleanup interval for workers in seconds, defaults to C<15>.
     $daemon          = $daemon->idle_timeout(30);
 
 Timeout for workers to be idle in seconds, defaults to C<30>.
+
+=head2 C<lock_file>
+
+    my $lock_file = $daemon->lock_file;
+    $daemon       = $daemon->lock_file('/tmp/mojo_daemon.lock');
+
+Path to lock file, defaults to a random temporary file.
 
 =head2 C<max_clients>
 

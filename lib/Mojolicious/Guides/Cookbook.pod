@@ -92,12 +92,13 @@ The builtin web server of course supports them as well.
     Server available at file:///tmp/myapp.sock.
 
 One interesting side effect here is that you can start multiple prefork web
-servers parallel letting them share the same UNIX domain socket.
+servers parallel letting them share the same UNIX domain socket and lock
+file.
 This allows something called C<Hot Deployment>, which essentially means zero
 downtime software updates.
 
     % ./script/myapp daemon_prefork --listen file:///tmp/myapp.sock\
-      --pid /tmp/myapp1.pid --daemonize
+      --pid /tmp/myapp1.pid --lock /tmp/myapp.lock --daemonize
     Server available at file:///tmp/myapp.sock.
 
 All you have to do is update your application code, start a second web server
@@ -106,7 +107,7 @@ This will bring down the old web server gracefully, so no active connections
 get interrupted and your users won't notice a thing.
 
     % ./script/myapp daemon_prefork --listen file:///tmp/myapp.sock\
-      --pid /tmp/myapp2.pid --daemonize
+      --pid /tmp/myapp2.pid --lock /tmp/myapp.lock --daemonize
 
     % kill -s USR1 `cat /tmp/myapp1.pid`
 

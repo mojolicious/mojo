@@ -20,14 +20,21 @@ sub import {
     no warnings 'redefine';
 
     # Functions
-    *{"${caller}::oO"} = sub {
-        my $method = $_[0] =~ /:/ ? 'get' : lc shift;
-        my $client = Mojo::Client->singleton->proxy_env;
-        my $tx     = $client->build_tx($method, @_);
-        $client->process($tx, sub { $tx = $_[1] });
-        return $tx->res;
-    };
-    *{"${caller}::Oo"} = sub { Mojo::ByteStream->new(@_) };
+    *{"${caller}::Oo"} = *{"${caller}::b"} =
+      sub { Mojo::ByteStream->new(@_) };
+    *{"${caller}::oO"} = sub { _request(@_) };
+    *{"${caller}::d"}  = sub { _request('delete', @_) };
+    *{"${caller}::g"}  = sub { _request('get', @_) };
+    *{"${caller}::p"}  = sub { _request('post', @_) };
+    *{"${caller}::u"}  = sub { _request('put', @_) };
+}
+
+sub _request {
+    my $method = $_[0] =~ /:/ ? 'get' : lc shift;
+    my $client = Mojo::Client->singleton->proxy_env;
+    my $tx     = $client->build_tx($method, @_);
+    $client->process($tx, sub { $tx = $_[1] });
+    return $tx->res;
 }
 
 1;
@@ -39,7 +46,7 @@ ojo - Fun Oneliners With Mojo!
 
 =head1 SYNOPSIS
 
-    perl -Mojo -e 'print oO("http://mojolicio.us")->dom->at("title")->text'
+    perl -Mojo -e 'print g("http://mojolicio.us")->dom->at("title")->text'
 
 =head1 DESCRIPTION
 
@@ -50,33 +57,65 @@ Note that this module is EXPERIMENTAL and might change without warning!
 
 L<ojo> implements the following functions.
 
-=head2 C<oO>
+=head2 C<b>
 
-    my $res = oO('http://mojolicio.us');
-    my $res = oO('http://mojolicio.us', {'X-Bender' => 'X_x'});
-    my $res = oO(
-        'http://mojolicio.us',
-        {'Content-Type' => 'text/plain'},
-        'Hello!'
-    );
-    my $res = oO(POST => 'http://mojolicio.us');
-    my $res = oO(POST => 'http://mojolicio.us', {'X-Bender' => 'X_x'});
-    my $res = oO(
-        'POST',
-        'http://mojolicio.us',
-        {'Content-Type' => 'text/plain'},
-        'Hello!'
-    );
-
-Fetch URL and turn response into a L<Mojo::Message::Response> object.
-
-=head2 C<Oo>
-
-    my $stream = Oo('lalala');
+    my $stream = b('lalala');
 
 Turn input into a L<Mojo::ByteStream> object.
 
-    perl -Mojo -e 'print Oo(oO("http://mojolicio.us")->body)->html_unescape'
+    perl -Mojo -e 'print b(g("http://mojolicio.us")->body)->html_unescape'
+
+=head2 C<d>
+
+    my $res = d('http://mojolicio.us');
+    my $res = d('http://mojolicio.us', {'X-Bender' => 'X_x'});
+    my $res = d(
+        'http://mojolicio.us',
+        {'Content-Type' => 'text/plain'},
+        'Hello!'
+    );
+
+Perform C<DELETE> request and turn response into a L<Mojo::Message::Response>
+object.
+
+=head2 C<g>
+
+    my $res = g('http://mojolicio.us');
+    my $res = g('http://mojolicio.us', {'X-Bender' => 'X_x'});
+    my $res = g(
+        'http://mojolicio.us',
+        {'Content-Type' => 'text/plain'},
+        'Hello!'
+    );
+
+Perform C<GET> request and turn response into a L<Mojo::Message::Response>
+object.
+
+=head2 C<p>
+
+    my $res = p('http://mojolicio.us');
+    my $res = p('http://mojolicio.us', {'X-Bender' => 'X_x'});
+    my $res = p(
+        'http://mojolicio.us',
+        {'Content-Type' => 'text/plain'},
+        'Hello!'
+    );
+
+Perform C<POST> request and turn response into a L<Mojo::Message::Response>
+object.
+
+=head2 C<u>
+
+    my $res = u('http://mojolicio.us');
+    my $res = u('http://mojolicio.us', {'X-Bender' => 'X_x'});
+    my $res = u(
+        'http://mojolicio.us',
+        {'Content-Type' => 'text/plain'},
+        'Hello!'
+    );
+
+Perform C<PUT> request and turn response into a L<Mojo::Message::Response>
+object.
 
 =head1 SEE ALSO
 

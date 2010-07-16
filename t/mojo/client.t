@@ -13,7 +13,7 @@ use Test::More;
 plan skip_all =>
   'set TEST_CLIENT to enable this test (internet connection required!)'
   unless $ENV{TEST_CLIENT};
-plan tests => 95;
+plan tests => 97;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -74,6 +74,8 @@ $ENV{HTTP_PROXY}  = $backup;
 $ENV{HTTPS_PROXY} = $backup2;
 
 # Oneliner
+is(g('http://mojolicious.org')->code,  200, 'right status');
+is(p('http://mojolicious.org')->code,  404, 'right status');
 is(oO('http://mojolicious.org')->code, 200, 'right status');
 is(oO(POST => 'http://mojolicious.org')->code, 404, 'right status');
 

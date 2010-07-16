@@ -74,8 +74,8 @@ $ENV{HTTP_PROXY}  = $backup;
 $ENV{HTTPS_PROXY} = $backup2;
 
 # Oneliner
-is(fetch('http://mojolicious.org')->code, 200, 'right status');
-is(fetch(POST => 'http://mojolicious.org')->code, 404, 'right status');
+is(oO('http://mojolicious.org')->code, 200, 'right status');
+is(oO(POST => 'http://mojolicious.org')->code, 404, 'right status');
 
 # Simple request
 my ($method, $url);

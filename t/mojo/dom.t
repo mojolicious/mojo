@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 110;
+use Test::More tests => 116;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -228,6 +228,12 @@ $dom->replace('♥');
 is("$dom", '♥', 'right text');
 $dom->replace('<div>foo<p>lalala</p>bar</div>');
 is("$dom", '<div>foo<p>lalala</p>bar</div>', 'right text');
+$dom->replace('');
+is("$dom", '', 'right text');
+$dom->replace('<div>foo<p>lalala</p>bar</div>');
+is("$dom", '<div>foo<p>lalala</p>bar</div>', 'right text');
+$dom->search('p')->each(sub { shift->replace('') });
+is("$dom", '<div>foobar</div>', 'right text');
 
 # Replace element content
 $dom->parse('<div>foo<p>lalala</p>bar</div>');
@@ -238,11 +244,17 @@ is("$dom", '<div>foo<p>text</p>bar</div>', 'right text');
 $dom->parse('<div>foo</div><div>bar</div>');
 $dom->search('div')->each(sub { shift->replace_content('<p>test</p>') });
 is("$dom", '<div><p>test</p></div><div><p>test</p></div>', 'right text');
+$dom->search('p')->each(sub { shift->replace_content('') });
+is("$dom", '<div><p /></div><div><p /></div>', 'right text');
 $dom->parse('<div><p id="☃" /></div>');
 $dom->at('#☃')->replace_content('♥');
 is("$dom", '<div><p id="☃">♥</p></div>', 'right text');
 $dom->parse('<div>foo<p>lalala</p>bar</div>');
 $dom->replace_content('♥');
 is("$dom", '♥', 'right text');
+$dom->replace_content('<div>foo<p>lalala</p>bar</div>');
+is("$dom", '<div>foo<p>lalala</p>bar</div>', 'right text');
+$dom->replace_content('');
+is("$dom", '', 'right text');
 $dom->replace_content('<div>foo<p>lalala</p>bar</div>');
 is("$dom", '<div>foo<p>lalala</p>bar</div>', 'right text');

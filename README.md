@@ -13,19 +13,10 @@ Features
 * An amazing MVC web framework supporting a simplified single file mode
   through Mojolicious::Lite.
 
-    * Very smart RESTful routing system.
-
-    * MIME type based renderer with a very Perl-ish default template system.
-
-    * Session management with signed cookies that just works.
-
-    * Easily extendable through plugins.
-
-    * Optimized for test driven development.
-
-    * Convenient static file server.
-
-    * Internationalization and first class unicode support out of the box.
+    Powerful out of the box with RESTful routes, plugins, Perl-ish
+    templates, session management, signed cookies, testing framework,
+    static file server, I18N, first class unicode support and much more for
+    you to discover.
 
 * Very clean, portable and Object Oriented pure Perl API without any hidden
   magic and no requirements besides Perl 5.8.7.
@@ -36,15 +27,11 @@ Features
 * Builtin async IO and prefork web server supporting epoll, kqueue, hot
   deployment and UNIX domain socket sharing, perfect for embedding.
 
-* CGI, FastCGI and PSGI support.
+* Automatic CGI, FastCGI and L<PSGI> detection.
 
-* XML/HTML5 parser with CSS3 selector support.
-
-* JSON parser and generator.
+* JSON and XML/HTML5 parser with CSS3 selector support.
 
 * Fresh code based upon years of experience developing Catalyst.
-
-And much more for you to discover!
 
 Duct Tape For The HTML5 Web
 ---------------------------

@@ -310,19 +310,9 @@ L<Mojolicious::Lite>.
 
 =over 4
 
-Very smart RESTful routing system.
-
-MIME type based renderer with a very Perl-ish default template system.
-
-Session management with signed cookies that just works.
-
-Easily extendable through plugins.
-
-Optimized for test driven development.
-
-Convenient static file server.
-
-Internationalization and first class unicode support out of the box.
+Powerful out of the box with RESTful routes, plugins, Perl-ish templates,
+session management, signed cookies, testing framework, static file server,
+I18N, first class unicode support and much more for you to discover.
 
 =back
 
@@ -335,17 +325,13 @@ TLS, IDNA, pipelining, chunking and multipart support.
 Builtin async IO and prefork web server supporting epoll, kqueue, hot
 deployment and UNIX domain socket sharing, perfect for embedding.
 
-CGI, FastCGI and L<PSGI> support.
+Automatic CGI, FastCGI and L<PSGI> detection.
 
-XML/HTML5 parser with CSS3 selector support.
-
-JSON parser and generator.
+JSON and XML/HTML5 parser with CSS3 selector support.
 
 Fresh code based upon years of experience developing L<Catalyst>.
 
 =back
-
-And much more for you to discover!
 
 =head2 Duct Tape For The HTML5 Web
 

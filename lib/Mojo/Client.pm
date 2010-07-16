@@ -293,6 +293,13 @@ sub delete {
     return $self->_queue_or_process_tx($self->build_tx('DELETE', @_));
 }
 
+sub detect_proxy {
+    my $self = shift;
+    $self->http_proxy($ENV{HTTP_PROXY}   || $ENV{http_proxy});
+    $self->https_proxy($ENV{HTTPS_PROXY} || $ENV{https_proxy});
+    return $self;
+}
+
 sub finish {
     my $self = shift;
 
@@ -377,13 +384,6 @@ sub process {
         $loop->one_tick(0);
     }
 
-    return $self;
-}
-
-sub proxy_env {
-    my $self = shift;
-    $self->http_proxy($ENV{HTTP_PROXY}   || $ENV{http_proxy});
-    $self->https_proxy($ENV{HTTPS_PROXY} || $ENV{https_proxy});
     return $self;
 }
 
@@ -1506,6 +1506,12 @@ easily run out of file descriptors with too many active clients.
 
 Send a HTTP C<DELETE> request.
 
+=head2 C<detect_proxy>
+
+    $client = $client->detect_proxy;
+
+Check environment variables for proxy information.
+
 =head2 C<finish>
 
     $client->finish;
@@ -1658,12 +1664,6 @@ Send a HTTP C<POST> request with form data.
 Process all queued transactions.
 Will be blocking unless you have a global shared ioloop and use the C<async>
 method.
-
-=head2 C<proxy_env>
-
-    $client = $client->proxy_env;
-
-Check environment variables for proxy information.
 
 =head2 C<put>
 

@@ -63,7 +63,7 @@ my $backup  = $ENV{HTTP_PROXY}  || '';
 my $backup2 = $ENV{HTTPS_PROXY} || '';
 $ENV{HTTP_PROXY}  = 'http://127.0.0.1';
 $ENV{HTTPS_PROXY} = 'https://127.0.0.1';
-$client->proxy_env;
+$client->detect_proxy;
 is($client->http_proxy,  'http://127.0.0.1',  'right proxy');
 is($client->https_proxy, 'https://127.0.0.1', 'right proxy');
 $client->http_proxy(undef);

@@ -56,7 +56,7 @@ L<ojo> implements the following functions.
 
 Build L<Mojo::ByteStream> object.
 
-=head2 C<r>
+=head2 C<oO>
 
     my $res = oO('http://mojolicio.us');
     my $res = oO('http://mojolicio.us', {'X-Bender' => 'X_x'});

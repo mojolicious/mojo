@@ -101,7 +101,7 @@ L<Mojo::Message::Response> object.
     );
     my $res = form(
         'http://search.cpan.org/search',
-        {file => '/foo/bar.txt'},
+        {file => {file => '/foo/bar.txt'}}
     );
     my $res = form(
         'http://search.cpan.org/search',

@@ -382,8 +382,8 @@ sub process {
 
 sub proxy_env {
     my $self = shift;
-    $self->http_proxy($ENV{HTTP_PROXY});
-    $self->https_proxy($ENV{HTTPS_PROXY});
+    $self->http_proxy($ENV{HTTP_PROXY}   || $ENV{http_proxy});
+    $self->https_proxy($ENV{HTTPS_PROXY} || $ENV{https_proxy});
     return $self;
 }
 

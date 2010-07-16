@@ -343,9 +343,9 @@ JSON parser and generator.
 
 Fresh code based upon years of experience developing L<Catalyst>.
 
-And much more for you to discover!
-
 =back
+
+And much more for you to discover!
 
 =head2 Duct Tape For The HTML5 Web
 

@@ -44,7 +44,7 @@ Features
 
 * Fresh code based upon years of experience developing Catalyst.
 
-* And much more for you to discover!
+And much more for you to discover!
 
 Duct Tape For The HTML5 Web
 ---------------------------

@@ -36,6 +36,7 @@ use Mojo::JSON;
 use Mojo::Transaction::HTTP;
 use Mojolicious::Lite;
 use Test::Mojo;
+use ojo;
 
 # Silence
 app->log->level('error');
@@ -325,8 +326,8 @@ get '/subrequest' => sub {
 # GET /subrequest_simple
 get '/subrequest_simple' => sub {
     my $self = shift;
-    my $tx   = $self->client->post('/template');
-    $self->render_text($tx->res->body);
+    my $res  = p('/template');
+    $self->render_text($res->body);
 };
 
 # GET /subrequest_sync

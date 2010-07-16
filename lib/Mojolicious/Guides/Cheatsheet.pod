@@ -236,6 +236,13 @@ since other mainloops are generally faster and scale better.
 
     MOJO_POLL=1
 
+=head2 C<MOJO_PROXY>
+
+Enable automatic HTTP and HTTPS proxy detection in L<Mojo::Client>, for
+security reasons this is disabled by default.
+
+    MOJO_PROXY=1
+
 =head2 C<MOJO_RELOAD>
 
 Enable L<Mojolicious> application reloading, changes to your application will

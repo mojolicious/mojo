@@ -870,6 +870,9 @@ sub _prepare_pipeline {
         # Scheme
         my $scheme = $req->url->scheme || '';
 
+        # Detect proxy
+        $self->detect_proxy if $ENV{MOJO_PROXY};
+
         # HTTP proxy
         if (my $proxy = $self->http_proxy) {
             $req->proxy($proxy) if !$req->proxy && $scheme eq 'http';

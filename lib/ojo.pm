@@ -30,7 +30,7 @@ sub import {
 }
 
 sub _request {
-    my $method = $_[0] =~ /:/ ? 'get' : lc shift;
+    my $method = $_[0] =~ /:|\// ? 'get' : lc shift;
     my $client = Mojo::Client->singleton->proxy_env;
     my $tx     = $client->build_tx($method, @_);
     $client->process($tx, sub { $tx = $_[1] });

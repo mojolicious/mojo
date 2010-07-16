@@ -13,10 +13,9 @@ Features
 * An amazing MVC web framework supporting a simplified single file mode
   through Mojolicious::Lite.
 
-    Powerful out of the box with RESTful routes, plugins, Perl-ish
-    templates, session management, signed cookies, testing framework,
-    static file server, I18N, first class unicode support and much more for
-    you to discover.
+  Powerful out of the box with RESTful routes, plugins, Perl-ish templates,
+  session management, signed cookies, testing framework, static file server,
+  I18N, first class unicode support and much more for you to discover.
 
 * Very clean, portable and Object Oriented pure Perl API without any hidden
   magic and no requirements besides Perl 5.8.7.

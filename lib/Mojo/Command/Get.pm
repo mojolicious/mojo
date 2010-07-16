@@ -37,8 +37,8 @@ sub run {
     die $self->usage unless $url;
     $url = b($url)->decode('UTF-8')->to_string;
 
-    # Relaxed client
-    my $client = Mojo::Client->new(relaxed => 1);
+    # Client
+    my $client = Mojo::Client->new;
 
     # Silence
     $client->log->level('fatal');

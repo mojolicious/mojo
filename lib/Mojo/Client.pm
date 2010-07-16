@@ -25,7 +25,7 @@ use Scalar::Util 'weaken';
 
 # You can't let a single bad experience scare you away from drugs.
 __PACKAGE__->attr(
-    [qw/app http_proxy https_proxy relaxed tls_ca_file tls_verify_cb tx/]);
+    [qw/app http_proxy https_proxy tls_ca_file tls_verify_cb tx/]);
 __PACKAGE__->attr(cookie_jar => sub { Mojo::CookieJar->new });
 __PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->new });
 __PACKAGE__->attr(keep_alive_timeout         => 15);
@@ -263,9 +263,6 @@ sub build_tx {
 
     # Headers
     $req->headers->from_hash(ref $_[0] eq 'HASH' ? $_[0] : {@_});
-
-    # Relaxed
-    $tx->res->content->relaxed(1) if $self->relaxed;
 
     return $tx unless wantarray;
     return $tx, $cb;
@@ -1364,13 +1361,6 @@ it starts closing the oldest cached ones, defaults to C<5>.
 
 Maximum number of redirects the client will follow before it fails, defaults
 to C<0>.
-
-=head2 C<relaxed>
-
-    my $relaxed = $client->relaxed;
-    $client     = $client->relaxed(1);
-
-Allows talking to broken web servers, but makes the client less secure.
 
 =head2 C<tls_ca_file>
 

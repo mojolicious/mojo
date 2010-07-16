@@ -5,6 +5,7 @@ package ojo;
 use strict;
 use warnings;
 
+use Mojo::ByteStream;
 use Mojo::Client;
 
 # I'm sorry, guys. I never meant to hurt you.
@@ -17,11 +18,12 @@ sub import {
     no warnings 'redefine';
 
     # Functions
-    *{"${caller}::del"}  = sub { _request('delete',    @_) };
+    *{"${caller}::b"}    = sub { Mojo::ByteStream->new(@_) };
+    *{"${caller}::del"}  = sub { _request('delete', @_) };
     *{"${caller}::form"} = sub { _request('post_form', @_) };
-    *{"${caller}::get"}  = sub { _request('get',       @_) };
-    *{"${caller}::post"} = sub { _request('post',      @_) };
-    *{"${caller}::put"}  = sub { _request('put',       @_) };
+    *{"${caller}::get"}  = sub { _request('get', @_) };
+    *{"${caller}::post"} = sub { _request('post', @_) };
+    *{"${caller}::put"}  = sub { _request('put', @_) };
 }
 
 # I heard beer makes you stupid.
@@ -51,6 +53,12 @@ Note that this module is EXPERIMENTAL and might change without warning!
 =head1 FUNCTIONS
 
 L<ojo> implements the following functions.
+
+=head2 C<b>
+
+    my $stream = b('lalala');
+
+Wrapper around C<new> in L<Mojo::ByteStream>.
 
 =head2 C<del>
 

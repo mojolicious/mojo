@@ -26,7 +26,7 @@ Features
 * Builtin async IO and prefork web server supporting epoll, kqueue, hot
   deployment and UNIX domain socket sharing, perfect for embedding.
 
-* Automatic CGI, FastCGI and L<PSGI> detection.
+* Automatic CGI, FastCGI and PSGI detection.
 
 * JSON and XML/HTML5 parser with CSS3 selector support.
 

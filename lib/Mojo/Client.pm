@@ -1230,19 +1230,18 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
 
     # Grab the latest Mojolicious release :)
     my $latest = 'http://mojolicious.org/Mojolicious-latest.tar.gz';
-    print $client->get($latest)->success->body;
+    print $client->get($latest)->res->body;
 
     # Quick JSON request
     my $trends = 'http://search.twitter.com/trends.json';
-    print $client->get($trends)->success->json->{trends}->[0]->{name};
+    print $client->get($trends)->res->json->{trends}->[0]->{name};
 
     # Extract data from HTML and XML resources
-    my $home = 'http://mojolicious.org';
-    print $client->get($home)->success->dom->at('title')->text;
+    print $client->get('http://mojolicious.org')->res->dom->at('title')->text;
 
     # Scrape the latest headlines from a news site
     my $news = 'http://digg.com';
-    $client->get($news)->success->dom->search("h3 > a.offsite")->each(sub {
+    $client->get($news)->res->dom->search("h3 > a.offsite")->each(sub {
         print shift->text . "\n";
     });
 

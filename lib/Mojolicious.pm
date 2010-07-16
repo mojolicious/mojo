@@ -357,7 +357,7 @@ Web development for humans, making hard things possible and everything fun.
         my $self = shift;
         my $url  = $self->param('url');
         $self->render(text =>
-              $self->client->get($url)->success->dom->at('title')->text);
+              $self->client->get($url)->res->dom->at('title')->text);
     };
 
     post '/:offset' => sub {

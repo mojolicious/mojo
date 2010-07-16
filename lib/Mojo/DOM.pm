@@ -174,7 +174,8 @@ sub replace {
     my $tree = $self->tree;
 
     # Root
-    return $self->replace_content($self->new(tree => $new))
+    return $self->replace_content(
+        $self->new(charset => $self->charset, tree => $new))
       if $tree->[0] eq 'root';
 
     # Parent
@@ -221,6 +222,19 @@ sub replace_content {
     splice @$tree, $start, $#$tree, @new;
 
     return $self;
+}
+
+sub root {
+    my $self = shift;
+
+    # Find root
+    my $root = $self->tree;
+    while ($root->[0] eq 'tag') {
+        last unless my $parent = $root->[3];
+        $root = $parent;
+    }
+
+    return $self->new(charset => $self->charset, tree => $root);
 }
 
 sub search {
@@ -775,15 +789,9 @@ sub each {
     # Iterate
     $_->$cb for @$self;
 
-    # Find root
+    # Root
     return unless my $start = $self->[0];
-    my $root = $start->tree;
-    while ($root->[0] eq 'tag') {
-        last unless my $parent = $root->[3];
-        $root = $parent;
-    }
-
-    return $start->new(tree => $root);
+    return $start->root;
 }
 
 1;
@@ -953,6 +961,12 @@ Replace elements.
     $dom = $dom->replace_content('test');
 
 Replace element content.
+
+=head2 C<root>
+
+    my $root = $dom->root;
+
+Find root element.
 
 =head2 C<search>
 

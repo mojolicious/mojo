@@ -308,6 +308,24 @@ art technology.
 An amazing MVC web framework supporting a simplified single file mode through
 L<Mojolicious::Lite>.
 
+=over 4
+
+Very smart RESTful routing system.
+
+MIME type based renderer with a very Perl-ish default template system.
+
+Session management with signed cookies that just works.
+
+Easily extendable through plugins.
+
+Optimized for test driven development.
+
+Convenient static file server.
+
+Internationalization and first class unicode support out of the box.
+
+=back
+
 Very clean, portable and Object Oriented pure Perl API without any hidden
 magic and no requirements besides Perl 5.8.7.
 
@@ -319,12 +337,13 @@ deployment and UNIX domain socket sharing, perfect for embedding.
 
 CGI, FastCGI and L<PSGI> support.
 
+XML/HTML5 parser with CSS3 selector support.
+
+JSON parser and generator.
+
 Fresh code based upon years of experience, from the author of L<Catalyst>.
 
-Powerful out of the box with RESTful routes, plugins, sessions, signed
-cookies, static file server, testing framework, Perl-ish templates, JSON,
-XML parser with CSS3 selectors, I18N, first class Unicode support and much
-more for you to discover!
+And much more for you to discover!
 
 =back
 

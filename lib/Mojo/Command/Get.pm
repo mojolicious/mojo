@@ -33,7 +33,7 @@ sub run {
     GetOptions('headers' => sub { $headers = 1 });
 
     # URL
-    my $url = shift;
+    my $url = $ARGV[0];
     die $self->usage unless $url;
     $url = b($url)->decode('UTF-8')->to_string;
 

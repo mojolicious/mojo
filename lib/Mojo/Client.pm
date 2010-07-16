@@ -1423,6 +1423,8 @@ clients.
 
 Clone client instance and start using the global shared L<Mojo::IOLoop>
 singleton.
+Note that parallel requests are always handled asynchronous, this only
+affects shared L<Mojo::IOLoop> instances.
 
     $client->async->get('http://mojolicious.org' => sub {
         my $client = shift;

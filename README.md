@@ -42,7 +42,7 @@ Features
 
 * JSON parser and generator.
 
-* Fresh code based upon years of experience, from the author of Catalyst.
+* Fresh code based upon years of experience developing Catalyst.
 
 * And much more for you to discover!
 

@@ -341,7 +341,7 @@ XML/HTML5 parser with CSS3 selector support.
 
 JSON parser and generator.
 
-Fresh code based upon years of experience, from the author of L<Catalyst>.
+Fresh code based upon years of experience developing L<Catalyst>.
 
 And much more for you to discover!
 

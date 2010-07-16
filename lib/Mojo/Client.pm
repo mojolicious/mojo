@@ -380,6 +380,13 @@ sub process {
     return $self;
 }
 
+sub proxy_env {
+    my $self = shift;
+    $self->http_proxy($ENV{HTTP_PROXY});
+    $self->https_proxy($ENV{HTTPS_PROXY});
+    return $self;
+}
+
 sub put {
     my $self = shift;
     $self->_queue_or_process_tx($self->build_tx('PUT', @_));
@@ -1651,6 +1658,12 @@ Send a HTTP C<POST> request with form data.
 Process all queued transactions.
 Will be blocking unless you have a global shared ioloop and use the C<async>
 method.
+
+=head2 C<proxy_env>
+
+    $client = $client->proxy_env;
+
+Check environment variables for proxy information.
 
 =head2 C<put>
 

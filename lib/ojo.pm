@@ -29,7 +29,7 @@ sub import {
 sub _request {
     my $method = shift;
     pop @_ if ref $_[-1] && ref $_[-1] eq 'CODE';
-    return Mojo::Client->new->$method(@_)->res;
+    return Mojo::Client->new->proxy_env->$method(@_)->res;
 }
 
 1;

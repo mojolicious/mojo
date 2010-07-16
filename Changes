@@ -14,6 +14,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added relative path support to Mojo::URL. (marcus)
         - Added simple iterator support to Mojo::DOM.
         - Added is_xhr method to Mojo::Message::Request.
+        - Added proxy_env method to Mojo::Client. (DaTa)
         - Cleaned up tests. (memowe)
         - Improved Mojo::Client error logging.
         - Improved Mojo::Template error messages.

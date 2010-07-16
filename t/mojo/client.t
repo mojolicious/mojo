@@ -13,7 +13,7 @@ use Test::More;
 plan skip_all =>
   'set TEST_CLIENT to enable this test (internet connection required!)'
   unless $ENV{TEST_CLIENT};
-plan tests => 91;
+plan tests => 95;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -57,6 +57,21 @@ $client->process($tx);
 is($tx->state,     'done', 'right state');
 is($tx->res->code, 301,    'right status');
 like($tx->res->headers->connection, qr/close/i, 'right "Connection" header');
+
+# Proxy check
+my $backup  = $ENV{HTTP_PROXY}  || '';
+my $backup2 = $ENV{HTTPS_PROXY} || '';
+$ENV{HTTP_PROXY}  = 'http://127.0.0.1';
+$ENV{HTTPS_PROXY} = 'https://127.0.0.1';
+$client->proxy_env;
+is($client->http_proxy,  'http://127.0.0.1',  'right proxy');
+is($client->https_proxy, 'https://127.0.0.1', 'right proxy');
+$client->http_proxy(undef);
+$client->https_proxy(undef);
+is($client->http_proxy,  undef, 'right proxy');
+is($client->https_proxy, undef, 'right proxy');
+$ENV{HTTP_PROXY}  = $backup;
+$ENV{HTTPS_PROXY} = $backup2;
 
 # Oneliner
 is(get('http://mojolicious.org')->code, 200, 'right status');

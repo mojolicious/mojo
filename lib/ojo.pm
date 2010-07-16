@@ -20,7 +20,6 @@ sub import {
     no warnings 'redefine';
 
     # Functions
-    *{"${caller}::b"} = sub { Mojo::ByteStream->new(@_) };
     *{"${caller}::oO"} = sub {
         my $method = $_[0] =~ /:/ ? 'get' : lc shift;
         my $client = Mojo::Client->singleton->proxy_env;
@@ -28,6 +27,7 @@ sub import {
         $client->process($tx, sub { $tx = $_[1] });
         return $tx->res;
     };
+    *{"${caller}::Oo"} = sub { Mojo::ByteStream->new(@_) };
 }
 
 1;
@@ -39,7 +39,7 @@ ojo - Fun Oneliners With Mojo!
 
 =head1 SYNOPSIS
 
-    perl -Mojo -e 'print fetch("http://mojolicio.us")->dom->at("title")->text'
+    perl -Mojo -e 'print oO("http://mojolicio.us")->dom->at("title")->text'
 
 =head1 DESCRIPTION
 
@@ -49,12 +49,6 @@ Note that this module is EXPERIMENTAL and might change without warning!
 =head1 FUNCTIONS
 
 L<ojo> implements the following functions.
-
-=head2 C<b>
-
-    my $stream = b('lalala');
-
-Build L<Mojo::ByteStream> object.
 
 =head2 C<oO>
 
@@ -75,6 +69,12 @@ Build L<Mojo::ByteStream> object.
     );
 
 Fetch URL and turn response into a L<Mojo::Message::Response> object.
+
+=head2 C<Oo>
+
+    my $stream = Oo('lalala');
+
+Turn input into a L<Mojo::ByteStream> object.
 
 =head1 SEE ALSO
 

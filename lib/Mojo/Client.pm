@@ -1487,7 +1487,9 @@ Versatile general purpose transaction builder.
 
     my $clone = $client->clone;
 
-Clone client instance.
+Clone client the instance.
+Note that cloned clients don't share the same keep alive queue, so you could
+easily run out of file descriptors with too many active clients.
 
 =head2 C<delete>
 

@@ -76,6 +76,8 @@ Fetch URL and turn response into a L<Mojo::Message::Response> object.
 
 Turn input into a L<Mojo::ByteStream> object.
 
+    perl -Mojo -e 'print Oo(oO("http://mojolicio.us")->body)->html_unescape'
+
 =head1 SEE ALSO
 
 L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.

@@ -5,6 +5,8 @@ package ojo;
 use strict;
 use warnings;
 
+# I heard beer makes you stupid.
+# No I'm... doesn't.
 use Mojo::ByteStream;
 use Mojo::Client;
 
@@ -18,20 +20,11 @@ sub import {
     no warnings 'redefine';
 
     # Functions
-    *{"${caller}::b"}    = sub { Mojo::ByteStream->new(@_) };
-    *{"${caller}::del"}  = sub { _request('delete', @_) };
-    *{"${caller}::form"} = sub { _request('post_form', @_) };
-    *{"${caller}::get"}  = sub { _request('get', @_) };
-    *{"${caller}::post"} = sub { _request('post', @_) };
-    *{"${caller}::put"}  = sub { _request('put', @_) };
-}
-
-# I heard beer makes you stupid.
-# No I'm... doesn't.
-sub _request {
-    my $method = shift;
-    pop @_ if ref $_[-1] && ref $_[-1] eq 'CODE';
-    return Mojo::Client->new->proxy_env->$method(@_)->res;
+    *{"${caller}::b"} = sub { Mojo::ByteStream->new(@_) };
+    *{"${caller}::fetch"} = sub {
+        pop @_ if ref $_[-1] && ref $_[-1] eq 'CODE';
+        return Mojo::Client->singleton->proxy_env->get(@_)->res;
+    };
 }
 
 1;
@@ -43,7 +36,7 @@ ojo - Fun Oneliners With Mojo!
 
 =head1 SYNOPSIS
 
-    perl -Mojo -e 'print get("http://mojolicio.us")->dom->at("title")->text'
+    perl -Mojo -e 'print fetch("http://mojolicio.us")->dom->at("title")->text'
 
 =head1 DESCRIPTION
 
@@ -58,82 +51,19 @@ L<ojo> implements the following functions.
 
     my $stream = b('lalala');
 
-Wrapper around C<new> in L<Mojo::ByteStream>.
+Build L<Mojo::ByteStream> object.
 
-=head2 C<del>
+=head2 C<fetch>
 
-    my $res = del('http://mojolicio.us');
-    my $res = del('http://mojolicio.us', {'X-Bender' => 'X_x'});
-    my $res =
-      del('http://mojolicio.us', {'Content-Type' => 'text/plain', 'Hello!'});
-
-Wrapper around C<delete> in L<Mojo::Client> that directly returns a
-L<Mojo::Message::Response> object.
-
-=head2 C<get>
-
-    my $res = get('http://mojolicio.us');
-    my $res = get('http://mojolicio.us', {'X-Bender' => 'X_x'});
-    my $res =
-      get('http://mojolicio.us', {'Content-Type' => 'text/plain', 'Hello!'});
-
-Wrapper around C<get> in L<Mojo::Client> that directly returns a
-L<Mojo::Message::Response> object.
-
-=head2 C<form>
-
-    my $res = form('http://search.cpan.org/search', {query => 'ojo'});
-    my $res = form(
-        'http://search.cpan.org/search',
-        'UTF-8',
-        {query => 'ojo'}
-    );
-    my $res = form(
-        'http://search.cpan.org/search',
-        {query => 'ojo'},
-        {'X-Bender' => 'X_x'}
-    );
-    my $res = form(
-        'http://search.cpan.org/search',
-        'UTF-8',
-        {query => 'ojo'},
-        {'X-Bender' => 'X_x'}
-    );
-    my $res = form(
-        'http://search.cpan.org/search',
-        {file => {file => '/foo/bar.txt'}}
-    );
-    my $res = form(
-        'http://search.cpan.org/search',
-        {file => {content => 'lalala'}}
-    );
-    my $res = form(
-        'http://search.cpan.org/search',
-        {myzip => {file => $asset, filename => 'foo.zip'}}
+    my $res = fetch('http://mojolicio.us');
+    my $res = fetch('http://mojolicio.us', {'X-Bender' => 'X_x'});
+    my $res = fetch(
+        'http://mojolicio.us',
+        {'Content-Type' => 'text/plain'},
+        'Hello!'
     );
 
-Wrapper around C<post_form> in L<Mojo::Client> that directly returns a
-L<Mojo::Message::Response> object.
-
-=head2 C<post>
-
-    my $res = post('http://mojolicio.us');
-    my $res = post('http://mojolicio.us', {'X-Bender' => 'X_x'});
-    my $res =
-      post('http://mojolicio.us', {'Content-Type' => 'text/plain', 'Hello!'});
-
-Wrapper around C<post> in L<Mojo::Client> that directly returns a
-L<Mojo::Message::Response> object.
-
-=head2 C<put>
-
-    my $res = put('http://mojolicio.us');
-    my $res = put('http://mojolicio.us', {'X-Bender' => 'X_x'});
-    my $res =
-      put('http://mojolicio.us', {'Content-Type' => 'text/plain', 'Hello!'});
-
-Wrapper around C<put> in L<Mojo::Client> that directly returns a
-L<Mojo::Message::Response> object.
+Fetch URL and turn response into a L<Mojo::Message::Response> object.
 
 =head1 SEE ALSO
 

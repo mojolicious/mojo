@@ -173,6 +173,10 @@ sub replace {
     # Tree
     my $tree = $self->tree;
 
+    # Root
+    return $self->replace_content($self->new(tree => $new))
+      if $tree->[0] eq 'root';
+
     # Parent
     my $parent = $tree->[3];
 

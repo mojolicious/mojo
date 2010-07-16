@@ -1414,8 +1414,8 @@ following new ones.
     my $client = Mojo::Client->new;
 
 Construct a new L<Mojo::Client> object.
-Use C<singleton> if you want to share keep alive connections and cookies with
-other clients
+Use C<singleton> if you want to share keep alive connections with other
+clients.
 
 =head2 C<async>
 

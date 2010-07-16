@@ -22,8 +22,11 @@ sub import {
     # Functions
     *{"${caller}::b"} = sub { Mojo::ByteStream->new(@_) };
     *{"${caller}::fetch"} = sub {
-        pop @_ if ref $_[-1] && ref $_[-1] eq 'CODE';
-        return Mojo::Client->singleton->proxy_env->get(@_)->res;
+        my $method = $_[0] =~ /:/ ? 'get' : lc shift;
+        my $client = Mojo::Client->singleton->proxy_env;
+        my $tx     = $client->build_tx($method, @_);
+        $client->process($tx, sub { $tx = $_[1] });
+        return $tx->res;
     };
 }
 
@@ -58,6 +61,14 @@ Build L<Mojo::ByteStream> object.
     my $res = fetch('http://mojolicio.us');
     my $res = fetch('http://mojolicio.us', {'X-Bender' => 'X_x'});
     my $res = fetch(
+        'http://mojolicio.us',
+        {'Content-Type' => 'text/plain'},
+        'Hello!'
+    );
+    my $res = fetch(POST => 'http://mojolicio.us');
+    my $res = fetch(POST => 'http://mojolicio.us', {'X-Bender' => 'X_x'});
+    my $res = fetch(
+        'POST',
         'http://mojolicio.us',
         {'Content-Type' => 'text/plain'},
         'Hello!'

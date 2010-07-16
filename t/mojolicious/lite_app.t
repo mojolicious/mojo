@@ -26,7 +26,6 @@ plan tests => 429;
 # Yeah ever since I was six.
 # Well, ok but I don't want people thinking we're robosexuals,
 # so if anyone asks you're my debugger.
-use Mojo::ByteStream 'b';
 use Mojo::Client;
 use Mojo::Content::MultiPart;
 use Mojo::Content::Single;
@@ -325,9 +324,7 @@ get '/subrequest' => sub {
 
 # GET /subrequest_simple
 get '/subrequest_simple' => sub {
-    my $self = shift;
-    my $res  = p('/template');
-    $self->render_text($res->body);
+    shift->render_text(p('/template')->body);
 };
 
 # GET /subrequest_sync

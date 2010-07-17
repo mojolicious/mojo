@@ -20,7 +20,7 @@ __PACKAGE__->attr(usage => <<"EOF");
 usage: $0 get [OPTIONS] [URL]
 
 These options are available:
-  --headers    Print response headers to STDERR.
+  --verbose   Print response start line and headers to STDERR.
 EOF
 
 # I hope this has taught you kids a lesson: kids never learn.
@@ -30,7 +30,11 @@ sub run {
     # Options
     local @ARGV = @_ if @_;
     my $headers = 0;
-    GetOptions('headers' => sub { $headers = 1 });
+    my $verbose = 0;
+    GetOptions(
+        'headers' => sub { $headers = 1 },
+        'verbose' => sub { $verbose = 1 }
+    );
 
     # URL
     my $url = $ARGV[0];
@@ -51,10 +55,12 @@ sub run {
     my $tx = $client->build_tx(GET => $url);
     $tx->res->body(
         sub {
-            my ($tx, $chunk) = @_;
-            print STDERR $tx->headers->to_string . "\n\n" if $headers;
+            my ($res, $chunk) = @_;
+            print STDERR $tx->res->build_start_line if $verbose;
+            print STDERR $res->headers->to_string, "\n\n"
+              if $headers || $verbose;
             print $chunk;
-            $headers = 0;
+            $verbose = $headers = 0;
         }
     );
 

@@ -7,8 +7,6 @@ use warnings;
 
 use base 'Mojo::Server';
 
-use Errno qw/EAGAIN EWOULDBLOCK/;
-
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 8192;
 
 __PACKAGE__->attr(nph => 0);
@@ -31,10 +29,6 @@ sub run {
     # Request body
     while (!$req->is_finished) {
         my $read = STDIN->sysread(my $buffer, CHUNK_SIZE, 0);
-        unless (defined $read) {
-            next if $! == EAGAIN || $! == EWOULDBLOCK;
-            last;
-        }
         last unless $read;
         $req->parse($buffer);
     }

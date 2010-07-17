@@ -290,7 +290,17 @@ sub write_records {
         my $woffset = 0;
         while ($woffset < length $record) {
             my $written = $c->syswrite($record, undef, $woffset);
-            return unless defined $written;
+
+            # Error
+            unless (defined $written) {
+
+                # Retry
+                next if $! == EAGAIN || $! == EWOULDBLOCK;
+
+                # Write error
+                return;
+            }
+
             $woffset += $written;
         }
 

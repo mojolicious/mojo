@@ -29,12 +29,8 @@ sub run {
 
     # Options
     local @ARGV = @_ if @_;
-    my $headers = 0;
     my $verbose = 0;
-    GetOptions(
-        'headers' => sub { $headers = 1 },
-        'verbose' => sub { $verbose = 1 }
-    );
+    GetOptions('verbose' => sub { $verbose = 1 });
 
     # URL
     my $url = $ARGV[0];
@@ -57,10 +53,9 @@ sub run {
         sub {
             my ($res, $chunk) = @_;
             print STDERR $tx->res->build_start_line if $verbose;
-            print STDERR $res->headers->to_string, "\n\n"
-              if $headers || $verbose;
+            print STDERR $res->headers->to_string, "\n\n" if $verbose;
             print $chunk;
-            $verbose = $headers = 0;
+            $verbose = 0;
         }
     );
 

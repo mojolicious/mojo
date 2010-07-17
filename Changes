@@ -15,6 +15,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added simple iterator support to Mojo::DOM.
         - Added is_xhr method to Mojo::Message::Request.
         - Added detect_proxy method to Mojo::Client. (DaTa)
+        - Added say method to Mojo::ByteStream.
         - Cleaned up tests. (memowe)
         - Improved Mojo::Client error logging.
         - Improved Mojo::Template error messages.

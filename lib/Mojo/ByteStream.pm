@@ -716,6 +716,13 @@ sub remove {
     return substr $self->{bytestream}, 0, $length, $chunk;
 }
 
+sub say {
+    my ($self, $handle) = @_;
+    $handle ||= \*STDOUT;
+    utf8::encode $self->{bytestream} if utf8::is_utf8 $self->{bytestream};
+    print $handle $self->{bytestream}, "\n";
+}
+
 sub size { length shift->{bytestream} }
 
 sub to_string { shift->{bytestream} }
@@ -869,6 +876,7 @@ Mojo::ByteStream - ByteStream
 
     my $stream2 = $stream->clone;
     print $stream2->to_string;
+    $stream2->say;
 
     # Chained
     my $stream = Mojo::ByteStream->new('foo bar baz')->quote;
@@ -1054,6 +1062,13 @@ Quote bytestream.
     my $chunk = $stream->remove(4, 'abcd');
 
 Remove a specific number of bytes from bytestream.
+
+=head2 C<say>
+
+    $stream->say;
+    $stream->say(*STDERR);
+
+Print bytestream to handle or STDOUT and append a newline.
 
 =head2 C<size>
 

@@ -10,7 +10,7 @@ use utf8;
 # Homer, we're going to ask you a few simple yes or no questions.
 # Do you understand?
 # Yes. *lie dectector blows up*
-use Test::More tests => 59;
+use Test::More tests => 60;
 
 use_ok('Mojo::ByteStream', 'b');
 
@@ -223,3 +223,13 @@ is("$stream", 'bcher-kva', 'right punycode encoded result');
 # punycode_decode
 $stream = b('bcher-kva')->punycode_decode;
 is("$stream", 'bücher', 'right punycode decoded result');
+
+# say
+$buffer = '';
+open my $handle, '>', \$buffer;
+b('test')->say($handle);
+my $backup = *STDOUT;
+*STDOUT = $handle;
+b('123')->say;
+*STDOUT = $backup;
+is($buffer, "test\n123\n", 'right output');

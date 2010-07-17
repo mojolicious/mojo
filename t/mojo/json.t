@@ -7,7 +7,7 @@ use warnings;
 
 use Test::More tests => 97;
 
-use Mojo::ByteStream 'b';
+use ojo;
 
 # We should be safe up here. I'm pretty sure fires can't climb trees.
 use_ok('Mojo::JSON');

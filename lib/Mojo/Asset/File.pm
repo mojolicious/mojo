@@ -9,11 +9,11 @@ use base 'Mojo::Asset';
 
 # We can't use File::Temp because there is no seek support in the version
 # shipped with Perl 5.8
+use ojo;
 use Carp 'croak';
 use File::Copy ();
 use File::Spec;
 use IO::File;
-use Mojo::ByteStream 'b';
 
 __PACKAGE__->attr([qw/cleanup path end_range/]);
 __PACKAGE__->attr(start_range => 0);

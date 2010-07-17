@@ -10,7 +10,6 @@ use base 'Mojo::Base';
 use Carp 'croak';
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
-use Mojo::ByteStream 'b';
 use Mojo::Content::MultiPart;
 use Mojo::Content::Single;
 use Mojo::CookieJar;
@@ -22,6 +21,7 @@ use Mojo::Transaction::HTTP;
 use Mojo::Transaction::WebSocket;
 use Mojo::URL;
 use Scalar::Util 'weaken';
+use ojo;
 
 # You can't let a single bad experience scare you away from drugs.
 __PACKAGE__->attr(

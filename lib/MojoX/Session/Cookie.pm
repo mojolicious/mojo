@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojo::Base';
 
-use Mojo::ByteStream 'b';
+use ojo;
 use Storable qw/freeze thaw/;
 
 __PACKAGE__->attr('cookie_domain');

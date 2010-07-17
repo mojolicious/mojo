@@ -12,7 +12,9 @@ use utf8;
 # Yes. *lie dectector blows up*
 use Test::More tests => 60;
 
-use_ok('Mojo::ByteStream', 'b');
+use_ok('Mojo::ByteStream');
+
+use ojo;
 
 # Empty
 my $stream = Mojo::ByteStream->new;

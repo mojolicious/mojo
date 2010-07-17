@@ -7,8 +7,9 @@ use warnings;
 
 # I heard beer makes you stupid.
 # No I'm... doesn't.
+require Mojo::Client;
+
 use Mojo::ByteStream;
-use Mojo::Client;
 
 # I'm sorry, guys. I never meant to hurt you.
 # Just to destroy everything you ever believed in.

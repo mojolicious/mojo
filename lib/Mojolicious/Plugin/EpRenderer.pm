@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojolicious::Plugin';
 
-use Mojo::ByteStream 'b';
+use ojo;
 use Mojo::Template;
 
 # What do you want?

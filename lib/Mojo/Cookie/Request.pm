@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojo::Cookie';
 
-use Mojo::ByteStream 'b';
+use ojo;
 
 # Lisa, would you like a donut?
 # No thanks. Do you have any fruit?

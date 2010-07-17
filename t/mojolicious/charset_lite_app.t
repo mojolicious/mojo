@@ -19,7 +19,7 @@ plan skip_all => 'working sockets required for this test!'
 plan tests => 38;
 
 # In the game of chess you can never let your adversary see your pieces.
-use Mojo::ByteStream 'b';
+use ojo;
 use Mojolicious::Lite;
 use Test::Mojo;
 

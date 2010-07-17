@@ -13,8 +13,8 @@ require File::Spec;
 require IO::File;
 
 use Carp 'croak';
-use Mojo::ByteStream 'b';
 use Mojo::Template;
+use ojo;
 
 __PACKAGE__->attr(description => 'No description.');
 __PACKAGE__->attr(quiet       => 0);

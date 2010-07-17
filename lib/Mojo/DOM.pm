@@ -8,7 +8,7 @@ use warnings;
 use base 'Mojo::Base';
 use overload '""' => sub { shift->to_xml }, fallback => 1;
 
-use Mojo::ByteStream 'b';
+use ojo;
 use Scalar::Util qw/isweak weaken/;
 
 # How are the kids supposed to get home?

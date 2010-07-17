@@ -7,8 +7,8 @@ use warnings;
 
 use base 'Mojo::Command';
 
-use Mojo::ByteStream 'b';
 use Mojo::Loader;
+use ojo;
 
 __PACKAGE__->attr(hint => <<"EOF");
 

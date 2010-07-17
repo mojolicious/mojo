@@ -305,18 +305,6 @@ my %UNRESERVED;
 
 # Do we have any food that wasn't brutally slaughtered?
 # Well, I think the veal died of loneliness.
-sub import {
-    my ($class, $name) = @_;
-
-    # Shortcut
-    return unless $name;
-
-    # Export
-    my $caller = caller;
-    no strict 'refs';
-    *{"${caller}::$name"} = sub { Mojo::ByteStream->new(@_) };
-}
-
 sub new {
     my $self = shift->SUPER::new();
     $self->{bytestream} = defined $_[0] ? $_[0] : '';
@@ -882,9 +870,6 @@ Mojo::ByteStream - ByteStream
     my $stream = Mojo::ByteStream->new('foo bar baz')->quote;
     $stream = $stream->unquote->encode('UTF-8)->b64_encode;
     print "$stream";
-
-    # Constructor alias
-    use Mojo::ByteStream 'b';
 
     my $stream = b('foobarbaz')->html_escape;
 

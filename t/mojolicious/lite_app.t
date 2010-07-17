@@ -26,6 +26,7 @@ plan tests => 429;
 # Yeah ever since I was six.
 # Well, ok but I don't want people thinking we're robosexuals,
 # so if anyone asks you're my debugger.
+use ojo;
 use Mojo::Client;
 use Mojo::Content::MultiPart;
 use Mojo::Content::Single;
@@ -35,7 +36,6 @@ use Mojo::JSON;
 use Mojo::Transaction::HTTP;
 use Mojolicious::Lite;
 use Test::Mojo;
-use ojo;
 
 # Silence
 app->log->level('error');

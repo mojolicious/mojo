@@ -7,8 +7,8 @@ use warnings;
 
 use base 'Mojo::Cookie';
 
-use Mojo::ByteStream 'b';
 use Mojo::Date;
+use ojo;
 
 __PACKAGE__->attr([qw/comment domain httponly max_age port secure/]);
 

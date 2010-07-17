@@ -8,8 +8,8 @@ use warnings;
 use base 'Mojo::Base';
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
+use ojo;
 use Carp 'croak';
-use Mojo::ByteStream 'b';
 
 __PACKAGE__->attr([qw/name path value version/]);
 

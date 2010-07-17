@@ -46,7 +46,7 @@ ojo - Fun Oneliners With Mojo!
 
 =head1 SYNOPSIS
 
-    perl -Mojo -e 'print g("http://mojolicio.us")->dom->at("title")->text'
+    perl -Mojo -e 'b(g("http://mojolicio.us")->dom->at("title")->text)->say'
 
 =head1 DESCRIPTION
 
@@ -63,7 +63,7 @@ L<ojo> implements the following functions.
 
 Turn input into a L<Mojo::ByteStream> object.
 
-    perl -Mojo -e 'print b(g("http://mojolicio.us")->body)->html_unescape'
+    perl -Mojo -e 'b(g("http://mojolicio.us")->body)->html_unescape->say'
 
 =head2 C<d>
 

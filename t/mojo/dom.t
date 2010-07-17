@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 119;
+use Test::More tests => 121;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -268,12 +268,14 @@ $dom->parse(<<EOF);
   </tr>
 </table>
 EOF
-my @td;
+my @data;
 for my $tr ($dom->search('table tr')->each) {
     for my $td (@{$tr->children}) {
-        push @td, $td->name . $td->all_text;
+        push @data, $td->name, $td->all_text;
     }
 }
-is($td[0], 'tdtext1', 'right text');
-is($td[1], 'tdtext2', 'right text');
-is($td[2], undef,     'no text');
+is($data[0], 'td',    'right tag');
+is($data[1], 'text1', 'right text');
+is($data[2], 'td',    'right tag');
+is($data[3], 'text2', 'right text');
+is($data[4], undef,   'no tag');

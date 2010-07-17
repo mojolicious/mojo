@@ -68,12 +68,13 @@ sub all_text {
     # Text
     my $text = '';
 
-    # Walk tree
-    my @stack = @{$self->tree};
-    while (my $e = shift @stack) {
+    # Tree
+    my $tree = $self->tree;
 
-        # Meta data
-        next unless ref $e eq 'ARRAY';
+    # Walk tree
+    my $start = $tree->[0] eq 'root' ? 1 : 4;
+    my @stack = @$tree[$start .. $#$tree];
+    while (my $e = shift @stack) {
 
         # Type
         my $type = $e->[0];
@@ -110,11 +111,12 @@ sub children {
     # Children
     my @children;
 
-    # Walk stack
-    for my $e (@{$self->tree}) {
+    # Tree
+    my $tree = $self->tree;
 
-        # Meta data
-        next unless ref $e eq 'ARRAY';
+    # Walk tree
+    my $start = $tree->[0] eq 'root' ? 1 : 4;
+    for my $e (@$tree[$start .. $#$tree]) {
 
         # Tag
         next unless $e->[0] eq 'tag';

@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 116;
+use Test::More tests => 119;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -258,3 +258,22 @@ $dom->replace_content('');
 is("$dom", '', 'right text');
 $dom->replace_content('<div>foo<p>lalala</p>bar</div>');
 is("$dom", '<div>foo<p>lalala</p>bar</div>', 'right text');
+
+# Mixed search and tree walk
+$dom->parse(<<EOF);
+<table>
+<tr>
+ <td>text1</td>
+ <td>text2</td>
+</tr>
+</table>
+EOF
+my @td;
+for my $row (@{$dom->search('table tr')}) {
+    for my $child (@{$row->children}) {
+        push @td, $child->name . $child->all_text;
+    }
+}
+is($td[0], 'tdtext1', 'right text');
+is($td[1], 'tdtext2', 'right text');
+is($td[2], undef,     'no text');

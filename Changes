@@ -23,6 +23,7 @@ This file documents the revision history for Perl extension Mojolicious.
           (John Kingsley)
         - Fixed Mojo::DOM to support escaped selectors.
         - Fixed Mojo::DOM parser bugs.
+        - Fixed Mojo::DOM child listing bug. (evt)
         - Fixed json/data rendering with layouts in MojoX::Renderer.
         - Fixed Mojo::IOLoop to not stop unexpectedly.
         - Fixed graceful shutdown in Mojo::Server::Daemon::Prefork.

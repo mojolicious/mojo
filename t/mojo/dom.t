@@ -262,16 +262,16 @@ is("$dom", '<div>foo<p>lalala</p>bar</div>', 'right text');
 # Mixed search and tree walk
 $dom->parse(<<EOF);
 <table>
-<tr>
- <td>text1</td>
- <td>text2</td>
-</tr>
+  <tr>
+    <td>text1</td>
+    <td>text2</td>
+  </tr>
 </table>
 EOF
 my @td;
-for my $row (@{$dom->search('table tr')}) {
-    for my $child (@{$row->children}) {
-        push @td, $child->name . $child->all_text;
+for my $tr ($dom->search('table tr')->each) {
+    for my $td (@{$tr->children}) {
+        push @td, $td->name . $td->all_text;
     }
 }
 is($td[0], 'tdtext1', 'right text');

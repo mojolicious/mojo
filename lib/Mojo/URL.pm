@@ -8,7 +8,7 @@ use warnings;
 use base 'Mojo::Base';
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
-use ojo;
+use Mojo::ByteStream 'b';
 use Mojo::Parameters;
 use Mojo::Path;
 

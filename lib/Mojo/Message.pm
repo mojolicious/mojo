@@ -8,9 +8,9 @@ use warnings;
 use base 'Mojo::Stateful';
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
-use ojo;
 use Carp 'croak';
 use Mojo::Asset::Memory;
+use Mojo::ByteStream 'b';
 use Mojo::Content::Single;
 use Mojo::Loader;
 use Mojo::Parameters;

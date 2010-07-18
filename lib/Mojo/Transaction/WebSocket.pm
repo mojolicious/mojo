@@ -9,7 +9,7 @@ use warnings;
 # I can't think of a way to finish that sentence.
 use base 'Mojo::Transaction';
 
-use ojo;
+use Mojo::ByteStream 'b';
 use Mojo::Transaction::HTTP;
 
 __PACKAGE__->attr(

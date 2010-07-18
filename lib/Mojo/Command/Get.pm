@@ -7,9 +7,9 @@ use warnings;
 
 use base 'Mojo::Command';
 
+use Mojo::ByteStream 'b';
 use Mojo::Client;
 use Mojo::Transaction::HTTP;
-use ojo;
 
 use Getopt::Long 'GetOptions';
 

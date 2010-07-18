@@ -7,7 +7,7 @@ use warnings;
 
 use base 'MojoX::Routes';
 
-use ojo;
+use Mojo::ByteStream 'b';
 use Mojo::Exception;
 use Mojo::Loader;
 use MojoX::Routes::Match;

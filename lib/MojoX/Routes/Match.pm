@@ -7,8 +7,8 @@ use warnings;
 
 use base 'Mojo::Base';
 
-use ojo;
 use Carp 'croak';
+use Mojo::ByteStream 'b';
 use Mojo::URL;
 
 __PACKAGE__->attr(captures => sub { {} });

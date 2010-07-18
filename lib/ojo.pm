@@ -7,8 +7,8 @@ use warnings;
 
 # I heard beer makes you stupid.
 # No I'm... doesn't.
-require Mojo::ByteStream;
-require Mojo::Client;
+use Mojo::ByteStream 'b';
+use Mojo::Client;
 
 # I'm sorry, guys. I never meant to hurt you.
 # Just to destroy everything you ever believed in.
@@ -20,8 +20,7 @@ sub import {
     no warnings 'redefine';
 
     # Functions
-    *{"${caller}::Oo"} = *{"${caller}::b"} =
-      sub { Mojo::ByteStream->new(@_) };
+    *{"${caller}::Oo"} = *{"${caller}::b"} = \&b;
     *{"${caller}::oO"} = sub { _request(@_) };
     *{"${caller}::d"}  = sub { _request('delete', @_) };
     *{"${caller}::g"}  = sub { _request('get', @_) };

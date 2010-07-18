@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojo::Base';
 
-use ojo;
+use Mojo::ByteStream 'b';
 use Mojo::Client;
 use Mojo::Message::Response;
 

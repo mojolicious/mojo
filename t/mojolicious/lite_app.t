@@ -16,7 +16,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 429;
+plan tests => 430;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -26,7 +26,6 @@ plan tests => 429;
 # Yeah ever since I was six.
 # Well, ok but I don't want people thinking we're robosexuals,
 # so if anyone asks you're my debugger.
-use ojo;
 use Mojo::Client;
 use Mojo::Content::MultiPart;
 use Mojo::Content::Single;
@@ -36,6 +35,9 @@ use Mojo::JSON;
 use Mojo::Transaction::HTTP;
 use Mojolicious::Lite;
 use Test::Mojo;
+
+# Mojolicious::Lite and ojo
+use_ok('ojo');
 
 # Silence
 app->log->level('error');

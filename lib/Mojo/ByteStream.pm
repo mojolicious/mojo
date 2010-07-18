@@ -303,14 +303,11 @@ my %UNRESERVED;
     $UNRESERVED{$_}++ for @unreserved;
 }
 
-# DEPRECATED in Snowman!
-# Use ojo instead
 sub import {
-    my ($class, $name) = @_;
-    return unless $name;
     my $caller = caller;
     no strict 'refs';
-    *{"${caller}::$name"} = sub { Mojo::ByteStream->new(@_) };
+    *{"${caller}::b"} = sub { Mojo::ByteStream->new(@_) }
+      if @_ > 1;
 }
 
 # Do we have any food that wasn't brutally slaughtered?
@@ -881,6 +878,8 @@ Mojo::ByteStream - ByteStream
     $stream = $stream->unquote->encode('UTF-8)->b64_encode;
     print "$stream";
 
+    # Alternative constructor
+    use Mojo::ByteStream 'b';
     my $stream = b('foobarbaz')->html_escape;
 
     # Buffering

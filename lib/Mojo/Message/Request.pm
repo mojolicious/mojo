@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojo::Message';
 
-use ojo;
+use Mojo::ByteStream 'b';
 use Mojo::Cookie::Request;
 use Mojo::Parameters;
 use Mojo::URL;

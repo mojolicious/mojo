@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojo::Base';
 
-use ojo;
+use Mojo::ByteStream 'b';
 
 __PACKAGE__->attr(hooks      => sub { {} });
 __PACKAGE__->attr(namespaces => sub { ['Mojolicious::Plugin'] });

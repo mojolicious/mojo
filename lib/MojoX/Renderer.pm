@@ -7,8 +7,8 @@ use warnings;
 
 use base 'Mojo::Base';
 
-use ojo;
 use File::Spec;
+use Mojo::ByteStream 'b';
 use Mojo::Command;
 use Mojo::JSON;
 use MojoX::Types;

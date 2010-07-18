@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojo::Content';
 
-use ojo;
+use Mojo::ByteStream 'b';
 
 __PACKAGE__->attr(parts => sub { [] });
 

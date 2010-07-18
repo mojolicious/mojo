@@ -303,6 +303,16 @@ my %UNRESERVED;
     $UNRESERVED{$_}++ for @unreserved;
 }
 
+# DEPRECATED in Snowman!
+# Use ojo instead
+sub import {
+    my ($class, $name) = @_;
+    return unless $name;
+    my $caller = caller;
+    no strict 'refs';
+    *{"${caller}::$name"} = sub { Mojo::ByteStream->new(@_) };
+}
+
 # Do we have any food that wasn't brutally slaughtered?
 # Well, I think the veal died of loneliness.
 sub new {

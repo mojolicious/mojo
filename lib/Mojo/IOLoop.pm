@@ -154,7 +154,7 @@ sub connect {
 
     # New connection
     my $class = IPV6 ? 'IO::Socket::INET6' : 'IO::Socket::INET';
-    return unless my $socket = $class->new(%options);
+    return unless my $socket = $args->{socket} || $class->new(%options);
     my $id = "$socket";
 
     # Add connection
@@ -1455,6 +1455,10 @@ Port to connect to.
 =item C<read_cb>
 
 Callback to be invoked if new data arrives on the connection.
+
+=item C<socket>
+
+Use an already prepared socket handle.
 
 =item C<tls>
 

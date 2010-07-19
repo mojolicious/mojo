@@ -268,6 +268,50 @@ sub build_tx {
     return $tx, $cb;
 }
 
+sub build_websocket_tx {
+    my $self = shift;
+
+    # New WebSocket
+    my $tx = Mojo::Transaction::HTTP->new;
+
+    # Request
+    my $req = $tx->req;
+    $req->method('GET');
+
+    # URL
+    my $url = $req->url;
+    $url->parse(shift);
+
+    # Scheme
+    my $abs = $url->to_abs;
+    if (my $scheme = $abs->scheme) {
+        $scheme = $scheme eq 'wss' ? 'https' : 'http';
+        $req->url($abs->scheme($scheme));
+    }
+
+    # Callback
+    my $cb = pop @_ if ref $_[-1] && ref $_[-1] eq 'CODE';
+
+    # Headers
+    my $h = $req->headers;
+    $h->from_hash(ref $_[0] eq 'HASH' ? $_[0] : {@_});
+
+    # Default headers
+    $h->upgrade('WebSocket')           unless $h->upgrade;
+    $h->connection('Upgrade')          unless $h->connection;
+    $h->sec_websocket_protocol('mojo') unless $h->sec_websocket_protocol;
+
+    # Generate challenge
+    $h->sec_websocket_key1($self->_generate_key)
+      unless $h->sec_websocket_key1;
+    $h->sec_websocket_key2($self->_generate_key)
+      unless $h->sec_websocket_key2;
+    $req->body(pack 'N*', int(rand 9999999) + 1, int(rand 9999999) + 1);
+
+    return $tx unless wantarray;
+    return $tx, $cb;
+}
+
 sub clone {
     my $self = shift;
 
@@ -370,10 +414,10 @@ sub process {
         return $clone->process;
     }
 
-    # Add transactions from queue
+    # Add async transactions from queue
     else { $self->_prepare_pipeline(@$_) for @$queue }
 
-    # Sync
+    # Process sync requests
     if (!$self->{_is_async} && $self->{_processing}) {
 
         # Start loop
@@ -483,46 +527,7 @@ sub test_server {
 # ...Where are we going?
 sub websocket {
     my $self = shift;
-
-    # New WebSocket
-    my $tx = Mojo::Transaction::HTTP->new;
-
-    # Request
-    my $req = $tx->req;
-    $req->method('GET');
-
-    # URL
-    my $url = $req->url;
-    $url->parse(shift);
-
-    # Scheme
-    my $abs = $url->to_abs;
-    if (my $scheme = $abs->scheme) {
-        $scheme = $scheme eq 'wss' ? 'https' : 'http';
-        $req->url($abs->scheme($scheme));
-    }
-
-    # Callback
-    my $cb = pop @_ if ref $_[-1] && ref $_[-1] eq 'CODE';
-
-    # Headers
-    my $h = $req->headers;
-    $h->from_hash(ref $_[0] eq 'HASH' ? $_[0] : {@_});
-
-    # Default headers
-    $h->upgrade('WebSocket')           unless $h->upgrade;
-    $h->connection('Upgrade')          unless $h->connection;
-    $h->sec_websocket_protocol('mojo') unless $h->sec_websocket_protocol;
-
-    # Generate challenge
-    $h->sec_websocket_key1($self->_generate_key)
-      unless $h->sec_websocket_key1;
-    $h->sec_websocket_key2($self->_generate_key)
-      unless $h->sec_websocket_key2;
-    $req->body(pack 'N*', int(rand 9999999) + 1, int(rand 9999999) + 1);
-
-    # Queue
-    $self->queue($tx, $cb);
+    $self->queue($self->build_websocket_tx(@_));
 }
 
 sub websocket_challenge {
@@ -537,32 +542,65 @@ sub websocket_challenge {
     return b("$c1$c2$key3")->md5_bytes->to_string;
 }
 
+sub _cache {
+    my ($self, $name, $id) = @_;
+
+    # Cache
+    my $cache = $self->{_cache} ||= [];
+
+    # Enqueue
+    if ($id) {
+
+        # Limit keep alive connections
+        while (@$cache > $self->max_keep_alive_connections) {
+            my $cached = shift @$cache;
+            $self->_drop($cached->[1]);
+        }
+
+        # Add to cache
+        push @$cache, [$name, $id];
+
+        return $self;
+    }
+
+    # Dequeue
+    my $result;
+    my @cache;
+    for my $cached (@$cache) {
+
+        # Search for name or id
+        $result = $cached->[1] and next
+          if $cached->[1] eq $name || $cached->[0] eq $name;
+
+        # Cache again
+        push @cache, $cached;
+    }
+    $self->{_cache} = \@cache;
+
+    return $result;
+}
+
 # Where on my badge does it say anything about protecting people?
 # Uh, second word, chief.
 sub _connect {
     my ($self, $p, $cb) = @_;
 
     # First transaction
-    my $f = $p->[0];
+    my $c = $p->[0];
 
     # Check for specific connection id
-    my $id = $f->connection;
-
-    # Info
-    my ($scheme, $address, $port) = $self->_pipeline_info($p);
+    my $id = $c->connection;
 
     # Cleanup
     my $loop = $self->ioloop;
     $loop->one_tick(0);
 
-    # CONNECT request
-    my $connect;
-    $connect = 1 if ($f->req->method || '') eq 'CONNECT';
+    # Info
+    my ($scheme, $address, $port) = $self->_pipeline_info($p);
 
-    # Cached connection
-    $id = $self->_dequeue_connection($id || "$scheme:$address:$port")
-      unless $connect;
-    if ($id) {
+    # Keep alive connection
+    $id ||= $self->_cache("$scheme:$address:$port");
+    if ($id && !ref $id) {
 
         # Writing
         $loop->writing($id);
@@ -581,7 +619,7 @@ sub _connect {
     else {
 
         # TLS/WebSocket proxy
-        if (!$connect) {
+        unless (($c->req->method || '') eq 'CONNECT') {
 
             # CONNECT request to proxy required
             return if $self->_proxy_connect($p, $cb);
@@ -591,6 +629,7 @@ sub _connect {
         $id = $loop->connect(
             address => $address,
             port    => $port,
+            socket  => $id,
             tls     => $scheme eq 'https' ? 1 : 0,
             tls_ca_file => $self->tls_ca_file || $ENV{MOJO_CA_FILE},
             tls_verify_cb => $self->tls_verify_cb,
@@ -647,48 +686,26 @@ sub _connected {
     $loop->connection_timeout($id => $self->keep_alive_timeout);
 }
 
-sub _dequeue_connection {
-    my ($self, $name) = @_;
-
-    # Withdraw
-    my $found;
-    my @cache;
-    my $cache = $self->{_cache} || [];
-    for my $cached (@$cache) {
-
-        # Search for name or id
-        $found = $cached->[1] and next
-          if $cached->[1] eq $name || $cached->[0] eq $name;
-
-        # Cache again
-        push @cache, $cached;
-    }
-    $self->{_cache} = \@cache;
-
-    return $found;
-}
-
 # Mrs. Simpson, bathroom is not for customers.
 # Please use the crack house across the street.
 sub _drop {
     my ($self, $id) = @_;
 
-    # Keep connection alive
+    # Keep alive
     if (my $p = $self->{_cs}->{$id}->{p}) {
 
         # Read only
         $self->ioloop->not_writing($id);
 
-        # Deposit
+        # Keep connection alive
         my ($scheme, $address, $port) = $self->_pipeline_info($p);
-        $self->_queue_connection("$scheme:$address:$port", $id)
-          if $p->[-1]->keep_alive;
+        $self->_cache("$scheme:$address:$port", $id) if $p->[-1]->keep_alive;
     }
 
     # Connection close
     else {
+        $self->_cache($id);
         $self->ioloop->drop($id);
-        $self->_dequeue_connection($id);
     }
 
     # Drop connection
@@ -710,27 +727,6 @@ sub _error {
 
     # Finished
     $self->_handle_response($id);
-}
-
-sub _fetch_cookies {
-    my ($self, $p) = @_;
-
-    # Shortcut
-    return unless $self->cookie_jar;
-
-    # Fetch cookies for pipeline
-    for my $tx (@$p) {
-
-        # Request
-        my $req = $tx->req;
-
-        # URL
-        my $url = $req->url->clone;
-        if (my $host = $req->headers->host) { $url->host($host) }
-
-        # Fetch
-        $req->cookies($self->cookie_jar->find($url));
-    }
 }
 
 sub _generate_key {
@@ -792,8 +788,8 @@ sub _handle_response {
     # Finish pipeline
     if ($old) {
 
-        # Cookies to the jar
-        $self->_store_cookies($old);
+        # Extract cookies
+        if (my $jar = $self->cookie_jar) { $jar->extract(@$old) }
 
         # Counter
         $self->{_processing} -= 1 unless $new;
@@ -817,10 +813,10 @@ sub _pipeline_info {
     my ($self, $p) = @_;
 
     # First transaction
-    my $f = $p->[-1];
+    my $c = $p->[-1];
 
     # Info
-    my $req    = $f->req;
+    my $req    = $c->req;
     my $url    = $req->url;
     my $scheme = $url->scheme || 'http';
     my $host   = $url->ihost;
@@ -829,7 +825,7 @@ sub _pipeline_info {
     # Check for connect transaction
     my $connect;
     my $method = $req->method  || '';
-    my $code   = $f->res->code || '';
+    my $code   = $c->res->code || '';
     $connect = 1
       if ($method eq 'CONNECT' && $code eq '200')
       || ($method ne 'CONNECT' && $scheme eq 'https');
@@ -893,8 +889,8 @@ sub _prepare_pipeline {
           unless $headers->user_agent;
     }
 
-    # Cookies from the jar
-    $self->_fetch_cookies($p);
+    # Inject cookies
+    if (my $jar = $self->cookie_jar) { $jar->inject(@$p) }
 
     # Connect
     return unless my $id = $self->_connect($p, $cb);
@@ -921,24 +917,24 @@ sub _prepare_pipeline {
     return $id;
 }
 
-# Hey, Weener Boy... where do you think you'e going?
+# Hey, Weener Boy... where do you think you're going?
 sub _proxy_connect {
     my ($self, $p, $cb) = @_;
 
     # First transaction
-    my $f = $p->[0];
+    my $c = $p->[0];
 
     # Request
-    my $req = $f->req;
+    my $req = $c->req;
 
     # Proxy
     return
       unless ($req->headers->upgrade || '') eq 'WebSocket'
       || ($req->proxy && ($req->url->scheme || '') eq 'https');
-    return unless my $proxy = $f->req->proxy;
+    return unless my $proxy = $c->req->proxy;
 
     # CONNECT request
-    my $new = $self->build_tx(CONNECT => $f->req->url->clone);
+    my $new = $self->build_tx(CONNECT => $c->req->url->clone);
     $new->req->proxy($proxy);
 
     # Prepare
@@ -956,10 +952,8 @@ sub _proxy_connect {
             # TLS upgrade
             if ($tx->req->url->scheme eq 'https') {
 
-                # Connection
-                return
-                  unless my $old =
-                      $self->_dequeue_connection($tx->connection);
+                # Connection from keep alive cache
+                return unless my $old = $tx->connection;
 
                 # Start TLS
                 my $new = $self->ioloop->start_tls(
@@ -972,14 +966,10 @@ sub _proxy_connect {
                 $p->[0]->req->proxy(undef);
                 delete $self->{_cs}->{$old};
                 $tx->connection($new);
-
-                # Queue connection
-                my ($scheme, $address, $port) = $self->_pipeline_info($p);
-                $self->_queue_connection("$scheme:$address:$port", $new);
             }
 
             # Share connection
-            $f->connection($tx->connection);
+            $c->connection($tx->connection);
 
             # Queue real pipeline
             $self->_prepare_pipeline($p, $cb);
@@ -987,20 +977,6 @@ sub _proxy_connect {
     );
 
     return 1;
-}
-
-sub _queue_connection {
-    my ($self, $name, $id) = @_;
-
-    # Limit keep alive connections
-    my $cache = $self->{_cache} ||= [];
-    while (@$cache >= $self->max_keep_alive_connections) {
-        my $cached = shift @$cache;
-        $self->_drop($cached->[1]);
-    }
-
-    # Deposit
-    push @$cache, [$name, $id];
 }
 
 sub _queue_or_process_tx {
@@ -1110,34 +1086,6 @@ sub _state {
       : $self->ioloop->not_writing($id);
 }
 
-sub _store_cookies {
-    my ($self, $p) = @_;
-
-    # Shortcut
-    return unless $self->cookie_jar;
-
-    # Store cookies
-    for my $tx (@$p) {
-
-        # URL
-        my $url = $tx->req->url;
-
-        # Fix cookies
-        my @cookies = @{$tx->res->cookies};
-        for my $cookie (@cookies) {
-
-            # Domain
-            $cookie->domain($url->host) unless $cookie->domain;
-
-            # Path
-            $cookie->path($url->path) unless $cookie->path;
-        }
-
-        # Store
-        $self->cookie_jar->add(@cookies);
-    }
-}
-
 # Once the government approves something, it's no longer immoral!
 sub _upgrade {
     my ($self, $id) = @_;
@@ -1145,32 +1093,32 @@ sub _upgrade {
     # Connection
     my $c = $self->{_cs}->{$id};
 
-    # Transaction
+    # Last transaction
     my $old = $c->{p}->[-1];
 
     # Request
     my $req = $old->req;
 
-    # Response
-    my $res = $old->res;
-
     # Headers
     my $headers = $req->headers;
 
-    # No handshake
-    return unless $req->headers->upgrade;
+    # No upgrade request
+    return unless $headers->upgrade;
+
+    # Response
+    my $res = $old->res;
 
     # Handshake failed
     return unless ($res->code || '') eq '101';
 
-    # Challenge
+    # WebSocket challenge
     my $solution =
       $self->websocket_challenge(scalar $headers->sec_websocket_key1,
         scalar $headers->sec_websocket_key2, $req->body);
     $old->error('WebSocket challenge failed.') and return
       unless $solution eq $res->body;
 
-    # Start new WebSocket
+    # Upgrade to WebSocket transaction
     my $new = Mojo::Transaction::WebSocket->new(handshake => $old);
     $c->{p} = [$new];
     $new->kept_alive($old->kept_alive);
@@ -1483,6 +1431,15 @@ Versatile general purpose transaction builder.
     my $tx = $client->build_tx(GET => 'http://mojolicious.org');
     $tx->res->body(sub { print $_[1] });
     $client->process($tx);
+
+=head2 C<build_websocket_tx>
+
+    my $tx = $client->build_websocket_tx('ws://localhost:3000' => sub {...});
+    my $tx = $client->build_websocket_tx(
+        'ws://localhost:3000' => {'User-Agent' => 'Agent 1.0'} => sub {...}
+    );
+
+Versatile WebSocket transaction builder.
 
 =head2 C<clone>
 

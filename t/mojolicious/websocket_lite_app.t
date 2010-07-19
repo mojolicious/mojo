@@ -14,10 +14,11 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 10;
+plan tests => 12;
 
 # Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
 # Well, that’s love for you.
+use IO::Socket::INET;
 use Mojolicious::Lite;
 use Mojo::Client;
 
@@ -39,6 +40,13 @@ websocket '/' => sub {
             $flag = 20;
         }
     );
+};
+
+# WebSocket /socket
+websocket '/socket' => sub {
+    my $self = shift;
+    $self->send_message(scalar $self->req->headers->host);
+    $self->finish;
 };
 
 # WebSocket /early_start
@@ -84,6 +92,34 @@ $client->websocket(
     }
 )->process;
 is($result, 'test1test2', 'right result');
+
+# WebSocket /socket (using an already prepared socket)
+my $peer  = $client->test_server;
+my $local = $client->ioloop->generate_port;
+$result = undef;
+my $tx     = $client->build_websocket_tx("ws://lalala/socket");
+my $socket = IO::Socket::INET->new(
+    PeerAddr  => 'localhost',
+    PeerPort  => $peer,
+    LocalPort => $local
+);
+$tx->connection($socket);
+my $port;
+$client->process(
+    $tx => sub {
+        my $self = shift;
+        $self->receive_message(
+            sub {
+                my ($self, $message) = @_;
+                $result = $message;
+                $self->finish;
+            }
+        );
+        $port = $self->ioloop->local_info($self->tx->connection)->{port};
+    }
+)->process;
+is($result, 'lalala', 'right result');
+is($port,   $local,   'right local port');
 
 # WebSocket /early_start (server directly sends a message)
 my $flag2;

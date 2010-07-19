@@ -595,8 +595,8 @@ Note that you should use a custom C<secret> to make signed cookies really secure
     app->secret('My secret passphrase here!');
 
 A full featured HTTP 1.1 and WebSocket client is built right in.
-Especially in combination with L<Mojo::JSON> this can be a very powerful
-tool.
+Especially in combination with L<Mojo::JSON> and L<Mojo::DOM> this can be a
+very powerful tool.
 
     get '/test' => sub {
         my $self = shift;

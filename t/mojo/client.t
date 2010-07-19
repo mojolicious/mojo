@@ -99,9 +99,9 @@ $tx = $client->get('https://www.google.com');
 is($tx->has_error, 1, 'request failed');
 
 # Simple request with body
-$tx = $client->get('http://www.apache.org' => 'Hi there!');
+$tx = $client->get('http://mojolicious.org' => 'Hi there!');
 is($tx->req->method, 'GET', 'right method');
-is($tx->req->url, 'http://www.apache.org', 'right url');
+is($tx->req->url, 'http://mojolicious.org', 'right url');
 is($tx->req->headers->content_length, 9,           'right content length');
 is($tx->req->body,                    'Hi there!', 'right content');
 is($tx->res->code,                    200,         'right status');

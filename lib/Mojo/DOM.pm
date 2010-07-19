@@ -19,17 +19,17 @@ __PACKAGE__->attr(tree => sub { ['root'] });
 # Regex
 my $CSS_ATTR_RE = qr/
     \[
-    (\w+)               # Key
+    ((?:\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}|\w)+)   # Key
     (?:
-    (\W)?               # Operator
+    (\W)?                                         # Operator
     =
-    "((?:[^"]|\\")+)"   # Value
+    "((?:\\"|[^"])+)"                             # Value
     )?
     \]
 /x;
-my $CSS_CLASS_RE        = qr/\.([^\.]+)/;
-my $CSS_ELEMENT_RE      = qr/^([^\.\#]+)/;
-my $CSS_ID_RE           = qr/\#([^\#]+)/;
+my $CSS_CLASS_RE        = qr/\.((?:\\\.|[^\.])+)/;
+my $CSS_ELEMENT_RE      = qr/^((?:\\\.|\\\#|[^\.\#])+)/;
+my $CSS_ID_RE           = qr/\#((?:\\\#|[^\#])+)/;
 my $CSS_PSEUDO_CLASS_RE = qr/(?:\:(\w+)(?:\(([^\)]+)\))?)/;
 my $CSS_TOKEN_RE        = qr/
     (\s*,\s*)?                                                # Separator
@@ -523,7 +523,7 @@ sub _parse_css {
 
         # Attributes
         while ($attributes =~ /$CSS_ATTR_RE/g) {
-            my $key   = $1;
+            my $key   = $self->_css_unescape($1);
             my $op    = $2 || '';
             my $value = $3;
 

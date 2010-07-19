@@ -187,7 +187,7 @@ sub build_form_tx {
                 $filename =
                   $filename->url_escape($Mojo::URL::PARAM)->to_string;
 
-                # File
+                # Asset
                 $part->asset(delete $f->{file});
 
                 # Headers
@@ -415,7 +415,7 @@ sub process {
     }
 
     # Add async transactions from queue
-    else { $self->_prepare_pipeline(@$_) for @$queue }
+    else { $self->_start_pipeline(@$_) for @$queue }
 
     # Process sync requests
     if (!$self->{_is_async} && $self->{_processing}) {
@@ -586,10 +586,10 @@ sub _connect {
     my ($self, $p, $cb) = @_;
 
     # First transaction
-    my $c = $p->[0];
+    my $f = $p->[0];
 
     # Check for specific connection id
-    my $id = $c->connection;
+    my $id = $f->connection;
 
     # Cleanup
     my $loop = $self->ioloop;
@@ -619,7 +619,7 @@ sub _connect {
     else {
 
         # TLS/WebSocket proxy
-        unless (($c->req->method || '') eq 'CONNECT') {
+        unless (($f->req->method || '') eq 'CONNECT') {
 
             # CONNECT request to proxy required
             return if $self->_proxy_connect($p, $cb);
@@ -813,10 +813,10 @@ sub _pipeline_info {
     my ($self, $p) = @_;
 
     # First transaction
-    my $c = $p->[-1];
+    my $f = $p->[-1];
 
     # Info
-    my $req    = $c->req;
+    my $req    = $f->req;
     my $url    = $req->url;
     my $scheme = $url->scheme || 'http';
     my $host   = $url->ihost;
@@ -825,7 +825,7 @@ sub _pipeline_info {
     # Check for connect transaction
     my $connect;
     my $method = $req->method  || '';
-    my $code   = $c->res->code || '';
+    my $code   = $f->res->code || '';
     $connect = 1
       if ($method eq 'CONNECT' && $code eq '200')
       || ($method ne 'CONNECT' && $scheme eq 'https');
@@ -843,8 +843,143 @@ sub _pipeline_info {
     return ($scheme, $host, $port);
 }
 
+# Hey, Weener Boy... where do you think you're going?
+sub _proxy_connect {
+    my ($self, $p, $cb) = @_;
+
+    # First transaction
+    my $f = $p->[0];
+
+    # Request
+    my $req = $f->req;
+
+    # URL
+    my $url = $req->url;
+
+    # Proxy check
+    return unless my $proxy = $req->proxy;
+    return
+      unless ($req->headers->upgrade || '') eq 'WebSocket'
+      || ($url->scheme || '') eq 'https';
+
+    # CONNECT request
+    my $new = $self->build_tx(CONNECT => $url->clone);
+    $new->req->proxy($proxy);
+
+    # Start CONNECT request
+    $self->_start_pipeline(
+        [$new] => sub {
+            my ($self, $tx) = @_;
+
+            # Failed
+            unless (($tx->res->code || '') eq '200') {
+                $_->error('Proxy connection failed.', 500) for @$p;
+                $self->$cb(@$p) if $cb;
+                return;
+            }
+
+            # TLS upgrade
+            if ($tx->req->url->scheme eq 'https') {
+
+                # Connection from keep alive cache
+                return unless my $old = $tx->connection;
+
+                # Start TLS
+                my $new = $self->ioloop->start_tls(
+                    $old,
+                    tls_ca_file => $self->tls_ca_file || $ENV{MOJO_CA_FILE},
+                    tls_verify_cb => $self->tls_verify_cb
+                );
+
+                # Cleanup
+                $p->[0]->req->proxy(undef);
+                delete $self->{_cs}->{$old};
+                $tx->connection($new);
+            }
+
+            # Share connection
+            $f->connection($tx->connection);
+
+            # Start real pipeline
+            $self->_start_pipeline($p, $cb);
+        }
+    );
+
+    return 1;
+}
+
+sub _queue_or_process_tx {
+    my ($self, $tx, $cb) = @_;
+
+    # Quick process
+    if (!$cb && !$self->{_is_async}) {
+        $self->process($tx, sub { $tx = $_[1] });
+        return $tx;
+    }
+
+    # Queue transaction with callback
+    $self->queue($tx, $cb);
+}
+
+# Have you ever seen that Blue Man Group? Total ripoff of the Smurfs.
+# And the Smurfs, well, they SUCK.
+sub _read {
+    my ($self, $loop, $id, $chunk) = @_;
+
+    # Connection
+    my $c = $self->{_cs}->{$id};
+
+    # Pipeline
+    if (my $p = $c->{p}) {
+
+        # Read
+        $p->[$c->{reader}]->client_read($chunk);
+    }
+
+    # Corrupted connection
+    else { $self->_drop($id) }
+}
+
+sub _redirect {
+    my ($self, $c, $p) = @_;
+
+    # Transaction
+    my $tx = $p->[-1];
+
+    # Code
+    return unless $tx->res->is_status_class('300');
+    return if $tx->res->code == 305;
+
+    # Location
+    return unless my $location = $tx->res->headers->location;
+
+    # Method
+    my $method = $tx->req->method;
+    $method = 'GET' unless $method =~ /^GET|HEAD$/i;
+
+    # Max redirects
+    my $r = $c->{redirects} || 0;
+    my $max = $self->max_redirects;
+    return unless $r < $max;
+
+    # New transaction
+    my $new = Mojo::Transaction::HTTP->new;
+    $new->req->method($method);
+    $new->req->url->parse($location);
+    $new->previous($p);
+
+    # Start redirected request
+    my $nid = $self->_start_pipeline([$new], $c->{cb});
+
+    # Create new connection
+    $self->{_cs}->{$nid}->{redirects} = $r + 1;
+
+    # Redirecting
+    return 1;
+}
+
 # It's greeat! We can do *anything* now that Science has invented Magic.
-sub _prepare_pipeline {
+sub _start_pipeline {
     my ($self, $p, $cb) = @_;
 
     # Prepare all transactions
@@ -915,138 +1050,6 @@ sub _prepare_pipeline {
     $self->{_processing} += 1;
 
     return $id;
-}
-
-# Hey, Weener Boy... where do you think you're going?
-sub _proxy_connect {
-    my ($self, $p, $cb) = @_;
-
-    # First transaction
-    my $c = $p->[0];
-
-    # Request
-    my $req = $c->req;
-
-    # Proxy
-    return
-      unless ($req->headers->upgrade || '') eq 'WebSocket'
-      || ($req->proxy && ($req->url->scheme || '') eq 'https');
-    return unless my $proxy = $c->req->proxy;
-
-    # CONNECT request
-    my $new = $self->build_tx(CONNECT => $c->req->url->clone);
-    $new->req->proxy($proxy);
-
-    # Prepare
-    $self->_prepare_pipeline(
-        [$new] => sub {
-            my ($self, $tx) = @_;
-
-            # Failed
-            unless (($tx->res->code || '') eq '200') {
-                $_->error('Proxy connection failed.', 500) for @$p;
-                $self->$cb(@$p) if $cb;
-                return;
-            }
-
-            # TLS upgrade
-            if ($tx->req->url->scheme eq 'https') {
-
-                # Connection from keep alive cache
-                return unless my $old = $tx->connection;
-
-                # Start TLS
-                my $new = $self->ioloop->start_tls(
-                    $old,
-                    tls_ca_file => $self->tls_ca_file || $ENV{MOJO_CA_FILE},
-                    tls_verify_cb => $self->tls_verify_cb
-                );
-
-                # Cleanup
-                $p->[0]->req->proxy(undef);
-                delete $self->{_cs}->{$old};
-                $tx->connection($new);
-            }
-
-            # Share connection
-            $c->connection($tx->connection);
-
-            # Queue real pipeline
-            $self->_prepare_pipeline($p, $cb);
-        }
-    );
-
-    return 1;
-}
-
-sub _queue_or_process_tx {
-    my ($self, $tx, $cb) = @_;
-
-    # Quick process
-    if (!$cb && !$self->{_is_async}) {
-        $self->process($tx, sub { $tx = $_[1] });
-        return $tx;
-    }
-
-    # Queue transaction with callback
-    $self->queue($tx, $cb);
-}
-
-# Have you ever seen that Blue Man Group? Total ripoff of the Smurfs.
-# And the Smurfs, well, they SUCK.
-sub _read {
-    my ($self, $loop, $id, $chunk) = @_;
-
-    # Connection
-    my $c = $self->{_cs}->{$id};
-
-    # Pipeline
-    if (my $p = $c->{p}) {
-
-        # Read
-        $p->[$c->{reader}]->client_read($chunk);
-    }
-
-    # Corrupted connection
-    else { $self->_drop($id) }
-}
-
-sub _redirect {
-    my ($self, $c, $p) = @_;
-
-    # Transaction
-    my $tx = $p->[-1];
-
-    # Code
-    return unless $tx->res->is_status_class('300');
-    return if $tx->res->code == 305;
-
-    # Location
-    return unless my $location = $tx->res->headers->location;
-
-    # Method
-    my $method = $tx->req->method;
-    $method = 'GET' unless $method =~ /^GET|HEAD$/i;
-
-    # Max redirects
-    my $r = $c->{redirects} || 0;
-    my $max = $self->max_redirects;
-    return unless $r < $max;
-
-    # New transaction
-    my $new = Mojo::Transaction::HTTP->new;
-    $new->req->method($method);
-    $new->req->url->parse($location);
-    $new->previous($p);
-
-    # Queue redirected request
-    my $nid = $self->_prepare_pipeline([$new], $c->{cb});
-
-    # Create new connection
-    $self->{_cs}->{$nid}->{redirects} = $r + 1;
-
-    # Redirecting
-    return 1;
 }
 
 # Oh, I'm in no condition to drive. Wait a minute.
@@ -1428,8 +1431,14 @@ Versatile transaction builder for forms.
 
 Versatile general purpose transaction builder.
 
+    # Streaming response
     my $tx = $client->build_tx(GET => 'http://mojolicious.org');
     $tx->res->body(sub { print $_[1] });
+    $client->process($tx);
+
+    # Custom socket
+    my $tx = $client->build_tx(GET => 'http://mojolicious.org');
+    $tx->connection($socket);
     $client->process($tx);
 
 =head2 C<build_websocket_tx>

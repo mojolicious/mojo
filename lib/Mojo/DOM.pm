@@ -48,17 +48,17 @@ my $XML_ATTR_RE = qr/
 my $XML_END_RE   = qr/^\s*\/\s*(.+)\s*/;
 my $XML_START_RE = qr/(\S+)\s*(.*)/;
 my $XML_TOKEN_RE = qr/
-    ([^<]*)                          # Text
+    ([^<]*)                                   # Text
     (?:
-    <\?(\S+[^(\?>)]*)\?>             # Processing Instruction
+    <\?(\S+(?:[^?]|\?(?!>))*)\?>              # Processing Instruction
     |
-    <\!--([^(-->)*]+)-->             # Comment
+    <\!--((?:[^-]|-(?!->))+)-->               # Comment
     |
-    <\!\[CDATA\[([^(\]\]>)]*)\]\]>   # CDATA
+    <\!\[CDATA\[((?:[^\]]|\](?!\]>))*)\]\]>   # CDATA
     |
-    <\!DOCTYPE([^>]*)>               # DOCTYPE
+    <\!DOCTYPE([^>]*)>                        # DOCTYPE
     |
-    <([^>]+)>                        # Tag
+    <([^>]+)>                                 # Tag
     )?
 /xi;
 
@@ -498,7 +498,7 @@ sub _parse_css {
         # Element
         $element ||= '';
         my $tag = '*';
-        $element =~ s/$CSS_ELEMENT_RE// and $tag = $1;
+        $element =~ s/$CSS_ELEMENT_RE// and $tag = $self->_css_unescape($1);
 
         # Tag
         push @$selector, ['tag', $tag];
@@ -734,7 +734,7 @@ sub _select {
         if ($type eq 'root') {
 
             # Fill queue
-            push @queue, @$current[1 .. $#$current];
+            unshift @queue, @$current[1 .. $#$current];
             next;
         }
 
@@ -742,7 +742,7 @@ sub _select {
         elsif ($type eq 'tag') {
 
             # Fill queue
-            push @queue, @$current[4 .. $#$current];
+            unshift @queue, @$current[4 .. $#$current];
 
             # Match
             push @results, $current if $self->_match($current, $pattern);

@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 121;
+use Test::More tests => 127;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -138,7 +138,7 @@ my @p;
 $dom->search('div')->each(sub { push @div, $_->attributes->{id} })
   ->search('p')->each(sub { push @p, $_->attributes->{id} });
 is_deeply(\@p, [qw/foo bar/], 'found all p elements');
-my $ids = [qw/container header content logo buttons buttons/];
+my $ids = [qw/container header logo buttons buttons content/];
 is_deeply(\@div, $ids, 'found all div elements');
 
 # Script tag
@@ -279,3 +279,41 @@ is($data[1], 'text1', 'right text');
 is($data[2], 'td',    'right tag');
 is($data[3], 'text2', 'right text');
 is($data[4], undef,   'no tag');
+
+# RSS
+$dom->parse(<<EOF);
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+  <channel>
+    <title>Test Blog</title>
+    <link>http://blog.kraih.com</link>
+    <description>lalala</description>
+    <generator>Mojolicious</generator>
+    <item>
+      <pubDate>Mon, 12 Jul 2010 20:42:00</pubDate>
+      <title>Works!</title>
+      <link>http://blog.kraih.com/test</link>
+      <guid>http://blog.kraih.com/test</guid>
+      <description>
+        <![CDATA[<p>trololololo>]]>
+      </description>
+      <my:extension id="works">
+        <![CDATA[
+          [awesome]]
+        ]]>
+      </my:extension>
+    </item>
+  </channel>
+</rss>
+EOF
+is($dom->search('rss')->[0]->attributes->{version}, '2.0',   'right version');
+is($dom->at('my\:extension')->attributes->{id},     'works', 'right id');
+like($dom->at('#works')->text, qr/\[awesome\]/, 'right text');
+is($dom->search('description')->[1]->text, '<p>trololololo>', 'right text');
+is($dom->at('pubdate')->text, 'Mon, 12 Jul 2010 20:42:00', 'right text');
+
+# Result and iterator order
+$dom->parse('<a><b>1</b></a><b>2</b><b>3</b>');
+my @numbers;
+$dom->search("b")->each(sub { push @numbers, shift->text });
+is_deeply(\@numbers, [1, 2, 3], 'right order');

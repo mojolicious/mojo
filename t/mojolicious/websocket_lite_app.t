@@ -97,7 +97,7 @@ is($result, 'test1test2', 'right result');
 my $peer  = $client->test_server;
 my $local = $client->ioloop->generate_port;
 $result = undef;
-my $tx     = $client->build_websocket_tx("ws://lalala/socket");
+my $tx     = $client->build_websocket_tx('ws://lalala/socket');
 my $socket = IO::Socket::INET->new(
     PeerAddr  => 'localhost',
     PeerPort  => $peer,

@@ -297,7 +297,7 @@ $dom->parse(<<EOF);
       <description>
         <![CDATA[<p>trololololo>]]>
       </description>
-      <my:extension id="works">
+      <my:extension foo:id="works">
         <![CDATA[
           [awesome]]
         ]]>
@@ -307,7 +307,7 @@ $dom->parse(<<EOF);
 </rss>
 EOF
 is($dom->search('rss')->[0]->attributes->{version}, '2.0',   'right version');
-is($dom->at('my\:extension')->attributes->{id},     'works', 'right id');
+is($dom->at('extension')->attributes->{'foo:id'},   'works', 'right id');
 like($dom->at('#works')->text, qr/\[awesome\]\]/, 'right text');
 is($dom->search('description')->[1]->text, '<p>trololololo>', 'right text');
 is($dom->at('pubdate')->text, 'Mon, 12 Jul 2010 20:42:00', 'right text');

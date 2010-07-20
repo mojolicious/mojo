@@ -318,22 +318,25 @@ sub _compare {
             # Wildcard
             next if $name eq '*';
 
-            # Name
-            next if $name eq $current->[1];
+            # Name (ignore namespace prefix)
+            next if $current->[1] =~ /\:?$name$/;
         }
 
         # Attribute
         elsif ($type eq 'attribute') {
             my $key   = $c->[1];
+            my $regex = $c->[2];
             my $attrs = $current->[2];
 
-            # Regex
-            if (my $regex = $c->[2]) {
-                next if ($attrs->{$key} || '') =~ /$regex/;
+            # Find attributes (ignore namespace prefix)
+            my $found = 0;
+            for my $name (keys %$attrs) {
+                if ($name =~ /\:?$key$/) {
+                    ++$found and last
+                      if !$regex || ($attrs->{$name} || '') =~ /$regex/;
+                }
             }
-
-            # Exists
-            else { next if exists $attrs->{$key} }
+            next if $found;
         }
 
         # Pseudo class

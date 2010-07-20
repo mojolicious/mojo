@@ -147,6 +147,41 @@ sub name {
     return $self;
 }
 
+sub namespace {
+    my $self = shift;
+
+    # Current
+    my $current = $self->tree;
+    return if $current->[0] eq 'root';
+
+    # Prefix
+    my $prefix = '';
+    if ($current->[1] =~ /^(.*?)\:/) { $prefix = $1 }
+
+    # Walk tree
+    while ($current) {
+
+        # Root
+        return if $current->[0] eq 'root';
+
+        # Attributes
+        my $attrs = $current->[2];
+
+        # Namespace for prefix
+        if ($prefix) {
+            for my $key (keys %$attrs) {
+                return $attrs->{$key} if $key =~ /^xmlns\:$prefix$/;
+            }
+        }
+
+        # Namespace attribute
+        if (my $namespace = $attrs->{xmlns}) { return $namespace }
+
+        # Parent
+        $current = $current->[3];
+    }
+}
+
 sub parent {
     my $self = shift;
 
@@ -943,6 +978,12 @@ Children of element.
     $dom     = $dom->name('html');
 
 Element name.
+
+=head2 C<namespace>
+
+    my $namespace = $dom->namespace;
+
+Element namespace.
 
 =head2 C<parent>
 

@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 136;
+use Test::More tests => 142;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -329,7 +329,9 @@ $dom->parse(<<'EOF');
 EOF
 my $s = $dom->search('xrds xrd service');
 is($s->[0]->at('type')->text, 'http://o.r.g/sso/2.0', 'right text');
+is($s->[0]->namespace,        'xri://$xrd*($v*2.0)',  'right namespace');
 is($s->[1]->at('type')->text, 'http://o.r.g/sso/1.0', 'right text');
+is($s->[1]->namespace,        'xri://$xrd*($v*2.0)',  'right namespace');
 is($s->[2],                   undef,                  'no text');
 
 # Yadis (with namespace)
@@ -340,9 +342,9 @@ $dom->parse(<<'EOF');
     <Service>
       <Type>http://o.r.g/sso/3.0</Type>
     </Service>
-    <Service>
+    <xrds:Service>
       <Type>http://o.r.g/sso/4.0</Type>
-    </Service>
+    </xrds:Service>
   </XRD>
   <XRD>
     <Service>
@@ -356,9 +358,13 @@ $dom->parse(<<'EOF');
 EOF
 $s = $dom->search('xrds xrd service');
 is($s->[0]->at('type')->text, 'http://o.r.g/sso/3.0', 'right text');
+is($s->[0]->namespace,        'xri://$xrd*($v*2.0)',  'right namespace');
 is($s->[1]->at('type')->text, 'http://o.r.g/sso/4.0', 'right text');
+is($s->[1]->namespace,        'xri://$xrds',          'right namespace');
 is($s->[2]->at('type')->text, 'http://o.r.g/sso/2.0', 'right text');
+is($s->[2]->namespace,        'xri://$xrd*($v*2.0)',  'right namespace');
 is($s->[3]->at('type')->text, 'http://o.r.g/sso/1.0', 'right text');
+is($s->[3]->namespace,        'xri://$xrd*($v*2.0)',  'right namespace');
 is($s->[4],                   undef,                  'no text');
 
 # Result and iterator order

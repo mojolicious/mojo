@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 128;
+use Test::More tests => 136;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -312,6 +312,54 @@ like($dom->at('#works')->text,       qr/\[awesome\]\]/, 'right text');
 like($dom->at('[id="works"]')->text, qr/\[awesome\]\]/, 'right text');
 is($dom->search('description')->[1]->text, '<p>trololololo>', 'right text');
 is($dom->at('pubdate')->text, 'Mon, 12 Jul 2010 20:42:00', 'right text');
+
+# Yadis
+$dom->parse(<<'EOF');
+<?xml version="1.0" encoding="UTF-8"?>
+<XRDS xmlns="xri://$xrds">
+  <XRD xmlns="xri://$xrd*($v*2.0)">
+    <Service>
+      <Type>http://o.r.g/sso/2.0</Type>
+    </Service>
+    <Service>
+      <Type>http://o.r.g/sso/1.0</Type>
+    </Service>
+  </XRD>
+</XRDS>
+EOF
+my $s = $dom->search('xrds xrd service');
+is($s->[0]->at('type')->text, 'http://o.r.g/sso/2.0', 'right text');
+is($s->[1]->at('type')->text, 'http://o.r.g/sso/1.0', 'right text');
+is($s->[2],                   undef,                  'no text');
+
+# Yadis (with namespace)
+$dom->parse(<<'EOF');
+<?xml version="1.0" encoding="UTF-8"?>
+<xrds:XRDS xmlns:xrds="xri://$xrds" xmlns="xri://$xrd*($v*2.0)">
+  <XRD>
+    <Service>
+      <Type>http://o.r.g/sso/3.0</Type>
+    </Service>
+    <Service>
+      <Type>http://o.r.g/sso/4.0</Type>
+    </Service>
+  </XRD>
+  <XRD>
+    <Service>
+      <Type>http://o.r.g/sso/2.0</Type>
+    </Service>
+    <Service>
+      <Type>http://o.r.g/sso/1.0</Type>
+    </Service>
+  </XRD>
+</xrds:XRDS>
+EOF
+$s = $dom->search('xrds xrd service');
+is($s->[0]->at('type')->text, 'http://o.r.g/sso/3.0', 'right text');
+is($s->[1]->at('type')->text, 'http://o.r.g/sso/4.0', 'right text');
+is($s->[2]->at('type')->text, 'http://o.r.g/sso/2.0', 'right text');
+is($s->[3]->at('type')->text, 'http://o.r.g/sso/1.0', 'right text');
+is($s->[4],                   undef,                  'no text');
 
 # Result and iterator order
 $dom->parse('<a><b>1</b></a><b>2</b><b>3</b>');

@@ -17,13 +17,14 @@ __PACKAGE__->attr(charset => 'UTF-8');
 __PACKAGE__->attr(tree => sub { ['root'] });
 
 # Regex
-my $CSS_ATTR_RE = qr/
+my $CSS_ESCAPE_RE = qr/\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}/;
+my $CSS_ATTR_RE   = qr/
     \[
-    ((?:\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}|\w)+)   # Key
+    ((?:$CSS_ESCAPE_RE|\w)+)   # Key
     (?:
-    (\W)?                                         # Operator
+    (\W)?                      # Operator
     =
-    "((?:\\"|[^"])+)"                             # Value
+    "((?:\\"|[^"])+)"          # Value
     )?
     \]
 /x;
@@ -32,13 +33,13 @@ my $CSS_ELEMENT_RE      = qr/^((?:\\\.|\\\#|[^\.\#])+)/;
 my $CSS_ID_RE           = qr/\#((?:\\\#|[^\#])+)/;
 my $CSS_PSEUDO_CLASS_RE = qr/(?:\:(\w+)(?:\(([^\)]+)\))?)/;
 my $CSS_TOKEN_RE        = qr/
-    (\s*,\s*)?                                                # Separator
-    ((?:[^\[\\\:\s]|\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}\s?)+)?  # Element
-    ((?:\:\w+(?:\([^\)]+\))?)*)?                              # Pseudo Class
-    ((?:\[\w+(?:\W?="(?:[^"]|\\")+")?\])*)?                   # Attributes
+    (\s*,\s*)?                                                   # Separator
+    ((?:[^\[\\\:\s]|$CSS_ESCAPE_RE\s?)+)?                        # Element
+    ((?:\:\w+(?:\([^\)]+\))?)*)?                                 # Pseudoclass
+    ((?:\[(?:$CSS_ESCAPE_RE|\w)+(?:\W?="(?:\\"|[^"])+")?\])*)?   # Attributes
     (?:
     \s*
-    ([\>\+\~])                                                # Combinator
+    ([\>\+\~])                                                   # Combinator
     )?
 /x;
 my $XML_ATTR_RE = qr/

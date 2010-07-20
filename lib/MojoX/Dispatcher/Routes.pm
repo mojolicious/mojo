@@ -65,10 +65,6 @@ sub dispatch {
 
     # Params
     my $p = $c->stash->{'mojo.params'} = $c->tx->req->params->clone;
-    $p->append(%{$m->captures});
-
-    # Merge in captures
-    $c->stash({%{$c->stash}, %{$m->captures}});
 
     # Walk the stack
     return 1 if $self->_walk_stack($c);
@@ -303,6 +299,12 @@ sub _walk_stack {
     # Walk the stack
     my $staging = $#{$c->match->stack};
     for my $field (@{$c->match->stack}) {
+
+        # Params
+        $c->stash->{'mojo.params'}->append(%{$field});
+
+        # Merge in captures
+        $c->stash({%{$c->stash}, %{$field}});
 
         # Captures
         $c->match->captures($field);

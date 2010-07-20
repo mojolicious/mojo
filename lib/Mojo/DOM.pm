@@ -73,14 +73,14 @@ sub all_text {
     my $tree = $self->tree;
 
     # Walk tree
-    my $start = $tree->[0] eq 'root' ? 1 : 5;
+    my $start = $tree->[0] eq 'root' ? 1 : 4;
     my @stack = @$tree[$start .. $#$tree];
     while (my $e = shift @stack) {
 
         # Type
         my $type = $e->[0];
 
-        push @stack, @$e[5 .. $#$e] and next if $type eq 'tag';
+        push @stack, @$e[4 .. $#$e] and next if $type eq 'tag';
 
         # Text or CDATA
         if ($type eq 'text' || $type eq 'cdata') {
@@ -116,7 +116,7 @@ sub children {
     my $tree = $self->tree;
 
     # Walk tree
-    my $start = $tree->[0] eq 'root' ? 1 : 5;
+    my $start = $tree->[0] eq 'root' ? 1 : 4;
     for my $e (@$tree[$start .. $#$tree]) {
 
         # Tag
@@ -145,19 +145,6 @@ sub name {
     $tree->[1] = $name;
 
     return $self;
-}
-
-sub namespace {
-    my $self = shift;
-
-    # Tree
-    my $tree = $self->tree;
-
-    # Root
-    return if $tree->[0] eq 'root';
-
-    # Namespace
-    return $tree->[4]->{namespace};
 }
 
 sub parent {
@@ -205,7 +192,7 @@ sub replace {
     }
 
     # Find
-    my $i = $parent->[0] eq 'root' ? 1 : 5;
+    my $i = $parent->[0] eq 'root' ? 1 : 4;
     for my $e (@$parent[$i .. $#$parent]) {
         last if $e == $tree;
         $i++;
@@ -234,7 +221,7 @@ sub replace_content {
     }
 
     # Replace
-    my $start = $tree->[0] eq 'root' ? 1 : 5;
+    my $start = $tree->[0] eq 'root' ? 1 : 4;
     splice @$tree, $start, $#$tree, @new;
 
     return $self;
@@ -408,7 +395,7 @@ sub _end {
         return $$current = $$current->[3] if $end eq $$current->[1];
 
         # Children to move to parent
-        my @buffer = splice @$$current, 5;
+        my @buffer = splice @$$current, 4;
 
         # Parent
         $$current = $$current->[3];
@@ -694,7 +681,7 @@ sub _render {
     if ($e eq 'tag') {
 
         # Offset
-        $start = 5;
+        $start = 4;
 
         # Open tag
         $content .= '<' . $tree->[1];
@@ -717,7 +704,7 @@ sub _render {
         $content .= " $attrs" if $attrs;
 
         # Empty tag
-        return "$content />" unless $tree->[5];
+        return "$content />" unless $tree->[4];
 
         # Close tag
         $content .= '>';
@@ -759,7 +746,7 @@ sub _select {
         elsif ($type eq 'tag') {
 
             # Fill queue
-            unshift @queue, @$current[5 .. $#$current];
+            unshift @queue, @$current[4 .. $#$current];
 
             # Match
             push @results, $current if $self->_match($current, $pattern);
@@ -782,25 +769,8 @@ sub _start {
     # Parent
     weaken $$current unless isweak $$current;
 
-    # Parent hints
-    my $parent = $$current->[0] eq 'root' ? {} : $$current->[4];
-
-    # Namespaces
-    my $namespace = $attrs->{xmlns};
-    my $known = $parent->{namespaces} || {};
-    for my $key (keys %$attrs) {
-        $key =~ /^xmlns\:(.+)/ and $known->{$1} = $attrs->{$key};
-    }
-    if ($start =~ /^(.*?)\:/) { $namespace ||= $known->{$1} }
-    $namespace ||= $parent->{namespace};
-
-    # Hints
-    my $hints = {};
-    $hints->{namespace}  = $namespace if $namespace;
-    $hints->{namespaces} = $known     if keys %$known;
-
     # New
-    my $new = ['tag', $start, $attrs, $$current, $hints];
+    my $new = ['tag', $start, $attrs, $$current];
 
     # Append
     push @$$current, $new;
@@ -973,12 +943,6 @@ Children of element.
     $dom     = $dom->name('html');
 
 Element name.
-
-=head2 C<namespace>
-
-    my $namespace = $dom->namespace;
-
-Element namespace.
 
 =head2 C<parent>
 

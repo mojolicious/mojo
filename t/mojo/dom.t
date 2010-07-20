@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 142;
+use Test::More tests => 136;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -31,26 +31,26 @@ is($dom->tree->[1]->[0], 'tag',  'right element');
 is($dom->tree->[1]->[1], 'foo',  'right tag');
 is_deeply($dom->tree->[1]->[2], {}, 'empty attributes');
 is($dom->tree->[1]->[3],      $dom->tree, 'right parent');
-is($dom->tree->[1]->[5]->[0], 'tag',      'right element');
-is($dom->tree->[1]->[5]->[1], 'bar',      'right tag');
-is_deeply($dom->tree->[1]->[5]->[2], {a => 'b<c'}, 'right attributes');
-is($dom->tree->[1]->[5]->[3],      $dom->tree->[1], 'right parent');
-is($dom->tree->[1]->[5]->[5]->[0], 'text',          'right element');
-is($dom->tree->[1]->[5]->[5]->[1], 'ju',            'right text');
-is($dom->tree->[1]->[5]->[6]->[0], 'tag',           'right element');
-is($dom->tree->[1]->[5]->[6]->[1], 'baz',           'right tag');
-is_deeply($dom->tree->[1]->[5]->[6]->[2], {a23 => undef}, 'right attributes');
-is($dom->tree->[1]->[5]->[6]->[3], $dom->tree->[1]->[5], 'right parent');
-is($dom->tree->[1]->[5]->[7]->[0], 'text',               'right element');
-is($dom->tree->[1]->[5]->[7]->[1], 's',                  'right text');
-is($dom->tree->[1]->[5]->[8]->[0], 'tag',                'right element');
-is($dom->tree->[1]->[5]->[8]->[1], 'bazz',               'right tag');
-is_deeply($dom->tree->[1]->[5]->[8]->[2], {}, 'empty attributes');
-is($dom->tree->[1]->[5]->[8]->[3], $dom->tree->[1]->[5], 'right parent');
-is($dom->tree->[1]->[5]->[9]->[0], 'text',               'right element');
-is($dom->tree->[1]->[5]->[9]->[1], 't',                  'right text');
-is($dom->tree->[1]->[6]->[0],      'text',               'right element');
-is($dom->tree->[1]->[6]->[1],      'works',              'right text');
+is($dom->tree->[1]->[4]->[0], 'tag',      'right element');
+is($dom->tree->[1]->[4]->[1], 'bar',      'right tag');
+is_deeply($dom->tree->[1]->[4]->[2], {a => 'b<c'}, 'right attributes');
+is($dom->tree->[1]->[4]->[3],      $dom->tree->[1], 'right parent');
+is($dom->tree->[1]->[4]->[4]->[0], 'text',          'right element');
+is($dom->tree->[1]->[4]->[4]->[1], 'ju',            'right text');
+is($dom->tree->[1]->[4]->[5]->[0], 'tag',           'right element');
+is($dom->tree->[1]->[4]->[5]->[1], 'baz',           'right tag');
+is_deeply($dom->tree->[1]->[4]->[5]->[2], {a23 => undef}, 'right attributes');
+is($dom->tree->[1]->[4]->[5]->[3], $dom->tree->[1]->[4], 'right parent');
+is($dom->tree->[1]->[4]->[6]->[0], 'text',               'right element');
+is($dom->tree->[1]->[4]->[6]->[1], 's',                  'right text');
+is($dom->tree->[1]->[4]->[7]->[0], 'tag',                'right element');
+is($dom->tree->[1]->[4]->[7]->[1], 'bazz',               'right tag');
+is_deeply($dom->tree->[1]->[4]->[7]->[2], {}, 'empty attributes');
+is($dom->tree->[1]->[4]->[7]->[3], $dom->tree->[1]->[4], 'right parent');
+is($dom->tree->[1]->[4]->[8]->[0], 'text',               'right element');
+is($dom->tree->[1]->[4]->[8]->[1], 't',                  'right text');
+is($dom->tree->[1]->[5]->[0],      'text',               'right element');
+is($dom->tree->[1]->[5]->[1],      'works',              'right text');
 is("$dom",                         <<EOF,                'stringified right');
 <foo><bar a="b&lt;c">ju<baz a23 />s<bazz />t</bar>works</foo>
 EOF
@@ -329,9 +329,7 @@ $dom->parse(<<'EOF');
 EOF
 my $s = $dom->search('xrds xrd service');
 is($s->[0]->at('type')->text, 'http://o.r.g/sso/2.0', 'right text');
-is($s->[0]->namespace,        'xri://$xrd*($v*2.0)',  'right namespace');
 is($s->[1]->at('type')->text, 'http://o.r.g/sso/1.0', 'right text');
-is($s->[1]->namespace,        'xri://$xrd*($v*2.0)',  'right namespace');
 is($s->[2],                   undef,                  'no text');
 
 # Yadis (with namespace)
@@ -347,9 +345,9 @@ $dom->parse(<<'EOF');
     </Service>
   </XRD>
   <XRD>
-    <xrds:Service>
+    <Service>
       <Type>http://o.r.g/sso/2.0</Type>
-    </xrds:Service>
+    </Service>
     <Service>
       <Type>http://o.r.g/sso/1.0</Type>
     </Service>
@@ -358,13 +356,9 @@ $dom->parse(<<'EOF');
 EOF
 $s = $dom->search('xrds xrd service');
 is($s->[0]->at('type')->text, 'http://o.r.g/sso/3.0', 'right text');
-is($s->[0]->namespace,        'xri://$xrd*($v*2.0)',  'right namespace');
 is($s->[1]->at('type')->text, 'http://o.r.g/sso/4.0', 'right text');
-is($s->[1]->namespace,        'xri://$xrd*($v*2.0)',  'right namespace');
 is($s->[2]->at('type')->text, 'http://o.r.g/sso/2.0', 'right text');
-is($s->[2]->namespace,        'xri://$xrds',          'right namespace');
 is($s->[3]->at('type')->text, 'http://o.r.g/sso/1.0', 'right text');
-is($s->[3]->namespace,        'xri://$xrd*($v*2.0)',  'right namespace');
 is($s->[4],                   undef,                  'no text');
 
 # Result and iterator order

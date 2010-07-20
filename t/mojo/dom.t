@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 142;
+use Test::More tests => 146;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -327,6 +327,8 @@ $dom->parse(<<'EOF');
   </XRD>
 </XRDS>
 EOF
+is($dom->at('xrds')->namespace, 'xri://$xrds',         'right namespace');
+is($dom->at('xrd')->namespace,  'xri://$xrd*($v*2.0)', 'right namespace');
 my $s = $dom->search('xrds xrd service');
 is($s->[0]->at('type')->text, 'http://o.r.g/sso/2.0', 'right text');
 is($s->[0]->namespace,        'xri://$xrd*($v*2.0)',  'right namespace');
@@ -356,6 +358,8 @@ $dom->parse(<<'EOF');
   </XRD>
 </xrds:XRDS>
 EOF
+is($dom->at('xrds')->namespace, 'xri://$xrds',         'right namespace');
+is($dom->at('xrd')->namespace,  'xri://$xrd*($v*2.0)', 'right namespace');
 $s = $dom->search('xrds xrd service');
 is($s->[0]->at('type')->text, 'http://o.r.g/sso/3.0', 'right text');
 is($s->[0]->namespace,        'xri://$xrd*($v*2.0)',  'right namespace');

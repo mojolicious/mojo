@@ -94,7 +94,7 @@ sub all_text {
 
 sub at { shift->search(@_)->[0] }
 
-sub attributes {
+sub attrs {
     my $self = shift;
 
     # Tree
@@ -925,9 +925,9 @@ Extract all text content from DOM structure.
 
 Search for a single element with CSS3 selectors.
 
-=head2 C<attributes>
+=head2 C<attrs>
 
-    my $attrs = $dom->attributes;
+    my $attrs = $dom->attrs;
 
 Element attributes.
 

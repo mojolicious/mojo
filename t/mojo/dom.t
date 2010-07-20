@@ -93,10 +93,10 @@ my $simple = $dom->at('foo simple.working[class^="wor"]');
 like($simple->parent->all_text,
     qr/test\s+works\s+well\s+yada\s+yada\s+more\s+text/);
 is($simple->name,                        'simple',  'right name');
-is($simple->attributes->{class},         'working', 'right class attribute');
+is($simple->attrs->{class},              'working', 'right class attribute');
 is($simple->text,                        'easy',    'right text');
 is($simple->parent->name,                'foo',     'right parent name');
-is($simple->parent->attributes->{bar},   'ba<z',    'right parent attribute');
+is($simple->parent->attrs->{bar},        'ba<z',    'right parent attribute');
 is($simple->parent->children->[1]->name, 'test',    'right sibling');
 is( $simple->to_xml,
     '<simple class="working">easy</simple>',
@@ -131,12 +131,12 @@ $dom->parse(<<EOF);
 </html>
 EOF
 my $p = $dom->search('body > #container > div p[id]');
-is($p->[0]->attributes->{id}, 'foo', 'right id attribute');
-is($p->[1],                   undef, 'no second result');
+is($p->[0]->attrs->{id}, 'foo', 'right id attribute');
+is($p->[1],              undef, 'no second result');
 my @p;
 @div = ();
-$dom->search('div')->each(sub { push @div, $_->attributes->{id} })
-  ->search('p')->each(sub { push @p, $_->attributes->{id} });
+$dom->search('div')->each(sub { push @div, $_->attrs->{id} })->search('p')
+  ->each(sub { push @p, $_->attrs->{id} });
 is_deeply(\@p, [qw/foo bar/], 'found all p elements');
 my $ids = [qw/container header logo buttons buttons content/];
 is_deeply(\@div, $ids, 'found all div elements');
@@ -306,8 +306,8 @@ $dom->parse(<<EOF);
   </channel>
 </rss>
 EOF
-is($dom->search('rss')->[0]->attributes->{version}, '2.0',   'right version');
-is($dom->at('extension')->attributes->{'foo:id'},   'works', 'right id');
+is($dom->search('rss')->[0]->attrs->{version}, '2.0',   'right version');
+is($dom->at('extension')->attrs->{'foo:id'},   'works', 'right id');
 like($dom->at('#works')->text,       qr/\[awesome\]\]/, 'right text');
 like($dom->at('[id="works"]')->text, qr/\[awesome\]\]/, 'right text');
 is($dom->search('description')->[1]->text, '<p>trololololo>', 'right text');

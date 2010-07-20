@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 127;
+use Test::More tests => 128;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -308,7 +308,8 @@ $dom->parse(<<EOF);
 EOF
 is($dom->search('rss')->[0]->attributes->{version}, '2.0',   'right version');
 is($dom->at('extension')->attributes->{'foo:id'},   'works', 'right id');
-like($dom->at('#works')->text, qr/\[awesome\]\]/, 'right text');
+like($dom->at('#works')->text,       qr/\[awesome\]\]/, 'right text');
+like($dom->at('[id="works"]')->text, qr/\[awesome\]\]/, 'right text');
 is($dom->search('description')->[1]->text, '<p>trololololo>', 'right text');
 is($dom->at('pubdate')->text, 'Mon, 12 Jul 2010 20:42:00', 'right text');
 

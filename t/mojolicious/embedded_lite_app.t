@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 32;
+plan tests => 35;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -101,6 +101,16 @@ get '/' => sub {
     $self->render_text("Bye from the $name app! $url!");
 };
 
+package MyTestApp::Basic;
+
+use base 'Mojo';
+
+sub handler {
+    my ($self, $tx) = @_;
+    $tx->res->code(200);
+    $tx->res->body('Hello stoneage!');
+}
+
 package main;
 
 use Mojolicious::Lite;
@@ -132,6 +142,9 @@ get('/yada')->to('test1#', name => 'fifth embedded');
 # /yada/yada/yada (dispatch to embedded app)
 get('/yada/yada/yada')
   ->to('test1#', path => '/yada', name => 'sixth embedded');
+
+# /basic (dispatch to embedded app)
+get('/basic')->detour(MyTestApp::Basic->new, test => 'lalala');
 
 # /third/* (dispatch to embedded app)
 get '/third/(*path)' =>
@@ -177,6 +190,9 @@ $t->get_ok('/yada/yada')->status_is(404);
 # GET /yada/yada/yada (from embedded app)
 $t->get_ok('/yada/yada/yada')->status_is(200)
   ->content_is('yada sixth embedded works!');
+
+# GET /basic (from embedded app)
+$t->get_ok('/basic')->status_is(200)->content_is('Hello stoneage!');
 
 # GET /third/ (from embedded app)
 $t->get_ok('/third')->status_is(200)

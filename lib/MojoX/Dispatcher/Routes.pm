@@ -152,10 +152,12 @@ sub _dispatch_controller {
         if ($app->can('handler')) {
 
             # Connect routes
-            my $r = $app->routes;
-            unless ($r->parent) {
-                $r->parent($c->match->endpoint);
-                weaken $r->{parent};
+            if ($app->can('routes')) {
+                my $r = $app->routes;
+                unless ($r->parent) {
+                    $r->parent($c->match->endpoint);
+                    weaken $r->{parent};
+                }
             }
 
             # Handler

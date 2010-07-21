@@ -26,6 +26,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved Mojo::Template error messages.
         - Improved generated multipart messages to be 2 bytes shorter.
           (John Kingsley)
+        - Fixed Mojo::Server::Daemon::Prefork to use a random lock file by
+          default.
         - Fixed Mojo::DOM to support escaped selectors.
         - Fixed Mojo::DOM parser bugs.
         - Fixed Mojo::DOM child listing bug. (evt)

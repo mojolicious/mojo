@@ -24,7 +24,7 @@ __PACKAGE__->attr(
     lock_file => sub {
         my $self = shift;
         return File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
-            Mojo::Command->class_to_file(ref $self->app) . '.lock');
+            Mojo::Command->class_to_file(ref $self->app) . ".$$.lock");
     }
 );
 __PACKAGE__->attr(max_clients                           => 1);
@@ -90,6 +90,9 @@ sub run {
 
     # PID file
     $self->prepare_pid_file;
+
+    # Generate lock file name
+    $self->lock_file;
 
     # No windows support
     die "Prefork daemon not available for Windows.\n" if $^O eq 'MSWin32';

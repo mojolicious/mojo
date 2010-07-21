@@ -575,6 +575,21 @@ embedded application.
 
     1;
 
+A minimal embeddable application is nothing more than a class with a
+C<handler> method, accepting L<Mojo::Transaction> objects.
+
+    package MyApp;
+
+    sub new { bless {}, shift }
+
+    sub handler {
+        my ($self, $tx) = @_;
+        $tx->res->code(200);
+        $tx->res->body('Hello Mojo!');
+    }
+
+    1;
+
 With the C<detour> method which is very similar to C<to>, you can allow the
 route to partially match and use only the remaining path in the embedded
 application.

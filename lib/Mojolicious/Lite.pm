@@ -30,6 +30,7 @@ sub import {
 
     # Initialize routes
     my $routes = $app->routes;
+    $routes->namespace('');
 
     # Route generator
     my $route = sub {

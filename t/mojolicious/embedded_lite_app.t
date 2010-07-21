@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 18;
+plan tests => 24;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -106,11 +106,19 @@ app->log->level('error');
 # /foo/* (plugin app)
 plugin 'my_embedded_app';
 
+app->routes->namespace('MyTestApp');
+
 # GET /hello
 get '/hello' => 'works';
 
 # /bye/* (dispatch to embedded app)
 get('/bye' => {name => 'second embedded'})->detour('MyTestApp::Test1');
+
+# /bar/* (dispatch to embedded app)
+get('/bar' => {name => 'third embedded'})->detour(app => 'MyTestApp::Test1');
+
+# /baz/* (dispatch to embedded app)
+get('/baz')->detour('test1#', name => 'fourth embedded');
 
 # /third/* (dispatch to embedded app)
 get '/third/(*path)' =>
@@ -138,6 +146,14 @@ $t->get_ok('/hello/hello')->status_is(200)
 # GET /bye/bye (from embedded app)
 $t->get_ok('/bye/bye')->status_is(200)
   ->content_is('Hello from the embedded app!second embedded! success!');
+
+# GET /bar/bye (from embedded app)
+$t->get_ok('/bar/bye')->status_is(200)
+  ->content_is('Hello from the embedded app!third embedded! success!');
+
+# GET /baz/bye (from embedded app)
+$t->get_ok('/baz/bye')->status_is(200)
+  ->content_is('Hello from the embedded app!fourth embedded! success!');
 
 # GET /third/ (from embedded app)
 $t->get_ok('/third')->status_is(200)

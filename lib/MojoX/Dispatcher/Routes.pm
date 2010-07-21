@@ -34,13 +34,13 @@ sub auto_render {
 }
 
 sub detour {
-    my ($self, $app) = @_;
-
-    # App
-    $self->to(app => $app);
+    my $self = shift;
 
     # Partial
     $self->partial('path');
+
+    # Defaults
+    $self->to(@_);
 
     return $self;
 }
@@ -74,65 +74,6 @@ sub dispatch {
 }
 
 sub hide { push @{shift->hidden}, @_ }
-
-sub _dispatch_app {
-    my ($self, $c) = @_;
-
-    # Load app
-    my $app = $c->match->captures->{app};
-    unless (ref $app && $self->{_loaded}->{$app}) {
-
-        # Debug
-        $c->app->log->debug(qq/Dispatching application "$app"./);
-
-        # Load
-        if (my $e = Mojo::Loader->load($app)) {
-
-            # Doesn't exist
-            return unless ref $e;
-
-            # Error
-            $c->app->log->error($e);
-            return $e;
-        }
-
-        # Loaded
-        $self->{_loaded}->{$app}++;
-    }
-
-    # Debug
-    else { $c->app->log->debug(qq/Dispatching application./) }
-
-    # Dispatch
-    my $success = eval {
-
-        # App
-        $app = $app->new unless ref $app;
-
-        # Connect routes
-        my $r = $app->routes;
-        unless ($r->parent) {
-            $r->parent($c->match->endpoint);
-            weaken $r->{parent};
-        }
-
-        # Handler
-        $app->handler($c);
-
-        # Success
-        1;
-    };
-
-    # Callback error
-    if (!$success && $@) {
-        my $e = Mojo::Exception->new($@);
-        $c->app->log->error($e);
-        return $e;
-    }
-
-    # Success!
-    return 1;
-}
 
 sub _dispatch_callback {
     my ($self, $c, $staging) = @_;
@@ -169,22 +110,24 @@ sub _dispatch_callback {
 sub _dispatch_controller {
     my ($self, $c, $staging) = @_;
 
-    # Method
-    my $method = $self->_generate_method($c);
-    return unless $method;
+    # Application
+    my $app = $c->match->captures->{app};
 
     # Class
-    my $class = $self->_generate_class($c);
-    return unless $class;
+    $app ||= $self->_generate_class($c);
+    return unless $app;
+
+    # Method
+    my $method = $self->_generate_method($c);
 
     # Debug
-    $c->app->log->debug(qq/Dispatching "${class}::$method"./);
+    $c->app->log->debug('Dispatching controller.');
 
     # Load class
-    unless ($self->{_loaded}->{$class}) {
+    unless (ref $app && $self->{_loaded}->{$app}) {
 
         # Load
-        if (my $e = Mojo::Loader->load($class)) {
+        if (my $e = Mojo::Loader->load($app)) {
 
             # Doesn't exist
             return unless ref $e;
@@ -195,28 +138,38 @@ sub _dispatch_controller {
         }
 
         # Loaded
-        $self->{_loaded}->{$class}++;
+        $self->{_loaded}->{$app}++;
     }
-
-    # Not a controller
-    $c->app->log->debug(qq/"$class" is not a controller./) and return
-      unless $class->isa($self->controller_base_class);
 
     # Dispatch
     my $continue;
     my $success = eval {
 
         # Instantiate
-        my $new = $class->new($c);
+        $app = $app->new($c) unless ref $app;
 
-        # Get action
-        if (my $code = $new->can($method)) {
+        # Handler
+        if ($app->can('handler')) {
+
+            # Connect routes
+            my $r = $app->routes;
+            unless ($r->parent) {
+                $r->parent($c->match->endpoint);
+                weaken $r->{parent};
+            }
+
+            # Handler
+            $app->handler($c);
+        }
+
+        # Action
+        elsif ($method && (my $code = $app->can($method))) {
 
             # Call action
-            $continue = $new->$code;
+            $continue = $app->$code;
 
             # Copy stash
-            $c->stash($new->stash);
+            $c->stash($app->stash);
         }
 
         # Success
@@ -311,9 +264,9 @@ sub _walk_stack {
 
         # Dispatch
         my $e =
-            $field->{cb} ? $self->_dispatch_callback($c, $staging)
-          : $field->{app} ? $self->_dispatch_app($c)
-          :                 $self->_dispatch_controller($c, $staging);
+            $field->{cb}
+          ? $self->_dispatch_callback($c, $staging)
+          : $self->_dispatch_controller($c, $staging);
 
         # Exception
         if (ref $e) {
@@ -394,8 +347,17 @@ Automatic rendering.
 
 =head2 C<detour>
 
-    $dispatcher = $dispatcher->detour('MyApp');
-    $dispatcher = $dispatcher->detour($app);
+    $dispatcher = $dispatcher->to(action => 'foo');
+    $dispatcher = $dispatcher->to({action => 'foo'});
+    $dispatcher = $dispatcher->to('controller#action');
+    $dispatcher = $dispatcher->to('controller#action', foo => 'bar');
+    $dispatcher = $dispatcher->to('controller#action', {foo => 'bar'});
+    $dispatcher = $dispatcher->to($app);
+    $dispatcher = $dispatcher->to($app, foo => 'bar');
+    $dispatcher = $dispatcher->to($app, {foo => 'bar'});
+    $dispatcher = $dispatcher->to('MyApp');
+    $dispatcher = $dispatcher->to('MyApp', foo => 'bar');
+    $dispatcher = $dispatcher->to('MyApp', {foo => 'bar'});
 
 Embed application.
 Note that this method is EXPERIMENTAL and might change without warning!

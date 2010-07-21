@@ -181,10 +181,19 @@ sub to {
         }
     }
 
-    # Controller and action
-    if ($shortcut && $shortcut =~ /^([\w\-]+)?\#(\w+)?$/) {
-        $defaults->{controller} = $1 if defined $1;
-        $defaults->{action}     = $2 if defined $2;
+    # Shortcut
+    if ($shortcut) {
+
+        # App
+        if (ref $shortcut || $shortcut =~ /^[\w\:]+$/) {
+            $defaults->{app} = $shortcut;
+        }
+
+        # Controller and action
+        elsif ($shortcut =~ /^([\w\-]+)?\#(\w+)?$/) {
+            $defaults->{controller} = $1 if defined $1;
+            $defaults->{action}     = $2 if defined $2;
+        }
     }
 
     # Pattern
@@ -420,6 +429,12 @@ Add a new nested child to this route.
     $r = $r->to('controller#action');
     $r = $r->to('controller#action', foo => 'bar');
     $r = $r->to('controller#action', {foo => 'bar'});
+    $r = $r->to($app);
+    $r = $r->to($app, foo => 'bar');
+    $r = $r->to($app, {foo => 'bar'});
+    $r = $r->to('MyApp');
+    $r = $r->to('MyApp', foo => 'bar');
+    $r = $r->to('MyApp', {foo => 'bar'});
 
 Set default parameters for this route.
 

@@ -80,7 +80,7 @@ sub all_text {
         # Type
         my $type = $e->[0];
 
-        push @stack, @$e[4 .. $#$e] and next if $type eq 'tag';
+        unshift @stack, @$e[4 .. $#$e] and next if $type eq 'tag';
 
         # Text or CDATA
         if ($type eq 'text' || $type eq 'cdata') {

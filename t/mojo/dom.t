@@ -91,7 +91,7 @@ is("$dom",               <<EOF,     'stringified right');
 EOF
 my $simple = $dom->at('foo simple.working[class^="wor"]');
 like($simple->parent->all_text,
-    qr/test\s+works\s+well\s+yada\s+yada\s+more\s+text/);
+    qr/test\s+easy\s+works\s+well\s+yada\s+yada\s+more\s+text/);
 is($simple->name,                        'simple',  'right name');
 is($simple->attrs->{class},              'working', 'right class attribute');
 is($simple->text,                        'easy',    'right text');

@@ -828,7 +828,8 @@ sub each {
     return @$self unless $cb;
 
     # Iterate
-    $_->$cb for @$self;
+    my $i = 1;
+    $_->$cb($i++) for @$self;
 
     # Root
     return unless my $start = $self->[0];

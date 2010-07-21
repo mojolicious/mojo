@@ -374,5 +374,5 @@ is($s->[4],                   undef,                  'no text');
 # Result and iterator order
 $dom->parse('<a><b>1</b></a><b>2</b><b>3</b>');
 my @numbers;
-$dom->find("b")->each(sub { push @numbers, shift->text });
-is_deeply(\@numbers, [1, 2, 3], 'right order');
+$dom->find("b")->each(sub { push @numbers, shift->text, shift });
+is_deeply(\@numbers, [1, 1, 2, 2, 3, 3], 'right order');

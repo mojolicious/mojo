@@ -359,7 +359,8 @@ Automatic rendering.
     $dispatcher = $dispatcher->detour('MyApp', foo => 'bar');
     $dispatcher = $dispatcher->detour('MyApp', {foo => 'bar'});
 
-Embed application.
+Set default parameters for this route and allow partial matching to simplify
+application embedding.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<dispatch>

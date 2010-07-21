@@ -224,12 +224,12 @@ is("$stream", 'bcher-kva', 'right punycode encoded result');
 $stream = b('bcher-kva')->punycode_decode;
 is("$stream", 'bücher', 'right punycode decoded result');
 
-# say
+# say and autojoin
 $buffer = '';
 open my $handle, '>', \$buffer;
-b('test')->say($handle);
+b('te', 'st')->say($handle);
 my $backup = *STDOUT;
 *STDOUT = $handle;
-b('123')->say;
+b(1, 2, 3)->say;
 *STDOUT = $backup;
 is($buffer, "test\n123\n", 'right output');

@@ -314,7 +314,7 @@ sub import {
 # Well, I think the veal died of loneliness.
 sub new {
     my $self = shift->SUPER::new();
-    $self->{bytestream} = defined $_[0] ? $_[0] : '';
+    $self->{bytestream} = @_ > 1 ? join('', @_) : defined $_[0] ? $_[0] : '';
     $self->{raw_size} = length $self->{bytestream};
     return $self;
 }

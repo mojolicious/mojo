@@ -99,15 +99,12 @@ is($result, 'test1test2', 'right result');
 # WebSocket / (ojo)
 $result = undef;
 w '/' => sub {
-    my $self = shift;
-    $self->receive_message(
+    shift->receive_message(
         sub {
-            my ($self, $message) = @_;
-            $result = $message;
-            $self->finish;
+            shift->finish;
+            $result = shift;
         }
-    );
-    $self->send_message('test1');
+    )->send_message('test1');
 };
 is($result, 'test1test2', 'right result');
 

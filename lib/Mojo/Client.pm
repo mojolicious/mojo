@@ -472,6 +472,8 @@ sub receive_message {
     # Receive
     $tx->receive_message(
         sub { shift; local $self->{tx} = $tx; $self->$cb(@_) });
+
+    return $self;
 }
 
 sub req { shift->tx->req(@_) }
@@ -492,6 +494,8 @@ sub send_message {
 
     # Send
     $tx->send_message(@_);
+
+    return $self;
 }
 
 # It's like my dad always said: eventually, everybody gets shot.
@@ -1667,7 +1671,7 @@ transactions.
 
 =head2 C<receive_message>
 
-    $client->receive_message(sub {...});
+    $client = $client->receive_message(sub {...});
 
 Receive messages via WebSocket, only available from callbacks.
 
@@ -1698,7 +1702,7 @@ everywhere inside the process.
 
 =head2 C<send_message>
 
-    $client->send_message('Hi there!');
+    $client = $client->send_message('Hi there!');
 
 Send a message via WebSocket, only available from callbacks.
 

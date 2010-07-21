@@ -71,6 +71,8 @@ sub receive_message {
 
     # Receive
     $self->tx->receive_message(sub { shift and $self->$cb(@_) });
+
+    return $self;
 }
 
 sub redirect_to {
@@ -308,6 +310,8 @@ sub send_message {
 
     # Send
     $self->tx->send_message(@_);
+
+    return $self;
 }
 
 sub url_for {
@@ -436,7 +440,7 @@ transaction.
 
 =head2 C<receive_message>
 
-    $c->receive_message(sub {...});
+    $c = $c->receive_message(sub {...});
 
 Receive messages via WebSocket, only works if there is currently a WebSocket
 connection in progress.
@@ -548,7 +552,7 @@ applications.
 
 =head2 C<send_message>
 
-    $c->send_message('Hi there!');
+    $c = $c->send_message('Hi there!');
 
 Send a message via WebSocket, only works if there is currently a WebSocket
 connection in progress.

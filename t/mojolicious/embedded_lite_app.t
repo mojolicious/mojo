@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 24;
+plan tests => 32;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -45,6 +45,12 @@ use Mojolicious::Lite;
 
 # Silence
 app->log->level('error');
+
+get '/yada' => sub {
+    my $self = shift;
+    my $name = $self->stash('name');
+    $self->render(text => "yada $name works!");
+};
 
 # GET /bye (embedded)
 get '/bye' => sub {
@@ -120,6 +126,13 @@ get('/bar' => {name => 'third embedded'})->detour(app => 'MyTestApp::Test1');
 # /baz/* (dispatch to embedded app)
 get('/baz')->detour('test1#', name => 'fourth embedded');
 
+# /yada (dispatch to embedded app)
+get('/yada')->to('test1#', name => 'fifth embedded');
+
+# /yada/yada/yada (dispatch to embedded app)
+get('/yada/yada/yada')
+  ->to('test1#', path => '/yada', name => 'sixth embedded');
+
 # /third/* (dispatch to embedded app)
 get '/third/(*path)' =>
   {app => 'MyTestApp::Test2', name => 'third embedded', path => '/'};
@@ -154,6 +167,16 @@ $t->get_ok('/bar/bye')->status_is(200)
 # GET /baz/bye (from embedded app)
 $t->get_ok('/baz/bye')->status_is(200)
   ->content_is('Hello from the embedded app!fourth embedded! success!');
+
+# GET /yada (from embedded app)
+$t->get_ok('/yada')->status_is(200)->content_is('yada fifth embedded works!');
+
+# GET /yada/yada (404 from embedded app)
+$t->get_ok('/yada/yada')->status_is(404);
+
+# GET /yada/yada/yada (from embedded app)
+$t->get_ok('/yada/yada/yada')->status_is(200)
+  ->content_is('yada sixth embedded works!');
 
 # GET /third/ (from embedded app)
 $t->get_ok('/third')->status_is(200)

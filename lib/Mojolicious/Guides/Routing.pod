@@ -539,8 +539,8 @@ applications.
 
 =head2 Embedding Applications
 
-You can easily embed whole applications using the C<detour> method, it
-accepts a L<Mojolicious> application class or instance.
+You can easily embed whole applications simply by using them instead of a
+controller.
 
     # Application
     package MyApp;
@@ -552,26 +552,60 @@ accepts a L<Mojolicious> application class or instance.
         # Routes
         my $r = $self->routes;
 
-        # Embedded Mojolicious::Lite app under "/foo/*"
-        $r->route('/foo')->detour('MyApp::Foo');
+        # Embedded Mojolicious::Lite app under "/foo"
+        $r->route('/foo')->to('bar#');
     }
 
     1;
 
 This allows for example the use of the L<Mojolicious::Lite> domain specific
 language in normal L<Mojolicious> controllers.
+But note that by default the original path will simply be reused for the
+embedded application.
 
     # Controller
-    package MyApp::Foo;
+    package MyApp::Bar;
     use Mojolicious::Lite;
 
-    # Action
-    get '/bar' => sub {
+    # Action with same route
+    get '/foo' => sub {
         my $self = shift;
-        $self->render(text => 'Hello World!');
+        $self->render(text => 'Hello Mojo!');
     };
 
     1;
+
+With the C<detour> method which is very similar to C<to>, you can allow the
+route to partially match and use only the remaining path in the embedded
+application.
+
+    # /foo/*
+    $r->route('/foo')->detour('bar#');
+
+The remaining path gets always stored in the C<path> stash value.
+
+    # Controller
+    package MyApp::Bar;
+    use Mojolicious::Lite;
+
+    # Action
+    get '/hello' => sub {
+        my $self = shift;
+        $self->render(text => 'Hello Mojo!');
+    };
+
+    # Another one
+    get '/bye' => sub {
+        my $self = shift;
+        $self->render(text => 'Bye Mojo!');
+    };
+
+    1;
+
+Instead of using C<detour> you could also just capture your own C<path>.
+
+    # /foo/*
+    $r->route('/foo/(*path)')->to('bar#');
 
 =head2 Application Plugins
 
@@ -586,7 +620,7 @@ package the whole thing as a self contained reusable plugin.
         my ($self, $app) = @_;
 
         # Automatically add route
-        $app->routes->route('/foo')->detour(EmbeddedApp::app());
+        $app->routes->route('/foo')->detour(app => EmbeddedApp::app());
     }
 
     package EmbeddedApp;
@@ -599,7 +633,8 @@ package the whole thing as a self contained reusable plugin.
     @@ bar.html.ep
     Hello World!
 
-Just load the plugin and you're done.
+The C<app> stash value can be used for already instantiated applications.
+Now just load the plugin and you're done.
 
     # Application
     package MyApp;

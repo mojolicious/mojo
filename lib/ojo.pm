@@ -67,7 +67,7 @@ L<ojo> implements the following functions.
 
     my $app = a('/' => sub { shift->render(json => {hello => 'world'}) });
 
-Create L<Mojolicious::Lite> route accepting all request methods and return
+Create a L<Mojolicious::Lite> route accepting all request methods and return
 the application.
 
     perl -Mojo -e 'a("/" => {text => "Hello Mojo!"})->start' daemon

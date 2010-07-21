@@ -19,6 +19,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added say method to Mojo::ByteStream.
         - Added custom socket support to Mojo::Client.
         - Renamed attributes method in Mojo::DOM to attrs.
+        - Renamed search method in Mojo::DOM to find.
         - Cleaned up tests. (memowe)
         - Cleaned up regular expressions in Mojo::DOM. (mpu)
         - Improved Mojo::Client error logging.

@@ -92,7 +92,7 @@ sub all_text {
     return $text;
 }
 
-sub at { shift->search(@_)->[0] }
+sub at { shift->find(@_)->[0] }
 
 sub attrs {
     my $self = shift;
@@ -127,6 +127,16 @@ sub children {
     }
 
     return \@children;
+}
+
+sub find {
+    my ($self, $css) = @_;
+
+    # Parse CSS selectors
+    my $pattern = $self->_parse_css($css);
+
+    # Filter tree
+    return $self->_select($self->tree, $pattern);
 }
 
 sub name {
@@ -273,16 +283,6 @@ sub root {
     }
 
     return $self->new(charset => $self->charset, tree => $root);
-}
-
-sub search {
-    my ($self, $css) = @_;
-
-    # Parse CSS selectors
-    my $pattern = $self->_parse_css($css);
-
-    # Filter tree
-    return $self->_select($self->tree, $pattern);
 }
 
 sub text {
@@ -855,7 +855,7 @@ Mojo::DOM - Minimalistic XML DOM Parser With CSS3 Selectors
     print $b->text;
 
     # Iterate
-    $dom->search('div[id]')->each(sub { print shift->text });
+    $dom->find('div[id]')->each(sub { print shift->text });
 
 =head1 DESCRIPTION
 
@@ -881,26 +881,26 @@ An element of type C<E>.
 
 =item C<E[foo]>
 
-    my $links = $dom->search('a[href]');
+    my $links = $dom->find('a[href]');
 
 An C<E> element with a C<foo> attribute.
 
 =item C<E[foo="bar"]>
 
-    my $fields = $dom->search('input[name="foo"]');
+    my $fields = $dom->find('input[name="foo"]');
 
 An C<E> element whose C<foo> attribute value is exactly equal to C<bar>.
 
 =item C<E[foo^="bar"]>
 
-    my $fields = $dom->search('input[name^="f"]');
+    my $fields = $dom->find('input[name^="f"]');
 
 An C<E> element whose C<foo> attribute value begins exactly with the string
 C<bar>.
 
 =item C<E[foo$="bar"]>
 
-    my $fields = $dom->search('input[name$="o"]');
+    my $fields = $dom->find('input[name$="o"]');
 
 An C<E> element whose C<foo> attribute value ends exactly with the string
 C<bar>.
@@ -913,13 +913,13 @@ An C<E> element, root of the document.
 
 =item C<E F>
 
-    my $headlines = $dom->search('div h1');
+    my $headlines = $dom->find('div h1');
 
 An C<F> element descendant of an C<E> element.
 
 =item C<E E<gt> F>
 
-    my $headlines = $dom->search('html > body > div > h1');
+    my $headlines = $dom->find('html > body > div > h1');
 
 An C<F> element child of an C<E> element.
 
@@ -958,7 +958,7 @@ Extract all text content from DOM structure.
 
     my $result = $dom->at('html title');
 
-Search for a single element with CSS3 selectors.
+Find a single element with CSS3 selectors.
 
 =head2 C<attrs>
 
@@ -971,6 +971,14 @@ Element attributes.
     my $children = $dom->children;
 
 Children of element.
+
+=head2 C<find>
+
+    my $results = $dom->find('html title');
+
+Find elements with CSS3 selectors.
+
+    $dom->find('div')->each(sub { print shift->text });
 
 =head2 C<name>
 
@@ -1014,14 +1022,6 @@ Replace element content.
     my $root = $dom->root;
 
 Find root element.
-
-=head2 C<search>
-
-    my $results = $dom->search('html title');
-
-Search for elements with CSS3 selectors.
-
-    $dom->search('div')->each(sub { print shift->text });
 
 =head2 C<text>
 

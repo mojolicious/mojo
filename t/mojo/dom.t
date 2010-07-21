@@ -19,7 +19,7 @@ my $dom = Mojo::DOM->new;
 $dom->parse('<div><div id="a">A</div><div id="b">B</div></div>');
 is($dom->at('#b')->text, 'B', 'right text');
 my @div;
-$dom->search('div[id]')->each(sub { push @div, shift->text });
+$dom->find('div[id]')->each(sub { push @div, shift->text });
 is_deeply(\@div, [qw/A B/], 'found all div elements with id');
 
 # Simple nesting (tree structure)
@@ -130,12 +130,12 @@ $dom->parse(<<EOF);
   </body>
 </html>
 EOF
-my $p = $dom->search('body > #container > div p[id]');
+my $p = $dom->find('body > #container > div p[id]');
 is($p->[0]->attrs->{id}, 'foo', 'right id attribute');
 is($p->[1],              undef, 'no second result');
 my @p;
 @div = ();
-$dom->search('div')->each(sub { push @div, $_->attrs->{id} })->search('p')
+$dom->find('div')->each(sub { push @div, $_->attrs->{id} })->find('p')
   ->each(sub { push @p, $_->attrs->{id} });
 is_deeply(\@p, [qw/foo bar/], 'found all p elements');
 my $ids = [qw/container header logo buttons buttons content/];
@@ -221,7 +221,7 @@ is("$dom", '<div>foo<foo>bar</foo>bar</div>', 'right text');
 $dom->at('foo')->replace(Mojo::DOM->new->parse('text'));
 is("$dom", '<div>footextbar</div>', 'right text');
 $dom->parse('<div>foo</div><div>bar</div>');
-$dom->search('div')->each(sub { shift->replace('<p>test</p>') });
+$dom->find('div')->each(sub { shift->replace('<p>test</p>') });
 is("$dom", '<p>test</p><p>test</p>', 'right text');
 $dom->parse('<div>foo<p>lalala</p>bar</div>');
 $dom->replace('♥');
@@ -232,7 +232,7 @@ $dom->replace('');
 is("$dom", '', 'right text');
 $dom->replace('<div>foo<p>lalala</p>bar</div>');
 is("$dom", '<div>foo<p>lalala</p>bar</div>', 'right text');
-$dom->search('p')->each(sub { shift->replace('') });
+$dom->find('p')->each(sub { shift->replace('') });
 is("$dom", '<div>foobar</div>', 'right text');
 
 # Replace element content
@@ -242,9 +242,9 @@ is("$dom", '<div>foo<p>bar</p>bar</div>', 'right text');
 $dom->at('p')->replace_content(Mojo::DOM->new->parse('text'));
 is("$dom", '<div>foo<p>text</p>bar</div>', 'right text');
 $dom->parse('<div>foo</div><div>bar</div>');
-$dom->search('div')->each(sub { shift->replace_content('<p>test</p>') });
+$dom->find('div')->each(sub { shift->replace_content('<p>test</p>') });
 is("$dom", '<div><p>test</p></div><div><p>test</p></div>', 'right text');
-$dom->search('p')->each(sub { shift->replace_content('') });
+$dom->find('p')->each(sub { shift->replace_content('') });
 is("$dom", '<div><p /></div><div><p /></div>', 'right text');
 $dom->parse('<div><p id="☃" /></div>');
 $dom->at('#☃')->replace_content('♥');
@@ -269,7 +269,7 @@ $dom->parse(<<EOF);
 </table>
 EOF
 my @data;
-for my $tr ($dom->search('table tr')->each) {
+for my $tr ($dom->find('table tr')->each) {
     for my $td (@{$tr->children}) {
         push @data, $td->name, $td->all_text;
     }
@@ -306,11 +306,11 @@ $dom->parse(<<EOF);
   </channel>
 </rss>
 EOF
-is($dom->search('rss')->[0]->attrs->{version}, '2.0',   'right version');
-is($dom->at('extension')->attrs->{'foo:id'},   'works', 'right id');
+is($dom->find('rss')->[0]->attrs->{version}, '2.0',   'right version');
+is($dom->at('extension')->attrs->{'foo:id'}, 'works', 'right id');
 like($dom->at('#works')->text,       qr/\[awesome\]\]/, 'right text');
 like($dom->at('[id="works"]')->text, qr/\[awesome\]\]/, 'right text');
-is($dom->search('description')->[1]->text, '<p>trololololo>', 'right text');
+is($dom->find('description')->[1]->text, '<p>trololololo>', 'right text');
 is($dom->at('pubdate')->text, 'Mon, 12 Jul 2010 20:42:00', 'right text');
 
 # Yadis
@@ -329,7 +329,7 @@ $dom->parse(<<'EOF');
 EOF
 is($dom->at('xrds')->namespace, 'xri://$xrds',         'right namespace');
 is($dom->at('xrd')->namespace,  'xri://$xrd*($v*2.0)', 'right namespace');
-my $s = $dom->search('xrds xrd service');
+my $s = $dom->find('xrds xrd service');
 is($s->[0]->at('type')->text, 'http://o.r.g/sso/2.0', 'right text');
 is($s->[0]->namespace,        'xri://$xrd*($v*2.0)',  'right namespace');
 is($s->[1]->at('type')->text, 'http://o.r.g/sso/1.0', 'right text');
@@ -360,7 +360,7 @@ $dom->parse(<<'EOF');
 EOF
 is($dom->at('xrds')->namespace, 'xri://$xrds',         'right namespace');
 is($dom->at('xrd')->namespace,  'xri://$xrd*($v*2.0)', 'right namespace');
-$s = $dom->search('xrds xrd service');
+$s = $dom->find('xrds xrd service');
 is($s->[0]->at('type')->text, 'http://o.r.g/sso/3.0', 'right text');
 is($s->[0]->namespace,        'xri://$xrd*($v*2.0)',  'right namespace');
 is($s->[1]->at('type')->text, 'http://o.r.g/sso/4.0', 'right text');
@@ -374,5 +374,5 @@ is($s->[4],                   undef,                  'no text');
 # Result and iterator order
 $dom->parse('<a><b>1</b></a><b>2</b><b>3</b>');
 my @numbers;
-$dom->search("b")->each(sub { push @numbers, shift->text });
+$dom->find("b")->each(sub { push @numbers, shift->text });
 is_deeply(\@numbers, [1, 2, 3], 'right order');

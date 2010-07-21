@@ -14,13 +14,16 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 12;
+plan tests => 13;
 
 # Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
 # Well, that’s love for you.
 use IO::Socket::INET;
 use Mojolicious::Lite;
 use Mojo::Client;
+
+# Mojolicious::Lite and ojo
+use ojo;
 
 # Silence
 app->log->level('fatal');
@@ -74,7 +77,7 @@ websocket '/deadcallback' => sub {
     $self->receive_message(sub { die 'i see dead callbacks' });
 };
 
-my $client = Mojo::Client->new->app(app);
+my $client = Mojo::Client->singleton->app(app);
 
 # WebSocket /
 my $result;
@@ -91,6 +94,21 @@ $client->websocket(
         $self->send_message('test1');
     }
 )->process;
+is($result, 'test1test2', 'right result');
+
+# WebSocket / (ojo)
+$result = undef;
+w '/' => sub {
+    my $self = shift;
+    $self->receive_message(
+        sub {
+            my ($self, $message) = @_;
+            $result = $message;
+            $self->finish;
+        }
+    );
+    $self->send_message('test1');
+};
 is($result, 'test1test2', 'right result');
 
 # WebSocket /socket (using an already prepared socket)

@@ -19,13 +19,20 @@ sub import {
     no strict 'refs';
     no warnings 'redefine';
 
+    # Mojolicious::Lite
+    eval "package $caller; use Mojolicious::Lite;";
+
     # Functions
     *{"${caller}::Oo"} = *{"${caller}::b"} = \&b;
     *{"${caller}::oO"} = sub { _request(@_) };
-    *{"${caller}::d"}  = sub { _request('delete', @_) };
-    *{"${caller}::g"}  = sub { _request('get', @_) };
-    *{"${caller}::p"}  = sub { _request('post', @_) };
-    *{"${caller}::u"}  = sub { _request('put', @_) };
+    *{"${caller}::a"} =
+      sub { *{"${caller}::any"}->(@_) and return *{"${caller}::app"}->() };
+    *{"${caller}::d"} = sub { _request('delete', @_) };
+    *{"${caller}::g"} = sub { _request('get',    @_) };
+    *{"${caller}::p"} = sub { _request('post',   @_) };
+    *{"${caller}::u"} = sub { _request('put',    @_) };
+    *{"${caller}::w"} =
+      sub { Mojo::Client->singleton->websocket(@_)->process }
 }
 
 sub _request {
@@ -55,6 +62,15 @@ Note that this module is EXPERIMENTAL and might change without warning!
 =head1 FUNCTIONS
 
 L<ojo> implements the following functions.
+
+=head2 C<a>
+
+    my $app = a('/' => sub { shift->render(json => {hello => 'world'}) });
+
+Create L<Mojolicious::Lite> route accepting all request methods and return
+the application.
+
+    perl -Mojo -e 'a("/" => {text => "Hello Mojo!"})->start' daemon
 
 =head2 C<b>
 
@@ -115,6 +131,12 @@ object.
 
 Perform C<PUT> request and turn response into a L<Mojo::Message::Response>
 object.
+
+=head2 C<w>
+
+    w('ws://mojolicio.us' => sub {...});
+
+Open a WebSocket connection.
 
 =head1 SEE ALSO
 

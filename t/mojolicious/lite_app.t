@@ -16,7 +16,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 430;
+plan tests => 432;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -37,7 +37,7 @@ use Mojolicious::Lite;
 use Test::Mojo;
 
 # Mojolicious::Lite and ojo
-use_ok('ojo');
+use ojo;
 
 # Silence
 app->log->level('error');
@@ -53,6 +53,9 @@ app->defaults(default => 23);
 
 # GET /
 get '/' => 'root';
+
+# /ojo
+a '/ojo' => {json => {hello => 'world'}};
 
 # GET /null/0
 get '/null/:null' => sub {
@@ -480,6 +483,9 @@ $t->head_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
 # GET / (with body)
 $t->get_ok('/', '1234' x 1024)->status_is(200)
   ->content_is('/root.html/root.html/root.html/root.html/root.html');
+
+# GET /ojo (ojo)
+$t->get_ok('/ojo')->status_is(200)->json_content_is({hello => 'world'});
 
 # GET /null/0
 $t->get_ok('/null/0')->status_is(200)

@@ -347,17 +347,17 @@ Automatic rendering.
 
 =head2 C<detour>
 
-    $dispatcher = $dispatcher->to(action => 'foo');
-    $dispatcher = $dispatcher->to({action => 'foo'});
-    $dispatcher = $dispatcher->to('controller#action');
-    $dispatcher = $dispatcher->to('controller#action', foo => 'bar');
-    $dispatcher = $dispatcher->to('controller#action', {foo => 'bar'});
-    $dispatcher = $dispatcher->to($app);
-    $dispatcher = $dispatcher->to($app, foo => 'bar');
-    $dispatcher = $dispatcher->to($app, {foo => 'bar'});
-    $dispatcher = $dispatcher->to('MyApp');
-    $dispatcher = $dispatcher->to('MyApp', foo => 'bar');
-    $dispatcher = $dispatcher->to('MyApp', {foo => 'bar'});
+    $dispatcher = $dispatcher->detour(action => 'foo');
+    $dispatcher = $dispatcher->detour({action => 'foo'});
+    $dispatcher = $dispatcher->detour('controller#action');
+    $dispatcher = $dispatcher->detour('controller#action', foo => 'bar');
+    $dispatcher = $dispatcher->detour('controller#action', {foo => 'bar'});
+    $dispatcher = $dispatcher->detour($app);
+    $dispatcher = $dispatcher->detour($app, foo => 'bar');
+    $dispatcher = $dispatcher->detour($app, {foo => 'bar'});
+    $dispatcher = $dispatcher->detour('MyApp');
+    $dispatcher = $dispatcher->detour('MyApp', foo => 'bar');
+    $dispatcher = $dispatcher->detour('MyApp', {foo => 'bar'});
 
 Embed application.
 Note that this method is EXPERIMENTAL and might change without warning!

@@ -106,9 +106,9 @@ package MyTestApp::Basic;
 sub new { bless {}, shift }
 
 sub handler {
-    my ($self, $tx) = @_;
-    $tx->res->code(200);
-    $tx->res->body('Hello stoneage!');
+    my ($self, $c) = @_;
+    $c->res->code(200);
+    $c->res->body('Hello stoneage!');
 }
 
 package main;

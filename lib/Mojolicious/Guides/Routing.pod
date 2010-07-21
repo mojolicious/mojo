@@ -576,16 +576,16 @@ embedded application.
     1;
 
 A minimal embeddable application is nothing more than a class with a
-C<handler> method, accepting L<Mojo::Transaction> objects.
+C<handler> method, accepting L<MojoX::Controller> objects.
 
     package MyApp;
 
     sub new { bless {}, shift }
 
     sub handler {
-        my ($self, $tx) = @_;
-        $tx->res->code(200);
-        $tx->res->body('Hello Mojo!');
+        my ($self, $c) = @_;
+        $c->res->code(200);
+        $c->res->body('Hello Mojo!');
     }
 
     1;

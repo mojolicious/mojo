@@ -541,33 +541,14 @@ applications.
 
 You can easily embed whole applications simply by using them instead of a
 controller.
-
-    # Application
-    package MyApp;
-    use base 'Mojolicious';
-
-    sub startup {
-        my $self = shift;
-
-        # Routes
-        my $r = $self->routes;
-
-        # Embedded Mojolicious::Lite app under "/foo"
-        $r->route('/foo')->to('bar#');
-    }
-
-    1;
-
 This allows for example the use of the L<Mojolicious::Lite> domain specific
 language in normal L<Mojolicious> controllers.
-But note that by default the original path will simply be reused for the
-embedded application.
 
     # Controller
     package MyApp::Bar;
     use Mojolicious::Lite;
 
-    # Action with same route
+    # GET /foo
     get '/foo' => sub {
         my $self = shift;
         $self->render(text => 'Hello Mojo!');
@@ -575,10 +556,16 @@ embedded application.
 
     1;
 
+But note that by default the original path will simply be reused for the
+embedded application.
+
+    # /foo
+    $r->route('/foo')->to('bar#');
+
 A minimal embeddable application is nothing more than a subclass of L<Mojo>
 containing a C<handler> method accepting L<MojoX::Controller> objects.
 
-    package MyApp;
+    package MyApp::Bar;
     use base 'Mojo';
 
     sub handler {
@@ -598,17 +585,16 @@ application.
 
 The remaining path gets always stored in the C<path> stash value.
 
-    # Controller
     package MyApp::Bar;
     use Mojolicious::Lite;
 
-    # Action
+    # GET */hello
     get '/hello' => sub {
         my $self = shift;
         $self->render(text => 'Hello Mojo!');
     };
 
-    # Another one
+    # GET */bye
     get '/bye' => sub {
         my $self = shift;
         $self->render(text => 'Bye Mojo!');
@@ -619,7 +605,7 @@ The remaining path gets always stored in the C<path> stash value.
 Instead of using C<detour> you could also just capture your own C<path>.
 
     # /foo/*
-    $r->route('/foo/(*path)')->to('bar#');
+    $r->route('/foo/(*path)')->to('bar#', path => '/default');
 
 =head2 Application Plugins
 

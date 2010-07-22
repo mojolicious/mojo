@@ -103,7 +103,7 @@ get '/' => sub {
 
 package MyTestApp::Basic;
 
-sub new { bless {}, shift }
+use base 'Mojo';
 
 sub handler {
     my ($self, $c) = @_;

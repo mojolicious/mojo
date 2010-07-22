@@ -148,8 +148,18 @@ sub _dispatch_controller {
         # Instantiate
         $app = $app->new($c) unless ref $app;
 
+        # Action
+        if ($method && $app->isa($c->app->controller_class)) {
+
+            # Call action
+            $continue = $app->$method if $app->can($method);
+
+            # Copy stash
+            $c->stash($app->stash);
+        }
+
         # Handler
-        if ($app->can('handler')) {
+        elsif ($app->isa('Mojo')) {
 
             # Connect routes
             if ($app->can('routes')) {
@@ -162,16 +172,6 @@ sub _dispatch_controller {
 
             # Handler
             $app->handler($c);
-        }
-
-        # Action
-        elsif ($method && (my $code = $app->can($method))) {
-
-            # Call action
-            $continue = $app->$code;
-
-            # Copy stash
-            $c->stash($app->stash);
         }
 
         # Success

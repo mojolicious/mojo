@@ -9,7 +9,7 @@ use base 'Mojo::Base';
 use overload '""' => sub { shift->to_xml }, fallback => 1;
 
 use Mojo::ByteStream 'b';
-use Scalar::Util qw/isweak weaken/;
+use Scalar::Util 'weaken';
 
 # How are the kids supposed to get home?
 # I dunno. Internet?
@@ -437,8 +437,8 @@ sub _end {
 
         # Update parent reference
         for my $e (@buffer) {
-            weaken $$current unless isweak $$current;
             $e->[3] = $$current if $e->[0] eq 'tag';
+            weaken $e->[3];
         }
 
         # Move children
@@ -801,11 +801,9 @@ sub _select {
 sub _start {
     my ($self, $start, $attrs, $current) = @_;
 
-    # Parent
-    weaken $$current unless isweak $$current;
-
     # New
     my $new = ['tag', $start, $attrs, $$current];
+    weaken $new->[3];
 
     # Append
     push @$$current, $new;

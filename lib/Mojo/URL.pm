@@ -319,7 +319,7 @@ Mojo::URL - Uniform Resource Locator
     $url->host('kraih.com');
     $url->port(3000);
     $url->path->parts(qw/foo bar/);
-    $url->query->params(foo => 'bar');
+    $url->query->param(foo => 'bar');
     $url->fragment(23);
     print "$url";
 

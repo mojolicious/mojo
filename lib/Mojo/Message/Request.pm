@@ -209,7 +209,7 @@ sub _build_start_line {
     }
 
     # Method
-    my $method = $self->method;
+    my $method = uc $self->method;
 
     # CONNECT
     if ($method eq 'CONNECT') {

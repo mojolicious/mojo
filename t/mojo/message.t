@@ -487,7 +487,7 @@ is( $req->build,
 $req      = Mojo::Message::Request->new;
 $finished = undef;
 $req->finish_cb(sub { $finished = $_[0]->state });
-$req->method('GET');
+$req->method('get');
 $req->url->parse('http://127.0.0.1/foo/bar');
 $req->headers->expect('100-continue');
 $req->body("Hello World!\n");

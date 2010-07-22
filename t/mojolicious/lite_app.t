@@ -16,7 +16,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 432;
+plan tests => 433;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -499,6 +499,11 @@ $t->get_ok("http://sri:foo\@localhost:$port/stream?foo=bar")->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/^foobarsri\:foohttp:\/\/localhost\:\d+\/stream$/);
+
+# GET /stream (with basic auth and ojo)
+my $b = g("http://sri:foo\@localhost:$port/stream?foo=bar")->body;
+like($b, qr/^foobarsri\:foohttp:\/\/localhost\:\d+\/stream$/,
+    'right content');
 
 # GET /maybe/ajax (not ajax)
 $t->get_ok('/maybe/ajax')->status_is(200)

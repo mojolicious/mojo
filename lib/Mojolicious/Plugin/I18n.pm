@@ -21,8 +21,13 @@ sub register {
     # Namespace
     my $namespace = $conf->{namespace} || ((ref $app) . "::I18N");
 
+    # Default
+    my $default = $conf->{default} || 'en';
+
     # Initialize
     eval "package $namespace; use base 'Locale::Maketext'; 1;";
+    eval "package ${namespace}::$default; use base '$namespace';"
+      . 'our %Lexicon = (_AUTO => 1); 1;';
     die qq/Couldn't initialize I18N class "$namespace": $@/ if $@;
 
     # Start timer
@@ -30,11 +35,8 @@ sub register {
         before_dispatch => sub {
             my ($self, $c) = @_;
 
-            # Languages
-            my @languages = ('en');
-
             # Header detection
-            @languages = I18N::LangTags::implicate_supers(
+            my @languages = I18N::LangTags::implicate_supers(
                 I18N::LangTags::Detect->http_accept_langs(
                     scalar $c->req->headers->accept_language
                 )
@@ -46,7 +48,7 @@ sub register {
                 _namespace => $namespace);
 
             # Languages
-            $c->stash->{i18n}->languages(@languages);
+            $c->stash->{i18n}->languages(@languages, $default);
         }
     );
 
@@ -64,23 +66,20 @@ package Mojolicious::Plugin::I18n::_Handler;
 
 use base 'Mojo::Base';
 
-__PACKAGE__->attr([qw/_handle _language _namespace/]);
-
 sub languages {
     my ($self, @languages) = @_;
 
     # Shortcut
-    return $self->_language unless @languages;
+    return $self->{_language} unless @languages;
 
     # Namespace
-    my $namespace = $self->_namespace;
+    my $namespace = $self->{_namespace};
 
     # Handle
     if (my $handle = $namespace->get_handle(@languages)) {
-        $self->_handle($handle);
-        $self->_language($handle->language_tag);
+        $self->{_handle}   = $handle;
+        $self->{_language} = $handle->language_tag;
     }
-    else { $self->_language('en') }
 
     return $self;
 }
@@ -89,7 +88,7 @@ sub localize {
     my $self = shift;
 
     # Localize
-    my $handle = $self->_handle;
+    my $handle = $self->{_handle};
     return $handle->maketext(@_) if $handle;
 
     # Pass through
@@ -126,6 +125,18 @@ Mojolicious::Plugin::I18n - Intenationalization Plugin
 
 L<Mojolicous::Plugin::I18n> adds L<Locale::Maketext> support to
 L<Mojolicious>.
+
+=head1 OPTIONS
+
+=head2 C<default>
+
+    # Mojolicious::Lite
+    plugin i18n => {default => 'en'};
+
+=head2 C<namespace>
+
+    # Mojolicious::Lite
+    plugin i18n => {namespace => 'MyApp::I18N'};
 
 =head1 METHODS
 

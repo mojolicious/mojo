@@ -564,8 +564,8 @@ application.
     # /foo/*
     $r->route('/foo')->detour('bar#', name => 'Mojo');
 
-A minimal embeddable application is nothing more than a subclass of L<Mojo>
-containing a C<handler> method accepting L<MojoX::Controller> objects.
+A minimal embeddable application is nothing more than a subclass of L<Mojo>,
+containing a C<handler> method accepting L<Mojolicious::Controller> objects.
 
     package MyApp::Bar;
     use base 'Mojo';

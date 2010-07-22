@@ -37,6 +37,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed Mojo::Server::CGI and Mojo::Server::FastCGI to be more
           portable.
         - Fixed poll + tls support.
+        - Fixed language switching in Mojolicious::Plugin::I18n.
         - Fixed async Mojo::Client tests.
         - Fixed HTML1 and HTML5 compatibility of Mojo::DOM.
         - Fixed a selector bug in Mojo::DOM.

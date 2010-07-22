@@ -149,7 +149,7 @@ sub _dispatch_controller {
         $app = $app->new($c) unless ref $app;
 
         # Action
-        if ($method && $app->isa($c->app->controller_class)) {
+        if ($method && $app->isa($self->controller_base_class)) {
 
             # Call action
             $continue = $app->$method if $app->can($method);

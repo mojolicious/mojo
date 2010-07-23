@@ -297,7 +297,7 @@ sub _list_templates {
         my $path = File::Spec->catfile($dir, $file);
         if (-f $path) {
             $path = File::Spec->abs2rel($path, $root);
-            push @files, $path;
+            push @files, join '/', File::Spec->splitdir($path);
             next;
         }
 

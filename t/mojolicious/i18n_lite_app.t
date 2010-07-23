@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 18;
+plan tests => 24;
 
 # Aw, he looks like a little insane drunken angel.
 package MyTestApp::I18N::de;
@@ -49,6 +49,9 @@ get '/mixed' => 'mixed';
 # GET /nothing
 get '/nothing' => 'nothing';
 
+# GET /unknown
+get '/unknown' => 'unknown';
+
 # Hey, I don’t see you planning for your old age.
 # I got plans. I’m gonna turn my on/off switch to off.
 my $t = Test::Mojo->new;
@@ -76,6 +79,13 @@ $t->get_ok('/mixed' => {'Accept-Language' => 'de, en-US'})->status_is(200)
 # Nothing
 $t->get_ok('/nothing')->status_is(200)->content_is("helloen\n");
 
+# Unknown (manual)
+$t->get_ok('/unknown')->status_is(200)->content_is("unknownde\nunknownen\n");
+
+# Unknwon (manual)
+$t->get_ok('/unknown' => {'Accept-Language' => 'de, en-US'})->status_is(200)
+  ->content_is("unknownde\nunknownen\n");
+
 __DATA__
 @@ index.html.ep
 <%=l 'hello' %><%= languages %>
@@ -96,3 +106,9 @@ __DATA__
 
 @@ nothing.html.ep
 <%=l 'hello' %><%= languages %>
+
+@@ unknown.html.ep
+% languages 'de';
+<%=l 'unknown' %><%= languages %>
+% languages 'en';
+<%=l 'unknown' %><%= languages %>

@@ -77,6 +77,7 @@ sub languages {
 
     # Handle
     if (my $handle = $namespace->get_handle(@languages)) {
+        $handle->fail_with(sub { $_[1] });
         $self->{_handle}   = $handle;
         $self->{_language} = $handle->language_tag;
     }
@@ -86,13 +87,11 @@ sub languages {
 
 sub localize {
     my $self = shift;
+    my $key  = shift;
 
     # Localize
-    my $handle = $self->{_handle};
-    return $handle->maketext(@_) if $handle;
-
-    # Pass through
-    return join '', @_;
+    return $key unless my $handle = $self->{_handle};
+    return $handle->maketext($key, @_);
 }
 
 1;

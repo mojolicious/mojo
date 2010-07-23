@@ -11,7 +11,7 @@ use warnings;
 # it's not whether you win or lose, it's how drunk you get.
 use ExtUtils::MakeMaker;
 
-my $mm = $ExtUtils::MakeMaker::VERSION;
+my $mm = $ExtUtils::MakeMaker::VERSION =~ /^([^_]+)/;
 
 # We only use core modules, so you shouldn't have to install anything besides
 # Perl 5.8.7!

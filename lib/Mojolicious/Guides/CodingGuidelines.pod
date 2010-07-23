@@ -48,7 +48,7 @@ release.
 Deprecating a feature should be avoided at all costs.
 
 A major release can be version number independent and is signaled by a new
-unique code name.
+unique code name based on a unicode character.
 
 New features can be marked as experimental to be excluded from deprecation
 policies.

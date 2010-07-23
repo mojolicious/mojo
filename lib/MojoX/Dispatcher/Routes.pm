@@ -64,7 +64,7 @@ sub dispatch {
     return 1 unless $m && @{$m->stack};
 
     # Params
-    my $p = $c->stash->{'mojo.params'} = $c->tx->req->params->clone;
+    my $p = $c->stash->{'mojo.params'} ||= $c->tx->req->params->clone;
 
     # Walk the stack
     return 1 if $self->_walk_stack($c);

@@ -551,7 +551,7 @@ language in normal L<Mojolicious> controllers.
     # GET /hello
     get '/hello' => sub {
         my $self = shift;
-        my $name = $self->stash('name');
+        my $name = $self->param('name');
         $self->render(text => "Hello $name!");
     };
 
@@ -573,7 +573,7 @@ containing a C<handler> method accepting L<Mojolicious::Controller> objects.
     sub handler {
         my ($self, $c) = @_;
         $c->res->code(200);
-        my $name = $c->stash('name');
+        my $name = $c->param('name');
         $c->res->body("Hello $name!");
     }
 

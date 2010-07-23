@@ -96,7 +96,7 @@ app->log->level('error');
 # GET / (embedded)
 get '/' => sub {
     my $self = shift;
-    my $name = $self->stash('name');
+    my $name = $self->param('name');
     my $url  = $self->url_for;
     $self->render_text("Bye from the $name app! $url!");
 };
@@ -108,7 +108,8 @@ use base 'Mojo';
 sub handler {
     my ($self, $c) = @_;
     $c->res->code(200);
-    $c->res->body('Hello stoneage!');
+    my $test = $c->param('test');
+    $c->res->body("Hello $test!");
 }
 
 package main;
@@ -192,7 +193,7 @@ $t->get_ok('/yada/yada/yada')->status_is(200)
   ->content_is('yada sixth embedded works!');
 
 # GET /basic (from embedded app)
-$t->get_ok('/basic')->status_is(200)->content_is('Hello stoneage!');
+$t->get_ok('/basic')->status_is(200)->content_is('Hello lalala!');
 
 # GET /third/ (from embedded app)
 $t->get_ok('/third')->status_is(200)

@@ -548,8 +548,8 @@ language in normal L<Mojolicious> controllers.
     package MyApp::Bar;
     use Mojolicious::Lite;
 
-    # GET /foo
-    get '/foo' => sub {
+    # GET /hello
+    get '/hello' => sub {
         my $self = shift;
         my $name = $self->stash('name');
         $self->render(text => "Hello $name!");

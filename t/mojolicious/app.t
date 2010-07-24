@@ -269,4 +269,4 @@ $t->get_ok('/foo/session')->status_is(200)
 
 # Mixed formats
 $t->get_ok('/rss.xml')->status_is(200)->content_type_is('application/rss+xml')
-  ->content_is(qq/<?xml version="1.0" encoding="UTF-8"?><rss \/>\n/)
+  ->content_like(qr/<\?xml version="1.0" encoding="UTF-8"\?><rss \/>/)

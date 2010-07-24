@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 13;
+plan tests => 16;
 
 # Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
 # Well, that’s love for you.
@@ -63,6 +63,15 @@ websocket '/early_start' => sub {
             $self->finish;
         }
     );
+};
+
+# WebSocket /denied
+my ($handshake, $denied);
+websocket '/denied' => sub {
+    my $self = shift;
+    $self->tx->handshake->finished(sub { $handshake = 'works' });
+    $self->finished(sub                { $denied    = 'works' });
+    $self->render(text => 'denied', status => 403);
 };
 
 # WebSocket /dead
@@ -156,8 +165,16 @@ $client->websocket(
 is($result, 'test3test2', 'right result');
 is($flag2,  23,           'finished callback');
 
+# WebSocket /denied (connection denied)
+my $code = undef;
+$client->websocket('/denied' => sub { $code = shift->res->code })->process;
+is($code,      403,     'right status');
+is($handshake, 'works', 'finished handshake');
+is($denied,    'works', 'finished websocket');
+
 # WebSocket /dead (dies)
-my ($websocket, $code, $message);
+$code = undef;
+my ($websocket, $message);
 $client->websocket(
     '/dead' => sub {
         my $self = shift;

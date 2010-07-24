@@ -331,37 +331,44 @@ sub _state {
     # Finish
     if ($tx->is_finished) {
 
-        # Finish normal transactions
-        $tx->server_close unless $tx->is_websocket;
-
         # Connection
         my $c = $self->{_cs}->{$id};
 
-        # Successful WebSocket upgrade
-        my $upgraded = 0;
-        $upgraded = 1
-          if $c->{websocket} && $c->{websocket}->res->code eq '101';
+        # Finish transaction
+        delete $c->{transaction};
+        $tx->server_close;
+
+        # WebSocket
+        my $s = 0;
+        if (my $ws = $c->{websocket}) {
+
+            # Successful upgrade
+            if ($ws->res->code eq '101') {
+
+                # Make sure connection stays active
+                $tx->keep_alive(1);
+
+                # Allow early writing from the server side
+                return $self->ioloop->writing($id) if $ws->is_writing;
+            }
+
+            # Failed upgrade
+            else {
+                delete $c->{websocket};
+                $ws->server_close;
+            }
+        }
 
         # Close connection
-        if ($tx->req->has_error || (!$tx->keep_alive && !$upgraded)) {
+        if ($tx->req->has_error || !$tx->keep_alive) {
             $self->_drop($id);
             $self->ioloop->drop($id);
         }
 
-        # Cleanup connection
-        else {
-            delete $c->{transaction};
-            delete $c->{websocket} unless $upgraded;
-
-            # Allow early writing from the server side
-            return $self->ioloop->writing($id)
-              if $upgraded && $c->{websocket}->is_writing;
-
-            # Leftovers
-            if (defined(my $leftovers = $tx->server_leftovers)) {
-                $tx = $c->{transaction} = $self->_build_tx($id, $c);
-                $tx->server_read($leftovers);
-            }
+        # Leftovers
+        elsif (defined(my $leftovers = $tx->server_leftovers)) {
+            $tx = $c->{transaction} = $self->_build_tx($id, $c);
+            $tx->server_read($leftovers);
         }
     }
 

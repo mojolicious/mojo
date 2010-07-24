@@ -1377,6 +1377,8 @@ clients.
 
 Clone client instance and start using the global shared L<Mojo::IOLoop>
 singleton.
+In case of connection failures the callback can be triggered immediately,
+independent from reactor ticks.
 Note that parallel requests are always handled asynchronous, this only
 affects shared L<Mojo::IOLoop> instances.
 

@@ -72,7 +72,7 @@ Mojolicious::Plugin::DefaultHelpers - Default Helpers Plugin
 L<Mojolicous::Plugin::DefaultHelpers> is a collection of renderer helpers for
 L<Mojolicious>.
 
-=head2 HELPERS
+=head2 Helpers
 
 =over 4
 

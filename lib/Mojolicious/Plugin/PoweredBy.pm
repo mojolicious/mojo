@@ -50,6 +50,14 @@ Mojolicious::Plugin::PoweredBy - Powered By Plugin
 L<Mojolicous::Plugin::PoweredBy> is a plugin that adds an C<X-Powered-By>
 header which defaults to C<Mojolicious (Perl)>.
 
+=head2 Options
+
+=over 4
+
+=item powered_by
+
+=back
+
 =head1 METHODS
 
 L<Mojolicious::Plugin::PoweredBy> inherits all methods from

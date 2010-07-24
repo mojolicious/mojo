@@ -124,18 +124,44 @@ Mojolicious::Plugin::I18n - Intenationalization Plugin
 
 L<Mojolicous::Plugin::I18n> adds L<Locale::Maketext> support to
 L<Mojolicious>.
+All you have to do besides using this plugin is to add as many lexicon
+classes as you need.
+Languages can usually be detected automatically from the C<Accept-Languages>
+request header.
 
-=head1 OPTIONS
+=head2 Options
 
-=head2 C<default>
+=over 4
+
+=item default
 
     # Mojolicious::Lite
     plugin i18n => {default => 'en'};
 
-=head2 C<namespace>
+=item namespace
 
     # Mojolicious::Lite
     plugin i18n => {namespace => 'MyApp::I18N'};
+
+=back
+
+=head2 Helpers
+
+=over 4
+
+=item l
+
+    <%=l 'hello' %>
+
+Translate sentence.
+
+=item languages
+
+    <% languages 'de'; %>
+
+Change languages.
+
+=back
 
 =head1 METHODS
 

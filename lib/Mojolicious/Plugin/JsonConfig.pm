@@ -159,21 +159,23 @@ preprocesses it's input with L<Mojo::Template>.
 
 The application object can be accessed via C<$app> or the C<app> helper.
 
-=head1 OPTIONS
+=head2 Options
 
-=head2 C<default>
+=over 4
+
+=item default
 
     # Mojolicious::Lite
     plugin json_config => {default => {foo => 'bar'}};
 
-=head2 C<ext>
+=item ext
 
     # Mojolicious::Lite
     plugin json_config => {ext => 'conf'};
 
 File extension of config file, defaults to C<json>.
 
-=head2 C<file>
+=item file
 
     # Mojolicious::Lite
     plugin json_config => {file => 'myapp.conf'};
@@ -181,15 +183,17 @@ File extension of config file, defaults to C<json>.
 
 By default C<myapp.json> is searched in the application home directory.
 
-=head2 C<stash_key>
+=item stash_key
 
     # Mojolicious::Lite
     plugin json_config => {stash_key => 'conf'};
 
-=head2 C<template>
+=item template
 
     # Mojolicious::Lite
     plugin json_config => {template => {line_start => '.'}};
+
+=back
 
 =head1 METHODS
 

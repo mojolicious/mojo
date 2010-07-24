@@ -122,17 +122,21 @@ sugar designed specifically for L<Mojolicious>.
 It supports L<Mojolicious> template helpers and exposes the stash directly as
 perl variables.
 
-=head1 OPTIONS
+=head2 Options
 
-=head2 C<name>
+=over 4
+
+=item name
 
     # Mojolicious::Lite
     plugin ep_renderer => {name => 'foo'};
 
-=head2 C<template>
+=item template
 
     # Mojolicious::Lite
     plugin ep_renderer => {template => {line_start => '.'}};
+
+=back
 
 =head1 METHODS
 

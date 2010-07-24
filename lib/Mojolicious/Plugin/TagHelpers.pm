@@ -157,7 +157,7 @@ L<Mojolicous::Plugin::TagHelpers> is a collection of HTML5 tag helpers for
 L<Mojolicious>.
 Note that this module is EXPERIMENTAL and might change without warning!
 
-=head2 HELPERS
+=head2 Helpers
 
 =over 4
 

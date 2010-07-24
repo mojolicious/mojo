@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 16;
+plan tests => 18;
 
 # Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
 # Well, that’s love for you.
@@ -66,12 +66,41 @@ websocket '/early_start' => sub {
 };
 
 # WebSocket /denied
-my ($handshake, $denied);
+my ($handshake, $denied) = 0;
 websocket '/denied' => sub {
     my $self = shift;
-    $self->tx->handshake->finished(sub { $handshake = 'works' });
-    $self->finished(sub                { $denied    = 'works' });
+    $self->tx->handshake->finished(sub { $handshake += 2 });
+    $self->finished(sub                { $denied    += 1 });
     $self->render(text => 'denied', status => 403);
+};
+
+# WebSocket /subreq
+websocket '/subreq' => sub {
+    my $self = shift;
+    $self->client->async->websocket(
+        '/echo' => sub {
+            my $client = shift;
+            $client->receive_message(
+                sub {
+                    my ($client, $message) = @_;
+                    $self->send_message($message);
+                    $client->finish;
+                    $self->finish;
+                }
+            );
+            $client->send_message('test1');
+        }
+    )->process;
+};
+
+# WebSocket /echo
+websocket '/echo' => sub {
+    shift->receive_message(
+        sub {
+            my ($self, $message) = @_;
+            $self->send_message($message);
+        }
+    );
 };
 
 # WebSocket /dead
@@ -168,9 +197,27 @@ is($flag2,  23,           'finished callback');
 # WebSocket /denied (connection denied)
 my $code = undef;
 $client->websocket('/denied' => sub { $code = shift->res->code })->process;
-is($code,      403,     'right status');
-is($handshake, 'works', 'finished handshake');
-is($denied,    'works', 'finished websocket');
+is($code,      403, 'right status');
+is($handshake, 2,   'finished handshake');
+is($denied,    1,   'finished websocket');
+
+# WebSocket /subreq
+($code, $result) = undef;
+$client->websocket(
+    '/subreq' => sub {
+        my $self = shift;
+        $code = $self->res->code;
+        $self->receive_message(
+            sub {
+                my ($self, $message) = @_;
+                $result = $message;
+                $self->finish;
+            }
+        );
+    }
+)->process;
+is($code,   101,     'right status');
+is($result, 'test1', 'right result');
 
 # WebSocket /dead (dies)
 $code = undef;

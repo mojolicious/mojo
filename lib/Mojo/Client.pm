@@ -595,9 +595,8 @@ sub _connect {
     # Check for specific connection id
     my $id = $f->connection;
 
-    # Cleanup
+    # Loop
     my $loop = $self->ioloop;
-    $loop->one_tick(0);
 
     # Info
     my ($scheme, $address, $port) = $self->_pipeline_info($p);

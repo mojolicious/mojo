@@ -423,9 +423,7 @@ sub _write {
     return unless my $tx = $c->{transaction} || $c->{websocket};
 
     # Get chunk
-    my $chunk = $tx->server_write;
-
-    return $chunk;
+    return $tx->server_write;
 }
 
 1;

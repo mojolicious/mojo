@@ -23,11 +23,15 @@ __PACKAGE__->attr('namespace');
 sub auto_render {
     my ($self, $c) = @_;
 
+    # Transaction
+    my $tx = $c->tx;
+
     # Render
     return !$c->render
       unless $c->stash->{'mojo.rendered'}
           || $c->res->code
-          || $c->tx->is_paused;
+          || $tx->is_paused
+          || $tx->is_websocket;
 
     # Nothing to render
     return;

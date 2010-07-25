@@ -949,12 +949,15 @@ sub _redirect {
     # Transaction
     my $tx = $p->[-1];
 
+    # Response
+    my $res = $tx->res;
+
     # Code
-    return unless $tx->res->is_status_class('300');
-    return if $tx->res->code == 305;
+    return unless $res->is_status_class('300');
+    return if $res->code == 305;
 
     # Location
-    return unless my $location = $tx->res->headers->location;
+    return unless my $location = $res->headers->location;
 
     # Method
     my $method = $tx->req->method;
@@ -967,8 +970,9 @@ sub _redirect {
 
     # New transaction
     my $new = Mojo::Transaction::HTTP->new;
-    $new->req->method($method);
-    $new->req->url->parse($location);
+    my $req = $new->req;
+    $req->method($method);
+    $req->url->parse($location);
     $new->previous($p);
 
     # Start redirected request
@@ -990,12 +994,13 @@ sub _start_pipeline {
 
         # Embedded server
         if ($self->app) {
-            my $url = $tx->req->url->to_abs;
+            my $req = $tx->req;
+            my $url = $req->url->to_abs;
             next if $url->host;
             $url->scheme('http');
             $url->host('localhost');
             $url->port($self->test_server);
-            $tx->req->url($url);
+            $req->url($url);
         }
 
         # Request

@@ -318,7 +318,8 @@ Mojo::URL - Uniform Resource Locator
     $url->userinfo('sri:foobar');
     $url->host('kraih.com');
     $url->port(3000);
-    $url->path->parts(qw/foo bar/);
+    $url->path('/foo/bar');
+    $url->path('baz');
     $url->query->param(foo => 'bar');
     $url->fragment(23);
     print "$url";

@@ -22,6 +22,10 @@ sub import {
     # Mojolicious::Lite
     eval "package $caller; use Mojolicious::Lite;";
 
+    # Allow redirects
+    my $client = Mojo::Client->singleton;
+    $client->max_redirects(1) unless $client->max_redirects;
+
     # Functions
     *{"${caller}::Oo"} = *{"${caller}::b"} = \&b;
     *{"${caller}::oO"} = sub { _request(@_) };
@@ -52,7 +56,7 @@ ojo - Fun Oneliners With Mojo!
 
 =head1 SYNOPSIS
 
-    perl -Mojo -e 'b(g("http://mojolicio.us")->dom->at("title")->text)->say'
+    perl -Mojo -e 'b(g("mojolicio.us")->dom->at("title")->text)->say'
 
 =head1 DESCRIPTION
 
@@ -78,7 +82,7 @@ the application.
 
 Turn input into a L<Mojo::ByteStream> object.
 
-    perl -Mojo -e 'b(g("http://mojolicio.us")->body)->html_unescape->say'
+    perl -Mojo -e 'b(g("mojolicio.us")->body)->html_unescape->say'
 
 =head2 C<d>
 

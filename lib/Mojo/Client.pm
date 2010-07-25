@@ -31,8 +31,8 @@ __PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->new });
 __PACKAGE__->attr(keep_alive_timeout         => 15);
 __PACKAGE__->attr(log                        => sub { Mojo::Log->new });
 __PACKAGE__->attr(max_keep_alive_connections => 5);
-__PACKAGE__->attr(max_redirects              => 0);
-__PACKAGE__->attr(websocket_timeout          => 300);
+__PACKAGE__->attr(max_redirects     => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 });
+__PACKAGE__->attr(websocket_timeout => 300);
 
 # Singleton
 our $CLIENT;
@@ -252,7 +252,9 @@ sub build_tx {
     $req->method(shift);
 
     # URL
-    $req->url->parse(shift);
+    my $url = shift;
+    $url = "http://$url" unless $url =~ /^\/|\:\/\//;
+    $req->url->parse($url);
 
     # Callback
     my $cb = pop @_ if ref $_[-1] && ref $_[-1] eq 'CODE';
@@ -272,15 +274,13 @@ sub build_websocket_tx {
     my $self = shift;
 
     # New WebSocket
-    my $tx = Mojo::Transaction::HTTP->new;
+    my $tx = $self->build_tx(GET => shift);
 
     # Request
     my $req = $tx->req;
-    $req->method('GET');
 
     # URL
     my $url = $req->url;
-    $url->parse(shift);
 
     # Scheme
     my $abs = $url->to_abs;
@@ -1431,7 +1431,8 @@ Versatile transaction builder for forms.
 
 =head2 C<build_tx>
 
-    my $tx = $client->build_tx(GET => 'http://mojolicious.org');
+    my $tx = $client->build_tx(GET => 'mojolicious.org');
+    my $tx = $client->build_tx(POST => 'http://mojolicious.org');
     my $tx = $client->build_tx(
         GET => 'http://kraih.com' => {Connection => 'close'}
     );

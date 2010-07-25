@@ -26,15 +26,8 @@ __PACKAGE__->attr(log    => sub { Mojo::Log->new });
 __PACKAGE__->attr(
     websocket_handshake_cb => sub {
         sub {
-            my ($self, $tx) = @_;
-
-            # WebSocket transaction
-            my $ws = Mojo::Transaction::WebSocket->new(handshake => $tx);
-
-            # Handshake
-            $ws->server_handshake;
-
-            return $ws;
+            return Mojo::Transaction::WebSocket->new(handshake => pop)
+              ->server_handshake;
           }
     }
 );

@@ -58,6 +58,8 @@ sub client_handshake {
     $headers->sec_websocket_key2($self->_generate_key)
       unless $headers->sec_websocket_key2;
     $req->body(pack 'N*', int(rand 9999999) + 1, int(rand 9999999) + 1);
+
+    return $self;
 }
 
 sub client_read  { shift->server_read(@_) }
@@ -131,6 +133,8 @@ sub server_handshake {
         $res->headers->header('WebSocket-Origin',   $origin);
         $res->headers->header('WebSocket-Location', $location);
     }
+
+    return $self;
 }
 
 # Being eaten by crocodile is just like going to sleep... in a giant blender.
@@ -159,6 +163,8 @@ sub server_read {
             $self, b($message)->decode('UTF-8')->to_string
         );
     }
+
+    return $self;
 }
 
 sub server_write {
@@ -274,19 +280,19 @@ Check WebSocket handshake challenge, only used by client.
 
 =head2 C<client_close>
 
-    $ws->client_close;
+    $ws = $ws->client_close;
 
 Connection got closed, only used by clients.
 
 =head2 C<client_handshake>
 
-    $ws->client_handshake;
+    $ws = $ws->client_handshake;
 
 WebSocket handshake, only used by clients.
 
 =head2 C<client_read>
 
-    $ws->client_read($data);
+    $ws = $ws->client_read($data);
 
 Read raw WebSocket data, only used by clients.
 
@@ -359,13 +365,13 @@ transparently.
 
 =head2 C<server_handshake>
 
-    $ws->server_handshake;
+    $ws = $ws->server_handshake;
 
 WebSocket handshake, only used by servers.
 
 =head2 C<server_read>
 
-    $ws->server_read($data);
+    $ws = $ws->server_read($data);
 
 Read raw WebSocket data, only used by servers.
 

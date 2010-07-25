@@ -102,6 +102,8 @@ sub server_close {
 
     # Transaction finished
     $self->finished->($self);
+
+    return $self;
 }
 
 sub server_read  { croak 'Method "server_read" not implemented by subclass' }
@@ -261,7 +263,7 @@ Resume transaction.
 
 =head2 C<server_close>
 
-    $tx->server_close;
+    $tx = $tx->server_close;
 
 Transaction closed.
 

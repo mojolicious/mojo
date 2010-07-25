@@ -23,8 +23,8 @@ sub import {
     eval "package $caller; use Mojolicious::Lite;";
 
     # Allow redirects
-    my $client = Mojo::Client->singleton;
-    $client->max_redirects(1) unless $client->max_redirects;
+    Mojo::Client->singleton->max_redirects(1)
+      unless defined $ENV{MOJO_MAX_REDIRECTS};
 
     # Functions
     *{"${caller}::Oo"} = *{"${caller}::b"} = \&b;
@@ -109,6 +109,10 @@ object.
 
 Perform C<GET> request and turn response into a L<Mojo::Message::Response>
 object.
+One redirect will be followed by default, you can change this behavior with
+the C<MOJO_MAX_REDIRECTS> environment variable.
+
+    MOJO_MAX_REDIRECTS=0 perl -Mojo -e 'b(g("mojolicious.org")->code)->say'
 
 =head2 C<p>
 

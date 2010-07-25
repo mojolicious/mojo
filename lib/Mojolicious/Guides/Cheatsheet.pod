@@ -205,6 +205,12 @@ Maximum size for HTTP messages in bytes, defaults to C<524288>.
 
     MOJO_MAX_MESSAGE_SIZE=1024
 
+=head2 C<MOJO_MAX_REDIRECTS>
+
+    MOJO_MAX_REDIRECTS=3
+
+Maximum number of redirects L<Mojo::Client> will follow, defaults to C<0>.
+
 =head2 C<MOJO_MODE>
 
 Run mode for the L<Mojolicious> application, should contain a valid mode like

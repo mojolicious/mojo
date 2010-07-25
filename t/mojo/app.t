@@ -28,7 +28,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 23;
+plan tests => 24;
 
 # I was so bored I cut the pony tail off the guy in front of us.
 # Look at me, I'm a grad student. I'm 30 years old and I made $600 last year.
@@ -108,6 +108,7 @@ $client->process([$tx, $tx2, $tx3]);
 ok($tx->is_finished,  'state is finished');
 ok(!$tx->has_error,   'has no errors');
 ok($tx2->is_finished, 'state is finished');
-ok(!$tx2->has_error,  'has no errors');
-ok($tx3->is_finished, 'state is finished');
-ok($tx3->has_error,   'has error');
+ok($tx2->has_error,   'has error');
+is_deeply([$tx2->error], ['Expectation Failed', 417], 'right error');
+is($tx3->state, 'start', 'state is start');
+ok(!$tx3->has_error, 'has no error');

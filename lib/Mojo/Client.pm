@@ -645,13 +645,8 @@ sub _connect {
 
         # Error
         unless (defined $id) {
-
-            # Update all transactions
-            $_->error(qq/Couldn't connect./, 500) for @$p;
-
-            # Callback
-            $self->$cb(@$p) if $cb;
-
+            $p->[0]->error(qq/Couldn't connect./);
+            $self->_run_callback($p, $cb);
             return;
         }
 
@@ -717,13 +712,6 @@ sub _drop {
 
 sub _error {
     my ($self, $loop, $id, $error) = @_;
-
-    # Pipeline
-    if (my $p = $self->{_cs}->{$id}->{p}) {
-
-        # Add error message to all transactions
-        for my $tx (@$p) { $tx->error($error, 500) unless $tx->is_finished }
-    }
 
     # Log
     $self->log->error($error) if $error;
@@ -797,15 +785,9 @@ sub _handle_response {
         # Counter
         $self->{_processing} -= 1 unless $new;
 
-        # Redirect
-        unless ($self->_redirect($c, $old)) {
-
-            # Callback
-            my $cb = $c->{cb};
-            my $p = $new ? [$new] : $old;
-            local $self->{tx} = $p->[-1];
-            $self->$cb(@$p) if $cb;
-        }
+        # Redirect or callback
+        $self->_run_callback($new ? [$new] : $old, $c->{cb})
+          unless $self->_redirect($c, $old);
     }
 
     # Stop ioloop
@@ -876,8 +858,8 @@ sub _proxy_connect {
 
             # Failed
             unless (($tx->res->code || '') eq '200') {
-                $_->error('Proxy connection failed.', 500) for @$p;
-                $self->$cb(@$p) if $cb;
+                $p->[0]->error('Proxy connection failed.');
+                $self->_run_callback($p, $cb);
                 return;
             }
 
@@ -985,6 +967,37 @@ sub _redirect {
     return 1;
 }
 
+sub _run_callback {
+    my ($self, $p, $cb) = @_;
+
+    # Errors
+    my $error;
+    for my $tx (@$p) {
+
+        # Response
+        my $res = $tx->res;
+
+        # Error
+        $error ||= $tx->error || $res->error;
+        if ($error) {
+            $tx->error($error);
+            $res->error($error);
+        }
+
+        # 400/500
+        elsif ($res->is_status_class(400) || $res->is_status_class(500)) {
+            my @error = ($res->message, $res->code);
+            $tx->error(@error);
+            $res->error(@error);
+        }
+    }
+
+    # Callback
+    return unless $cb;
+    local $self->{tx} = $p->[-1];
+    $self->$cb(@$p);
+}
+
 # It's greeat! We can do *anything* now that Science has invented Magic.
 sub _start_pipeline {
     my ($self, $p, $cb) = @_;
@@ -1066,7 +1079,7 @@ sub _state {
     my ($self, $id, $tx) = @_;
 
     # Connection
-    my $c = $self->{_cs}->{$id};
+    return unless my $c = $self->{_cs}->{$id};
 
     # Reader
     my $reader = $c->{p}->[$c->{reader}];

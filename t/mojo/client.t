@@ -13,7 +13,7 @@ use Test::More;
 plan skip_all =>
   'set TEST_CLIENT to enable this test (internet connection required!)'
   unless $ENV{TEST_CLIENT};
-plan tests => 99;
+plan tests => 100;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -230,7 +230,8 @@ $tx->req->body(
     }
 );
 $client->process($tx);
-ok($tx->is_done, 'state is done');
+is_deeply([$tx->error],      ['Bad Request', 400], 'right error');
+is_deeply([$tx->res->error], ['Bad Request', 400], 'right error');
 
 # Custom requests with keep alive
 $tx = Mojo::Transaction::HTTP->new;

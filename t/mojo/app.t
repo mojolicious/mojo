@@ -79,20 +79,20 @@ ok(defined $tx->connection, 'has connection id');
 is($tx->res->code,                417,     'right status');
 is($tx->res->headers->connection, 'Close', 'right content');
 
-# Regular pipeline
+# Multiple requests
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/4/');
 my $tx2 = Mojo::Transaction::HTTP->new;
 $tx2->req->method('GET');
 $tx2->req->url->parse('/5/');
-$client->process([$tx, $tx2]);
+$client->process($tx, $tx2);
 ok(defined $tx->connection,  'has connection id');
 ok(defined $tx2->connection, 'has connection id');
 ok($tx->is_done,             'state is done');
 ok($tx2->is_done,            'state is done');
 
-# Interrupted pipeline
+# Multiple interrupted requests
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/6/');
@@ -104,11 +104,11 @@ $tx2->req->body('bar baz foo' x 128);
 my $tx3 = Mojo::Transaction::HTTP->new;
 $tx3->req->method('GET');
 $tx3->req->url->parse('/8/');
-$client->process([$tx, $tx2, $tx3]);
+$client->process($tx, $tx2, $tx3);
 ok($tx->is_finished,  'state is finished');
 ok(!$tx->has_error,   'has no errors');
 ok($tx2->is_finished, 'state is finished');
 ok($tx2->has_error,   'has error');
 is_deeply([$tx2->error], ['Expectation Failed', 417], 'right error');
-is($tx3->state, 'start', 'state is start');
+ok($tx3->is_done,    'state is done');
 ok(!$tx3->has_error, 'has no error');

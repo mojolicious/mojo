@@ -63,28 +63,24 @@ sub add {
 sub empty { shift->{_jar} = {} }
 
 sub extract {
-    my $self = shift;
+    my ($self, $tx) = @_;
 
-    # Store cookies
-    for my $tx (@_) {
+    # URL
+    my $url = $tx->req->url;
 
-        # URL
-        my $url = $tx->req->url;
+    # Fix cookies
+    my @cookies = @{$tx->res->cookies};
+    for my $cookie (@cookies) {
 
-        # Fix cookies
-        my @cookies = @{$tx->res->cookies};
-        for my $cookie (@cookies) {
+        # Domain
+        $cookie->domain($url->host) unless $cookie->domain;
 
-            # Domain
-            $cookie->domain($url->host) unless $cookie->domain;
-
-            # Path
-            $cookie->path($url->path) unless $cookie->path;
-        }
-
-        # Store
-        $self->add(@cookies);
+        # Path
+        $cookie->path($url->path) unless $cookie->path;
     }
+
+    # Store
+    $self->add(@cookies);
 }
 
 sub find {
@@ -144,21 +140,17 @@ sub find {
 }
 
 sub inject {
-    my $self = shift;
+    my ($self, $tx) = @_;
 
-    # Fetch cookies for pipeline
-    for my $tx (@_) {
+    # Request
+    my $req = $tx->req;
 
-        # Request
-        my $req = $tx->req;
+    # URL
+    my $url = $req->url->clone;
+    if (my $host = $req->headers->host) { $url->host($host) }
 
-        # URL
-        my $url = $req->url->clone;
-        if (my $host = $req->headers->host) { $url->host($host) }
-
-        # Fetch
-        $req->cookies($self->find($url));
-    }
+    # Fetch
+    $req->cookies($self->find($url));
 }
 
 1;
@@ -207,9 +199,9 @@ Empty the jar.
 
 =head2 C<extract>
 
-    $jar = $jar->extract(@transactions);
+    $jar = $jar->extract($tx);
 
-Extract cookies from transactions.
+Extract cookies from transaction.
 
 =head2 C<find>
 
@@ -219,9 +211,9 @@ Find cookies in the jar.
 
 =head2 C<inject>
 
-    $jar = $jar->inject(@transactions);
+    $jar = $jar->inject($tx);
 
-Inject cookies into transactions.
+Inject cookies into transaction.
 
 =head1 SEE ALSO
 

@@ -17,19 +17,6 @@ __PACKAGE__->attr(res              => sub { Mojo::Message::Response->new });
 
 # What's a wedding?  Webster's dictionary describes it as the act of removing
 # weeds from one's garden.
-sub client_leftovers {
-    my $self = shift;
-
-    # No leftovers
-    return unless $self->is_state('done_with_leftovers');
-
-    # Leftovers
-    my $leftovers = $self->res->leftovers;
-    $self->done;
-
-    return $leftovers;
-}
-
 sub client_read {
     my ($self, $chunk) = @_;
 
@@ -609,12 +596,6 @@ WebSocket upgrade callback.
 
 L<Mojo::Transaction::HTTP> inherits all methods from L<Mojo::Transaction> and
 implements the following new ones.
-
-=head2 C<client_leftovers>
-
-    my $leftovers = $tx->client_leftovers;
-
-Leftovers from the client response, used for pipelining.
 
 =head2 C<client_read>
 

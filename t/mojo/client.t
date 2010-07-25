@@ -13,7 +13,7 @@ use Test::More;
 plan skip_all =>
   'set TEST_CLIENT to enable this test (internet connection required!)'
   unless $ENV{TEST_CLIENT};
-plan tests => 100;
+plan tests => 99;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -188,9 +188,9 @@ $client->get(
         $method  = $tx->req->method;
         $url     = $tx->req->url;
         $code    = $tx->res->code;
-        $method2 = $tx->previous->[-1]->req->method;
-        $url2    = $tx->previous->[-1]->req->url;
-        $code2   = $tx->previous->[-1]->res->code;
+        $method2 = $tx->previous->req->method;
+        $url2    = $tx->previous->req->url;
+        $code2   = $tx->previous->res->code;
     }
 )->process;
 $client->max_redirects(0);
@@ -205,12 +205,12 @@ is($code2,   302,                     'right status');
 $client->max_redirects(3);
 $tx = $client->get('http://www.google.com');
 $client->max_redirects(0);
-is($tx->req->method,                'GET',                   'right method');
-is($tx->req->url,                   'http://www.google.de/', 'right url');
-is($tx->res->code,                  200,                     'right status');
-is($tx->previous->[0]->req->method, 'GET',                   'right method');
-is($tx->previous->[0]->req->url,    'http://www.google.com', 'right url');
-is($tx->previous->[0]->res->code,   302,                     'right status');
+is($tx->req->method,           'GET',                   'right method');
+is($tx->req->url,              'http://www.google.de/', 'right url');
+is($tx->res->code,             200,                     'right status');
+is($tx->previous->req->method, 'GET',                   'right method');
+is($tx->previous->req->url,    'http://www.google.com', 'right url');
+is($tx->previous->res->code,   302,                     'right status');
 
 # Custom chunked request without callback
 $tx = Mojo::Transaction::HTTP->new;
@@ -274,7 +274,7 @@ ok($port > 0,   'has local port');
 is($port2, 80, 'right remote port');
 ok($tx->is_done, 'state is done');
 
-# Custom pipelined requests
+# Multiple requests
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('http://www.apache.org');
@@ -284,19 +284,10 @@ $tx2->req->url->parse('http://www.apache.org');
 my $tx3 = Mojo::Transaction::HTTP->new;
 $tx3->req->method('GET');
 $tx3->req->url->parse('http://www.apache.org');
-my ($done2, $done3);
-$done = undef;
-$client->process(
-    ([$tx, $tx2], $tx3) => sub {
-        my ($self, $tx, $tx2) = @_;
-        return $done3 = $tx->is_done unless $tx2;
-        $done  = $tx->is_done;
-        $done2 = $tx2->is_done;
-    }
-);
-ok($done,         'state is done');
-ok($done2,        'state is done');
-ok($done3,        'state is done');
+$client->process($tx, $tx2, $tx3);
+ok($tx->is_done,  'state is done');
+ok($tx2->is_done, 'state is done');
+ok($tx3->is_done, 'state is done');
 ok($tx2->is_done, 'state is done');
 ok($tx3->is_done, 'state is done');
 is($tx->res->code,  200, 'right status');
@@ -304,29 +295,21 @@ is($tx2->res->code, 200, 'right status');
 is($tx3->res->code, 200, 'right status');
 like($tx2->res->content->asset->slurp, qr/Apache/, 'right content');
 
-# Custom pipelined HEAD request
+# Mixed HEAD and GET requests
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('HEAD');
 $tx->req->url->parse('http://www.apache.org');
 $tx2 = Mojo::Transaction::HTTP->new;
 $tx2->req->method('GET');
 $tx2->req->url->parse('http://www.apache.org');
-($done, $done2) = undef;
-$client->process(
-    [$tx, $tx2] => sub {
-        my ($self, $tx, $tx2) = @_;
-        $done  = $tx->is_done;
-        $done2 = $tx2->is_done;
-    }
-);
-ok($done,         'state is done');
-ok($done2,        'state is done');
+$client->process($tx, $tx2);
+ok($tx->is_done,  'state is done');
 ok($tx2->is_done, 'state is done');
 is($tx->res->code,  200, 'right status');
 is($tx2->res->code, 200, 'right status');
 like($tx2->res->content->asset->slurp, qr/Apache/, 'right content');
 
-# Custom pipelined requests with 100 Continue
+# Multiple requests with 100 Continue
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('http://www.apache.org');
@@ -341,7 +324,7 @@ $tx3->req->url->parse('http://www.apache.org');
 my $tx4 = Mojo::Transaction::HTTP->new;
 $tx4->req->method('GET');
 $tx4->req->url->parse('http://www.apache.org');
-$client->process([$tx, $tx2, $tx3, $tx4]);
+$client->process($tx, $tx2, $tx3, $tx4);
 ok($tx->is_done,  'state is done');
 ok($tx2->is_done, 'state is done');
 ok($tx3->is_done, 'state is done');

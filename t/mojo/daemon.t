@@ -42,7 +42,7 @@ is($tx->res->code, 200,    'right status');
 like($tx->res->headers->connection, qr/close/i, 'right "Connection" header');
 like($tx->res->body, qr/Mojo is working/, 'right content');
 
-# Pipelined with 100 Continue
+# Multiple requests with 100 Continue
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse("http://127.0.0.1:$port/1/");
@@ -57,7 +57,7 @@ $tx3->req->url->parse("http://127.0.0.1:$port/3/");
 my $tx4 = Mojo::Transaction::HTTP->new;
 $tx4->req->method('GET');
 $tx4->req->url->parse("http://127.0.0.1:$port/4/");
-$client->process([$tx, $tx2, $tx3, $tx4]);
+$client->process($tx, $tx2, $tx3, $tx4);
 ok($tx->is_done,  'state is done');
 ok($tx2->is_done, 'state is done');
 ok($tx3->is_done, 'state is done');
@@ -104,21 +104,21 @@ like($tx->res->headers->connection,
     qr/Keep-Alive/i, 'right "Connection" header');
 like($tx->res->body, qr/Mojo is working/, 'right content');
 
-# Pipelined
+# Multiple requests
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse("http://127.0.0.1:$port/8/");
 $tx2 = Mojo::Transaction::HTTP->new;
 $tx2->req->method('GET');
 $tx2->req->url->parse("http://127.0.0.1:$port/9/");
-$client->process([$tx, $tx2]);
+$client->process($tx, $tx2);
 ok($tx->is_done,  'state is done');
 ok($tx2->is_done, 'state is done');
 is($tx->res->code,  200, 'right status');
 is($tx2->res->code, 200, 'right status');
 like($tx2->res->content->asset->slurp, qr/Mojo is working/, 'right content');
 
-# Pipelined with 100 Continue and a chunked response
+# Multiple requests with 100 Continue and a chunked response
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse("http://127.0.0.1:$port/10/");
@@ -134,7 +134,7 @@ $tx3->req->url->parse(
 $tx4 = Mojo::Transaction::HTTP->new;
 $tx4->req->method('GET');
 $tx4->req->url->parse("http://127.0.0.1:$port/13/");
-$client->process([$tx, $tx2, $tx3, $tx4]);
+$client->process($tx, $tx2, $tx3, $tx4);
 ok($tx->is_done,  'state is done');
 ok($tx2->is_done, 'state is done');
 ok($tx3->is_done, 'state is done');

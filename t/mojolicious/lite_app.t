@@ -959,7 +959,7 @@ $t->get_ok('/redirect_named')->status_is(200)
   ->text_is('div' => 'Redirect works!')
   ->text_like('[id="foo"]' => qr/^Redirect/);
 $t->max_redirects(0);
-Test::Mojo->new(tx => $t->tx->previous->[-1])->status_is(302)
+Test::Mojo->new(tx => $t->tx->previous)->status_is(302)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->header_like(Location => qr/\/template.txt$/)->content_is('Redirecting!');

@@ -21,7 +21,7 @@ Features
   magic and no requirements besides Perl 5.8.7.
 
 * Full stack HTTP 1.1 and WebSocket client/server implementation with IPv6,
-  TLS, IDNA, pipelining, chunking and multipart support.
+  TLS, IDNA, chunking and multipart support.
 
 * Builtin async IO and prefork web server supporting epoll, kqueue, hot
   deployment and UNIX domain socket sharing, perfect for embedding.

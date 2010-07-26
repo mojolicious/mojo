@@ -1083,7 +1083,7 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
     print $client->get($trends)->res->json->{trends}->[0]->{name};
 
     # Extract data from HTML and XML resources
-    print $client->get('http://mojolicious.org')->res->dom->at('title')->text;
+    print $client->get('mojolicious.org')->res->dom->at('title')->text;
 
     # Scrape the latest headlines from a news site
     my $news = 'http://digg.com';

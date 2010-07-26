@@ -14,11 +14,12 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 3;
+plan tests => 4;
+
+use_ok('Mojo::Client');
 
 # The strong must protect the sweet.
 use Mojolicious::Lite;
-use Mojo::Client;
 
 # Silence
 app->log->level('fatal');

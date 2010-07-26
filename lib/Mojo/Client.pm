@@ -318,7 +318,7 @@ sub clone {
 # and you didn't do it.
 sub delete {
     my $self = shift;
-    return $self->_queue_or_process_tx($self->build_tx('DELETE', @_));
+    return $self->_tx_queue_or_process($self->build_tx('DELETE', @_));
 }
 
 sub detect_proxy {
@@ -364,22 +364,22 @@ sub finished {
 # "What are you lookin' at?" - the innocent words of a drunken child.
 sub get {
     my $self = shift;
-    return $self->_queue_or_process_tx($self->build_tx('GET', @_));
+    return $self->_tx_queue_or_process($self->build_tx('GET', @_));
 }
 
 sub head {
     my $self = shift;
-    return $self->_queue_or_process_tx($self->build_tx('HEAD', @_));
+    return $self->_tx_queue_or_process($self->build_tx('HEAD', @_));
 }
 
 sub post {
     my $self = shift;
-    return $self->_queue_or_process_tx($self->build_tx('POST', @_));
+    return $self->_tx_queue_or_process($self->build_tx('POST', @_));
 }
 
 sub post_form {
     my $self = shift;
-    return $self->_queue_or_process_tx($self->build_form_tx(@_));
+    return $self->_tx_queue_or_process($self->build_form_tx(@_));
 }
 
 # Olive oil? Asparagus? If your mother wasn't so fancy,
@@ -399,7 +399,7 @@ sub process {
     }
 
     # Add async transactions from queue
-    else { $self->_start_tx(@$_) for @$queue }
+    else { $self->_tx_start(@$_) for @$queue }
 
     # Process sync requests
     if (!$self->{_is_async} && $self->{_processing}) {
@@ -417,7 +417,7 @@ sub process {
 
 sub put {
     my $self = shift;
-    $self->_queue_or_process_tx($self->build_tx('PUT', @_));
+    $self->_tx_queue_or_process($self->build_tx('PUT', @_));
 }
 
 # And I gave that man directions, even though I didn't know the way,
@@ -592,7 +592,7 @@ sub _connect {
         unless (($tx->req->method || '') eq 'CONNECT') {
 
             # CONNECT request to proxy required
-            return if $self->_proxy_connect($tx, $cb);
+            return if $self->_connect_proxy($tx, $cb);
         }
 
         # Connect
@@ -613,7 +613,7 @@ sub _connect {
         # Error
         unless (defined $id) {
             $tx->error(qq/Couldn't connect./);
-            $self->_finish_tx($tx, $cb);
+            $self->_tx_finish($tx, $cb);
             return;
         }
 
@@ -622,6 +622,70 @@ sub _connect {
     }
 
     return $id;
+}
+
+# Hey, Weener Boy... where do you think you're going?
+sub _connect_proxy {
+    my ($self, $old, $cb) = @_;
+
+    # Request
+    my $req = $old->req;
+
+    # URL
+    my $url = $req->url;
+
+    # Proxy
+    return unless my $proxy = $req->proxy;
+
+    # WebSocket and/or HTTPS
+    return
+      unless ($req->headers->upgrade || '') eq 'WebSocket'
+      || ($url->scheme || '') eq 'https';
+
+    # CONNECT request
+    my $new = $self->build_tx(CONNECT => $url->clone);
+    $new->req->proxy($proxy);
+
+    # Start CONNECT request
+    $self->_tx_start(
+        $new => sub {
+            my ($self, $tx) = @_;
+
+            # CONNECT failed
+            unless (($tx->res->code || '') eq '200') {
+                $old->error('Proxy connection failed.');
+                $self->_tx_finish($old, $cb);
+                return;
+            }
+
+            # TLS upgrade
+            if ($tx->req->url->scheme eq 'https') {
+
+                # Connection from keep alive cache
+                return unless my $oid = $tx->connection;
+
+                # Start TLS
+                my $nid = $self->ioloop->start_tls(
+                    $oid,
+                    tls_ca_file => $self->tls_ca_file || $ENV{MOJO_CA_FILE},
+                    tls_verify_cb => $self->tls_verify_cb
+                );
+
+                # Cleanup
+                $old->req->proxy(undef);
+                delete $self->{_cs}->{$oid};
+                $tx->connection($nid);
+            }
+
+            # Share connection
+            $old->connection($tx->connection);
+
+            # Start real transaction
+            $self->_tx_start($old, $cb);
+        }
+    );
+
+    return 1;
 }
 
 # I don't mind being called a liar when I'm lying, or about to lie,
@@ -656,14 +720,20 @@ sub _drop {
     my ($self, $id) = @_;
 
     # Keep alive
-    if (my $tx = $self->{_cs}->{$id}->{tx}) {
+    my $tx;
+    if (($tx = $self->{_cs}->{$id}->{tx}) && $tx->keep_alive) {
 
-        # Read only
-        $self->ioloop->not_writing($id);
+        # Don't keep CONNECTed connections alive
+        my $method = $tx->req->method || '';
+        my $code   = $tx->res->code   || '';
+        unless ($method eq 'CONNECT' && $code eq '200') {
 
-        # Keep connection alive
-        my ($scheme, $address, $port) = $self->_tx_info($tx);
-        $self->_cache("$scheme:$address:$port", $id) if $tx->keep_alive;
+            # Read only
+            $self->ioloop->not_writing($id);
+
+            # Keep connection alive
+            $self->_cache(join(':', $self->_tx_info($tx)), $id);
+        }
     }
 
     # Connection close
@@ -683,38 +753,12 @@ sub _error {
     $self->log->error($error) if $error;
 
     # Finished
-    $self->_handle_response($id);
-}
-
-sub _finish_tx {
-    my ($self, $tx, $cb) = @_;
-
-    # Response
-    my $res = $tx->res;
-
-    # Error
-    my $error ||= $tx->error || $res->error;
-    if ($error) {
-        $tx->error($error);
-        $res->error($error);
-    }
-
-    # 400/500
-    elsif ($res->is_status_class(400) || $res->is_status_class(500)) {
-        my @error = ($res->message, $res->code);
-        $tx->error(@error);
-        $res->error(@error);
-    }
-
-    # Callback
-    return unless $cb;
-    local $self->{tx} = $tx;
-    $self->$cb($tx);
+    $self->_handle($id);
 }
 
 # No children have ever meddled with the Republican Party and lived to tell
 # about it.
-sub _handle_response {
+sub _handle {
     my ($self, $id) = @_;
 
     # Connection
@@ -753,87 +797,12 @@ sub _handle_response {
         $self->{_processing} -= 1 unless $new;
 
         # Redirect or callback
-        $self->_finish_tx($new || $old, $c->{cb})
+        $self->_tx_finish($new || $old, $c->{cb})
           unless $self->_redirect($c, $old);
     }
 
     # Stop ioloop
     $self->ioloop->stop if !$self->{_is_async} && !$self->{_processing};
-}
-
-# Hey, Weener Boy... where do you think you're going?
-sub _proxy_connect {
-    my ($self, $old, $cb) = @_;
-
-    # Request
-    my $req = $old->req;
-
-    # URL
-    my $url = $req->url;
-
-    # Proxy
-    return unless my $proxy = $req->proxy;
-
-    # WebSocket and/or HTTPS
-    return
-      unless ($req->headers->upgrade || '') eq 'WebSocket'
-      || ($url->scheme || '') eq 'https';
-
-    # CONNECT request
-    my $new = $self->build_tx(CONNECT => $url->clone);
-    $new->req->proxy($proxy);
-
-    # Start CONNECT request
-    $self->_start_tx(
-        $new => sub {
-            my ($self, $tx) = @_;
-
-            # CONNECT failed
-            unless (($tx->res->code || '') eq '200') {
-                $old->error('Proxy connection failed.');
-                $self->_finish_tx($old, $cb);
-                return;
-            }
-
-            # TLS upgrade
-            if ($tx->req->url->scheme eq 'https') {
-
-                # Connection from keep alive cache
-                return unless my $id = $tx->connection;
-
-                # Start TLS
-                my $new = $self->ioloop->start_tls(
-                    $id,
-                    tls_ca_file => $self->tls_ca_file || $ENV{MOJO_CA_FILE},
-                    tls_verify_cb => $self->tls_verify_cb
-                );
-
-                # Cleanup
-                $old->req->proxy(undef);
-                delete $self->{_cs}->{$id};
-                $tx->connection($new);
-            }
-
-            # Share connection
-            $old->connection($tx->connection);
-
-            # Start real transaction
-            $self->_start_tx($old, $cb);
-        }
-    );
-
-    return 1;
-}
-
-sub _queue_or_process_tx {
-    my ($self, $tx, $cb) = @_;
-
-    # Quick process
-    $self->process($tx, sub { $tx = $_[1] }) and return $tx
-      if !$cb && !$self->{_is_async};
-
-    # Queue transaction with callback
-    $self->queue($tx, $cb);
 }
 
 # Have you ever seen that Blue Man Group? Total ripoff of the Smurfs.
@@ -881,7 +850,7 @@ sub _redirect {
     $new->previous($old);
 
     # Start redirected request
-    my $nid = $self->_start_tx($new, $c->{cb});
+    my $nid = $self->_tx_start($new, $c->{cb});
 
     # Create new connection
     $self->{_cs}->{$nid}->{redirects} = $r + 1;
@@ -890,8 +859,85 @@ sub _redirect {
     return 1;
 }
 
+# Oh, I'm in no condition to drive. Wait a minute.
+# I don't have to listen to myself. I'm drunk.
+sub _state {
+    my ($self, $id, $tx) = @_;
+
+    # Finished
+    return $self->_handle($id) if $tx->is_finished;
+
+    return $tx->is_writing
+      ? $self->ioloop->writing($id)
+      : $self->ioloop->not_writing($id);
+}
+
+sub _tx_finish {
+    my ($self, $tx, $cb) = @_;
+
+    # Response
+    my $res = $tx->res;
+
+    # Error
+    my $error ||= $tx->error || $res->error;
+    if ($error) {
+        $tx->error($error);
+        $res->error($error);
+    }
+
+    # 400/500
+    elsif ($res->is_status_class(400) || $res->is_status_class(500)) {
+        my @error = ($res->message, $res->code);
+        $tx->error(@error);
+        $res->error(@error);
+    }
+
+    # Callback
+    return unless $cb;
+    local $self->{tx} = $tx;
+    $self->$cb($tx);
+}
+
+sub _tx_info {
+    my ($self, $tx) = @_;
+
+    # Request
+    my $req = $tx->req;
+
+    # URL
+    my $url = $req->url;
+
+    # Info
+    my $scheme = $url->scheme || 'http';
+    my $host   = $url->ihost;
+    my $port   = $url->port;
+
+    # Proxy info
+    if (my $proxy = $req->proxy) {
+        $scheme = $proxy->scheme;
+        $host   = $proxy->ihost;
+        $port   = $proxy->port;
+    }
+
+    # Default port
+    $port ||= $scheme eq 'https' ? 443 : 80;
+
+    return ($scheme, $host, $port);
+}
+
+sub _tx_queue_or_process {
+    my ($self, $tx, $cb) = @_;
+
+    # Quick process
+    $self->process($tx, sub { $tx = $_[1] }) and return $tx
+      if !$cb && !$self->{_is_async};
+
+    # Queue transaction with callback
+    $self->queue($tx, $cb);
+}
+
 # It's greeat! We can do *anything* now that Science has invented Magic.
-sub _start_tx {
+sub _tx_start {
     my ($self, $tx, $cb) = @_;
 
     # Embedded server
@@ -956,50 +1002,6 @@ sub _start_tx {
     $self->{_processing} += 1;
 
     return $id;
-}
-
-# Oh, I'm in no condition to drive. Wait a minute.
-# I don't have to listen to myself. I'm drunk.
-sub _state {
-    my ($self, $id, $tx) = @_;
-
-    # Finished
-    return $self->_handle_response($id) if $tx->is_finished;
-
-    return $tx->is_writing
-      ? $self->ioloop->writing($id)
-      : $self->ioloop->not_writing($id);
-}
-
-sub _tx_info {
-    my ($self, $tx) = @_;
-
-    # Info
-    my $req    = $tx->req;
-    my $url    = $req->url;
-    my $scheme = $url->scheme || 'http';
-    my $host   = $url->ihost;
-    my $port   = $url->port;
-
-    # Check for connect transaction
-    my $connect;
-    my $method = $req->method   || '';
-    my $code   = $tx->res->code || '';
-    $connect = 1
-      if ($method eq 'CONNECT' && $code eq '200')
-      || ($method ne 'CONNECT' && $scheme eq 'https');
-
-    # Proxy
-    if ((my $proxy = $req->proxy) && !$connect) {
-        $scheme = $proxy->scheme;
-        $host   = $proxy->ihost;
-        $port   = $proxy->port;
-    }
-
-    # Default port
-    $port ||= $scheme eq 'https' ? 443 : 80;
-
-    return ($scheme, $host, $port);
 }
 
 # Once the government approves something, it's no longer immoral!

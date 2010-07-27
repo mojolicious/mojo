@@ -62,6 +62,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed url_for to not expose userinfo in absolute URLs.
         - Fixed path detection bug in generated scripts. (merlyn)
         - Fixed a small redirect bug in Mojo::Client.
+        - Fixed a security problem in the HMAC MD5 implementation. (vti)
 
 0.999926 2010-06-07 00:00:00
         - Added version requirement for all optional dependencies.

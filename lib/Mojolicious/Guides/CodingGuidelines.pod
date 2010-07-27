@@ -32,6 +32,8 @@ distribution an example application.
 
 =over 4
 
+Web development should be easy and fun, this is what we optimize for.
+
 Keep it simple, no magic unless absolutely necessary.
 
 Code should be written with a Perl6 port in mind.

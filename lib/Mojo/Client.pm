@@ -1277,7 +1277,7 @@ affects shared L<Mojo::IOLoop> instances.
 
     my $tx = $client->build_form_tx('http://kraih.com/foo' => {test => 123});
     my $tx = $client->build_form_tx(
-        'http://kraih.com/foo'
+        'http://kraih.com/foo',
         'UTF-8',
         {test => 123}
     );

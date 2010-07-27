@@ -12,7 +12,7 @@ use Test::More;
 
 plan skip_all => 'set TEST_CLIENT to enable this test (developer only!)'
   unless $ENV{TEST_CLIENT};
-plan tests => 99;
+plan tests => 101;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -79,6 +79,9 @@ is(g('http://mojolicious.org')->code,   200, 'right status');
 is(p('http://mojolicious.org')->code,   404, 'right status');
 is(oO('http://mojolicious.org')->code,  200, 'right status');
 is(oO(POST => 'http://mojolicious.org')->code, 404, 'right status');
+my $res = f('search.cpan.org/search' => {query => 'mojolicious'});
+like($res->body, qr/Mojolicious/, 'right content');
+is($res->code, 200, 'right status');
 
 # Simple request
 my ($method, $url);

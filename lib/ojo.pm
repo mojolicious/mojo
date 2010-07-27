@@ -31,10 +31,11 @@ sub import {
     *{"${caller}::oO"} = sub { _request(@_) };
     *{"${caller}::a"} =
       sub { *{"${caller}::any"}->(@_) and return *{"${caller}::app"}->() };
-    *{"${caller}::d"} = sub { _request('delete', @_) };
-    *{"${caller}::g"} = sub { _request('get',    @_) };
-    *{"${caller}::p"} = sub { _request('post',   @_) };
-    *{"${caller}::u"} = sub { _request('put',    @_) };
+    *{"${caller}::d"} = sub { _request('delete',    @_) };
+    *{"${caller}::f"} = sub { _request('post_form', @_) };
+    *{"${caller}::g"} = sub { _request('get',       @_) };
+    *{"${caller}::p"} = sub { _request('post',      @_) };
+    *{"${caller}::u"} = sub { _request('put',       @_) };
     *{"${caller}::w"} =
       sub { Mojo::Client->singleton->websocket(@_)->process }
 }
@@ -42,7 +43,10 @@ sub import {
 sub _request {
     my $method = $_[0] =~ /:|\// ? 'get' : lc shift;
     my $client = Mojo::Client->singleton;
-    my $tx     = $client->build_tx($method, @_);
+    my $tx =
+        $method eq 'post_form'
+      ? $client->build_form_tx(@_)
+      : $client->build_tx($method, @_);
     $client->process($tx, sub { $tx = $_[1] });
     return $tx->res;
 }
@@ -96,6 +100,31 @@ Turn input into a L<Mojo::ByteStream> object.
 
 Perform C<DELETE> request and turn response into a L<Mojo::Message::Response>
 object.
+
+=head2 C<f>
+
+    my $res = f('http://kraih.com/foo' => {test => 123});
+    my $res = f('http://kraih.com/foo', 'UTF-8', {test => 123});
+    my $res = f(
+        'http://kraih.com/foo',
+        {test => 123},
+        {'Content-Type' => 'multipart/form-data'}
+    );
+    my $res = f(
+        'http://kraih.com/foo',
+        'UTF-8',
+        {test => 123},
+        {'Content-Type' => 'multipart/form-data'}
+    );
+    my $res = f('http://kraih.com/foo', {file => {file => '/foo/bar.txt'}});
+    my $res = f('http://kraih.com/foo', {file => {content => 'lalala'}});
+    my $res = f(
+        'http://kraih.com/foo',
+        {myzip => {file => $asset, filename => 'foo.zip'}}
+    );
+
+Perform a C<POST> request for a form and turn response into a
+L<Mojo::Message::Response> object.
 
 =head2 C<g>
 

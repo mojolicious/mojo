@@ -15,8 +15,11 @@ Inflate embedded files to real files.
 EOF
 __PACKAGE__->attr(usage => <<"EOF");
 usage: $0 inflate [OPTIONS]
-  --class <class>   Class to inflate.
-  --prefix <path>   Path prefix for generated files, defaults to templates.
+  --class <class>      Class to inflate.
+  --public <path>      Path prefix for generated static files, defaults to
+                       public.
+  --templates <path>   Path prefix for generated template files, defaults to
+                       templates.
 EOF
 
 # Eternity with nerds. It's the Pasadena Star Trek convention all over again.
@@ -24,14 +27,16 @@ sub run {
     my $self = shift;
 
     # Class
-    my $class  = 'main';
-    my $prefix = 'templates';
+    my $class     = 'main';
+    my $public    = 'public';
+    my $templates = 'templates';
 
     # Options
     local @ARGV = @_ if @_;
     GetOptions(
-        'class=s'  => sub { $class  = $_[1] },
-        'prefix=s' => sub { $prefix = $_[1] }
+        'class=s'     => sub { $class     = $_[1] },
+        'public=s'    => sub { $public    = $_[1] },
+        'templates=s' => sub { $templates = $_[1] },
     );
 
     # Load class
@@ -41,6 +46,7 @@ sub run {
     # Generate
     my $all = $self->get_all_data($class);
     for my $file (keys %$all) {
+        my $prefix = $file =~ /\.\w+\.\w+$/ ? $templates : $public;
         my $path = $self->rel_file("$prefix/$file");
         $self->write_file($path, $all->{$file});
     }

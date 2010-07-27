@@ -723,7 +723,7 @@ Module "Digest::SHA" not present in this version of Perl.
 Please install it manually or upgrade Perl to at least version 5.10.
 EOF
     utf8::encode $self->{bytestream} if utf8::is_utf8 $self->{bytestream};
-    $self->{bytestream} = Digest::SHA1::sha1_hex($self->{bytestream});
+    $self->{bytestream} = Digest::SHA::sha1_hex($self->{bytestream});
     return $self;
 }
 

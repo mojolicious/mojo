@@ -15,8 +15,7 @@ use File::Spec;
 use IO::File;
 use Mojo::ByteStream 'b';
 
-__PACKAGE__->attr([qw/cleanup path end_range/]);
-__PACKAGE__->attr(start_range => 0);
+__PACKAGE__->attr([qw/cleanup path/]);
 __PACKAGE__->attr(tmpdir => sub { $ENV{MOJO_TMPDIR} || File::Spec->tmpdir });
 __PACKAGE__->attr(
     handle => sub {
@@ -219,13 +218,6 @@ L<Mojo::Asset::File> implements the following attributes.
 
 Delete file automatically once it's not used anymore.
 
-=head2 C<end_range>
-
-    my $end = $asset->end_range;
-    $asset  = $asset->end_range(8);
-
-Pretend file ends earlier.
-
 =head2 C<handle>
 
     my $handle = $asset->handle;
@@ -239,13 +231,6 @@ Actual file handle.
     $asset   = $asset->path('/foo/bar/baz.txt');
 
 Actual file path.
-
-=head2 C<start_range>
-
-    my $start = $asset->start_range;
-    $asset    = $asset->start_range(0);
-
-Pretend file starts later.
 
 =head2 C<tmpdir>
 

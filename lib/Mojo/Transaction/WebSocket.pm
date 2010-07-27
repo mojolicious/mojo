@@ -104,24 +104,32 @@ sub server_handshake {
     # Response
     my $res = $self->res;
 
+    # Request headers
+    my $rqh = $req->headers;
+
+    # Response headers
+    my $rsh = $res->headers;
+
+    # URL
+    my $url = $req->url;
+
     # Handshake
     $res->code(101);
-    $res->headers->upgrade('WebSocket');
-    $res->headers->connection('Upgrade');
-    my $scheme   = $req->url->to_abs->scheme eq 'https' ? 'wss' : 'ws';
-    my $location = $req->url->to_abs->scheme($scheme)->to_string;
-    my $origin   = $req->headers->origin;
+    $rsh->upgrade('WebSocket');
+    $rsh->connection('Upgrade');
+    my $scheme   = $url->to_abs->scheme eq 'https' ? 'wss' : 'ws';
+    my $location = $url->to_abs->scheme($scheme)->to_string;
+    my $origin   = $rqh->origin;
 
     # Draft 76 WebSocket support
-    if ($req->headers->sec_websocket_key1) {
-        $res->headers->sec_websocket_origin($origin);
-        $res->headers->sec_websocket_location($location);
-        $res->headers->sec_websocket_protocol(
-            $req->headers->sec_websocket_protocol);
+    if ($rqh->sec_websocket_key1) {
+        $rsh->sec_websocket_origin($origin);
+        $rsh->sec_websocket_location($location);
+        $rsh->sec_websocket_protocol($rqh->sec_websocket_protocol);
         $res->body(
             $self->_challenge(
-                scalar $req->headers->sec_websocket_key1,
-                scalar $req->headers->sec_websocket_key2,
+                scalar $rqh->sec_websocket_key1,
+                scalar $rqh->sec_websocket_key2,
                 $req->body
             )
         );
@@ -130,8 +138,8 @@ sub server_handshake {
     # DEPRECATED in Snowman!
     # Draft 75 WebSocket support
     else {
-        $res->headers->header('WebSocket-Origin',   $origin);
-        $res->headers->header('WebSocket-Location', $location);
+        $rsh->header('WebSocket-Origin',   $origin);
+        $rsh->header('WebSocket-Location', $location);
     }
 
     return $self;

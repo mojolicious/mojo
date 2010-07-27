@@ -98,6 +98,7 @@ my (%ORDERED_HEADERS, %NORMALCASE_HEADERS);
 }
 
 sub accept_language { shift->header('Accept-Language' => @_) }
+sub accept_ranges   { shift->header('Accept-Ranges'   => @_) }
 sub authorization   { shift->header('Authorization'   => @_) }
 
 sub add {
@@ -158,6 +159,7 @@ sub build {
 sub connection          { shift->header(Connection            => @_) }
 sub content_disposition { shift->header('Content-Disposition' => @_) }
 sub content_length      { shift->header('Content-Length'      => @_) }
+sub content_range       { shift->header('Content-Range'       => @_) }
 
 sub content_transfer_encoding {
     shift->header('Content-Transfer-Encoding' => @_);
@@ -219,8 +221,10 @@ sub header {
     return @$headers;
 }
 
-sub host     { shift->header(Host     => @_) }
-sub location { shift->header(Location => @_) }
+sub host              { shift->header(Host                => @_) }
+sub if_modified_since { shift->header('If-Modified-Since' => @_) }
+sub last_modified     { shift->header('Last-Modified'     => @_) }
+sub location          { shift->header(Location            => @_) }
 
 sub names {
     my $self = shift;
@@ -284,6 +288,7 @@ sub parse {
 
 sub proxy_authenticate  { shift->header('Proxy-Authenticate'  => @_) }
 sub proxy_authorization { shift->header('Proxy-Authorization' => @_) }
+sub range               { shift->header(Range                 => @_) }
 sub referrer            { shift->header(Referer               => @_) }
 
 sub remove {
@@ -381,6 +386,13 @@ the following new ones.
 
 Shortcut for the C<Accept-Language> header.
 
+=head2 C<accept_ranges>
+
+    my $ranges = $headers->accept_ranges;
+    $headers   = $headers->accept_ranges('bytes');
+
+Shortcut for the C<Accept-Ranges> header.
+
 =head2 C<add>
 
     $headers = $headers->add('Content-Type', 'text/plain');
@@ -424,6 +436,13 @@ Shortcut for the C<Content-Disposition> header.
     $headers           = $headers->content_length(4000);
 
 Shortcut for the C<Content-Length> header.
+
+=head2 C<content_range>
+
+    my $range = $headers->content_range;
+    $headers  = $headers->content_range('bytes 2-8/100');
+
+Shortcut for the C<Content-Range> header.
 
 =head2 C<content_transfer_encoding>
 
@@ -483,6 +502,20 @@ into a single one in scalar context.
 
 Shortcut for the C<Host> header.
 
+=head2 C<if_modified_since>
+
+    my $m    = $headers->if_modified_since;
+    $headers = $headers->if_modified_since('Sun, 17 Aug 2008 16:27:35 GMT');
+
+Shortcut for the C<If-Modified-Since> header.
+
+=head2 C<last_modified>
+
+    my $m    = $headers->last_modified;
+    $headers = $headers->last_modified('Sun, 17 Aug 2008 16:27:35 GMT');
+
+Shortcut for the C<Last-Modified> header.
+
 =head2 C<location>
 
     my $location = $headers->location;
@@ -522,6 +555,13 @@ Shortcut for the C<Proxy-Authenticate> header.
     $headers = $headers->proxy_authorization('Basic Zm9vOmJhcg==');
 
 Shortcut for the C<Proxy-Authorization> header.
+
+=head2 C<range>
+
+    my $range = $headers->range;
+    $headers  = $headers->range('bytes=2-8');
+
+Shortcut for the C<Range> header.
 
 =head2 C<referrer>
 

@@ -16,7 +16,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 432;
+plan tests => 456;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -30,6 +30,7 @@ use Mojo::Client;
 use Mojo::Content::MultiPart;
 use Mojo::Content::Single;
 use Mojo::Cookie::Response;
+use Mojo::Date;
 use Mojo::Filter::Chunked;
 use Mojo::JSON;
 use Mojo::Transaction::HTTP;
@@ -486,6 +487,30 @@ $t->get_ok('/', '1234' x 1024)->status_is(200)
 
 # GET /ojo (ojo)
 $t->get_ok('/ojo')->status_is(200)->json_content_is({hello => 'world'});
+
+# GET /static.txt (static inline file)
+$t->get_ok('/static.txt')->status_is(200)
+  ->header_is(Server          => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
+  ->header_is('Accept-Ranges' => 'bytes')->content_is("Just some\ntext!\n\n");
+
+# GET /static.txt (static inline file, If-Modified-Since)
+my $modified = Mojo::Date->new->epoch(time - 3600);
+$t->get_ok('/static.txt', {'If-Modified-Since' => $modified})->status_is(200)
+  ->header_is(Server          => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
+  ->header_is('Accept-Ranges' => 'bytes')->content_is("Just some\ntext!\n\n");
+$modified = $t->tx->res->headers->last_modified;
+$t->get_ok('/static.txt', {'If-Modified-Since' => $modified})->status_is(304)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('');
+
+# GET /static.txt (partial inline file)
+$t->get_ok('/static.txt', {'Range' => 'bytes=2-5'})->status_is(206)
+  ->header_is(Server          => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
+  ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 4)
+  ->content_is('st s');
 
 # GET /null/0
 $t->get_ok('/null/0')->status_is(200)
@@ -1121,6 +1146,10 @@ __DATA__
 <%}%>
 <%= img '/foo.jpg' %>
 <%= img '/foo.jpg', alt => 'image' %>
+
+@@ static.txt
+Just some
+text!
 
 @@ template.txt.epl
 <div id="foo">Redirect works!</div>

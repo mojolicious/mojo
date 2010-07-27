@@ -10,11 +10,13 @@ use base 'Mojo::Base';
 use File::stat;
 use File::Spec;
 use Mojo::Asset::File;
+use Mojo::Asset::Memory;
+use Mojo::Command;
 use Mojo::Content::Single;
 use Mojo::Path;
 use MojoX::Types;
 
-__PACKAGE__->attr([qw/prefix root/]);
+__PACKAGE__->attr([qw/default_static_class prefix root/]);
 __PACKAGE__->attr(types => sub { MojoX::Types->new });
 
 # Valentine's Day's coming? Aw crap! I forgot to get a girlfriend again!
@@ -58,94 +60,109 @@ sub serve {
     # Type
     my $type = $self->types->type($ext) || 'text/plain';
 
-    # Dispatch
+    # Response
+    my $res = $c->res;
+
+    # Asset
+    my $asset;
+
+    # Modified
+    my $modified = $self->{_modified} ||= time;
+
+    # Size
+    my $size = 0;
+
+    # File
     if (-f $path) {
 
-        # Log
-        $c->app->log->debug(qq/Serving static file "$rel"./);
-
-        my $res = $c->res;
+        # Readable
         if (-r $path) {
-            my $req  = $c->req;
+
+            # Modified
             my $stat = stat($path);
+            $modified = $stat->mtime;
 
-            # If modified since
-            if (my $date = $req->headers->header('If-Modified-Since')) {
-
-                # Not modified
-                my $since = Mojo::Date->new($date)->epoch;
-                if (defined $since && $since == $stat->mtime) {
-
-                    # Log
-                    $c->app->log->debug('File not modified.');
-
-                    $res->code(304);
-                    $res->headers->remove('Content-Type');
-                    $res->headers->remove('Content-Length');
-                    $res->headers->remove('Content-Disposition');
-                    return;
-                }
-            }
-
-            $res->code(200);
-
-            # Partial content
-            my $size  = $stat->size;
-            my $start = 0;
-            my $end   = $size - 1 >= 0 ? $size - 1 : 0;
-
-            if (my $range = $req->headers->header('Range')) {
-                if ($range =~ m/^bytes=(\d+)\-(\d+)?/ && $1 <= $end) {
-                    $start = $1;
-                    $end = $2 if defined $2 && $2 <= $end;
-                    $res->code(206);
-                    $res->headers->header(
-                        'Content-Length' => $end - $start + 1);
-                    $res->headers->header(
-                        'Content-Range' => "bytes $start-$end/$size");
-                    $c->app->log->debug("Range request: $start-$end/$size.");
-                }
-                else {
-
-                    # Not satisfiable
-                    $res->code(416);
-                    return;
-                }
-            }
+            # Size
+            $size = $stat->size;
 
             # Content
-            $res->content(
-                Mojo::Content::Single->new(
-                    asset => Mojo::Asset::File->new(
-                        start_range => $start,
-                        end_range   => $end
-                    ),
-                    headers => $res->headers
-                )
-            );
-
-            # Accept ranges
-            $res->headers->header('Accept-Ranges' => 'bytes');
-
-            # Last modified
-            $res->headers->header(
-                'Last-Modified' => Mojo::Date->new($stat->mtime));
-
-            $res->headers->content_type($type);
-            $res->content->asset->path($path);
-
-            return;
+            $asset = Mojo::Asset::File->new(path => $path);
         }
 
         # Exists, but is forbidden
         else {
-
-            # Log
             $c->app->log->debug('File forbidden.');
-
-            $res->code(403);
-            return;
+            $res->code(403) and return;
         }
+    }
+
+    # Inline file
+    elsif (defined(my $file = $self->_get_inline_file($c, $rel))) {
+        $size  = length $file;
+        $asset = Mojo::Asset::Memory->new->add_chunk($file);
+    }
+
+    # Found
+    if ($asset) {
+
+        # Log
+        $c->app->log->debug(qq/Serving static file "$rel"./);
+
+        # Request
+        my $req = $c->req;
+
+        # Request headers
+        my $rqh = $req->headers;
+
+        # Response headers
+        my $rsh = $res->headers;
+
+        # If modified since
+        if (my $date = $rqh->if_modified_since) {
+
+            # Not modified
+            my $since = Mojo::Date->new($date)->epoch;
+            if (defined $since && $since == $modified) {
+                $c->app->log->debug('File not modified.');
+                $res->code(304);
+                $rsh->remove('Content-Type');
+                $rsh->remove('Content-Length');
+                $rsh->remove('Content-Disposition');
+                return;
+            }
+        }
+
+        # Start and end
+        my $start = 0;
+        my $end = $size - 1 >= 0 ? $size - 1 : 0;
+
+        # Range
+        if (my $range = $rqh->range) {
+            if ($range =~ m/^bytes=(\d+)\-(\d+)?/ && $1 <= $end) {
+                $start = $1;
+                $end = $2 if defined $2 && $2 <= $end;
+                $res->code(206);
+                $rsh->content_length($end - $start + 1);
+                $rsh->content_range("bytes $start-$end/$size");
+                $c->app->log->debug("Range request: $start-$end/$size.");
+            }
+            else {
+
+                # Not satisfiable
+                $res->code(416);
+                return;
+            }
+        }
+        $asset->start_range($start);
+        $asset->end_range($end);
+
+        # Response
+        $res->code(200) unless $res->code;
+        $res->content->asset($asset);
+        $rsh->content_type($type);
+        $rsh->accept_ranges('bytes');
+        $rsh->last_modified(Mojo::Date->new($modified));
+        return;
     }
 
     return 1;
@@ -172,27 +189,11 @@ sub serve_error {
     # Default to "code.html"
     $rel ||= "$code.html";
 
-    # Append path to root
-    my $path = File::Spec->catfile($self->root, split('/', $rel));
-
     # File
-    if (-r $path) {
+    if (!$self->serve($c, $rel)) {
 
         # Log
         $c->app->log->debug(qq/Serving error file "$rel"./);
-
-        # File
-        $res->content(
-            Mojo::Content::Single->new(asset => Mojo::Asset::File->new));
-        $res->content->asset->path($path);
-
-        # Extension
-        $path =~ /\.(\w+)$/;
-        my $ext = $1;
-
-        # Type
-        my $type = $self->types->type($ext) || 'text/plain';
-        $res->headers->content_type($type);
     }
 
     # 404
@@ -228,6 +229,32 @@ EOF
     return;
 }
 
+sub _get_inline_file {
+    my ($self, $c, $rel) = @_;
+
+    # Class
+    my $class =
+         $c->stash->{static_class}
+      || $ENV{MOJO_STATIC_CLASS}
+      || $self->default_static_class
+      || 'main';
+
+    # Inline files
+    my $inline = $self->{_inline_files}->{$class};
+    unless ($inline) {
+        my $files = Mojo::Command->new->get_all_data($class) || {};
+        $inline = $self->{_inline_files}->{$class} = [keys %$files];
+    }
+
+    # Find
+    for my $path (@$inline) {
+        return Mojo::Command->new->get_data($rel, $class) if $path eq $rel;
+    }
+
+    # Nothing
+    return;
+}
+
 1;
 __END__
 
@@ -250,12 +277,19 @@ MojoX::Dispatcher::Static - Serve Static Files
 
 =head1 DESCRIPTION
 
-L<MojoX::Dispatcher::Static> is a dispatcher for static files with C<RANGE>
-and C<IF-MODIFIED-SINCE> support.
+L<MojoX::Dispatcher::Static> is a dispatcher for static files with C<Range>
+and C<If-Modified-Since> support.
 
 =head1 ATTRIBUTES
 
 L<MojoX::Dispatcher::Static> implements the following attributes.
+
+=head2 C<default_static_class>
+
+    my $class   = $dispatcher->default_static_class;
+    $dispatcher = $dispatcher->default_static_class('main');
+
+The dispatcher will use this class to look for files in the C<DATA> section.
 
 =head2 C<prefix>
 

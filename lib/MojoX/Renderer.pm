@@ -396,7 +396,7 @@ C<Embedded Perl> handled by L<Mojolicious::Plugin::EpRenderer>.
     my $default = $renderer->default_template_class;
     $renderer   = $renderer->default_template_class('main');
 
-The renderer will use this class to look for templates in the C<__DATA__>
+The renderer will use this class to look for templates in the C<DATA>
 section.
 
 =head2 C<detect_templates>

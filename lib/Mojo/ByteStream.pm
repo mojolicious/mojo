@@ -24,6 +24,9 @@ use constant PUNYCODE_DAMP         => 700;
 use constant PUNYCODE_INITIAL_BIAS => 72;
 use constant PUNYCODE_INITIAL_N    => 128;
 
+# Core module since Perl 5.9.3
+use constant SHA1 => eval 'use Digest::SHA1 (); 1';
+
 __PACKAGE__->attr(raw_size => 0);
 
 # Punycode delimiter
@@ -462,21 +465,9 @@ sub get_line {
     return $line;
 }
 
-sub hmac_md5_sum {
-    my ($self, $secret) = @_;
+sub hmac_md5_sum { shift->_hmac(\&_md5, @_) }
 
-    #Secret
-    $secret ||= 'Very unsecure!';
-    $secret = _md5_sum($secret) if length $secret > 64;
-
-    # HMAC
-    my $ipad = $secret ^ (chr(0x36) x 64);
-    my $opad = $secret ^ (chr(0x5c) x 64);
-    $self->{bytestream} =
-      _md5_sum($opad . _md5_sum($ipad . $self->{bytestream}));
-
-    return $self;
-}
+sub hmac_sha1_sum { shift->_hmac(\&_sha1, @_) }
 
 sub html_escape {
     my $self = shift;
@@ -516,7 +507,7 @@ sub html_unescape {
 sub md5_bytes {
     my $self = shift;
     utf8::encode $self->{bytestream} if utf8::is_utf8 $self->{bytestream};
-    $self->{bytestream} = Digest::MD5::md5($self->{bytestream});
+    $self->{bytestream} = _md5($self->{bytestream});
     return $self;
 }
 
@@ -718,6 +709,24 @@ sub say {
     print $handle $self->{bytestream}, "\n";
 }
 
+sub sha1_bytes {
+    my $self = shift;
+    utf8::encode $self->{bytestream} if utf8::is_utf8 $self->{bytestream};
+    $self->{bytestream} = _sha1($self->{bytestream});
+    return $self;
+}
+
+sub sha1_sum {
+    my $self = shift;
+    die <<'EOF' unless SHA1;
+Module "Digest::SHA" not present in this version of Perl.
+Please install it manually or upgrade Perl to at least version 5.10.
+EOF
+    utf8::encode $self->{bytestream} if utf8::is_utf8 $self->{bytestream};
+    $self->{bytestream} = Digest::SHA1::sha1_hex($self->{bytestream});
+    return $self;
+}
+
 sub size { length shift->{bytestream} }
 
 sub to_string { shift->{bytestream} }
@@ -802,8 +811,24 @@ sub _adapt {
         / ($delta + PUNYCODE_SKEW));
 }
 
-# Helper for hmac_md5_sum
-sub _md5_sum { Mojo::ByteStream->new(shift)->md5_sum->to_string }
+sub _hmac {
+    my ($self, $cb, $secret) = @_;
+
+    #Secret
+    $secret ||= 'Very unsecure!';
+    $secret = $cb->($secret) if length $secret > 64;
+
+    # HMAC
+    my $ipad = $secret ^ (chr(0x36) x 64);
+    my $opad = $secret ^ (chr(0x5c) x 64);
+    $self->{bytestream} = unpack 'H*',
+      $cb->($opad . $cb->($ipad . $self->{bytestream}));
+
+    return $self;
+}
+
+# Helper for md5_bytes
+sub _md5 { Digest::MD5::md5(shift) }
 
 # Helper for url_sanitize
 sub _sanitize {
@@ -813,6 +838,15 @@ sub _sanitize {
     return chr $char if $UNRESERVED{$char};
 
     return '%' . uc $hex;
+}
+
+# Helper for sha1_bytes
+sub _sha1 {
+    die <<'EOF' unless SHA1;
+Module "Digest::SHA" not present in this version of Perl.
+Please install it manually or upgrade Perl to at least version 5.10.
+EOF
+    Digest::SHA::sha1(shift);
 }
 
 # Helper for html_unescape
@@ -852,6 +886,7 @@ Mojo::ByteStream - ByteStream
     $stream->encode('UTF-8');
     $stream->decode('UTF-8');
     $stream->hmac_md5_sum('secret');
+    $stream->hmac_sha1_sum('secret');
     $stream->html_escape;
     $stream->html_unescape;
     $stream->md5_bytes;
@@ -859,6 +894,8 @@ Mojo::ByteStream - ByteStream
     $stream->qp_encode;
     $stream->qp_decode;
     $stream->quote;
+    $stream->sha1_bytes;
+    $stream->sha1_sum;
     $stream->unquote;
     $stream->url_escape;
     $stream->url_sanitize;
@@ -996,6 +1033,13 @@ Lines are expected to end with C<0x0d 0x0a> or C<0x0a>.
 
 Turn bytestream into HMAC-MD5 checksum of old content.
 
+=head2 C<hmac_sha1_sum>
+
+    $stream = $stream->hmac_sha1_sum($secret);
+
+Turn bytestream into HMAC-SHA1 checksum of old content.
+Note that Perl 5.10 or L<Digest::SHA> are required for C<SHA1> support.
+
 =head2 C<html_escape>
 
     $stream = $stream->html_escape;
@@ -1012,7 +1056,7 @@ HTML unescape bytestream.
 
     $stream = $stream->md5_bytes;
 
-Turn bytestream into 16 byte MD5 checksum of old content.
+Turn bytestream into binary MD5 checksum of old content.
 
 =head2 C<md5_sum>
 
@@ -1063,6 +1107,20 @@ Remove a specific number of bytes from bytestream.
     $stream->say(*STDERR);
 
 Print bytestream to handle or STDOUT and append a newline.
+
+=head2 C<sha1_bytes>
+
+    $stream = $stream->sha1_bytes;
+
+Turn bytestream into binary SHA1 checksum of old content.
+Note that Perl 5.10 or L<Digest::SHA> are required for C<SHA1> support.
+
+=head2 C<sha1_sum>
+
+    $stream = $stream->sha1_sum;
+
+Turn bytestream into SHA1 checksum of old content.
+Note that Perl 5.10 or L<Digest::SHA> are required for C<SHA1> support.
 
 =head2 C<size>
 

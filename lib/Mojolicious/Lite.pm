@@ -105,8 +105,8 @@ sub import {
     no strict 'refs';
     no warnings 'redefine';
 
-    # Default file and template class
-    $app->static->default_file_class($caller);
+    # Default static and template class
+    $app->static->default_static_class($caller);
     $app->renderer->default_template_class($caller);
 
     # Export

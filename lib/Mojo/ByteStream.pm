@@ -25,7 +25,7 @@ use constant PUNYCODE_INITIAL_BIAS => 72;
 use constant PUNYCODE_INITIAL_N    => 128;
 
 # Core module since Perl 5.9.3
-use constant SHA1 => eval 'use Digest::SHA1 (); 1';
+use constant SHA1 => eval 'use Digest::SHA (); 1';
 
 __PACKAGE__->attr(raw_size => 0);
 

@@ -16,7 +16,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 461;
+plan tests => 485;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -511,6 +511,30 @@ $t->get_ok('/static.txt', {'Range' => 'bytes=2-5'})->status_is(206)
   ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
   ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 4)
   ->content_is('st s');
+
+# GET /static.txt (base 64 static inline file)
+$t->get_ok('/static2.txt')->status_is(200)
+  ->header_is(Server          => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
+  ->header_is('Accept-Ranges' => 'bytes')->content_is("test 123\nlalala");
+
+# GET /static.txt (base 64 static inline file, If-Modified-Since)
+$modified = Mojo::Date->new->epoch(time - 3600);
+$t->get_ok('/static2.txt', {'If-Modified-Since' => $modified})->status_is(200)
+  ->header_is(Server          => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
+  ->header_is('Accept-Ranges' => 'bytes')->content_is("test 123\nlalala");
+$modified = $t->tx->res->headers->last_modified;
+$t->get_ok('/static2.txt', {'If-Modified-Since' => $modified})->status_is(304)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('');
+
+# GET /static.txt (base 64 partial inline file)
+$t->get_ok('/static2.txt', {'Range' => 'bytes=2-5'})->status_is(206)
+  ->header_is(Server          => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
+  ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 4)
+  ->content_is('st 1');
 
 # GET /template.txt.epl (protected inline template)
 $t->get_ok('/template.txt.epl')->status_is(404)
@@ -1159,6 +1183,9 @@ text!
 
 @@ template.txt.epl
 <div id="foo">Redirect works!</div>
+
+@@ static2.txt;base64
+dGVzdCAxMjMKbGFsYWxh
 
 @@ with_header_condition.html.epl
 Test ok

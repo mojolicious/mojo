@@ -11,6 +11,7 @@ use File::stat;
 use File::Spec;
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
+use Mojo::ByteStream 'b';
 use Mojo::Command;
 use Mojo::Content::Single;
 use Mojo::Path;
@@ -251,7 +252,11 @@ sub _get_inline_file {
 
     # Find
     for my $path (@$inline) {
-        return Mojo::Command->new->get_data($rel, $class) if $path eq $rel;
+        if ($path =~ /^$rel(?:\;\w+)?$/) {
+            my $file = Mojo::Command->new->get_data($path, $class);
+            return b($file)->b64_decode->to_string if $path =~ /\;base64/;
+            return $file;
+        }
     }
 
     # Nothing

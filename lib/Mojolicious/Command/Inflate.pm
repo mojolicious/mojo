@@ -8,6 +8,7 @@ use warnings;
 use base 'Mojo::Command';
 
 use Getopt::Long 'GetOptions';
+use Mojo::ByteStream 'b';
 use Mojo::Loader;
 
 __PACKAGE__->attr(description => <<'EOF');
@@ -47,8 +48,12 @@ sub run {
     my $all = $self->get_all_data($class);
     for my $file (keys %$all) {
         my $prefix = $file =~ /\.\w+\.\w+$/ ? $templates : $public;
+        my $content = $all->{$file};
+        if ($file =~ s/\;(\w+)$//) {
+            $content = b($content)->b64_decode->to_string;
+        }
         my $path = $self->rel_file("$prefix/$file");
-        $self->write_file($path, $all->{$file});
+        $self->write_file($path, $content);
     }
 
     return $self;

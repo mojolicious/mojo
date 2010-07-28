@@ -346,7 +346,8 @@ sub b64_decode {
 sub b64_encode {
     my $self = shift;
     utf8::encode $self->{bytestream} if utf8::is_utf8 $self->{bytestream};
-    $self->{bytestream} = MIME::Base64::encode_base64($self->{bytestream});
+    $self->{bytestream} =
+      MIME::Base64::encode_base64($self->{bytestream}, shift);
     return $self;
 }
 
@@ -967,6 +968,7 @@ Base 64 decode bytestream.
 =head2 C<b64_encode>
 
     $stream = $stream->b64_encode;
+    $stream = $stream->b64_encode('');
 
 Base 64 encode bytestream.
 

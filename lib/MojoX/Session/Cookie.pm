@@ -70,8 +70,7 @@ sub store {
         $value = freeze $session;
 
         # Encode
-        $value = b($value)->b64_encode->to_string;
-        $value =~ s/\n//g;
+        $value = b($value)->b64_encode('')->to_string;
     }
 
     # Options

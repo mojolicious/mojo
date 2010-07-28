@@ -14,7 +14,7 @@ use Test::More;
 
 plan skip_all => 'Perl 5.10 required for this test!'
   unless eval { require Digest::SHA; 1 };
-plan tests => 73;
+plan tests => 74;
 
 use_ok('Mojo::ByteStream', 'b');
 
@@ -93,6 +93,11 @@ is( "$stream",
     "foo\x{df}\x{0100}bar%23\x{263a}",
     'right base64 decoded result'
 );
+
+# b64_encode (custom line ending)
+$stream = b('foobar$%^&3217');
+is($stream->b64_encode(''),
+    "Zm9vYmFyJCVeJjMyMTc=", 'right base64 encoded result');
 
 # url_escape
 $stream = b('business;23');

@@ -232,6 +232,9 @@ EOF
 sub _get_inline_file {
     my ($self, $c, $rel) = @_;
 
+    # Protect templates
+    return if $rel =~ /\.\w+\.\w+$/;
+
     # Class
     my $class =
          $c->stash->{static_class}

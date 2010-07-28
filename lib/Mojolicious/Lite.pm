@@ -627,8 +627,11 @@ directory.
         $self->render('foo/bar');
     };
 
-Static files will be automatically served from the C<public> directory if it
-exists.
+Static files will be automatically served from the C<DATA> section or a
+C<public> directory if it exists.
+
+    @@ something.js
+    alert('hello!');
 
     % mkdir public
     % mv something.js public/something.js

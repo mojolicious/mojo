@@ -237,7 +237,7 @@ sub _error {
     my ($self, $loop, $id, $error) = @_;
 
     # Log
-    $self->app->log->error($error) if $error;
+    $self->app->log->error($error);
 
     # Drop
     $self->_drop($id);

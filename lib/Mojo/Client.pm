@@ -750,7 +750,7 @@ sub _error {
     my ($self, $loop, $id, $error) = @_;
 
     # Log
-    $self->log->error($error) if $error;
+    $self->log->error($error);
 
     # Finished
     $self->_handle($id);

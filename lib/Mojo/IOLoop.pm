@@ -805,6 +805,9 @@ sub _error {
     # Cleanup
     $self->_drop_immediately($id);
 
+    # Error
+    $error ||= 'Unknown error, propably harmless.';
+
     # No event
     warn "Unhandled event error: $error" and return unless $event;
 

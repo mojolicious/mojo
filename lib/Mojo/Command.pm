@@ -118,6 +118,11 @@ sub get_all_data {
     my $all = {};
     while (@data) {
         my ($name, $content) = splice @data, 0, 2;
+
+        # Base 64
+        $content = b($content)->b64_decode->to_string
+          if $name =~ s/\;base64$//;
+
         $all->{$name} = $content;
     }
 

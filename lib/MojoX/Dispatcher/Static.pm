@@ -252,11 +252,7 @@ sub _get_inline_file {
 
     # Find
     for my $path (@$inline) {
-        if ($path =~ /^$rel(?:\;\w+)?$/) {
-            my $file = Mojo::Command->new->get_data($path, $class);
-            return b($file)->b64_decode->to_string if $path =~ /\;base64/;
-            return $file;
-        }
+        return Mojo::Command->new->get_data($path, $class) if $path eq $rel;
     }
 
     # Nothing

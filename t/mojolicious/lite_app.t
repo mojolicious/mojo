@@ -1184,7 +1184,7 @@ text!
 @@ template.txt.epl
 <div id="foo">Redirect works!</div>
 
-@@ static2.txt base64
+@@ static2.txt (base64)
 dGVzdCAxMjMKbGFsYWxh
 
 @@ with_header_condition.html.epl

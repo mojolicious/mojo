@@ -1493,7 +1493,7 @@ $res->headers->sec_websocket_location('ws://example.com/demo');
 $res->headers->sec_websocket_protocol('sample');
 $res->body('8jKS\'y:G*Co,Wxa-');
 is( $res->build,
-    "HTTP/1.1 101 Web Socket Protocol Handshake\x0d\x0a"
+    "HTTP/1.1 101 WebSocket Protocol Handshake\x0d\x0a"
       . "Connection: Upgrade\x0d\x0a"
       . "Date: Sun, 17 Aug 2008 16:27:35 GMT\x0d\x0a"
       . "Upgrade: WebSocket\x0d\x0a"

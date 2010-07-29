@@ -15,17 +15,14 @@ __PACKAGE__->attr(buffer => sub { Mojo::ByteStream->new });
 # Filter regex
 my $FILTER_RE = qr/[[:cntrl:]\(\|\)\<\>\@\,\;\:\\\"\/\[\]\?\=\{\}\s]/;
 
-# DEPRECATED!!! Draft 75 WebSocket support
 my @GENERAL_HEADERS = qw/
-  Upgrade
   Connection
-  WebSocket-Origin
-  WebSocket-Location
   Cache-Control
   Date
   Pragma
   Trailer
   Transfer-Encoding
+  Upgrade
   Via
   Warning
   /;

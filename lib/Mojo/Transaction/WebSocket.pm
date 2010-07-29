@@ -120,27 +120,16 @@ sub server_handshake {
     my $scheme   = $url->to_abs->scheme eq 'https' ? 'wss' : 'ws';
     my $location = $url->to_abs->scheme($scheme)->to_string;
     my $origin   = $rqh->origin;
-
-    # Draft 76 WebSocket support
-    if ($rqh->sec_websocket_key1) {
-        $rsh->sec_websocket_origin($origin);
-        $rsh->sec_websocket_location($location);
-        $rsh->sec_websocket_protocol($rqh->sec_websocket_protocol);
-        $res->body(
-            $self->_challenge(
-                scalar $rqh->sec_websocket_key1,
-                scalar $rqh->sec_websocket_key2,
-                $req->body
-            )
-        );
-    }
-
-    # DEPRECATED in Snowman!
-    # Draft 75 WebSocket support
-    else {
-        $rsh->header('WebSocket-Origin',   $origin);
-        $rsh->header('WebSocket-Location', $location);
-    }
+    $rsh->sec_websocket_origin($origin);
+    $rsh->sec_websocket_location($location);
+    $rsh->sec_websocket_protocol($rqh->sec_websocket_protocol);
+    $res->body(
+        $self->_challenge(
+            scalar $rqh->sec_websocket_key1,
+            scalar $rqh->sec_websocket_key2,
+            $req->body
+        )
+    );
 
     return $self;
 }

@@ -121,7 +121,7 @@ sub get_all_data {
 
         # Base 64
         $content = b($content)->b64_decode->to_string
-          if $name =~ s/\;base64$//;
+          if $name =~ s/\s+base64$//;
 
         $all->{$name} = $content;
     }

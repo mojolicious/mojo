@@ -633,7 +633,7 @@ Static files will be automatically served from the C<DATA> section
     @@ something.js
     alert('hello!');
 
-    @@ test.txt;base64
+    @@ test.txt base64
     dGVzdCAxMjMKbGFsYWxh
 
     % mkdir public

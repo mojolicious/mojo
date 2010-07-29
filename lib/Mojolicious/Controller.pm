@@ -540,7 +540,7 @@ Render a static asset using L<MojoX::Dispatcher::Static>.
     $c->render_text('Hello World!');
     $c->render_text('Hello World', layout => 'green');
 
-Render the givent content as plain text, note that text will be encoded.
+Render the given content as plain text, note that text will be encoded.
 See C<render_data> for an alternative without encoding.
 
 =head2 C<resume>

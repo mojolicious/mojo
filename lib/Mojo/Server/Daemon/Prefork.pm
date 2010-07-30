@@ -376,12 +376,13 @@ Mojo::Server::Daemon::Prefork - Preforking HTTP 1.1 And WebSocket Server
 =head1 DESCRIPTION
 
 L<Mojo::Server::Daemon::Prefork> is a full featured preforking HTTP 1.1 and
-WebSocket server using a dynamic worker pool with C<IPv6>, C<TLS>, C<epoll>,
-C<kqueue>, hot deployment, UNIX domain socket sharing and optional async io
-support.
+WebSocket server using a dynamic worker pool with C<IPv6>, C<TLS>,
+C<Bonjour>, C<epoll>, C<kqueue>, hot deployment, UNIX domain socket sharing
+and optional async io support.
 
-Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::INET6> and
-L<IO::Socket::SSL> are supported transparently and used if installed.
+Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::INET6>,
+L<IO::Socket::SSL> and L<Net::Rendezvous::Publish> are supported
+transparently and used if installed.
 
 =head1 ATTRIBUTES
 

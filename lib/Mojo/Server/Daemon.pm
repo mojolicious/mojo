@@ -18,7 +18,7 @@ use Sys::Hostname;
 # Bonjour
 use constant BONJOUR => $ENV{MOJO_NO_BONJOUR}
   ? 0
-  : eval 'use Net::Rendezvous::Publish (); 1';
+  : eval 'use Net::Rendezvous::Publish 0.04 (); 1';
 
 __PACKAGE__->attr(
     [qw/group listen listen_queue_size max_requests silent user/]);
@@ -313,7 +313,7 @@ sub _listen {
             type   => '_http._tcp',
             domain => 'local',
             port   => $port
-        ) if $port;
+        ) if $port && !$options->{tls};
     }
 
     # Log

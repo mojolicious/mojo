@@ -8,6 +8,7 @@ use warnings;
 use base 'Mojo::Command';
 
 use Mojo::IOLoop;
+use Mojo::Server::Daemon;
 use Mojolicious;
 
 __PACKAGE__->attr(description => <<'EOF');
@@ -41,16 +42,23 @@ sub run {
     my $tls =
       Mojo::IOLoop::TLS() ? $IO::Socket::SSL::VERSION : 'not installed';
 
+    # Bonjour
+    my $bonjour =
+      eval 'Mojo::Server::Daemon::BONJOUR()'
+      ? $Net::Rendezvous::Publish::VERSION
+      : 'not installed';
+
     print <<"EOF";
 CORE
   Perl        ($])
   Mojolicious ($mojo, $codename)
 
 OPTIONAL
-  IO::Epoll         ($epoll)
-  IO::KQueue        ($kqueue)
-  IO::Socket::INET6 ($ipv6)
-  IO::Socket::SSL   ($tls)
+  IO::Epoll                ($epoll)
+  IO::KQueue               ($kqueue)
+  IO::Socket::INET6        ($ipv6)
+  IO::Socket::SSL          ($tls)
+  Net::Rendezvous::Publish ($bonjour)
 EOF
 
     return $self;

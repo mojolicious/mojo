@@ -309,7 +309,7 @@ sub _listen {
         my $port = $options->{port};
         my $name = $options->{address} || Sys::Hostname::hostname();
         $p->publish(
-            name   => "Mojolicious ($name)",
+            name   => "Mojolicious ($name:$port)",
             type   => '_http._tcp',
             domain => 'local',
             port   => $port

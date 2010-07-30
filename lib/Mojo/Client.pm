@@ -38,23 +38,7 @@ __PACKAGE__->attr(websocket_timeout => 300);
 our $CLIENT;
 
 # Make sure we leave a clean ioloop behind
-sub DESTROY {
-    my $self = shift;
-
-    # Shortcut
-    return unless my $loop = $self->ioloop;
-
-    # Cleanup active connections
-    my $cs = $self->{_cs} || {};
-    $loop->drop($_) for keys %$cs;
-
-    # Cleanup keep alive connections
-    my $cache = $self->{_cache} || [];
-    for my $cached (@$cache) {
-        my $id = $cached->[1];
-        $loop->drop($id);
-    }
-}
+sub DESTROY { shift->_cleanup }
 
 # Homer, it's easy to criticize.
 # Fun, too.
@@ -554,6 +538,28 @@ sub _cache {
     return $result;
 }
 
+sub _cleanup {
+    my ($self, $stop) = @_;
+
+    # Loop
+    return unless my $loop = $self->ioloop;
+
+    # Stop
+    $loop->stop if $stop;
+
+    # Cleanup active connections
+    my $cs = $self->{_cs} || {};
+    $loop->drop($_) for keys %$cs;
+    $self->{_cs} = {};
+
+    # Cleanup keep alive connections
+    my $cache = $self->{_cache} || [];
+    for my $cached (@$cache) {
+        $loop->drop($cached->[1]);
+    }
+    $self->{_cache} = [];
+}
+
 # Where on my badge does it say anything about protecting people?
 # Uh, second word, chief.
 sub _connect {
@@ -804,8 +810,8 @@ sub _handle {
           unless $self->_redirect($c, $old);
     }
 
-    # Stop ioloop
-    $self->ioloop->stop if !$self->{_is_async} && !$self->{_processing};
+    # Clean up and stop ioloop
+    $self->_cleanup(1) if !$self->{_is_async} && !$self->{_processing};
 }
 
 sub _hup { shift->_handle(pop) }

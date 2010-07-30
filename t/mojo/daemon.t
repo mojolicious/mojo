@@ -90,8 +90,8 @@ $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse("http://127.0.0.1:$port/6/");
 $client->process($tx);
-is($tx->res->code,  200, 'right status');
-is($tx->kept_alive, 1,   'connection was kept alive');
+is($tx->res->code,   200, 'right status');
+is(!$tx->kept_alive, 1,   'connection was not kept alive');
 like($tx->res->headers->connection,
     qr/Keep-Alive/i, 'right "Connection" header');
 like($tx->res->body, qr/Mojo is working/, 'right content');
@@ -101,8 +101,8 @@ $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse("http://127.0.0.1:$port/7/");
 $client->process($tx);
-is($tx->res->code,  200, 'right status');
-is($tx->kept_alive, 1,   'connection was kept alive');
+is($tx->res->code,   200, 'right status');
+is(!$tx->kept_alive, 1,   'connection was not kept alive');
 like($tx->res->headers->connection,
     qr/Keep-Alive/i, 'right "Connection" header');
 like($tx->res->body, qr/Mojo is working/, 'right content');

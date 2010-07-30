@@ -12,7 +12,7 @@ use Test::More;
 
 plan skip_all => 'set TEST_CLIENT to enable this test (developer only!)'
   unless $ENV{TEST_CLIENT};
-plan tests => 152;
+plan tests => 103;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -56,22 +56,21 @@ $tx = $client->build_tx(GET => 'http://cdeabcdeffoobarnonexisting.com');
 $client->process($tx);
 is($tx->state, 'error', 'right state');
 
-# Stress test (Detect leaking file descriptors)
-for my $i (1 .. 50) {
-    my $pass = 0;
-    for my $j (1 .. 10) {
-        my $k = $i + $j;
-        $client->get(
-            "http://www$k.mojolicio.us",
-            sub {
-                my ($self, $tx) = @_;
-                $pass++ if $tx->success;
-            }
-        );
+# Keep alive
+my $async = $client->async;
+$async->get('http://mojolicio.us', sub { shift->ioloop->stop })->process;
+$async->ioloop->start;
+my $kept_alive = undef;
+$async->get(
+    'http://mojolicio.us',
+    sub {
+        my $self = shift;
+        $self->ioloop->stop;
+        $kept_alive = shift->kept_alive;
     }
-    $client->process;
-    is($pass, 10, 'stress test passed');
-}
+)->process;
+$async->ioloop->start;
+is($kept_alive, 1, 'connection was kept alive');
 
 # Custom non keep alive request
 $tx = Mojo::Transaction::HTTP->new;
@@ -176,7 +175,8 @@ $client->get(
         $code   = $self->res->code;
     }
 );
-my ($method2, $url2, $code2, $kept_alive);
+my ($method2, $url2, $code2);
+$kept_alive = undef;
 $client->get(
     'http://www.apache.org' => sub {
         my $self = shift;
@@ -196,16 +196,16 @@ $client->get(
     }
 );
 $client->process;
-is($method,     'GET',                   'right method');
-is($url,        'http://google.com',     'right url');
-is($code,       301,                     'right status');
-is($method2,    'GET',                   'right method');
-is($url2,       'http://www.apache.org', 'right url');
-is($code2,      200,                     'right status');
-is($kept_alive, 1,                       'connection was kept alive');
-is($method3,    'GET',                   'right method');
-is($url3,       'http://www.google.de',  'right url');
-is($code3,      200,                     'right status');
+is($method,      'GET',                   'right method');
+is($url,         'http://google.com',     'right url');
+is($code,        301,                     'right status');
+is($method2,     'GET',                   'right method');
+is($url2,        'http://www.apache.org', 'right url');
+is($code2,       200,                     'right status');
+is(!$kept_alive, 1,                       'connection was not kept alive');
+is($method3,     'GET',                   'right method');
+is($url3,        'http://www.google.de',  'right url');
+is($code3,       200,                     'right status');
 
 # Simple requests with redirect
 ($method, $url, $code, $method2, $url2, $code2) = undef;
@@ -277,7 +277,7 @@ $client->queue(
 );
 $client->process;
 ok($done,        'state is done');
-ok($kept_alive,  'connection was kept alive');
+ok(!$kept_alive, 'connection was not kept alive');
 ok($tx->is_done, 'right state');
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
@@ -295,10 +295,10 @@ $client->process(
         $port2      = $tx->remote_port, 80;
     }
 );
-ok($done,       'state is done');
-ok($kept_alive, 'connection was kept alive');
-ok($address,    'has local address');
-ok($port > 0,   'has local port');
+ok($done,        'state is done');
+ok(!$kept_alive, 'connection was not kept alive');
+ok($address,     'has local address');
+ok($port > 0,    'has local port');
 is($port2, 80, 'right remote port');
 ok($tx->is_done, 'state is done');
 

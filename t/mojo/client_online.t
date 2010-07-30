@@ -12,7 +12,7 @@ use Test::More;
 
 plan skip_all => 'set TEST_CLIENT to enable this test (developer only!)'
   unless $ENV{TEST_CLIENT};
-plan tests => 101;
+plan tests => 102;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -42,8 +42,17 @@ is($code,  301, 'right status');
 # Fresh client
 $client = Mojo::Client->new;
 
+# Connection refused
+$client->log->level('fatal');
+my $tx = $client->build_tx(GET => 'http://localhost:99999');
+$client->process($tx);
+is($tx->state, 'error', 'right state');
+
+# Fresh client again
+$client = Mojo::Client->new;
+
 # Host does not exist
-my $tx = $client->build_tx(GET => 'http://cdeabcdeffoobarnonexisting.com');
+$tx = $client->build_tx(GET => 'http://cdeabcdeffoobarnonexisting.com');
 $client->process($tx);
 is($tx->state, 'error', 'right state');
 

@@ -605,7 +605,7 @@ sub _connect {
             tls_verify_cb => $self->tls_verify_cb,
             connect_cb    => sub { $self->_connected($_[1]) },
             error_cb      => sub { $self->_error(@_) },
-            hup_cb        => sub { $self->_error(@_) },
+            hup_cb        => sub { $self->_hup(@_) },
             read_cb       => sub { $self->_read(@_) },
             write_cb      => sub { $self->_write(@_) }
         );
@@ -749,6 +749,9 @@ sub _drop {
 sub _error {
     my ($self, $loop, $id, $error) = @_;
 
+    # Transaction
+    if (my $tx = $self->{_cs}->{$id}->{tx}) { $tx->error($error) }
+
     # Log
     $self->log->error($error);
 
@@ -804,6 +807,8 @@ sub _handle {
     # Stop ioloop
     $self->ioloop->stop if !$self->{_is_async} && !$self->{_processing};
 }
+
+sub _hup { shift->_handle(pop) }
 
 # Have you ever seen that Blue Man Group? Total ripoff of the Smurfs.
 # And the Smurfs, well, they SUCK.

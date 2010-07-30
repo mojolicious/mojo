@@ -20,9 +20,10 @@ __PACKAGE__->attr(
         sub { return Mojo::Transaction::HTTP->new }
     }
 );
-__PACKAGE__->attr(client => sub { Mojo::Client->singleton });
-__PACKAGE__->attr(home   => sub { Mojo::Home->new });
-__PACKAGE__->attr(log    => sub { Mojo::Log->new });
+__PACKAGE__->attr(
+    client => sub { Mojo::Client->singleton->max_keep_alive_connections(5) });
+__PACKAGE__->attr(home => sub { Mojo::Home->new });
+__PACKAGE__->attr(log  => sub { Mojo::Log->new });
 __PACKAGE__->attr(
     websocket_handshake_cb => sub {
         sub {

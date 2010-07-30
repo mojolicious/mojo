@@ -57,7 +57,7 @@ $client->process($tx);
 is($tx->state, 'error', 'right state');
 
 # Keep alive
-my $async = $client->async;
+my $async = $client->async->max_keep_alive_connections(5);
 $async->get('http://mojolicio.us', sub { shift->ioloop->stop })->process;
 $async->ioloop->start;
 my $kept_alive = undef;

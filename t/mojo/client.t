@@ -37,7 +37,7 @@ is($tx->res->body, 'works', 'right content');
 
 # Nested keep alive
 my @kept_alive;
-$client->async->get(
+$client->max_keep_alive_connections(1)->async->get(
     '/',
     sub {
         my ($self, $tx) = @_;

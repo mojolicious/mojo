@@ -30,7 +30,7 @@ __PACKAGE__->attr(cookie_jar => sub { Mojo::CookieJar->new });
 __PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->new });
 __PACKAGE__->attr(keep_alive_timeout         => 15);
 __PACKAGE__->attr(log                        => sub { Mojo::Log->new });
-__PACKAGE__->attr(max_keep_alive_connections => 5);
+__PACKAGE__->attr(max_keep_alive_connections => 0);
 __PACKAGE__->attr(max_redirects     => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 });
 __PACKAGE__->attr(websocket_timeout => 300);
 
@@ -38,7 +38,24 @@ __PACKAGE__->attr(websocket_timeout => 300);
 our $CLIENT;
 
 # Make sure we leave a clean ioloop behind
-sub DESTROY { shift->_cleanup }
+sub DESTROY {
+    my $self = shift;
+
+    # Loop
+    return unless my $loop = $self->ioloop;
+
+    # Cleanup active connections
+    my $cs = $self->{_cs} || {};
+    $loop->drop($_) for keys %$cs;
+    $self->{_cs} = {};
+
+    # Cleanup keep alive connections
+    my $cache = $self->{_cache} || [];
+    for my $cached (@$cache) {
+        $loop->drop($cached->[1]);
+    }
+    $self->{_cache} = [];
+}
 
 # Homer, it's easy to criticize.
 # Fun, too.
@@ -510,13 +527,14 @@ sub _cache {
     if ($id) {
 
         # Limit keep alive connections
-        while (@$cache > $self->max_keep_alive_connections) {
+        my $max = $self->max_keep_alive_connections;
+        while (@$cache > $max) {
             my $cached = shift @$cache;
             $self->_drop($cached->[1]);
         }
 
         # Add to cache
-        push @$cache, [$name, $id];
+        push @$cache, [$name, $id] if $max;
 
         return $self;
     }
@@ -536,28 +554,6 @@ sub _cache {
     $self->{_cache} = \@cache;
 
     return $result;
-}
-
-sub _cleanup {
-    my ($self, $stop) = @_;
-
-    # Loop
-    return unless my $loop = $self->ioloop;
-
-    # Stop
-    $loop->stop if $stop;
-
-    # Cleanup active connections
-    my $cs = $self->{_cs} || {};
-    $loop->drop($_) for keys %$cs;
-    $self->{_cs} = {};
-
-    # Cleanup keep alive connections
-    my $cache = $self->{_cache} || [];
-    for my $cached (@$cache) {
-        $loop->drop($cached->[1]);
-    }
-    $self->{_cache} = [];
 }
 
 # Where on my badge does it say anything about protecting people?
@@ -811,7 +807,7 @@ sub _handle {
     }
 
     # Clean up and stop ioloop
-    $self->_cleanup(1) if !$self->{_is_async} && !$self->{_processing};
+    $self->ioloop->stop if !$self->{_is_async} && !$self->{_processing};
 }
 
 sub _hup { shift->_handle(pop) }
@@ -1206,7 +1202,9 @@ be used.
     $client                        = $client->max_keep_alive_connections(5);
 
 Maximum number of keep alive connections that the client will retain before
-it starts closing the oldest cached ones, defaults to C<5>.
+it starts closing the oldest cached ones, defaults to C<0>.
+Note that all cloned clients have their own keep alive connection queue, so
+you can quickly run out of file descriptors with too many active clients.
 
 =head2 C<max_redirects>
 
@@ -1266,8 +1264,6 @@ clients.
 
 Clone client instance and start using the global shared L<Mojo::IOLoop>
 singleton if it is running.
-Note that all cloned clients have their own keep alive connection queue, so
-you can quickly run out of file descriptors with too many active clients.
 
 =head2 C<build_form_tx>
 
@@ -1344,8 +1340,6 @@ Versatile WebSocket transaction builder.
     my $clone = $client->clone;
 
 Clone client the instance.
-Note that all cloned clients have their own keep alive connection queue, so
-you can quickly run out of file descriptors with too many active clients.
 
 =head2 C<delete>
 

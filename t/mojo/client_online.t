@@ -12,7 +12,7 @@ use Test::More;
 
 plan skip_all => 'set TEST_CLIENT to enable this test (developer only!)'
   unless $ENV{TEST_CLIENT};
-plan tests => 102;
+plan tests => 152;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -55,6 +55,23 @@ $client = Mojo::Client->new;
 $tx = $client->build_tx(GET => 'http://cdeabcdeffoobarnonexisting.com');
 $client->process($tx);
 is($tx->state, 'error', 'right state');
+
+# Stress test (Detect leaking file descriptors)
+for my $i (1 .. 50) {
+    my $pass = 0;
+    for my $j (1 .. 10) {
+        my $k = $i + $j;
+        $client->get(
+            "http://www$k.mojolicio.us",
+            sub {
+                my ($self, $tx) = @_;
+                $pass++ if $tx->success;
+            }
+        );
+    }
+    $client->process;
+    is($pass, 10, 'stress test passed');
+}
 
 # Custom non keep alive request
 $tx = Mojo::Transaction::HTTP->new;

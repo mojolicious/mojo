@@ -14,7 +14,7 @@ use Test::More;
 
 plan skip_all => 'Perl 5.10 required for this test!'
   unless eval { require Digest::SHA; 1 };
-plan tests => 74;
+plan tests => 78;
 
 use_ok('Mojo::ByteStream', 'b');
 
@@ -300,6 +300,16 @@ is("$stream", 'bcher-kva', 'right punycode encoded result');
 # punycode_decode
 $stream = b('bcher-kva')->punycode_decode;
 is("$stream", 'bücher', 'right punycode decoded result');
+
+# trim
+$stream = b(' la la la ')->trim;
+is("$stream", 'la la la', 'right trimmed result');
+$stream = b(" \n la la la \n ")->trim;
+is("$stream", 'la la la', 'right trimmed result');
+$stream = b("\n la\nla la \n")->trim;
+is("$stream", "la\nla la", 'right trimmed result');
+$stream = b(" \nla\nla\nla\n ")->trim;
+is("$stream", "la\nla\nla", 'right trimmed result');
 
 # say and autojoin
 $buffer = '';

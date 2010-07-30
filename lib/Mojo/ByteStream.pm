@@ -732,6 +732,13 @@ sub size { length shift->{bytestream} }
 
 sub to_string { shift->{bytestream} }
 
+sub trim {
+    my $self = shift;
+    $self->{bytestream} =~ s/^\s*//;
+    $self->{bytestream} =~ s/\s*$//;
+    return $self;
+}
+
 sub unquote {
     my $self = shift;
 
@@ -897,6 +904,7 @@ Mojo::ByteStream - ByteStream
     $stream->quote;
     $stream->sha1_bytes;
     $stream->sha1_sum;
+    $stream->trim;
     $stream->unquote;
     $stream->url_escape;
     $stream->url_sanitize;
@@ -1135,6 +1143,12 @@ Size of bytestream.
     my $string = $stream->to_string;
 
 Stringify bytestream.
+
+=head2 C<trim>
+
+    $stream = $stream->trim;
+
+Trim whitespace characters from both ends of bytestream.
 
 =head2 C<unquote>
 

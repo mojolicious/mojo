@@ -74,6 +74,47 @@ sub lib_dir {
     return;
 }
 
+sub list_files {
+    my ($self, $dir) = @_;
+
+    # Parts
+    my $parts = $self->{_parts} || [];
+
+    # Root
+    my $root = File::Spec->catdir(@$parts);
+
+    # Directory
+    $dir = File::Spec->catdir($root, split '/', ($dir || ''));
+
+    # Read directory
+    my (@files, @dirs);
+    opendir DIR, $dir or return [];
+    for my $file (readdir DIR) {
+
+        # Hidden file
+        next if $file =~ /^\./;
+
+        # File
+        my $path = File::Spec->catfile($dir, $file);
+        my $rel = File::Spec->abs2rel($path, $root);
+        if (-f $path) {
+            push @files, join '/', File::Spec->splitdir($rel);
+        }
+
+        # Directory
+        elsif (-d $path) { push @dirs, join('/', File::Spec->splitdir($rel)) }
+    }
+    closedir DIR;
+
+    # Walk directories
+    for my $path (@dirs) {
+        my $new = $self->list_files($path);
+        push @files, @$new;
+    }
+
+    return [sort @files];
+}
+
 sub parse {
     my ($self, $path) = @_;
     my @parts = File::Spec->splitdir($path);
@@ -145,6 +186,13 @@ Detect home directory from application class.
     my $path = $home->lib_dir;
 
 Path to C<lib> directory.
+
+=head2 C<list_files>
+
+    my $files = $home->list_files;
+    my $files = $home->list_files('foo/bar');
+
+List all files in directory and subdirectories recursively.
 
 =head2 C<parse>
 

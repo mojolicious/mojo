@@ -10,6 +10,7 @@ use base 'Mojo::Base';
 use File::Spec;
 use Mojo::ByteStream 'b';
 use Mojo::Command;
+use Mojo::Home;
 use Mojo::JSON;
 use MojoX::Types;
 
@@ -229,8 +230,8 @@ sub _detect_handler {
     # Templates
     my $templates = $self->{_templates};
     unless ($templates) {
-        $templates = $self->_list_templates;
-        $self->{_templates} = $templates;
+        $templates = $self->{_templates} =
+          Mojo::Home->new->parse($self->root)->list_files;
     }
 
     # Inline templates
@@ -276,43 +277,6 @@ sub _list_inline_templates {
 
     # List
     return [keys %$all];
-}
-
-sub _list_templates {
-    my ($self, $dir) = @_;
-
-    # Root
-    my $root = $self->root;
-    $dir ||= $root;
-
-    # Read directory
-    my (@files, @dirs);
-    opendir DIR, $dir or return [];
-    for my $file (readdir DIR) {
-
-        # Hidden file
-        next if $file =~ /^\./;
-
-        # File
-        my $path = File::Spec->catfile($dir, $file);
-        if (-f $path) {
-            $path = File::Spec->abs2rel($path, $root);
-            push @files, join '/', File::Spec->splitdir($path);
-            next;
-        }
-
-        # Directory
-        push @dirs, $path if -d $path;
-    }
-    closedir DIR;
-
-    # Walk directories
-    for my $path (@dirs) {
-        my $new = $self->_list_templates($path);
-        push @files, @$new;
-    }
-
-    return [sort @files];
 }
 
 # Well, at least here you'll be treated with dignity.

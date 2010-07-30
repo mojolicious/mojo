@@ -30,7 +30,7 @@ __PACKAGE__->attr(cookie_jar => sub { Mojo::CookieJar->new });
 __PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->new });
 __PACKAGE__->attr(keep_alive_timeout         => 15);
 __PACKAGE__->attr(log                        => sub { Mojo::Log->new });
-__PACKAGE__->attr(max_keep_alive_connections => 0);
+__PACKAGE__->attr(max_keep_alive_connections => 5);
 __PACKAGE__->attr(max_redirects     => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 });
 __PACKAGE__->attr(websocket_timeout => 300);
 
@@ -47,14 +47,12 @@ sub DESTROY {
     # Cleanup active connections
     my $cs = $self->{_cs} || {};
     $loop->drop($_) for keys %$cs;
-    $self->{_cs} = {};
 
     # Cleanup keep alive connections
     my $cache = $self->{_cache} || [];
     for my $cached (@$cache) {
         $loop->drop($cached->[1]);
     }
-    $self->{_cache} = [];
 }
 
 # Homer, it's easy to criticize.
@@ -596,6 +594,9 @@ sub _connect {
             # CONNECT request to proxy required
             return if $self->_connect_proxy($tx, $cb);
         }
+
+        # Weaken
+        weaken $self;
 
         # Connect
         $id = $loop->connect(
@@ -1202,9 +1203,7 @@ be used.
     $client                        = $client->max_keep_alive_connections(5);
 
 Maximum number of keep alive connections that the client will retain before
-it starts closing the oldest cached ones, defaults to C<0>.
-Note that all cloned clients have their own keep alive connection queue, so
-you can quickly run out of file descriptors with too many active clients.
+it starts closing the oldest cached ones, defaults to C<5>.
 
 =head2 C<max_redirects>
 
@@ -1264,6 +1263,8 @@ clients.
 
 Clone client instance and start using the global shared L<Mojo::IOLoop>
 singleton if it is running.
+Note that all cloned clients have their own keep alive connection queue, so
+you can quickly run out of file descriptors with too many active clients.
 
 =head2 C<build_form_tx>
 
@@ -1340,6 +1341,8 @@ Versatile WebSocket transaction builder.
     my $clone = $client->clone;
 
 Clone client the instance.
+Note that all cloned clients have their own keep alive connection queue, so
+you can quickly run out of file descriptors with too many active clients.
 
 =head2 C<delete>
 

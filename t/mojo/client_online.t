@@ -57,7 +57,7 @@ $client->process($tx);
 is($tx->state, 'error', 'right state');
 
 # Keep alive
-my $async = $client->async->max_keep_alive_connections(5);
+my $async = $client->async;
 $async->get('http://mojolicio.us', sub { shift->ioloop->stop })->process;
 $async->ioloop->start;
 my $kept_alive = undef;
@@ -223,16 +223,16 @@ $client->get(
     }
 );
 $client->process;
-is($method,      'GET',                   'right method');
-is($url,         'http://google.com',     'right url');
-is($code,        301,                     'right status');
-is($method2,     'GET',                   'right method');
-is($url2,        'http://www.apache.org', 'right url');
-is($code2,       200,                     'right status');
-is(!$kept_alive, 1,                       'connection was not kept alive');
-is($method3,     'GET',                   'right method');
-is($url3,        'http://www.google.de',  'right url');
-is($code3,       200,                     'right status');
+is($method,     'GET',                   'right method');
+is($url,        'http://google.com',     'right url');
+is($code,       301,                     'right status');
+is($method2,    'GET',                   'right method');
+is($url2,       'http://www.apache.org', 'right url');
+is($code2,      200,                     'right status');
+is($kept_alive, 1,                       'connection was kept alive');
+is($method3,    'GET',                   'right method');
+is($url3,       'http://www.google.de',  'right url');
+is($code3,      200,                     'right status');
 
 # Simple requests with redirect
 ($method, $url, $code, $method2, $url2, $code2) = undef;
@@ -304,7 +304,7 @@ $client->queue(
 );
 $client->process;
 ok($done,        'state is done');
-ok(!$kept_alive, 'connection was not kept alive');
+ok($kept_alive,  'connection was kept alive');
 ok($tx->is_done, 'right state');
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
@@ -322,10 +322,10 @@ $client->process(
         $port2      = $tx->remote_port, 80;
     }
 );
-ok($done,        'state is done');
-ok(!$kept_alive, 'connection was not kept alive');
-ok($address,     'has local address');
-ok($port > 0,    'has local port');
+ok($done,       'state is done');
+ok($kept_alive, 'connection was kept alive');
+ok($address,    'has local address');
+ok($port > 0,   'has local port');
 is($port2, 80, 'right remote port');
 ok($tx->is_done, 'state is done');
 

@@ -70,6 +70,7 @@ WriteMakefile(
         'POSIX'                 => 0,
         'Scalar::Util'          => 0,
         'Storable'              => 0,
+        'Sys::Hostname'         => 0,
         'Test::Builder'         => 0,
         'Test::Harness'         => 0,
         'Test::More'            => 0,

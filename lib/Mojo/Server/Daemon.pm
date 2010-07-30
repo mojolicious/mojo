@@ -13,6 +13,12 @@ use IO::File;
 use Mojo::Command;
 use Mojo::IOLoop;
 use Scalar::Util 'weaken';
+use Sys::Hostname;
+
+# Bonjour
+use constant BONJOUR => $ENV{MOJO_NO_BONJOUR}
+  ? 0
+  : eval 'use Net::Rendezvous::Publish (); 1';
 
 __PACKAGE__->attr(
     [qw/group listen listen_queue_size max_requests silent user/]);
@@ -298,6 +304,18 @@ sub _listen {
     $self->{_listen} ||= [];
     push @{$self->{_listen}}, $id;
 
+    # Bonjour
+    if (BONJOUR && (my $p = Net::Rendezvous::Publish->new)) {
+        my $port = $options->{port};
+        my $name = $options->{address} || Sys::Hostname::hostname();
+        $p->publish(
+            name   => "Mojolicious ($name)",
+            type   => '_http._tcp',
+            domain => 'local',
+            port   => $port
+        ) if $port;
+    }
+
     # Log
     $self->app->log->info("Server listening ($listen)");
 
@@ -447,8 +465,9 @@ L<Mojo::Server::Daemon> is a full featured async io HTTP 1.1 and WebSocket
 server with C<IPv6>, C<TLS>, C<epoll>, C<kqueue>, hot deployment and UNIX
 domain socket sharing support.
 
-Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::INET6> and
-L<IO::Socket::SSL> are supported transparently and used if installed.
+Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::INET6>,
+L<IO::Socket::SSL> and L<Net::Rendezvous::Publish> are supported
+transparently and used if installed.
 
 =head1 ATTRIBUTES
 

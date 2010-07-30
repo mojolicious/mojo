@@ -157,6 +157,10 @@ sub connect {
     return unless my $socket = $args->{socket} || $class->new(%options);
     my $id = "$socket";
 
+    # File descriptor
+    return unless defined(my $fd = fileno $socket);
+    $self->{_fds}->{$fd} = $id;
+
     # Add connection
     my $c = $self->{_cs}->{$id} = {
         buffer     => Mojo::ByteStream->new,
@@ -175,10 +179,6 @@ sub connect {
     $c->{connect_timer} =
       $self->timer($self->connect_timeout =>
           sub { shift->_error($id, 'Connect timeout.') });
-
-    # File descriptor
-    my $fd = fileno $socket;
-    $self->{_fds}->{$fd} = $id;
 
     # Register callbacks
     for my $name (qw/error_cb hup_cb read_cb write_cb/) {

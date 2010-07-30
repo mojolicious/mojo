@@ -12,7 +12,7 @@ use Test::More;
 
 plan skip_all => 'set TEST_CLIENT to enable this test (developer only!)'
   unless $ENV{TEST_CLIENT};
-plan tests => 103;
+plan tests => 104;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -71,6 +71,33 @@ $async->get(
 )->process;
 $async->ioloop->start;
 is($kept_alive, 1, 'connection was kept alive');
+
+# Nested keep alive
+my @kept_alive;
+$client->async->get(
+    'http://mojolicio.us',
+    sub {
+        my ($self, $tx) = @_;
+        push @kept_alive, $tx->kept_alive;
+        $self->async->get(
+            'http://mojolicio.us',
+            sub {
+                my ($self, $tx) = @_;
+                push @kept_alive, $tx->kept_alive;
+                $self->async->get(
+                    'http://mojolicio.us',
+                    sub {
+                        my ($self, $tx) = @_;
+                        push @kept_alive, $tx->kept_alive;
+                        $self->ioloop->stop;
+                    }
+                )->process;
+            }
+        )->process;
+    }
+)->process;
+$client->ioloop->start;
+is_deeply(\@kept_alive, [1, 1, 1], 'connections kept alive');
 
 # Custom non keep alive request
 $tx = Mojo::Transaction::HTTP->new;

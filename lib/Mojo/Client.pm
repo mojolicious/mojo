@@ -1120,14 +1120,6 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
     $client->get('http://search.cpan.org' => $callback);
     $client->process;
 
-    # Async request
-    $client->async->get(
-        'http://kraih.com' => sub {
-            my $client = shift;
-            print $client->res->code;
-        }
-    )->process;
-
     # Websocket request
     $client->websocket(
         'ws://websockets.org:8787' => sub {
@@ -1273,16 +1265,9 @@ clients.
     my $async = $client->async;
 
 Clone client instance and start using the global shared L<Mojo::IOLoop>
-singleton.
-In case of connection failures the callback can be triggered immediately,
-independent from reactor ticks.
-Note that parallel requests are always handled asynchronous, this only
-affects shared L<Mojo::IOLoop> instances.
-
-    $client->async->get('http://mojolicious.org' => sub {
-        my $client = shift;
-        print $client->res->body;
-    })->process;
+singleton if it is running.
+Note that all cloned clients have their own keep alive connection queue, so
+you can quickly run out of file descriptors with too many active clients.
 
 =head2 C<build_form_tx>
 
@@ -1359,8 +1344,8 @@ Versatile WebSocket transaction builder.
     my $clone = $client->clone;
 
 Clone client the instance.
-Note that cloned clients don't share the same keep alive queue, so you could
-easily run out of file descriptors with too many active clients.
+Note that all cloned clients have their own keep alive connection queue, so
+you can quickly run out of file descriptors with too many active clients.
 
 =head2 C<delete>
 

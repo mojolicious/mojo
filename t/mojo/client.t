@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 5;
+plan tests => 805;
 
 use_ok('Mojo::Client');
 
@@ -61,3 +61,12 @@ $client->async->get(
 )->process;
 $client->ioloop->start;
 is_deeply(\@kept_alive, [undef, 1, 1], 'connections kept alive');
+
+# Stress test to make sure we don't leak file descriptors
+for (1 .. 200) {
+    my $tx = Mojo::Client->new->app(app)->get('/');
+    is($tx->res->code, 200,     'right status');
+    is($tx->res->body, 'works', 'right content');
+    ok($tx->success, 'request successful');
+    is($tx->kept_alive, undef, 'connection not kept alive');
+}

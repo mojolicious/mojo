@@ -284,7 +284,9 @@ Write server data.
     my $res = $tx->success;
 
 Returns the L<Mojo::Message::Response> object (C<res>) if transaction was
-successful and had no connection/parser errors or C<undef> otherwise.
+successful or C<undef> otherwise.
+Connection and parser errors have only a message in C<error>, 400 and 500
+responses also a code.
 Note that this method is EXPERIMENTAL and might change without warning!
 
     if (my $res = $tx->success) {
@@ -292,7 +294,12 @@ Note that this method is EXPERIMENTAL and might change without warning!
     }
     else {
         my ($message, $code) = $tx->error;
-        print "Error $code: $message";
+        if ($code) {
+            print "$code $message response.\n";
+        }
+        else {
+            print "Connection error: $message\n";
+        }
     }
 
 Error messages can be accessed with the C<error> method of the transaction

@@ -91,6 +91,7 @@ websocket '/subreq' => sub {
             $client->send_message('test1');
         }
     )->process;
+    $self->send_message('test0');
 };
 
 # WebSocket /echo
@@ -206,18 +207,19 @@ is($denied,    1,   'finished websocket');
 $client->websocket(
     '/subreq' => sub {
         my $self = shift;
-        $code = $self->res->code;
+        $code   = $self->res->code;
+        $result = '';
         $self->receive_message(
             sub {
                 my ($self, $message) = @_;
-                $result = $message;
-                $self->finish;
+                $result .= $message;
+                $self->finish if $message eq 'test1';
             }
         );
     }
 )->process;
-is($code,   101,     'right status');
-is($result, 'test1', 'right result');
+is($code,   101,          'right status');
+is($result, 'test0test1', 'right result');
 
 # WebSocket /dead (dies)
 $code = undef;

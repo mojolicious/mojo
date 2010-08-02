@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 18;
+plan tests => 26;
 
 # Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
 # Well, that’s love for you.
@@ -75,6 +75,7 @@ websocket '/denied' => sub {
 };
 
 # WebSocket /subreq
+my $subreq = 0;
 websocket '/subreq' => sub {
     my $self = shift;
     $self->client->async->websocket(
@@ -92,6 +93,7 @@ websocket '/subreq' => sub {
         }
     )->process;
     $self->send_message('test0');
+    $self->finished(sub { $subreq += 3 });
 };
 
 # WebSocket /echo
@@ -203,6 +205,7 @@ is($handshake, 2,   'finished handshake');
 is($denied,    1,   'finished websocket');
 
 # WebSocket /subreq
+my $finished = 0;
 ($code, $result) = undef;
 $client->websocket(
     '/subreq' => sub {
@@ -216,10 +219,57 @@ $client->websocket(
                 $self->finish if $message eq 'test1';
             }
         );
+        $self->finished(sub { $finished += 4 });
     }
 )->process;
-is($code,   101,          'right status');
-is($result, 'test0test1', 'right result');
+is($code,     101,          'right status');
+is($result,   'test0test1', 'right result');
+is($finished, 4,            'finished client websocket');
+is($subreq,   3,            'finished server websocket');
+
+# WebSocket /subreq (async)
+my $running = 2;
+my ($code2, $result2);
+($code, $result) = undef;
+$client->async->websocket(
+    '/subreq' => sub {
+        my $self = shift;
+        $code   = $self->res->code;
+        $result = '';
+        $self->receive_message(
+            sub {
+                my ($self, $message) = @_;
+                $result .= $message;
+                $self->finish and $running-- if $message eq 'test1';
+                $self->ioloop->idle_cb(sub { shift->stop }) unless $running;
+            }
+        );
+        $self->finished(sub { $finished += 1 });
+    }
+)->process;
+$client->async->websocket(
+    '/subreq' => sub {
+        my $self = shift;
+        $code2   = $self->res->code;
+        $result2 = '';
+        $self->receive_message(
+            sub {
+                my ($self, $message) = @_;
+                $result2 .= $message;
+                $self->finish and $running-- if $message eq 'test1';
+                $self->ioloop->idle_cb(sub { shift->stop }) unless $running;
+            }
+        );
+        $self->finished(sub { $finished += 2 });
+    }
+)->process;
+$client->ioloop->start;
+is($code,     101,          'right status');
+is($result,   'test0test1', 'right result');
+is($code2,    101,          'right status');
+is($result2,  'test0test1', 'right result');
+is($finished, 7,            'finished client websocket');
+is($subreq,   9,            'finished server websocket');
 
 # WebSocket /dead (dies)
 $code = undef;

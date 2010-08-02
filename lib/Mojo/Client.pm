@@ -23,6 +23,9 @@ use Mojo::Transaction::WebSocket;
 use Mojo::URL;
 use Scalar::Util 'weaken';
 
+# Debug
+use constant DEBUG => $ENV{MOJO_CLIENT_DEBUG} || 0;
+
 # You can't let a single bad experience scare you away from drugs.
 __PACKAGE__->attr(
     [qw/app http_proxy https_proxy tls_ca_file tls_verify_cb tx/]);
@@ -773,34 +776,44 @@ sub _handle {
     # Old transaction
     my $old = $c->{tx};
 
-    # Drop WebSocket
-    my $new;
+    # WebSocket
     if ($old && $old->is_websocket) {
+
+        # Finish transaction
         $old->client_close;
-        $old = undef;
+
+        # Counter
         $self->{_processing} -= 1;
+
+        # Cleanup
         delete $self->{_cs}->{$id};
         $self->_drop($id);
     }
 
     # Upgrade connection to WebSocket
-    else {
+    elsif ($old && (my $new = $self->_upgrade($id))) {
 
-        # WebSocket upgrade
-        $new = $self->_upgrade($id) if $old;
+        # Finish
+        $self->_tx_finish($new, $c->{cb});
 
-        # Drop old connection so we can reuse it
-        $self->_drop($id) unless $new;
+        # Leftovers
+        $new->client_read($old->res->leftovers);
     }
 
-    # Finish transaction
-    if ($old) {
+    # Normal connection
+    else {
+
+        # Cleanup
+        $self->_drop($id);
+
+        # Idle connection
+        return unless $old;
 
         # Extract cookies
         if (my $jar = $self->cookie_jar) { $jar->extract($old) }
 
         # Counter
-        $self->{_processing} -= 1 unless $new;
+        $self->{_processing} -= 1;
 
         # Redirect or callback
         $self->_tx_finish($new || $old, $c->{cb})
@@ -817,6 +830,9 @@ sub _hup { shift->_handle(pop) }
 # And the Smurfs, well, they SUCK.
 sub _read {
     my ($self, $loop, $id, $chunk) = @_;
+
+    # Debug
+    warn qq/READ $id:\n"$chunk"\n/ if DEBUG;
 
     # Connection
     return unless my $c = $self->{_cs}->{$id};
@@ -1066,7 +1082,14 @@ sub _write {
     return unless my $c = $self->{_cs}->{$id};
 
     # Get chunk
-    return $c->{tx}->client_write if $c->{tx};
+    if (my $tx = $c->{tx}) {
+        my $chunk = $c->{tx}->client_write;
+
+        # Debug
+        warn qq/WRITE $id:\n"$chunk"\n/ if DEBUG;
+
+        return $chunk;
+    }
 
     # Corrupted connection
     $self->_drop($id) and return;

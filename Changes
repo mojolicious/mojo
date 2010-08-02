@@ -59,8 +59,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed small url_for bug.
         - Fixed Mojo::IOLoop to not connect to TLS hosts without checking TLS
           support first. (ashleydev)
-        - Fixed a WebSocket finished callback bug.
-        - Fixed a WebSocket subrequest bug.
+        - Fixed multiple WebSocket bugs.
         - Fixed Test::Mojo::Server to be more portable. (afresh1)
         - Fixed url_for to not expose userinfo in absolute URLs.
         - Fixed path detection bug in generated scripts. (merlyn)

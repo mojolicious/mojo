@@ -134,7 +134,7 @@ Most commonly used features every L<Mojolicious> developer should know about.
 =head2 Automatic Rendering
 
 The renderer can be manually started by calling the C<render> controller
-method, but thats usually not neccessary, because it will get automatically
+method, but thats usually not necessary, because it will get automatically
 called if nothing has been rendered after the routes dispatcher finished its
 work.
 This also means you can have routes pointing only to templates without actual
@@ -429,7 +429,7 @@ can be easily changed.
     1;
 
 All templates from the DATA section are bound to the encoding of the Perl
-script, so don't forget to use the L<utf8> pragma if neccessary.
+script, so don't forget to use the L<utf8> pragma if necessary.
 
 =head2 Inflating DATA Templates
 

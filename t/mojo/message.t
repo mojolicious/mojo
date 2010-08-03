@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 632;
+use Test::More tests => 640;
 
 use File::Spec;
 use File::Temp;
@@ -225,6 +225,27 @@ is($req->headers->content_length, 13, 'right "Content-Length" value');
 is($req->headers->content_type, 'text/plain', 'right "Content-Type" value');
 is($req->content->asset->size,  13,           'right size');
 is($req->content->asset->slurp, 'abcdabcdefghi', 'right content');
+
+# Parse HTTP 1.1 chunked request with callback
+$req = Mojo::Message::Request->new;
+my $buffer = '';
+$req->body_cb(sub { $buffer .= pop });
+$req->parse("POST /foo/bar/baz.html?foo=13#23 HTTP/1.1\x0d\x0a");
+$req->parse("Content-Type: text/plain\x0d\x0a");
+$req->parse("Transfer-Encoding: chunked\x0d\x0a\x0d\x0a");
+$req->parse("4\x0d\x0a");
+$req->parse("abcd\x0d\x0a");
+$req->parse("9\x0d\x0a");
+$req->parse("abcdefghi\x0d\x0a");
+$req->parse("0\x0d\x0a\x0d\x0a");
+is($req->state,         'done',                        'state is done');
+is($req->method,        'POST',                        'right method');
+is($req->major_version, 1,                             'right major version');
+is($req->minor_version, 1,                             'right minor version');
+is($req->url,           '/foo/bar/baz.html?foo=13#23', 'right URL');
+is($req->headers->content_length, 13, 'right "Content-Length" value');
+is($req->headers->content_type, 'text/plain', 'right "Content-Type" value');
+is($buffer, 'abcdabcdefghi', 'right content');
 
 # Parse HTTP 1.1 "x-application-urlencoded"
 $req = Mojo::Message::Request->new;

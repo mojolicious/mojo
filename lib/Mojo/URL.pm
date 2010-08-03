@@ -186,7 +186,7 @@ sub query {
     if (@_) {
 
         # Multiple values
-        if (@_ > 1) {
+        if (@_ > 1 || (ref $_[0] && ref $_[0] eq 'ARRAY')) {
             $self->{query} = Mojo::Parameters->new(ref $_[0] ? @{$_[0]} : @_);
         }
 

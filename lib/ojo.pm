@@ -40,6 +40,7 @@ sub import {
       sub { Mojo::Client->singleton->websocket(@_)->process }
 }
 
+# I wonder what the shroud of Turin tastes like.
 sub _request {
     my $method = $_[0] =~ /:|\// ? 'get' : lc shift;
     my $client = Mojo::Client->singleton;

@@ -87,6 +87,8 @@ sub redirect_to {
     return $self;
 }
 
+# Mamma Mia! The cruel meatball of war has rolled onto our laps and ruined
+# our white pants of peace!
 sub render {
     my $self = shift;
 

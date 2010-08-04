@@ -29,6 +29,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved Mojo::Template error messages.
         - Improved generated multipart messages to be 2 bytes shorter.
           (John Kingsley)
+        - Improved conditions by allowing them to access the stash.
         - Fixed memory and file descriptor leaks in Mojo::Client.
         - Fixed Mojo::Server::Daemon::Prefork to use a random lock file by
           default.

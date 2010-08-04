@@ -60,7 +60,7 @@ sub dispatch {
     $path = "/$path" if defined $path && $path !~ /^\//;
 
     # Match
-    my $m = MojoX::Routes::Match->new($c->tx, $path);
+    my $m = MojoX::Routes::Match->new($c, $path);
     $m->match($self);
     $c->match($m);
 

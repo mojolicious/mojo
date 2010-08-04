@@ -25,16 +25,16 @@ sub new {
     # Method condition
     $self->add_condition(
         method => sub {
-            my ($r, $tx, $stash, $methods) = @_;
+            my ($r, $c, $captures, $methods) = @_;
 
             # Methods
             return unless $methods && ref $methods eq 'ARRAY';
 
             # Match
-            my $m = lc $tx->req->method;
+            my $m = lc $c->req->method;
             $m = 'get' if $m eq 'head';
             for my $method (@$methods) {
-                return $stash if $method eq $m;
+                return $captures if $method eq $m;
             }
 
             # Nothing
@@ -45,10 +45,10 @@ sub new {
     # WebSocket condition
     $self->add_condition(
         websocket => sub {
-            my ($r, $tx, $stash) = @_;
+            my ($r, $c, $captures) = @_;
 
             # WebSocket
-            return $stash if $tx->is_websocket;
+            return $captures if $c->is_websocket;
 
             # Not a WebSocket
             return;

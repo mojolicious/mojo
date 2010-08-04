@@ -12,16 +12,16 @@ use Mojo::ByteStream 'b';
 use Mojo::URL;
 
 __PACKAGE__->attr(captures => sub { {} });
-__PACKAGE__->attr([qw/endpoint root tx/]);
+__PACKAGE__->attr([qw/controller endpoint root/]);
 __PACKAGE__->attr(stack => sub { [] });
 
 # I'm Bender, baby, please insert liquor!
 sub new {
     my $self = shift->SUPER::new();
-    my $tx   = shift;
-    $self->tx($tx);
+    my $c    = shift;
+    $self->controller($c);
     $self->{_path} = shift
-      || b($tx->req->url->path->to_string)->url_unescape->decode('UTF-8')
+      || b($c->req->url->path->to_string)->url_unescape->decode('UTF-8')
       ->to_string;
     return $self;
 }
@@ -49,7 +49,8 @@ sub match {
         return unless $condition;
 
         # Match
-        my $captures = $condition->($r, $self->tx, $self->captures, $value);
+        my $captures =
+          $condition->($r, $self->controller, $self->captures, $value);
 
         # Matched
         return unless $captures && ref $captures eq 'HASH';
@@ -221,7 +222,7 @@ MojoX::Routes::Match - Routes Visitor
     use MojoX::Routes::Match;
 
     # New match object
-    my $m = MojoX::Routes::Match->new($tx);
+    my $m = MojoX::Routes::Match->new($c);
 
     # Match
     $m->match($routes);
@@ -240,6 +241,13 @@ L<MojoX::Routes::Match> implements the following attributes.
     $m           = $m->captures({foo => 'bar'});
 
 Captured parameters.
+
+=head2 C<controller>
+
+    my $c = $m->controller;
+    $m    = $m->controller(MojoX::Controller->new);
+
+Controller object used for matching.
 
 =head2 C<endpoint>
 
@@ -262,13 +270,6 @@ The root of the routes tree.
 
 Captured parameters with nesting history.
 
-=head2 C<tx>
-
-    my $tx = $m->tx;
-    $m     = $m->tx(Mojo::Transaction::HTTP->new);
-
-Transaction object used for matching.
-
 =head1 METHODS
 
 L<MojoX::Routes::Match> inherits all methods from L<Mojo::Base> and
@@ -277,7 +278,7 @@ implements the following ones.
 =head2 C<new>
 
     my $m = MojoX::Routes::Match->new;
-    my $m = MojoX::Routes::Match->new(Mojo::Transaction::HTTP->new);
+    my $m = MojoX::Routes::Match->new(MojoX:Controller->new);
 
 Construct a new match object.
 

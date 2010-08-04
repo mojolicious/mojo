@@ -39,7 +39,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 31;
+use Test::More tests => 32;
 
 use Mojo;
 use Mojo::Transaction::HTTP;
@@ -74,10 +74,12 @@ $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('POST');
 $tx->req->url->parse('/foo/hello');
 $c->tx($tx);
+$c->stash(test => 23);
 is($d->dispatch($c),               '',                 'dispatched');
 is($c->stash->{controller},        'foo',              'right value');
 is($c->stash->{action},            'bar',              'right value');
 is($c->stash->{capture},           'hello',            'right value');
+is($c->stash->{test},              23,                 'right value');
 is(ref $c->stash->{'mojo.params'}, 'Mojo::Parameters', 'right parameters');
 is($c->param('controller'),        'foo',              'right value');
 is($c->param('action'),            'bar',              'right value');

@@ -16,7 +16,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 485;
+plan tests => 490;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -389,6 +389,22 @@ get '/koi8-r' => sub {
 
 # GET /hello3.txt
 get '/hello3.txt' => sub { shift->render_static('hello2.txt') };
+
+# Condition
+app->routes->add_condition(
+    default => sub {
+        my ($r, $c, $captures, $num) = @_;
+        return $captures if $c->stash->{default} == $num;
+        return;
+    }
+);
+
+# GET /default/condition
+get '/default/condition' => (default => 23) => sub {
+    my $self    = shift;
+    my $default = $self->stash('default');
+    $self->render(text => "works $default");
+};
 
 under sub {
     my $self = shift;
@@ -1112,6 +1128,11 @@ $t->get_ok('/hello3.txt', {'Range' => 'bytes=0-0'})->status_is(206)
   ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
   ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 1)
   ->content_is('X');
+
+# GET /default/condition
+$t->get_ok('/default/condition')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('works 23');
 
 # GET /bridge2stash
 $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)

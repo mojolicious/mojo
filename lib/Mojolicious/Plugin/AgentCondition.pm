@@ -15,13 +15,13 @@ sub register {
     # Agent
     $app->routes->add_condition(
         agent => sub {
-            my ($r, $tx, $captures, $pattern) = @_;
+            my ($r, $c, $captures, $pattern) = @_;
 
             # Pattern
             return unless $pattern && ref $pattern eq 'Regexp';
 
             # Match
-            my $agent = $tx->req->headers->user_agent;
+            my $agent = $c->req->headers->user_agent;
             return $captures if $agent && $agent =~ $pattern;
 
             # Nothing

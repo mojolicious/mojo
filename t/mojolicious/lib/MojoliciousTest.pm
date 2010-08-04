@@ -41,6 +41,17 @@ sub startup {
     # Routes
     my $r = $self->routes;
 
+    # /auth (authentication bridge)
+    my $auth = $r->bridge('/auth')->to(
+        cb => sub {
+            return 1 if shift->req->headers->header('X-Bender');
+            return;
+        }
+    );
+
+    # /auth/authenticated
+    $auth->route('/authenticated')->to('foo#authenticated');
+
     # /stash_config
     $r->route('/stash_config')
       ->to(controller => 'foo', action => 'config', config => {test => 123});

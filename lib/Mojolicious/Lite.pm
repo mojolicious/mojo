@@ -73,8 +73,7 @@ sub import {
 
         # Defaults
         $defaults ||= {};
-        $defaults = {%$defaults, cb => $cb || undef};
-        $defaults->{app} ||= undef;
+        $defaults->{cb} = $cb if $cb;
 
         # Name
         $name ||= '';

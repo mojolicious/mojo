@@ -90,8 +90,11 @@ sub match {
     $self->captures->{format} ||= $r->pattern->format if $r->pattern->format;
 
     # Update stack
-    push @{$self->stack}, $captures
-      if $r->inline || ($r->is_endpoint && $self->_is_path_empty);
+    if ($r->inline || ($r->is_endpoint && $self->_is_path_empty)) {
+        push @{$self->stack}, {%$captures};
+        delete $captures->{cb};
+        delete $captures->{app};
+    }
 
     # Waypoint match
     if ($r->block && $self->_is_path_empty) {

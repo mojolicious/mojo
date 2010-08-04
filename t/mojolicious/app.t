@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 182;
+plan tests => 194;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -54,6 +54,18 @@ $t->get_ok('/foo/syntaxerror')->status_is(500)
 # Foo::badtemplate (template missing)
 $t->get_ok('/foo/badtemplate')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_like(qr/File Not Found/);
+
+# Foo::authenticated (authentication bridge)
+$t->get_ok('/auth/authenticated', {'X-Bender' => 'Hi there!'})->status_is(200)
+  ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('authenticated');
+
+# Foo::authenticated (authentication bridge)
+$t->get_ok('/auth/authenticated')->status_is(404)
+  ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/File Not Found/);
 

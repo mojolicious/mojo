@@ -48,7 +48,7 @@ sub new {
             my ($r, $c, $captures) = @_;
 
             # WebSocket
-            return $captures if $c->is_websocket;
+            return $captures if $c->tx->is_websocket;
 
             # Not a WebSocket
             return;

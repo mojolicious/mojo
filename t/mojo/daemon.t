@@ -16,7 +16,7 @@ use Test::Mojo::Server;
 
 plan skip_all => 'set TEST_DAEMON to enable this test (developer only!)'
   unless $ENV{TEST_DAEMON};
-plan tests => 46;
+plan tests => 43;
 
 # Daddy, I'm scared. Too scared to even wet my pants.
 # Just relax and it'll come, son.
@@ -45,14 +45,14 @@ is($tx->res->code, 200,    'right status');
 like($tx->res->headers->connection, qr/close/i, 'right "Connection" header');
 like($tx->res->body, qr/Mojo is working/, 'right content');
 
-# Multiple requests with 100 Continue
+# Multiple requests
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse("http://127.0.0.1:$port/1/");
 my $tx2 = Mojo::Transaction::HTTP->new;
 $tx2->req->method('GET');
 $tx2->req->url->parse("http://127.0.0.1:$port/2/");
-$tx2->req->headers->expect('100-continue');
+$tx2->req->headers->expect('fun');
 $tx2->req->body('foo bar baz');
 my $tx3 = Mojo::Transaction::HTTP->new;
 $tx3->req->method('GET');
@@ -67,20 +67,18 @@ ok($tx3->is_done, 'state is done');
 ok($tx4->is_done, 'state is done');
 is($tx->res->code,  200, 'right status');
 is($tx2->res->code, 200, 'right status');
-is($tx2->continued, 1,   'transaction was continued');
 is($tx3->res->code, 200, 'right status');
 is($tx4->res->code, 200, 'right status');
 like($tx2->res->content->asset->slurp, qr/Mojo is working/, 'right content');
 
-# 100 Continue request
+# Request
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse("http://127.0.0.1:$port/5/");
-$tx->req->headers->expect('100-continue');
+$tx->req->headers->expect('fun');
 $tx->req->body('Hello Mojo!');
 $client->process($tx);
 is($tx->res->code, 200, 'right status');
-is($tx->continued, 1,   'transaction was continued');
 like($tx->res->headers->connection,
     qr/Keep-Alive/i, 'right "Connection" header');
 like($tx->res->body, qr/Mojo is working/, 'right content');
@@ -121,14 +119,14 @@ is($tx->res->code,  200, 'right status');
 is($tx2->res->code, 200, 'right status');
 like($tx2->res->content->asset->slurp, qr/Mojo is working/, 'right content');
 
-# Multiple requests with 100 Continue and a chunked response
+# Multiple requests with a chunked response
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse("http://127.0.0.1:$port/10/");
 $tx2 = Mojo::Transaction::HTTP->new;
 $tx2->req->method('GET');
 $tx2->req->url->parse("http://127.0.0.1:$port/11/");
-$tx2->req->headers->expect('100-continue');
+$tx2->req->headers->expect('fun');
 $tx2->req->body('foo bar baz');
 $tx3 = Mojo::Transaction::HTTP->new;
 $tx3->req->method('GET');
@@ -144,7 +142,6 @@ ok($tx3->is_done, 'state is done');
 ok($tx4->is_done, 'state is done');
 is($tx->res->code,  200, 'right status');
 is($tx2->res->code, 200, 'right status');
-is($tx2->continued, 1,   'transaction was continued');
 is($tx3->res->code, 200, 'right status');
 is($tx4->res->code, 200, 'right status');
 like($tx2->res->content->asset->slurp, qr/Mojo is working/, 'right content');

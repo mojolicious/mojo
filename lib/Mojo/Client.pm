@@ -1300,13 +1300,13 @@ you can quickly run out of file descriptors with too many active clients.
     my $tx = $client->build_form_tx(
         'http://kraih.com/foo',
         {test => 123},
-        {Expect => '100-continue'}
+        {Expect => 'fun'}
     );
     my $tx = $client->build_form_tx(
         'http://kraih.com/foo',
         'UTF-8',
         {test => 123},
-        {Expect => '100-continue'}
+        {Expect => 'fun'}
     );
     my $tx = $client->build_form_tx(
         'http://kraih.com/foo',
@@ -1475,13 +1475,13 @@ Send a HTTP C<POST> request.
     my $tx  = $client->post_form(
         'http://kraih.com/foo',
         {test => 123},
-        {Expect => '100-continue'}
+        {Expect => 'fun'}
     );
     my $tx  = $client->post_form(
         'http://kraih.com/foo',
         'UTF-8',
         {test => 123},
-        {Expect => '100-continue'}
+        {Expect => 'fun'}
     );
     my $tx = $client->post_form(
         'http://kraih.com/foo',
@@ -1505,14 +1505,14 @@ Send a HTTP C<POST> request.
     $client = $client->post_form(
         'http://kraih.com/foo',
         {test => 123},
-        {Expect => '100-continue'},
+        {Expect => 'fun'},
         sub {...}
     );
     $client = $client->post_form(
         'http://kraih.com/foo',
         'UTF-8',
         {test => 123},
-        {Expect => '100-continue'},
+        {Expect => 'fun'},
         sub {...}
     );
     $client = $client->post_form(

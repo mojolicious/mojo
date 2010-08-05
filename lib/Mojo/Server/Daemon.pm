@@ -196,16 +196,6 @@ sub _build_tx {
         }
     );
 
-    # Continue handler callback
-    $tx->continue_handler_cb(
-        sub {
-            my $tx = shift;
-
-            # Continue handler
-            $self->continue_handler_cb->($self, $tx);
-        }
-    );
-
     # Upgrade callback
     $tx->upgrade_cb(sub { $self->_upgrade($id, @_) });
 

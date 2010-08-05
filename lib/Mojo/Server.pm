@@ -44,23 +44,6 @@ __PACKAGE__->attr(
     }
 );
 __PACKAGE__->attr(
-    continue_handler_cb => sub {
-        sub {
-            my ($self, $tx) = @_;
-            if ($self->app->can('continue_handler')) {
-                $self->app->continue_handler($tx);
-
-                # Close connection to prevent potential race condition
-                unless ($tx->res->code == 100) {
-                    $tx->keep_alive(0);
-                    $tx->res->headers->connection('Close');
-                }
-            }
-            else { $tx->res->code(100) }
-        };
-    }
-);
-__PACKAGE__->attr(
     handler_cb => sub {
         sub { shift->app->handler(shift) }
     }
@@ -137,15 +120,6 @@ L<Mojo::HelloWorld>.
     });
 
 Transaction builder callback.
-
-=head2 C<continue_handler_cb>
-
-    my $handler = $server->continue_handler_cb;
-    $server     = $server->continue_handler_cb(sub {
-        my ($self, $tx) = @_;
-    });
-
-Callback handling C<100 Continue> requests.
 
 =head2 C<handler_cb>
 

@@ -10,10 +10,9 @@ use base 'Mojo::Transaction';
 use Mojo::Message::Request;
 use Mojo::Message::Response;
 
-__PACKAGE__->attr([qw/continue_handler_cb continued handler_cb upgrade_cb/]);
-__PACKAGE__->attr(continue_timeout => 5);
-__PACKAGE__->attr(req              => sub { Mojo::Message::Request->new });
-__PACKAGE__->attr(res              => sub { Mojo::Message::Response->new });
+__PACKAGE__->attr([qw/handler_cb upgrade_cb/]);
+__PACKAGE__->attr(req => sub { Mojo::Message::Request->new });
+__PACKAGE__->attr(res => sub { Mojo::Message::Response->new });
 
 # What's a wedding?  Webster's dictionary describes it as the act of removing
 # weeds from one's garden.
@@ -27,91 +26,43 @@ sub client_read {
     # Length
     my $read = length $chunk;
 
-    # Read 100 Continue
-    if ($self->is_state('read_continue')) {
-        $res->done if $read == 0;
-        $res->parse($chunk);
+    $self->done if $read == 0;
 
-        # We got a 100 Continue response
-        my $done = $res->is_state(qw/done done_with_leftovers/);
-        if ($done && $res->code == 100) {
-            $self->_new_response;
-            $self->continued(1);
-            $self->{_continue} = 0;
-        }
+    # HEAD response
+    if ($req->method eq 'HEAD') {
+        $res->parse_until_body($chunk);
+        while ($res->content->is_state('body')) {
 
-        # We got something else
-        elsif ($res->is_finished) {
-            $self->continued(0);
-            $self->done;
+            # Leftovers
+            if ($res->has_leftovers) {
+                $res->state('done_with_leftovers');
+                $self->state('done_with_leftovers');
+                last;
+            }
+
+            # Done
+            else { $self->done and last }
         }
     }
 
-    # Read response
+    # Normal response
     else {
-        $self->done if $read == 0;
 
-        # HEAD response
-        if ($req->method eq 'HEAD') {
-            $res->parse_until_body($chunk);
-            while ($res->content->is_state('body')) {
+        # Parse
+        $res->parse($chunk);
 
-                # Check for unexpected 1XX
-                if ($res->is_status_class(100)) { $self->_new_response(1) }
+        # Finished
+        if ($res->is_finished) {
 
-                # Leftovers
-                elsif ($res->has_leftovers) {
-                    $res->state('done_with_leftovers');
-                    $self->state('done_with_leftovers');
-                    last;
-                }
-
-                # Done
-                else { $self->done and last }
-            }
-        }
-
-        # Normal response
-        else {
-
-            # Parse
-            $res->parse($chunk);
-
-            # Finished
-            while ($res->is_finished) {
-
-                # Check for unexpected 100
-                if (($res->code || '') eq '100') { $self->_new_response }
-
-                else {
-
-                    # Inherit state
-                    $self->state($res->state);
-                    $self->error($res->error) if $res->has_error;
-                    last;
-                }
-            }
+            # Inherit state
+            $self->state($res->state);
+            $self->error($res->error) if $res->has_error;
         }
     }
 
     # Check for request/response errors
     $self->error($req->error) if $req->has_error;
     $self->error($res->error) if $res->has_error;
-
-    # Make sure we don't wait longer than the set time for a 100 Continue
-    # (defaults to 5 seconds)
-    if ($self->{_continue}) {
-        my $continue = $self->{_continue};
-        my $started = $self->{_started} ||= time;
-        $continue = $self->continue_timeout - (time - $started);
-        $continue = 0 if $continue < 0;
-        $self->{_continue} = $continue;
-    }
-
-    # 100 Continue timeout
-    if ($self->is_state('read_continue')) {
-        $self->state('write_body') unless $self->{_continue};
-    }
 
     return $self;
 }
@@ -141,10 +92,6 @@ sub client_write {
             }
             else { $headers->connection('Close') }
         }
-
-        # We might have to handle 100 Continue
-        $self->{_continue} = $self->continue_timeout
-          if ($req->headers->expect || '') =~ /100-continue/;
 
         # Ready for next state
         $state = 'write_start_line';
@@ -184,7 +131,7 @@ sub client_write {
         # Done
         if ($write <= 0) {
 
-            $state  = $self->{_continue} ? 'read_continue' : 'write_body';
+            $state  = 'write_body';
             $offset = 0;
             $write  = $req->body_size;
 
@@ -321,15 +268,15 @@ sub server_read {
     }
 
     # Expect 100 Continue
-    elsif ($req->content->is_state('body') && !defined $self->continued) {
+    elsif ($req->content->is_state('body') && !defined $self->{_continued}) {
         if (($req->headers->expect || '') =~ /100-continue/i) {
 
             # Writing
             $self->state('write');
 
-            # Continue handler callback
-            $self->continue_handler_cb->($self);
-            $self->continued(0);
+            # Continue
+            $res->code(100);
+            $self->{_continued} = 0;
         }
     }
 
@@ -430,11 +377,11 @@ sub server_write {
         if ($write <= 0) {
 
             # Continue done
-            if (defined $self->continued && $self->continued == 0) {
-                $self->continued(1);
+            if (defined $self->{_continued} && $self->{_continued} == 0) {
+                $self->{_continued} = 1;
                 $state = 'read';
 
-                # Continue
+                # New response after continue
                 if ($res->code == 100) { $self->res($res->new) }
 
                 # Don't continue
@@ -442,7 +389,7 @@ sub server_write {
             }
 
             # Everything done
-            elsif (!defined $self->continued) {
+            elsif (!defined $self->{_continued}) {
                 $state =
                   $req->is_state('done_with_leftovers')
                   ? 'done_with_leftovers'
@@ -483,31 +430,6 @@ sub server_write {
     return $chunk;
 }
 
-# Replace client response after receiving 100 Continue
-sub _new_response {
-    my $self = shift;
-
-    # 1 is special case for HEAD
-    my $until_body = @_ ? shift : 0;
-
-    my $res = $self->res;
-    my $new = $res->new;
-
-    # Check for leftovers in old response
-    if ($res->has_leftovers) {
-
-        $until_body
-          ? $new->parse_until_body($res->leftovers)
-          : $new->parse($res->leftovers);
-
-        $new->is_finished
-          ? $self->state($new->state)
-          : $self->state('read_response');
-    }
-
-    $self->res($new);
-}
-
 1;
 __END__
 
@@ -535,27 +457,6 @@ transactions as described in RFC 2616.
 
 L<Mojo::Transaction::HTTP> inherits all attributes from L<Mojo::Transaction>
 and implements the following new ones.
-
-=head2 C<continue_handler_cb>
-
-    my $cb = $tx->continue_handler_cb;
-    $tx    = $tx->continue_handler_cb(sub {...});
-
-Callback to handle C<100 Continue> requests.
-
-=head2 C<continue_timeout>
-
-    my $timeout = $tx->continue_timeout;
-    $tx         = $tx->continue_timeout(3);
-
-Timeout for C<100 Continue> requests.
-
-=head2 C<continued>
-
-    my $continued = $tx->continued;
-    $tx           = $tx->continued(1);
-
-Transaction was continued.
 
 =head2 C<handler_cb>
 

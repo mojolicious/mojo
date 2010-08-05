@@ -12,7 +12,7 @@ use Test::More;
 
 plan skip_all => 'set TEST_CLIENT to enable this test (developer only!)'
   unless $ENV{TEST_CLIENT};
-plan tests => 104;
+plan tests => 102;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -172,25 +172,22 @@ is($tx->req->body, 'query=mojolicious', 'right content');
 like($tx->res->body, qr/Mojolicious/, 'right content');
 is($tx->res->code, 200, 'right status');
 
-# Simple request with headers and body
-my ($body, $continued);
+# Simple request
+my $body;
 ($method, $url, $code) = undef;
 $client->get(
-    'http://www.apache.org' => {Expect => '100-continue'} => 'Hi there!' =>
-      sub {
+    'http://www.apache.org' => sub {
         my $self = shift;
-        $method    = $self->req->method;
-        $url       = $self->req->url;
-        $body      = $self->req->body;
-        $code      = $self->res->code;
-        $continued = $self->tx->continued;
+        $method = $self->req->method;
+        $url    = $self->req->url;
+        $body   = $self->req->body;
+        $code   = $self->res->code;
     }
 )->process;
 is($method, 'GET',                   'right method');
 is($url,    'http://www.apache.org', 'right url');
-is($body,   'Hi there!',             'right content');
+is($body,   '',                      'right content');
 is($code,   200,                     'right status');
-ok($continued, 'request was continued');
 
 # Simple parallel requests with keep alive
 ($method, $url, $code) = undef;
@@ -364,15 +361,13 @@ is($tx->res->code,  200, 'right status');
 is($tx2->res->code, 200, 'right status');
 like($tx2->res->content->asset->slurp, qr/Apache/, 'right content');
 
-# Multiple requests with 100 Continue
+# Multiple requests
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('http://www.apache.org');
 $tx2 = Mojo::Transaction::HTTP->new;
 $tx2->req->method('GET');
 $tx2->req->url->parse('http://www.apache.org');
-$tx2->req->headers->expect('100-continue');
-$tx2->req->body('foo bar baz');
 $tx3 = Mojo::Transaction::HTTP->new;
 $tx3->req->method('GET');
 $tx3->req->url->parse('http://www.apache.org');
@@ -386,7 +381,6 @@ ok($tx3->is_done, 'state is done');
 ok($tx4->is_done, 'state is done');
 is($tx->res->code,  200, 'right status');
 is($tx2->res->code, 200, 'right status');
-is($tx2->continued, 1,   'transaction was continued');
 is($tx3->res->code, 200, 'right status');
 is($tx4->res->code, 200, 'right status');
 like($tx2->res->content->asset->slurp, qr/Apache/, 'right content');

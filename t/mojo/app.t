@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 23;
+plan tests => 25;
 
 # I was so bored I cut the pony tail off the guy in front of us.
 # Look at me, I'm a grad student. I'm 30 years old and I made $600 last year.
@@ -32,6 +32,57 @@ is($app->log, $logger, 'right logger');
 
 $app = Mojo::HelloWorld->new;
 my $client = Mojo::Client->new->app($app);
+
+# Continue
+my $port   = $client->test_server;
+my $buffer = '';
+my $i      = 1;
+$client->ioloop->connect(
+    address => 'localhost',
+    port    => $port,
+    read_cb => sub {
+        my ($self, $id, $chunk) = @_;
+        $buffer .= $chunk;
+        $self->drop($id) and $self->stop if $buffer =~ /Mojo is working!/;
+        $self->writing($id)
+          if $buffer =~ /HTTP\/1.1 100 Continue.*\x0d\x0a\x0d\x0a/gs;
+    },
+    write_cb => sub {
+        my ($self, $id) = @_;
+        $self->not_writing($id);
+        return '4321' if $i == 2;
+        $i++;
+        return
+            "GET / HTTP/1.1\x0d\x0a"
+          . "Expect: 100-continue\x0d\x0a"
+          . "Content-Length: 4\x0d\x0a\x0d\x0a";
+    }
+);
+$client->ioloop->start;
+like($buffer, qr/HTTP\/1.1 100 Continue/, 'request was continued');
+
+# Pipelined
+$buffer = '';
+$client->ioloop->connect(
+    address => 'localhost',
+    port    => $port,
+    read_cb => sub {
+        my ($self, $id, $chunk) = @_;
+        $buffer .= $chunk;
+        $self->drop($id) and $self->stop if $buffer =~ /working!.*working!/gs;
+    },
+    write_cb => sub {
+        my ($self, $id) = @_;
+        $self->not_writing($id);
+        return
+            "GET / HTTP/1.1\x0d\x0a"
+          . "Content-Length: 0\x0d\x0a\x0d\x0a"
+          . "GET / HTTP/1.1\x0d\x0a"
+          . "Content-Length: 0\x0d\x0a\x0d\x0a";
+    }
+);
+$client->ioloop->start;
+like($buffer, qr/Mojo is working!/, 'transactions were pipelined');
 
 # Normal request
 my $tx = Mojo::Transaction::HTTP->new;

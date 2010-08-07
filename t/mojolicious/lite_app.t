@@ -960,8 +960,7 @@ $t->get_ok('/autostash?bar=23')->status_is(200)
 $t->get_ok('/helper')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is(
-    '23<br/>&lt;.../template(Mozilla/5.0 (compatible; Mojolicious; Perl))');
+  ->content_is('23<br/>&lt;.../template(Mojolicious (Perl))');
 
 # GET /helper
 $t->get_ok('/helper', {'User-Agent' => 'Explorer'})->status_is(200)

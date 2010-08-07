@@ -1000,8 +1000,7 @@ sub _tx_start {
       if $headers->upgrade && !$headers->origin;
 
     # We identify ourself
-    $headers->user_agent('Mozilla/5.0 (compatible; Mojolicious; Perl)')
-      unless $headers->user_agent;
+    $headers->user_agent('Mojolicious (Perl)') unless $headers->user_agent;
 
     # Inject cookies
     if (my $jar = $self->cookie_jar) { $jar->inject($tx) }

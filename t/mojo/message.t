@@ -487,8 +487,7 @@ $req = Mojo::Message::Request->new;
 $req->method('GET');
 $req->url->parse('http://127.0.0.1/');
 is( $req->build,
-    "GET / HTTP/1.1\x0d\x0a"
-      . "Host: 127.0.0.1\x0d\x0aContent-Length: 0\x0d\x0a\x0d\x0a",
+    "GET / HTTP/1.1\x0d\x0aHost: 127.0.0.1\x0d\x0a\x0d\x0a",
     'right message'
 );
 
@@ -500,7 +499,7 @@ $req->headers->expect('100-continue');
 is( $req->build,
     "GET /foo/bar HTTP/1.1\x0d\x0a"
       . "Expect: 100-continue\x0d\x0a"
-      . "Host: 127.0.0.1\x0d\x0aContent-Length: 0\x0d\x0a\x0d\x0a",
+      . "Host: 127.0.0.1\x0d\x0a\x0d\x0a",
     'right message'
 );
 
@@ -606,7 +605,7 @@ is( $req->build,
       . "Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==\x0d\x0a"
       . "Host: 127.0.0.1:3000\x0d\x0a"
       . "Proxy-Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==\x0d\x0a"
-      . "Content-Length: 0\x0d\x0a\x0d\x0a",
+      . "\x0d\x0a",
     'right message'
 );
 
@@ -770,14 +769,13 @@ $res->parse("HTTP/1.1 413 Request Entity Too Large\x0d\x0a"
       . "Connection: Close\x0d\x0a"
       . "Date: Tue, 09 Feb 2010 16:34:51 GMT\x0d\x0a"
       . "Server: Mojolicious (Perl)\x0d\x0a"
-      . "Content-Length: 0\x0d\x0a"
       . "X-Powered-By: Mojolicious (Perl)\x0d\x0a\x0d\x0a");
 ok($res->is_done, 'response is done');
 is($res->code,          413,                        'right status');
 is($res->message,       'Request Entity Too Large', 'right message');
 is($res->major_version, 1,                          'right major version');
 is($res->minor_version, 1,                          'right minor version');
-is($res->headers->content_length, 0, 'right "Content-Length" value');
+is($res->headers->content_length, undef, 'right "Content-Length" value');
 
 # Parse HTTP 1.1 chunked response
 $res = Mojo::Message::Response->new;
@@ -839,8 +837,7 @@ $res->code(404);
 $res->headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
 is( $res->build,
     "HTTP/1.1 404 Not Found\x0d\x0a"
-      . "Date: Sun, 17 Aug 2008 16:27:35 GMT\x0d\x0a"
-      . "Content-Length: 0\x0d\x0a\x0d\x0a",
+      . "Date: Sun, 17 Aug 2008 16:27:35 GMT\x0d\x0a\x0d\x0a",
     'right message'
 );
 
@@ -852,8 +849,7 @@ $res->headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
 is( $res->build,
     "HTTP/1.1 200 OK\x0d\x0a"
       . "Connection: keep-alive\x0d\x0a"
-      . "Date: Sun, 17 Aug 2008 16:27:35 GMT\x0d\x0a"
-      . "Content-Length: 0\x0d\x0a\x0d\x0a",
+      . "Date: Sun, 17 Aug 2008 16:27:35 GMT\x0d\x0a\x0d\x0a",
     'right message'
 );
 
@@ -1558,7 +1554,6 @@ $res->headers->set_cookie2(
 is( $res->build,
     "HTTP/1.1 404 Not Found\x0d\x0a"
       . "Date: Sun, 17 Aug 2008 16:27:35 GMT\x0d\x0a"
-      . "Content-Length: 0\x0d\x0a"
       . "Set-Cookie: foo=bar; Version=1; Path=/foobar\x0d\x0a"
       . "Set-Cookie: bar=baz; Version=1; Path=/test/23\x0d\x0a"
       . "Set-Cookie2: baz=yada; Version=1; Path=/foobar\x0d\x0a\x0d\x0a",
@@ -1570,7 +1565,7 @@ ok($res2->is_done, 'response is done');
 is($res2->code,                    404,       'right status');
 is($res2->major_version,           1,         'right major version');
 is($res2->minor_version,           1,         'right minor version');
-is($res2->headers->content_length, 0,         'right "Content-Length" value');
+is($res2->headers->content_length, undef,     'right "Content-Length" value');
 is(defined $res2->cookie('foo'),   1,         'right value');
 is(defined $res2->cookie('baz'),   1,         'right value');
 is(defined $res2->cookie('bar'),   1,         'right value');

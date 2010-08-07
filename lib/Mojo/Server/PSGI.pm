@@ -27,7 +27,7 @@ sub run {
     $tx->local_port($env->{SERVER_PORT});
 
     # Request body
-    while (!$req->is_finished) {
+    while (!$req->is_done) {
         my $read = $env->{'psgi.input'}->read(my $buffer, CHUNK_SIZE, 0);
         last if $read == 0;
         $req->parse($buffer);

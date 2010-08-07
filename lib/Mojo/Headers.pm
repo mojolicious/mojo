@@ -5,7 +5,7 @@ package Mojo::Headers;
 use strict;
 use warnings;
 
-use base 'Mojo::Stateful';
+use base 'Mojo::Base';
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
 use Mojo::ByteStream;
@@ -218,10 +218,16 @@ sub header {
     return @$headers;
 }
 
-sub host              { shift->header(Host                => @_) }
+sub host { shift->header(Host => @_) }
 sub if_modified_since { shift->header('If-Modified-Since' => @_) }
-sub last_modified     { shift->header('Last-Modified'     => @_) }
-sub location          { shift->header(Location            => @_) }
+
+sub is_done {
+    return 1 if (shift->{_state} || '') eq 'done';
+    return;
+}
+
+sub last_modified { shift->header('Last-Modified' => @_) }
+sub location      { shift->header(Location        => @_) }
 
 sub names {
     my $self = shift;
@@ -255,7 +261,7 @@ sub parse {
     # Parse headers
     my $buffer = $self->buffer;
     my $headers = $self->{_buffer} || [];
-    $self->state('headers') if $self->is_state('start');
+    $self->{_state} = 'headers';
     while (defined(my $line = $buffer->get_line)) {
 
         # New header
@@ -273,7 +279,7 @@ sub parse {
             }
 
             # Done
-            $self->done;
+            $self->{_state}  = 'done';
             $self->{_buffer} = [];
             return $buffer;
         }
@@ -360,8 +366,7 @@ L<Mojo::Headers> is a container and parser for HTTP headers.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Headers> inherits all attributes from L<Mojo::Stateful> and
-implements the following new ones.
+L<Mojo::Headers> implements the following attributes.
 
 =head2 C<buffer>
 
@@ -373,8 +378,8 @@ object.
 
 =head1 METHODS
 
-L<Mojo::Headers> inherits all methods from L<Mojo::Stateful> and implements
-the following new ones.
+L<Mojo::Headers> inherits all methods from L<Mojo::Base> and implements the
+following new ones.
 
 =head2 C<accept_language>
 
@@ -505,6 +510,12 @@ Shortcut for the C<Host> header.
     $headers = $headers->if_modified_since('Sun, 17 Aug 2008 16:27:35 GMT');
 
 Shortcut for the C<If-Modified-Since> header.
+
+=head2 C<is_done>
+
+    my $done = $headers->is_done;
+
+Check if header parser is done.
 
 =head2 C<last_modified>
 

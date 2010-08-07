@@ -159,8 +159,9 @@ sub render {
 
     # Status
     unless ($res->code) {
-        $req->has_error
-          ? $res->code(($req->error)[1])
+        my ($error, $code) = $req->error;
+        $code
+          ? $res->code($code)
           : $res->code($stash->{status} || 200);
     }
 

@@ -27,7 +27,7 @@ sub run {
     $tx->local_port($ENV{SERVER_PORT});
 
     # Request body
-    while (!$req->is_finished) {
+    while (!$req->is_done) {
         my $read = STDIN->sysread(my $buffer, CHUNK_SIZE, 0);
         last unless $read;
         $req->parse($buffer);

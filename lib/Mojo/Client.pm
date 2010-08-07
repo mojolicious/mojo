@@ -575,6 +575,9 @@ sub _connect {
     $id ||= $self->_cache("$scheme:$address:$port");
     if ($id && !ref $id) {
 
+        # Debug
+        warn "KEEP ALIVE CONNECTION\n" if DEBUG;
+
         # Writing
         $loop->writing($id);
 
@@ -598,6 +601,9 @@ sub _connect {
             return if $self->_connect_proxy($tx, $cb);
         }
 
+        # Debug
+        warn "NEW CONNECTION\n" if DEBUG;
+
         # Weaken
         weaken $self;
 
@@ -618,7 +624,7 @@ sub _connect {
 
         # Error
         unless (defined $id) {
-            $tx->error(qq/Couldn't connect./);
+            $tx->req->error("Couldn't connect.");
             $self->_tx_finish($tx, $cb);
             return;
         }
@@ -659,7 +665,7 @@ sub _connect_proxy {
 
             # CONNECT failed
             unless (($tx->res->code || '') eq '200') {
-                $old->error('Proxy connection failed.');
+                $old->req->error('Proxy connection failed.');
                 $self->_tx_finish($old, $cb);
                 return;
             }
@@ -756,7 +762,7 @@ sub _error {
     my ($self, $loop, $id, $error) = @_;
 
     # Transaction
-    if (my $tx = $self->{_cs}->{$id}->{tx}) { $tx->error($error) }
+    if (my $tx = $self->{_cs}->{$id}->{tx}) { $tx->res->error($error) }
 
     # Log
     $self->log->error($error);
@@ -837,8 +843,20 @@ sub _read {
     # Connection
     return unless my $c = $self->{_cs}->{$id};
 
-    # Read
-    return $c->{tx}->client_read($chunk) if $c->{tx};
+    # Transaction
+    if (my $tx = $c->{tx}) {
+
+        # Read
+        $tx->client_read($chunk);
+
+        # Finish
+        $self->_handle($id) if $tx->is_done;
+
+        # Writing
+        $loop->writing($id) if $tx->is_writing;
+
+        return;
+    }
 
     # Corrupted connection
     $self->_drop($id);
@@ -885,36 +903,15 @@ sub _redirect {
 
 # Oh, I'm in no condition to drive. Wait a minute.
 # I don't have to listen to myself. I'm drunk.
-sub _state {
-    my ($self, $id, $tx) = @_;
-
-    # Finished
-    return $self->_handle($id) if $tx->is_finished;
-
-    return $tx->is_writing
-      ? $self->ioloop->writing($id)
-      : $self->ioloop->not_writing($id);
-}
-
 sub _tx_finish {
     my ($self, $tx, $cb) = @_;
 
     # Response
     my $res = $tx->res;
 
-    # Error
-    my $error ||= $tx->error || $res->error;
-    if ($error) {
-        $tx->error($error);
-        $res->error($error);
-    }
-
     # 400/500
-    elsif ($res->is_status_class(400) || $res->is_status_class(500)) {
-        my @error = ($res->message, $res->code);
-        $tx->error(@error);
-        $res->error(@error);
-    }
+    $res->error($res->message, $res->code)
+      if $res->is_status_class(400) || $res->is_status_class(500);
 
     # Callback
     return unless $cb;
@@ -1012,14 +1009,11 @@ sub _tx_start {
     # Connect
     return unless my $id = $self->_connect($tx, $cb);
 
-    # Connection
-    my $c = $self->{_cs}->{$id};
-
     # Weaken
     weaken $self;
 
-    # State change callback
-    $tx->state_cb(sub { $self->_state($id, @_) });
+    # Resume callback
+    $tx->resume_cb(sub { $self->ioloop->writing($id) if shift->is_writing });
 
     # Counter
     $self->{_processing} ||= 0;
@@ -1058,7 +1052,7 @@ sub _upgrade {
     $new->kept_alive($old->kept_alive);
 
     # WebSocket challenge
-    $old->error('WebSocket challenge failed.') and return
+    $res->error('WebSocket challenge failed.') and return
       unless $new->client_challenge;
     $c->{tx} = $new;
 
@@ -1068,8 +1062,8 @@ sub _upgrade {
     # Weaken
     weaken $self;
 
-    # State change callback
-    $new->state_cb(sub { $self->_state($id, @_) });
+    # Resume callback
+    $new->resume_cb(sub { $self->ioloop->writing($id) if shift->is_writing });
 
     return $new;
 }
@@ -1087,6 +1081,12 @@ sub _write {
 
         # Debug
         warn qq/WRITE $id:\n"$chunk"\n/ if DEBUG;
+
+        # Finish
+        $self->_handle($id) if $tx->is_done;
+
+        # Writing
+        $loop->not_writing($id) unless $tx->is_writing;
 
         return $chunk;
     }

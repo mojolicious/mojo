@@ -192,7 +192,7 @@ sub read_request {
             $req->parse($body);
 
             # Error
-            return $tx if $req->has_error;
+            return $tx if $req->error;
         }
     }
 

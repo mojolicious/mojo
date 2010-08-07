@@ -5,7 +5,7 @@ package Mojo::Filter;
 use strict;
 use warnings;
 
-use base 'Mojo::Stateful';
+use base 'Mojo::Base';
 
 use Carp 'croak';
 use Mojo::ByteStream;
@@ -19,6 +19,8 @@ __PACKAGE__->attr(
 # You mean the revolver, sir?
 # Precisely.
 sub build { croak 'Method "build" not implemented by subclass' }
+
+sub is_done { croak 'Method "is_done" not implemented by subclass' }
 
 sub parse { croak 'Method "parse" not implemented by subclass' }
 
@@ -40,8 +42,7 @@ in RFC 2616.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Filter> inherits all attributes from L<Mojo::Stateful> and implements
-the following new ones.
+L<Mojo::Filter> implements the following attributes.
 
 =head2 C<headers>
 
@@ -66,14 +67,20 @@ Output buffer for filtering.
 
 =head1 METHODS
 
-L<Mojo::Filter> inherits all methods from L<Mojo::Stateful> and implements
-the following new ones.
+L<Mojo::Filter> inherits all methods from L<Mojo::Base> and implements the
+following new ones.
 
 =head2 C<build>
 
     my $formatted = $filter->build('Hello World!');
 
 Build filtered content.
+
+=head2 C<is_done>
+
+    my $done = $filter->is_done;
+
+Check if filter is done.
 
 =head2 C<parse>
 

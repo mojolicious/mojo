@@ -143,7 +143,8 @@ sub parse {
     return $self if $self->body_cb;
 
     # Upgrade state
-    $self->state('multipart_preamble') if $self->is_state('body');
+    $self->{_state} = 'multipart_preamble'
+      if ($self->{_state} || '') eq 'body';
 
     # Parse multipart content
     $self->_parse_multipart;
@@ -166,20 +167,20 @@ sub _parse_multipart {
     while (1) {
 
         # Done
-        last if $self->is_state('done', 'error');
+        last if $self->is_done;
 
         # Preamble
-        if ($self->is_state('multipart_preamble')) {
+        if (($self->{_state} || '') eq 'multipart_preamble') {
             last unless $self->_parse_multipart_preamble($boundary);
         }
 
         # Boundary
-        elsif ($self->is_state('multipart_boundary')) {
+        elsif (($self->{_state} || '') eq 'multipart_boundary') {
             last unless $self->_parse_multipart_boundary($boundary);
         }
 
         # Body
-        elsif ($self->is_state('multipart_body')) {
+        elsif (($self->{_state} || '') eq 'multipart_body') {
             last unless $self->_parse_multipart_body($boundary);
         }
     }
@@ -204,7 +205,7 @@ sub _parse_multipart_body {
     # Store chunk
     my $chunk = $buffer->remove($pos);
     $self->parts->[-1] = $self->parts->[-1]->parse($chunk);
-    $self->state('multipart_boundary');
+    $self->{_state} = 'multipart_boundary';
     return 1;
 }
 
@@ -218,7 +219,7 @@ sub _parse_multipart_boundary {
 
         # New part
         push @{$self->parts}, Mojo::Content::Single->new(relaxed => 1);
-        $self->state('multipart_body');
+        $self->{_state} = 'multipart_body';
         return 1;
     }
 
@@ -228,7 +229,7 @@ sub _parse_multipart_boundary {
         $buffer->remove(length $end);
 
         # Done
-        $self->done;
+        $self->{_state} = 'done';
     }
 
     return;
@@ -244,7 +245,7 @@ sub _parse_multipart_preamble {
         $buffer->remove($pos, "\x0d\x0a");
 
         # Parse boundary
-        $self->state('multipart_boundary');
+        $self->{_state} = 'multipart_boundary';
         return 1;
     }
 

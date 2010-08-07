@@ -33,16 +33,16 @@ use_ok('Mojo::Message::Response');
 # Parse HTTP 1.1 start line, no headers and body
 my $req = Mojo::Message::Request->new;
 $req->parse("GET / HTTP/1.1\x0d\x0a\x0d\x0a");
-is($req->state,         'done', 'state is done');
-is($req->method,        'GET',  'right method');
-is($req->major_version, 1,      'right major version');
-is($req->minor_version, 1,      'right minor version');
-is($req->url,           '/',    'right URL');
+ok($req->is_done, 'request is done');
+is($req->method,        'GET', 'right method');
+is($req->major_version, 1,     'right major version');
+is($req->minor_version, 1,     'right minor version');
+is($req->url,           '/',   'right URL');
 
 # Parse pipelined HTTP 1.1 start line, no headers and body
 $req = Mojo::Message::Request->new;
 $req->parse("GET / HTTP/1.1\x0d\x0a\x0d\x0aGET / HTTP/1.1\x0d\x0a\x0d\x0a");
-is($req->state, 'done_with_leftovers', 'right state');
+ok($req->is_done, 'request is done');
 is( $req->leftovers,
     "GET / HTTP/1.1\x0d\x0a\x0d\x0a",
     'second request in leftovers'
@@ -52,11 +52,11 @@ is( $req->leftovers,
 # (SHOULD be ignored, RFC2616, Section 4.1)
 $req = Mojo::Message::Request->new;
 $req->parse("\x0d\x0aGET / HTTP/1.1\x0d\x0a\x0d\x0a");
-is($req->state,         'done', 'state is done');
-is($req->method,        'GET',  'right method');
-is($req->major_version, 1,      'right major version');
-is($req->minor_version, 1,      'right minor version');
-is($req->url,           '/',    'right URL');
+ok($req->is_done, 'request is done');
+is($req->method,        'GET', 'right method');
+is($req->major_version, 1,     'right major version');
+is($req->minor_version, 1,     'right minor version');
+is($req->url,           '/',   'right URL');
 
 # Parse WebSocket handshake request
 $req = Mojo::Message::Request->new;
@@ -69,7 +69,7 @@ $req->parse("Upgrade: WebSocket\x0d\x0a");
 $req->parse("Sec-WebSocket-Key1: 4 \@1  46546xW%0l 1 5\x0d\x0a");
 $req->parse("Origin: http://example.com\x0d\x0a\x0d\x0a");
 $req->parse('^n:ds[4U');
-is($req->state,               'done',        'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,              'GET',         'right method');
 is($req->major_version,       1,             'right major version');
 is($req->minor_version,       1,             'right minor version');
@@ -95,7 +95,7 @@ $req = Mojo::Message::Request->new;
 $req->parse("GET /foo/bar/baz.html HTTP/1.0\x0d\x0a");
 $req->parse("Content-Type: text/plain\x0d\x0a");
 $req->parse("Content-Length: 0\x0d\x0a\x0d\x0a");
-is($req->state,         'done',              'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,        'GET',               'right method');
 is($req->major_version, 1,                   'right major version');
 is($req->minor_version, 0,                   'right minor version');
@@ -108,8 +108,8 @@ $req = Mojo::Message::Request->new;
 my $backup = $ENV{MOJO_MAX_LINE_SIZE} || '';
 $ENV{MOJO_MAX_LINE_SIZE} = 5;
 $req->parse('GET /foo/bar/baz.html HTTP/1');
-is($req->state,      'error', 'state is error');
-is(($req->error)[1], 413,     'right status');
+ok($req->is_done, 'request is done');
+is(($req->error)[1], 413, 'right status');
 $ENV{MOJO_MAX_LINE_SIZE} = $backup;
 
 # Parse HTTP 1.0 start line and headers, no body (with message size limit)
@@ -117,8 +117,8 @@ $req                        = Mojo::Message::Request->new;
 $backup                     = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
 $ENV{MOJO_MAX_MESSAGE_SIZE} = 5;
 $req->parse('GET /foo/bar/baz.html HTTP/1');
-is($req->state,      'error', 'state is error');
-is(($req->error)[1], 413,     'right status');
+ok($req->is_done, 'request is done');
+is(($req->error)[1], 413, 'right status');
 $ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
 
 # Parse full HTTP 1.0 request
@@ -128,7 +128,7 @@ $req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
 $req->parse('-Type: text/');
 $req->parse("plain\x0d\x0aContent-Length: 27\x0d\x0a\x0d\x0aHell");
 $req->parse("o World!\n1234\nlalalala\n");
-is($req->state,         'done',                        'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,        'GET',                         'right method');
 is($req->major_version, 1,                             'right major version');
 is($req->minor_version, 0,                             'right minor version');
@@ -145,7 +145,7 @@ $req->parse("plain\x0d\x0aContent-Length: 27\x0d\x0a");
 $req->parse("Host: mojolicious.org\x0d\x0a");
 $req->parse("X-Forwarded-For: 192.168.2.1, 127.0.0.1\x0d\x0a\x0d\x0a");
 $req->parse("Hello World!\n1234\nlalalala\n");
-is($req->state,         'done',                        'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,        'GET',                         'right method');
 is($req->major_version, 1,                             'right major version');
 is($req->minor_version, 0,                             'right minor version');
@@ -160,7 +160,7 @@ is($req->headers->content_length, 27, 'right "Content-Length" value');
 # Parse full HTTP 1.0 request with zero chunk
 $req = Mojo::Message::Request->new;
 my $finished;
-$req->finish_cb(sub { $finished = $_[0]->state });
+$req->finish_cb(sub { $finished = shift->is_done });
 $req->parse('GET /foo/bar/baz.html?fo');
 $req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
 $req->parse('-Type: text/');
@@ -168,8 +168,8 @@ $req->parse("plain\x0d\x0aContent-Length: 27\x0d\x0a\x0d\x0aHell");
 $req->parse("o World!\n123");
 $req->parse('0');
 $req->parse("\nlalalala\n");
-is($finished,           'done',                        'state is done');
-is($req->state,         'done',                        'state is done');
+ok($finished,     'finish callback was called');
+ok($req->is_done, 'request is done');
 is($req->method,        'GET',                         'right method');
 is($req->major_version, 1,                             'right major version');
 is($req->minor_version, 0,                             'right minor version');
@@ -185,7 +185,7 @@ $req->parse('-Type: application/');
 $req->parse("x-www-form-urlencoded\x0d\x0aContent-Length: 53");
 $req->parse("\x0d\x0a\x0d\x0a");
 $req->parse('name=%D0%92%D1%8F%D1%87%D0%B5%D1%81%D0%BB%D0%B0%D0%B2');
-is($req->state,         'done',                        'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,        'GET',                         'right method');
 is($req->major_version, 1,                             'right major version');
 is($req->minor_version, 0,                             'right minor version');
@@ -200,11 +200,11 @@ is($req->param('name'), 'Вячеслав', 'right value');
 # Parse HTTP 0.9 request
 $req = Mojo::Message::Request->new;
 $req->parse("GET /\x0d\x0a\x0d\x0a");
-is($req->state,         'done', 'state is done');
-is($req->method,        'GET',  'right method');
-is($req->major_version, 0,      'right major version');
-is($req->minor_version, 9,      'right minor version');
-is($req->url,           '/',    'right URL');
+ok($req->is_done, 'request is done');
+is($req->method,        'GET', 'right method');
+is($req->major_version, 0,     'right major version');
+is($req->minor_version, 9,     'right minor version');
+is($req->url,           '/',   'right URL');
 
 # Parse HTTP 1.1 chunked request
 $req = Mojo::Message::Request->new;
@@ -216,7 +216,7 @@ $req->parse("abcd\x0d\x0a");
 $req->parse("9\x0d\x0a");
 $req->parse("abcdefghi\x0d\x0a");
 $req->parse("0\x0d\x0a\x0d\x0a");
-is($req->state,         'done',                        'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,        'POST',                        'right method');
 is($req->major_version, 1,                             'right major version');
 is($req->minor_version, 1,                             'right minor version');
@@ -238,7 +238,7 @@ $req->parse("abcd\x0d\x0a");
 $req->parse("9\x0d\x0a");
 $req->parse("abcdefghi\x0d\x0a");
 $req->parse("0\x0d\x0a\x0d\x0a");
-is($req->state,         'done',                        'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,        'POST',                        'right method');
 is($req->major_version, 1,                             'right major version');
 is($req->minor_version, 1,                             'right minor version');
@@ -253,7 +253,7 @@ $req->parse("POST /foo/bar/baz.html?foo=13#23 HTTP/1.1\x0d\x0a");
 $req->parse("Content-Length: 26\x0d\x0a");
 $req->parse("Content-Type: x-application-urlencoded\x0d\x0a\x0d\x0a");
 $req->parse('foo=bar& tset=23+;&foo=bar');
-is($req->state,         'done',                        'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,        'POST',                        'right method');
 is($req->major_version, 1,                             'right major version');
 is($req->minor_version, 1,                             'right minor version');
@@ -274,7 +274,7 @@ $req->parse("POST /foo/bar/baz.html?foo=13#23 HTTP/1.1\x0d\x0a");
 $req->parse("Content-Length: 26\x0d\x0a");
 $req->parse("Content-Type: application/x-www-form-urlencoded\x0d\x0a");
 $req->parse("\x0d\x0afoo=bar&+tset=23+;&foo=bar");
-is($req->state,         'done',                        'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,        'POST',                        'right method');
 is($req->major_version, 1,                             'right major version');
 is($req->minor_version, 1,                             'right minor version');
@@ -312,7 +312,7 @@ $req->parse("abcdefghi\x0d\x0a");
 $req->parse("0\x0d\x0a");
 $req->parse("X-Trailer1: test\x0d\x0a");
 $req->parse("X-Trailer2: 123\x0d\x0a\x0d\x0a");
-is($req->state,         'done', 'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,        'POST', 'right method');
 is($req->major_version, 1,      'right major version');
 is($req->minor_version, 1,      'right minor version');
@@ -336,10 +336,10 @@ $req->parse("abcd\x0d\x0a");
 $req->parse("9\x0d\x0a");
 $req->parse("abcdefghi\x0d\x0a");
 $req->parse("0\x0d\x0aX-Trailer: 777\x0d\x0a\x0d\x0aLEFTOVER");
-is($req->state, 'done_with_leftovers', 'state is done_with_leftovers');
-is($req->method, 'POST', 'right method');
-is($req->major_version, 1, 'right major version');
-is($req->minor_version, 1, 'right minor version');
+ok($req->is_done, 'request is done');
+is($req->method,        'POST', 'right method');
+is($req->major_version, 1,      'right major version');
+is($req->minor_version, 1,      'right minor version');
 is($req->url, '/foo/bar/baz.html?foo=13&bar=23#23', 'right URL');
 is($req->query_params, 'foo=13&bar=23', 'right parameters');
 ok(!defined $req->headers->transfer_encoding, 'no "Transfer-Encoding" value');
@@ -361,7 +361,7 @@ $req->parse("9\x0d\x0a");
 $req->parse("abcdefghi\x0d\x0a");
 $req->parse(
     "0\x0d\x0aX-Trailer1: test\x0d\x0aX-Trailer2: 123\x0d\x0a\x0d\x0a");
-is($req->state,         'done', 'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,        'POST', 'right method');
 is($req->major_version, 1,      'right major version');
 is($req->minor_version, 1,      'right minor version');
@@ -385,7 +385,7 @@ $req->parse("9\x0d\x0a");
 $req->parse("abcdefghi\x0d\x0a");
 $req->parse(
     "0\x0d\x0aX-Trailer1: test\x0d\x0aX-Trailer2: 123\x0d\x0a\x0d\x0a");
-is($req->state,         'done', 'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,        'POST', 'right method');
 is($req->major_version, 1,      'right major version');
 is($req->minor_version, 1,      'right minor version');
@@ -418,7 +418,7 @@ $req->parse("use strict;\n");
 $req->parse("use warnings;\n\n");
 $req->parse("print \"Hello World :)\\n\"\n");
 $req->parse("\x0d\x0a------------0xKhTmLbOuNdArY--");
-is($req->state,         'done',                       'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,        'GET',                        'right method');
 is($req->major_version, 1,                            'right major version');
 is($req->minor_version, 1,                            'right minor version');
@@ -456,10 +456,10 @@ $req->parse(
     "Proxy-Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==\x0d\x0a");
 $req->parse("Content-Length: 13\x0d\x0a\x0d\x0a");
 $req->parse("Hello World!\n");
-is($req->state,         'done', 'state is done');
-is($req->method,        'GET',  'right method');
-is($req->major_version, 1,      'right major version');
-is($req->minor_version, 1,      'right minor version');
+ok($req->is_done, 'request is done');
+is($req->method,        'GET', 'right method');
+is($req->major_version, 1,     'right major version');
+is($req->minor_version, 1,     'right minor version');
 is( $req->url->base,
     'http://Aladdin:open%20sesame@127.0.0.1',
     'right base URL'
@@ -475,7 +475,7 @@ $req->parse("Host: 127.0.0.1\x0d\x0a");
 $req->parse(
     "Proxy-Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==\x0d\x0a");
 $req->parse("Content-Length: 0\x0d\x0a\x0d\x0a");
-is($req->state,           'done',                'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,          'CONNECT',             'right method');
 is($req->major_version,   1,                     'right major version');
 is($req->minor_version,   1,                     'right minor version');
@@ -507,7 +507,7 @@ is( $req->build,
 # Build full HTTP 1.1 request
 $req      = Mojo::Message::Request->new;
 $finished = undef;
-$req->finish_cb(sub { $finished = $_[0]->state });
+$req->finish_cb(sub { $finished = shift->is_done });
 $req->method('get');
 $req->url->parse('http://127.0.0.1/foo/bar');
 $req->headers->expect('100-continue');
@@ -520,7 +520,21 @@ is( $req->build,
       . "Hello World!\n",
     'right message'
 );
-is($finished, 'start', 'state is start');
+ok($finished,     'finish callback was called');
+ok($req->is_done, 'request is done');
+
+# Build HTTP 1.1 request body
+$req      = Mojo::Message::Request->new;
+$finished = undef;
+$req->finish_cb(sub { $finished = shift->is_done });
+$req->method('get');
+$req->url->parse('http://127.0.0.1/foo/bar');
+$req->headers->expect('100-continue');
+$req->body("Hello World!\n");
+my $i = 0;
+while (my $chunk = $req->get_body_chunk($i)) { $i += length $chunk }
+ok($finished,     'finish callback was called');
+ok($req->is_done, 'request is done');
 
 # Build WebSocket handshake request
 $req = Mojo::Message::Request->new;
@@ -706,18 +720,18 @@ is($res->code(400)->default_message, 'Bad Request', 'right default message');
 # Parse HTTP 1.1 response start line, no headers and body
 $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.1 200 OK\x0d\x0a\x0d\x0a");
-is($res->state,         'done', 'state is done');
-is($res->code,          200,    'right status');
-is($res->message,       'OK',   'right message');
-is($res->major_version, 1,      'right major version');
-is($res->minor_version, 1,      'right minor version');
+ok($res->is_done, 'response is done');
+is($res->code,          200,  'right status');
+is($res->message,       'OK', 'right message');
+is($res->major_version, 1,    'right major version');
+is($res->minor_version, 1,    'right minor version');
 
 # Parse HTTP 0.9 response
 $res = Mojo::Message::Response->new;
 $res->parse("HTT... this is just a document and valid HTTP 0.9\n\n");
-is($res->state,         'done', 'state is done');
-is($res->major_version, 0,      'right major version');
-is($res->minor_version, 9,      'right minor version');
+ok($res->is_done, 'response is done');
+is($res->major_version, 0, 'right major version');
+is($res->minor_version, 9, 'right minor version');
 is( $res->body,
     "HTT... this is just a document and valid HTTP 0.9\n\n",
     'right content'
@@ -728,7 +742,7 @@ $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.0 404 Damn it\x0d\x0a");
 $res->parse("Content-Type: text/plain\x0d\x0a");
 $res->parse("Content-Length: 0\x0d\x0a\x0d\x0a");
-is($res->state,                 'done',       'state is done');
+ok($res->is_done, 'response is done');
 is($res->code,                  404,          'right status');
 is($res->message,               'Damn it',    'right message');
 is($res->major_version,         1,            'right major version');
@@ -742,7 +756,7 @@ $res->parse("HTTP/1.0 500 Internal Server Error\x0d\x0a");
 $res->parse("Content-Type: text/plain\x0d\x0a");
 $res->parse("Content-Length: 27\x0d\x0a\x0d\x0a");
 $res->parse("Hello World!\n1234\nlalalala\n");
-is($res->state,         'done',                  'state is done');
+ok($res->is_done, 'response is done');
 is($res->code,          500,                     'right status');
 is($res->message,       'Internal Server Error', 'right message');
 is($res->major_version, 1,                       'right major version');
@@ -758,7 +772,7 @@ $res->parse("HTTP/1.1 413 Request Entity Too Large\x0d\x0a"
       . "Server: Mojolicious (Perl)\x0d\x0a"
       . "Content-Length: 0\x0d\x0a"
       . "X-Powered-By: Mojolicious (Perl)\x0d\x0a\x0d\x0a");
-is($res->state,         'done',                     'state is done');
+ok($res->is_done, 'response is done');
 is($res->code,          413,                        'right status');
 is($res->message,       'Request Entity Too Large', 'right message');
 is($res->major_version, 1,                          'right major version');
@@ -775,7 +789,7 @@ $res->parse("abcd\x0d\x0a");
 $res->parse("9\x0d\x0a");
 $res->parse("abcdefghi\x0d\x0a");
 $res->parse("0\x0d\x0a\x0d\x0a");
-is($res->state,         'done',                  'state is done');
+ok($res->is_done, 'response is done');
 is($res->code,          500,                     'right status');
 is($res->message,       'Internal Server Error', 'right message');
 is($res->major_version, 1,                       'right major version');
@@ -804,11 +818,11 @@ $res->parse("use strict;\n");
 $res->parse("use warnings;\n\n");
 $res->parse("print \"Hello World :)\\n\"\n");
 $res->parse("\x0d\x0a------------0xKhTmLbOuNdArY--");
-is($res->state,         'done', 'state is done');
-is($res->code,          200,    'right status');
-is($res->message,       'OK',   'right message');
-is($res->major_version, 1,      'right major version');
-is($res->minor_version, 1,      'right minor version');
+ok($res->is_done, 'response is done');
+is($res->code,          200,  'right status');
+is($res->message,       'OK', 'right message');
+is($res->major_version, 1,    'right major version');
+is($res->minor_version, 1,    'right minor version');
 ok($res->headers->content_type =~ /multipart\/form-data/,
     'right "Content-Type" value');
 is(ref $res->content->parts->[0], 'Mojo::Content::Single', 'right part');
@@ -911,8 +925,8 @@ $req->parse(
     HTTP_HOST       => 'test',
     SERVER_PROTOCOL => 'HTTP/1.1'
 );
-is($req->state,  'done', 'state is done');
-is($req->method, 'GET',  'right method');
+ok($req->is_done, 'request is done');
+is($req->method, 'GET', 'right method');
 is( $req->headers->header('Accept'),
     'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
     'right "Accept" value'
@@ -940,8 +954,8 @@ $req->parse(
     HTTP_HOST       => 'test',
     SERVER_PROTOCOL => 'HTTP/1.1'
 );
-is($req->state,  'done', 'state is done');
-is($req->method, 'GET',  'right method');
+ok($req->is_done, 'request is done');
+is($req->method, 'GET', 'right method');
 is( $req->headers->header('Accept'),
     'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
     'right "Accept" value'
@@ -969,7 +983,7 @@ $req->parse(
     SERVER_PROTOCOL => 'HTTP/1.0'
 );
 $req->parse('hello=world');
-is($req->state,           'done',              'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,          'POST',              'right method');
 is($req->headers->expect, '100-continue',      'right "Expect" value');
 is($req->url->path,       '/bar',              'right URL');
@@ -1003,7 +1017,7 @@ $req->parse(
     SERVER_PROTOCOL => 'HTTP/1.0'
 );
 $req->parse('hello=world');
-is($req->state,           'done',              'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,          'POST',              'right method');
 is($req->headers->expect, '100-continue',      'right "Expect" value');
 is($req->url->path,       '/foo/bar',          'right URL');
@@ -1036,7 +1050,7 @@ $req->parse(
     SERVER_PROTOCOL => 'HTTP/1.0'
 );
 $req->parse('hello=world');
-is($req->state,           'done',              'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,          'POST',              'right method');
 is($req->headers->expect, '100-continue',      'right "Expect" value');
 is($req->url->path,       '/foo/bar/',         'right path');
@@ -1070,7 +1084,7 @@ $req->parse(
     SERVER_PROTOCOL => 'HTTP/1.0'
 );
 $req->parse('hello=world');
-is($req->state,           'done',              'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,          'POST',              'right method');
 is($req->headers->expect, '100-continue',      'right "Expect" value');
 is($req->url->path,       '/',                 'right path');
@@ -1103,7 +1117,7 @@ $req->parse(
     SERVER_PROTOCOL => 'HTTP/1.0'
 );
 $req->parse('hello=world');
-is($req->state,           'done',              'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,          'POST',              'right method');
 is($req->headers->expect, '100-continue',      'right "Expect" value');
 is($req->url->path,       '/',                 'right path');
@@ -1133,7 +1147,7 @@ $req->parse(
     SERVER_PROTOCOL     => 'HTTP/1.0'
 );
 $req->parse('Hello World');
-is($req->state,           'done',              'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,          'POST',              'right method');
 is($req->headers->expect, '100-continue',      'right "Expect" value');
 is($req->url->path,       '/foo/bar',          'right path');
@@ -1164,7 +1178,7 @@ $req->parse(
     SERVER_PROTOCOL      => 'HTTP/1.0'
 );
 $req->parse('Hello World');
-is($req->state,           'done',              'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,          'POST',              'right method');
 is($req->headers->expect, '100-continue',      'right "Expect" value');
 is($req->url->path,       '/foo/bar',          'right path');
@@ -1194,7 +1208,7 @@ $req->parse(
     SERVER_PROTOCOL => 'HTTP/1.0'
 );
 $req->parse('hello=world');
-is($req->state,           'done',              'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,          'POST',              'right method');
 is($req->headers->expect, '100-continue',      'right "Expect" value');
 is($req->url->path,       '/foo/bar',          'right path');
@@ -1227,7 +1241,7 @@ $req->parse(
     SERVER_PROTOCOL          => 'HTTP/1.0'
 );
 $req->parse('hello=world');
-is($req->state,           'done',              'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,          'POST',              'right method');
 is($req->headers->expect, '100-continue',      'right "Expect" value');
 is($req->url->path,       '/foo/bar',          'right path');
@@ -1266,7 +1280,7 @@ $req->parse(
 );
 $req->parse('request=&ajax=true&login=test&password=111&');
 $req->parse('edition=db6d8b30-16df-4ecd-be2f-c8194f94e1f4');
-is($req->state,           'done',       'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,          'POST',       'right method');
 is($req->url->path,       '',           'right path');
 is($req->url->base->path, '/index.pl/', 'right base path');
@@ -1303,7 +1317,7 @@ $req->parse(
     SERVER_PROTOCOL => 'HTTP/1.0'
 );
 $req->parse('hello=world');
-is($req->state,           'done',             'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,          'GET',              'right method');
 is($req->url->base->host, 'localhost',        'right base host');
 is($req->url->path,       '/foo/bar',         'right path');
@@ -1332,7 +1346,7 @@ $req->parse(
     SERVER_PROTOCOL => 'HTTP/1.0'
 );
 $req->parse('hello=world');
-is($req->state,           'done',             'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,          'GET',              'right method');
 is($req->url->base->host, 'localhost',        'right base host');
 is($req->url->path,       '/foo/bar',         'right path');
@@ -1361,7 +1375,7 @@ $req->parse(
     SERVER_PROTOCOL => 'HTTP/1.0'
 );
 $req->parse('hello=world');
-is($req->state,           'done',             'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,          'GET',              'right method');
 is($req->url->base->host, 'localhost',        'right base host');
 is($req->url->path,       '/foo/bar/',        'right path');
@@ -1388,7 +1402,7 @@ $req->parse(
     SERVER_PROTOCOL => 'HTTP/1.0'
 );
 $req->parse('hello=world');
-is($req->state,           'done',        'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,          'GET',         'right method');
 is($req->url->base->host, 'localhost',   'right base host');
 is($req->url->path,       '/foo/bar',    'right path');
@@ -1413,7 +1427,7 @@ $req->parse(
     SERVER_PROTOCOL => 'HTTP/1.0'
 );
 $req->parse('hello=world');
-is($req->state,           'done',             'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,          'GET',              'right method');
 is($req->url->base->host, 'localhost',        'right base host');
 is($req->url->path,       '',                 'right path');
@@ -1438,7 +1452,7 @@ $req->parse(
     REQUEST_URI     => '/cgi-bin/bootylicious/bootylicious.pl',
     SERVER_PROTOCOL => 'HTTP/1.1',
 );
-is($req->state,           'done',                'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,          'GET',                 'right method');
 is($req->url->base->host, 'getbootylicious.org', 'right base host');
 is($req->url->path,       '/',                   'right path');
@@ -1460,7 +1474,7 @@ $res->parse("Content-Type: text/plain\x0d\x0a");
 $res->parse("Content-Length: 27\x0d\x0a");
 $res->parse("Set-Cookie: foo=bar; Version=1; Path=/test\x0d\x0a\x0d\x0a");
 $res->parse("Hello World!\n1234\nlalalala\n");
-is($res->state,                 'done',       'state is done');
+ok($req->is_done, 'request is done');
 is($res->code,                  200,          'right status');
 is($res->message,               'OK',         'right message');
 is($res->major_version,         1,            'right major version');
@@ -1488,8 +1502,8 @@ $res->parse("Sec-WebSocket-Origin: http://example.com\x0d\x0a");
 $res->parse("Sec-WebSocket-Location: ws://example.com/demo\x0d\x0a");
 $res->parse("Sec-WebSocket-Protocol: sample\x0d\x0a\x0d\x0a");
 $res->parse('8jKS\'y:G*Co,Wxa-');
-is($res->state,   'done',                         'state is done');
-is($res->code,    101,                            'right status');
+ok($req->is_done, 'request is done');
+is($res->code, 101, 'right status');
 is($res->message, 'WebSocket Protocol Handshake', 'right message');
 is($res->major_version,       1,           'right major version');
 is($res->minor_version,       1,           'right minor version');
@@ -1552,7 +1566,7 @@ is( $res->build,
 );
 my $res2 = Mojo::Message::Response->new;
 $res2->parse($res->build);
-is($res2->state,                   'done',    'state is done');
+ok($res2->is_done, 'response is done');
 is($res2->code,                    404,       'right status');
 is($res2->major_version,           1,         'right major version');
 is($res2->minor_version,           1,         'right minor version');
@@ -1636,8 +1650,8 @@ $req->parse('Cookie: $Version=1; foo=bar; $Path=/foobar; bar=baz; $Path=/t');
 $req->parse("est/23\x0d\x0a");
 $req->parse("Content-Length: 27\x0d\x0a\x0d\x0aHell");
 $req->parse("o World!\n1234\nlalalala\n");
-is($counter,            8,                             'right count');
-is($req->state,         'done',                        'state is done');
+is($counter, 8, 'right count');
+ok($req->is_done, 'request is done');
 is($req->method,        'GET',                         'right method');
 is($req->major_version, 1,                             'right major version');
 is($req->minor_version, 0,                             'right minor version');
@@ -1670,7 +1684,7 @@ $req->parse("POST /example/testform_handler HTTP/1.1\x0d\x0a"
       . "\x0aContent-Disposition: form-data; name=\"Text\"\x0d\x0a"
       . "\x0d\x0a\x0d\x0a------WebKitFormBoundaryi5BnD9J9zoTMiSuP--"
       . "\x0d\x0a");
-is($req->is_done, 1, 'state is done');
+ok($req->is_done, 'request is done');
 is_deeply($req->param('Vorname'), 'T', 'right value');
 
 # Google Chrome multipart/form-data request
@@ -1717,8 +1731,7 @@ $req->parse("POST / HTTP/1.0\x0d\x0a"
       . "Content-Disposition: form-data; name=\"submit\"\x0d\x0a\x0d\x0a"
       . "Сохранить"
       . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX--\x0d\x0a");
-is($req->is_done,       1,      'state is done');
-is($req->state,         'done', 'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,        'POST', 'right method');
 is($req->major_version, 1,      'right major version');
 is($req->minor_version, 0,      'right minor version');
@@ -1792,8 +1805,7 @@ $req->parse("POST / HTTP/1.0\x0d\x0a"
       . "Сохранить"
       . "\x0d\x0a-----------------------------2130907227147213000020304999"
       . "22--");
-is($req->is_done,       1,      'state is done');
-is($req->state,         'done', 'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,        'POST', 'right method');
 is($req->major_version, 1,      'right major version');
 is($req->minor_version, 0,      'right minor version');
@@ -1862,8 +1874,7 @@ $req->parse("POST / HTTP/1.0\x0d\x0a"
       . "Content-Disposition: form-data; name=\"submit\"\x0d\x0a\x0d\x0a"
       . "Сохранить"
       . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0--");
-is($req->is_done,       1,      'state is done');
-is($req->state,         'done', 'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,        'POST', 'right method');
 is($req->major_version, 1,      'right major version');
 is($req->minor_version, 0,      'right minor version');
@@ -1891,7 +1902,7 @@ is($upload->slurp,    '1234',             'right content');
 # Parse ~ in URL
 $req = Mojo::Message::Request->new;
 $req->parse("GET /~foobar/ HTTP/1.1\x0d\x0a\x0d\x0a");
-is($req->state,         'done',      'state is done');
+ok($req->is_done, 'request is done');
 is($req->method,        'GET',       'right method');
 is($req->major_version, 1,           'right major version');
 is($req->minor_version, 1,           'right minor version');
@@ -1900,10 +1911,10 @@ is($req->url,           '/~foobar/', 'right URL');
 # Parse : in URL
 $req = Mojo::Message::Request->new;
 $req->parse("GET /perldoc?Mojo::Message::Request HTTP/1.1\x0d\x0a\x0d\x0a");
-is($req->state,         'done', 'state is done');
-is($req->method,        'GET',  'right method');
-is($req->major_version, 1,      'right major version');
-is($req->minor_version, 1,      'right minor version');
+ok($req->is_done, 'request is done');
+is($req->method,        'GET', 'right method');
+is($req->major_version, 1,     'right major version');
+is($req->minor_version, 1,     'right minor version');
 is($req->url, '/perldoc?Mojo::Message::Request', 'right URL');
 
 # Body helper

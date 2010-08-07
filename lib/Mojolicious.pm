@@ -38,6 +38,8 @@ __PACKAGE__->attr(types   => sub { MojoX::Types->new });
 our $CODENAME = 'Snowman';
 our $VERSION  = '0.999927';
 
+# I personalized each of your meals.
+# For example, Amy: you're cute, so I baked you a pony.
 sub new {
     my $self = shift->SUPER::new(@_);
 

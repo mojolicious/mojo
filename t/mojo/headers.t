@@ -76,7 +76,7 @@ Content-Type: text/plain
 Expect: 100-continue
 
 EOF
-is($headers->state,        'done',         'right state');
+ok($headers->is_done, 'parser is done');
 is($headers->content_type, 'text/plain',   'right value');
 is($headers->expect,       '100-continue', 'right value');
 
@@ -116,19 +116,19 @@ $headers = Mojo::Headers->new;
 ok(!defined($headers->parse(<<EOF)), 'right return value');
 Content-Type: text/plain
 EOF
-is($headers->state, 'headers', 'right state');
+ok(!$headers->is_done,               'parser is not done');
 ok(!defined($headers->content_type), 'no value');
 ok(!defined($headers->parse(<<EOF)), 'right return value');
 X-Bender: Bite my shiny
 EOF
-is($headers->state, 'headers', 'right state');
+ok(!$headers->is_done,             'parser is not done');
 ok(!defined($headers->connection), 'no value');
 is(ref $headers->parse(<<EOF), 'Mojo::ByteStream', 'right return value');
 X-Bender: metal ass!
 
 EOF
-is($headers->state,              'done',                      'right state');
-is($headers->content_type,       'text/plain',                'right value');
+ok($headers->is_done, 'parser is done');
+is($headers->content_type, 'text/plain', 'right value');
 is($headers->header('X-Bender'), 'Bite my shiny, metal ass!', 'right value');
 
 # Filter unallowed characters

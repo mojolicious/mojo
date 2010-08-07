@@ -124,8 +124,8 @@ $tx2->req->url->parse('/5/');
 $client->process($tx, $tx2);
 ok(defined $tx->connection,  'has connection id');
 ok(defined $tx2->connection, 'has connection id');
-ok($tx->is_done,             'state is done');
-ok($tx2->is_done,            'state is done');
+ok($tx->is_done,             'transaction is done');
+ok($tx2->is_done,            'transaction is done');
 
 # Multiple requests
 $tx = Mojo::Transaction::HTTP->new;
@@ -140,9 +140,9 @@ my $tx3 = Mojo::Transaction::HTTP->new;
 $tx3->req->method('GET');
 $tx3->req->url->parse('/8/');
 $client->process($tx, $tx2, $tx3);
-ok($tx->is_finished, 'state is finished');
-ok(!$tx->has_error,  'has no errors');
-ok($tx2->is_done,    'state is done');
-ok(!$tx2->has_error, 'has no error');
-ok($tx3->is_done,    'state is done');
-ok(!$tx3->has_error, 'has no error');
+ok($tx->is_done,  'transaction is done');
+ok(!$tx->error,   'has no errors');
+ok($tx2->is_done, 'transaction is done');
+ok(!$tx2->error,  'has no error');
+ok($tx3->is_done, 'transaction is done');
+ok(!$tx3->error,  'has no error');

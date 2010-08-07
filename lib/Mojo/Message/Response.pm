@@ -168,7 +168,7 @@ sub _parse {
     my $until_body = @_ ? shift : 0;
 
     # Start line
-    $self->_parse_start_line if $self->is_state('start');
+    $self->_parse_start_line unless $self->{_state};
 
     # Pass through
     return $self->SUPER::_parse($until_body);
@@ -180,7 +180,7 @@ sub _parse_start_line {
     my $self = shift;
 
     # HTTP 0.9 responses have no start line
-    return $self->state('content') if $self->version eq '0.9';
+    return $self->{_state} = 'content' if $self->version eq '0.9';
 
     # Try to detect HTTP 0.9
     my $buffer = $self->buffer;
@@ -196,7 +196,7 @@ sub _parse_start_line {
         if ($string !~ /^\s*$match/) {
             $self->major_version(0);
             $self->minor_version(9);
-            $self->state('content');
+            $self->{_state} = 'content';
             $self->content->relaxed(1);
             return 1;
         }
@@ -210,7 +210,7 @@ sub _parse_start_line {
             $self->minor_version($2);
             $self->code($3);
             $self->message($4);
-            $self->state('content');
+            $self->{_state} = 'content';
         }
         else { $self->error('Bad response start line.', 400) }
     }

@@ -153,6 +153,8 @@ sub parse {
     return $self;
 }
 
+# Don't kid yourself, Jimmy. If a cow ever got the chance,
+# he'd eat you and everyone you care about!
 sub remove {
     my ($self, $name) = @_;
 

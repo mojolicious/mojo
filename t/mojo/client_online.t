@@ -12,7 +12,7 @@ use Test::More;
 
 plan skip_all => 'set TEST_CLIENT to enable this test (developer only!)'
   unless $ENV{TEST_CLIENT};
-plan tests => 102;
+plan tests => 99;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -46,7 +46,7 @@ $client = Mojo::Client->new;
 $client->log->level('fatal');
 my $tx = $client->build_tx(GET => 'http://localhost:99999');
 $client->process($tx);
-is($tx->state, 'error', 'right state');
+ok(!$tx->is_done, 'transaction is not done');
 
 # Fresh client again
 $client = Mojo::Client->new;
@@ -54,7 +54,7 @@ $client = Mojo::Client->new;
 # Host does not exist
 $tx = $client->build_tx(GET => 'http://cdeabcdeffoobarnonexisting.com');
 $client->process($tx);
-is($tx->state, 'error', 'right state');
+ok(!$tx->is_done, 'transaction is not done');
 
 # Keep alive
 my $async = $client->async;
@@ -105,8 +105,8 @@ $tx->req->method('GET');
 $tx->req->url->parse('http://cpan.org');
 $tx->req->headers->connection('close');
 $client->process($tx);
-is($tx->state,     'done', 'right state');
-is($tx->res->code, 301,    'right status');
+ok($tx->is_done, 'transaction is done');
+is($tx->res->code, 301, 'right status');
 like($tx->res->headers->connection, qr/close/i, 'right "Connection" header');
 
 # Proxy check
@@ -152,7 +152,7 @@ is($code,   301,               'right status');
 
 # HTTPS request without TLS support
 $tx = $client->get('https://www.google.com');
-is($tx->has_error, 1, 'request failed');
+ok(!!$tx->error, 'request failed');
 
 # Simple request with body
 $tx = $client->get('http://mojolicious.org' => 'Hi there!');
@@ -300,9 +300,9 @@ $client->queue(
     }
 );
 $client->process;
-ok($done,        'state is done');
+ok($done,        'transaction is done');
 ok($kept_alive,  'connection was kept alive');
-ok($tx->is_done, 'right state');
+ok($tx->is_done, 'transaction is done');
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('http://www.apache.org');
@@ -319,12 +319,11 @@ $client->process(
         $port2      = $tx->remote_port, 80;
     }
 );
-ok($done,       'state is done');
-ok($kept_alive, 'connection was kept alive');
-ok($address,    'has local address');
-ok($port > 0,   'has local port');
-is($port2, 80, 'right remote port');
-ok($tx->is_done, 'state is done');
+ok($done,        'transaction is done');
+ok($kept_alive,  'connection was kept alive');
+ok($address,     'has local address');
+ok($port > 0,    'has local port');
+ok($tx->is_done, 'transaction is done');
 
 # Multiple requests
 $tx = Mojo::Transaction::HTTP->new;
@@ -337,11 +336,9 @@ my $tx3 = Mojo::Transaction::HTTP->new;
 $tx3->req->method('GET');
 $tx3->req->url->parse('http://www.apache.org');
 $client->process($tx, $tx2, $tx3);
-ok($tx->is_done,  'state is done');
-ok($tx2->is_done, 'state is done');
-ok($tx3->is_done, 'state is done');
-ok($tx2->is_done, 'state is done');
-ok($tx3->is_done, 'state is done');
+ok($tx->is_done,  'transaction is done');
+ok($tx2->is_done, 'transaction is done');
+ok($tx3->is_done, 'transaction is done');
 is($tx->res->code,  200, 'right status');
 is($tx2->res->code, 200, 'right status');
 is($tx3->res->code, 200, 'right status');
@@ -355,8 +352,8 @@ $tx2 = Mojo::Transaction::HTTP->new;
 $tx2->req->method('GET');
 $tx2->req->url->parse('http://www.apache.org');
 $client->process($tx, $tx2);
-ok($tx->is_done,  'state is done');
-ok($tx2->is_done, 'state is done');
+ok($tx->is_done,  'transaction is done');
+ok($tx2->is_done, 'transaction is done');
 is($tx->res->code,  200, 'right status');
 is($tx2->res->code, 200, 'right status');
 like($tx2->res->content->asset->slurp, qr/Apache/, 'right content');
@@ -375,10 +372,10 @@ my $tx4 = Mojo::Transaction::HTTP->new;
 $tx4->req->method('GET');
 $tx4->req->url->parse('http://www.apache.org');
 $client->process($tx, $tx2, $tx3, $tx4);
-ok($tx->is_done,  'state is done');
-ok($tx2->is_done, 'state is done');
-ok($tx3->is_done, 'state is done');
-ok($tx4->is_done, 'state is done');
+ok($tx->is_done,  'transaction is done');
+ok($tx2->is_done, 'transaction is done');
+ok($tx3->is_done, 'transaction is done');
+ok($tx4->is_done, 'transaction is done');
 is($tx->res->code,  200, 'right status');
 is($tx2->res->code, 200, 'right status');
 is($tx3->res->code, 200, 'right status');

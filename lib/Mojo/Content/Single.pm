@@ -42,7 +42,7 @@ sub parse {
     $self->SUPER::parse(@_);
 
     # Still parsing headers or using a custom body parser
-    return $self if $self->is_state('headers') || $self->body_cb;
+    return $self if ($self->{_state} || '') eq 'headers' || $self->body_cb;
 
     # Headers
     my $headers = $self->headers;
@@ -87,12 +87,7 @@ sub parse {
         $asset->add_chunk($self->buffer->remove($need)) if $need > 0;
 
         # Done
-        $self->done if $length <= $self->raw_body_size;
-    }
-
-    # With leftovers, maybe pipelined
-    if ($self->is_done) {
-        $self->state('done_with_leftovers') if $self->has_leftovers;
+        $self->{_state} = 'done' if $length <= $self->raw_body_size;
     }
 
     return $self;

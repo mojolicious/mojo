@@ -20,6 +20,9 @@ use constant BONJOUR => $ENV{MOJO_NO_BONJOUR}
   ? 0
   : eval 'use Net::Rendezvous::Publish 0.04 (); 1';
 
+# Debug
+use constant DEBUG => $ENV{MOJO_DAEMON_DEBUG} || 0;
+
 __PACKAGE__->attr(
     [qw/group listen listen_queue_size max_requests silent user/]);
 __PACKAGE__->attr(ioloop => sub { Mojo::IOLoop->singleton });
@@ -183,8 +186,8 @@ sub _build_tx {
     # Weaken
     weaken $self;
 
-    # State change callback
-    $tx->state_cb(sub { $self->_state($id, @_) });
+    # Resume callback
+    $tx->resume_cb(sub { $self->ioloop->writing($id) if shift->is_writing });
 
     # Handler callback
     $tx->handler_cb(
@@ -237,6 +240,56 @@ sub _error {
 
     # Drop
     $self->_drop($id);
+}
+
+sub _finish {
+    my ($self, $id, $tx) = @_;
+
+    # WebSocket
+    if ($tx->is_websocket) {
+        $self->_drop($id);
+        return $self->ioloop->drop($id);
+    }
+
+    # Connection
+    my $c = $self->{_cs}->{$id};
+
+    # Finish transaction
+    delete $c->{transaction};
+    $tx->server_close;
+
+    # WebSocket
+    my $s = 0;
+    if (my $ws = $c->{websocket}) {
+
+        # Successful upgrade
+        if ($ws->res->code eq '101') {
+
+            # Make sure connection stays active
+            $tx->keep_alive(1);
+
+            # Allow early writing from the server side
+            return $self->ioloop->writing($id) if $ws->is_writing;
+        }
+
+        # Failed upgrade
+        else {
+            delete $c->{websocket};
+            $ws->server_close;
+        }
+    }
+
+    # Close connection
+    if ($tx->req->error || !$tx->keep_alive) {
+        $self->_drop($id);
+        $self->ioloop->drop($id);
+    }
+
+    # Leftovers
+    elsif (defined(my $leftovers = $tx->server_leftovers)) {
+        $tx = $c->{transaction} = $self->_build_tx($id, $c);
+        $tx->server_read($leftovers);
+    }
 }
 
 sub _hup {
@@ -316,6 +369,9 @@ sub _listen {
 sub _read {
     my ($self, $loop, $id, $chunk) = @_;
 
+    # Debug
+    warn qq/READ $id:\n"$chunk"\n/ if DEBUG;
+
     # Connection
     my $c = $self->{_cs}->{$id};
 
@@ -328,62 +384,15 @@ sub _read {
     # Read
     $tx->server_read($chunk);
 
+    # Writing
+    $loop->writing($id) if $tx->is_writing;
+
+    # Finish
+    $self->_finish($id, $tx) if $tx->is_done;
+
     # Last keep alive request
     $tx->res->headers->connection('Close')
       if ($c->{requests} || 0) >= $self->max_keep_alive_requests;
-}
-
-sub _state {
-    my ($self, $id, $tx) = @_;
-
-    # Finish
-    if ($tx->is_finished) {
-
-        # Connection
-        my $c = $self->{_cs}->{$id};
-
-        # Finish transaction
-        delete $c->{transaction};
-        $tx->server_close;
-
-        # WebSocket
-        my $s = 0;
-        if (my $ws = $c->{websocket}) {
-
-            # Successful upgrade
-            if ($ws->res->code eq '101') {
-
-                # Make sure connection stays active
-                $tx->keep_alive(1);
-
-                # Allow early writing from the server side
-                return $self->ioloop->writing($id) if $ws->is_writing;
-            }
-
-            # Failed upgrade
-            else {
-                delete $c->{websocket};
-                $ws->server_close;
-            }
-        }
-
-        # Close connection
-        if ($tx->req->has_error || !$tx->keep_alive) {
-            $self->_drop($id);
-            $self->ioloop->drop($id);
-        }
-
-        # Leftovers
-        elsif (defined(my $leftovers = $tx->server_leftovers)) {
-            $tx = $c->{transaction} = $self->_build_tx($id, $c);
-            $tx->server_read($leftovers);
-        }
-    }
-
-    # Writing
-    return $tx->is_writing
-      ? $self->ioloop->writing($id)
-      : $self->ioloop->not_writing($id);
 }
 
 sub _upgrade {
@@ -401,24 +410,11 @@ sub _upgrade {
     # Upgrade connection timeout
     $self->ioloop->connection_timeout($id, $self->websocket_timeout);
 
-    # State change callback
-    $ws->state_cb(
-        sub {
-            my $ws = shift;
+    # Weaken
+    weaken $self;
 
-            # Writing
-            return $self->ioloop->writing($id) if $ws->is_writing;
-
-            # Finish
-            if ($ws->is_finished) {
-                $self->_drop($id);
-                $self->ioloop->drop($id);
-            }
-
-            # Not writing
-            $self->ioloop->not_writing($id);
-        }
-    );
+    # Resume callback
+    $ws->resume_cb(sub { $self->ioloop->writing($id) if shift->is_writing });
 }
 
 sub _write {
@@ -428,10 +424,25 @@ sub _write {
     my $c = $self->{_cs}->{$id};
 
     # Transaction
-    return unless my $tx = $c->{transaction} || $c->{websocket};
+    my $tx;
+    unless ($tx = $c->{transaction} || $c->{websocket}) {
+        $loop->not_writing($id);
+        return;
+    }
 
     # Get chunk
-    return $tx->server_write;
+    my $chunk = $tx->server_write;
+
+    # WebSockets are not always writing
+    $loop->not_writing($id) if $c->{websocket} && !$tx->is_writing;
+
+    # Finish
+    $self->_finish($id, $tx) if $tx->is_done;
+
+    # Debug
+    warn qq/WRITE $id:\n"$chunk"\n/ if DEBUG;
+
+    return $chunk;
 }
 
 1;

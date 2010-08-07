@@ -161,6 +161,9 @@ sub server_read {
         );
     }
 
+    # Resume
+    $self->resume_cb->($self);
+
     return $self;
 }
 
@@ -170,7 +173,7 @@ sub server_write {
     # Not writing anymore
     my $write = $self->{_write} ||= Mojo::ByteStream->new;
     unless ($write->size) {
-        $self->{_finished} ? $self->state('done') : $self->state('read');
+        $self->{_state} = $self->{_finished} ? 'done' : 'read';
     }
 
     # Empty buffer
@@ -222,7 +225,10 @@ sub _send_bytes {
     $write->add_chunk($bytes);
 
     # Writing
-    $self->state('write');
+    $self->{_state} = 'write';
+
+    # Resume
+    $self->resume_cb->($self);
 }
 
 1;
@@ -238,8 +244,8 @@ Mojo::Transaction::WebSocket - WebSocket Transaction Container
 
 =head1 DESCRIPTION
 
-L<Mojo::Transaction::WebSocket> is a container and state machine for
-WebSocket transactions as described in C<The Web Socket protocol>.
+L<Mojo::Transaction::WebSocket> is a container for WebSocket transactions as
+described in C<The WebSocket protocol>.
 
 =head1 ATTRIBUTES
 

@@ -124,7 +124,7 @@ post '/upload' => sub {
     my $self = shift;
     my $body = $self->res->body || '';
     $self->res->body("called, $body");
-    return if $self->req->has_error;
+    return if $self->req->error;
     if (my $u = $self->req->upload('Вячеслав')) {
         $self->stash('mojo.rendered' => 1);
         $self->res->body($self->res->body . $u->filename . $u->size);
@@ -695,8 +695,8 @@ $tx->req->method('POST');
 $tx->req->url->parse('/upload');
 $tx->req->content($content);
 $client->process($tx);
-is($tx->state,     'done', 'state is done');
-is($tx->res->code, 200,    'right status');
+ok($tx->is_done, 'transaction is done');
+is($tx->res->code, 200, 'right status');
 is( b($tx->res->body)->decode('UTF-8')->to_string,
     'called, Вячеслав.jpg4096',
     'right content'

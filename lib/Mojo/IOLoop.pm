@@ -448,16 +448,16 @@ sub one_tick {
         $loop->poll($timeout);
 
         # Read
-        push @read, $_ for $loop->handles(EPOLL_POLLIN);
+        push @read, "$_" for $loop->handles(EPOLL_POLLIN);
 
         # Write
-        push @write, $_ for $loop->handles(EPOLL_POLLOUT);
+        push @write, "$_" for $loop->handles(EPOLL_POLLOUT);
 
         # Error
-        push @error, $_ for $loop->handles(EPOLL_POLLERR);
+        push @error, "$_" for $loop->handles(EPOLL_POLLERR);
 
         # HUP
-        push @hup, $_ for $loop->handles(EPOLL_POLLHUP);
+        push @hup, "$_" for $loop->handles(EPOLL_POLLHUP);
     }
 
     # Poll
@@ -465,16 +465,16 @@ sub one_tick {
         $loop->poll($timeout);
 
         # Read
-        push @read, $_ for $loop->handles(POLLIN);
+        push @read, "$_" for $loop->handles(POLLIN);
 
         # Write
-        push @write, $_ for $loop->handles(POLLOUT);
+        push @write, "$_" for $loop->handles(POLLOUT);
 
         # Error
-        push @error, $_ for $loop->handles(POLLERR);
+        push @error, "$_" for $loop->handles(POLLERR);
 
         # HUP
-        push @hup, $_ for $loop->handles(POLLHUP);
+        push @hup, "$_" for $loop->handles(POLLHUP);
     }
 
     # Read

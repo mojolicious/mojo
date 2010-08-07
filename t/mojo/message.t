@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 640;
+use Test::More tests => 798;
 
 use File::Spec;
 use File::Temp;
@@ -486,22 +486,29 @@ is($req->proxy->userinfo, 'Aladdin:open sesame', 'right proxy userinfo');
 $req = Mojo::Message::Request->new;
 $req->method('GET');
 $req->url->parse('http://127.0.0.1/');
-is( $req->build,
-    "GET / HTTP/1.1\x0d\x0aHost: 127.0.0.1\x0d\x0a\x0d\x0a",
-    'right message'
-);
+$req = Mojo::Message::Request->new->parse($req->build);
+ok($req->is_done, 'request is done');
+is($req->method,        'GET',               'right method');
+is($req->major_version, 1,                   'right major version');
+is($req->minor_version, 1,                   'right minor version');
+is($req->url,           '/',                 'right URL');
+is($req->url->to_abs,   'http://127.0.0.1/', 'right absolute URL');
+is($req->headers->host, '127.0.0.1',         'right "Host" value');
 
 # Build HTTP 1.1 start line and header
 $req = Mojo::Message::Request->new;
 $req->method('GET');
 $req->url->parse('http://127.0.0.1/foo/bar');
 $req->headers->expect('100-continue');
-is( $req->build,
-    "GET /foo/bar HTTP/1.1\x0d\x0a"
-      . "Expect: 100-continue\x0d\x0a"
-      . "Host: 127.0.0.1\x0d\x0a\x0d\x0a",
-    'right message'
-);
+$req = Mojo::Message::Request->new->parse($req->build);
+ok($req->is_done, 'request is done');
+is($req->method,          'GET',                      'right method');
+is($req->major_version,   1,                          'right major version');
+is($req->minor_version,   1,                          'right minor version');
+is($req->url,             '/foo/bar',                 'right URL');
+is($req->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL');
+is($req->headers->expect, '100-continue',             'right "Expect" value');
+is($req->headers->host,   '127.0.0.1',                'right "Host" value');
 
 # Build full HTTP 1.1 request
 $req      = Mojo::Message::Request->new;
@@ -511,14 +518,17 @@ $req->method('get');
 $req->url->parse('http://127.0.0.1/foo/bar');
 $req->headers->expect('100-continue');
 $req->body("Hello World!\n");
-is( $req->build,
-    "GET /foo/bar HTTP/1.1\x0d\x0a"
-      . "Expect: 100-continue\x0d\x0a"
-      . "Host: 127.0.0.1\x0d\x0a"
-      . "Content-Length: 13\x0d\x0a\x0d\x0a"
-      . "Hello World!\n",
-    'right message'
-);
+$req = Mojo::Message::Request->new->parse($req->build);
+ok($req->is_done, 'request is done');
+is($req->method,          'GET',                      'right method');
+is($req->major_version,   1,                          'right major version');
+is($req->minor_version,   1,                          'right minor version');
+is($req->url,             '/foo/bar',                 'right URL');
+is($req->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL');
+is($req->headers->expect, '100-continue',             'right "Expect" value');
+is($req->headers->host,   '127.0.0.1',                'right "Host" value');
+is($req->headers->content_length, '13', 'right "Content-Length" value');
+is($req->body, "Hello World!\n", 'right content');
 ok($finished,     'finish callback was called');
 ok($req->is_done, 'request is done');
 
@@ -547,19 +557,32 @@ $req->headers->upgrade('WebSocket');
 $req->headers->sec_websocket_key1('4 @1  46546xW%0l 1 5');
 $req->headers->origin('http://example.com');
 $req->body('^n:ds[4U');
-is( $req->build,
-    "GET /demo HTTP/1.1\x0d\x0a"
-      . "Connection: Upgrade\x0d\x0a"
-      . "Upgrade: WebSocket\x0d\x0a"
-      . "Host: example.com\x0d\x0a"
-      . "Content-Length: 8\x0d\x0a"
-      . "Origin: http://example.com\x0d\x0a"
-      . "Sec-WebSocket-Key1: 4 \@1  46546xW%0l 1 5\x0d\x0a"
-      . "Sec-WebSocket-Key2: 12998 5 Y3 1  .P00\x0d\x0a"
-      . "Sec-WebSocket-Protocol: sample\x0d\x0a\x0d\x0a"
-      . '^n:ds[4U',
-    'right message'
+$req = Mojo::Message::Request->new->parse($req->build);
+ok($req->is_done, 'request is done');
+is($req->method,        'GET',                     'right method');
+is($req->major_version, 1,                         'right major version');
+is($req->minor_version, 1,                         'right minor version');
+is($req->url,           '/demo',                   'right URL');
+is($req->url->to_abs,   'http://example.com/demo', 'right absolute URL');
+is($req->headers->connection, 'Upgrade',     'right "Connection" value');
+is($req->headers->upgrade,    'WebSocket',   'right "Upgrade" value');
+is($req->headers->host,       'example.com', 'right "Host" value');
+is($req->headers->content_length, '8', 'right "Content-Length" value');
+is($req->headers->origin, 'http://example.com', 'right "Origin" value');
+is( $req->headers->sec_websocket_key1,
+    "4 \@1  46546xW%0l 1 5",
+    'right "Sec-WebSocket-Key1" value'
 );
+is( $req->headers->sec_websocket_key2,
+    '12998 5 Y3 1  .P00',
+    'right "Sec-WebSocket-Key2" value'
+);
+is($req->headers->sec_websocket_protocol,
+    'sample', 'right "Sec-WebSocket-Protocol" value');
+is($req->body, '^n:ds[4U', 'right content');
+ok($finished,     'finish callback was called');
+ok($req->is_done, 'request is done');
+
 
 # Build full HTTP 1.1 proxy request
 $req = Mojo::Message::Request->new;
@@ -568,14 +591,17 @@ $req->url->parse('http://127.0.0.1/foo/bar');
 $req->headers->expect('100-continue');
 $req->body("Hello World!\n");
 $req->proxy('http://127.0.0.2:8080');
-is( $req->build,
-    "GET http://127.0.0.1/foo/bar HTTP/1.1\x0d\x0a"
-      . "Expect: 100-continue\x0d\x0a"
-      . "Host: 127.0.0.1\x0d\x0a"
-      . "Content-Length: 13\x0d\x0a\x0d\x0a"
-      . "Hello World!\n",
-    'right message'
-);
+$req = Mojo::Message::Request->new->parse($req->build);
+ok($req->is_done, 'request is done');
+is($req->method,          'GET',                      'right method');
+is($req->major_version,   1,                          'right major version');
+is($req->minor_version,   1,                          'right minor version');
+is($req->url,             'http://127.0.0.1/foo/bar', 'right URL');
+is($req->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL');
+is($req->headers->expect, '100-continue',             'right "Expect" value');
+is($req->headers->host,   '127.0.0.1',                'right "Host" value');
+is($req->headers->content_length, '13', 'right "Content-Length" value');
+is($req->body, "Hello World!\n", 'right content');
 
 # Build full HTTP 1.1 proxy request with basic authorization
 $req = Mojo::Message::Request->new;
@@ -584,29 +610,51 @@ $req->url->parse('http://Aladdin:open%20sesame@127.0.0.1/foo/bar');
 $req->headers->expect('100-continue');
 $req->body("Hello World!\n");
 $req->proxy('http://Aladdin:open%20sesame@127.0.0.2:8080');
-is( $req->build,
-    "GET http://127.0.0.1/foo/bar HTTP/1.1\x0d\x0a"
-      . "Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==\x0d\x0a"
-      . "Expect: 100-continue\x0d\x0a"
-      . "Host: 127.0.0.1\x0d\x0a"
-      . "Proxy-Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==\x0d\x0a"
-      . "Content-Length: 13\x0d\x0a\x0d\x0a"
-      . "Hello World!\n",
-    'right message'
+$req = Mojo::Message::Request->new->parse($req->build);
+ok($req->is_done, 'request is done');
+is($req->method,          'GET',                      'right method');
+is($req->major_version,   1,                          'right major version');
+is($req->minor_version,   1,                          'right minor version');
+is($req->url,             'http://127.0.0.1/foo/bar', 'right URL');
+is($req->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL');
+is($req->proxy->userinfo, 'Aladdin:open sesame',      'right proxy userinfo');
+is( $req->headers->authorization,
+    'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
+    'right "Authorization" value'
 );
+is($req->headers->expect, '100-continue', 'right "Expect" value');
+is($req->headers->host,   '127.0.0.1',    'right "Host" value');
+is( $req->headers->proxy_authorization,
+    'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
+    'right "Proxy-Authorization" value'
+);
+is($req->headers->content_length, '13', 'right "Content-Length" value');
+is($req->body, "Hello World!\n", 'right content');
 
 # Build full HTTP 1.1 proxy connect request with basic authorization
 $req = Mojo::Message::Request->new;
 $req->method('CONNECT');
 $req->url->parse('http://Aladdin:open%20sesame@127.0.0.1:3000/foo/bar');
 $req->proxy('http://Aladdin:open%20sesame@127.0.0.2:8080');
-is( $req->build,
-    "CONNECT 127.0.0.1:3000 HTTP/1.1\x0d\x0a"
-      . "Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==\x0d\x0a"
-      . "Host: 127.0.0.1:3000\x0d\x0a"
-      . "Proxy-Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==\x0d\x0a"
-      . "\x0d\x0a",
-    'right message'
+$req = Mojo::Message::Request->new->parse($req->build);
+ok($req->is_done, 'request is done');
+is($req->method,        'CONNECT',        'right method');
+is($req->major_version, 1,                'right major version');
+is($req->minor_version, 1,                'right minor version');
+is($req->url,           '127.0.0.1:3000', 'right URL');
+is( $req->url->to_abs,
+    'http://Aladdin:open%20sesame@127.0.0.1:3000/',
+    'right absolute URL'
+);
+is($req->proxy->userinfo, 'Aladdin:open sesame', 'right proxy userinfo');
+is( $req->headers->authorization,
+    'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
+    'right "Authorization" value'
+);
+is($req->headers->host, '127.0.0.1:3000', 'right "Host" value');
+is( $req->headers->proxy_authorization,
+    'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
+    'right "Proxy-Authorization" value'
 );
 
 # Build HTTP 1.1 multipart request
@@ -621,18 +669,28 @@ my $content = Mojo::Content::Single->new;
 $content->asset->add_chunk("lala\nfoobar\nperl rocks\n");
 $content->headers->content_type('text/plain');
 push @{$req->content->parts}, $content;
-is( $req->build,
-    "GET /foo/bar HTTP/1.1\x0d\x0a"
-      . "Host: 127.0.0.1\x0d\x0a"
-      . "Content-Length: 104\x0d\x0a"
-      . "Content-Type: multipart/mixed; boundary=7am1X\x0d\x0a\x0d\x0a"
-      . "--7am1X\x0d\x0a\x0d\x0a"
-      . "Hallo Welt lalalala!"
-      . "\x0d\x0a--7am1X\x0d\x0a"
-      . "Content-Type: text/plain\x0d\x0a\x0d\x0a"
-      . "lala\nfoobar\nperl rocks\n"
-      . "\x0d\x0a--7am1X--",
-    'right message'
+$req = Mojo::Message::Request->new->parse($req->build);
+ok($req->is_done, 'request is done');
+is($req->method,        'GET',                      'right method');
+is($req->major_version, 1,                          'right major version');
+is($req->minor_version, 1,                          'right minor version');
+is($req->url,           '/foo/bar',                 'right URL');
+is($req->url->to_abs,   'http://127.0.0.1/foo/bar', 'right absolute URL');
+is($req->headers->host, '127.0.0.1',                'right "Host" value');
+is($req->headers->content_length, '104', 'right "Content-Length" value');
+is( $req->headers->content_type,
+    'multipart/mixed; boundary=7am1X',
+    'right "Content-Type" value'
+);
+is( $req->content->parts->[0]->asset->slurp,
+    'Hallo Welt lalalala!',
+    'right content'
+);
+is($req->content->parts->[1]->headers->content_type,
+    'text/plain', 'right "Content-Type" value');
+is( $req->content->parts->[1]->asset->slurp,
+    "lala\nfoobar\nperl rocks\n",
+    'right content'
 );
 
 # Build HTTP 1.1 chunked request
@@ -654,17 +712,16 @@ $req->body(
         return $chunked->build($chunk);
     }
 );
-is( $req->build,
-    "GET /foo/bar HTTP/1.1\x0d\x0a"
-      . "Transfer-Encoding: chunked\x0d\x0a"
-      . "Host: 127.0.0.1:8080\x0d\x0a\x0d\x0a"
-      . "c\x0d\x0a"
-      . "hello world!"
-      . "\x0d\x0af\x0d\x0a"
-      . "hello world2!\n\n"
-      . "\x0d\x0a0\x0d\x0a\x0d\x0a",
-    'right message'
-);
+$req = Mojo::Message::Request->new->parse($req->build);
+ok($req->is_done, 'request is done');
+is($req->method,        'GET',      'right method');
+is($req->major_version, 1,          'right major version');
+is($req->minor_version, 1,          'right minor version');
+is($req->url,           '/foo/bar', 'right URL');
+is($req->url->to_abs, 'http://127.0.0.1:8080/foo/bar', 'right absolute URL');
+is($req->headers->host, '127.0.0.1:8080', 'right "Host" value');
+is($req->headers->transfer_encoding, undef, 'no "Transfer-Encoding" value');
+is($req->body, "hello world!hello world2!\n\n", 'right content');
 ok($counter2, 'right counter');
 
 # Build HTTP 1.1 chunked request with trailing headers
@@ -687,20 +744,19 @@ $req->body_cb(
         return $chunked->build($chunk);
     }
 );
-is( $req->build,
-    "GET /foo/bar HTTP/1.1\x0d\x0a"
-      . "Trailer: X-Test; X-Test2\x0d\x0a"
-      . "Transfer-Encoding: chunked\x0d\x0a"
-      . "Host: 127.0.0.1\x0d\x0a\x0d\x0a"
-      . "c\x0d\x0a"
-      . "hello world!"
-      . "\x0d\x0af\x0d\x0a"
-      . "hello world2!\n\n"
-      . "\x0d\x0a0\x0d\x0a"
-      . "X-Test: test\x0d\x0a"
-      . "X-Test2: 123\x0d\x0a\x0d\x0a",
-    'right message'
-);
+$req = Mojo::Message::Request->new->parse($req->build);
+ok($req->is_done, 'request is done');
+is($req->method,        'GET',                      'right method');
+is($req->major_version, 1,                          'right major version');
+is($req->minor_version, 1,                          'right minor version');
+is($req->url,           '/foo/bar',                 'right URL');
+is($req->url->to_abs,   'http://127.0.0.1/foo/bar', 'right absolute URL');
+is($req->headers->trailer, 'X-Test; X-Test2', 'right "Trailer" value');
+is($req->headers->host,    '127.0.0.1',       'right "Host" value');
+is($req->headers->transfer_encoding, undef,  'no "Transfer-Encoding" value');
+is($req->headers->header('X-Test'),  'test', 'right "X-Test" value');
+is($req->headers->header('X-Test2'), '123',  'right "X-Test2" value');
+is($req->body, "hello world!hello world2!\n\n", 'right content');
 
 # Status code and message
 my $res = Mojo::Message::Response->new;
@@ -846,12 +902,15 @@ $res = Mojo::Message::Response->new;
 $res->code(200);
 $res->headers->connection('keep-alive');
 $res->headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
-is( $res->build,
-    "HTTP/1.1 200 OK\x0d\x0a"
-      . "Connection: keep-alive\x0d\x0a"
-      . "Date: Sun, 17 Aug 2008 16:27:35 GMT\x0d\x0a\x0d\x0a",
-    'right message'
-);
+$res = Mojo::Message::Response->new->parse($res->build);
+ok($res->is_done, 'request is done');
+is($res->code,                '200',        'right status');
+is($res->message,             'OK',         'right message');
+is($res->major_version,       1,            'right major version');
+is($res->minor_version,       1,            'right minor version');
+is($res->headers->connection, 'keep-alive', 'right "Connection" value');
+is($res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT',
+    'right "Date" value');
 
 # Build full HTTP 1.1 response
 $res = Mojo::Message::Response->new;
@@ -859,14 +918,17 @@ $res->code(200);
 $res->headers->connection('keep-alive');
 $res->headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
 $res->body("Hello World!\n");
-is( $res->build,
-    "HTTP/1.1 200 OK\x0d\x0a"
-      . "Connection: keep-alive\x0d\x0a"
-      . "Date: Sun, 17 Aug 2008 16:27:35 GMT\x0d\x0a"
-      . "Content-Length: 13\x0d\x0a\x0d\x0a"
-      . "Hello World!\n",
-    'right message'
-);
+$res = Mojo::Message::Response->new->parse($res->build);
+ok($res->is_done, 'request is done');
+is($res->code,                '200',        'right status');
+is($res->message,             'OK',         'right message');
+is($res->major_version,       1,            'right major version');
+is($res->minor_version,       1,            'right minor version');
+is($res->headers->connection, 'keep-alive', 'right "Connection" value');
+is($res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT',
+    'right "Date" value');
+is($res->headers->content_length, '13', 'right "Content-Length" value');
+is($res->body, "Hello World!\n", 'right content');
 
 # Build HTTP 0.9 response
 $res = Mojo::Message::Response->new;
@@ -876,6 +938,16 @@ $res->body("this is just a document and valid HTTP 0.9\nlalala\n");
 is( $res->build,
     "this is just a document and valid HTTP 0.9\nlalala\n",
     'right message'
+);
+$res = Mojo::Message::Response->new->parse($res->build);
+ok($res->is_done, 'request is done');
+is($res->code,          undef, 'no status');
+is($res->message,       undef, 'no message');
+is($res->major_version, 0,     'right major version');
+is($res->minor_version, 9,     'right minor version');
+is( $res->body,
+    "this is just a document and valid HTTP 0.9\nlalala\n",
+    'right content'
 );
 
 # Build HTTP 1.1 multipart response
@@ -891,18 +963,28 @@ $content = Mojo::Content::Single->new;
 $content->asset->add_chunk("lala\nfoobar\nperl rocks\n");
 $content->headers->content_type('text/plain');
 push @{$res->content->parts}, $content;
-is( $res->build,
-    "HTTP/1.1 200 OK\x0d\x0a"
-      . "Date: Sun, 17 Aug 2008 16:27:35 GMT\x0d\x0a"
-      . "Content-Length: 108\x0d\x0a"
-      . "Content-Type: multipart/mixed; boundary=7am1X\x0d\x0a\x0d\x0a"
-      . "--7am1X\x0d\x0a\x0d\x0a"
-      . 'Hallo Welt lalalalalala!'
-      . "\x0d\x0a--7am1X\x0d\x0a"
-      . "Content-Type: text/plain\x0d\x0a\x0d\x0a"
-      . "lala\nfoobar\nperl rocks\n"
-      . "\x0d\x0a--7am1X--",
-    'right message'
+$res = Mojo::Message::Response->new->parse($res->build);
+ok($res->is_done, 'request is done');
+is($res->code,          200,  'right status');
+is($res->message,       'OK', 'right message');
+is($res->major_version, 1,    'right major version');
+is($res->minor_version, 1,    'right minor version');
+is($res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT',
+    'right "Date" value');
+is($res->headers->content_length, '108', 'right "Content-Length" value');
+is( $res->headers->content_type,
+    'multipart/mixed; boundary=7am1X',
+    'right "Content-Type" value'
+);
+is( $res->content->parts->[0]->asset->slurp,
+    'Hallo Welt lalalalalala!',
+    'right content'
+);
+is($res->content->parts->[1]->headers->content_type,
+    'text/plain', 'right "Content-Type" value');
+is( $res->content->parts->[1]->asset->slurp,
+    "lala\nfoobar\nperl rocks\n",
+    'right content'
 );
 
 # Parse IIS 7.5 like CGI environment (root)
@@ -1523,18 +1605,24 @@ $res->headers->sec_websocket_origin('http://example.com');
 $res->headers->sec_websocket_location('ws://example.com/demo');
 $res->headers->sec_websocket_protocol('sample');
 $res->body('8jKS\'y:G*Co,Wxa-');
-is( $res->build,
-    "HTTP/1.1 101 WebSocket Protocol Handshake\x0d\x0a"
-      . "Connection: Upgrade\x0d\x0a"
-      . "Date: Sun, 17 Aug 2008 16:27:35 GMT\x0d\x0a"
-      . "Upgrade: WebSocket\x0d\x0a"
-      . "Content-Length: 16\x0d\x0a"
-      . "Sec-WebSocket-Origin: http://example.com\x0d\x0a"
-      . "Sec-WebSocket-Location: ws://example.com/demo\x0d\x0a"
-      . "Sec-WebSocket-Protocol: sample\x0d\x0a\x0d\x0a"
-      . '8jKS\'y:G*Co,Wxa-',
-    'right message'
-);
+$res = Mojo::Message::Response->new->parse($res->build);
+ok($res->is_done, 'request is done');
+is($res->code, '101', 'right status');
+is($res->message, 'WebSocket Protocol Handshake', 'right message');
+is($res->major_version,       1,         'right major version');
+is($res->minor_version,       1,         'right minor version');
+is($res->headers->connection, 'Upgrade', 'right "Connection" value');
+is($res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT',
+    'right "Date" value');
+is($res->headers->upgrade, 'WebSocket', 'right "Upgrade" value');
+is($res->headers->content_length, '16', 'right "Content-Length" value');
+is($res->headers->sec_websocket_origin,
+    'http://example.com', 'right "Sec-WebSocket-Origin" value');
+is($res->headers->sec_websocket_location,
+    'ws://example.com/demo', 'right "Sec-WebSocket-Location" value');
+is($res->headers->sec_websocket_protocol,
+    'sample', 'right "Sec-WebSocket-Protocol" value');
+is($res->body, '8jKS\'y:G*Co,Wxa-', 'right content');
 
 # Build and parse HTTP 1.1 response with 3 cookies
 $res = Mojo::Message::Response->new;
@@ -1551,14 +1639,7 @@ $res->headers->set_cookie2(
         path  => '/foobar'
     )
 );
-is( $res->build,
-    "HTTP/1.1 404 Not Found\x0d\x0a"
-      . "Date: Sun, 17 Aug 2008 16:27:35 GMT\x0d\x0a"
-      . "Set-Cookie: foo=bar; Version=1; Path=/foobar\x0d\x0a"
-      . "Set-Cookie: bar=baz; Version=1; Path=/test/23\x0d\x0a"
-      . "Set-Cookie2: baz=yada; Version=1; Path=/foobar\x0d\x0a\x0d\x0a",
-    'right message'
-);
+ok(!!$res->build, 'message built');
 my $res2 = Mojo::Message::Response->new;
 $res2->parse($res->build);
 ok($res2->is_done, 'response is done');
@@ -1622,16 +1703,30 @@ $req->cookies(
     )
 );
 $req->body("Hello World!\n");
-is( $req->build,
-    "GET /foo/bar HTTP/1.1\x0d\x0a"
-      . "Expect: 100-continue\x0d\x0a"
-      . "Host: 127.0.0.1\x0d\x0a"
-      . "Content-Length: 13\x0d\x0a"
-      . 'Cookie: $Version=1; foo=bar; $Path=/foobar; bar=baz; $Path=/test/23'
-      . "\x0d\x0a\x0d\x0a"
-      . "Hello World!\n",
-    'right message'
+ok(!!$req->build, 'message built');
+my $req2 = Mojo::Message::Request->new;
+$req2->parse($req->build);
+ok($req2->is_done, 'request is done');
+is($req2->method,          'GET',          'right method');
+is($req2->major_version,   1,              'right major version');
+is($req2->minor_version,   1,              'right minor version');
+is($req2->headers->expect, '100-continue', 'right "Expect" value');
+is($req2->headers->host,   '127.0.0.1',    'right "Host" value');
+is($req2->headers->content_length, 13, 'right "Content-Length" value');
+is( $req2->headers->cookie,
+    '$Version=1; foo=bar; $Path=/foobar; bar=baz; $Path=/test/23',
+    'right "Cookie" value'
 );
+is($req2->url, '/foo/bar', 'right URL');
+is($req2->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL');
+is(defined $req2->cookie('foo'), 1,                'right value');
+is(defined $req2->cookie('baz'), '',               'no value');
+is(defined $req2->cookie('bar'), 1,                'right value');
+is($req2->cookie('foo')->path,   '/foobar',        'right path');
+is($req2->cookie('foo')->value,  'bar',            'right value');
+is($req2->cookie('bar')->path,   '/test/23',       'right path');
+is($req2->cookie('bar')->value,  'baz',            'right value');
+is($req2->body,                  "Hello World!\n", 'right content');
 
 # Parse full HTTP 1.0 request with cookies
 $req     = Mojo::Message::Request->new;

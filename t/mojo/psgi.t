@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 19;
+use Test::More tests => 15;
 
 use Mojo::JSON;
 
@@ -36,13 +36,13 @@ my $env = {
     'psgi.run_once'     => 0
 };
 my $res = $app->($env);
-is($res->[0],      200,    'right status');
-is($res->[1]->[0], 'Date', 'right header name');
-ok($res->[1]->[1], 'right header value');
-is($res->[1]->[2], 'Content-Length',   'right header name');
-is($res->[1]->[3], 41,                 'right header value');
-is($res->[1]->[4], 'Content-Type',     'right header name');
-is($res->[1]->[5], 'application/json', 'right header value');
+is($res->[0], 200, 'right status');
+my %headers = @{$res->[1]};
+is(keys %headers, 3, 'right number of headers');
+ok($headers{Date}, 'right "Date" value');
+is($headers{'Content-Length'}, '41', 'right "Content-Length" value');
+is($headers{'Content-Type'}, 'application/json',
+    'right "Content-Type" value');
 my $params = '';
 while (defined(my $chunk = $res->[2]->getline)) { $params .= $chunk }
 $params = Mojo::JSON->new->decode($params);
@@ -74,13 +74,13 @@ $env = {
 };
 $app = Mojo::Command::Psgi->new->run;
 $res = $app->($env);
-is($res->[0],      200,    'right status');
-is($res->[1]->[0], 'Date', 'right header name');
-ok($res->[1]->[1], 'right header value');
-is($res->[1]->[2], 'Content-Length',   'right header name');
-is($res->[1]->[3], 41,                 'right header value');
-is($res->[1]->[4], 'Content-Type',     'right header name');
-is($res->[1]->[5], 'application/json', 'right header value');
+is($res->[0], 200, 'right status');
+%headers = @{$res->[1]};
+is(keys %headers, 3, 'right number of headers');
+ok($headers{Date}, 'right "Date" value');
+is($headers{'Content-Length'}, '41', 'right "Content-Length" value');
+is($headers{'Content-Type'}, 'application/json',
+    'right "Content-Type" value');
 $params = '';
 while (defined(my $chunk = $res->[2]->getline)) { $params .= $chunk }
 $params = Mojo::JSON->new->decode($params);

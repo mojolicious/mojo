@@ -15,6 +15,7 @@ __PACKAGE__->attr(buffer => sub { Mojo::ByteStream->new });
 # Filter regex
 my $FILTER_RE = qr/[[:cntrl:]\(\|\)\<\>\@\,\;\:\\\"\/\[\]\?\=\{\}\s]/;
 
+# Headers
 my @GENERAL_HEADERS = qw/
   Connection
   Cache-Control
@@ -78,20 +79,16 @@ my @WEBSOCKET_HEADERS = qw/
   Sec-WebSocket-Location
   Sec-WebSocket-Protocol
   /;
+my @HEADERS = (
+    @GENERAL_HEADERS, @REQUEST_HEADERS, @RESPONSE_HEADERS,
+    @ENTITY_HEADERS,  @WEBSOCKET_HEADERS
+);
 
-my (%ORDERED_HEADERS, %NORMALCASE_HEADERS);
-{
-    my $i       = 1;
-    my @headers = (
-        @GENERAL_HEADERS, @REQUEST_HEADERS, @RESPONSE_HEADERS,
-        @ENTITY_HEADERS,  @WEBSOCKET_HEADERS
-    );
-    for my $name (@headers) {
-        my $lowercase = lc $name;
-        $ORDERED_HEADERS{$lowercase}    = $i;
-        $NORMALCASE_HEADERS{$lowercase} = $name;
-        $i++;
-    }
+# Lower case headers
+my %NORMALCASE_HEADERS;
+for my $name (@HEADERS) {
+    my $lowercase = lc $name;
+    $NORMALCASE_HEADERS{$lowercase} = $name;
 }
 
 sub accept_language { shift->header('Accept-Language' => @_) }
@@ -232,18 +229,9 @@ sub location      { shift->header(Location        => @_) }
 sub names {
     my $self = shift;
 
-    # Names
-    my @names = keys %{$self->{_headers}};
-
-    # Sort
-    @names = sort {
-        ($ORDERED_HEADERS{$a} || 999) <=> ($ORDERED_HEADERS{$b} || 999)
-          || $a cmp $b
-    } @names;
-
     # Normal case
     my @headers;
-    for my $name (@names) {
+    for my $name (keys %{$self->{_headers}}) {
         push @headers, $NORMALCASE_HEADERS{$name} || $name;
     }
 

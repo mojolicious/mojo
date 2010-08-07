@@ -11,11 +11,8 @@ use base 'Mojo::Filter';
 sub build {
     my ($self, $chunk) = @_;
 
-    # State
-    $self->{_state} ||= 'start';
-
     # Done
-    return '' if $self->{_state} eq 'done';
+    return '' if ($self->{_state} || '') eq 'done';
 
     # Shortcut
     return unless defined $chunk;
@@ -41,7 +38,7 @@ sub build {
     else {
 
         # First chunk has no leading CRLF
-        $formatted = "\x0d\x0a" unless $self->{_state} eq 'start';
+        $formatted = "\x0d\x0a" if $self->{_state};
         $self->{_state} = 'chunks';
 
         # Chunk
@@ -59,11 +56,8 @@ sub is_done {
 sub parse {
     my $self = shift;
 
-    # State
-    $self->{_state} ||= 'start';
-
     # Trailing headers
-    if ($self->{_state} eq 'trailing_headers') {
+    if (($self->{_state} || '') eq 'trailing_headers') {
         $self->_parse_trailing_headers;
         return $self;
     }
@@ -107,7 +101,8 @@ sub parse {
     }
 
     # Trailing headers
-    $self->_parse_trailing_headers if $self->{_state} eq 'trailing_headers';
+    $self->_parse_trailing_headers
+      if ($self->{_state} || '') eq 'trailing_headers';
 }
 
 sub _parse_trailing_headers {

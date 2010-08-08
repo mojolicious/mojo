@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 148;
+use Test::More tests => 151;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -381,3 +381,9 @@ is_deeply(\@numbers, [1, 1, 2, 2, 3, 3], 'right order');
 $dom->parse("<div test=23 id='a' \n class='x' foo=bar />");
 is($dom->at('div.x')->attrs->{test},        23,  'right attribute');
 is($dom->at('[foo="bar"]')->attrs->{class}, 'x', 'right attribute');
+
+# Markup characters in attribute values
+$dom->parse(qq/<div id="<a>" \n test='='>Test<div id="><" \/><\/div>/);
+is($dom->at('div[id="<a>"]')->attrs->{test}, '=',    'right attribute');
+is($dom->at('[id="<a>"]')->text,             'Test', 'right text');
+is($dom->at('[id="><"]')->attrs->{id},       '><',   'right attribute');

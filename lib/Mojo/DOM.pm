@@ -47,7 +47,7 @@ my $XML_ATTR_RE = qr/
     (?:\s*=\s*(?:"([^"]+)"|'([^']+)'|(\S+)))?   # Value
 /x;
 my $XML_END_RE   = qr/^\s*\/\s*(.+)\s*/;
-my $XML_START_RE = qr/(\S+)([^>]*)/;
+my $XML_START_RE = qr/(\S+)([\s\S]*)/;
 my $XML_TOKEN_RE = qr/
     ([^<]*)                  # Text
     (?:
@@ -59,8 +59,27 @@ my $XML_TOKEN_RE = qr/
     |
     <\!DOCTYPE([^>]*)>       # DOCTYPE
     |
-    <([^>]+)>                # Tag
-    )?
+    <(
+    \s*
+    [^>\s]+                  # Tag
+    (?:
+        \s*
+        [^=\s>"']+           # Key
+        (?:
+            \s*
+            =
+            \s*
+            (?:
+            "[^"]+?"         # Quotation marks
+            |
+            '[^']+?'         # Apostrophe
+            |
+            [^>\s]+          # Unquoted
+            )
+        )?
+    )*
+    )>
+    )??
 /xis;
 
 sub all_text {

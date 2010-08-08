@@ -26,6 +26,9 @@ sub client_read {
     # Length
     my $read = length $chunk;
 
+    # Preserve state
+    my $preserved = $self->{_state};
+
     # Done
     $self->{_state} = 'done' if $read == 0;
 
@@ -43,6 +46,12 @@ sub client_read {
 
         # Done
         $self->{_state} = 'done' if $res->is_done;
+    }
+
+    # Unexpected 100 Continue
+    if ($self->{_state} eq 'done' && ($res->code || '') eq '100') {
+        $self->res($res->new);
+        $self->{_state} = $preserved;
     }
 
     # Check for errors
@@ -132,7 +141,7 @@ sub client_write {
         $write  = $write - $written;
         $offset = $offset + $written;
 
-        $chunk .= $buffer;
+        $chunk .= $buffer if defined $buffer;
 
         # End
         $self->{_state} = 'read_response'

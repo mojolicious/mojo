@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 26;
+plan tests => 27;
 
 # Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
 # Well, that’s love for you.
@@ -273,15 +273,17 @@ is($subreq,   9,            'finished server websocket');
 
 # WebSocket /dead (dies)
 $code = undef;
-my ($websocket, $message);
+my ($done, $websocket, $message);
 $client->websocket(
     '/dead' => sub {
         my $self = shift;
+        $done      = $self->tx->is_done;
         $websocket = $self->tx->is_websocket;
         $code      = $self->res->code;
         $message   = $self->res->message;
     }
 )->process;
+is($done,      1,                       'transaction is done');
 is($websocket, 0,                       'no websocket');
 is($code,      500,                     'right status');
 is($message,   'Internal Server Error', 'right message');

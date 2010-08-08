@@ -22,6 +22,7 @@ plan tests => 16;
 # about being damaged if I'm not?
 # That's like Christina Aguilera singing Spanish.
 # Ooh, wait! That's it! I'll fake it!
+use Mojo::ByteStream 'b';
 use Mojo::Client;
 use Mojo::Server::Daemon;
 use Mojolicious::Lite;
@@ -63,18 +64,20 @@ $server->prepare_ioloop;
 my $c = {};
 my $connected;
 my ($read, $sent, $fail) = 0;
+my $nf = "HTTP/1.1 404 NOT FOUND\x0d\x0aConnection: close\x0d\x0a\x0d\x0a";
+my $ok = "HTTP/1.1 200 OK\x0d\x0aConnection: keep-alive\x0d\x0a\x0d\x0a";
 $loop->listen(
     port    => $proxy,
     read_cb => sub {
         my ($loop, $client, $chunk) = @_;
-        $c->{$client}->{client} ||= '';
-        $c->{$client}->{client} .= $chunk;
+        $c->{$client}->{client} = b unless exists $c->{$client}->{client};
+        $c->{$client}->{client}->add_chunk($chunk);
         if (my $server = $c->{$client}->{connection}) {
             $loop->writing($server);
             return;
         }
         if ($c->{$client}->{client} =~ /\x0d?\x0a\x0d?\x0a$/) {
-            my $buffer = delete $c->{$client}->{client};
+            my $buffer = $c->{$client}->{client}->empty;
             if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
                 $connected = "$1:$2";
                 $fail = 1 if $2 == $port + 1;
@@ -84,12 +87,7 @@ $loop->listen(
                     connect_cb => sub {
                         my ($loop, $server) = @_;
                         $c->{$client}->{connection} = $server;
-                        $c->{$client}->{server} =
-                          $fail
-                          ? "HTTP/1.1 404 NOT FOUND\x0d\x0a"
-                          . "Connection: close\x0d\x0a\x0d\x0a"
-                          : "HTTP/1.1 200 OK\x0d\x0a"
-                          . "Connection: keep-alive\x0d\x0a\x0d\x0a";
+                        $c->{$client}->{server} = b($fail ? $nf : $ok);
                         $loop->writing($client);
                     },
                     error_cb => sub {
@@ -99,14 +97,13 @@ $loop->listen(
                     read_cb => sub {
                         my ($loop, $server, $chunk) = @_;
                         $read += length $chunk;
-                        $c->{$client}->{server} ||= '';
-                        $c->{$client}->{server} .= $chunk;
+                        $c->{$client}->{server}->add_chunk($chunk);
                         $loop->writing($client);
                     },
                     write_cb => sub {
                         my ($loop, $server) = @_;
                         $loop->not_writing($server);
-                        my $chunk = delete $c->{$client}->{client} || '';
+                        my $chunk = $c->{$client}->{client}->empty;
                         $sent += length $chunk;
                         return $chunk;
                     }
@@ -118,7 +115,7 @@ $loop->listen(
     write_cb => sub {
         my ($loop, $client) = @_;
         $loop->not_writing($client);
-        return delete $c->{$client}->{server};
+        return $c->{$client}->{server}->empty;
     },
     error_cb => sub {
         my ($self, $client) = @_;

@@ -39,7 +39,7 @@ sub contains {
 sub get_chunk {
     my ($self, $start) = @_;
     $start += $self->start_range;
-    my $length = $ENV{MOJO_CHUNK_SIZE} || 8192;
+    my $length = $ENV{MOJO_CHUNK_SIZE} || 262144;
     if (my $end = $self->end_range) {
         $length = $end + 1 - $start if ($start + $length) > $end;
     }

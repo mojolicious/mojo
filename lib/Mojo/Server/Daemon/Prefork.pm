@@ -33,7 +33,7 @@ __PACKAGE__->attr(max_servers                           => 100);
 __PACKAGE__->attr(max_spare_servers                     => 10);
 __PACKAGE__->attr([qw/min_spare_servers start_servers/] => 5);
 
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 8192;
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 262144;
 
 # Marge? Since I'm not talking to Lisa,
 # would you please ask her to pass me the syrup?

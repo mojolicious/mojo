@@ -7,7 +7,7 @@ use warnings;
 
 use base 'Mojo::Server';
 
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 8192;
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 262144;
 
 __PACKAGE__->attr(nph => 0);
 

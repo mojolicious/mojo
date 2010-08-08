@@ -17,7 +17,7 @@ use Mojo::ByteStream;
 use Socket qw/IPPROTO_TCP TCP_NODELAY/;
 use Time::HiRes 'time';
 
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 8192;
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 262144;
 
 # Epoll support requires IO::Epoll
 use constant EPOLL => ($ENV{MOJO_POLL} || $ENV{MOJO_KQUEUE})
@@ -1027,7 +1027,7 @@ sub _read {
     # Socket
     return unless defined(my $socket = $c->{socket});
 
-    # Read chunk
+    # Read as much as possible
     my $read = $socket->sysread(my $buffer, CHUNK_SIZE, 0);
 
     # Error
@@ -1204,11 +1204,8 @@ sub _write {
     return unless my $socket = $c->{socket};
     return unless $socket->connected;
 
-    # Try to write whole buffer
-    my $chunk = $buffer->to_string;
-
     # Write
-    my $written = $socket->syswrite($chunk, length $chunk);
+    my $written = $socket->syswrite($buffer->to_string, CHUNK_SIZE);
 
     # Error
     unless (defined $written) {

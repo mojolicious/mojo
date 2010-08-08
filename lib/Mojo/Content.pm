@@ -12,7 +12,7 @@ use Mojo::ByteStream;
 use Mojo::Filter::Chunked;
 use Mojo::Headers;
 
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 8192;
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 262144;
 
 __PACKAGE__->attr([qw/body_cb filter/]);
 __PACKAGE__->attr([qw/buffer filter_buffer/] => sub { Mojo::ByteStream->new }

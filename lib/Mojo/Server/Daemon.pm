@@ -370,7 +370,7 @@ sub _read {
     my ($self, $loop, $id, $chunk) = @_;
 
     # Debug
-    warn qq/READ $id:\n"$chunk"\n/ if DEBUG;
+    warn "< $chunk\n" if DEBUG;
 
     # Connection
     my $c = $self->{_cs}->{$id};
@@ -384,11 +384,11 @@ sub _read {
     # Read
     $tx->server_read($chunk);
 
-    # Writing
-    $loop->writing($id) if $tx->is_writing;
-
     # Finish
-    $self->_finish($id, $tx) if $tx->is_done;
+    if ($tx->is_done) { $self->_finish($id, $tx) }
+
+    # Writing
+    elsif ($tx->is_writing) { $loop->writing($id) }
 
     # Last keep alive request
     $tx->res->headers->connection('Close')
@@ -433,14 +433,14 @@ sub _write {
     # Get chunk
     my $chunk = $tx->server_write;
 
-    # WebSockets are not always writing
-    $loop->not_writing($id) if $c->{websocket} && !$tx->is_writing;
-
     # Finish
-    $self->_finish($id, $tx) if $tx->is_done;
+    if ($tx->is_done) { $self->_finish($id, $tx) }
+
+    # Not writing
+    elsif (!$tx->is_writing) { $loop->not_writing($id) }
 
     # Debug
-    warn qq/WRITE $id:\n"$chunk"\n/ if DEBUG;
+    warn "> $chunk\n" if DEBUG;
 
     return $chunk;
 }

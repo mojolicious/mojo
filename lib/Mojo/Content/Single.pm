@@ -47,19 +47,22 @@ sub parse {
     # Headers
     my $headers = $self->headers;
 
+    # Content-Length
+    my $length = $self->headers->content_length;
+
     # WebSocket handshakes have a static Content-Length
-    my $length =
+    $length ||=
         $headers->sec_websocket_key1     ? 8
       : $headers->sec_websocket_location ? 16
       :                                    undef;
 
     # Don't waste memory
     if ($self->asset->isa('Mojo::Asset::Memory')) {
-        $length ||= $self->headers->content_length;
 
         # Upgrade to file storage
         $self->asset(Mojo::Asset::File->new)
-          if !$length || $length > ($ENV{MOJO_MAX_MEMORY_SIZE} || 24576);
+          if !defined $length
+              || $length > ($ENV{MOJO_MAX_MEMORY_SIZE} || 262144);
     }
 
     # Content needs to be upgraded to multipart

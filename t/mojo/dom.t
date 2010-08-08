@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 146;
+use Test::More tests => 148;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -85,7 +85,7 @@ is("$dom",               <<EOF,     'stringified right');
   <![CDATA[ yada yada]]>
   <?boom lalalala ?>
   <a bit broken little />
-  <very broken />
+  <very <br broken />
   more text
 </foo>
 EOF
@@ -376,3 +376,8 @@ $dom->parse('<a><b>1</b></a><b>2</b><b>3</b>');
 my @numbers;
 $dom->find("b")->each(sub { push @numbers, pop, shift->text });
 is_deeply(\@numbers, [1, 1, 2, 2, 3, 3], 'right order');
+
+# Attributes on multiple lines
+$dom->parse("<div test=23 id='a' \n class='x' foo=bar />");
+is($dom->at('div.x')->attrs->{test},        23,  'right attribute');
+is($dom->at('[foo="bar"]')->attrs->{class}, 'x', 'right attribute');

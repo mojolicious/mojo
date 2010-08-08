@@ -826,7 +826,7 @@ sub _handle {
           unless $self->_redirect($c, $old);
     }
 
-    # Clean up and stop ioloop
+    # Cleanup
     $self->ioloop->stop if !$self->{_is_async} && !$self->{_processing};
 }
 
@@ -838,7 +838,7 @@ sub _read {
     my ($self, $loop, $id, $chunk) = @_;
 
     # Debug
-    warn qq/READ $id:\n"$chunk"\n/ if DEBUG;
+    warn "< $chunk\n" if DEBUG;
 
     # Connection
     return unless my $c = $self->{_cs}->{$id};
@@ -853,7 +853,7 @@ sub _read {
         $self->_handle($id) if $tx->is_done;
 
         # Writing
-        $loop->writing($id) if $tx->is_writing;
+        $loop->writing($id) if $c->{tx}->is_writing;
 
         return;
     }
@@ -1079,13 +1079,13 @@ sub _write {
         my $chunk = $c->{tx}->client_write;
 
         # Debug
-        warn qq/WRITE $id:\n"$chunk"\n/ if DEBUG;
+        warn "> $chunk\n" if DEBUG;
 
         # Finish
         $self->_handle($id) if $tx->is_done;
 
         # Writing
-        $loop->not_writing($id) unless $tx->is_writing;
+        $loop->not_writing($id) unless $c->{tx}->is_writing;
 
         return $chunk;
     }

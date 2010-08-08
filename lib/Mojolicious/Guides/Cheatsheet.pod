@@ -152,7 +152,7 @@ Note that L<IO::Socket::SSL> must be installed for TLS support.
 =head2 C<MOJO_CHUNK_SIZE>
 
 Chunk size used for IO operations in bytes, a bigger chunk size speeds up IO
-operations but will also use more memory, defaults to C<8192>.
+operations but will also use more memory, defaults to C<262144>.
 
     MOJO_CHUNK_SIZE=1024
 
@@ -195,13 +195,13 @@ to C<10240>.
 =head2 C<MOJO_MAX_MEMORY_SIZE>
 
 Maximum size in bytes for HTTP content to keep in memory, bigger content will
-be written to temporary files, defaults to C<24576>.
+be written to temporary files, defaults to C<262144>.
 
     MOJO_MAX_MEMORY_SIZE=2048
 
 =head2 C<MOJO_MAX_MESSAGE_SIZE>
 
-Maximum size for HTTP messages in bytes, defaults to C<524288>.
+Maximum size for HTTP messages in bytes, defaults to C<5242880>.
 
     MOJO_MAX_MESSAGE_SIZE=1024
 

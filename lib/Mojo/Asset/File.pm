@@ -127,7 +127,7 @@ sub get_chunk {
     my $buffer;
 
     # Chunk size
-    my $size = $ENV{MOJO_CHUNK_SIZE} || 8192;
+    my $size = $ENV{MOJO_CHUNK_SIZE} || 262144;
 
     # Range support
     if (defined $end) {
@@ -180,7 +180,7 @@ sub slurp {
 
     # Slurp
     my $content = '';
-    while ($self->handle->sysread(my $buffer, 8192)) { $content .= $buffer }
+    while ($self->handle->sysread(my $buffer, 262144)) { $content .= $buffer }
 
     return $content;
 }

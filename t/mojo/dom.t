@@ -383,7 +383,7 @@ is($dom->at('div.x')->attrs->{test},        23,  'right attribute');
 is($dom->at('[foo="bar"]')->attrs->{class}, 'x', 'right attribute');
 
 # Markup characters in attribute values
-$dom->parse(qq/<div id="<a>" \n test='='>Test<div id="><" \/><\/div>/);
+$dom->parse(qq/<div id="<a>" \n test='='>Test<div id='><' \/><\/div>/);
 is($dom->at('div[id="<a>"]')->attrs->{test}, '=',    'right attribute');
 is($dom->at('[id="<a>"]')->text,             'Test', 'right text');
 is($dom->at('[id="><"]')->attrs->{id},       '><',   'right attribute');

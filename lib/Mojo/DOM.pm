@@ -72,7 +72,7 @@ my $XML_TOKEN_RE = qr/
             (?:
             "[^"]+?"         # Quotation marks
             |
-            '[^']+?'         # Apostrophe
+            '[^']+?'         # Apostrophes
             |
             [^>\s]+          # Unquoted
             )

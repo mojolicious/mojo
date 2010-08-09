@@ -10,6 +10,7 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 
 # Cheating in a fake fight. That's low.
+use Mojo::ByteStream 'b';
 use Mojo::IOLoop;
 
 # The loop
@@ -23,23 +24,26 @@ $loop->listen(
     port    => 3000,
     read_cb => sub {
         my ($loop, $client, $chunk) = @_;
-        $c->{$client}->{client} ||= '';
-        $c->{$client}->{client} .= $chunk;
+        $c->{$client}->{client} = b unless exists $c->{$client}->{client};
+        $c->{$client}->{client}->add_chunk($chunk);
         if (my $server = $c->{$client}->{connection}) {
             $loop->writing($server);
             return;
         }
         if ($c->{$client}->{client} =~ /\x0d?\x0a\x0d?\x0a$/) {
-            my $buffer = delete $c->{$client}->{client};
+            my $buffer = $c->{$client}->{client}->empty;
             if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
-                my $server = $loop->connect(
-                    address    => $1,
-                    port       => $2 || 80,
+                my $address = $1;
+                my $port    = $2 || 80;
+                my $server  = $loop->connect(
+                    address    => $address,
+                    port       => $port,
                     connect_cb => sub {
                         my ($loop, $server) = @_;
+                        print "Forwarding to $address:$port.\n";
                         $c->{$client}->{connection} = $server;
-                        $c->{$client}->{server} = "HTTP/1.1 200 OK\x0d\x0a"
-                          . "Connection: keep-alive\x0d\x0a\x0d\x0a";
+                        $c->{$client}->{server} = b("HTTP/1.1 200 OK\x0d\x0a"
+                              . "Connection: keep-alive\x0d\x0a\x0d\x0a");
                         $loop->writing($client);
                     },
                     error_cb => sub {
@@ -48,14 +52,13 @@ $loop->listen(
                     },
                     read_cb => sub {
                         my ($loop, $server, $chunk) = @_;
-                        $c->{$client}->{server} ||= '';
-                        $c->{$client}->{server} .= $chunk;
+                        $c->{$client}->{server}->add_chunk($chunk);
                         $loop->writing($client);
                     },
                     write_cb => sub {
                         my ($loop, $server) = @_;
                         $loop->not_writing($server);
-                        return delete $c->{$client}->{client};
+                        return $c->{$client}->{client}->empty;
                     }
                 );
             }
@@ -65,7 +68,7 @@ $loop->listen(
     write_cb => sub {
         my ($loop, $client) = @_;
         $loop->not_writing($client);
-        return delete $c->{$client}->{server};
+        return $c->{$client}->{server}->empty;
     },
     error_cb => sub {
         my ($self, $client) = @_;

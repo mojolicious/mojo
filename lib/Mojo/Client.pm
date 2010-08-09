@@ -576,7 +576,7 @@ sub _connect {
     if ($id && !ref $id) {
 
         # Debug
-        warn "KEEP ALIVE CONNECTION\n" if DEBUG;
+        warn "KEEP ALIVE CONNECTION ($scheme:$address:$port)\n" if DEBUG;
 
         # Writing
         $loop->writing($id);
@@ -602,7 +602,7 @@ sub _connect {
         }
 
         # Debug
-        warn "NEW CONNECTION\n" if DEBUG;
+        warn "NEW CONNECTION ($scheme:$address:$port)\n" if DEBUG;
 
         # Weaken
         weaken $self;

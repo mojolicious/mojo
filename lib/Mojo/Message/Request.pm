@@ -72,14 +72,14 @@ sub fix_headers {
 
     # Basic authorization
     if ((my $u = $url->userinfo) && !$headers->authorization) {
-        $headers->authorization('Basic ' . b($u)->b64_encode->to_string);
+        $headers->authorization('Basic ' . b($u)->b64_encode('')->to_string);
     }
 
     # Basic proxy authorization
     if (my $proxy = $self->proxy) {
         if ((my $u = $proxy->userinfo) && !$headers->proxy_authorization) {
             $headers->proxy_authorization(
-                'Basic ' . b($u)->b64_encode->to_string);
+                'Basic ' . b($u)->b64_encode('')->to_string);
         }
     }
 

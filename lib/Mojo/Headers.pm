@@ -12,9 +12,6 @@ use Mojo::ByteStream;
 
 __PACKAGE__->attr(buffer => sub { Mojo::ByteStream->new });
 
-# Filter regex
-my $FILTER_RE = qr/[[:cntrl:]\(\|\)\<\>\@\,\;\:\\\"\/\[\]\?\=\{\}\s]/;
-
 # Headers
 my @GENERAL_HEADERS = qw/
   Connection
@@ -99,34 +96,15 @@ sub add {
     my $self = shift;
     my $name = shift;
 
-    # Filter illegal characters from header name
-    # (1*<any CHAR except CTLs or separators>)
-    $name =~ s/$FILTER_RE//go;
-
     # Make sure we have a normal case entry for name
     my $lcname = lc $name;
-    unless ($NORMALCASE_HEADERS{$lcname}) {
-        $NORMALCASE_HEADERS{$lcname} = $name;
-    }
+    $NORMALCASE_HEADERS{$lcname} = $name
+      unless exists $NORMALCASE_HEADERS{$lcname};
     $name = $lcname;
 
-    # Filter values
-    my @values;
-    for my $v (@_) {
-        push @values, [];
-
-        for my $value (@{ref $v eq 'ARRAY' ? $v : [$v]}) {
-
-            # Filter control characters
-            $value = '' unless defined $value;
-            $value =~ s/[[:cntrl:]]//g;
-
-            push @{$values[-1]}, $value;
-        }
-    }
-
-    # Add line
-    push @{$self->{_headers}->{$name}}, @values;
+    # Add lines
+    push @{$self->{_headers}->{$name}}, (ref $_ || '') eq 'ARRAY' ? $_ : [$_]
+      for @_;
 
     return $self;
 }

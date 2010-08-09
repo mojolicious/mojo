@@ -52,14 +52,14 @@ $client->async->get(
                     sub {
                         my ($self, $tx) = @_;
                         push @kept_alive, $tx->kept_alive;
-                        $self->ioloop->stop;
+                        $self->async->ioloop->stop;
                     }
                 )->process;
             }
         )->process;
     }
 )->process;
-$client->ioloop->start;
+$client->async->ioloop->start;
 is_deeply(\@kept_alive, [undef, 1, 1], 'connections kept alive');
 
 # Stress test to make sure we don't leak file descriptors

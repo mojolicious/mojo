@@ -732,8 +732,8 @@ sub _drop {
     my ($self, $id) = @_;
 
     # Keep alive
-    my $tx;
-    if (($tx = $self->{_cs}->{$id}->{tx}) && $tx->keep_alive) {
+    my $tx = $self->{_cs}->{$id}->{tx};
+    if ($tx && $tx->keep_alive && !$tx->error) {
 
         # Don't keep CONNECTed connections alive
         my $method = $tx->req->method || '';

@@ -767,6 +767,11 @@ sub _drop_immediately {
         delete $self->{_listening};
     }
 
+    # Delete associated timers
+    if (my $t = $c->{connect_timer} || $c->{accept_timer}) {
+        $self->_drop_immediately($t);
+    }
+
     # Drop socket
     if (my $socket = $c->{socket}) {
 

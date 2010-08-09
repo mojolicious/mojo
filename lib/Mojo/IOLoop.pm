@@ -353,9 +353,6 @@ sub not_writing {
     # Connection
     return unless my $c = $self->{_cs}->{$id};
 
-    # Activity
-    $self->_activity($id);
-
     # Chunk still in buffer or protected
     my $protected = $c->{protected} || 0;
     if (my $buffer = $c->{buffer}) { $protected = 1 if $buffer->size }
@@ -366,6 +363,7 @@ sub not_writing {
 
     # Writing
     my $writing = $c->{writing};
+    return if defined $writing && !$writing;
 
     # KQueue
     my $loop = $self->_prepare_loop;
@@ -393,6 +391,9 @@ sub not_writing {
 
     # Not writing anymore
     $c->{writing} = 0;
+
+    # Active
+    $c->{active} = time;
 }
 
 sub one_tick {
@@ -612,20 +613,17 @@ sub write_cb { shift->_add_event('write', @_) }
 sub writing {
     my ($self, $id) = @_;
 
-    # Activity
-    $self->_activity($id);
-
     # Connection
     my $c = $self->{_cs}->{$id};
+
+    # Writing
+    return if my $writing = $c->{writing};
 
     # Writing again
     delete $c->{read_only};
 
     # Socket
     return unless my $socket = $c->{socket};
-
-    # Writing
-    my $writing = $c->{writing};
 
     # KQueue
     my $loop = $self->_prepare_loop;
@@ -640,19 +638,19 @@ sub writing {
     # Poll and epoll
     else {
 
-        # Not writing anymore
-        unless ($writing) {
-            $loop->remove($socket);
+        # Cleanup
+        $loop->remove($socket);
 
-            # Writing
-            my $mask =
-              EPOLL ? EPOLL_POLLIN | EPOLL_POLLOUT : POLLIN | POLLOUT;
-            $loop->mask($socket, $mask);
-        }
+        # Writing
+        my $mask = EPOLL ? EPOLL_POLLIN | EPOLL_POLLOUT : POLLIN | POLLOUT;
+        $loop->mask($socket, $mask);
     }
 
     # Writing
     $c->{writing} = 1;
+
+    # Active
+    $c->{active} = time;
 }
 
 sub _accept {
@@ -719,16 +717,6 @@ sub _accept {
 
     # Not listening anymore
     delete $self->{_listening};
-}
-
-sub _activity {
-    my ($self, $id) = @_;
-
-    # Connection
-    return unless my $c = $self->{_cs}->{$id};
-
-    # Activity
-    return $c->{active} = time;
 }
 
 sub _add_event {
@@ -925,7 +913,7 @@ sub _prepare_connections {
         $self->not_writing($id) if delete $c->{read_only};
 
         # Last active
-        my $time = $c->{active} || $self->_activity($id);
+        my $time = $c->{active} ||= time;
 
         # HUP
         $self->_hup($id) if (time - $time) >= ($c->{timeout} || 15);
@@ -1024,10 +1012,10 @@ sub _read {
     my $c = $self->{_cs}->{$id};
 
     # TLS accept
-    return $self->_tls_accept($id) if $c->{tls_accept};
+    return $self->_tls_accept($id) if exists $c->{tls_accept};
 
     # TLS connect
-    return $self->_tls_connect($id) if $c->{tls_connect};
+    return $self->_tls_connect($id) if exists $c->{tls_connect};
 
     # Socket
     return unless defined(my $socket = $c->{socket});
@@ -1053,7 +1041,7 @@ sub _read {
     $self->_run_event('read', $event, $id, $buffer) if $event;
 
     # Active
-    $self->_activity($id);
+    $c->{active} = time;
 }
 
 # Failed callbacks should not kill everything
@@ -1180,10 +1168,10 @@ sub _write {
     my $c = $self->{_cs}->{$id};
 
     # TLS accept
-    return $self->_tls_accept($id) if $c->{tls_accept};
+    return $self->_tls_accept($id) if exists $c->{tls_accept};
 
     # TLS connect
-    return $self->_tls_connect($id) if $c->{tls_connect};
+    return $self->_tls_connect($id) if exists $c->{tls_connect};
 
     # Connect has just completed
     return if $c->{connecting};
@@ -1225,8 +1213,8 @@ sub _write {
     # Remove written chunk from buffer
     $buffer->remove($written);
 
-    # Activity
-    $self->_activity($id) if $written;
+    # Active
+    $c->{active} = time if $written;
 }
 
 1;

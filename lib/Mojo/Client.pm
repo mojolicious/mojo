@@ -850,10 +850,10 @@ sub _read {
         $tx->client_read($chunk);
 
         # Finish
-        $self->_handle($id) if $tx->is_done;
+        if ($tx->is_done) { $self->_handle($id) }
 
         # Writing
-        $loop->writing($id) if $c->{tx}->is_writing;
+        elsif ($c->{tx}->is_writing) { $loop->writing($id) }
 
         return;
     }
@@ -1084,7 +1084,7 @@ sub _write {
         # Finish
         $self->_handle($id) if $tx->is_done;
 
-        # Writing
+        # Not writing
         $loop->not_writing($id) unless $c->{tx}->is_writing;
 
         return $chunk;

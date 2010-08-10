@@ -37,6 +37,7 @@ These options are available:
                                  daemon is allowed to handle, not used by
                                  default.
   --user <name>                  Set user name for process.
+  --websocket <seconds>          Set WebSocket timeout, defaults to 300.
 EOF
 
 
@@ -54,12 +55,13 @@ sub run {
         'keepalive=i' => sub { $daemon->keep_alive_timeout($_[1]) },
         'keepaliverequests=i' =>
           sub { $daemon->max_keep_alive_requests($_[1]) },
-        'listen=s'   => sub { $daemon->listen($_[1]) },
-        'pid=s'      => sub { $daemon->pid_file($_[1]) },
-        'queue=i'    => sub { $daemon->listen_queue_size($_[1]) },
-        reload       => sub { $daemon->reload(1) },
-        'requests=i' => sub { $daemon->max_requests($_[1]) },
-        'user=s'     => sub { $daemon->user($_[1]) }
+        'listen=s'    => sub { $daemon->listen($_[1]) },
+        'pid=s'       => sub { $daemon->pid_file($_[1]) },
+        'queue=i'     => sub { $daemon->listen_queue_size($_[1]) },
+        reload        => sub { $daemon->reload(1) },
+        'requests=i'  => sub { $daemon->max_requests($_[1]) },
+        'user=s'      => sub { $daemon->user($_[1]) },
+        'websocket=i' => sub { $daemon->websocket_timeout($_[1]) }
     );
 
     # Run

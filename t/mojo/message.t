@@ -7,7 +7,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 798;
+use Test::More tests => 801;
 
 use File::Spec;
 use File::Temp;
@@ -2052,14 +2052,17 @@ ok($m->at_least_version('0.9'),  '0.9 passes at_least_version("0.9")');
 $req = Mojo::Message::Request->new->headers(Mojo::Headers->new);
 is($req->isa('Mojo::Message::Request'), 1, 'right request');
 
-# Build dom from request with charset in header
-my $res = Mojo::Message::Response->new;
-$res->parse("HTTP/1.1 200 OK\x0d\x0a");
-$res->parse("Content-Type: application/atom+xml; charset=UTF-8; type=feed\x0d\x0a");
-$res->parse("\x0d\x0a");
-$res->body('<test></test>');
+# Build dom from request with charset
+$res = Mojo::Message::Response->new;
+$res->parse("HTTP/1.1 200 OK\x0a");
+$res->parse(
+    "Content-Type: application/atom+xml; charset=UTF-8; type=feed\x0a");
+$res->parse("\x0a");
+$res->body('<test>Test</test>');
 ok($res->is_done, 'request is done');
-is($res->headers->content_type, 'application/atom+xml; charset=UTF-8; type=feed',
-    'right "Content-Type" value');
-ok($res->dom, 'build dom');
+is( $res->headers->content_type,
+    'application/atom+xml; charset=UTF-8; type=feed',
+    'right "Content-Type" value'
+);
+ok($res->dom, 'dom built');
 

@@ -616,11 +616,11 @@ sub writing {
     # Connection
     my $c = $self->{_cs}->{$id};
 
-    # Writing
-    return if my $writing = $c->{writing};
-
     # Writing again
     delete $c->{read_only};
+
+    # Writing
+    return if my $writing = $c->{writing};
 
     # Socket
     return unless my $socket = $c->{socket};
@@ -1012,10 +1012,10 @@ sub _read {
     my $c = $self->{_cs}->{$id};
 
     # TLS accept
-    return $self->_tls_accept($id) if exists $c->{tls_accept};
+    return $self->_tls_accept($id) if $c->{tls_accept};
 
     # TLS connect
-    return $self->_tls_connect($id) if exists $c->{tls_connect};
+    return $self->_tls_connect($id) if $c->{tls_connect};
 
     # Socket
     return unless defined(my $socket = $c->{socket});
@@ -1168,10 +1168,10 @@ sub _write {
     my $c = $self->{_cs}->{$id};
 
     # TLS accept
-    return $self->_tls_accept($id) if exists $c->{tls_accept};
+    return $self->_tls_accept($id) if $c->{tls_accept};
 
     # TLS connect
-    return $self->_tls_connect($id) if exists $c->{tls_connect};
+    return $self->_tls_connect($id) if $c->{tls_connect};
 
     # Connect has just completed
     return if $c->{connecting};

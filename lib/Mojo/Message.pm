@@ -240,7 +240,7 @@ sub dom {
 
     # Charset
     my $charset = $self->default_charset;
-    ($self->headers->content_type || '') =~ /charset=\"?(\S+)\"?/
+    ($self->headers->content_type || '') =~ /charset=\"?([^\s;]+)\"?/
       and $charset = $1;
 
     # Parse

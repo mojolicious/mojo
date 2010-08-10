@@ -2051,3 +2051,15 @@ ok($m->at_least_version('0.9'),  '0.9 passes at_least_version("0.9")');
 # "headers" chaining
 $req = Mojo::Message::Request->new->headers(Mojo::Headers->new);
 is($req->isa('Mojo::Message::Request'), 1, 'right request');
+
+# Build dom from request with charset in header
+my $res = Mojo::Message::Response->new;
+$res->parse("HTTP/1.1 200 OK\x0d\x0a");
+$res->parse("Content-Type: application/atom+xml; charset=UTF-8; type=feed\x0d\x0a");
+$res->parse("\x0d\x0a");
+$res->body('<test></test>');
+ok($res->is_done, 'request is done');
+is($res->headers->content_type, 'application/atom+xml; charset=UTF-8; type=feed',
+    'right "Content-Type" value');
+ok($res->dom, 'build dom');
+

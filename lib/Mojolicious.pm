@@ -35,7 +35,7 @@ __PACKAGE__->attr(session => sub { MojoX::Session::Cookie->new });
 __PACKAGE__->attr(static  => sub { MojoX::Dispatcher::Static->new });
 __PACKAGE__->attr(types   => sub { MojoX::Types->new });
 
-our $CODENAME = 'Snowman';
+our $CODENAME = 'Comet';
 our $VERSION  = '0.999927';
 
 # I personalized each of your meals.

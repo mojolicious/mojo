@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 0.999927 2010-06-11 00:00:00
+        - Code name "Comet", this is a major release.
         - Added EXPERIMENTAL method defaults to Mojolicious.
         - Added EXPERIMENTAL method detour to MojoX::Dispatcher::Routes.
         - Added EXPERIMENTAL attribute partial to MojoX::Routes.

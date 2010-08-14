@@ -1252,14 +1252,17 @@ Mojo::IOLoop - Minimalistic Reactor For TCP Clients And Servers
         address => 'localhost',
         port => 3000,
         tls => 1,
+        connect_cb => sub {
+            my ($self, $id) = @_;
+
+            # Write request
+            $self->write($id, "GET / HTTP/1.1\r\n\r\n");
+        },
         read_cb => sub {
             my ($self, $id, $chunk) = @_;
 
             # Process input
             print $chunk;
-
-            # Time to write more
-            $self->write($id, "GET / HTTP/1.1\r\n\r\n");
         }
     );
 

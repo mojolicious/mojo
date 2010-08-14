@@ -8,19 +8,26 @@ use base 'Mojo::Base';
 use Carp 'croak';
 use Mojo::ByteStream 'b';
 use Mojo::URL;
+use Scalar::Util 'weaken';
 
 __PACKAGE__->attr(captures => sub { {} });
-__PACKAGE__->attr([qw/controller endpoint root/]);
+__PACKAGE__->attr([qw/endpoint root/]);
 __PACKAGE__->attr(stack => sub { [] });
 
 # I'm Bender, baby, please insert liquor!
 sub new {
     my $self = shift->SUPER::new();
     my $c    = shift;
-    $self->controller($c);
+
+    # Controller
+    $self->{_controller} = $c;
+    weaken $self->{_controller};
+
+    # Path
     $self->{_path} = shift
       || b($c->req->url->path->to_string)->url_unescape->decode('UTF-8')
       ->to_string;
+
     return $self;
 }
 
@@ -48,7 +55,7 @@ sub match {
 
         # Match
         my $captures =
-          $condition->($r, $self->controller, $self->captures, $value);
+          $condition->($r, $self->{_controller}, $self->captures, $value);
 
         # Matched
         return unless $captures && ref $captures eq 'HASH';
@@ -242,13 +249,6 @@ L<MojoX::Routes::Match> implements the following attributes.
     $m           = $m->captures({foo => 'bar'});
 
 Captured parameters.
-
-=head2 C<controller>
-
-    my $c = $m->controller;
-    $m    = $m->controller(MojoX::Controller->new);
-
-Controller object used for matching.
 
 =head2 C<endpoint>
 

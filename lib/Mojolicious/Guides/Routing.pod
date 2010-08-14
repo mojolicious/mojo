@@ -354,6 +354,15 @@ throughout the whole framework.
     # Generate URL "/foo/sebastian" for route "test"
     $self->url_for('test', name => 'sebastian');
 
+The value C<*> means that the name is simply equal to the route without
+non-word characters.
+
+    # /foo/bar ("foobar")
+    $r->route('/foo/bar')->to('test#stuff')->name('*');
+
+    # Generate URL "/foo/bar"
+    $self->url_for('foobar');
+
 =head2 HTTP Methods
 
 The C<via> method of the route object allows only specific HTTP methods to

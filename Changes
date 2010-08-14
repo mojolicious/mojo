@@ -22,6 +22,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added say and trim methods to Mojo::ByteStream.
         - Added custom socket support to Mojo::Client.
         - Added SHA1 support to Mojo::ByteStream. (vti)
+        - Added support for route name generation.
         - Renamed attributes method in Mojo::DOM to attrs.
         - Renamed search method in Mojo::DOM to find.
         - Cleaned up tests. (memowe)

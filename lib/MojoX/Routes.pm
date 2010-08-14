@@ -9,7 +9,7 @@ use Mojo::URL;
 use MojoX::Routes::Pattern;
 use Scalar::Util 'weaken';
 
-__PACKAGE__->attr([qw/block inline name parent partial/]);
+__PACKAGE__->attr([qw/block inline parent partial/]);
 __PACKAGE__->attr([qw/children conditions/] => sub { [] });
 __PACKAGE__->attr(dictionary                => sub { {} });
 __PACKAGE__->attr(pattern => sub { MojoX::Routes::Pattern->new });
@@ -86,6 +86,25 @@ sub is_endpoint {
     return 1 if $self->block;
     return   if @{$self->children};
     return 1;
+}
+
+sub name {
+    my ($self, $name) = @_;
+
+    # New name
+    if (defined $name) {
+
+        # Generate
+        if ($name eq '*') {
+            $name = $self->pattern->pattern;
+            $name =~ s/\W+//g;
+        }
+        $self->{_name} = $name;
+
+        return $self;
+    }
+
+    return $self->{_name};
 }
 
 sub over {
@@ -327,13 +346,6 @@ There are currently two conditions built in, C<method> and C<websocket>.
 
 Allow C<bridge> semantics for this route.
 
-=head2 C<name>
-
-    my $name = $r->name;
-    $r       = $r->name('foo');
-
-The name of this route.
-
 =head2 C<parent>
 
     my $parent = $r->parent;
@@ -394,6 +406,14 @@ Add a new bridge to this route as a nested child.
     my $is_endpoint = $r->is_endpoint;
 
 Returns true if this route qualifies as an endpoint.
+
+=head2 C<name>
+
+    my $name = $r->name;
+    $r       = $r->name('foo');
+    $r       = $r->name('*');
+
+The name of this route.
 
 =head2 C<over>
 

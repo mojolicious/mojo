@@ -303,7 +303,7 @@ get '/json' =>
 
 # GET /autostash
 get '/autostash' => sub { shift->render(handler => 'ep', foo => 'bar') } =>
-  'autostash';
+  '*';
 
 # GET /helper
 get '/helper' => sub { shift->render(handler => 'ep') } => 'helper';
@@ -436,7 +436,7 @@ under sub {
 };
 
 # GET /param_auth
-get '/param_auth' => 'param_auth';
+get '/param_auth' => '*';
 
 # GET /param_auth/too
 get '/param_auth/too' =>
@@ -463,7 +463,7 @@ under sub {
 };
 
 # GET /with_under_count
-get '/with_under_count' => 'with_under_count';
+get '/with/under/count' => '*';
 
 # Oh Fry, I love you more than the moon, and the stars,
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
@@ -1150,8 +1150,8 @@ $t->get_ok('/bridge2stash' => {'X-Flash2' => 1})->status_is(200)
 $t->get_ok('/bridge2stash')->status_is(200)
   ->content_is("stash too!cookie!signed_cookie!!bad_cookie--12345678!!!!\n");
 
-# GET /with_under_count
-$t->get_ok('/with_under_count', {'X-Bender' => 'Rodriguez'})->status_is(200)
+# GET /with/under/count
+$t->get_ok('/with/under/count', {'X-Bender' => 'Rodriguez'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->header_is('X-Under'      => 1)->content_is("counter\n");
@@ -1318,7 +1318,7 @@ with_block <%= $block->('one', 'two') %>
 % $self->flash(foo => 'flash') if $headers->header('X-Flash');
 % $self->session(expires => 1) if $headers->header('X-Flash2');
 
-@@ with_under_count.html.ep
+@@ withundercount.html.ep
 counter
 
 __END__

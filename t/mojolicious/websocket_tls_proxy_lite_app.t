@@ -1,7 +1,5 @@
 #!/usr/bin/env perl
 
-# Copyright (C) 2008-2010, Sebastian Riedel.
-
 use strict;
 use warnings;
 
@@ -70,12 +68,11 @@ $loop->listen(
     port    => $proxy,
     read_cb => sub {
         my ($loop, $client, $chunk) = @_;
+        if (my $server = $c->{$client}->{connection}) {
+            return $loop->write($server, $chunk);
+        }
         $c->{$client}->{client} = b unless exists $c->{$client}->{client};
         $c->{$client}->{client}->add_chunk($chunk);
-        if (my $server = $c->{$client}->{connection}) {
-            $loop->writing($server);
-            return;
-        }
         if ($c->{$client}->{client} =~ /\x0d?\x0a\x0d?\x0a$/) {
             my $buffer = $c->{$client}->{client}->empty;
             if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
@@ -87,8 +84,7 @@ $loop->listen(
                     connect_cb => sub {
                         my ($loop, $server) = @_;
                         $c->{$client}->{connection} = $server;
-                        $c->{$client}->{server} = b($fail ? $nf : $ok);
-                        $loop->writing($client);
+                        $loop->write($client, $fail ? $nf : $ok);
                     },
                     error_cb => sub {
                         shift->drop($client);
@@ -97,25 +93,13 @@ $loop->listen(
                     read_cb => sub {
                         my ($loop, $server, $chunk) = @_;
                         $read += length $chunk;
-                        $c->{$client}->{server}->add_chunk($chunk);
-                        $loop->writing($client);
-                    },
-                    write_cb => sub {
-                        my ($loop, $server) = @_;
-                        $loop->not_writing($server);
-                        my $chunk = $c->{$client}->{client}->empty;
                         $sent += length $chunk;
-                        return $chunk;
+                        $loop->write($client, $chunk);
                     }
                 );
             }
             else { $loop->drop($client) }
         }
-    },
-    write_cb => sub {
-        my ($loop, $client) = @_;
-        $loop->not_writing($client);
-        return $c->{$client}->{server}->empty;
     },
     error_cb => sub {
         my ($self, $client) = @_;

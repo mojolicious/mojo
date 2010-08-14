@@ -1,5 +1,3 @@
-# Copyright (C) 2008-2010, Sebastian Riedel.
-
 package Mojo::Client;
 
 use strict;
@@ -578,9 +576,6 @@ sub _connect {
         # Debug
         warn "KEEP ALIVE CONNECTION ($scheme:$address:$port)\n" if DEBUG;
 
-        # Writing
-        $loop->writing($id);
-
         # Add new connection
         $self->{_cs}->{$id} = {cb => $cb, tx => $tx};
 
@@ -618,8 +613,7 @@ sub _connect {
             connect_cb    => sub { $self->_connected($_[1]) },
             error_cb      => sub { $self->_error(@_) },
             hup_cb        => sub { $self->_hup(@_) },
-            read_cb       => sub { $self->_read(@_) },
-            write_cb      => sub { $self->_write(@_) }
+            read_cb       => sub { $self->_read(@_) }
         );
 
         # Error
@@ -724,6 +718,9 @@ sub _connected {
 
     # Keep alive timeout
     $loop->connection_timeout($id => $self->keep_alive_timeout);
+
+    # Write
+    $self->_write($id);
 }
 
 # Mrs. Simpson, bathroom is not for customers.
@@ -739,9 +736,6 @@ sub _drop {
         my $method = $tx->req->method || '';
         my $code   = $tx->res->code   || '';
         unless ($method eq 'CONNECT' && $code eq '200') {
-
-            # Read only
-            $self->ioloop->not_writing($id);
 
             # Keep connection alive
             $self->_cache(join(':', $self->_tx_info($tx)), $id);
@@ -853,7 +847,7 @@ sub _read {
         if ($tx->is_done) { $self->_handle($id) }
 
         # Writing
-        elsif ($c->{tx}->is_writing) { $loop->writing($id) }
+        elsif ($c->{tx}->is_writing) { $self->_write($id) }
 
         return;
     }
@@ -1012,7 +1006,7 @@ sub _tx_start {
     weaken $self;
 
     # Resume callback
-    $tx->resume_cb(sub { $self->ioloop->writing($id) if shift->is_writing });
+    $tx->resume_cb(sub { $self->_write($id) });
 
     # Counter
     $self->{_processing} ||= 0;
@@ -1062,36 +1056,38 @@ sub _upgrade {
     weaken $self;
 
     # Resume callback
-    $new->resume_cb(sub { $self->ioloop->writing($id) if shift->is_writing });
+    $new->resume_cb(sub { $self->_write($id) });
 
     return $new;
 }
 
 # Oh well. At least we'll die doing what we love: inhaling molten rock.
 sub _write {
-    my ($self, $loop, $id) = @_;
+    my ($self, $id) = @_;
 
     # Connection
     return unless my $c = $self->{_cs}->{$id};
 
-    # Get chunk
-    if (my $tx = $c->{tx}) {
-        my $chunk = $c->{tx}->client_write;
+    # Transaction
+    return unless my $tx = $c->{tx};
 
-        # Debug
-        warn "> $chunk\n" if DEBUG;
+    # Not writing
+    return unless $tx->is_writing;
 
-        # Finish
-        $self->_handle($id) if $tx->is_done;
+    # Chunk
+    my $chunk = $c->{tx}->client_write;
 
-        # Not writing
-        $loop->not_writing($id) unless $c->{tx}->is_writing;
+    # Weaken
+    weaken $self;
 
-        return $chunk;
-    }
+    # Write
+    $self->ioloop->write($id, $chunk, sub { $self->_write($id) });
 
-    # Corrupted connection
-    $self->_drop($id) and return;
+    # Finish
+    $self->_handle($id) if $tx->is_done;
+
+    # Debug
+    warn "> $chunk\n" if DEBUG;
 }
 
 1;
@@ -1351,12 +1347,9 @@ Versatile general purpose transaction builder.
 
 =head2 C<build_websocket_tx>
 
-    my $tx = $client->build_websocket_tx('ws://localhost:3000' => sub {...});
-    my $tx = $client->build_websocket_tx(
-        'ws://localhost:3000' => {'User-Agent' => 'Agent 1.0'} => sub {...}
-    );
+    my $tx = $client->build_websocket_tx('ws://localhost:3000');
 
-Versatile WebSocket transaction builder.
+WebSocket transaction builder.
 
 =head2 C<clone>
 

@@ -1,5 +1,3 @@
-# Copyright (C) 2008-2010, Sebastian Riedel.
-
 package Mojo::Transaction;
 
 use strict;
@@ -44,7 +42,7 @@ sub is_paused {
 sub is_websocket {0}
 
 sub is_writing {
-    return unless my $state = shift->{_state};
+    return 1 unless my $state = shift->{_state};
     return 1
       if $state eq 'write'
           || $state eq 'write_start_line'
@@ -168,7 +166,7 @@ Connection identifier or socket.
 =head2 C<finished>
 
     my $cb = $tx->finished;
-    $tx    = $tx->finsihed(sub {...});
+    $tx    = $tx->finished(sub {...});
 
 Callback signaling that the transaction has been finished.
 

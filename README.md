@@ -105,11 +105,3 @@ Installation
     make
     make test
     make install
-
-Copyright And License
----------------------
-
-Copyright (C) 2008-2010, Sebastian Riedel.
-
-This program is free software, you can redistribute it and/or modify it under
-the terms of the Artistic License version 2.0.

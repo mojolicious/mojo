@@ -1,7 +1,5 @@
 #!/usr/bin/env perl
 
-# Copyright (C) 2008-2010, Sebastian Riedel.
-
 use strict;
 use warnings;
 
@@ -36,26 +34,22 @@ my $client = Mojo::Client->new->app($app);
 # Continue
 my $port   = $client->test_server;
 my $buffer = '';
-my $i      = 1;
 $client->ioloop->connect(
-    address => 'localhost',
-    port    => $port,
+    address    => 'localhost',
+    port       => $port,
+    connect_cb => sub {
+        my ($self, $id, $chunk) = @_;
+        $self->write($id,
+                "GET /1/ HTTP/1.1\x0d\x0a"
+              . "Expect: 100-continue\x0d\x0a"
+              . "Content-Length: 4\x0d\x0a\x0d\x0a");
+    },
     read_cb => sub {
         my ($self, $id, $chunk) = @_;
         $buffer .= $chunk;
         $self->drop($id) and $self->stop if $buffer =~ /Mojo is working!/;
-        $self->writing($id)
+        $self->write($id, '4321')
           if $buffer =~ /HTTP\/1.1 100 Continue.*\x0d\x0a\x0d\x0a/gs;
-    },
-    write_cb => sub {
-        my ($self, $id) = @_;
-        $self->not_writing($id);
-        return '4321' if $i == 2;
-        $i++;
-        return
-            "GET /1/ HTTP/1.1\x0d\x0a"
-          . "Expect: 100-continue\x0d\x0a"
-          . "Content-Length: 4\x0d\x0a\x0d\x0a";
     }
 );
 $client->ioloop->start;
@@ -64,21 +58,20 @@ like($buffer, qr/HTTP\/1.1 100 Continue/, 'request was continued');
 # Pipelined
 $buffer = '';
 $client->ioloop->connect(
-    address => 'localhost',
-    port    => $port,
+    address    => 'localhost',
+    port       => $port,
+    connect_cb => sub {
+        my ($self, $id) = @_;
+        $self->write($id,
+                "GET /2/ HTTP/1.1\x0d\x0a"
+              . "Content-Length: 0\x0d\x0a\x0d\x0a"
+              . "GET /3/ HTTP/1.1\x0d\x0a"
+              . "Content-Length: 0\x0d\x0a\x0d\x0a");
+    },
     read_cb => sub {
         my ($self, $id, $chunk) = @_;
         $buffer .= $chunk;
         $self->drop($id) and $self->stop if $buffer =~ /working!.*working!/gs;
-    },
-    write_cb => sub {
-        my ($self, $id) = @_;
-        $self->not_writing($id);
-        return
-            "GET /2/ HTTP/1.1\x0d\x0a"
-          . "Content-Length: 0\x0d\x0a\x0d\x0a"
-          . "GET /3/ HTTP/1.1\x0d\x0a"
-          . "Content-Length: 0\x0d\x0a\x0d\x0a";
     }
 );
 $client->ioloop->start;

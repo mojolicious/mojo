@@ -1,7 +1,5 @@
 #!/usr/bin/env perl
 
-# Copyright (C) 2008-2010, Sebastian Riedel.
-
 package Test::Foo;
 
 use strict;

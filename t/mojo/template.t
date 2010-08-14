@@ -1,7 +1,5 @@
 #!/usr/bin/env perl
 
-# Copyright (C) 2008-2010, Sebastian Riedel.
-
 package MyTemplateExporter;
 
 use strict;
@@ -296,15 +294,15 @@ test
 EOF
 is(ref $output, 'Mojo::Exception', 'right exception');
 like($output->message, qr/ohoh/, 'right message');
-is($output->lines_before->[0]->[0], 19,              'right number');
+is($output->lines_before->[0]->[0], 17,              'right number');
 is($output->lines_before->[0]->[1], 'use warnings;', 'right line');
-is($output->lines_before->[1]->[0], 20,              'right number');
+is($output->lines_before->[1]->[0], 18,              'right number');
 is($output->lines_before->[1]->[1], '',              'right line');
-is($output->line->[0],              21,              'right number');
+is($output->line->[0],              19,              'right number');
 is($output->line->[1], "sub exception { die 'ohoh' }", 'right line');
-is($output->lines_after->[0]->[0], 22,              'right number');
+is($output->lines_after->[0]->[0], 20,              'right number');
 is($output->lines_after->[0]->[1], '',              'right line');
-is($output->lines_after->[1]->[0], 23,              'right number');
+is($output->lines_after->[1]->[0], 21,              'right number');
 is($output->lines_after->[1]->[1], 'package main;', 'right line');
 like("$output", qr/ohoh/, 'right result');
 

@@ -1,7 +1,5 @@
 #!/usr/bin/env perl
 
-# Copyright (C) 2008-2010, Sebastian Riedel.
-
 use strict;
 use warnings;
 
@@ -23,11 +21,11 @@ my $loader = Mojo::Loader->new;
 my $e      = $loader->load('LoaderException');
 is(ref $e, 'Mojo::Exception', 'right object');
 like($e->message, qr/Missing right curly/, 'right message');
-is($e->lines_before->[0]->[0], 13,      'right line');
+is($e->lines_before->[0]->[0], 11,      'right line');
 is($e->lines_before->[0]->[1], 'foo {', 'right value');
-is($e->lines_before->[1]->[0], 14,      'right line');
+is($e->lines_before->[1]->[0], 12,      'right line');
 is($e->lines_before->[1]->[1], '',      'right value');
-is($e->line->[0],              15,      'right line');
+is($e->line->[0],              13,      'right line');
 is($e->line->[1],              "1;",    'right value');
 like("$e", qr/Missing right curly/, 'right message');
 
@@ -36,15 +34,15 @@ $loader = Mojo::Loader->new;
 $e      = $loader->load('LoaderException2');
 is(ref $e, 'Mojo::Exception', 'right object');
 like($e->message, qr/Exception/, 'right message');
-is($e->lines_before->[0]->[0], 6,             'right line');
+is($e->lines_before->[0]->[0], 4,             'right line');
 is($e->lines_before->[0]->[1], 'use strict;', 'right value');
-is($e->lines_before->[1]->[0], 7,             'right line');
+is($e->lines_before->[1]->[0], 5,             'right line');
 is($e->lines_before->[1]->[1], '',            'right value');
-is($e->line->[0],              8,             'right line');
+is($e->line->[0],              6,             'right line');
 is($e->line->[1], 'LoaderException2_2::throw_error();', 'right value');
-is($e->lines_after->[0]->[0], 9,    'right line');
+is($e->lines_after->[0]->[0], 7,    'right line');
 is($e->lines_after->[0]->[1], '',   'right value');
-is($e->lines_after->[1]->[0], 10,   'right line');
+is($e->lines_after->[1]->[0], 8,    'right line');
 is($e->lines_after->[1]->[1], '1;', 'right value');
 like("$e", qr/Exception/, 'right message');
 

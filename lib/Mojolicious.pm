@@ -1,5 +1,3 @@
-# Copyright (C) 2008-2010, Sebastian Riedel.
-
 package Mojolicious;
 
 use strict;
@@ -170,9 +168,6 @@ sub dispatch {
         # Nothing found
         $c->render_not_found unless $c->res->code;
     }
-
-    # Websocket handshake
-    $c->res->code(101) if !$c->res->code && $c->tx->is_websocket;
 
     # Finish
     $self->finish($c);

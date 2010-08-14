@@ -1,5 +1,3 @@
-# Copyright (C) 2008-2010, Sebastian Riedel.
-
 package MojoX::Dispatcher::Routes;
 
 use strict;
@@ -29,7 +27,6 @@ sub auto_render {
     # Render
     return !$c->render
       unless $c->stash->{'mojo.rendered'}
-          || $c->res->code
           || $tx->is_paused
           || $tx->is_websocket;
 
@@ -52,8 +49,11 @@ sub detour {
 sub dispatch {
     my ($self, $c) = @_;
 
+    # Response
+    my $res = $c->res;
+
     # Already rendered
-    return if $c->res->code;
+    return if $res->code;
 
     # Path
     my $path = $c->stash->{path};
@@ -66,6 +66,17 @@ sub dispatch {
 
     # No match
     return 1 unless $m && @{$m->stack};
+
+    # Status
+    unless ($res->code) {
+
+        # Websocket handshake
+        $res->code(101) if !$res->code && $c->tx->is_websocket;
+
+        # Error or 200
+        my ($error, $code) = $c->req->error;
+        $res->code($code) if $code;
+    }
 
     # Params
     my $p = $c->stash->{'mojo.params'} ||= $c->tx->req->params->clone;

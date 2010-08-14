@@ -1,5 +1,3 @@
-# Copyright (C) 2008-2010, Sebastian Riedel.
-
 package MojoX::Session::Cookie::Controller;
 
 use strict;

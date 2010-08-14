@@ -1,5 +1,3 @@
-# Copyright (C) 2008-2010, Sebastian Riedel.
-
 package Mojolicious::Controller;
 
 use strict;
@@ -20,17 +18,20 @@ sub client { shift->app->client }
 sub finish {
     my $self = shift;
 
-    # Resume
-    $self->resume;
+    # Transaction
+    my $tx = $self->tx;
 
     # Finish WebSocket
-    return $self->tx->finish if $self->tx->is_websocket;
+    return $tx->finish if $tx->is_websocket;
 
     # Render
     $self->app->routes->auto_render($self);
 
     # Finish
     $self->app->finish($self);
+
+    # Resume
+    $self->resume if $tx->is_paused;
 }
 
 sub finished {
@@ -158,12 +159,8 @@ sub render {
     my $req = $self->req;
 
     # Status
-    unless ($res->code) {
-        my ($error, $code) = $req->error;
-        $code
-          ? $res->code($code)
-          : $res->code($stash->{status} || 200);
-    }
+    $res->code($stash->{status}) if $stash->{status};
+    $res->code(200) unless $res->code;
 
     # Output
     $res->body($output) unless $res->body;
@@ -198,9 +195,6 @@ sub render_exception {
     # Error
     $self->app->log->error($e);
 
-    # Resume for exceptions
-    $self->resume if $self->tx->is_paused;
-
     # Render exception template
     my $options = {
         template         => 'exception',
@@ -211,6 +205,9 @@ sub render_exception {
     };
     $self->app->static->serve_500($self)
       if $self->stash->{'mojo.exception'} || !$self->render($options);
+
+    # Resume for exceptions
+    $self->resume if $self->tx->is_paused;
 }
 
 sub render_inner {

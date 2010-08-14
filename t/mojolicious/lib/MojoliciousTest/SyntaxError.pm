@@ -1,5 +1,3 @@
-# Copyright (C) 2008-2010, Sebastian Riedel.
-
 package MojoliciousTest::SyntaxError;
 
 use strict;

@@ -1,5 +1,3 @@
-# Copyright (C) 2008-2010, Sebastian Riedel.
-
 package Mojo::Server::Daemon;
 
 use strict;
@@ -187,7 +185,7 @@ sub _build_tx {
     weaken $self;
 
     # Resume callback
-    $tx->resume_cb(sub { $self->ioloop->writing($id) if shift->is_writing });
+    $tx->resume_cb(sub { $self->_write($id) });
 
     # Handler callback
     $tx->handler_cb(
@@ -267,9 +265,6 @@ sub _finish {
 
             # Make sure connection stays active
             $tx->keep_alive(1);
-
-            # Allow early writing from the server side
-            return $self->ioloop->writing($id) if $ws->is_writing;
         }
 
         # Failed upgrade
@@ -340,7 +335,6 @@ sub _listen {
     $options->{error_cb} = sub { $self->_error(@_) };
     $options->{hup_cb}   = sub { $self->_hup(@_) };
     $options->{read_cb}  = sub { $self->_read(@_) };
-    $options->{write_cb} = sub { $self->_write(@_) };
 
     # Listen
     my $id = $self->ioloop->listen($options);
@@ -384,15 +378,15 @@ sub _read {
     # Read
     $tx->server_read($chunk);
 
+    # Last keep alive request
+    $tx->res->headers->connection('Close')
+      if ($c->{requests} || 0) >= $self->max_keep_alive_requests;
+
     # Finish
     if ($tx->is_done) { $self->_finish($id, $tx) }
 
     # Writing
-    elsif ($tx->is_writing) { $loop->writing($id) }
-
-    # Last keep alive request
-    $tx->res->headers->connection('Close')
-      if ($c->{requests} || 0) >= $self->max_keep_alive_requests;
+    elsif ($tx->is_writing) { $self->_write($id) }
 }
 
 sub _upgrade {
@@ -414,35 +408,45 @@ sub _upgrade {
     weaken $self;
 
     # Resume callback
-    $ws->resume_cb(sub { $self->ioloop->writing($id) if shift->is_writing });
+    $ws->resume_cb(sub { $self->_write($id) });
 }
 
 sub _write {
-    my ($self, $loop, $id) = @_;
+    my ($self, $id) = @_;
 
     # Connection
     my $c = $self->{_cs}->{$id};
 
     # Transaction
-    my $tx;
-    unless ($tx = $c->{transaction} || $c->{websocket}) {
-        $loop->not_writing($id);
-        return;
-    }
+    return unless my $tx = $c->{transaction} || $c->{websocket};
+
+    # Not writing
+    return unless $tx->is_writing;
 
     # Get chunk
     my $chunk = $tx->server_write;
 
-    # Finish
-    if ($tx->is_done) { $self->_finish($id, $tx) }
+    # Weaken
+    weaken $self;
 
-    # Not writing
-    elsif (!$tx->is_writing) { $loop->not_writing($id) }
+    # Callback
+    my $cb = sub { $self->_write($id) };
+
+    # Done
+    if ($tx->is_done) {
+
+        # Finish
+        $self->_finish($id, $tx);
+
+        # No followup
+        $cb = undef unless $c->{transaction} || $c->{websocket};
+    }
+
+    # Write
+    $self->ioloop->write($id, $chunk, $cb);
 
     # Debug
     warn "> $chunk\n" if DEBUG;
-
-    return $chunk;
 }
 
 1;

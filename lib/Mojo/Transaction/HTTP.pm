@@ -1,5 +1,3 @@
-# Copyright (C) 2008-2010, Sebastian Riedel.
-
 package Mojo::Transaction::HTTP;
 
 use strict;
@@ -224,6 +222,9 @@ sub server_read {
 
     # Parse
     $req->parse($chunk) unless $req->error;
+
+    # State
+    $self->{_state} ||= 'read';
 
     # Parser error
     my $handled = $self->{_handled};

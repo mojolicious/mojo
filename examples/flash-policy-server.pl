@@ -1,7 +1,5 @@
 #!/usr/bin/env perl
 
-# Copyright (C) 2008-2010, Sebastian Riedel.
-
 use strict;
 use warnings;
 
@@ -34,19 +32,10 @@ EOF
 $loop->listen(
     port    => 843,
     read_cb => sub {
-        my ($loop, $id, $chunk) = @_;
-
-        # Writing
-        $loop->writing($id);
-    },
-    write_cb => sub {
         my ($loop, $id) = @_;
 
-        # Finish
-        $loop->drop($id);
-
         # Write XML
-        return $xml;
+        $loop->write($id, $xml, sub { shift->drop($id) });
     }
 ) or die "Couldn't create listen socket!\n";
 

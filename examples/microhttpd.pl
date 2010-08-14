@@ -1,7 +1,5 @@
 #!/usr/bin/env perl
 
-# Copyright (C) 2008-2010, Sebastian Riedel.
-
 use strict;
 use warnings;
 
@@ -35,27 +33,17 @@ $loop->listen(
         $buffer->{$id} .= $chunk;
 
         # Check if we got start line and headers (no body support)
-        if ($buffer->{$id} =~ /\x0d?\x0a\x0d?\x0a$/) {
+        if (index $buffer->{$id}, "\x0d\x0a\x0d\x0a") {
 
             # Clean buffer
             delete $buffer->{$id};
 
-            # Start read/write mode
-            $loop->writing($id);
+            # Write a minimal HTTP response
+            # (not spec compliant but benchmarks won't care)
+            $loop->write($id => "HTTP/1.1 200 OK\x0d\x0a"
+                  . "Connection: keep-alive\x0d\x0aContent-Length: 11\x0d\x0a"
+                  . "\x0d\x0aHello Mojo!");
         }
-    },
-    write_cb => sub {
-        my ($loop, $id) = @_;
-
-        # Start read only mode again
-        $loop->not_writing($id);
-
-        # Write a minimal HTTP response
-        # (not spec compliant but benchmarks won't care)
-        return
-            "HTTP/1.1 200 OK\x0d\x0a"
-          . "Connection: keep-alive\x0d\x0aContent-Length: 11\x0d\x0a\x0d\x0a"
-          . "Hello Mojo!";
     },
     error_cb => sub {
         my ($self, $id) = @_;
@@ -68,7 +56,7 @@ $loop->listen(
 print <<'EOF';
 Starting server on port 3000.
 Try something like "ab -c 30 -n 100000 -k http://127.0.0.1:3000/" for testing.
-On a MacBook Pro 13" this results in about 12k req/s.
+On a MacBook Pro 13" this results in about 19k req/s.
 EOF
 
 # Start loop

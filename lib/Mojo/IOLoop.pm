@@ -1,5 +1,3 @@
-# Copyright (C) 2008-2010, Sebastian Riedel.
-
 package Mojo::IOLoop;
 
 use strict;
@@ -181,13 +179,13 @@ sub connect {
           sub { shift->_error($id, 'Connect timeout.') });
 
     # Register callbacks
-    for my $name (qw/error_cb hup_cb read_cb write_cb/) {
+    for my $name (qw/error_cb hup_cb read_cb/) {
         my $cb = $args->{$name};
         $self->$name($id => $cb) if $cb;
     }
 
     # Add socket to poll
-    $self->writing($id);
+    $self->_not_writing($id);
 
     # Start TLS
     if ($args->{tls}) { return unless $id = $self->start_tls($id => $args) }
@@ -211,20 +209,7 @@ sub drop {
     my ($self, $id) = @_;
 
     # Connection
-    if (my $c = $self->{_cs}->{$id}) {
-
-        # Protected connection
-        my $protected = $c->{protected} || 0;
-
-        # Finish connection once buffer is empty
-        if (my $buffer = $c->{buffer}) { $protected = 1 if $buffer->size }
-
-        # Delay connection drop
-        if ($protected) {
-            $c->{finish} = 1;
-            return $self;
-        }
-    }
+    if (my $c = $self->{_cs}->{$id}) { return $c->{finish} = 1 }
 
     # Drop
     return $self->_drop_immediately($id);
@@ -310,10 +295,9 @@ sub listen {
         accept_cb => $args->{accept_cb} || $args->{cb},
         error_cb => $args->{error_cb},
         file => $args->{file} ? 1 : 0,
-        hup_cb   => $args->{hup_cb},
-        read_cb  => $args->{read_cb},
-        socket   => $socket,
-        write_cb => $args->{write_cb}
+        hup_cb  => $args->{hup_cb},
+        read_cb => $args->{read_cb},
+        socket  => $socket
     };
 
     # TLS options
@@ -345,55 +329,6 @@ sub local_info {
 
     # Info
     return {address => $socket->sockhost, port => $socket->sockport};
-}
-
-sub not_writing {
-    my ($self, $id) = @_;
-
-    # Connection
-    return unless my $c = $self->{_cs}->{$id};
-
-    # Chunk still in buffer or protected
-    my $protected = $c->{protected} || 0;
-    if (my $buffer = $c->{buffer}) { $protected = 1 if $buffer->size }
-    return $c->{read_only} = 1 if $protected;
-
-    # Socket
-    return unless my $socket = $c->{socket};
-
-    # Writing
-    my $writing = $c->{writing};
-    return if defined $writing && !$writing;
-
-    # KQueue
-    my $loop = $self->_prepare_loop;
-    if (KQUEUE) {
-        my $fd = fileno $socket;
-
-        # Writing
-        $loop->EV_SET($fd, KQUEUE_READ, KQUEUE_ADD) unless defined $writing;
-        $loop->EV_SET($fd, KQUEUE_WRITE, KQUEUE_DELETE) if $writing;
-    }
-
-    # Poll and epoll
-    else {
-
-        # Not writing anymore
-        if ($writing) {
-            $loop->remove($socket);
-            $writing = undef;
-        }
-
-        # Reading
-        my $mask = EPOLL ? EPOLL_POLLIN : POLLIN;
-        $loop->mask($socket, $mask) unless defined $writing;
-    }
-
-    # Not writing anymore
-    $c->{writing} = 0;
-
-    # Active
-    $c->{active} = time;
 }
 
 sub one_tick {
@@ -588,7 +523,7 @@ sub start_tls {
     $c->{socket}         = $new;
     $self->{_cs}->{$new} = delete $self->{_cs}->{$id};
     $c->{tls_connect}    = 1;
-    $self->writing("$new");
+    $self->_writing("$new");
 
     return "$new";
 }
@@ -608,49 +543,27 @@ sub timer {
     return $id;
 }
 
-sub write_cb { shift->_add_event('write', @_) }
-
-sub writing {
-    my ($self, $id) = @_;
+sub write {
+    my ($self, $id, $chunk, $cb) = @_;
 
     # Connection
     my $c = $self->{_cs}->{$id};
 
-    # Writing again
-    delete $c->{read_only};
+    # Buffer
+    $c->{buffer} = Mojo::ByteStream->new unless exists $c->{buffer};
+    $c->{buffer}->add_chunk($chunk);
+
+    # Callback
+    $c->{drain} = 0 if $cb;
+
+    # Fast write
+    $self->_write($id);
+
+    # Callback
+    $c->{drain} = $cb if $cb;
 
     # Writing
-    return if my $writing = $c->{writing};
-
-    # Socket
-    return unless my $socket = $c->{socket};
-
-    # KQueue
-    my $loop = $self->_prepare_loop;
-    if (KQUEUE) {
-        my $fd = fileno $socket;
-
-        # Writing
-        $loop->EV_SET($fd, KQUEUE_READ,  KQUEUE_ADD) unless defined $writing;
-        $loop->EV_SET($fd, KQUEUE_WRITE, KQUEUE_ADD) unless $writing;
-    }
-
-    # Poll and epoll
-    else {
-
-        # Cleanup
-        $loop->remove($socket);
-
-        # Writing
-        my $mask = EPOLL ? EPOLL_POLLIN | EPOLL_POLLOUT : POLLIN | POLLOUT;
-        $loop->mask($socket, $mask);
-    }
-
-    # Writing
-    $c->{writing} = 1;
-
-    # Active
-    $c->{active} = time;
+    $self->_writing($id) if $cb || $c->{buffer}->size;
 }
 
 sub _accept {
@@ -691,7 +604,7 @@ sub _accept {
     $self->{_fds}->{$fd} = $id;
 
     # Register callbacks
-    for my $name (qw/error_cb hup_cb read_cb write_cb/) {
+    for my $name (qw/error_cb hup_cb read_cb/) {
         my $cb = $l->{$name};
         $self->$name($id => $cb) if $cb;
     }
@@ -824,6 +737,55 @@ sub _hup {
     $self->_run_event('hup', $event, $id);
 }
 
+sub _not_writing {
+    my ($self, $id) = @_;
+
+    # Connection
+    return unless my $c = $self->{_cs}->{$id};
+
+    # Chunk still in buffer
+    if (my $buffer = $c->{buffer}) {
+        return $c->{read_only} = 1 if $buffer->size;
+    }
+
+    # Socket
+    return unless my $socket = $c->{socket};
+
+    # Writing
+    my $writing = $c->{writing};
+    return if defined $writing && !$writing;
+
+    # KQueue
+    my $loop = $self->_prepare_loop;
+    if (KQUEUE) {
+        my $fd = fileno $socket;
+
+        # Writing
+        $loop->EV_SET($fd, KQUEUE_READ, KQUEUE_ADD) unless defined $writing;
+        $loop->EV_SET($fd, KQUEUE_WRITE, KQUEUE_DELETE) if $writing;
+    }
+
+    # Poll and epoll
+    else {
+
+        # Not writing anymore
+        if ($writing) {
+            $loop->remove($socket);
+            $writing = undef;
+        }
+
+        # Reading
+        my $mask = EPOLL ? EPOLL_POLLIN : POLLIN;
+        $loop->mask($socket, $mask) unless defined $writing;
+    }
+
+    # Not writing anymore
+    $c->{writing} = 0;
+
+    # Active
+    $c->{active} = time;
+}
+
 sub _prepare_accept {
     my ($self, $id) = @_;
 
@@ -843,7 +805,7 @@ sub _prepare_accept {
     $c->{socket}->blocking(0);
 
     # Add socket to poll
-    $self->not_writing($id);
+    $self->_not_writing($id);
 }
 
 sub _prepare_cert {
@@ -910,7 +872,7 @@ sub _prepare_connections {
         }
 
         # Read only
-        $self->not_writing($id) if delete $c->{read_only};
+        $self->_not_writing($id) if delete $c->{read_only};
 
         # Last active
         my $time = $c->{active} ||= time;
@@ -1021,7 +983,7 @@ sub _read {
     return unless defined(my $socket = $c->{socket});
 
     # Read as much as possible
-    my $read = $socket->sysread(my $buffer, CHUNK_SIZE, 0);
+    my $read = $socket->sysread(my $buffer, 4194304, 0);
 
     # Error
     unless (defined $read) {
@@ -1118,7 +1080,7 @@ sub _tls_accept {
     # Connected
     if ($c->{socket}->accept_SSL) {
         delete $c->{tls_accept};
-        $self->writing($id);
+        $self->_writing($id);
         return;
     }
 
@@ -1126,10 +1088,10 @@ sub _tls_accept {
     my $error = $IO::Socket::SSL::SSL_ERROR;
 
     # Reading
-    if ($error == TLS_READ) { $self->not_writing($id) }
+    if ($error == TLS_READ) { $self->_not_writing($id) }
 
     # Writing
-    elsif ($error == TLS_WRITE) { $self->writing($id) }
+    elsif ($error == TLS_WRITE) { $self->_writing($id) }
 
     # Real error
     else { $self->_error($id, $error) }
@@ -1144,7 +1106,7 @@ sub _tls_connect {
     # Connected
     if ($c->{socket}->connect_SSL) {
         delete $c->{tls_connect};
-        $self->writing($id);
+        $self->_writing($id);
         return;
     }
 
@@ -1152,10 +1114,10 @@ sub _tls_connect {
     my $error = $IO::Socket::SSL::SSL_ERROR;
 
     # Reading
-    if ($error == TLS_READ) { $self->not_writing($id) }
+    if ($error == TLS_READ) { $self->_not_writing($id) }
 
     # Writing
-    elsif ($error == TLS_WRITE) { $self->writing($id) }
+    elsif ($error == TLS_WRITE) { $self->_writing($id) }
 
     # Real error
     else { $self->_error($id, $error) }
@@ -1179,26 +1141,20 @@ sub _write {
     # Buffer
     my $buffer = $c->{buffer};
 
-    # Try to fill the buffer before writing
-    my $more = !$c->{read_only} && !$c->{finish} ? 1 : 0;
-    my $event = $c->{write};
-    if ($more && $event && $buffer->size < CHUNK_SIZE) {
-
-        # Write callback
-        $c->{protected} = 1;
-        my $chunk = $self->_run_event('write', $event, $id);
-        delete $c->{protected};
-
-        # Add to buffer
-        $buffer->add_chunk($chunk);
-    }
-
     # Socket
     return unless my $socket = $c->{socket};
     return unless $socket->connected;
 
+    # Callback
+    if ($c->{drain} && (my $event = delete $c->{drain})) {
+        $self->_run_event('drain', $event, $id);
+    }
+
+    # Nothing to write
+    return unless $buffer->size;
+
     # Write
-    my $written = $socket->syswrite($buffer->to_string, CHUNK_SIZE);
+    my $written = $socket->syswrite($buffer->to_string);
 
     # Error
     unless (defined $written) {
@@ -1213,8 +1169,54 @@ sub _write {
     # Remove written chunk from buffer
     $buffer->remove($written);
 
+    # Not writing
+    $self->_not_writing($id) unless exists $c->{drain} || $buffer->size;
+
     # Active
     $c->{active} = time if $written;
+}
+
+sub _writing {
+    my ($self, $id) = @_;
+
+    # Connection
+    my $c = $self->{_cs}->{$id};
+
+    # Writing again
+    delete $c->{read_only};
+
+    # Writing
+    return if my $writing = $c->{writing};
+
+    # Socket
+    return unless my $socket = $c->{socket};
+
+    # KQueue
+    my $loop = $self->_prepare_loop;
+    if (KQUEUE) {
+        my $fd = fileno $socket;
+
+        # Writing
+        $loop->EV_SET($fd, KQUEUE_READ,  KQUEUE_ADD) unless defined $writing;
+        $loop->EV_SET($fd, KQUEUE_WRITE, KQUEUE_ADD) unless $writing;
+    }
+
+    # Poll and epoll
+    else {
+
+        # Cleanup
+        $loop->remove($socket);
+
+        # Writing
+        my $mask = EPOLL ? EPOLL_POLLIN | EPOLL_POLLOUT : POLLIN | POLLOUT;
+        $loop->mask($socket, $mask);
+    }
+
+    # Writing
+    $c->{writing} = 1;
+
+    # Active
+    $c->{active} = time;
 }
 
 1;
@@ -1241,16 +1243,7 @@ Mojo::IOLoop - Minimalistic Reactor For TCP Clients And Servers
             print $chunk;
 
             # Got some data, time to write
-            $self->writing($id);
-        },
-        write_cb => sub {
-            my ($self, $id) = @_;
-
-            # Back to reading only
-            $self->not_writing($id);
-
-            # The loop will take care of buffering for us
-            return 'HTTP/1.1 200 OK';
+            $self->write($id, 'HTTP/1.1 200 OK');
         }
     );
 
@@ -1259,15 +1252,6 @@ Mojo::IOLoop - Minimalistic Reactor For TCP Clients And Servers
         address => 'localhost',
         port => 3000,
         tls => 1,
-        write_cb => sub {
-            my ($self, $id) = @_;
-
-            # Back to reading only
-            $self->not_writing($id);
-
-            # The loop will take care of buffering for us
-            return "GET / HTTP/1.1\r\n\r\n";
-        },
         read_cb => sub {
             my ($self, $id, $chunk) = @_;
 
@@ -1275,12 +1259,9 @@ Mojo::IOLoop - Minimalistic Reactor For TCP Clients And Servers
             print $chunk;
 
             # Time to write more
-            $self->writing($id);
+            $self->write($id, "GET / HTTP/1.1\r\n\r\n");
         }
     );
-
-    # Loop starts writing
-    $loop->writing($id);
 
     # Add a timer
     $loop->timer(5 => sub {
@@ -1465,12 +1446,6 @@ CA file to use for TLS.
 
 Callback to invoke for TLS verification.
 
-=item C<write_cb>
-
-Callback to be invoked if new data can be written to the connection.
-The callback should return a chunk of data which will be buffered inside the
-loop to guarantee safe writing.
-
 =back
 
 =head2 C<connection_timeout>
@@ -1579,12 +1554,6 @@ Path to the TLS cert file, defaulting to a built in test certificate.
 
 Path to the TLS key file, defaulting to a built in test key.
 
-=item C<write_cb>
-
-Callback to be invoked if new data can be written to the connection.
-The callback should return a chunk of data which will be buffered inside the
-loop to guarantee safe writing.
-
 =back
 
 =head2 C<local_info>
@@ -1608,12 +1577,6 @@ The local address.
 The local port.
 
 =back
-
-=head2 C<not_writing>
-
-    $loop->not_writing($id);
-
-Activate read only mode for a connection.
 
 =head2 C<one_tick>
 
@@ -1707,25 +1670,13 @@ and the loop can be restarted by running C<start> again.
 
 Create a new timer, invoking the callback afer a given amount of seconds.
 
-=head2 C<write_cb>
+=head2 C<write>
 
-    $loop = $loop->write_cb($id => sub {...});
+    $loop->write($id => 'Hello!');
+    $loop->write($id => 'Hello!', sub {...});
 
-Callback to be invoked if new data can be written to the connection.
-The callback should return a chunk of data which will be buffered inside the
-loop to guarantee safe writing.
-
-    $loop->write_cb($id => sub {
-        my ($loop, $id) = @_;
-        return 'Data to be buffered by the loop!';
-    });
-
-=head2 C<writing>
-
-    $loop->writing($id);
-
-Activate read/write mode for a connection.
-Note that connections have no mode after they are created.
+Write data to connection, the optional drain callback will be invoked once
+all data has been written.
 
 =head1 SEE ALSO
 

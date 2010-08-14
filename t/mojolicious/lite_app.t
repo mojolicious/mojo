@@ -1,7 +1,5 @@
 #!/usr/bin/env perl
 
-# Copyright (C) 2008-2010, Sebastian Riedel.
-
 use strict;
 use warnings;
 
@@ -122,11 +120,11 @@ get 'tags/:test' => 'tags';
 # POST /upload
 post '/upload' => sub {
     my $self = shift;
+    $self->stash('mojo.rendered' => 1);
     my $body = $self->res->body || '';
     $self->res->body("called, $body");
     return if $self->req->error;
     if (my $u = $self->req->upload('Вячеслав')) {
-        $self->stash('mojo.rendered' => 1);
         $self->res->body($self->res->body . $u->filename . $u->size);
     }
 };

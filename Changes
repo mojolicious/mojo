@@ -11,6 +11,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL support for static files in the DATA section of
           Mojolicious applications.
         - Added EXPERIMENTAL Bonjour support.
+        - Added EXPERIMENTAL support for route name generation.
         - Added graceful shutdown support to Mojo::Server::Daemon.
         - Added multiple guides and improved documentation substantially.
         - Added finished callback support for HTTP transactions.
@@ -22,7 +23,6 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added say and trim methods to Mojo::ByteStream.
         - Added custom socket support to Mojo::Client.
         - Added SHA1 support to Mojo::ByteStream. (vti)
-        - Added support for route name generation.
         - Renamed attributes method in Mojo::DOM to attrs.
         - Renamed search method in Mojo::DOM to find.
         - Cleaned up tests. (memowe)

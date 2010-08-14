@@ -31,7 +31,7 @@ $tx->req->url->parse("http://127.0.0.1:$port/");
 my $client = Mojo::Client->new;
 $client->process($tx);
 is($tx->res->code, 200, 'right status');
-like($tx->res->body, qr/Mojo is working/, 'right content');
+like($tx->res->body, qr/Mojo/, 'right content');
 
 # Stop
 $server->stop_server_ok;

@@ -71,11 +71,11 @@ $client->ioloop->connect(
     read_cb => sub {
         my ($self, $id, $chunk) = @_;
         $buffer .= $chunk;
-        $self->drop($id) and $self->stop if $buffer =~ /working!.*working!/gs;
+        $self->drop($id) and $self->stop if $buffer =~ /Mojo.*Mojo/gs;
     }
 );
 $client->ioloop->start;
-like($buffer, qr/Mojo is working!/, 'transactions were pipelined');
+like($buffer, qr/Mojo/, 'transactions were pipelined');
 
 # Normal request
 my $tx = Mojo::Transaction::HTTP->new;
@@ -84,7 +84,7 @@ $tx->req->url->parse('/5/');
 $client->process($tx);
 ok($tx->keep_alive, 'will be kept alive');
 is($tx->res->code, 200, 'right status');
-like($tx->res->body, qr/^Congratulations/, 'right content');
+like($tx->res->body, qr/Mojo/, 'right content');
 
 # POST request
 $tx = Mojo::Transaction::HTTP->new;
@@ -94,7 +94,7 @@ $tx->req->headers->expect('fun');
 $tx->req->body('foo bar baz' x 128);
 $client->process($tx);
 is($tx->res->code, 200, 'right status');
-like($tx->res->body, qr/^Congratulations/, 'right content');
+like($tx->res->body, qr/Mojo/, 'right content');
 
 # POST request
 $tx = Mojo::Transaction::HTTP->new;
@@ -105,7 +105,7 @@ $tx->req->body('bar baz foo' x 128);
 $client->process($tx);
 ok(defined $tx->connection, 'has connection id');
 is($tx->res->code, 200, 'right status');
-like($tx->res->body, qr/^Congratulations/, 'right content');
+like($tx->res->body, qr/Mojo/, 'right content');
 
 # Multiple requests
 $tx = Mojo::Transaction::HTTP->new;

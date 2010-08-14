@@ -41,7 +41,7 @@ $client->process($tx);
 ok($tx->is_done, 'transaction is done');
 is($tx->res->code, 200, 'right status');
 like($tx->res->headers->connection, qr/close/i, 'right "Connection" header');
-like($tx->res->body, qr/Mojo is working/, 'right content');
+like($tx->res->body,                qr/Mojo/,   'right content');
 
 # Multiple requests
 $tx = Mojo::Transaction::HTTP->new;
@@ -67,7 +67,7 @@ is($tx->res->code,  200, 'right status');
 is($tx2->res->code, 200, 'right status');
 is($tx3->res->code, 200, 'right status');
 is($tx4->res->code, 200, 'right status');
-like($tx2->res->content->asset->slurp, qr/Mojo is working/, 'right content');
+like($tx2->res->content->asset->slurp, qr/Mojo/, 'right content');
 
 # Request
 $tx = Mojo::Transaction::HTTP->new;
@@ -79,7 +79,7 @@ $client->process($tx);
 is($tx->res->code, 200, 'right status');
 like($tx->res->headers->connection,
     qr/Keep-Alive/i, 'right "Connection" header');
-like($tx->res->body, qr/Mojo is working/, 'right content');
+like($tx->res->body, qr/Mojo/, 'right content');
 
 # Second keep alive request
 $tx = Mojo::Transaction::HTTP->new;
@@ -90,7 +90,7 @@ is($tx->res->code,  200, 'right status');
 is($tx->kept_alive, 1,   'connection was alive');
 like($tx->res->headers->connection,
     qr/Keep-Alive/i, 'right "Connection" header');
-like($tx->res->body, qr/Mojo is working/, 'right content');
+like($tx->res->body, qr/Mojo/, 'right content');
 
 # Third keep alive request
 $tx = Mojo::Transaction::HTTP->new;
@@ -101,7 +101,7 @@ is($tx->res->code,  200, 'right status');
 is($tx->kept_alive, 1,   'connection was kept alive');
 like($tx->res->headers->connection,
     qr/Keep-Alive/i, 'right "Connection" header');
-like($tx->res->body, qr/Mojo is working/, 'right content');
+like($tx->res->body, qr/Mojo/, 'right content');
 
 # Multiple requests
 $tx = Mojo::Transaction::HTTP->new;
@@ -115,7 +115,7 @@ ok($tx->is_done,  'transaction is done');
 ok($tx2->is_done, 'transaction is done');
 is($tx->res->code,  200, 'right status');
 is($tx2->res->code, 200, 'right status');
-like($tx2->res->content->asset->slurp, qr/Mojo is working/, 'right content');
+like($tx2->res->content->asset->slurp, qr/Mojo/, 'right content');
 
 # Multiple requests with a chunked response
 $tx = Mojo::Transaction::HTTP->new;
@@ -142,7 +142,7 @@ is($tx->res->code,  200, 'right status');
 is($tx2->res->code, 200, 'right status');
 is($tx3->res->code, 200, 'right status');
 is($tx4->res->code, 200, 'right status');
-like($tx2->res->content->asset->slurp, qr/Mojo is working/, 'right content');
+like($tx2->res->content->asset->slurp, qr/Mojo/, 'right content');
 is($tx3->res->content->asset->slurp, 'foo12', 'right content');
 
 # Stop

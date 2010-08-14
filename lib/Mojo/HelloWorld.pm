@@ -25,57 +25,14 @@ sub new {
 sub handler {
     my ($self, $tx) = @_;
 
-    # Finished transaction
-    $tx->finished(sub { $ENV{MOJO_HELLO} = 'world' });
-
-    # Default to 200
-    $tx->res->code(200) unless $tx->is_websocket;
-
     # Dispatch to diagnostics functions
-    return $self->_diag($tx) if index($tx->req->url->path, '/diag') == 0;
-
-    # WebSocket
-    return if $tx->is_websocket;
+    return $self->_diag($tx) if defined $tx->req->url->path->parts->[0];
 
     # Hello world!
-    $tx->res->headers->content_type('text/plain');
-    $tx->res->body('Congratulations, your Mojo is working!');
-}
-
-sub _diag {
-    my ($self, $tx) = @_;
-
-    # Path
-    my $path = $tx->req->url->path;
-    $path =~ s/^\/diag//;
-
-    # WebSocket
-    return $self->_websocket($tx) if $path =~ /^\/websocket/;
-
-    # Defaults
-    $tx->res->headers->content_type('text/plain')
-      unless $tx->res->headers->content_type;
-
-    # Dispatch
-    return $self->_chunked_params($tx) if $path =~ /^\/chunked_params/;
-    return $self->_dump_env($tx)       if $path =~ /^\/dump_env/;
-    return $self->_dump_params($tx)    if $path =~ /^\/dump_params/;
-    return $self->_proxy($tx)          if $path =~ /^\/proxy/;
-
-    # List
-    $tx->res->headers->content_type('text/html');
-    $tx->res->body(<<'EOF');
-<!doctype html><html>
-    <head><title>Mojo Diagnostics</title></head>
-    <body>
-        <a href="/diag/chunked_params">Chunked Request Parameters</a><br />
-        <a href="/diag/dump_env">Dump Environment Variables</a><br />
-        <a href="/diag/dump_params">Dump Request Parameters</a><br />
-        <a href="/diag/proxy">Proxy</a><br />
-        <a href="/diag/websocket">WebSocket</a>
-    </body>
-</html>
-EOF
+    my $res = $tx->res;
+    $res->code(200);
+    $res->headers->content_type('text/plain');
+    $res->body('Your Mojo is working!');
 }
 
 sub _chunked_params {
@@ -104,6 +61,46 @@ sub _chunked_params {
     );
 }
 
+sub _diag {
+    my ($self, $tx) = @_;
+
+    # Finished transaction
+    $tx->finished(sub { $ENV{MOJO_HELLO} = 'world' });
+
+    # Path
+    my $path = $tx->req->url->path;
+    $path =~ s/^\/diag// or return $self->_hello($tx);
+
+    # WebSocket
+    return $self->_websocket($tx) if $path =~ /^\/websocket/;
+
+    # Defaults
+    $tx->res->code(200);
+    $tx->res->headers->content_type('text/plain')
+      unless $tx->res->headers->content_type;
+
+    # Dispatch
+    return $self->_chunked_params($tx) if $path =~ /^\/chunked_params/;
+    return $self->_dump_env($tx)       if $path =~ /^\/dump_env/;
+    return $self->_dump_params($tx)    if $path =~ /^\/dump_params/;
+    return $self->_proxy($tx)          if $path =~ /^\/proxy/;
+
+    # List
+    $tx->res->headers->content_type('text/html');
+    $tx->res->body(<<'EOF');
+<!doctype html><html>
+    <head><title>Mojo Diagnostics</title></head>
+    <body>
+        <a href="/diag/chunked_params">Chunked Request Parameters</a><br />
+        <a href="/diag/dump_env">Dump Environment Variables</a><br />
+        <a href="/diag/dump_params">Dump Request Parameters</a><br />
+        <a href="/diag/proxy">Proxy</a><br />
+        <a href="/diag/websocket">WebSocket</a>
+    </body>
+</html>
+EOF
+}
+
 sub _dump_env {
     my ($self, $tx) = @_;
     my $res = $tx->res;
@@ -116,6 +113,16 @@ sub _dump_params {
     my $res = $tx->res;
     $res->headers->content_type('application/json');
     $res->body(Mojo::JSON->new->encode($tx->req->params->to_hash));
+}
+
+sub _hello {
+    my ($self, $tx) = @_;
+
+    # Hello world!
+    my $res = $tx->res;
+    $res->code(200);
+    $res->headers->content_type('text/plain');
+    $res->body('Your Mojo is working!');
 }
 
 sub _proxy {

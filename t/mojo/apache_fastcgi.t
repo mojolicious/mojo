@@ -84,7 +84,7 @@ $client->get(
     "http://127.0.0.1:$port/" => sub {
         my $self = shift;
         is($self->res->code, 200, 'right status');
-        like($self->res->body, qr/Mojo is working/, 'right content');
+        like($self->res->body, qr/Mojo/, 'right content');
     }
 )->process;
 

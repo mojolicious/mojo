@@ -1077,11 +1077,18 @@ sub _write {
     # Chunk
     my $chunk = $c->{tx}->client_write;
 
-    # Weaken
-    weaken $self;
+    # Still writing
+    my $cb;
+    if ($tx->is_writing) {
+
+        # Weaken
+        weaken $self;
+
+        $cb = sub { $self->_write($id) };
+    }
 
     # Write
-    $self->ioloop->write($id, $chunk, sub { $self->_write($id) });
+    $self->ioloop->write($id, $chunk, $cb);
 
     # Finish
     $self->_handle($id) if $tx->is_done;

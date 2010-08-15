@@ -305,8 +305,8 @@ get '/json' =>
 get '/autostash' => sub { shift->render(handler => 'ep', foo => 'bar') } =>
   '*';
 
-# GET /tied
-get '/tied' => {tied => 23, layout => 'tied'} => '*';
+# GET /app
+get '/app' => {layout => 'app'} => '*';
 
 # GET /helper
 get '/helper' => sub { shift->render(handler => 'ep') } => 'helper';
@@ -957,10 +957,10 @@ $t->get_ok('/autostash?bar=23')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("layouted bar2342autostash\n");
 
-# GET /tied
-$t->get_ok('/tied')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+# GET /app
+$t->get_ok('/app')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("tied layout 2423tied23\ndevelopment\n");
+  ->content_is("app layout app23\ndevelopment\n");
 
 # GET /helper
 $t->get_ok('/helper')->status_is(200)
@@ -1305,11 +1305,11 @@ Two: <%= $two %>
 %}
 with_block <%= $block->('one', 'two') %>
 
-@@ layouts/tied23.html.ep
-tied layout <%= $tied %><%= content %><%= app->mode %>
+@@ layouts/app23.html.ep
+app layout <%= content %><%= app->mode %>
 
-@@ tied.html.ep
-<% $layout .= $tied; %><%= $tied++ %><%= $layout %>
+@@ app.html.ep
+<% layout layout . 23; %><%= layout %>
 
 @@ helper.html.ep
 %= $default

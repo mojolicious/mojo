@@ -781,9 +781,6 @@ sub _not_writing {
 
     # Not writing anymore
     $c->{writing} = 0;
-
-    # Active
-    $c->{active} = time;
 }
 
 sub _prepare_accept {
@@ -1214,9 +1211,6 @@ sub _writing {
 
     # Writing
     $c->{writing} = 1;
-
-    # Active
-    $c->{active} = time;
 }
 
 1;

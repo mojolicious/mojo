@@ -12,6 +12,9 @@ require Data::Dumper;
 sub register {
     my ($self, $app) = @_;
 
+    # Add "app" helper
+    $app->renderer->add_helper(app => sub { shift->app });
+
     # Add "content" helper
     $app->renderer->add_helper(content => sub { shift->render_inner(@_) });
 

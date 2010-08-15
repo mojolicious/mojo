@@ -960,7 +960,7 @@ $t->get_ok('/autostash?bar=23')->status_is(200)
 # GET /tied
 $t->get_ok('/tied')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("tied layout 2423tied23\n\n");
+  ->content_is("tied layout 2423tied23\ndevelopment\n");
 
 # GET /helper
 $t->get_ok('/helper')->status_is(200)
@@ -1306,7 +1306,7 @@ Two: <%= $two %>
 with_block <%= $block->('one', 'two') %>
 
 @@ layouts/tied23.html.ep
-tied layout <%= $tied %><%= content %>
+tied layout <%= $tied %><%= content %><%= app->mode %>
 
 @@ tied.html.ep
 <% $layout .= $tied; %><%= $tied++ %><%= $layout %>

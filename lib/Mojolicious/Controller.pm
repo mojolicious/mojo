@@ -104,25 +104,8 @@ sub render {
     # Template
     $args->{template} = $template if $template;
 
-    # Localize layout and extends for partials
-    if (!$stash->{'mojo.render'} && $args->{partial}) {
-        $stash->{'mojo.render'} = 1;
-        local $stash->{layout}  = undef;
-        local $stash->{extends} = undef;
-        return $self->render($args);
-    }
-
-    # Localize render arguments
-    for my $key (keys %$args) {
-        local $stash->{$key} = delete $args->{$key};
-        return $self->render($args);
-    }
-
-    # Render
-    delete $stash->{'mojo.render'};
-
     # Template
-    unless ($stash->{template}) {
+    unless ($stash->{template} || $args->{template}) {
 
         # Default template
         my $controller = $stash->{controller};
@@ -140,23 +123,17 @@ sub render {
         }
     }
 
-    # Partial
-    my $partial = $stash->{partial};
-
     # Render
-    my ($output, $type) = $self->app->renderer->render($self);
+    my ($output, $type) = $self->app->renderer->render($self, $args);
 
     # Failed
     return unless defined $output;
 
     # Partial
-    return $output if $partial;
+    return $output if delete $stash->{partial};
 
     # Response
     my $res = $self->res;
-
-    # Request
-    my $req = $self->req;
 
     # Status
     $res->code($stash->{status}) if $stash->{status};
@@ -252,9 +229,9 @@ sub render_not_found {
     my $options = {
         template  => 'not_found',
         format    => 'html',
-        status    => 404,
         not_found => 1
     };
+    $options->{status} = 404 unless $self->stash->{status};
     $self->app->static->serve_404($self)
       if $self->stash->{not_found} || !$self->render($options);
 }

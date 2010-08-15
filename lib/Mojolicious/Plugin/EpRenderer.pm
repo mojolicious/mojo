@@ -72,7 +72,10 @@ sub register {
                 # Stash
                 for my $var (keys %{$c->stash}) {
                     next unless $var =~ /^\w+$/;
-                    $prepend .= " my \$$var = \$self->stash->{'$var'};";
+                    $prepend
+                      .= " my \$$var;"
+                      . " tie \$$var, 'Mojolicious::Plugin::EpRenderer::_Tie',"
+                      . " stash => \$self->stash, name => '$var';";
                 }
 
                 # Prepend
@@ -86,6 +89,19 @@ sub register {
 
     # Set default handler
     $app->renderer->default_handler('ep');
+}
+
+package Mojolicious::Plugin::EpRenderer::_Tie;
+
+use strict;
+use warnings;
+
+sub FETCH { $_[0]->{stash}->{$_[0]->{name}} }
+sub STORE { $_[0]->{stash}->{$_[0]->{name}} = $_[1] }
+
+sub TIESCALAR {
+    my $class = shift;
+    bless {@_}, $class;
 }
 
 1;

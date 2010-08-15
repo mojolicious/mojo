@@ -74,15 +74,29 @@ sub get_inline_template {
 
 # Bodies are for hookers and fat people.
 sub render {
-    my ($self, $c) = @_;
+    my ($self, $c, $args) = @_;
+
+    # Stash
+    my $stash = $c->stash;
+
+    # Arguments
+    $args ||= {};
 
     # We got called
-    my $stash = $c->stash;
     $stash->{'mojo.rendered'} = 1;
     my $content = $stash->{'mojo.content'} ||= {};
 
     # Partial
-    my $partial = delete $stash->{partial};
+    my $partial = $stash->{partial} || $args->{partial};
+
+    # Localize extends and layout
+    local $stash->{layout}  = $partial ? undef : $stash->{layout};
+    local $stash->{extends} = $partial ? undef : $stash->{extends};
+
+    # Merge stash and arguments
+    while (my ($key, $value) = each %$args) {
+        $stash->{$key} = $value;
+    }
 
     # Template
     my $template = delete $stash->{template};
@@ -110,10 +124,6 @@ sub render {
         template_class => $stash->{template_class}
     };
     my $output;
-
-    # Localize extends and layout
-    local $stash->{layout}  = $stash->{layout};
-    local $stash->{extends} = $stash->{extends};
 
     # Text
     if (defined $text) {

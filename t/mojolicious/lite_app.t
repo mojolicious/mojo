@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 490;
+plan tests => 495;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -304,6 +304,9 @@ get '/json' =>
 # GET /autostash
 get '/autostash' => sub { shift->render(handler => 'ep', foo => 'bar') } =>
   '*';
+
+# GET /tied
+get '/tied' => {tied => 23, layout => 'tied'} => '*';
 
 # GET /helper
 get '/helper' => sub { shift->render(handler => 'ep') } => 'helper';
@@ -954,6 +957,11 @@ $t->get_ok('/autostash?bar=23')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("layouted bar2342autostash\n");
 
+# GET /tied
+$t->get_ok('/tied')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("tied layout 2423tied23\n\n");
+
 # GET /helper
 $t->get_ok('/helper')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
@@ -1296,6 +1304,12 @@ One: <%= $one %>
 Two: <%= $two %>
 %}
 with_block <%= $block->('one', 'two') %>
+
+@@ layouts/tied23.html.ep
+tied layout <%= $tied %><%= content %>
+
+@@ tied.html.ep
+<% $layout .= $tied; %><%= $tied++ %><%= $layout %>
 
 @@ helper.html.ep
 %= $default

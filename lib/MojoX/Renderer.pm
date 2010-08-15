@@ -462,6 +462,7 @@ Get an inline template by name, usually used by handlers.
 =head2 C<render>
 
     my ($output, $type) = $renderer->render($c);
+    my ($output, $type) = $renderer->render($c, $args);
 
 Render output through one of the Mojo renderers.
 This renderer requires some configuration, at the very least you will need to

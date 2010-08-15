@@ -106,8 +106,6 @@ sub render {
 
     # Template
     $args->{template} = $template if $template;
-
-    # Template
     unless ($stash->{template} || $args->{template}) {
 
         # Default template

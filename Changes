@@ -1,5 +1,9 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+0.999928 2010-08-15 00:00:00
+        - Fixed redirect_to without content bug.
+        - Fixed nested partial rendering bug. (yko)
+
 0.999927 2010-08-15 00:00:00
         - Code name "Comet", this is a major release.
         - Added EXPERIMENTAL method defaults to Mojolicious.

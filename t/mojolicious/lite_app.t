@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 495;
+plan tests => 506;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -184,6 +184,16 @@ get '/layout_without_inheritance' => sub {
 # GET /double_inheritance
 get '/double_inheritance' =>
   sub { shift->render(template => 'double_inheritance') };
+
+# GET /nested-includes
+get '/nested-includes' => sub {
+    my $self = shift;
+    $self->render(
+        template => 'nested-includes',
+        layout   => 'layout',
+        handler  => 'ep'
+    );
+};
 
 # GET /outerlayout
 get '/outerlayout' => sub {
@@ -379,6 +389,11 @@ get '/redirect_path' => sub {
 get '/redirect_named' => sub {
     shift->redirect_to('index', format => 'txt')->render_text('Redirecting!');
 };
+
+# GET /redirect_no_render
+get '/redirect_no_render' => sub {
+    shift->redirect_to('index', format => 'txt');
+} => '*';
 
 # GET /koi8-r
 app->types->type('koi8-r' => 'text/html; charset=koi8-r');
@@ -768,6 +783,12 @@ $t->get_ok('/double_inheritance')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("<title>Welcome</title>\nSidebar too!\nDefault footer!\n");
 
+# GET /nested-includes
+$t->get_ok('/nested-includes')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("layouted Nested Hello\n[\n  1,\n  2\n]\nthere<br/>!\n\n\n\n");
+
 # GET /outerlayout
 $t->get_ok('/outerlayout')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
@@ -1026,6 +1047,12 @@ $t->get_ok('/redirect_named')->status_is(302)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->header_like(Location => qr/\/template.txt$/)->content_is('Redirecting!');
 
+# GET /redirect_no_render
+$t->get_ok('/redirect_no_render')->status_is(302)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->header_like(Location => qr/\/template.txt$/)->content_is('');
+
 # GET /redirect_named (with redirecting enabled in client)
 $t->max_redirects(3);
 $t->get_ok('/redirect_named')->status_is(200)
@@ -1244,6 +1271,9 @@ Default footer!
 %{ content sidebar =>
 Sidebar too!
 %}
+
+@@ nested-includes.html.ep
+Nested <%= include 'outerlayout' %>
 
 @@ param_auth.html.epl
 Bender!

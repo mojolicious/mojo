@@ -87,7 +87,7 @@ sub render {
     my $content = $stash->{'mojo.content'} ||= {};
 
     # Partial
-    my $partial = $stash->{partial} || $args->{partial};
+    my $partial = $args->{partial};
 
     # Localize extends and layout
     local $stash->{layout}  = $partial ? undef : $stash->{layout};

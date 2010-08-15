@@ -79,6 +79,9 @@ sub receive_message {
 sub redirect_to {
     my $self = shift;
 
+    # Rendered
+    $self->stash->{'mojo.rendered'} = 1;
+
     # Code
     $self->res->code(302);
 
@@ -130,7 +133,7 @@ sub render {
     return unless defined $output;
 
     # Partial
-    return $output if delete $stash->{partial};
+    return $output if $args->{partial};
 
     # Response
     my $res = $self->res;

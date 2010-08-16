@@ -42,7 +42,7 @@ my $CSS_TOKEN_RE        = qr/
 /x;
 my $XML_ATTR_RE = qr/
     ([^=\s]+)                                   # Key
-    (?:\s*=\s*(?:"([^"]+)"|'([^']+)'|(\S+)))?   # Value
+    (?:\s*=\s*(?:"([^"]*)"|'([^']*)'|(\S+)))?   # Value
 /x;
 my $XML_END_RE   = qr/^\s*\/\s*(.+)\s*/;
 my $XML_START_RE = qr/(\S+)([\s\S]*)/;

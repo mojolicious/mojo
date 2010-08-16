@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 151;
+use Test::More tests => 153;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -385,3 +385,8 @@ $dom->parse(qq/<div id="<a>" \n test='='>Test<div id='><' \/><\/div>/);
 is($dom->at('div[id="<a>"]')->attrs->{test}, '=',    'right attribute');
 is($dom->at('[id="<a>"]')->text,             'Test', 'right text');
 is($dom->at('[id="><"]')->attrs->{id},       '><',   'right attribute');
+
+$dom->parse(qq{<div test="" test2='' />});
+
+is($dom->at('div')->attrs->{test}, '', "empty quoted param value");
+is($dom->at('div')->attrs->{test2}, '', "empty quoted param value");

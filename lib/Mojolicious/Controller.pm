@@ -82,11 +82,16 @@ sub redirect_to {
     # Rendered
     $self->stash->{'mojo.rendered'} = 1;
 
-    # Code
-    $self->res->code(302);
+    # Response
+    my $res = $self->res;
 
-    # Location header
-    $self->res->headers->location($self->url_for(@_)->to_abs);
+    # Code
+    $res->code(302);
+
+    # Headers
+    my $headers = $res->headers;
+    $headers->location($self->url_for(@_)->to_abs);
+    $headers->content_length(0);
 
     return $self;
 }

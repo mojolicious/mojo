@@ -74,7 +74,7 @@ my $XML_TOKEN_RE = qr/
             |
             [^>\s]+          # Unquoted
             )
-        )?
+        )?\s*
     )*
     )>
     )??

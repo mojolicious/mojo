@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 506;
+plan tests => 510;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -1030,27 +1030,31 @@ $t->get_ok('/subrequest_async')->status_is(200)
 
 # GET /redirect_url
 $t->get_ok('/redirect_url')->status_is(302)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->header_is(Server           => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
+  ->header_is('Content-Length' => 12)
   ->header_is(Location => 'http://127.0.0.1/foo')->content_is('Redirecting!');
 
 # GET /redirect_path
 $t->get_ok('/redirect_path')->status_is(302)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->header_is(Server           => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
+  ->header_is('Content-Length' => 12)
   ->header_like(Location => qr/\/foo\/bar\?foo=bar$/)
   ->content_is('Redirecting!');
 
 # GET /redirect_named
 $t->get_ok('/redirect_named')->status_is(302)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->header_is(Server           => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
+  ->header_is('Content-Length' => 12)
   ->header_like(Location => qr/\/template.txt$/)->content_is('Redirecting!');
 
 # GET /redirect_no_render
 $t->get_ok('/redirect_no_render')->status_is(302)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->header_is(Server           => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
+  ->header_is('Content-Length' => 0)
   ->header_like(Location => qr/\/template.txt$/)->content_is('');
 
 # GET /redirect_named (with redirecting enabled in client)

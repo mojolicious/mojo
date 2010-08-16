@@ -386,13 +386,12 @@ is($dom->at('div[id="<a>"]')->attrs->{test}, '=',    'right attribute');
 is($dom->at('[id="<a>"]')->text,             'Test', 'right text');
 is($dom->at('[id="><"]')->attrs->{id},       '><',   'right attribute');
 
-$dom->parse(qq{<div test="" test2='' />});
-
-is($dom->at('div')->attrs->{test}, '', "empty quoted param value");
-is($dom->at('div')->attrs->{test2}, '', "empty quoted param value");
+# Empty attributes
+$dom->parse(qq/<div test="" test2='' \/>/);
+is($dom->at('div')->attrs->{test},  '', 'empty attribute value');
+is($dom->at('div')->attrs->{test2}, '', 'empty attribute value');
 
 # Whitespaces before closing bracket
-$dom->parse(qq{<div >content</div>});
-
-ok($dom->at('div'), 'whitespaces before end of tag');
-is($dom->at('div')->text, 'content', 'whitespaces before end of tag');
+$dom->parse(qq/<div >content<\/div>/);
+ok($dom->at('div'), 'tag found');
+is($dom->at('div')->text, 'content', 'right text');

@@ -11,7 +11,7 @@ __PACKAGE__->attr([qw/connection kept_alive local_address local_port/]);
 __PACKAGE__->attr([qw/previous remote_port/]);
 __PACKAGE__->attr(
     [qw/finished resume_cb/] => sub {
-        sub { }
+        sub {1}
     }
 );
 __PACKAGE__->attr(keep_alive => 0);

@@ -184,9 +184,6 @@ sub _build_tx {
     # Weaken
     weaken $self;
 
-    # Resume callback
-    $tx->resume_cb(sub {1});
-
     # Handler callback
     $tx->handler_cb(
         sub {

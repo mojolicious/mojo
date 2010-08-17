@@ -12,7 +12,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 25;
+plan tests => 39;
 
 # I was so bored I cut the pony tail off the guy in front of us.
 # Look at me, I'm a grad student. I'm 30 years old and I made $600 last year.
@@ -84,6 +84,40 @@ $tx->req->url->parse('/5/');
 $client->process($tx);
 ok($tx->keep_alive, 'will be kept alive');
 is($tx->res->code, 200, 'right status');
+like($tx->res->body, qr/Mojo/, 'right content');
+
+# Keep alive request
+$tx = Mojo::Transaction::HTTP->new;
+$tx->req->method('GET');
+$tx->req->url->parse('/5/');
+$client->process($tx);
+ok($tx->keep_alive, 'will be kept alive');
+ok($tx->kept_alive, 'was kept alive');
+is($tx->res->code, 200, 'right status');
+like($tx->res->body, qr/Mojo/, 'right content');
+
+# Non keep alive request
+$tx = Mojo::Transaction::HTTP->new;
+$tx->req->method('GET');
+$tx->req->url->parse('/5/');
+$tx->req->headers->connection('close');
+$client->process($tx);
+ok(!$tx->keep_alive, 'will not be kept alive');
+ok($tx->kept_alive,  'was kept alive');
+is($tx->res->code,                200,     'right status');
+is($tx->res->headers->connection, 'Close', 'right "Connection" value');
+like($tx->res->body, qr/Mojo/, 'right content');
+
+# Second non keep alive request
+$tx = Mojo::Transaction::HTTP->new;
+$tx->req->method('GET');
+$tx->req->url->parse('/5/');
+$tx->req->headers->connection('close');
+$client->process($tx);
+ok(!$tx->keep_alive, 'will not be kept alive');
+ok(!$tx->kept_alive, 'was not kept alive');
+is($tx->res->code,                200,     'right status');
+is($tx->res->headers->connection, 'Close', 'right "Connection" value');
 like($tx->res->body, qr/Mojo/, 'right content');
 
 # POST request

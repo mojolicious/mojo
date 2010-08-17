@@ -145,9 +145,6 @@ sub _detect {
     # PSGI (Plack only for now)
     return 'psgi' if defined $ENV{PLACK_ENV};
 
-    # No further detection if we have a name
-    return $name if $name;
-
     # CGI
     return 'cgi'
       if defined $ENV{PATH_INFO} || defined $ENV{GATEWAY_INTERFACE};
@@ -156,7 +153,7 @@ sub _detect {
     return 'fastcgi' unless defined $ENV{PATH};
 
     # Nothing
-    return;
+    return $name;
 }
 
 1;

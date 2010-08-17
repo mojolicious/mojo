@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 510;
+plan tests => 516;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -393,6 +393,11 @@ get '/redirect_named' => sub {
 # GET /redirect_no_render
 get '/redirect_no_render' => sub {
     shift->redirect_to('index', format => 'txt');
+} => '*';
+
+# GET /static_render
+get '/static_render' => sub {
+    shift->render_static('hello.txt');
 } => '*';
 
 # GET /koi8-r
@@ -1056,6 +1061,13 @@ $t->get_ok('/redirect_no_render')->status_is(302)
   ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
   ->header_is('Content-Length' => 0)
   ->header_like(Location => qr/\/template.txt$/)->content_is('');
+
+# GET /static_render
+$t->get_ok('/static_render')->status_is(200)
+  ->header_is(Server           => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
+  ->header_is('Content-Length' => 30)
+  ->content_is('Hello Mojo from a static file!');
 
 # GET /redirect_named (with redirecting enabled in client)
 $t->max_redirects(3);

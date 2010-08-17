@@ -263,6 +263,11 @@ sub render_partial {
 
 sub render_static {
     my $self = shift;
+
+    # Rendered
+    $self->stash->{'mojo.rendered'} = 1;
+
+    # Static
     $self->app->static->serve($self, @_);
 }
 

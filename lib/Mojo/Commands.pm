@@ -149,11 +149,14 @@ sub _detect {
     return 'cgi'
       if defined $ENV{PATH_INFO} || defined $ENV{GATEWAY_INTERFACE};
 
+    # No further detection if we have a name
+    return $name if $name;
+
     # FastCGI
     return 'fastcgi' unless defined $ENV{PATH};
 
     # Nothing
-    return $name;
+    return;
 }
 
 1;

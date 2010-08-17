@@ -79,7 +79,7 @@ Mojo - The Box!
 
     use base 'Mojo';
 
-    # All the complexities of CGI, FastCGI, PSGI, HTTP and WebSocket get
+    # All the complexities of CGI, FastCGI, PSGI, HTTP and WebSockets get
     # reduced to a single method call!
     sub handler {
         my ($self, $tx) = @_;

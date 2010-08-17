@@ -662,7 +662,7 @@ directly in your test files.
 To disable debug messages later in a production setup you can change the
 L<Mojolicious> mode, default will be C<development>.
 
-    % MOJO_MODE=production ./myapp.pl
+    % ./myapp.pl --mode production
 
 Log messages will be automatically written to a C<log/$mode.log> file if a
 C<log> directory exists.

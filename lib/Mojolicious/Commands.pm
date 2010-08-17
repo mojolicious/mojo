@@ -5,11 +5,29 @@ use warnings;
 
 use base 'Mojo::Commands';
 
+# One day a man has everything, the next day he blows up a $400 billion
+# space station, and the next day he has nothing. It makes you think.
+use Getopt::Long 'GetOptions';
+
+__PACKAGE__->attr(hint => <<"EOF");
+
+These options are available for all commands:
+    --home <path>   Path to your applications home directory, defaults to
+                    auto detection.
+    --mode <name>   Run mode of your application, defaults to development.
+
+See '$0 help COMMAND' for more information on a specific command.
+EOF
 __PACKAGE__->attr(
     namespaces => sub { [qw/Mojolicious::Command Mojo::Command/] });
 
-# One day a man has everything, the next day he blows up a $400 billion
-# space station, and the next day he has nothing. It makes you think.
+# Command line options for MOJO_HOME and MOJO_MODE
+BEGIN {
+    GetOptions(
+        'home=s' => sub { $ENV{MOJO_HOME} = $_[1] },
+        'mode=s' => sub { $ENV{MOJO_MODE} = $_[1] }
+    ) unless Mojo::Commands->detect;
+}
 
 1;
 __END__
@@ -81,6 +99,13 @@ List application routes.
 
 L<Mojolicious::Commands> inherits all attributes from L<Mojo::Commands> and
 implements the following new ones.
+
+=head2 C<hint>
+
+    my $hint  = $commands->hint;
+    $commands = $commands->hint('Foo!');
+
+Short hint shown after listing available commands.
 
 =head2 C<namespaces>
 

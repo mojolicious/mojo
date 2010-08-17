@@ -24,11 +24,31 @@ __PACKAGE__->attr(namespaces => sub { ['Mojo::Command'] });
 
 # Aren't we forgetting the true meaning of Christmas?
 # You know, the birth of Santa.
+sub detect {
+    my ($self, $guess) = @_;
+
+    # PSGI (Plack only for now)
+    return 'psgi' if defined $ENV{PLACK_ENV};
+
+    # CGI
+    return 'cgi'
+      if defined $ENV{PATH_INFO} || defined $ENV{GATEWAY_INTERFACE};
+
+    # No further detection if we have a guess
+    return $guess if $guess;
+
+    # FastCGI
+    return 'fastcgi' unless defined $ENV{PATH};
+
+    # Nothing
+    return;
+}
+
 sub run {
     my ($self, $name, @args) = @_;
 
     # Try to detect environment
-    $name = $self->_detect($name) unless $ENV{MOJO_NO_DETECT};
+    $name = $self->detect($name) unless $ENV{MOJO_NO_DETECT};
 
     # Run command
     if ($name && $name =~ /^\w+$/ && ($name ne 'help' || $args[0])) {
@@ -137,26 +157,6 @@ sub start {
 
     # Run
     return ref $self ? $self->run(@args) : $self->new->run(@args);
-}
-
-sub _detect {
-    my ($self, $name) = @_;
-
-    # PSGI (Plack only for now)
-    return 'psgi' if defined $ENV{PLACK_ENV};
-
-    # CGI
-    return 'cgi'
-      if defined $ENV{PATH_INFO} || defined $ENV{GATEWAY_INTERFACE};
-
-    # No further detection if we have a name
-    return $name if $name;
-
-    # FastCGI
-    return 'fastcgi' unless defined $ENV{PATH};
-
-    # Nothing
-    return;
 }
 
 1;
@@ -309,6 +309,13 @@ Namespaces to search for available commands, defaults to L<Mojo::Command>.
 
 L<Mojo::Commands> inherits all methods from L<Mojo::Command> and implements
 the following new ones.
+
+=head2 C<detect>
+
+    my $env = $commands->detect;
+    my $env = $commands->detect($guess);
+
+Try to detect environment.
 
 =head2 C<run>
 

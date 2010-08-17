@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+0.999929 2010-08-17 00:00:00
+        - Removed OS X resource fork files.
+
 0.999928 2010-08-15 00:00:00
         - Fixed a security problem with CGI environment detection.
         - Fixed redirect_to without content and render_static bug.

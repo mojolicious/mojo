@@ -89,7 +89,7 @@ like($tx->res->body, qr/Mojo/, 'right content');
 # Keep alive request
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
-$tx->req->url->parse('/5/');
+$tx->req->url->parse('/6/');
 $client->process($tx);
 ok($tx->keep_alive, 'will be kept alive');
 ok($tx->kept_alive, 'was kept alive');
@@ -99,7 +99,7 @@ like($tx->res->body, qr/Mojo/, 'right content');
 # Non keep alive request
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
-$tx->req->url->parse('/5/');
+$tx->req->url->parse('/7/');
 $tx->req->headers->connection('close');
 $client->process($tx);
 ok(!$tx->keep_alive, 'will not be kept alive');
@@ -111,7 +111,7 @@ like($tx->res->body, qr/Mojo/, 'right content');
 # Second non keep alive request
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
-$tx->req->url->parse('/5/');
+$tx->req->url->parse('/8/');
 $tx->req->headers->connection('close');
 $client->process($tx);
 ok(!$tx->keep_alive, 'will not be kept alive');
@@ -123,7 +123,7 @@ like($tx->res->body, qr/Mojo/, 'right content');
 # POST request
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('POST');
-$tx->req->url->parse('/6/');
+$tx->req->url->parse('/9/');
 $tx->req->headers->expect('fun');
 $tx->req->body('foo bar baz' x 128);
 $client->process($tx);
@@ -133,7 +133,7 @@ like($tx->res->body, qr/Mojo/, 'right content');
 # POST request
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('POST');
-$tx->req->url->parse('/7/');
+$tx->req->url->parse('/10/');
 $tx->req->headers->expect('fun');
 $tx->req->body('bar baz foo' x 128);
 $client->process($tx);
@@ -144,10 +144,10 @@ like($tx->res->body, qr/Mojo/, 'right content');
 # Multiple requests
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
-$tx->req->url->parse('/8/');
+$tx->req->url->parse('/11/');
 my $tx2 = Mojo::Transaction::HTTP->new;
 $tx2->req->method('GET');
-$tx2->req->url->parse('/9/');
+$tx2->req->url->parse('/12/');
 $client->process($tx, $tx2);
 ok(defined $tx->connection,  'has connection id');
 ok(defined $tx2->connection, 'has connection id');
@@ -157,15 +157,15 @@ ok($tx2->is_done,            'transaction is done');
 # Multiple requests
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
-$tx->req->url->parse('/10/');
+$tx->req->url->parse('/13/');
 $tx2 = Mojo::Transaction::HTTP->new;
 $tx2->req->method('POST');
-$tx2->req->url->parse('/11/');
+$tx2->req->url->parse('/14/');
 $tx2->req->headers->expect('fun');
 $tx2->req->body('bar baz foo' x 128);
 my $tx3 = Mojo::Transaction::HTTP->new;
 $tx3->req->method('GET');
-$tx3->req->url->parse('/12/');
+$tx3->req->url->parse('/15/');
 $client->process($tx, $tx2, $tx3);
 ok($tx->is_done,  'transaction is done');
 ok(!$tx->error,   'has no errors');

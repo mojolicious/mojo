@@ -23,6 +23,9 @@ __PACKAGE__->attr(dom_class       => 'Mojo::DOM');
 __PACKAGE__->attr([qw/finish_cb progress_cb/]);
 __PACKAGE__->attr(json_class                        => 'Mojo::JSON');
 __PACKAGE__->attr([qw/major_version minor_version/] => 1);
+__PACKAGE__->attr(max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 10240 });
+__PACKAGE__->attr(
+    max_message_size => sub { $ENV{MOJO_MAX_MESSAGE_SIZE} || 5242880 });
 
 # I'll keep it short and sweet. Family. Religion. Friendship.
 # These are the three demons you must slay if you wish to succeed in
@@ -497,12 +500,12 @@ sub _parse {
 
         # Check line size
         $self->error('Maximum line size exceeded.', 413)
-          if $buffer->size > ($ENV{MOJO_MAX_LINE_SIZE} || 10240);
+          if $buffer->size > $self->max_line_size;
     }
 
     # Check message size
     $self->error('Maximum message size exceeded.', 413)
-      if $buffer->raw_size > ($ENV{MOJO_MAX_MESSAGE_SIZE} || 5242880);
+      if $buffer->raw_size > $self->max_message_size;
 
     # Content
     my $state = $self->{_state} || '';
@@ -696,6 +699,20 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
     $message          = $message->major_version(1);
 
 Major version, defaults to C<1>.
+
+=head2 C<max_line_size>
+
+    my $size = $message->max_line_size;
+    $message = $message->max_line_size(1024);
+
+Maximum raw line size in bytes, defaults to C<10240>.
+
+=head2 C<max_message_size>
+
+    my $size = $message->max_message_size;
+    $message = $message->max_message_size(1024);
+
+Maximum raw message size in bytes, defaults to C<5242880>.
 
 =head2 C<minor_version>
 

@@ -89,6 +89,7 @@ Mojo - The Box!
         my $path   = $tx->req->url->path;
 
         # Response
+        $tx->res->code(200);
         $tx->res->headers->content_type('text/plain');
         $tx->res->body("$method request for $path!");
     }

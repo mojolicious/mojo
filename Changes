@@ -1,7 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 0.999928 2010-08-15 00:00:00
-        - Fixed a security problem in the CGI environment detection.
+        - Fixed a security problem with CGI environment detection.
         - Fixed redirect_to without content and render_static bug.
         - Fixed nested partial rendering bug. (yko)
         - Fixed multiple small Mojo::DOM bugs. (yko)

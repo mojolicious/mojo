@@ -105,17 +105,21 @@ is($req->headers->content_length, 0, 'right "Content-Length" value');
 
 # Parse HTTP 1.0 start line and headers, no body (with line size limit)
 $req = Mojo::Message::Request->new;
-$req->max_line_size(5);
+my $backup = $ENV{MOJO_MAX_LINE_SIZE} || '';
+$ENV{MOJO_MAX_LINE_SIZE} = 5;
 $req->parse('GET /foo/bar/baz.html HTTP/1');
 ok($req->is_done, 'request is done');
 is(($req->error)[1], 413, 'right status');
+$ENV{MOJO_MAX_LINE_SIZE} = $backup;
 
 # Parse HTTP 1.0 start line and headers, no body (with message size limit)
-$req = Mojo::Message::Request->new;
-$req->max_message_size(5);
+$req                        = Mojo::Message::Request->new;
+$backup                     = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
+$ENV{MOJO_MAX_MESSAGE_SIZE} = 5;
 $req->parse('GET /foo/bar/baz.html HTTP/1');
 ok($req->is_done, 'request is done');
 is(($req->error)[1], 413, 'right status');
+$ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
 
 # Parse full HTTP 1.0 request
 $req = Mojo::Message::Request->new;

@@ -843,18 +843,14 @@ sub _iterate {
     # Shortcut
     return @$self unless $cb;
 
-    # Iterate
+    # Iterator
     my $i = 1;
 
     # Iterate until condition is true
-    if (defined $cond) {
-        !!$_->$cb($i++) == $cond && last for @$self;
-    }
+    if (defined $cond) { !!$_->$cb($i++) == $cond && last for @$self }
 
     # Iterate over all elements
-    else {
-        $_->$cb($i++) for @$self;
-    }
+    else { $_->$cb($i++) for @$self }
 
     # Root
     return unless my $start = $self->[0];
@@ -887,12 +883,13 @@ Mojo::DOM - Minimalistic XML DOM Parser With CSS3 Selectors
     # Iterate
     $dom->find('div[id]')->each(sub { print shift->text });
 
-    # Get the top 10 links
+    # Get the first 10 links
     $dom->find('a[href]')
-      ->while(sub { push @links, shift->attrs->{href} && @links < 10 });
+      ->while(sub { print shift->attrs->{href} && pop() < 10 });
 
-    # Get the first link with a specific path
-    $dom->find('a[href]')->until(sub { shift->attrs->{href} =~ m/kraih/ });
+    # Get text for the first link containing a specific path
+    $dom->find('a[href]')
+      ->until(sub { $_->attrs->{href} =~ m/kraih/ && print $_->text });
 
 =head1 DESCRIPTION
 
@@ -1016,8 +1013,8 @@ Children of element.
 Find elements with CSS3 selectors.
 
     $dom->find('div')->each(sub { print shift->text });
-    $dom->find('div')->while(sub { shift->text ne 'foo' });
-    $dom->find('div')->until(sub { shift->text eq 'foo' });
+    $dom->find('div')->while(sub { print $_->text && $_->text =~ /foo/ });
+    $dom->find('div')->until(sub { $_->text =~ /foo/ && print $_->text });
 
 =head2 C<name>
 

@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 157;
+use Test::More tests => 160;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -20,10 +20,19 @@ my @div;
 $dom->find('div[id]')->each(sub { push @div, shift->text });
 is_deeply(\@div, [qw/A B/], 'found all div elements with id');
 @div = ();
+$dom->find('div[id]')->each(sub { push @div, $_->text });
+is_deeply(\@div, [qw/A B/], 'found all div elements with id');
+@div = ();
 $dom->find('div[id]')->until(sub { push @div, shift->text; @div == 1 });
 is_deeply(\@div, [qw/A/], 'found first div elements with id');
 @div = ();
+$dom->find('div[id]')->until(sub { pop == 1 && push @div, $_->text });
+is_deeply(\@div, [qw/A/], 'found first div elements with id');
+@div = ();
 $dom->find('div[id]')->while(sub { push @div, shift->text; @div < 1 });
+is_deeply(\@div, [qw/A/], 'found first div elements with id');
+@div = ();
+$dom->find('div[id]')->while(sub { pop() < 2 && push @div, $_->text });
 is_deeply(\@div, [qw/A/], 'found first div elements with id');
 
 # Simple nesting (tree structure)

@@ -837,20 +837,33 @@ sub _text {
 
 package Mojo::DOM::_Collection;
 
-sub each {
-    my ($self, $cb) = @_;
+sub _iterate {
+    my ($self, $cb, $cond) = @_;
 
     # Shortcut
     return @$self unless $cb;
 
     # Iterate
     my $i = 1;
-    $_->$cb($i++) for @$self;
+
+    # Iterate until condition is true
+    if (defined $cond) {
+        !!$_->$cb($i++) == $cond && last for @$self;
+    }
+
+    # Iterate over all elements
+    else {
+        $_->$cb($i++) for @$self;
+    }
 
     # Root
     return unless my $start = $self->[0];
     return $start->root;
 }
+
+sub each  { shift->_iterate(@_) }
+sub until { shift->_iterate(@_, 1) }
+sub while { shift->_iterate(@_, 0) }
 
 1;
 __END__
@@ -873,6 +886,13 @@ Mojo::DOM - Minimalistic XML DOM Parser With CSS3 Selectors
 
     # Iterate
     $dom->find('div[id]')->each(sub { print shift->text });
+
+    # Get the top 10 links
+    $dom->find('a[href]')
+      ->while(sub { push @links, shift->attrs->{href} && @links < 10 });
+
+    # Get the first link with a specific path
+    $dom->find('a[href]')->until(sub { shift->attrs->{href} =~ m/kraih/ });
 
 =head1 DESCRIPTION
 
@@ -996,6 +1016,8 @@ Children of element.
 Find elements with CSS3 selectors.
 
     $dom->find('div')->each(sub { print shift->text });
+    $dom->find('div')->while(sub { shift->text ne 'foo' });
+    $dom->find('div')->until(sub { shift->text eq 'foo' });
 
 =head2 C<name>
 

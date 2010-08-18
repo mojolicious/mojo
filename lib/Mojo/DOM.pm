@@ -887,9 +887,9 @@ Mojo::DOM - Minimalistic XML DOM Parser With CSS3 Selectors
     $dom->find('a[href]')
       ->while(sub { print shift->attrs->{href} && pop() < 10 });
 
-    # Get text for the first link containing a specific path
+    # Search for a link about a specific topic
     $dom->find('a[href]')
-      ->until(sub { $_->attrs->{href} =~ m/kraih/ && print $_->text });
+      ->until(sub { $_->text =~ m/kraih/ && print $_->attrs->{href} });
 
 =head1 DESCRIPTION
 

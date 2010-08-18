@@ -862,7 +862,7 @@ sub _prepare_connections {
         if ($c->{finish}) {
 
             # Buffer empty
-            unless ($c->{buffer} && $c->{buffer}->size) {
+            unless (defined $c->{buffer} && $c->{buffer}->size) {
                 $self->_drop_immediately($id);
                 next;
             }

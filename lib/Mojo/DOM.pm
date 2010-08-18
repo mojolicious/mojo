@@ -837,6 +837,10 @@ sub _text {
 
 package Mojo::DOM::_Collection;
 
+sub each  { shift->_iterate(@_) }
+sub until { shift->_iterate(@_, 1) }
+sub while { shift->_iterate(@_, 0) }
+
 sub _iterate {
     my ($self, $cb, $cond) = @_;
 
@@ -856,10 +860,6 @@ sub _iterate {
     return unless my $start = $self->[0];
     return $start->root;
 }
-
-sub each  { shift->_iterate(@_) }
-sub until { shift->_iterate(@_, 1) }
-sub while { shift->_iterate(@_, 0) }
 
 1;
 __END__

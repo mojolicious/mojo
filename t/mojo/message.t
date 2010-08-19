@@ -1435,7 +1435,7 @@ is($req->is_secure,       1,                  'is secure');
 is($req->body,            'hello=world',      'right content');
 is_deeply($req->param('hello'), 'world', 'right parameters');
 is( $req->url->to_abs->to_string,
-    'http://localhost/test/index.cgi/foo/bar',
+    'https://localhost/test/index.cgi/foo/bar',
     'right absolute URL'
 );
 

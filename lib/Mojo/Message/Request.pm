@@ -290,13 +290,12 @@ sub _parse_env {
     # Scheme/Version
     if (my $value = $env->{SERVER_PROTOCOL}) {
         $value =~ /^([^\/]*)\/*(.*)$/;
-        $self->url->scheme($1)       if $1;
         $self->url->base->scheme($1) if $1;
-        $self->version($2)           if $2;
+        $self->version($2) if $2;
     }
 
     # HTTPS
-    if ($env->{HTTPS}) { $self->url->scheme('https') }
+    if ($env->{HTTPS}) { $self->url->base->scheme('https') }
 
     # Base path
     if (my $value = $env->{SCRIPT_NAME}) {

@@ -175,11 +175,7 @@ sub _build_tx {
     $tx->remote_port($remote->{port});
 
     # TLS
-    if ($c->{tls}) {
-        my $url = $tx->req->url;
-        $url->scheme('https');
-        $url->base->scheme('https');
-    }
+    $tx->req->url->base->scheme('https') if $c->{tls};
 
     # Weaken
     weaken $self;

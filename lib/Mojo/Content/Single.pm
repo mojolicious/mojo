@@ -21,7 +21,11 @@ sub body_contains {
     return 0;
 }
 
-sub body_size { shift->asset->size }
+sub body_size {
+    my $self = shift;
+    return ($self->headers->content_length || 0) if $self->read_cb;
+    return $self->asset->size;
+}
 
 sub get_body_chunk {
     my ($self, $offset) = @_;

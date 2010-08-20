@@ -337,6 +337,32 @@ sub url_for {
     return $url;
 }
 
+sub write {
+    my ($self, $chunk, $cb) = @_;
+
+    # Rendered
+    $self->rendered;
+
+    # Write
+    $self->res->write(
+        $chunk,
+        sub {
+
+            # Cleanup
+            shift;
+
+            # Pause
+            $self->pause;
+
+            # Callback
+            $self->$cb(@_) if $cb;
+        }
+    );
+
+    # Resume
+    $self->resume;
+}
+
 sub write_chunk {
     my ($self, $chunk, $cb) = @_;
 
@@ -587,6 +613,19 @@ connection in progress.
     my $url = $c->url_for('named', controller => 'bar', action => 'baz');
 
 Generate a L<Mojo::URL> for the current or a named route.
+
+=head2 C<write>
+
+    $c->write('Hello!');
+    $c->write('Hello!', sub {...});
+
+Write dynamic content, the optional drain callback will be invoked once all
+data has been written.
+
+    $c->res->headers->content_length(6);
+    $c->write('Hello!');
+
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<write_chunk>
 

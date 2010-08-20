@@ -65,8 +65,8 @@ sub client_write {
     my $chunk = '';
 
     # Offsets
-    my $offset = $self->{_offset} ||= 0;
-    my $write  = $self->{_write}  ||= 0;
+    $self->{_offset} ||= 0;
+    $self->{_write}  ||= 0;
 
     # Request
     my $req = $self->req;
@@ -85,59 +85,59 @@ sub client_write {
 
         # Ready for next state
         $self->{_state} = 'write_start_line';
-        $write = $req->start_line_size;
+        $self->{_write} = $req->start_line_size;
     }
 
     # Start line
     if ($self->{_state} eq 'write_start_line') {
-        my $buffer = $req->get_start_line_chunk($offset);
+        my $buffer = $req->get_start_line_chunk($self->{_offset});
 
         # Written
         my $written = defined $buffer ? length $buffer : 0;
-        $write  = $write - $written;
-        $offset = $offset + $written;
+        $self->{_write}  = $self->{_write} - $written;
+        $self->{_offset} = $self->{_offset} + $written;
 
         $chunk .= $buffer;
 
         # Done
-        if ($write <= 0) {
-            $self->{_state} = 'write_headers';
-            $offset         = 0;
-            $write          = $req->header_size;
+        if ($self->{_write} <= 0) {
+            $self->{_state}  = 'write_headers';
+            $self->{_offset} = 0;
+            $self->{_write}  = $req->header_size;
         }
     }
 
     # Headers
     if ($self->{_state} eq 'write_headers') {
-        my $buffer = $req->get_header_chunk($offset);
+        my $buffer = $req->get_header_chunk($self->{_offset});
 
         # Written
         my $written = defined $buffer ? length $buffer : 0;
-        $write  = $write - $written;
-        $offset = $offset + $written;
+        $self->{_write}  = $self->{_write} - $written;
+        $self->{_offset} = $self->{_offset} + $written;
 
         $chunk .= $buffer;
 
         # Done
-        if ($write <= 0) {
+        if ($self->{_write} <= 0) {
 
-            $self->{_state} = 'write_body';
-            $offset         = 0;
-            $write          = $req->body_size;
+            $self->{_state}  = 'write_body';
+            $self->{_offset} = 0;
+            $self->{_write}  = $req->body_size;
 
             # Chunked
-            $write = 1 if $req->is_chunked;
+            $self->{_write} = 1 if $req->is_chunked;
         }
     }
 
     # Body
     if ($self->{_state} eq 'write_body') {
-        my $buffer = $req->get_body_chunk($offset);
+        my $buffer = $req->get_body_chunk($self->{_offset});
 
         # Written
         my $written = defined $buffer ? length $buffer : 0;
-        $write  = $write - $written;
-        $offset = $offset + $written;
+        $self->{_write}  = $self->{_write} - $written;
+        $self->{_offset} = $self->{_offset} + $written;
 
         $chunk .= $buffer if defined $buffer;
 
@@ -146,15 +146,11 @@ sub client_write {
           if defined $buffer && !length $buffer;
 
         # Chunked
-        $write = 1 if $req->is_chunked;
+        $self->{_write} = 1 if $req->is_chunked;
 
         # Done
-        $self->{_state} = 'read_response' if $write <= 0;
+        $self->{_state} = 'read_response' if $self->{_write} <= 0;
     }
-
-    # Offsets
-    $self->{_offset} = $offset;
-    $self->{_write}  = $write;
 
     return $chunk;
 }
@@ -286,8 +282,8 @@ sub server_write {
     return $chunk unless $self->{_state};
 
     # Offsets
-    my $offset = $self->{_offset} ||= 0;
-    my $write  = $self->{_write}  ||= 0;
+    $self->{_offset} ||= 0;
+    $self->{_write}  ||= 0;
 
     # Request and response
     my $req = $self->req;
@@ -305,43 +301,43 @@ sub server_write {
 
         # Ready for next state
         $self->{_state} = 'write_start_line';
-        $write = $res->start_line_size;
+        $self->{_write} = $res->start_line_size;
     }
 
     # Start line
     if ($self->{_state} eq 'write_start_line') {
-        my $buffer = $res->get_start_line_chunk($offset);
+        my $buffer = $res->get_start_line_chunk($self->{_offset});
 
         # Written
         my $written = defined $buffer ? length $buffer : 0;
-        $write  = $write - $written;
-        $offset = $offset + $written;
+        $self->{_write}  = $self->{_write} - $written;
+        $self->{_offset} = $self->{_offset} + $written;
 
         # Append
         $chunk .= $buffer;
 
         # Done
-        if ($write <= 0) {
-            $self->{_state} = 'write_headers';
-            $offset         = 0;
-            $write          = $res->header_size;
+        if ($self->{_write} <= 0) {
+            $self->{_state}  = 'write_headers';
+            $self->{_offset} = 0;
+            $self->{_write}  = $res->header_size;
         }
     }
 
     # Headers
     if ($self->{_state} eq 'write_headers') {
-        my $buffer = $res->get_header_chunk($offset);
+        my $buffer = $res->get_header_chunk($self->{_offset});
 
         # Written
         my $written = defined $buffer ? length $buffer : 0;
-        $write  = $write - $written;
-        $offset = $offset + $written;
+        $self->{_write}  = $self->{_write} - $written;
+        $self->{_offset} = $self->{_offset} + $written;
 
         # Append
         $chunk .= $buffer;
 
         # Done
-        if ($write <= 0) {
+        if ($self->{_write} <= 0) {
 
             # HEAD request
             if ($req->method eq 'HEAD') {
@@ -352,12 +348,12 @@ sub server_write {
 
             # Body
             else {
-                $self->{_state} = 'write_body';
-                $offset         = 0;
-                $write          = $res->body_size;
+                $self->{_state}  = 'write_body';
+                $self->{_offset} = 0;
+                $self->{_write}  = $res->body_size;
 
                 # Chunked
-                $write = 1 if $res->is_chunked;
+                $self->{_write} = 1 if $res->is_chunked;
             }
         }
     }
@@ -366,7 +362,7 @@ sub server_write {
     if ($self->{_state} eq 'write_body') {
 
         # 100 Continue
-        if ($write <= 0) {
+        if ($self->{_write} <= 0) {
 
             # Continue done
             if (defined $self->{_continued} && $self->{_continued} == 0) {
@@ -383,28 +379,24 @@ sub server_write {
 
         # Normal body
         else {
-            my $buffer = $res->get_body_chunk($offset);
+            my $buffer = $res->get_body_chunk($self->{_offset});
 
             # Written
             my $written = defined $buffer ? length $buffer : 0;
-            $write  = $write - $written;
-            $offset = $offset + $written;
+            $self->{_write}  = $self->{_write} - $written;
+            $self->{_offset} = $self->{_offset} + $written;
 
             # Append
             $chunk .= $buffer if defined $buffer;
 
             # Chunked
-            $write = 1 if $res->is_chunked;
+            $self->{_write} = 1 if $res->is_chunked;
 
             # Done
             $self->{_state} = 'done'
-              if $write <= 0 || (defined $buffer && !length $buffer);
+              if $self->{_write} <= 0 || (defined $buffer && !length $buffer);
         }
     }
-
-    # Offsets
-    $self->{_offset} = $offset;
-    $self->{_write}  = $write;
 
     return $chunk;
 }

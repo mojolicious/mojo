@@ -289,7 +289,7 @@ sub write_chunk {
     $self->headers->transfer_encoding('chunked') unless $self->is_chunked;
 
     # Write
-    $self->write(defined $chunk ? $filter->build($chunk) : '', $cb);
+    $self->write(defined $chunk ? $filter->build($chunk) : $chunk, $cb);
 
     # Finish
     $self->finish if $filter->is_done;

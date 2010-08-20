@@ -84,7 +84,8 @@ sub new {
     $r->hide(qw/pause receive_message redirect_to render render_data/);
     $r->hide(qw/render_exception render_inner render_json render_not_found/);
     $r->hide(qw/render_partial render_static render_text rendered resume/);
-    $r->hide(qw/send_message session signed_cookie url_for write_chunk/);
+    $r->hide(
+        qw/send_message session signed_cookie url_for write write_chunk/);
 
     # Mode
     my $mode = $self->mode;

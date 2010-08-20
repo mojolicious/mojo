@@ -1675,7 +1675,7 @@ my $count  = 0;
 my $offset = 0;
 while (1) {
     my $chunk = $res->get_body_chunk($offset);
-    last unless length($chunk);
+    last unless defined $chunk;
     $full .= $chunk;
     $offset = length($full);
     $count++;

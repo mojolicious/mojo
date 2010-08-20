@@ -386,6 +386,8 @@ Content parser callback.
         print $chunk;
     });
 
+Note that this attribute is EXPERIMENTAL and might change without warning!
+
 =head2 C<relaxed>
 
     my $relaxed = $content->relaxed;
@@ -433,6 +435,7 @@ Render all headers.
     $content->finish;
 
 Finish dynamic content generation.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<generate_body_chunk>
 
@@ -533,6 +536,7 @@ Raw size of body in bytes.
 
 Write dynamic content, the optional drain callback will be invoked once all
 data has been written.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<write_chunk>
 
@@ -541,6 +545,7 @@ data has been written.
 
 Write chunked content, the optional drain callback will be invoked once all
 data has been written.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head1 SEE ALSO
 

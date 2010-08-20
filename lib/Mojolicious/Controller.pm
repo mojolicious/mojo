@@ -586,9 +586,11 @@ Generate a L<Mojo::URL> for the current or a named route.
 
 Write chunked content, the optional drain callback will be invoked once all
 data has been written.
-Note that an empty chunk marks the end of the stream.
+An empty chunk marks the end of the stream.
 
     $c->write_chunk('');
+
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head1 SEE ALSO
 

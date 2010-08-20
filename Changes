@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojolicious.
 0.999930 2010-08-17 00:00:00
         - Added EXPERIMENTAL support for --mode and --home options to all
           Mojolicious commands.
+        - Added EXPERIMENTAL write_chunk method to Mojolicious::Controller.
         - Added while and until methods for Mojo::DOM collections. (vti)
         - Fixed a serious design flaw in Mojo::Message and made long poll
           much easier.

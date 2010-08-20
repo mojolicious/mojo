@@ -9,7 +9,6 @@ use Test::More tests => 801;
 
 use File::Spec;
 use File::Temp;
-use Mojo::Filter::Chunked;
 use Mojo::Headers;
 
 # When will I learn?
@@ -229,7 +228,7 @@ is($req->content->asset->slurp, 'abcdabcdefghi', 'right content');
 # Parse HTTP 1.1 chunked request with callback
 $req = Mojo::Message::Request->new;
 my $buffer = '';
-$req->body_cb(sub { $buffer .= pop });
+$req->read_cb(sub { $buffer .= pop });
 $req->parse("POST /foo/bar/baz.html?foo=13#23 HTTP/1.1\x0d\x0a");
 $req->parse("Content-Type: text/plain\x0d\x0a");
 $req->parse("Transfer-Encoding: chunked\x0d\x0a\x0d\x0a");
@@ -698,18 +697,17 @@ $req = Mojo::Message::Request->new;
 $req->method('GET');
 $req->url->parse('http://127.0.0.1:8080/foo/bar');
 $req->headers->transfer_encoding('chunked');
-my $counter  = 1;
-my $chunked  = Mojo::Filter::Chunked->new;
 my $counter2 = 0;
 $req->progress_cb(sub { $counter2++ });
-$req->body(
-    sub {
-        my $self  = shift;
-        my $chunk = '';
-        $chunk = "hello world!"      if $counter == 1;
-        $chunk = "hello world2!\n\n" if $counter == 2;
-        $counter++;
-        return $chunked->build($chunk);
+$req->write_chunk(
+    'hello world!' => sub {
+        shift->write_chunk(
+            "hello world2!\n\n" => sub {
+                my $self = shift;
+                $self->write_chunk('');
+                $self->finish;
+            }
+        );
     }
 );
 $req = Mojo::Message::Request->new->parse($req->build);
@@ -728,20 +726,19 @@ ok($counter2, 'right counter');
 $req = Mojo::Message::Request->new;
 $req->method('GET');
 $req->url->parse('http://127.0.0.1/foo/bar');
-$req->headers->transfer_encoding('chunked');
 $req->headers->trailer('X-Test; X-Test2');
-$counter = 1;
-$chunked = Mojo::Filter::Chunked->new;
-$req->body_cb(
-    sub {
-        my $self  = shift;
-        my $chunk = Mojo::Headers->new;
-        $chunk->header('X-Test',  'test');
-        $chunk->header('X-Test2', '123');
-        $chunk = "hello world!"      if $counter == 1;
-        $chunk = "hello world2!\n\n" if $counter == 2;
-        $counter++;
-        return $chunked->build($chunk);
+$req->write_chunk(
+    'hello world!' => sub {
+        shift->write_chunk(
+            "hello world2!\n\n" => sub {
+                my $self = shift;
+                my $h    = Mojo::Headers->new;
+                $h->header('X-Test',  'test');
+                $h->header('X-Test2', '123');
+                $self->write_chunk($h);
+                $self->finish;
+            }
+        );
     }
 );
 $req = Mojo::Message::Request->new->parse($req->build);
@@ -1661,15 +1658,18 @@ is($res2->cookie('bar')->value, 'baz',      'right value');
 $res = Mojo::Message::Response->new;
 $res->code(200);
 $res->headers->content_length(10);
-$res->body(sub { die "Body coderef was called properly\n" });
-eval { $res->get_body_chunk(0) };
+$res->write('lala', sub { die "Body coderef was called properly\n" });
+$res->get_body_chunk(0);
+eval { $res->get_body_chunk(3) };
 is($@, "Body coderef was called properly\n", 'right error');
 
 # Build response with callback (consistency calls)
 $res = Mojo::Message::Response->new;
 my $body = 'I is here';
 $res->headers->content_length(length($body));
-$res->body(sub { return substr($body, $_[1], 1) });
+my $cb;
+$cb = sub { shift->write(substr($body, pop, 1), $cb) };
+$res->write('', $cb);
 my $full   = '';
 my $count  = 0;
 my $offset = 0;
@@ -1729,8 +1729,8 @@ is($req2->cookie('bar')->value,  'baz',            'right value');
 is($req2->body,                  "Hello World!\n", 'right content');
 
 # Parse full HTTP 1.0 request with cookies
-$req     = Mojo::Message::Request->new;
-$counter = 0;
+$req = Mojo::Message::Request->new;
+my $counter = 0;
 $req->progress_cb(sub { $counter++ });
 $req->parse('GET /foo/bar/baz.html?fo');
 $req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
@@ -2027,7 +2027,7 @@ $req->body(sub { });
 is(ref $req->body, 'CODE', 'body is callback');
 $req->body('hello!');
 is($req->body,    'hello!', 'right content');
-is($req->body_cb, undef,    'no body callback');
+is($req->read_cb, undef,    'no read callback');
 $req->content(Mojo::Content::MultiPart->new);
 $req->body('hi!');
 is($req->body, 'hi!', 'right content');

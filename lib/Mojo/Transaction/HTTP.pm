@@ -379,7 +379,6 @@ sub server_write {
 
             # Everything done
             elsif (!defined $self->{_continued}) { $self->{_state} = 'done' }
-
         }
 
         # Normal body
@@ -392,7 +391,7 @@ sub server_write {
             $offset = $offset + $written;
 
             # Append
-            $chunk .= $buffer;
+            $chunk .= $buffer if defined $buffer;
 
             # Chunked
             $write = 1 if $res->is_chunked;

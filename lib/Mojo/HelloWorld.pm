@@ -5,7 +5,6 @@ use warnings;
 
 use base 'Mojo';
 
-use Mojo::Filter::Chunked;
 use Mojo::JSON;
 
 # How is education supposed to make me feel smarter? Besides,
@@ -49,16 +48,14 @@ sub _chunked_params {
     }
 
     # Callback
-    my $counter = 0;
-    my $chunked = Mojo::Filter::Chunked->new;
-    $tx->res->body(
-        sub {
-            my $self = shift;
-            my $chunk = $chunks->[$counter] || '';
-            $counter++;
-            return $chunked->build($chunk);
-        }
-    );
+    my $cb;
+    $cb = sub {
+        my $self = shift;
+        my $chunk = shift @$chunks || '';
+        $self->write_chunk($chunk, $chunk ? $cb : undef);
+        $self->finish unless $chunk;
+    };
+    $cb->($tx->res);
 }
 
 sub _diag {

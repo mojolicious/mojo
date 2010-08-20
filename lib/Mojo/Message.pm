@@ -50,8 +50,8 @@ sub body {
 
     # Get
     unless (@_) {
-        return $self->body_cb
-          ? $self->body_cb
+        return $self->read_cb
+          ? $self->read_cb
           : return $self->content->asset->slurp;
     }
 
@@ -59,22 +59,20 @@ sub body {
     my $content = shift;
 
     # Cleanup
-    $self->body_cb(undef);
+    $self->read_cb(undef);
     $self->content->asset(Mojo::Asset::Memory->new);
 
     # Shortcut
     return $self unless defined $content;
 
     # Callback
-    if (ref $content eq 'CODE') { $self->body_cb($content) }
+    if (ref $content eq 'CODE') { $self->read_cb($content) }
 
     # Set text content
     elsif (length $content) { $self->content->asset->add_chunk($content) }
 
     return $self;
 }
-
-sub body_cb { shift->content->body_cb(@_) }
 
 sub body_params {
     my $self = shift;
@@ -261,6 +259,8 @@ sub error {
     return $self;
 }
 
+sub finish { shift->content->finish(@_) }
+
 sub fix_headers {
     my $self = shift;
 
@@ -393,6 +393,8 @@ sub parse_until_body {
     return $self->_parse(1);
 }
 
+sub read_cb { shift->content->read_cb(@_) }
+
 sub start_line_size { length shift->build_start_line }
 
 sub to_string { shift->build(@_) }
@@ -479,6 +481,9 @@ sub version {
 
     return $self;
 }
+
+sub write       { shift->content->write(@_) }
+sub write_chunk { shift->content->write_chunk(@_) }
 
 sub _build_start_line {
     croak 'Method "_build_start_line" not implemented by subclass';
@@ -627,22 +632,6 @@ in RFC 2616 and RFC 2388.
 
 L<Mojo::Message> implements the following attributes.
 
-=head2 C<body_cb>
-
-    my $cb = $message->body_cb;
-
-    $counter = 1;
-    $message = $message->body_cb(sub {
-        my $self  = shift;
-        my $chunk = '';
-        $chunk    = "hello world!" if $counter == 1;
-        $chunk    = "hello world2!\n\n" if $counter == 2;
-        $counter++;
-        return $chunk;
-    });
-
-Content generator callback.
-
 =head2 C<buffer>
 
     my $buffer = $message->buffer;
@@ -652,7 +641,7 @@ Input buffer for parsing.
 
 =head2 C<content>
 
-    my $content = $message->content;
+    my $message = $message->content;
     $message    = $message->content(Mojo::Content::Single->new);
 
 Content container, defaults to a L<Mojo::Content::Single> object.
@@ -714,6 +703,18 @@ Minor version, defaults to C<1>.
 
 Progress callback.
 
+=head2 C<read_cb>
+
+    my $cb   = $message->read_cb;
+    $message = $message->read_cb(sub {...});
+
+Content parser callback.
+
+    $message = $message->read_cb(sub {
+        my ($self, $chunk) = @_;
+        print $chunk;
+    });
+
 =head1 METHODS
 
 L<Mojo::Message> inherits all methods from L<Mojo::Base> and implements the
@@ -729,16 +730,7 @@ Check if message is at least a specific version.
 
     my $string = $message->body;
     $message   = $message->body('Hello!');
-
-    $counter = 1;
-    $message = $message->body(sub {
-        my $self  = shift;
-        my $chunk = '';
-        $chunk    = "hello world!" if $counter == 1;
-        $chunk    = "hello world2!\n\n" if $counter == 2;
-        $counter++;
-        return $chunk;
-    });
+    $message   = $message->body(sub {...});
 
 Helper for simplified content access.
 
@@ -802,6 +794,12 @@ Note that this method is EXPERIMENTAL and might change without warning!
     $message             = $message->error('Parser error.', 500);
 
 Parser errors and codes.
+
+=head2 C<finish>
+
+    $message->finish;
+
+Finish dynamic content generation.
 
 =head2 C<fix_headers>
 
@@ -923,6 +921,22 @@ All file uploads.
     $message    = $message->version('1.1');
 
 HTTP version of message.
+
+=head2 C<write>
+
+    $message->write('Hello!');
+    $message->write('Hello!', sub {...});
+
+Write dynamic content, the optional drain callback will be invoked once all
+data has been written.
+
+=head2 C<write_chunk>
+
+    $message->write_chunk('Hello!');
+    $message->write_chunk('Hello!', sub {...});
+
+Write chunked content, the optional drain callback will be invoked once all
+data has been written.
 
 =head1 SEE ALSO
 

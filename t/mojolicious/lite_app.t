@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 516;
+plan tests => 530;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -71,22 +71,19 @@ get '/maybe/ajax' => sub {
 
 # GET /stream
 get '/stream' => sub {
-    my $self    = shift;
-    my $counter = 0;
-    my $chunks  = [qw/foo bar/, $self->req->url->to_abs->userinfo,
+    my $self = shift;
+    my $chunks = [qw/foo bar/, $self->req->url->to_abs->userinfo,
         $self->url_for->to_abs];
-    my $chunked = Mojo::Filter::Chunked->new;
     $self->res->code(200);
     $self->res->headers->content_type('text/plain');
-    $self->res->headers->transfer_encoding('chunked');
-    $self->res->body(
-        sub {
-            my $self = shift;
-            my $chunk = $chunks->[$counter] || '';
-            $counter++;
-            return $chunked->build($chunk);
-        }
-    );
+    my $cb;
+    $cb = sub {
+        my $self = shift;
+        my $chunk = shift @$chunks || '';
+        $self->write_chunk($chunk, $chunk ? $cb : undef);
+        $self->finish unless $chunk;
+    };
+    $cb->($self->res);
 };
 
 # GET /finished
@@ -507,6 +504,57 @@ $client->ioloop->timer(
         $async = 'works!';
     }
 );
+
+# GET /longpoll
+my $longpoll;
+get '/longpoll' => sub {
+    my $self = shift;
+    $self->finished(sub { $longpoll = 'finished!' });
+    my $loop = $client->ioloop;
+    $self->res->code(200);
+    $self->res->headers->content_type('text/plain');
+    $self->write_chunk('hi ');
+    $loop->timer(
+        '0.5' => sub {
+            my $loop = shift;
+            $self->write_chunk('there,',
+                sub { shift->write_chunk(' whats up?'); });
+            $loop->timer(
+                '0.5' => sub {
+                    my $loop = shift;
+                    $self->write_chunk('');
+                    $self->finish;
+                }
+            );
+        }
+    );
+};
+
+# GET /longpolltoo
+my $longpolltoo;
+get '/longpolltoo' => sub {
+    my $self = shift;
+    $self->finished(sub { $longpolltoo = 'finished!' });
+    my $loop = $client->ioloop;
+    $self->res->code(200);
+    $self->res->headers->content_type('text/plain');
+    $self->write_chunk;
+    $loop->timer(
+        '0.5' => sub {
+            my $loop = shift;
+            $self->write_chunk(
+                undef,
+                sub {
+                    my $self = shift;
+                    $self->write_chunk('how');
+                    $self->write_chunk('dy!');
+                    $self->write_chunk('');
+                    $self->finish;
+                }
+            );
+        }
+    );
+};
 
 # GET /
 $t->get_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
@@ -1213,6 +1261,20 @@ is( $timer,
     '/root.html/root.html/root.html/root.html/root.htmlworks!',
     'right content'
 );
+
+# GET /longpoll
+$t->get_ok('/longpoll')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_type_is('text/plain')->content_is('hi there, whats up?');
+is($longpoll, 'finished!', 'finished');
+
+# GET /longpolltoo
+$t->get_ok('/longpolltoo')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_type_is('text/plain')->content_is('howdy!');
+is($longpolltoo, 'finished!', 'finished');
 
 __DATA__
 @@ tags.html.ep

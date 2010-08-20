@@ -4,6 +4,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL support for --mode and --home options to all
           Mojolicious commands.
         - Added while and until methods for Mojo::DOM collections. (vti)
+        - Fixed a serious design flaw in Mojo::Message and made long poll
+          much easier.
         - Fixed a bug where Mojo::IOLoop connections could be closed too
           early.
         - Fixed HTTPS support for CGI environments.

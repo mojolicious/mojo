@@ -27,7 +27,7 @@ sub get_body_chunk {
     my ($self, $offset) = @_;
 
     # Body generator
-    return $self->generate_body_chunk($offset) if $self->body_cb;
+    return $self->generate_body_chunk($offset) if $self->read_cb;
 
     # Normal content
     return $self->asset->get_chunk($offset);
@@ -40,7 +40,7 @@ sub parse {
     $self->SUPER::parse(@_);
 
     # Still parsing headers or using a custom body parser
-    return $self if ($self->{_state} || '') eq 'headers' || $self->body_cb;
+    return $self if ($self->{_state} || '') eq 'headers' || $self->read_cb;
 
     # Headers
     my $headers = $self->headers;

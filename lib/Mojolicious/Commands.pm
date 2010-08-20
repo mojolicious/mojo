@@ -7,7 +7,7 @@ use base 'Mojo::Commands';
 
 # One day a man has everything, the next day he blows up a $400 billion
 # space station, and the next day he has nothing. It makes you think.
-use Getopt::Long 'GetOptions';
+use Getopt::Long qw/GetOptions :config pass_through/;
 
 __PACKAGE__->attr(hint => <<"EOF");
 

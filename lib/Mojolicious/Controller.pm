@@ -29,6 +29,7 @@ sub finish {
 
     # Finish
     $self->app->finish($self);
+    $self->res->finish;
 
     # Resume
     $self->resume if $tx->is_paused;
@@ -335,6 +336,32 @@ sub url_for {
     return $url;
 }
 
+sub write_chunk {
+    my ($self, $chunk, $cb) = @_;
+
+    # Deactivate auto rendering
+    $self->stash->{'mojo.rendered'} = 1;
+
+    # Write
+    $self->res->write_chunk(
+        $chunk,
+        sub {
+
+            # Cleanup
+            shift;
+
+            # Pause
+            $self->pause;
+
+            # Callback
+            $self->$cb(@_) if $cb;
+        }
+    );
+
+    # Resume
+    $self->resume;
+}
+
 1;
 __END__
 
@@ -552,6 +579,14 @@ connection in progress.
     my $url = $c->url_for('named', controller => 'bar', action => 'baz');
 
 Generate a L<Mojo::URL> for the current or a named route.
+
+=head2 C<write_chunk>
+
+    $c->write_chunk('Hello!');
+    $c->write_chunk('Hello!', sub {...});
+
+Write chunked content, the optional drain callback will be invoked once all
+data has been written.
 
 =head1 SEE ALSO
 

@@ -12,7 +12,7 @@ use Mojo::Headers;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 262144;
 
-__PACKAGE__->attr([qw/body_cb filter/]);
+__PACKAGE__->attr([qw/filter read_cb/]);
 __PACKAGE__->attr([qw/buffer filter_buffer/] => sub { Mojo::ByteStream->new }
 );
 __PACKAGE__->attr(headers => sub { Mojo::Headers->new });
@@ -70,32 +70,21 @@ sub build_headers {
     return $headers;
 }
 
+sub finish { shift->{_eof} = 1 }
+
 sub generate_body_chunk {
     my ($self, $offset) = @_;
 
-    # Shortcut
-    return '' unless $self->body_cb;
-
-    # Remove written
+    # Buffer
     my $buffer = $self->buffer;
-    my $written = $offset - ($buffer->raw_size - $buffer->size);
-    $buffer->remove($written);
 
-    # Fill buffer
-    if (!$self->{_eof} && $buffer->size < CHUNK_SIZE) {
-
-        # Generate
-        my $chunk = $self->body_cb->($self, $buffer->raw_size);
-
-        # EOF
-        if (defined $chunk && !length $chunk) { $self->{_eof} = 1 }
-
-        # Buffer chunk
-        else { $buffer->add_chunk($chunk) }
+    # Callback
+    if (!$buffer->size && (my $cb = delete $self->{_drain})) {
+        $self->$cb($offset);
     }
 
     # Get chunk
-    my $chunk = $buffer->to_string;
+    my $chunk = $buffer->empty;
 
     # Pause or EOF
     return $self->{_eof} ? '' : undef unless length $chunk;
@@ -198,7 +187,7 @@ sub parse {
     else { $self->buffer($fbuffer) }
 
     # Custom body parser
-    if (my $cb = $self->body_cb) {
+    if (my $cb = $self->read_cb) {
 
         # Chunked or relaxed content
         if ($self->is_chunked || $self->relaxed) {
@@ -276,6 +265,32 @@ sub raw_body_size {
     return $length - $header_length;
 }
 
+sub write {
+    my ($self, $chunk, $cb) = @_;
+
+    # Dynamic content
+    $self->read_cb(sub { });
+
+    # Buffer
+    $self->buffer->add_chunk($chunk);
+
+    # Drain callback
+    $self->{_drain} = $cb if $cb;
+}
+
+sub write_chunk {
+    my ($self, $chunk, $cb) = @_;
+
+    # Filter
+    $self->filter(Mojo::Filter::Chunked->new) unless $self->filter;
+
+    # Chunked transfer encoding
+    $self->headers->transfer_encoding('chunked') unless $self->is_chunked;
+
+    # Write
+    $self->write(defined $chunk ? $self->filter->build($chunk) : '', $cb);
+}
+
 sub _build_headers {
     my $self = shift;
 
@@ -327,22 +342,6 @@ in RFC 2616.
 
 L<Mojo::Content> implements the following attributes.
 
-=head2 C<body_cb>
-
-    my $cb = $content->body_cb;
-
-    $counter = 1;
-    $content = $content->body_cb(sub {
-        my $self  = shift;
-        my $chunk = '';
-        $chunk    = "hello world!" if $counter == 1;
-        $chunk    = "hello world2!\n\n" if $counter == 2;
-        $counter++;
-        return $chunk;
-    });
-
-Content generator callback.
-
 =head2 C<buffer>
 
     my $buffer = $content->buffer;
@@ -370,6 +369,18 @@ Input buffer for filtering.
     $content    = $content->headers(Mojo::Headers->new);
 
 The headers.
+
+=head2 C<read_cb>
+
+    my $cb   = $content->read_cb;
+    $content = $content->read_cb(sub {...});
+
+Content parser callback.
+
+    $content = $content->read_cb(sub {
+        my ($self, $chunk) = @_;
+        print $chunk;
+    });
 
 =head2 C<relaxed>
 
@@ -413,11 +424,17 @@ Render whole body.
 
 Render all headers.
 
+=head2 C<finish>
+
+    $content->finish;
+
+Finish dynamic content generation.
+
 =head2 C<generate_body_chunk>
 
     my $chunk = $content->generate_body_chunk(0);
 
-Generate content from C<body_cb>.
+Generate dynamic content.
 
 =head2 C<get_body_chunk>
 
@@ -504,6 +521,22 @@ Parse and stop after headers.
     my $size = $content->raw_body_size;
 
 Raw size of body in bytes.
+
+=head2 C<write>
+
+    $content->write('Hello!');
+    $content->write('Hello!', sub {...});
+
+Write dynamic content, the optional drain callback will be invoked once all
+data has been written.
+
+=head2 C<write_chunk>
+
+    $content->write_chunk('Hello!');
+    $content->write_chunk('Hello!', sub {...});
+
+Write chunked content, the optional drain callback will be invoked once all
+data has been written.
 
 =head1 SEE ALSO
 

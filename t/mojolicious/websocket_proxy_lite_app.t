@@ -24,7 +24,12 @@ use Mojolicious::Lite;
 app->log->level('fatal');
 
 # GET /
-get '/' => sub { shift->render_text('Hello World!') };
+get '/' => sub {
+    my $self = shift;
+    my $rel  = $self->req->url;
+    my $abs  = $rel->to_abs;
+    $self->render_text("Hello World! $rel $abs");
+};
 
 # GET /proxy
 get '/proxy' => sub {
@@ -105,8 +110,10 @@ $loop->listen(
 );
 
 # GET / (normal request)
-is($client->get("http://localhost:$port/")->success->body,
-    'Hello World!', 'right content');
+is( $client->get("http://localhost:$port/")->success->body,
+    "Hello World! / http://localhost:$port/",
+    'right content'
+);
 
 # WebSocket /test (normal websocket)
 my $result;

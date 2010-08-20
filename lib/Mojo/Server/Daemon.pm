@@ -441,6 +441,9 @@ sub _write {
         $cb = undef unless $c->{transaction} || $c->{websocket};
     }
 
+    # Not writing
+    elsif (!$tx->is_writing) { $cb = undef }
+
     # Write
     $self->ioloop->write($id, $chunk, $cb);
 

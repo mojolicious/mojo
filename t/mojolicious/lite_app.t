@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 530;
+plan tests => 537;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -505,6 +505,17 @@ $client->ioloop->timer(
     }
 );
 
+# GET /shortpoll
+my $shortpoll;
+get '/shortpoll' => sub {
+    my $self = shift;
+    $self->finished(sub { $shortpoll = 'finished!' });
+    $self->res->code(200);
+    $self->res->headers->content_type('text/plain');
+    $self->write_chunk('this was short.');
+    $self->write_chunk('');
+};
+
 # GET /longpoll
 my $longpoll;
 get '/longpoll' => sub {
@@ -523,7 +534,6 @@ get '/longpoll' => sub {
                 '0.5' => sub {
                     my $loop = shift;
                     $self->write_chunk('');
-                    $self->finish;
                 }
             );
         }
@@ -549,7 +559,6 @@ get '/longpolltoo' => sub {
                     $self->write_chunk('how');
                     $self->write_chunk('dy!');
                     $self->write_chunk('');
-                    $self->finish;
                 }
             );
         }
@@ -1261,6 +1270,13 @@ is( $timer,
     '/root.html/root.html/root.html/root.html/root.htmlworks!',
     'right content'
 );
+
+# GET /shortpoll
+$t->get_ok('/shortpoll')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_type_is('text/plain')->content_is('this was short.');
+is($shortpoll, 'finished!', 'finished');
 
 # GET /longpoll
 $t->get_ok('/longpoll')->status_is(200)

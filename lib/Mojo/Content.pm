@@ -283,12 +283,16 @@ sub write_chunk {
 
     # Filter
     $self->filter(Mojo::Filter::Chunked->new) unless $self->filter;
+    my $filter = $self->filter;
 
     # Chunked transfer encoding
     $self->headers->transfer_encoding('chunked') unless $self->is_chunked;
 
     # Write
-    $self->write(defined $chunk ? $self->filter->build($chunk) : '', $cb);
+    $self->write(defined $chunk ? $filter->build($chunk) : '', $cb);
+
+    # Finish
+    $self->finish if $filter->is_done;
 }
 
 sub _build_headers {

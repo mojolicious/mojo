@@ -29,7 +29,6 @@ sub finish {
 
     # Finish
     $self->app->finish($self);
-    $self->res->finish;
 
     # Resume
     $self->resume if $tx->is_paused;

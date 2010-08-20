@@ -282,7 +282,7 @@ sub get_body_chunk {
 
     # Chunk
     my $chunk = $self->content->get_body_chunk(@_);
-    return $chunk if length $chunk || !defined $chunk;
+    return $chunk if !defined $chunk || length $chunk;
 
     # Finish
     $self->{_state} = 'done';

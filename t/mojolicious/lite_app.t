@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 558;
+plan tests => 516;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -504,107 +504,6 @@ $client->ioloop->timer(
         $async = 'works!';
     }
 );
-
-# GET /shortpoll
-my $shortpoll;
-get '/shortpoll' => sub {
-    my $self = shift;
-    $self->finished(sub { $shortpoll = 'finished!' });
-    $self->res->code(200);
-    $self->res->headers->content_type('text/plain');
-    $self->write_chunk('this was short.');
-    $self->write_chunk('');
-};
-
-# GET /shortpoll/plain
-my $shortpoll_plain;
-get '/shortpoll/plain' => sub {
-    my $self = shift;
-    $self->finished(sub { $shortpoll_plain = 'finished!' });
-    $self->res->code(200);
-    $self->res->headers->content_type('text/plain');
-    $self->res->headers->content_length(25);
-    $self->write('this was short and plain.');
-};
-
-# GET /longpoll
-my $longpoll;
-get '/longpoll' => sub {
-    my $self = shift;
-    $self->finished(sub { $longpoll = 'finished!' });
-    $self->res->code(200);
-    $self->res->headers->content_type('text/plain');
-    $self->write_chunk('hi ');
-    $self->client->ioloop->timer(
-        '0.5' => sub {
-            $self->write_chunk('there,',
-                sub { shift->write_chunk(' whats up?'); });
-            shift->timer('0.5' => sub { $self->write_chunk('') });
-        }
-    );
-};
-
-# GET /longpoll/plain
-my $longpoll_plain;
-get '/longpoll/plain' => sub {
-    my $self = shift;
-    $self->finished(sub { $longpoll_plain = 'finished!' });
-    $self->res->code(200);
-    $self->res->headers->content_type('text/plain');
-    $self->res->headers->content_length(25);
-    $self->write('hi ');
-    $self->client->ioloop->timer(
-        '0.5' => sub {
-            $self->write('there plain,', sub { shift->write(' whats up?') });
-        }
-    );
-};
-
-# GET /longpoll/delayed
-my $longpoll_delayed;
-get '/longpoll/delayed' => sub {
-    my $self = shift;
-    $self->finished(sub { $longpoll_delayed = 'finished!' });
-    $self->res->code(200);
-    $self->res->headers->content_type('text/plain');
-    $self->write_chunk;
-    $self->client->ioloop->timer(
-        '0.5' => sub {
-            $self->write_chunk(
-                undef,
-                sub {
-                    my $self = shift;
-                    $self->write_chunk('how');
-                    $self->write_chunk('dy!');
-                    $self->write_chunk('');
-                }
-            );
-        }
-    );
-};
-
-# GET /longpoll/plain/delayed
-my $longpoll_plain_delayed;
-get '/longpoll/plain/delayed' => sub {
-    my $self = shift;
-    $self->finished(sub { $longpoll_plain_delayed = 'finished!' });
-    $self->res->code(200);
-    $self->res->headers->content_type('text/plain');
-    $self->res->headers->content_length(12);
-    $self->write;
-    $self->client->ioloop->timer(
-        '0.5' => sub {
-            $self->write(
-                undef,
-                sub {
-                    my $self = shift;
-                    $self->write('how');
-                    $self->write('dy plain!');
-                }
-            );
-        }
-    );
-};
 
 # GET /
 $t->get_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
@@ -1311,48 +1210,6 @@ is( $timer,
     '/root.html/root.html/root.html/root.html/root.htmlworks!',
     'right content'
 );
-
-# GET /shortpoll
-$t->get_ok('/shortpoll')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_type_is('text/plain')->content_is('this was short.');
-is($shortpoll, 'finished!', 'finished');
-
-# GET /shortpoll/plain
-$t->get_ok('/shortpoll/plain')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_type_is('text/plain')->content_is('this was short and plain.');
-is($shortpoll_plain, 'finished!', 'finished');
-
-# GET /longpoll
-$t->get_ok('/longpoll')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_type_is('text/plain')->content_is('hi there, whats up?');
-is($longpoll, 'finished!', 'finished');
-
-# GET /longpoll/plain
-$t->get_ok('/longpoll/plain')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_type_is('text/plain')->content_is('hi there plain, whats up?');
-is($longpoll_plain, 'finished!', 'finished');
-
-# GET /longpoll/delayed
-$t->get_ok('/longpoll/delayed')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_type_is('text/plain')->content_is('howdy!');
-is($longpoll_delayed, 'finished!', 'finished');
-
-# GET /longpoll/plain/delayed
-$t->get_ok('/longpoll/plain/delayed')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_type_is('text/plain')->content_is('howdy plain!');
-is($longpoll_plain_delayed, 'finished!', 'finished');
 
 __DATA__
 @@ tags.html.ep

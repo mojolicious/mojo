@@ -60,8 +60,8 @@ sub pause { shift->tx->pause }
 sub receive_message {
     my $self = shift;
 
-    # Deactivate auto rendering
-    $self->stash->{'mojo.rendered'} = 1;
+    # Rendered
+    $self->rendered;
 
     # WebSocket check
     Carp::croak('No WebSocket connection to receive messages from')
@@ -80,7 +80,7 @@ sub redirect_to {
     my $self = shift;
 
     # Rendered
-    $self->stash->{'mojo.rendered'} = 1;
+    $self->rendered;
 
     # Response
     my $res = $self->res;
@@ -265,7 +265,7 @@ sub render_static {
     my $self = shift;
 
     # Rendered
-    $self->stash->{'mojo.rendered'} = 1;
+    $self->rendered;
 
     # Static
     $self->app->static->serve($self, @_);
@@ -284,13 +284,15 @@ sub render_text {
     return $self->render($args);
 }
 
+sub rendered { shift->stash->{'mojo.rendered'} = 1 }
+
 sub resume { shift->tx->resume }
 
 sub send_message {
     my $self = shift;
 
-    # Deactivate auto rendering
-    $self->stash->{'mojo.rendered'} = 1;
+    # Rendered
+    $self->rendered;
 
     # WebSocket check
     Carp::croak('No WebSocket connection to send message to')
@@ -338,8 +340,8 @@ sub url_for {
 sub write_chunk {
     my ($self, $chunk, $cb) = @_;
 
-    # Deactivate auto rendering
-    $self->stash->{'mojo.rendered'} = 1;
+    # Rendered
+    $self->rendered;
 
     # Write
     $self->res->write_chunk(
@@ -556,6 +558,13 @@ Render a static asset using L<MojoX::Dispatcher::Static>.
 
 Render the given content as plain text, note that text will be encoded.
 See C<render_data> for an alternative without encoding.
+
+=head2 C<rendered>
+
+    $c->rendered;
+
+Consider response rendered and disable automatic rendering.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<resume>
 

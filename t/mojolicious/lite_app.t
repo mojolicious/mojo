@@ -117,7 +117,7 @@ get 'tags/:test' => 'tags';
 # POST /upload
 post '/upload' => sub {
     my $self = shift;
-    $self->stash('mojo.rendered' => 1);
+    $self->rendered;
     my $body = $self->res->body || '';
     $self->res->body("called, $body");
     return if $self->req->error;

@@ -521,37 +521,28 @@ my $longpoll;
 get '/longpoll' => sub {
     my $self = shift;
     $self->finished(sub { $longpoll = 'finished!' });
-    my $loop = $client->ioloop;
     $self->res->code(200);
     $self->res->headers->content_type('text/plain');
     $self->write_chunk('hi ');
-    $loop->timer(
+    $self->client->ioloop->timer(
         '0.5' => sub {
-            my $loop = shift;
             $self->write_chunk('there,',
                 sub { shift->write_chunk(' whats up?'); });
-            $loop->timer(
-                '0.5' => sub {
-                    my $loop = shift;
-                    $self->write_chunk('');
-                }
-            );
+            shift->timer('0.5' => sub { $self->write_chunk('') });
         }
     );
 };
 
-# GET /longpolltoo
-my $longpolltoo;
-get '/longpolltoo' => sub {
+# GET /longpolldelayed
+my $longpolldelayed;
+get '/longpolldelayed' => sub {
     my $self = shift;
-    $self->finished(sub { $longpolltoo = 'finished!' });
-    my $loop = $client->ioloop;
+    $self->finished(sub { $longpolldelayed = 'finished!' });
     $self->res->code(200);
     $self->res->headers->content_type('text/plain');
     $self->write_chunk;
-    $loop->timer(
+    $self->client->ioloop->timer(
         '0.5' => sub {
-            my $loop = shift;
             $self->write_chunk(
                 undef,
                 sub {
@@ -1285,12 +1276,12 @@ $t->get_ok('/longpoll')->status_is(200)
   ->content_type_is('text/plain')->content_is('hi there, whats up?');
 is($longpoll, 'finished!', 'finished');
 
-# GET /longpolltoo
-$t->get_ok('/longpolltoo')->status_is(200)
+# GET /longpolldelayed
+$t->get_ok('/longpolldelayed')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/plain')->content_is('howdy!');
-is($longpolltoo, 'finished!', 'finished');
+is($longpolldelayed, 'finished!', 'finished');
 
 __DATA__
 @@ tags.html.ep

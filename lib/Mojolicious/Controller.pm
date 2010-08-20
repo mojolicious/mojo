@@ -563,7 +563,7 @@ See C<render_data> for an alternative without encoding.
 
     $c->rendered;
 
-Consider response rendered and disable automatic rendering.
+Disable automatic rendering for response.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<resume>

@@ -12,7 +12,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 42;
+plan tests => 49;
 
 # I was God once.
 # Yes, I saw. You were doing well until everyone died.
@@ -61,6 +61,20 @@ get '/longpoll' => sub {
     );
 };
 
+# GET /longpoll/nested
+my $longpoll_nested;
+get '/longpoll/nested' => sub {
+    my $self = shift;
+    $self->finished(sub { $longpoll_nested = 'finished!' });
+    $self->res->code(200);
+    $self->res->headers->content_type('text/plain');
+    $self->write_chunk(
+        sub {
+            shift->write_chunk('nested!', sub { shift->write_chunk('') });
+        }
+    );
+};
+
 # GET /longpoll/plain
 my $longpoll_plain;
 get '/longpoll/plain' => sub {
@@ -88,7 +102,6 @@ get '/longpoll/delayed' => sub {
     $self->client->ioloop->timer(
         '0.5' => sub {
             $self->write_chunk(
-                undef,
                 sub {
                     my $self = shift;
                     $self->write_chunk('how');
@@ -112,7 +125,6 @@ get '/longpoll/plain/delayed' => sub {
     $self->client->ioloop->timer(
         '0.5' => sub {
             $self->write(
-                undef,
                 sub {
                     my $self = shift;
                     $self->write('how');
@@ -145,6 +157,13 @@ $t->get_ok('/longpoll')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/plain')->content_is('hi there, whats up?');
 is($longpoll, 'finished!', 'finished');
+
+# GET /longpoll/nested
+$t->get_ok('/longpoll/nested')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_type_is('text/plain')->content_is('nested!');
+is($longpoll_nested, 'finished!', 'finished');
 
 # GET /longpoll/plain
 $t->get_ok('/longpoll/plain')->status_is(200)

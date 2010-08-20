@@ -343,6 +343,12 @@ sub write {
     # Rendered
     $self->rendered;
 
+    # Callback only
+    if (ref $chunk && ref $chunk eq 'CODE') {
+        $cb    = $chunk;
+        $chunk = undef;
+    }
+
     # Write
     $self->res->write(
         $chunk,
@@ -368,6 +374,12 @@ sub write_chunk {
 
     # Rendered
     $self->rendered;
+
+    # Callback only
+    if (ref $chunk && ref $chunk eq 'CODE') {
+        $cb    = $chunk;
+        $chunk = undef;
+    }
 
     # Write
     $self->res->write_chunk(
@@ -617,6 +629,7 @@ Generate a L<Mojo::URL> for the current or a named route.
 =head2 C<write>
 
     $c->write('Hello!');
+    $c->write(sub {...});
     $c->write('Hello!', sub {...});
 
 Write dynamic content, the optional drain callback will be invoked once all
@@ -630,6 +643,7 @@ Note that this method is EXPERIMENTAL and might change without warning!
 =head2 C<write_chunk>
 
     $c->write_chunk('Hello!');
+    $c->write_chunk(sub {...});
     $c->write_chunk('Hello!', sub {...});
 
 Write chunked content, the optional drain callback will be invoked once all

@@ -78,8 +78,11 @@ sub generate_body_chunk {
     # Buffer
     my $buffer = $self->buffer;
 
+    # Delay
+    my $delay = delete $self->{_delay};
+
     # Callback
-    if (!$buffer->size && (my $cb = delete $self->{_drain})) {
+    if (!$delay && !$buffer->size && (my $cb = delete $self->{_drain})) {
         $self->$cb($offset);
     }
 
@@ -273,6 +276,9 @@ sub write {
 
     # Buffer
     $self->buffer->add_chunk($chunk);
+
+    # Delay
+    $self->{_delay} = 1 unless defined $chunk;
 
     # Drain callback
     $self->{_drain} = $cb if $cb;

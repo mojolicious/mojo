@@ -628,12 +628,14 @@ Generate a L<Mojo::URL> for the current or a named route.
 
 =head2 C<write>
 
+    $c->write;
     $c->write('Hello!');
     $c->write(sub {...});
     $c->write('Hello!', sub {...});
 
-Write dynamic content, the optional drain callback will be invoked once all
-data has been written.
+Write dynamic content matching the corresponding C<Content-Length> header
+chunk wise, the optional drain callback will be invoked once all data has
+been written to the kernel send buffer or equivalent.
 
     $c->res->headers->content_length(6);
     $c->write('Hello!');
@@ -642,12 +644,15 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<write_chunk>
 
+    $c->write_chunk;
     $c->write_chunk('Hello!');
     $c->write_chunk(sub {...});
     $c->write_chunk('Hello!', sub {...});
 
-Write chunked content, the optional drain callback will be invoked once all
-data has been written.
+Write dynamic content chunk wise with the C<chunked> C<Transfer-Encoding>
+which doesn't require a C<Content-Length> header, the optional drain callback
+will be invoked once all data has been written to the kernel send buffer or
+equivalent.
 An empty chunk marks the end of the stream.
 
     $c->write_chunk('');

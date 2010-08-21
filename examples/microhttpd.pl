@@ -41,8 +41,7 @@ $loop->listen(
             # Write a minimal HTTP response
             # (not spec compliant but benchmarks won't care)
             $loop->write($id => "HTTP/1.1 200 OK\x0d\x0a"
-                  . "Connection: keep-alive\x0d\x0aContent-Length: 11\x0d\x0a"
-                  . "\x0d\x0aHello Mojo!");
+                  . "Connection: keep-alive\x0d\x0a\x0d\x0a");
         }
     },
     error_cb => sub {

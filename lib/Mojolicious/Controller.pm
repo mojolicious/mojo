@@ -638,7 +638,8 @@ chunk wise, the optional drain callback will be invoked once all data has
 been written to the kernel send buffer or equivalent.
 
     $c->res->headers->content_length(6);
-    $c->write('Hello!');
+    $c->write('Hel');
+    $c->write('lo!');
 
 Note that this method is EXPERIMENTAL and might change without warning!
 
@@ -655,6 +656,8 @@ will be invoked once all data has been written to the kernel send buffer or
 equivalent.
 An empty chunk marks the end of the stream.
 
+    $c->write_chunk('Hel');
+    $c->write_chunk('lo!');
     $c->write_chunk('');
 
 Note that this method is EXPERIMENTAL and might change without warning!

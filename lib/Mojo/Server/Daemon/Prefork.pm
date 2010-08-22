@@ -101,17 +101,19 @@ sub run {
     $self->{_child_poll} = IO::Poll->new;
     $self->{_child_poll}->mask($self->{_child_read}, POLLIN);
 
-    # Parent signals
-    my ($done, $graceful) = 0;
-    $SIG{INT} = $SIG{TERM} = sub { $done++ };
-    $SIG{CHLD} = sub { $self->_reap_child };
-    $SIG{USR1} = sub { $done = $graceful = 1 };
-
     # Preload application
     $self->app;
 
     # Parent stuff
     $self->parent;
+
+    # Parent signals
+    my ($done, $graceful) = 0;
+    $SIG{INT} = $SIG{TERM} = sub { $done++ };
+    $SIG{CHLD} = sub { $self->_reap_child };
+    $SIG{USR1} = sub {
+        $done = $graceful = 1 and $self->app->log->info('Graceful shutdown.');
+    };
 
     $self->app->log->debug('Prefork parent started.') if DEBUG;
 

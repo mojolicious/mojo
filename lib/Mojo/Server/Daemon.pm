@@ -56,8 +56,11 @@ sub prepare_ioloop {
 
     # Signals
     my $loop = $self->ioloop;
-    $SIG{HUP}  = sub { $loop->stop };
-    $SIG{USR1} = sub { $loop->max_connections(0) }
+    $SIG{HUP} = sub { $loop->stop };
+    $SIG{USR1} = sub {
+        $loop->max_connections(0)
+          and $self->app->log->info('Graceful shutdown.');
+      }
       if $^O ne 'MSWin32';
 
     # Listen

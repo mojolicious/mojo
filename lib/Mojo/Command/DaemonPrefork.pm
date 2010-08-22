@@ -44,6 +44,8 @@ These options are available:
   --requests <number>            Set maximum number of requests a worker
                                  process is allowed to handle, defaults to
                                  1000.
+  --reverseproxy                 Activate reverse proxy support, defaults to
+                                 the value of MOJO_REVERSE_PROXY.
   --servers <number>             Set maximum number of children, defaults to
                                  100.
   --start <number>               Set number of children to spawn at startup,
@@ -71,18 +73,19 @@ sub run {
         'keepalive=i' => sub { $daemon->keep_alive_timeout($_[1]) },
         'keepaliverequests=i' =>
           sub { $daemon->max_keep_alive_requests($_[1]) },
-        'listen=s'    => sub { $daemon->listen($_[1]) },
-        'lock=s'      => sub { $daemon->lock_file($_[1]) },
-        'maxspare=i'  => sub { $daemon->max_spare_servers($_[1]) },
-        'minspare=i'  => sub { $daemon->min_spare_servers($_[1]) },
-        'pid=s'       => sub { $daemon->pid_file($_[1]) },
-        'queue=i'     => sub { $daemon->listen_queue_size($_[1]) },
-        reload        => sub { $daemon->reload(1) },
-        'requests=i'  => sub { $daemon->max_requests($_[1]) },
-        'servers=i'   => sub { $daemon->max_servers($_[1]) },
-        'start=i'     => sub { $daemon->start_servers($_[1]) },
-        'user=s'      => sub { $daemon->user($_[1]) },
-        'websocket=i' => sub { $daemon->websocket_timeout($_[1]) }
+        'listen=s'     => sub { $daemon->listen($_[1]) },
+        'lock=s'       => sub { $daemon->lock_file($_[1]) },
+        'maxspare=i'   => sub { $daemon->max_spare_servers($_[1]) },
+        'minspare=i'   => sub { $daemon->min_spare_servers($_[1]) },
+        'pid=s'        => sub { $daemon->pid_file($_[1]) },
+        'queue=i'      => sub { $daemon->listen_queue_size($_[1]) },
+        reload         => sub { $daemon->reload(1) },
+        'requests=i'   => sub { $daemon->max_requests($_[1]) },
+        'reverseproxy' => sub { $ENV{MOJO_REVERSE_PROXY} = 1 },
+        'servers=i'    => sub { $daemon->max_servers($_[1]) },
+        'start=i'      => sub { $daemon->start_servers($_[1]) },
+        'user=s'       => sub { $daemon->user($_[1]) },
+        'websocket=i'  => sub { $daemon->websocket_timeout($_[1]) }
     );
 
     # Daemonize

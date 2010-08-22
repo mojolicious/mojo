@@ -1260,7 +1260,8 @@ Note that L<IO::Socket::SSL> must be installed for HTTPS support.
 
     $client->tx;
 
-The last finished transaction, only available from callbacks.
+The last finished transaction, only available from callbacks, usually a
+L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object.
 
 =head2 C<websocket_timeout>
 
@@ -1323,7 +1324,7 @@ you can quickly run out of file descriptors with too many active clients.
         {myzip => {file => $asset, filename => 'foo.zip'}}
     );
 
-Versatile transaction builder for forms.
+Versatile L<Mojo::Transaction::HTTP> builder for forms.
 
     my $tx = $client->build_form_tx('http://kraih.com/foo' => {test => 123});
     $tx->res->body(sub { print $_[1] });
@@ -1340,7 +1341,7 @@ Versatile transaction builder for forms.
         POST => 'http://kraih.com' => {Connection => 'close'} => 'Hi!'
     );
 
-Versatile general purpose transaction builder.
+Versatile general purpose L<Mojo::Transaction::HTTP> builder.
 
     # Streaming response
     my $tx = $client->build_tx(GET => 'http://mojolicious.org');
@@ -1356,7 +1357,9 @@ Versatile general purpose transaction builder.
 
     my $tx = $client->build_websocket_tx('ws://localhost:3000');
 
-WebSocket transaction builder.
+Versatile L<Mojo::Transaction::HTTP> builder for WebSocket handshakes.
+An upgrade to L<Mojo::Transaction::WebSocket> will happen automatically after
+a successful handshake is performed.
 
 =head2 C<clone>
 
@@ -1381,7 +1384,16 @@ you can quickly run out of file descriptors with too many active clients.
         'http://kraih.com' => {Connection => 'close'} => 'Hi!' => sub {...}
     );
 
-Send a HTTP C<DELETE> request.
+Prepare HTTP C<DELETE> request.
+
+    $client->delete('http://kraih.com' => sub {
+        print shift->res->body;
+    })->process;
+
+The request will be performed right away and the resulting
+L<Mojo::Transaction::HTTP> object returned if no callback is given.
+
+    print $client->delete('http://kraih.com')->res->body;
 
 =head2 C<detect_proxy>
 
@@ -1421,7 +1433,16 @@ available from callbacks.
         'http://kraih.com' => {Connection => 'close'} => 'Hi!' => sub {...}
     );
 
-Send a HTTP C<GET> request.
+Prepare HTTP C<GET> request.
+
+    $client->get('http://kraih.com' => sub {
+        print shift->res->body;
+    })->process;
+
+The request will be performed right away and the resulting
+L<Mojo::Transaction::HTTP> object returned if no callback is given.
+
+    print $client->get('http://kraih.com')->res->body;
 
 =head2 C<head>
 
@@ -1438,7 +1459,16 @@ Send a HTTP C<GET> request.
         'http://kraih.com' => {Connection => 'close'} => 'Hi!' => sub {...}
     );
 
-Send a HTTP C<HEAD> request.
+Prepare HTTP C<HEAD> request.
+
+    $client->head('http://kraih.com' => sub {
+        print shift->res->headers->content_length;
+    })->process;
+
+The request will be performed right away and the resulting
+L<Mojo::Transaction::HTTP> object returned if no callback is given.
+
+    print $client->head('http://kraih.com')->res->headers->content_length;
 
 =head2 C<post>
 
@@ -1461,7 +1491,16 @@ Send a HTTP C<HEAD> request.
         'http://kraih.com' => {Connection => 'close'} => 'Hi!' => sub {...}
     );
 
-Send a HTTP C<POST> request.
+Prepare HTTP C<POST> request.
+
+    $client->post('http://kraih.com' => sub {
+        print shift->res->body;
+    })->process;
+
+The request will be performed right away and the resulting
+L<Mojo::Transaction::HTTP> object returned if no callback is given.
+
+    print $client->post('http://kraih.com')->res->body;
 
 =head2 C<post_form>
 
@@ -1530,7 +1569,16 @@ Send a HTTP C<POST> request.
         sub {...}
     );
 
-Send a HTTP C<POST> request with form data.
+Prepare HTTP C<POST> request with form data.
+
+    $client->post_form('http://kraih.com' => {q => 'test'} => sub {
+        print shift->res->body;
+    })->process;
+
+The request will be performed right away and the resulting
+L<Mojo::Transaction::HTTP> object returned if no callback is given.
+
+    print $client->post_form('http://kraih.com' => {q => 'test'})->res->body;
 
 =head2 C<process>
 
@@ -1557,7 +1605,16 @@ method.
         'http://kraih.com' => {Connection => 'close'} => 'Hi!' => sub {...}
     );
 
-Send a HTTP C<PUT> request.
+Prepare HTTP C<PUT> request.
+
+    $client->put('http://kraih.com' => sub {
+        print shift->res->body;
+    })->process;
+
+The request will be performed right away and the resulting
+L<Mojo::Transaction::HTTP> object returned if no callback is given.
+
+    print $client->put('http://kraih.com')->res->body;
 
 =head2 C<queue>
 
@@ -1581,14 +1638,14 @@ Receive messages via WebSocket, only available from callbacks.
     my $req = $client->req;
 
 The request object of the last finished transaction, only available from
-callbacks.
+callbacks, usually a L<Mojo::Message::Request> object.
 
 =head2 C<res>
 
     my $res = $client->res;
 
 The response object of the last finished transaction, only available from
-callbacks.
+callbacks, usually a L<Mojo::Message::Response> object.
 
 =head2 C<singleton>
 

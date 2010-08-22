@@ -288,13 +288,13 @@ Pause transaction, it can still read but writing is disabled while paused.
 
     my $req = $tx->req;
 
-Transaction request.
+Transaction request, usually a L<Mojo::Message::Request> object.
 
 =head2 C<res>
 
     my $res = $tx->res;
 
-Transaction response.
+Transaction response, usually a L<Mojo::Message::Response> object.
 
 =head2 C<resume>
 

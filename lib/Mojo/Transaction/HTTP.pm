@@ -448,14 +448,14 @@ Connection can be kept alive.
     my $req = $tx->req;
     $tx     = $tx->req(Mojo::Message::Request->new);
 
-HTTP 1.1 request.
+HTTP 1.1 request, by default a L<Mojo::Message::Request> object.
 
 =head2 C<res>
 
     my $res = $tx->res;
     $tx     = $tx->res(Mojo::Message::Response->new);
 
-HTTP 1.1 response.
+HTTP 1.1 response, by default a L<Mojo::Message::Response> object.
 
 =head2 C<upgrade_cb>
 

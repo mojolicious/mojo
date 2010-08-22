@@ -376,6 +376,8 @@ L<Mojolicious::Lite>.
 
 =head2 Have Some Cake
 
+Loosely coupled building blocks, use what you like and just ignore the rest.
+
     .---------------------------------------------------------------.
     |                             Fun!                              |
     '---------------------------------------------------------------'

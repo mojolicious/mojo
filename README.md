@@ -79,6 +79,8 @@ and "perldoc Mojolicious::Lite".
 Have Some Cake
 --------------
 
+Loosely coupled building blocks, use what you like and just ignore the rest.
+
     .---------------------------------------------------------------.
     |                             Fun!                              |
     '---------------------------------------------------------------'

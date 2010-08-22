@@ -11,6 +11,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed a bug where Mojo::IOLoop connections could be closed too
           early.
         - Fixed HTTPS support for CGI environments.
+        - Fixed Mojo::Server::Daemon::Prefork not to prefork more workers
+          than allowed.
 
 0.999929 2010-08-17 00:00:00
         - Removed OS X resource fork files.

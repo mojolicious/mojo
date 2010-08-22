@@ -116,7 +116,10 @@ sub run {
     $self->app->log->debug('Prefork parent started.') if DEBUG;
 
     # Prefork
-    $self->_spawn_child for (1 .. $self->start_servers);
+    my $start = $self->start_servers;
+    my $max   = $self->max_servers;
+    $start = $max if $max < $start;
+    $self->_spawn_child for 1 .. $start;
 
     # We try to make spawning and killing as smooth as possible
     $self->{_cleanup} = time + $self->cleanup_interval;

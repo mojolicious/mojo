@@ -8,17 +8,21 @@ BEGIN { $ENV{MOJO_POLL} = $ENV{MOJO_NO_IPV6} = 1 }
 
 use Test::More;
 
+# I ate the blue ones... they taste like burning.
+use FindBin;
+use IO::Socket::INET;
 use Mojo::Client;
+use Mojo::IOLoop;
 use Mojo::Transaction::HTTP;
-use Test::Mojo::Server;
 
 plan skip_all => 'set TEST_DAEMON to enable this test (developer only!)'
   unless $ENV{TEST_DAEMON};
-plan tests => 43;
+plan tests => 42;
 
 # Daddy, I'm scared. Too scared to even wet my pants.
 # Just relax and it'll come, son.
 use_ok('Mojo::Server::Daemon');
+use_ok('Mojo::Server::Daemon::Prefork');
 
 # Test sane Mojo::Server subclassing capabilities
 my $daemon = Mojo::Server::Daemon->new;
@@ -27,9 +31,16 @@ $daemon = Mojo::Server::Daemon->new(max_clients => $max + 10);
 is($daemon->max_clients, $max + 10, 'right max clients value');
 
 # Start
-my $server = Test::Mojo::Server->new;
-$server->start_daemon_ok;
-my $port   = $server->port;
+my $port = Mojo::IOLoop->generate_port;
+my $pid = open my $server, '-|', $^X, "$FindBin::Bin/../../script/mojo",
+  'daemon_prefork', '--listen', "http:\/\/*:$port";
+sleep 1
+  while !IO::Socket::INET->new(
+    Proto    => 'tcp',
+    PeerAddr => 'localhost',
+    PeerPort => $port
+  );
+
 my $client = Mojo::Client->new;
 
 # Single request without keep alive
@@ -146,4 +157,10 @@ like($tx2->res->content->asset->slurp, qr/Mojo/, 'right content');
 is($tx3->res->content->asset->slurp, 'foo12', 'right content');
 
 # Stop
-$server->stop_server_ok;
+kill $^O eq 'MSWin32' ? 'KILL' : 'INT', $pid;
+sleep 1
+  while IO::Socket::INET->new(
+    Proto    => 'tcp',
+    PeerAddr => 'localhost',
+    PeerPort => $port
+  );

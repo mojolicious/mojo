@@ -309,7 +309,7 @@ sub _listen {
     my $options = {};
 
     # UNIX domain socket
-    if ($listen =~ /^file\:\/\/(.+)$/) { $options->{file} = $1 }
+    if ($listen =~ /^file\:\/\/(.+)$/) { unlink $options->{file} = $1 }
 
     # Internet socket
     elsif ($listen =~ /^(http(?:s)?)\:\/\/(.+)\:(\d+)(?:\:(.*)\:(.*))?$/) {

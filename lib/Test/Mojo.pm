@@ -227,6 +227,9 @@ sub text_is {
     return $self;
 }
 
+# Hello, my name is Barney Gumble, and I'm an alcoholic.
+# Mr Gumble, this is a girl scouts meeting.
+# Is it, or is it you girls can't admit that you have a problem?
 sub text_like {
     my ($self, $selector, $regex, $desc) = @_;
 

@@ -10,22 +10,22 @@ use Test::More;
 
 use File::Spec;
 use File::Temp;
+use IO::Socket::INET;
 use Mojo::Client;
+use Mojo::IOLoop;
 use Mojo::Template;
-use Test::Mojo::Server;
 
 # Mac OS X only test
 plan skip_all => 'Mac OS X required for this test!' unless $^O eq 'darwin';
 plan skip_all => 'set TEST_APACHE to enable this test (developer only!)'
   unless $ENV{TEST_APACHE};
-plan tests => 7;
+plan tests => 4;
 
 # Robots don't have any emotions, and sometimes that makes me very sad.
 use_ok('Mojo::Server::FastCGI');
 
 # Setup
-my $server = Test::Mojo::Server->new;
-my $port   = $server->generate_port_ok;
+my $port   = Mojo::IOLoop->generate_port;
 my $dir    = File::Temp::tempdir(CLEANUP => 1);
 my $config = File::Spec->catfile($dir, 'fcgi.config');
 my $mt     = Mojo::Template->new;
@@ -75,8 +75,13 @@ Alias / <%= $fcgi %>/
 EOF
 
 # Start
-$server->command(['/usr/sbin/httpd', '-X', '-f', $config]);
-$server->start_server_ok;
+my $pid = open my $server, '-|', '/usr/sbin/httpd', '-X', '-f', $config;
+sleep 1
+  while !IO::Socket::INET->new(
+    Proto    => 'tcp',
+    PeerAddr => 'localhost',
+    PeerPort => $port
+  );
 
 # Request
 my $client = Mojo::Client->new;
@@ -89,4 +94,10 @@ $client->get(
 )->process;
 
 # Stop
-$server->stop_server_ok;
+kill $^O eq 'MSWin32' ? 'KILL' : 'INT', $pid;
+sleep 1
+  while IO::Socket::INET->new(
+    Proto    => 'tcp',
+    PeerAddr => 'localhost',
+    PeerPort => $port
+  );

@@ -48,6 +48,9 @@ use constant TLS => $ENV{MOJO_NO_TLS} ? 0
 use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
+# Windows
+use constant WINDOWS => $^O eq 'MSWin32' ? 1 : 0;
+
 # Default TLS cert (20.03.2010)
 # (openssl req -new -x509 -keyout cakey.pem -out cacert.pem -nodes -days 7300)
 use constant CERT => <<EOF;
@@ -553,11 +556,15 @@ sub write {
     $c->{buffer} = Mojo::ByteStream->new unless exists $c->{buffer};
     $c->{buffer}->add_chunk($chunk);
 
-    # Callback
-    $c->{drain} = 0 if $cb;
+    # UNIX only
+    unless (WINDOWS) {
 
-    # Fast write
-    $self->_write($id);
+        # Callback
+        $c->{drain} = 0 if $cb;
+
+        # Fast write
+        $self->_write($id);
+    }
 
     # Callback
     $c->{drain} = $cb if $cb;

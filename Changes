@@ -15,6 +15,7 @@ This file documents the revision history for Perl extension Mojolicious.
           than allowed.
         - Fixed graceful shutdown support in Mojo::Server::Daemon::Prefork.
         - Fixed a auto rendering bug related to bridges.
+        - Fixed Mojo::IOLoop Windows support.
 
 0.999929 2010-08-17 00:00:00
         - Removed OS X resource fork files.

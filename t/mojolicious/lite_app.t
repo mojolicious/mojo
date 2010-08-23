@@ -29,7 +29,6 @@ use Mojo::Content::MultiPart;
 use Mojo::Content::Single;
 use Mojo::Cookie::Response;
 use Mojo::Date;
-use Mojo::Filter::Chunked;
 use Mojo::JSON;
 use Mojo::Transaction::HTTP;
 use Mojolicious::Lite;

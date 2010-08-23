@@ -515,7 +515,7 @@ sub _parse {
         my $content = $self->content;
 
         # Parse
-        $content->filter_buffer($buffer);
+        $content->chunked_buffer($buffer);
 
         # Until body
         if ($until_body) { $self->content($content->parse_until_body) }

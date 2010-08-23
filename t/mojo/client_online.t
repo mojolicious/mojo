@@ -267,16 +267,9 @@ $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('http://www.google.com');
 $tx->req->headers->transfer_encoding('chunked');
-my $counter = 1;
-my $chunked = Mojo::Filter::Chunked->new;
-$tx->req->body(
-    sub {
-        my $self  = shift;
-        my $chunk = '';
-        $chunk = "hello world!"      if $counter == 1;
-        $chunk = "hello world2!\n\n" if $counter == 2;
-        $counter++;
-        return $chunked->build($chunk);
+$tx->req->write_chunk(
+    'hello world!' => sub {
+        shift->write_chunk('hello world2!' => sub { shift->write_chunk('') });
     }
 );
 $client->process($tx);

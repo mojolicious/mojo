@@ -8,7 +8,7 @@ use base 'Mojo::Command';
 use Mojo::Server::FastCGI;
 
 __PACKAGE__->attr(description => <<'EOF');
-Start application with FastCGI backend.
+Start application with FastCGI.
 EOF
 __PACKAGE__->attr(usage => <<"EOF");
 usage: $0 fastcgi

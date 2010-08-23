@@ -10,13 +10,13 @@ use Mojo::Server::CGI;
 use Getopt::Long 'GetOptions';
 
 __PACKAGE__->attr(description => <<'EOF');
-Start application with CGI backend.
+Start application with CGI.
 EOF
 __PACKAGE__->attr(usage => <<"EOF");
 usage: $0 cgi [OPTIONS]
 
 These options are available:
-  --nph      Enable non-parsed-header mode.
+  --nph   Enable non-parsed-header mode.
 EOF
 
 # Hi, Super Nintendo Chalmers!

@@ -7,13 +7,12 @@ use base 'Mojo::Base';
 
 use Carp 'croak';
 use Mojo::ByteStream;
-use Mojo::Filter::Chunked;
 use Mojo::Headers;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 262144;
 
-__PACKAGE__->attr([qw/filter read_cb/]);
-__PACKAGE__->attr([qw/buffer filter_buffer/] => sub { Mojo::ByteStream->new }
+__PACKAGE__->attr('read_cb');
+__PACKAGE__->attr([qw/buffer chunked_buffer/] => sub { Mojo::ByteStream->new }
 );
 __PACKAGE__->attr(headers => sub { Mojo::Headers->new });
 __PACKAGE__->attr(raw_header_size => 0);
@@ -111,7 +110,7 @@ sub has_leftovers {
     my $self = shift;
 
     # Leftovers
-    return 1 if $self->buffer->size || $self->filter_buffer->size;
+    return 1 if $self->buffer->size || $self->chunked_buffer->size;
 
     # Empty buffer
     return;
@@ -148,9 +147,9 @@ sub is_parsing_body {
 sub leftovers {
     my $self = shift;
 
-    # Chunked leftovers are in the filter buffer, and so are those from a
+    # Chunked leftovers are in the chunked buffer, and so are those from a
     # HEAD request
-    return $self->filter_buffer->to_string if $self->filter_buffer->size;
+    return $self->chunked_buffer->to_string if $self->chunked_buffer->size;
 
     # Normal leftovers
     return $self->buffer->to_string;
@@ -160,7 +159,7 @@ sub parse {
     my ($self, $chunk) = @_;
 
     # Buffer
-    my $fbuffer = $self->filter_buffer;
+    my $fbuffer = $self->chunked_buffer;
     $fbuffer->add_chunk($chunk);
 
     # Parse headers
@@ -169,21 +168,10 @@ sub parse {
     # Still parsing headers
     return $self if $self->{_state} eq 'headers';
 
-    # Chunked, need to filter
+    # Chunked
     if ($self->is_chunked && ($self->{_state} || '') ne 'headers') {
-
-        # Initialize filter
-        $self->filter(
-            Mojo::Filter::Chunked->new(
-                headers       => $self->headers,
-                input_buffer  => $fbuffer,
-                output_buffer => $self->buffer
-            )
-        ) unless $self->filter;
-
-        # Filter
-        $self->filter->parse;
-        $self->{_state} = 'done' if $self->filter->is_done;
+        $self->_parse_chunked;
+        $self->{_state} = 'done' if ($self->{_chunked} || '') eq 'done';
     }
 
     # Not chunked, pass through
@@ -233,11 +221,14 @@ sub parse_body_once {
     return $self;
 }
 
+# Quick Smithers. Bring the mind eraser device!
+# You mean the revolver, sir?
+# Precisely.
 sub parse_until_body {
     my ($self, $chunk) = @_;
 
     # Buffer
-    my $fbuffer = $self->filter_buffer;
+    my $fbuffer = $self->chunked_buffer;
     $fbuffer->add_chunk($chunk);
 
     # Parser started
@@ -263,7 +254,7 @@ sub raw_body_size {
     my $self = shift;
 
     # Calculate
-    my $length        = $self->filter_buffer->raw_size;
+    my $length        = $self->chunked_buffer->raw_size;
     my $header_length = $self->raw_header_size;
     return $length - $header_length;
 }
@@ -284,21 +275,51 @@ sub write {
     $self->{_drain} = $cb if $cb;
 }
 
+# Here's to alcohol, the cause of—and solution to—all life's problems.
 sub write_chunk {
     my ($self, $chunk, $cb) = @_;
-
-    # Filter
-    $self->filter(Mojo::Filter::Chunked->new) unless $self->filter;
-    my $filter = $self->filter;
 
     # Chunked transfer encoding
     $self->headers->transfer_encoding('chunked') unless $self->is_chunked;
 
     # Write
-    $self->write(defined $chunk ? $filter->build($chunk) : $chunk, $cb);
+    $self->write(defined $chunk ? $self->_build_chunk($chunk) : $chunk, $cb);
 
     # Finish
-    $self->finish if $filter->is_done;
+    $self->finish if defined $chunk && $chunk eq '';
+}
+
+sub _build_chunk {
+    my ($self, $chunk) = @_;
+
+    my $chunk_length = length $chunk;
+
+    # Trailing headers
+    my $headers = ref $chunk && $chunk->isa('Mojo::Headers') ? 1 : 0;
+
+    # End
+    my $formatted = '';
+    if ($headers || ($chunk_length == 0)) {
+
+        # Normal end
+        $formatted = "\x0d\x0a0\x0d\x0a";
+
+        # Trailing headers
+        $formatted .= $headers ? "$chunk\x0d\x0a\x0d\x0a" : "\x0d\x0a";
+    }
+
+    # Separator
+    else {
+
+        # First chunk has no leading CRLF
+        $formatted = "\x0d\x0a" if $self->{_chunks};
+        $self->{_chunks} = 1;
+
+        # Chunk
+        $formatted .= sprintf('%x', length $chunk) . "\x0d\x0a$chunk";
+    }
+
+    return $formatted;
 }
 
 sub _build_headers {
@@ -313,12 +334,78 @@ sub _build_headers {
     return "$headers\x0d\x0a\x0d\x0a";
 }
 
+sub _parse_chunked {
+    my $self = shift;
+
+    # Trailing headers
+    if (($self->{_chunked} || '') eq 'trailing_headers') {
+        $self->_parse_chunked_trailing_headers;
+        return $self;
+    }
+
+    # New chunk (ignore the chunk extension)
+    my $chunked = $self->chunked_buffer;
+    my $content = $chunked->to_string;
+    my $buffer  = $self->buffer;
+    while ($content =~ /^((?:\x0d?\x0a)?([\da-fA-F]+).*\x0d?\x0a)/) {
+        my $header = $1;
+        my $length = hex($2);
+
+        # Last chunk
+        if ($length == 0) {
+            $chunked->remove(length $header);
+            $self->{_chunked} = 'trailing_headers';
+            last;
+        }
+
+        # Read chunk
+        else {
+
+            # Whole chunk
+            if (length $content >= (length($header) + $length)) {
+
+                # Remove header
+                $content =~ s/^$header//;
+                $chunked->remove(length $header);
+
+                # Remove payload
+                substr $content, 0, $length, '';
+                $buffer->add_chunk($chunked->remove($length));
+
+                # Remove newline at end of chunk
+                $content =~ s/^(\x0d?\x0a)// and $chunked->remove(length $1);
+            }
+
+            # Not a whole chunk, wait for more data
+            else {last}
+        }
+    }
+
+    # Trailing headers
+    $self->_parse_chunked_trailing_headers
+      if ($self->{_chunked} || '') eq 'trailing_headers';
+}
+
+sub _parse_chunked_trailing_headers {
+    my $self = shift;
+
+    # Parse
+    my $headers = $self->headers;
+    $headers->parse;
+
+    # Done
+    if ($headers->is_done) {
+        $self->_remove_chunked_encoding;
+        $self->{_chunked} = 'done';
+    }
+}
+
 sub _parse_headers {
     my $self = shift;
 
     # Parse
     my $headers = $self->headers;
-    $headers->buffer($self->filter_buffer);
+    $headers->buffer($self->chunked_buffer);
     $headers->parse;
 
     # Update size
@@ -330,6 +417,19 @@ sub _parse_headers {
 
     # Done
     $self->{_state} = 'body' if $headers->is_done;
+}
+
+sub _remove_chunked_encoding {
+    my $self = shift;
+
+    # Remove encoding
+    my $headers  = $self->headers;
+    my $encoding = $headers->transfer_encoding;
+    $encoding =~ s/,?\s*chunked//ig;
+    $encoding
+      ? $headers->transfer_encoding($encoding)
+      : $headers->remove('Transfer-Encoding');
+    $headers->content_length($self->buffer->raw_size);
 }
 
 1;
@@ -359,19 +459,12 @@ L<Mojo::Content> implements the following attributes.
 
 Parser buffer.
 
-=head2 C<filter>
+=head2 C<chunked_buffer>
 
-    my $filter = $content->filter;
-    $content   = $content->filter(Mojo::Filter::Chunked->new);
+    my $buffer = $content->chunked_buffer;
+    $content   = $content->chunked_buffer(Mojo::ByteStream->new);
 
-Input filter.
-
-=head2 C<filter_buffer>
-
-    my $filter_buffer = $content->filter_buffer;
-    $content          = $content->filter_buffer(Mojo::ByteStream->new);
-
-Input buffer for filtering.
+Parser buffer for chunked transfer encoding.
 
 =head2 C<headers>
 
@@ -399,7 +492,7 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
     my $relaxed = $content->relaxed;
     $content    = $content->relaxed(1);
 
-Activate relaxed filtering for HTTP 0.9.
+Activate relaxed parsing for HTTP 0.9.
 
 =head2 C<raw_header_size>
 

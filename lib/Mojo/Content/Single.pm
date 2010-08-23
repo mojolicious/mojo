@@ -40,7 +40,7 @@ sub get_body_chunk {
 sub parse {
     my $self = shift;
 
-    # Parse headers and filter body
+    # Parse headers and chunked body
     $self->SUPER::parse(@_);
 
     # Still parsing headers or using a custom body parser

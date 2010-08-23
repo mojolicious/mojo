@@ -267,8 +267,9 @@ sub _walk_stack {
     my ($self, $c) = @_;
 
     # Walk the stack
-    my $staging = $#{$c->match->stack};
+    my $staging = @{$c->match->stack};
     for my $field (@{$c->match->stack}) {
+        $staging-- if $staging > 0;
 
         # Params
         $c->stash->{'mojo.params'}->append(%{$field});
@@ -292,7 +293,7 @@ sub _walk_stack {
         }
 
         # Break the chain
-        return unless $e;
+        return 1 if $staging && !$e;
     }
 
     # Done

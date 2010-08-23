@@ -80,7 +80,6 @@ sub match {
     }
     $self->{_path} = $path;
 
-
     # Merge captures
     $captures = {%{$self->captures}, %$captures};
     $self->captures($captures);

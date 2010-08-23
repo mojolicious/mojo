@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 516;
+plan tests => 530;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -483,6 +483,24 @@ under sub {
 
 # GET /with_under_count
 get '/with/under/count' => '*';
+
+# Everything gets past this
+under sub {
+    shift->res->headers->header('X-Possible' => 1);
+    return 1;
+};
+
+# GET /possible
+get '/possible' => 'possible';
+
+# Nothing gets past this
+under sub {
+    shift->res->headers->header('X-Impossible' => 1);
+    return 0;
+};
+
+# GET /impossible
+get '/impossible' => 'impossible';
 
 # Oh Fry, I love you more than the moon, and the stars,
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
@@ -1203,6 +1221,20 @@ $t->get_ok('/with/under/count', {'X-Bender' => 'Rodriguez'})->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->header_is('X-Under'      => 1)->content_is("counter\n");
 
+# GET /possible
+$t->get_ok('/possible')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->header_is('X-Possible'   => 1)->header_is('X-Impossible' => undef)
+  ->content_is("Possible!\n");
+
+# GET /impossible
+$t->get_ok('/impossible')->status_is(404)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->header_is('X-Possible'   => undef)->header_is('X-Impossible' => 1)
+  ->content_is("Oops!\n");
+
 # Client timer
 $client->ioloop->one_tick('0.1');
 is( $timer,
@@ -1376,6 +1408,12 @@ app layout <%= content %><%= app->mode %>
 
 @@ withundercount.html.ep
 counter
+
+@@ possible.html.ep
+Possible!
+
+@@ impossible.html.ep
+Impossible
 
 __END__
 This is not a template!

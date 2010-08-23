@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 801;
+use Test::More tests => 798;
 
 use File::Spec;
 use File::Temp;
@@ -705,7 +705,6 @@ $req->write_chunk(
             "hello world2!\n\n" => sub {
                 my $self = shift;
                 $self->write_chunk('');
-                $self->finish;
             }
         );
     }
@@ -722,25 +721,13 @@ is($req->headers->transfer_encoding, undef, 'no "Transfer-Encoding" value');
 is($req->body, "hello world!hello world2!\n\n", 'right content');
 ok($counter2, 'right counter');
 
-# Build HTTP 1.1 chunked request with trailing headers
+# Build HTTP 1.1 chunked request
 $req = Mojo::Message::Request->new;
 $req->method('GET');
 $req->url->parse('http://127.0.0.1/foo/bar');
-$req->headers->trailer('X-Test; X-Test2');
-$req->write_chunk(
-    'hello world!' => sub {
-        shift->write_chunk(
-            "hello world2!\n\n" => sub {
-                my $self = shift;
-                my $h    = Mojo::Headers->new;
-                $h->header('X-Test',  'test');
-                $h->header('X-Test2', '123');
-                $self->write_chunk($h);
-                $self->finish;
-            }
-        );
-    }
-);
+$req->write_chunk('hello world!');
+$req->write_chunk("hello world2!\n\n");
+$req->write_chunk('');
 $req = Mojo::Message::Request->new->parse($req->build);
 ok($req->is_done, 'request is done');
 is($req->method,        'GET',                      'right method');
@@ -748,11 +735,8 @@ is($req->major_version, 1,                          'right major version');
 is($req->minor_version, 1,                          'right minor version');
 is($req->url,           '/foo/bar',                 'right URL');
 is($req->url->to_abs,   'http://127.0.0.1/foo/bar', 'right absolute URL');
-is($req->headers->trailer, 'X-Test; X-Test2', 'right "Trailer" value');
-is($req->headers->host,    '127.0.0.1',       'right "Host" value');
-is($req->headers->transfer_encoding, undef,  'no "Transfer-Encoding" value');
-is($req->headers->header('X-Test'),  'test', 'right "X-Test" value');
-is($req->headers->header('X-Test2'), '123',  'right "X-Test2" value');
+is($req->headers->host, '127.0.0.1',                'right "Host" value');
+is($req->headers->transfer_encoding, undef, 'no "Transfer-Encoding" value');
 is($req->body, "hello world!hello world2!\n\n", 'right content');
 
 # Status code and message

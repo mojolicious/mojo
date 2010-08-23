@@ -292,21 +292,9 @@ sub write_chunk {
 sub _build_chunk {
     my ($self, $chunk) = @_;
 
-    my $chunk_length = length $chunk;
-
-    # Trailing headers
-    my $headers = ref $chunk && $chunk->isa('Mojo::Headers') ? 1 : 0;
-
     # End
     my $formatted = '';
-    if ($headers || ($chunk_length == 0)) {
-
-        # Normal end
-        $formatted = "\x0d\x0a0\x0d\x0a";
-
-        # Trailing headers
-        $formatted .= $headers ? "$chunk\x0d\x0a\x0d\x0a" : "\x0d\x0a";
-    }
+    if (length $chunk == 0) { $formatted = "\x0d\x0a0\x0d\x0a\x0d\x0a" }
 
     # Separator
     else {
@@ -373,7 +361,8 @@ sub _parse_chunked {
                 $buffer->add_chunk($chunked->remove($length));
 
                 # Remove newline at end of chunk
-                $content =~ s/^(\x0d?\x0a)// and $chunked->remove(length $1);
+                $content =~ s/^(\x0d?\x0a)//
+                  and $chunked->remove(length $1);
             }
 
             # Not a whole chunk, wait for more data

@@ -53,7 +53,6 @@ sub _chunked_params {
         my $self = shift;
         my $chunk = shift @$chunks || '';
         $self->write_chunk($chunk, $chunk ? $cb : undef);
-        $self->finish unless $chunk;
     };
     $cb->($tx->res);
 }

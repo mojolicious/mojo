@@ -94,7 +94,7 @@ $client->get(
 )->process;
 
 # Stop
-kill $^O eq 'MSWin32' ? 'KILL' : 'INT', $pid;
+kill 'INT', $pid;
 sleep 1
   while IO::Socket::INET->new(
     Proto    => 'tcp',

@@ -269,7 +269,7 @@ sub _walk_stack {
     # Walk the stack
     my $staging = @{$c->match->stack};
     for my $field (@{$c->match->stack}) {
-        $staging-- if $staging > 0;
+        $staging--;
 
         # Params
         $c->stash->{'mojo.params'}->append(%{$field});

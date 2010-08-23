@@ -384,7 +384,16 @@ sub _parse_chunked_trailing_headers {
 
     # Done
     if ($headers->is_done) {
-        $self->_remove_chunked_encoding;
+
+        # Remove Transfer-Encoding
+        my $headers  = $self->headers;
+        my $encoding = $headers->transfer_encoding;
+        $encoding =~ s/,?\s*chunked//ig;
+        $encoding
+          ? $headers->transfer_encoding($encoding)
+          : $headers->remove('Transfer-Encoding');
+        $headers->content_length($self->buffer->raw_size);
+
         $self->{_chunked} = 'done';
     }
 }
@@ -406,19 +415,6 @@ sub _parse_headers {
 
     # Done
     $self->{_state} = 'body' if $headers->is_done;
-}
-
-sub _remove_chunked_encoding {
-    my $self = shift;
-
-    # Remove encoding
-    my $headers  = $self->headers;
-    my $encoding = $headers->transfer_encoding;
-    $encoding =~ s/,?\s*chunked//ig;
-    $encoding
-      ? $headers->transfer_encoding($encoding)
-      : $headers->remove('Transfer-Encoding');
-    $headers->content_length($self->buffer->raw_size);
 }
 
 1;

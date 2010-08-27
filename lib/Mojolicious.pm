@@ -177,8 +177,11 @@ sub dispatch {
 sub finish {
     my ($self, $c) = @_;
 
-    # Already finished
-    return if $c->stash->{finished};
+    # Stash
+    my $stash = $c->stash;
+
+    # Already finished or delayed
+    return if $stash->{finished} || !$stash->{'mojo.rendered'};
 
     # Transaction
     my $tx = $c->tx;
@@ -193,7 +196,7 @@ sub finish {
     $self->session->store($c);
 
     # Finished
-    $c->stash->{finished} = 1;
+    $stash->{finished} = 1;
 }
 
 # Bite my shiny metal ass!

@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 530;
+plan tests => 531;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -355,18 +355,27 @@ get '/subrequest_sync' => sub {
     )->process;
 };
 
+# Make sure hook runs async
+app->plugins->add_hook(
+    after_dispatch => sub {
+        my ($self, $c) = @_;
+        $c->stash->{async} = 'broken!';
+    }
+);
+
 # GET /subrequest_async
+my $async;
 get '/subrequest_async' => sub {
-    my $self  = shift;
-    my $async = '';
+    my $self = shift;
     $self->client->async->post(
         '/template' => sub {
             my $client = shift;
-            $self->render_text($client->res->body . $async);
+            $self->render_text($client->res->body . $self->stash->{'async'});
             $self->finish;
+            $async = $self->stash->{async};
         }
     )->process;
-    $async .= 'success!';
+    $self->stash->{'async'} = 'success!';
 };
 
 # GET /redirect_url
@@ -1044,6 +1053,7 @@ $t->get_ok('/subrequest_async')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('Just works!success!');
+is($async, 'broken!', 'right text');
 
 # GET /redirect_url
 $t->get_ok('/redirect_url')->status_is(302)

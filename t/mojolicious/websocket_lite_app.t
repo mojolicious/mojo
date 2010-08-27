@@ -108,7 +108,8 @@ websocket '/echo' => sub {
 websocket '/dead' => sub { die 'i see dead processes' };
 
 # WebSocket /foo
-websocket '/foo' => sub { shift->res->code('403')->message("i'm a teapot") };
+websocket '/foo' =>
+  sub { shift->rendered->res->code('403')->message("i'm a teapot") };
 
 # WebSocket /deadcallback
 websocket '/deadcallback' => sub {

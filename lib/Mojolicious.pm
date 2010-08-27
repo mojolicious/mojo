@@ -180,8 +180,12 @@ sub finish {
     # Stash
     my $stash = $c->stash;
 
-    # Already finished or delayed
-    return if $stash->{finished} || !$stash->{'mojo.rendered'};
+    # Already finished
+    return if $stash->{finished};
+
+    # Delayed
+    $self->log->debug('Delayed response.') and return
+      unless $stash->{'mojo.rendered'};
 
     # Transaction
     my $tx = $c->tx;

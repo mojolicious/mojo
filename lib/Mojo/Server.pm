@@ -43,7 +43,22 @@ __PACKAGE__->attr(
 );
 __PACKAGE__->attr(
     handler_cb => sub {
-        sub { shift->app->handler(shift) }
+        sub {
+
+            # Application
+            my $app = shift->app;
+
+            # Transaction
+            my $tx = shift;
+
+            # Handler
+            $app->handler($tx);
+
+            # Delayed
+            $app->log->debug(
+                'Waiting for delayed response, forgot to render or resume?')
+              unless $tx->is_writing;
+          }
     }
 );
 __PACKAGE__->attr(reload => sub { $ENV{MOJO_RELOAD} || 0 });

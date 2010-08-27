@@ -169,10 +169,6 @@ sub dispatch {
         # Nothing found
         $c->render_not_found unless $c->res->code;
     }
-
-    # Delayed
-    $self->log->debug('No response rendered, waiting for delayed rendering.')
-      unless $c->stash->{'mojo.rendered'};
 }
 
 # Bite my shiny metal ass!

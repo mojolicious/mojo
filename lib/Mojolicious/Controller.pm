@@ -18,14 +18,12 @@ sub client { shift->app->client }
 sub finish {
     my $self = shift;
 
-    # Transaction
-    my $tx = $self->tx;
+    # WebSocket check
+    Carp::croak('No WebSocket connection to finish')
+      unless $self->tx->is_websocket;
 
     # Finish WebSocket
-    return $tx->finish if $tx->is_websocket;
-
-    # Render
-    $self->app->routes->auto_render($self);
+    $self->tx->finish;
 }
 
 sub finished {
@@ -472,8 +470,7 @@ For async processing you can use C<finish>.
 
     $c->finish;
 
-Trigger automatic rendering and the C<after_dispatch> plugin hook.
-For WebSockets it will gracefully end the connection.
+Gracefully end WebSocket connection.
 
 =head2 C<finished>
 

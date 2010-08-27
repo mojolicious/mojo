@@ -226,9 +226,6 @@ sub server_read {
     my $handled = $self->{_handled};
     if ($req->error && !$handled) {
 
-        # Write
-        $self->{_state} = 'write';
-
         # Handler callback
         $self->handler_cb->($self);
 
@@ -241,9 +238,6 @@ sub server_read {
 
     # EOF
     elsif ((length $chunk == 0) || ($req->is_done && !$handled)) {
-
-        # Writing
-        $self->{_state} = 'write';
 
         # Upgrade callback
         my $ws;

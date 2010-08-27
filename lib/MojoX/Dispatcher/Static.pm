@@ -107,6 +107,9 @@ sub serve {
         # Log
         $c->app->log->debug(qq/Serving static file "$rel"./);
 
+        # Resume
+        $c->tx->resume;
+
         # Request
         my $req = $c->req;
 

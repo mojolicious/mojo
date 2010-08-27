@@ -34,11 +34,6 @@ sub is_done {
     return;
 }
 
-sub is_paused {
-    return 1 if (shift->{_state} || '') eq 'paused';
-    return;
-}
-
 sub is_websocket {0}
 
 sub is_writing {
@@ -49,21 +44,6 @@ sub is_writing {
           || $state eq 'write_headers'
           || $state eq 'write_body';
     return;
-}
-
-sub pause {
-    my $self = shift;
-
-    # Already paused
-    return $self if $self->{_real_state};
-
-    # Save state
-    $self->{_real_state} = $self->{_state};
-
-    # Pause
-    $self->{_state} = 'paused';
-
-    return $self;
 }
 
 sub remote_address {
@@ -107,11 +87,8 @@ sub res { croak 'Method "res" not implemented by subclass' }
 sub resume {
     my $self = shift;
 
-    # Not paused
-    return unless $self->{_real_state};
-
     # Resume
-    $self->{_state} = delete $self->{_real_state};
+    $self->{_state} = 'write' unless $self->is_writing;
 
     # Callback
     $self->resume_cb->($self);
@@ -260,12 +237,6 @@ Parser errors and codes.
 
 Check if transaction is done.
 
-=head2 C<is_paused>
-
-    my $paused = $tx->is_paused;
-
-Check if transaction is paused.
-
 =head2 C<is_websocket>
 
     my $is_websocket = $tx->is_websocket;
@@ -277,12 +248,6 @@ Check if transaction is a WebSocket.
     my $writing = $tx->is_writing;
 
 Check if transaction is writing.
-
-=head2 C<pause>
-
-    $tx = $tx->pause;
-
-Pause transaction, it can still read but writing is disabled while paused.
 
 =head2 C<req>
 

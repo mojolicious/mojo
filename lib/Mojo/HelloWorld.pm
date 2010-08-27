@@ -32,6 +32,7 @@ sub handler {
     $res->code(200);
     $res->headers->content_type('text/plain');
     $res->body('Your Mojo is working!');
+    $tx->resume;
 }
 
 sub _chunked_params {
@@ -55,6 +56,7 @@ sub _chunked_params {
         $self->write_chunk($chunk, $chunk ? $cb : undef);
     };
     $cb->($tx->res);
+    $tx->resume;
 }
 
 sub _diag {
@@ -95,6 +97,7 @@ sub _diag {
     </body>
 </html>
 EOF
+    $tx->resume;
 }
 
 sub _dump_env {
@@ -102,6 +105,7 @@ sub _dump_env {
     my $res = $tx->res;
     $res->headers->content_type('application/json');
     $res->body(Mojo::JSON->new->encode(\%ENV));
+    $tx->resume;
 }
 
 sub _dump_params {
@@ -109,6 +113,7 @@ sub _dump_params {
     my $res = $tx->res;
     $res->headers->content_type('application/json');
     $res->body(Mojo::JSON->new->encode($tx->req->params->to_hash));
+    $tx->resume;
 }
 
 sub _hello {
@@ -119,6 +124,7 @@ sub _hello {
     $res->code(200);
     $res->headers->content_type('text/plain');
     $res->body('Your Mojo is working!');
+    $tx->resume;
 }
 
 sub _proxy {
@@ -136,6 +142,7 @@ sub _proxy {
                 $tx->res->headers->content_type(
                     $tx2->res->headers->content_type);
                 $tx->res->body($tx2->res->content->asset->slurp);
+                $tx->resume;
             }
         )->process;
 
@@ -145,21 +152,16 @@ sub _proxy {
     # Async proxy
     if (my $url = $tx->req->param('async_url')) {
 
-        # Pause transaction
-        $tx->pause;
-
         # Fetch
         $self->client->async->get(
             $url => sub {
                 my ($self, $tx2) = @_;
 
-                # Resume transaction
-                $tx->resume;
-
                 # Pass through content
                 $tx->res->headers->content_type(
                     $tx2->res->headers->content_type);
                 $tx->res->body($tx2->res->content->asset->slurp);
+                $tx->resume;
             }
         )->process;
 
@@ -188,6 +190,7 @@ sub _proxy {
     </body>
 </html>
 EOF
+    $tx->resume;
 }
 
 sub _websocket {
@@ -196,13 +199,15 @@ sub _websocket {
     # WebSocket request
     if ($tx->is_websocket) {
         $tx->send_message('Congratulations, your Mojo is working!');
-        return $tx->receive_message(
+        $tx->receive_message(
             sub {
                 my ($tx, $message) = @_;
                 return unless $message eq 'test 123';
                 $tx->send_message('With WebSocket support!');
+                $tx->resume;
             }
         );
+        return $tx->resume;
     }
 
     # WebSocket example
@@ -237,6 +242,7 @@ sub _websocket {
     </body>
 </html>
 EOF
+    $tx->resume;
 }
 
 1;

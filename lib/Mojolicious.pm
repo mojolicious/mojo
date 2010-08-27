@@ -81,9 +81,9 @@ sub new {
 
     # Hide own controller methods
     $r->hide(qw/client cookie finish finished flash handler helper param/);
-    $r->hide(qw/pause receive_message redirect_to render render_data/);
+    $r->hide(qw/receive_message redirect_to render render_data/);
     $r->hide(qw/render_exception render_inner render_json render_not_found/);
-    $r->hide(qw/render_partial render_static render_text rendered resume/);
+    $r->hide(qw/render_partial render_static render_text rendered/);
     $r->hide(
         qw/send_message session signed_cookie url_for write write_chunk/);
 
@@ -180,8 +180,11 @@ sub finish {
     # Already finished
     return if $c->stash->{finished};
 
-    # Paused
-    return if $c->tx->is_paused;
+    # Transaction
+    my $tx = $c->tx;
+
+    # Resume WebSocket
+    $tx->resume if $tx->is_websocket;
 
     # Hook
     $self->plugins->run_hook_reverse(after_dispatch => $c);

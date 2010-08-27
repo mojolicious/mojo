@@ -27,6 +27,9 @@ __PACKAGE__->attr(namespaces => sub { ['Mojo::Command'] });
 sub detect {
     my ($self, $guess) = @_;
 
+    # Hypnotoad
+    return 'hypnotoad' if defined $ENV{HYPNOTOAD_APP};
+
     # PSGI (Plack only for now)
     return 'psgi' if defined $ENV{PLACK_ENV};
 

@@ -82,8 +82,7 @@ sub render {
     # Arguments
     $args ||= {};
 
-    # We got called
-    $stash->{'mojo.rendered'} = 1;
+    # Content
     my $content = $stash->{'mojo.content'} ||= {};
 
     # Partial

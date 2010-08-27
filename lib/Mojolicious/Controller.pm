@@ -29,9 +29,6 @@ sub finish {
 
     # Finish
     $self->app->finish($self);
-
-    # Resume
-    $self->resume if $tx->is_paused;
 }
 
 sub finished {
@@ -55,13 +52,8 @@ sub helper {
     return $self->$helper(@_);
 }
 
-sub pause { shift->tx->pause }
-
 sub receive_message {
     my $self = shift;
-
-    # Rendered
-    $self->rendered;
 
     # WebSocket check
     Carp::croak('No WebSocket connection to receive messages from')
@@ -73,14 +65,14 @@ sub receive_message {
     # Receive
     $self->tx->receive_message(sub { shift and $self->$cb(@_) });
 
+    # Rendered
+    $self->rendered;
+
     return $self;
 }
 
 sub redirect_to {
     my $self = shift;
-
-    # Rendered
-    $self->rendered;
 
     # Response
     my $res = $self->res;
@@ -92,6 +84,9 @@ sub redirect_to {
     my $headers = $res->headers;
     $headers->location($self->url_for(@_)->to_abs);
     $headers->content_length(0);
+
+    # Rendered
+    $self->rendered;
 
     return $self;
 }
@@ -152,6 +147,9 @@ sub render {
     my $headers = $res->headers;
     $headers->content_type($type) unless $headers->content_type;
 
+    # Rendered
+    $self->rendered;
+
     # Success
     return 1;
 }
@@ -189,8 +187,8 @@ sub render_exception {
     $self->app->static->serve_500($self)
       if $self->stash->{'mojo.exception'} || !$self->render($options);
 
-    # Resume for exceptions
-    $self->resume if $self->tx->is_paused;
+    # Rendered
+    $self->rendered;
 }
 
 sub render_inner {
@@ -240,6 +238,9 @@ sub render_not_found {
     $options->{status} = 404 unless $self->stash->{status};
     $self->app->static->serve_404($self)
       if $self->stash->{not_found} || !$self->render($options);
+
+    # Rendered
+    $self->rendered;
 }
 
 sub render_partial {
@@ -264,11 +265,11 @@ sub render_partial {
 sub render_static {
     my $self = shift;
 
-    # Rendered
-    $self->rendered;
-
     # Static
     $self->app->static->serve($self, @_);
+
+    # Rendered
+    $self->rendered;
 }
 
 sub render_text {
@@ -284,15 +285,18 @@ sub render_text {
     return $self->render($args);
 }
 
-sub rendered { shift->stash->{'mojo.rendered'} = 1 }
-
-sub resume { shift->tx->resume }
-
-sub send_message {
+sub rendered {
     my $self = shift;
 
     # Rendered
-    $self->rendered;
+    $self->stash->{'mojo.rendered'} = 1;
+
+    # Resume
+    $self->tx->resume;
+}
+
+sub send_message {
+    my $self = shift;
 
     # WebSocket check
     Carp::croak('No WebSocket connection to send message to')
@@ -300,6 +304,9 @@ sub send_message {
 
     # Send
     $self->tx->send_message(@_);
+
+    # Rendered
+    $self->rendered;
 
     return $self;
 }
@@ -340,9 +347,6 @@ sub url_for {
 sub write {
     my ($self, $chunk, $cb) = @_;
 
-    # Rendered
-    $self->rendered;
-
     # Callback only
     if (ref $chunk && ref $chunk eq 'CODE') {
         $cb    = $chunk;
@@ -357,23 +361,17 @@ sub write {
             # Cleanup
             shift;
 
-            # Pause
-            $self->pause;
-
             # Callback
             $self->$cb(@_) if $cb;
         }
     );
 
-    # Resume
-    $self->resume;
+    # Rendered
+    $self->rendered;
 }
 
 sub write_chunk {
     my ($self, $chunk, $cb) = @_;
-
-    # Rendered
-    $self->rendered;
 
     # Callback only
     if (ref $chunk && ref $chunk eq 'CODE') {
@@ -389,16 +387,13 @@ sub write_chunk {
             # Cleanup
             shift;
 
-            # Pause
-            $self->pause;
-
             # Callback
             $self->$cb(@_) if $cb;
         }
     );
 
-    # Resume
-    $self->resume;
+    # Rendered
+    $self->rendered;
 }
 
 1;
@@ -445,9 +440,8 @@ A L<Mojo::Client> prepared for the current environment.
         $c->render_data($client->res->body);
     })->process;
 
-For async processing you can use C<pause> and C<finish>.
+For async processing you can use C<finish>.
 
-    $c->pause;
     $c->client->async->get('http://mojolicious.org' => sub {
         my $client = shift;
         $c->render_data($client->res->body);
@@ -458,9 +452,7 @@ For async processing you can use C<pause> and C<finish>.
 
     $c->finish;
 
-Similar to C<resume> but will also trigger automatic rendering and the
-C<after_dispatch> plugin hook, which would normally get disabled once a
-request gets paused.
+Trigger automatic rendering and the C<after_dispatch> plugin hook.
 For WebSockets it will gracefully end the connection.
 
 =head2 C<finished>
@@ -481,16 +473,6 @@ Callback signaling that the transaction has been finished.
 Directly call a L<Mojolicious> helper, see
 L<Mojolicious::Plugin::DefaultHelpers> for a list of helpers that are always
 available.
-
-=head2 C<pause>
-
-    $c->pause;
-
-Pause transaction associated with this request, used for async web
-applications.
-Note that automatic rendering and some plugins that do state changing
-operations inside the C<after_dispatch> hook won't work if you pause a
-transaction.
 
 =head2 C<receive_message>
 
@@ -603,13 +585,6 @@ See C<render_data> for an alternative without encoding.
 
 Disable automatic rendering for response.
 Note that this method is EXPERIMENTAL and might change without warning!
-
-=head2 C<resume>
-
-    $c->resume;
-
-Resume transaction associated with this request, used for async web
-applications.
 
 =head2 C<send_message>
 

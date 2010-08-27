@@ -83,6 +83,15 @@ sub remote_port    { shift->handshake->remote_port }
 sub req            { shift->handshake->req(@_) }
 sub res            { shift->handshake->res(@_) }
 
+sub resume {
+    my $self = shift;
+
+    # Resume
+    $self->handshake->resume;
+
+    return $self;
+}
+
 sub send_message {
     my ($self, $message) = @_;
 
@@ -358,6 +367,12 @@ The original handshake request.
     my $req = $ws->res;
 
 The original handshake response.
+
+=head2 C<resume>
+
+    $ws = $ws->resume;
+
+Resume transaction.
 
 =head2 C<send_message>
 

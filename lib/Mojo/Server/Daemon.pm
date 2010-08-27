@@ -24,7 +24,7 @@ use constant DEBUG => $ENV{MOJO_DAEMON_DEBUG} || 0;
 __PACKAGE__->attr(
     [qw/group listen listen_queue_size max_requests silent user/]);
 __PACKAGE__->attr(ioloop => sub { Mojo::IOLoop->singleton });
-__PACKAGE__->attr(keep_alive_timeout      => 15);
+__PACKAGE__->attr(keep_alive_timeout      => 5);
 __PACKAGE__->attr(max_clients             => 1000);
 __PACKAGE__->attr(max_keep_alive_requests => 100);
 __PACKAGE__->attr(
@@ -54,10 +54,11 @@ sub DESTROY {
 sub prepare_ioloop {
     my $self = shift;
 
-    # Signals
+    # Loop
     my $loop = $self->ioloop;
-    $SIG{HUP} = sub { $loop->stop };
-    $SIG{USR1} = sub {
+
+    # Signals
+    $SIG{HUP} = sub {
         $loop->max_connections(0)
           and $self->app->log->info('Graceful shutdown.');
       }
@@ -503,7 +504,7 @@ Event loop for server IO, defaults to the global L<Mojo::IOLoop> singleton.
     my $keep_alive_timeout = $daemon->keep_alive_timeout;
     $daemon                = $daemon->keep_alive_timeout(15);
 
-Timeout for keep alive connections in seconds, defaults to C<15>.
+Timeout for keep alive connections in seconds, defaults to C<5>.
 
 =head2 C<listen>
 

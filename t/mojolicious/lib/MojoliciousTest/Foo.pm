@@ -19,8 +19,6 @@ sub config {
     $self->render_text($self->stash('config')->{test});
 }
 
-sub exceptionduringpausedtransaction { shift->pause and die 'Exception' }
-
 sub index {
     shift->stash(
         layout  => 'default',

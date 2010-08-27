@@ -25,10 +25,7 @@ sub auto_render {
     my $tx = $c->tx;
 
     # Render
-    return !$c->render
-      unless $c->stash->{'mojo.rendered'}
-          || $tx->is_paused
-          || $tx->is_websocket;
+    $c->render unless $c->stash->{'mojo.rendered'} || $tx->is_websocket;
 
     # Nothing to render
     return;

@@ -52,9 +52,8 @@ get '/yada' => sub {
 
 # GET /bye (embedded)
 get '/bye' => sub {
-    my $self = shift;
-    my $name = $self->stash('name');
-    $self->pause;
+    my $self  = shift;
+    my $name  = $self->stash('name');
     my $async = '';
     $self->client->async->get(
         '/hello/hello' => sub {
@@ -108,6 +107,7 @@ sub handler {
     $c->res->code(200);
     my $test = $c->param('test');
     $c->res->body("Hello $test!");
+    $c->tx->resume;
 }
 
 package main;

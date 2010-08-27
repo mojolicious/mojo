@@ -83,6 +83,7 @@ get '/stream' => sub {
         $self->finish unless $chunk;
     };
     $cb->($self->res);
+    $self->tx->resume;
 };
 
 # GET /finished
@@ -325,12 +326,10 @@ get '/eperror' => sub { shift->render(handler => 'ep') } => 'eperror';
 # GET /subrequest
 get '/subrequest' => sub {
     my $self = shift;
-    $self->pause;
     $self->client->post(
         '/template' => sub {
             my $client = shift;
             $self->render_text($client->tx->success->body);
-            $self->finish;
         }
     )->process;
 };
@@ -358,8 +357,7 @@ get '/subrequest_sync' => sub {
 
 # GET /subrequest_async
 get '/subrequest_async' => sub {
-    my $self = shift;
-    $self->pause;
+    my $self  = shift;
     my $async = '';
     $self->client->async->post(
         '/template' => sub {

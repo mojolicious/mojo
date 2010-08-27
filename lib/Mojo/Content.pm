@@ -88,7 +88,7 @@ sub generate_body_chunk {
     # Get chunk
     my $chunk = $buffer->empty;
 
-    # Pause or EOF
+    # EOF
     return $self->{_eof} ? '' : undef unless length $chunk;
 
     return $chunk;

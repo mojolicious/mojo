@@ -80,7 +80,6 @@ get '/stream' => sub {
         my $self = shift;
         my $chunk = shift @$chunks || '';
         $self->write_chunk($chunk, $chunk ? $cb : undef);
-        $self->finish unless $chunk;
     };
     $cb->($self->res);
     $self->tx->resume;

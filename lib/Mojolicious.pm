@@ -171,7 +171,7 @@ sub dispatch {
     }
 
     # Delayed
-    $self->log->debug('Delayed response.')
+    $self->log->debug('Waiting for delayed rendering.')
       unless $c->stash->{'mojo.rendered'};
 }
 

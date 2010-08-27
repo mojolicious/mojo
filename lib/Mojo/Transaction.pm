@@ -87,8 +87,13 @@ sub res { croak 'Method "res" not implemented by subclass' }
 sub resume {
     my $self = shift;
 
-    # Resume
-    $self->{_state} = 'write' unless $self->is_writing;
+    # Delayed
+    if (($self->{_state} || '') eq 'paused') {
+        $self->{_state} = 'write_body';
+    }
+
+    # Writing
+    elsif (!$self->is_writing) { $self->{_state} = 'write' }
 
     # Callback
     $self->resume_cb->($self);

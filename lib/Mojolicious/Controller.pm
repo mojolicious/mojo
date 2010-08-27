@@ -26,9 +26,6 @@ sub finish {
 
     # Render
     $self->app->routes->auto_render($self);
-
-    # Finish
-    $self->app->finish($self);
 }
 
 sub finished {
@@ -288,11 +285,34 @@ sub render_text {
 sub rendered {
     my $self = shift;
 
+    # Resume
+    $self->tx->resume;
+
     # Rendered
     $self->stash->{'mojo.rendered'} = 1;
 
-    # Resume
-    $self->tx->resume;
+    # Stash
+    my $stash = $self->stash;
+
+    # Already finished
+    return $self if $stash->{'mojo.finished'};
+
+    # Transaction
+    my $tx = $self->tx;
+
+    # Application
+    my $app = $self->app;
+
+    # Hook
+    $app->plugins->run_hook_reverse(after_dispatch => $self);
+
+    # Session
+    $app->session->store($self);
+
+    # Finished
+    $stash->{'mojo.finished'} = 1;
+
+    return $self;
 }
 
 sub send_message {

@@ -170,37 +170,9 @@ sub dispatch {
         $c->render_not_found unless $c->res->code;
     }
 
-    # Finish
-    $self->finish($c);
-}
-
-sub finish {
-    my ($self, $c) = @_;
-
-    # Stash
-    my $stash = $c->stash;
-
-    # Already finished
-    return if $stash->{finished};
-
     # Delayed
-    $self->log->debug('Delayed response.') and return
-      unless $stash->{'mojo.rendered'};
-
-    # Transaction
-    my $tx = $c->tx;
-
-    # Resume WebSocket
-    $tx->resume if $tx->is_websocket;
-
-    # Hook
-    $self->plugins->run_hook_reverse(after_dispatch => $c);
-
-    # Session
-    $self->session->store($c);
-
-    # Finished
-    $stash->{finished} = 1;
+    $self->log->debug('Delayed response.')
+      unless $c->stash->{'mojo.rendered'};
 }
 
 # Bite my shiny metal ass!
@@ -540,12 +512,6 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
 The heart of every Mojolicious application, calls the static and routes
 dispatchers for every request.
-
-=head2 C<finish>
-
-    $mojo->finish($c);
-
-Clean up after processing a request, usually called automatically.
 
 =head2 C<handler>
 

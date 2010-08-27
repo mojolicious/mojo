@@ -371,7 +371,6 @@ get '/subrequest_async' => sub {
         '/template' => sub {
             my $client = shift;
             $self->render_text($client->res->body . $self->stash->{'async'});
-            $self->finish;
             $async = $self->stash->{async};
         }
     )->process;

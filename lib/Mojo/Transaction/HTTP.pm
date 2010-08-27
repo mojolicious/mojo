@@ -381,7 +381,17 @@ sub server_write {
             $self->{_offset} = $self->{_offset} + $written;
 
             # Append
-            $chunk .= $buffer if defined $buffer;
+            if (defined $buffer) {
+                $chunk .= $buffer;
+                delete $self->{_delay};
+            }
+
+            # Delayed
+            else {
+                my $delay = delete $self->{_delay};
+                $self->{_state} = 'paused' if $delay;
+                $self->{_delay} = 1 unless $delay;
+            }
 
             # Chunked
             $self->{_write} = 1 if $res->is_chunked;

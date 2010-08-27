@@ -511,7 +511,8 @@ Note that this method is EXPERIMENTAL and might change without warning!
     $mojo->dispatch($c);
 
 The heart of every Mojolicious application, calls the static and routes
-dispatchers for every request.
+dispatchers for every request and passes them a L<Mojolicious::Controller>
+object.
 
 =head2 C<handler>
 
@@ -532,7 +533,7 @@ Load a plugin.
     $mojo->process($c);
 
 This method can be overloaded to do logic on a per request basis, by default
-just calls dispatch.
+just calls dispatch and passes it a L<Mojolicious::Controller> object.
 Generally you will use a plugin or controller instead of this, consider it
 the sledgehammer in your toolbox.
 

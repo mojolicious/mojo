@@ -165,7 +165,8 @@ C<log/mojo.log> if there's a log directory.
     $tx = $mojo->handler($tx);
 
 The handler is the main entry point to your application or framework and
-will be called for each new transaction.
+will be called for each new transaction, usually a L<Mojo::Transaction::HTTP>
+or L<Mojo::Transaction::WebSocket> object.
 
     sub handler {
         my ($self, $tx) = @_;

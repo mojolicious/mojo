@@ -82,7 +82,7 @@ get '/stream' => sub {
         $self->write_chunk($chunk, $chunk ? $cb : undef);
     };
     $cb->($self->res);
-    $self->tx->resume;
+    $self->rendered;
 };
 
 # GET /finished

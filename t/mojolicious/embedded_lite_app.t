@@ -107,7 +107,7 @@ sub handler {
     $c->res->code(200);
     my $test = $c->param('test');
     $c->res->body("Hello $test!");
-    $c->tx->resume;
+    $c->rendered;
 }
 
 package main;

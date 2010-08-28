@@ -167,7 +167,7 @@ post '/with/body/and/headers/desc' => sub {
 
 # GET /template_inheritance
 get '/template_inheritance' =>
-  sub { shift->render(template => 'template_inheritance') };
+  sub { shift->render('template_inheritance', {}) };
 
 # GET /layout_without_inheritance
 get '/layout_without_inheritance' => sub {

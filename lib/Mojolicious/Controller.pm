@@ -94,7 +94,7 @@ sub render {
     # Template as single argument
     my $stash = $self->stash;
     my $template;
-    $template = shift if (@_ % 2 && !ref $_[0]) || (!@_ % 2 && ref $_[1]);
+    $template = shift if (@_ % 2 && !ref $_[0]) || (!(@_ % 2) && ref $_[1]);
 
     # Arguments
     my $args = ref $_[0] ? $_[0] : {@_};

@@ -94,7 +94,7 @@ sub render {
     # Template as single argument
     my $stash = $self->stash;
     my $template;
-    $template = shift if (@_ % 2 && !ref $_[0]) || (!(@_ % 2) && ref $_[1]);
+    $template = shift if @_ % 2 && !ref $_[0];
 
     # Arguments
     my $args = ref $_[0] ? $_[0] : {@_};
@@ -523,7 +523,6 @@ Prepare a redirect response.
     $c->render(handler => 'something');
     $c->render('foo/bar');
     $c->render('foo/bar', format => 'html');
-    $c->render('foo/bar', {format => 'html'});
 
 This is a wrapper around L<MojoX::Renderer> exposing pretty much all
 functionality provided by it.

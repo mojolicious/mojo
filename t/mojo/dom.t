@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 160;
+use Test::More tests => 161;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -410,3 +410,9 @@ is($dom->at('div')->attrs->{test2}, '', 'empty attribute value');
 $dom->parse(qq/<div >content<\/div>/);
 ok($dom->at('div'), 'tag found');
 is($dom->at('div')->text, 'content', 'right text');
+
+# Class selector with hypen
+$dom->parse(qq/<div class="a">A<\/div><div class="a-1">A1<\/div>/);
+@div = ();
+$dom->find('.a')->each(sub { push @div, shift->text });
+is_deeply(\@div, [qw/A/], 'found first element only');

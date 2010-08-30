@@ -92,7 +92,9 @@ sub parse {
         $asset->add_chunk($self->buffer->remove($need)) if $need > 0;
 
         # Done
-        $self->{_state} = 'done' if $length <= $self->raw_body_size;
+        $self->{_state} = 'done'
+          if $length <= $self->chunked_buffer->raw_size
+              - ($self->{_header_size} || 0);
     }
 
     return $self;

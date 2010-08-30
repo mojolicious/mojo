@@ -15,8 +15,7 @@ __PACKAGE__->attr('read_cb');
 __PACKAGE__->attr([qw/buffer chunked_buffer/] => sub { Mojo::ByteStream->new }
 );
 __PACKAGE__->attr(headers => sub { Mojo::Headers->new });
-__PACKAGE__->attr(raw_header_size => 0);
-__PACKAGE__->attr(relaxed         => 0);
+__PACKAGE__->attr(relaxed => 0);
 
 sub body_contains {
     croak 'Method "body_contains" not implemented by subclass';
@@ -201,7 +200,9 @@ sub parse {
             }
 
             # Done
-            $self->{_state} = 'done' if $length <= $self->raw_body_size;
+            $self->{_state} = 'done'
+              if $length <= $self->chunked_buffer->raw_size
+                  - ($self->{_header_size} || 0);
         }
     }
 
@@ -228,17 +229,14 @@ sub parse_until_body {
     my ($self, $chunk) = @_;
 
     # Buffer
-    my $fbuffer = $self->chunked_buffer;
-    $fbuffer->add_chunk($chunk);
+    my $buffer = $self->chunked_buffer;
+    $buffer->add_chunk($chunk);
 
     # Parser started
     unless ($self->{_state}) {
 
         # Update size
-        my $length            = $fbuffer->size;
-        my $raw_length        = $fbuffer->raw_size;
-        my $raw_header_length = $raw_length - $length;
-        $self->raw_header_size($raw_header_length);
+        $self->{_header_size} = $buffer->raw_size - $buffer->size;
 
         # Headers
         $self->{_state} = 'headers';
@@ -248,15 +246,6 @@ sub parse_until_body {
     $self->_parse_headers if ($self->{_state} || '') eq 'headers';
 
     return $self;
-}
-
-sub raw_body_size {
-    my $self = shift;
-
-    # Calculate
-    my $length        = $self->chunked_buffer->raw_size;
-    my $header_length = $self->raw_header_size;
-    return $length - $header_length;
 }
 
 sub write {
@@ -407,11 +396,8 @@ sub _parse_headers {
     $headers->parse;
 
     # Update size
-    my $buffer            = $headers->buffer;
-    my $length            = $buffer->size;
-    my $raw_length        = $buffer->raw_size;
-    my $raw_header_length = $raw_length - $length;
-    $self->raw_header_size($raw_header_length);
+    my $buffer = $headers->buffer;
+    $self->{_header_size} = $buffer->raw_size - $buffer->size;
 
     # Done
     $self->{_state} = 'body' if $headers->is_done;
@@ -478,12 +464,6 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
     $content    = $content->relaxed(1);
 
 Activate relaxed parsing for HTTP 0.9.
-
-=head2 C<raw_header_size>
-
-    my $size = $content->raw_header_size;
-
-Raw size of headers in bytes.
 
 =head1 METHODS
 
@@ -606,12 +586,6 @@ Parse body once.
     );
 
 Parse and stop after headers.
-
-=head2 C<raw_body_size>
-
-    my $size = $content->raw_body_size;
-
-Raw size of body in bytes.
 
 =head2 C<write>
 

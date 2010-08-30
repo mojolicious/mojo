@@ -347,7 +347,9 @@ Web development for humans, making hard things possible and everything fun.
 
     @@ clock.html.ep
     % my ($second, $minute, $hour) = (localtime(time))[0, 1, 2];
-    The time is <%= $hour %>:<%= $minute %>:<%= $second %>.
+    <%= link_to clock => begin %>
+        The time is <%= $hour %>:<%= $minute %>:<%= $second %>.
+    <% end %>
 
 For more user friendly documentation see L<Mojolicious::Guides> and
 L<Mojolicious::Lite>.

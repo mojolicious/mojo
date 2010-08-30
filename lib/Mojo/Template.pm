@@ -16,7 +16,7 @@ use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 262144;
 __PACKAGE__->attr([qw/auto_escape compiled namespace/]);
 __PACKAGE__->attr([qw/append code prepend/] => '');
 __PACKAGE__->attr(capture_end               => 'end');
-__PACKAGE__->attr(capture_start             => 'block');
+__PACKAGE__->attr(capture_start             => 'begin');
 __PACKAGE__->attr(comment_mark              => '#');
 __PACKAGE__->attr(encoding                  => 'UTF-8');
 __PACKAGE__->attr(escape_mark               => '=');
@@ -576,10 +576,10 @@ Whitespace characters around tags can be trimmed with a special tag ending.
 
     <%= All whitespace characters around this expression will be trimmed =%>
 
-You can capture whole template blocks for reuse later with the C<block> and
+You can capture whole template blocks for reuse later with the C<begin> and
 C<end> keywords.
 
-    <% my $block = block %>
+    <% my $block = begin %>
         <% my $name = shift; =%>
         Hello <%= $name %>.
     <% end %>
@@ -674,18 +674,18 @@ Append Perl code to compiled template.
 
 Keyword indicating the end of a capture block, defaults to C<end>.
 
-    <% my $block = block %>
+    <% my $block = begin %>
         Some data!
     <% end %>
 
 =head2 C<capture_start>
 
     my $capture_start = $mt->capture_start;
-    $mt               = $mt->capture_start('block');
+    $mt               = $mt->capture_start('begin');
 
-Keyword indicating the start of a capture block, defaults to C<block>.
+Keyword indicating the start of a capture block, defaults to C<begin>.
 
-    <% my $block = block %>
+    <% my $block = begin %>
         Some data!
     <% end %>
 

@@ -65,13 +65,13 @@ is($output, 'test', 'multiple empty lines trimmed');
 
 # Trim expression tags
 $mt     = Mojo::Template->new;
-$output = $mt->render('    <%= filter block =%><html><% end =%>    ');
+$output = $mt->render('    <%= filter begin =%><html><% end =%>    ');
 is($output, '<html>', 'expression tags trimmed');
 
 # Expression block (extra whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $block =  block   =%>
+<% my $block =  begin   =%>
 <html>
 <%   end  =%>
 <%= $block->() %>
@@ -81,7 +81,7 @@ is($output, "<html>\n", 'expression block');
 # Escaped expression block (extra whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $block =  block %>
+<% my $block =  begin %>
 <html>
 <% end  %>
 <%== $block->() %>
@@ -91,7 +91,7 @@ is($output, "\n\n&lt;html&gt;\n\n", 'escaped expression block');
 # Captured escaped expression block (extra whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<%== my $result = filter block  =%>
+<%== my $result = filter begin  =%>
 <html>
 <%  end =%>
 <%= $result =%>
@@ -101,7 +101,7 @@ is($output, '&lt;html&gt;<html>', 'captured escaped expression block');
 # Capture lines (extra whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = escape filter block                  %>
+<% my $result = escape filter begin                  %>
 <html>
 <%                        end %>
 %= $result
@@ -111,28 +111,28 @@ is($output, "\n\n&lt;html&gt;\n", 'captured lines');
 # Capture tags
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = escape filter block %><html><% end %><%= $result %>
+<% my $result = escape filter begin %><html><% end %><%= $result %>
 EOF
 is($output, "&lt;html&gt;\n", 'capture tags');
 
 # Capture tags (alternative)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = escape filter block %><html><% end %><%= $result %>
+<% my $result = escape filter begin %><html><% end %><%= $result %>
 EOF
 is($output, "&lt;html&gt;\n", 'capture tags');
 
 # Capture tags with appended code
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = escape( filter block %><html><% end ); %><%= $result %>
+<% my $result = escape( filter begin %><html><% end ); %><%= $result %>
 EOF
 is($output, "&lt;html&gt;\n", 'capture tags with appended code');
 
 # Capture tags with appended code (alternative)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = escape( filter block %><html><% end ); %><%= $result %>
+<% my $result = escape( filter begin %><html><% end ); %><%= $result %>
 EOF
 is($output, "&lt;html&gt;\n", 'capture tags with appended code');
 
@@ -140,7 +140,7 @@ is($output, "&lt;html&gt;\n", 'capture tags with appended code');
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 <% my $result = filter
-  block %><%= escape filter block %><html><% end
+  begin %><%= escape filter begin %><html><% end
   %><% end %><%= $result %>
 EOF
 is($output, "&lt;html&gt;\n", 'nested capture tags');
@@ -148,8 +148,8 @@ is($output, "&lt;html&gt;\n", 'nested capture tags');
 # Nested capture tags (alternative)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = filter block =%>
-    <%= escape filter block =%>
+<% my $result = filter begin =%>
+    <%= escape filter begin =%>
         <html>
     <% end =%>
 <% end =%>
@@ -160,7 +160,7 @@ is($output, '&lt;html&gt;', 'nested capture tags');
 # Advanced capturing (extra whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $block =  block  =%>
+<% my $block =  begin  =%>
 <% my $name = shift; =%>
 Hello <%= $name %>.
 <%  end  =%>
@@ -175,7 +175,7 @@ EOF
 # Advanced capturing with tags
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $block = block =%>
+<% my $block = begin =%>
     <% my $name = shift; =%>
     Hello <%= $name %>.
 <% end =%>
@@ -190,7 +190,7 @@ EOF
 # Advanced capturing with tags (alternative)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $block = block =%>
+<% my $block = begin =%>
     <% my $name = shift; =%>
     Hello <%= $name %>.
 <% end =%>
@@ -206,13 +206,13 @@ EOF
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 <% my
-$block1 = block =%>
+$block1 = begin =%>
     <% my $name = shift; =%>
     Hello <%= $name %>.
 <% end =%>
 <% my
 $block2 =
-block =%>
+begin =%>
     <% my $name = shift; =%>
     Bye <%= $name %>.
 <% end =%>
@@ -228,7 +228,7 @@ EOF
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 % my $i = 2;
-<%= filter block %>
+<%= filter begin %>
     <%= $i++ %>
 <% end for 1 .. 3; %>
 EOF

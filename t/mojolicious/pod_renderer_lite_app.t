@@ -60,6 +60,6 @@ __DATA__
 test123<%= pod_to_html "=head1 lalala\n\nC<test>"%>
 
 @@ block.html.ep
-test321<%= pod_to_html {%>=head2 lalala
+test321<%= pod_to_html begin %>=head2 lalala
 
 C<test><% end %>

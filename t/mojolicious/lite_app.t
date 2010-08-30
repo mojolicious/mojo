@@ -1250,29 +1250,29 @@ __DATA__
 @@ tags.html.ep
 <%= tag 'foo' %>
 <%= tag 'foo', bar => 'baz' %>
-<%= tag 'foo', one => 'two', three => 'four' => block %>Hello<% end %>
+<%= tag 'foo', one => 'two', three => 'four' => begin %>Hello<% end %>
 <%= link_to '/path' %>
 <%= link_to 'http://example.com/', title => 'Foo', sub { 'Foo' } %>
-<%= link_to 'http://example.com/' => block %>Example<% end %>
+<%= link_to 'http://example.com/' => begin %>Example<% end %>
 <%= link_to 'index' %>
 <%= link_to 'tags', {test => 23}, title => 'Foo' %>
-<%= form_for 'index', method => 'post' => block %><%= input 'foo' %><% end %>
-<%= form_for 'tags', {test => 24}, method => 'post' => block %>
+<%= form_for 'index', method => 'post' => begin %><%= input 'foo' %><% end %>
+<%= form_for 'tags', {test => 24}, method => 'post' => begin %>
     <%= input 'foo' %>
     <%= input 'foo', type => 'checkbox' %>
     <%= input 'a', type => 'checkbox' %>
 <% end %>
-<%= form_for '/' => block %>
-    <%= label 'foo' => block %>Name<% end %>
+<%= form_for '/' => begin %>
+    <%= label 'foo' => begin %>Name<% end %>
     <%= input 'foo' %>
 <% end %>
 <%= input 'a' %>
 <%= input 'a', value => 'c' %>
 <%= script '/script.js' %>
-<%= script block %>
+<%= script begin %>
     var a = 'b';
 <% end %>
-<%= script type => 'foo' => block %>
+<%= script type => 'foo' => begin %>
     var a = 'b';
 <% end %>
 <%= img '/foo.jpg' %>
@@ -1293,30 +1293,30 @@ Test ok
 
 @@ template_inheritance.html.ep
 % layout 'template_inheritance';
-<% content header => block =%>
+<% content header => begin =%>
 <title>Welcome</title>
 <% end =%>
-<% content sidebar => block =%>
+<% content sidebar => begin =%>
 Sidebar!
 <% end =%>
 Hello World!
 
 @@ layouts/template_inheritance.html.ep
 % stash foo => 'Default';
-<%= content header => block =%>
+<%= content header => begin =%>
 Default header!
 <% end =%>
-<%= content sidebar => block =%>
+<%= content sidebar => begin =%>
 <%= stash 'foo' %> sidebar!
 <% end =%>
 %= content
-<%= content footer => block =%>
+<%= content footer => begin =%>
 Default footer!
 <% end =%>
 
 @@ double_inheritance.html.ep
 % extends 'template_inheritance';
-<% content sidebar => block =%>
+<% content sidebar => begin =%>
 Sidebar too!
 <% end =%>
 
@@ -1376,7 +1376,7 @@ Just works!\
 layouted <%== content %>
 
 @@ layouts/with_block.html.epl
-<% my $block = block %>
+<% my $block = begin %>
 <% my ($one, $two) = @_; %>
 One: <%= $one %>
 Two: <%= $two %>

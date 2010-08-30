@@ -1,4 +1,4 @@
-<% my $block = block %>
+<% my $block = begin %>
 <% my $name = shift; =%>
 Hello <%= $name %>.
 <% end %>

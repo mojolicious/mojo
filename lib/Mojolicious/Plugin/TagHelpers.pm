@@ -161,16 +161,16 @@ Note that this module is EXPERIMENTAL and might change without warning!
 
 =item form_for
 
-    <%= form_for login => (method => 'post') => block %>
+    <%= form_for login => (method => 'post') => begin %>
         <%= input 'first_name' %>
     <% end %>
-    <%= form_for login => {foo => 'bar'} => (method => 'post') => block %>
+    <%= form_for login => {foo => 'bar'} => (method => 'post') => begin %>
         <%= input 'first_name' %>
     <% end %>
-    <%= form_for '/login' => (method => 'post') => block %>
+    <%= form_for '/login' => (method => 'post') => begin %>
         <%= input 'first_name' %>
     <% end %>
-    <%= form_for 'http://kraih.com/login' => (method => 'post') => block %>
+    <%= form_for 'http://kraih.com/login' => (method => 'post') => begin %>
         <%= input 'first_name' %>
     <% end %>
 
@@ -192,25 +192,25 @@ Generate form input element.
 
 =item label
 
-    <%= label first_name => block %>First name<% end %>
+    <%= label first_name => begin %>First name<% end %>
 
 Generate form label.
 
 =item link_to
 
-    <%= link_to index => block %>Home<% end %>
-    <%= link_to index => {foo => 'bar'} => (class => 'links') => block %>
+    <%= link_to index => begin %>Home<% end %>
+    <%= link_to index => {foo => 'bar'} => (class => 'links') => begin %>
         Home
     <% end %>
-    <%= link_to '/path/to/file' => block %>File<% end %>
-    <%= link_to 'http://mojolicious.org' => block %>Mojolicious<% end %>
+    <%= link_to '/path/to/file' => begin %>File<% end %>
+    <%= link_to 'http://mojolicious.org' => begin %>Mojolicious<% end %>
 
 Generate link to route, path or URL.
 
 =item script
 
     <%= script '/script.js' %>
-    <%= script block %>
+    <%= script begin %>
         var a = 'b';
     <% end %>
 
@@ -220,7 +220,7 @@ Generate script tag.
 
     <%= tag 'div' %>
     <%= tag 'div', id => 'foo' %>
-    <%= tag div => block %>Content<% end %>
+    <%= tag div => begin %>Content<% end %>
 
 HTML5 tag generator.
 

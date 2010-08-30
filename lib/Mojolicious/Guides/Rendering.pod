@@ -239,7 +239,7 @@ used to generate C<HTML> tags.
 
     <%= script '/script.js' %>
 
-    <%= script block %>
+    <%= script begin %>
         var a = 'b';
     <% end %>
 
@@ -318,7 +318,7 @@ Of course you can also pass stash values.
 It's never fun to repeat yourself, thats why you can build reusable template
 blocks in C<ep> that work very similar normal Perl functions.
 
-    <% my $block = block %>
+    <% my $block = begin %>
         <% my $name = shift; %>
         Hello <%= $name %>.
     <% end %>
@@ -330,7 +330,7 @@ containing only the closing bracket.
 Whitespace characters between bracket and tag are not allowed, to
 differentiate between template blocks and normal Perl code.
 
-    <% my $block = block %>
+    <% my $block = begin %>
         <% my $name = shift; %>
         Hello <%= $name %>.
     <% end %>
@@ -359,7 +359,7 @@ the template to the layout.
 
    @@ foo/bar.html.ep
    % layout 'mylayout';
-   <% content header => block %>
+   <% content header => begin %>
        <title>MyApp!</title>
    <% end %>
    Hello World!
@@ -381,10 +381,10 @@ extended templates don't get prefixed with C<layout/>.
     @@ first.html.ep
     %# "<div>First header!First footer!</div>"
     <div>
-    <%= content header => block %>
+    <%= content header => begin %>
         First header!
     <% end %>
-    <%= content footer => block %>
+    <%= content footer => begin %>
         First footer!
     <% end %>
     </div>
@@ -392,14 +392,14 @@ extended templates don't get prefixed with C<layout/>.
     @@ second.html.ep
     %# "<div>Second header!First footer!</div>"
     % extends 'first';
-    <% content header => block %>
+    <% content header => begin %>
         Second header!
     <% end %>
 
     @@ third.html.ep
     %# "<div>Second header!Third footer!</div>"
     % extends 'second';
-    <% content footer => block %>
+    <% content footer => begin %>
         Third footer!
     <% end %>
 

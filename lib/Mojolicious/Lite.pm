@@ -230,10 +230,10 @@ simply equal to the route without non-word characters.
     __DATA__
 
     @@ index.html.ep
-    <%= link_to foo => block %>
+    <%= link_to foo => begin %>
         Foo
     <% end %>.
-    <%= link_to bar => block %>
+    <%= link_to bar => begin %>
         Bar
     <% end %>.
 
@@ -267,9 +267,9 @@ Template blocks can be reused like functions in Perl scripts.
     __DATA__
 
     @@ block.html.ep
-    <% my $link = block %>
+    <% my $link = begin %>
         <% my ($url, $name) = @_; %>
-        Try <%= link_to $url => block %><%= $name %><% end %>!
+        Try <%= link_to $url => begin %><%= $name %><% end %>!
     <% end %>
     <!doctype html><html>
         <head><title>Sebastians Frameworks!</title></head>
@@ -293,12 +293,12 @@ other.
     @@ first.html.ep
     <!doctype html><html>
         <head>
-            <%= content header => block %>
+            <%= content header => begin %>
                 <title>Hi!</title>
             <% end %>
         </head>
         <body>
-            <%= content body => block %>
+            <%= content body => begin %>
                 First page!
             <% end %>
         </body>
@@ -306,10 +306,10 @@ other.
 
     @@ second.html.ep
     % extends 'first';
-    <% content header => block %>
+    <% content header => begin %>
         <title>Howdy!</title>
     <% end %>
-    <% content body => block %>
+    <% content body => begin %>
         Second page!
     <% end %>
 
@@ -450,7 +450,7 @@ multiple features at once.
     @@ index.html.ep
     % layout 'funky';
     Who is groovy?
-    <%= form_for test => (method => 'post') => block %>
+    <%= form_for test => (method => 'post') => begin %>
         <%= input 'groovy', type => 'text' %>
         <input type="submit" value="Woosh!" />
     <% end %>
@@ -460,7 +460,7 @@ multiple features at once.
     <%= include 'menu' %>
 
     @@ menu.html.ep
-    <%= link_to index => block %>
+    <%= link_to index => begin %>
         Try again
     <% end %>
 
@@ -577,7 +577,7 @@ request, this is very useful in combination with C<redirect_to>.
 
     @@ login.html.ep
     % layout 'default';
-    <%= form_for login => block %>
+    <%= form_for login => begin %>
         <% if (param 'name') { %>
             <b>Wrong name or password, please try again.</b><br />
         <% } %>
@@ -594,7 +594,7 @@ request, this is very useful in combination with C<redirect_to>.
         <b><%= $message %></b><br />
     <% } %>
     Welcome <%= session 'name' %>!<br />
-    <%= link_to logout => block %>
+    <%= link_to logout => begin %>
         Logout
     <% end %>
 

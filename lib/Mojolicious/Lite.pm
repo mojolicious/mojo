@@ -230,12 +230,12 @@ simply equal to the route without non-word characters.
     __DATA__
 
     @@ index.html.ep
-    <%= link_to foo => {%>
+    <%= link_to foo => block %>
         Foo
-    <%}%>.
-    <%= link_to bar => {%>
+    <% end %>.
+    <%= link_to bar => block %>
         Bar
-    <%}%>.
+    <% end %>.
 
     @@ foo.html.ep
     <a href="<%= url_for 'index' %>">Home</a>.
@@ -267,10 +267,10 @@ Template blocks can be reused like functions in Perl scripts.
     __DATA__
 
     @@ block.html.ep
-    <% my $link = {%>
+    <% my $link = block %>
         <% my ($url, $name) = @_; %>
-        Try <%= link_to $url => {%><%= $name %><%}%>!
-    <%}%>
+        Try <%= link_to $url => block %><%= $name %><% end %>!
+    <% end %>
     <!doctype html><html>
         <head><title>Sebastians Frameworks!</title></head>
         <body>
@@ -292,18 +292,26 @@ other.
 
     @@ first.html.ep
     <!doctype html><html>
-        <head><%= content header => {%><title>Hi!</title><%}%></head>
-        <body><%= content body => {%>First page!<%}%></body>
+        <head>
+            <%= content header => block %>
+                <title>Hi!</title>
+            <% end %>
+        </head>
+        <body>
+            <%= content body => block %>
+                First page!
+            <% end %>
+        </body>
     </html>
 
     @@ second.html.ep
     % extends 'first';
-    <% content header => {%>
+    <% content header => block %>
         <title>Howdy!</title>
-    <%}%>
-    <% content body => {%>
+    <% end %>
+    <% content body => block %>
         Second page!
-    <%}%>
+    <% end %>
 
 Route placeholders allow capturing parts of a request path until a C</> or
 C<.> separator occurs, results will be stored by name in the C<stash> and
@@ -442,19 +450,19 @@ multiple features at once.
     @@ index.html.ep
     % layout 'funky';
     Who is groovy?
-    <%= form_for test => (method => 'post') => {%>
+    <%= form_for test => (method => 'post') => block %>
         <%= input 'groovy', type => 'text' %>
         <input type="submit" value="Woosh!" />
-    <%}%>
+    <% end %>
 
     @@ welcome.html.ep
     <%= $groovy %> is groovy!
     <%= include 'menu' %>
 
     @@ menu.html.ep
-    <%= link_to index => {%>
+    <%= link_to index => block %>
         Try again
-    <%}%>
+    <% end %>
 
     @@ layouts/funky.html.ep
     <!doctype html><html>
@@ -569,7 +577,7 @@ request, this is very useful in combination with C<redirect_to>.
 
     @@ login.html.ep
     % layout 'default';
-    <%= form_for login => {%>
+    <%= form_for login => block %>
         <% if (param 'name') { %>
             <b>Wrong name or password, please try again.</b><br />
         <% } %>
@@ -578,7 +586,7 @@ request, this is very useful in combination with C<redirect_to>.
         Password:<br />
         <%= input pass => (type => 'text') %><br />
         <input type="submit" value="Login" />
-    <%}%>
+    <% end %>
 
     @@ index.html.ep
     % layout 'default';
@@ -586,9 +594,9 @@ request, this is very useful in combination with C<redirect_to>.
         <b><%= $message %></b><br />
     <% } %>
     Welcome <%= session 'name' %>!<br />
-    <%= link_to logout => {%>
+    <%= link_to logout => block %>
         Logout
-    <%}%>
+    <% end %>
 
 Note that you should use a custom C<secret> to make signed cookies really secure.
 

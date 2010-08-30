@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 0.999930 2010-08-17 00:00:00
+        - Deprecated old Mojo::Template block syntax and added a very pretty
+          replacement.
         - Added EXPERIMENTAL support for --mode and --home options to all
           Mojolicious commands.
         - Added EXPERIMENTAL write, write_chunk and rendered methods to

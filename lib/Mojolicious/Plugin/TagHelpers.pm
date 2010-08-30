@@ -161,18 +161,18 @@ Note that this module is EXPERIMENTAL and might change without warning!
 
 =item form_for
 
-    <%= form_for login => (method => 'post') => {%>
+    <%= form_for login => (method => 'post') => block %>
         <%= input 'first_name' %>
-    <%}%>
-    <%= form_for login => {foo => 'bar'} => (method => 'post') => {%>
+    <% end %>
+    <%= form_for login => {foo => 'bar'} => (method => 'post') => block %>
         <%= input 'first_name' %>
-    <%}%>
-    <%= form_for '/login' => (method => 'post') => {%>
+    <% end %>
+    <%= form_for '/login' => (method => 'post') => block %>
         <%= input 'first_name' %>
-    <%}%>
-    <%= form_for 'http://mojolicious.org/login' => (method => 'post') => {%>
+    <% end %>
+    <%= form_for 'http://kraih.com/login' => (method => 'post') => block %>
         <%= input 'first_name' %>
-    <%}%>
+    <% end %>
 
 Generate form for route, path or URL.
 
@@ -192,25 +192,27 @@ Generate form input element.
 
 =item label
 
-    <%= label first_name => {%>First name<%}%>
+    <%= label first_name => block %>First name<% end %>
 
 Generate form label.
 
 =item link_to
 
-    <%= link_to index => {%>Home<%}%>
-    <%= link_to index => {foo => 'bar'} => (class => 'links') => {%>Home<%}%>
-    <%= link_to '/path/to/file' => {%>File<%}%>
-    <%= link_to 'http://mojolicious.org' => {%>Mojolicious<%}%>
+    <%= link_to index => block %>Home<% end %>
+    <%= link_to index => {foo => 'bar'} => (class => 'links') => block %>
+        Home
+    <% end %>
+    <%= link_to '/path/to/file' => block %>File<% end %>
+    <%= link_to 'http://mojolicious.org' => block %>Mojolicious<% end %>
 
 Generate link to route, path or URL.
 
 =item script
 
     <%= script '/script.js' %>
-    <%= script {%>
+    <%= script block %>
         var a = 'b';
-    <%}%>
+    <% end %>
 
 Generate script tag.
 
@@ -218,7 +220,7 @@ Generate script tag.
 
     <%= tag 'div' %>
     <%= tag 'div', id => 'foo' %>
-    <%= tag div => {%>Content<%}%>
+    <%= tag div => block %>Content<% end %>
 
 HTML5 tag generator.
 

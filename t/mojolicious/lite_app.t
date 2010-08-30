@@ -791,20 +791,19 @@ $t->post_ok('/with/body/and/headers/desc', {with => 'header'}, 'body', 'desc')
 $t->get_ok('/template_inheritance')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is(
-    "<title>Welcome</title>\nSidebar!\nHello World!\nDefault footer!\n");
+  ->content_is("<title>Welcome</title>Sidebar!Hello World!\nDefault footer!");
 
 # GET /layout_without_inheritance
 $t->get_ok('/layout_without_inheritance')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("Default header!\nDefault sidebar!\nDefault footer!\n");
+  ->content_is('Default header!Default sidebar!Default footer!');
 
 # GET /double_inheritance
 $t->get_ok('/double_inheritance')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("<title>Welcome</title>\nSidebar too!\nDefault footer!\n");
+  ->content_is('<title>Welcome</title>Sidebar too!Default footer!');
 
 # GET /nested-includes
 $t->get_ok('/nested-includes')->status_is(200)
@@ -835,7 +834,7 @@ $t->get_ok('/outerinnerlayout')->status_is(200)
 $t->get_ok('/withblocklayout')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("with_block \nOne: one\nTwo: two\n\n");
+  ->content_is("\nwith_block \n\nOne: one\nTwo: two\n\n");
 
 # GET /session_cookie
 $t->get_ok('/session_cookie')->status_is(200)
@@ -1251,31 +1250,31 @@ __DATA__
 @@ tags.html.ep
 <%= tag 'foo' %>
 <%= tag 'foo', bar => 'baz' %>
-<%= tag 'foo', one => 'two', three => 'four' => {%>Hello<%}%>
+<%= tag 'foo', one => 'two', three => 'four' => block %>Hello<% end %>
 <%= link_to '/path' %>
 <%= link_to 'http://example.com/', title => 'Foo', sub { 'Foo' } %>
-<%= link_to 'http://example.com/' => {%>Example<%}%>
+<%= link_to 'http://example.com/' => block %>Example<% end %>
 <%= link_to 'index' %>
 <%= link_to 'tags', {test => 23}, title => 'Foo' %>
-<%= form_for 'index', method => 'post' => {%><%= input 'foo' %><%}%>
-<%= form_for 'tags', {test => 24}, method => 'post' => {%>
+<%= form_for 'index', method => 'post' => block %><%= input 'foo' %><% end %>
+<%= form_for 'tags', {test => 24}, method => 'post' => block %>
     <%= input 'foo' %>
     <%= input 'foo', type => 'checkbox' %>
     <%= input 'a', type => 'checkbox' %>
-<%}%>
-<%= form_for '/' => {%>
-    <%= label 'foo' => {%>Name<%}%>
+<% end %>
+<%= form_for '/' => block %>
+    <%= label 'foo' => block %>Name<% end %>
     <%= input 'foo' %>
-<%}%>
+<% end %>
 <%= input 'a' %>
 <%= input 'a', value => 'c' %>
 <%= script '/script.js' %>
-<%= script {%>
+<%= script block %>
     var a = 'b';
-<%}%>
-<%= script type => 'foo' => {%>
+<% end %>
+<%= script type => 'foo' => block %>
     var a = 'b';
-<%}%>
+<% end %>
 <%= img '/foo.jpg' %>
 <%= img '/foo.jpg', alt => 'image' %>
 
@@ -1294,32 +1293,32 @@ Test ok
 
 @@ template_inheritance.html.ep
 % layout 'template_inheritance';
-%{ content header =>
+<% content header => block =%>
 <title>Welcome</title>
-%}
-%{ content sidebar =>
+<% end =%>
+<% content sidebar => block =%>
 Sidebar!
-%}
+<% end =%>
 Hello World!
 
 @@ layouts/template_inheritance.html.ep
 % stash foo => 'Default';
-%{= content header =>
+<%= content header => block =%>
 Default header!
-%}
-%{= content sidebar =>
+<% end =%>
+<%= content sidebar => block =%>
 <%= stash 'foo' %> sidebar!
-%}
+<% end =%>
 %= content
-%{= content footer =>
+<%= content footer => block =%>
 Default footer!
-%}
+<% end =%>
 
 @@ double_inheritance.html.ep
 % extends 'template_inheritance';
-%{ content sidebar =>
+<% content sidebar => block =%>
 Sidebar too!
-%}
+<% end =%>
 
 @@ nested-includes.html.ep
 Nested <%= include 'outerlayout' %>
@@ -1377,11 +1376,11 @@ Just works!\
 layouted <%== content %>
 
 @@ layouts/with_block.html.epl
-%{ my $block =
+<% my $block = block %>
 <% my ($one, $two) = @_; %>
 One: <%= $one %>
 Two: <%= $two %>
-%}
+<% end %>
 with_block <%= $block->('one', 'two') %>
 
 @@ layouts/app23.html.ep

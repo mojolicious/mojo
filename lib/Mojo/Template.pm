@@ -15,8 +15,8 @@ use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 262144;
 
 __PACKAGE__->attr([qw/auto_escape compiled namespace/]);
 __PACKAGE__->attr([qw/append code prepend/] => '');
-__PACKAGE__->attr(capture_end               => '}');
-__PACKAGE__->attr(capture_start             => '{');
+__PACKAGE__->attr(capture_end               => 'end');
+__PACKAGE__->attr(capture_start             => 'block');
 __PACKAGE__->attr(comment_mark              => '#');
 __PACKAGE__->attr(encoding                  => 'UTF-8');
 __PACKAGE__->attr(escape_mark               => '=');
@@ -31,8 +31,8 @@ __PACKAGE__->attr(trim_mark => '=');
 # Helpers
 my $HELPERS = <<'EOF';
 no strict 'refs'; no warnings 'redefine';
-sub block;
-*block = sub { shift->(@_) };
+sub filter;
+*filter = sub { shift->(@_) };
 sub escape;
 *escape = sub {
     my $v = shift;
@@ -190,52 +190,70 @@ sub parse {
     my $capture_start = quotemeta $self->capture_start;
     my $capture_end   = quotemeta $self->capture_end;
 
+    # DEPRECATED in Comet!
+    # Use "block" and "end" instead of "{" and "}"
     my $mixed_re = qr/
         (
-        $tag_start$capture_start$expr$escp   # Escaped expression (start)
-        |
         $tag_start$expr$escp                 # Escaped expression
-        |
-        $tag_start$capture_start$expr        # Expression (start)
         |
         $tag_start$expr                      # Expression
         |
-        $tag_start$capture_end$cmnt          # Comment (end)
+        $tag_start$cmnt\s*$capture_end       # Comment (end)
         |
-        $tag_start$capture_start$cmnt        # Comment (start)
+        $tag_start$cmnt\}                    # DEPRECATED Comment (end)
         |
         $tag_start$cmnt                      # Comment
         |
-        $tag_start$capture_end               # Code (end)
+        $tag_start\s*$capture_end            # Code (end)
         |
-        $tag_start$capture_start             # Code (start)
+        $tag_start\}                         # DEPRECATED Code (end)
         |
         $tag_start                           # Code
         |
-        $trim$capture_start$tag_end          # Trim end (start)
+        $capture_start\s*$trim$tag_end       # Trim end (start)
+        |
+        \{$trim$tag_end                      # DEPRECATED Trim end (start)
         |
         $trim$tag_end                        # Trim end
         |
-        $capture_start$tag_end               # End (start)
+        $capture_start\s*$tag_end            # End (start)
+        |
+        \{$tag_end                           # DEPRECATED End (start)
         |
         $tag_end                             # End
         )
     /x;
 
-    # Capture regex
-    my $token_capture_re =
-      qr/^($tag_start|$tag_end)($capture_end|$capture_start)/;
+    # Capture end regex
+    my $capture_end_re = qr/
+        ^(
+        $tag_start        # Start
+        )
+        (?:
+        \s*$capture_end   # (end)
+        |
+        \}                # DEPRECATED (end)
+        )
+    /x;
 
     # Tag end regex
     my $end_re = qr/
         ^(
-        $trim$capture_start$tag_end   # Trim end (start)
+            (?:
+            $capture_start\s*$trim$tag_end   # Trim end (start)
+            |
+            \{$trim$tag_end                  # DEPRECATED Trim end (start)
+            )
         )|(
-        $capture_start$tag_end        # End (start)
+            (?:
+            $capture_start\s*$tag_end        # End (start)
+            |
+            \{$tag_end                       # DEPRECATED End (start)
+            )
         )|(
-        $trim$tag_end                 # Trim end
+        $trim$tag_end                        # Trim end
         )|
-        $tag_end                      # End
+        $tag_end                             # End
         $
     /x;
 
@@ -245,40 +263,30 @@ sub parse {
     my @capture_token;
     my $trimming = 0;
     for my $line (split /\n/, $tmpl) {
-        my @capture;
-
-        # Perl line with capture end or start
-        if ($line =~ /^$line_start($capture_end|$capture_start)/) {
-            my $capture = $1;
-            $line =~ s/^($line_start)$capture/$1/;
-            @capture =
-              ("\\$capture" eq $capture_end ? 'cpen' : 'cpst', undef);
-        }
 
         # Perl line with return value that needs to be escaped
         if ($line =~ /^$line_start$expr$escp(.+)?$/) {
-            push @{$self->tree}, [@capture, 'escp', $1];
+            push @{$self->tree}, ['escp', $1];
             $multiline_expression = 0;
             next;
         }
 
         # Perl line with return value
         if ($line =~ /^$line_start$expr(.+)?$/) {
-            push @{$self->tree}, [@capture, 'expr', $1];
+            push @{$self->tree}, ['expr', $1];
             $multiline_expression = 0;
             next;
         }
 
         # Comment line, dummy token needed for line count
         if ($line =~ /^$line_start$cmnt(.+)?$/) {
-            push @{$self->tree}, [@capture];
             $multiline_expression = 0;
             next;
         }
 
         # Perl line without return value
         if ($line =~ /^$line_start([^\>]{1}.*)?$/) {
-            push @{$self->tree}, [@capture, 'code', $1];
+            push @{$self->tree}, ['code', $1];
             $multiline_expression = 0;
             next;
         }
@@ -309,14 +317,9 @@ sub parse {
             # Done trimming
             $trimming = 0 if $trimming && $state ne 'text';
 
-            # Perl token with capture end or start
-            if ($token =~ /$token_capture_re/) {
-                my $tag     = quotemeta $1;
-                my $capture = quotemeta $2;
-                $token =~ s/^($tag)$capture/$1/;
-                @capture_token =
-                  ($capture eq $capture_end ? 'cpen' : 'cpst', undef);
-            }
+            # Capture end
+            @capture_token = ('cpen', undef)
+              if $token =~ s/$capture_end_re/$1/;
 
             # End
             if ($state ne 'text' && $token =~ /$end_re/) {
@@ -573,21 +576,15 @@ Whitespace characters around tags can be trimmed with a special tag ending.
 
     <%= All whitespace characters around this expression will be trimmed =%>
 
-You can capture whole template blocks for reuse later.
+You can capture whole template blocks for reuse later with the C<block> and
+C<end> keywords.
 
-    <% my $block = {%>
+    <% my $block = block %>
         <% my $name = shift; =%>
         Hello <%= $name %>.
-    <%}%>
-    <%= $block->('Sebastian') %>
-    <%= $block->('Sara') %>
-
-    %{ my $block =
-    % my $name = shift;
-    Hello <%= $name %>.
-    %}
-    %= $block->('Baerbel')
-    %= $block->('Wolfgang')
+    <% end %>
+    <%= $block->('Baerbel') %>
+    <%= $block->('Wolfgang') %>
 
 L<Mojo::Template> templates work just like Perl subs (actually they get
 compiled to a Perl sub internally).
@@ -673,24 +670,24 @@ Append Perl code to compiled template.
 =head2 C<capture_end>
 
     my $capture_end = $mt->capture_end;
-    $mt             = $mt->capture_end('}');
+    $mt             = $mt->capture_end('end');
 
-Character indicating the end of a capture block, defaults to C<}>.
+Keyword indicating the end of a capture block, defaults to C<end>.
 
-    %{ $block =
+    <% my $block = block %>
         Some data!
-    %}
+    <% end %>
 
 =head2 C<capture_start>
 
     my $capture_start = $mt->capture_start;
-    $mt               = $mt->capture_start('{');
+    $mt               = $mt->capture_start('block');
 
-Character indicating the start of a capture block, defaults to C<{>.
+Keyword indicating the start of a capture block, defaults to C<block>.
 
-    <% my $block = {%>
+    <% my $block = block %>
         Some data!
-    <%}%>
+    <% end %>
 
 =head2 C<code>
 

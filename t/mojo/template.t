@@ -65,100 +65,107 @@ is($output, 'test', 'multiple empty lines trimmed');
 
 # Trim expression tags
 $mt     = Mojo::Template->new;
-$output = $mt->render('    <%{= block =%><html><%} =%>    ');
+$output = $mt->render('    <%= filter block =%><html><% end =%>    ');
 is($output, '<html>', 'expression tags trimmed');
 
-# Expression block
+# Expression block (extra whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-%{ my $block =
+<% my $block =  block   =%>
 <html>
-%}
-%= $block->()
+<%   end  =%>
+<%= $block->() %>
 EOF
 is($output, "<html>\n", 'expression block');
 
-# Escaped expression block
+# Escaped expression block (extra whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-%{ my $block =
+<% my $block =  block %>
 <html>
-%}
-%== $block->()
+<% end  %>
+<%== $block->() %>
 EOF
-is($output, "&lt;html&gt;\n", 'escaped expression block');
+is($output, "\n\n&lt;html&gt;\n\n", 'escaped expression block');
 
-# Captured escaped expression block
+# Captured escaped expression block (extra whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-%{== my $result = block
+<%== my $result = filter block  =%>
 <html>
-%}
+<%  end =%>
+<%= $result =%>
+EOF
+is($output, '&lt;html&gt;<html>', 'captured escaped expression block');
+
+# Capture lines (extra whitespace)
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+<% my $result = escape filter block                  %>
+<html>
+<%                        end %>
 %= $result
 EOF
-is($output, "&lt;html&gt;\n<html>\n", 'captured escaped expression block');
-
-# Capture lines
-$mt     = Mojo::Template->new;
-$output = $mt->render(<<'EOF');
-%{ my $result = escape block
-<html>
-%}
-%= $result
-EOF
-is($output, "&lt;html&gt;\n", 'captured lines');
+is($output, "\n\n&lt;html&gt;\n", 'captured lines');
 
 # Capture tags
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<%{ my $result = escape block%><html><%}%><%= $result %>
+<% my $result = escape filter block %><html><% end %><%= $result %>
 EOF
 is($output, "&lt;html&gt;\n", 'capture tags');
 
 # Capture tags (alternative)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = escape block {%><html><%}%><%= $result %>
+<% my $result = escape filter block %><html><% end %><%= $result %>
 EOF
 is($output, "&lt;html&gt;\n", 'capture tags');
 
 # Capture tags with appended code
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<%{ my $result = escape( block %><html><%} ); %><%= $result %>
+<% my $result = escape( filter block %><html><% end ); %><%= $result %>
 EOF
 is($output, "&lt;html&gt;\n", 'capture tags with appended code');
 
 # Capture tags with appended code (alternative)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = escape( block {%><html><%} ); %><%= $result %>
+<% my $result = escape( filter block %><html><% end ); %><%= $result %>
 EOF
 is($output, "&lt;html&gt;\n", 'capture tags with appended code');
 
 # Nested capture tags
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<%{ my $result = block %><%{= escape block %><html><%}%><%}%><%= $result %>
+<% my $result = filter
+  block %><%= escape filter block %><html><% end
+  %><% end %><%= $result %>
 EOF
 is($output, "&lt;html&gt;\n", 'nested capture tags');
 
 # Nested capture tags (alternative)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = block {%><%= escape block {%><html><%}%><%}%><%= $result %>
+<% my $result = filter block =%>
+    <%= escape filter block =%>
+        <html>
+    <% end =%>
+<% end =%>
+<%= $result =%>
 EOF
-is($output, "&lt;html&gt;\n", 'nested capture tags');
+is($output, '&lt;html&gt;', 'nested capture tags');
 
-# Advanced capturing
+# Advanced capturing (extra whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-%{ my $block =
-% my $name = shift;
+<% my $block =  block  =%>
+<% my $name = shift; =%>
 Hello <%= $name %>.
-%}
-%= $block->('Baerbel')
-%= $block->('Wolfgang')
+<%  end  =%>
+<%= $block->('Baerbel') %>
+<%= $block->('Wolfgang') %>
 EOF
 is($output, <<EOF, 'advanced capturing');
 Hello Baerbel.
@@ -168,10 +175,10 @@ EOF
 # Advanced capturing with tags
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<%{ my $block = =%>
+<% my $block = block =%>
     <% my $name = shift; =%>
     Hello <%= $name %>.
-<%}=%>
+<% end =%>
 <%= $block->('Sebastian') %>
 <%= $block->('Sara') %>
 EOF
@@ -183,10 +190,10 @@ EOF
 # Advanced capturing with tags (alternative)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $block = ={%>
+<% my $block = block =%>
     <% my $name = shift; =%>
     Hello <%= $name %>.
-<%}=%>
+<% end =%>
 <%= $block->('Sebastian') %>
 <%= $block->('Sara') %>
 EOF
@@ -199,16 +206,16 @@ EOF
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 <% my
-$block1 = ={%>
+$block1 = block =%>
     <% my $name = shift; =%>
     Hello <%= $name %>.
-<%}=%>
+<% end =%>
 <% my
 $block2 =
-={%>
+block =%>
     <% my $name = shift; =%>
     Bye <%= $name %>.
-<%}=%>
+<% end =%>
 <%= $block1->('Sebastian') %>
 <%= $block2->('Sara') %>
 EOF
@@ -221,9 +228,9 @@ EOF
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 % my $i = 2;
-<%{= block %>
+<%= filter block %>
     <%= $i++ %>
-<%} for 1 .. 3; %>
+<% end for 1 .. 3; %>
 EOF
 is($output, <<EOF, 'block loop');
 

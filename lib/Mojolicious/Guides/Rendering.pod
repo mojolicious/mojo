@@ -239,9 +239,9 @@ used to generate C<HTML> tags.
 
     <%= script '/script.js' %>
 
-    <%= script {%>
+    <%= script block %>
         var a = 'b';
-    <%}%>
+    <% end %>
 
 The plugins L<Mojolicious::Plugin::DefaultHelpers> and
 L<Mojolicious::Plugin::TagHelpers> contain all of them.
@@ -318,10 +318,10 @@ Of course you can also pass stash values.
 It's never fun to repeat yourself, thats why you can build reusable template
 blocks in C<ep> that work very similar normal Perl functions.
 
-    <% my $block = {%>
+    <% my $block = block %>
         <% my $name = shift; %>
         Hello <%= $name %>.
-    <%}%>
+    <% end %>
     <%= $block->('Sebastian') %>
     <%= $block->('Sara') %>
 
@@ -330,10 +330,10 @@ containing only the closing bracket.
 Whitespace characters between bracket and tag are not allowed, to
 differentiate between template blocks and normal Perl code.
 
-    <% my $block = {%>
+    <% my $block = block %>
         <% my $name = shift; %>
         Hello <%= $name %>.
-    <%}%>
+    <% end %>
     <% for (1 .. 10) { %>
         <%= $block->('Sebastian') %>
     <% } %>
@@ -359,9 +359,9 @@ the template to the layout.
 
    @@ foo/bar.html.ep
    % layout 'mylayout';
-   <% content header => {%>
+   <% content header => block %>
        <title>MyApp!</title>
-   <%}%>
+   <% end %>
    Hello World!
 
    @@ layouts/mylayout.html.ep
@@ -381,27 +381,27 @@ extended templates don't get prefixed with C<layout/>.
     @@ first.html.ep
     %# "<div>First header!First footer!</div>"
     <div>
-    <%= content header => {%>
+    <%= content header => block %>
         First header!
-    <%}%>
-    <%= content footer => {%>
+    <% end %>
+    <%= content footer => block %>
         First footer!
-    <%}%>
+    <% end %>
     </div>
 
     @@ second.html.ep
     %# "<div>Second header!First footer!</div>"
     % extends 'first';
-    <% content header => {%>
+    <% content header => block %>
         Second header!
-    <%}%>
+    <% end %>
 
     @@ third.html.ep
     %# "<div>Second header!Third footer!</div>"
     % extends 'second';
-    <% content footer => {%>
+    <% content footer => block %>
         Third footer!
-    <%}%>
+    <% end %>
 
 This chain could go on and on to allow a very high level of template reuse.
 

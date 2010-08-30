@@ -1,6 +1,6 @@
-<% my $block = {%>
+<% my $block = block %>
 <% my $name = shift; =%>
 Hello <%= $name %>.
-<%}%>
+<% end %>
 %= $block->('Baerbel')
 %= $block->('Wolfgang')

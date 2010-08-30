@@ -158,8 +158,8 @@ sub parse {
     my ($self, $chunk) = @_;
 
     # Buffer
-    my $fbuffer = $self->chunked_buffer;
-    $fbuffer->add_chunk($chunk);
+    my $buffer = $self->chunked_buffer;
+    $buffer->add_chunk($chunk);
 
     # Parse headers
     $self->parse_until_body;
@@ -174,7 +174,7 @@ sub parse {
     }
 
     # Not chunked, pass through
-    else { $self->buffer($fbuffer) }
+    else { $self->buffer($buffer) }
 
     # Custom body parser
     if (my $cb = $self->read_cb) {

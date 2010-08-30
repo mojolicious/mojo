@@ -564,7 +564,7 @@ sub _parse_css {
         while ($element =~ /$CSS_CLASS_RE/g) {
             my $class = $self->_css_unescape($1);
             push @$selector,
-              ['attribute', 'class', qr/(?:^|\W+)$class(?:\W+|$)/];
+              ['attribute', 'class', qr/(?:^|.*\s+)$class(?:\s+.*|$)/];
         }
 
         # ID

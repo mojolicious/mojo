@@ -68,12 +68,12 @@ $mt     = Mojo::Template->new;
 $output = $mt->render('    <%= filter begin =%><html><% end =%>    ');
 is($output, '<html>', 'expression tags trimmed');
 
-# Expression block (extra whitespace)
+# Expression block (less whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $block =  begin   =%>
+<% my $block =begin=%>
 <html>
-<%   end  =%>
+<%end=%>
 <%= $block->() %>
 EOF
 is($output, "<html>\n", 'expression block');

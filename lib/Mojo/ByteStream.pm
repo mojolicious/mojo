@@ -25,8 +25,6 @@ use constant PUNYCODE_INITIAL_N    => 128;
 # Core module since Perl 5.9.3
 use constant SHA1 => eval 'use Digest::SHA (); 1';
 
-__PACKAGE__->attr(raw_size => 0);
-
 # Punycode delimiter
 my $DELIMITER = chr 0x2D;
 
@@ -316,7 +314,6 @@ sub import {
 sub new {
     my $self = shift->SUPER::new();
     $self->{bytestream} = @_ < 2 ? defined $_[0] ? $_[0] : '' : join('', @_);
-    $self->{raw_size} = length $self->{bytestream};
     return $self;
 }
 
@@ -327,7 +324,7 @@ sub add_chunk {
     return $self unless defined $chunk;
 
     # Raw length
-    $self->{raw_size} = $self->{raw_size} + length $chunk;
+    $self->{_raw_size} += length $chunk;
 
     # Store
     $self->{bytestream} .= $chunk;
@@ -691,6 +688,8 @@ sub quote {
     return $self;
 }
 
+sub raw_size { shift->{_raw_size} || 0 }
+
 sub remove {
     my ($self, $length, $chunk) = @_;
 
@@ -937,17 +936,6 @@ Mojo::ByteStream - ByteStream
 L<Mojo::ByteStream> provides portable text and bytestream manipulation
 functions.
 
-=head1 ATTRIBUTES
-
-L<Mojo::ByteStream> implements the following attributes.
-
-=head2 C<raw_size>
-
-    my $size = $stream->raw_size;
-    $stream  = $stream->raw_size(23);
-
-Raw bytestream size in bytes.
-
 =head1 METHODS
 
 L<Mojo::ByteStream> inherits all methods from L<Mojo::Base> and implements
@@ -1101,6 +1089,12 @@ Quoted Printable encode bytestream.
     $stream = $stream->quote;
 
 Quote bytestream.
+
+=head2 C<raw_size>
+
+    my $size = $stream->raw_size;
+
+Raw size of chunks added to bytestream in bytes.
 
 =head2 C<remove>
 

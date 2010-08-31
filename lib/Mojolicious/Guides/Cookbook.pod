@@ -68,6 +68,8 @@ server behind a Nginx reverse proxy.
         location / {
             proxy_read_timeout 300;
             proxy_pass http://myapp;
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         }
     }
 
@@ -82,6 +84,8 @@ Also possible using UNIX domain sockets.
         location / {
             proxy_read_timeout 300;
             proxy_pass http://myapp;
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         }
     }
 

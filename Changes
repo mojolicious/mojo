@@ -3,6 +3,10 @@ This file documents the revision history for Perl extension Mojolicious.
 0.999930 2010-08-17 00:00:00
         - Deprecated old Mojo::Template block syntax and added a very pretty
           replacement. (See documentation for more)
+        - Replaced Mojo::Server::Daemon::Prefork with the much more advanced
+          and for production environments optimized Mojo::Server::Hypnotoad.
+          See the new hypnotoad script and updated
+          Mojolicious::Guides::Cookbook recipes for more information.
         - Added EXPERIMENTAL support for --mode and --home options to all
           Mojolicious commands.
         - Added EXPERIMENTAL write, write_chunk and rendered methods to
@@ -14,9 +18,6 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed a bug where Mojo::IOLoop connections could be closed too
           early.
         - Fixed HTTPS support for CGI environments.
-        - Fixed Mojo::Server::Daemon::Prefork not to prefork more workers
-          than allowed.
-        - Fixed graceful shutdown support in Mojo::Server::Daemon::Prefork.
         - Fixed a auto rendering bug related to bridges.
         - Fixed Mojo::IOLoop Windows support.
         - Fixed Mojo::DOM class selector bug. (tempire)

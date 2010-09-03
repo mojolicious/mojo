@@ -346,10 +346,10 @@ $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/wildcards/1/http://www.google.com');
 $m = MojoX::Routes::Match->new($tx)->match($r);
-is($m->stack->[0]->{controller}, 'wild',                 'right value');
-is($m->stack->[0]->{action},     'card',                 'right value');
-is($m->stack->[0]->{wildcard},   'http:/www.google.com', 'right value');
-is($m->url_for, '/wildcards/1/http:/www.google.com', 'right URL');
+is($m->stack->[0]->{controller}, 'wild',                  'right value');
+is($m->stack->[0]->{action},     'card',                  'right value');
+is($m->stack->[0]->{wildcard},   'http://www.google.com', 'right value');
+is($m->url_for, '/wildcards/1/http://www.google.com', 'right URL');
 is(@{$m->stack}, 1, 'right number of elements');
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
@@ -358,7 +358,7 @@ $m = MojoX::Routes::Match->new($tx)->match($r);
 is($m->stack->[0]->{controller}, 'wild',                  'right value');
 is($m->stack->[0]->{action},     'card',                  'right value');
 is($m->stack->[0]->{wildcard},   'http://www.google.com', 'right value');
-is($m->url_for, '/wildcards/1/http:/www.google.com', 'right URL');
+is($m->url_for, '/wildcards/1/http://www.google.com', 'right URL');
 is(@{$m->stack}, 1, 'right number of elements');
 
 # Format

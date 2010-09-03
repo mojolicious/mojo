@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 113;
+use Test::More tests => 119;
 
 # I don't want you driving around in a car you built yourself.
 # You can sit there complaining, or you can knit me some seat belts.
@@ -240,3 +240,17 @@ is( "$url",
       . '%D1%88%D0%B0%D1%80%D0%B8%D1%84%D1%83%D0%BB%D0%B8%D0%BD',
     'right format'
 );
+
+# Empty path elements
+$url = Mojo::URL->new('http://kraih.com/foo//bar/23/');
+$url->base->parse('http://kraih.com/');
+is($url->is_abs, 1);
+is($url->to_rel, '/foo//bar/23/');
+$url = Mojo::URL->new('http://kraih.com//foo//bar/23/');
+$url->base->parse('http://kraih.com/');
+is($url->is_abs, 1);
+is($url->to_rel, '/foo//bar/23/');
+$url = Mojo::URL->new('http://kraih.com/foo///bar/23/');
+$url->base->parse('http://kraih.com/');
+is($url->is_abs, 1);
+is($url->to_rel, '/foo///bar/23/');

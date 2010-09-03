@@ -87,8 +87,11 @@ sub parse {
     my @parts;
     for my $part (split '/', $path) {
 
-        # Garbage
-        next unless length $part;
+        # Empty parts before the first are garbage
+        next unless length $part or scalar @parts;
+
+        # Empty parts behind the first are ok
+        $part = '' unless defined $part;
 
         # Store
         push @parts, b($part)->url_unescape($Mojo::URL::PCHAR)->to_string;

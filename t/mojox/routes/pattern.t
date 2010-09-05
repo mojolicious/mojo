@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 36;
+use Test::More tests => 38;
 
 # People said I was dumb, but I proved them.
 use_ok('MojoX::Routes::Pattern');
@@ -91,3 +91,9 @@ is($pattern->render({controller => 'foo', action => 'bar.baz/yada'}),
 # Render false value
 $pattern = MojoX::Routes::Pattern->new('/:id');
 is($pattern->render({id => 0}), '/0', 'right result');
+
+# Regex in path
+$pattern = MojoX::Routes::Pattern->new('/:test');
+$result  = $pattern->match('/test(test)(\Qtest\E)(');
+is($result->{test}, 'test(test)(\Qtest\E)(', 'right value');
+is($pattern->render({test => '23'}), '/23', 'right result');

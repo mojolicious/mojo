@@ -98,7 +98,7 @@ all characters except C</> and C<.>.
     /sebastian23/hello  -> /:name/hello -> {name => 'sebastian23'}
     /sebastian 23/hello -> /:name/hello -> {name => 'sebastian 23'}
 
-A generic placeholder can be surrounded by backets to separate it from the
+A generic placeholder can be surrounded by brackets to separate it from the
 surrounding text.
 
     /hello             -> /(:name)hello -> undef

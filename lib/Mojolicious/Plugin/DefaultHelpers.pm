@@ -15,6 +15,27 @@ sub register {
     # Add "app" helper
     $app->renderer->add_helper(app => sub { shift->app });
 
+    # Add "cache" helper
+    my $cache = {};
+    $app->renderer->add_helper(
+        cache => sub {
+            shift;
+
+            # Callback
+            my $cb = pop;
+            return '' unless ref $cb && ref $cb eq 'CODE';
+
+            # Name
+            my $name = pop || join '', map { $_ || '' } caller(1);
+
+            # Cached
+            return $cache->{$name} if exists $cache->{$name};
+
+            # Cache
+            $cache->{$name} = $cb->();
+        }
+    );
+
     # Add "content" helper
     $app->renderer->add_helper(content => sub { shift->render_inner(@_) });
 
@@ -77,43 +98,79 @@ L<Mojolicious>.
 
 =over 4
 
+=item cache
+
+    <%= cache begin %>
+        <%= time %>
+    <% end %>
+    <%= cache foo => begin %>
+        <%= time %>
+    <% end %>
+
+Cache block result in memory and prevent future execution.
+Note that this helper is EXPERIMENTAL and might change without warning!
+
 =item content
+
+    <%= content %>
 
 Insert content into a layout template.
 
 =item dumper
 
+    <%= dumper $foo %>
+
 Dump a Perl data structure using L<Data::Dumper>.
 
 =item extends
+
+    <% extends 'foo'; %>
 
 Extend a template.
 
 =item flash
 
+    <%= flash 'foo' %>
+
 Access flash values.
 
 =item include
+
+    <%= include 'menubar' %>
+    <%= include 'menubar', format => 'txt' %>
 
 Include a partial template.
 
 =item layout
 
+    <% layout 'green'; %>
+
 Render this template with a layout.
 
 =item param
+
+    <%= param 'foo' %>
 
 Access request parameters and routes captures.
 
 =item session
 
+    <%= session 'foo' %>
+
 Access session values.
 
 =item stash
 
+    <%= stash 'foo' %>
+    <% stash foo => 'bar'; %>
+
 Access stash values.
 
 =item url_for
+
+    <%= url_for %>
+    <%= url_for 'index' %>
+    <%= url_for 'index', foo => 'bar' %>
 
 Generate URLs.
 

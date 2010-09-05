@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 536;
+plan tests => 551;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -265,6 +265,9 @@ get '/layout' => sub {
 
 # POST /template
 post '/template' => 'index';
+
+# GET /cached
+get '/cached' => 'cached';
 
 # * /something
 any '/something' => sub {
@@ -882,6 +885,23 @@ $t->post_ok('/template')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('Just works!');
 
+# GET /cached
+$t->get_ok('/cached')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_like(qr/\d+a\d+b\d+c\d+/);
+my $cached = $t->tx->res->body;
+
+# GET /cached
+$t->get_ok('/cached')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is($cached);
+
+# GET /cached
+$t->get_ok('/cached')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is($cached);
+
 # GET /something
 $t->get_ok('/something')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
@@ -1293,6 +1313,17 @@ text!
 
 @@ template.txt.epl
 <div id="foo">Redirect works!</div>
+
+@@ cached.html.ep
+<%= cache begin =%>
+<%= time =%>
+<% end =%>
+<%= cache begin =%><%= 'a' . int(rand(999)) %><% end =%><%= cache begin =%>
+<%= 'b' . int(rand(999)) =%>
+<% end =%>
+<%= cache test => begin =%>
+<%= 'c' . time . int(rand(999)) =%>
+<% end =%>
 
 @@ test(test)(\Qtest\E)(.html.ep
 <%= $self->match->endpoint->name %>

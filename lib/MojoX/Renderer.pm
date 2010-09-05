@@ -247,6 +247,7 @@ sub _detect_handler {
 
     # Detect
     return unless my $file = $self->template_name($options);
+    $file = quotemeta $file;
     for my $template (@$templates, @$inline) {
         if ($template =~ /^$file\.(\w+)$/) { return $1 }
     }

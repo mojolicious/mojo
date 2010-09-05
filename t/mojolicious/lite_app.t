@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 531;
+plan tests => 536;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -60,6 +60,9 @@ get '/null/:null' => sub {
     my $self = shift;
     $self->render(text => $self->param('null'), layout => 'layout');
 };
+
+# GET /regex/in/template
+get '/regex/in/template' => 'test(test)(\Qtest\E)(';
 
 # GET /maybe/ajax
 get '/maybe/ajax' => sub {
@@ -602,6 +605,12 @@ $t->get_ok('/null/0')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/layouted 0/);
+
+# GET /regex/in/template
+$t->get_ok('/regex/in/template')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("test(test)(\\Qtest\\E)(\n");
 
 # GET /stream (with basic auth)
 my $port = $t->client->test_server;
@@ -1284,6 +1293,9 @@ text!
 
 @@ template.txt.epl
 <div id="foo">Redirect works!</div>
+
+@@ test(test)(\Qtest\E)(.html.ep
+<%= $self->match->endpoint->name %>
 
 @@ static2.txt (base64)
 dGVzdCAxMjMKbGFsYWxh

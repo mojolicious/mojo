@@ -434,7 +434,7 @@ sub AUTOLOAD {
     my $self = shift;
 
     # Method
-    return unless my $method = (split '::' => $AUTOLOAD)[-1];
+    return unless my $method = (split '::', $AUTOLOAD)[-1];
 
     # Controller
     return unless my $c = $self->{_controller};

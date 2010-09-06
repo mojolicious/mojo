@@ -80,12 +80,12 @@ sub new {
     $static->root($home->rel_dir('public'));
 
     # Hide own controller methods
-    $r->hide(qw/client cookie finish finished flash handler helper param/);
-    $r->hide(qw/receive_message redirect_to render render_data/);
-    $r->hide(qw/render_exception render_inner render_json render_not_found/);
-    $r->hide(qw/render_partial render_static render_text rendered/);
-    $r->hide(
-        qw/send_message session signed_cookie url_for write write_chunk/);
+    $r->hide(qw/AUTOLOAD DESTROY client cookie finish finished flash/);
+    $r->hide(qw/handler helper param receive_message redirect_to render/);
+    $r->hide(qw/render_data render_exception render_inner render_json/);
+    $r->hide(qw/render_not_found render_partial render_static render_text/);
+    $r->hide(qw/rendered send_message session signed_cookie url_for/);
+    $r->hide(qw/write write_chunk/);
 
     # Mode
     my $mode = $self->mode;

@@ -484,19 +484,22 @@ much everything.
     use Mojolicious::Lite;
 
     app->renderer->add_helper(
-        echo => sub {
+        debug => sub {
             my ($self, $string) = @_;
-            return "ECHO: $string";
+            $self->app->log->debug($string);
         }
     );
 
-    get '/' => 'index';
+    get '/' => sub {
+        my $self = shift;
+        $self->debug('action');
+    } => 'index';
 
     app->start;
     __DATA__
 
     @@ index.html.ep
-    <%= echo 'lalala' %>
+    % debug 'template';
 
 =head2 Adding Your Favorite Template System
 

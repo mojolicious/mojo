@@ -17,7 +17,7 @@ sub AUTOLOAD {
     my $self = shift;
 
     # Method
-    return unless my $method = (split '::', $AUTOLOAD)[-1];
+    my ($method) = $AUTOLOAD =~ /(\w+)$/;
 
     # Helper
     Carp::croak(qq/Helper "$method" not found/)

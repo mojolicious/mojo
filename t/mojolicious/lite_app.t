@@ -1410,7 +1410,7 @@ Just works!\
 @@ autostash.html.ep
 % $self->helper(layout => 'layout');
 %= $foo
-%= param 'bar'
+%= $self->helper->param('bar')
 % my $foo = 42;
 %= $foo
 %= $self->match->endpoint->name;

@@ -10,6 +10,7 @@ use Mojo::Exception;
 use Mojo::URL;
 
 require Carp;
+require Scalar::Util;
 
 # Space: It seems to go on and on forever...
 # but then you get to the end and a gorilla starts throwing barrels at you.
@@ -36,15 +37,22 @@ sub finished {
 sub helper {
     my $self = shift;
 
-    # Name
-    return unless my $name = shift;
+    # Helper proxy
+    unless (exists $self->{_helpers}) {
 
-    # Helper
-    Carp::croak(qq/Helper "$name" not found/)
-      unless my $helper = $self->app->renderer->helper->{$name};
+        # Helpers
+        $self->{_helpers} =
+          Mojolicious::Controller::_Helpers->new(_controller => $self);
+
+        # Weaken
+        Scalar::Util::weaken $self->{_helpers}->{_controller};
+    }
+
+    # Name
+    return $self->{_helpers} unless my $name = shift;
 
     # Run
-    return $self->$helper(@_);
+    return $self->{_helpers}->$name(@_);
 }
 
 sub receive_message {
@@ -415,6 +423,32 @@ sub write_chunk {
     $self->rendered;
 }
 
+# Helper proxy
+package Mojolicious::Controller::_Helpers;
+
+use base 'Mojo::Base';
+
+our $AUTOLOAD;
+
+sub AUTOLOAD {
+    my $self = shift;
+
+    # Method
+    return unless my $method = (split '::' => $AUTOLOAD)[-1];
+
+    # Controller
+    return unless my $c = $self->{_controller};
+
+    # Helper
+    Carp::croak(qq/Helper "$method" not found/)
+      unless my $helper = $c->app->renderer->helper->{$method};
+
+    # Run
+    return $c->$helper(@_);
+}
+
+sub DESTROY { }
+
 1;
 __END__
 
@@ -485,12 +519,15 @@ Callback signaling that the transaction has been finished.
 
 =head2 C<helper>
 
+    $c->helper->foo;
+    $c->helper->foo(23);
     $c->helper('foo');
     $c->helper(foo => 23);
 
 Directly call a L<Mojolicious> helper, see
 L<Mojolicious::Plugin::DefaultHelpers> for a list of helpers that are always
 available.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<receive_message>
 

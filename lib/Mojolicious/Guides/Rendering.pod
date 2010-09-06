@@ -229,7 +229,7 @@ controller method to call them.
 
     <%= dumper [1, 2, 3] %>
 
-    my $serialized = $self->helper(dumper => [1, 2, 3]);
+    my $serialized = $self->helper->dumper([1, 2, 3]);
 
 The C<dumper> helper will use L<Data::Dumper> to serialize whatever data
 structure you pass it, this can be very useful for debugging.

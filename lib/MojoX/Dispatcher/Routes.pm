@@ -166,8 +166,9 @@ sub _dispatch_controller {
             # Call action
             $continue = $app->$method if $app->can($method);
 
-            # Copy stash
-            $c->stash($app->stash);
+            # Merge stash
+            my $new = $app->stash;
+            @{$c->stash}{keys %$new} = values %$new;
         }
 
         # Handler
@@ -272,7 +273,7 @@ sub _walk_stack {
         $c->stash->{'mojo.params'}->append(%{$field});
 
         # Merge in captures
-        $c->stash({%{$c->stash}, %{$field}});
+        @{$c->stash}{keys %$field} = values %$field;
 
         # Captures
         $c->match->captures($field);

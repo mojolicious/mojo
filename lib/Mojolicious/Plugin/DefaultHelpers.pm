@@ -48,7 +48,14 @@ sub register {
     );
 
     # Add "extends" helper
-    $app->renderer->add_helper(extends => sub { shift->stash(extends => @_) }
+    $app->renderer->add_helper(
+        extends => sub {
+            my $self  = shift;
+            my $stash = $self->stash;
+            $stash->{extends} = shift if @_;
+            $self->stash(@_) if @_;
+            return $stash->{extends};
+        }
     );
 
     # Add "flash" helper
@@ -58,7 +65,15 @@ sub register {
     $app->renderer->add_helper(include => sub { shift->render_partial(@_) });
 
     # Add "layout" helper
-    $app->renderer->add_helper(layout => sub { shift->stash(layout => @_) });
+    $app->renderer->add_helper(
+        layout => sub {
+            my $self  = shift;
+            my $stash = $self->stash;
+            $stash->{layout} = shift if @_;
+            $self->stash(@_) if @_;
+            return $stash->{layout};
+        }
+    );
 
     # Add "param" helper
     $app->renderer->add_helper(param =>

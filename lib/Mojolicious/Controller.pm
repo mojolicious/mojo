@@ -109,13 +109,13 @@ sub render {
 
         # Normal default template
         if ($controller && $action) {
-            $self->stash(
-                template => join('/', split(/-/, $controller), $action));
+            $self->stash->{template} =
+              join('/', split(/-/, $controller), $action);
         }
 
         # Try the route name if we don't have controller and action
         elsif ($self->match && (my $name = $self->match->endpoint->name)) {
-            $self->stash(template => $name);
+            $self->stash->{template} = $name;
         }
     }
 
@@ -222,7 +222,8 @@ sub render_not_found {
     my ($self, $resource) = @_;
 
     # Debug
-    $self->app->log->debug(qq/Resource "$resource" not found./) if $resource;
+    $self->app->log->debug(qq/Resource "$resource" not found./)
+      if $resource;
 
     # Render not found template
     my $options = {

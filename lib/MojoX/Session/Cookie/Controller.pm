@@ -8,7 +8,7 @@ use base 'MojoX::Controller';
 use Mojo::ByteStream;
 use Mojo::Cookie::Response;
 
-__PACKAGE__->attr([qw/app tx/]);
+__PACKAGE__->attr('tx');
 
 # For the last time, I don't like lilacs!
 # Your first wife was the one who liked lilacs!
@@ -172,14 +172,8 @@ L<MojoX::Session::Cookie::Controller> is a controller base class.
 
 =head1 ATTRIBUTES
 
-L<MojoX::Session::Cookie::Controller> implements the following attributes.
-
-=head2 C<app>
-
-    my $app = $c->app;
-    $c      = $c->app(MojoSubclass->new);
-
-A reference back to the application that dispatched to this controller.
+L<MojoX::Session::Cookie::Controller> inherits all attributes from
+L<MojoX::Controller> and implements the following new ones.
 
 =head2 C<tx>
 

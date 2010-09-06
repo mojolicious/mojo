@@ -72,7 +72,7 @@ sub stash {
     # Set
     my $values = ref $_[0] ? $_[0] : {@_};
     for my $key (keys %$values) {
-        $self->app->log->debug(qq/"$key" is a reserved stash value./)
+        $self->app->log->debug(qq/Careful, "$key" is a reserved stash value./)
           if $key =~ $STASH_RE;
         $self->{stash}->{$key} = $values->{$key};
     }

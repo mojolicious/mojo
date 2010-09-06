@@ -49,6 +49,9 @@ plugin 'header_condition';
 # Default
 app->defaults(default => 23);
 
+# Test helper
+app->renderer->add_helper(test_helper => sub { shift->param(@_) });
+
 # GET /
 get '/' => 'root';
 
@@ -1410,7 +1413,7 @@ Just works!\
 @@ autostash.html.ep
 % $self->helper(layout => 'layout');
 %= $foo
-%= $self->helper->param('bar')
+%= $self->test_helper('bar')
 % my $foo = 42;
 %= $foo
 %= $self->match->endpoint->name;

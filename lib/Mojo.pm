@@ -109,39 +109,39 @@ L<Mojo> implements the following attributes.
 
 =head2 C<build_tx_cb>
 
-    my $cb = $mojo->build_tx_cb;
-    $mojo  = $mojo->build_tx_cb(sub { ... });
+    my $cb = $app->build_tx_cb;
+    $app   = $app->build_tx_cb(sub { ... });
 
 The transaction builder callback, by default it builds a
 L<Mojo::Transaction::HTTP> object.
 
 =head2 C<client>
 
-    my $client = $mojo->client;
-    $mojo      = $mojo->client(Mojo::Client->new);
+    my $client = $app->client;
+    $app       = $app->client(Mojo::Client->new);
 
 A full featured HTTP 1.1 client for use in your applications, by default a
 L<Mojo::Client> object.
 
 =head2 C<home>
 
-    my $home = $mojo->home;
-    $mojo    = $mojo->home(Mojo::Home->new);
+    my $home = $app->home;
+    $app     = $app->home(Mojo::Home->new);
 
 The home directory of your application, by default a L<Mojo::Home> object
 which stringifies to the actual path.
 
 =head2 C<log>
 
-    my $log = $mojo->log;
-    $mojo   = $mojo->log(Mojo::Log->new);
+    my $log = $app->log;
+    $app    = $app->log(Mojo::Log->new);
     
 The logging layer of your application, by default a L<Mojo::Log> object.
 
 =head2 C<websocket_handshake_cb>
 
-    my $cb = $mojo->websocket_handshake_cb;
-    $mojo  = $mojo->websocket_handshake_cb(sub { ... });
+    my $cb = $app->websocket_handshake_cb;
+    $app   = $app->websocket_handshake_cb(sub { ... });
 
 The websocket handshake callback, by default it builds a
 L<Mojo::Transaction::WebSocket> object and handles the response for the
@@ -154,7 +154,7 @@ new ones.
 
 =head2 C<new>
 
-    my $mojo = Mojo->new;
+    my $app = Mojo->new;
 
 Construct a new L<Mojo> application.
 Will automatically detect your home directory and set up logging to
@@ -162,7 +162,7 @@ C<log/mojo.log> if there's a log directory.
 
 =head2 C<handler>
 
-    $tx = $mojo->handler($tx);
+    $tx = $app->handler($tx);
 
 The handler is the main entry point to your application or framework and
 will be called for each new transaction, usually a L<Mojo::Transaction::HTTP>

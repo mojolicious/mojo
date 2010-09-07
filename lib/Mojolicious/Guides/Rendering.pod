@@ -483,7 +483,7 @@ much everything.
 
     use Mojolicious::Lite;
 
-    app->renderer->add_helper(
+    app->add_helper(
         debug => sub {
             my ($self, $string) = @_;
             $self->app->log->debug($string);

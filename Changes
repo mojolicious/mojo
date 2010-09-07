@@ -11,6 +11,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL support for --mode and --home options to all
           Mojolicious commands.
         - Added EXPERIMENTAL support for helper methods.
+        - Added EXPERIMENTAL add_helper method to Mojolicious.
         - Added EXPERIMENTAL cache helper to
           Mojolicious::Plugin::DefaultHelpers.
         - Added EXPERIMENTAL write, write_chunk and rendered methods to

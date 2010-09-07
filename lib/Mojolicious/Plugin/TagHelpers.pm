@@ -13,7 +13,7 @@ sub register {
     my ($self, $app) = @_;
 
     # Add "form_for" helper
-    $app->renderer->add_helper(
+    $app->add_helper(
         form_for => sub {
             my $c    = shift;
             my $name = shift;
@@ -26,11 +26,11 @@ sub register {
     );
 
     # Add "img" helper
-    $app->renderer->add_helper(
+    $app->add_helper(
         img => sub { shift; $self->_tag('img', src => shift, @_) });
 
     # Add "input" helper
-    $app->renderer->add_helper(
+    $app->add_helper(
         input => sub {
             my $c    = shift;
             my $name = shift;
@@ -58,11 +58,11 @@ sub register {
     );
 
     # Add "label" helper
-    $app->renderer->add_helper(
+    $app->add_helper(
         label => sub { shift; $self->_tag('label', for => shift, @_) });
 
     # Add "link_to" helper
-    $app->renderer->add_helper(
+    $app->add_helper(
         link_to => sub {
             my $c    = shift;
             my $name = shift;
@@ -79,7 +79,7 @@ sub register {
     );
 
     # Add "script" helper
-    $app->renderer->add_helper(
+    $app->add_helper(
         script => sub {
             my $c = shift;
 
@@ -99,7 +99,7 @@ sub register {
     );
 
     # Add "tag" helper
-    $app->renderer->add_helper(tag => sub { shift; $self->_tag(@_) });
+    $app->add_helper(tag => sub { shift; $self->_tag(@_) });
 }
 
 sub _tag {

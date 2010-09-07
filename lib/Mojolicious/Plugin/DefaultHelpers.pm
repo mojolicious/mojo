@@ -13,11 +13,11 @@ sub register {
     my ($self, $app) = @_;
 
     # Add "app" helper
-    $app->renderer->add_helper(app => sub { shift->app });
+    $app->add_helper(app => sub { shift->app });
 
     # Add "cache" helper
     my $cache = {};
-    $app->renderer->add_helper(
+    $app->add_helper(
         cache => sub {
             shift;
 
@@ -37,10 +37,10 @@ sub register {
     );
 
     # Add "content" helper
-    $app->renderer->add_helper(content => sub { shift->render_inner(@_) });
+    $app->add_helper(content => sub { shift->render_inner(@_) });
 
     # Add "dumper" helper
-    $app->renderer->add_helper(
+    $app->add_helper(
         dumper => sub {
             shift;
             Data::Dumper->new([@_])->Maxdepth(2)->Indent(1)->Terse(1)->Dump;
@@ -48,7 +48,7 @@ sub register {
     );
 
     # Add "extends" helper
-    $app->renderer->add_helper(
+    $app->add_helper(
         extends => sub {
             my $self  = shift;
             my $stash = $self->stash;
@@ -59,13 +59,13 @@ sub register {
     );
 
     # Add "flash" helper
-    $app->renderer->add_helper(flash => sub { shift->flash(@_) });
+    $app->add_helper(flash => sub { shift->flash(@_) });
 
     # Add "include" helper
-    $app->renderer->add_helper(include => sub { shift->render_partial(@_) });
+    $app->add_helper(include => sub { shift->render_partial(@_) });
 
     # Add "layout" helper
-    $app->renderer->add_helper(
+    $app->add_helper(
         layout => sub {
             my $self  = shift;
             my $stash = $self->stash;
@@ -76,17 +76,17 @@ sub register {
     );
 
     # Add "param" helper
-    $app->renderer->add_helper(param =>
+    $app->add_helper(param =>
           sub { wantarray ? (shift->param(@_)) : scalar shift->param(@_); });
 
     # Add "session" helper
-    $app->renderer->add_helper(session => sub { shift->session(@_) });
+    $app->add_helper(session => sub { shift->session(@_) });
 
     # Add "stash" helper
-    $app->renderer->add_helper(stash => sub { shift->stash(@_) });
+    $app->add_helper(stash => sub { shift->stash(@_) });
 
     # Add "url_for" helper
-    $app->renderer->add_helper(url_for => sub { shift->url_for(@_) });
+    $app->add_helper(url_for => sub { shift->url_for(@_) });
 }
 
 1;

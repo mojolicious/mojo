@@ -50,7 +50,7 @@ plugin 'header_condition';
 app->defaults(default => 23);
 
 # Test helper
-app->renderer->add_helper(test_helper => sub { shift->param(@_) });
+app->add_helper(test_helper => sub { shift->param(@_) });
 
 # GET /
 get '/' => 'root';
@@ -324,8 +324,7 @@ get '/app' => {layout => 'app'} => '*';
 
 # GET /helper
 get '/helper' => sub { shift->render(handler => 'ep') } => 'helper';
-app->renderer->add_helper(
-    agent => sub { scalar shift->req->headers->user_agent });
+app->add_helper(agent => sub { scalar shift->req->headers->user_agent });
 
 # GET /eperror
 get '/eperror' => sub { shift->render(handler => 'ep') } => 'eperror';

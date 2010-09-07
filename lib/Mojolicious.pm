@@ -116,6 +116,8 @@ sub new {
     return $self;
 }
 
+sub add_helper { shift->renderer->add_helper(@_) }
+
 sub defaults {
     my $self = shift;
 
@@ -489,6 +491,22 @@ Construct a new L<Mojolicious> application.
 Will automatically detect your home directory and set up logging based on
 your current operating mode.
 Also sets up the renderer, static dispatcher and a default set of plugins.
+
+=head2 C<add_helper>
+
+    $mojo->add_helper(foo => sub { ... });
+
+Add a new helper.
+Note that this method is EXPERIMENTAL and might change without warning!
+
+    # Helper
+    $mojo->add_helper(add => sub { $_[1] + $_[2] });
+
+    # Controller
+    my $result = $self->add(2, 3);
+
+    # Template
+    <%= add 2, 3 %>
 
 =head2 C<defaults>
 

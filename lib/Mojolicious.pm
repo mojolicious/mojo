@@ -386,16 +386,16 @@ following new ones.
 
 =head2 C<controller_class>
 
-    my $class = $mojo->controller_class;
-    $mojo     = $mojo->controller_class('Mojolicious::Controller');
+    my $class = $app->controller_class;
+    $app      = $app->controller_class('Mojolicious::Controller');
 
 Class to be used for the default controller, defaults to
 L<Mojolicious::Controller>.
 
 =head2 C<mode>
 
-    my $mode = $mojo->mode;
-    $mojo    = $mojo->mode('production');
+    my $mode = $app->mode;
+    $app     = $app->mode('production');
 
 The operating mode for your application.
 It defaults to the value of the environment variable C<MOJO_MODE> or
@@ -416,8 +416,8 @@ to your application named C<$mode_mode>.
 
 =head2 C<plugins>
 
-    my $plugins = $mojo->plugins;
-    $mojo       = $mojo->plugins(Mojolicious::Plugins->new);
+    my $plugins = $app->plugins;
+    $app        = $app->plugins(Mojolicious::Plugins->new);
 
 The plugin loader, by default a L<Mojolicious::Plugins> object.
 You can usually leave this alone, see L<Mojolicious::Plugin> if you want to
@@ -425,8 +425,8 @@ write a plugin.
 
 =head2 C<renderer>
 
-    my $renderer = $mojo->renderer;
-    $mojo        = $mojo->renderer(MojoX::Renderer->new);
+    my $renderer = $app->renderer;
+    $app         = $app->renderer(MojoX::Renderer->new);
 
 Used in your application to render content, by default a L<MojoX::Renderer>
 object.
@@ -435,8 +435,8 @@ L<Mojolicious::Plugin::EplRenderer> contain more specific information.
 
 =head2 C<routes>
 
-    my $routes = $mojo->routes;
-    $mojo      = $mojo->routes(MojoX::Dispatcher::Routes->new);
+    my $routes = $app->routes;
+    $app       = $app->routes(MojoX::Dispatcher::Routes->new);
 
 The routes dispatcher, by default a L<MojoX::Dispatcher::Routes> object.
 You use this in your startup method to define the url endpoints for your
@@ -451,8 +451,8 @@ application.
 
 =head2 C<secret>
 
-    my $secret = $mojo->secret;
-    $mojo      = $mojo->secret('passw0rd');
+    my $secret = $app->secret;
+    $app       = $app->secret('passw0rd');
 
 A secret passphrase used for signed cookies and the like, defaults to the
 application name which is not very secure, so you should change it!!!
@@ -461,22 +461,22 @@ the log file reminding you to change your passphrase.
 
 =head2 C<static>
 
-    my $static = $mojo->static;
-    $mojo      = $mojo->static(MojoX::Dispatcher::Static->new);
+    my $static = $app->static;
+    $app       = $app->static(MojoX::Dispatcher::Static->new);
 
 For serving static assets from your C<public> directory, by default a
 L<MojoX::Dispatcher::Static> object.
 
 =head2 C<types>
 
-    my $types = $mojo->types;
-    $mojo     = $mojo->types(MojoX::Types->new);
+    my $types = $app->types;
+    $app      = $app->types(MojoX::Types->new);
 
 Responsible for tracking the types of content you want to serve in your
 application, by default a L<MojoX::Types> object.
 You can easily register new types.
 
-    $mojo->types->type(vti => 'help/vampire');
+    $app->types->type(vti => 'help/vampire');
 
 =head1 METHODS
 
@@ -485,7 +485,7 @@ new ones.
 
 =head2 C<new>
 
-    my $mojo = Mojolicious->new;
+    my $app = Mojolicious->new;
 
 Construct a new L<Mojolicious> application.
 Will automatically detect your home directory and set up logging based on
@@ -494,13 +494,13 @@ Also sets up the renderer, static dispatcher and a default set of plugins.
 
 =head2 C<add_helper>
 
-    $mojo->add_helper(foo => sub { ... });
+    $app->add_helper(foo => sub { ... });
 
 Add a new helper.
 Note that this method is EXPERIMENTAL and might change without warning!
 
     # Helper
-    $mojo->add_helper(add => sub { $_[1] + $_[2] });
+    $app->add_helper(add => sub { $_[1] + $_[2] });
 
     # Controller
     my $result = $self->add(2, 3);
@@ -510,21 +510,21 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<defaults>
 
-    my $defaults = $mojo->default;
-    my $foo      = $mojo->defaults('foo');
-    $mojo        = $mojo->defaults({foo => 'bar'});
-    $mojo        = $mojo->defaults(foo => 'bar');
+    my $defaults = $app->default;
+    my $foo      = $app->defaults('foo');
+    $app         = $app->defaults({foo => 'bar'});
+    $app         = $app->defaults(foo => 'bar');
 
 Default values for the stash.
 Note that this method is EXPERIMENTAL and might change without warning!
 
-    $mojo->defaults->{foo} = 'bar';
-    my $foo = $mojo->defaults->{foo};
-    delete $mojo->defaults->{foo};
+    $app->defaults->{foo} = 'bar';
+    my $foo = $app->defaults->{foo};
+    delete $app->defaults->{foo};
 
 =head2 C<dispatch>
 
-    $mojo->dispatch($c);
+    $app->dispatch($c);
 
 The heart of every Mojolicious application, calls the static and routes
 dispatchers for every request and passes them a L<Mojolicious::Controller>
@@ -532,21 +532,21 @@ object.
 
 =head2 C<handler>
 
-    $tx = $mojo->handler($tx);
+    $tx = $app->handler($tx);
 
 Sets up the default controller and calls process for every request.
 
 =head2 C<plugin>
 
-    $mojo->plugin('something');
-    $mojo->plugin('something', foo => 23);
-    $mojo->plugin('something', {foo => 23});
+    $app->plugin('something');
+    $app->plugin('something', foo => 23);
+    $app->plugin('something', {foo => 23});
 
 Load a plugin.
 
 =head2 C<process>
 
-    $mojo->process($c);
+    $app->process($c);
 
 This method can be overloaded to do logic on a per request basis, by default
 just calls dispatch and passes it a L<Mojolicious::Controller> object.
@@ -568,7 +568,7 @@ application.
 
 =head2 C<startup>
 
-    $mojo->startup;
+    $app->startup;
 
 This is your main hook into the application, it will be called at application
 startup.

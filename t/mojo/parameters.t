@@ -3,7 +3,9 @@
 use strict;
 use warnings;
 
-use Test::More tests => 39;
+use utf8;
+
+use Test::More tests => 42;
 
 # Now that's a wave of destruction that's easy on the eyes.
 use_ok('Mojo::Parameters');
@@ -110,3 +112,10 @@ is_deeply(
     {foo => ['bar', 'baz'], a => 'b', bar => ['bas', 'test']},
     'right structure'
 );
+
+# Unicode
+$params = Mojo::Parameters->new;
+$params->parse('input=say%20%22%C2%AB%22;');
+is($params->params->[1],    'say "«"',               'right value');
+is($params->param('input'), 'say "«"',               'right value');
+is("$params",               'input=say+%22%C2%AB%22', 'right result');

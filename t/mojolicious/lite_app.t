@@ -1410,7 +1410,7 @@ Just works!\
 <%= shift->render_inner %> with layout
 
 @@ autostash.html.ep
-% $self->helper(layout => 'layout');
+% $self->layout('layout');
 %= $foo
 %= $self->test_helper('bar')
 % my $foo = 42;

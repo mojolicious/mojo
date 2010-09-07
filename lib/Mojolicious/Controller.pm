@@ -500,14 +500,7 @@ Callback signaling that the transaction has been finished.
 
 =head2 C<helper>
 
-    $c->helper('foo');
-    $c->helper(foo => 23);
-
-Directly call a L<Mojolicious> helper, see
-L<Mojolicious::Plugin::DefaultHelpers> for a list of helpers that are always
-available.
-Note that this method is DEPRECATED and will be removed soon!
-Helpers can now be called like normal methods.
+This method is DEPRECATED, helpers can now be called like normal methods.
 
     $c->foo(23);
 

@@ -116,8 +116,6 @@ sub new {
     return $self;
 }
 
-sub add_helper { shift->renderer->add_helper(@_) }
-
 sub defaults {
     my $self = shift;
 
@@ -204,6 +202,8 @@ sub handler {
     };
     $self->log->error("Processing request failed: $@") if $@;
 }
+
+sub helper { shift->renderer->add_helper(@_) }
 
 sub plugin {
     my $self = shift;
@@ -492,25 +492,9 @@ Will automatically detect your home directory and set up logging based on
 your current operating mode.
 Also sets up the renderer, static dispatcher and a default set of plugins.
 
-=head2 C<add_helper>
-
-    $app->add_helper(foo => sub { ... });
-
-Add a new helper.
-Note that this method is EXPERIMENTAL and might change without warning!
-
-    # Helper
-    $app->add_helper(add => sub { $_[1] + $_[2] });
-
-    # Controller
-    my $result = $self->add(2, 3);
-
-    # Template
-    <%= add 2, 3 %>
-
 =head2 C<defaults>
 
-    my $defaults = $app->default;
+    my $defaults = $app->defaults;
     my $foo      = $app->defaults('foo');
     $app         = $app->defaults({foo => 'bar'});
     $app         = $app->defaults(foo => 'bar');
@@ -535,6 +519,22 @@ object.
     $tx = $app->handler($tx);
 
 Sets up the default controller and calls process for every request.
+
+=head2 C<helper>
+
+    $app->helper(foo => sub { ... });
+
+Add a new helper.
+Note that this method is EXPERIMENTAL and might change without warning!
+
+    # Helper
+    $app->helper(add => sub { $_[1] + $_[2] });
+
+    # Controller
+    my $result = $self->add(2, 3);
+
+    # Template
+    <%= add 2, 3 %>
 
 =head2 C<plugin>
 

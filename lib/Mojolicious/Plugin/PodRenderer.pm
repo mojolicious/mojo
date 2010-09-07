@@ -36,7 +36,7 @@ sub register {
     );
 
     # Add "pod_to_html" helper
-    $app->add_helper(pod_to_html =>
+    $app->helper(pod_to_html =>
           sub { shift; Mojo::ByteStream->new($self->_pod_to_html(@_)) });
 }
 

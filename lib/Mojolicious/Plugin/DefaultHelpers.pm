@@ -13,11 +13,11 @@ sub register {
     my ($self, $app) = @_;
 
     # Add "app" helper
-    $app->add_helper(app => sub { shift->app });
+    $app->helper(app => sub { shift->app });
 
     # Add "cache" helper
     my $cache = {};
-    $app->add_helper(
+    $app->helper(
         cache => sub {
             shift;
 
@@ -37,10 +37,10 @@ sub register {
     );
 
     # Add "content" helper
-    $app->add_helper(content => sub { shift->render_inner(@_) });
+    $app->helper(content => sub { shift->render_inner(@_) });
 
     # Add "dumper" helper
-    $app->add_helper(
+    $app->helper(
         dumper => sub {
             shift;
             Data::Dumper->new([@_])->Maxdepth(2)->Indent(1)->Terse(1)->Dump;
@@ -48,7 +48,7 @@ sub register {
     );
 
     # Add "extends" helper
-    $app->add_helper(
+    $app->helper(
         extends => sub {
             my $self  = shift;
             my $stash = $self->stash;
@@ -59,13 +59,13 @@ sub register {
     );
 
     # Add "flash" helper
-    $app->add_helper(flash => sub { shift->flash(@_) });
+    $app->helper(flash => sub { shift->flash(@_) });
 
     # Add "include" helper
-    $app->add_helper(include => sub { shift->render_partial(@_) });
+    $app->helper(include => sub { shift->render_partial(@_) });
 
     # Add "layout" helper
-    $app->add_helper(
+    $app->helper(
         layout => sub {
             my $self  = shift;
             my $stash = $self->stash;
@@ -76,17 +76,17 @@ sub register {
     );
 
     # Add "param" helper
-    $app->add_helper(param =>
+    $app->helper(param =>
           sub { wantarray ? (shift->param(@_)) : scalar shift->param(@_); });
 
     # Add "session" helper
-    $app->add_helper(session => sub { shift->session(@_) });
+    $app->helper(session => sub { shift->session(@_) });
 
     # Add "stash" helper
-    $app->add_helper(stash => sub { shift->stash(@_) });
+    $app->helper(stash => sub { shift->stash(@_) });
 
     # Add "url_for" helper
-    $app->add_helper(url_for => sub { shift->url_for(@_) });
+    $app->helper(url_for => sub { shift->url_for(@_) });
 }
 
 1;

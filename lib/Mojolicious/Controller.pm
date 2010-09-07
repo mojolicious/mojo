@@ -506,6 +506,10 @@ Callback signaling that the transaction has been finished.
 Directly call a L<Mojolicious> helper, see
 L<Mojolicious::Plugin::DefaultHelpers> for a list of helpers that are always
 available.
+Note that this method is DEPRECATED and will be removed soon!
+Helpers can now be called like normal methods.
+
+    $c->foo(23);
 
 =head2 C<receive_message>
 

@@ -20,11 +20,9 @@ sub config {
 }
 
 sub index {
-    shift->stash(
-        layout  => 'default',
-        handler => 'xpl',
-        msg     => 'Hello World!'
-    );
+    my $self = shift;
+    $self->layout('default');
+    $self->stash(handler => 'xpl', msg => 'Hello World!');
 }
 
 sub session_domain {

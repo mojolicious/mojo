@@ -22,6 +22,9 @@ sub run {
     my $self = shift;
     my $psgi = Mojo::Server::PSGI->new;
 
+    # Preload
+    $psgi->app;
+
     # Return app callback
     return sub { $psgi->run(@_) };
 }

@@ -18,6 +18,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added while and until methods for Mojo::DOM collections. (vti)
         - Simplified transaction pausing by replacing it with an automatism.
         - Improved RFC3986 compliance of Mojo::Path. (janus)
+        - Improved Mojo::Server::PSGI to preload applications.
         - Fixed a serious design flaw in Mojo::Message and made long poll
           much easier.
         - Fixed a bug where Mojo::IOLoop connections could be closed too

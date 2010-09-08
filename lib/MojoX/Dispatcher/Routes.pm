@@ -24,10 +24,20 @@ sub auto_render {
     # Transaction
     my $tx = $c->tx;
 
-    # Render
-    $c->render unless $c->stash->{'mojo.rendered'} || $tx->is_websocket;
+    # Rendering
+    my $success = eval {
 
-    # Nothing to render
+        # Render
+        $c->render unless $c->stash->{'mojo.rendered'} || $tx->is_websocket;
+
+        # Success
+        1;
+    };
+
+    # Renderer error
+    $c->render_exception($@) if !$success && $@;
+
+    # Rendered
     return;
 }
 

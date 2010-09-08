@@ -190,6 +190,7 @@ sub render_exception {
     my $options = {
         template         => 'exception',
         format           => 'html',
+        handler          => undef,
         status           => 500,
         exception        => $e,
         'mojo.exception' => 1

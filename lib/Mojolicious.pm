@@ -200,7 +200,13 @@ sub handler {
     eval {
         $self->process($class->new(app => $self, stash => $stash, tx => $tx));
     };
-    $self->log->error("Processing request failed: $@") if $@;
+
+    # Fatal exception
+    if ($@) {
+        $self->log->fatal("Processing request failed: $@");
+        $tx->res->code(500);
+        $tx->resume;
+    }
 }
 
 sub helper { shift->renderer->add_helper(@_) }

@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 561;
+plan tests => 571;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -38,7 +38,7 @@ use Test::Mojo;
 use ojo;
 
 # Silence
-app->log->level('fatal');
+app->log->level('error');
 
 # Test with lite templates
 app->renderer->default_handler('epl');
@@ -52,6 +52,9 @@ app->defaults(default => 23);
 # Test helpers
 app->helper(test_helper => sub { shift->param(@_) });
 app->helper(dead => sub { die $_[1] || 'works!' });
+
+# Test renderer
+app->renderer->add_handler(dead => sub { die 'renderer works!' });
 
 # GET /
 get '/' => 'root';
@@ -74,6 +77,12 @@ get '/dead' => sub {
 
 # GET /dead_template
 get '/dead_template' => 'dead_template';
+
+# GET /dead_renderer
+get '/dead_renderer' => sub { shift->render(handler => 'dead') };
+
+# GET /dead_auto_renderer
+get '/dead_auto_renderer' => {handler => 'dead'};
 
 # GET /regex/in/template
 get '/regex/in/template' => 'test(test)(\Qtest\E)(';
@@ -623,15 +632,30 @@ $t->get_ok('/null/0')->status_is(200)
   ->content_like(qr/layouted 0/);
 
 # GET /dead
+my $level = app->log->level;
+app->log->level('fatal');
 $t->get_ok('/dead')->status_is(500)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/works!/);
+
+# GET /dead_renderer
+$t->get_ok('/dead_renderer')->status_is(500)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_like(qr/renderer works!/);
+
+# GET /dead_auto_renderer
+$t->get_ok('/dead_auto_renderer')->status_is(500)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_like(qr/renderer works!/);
 
 # GET /dead_template
 $t->get_ok('/dead_template')->status_is(500)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/works too!/);
+app->log->level($level);
 
 # GET /regex/in/template
 $t->get_ok('/regex/in/template')->status_is(200)
@@ -1018,7 +1042,7 @@ $t->post_form_ok(
       ->to_string);
 
 # POST /malformed_utf8
-my $level = app->log->level;
+$level = app->log->level;
 app->log->level('fatal');
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('POST');
@@ -1075,8 +1099,7 @@ $level = app->log->level;
 app->log->level('fatal');
 $t->get_ok('/eperror')->status_is(500)
   ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->text_is('title', 'Internal Server Error');
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_like(qr/\$c/);
 app->log->level($level);
 
 # GET /subrequest

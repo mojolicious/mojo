@@ -24,6 +24,7 @@ This file documents the revision history for Perl extension Mojolicious.
           much easier.
         - Fixed a bug where Mojo::IOLoop connections could be closed too
           early.
+        - Fixed a bug where a broken renderer could cause a fatal exception.
         - Fixed HTTPS support for CGI environments.
         - Fixed a auto rendering bug related to bridges.
         - Fixed Mojo::IOLoop Windows support.

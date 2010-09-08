@@ -42,9 +42,7 @@ sub detect {
 
     # FastCGI
     return 'fastcgi'
-      if !defined $ENV{PATH}
-          || defined $ENV{FCGI_ID}
-          || defined $ENV{FCGI_ROLE};
+      if !defined $ENV{TMP} && !defined $ENV{TEMP} && !defined $ENV{TMPDIR};
 
     # Nothing
     return;

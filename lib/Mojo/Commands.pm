@@ -41,7 +41,10 @@ sub detect {
     return $guess if $guess;
 
     # FastCGI
-    return 'fastcgi' unless defined $ENV{PATH};
+    return 'fastcgi'
+      if !defined $ENV{PATH}
+          || defined $ENV{FCGI_ID}
+          || defined $ENV{FCGI_ROLE};
 
     # Nothing
     return;

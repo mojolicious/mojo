@@ -143,7 +143,9 @@ sub _dispatch_controller {
     my $method = $self->_generate_method($c);
 
     # Debug
-    $c->app->log->debug('Dispatching controller.');
+    my $dispatch = ref $app || $app;
+    $dispatch .= "->$method" if $method;
+    $c->app->log->debug("Dispatching $dispatch.");
 
     # Load class
     unless (ref $app && $self->{_loaded}->{$app}) {

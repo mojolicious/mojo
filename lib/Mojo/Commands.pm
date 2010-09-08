@@ -40,9 +40,8 @@ sub detect {
     # No further detection if we have a guess
     return $guess if $guess;
 
-    # FastCGI
-    return 'fastcgi'
-      if !defined $ENV{TMP} && !defined $ENV{TEMP} && !defined $ENV{TMPDIR};
+    # FastCGI (detect absence of WINDIR for Windows and USER for UNIX)
+    return 'fastcgi' if !defined $ENV{WINDIR} && !defined $ENV{USER};
 
     # Nothing
     return;

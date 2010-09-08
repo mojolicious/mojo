@@ -119,8 +119,8 @@ sub render {
     unless ($stash->{template} || $args->{template}) {
 
         # Default template
-        my $controller = $stash->{controller};
-        my $action     = $stash->{action};
+        my $controller = $args->{controller} || $stash->{controller};
+        my $action     = $args->{action}     || $stash->{action};
 
         # Normal default template
         if ($controller && $action) {

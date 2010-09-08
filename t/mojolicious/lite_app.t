@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 571;
+plan tests => 576;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -66,6 +66,12 @@ a '/ojo' => {json => {hello => 'world'}};
 get '/null/:null' => sub {
     my $self = shift;
     $self->render(text => $self->param('null'), layout => 'layout');
+};
+
+# GET /action_template
+get '/action_template' => {controller => 'foo'} => sub {
+    my $self = shift;
+    $self->render(action => 'bar');
 };
 
 # GET /dead
@@ -630,6 +636,12 @@ $t->get_ok('/null/0')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/layouted 0/);
+
+# GET /action_template
+$t->get_ok('/action_template')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("controller and action!\n");
 
 # GET /dead
 my $level = app->log->level;
@@ -1323,6 +1335,9 @@ is( $timer,
 );
 
 __DATA__
+@@ foo/bar.html.ep
+controller and action!
+
 @@ dead_template.html.ep
 <%= dead 'works too!' %>
 

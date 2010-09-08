@@ -1398,10 +1398,10 @@ text!
 <%= cache test => begin =%>
 <%= 'c' . time . int(rand(999)) =%>
 <% end =%>
-<%= cache expiry => { expires => time + 1 } => begin %>
+<%= cache expiry => {expires => time + 1} => begin %>
 <%= 'd' . time . int(rand(999)) =%>
 <% end =%>
-<%= cache { expires => time + 1 } => begin %>
+<%= cache {expires => time + 1} => begin %>
 <%= 'e' . time . int(rand(999)) =%>
 <% end =%>
 

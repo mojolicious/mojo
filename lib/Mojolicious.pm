@@ -94,6 +94,9 @@ sub new {
     $self->log->path($home->rel_file("log/$mode.log"))
       if -w $home->rel_file('log');
 
+    # Plugin namespace
+    unshift @{$self->plugins->namespaces}, $r->namespace . '::Plugin';
+
     # Plugins
     $self->plugin('agent_condition');
     $self->plugin('default_helpers');

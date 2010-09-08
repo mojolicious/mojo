@@ -48,7 +48,10 @@ sub stage1 {
     return;
 }
 
-sub stage2 { shift->render_text('Welcome aboard!') }
+sub stage2 {
+    my $self = shift;
+    $self->render_text($self->test_plugin);
+}
 
 sub syntaxerror { shift->render('syntaxerror', format => 'html') }
 

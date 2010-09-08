@@ -17,6 +17,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL write, write_chunk and rendered methods to
           Mojolicious::Controller.
         - Added while and until methods for Mojo::DOM collections. (vti)
+        - Added application specific plugin namespace to Mojolicious.
         - Simplified transaction pausing by replacing it with an automatism.
         - Improved RFC3986 compliance of Mojo::Path. (janus)
         - Improved Mojo::Server::PSGI to preload applications.

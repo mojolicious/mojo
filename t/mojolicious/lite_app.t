@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 551;
+plan tests => 561;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -38,7 +38,7 @@ use Test::Mojo;
 use ojo;
 
 # Silence
-app->log->level('error');
+app->log->level('fatal');
 
 # Test with lite templates
 app->renderer->default_handler('epl');
@@ -49,8 +49,9 @@ plugin 'header_condition';
 # Default
 app->defaults(default => 23);
 
-# Test helper
+# Test helpers
 app->helper(test_helper => sub { shift->param(@_) });
+app->helper(dead => sub { die $_[1] || 'works!' });
 
 # GET /
 get '/' => 'root';
@@ -63,6 +64,16 @@ get '/null/:null' => sub {
     my $self = shift;
     $self->render(text => $self->param('null'), layout => 'layout');
 };
+
+# GET /dead
+get '/dead' => sub {
+    my $self = shift;
+    $self->dead;
+    $self->render(text => 'failed!');
+};
+
+# GET /dead_template
+get '/dead_template' => 'dead_template';
 
 # GET /regex/in/template
 get '/regex/in/template' => 'test(test)(\Qtest\E)(';
@@ -610,6 +621,17 @@ $t->get_ok('/null/0')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/layouted 0/);
+
+# GET /dead
+$t->get_ok('/dead')->status_is(500)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_like(qr/works!/);
+
+# GET /dead_template
+$t->get_ok('/dead_template')->status_is(500)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_like(qr/works too!/);
 
 # GET /regex/in/template
 $t->get_ok('/regex/in/template')->status_is(200)
@@ -1278,6 +1300,9 @@ is( $timer,
 );
 
 __DATA__
+@@ dead_template.html.ep
+<%= dead 'works too!' %>
+
 @@ tags.html.ep
 <%= tag 'foo' %>
 <%= tag 'foo', bar => 'baz' %>

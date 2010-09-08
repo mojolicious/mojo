@@ -72,6 +72,7 @@ get '/null/:null' => sub {
 get '/action_template' => {controller => 'foo'} => sub {
     my $self = shift;
     $self->render(action => 'bar');
+    $self->rendered;
 };
 
 # GET /dead

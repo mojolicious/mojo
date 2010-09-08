@@ -26,13 +26,32 @@ sub register {
             return '' unless ref $cb && ref $cb eq 'CODE';
 
             # Name
-            my $name = pop || join '', map { $_ || '' } caller(1);
+            my $name = shift;
+
+            # Arguments
+            my $args;
+            if (ref $name && ref $name eq 'HASH') {
+                $args = $name;
+                $name = undef;
+            }
+            else { $args = shift || {} }
+
+            # Default name
+            $name ||= join '', map { $_ || '' } caller(1);
+
+            # Expire
+            my $expires = $args->{expires} || 0;
+            delete $cache->{$name}
+              if exists $cache->{$name}
+                  && $expires > 0
+                  && $cache->{$name}->{expires} < time;
 
             # Cached
-            return $cache->{$name} if exists $cache->{$name};
+            return $cache->{$name}->{content} if exists $cache->{$name};
 
             # Cache
-            $cache->{$name} = $cb->();
+            $cache->{$name}->{expires} = $expires;
+            $cache->{$name}->{content} = $cb->();
         }
     );
 
@@ -118,7 +137,13 @@ L<Mojolicious>.
     <%= cache begin %>
         <%= time %>
     <% end %>
+    <%= cache {expires => time + 1} => begin %>
+        <%= time %>
+    <% end %>
     <%= cache foo => begin %>
+        <%= time %>
+    <% end %>
+    <%= cache foo => {expires => time + 1} => begin %>
         <%= time %>
     <% end %>
 

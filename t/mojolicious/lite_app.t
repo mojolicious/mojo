@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 576;
+plan tests => 582;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -950,7 +950,7 @@ $t->post_ok('/template')->status_is(200)
 $t->get_ok('/cached')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/\d+a\d+b\d+c\d+/);
+  ->content_like(qr/\d+a\d+b\d+c\d+d\d+e\d+/);
 my $cached = $t->tx->res->body;
 
 # GET /cached
@@ -962,6 +962,14 @@ $t->get_ok('/cached')->status_is(200)
 $t->get_ok('/cached')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is($cached);
+
+# GET /cached (expired)
+sleep 2;
+$t->get_ok('/cached')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_like(qr/\d+a\d+b\d+c\d+d\d+e\d+/);
+isnt($cached, $t->tx->res->body, 'cached blocks expired');
 
 # GET /something
 $t->get_ok('/something')->status_is(200)
@@ -1389,6 +1397,12 @@ text!
 <% end =%>
 <%= cache test => begin =%>
 <%= 'c' . time . int(rand(999)) =%>
+<% end =%>
+<%= cache expiry => { expires => time + 1 } => begin %>
+<%= 'd' . time . int(rand(999)) =%>
+<% end =%>
+<%= cache { expires => time + 1 } => begin %>
+<%= 'e' . time . int(rand(999)) =%>
 <% end =%>
 
 @@ test(test)(\Qtest\E)(.html.ep

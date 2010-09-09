@@ -74,10 +74,8 @@ is($tx->kept_alive, 1,        'kept connection alive');
 is($tx->res->code,  200,      'right status');
 is($tx->res->body,  'works!', 'no content');
 
-# GET / (close connection)
-$client->get(
-    "http://localhost:$port/mock" => sub { shift->ioloop->drop($last) })
-  ->process;
+# Close connection (bypassing safety net)
+$client->ioloop->_drop_immediately($last);
 
 # GET / (mock server closed connection)
 $tx = $client->get("http://localhost:$port/mock");
@@ -93,10 +91,8 @@ is($tx->kept_alive, 1,        'kept connection alive');
 is($tx->res->code,  200,      'right status');
 is($tx->res->body,  'works!', 'no content');
 
-# GET / (close connection)
-$client->get(
-    "http://localhost:$port/mock" => sub { shift->ioloop->drop($last) })
-  ->process;
+# Close connection (bypassing safety net)
+$client->ioloop->_drop_immediately($last);
 
 # GET / (mock server closed connection)
 $tx = $client->get("http://localhost:$port/mock");

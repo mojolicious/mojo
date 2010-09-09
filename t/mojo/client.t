@@ -12,7 +12,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 825;
+plan tests => 841;
 
 use_ok('Mojo::Client');
 
@@ -95,6 +95,40 @@ is($tx->res->body,  'works!', 'no content');
 $client->ioloop->_drop_immediately($last);
 
 # GET / (mock server closed connection)
+$tx = $client->get("http://localhost:$port/mock");
+ok($tx->success, 'successful');
+is($tx->kept_alive, undef,    'kept connection not alive');
+is($tx->res->code,  200,      'right status');
+is($tx->res->body,  'works!', 'no content');
+
+# GET / (mock server again)
+$tx = $client->get("http://localhost:$port/mock");
+ok($tx->success, 'successful');
+is($tx->kept_alive, 1,        'kept connection alive');
+is($tx->res->code,  200,      'right status');
+is($tx->res->body,  'works!', 'no content');
+
+# Taint connection
+$client->ioloop->write($last => 'broken!');
+
+# GET / (mock server tainted connection)
+$tx = $client->get("http://localhost:$port/mock");
+ok($tx->success, 'successful');
+is($tx->kept_alive, undef,    'kept connection not alive');
+is($tx->res->code,  200,      'right status');
+is($tx->res->body,  'works!', 'no content');
+
+# GET / (mock server again)
+$tx = $client->get("http://localhost:$port/mock");
+ok($tx->success, 'successful');
+is($tx->kept_alive, 1,        'kept connection alive');
+is($tx->res->code,  200,      'right status');
+is($tx->res->body,  'works!', 'no content');
+
+# Taint connection
+$client->ioloop->write($last => 'broken!');
+
+# GET / (mock server tainted connection)
 $tx = $client->get("http://localhost:$port/mock");
 ok($tx->success, 'successful');
 is($tx->kept_alive, undef,    'kept connection not alive');

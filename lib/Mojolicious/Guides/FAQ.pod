@@ -12,31 +12,36 @@ L<Mojolicious> together with the right answers.
 
 =head2 Does L<Mojolicious> run on Windows systems?
 
-Sure it does! Right now there are two different ways of running Perl
-on the Windows platform. One is C<Strawberry Perl> and the other is
-C<ActiveState Perl>. Both are capable Perl distributions which are
-stable, mature and ready for production. C<Strawberry Perl> seems to be
-the Perl distribution of choice for that platform. It comes with a fully
-working toolchain around Perl which allows you to install modules from
-the L<CPAN> archive even XS based modules.
-With C<Strawberry Perl> it's even possible to download the sources from
-the github repository, unzip them and install them straight from the
-source as you would do on a Unix based machine.
+Sure it does!
+Right now there are two different ways of running Perl on the Windows
+platform.
+One is C<Strawberry Perl> and the other is C<ActiveState Perl>.
+Both are capable Perl distributions which are stable, mature and ready for
+production.
+But C<Strawberry Perl> is quite a bit better at dealing with the L<CPAN> and
+especially XS based modules due to its remarkable toolchain.
+With it you can even install modules straight from the source as you would do
+on a Unix based machine.
 
 =head2 Is it possible to run the builtin webserver on Windows?
 
-It is! The builtin webserver is great way to run your L<Mojolicious>
-web application on any platform. However there are some performance
-drawbacks on Windows as it was optimized for Unix environments. Please
-check L<Mojolicious::Guides::Cookbook> for more information about
-running L<Mojolicious>.
+It is!
+The builtin webserver is great way to run your L<Mojolicious> web application
+on any platform.
+See L<Mojolicious::Guides::Cookbook> for more information about running and
+deploying L<Mojolicious> applications.
 
-Please note: If you run your L<Mojolicious::Lite> application with the
-options C<daemon --reload> Windows will lock your file. If you use the
-Windows editor C<WordPad> it will complain that this file has already
-been opened by a different proccess. Using a more capable editor can
-handle this accordingly by forcing the change. L<Mojolicious> will
-notice the change and will reload your server.
+Note that if you run your application with the C<--reload> option Windows
+will lock your files.
+A simple Windows editor like C<WordPad> will complain that the file has
+already been opened by a different proccess.
+More capable editors can handle this accordingly and force the change.
+
+=head2 Whats the easiest way to install L<Mojolicious> on UNIX?
+
+Quite possibly this oneliner.
+
+    % sudo -s ‘curl -L cpanmin.us | perl – Mojolicious’
 
 =head2 I think L<Mojolicious> is awesome, how can i support you guys?
 

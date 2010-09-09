@@ -739,6 +739,8 @@ The Perl Foundation
 
 Tomas Znamenacek
 
+Ulrich Habel
+
 Ulrich Kautz
 
 Uwe Voelker

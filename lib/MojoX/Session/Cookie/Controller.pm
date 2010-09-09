@@ -202,7 +202,7 @@ Access request cookie values and create new response cookies.
     $c        = $c->flash({foo => 'bar'});
     $c        = $c->flash(foo => 'bar');
 
-Data storage persistent for a single request, stored in the session.
+Data storage persistent for the next request, stored in the session.
 
     $c->flash->{foo} = 'bar';
     my $foo = $c->flash->{foo};

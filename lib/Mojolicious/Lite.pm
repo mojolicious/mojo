@@ -539,8 +539,9 @@ Formats can be automatically detected by looking at file extensions.
 
 Signed cookie based sessions just work out of the box as soon as you start
 using them.
-The C<flash> can be used to store values that will only be available for one
-request, this is very useful in combination with C<redirect_to>.
+The C<flash> can be used to store values that will only be available for the next
+request (unlike stash, which is only available for the current request), 
+this is very useful in combination with C<redirect_to>.
 
     use Mojolicious::Lite;
 

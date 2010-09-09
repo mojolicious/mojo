@@ -20,6 +20,8 @@ sub startup {
     $self->log->level('fatal');
 
     # Plugin
+    unshift @{$self->plugins->namespaces},
+      $self->routes->namespace . '::Plugin';
     $self->plugin('test_plugin');
 
     # Templateless renderer

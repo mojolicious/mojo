@@ -12,7 +12,7 @@ L<Mojolicious> together with the right answers.
 
 =head2 I think L<Mojolicious> is awesome, how can i support you guys?
 
-Blog and tweet about it, get other people hooked! :)
+Share your success story via blog or twitter, get more people hooked! :)
 
 =head2 I think i have found a bug, what should i do now?
 
@@ -25,12 +25,12 @@ right.
 Writing a test is usually the hardest part of fixing a bug, so the better
 your test case the faster it can be fixed. ;)
 
-Now you are ready to contact the developers via GitHub
+Once thats done you can contact the developers via GitHub
 (http://github.com/kraih/mojo), mailing list
 (L<http://groups.google.com/group/mojolicious>) or IRC
 (C<#mojo> on C<irc.perl.org>).
 
-If you decide to fix the bug yourself make sure to take a look at
-L<Mojolicious::Guides::CodingGuidelines> too.
+If you decide to fix the bug yourself make sure to also take a look at
+L<Mojolicious::Guides::CodingGuidelines>.
 
 =cut

@@ -538,17 +538,29 @@ sub _cache {
         return $self;
     }
 
+    # Loop
+    my $loop = $self->ioloop;
+
     # Dequeue
     my $result;
     my @cache;
     for my $cached (@$cache) {
 
         # Search for name or id
-        $result = $cached->[1] and next
-          if $cached->[1] eq $name || $cached->[0] eq $name;
+        if (!$result && ($cached->[1] eq $name || $cached->[0] eq $name)) {
+
+            # Result
+            my $id = $cached->[1];
+
+            # Test connection
+            if ($loop->test($id)) { $result = $id }
+
+            # Drop corrupted connection
+            else { $loop->drop($id) }
+        }
 
         # Cache again
-        push @cache, $cached;
+        else { push @cache, $cached }
     }
     $self->{_cache} = \@cache;
 

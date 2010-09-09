@@ -533,6 +533,25 @@ sub start_tls {
 
 sub stop { delete shift->{_running} }
 
+sub test {
+    my ($self, $id) = @_;
+
+    # Connection
+    return unless my $c = $self->{_cs}->{$id};
+
+    # Socket
+    return unless my $socket = $c->{socket};
+
+    # Test
+    my $test = $self->{_test} ||= IO::Poll->new;
+    $test->mask($socket, POLLIN);
+    $test->poll(0);
+    my $result = $test->handles(POLLIN | POLLERR | POLLHUP);
+    $test->remove($socket);
+
+    return !$result;
+}
+
 sub timer {
     my ($self, $after, $cb) = @_;
 
@@ -1666,6 +1685,13 @@ Callback to invoke for TLS verification.
 
 Stop the loop immediately, this will not interrupt any existing connections
 and the loop can be restarted by running C<start> again.
+
+=head2 C<test>
+
+    my $success = $loop->test($id);
+
+Test for errors and garbage bytes on the connection.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<timer>
 

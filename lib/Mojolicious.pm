@@ -33,7 +33,7 @@ __PACKAGE__->attr(session => sub { MojoX::Session::Cookie->new });
 __PACKAGE__->attr(static  => sub { MojoX::Dispatcher::Static->new });
 __PACKAGE__->attr(types   => sub { MojoX::Types->new });
 
-our $CODENAME = 'Comet';
+our $CODENAME = 'Hot Beverage';
 our $VERSION  = '0.999930';
 
 # I personalized each of your meals.
@@ -238,6 +238,8 @@ sub startup { }
 
 1;
 __END__
+
+=encoding utf8
 
 =head1 NAME
 
@@ -602,6 +604,17 @@ startup.
 =head2 Repository
 
     http://github.com/kraih/mojo
+
+=head1 CODE NAMES
+
+Every major release of L<Mojolicious> has a code name, these are the ones
+that have been used in the past.
+
+0.999930, C<Hot Beverage>, \u2615, ☕
+
+0.999927, C<Comet>, \u2604, ☄
+
+0.999920, C<Snowman>, \u2603, ☃
 
 =head1 AUTHOR
 

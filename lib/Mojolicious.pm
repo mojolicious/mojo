@@ -304,7 +304,7 @@ Very clean, portable and Object Oriented pure Perl API without any hidden
 magic and no requirements besides Perl 5.8.7.
 
 Full stack HTTP 1.1 and WebSocket client/server implementation with IPv6,
-TLS, Bonjour, IDNA, chunking and multipart support.
+TLS, Bonjour, IDNA, Comet (long polling), chunking and multipart support.
 
 Builtin async IO and prefork web server supporting epoll, kqueue, hot
 deployment and UNIX domain socket sharing, perfect for embedding.

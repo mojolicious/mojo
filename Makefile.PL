@@ -30,7 +30,8 @@ WriteMakefile(
                     license  => 'http://dev.perl.org/licenses/',
                     MailingList =>
                       'http://groups.google.com/group/mojolicious',
-                    repository => 'http://github.com/kraih/mojo'
+                    repository => 'http://github.com/kraih/mojo',
+                    bugtracker => 'http://github.com/kraih/mojo/issues'
                 },
                 no_index => {directory => [qw/t/]}
             },

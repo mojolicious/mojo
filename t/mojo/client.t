@@ -109,7 +109,7 @@ is($tx->res->code,  200,      'right status');
 is($tx->res->body,  'works!', 'no content');
 
 # Taint connection (on UNIX)
-$^O eq 'Win32'
+$^O eq 'MSWin32'
   ? $client->ioloop->_drop_immediately($last)
   : $client->ioloop->write($last => 'broken!');
 
@@ -128,7 +128,7 @@ is($tx->res->code,  200,      'right status');
 is($tx->res->body,  'works!', 'no content');
 
 # Taint connection (on UNIX)
-$^O eq 'Win32'
+$^O eq 'MSWin32'
   ? $client->ioloop->_drop_immediately($last)
   : $client->ioloop->write($last => 'broken!');
 

@@ -50,7 +50,7 @@ sub new {
             my $tx = Mojo::Transaction::HTTP->new;
 
             # Hook
-            $self->plugins->run_hook_reverse(after_build_tx => $tx);
+            $self->plugins->run_hook(after_build_tx => $tx);
 
             return $tx;
         }

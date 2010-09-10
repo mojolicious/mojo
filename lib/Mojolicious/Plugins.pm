@@ -138,10 +138,20 @@ implements the following new ones.
     $plugins = $plugins->add_hook(event => sub {...});
 
 Hook into an event.
-The following events are available.
-(Note that C<after_*> hooks run in reverse order)
+The following events are available and run in the listed order.
 
 =over 4
+
+=item after_build_tx
+
+Runs right after the transaction is built and before the HTTP request gets
+parsed.
+One usage case would be upload progress bars.
+(Passed the transaction instance)
+
+    $plugins->add_hook(before_request => sub {
+        my ($self, $tx) = @_;
+    });
 
 =item before_dispatch
 
@@ -152,34 +162,25 @@ Runs before the dispatchers determines what action to run.
         my ($self, $c) = @_;
     });
 
-=item after_dispatch
-
-Runs after the dispatchers determines what action to run.
-(Passed the default controller instance)
-
-    $plugins->add_hook(after_dispatch => sub {
-        my ($self, $c) = @_;
-    });
-
 =item after_static_dispatch
 
 Runs after the static dispatcher determines if a static file should be
 served. (Passed the default controller instance)
+Note that the callbacks of this hook run in reverse order.
 
     $plugins->add_hook(after_static_dispatch => sub {
         my ($self, $c) = @_;
-    })
+    });
 
-=item after_build_tx
+=item after_dispatch
 
-Runs right after the transaction is built and before the HTTP message gets
-parsed.
-One usage case would be upload progress bars.
-(Passed the transaction instance)
+Runs after the dispatchers determines what action to run.
+(Passed the default controller instance)
+Note that the callbacks of this hook run in reverse order.
 
-    $plugins->add_hook(after_build_tx => sub {
-        my ($self, $tx) = @_;
-    })
+    $plugins->add_hook(after_dispatch => sub {
+        my ($self, $c) = @_;
+    });
 
 =back
 

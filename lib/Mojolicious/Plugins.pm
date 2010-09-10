@@ -44,7 +44,7 @@ sub load_plugin {
         return $name->new->register($app, $args) if $self->_load($name);
     }
 
-    # Normal plugin
+    # Search plugin by name
     else {
 
         # Class
@@ -104,7 +104,6 @@ sub _load {
 
     # Module is a plugin
     return unless $module->can('new') && $module->can('register');
-
     return 1;
 }
 

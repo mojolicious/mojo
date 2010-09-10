@@ -239,8 +239,6 @@ sub startup { }
 1;
 __END__
 
-=encoding utf8
-
 =head1 NAME
 
 Mojolicious - The Web In A Box!
@@ -610,11 +608,11 @@ startup.
 Every major release of L<Mojolicious> has a code name, these are the ones
 that have been used in the past.
 
-0.999930, C<Hot Beverage>, \u2615, ☕
+0.999930, C<Hot Beverage> (u2615)
 
-0.999927, C<Comet>, \u2604, ☄
+0.999927, C<Comet> (u2604)
 
-0.999920, C<Snowman>, \u2603, ☃
+0.999920, C<Snowman> (u2603)
 
 =head1 AUTHOR
 

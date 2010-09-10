@@ -13,8 +13,19 @@ sub startup {
     $self->log->path(undef);
     $self->log->level('fatal');
 
+    # Plugin
+    $self->plugin('MojoliciousTest::Plugin::TestPlugin');
+
     # Default handler
     $self->renderer->default_handler('epl');
+
+    # Helper route
+    $self->routes->route('/helper')->to(
+        cb => sub {
+            my $self = shift;
+            $self->render(text => $self->test_plugin);
+        }
+    );
 
     # /*/* - the default route
     $self->routes->route('/:controller/:action')->to(action => 'index');

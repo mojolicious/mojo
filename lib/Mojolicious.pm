@@ -547,8 +547,12 @@ Note that this method is EXPERIMENTAL and might change without warning!
     $app->plugin('something');
     $app->plugin('something', foo => 23);
     $app->plugin('something', {foo => 23});
+    $app->plugin('Foo::Bar');
+    $app->plugin('Foo::Bar', foo => 23);
+    $app->plugin('Foo::Bar', {foo => 23});
 
 Load a plugin.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<process>
 

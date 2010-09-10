@@ -12,7 +12,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 189;
+plan tests => 194;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -211,6 +211,12 @@ $t = Test::Mojo->new(app => 'SingleFileTestApp');
 $t->get_ok('/foo')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/Same old in green Seems to work!/);
+
+# SingleFileTestApp (helper)
+$t->get_ok('/helper')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('Welcome aboard!');
 
 # SingleFileTestApp::Foo::data_template
 $t->get_ok('/foo/data_template')->status_is(200)

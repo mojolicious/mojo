@@ -32,30 +32,34 @@ sub load_plugin {
     my $app = shift;
     return unless $app;
 
-    # Class
+    # Name
     my $name = shift;
     return unless $name;
-    my $class = b($name)->camelize->to_string;
 
     # Arguments
     my $args = ref $_[0] ? $_[0] : {@_};
 
-    # Try all namspaces
-    for my $namespace (@{$self->namespaces}) {
+    # Module
+    if ($name =~ /^[A-Z]+/) {
+        return $name->new->register($app, $args) if $self->_load($name);
+    }
 
-        # Module
-        my $module = "${namespace}::$class";
+    # Normal plugin
+    else {
 
-        # Load
-        my $e = Mojo::Loader->load($module);
-        if (ref $e) { die $e }
-        next if $e;
+        # Class
+        my $class = b($name)->camelize->to_string;
 
-        # Module is a plugin
-        next unless $module->can('new') && $module->can('register');
+        # Try all namspaces
+        for my $namespace (@{$self->namespaces}) {
 
-        # Register
-        return $module->new->register($app, $args);
+            # Module
+            my $module = "${namespace}::$class";
+
+            # Load and register
+            return $module->new->register($app, $args)
+              if $self->_load($module);
+        }
     }
 
     # Not found
@@ -88,6 +92,20 @@ sub run_hook_reverse {
     for my $hook (reverse @{$self->hooks->{$name}}) { $self->$hook(@_) }
 
     return $self;
+}
+
+sub _load {
+    my ($self, $module) = @_;
+
+    # Load
+    my $e = Mojo::Loader->load($module);
+    if (ref $e) { die $e }
+    return if $e;
+
+    # Module is a plugin
+    return unless $module->can('new') && $module->can('register');
+
+    return 1;
 }
 
 1;
@@ -192,9 +210,14 @@ in your application.
     $plugins = $plugins->load_plugin($app, 'something');
     $plugins = $plugins->load_plugin($app, 'something', foo => 23);
     $plugins = $plugins->load_plugin($app, 'something', {foo => 23});
+    $plugins = $plugins->load_plugin($app, 'Foo::Bar');
+    $plugins = $plugins->load_plugin($app, 'Foo::Bar', foo => 23);
+    $plugins = $plugins->load_plugin($app, 'Foo::Bar', {foo => 23});
 
-Load a plugin from the configured namespaces and run C<register>.
+Load a plugin from the configured namespaces or by full module name and run
+C<register>.
 Optional arguments are passed to register.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<run_hook>
 

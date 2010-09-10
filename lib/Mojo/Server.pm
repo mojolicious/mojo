@@ -31,8 +31,7 @@ __PACKAGE__->attr(
             my $self = shift;
 
             # Reload
-            if (my $reload = $self->reload) {
-                local $ENV{MOJO_RELOAD} = $reload;
+            if ($self->reload) {
                 if (my $e = Mojo::Loader->reload) { warn $e }
                 delete $self->{app};
             }

@@ -33,6 +33,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed Mojo::DOM class selector bug. (tempire)
         - Fixed small render bug. (skaurus)
         - Fixed a small renderer bug.
+        - Fixed automatic reloading for external templates.
 
 0.999929 2010-08-17 00:00:00
         - Removed OS X resource fork files.

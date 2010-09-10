@@ -58,7 +58,7 @@ sub run {
         'listen=s'     => sub { $daemon->listen($_[1]) },
         'pid=s'        => sub { $daemon->pid_file($_[1]) },
         'queue=i'      => sub { $daemon->listen_queue_size($_[1]) },
-        reload         => sub { $daemon->reload(1) },
+        reload         => sub { $ENV{MOJO_RELOAD} = 1 },
         'requests=i'   => sub { $daemon->max_requests($_[1]) },
         'reverseproxy' => sub { $ENV{MOJO_REVERSE_PROXY} = 1 },
         'user=s'       => sub { $daemon->user($_[1]) },

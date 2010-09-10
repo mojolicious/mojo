@@ -112,9 +112,10 @@ sub import {
     *{"${caller}::get"} = sub { $route->('get', @_) };
     *{"${caller}::under"} = *{"${caller}::ladder"} =
       sub { $route->('under', @_) };
-    *{"${caller}::plugin"}    = sub { $app->plugin(@_) };
-    *{"${caller}::post"}      = sub { $route->('post', @_) };
-    *{"${caller}::websocket"} = sub { $route->('websocket', @_) };
+    *{"${caller}::plugin"}        = sub { $app->plugin(@_) };
+	*{"${caller}::plugin_direct"} = sub { $app->plugin_direct(@_) };
+    *{"${caller}::post"}          = sub { $route->('post', @_) };
+    *{"${caller}::websocket"}     = sub { $route->('websocket', @_) };
 
     # We are most likely the app in a lite environment
     $ENV{MOJO_APP} = $app;

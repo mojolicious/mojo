@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+0.999930_1 2010-09-10 00:00:00, esskar
+		- Added load_plugin_direct to Mojolicious::Plugins to load a plugin directly
+
 0.999930 2010-09-10 00:00:00
         - Code name "Hot Beverage", this is a major release.
         - Deprecated old Mojo::Template block syntax and added a very pretty

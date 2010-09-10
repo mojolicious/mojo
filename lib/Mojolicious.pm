@@ -212,8 +212,13 @@ sub handler {
 sub helper { shift->renderer->add_helper(@_) }
 
 sub plugin {
-    my $self = shift;
+    my $self = shift;	
     $self->plugins->load_plugin($self, @_);
+}
+
+sub plugin_direct {
+    my $self = shift;	
+    $self->plugins->load_plugin_direct($self, @_);
 }
 
 # This will run for each request

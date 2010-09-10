@@ -45,21 +45,39 @@ sub load_plugin {
 
         # Module
         my $module = "${namespace}::$class";
-
-        # Load
-        my $e = Mojo::Loader->load($module);
-        if (ref $e) { die $e }
-        next if $e;
-
-        # Module is a plugin
-        next unless $module->can('new') && $module->can('register');
-
-        # Register
-        return $module->new->register($app, $args);
+		
+		next unless my $r = $self->load_plugin_direct( $app, $module, $args );
+		
+		return $r;
     }
 
     # Not found
     die qq/Plugin "$name" missing, maybe you need to install it?\n/;
+}
+
+sub load_plugin_direct {
+	my $self = shift;
+
+    # Application
+    my $app = shift;
+    return unless $app;
+	
+	# Module
+	my $module = shift;
+    return unless $module;
+	
+	# Arguments
+    my $args = ref $_[0] ? $_[0] : {@_};
+	
+	my $e = Mojo::Loader->load($module);
+    if (ref $e) { die $e }
+	return if $e;
+	
+	# Module is a plugin
+    return unless $module->can('new') && $module->can('register');
+
+	# Register
+    return $module->new->register($app, $args) || 1;
 }
 
 sub run_hook {

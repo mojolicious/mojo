@@ -1364,11 +1364,12 @@ controller and action!
 <%= link_to 'index' %>
 <%= link_to 'tags', {test => 23}, title => 'Foo' %>
 <%= form_for 'index', method => 'post' => begin %><%= input 'foo' %><% end %>
-<%= form_for 'tags', {test => 24}, method => 'post' => begin %>
+%= form_for 'tags', {test => 24}, method => 'post' => begin
+
     %= input 'foo'
     %= input 'foo', type => 'checkbox'
     %= input 'a', type => 'checkbox'
-<% end %>
+% end
 <%= form_for '/' => begin %>
     <%= label 'foo' => begin %>Name<% end %>
     <%= input 'foo' %>

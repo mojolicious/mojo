@@ -9,6 +9,8 @@ This file documents the revision history for Perl extension Mojolicious.
           and for production environments optimized Mojo::Server::Hypnotoad.
           See the new hypnotoad script and updated
           Mojolicious::Guides::Cookbook recipes for more information.
+        - Added EXPERIMENTAL support for indented Perl lines in
+          Mojo::Template.
         - Added EXPERIMENTAL support for --mode and --home options to all
           Mojolicious commands.
         - Added EXPERIMENTAL support for helper methods.

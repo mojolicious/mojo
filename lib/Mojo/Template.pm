@@ -31,8 +31,8 @@ __PACKAGE__->attr(trim_mark => '=');
 # Helpers
 my $HELPERS = <<'EOF';
 no strict 'refs'; no warnings 'redefine';
-sub filter;
-*filter = sub { shift->(@_) };
+sub block;
+*block = sub { shift->(@_) };
 sub escape;
 *escape = sub {
     my $v = shift;
@@ -257,6 +257,19 @@ sub parse {
         $
     /x;
 
+    # Perl line regex
+    my $line_re = qr/
+        ^
+        (\s*)                  # Leading whitespace
+        $line_start            # Line start
+        ($expr)?               # Expression
+        ($escp)?               # Escaped expression
+        (\s*$capture_end)?     # End
+        ([^\#\>]{1}.*?)?       # Code
+        ($capture_start\s*)?   # Start
+        $
+    /x;
+
     # Tokenize
     my $state                = 'text';
     my $multiline_expression = 0;
@@ -264,29 +277,35 @@ sub parse {
     my $trimming = 0;
     for my $line (split /\n/, $tmpl) {
 
-        # Perl line with return value that needs to be escaped
-        if ($line =~ /^$line_start$expr$escp(.+)?$/) {
-            push @{$self->tree}, ['escp', $1];
-            $multiline_expression = 0;
-            next;
-        }
+        # Perl line
+        if ($line =~ /$line_re/) {
 
-        # Perl line with return value
-        if ($line =~ /^$line_start$expr(.+)?$/) {
-            push @{$self->tree}, ['expr', $1];
+            # Token
+            my @token = ();
+
+            # Capture end
+            push @token, 'cpen', undef if $4;
+
+            # Capture start
+            push @token, 'cpst', undef if $6;
+
+            # Expression
+            if ($2) {
+                unshift @token, 'text', $1;
+                push @token, $3 ? 'escp' : 'expr', $5;
+                push @token, 'text', "\n" unless $4 || $6;
+            }
+
+            # Code
+            else { push @token, 'code', $5 }
+
+            push @{$self->tree}, \@token;
             $multiline_expression = 0;
             next;
         }
 
         # Comment line, dummy token needed for line count
-        if ($line =~ /^$line_start$cmnt(.+)?$/) {
-            $multiline_expression = 0;
-            next;
-        }
-
-        # Perl line without return value
-        if ($line =~ /^$line_start([^\>]{1}.*)?$/) {
-            push @{$self->tree}, ['code', $1];
+        if ($line =~ /^\s*$line_start$cmnt(.+)?$/) {
             $multiline_expression = 0;
             next;
         }
@@ -585,6 +604,15 @@ C<end> keywords.
     <% end %>
     <%= $block->('Baerbel') %>
     <%= $block->('Wolfgang') %>
+
+Perl lines can also be indented freely.
+
+    % my $block = begin
+        % my $name = shift;
+        Hello <%= $name %>.
+    % end
+    %= $block->('Baerbel')
+    %= $block->('Wolfgang')
 
 L<Mojo::Template> templates work just like Perl subs (actually they get
 compiled to a Perl sub internally).

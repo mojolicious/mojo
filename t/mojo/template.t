@@ -23,7 +23,7 @@ package main;
 use strict;
 use warnings;
 
-use Test::More tests => 96;
+use Test::More tests => 112;
 
 use File::Spec;
 use File::Temp;
@@ -65,7 +65,7 @@ is($output, 'test', 'multiple empty lines trimmed');
 
 # Trim expression tags
 $mt     = Mojo::Template->new;
-$output = $mt->render('    <%= filter begin =%><html><% end =%>    ');
+$output = $mt->render('    <%= block begin =%><html><% end =%>    ');
 is($output, '<html>', 'expression tags trimmed');
 
 # Recursive block
@@ -81,6 +81,32 @@ $output = $mt->render(<<'EOF');
 EOF
 is($output, "<html>\n<html>\n<html>\n\n", 'recursive block');
 
+# Recursive block (perl lines)
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+% my $block;
+% $block = begin
+% my $i = shift;
+<html>
+%= $block->(--$i) if $i
+% end
+%= $block->(2)
+EOF
+is($output, "<html>\n<html>\n<html>\n\n\n\n\n", 'recursive block');
+
+# Recursive block (indented perl lines)
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+  % my $block;
+  % $block = begin
+    % my $i = shift;
+<html>
+    <%= $block->(--$i) if $i =%>
+  % end
+  %= $block->(2)
+EOF
+is($output, "  <html><html><html>\n", 'recursive block');
+
 # Expression block (less whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
@@ -90,6 +116,26 @@ $output = $mt->render(<<'EOF');
 <%= $block->() %>
 EOF
 is($output, "<html>\n", 'expression block');
+
+# Expression block (perl lines and less whitespace)
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+% my $block =begin
+<html>
+%end
+<%= $block->() %>
+EOF
+is($output, "<html>\n\n", 'expression block');
+
+# Expression block (indented perl lines and less whitespace)
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+    % my $block =begin
+<html>
+    %end
+<%= $block->() %>
+EOF
+is($output, "<html>\n\n", 'expression block');
 
 # Escaped expression block (extra whitespace)
 $mt     = Mojo::Template->new;
@@ -101,59 +147,105 @@ $output = $mt->render(<<'EOF');
 EOF
 is($output, "\n\n&lt;html&gt;\n\n", 'escaped expression block');
 
+# Escaped expression block (perl lines and extra whitespace)
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+% my $block =  begin
+<html>
+<% end  %>
+<%== $block->() %>
+EOF
+is($output, "\n&lt;html&gt;\n\n", 'escaped expression block');
+
+# Escaped expression block (indented perl lines and extra whitespace)
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+ % my $block =  begin
+<html>
+   % end
+<%== $block->() %>
+EOF
+is($output, "&lt;html&gt;\n\n", 'escaped expression block');
+
 # Captured escaped expression block (extra whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<%== my $result = filter begin  =%>
+<%== my $result = block begin  =%>
 <html>
 <%  end =%>
 <%= $result =%>
 EOF
 is($output, '&lt;html&gt;<html>', 'captured escaped expression block');
 
+# Captured escaped expression block (perl lines and extra whitespace)
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+%== my $result = block  begin
+<html>
+%  end
+<%= $result =%>
+EOF
+is($output, <<EOF, 'captured escaped expression block');
+&lt;html&gt;
+<html>
+EOF
+
+# Captured escaped expression block (indented perl lines and extra whitespace)
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+ %== my $result = block  begin
+<html>
+ %  end
+<%= $result =%>
+EOF
+is($output, <<EOF, 'captured escaped expression block');
+ &lt;html&gt;
+<html>
+EOF
+
 # Capture lines (extra whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = escape filter begin                  %>
+<% my $result = escape block begin                  %>
 <html>
 <%                        end %>
 %= $result
 EOF
-is($output, "\n\n&lt;html&gt;\n", 'captured lines');
+is($output, "\n\n&lt;html&gt;\n\n", 'captured lines');
 
 # Capture tags
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = escape filter begin %><html><% end %><%= $result %>
+<% my $result = escape block begin %><html><% end %><%= $result %>
 EOF
 is($output, "&lt;html&gt;\n", 'capture tags');
 
 # Capture tags (alternative)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = escape filter begin %><html><% end %><%= $result %>
+<% my $result = escape block begin %><html><% end %><%= $result %>
 EOF
 is($output, "&lt;html&gt;\n", 'capture tags');
 
 # Capture tags with appended code
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = escape( filter begin %><html><% end ); %><%= $result %>
+<% my $result = escape( block begin %><html><% end ); %><%= $result %>
 EOF
 is($output, "&lt;html&gt;\n", 'capture tags with appended code');
 
 # Capture tags with appended code (alternative)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = escape( filter begin %><html><% end ); %><%= $result %>
+<% my $result = escape( block begin %><html><% end ); %><%= $result %>
 EOF
 is($output, "&lt;html&gt;\n", 'capture tags with appended code');
 
 # Nested capture tags
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = filter
-  begin %><%= escape filter begin %><html><% end
+<% my $result = block
+  begin %><%= escape block begin %><html><% end
   %><% end %><%= $result %>
 EOF
 is($output, "&lt;html&gt;\n", 'nested capture tags');
@@ -161,8 +253,8 @@ is($output, "&lt;html&gt;\n", 'nested capture tags');
 # Nested capture tags (alternative)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = filter begin =%>
-    <%= escape filter begin =%>
+<% my $result = block begin =%>
+    <%= escape block begin =%>
         <html>
     <% end =%>
 <% end =%>
@@ -185,6 +277,40 @@ Hello Baerbel.
 Hello Wolfgang.
 EOF
 
+# Advanced capturing (perl lines extra whitespace)
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+% my $block =  begin
+<% my $name = shift; =%>
+Hello <%= $name %>.
+%  end
+<%= $block->('Baerbel') %>
+<%= $block->('Wolfgang') %>
+EOF
+is($output, <<EOF, 'advanced capturing');
+Hello Baerbel.
+
+Hello Wolfgang.
+
+EOF
+
+# Advanced capturing (indented perl lines extra whitespace)
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+    % my $block =  begin
+<% my $name = shift; =%>
+Hello <%= $name %>.
+    %  end
+<%= $block->('Baerbel') %>
+<%= $block->('Wolfgang') %>
+EOF
+is($output, <<EOF, 'advanced capturing');
+Hello Baerbel.
+
+Hello Wolfgang.
+
+EOF
+
 # Advanced capturing with tags
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
@@ -200,6 +326,40 @@ Hello Sebastian.
 Hello Sara.
 EOF
 
+# Advanced capturing with tags (perl lines)
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+% my $block = begin
+    <% my $name = shift; =%>
+    Hello <%= $name %>.
+% end
+%= $block->('Sebastian')
+%= $block->('Sara')
+EOF
+is($output, <<EOF, 'advanced capturing with tags');
+Hello Sebastian.
+
+Hello Sara.
+
+EOF
+
+# Advanced capturing with tags (indented perl lines)
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+% my $block = begin
+    % my $name = shift;
+    Hello <%= $name %>.
+% end
+    %= $block->('Sebastian')
+%= $block->('Sara')
+EOF
+is($output, <<EOF, 'advanced capturing with tags');
+        Hello Sebastian.
+
+    Hello Sara.
+
+EOF
+
 # Advanced capturing with tags (alternative)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
@@ -213,6 +373,40 @@ EOF
 is($output, <<EOF, 'advanced capturing with tags');
 Hello Sebastian.
 Hello Sara.
+EOF
+
+# Advanced capturing with tags (perl lines and alternative)
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+% my $block = begin
+    <% my $name = shift; =%>
+    Hello <%= $name %>.
+% end
+%= $block->('Sebastian')
+%= $block->('Sara')
+EOF
+is($output, <<EOF, 'advanced capturing with tags');
+Hello Sebastian.
+
+Hello Sara.
+
+EOF
+
+# Advanced capturing with tags (indented perl lines and alternative)
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+ % my $block = begin
+    % my $name = shift;
+    Hello <%= $name %>.
+ % end
+%= $block->('Sebastian')
+%= $block->('Sara')
+EOF
+is($output, <<EOF, 'advanced capturing with tags');
+    Hello Sebastian.
+
+    Hello Sara.
+
 EOF
 
 # More advanced capturing with tags (alternative)
@@ -241,7 +435,7 @@ EOF
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 % my $i = 2;
-<%= filter begin %>
+<%= block begin %>
     <%= $i++ %>
 <% end for 1 .. 3; %>
 EOF
@@ -254,6 +448,30 @@ is($output, <<EOF, 'block loop');
     4
 
 EOF
+
+# Block loop (perl lines)
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+% my $i = 2;
+%= block begin
+    <%= $i++ %>
+% end for 1 .. 3;
+EOF
+is($output, <<EOF, 'block loop');
+    2
+    3
+    4
+EOF
+
+# Block loop (indented perl lines)
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+  % my $i = 2;
+ %= block begin
+    %= $i++
+   % end for 1 .. 3;
+EOF
+is($output, "     2\n    3\n    4\n", 'block loop');
 
 # Strict
 $mt     = Mojo::Template->new;
@@ -270,13 +488,13 @@ $output = $mt->render(<<'EOF');
 %= __PACKAGE__
 %= foo
 EOF
-is($output, 'Mojo::Templateworks!', 'right result');
+is($output, "Mojo::Template\nworks!\n", 'right result');
 $output = $mt->render(<<'EOF');
 % BEGIN { MyTemplateExporter->import }
 %= __PACKAGE__
 %= foo
 EOF
-is($output, 'Mojo::Templateworks!', 'right result');
+is($output, "Mojo::Template\nworks!\n", 'right result');
 
 # Compile time exception
 $mt     = Mojo::Template->new;
@@ -369,6 +587,7 @@ test
 Bareword "bar" not allowed while "strict subs" in use at template line 1.
 1: %= bar
 
+
 EOF
 
 # Control structures
@@ -407,7 +626,7 @@ ok(!defined($mt->compiled), 'nothing compiled');
 $mt->compile;
 is(ref($mt->compiled), 'CODE', 'code compiled');
 $output = $mt->interpret(2);
-is($output, "<html foo=\"bar\">\n3 test 4 lala \n4\</html>\n", 'all tags');
+is($output, "<html foo=\"bar\">\n3 test 4 lala \n4\n\</html>\n", 'all tags');
 
 # Arguments
 $mt = Mojo::Template->new;
@@ -417,7 +636,7 @@ $output = $mt->render(<<'EOF', 'test', {foo => 'bar'});
 %= $message . ' ' . $hash->{foo}
 </html>
 EOF
-is($output, "<html>\ntest bar</html>\n", 'arguments');
+is($output, "<html>\ntest bar\n</html>\n", 'arguments');
 
 # Ugly multiline loop
 $mt     = Mojo::Template->new;
@@ -438,7 +657,7 @@ $output = $mt->render(<<'EOF');
 %  }
 </html>
 EOF
-is($output, "<html>\n1234</html>\n", 'clean multiline loop');
+is($output, "<html>\n1\n2\n3\n4\n</html>\n", 'clean multiline loop');
 
 # Escaped line ending
 $mt     = Mojo::Template->new;
@@ -447,7 +666,7 @@ $output = $mt->render(<<'EOF');
 %= '2' x 4
 </html>\\\\
 EOF
-is($output, "<html>2222</html>\\\\\\\n", 'escaped line ending');
+is($output, "<html>2222\n</html>\\\\\\\n", 'escaped line ending');
 
 # XML escape
 $mt     = Mojo::Template->new;
@@ -456,7 +675,7 @@ $output = $mt->render(<<'EOF');
 %== '&lt;'
 </html>
 EOF
-is($output, "<html>&lt;html&gt;\n&amp;lt;</html>\n", 'XML escape');
+is($output, "<html>&lt;html&gt;\n&amp;lt;\n</html>\n", 'XML escape');
 
 # XML auto escape
 $mt = Mojo::Template->new;
@@ -467,7 +686,12 @@ $output = $mt->render(<<'EOF');
 %== '&lt;'
 </html>
 EOF
-is($output, "<html>&lt;html&gt;\n&amp;lt;&lt;</html>\n", 'XML auto escape');
+is($output, <<EOF, 'XML auto escape');
+<html>&lt;html&gt;
+&amp;lt;
+&lt;
+</html>
+EOF
 
 # Complicated XML auto escape
 $mt = Mojo::Template->new;
@@ -480,6 +704,7 @@ is($output, <<'EOF', 'complicated XML auto escape');
 {
   &apos;foo&apos; =&gt; 23
 }
+
 EOF
 
 # Complicated XML auto escape
@@ -488,10 +713,9 @@ $mt->auto_escape(1);
 $output = $mt->render(<<'EOF');
 <html><%= '<html>' for 1 .. 3 %></html>
 EOF
-is( $output,
-    "<html>&lt;html&gt;&lt;html&gt;&lt;html&gt;</html>\n",
-    'complicated XML auto escape'
-);
+is($output, <<EOF, 'complicated XML auto escape');
+<html>&lt;html&gt;&lt;html&gt;&lt;html&gt;</html>
+EOF
 
 # Prepending code
 $mt = Mojo::Template->new;
@@ -502,14 +726,14 @@ $output = $mt->render(<<'EOF', 23);
 % my $bar = 23;
 %= $bar
 EOF
-is($output, "23\nsomething\nelse23", 'prepending code');
+is($output, "23\nsomething\nelse\n23\n", 'prepending code');
 $mt = Mojo::Template->new;
 $mt->prepend(
     q/{no warnings 'redefine'; no strict 'refs'; *foo = sub { 23 }}/);
 $output = $mt->render('<%= foo() %>');
 is($output, "23\n", 'right result');
 $output = $mt->render('%= foo()');
-is($output, 23, 'right result');
+is($output, "23\n", 'right result');
 
 # Appending code
 $mt = Mojo::Template->new;
@@ -528,7 +752,7 @@ comment %>this not
 %  }
 </html>
 EOF
-is($output, "<html>this not\n1234</html>\n", 'multiline comment');
+is($output, "<html>this not\n1\n2\n3\n4\n</html>\n", 'multiline comment');
 
 # Oneliner
 $mt     = Mojo::Template->new;
@@ -543,7 +767,7 @@ $output = $mt->render(<<'EOF');
 $= '2' x 4
 </html>\\\\
 EOF
-is($output, "<html>2222</html>\\\\\\\n", 'different line start');
+is($output, "<html>2222\n</html>\\\\\\\n", 'different line start');
 
 # Multiline expression
 $mt     = Mojo::Template->new;
@@ -582,7 +806,7 @@ $- my $message = shift;
 $-= $message . ' ' . $hash->{foo}
 </html>
 EOF
-is($output, "<html>\ntest bar</html>\n", 'different tags and line start');
+is($output, "<html>\ntest bar\n</html>\n", 'different tags and line start');
 
 # Different expression and comment marks
 $mt = Mojo::Template->new;
@@ -594,17 +818,18 @@ $output = $mt->render(<<'EOF', 'test', {foo => 'bar'});
 %--- $message . ' ' . $hash->{foo}
 </html>
 EOF
-is( $output,
-    "<html>\ntest bar</html>\n",
-    'different expression and comment mark'
-);
+is($output, <<EOF, 'different expression and comment mark');
+<html>
+test bar
+</html>
+EOF
 
 # File
 $mt = Mojo::Template->new;
 my $file =
   File::Spec->catfile(File::Spec->splitdir($FindBin::Bin), qw/lib test.mt/);
 $output = $mt->render_file($file, 3);
-like($output, qr/23Hello World!/, 'file');
+like($output, qr/23\nHello World!/, 'file');
 
 # File to file with utf8 data
 $mt = Mojo::Template->new;

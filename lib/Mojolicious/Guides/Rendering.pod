@@ -70,15 +70,15 @@ usually look a bit better.
 
     <% my $i = 10; %>
     Text before.
-    <% for (1 .. $i) { %>
-    Insert this text 10 times!
+    <% for my $j (1 .. $i) { %>
+        <%= $j %>
     <% } %>
     Text after.
 
     % my $i = 10;
     Text before.
-    % for (1 .. $i) {
-    Insert this text 10 times!
+    % for my $j (1 .. $i) {
+        %= $j
     % }
     Text after.
 
@@ -323,18 +323,15 @@ blocks in C<ep> that work very similar normal Perl functions.
     <%= $block->('Sebastian') %>
     <%= $block->('Sara') %>
 
-Blocks start with an opening bracket in the first tag and end with a mini tag
-containing only the closing bracket.
-Whitespace characters between bracket and tag are not allowed, to
-differentiate between template blocks and normal Perl code.
+Blocks are always delimited by the C<begin> and C<end> keywords.
 
-    <% my $block = begin %>
-        <% my $name = shift; %>
+    % my $block = begin
+        % my $name = shift;
         Hello <%= $name %>.
-    <% end %>
-    <% for (1 .. 10) { %>
-        <%= $block->('Sebastian') %>
-    <% } %>
+    % end
+    % for (1 .. 10) {
+        %= $block->('Sebastian')
+    % }
 
 A naive translation to equivalent Perl code could look like this.
 

@@ -564,16 +564,18 @@ $client->ioloop->timer(
 # GET /
 $t->get_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('/root.html/root.html/root.html/root.html/root.html');
+  ->content_is(
+    "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
 
 # HEAD /
 $t->head_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
-  ->header_is('Content-Length' => 50)->content_is('');
+  ->header_is('Content-Length' => 55)->content_is('');
 
 # GET / (with body)
 $t->get_ok('/', '1234' x 1024)->status_is(200)
-  ->content_is('/root.html/root.html/root.html/root.html/root.html');
+  ->content_is(
+    "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
 
 # GET /ojo (ojo)
 $t->get_ok('/ojo')->status_is(200)->json_content_is({hello => 'world'});
@@ -716,13 +718,14 @@ is( b($t->tx->res->body)->decode('UTF-8'),
 # GET /root
 $t->get_ok('/root.html')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('/.html');
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is("/.html\n");
 
 # GET /.html
 $t->get_ok('/.html')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('/root.html/root.html/root.html/root.html/root.html');
+  ->content_is(
+    "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
 
 # GET /0 (reverse proxy)
 my $backup = $ENV{MOJO_REVERSE_PROXY};
@@ -821,7 +824,8 @@ $ENV{MOJO_MAX_MESSAGE_SIZE} = 1024;
 $backup2 = app->log->level;
 app->log->level('fatal');
 $t->get_ok('/', '1234' x 1024)->status_is(413)
-  ->content_is('/root.html/root.html/root.html/root.html/root.html');
+  ->content_is(
+    "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
 app->log->level($backup2);
 $ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
 
@@ -1096,7 +1100,7 @@ $t->get_ok('/json')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
 $t->get_ok('/autostash?bar=23')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("layouted bar2342autostash\n");
+  ->content_is("layouted bar\n23\n42\nautostash\n\n");
 
 # GET /app
 $t->get_ok('/app')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
@@ -1107,13 +1111,13 @@ $t->get_ok('/app')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
 $t->get_ok('/helper')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('23<br/>&lt;.../template(Mojolicious (Perl))');
+  ->content_is("23\n<br/>\n&lt;...\n/template\n(Mojolicious (Perl))");
 
 # GET /helper
 $t->get_ok('/helper', {'User-Agent' => 'Explorer'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('23<br/>&lt;.../template(Explorer)');
+  ->content_is("23\n<br/>\n&lt;...\n/template\n(Explorer)");
 
 # GET /eperror
 $level = app->log->level;
@@ -1339,7 +1343,7 @@ $t->get_ok('/impossible')->status_is(404)
 # Client timer
 $client->ioloop->one_tick('0.1');
 is( $timer,
-    '/root.html/root.html/root.html/root.html/root.htmlworks!',
+    "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\nworks!",
     'right content'
 );
 
@@ -1361,9 +1365,9 @@ controller and action!
 <%= link_to 'tags', {test => 23}, title => 'Foo' %>
 <%= form_for 'index', method => 'post' => begin %><%= input 'foo' %><% end %>
 <%= form_for 'tags', {test => 24}, method => 'post' => begin %>
-    <%= input 'foo' %>
-    <%= input 'foo', type => 'checkbox' %>
-    <%= input 'a', type => 'checkbox' %>
+    %= input 'foo'
+    %= input 'foo', type => 'checkbox'
+    %= input 'a', type => 'checkbox'
 <% end %>
 <%= form_for '/' => begin %>
     <%= label 'foo' => begin %>Name<% end %>

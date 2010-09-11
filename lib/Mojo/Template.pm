@@ -292,8 +292,7 @@ sub parse {
             # Expression
             if ($2) {
                 unshift @token, 'text', $1;
-                push @token, $3 ? 'escp' : 'expr', $5;
-                push @token, 'text', "\n" unless $4 || $6;
+                push @token, $3 ? 'escp' : 'expr', $5, 'text', "\n";
             }
 
             # Code

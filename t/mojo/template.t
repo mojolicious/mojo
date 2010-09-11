@@ -186,20 +186,24 @@ $output = $mt->render(<<'EOF');
 <%= $result =%>
 EOF
 is($output, <<EOF, 'captured escaped expression block');
+
 &lt;html&gt;
+
 <html>
 EOF
 
 # Captured escaped expression block (indented perl lines and extra whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
- %== my $result = block  begin
+%== my $result = block  begin
 <html>
  %  end
 <%= $result =%>
 EOF
 is($output, <<EOF, 'captured escaped expression block');
- &lt;html&gt;
+
+&lt;html&gt;
+
 <html>
 EOF
 
@@ -454,14 +458,10 @@ $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 % my $i = 2;
 %= block begin
-    <%= $i++ %>
+    <%= $i++ =%>
 % end for 1 .. 3;
 EOF
-is($output, <<EOF, 'block loop');
-    2
-    3
-    4
-EOF
+is($output, '234', 'block loop');
 
 # Block loop (indented perl lines)
 $mt     = Mojo::Template->new;
@@ -471,7 +471,7 @@ $output = $mt->render(<<'EOF');
     %= $i++
    % end for 1 .. 3;
 EOF
-is($output, "     2\n    3\n    4\n", 'block loop');
+is($output, " \n    2\n\n    3\n\n    4\n", 'block loop');
 
 # Strict
 $mt     = Mojo::Template->new;

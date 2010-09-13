@@ -14,16 +14,8 @@ __PACKAGE__->attr('match');
 # it make sure to put them in *after* you cook it.
 sub param {
     my $self = shift;
-
-    # Parameters
     my $params = $self->stash->{'mojo.params'} || $self->req->params;
-    Carp::croak(qq/Stash value "params" is not a "Mojo::Parameters" object./)
-      unless ref $params
-          && Scalar::Util::blessed($params)
-          && $params->isa('Mojo::Parameters');
-
-    # Values
-    return wantarray ? ($params->param(@_)) : scalar $params->param(@_);
+    return $params->param(@_);
 }
 
 1;

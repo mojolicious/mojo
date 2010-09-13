@@ -282,8 +282,8 @@ sub _walk_stack {
         my $stash = $c->stash;
 
         # Captures
-        $stash->{'mojo.captures'} ||= {};
-        @{$stash->{'mojo.captures'}}{keys %$field} = values %$field;
+        my $captures = $stash->{'mojo.captures'} ||= {};
+        $stash->{'mojo.captures'} = {%$captures, %$field};
 
         # Merge in captures
         @{$c->stash}{keys %$field} = values %$field;

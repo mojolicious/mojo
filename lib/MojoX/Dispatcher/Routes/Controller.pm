@@ -10,10 +10,14 @@ __PACKAGE__->attr('match');
 # Just make a simple cake. And this time, if someone's going to jump out of
 # it make sure to put them in *after* you cook it.
 sub param {
-    my $self   = shift;
-    my $params = $self->stash->{'mojo.params'};
-    $params = $self->req->params unless defined $params;
-    return $params->param(@_);
+    my ($self, $name) = @_;
+
+    # Captures
+    my $p = $self->stash->{'mojo.captures'} || {};
+    return $p->{$name} if exists $p->{$name};
+
+    # Params
+    return $self->req->param($name);
 }
 
 1;

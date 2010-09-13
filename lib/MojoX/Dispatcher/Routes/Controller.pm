@@ -5,16 +5,14 @@ use warnings;
 
 use base 'MojoX::Session::Cookie::Controller';
 
-require Carp;
-require Scalar::Util;
-
 __PACKAGE__->attr('match');
 
 # Just make a simple cake. And this time, if someone's going to jump out of
 # it make sure to put them in *after* you cook it.
 sub param {
-    my $self = shift;
-    my $params = $self->stash->{'mojo.params'} || $self->req->params;
+    my $self   = shift;
+    my $params = $self->stash->{'mojo.params'};
+    $params = $self->req->params unless defined $params;
     return $params->param(@_);
 }
 

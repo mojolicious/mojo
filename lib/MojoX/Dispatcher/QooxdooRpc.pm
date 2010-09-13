@@ -116,7 +116,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::QooxdooRpc - Dispatcher for Qooxdoo Rpc Calls
+MojoX::Dispatcher::QooxdooRpc - Dispatcher for Qooxdoo Rpc Calls
 
 =head1 SYNOPSIS
 
@@ -136,6 +136,7 @@ Mojolicious::Plugin::QooxdooRpc - Dispatcher for Qooxdoo Rpc Calls
         Test => new Test(),
         
     };
+    
     
     # add a route to the Qooxdoo dispatcher and route to it
     my $r = $self->routes;

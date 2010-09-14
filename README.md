@@ -23,8 +23,8 @@ Features
 * Full stack HTTP 1.1 and WebSocket client/server implementation with IPv6,
   TLS, Bonjour, IDNA, Comet (long polling), chunking and multipart support.
 
-* Builtin async IO and prefork web server supporting epoll, kqueue, hot
-  deployment and UNIX domain socket sharing, perfect for embedding.
+* Builtin async IO and prefork web server supporting epoll, kqueue, UNIX
+  domain sockets and hot deployment, perfect for embedding.
 
 * Automatic CGI, FastCGI and PSGI detection.
 

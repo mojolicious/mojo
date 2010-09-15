@@ -45,6 +45,12 @@ sub register {
                     $attrs{checked} = 'checked';
                 }
 
+		# Radiobutton
+                elsif (($attrs{type} || '') eq 'radio') {
+                    $attrs{checked} = 'checked'
+		      if (($attrs{value} || '') eq $p);
+                }
+
                 # Other
                 else { $attrs{value} = $p }
 
@@ -186,6 +192,13 @@ Generate image tag.
 
     <%= input 'first_name' %>
     <%= input 'first_name', value => 'Default name' %>
+    <%= input 'employed', type => 'checkbox'%>
+
+Generate form input element. By default, type => 'text' is assumed.
+
+Input elements, including checkbox and radio button groups,
+automatically preserve the current value as set in the request's
+parameters.
 
 Generate form input element.
 
@@ -197,14 +210,17 @@ Generate form label.
 
 =item link_to
 
+    <%= link_to index %>
     <%= link_to index => begin %>Home<% end %>
     <%= link_to index => {foo => 'bar'} => (class => 'links') => begin %>
         Home
     <% end %>
     <%= link_to '/path/to/file' => begin %>File<% end %>
     <%= link_to 'http://mojolicious.org' => begin %>Mojolicious<% end %>
+    <%= link_to url_for('search')->query(query => $self->param('query') => begin %>Search again<% end %>
 
-Generate link to route, path or URL.
+Generate link to route, path or URL. Uses the capitalized link target
+for default content.
 
 =item script
 

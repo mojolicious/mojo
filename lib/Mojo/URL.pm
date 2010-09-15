@@ -183,12 +183,18 @@ sub query {
     # Set
     if (@_) {
 
-        # Multiple values
+        # Replace with array
         if (@_ > 1 || (ref $_[0] && ref $_[0] eq 'ARRAY')) {
             $self->{query} = Mojo::Parameters->new(ref $_[0] ? @{$_[0]} : @_);
         }
 
-        # Single value
+        # Append hash
+        elsif (ref $_[0] && ref $_[0] eq 'HASH') {
+            my $q = $self->{query} ||= Mojo::Parameters->new;
+            $q->append(%{$_[0]});
+        }
+
+        # Replace with string or object
         else {
             $self->{query} =
               !ref $_[0] ? Mojo::Parameters->new->append($_[0]) : $_[0];
@@ -430,8 +436,9 @@ defaults to a L<Mojo::Path> object.
 =head2 C<query>
 
     my $query = $url->query;
-    $url      = $url->query(name => 'value');
-    $url      = $url->query([name => 'value']);
+    $url      = $url->query(replace => 'with');
+    $url      = $url->query([replace => 'with']);
+    $url      = $url->query({merge => 'with'});
     $url      = $url->query(Mojo::Parameters->new);
 
 Query part of this URL, defaults to a L<Mojo::Parameters> object.

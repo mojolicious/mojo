@@ -438,7 +438,7 @@ defaults to a L<Mojo::Path> object.
     my $query = $url->query;
     $url      = $url->query(replace => 'with');
     $url      = $url->query([replace => 'with']);
-    $url      = $url->query({merge => 'with'});
+    $url      = $url->query({append => 'to'});
     $url      = $url->query(Mojo::Parameters->new);
 
 Query part of this URL, defaults to a L<Mojo::Parameters> object.

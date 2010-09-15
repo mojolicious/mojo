@@ -54,7 +54,6 @@ is("$url", 'http://sri:foobar@kraih.com:8080?monkey=foo#23', 'right format');
 $url->query({foo => 'bar'});
 is("$url", 'http://sri:foobar@kraih.com:8080?monkey=foo&foo=bar#23',
     'right format');
-$url->query(monkey => 'foo');
 $url->query('foo');
 is("$url", 'http://sri:foobar@kraih.com:8080?foo#23', 'right format');
 $url->query('foo=bar');

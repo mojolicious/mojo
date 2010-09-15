@@ -62,6 +62,38 @@ sub register {
         }
     );
 
+    # Add "selection" helper
+    $app->helper(
+        selection => sub {
+            my $c    = shift;
+            my $name = shift;
+	    my $options = shift;
+	    my %attrs = @_;
+	    my $p = $c->param($name) || $options->[0];
+	    my %p = map { $_, 1 } $c->param($name);
+
+	    return $self->_tag('select', name => $name, %attrs,
+			       sub {
+				 join('',
+				      map {
+					my %attrs = ( value => $_ );
+					$attrs{selected} = 'selected' if exists $p{$_};
+					$self->_tag('option', %attrs, sub { $_ });
+				      } @$options
+				     )
+			       }
+			      );
+	             }
+		);
+
+
+
+    #         # Empty tag
+    #         $self->_tag('input', name => $name, @_);
+    #     }
+    # );
+
+
     # Add "label" helper
     $app->helper(
         label => sub { shift; $self->_tag('label', for => shift, @_) });
@@ -200,7 +232,19 @@ Input elements, including checkbox and radio button groups,
 automatically preserve the current value as set in the request's
 parameters.
 
-Generate form input element.
+=item selection
+
+    <%= selection 'simple', [qw/bar baz/], class => 'simple' %>
+
+To implement:
+
+    <%= selection 'named', [bar => 'Bar', baz=>'Baz'], class => 'fnord' %>
+    <%= selection 'nested', [a => ['aa', 'ab'], b=>['ba', 'bc'] %>
+    <%= selection 'both', [a => [abar => 'A Bar', abaz=>'A Baz'],
+        the => [thebar => 'The Bar', thebaz=>'The Baz']] %>
+
+Generate selection using select tag. Use pairs to specify the option
+name displayed. Option groups are supported as nested arrays.
 
 =item label
 

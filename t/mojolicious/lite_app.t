@@ -735,7 +735,7 @@ $t->get_ok('/0', {'X-Forwarded-For' => '192.168.2.2, 192.168.2.1'})
 $ENV{MOJO_REVERSE_PROXY} = $backup;
 
 # GET /tags
-$t->get_ok('/tags/lala?a=b&b=0&c=2&d=3')->status_is(200)->content_is(<<EOF);
+$t->get_ok('/tags/lala?a=b&b=0&c=2&d=3&i=c')->status_is(200)->content_is(<<EOF);
 <foo />
 <foo bar="baz" />
 <foo one="two" three="four">Hello</foo>
@@ -759,6 +759,7 @@ $t->get_ok('/tags/lala?a=b&b=0&c=2&d=3')->status_is(200)->content_is(<<EOF);
     <textarea name="f"></textarea>
     <input name="g" type="password" />
     <input id="foo" name="h" type="password" />
+    <select multiple="multiple" name="i"><option value="a">a</option><optgroup label="etc"><option value="b">b</option><option selected="selected" value="c">C</option><option value="d">d</option></optgroup><option value="e">e</option></select>
     <input type="submit" value="Ok!" />
     <input id="bar" type="submit" value="Ok too!" />
 </form>
@@ -780,7 +781,7 @@ $t->get_ok('/tags/lala?a=b&b=0&c=2&d=3')->status_is(200)->content_is(<<EOF);
 EOF
 
 # GET /tags (alternative)
-$t->get_ok('/tags/lala?c=b&d=3&e=4&f=5')->status_is(200)->content_is(<<EOF);
+$t->get_ok('/tags/lala?c=b&d=3&e=4&f=5&i=a&i=d')->status_is(200)->content_is(<<EOF);
 <foo />
 <foo bar="baz" />
 <foo one="two" three="four">Hello</foo>
@@ -802,6 +803,7 @@ $t->get_ok('/tags/lala?c=b&d=3&e=4&f=5')->status_is(200)->content_is(<<EOF);
     <textarea name="f">5</textarea>
     <input name="g" type="password" />
     <input id="foo" name="h" type="password" />
+    <select multiple="multiple" name="i"><option selected="selected" value="a">a</option><optgroup label="etc"><option value="b">b</option><option value="c">C</option><option selected="selected" value="d">d</option></optgroup><option value="e">e</option></select>
     <input type="submit" value="Ok!" />
     <input id="bar" type="submit" value="Ok too!" />
 </form>
@@ -1433,6 +1435,7 @@ controller and action!
     %= text_area 'f'
     %= password_field 'g'
     %= password_field 'h', id => 'foo'
+    %= selection 'i', [ 'a', [etc => ['b', [C=>'c'], 'd']], 'e', ], multiple=>"multiple"
     %= submit_button 'Ok!'
     %= submit_button 'Ok too!', id => 'bar'
 %= end

@@ -85,6 +85,54 @@ sub register {
     # Add "radio_button" helper
     $app->helper(radio_button => sub { $self->_input(@_, type => 'radio') });
 
+    # Add "selection" helper
+    $app->helper(
+        selection => sub {
+            my $c       = shift;
+            my $name    = shift;
+            my $options = shift;
+            my %attrs   = @_;
+            my %p       = map { $_, 1 } $c->param($name);    #support multiple
+
+            # option
+            my $opt = sub {
+                $_ = [$_, $_] unless ref $_ eq 'ARRAY';
+                my %attrs = (value => $_->[1]);
+                $attrs{selected} = 'selected' if exists $p{$_->[1]};
+                $self->_tag('option', %attrs, sub { $_->[0] });
+            };
+
+            return $self->_tag(
+                'select',
+                name => $name,
+                %attrs,
+                sub {
+                    join(
+                        '',
+                        map {
+
+                            # optgroup
+                            if (ref $_ eq 'ARRAY' and ref $_->[1] eq 'ARRAY')
+                            {
+                                $self->_tag(
+                                    'optgroup',
+                                    label => $_->[0],
+                                    sub {
+                                        join('', map { &$opt; } @{$_->[1]});
+                                    }
+                                );
+                            }
+
+                            # normal
+                            else { &$opt; }
+                          } @$options
+                    );
+                }
+            );
+        }
+    );
+
+
     # Add "script" helper
     $app->helper(
         script => sub {
@@ -313,6 +361,19 @@ Generate password input element.
     <%= radio_button 'country', value => 'germany', id => 'foo' %>
 
 Generate radio input element.
+
+=item selection
+
+    <%= selection 'simple', [qw/bar baz/], class => 'simple' %>
+    <%= selection 'named', [[name => 'value'], 'unnamed'] %>
+    <%= selection 'optgroups', [ [group => [qw/a b/]], 'simple' ] %>
+    <%= selection 'both', [ [grp => [[name => 1], [another => 2]] ] ] %>
+
+Generate select tag and its option tags for form menus. Option names
+default to their values.
+
+Use arrayref pairs to specify option names for display and arrayref
+with optiongroup name and arrayref of its options for option groups.
 
 =item script
 

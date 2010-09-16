@@ -735,7 +735,7 @@ $t->get_ok('/0', {'X-Forwarded-For' => '192.168.2.2, 192.168.2.1'})
 $ENV{MOJO_REVERSE_PROXY} = $backup;
 
 # GET /tags
-$t->get_ok('/tags/lala?a=b')->status_is(200)->content_is(<<EOF);
+$t->get_ok('/tags/lala?a=b&b=test2')->status_is(200)->content_is(<<EOF);
 <foo />
 <foo bar="baz" />
 <foo one="two" three="four">Hello</foo>
@@ -749,6 +749,8 @@ $t->get_ok('/tags/lala?a=b')->status_is(200)->content_is(<<EOF);
     <input name="foo" />
     <input name="foo" type="checkbox" />
     <input checked="checked" name="a" type="checkbox" />
+    <input name="b" type="radio" value="test1" />
+    <input checked="checked" name="b" type="radio" value="test2" />
 </form>
 <form action="/">
     <label for="foo">Name</label>
@@ -1368,6 +1370,8 @@ controller and action!
     %= input 'foo'
     %= input 'foo', type => 'checkbox'
     %= input 'a', type => 'checkbox'
+    %= input 'b', type => 'radio', value => 'test1'
+    %= input 'b', type => 'radio', value => 'test2'
 %= end
 <%= form_for '/' => begin %>
     <%= label 'foo' => begin %>Name<% end %>

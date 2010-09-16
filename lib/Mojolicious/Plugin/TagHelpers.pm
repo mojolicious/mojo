@@ -31,18 +31,24 @@ sub register {
     # Add "input" helper
     $app->helper(
         input => sub {
-            my $c    = shift;
-            my $name = shift;
+            my $c     = shift;
+            my $name  = shift;
+            my %attrs = @_;
 
             # Value
-            if (defined(my $p = $c->param($name))) {
-
-                # Attributes
-                my %attrs = @_;
+            my $p = $c->param($name);
+            my $t = $attrs{type} || '';
+            if (defined $p && $t ne 'submit') {
 
                 # Checkbox
-                if (($attrs{type} || '') eq 'checkbox') {
+                if ($t eq 'checkbox') {
                     $attrs{checked} = 'checked';
+                }
+
+                # Radiobutton
+                elsif ($t eq 'radio') {
+                    $attrs{checked} = 'checked'
+                      if ($attrs{value} || '') eq $p;
                 }
 
                 # Other
@@ -52,7 +58,7 @@ sub register {
             }
 
             # Empty tag
-            $self->_tag('input', name => $name, @_);
+            $self->_tag('input', name => $name, %attrs);
         }
     );
 
@@ -186,6 +192,8 @@ Generate image tag.
 
     <%= input 'first_name' %>
     <%= input 'first_name', value => 'Default name' %>
+    <%= input 'employed', type => 'checkbox' %>
+    <%= input 'country', type => 'radio', value => 'germany' %>
 
 Generate form input element.
 
@@ -197,14 +205,17 @@ Generate form label.
 
 =item link_to
 
+    <%= link_to 'index' %>
     <%= link_to index => begin %>Home<% end %>
     <%= link_to index => {foo => 'bar'} => (class => 'links') => begin %>
         Home
     <% end %>
     <%= link_to '/path/to/file' => begin %>File<% end %>
     <%= link_to 'http://mojolicious.org' => begin %>Mojolicious<% end %>
+    <%= link_to url_for->query(foo => $foo) => begin %>Retry<% end %>
 
-Generate link to route, path or URL.
+Generate link to route, path or URL, by default the capitalized link target
+will be used as content.
 
 =item script
 

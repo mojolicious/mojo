@@ -33,12 +33,12 @@ sub register {
         input => sub {
             my $c    = shift;
             my $name = shift;
+	    # Attributes
+	    my %attrs = @_;
 
             # Value
-            if (defined(my $p = $c->param($name))) {
-
-                # Attributes
-                my %attrs = @_;
+            if (defined(my $p = $c->param($name))
+		and $attrs{type} ne 'submit') {
 
                 # Checkbox
                 if (($attrs{type} || '') eq 'checkbox') {

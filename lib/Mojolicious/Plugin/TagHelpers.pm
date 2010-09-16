@@ -74,21 +74,29 @@ sub register {
 	    my $options = shift;
 	    my %attrs = @_;
 	    my %p = map { $_, 1 } $c->param($name); #support multiple
-	    warn $c->helper(dumper=> $options->[2]);
 	    return $self->_tag('select', name => $name, %attrs,
 			       sub {
-				 join('',
-				      map {
-					$_ =  [ $_, $_ ] unless ref $_ eq 'ARRAY';
-					my %attrs = ( value => $_->[1] );
-					$attrs{selected} = 'selected' if exists $p{$_->[1]};
-					$self->_tag('option', %attrs, sub { $_->[0] });
-				      } @$options
-				     ) ;
+				 my $parse = sub {
+				   my ($parser, $opts, $p) = @_;
+				   join('', map {
+				     # optgroup
+				     if ( ref $_ eq 'ARRAY' and (ref $_->[1] eq 'ARRAY') ) {
+				       $self->_tag('optgroup', label=>$_->[0], sub { &$parser($parser, $_->[1], \%p) } );
+				     }
+				     # normal
+				     else {
+				       $_ =  [ $_, $_ ] unless ref $_ eq 'ARRAY';
+				       my %attrs = ( value => $_->[1] );
+				       $attrs{selected} = 'selected' if exists $p->{$_->[1]};
+				       $self->_tag('option', %attrs, sub { $_->[0] });
+				     }
+				   } @$opts);
+				 };
+				 &$parse($parse, $options, \%p);
 			       }
 			      );
-	             }
-		) ;
+	  }
+		);
 
 
     # Add "label" helper

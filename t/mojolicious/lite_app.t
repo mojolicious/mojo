@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 582;
+plan tests => 585;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -735,7 +735,7 @@ $t->get_ok('/0', {'X-Forwarded-For' => '192.168.2.2, 192.168.2.1'})
 $ENV{MOJO_REVERSE_PROXY} = $backup;
 
 # GET /tags
-$t->get_ok('/tags/lala?a=b&b=test2')->status_is(200)->content_is(<<EOF);
+$t->get_ok('/tags/lala?a=b&b=0&c=2&d=3')->status_is(200)->content_is(<<EOF);
 <foo />
 <foo bar="baz" />
 <foo one="two" three="four">Hello</foo>
@@ -749,8 +749,14 @@ $t->get_ok('/tags/lala?a=b&b=test2')->status_is(200)->content_is(<<EOF);
     <input name="foo" />
     <input name="foo" type="checkbox" />
     <input checked="checked" name="a" type="checkbox" />
-    <input name="b" type="radio" value="test1" />
-    <input checked="checked" name="b" type="radio" value="test2" />
+    <input name="b" type="radio" value="1" />
+    <input checked="checked" name="b" type="radio" value="0" />
+    <input name="c" type="hidden" value="foo" />
+    <input name="d" type="file" />
+    <textarea cols="40" name="e" rows="50">
+        default!
+    </textarea>
+    <textarea name="f"></textarea>
 </form>
 <form action="/">
     <label for="foo">Name</label>
@@ -758,6 +764,45 @@ $t->get_ok('/tags/lala?a=b&b=test2')->status_is(200)->content_is(<<EOF);
 </form>
 <input name="a" value="b" />
 <input name="a" value="b" />
+<script src="/script.js" type="text/javascript" />
+<script type="text/javascript">
+    var a = 'b';
+</script>
+<script type="foo">
+    var a = 'b';
+</script>
+<img src="/foo.jpg" />
+<img alt="image" src="/foo.jpg" />
+EOF
+
+# GET /tags (alternative)
+$t->get_ok('/tags/lala?c=b&d=3&e=4&f=5')->status_is(200)->content_is(<<EOF);
+<foo />
+<foo bar="baz" />
+<foo one="two" three="four">Hello</foo>
+<a href="/path">/path</a>
+<a href="http://example.com/" title="Foo">Foo</a>
+<a href="http://example.com/">Example</a>
+<a href="/template">Index</a>
+<a href="/tags/23" title="Foo">Tags</a>
+<form action="/template" method="post"><input name="foo" /></form>
+<form action="/tags/24" method="post">
+    <input name="foo" />
+    <input name="foo" type="checkbox" />
+    <input name="a" type="checkbox" />
+    <input name="b" type="radio" value="1" />
+    <input name="b" type="radio" value="0" />
+    <input name="c" type="hidden" value="foo" />
+    <input name="d" type="file" />
+    <textarea cols="40" name="e" rows="50">4</textarea>
+    <textarea name="f">5</textarea>
+</form>
+<form action="/">
+    <label for="foo">Name</label>
+    <input name="foo" />
+</form>
+<input name="a" />
+<input name="a" value="c" />
 <script src="/script.js" type="text/javascript" />
 <script type="text/javascript">
     var a = 'b';
@@ -1367,11 +1412,17 @@ controller and action!
 <%= link_to 'tags', {test => 23}, title => 'Foo' %>
 <%= form_for 'index', method => 'post' => begin %><%= input 'foo' %><% end %>
 %= form_for 'tags', {test => 24}, method => 'post' => begin
-    %= input 'foo'
-    %= input 'foo', type => 'checkbox'
-    %= input 'a', type => 'checkbox'
-    %= input 'b', type => 'radio', value => 'test1'
-    %= input 'b', type => 'radio', value => 'test2'
+    %= text_field 'foo'
+    %= check_box 'foo'
+    %= check_box 'a'
+    %= radio_button 'b', value => '1'
+    %= radio_button 'b', value => '0'
+    %= hidden_field 'c', value => 'foo'
+    %= file_field 'd'
+    %= text_area e => (cols => 40, rows => 50) => begin
+        default!
+    %= end
+    %= text_area 'f'
 %= end
 <%= form_for '/' => begin %>
     <%= label 'foo' => begin %>Name<% end %>

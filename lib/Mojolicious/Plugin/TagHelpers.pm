@@ -12,6 +12,18 @@ use Mojo::ByteStream;
 sub register {
     my ($self, $app) = @_;
 
+    # Add "checkbox" helper
+    $app->helper(check_box => sub { $self->_input(@_, type => 'checkbox') });
+
+    # Add "file_field" helper
+    $app->helper(
+        file_field => sub {
+            my $c    = shift;
+            my $name = shift;
+            $self->_tag('input', name => $name, type => 'file', @_);
+        }
+    );
+
     # Add "form_for" helper
     $app->helper(
         form_for => sub {
@@ -25,42 +37,20 @@ sub register {
         }
     );
 
+    # Add "hidden_field" helper
+    $app->helper(
+        hidden_field => sub {
+            my $c    = shift;
+            my $name = shift;
+            $self->_tag('input', name => $name, type => 'hidden', @_);
+        }
+    );
+
     # Add "img" helper
     $app->helper(img => sub { shift; $self->_tag('img', src => shift, @_) });
 
     # Add "input" helper
-    $app->helper(
-        input => sub {
-            my $c     = shift;
-            my $name  = shift;
-            my %attrs = @_;
-
-            # Value
-            my $p = $c->param($name);
-            my $t = $attrs{type} || '';
-            if (defined $p && $t ne 'submit') {
-
-                # Checkbox
-                if ($t eq 'checkbox') {
-                    $attrs{checked} = 'checked';
-                }
-
-                # Radiobutton
-                elsif ($t eq 'radio') {
-                    $attrs{checked} = 'checked'
-                      if ($attrs{value} || '') eq $p;
-                }
-
-                # Other
-                else { $attrs{value} = $p }
-
-                return $self->_tag('input', name => $name, %attrs);
-            }
-
-            # Empty tag
-            $self->_tag('input', name => $name, %attrs);
-        }
-    );
+    $app->helper(input => sub { $self->_input(@_) });
 
     # Add "label" helper
     $app->helper(
@@ -82,6 +72,9 @@ sub register {
             $self->_tag('a', href => $c->url_for($name, $captures), @_);
         }
     );
+
+    # Add "radio_button" helper
+    $app->helper(radio_button => sub { $self->_input(@_, type => 'radio') });
 
     # Add "script" helper
     $app->helper(
@@ -105,6 +98,58 @@ sub register {
 
     # Add "tag" helper
     $app->helper(tag => sub { shift; $self->_tag(@_) });
+
+    # Add "text_area" helper
+    $app->helper(
+        text_area => sub {
+            my $c    = shift;
+            my $name = shift;
+
+            # Value
+            my $cb = ref $_[-1] && ref $_[-1] eq 'CODE' ? pop : sub {''};
+            if (defined(my $value = $c->param($name))) {
+                $cb = sub {$value}
+            }
+
+            $self->_tag('textarea', name => $name, @_, $cb);
+        }
+    );
+
+    # Add "text_field" helper
+    $app->helper(text_field => sub { $self->_input(@_) });
+}
+
+sub _input {
+    my $self  = shift;
+    my $c     = shift;
+    my $name  = shift;
+    my %attrs = @_;
+
+    # Value
+    my $p = $c->param($name);
+    my $t = $attrs{type} || '';
+    if (defined $p && $t ne 'submit') {
+
+        # Checkbox
+        if ($t eq 'checkbox') {
+            $attrs{checked} = 'checked';
+        }
+
+        # Radiobutton
+        elsif ($t eq 'radio') {
+            my $value = $attrs{value};
+            $value = '' unless defined $value;
+            $attrs{checked} = 'checked' if $value eq $p;
+        }
+
+        # Other
+        else { $attrs{value} = $p }
+
+        return $self->_tag('input', name => $name, %attrs);
+    }
+
+    # Empty tag
+    $self->_tag('input', name => $name, %attrs);
 }
 
 sub _tag {
@@ -164,6 +209,20 @@ Note that this module is EXPERIMENTAL and might change without warning!
 
 =over 4
 
+=item check_box
+
+    <%= check_box 'employed' %>
+    <%= check_box 'employed', id => 'foo' %>
+
+Generate checkbox input element.
+
+=item file_field
+
+    <%= file_field 'avatar' %>
+    <%= file_field 'avatar', id => 'foo' %>
+
+Generate file input element.
+
 =item form_for
 
     <%= form_for login => (method => 'post') => begin %>
@@ -180,6 +239,12 @@ Note that this module is EXPERIMENTAL and might change without warning!
     <% end %>
 
 Generate form for route, path or URL.
+
+=item hidden_field
+
+    <%= hidden_field 'foo', value => 'bar' %>
+
+Generate hidden input element.
 
 =item img
 
@@ -217,6 +282,13 @@ Generate form label.
 Generate link to route, path or URL, by default the capitalized link target
 will be used as content.
 
+=item radio_button
+
+    <%= radio_button 'country' %>
+    <%= radio_button 'country', value => 'germany', id => 'foo' %>
+
+Generate radio input element.
+
 =item script
 
     <%= script '/script.js' %>
@@ -233,6 +305,22 @@ Generate script tag.
     <%= tag div => begin %>Content<% end %>
 
 HTML5 tag generator.
+
+=item text_field
+
+    <%= text_field 'first_name' %>
+    <%= text_field 'first_name', value => 'Default name' %>
+
+Generate text input element.
+
+=item text_area
+
+    <%= text_area 'foo' %>
+    <%= text_area foo => begin %>
+        Default!
+    <% end %>
+
+Generate textarea element.
 
 =back
 

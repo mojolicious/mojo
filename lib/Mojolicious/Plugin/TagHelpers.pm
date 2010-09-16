@@ -73,6 +73,15 @@ sub register {
         }
     );
 
+    # Add "password_field" helper
+    $app->helper(
+        password_field => sub {
+            my $c    = shift;
+            my $name = shift;
+            $self->_tag('input', name => $name, type => 'password', @_);
+        }
+    );
+
     # Add "radio_button" helper
     $app->helper(radio_button => sub { $self->_input(@_, type => 'radio') });
 
@@ -93,6 +102,15 @@ sub register {
 
             # Block
             $self->_tag('script', type => 'text/javascript', @_);
+        }
+    );
+
+    # Add "submit_button" helper
+    $app->helper(
+        submit_button => sub {
+            my $c     = shift;
+            my $value = shift;
+            $self->_tag('input', value => $value, type => 'submit', @_);
         }
     );
 
@@ -282,6 +300,13 @@ Generate form label.
 Generate link to route, path or URL, by default the capitalized link target
 will be used as content.
 
+=item password_field
+
+    <%= password_field 'pass' %>
+    <%= password_field 'pass', id => 'foo' %>
+
+Generate password input element.
+
 =item radio_button
 
     <%= radio_button 'country' %>
@@ -297,6 +322,13 @@ Generate radio input element.
     <% end %>
 
 Generate script tag.
+
+=item submit_button
+
+    <%= submit_button 'Ok!' %>
+    <%= submit_button 'Ok!', id => 'foo' %>
+
+Generate submit input element.
 
 =item tag
 

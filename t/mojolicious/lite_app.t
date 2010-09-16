@@ -757,6 +757,10 @@ $t->get_ok('/tags/lala?a=b&b=0&c=2&d=3')->status_is(200)->content_is(<<EOF);
         default!
     </textarea>
     <textarea name="f"></textarea>
+    <input name="g" type="password" />
+    <input id="foo" name="h" type="password" />
+    <input type="submit" value="Ok!" />
+    <input id="bar" type="submit" value="Ok too!" />
 </form>
 <form action="/">
     <label for="foo">Name</label>
@@ -796,6 +800,10 @@ $t->get_ok('/tags/lala?c=b&d=3&e=4&f=5')->status_is(200)->content_is(<<EOF);
     <input name="d" type="file" />
     <textarea cols="40" name="e" rows="50">4</textarea>
     <textarea name="f">5</textarea>
+    <input name="g" type="password" />
+    <input id="foo" name="h" type="password" />
+    <input type="submit" value="Ok!" />
+    <input id="bar" type="submit" value="Ok too!" />
 </form>
 <form action="/">
     <label for="foo">Name</label>
@@ -1423,6 +1431,10 @@ controller and action!
         default!
     %= end
     %= text_area 'f'
+    %= password_field 'g'
+    %= password_field 'h', id => 'foo'
+    %= submit_button 'Ok!'
+    %= submit_button 'Ok too!', id => 'bar'
 %= end
 <%= form_for '/' => begin %>
     <%= label 'foo' => begin %>Name<% end %>

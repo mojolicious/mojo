@@ -451,8 +451,8 @@ multiple features at once.
     % layout 'funky';
     Who is groovy?
     <%= form_for test => (method => 'post') => begin %>
-        <%= input 'groovy', type => 'text' %>
-        <input type="submit" value="Woosh!" />
+        <%= text_field 'groovy' %>
+        <%= submit_button 'Woosh!' %>
     <% end %>
 
     @@ welcome.html.ep
@@ -583,10 +583,10 @@ request), this is very useful in combination with C<redirect_to>.
             <b>Wrong name or password, please try again.</b><br />
         <% } %>
         Name:<br />
-        <%= input name => (type => 'text') %><br />
+        <%= text_field 'name' %><br />
         Password:<br />
-        <%= input pass => (type => 'text') %><br />
-        <input type="submit" value="Login" />
+        <%= password_field 'pass' %><br />
+        <%= submit_button 'Login' %>
     <% end %>
 
     @@ index.html.ep

@@ -85,21 +85,30 @@ sub register {
     # Add "radio_button" helper
     $app->helper(radio_button => sub { $self->_input(@_, type => 'radio') });
 
-    # Add "selection" helper
+    # Add "select_field" helper
     $app->helper(
-        selection => sub {
+        select_field => sub {
             my $c       = shift;
             my $name    = shift;
             my $options = shift;
             my %attrs   = @_;
-            my %p       = map { $_, 1 } $c->param($name);    #support multiple
 
-            # option
-            my $opt = sub {
-                $_ = [$_, $_] unless ref $_ eq 'ARRAY';
-                my %attrs = (value => $_->[1]);
-                $attrs{selected} = 'selected' if exists $p{$_->[1]};
-                $self->_tag('option', %attrs, sub { $_->[0] });
+            # Values
+            my %v = map { $_, 1 } $c->param($name);
+
+            # Callback
+            my $cb = sub {
+
+                # Pair
+                my $pair = shift;
+                $pair = [$pair, $pair] unless ref $pair eq 'ARRAY';
+
+                # Attributes
+                my %attrs = (value => $pair->[1]);
+                $attrs{selected} = 'selected' if exists $v{$pair->[1]};
+
+                # Option tag
+                $self->_tag('option', %attrs, sub { $pair->[0] });
             };
 
             return $self->_tag(
@@ -107,26 +116,27 @@ sub register {
                 name => $name,
                 %attrs,
                 sub {
-                    join(
-                        '',
-                        map {
 
-                            # optgroup
-                            if (ref $_ eq 'ARRAY' and ref $_->[1] eq 'ARRAY')
-                            {
-                                $self->_tag(
-                                    'optgroup',
-                                    label => $_->[0],
-                                    sub {
-                                        join('', map { &$opt; } @{$_->[1]});
-                                    }
-                                );
-                            }
+                    # Parts
+                    my $parts = '';
+                    for my $o (@$options) {
 
-                            # normal
-                            else { &$opt; }
-                          } @$options
-                    );
+                        # OptGroup
+                        if (ref $o eq 'ARRAY' && ref $o->[1] eq 'ARRAY') {
+                            $parts .= $self->_tag(
+                                'optgroup',
+                                label => $o->[0],
+                                sub {
+                                    join '', map { $cb->($_) } @{$o->[1]};
+                                }
+                            );
+                        }
+
+                        # Option
+                        else { $parts .= $cb->($o) }
+                    }
+
+                    return $parts;
                 }
             );
         }
@@ -158,6 +168,7 @@ sub register {
         submit_button => sub {
             my $c     = shift;
             my $value = shift;
+            $value = 'Ok' unless defined $value;
             $self->_tag('input', value => $value, type => 'submit', @_);
         }
     );
@@ -282,6 +293,9 @@ Note that this module is EXPERIMENTAL and might change without warning!
 
 Generate checkbox input element.
 
+    <input name="employed" type="checkbox" />
+    <input id="foo" name="employed" type="checkbox" />
+
 =item file_field
 
     <%= file_field 'avatar' %>
@@ -289,22 +303,46 @@ Generate checkbox input element.
 
 Generate file input element.
 
+    <input name="avatar" type="file" />
+    <input id="foo" name="avatar" type="file" />
+
 =item form_for
 
     <%= form_for login => (method => 'post') => begin %>
-        <%= input 'first_name' %>
+        <%= text_field 'first_name' %>
+        <%= submit_button %>
     <% end %>
     <%= form_for login => {foo => 'bar'} => (method => 'post') => begin %>
-        <%= input 'first_name' %>
+        <%= text_field 'first_name' %>
+        <%= submit_button %>
     <% end %>
     <%= form_for '/login' => (method => 'post') => begin %>
-        <%= input 'first_name' %>
+        <%= text_field 'first_name' %>
+        <%= submit_button %>
     <% end %>
     <%= form_for 'http://kraih.com/login' => (method => 'post') => begin %>
-        <%= input 'first_name' %>
+        <%= text_field 'first_name' %>
+        <%= submit_button %>
     <% end %>
 
 Generate form for route, path or URL.
+
+    <form action="/path/to/login" method="post">
+        <input name="first_name" type="text" />
+        <input value="Ok" type="submit" />
+    </form>
+    <form action="/path/to/login/bar" method="post">
+        <input name="first_name" type="text" />
+        <input value="Ok" type="submit" />
+    </form>
+    <form action="/login" method="post">
+        <input name="first_name" type="text" />
+        <input value="Ok" type="submit" />
+    </form>
+    <form action="http://kraih.com/login" method="post">
+        <input name="first_name" type="text" />
+        <input value="Ok" type="submit" />
+    </form>
 
 =item hidden_field
 
@@ -312,12 +350,17 @@ Generate form for route, path or URL.
 
 Generate hidden input element.
 
+    <input name="foo" type="hidden" value="bar" />
+
 =item img
 
     <%= img '/foo.jpg' %>
     <%= img '/foo.jpg', alt => 'Image' %>
 
 Generate image tag.
+
+    <img src="/foo.jpg" />
+    <img alt="Image" src="/foo.jpg" />
 
 =item input
 
@@ -328,11 +371,18 @@ Generate image tag.
 
 Generate form input element.
 
+    <input name="first_name" type="text" />
+    <input name="first_name" type="text" value="Default name" />
+    <input name="employed" type="checkbox" />
+    <input name="country" type="radio" value="germany" />
+
 =item label
 
     <%= label first_name => begin %>First name<% end %>
 
 Generate form label.
+
+    <label for="first_name">First name</label>
 
 =item link_to
 
@@ -348,12 +398,22 @@ Generate form label.
 Generate link to route, path or URL, by default the capitalized link target
 will be used as content.
 
+    <a href="/path/to/index">Index</a>
+    <a href="/path/to/index">Home</a>
+    <a class="links" href="/path/to/index/bar">Home</a>
+    <a href="/path/to/file">File</a>
+    <a href="http://mojolicious.org">Mojolicious</a>
+    <a href="/current/path?foo=something">Retry</a>
+
 =item password_field
 
     <%= password_field 'pass' %>
     <%= password_field 'pass', id => 'foo' %>
 
 Generate password input element.
+
+    <input name="pass" type="password" />
+    <input id="foo" name="pass" type="password" />
 
 =item radio_button
 
@@ -362,18 +422,36 @@ Generate password input element.
 
 Generate radio input element.
 
-=item selection
+    <input name="country" type="radio" />
+    <input name="country" type="radio" value="germany" />
 
-    <%= selection 'simple', [qw/bar baz/], class => 'simple' %>
-    <%= selection 'named', [[name => 'value'], 'unnamed'] %>
-    <%= selection 'optgroups', [ [group => [qw/a b/]], 'simple' ] %>
-    <%= selection 'both', [ [grp => [[name => 1], [another => 2]] ] ] %>
+=item select_field
 
-Generate select tag and its option tags for form menus. Option names
-default to their values.
+    <%= select_field language => [qw/de en/] %>
+    <%= select_field language => [qw/de en/], id => 'lang' %>
+    <%= select_field country => [[Germany => 'de'], 'en'] %>
+    <%= select_field country => [[Europe => [Germany => 'de']]] %>
 
-Use arrayref pairs to specify option names for display and arrayref
-with optiongroup name and arrayref of its options for option groups.
+Generate select, option and optgroup elements.
+
+    <select name="language">
+        <option name="de">de</option>
+        <option name="en">en</option>
+    </select>
+    <select id="lang" name="language">
+        <option name="de">de</option>
+        <option name="en">en</option>
+    </select>
+    <select name="country">
+        <option name="de">Germany</option>
+        <option name="en">en</option>
+    </select>
+    <select id="lang" name="language">
+        <optgroup label="Europe">
+            <option name="de">Germany</option>
+            <option name="en">en</option>
+        </optgroup>
+    </select>
 
 =item script
 
@@ -384,12 +462,20 @@ with optiongroup name and arrayref of its options for option groups.
 
 Generate script tag.
 
+    <script src="/script.js" type="text/javascript" />
+    <script type="text/javascript">
+        var a = 'b';
+    </script>
+
 =item submit_button
 
-    <%= submit_button 'Ok!' %>
+    <%= submit_button %>
     <%= submit_button 'Ok!', id => 'foo' %>
 
 Generate submit input element.
+
+    <input type="submit" value="Ok" />
+    <input id="foo" type="submit" value="Ok!" />
 
 =item tag
 
@@ -399,12 +485,19 @@ Generate submit input element.
 
 HTML5 tag generator.
 
+    <div />
+    <div id="foo" />
+    <div>Content</div>
+
 =item text_field
 
     <%= text_field 'first_name' %>
     <%= text_field 'first_name', value => 'Default name' %>
 
 Generate text input element.
+
+    <input name="first_name" type="text" />
+    <input name="first_name" type="text" value="Default name" />
 
 =item text_area
 
@@ -414,6 +507,11 @@ Generate text input element.
     <% end %>
 
 Generate textarea element.
+
+    <textarea name="foo"></textarea>
+    <textarea name="foo">
+        Default!
+    </textarea>
 
 =back
 

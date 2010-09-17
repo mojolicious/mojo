@@ -686,6 +686,8 @@ Hideki Yamamura
 
 James Duncan
 
+Jan Jona Javorsek
+
 Jaroslav Muhin
 
 Jesse Vincent

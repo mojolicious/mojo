@@ -23,8 +23,8 @@ This file documents the revision history for Perl extension Mojolicious.
           name.
         - Added while and until methods for Mojo::DOM collections. (vti)
         - Added many new tag helpers to Mojolicious::Plugin::TagHelpers.
-        - Added support for radiobuttons to Mojolicious::Plugin::TagHelpers.
-          (kvorg)
+        - Added support for radiobuttons and selections to
+          Mojolicious::Plugin::TagHelpers. (kvorg)
         - Simplified transaction pausing by replacing it with an automatism.
         - Improved RFC3986 compliance of Mojo::Path. (janus)
         - Improved Mojo::Server::PSGI to preload applications.

@@ -292,6 +292,7 @@ Note that this module is EXPERIMENTAL and might change without warning!
     <%= check_box 'employed', id => 'foo' %>
 
 Generate checkbox input element.
+Note that this helper is EXPERIMENTAL and might change without warning!
 
     <input name="employed" type="checkbox" />
     <input id="foo" name="employed" type="checkbox" />
@@ -302,6 +303,7 @@ Generate checkbox input element.
     <%= file_field 'avatar', id => 'foo' %>
 
 Generate file input element.
+Note that this helper is EXPERIMENTAL and might change without warning!
 
     <input name="avatar" type="file" />
     <input id="foo" name="avatar" type="file" />
@@ -349,6 +351,7 @@ Generate form for route, path or URL.
     <%= hidden_field 'foo', value => 'bar' %>
 
 Generate hidden input element.
+Note that this helper is EXPERIMENTAL and might change without warning!
 
     <input name="foo" type="hidden" value="bar" />
 
@@ -411,6 +414,7 @@ will be used as content.
     <%= password_field 'pass', id => 'foo' %>
 
 Generate password input element.
+Note that this helper is EXPERIMENTAL and might change without warning!
 
     <input name="pass" type="password" />
     <input id="foo" name="pass" type="password" />
@@ -421,6 +425,7 @@ Generate password input element.
     <%= radio_button 'country', value => 'germany', id => 'foo' %>
 
 Generate radio input element.
+Note that this helper is EXPERIMENTAL and might change without warning!
 
     <input name="country" type="radio" />
     <input name="country" type="radio" value="germany" />
@@ -433,6 +438,7 @@ Generate radio input element.
     <%= select_field country => [[Europe => [Germany => 'de']]] %>
 
 Generate select, option and optgroup elements.
+Note that this helper is EXPERIMENTAL and might change without warning!
 
     <select name="language">
         <option name="de">de</option>
@@ -473,6 +479,7 @@ Generate script tag.
     <%= submit_button 'Ok!', id => 'foo' %>
 
 Generate submit input element.
+Note that this helper is EXPERIMENTAL and might change without warning!
 
     <input type="submit" value="Ok" />
     <input id="foo" type="submit" value="Ok!" />
@@ -495,6 +502,7 @@ HTML5 tag generator.
     <%= text_field 'first_name', value => 'Default name' %>
 
 Generate text input element.
+Note that this helper is EXPERIMENTAL and might change without warning!
 
     <input name="first_name" type="text" />
     <input name="first_name" type="text" value="Default name" />
@@ -507,6 +515,7 @@ Generate text input element.
     <% end %>
 
 Generate textarea element.
+Note that this helper is EXPERIMENTAL and might change without warning!
 
     <textarea name="foo"></textarea>
     <textarea name="foo">

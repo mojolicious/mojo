@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 594;
+plan tests => 599;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -543,6 +543,12 @@ under sub {
 
 # GET /impossible
 get '/impossible' => 'impossible';
+
+# Prefix
+under '/prefix';
+
+# GET /prefix/works
+get '/works' => sub { shift->render(text => 'prefix works!') };
 
 # Oh Fry, I love you more than the moon, and the stars,
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
@@ -1463,6 +1469,12 @@ $t->get_ok('/impossible')->status_is(404)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->header_is('X-Possible'   => undef)->header_is('X-Impossible' => 1)
   ->content_is("Oops!\n");
+
+# GET /prefix/works
+$t->get_ok('/prefix/works')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('prefix works!');
 
 # Client timer
 $client->ioloop->one_tick('0.1');

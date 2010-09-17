@@ -43,6 +43,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed a small renderer bug.
         - Fixed automatic reloading for external templates.
         - Fixed after_build_tx plugin hook callback order.
+        - Fixed a small under bug in Mojolicious::Lite.
 
 0.999929 2010-08-17 00:00:00
         - Removed OS X resource fork files.

@@ -265,15 +265,30 @@ sub listen {
         %{$args->{args} || {}}
     );
 
+    # File
+    my $file = $args->{file};
+
+    # Port
+    my $port = $args->{port} || 3000;
+
+    # File descriptor reuse
+    my $reuse = defined $file ? $file : $port;
+    $ENV{MOJO_REUSE} ||= '';
+    my $fd;
+    if ($ENV{MOJO_REUSE} =~ /(?:^|\,)$reuse\:(\d+)/) { $fd = $1 }
+
     # Listen on UNIX domain socket
     my $socket;
-    if (my $file = $args->{file}) {
+    if (defined $file) {
 
         # Path
         $options{Local} = $file;
 
         # Create socket
-        $socket = IO::Socket::UNIX->new(%options)
+        $socket =
+          defined $fd
+          ? IO::Socket::UNIX->new
+          : IO::Socket::UNIX->new(%options)
           or croak "Can't create listen socket: $!";
     }
 
@@ -282,16 +297,25 @@ sub listen {
 
         # Socket options
         $options{LocalAddr} = $args->{address} || (IPV6 ? '::' : '0.0.0.0');
-        $options{LocalPort} = $args->{port}    || 3000;
+        $options{LocalPort} = $port;
         $options{Proto}     = 'tcp';
         $options{ReuseAddr} = 1;
 
         # Create socket
         my $class = IPV6 ? 'IO::Socket::INET6' : 'IO::Socket::INET';
-        $socket = $class->new(%options)
+        $socket = defined $fd ? $class->new : $class->new(%options)
           or croak "Can't create listen socket: $!";
     }
+
+    # File descriptor
+    if (defined $fd) { $socket->fdopen($fd, 'r') }
+    else {
+        $fd = fileno $socket;
+        $reuse = ",$reuse" if length $ENV{MOJO_REUSE};
+        $ENV{MOJO_REUSE} .= "$reuse:$fd";
+    }
     my $id = "$socket";
+    $self->{_fds}->{$fd} = $id;
 
     # Add listen socket
     my $c = $self->{_listen}->{$id} = {
@@ -310,10 +334,6 @@ sub listen {
         SSL_key_file       => $args->{tls_key} || $self->_prepare_key
       }
       if $args->{tls};
-
-    # File descriptor
-    my $fd = fileno $socket;
-    $self->{_fds}->{$fd} = $id;
 
     return $id;
 }

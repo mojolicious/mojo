@@ -503,6 +503,21 @@ true value.
     @@ index.html.ep
     Hi Bender!
 
+Prefixing multiple routes is another good use for C<under>.
+
+    use Mojolicious::Lite;
+
+    # /foo
+    under '/foo';
+
+    # GET /foo/bar
+    get '/bar' => sub { shift->render(text => 'bar!') };
+
+    # GET /foo/baz
+    get '/baz' => sub { shift->render(text => 'baz!') };
+
+    app->start;
+
 Conditions such as C<agent> allow even more powerful route constructs.
 
     # /foo

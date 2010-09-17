@@ -134,7 +134,7 @@ sub _dispatch_controller {
 
     # Class
     $app ||= $self->_generate_class($c);
-    return unless $app;
+    return 1 unless $app;
 
     # Method
     my $method = $self->_generate_method($c);

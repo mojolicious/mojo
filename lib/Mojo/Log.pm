@@ -68,7 +68,8 @@ sub log {
     return $self unless $level && $self->is_level($level);
 
     my $time = localtime(time);
-    my $msgs = join "\n", @msgs;
+    my $msgs = join "\n",
+      map { utf8::is_utf8 $_ ? $_ : utf8::encode $_} @msgs;
 
     # Caller
     my ($pkg, $line) = (caller())[0, 2];

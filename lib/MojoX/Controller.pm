@@ -11,6 +11,7 @@ __PACKAGE__->attr('app');
 # Reserved stash values
 my $STASH_RE = qr/
     ^
+    (?:
     action
     |
     app
@@ -48,6 +49,7 @@ my $STASH_RE = qr/
     template
     |
     text
+    )
     $
     /x;
 

@@ -30,6 +30,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved Mojo::Server::PSGI to preload applications.
         - Improved FastCGI detection for Dreamhost. (garu)
         - Improved keep alive timeout handling in Mojo::Client.
+        - Improved documentation. (rhaen)
         - Fixed a serious design flaw in Mojo::Message and made long poll
           much easier.
         - Fixed a bug where Mojo::IOLoop connections could be closed too

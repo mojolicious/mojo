@@ -221,6 +221,19 @@ These mappings can be easily extended or changed.
 
     1;
 
+=head2 Stash Data
+
+Data can be passed to templates through the C<stash> in any of the native
+Perl data types.
+
+    $self->stash(author => 'Sebastian');
+    $self->stash(frameworks => [qw/Catalyst Mojolicious/]);
+    $self->stash(examples => {tweetylicious => 'a microblogging app'});
+
+    <%= $author %>
+    <%= $frameworks->[1] %>
+    <%= $examples->{tweetylicious} %>
+
 =head2 Helpers
 
 Helpers are little functions you can use in templates and controller code.

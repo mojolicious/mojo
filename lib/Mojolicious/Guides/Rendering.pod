@@ -234,6 +234,16 @@ Perl data types.
     <%= $frameworks->[1] %>
     <%= $examples->{tweetylicious} %>
 
+Since everything is just Perl normal control structures just work.
+
+    <% for my $framework (@$frameworks) { %>
+        <%= $framework %> was written by <%= $author %>.
+    <% } %>
+
+    <% while (my ($app, $description) = each %$examples) { %>
+        <%= $app %> is a <%= $description %>.
+    <% } %>
+
 =head2 Helpers
 
 Helpers are little functions you can use in templates and controller code.

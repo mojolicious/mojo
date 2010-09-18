@@ -13,7 +13,15 @@ sub register {
     my ($self, $app) = @_;
 
     # Add "checkbox" helper
-    $app->helper(check_box => sub { $self->_input(@_, type => 'checkbox') });
+    $app->helper(
+        check_box => sub {
+            $self->_input(
+                shift, shift,
+                value => shift,
+                @_, type => 'checkbox'
+            );
+        }
+    );
 
     # Add "file_field" helper
     $app->helper(
@@ -40,9 +48,14 @@ sub register {
     # Add "hidden_field" helper
     $app->helper(
         hidden_field => sub {
-            my $c    = shift;
-            my $name = shift;
-            $self->_tag('input', name => $name, type => 'hidden', @_);
+            shift;
+            $self->_tag(
+                'input',
+                name  => shift,
+                value => shift,
+                type  => 'hidden',
+                @_
+            );
         }
     );
 
@@ -83,7 +96,11 @@ sub register {
     );
 
     # Add "radio_button" helper
-    $app->helper(radio_button => sub { $self->_input(@_, type => 'radio') });
+    $app->helper(
+        radio_button => sub {
+            $self->_input(shift, shift, value => shift, @_, type => 'radio');
+        }
+    );
 
     # Add "select_field" helper
     $app->helper(
@@ -288,14 +305,14 @@ Note that this module is EXPERIMENTAL and might change without warning!
 
 =item check_box
 
-    <%= check_box 'employed' %>
-    <%= check_box 'employed', id => 'foo' %>
+    <%= check_box employed => 1 %>
+    <%= check_box employed => 1, id => 'foo' %>
 
 Generate checkbox input element.
 Note that this helper is EXPERIMENTAL and might change without warning!
 
-    <input name="employed" type="checkbox" />
-    <input id="foo" name="employed" type="checkbox" />
+    <input name="employed" type="checkbox" value="1" />
+    <input id="foo" name="employed" type="checkbox" value="1" />
 
 =item file_field
 
@@ -348,12 +365,14 @@ Generate form for route, path or URL.
 
 =item hidden_field
 
-    <%= hidden_field 'foo', value => 'bar' %>
+    <%= hidden_field foo => 'bar' %>
+    <%= hidden_field foo => 'bar', id => 'bar' %>
 
 Generate hidden input element.
 Note that this helper is EXPERIMENTAL and might change without warning!
 
     <input name="foo" type="hidden" value="bar" />
+    <input id="bar" name="foo" type="hidden" value="bar" />
 
 =item img
 
@@ -421,14 +440,14 @@ Note that this helper is EXPERIMENTAL and might change without warning!
 
 =item radio_button
 
-    <%= radio_button 'country' %>
-    <%= radio_button 'country', value => 'germany', id => 'foo' %>
+    <%= radio_button country => 'germany' %>
+    <%= radio_button country => 'germany', id => 'foo' %>
 
 Generate radio input element.
 Note that this helper is EXPERIMENTAL and might change without warning!
 
-    <input name="country" type="radio" />
     <input name="country" type="radio" value="germany" />
+    <input id="foo" name="country" type="radio" value="germany" />
 
 =item select_field
 

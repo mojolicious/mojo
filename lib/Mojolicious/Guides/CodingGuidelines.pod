@@ -54,13 +54,13 @@ unique code name based on a unicode character.
 New features can be marked as experimental to be excluded from deprecation
 policies.
 
-Only add prereqs if absolutely necessary.
+Only add prereqs if absolutely necessary and make them optional if possible.
 
 Domain specific languages should be avoided in favor of Perl'ish solutions.
 
 No inline POD.
 
-Documentation belongs to the book, module POD is just an API reference.
+Documentation belongs to the guides, module POD is just an API reference.
 
 Lines should not be longer than 78 characters and we indent with 4
 whitespaces.

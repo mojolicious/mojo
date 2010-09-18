@@ -756,8 +756,8 @@ $t->get_ok('/tags/lala?a=b&b=0&c=2&d=3')->status_is(200)->content_is(<<EOF);
 <form action="/template" method="post"><input name="foo" /></form>
 <form action="/tags/24" method="post">
     <input name="foo" />
-    <input name="foo" type="checkbox" />
-    <input checked="checked" name="a" type="checkbox" />
+    <input name="foo" type="checkbox" value="1" />
+    <input checked="checked" name="a" type="checkbox" value="2" />
     <input name="b" type="radio" value="1" />
     <input checked="checked" name="b" type="radio" value="0" />
     <input name="c" type="hidden" value="foo" />
@@ -801,8 +801,8 @@ $t->get_ok('/tags/lala?c=b&d=3&e=4&f=5')->status_is(200)->content_is(<<EOF);
 <form action="/template" method="post"><input name="foo" /></form>
 <form action="/tags/24" method="post">
     <input name="foo" />
-    <input name="foo" type="checkbox" />
-    <input name="a" type="checkbox" />
+    <input name="foo" type="checkbox" value="1" />
+    <input name="a" type="checkbox" value="2" />
     <input name="b" type="radio" value="1" />
     <input name="b" type="radio" value="0" />
     <input name="c" type="hidden" value="foo" />
@@ -1502,11 +1502,11 @@ controller and action!
 <%= form_for 'index', method => 'post' => begin %><%= input 'foo' %><% end %>
 %= form_for 'tags', {test => 24}, method => 'post' => begin
     %= text_field 'foo'
-    %= check_box 'foo'
-    %= check_box 'a'
-    %= radio_button 'b', value => '1'
-    %= radio_button 'b', value => '0'
-    %= hidden_field 'c', value => 'foo'
+    %= check_box foo => 1
+    %= check_box a => 2
+    %= radio_button b => '1'
+    %= radio_button b => '0'
+    %= hidden_field c => 'foo'
     %= file_field 'd'
     %= text_area e => (cols => 40, rows => 50) => begin
         default!

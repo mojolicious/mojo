@@ -12,7 +12,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 841;
+plan tests => 41;
 
 use_ok('Mojo::Client');
 
@@ -31,7 +31,7 @@ my $client = Mojo::Client->singleton->app(app);
 my $port   = $client->ioloop->generate_port;
 my $buffer = {};
 my $last;
-$client->ioloop->listen(
+my $id = $client->ioloop->listen(
     port      => $port,
     accept_cb => sub {
         my ($loop, $id) = @_;
@@ -165,12 +165,3 @@ $client->async->get(
 )->process;
 $client->async->ioloop->start;
 is_deeply(\@kept_alive, [undef, 1, 1], 'connections kept alive');
-
-# Stress test to make sure we don't leak file descriptors
-for (1 .. 200) {
-    my $tx = Mojo::Client->new->app(app)->get('/');
-    is($tx->res->code, 200,     'right status');
-    is($tx->res->body, 'works', 'right content');
-    ok($tx->success, 'request successful');
-    is($tx->kept_alive, undef, 'connection not kept alive');
-}

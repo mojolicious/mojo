@@ -69,7 +69,7 @@ sub log {
 
     my $time = localtime(time);
     my $msgs = join "\n",
-      map { utf8::is_utf8 $_ ? $_ : utf8::encode $_} @msgs;
+      map { utf8::decode $_ unless utf8::is_utf8 $_; $_ } @msgs;
 
     # Caller
     my ($pkg, $line) = (caller())[0, 2];

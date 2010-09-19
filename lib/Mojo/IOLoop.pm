@@ -1123,7 +1123,6 @@ sub _tls_accept {
     # Connected
     if ($c->{socket}->accept_SSL) {
         delete $c->{tls_accept};
-        $self->_writing($id);
         return;
     }
 
@@ -1149,7 +1148,6 @@ sub _tls_connect {
     # Connected
     if ($c->{socket}->connect_SSL) {
         delete $c->{tls_connect};
-        $self->_writing($id);
         return;
     }
 

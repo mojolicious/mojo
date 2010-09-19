@@ -635,7 +635,7 @@ sub _parse_xml {
         my $tag     = $6;
 
         # Text
-        if ($text) {
+        if (length $text) {
 
             # Unescape
             $text = b($text)->html_unescape->to_string if $text =~ /&/;

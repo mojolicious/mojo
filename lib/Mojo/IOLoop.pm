@@ -12,6 +12,7 @@ use IO::File;
 use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
 use IO::Socket;
 use Mojo::ByteStream;
+use Scalar::Util 'weaken';
 use Socket qw/IPPROTO_TCP TCP_NODELAY/;
 use Time::HiRes 'time';
 
@@ -508,9 +509,15 @@ sub start_tls {
     # Arguments
     my $args = ref $_[0] ? $_[0] : {@_};
 
+    # Weaken
+    weaken $self;
+
     # Options
-    my %options =
-      (SSL_startHandshake => 0, Timeout => $self->connect_timeout);
+    my %options = (
+        SSL_startHandshake => 0,
+        SSL_error_trap     => sub { $self->_drop_immediately(shift) },
+        Timeout            => $self->connect_timeout
+    );
     if ($args->{tls_ca_file}) {
         $options{SSL_ca_file}         = $args->{tls_ca_file};
         $options{SSL_verify_mode}     = 0x01;
@@ -624,9 +631,15 @@ sub _accept {
     # Listen
     my $l = $self->{_listen}->{$listen};
 
+    # Weaken
+    weaken $self;
+
     # TLS handshake
     my $tls = $l->{tls};
-    $socket = IO::Socket::SSL->start_SSL($socket, %$tls) if $tls;
+    if ($tls) {
+        $tls->{SSL_error_trap} = sub { $self->_drop_immediately(shift) };
+        $socket = IO::Socket::SSL->start_SSL($socket, %$tls);
+    }
 
     # Add connection
     my $id = "$socket";

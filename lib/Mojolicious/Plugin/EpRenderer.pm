@@ -42,13 +42,12 @@ sub register {
             local $ENV{MOJO_RELOAD} = 0 if $ENV{MOJO_RELOAD};
 
             # Cache
-            $r->{_epl_cache} ||= {};
-            unless ($r->{_epl_cache}->{$cache}) {
+            my $ec = $r->{_epl_cache} ||= {};
+            unless ($ec->{$cache}) {
 
                 # Initialize
                 $template->{namespace} ||= "Mojo::Template::$cache";
-                my $mt = $r->{_epl_cache}->{$cache} =
-                  Mojo::Template->new($template);
+                my $mt = $ec->{$cache} = Mojo::Template->new($template);
 
                 # Self
                 my $prepend = 'my $self = shift;';

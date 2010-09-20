@@ -41,35 +41,37 @@ sub register {
             # Cached
             if ($mt && $mt->compiled) { $$output = $mt->interpret($c) }
 
-            # Inline
-            elsif (defined $inline) { $$output = $mt->render($inline, $c) }
-
-            # File
+            # Not cached
             else {
 
-                # Encoding
-                $mt->encoding($r->encoding) if $r->encoding;
+                # Inline
+                if (defined $inline) { $$output = $mt->render($inline, $c) }
 
-                # Name
-                return unless my $t = $r->template_name($options);
-
-                # Try template
-                if (-r $path) { $$output = $mt->render_file($path, $c) }
-
-                # Try DATA section
-                elsif (my $d = $r->get_inline_template($options, $t)) {
-                    $$output = $mt->render($d, $c);
-                }
-
-                # No template
+                # File
                 else {
-                    $c->render_not_found($t);
-                    return;
-                }
-            }
 
-            # Cache
-            unless ($ec->{$cache}) {
+                    # Encoding
+                    $mt->encoding($r->encoding) if $r->encoding;
+
+                    # Name
+                    return unless my $t = $r->template_name($options);
+
+                    # Try template
+                    if (-r $path) { $$output = $mt->render_file($path, $c) }
+
+                    # Try DATA section
+                    elsif (my $d = $r->get_inline_template($options, $t)) {
+                        $$output = $mt->render($d, $c);
+                    }
+
+                    # No template
+                    else {
+                        $c->render_not_found($t);
+                        return;
+                    }
+                }
+
+                # Cache
                 delete $ec->{shift @$stack}
                   while @$stack > ($ENV{MOJO_TEMPLATE_CACHE} || 100);
                 push @$stack, $cache;

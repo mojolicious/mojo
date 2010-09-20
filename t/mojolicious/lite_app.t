@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 599;
+plan tests => 611;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -148,6 +148,26 @@ get 'tags/:test' => 'tags';
 
 # GET /selection
 get 'selection' => '*';
+
+# GET /inline/epl
+get '/inline/epl' => sub { shift->render(inline => '<%= 1 + 1%>') };
+
+# GET /inline/ep
+get '/inline/ep' =>
+  sub { shift->render(inline => "<%= param 'foo' %>works!", handler => 'ep') };
+
+# GET /inline/ep/too
+get '/inline/ep/too' => sub { shift->render(inline => '0', handler => 'ep') };
+
+# GET /inline/ep/partial
+get '/inline/ep/partial' => sub {
+    my $self = shift;
+    $self->stash(inline_template => "<%= 'just' %>");
+    $self->render(
+        inline  => '<%= include inline => $inline_template %>works!',
+        handler => 'ep'
+    );
+};
 
 # POST /upload
 post '/upload' => sub {
@@ -896,6 +916,19 @@ $t->get_ok('/selection?foo=bar&a=e&foo=baz')->status_is(200)
       . '<input type="submit" value="Ok" />' . "\n"
       . '</form>'
       . "\n");
+
+# GET /inline/epl
+$t->get_ok('/inline/epl')->status_is(200)->content_is("2\n");
+
+# GET /inline/ep
+$t->get_ok('/inline/ep?foo=bar')->status_is(200)->content_is("barworks!\n");
+
+# GET /inline/ep/too
+$t->get_ok('/inline/ep/too')->status_is(200)->content_is("0\n");
+
+# GET /inline/ep/partial
+$t->get_ok('/inline/ep/partial')->status_is(200)
+  ->content_is("just\nworks!\n");
 
 # POST /upload (huge upload without appropriate max message size)
 $backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';

@@ -115,11 +115,16 @@ sub render {
     # Text
     my $text = delete $stash->{text};
 
+    # Inline
+    my $inline = delete $stash->{inline};
+    $handler = $self->default_handler if defined $inline && !defined $handler;
+
     my $options = {
         template       => $template,
         format         => $format,
         handler        => $handler,
         encoding       => $self->encoding,
+        inline         => $inline,
         template_class => $stash->{template_class}
     };
     my $output;

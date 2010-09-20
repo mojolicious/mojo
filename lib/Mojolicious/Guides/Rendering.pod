@@ -165,6 +165,17 @@ shortcut.
 All values passed to the C<render> call are only temporarily assigned to the
 stash and get reset again once rendering is finished.
 
+=head2 Rendering Inline Templates (C<inline>)
+
+Some renderers such as C<ep> allow templates to be passed inline.
+
+    $self->render(inline => 'The result is <%= 1 + 1%>!');
+
+Since auto detection depends on a path you might have to supply a C<handler>
+too.
+
+    $self->render(inline => "<%= shift->param('foo') %>", handler => 'epl');
+
 =head2 Rendering Text (C<text>)
 
 Plain text can be rendered with the C<text> stash value, characters get

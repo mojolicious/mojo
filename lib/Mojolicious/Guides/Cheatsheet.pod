@@ -72,6 +72,12 @@ Format to render.
 
 Handler to use for rendering.
 
+=head2 C<inline>
+
+    $self->render(inline => '<%= 1 + 1%>');
+
+Inline template to render.
+
 =head2 C<json>
 
     $self->render(json => {foo => 23});

@@ -15,6 +15,7 @@ This file documents the revision history for Perl extension Mojolicious.
           Mojolicious commands.
         - Added EXPERIMENTAL support for helper methods.
         - Added EXPERIMENTAL helper method to Mojolicious.
+        - Added EXPERIMENTAL support for inline rendering to Mojolicious.
         - Added EXPERIMENTAL cache helper to
           Mojolicious::Plugin::DefaultHelpers. (ptomli)
         - Added EXPERIMENTAL write, write_chunk and rendered methods to

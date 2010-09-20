@@ -64,6 +64,7 @@ sub new {
 
     # Renderer
     my $renderer = $self->renderer;
+    $renderer->default_handler('ep');
 
     # Static
     my $static = $self->static;

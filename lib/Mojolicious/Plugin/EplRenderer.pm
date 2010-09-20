@@ -5,6 +5,7 @@ use warnings;
 
 use base 'Mojolicious::Plugin';
 
+use Mojo::ByteStream 'b';
 use Mojo::Template;
 
 # Clever things make people feel stupid and unexpected things make them feel
@@ -17,9 +18,13 @@ sub register {
         epl => sub {
             my ($r, $c, $output, $options) = @_;
 
+            # Inline
+            my $inline = $options->{inline};
+
             # Template
-            return unless my $t    = $r->template_name($options);
-            return unless my $path = $r->template_path($options);
+            my $path = $r->template_path($options);
+            $path = b($inline)->md5_sum->to_string if defined $inline;
+            return unless defined $path;
             my $cache = delete $options->{cache} || $path;
 
             # Reload
@@ -29,17 +34,23 @@ sub register {
             $r->{_epl_cache} ||= {};
             my $mt = $r->{_epl_cache}->{$cache};
 
-            # Interpret again
+            # Initialize
+            $mt ||= Mojo::Template->new;
+
+            # Cached
             if ($mt && $mt->compiled) { $$output = $mt->interpret($c) }
 
-            # No cache
-            else {
+            # Inline
+            elsif (defined $inline) { $$output = $mt->render($inline, $c) }
 
-                # Initialize
-                $mt ||= Mojo::Template->new;
+            # File
+            else {
 
                 # Encoding
                 $mt->encoding($r->encoding) if $r->encoding;
+
+                # Name
+                return unless my $t = $r->template_name($options);
 
                 # Try template
                 if (-r $path) { $$output = $mt->render_file($path, $c) }
@@ -54,10 +65,10 @@ sub register {
                     $c->render_not_found($t);
                     return;
                 }
-
-                # Cache
-                $r->{_epl_cache}->{$cache} = $mt;
             }
+
+            # Cache
+            $r->{_epl_cache}->{$cache} = $mt;
 
             # Exception
             if (ref $$output) {

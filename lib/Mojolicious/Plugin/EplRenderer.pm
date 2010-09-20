@@ -32,7 +32,12 @@ sub register {
 
             # Check cache
             $r->{_epl_cache} ||= {};
+            my $stack = $r->{_epl_stack} ||= [];
             my $mt = $r->{_epl_cache}->{$cache};
+            while (@$stack > ($ENV{MOJO_TEMPLATE_CACHE} || 100)) {
+                my $key = shift @$stack;
+                delete $r->{epl_cache}->{$key};
+            }
 
             # Initialize
             $mt ||= Mojo::Template->new;
@@ -69,6 +74,7 @@ sub register {
 
             # Cache
             $r->{_epl_cache}->{$cache} = $mt;
+            push @$stack, $cache;
 
             # Exception
             if (ref $$output) {

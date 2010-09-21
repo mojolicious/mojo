@@ -25,8 +25,7 @@ use Scalar::Util 'weaken';
 use constant DEBUG => $ENV{MOJO_CLIENT_DEBUG} || 0;
 
 # You can't let a single bad experience scare you away from drugs.
-__PACKAGE__->attr(
-    [qw/app http_proxy https_proxy tls_ca_file tls_verify_cb tx/]);
+__PACKAGE__->attr([qw/app http_proxy https_proxy tx/]);
 __PACKAGE__->attr(cookie_jar => sub { Mojo::CookieJar->new });
 __PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->new });
 __PACKAGE__->attr(keep_alive_timeout         => 15);
@@ -307,8 +306,6 @@ sub clone {
     $clone->keep_alive_timeout($self->keep_alive_timeout);
     $clone->max_keep_alive_connections($self->max_keep_alive_connections);
     $clone->max_redirects($self->max_redirects);
-    $clone->tls_ca_file($self->tls_ca_file);
-    $clone->tls_verify_cb($self->tls_verify_cb);
     $clone->websocket_timeout($self->websocket_timeout);
 
     return $clone;
@@ -620,12 +617,10 @@ sub _connect {
             port    => $port,
             socket  => $id,
             tls     => $scheme eq 'https' ? 1 : 0,
-            tls_ca_file => $self->tls_ca_file || $ENV{MOJO_CA_FILE},
-            tls_verify_cb => $self->tls_verify_cb,
-            connect_cb    => sub { $self->_connected($_[1]) },
-            error_cb      => sub { $self->_error(@_) },
-            hup_cb        => sub { $self->_hup(@_) },
-            read_cb       => sub { $self->_read(@_) }
+            connect_cb => sub { $self->_connected($_[1]) },
+            error_cb   => sub { $self->_error(@_) },
+            hup_cb     => sub { $self->_hup(@_) },
+            read_cb    => sub { $self->_read(@_) }
         );
 
         # Error
@@ -683,11 +678,7 @@ sub _connect_proxy {
                 return unless my $oid = $tx->connection;
 
                 # Start TLS
-                my $nid = $self->ioloop->start_tls(
-                    $oid,
-                    tls_ca_file => $self->tls_ca_file || $ENV{MOJO_CA_FILE},
-                    tls_verify_cb => $self->tls_verify_cb
-                );
+                my $nid = $self->ioloop->start_tls($oid);
 
                 # Cleanup
                 $old->req->proxy(undef);
@@ -1249,24 +1240,6 @@ it starts closing the oldest cached ones, defaults to C<5>.
 
 Maximum number of redirects the client will follow before it fails, defaults
 to C<0>.
-
-=head2 C<tls_ca_file>
-
-    my $tls_ca_file = $client->tls_ca_file;
-    $client         = $client->tls_ca_file('/etc/tls/cacerts.pem');
-
-TLS certificate authority file to use, defaults to the C<MOJO_CA_FILE>
-environment variable.
-Note that L<IO::Socket::SSL> must be installed for HTTPS support.
-
-=head2 C<tls_verify_cb>
-
-    my $tls_verify_cb = $client->tls_verify_cb;
-    $client           = $client->tls_verify_cb(sub {...});
-
-Callback to verify your TLS connection, by default the client will accept
-most certificates.
-Note that L<IO::Socket::SSL> must be installed for HTTPS support.
 
 =head2 C<tx>
 

@@ -509,20 +509,12 @@ sub start_tls {
     # Arguments
     my $args = ref $_[0] ? $_[0] : {@_};
 
-    # Weaken
-    weaken $self;
-
     # Options
     my %options = (
         SSL_startHandshake => 0,
-        SSL_error_trap     => sub { $self->_drop_immediately(shift) },
-        Timeout            => $self->connect_timeout
+        Timeout            => $self->connect_timeout,
+        %{$args->{args} || {}}
     );
-    if ($args->{tls_ca_file}) {
-        $options{SSL_ca_file}         = $args->{tls_ca_file};
-        $options{SSL_verify_mode}     = 0x01;
-        $options{SSL_verify_callback} = $args->{tls_verify_cb};
-    }
 
     # Connection
     $self->drop($id) and return unless my $c = $self->{_cs}->{$id};
@@ -1492,14 +1484,6 @@ Use an already prepared socket handle.
 
 Enable TLS.
 
-=item C<tls_ca_file>
-
-CA file to use for TLS.
-
-=item C<tls_verify_cb>
-
-Callback to invoke for TLS verification.
-
 =back
 
 =head2 C<connection_timeout>
@@ -1691,24 +1675,9 @@ if the loop is already running.
 =head2 C<start_tls>
 
     my $id = $loop->start_tls($id);
-    my $id = $loop->start_tls($id => {tls_ca_file => '/etc/tls/cacerts.pem'});
 
 Start new TLS connection inside old connection.
 Note that TLS support depends on L<IO::Socket::SSL>.
-
-These options are currently available.
-
-=over 4
-
-=item C<tls_ca_file>
-
-CA file to use for TLS.
-
-=item C<tls_verify_cb>
-
-Callback to invoke for TLS verification.
-
-=back
 
 =head2 C<stop>
 

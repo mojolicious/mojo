@@ -206,12 +206,12 @@ in your application.
 
 =head2 C<load_plugin>
 
-    $plugins = $plugins->load_plugin($app, 'something');
-    $plugins = $plugins->load_plugin($app, 'something', foo => 23);
-    $plugins = $plugins->load_plugin($app, 'something', {foo => 23});
-    $plugins = $plugins->load_plugin($app, 'Foo::Bar');
-    $plugins = $plugins->load_plugin($app, 'Foo::Bar', foo => 23);
-    $plugins = $plugins->load_plugin($app, 'Foo::Bar', {foo => 23});
+    $plugins->load_plugin($app, 'something');
+    $plugins->load_plugin($app, 'something', foo => 23);
+    $plugins->load_plugin($app, 'something', {foo => 23});
+    $plugins->load_plugin($app, 'Foo::Bar');
+    $plugins->load_plugin($app, 'Foo::Bar', foo => 23);
+    $plugins->load_plugin($app, 'Foo::Bar', {foo => 23});
 
 Load a plugin from the configured namespaces or by full module name and run
 C<register>.

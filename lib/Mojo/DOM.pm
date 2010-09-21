@@ -692,7 +692,7 @@ sub _parse_xml {
             $self->_start($start, $attrs, \$current);
 
             # Empty tag
-            $current = $current->[3] if $attr =~ /\/\s*$/;
+            $self->_end($start, \$current) if $attr =~ /\/\s*$/;
         }
     }
 

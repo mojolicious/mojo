@@ -214,7 +214,7 @@ sub helper { shift->renderer->add_helper(@_) }
 
 sub plugin {
     my $self = shift;
-    $self->plugins->load_plugin($self, @_);
+    $self->plugins->register_plugin(shift, $self, @_);
 }
 
 # This will run for each request

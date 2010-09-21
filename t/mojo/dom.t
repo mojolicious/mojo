@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 163;
+use Test::More tests => 164;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -426,3 +426,7 @@ $dom->parse(
 @div = ();
 $dom->find('div[id]')->each(sub { push @div, shift->text });
 is_deeply(\@div, [qw/A B 0/], 'found all div elements with id');
+
+# Empty tags
+$dom->parse('<hr /><br/><br id="br"/><br />');
+is("$dom", '<hr /><br /><br id="br" /><br />', 'right result');

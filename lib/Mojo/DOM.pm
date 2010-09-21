@@ -45,7 +45,7 @@ my $XML_ATTR_RE = qr/
     (?:\s*=\s*(?:"([^"]*)"|'([^']*)'|(\S+)))?   # Value
 /x;
 my $XML_END_RE   = qr/^\s*\/\s*(.+)\s*/;
-my $XML_START_RE = qr/(\S+)([\s\S]*)/;
+my $XML_START_RE = qr/([^\s\/]+)([\s\S]*)/;
 my $XML_TOKEN_RE = qr/
     ([^<]*)                  # Text
     (?:
@@ -690,6 +690,9 @@ sub _parse_xml {
 
             # Start
             $self->_start($start, $attrs, \$current);
+
+            # Empty tag
+            $current = $current->[3] if $attr =~ /\/\s*$/;
         }
     }
 

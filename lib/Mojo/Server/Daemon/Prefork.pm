@@ -383,7 +383,7 @@ WebSocket server using a dynamic worker pool with C<IPv6>, C<TLS>,
 C<Bonjour>, C<epoll>, C<kqueue>, hot deployment, UNIX domain socket sharing
 and optional async io support.
 
-Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::INET6>,
+Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::IP>,
 L<IO::Socket::SSL> and L<Net::Rendezvous::Publish> are supported
 transparently and used if installed.
 

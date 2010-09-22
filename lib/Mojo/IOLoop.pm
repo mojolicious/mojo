@@ -27,10 +27,10 @@ use constant EPOLL_POLLHUP => EPOLL ? IO::Epoll::POLLHUP() : 0;
 use constant EPOLL_POLLIN  => EPOLL ? IO::Epoll::POLLIN()  : 0;
 use constant EPOLL_POLLOUT => EPOLL ? IO::Epoll::POLLOUT() : 0;
 
-# IPv6 support requires IO::Socket::INET6
+# IPv6 support requires IO::Socket::IP
 use constant IPV6 => $ENV{MOJO_NO_IPV6}
   ? 0
-  : eval 'use IO::Socket::INET6 (); 1';
+  : eval 'use IO::Socket::IP 0.03 (); 1';
 
 # KQueue support requires IO::KQueue
 use constant KQUEUE => ($ENV{MOJO_POLL} || $ENV{MOJO_EPOLL})
@@ -146,7 +146,6 @@ sub connect {
 
     # Options
     my %options = (
-        Blocking => 0,
         PeerAddr => $args->{address},
         PeerPort => $args->{port} || ($args->{tls} ? 443 : 80),
         Proto    => 'tcp',
@@ -155,7 +154,7 @@ sub connect {
     );
 
     # New connection
-    my $class = IPV6 ? 'IO::Socket::INET6' : 'IO::Socket::INET';
+    my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';
     return unless my $socket = $args->{socket} || $class->new(%options);
     my $id = "$socket";
 
@@ -260,9 +259,9 @@ sub listen {
 
     # Options
     my %options = (
-        Blocking => 0,
-        Listen   => $args->{queue_size} || SOMAXCONN,
-        Type     => SOCK_STREAM,
+        Listen => $args->{queue_size} || SOMAXCONN,
+        Proto  => 'tcp',
+        Type   => SOCK_STREAM,
         %{$args->{args} || {}}
     );
 
@@ -303,7 +302,7 @@ sub listen {
         $options{ReuseAddr} = 1;
 
         # Create socket
-        my $class = IPV6 ? 'IO::Socket::INET6' : 'IO::Socket::INET';
+        my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';
         $socket = defined $fd ? $class->new : $class->new(%options)
           or croak "Can't create listen socket: $!";
     }
@@ -513,7 +512,7 @@ sub start_tls {
     my %options = (
         SSL_startHandshake => 0,
         Timeout            => $self->connect_timeout,
-        %{$args->{args} || {}}
+        %{$args->{tls_args} || {}}
     );
 
     # Connection
@@ -616,6 +615,10 @@ sub _accept {
 
     # Accept
     my $socket = $listen->accept or return;
+
+    # Workaround for an IO::Socket bug (required for IO::Socket::IP)
+    no strict 'refs';
+    ${*$socket}{'io_socket_type'} = ${*$listen}{'io_socket_type'};
 
     # Unlock
     $self->unlock_cb->($self);
@@ -756,8 +759,11 @@ sub _drop_immediately {
 sub _error {
     my ($self, $id, $error) = @_;
 
+    # Connection
+    return unless my $c = $self->{_cs}->{$id};
+
     # Get error callback
-    my $event = $self->{_cs}->{$id}->{error};
+    my $event = $c->{error};
 
     # Cleanup
     $self->_drop_immediately($id);
@@ -1325,7 +1331,7 @@ L<Mojo::IOLoop> is a very minimalistic reactor that has been reduced to the
 absolute minimal feature set required to build solid and scalable TCP clients
 and servers.
 
-Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::INET6> and
+Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::IP> and
 L<IO::Socket::SSL> are supported transparently and used if installed.
 
 A TLS certificate and key are also built right in to make writing test
@@ -1445,7 +1451,7 @@ possible.
 
 Open a TCP connection to a remote host, IPv6 will be used automatically if
 available.
-Note that IPv6 support depends on L<IO::Socket::INET6> and TLS support on
+Note that IPv6 support depends on L<IO::Socket::IP> and TLS support on
 L<IO::Socket::SSL>.
 
 These options are currently available.
@@ -1541,7 +1547,7 @@ Check if loop is running.
     );
 
 Create a new listen socket, IPv6 will be used automatically if available.
-Note that IPv6 support depends on L<IO::Socket::INET6> and TLS support on
+Note that IPv6 support depends on L<IO::Socket::IP> and TLS support on
 L<IO::Socket::SSL>.
 
 These options are currently available.

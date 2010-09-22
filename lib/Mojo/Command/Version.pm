@@ -34,7 +34,7 @@ sub run {
 
     # IPv6
     my $ipv6 =
-      Mojo::IOLoop::IPV6() ? $IO::Socket::INET6::VERSION : 'not installed';
+      Mojo::IOLoop::IPV6() ? $IO::Socket::IP::VERSION : 'not installed';
 
     # TLS
     my $tls =
@@ -54,7 +54,7 @@ CORE
 OPTIONAL
   IO::Epoll                ($epoll)
   IO::KQueue               ($kqueue)
-  IO::Socket::INET6        ($ipv6)
+  IO::Socket::IP           ($ipv6)
   IO::Socket::SSL          ($tls)
   Net::Rendezvous::Publish ($bonjour)
 EOF

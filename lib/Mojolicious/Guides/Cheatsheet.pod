@@ -235,7 +235,7 @@ Note that L<Net::Rendezvous::Publish> must be installed for Bonjour support.
 
 Disable IPv6 support, this might result in slightly better performance and
 less memory use.
-Note that L<IO::Socket::INET6> must be installed for IPv6 support.
+Note that L<IO::Socket::IP> must be installed for IPv6 support.
 
     MOJO_NO_IPV6=1
 

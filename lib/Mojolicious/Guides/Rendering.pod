@@ -434,13 +434,13 @@ extended templates don't get prefixed with C<layout/>.
 
 This chain could go on and on to allow a very high level of template reuse.
 
-=head2 Caching
+=head2 Memorizing Template Blocks
 
-Compiled templates are always cached in memory, but with the C<cache> helper
-you can go one step further and prevent template blocks from being executed
-more than once.
+Compiled templates are always cached in memory, but with the C<memorize>
+helper you can go one step further and prevent template blocks from being
+executed more than once.
 
-    <%= cache begin %>
+    <%= memorize begin %>
         This template was compiled at <%= localtime time %>.
     <% end %>
 

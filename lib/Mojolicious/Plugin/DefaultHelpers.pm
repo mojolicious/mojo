@@ -15,46 +15,6 @@ sub register {
     # Add "app" helper
     $app->helper(app => sub { shift->app });
 
-    # Add "cache" helper
-    my $cache = {};
-    $app->helper(
-        cache => sub {
-            shift;
-
-            # Callback
-            my $cb = pop;
-            return '' unless ref $cb && ref $cb eq 'CODE';
-
-            # Name
-            my $name = shift;
-
-            # Arguments
-            my $args;
-            if (ref $name && ref $name eq 'HASH') {
-                $args = $name;
-                $name = undef;
-            }
-            else { $args = shift || {} }
-
-            # Default name
-            $name ||= join '', map { $_ || '' } caller(1);
-
-            # Expire
-            my $expires = $args->{expires} || 0;
-            delete $cache->{$name}
-              if exists $cache->{$name}
-                  && $expires > 0
-                  && $cache->{$name}->{expires} < time;
-
-            # Cached
-            return $cache->{$name}->{content} if exists $cache->{$name};
-
-            # Cache
-            $cache->{$name}->{expires} = $expires;
-            $cache->{$name}->{content} = $cb->();
-        }
-    );
-
     # Add "content" helper
     $app->helper(content => sub { shift->render_inner(@_) });
 
@@ -91,6 +51,46 @@ sub register {
             $stash->{layout} = shift if @_;
             $self->stash(@_) if @_;
             return $stash->{layout};
+        }
+    );
+
+    # Add "memorize" helper
+    my $memorize = {};
+    $app->helper(
+        memorize => sub {
+            shift;
+
+            # Callback
+            my $cb = pop;
+            return '' unless ref $cb && ref $cb eq 'CODE';
+
+            # Name
+            my $name = shift;
+
+            # Arguments
+            my $args;
+            if (ref $name && ref $name eq 'HASH') {
+                $args = $name;
+                $name = undef;
+            }
+            else { $args = shift || {} }
+
+            # Default name
+            $name ||= join '', map { $_ || '' } caller(1);
+
+            # Expire
+            my $expires = $args->{expires} || 0;
+            delete $memorize->{$name}
+              if exists $memorize->{$name}
+                  && $expires > 0
+                  && $memorize->{$name}->{expires} < time;
+
+            # Memorized
+            return $memorize->{$name}->{content} if exists $memorize->{$name};
+
+            # Memorize
+            $memorize->{$name}->{expires} = $expires;
+            $memorize->{$name}->{content} = $cb->();
         }
     );
 
@@ -132,24 +132,6 @@ L<Mojolicious>.
 
 =over 4
 
-=item cache
-
-    <%= cache begin %>
-        <%= time %>
-    <% end %>
-    <%= cache {expires => time + 1} => begin %>
-        <%= time %>
-    <% end %>
-    <%= cache foo => begin %>
-        <%= time %>
-    <% end %>
-    <%= cache foo => {expires => time + 1} => begin %>
-        <%= time %>
-    <% end %>
-
-Cache block result in memory and prevent future execution.
-Note that this helper is EXPERIMENTAL and might change without warning!
-
 =item content
 
     <%= content %>
@@ -186,6 +168,24 @@ Include a partial template.
     <% layout 'green'; %>
 
 Render this template with a layout.
+
+=item memorize
+
+    <%= memorize begin %>
+        <%= time %>
+    <% end %>
+    <%= memorize {expires => time + 1} => begin %>
+        <%= time %>
+    <% end %>
+    <%= memorize foo => begin %>
+        <%= time %>
+    <% end %>
+    <%= memorize foo => {expires => time + 1} => begin %>
+        <%= time %>
+    <% end %>
+
+Memorize block result in memory and prevent future execution.
+Note that this helper is EXPERIMENTAL and might change without warning!
 
 =item param
 

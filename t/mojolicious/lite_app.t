@@ -319,8 +319,8 @@ get '/layout' => sub {
 # POST /template
 post '/template' => 'index';
 
-# GET /cached
-get '/cached' => 'cached';
+# GET /memorized
+get '/memorized' => 'memorized';
 
 # * /something
 any '/something' => sub {
@@ -1113,30 +1113,30 @@ $t->post_ok('/template')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('Just works!');
 
-# GET /cached
-$t->get_ok('/cached')->status_is(200)
+# GET /memorized
+$t->get_ok('/memorized')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/\d+a\d+b\d+c\d+d\d+e\d+/);
-my $cached = $t->tx->res->body;
+my $memorized = $t->tx->res->body;
 
-# GET /cached
-$t->get_ok('/cached')->status_is(200)
+# GET /memorized
+$t->get_ok('/memorized')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is($cached);
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is($memorized);
 
-# GET /cached
-$t->get_ok('/cached')->status_is(200)
+# GET /memorized
+$t->get_ok('/memorized')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is($cached);
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is($memorized);
 
-# GET /cached (expired)
+# GET /memorized (expired)
 sleep 2;
-$t->get_ok('/cached')->status_is(200)
+$t->get_ok('/memorized')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/\d+a\d+b\d+c\d+d\d+e\d+/);
-isnt($cached, $t->tx->res->body, 'cached blocks expired');
+isnt($memorized, $t->tx->res->body, 'memorized blocks expired');
 
 # GET /something
 $t->get_ok('/something')->status_is(200)
@@ -1580,20 +1580,22 @@ text!
 @@ template.txt.epl
 <div id="foo">Redirect works!</div>
 
-@@ cached.html.ep
-<%= cache begin =%>
+@@ memorized.html.ep
+<%= memorize begin =%>
 <%= time =%>
 <% end =%>
-<%= cache begin =%><%= 'a' . int(rand(999)) %><% end =%><%= cache begin =%>
+<%= memorize begin =%>
+    <%= 'a' . int(rand(999)) =%>
+<% end =%><%= memorize begin =%>
 <%= 'b' . int(rand(999)) =%>
 <% end =%>
-<%= cache test => begin =%>
+<%= memorize test => begin =%>
 <%= 'c' . time . int(rand(999)) =%>
 <% end =%>
-<%= cache expiry => {expires => time + 1} => begin %>
+<%= memorize expiry => {expires => time + 1} => begin %>
 <%= 'd' . time . int(rand(999)) =%>
 <% end =%>
-<%= cache {expires => time + 1} => begin %>
+<%= memorize {expires => time + 1} => begin %>
 <%= 'e' . time . int(rand(999)) =%>
 <% end =%>
 

@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 611;
+plan tests => 614;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -168,6 +168,9 @@ get '/inline/ep/partial' => sub {
         handler => 'ep'
     );
 };
+
+# GET /source
+get '/source' => sub { shift->render_static('../lite_app.t') };
 
 # POST /upload
 post '/upload' => sub {
@@ -929,6 +932,9 @@ $t->get_ok('/inline/ep/too')->status_is(200)->content_is("0\n");
 # GET /inline/ep/partial
 $t->get_ok('/inline/ep/partial')->status_is(200)
   ->content_is("just\nworks!\n");
+
+# GET /source
+$t->get_ok('/source')->status_is(200)->content_like(qr/get_ok\('\/source/);
 
 # POST /upload (huge upload without appropriate max message size)
 $backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';

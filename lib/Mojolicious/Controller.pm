@@ -596,8 +596,10 @@ Same as C<render> but returns the rendered result.
 =head2 C<render_static>
 
     $c->render_static('images/logo.png');
+    $c->render_static('../lib/MyApp.pm');
 
-Render a static asset using L<MojoX::Dispatcher::Static>.
+Render a static file using L<MojoX::Dispatcher::Static> relative to the
+C<public> directory of your application.
 
 =head2 C<render_text>
 

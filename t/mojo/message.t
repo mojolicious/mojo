@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 798;
+use Test::More tests => 805;
 
 use File::Spec;
 use File::Temp;
@@ -872,11 +872,15 @@ is( $res->content->parts->[0]->asset->slurp,
 $res = Mojo::Message::Response->new;
 $res->code(404);
 $res->headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
-is( $res->build,
-    "HTTP/1.1 404 Not Found\x0d\x0a"
-      . "Date: Sun, 17 Aug 2008 16:27:35 GMT\x0d\x0a\x0d\x0a",
-    'right message'
-);
+$res = Mojo::Message::Response->new->parse($res->build);
+ok($res->is_done, 'request is done');
+is($res->code,          '404',       'right status');
+is($res->message,       'Not Found', 'right message');
+is($res->major_version, 1,           'right major version');
+is($res->minor_version, 1,           'right minor version');
+is($res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT',
+    'right "Date" value');
+is($res->headers->content_length, 0, 'right "Content-Length" value');
 
 # Build HTTP 1.1 response start line and header
 $res = Mojo::Message::Response->new;
@@ -892,6 +896,7 @@ is($res->minor_version,       1,            'right minor version');
 is($res->headers->connection, 'keep-alive', 'right "Connection" value');
 is($res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT',
     'right "Date" value');
+is($res->headers->content_length, 0, 'right "Content-Length" value');
 
 # Build full HTTP 1.1 response
 $res = Mojo::Message::Response->new;
@@ -1627,7 +1632,7 @@ ok($res2->is_done, 'response is done');
 is($res2->code,                    404,       'right status');
 is($res2->major_version,           1,         'right major version');
 is($res2->minor_version,           1,         'right minor version');
-is($res2->headers->content_length, undef,     'right "Content-Length" value');
+is($res2->headers->content_length, 0,         'right "Content-Length" value');
 is(defined $res2->cookie('foo'),   1,         'right value');
 is(defined $res2->cookie('baz'),   1,         'right value');
 is(defined $res2->cookie('bar'),   1,         'right value');

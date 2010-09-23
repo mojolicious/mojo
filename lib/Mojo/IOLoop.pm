@@ -30,7 +30,7 @@ use constant EPOLL_POLLOUT => EPOLL ? IO::Epoll::POLLOUT() : 0;
 # IPv6 support requires IO::Socket::IP
 use constant IPV6 => $ENV{MOJO_NO_IPV6}
   ? 0
-  : eval 'use IO::Socket::IP 0.03 (); 1';
+  : eval 'use IO::Socket::IP 0.04 (); 1';
 
 # KQueue support requires IO::KQueue
 use constant KQUEUE => ($ENV{MOJO_POLL} || $ENV{MOJO_EPOLL})
@@ -615,10 +615,6 @@ sub _accept {
 
     # Accept
     my $socket = $listen->accept or return;
-
-    # Workaround for an IO::Socket bug (required for IO::Socket::IP)
-    no strict 'refs';
-    ${*$socket}{'io_socket_type'} = ${*$listen}{'io_socket_type'};
 
     # Unlock
     $self->unlock_cb->($self);

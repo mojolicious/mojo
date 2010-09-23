@@ -43,7 +43,7 @@ sub dispatch {
     return 1 if $parts[0] eq '..';
 
     # Serve static file
-    return $self->serve($c, File::Spec->catfile(@parts));
+    return $self->serve($c, join('/', @parts));
 }
 
 sub serve {

@@ -112,7 +112,7 @@ sub header_is {
 
     # Test
     local $Test::Builder::Level = $Test::Builder::Level + 1;
-    Test::More::is($tx->res->headers->header($name),
+    Test::More::is(scalar $tx->res->headers->header($name),
         $value, "$name: " . ($value ? $value : ''));
 
     return $self;
@@ -129,7 +129,7 @@ sub header_like {
 
     # Test
     local $Test::Builder::Level = $Test::Builder::Level + 1;
-    Test::More::like($tx->res->headers->header($name), $regex, $desc);
+    Test::More::like(scalar $tx->res->headers->header($name), $regex, $desc);
 
     return $self;
 }

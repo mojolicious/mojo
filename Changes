@@ -50,6 +50,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed logging of UTF-8 errors. (und3f)
         - Fixed Mojo::DOM parser bug. (esskar)
         - Fixed TLS handshake bug in Mojo::IOLoop. (und3f)
+        - Fixed a small Test::Mojo bug.
 
 0.999929 2010-08-17 00:00:00
         - Removed OS X resource fork files.

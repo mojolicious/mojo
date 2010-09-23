@@ -493,7 +493,8 @@ get '/default/condition' => (default => 23) => sub {
 under sub {
     my $self = shift;
     return unless $self->req->headers->header('X-Bender');
-    $self->res->headers->header('X-Under' => 23);
+    $self->res->headers->add('X-Under' => 23);
+    $self->res->headers->add('X-Under' => 24);
     return 1;
 };
 
@@ -1387,13 +1388,13 @@ $t->get_ok('/koi8-r')->status_is(200)
 $t->get_ok('/with_under', {'X-Bender' => 'Rodriguez'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->header_is('X-Under'      => 23)->content_is('Unders are cool!');
+  ->header_is('X-Under'      => '23, 24')->content_is('Unders are cool!');
 
 # GET /with_under_too
 $t->get_ok('/with_under_too', {'X-Bender' => 'Rodriguez'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->header_is('X-Under'      => 23)->content_is('Unders are cool too!');
+  ->header_is('X-Under'      => '23, 24')->content_is('Unders are cool too!');
 
 # GET /with_under_too
 $t->get_ok('/with_under_too')->status_is(404)

@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 164;
+use Test::More tests => 168;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -409,7 +409,8 @@ is($dom->at('div')->attrs->{test2}, '', 'empty attribute value');
 # Whitespaces before closing bracket
 $dom->parse(qq/<div >content<\/div>/);
 ok($dom->at('div'), 'tag found');
-is($dom->at('div')->text, 'content', 'right text');
+is($dom->at('div')->text,      'content', 'right text');
+is($dom->at('div')->inner_xml, 'content', 'right text');
 
 # Class with hyphen
 $dom->parse(qq/<div class="a">A<\/div><div class="a-1">A1<\/div>/);
@@ -430,3 +431,9 @@ is_deeply(\@div, [qw/A B 0/], 'found all div elements with id');
 # Empty tags
 $dom->parse('<hr /><br/><br id="br"/><br />');
 is("$dom", '<hr /><br /><br id="br" /><br />', 'right result');
+is($dom->at('br')->inner_xml, '', 'empty result');
+
+# Inner XML
+$dom->parse('<a>xxx<x>x</x>xxx</a>');
+is($dom->at('a')->inner_xml, 'xxx<x>x</x>xxx',        'right result');
+is($dom->inner_xml,          '<a>xxx<x>x</x>xxx</a>', 'right result');

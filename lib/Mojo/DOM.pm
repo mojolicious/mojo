@@ -157,6 +157,28 @@ sub find {
     return $self->_select($self->tree, $pattern);
 }
 
+sub inner_xml {
+    my $self = shift;
+
+    # Tree
+    my $tree = $self->tree;
+
+    # Walk tree
+    my $result = '';
+    my $start = $tree->[0] eq 'root' ? 1 : 4;
+    for my $e (@$tree[$start .. $#$tree]) {
+
+        # Render
+        $result .= $self->_render($e);
+    }
+
+    # Encode
+    my $charset = $self->charset;
+    $result = b($result)->encode($charset)->to_string if $charset;
+
+    return $result;
+}
+
 sub name {
     my ($self, $name) = @_;
 
@@ -1018,6 +1040,12 @@ Find elements with CSS3 selectors.
     $dom->find('div')->each(sub { print shift->text });
     $dom->find('div')->while(sub { print $_->text && $_->text =~ /foo/ });
     $dom->find('div')->until(sub { $_->text =~ /foo/ && print $_->text });
+
+=head2 C<inner_xml>
+
+    my $xml = $dom->inner_xml;
+
+Render content of this element to XML.
 
 =head2 C<name>
 

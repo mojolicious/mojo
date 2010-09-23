@@ -20,7 +20,7 @@ sub register {
 
             # Match
             my $agent = $c->req->headers->user_agent;
-            return $captures if $agent && $agent =~ $pattern;
+            return 1 if $agent && $agent =~ $pattern;
 
             # Nothing
             return;

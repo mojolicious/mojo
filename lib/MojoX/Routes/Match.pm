@@ -54,14 +54,8 @@ sub match {
         return unless $condition;
 
         # Match
-        my $captures =
-          $condition->($r, $self->{_controller}, $self->captures, $value);
-
-        # Matched
-        return unless $captures && ref $captures eq 'HASH';
-
-        # Merge captures
-        $self->captures($captures);
+        return
+          if !$condition->($r, $self->{_controller}, $self->captures, $value);
     }
 
     # Path

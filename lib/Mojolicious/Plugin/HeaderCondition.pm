@@ -35,7 +35,7 @@ sub register {
             }
 
             # Success
-            return $captures if $passed;
+            return 1 if $passed;
 
             # Robot 1-X, save my friends! And Zoidberg!
             return;

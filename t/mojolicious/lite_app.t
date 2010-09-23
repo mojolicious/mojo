@@ -476,7 +476,8 @@ get '/hello3.txt' => sub { shift->render_static('hello2.txt') };
 app->routes->add_condition(
     default => sub {
         my ($r, $c, $captures, $num) = @_;
-        return $captures if $c->stash->{default} == $num;
+        $captures->{test} = "$num works!";
+        return 1 if $c->stash->{default} == $num;
         return;
     }
 );
@@ -485,7 +486,8 @@ app->routes->add_condition(
 get '/default/condition' => (default => 23) => sub {
     my $self    = shift;
     my $default = $self->stash('default');
-    $self->render(text => "works $default");
+    my $test    = $self->stash('test');
+    $self->render(text => "works $default $test");
 };
 
 under sub {
@@ -1468,7 +1470,8 @@ $t->get_ok('/hello3.txt', {'Range' => 'bytes=0-0'})->status_is(206)
 # GET /default/condition
 $t->get_ok('/default/condition')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('works 23');
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('works 23 23 works!');
 
 # GET /bridge2stash
 $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)

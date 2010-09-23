@@ -32,7 +32,7 @@ sub new {
             my $m = lc $c->req->method;
             $m = 'get' if $m eq 'head';
             for my $method (@$methods) {
-                return $captures if $method eq $m;
+                return 1 if $method eq $m;
             }
 
             # Nothing
@@ -46,7 +46,7 @@ sub new {
             my ($r, $c, $captures) = @_;
 
             # WebSocket
-            return $captures if $c->tx->is_websocket;
+            return 1 if $c->tx->is_websocket;
 
             # Not a WebSocket
             return;

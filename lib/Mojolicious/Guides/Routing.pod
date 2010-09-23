@@ -477,9 +477,9 @@ This is where conditions come into play, they are basically router plugins.
             # User supplied regular expression
             return unless $pattern && ref $pattern eq 'Regexp';
 
-            # Match "User-Agent" header and return captured values on success
+            # Match "User-Agent" header and return true on success
             my $agent = $c->req->headers->user_agent;
-            return $captures if $agent && $agent =~ $pattern;
+            return 1 if $agent && $agent =~ $pattern;
 
             # No success
             return;
@@ -515,7 +515,7 @@ You can also package your conditions as reusable plugins.
                 return if abs(14 - (phase(time))[2]) > ($days / 2);
 
                 # It's ok, no werewolf
-                return $captures;
+                return 1;
             }
         );
     }

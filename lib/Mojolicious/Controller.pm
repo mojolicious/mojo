@@ -273,10 +273,15 @@ sub render_partial {
 }
 
 sub render_static {
-    my $self = shift;
+    my ($self, $file) = @_;
+
+    # Application
+    my $app = $self->app;
 
     # Static
-    $self->app->static->serve($self, @_);
+    $app->static->serve($self, $file)
+      and $app->log->debug(
+        qq/Static file "$file" not found, public directory missing?/);
 
     # Rendered
     $self->rendered;

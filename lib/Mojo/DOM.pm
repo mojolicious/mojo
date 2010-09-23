@@ -993,7 +993,7 @@ L<Mojo::DOM> implements the following attributes.
     my $charset = $dom->charset;
     $dom        = $dom->charset('UTF-8');
 
-Charset used for decoding XML.
+Charset used for decoding and encoding XML.
 
 =head2 C<tree>
 

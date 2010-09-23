@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 614;
+plan tests => 616;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -1388,13 +1388,15 @@ $t->get_ok('/koi8-r')->status_is(200)
 $t->get_ok('/with_under', {'X-Bender' => 'Rodriguez'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->header_is('X-Under'      => '23, 24')->content_is('Unders are cool!');
+  ->header_is('X-Under' => '23, 24')->header_like('X-Under' => qr/23, 24/)
+  ->content_is('Unders are cool!');
 
 # GET /with_under_too
 $t->get_ok('/with_under_too', {'X-Bender' => 'Rodriguez'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->header_is('X-Under'      => '23, 24')->content_is('Unders are cool too!');
+  ->header_is('X-Under' => '23, 24')->header_like('X-Under' => qr/23, 24/)
+  ->content_is('Unders are cool too!');
 
 # GET /with_under_too
 $t->get_ok('/with_under_too')->status_is(404)

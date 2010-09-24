@@ -30,15 +30,15 @@ __PACKAGE__->attr(trim_mark => '=');
 
 # Helpers
 my $HELPERS = <<'EOF';
+use Mojo::ByteStream 'b';
 no strict 'refs'; no warnings 'redefine';
 sub block;
 *block = sub { shift->(@_) };
 sub escape;
 *escape = sub {
-    my $v = shift;
-    ref $v && ref $v eq 'Mojo::ByteStream'
-      ? "$v"
-      : Mojo::ByteStream->new($v)->xml_escape->to_string;
+    ref $_[0] && ref $_[0] eq 'Mojo::ByteStream'
+      ? "$_[0]"
+      : b($_[0])->xml_escape->to_string;
 };
 use strict; use warnings;
 EOF
@@ -124,7 +124,7 @@ sub build {
     my $namespace = $self->namespace || ref $self;
     $lines[0] ||= '';
     $lines[0] =
-      "package $namespace; sub { my \$_M = ''; $HELPERS; $prepend; do {"
+      "package $namespace; $HELPERS sub { my \$_M = ''; $prepend; do {"
       . $lines[0];
     $lines[-1] .= qq/$append; \$_M; } };/;
 

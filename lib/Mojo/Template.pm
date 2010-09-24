@@ -30,7 +30,7 @@ __PACKAGE__->attr(trim_mark => '=');
 
 # Helpers
 my $HELPERS = <<'EOF';
-use Mojo::ByteStream 'b';
+use Mojo::ByteStream;
 no strict 'refs'; no warnings 'redefine';
 sub block;
 *block = sub { shift->(@_) };
@@ -38,7 +38,7 @@ sub escape;
 *escape = sub {
     ref $_[0] && ref $_[0] eq 'Mojo::ByteStream'
       ? "$_[0]"
-      : b($_[0])->xml_escape->to_string;
+      : Mojo::ByteStream->new($_[0])->xml_escape->to_string;
 };
 use strict; use warnings;
 EOF

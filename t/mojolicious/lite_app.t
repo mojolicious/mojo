@@ -1623,7 +1623,7 @@ Test ok
 @@ template_inheritance.html.ep
 % layout 'template_inheritance';
 <% content header => begin =%>
-<title>Welcome</title>
+<%= b('<title>Welcome</title>') %>
 <% end =%>
 <% content sidebar => begin =%>
 Sidebar!

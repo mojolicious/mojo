@@ -27,6 +27,7 @@ This file documents the revision history for Perl extension Mojolicious.
           Mojolicious::Plugin::TagHelpers. (kvorg)
         - Added while, until and inner_xml methods for Mojo::DOM collections.
           (vti)
+        - Added b function to all Mojo::Template templates.
         - Simplified transaction pausing by replacing it with an automatism.
         - Improved RFC3986 compliance of Mojo::Path. (janus)
         - Improved Mojo::Server::PSGI to preload applications.

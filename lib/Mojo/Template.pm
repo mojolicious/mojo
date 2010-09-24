@@ -30,7 +30,7 @@ __PACKAGE__->attr(trim_mark => '=');
 
 # Helpers
 my $HELPERS = <<'EOF';
-use Mojo::ByteStream;
+use Mojo::ByteStream 'b';
 no strict 'refs'; no warnings 'redefine';
 sub block;
 *block = sub { shift->(@_) };
@@ -590,6 +590,9 @@ example.
     %== Perl expression line, replaced with result
 
 L<Mojo::ByteStream> objects are always excluded from automatic escaping.
+
+    <%= b('<div>excluded!</div>') %>
+
 Whitespace characters around tags can be trimmed with a special tag ending.
 
     <%= All whitespace characters around this expression will be trimmed =%>

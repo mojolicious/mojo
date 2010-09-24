@@ -100,15 +100,15 @@ sub parse {
 
     # Detect query string without key/value pairs
     if ($string !~ /\=/) {
+
+        # Replace "+" with whitespace
         $string =~ s/\+/\ /g;
 
-        # Unescape
-        $string = b($string)->url_unescape->to_string;
-
-        # Try to decode
-        if ($charset) {
+        # Escaped string
+        if (index($string, '%') >= 0) {
+            $string = b($string)->url_unescape->to_string;
             my $backup = $string;
-            $string = b($string)->decode($charset)->to_string;
+            $string = b($string)->decode($charset)->to_string if $charset;
             $string = $backup unless defined $string;
         }
 
@@ -126,23 +126,27 @@ sub parse {
         $pair =~ /^([^\=]*)(?:=(.*))?$/;
         my $name  = $1;
         my $value = $2;
+        $name  = '' unless defined $name;
+        $value = '' unless defined $name;
 
         # Replace "+" with whitespace
-        $name  =~ s/\+/\ /g if $name;
-        $value =~ s/\+/\ /g if $value;
+        $name  =~ s/\+/\ /g;
+        $value =~ s/\+/\ /g;
 
-        # Unescape
-        $name  = b($name)->url_unescape->to_string;
-        $value = b($value)->url_unescape->to_string;
+        # Escaped name
+        if (index($name, '%') >= 0) {
+            $name = b($name)->url_unescape->to_string;
+            my $backup = $name;
+            $name = b($name)->decode($charset)->to_string if $charset;
+            $name = $backup unless defined $name;
+        }
 
-        # Try to decode
-        if ($charset) {
-            my $nbackup = $name;
-            my $vbackup = $value;
-            $name  = b($name)->decode($charset)->to_string;
-            $value = b($value)->decode($charset)->to_string;
-            $name  = $nbackup unless defined $name;
-            $value = $vbackup unless defined $value;
+        # Escaped value
+        if (index($value, '%') >= 0) {
+            $value = b($value)->url_unescape->to_string;
+            my $backup = $value;
+            $value = b($value)->decode($charset)->to_string if $charset;
+            $value = $backup unless defined $value;
         }
 
         push @{$self->params}, $name, $value;

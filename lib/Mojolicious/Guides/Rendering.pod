@@ -469,13 +469,24 @@ can be easily changed.
 All templates from the DATA section are bound to the encoding of the Perl
 script, so don't forget to use the L<utf8> pragma if necessary.
 
+=head2 Rendering base64 encoded content
+
+It's possible to store base64 encoded images inside the templates. In order
+to serve the files from the C<DATA> section a static route is needed.
+
+    '/favicon' => '*';
+    
+    @@ favicon.ico (base64)
+    <base64 encoded images>
+
 =head2 Inflating DATA Templates
 
 Templates stored in files get preferred over files from the C<DATA> section,
 this allows you to include a default set of templates in your application
 that the user can later customize.
 The C<inflate> command will write all templates from the C<DATA> section into
-actual files in the C<templates> directory.
+actual files in the C<templates> directory. This includes base64 encoded files,
+too.
 
     % ./myapp.pl inflate
     ...

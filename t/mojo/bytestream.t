@@ -12,7 +12,7 @@ use Test::More;
 
 plan skip_all => 'Perl 5.10 required for this test!'
   unless eval { require Digest::SHA; 1 };
-plan tests => 78;
+plan tests => 80;
 
 use_ok('Mojo::ByteStream', 'b');
 
@@ -318,3 +318,9 @@ my $backup = *STDOUT;
 b(1, 2, 3)->say;
 *STDOUT = $backup;
 is($buffer, "test\n123\n", 'right output');
+
+$stream = b(b("test"));
+ok !ref $stream->to_string, 'nested bytestream stringified';
+
+$stream = Mojo::ByteStream->new(Mojo::ByteStream->new("test"));
+ok !ref $stream->to_string, 'nested bytestream stringified';

@@ -407,6 +407,9 @@ sub decamelize {
 # Number 1: "Cover for me."
 # Number 2: "Oh, good idea, Boss!"
 # Number 3: "It was like that when I got here."
+
+our %ENCODE;
+
 sub decode {
     my ($self, $encoding) = @_;
 
@@ -415,8 +418,13 @@ sub decode {
 
     # Try decoding
     eval {
-        $self->{bytestream} =
-          Encode::decode($encoding, $self->{bytestream}, 1);
+        if ($encoding eq 'utf8') {
+            utf8::decode($self->{bytestream});
+        } else {
+            $self->{bytestream} =
+                ($ENCODE{$encoding} ||= Encode::find_encoding($encoding))
+                ->decode($self->{bytestream}, 1);
+        }
     };
 
     # Failed
@@ -441,7 +449,13 @@ sub encode {
     # Shortcut
     return $self unless $encoding;
 
-    $self->{bytestream} = Encode::encode($encoding, $self->{bytestream});
+    if ($encoding eq 'utf8') {
+        utf8::encode($self->{bytestream});
+    } else {
+        $self->{bytestream} =
+            ($ENCODE{$encoding} ||= Encode::find_encoding($encoding))
+            ->encode($self->{bytestream});
+    }
     return $self;
 }
 

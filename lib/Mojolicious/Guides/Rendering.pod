@@ -92,7 +92,7 @@ Semicolons get automatically appended to all expressions.
 
 Only L<Mojo::ByteStream> objects are excluded from automatic escaping.
 
-    <%= Mojo::ByteStream->new('<p>test</p>') %>
+    <%= b('<p>test</p>') %>
 
 You can also add an additional equal sign to the end of a tag to have it
 automatically remove all surrounding whitespaces, this allows free indenting

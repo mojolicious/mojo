@@ -5,7 +5,7 @@ use warnings;
 
 use base 'Mojolicious::Plugin';
 
-use Mojo::ByteStream;
+use Mojo::ByteStream 'b';
 
 # Is today's hectic lifestyle making you tense and impatient?
 # Shut up and get to the point!
@@ -275,7 +275,7 @@ sub _tag {
     else { $tag .= ' />' }
 
     # Prevent escaping
-    return Mojo::ByteStream->new($tag);
+    return b($tag);
 }
 
 1;

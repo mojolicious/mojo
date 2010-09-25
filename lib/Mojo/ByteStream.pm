@@ -28,6 +28,9 @@ use constant SHA1 => eval 'use Digest::SHA (); 1';
 # Punycode delimiter
 my $DELIMITER = chr 0x2D;
 
+# Encode cache
+my %ENCODE;
+
 # XHTML 1.0 entities for html_unescape
 my %ENTITIES = (
     Aacute   => 193,
@@ -305,7 +308,11 @@ my %UNRESERVED;
 sub import {
     my $caller = caller;
     no strict 'refs';
-    *{"${caller}::b"} = sub { bless { bytestream => @_ < 2 ? defined $_[0] ? "$_[0]" : '' : join('', @_)  }, 'Mojo::ByteStream' }
+    *{"${caller}::b"} = sub {
+        bless {
+            bytestream => @_ < 2 ? defined $_[0] ? "$_[0]" : '' : join('', @_)
+        }, 'Mojo::ByteStream';
+      }
       if @_ > 1;
 }
 
@@ -313,7 +320,8 @@ sub import {
 # Well, I think the veal died of loneliness.
 sub new {
     my $self = shift->SUPER::new();
-    $self->{bytestream} = @_ < 2 ? defined $_[0] ? "$_[0]" : '' : join('', @_);
+    $self->{bytestream} =
+      @_ < 2 ? defined $_[0] ? "$_[0]" : '' : join('', @_);
     return $self;
 }
 
@@ -408,8 +416,6 @@ sub decamelize {
 # Number 2: "Oh, good idea, Boss!"
 # Number 3: "It was like that when I got here."
 
-our %ENCODE;
-
 sub decode {
     my ($self, $encoding) = @_;
 
@@ -418,12 +424,17 @@ sub decode {
 
     # Try decoding
     eval {
-        if ($encoding eq 'utf8') {
-            utf8::decode($self->{bytestream});
-        } else {
+
+        # UTF-8
+        if ($encoding eq 'UTF-8') {
+            die unless utf8::decode $self->{bytestream};
+        }
+
+        # Everything else
+        else {
             $self->{bytestream} =
-                ($ENCODE{$encoding} ||= Encode::find_encoding($encoding))
-                ->decode($self->{bytestream}, 1);
+              ($ENCODE{$encoding} ||= Encode::find_encoding($encoding))
+              ->decode($self->{bytestream}, 1);
         }
     };
 
@@ -449,12 +460,14 @@ sub encode {
     # Shortcut
     return $self unless $encoding;
 
-    if ($encoding eq 'utf8') {
-        utf8::encode($self->{bytestream});
-    } else {
+    # UTF-8
+    if ($encoding eq 'UTF-8') { utf8::encode $self->{bytestream} }
+
+    # Everything else
+    else {
         $self->{bytestream} =
-            ($ENCODE{$encoding} ||= Encode::find_encoding($encoding))
-            ->encode($self->{bytestream});
+          ($ENCODE{$encoding} ||= Encode::find_encoding($encoding))
+          ->encode($self->{bytestream});
     }
     return $self;
 }

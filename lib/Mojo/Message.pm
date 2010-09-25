@@ -16,7 +16,7 @@ use Mojo::Upload;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 262144;
 
-__PACKAGE__->attr(buffer  => sub { Mojo::ByteStream->new });
+__PACKAGE__->attr(buffer  => sub { b() });
 __PACKAGE__->attr(content => sub { Mojo::Content::Single->new });
 __PACKAGE__->attr(default_charset => 'UTF-8');
 __PACKAGE__->attr(dom_class       => 'Mojo::DOM');

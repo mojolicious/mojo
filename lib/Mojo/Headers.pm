@@ -6,9 +6,9 @@ use warnings;
 use base 'Mojo::Base';
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
-use Mojo::ByteStream;
+use Mojo::ByteStream 'b';
 
-__PACKAGE__->attr(buffer => sub { Mojo::ByteStream->new });
+__PACKAGE__->attr(buffer => sub { b() });
 
 # Headers
 my @GENERAL_HEADERS = qw/

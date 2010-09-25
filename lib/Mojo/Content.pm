@@ -6,16 +6,15 @@ use warnings;
 use base 'Mojo::Base';
 
 use Carp 'croak';
-use Mojo::ByteStream;
+use Mojo::ByteStream 'b';
 use Mojo::Headers;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 262144;
 
 __PACKAGE__->attr('read_cb');
-__PACKAGE__->attr([qw/buffer chunked_buffer/] => sub { Mojo::ByteStream->new }
-);
-__PACKAGE__->attr(headers => sub { Mojo::Headers->new });
-__PACKAGE__->attr(relaxed => 0);
+__PACKAGE__->attr([qw/buffer chunked_buffer/] => sub { b() });
+__PACKAGE__->attr(headers                     => sub { Mojo::Headers->new });
+__PACKAGE__->attr(relaxed                     => 0);
 
 sub body_contains {
     croak 'Method "body_contains" not implemented by subclass';

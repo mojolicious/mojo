@@ -38,7 +38,7 @@ sub escape;
 *escape = sub {
     ref $_[0] && ref $_[0] eq 'Mojo::ByteStream'
       ? "$_[0]"
-      : Mojo::ByteStream->new($_[0])->xml_escape->to_string;
+      : b($_[0])->xml_escape->to_string;
 };
 use strict; use warnings;
 EOF

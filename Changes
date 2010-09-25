@@ -34,6 +34,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved FastCGI detection for Dreamhost. (garu)
         - Improved keep alive timeout handling in Mojo::Client.
         - Improved documentation. (rhaen)
+        - Improved Mojo::ByteStream performance. (mons)
         - Improved Mojo::Parameters performance. (kimoto)
         - Fixed a serious design flaw in Mojo::Message and made long poll
           much easier.

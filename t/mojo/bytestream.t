@@ -319,8 +319,8 @@ b(1, 2, 3)->say;
 *STDOUT = $backup;
 is($buffer, "test\n123\n", 'right output');
 
-$stream = b(b("test"));
-ok !ref $stream->to_string, 'nested bytestream stringified';
-
-$stream = Mojo::ByteStream->new(Mojo::ByteStream->new("test"));
-ok !ref $stream->to_string, 'nested bytestream stringified';
+# Nested bytestreams
+$stream = b(b('test'));
+ok(!ref $stream->to_string, 'nested bytestream stringified');
+$stream = Mojo::ByteStream->new(Mojo::ByteStream->new('test'));
+ok(!ref $stream->to_string, 'nested bytestream stringified');

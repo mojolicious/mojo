@@ -11,7 +11,7 @@ use File::Spec;
 use IO::File;
 use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
 use IO::Socket;
-use Mojo::ByteStream;
+use Mojo::ByteStream 'b';
 use Scalar::Util 'weaken';
 use Socket qw/IPPROTO_TCP TCP_NODELAY/;
 use Time::HiRes 'time';
@@ -164,7 +164,7 @@ sub connect {
 
     # Add connection
     my $c = $self->{_cs}->{$id} = {
-        buffer     => Mojo::ByteStream->new,
+        buffer     => b(),
         connect_cb => $args->{connect_cb} || $args->{cb},
         connecting => 1,
         socket     => $socket
@@ -590,7 +590,7 @@ sub write {
     my $c = $self->{_cs}->{$id};
 
     # Buffer
-    $c->{buffer} = Mojo::ByteStream->new unless exists $c->{buffer};
+    $c->{buffer} = b() unless exists $c->{buffer};
     $c->{buffer}->add_chunk($chunk);
 
     # UNIX only
@@ -636,7 +636,7 @@ sub _accept {
     my $id = "$socket";
     my $c = $self->{_cs}->{$id} = {
         accepting => 1,
-        buffer    => Mojo::ByteStream->new,
+        buffer    => b(),
         socket    => $socket
     };
     $c->{tls_accept} = 1 if $tls;

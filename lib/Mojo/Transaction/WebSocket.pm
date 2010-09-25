@@ -146,7 +146,7 @@ sub server_read {
     my ($self, $chunk) = @_;
 
     # Add chunk
-    my $buffer = $self->{_read} ||= Mojo::ByteStream->new;
+    my $buffer = $self->{_read} ||= b();
     $buffer->add_chunk($chunk);
 
     # Full frames
@@ -178,7 +178,7 @@ sub server_write {
     my $self = shift;
 
     # Not writing anymore
-    my $write = $self->{_write} ||= Mojo::ByteStream->new;
+    my $write = $self->{_write} ||= b();
     unless ($write->size) {
         $self->{_state} = $self->{_finished} ? 'done' : 'read';
     }
@@ -228,7 +228,7 @@ sub _send_bytes {
     my ($self, $bytes) = @_;
 
     # Add to buffer
-    my $write = $self->{_write} ||= Mojo::ByteStream->new;
+    my $write = $self->{_write} ||= b();
     $write->add_chunk($bytes);
 
     # Writing

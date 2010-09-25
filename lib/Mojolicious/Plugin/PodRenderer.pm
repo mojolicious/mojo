@@ -5,7 +5,7 @@ use warnings;
 
 use base 'Mojolicious::Plugin';
 
-use Mojo::ByteStream;
+use Mojo::ByteStream 'b';
 
 # Core module since Perl 5.9.3, so it might not always be present
 BEGIN {
@@ -36,8 +36,7 @@ sub register {
     );
 
     # Add "pod_to_html" helper
-    $app->helper(pod_to_html =>
-          sub { shift; Mojo::ByteStream->new($self->_pod_to_html(@_)) });
+    $app->helper(pod_to_html => sub { shift; b($self->_pod_to_html(@_)) });
 }
 
 sub _pod_to_html {

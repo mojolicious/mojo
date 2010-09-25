@@ -871,6 +871,11 @@ sub _redirect {
 
     # Location
     return unless my $location = $res->headers->location;
+    $location = Mojo::URL->new($location);
+
+    # Fix broken redirects without authority
+    $location->authority($old->req->url->authority)
+      unless $location->authority;
 
     # Method
     my $method = $old->req->method;
@@ -885,11 +890,11 @@ sub _redirect {
     my $new = Mojo::Transaction::HTTP->new;
     my $req = $new->req;
     $req->method($method);
-    $req->url->parse($location);
+    $req->url($location);
     $new->previous($old);
 
     # Start redirected request
-    my $nid = $self->_tx_start($new, $c->{cb});
+    return 1 unless my $nid = $self->_tx_start($new, $c->{cb});
 
     # Create new connection
     $self->{_cs}->{$nid}->{redirects} = $r + 1;

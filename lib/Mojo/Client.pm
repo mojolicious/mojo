@@ -873,12 +873,15 @@ sub _redirect {
     return unless my $location = $res->headers->location;
     $location = Mojo::URL->new($location);
 
-    # Fix broken redirects without authority
-    $location->authority($old->req->url->authority)
+    # Request
+    my $req = $old->req;
+
+    # Fix broken location without authority
+    $location->authority($req->url->authority)
       unless $location->authority;
 
     # Method
-    my $method = $old->req->method;
+    my $method = $req->method;
     $method = 'GET' unless $method =~ /^GET|HEAD$/i;
 
     # Max redirects
@@ -888,9 +891,7 @@ sub _redirect {
 
     # New transaction
     my $new = Mojo::Transaction::HTTP->new;
-    my $req = $new->req;
-    $req->method($method);
-    $req->url($location);
+    $new->req->method($method)->url($location);
     $new->previous($old);
 
     # Start redirected request

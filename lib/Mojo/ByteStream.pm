@@ -305,7 +305,7 @@ my %UNRESERVED;
 sub import {
     my $caller = caller;
     no strict 'refs';
-    *{"${caller}::b"} = sub { Mojo::ByteStream->new(@_) }
+    *{"${caller}::b"} = sub { bless { bytestream => @_ < 2 ? defined $_[0] ? "$_[0]" : '' : join('', @_)  }, 'Mojo::ByteStream' }
       if @_ > 1;
 }
 
@@ -313,7 +313,7 @@ sub import {
 # Well, I think the veal died of loneliness.
 sub new {
     my $self = shift->SUPER::new();
-    $self->{bytestream} = @_ < 2 ? defined $_[0] ? $_[0] : '' : join('', @_);
+    $self->{bytestream} = @_ < 2 ? defined $_[0] ? "$_[0]" : '' : join('', @_);
     return $self;
 }
 

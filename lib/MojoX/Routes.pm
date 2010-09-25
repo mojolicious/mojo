@@ -115,7 +115,7 @@ sub over {
 
     # Conditions
     my $conditions = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
-    $self->conditions($conditions);
+    push @{$self->conditions}, @$conditions;
 
     return $self;
 }
@@ -418,7 +418,6 @@ The name of this route.
 =head2 C<over>
 
     $r = $r->over(foo => qr/\w+/);
-    $r = $r->over({foo => qr/\w+/});
 
 Apply condition parameters to this route.
 

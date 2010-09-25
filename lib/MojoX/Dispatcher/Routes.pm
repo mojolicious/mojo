@@ -273,9 +273,12 @@ sub _generate_method {
 sub _walk_stack {
     my ($self, $c) = @_;
 
+    # Stack
+    my $stack = $c->match->stack;
+
     # Walk the stack
-    my $staging = @{$c->match->stack};
-    for my $field (@{$c->match->stack}) {
+    my $staging = @$stack;
+    for my $field (@$stack) {
         $staging--;
 
         # Stash

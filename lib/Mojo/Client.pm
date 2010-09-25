@@ -1131,7 +1131,7 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
 
     # Scrape the latest headlines from a news site
     my $news = 'http://digg.com';
-    $client->get($news)->res->dom->find("h3 > a.offsite")->each(sub {
+    $client->get($news)->res->dom->find("h3 > a.story-title")->each(sub {
         print shift->text . "\n";
     });
 

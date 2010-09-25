@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 805;
+use Test::More tests => 806;
 
 use File::Spec;
 use File::Temp;
@@ -2045,11 +2045,13 @@ $res->parse("HTTP/1.1 200 OK\x0a");
 $res->parse(
     "Content-Type: application/atom+xml; charset=UTF-8; type=feed\x0a");
 $res->parse("\x0a");
-$res->body('<test>Test</test>');
+$res->body('<p>foo <a href="/">bar</a><a href="/baz">baz</a></p>');
 ok($res->is_done, 'request is done');
 is( $res->headers->content_type,
     'application/atom+xml; charset=UTF-8; type=feed',
     'right "Content-Type" value'
 );
 ok($res->dom, 'dom built');
-
+$count = 0;
+$res->dom('a')->each(sub { $count++ });
+is($count, 2, 'all anchors found');

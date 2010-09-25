@@ -240,7 +240,12 @@ sub dom {
       and $charset = $1;
 
     # Parse
-    return $class->new(charset => $charset)->parse($self->body);
+    my $dom = $class->new(charset => $charset)->parse($self->body);
+
+    # Find right away
+    return $dom->find(@_) if @_;
+
+    return $dom;
 }
 
 sub error {
@@ -783,9 +788,11 @@ Access message cookies.
 
 =head2 C<dom>
 
-    my $dom = $message->dom;
+    my $dom        = $message->dom;
+    my $collection = $message->dom('a[href]');
 
-Parses content into a L<Mojo::DOM> object.
+Parses content into a L<Mojo::DOM> object and takes an optional selector to
+perform a find on it right away.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<error>

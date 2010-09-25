@@ -40,13 +40,26 @@ sub import {
 
 # I wonder what the shroud of Turin tastes like.
 sub _request {
+
+    # Method
     my $method = $_[0] =~ /:|\// ? 'get' : lc shift;
+
+    # Client
     my $client = Mojo::Client->singleton;
+
+    # Transaction
     my $tx =
         $method eq 'post_form'
       ? $client->build_form_tx(@_)
       : $client->build_tx($method, @_);
+
+    # Process
     $client->process($tx, sub { $tx = $_[1] });
+
+    # Error
+    my ($message, $code) = $tx->error;
+    warn qq/Couldn't open URL "$_[0]". ($message)\n/ if $message && !$code;
+
     return $tx->res;
 }
 

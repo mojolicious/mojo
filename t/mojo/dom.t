@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 174;
+use Test::More tests => 176;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -460,3 +460,19 @@ is_deeply(\@div, [qw/A B/], 'found all div elements with the right ids');
 $dom->find('div[id="☃"], div[id="♥x"]')
   ->each(sub { push @div, shift->text });
 is_deeply(\@div, [qw/A C/], 'found all div elements with the right ids');
+
+# Multiple attributes
+$dom->parse(<<EOF);
+<div foo="bar" bar="baz">A</div>
+<div foo="bar">B</div>
+<div foo="bar" bar="baz">C</div>
+<div foo="baz" bar="baz">D</div>
+EOF
+@div = ();
+$dom->find('div[foo="bar"][bar="baz"]')->each(sub { push @div, shift->text });
+is_deeply(\@div, [qw/A C/],
+    'found all div elements with the right atributes');
+@div = ();
+$dom->find('div[foo^="b"][foo$="r"]')->each(sub { push @div, shift->text });
+is_deeply(\@div, [qw/A B C/],
+    'found all div elements with the right atributes');

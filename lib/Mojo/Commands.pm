@@ -200,36 +200,6 @@ List available commands with short descriptions.
 
 List available options for the command with short descriptions.
 
-=item C<generate>
-
-    mojo generate
-    mojo generate help
-
-List available generator commands with short descriptions.
-
-    mojo generate help <generator>
-
-List available options for generator command with short descriptions.
-
-=item C<generate app>
-
-    mojo generate app <AppName>
-
-Generate application directory structure for a fully functional L<Mojo>
-application.
-
-=item C<generate makefile>
-
-    script/myapp generate makefile
-
-Generate C<Makefile.PL> file for application.
-
-=item C<generate psgi>
-
-    script/myapp generate psgi
-
-Generate C<myapp.psgi> file for application.
-
 =item C<cgi>
 
     mojo cgi
@@ -244,13 +214,6 @@ Start application with CGI backend.
 
 Start application with standalone HTTP 1.1 server backend.
 
-=item C<daemon_prefork>
-
-    mojo daemon_prefork
-    script/myapp daemon_prefork
-
-Start application with preforking standalone HTTP 1.1 server backend.
-
 =item C<fastcgi>
 
     mojo fastcgi
@@ -264,6 +227,13 @@ Start application with FastCGI backend.
    script/myapp get /foo
 
 Perform GET request to remote host or local application.
+
+=item C<hypnotoad>
+
+    mojo hypnotoad
+    script/myapp hypnotoad
+
+Start application with C<Mojo::Server::Hypnotoad> backend.
 
 =item C<test>
 

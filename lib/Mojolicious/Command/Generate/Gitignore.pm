@@ -1,4 +1,4 @@
-package Mojo::Command::Generate::Gitignore;
+package Mojolicious::Command::Generate::Gitignore;
 
 use strict;
 use warnings;
@@ -39,22 +39,22 @@ pm_to_blib
 __END__
 =head1 NAME
 
-Mojo::Command::Generate::Gitignore - Gitignore Generator Command
+Mojolicious::Command::Generate::Gitignore - Gitignore Generator Command
 
 =head1 SYNOPSIS
 
-    use Mojo::Command::Generate::Gitignore;
+    use Mojolicious::Command::Generate::Gitignore;
 
-    my $gitignore = Mojo::Command::Generate::Gitignore->new;
+    my $gitignore = Mojolicious::Command::Generate::Gitignore->new;
     $gitignore->run(@ARGV);
 
 =head1 DESCRIPTION
 
-L<Mojo::Command::Generate::Gitignore> is a C<.gitignore> generator.
+L<Mojolicious::Command::Generate::Gitignore> is a C<.gitignore> generator.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Command::Generate::Gitignore> inherits all attributes from
+L<Mojolicious::Command::Generate::Gitignore> inherits all attributes from
 L<Mojo::Command> and implements the following new ones.
 
 =head2 C<description>
@@ -73,7 +73,7 @@ Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
-L<Mojo::Command::Generate::Gitignore> inherits all methods from
+L<Mojolicious::Command::Generate::Gitignore> inherits all methods from
 L<Mojo::Command> and implements the following new ones.
 
 =head2 C<run>

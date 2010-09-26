@@ -81,6 +81,12 @@ L<Mojolicious> application.
 
 Generate a fully functional L<Mojolicious::Lite> application.
 
+=item C<generate makefile>
+
+    mojolicious generate makefile
+
+Generate C<Makefile.PL> file for application.
+
 =item C<inflate>
 
     myapp.pl inflate

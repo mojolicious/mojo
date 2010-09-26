@@ -53,9 +53,6 @@ my $STASH_RE = qr/
     $
     /x;
 
-# If we don't go back there and make that event happen,
-# the entire universe will be destroyed...
-# And as an environmentalist, I'm against that.
 sub render_exception { }
 sub render_not_found { }
 

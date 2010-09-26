@@ -1,4 +1,4 @@
-package Mojo::Command::Generate::Makefile;
+package Mojolicious::Command::Generate::Makefile;
 
 use strict;
 use warnings;
@@ -12,8 +12,9 @@ __PACKAGE__->attr(usage => <<"EOF");
 usage: $0 generate makefile
 EOF
 
-# You don’t like your job, you don’t strike.
-# You go in every day and do it really half-assed. That’s the American way.
+# If we don't go back there and make that event happen,
+# the entire universe will be destroyed...
+# And as an environmentalist, I'm against that.
 sub run {
     my $self = shift;
 
@@ -52,22 +53,22 @@ WriteMakefile(
 __END__
 =head1 NAME
 
-Mojo::Command::Generate::Makefile - Makefile Generator Command
+Mojolicious::Command::Generate::Makefile - Makefile Generator Command
 
 =head1 SYNOPSIS
 
-    use Mojo::Command::Generate::Makefile;
+    use Mojolicious::Command::Generate::Makefile;
 
-    my $makefile = Mojo::Command::Generate::Makefile->new;
+    my $makefile = Mojolicious::Command::Generate::Makefile->new;
     $makefile->run(@ARGV);
 
 =head1 DESCRIPTION
 
-L<Mojo::Command::Generate::Makefile> is a makefile generator.
+L<Mojolicious::Command::Generate::Makefile> is a makefile generator.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Command::Generate::Makefile> inherits all attributes from
+L<Mojolicious::Command::Generate::Makefile> inherits all attributes from
 L<Mojo::Command> and implements the following new ones.
 
 =head2 C<description>
@@ -86,7 +87,7 @@ Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
-L<Mojo::Command::Generate::Makefile> inherits all methods from
+L<Mojolicious::Command::Generate::Makefile> inherits all methods from
 L<Mojo::Command> and implements the following new ones.
 
 =head2 C<run>

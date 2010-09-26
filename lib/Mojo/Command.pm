@@ -136,6 +136,8 @@ sub get_data {
     return $all->{$data};
 }
 
+# You don’t like your job, you don’t strike.
+# You go in every day and do it really half-assed. That’s the American way.
 sub help {
     my $self = shift;
     print $self->usage;

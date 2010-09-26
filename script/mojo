@@ -10,7 +10,7 @@ use lib join '/', File::Spec->splitdir(dirname(__FILE__)), 'lib';
 use lib join '/', File::Spec->splitdir(dirname(__FILE__)), '..', 'lib';
 
 # Check if Mojo is installed
-eval 'use Mojo::Commands';
+eval 'use Mojolicious::Commands';
 die <<EOF if $@;
 It looks like you don't have the Mojo Framework installed.
 Please visit http://mojolicious.org for detailed installation instructions.
@@ -18,13 +18,13 @@ Please visit http://mojolicious.org for detailed installation instructions.
 EOF
 
 # Start the command system
-Mojo::Commands->start;
+Mojolicious::Commands->start;
 
 __END__
 
 =head1 NAME
 
-mojo - The Mojo Command System
+mojo - The Mojolicious Command System
 
 =head1 SEE ALSO
 

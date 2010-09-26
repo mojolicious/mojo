@@ -164,7 +164,7 @@ application.
 
 There is also a helper command to generate a small example application.
 
-    % mojolicious generate lite_app
+    % mojo generate lite_app
 
 All the normal L<Mojolicious> command options are available from the command
 line.
@@ -725,7 +725,7 @@ L<Mojolicious::Lite> and L<Mojolicious> applications.
 Both share about 99% of the same code, so almost everything you learned in
 this tutorial applies there too. :)
 
-    % mojolicious generate app
+    % mojo generate app
 
 Have fun!
 

@@ -59,31 +59,31 @@ L<Mojo::Commands>.
 
 =item C<generate>
 
-    mojolicious generate
-    mojolicious generate help
+    mojo generate
+    mojo generate help
 
 List available generator commands with short descriptions.
 
-    mojolicious generate help <generator>
+    mojo generate help <generator>
 
 List available options for generator command with short descriptions.
 
 =item C<generate app>
 
-    mojolicious generate app <AppName>
+    mojo generate app <AppName>
 
 Generate application directory structure for a fully functional
 L<Mojolicious> application.
 
 =item C<generate lite_app>
 
-    mojolicious generate lite_app
+    mojo generate lite_app
 
 Generate a fully functional L<Mojolicious::Lite> application.
 
 =item C<generate makefile>
 
-    mojolicious generate makefile
+    mojo generate makefile
 
 Generate C<Makefile.PL> file for application.
 

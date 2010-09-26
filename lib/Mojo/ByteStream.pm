@@ -783,9 +783,10 @@ sub url_escape {
 
     # Default to unreserved characters
     my $pattern = shift || 'A-Za-z0-9\-\.\_\~';
-
+    
     # Escape
     utf8::encode $self->{bytestream} if utf8::is_utf8 $self->{bytestream};
+    return $self unless $self->{bytestream} =~ /[^$pattern]/;
     $self->{bytestream} =~ s/([^$pattern])/sprintf('%%%02X',ord($1))/ge;
 
     return $self;
@@ -802,6 +803,9 @@ sub url_sanitize {
 
 sub url_unescape {
     my $self = shift;
+    
+    # Shortcut
+    return $self if index($self->{bytestream}, '%') == -1;
 
     # Unescape
     $self->{bytestream} =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge;

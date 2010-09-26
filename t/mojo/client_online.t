@@ -31,8 +31,8 @@ $client->get(
 )->process;
 $client = undef;
 my $ticks = 0;
-$loop->tick_cb(sub { $ticks++ });
-$loop->idle_cb(sub { shift->stop });
+$loop->on_tick(sub { $ticks++ });
+$loop->on_idle(sub { shift->stop });
 $loop->start;
 is($ticks, 1,   'loop not tainted');
 is($code,  301, 'right status');

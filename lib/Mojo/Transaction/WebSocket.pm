@@ -169,7 +169,7 @@ sub server_read {
     }
 
     # Resume
-    $self->resume_cb->($self);
+    $self->on_resume->($self);
 
     return $self;
 }
@@ -235,7 +235,7 @@ sub _send_bytes {
     $self->{_state} = 'write';
 
     # Resume
-    $self->resume_cb->($self);
+    $self->on_resume->($self);
 }
 
 1;

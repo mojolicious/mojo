@@ -37,14 +37,14 @@ my $buffer = '';
 $client->ioloop->connect(
     address    => 'localhost',
     port       => $port,
-    connect_cb => sub {
+    on_connect => sub {
         my ($self, $id, $chunk) = @_;
         $self->write($id,
                 "GET /1/ HTTP/1.1\x0d\x0a"
               . "Expect: 100-continue\x0d\x0a"
               . "Content-Length: 4\x0d\x0a\x0d\x0a");
     },
-    read_cb => sub {
+    on_read => sub {
         my ($self, $id, $chunk) = @_;
         $buffer .= $chunk;
         $self->drop($id) and $self->stop if $buffer =~ /Mojo is working!/;
@@ -60,7 +60,7 @@ $buffer = '';
 $client->ioloop->connect(
     address    => 'localhost',
     port       => $port,
-    connect_cb => sub {
+    on_connect => sub {
         my ($self, $id) = @_;
         $self->write($id,
                 "GET /2/ HTTP/1.1\x0d\x0a"
@@ -68,7 +68,7 @@ $client->ioloop->connect(
               . "GET /3/ HTTP/1.1\x0d\x0a"
               . "Content-Length: 0\x0d\x0a\x0d\x0a");
     },
-    read_cb => sub {
+    on_read => sub {
         my ($self, $id, $chunk) = @_;
         $buffer .= $chunk;
         $self->drop($id) and $self->stop if $buffer =~ /Mojo.*Mojo/gs;

@@ -31,7 +31,7 @@ EOF
 # Flash policy server
 $loop->listen(
     port    => 843,
-    read_cb => sub {
+    on_read => sub {
         my ($loop, $id) = @_;
 
         # Write XML

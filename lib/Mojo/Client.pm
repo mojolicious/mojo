@@ -617,10 +617,10 @@ sub _connect {
             port    => $port,
             socket  => $id,
             tls     => $scheme eq 'https' ? 1 : 0,
-            connect_cb => sub { $self->_connected($_[1]) },
-            error_cb   => sub { $self->_error(@_) },
-            hup_cb     => sub { $self->_hup(@_) },
-            read_cb    => sub { $self->_read(@_) }
+            on_connect => sub { $self->_connected($_[1]) },
+            on_error   => sub { $self->_error(@_) },
+            on_hup     => sub { $self->_hup(@_) },
+            on_read    => sub { $self->_read(@_) }
         );
 
         # Error
@@ -1015,7 +1015,7 @@ sub _tx_start {
     weaken $self;
 
     # Resume callback
-    $tx->resume_cb(sub { $self->_write($id) });
+    $tx->on_resume(sub { $self->_write($id) });
 
     # Counter
     $self->{_processing} ||= 0;
@@ -1065,7 +1065,7 @@ sub _upgrade {
     weaken $self;
 
     # Resume callback
-    $new->resume_cb(sub { $self->_write($id) });
+    $new->on_resume(sub { $self->_write($id) });
 
     return $new;
 }

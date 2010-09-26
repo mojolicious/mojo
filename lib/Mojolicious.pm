@@ -42,7 +42,7 @@ sub new {
     my $self = shift->SUPER::new(@_);
 
     # Transaction builder
-    $self->build_tx_cb(
+    $self->on_build_tx(
         sub {
             my $self = shift;
 

@@ -161,7 +161,7 @@ sub _build_tx {
     my ($self, $id, $c) = @_;
 
     # Build transaction
-    my $tx = $self->build_tx_cb->($self);
+    my $tx = $self->on_build_tx->($self);
 
     # Identify
     $tx->res->headers->server('Mojolicious (Perl)');
@@ -185,20 +185,20 @@ sub _build_tx {
     weaken $self;
 
     # Handler callback
-    $tx->handler_cb(
+    $tx->on_handler(
         sub {
             my $tx = shift;
 
             # Handler
-            $self->handler_cb->($self, $tx);
+            $self->on_handler->($self, $tx);
 
             # Resume callback
-            $tx->resume_cb(sub { $self->_write($id) });
+            $tx->on_resume(sub { $self->_write($id) });
         }
     );
 
     # Upgrade callback
-    $tx->upgrade_cb(sub { $self->_upgrade($id, @_) });
+    $tx->on_upgrade(sub { $self->_upgrade($id, @_) });
 
     # New request on the connection
     $c->{requests} ||= 0;
@@ -270,7 +270,7 @@ sub _finish {
             weaken $self;
 
             # Resume callback
-            $ws->resume_cb(sub { $self->_write($id) });
+            $ws->on_resume(sub { $self->_write($id) });
         }
 
         # Failed upgrade
@@ -329,7 +329,7 @@ sub _listen {
     weaken $self;
 
     # Callbacks
-    $options->{accept_cb} = sub {
+    $options->{on_accept} = sub {
         my ($loop, $id) = @_;
 
         # Add new connection
@@ -338,9 +338,9 @@ sub _listen {
         # Keep alive timeout
         $loop->connection_timeout($id => $self->keep_alive_timeout);
     };
-    $options->{error_cb} = sub { $self->_error(@_) };
-    $options->{hup_cb}   = sub { $self->_hup(@_) };
-    $options->{read_cb}  = sub { $self->_read(@_) };
+    $options->{on_error} = sub { $self->_error(@_) };
+    $options->{on_hup}   = sub { $self->_hup(@_) };
+    $options->{on_read}  = sub { $self->_read(@_) };
 
     # Listen
     my $id = $self->ioloop->listen($options);
@@ -405,13 +405,13 @@ sub _upgrade {
     my $c = $self->{_cs}->{$id};
 
     # WebSocket handshake handler
-    my $ws = $c->{websocket} = $self->websocket_handshake_cb->($self, $tx);
+    my $ws = $c->{websocket} = $self->on_websocket_handshake->($self, $tx);
 
     # Upgrade connection timeout
     $self->ioloop->connection_timeout($id, $self->websocket_timeout);
 
     # Not resumable yet
-    $ws->resume_cb(sub {1});
+    $ws->on_resume(sub {1});
 }
 
 sub _write {

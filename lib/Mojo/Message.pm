@@ -18,11 +18,16 @@ use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 262144;
 
 __PACKAGE__->attr(buffer  => sub { b() });
 __PACKAGE__->attr(content => sub { Mojo::Content::Single->new });
-__PACKAGE__->attr(default_charset => 'UTF-8');
-__PACKAGE__->attr(dom_class       => 'Mojo::DOM');
-__PACKAGE__->attr([qw/finish_cb progress_cb/]);
+__PACKAGE__->attr(default_charset                   => 'UTF-8');
+__PACKAGE__->attr(dom_class                         => 'Mojo::DOM');
 __PACKAGE__->attr(json_class                        => 'Mojo::JSON');
 __PACKAGE__->attr([qw/major_version minor_version/] => 1);
+__PACKAGE__->attr([qw/on_finish on_progress/]);
+
+# DEPRECATED in Comet!
+*finish_cb   = \&on_finish;
+*progress_cb = \&on_progress;
+*read_cb     = \&on_read;
 
 # I'll keep it short and sweet. Family. Religion. Friendship.
 # These are the three demons you must slay if you wish to succeed in
@@ -50,8 +55,8 @@ sub body {
 
     # Get
     unless (@_) {
-        return $self->read_cb
-          ? $self->read_cb
+        return $self->on_read
+          ? $self->on_read
           : return $self->content->asset->slurp;
     }
 
@@ -59,14 +64,14 @@ sub body {
     my $content = shift;
 
     # Cleanup
-    $self->read_cb(undef);
+    $self->on_read(undef);
     $self->content->asset(Mojo::Asset::Memory->new);
 
     # Shortcut
     return $self unless defined $content;
 
     # Callback
-    if (ref $content eq 'CODE') { $self->read_cb($content) }
+    if (ref $content eq 'CODE') { $self->on_read($content) }
 
     # Set text content
     elsif (length $content) { $self->content->asset->add_chunk($content) }
@@ -145,7 +150,7 @@ sub build_body {
 
     # Finished
     $self->{_state} = 'done';
-    if (my $cb = $self->finish_cb) { $self->$cb }
+    if (my $cb = $self->on_finish) { $self->$cb }
 
     return $body;
 }
@@ -283,7 +288,7 @@ sub get_body_chunk {
     my $self = shift;
 
     # Progress
-    if (my $cb = $self->progress_cb) { $self->$cb('body', @_) }
+    if (my $cb = $self->on_progress) { $self->$cb('body', @_) }
 
     # Chunk
     my $chunk = $self->content->get_body_chunk(@_);
@@ -291,7 +296,7 @@ sub get_body_chunk {
 
     # Finish
     $self->{_state} = 'done';
-    if (my $cb = $self->finish_cb) { $self->$cb }
+    if (my $cb = $self->on_finish) { $self->$cb }
 
     return $chunk;
 }
@@ -300,7 +305,7 @@ sub get_header_chunk {
     my $self = shift;
 
     # Progress
-    if (my $cb = $self->progress_cb) { $self->$cb('headers', @_) }
+    if (my $cb = $self->on_progress) { $self->$cb('headers', @_) }
 
     # HTTP 0.9 has no headers
     return '' if $self->version eq '0.9';
@@ -315,7 +320,7 @@ sub get_start_line_chunk {
     my ($self, $offset) = @_;
 
     # Progress
-    if (my $cb = $self->progress_cb) { $self->$cb('start_line', @_) }
+    if (my $cb = $self->on_progress) { $self->$cb('start_line', @_) }
 
     my $copy = $self->_build_start_line;
     return substr($copy, $offset, CHUNK_SIZE);
@@ -398,7 +403,7 @@ sub parse_until_body {
     return $self->_parse(1);
 }
 
-sub read_cb { shift->content->read_cb(@_) }
+sub on_read { shift->content->on_read(@_) }
 
 sub start_line_size { length shift->build_start_line }
 
@@ -499,7 +504,7 @@ sub _parse {
     my $until_body = @_ ? shift : 0;
 
     # Progress
-    if (my $cb = $self->progress_cb) { $self->$cb }
+    if (my $cb = $self->on_progress) { $self->$cb }
 
     # Start line and headers
     my $buffer = $self->buffer;
@@ -541,7 +546,7 @@ sub _parse {
     $self->{_state} = 'done' if $self->content->is_done;
 
     # Finished
-    if ((my $cb = $self->finish_cb) && $self->is_done) { $self->$cb }
+    if ((my $cb = $self->on_finish) && $self->is_done) { $self->$cb }
 
     return $self;
 }
@@ -666,15 +671,6 @@ Default charset used for form data parsing.
 Class to be used for DOM manipulation, defaults to L<Mojo::DOM>.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
-=head2 C<finish_cb>
-
-    my $cb   = $message->finish_cb;
-    $message = $message->finish_cb(sub {
-        my $self = shift;
-    });
-
-Callback called after message building or parsing is finished.
-
 =head2 C<json_class>
 
     my $class = $message->json_class;
@@ -698,24 +694,33 @@ Major version, defaults to C<1>.
 
 Minor version, defaults to C<1>.
 
-=head2 C<progress_cb>
+=head2 C<on_finish>
 
-    my $cb   = $message->progress_cb;
-    $message = $message->progress_cb(sub {
+    my $cb   = $message->on_finish;
+    $message = $message->on_finish(sub {
+        my $self = shift;
+    });
+
+Callback called after message building or parsing is finished.
+
+=head2 C<on_progress>
+
+    my $cb   = $message->on_progress;
+    $message = $message->on_progress(sub {
         my $self = shift;
         print '+';
     });
 
 Progress callback.
 
-=head2 C<read_cb>
+=head2 C<on_read>
 
-    my $cb   = $message->read_cb;
-    $message = $message->read_cb(sub {...});
+    my $cb   = $message->on_read;
+    $message = $message->on_read(sub {...});
 
 Content parser callback.
 
-    $message = $message->read_cb(sub {
+    $message = $message->on_read(sub {
         my ($self, $chunk) = @_;
         print $chunk;
     });

@@ -26,7 +26,7 @@ __PACKAGE__->attr(
 __PACKAGE__->attr(app_class =>
       sub { ref $ENV{MOJO_APP} || $ENV{MOJO_APP} || 'Mojo::HelloWorld' });
 __PACKAGE__->attr(
-    build_tx_cb => sub {
+    on_build_tx => sub {
         sub {
             my $self = shift;
 
@@ -36,12 +36,12 @@ __PACKAGE__->attr(
                 delete $self->{app};
             }
 
-            return $self->app->build_tx_cb->($self->app);
+            return $self->app->on_build_tx->($self->app);
           }
     }
 );
 __PACKAGE__->attr(
-    handler_cb => sub {
+    on_handler => sub {
         sub {
 
             # Application
@@ -60,15 +60,20 @@ __PACKAGE__->attr(
           }
     }
 );
-__PACKAGE__->attr(reload => sub { $ENV{MOJO_RELOAD} || 0 });
 __PACKAGE__->attr(
-    websocket_handshake_cb => sub {
+    on_websocket_handshake => sub {
         sub {
             my $self = shift;
-            return $self->app->websocket_handshake_cb->($self->app, @_);
+            return $self->app->on_websocket_handshake->($self->app, @_);
           }
     }
 );
+__PACKAGE__->attr(reload => sub { $ENV{MOJO_RELOAD} || 0 });
+
+# DEPRECATED in Comet!
+*build_tx_cb            = \&on_build_tx;
+*handler_cb             = \&on_handler;
+*websocket_handshake_cb = \&on_websocket_handshake;
 
 # Are you saying you're never going to eat any animal again? What about bacon?
 # No.
@@ -94,10 +99,10 @@ Mojo::Server - HTTP Server Base Class
         my $self = shift;
 
         # Get a transaction
-        my $tx = $self->build_tx_cb->($self);
+        my $tx = $self->on_build_tx->($self);
 
         # Call the handler
-        $tx = $self->handler_cb->($self);
+        $tx = $self->on_handler->($self);
     }
 
 =head1 DESCRIPTION
@@ -123,24 +128,33 @@ Application this server handles, defaults to a L<Mojo::HelloWorld> object.
 Class of the application this server handles, defaults to
 L<Mojo::HelloWorld>.
 
-=head2 C<build_tx_cb>
+=head2 C<on_build_tx>
 
-    my $btx = $server->build_tx_cb;
-    $server = $server->build_tx_cb(sub {
+    my $btx = $server->on_build_tx;
+    $server = $server->on_build_tx(sub {
         my $self = shift;
         return Mojo::Transaction::HTTP->new;
     });
 
 Transaction builder callback.
 
-=head2 C<handler_cb>
+=head2 C<on_handler>
 
-    my $handler = $server->handler_cb;
-    $server     = $server->handler_cb(sub {
+    my $handler = $server->on_handler;
+    $server     = $server->on_handler(sub {
         my ($self, $tx) = @_;
     });
 
 Handler callback.
+
+=head2 C<on_websocket_handshake>
+
+    my $handshake = $server->on_websocket_handshake;
+    $server       = $server->on_websocket_handshake(sub {
+        my ($self, $tx) = @_;
+    });
+
+WebSocket handshake callback.
 
 =head2 C<reload>
 
@@ -148,15 +162,6 @@ Handler callback.
     $server    = $server->reload(1);
 
 Activate automatic reloading.
-
-=head2 C<websocket_handshake_cb>
-
-    my $handshake = $server->websocket_handshake_cb;
-    $server       = $server->websocket_handshake_cb(sub {
-        my ($self, $tx) = @_;
-    });
-
-WebSocket handshake callback.
 
 =head1 METHODS
 

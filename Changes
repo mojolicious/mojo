@@ -5,6 +5,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Deprecated old Mojo::Template block syntax and added a very pretty
           replacement. (See documentation for more)
         - Deprecated helper method in Mojolicious::Controller.
+        - Deprecated all *_cb methods in favor of on_* methods.
         - Replaced Mojo::Server::Daemon::Prefork with the much more advanced
           and for production environments optimized Mojo::Server::Hypnotoad.
           See the new hypnotoad script and updated

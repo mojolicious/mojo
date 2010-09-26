@@ -10,11 +10,14 @@ use Carp 'croak';
 __PACKAGE__->attr([qw/connection kept_alive local_address local_port/]);
 __PACKAGE__->attr([qw/previous remote_port/]);
 __PACKAGE__->attr(
-    [qw/finished resume_cb/] => sub {
+    [qw/finished on_resume/] => sub {
         sub {1}
     }
 );
 __PACKAGE__->attr(keep_alive => 0);
+
+# DEPRECATED in Comet!
+*resume_cb = \&on_resume;
 
 # Please don't eat me! I have a wife and kids. Eat them!
 sub client_read  { croak 'Method "client_read" not implemented by subclass' }
@@ -96,7 +99,7 @@ sub resume {
     elsif (!$self->is_writing) { $self->{_state} = 'write' }
 
     # Callback
-    $self->resume_cb->($self);
+    $self->on_resume->($self);
 
     return $self;
 }
@@ -184,6 +187,13 @@ Local interface address.
 
 Local interface port.
 
+=head2 C<on_resume>
+
+    my $cb = $tx->on_resume;
+    $tx    = $tx->on_resume(sub {...});
+
+Callback to be invoked whenever the transaction is resumed.
+
 =head2 C<previous>
 
     my $previous = $tx->previous;
@@ -204,13 +214,6 @@ Remote interface address.
     $tx             = $tx->remote_port($port);
 
 Remote interface port.
-
-=head2 C<resume_cb>
-
-    my $cb = $tx->resume_cb;
-    $tx    = $tx->resume_cb(sub {...});
-
-Callback to be invoked whenever the transaction is resumed.
 
 =head1 METHODS
 

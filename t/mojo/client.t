@@ -33,12 +33,12 @@ my $buffer = {};
 my $last;
 my $id = $client->ioloop->listen(
     port      => $port,
-    accept_cb => sub {
+    on_accept => sub {
         my ($loop, $id) = @_;
         $last = $id;
         $buffer->{$id} = '';
     },
-    read_cb => sub {
+    on_read => sub {
         my ($loop, $id, $chunk) = @_;
         $buffer->{$id} .= $chunk;
         if (index $buffer->{$id}, "\x0d\x0a\x0d\x0a") {
@@ -48,7 +48,7 @@ my $id = $client->ioloop->listen(
                   . "Content-Length: 6\x0d\x0a\x0d\x0aworks!");
         }
     },
-    error_cb => sub {
+    on_error => sub {
         my ($self, $id) = @_;
         delete $buffer->{$id};
     }

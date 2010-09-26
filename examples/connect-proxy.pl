@@ -20,7 +20,7 @@ my $c = {};
 # Minimal connect proxy server to test TLS tunneling
 $loop->listen(
     port    => 3000,
-    read_cb => sub {
+    on_read => sub {
         my ($loop, $client, $chunk) = @_;
         if (my $server = $c->{$client}->{connection}) {
             return $loop->write($server, $chunk);
@@ -35,7 +35,7 @@ $loop->listen(
                 my $server  = $loop->connect(
                     address    => $address,
                     port       => $port,
-                    connect_cb => sub {
+                    on_connect => sub {
                         my ($loop, $server) = @_;
                         print "Forwarding to $address:$port.\n";
                         $c->{$client}->{connection} = $server;
@@ -43,11 +43,11 @@ $loop->listen(
                                 "HTTP/1.1 200 OK\x0d\x0a"
                               . "Connection: keep-alive\x0d\x0a\x0d\x0a");
                     },
-                    read_cb => sub {
+                    on_read => sub {
                         my ($loop, $server, $chunk) = @_;
                         $loop->write($client, $chunk);
                     },
-                    error_cb => sub {
+                    on_error => sub {
                         shift->drop($client);
                         delete $c->{$client};
                     }
@@ -56,7 +56,7 @@ $loop->listen(
             else { $loop->drop($client) }
         }
     },
-    error_cb => sub {
+    on_error => sub {
         my ($self, $client) = @_;
         shift->drop($c->{$client}->{connection})
           if $c->{$client}->{connection};

@@ -14,7 +14,7 @@ __PACKAGE__->attr(nph => 0);
 sub run {
     my $self = shift;
 
-    my $tx  = $self->build_tx_cb->($self);
+    my $tx  = $self->on_build_tx->($self);
     my $req = $tx->req;
 
     # Environment
@@ -32,7 +32,7 @@ sub run {
     }
 
     # Handle
-    $self->handler_cb->($self, $tx);
+    $self->on_handler->($self, $tx);
 
     my $res = $tx->res;
 

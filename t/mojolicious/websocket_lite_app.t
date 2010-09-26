@@ -240,7 +240,7 @@ $client->async->websocket(
                 my ($self, $message) = @_;
                 $result .= $message;
                 $self->finish and $running-- if $message eq 'test1';
-                $self->ioloop->idle_cb(sub { shift->stop }) unless $running;
+                $self->ioloop->on_idle(sub { shift->stop }) unless $running;
             }
         );
         $self->finished(sub { $finished += 1 });
@@ -256,7 +256,7 @@ $client->async->websocket(
                 my ($self, $message) = @_;
                 $result2 .= $message;
                 $self->finish and $running-- if $message eq 'test1';
-                $self->ioloop->idle_cb(sub { shift->stop }) unless $running;
+                $self->ioloop->on_idle(sub { shift->stop }) unless $running;
             }
         );
         $self->finished(sub { $finished += 2 });

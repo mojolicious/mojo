@@ -71,7 +71,7 @@ my $nf = "HTTP/1.1 404 NOT FOUND\x0d\x0aConnection: close\x0d\x0a\x0d\x0a";
 my $ok = "HTTP/1.1 200 OK\x0d\x0aConnection: keep-alive\x0d\x0a\x0d\x0a";
 $loop->listen(
     port    => $proxy,
-    read_cb => sub {
+    on_read => sub {
         my ($loop, $client, $chunk) = @_;
         if (my $server = $c->{$client}->{connection}) {
             return $loop->write($server, $chunk);
@@ -86,16 +86,16 @@ $loop->listen(
                 my $server = $loop->connect(
                     address    => $1,
                     port       => $fail ? $port : $2,
-                    connect_cb => sub {
+                    on_connect => sub {
                         my ($loop, $server) = @_;
                         $c->{$client}->{connection} = $server;
                         $loop->write($client, $fail ? $nf : $ok);
                     },
-                    error_cb => sub {
+                    on_error => sub {
                         shift->drop($client);
                         delete $c->{$client};
                     },
-                    read_cb => sub {
+                    on_read => sub {
                         my ($loop, $server, $chunk) = @_;
                         $read += length $chunk;
                         $sent += length $chunk;
@@ -106,7 +106,7 @@ $loop->listen(
             else { $loop->drop($client) }
         }
     },
-    error_cb => sub {
+    on_error => sub {
         my ($self, $client) = @_;
         shift->drop($c->{$client}->{connection})
           if $c->{$client}->{connection};

@@ -240,7 +240,7 @@ sub _prepare_lock_file {
 
     # Lock callback
     my $loop = $self->ioloop;
-    $loop->lock_cb(
+    $loop->on_lock(
         sub {
             my $blocking = $_[1];
 
@@ -259,7 +259,7 @@ sub _prepare_lock_file {
     );
 
     # Unlock callback
-    $loop->unlock_cb(sub { flock($self->{_lock}, LOCK_UN) });
+    $loop->on_unlock(sub { flock($self->{_lock}, LOCK_UN) });
 }
 
 sub _read_messages {

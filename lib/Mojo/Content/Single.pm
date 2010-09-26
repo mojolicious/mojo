@@ -23,7 +23,7 @@ sub body_contains {
 
 sub body_size {
     my $self = shift;
-    return ($self->headers->content_length || 0) if $self->read_cb;
+    return ($self->headers->content_length || 0) if $self->on_read;
     return $self->asset->size;
 }
 
@@ -31,7 +31,7 @@ sub get_body_chunk {
     my ($self, $offset) = @_;
 
     # Body generator
-    return $self->generate_body_chunk($offset) if $self->read_cb;
+    return $self->generate_body_chunk($offset) if $self->on_read;
 
     # Normal content
     return $self->asset->get_chunk($offset);
@@ -44,7 +44,7 @@ sub parse {
     $self->SUPER::parse(@_);
 
     # Still parsing headers or using a custom body parser
-    return $self if ($self->{_state} || '') eq 'headers' || $self->read_cb;
+    return $self if ($self->{_state} || '') eq 'headers' || $self->on_read;
 
     # Headers
     my $headers = $self->headers;

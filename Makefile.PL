@@ -42,7 +42,7 @@ WriteMakefile(
         )
     ),
 
-    EXE_FILES => ['script/mojo', 'script/mojolicious'],
+    EXE_FILES => ['script/mojo'],
     PREREQ_PM => {
         'Carp'                  => 0,
         'Cwd'                   => 0,

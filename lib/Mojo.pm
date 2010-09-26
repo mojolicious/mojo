@@ -13,22 +13,26 @@ use Mojo::Log;
 use Mojo::Transaction::HTTP;
 use Mojo::Transaction::WebSocket;
 
-__PACKAGE__->attr(
-    build_tx_cb => sub {
-        sub { return Mojo::Transaction::HTTP->new }
-    }
-);
 __PACKAGE__->attr(client => sub { Mojo::Client->singleton });
 __PACKAGE__->attr(home   => sub { Mojo::Home->new });
 __PACKAGE__->attr(log    => sub { Mojo::Log->new });
 __PACKAGE__->attr(
-    websocket_handshake_cb => sub {
+    on_build_tx => sub {
+        sub { return Mojo::Transaction::HTTP->new }
+    }
+);
+__PACKAGE__->attr(
+    on_websocket_handshake => sub {
         sub {
             return Mojo::Transaction::WebSocket->new(handshake => pop)
               ->server_handshake;
           }
     }
 );
+
+# DEPRECATED in Comet!
+*build_tx_cb            = \&on_build_tx;
+*websocket_handshake_cb = \&on_websocket_handshake;
 
 # Oh, so they have internet on computers now!
 sub new {
@@ -103,14 +107,6 @@ See L<Mojolicious> for more!
 
 L<Mojo> implements the following attributes.
 
-=head2 C<build_tx_cb>
-
-    my $cb = $app->build_tx_cb;
-    $app   = $app->build_tx_cb(sub { ... });
-
-The transaction builder callback, by default it builds a
-L<Mojo::Transaction::HTTP> object.
-
 =head2 C<client>
 
     my $client = $app->client;
@@ -134,10 +130,18 @@ which stringifies to the actual path.
     
 The logging layer of your application, by default a L<Mojo::Log> object.
 
-=head2 C<websocket_handshake_cb>
+=head2 C<on_build_tx>
 
-    my $cb = $app->websocket_handshake_cb;
-    $app   = $app->websocket_handshake_cb(sub { ... });
+    my $cb = $app->on_build_tx;
+    $app   = $app->on_build_tx(sub { ... });
+
+The transaction builder callback, by default it builds a
+L<Mojo::Transaction::HTTP> object.
+
+=head2 C<on_websocket_handshake>
+
+    my $cb = $app->on_websocket_handshake;
+    $app   = $app->on_websocket_handshake(sub { ... });
 
 The websocket handshake callback, by default it builds a
 L<Mojo::Transaction::WebSocket> object and handles the response for the

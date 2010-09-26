@@ -15,7 +15,7 @@ my $loop = Mojo::IOLoop->new;
 
 # Ticks
 my $ticks = 0;
-$loop->tick_cb(sub { $ticks++ });
+$loop->on_tick(sub { $ticks++ });
 
 # Timer
 my $flag = 0;
@@ -48,7 +48,7 @@ is($hiresflag, 42, 'hires timer');
 
 # Idle callback
 my $idle = 0;
-$loop->idle_cb(sub { $idle++ });
+$loop->on_idle(sub { $idle++ });
 
 # Another tick
 $loop->one_tick;
@@ -57,4 +57,4 @@ $loop->one_tick;
 ok($ticks > 2, 'more than two ticks');
 
 # Idle callback
-is($idle, 1, 'idle_cb was called');
+is($idle, 1, 'on_idle was called');

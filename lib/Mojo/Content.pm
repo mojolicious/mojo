@@ -11,10 +11,13 @@ use Mojo::Headers;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 262144;
 
-__PACKAGE__->attr('read_cb');
 __PACKAGE__->attr([qw/buffer chunked_buffer/] => sub { b() });
 __PACKAGE__->attr(headers                     => sub { Mojo::Headers->new });
-__PACKAGE__->attr(relaxed                     => 0);
+__PACKAGE__->attr('on_read');
+__PACKAGE__->attr(relaxed => 0);
+
+# DEPRECATED in Comet!
+*read_cb = \&on_read;
 
 sub body_contains {
     croak 'Method "body_contains" not implemented by subclass';
@@ -176,7 +179,7 @@ sub parse {
     else { $self->buffer($buffer) }
 
     # Custom body parser
-    if (my $cb = $self->read_cb) {
+    if (my $cb = $self->on_read) {
 
         # Chunked or relaxed content
         if ($self->is_chunked || $self->relaxed) {
@@ -251,7 +254,7 @@ sub write {
     my ($self, $chunk, $cb) = @_;
 
     # Dynamic content
-    $self->read_cb(sub { });
+    $self->on_read(sub { });
 
     # Buffer
     $self->buffer->add_chunk($chunk);
@@ -443,14 +446,14 @@ Parser buffer for chunked transfer encoding.
 
 The headers.
 
-=head2 C<read_cb>
+=head2 C<on_read>
 
-    my $cb   = $content->read_cb;
-    $content = $content->read_cb(sub {...});
+    my $cb   = $content->on_read;
+    $content = $content->on_read(sub {...});
 
 Content parser callback.
 
-    $content = $content->read_cb(sub {
+    $content = $content->on_read(sub {
         my ($self, $chunk) = @_;
         print $chunk;
     });

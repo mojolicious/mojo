@@ -159,7 +159,7 @@ is($req->headers->content_length, 27, 'right "Content-Length" value');
 # Parse full HTTP 1.0 request with zero chunk
 $req = Mojo::Message::Request->new;
 my $finished;
-$req->finish_cb(sub { $finished = shift->is_done });
+$req->on_finish(sub { $finished = shift->is_done });
 $req->parse('GET /foo/bar/baz.html?fo');
 $req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
 $req->parse('-Type: text/');
@@ -228,7 +228,7 @@ is($req->content->asset->slurp, 'abcdabcdefghi', 'right content');
 # Parse HTTP 1.1 chunked request with callback
 $req = Mojo::Message::Request->new;
 my $buffer = '';
-$req->read_cb(sub { $buffer .= pop });
+$req->on_read(sub { $buffer .= pop });
 $req->parse("POST /foo/bar/baz.html?foo=13#23 HTTP/1.1\x0d\x0a");
 $req->parse("Content-Type: text/plain\x0d\x0a");
 $req->parse("Transfer-Encoding: chunked\x0d\x0a\x0d\x0a");
@@ -512,7 +512,7 @@ is($req->headers->host,   '127.0.0.1',                'right "Host" value');
 # Build full HTTP 1.1 request
 $req      = Mojo::Message::Request->new;
 $finished = undef;
-$req->finish_cb(sub { $finished = shift->is_done });
+$req->on_finish(sub { $finished = shift->is_done });
 $req->method('get');
 $req->url->parse('http://127.0.0.1/foo/bar');
 $req->headers->expect('100-continue');
@@ -534,7 +534,7 @@ ok($req->is_done, 'request is done');
 # Build HTTP 1.1 request body
 $req      = Mojo::Message::Request->new;
 $finished = undef;
-$req->finish_cb(sub { $finished = shift->is_done });
+$req->on_finish(sub { $finished = shift->is_done });
 $req->method('get');
 $req->url->parse('http://127.0.0.1/foo/bar');
 $req->headers->expect('100-continue');
@@ -698,7 +698,7 @@ $req->method('GET');
 $req->url->parse('http://127.0.0.1:8080/foo/bar');
 $req->headers->transfer_encoding('chunked');
 my $counter2 = 0;
-$req->progress_cb(sub { $counter2++ });
+$req->on_progress(sub { $counter2++ });
 $req->write_chunk(
     'hello world!' => sub {
         shift->write_chunk(
@@ -1720,7 +1720,7 @@ is($req2->body,                  "Hello World!\n", 'right content');
 # Parse full HTTP 1.0 request with cookies
 $req = Mojo::Message::Request->new;
 my $counter = 0;
-$req->progress_cb(sub { $counter++ });
+$req->on_progress(sub { $counter++ });
 $req->parse('GET /foo/bar/baz.html?fo');
 $req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
 $req->parse('-Type: text/');
@@ -2016,7 +2016,7 @@ $req->body(sub { });
 is(ref $req->body, 'CODE', 'body is callback');
 $req->body('hello!');
 is($req->body,    'hello!', 'right content');
-is($req->read_cb, undef,    'no read callback');
+is($req->on_read, undef,    'no read callback');
 $req->content(Mojo::Content::MultiPart->new);
 $req->body('hi!');
 is($req->body, 'hi!', 'right content');

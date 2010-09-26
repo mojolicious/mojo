@@ -98,18 +98,27 @@ AnqxHi90n/p912ynLg2SjBq+03GaECeGzC/QqKK2gtA=
 -----END RSA PRIVATE KEY-----
 EOF
 
+__PACKAGE__->attr([qw/accept_timeout connect_timeout/] => 5);
+__PACKAGE__->attr(max_connections                      => 1000);
+__PACKAGE__->attr([qw/on_idle on_tick/]);
 __PACKAGE__->attr(
-    [qw/lock_cb unlock_cb/] => sub {
+    [qw/on_lock on_unlock/] => sub {
         sub {1}
     }
 );
-__PACKAGE__->attr([qw/idle_cb tick_cb/]);
-__PACKAGE__->attr([qw/accept_timeout connect_timeout/] => 5);
-__PACKAGE__->attr(max_connections                      => 1000);
-__PACKAGE__->attr(timeout                              => '0.25');
+__PACKAGE__->attr(timeout => '0.25');
 
 # Singleton
 our $LOOP;
+
+# DEPRECATED in Comet!
+*error_cb  = \&on_error;
+*hup_cb    = \&on_hup;
+*idle_cb   = \&on_idle;
+*lock_cb   = \&on_lock;
+*read_cb   = \&on_read;
+*tick_cb   = \&on_tick;
+*unlock_cb = \&on_unlock;
 
 sub DESTROY {
     my $self = shift;
@@ -165,7 +174,9 @@ sub connect {
     # Add connection
     my $c = $self->{_cs}->{$id} = {
         buffer     => b(),
-        connect_cb => $args->{connect_cb} || $args->{cb},
+        on_connect => $args->{on_connect}
+          || $args->{connect_cb}
+          || $args->{cb},
         connecting => 1,
         socket     => $socket
     };
@@ -182,9 +193,10 @@ sub connect {
           sub { shift->_error($id, 'Connect timeout.') });
 
     # Register callbacks
-    for my $name (qw/error_cb hup_cb read_cb/) {
-        my $cb = $args->{$name};
-        $self->$name($id => $cb) if $cb;
+    for my $name (qw/error hup read/) {
+        my $cb = $args->{"on_$name"} || $args->{"${name}_cb"};
+        my $event = "on_$name";
+        $self->$event($id => $cb) if $cb;
     }
 
     # Add socket to poll
@@ -218,8 +230,6 @@ sub drop {
     return $self->_drop_immediately($id);
 }
 
-sub error_cb { shift->_add_event('error', @_) }
-
 sub generate_port {
     my $self = shift;
 
@@ -240,8 +250,6 @@ sub generate_port {
     # Nothing
     return;
 }
-
-sub hup_cb { shift->_add_event('hup', @_) }
 
 sub is_running { shift->{_running} }
 
@@ -319,12 +327,12 @@ sub listen {
 
     # Add listen socket
     my $c = $self->{_listen}->{$id} = {
-        accept_cb => $args->{accept_cb} || $args->{cb},
-        error_cb => $args->{error_cb},
         file => $args->{file} ? 1 : 0,
-        hup_cb  => $args->{hup_cb},
-        read_cb => $args->{read_cb},
-        socket  => $socket
+        on_accept => $args->{on_accept} || $args->{accept_cb} || $args->{cb},
+        on_error  => $args->{on_error}  || $args->{error_cb},
+        on_hup    => $args->{on_hup}    || $args->{hup_cb},
+        on_read   => $args->{on_read}   || $args->{read_cb},
+        socket    => $socket
     };
 
     # TLS options
@@ -353,6 +361,10 @@ sub local_info {
     # Info
     return {address => $socket->sockhost, port => $socket->sockport};
 }
+
+sub on_error { shift->_add_event('error', @_) }
+sub on_hup   { shift->_add_event('hup',   @_) }
+sub on_read  { shift->_add_event('read',  @_) }
 
 sub one_tick {
     my ($self, $timeout) = @_;
@@ -452,18 +464,16 @@ sub one_tick {
     my $timers = $self->_timer;
 
     # Tick callback
-    if (my $cb = $self->tick_cb) {
+    if (my $cb = $self->on_tick) {
         $self->_run_callback('tick', $cb);
     }
 
     # Idle callback
-    if (my $cb = $self->idle_cb) {
+    if (my $cb = $self->on_idle) {
         $self->_run_callback('idle', $cb)
           unless @read || @write || @error || @hup || $timers;
     }
 }
-
-sub read_cb { shift->_add_event('read', @_) }
 
 sub remote_info {
     my ($self, $id) = @_;
@@ -617,7 +627,7 @@ sub _accept {
     my $socket = $listen->accept or return;
 
     # Unlock
-    $self->unlock_cb->($self);
+    $self->on_unlock->($self);
 
     # Listen
     my $l = $self->{_listen}->{$listen};
@@ -654,13 +664,13 @@ sub _accept {
     $self->{_fds}->{$fd} = $id;
 
     # Register callbacks
-    for my $name (qw/error_cb hup_cb read_cb/) {
+    for my $name (qw/on_error on_hup on_read/) {
         my $cb = $l->{$name};
         $self->$name($id => $cb) if $cb;
     }
 
     # Accept callback
-    my $cb = $l->{accept_cb};
+    my $cb = $l->{on_accept};
     $self->_run_event('accept', $cb, $id) if $cb;
 
     # Remove listen sockets
@@ -892,7 +902,7 @@ sub _prepare_connect {
     $self->_drop_immediately(delete $c->{connect_timer});
 
     # Connect callback
-    my $cb = $c->{connect_cb};
+    my $cb = $c->{on_connect};
     $self->_run_event('connect', $cb, $id) if $cb;
 }
 
@@ -971,7 +981,7 @@ sub _prepare_listen {
     return unless $i < $self->max_connections;
 
     # Lock
-    return unless $self->lock_cb->($self, !$i);
+    return unless $self->on_lock->($self, !$i);
 
     # Add listen sockets
     for my $lid (keys %$listen) {
@@ -1281,7 +1291,7 @@ Mojo::IOLoop - Minimalistic Reactor For TCP Clients And Servers
     # Listen on port 3000
     $loop->listen(
         port => 3000,
-        read_cb => sub {
+        on_read => sub {
             my ($self, $id, $chunk) = @_;
 
             # Process input
@@ -1297,13 +1307,13 @@ Mojo::IOLoop - Minimalistic Reactor For TCP Clients And Servers
         address => 'localhost',
         port => 3000,
         tls => 1,
-        connect_cb => sub {
+        on_connect => sub {
             my ($self, $id) = @_;
 
             # Write request
             $self->write($id, "GET / HTTP/1.1\r\n\r\n");
         },
-        read_cb => sub {
+        on_read => sub {
             my ($self, $id, $chunk) = @_;
 
             # Process input
@@ -1353,31 +1363,6 @@ dropped, defaults to C<5>.
 Maximum time in seconds a conenction can take to be connected before being
 dropped, defaults to C<5>.
 
-=head2 C<idle_cb>
-
-    my $cb = $loop->idle_cb;
-    $loop  = $loop->idle_cb(sub {...});
-
-Callback to be invoked on every reactor tick if no events occurred.
-Note that this attribute is EXPERIMENTAL and might change without warning!
-
-=head2 C<lock_cb>
-
-    my $cb = $loop->lock_cb;
-    $loop  = $loop->lock_cb(sub {...});
-
-A locking callback that decides if this loop is allowed to accept new
-incoming connections, used to sync multiple server processes.
-The callback should return true or false.
-Note that exceptions in this callback are not captured.
-
-    $loop->lock_cb(sub {
-        my ($loop, $blocking) = @_;
-
-        # Got the lock, listen for new connections
-        return 1;
-    });
-
 =head2 C<max_connections>
 
     my $max = $loop->max_connections;
@@ -1389,19 +1374,52 @@ Setting the value to C<0> will make this loop stop accepting new connections
 and allow it to shutdown gracefully without interrupting existing
 connections.
 
-=head2 C<tick_cb>
+=head2 C<on_idle>
 
-    my $cb = $loop->tick_cb;
-    $loop  = $loop->tick_cb(sub {...});
+    my $cb = $loop->on_idle;
+    $loop  = $loop->on_idle(sub {...});
+
+Callback to be invoked on every reactor tick if no events occurred.
+Note that this attribute is EXPERIMENTAL and might change without warning!
+
+=head2 C<on_lock>
+
+    my $cb = $loop->on_lock;
+    $loop  = $loop->on_lock(sub {...});
+
+A locking callback that decides if this loop is allowed to accept new
+incoming connections, used to sync multiple server processes.
+The callback should return true or false.
+Note that exceptions in this callback are not captured.
+
+    $loop->on_lock(sub {
+        my ($loop, $blocking) = @_;
+
+        # Got the lock, listen for new connections
+        return 1;
+    });
+
+=head2 C<on_tick>
+
+    my $cb = $loop->on_tick;
+    $loop  = $loop->on_tick(sub {...});
 
 Callback to be invoked on every reactor tick, this for example allows you to
 run multiple reactors next to each other.
 
     my $loop2 = Mojo::IOLoop->new(timeout => 0);
-    Mojo::IOLoop->singleton->tick_cb(sub { $loop2->one_tick });
+    Mojo::IOLoop->singleton->on_tick(sub { $loop2->one_tick });
 
 Note that the loop timeout can be changed dynamically at any time to adjust
 responsiveness.
+
+=head2 C<on_unlock>
+
+    my $cb = $loop->on_unlock;
+    $loop  = $loop->on_unlock(sub {...});
+
+A callback to free the accept lock, used to sync multiple server processes.
+Note that exceptions in this callback are not captured.
 
 =head2 C<timeout>
 
@@ -1411,14 +1429,6 @@ responsiveness.
 Maximum time in seconds our loop waits for new events to happen, defaults to
 C<0.25>.
 Note that a value of C<0> would make the loop non blocking.
-
-=head2 C<unlock_cb>
-
-    my $cb = $loop->unlock_cb;
-    $loop  = $loop->unlock_cb(sub {...});
-
-A callback to free the accept lock, used to sync multiple server processes.
-Note that exceptions in this callback are not captured.
 
 =head1 METHODS
 
@@ -1458,25 +1468,25 @@ These options are currently available.
 
 Address or host name of the peer to connect to.
 
-=item C<connect_cb>
+=item C<on_connect>
 
 Callback to be invoked once the connection is established.
 
-=item C<error_cb>
+=item C<on_error>
 
 Callback to be invoked if an error event happens on the connection.
 
-=item C<hup_cb>
+=item C<on_hup>
 
 Callback to be invoked if the connection gets closed.
+
+=item C<on_read>
+
+Callback to be invoked if new data arrives on the connection.
 
 =item C<port>
 
 Port to connect to.
-
-=item C<read_cb>
-
-Callback to be invoked if new data arrives on the connection.
 
 =item C<socket>
 
@@ -1504,23 +1514,11 @@ Drop a connection, listen socket or timer.
 Connections will be dropped gracefully by allowing them to finish writing all
 data in it's write buffer.
 
-=head2 C<error_cb>
-
-    $loop = $loop->error_cb($id => sub {...});
-
-Callback to be invoked if an error event happens on the connection.
-
 =head2 C<generate_port>
 
     my $port = $loop->generate_port;
 
 Find a free TCP port, this is a utility function primarily used for tests.
-
-=head2 C<hup_cb>
-
-    $loop = $loop->hup_cb($id => sub {...});
-
-Callback to be invoked if the connection gets closed.
 
 =head2 C<is_running>
 
@@ -1554,21 +1552,25 @@ These options are currently available.
 
 Local address to listen on, defaults to all.
 
-=item C<accept_cb>
-
-Callback to invoke for each accepted connection.
-
-=item C<error_cb>
-
-Callback to be invoked if an error event happens on the connection.
-
 =item C<file>
 
 A unix domain socket to listen on.
 
-=item C<hup_cb>
+=item C<on_accept>
+
+Callback to invoke for each accepted connection.
+
+=item C<on_error>
+
+Callback to be invoked if an error event happens on the connection.
+
+=item C<on_hup>
 
 Callback to be invoked if the connection gets closed.
+
+=item C<on_read>
+
+Callback to be invoked if new data arrives on the connection.
 
 =item C<port>
 
@@ -1577,10 +1579,6 @@ Port to listen on.
 =item C<queue_size>
 
 Maximum queue size, defaults to C<SOMAXCONN>.
-
-=item C<read_cb>
-
-Callback to be invoked if new data arrives on the connection.
 
 =item C<tls>
 
@@ -1618,6 +1616,30 @@ The local port.
 
 =back
 
+=head2 C<on_error>
+
+    $loop = $loop->on_error($id => sub {...});
+
+Callback to be invoked if an error event happens on the connection.
+
+=head2 C<on_hup>
+
+    $loop = $loop->on_hup($id => sub {...});
+
+Callback to be invoked if the connection gets closed.
+
+=head2 C<on_read>
+
+    $loop = $loop->on_read($id => sub {...});
+
+Callback to be invoked if new data arrives on the connection.
+
+    $loop->on_read($id => sub {
+        my ($loop, $id, $chunk) = @_;
+
+        # Process chunk
+    });
+
 =head2 C<one_tick>
 
     $loop->one_tick;
@@ -1625,18 +1647,6 @@ The local port.
     $loop->one_tick(0);
 
 Run reactor for exactly one tick.
-
-=head2 C<read_cb>
-
-    $loop = $loop->read_cb($id => sub {...});
-
-Callback to be invoked if new data arrives on the connection.
-
-    $loop->read_cb($id => sub {
-        my ($loop, $id, $chunk) = @_;
-
-        # Process chunk
-    });
 
 =head2 C<remote_info>
 

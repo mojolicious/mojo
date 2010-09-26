@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 168;
+use Test::More tests => 174;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -437,3 +437,26 @@ is($dom->at('br')->inner_xml, '', 'empty result');
 $dom->parse('<a>xxx<x>x</x>xxx</a>');
 is($dom->at('a')->inner_xml, 'xxx<x>x</x>xxx',        'right result');
 is($dom->inner_xml,          '<a>xxx<x>x</x>xxx</a>', 'right result');
+
+# Multiple selectors
+$dom->parse('<div id="a">A</div><div id="b">B</div><div id="c">C</div>');
+@div = ();
+$dom->find('#a, #c')->each(sub { push @div, shift->text });
+is_deeply(\@div, [qw/A C/], 'found all div elements with the right ids');
+@div = ();
+$dom->find('div#a, div#b')->each(sub { push @div, shift->text });
+is_deeply(\@div, [qw/A B/], 'found all div elements with the right ids');
+@div = ();
+$dom->find('div[id="a"], div[id="c"]')->each(sub { push @div, shift->text });
+is_deeply(\@div, [qw/A C/], 'found all div elements with the right ids');
+$dom->parse('<div id="☃">A</div><div id="b">B</div><div id="♥x">C</div>');
+@div = ();
+$dom->find('#☃, #♥x')->each(sub { push @div, shift->text });
+is_deeply(\@div, [qw/A C/], 'found all div elements with the right ids');
+@div = ();
+$dom->find('div#☃, div#b')->each(sub { push @div, shift->text });
+is_deeply(\@div, [qw/A B/], 'found all div elements with the right ids');
+@div = ();
+$dom->find('div[id="☃"], div[id="♥x"]')
+  ->each(sub { push @div, shift->text });
+is_deeply(\@div, [qw/A C/], 'found all div elements with the right ids');

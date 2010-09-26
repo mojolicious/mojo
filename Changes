@@ -30,6 +30,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added b function to all Mojo::Template templates.
         - Added selector support to the dom method of Mojo::Message. (marcus)
         - Added failed request warnings to ojo. (marcus)
+        - Added support for selector groups to Mojo::DOM.
         - Simplified transaction pausing by replacing it with an automatism.
         - Improved RFC3986 compliance of Mojo::Path. (janus)
         - Improved Mojo::Server::PSGI to preload applications.

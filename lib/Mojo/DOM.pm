@@ -32,7 +32,7 @@ my $CSS_ID_RE           = qr/\#((?:\\\#|[^\#])+)/;
 my $CSS_PSEUDO_CLASS_RE = qr/(?:\:(\w+)(?:\(([^\)]+)\))?)/;
 my $CSS_TOKEN_RE        = qr/
     (\s*,\s*)?                                                   # Separator
-    ((?:[^\[\\\:\s]|$CSS_ESCAPE_RE\s?)+)?                        # Element
+    ((?:[^\[\\\:\s\,]|$CSS_ESCAPE_RE\s?)+)?                      # Element
     ((?:\:\w+(?:\([^\)]+\))?)*)?                                 # Pseudoclass
     ((?:\[(?:$CSS_ESCAPE_RE|\w)+(?:\W?="(?:\\"|[^"])+")?\])*)?   # Attributes
     (?:
@@ -487,60 +487,56 @@ sub _end {
 }
 
 sub _match {
-    my ($self, $candidate, $pattern) = @_;
+    my ($self, $candidate, $selectors) = @_;
 
-    # Parts
+    # Selectors
+    my @selectors = reverse @$selectors;
+
+    # Match
     my $first = 2;
-    for my $part (@$pattern) {
+    my ($current, $marker, $snapback);
+    my $parentonly = 0;
+    for (my $i = 0; $i <= $#selectors; $i++) {
+        my $selector = $selectors[$i];
 
-        # Selectors
-        my @selectors = reverse @$part;
+        # Combinator
+        $parentonly-- if $parentonly > 0;
+        if ($selector->[0] eq 'combinator') {
 
-        # Match
-        my ($current, $marker, $snapback);
-        my $parentonly = 0;
-        for (my $i = 0; $i <= $#selectors; $i++) {
-            my $selector = $selectors[$i];
-
-            # Combinator
-            $parentonly-- if $parentonly > 0;
-            if ($selector->[0] eq 'combinator') {
-
-                # Parent only ">"
-                if ($selector->[1] eq '>') {
-                    $parentonly += 2;
-                    $marker   = $i - 1   unless defined $marker;
-                    $snapback = $current unless $snapback;
-                }
-
-                # Move on
-                next;
+            # Parent only ">"
+            if ($selector->[1] eq '>') {
+                $parentonly += 2;
+                $marker   = $i - 1   unless defined $marker;
+                $snapback = $current unless $snapback;
             }
 
-            while (1) {
-                $first-- if $first != 0;
+            # Move on
+            next;
+        }
 
-                # Next parent
-                return
-                  unless $current = $current ? $current->[3] : $candidate;
+        while (1) {
+            $first-- if $first != 0;
 
-                # Root
-                return if $current->[0] ne 'tag';
+            # Next parent
+            return
+              unless $current = $current ? $current->[3] : $candidate;
 
-                # Compare part to element
-                last if $self->_compare($selector, $current);
+            # Root
+            return if $current->[0] ne 'tag';
 
-                # First selector needs to match
-                return if $first;
+            # Compare part to element
+            last if $self->_compare($selector, $current);
 
-                # Parent only
-                if ($parentonly) {
-                    $i        = $marker - 1;
-                    $current  = $snapback;
-                    $snapback = undef;
-                    $marker   = undef;
-                    last;
-                }
+            # First selector needs to match
+            return if $first;
+
+            # Parent only
+            if ($parentonly) {
+                $i        = $marker - 1;
+                $current  = $snapback;
+                $snapback = undef;
+                $marker   = undef;
+                last;
             }
         }
     }
@@ -826,8 +822,13 @@ sub _select {
             # Fill queue
             unshift @queue, @$current[4 .. $#$current];
 
-            # Match
-            push @results, $current if $self->_match($current, $pattern);
+            # Parts
+            for my $part (@$pattern) {
+
+                # Match
+                push(@results, $current) and last
+                  if $self->_match($current, $part);
+            }
         }
     }
 
@@ -922,7 +923,7 @@ L<Mojo::DOM> is a minimalistic and very relaxed XML DOM parser with support
 for CSS3 selectors.
 Note that this module is EXPERIMENTAL and might change without warning!
 
-=head2 SELECTORS
+=head2 Selectors
 
 These CSS3 selectors are currently implemented.
 
@@ -983,6 +984,14 @@ An C<F> element descendant of an C<E> element.
 An C<F> element child of an C<E> element.
 
 =back
+
+=head2 Groups Of Selectors
+
+A comma-separated list of selectors represents the union of all elements
+selected by each of the individual selectors in the list.
+
+    # Print all headlines
+    $dom->find('h1, h2, h3')->each(sub { print shift->text });
 
 =head1 ATTRIBUTES
 

@@ -9,62 +9,62 @@ use Test::More tests => 176;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
-use_ok('Mojo::DOM');
+use_ok 'Mojo::DOM';
 
 my $dom = Mojo::DOM->new;
 
 # Simple (basics)
 $dom->parse('<div><div id="a">A</div><div id="b">B</div></div>');
-is($dom->at('#b')->text, 'B', 'right text');
+is $dom->at('#b')->text, 'B', 'right text';
 my @div;
 $dom->find('div[id]')->each(sub { push @div, shift->text });
-is_deeply(\@div, [qw/A B/], 'found all div elements with id');
+is_deeply \@div, [qw/A B/], 'found all div elements with id';
 @div = ();
 $dom->find('div[id]')->each(sub { push @div, $_->text });
-is_deeply(\@div, [qw/A B/], 'found all div elements with id');
+is_deeply \@div, [qw/A B/], 'found all div elements with id';
 @div = ();
 $dom->find('div[id]')->until(sub { push @div, shift->text; @div == 1 });
-is_deeply(\@div, [qw/A/], 'found first div elements with id');
+is_deeply \@div, [qw/A/], 'found first div elements with id';
 @div = ();
 $dom->find('div[id]')->until(sub { pop == 1 && push @div, $_->text });
-is_deeply(\@div, [qw/A/], 'found first div elements with id');
+is_deeply \@div, [qw/A/], 'found first div elements with id';
 @div = ();
 $dom->find('div[id]')->while(sub { push @div, shift->text; @div < 1 });
-is_deeply(\@div, [qw/A/], 'found first div elements with id');
+is_deeply \@div, [qw/A/], 'found first div elements with id';
 @div = ();
 $dom->find('div[id]')->while(sub { pop() < 2 && push @div, $_->text });
-is_deeply(\@div, [qw/A/], 'found first div elements with id');
+is_deeply \@div, [qw/A/], 'found first div elements with id';
 
 # Simple nesting (tree structure)
 $dom->parse(<<EOF);
 <foo><bar a="b&lt;c">ju<baz a23>s<bazz />t</bar>works</foo>
 EOF
-is($dom->tree->[0],      'root', 'right element');
-is($dom->tree->[1]->[0], 'tag',  'right element');
-is($dom->tree->[1]->[1], 'foo',  'right tag');
-is_deeply($dom->tree->[1]->[2], {}, 'empty attributes');
-is($dom->tree->[1]->[3],      $dom->tree, 'right parent');
-is($dom->tree->[1]->[4]->[0], 'tag',      'right element');
-is($dom->tree->[1]->[4]->[1], 'bar',      'right tag');
-is_deeply($dom->tree->[1]->[4]->[2], {a => 'b<c'}, 'right attributes');
-is($dom->tree->[1]->[4]->[3],      $dom->tree->[1], 'right parent');
-is($dom->tree->[1]->[4]->[4]->[0], 'text',          'right element');
-is($dom->tree->[1]->[4]->[4]->[1], 'ju',            'right text');
-is($dom->tree->[1]->[4]->[5]->[0], 'tag',           'right element');
-is($dom->tree->[1]->[4]->[5]->[1], 'baz',           'right tag');
-is_deeply($dom->tree->[1]->[4]->[5]->[2], {a23 => undef}, 'right attributes');
-is($dom->tree->[1]->[4]->[5]->[3], $dom->tree->[1]->[4], 'right parent');
-is($dom->tree->[1]->[4]->[6]->[0], 'text',               'right element');
-is($dom->tree->[1]->[4]->[6]->[1], 's',                  'right text');
-is($dom->tree->[1]->[4]->[7]->[0], 'tag',                'right element');
-is($dom->tree->[1]->[4]->[7]->[1], 'bazz',               'right tag');
-is_deeply($dom->tree->[1]->[4]->[7]->[2], {}, 'empty attributes');
-is($dom->tree->[1]->[4]->[7]->[3], $dom->tree->[1]->[4], 'right parent');
-is($dom->tree->[1]->[4]->[8]->[0], 'text',               'right element');
-is($dom->tree->[1]->[4]->[8]->[1], 't',                  'right text');
-is($dom->tree->[1]->[5]->[0],      'text',               'right element');
-is($dom->tree->[1]->[5]->[1],      'works',              'right text');
-is("$dom",                         <<EOF,                'stringified right');
+is $dom->tree->[0], 'root', 'right element';
+is $dom->tree->[1]->[0], 'tag', 'right element';
+is $dom->tree->[1]->[1], 'foo', 'right tag';
+is_deeply $dom->tree->[1]->[2], {}, 'empty attributes';
+is $dom->tree->[1]->[3], $dom->tree, 'right parent';
+is $dom->tree->[1]->[4]->[0], 'tag', 'right element';
+is $dom->tree->[1]->[4]->[1], 'bar', 'right tag';
+is_deeply $dom->tree->[1]->[4]->[2], {a => 'b<c'}, 'right attributes';
+is $dom->tree->[1]->[4]->[3], $dom->tree->[1], 'right parent';
+is $dom->tree->[1]->[4]->[4]->[0], 'text', 'right element';
+is $dom->tree->[1]->[4]->[4]->[1], 'ju',   'right text';
+is $dom->tree->[1]->[4]->[5]->[0], 'tag',  'right element';
+is $dom->tree->[1]->[4]->[5]->[1], 'baz',  'right tag';
+is_deeply $dom->tree->[1]->[4]->[5]->[2], {a23 => undef}, 'right attributes';
+is $dom->tree->[1]->[4]->[5]->[3], $dom->tree->[1]->[4], 'right parent';
+is $dom->tree->[1]->[4]->[6]->[0], 'text', 'right element';
+is $dom->tree->[1]->[4]->[6]->[1], 's',    'right text';
+is $dom->tree->[1]->[4]->[7]->[0], 'tag',  'right element';
+is $dom->tree->[1]->[4]->[7]->[1], 'bazz', 'right tag';
+is_deeply $dom->tree->[1]->[4]->[7]->[2], {}, 'empty attributes';
+is $dom->tree->[1]->[4]->[7]->[3], $dom->tree->[1]->[4], 'right parent';
+is $dom->tree->[1]->[4]->[8]->[0], 'text', 'right element';
+is $dom->tree->[1]->[4]->[8]->[1], 't',    'right text';
+is $dom->tree->[1]->[5]->[0], 'text',  'right element';
+is $dom->tree->[1]->[5]->[1], 'works', 'right text';
+is "$dom", <<EOF, 'stringified right';
 <foo><bar a="b&lt;c">ju<baz a23 />s<bazz />t</bar>works</foo>
 EOF
 
@@ -85,9 +85,9 @@ $dom->parse(<<EOF);
   more text
 </foo>
 EOF
-is($dom->tree->[1]->[0], 'doctype', 'right element');
-is($dom->tree->[1]->[1], ' foo',    'right doctype');
-is("$dom",               <<EOF,     'stringified right');
+is $dom->tree->[1]->[0], 'doctype', 'right element';
+is $dom->tree->[1]->[1], ' foo',    'right doctype';
+is "$dom", <<EOF, 'stringified right';
 <!DOCTYPE foo>
 <foo bar="ba&lt;z">
   test
@@ -103,21 +103,19 @@ is("$dom",               <<EOF,     'stringified right');
 </foo>
 EOF
 my $simple = $dom->at('foo simple.working[class^="wor"]');
-like($simple->parent->all_text,
-    qr/test\s+easy\s+works\s+well\s+yada\s+yada\s+more\s+text/);
-is($simple->name,                        'simple',  'right name');
-is($simple->attrs->{class},              'working', 'right class attribute');
-is($simple->text,                        'easy',    'right text');
-is($simple->parent->name,                'foo',     'right parent name');
-is($simple->parent->attrs->{bar},        'ba<z',    'right parent attribute');
-is($simple->parent->children->[1]->name, 'test',    'right sibling');
-is( $simple->to_xml,
-    '<simple class="working">easy</simple>',
-    'stringified right'
-);
-is($dom->at('test#test')->name,         'test',   'right name');
-is($dom->at('[class$="ing"]')->name,    'simple', 'right name');
-is($dom->at('[class="working"]')->name, 'simple', 'right name');
+like $simple->parent->all_text,
+  qr/test\s+easy\s+works\s+well\s+yada\s+yada\s+more\s+text/;
+is $simple->name, 'simple', 'right name';
+is $simple->attrs->{class}, 'working', 'right class attribute';
+is $simple->text, 'easy', 'right text';
+is $simple->parent->name, 'foo', 'right parent name';
+is $simple->parent->attrs->{bar}, 'ba<z', 'right parent attribute';
+is $simple->parent->children->[1]->name, 'test', 'right sibling';
+is $simple->to_xml, '<simple class="working">easy</simple>',
+  'stringified right';
+is $dom->at('test#test')->name,         'test',   'right name';
+is $dom->at('[class$="ing"]')->name,    'simple', 'right name';
+is $dom->at('[class="working"]')->name, 'simple', 'right name';
 
 # Deep nesting (parent combinator)
 $dom->parse(<<EOF);
@@ -144,133 +142,133 @@ $dom->parse(<<EOF);
 </html>
 EOF
 my $p = $dom->find('body > #container > div p[id]');
-is($p->[0]->attrs->{id}, 'foo', 'right id attribute');
-is($p->[1],              undef, 'no second result');
+is $p->[0]->attrs->{id}, 'foo', 'right id attribute';
+is $p->[1], undef, 'no second result';
 my @p;
 @div = ();
 $dom->find('div')->each(sub { push @div, $_->attrs->{id} })->find('p')
   ->each(sub { push @p, $_->attrs->{id} });
-is_deeply(\@p, [qw/foo bar/], 'found all p elements');
+is_deeply \@p, [qw/foo bar/], 'found all p elements';
 my $ids = [qw/container header logo buttons buttons content/];
-is_deeply(\@div, $ids, 'found all div elements');
+is_deeply \@div, $ids, 'found all div elements';
 
 # Script tag
 $dom->parse(<<EOF);
 <script type="text/javascript" charset="utf-8">alert('lalala');</script>
 EOF
-is($dom->at('script')->text, "alert('lalala');", 'right script content');
+is $dom->at('script')->text, "alert('lalala');", 'right script content';
 
 # HTML5 (unquoted values)
 $dom->parse(qq/<div id = test foo ="bar" class=tset>works<\/div>/);
-is($dom->at('#test')->text,       'works', 'right text');
-is($dom->at('div')->text,         'works', 'right text');
-is($dom->at('[foo="bar"]')->text, 'works', 'right text');
-is($dom->at('[foo="ba"]'),        undef,   'no result');
-is($dom->at('.tset')->text,       'works', 'right text');
+is $dom->at('#test')->text,       'works', 'right text';
+is $dom->at('div')->text,         'works', 'right text';
+is $dom->at('[foo="bar"]')->text, 'works', 'right text';
+is $dom->at('[foo="ba"]'), undef, 'no result';
+is $dom->at('.tset')->text, 'works', 'right text';
 
 # HTML1 (single quotes, uppercase tags and whitespace in attributes)
 $dom->parse(qq/<DIV id = 'test' foo ='bar' class= "tset">works<\/DIV>/);
-is($dom->at('#test')->text,       'works', 'right text');
-is($dom->at('div')->text,         'works', 'right text');
-is($dom->at('[foo="bar"]')->text, 'works', 'right text');
-is($dom->at('[foo="ba"]'),        undef,   'no result');
-is($dom->at('.tset')->text,       'works', 'right text');
+is $dom->at('#test')->text,       'works', 'right text';
+is $dom->at('div')->text,         'works', 'right text';
+is $dom->at('[foo="bar"]')->text, 'works', 'right text';
+is $dom->at('[foo="ba"]'), undef, 'no result';
+is $dom->at('.tset')->text, 'works', 'right text';
 
 # Already decoded unicode snowman and quotes in selector
 $dom->charset(undef)->parse('<div id="sno&quot;wman">☃</div>');
-is($dom->at('[id="sno\"wman"]')->text, '☃', 'right text');
+is $dom->at('[id="sno\"wman"]')->text, '☃', 'right text';
 
 # Unicode and escaped selectors
 $dom->parse(
     qq/<p><div id="☃x">Snowman<\/div><div class="x ♥">Heart<\/div><\/p>/);
-is($dom->at("#\\\n\\002603x")->text,               'Snowman', 'right text');
-is($dom->at('#\\2603 x')->text,                    'Snowman', 'right text');
-is($dom->at("#\\\n\\2603 x")->text,                'Snowman', 'right text');
-is($dom->at(qq/[id="\\\n\\2603 x"]/)->text,        'Snowman', 'right text');
-is($dom->at(qq/[id="\\\n\\002603x"]/)->text,       'Snowman', 'right text');
-is($dom->at(qq/[id="\\\\2603 x"]/)->text,          'Snowman', 'right text');
-is($dom->at("p #\\\n\\002603x")->text,             'Snowman', 'right text');
-is($dom->at('p #\\2603 x')->text,                  'Snowman', 'right text');
-is($dom->at("p #\\\n\\2603 x")->text,              'Snowman', 'right text');
-is($dom->at(qq/p [id="\\\n\\2603 x"]/)->text,      'Snowman', 'right text');
-is($dom->at(qq/p [id="\\\n\\002603x"]/)->text,     'Snowman', 'right text');
-is($dom->at(qq/p [id="\\\\2603 x"]/)->text,        'Snowman', 'right text');
-is($dom->at('#☃x')->text,                        'Snowman', 'right text');
-is($dom->at('div#☃x')->text,                     'Snowman', 'right text');
-is($dom->at('p div#☃x')->text,                   'Snowman', 'right text');
-is($dom->at('[id^="☃"]')->text,                  'Snowman', 'right text');
-is($dom->at('div[id^="☃"]')->text,               'Snowman', 'right text');
-is($dom->at('p div[id^="☃"]')->text,             'Snowman', 'right text');
-is($dom->at('p > div[id^="☃"]')->text,           'Snowman', 'right text');
-is($dom->at(".\\\n\\002665")->text,                'Heart',   'right text');
-is($dom->at('.\\2665')->text,                      'Heart',   'right text');
-is($dom->at("p .\\\n\\002665")->text,              'Heart',   'right text');
-is($dom->at('p .\\2665')->text,                    'Heart',   'right text');
-is($dom->at(qq/p [class\$="\\\n\\002665"]/)->text, 'Heart',   'right text');
-is($dom->at(qq/p [class\$="\\2665"]/)->text,       'Heart',   'right text');
-is($dom->at(qq/[class\$="\\\n\\002665"]/)->text,   'Heart',   'right text');
-is($dom->at(qq/[class\$="\\2665"]/)->text,         'Heart',   'right text');
-is($dom->at('.x')->text,                           'Heart',   'right text');
-is($dom->at('p .x')->text,                         'Heart',   'right text');
-is($dom->at('.♥')->text,                         'Heart',   'right text');
-is($dom->at('p .♥')->text,                       'Heart',   'right text');
-is($dom->at('div.♥')->text,                      'Heart',   'right text');
-is($dom->at('p div.♥')->text,                    'Heart',   'right text');
-is($dom->at('[class$="♥"]')->text,               'Heart',   'right text');
-is($dom->at('div[class$="♥"]')->text,            'Heart',   'right text');
-is($dom->at('p div[class$="♥"]')->text,          'Heart',   'right text');
-is($dom->at('p > div[class$="♥"]')->text,        'Heart',   'right text');
+is $dom->at("#\\\n\\002603x")->text,               'Snowman', 'right text';
+is $dom->at('#\\2603 x')->text,                    'Snowman', 'right text';
+is $dom->at("#\\\n\\2603 x")->text,                'Snowman', 'right text';
+is $dom->at(qq/[id="\\\n\\2603 x"]/)->text,        'Snowman', 'right text';
+is $dom->at(qq/[id="\\\n\\002603x"]/)->text,       'Snowman', 'right text';
+is $dom->at(qq/[id="\\\\2603 x"]/)->text,          'Snowman', 'right text';
+is $dom->at("p #\\\n\\002603x")->text,             'Snowman', 'right text';
+is $dom->at('p #\\2603 x')->text,                  'Snowman', 'right text';
+is $dom->at("p #\\\n\\2603 x")->text,              'Snowman', 'right text';
+is $dom->at(qq/p [id="\\\n\\2603 x"]/)->text,      'Snowman', 'right text';
+is $dom->at(qq/p [id="\\\n\\002603x"]/)->text,     'Snowman', 'right text';
+is $dom->at(qq/p [id="\\\\2603 x"]/)->text,        'Snowman', 'right text';
+is $dom->at('#☃x')->text,                        'Snowman', 'right text';
+is $dom->at('div#☃x')->text,                     'Snowman', 'right text';
+is $dom->at('p div#☃x')->text,                   'Snowman', 'right text';
+is $dom->at('[id^="☃"]')->text,                  'Snowman', 'right text';
+is $dom->at('div[id^="☃"]')->text,               'Snowman', 'right text';
+is $dom->at('p div[id^="☃"]')->text,             'Snowman', 'right text';
+is $dom->at('p > div[id^="☃"]')->text,           'Snowman', 'right text';
+is $dom->at(".\\\n\\002665")->text,                'Heart',   'right text';
+is $dom->at('.\\2665')->text,                      'Heart',   'right text';
+is $dom->at("p .\\\n\\002665")->text,              'Heart',   'right text';
+is $dom->at('p .\\2665')->text,                    'Heart',   'right text';
+is $dom->at(qq/p [class\$="\\\n\\002665"]/)->text, 'Heart',   'right text';
+is $dom->at(qq/p [class\$="\\2665"]/)->text,       'Heart',   'right text';
+is $dom->at(qq/[class\$="\\\n\\002665"]/)->text,   'Heart',   'right text';
+is $dom->at(qq/[class\$="\\2665"]/)->text,         'Heart',   'right text';
+is $dom->at('.x')->text,                           'Heart',   'right text';
+is $dom->at('p .x')->text,                         'Heart',   'right text';
+is $dom->at('.♥')->text,                         'Heart',   'right text';
+is $dom->at('p .♥')->text,                       'Heart',   'right text';
+is $dom->at('div.♥')->text,                      'Heart',   'right text';
+is $dom->at('p div.♥')->text,                    'Heart',   'right text';
+is $dom->at('[class$="♥"]')->text,               'Heart',   'right text';
+is $dom->at('div[class$="♥"]')->text,            'Heart',   'right text';
+is $dom->at('p div[class$="♥"]')->text,          'Heart',   'right text';
+is $dom->at('p > div[class$="♥"]')->text,        'Heart',   'right text';
 
 # Looks remotely like HTML
 $dom->parse('<!DOCTYPE H "-/W/D HT 4/E">☃<title class=test>♥</title>☃');
-is($dom->at('title')->text, '♥', 'right text');
-is($dom->at('*')->text,     '♥', 'right text');
-is($dom->at('.test')->text, '♥', 'right text');
+is $dom->at('title')->text, '♥', 'right text';
+is $dom->at('*')->text,     '♥', 'right text';
+is $dom->at('.test')->text, '♥', 'right text';
 
 # Replace elements
 $dom->parse('<div>foo<p>lalala</p>bar</div>');
 $dom->at('p')->replace('<foo>bar</foo>');
-is("$dom", '<div>foo<foo>bar</foo>bar</div>', 'right text');
+is "$dom", '<div>foo<foo>bar</foo>bar</div>', 'right text';
 $dom->at('foo')->replace(Mojo::DOM->new->parse('text'));
-is("$dom", '<div>footextbar</div>', 'right text');
+is "$dom", '<div>footextbar</div>', 'right text';
 $dom->parse('<div>foo</div><div>bar</div>');
 $dom->find('div')->each(sub { shift->replace('<p>test</p>') });
-is("$dom", '<p>test</p><p>test</p>', 'right text');
+is "$dom", '<p>test</p><p>test</p>', 'right text';
 $dom->parse('<div>foo<p>lalala</p>bar</div>');
 $dom->replace('♥');
-is("$dom", '♥', 'right text');
+is "$dom", '♥', 'right text';
 $dom->replace('<div>foo<p>lalala</p>bar</div>');
-is("$dom", '<div>foo<p>lalala</p>bar</div>', 'right text');
+is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right text';
 $dom->replace('');
-is("$dom", '', 'right text');
+is "$dom", '', 'right text';
 $dom->replace('<div>foo<p>lalala</p>bar</div>');
-is("$dom", '<div>foo<p>lalala</p>bar</div>', 'right text');
+is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right text';
 $dom->find('p')->each(sub { shift->replace('') });
-is("$dom", '<div>foobar</div>', 'right text');
+is "$dom", '<div>foobar</div>', 'right text';
 
 # Replace element content
 $dom->parse('<div>foo<p>lalala</p>bar</div>');
 $dom->at('p')->replace_content('bar');
-is("$dom", '<div>foo<p>bar</p>bar</div>', 'right text');
+is "$dom", '<div>foo<p>bar</p>bar</div>', 'right text';
 $dom->at('p')->replace_content(Mojo::DOM->new->parse('text'));
-is("$dom", '<div>foo<p>text</p>bar</div>', 'right text');
+is "$dom", '<div>foo<p>text</p>bar</div>', 'right text';
 $dom->parse('<div>foo</div><div>bar</div>');
 $dom->find('div')->each(sub { shift->replace_content('<p>test</p>') });
-is("$dom", '<div><p>test</p></div><div><p>test</p></div>', 'right text');
+is "$dom", '<div><p>test</p></div><div><p>test</p></div>', 'right text';
 $dom->find('p')->each(sub { shift->replace_content('') });
-is("$dom", '<div><p /></div><div><p /></div>', 'right text');
+is "$dom", '<div><p /></div><div><p /></div>', 'right text';
 $dom->parse('<div><p id="☃" /></div>');
 $dom->at('#☃')->replace_content('♥');
-is("$dom", '<div><p id="☃">♥</p></div>', 'right text');
+is "$dom", '<div><p id="☃">♥</p></div>', 'right text';
 $dom->parse('<div>foo<p>lalala</p>bar</div>');
 $dom->replace_content('♥');
-is("$dom", '♥', 'right text');
+is "$dom", '♥', 'right text';
 $dom->replace_content('<div>foo<p>lalala</p>bar</div>');
-is("$dom", '<div>foo<p>lalala</p>bar</div>', 'right text');
+is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right text';
 $dom->replace_content('');
-is("$dom", '', 'right text');
+is "$dom", '', 'right text';
 $dom->replace_content('<div>foo<p>lalala</p>bar</div>');
-is("$dom", '<div>foo<p>lalala</p>bar</div>', 'right text');
+is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right text';
 
 # Mixed search and tree walk
 $dom->parse(<<EOF);
@@ -287,11 +285,11 @@ for my $tr ($dom->find('table tr')->each) {
         push @data, $td->name, $td->all_text;
     }
 }
-is($data[0], 'td',    'right tag');
-is($data[1], 'text1', 'right text');
-is($data[2], 'td',    'right tag');
-is($data[3], 'text2', 'right text');
-is($data[4], undef,   'no tag');
+is $data[0], 'td',    'right tag';
+is $data[1], 'text1', 'right text';
+is $data[2], 'td',    'right tag';
+is $data[3], 'text2', 'right text';
+is $data[4], undef,   'no tag';
 
 # RSS
 $dom->parse(<<EOF);
@@ -319,12 +317,12 @@ $dom->parse(<<EOF);
   </channel>
 </rss>
 EOF
-is($dom->find('rss')->[0]->attrs->{version}, '2.0',   'right version');
-is($dom->at('extension')->attrs->{'foo:id'}, 'works', 'right id');
-like($dom->at('#works')->text,       qr/\[awesome\]\]/, 'right text');
-like($dom->at('[id="works"]')->text, qr/\[awesome\]\]/, 'right text');
-is($dom->find('description')->[1]->text, '<p>trololololo>', 'right text');
-is($dom->at('pubdate')->text, 'Mon, 12 Jul 2010 20:42:00', 'right text');
+is $dom->find('rss')->[0]->attrs->{version}, '2.0', 'right version';
+is $dom->at('extension')->attrs->{'foo:id'}, 'works', 'right id';
+like $dom->at('#works')->text,       qr/\[awesome\]\]/, 'right text';
+like $dom->at('[id="works"]')->text, qr/\[awesome\]\]/, 'right text';
+is $dom->find('description')->[1]->text, '<p>trololololo>', 'right text';
+is $dom->at('pubdate')->text, 'Mon, 12 Jul 2010 20:42:00', 'right text';
 
 # Yadis
 $dom->parse(<<'EOF');
@@ -340,14 +338,14 @@ $dom->parse(<<'EOF');
   </XRD>
 </XRDS>
 EOF
-is($dom->at('xrds')->namespace, 'xri://$xrds',         'right namespace');
-is($dom->at('xrd')->namespace,  'xri://$xrd*($v*2.0)', 'right namespace');
+is $dom->at('xrds')->namespace, 'xri://$xrds',         'right namespace';
+is $dom->at('xrd')->namespace,  'xri://$xrd*($v*2.0)', 'right namespace';
 my $s = $dom->find('xrds xrd service');
-is($s->[0]->at('type')->text, 'http://o.r.g/sso/2.0', 'right text');
-is($s->[0]->namespace,        'xri://$xrd*($v*2.0)',  'right namespace');
-is($s->[1]->at('type')->text, 'http://o.r.g/sso/1.0', 'right text');
-is($s->[1]->namespace,        'xri://$xrd*($v*2.0)',  'right namespace');
-is($s->[2],                   undef,                  'no text');
+is $s->[0]->at('type')->text, 'http://o.r.g/sso/2.0', 'right text';
+is $s->[0]->namespace, 'xri://$xrd*($v*2.0)', 'right namespace';
+is $s->[1]->at('type')->text, 'http://o.r.g/sso/1.0', 'right text';
+is $s->[1]->namespace, 'xri://$xrd*($v*2.0)', 'right namespace';
+is $s->[2], undef, 'no text';
 
 # Yadis (with namespace)
 $dom->parse(<<'EOF');
@@ -371,95 +369,95 @@ $dom->parse(<<'EOF');
   </XRD>
 </xrds:XRDS>
 EOF
-is($dom->at('xrds')->namespace, 'xri://$xrds',         'right namespace');
-is($dom->at('xrd')->namespace,  'xri://$xrd*($v*2.0)', 'right namespace');
+is $dom->at('xrds')->namespace, 'xri://$xrds',         'right namespace';
+is $dom->at('xrd')->namespace,  'xri://$xrd*($v*2.0)', 'right namespace';
 $s = $dom->find('xrds xrd service');
-is($s->[0]->at('type')->text, 'http://o.r.g/sso/3.0', 'right text');
-is($s->[0]->namespace,        'xri://$xrd*($v*2.0)',  'right namespace');
-is($s->[1]->at('type')->text, 'http://o.r.g/sso/4.0', 'right text');
-is($s->[1]->namespace,        'xri://$xrds',          'right namespace');
-is($s->[2]->at('type')->text, 'http://o.r.g/sso/2.0', 'right text');
-is($s->[2]->namespace,        'xri://$xrd*($v*2.0)',  'right namespace');
-is($s->[3]->at('type')->text, 'http://o.r.g/sso/1.0', 'right text');
-is($s->[3]->namespace,        'xri://$xrd*($v*2.0)',  'right namespace');
-is($s->[4],                   undef,                  'no text');
+is $s->[0]->at('type')->text, 'http://o.r.g/sso/3.0', 'right text';
+is $s->[0]->namespace, 'xri://$xrd*($v*2.0)', 'right namespace';
+is $s->[1]->at('type')->text, 'http://o.r.g/sso/4.0', 'right text';
+is $s->[1]->namespace, 'xri://$xrds', 'right namespace';
+is $s->[2]->at('type')->text, 'http://o.r.g/sso/2.0', 'right text';
+is $s->[2]->namespace, 'xri://$xrd*($v*2.0)', 'right namespace';
+is $s->[3]->at('type')->text, 'http://o.r.g/sso/1.0', 'right text';
+is $s->[3]->namespace, 'xri://$xrd*($v*2.0)', 'right namespace';
+is $s->[4], undef, 'no text';
 
 # Result and iterator order
 $dom->parse('<a><b>1</b></a><b>2</b><b>3</b>');
 my @numbers;
 $dom->find("b")->each(sub { push @numbers, pop, shift->text });
-is_deeply(\@numbers, [1, 1, 2, 2, 3, 3], 'right order');
+is_deeply \@numbers, [1, 1, 2, 2, 3, 3], 'right order';
 
 # Attributes on multiple lines
 $dom->parse("<div test=23 id='a' \n class='x' foo=bar />");
-is($dom->at('div.x')->attrs->{test},        23,  'right attribute');
-is($dom->at('[foo="bar"]')->attrs->{class}, 'x', 'right attribute');
+is $dom->at('div.x')->attrs->{test},        23,  'right attribute';
+is $dom->at('[foo="bar"]')->attrs->{class}, 'x', 'right attribute';
 
 # Markup characters in attribute values
 $dom->parse(qq/<div id="<a>" \n test='='>Test<div id='><' \/><\/div>/);
-is($dom->at('div[id="<a>"]')->attrs->{test}, '=',    'right attribute');
-is($dom->at('[id="<a>"]')->text,             'Test', 'right text');
-is($dom->at('[id="><"]')->attrs->{id},       '><',   'right attribute');
+is $dom->at('div[id="<a>"]')->attrs->{test}, '=', 'right attribute';
+is $dom->at('[id="<a>"]')->text, 'Test', 'right text';
+is $dom->at('[id="><"]')->attrs->{id}, '><', 'right attribute';
 
 # Empty attributes
 $dom->parse(qq/<div test="" test2='' \/>/);
-is($dom->at('div')->attrs->{test},  '', 'empty attribute value');
-is($dom->at('div')->attrs->{test2}, '', 'empty attribute value');
+is $dom->at('div')->attrs->{test},  '', 'empty attribute value';
+is $dom->at('div')->attrs->{test2}, '', 'empty attribute value';
 
 # Whitespaces before closing bracket
 $dom->parse(qq/<div >content<\/div>/);
-ok($dom->at('div'), 'tag found');
-is($dom->at('div')->text,      'content', 'right text');
-is($dom->at('div')->inner_xml, 'content', 'right text');
+ok $dom->at('div'), 'tag found';
+is $dom->at('div')->text,      'content', 'right text';
+is $dom->at('div')->inner_xml, 'content', 'right text';
 
 # Class with hyphen
 $dom->parse(qq/<div class="a">A<\/div><div class="a-1">A1<\/div>/);
 @div = ();
 $dom->find('.a')->each(sub { push @div, shift->text });
-is_deeply(\@div, ['A'], 'found first element only');
+is_deeply \@div, ['A'], 'found first element only';
 @div = ();
 $dom->find('.a-1')->each(sub { push @div, shift->text });
-is_deeply(\@div, ['A1'], 'found last element only');
+is_deeply \@div, ['A1'], 'found last element only';
 
 # Defined but false text
 $dom->parse(
     '<div><div id="a">A</div><div id="b">B</div></div><div id="0">0</div>');
 @div = ();
 $dom->find('div[id]')->each(sub { push @div, shift->text });
-is_deeply(\@div, [qw/A B 0/], 'found all div elements with id');
+is_deeply \@div, [qw/A B 0/], 'found all div elements with id';
 
 # Empty tags
 $dom->parse('<hr /><br/><br id="br"/><br />');
-is("$dom", '<hr /><br /><br id="br" /><br />', 'right result');
-is($dom->at('br')->inner_xml, '', 'empty result');
+is "$dom", '<hr /><br /><br id="br" /><br />', 'right result';
+is $dom->at('br')->inner_xml, '', 'empty result';
 
 # Inner XML
 $dom->parse('<a>xxx<x>x</x>xxx</a>');
-is($dom->at('a')->inner_xml, 'xxx<x>x</x>xxx',        'right result');
-is($dom->inner_xml,          '<a>xxx<x>x</x>xxx</a>', 'right result');
+is $dom->at('a')->inner_xml, 'xxx<x>x</x>xxx', 'right result';
+is $dom->inner_xml, '<a>xxx<x>x</x>xxx</a>', 'right result';
 
 # Multiple selectors
 $dom->parse('<div id="a">A</div><div id="b">B</div><div id="c">C</div>');
 @div = ();
 $dom->find('#a, #c')->each(sub { push @div, shift->text });
-is_deeply(\@div, [qw/A C/], 'found all div elements with the right ids');
+is_deeply \@div, [qw/A C/], 'found all div elements with the right ids';
 @div = ();
 $dom->find('div#a, div#b')->each(sub { push @div, shift->text });
-is_deeply(\@div, [qw/A B/], 'found all div elements with the right ids');
+is_deeply \@div, [qw/A B/], 'found all div elements with the right ids';
 @div = ();
 $dom->find('div[id="a"], div[id="c"]')->each(sub { push @div, shift->text });
-is_deeply(\@div, [qw/A C/], 'found all div elements with the right ids');
+is_deeply \@div, [qw/A C/], 'found all div elements with the right ids';
 $dom->parse('<div id="☃">A</div><div id="b">B</div><div id="♥x">C</div>');
 @div = ();
 $dom->find('#☃, #♥x')->each(sub { push @div, shift->text });
-is_deeply(\@div, [qw/A C/], 'found all div elements with the right ids');
+is_deeply \@div, [qw/A C/], 'found all div elements with the right ids';
 @div = ();
 $dom->find('div#☃, div#b')->each(sub { push @div, shift->text });
-is_deeply(\@div, [qw/A B/], 'found all div elements with the right ids');
+is_deeply \@div, [qw/A B/], 'found all div elements with the right ids';
 @div = ();
 $dom->find('div[id="☃"], div[id="♥x"]')
   ->each(sub { push @div, shift->text });
-is_deeply(\@div, [qw/A C/], 'found all div elements with the right ids');
+is_deeply \@div, [qw/A C/], 'found all div elements with the right ids';
 
 # Multiple attributes
 $dom->parse(<<EOF);
@@ -470,9 +468,8 @@ $dom->parse(<<EOF);
 EOF
 @div = ();
 $dom->find('div[foo="bar"][bar="baz"]')->each(sub { push @div, shift->text });
-is_deeply(\@div, [qw/A C/],
-    'found all div elements with the right atributes');
+is_deeply \@div, [qw/A C/], 'found all div elements with the right atributes';
 @div = ();
 $dom->find('div[foo^="b"][foo$="r"]')->each(sub { push @div, shift->text });
-is_deeply(\@div, [qw/A B C/],
-    'found all div elements with the right atributes');
+is_deeply \@div, [qw/A B C/],
+  'found all div elements with the right atributes';

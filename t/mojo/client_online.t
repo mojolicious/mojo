@@ -14,10 +14,10 @@ plan tests => 99;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
-use_ok('Mojo::Client');
-use_ok('Mojo::IOLoop');
-use_ok('Mojo::Transaction::HTTP');
-use_ok('ojo');
+use_ok 'Mojo::Client';
+use_ok 'Mojo::IOLoop';
+use_ok 'Mojo::Transaction::HTTP';
+use_ok 'ojo';
 
 # Make sure clients dont taint the ioloop
 my $loop   = Mojo::IOLoop->new;
@@ -34,8 +34,8 @@ my $ticks = 0;
 $loop->on_tick(sub { $ticks++ });
 $loop->on_idle(sub { shift->stop });
 $loop->start;
-is($ticks, 1,   'loop not tainted');
-is($code,  301, 'right status');
+is $ticks, 1,   'loop not tainted';
+is $code,  301, 'right status';
 
 # Fresh client
 $client = Mojo::Client->new;
@@ -44,7 +44,7 @@ $client = Mojo::Client->new;
 $client->log->level('fatal');
 my $tx = $client->build_tx(GET => 'http://localhost:99999');
 $client->process($tx);
-ok(!$tx->is_done, 'transaction is not done');
+ok !$tx->is_done, 'transaction is not done';
 
 # Fresh client again
 $client = Mojo::Client->new;
@@ -52,7 +52,7 @@ $client = Mojo::Client->new;
 # Host does not exist
 $tx = $client->build_tx(GET => 'http://cdeabcdeffoobarnonexisting.com');
 $client->process($tx);
-ok(!$tx->is_done, 'transaction is not done');
+ok !$tx->is_done, 'transaction is not done';
 
 # Keep alive
 my $async = $client->async;
@@ -68,7 +68,7 @@ $async->get(
     }
 )->process;
 $async->ioloop->start;
-is($kept_alive, 1, 'connection was kept alive');
+is $kept_alive, 1, 'connection was kept alive';
 
 # Nested keep alive
 my @kept_alive;
@@ -95,7 +95,7 @@ $client->async->get(
     }
 )->process;
 $client->ioloop->start;
-is_deeply(\@kept_alive, [1, 1, 1], 'connections kept alive');
+is_deeply \@kept_alive, [1, 1, 1], 'connections kept alive';
 
 # Custom non keep alive request
 $tx = Mojo::Transaction::HTTP->new;
@@ -103,9 +103,9 @@ $tx->req->method('GET');
 $tx->req->url->parse('http://cpan.org');
 $tx->req->headers->connection('close');
 $client->process($tx);
-ok($tx->is_done, 'transaction is done');
-is($tx->res->code, 301, 'right status');
-like($tx->res->headers->connection, qr/close/i, 'right "Connection" header');
+ok $tx->is_done, 'transaction is done';
+is $tx->res->code, 301, 'right status';
+like $tx->res->headers->connection, qr/close/i, 'right "Connection" header';
 
 # Proxy check
 my $backup  = $ENV{HTTP_PROXY}  || '';
@@ -113,25 +113,25 @@ my $backup2 = $ENV{HTTPS_PROXY} || '';
 $ENV{HTTP_PROXY}  = 'http://127.0.0.1';
 $ENV{HTTPS_PROXY} = 'https://127.0.0.1';
 $client->detect_proxy;
-is($client->http_proxy,  'http://127.0.0.1',  'right proxy');
-is($client->https_proxy, 'https://127.0.0.1', 'right proxy');
+is $client->http_proxy,  'http://127.0.0.1',  'right proxy';
+is $client->https_proxy, 'https://127.0.0.1', 'right proxy';
 $client->http_proxy(undef);
 $client->https_proxy(undef);
-is($client->http_proxy,  undef, 'right proxy');
-is($client->https_proxy, undef, 'right proxy');
+is $client->http_proxy,  undef, 'right proxy';
+is $client->https_proxy, undef, 'right proxy';
 $ENV{HTTP_PROXY}  = $backup;
 $ENV{HTTPS_PROXY} = $backup2;
 
 # Oneliner
-is(g('mojolicious.org')->code,          200, 'right status');
-is(p('mojolicious.org/lalalala')->code, 404, 'right status');
-is(g('http://mojolicious.org')->code,   200, 'right status');
-is(p('http://mojolicious.org')->code,   404, 'right status');
-is(oO('http://mojolicious.org')->code,  200, 'right status');
-is(oO(POST => 'http://mojolicious.org')->code, 404, 'right status');
+is g('mojolicious.org')->code,          200, 'right status';
+is p('mojolicious.org/lalalala')->code, 404, 'right status';
+is g('http://mojolicious.org')->code,   200, 'right status';
+is p('http://mojolicious.org')->code,   404, 'right status';
+is oO('http://mojolicious.org')->code,  200, 'right status';
+is oO(POST => 'http://mojolicious.org')->code, 404, 'right status';
 my $res = f('search.cpan.org/search' => {query => 'mojolicious'});
-like($res->body, qr/Mojolicious/, 'right content');
-is($res->code, 200, 'right status');
+like $res->body, qr/Mojolicious/, 'right content';
+is $res->code,   200,             'right status';
 
 # Simple request
 my ($method, $url);
@@ -144,31 +144,31 @@ $client->get(
         $code   = $self->res->code;
     }
 )->process;
-is($method, 'GET',             'right method');
-is($url,    'http://cpan.org', 'right url');
-is($code,   301,               'right status');
+is $method, 'GET',             'right method';
+is $url,    'http://cpan.org', 'right url';
+is $code,   301,               'right status';
 
 # HTTPS request without TLS support
 $tx = $client->get('https://www.google.com');
-ok(!!$tx->error, 'request failed');
+ok !!$tx->error, 'request failed';
 
 # Simple request with body
 $tx = $client->get('http://mojolicious.org' => 'Hi there!');
-is($tx->req->method, 'GET', 'right method');
-is($tx->req->url, 'http://mojolicious.org', 'right url');
-is($tx->req->headers->content_length, 9,           'right content length');
-is($tx->req->body,                    'Hi there!', 'right content');
-is($tx->res->code,                    200,         'right status');
+is $tx->req->method, 'GET', 'right method';
+is $tx->req->url, 'http://mojolicious.org', 'right url';
+is $tx->req->headers->content_length, 9, 'right content length';
+is $tx->req->body, 'Hi there!', 'right content';
+is $tx->res->code, 200,         'right status';
 
 # Simple form post
 $tx = $client->post_form(
     'http://search.cpan.org/search' => {query => 'mojolicious'});
-is($tx->req->method, 'POST', 'right method');
-is($tx->req->url, 'http://search.cpan.org/search', 'right url');
-is($tx->req->headers->content_length, 17, 'right content length');
-is($tx->req->body, 'query=mojolicious', 'right content');
-like($tx->res->body, qr/Mojolicious/, 'right content');
-is($tx->res->code, 200, 'right status');
+is $tx->req->method, 'POST', 'right method';
+is $tx->req->url, 'http://search.cpan.org/search', 'right url';
+is $tx->req->headers->content_length, 17, 'right content length';
+is $tx->req->body,   'query=mojolicious', 'right content';
+like $tx->res->body, qr/Mojolicious/,     'right content';
+is $tx->res->code,   200,                 'right status';
 
 # Simple request
 my $body;
@@ -182,10 +182,10 @@ $client->get(
         $code   = $self->res->code;
     }
 )->process;
-is($method, 'GET',                   'right method');
-is($url,    'http://www.apache.org', 'right url');
-is($body,   '',                      'right content');
-is($code,   200,                     'right status');
+is $method, 'GET',                   'right method';
+is $url,    'http://www.apache.org', 'right url';
+is $body,   '',                      'right content';
+is $code,   200,                     'right status';
 
 # Simple parallel requests with keep alive
 ($method, $url, $code) = undef;
@@ -218,16 +218,16 @@ $client->get(
     }
 );
 $client->process;
-is($method,     'GET',                   'right method');
-is($url,        'http://google.com',     'right url');
-is($code,       301,                     'right status');
-is($method2,    'GET',                   'right method');
-is($url2,       'http://www.apache.org', 'right url');
-is($code2,      200,                     'right status');
-is($kept_alive, 1,                       'connection was kept alive');
-is($method3,    'GET',                   'right method');
-is($url3,       'http://www.google.de',  'right url');
-is($code3,      200,                     'right status');
+is $method,     'GET',                   'right method';
+is $url,        'http://google.com',     'right url';
+is $code,       301,                     'right status';
+is $method2,    'GET',                   'right method';
+is $url2,       'http://www.apache.org', 'right url';
+is $code2,      200,                     'right status';
+is $kept_alive, 1,                       'connection was kept alive';
+is $method3,    'GET',                   'right method';
+is $url3,       'http://www.google.de',  'right url';
+is $code3,      200,                     'right status';
 
 # Simple requests with redirect
 ($method, $url, $code, $method2, $url2, $code2) = undef;
@@ -244,23 +244,23 @@ $client->get(
     }
 )->process;
 $client->max_redirects(0);
-is($method,  'GET',                   'right method');
-is($url,     'http://www.google.de/', 'right url');
-is($code,    200,                     'right status');
-is($method2, 'GET',                   'right method');
-is($url2,    'http://www.google.com', 'right url');
-is($code2,   302,                     'right status');
+is $method,  'GET',                   'right method';
+is $url,     'http://www.google.de/', 'right url';
+is $code,    200,                     'right status';
+is $method2, 'GET',                   'right method';
+is $url2,    'http://www.google.com', 'right url';
+is $code2,   302,                     'right status';
 
 # Simple requests with redirect and no callback
 $client->max_redirects(3);
 $tx = $client->get('http://www.google.com');
 $client->max_redirects(0);
-is($tx->req->method,           'GET',                   'right method');
-is($tx->req->url,              'http://www.google.de/', 'right url');
-is($tx->res->code,             200,                     'right status');
-is($tx->previous->req->method, 'GET',                   'right method');
-is($tx->previous->req->url,    'http://www.google.com', 'right url');
-is($tx->previous->res->code,   302,                     'right status');
+is $tx->req->method, 'GET',                   'right method';
+is $tx->req->url,    'http://www.google.de/', 'right url';
+is $tx->res->code,   200,                     'right status';
+is $tx->previous->req->method, 'GET',                   'right method';
+is $tx->previous->req->url,    'http://www.google.com', 'right url';
+is $tx->previous->res->code,   302,                     'right status';
 
 # Custom chunked request without callback
 $tx = Mojo::Transaction::HTTP->new;

@@ -27,9 +27,9 @@ app->log->level('error');
 # Load plugin
 my $config =
   plugin json_config => {default => {foo => 'baz', hello => 'there'}};
-is($config->{foo},   'bar',    'right value');
-is($config->{hello}, 'there',  'right value');
-is($config->{utf},   'утф', 'right value');
+is $config->{foo},   'bar',    'right value';
+is $config->{hello}, 'there',  'right value';
+is $config->{utf},   'утф', 'right value';
 
 # GET /
 get '/' => 'index';
@@ -42,11 +42,10 @@ $t->get_ok('/')->status_is(200)->content_like(qr/bar/);
 # No config file, default only
 $config =
   plugin json_config => {file => 'nonexisted', default => {foo => 'qux'}};
-is($config->{foo}, 'qux', 'right value');
+is $config->{foo}, 'qux', 'right value';
 
 # No config file, no default
-ok(not(eval { plugin json_config => {file => 'nonexisted'} }),
-    'no config file');
+ok !(eval { plugin json_config => {file => 'nonexisted'} }), 'no config file';
 
 __DATA__
 @@ index.html.ep

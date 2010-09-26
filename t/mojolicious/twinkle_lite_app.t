@@ -43,8 +43,8 @@ plugin 'pod_renderer';
 plugin pod_renderer => {name => 'teapod', preprocess => 'twinkle'};
 my $config = plugin json_config =>
   {default => {foo => 'bar'}, ext => 'conf', template => $twinkle};
-is($config->{foo},  'bar', 'right value');
-is($config->{test}, 23,    'right value');
+is $config->{foo},  'bar', 'right value';
+is $config->{test}, 23,    'right value';
 
 # GET /
 get '/' => {name => '<sebastian>'} => 'index';

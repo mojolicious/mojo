@@ -26,7 +26,7 @@ use Mojolicious;
 
 # Congratulations Fry, you've snagged the perfect girlfriend.
 # Amy's rich, she's probably got other characteristics...
-use_ok('MojoliciousTest');
+use_ok 'MojoliciousTest';
 
 my $t = Test::Mojo->new(app => 'MojoliciousTest');
 
@@ -170,11 +170,11 @@ $t->get_ok('/hello.txt', {'If-Modified-Since' => $mtime})->status_is(304)
 
 # Check develpment mode log level
 my $app = Mojolicious->new;
-is($app->log->level, 'debug', 'right log level');
+is $app->log->level, 'debug', 'right log level';
 
 # Make sure we can override attributes with constructor arguments
 $app = MojoliciousTest->new({mode => 'test'});
-is($app->mode, 'test', 'right mode');
+is $app->mode, 'test', 'right mode';
 
 # Persistent error
 $app = MojoliciousTest->new;
@@ -182,28 +182,22 @@ my $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/foo');
 $app->handler($tx);
-is($tx->res->code, 200, 'right status');
-like(
-    $tx->res->body,
-    qr/Hello Mojo from the template \/foo! Hello World!/,
-    'right content'
-);
+is $tx->res->code, 200, 'right status';
+like $tx->res->body, qr/Hello Mojo from the template \/foo! Hello World!/,
+  'right content';
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/foo/willdie');
 $app->handler($tx);
-is($tx->res->code, 500, 'right status');
-like($tx->res->body, qr/Foo\.pm/, 'right content');
+is $tx->res->code,   500,         'right status';
+like $tx->res->body, qr/Foo\.pm/, 'right content';
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/foo');
 $app->handler($tx);
-is($tx->res->code, 200, 'right status');
-like(
-    $tx->res->body,
-    qr/Hello Mojo from the template \/foo! Hello World!/,
-    'right content'
-);
+is $tx->res->code, 200, 'right status';
+like $tx->res->body, qr/Hello Mojo from the template \/foo! Hello World!/,
+  'right content';
 
 $t = Test::Mojo->new(app => 'SingleFileTestApp');
 

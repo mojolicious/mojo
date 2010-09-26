@@ -110,10 +110,8 @@ $loop->listen(
 );
 
 # GET / (normal request)
-is( $client->get("http://localhost:$port/")->success->body,
-    "Hello World! / http://localhost:$port/",
-    'right content'
-);
+is $client->get("http://localhost:$port/")->success->body,
+  "Hello World! / http://localhost:$port/", 'right content';
 
 # WebSocket /test (normal websocket)
 my $result;
@@ -130,12 +128,12 @@ $client->websocket(
         $self->send_message('test1');
     }
 )->process;
-is($result, 'test1test2', 'right result');
+is $result, 'test1test2', 'right result';
 
 # GET http://kraih.com/proxy (proxy request)
 $client->http_proxy("http://localhost:$port");
-is($client->get("http://kraih.com/proxy")->success->body,
-    'http://kraih.com/proxy', 'right content');
+is $client->get("http://kraih.com/proxy")->success->body,
+  'http://kraih.com/proxy', 'right content';
 
 # WebSocket /test (proxy websocket)
 $client->http_proxy("http://localhost:$proxy");
@@ -153,10 +151,10 @@ $client->websocket(
         $self->send_message('test1');
     }
 )->process;
-is($connected, "localhost:$port", 'connected');
-is($result,    'test1test2',      'right result');
-ok($read > 25, 'read enough');
-ok($sent > 25, 'sent enough');
+is $connected, "localhost:$port", 'connected';
+is $result,    'test1test2',      'right result';
+ok $read > 25, 'read enough';
+ok $sent > 25, 'sent enough';
 
 # WebSocket /test (proxy websocket with bad target)
 $client->http_proxy("http://localhost:$proxy");
@@ -169,5 +167,5 @@ $client->websocket(
         $error   = $tx->error;
     }
 )->process;
-is($success, undef, 'no success');
-is($error, 'Proxy connection failed.', 'right message');
+is $success, undef, 'no success';
+is $error, 'Proxy connection failed.', 'right message';

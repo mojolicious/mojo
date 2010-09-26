@@ -722,8 +722,7 @@ $t->get_ok("sri:foo\@localhost:$port/stream?foo=bar")->status_is(200)
 
 # GET /stream (with basic auth and ojo)
 my $b = g("http://sri:foo\@localhost:$port/stream?foo=bar")->body;
-like($b, qr/^foobarsri\:foohttp:\/\/localhost\:\d+\/stream$/,
-    'right content');
+like $b, qr/^foobarsri\:foohttp:\/\/localhost\:\d+\/stream$/, 'right content';
 
 # GET /maybe/ajax (not ajax)
 $t->get_ok('/maybe/ajax')->status_is(200)
@@ -740,15 +739,13 @@ $t->get_ok('/finished')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('so far so good!');
-is($finished, 23, 'finished');
+is $finished, 23, 'finished';
 
 # GET / (IRI)
 $t->get_ok('/привет/мир')->status_is(200)
   ->content_type_is('text/html');
-is( b($t->tx->res->body)->decode('UTF-8'),
-    'привет мир',
-    'right content'
-);
+is b($t->tx->res->body)->decode('UTF-8'), 'привет мир',
+  'right content';
 
 # GET /root
 $t->get_ok('/root.html')->status_is(200)
@@ -959,8 +956,8 @@ $tx->req->method('POST');
 $tx->req->url->parse('/upload');
 $tx->req->content($content);
 $client->process($tx);
-is($tx->res->code, 413,        'right status');
-is($tx->res->body, 'called, ', 'right content');
+is $tx->res->code, 413,        'right status';
+is $tx->res->body, 'called, ', 'right content';
 app->log->level($backup2);
 $ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
 
@@ -982,12 +979,10 @@ $tx->req->method('POST');
 $tx->req->url->parse('/upload');
 $tx->req->content($content);
 $client->process($tx);
-ok($tx->is_done, 'transaction is done');
-is($tx->res->code, 200, 'right status');
-is( b($tx->res->body)->decode('UTF-8')->to_string,
-    'called, Вячеслав.jpg4096',
-    'right content'
-);
+ok $tx->is_done, 'transaction is done';
+is $tx->res->code, 200, 'right status';
+is b($tx->res->body)->decode('UTF-8')->to_string,
+  'called, Вячеслав.jpg4096', 'right content';
 $ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
 
 # GET / (with body and max message size)
@@ -1105,7 +1100,7 @@ $t->get_ok('/session_cookie/2')->status_is(200)
 
 # GET /session_cookie/2 (session reset)
 $t->reset_session;
-ok(!$t->tx, 'session reset');
+ok !$t->tx, 'session reset';
 $t->get_ok('/session_cookie/2')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
@@ -1256,10 +1251,10 @@ $client->queue(
         $body    = $tx->res->body;
     }
 )->process;
-is($code,    200,                  'right status');
-is($server,  'Mojolicious (Perl)', 'right "Server" value');
-is($powered, 'Mojolicious (Perl)', 'right "X-Powered-By" value');
-is($body,    '%E1',                'right content');
+is $code,    200,                  'right status';
+is $server,  'Mojolicious (Perl)', 'right "Server" value';
+is $powered, 'Mojolicious (Perl)', 'right "X-Powered-By" value';
+is $body,    '%E1',                'right content';
 app->log->level($level);
 
 # GET /json
@@ -1322,7 +1317,7 @@ $t->get_ok('/subrequest_async')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('Just works!success!');
-is($async, 'broken!', 'right text');
+is $async, 'broken!', 'right text';
 
 # GET /redirect_url
 $t->get_ok('/redirect_url')->status_is(302)
@@ -1523,10 +1518,9 @@ $t->get_ok('/prefix/works')->status_is(200)
 
 # Client timer
 $client->ioloop->one_tick('0.1');
-is( $timer,
-    "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\nworks!",
-    'right content'
-);
+is $timer,
+  "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\nworks!",
+  'right content';
 
 __DATA__
 @@ foo/bar.html.ep

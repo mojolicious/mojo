@@ -8,8 +8,8 @@ use Test::More tests => 15;
 use Mojo::JSON;
 
 # We need some more secret sauce. Put the mayonnaise in the sun.
-use_ok('Mojo::Server::PSGI');
-use_ok('Mojo::Command::Psgi');
+use_ok 'Mojo::Server::PSGI';
+use_ok 'Mojo::Command::Psgi';
 
 # Binding
 my $psgi    = Mojo::Server::PSGI->new;
@@ -34,21 +34,21 @@ my $env = {
     'psgi.run_once'     => 0
 };
 my $res = $app->($env);
-is($res->[0], 200, 'right status');
+is $res->[0], 200, 'right status';
 my %headers = @{$res->[1]};
-is(keys %headers, 3, 'right number of headers');
-ok($headers{Date}, 'right "Date" value');
-is($headers{'Content-Length'}, '41', 'right "Content-Length" value');
-is($headers{'Content-Type'}, 'application/json',
-    'right "Content-Type" value');
+is keys(%headers), 3, 'right number of headers';
+ok $headers{Date}, 'right "Date" value';
+is $headers{'Content-Length'}, 41, 'right "Content-Length" value';
+is $headers{'Content-Type'}, 'application/json', 'right "Content-Type" value';
 my $params = '';
 while (defined(my $chunk = $res->[2]->getline)) { $params .= $chunk }
 $params = Mojo::JSON->new->decode($params);
-is_deeply(
-    $params,
-    {bar => 'baz', hello => 'world', lalala => 23},
-    'right structure'
-);
+is_deeply $params,
+  { bar    => 'baz',
+    hello  => 'world',
+    lalala => 23
+  },
+  'right structure';
 
 # Command
 $content = 'world=hello';
@@ -72,19 +72,19 @@ $env = {
 };
 $app = Mojo::Command::Psgi->new->run;
 $res = $app->($env);
-is($res->[0], 200, 'right status');
+is $res->[0], 200, 'right status';
 %headers = @{$res->[1]};
-is(keys %headers, 3, 'right number of headers');
-ok($headers{Date}, 'right "Date" value');
-is($headers{'Content-Length'}, '41', 'right "Content-Length" value');
-is($headers{'Content-Type'}, 'application/json',
-    'right "Content-Type" value');
+is keys(%headers), 3, 'right number of headers';
+ok $headers{Date}, 'right "Date" value';
+is $headers{'Content-Length'}, 41, 'right "Content-Length" value';
+is $headers{'Content-Type'}, 'application/json', 'right "Content-Type" value';
 $params = '';
 while (defined(my $chunk = $res->[2]->getline)) { $params .= $chunk }
 $params = Mojo::JSON->new->decode($params);
-is_deeply(
-    $params,
-    {bar => 'baz', world => 'hello', lalala => 23},
-    'right structure'
-);
-is($ENV{MOJO_HELLO}, 'world', 'finished callback');
+is_deeply $params,
+  { bar    => 'baz',
+    world  => 'hello',
+    lalala => 23
+  },
+  'right structure';
+is $ENV{MOJO_HELLO}, 'world', 'finished callback';

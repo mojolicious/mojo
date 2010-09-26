@@ -115,10 +115,8 @@ $loop->listen(
 );
 
 # GET / (normal request)
-is( $client->get("https://localhost:$port/")->success->body,
-    "Hello World! / https://localhost:$port/",
-    'right content'
-);
+is $client->get("https://localhost:$port/")->success->body,
+  "Hello World! / https://localhost:$port/", 'right content';
 
 # WebSocket /test (normal websocket)
 my $result;
@@ -135,21 +133,19 @@ $client->websocket(
         $self->send_message('test1');
     }
 )->process;
-is($result, 'test1test2', 'right result');
+is $result, 'test1test2', 'right result';
 
 # GET /proxy (proxy request)
 $client->https_proxy("http://localhost:$proxy");
-is( $client->get("https://localhost:$port/proxy")->success->body,
-    "https://localhost:$port/proxy",
-    'right content'
-);
+is $client->get("https://localhost:$port/proxy")->success->body,
+  "https://localhost:$port/proxy", 'right content';
 
 # GET /proxy (kept alive proxy request)
 $client->https_proxy("http://localhost:$proxy");
 my $tx = $client->build_tx(GET => "https://localhost:$port/proxy");
 $client->process($tx);
-is($tx->success->body, "https://localhost:$port/proxy", 'right content');
-is($tx->kept_alive, 1, 'kept alive');
+is $tx->success->body, "https://localhost:$port/proxy", 'right content';
+is $tx->kept_alive, 1, 'kept alive';
 
 # WebSocket /test (kept alive proxy websocket)
 $client->https_proxy("http://localhost:$proxy");
@@ -169,11 +165,11 @@ $client->websocket(
         $self->send_message('test1');
     }
 )->process;
-is($kept_alive, 1,                 'kept alive');
-is($connected,  "localhost:$port", 'connected');
-is($result,     'test1test2',      'right result');
-ok($read > 25, 'read enough');
-ok($sent > 25, 'sent enough');
+is $kept_alive, 1,                 'kept alive';
+is $connected,  "localhost:$port", 'connected';
+is $result,     'test1test2',      'right result';
+ok $read > 25, 'read enough';
+ok $sent > 25, 'sent enough';
 
 # WebSocket /test (proxy websocket)
 $client->https_proxy("http://localhost:$proxy");
@@ -191,10 +187,10 @@ $client->websocket(
         $self->send_message('test1');
     }
 )->process;
-is($connected, "localhost:$port", 'connected');
-is($result,    'test1test2',      'right result');
-ok($read > 25, 'read enough');
-ok($sent > 25, 'sent enough');
+is $connected, "localhost:$port", 'connected';
+is $result,    'test1test2',      'right result';
+ok $read > 25, 'read enough';
+ok $sent > 25, 'sent enough';
 
 # WebSocket /test (proxy websocket with bad target)
 $client->https_proxy("http://localhost:$proxy");
@@ -207,5 +203,5 @@ $client->websocket(
         $error   = $tx->error;
     }
 )->process;
-is($success, undef, 'no success');
-is($error, 'Proxy connection failed.', 'right message');
+is $success, undef, 'no success';
+is $error, 'Proxy connection failed.', 'right message';

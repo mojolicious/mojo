@@ -134,7 +134,7 @@ $client->websocket(
         $self->send_message('test1');
     }
 )->process;
-is($result, 'test1test2', 'right result');
+is $result, 'test1test2', 'right result';
 
 # WebSocket / (ojo)
 $result = undef;
@@ -146,7 +146,7 @@ w '/' => sub {
         }
     )->send_message('test1');
 };
-is($result, 'test1test2', 'right result');
+is $result, 'test1test2', 'right result';
 
 # WebSocket /socket (using an already prepared socket)
 my $peer  = $client->test_server;
@@ -173,8 +173,8 @@ $client->process(
         $port = $self->ioloop->local_info($self->tx->connection)->{port};
     }
 )->process;
-is($result, 'lalala', 'right result');
-is($port,   $local,   'right local port');
+is $result, 'lalala', 'right result';
+is $port, $local, 'right local port';
 
 # WebSocket /early_start (server directly sends a message)
 my $flag2;
@@ -193,15 +193,15 @@ $client->websocket(
         );
     }
 )->process;
-is($result, 'test3test2', 'right result');
-is($flag2,  23,           'finished callback');
+is $result, 'test3test2', 'right result';
+is $flag2,  23,           'finished callback';
 
 # WebSocket /denied (connection denied)
 my $code = undef;
 $client->websocket('/denied' => sub { $code = shift->res->code })->process;
-is($code,      403, 'right status');
-is($handshake, 2,   'finished handshake');
-is($denied,    1,   'finished websocket');
+is $code,      403, 'right status';
+is $handshake, 2,   'finished handshake';
+is $denied,    1,   'finished websocket';
 
 # WebSocket /subreq
 my $finished = 0;
@@ -221,10 +221,10 @@ $client->websocket(
         $self->finished(sub { $finished += 4 });
     }
 )->process;
-is($code,     101,          'right status');
-is($result,   'test0test1', 'right result');
-is($finished, 4,            'finished client websocket');
-is($subreq,   3,            'finished server websocket');
+is $code,     101,          'right status';
+is $result,   'test0test1', 'right result';
+is $finished, 4,            'finished client websocket';
+is $subreq,   3,            'finished server websocket';
 
 # WebSocket /subreq (async)
 my $running = 2;
@@ -263,12 +263,12 @@ $client->async->websocket(
     }
 )->process;
 $client->ioloop->start;
-is($code,     101,          'right status');
-is($result,   'test0test1', 'right result');
-is($code2,    101,          'right status');
-is($result2,  'test0test1', 'right result');
-is($finished, 7,            'finished client websocket');
-is($subreq,   9,            'finished server websocket');
+is $code,     101,          'right status';
+is $result,   'test0test1', 'right result';
+is $code2,    101,          'right status';
+is $result2,  'test0test1', 'right result';
+is $finished, 7,            'finished client websocket';
+is $subreq,   9,            'finished server websocket';
 
 # WebSocket /dead (dies)
 $code = undef;
@@ -282,10 +282,10 @@ $client->websocket(
         $message   = $self->res->message;
     }
 )->process;
-is($done,      1,                       'transaction is done');
-is($websocket, 0,                       'no websocket');
-is($code,      500,                     'right status');
-is($message,   'Internal Server Error', 'right message');
+is $done,      1,                       'transaction is done';
+is $websocket, 0,                       'no websocket';
+is $code,      500,                     'right status';
+is $message,   'Internal Server Error', 'right message';
 
 # WebSocket /foo (forbidden)
 ($websocket, $code, $message) = undef;
@@ -297,9 +297,9 @@ $client->websocket(
         $message   = $self->res->message;
     }
 )->process;
-is($websocket, 0,              'no websocket');
-is($code,      403,            'right status');
-is($message,   "i'm a teapot", 'right message');
+is $websocket, 0,              'no websocket';
+is $code,      403,            'right status';
+is $message,   "i'm a teapot", 'right message';
 
 # WebSocket /deadcallback (dies in callback)
 $client->websocket(
@@ -310,4 +310,4 @@ $client->websocket(
 )->process;
 
 # Server side "finished" callback
-is($flag, 24, 'finished callback');
+is $flag, 24, 'finished callback';

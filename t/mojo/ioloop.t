@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More tests => 5;
 
-use_ok('Mojo::IOLoop');
+use_ok 'Mojo::IOLoop';
 
 # Marge, you being a cop makes you the man!
 # Which makes me the woman, and I have no interest in that,
@@ -41,10 +41,10 @@ $loop->timer(0.25 => sub { $hiresflag = 42 });
 $loop->start;
 
 # Timer
-is($flag, 23, 'recursive timer works');
+is $flag, 23, 'recursive timer works';
 
 # HiRes timer
-is($hiresflag, 42, 'hires timer');
+is $hiresflag, 42, 'hires timer';
 
 # Idle callback
 my $idle = 0;
@@ -54,7 +54,7 @@ $loop->on_idle(sub { $idle++ });
 $loop->one_tick;
 
 # Ticks
-ok($ticks > 2, 'more than two ticks');
+ok $ticks > 2, 'more than two ticks';
 
 # Idle callback
-is($idle, 1, 'on_idle was called');
+is $idle, 1, 'on_idle was called';

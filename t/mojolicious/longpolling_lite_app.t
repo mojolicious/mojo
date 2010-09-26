@@ -142,46 +142,46 @@ $t->get_ok('/shortpoll')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/plain')->content_is('this was short.');
-is($shortpoll, 'finished!', 'finished');
+is $shortpoll, 'finished!', 'finished';
 
 # GET /shortpoll/plain
 $t->get_ok('/shortpoll/plain')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/plain')->content_is('this was short and plain.');
-is($shortpoll_plain, 'finished!', 'finished');
+is $shortpoll_plain, 'finished!', 'finished';
 
 # GET /longpoll
 $t->get_ok('/longpoll')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/plain')->content_is('hi there, whats up?');
-is($longpoll, 'finished!', 'finished');
+is $longpoll, 'finished!', 'finished';
 
 # GET /longpoll/nested
 $t->get_ok('/longpoll/nested')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/plain')->content_is('nested!');
-is($longpoll_nested, 'finished!', 'finished');
+is $longpoll_nested, 'finished!', 'finished';
 
 # GET /longpoll/plain
 $t->get_ok('/longpoll/plain')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/plain')->content_is('hi there plain, whats up?');
-is($longpoll_plain, 'finished!', 'finished');
+is $longpoll_plain, 'finished!', 'finished';
 
 # GET /longpoll/delayed
 $t->get_ok('/longpoll/delayed')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/plain')->content_is('howdy!');
-is($longpoll_delayed, 'finished!', 'finished');
+is $longpoll_delayed, 'finished!', 'finished';
 
 # GET /longpoll/plain/delayed
 $t->get_ok('/longpoll/plain/delayed')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/plain')->content_is('howdy plain!');
-is($longpoll_plain_delayed, 'finished!', 'finished');
+is $longpoll_plain_delayed, 'finished!', 'finished';

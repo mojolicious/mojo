@@ -25,34 +25,34 @@ use Test::More tests => 404;
 
 # I've done everything the Bible says,
 # even the stuff that contradicts the other stuff!
-use_ok('Mojo::Base');
+use_ok 'Mojo::Base';
 
 # Basic functionality
 my $monkeys = [];
 for my $i (1 .. 50) {
     $monkeys->[$i] = BaseTest->new;
     $monkeys->[$i]->bananas($i);
-    is($monkeys->[$i]->bananas, $i, 'right attribute value');
+    is $monkeys->[$i]->bananas, $i, 'right attribute value';
 }
 for my $i (51 .. 100) {
     $monkeys->[$i] = BaseTest->new(bananas => $i);
-    is($monkeys->[$i]->bananas, $i, 'right attribute value');
+    is $monkeys->[$i]->bananas, $i, 'right attribute value';
 }
 
 # "default" defined but false
 my $m = $monkeys->[1];
-ok(defined($m->figs));
-is($m->figs, 0, 'right attribute value');
+ok defined($m->figs);
+is $m->figs, 0, 'right attribute value';
 $m->figs(5);
-is($m->figs, 5, 'right attribute value');
+is $m->figs, 5, 'right attribute value';
 
 # "default" support
 my $y = 1;
 for my $i (101 .. 150) {
     $y = !$y;
     $monkeys->[$i] = BaseTest->new;
-    is(ref $monkeys->[$i]->name('foobarbaz'),
-        'BaseTest', 'attribute value has right class');
+    is ref $monkeys->[$i]->name('foobarbaz'),
+      'BaseTest', 'attribute value has right class';
     $monkeys->[$i]->heads('3') if $y;
     $y
       ? is($monkeys->[$i]->heads, 3, 'right attribute value')
@@ -62,10 +62,10 @@ for my $i (101 .. 150) {
 # "chained" and coderef "default" support
 for my $i (151 .. 200) {
     $monkeys->[$i] = BaseTest->new;
-    is($monkeys->[$i]->ears,          2, 'right attribute value');
-    is($monkeys->[$i]->ears(6)->ears, 6, 'right chained attribute value');
-    is($monkeys->[$i]->eyes,          2, 'right attribute value');
-    is($monkeys->[$i]->eyes(6)->eyes, 6, 'right chained attribute value');
+    is $monkeys->[$i]->ears, 2, 'right attribute value';
+    is $monkeys->[$i]->ears(6)->ears, 6, 'right chained attribute value';
+    is $monkeys->[$i]->eyes, 2, 'right attribute value';
+    is $monkeys->[$i]->eyes(6)->eyes, 6, 'right chained attribute value';
 }
 
 1;

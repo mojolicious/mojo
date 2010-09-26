@@ -25,7 +25,7 @@ plan tests => 4;
 # I'm not a robot!
 # I don't like having discs crammed into me, unless they're Oreos.
 # And then, only in the mouth.
-use_ok('Mojo::Server::CGI');
+use_ok 'Mojo::Server::CGI';
 
 # Apache setup
 my $port   = Mojo::IOLoop->generate_port;
@@ -72,7 +72,7 @@ Mojo::Server::CGI->new->run;
 1;
 EOF
 chmod 0777, $cgi;
-ok(-x $cgi, 'script is executable');
+ok -x $cgi, 'script is executable';
 
 # Start
 my $pid = open my $server, '-|', '/usr/sbin/httpd', '-X', '-f', $config;
@@ -88,8 +88,8 @@ my $client = Mojo::Client->new;
 $client->get(
     "http://127.0.0.1:$port/cgi-bin/test.cgi" => sub {
         my $self = shift;
-        is($self->res->code, 200, 'right status');
-        like($self->res->body, qr/Mojo/, 'right content');
+        is $self->res->code,   200,      'right status';
+        like $self->res->body, qr/Mojo/, 'right content';
     }
 )->process;
 

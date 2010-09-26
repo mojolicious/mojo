@@ -14,7 +14,7 @@ plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
 plan tests => 41;
 
-use_ok('Mojo::Client');
+use_ok 'Mojo::Client';
 
 # The strong must protect the sweet.
 use Mojolicious::Lite;
@@ -56,57 +56,57 @@ my $id = $client->ioloop->listen(
 
 # GET /
 my $tx = $client->get('/');
-ok($tx->success, 'successful');
-is($tx->res->code, 200,     'right status');
-is($tx->res->body, 'works', 'right content');
+ok $tx->success, 'successful';
+is $tx->res->code, 200,     'right status';
+is $tx->res->body, 'works', 'right content';
 
 # GET / (mock server)
 $tx = $client->get("http://localhost:$port/mock");
-ok($tx->success, 'successful');
-is($tx->kept_alive, undef,    'kept connection not alive');
-is($tx->res->code,  200,      'right status');
-is($tx->res->body,  'works!', 'no content');
+ok $tx->success, 'successful';
+is $tx->kept_alive, undef, 'kept connection not alive';
+is $tx->res->code, 200,      'right status';
+is $tx->res->body, 'works!', 'no content';
 
 # GET / (mock server again)
 $tx = $client->get("http://localhost:$port/mock");
-ok($tx->success, 'successful');
-is($tx->kept_alive, 1,        'kept connection alive');
-is($tx->res->code,  200,      'right status');
-is($tx->res->body,  'works!', 'no content');
+ok $tx->success, 'successful';
+is $tx->kept_alive, 1, 'kept connection alive';
+is $tx->res->code, 200,      'right status';
+is $tx->res->body, 'works!', 'no content';
 
 # Close connection (bypassing safety net)
 $client->ioloop->_drop_immediately($last);
 
 # GET / (mock server closed connection)
 $tx = $client->get("http://localhost:$port/mock");
-ok($tx->success, 'successful');
-is($tx->kept_alive, undef,    'kept connection not alive');
-is($tx->res->code,  200,      'right status');
-is($tx->res->body,  'works!', 'no content');
+ok $tx->success, 'successful';
+is $tx->kept_alive, undef, 'kept connection not alive';
+is $tx->res->code, 200,      'right status';
+is $tx->res->body, 'works!', 'no content';
 
 # GET / (mock server again)
 $tx = $client->get("http://localhost:$port/mock");
-ok($tx->success, 'successful');
-is($tx->kept_alive, 1,        'kept connection alive');
-is($tx->res->code,  200,      'right status');
-is($tx->res->body,  'works!', 'no content');
+ok $tx->success, 'successful';
+is $tx->kept_alive, 1, 'kept connection alive';
+is $tx->res->code, 200,      'right status';
+is $tx->res->body, 'works!', 'no content';
 
 # Close connection (bypassing safety net)
 $client->ioloop->_drop_immediately($last);
 
 # GET / (mock server closed connection)
 $tx = $client->get("http://localhost:$port/mock");
-ok($tx->success, 'successful');
-is($tx->kept_alive, undef,    'kept connection not alive');
-is($tx->res->code,  200,      'right status');
-is($tx->res->body,  'works!', 'no content');
+ok $tx->success, 'successful';
+is $tx->kept_alive, undef, 'kept connection not alive';
+is $tx->res->code, 200,      'right status';
+is $tx->res->body, 'works!', 'no content';
 
 # GET / (mock server again)
 $tx = $client->get("http://localhost:$port/mock");
-ok($tx->success, 'successful');
-is($tx->kept_alive, 1,        'kept connection alive');
-is($tx->res->code,  200,      'right status');
-is($tx->res->body,  'works!', 'no content');
+ok $tx->success, 'successful';
+is $tx->kept_alive, 1, 'kept connection alive';
+is $tx->res->code, 200,      'right status';
+is $tx->res->body, 'works!', 'no content';
 
 # Taint connection (on UNIX)
 $^O eq 'MSWin32'
@@ -115,17 +115,17 @@ $^O eq 'MSWin32'
 
 # GET / (mock server tainted connection)
 $tx = $client->get("http://localhost:$port/mock");
-ok($tx->success, 'successful');
-is($tx->kept_alive, undef,    'kept connection not alive');
-is($tx->res->code,  200,      'right status');
-is($tx->res->body,  'works!', 'no content');
+ok $tx->success, 'successful';
+is $tx->kept_alive, undef, 'kept connection not alive';
+is $tx->res->code, 200,      'right status';
+is $tx->res->body, 'works!', 'no content';
 
 # GET / (mock server again)
 $tx = $client->get("http://localhost:$port/mock");
-ok($tx->success, 'successful');
-is($tx->kept_alive, 1,        'kept connection alive');
-is($tx->res->code,  200,      'right status');
-is($tx->res->body,  'works!', 'no content');
+ok $tx->success, 'successful';
+is $tx->kept_alive, 1, 'kept connection alive';
+is $tx->res->code, 200,      'right status';
+is $tx->res->body, 'works!', 'no content';
 
 # Taint connection (on UNIX)
 $^O eq 'MSWin32'
@@ -134,10 +134,10 @@ $^O eq 'MSWin32'
 
 # GET / (mock server tainted connection)
 $tx = $client->get("http://localhost:$port/mock");
-ok($tx->success, 'successful');
-is($tx->kept_alive, undef,    'kept connection not alive');
-is($tx->res->code,  200,      'right status');
-is($tx->res->body,  'works!', 'no content');
+ok $tx->success, 'successful';
+is $tx->kept_alive, undef, 'kept connection not alive';
+is $tx->res->code, 200,      'right status';
+is $tx->res->body, 'works!', 'no content';
 
 # Nested keep alive
 my @kept_alive;
@@ -164,4 +164,4 @@ $client->async->get(
     }
 )->process;
 $client->async->ioloop->start;
-is_deeply(\@kept_alive, [undef, 1, 1], 'connections kept alive');
+is_deeply \@kept_alive, [undef, 1, 1], 'connections kept alive';

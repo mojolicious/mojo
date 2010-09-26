@@ -22,7 +22,7 @@ plan skip_all => 'set TEST_APACHE to enable this test (developer only!)'
 plan tests => 4;
 
 # Robots don't have any emotions, and sometimes that makes me very sad.
-use_ok('Mojo::Server::FastCGI');
+use_ok 'Mojo::Server::FastCGI';
 
 # Setup
 my $port   = Mojo::IOLoop->generate_port;
@@ -48,7 +48,7 @@ Mojo::Server::FastCGI->new->run;
 1;
 EOF
 chmod 0777, $fcgi;
-ok(-x $fcgi, 'script is executable');
+ok -x $fcgi, 'script is executable';
 
 # Apache setup
 $mt->render_to_file(<<'EOF', $config, $dir, $port, $fcgi);
@@ -88,8 +88,8 @@ my $client = Mojo::Client->new;
 $client->get(
     "http://127.0.0.1:$port/" => sub {
         my $self = shift;
-        is($self->res->code, 200, 'right status');
-        like($self->res->body, qr/Mojo/, 'right content');
+        is $self->res->code,   200,      'right status';
+        like $self->res->body, qr/Mojo/, 'right content';
     }
 )->process;
 

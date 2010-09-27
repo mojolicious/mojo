@@ -490,7 +490,7 @@ get '/default/condition' => (default => 23) => sub {
     $self->render(text => "works $default $test");
 };
 
-# Test condition
+# Redirect condition
 app->routes->add_condition(
     redirect => sub {
         my ($r, $c, $captures, $active) = @_;

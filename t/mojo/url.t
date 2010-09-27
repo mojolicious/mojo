@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 120;
+use Test::More tests => 124;
 
 # I don't want you driving around in a car you built yourself.
 # You can sit there complaining, or you can knit me some seat belts.
@@ -93,10 +93,21 @@ is $rel->to_abs, 'http://kraih.com/foo/index.html?foo=bar#23',
 # Relative path
 $url = Mojo::URL->new('http://kraih.com/foo/?foo=bar#23');
 $url->path('bar');
-is "$url", 'http://kraih.com/foo/bar?foo=bar#23';
+is "$url", 'http://kraih.com/foo/bar?foo=bar#23', 'right path';
 $url = Mojo::URL->new('http://kraih.com?foo=bar#23');
 $url->path('bar');
-is "$url", 'http://kraih.com/bar?foo=bar#23';
+is "$url", 'http://kraih.com/bar?foo=bar#23', 'right path';
+$url = Mojo::URL->new('http://kraih.com/foo?foo=bar#23');
+$url->path('bar');
+is "$url", 'http://kraih.com/bar?foo=bar#23', 'right path';
+$url = Mojo::URL->new('http://kraih.com/foo/bar?foo=bar#23');
+$url->path('yada/baz');
+is "$url", 'http://kraih.com/foo/yada/baz?foo=bar#23', 'right path';
+$url = Mojo::URL->new('http://kraih.com/foo/bar?foo=bar#23');
+$url->path('../baz');
+is "$url", 'http://kraih.com/foo/../baz?foo=bar#23', 'right path';
+$url->path->canonicalize;
+is "$url", 'http://kraih.com/baz?foo=bar#23', 'right canonicalized path';
 
 # Absolute (base without trailing slash)
 $url = Mojo::URL->new('/foo?foo=bar#23');

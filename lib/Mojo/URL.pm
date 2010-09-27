@@ -162,6 +162,7 @@ sub path {
             else {
                 my $new = Mojo::Path->new($path);
                 $path = $self->{path} || Mojo::Path->new;
+                pop @{$path->parts} unless $path->trailing_slash;
                 push @{$path->parts}, @{$new->parts};
                 $path->leading_slash(1);
                 $path->trailing_slash($new->trailing_slash);

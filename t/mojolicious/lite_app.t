@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 616;
+plan tests => 632;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -472,7 +472,7 @@ get '/koi8-r' => sub {
 # GET /hello3.txt
 get '/hello3.txt' => sub { shift->render_static('hello2.txt') };
 
-# Condition
+# Default condition
 app->routes->add_condition(
     default => sub {
         my ($r, $c, $captures, $num) = @_;
@@ -489,6 +489,26 @@ get '/default/condition' => (default => 23) => sub {
     my $test    = $self->stash('test');
     $self->render(text => "works $default $test");
 };
+
+# Test condition
+app->routes->add_condition(
+    redirect => sub {
+        my ($r, $c, $captures, $active) = @_;
+        return 1 unless $active;
+        $c->redirect_to('index') and return
+          unless $c->req->headers->header('X-Condition-Test');
+        return 1;
+    }
+);
+
+# GET /redirect/condition/0
+get '/redirect/condition/0' => (redirect => 0) => sub {
+    shift->render(text => 'condition works!');
+};
+
+# GET /redirect/condition/1
+get '/redirect/condition/1' => (redirect => 1) =>
+  {text => 'condition works too!'};
 
 under sub {
     my $self = shift;
@@ -1470,6 +1490,24 @@ $t->get_ok('/default/condition')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('works 23 23 works!');
+
+# GET /redirect/condition/0
+$t->get_ok('/redirect/condition/0')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('condition works!');
+
+# GET /redirect/condition/1
+$t->get_ok('/redirect/condition/1')->status_is(302)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->header_like('Location' => qr/\/template$/)->content_is('');
+
+# GET /redirect/condition/1 (with condition header)
+$t->get_ok('/redirect/condition/1' => {'X-Condition-Test' => 1})
+  ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('condition works too!');
 
 # GET /bridge2stash
 $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)

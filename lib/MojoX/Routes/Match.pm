@@ -44,6 +44,15 @@ sub match {
     # Root
     $self->root($r) unless $self->root;
 
+    # Path
+    my $path = $self->{_path};
+
+    # Match
+    my $captures = $r->pattern->shape_match(\$path);
+
+    # No match
+    return unless $captures;
+
     # Conditions
     for (my $i = 0; $i < @{$r->conditions}; $i += 2) {
         my $name      = $r->conditions->[$i];
@@ -57,15 +66,6 @@ sub match {
         return
           if !$condition->($r, $self->{_controller}, $self->captures, $value);
     }
-
-    # Path
-    my $path = $self->{_path};
-
-    # Match
-    my $captures = $r->pattern->shape_match(\$path);
-
-    # No match
-    return unless $captures;
 
     # Partial
     if (my $partial = $r->partial) {
@@ -271,7 +271,6 @@ implements the following ones.
 
 =head2 C<new>
 
-    my $m = MojoX::Routes::Match->new;
     my $m = MojoX::Routes::Match->new(MojoX:Controller->new);
 
 Construct a new match object.

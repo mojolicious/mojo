@@ -354,7 +354,7 @@ sub url_for {
     my $target = shift || '';
 
     # Make sure we have a match for named routes
-    $self->match(MojoX::Routes::Match->new->root($self->app->routes))
+    $self->match(MojoX::Routes::Match->new($self)->root($self->app->routes))
       unless $self->match;
 
     # Path

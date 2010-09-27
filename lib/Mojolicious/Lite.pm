@@ -39,7 +39,7 @@ sub import {
 
         # Route information
         my $condition;
-        while (my $arg = shift @args) {
+        while (defined(my $arg = shift @args)) {
 
             # Condition can be everything
             if ($condition) {

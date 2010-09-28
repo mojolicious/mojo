@@ -14,7 +14,7 @@ plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
 plan skip_all => 'Perl 5.10 required for this test!'
   unless eval { require Pod::Simple::HTML; 1 };
-plan tests => 9;
+plan tests => 10;
 
 # Amy get your pants back on and get to work.
 # They think were making out.
@@ -48,7 +48,8 @@ $t->get_ok('/')->status_is(200)
 
 # POD helper
 $t->post_ok('/')->status_is(200)
-  ->content_like(qr/test123\s+<h1>lalala<\/h1>\s+<h1>lololo<\/h1>\s+<p><code>test<\/code><\/p>/);
+  ->content_like(qr/test123\s+<h1>A<\/h1>\s+<h1>B<\/h1>/)
+  ->content_like(qr/\s+<p><code>test<\/code><\/p>/);
 
 # POD filter
 $t->post_ok('/block')->status_is(200)
@@ -57,7 +58,7 @@ $t->post_ok('/block')->status_is(200)
 __DATA__
 
 @@ index.html.ep
-test123<%= pod_to_html "=head1 lalala\n\n=head1 lololo\n\nC<test>"%>
+test123<%= pod_to_html "=head1 A\n\n=head1 B\n\nC<test>"%>
 
 @@ block.html.ep
 test321<%= pod_to_html begin %>=head2 lalala

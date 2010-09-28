@@ -62,8 +62,8 @@ sub _pod_to_html {
     return $@ if $@;
 
     # Filter
-    $output =~ s/<a name='___top' class='dummyTopAnchor'\s*><\/a>\n//g;
-    $output =~ s/<a class='u'.*name=".*"\s*>(.*)<\/a>/$1/sg;
+    $output =~ s/<a name='___top' class='dummyTopAnchor'\s*?><\/a>\n//g;
+    $output =~ s/<a class='u'.*?name=".*?"\s*>(.*?)<\/a>/$1/sg;
 
     return $output;
 }

@@ -48,7 +48,7 @@ $t->get_ok('/')->status_is(200)
 
 # POD helper
 $t->post_ok('/')->status_is(200)
-  ->content_like(qr/test123\s+<h1>lalala<\/h1>\s+<p><code>test<\/code><\/p>/);
+  ->content_like(qr/test123\s+<h1>lalala<\/h1>\s+<h1>lololo<\/h1>\s+<p><code>test<\/code><\/p>/);
 
 # POD filter
 $t->post_ok('/block')->status_is(200)
@@ -57,7 +57,7 @@ $t->post_ok('/block')->status_is(200)
 __DATA__
 
 @@ index.html.ep
-test123<%= pod_to_html "=head1 lalala\n\nC<test>"%>
+test123<%= pod_to_html "=head1 lalala\n\n=head1 lololo\n\nC<test>"%>
 
 @@ block.html.ep
 test321<%= pod_to_html begin %>=head2 lalala

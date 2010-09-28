@@ -89,7 +89,7 @@ websocket '/subreq' => sub {
             );
             $client->send_message('test1');
         }
-    )->process;
+    )->start;
     $self->send_message('test0');
     $self->on_finish(sub { $subreq += 3 });
 };
@@ -133,7 +133,7 @@ $client->websocket(
         );
         $self->send_message('test1');
     }
-)->process;
+)->start;
 is $result, 'test1test2', 'right result';
 
 # WebSocket / (ojo)
@@ -160,7 +160,7 @@ my $socket = IO::Socket::INET->new(
 );
 $tx->connection($socket);
 my $port;
-$client->process(
+$client->start(
     $tx => sub {
         my $self = shift;
         $self->on_message(
@@ -172,7 +172,7 @@ $client->process(
         );
         $port = $self->ioloop->local_info($self->tx->connection)->{port};
     }
-)->process;
+);
 is $result, 'lalala', 'right result';
 is $port, $local, 'right local port';
 
@@ -192,13 +192,13 @@ $client->websocket(
             }
         );
     }
-)->process;
+)->start;
 is $result, 'test3test2', 'right result';
 is $flag2,  23,           'finished callback';
 
 # WebSocket /denied (connection denied)
 my $code = undef;
-$client->websocket('/denied' => sub { $code = shift->res->code })->process;
+$client->websocket('/denied' => sub { $code = shift->res->code })->start;
 is $code,      403, 'right status';
 is $handshake, 2,   'finished handshake';
 is $denied,    1,   'finished websocket';
@@ -220,7 +220,7 @@ $client->websocket(
         );
         $self->on_finish(sub { $finished += 4 });
     }
-)->process;
+)->start;
 is $code,     101,          'right status';
 is $result,   'test0test1', 'right result';
 is $finished, 4,            'finished client websocket';
@@ -245,7 +245,7 @@ $client->async->websocket(
         );
         $self->on_finish(sub { $finished += 1 });
     }
-)->process;
+)->start;
 $client->async->websocket(
     '/subreq' => sub {
         my $self = shift;
@@ -261,7 +261,7 @@ $client->async->websocket(
         );
         $self->on_finish(sub { $finished += 2 });
     }
-)->process;
+)->start;
 $client->ioloop->start;
 is $code,     101,          'right status';
 is $result,   'test0test1', 'right result';
@@ -281,7 +281,7 @@ $client->websocket(
         $code      = $self->res->code;
         $message   = $self->res->message;
     }
-)->process;
+)->start;
 is $done,      1,                       'transaction is done';
 is $websocket, 0,                       'no websocket';
 is $code,      500,                     'right status';
@@ -296,7 +296,7 @@ $client->websocket(
         $code      = $self->res->code;
         $message   = $self->res->message;
     }
-)->process;
+)->start;
 is $websocket, 0,              'no websocket';
 is $code,      403,            'right status';
 is $message,   "i'm a teapot", 'right message';
@@ -307,7 +307,7 @@ $client->websocket(
         my $self = shift;
         $self->send_message('test1');
     }
-)->process;
+)->start;
 
 # Server side "finished" callback
 is $flag, 24, 'finished callback';

@@ -60,7 +60,7 @@ get '/bye' => sub {
             my $client = shift;
             $self->render_text($client->res->body . "$name! $async");
         }
-    )->process;
+    )->start;
     $async .= 'success!';
 };
 

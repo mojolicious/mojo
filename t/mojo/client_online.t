@@ -28,7 +28,7 @@ $client->get(
         my $self = shift;
         $code = $self->res->code;
     }
-)->process;
+)->start;
 $client = undef;
 my $ticks = 0;
 $loop->on_tick(sub { $ticks++ });
@@ -43,7 +43,7 @@ $client = Mojo::Client->new;
 # Connection refused
 $client->log->level('fatal');
 my $tx = $client->build_tx(GET => 'http://localhost:99999');
-$client->process($tx);
+$client->start($tx);
 ok !$tx->is_done, 'transaction is not done';
 
 # Fresh client again
@@ -51,12 +51,12 @@ $client = Mojo::Client->new;
 
 # Host does not exist
 $tx = $client->build_tx(GET => 'http://cdeabcdeffoobarnonexisting.com');
-$client->process($tx);
+$client->start($tx);
 ok !$tx->is_done, 'transaction is not done';
 
 # Keep alive
 my $async = $client->async;
-$async->get('http://mojolicio.us', sub { shift->ioloop->stop })->process;
+$async->get('http://mojolicio.us', sub { shift->ioloop->stop })->start;
 $async->ioloop->start;
 my $kept_alive = undef;
 $async->get(
@@ -66,7 +66,7 @@ $async->get(
         $self->ioloop->stop;
         $kept_alive = shift->kept_alive;
     }
-)->process;
+)->start;
 $async->ioloop->start;
 is $kept_alive, 1, 'connection was kept alive';
 
@@ -89,11 +89,11 @@ $client->async->get(
                         push @kept_alive, $tx->kept_alive;
                         $self->ioloop->stop;
                     }
-                )->process;
+                )->start;
             }
-        )->process;
+        )->start;
     }
-)->process;
+)->start;
 $client->ioloop->start;
 is_deeply \@kept_alive, [1, 1, 1], 'connections kept alive';
 
@@ -102,7 +102,7 @@ $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('http://cpan.org');
 $tx->req->headers->connection('close');
-$client->process($tx);
+$client->start($tx);
 ok $tx->is_done, 'transaction is done';
 is $tx->res->code, 301, 'right status';
 like $tx->res->headers->connection, qr/close/i, 'right "Connection" header';
@@ -143,7 +143,7 @@ $client->get(
         $url    = $self->req->url;
         $code   = $self->res->code;
     }
-)->process;
+)->start;
 is $method, 'GET',             'right method';
 is $url,    'http://cpan.org', 'right url';
 is $code,   301,               'right status';
@@ -181,7 +181,7 @@ $client->get(
         $body   = $self->req->body;
         $code   = $self->res->code;
     }
-)->process;
+)->start;
 is $method, 'GET',                   'right method';
 is $url,    'http://www.apache.org', 'right url';
 is $body,   '',                      'right content';
@@ -217,7 +217,7 @@ $client->get(
         $code3   = $self->res->code;
     }
 );
-$client->process;
+$client->start;
 is $method,     'GET',                   'right method';
 is $url,        'http://google.com',     'right url';
 is $code,       301,                     'right status';
@@ -242,7 +242,7 @@ $client->get(
         $url2    = $tx->previous->req->url;
         $code2   = $tx->previous->res->code;
     }
-)->process;
+)->start;
 $client->max_redirects(0);
 is $method,  'GET',                   'right method';
 is $url,     'http://www.google.de/', 'right url';
@@ -272,7 +272,7 @@ $tx->req->write_chunk(
         shift->write_chunk('hello world2!' => sub { shift->write_chunk('') });
     }
 );
-$client->process($tx);
+$client->start($tx);
 is_deeply([$tx->error],      ['Bad Request', 400], 'right error');
 is_deeply([$tx->res->error], ['Bad Request', 400], 'right error');
 
@@ -290,7 +290,7 @@ $client->queue(
         $kept_alive = $tx->kept_alive;
     }
 );
-$client->process;
+$client->start;
 ok($done,        'transaction is done');
 ok($kept_alive,  'connection was kept alive');
 ok($tx->is_done, 'transaction is done');
@@ -300,7 +300,7 @@ $tx->req->url->parse('http://www.apache.org');
 ok(!$tx->kept_alive, 'connection was not kept alive');
 my ($address, $port, $port2);
 ($done, $kept_alive) = undef;
-$client->process(
+$client->start(
     $tx => sub {
         my ($self, $tx) = @_;
         $done       = $tx->is_done;
@@ -326,7 +326,7 @@ $tx2->req->url->parse('http://www.apache.org');
 my $tx3 = Mojo::Transaction::HTTP->new;
 $tx3->req->method('GET');
 $tx3->req->url->parse('http://www.apache.org');
-$client->process($tx, $tx2, $tx3);
+$client->start($tx, $tx2, $tx3);
 ok($tx->is_done,  'transaction is done');
 ok($tx2->is_done, 'transaction is done');
 ok($tx3->is_done, 'transaction is done');
@@ -342,7 +342,7 @@ $tx->req->url->parse('http://www.apache.org');
 $tx2 = Mojo::Transaction::HTTP->new;
 $tx2->req->method('GET');
 $tx2->req->url->parse('http://www.apache.org');
-$client->process($tx, $tx2);
+$client->start($tx, $tx2);
 ok($tx->is_done,  'transaction is done');
 ok($tx2->is_done, 'transaction is done');
 is($tx->res->code,  200, 'right status');
@@ -362,7 +362,7 @@ $tx3->req->url->parse('http://www.apache.org');
 my $tx4 = Mojo::Transaction::HTTP->new;
 $tx4->req->method('GET');
 $tx4->req->url->parse('http://www.apache.org');
-$client->process($tx, $tx2, $tx3, $tx4);
+$client->start($tx, $tx2, $tx3, $tx4);
 ok($tx->is_done,  'transaction is done');
 ok($tx2->is_done, 'transaction is done');
 ok($tx3->is_done, 'transaction is done');

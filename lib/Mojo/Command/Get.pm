@@ -59,7 +59,7 @@ sub run {
     );
 
     # Request
-    $client->process($tx);
+    $client->start($tx);
 
     # Error
     my ($message, $code) = $tx->error;

@@ -34,8 +34,7 @@ sub import {
     *{"${caller}::g"} = sub { _request('get',       @_) };
     *{"${caller}::p"} = sub { _request('post',      @_) };
     *{"${caller}::u"} = sub { _request('put',       @_) };
-    *{"${caller}::w"} =
-      sub { Mojo::Client->singleton->websocket(@_)->process }
+    *{"${caller}::w"} = sub { Mojo::Client->singleton->websocket(@_)->start }
 }
 
 # I wonder what the shroud of Turin tastes like.
@@ -54,7 +53,7 @@ sub _request {
       : $client->build_tx($method, @_);
 
     # Process
-    $client->process($tx, sub { $tx = $_[1] });
+    $client->start($tx, sub { $tx = $_[1] });
 
     # Error
     my ($message, $code) = $tx->error;

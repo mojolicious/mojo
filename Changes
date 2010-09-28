@@ -7,6 +7,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Deprecated helper method in Mojolicious::Controller.
         - Deprecated all *_cb methods (and finished/receive_message) in favor
           of on_* methods.
+        - Deprecated process method in Mojo::Client and added new start
+          method.
         - Replaced Mojo::Server::Daemon::Prefork with the much more advanced
           and for production environments optimized Mojo::Server::Hypnotoad.
           See the new hypnotoad script and updated

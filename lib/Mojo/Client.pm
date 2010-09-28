@@ -36,6 +36,7 @@ __PACKAGE__->attr(websocket_timeout => 300);
 
 # DEPRECATED in Comet!
 *finished        = \&on_finish;
+*process         = \&start;
 *receive_message = \&on_message;
 
 # Singleton
@@ -319,7 +320,7 @@ sub clone {
 # and you didn't do it.
 sub delete {
     my $self = shift;
-    return $self->_tx_queue_or_process($self->build_tx('DELETE', @_));
+    return $self->_tx_queue_or_start($self->build_tx('DELETE', @_));
 }
 
 sub detect_proxy {
@@ -345,12 +346,12 @@ sub finish {
 # "What are you lookin' at?" - the innocent words of a drunken child.
 sub get {
     my $self = shift;
-    return $self->_tx_queue_or_process($self->build_tx('GET', @_));
+    return $self->_tx_queue_or_start($self->build_tx('GET', @_));
 }
 
 sub head {
     my $self = shift;
-    return $self->_tx_queue_or_process($self->build_tx('HEAD', @_));
+    return $self->_tx_queue_or_start($self->build_tx('HEAD', @_));
 }
 
 sub on_finish {
@@ -397,50 +398,17 @@ sub on_message {
 
 sub post {
     my $self = shift;
-    return $self->_tx_queue_or_process($self->build_tx('POST', @_));
+    return $self->_tx_queue_or_start($self->build_tx('POST', @_));
 }
 
 sub post_form {
     my $self = shift;
-    return $self->_tx_queue_or_process($self->build_form_tx(@_));
-}
-
-# Olive oil? Asparagus? If your mother wasn't so fancy,
-# we could just shop at the gas station like normal people.
-sub process {
-    my $self = shift;
-
-    # Queue
-    $self->queue(@_) if @_;
-    my $queue = delete $self->{_queue} || [];
-
-    # Process sync subrequests in new client
-    if (!$self->{_is_async} && $self->{_processing}) {
-        my $clone = $self->clone;
-        $clone->queue(@$_) for @$queue;
-        return $clone->process;
-    }
-
-    # Add async transactions from queue
-    else { $self->_tx_start(@$_) for @$queue }
-
-    # Process sync requests
-    if (!$self->{_is_async} && $self->{_processing}) {
-
-        # Start loop
-        my $loop = $self->ioloop;
-        $loop->start;
-
-        # Cleanup
-        $loop->one_tick(0);
-    }
-
-    return $self;
+    return $self->_tx_queue_or_start($self->build_form_tx(@_));
 }
 
 sub put {
     my $self = shift;
-    $self->_tx_queue_or_process($self->build_tx('PUT', @_));
+    $self->_tx_queue_or_start($self->build_tx('PUT', @_));
 }
 
 # And I gave that man directions, even though I didn't know the way,
@@ -476,6 +444,39 @@ sub send_message {
 
     # Send
     $tx->send_message(@_);
+
+    return $self;
+}
+
+# Olive oil? Asparagus? If your mother wasn't so fancy,
+# we could just shop at the gas station like normal people.
+sub start {
+    my $self = shift;
+
+    # Queue
+    $self->queue(@_) if @_;
+    my $queue = delete $self->{_queue} || [];
+
+    # Process sync subrequests in new client
+    if (!$self->{_is_async} && $self->{_processing}) {
+        my $clone = $self->clone;
+        $clone->queue(@$_) for @$queue;
+        return $clone->start;
+    }
+
+    # Add async transactions from queue
+    else { $self->_tx_start(@$_) for @$queue }
+
+    # Process sync requests
+    if (!$self->{_is_async} && $self->{_processing}) {
+
+        # Start loop
+        my $loop = $self->ioloop;
+        $loop->start;
+
+        # Cleanup
+        $loop->one_tick(0);
+    }
 
     return $self;
 }
@@ -952,11 +953,11 @@ sub _tx_info {
     return ($scheme, $host, $port);
 }
 
-sub _tx_queue_or_process {
+sub _tx_queue_or_start {
     my ($self, $tx, $cb) = @_;
 
-    # Quick process
-    $self->process($tx, sub { $tx = $_[1] }) and return $tx
+    # Quick start
+    $self->start($tx, sub { $tx = $_[1] }) and return $tx
       if !$cb && !$self->{_is_async};
 
     # Queue transaction with callback
@@ -1153,7 +1154,7 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
     my $callback = sub { print shift->res->body };
     $client->get('http://mojolicious.org' => $callback);
     $client->get('http://search.cpan.org' => $callback);
-    $client->process;
+    $client->start;
 
     # Websocket request
     $client->websocket(
@@ -1168,7 +1169,7 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
             );
             $client->send_message('hi there!');
         }
-    )->process;
+    )->start;
 
 =head1 DESCRIPTION
 
@@ -1323,7 +1324,7 @@ Versatile L<Mojo::Transaction::HTTP> builder for forms.
 
     my $tx = $client->build_form_tx('http://kraih.com/foo' => {test => 123});
     $tx->res->body(sub { print $_[1] });
-    $client->process($tx);
+    $client->start($tx);
 
 =head2 C<build_tx>
 
@@ -1341,12 +1342,12 @@ Versatile general purpose L<Mojo::Transaction::HTTP> builder.
     # Streaming response
     my $tx = $client->build_tx(GET => 'http://mojolicious.org');
     $tx->res->body(sub { print $_[1] });
-    $client->process($tx);
+    $client->start($tx);
 
     # Custom socket
     my $tx = $client->build_tx(GET => 'http://mojolicious.org');
     $tx->connection($socket);
-    $client->process($tx);
+    $client->start($tx);
 
 =head2 C<build_websocket_tx>
 
@@ -1383,7 +1384,7 @@ Prepare HTTP C<DELETE> request.
 
     $client->delete('http://kraih.com' => sub {
         print shift->res->body;
-    })->process;
+    })->start;
 
 The request will be performed right away and the resulting
 L<Mojo::Transaction::HTTP> object returned if no callback is given.
@@ -1421,7 +1422,7 @@ Prepare HTTP C<GET> request.
 
     $client->get('http://kraih.com' => sub {
         print shift->res->body;
-    })->process;
+    })->start;
 
 The request will be performed right away and the resulting
 L<Mojo::Transaction::HTTP> object returned if no callback is given.
@@ -1447,7 +1448,7 @@ Prepare HTTP C<HEAD> request.
 
     $client->head('http://kraih.com' => sub {
         print shift->res->headers->content_length;
-    })->process;
+    })->start;
 
 The request will be performed right away and the resulting
 L<Mojo::Transaction::HTTP> object returned if no callback is given.
@@ -1500,7 +1501,7 @@ Prepare HTTP C<POST> request.
 
     $client->post('http://kraih.com' => sub {
         print shift->res->body;
-    })->process;
+    })->start;
 
 The request will be performed right away and the resulting
 L<Mojo::Transaction::HTTP> object returned if no callback is given.
@@ -1578,22 +1579,12 @@ Prepare HTTP C<POST> request with form data.
 
     $client->post_form('http://kraih.com' => {q => 'test'} => sub {
         print shift->res->body;
-    })->process;
+    })->start;
 
 The request will be performed right away and the resulting
 L<Mojo::Transaction::HTTP> object returned if no callback is given.
 
     print $client->post_form('http://kraih.com' => {q => 'test'})->res->body;
-
-=head2 C<process>
-
-    $client = $client->process;
-    $client = $client->process(@transactions);
-    $client = $client->process(@transactions => sub {...});
-
-Process all queued transactions.
-Will be blocking unless you have a global shared ioloop and use the C<async>
-method.
 
 =head2 C<put>
 
@@ -1614,7 +1605,7 @@ Prepare HTTP C<PUT> request.
 
     $client->put('http://kraih.com' => sub {
         print shift->res->body;
-    })->process;
+    })->start;
 
 The request will be performed right away and the resulting
 L<Mojo::Transaction::HTTP> object returned if no callback is given.
@@ -1654,6 +1645,16 @@ everywhere inside the process.
     $client = $client->send_message('Hi there!');
 
 Send a message via WebSocket, only available from callbacks.
+
+=head2 C<start>
+
+    $client = $client->start;
+    $client = $client->start(@transactions);
+    $client = $client->start(@transactions => sub {...});
+
+Start processing all queued transactions.
+Will be blocking unless you have a global shared ioloop and use the C<async>
+method.
 
 =head2 C<test_server>
 

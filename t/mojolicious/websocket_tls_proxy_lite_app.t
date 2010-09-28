@@ -132,7 +132,7 @@ $client->websocket(
         );
         $self->send_message('test1');
     }
-)->process;
+)->start;
 is $result, 'test1test2', 'right result';
 
 # GET /proxy (proxy request)
@@ -143,7 +143,7 @@ is $client->get("https://localhost:$port/proxy")->success->body,
 # GET /proxy (kept alive proxy request)
 $client->https_proxy("http://localhost:$proxy");
 my $tx = $client->build_tx(GET => "https://localhost:$port/proxy");
-$client->process($tx);
+$client->start($tx);
 is $tx->success->body, "https://localhost:$port/proxy", 'right content';
 is $tx->kept_alive, 1, 'kept alive';
 
@@ -164,7 +164,7 @@ $client->websocket(
         );
         $self->send_message('test1');
     }
-)->process;
+)->start;
 is $kept_alive, 1,                 'kept alive';
 is $connected,  "localhost:$port", 'connected';
 is $result,     'test1test2',      'right result';
@@ -186,7 +186,7 @@ $client->websocket(
         );
         $self->send_message('test1');
     }
-)->process;
+)->start;
 is $connected, "localhost:$port", 'connected';
 is $result,    'test1test2',      'right result';
 ok $read > 25, 'read enough';
@@ -202,6 +202,6 @@ $client->websocket(
         $success = $tx->success;
         $error   = $tx->error;
     }
-)->process;
+)->start;
 is $success, undef, 'no success';
 is $error, 'Proxy connection failed.', 'right message';

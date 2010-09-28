@@ -127,7 +127,7 @@ $client->websocket(
         );
         $self->send_message('test1');
     }
-)->process;
+)->start;
 is $result, 'test1test2', 'right result';
 
 # GET http://kraih.com/proxy (proxy request)
@@ -150,7 +150,7 @@ $client->websocket(
         );
         $self->send_message('test1');
     }
-)->process;
+)->start;
 is $connected, "localhost:$port", 'connected';
 is $result,    'test1test2',      'right result';
 ok $read > 25, 'read enough';
@@ -166,6 +166,6 @@ $client->websocket(
         $success = $tx->success;
         $error   = $tx->error;
     }
-)->process;
+)->start;
 is $success, undef, 'no success';
 is $error, 'Proxy connection failed.', 'right message';

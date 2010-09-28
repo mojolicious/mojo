@@ -91,7 +91,7 @@ $client->get(
         is $self->res->code,   200,      'right status';
         like $self->res->body, qr/Mojo/, 'right content';
     }
-)->process;
+)->start;
 
 # Stop
 kill 'INT', $pid;

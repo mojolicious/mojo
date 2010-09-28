@@ -168,7 +168,7 @@ sub post_form_ok {
     $client->max_redirects($self->max_redirects);
 
     # Request
-    $client->post_form(@_, sub { $self->tx($_[-1]) })->process;
+    $client->post_form(@_, sub { $self->tx($_[-1]) })->start;
 
     # Test
     local $Test::Builder::Level = $Test::Builder::Level + 1;
@@ -282,7 +282,7 @@ sub _request_ok {
 
     # Request
     $client->$method($url, %$headers, $body, sub { $self->tx($_[-1]) })
-      ->process;
+      ->start;
 
     # Test
     local $Test::Builder::Level = $Test::Builder::Level + 2;

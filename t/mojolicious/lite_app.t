@@ -390,7 +390,7 @@ get '/subrequest' => sub {
             my $client = shift;
             $self->render_text($client->tx->success->body);
         }
-    )->process;
+    )->start;
 };
 
 # GET /subrequest_simple
@@ -409,9 +409,9 @@ get '/subrequest_sync' => sub {
                     my $client = shift;
                     $self->render_text($client->res->body);
                 }
-            )->process;
+            )->start;
         }
-    )->process;
+    )->start;
 };
 
 # Make sure hook runs async
@@ -432,7 +432,7 @@ get '/subrequest_async' => sub {
             $self->render_text($client->res->body . $self->stash->{'async'});
             $async = $self->stash->{async};
         }
-    )->process;
+    )->start;
     $self->stash->{'async'} = 'success!';
 };
 
@@ -611,7 +611,7 @@ $client->ioloop->timer(
                 my $self = shift;
                 $timer = $self->res->body . $async;
             }
-        )->process;
+        )->start;
         $async = 'works!';
     }
 );
@@ -975,7 +975,7 @@ $content->parts([$part]);
 $tx->req->method('POST');
 $tx->req->url->parse('/upload');
 $tx->req->content($content);
-$client->process($tx);
+$client->start($tx);
 is $tx->res->code, 413,        'right status';
 is $tx->res->body, 'called, ', 'right content';
 app->log->level($backup2);
@@ -998,7 +998,7 @@ $content->parts([$part]);
 $tx->req->method('POST');
 $tx->req->url->parse('/upload');
 $tx->req->content($content);
-$client->process($tx);
+$client->start($tx);
 ok $tx->is_done, 'transaction is done';
 is $tx->res->code, 200, 'right status';
 is b($tx->res->body)->decode('UTF-8')->to_string,
@@ -1270,7 +1270,7 @@ $client->queue(
         $powered = $tx->res->headers->header('X-Powered-By');
         $body    = $tx->res->body;
     }
-)->process;
+)->start;
 is $code,    200,                  'right status';
 is $server,  'Mojolicious (Perl)', 'right "Server" value';
 is $powered, 'Mojolicious (Perl)', 'right "X-Powered-By" value';

@@ -144,7 +144,7 @@ sub _proxy {
                 $tx->res->body($tx2->res->content->asset->slurp);
                 $tx->resume;
             }
-        )->process;
+        )->start;
 
         return;
     }
@@ -163,7 +163,7 @@ sub _proxy {
                 $tx->res->body($tx2->res->content->asset->slurp);
                 $tx->resume;
             }
-        )->process;
+        )->start;
 
         return;
     }

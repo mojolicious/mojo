@@ -158,10 +158,10 @@ $client->async->get(
                         push @kept_alive, $tx->kept_alive;
                         $self->async->ioloop->stop;
                     }
-                )->process;
+                )->start;
             }
-        )->process;
+        )->start;
     }
-)->process;
+)->start;
 $client->async->ioloop->start;
 is_deeply \@kept_alive, [undef, 1, 1], 'connections kept alive';

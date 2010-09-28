@@ -122,7 +122,7 @@ get '/stream' => sub {
 my $finished;
 get '/finished' => sub {
     my $self = shift;
-    $self->finished(sub { $finished += 3 });
+    $self->on_finish(sub { $finished += 3 });
     $finished = 20;
     $self->render(text => 'so far so good!');
 };
@@ -754,7 +754,7 @@ $t->get_ok('/maybe/ajax', {'X-Requested-With' => 'XMLHttpRequest'})
   ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('is ajax');
 
-# GET /finished (with finished callback)
+# GET /finished (with on_finish callback)
 $t->get_ok('/finished')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')

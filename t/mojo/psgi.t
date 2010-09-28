@@ -87,4 +87,4 @@ is_deeply $params,
     lalala => 23
   },
   'right structure';
-is $ENV{MOJO_HELLO}, 'world', 'finished callback';
+is $ENV{MOJO_HELLO}, 'world', 'on_finish callback';

@@ -11,6 +11,10 @@ use Mojo::URL;
 
 require Carp;
 
+# DEPRECATED in Comet!
+*finished        = \&on_finish;
+*receive_message = \&on_message;
+
 our $AUTOLOAD;
 
 sub AUTOLOAD {
@@ -42,13 +46,6 @@ sub finish {
     $self->tx->finish;
 }
 
-sub finished {
-    my ($self, $cb) = @_;
-
-    # Transaction finished
-    $self->tx->finished(sub { shift and $self->$cb(@_) });
-}
-
 # DEPRECATED in Comet!
 sub helper {
     my $self = shift;
@@ -60,7 +57,14 @@ sub helper {
     return $self->$name(@_);
 }
 
-sub receive_message {
+sub on_finish {
+    my ($self, $cb) = @_;
+
+    # Transaction finished
+    $self->tx->on_finish(sub { shift and $self->$cb(@_) });
+}
+
+sub on_message {
     my $self = shift;
 
     # WebSocket check
@@ -71,7 +75,7 @@ sub receive_message {
     my $cb = shift;
 
     # Receive
-    $self->tx->receive_message(sub { shift and $self->$cb(@_) });
+    $self->tx->on_message(sub { shift and $self->$cb(@_) });
 
     # Rendered
     $self->rendered;
@@ -492,30 +496,30 @@ For async processing you can use C<finish>.
 
 Gracefully end WebSocket connection.
 
-=head2 C<finished>
-
-    $c->finished(sub {...});
-
-Callback signaling that the transaction has been finished.
-
-    $c->finished(sub {
-        my $self = shift;
-    });
-
 =head2 C<helper>
 
 This method is DEPRECATED, helpers can now be called like normal methods.
 
     $c->foo(23);
 
-=head2 C<receive_message>
+=head2 C<on_finish>
 
-    $c = $c->receive_message(sub {...});
+    $c->on_finish(sub {...});
+
+Callback signaling that the transaction has been finished.
+
+    $c->on_finish(sub {
+        my $self = shift;
+    });
+
+=head2 C<on_message>
+
+    $c = $c->on_message(sub {...});
 
 Receive messages via WebSocket, only works if there is currently a WebSocket
 connection in progress.
 
-    $c->receive_message(sub {
+    $c->on_message(sub {
         my ($self, $message) = @_;
     });
 

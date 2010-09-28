@@ -63,7 +63,7 @@ sub _diag {
     my ($self, $tx) = @_;
 
     # Finished transaction
-    $tx->finished(sub { $ENV{MOJO_HELLO} = 'world' });
+    $tx->on_finish(sub { $ENV{MOJO_HELLO} = 'world' });
 
     # Path
     my $path = $tx->req->url->path;
@@ -199,7 +199,7 @@ sub _websocket {
     # WebSocket request
     if ($tx->is_websocket) {
         $tx->send_message('Congratulations, your Mojo is working!');
-        $tx->receive_message(
+        $tx->on_message(
             sub {
                 my ($tx, $message) = @_;
                 return unless $message eq 'test 123';

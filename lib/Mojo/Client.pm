@@ -34,6 +34,10 @@ __PACKAGE__->attr(max_keep_alive_connections => 5);
 __PACKAGE__->attr(max_redirects     => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 });
 __PACKAGE__->attr(websocket_timeout => 300);
 
+# DEPRECATED in Comet!
+*finished        = \&on_finish;
+*receive_message = \&on_message;
+
 # Singleton
 our $CLIENT;
 
@@ -338,7 +342,18 @@ sub finish {
     $tx->finish;
 }
 
-sub finished {
+# "What are you lookin' at?" - the innocent words of a drunken child.
+sub get {
+    my $self = shift;
+    return $self->_tx_queue_or_process($self->build_tx('GET', @_));
+}
+
+sub head {
+    my $self = shift;
+    return $self->_tx_queue_or_process($self->build_tx('HEAD', @_));
+}
+
+sub on_finish {
     my $self = shift;
 
     # Transaction
@@ -355,18 +370,29 @@ sub finished {
     weaken $tx;
 
     # Connection finished
-    $tx->finished(sub { shift; local $self->{tx} = $tx; $self->$cb(@_) });
+    $tx->on_finish(sub { shift; local $self->{tx} = $tx; $self->$cb(@_) });
 }
 
-# "What are you lookin' at?" - the innocent words of a drunken child.
-sub get {
+sub on_message {
     my $self = shift;
-    return $self->_tx_queue_or_process($self->build_tx('GET', @_));
-}
 
-sub head {
-    my $self = shift;
-    return $self->_tx_queue_or_process($self->build_tx('HEAD', @_));
+    # Transaction
+    my $tx = $self->tx;
+
+    # WebSocket
+    croak 'Transaction is not a WebSocket' unless $tx->is_websocket;
+
+    # Callback
+    my $cb = shift;
+
+    # Weaken
+    weaken $self;
+    weaken $tx;
+
+    # Receive
+    $tx->on_message(sub { shift; local $self->{tx} = $tx; $self->$cb(@_) });
+
+    return $self;
 }
 
 sub post {
@@ -428,29 +454,6 @@ sub queue {
     # Queue transactions
     my $queue = $self->{_queue} ||= [];
     push @$queue, [$_, $cb] for @_;
-
-    return $self;
-}
-
-sub receive_message {
-    my $self = shift;
-
-    # Transaction
-    my $tx = $self->tx;
-
-    # WebSocket
-    croak 'Transaction is not a WebSocket' unless $tx->is_websocket;
-
-    # Callback
-    my $cb = shift;
-
-    # Weaken
-    weaken $self;
-    weaken $tx;
-
-    # Receive
-    $tx->receive_message(
-        sub { shift; local $self->{tx} = $tx; $self->$cb(@_) });
 
     return $self;
 }
@@ -1156,7 +1159,7 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
     $client->websocket(
         'ws://websockets.org:8787' => sub {
             my $client = shift;
-            $client->receive_message(
+            $client->on_message(
                 sub {
                     my ($client, $message) = @_;
                     print "$message\n";
@@ -1399,17 +1402,6 @@ Check environment variables for proxy information.
 
 Finish the WebSocket connection, only available from callbacks.
 
-=head2 C<finished>
-
-    $client->finished(sub {...});
-
-Callback signaling that peer finished the WebSocket connection, only
-available from callbacks.
-
-    $client->finished(sub {
-        my $client = shift;
-    });
-
 =head2 C<get>
 
     my $tx  = $client->get('http://kraih.com');
@@ -1461,6 +1453,27 @@ The request will be performed right away and the resulting
 L<Mojo::Transaction::HTTP> object returned if no callback is given.
 
     print $client->head('http://kraih.com')->res->headers->content_length;
+
+=head2 C<on_finish>
+
+    $client->on_finish(sub {...});
+
+Callback signaling that peer finished the WebSocket connection, only
+available from callbacks.
+
+    $client->on_finish(sub {
+        my $client = shift;
+    });
+
+=head2 C<on_message>
+
+    $client = $client->on_message(sub {...});
+
+Receive messages via WebSocket, only available from callbacks.
+
+    $client->on_message(sub {
+        my ($client, $message) = @_;
+    });
 
 =head2 C<post>
 
@@ -1614,16 +1627,6 @@ L<Mojo::Transaction::HTTP> object returned if no callback is given.
     $client = $client->queue(@transactions => sub {...});
 
 Queue a list of transactions for processing.
-
-=head2 C<receive_message>
-
-    $client = $client->receive_message(sub {...});
-
-Receive messages via WebSocket, only available from callbacks.
-
-    $client->receive_message(sub {
-        my ($client, $message) = @_;
-    });
 
 =head2 C<req>
 

@@ -33,8 +33,8 @@ app->renderer->root(app->home->rel_dir('public'));
 my $flag;
 websocket '/' => sub {
     my $self = shift;
-    $self->finished(sub { $flag += 4 });
-    $self->receive_message(
+    $self->on_finish(sub { $flag += 4 });
+    $self->on_message(
         sub {
             my ($self, $message) = @_;
             $self->send_message("${message}test2");
@@ -54,7 +54,7 @@ websocket '/socket' => sub {
 websocket '/early_start' => sub {
     my $self = shift;
     $self->send_message('test1');
-    $self->receive_message(
+    $self->on_message(
         sub {
             my ($self, $message) = @_;
             $self->send_message("${message}test2");
@@ -67,8 +67,8 @@ websocket '/early_start' => sub {
 my ($handshake, $denied) = 0;
 websocket '/denied' => sub {
     my $self = shift;
-    $self->tx->handshake->finished(sub { $handshake += 2 });
-    $self->finished(sub                { $denied    += 1 });
+    $self->tx->handshake->on_finish(sub { $handshake += 2 });
+    $self->on_finish(sub                { $denied    += 1 });
     $self->render(text => 'denied', status => 403);
 };
 
@@ -79,7 +79,7 @@ websocket '/subreq' => sub {
     $self->client->async->websocket(
         '/echo' => sub {
             my $client = shift;
-            $client->receive_message(
+            $client->on_message(
                 sub {
                     my ($client, $message) = @_;
                     $self->send_message($message);
@@ -91,12 +91,12 @@ websocket '/subreq' => sub {
         }
     )->process;
     $self->send_message('test0');
-    $self->finished(sub { $subreq += 3 });
+    $self->on_finish(sub { $subreq += 3 });
 };
 
 # WebSocket /echo
 websocket '/echo' => sub {
-    shift->receive_message(
+    shift->on_message(
         sub {
             my ($self, $message) = @_;
             $self->send_message($message);
@@ -114,7 +114,7 @@ websocket '/foo' =>
 # WebSocket /deadcallback
 websocket '/deadcallback' => sub {
     my $self = shift;
-    $self->receive_message(sub { die 'i see dead callbacks' });
+    $self->on_message(sub { die 'i see dead callbacks' });
 };
 
 my $client = Mojo::Client->singleton->app(app);
@@ -124,7 +124,7 @@ my $result;
 $client->websocket(
     '/' => sub {
         my $self = shift;
-        $self->receive_message(
+        $self->on_message(
             sub {
                 my ($self, $message) = @_;
                 $result = $message;
@@ -139,7 +139,7 @@ is $result, 'test1test2', 'right result';
 # WebSocket / (ojo)
 $result = undef;
 w '/' => sub {
-    shift->receive_message(
+    shift->on_message(
         sub {
             shift->finish;
             $result = shift;
@@ -163,7 +163,7 @@ my $port;
 $client->process(
     $tx => sub {
         my $self = shift;
-        $self->receive_message(
+        $self->on_message(
             sub {
                 my ($self, $message) = @_;
                 $result = $message;
@@ -182,8 +182,8 @@ $result = undef;
 $client->websocket(
     '/early_start' => sub {
         my $self = shift;
-        $self->finished(sub { $flag2 += 5 });
-        $self->receive_message(
+        $self->on_finish(sub { $flag2 += 5 });
+        $self->on_message(
             sub {
                 my ($self, $message) = @_;
                 $result = $message;
@@ -211,14 +211,14 @@ $client->websocket(
         my $self = shift;
         $code   = $self->res->code;
         $result = '';
-        $self->receive_message(
+        $self->on_message(
             sub {
                 my ($self, $message) = @_;
                 $result .= $message;
                 $self->finish if $message eq 'test1';
             }
         );
-        $self->finished(sub { $finished += 4 });
+        $self->on_finish(sub { $finished += 4 });
     }
 )->process;
 is $code,     101,          'right status';
@@ -235,7 +235,7 @@ $client->async->websocket(
         my $self = shift;
         $code   = $self->res->code;
         $result = '';
-        $self->receive_message(
+        $self->on_message(
             sub {
                 my ($self, $message) = @_;
                 $result .= $message;
@@ -243,7 +243,7 @@ $client->async->websocket(
                 $self->ioloop->on_idle(sub { shift->stop }) unless $running;
             }
         );
-        $self->finished(sub { $finished += 1 });
+        $self->on_finish(sub { $finished += 1 });
     }
 )->process;
 $client->async->websocket(
@@ -251,7 +251,7 @@ $client->async->websocket(
         my $self = shift;
         $code2   = $self->res->code;
         $result2 = '';
-        $self->receive_message(
+        $self->on_message(
             sub {
                 my ($self, $message) = @_;
                 $result2 .= $message;
@@ -259,7 +259,7 @@ $client->async->websocket(
                 $self->ioloop->on_idle(sub { shift->stop }) unless $running;
             }
         );
-        $self->finished(sub { $finished += 2 });
+        $self->on_finish(sub { $finished += 2 });
     }
 )->process;
 $client->ioloop->start;

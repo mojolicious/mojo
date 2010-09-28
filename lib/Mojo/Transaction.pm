@@ -10,13 +10,14 @@ use Carp 'croak';
 __PACKAGE__->attr([qw/connection kept_alive local_address local_port/]);
 __PACKAGE__->attr([qw/previous remote_port/]);
 __PACKAGE__->attr(
-    [qw/finished on_resume/] => sub {
+    [qw/on_finish on_resume/] => sub {
         sub {1}
     }
 );
 __PACKAGE__->attr(keep_alive => 0);
 
 # DEPRECATED in Comet!
+*finished  = \&on_finish;
 *resume_cb = \&on_resume;
 
 # Please don't eat me! I have a wife and kids. Eat them!
@@ -108,7 +109,7 @@ sub server_close {
     my $self = shift;
 
     # Transaction finished
-    $self->finished->($self);
+    $self->on_finish->($self);
 
     return $self;
 }
@@ -148,17 +149,6 @@ L<Mojo::Transaction> implements the following attributes.
 
 Connection identifier or socket.
 
-=head2 C<finished>
-
-    my $cb = $tx->finished;
-    $tx    = $tx->finished(sub {...});
-
-Callback signaling that the transaction has been finished.
-
-    $tx->finsihed(sub {
-        my $self = shift;
-    });
-
 =head2 C<keep_alive>
 
     my $keep_alive = $tx->keep_alive;
@@ -186,6 +176,17 @@ Local interface address.
     $tx            = $tx->local_port($port);
 
 Local interface port.
+
+=head2 C<on_finish>
+
+    my $cb = $tx->on_finish;
+    $tx    = $tx->on_finish(sub {...});
+
+Callback signaling that the transaction has been finished.
+
+    $tx->on_finish(sub {
+        my $self = shift;
+    });
 
 =head2 C<on_resume>
 

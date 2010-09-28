@@ -52,7 +52,7 @@ sub run {
     my $body = Mojo::Server::PSGI::_Handle->new(_res => $res);
 
     # Finish transaction
-    $tx->finished->($tx);
+    $tx->on_finish->($tx);
 
     return [$status, \@headers, $body];
 }

@@ -236,7 +236,7 @@ sub run {
         $self->write_response($tx);
 
         # Finish transaction
-        $tx->finished->($tx);
+        $tx->on_finish->($tx);
     }
 }
 

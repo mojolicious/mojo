@@ -46,7 +46,7 @@ get '/proxy' => sub {
 websocket '/test' => sub {
     my $self = shift;
     my $flag = 0;
-    $self->receive_message(
+    $self->on_message(
         sub {
             my ($self, $message) = @_;
             $self->send_message("${message}test2");
@@ -123,7 +123,7 @@ my $result;
 $client->websocket(
     "wss://localhost:$port/test" => sub {
         my $self = shift;
-        $self->receive_message(
+        $self->on_message(
             sub {
                 my ($self, $message) = @_;
                 $result = $message;
@@ -155,7 +155,7 @@ $client->websocket(
     "wss://localhost:$port/test" => sub {
         my $self = shift;
         $kept_alive = $self->tx->kept_alive;
-        $self->receive_message(
+        $self->on_message(
             sub {
                 my ($self, $message) = @_;
                 $result = $message;
@@ -177,7 +177,7 @@ $client->https_proxy("http://localhost:$proxy");
 $client->websocket(
     "wss://localhost:$port/test" => sub {
         my $self = shift;
-        $self->receive_message(
+        $self->on_message(
             sub {
                 my ($self, $message) = @_;
                 $result = $message;

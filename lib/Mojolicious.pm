@@ -82,7 +82,7 @@ sub new {
 
     # Hide own controller methods
     $r->hide(qw/AUTOLOAD DESTROY client cookie finish finished flash/);
-    $r->hide(qw/handler helper param receive_message redirect_to render/);
+    $r->hide(qw/handler helper on_message param redirect_to render/);
     $r->hide(qw/render_data render_exception render_inner render_json/);
     $r->hide(qw/render_not_found render_partial render_static render_text/);
     $r->hide(qw/rendered send_message session signed_cookie url_for/);
@@ -330,7 +330,7 @@ Web development for humans, making hard things possible and everything fun.
 
     websocket '/echo' => sub {
         my $self = shift;
-        $self->receive_message(
+        $self->on_message(
             sub {
                 my ($self, $message) = @_;
                 $self->send_message("echo: $message");

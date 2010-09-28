@@ -10,12 +10,15 @@ use base 'Mojo::Transaction';
 use Mojo::ByteStream 'b';
 use Mojo::Transaction::HTTP;
 
+__PACKAGE__->attr(handshake => sub { Mojo::Transaction::HTTP->new });
 __PACKAGE__->attr(
-    receive_message => sub {
+    on_message => sub {
         sub { }
     }
 );
-__PACKAGE__->attr(handshake => sub { Mojo::Transaction::HTTP->new });
+
+# DEPRECATED in Comet!
+*receive_message = \&on_message;
 
 sub client_challenge {
     my $self = shift;
@@ -163,9 +166,7 @@ sub server_read {
         $message =~ s/[\xff]$//;
 
         # Callback
-        $self->receive_message->(
-            $self, b($message)->decode('UTF-8')->to_string
-        );
+        $self->on_message->($self, b($message)->decode('UTF-8')->to_string);
     }
 
     # Resume
@@ -266,14 +267,14 @@ L<Mojo::Transaction> and implements the following new ones.
 
 The original handshake transaction.
 
-=head2 C<receive_message>
+=head2 C<on_message>
 
-    my $cb = $ws->receive_message;
-    $ws    = $ws->receive_message(sub {...});
+    my $cb = $ws->on_message;
+    $ws    = $ws->on_message(sub {...});
 
 The callback that receives decoded messages one by one.
 
-    $ws->receive_message(sub {
+    $ws->on_message(sub {
         my ($self, $message) = @_;
     });
 

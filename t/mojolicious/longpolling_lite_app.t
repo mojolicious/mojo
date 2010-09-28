@@ -26,7 +26,7 @@ app->log->level('error');
 my $shortpoll;
 get '/shortpoll' => sub {
     my $self = shift;
-    $self->finished(sub { $shortpoll = 'finished!' });
+    $self->on_finish(sub { $shortpoll = 'finished!' });
     $self->res->code(200);
     $self->res->headers->content_type('text/plain');
     $self->write_chunk('this was short.');
@@ -37,7 +37,7 @@ get '/shortpoll' => sub {
 my $shortpoll_plain;
 get '/shortpoll/plain' => sub {
     my $self = shift;
-    $self->finished(sub { $shortpoll_plain = 'finished!' });
+    $self->on_finish(sub { $shortpoll_plain = 'finished!' });
     $self->res->code(200);
     $self->res->headers->content_type('text/plain');
     $self->res->headers->content_length(25);
@@ -48,7 +48,7 @@ get '/shortpoll/plain' => sub {
 my $longpoll;
 get '/longpoll' => sub {
     my $self = shift;
-    $self->finished(sub { $longpoll = 'finished!' });
+    $self->on_finish(sub { $longpoll = 'finished!' });
     $self->res->code(200);
     $self->res->headers->content_type('text/plain');
     $self->write_chunk('hi ');
@@ -65,7 +65,7 @@ get '/longpoll' => sub {
 my $longpoll_nested;
 get '/longpoll/nested' => sub {
     my $self = shift;
-    $self->finished(sub { $longpoll_nested = 'finished!' });
+    $self->on_finish(sub { $longpoll_nested = 'finished!' });
     $self->res->code(200);
     $self->res->headers->content_type('text/plain');
     $self->write_chunk(
@@ -79,7 +79,7 @@ get '/longpoll/nested' => sub {
 my $longpoll_plain;
 get '/longpoll/plain' => sub {
     my $self = shift;
-    $self->finished(sub { $longpoll_plain = 'finished!' });
+    $self->on_finish(sub { $longpoll_plain = 'finished!' });
     $self->res->code(200);
     $self->res->headers->content_type('text/plain');
     $self->res->headers->content_length(25);
@@ -95,7 +95,7 @@ get '/longpoll/plain' => sub {
 my $longpoll_delayed;
 get '/longpoll/delayed' => sub {
     my $self = shift;
-    $self->finished(sub { $longpoll_delayed = 'finished!' });
+    $self->on_finish(sub { $longpoll_delayed = 'finished!' });
     $self->res->code(200);
     $self->res->headers->content_type('text/plain');
     $self->write_chunk;
@@ -117,7 +117,7 @@ get '/longpoll/delayed' => sub {
 my $longpoll_plain_delayed;
 get '/longpoll/plain/delayed' => sub {
     my $self = shift;
-    $self->finished(sub { $longpoll_plain_delayed = 'finished!' });
+    $self->on_finish(sub { $longpoll_plain_delayed = 'finished!' });
     $self->res->code(200);
     $self->res->headers->content_type('text/plain');
     $self->res->headers->content_length(12);

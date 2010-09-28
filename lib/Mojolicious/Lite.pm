@@ -632,7 +632,7 @@ WebSocket applications have never been this easy before.
 
     websocket '/echo' => sub {
         my $self = shift;
-        $self->receive_message(sub {
+        $self->on_message(sub {
             my ($self, $message) = @_;
             $self->send_message("echo: $message");
         });

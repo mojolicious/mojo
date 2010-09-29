@@ -5,11 +5,14 @@ use warnings;
 
 use base 'MojoX::Dispatcher::Routes::Controller';
 
+use Mojo::Transaction::HTTP;
 use Mojo::ByteStream;
 use Mojo::Exception;
 use Mojo::URL;
 
 require Carp;
+
+__PACKAGE__->attr(tx => sub { Mojo::Transaction::HTTP->new });
 
 # DEPRECATED in Comet!
 *finished        = \&on_finish;

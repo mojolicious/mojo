@@ -611,8 +611,11 @@ sub _parse_css {
                 # Quote
                 $value = quotemeta $self->_css_unescape($value);
 
+                # "~=" (word)
+                if ($op eq '~') { $regex = qr/(?:^|.*\s+)$value(?:\s+.*|$)/ }
+
                 # "*=" (contains)
-                if ($op eq '*') { $regex = qr/$value/ }
+                elsif ($op eq '*') { $regex = qr/$value/ }
 
                 # "^=" (begins with)
                 elsif ($op eq '^') { $regex = qr/^$value/ }
@@ -954,6 +957,13 @@ An C<E> element with a C<foo> attribute.
 
 An C<E> element whose C<foo> attribute value is exactly equal to C<bar>.
 
+=item C<E[foo~="bar"]>
+
+    my $fields = $dom->find('input[name~="foo"]');
+
+An C<E> element whose C<foo> attribute value is a list of
+whitespace-separated values, one of which is exactly equal to C<bar>.
+
 =item C<E[foo^="bar"]>
 
     my $fields = $dom->find('input[name^="f"]');
@@ -1059,6 +1069,7 @@ Children of element.
 
 Find elements with CSS3 selectors.
 
+    print $dom->find('div')->[23]->text;
     $dom->find('div')->each(sub { print shift->text });
     $dom->find('div')->while(sub { print $_->text && $_->text =~ /foo/ });
     $dom->find('div')->until(sub { $_->text =~ /foo/ && print $_->text });

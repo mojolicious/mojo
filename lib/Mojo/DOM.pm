@@ -432,6 +432,36 @@ sub _compare {
     return 1;
 }
 
+sub _css_regex {
+    my ($self, $op, $value) = @_;
+
+    # Shortcut
+    return unless $value;
+
+    # Quote
+    $value = quotemeta $self->_css_unescape($value);
+
+    # Regex
+    my $regex;
+
+    # "~=" (word)
+    if ($op eq '~') { $regex = qr/(?:^|.*\s+)$value(?:\s+.*|$)/ }
+
+    # "*=" (contains)
+    elsif ($op eq '*') { $regex = qr/$value/ }
+
+    # "^=" (begins with)
+    elsif ($op eq '^') { $regex = qr/^$value/ }
+
+    # "$=" (ends with)
+    elsif ($op eq '$') { $regex = qr/$value$/ }
+
+    # Everything else
+    else { $regex = qr/^$value$/ }
+
+    return $regex;
+}
+
 sub _css_unescape {
     my ($self, $value) = @_;
 
@@ -580,15 +610,13 @@ sub _parse_css {
 
         # Classes
         while ($element =~ /$CSS_CLASS_RE/g) {
-            my $class = $self->_css_unescape($1);
             push @$selector,
-              ['attribute', 'class', qr/(?:^|.*\s+)$class(?:\s+.*|$)/];
+              ['attribute', 'class', $self->_css_regex('~', $1)];
         }
 
         # ID
         if ($element =~ /$CSS_ID_RE/) {
-            my $id = $self->_css_unescape($1);
-            push @$selector, ['attribute', 'id', qr/^$id$/];
+            push @$selector, ['attribute', 'id', $self->_css_regex('', $1)];
         }
 
         # Pseudo classes
@@ -602,32 +630,8 @@ sub _parse_css {
             my $op    = $2 || '';
             my $value = $3;
 
-            # Regex
-            my $regex;
-
-            # Value
-            if ($value) {
-
-                # Quote
-                $value = quotemeta $self->_css_unescape($value);
-
-                # "~=" (word)
-                if ($op eq '~') { $regex = qr/(?:^|.*\s+)$value(?:\s+.*|$)/ }
-
-                # "*=" (contains)
-                elsif ($op eq '*') { $regex = qr/$value/ }
-
-                # "^=" (begins with)
-                elsif ($op eq '^') { $regex = qr/^$value/ }
-
-                # "$=" (ends with)
-                elsif ($op eq '$') { $regex = qr/$value$/ }
-
-                # Everything else
-                else { $regex = qr/^$value$/ }
-            }
-
-            push @$selector, ['attribute', $key, $regex];
+            push @$selector,
+              ['attribute', $key, $self->_css_regex($op, $value)];
         }
 
         # Combinator

@@ -7,8 +7,9 @@ use base 'MojoX::Controller';
 
 use Mojo::ByteStream;
 use Mojo::Cookie::Response;
+use Mojo::Transaction::HTTP;
 
-__PACKAGE__->attr('tx');
+__PACKAGE__->attr(tx => sub { Mojo::Transaction::HTTP->new });
 
 # For the last time, I don't like lilacs!
 # Your first wife was the one who liked lilacs!
@@ -179,7 +180,8 @@ L<MojoX::Controller> and implements the following new ones.
 
     my $tx = $c->tx;
 
-The transaction that is currently being processed.
+The transaction that is currently being processed, defaults to a
+L<Mojo::Transaction::HTTP> object.
 
 =head1 METHODS
 

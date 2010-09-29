@@ -992,17 +992,17 @@ An C<F> element descendant of an C<E> element.
 
 An C<F> element child of an C<E> element.
 
-=item C<E[foo=bar][bar=baz]>
-
-    my $links = $dom->find('a[foo^="b"][foo$="ar"]');
-
-An C<E> element whose attributes match all following attribute selectors.
-
 =item C<E, F, G>
 
     my $headlines = $dom->find('h1, h2, h3');
 
 Elements of type C<E>, C<F> and C<G>.
+
+=item C<E[foo=bar][bar=baz]>
+
+    my $links = $dom->find('a[foo^="b"][foo$="ar"]');
+
+An C<E> element whose attributes match all following attribute selectors.
 
 =back
 

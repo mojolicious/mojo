@@ -972,7 +972,7 @@ C<bar>.
 
     my $fields = $dom->find('input[name*="fo"]');
 
-An C<E> element whose C<foo> attribute contains the substring C<bar>.
+An C<E> element whose C<foo> attribute value contains the substring C<bar>.
 
 =item C<E:root>
 

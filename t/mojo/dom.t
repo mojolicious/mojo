@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 176;
+use Test::More tests => 180;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -322,7 +322,11 @@ is $dom->at('extension')->attrs->{'foo:id'}, 'works', 'right id';
 like $dom->at('#works')->text,       qr/\[awesome\]\]/, 'right text';
 like $dom->at('[id="works"]')->text, qr/\[awesome\]\]/, 'right text';
 is $dom->find('description')->[1]->text, '<p>trololololo>', 'right text';
-is $dom->at('pubdate')->text, 'Mon, 12 Jul 2010 20:42:00', 'right text';
+is $dom->at('pubdate')->text,       'Mon, 12 Jul 2010 20:42:00', 'right text';
+like $dom->at('[id*="ork"]')->text, qr/\[awesome\]\]/,           'right text';
+like $dom->at('[id*="orks"]')->text, qr/\[awesome\]\]/, 'right text';
+like $dom->at('[id*="work"]')->text, qr/\[awesome\]\]/, 'right text';
+like $dom->at('[id*="or"]')->text,   qr/\[awesome\]\]/, 'right text';
 
 # Yadis
 $dom->parse(<<'EOF');

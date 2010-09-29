@@ -611,8 +611,11 @@ sub _parse_css {
                 # Quote
                 $value = quotemeta $self->_css_unescape($value);
 
+                # "*=" (contains)
+                if ($op eq '*') { $regex = qr/$value/ }
+
                 # "^=" (begins with)
-                if ($op eq '^') { $regex = qr/^$value/ }
+                elsif ($op eq '^') { $regex = qr/^$value/ }
 
                 # "$=" (ends with)
                 elsif ($op eq '$') { $regex = qr/$value$/ }
@@ -964,6 +967,12 @@ C<bar>.
 
 An C<E> element whose C<foo> attribute value ends exactly with the string
 C<bar>.
+
+=item C<E[foo*="bar"]>
+
+    my $fields = $dom->find('input[name*="fo"]');
+
+An C<E> element whose C<foo> attribute contains the substring C<bar>.
 
 =item C<E:root>
 

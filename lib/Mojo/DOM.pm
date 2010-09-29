@@ -418,8 +418,18 @@ sub _compare {
         elsif ($type eq 'pseudoclass') {
             my $class = $c->[1];
 
+            # ":checked"
+            if ($class eq 'checked') {
+                my $attrs = $current->[2];
+                next if ($attrs->{checked}  || '') eq 'checked';
+                next if ($attrs->{selected} || '') eq 'selected';
+            }
+
+            # ":empty"
+            elsif ($class eq 'empty') { next unless exists $current->[4] }
+
             # ":root"
-            if ($class eq 'root') {
+            elsif ($class eq 'root') {
                 if (my $parent = $current->[3]) {
                     next if $parent->[0] eq 'root';
                 }
@@ -993,6 +1003,19 @@ An C<E> element whose C<foo> attribute value contains the substring C<bar>.
     my $root = $dom->at(':root');
 
 An C<E> element, root of the document.
+
+=item C<E:checked>
+
+    my $input = $dom->at(':checked');
+
+A user interface element C<E> which is checked (for instance a radio-button
+or checkbox).
+
+=item C<E:empty>
+
+    my $empty = $dom->find(':empty');
+
+An C<E> element that has no children (including text nodes).
 
 =item C<E F>
 

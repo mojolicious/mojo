@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 188;
+use Test::More tests => 209;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -485,3 +485,42 @@ is_deeply \@div, [qw/A C/], 'found all div elements with the right atributes';
 $dom->find('div[foo^="b"][foo$="r"]')->each(sub { push @div, shift->text });
 is_deeply \@div, [qw/A B C/],
   'found all div elements with the right atributes';
+
+# Form
+$dom->parse(<<EOF);
+<form action="/foo">
+    <input type="text" name="user" value="test" />
+    <input type="checkbox" checked="checked" name="groovy">
+    <select name="a">
+        <option value="b">b</option>
+        <optgroup label="c">
+            <option value="d">d</option>
+            <option selected="selected" value="e">E</option>
+            <option value="f">f</option>
+        </optgroup>
+        <option value="g">g</option>
+    </select>
+    <input type="submit" value="Ok!" />
+</form>
+EOF
+is($dom->find(':root')->[0]->name,             'form',   'right name');
+is($dom->find('*:root')->[0]->name,            'form',   'right name');
+is($dom->find('form:root')->[0]->name,         'form',   'right name');
+is($dom->find(':root')->[1],                   undef,    'no element');
+is($dom->find(':checked')->[0]->attrs->{name}, 'groovy', 'right name');
+is($dom->find('option:checked')->[0]->attrs->{value},    'e', 'right value');
+is($dom->find(':checked')->[1]->text,                    'E', 'right text');
+is($dom->find('*:checked')->[1]->text,                   'E', 'right text');
+is($dom->find(':checked[value="e"]')->[0]->text,         'E', 'right text');
+is($dom->find('*:checked[value="e"]')->[0]->text,        'E', 'right text');
+is($dom->find('option:checked[value="e"]')->[0]->text,   'E', 'right text');
+is($dom->at('optgroup option:checked[value="e"]')->text, 'E', 'right text');
+is($dom->at('select option:checked[value="e"]')->text,   'E', 'right text');
+is($dom->at('select :checked[value="e"]')->text,         'E', 'right text');
+is($dom->at('optgroup > :checked[value="e"]')->text,     'E', 'right text');
+is($dom->at('select *:checked[value="e"]')->text,        'E', 'right text');
+is($dom->at('optgroup > *:checked[value="e"]')->text,    'E', 'right text');
+is($dom->find(':checked[value="e"]')->[1],        undef,    'no element');
+is($dom->find(':empty')->[0]->attrs->{name},      'user',   'right name');
+is($dom->find('input:empty')->[0]->attrs->{name}, 'user',   'right name');
+is($dom->at(':empty[type^="ch"]')->attrs->{name}, 'groovy', 'right name');

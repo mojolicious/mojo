@@ -418,43 +418,8 @@ sub _compare {
         elsif ($type eq 'pseudoclass') {
             my $class = $c->[1];
 
-            # "nth-child" and "nth-last-child"
-            if ($class eq 'nth-child' || $class eq 'nth-last-child') {
-
-                # Numbers
-                $c->[2] = $self->_css_equation($c->[2]) unless ref $c->[2];
-
-                # Parent
-                my $parent = $current->[3];
-
-                # Siblings
-                my $start = $parent->[0] eq 'root' ? 1 : 4;
-                my @siblings;
-                for my $j ($start .. $#$parent) {
-                    my $sibling = $parent->[$j];
-                    next unless $sibling->[0] eq 'tag';
-                    push @siblings, $sibling;
-                }
-
-                # Reverse
-                @siblings = reverse @siblings if $class eq 'nth-last-child';
-
-                # Find
-                my $found = 0;
-                for my $i (0 .. $#siblings) {
-                    my $result = $c->[2]->[0] * $i + $c->[2]->[1];
-                    next if $result < 1;
-                    last unless my $sibling = $siblings[$result - 1];
-                    if ($sibling eq $current) {
-                        $found = 1;
-                        last;
-                    }
-                }
-                next if $found;
-            }
-
             # ":checked"
-            elsif ($class eq 'checked') {
+            if ($class eq 'checked') {
                 my $attrs = $current->[2];
                 next if ($attrs->{checked}  || '') eq 'checked';
                 next if ($attrs->{selected} || '') eq 'selected';
@@ -468,6 +433,43 @@ sub _compare {
                 if (my $parent = $current->[3]) {
                     next if $parent->[0] eq 'root';
                 }
+            }
+
+            # "nth-*"
+            elsif ($class =~ /^nth-/) {
+
+                # Numbers
+                $c->[2] = $self->_css_equation($c->[2]) unless ref $c->[2];
+
+                # Parent
+                my $parent = $current->[3];
+
+                # Siblings
+                my $start = $parent->[0] eq 'root' ? 1 : 4;
+                my @siblings;
+                my $type = $class =~ /of-type$/ ? $current->[1] : undef;
+                for my $j ($start .. $#$parent) {
+                    my $sibling = $parent->[$j];
+                    next unless $sibling->[0] eq 'tag';
+                    next if defined $type && $type ne $sibling->[1];
+                    push @siblings, $sibling;
+                }
+
+                # Reverse
+                @siblings = reverse @siblings if $class =~ /^nth-last/;
+
+                # Find
+                my $found = 0;
+                for my $i (0 .. $#siblings) {
+                    my $result = $c->[2]->[0] * $i + $c->[2]->[1];
+                    next if $result < 1;
+                    last unless my $sibling = $siblings[$result - 1];
+                    if ($sibling eq $current) {
+                        $found = 1;
+                        last;
+                    }
+                }
+                next if $found;
             }
         }
 
@@ -1070,6 +1072,24 @@ An C<E> element, the C<n-th> child of its parent.
     my $bottom3  = $dom->find('div:nth-last-child(-n+3)');
 
 An C<E> element, the C<n-th> child of its parent, counting from the last one.
+
+=item C<E:nth-child-of-type(n)>
+
+    my $third = $dom->at('div:nth-child-of-type(3)');
+    my $odd   = $dom->find('div:nth-child-of-type(odd)');
+    my $even  = $dom->find('div:nth-child-of-type(even)');
+    my $top3  = $dom->find('div:nth-child-of-type(-n+3)');
+
+An C<E> element, the C<n-th> sibling of its type.
+
+=item C<E:nth-last-child-of-type(n)>
+
+    my $third = $dom->at('div:nth-last-child-of-type(3)');
+    my $odd   = $dom->find('div:nth-last-child-of-type(odd)');
+    my $even  = $dom->find('div:nth-last-child-of-type(even)');
+    my $bottom3  = $dom->find('div:nth-last-child-of-type(-n+3)');
+
+An C<E> element, the C<n-th> sibling of its type, counting from the last one.
 
 =item C<E:root>
 

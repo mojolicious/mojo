@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 241;
+use Test::More tests => 246;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -618,3 +618,35 @@ is_deeply \@li, [qw/C/], 'found third li element';
 @li = ();
 $dom->find('li:nth-last-child(3)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/F/], 'found third last li element';
+
+# Even more pseudo classes
+$dom->parse(<<EOF);
+<ul>
+    <li>A</li>
+    <p>B</p>
+    <li>C</li>
+    <p>D</p>
+    <li>E</li>
+    <li>F</li>
+    <p>G</p>
+    <li>H</li>
+    <li>I</li>
+</ul>
+EOF
+my @e;
+$dom->find('ul :nth-child(odd)')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/A C E G I/], 'found all odd elements';
+@e = ();
+$dom->find('li:nth-child-of-type(odd)')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/A E H/], 'found all odd li elements';
+@e = ();
+$dom->find('li:nth-last-child-of-type(odd)')
+  ->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/C F I/], 'found all odd li elements';
+@e = ();
+$dom->find('p:nth-child-of-type(odd)')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/B G/], 'found all odd p elements';
+@e = ();
+$dom->find('p:nth-last-child-of-type(odd)')
+  ->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/B G/], 'found all odd li elements';

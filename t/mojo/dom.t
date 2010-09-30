@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 259;
+use Test::More tests => 281;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -659,20 +659,42 @@ $dom->parse(<<EOF);
     <li>C</li>
 </ul>
 <h1>D</h1>
-<p>E</p>
-<p>F</p>
+<p id="♥">E</p>
+<p id="☃">F</p>
 <div>G</div>
 EOF
-is($dom->at('li ~ p')->text,                'B',   'rigth text');
-is($dom->at('li + p')->text,                'B',   'rigth text');
-is($dom->at('h1 ~ p ~ p')->text,            'F',   'rigth text');
-is($dom->at('h1 + p ~ p')->text,            'F',   'rigth text');
-is($dom->at('h1 ~ p + p')->text,            'F',   'rigth text');
-is($dom->at('h1 + p + p')->text,            'F',   'rigth text');
-is($dom->at('ul > li ~ li')->text,          'C',   'rigth text');
-is($dom->at('ul > li + li'),                undef, 'no result');
-is($dom->at('h1 ~ div')->text,              'G',   'rigth text');
-is($dom->at('h1 + div'),                    undef, 'no result');
-is($dom->at('p + div')->text,               'G',   'rigth text');
-is($dom->at('ul + h1 + p + p + div')->text, 'G',   'rigth text');
-is($dom->at('ul + h1 ~ p + div')->text,     'G',   'rigth text');
+is($dom->at('li ~ p')->text,                            'B',   'right text');
+is($dom->at('li + p')->text,                            'B',   'right text');
+is($dom->at('h1 ~ p ~ p')->text,                        'F',   'right text');
+is($dom->at('h1 + p ~ p')->text,                        'F',   'right text');
+is($dom->at('h1 ~ p + p')->text,                        'F',   'right text');
+is($dom->at('h1 + p + p')->text,                        'F',   'right text');
+is($dom->at('ul > li ~ li')->text,                      'C',   'right text');
+is($dom->at('ul li ~ li')->text,                        'C',   'right text');
+is($dom->at('ul li li'),                                undef, 'no result');
+is($dom->at('ul ~ li ~ li'),                            undef, 'no result');
+is($dom->at('ul + li ~ li'),                            undef, 'no result');
+is($dom->at('ul > li + li'),                            undef, 'no result');
+is($dom->at('h1 ~ div')->text,                          'G',   'right text');
+is($dom->at('h1 + div'),                                undef, 'no result');
+is($dom->at('p + div')->text,                           'G',   'right text');
+is($dom->at('ul + h1 + p + p + div')->text,             'G',   'right text');
+is($dom->at('ul + h1 ~ p + div')->text,                 'G',   'right text');
+is($dom->at('h1 ~ #♥')->text,                         'E',   'right text');
+is($dom->at('h1 + #♥')->text,                         'E',   'right text');
+is($dom->at('#♥ ~ #☃')->text,                       'F',   'right text');
+is($dom->at('#♥ + #☃')->text,                       'F',   'right text');
+is($dom->at('#♥ > #☃'),                             undef, 'no result');
+is($dom->at('#♥ #☃'),                               undef, 'no result');
+is($dom->at('#♥ + #☃ + :nth-last-child(1)')->text,  'G',   'right text');
+is($dom->at('#♥ ~ #☃ + :nth-last-child(1)')->text,  'G',   'right text');
+is($dom->at('#♥ + #☃ ~ :nth-last-child(1)')->text,  'G',   'right text');
+is($dom->at('#♥ ~ #☃ ~ :nth-last-child(1)')->text,  'G',   'right text');
+is($dom->at('#♥ + :nth-last-child(2)')->text,         'F',   'right text');
+is($dom->at('#♥ ~ :nth-last-child(2)')->text,         'F',   'right text');
+is($dom->at('#♥ + #☃ + *:nth-last-child(1)')->text, 'G',   'right text');
+is($dom->at('#♥ ~ #☃ + *:nth-last-child(1)')->text, 'G',   'right text');
+is($dom->at('#♥ + #☃ ~ *:nth-last-child(1)')->text, 'G',   'right text');
+is($dom->at('#♥ ~ #☃ ~ *:nth-last-child(1)')->text, 'G',   'right text');
+is($dom->at('#♥ + *:nth-last-child(2)')->text,        'F',   'right text');
+is($dom->at('#♥ ~ *:nth-last-child(2)')->text,        'F',   'right text');

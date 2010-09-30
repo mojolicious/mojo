@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 632;
+plan tests => 642;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -592,6 +592,12 @@ get '/impossible' => 'impossible';
 
 # Prefix
 under '/prefix';
+
+# GET
+get sub { shift->render(text => 'prefixed GET works!') };
+
+# POST
+post sub { shift->render(text => 'prefixed POST works!') };
 
 # GET /prefix/works
 get '/works' => sub { shift->render(text => 'prefix works!') };
@@ -1547,6 +1553,18 @@ $t->get_ok('/impossible')->status_is(404)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->header_is('X-Possible'   => undef)->header_is('X-Impossible' => 1)
   ->content_is("Oops!\n");
+
+# GET /prefix
+$t->get_ok('/prefix')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('prefixed GET works!');
+
+# POST /prefix
+$t->post_ok('/prefix')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('prefixed POST works!');
 
 # GET /prefix/works
 $t->get_ok('/prefix/works')->status_is(200)

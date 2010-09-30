@@ -38,20 +38,15 @@ sub import {
         my $conditions = [];
 
         # Route information
-        my $condition;
         while (defined(my $arg = shift @args)) {
 
-            # Condition can be everything
-            if ($condition) {
-                push @$conditions, $condition => $arg;
-                $condition = undef;
-            }
-
             # First scalar is the pattern
-            elsif (!ref $arg && !$pattern) { $pattern = $arg }
+            if (!ref $arg && !$pattern) { $pattern = $arg }
 
             # Scalar
-            elsif (!ref $arg && @args) { $condition = $arg }
+            elsif (!ref $arg && @args) {
+                push @$conditions, $arg, shift @args;
+            }
 
             # Last scalar is the route name
             elsif (!ref $arg) { $name = $arg }

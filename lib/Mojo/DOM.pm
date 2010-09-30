@@ -1066,9 +1066,9 @@ An C<E> element, the C<n-th> child of its parent.
 
 =item C<E:nth-last-child(n)>
 
-    my $third = $dom->at('div:nth-last-child(3)');
-    my $odd   = $dom->find('div:nth-last-child(odd)');
-    my $even  = $dom->find('div:nth-last-child(even)');
+    my $third    = $dom->at('div:nth-last-child(3)');
+    my $odd      = $dom->find('div:nth-last-child(odd)');
+    my $even     = $dom->find('div:nth-last-child(even)');
     my $bottom3  = $dom->find('div:nth-last-child(-n+3)');
 
 An C<E> element, the C<n-th> child of its parent, counting from the last one.
@@ -1084,9 +1084,9 @@ An C<E> element, the C<n-th> sibling of its type.
 
 =item C<E:nth-last-child-of-type(n)>
 
-    my $third = $dom->at('div:nth-last-child-of-type(3)');
-    my $odd   = $dom->find('div:nth-last-child-of-type(odd)');
-    my $even  = $dom->find('div:nth-last-child-of-type(even)');
+    my $third    = $dom->at('div:nth-last-child-of-type(3)');
+    my $odd      = $dom->find('div:nth-last-child-of-type(odd)');
+    my $even     = $dom->find('div:nth-last-child-of-type(even)');
     my $bottom3  = $dom->find('div:nth-last-child-of-type(-n+3)');
 
 An C<E> element, the C<n-th> sibling of its type, counting from the last one.

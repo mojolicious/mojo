@@ -418,8 +418,8 @@ sub _compare {
         elsif ($type eq 'pseudoclass') {
             my $class = $c->[1];
 
-            # "nth-child"
-            if ($class eq 'nth-child') {
+            # "nth-child" and "nth-last-child"
+            if ($class eq 'nth-child' || $class eq 'nth-last-child') {
 
                 # Numbers
                 $c->[2] = $self->_css_equation($c->[2]) unless ref $c->[2];
@@ -435,6 +435,9 @@ sub _compare {
                     next unless $sibling->[0] eq 'tag';
                     push @siblings, $sibling;
                 }
+
+                # Reverse
+                @siblings = reverse @siblings if $class eq 'nth-last-child';
 
                 # Find
                 my $found = 0;
@@ -1058,6 +1061,16 @@ An C<E> element whose C<foo> attribute value contains the substring C<bar>.
     my $top3  = $dom->find('div:nth-child(-n+3)');
 
 An C<E> element, the C<n-th> child of its parent.
+
+=item C<E:nth-last-child(n)>
+
+    my $third = $dom->at('div:nth-last-child(3)');
+    my $odd   = $dom->find('div:nth-last-child(odd)');
+    my $even  = $dom->find('div:nth-last-child(even)');
+    my $bottom3  = $dom->find('div:nth-last-child(-n+3)');
+
+An C<E> element, the C<n-th> the n-th child of its parent, counting from the
+last one.
 
 =item C<E:root>
 

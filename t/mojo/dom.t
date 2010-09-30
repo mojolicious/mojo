@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 209;
+use Test::More tests => 225;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -486,7 +486,7 @@ $dom->find('div[foo^="b"][foo$="r"]')->each(sub { push @div, shift->text });
 is_deeply \@div, [qw/A B C/],
   'found all div elements with the right atributes';
 
-# Form
+# Pseudo classes
 $dom->parse(<<EOF);
 <form action="/foo">
     <input type="text" name="user" value="test" />
@@ -524,3 +524,57 @@ is($dom->find(':checked[value="e"]')->[1],        undef,    'no element');
 is($dom->find(':empty')->[0]->attrs->{name},      'user',   'right name');
 is($dom->find('input:empty')->[0]->attrs->{name}, 'user',   'right name');
 is($dom->at(':empty[type^="ch"]')->attrs->{name}, 'groovy', 'right name');
+
+# More pseudo classes
+$dom->parse(<<EOF);
+<ul>
+    <li>A</li>
+    <li>B</li>
+    <li>C</li>
+    <li>D</li>
+    <li>E</li>
+    <li>F</li>
+    <li>G</li>
+    <li>H</li>
+</ul>
+EOF
+my @li;
+$dom->find('li:nth-child(odd)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/A C E G/], 'found all odd li elements';
+is($dom->find(':nth-child(odd)')->[0]->name, 'ul', 'right name');
+is($dom->find(':nth-child(odd)')->[1]->text, 'A',  'right text');
+is($dom->find(':nth-child(1)')->[0]->name,   'ul', 'right name');
+is($dom->find(':nth-child(1)')->[1]->text,   'A',  'right text');
+@li = ();
+$dom->find('li:nth-child(2n+1)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/A C E G/], 'found all odd li elements';
+@li = ();
+$dom->find('li:nth-child(even)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/B D F H/], 'found all even li elements';
+@li = ();
+$dom->find('li:nth-child(2n+2)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/B D F H/], 'found all even li elements';
+@li = ();
+$dom->find('li:nth-child(4n+1)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/A E/], 'found the right li elements';
+@li = ();
+$dom->find('li:nth-child(4n+4)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/D H/], 'found the right li element';
+@li = ();
+$dom->find('li:nth-child(4n)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/D H/], 'found the right li element';
+@li = ();
+$dom->find('li:nth-child(5n-2)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/C H/], 'found the right li element';
+@li = ();
+$dom->find('li:nth-child(-n+3)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/A B C/], 'found first three li elements';
+@li = ();
+$dom->find('li:nth-child(-1n+3)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/A B C/], 'found first three li elements';
+@li = ();
+$dom->find('li:nth-child(3n)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/C F/], 'found every third li elements';
+@li = ();
+$dom->find('li:nth-child(3)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/C/], 'found second li element';

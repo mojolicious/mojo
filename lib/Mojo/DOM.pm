@@ -29,11 +29,11 @@ my $CSS_ATTR_RE   = qr/
 my $CSS_CLASS_RE        = qr/\.((?:\\\.|[^\.])+)/;
 my $CSS_ELEMENT_RE      = qr/^((?:\\\.|\\\#|[^\.\#])+)/;
 my $CSS_ID_RE           = qr/\#((?:\\\#|[^\#])+)/;
-my $CSS_PSEUDO_CLASS_RE = qr/(?:\:(\w+)(?:\(([^\)]+)\))?)/;
+my $CSS_PSEUDO_CLASS_RE = qr/(?:\:([\w\-]+)(?:\(([^\)]+)\))?)/;
 my $CSS_TOKEN_RE        = qr/
     (\s*,\s*)?                                                   # Separator
     ((?:[^\[\\\:\s\,]|$CSS_ESCAPE_RE\s?)+)?                      # Element
-    ((?:\:\w+(?:\([^\)]+\))?)*)?                                 # Pseudoclass
+    ((?:\:[\w\-]+(?:\([^\)]+\))?)*)?                             # Pseudoclass
     ((?:\[(?:$CSS_ESCAPE_RE|\w)+(?:\W?="(?:\\"|[^"])+")?\])*)?   # Attributes
     (?:
     \s*
@@ -418,8 +418,40 @@ sub _compare {
         elsif ($type eq 'pseudoclass') {
             my $class = $c->[1];
 
+            # "nth-child"
+            if ($class eq 'nth-child') {
+
+                # Numbers
+                $c->[2] = $self->_css_equation($c->[2]) unless ref $c->[2];
+
+                # Parent
+                my $parent = $current->[3];
+
+                # Siblings
+                my $start = $parent->[0] eq 'root' ? 1 : 4;
+                my @siblings;
+                for my $j ($start .. $#$parent) {
+                    my $sibling = $parent->[$j];
+                    next unless $sibling->[0] eq 'tag';
+                    push @siblings, $sibling;
+                }
+
+                # Find
+                my $found = 0;
+                for my $i (0 .. $#siblings) {
+                    my $result = $c->[2]->[0] * $i + $c->[2]->[1];
+                    next if $result < 1;
+                    last unless my $sibling = $siblings[$result - 1];
+                    if ($sibling eq $current) {
+                        $found = 1;
+                        last;
+                    }
+                }
+                next if $found;
+            }
+
             # ":checked"
-            if ($class eq 'checked') {
+            elsif ($class eq 'checked') {
                 my $attrs = $current->[2];
                 next if ($attrs->{checked}  || '') eq 'checked';
                 next if ($attrs->{selected} || '') eq 'selected';
@@ -440,6 +472,26 @@ sub _compare {
     }
 
     return 1;
+}
+
+sub _css_equation {
+    my ($self, $equation) = @_;
+    my $num = [1, 1];
+
+    # "even"
+    if ($equation eq 'even') { $num = [2, 2] }
+
+    # "odd"
+    elsif ($equation eq 'odd') { $num = [2, 1] }
+
+    # Equation
+    elsif ($equation =~ /(?:(\-?(?:\d+)?)?n)?\+?(\-?\d+)?$/) {
+        $num->[0] = $1 || 0;
+        $num->[0] = -1 if $num->[0] eq '-';
+        $num->[1] = $2 || 0;
+    }
+
+    return $num;
 }
 
 sub _css_regex {
@@ -997,6 +1049,15 @@ C<bar>.
     my $fields = $dom->find('input[name*="fo"]');
 
 An C<E> element whose C<foo> attribute value contains the substring C<bar>.
+
+=item C<E:nth-child(n)>
+
+    my $third = $dom->at('div:nth-child(3)');
+    my $odd   = $dom->find('div:nth-child(odd)');
+    my $even  = $dom->find('div:nth-child(even)');
+    my $top3  = $dom->find('div:nth-child(-n+3)');
+
+An C<E> element, the C<n-th> child of its parent.
 
 =item C<E:root>
 

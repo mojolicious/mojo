@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 246;
+use Test::More tests => 259;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -650,3 +650,29 @@ is_deeply \@e, [qw/B G/], 'found all odd p elements';
 $dom->find('p:nth-last-child-of-type(odd)')
   ->each(sub { push @e, shift->text });
 is_deeply \@e, [qw/B G/], 'found all odd li elements';
+
+# Sibling combinator
+$dom->parse(<<EOF);
+<ul>
+    <li>A</li>
+    <p>B</p>
+    <li>C</li>
+</ul>
+<h1>D</h1>
+<p>E</p>
+<p>F</p>
+<div>G</div>
+EOF
+is($dom->at('li ~ p')->text,                'B',   'rigth text');
+is($dom->at('li + p')->text,                'B',   'rigth text');
+is($dom->at('h1 ~ p ~ p')->text,            'F',   'rigth text');
+is($dom->at('h1 + p ~ p')->text,            'F',   'rigth text');
+is($dom->at('h1 ~ p + p')->text,            'F',   'rigth text');
+is($dom->at('h1 + p + p')->text,            'F',   'rigth text');
+is($dom->at('ul > li ~ li')->text,          'C',   'rigth text');
+is($dom->at('ul > li + li'),                undef, 'no result');
+is($dom->at('h1 ~ div')->text,              'G',   'rigth text');
+is($dom->at('h1 + div'),                    undef, 'no result');
+is($dom->at('p + div')->text,               'G',   'rigth text');
+is($dom->at('ul + h1 + p + p + div')->text, 'G',   'rigth text');
+is($dom->at('ul + h1 ~ p + div')->text,     'G',   'rigth text');

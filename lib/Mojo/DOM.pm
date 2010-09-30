@@ -593,6 +593,7 @@ sub _match {
     my $first = 2;
     my ($current, $marker, $snapback);
     my $parentonly = 0;
+    my $siblings;
     for (my $i = 0; $i <= $#selectors; $i++) {
         my $selector = $selectors[$i];
 
@@ -600,29 +601,68 @@ sub _match {
         $parentonly-- if $parentonly > 0;
         if ($selector->[0] eq 'combinator') {
 
+            # Combinator
+            my $c = $selector->[1];
+
             # Parent only ">"
-            if ($selector->[1] eq '>') {
+            if ($c eq '>') {
                 $parentonly += 2;
                 $marker   = $i - 1   unless defined $marker;
                 $snapback = $current unless $snapback;
+            }
+
+            # Preceding siblings "~" and "+"
+            elsif ($c eq '~' || $c eq '+') {
+                my $parent = $current->[3];
+                my $start = $parent->[0] eq 'root' ? 1 : 4;
+                $siblings = [];
+
+                # Siblings
+                for my $i ($start .. $#$parent) {
+                    my $sibling = $parent->[$i];
+                    next unless $sibling->[0] eq 'tag';
+
+                    # Reached current
+                    if ($sibling eq $current) {
+                        @$siblings = ($siblings->[-1]) if $c eq '+';
+                        last;
+                    }
+                    push @$siblings, $sibling;
+                }
             }
 
             # Move on
             next;
         }
 
+        # Walk backwards
         while (1) {
             $first-- if $first != 0;
 
+            # Next sibling
+            if ($siblings) {
+
+                # Last sibling
+                unless ($current = shift @$siblings) {
+                    $siblings = undef;
+                    return;
+                }
+            }
+
             # Next parent
-            return
-              unless $current = $current ? $current->[3] : $candidate;
+            else {
+                return
+                  unless $current = $current ? $current->[3] : $candidate;
+            }
 
             # Root
             return if $current->[0] ne 'tag';
 
             # Compare part to element
-            last if $self->_compare($selector, $current);
+            if ($self->_compare($selector, $current)) {
+                $siblings = undef;
+                last;
+            }
 
             # First selector needs to match
             return if $first;
@@ -1055,6 +1095,25 @@ C<bar>.
 
 An C<E> element whose C<foo> attribute value contains the substring C<bar>.
 
+=item C<E:root>
+
+    my $root = $dom->at(':root');
+
+An C<E> element, root of the document.
+
+=item C<E:checked>
+
+    my $input = $dom->at(':checked');
+
+A user interface element C<E> which is checked (for instance a radio-button
+or checkbox).
+
+=item C<E:empty>
+
+    my $empty = $dom->find(':empty');
+
+An C<E> element that has no children (including text nodes).
+
 =item C<E:nth-child(n)>
 
     my $third = $dom->at('div:nth-child(3)');
@@ -1091,25 +1150,6 @@ An C<E> element, the C<n-th> sibling of its type.
 
 An C<E> element, the C<n-th> sibling of its type, counting from the last one.
 
-=item C<E:root>
-
-    my $root = $dom->at(':root');
-
-An C<E> element, root of the document.
-
-=item C<E:checked>
-
-    my $input = $dom->at(':checked');
-
-A user interface element C<E> which is checked (for instance a radio-button
-or checkbox).
-
-=item C<E:empty>
-
-    my $empty = $dom->find(':empty');
-
-An C<E> element that has no children (including text nodes).
-
 =item C<E F>
 
     my $headlines = $dom->find('div h1');
@@ -1121,6 +1161,18 @@ An C<F> element descendant of an C<E> element.
     my $headlines = $dom->find('html > body > div > h1');
 
 An C<F> element child of an C<E> element.
+
+=item C<E + F>
+
+    my $second = $dom->find('h1 + h2');
+
+An C<F> element immediately preceded by an C<E> element.
+
+=item C<E ~ F>
+
+    my $second = $dom->find('h1 ~ h2');
+
+An C<F> element preceded by an C<E> element.
 
 =item C<E, F, G>
 

@@ -16,8 +16,8 @@ my $START_LINE_RE = qr/
     HTTP\/(\d)\.(\d)   # Version
     \s+                # Whitespace
     (\d\d\d)           # Code
-    \s+                # Whitespace
-    ([\w\'\s]+)        # Message (with "I'm a teapot" support)
+    \s*                # Whitespace
+    ([\w\'\s]+)?       # Message (with "I'm a teapot" support)
     $                  # End
 /x;
 
@@ -192,7 +192,7 @@ sub _parse_start_line {
             $self->message($4);
             $self->{_state} = 'content';
         }
-        else { $self->error('Bad response start line.', 400) }
+        else { $self->error('Bad response start line.') }
     }
 }
 

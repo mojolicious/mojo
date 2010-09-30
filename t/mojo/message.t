@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 806;
+use Test::More tests => 811;
 
 use File::Spec;
 use File::Temp;
@@ -719,6 +719,15 @@ $res->parse("HTTP/1.1 200 OK\x0d\x0a\x0d\x0a");
 ok $res->is_done,       'response is done';
 is $res->code,          200, 'right status';
 is $res->message,       'OK', 'right message';
+is $res->major_version, 1, 'right major version';
+is $res->minor_version, 1, 'right minor version';
+
+# Parse HTTP 1.1 response start line, no headers and body (no message)
+$res = Mojo::Message::Response->new;
+$res->parse("HTTP/1.1 200\x0d\x0a\x0d\x0a");
+ok $res->is_done,       'response is done';
+is $res->code,          200, 'right status';
+is $res->message,       undef, 'no message';
 is $res->major_version, 1, 'right major version';
 is $res->minor_version, 1, 'right minor version';
 

@@ -1069,8 +1069,7 @@ An C<E> element, the C<n-th> child of its parent.
     my $even  = $dom->find('div:nth-last-child(even)');
     my $bottom3  = $dom->find('div:nth-last-child(-n+3)');
 
-An C<E> element, the C<n-th> the n-th child of its parent, counting from the
-last one.
+An C<E> element, the C<n-th> child of its parent, counting from the last one.
 
 =item C<E:root>
 

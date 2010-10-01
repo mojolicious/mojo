@@ -637,18 +637,16 @@ my @e;
 $dom->find('ul :nth-child(odd)')->each(sub { push @e, shift->text });
 is_deeply \@e, [qw/A C E G I/], 'found all odd elements';
 @e = ();
-$dom->find('li:nth-child-of-type(odd)')->each(sub { push @e, shift->text });
+$dom->find('li:nth-of-type(odd)')->each(sub { push @e, shift->text });
 is_deeply \@e, [qw/A E H/], 'found all odd li elements';
 @e = ();
-$dom->find('li:nth-last-child-of-type(odd)')
-  ->each(sub { push @e, shift->text });
+$dom->find('li:nth-last-of-type(odd)')->each(sub { push @e, shift->text });
 is_deeply \@e, [qw/C F I/], 'found all odd li elements';
 @e = ();
-$dom->find('p:nth-child-of-type(odd)')->each(sub { push @e, shift->text });
+$dom->find('p:nth-of-type(odd)')->each(sub { push @e, shift->text });
 is_deeply \@e, [qw/B G/], 'found all odd p elements';
 @e = ();
-$dom->find('p:nth-last-child-of-type(odd)')
-  ->each(sub { push @e, shift->text });
+$dom->find('p:nth-last-of-type(odd)')->each(sub { push @e, shift->text });
 is_deeply \@e, [qw/B G/], 'found all odd li elements';
 
 # Sibling combinator

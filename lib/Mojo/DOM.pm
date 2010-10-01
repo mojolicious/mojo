@@ -1132,21 +1132,21 @@ An C<E> element, the C<n-th> child of its parent.
 
 An C<E> element, the C<n-th> child of its parent, counting from the last one.
 
-=item C<E:nth-child-of-type(n)>
+=item C<E:nth-of-type(n)>
 
-    my $third = $dom->at('div:nth-child-of-type(3)');
-    my $odd   = $dom->find('div:nth-child-of-type(odd)');
-    my $even  = $dom->find('div:nth-child-of-type(even)');
-    my $top3  = $dom->find('div:nth-child-of-type(-n+3)');
+    my $third = $dom->at('div:nth-of-type(3)');
+    my $odd   = $dom->find('div:nth-of-type(odd)');
+    my $even  = $dom->find('div:nth-of-type(even)');
+    my $top3  = $dom->find('div:nth-of-type(-n+3)');
 
 An C<E> element, the C<n-th> sibling of its type.
 
-=item C<E:nth-last-child-of-type(n)>
+=item C<E:nth-last-of-type(n)>
 
-    my $third    = $dom->at('div:nth-last-child-of-type(3)');
-    my $odd      = $dom->find('div:nth-last-child-of-type(odd)');
-    my $even     = $dom->find('div:nth-last-child-of-type(even)');
-    my $bottom3  = $dom->find('div:nth-last-child-of-type(-n+3)');
+    my $third    = $dom->at('div:nth-last-of-type(3)');
+    my $odd      = $dom->find('div:nth-last-of-type(odd)');
+    my $even     = $dom->find('div:nth-last-of-type(even)');
+    my $bottom3  = $dom->find('div:nth-last-of-type(-n+3)');
 
 An C<E> element, the C<n-th> sibling of its type, counting from the last one.
 

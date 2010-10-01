@@ -94,7 +94,7 @@ sub _diag {
         <a href="/diag/dump_env">Dump Environment Variables</a><br />
         <a href="/diag/dump_params">Dump Request Parameters</a><br />
         <a href="/diag/proxy">Proxy</a><br />
-        <a href="/diag/upload">Upload</a>
+        <a href="/diag/upload">Upload</a><br />
         <a href="/diag/websocket">WebSocket</a>
     </body>
 </html>
@@ -198,28 +198,34 @@ EOF
 sub _upload {
     my ($self, $tx) = @_;
 
+    # Request
+    my $req = $tx->req;
+
     # Response
     my $res = $tx->res;
     $res->code(200);
 
     # File
-    if (my $file = $tx->req->upload('file')) {
-        $res->headers->content_type($file->headers->content_type
+    if (my $file = $req->upload('file')) {
+        my $headers = $res->headers;
+        $headers->content_type($file->headers->content_type
               || 'application/octet-stream');
+        $headers->header('X-Upload-Limit-Exceeded' => 1)
+          if $req->is_limit_exceeded;
         $res->body($file->slurp);
     }
 
     # Form
     else {
-        my $url = $tx->req->url->to_abs;
+        my $url = $req->url->to_abs;
         $url->path('/diag/upload');
-        $tx->res->headers->content_type('text/html');
-        $tx->res->body(<<"EOF");
+        $res->headers->content_type('text/html');
+        $res->body(<<"EOF");
 <!doctype html><html>
     <head><title>Mojo Diagnostics</title></head>
     <body>
         File:
-        <form action="$url" method="GET">
+        <form action="$url" method="POST" enctype="multipart/form-data">
             <input type="file" name="file" />
             <input type="submit" value="Upload" />
         </form>

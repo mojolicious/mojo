@@ -22,6 +22,9 @@ __PACKAGE__->attr(default_charset                   => 'UTF-8');
 __PACKAGE__->attr(dom_class                         => 'Mojo::DOM');
 __PACKAGE__->attr(json_class                        => 'Mojo::JSON');
 __PACKAGE__->attr([qw/major_version minor_version/] => 1);
+__PACKAGE__->attr(max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 10240 });
+__PACKAGE__->attr(
+    max_message_size => sub { $ENV{MOJO_MAX_MESSAGE_SIZE} || 5242880 });
 __PACKAGE__->attr([qw/on_finish on_progress/]);
 
 # DEPRECATED in Comet!
@@ -357,6 +360,13 @@ sub is_done {
     return;
 }
 
+sub is_limit_exceeded {
+    my $self = shift;
+    return unless my $code = ($self->error)[1];
+    return unless $code eq '413';
+    return 1;
+}
+
 sub is_multipart { shift->content->is_multipart }
 
 sub json {
@@ -512,12 +522,12 @@ sub _parse {
 
         # Check line size
         $self->error('Maximum line size exceeded.', 413)
-          if $buffer->size > ($ENV{MOJO_MAX_LINE_SIZE} || 10240);
+          if $buffer->size > $self->max_line_size;
     }
 
     # Check message size
     $self->error('Maximum message size exceeded.', 413)
-      if $buffer->raw_size > ($ENV{MOJO_MAX_MESSAGE_SIZE} || 5242880);
+      if $buffer->raw_size > $self->max_message_size;
 
     # Content
     my $state = $self->{_state} || '';
@@ -686,6 +696,22 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
     $message          = $message->major_version(1);
 
 Major version, defaults to C<1>.
+
+=head2 C<max_line_size>
+
+    my $size = $message->max_line_size;
+    $message = $message->max_line_size(1024);
+
+Maximum line size in bytes, defaults to C<10240>.
+Note that this attribute is EXPERIMENTAL and might change without warning!
+
+=head2 C<max_message_size>
+
+    my $size = $message->max_message_size;
+    $message = $message->max_message_size(1024);
+
+Maximum message size in bytes, defaults to C<5242880>.
+Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<minor_version>
 
@@ -870,6 +896,13 @@ Check if message content is chunked.
     my $done = $message->is_done;
 
 Check if parser is done.
+
+=head2 C<is_limit_exceeded>
+
+    my $limit = $message->is_limit_exceeded;
+
+Check if message has exceeded C<max_line_size> or C<max_message_size>.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<is_multipart>
 

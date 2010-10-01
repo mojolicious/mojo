@@ -178,7 +178,7 @@ post '/upload' => sub {
     $self->rendered;
     my $body = $self->res->body || '';
     $self->res->body("called, $body");
-    return if $self->req->error;
+    return if $self->req->is_limit_exceeded;
     if (my $u = $self->req->upload('Вячеслав')) {
         $self->res->body($self->res->body . $u->filename . $u->size);
     }

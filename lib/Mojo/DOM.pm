@@ -417,6 +417,19 @@ sub _compare {
         # Pseudo class
         elsif ($type eq 'pseudoclass') {
             my $class = $c->[1];
+            my $args  = $c->[2];
+
+            # "first-*"
+            if ($class =~ /^first\-(?:(child)|of-type)$/) {
+                $class = defined $1 ? 'nth-child' : 'nth-of-type';
+                $args = 1;
+            }
+
+            # "last-*"
+            elsif ($class =~ /^last\-(?:(child)|of-type)$/) {
+                $class = defined $1 ? 'nth-last-child' : 'nth-last-of-type';
+                $args = '-n+1';
+            }
 
             # ":checked"
             if ($class eq 'checked') {
@@ -439,7 +452,8 @@ sub _compare {
             elsif ($class =~ /^nth-/) {
 
                 # Numbers
-                $c->[2] = $self->_css_equation($c->[2]) unless ref $c->[2];
+                $args = $c->[2] = $self->_css_equation($args)
+                  unless ref $args;
 
                 # Parent
                 my $parent = $current->[3];
@@ -461,7 +475,7 @@ sub _compare {
                 # Find
                 my $found = 0;
                 for my $i (0 .. $#siblings) {
-                    my $result = $c->[2]->[0] * $i + $c->[2]->[1];
+                    my $result = $args->[0] * $i + $args->[1];
                     next if $result < 1;
                     last unless my $sibling = $siblings[$result - 1];
                     if ($sibling eq $current) {
@@ -1149,6 +1163,30 @@ An C<E> element, the C<n-th> sibling of its type.
     my $bottom3  = $dom->find('div:nth-last-of-type(-n+3)');
 
 An C<E> element, the C<n-th> sibling of its type, counting from the last one.
+
+=item C<E:first-child>
+
+    my $first = $dom->at('div :first-child');
+
+An C<E> element, first child of its parent.
+
+=item C<E:last-child>
+
+    my $last = $dom->at('div :last-child');
+
+An C<E> element, last child of its parent.
+
+=item C<E:first-of-type>
+
+    my $first = $dom->at('div :first-of-type');
+
+An C<E> element, first sibling of its type.
+
+=item C<E:last-of-type>
+
+    my $last = $dom->at('div :last-of-type');
+
+An C<E> element, last sibling of its type.
 
 =item C<E F>
 

@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 281;
+use Test::More tests => 293;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -648,6 +648,42 @@ is_deeply \@e, [qw/B G/], 'found all odd p elements';
 @e = ();
 $dom->find('p:nth-last-of-type(odd)')->each(sub { push @e, shift->text });
 is_deeply \@e, [qw/B G/], 'found all odd li elements';
+@e = ();
+$dom->find('ul :nth-child(1)')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/A/], 'found first child';
+@e = ();
+$dom->find('ul :first-child')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/A/], 'found first child';
+@e = ();
+$dom->find('p:nth-of-type(1)')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/B/], 'found first child';
+@e = ();
+$dom->find('p:first-of-type')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/B/], 'found first child';
+@e = ();
+$dom->find('li:nth-of-type(1)')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/A/], 'found first child';
+@e = ();
+$dom->find('li:first-of-type')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/A/], 'found first child';
+@e = ();
+$dom->find('ul :nth-last-child(-n+1)')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/I/], 'found last child';
+@e = ();
+$dom->find('ul :last-child')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/I/], 'found last child';
+@e = ();
+$dom->find('p:nth-last-of-type(-n+1)')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/G/], 'found last child';
+@e = ();
+$dom->find('p:last-of-type')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/G/], 'found last child';
+@e = ();
+$dom->find('li:nth-last-of-type(-n+1)')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/I/], 'found last child';
+@e = ();
+$dom->find('li:last-of-type')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/I/], 'found last child';
 
 # Sibling combinator
 $dom->parse(<<EOF);

@@ -20,7 +20,7 @@ use Mojo::Template;
 plan skip_all => 'Mac OS X required for this test!' unless $^O eq 'darwin';
 plan skip_all => 'set TEST_APACHE to enable this test (developer only!)'
   unless $ENV{TEST_APACHE};
-plan tests => 4;
+plan tests => 6;
 
 # I'm not a robot!
 # I don't like having discs crammed into me, unless they're Oreos.
@@ -85,13 +85,33 @@ sleep 1
 
 # Request
 my $client = Mojo::Client->new;
+my ($code, $body);
 $client->get(
     "http://127.0.0.1:$port/cgi-bin/test.cgi" => sub {
         my $self = shift;
-        is $self->res->code,   200,      'right status';
-        like $self->res->body, qr/Mojo/, 'right content';
+        $code = $self->res->code;
+        $body = $self->res->body;
     }
 )->start;
+is $code,   200,      'right status';
+like $body, qr/Mojo/, 'right content';
+
+# Huge request
+my $params = {};
+for my $i (1 .. 100000) { $params->{"test$i"} = $i }
+my $result = '';
+for my $key (sort keys %$params) { $result .= $params->{$key} }
+($code, $body) = undef;
+$client->post_form(
+    "http://127.0.0.1:$port/cgi-bin/test.cgi/diag/chunked_params" =>
+      $params => sub {
+        my $self = shift;
+        $code = $self->res->code;
+        $body = $self->res->body;
+    }
+)->start;
+is $code, 200, 'right status';
+is $body, $result, 'right content';
 
 # Stop
 kill 'INT', $pid;

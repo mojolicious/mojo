@@ -76,8 +76,6 @@ sub accept_connection {
     # Debug
     $self->app->log->debug('Accepted FastCGI connection.') if DEBUG;
 
-    # Blocking sucks
-    $c->blocking(0);
     return $c;
 }
 

@@ -81,6 +81,7 @@ sub _diag {
     return $self->_chunked_params($tx) if $path =~ /^\/chunked_params/;
     return $self->_dump_env($tx)       if $path =~ /^\/dump_env/;
     return $self->_dump_params($tx)    if $path =~ /^\/dump_params/;
+    return $self->_upload($tx)         if $path =~ /^\/upload/;
     return $self->_proxy($tx)          if $path =~ /^\/proxy/;
 
     # List
@@ -93,6 +94,7 @@ sub _diag {
         <a href="/diag/dump_env">Dump Environment Variables</a><br />
         <a href="/diag/dump_params">Dump Request Parameters</a><br />
         <a href="/diag/proxy">Proxy</a><br />
+        <a href="/diag/upload">Upload</a>
         <a href="/diag/websocket">WebSocket</a>
     </body>
 </html>
@@ -190,6 +192,41 @@ sub _proxy {
     </body>
 </html>
 EOF
+    $tx->resume;
+}
+
+sub _upload {
+    my ($self, $tx) = @_;
+
+    # Response
+    my $res = $tx->res;
+    $res->code(200);
+
+    # File
+    if (my $file = $tx->req->upload('file')) {
+        $res->headers->content_type($file->headers->content_type
+              || 'application/octet-stream');
+        $res->body($file->slurp);
+    }
+
+    # Form
+    else {
+        my $url = $tx->req->url->to_abs;
+        $url->path('/diag/upload');
+        $tx->res->headers->content_type('text/html');
+        $tx->res->body(<<"EOF");
+<!doctype html><html>
+    <head><title>Mojo Diagnostics</title></head>
+    <body>
+        File:
+        <form action="$url" method="GET">
+            <input type="file" name="file" />
+            <input type="submit" value="Upload" />
+        </form>
+    </body>
+</html>
+EOF
+    }
     $tx->resume;
 }
 

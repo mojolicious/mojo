@@ -19,7 +19,7 @@ use Mojo::Template;
 plan skip_all => 'Mac OS X required for this test!' unless $^O eq 'darwin';
 plan skip_all => 'set TEST_APACHE to enable this test (developer only!)'
   unless $ENV{TEST_APACHE};
-plan tests => 6;
+plan tests => 8;
 
 # Robots don't have any emotions, and sometimes that makes me very sad.
 use_ok 'Mojo::Server::FastCGI';
@@ -96,14 +96,27 @@ $client->get(
 is $code,   200,      'right status';
 like $body, qr/Mojo/, 'right content';
 
-# Huge request
+# Form with chunked response
 my $params = {};
-for my $i (1 .. 100000) { $params->{"test$i"} = $i }
+for my $i (1 .. 10) { $params->{"test$i"} = $i }
 my $result = '';
 for my $key (sort keys %$params) { $result .= $params->{$key} }
 ($code, $body) = undef;
 $client->post_form(
     "http://127.0.0.1:$port/diag/chunked_params" => $params => sub {
+        my $self = shift;
+        $code = $self->res->code;
+        $body = $self->res->body;
+    }
+)->start;
+is $code, 200, 'right status';
+is $body, $result, 'right content';
+
+# Upload
+($code, $body) = undef;
+$client->post_form(
+    "http://127.0.0.1:$port/diag/upload" => {file => {content => $result}} =>
+      sub {
         my $self = shift;
         $code = $self->res->code;
         $body = $self->res->body;

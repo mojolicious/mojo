@@ -69,6 +69,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed multiple route condition bugs. (esskar)
         - Fixed a small relative path bug in Mojo::URL.
         - Fixed pod renderer bug. (vti)
+        - Fixed a multipart parser bug affecting mostly file uploads.
 
 0.999929 2010-08-17 00:00:00
         - Removed OS X resource fork files.

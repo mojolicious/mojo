@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 811;
+use Test::More tests => 820;
 
 use File::Spec;
 use File::Temp;
@@ -1446,6 +1446,54 @@ is $req->major_version, '1', 'right major version';
 is $req->url->to_abs->to_string,
   'http://getbootylicious.org/cgi-bin/bootylicious/bootylicious.pl',
   'right absolute URL';
+
+# Parse Apache mod_fastcgi like CGI environment variables
+# (multipart file upload)
+$req = Mojo::Message::Request->new;
+$req->parse(
+    SCRIPT_NAME      => '',
+    SERVER_NAME      => '127.0.0.1',
+    SERVER_ADMIN     => '[no address given]',
+    PATH_INFO        => '/diag/upload',
+    HTTP_CONNECTION  => 'Keep-Alive',
+    REQUEST_METHOD   => 'POST',
+    CONTENT_LENGTH   => '135',
+    SCRIPT_FILENAME  => '/tmp/SnLu1cQ3t2/test.fcgi',
+    SERVER_SOFTWARE  => 'Apache/2.2.14 (Unix) mod_fastcgi/2.4.2',
+    QUERY_STRING     => '',
+    REMOTE_PORT      => '58232',
+    HTTP_USER_AGENT  => 'Mojolicious (Perl)',
+    SERVER_PORT      => '13028',
+    SERVER_SIGNATURE => '',
+    REMOTE_ADDR      => '127.0.0.1',
+    CONTENT_TYPE     => 'multipart/form-data; boundary=8jXGX',
+    SERVER_PROTOCOL  => 'HTTP/1.1',
+    PATH => '/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin',
+    REQUEST_URI       => '/diag/upload',
+    GATEWAY_INTERFACE => 'CGI/1.1',
+    SERVER_ADDR       => '127.0.0.1',
+    DOCUMENT_ROOT     => '/tmp/SnLu1cQ3t2',
+    PATH_TRANSLATED   => '/tmp/test.fcgi/diag/upload',
+    HTTP_HOST         => '127.0.0.1:13028'
+);
+$req->parse("--8jXGX\x0d\x0a");
+$req->parse(
+    "Content-Disposition: form-data; name=\"file\"; filename=\"file\"\x0d\x0a"
+      . "Content-Type: application/octet-stream\x0d\x0a\x0d\x0a");
+$req->parse('11023456789');
+$req->parse("\x0d\x0a--8jXGX--");
+ok $req->is_done, 'request is done';
+is $req->method, 'POST', 'right method';
+is $req->url->base->host, '127.0.0.1', 'right base host';
+is $req->url->path, '/diag/upload', 'right path';
+is $req->url->base->path, '', 'no base path';
+is $req->minor_version, '1', 'right minor version';
+is $req->major_version, '1', 'right major version';
+is $req->url->to_abs->to_string,
+  'http://127.0.0.1:13028/diag/upload',
+  'right absolute URL';
+$file = $req->upload('file');
+is $file->slurp, '11023456789', 'right uploaded content';
 
 # Parse response with cookie
 $res = Mojo::Message::Response->new;

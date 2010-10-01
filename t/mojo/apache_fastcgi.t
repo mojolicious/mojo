@@ -16,7 +16,7 @@ use Mojo::IOLoop;
 use Mojo::Template;
 
 # Mac OS X only test
-plan skip_all => 'Mac OS X required for this test!' unless $^O eq 'darwin';
+plan skip_all => 'Mac OS X or Linux required for this test!' unless grep {$^O eq $_} qw/darwin linux/;
 plan skip_all => 'set TEST_APACHE to enable this test (developer only!)'
   unless $ENV{TEST_APACHE};
 plan tests => 4;
@@ -29,6 +29,18 @@ my $port   = Mojo::IOLoop->generate_port;
 my $dir    = File::Temp::tempdir(CLEANUP => 1);
 my $config = File::Spec->catfile($dir, 'fcgi.config');
 my $mt     = Mojo::Template->new;
+
+# OS depend configuration
+my %config;
+
+my $httpd;
+if ( $^O eq 'darwin' ) {
+    $config{httpd}  = '/usr/sbin/httpd';
+    $config{modules_base} = 'libexec/apache2';
+} elsif ($^O eq 'linux') {
+    $config{httpd} = '/usr/sbin/apache2';
+    $config{modules_base} = 'lib/apache2/modules';
+}
 
 # FastCGI setup
 my $fcgi = File::Spec->catfile($dir, 'test.fcgi');
@@ -51,18 +63,18 @@ chmod 0777, $fcgi;
 ok -x $fcgi, 'script is executable';
 
 # Apache setup
-$mt->render_to_file(<<'EOF', $config, $dir, $port, $fcgi);
-% my ($dir, $port, $fcgi) = @_;
+my $e = $mt->render_to_file(<<'EOF', $config, $dir, $port, $fcgi, $config{modules_base});
+% my ($dir, $port, $fcgi, $mb) = @_;
 % use File::Spec::Functions 'catfile';
 ServerName 127.0.0.1
 Listen <%= $port %>
 
-LoadModule log_config_module libexec/apache2/mod_log_config.so
+LoadModule log_config_module <%= $mb %>/mod_log_config.so
 
 ErrorLog <%= catfile $dir, 'error.log' %>
 
-LoadModule alias_module libexec/apache2/mod_alias.so
-LoadModule fastcgi_module libexec/apache2/mod_fastcgi.so
+LoadModule alias_module <%= $mb %>/mod_alias.so
+LoadModule fastcgi_module <%= $mb %>/mod_fastcgi.so
 
 PidFile <%= catfile $dir, 'httpd.pid' %>
 LockFile <%= catfile $dir, 'accept.lock' %>
@@ -75,7 +87,8 @@ Alias / <%= $fcgi %>/
 EOF
 
 # Start
-my $pid = open my $server, '-|', '/usr/sbin/httpd', '-X', '-f', $config;
+
+my $pid = open my $server, '-|', $config{httpd}, '-X', '-f', $config;
 sleep 1
   while !IO::Socket::INET->new(
     Proto    => 'tcp',

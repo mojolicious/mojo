@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 642;
+plan tests => 658;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -471,6 +471,12 @@ get '/koi8-r' => sub {
 
 # GET /hello3.txt
 get '/hello3.txt' => sub { shift->render_static('hello2.txt') };
+
+# GET /captures/*/*
+get '/captures/:foo/:bar' => sub {
+    my $self = shift;
+    $self->render(text => $self->url_for);
+};
 
 # Default condition
 app->routes->add_condition(
@@ -1571,6 +1577,26 @@ $t->get_ok('/prefix/works')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('prefix works!');
+
+# GET /captures/foo/bar
+$t->get_ok('/captures/foo/bar')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('/captures/foo/bar');
+
+# GET /captures/bar/baz
+$t->get_ok('/captures/bar/baz')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('/captures/bar/baz');
+
+# GET /captures/♥/☃
+$t->get_ok('/captures/♥/☃')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('/captures/%E2%99%A5/%E2%98%83');
+is b($t->tx->res->body)->url_unescape->decode('UTF-8'),
+  '/captures/♥/☃', 'right result';
 
 # Client timer
 $client->ioloop->one_tick('0.1');

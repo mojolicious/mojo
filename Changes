@@ -15,6 +15,8 @@ This file documents the revision history for Perl extension Mojolicious.
           Mojolicious::Guides::Cookbook recipes for more information.
         - Replaced the "mojolicious" command with "mojo", for convenience.
         - Removed Mojo::Command::Generate::App.
+        - Renamed the methods name and replace_content to type and
+          replace_inner in Mojo::DOM.
         - Added EXPERIMENTAL support for indented Perl lines in
           Mojo::Template.
         - Added EXPERIMENTAL support for --mode and --home options to all

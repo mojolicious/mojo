@@ -105,17 +105,17 @@ EOF
 my $simple = $dom->at('foo simple.working[class^="wor"]');
 like $simple->parent->all_text,
   qr/test\s+easy\s+works\s+well\s+yada\s+yada\s+more\s+text/;
-is $simple->name, 'simple', 'right name';
+is $simple->type, 'simple', 'right type';
 is $simple->attrs->{class}, 'working', 'right class attribute';
 is $simple->text, 'easy', 'right text';
-is $simple->parent->name, 'foo', 'right parent name';
+is $simple->parent->type, 'foo', 'right parent type';
 is $simple->parent->attrs->{bar}, 'ba<z', 'right parent attribute';
-is $simple->parent->children->[1]->name, 'test', 'right sibling';
+is $simple->parent->children->[1]->type, 'test', 'right sibling';
 is $simple->to_xml, '<simple class="working">easy</simple>',
   'stringified right';
-is $dom->at('test#test')->name,         'test',   'right name';
-is $dom->at('[class$="ing"]')->name,    'simple', 'right name';
-is $dom->at('[class="working"]')->name, 'simple', 'right name';
+is $dom->at('test#test')->type,         'test',   'right type';
+is $dom->at('[class$="ing"]')->type,    'simple', 'right type';
+is $dom->at('[class="working"]')->type, 'simple', 'right type';
 
 # Deep nesting (parent combinator)
 $dom->parse(<<EOF);
@@ -256,26 +256,26 @@ is "$dom", '<div>foobar</div>', 'right text';
 
 # Replace element content
 $dom->parse('<div>foo<p>lalala</p>bar</div>');
-$dom->at('p')->replace_content('bar');
+$dom->at('p')->replace_inner('bar');
 is "$dom", '<div>foo<p>bar</p>bar</div>', 'right text';
-$dom->at('p')->replace_content(Mojo::DOM->new->parse('text'));
+$dom->at('p')->replace_inner(Mojo::DOM->new->parse('text'));
 is "$dom", '<div>foo<p>text</p>bar</div>', 'right text';
 $dom->parse('<div>foo</div><div>bar</div>');
-$dom->find('div')->each(sub { shift->replace_content('<p>test</p>') });
+$dom->find('div')->each(sub { shift->replace_inner('<p>test</p>') });
 is "$dom", '<div><p>test</p></div><div><p>test</p></div>', 'right text';
-$dom->find('p')->each(sub { shift->replace_content('') });
+$dom->find('p')->each(sub { shift->replace_inner('') });
 is "$dom", '<div><p /></div><div><p /></div>', 'right text';
 $dom->parse('<div><p id="☃" /></div>');
-$dom->at('#☃')->replace_content('♥');
+$dom->at('#☃')->replace_inner('♥');
 is "$dom", '<div><p id="☃">♥</p></div>', 'right text';
 $dom->parse('<div>foo<p>lalala</p>bar</div>');
-$dom->replace_content('♥');
+$dom->replace_inner('♥');
 is "$dom", '♥', 'right text';
-$dom->replace_content('<div>foo<p>lalala</p>bar</div>');
+$dom->replace_inner('<div>foo<p>lalala</p>bar</div>');
 is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right text';
-$dom->replace_content('');
+$dom->replace_inner('');
 is "$dom", '', 'right text';
-$dom->replace_content('<div>foo<p>lalala</p>bar</div>');
+$dom->replace_inner('<div>foo<p>lalala</p>bar</div>');
 is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right text';
 
 # Mixed search and tree walk
@@ -290,7 +290,7 @@ EOF
 my @data;
 for my $tr ($dom->find('table tr')->each) {
     for my $td (@{$tr->children}) {
-        push @data, $td->name, $td->all_text;
+        push @data, $td->type, $td->all_text;
     }
 }
 is $data[0], 'td',    'right tag';
@@ -503,9 +503,9 @@ $dom->parse(<<EOF);
     <input type="submit" value="Ok!" />
 </form>
 EOF
-is($dom->find(':root')->[0]->name,             'form',   'right name');
-is($dom->find('*:root')->[0]->name,            'form',   'right name');
-is($dom->find('form:root')->[0]->name,         'form',   'right name');
+is($dom->find(':root')->[0]->type,             'form',   'right type');
+is($dom->find('*:root')->[0]->type,            'form',   'right type');
+is($dom->find('form:root')->[0]->type,         'form',   'right type');
 is($dom->find(':root')->[1],                   undef,    'no element');
 is($dom->find(':checked')->[0]->attrs->{name}, 'groovy', 'right name');
 is($dom->find('option:checked')->[0]->attrs->{value},    'e', 'right value');
@@ -544,13 +544,13 @@ is_deeply \@li, [qw/A C E G/], 'found all odd li elements';
 @li = ();
 $dom->find('li:nth-last-child(odd)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/B D F H/], 'found all odd li elements';
-is($dom->find(':nth-child(odd)')->[0]->name,       'ul', 'right name');
+is($dom->find(':nth-child(odd)')->[0]->type,       'ul', 'right type');
 is($dom->find(':nth-child(odd)')->[1]->text,       'A',  'right text');
-is($dom->find(':nth-child(1)')->[0]->name,         'ul', 'right name');
+is($dom->find(':nth-child(1)')->[0]->type,         'ul', 'right type');
 is($dom->find(':nth-child(1)')->[1]->text,         'A',  'right text');
-is($dom->find(':nth-last-child(odd)')->[0]->name,  'ul', 'right name');
+is($dom->find(':nth-last-child(odd)')->[0]->type,  'ul', 'right type');
 is($dom->find(':nth-last-child(odd)')->[-1]->text, 'H',  'right text');
-is($dom->find(':nth-last-child(1)')->[0]->name,    'ul', 'right name');
+is($dom->find(':nth-last-child(1)')->[0]->type,    'ul', 'right type');
 is($dom->find(':nth-last-child(1)')->[1]->text,    'H',  'right text');
 @li = ();
 $dom->find('li:nth-child(2n+1)')->each(sub { push @li, shift->text });

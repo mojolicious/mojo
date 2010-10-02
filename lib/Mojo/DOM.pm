@@ -179,24 +179,6 @@ sub inner_xml {
     return $result;
 }
 
-sub name {
-    my ($self, $name) = @_;
-
-    # Tree
-    my $tree = $self->tree;
-
-    # Root
-    return if $tree->[0] eq 'root';
-
-    # Get
-    return $tree->[1] unless $name;
-
-    # Set
-    $tree->[1] = $name;
-
-    return $self;
-}
-
 sub namespace {
     my $self = shift;
 
@@ -262,7 +244,7 @@ sub replace {
     my $tree = $self->tree;
 
     # Root
-    return $self->replace_content(
+    return $self->replace_inner(
         $self->new(charset => $self->charset, tree => $new))
       if $tree->[0] eq 'root';
 
@@ -289,7 +271,7 @@ sub replace {
     return $self;
 }
 
-sub replace_content {
+sub replace_inner {
     my ($self, $new) = @_;
 
     # Parse
@@ -361,6 +343,24 @@ sub to_xml {
     $result = b($result)->encode($charset)->to_string if $charset;
 
     return $result;
+}
+
+sub type {
+    my ($self, $type) = @_;
+
+    # Tree
+    my $tree = $self->tree;
+
+    # Root
+    return if $tree->[0] eq 'root';
+
+    # Get
+    return $tree->[1] unless $type;
+
+    # Set
+    $tree->[1] = $type;
+
+    return $self;
 }
 
 # Woah! God is so in your face!
@@ -590,13 +590,13 @@ sub _match_selector {
 
         # Tag
         if ($type eq 'tag') {
-            my $name = $c->[1];
+            my $type = $c->[1];
 
             # Wildcard
-            next if $name eq '*';
+            next if $type eq '*';
 
-            # Name (ignore namespace prefix)
-            next if $current->[1] =~ /\:?$name$/;
+            # Type (ignore namespace prefix)
+            next if $current->[1] =~ /\:?$type$/;
         }
 
         # Attribute
@@ -1342,13 +1342,6 @@ Find elements with CSS3 selectors.
 
 Render content of this element to XML.
 
-=head2 C<name>
-
-    my $name = $dom->name;
-    $dom     = $dom->name('html');
-
-Element name.
-
 =head2 C<namespace>
 
     my $namespace = $dom->namespace;
@@ -1373,9 +1366,9 @@ Parse XML document.
 
 Replace elements.
 
-=head2 C<replace_content>
+=head2 C<replace_inner>
 
-    $dom = $dom->replace_content('test');
+    $dom = $dom->replace_inner('test');
 
 Replace element content.
 
@@ -1396,6 +1389,13 @@ Extract text content from element only, not including child elements.
     my $xml = $dom->to_xml;
 
 Render DOM to XML.
+
+=head2 C<type>
+
+    my $type = $dom->type;
+    $dom     = $dom->type('html');
+
+Element type.
 
 =head1 SEE ALSO
 

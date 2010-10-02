@@ -1090,7 +1090,7 @@ Note that this module is EXPERIMENTAL and might change without warning!
 
 =head2 Selectors
 
-These selectors are currently implemented.
+These CSS3 selectors are currently implemented.
 
 =over 4
 

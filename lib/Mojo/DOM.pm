@@ -692,6 +692,27 @@ sub _match_selector {
                 }
                 next if $found;
             }
+
+            # "only-*"
+            elsif ($class =~ /^only-(?:child|(of-type))$/) {
+                my $type = $1 ? $current->[1] : undef;
+
+                # Parent
+                my $parent = $current->[3];
+
+                # Siblings
+                my $start = $parent->[0] eq 'root' ? 1 : 4;
+                for my $j ($start .. $#$parent) {
+                    my $sibling = $parent->[$j];
+                    next unless $sibling->[0] eq 'tag';
+                    next if $sibling eq $current;
+                    next if defined $type && $sibling->[1] ne $type;
+                    return if $sibling ne $current;
+                }
+
+                # No siblings
+                next;
+            }
         }
 
         return;
@@ -1200,6 +1221,18 @@ An C<E> element, first sibling of its type.
     my $last = $dom->at('div :last-of-type');
 
 An C<E> element, last sibling of its type.
+
+=item C<E:only-child>
+
+    my $lonely = $dom->at('div :only-child');
+
+An C<E> element, only child of its parent.
+
+=item C<E:only-of-type>
+
+    my $lonely = $dom->at('div :only-of-type');
+
+an C<E> element, only sibling of its type.
 
 =item C<E:not(s)>
 

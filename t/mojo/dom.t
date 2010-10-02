@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 302;
+use Test::More tests => 306;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -632,6 +632,14 @@ $dom->parse(<<EOF);
     <li>H</li>
     <li>I</li>
 </ul>
+<div>
+    <div class="☃">J</div>
+</div>
+<div>
+    <a href="http://mojolicio.us">Mojo!</a>
+    <div class="☃">K</div>
+    <a href="http://mojolicio.us">Mojolicious!</a>
+</div>
 EOF
 my @e;
 $dom->find('ul :nth-child(odd)')->each(sub { push @e, shift->text });
@@ -719,6 +727,18 @@ is_deeply \@e, [qw/C/], 'found third element';
 $dom->find('ul :nth-child(-n+3):not(:nth-child(1)):not(:nth-child(2))')
   ->each(sub { push @e, shift->text });
 is_deeply \@e, [qw/C/], 'found third element';
+@e = ();
+$dom->find(':only-child')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/J/], 'found only child';
+@e = ();
+$dom->find('div :only-of-type')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/J K/], 'found only child';
+@e = ();
+$dom->find('div:only-child')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/J/], 'found only child';
+@e = ();
+$dom->find('div div:only-of-type')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/J K/], 'found only child';
 
 # Sibling combinator
 $dom->parse(<<EOF);

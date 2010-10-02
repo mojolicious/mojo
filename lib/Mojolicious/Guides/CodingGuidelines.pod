@@ -63,7 +63,7 @@ No inline POD.
 Documentation belongs to the guides, module POD is just an API reference.
 
 The main focus of the included documentation should be on examples, no walls
-of text.
+of text. (An example for every two sentences is a good rule of thumb)
 
 Lines should not be longer than 78 characters and we indent with 4
 whitespaces.

@@ -58,6 +58,9 @@ Only add prereqs if absolutely necessary and make them optional if possible.
 
 Domain specific languages should be avoided in favor of Perl'ish solutions.
 
+The main focus of the included documentation should be on examples, no walls
+of text.
+
 No inline POD.
 
 Documentation belongs to the guides, module POD is just an API reference.

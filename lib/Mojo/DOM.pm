@@ -1200,43 +1200,43 @@ An C<E> element, the C<n-th> sibling of its type, counting from the last one.
 
 =item C<E:first-child>
 
-    my $first = $dom->at('div :first-child');
+    my $first = $dom->at('div p:first-child');
 
 An C<E> element, first child of its parent.
 
 =item C<E:last-child>
 
-    my $last = $dom->at('div :last-child');
+    my $last = $dom->at('div p:last-child');
 
 An C<E> element, last child of its parent.
 
 =item C<E:first-of-type>
 
-    my $first = $dom->at('div :first-of-type');
+    my $first = $dom->at('div p:first-of-type');
 
 An C<E> element, first sibling of its type.
 
 =item C<E:last-of-type>
 
-    my $last = $dom->at('div :last-of-type');
+    my $last = $dom->at('div p:last-of-type');
 
 An C<E> element, last sibling of its type.
 
 =item C<E:only-child>
 
-    my $lonely = $dom->at('div :only-child');
+    my $lonely = $dom->at('div p:only-child');
 
 An C<E> element, only child of its parent.
 
 =item C<E:only-of-type>
 
-    my $lonely = $dom->at('div :only-of-type');
+    my $lonely = $dom->at('div p:only-of-type');
 
 an C<E> element, only sibling of its type.
 
 =item C<E:not(s)>
 
-    my $notfirst = $dom->at('div :not(:first-child)');
+    my $others = $dom->at('div p:not(:first-child)');
 
 An C<E> element that does not match simple selector C<s>.
 

@@ -154,7 +154,7 @@ sub find {
     my $pattern = $self->_parse_css($css);
 
     # Filter tree
-    return $self->_select($self->tree, $pattern);
+    return $self->_match_tree($self->tree, $pattern);
 }
 
 sub inner_xml {
@@ -379,7 +379,209 @@ sub _comment {
     push @$$current, ['comment', $comment];
 }
 
-sub _compare {
+sub _css_equation {
+    my ($self, $equation) = @_;
+    my $num = [1, 1];
+
+    # "even"
+    if ($equation eq 'even') { $num = [2, 2] }
+
+    # "odd"
+    elsif ($equation eq 'odd') { $num = [2, 1] }
+
+    # Equation
+    elsif ($equation =~ /(?:(\-?(?:\d+)?)?n)?\+?(\-?\d+)?$/) {
+        $num->[0] = $1 || 0;
+        $num->[0] = -1 if $num->[0] eq '-';
+        $num->[1] = $2 || 0;
+    }
+
+    return $num;
+}
+
+sub _css_regex {
+    my ($self, $op, $value) = @_;
+
+    # Shortcut
+    return unless $value;
+
+    # Quote
+    $value = quotemeta $self->_css_unescape($value);
+
+    # Regex
+    my $regex;
+
+    # "~=" (word)
+    if ($op eq '~') { $regex = qr/(?:^|.*\s+)$value(?:\s+.*|$)/ }
+
+    # "*=" (contains)
+    elsif ($op eq '*') { $regex = qr/$value/ }
+
+    # "^=" (begins with)
+    elsif ($op eq '^') { $regex = qr/^$value/ }
+
+    # "$=" (ends with)
+    elsif ($op eq '$') { $regex = qr/$value$/ }
+
+    # Everything else
+    else { $regex = qr/^$value$/ }
+
+    return $regex;
+}
+
+sub _css_unescape {
+    my ($self, $value) = @_;
+
+    # Remove escaped newlines
+    $value =~ s/\\\n//g;
+
+    # Unescape unicode characters
+    $value =~ s/\\([0-9a-fA-F]{1,6})\s?/pack('U', hex $1)/gex;
+
+    # Remove backslash
+    $value =~ s/\\//g;
+
+    return $value;
+}
+
+sub _doctype {
+    my ($self, $doctype, $current) = @_;
+
+    # Append
+    push @$$current, ['doctype', $doctype];
+}
+
+sub _end {
+    my ($self, $end, $current) = @_;
+
+    # Root
+    return if $$current->[0] eq 'root';
+
+    # Walk backwards
+    while (1) {
+
+        # Root
+        last if $$current->[0] eq 'root';
+
+        # Match
+        return $$current = $$current->[3] if $end eq $$current->[1];
+
+        # Children to move to parent
+        my @buffer = splice @$$current, 4;
+
+        # Parent
+        $$current = $$current->[3];
+
+        # Update parent reference
+        for my $e (@buffer) {
+            $e->[3] = $$current if $e->[0] eq 'tag';
+            weaken $e->[3];
+        }
+
+        # Move children
+        push @$$current, @buffer;
+    }
+}
+
+sub _match_element {
+    my ($self, $candidate, $selectors) = @_;
+
+    # Selectors
+    my @selectors = reverse @$selectors;
+
+    # Match
+    my $first = 2;
+    my ($current, $marker, $snapback);
+    my $parentonly = 0;
+    my $siblings;
+    for (my $i = 0; $i <= $#selectors; $i++) {
+        my $selector = $selectors[$i];
+
+        # Combinator
+        $parentonly-- if $parentonly > 0;
+        if ($selector->[0] eq 'combinator') {
+
+            # Combinator
+            my $c = $selector->[1];
+
+            # Parent only ">"
+            if ($c eq '>') {
+                $parentonly += 2;
+                $marker   = $i - 1   unless defined $marker;
+                $snapback = $current unless $snapback;
+            }
+
+            # Preceding siblings "~" and "+"
+            elsif ($c eq '~' || $c eq '+') {
+                my $parent = $current->[3];
+                my $start = $parent->[0] eq 'root' ? 1 : 4;
+                $siblings = [];
+
+                # Siblings
+                for my $i ($start .. $#$parent) {
+                    my $sibling = $parent->[$i];
+                    next unless $sibling->[0] eq 'tag';
+
+                    # Reached current
+                    if ($sibling eq $current) {
+                        @$siblings = ($siblings->[-1]) if $c eq '+';
+                        last;
+                    }
+                    push @$siblings, $sibling;
+                }
+            }
+
+            # Move on
+            next;
+        }
+
+        # Walk backwards
+        while (1) {
+            $first-- if $first != 0;
+
+            # Next sibling
+            if ($siblings) {
+
+                # Last sibling
+                unless ($current = shift @$siblings) {
+                    $siblings = undef;
+                    return;
+                }
+            }
+
+            # Next parent
+            else {
+                return
+                  unless $current = $current ? $current->[3] : $candidate;
+            }
+
+            # Root
+            return if $current->[0] ne 'tag';
+
+            # Compare part to element
+            if ($self->_match_selector($selector, $current)) {
+                $siblings = undef;
+                last;
+            }
+
+            # First selector needs to match
+            return if $first;
+
+            # Parent only
+            if ($parentonly) {
+                $i        = $marker - 1;
+                $current  = $snapback;
+                $snapback = undef;
+                $marker   = undef;
+                last;
+            }
+        }
+    }
+
+    return 1;
+}
+
+sub _match_selector {
     my ($self, $selector, $current) = @_;
 
     # Selectors
@@ -493,206 +695,47 @@ sub _compare {
     return 1;
 }
 
-sub _css_equation {
-    my ($self, $equation) = @_;
-    my $num = [1, 1];
+sub _match_tree {
+    my ($self, $tree, $pattern) = @_;
 
-    # "even"
-    if ($equation eq 'even') { $num = [2, 2] }
+    # Walk tree
+    my @results;
+    my @queue = ($tree);
+    while (my $current = shift @queue) {
 
-    # "odd"
-    elsif ($equation eq 'odd') { $num = [2, 1] }
-
-    # Equation
-    elsif ($equation =~ /(?:(\-?(?:\d+)?)?n)?\+?(\-?\d+)?$/) {
-        $num->[0] = $1 || 0;
-        $num->[0] = -1 if $num->[0] eq '-';
-        $num->[1] = $2 || 0;
-    }
-
-    return $num;
-}
-
-sub _css_regex {
-    my ($self, $op, $value) = @_;
-
-    # Shortcut
-    return unless $value;
-
-    # Quote
-    $value = quotemeta $self->_css_unescape($value);
-
-    # Regex
-    my $regex;
-
-    # "~=" (word)
-    if ($op eq '~') { $regex = qr/(?:^|.*\s+)$value(?:\s+.*|$)/ }
-
-    # "*=" (contains)
-    elsif ($op eq '*') { $regex = qr/$value/ }
-
-    # "^=" (begins with)
-    elsif ($op eq '^') { $regex = qr/^$value/ }
-
-    # "$=" (ends with)
-    elsif ($op eq '$') { $regex = qr/$value$/ }
-
-    # Everything else
-    else { $regex = qr/^$value$/ }
-
-    return $regex;
-}
-
-sub _css_unescape {
-    my ($self, $value) = @_;
-
-    # Remove escaped newlines
-    $value =~ s/\\\n//g;
-
-    # Unescape unicode characters
-    $value =~ s/\\([0-9a-fA-F]{1,6})\s?/pack('U', hex $1)/gex;
-
-    # Remove backslash
-    $value =~ s/\\//g;
-
-    return $value;
-}
-
-sub _doctype {
-    my ($self, $doctype, $current) = @_;
-
-    # Append
-    push @$$current, ['doctype', $doctype];
-}
-
-sub _end {
-    my ($self, $end, $current) = @_;
-
-    # Root
-    return if $$current->[0] eq 'root';
-
-    # Walk backwards
-    while (1) {
+        # Type
+        my $type = $current->[0];
 
         # Root
-        last if $$current->[0] eq 'root';
+        if ($type eq 'root') {
 
-        # Match
-        return $$current = $$current->[3] if $end eq $$current->[1];
-
-        # Children to move to parent
-        my @buffer = splice @$$current, 4;
-
-        # Parent
-        $$current = $$current->[3];
-
-        # Update parent reference
-        for my $e (@buffer) {
-            $e->[3] = $$current if $e->[0] eq 'tag';
-            weaken $e->[3];
-        }
-
-        # Move children
-        push @$$current, @buffer;
-    }
-}
-
-sub _match {
-    my ($self, $candidate, $selectors) = @_;
-
-    # Selectors
-    my @selectors = reverse @$selectors;
-
-    # Match
-    my $first = 2;
-    my ($current, $marker, $snapback);
-    my $parentonly = 0;
-    my $siblings;
-    for (my $i = 0; $i <= $#selectors; $i++) {
-        my $selector = $selectors[$i];
-
-        # Combinator
-        $parentonly-- if $parentonly > 0;
-        if ($selector->[0] eq 'combinator') {
-
-            # Combinator
-            my $c = $selector->[1];
-
-            # Parent only ">"
-            if ($c eq '>') {
-                $parentonly += 2;
-                $marker   = $i - 1   unless defined $marker;
-                $snapback = $current unless $snapback;
-            }
-
-            # Preceding siblings "~" and "+"
-            elsif ($c eq '~' || $c eq '+') {
-                my $parent = $current->[3];
-                my $start = $parent->[0] eq 'root' ? 1 : 4;
-                $siblings = [];
-
-                # Siblings
-                for my $i ($start .. $#$parent) {
-                    my $sibling = $parent->[$i];
-                    next unless $sibling->[0] eq 'tag';
-
-                    # Reached current
-                    if ($sibling eq $current) {
-                        @$siblings = ($siblings->[-1]) if $c eq '+';
-                        last;
-                    }
-                    push @$siblings, $sibling;
-                }
-            }
-
-            # Move on
+            # Fill queue
+            unshift @queue, @$current[1 .. $#$current];
             next;
         }
 
-        # Walk backwards
-        while (1) {
-            $first-- if $first != 0;
+        # Tag
+        elsif ($type eq 'tag') {
 
-            # Next sibling
-            if ($siblings) {
+            # Fill queue
+            unshift @queue, @$current[4 .. $#$current];
 
-                # Last sibling
-                unless ($current = shift @$siblings) {
-                    $siblings = undef;
-                    return;
-                }
-            }
+            # Parts
+            for my $part (@$pattern) {
 
-            # Next parent
-            else {
-                return
-                  unless $current = $current ? $current->[3] : $candidate;
-            }
-
-            # Root
-            return if $current->[0] ne 'tag';
-
-            # Compare part to element
-            if ($self->_compare($selector, $current)) {
-                $siblings = undef;
-                last;
-            }
-
-            # First selector needs to match
-            return if $first;
-
-            # Parent only
-            if ($parentonly) {
-                $i        = $marker - 1;
-                $current  = $snapback;
-                $snapback = undef;
-                $marker   = undef;
-                last;
+                # Match
+                push(@results, $current) and last
+                  if $self->_match_element($current, $part);
             }
         }
     }
 
-    return 1;
+    # Upgrade results
+    @results =
+      map { $self->new(charset => $self->charset, tree => $_) } @results;
+
+    # Collection
+    return bless \@results, 'Mojo::DOM::_Collection';
 }
 
 sub _parse_css {
@@ -926,49 +969,6 @@ sub _render {
     $content .= '</' . $tree->[1] . '>' if $e eq 'tag';
 
     return $content;
-}
-
-sub _select {
-    my ($self, $tree, $pattern) = @_;
-
-    # Walk tree
-    my @results;
-    my @queue = ($tree);
-    while (my $current = shift @queue) {
-
-        # Type
-        my $type = $current->[0];
-
-        # Root
-        if ($type eq 'root') {
-
-            # Fill queue
-            unshift @queue, @$current[1 .. $#$current];
-            next;
-        }
-
-        # Tag
-        elsif ($type eq 'tag') {
-
-            # Fill queue
-            unshift @queue, @$current[4 .. $#$current];
-
-            # Parts
-            for my $part (@$pattern) {
-
-                # Match
-                push(@results, $current) and last
-                  if $self->_match($current, $part);
-            }
-        }
-    }
-
-    # Upgrade results
-    @results =
-      map { $self->new(charset => $self->charset, tree => $_) } @results;
-
-    # Collection
-    return bless \@results, 'Mojo::DOM::_Collection';
 }
 
 # It's not important to talk about who got rich off of whom,

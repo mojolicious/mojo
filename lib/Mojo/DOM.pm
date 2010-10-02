@@ -29,11 +29,11 @@ my $CSS_ATTR_RE   = qr/
 my $CSS_CLASS_RE        = qr/\.((?:\\\.|[^\.])+)/;
 my $CSS_ELEMENT_RE      = qr/^((?:\\\.|\\\#|[^\.\#])+)/;
 my $CSS_ID_RE           = qr/\#((?:\\\#|[^\#])+)/;
-my $CSS_PSEUDO_CLASS_RE = qr/(?:\:([\w\-]+)(?:\(([^\)]+)\))?)/;
+my $CSS_PSEUDO_CLASS_RE = qr/(?:\:([\w\-]+)(?:\(((?:\([^\)]+\)|[^\)])+)\))?)/;
 my $CSS_TOKEN_RE        = qr/
     (\s*,\s*)?                                                   # Separator
     ((?:[^\[\\\:\s\,]|$CSS_ESCAPE_RE\s?)+)?                      # Element
-    ((?:\:[\w\-]+(?:\([^\)]+\))?)*)?                             # Pseudoclass
+    ((?:\:[\w\-]+(?:\((?:\([^\)]+\)|[^\)])+\))?)*)?              # Pseudoclass
     ((?:\[(?:$CSS_ESCAPE_RE|\w)+(?:\W?="(?:\\"|[^"])+")?\])*)?   # Attributes
     (?:
     \s*
@@ -650,6 +650,11 @@ sub _match_selector {
                 }
             }
 
+            # "not"
+            elsif ($class eq 'not') {
+                next unless $self->_match_selector($args, $current);
+            }
+
             # "nth-*"
             elsif ($class =~ /^nth-/) {
 
@@ -785,7 +790,15 @@ sub _parse_css {
 
         # Pseudo classes
         while ($pc =~ /$CSS_PSEUDO_CLASS_RE/g) {
-            push @$selector, ['pseudoclass', $1, $2];
+
+            # "not"
+            if ($1 eq 'not') {
+                my $subpattern = $self->_parse_css($2)->[-1]->[-1];
+                push @$selector, ['pseudoclass', 'not', $subpattern];
+            }
+
+            # Everything else
+            else { push @$selector, ['pseudoclass', $1, $2] }
         }
 
         # Attributes
@@ -1187,6 +1200,12 @@ An C<E> element, first sibling of its type.
     my $last = $dom->at('div :last-of-type');
 
 An C<E> element, last sibling of its type.
+
+=item C<E:not(s)>
+
+    my $notfirst = $dom->at('div :not(:first-child)');
+
+An C<E> element that does not match simple selector C<s>.
 
 =item C<E F>
 

@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 293;
+use Test::More tests => 302;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -624,7 +624,7 @@ $dom->parse(<<EOF);
 <ul>
     <li>A</li>
     <p>B</p>
-    <li>C</li>
+    <li class="test ♥">C</li>
     <p>D</p>
     <li>E</li>
     <li>F</li>
@@ -684,6 +684,41 @@ is_deeply \@e, [qw/I/], 'found last child';
 @e = ();
 $dom->find('li:last-of-type')->each(sub { push @e, shift->text });
 is_deeply \@e, [qw/I/], 'found last child';
+@e = ();
+$dom->find('ul :nth-child(-n+3):not(li)')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/B/], 'found first p element';
+@e = ();
+$dom->find('ul :nth-child(-n+3):not(:first-child)')
+  ->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/B C/], 'found second and third element';
+@e = ();
+$dom->find('ul :nth-child(-n+3):not(.♥)')
+  ->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/A B/], 'found first and second element';
+@e = ();
+$dom->find('ul :nth-child(-n+3):not([class$="♥"])')
+  ->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/A B/], 'found first and second element';
+@e = ();
+$dom->find('ul :nth-child(-n+3):not(li[class$="♥"])')
+  ->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/A B/], 'found first and second element';
+@e = ();
+$dom->find('ul :nth-child(-n+3):not([class$="♥"][class^="test"])')
+  ->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/A B/], 'found first and second element';
+@e = ();
+$dom->find('ul :nth-child(-n+3):not(*[class$="♥"])')
+  ->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/A B/], 'found first and second element';
+@e = ();
+$dom->find('ul :nth-child(-n+3):not(:nth-child(-n+2))')
+  ->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/C/], 'found third element';
+@e = ();
+$dom->find('ul :nth-child(-n+3):not(:nth-child(1)):not(:nth-child(2))')
+  ->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/C/], 'found third element';
 
 # Sibling combinator
 $dom->parse(<<EOF);

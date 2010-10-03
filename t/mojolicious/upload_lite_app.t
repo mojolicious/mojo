@@ -12,7 +12,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 18;
+plan tests => 20;
 
 # Um, Leela, Armondo and I are going to the back seat of his car for coffee.
 use Mojo::Asset::File;
@@ -30,15 +30,24 @@ app->plugins->add_hook(
         $tx->req->on_progress(
             sub {
                 my $req = shift;
+
+                # Upload id parameter
                 return unless my $id = $req->url->query->param('upload_id');
-                if (my $length = scalar $req->headers->content_length) {
-                    my $progress = $req->content->progress;
-                    $cache->{$id} =
-                      $progress == $length
-                      ? 100
-                      : int($progress / ($length / 100));
-                }
-                else { $cache->{$id} = 0 }
+
+                # Cache
+                my $c = $cache->{$id} ||= [0];
+
+                # Expected content length
+                return
+                  unless my $length = scalar $req->headers->content_length;
+
+                # Current progress
+                my $progress = $req->content->progress;
+
+                # Update cache
+                push @$c, $progress == $length
+                  ? 100
+                  : int($progress / ($length / 100));
             }
         );
     }
@@ -60,7 +69,7 @@ post '/upload' => sub {
 get '/progress/:id' => sub {
     my $self = shift;
     my $id   = $self->param('id');
-    $self->render_text(($cache->{$id} || 0) . '%');
+    $self->render_text(($cache->{$id}->[-1] || 0) . '%');
 };
 
 my $t = Test::Mojo->new;
@@ -91,3 +100,5 @@ $t->post_form_ok('/upload?upload_id=23',
 
 # GET/progress/23
 $t->get_ok('/progress/23')->status_is(200)->content_is('100%');
+ok @{$cache->{23}} > 1, 'made progress';
+ok $cache->{23}->[0] < $cache->{23}->[-1], 'progress increased';

@@ -1057,7 +1057,7 @@ __END__
 
 =head1 NAME
 
-Mojo::DOM - Minimalistic XML DOM Parser With CSS3 Selectors
+Mojo::DOM - Minimalistic XML/HTML5 DOM Parser With CSS3 Selectors
 
 =head1 SYNOPSIS
 
@@ -1084,13 +1084,13 @@ Mojo::DOM - Minimalistic XML DOM Parser With CSS3 Selectors
 
 =head1 DESCRIPTION
 
-L<Mojo::DOM> is a minimalistic and very relaxed XML DOM parser with support
-for CSS3 selectors.
+L<Mojo::DOM> is a minimalistic and very relaxed XML/HTML5 DOM parser with
+support for CSS3 selectors.
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head2 Selectors
 
-These CSS3 selectors are currently implemented.
+All CSS3 selectors that make sense for a standalone parser are supported.
 
 =over 4
 

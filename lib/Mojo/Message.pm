@@ -513,9 +513,6 @@ sub _parse {
     my $self = shift;
     my $until_body = @_ ? shift : 0;
 
-    # Progress
-    if (my $cb = $self->on_progress) { $self->$cb }
-
     # Start line and headers
     my $buffer = $self->buffer;
     if (!$self->{_state} || $self->{_state} eq 'headers') {
@@ -554,6 +551,9 @@ sub _parse {
 
     # Done
     $self->{_state} = 'done' if $self->content->is_done;
+
+    # Progress
+    if (my $cb = $self->on_progress) { $self->$cb }
 
     # Finished
     if ((my $cb = $self->on_finish) && $self->is_done) { $self->$cb }

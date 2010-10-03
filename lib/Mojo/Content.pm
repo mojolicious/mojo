@@ -202,9 +202,7 @@ sub parse {
             }
 
             # Done
-            $self->{_state} = 'done'
-              if $length <= $self->chunked_buffer->raw_size
-                  - ($self->{_header_size} || 0);
+            $self->{_state} = 'done' if $length <= $self->progress;
         }
     }
 
@@ -248,6 +246,11 @@ sub parse_until_body {
     $self->_parse_headers if ($self->{_state} || '') eq 'headers';
 
     return $self;
+}
+
+sub progress {
+    my $self = shift;
+    $self->chunked_buffer->raw_size - ($self->{_header_size} || 0);
 }
 
 sub write {
@@ -588,6 +591,13 @@ Parse body once.
     );
 
 Parse and stop after headers.
+
+=head2 C<progress>
+
+    my $bytes = $content->progress;
+
+Number of bytes already received from message content.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<write>
 

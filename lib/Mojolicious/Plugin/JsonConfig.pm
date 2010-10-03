@@ -21,6 +21,7 @@ sub register {
 
     # File
     my $file = $conf->{file};
+    my $mode_file;
     unless ($file) {
 
         # Basename
@@ -29,6 +30,9 @@ sub register {
         # Remove .pl, .p6 and .t extentions
         $file =~ s/(?:\.p(?:l|6))|\.t$//i;
 
+        # Mode specific config file
+        $mode_file = join '.', $file, $app->mode, ($conf->{ext} || 'json');
+
         # Default extension
         $file .= '.' . ($conf->{ext} || 'json');
     }
@@ -36,6 +40,8 @@ sub register {
     # Absolute path
     $file = $app->home->rel_file($file)
       unless File::Spec->file_name_is_absolute($file);
+    $mode_file = $app->home->rel_file($mode_file)
+      if defined $mode_file && !File::Spec->file_name_is_absolute($mode_file);
 
     # Read config file
     my $config = {};
@@ -52,6 +58,12 @@ sub register {
         # Debug
         $app->log->debug(
             qq/Config file "$file" missing, using default config./);
+    }
+
+    # Merge with mode specific config file
+    if (defined $mode_file && -e $mode_file) {
+        my $mode_config = $self->_read_config($mode_file, $template, $app);
+        $config = {%$config, %$mode_config};
     }
 
     # Stash key
@@ -156,6 +168,8 @@ L<Mojolicous::Plugin::JsonConfig> is a JSON configuration plugin that
 preprocesses it's input with L<Mojo::Template>.
 
 The application object can be accessed via C<$app> or the C<app> helper.
+You can extend the normal config file C<myapp.json> with C<mode> specific
+ones like C<myapp.$mode.json>.
 
 =head2 Options
 

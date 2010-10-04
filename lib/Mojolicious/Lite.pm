@@ -657,7 +657,9 @@ Static files will be automatically served from the C<DATA> section
     % mv something.js public/something.js
 
 Testing your application is as easy as creating a C<t> directory and filling
-it with normal Perl unit tests like C<t/funky.t>.
+it with normal Perl unit tests.
+Some plugins depend on the actual script name, so a test file for the
+application C<myapp.pl> should be named C<t/myapp.t>.
 
     use Test::More tests => 3;
     use Test::Mojo;

@@ -39,8 +39,6 @@ use utf8;
 
 use Test::More tests => 41;
 
-# Of all the parasites I've had over the years,
-# these worms are among the best.
 use Mojo;
 use Mojo::Transaction::HTTP;
 use MojoX::Dispatcher::Routes;

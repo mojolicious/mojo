@@ -12,6 +12,7 @@ plugin 'json_config';
 # GET /
 get '/' => 'index';
 
+app->start;
 __DATA__
 @@ index.html.ep
 <%= $config->{just} %>

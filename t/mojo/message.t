@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 844;
+use Test::More tests => 858;
 
 use File::Spec;
 use File::Temp;
@@ -95,6 +95,31 @@ is $req->minor_version, 0, 'right minor version';
 is $req->url,           '/foo/bar/baz.html', 'right URL';
 is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $req->headers->content_length, 0, 'right "Content-Length" value';
+
+# Parse HTTP 1.0 start line and headers, no body (missing Content-Length)
+$req = Mojo::Message::Request->new;
+$req->parse("GET /foo/bar/baz.html HTTP/1.0\x0d\x0a");
+$req->parse("Content-Type: text/plain\x0d\x0a\x0d\x0a");
+ok $req->is_done,       'request is done';
+is $req->method,        'GET', 'right method';
+is $req->major_version, 1, 'right major version';
+is $req->minor_version, 0, 'right minor version';
+is $req->url,           '/foo/bar/baz.html', 'right URL';
+is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
+is $req->headers->content_length, undef,        'no "Content-Length" value';
+
+# Parse HTTP 1.0 start line and headers, no body (missing Content-Length)
+$req = Mojo::Message::Request->new;
+$req->parse("GET /foo/bar/baz.html HTTP/1.0\x0d\x0a");
+$req->parse("Content-Type: text/plain\x0d\x0a");
+$req->parse("Connection: Close\x0d\x0a\x0d\x0a");
+ok $req->is_done,       'request is done';
+is $req->method,        'GET', 'right method';
+is $req->major_version, 1, 'right major version';
+is $req->minor_version, 0, 'right minor version';
+is $req->url,           '/foo/bar/baz.html', 'right URL';
+is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
+is $req->headers->content_length, undef,        'no "Content-Length" value';
 
 # Parse HTTP 1.0 start line and headers, no body (with line size limit)
 $req = Mojo::Message::Request->new;
@@ -818,7 +843,7 @@ $res->parse("HTTP/1.1 413 Request Entity Too Large\x0d\x0a"
       . "Date: Tue, 09 Feb 2010 16:34:51 GMT\x0d\x0a"
       . "Server: Mojolicious (Perl)\x0d\x0a"
       . "X-Powered-By: Mojolicious (Perl)\x0d\x0a\x0d\x0a");
-ok !$res->is_done, 'response is done';
+ok !$res->is_done, 'response is not done';
 is $res->code,          413,                        'right status';
 is $res->message,       'Request Entity Too Large', 'right message';
 is $res->major_version, 1,                          'right major version';

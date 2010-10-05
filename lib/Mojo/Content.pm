@@ -11,10 +11,10 @@ use Mojo::Headers;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 262144;
 
+__PACKAGE__->attr([qw/auto_relax relaxed/] => 0);
 __PACKAGE__->attr([qw/buffer chunked_buffer/] => sub { b() });
-__PACKAGE__->attr(headers                     => sub { Mojo::Headers->new });
+__PACKAGE__->attr(headers => sub { Mojo::Headers->new });
 __PACKAGE__->attr('on_read');
-__PACKAGE__->attr(relaxed => 0);
 
 # DEPRECATED in Comet!
 *read_cb = \&on_read;
@@ -169,11 +169,13 @@ sub parse {
     # Still parsing headers
     return $self if $self->{_state} eq 'headers';
 
-    # Relaxed parsing for broken server
-    my $headers = $self->headers;
-    $self->relaxed(1)
-      if !defined $headers->content_length
-          && ($headers->connection || '') =~ /close/i;
+    # Relaxed parsing for broken web servers
+    if ($self->auto_relax) {
+        my $headers = $self->headers;
+        $self->relaxed(1)
+          if !defined $headers->content_length
+              && ($headers->connection || '') =~ /close/i;
+    }
 
     # Chunked
     if ($self->is_chunked && ($self->{_state} || '') ne 'headers') {
@@ -434,6 +436,13 @@ in RFC 2616.
 
 L<Mojo::Content> implements the following attributes.
 
+=head2 C<auto_relax>
+
+    my $relax = $content->auto_relax;
+    $content  = $content->auto_relax(1);
+
+Try to detect broken web servers and turn on relaxed parsing automatically.
+
 =head2 C<buffer>
 
     my $buffer = $content->buffer;
@@ -474,7 +483,7 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
     my $relaxed = $content->relaxed;
     $content    = $content->relaxed(1);
 
-Activate relaxed parsing for HTTP 0.9.
+Activate relaxed parsing for HTTP 0.9 and broken web servers.
 
 =head1 METHODS
 

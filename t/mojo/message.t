@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 820;
+use Test::More tests => 844;
 
 use File::Spec;
 use File::Temp;
@@ -745,11 +745,11 @@ $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.0 404 Damn it\x0d\x0a");
 $res->parse("Content-Type: text/plain\x0d\x0a");
 $res->parse("Content-Length: 0\x0d\x0a\x0d\x0a");
-ok $res->is_done,       'response is done';
-is $res->code,          404, 'right status';
+ok !$res->is_done, 'response is not done';
+is $res->code,          404,       'right status';
 is $res->message,       'Damn it', 'right message';
-is $res->major_version, 1, 'right major version';
-is $res->minor_version, 0, 'right minor version';
+is $res->major_version, 1,         'right major version';
+is $res->minor_version, 0,         'right minor version';
 is $res->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, 0, 'right "Content-Length" value';
 
@@ -759,13 +759,57 @@ $res->parse("HTTP/1.0 500 Internal Server Error\x0d\x0a");
 $res->parse("Content-Type: text/plain\x0d\x0a");
 $res->parse("Content-Length: 27\x0d\x0a\x0d\x0a");
 $res->parse("Hello World!\n1234\nlalalala\n");
-ok $res->is_done,       'response is done';
-is $res->code,          500, 'right status';
+ok !$res->is_done, 'response is not done';
+is $res->code,          500,                     'right status';
 is $res->message,       'Internal Server Error', 'right message';
-is $res->major_version, 1, 'right major version';
-is $res->minor_version, 0, 'right minor version';
+is $res->major_version, 1,                       'right major version';
+is $res->minor_version, 0,                       'right minor version';
 is $res->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, 27, 'right "Content-Length" value';
+
+# Parse full HTTP 1.0 response (missing Content-Length)
+$res = Mojo::Message::Response->new;
+$res->parse("HTTP/1.0 500 Internal Server Error\x0d\x0a");
+$res->parse("Content-Type: text/plain\x0d\x0a");
+$res->parse("Connection: close\x0d\x0a\x0d\x0a");
+$res->parse("Hello World!\n1234\nlalalala\n");
+ok !$res->is_done, 'response is not done';
+is $res->code,          500,                     'right status';
+is $res->message,       'Internal Server Error', 'right message';
+is $res->major_version, 1,                       'right major version';
+is $res->minor_version, 0,                       'right minor version';
+is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
+is $res->headers->content_length, undef,        'no "Content-Length" value';
+is $res->body, "Hello World!\n1234\nlalalala\n", 'right content';
+
+# Parse full HTTP 1.0 response (missing Content-Length and Connection)
+$res = Mojo::Message::Response->new;
+$res->parse("HTTP/1.0 500 Internal Server Error\x0d\x0a");
+$res->parse("Content-Type: text/plain\x0d\x0a\x0d\x0a");
+$res->parse("Hello World!\n1234\nlalalala\n");
+ok !$res->is_done, 'response is not done';
+is $res->code,          500,                     'right status';
+is $res->message,       'Internal Server Error', 'right message';
+is $res->major_version, 1,                       'right major version';
+is $res->minor_version, 0,                       'right minor version';
+is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
+is $res->headers->content_length, undef,        'no "Content-Length" value';
+is $res->body, "Hello World!\n1234\nlalalala\n", 'right content';
+
+# Parse full HTTP 1.1 response (missing Content-Length)
+$res = Mojo::Message::Response->new;
+$res->parse("HTTP/1.1 500 Internal Server Error\x0d\x0a");
+$res->parse("Content-Type: text/plain\x0d\x0a");
+$res->parse("Connection: close\x0d\x0a\x0d\x0a");
+$res->parse("Hello World!\n1234\nlalalala\n");
+ok !$res->is_done, 'response is not done';
+is $res->code,          500,                     'right status';
+is $res->message,       'Internal Server Error', 'right message';
+is $res->major_version, 1,                       'right major version';
+is $res->minor_version, 1,                       'right minor version';
+is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
+is $res->headers->content_length, undef,        'no "Content-Length" value';
+is $res->body, "Hello World!\n1234\nlalalala\n", 'right content';
 
 # Parse HTTP 1.1 response (413 error in one big chunk)
 $res = Mojo::Message::Response->new;
@@ -774,11 +818,11 @@ $res->parse("HTTP/1.1 413 Request Entity Too Large\x0d\x0a"
       . "Date: Tue, 09 Feb 2010 16:34:51 GMT\x0d\x0a"
       . "Server: Mojolicious (Perl)\x0d\x0a"
       . "X-Powered-By: Mojolicious (Perl)\x0d\x0a\x0d\x0a");
-ok $res->is_done,       'response is done';
-is $res->code,          413, 'right status';
+ok !$res->is_done, 'response is done';
+is $res->code,          413,                        'right status';
 is $res->message,       'Request Entity Too Large', 'right message';
-is $res->major_version, 1, 'right major version';
-is $res->minor_version, 1, 'right minor version';
+is $res->major_version, 1,                          'right major version';
+is $res->minor_version, 1,                          'right minor version';
 is $res->headers->content_length, undef, 'right "Content-Length" value';
 
 # Parse HTTP 1.1 chunked response

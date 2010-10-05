@@ -191,6 +191,7 @@ sub _parse_start_line {
             $self->code($3);
             $self->message($4);
             $self->{_state} = 'content';
+            $self->content->relaxed(1) unless $self->at_least_version('1.1');
         }
         else { $self->error('Bad response start line.') }
     }

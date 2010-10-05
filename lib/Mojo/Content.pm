@@ -169,6 +169,12 @@ sub parse {
     # Still parsing headers
     return $self if $self->{_state} eq 'headers';
 
+    # Relaxed parsing for broken server
+    my $headers = $self->headers;
+    $self->relaxed(1)
+      if !defined $headers->content_length
+          && ($headers->connection || '') =~ /close/i;
+
     # Chunked
     if ($self->is_chunked && ($self->{_state} || '') ne 'headers') {
         $self->_parse_chunked;

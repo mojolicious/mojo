@@ -12,7 +12,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 41;
+plan tests => 46;
 
 use_ok 'Mojo::Client';
 
@@ -54,11 +54,46 @@ my $id = $client->ioloop->listen(
     }
 );
 
+# Broken server (missing Content-Length header)
+my $port2   = $client->ioloop->generate_port;
+my $buffer2 = {};
+$client->ioloop->listen(
+    port      => $port2,
+    on_accept => sub {
+        my ($loop, $id) = @_;
+        $buffer2->{$id} = '';
+    },
+    on_read => sub {
+        my ($loop, $id, $chunk) = @_;
+        $buffer2->{$id} .= $chunk;
+        if (index $buffer2->{$id}, "\x0d\x0a\x0d\x0a") {
+            delete $buffer2->{$id};
+            $loop->write(
+                $id => "HTTP/1.1 200 OK\x0d\x0a"
+                  . "Connection: close\x0d\x0a\x0d\x0aworks too!",
+                sub { shift->drop(shift) }
+            );
+        }
+    },
+    on_error => sub {
+        my ($self, $id) = @_;
+        delete $buffer2->{$id};
+    }
+);
+
 # GET /
 my $tx = $client->get('/');
 ok $tx->success, 'successful';
 is $tx->res->code, 200,     'right status';
 is $tx->res->body, 'works', 'right content';
+
+# GET / (missing Content-Lengt header)
+$tx = $client->get("http://localhost:$port2/");
+ok $tx->success,    'successful';
+is $tx->kept_alive, undef, 'kept connection not alive';
+is $tx->keep_alive, 0, 'keep connection not alive';
+is $tx->res->code, 200,          'right status';
+is $tx->res->body, 'works too!', 'no content';
 
 # GET / (mock server)
 $tx = $client->get("http://localhost:$port/mock");

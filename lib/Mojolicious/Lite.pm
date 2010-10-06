@@ -726,6 +726,64 @@ this tutorial applies there too. :)
 
 Have fun!
 
+=head1 FUNCTIONS
+
+L<Mojolicious::Lite> implements the following functions.
+
+=head2 C<any>
+
+    my $route = any '/:foo' => sub {...};
+    my $route = any [qw/get post/] => '/:foo' => sub {...};
+
+Generate route matching any of the listed HTTP request methods or all.
+See also the tutorial above for more argument variations.
+
+=head2 C<app>
+
+    my $app = app;
+
+The L<Mojolicious::Lite> application.
+
+=head2 C<get>
+
+    my $route = get '/:foo' => sub {...};
+
+Generate route matching only C<GET> requests.
+See also the tutorial above for more argument variations.
+
+=head2 C<plugin>
+
+    plugin 'something';
+    plugin 'something', foo => 23;
+    plugin 'something', {foo => 23};
+    plugin 'Foo::Bar';
+    plugin 'Foo::Bar', foo => 23;
+    plugin 'Foo::Bar', {foo => 23};
+
+Load a plugin.
+
+=head2 C<post>
+
+    my $route = post '/:foo' => sub {...};
+
+Generate route matching only C<POST> requests.
+See also the tutorial above for more argument variations.
+
+=head2 C<under>
+
+    my $route = under sub {...};
+    my $route = under '/:foo';
+
+Generate bridge to which all following routes are automatically appended.
+See also the tutorial above for more argument variations.
+
+=head2 C<websocket>
+
+    my $route = websocket '/:foo' => sub {...};
+
+Generate route matching only C<WebSocket> handshakes.
+See also the tutorial above for more argument variations.
+
 =head1 ATTRIBUTES
 
 L<Mojolicious::Lite> inherits all attributes from L<Mojolicious>.

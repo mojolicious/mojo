@@ -10,7 +10,7 @@ use Test::More;
 
 plan skip_all => 'set TEST_CLIENT to enable this test (developer only!)'
   unless $ENV{TEST_CLIENT};
-plan tests => 99;
+plan tests => 100;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -124,6 +124,7 @@ $ENV{HTTPS_PROXY} = $backup2;
 
 # Oneliner
 is g('mojolicious.org')->code,          200, 'right status';
+is h('mojolicious.org')->code,          200, 'right status';
 is p('mojolicious.org/lalalala')->code, 404, 'right status';
 is g('http://mojolicious.org')->code,   200, 'right status';
 is p('http://mojolicious.org')->code,   404, 'right status';

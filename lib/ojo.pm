@@ -32,6 +32,7 @@ sub import {
     *{"${caller}::d"} = sub { _request('delete',    @_) };
     *{"${caller}::f"} = sub { _request('post_form', @_) };
     *{"${caller}::g"} = sub { _request('get',       @_) };
+    *{"${caller}::h"} = sub { _request('head',      @_) };
     *{"${caller}::p"} = sub { _request('post',      @_) };
     *{"${caller}::u"} = sub { _request('put',       @_) };
     *{"${caller}::w"} = sub { Mojo::Client->singleton->websocket(@_)->start }
@@ -153,6 +154,19 @@ One redirect will be followed by default, you can change this behavior with
 the C<MOJO_MAX_REDIRECTS> environment variable.
 
     MOJO_MAX_REDIRECTS=0 perl -Mojo -e 'b(g("mojolicious.org")->code)->say'
+
+=head2 C<h>
+
+    my $res = h('http://mojolicio.us');
+    my $res = h('http://mojolicio.us', {'X-Bender' => 'X_x'});
+    my $res = h(
+        'http://mojolicio.us',
+        {'Content-Type' => 'text/plain'},
+        'Hello!'
+    );
+
+Perform C<HEAD> request and turn response into a L<Mojo::Message::Response>
+object.
 
 =head2 C<p>
 

@@ -12,7 +12,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 46;
+plan tests => 47;
 
 use_ok 'Mojo::Client';
 
@@ -200,3 +200,27 @@ $client->async->get(
 )->start;
 $client->async->ioloop->start;
 is_deeply \@kept_alive, [undef, 1, 1], 'connections kept alive';
+
+# Simple nested keep alive with timers
+@kept_alive = ();
+my $async = $client->async;
+my $loop  = $async->ioloop;
+$async->get(
+    '/',
+    sub {
+        push @kept_alive, pop->kept_alive;
+        $loop->timer(
+            '0.25' => sub {
+                $async->get(
+                    '/',
+                    sub {
+                        push @kept_alive, pop->kept_alive;
+                        $loop->timer('0.25' => sub { $loop->stop });
+                    }
+                )->start;
+            }
+        );
+    }
+)->start;
+$loop->start;
+is_deeply \@kept_alive, [1, 1], 'connections kept alive';

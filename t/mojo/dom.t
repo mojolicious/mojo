@@ -5,13 +5,17 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 306;
+use Test::More tests => 308;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
 use_ok 'Mojo::DOM';
+use_ok 'ojo';
 
 my $dom = Mojo::DOM->new;
+
+# ojo
+is x('<div>Hello ♥!</div>')->at('div')->text, 'Hello ♥!', 'right text';
 
 # Simple (basics)
 $dom->parse('<div><div id="a">A</div><div id="b">B</div></div>');
@@ -175,7 +179,7 @@ is $dom->at('[foo="ba"]'), undef, 'no result';
 is $dom->at('.tset')->text, 'works', 'right text';
 
 # Already decoded unicode snowman and quotes in selector
-$dom->charset(undef)->parse('<div id="sno&quot;wman">☃</div>');
+$dom->parse('<div id="sno&quot;wman">☃</div>');
 is $dom->at('[id="sno\"wman"]')->text, '☃', 'right text';
 
 # Unicode and escaped selectors

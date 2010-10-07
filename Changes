@@ -41,6 +41,7 @@ This file documents the revision history for Perl extension Mojolicious.
           (vti)
         - Added b function to all Mojo::Template templates.
         - Added selector support to the dom method of Mojo::Message. (marcus)
+        - Added x function to ojo. (DaTa)
         - Added failed request warnings to ojo. (marcus)
         - Added support for selector groups to Mojo::DOM.
         - Added more attribute selectors, pseudo classes and combinators to

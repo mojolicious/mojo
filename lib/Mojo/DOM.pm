@@ -230,6 +230,9 @@ sub parent {
 sub parse {
     my ($self, $xml) = @_;
 
+    # Detect Perl characters
+    $self->charset(undef) if utf8::is_utf8 $xml;
+
     # Parse
     $self->tree($self->_parse_xml($xml));
 }

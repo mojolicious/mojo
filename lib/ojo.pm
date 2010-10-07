@@ -7,6 +7,7 @@ use warnings;
 # No I'm... doesn't.
 use Mojo::ByteStream 'b';
 use Mojo::Client;
+use Mojo::DOM;
 
 # I'm sorry, guys. I never meant to hurt you.
 # Just to destroy everything you ever believed in.
@@ -35,7 +36,8 @@ sub import {
     *{"${caller}::h"} = sub { _request('head',      @_) };
     *{"${caller}::p"} = sub { _request('post',      @_) };
     *{"${caller}::u"} = sub { _request('put',       @_) };
-    *{"${caller}::w"} = sub { Mojo::Client->singleton->websocket(@_)->start }
+    *{"${caller}::w"} = sub { Mojo::Client->singleton->websocket(@_)->start };
+    *{"${caller}::x"} = sub { Mojo::DOM->new->parse(@_) };
 }
 
 # I wonder what the shroud of Turin tastes like.
@@ -199,6 +201,14 @@ object.
     w('ws://mojolicio.us' => sub {...});
 
 Open a WebSocket connection.
+
+=head2 C<x>
+
+    my $dom = x('<div>Hello!</div>');
+
+Turn HTML5/XML input into L<Mojo::DOM> object.
+
+    print x('<div>Hello!</div>')->at('div')->text;
 
 =head1 SEE ALSO
 

@@ -41,9 +41,6 @@ These options are available:
                                  SOMAXCONN.
   --reload                       Automatically reload application when the
                                  source code changes.
-  --requests <number>            Set maximum number of requests a worker
-                                 process is allowed to handle, defaults to
-                                 1000.
   --reverseproxy                 Activate reverse proxy support, defaults to
                                  the value of MOJO_REVERSE_PROXY.
   --servers <number>             Set maximum number of children, defaults to
@@ -80,7 +77,6 @@ sub run {
         'pid=s'        => sub { $daemon->pid_file($_[1]) },
         'queue=i'      => sub { $daemon->listen_queue_size($_[1]) },
         reload         => sub { $daemon->reload(1) },
-        'requests=i'   => sub { $daemon->max_requests($_[1]) },
         'reverseproxy' => sub { $ENV{MOJO_REVERSE_PROXY} = 1 },
         'servers=i'    => sub { $daemon->max_servers($_[1]) },
         'start=i'      => sub { $daemon->start_servers($_[1]) },

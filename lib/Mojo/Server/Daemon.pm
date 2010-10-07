@@ -21,8 +21,7 @@ use constant BONJOUR => $ENV{MOJO_NO_BONJOUR}
 # Debug
 use constant DEBUG => $ENV{MOJO_DAEMON_DEBUG} || 0;
 
-__PACKAGE__->attr(
-    [qw/group listen listen_queue_size max_requests silent user/]);
+__PACKAGE__->attr([qw/group listen listen_queue_size silent user/]);
 __PACKAGE__->attr(ioloop => sub { Mojo::IOLoop->singleton });
 __PACKAGE__->attr(keep_alive_timeout      => 5);
 __PACKAGE__->attr(max_clients             => 1000);
@@ -203,16 +202,6 @@ sub _build_tx {
     # New request on the connection
     $c->{requests} ||= 0;
     $c->{requests}++;
-
-    # Request limit
-    if (my $max = $self->max_requests) {
-        $self->{_requests} ||= 0;
-        if (++$self->{_requests} >= $max) {
-            for my $id (@{$self->{_listen}}) { $loop->drop($id) }
-            $self->max_keep_alive_requests(1);
-            $self->ioloop->max_connections(0);
-        }
-    }
 
     # Kept alive if we have more than one request on the connection
     $tx->kept_alive(1) if $c->{requests} > 1;
@@ -533,14 +522,6 @@ Maximum number of parallel client connections, defaults to C<1000>.
     $daemon                     = $daemon->max_keep_alive_requests(100);
 
 Maximum number of keep alive requests per connection, defaults to C<100>.
-
-=head2 C<max_requests>
-
-    my $max_requests = $daemon->max_requests;
-    $daemon          = $daemon->max_requests(1);
-
-Maximum number of requests the daemon is allowed to handle, not used by
-default.
 
 =head2 C<pid_file>
 

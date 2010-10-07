@@ -26,7 +26,6 @@ __PACKAGE__->attr(
     }
 );
 __PACKAGE__->attr(max_clients                           => 1);
-__PACKAGE__->attr(max_requests                          => 1000);
 __PACKAGE__->attr(max_servers                           => 100);
 __PACKAGE__->attr(max_spare_servers                     => 10);
 __PACKAGE__->attr([qw/min_spare_servers start_servers/] => 5);
@@ -420,14 +419,6 @@ Path to lock file, defaults to a random temporary file.
 
 Maximum number of parallel client connections handled by worker, defaults to
 C<1>.
-
-=head2 C<max_requests>
-
-    my $max_requests = $daemon->max_requests;
-    $daemon          = $daemon->max_requests(1);
-
-Maximum number of requests a worker process is allowed to handle, defaults to
-C<1000>.
 
 =head2 C<max_servers>
 

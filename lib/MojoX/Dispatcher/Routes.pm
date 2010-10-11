@@ -152,7 +152,7 @@ sub _dispatch_controller {
 
             # Doesn't exist
             unless (ref $e) {
-                $c->app->log->debug("$app does not exist.");
+                $c->app->log->debug("$app does not exist, maybe a typo?");
                 return;
             }
 

@@ -1,39 +1,48 @@
+
+=pod
+
 Back in the early days of the web there was this wonderful Perl library
-called CGI, many people only learned Perl because of it.
+called L<CGI>, many people only learned Perl because of it.
 It was simple enough to get started without knowing much about the language
 and powerful enough to keep you going, learning by doing was much fun.
 While most of the techniques used are outdated now, the idea behind it is
 not.
-Mojolicious is a new attempt at implementing this idea using state of the art
-technology.
+L<Mojolicious> is a new attempt at implementing this idea using state of the
+art technology.
 
-Features
---------
+=head2 Features
 
-* An amazing MVC web framework supporting a simplified single file mode
-  through Mojolicious::Lite.
+=over 4
 
-  Powerful out of the box with RESTful routes, plugins, Perl-ish templates,
-  session management, signed cookies, testing framework, static file server,
-  I18N, first class unicode support and much more for you to discover.
+An amazing MVC web framework supporting a simplified single file mode through
+L<Mojolicious::Lite>.
 
-* Very clean, portable and Object Oriented pure Perl API without any hidden
-  magic and no requirements besides Perl 5.8.7.
+=over 4
 
-* Full stack HTTP 1.1 and WebSocket client/server implementation with IPv6,
-  TLS, Bonjour, IDNA, Comet (long polling), chunking and multipart support.
+Powerful out of the box with RESTful routes, plugins, Perl-ish templates,
+session management, signed cookies, testing framework, static file server,
+I18N, first class unicode support and much more for you to discover.
 
-* Builtin async IO and prefork web server supporting epoll, kqueue, UNIX
-  domain sockets and hot deployment, perfect for embedding.
+=back
 
-* Automatic CGI, FastCGI and PSGI detection.
+Very clean, portable and Object Oriented pure Perl API without any hidden
+magic and no requirements besides Perl 5.8.7.
 
-* JSON and XML/HTML5 parser with CSS3 selector support.
+Full stack HTTP 1.1 and WebSocket client/server implementation with IPv6,
+TLS, Bonjour, IDNA, Comet (long polling), chunking and multipart support.
 
-* Fresh code based upon years of experience developing Catalyst.
+Builtin async IO and prefork web server supporting epoll, kqueue, UNIX domain
+sockets and hot deployment, perfect for embedding.
 
-Duct Tape For The HTML5 Web
----------------------------
+Automatic CGI, FastCGI and L<PSGI> detection.
+
+JSON and XML/HTML5 parser with CSS3 selector support.
+
+Fresh code based upon years of experience developing L<Catalyst>.
+
+=back
+
+=head2 Duct Tape For The HTML5 Web
 
 Web development for humans, making hard things possible and everything fun.
 
@@ -75,11 +84,10 @@ Web development for humans, making hard things possible and everything fun.
         The time is <%= $hour %>:<%= $minute %>:<%= $second %>.
     <% end %>
 
-For more user friendly documentation see "perldoc Mojolicious::Guides"
-and "perldoc Mojolicious::Lite".
+For more user friendly documentation see L<Mojolicious::Guides> and
+L<Mojolicious::Lite>.
 
-Have Some Cake
---------------
+=head2 Have Some Cake
 
 Loosely coupled building blocks, use what you like and just ignore the rest.
 
@@ -102,10 +110,11 @@ Loosely coupled building blocks, use what you like and just ignore the rest.
     |  CGI  | |  FastCGI  | |  PSGI  | |  HTTP 1.1  | |  WebSocket  |
     '-------' '-----------' '--------' '------------' '-------------'
 
-Installation
-------------
+=head2 Installation
 
     perl Makefile.PL
     make
     make test
     make install
+
+=cut

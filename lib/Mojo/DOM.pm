@@ -851,7 +851,8 @@ sub _parse_xml {
 
     # Decode
     my $charset = $self->charset;
-    $xml = b($xml)->decode($charset)->to_string if $charset;
+    $xml = b($xml)->decode($charset)->to_string
+      if $charset && !utf8::is_utf8 $xml;
     return $tree unless $xml;
 
     # Tokenize

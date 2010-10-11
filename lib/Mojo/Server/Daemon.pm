@@ -38,6 +38,9 @@ __PACKAGE__->attr(websocket_timeout => 300);
 sub DESTROY {
     my $self = shift;
 
+    # Remove PID file
+    unlink $self->pid_file;
+
     # Shortcut
     return unless my $loop = $self->ioloop;
 
@@ -55,13 +58,6 @@ sub prepare_ioloop {
 
     # Loop
     my $loop = $self->ioloop;
-
-    # Signals
-    $SIG{HUP} = sub {
-        $loop->max_connections(0)
-          and $self->app->log->info('Graceful shutdown.');
-      }
-      if $^O ne 'MSWin32';
 
     # Listen
     my $listen = $self->listen || 'http://*:3000';
@@ -94,16 +90,6 @@ sub prepare_pid_file {
     # PID
     print $fh $$;
     close $fh;
-
-    # Signals
-    $SIG{INT} = $SIG{TERM} = sub {
-
-        # Remove PID file
-        unlink $self->pid_file;
-
-        # Done
-        exit 0;
-    };
 }
 
 # 40 dollars!? This better be the best damn beer ever..
@@ -119,6 +105,9 @@ sub run {
 
     # Prepare PID file
     $self->prepare_pid_file;
+
+    # Signals
+    $SIG{INT} = $SIG{TERM} = sub { exit 0 };
 
     # Start loop
     $self->ioloop->start;

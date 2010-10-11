@@ -151,7 +151,10 @@ sub _dispatch_controller {
         if (my $e = Mojo::Loader->load($app)) {
 
             # Doesn't exist
-            return unless ref $e;
+            unless (ref $e) {
+                $c->app->log->debug("$app does not exist.");
+                return;
+            }
 
             # Error
             $c->app->log->error($e);

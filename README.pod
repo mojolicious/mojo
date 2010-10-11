@@ -14,6 +14,8 @@ art technology.
 
 =over 4
 
+=item *
+
 An amazing MVC web framework supporting a simplified single file mode through
 L<Mojolicious::Lite>.
 
@@ -25,18 +27,30 @@ I18N, first class unicode support and much more for you to discover.
 
 =back
 
+=item *
+
 Very clean, portable and Object Oriented pure Perl API without any hidden
 magic and no requirements besides Perl 5.8.7.
+
+=item *
 
 Full stack HTTP 1.1 and WebSocket client/server implementation with IPv6,
 TLS, Bonjour, IDNA, Comet (long polling), chunking and multipart support.
 
+=item *
+
 Builtin async IO and prefork web server supporting epoll, kqueue, UNIX domain
 sockets and hot deployment, perfect for embedding.
 
+=item *
+
 Automatic CGI, FastCGI and L<PSGI> detection.
 
+=item *
+
 JSON and XML/HTML5 parser with CSS3 selector support.
+
+=item *
 
 Fresh code based upon years of experience developing L<Catalyst>.
 

@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 308;
+use Test::More tests => 309;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -257,6 +257,9 @@ $dom->replace('<div>foo<p>lalala</p>bar</div>');
 is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right text';
 $dom->find('p')->each(sub { shift->replace('') });
 is "$dom", '<div>foobar</div>', 'right text';
+$dom->parse('<div>♥</div>');
+$dom->at('div')->replace_inner('☃');
+is "$dom", '<div>☃</div>', 'right text';
 
 # Replace element content
 $dom->parse('<div>foo<p>lalala</p>bar</div>');

@@ -698,7 +698,7 @@ $output = $mt->render(<<'EOF', {foo => 23});
 EOF
 is $output, <<'EOF', 'complicated XML auto escape';
 {
-  &apos;foo&apos; =&gt; 23
+  &#39;foo&#39; =&gt; 23
 }
 
 EOF

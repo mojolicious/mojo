@@ -822,7 +822,7 @@ sub xml_escape {
         s/</&lt;/g;
         s/>/&gt;/g;
         s/"/&quot;/g;
-        s/'/&apos;/g;
+        s/'/&#39;/g;
     }
 
     return $self;

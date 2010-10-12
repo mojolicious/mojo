@@ -100,6 +100,9 @@ sub render {
     # Template
     my $template = delete $stash->{template};
 
+    # Template class
+    my $class = $stash->{template_class};
+
     # Format
     my $format = $stash->{format} || $self->default_format;
 
@@ -125,7 +128,7 @@ sub render {
         handler        => $handler,
         encoding       => $self->encoding,
         inline         => $inline,
-        template_class => $stash->{template_class}
+        template_class => $class
     };
     my $output;
 
@@ -177,12 +180,19 @@ sub render {
     # Extends
     while ((my $extends = $self->_extends($c)) && !$json && !$data) {
 
+        # Stash
+        my $stash = $c->stash;
+
+        # Template class
+        $class = $stash->{template_class};
+        $options->{template_class} = $class;
+
         # Handler
-        $handler = $c->stash->{handler};
+        $handler = $stash->{handler};
         $options->{handler} = $handler;
 
         # Format
-        $format = $c->stash->{format} || $self->default_format;
+        $format = $stash->{format} || $self->default_format;
         $options->{format} = $format;
 
         # Template

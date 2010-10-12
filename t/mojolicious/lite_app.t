@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 658;
+plan tests => 661;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -45,6 +45,11 @@ app->renderer->default_handler('epl');
 
 # Header condition plugin
 plugin 'header_condition';
+
+# Plugin with a template
+use FindBin;
+use lib "$FindBin::Bin/lib";
+plugin 'PluginWithTemplate';
 
 # Default
 app->defaults(default => 23);
@@ -1081,6 +1086,10 @@ $t->get_ok('/double_inheritance')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('<title>Welcome</title>Sidebar too!Default footer!');
 
+# GET /plugin_with_template
+$t->get_ok('/plugin_with_template')->status_is(200)
+  ->content_is("layout_with_template\nwith template\n\n");
+
 # GET /nested-includes
 $t->get_ok('/nested-includes')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
@@ -1724,6 +1733,10 @@ Default footer!
 <% content sidebar => begin =%>
 Sidebar too!
 <% end =%>
+
+@@ layouts/plugin_with_template.html.ep
+layout_with_template
+<%= content %>
 
 @@ nested-includes.html.ep
 Nested <%= include 'outerlayout' %>

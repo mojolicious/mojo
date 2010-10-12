@@ -19,5 +19,5 @@ sub register {
 __DATA__
 
 @@ template.html.ep
-% layout plugin_with_template =>  (template_class => 'main');
+% layout plugin_with_template => (template_class => 'main');
 with template

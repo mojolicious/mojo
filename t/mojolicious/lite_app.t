@@ -804,7 +804,8 @@ $t->get_ok('/0', {'X-Forwarded-For' => '192.168.2.2, 192.168.2.1'})
 $ENV{MOJO_REVERSE_PROXY} = $backup;
 
 # GET /tags
-$t->get_ok('/tags/lala?a=b&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)->content_is(<<EOF);
+$t->get_ok('/tags/lala?a=b&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
+  ->content_is(<<EOF);
 <foo />
 <foo bar="baz" />
 <foo one="two" three="four">Hello</foo>

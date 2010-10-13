@@ -291,6 +291,9 @@ my %ENTITIES = (
 # Reverse entities for html_escape
 my %REVERSE_ENTITIES = reverse %ENTITIES;
 
+# "apos"
+$ENTITIES{apos} = 39;
+
 # Unreserved character map for url_sanitize
 my %UNRESERVED;
 {

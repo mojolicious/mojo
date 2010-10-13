@@ -12,7 +12,7 @@ use Test::More;
 
 plan skip_all => 'Perl 5.10 required for this test!'
   unless eval { require Digest::SHA; 1 };
-plan tests => 80;
+plan tests => 81;
 
 use_ok 'Mojo::ByteStream', 'b';
 
@@ -213,6 +213,10 @@ is $stream->html_escape, 'foobar', 'right html escaped result';
 # html_unescape
 $stream = b('foobar&lt;baz&gt;&#x26;&#34;');
 is $stream->html_unescape, "foobar<baz>&\"", 'right html unescaped result';
+
+# html_unescape (apos)
+$stream = b('foobar&apos;&lt;baz&gt;&#x26;&#34;');
+is $stream->html_unescape, "foobar'<baz>&\"", 'right html unescaped result';
 
 # html_unescape (nothing to unescape)
 $stream = b('foobar');

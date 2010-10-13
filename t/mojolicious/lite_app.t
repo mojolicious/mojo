@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 661;
+plan tests => 663;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -55,8 +55,11 @@ plugin 'PluginWithTemplate';
 app->defaults(default => 23);
 
 # Test helpers
-app->helper(test_helper => sub { shift->param(@_) });
-app->helper(dead => sub { die $_[1] || 'works!' });
+app->helper(test_helper  => sub { shift->param(@_) });
+app->helper(test_helper2 => sub { shift->app->controller_class });
+app->helper(dead         => sub { die $_[1] || 'works!' });
+is app->test_helper('foo'), undef, 'no value yet';
+is app->test_helper2, 'Mojolicious::Controller', 'right value';
 
 # Test renderer
 app->renderer->add_handler(dead => sub { die 'renderer works!' });

@@ -36,6 +36,34 @@ __PACKAGE__->attr(types   => sub { MojoX::Types->new });
 our $CODENAME = 'Hot Beverage';
 our $VERSION  = '0.999930';
 
+our $AUTOLOAD;
+
+sub AUTOLOAD {
+    my $self = shift;
+
+    # Method
+    my ($method) = $AUTOLOAD =~ /(\w+)$/;
+
+    # Helper
+    Carp::croak(qq/Helper "$method" not found/)
+      unless my $helper = $self->renderer->helper->{$method};
+
+    # Load controller class
+    my $class = $self->controller_class;
+    if (my $e = Mojo::Loader->load($class)) {
+        $self->log->error(
+            ref $e
+            ? qq/Can't load controller class "$class": $e/
+            : qq/Controller class "$class" doesn't exist./
+        );
+    }
+
+    # Run
+    return $class->new(app => $self)->$helper(@_);
+}
+
+sub DESTROY { }
+
 # I personalized each of your meals.
 # For example, Amy: you're cute, so I baked you a pony.
 sub new {
@@ -551,7 +579,7 @@ Note that this method is EXPERIMENTAL and might change without warning!
     # Helper
     $app->helper(add => sub { $_[1] + $_[2] });
 
-    # Controller
+    # Controller/Application
     my $result = $self->add(2, 3);
 
     # Template

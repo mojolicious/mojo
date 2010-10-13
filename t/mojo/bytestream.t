@@ -202,8 +202,9 @@ is b(
   'e8e99d0f45237d786d6bbaa7965c7808bbff1a91', 'right hmac sha1 checksum';
 
 # html_escape
-$stream = b('foobar<baz>');
-is $stream->html_escape, 'foobar&lt;baz&gt;', 'right html escaped result';
+$stream = b("foobar'<baz>");
+is $stream->html_escape, "foobar&#39;&lt;baz&gt;",
+  'right html escaped result';
 
 # html_escape (nothing to escape)
 $stream = b('foobar');

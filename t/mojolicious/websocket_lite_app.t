@@ -37,7 +37,8 @@ websocket '/' => sub {
     $self->on_message(
         sub {
             my ($self, $message) = @_;
-            $self->send_message("${message}test2");
+            my $url = $self->url_for->to_abs;
+            $self->send_message("${message}test2$url");
             $flag = 20;
         }
     );
@@ -134,7 +135,7 @@ $client->websocket(
         $self->send_message('test1');
     }
 )->start;
-is $result, 'test1test2', 'right result';
+like $result, qr/test1test2ws\:\/\/localhost\:\d+\//, 'right result';
 
 # WebSocket / (ojo)
 $result = undef;
@@ -146,7 +147,7 @@ w '/' => sub {
         }
     )->send_message('test1');
 };
-is $result, 'test1test2', 'right result';
+like $result, qr/test1test2ws\:\/\/localhost\:\d+\//, 'right result';
 
 # WebSocket /socket (using an already prepared socket)
 my $peer  = $client->test_server;

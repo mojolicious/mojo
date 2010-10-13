@@ -81,6 +81,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed pod renderer bug. (vti)
         - Fixed a multipart parser bug affecting mostly file uploads.
         - Fixed input tag helper escaping. (vti)
+        - Fixed url_for WebSocket support.
 
 0.999929 2010-08-17 00:00:00
         - Removed OS X resource fork files.

@@ -370,20 +370,8 @@ sub url_for {
     # URL
     elsif ($target =~ /^\w+\:\/\//) { return Mojo::URL->new($target) }
 
-    # Use match or root
-    my $url = $self->match->url_for($target, @_);
-
-    # Base
-    unless ($url->is_abs) {
-        $url->base($self->tx->req->url->base->clone);
-        $url->base->userinfo(undef);
-    }
-
-    # Fix paths
-    unshift @{$url->path->parts}, @{$url->base->path->parts};
-    $url->base->path->parts([]);
-
-    return $url;
+    # Route
+    return $self->match->url_for($target, @_);
 }
 
 sub write {

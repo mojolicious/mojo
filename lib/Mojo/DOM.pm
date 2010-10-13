@@ -1078,6 +1078,11 @@ Mojo::DOM - Minimalistic XML/HTML5 DOM Parser With CSS3 Selectors
     # Iterate
     $dom->find('div[id]')->each(sub { print shift->text });
 
+    # Loop
+    for my $e ($dom->find('div[id]')->each) {
+        print $e->text;
+    }
+
     # Get the first 10 links
     $dom->find('a[href]')
       ->while(sub { print shift->attrs->{href} && pop() < 10 });

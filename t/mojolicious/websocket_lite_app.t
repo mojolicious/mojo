@@ -12,7 +12,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 27;
+plan tests => 29;
 
 # Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
 # Well, that’s love for you.
@@ -29,6 +29,12 @@ app->log->level('fatal');
 # Avoid exception template
 app->renderer->root(app->home->rel_dir('public'));
 
+# GET /link
+get '/link' => sub {
+    my $self = shift;
+    $self->render(text => $self->url_for('index')->to_abs);
+};
+
 # WebSocket /
 my $flag;
 websocket '/' => sub {
@@ -42,7 +48,7 @@ websocket '/' => sub {
             $flag = 20;
         }
     );
-};
+} => 'index';
 
 # WebSocket /socket
 websocket '/socket' => sub {
@@ -119,6 +125,11 @@ websocket '/deadcallback' => sub {
 };
 
 my $client = Mojo::Client->singleton->app(app);
+
+# GET /link
+my $res = $client->get('/link')->success;
+is $res->code, 200, 'right status';
+like $res->body, qr/ws\:\/\/localhost\:\d+\//, 'right content';
 
 # WebSocket /
 my $result;

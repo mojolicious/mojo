@@ -180,23 +180,17 @@ sub url_for {
     # No endpoint
     return $url unless $endpoint;
 
+    # Base
+    $url->base($self->{_controller}->req->url->base->clone);
+    my $base = $url->base;
+    $url->base->userinfo(undef);
+
     # Render
     my $path = $endpoint->render($url->path->to_string, $values);
     $url->path->parse($path);
 
-    # Transaction
-    my $tx =
-        $self->{_controller}->can('tx')
-      ? $self->{_controller}->tx
-      : $self->{_controller};
-
-    # Base
-    $url->base($tx->req->url->base->clone);
-    my $base = $url->base;
-    $url->base->userinfo(undef);
-
     # Fix scheme
-    if (!$name && $tx->is_websocket) {
+    if ($endpoint->is_websocket) {
         $base->scheme(($base->scheme || '') eq 'https' ? 'wss' : 'ws');
     }
 

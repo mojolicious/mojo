@@ -88,6 +88,13 @@ sub is_endpoint {
     return 1;
 }
 
+sub is_websocket {
+    my $self = shift;
+    return 1 if $self->{_websocket};
+    if (my $parent = $self->parent) { return $parent->is_websocket }
+    return;
+}
+
 sub name {
     my ($self, $name) = @_;
 
@@ -254,6 +261,7 @@ sub websocket {
 
     # Condition
     push @{$self->conditions}, websocket => 1;
+    $self->{_websocket} = 1;
 
     return $self;
 }
@@ -406,6 +414,12 @@ Add a new bridge to this route as a nested child.
     my $is_endpoint = $r->is_endpoint;
 
 Returns true if this route qualifies as an endpoint.
+
+=head2 C<is_websocket>
+
+    my $is_websocket = $r->is_websocket;
+
+Returns true if this route leads to a WebSocket.
 
 =head2 C<name>
 

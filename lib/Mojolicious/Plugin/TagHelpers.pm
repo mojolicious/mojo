@@ -159,7 +159,6 @@ sub register {
         }
     );
 
-
     # Add "script" helper
     $app->helper(
         script => sub {
@@ -221,6 +220,8 @@ sub _input {
 
     # Value
     my $p = $c->param($name);
+    $p = b($p)->xml_escape if defined $p;
+
     my $t = $attrs{type} || '';
     if (defined $p && $t ne 'submit') {
 

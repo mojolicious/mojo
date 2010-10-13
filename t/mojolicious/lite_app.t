@@ -804,7 +804,7 @@ $t->get_ok('/0', {'X-Forwarded-For' => '192.168.2.2, 192.168.2.1'})
 $ENV{MOJO_REVERSE_PROXY} = $backup;
 
 # GET /tags
-$t->get_ok('/tags/lala?a=b&b=0&c=2&d=3')->status_is(200)->content_is(<<EOF);
+$t->get_ok('/tags/lala?a=b&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)->content_is(<<EOF);
 <foo />
 <foo bar="baz" />
 <foo one="two" three="four">Hello</foo>
@@ -835,6 +835,7 @@ $t->get_ok('/tags/lala?a=b&b=0&c=2&d=3')->status_is(200)->content_is(<<EOF);
     <label for="foo">Name</label>
     <input name="foo" />
 </form>
+<input name="escaped" value="1&quot; &quot;2" />
 <input name="a" value="b" />
 <input name="a" value="b" />
 <script src="/script.js" type="text/javascript" />
@@ -878,6 +879,7 @@ $t->get_ok('/tags/lala?c=b&d=3&e=4&f=5')->status_is(200)->content_is(<<EOF);
     <label for="foo">Name</label>
     <input name="foo" />
 </form>
+<input name="escaped" />
 <input name="a" />
 <input name="a" value="c" />
 <script src="/script.js" type="text/javascript" />
@@ -1651,6 +1653,7 @@ controller and action!
     <%= label 'foo' => begin %>Name<% end %>
     <%= input 'foo' %>
 <% end %>
+<%= input 'escaped' %>
 <%= input 'a' %>
 <%= input 'a', value => 'c' %>
 <%= script '/script.js' %>

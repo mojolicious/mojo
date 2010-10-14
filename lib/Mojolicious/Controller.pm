@@ -24,7 +24,7 @@ sub AUTOLOAD {
     my ($method) = $AUTOLOAD =~ /(\w+)$/;
 
     # Helper
-    Carp::croak(qq/Helper "$method" not found/)
+    Carp::croak(qq/Can't locate object method "$method"/)
       unless my $helper = $self->app->renderer->helper->{$method};
 
     # Run

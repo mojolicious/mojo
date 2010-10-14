@@ -42,10 +42,10 @@ sub AUTOLOAD {
     my $self = shift;
 
     # Method
-    my ($method) = $AUTOLOAD =~ /(\w+)$/;
+    my ($package, $method) = $AUTOLOAD =~ /^([\w\:]+)\:\:(\w+)$/;
 
     # Helper
-    Carp::croak(qq/Can't locate object method "$method"/)
+    Carp::croak(qq/Can't locate object method "$method" via "$package"/)
       unless my $helper = $self->renderer->helper->{$method};
 
     # Load controller class

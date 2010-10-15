@@ -18,7 +18,7 @@ our $UNRESERVED = 'A-Za-z0-9\-\.\_\~';
 our $SUBDELIM   = '!\$\&\'\(\)\*\+\,\;\=';
 our $PCHAR      = "$UNRESERVED$SUBDELIM\%\:\@";
 
-# The specs for this are blurry, it's mostly a colelction of w3c suggestions
+# The specs for this are blurry, it's mostly a collection of w3c suggestions
 our $PARAM = "$UNRESERVED\!\$\'\(\)\*\,\:\@\/\?";
 
 sub new {

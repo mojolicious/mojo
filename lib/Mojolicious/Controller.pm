@@ -484,12 +484,6 @@ For async processing you can use C<finish>.
 
 Gracefully end WebSocket connection.
 
-=head2 C<helper>
-
-This method is DEPRECATED, helpers can now be called like normal methods.
-
-    $c->foo(23);
-
 =head2 C<on_finish>
 
     $c->on_finish(sub {...});

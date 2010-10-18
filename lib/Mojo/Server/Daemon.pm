@@ -23,10 +23,13 @@ use constant DEBUG => $ENV{MOJO_DAEMON_DEBUG} || 0;
 
 __PACKAGE__->attr([qw/group listen listen_queue_size silent user/]);
 __PACKAGE__->attr(ioloop => sub { Mojo::IOLoop->singleton });
-__PACKAGE__->attr(keep_alive_timeout      => 5);
-__PACKAGE__->attr(max_clients             => 1000);
-__PACKAGE__->attr(max_keep_alive_requests => 100);
-__PACKAGE__->attr(websocket_timeout       => 300);
+__PACKAGE__->attr(keep_alive_timeout => 5);
+__PACKAGE__->attr(max_clients        => 1000);
+__PACKAGE__->attr(max_requests       => 100);
+__PACKAGE__->attr(websocket_timeout  => 300);
+
+# DEPRECATED in Comet!
+*max_keep_alive_requests = \&max_requests;
 
 sub DESTROY {
     my $self = shift;
@@ -326,7 +329,7 @@ sub _read {
 
     # Last keep alive request
     $tx->res->headers->connection('Close')
-      if ($c->{requests} || 0) >= $self->max_keep_alive_requests;
+      if ($c->{requests} || 0) >= $self->max_requests;
 
     # Finish
     if ($tx->is_done) { $self->_finish($id, $tx) }
@@ -467,10 +470,10 @@ Listen queue size, defaults to C<SOMAXCONN>.
 
 Maximum number of parallel client connections, defaults to C<1000>.
 
-=head2 C<max_keep_alive_requests>
+=head2 C<max_requests>
 
-    my $max_keep_alive_requests = $daemon->max_keep_alive_requests;
-    $daemon                     = $daemon->max_keep_alive_requests(100);
+    my $max_requests = $daemon->max_requests;
+    $daemon          = $daemon->max_requests(100);
 
 Maximum number of keep alive requests per connection, defaults to C<100>.
 

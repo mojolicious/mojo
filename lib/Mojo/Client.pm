@@ -28,16 +28,17 @@ use constant DEBUG => $ENV{MOJO_CLIENT_DEBUG} || 0;
 __PACKAGE__->attr([qw/app http_proxy https_proxy tx/]);
 __PACKAGE__->attr(cookie_jar => sub { Mojo::CookieJar->new });
 __PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->new });
-__PACKAGE__->attr(keep_alive_timeout         => 15);
-__PACKAGE__->attr(log                        => sub { Mojo::Log->new });
-__PACKAGE__->attr(max_keep_alive_connections => 5);
+__PACKAGE__->attr(keep_alive_timeout => 15);
+__PACKAGE__->attr(log                => sub { Mojo::Log->new });
+__PACKAGE__->attr(max_connections    => 5);
 __PACKAGE__->attr(max_redirects     => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 });
 __PACKAGE__->attr(websocket_timeout => 300);
 
 # DEPRECATED in Comet!
-*finished        = \&on_finish;
-*process         = \&start;
-*receive_message = \&on_message;
+*finished                   = \&on_finish;
+*max_keep_alive_connections = \&max_connections;
+*process                    = \&start;
+*receive_message            = \&on_message;
 
 # Singleton
 our $CLIENT;
@@ -309,7 +310,7 @@ sub clone {
     $clone->log($self->log);
     $clone->cookie_jar($self->cookie_jar);
     $clone->keep_alive_timeout($self->keep_alive_timeout);
-    $clone->max_keep_alive_connections($self->max_keep_alive_connections);
+    $clone->max_connections($self->max_connections);
     $clone->max_redirects($self->max_redirects);
     $clone->websocket_timeout($self->websocket_timeout);
 
@@ -527,7 +528,7 @@ sub _cache {
     if ($id) {
 
         # Limit keep alive connections
-        my $max = $self->max_keep_alive_connections;
+        my $max = $self->max_connections;
         while (@$cache > $max) {
             my $cached = shift @$cache;
             $self->_drop($cached->[1]);
@@ -1236,10 +1237,10 @@ Timeout in seconds for keep alive between requests, defaults to C<15>.
 A L<Mojo::Log> object used for logging, by default the application log will
 be used.
 
-=head2 C<max_keep_alive_connections>
+=head2 C<max_connections>
 
-    my $max_keep_alive_connections = $client->max_keep_alive_connections;
-    $client                        = $client->max_keep_alive_connections(5);
+    my $max_connections = $client->max_connections;
+    $client             = $client->max_connections(5);
 
 Maximum number of keep alive connections that the client will retain before
 it starts closing the oldest cached ones, defaults to C<5>.

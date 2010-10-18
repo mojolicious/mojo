@@ -194,33 +194,37 @@ sub parse {
     # Use "begin" and "end" instead of "{" and "}"
     my $mixed_re = qr/
         (
-        $tag_start$expr$escp                 # Escaped expression
+        $tag_start$expr$escp\s*$capture_end   # Escaped expression (end)
         |
-        $tag_start$expr                      # Expression
+        $tag_start$expr$escp                  # Escaped expression
         |
-        $tag_start$cmnt\s*$capture_end       # Comment (end)
+        $tag_start$expr\s*$capture_end        # Expression (end)
         |
-        $tag_start$cmnt\}                    # DEPRECATED Comment (end)
+        $tag_start$expr                       # Expression
         |
-        $tag_start$cmnt                      # Comment
+        $tag_start$cmnt\s*$capture_end        # Comment (end)
         |
-        $tag_start\s*$capture_end            # Code (end)
+        $tag_start$cmnt\}                     # DEPRECATED Comment (end)
         |
-        $tag_start\}                         # DEPRECATED Code (end)
+        $tag_start$cmnt                       # Comment
         |
-        $tag_start                           # Code
+        $tag_start\s*$capture_end             # Code (end)
         |
-        $capture_start\s*$trim$tag_end       # Trim end (start)
+        $tag_start\}                          # DEPRECATED Code (end)
         |
-        \{$trim$tag_end                      # DEPRECATED Trim end (start)
+        $tag_start                            # Code
         |
-        $trim$tag_end                        # Trim end
+        $capture_start\s*$trim$tag_end        # Trim end (start)
         |
-        $capture_start\s*$tag_end            # End (start)
+        \{$trim$tag_end                       # DEPRECATED Trim end (start)
         |
-        \{$tag_end                           # DEPRECATED End (start)
+        $trim$tag_end                         # Trim end
         |
-        $tag_end                             # End
+        $capture_start\s*$tag_end             # End (start)
+        |
+        \{$tag_end                            # DEPRECATED End (start)
+        |
+        $tag_end                              # End
         )
     /x;
 
@@ -229,6 +233,12 @@ sub parse {
         ^(
         $tag_start        # Start
         )
+        (?:
+        $expr             # Expression
+        )?
+        (?:
+        $escp             # Escaped expression
+        )?
         (?:
         \s*$capture_end   # (end)
         |

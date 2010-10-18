@@ -23,7 +23,7 @@ package main;
 use strict;
 use warnings;
 
-use Test::More tests => 112;
+use Test::More tests => 114;
 
 use File::Spec;
 use File::Temp;
@@ -66,6 +66,16 @@ is $output, 'test', 'multiple empty lines trimmed';
 # Trim expression tags
 $mt     = Mojo::Template->new;
 $output = $mt->render('    <%= block begin =%><html><% end =%>    ');
+is $output, '<html>', 'expression tags trimmed';
+
+# Trim expression tags (expression end)
+$mt     = Mojo::Template->new;
+$output = $mt->render('    <%= block begin =%><html><%= end =%>    ');
+is $output, '<html>', 'expression tags trimmed';
+
+# Trim expression tags (Escaped expression end)
+$mt     = Mojo::Template->new;
+$output = $mt->render('    <%= block begin =%><html><%== end =%>    ');
 is $output, '<html>', 'expression tags trimmed';
 
 # Recursive block

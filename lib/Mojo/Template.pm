@@ -191,7 +191,7 @@ sub parse {
     my $capture_end   = quotemeta $self->capture_end;
 
     # DEPRECATED in Comet!
-    # Use "block" and "end" instead of "{" and "}"
+    # Use "begin" and "end" instead of "{" and "}"
     my $mixed_re = qr/
         (
         $tag_start$expr$escp                 # Escaped expression

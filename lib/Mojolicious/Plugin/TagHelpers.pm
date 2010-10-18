@@ -72,15 +72,17 @@ sub register {
     # Add "link_to" helper
     $app->helper(
         link_to => sub {
-            my $c    = shift;
-            my $name = shift;
+            my $c = shift;
+            my $content = my $name = shift;
+
+            # Content
+            unless (defined $_[-1] && ref $_[-1] eq 'CODE') {
+                $name = shift;
+                push @_, sub {$content}
+            }
 
             # Captures
             my $captures = ref $_[0] eq 'HASH' ? shift : {};
-
-            # Default content
-            push @_, sub { ucfirst $name }
-              unless defined $_[-1] && ref $_[-1] eq 'CODE';
 
             $self->_tag('a', href => $c->url_for($name, $captures), @_);
         }
@@ -409,7 +411,7 @@ Generate form label.
 
 =item link_to
 
-    <%= link_to 'index' %>
+    <%= link_to Home => 'index' %>
     <%= link_to index => begin %>Home<% end %>
     <%= link_to index => {foo => 'bar'} => (class => 'links') => begin %>
         Home
@@ -421,7 +423,7 @@ Generate form label.
 Generate link to route, path or URL, by default the capitalized link target
 will be used as content.
 
-    <a href="/path/to/index">Index</a>
+    <a href="/path/to/index">Home</a>
     <a href="/path/to/index">Home</a>
     <a class="links" href="/path/to/index/bar">Home</a>
     <a href="/path/to/file">File</a>

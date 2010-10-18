@@ -812,11 +812,11 @@ $t->get_ok('/tags/lala?a=b&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
 <foo />
 <foo bar="baz" />
 <foo one="two" three="four">Hello</foo>
-<a href="/path">/path</a>
+<a href="/path">Path</a>
 <a href="http://example.com/" title="Foo">Foo</a>
 <a href="http://example.com/">Example</a>
-<a href="/template">Index</a>
-<a href="/tags/23" title="Foo">Tags</a>
+<a href="/template">Home</a>
+<a href="/tags/23" title="Foo">Foo</a>
 <form action="/template" method="post"><input name="foo" /></form>
 <form action="/tags/24" method="post">
     <input name="foo" />
@@ -858,11 +858,11 @@ $t->get_ok('/tags/lala?c=b&d=3&e=4&f=5')->status_is(200)->content_is(<<EOF);
 <foo />
 <foo bar="baz" />
 <foo one="two" three="four">Hello</foo>
-<a href="/path">/path</a>
+<a href="/path">Path</a>
 <a href="http://example.com/" title="Foo">Foo</a>
 <a href="http://example.com/">Example</a>
-<a href="/template">Index</a>
-<a href="/tags/23" title="Foo">Tags</a>
+<a href="/template">Home</a>
+<a href="/tags/23" title="Foo">Foo</a>
 <form action="/template" method="post"><input name="foo" /></form>
 <form action="/tags/24" method="post">
     <input name="foo" />
@@ -1630,11 +1630,11 @@ controller and action!
 <%= tag 'foo' %>
 <%= tag 'foo', bar => 'baz' %>
 <%= tag 'foo', one => 'two', three => 'four' => begin %>Hello<% end %>
-<%= link_to '/path' %>
+<%= link_to Path => '/path' %>
 <%= link_to 'http://example.com/', title => 'Foo', sub { 'Foo' } %>
 <%= link_to 'http://example.com/' => begin %>Example<% end %>
-<%= link_to 'index' %>
-<%= link_to 'tags', {test => 23}, title => 'Foo' %>
+<%= link_to Home => 'index' %>
+<%= link_to Foo => 'tags', {test => 23}, title => 'Foo' %>
 <%= form_for 'index', method => 'post' => begin %><%= input 'foo' %><% end %>
 %= form_for 'tags', {test => 24}, method => 'post' => begin
     %= text_field 'foo'

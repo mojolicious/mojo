@@ -225,12 +225,8 @@ simply equal to the route without non-word characters.
     __DATA__
 
     @@ index.html.ep
-    <%= link_to foo => begin %>
-        Foo
-    <% end %>.
-    <%= link_to bar => begin %>
-        Bar
-    <% end %>.
+    <%= link_to Foo => 'foo' %>.
+    <%= link_to Bar => 'bar' %>.
 
     @@ foo.html.ep
     <a href="<%= url_for 'index' %>">Home</a>.

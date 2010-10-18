@@ -68,12 +68,12 @@ $mt     = Mojo::Template->new;
 $output = $mt->render('    <%= block begin =%><html><% end =%>    ');
 is $output, '<html>', 'expression tags trimmed';
 
-# Trim expression tags (expression end)
+# Trim expression tags (relaxed expression end)
 $mt     = Mojo::Template->new;
 $output = $mt->render('    <%= block begin =%><html><%= end =%>    ');
 is $output, '<html>', 'expression tags trimmed';
 
-# Trim expression tags (Escaped expression end)
+# Trim expression tags (relaxed escaped expression end)
 $mt     = Mojo::Template->new;
 $output = $mt->render('    <%= block begin =%><html><%== end =%>    ');
 is $output, '<html>', 'expression tags trimmed';

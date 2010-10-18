@@ -363,6 +363,11 @@ non-word characters.
     # Generate URL "/foo/bar"
     $self->url_for('foobar');
 
+Note that the value C<current> is reserved for refering to the current route.
+
+    # Generate URL for current route
+    $self->url_for('current');
+
 =head2 HTTP Methods
 
 The C<via> method of the route object allows only specific HTTP methods to

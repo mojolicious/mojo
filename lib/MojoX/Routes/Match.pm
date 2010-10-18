@@ -168,8 +168,15 @@ sub url_for {
 
     # Named
     if ($name) {
-        croak qq/Route "$name" used in url_for does not exist/
-          unless $endpoint = $self->_find_route($name);
+
+        # Current route
+        if ($name eq 'current') { $name = undef }
+
+        # Find
+        else {
+            croak qq/Route "$name" used in url_for does not exist/
+              unless $endpoint = $self->_find_route($name);
+        }
     }
 
     # Merge values

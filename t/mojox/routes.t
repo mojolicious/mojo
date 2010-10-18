@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 193;
+use Test::More tests => 196;
 
 use Mojo::Transaction::HTTP;
 
@@ -130,7 +130,7 @@ my $edge = $r->route('/edge');
 my $auth = $edge->bridge('/auth')->to('auth#check');
 $auth->route('/about/')->to('pref#about');
 $auth->bridge->to('album#allow')->route('/album/create/')->to('album#create');
-$auth->route('/gift/')->to('gift#index');
+$auth->route('/gift/')->to('gift#index')->name('gift');
 
 # Make sure stash stays clean
 my $tx = Mojo::Transaction::HTTP->new;
@@ -484,6 +484,7 @@ is $m->stack->[0]->{controller}, 'test-test', 'right value';
 is $m->stack->[0]->{action},     'test',      'right value';
 is $m->stack->[0]->{format},     undef,       'no value';
 is $m->url_for, '/simple/form', 'right URL';
+is $m->url_for('current'), '/simple/form', 'right URL';
 is @{$m->stack}, 1, 'right number of elements';
 
 # Special edge case with nested bridges
@@ -499,4 +500,6 @@ is $m->stack->[1]->{action},     'index', 'right value';
 is $m->stack->[1]->{format},     undef,   'no value';
 is $m->stack->[2], undef, 'no value';
 is $m->url_for, '/edge/auth/gift', 'right URL';
+is $m->url_for('gift'),    '/edge/auth/gift', 'right URL';
+is $m->url_for('current'), '/edge/auth/gift', 'right URL';
 is @{$m->stack}, 2, 'right number of elements';

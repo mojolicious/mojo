@@ -427,7 +427,9 @@ Returns true if this route leads to a WebSocket.
     $r       = $r->name('foo');
     $r       = $r->name('*');
 
-The name of this route.
+The name of this route, the special value C<*> will generate a name based on
+the route pattern.
+Note that the name C<current> is reserved for refering to the current route.
 
 =head2 C<over>
 

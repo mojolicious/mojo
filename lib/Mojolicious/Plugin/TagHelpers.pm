@@ -35,13 +35,13 @@ sub register {
     # Add "form_for" helper
     $app->helper(
         form_for => sub {
-            my $c    = shift;
-            my $name = shift;
+            my $c   = shift;
+            my @url = (shift);
 
             # Captures
-            my $captures = ref $_[0] eq 'HASH' ? shift : {};
+            push @url, shift if ref $_[0] eq 'HASH';
 
-            $self->_tag('form', action => $c->url_for($name, $captures), @_);
+            $self->_tag('form', action => $c->url_for(@url), @_);
         }
     );
 
@@ -72,19 +72,20 @@ sub register {
     # Add "link_to" helper
     $app->helper(
         link_to => sub {
-            my $c = shift;
-            my $content = my $name = shift;
+            my $c       = shift;
+            my $content = shift;
+            my @url     = ($content);
 
             # Content
             unless (defined $_[-1] && ref $_[-1] eq 'CODE') {
-                $name = shift;
+                @url = (shift);
                 push @_, sub {$content}
             }
 
             # Captures
-            my $captures = ref $_[0] eq 'HASH' ? shift : {};
+            push @url, shift if ref $_[0] eq 'HASH';
 
-            $self->_tag('a', href => $c->url_for($name, $captures), @_);
+            $self->_tag('a', href => $c->url_for(@url), @_);
         }
     );
 

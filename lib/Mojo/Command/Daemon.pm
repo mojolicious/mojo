@@ -25,8 +25,6 @@ These options are available:
   --listen <locations>           Set a comma separated list of locations you
                                  want to listen on, defaults to
                                  http://*:3000.
-  --pid <path>                   Set path to pid file, defaults to a random
-                                 temporary file.
   --queue <size>                 Set listen queue size, defaults to
                                  SOMAXCONN.
   --reload                       Automatically reload application when the
@@ -53,7 +51,6 @@ sub run {
         'keepaliverequests=i' =>
           sub { $daemon->max_keep_alive_requests($_[1]) },
         'listen=s'     => sub { $daemon->listen($_[1]) },
-        'pid=s'        => sub { $daemon->pid_file($_[1]) },
         'queue=i'      => sub { $daemon->listen_queue_size($_[1]) },
         reload         => sub { $ENV{MOJO_RELOAD} = 1 },
         'reverseproxy' => sub { $ENV{MOJO_REVERSE_PROXY} = 1 },

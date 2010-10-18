@@ -26,20 +26,10 @@ __PACKAGE__->attr(ioloop => sub { Mojo::IOLoop->singleton });
 __PACKAGE__->attr(keep_alive_timeout      => 5);
 __PACKAGE__->attr(max_clients             => 1000);
 __PACKAGE__->attr(max_keep_alive_requests => 100);
-__PACKAGE__->attr(
-    pid_file => sub {
-        my $self = shift;
-        return File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
-            Mojo::Command->class_to_file(ref $self->app) . '.pid');
-    }
-);
-__PACKAGE__->attr(websocket_timeout => 300);
+__PACKAGE__->attr(websocket_timeout       => 300);
 
 sub DESTROY {
     my $self = shift;
-
-    # Remove PID file
-    unlink $self->pid_file;
 
     # Shortcut
     return unless my $loop = $self->ioloop;
@@ -67,31 +57,6 @@ sub prepare_ioloop {
     $loop->max_connections($self->max_clients);
 }
 
-sub prepare_pid_file {
-    my $self = shift;
-
-    return unless my $file = $self->pid_file;
-
-    # PID file
-    my $fh;
-    if (-e $file) {
-        $fh = IO::File->new("< $file")
-          or croak qq/Can't open PID file "$file": $!/;
-        my $pid = <$fh>;
-        warn "Server already running with PID $pid.\n" if kill 0, $pid;
-        warn qq/Can't unlink PID file "$file".\n/
-          unless -w $file && unlink $file;
-    }
-
-    # Create new PID file
-    $fh = IO::File->new($file, O_WRONLY | O_CREAT | O_EXCL, 0644)
-      or croak qq/Can't create PID file "$file"/;
-
-    # PID
-    print $fh $$;
-    close $fh;
-}
-
 # 40 dollars!? This better be the best damn beer ever..
 # *drinks beer* You got lucky.
 sub run {
@@ -102,9 +67,6 @@ sub run {
 
     # User and group
     $self->setuidgid;
-
-    # Prepare PID file
-    $self->prepare_pid_file;
 
     # Signals
     $SIG{INT} = $SIG{TERM} = sub { exit 0 };
@@ -512,13 +474,6 @@ Maximum number of parallel client connections, defaults to C<1000>.
 
 Maximum number of keep alive requests per connection, defaults to C<100>.
 
-=head2 C<pid_file>
-
-    my $pid_file = $daemon->pid_file;
-    $daemon      = $daemon->pid_file('/tmp/mojo_daemon.pid');
-
-Path to process id file, defaults to a random temporary file.
-
 =head2 C<silent>
 
     my $silent = $daemon->silent;
@@ -550,12 +505,6 @@ implements the following new ones.
     $daemon->prepare_ioloop;
 
 Prepare event loop.
-
-=head2 C<prepare_pid_file>
-
-    $daemon->prepare_pid_file;
-
-Prepare process id file.
 
 =head2 C<run>
 

@@ -35,8 +35,6 @@ These options are available:
                                  defaults to 10.
   --minspare <number>            Set minimum amount of idle children,
                                  defaults to 5.
-  --pid <path>                   Set path to pid file, defaults to a random
-                                 temporary file.
   --queue <size>                 Set listen queue size, defaults to
                                  SOMAXCONN.
   --reload                       Automatically reload application when the
@@ -74,7 +72,6 @@ sub run {
         'lock=s'       => sub { $daemon->lock_file($_[1]) },
         'maxspare=i'   => sub { $daemon->max_spare_servers($_[1]) },
         'minspare=i'   => sub { $daemon->min_spare_servers($_[1]) },
-        'pid=s'        => sub { $daemon->pid_file($_[1]) },
         'queue=i'      => sub { $daemon->listen_queue_size($_[1]) },
         reload         => sub { $daemon->reload(1) },
         'reverseproxy' => sub { $ENV{MOJO_REVERSE_PROXY} = 1 },

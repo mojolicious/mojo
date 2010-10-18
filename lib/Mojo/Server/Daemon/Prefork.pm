@@ -85,9 +85,6 @@ sub parent {
 sub run {
     my $self = shift;
 
-    # PID file
-    $self->prepare_pid_file;
-
     # Generate lock file name
     $self->lock_file;
 
@@ -167,9 +164,6 @@ sub _kill_children {
         # Wait
         sleep 1;
     }
-
-    # Remove PID file
-    unlink $self->pid_file;
 }
 
 sub _manage_children {

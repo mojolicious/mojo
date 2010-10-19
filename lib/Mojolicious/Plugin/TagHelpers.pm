@@ -351,19 +351,19 @@ Note that this helper is EXPERIMENTAL and might change without warning!
 Generate form for route, path or URL.
 
     <form action="/path/to/login" method="post">
-        <input name="first_name" type="text" />
+        <input name="first_name" />
         <input value="Ok" type="submit" />
     </form>
     <form action="/path/to/login/bar" method="post">
-        <input name="first_name" type="text" />
+        <input name="first_name" />
         <input value="Ok" type="submit" />
     </form>
     <form action="/login" method="post">
-        <input name="first_name" type="text" />
+        <input name="first_name" />
         <input value="Ok" type="submit" />
     </form>
     <form action="http://kraih.com/login" method="post">
-        <input name="first_name" type="text" />
+        <input name="first_name" />
         <input value="Ok" type="submit" />
     </form>
 
@@ -397,8 +397,8 @@ Generate image tag.
 
 Generate form input element.
 
-    <input name="first_name" type="text" />
-    <input name="first_name" type="text" value="Default name" />
+    <input name="first_name" />
+    <input name="first_name" value="Default name" />
     <input name="employed" type="checkbox" />
     <input name="country" type="radio" value="germany" />
 
@@ -527,8 +527,8 @@ HTML5 tag generator.
 Generate text input element.
 Note that this helper is EXPERIMENTAL and might change without warning!
 
-    <input name="first_name" type="text" />
-    <input name="first_name" type="text" value="Default name" />
+    <input name="first_name" />
+    <input name="first_name" value="Default name" />
 
 =item text_area
 

@@ -38,12 +38,14 @@ sub client { shift->app->client }
 sub finish {
     my $self = shift;
 
+    # Transaction
+    my $tx = $self->tx;
+
     # WebSocket check
-    Carp::croak('No WebSocket connection to finish')
-      unless $self->tx->is_websocket;
+    Carp::croak('No WebSocket connection to finish') unless $tx->is_websocket;
 
     # Finish WebSocket
-    $self->tx->finish;
+    $tx->finish;
 }
 
 # DEPRECATED in Comet!
@@ -67,15 +69,18 @@ sub on_finish {
 sub on_message {
     my $self = shift;
 
+    # Transaction
+    my $tx = $self->tx;
+
     # WebSocket check
     Carp::croak('No WebSocket connection to receive messages from')
-      unless $self->tx->is_websocket;
+      unless $tx->is_websocket;
 
     # Callback
     my $cb = shift;
 
     # Receive
-    $self->tx->on_message(sub { shift and $self->$cb(@_) });
+    $tx->on_message(sub { shift and $self->$cb(@_) });
 
     # Rendered
     $self->rendered;
@@ -319,9 +324,6 @@ sub rendered {
     # Already finished
     return $self if $stash->{'mojo.finished'};
 
-    # Transaction
-    my $tx = $self->tx;
-
     # Application
     my $app = $self->app;
 
@@ -340,12 +342,15 @@ sub rendered {
 sub send_message {
     my $self = shift;
 
+    # Transaction
+    my $tx = $self->tx;
+
     # WebSocket check
     Carp::croak('No WebSocket connection to send message to')
-      unless $self->tx->is_websocket;
+      unless $tx->is_websocket;
 
     # Send
-    $self->tx->send_message(@_);
+    $tx->send_message(@_);
 
     # Rendered
     $self->rendered;

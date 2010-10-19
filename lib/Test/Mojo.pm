@@ -16,6 +16,9 @@ __PACKAGE__->attr(client => sub { Mojo::Client->singleton });
 __PACKAGE__->attr('tx');
 __PACKAGE__->attr(max_redirects => 0);
 
+# Silent tests
+$ENV{MOJO_LOG_LEVEL} ||= 'fatal';
+
 # Ooh, a graduate student huh?
 # How come you guys can go to the moon but can't make my shoes smell good?
 sub content_is {

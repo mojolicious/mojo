@@ -21,9 +21,6 @@ plan tests => 8;
 use Mojolicious::Lite;
 use Test::Mojo;
 
-# Silence
-app->log->level('error');
-
 # Load plugin
 my $config =
   plugin json_config => {default => {foo => 'baz', hello => 'there'}};

@@ -25,9 +25,6 @@ use Test::Mojo;
 # POD renderer plugin
 plugin 'pod_renderer';
 
-# Silence
-app->log->level('error');
-
 # GET /
 get '/' => sub {
     my $self = shift;

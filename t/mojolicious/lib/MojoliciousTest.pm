@@ -16,9 +16,6 @@ sub development_mode {
 sub startup {
     my $self = shift;
 
-    # Only log errors to STDERR
-    $self->log->level('fatal');
-
     # Plugin
     unshift @{$self->plugins->namespaces},
       $self->routes->namespace . '::Plugin';

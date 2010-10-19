@@ -29,8 +29,5 @@ use Test::Mojo;
 
 my $t = Test::Mojo->new;
 
-# Silence
-$t->app->log->level('error');
-
 # GET /
 $t->get_ok('/')->status_is(200)->content_is("works!\n");

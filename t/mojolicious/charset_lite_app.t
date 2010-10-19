@@ -36,9 +36,6 @@ app->renderer->add_handler(
     }
 );
 
-# Silence
-app->log->level('error');
-
 # GET /
 get '/' => 'index';
 

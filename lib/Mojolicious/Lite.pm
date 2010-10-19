@@ -668,10 +668,10 @@ Run all unit tests with the C<test> command.
 
     % ./myapp.pl test
 
-To make your tests less noisy you can also change the application log level
-directly in your test files.
+To make your tests more noisy and show you all log messages you can also
+change the application log level directly in your test files.
 
-    $t->app->log->level('error');
+    $t->app->log->level('debug');
 
 To disable debug messages later in a production setup you can change the
 L<Mojolicious> mode, default will be C<development>.

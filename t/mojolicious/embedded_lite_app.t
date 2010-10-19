@@ -23,9 +23,6 @@ package TestApp;
 
 use Mojolicious::Lite;
 
-# Silence
-app->log->level('error');
-
 # GET /hello (embedded)
 get '/hello' => sub {
     my $self = shift;
@@ -40,9 +37,6 @@ get '/hello' => sub {
 package MyTestApp::Test1;
 
 use Mojolicious::Lite;
-
-# Silence
-app->log->level('error');
 
 get '/yada' => sub {
     my $self = shift;
@@ -76,18 +70,12 @@ sub register {
 package Mojolicious::Plugin::MyEmbeddedApp::App;
 use Mojolicious::Lite;
 
-# Silence
-app->log->level('error');
-
 # GET /bar
 get '/bar' => {text => 'plugin works!'};
 
 package MyTestApp::Test2;
 
 use Mojolicious::Lite;
-
-# Silence
-app->log->level('error');
 
 # GET / (embedded)
 get '/' => sub {
@@ -113,9 +101,6 @@ package main;
 
 use Mojolicious::Lite;
 use Test::Mojo;
-
-# Silence
-app->log->level('error');
 
 # /foo/* (plugin app)
 plugin 'my_embedded_app';

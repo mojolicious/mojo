@@ -86,11 +86,8 @@ $stash = $c->stash;
 is_deeply $stash, {a => 1, b => 2}, 'set via hashref';
 
 $c = Test::Controller->new(app => Mojo->new);
-
-# Silence
 $c->app->log->path(undef);
-$c->app->log->level('error');
-
+$c->app->log->level('fatal');
 my $d = MojoX::Dispatcher::Routes->new;
 ok $d, 'initialized';
 

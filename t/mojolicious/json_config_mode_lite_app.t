@@ -25,9 +25,6 @@ plan tests => 3;
 use Mojolicious::Lite;
 use Test::Mojo;
 
-# Silence
-app->log->level('error');
-
 # Load plugin
 plugin 'json_config';
 

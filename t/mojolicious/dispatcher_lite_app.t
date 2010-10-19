@@ -19,9 +19,6 @@ plan tests => 9;
 use Mojolicious::Lite;
 use Test::Mojo;
 
-# Silence
-app->log->level('error');
-
 # Custom dispatchers /custom
 app->plugins->add_hook(
     before_dispatch => sub {

@@ -19,9 +19,6 @@ plan tests => 49;
 use Mojolicious::Lite;
 use Test::Mojo;
 
-# Silence
-app->log->level('error');
-
 # GET /shortpoll
 my $shortpoll;
 get '/shortpoll' => sub {

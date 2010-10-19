@@ -37,9 +37,6 @@ use Test::Mojo;
 # Mojolicious::Lite and ojo
 use ojo;
 
-# Silence
-app->log->level('error');
-
 # Test with lite templates
 app->renderer->default_handler('epl');
 
@@ -737,8 +734,6 @@ $t->get_ok('/action_template')->status_is(200)
   ->content_is("controller and action!\n");
 
 # GET /dead
-my $level = app->log->level;
-app->log->level('fatal');
 $t->get_ok('/dead')->status_is(500)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/works!/);
@@ -760,7 +755,6 @@ $t->get_ok('/dead_template')->status_is(500)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/works too!/);
-app->log->level($level);
 
 # GET /regex/in/template
 $t->get_ok('/regex/in/template')->status_is(200)
@@ -997,8 +991,6 @@ $t->get_ok('/source')->status_is(200)->content_like(qr/get_ok\('\/source/);
 # POST /upload (huge upload without appropriate max message size)
 $backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
 $ENV{MOJO_MAX_MESSAGE_SIZE} = 2048;
-my $backup2 = app->log->level;
-app->log->level('fatal');
 my $tx   = Mojo::Transaction::HTTP->new;
 my $part = Mojo::Content::Single->new;
 my $name = b('Вячеслав')->url_escape;
@@ -1016,7 +1008,6 @@ $tx->req->content($content);
 $client->start($tx);
 is $tx->res->code, 413,        'right status';
 is $tx->res->body, 'called, ', 'right content';
-app->log->level($backup2);
 $ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
 
 # POST /upload (huge upload with appropriate max message size)
@@ -1046,12 +1037,9 @@ $ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
 # GET / (with body and max message size)
 $backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
 $ENV{MOJO_MAX_MESSAGE_SIZE} = 1024;
-$backup2 = app->log->level;
-app->log->level('fatal');
 $t->get_ok('/', '1234' x 1024)->status_is(413)
   ->content_is(
     "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
-app->log->level($backup2);
 $ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
 
 # GET /foo_relaxed/123
@@ -1296,8 +1284,6 @@ $t->post_form_ok(
       ->to_string);
 
 # POST /malformed_utf8
-$level = app->log->level;
-app->log->level('fatal');
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('POST');
 $tx->req->url->parse('/malformed_utf8');
@@ -1317,7 +1303,6 @@ is $code,    200,                  'right status';
 is $server,  'Mojolicious (Perl)', 'right "Server" value';
 is $powered, 'Mojolicious (Perl)', 'right "X-Powered-By" value';
 is $body,    '%E1',                'right content';
-app->log->level($level);
 
 # GET /json
 $t->get_ok('/json')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
@@ -1349,12 +1334,9 @@ $t->get_ok('/helper', {'User-Agent' => 'Explorer'})->status_is(200)
   ->content_is("23\n<br/>\n&lt;...\n/template\n(Explorer)");
 
 # GET /eperror
-$level = app->log->level;
-app->log->level('fatal');
 $t->get_ok('/eperror')->status_is(500)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_like(qr/\$c/);
-app->log->level($level);
 
 # GET /subrequest
 $t->get_ok('/subrequest')->status_is(200)

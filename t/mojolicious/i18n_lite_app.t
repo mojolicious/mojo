@@ -29,9 +29,6 @@ use Test::Mojo;
 # I18N plugin
 plugin i18n => {namespace => 'MyTestApp::I18N'};
 
-# Silence
-app->log->level('error');
-
 # GET /
 get '/' => 'index';
 

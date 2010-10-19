@@ -19,9 +19,6 @@ use Mojo::Asset::File;
 use Mojolicious::Lite;
 use Test::Mojo;
 
-# Silence
-app->log->level('error');
-
 # Upload progress
 my $cache = {};
 app->plugins->add_hook(

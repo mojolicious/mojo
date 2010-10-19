@@ -22,9 +22,6 @@ plan tests => 17;
 use Mojolicious::Lite;
 use Test::Mojo;
 
-# Silence
-app->log->level('error');
-
 # Twinkle template syntax
 my $twinkle = {
     capture_end     => '-',

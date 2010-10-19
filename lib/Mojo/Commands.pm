@@ -228,13 +228,6 @@ Start application with FastCGI backend.
 
 Perform GET request to remote host or local application.
 
-=item C<hypnotoad>
-
-    mojo hypnotoad
-    script/myapp hypnotoad
-
-Start application with C<Mojo::Server::Hypnotoad> backend.
-
 =item C<test>
 
    mojo test

@@ -126,11 +126,6 @@ Loosely coupled building blocks, use what you like and just ignore the rest.
 
 =head2 Installation
 
-    git clone git://github.com/kraih/mojo.git mojo
-    cd mojo
-    perl Makefile.PL
-    make
-    make test
-    make install
+    curl -L cpanmin.us | perl - http://github.com/kraih/mojo/tarball/master
 
 =cut

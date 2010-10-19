@@ -5,6 +5,7 @@ use warnings;
 
 use base 'Mojo::Command';
 
+use Mojo::Client;
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
 use Mojolicious;
@@ -24,6 +25,21 @@ sub run {
     # Mojo
     my $mojo     = $Mojolicious::VERSION;
     my $codename = $Mojolicious::CODENAME;
+
+    # Latest version
+    my $latest = $mojo;
+    eval {
+        Mojo::Client->new->max_redirects(3)
+          ->get('search.cpan.org/dist/Mojolicious')->res->dom('.version')
+          ->each(sub { $latest = $_->text if $_->text =~ /^[\d\.]+$/ });
+    };
+
+    # Message
+    my $message = 'Have fun!';
+    $message = 'Thanks for testing a development release, you are awesome!'
+      if $latest < $mojo;
+    $message = "You might want to update your Mojolicious to $latest."
+      if $latest > $mojo;
 
     # Epoll
     my $epoll = Mojo::IOLoop::EPOLL() ? $IO::Epoll::VERSION : 'not installed';
@@ -57,6 +73,8 @@ OPTIONAL
   IO::Socket::IP           ($ipv6)
   IO::Socket::SSL          ($tls)
   Net::Rendezvous::Publish ($bonjour)
+
+$message
 EOF
 
     return $self;

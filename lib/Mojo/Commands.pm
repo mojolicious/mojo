@@ -94,6 +94,9 @@ sub run {
         return $help ? $command->help : $command->run(@args);
     }
 
+    # Test
+    return $self if $ENV{HARNESS_ACTIVE};
+
     # Try all namespaces
     my $commands = [];
     my $seen     = {};

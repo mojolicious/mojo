@@ -1,7 +1,12 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-0.999930 2010-09-10 00:00:00
+0.999930 2010-10-18 00:00:00
         - Code name "Hot Beverage", this is a major release.
+        - Removed Mojo::Server::Daemon::Prefork due to unfixable design flaws
+          regarding WebSocket support, please use a PSGI server instead for
+          HTTP production setups.
+          For scalable WebSocket deployment we will introduce a whole new
+          server in one of the next releases!
         - Deprecated old Mojo::Template block syntax and added a very pretty
           replacement. (See documentation for more)
         - Deprecated helper method in Mojolicious::Controller.
@@ -9,10 +14,6 @@ This file documents the revision history for Perl extension Mojolicious.
           of on_* methods.
         - Deprecated process method in Mojo::Client and added new start
           method.
-        - Replaced Mojo::Server::Daemon::Prefork with the much more advanced
-          and for production environments optimized Mojo::Server::Hypnotoad.
-          See the new hypnotoad script and updated
-          Mojolicious::Guides::Cookbook recipes for more information.
         - Replaced the "mojolicious" command with "mojo", for convenience.
         - Removed Mojo::Command::Generate::App.
         - Renamed the methods name and replace_content to type and

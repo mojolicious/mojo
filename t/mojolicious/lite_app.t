@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 663;
+plan tests => 669;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -66,6 +66,12 @@ app->renderer->add_handler(dead => sub { die 'renderer works!' });
 
 # GET /
 get '/' => 'root';
+
+# GET /with-format
+get '/with-format' => {format => 'html'} => 'with-format';
+
+# GET /without-format
+get '/without-format' => 'without-format';
 
 # /ojo
 a '/ojo' => {json => {hello => 'world'}};
@@ -652,6 +658,15 @@ $t->get_ok('/', '1234' x 1024)->status_is(200)
   ->content_is(
     "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
 
+# GET /with-format
+$t->get_ok('/with-format')->content_is("/without-format\n");
+
+# GET /without-format
+$t->get_ok('/without-format')->content_is("/without-format\n");
+
+# GET /without-format.html
+$t->get_ok('/without-format.html')->content_is("/without-format\n");
+
 # GET /ojo (ojo)
 $t->get_ok('/ojo')->status_is(200)->json_content_is({hello => 'world'});
 
@@ -790,7 +805,7 @@ is b($t->tx->res->body)->decode('UTF-8'), 'привет мир',
 # GET /root
 $t->get_ok('/root.html')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is("/.html\n");
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is("/\n");
 
 # GET /.html
 $t->get_ok('/.html')->status_is(200)
@@ -1620,6 +1635,12 @@ is $timer,
   'right content';
 
 __DATA__
+@@ with-format.html.ep
+<%= url_for 'without-format' %>
+
+@@ without-format.html.ep
+<%= url_for 'without-format' %>
+
 @@ foo/bar.html.ep
 controller and action!
 

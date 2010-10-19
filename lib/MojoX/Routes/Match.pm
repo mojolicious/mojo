@@ -180,8 +180,9 @@ sub url_for {
     }
 
     # Merge values
-    $values = {%{$self->captures}, %$values};
+    $values = {%{$self->captures}, format => undef, %$values};
 
+    # URL
     my $url = Mojo::URL->new;
 
     # No endpoint

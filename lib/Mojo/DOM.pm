@@ -399,7 +399,7 @@ sub _add {
         $i++;
     }
 
-    # Append
+    # Add
     splice @$parent, $i + $offset, 0, @new;
 
     return $self;

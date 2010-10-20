@@ -816,7 +816,7 @@ is "$dom", <<EOF, 'right result';
 </ul>
 <div>D</div>
 EOF
-$dom->at('li')->before('24<div>A-1</div>25');
+$dom->at('li')->before('24')->before('<div>A-1</div>25');
 is "$dom", <<EOF, 'right result';
 <ul>
     24<div>A-1</div>25<li>A</li><p>A1</p>23
@@ -826,7 +826,7 @@ is "$dom", <<EOF, 'right result';
 <div>D</div>
 EOF
 is $dom->at('div')->text, 'A-1', 'right text';
-$dom->before('lalala');
+$dom->before('l')->before('alal')->before('a');
 is "$dom", <<EOF, 'no change';
 <ul>
     24<div>A-1</div>25<li>A</li><p>A1</p>23
@@ -844,7 +844,7 @@ is "$dom", <<EOF, 'no change';
 </ul>
 <div>D</div>
 EOF
-$dom->find('div')->each(sub { $_->after('works') });
+$dom->find('div')->each(sub { shift->after('works') });
 is "$dom", <<EOF, 'right result';
 <ul>
     24<div>A-1</div>works25<li>A</li><p>A1</p>23

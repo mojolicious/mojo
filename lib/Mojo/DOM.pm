@@ -1351,7 +1351,7 @@ following new ones.
 
 =head2 C<after>
 
-    $dom = $dom->after('<p>Hi!<p>');
+    $dom = $dom->after('<p>Hi!</p>');
 
 Add after element.
 
@@ -1375,7 +1375,7 @@ Element attributes.
 
 =head2 C<before>
 
-    $dom = $dom->before('<p>Hi!<p>');
+    $dom = $dom->before('<p>Hi!</p>');
 
 Add before element.
 

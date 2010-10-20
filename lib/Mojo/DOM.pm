@@ -81,6 +81,8 @@ my $XML_TOKEN_RE = qr/
     )??
 /xis;
 
+sub after { shift->_add(1, @_) }
+
 sub all_text {
     my $self = shift;
 
@@ -123,6 +125,8 @@ sub attrs {
 
     return $tree->[2];
 }
+
+sub before { shift->_add(0, @_) }
 
 sub children {
     my $self = shift;
@@ -362,6 +366,41 @@ sub type {
 
     # Set
     $tree->[1] = $type;
+
+    return $self;
+}
+
+sub _add {
+    my ($self, $offset, $new) = @_;
+
+    # Parse
+    $new = ref $new ? $new->tree : $self->_parse_xml($new);
+
+    # Tree
+    my $tree = $self->tree;
+
+    # Root
+    return $self if $tree->[0] eq 'root';
+
+    # Parent
+    my $parent = $tree->[3];
+
+    # Siblings
+    my @new;
+    for my $e (@$new[1 .. $#$new]) {
+        $e->[3] = $parent if $e->[0] eq 'tag';
+        push @new, $e;
+    }
+
+    # Find
+    my $i = $parent->[0] eq 'root' ? 1 : 4;
+    for my $e (@$parent[$i .. $#$parent]) {
+        last if $e == $tree;
+        $i++;
+    }
+
+    # Append
+    splice @$parent, $i + $offset, 0, @new;
 
     return $self;
 }
@@ -1310,6 +1349,12 @@ Document Object Model.
 L<Mojo::DOM> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
+=head2 C<after>
+
+    $dom = $dom->after('<p>Hi!<p>');
+
+Add after element.
+
 =head2 C<all_text>
 
     my $text = $dom->all_text;
@@ -1327,6 +1372,12 @@ Find a single element with CSS3 selectors.
     my $attrs = $dom->attrs;
 
 Element attributes.
+
+=head2 C<before>
+
+    $dom = $dom->before('<p>Hi!<p>');
+
+Add before element.
 
 =head2 C<children>
 

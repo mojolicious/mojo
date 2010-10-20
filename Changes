@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 0.999931 2010-10-19 00:00:00
+        - Added before and after methods to Mojo::DOM.
         - Hide command overview from prove. (omega)
         - Default to silent tests in Test::Mojo.
 

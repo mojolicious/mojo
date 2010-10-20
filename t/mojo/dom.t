@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 310;
+use Test::More tests => 316;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -797,3 +797,59 @@ is($dom->at('#♥ + #☃ ~ *:nth-last-child(1)')->text, 'G',   'right text');
 is($dom->at('#♥ ~ #☃ ~ *:nth-last-child(1)')->text, 'G',   'right text');
 is($dom->at('#♥ + *:nth-last-child(2)')->text,        'F',   'right text');
 is($dom->at('#♥ ~ *:nth-last-child(2)')->text,        'F',   'right text');
+
+# Adding nodes
+$dom->parse(<<EOF);
+<ul>
+    <li>A</li>
+    <p>B</p>
+    <li>C</li>
+</ul>
+<div>D</div>
+EOF
+$dom->at('li')->after('<p>A1</p>23');
+is "$dom", <<EOF, 'right result';
+<ul>
+    <li>A</li><p>A1</p>23
+    <p>B</p>
+    <li>C</li>
+</ul>
+<div>D</div>
+EOF
+$dom->at('li')->before('24<div>A-1</div>25');
+is "$dom", <<EOF, 'right result';
+<ul>
+    24<div>A-1</div>25<li>A</li><p>A1</p>23
+    <p>B</p>
+    <li>C</li>
+</ul>
+<div>D</div>
+EOF
+is $dom->at('div')->text, 'A-1', 'right text';
+$dom->before('lalala');
+is "$dom", <<EOF, 'no change';
+<ul>
+    24<div>A-1</div>25<li>A</li><p>A1</p>23
+    <p>B</p>
+    <li>C</li>
+</ul>
+<div>D</div>
+EOF
+$dom->after('lalala');
+is "$dom", <<EOF, 'no change';
+<ul>
+    24<div>A-1</div>25<li>A</li><p>A1</p>23
+    <p>B</p>
+    <li>C</li>
+</ul>
+<div>D</div>
+EOF
+$dom->find('div')->each(sub { $_->after('works') });
+is "$dom", <<EOF, 'right result';
+<ul>
+    24<div>A-1</div>works25<li>A</li><p>A1</p>23
+    <p>B</p>
+    <li>C</li>
+</ul>
+<div>D</div>works
+EOF

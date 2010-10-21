@@ -1355,6 +1355,8 @@ following new ones.
 
 Add after element.
 
+    $dom->parse('<div><h1>A</h1></div>')->at('h1')->after('<h2>B</h2>');
+
 =head2 C<all_text>
 
     my $text = $dom->all_text;
@@ -1378,6 +1380,8 @@ Element attributes.
     $dom = $dom->before('<p>Hi!</p>');
 
 Add before element.
+
+    $dom->parse('<div><h2>A</h2></div>')->at('h2')->before('<h1>B</h1>');
 
 =head2 C<children>
 
@@ -1426,11 +1430,15 @@ Parse XML document.
 
 Replace elements.
 
+    $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace('<h2>B</h2>');
+
 =head2 C<replace_inner>
 
     $dom = $dom->replace_inner('test');
 
 Replace element content.
+
+    $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace_inner('B');
 
 =head2 C<root>
 

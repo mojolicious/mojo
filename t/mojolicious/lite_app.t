@@ -14,7 +14,7 @@ use Test::More;
 # Make sure sockets are working
 plan skip_all => 'working sockets required for this test!'
   unless Mojo::IOLoop->new->generate_port;
-plan tests => 669;
+plan tests => 664;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -182,18 +182,6 @@ get '/inline/ep/partial' => sub {
 
 # GET /source
 get '/source' => sub { shift->render_static('../lite_app.t') };
-
-# POST /upload
-post '/upload' => sub {
-    my $self = shift;
-    $self->rendered;
-    my $body = $self->res->body || '';
-    $self->res->body("called, $body");
-    return if $self->req->is_limit_exceeded;
-    if (my $u = $self->req->upload('Вячеслав')) {
-        $self->res->body($self->res->body . $u->filename . $u->size);
-    }
-};
 
 # GET /foo_relaxed/*
 get '/foo_relaxed/(.test)' => sub {
@@ -988,52 +976,6 @@ $t->get_ok('/inline/ep/partial')->status_is(200)
 # GET /source
 $t->get_ok('/source')->status_is(200)->content_like(qr/get_ok\('\/source/);
 
-# POST /upload (huge upload without appropriate max message size)
-$backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
-$ENV{MOJO_MAX_MESSAGE_SIZE} = 2048;
-my $tx   = Mojo::Transaction::HTTP->new;
-my $part = Mojo::Content::Single->new;
-my $name = b('Вячеслав')->url_escape;
-$part->headers->content_disposition(
-    qq/form-data; name="$name"; filename="$name.jpg"/);
-$part->headers->content_type('image/jpeg');
-$part->asset->add_chunk('1234' x 1024);
-my $content = Mojo::Content::MultiPart->new;
-$content->headers($tx->req->headers);
-$content->headers->content_type('multipart/form-data');
-$content->parts([$part]);
-$tx->req->method('POST');
-$tx->req->url->parse('/upload');
-$tx->req->content($content);
-$client->start($tx);
-is $tx->res->code, 413,        'right status';
-is $tx->res->body, 'called, ', 'right content';
-$ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
-
-# POST /upload (huge upload with appropriate max message size)
-$backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
-$ENV{MOJO_MAX_MESSAGE_SIZE} = 1073741824;
-$tx                         = Mojo::Transaction::HTTP->new;
-$part                       = Mojo::Content::Single->new;
-$name                       = b('Вячеслав')->url_escape;
-$part->headers->content_disposition(
-    qq/form-data; name="$name"; filename="$name.jpg"/);
-$part->headers->content_type('image/jpeg');
-$part->asset->add_chunk('1234' x 1024);
-$content = Mojo::Content::MultiPart->new;
-$content->headers($tx->req->headers);
-$content->headers->content_type('multipart/form-data');
-$content->parts([$part]);
-$tx->req->method('POST');
-$tx->req->url->parse('/upload');
-$tx->req->content($content);
-$client->start($tx);
-ok $tx->is_done, 'transaction is done';
-is $tx->res->code, 200, 'right status';
-is b($tx->res->body)->decode('UTF-8')->to_string,
-  'called, Вячеслав.jpg4096', 'right content';
-$ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
-
 # GET / (with body and max message size)
 $backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
 $ENV{MOJO_MAX_MESSAGE_SIZE} = 1024;
@@ -1284,7 +1226,7 @@ $t->post_form_ok(
       ->to_string);
 
 # POST /malformed_utf8
-$tx = Mojo::Transaction::HTTP->new;
+my $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('POST');
 $tx->req->url->parse('/malformed_utf8');
 $tx->req->headers->content_type('application/x-www-form-urlencoded');

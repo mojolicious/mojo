@@ -60,7 +60,9 @@ sub to_string {
     return '' unless $self->name;
 
     # Render
-    my $cookie = $self->name . '=' . $self->value;
+    my $cookie = $self->name;
+    my $value  = $self->value;
+    $cookie .= "=$value" if defined $value && length $value;
     if (my $path = $self->path) { $cookie .= "; \$Path=$path" }
 
     return $cookie;

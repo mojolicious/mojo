@@ -88,8 +88,10 @@ sub to_string {
     return '' unless $self->name;
 
     # Version
-    my $cookie = sprintf "%s=%s; Version=%d",
-      $self->name, $self->value, ($self->version || 1);
+    my $cookie = $self->name;
+    my $value  = $self->value;
+    $cookie .= "=$value" if defined $value && length $value;
+    $cookie .= sprintf "; Version=%d", ($self->version || 1);
 
     # Domain
     if (my $domain = $self->domain) { $cookie .= "; Domain=$domain" }

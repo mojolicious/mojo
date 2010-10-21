@@ -4,6 +4,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added before and after methods to Mojo::DOM.
         - Hide command overview from prove. (omega)
         - Default to silent tests in Test::Mojo.
+        - Fixed optional value support in Mojo::Cookie.
 
 0.999930 2010-10-18 00:00:00
         - Code name "Hot Beverage", this is a major release.

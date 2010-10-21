@@ -153,12 +153,15 @@ sub connect {
     # TLS check
     return if $args->{tls} && !TLS;
 
+    # Protocol
+    $args->{proto} ||= 'tcp';
+
     # Options
     my %options = (
         PeerAddr => $args->{address},
         PeerPort => $args->{port} || ($args->{tls} ? 443 : 80),
-        Proto    => 'tcp',
-        Type     => SOCK_STREAM,
+        Proto    => $args->{proto},
+        Type     => $args->{proto} eq 'udp' ? SOCK_DGRAM : SOCK_STREAM,
         %{$args->{args} || {}}
     );
 
@@ -1487,6 +1490,10 @@ Callback to be invoked if new data arrives on the connection.
 =item C<port>
 
 Port to connect to.
+
+=item C<proto>
+
+Protocol to use, defaults to C<tcp>.
 
 =item C<socket>
 

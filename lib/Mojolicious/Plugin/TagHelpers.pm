@@ -59,8 +59,8 @@ sub register {
         }
     );
 
-    # Add "input" helper
-    $app->helper(input => sub { $self->_input(@_) });
+    # Add "input_tag" helper
+    $app->helper(input_tag => sub { $self->_input(@_) });
 
     # Add "javascript" helper
     $app->helper(
@@ -340,7 +340,6 @@ Note that this module is EXPERIMENTAL and might change without warning!
     <%= check_box employed => 1, id => 'foo' %>
 
 Generate checkbox input element.
-Note that this helper is EXPERIMENTAL and might change without warning!
 
     <input name="employed" type="checkbox" value="1" />
     <input id="foo" name="employed" type="checkbox" value="1" />
@@ -351,7 +350,6 @@ Note that this helper is EXPERIMENTAL and might change without warning!
     <%= file_field 'avatar', id => 'foo' %>
 
 Generate file input element.
-Note that this helper is EXPERIMENTAL and might change without warning!
 
     <input name="avatar" type="file" />
     <input id="foo" name="avatar" type="file" />
@@ -400,17 +398,16 @@ Generate form for route, path or URL.
     <%= hidden_field foo => 'bar', id => 'bar' %>
 
 Generate hidden input element.
-Note that this helper is EXPERIMENTAL and might change without warning!
 
     <input name="foo" type="hidden" value="bar" />
     <input id="bar" name="foo" type="hidden" value="bar" />
 
-=item input
+=item input_tag
 
-    <%= input 'first_name' %>
-    <%= input 'first_name', value => 'Default name' %>
-    <%= input 'employed', type => 'checkbox' %>
-    <%= input 'country', type => 'radio', value => 'germany' %>
+    <%= input_tag 'first_name' %>
+    <%= input_tag 'first_name', value => 'Default name' %>
+    <%= input_tag 'employed', type => 'checkbox' %>
+    <%= input_tag 'country', type => 'radio', value => 'germany' %>
 
 Generate form input element.
 
@@ -460,7 +457,6 @@ will be used as content.
     <%= password_field 'pass', id => 'foo' %>
 
 Generate password input element.
-Note that this helper is EXPERIMENTAL and might change without warning!
 
     <input name="pass" type="password" />
     <input id="foo" name="pass" type="password" />
@@ -471,7 +467,6 @@ Note that this helper is EXPERIMENTAL and might change without warning!
     <%= radio_button country => 'germany', id => 'foo' %>
 
 Generate radio input element.
-Note that this helper is EXPERIMENTAL and might change without warning!
 
     <input name="country" type="radio" value="germany" />
     <input id="foo" name="country" type="radio" value="germany" />
@@ -484,7 +479,6 @@ Note that this helper is EXPERIMENTAL and might change without warning!
     <%= select_field country => [[Europe => [Germany => 'de']]] %>
 
 Generate select, option and optgroup elements.
-Note that this helper is EXPERIMENTAL and might change without warning!
 
     <select name="language">
         <option name="de">de</option>
@@ -525,7 +519,6 @@ Generate style or link tag for C<CSS> asset.
     <%= submit_button 'Ok!', id => 'foo' %>
 
 Generate submit input element.
-Note that this helper is EXPERIMENTAL and might change without warning!
 
     <input type="submit" value="Ok" />
     <input id="foo" type="submit" value="Ok!" />
@@ -548,7 +541,6 @@ HTML5 tag generator.
     <%= text_field 'first_name', value => 'Default name' %>
 
 Generate text input element.
-Note that this helper is EXPERIMENTAL and might change without warning!
 
     <input name="first_name" />
     <input name="first_name" value="Default name" />
@@ -561,7 +553,6 @@ Note that this helper is EXPERIMENTAL and might change without warning!
     <% end %>
 
 Generate textarea element.
-Note that this helper is EXPERIMENTAL and might change without warning!
 
     <textarea name="foo"></textarea>
     <textarea name="foo">

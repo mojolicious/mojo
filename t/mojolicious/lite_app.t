@@ -814,7 +814,9 @@ $t->get_ok('/tags/lala?a=b&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
 <a href="http://example.com/">Example</a>
 <a href="/template">Home</a>
 <a href="/tags/23" title="Foo">Foo</a>
-<form action="/template" method="post"><input name="foo" /></form>
+<form action="/template" method="post">
+    <input name="foo" />
+</form>
 <form action="/tags/24" method="post">
     <input name="foo" />
     <input name="foo" type="checkbox" value="1" />
@@ -864,7 +866,9 @@ $t->get_ok('/tags/lala?c=b&d=3&e=4&f=5')->status_is(200)->content_is(<<EOF);
 <a href="http://example.com/">Example</a>
 <a href="/template">Home</a>
 <a href="/tags/23" title="Foo">Foo</a>
-<form action="/template" method="post"><input name="foo" /></form>
+<form action="/template" method="post">
+    <input name="foo" />
+</form>
 <form action="/tags/24" method="post">
     <input name="foo" />
     <input name="foo" type="checkbox" value="1" />
@@ -1588,7 +1592,9 @@ controller and action!
 <%= link_to 'http://example.com/' => begin %>Example<% end %>
 <%= link_to Home => 'index' %>
 <%= link_to Foo => 'tags', {test => 23}, title => 'Foo' %>
-<%= form_for 'index', method => 'post' => begin %><%= input 'foo' %><% end %>
+<%= form_for 'index', method => 'post' => begin %>
+    <%= input_tag 'foo' %>
+<% end %>
 %= form_for 'tags', {test => 24}, method => 'post' => begin
     %= text_field 'foo'
     %= check_box foo => 1
@@ -1607,11 +1613,11 @@ controller and action!
     %= submit_button 'Ok too!', id => 'bar'
 %= end
 <%= form_for '/' => begin %>
-    <%= input 'foo' %>
+    <%= input_tag 'foo' %>
 <% end %>
-<%= input 'escaped' %>
-<%= input 'a' %>
-<%= input 'a', value => 'c' %>
+<%= input_tag 'escaped' %>
+<%= input_tag 'a' %>
+<%= input_tag 'a', value => 'c' %>
 <%= javascript 'script.js' %>
 <%= javascript begin %>
     var a = 'b';

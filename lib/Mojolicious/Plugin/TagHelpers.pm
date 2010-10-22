@@ -59,15 +59,34 @@ sub register {
         }
     );
 
-    # Add "img" helper
-    $app->helper(img => sub { shift; $self->_tag('img', src => shift, @_) });
-
     # Add "input" helper
     $app->helper(input => sub { $self->_input(@_) });
 
-    # Add "label" helper
+    # Add "javascript" helper
     $app->helper(
-        label => sub { shift; $self->_tag('label', for => shift, @_) });
+        javascript => sub {
+            my $c = shift;
+
+            # CDATA
+            my $cb;
+            my $old = $cb = pop if ref $_[-1] && ref $_[-1] eq 'CODE';
+            $cb = sub { '<![CDATA[' . $old->() . ']]>' }
+              if $cb;
+
+            # Path
+            if (@_ % 2 ? ref $_[-1] ne 'CODE' : ref $_[-1] eq 'CODE') {
+                return $self->_tag(
+                    'script',
+                    src  => shift,
+                    type => 'text/javascript',
+                    @_
+                );
+            }
+
+            # Block
+            $self->_tag('script', type => 'text/javascript', @_, $cb);
+        }
+    );
 
     # Add "link_to" helper
     $app->helper(
@@ -159,26 +178,6 @@ sub register {
                     return $parts;
                 }
             );
-        }
-    );
-
-    # Add "script" helper
-    $app->helper(
-        script => sub {
-            my $c = shift;
-
-            # Path
-            if (@_ % 2 ? ref $_[-1] ne 'CODE' : ref $_[-1] eq 'CODE') {
-                return $self->_tag(
-                    'script',
-                    src  => shift,
-                    type => 'text/javascript',
-                    @_
-                );
-            }
-
-            # Block
-            $self->_tag('script', type => 'text/javascript', @_);
         }
     );
 
@@ -378,16 +377,6 @@ Note that this helper is EXPERIMENTAL and might change without warning!
     <input name="foo" type="hidden" value="bar" />
     <input id="bar" name="foo" type="hidden" value="bar" />
 
-=item img
-
-    <%= img '/foo.jpg' %>
-    <%= img '/foo.jpg', alt => 'Image' %>
-
-Generate image tag.
-
-    <img src="/foo.jpg" />
-    <img alt="Image" src="/foo.jpg" />
-
 =item input
 
     <%= input 'first_name' %>
@@ -402,13 +391,19 @@ Generate form input element.
     <input name="employed" type="checkbox" />
     <input name="country" type="radio" value="germany" />
 
-=item label
+=item javascript
 
-    <%= label first_name => begin %>First name<% end %>
+    <%= javascript '/script.js' %>
+    <%= javascript begin %>
+        var a = 'b';
+    <% end %>
 
-Generate form label.
+Generate script tag.
 
-    <label for="first_name">First name</label>
+    <script src="/script.js" type="text/javascript" />
+    <script type="text/javascript">
+        var a = 'b';
+    </script>
 
 =item link_to
 
@@ -481,20 +476,6 @@ Note that this helper is EXPERIMENTAL and might change without warning!
             <option name="en">en</option>
         </optgroup>
     </select>
-
-=item script
-
-    <%= script '/script.js' %>
-    <%= script begin %>
-        var a = 'b';
-    <% end %>
-
-Generate script tag.
-
-    <script src="/script.js" type="text/javascript" />
-    <script type="text/javascript">
-        var a = 'b';
-    </script>
 
 =item submit_button
 

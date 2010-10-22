@@ -181,6 +181,34 @@ sub register {
         }
     );
 
+    # Add "stylesheet" helper
+    $app->helper(
+        stylesheet => sub {
+            my $c = shift;
+
+            # CDATA
+            my $cb;
+            my $old = $cb = pop if ref $_[-1] && ref $_[-1] eq 'CODE';
+            $cb = sub { '<![CDATA[' . $old->() . ']]>' }
+              if $cb;
+
+            # Path
+            if (@_ % 2 ? ref $_[-1] ne 'CODE' : ref $_[-1] eq 'CODE') {
+                return $self->_tag(
+                    'link',
+                    href  => shift,
+                    media => 'screen',
+                    rel   => 'stylesheet',
+                    type  => 'text/css',
+                    @_
+                );
+            }
+
+            # Block
+            $self->_tag('style', type => 'text/css', @_, $cb);
+        }
+    );
+
     # Add "submit_button" helper
     $app->helper(
         submit_button => sub {
@@ -393,17 +421,17 @@ Generate form input element.
 
 =item javascript
 
-    <%= javascript '/script.js' %>
+    <%= javascript 'script.js' %>
     <%= javascript begin %>
         var a = 'b';
     <% end %>
 
-Generate script tag.
+Generate script tag for C<Javascript> asset.
 
-    <script src="/script.js" type="text/javascript" />
-    <script type="text/javascript">
+    <script src="script.js" type="text/javascript" />
+    <script type="text/javascript"><![CDATA[
         var a = 'b';
-    </script>
+    ]]></script>
 
 =item link_to
 
@@ -476,6 +504,20 @@ Note that this helper is EXPERIMENTAL and might change without warning!
             <option name="en">en</option>
         </optgroup>
     </select>
+
+=item stylesheet
+
+    <%= stylesheet 'foo.css %>
+    <%= stylesheet begin %>
+        body {color: #000}
+    <% end %>
+
+Generate style or link tag for C<CSS> asset.
+
+    <link href="foo.css" media="screen" rel="stylesheet" type="text/css" />
+    <style type="text/css"><![CDATA[
+        body {color: #000}
+    ]]></style>
 
 =item submit_button
 

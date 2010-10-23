@@ -277,6 +277,7 @@ sub _input {
     $self->_tag('input', name => $name, %attrs);
 }
 
+# We’ve lost power of the forward Gameboy! Mario not responding!
 sub _tag {
     my $self = shift;
     my $name = shift;

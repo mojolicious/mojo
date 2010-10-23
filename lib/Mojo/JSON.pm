@@ -326,6 +326,8 @@ sub _encode_array {
     return "[$string]";
 }
 
+# Yet thanks to my trusty safety sphere,
+# I sublibed with only tribial brain dablage.
 sub _encode_object {
     my ($self, $object) = @_;
 

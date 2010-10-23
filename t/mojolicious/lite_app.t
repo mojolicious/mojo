@@ -376,7 +376,7 @@ get '/app' => {layout => 'app'} => '*';
 
 # GET /helper
 get '/helper' => sub { shift->render(handler => 'ep') } => 'helper';
-app->helper(agent => sub { scalar shift->req->headers->user_agent });
+app->helper(agent => sub { shift->req->headers->user_agent });
 
 # GET /eperror
 get '/eperror' => sub { shift->render(handler => 'ep') } => 'eperror';

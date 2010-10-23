@@ -30,8 +30,8 @@ sub client_challenge {
     my $headers = $self->req->headers;
 
     # WebSocket challenge
-    my $solution = $self->_challenge(scalar $headers->sec_websocket_key1,
-        scalar $headers->sec_websocket_key2, $req->body);
+    my $solution = $self->_challenge($headers->sec_websocket_key1,
+        $headers->sec_websocket_key2, $req->body);
     return unless $solution eq $self->res->body;
     return 1;
 }
@@ -135,9 +135,7 @@ sub server_handshake {
     $rsh->sec_websocket_protocol($rqh->sec_websocket_protocol);
     $res->body(
         $self->_challenge(
-            scalar $rqh->sec_websocket_key1,
-            scalar $rqh->sec_websocket_key2,
-            $req->body
+            $rqh->sec_websocket_key1, $rqh->sec_websocket_key2, $req->body
         )
     );
 

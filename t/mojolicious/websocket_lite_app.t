@@ -53,7 +53,7 @@ websocket '/' => sub {
 # WebSocket /socket
 websocket '/socket' => sub {
     my $self = shift;
-    $self->send_message(scalar $self->req->headers->host);
+    $self->send_message($self->req->headers->host);
     $self->finish;
 };
 

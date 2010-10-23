@@ -40,7 +40,7 @@ app->plugins->add_hook(
 
                 # Expected content length
                 return
-                  unless my $length = scalar $req->headers->content_length;
+                  unless my $length = $req->headers->content_length;
 
                 # Current progress
                 my $progress = $req->content->progress;

@@ -36,7 +36,7 @@ sub register {
             # Header detection
             my @languages = I18N::LangTags::implicate_supers(
                 I18N::LangTags::Detect->http_accept_langs(
-                    scalar $c->req->headers->accept_language
+                    $c->req->headers->accept_language
                 )
             );
 

@@ -86,9 +86,9 @@ for my $name (@HEADERS) {
     $NORMALCASE_HEADERS{$lowercase} = $name;
 }
 
-sub accept_language { shift->header('Accept-Language' => @_) }
-sub accept_ranges   { shift->header('Accept-Ranges'   => @_) }
-sub authorization   { shift->header('Authorization'   => @_) }
+sub accept_language { scalar shift->header('Accept-Language' => @_) }
+sub accept_ranges   { scalar shift->header('Accept-Ranges'   => @_) }
+sub authorization   { scalar shift->header('Authorization'   => @_) }
 
 sub add {
     my $self = shift;
@@ -126,19 +126,19 @@ sub build {
     return length $headers ? $headers : undef;
 }
 
-sub connection          { shift->header(Connection            => @_) }
-sub content_disposition { shift->header('Content-Disposition' => @_) }
-sub content_length      { shift->header('Content-Length'      => @_) }
-sub content_range       { shift->header('Content-Range'       => @_) }
+sub connection          { scalar shift->header(Connection            => @_) }
+sub content_disposition { scalar shift->header('Content-Disposition' => @_) }
+sub content_length      { scalar shift->header('Content-Length'      => @_) }
+sub content_range       { scalar shift->header('Content-Range'       => @_) }
 
 sub content_transfer_encoding {
-    shift->header('Content-Transfer-Encoding' => @_);
+    scalar shift->header('Content-Transfer-Encoding' => @_);
 }
 
-sub content_type { shift->header('Content-Type' => @_) }
-sub cookie       { shift->header(Cookie         => @_) }
-sub date         { shift->header(Date           => @_) }
-sub expect       { shift->header(Expect         => @_) }
+sub content_type { scalar shift->header('Content-Type' => @_) }
+sub cookie       { scalar shift->header(Cookie         => @_) }
+sub date         { scalar shift->header(Date           => @_) }
+sub expect       { scalar shift->header(Expect         => @_) }
 
 sub from_hash {
     my $self = shift;
@@ -191,16 +191,16 @@ sub header {
     return @$headers;
 }
 
-sub host { shift->header(Host => @_) }
-sub if_modified_since { shift->header('If-Modified-Since' => @_) }
+sub host { scalar shift->header(Host => @_) }
+sub if_modified_since { scalar shift->header('If-Modified-Since' => @_) }
 
 sub is_done {
     return 1 if (shift->{_state} || '') eq 'done';
     return;
 }
 
-sub last_modified { shift->header('Last-Modified' => @_) }
-sub location      { shift->header(Location        => @_) }
+sub last_modified { scalar shift->header('Last-Modified' => @_) }
+sub location      { scalar shift->header(Location        => @_) }
 
 sub names {
     my $self = shift;
@@ -214,7 +214,7 @@ sub names {
     return \@headers;
 }
 
-sub origin { shift->header(Origin => @_) }
+sub origin { scalar shift->header(Origin => @_) }
 
 sub parse {
     my ($self, $chunk) = @_;
@@ -253,10 +253,10 @@ sub parse {
     return;
 }
 
-sub proxy_authenticate  { shift->header('Proxy-Authenticate'  => @_) }
-sub proxy_authorization { shift->header('Proxy-Authorization' => @_) }
-sub range               { shift->header(Range                 => @_) }
-sub referrer            { shift->header(Referer               => @_) }
+sub proxy_authenticate  { scalar shift->header('Proxy-Authenticate'  => @_) }
+sub proxy_authorization { scalar shift->header('Proxy-Authorization' => @_) }
+sub range               { scalar shift->header(Range                 => @_) }
+sub referrer            { scalar shift->header(Referer               => @_) }
 
 sub remove {
     my ($self, $name) = @_;
@@ -264,10 +264,10 @@ sub remove {
     return $self;
 }
 
-sub server      { shift->header(Server        => @_) }
-sub set_cookie  { shift->header('Set-Cookie'  => @_) }
-sub set_cookie2 { shift->header('Set-Cookie2' => @_) }
-sub status      { shift->header(Status        => @_) }
+sub server      { scalar shift->header(Server        => @_) }
+sub set_cookie  { scalar shift->header('Set-Cookie'  => @_) }
+sub set_cookie2 { scalar shift->header('Set-Cookie2' => @_) }
+sub status      { scalar shift->header(Status        => @_) }
 
 sub to_hash {
     my $self   = shift;
@@ -297,16 +297,25 @@ sub to_hash {
 
 sub to_string { shift->build(@_) }
 
-sub trailer                { shift->header(Trailer                  => @_) }
-sub transfer_encoding      { shift->header('Transfer-Encoding'      => @_) }
-sub upgrade                { shift->header(Upgrade                  => @_) }
-sub user_agent             { shift->header('User-Agent'             => @_) }
-sub sec_websocket_key1     { shift->header('Sec-WebSocket-Key1'     => @_) }
-sub sec_websocket_key2     { shift->header('Sec-WebSocket-Key2'     => @_) }
-sub sec_websocket_location { shift->header('Sec-WebSocket-Location' => @_) }
-sub sec_websocket_origin   { shift->header('Sec-WebSocket-Origin'   => @_) }
-sub sec_websocket_protocol { shift->header('Sec-WebSocket-Protocol' => @_) }
-sub www_authenticate       { shift->header('WWW-Authenticate'       => @_) }
+sub trailer            { scalar shift->header(Trailer              => @_) }
+sub transfer_encoding  { scalar shift->header('Transfer-Encoding'  => @_) }
+sub upgrade            { scalar shift->header(Upgrade              => @_) }
+sub user_agent         { scalar shift->header('User-Agent'         => @_) }
+sub sec_websocket_key1 { scalar shift->header('Sec-WebSocket-Key1' => @_) }
+sub sec_websocket_key2 { scalar shift->header('Sec-WebSocket-Key2' => @_) }
+
+sub sec_websocket_location {
+    scalar shift->header('Sec-WebSocket-Location' => @_);
+}
+
+sub sec_websocket_origin {
+    scalar shift->header('Sec-WebSocket-Origin' => @_);
+}
+
+sub sec_websocket_protocol {
+    scalar shift->header('Sec-WebSocket-Protocol' => @_);
+}
+sub www_authenticate { scalar shift->header('WWW-Authenticate' => @_) }
 
 1;
 __END__

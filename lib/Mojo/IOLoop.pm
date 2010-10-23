@@ -165,24 +165,26 @@ sub connect {
         %{$args->{args} || {}}
     );
 
-    # New connection
-    my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';
-    return unless my $socket = $args->{socket} || $class->new(%options);
-    my $id = "$socket";
-
-    # File descriptor
-    return unless defined(my $fd = fileno $socket);
-    $self->{_fds}->{$fd} = $id;
-
-    # Add connection
-    my $c = $self->{_cs}->{$id} = {
+    # Connection
+    my $c = {
         buffer     => b(),
         on_connect => $args->{on_connect}
           || $args->{connect_cb}
           || $args->{cb},
         connecting => 1,
-        socket     => $socket
     };
+    (my $id) = "$c" =~ /0x([\da-f]+)/;
+    $self->{_cs}->{$id} = $c;
+
+    # Socket
+    my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';
+    return unless my $socket = $args->{socket} || $class->new(%options);
+    $c->{socket} = $socket;
+    $self->{_reverse}->{$socket} = $id;
+
+    # File descriptor
+    return unless defined(my $fd = fileno $socket);
+    $self->{_fds}->{$fd} = $id;
 
     # Non blocking
     $socket->blocking(0);
@@ -288,6 +290,17 @@ sub listen {
     my $fd;
     if ($ENV{MOJO_REUSE} =~ /(?:^|\,)$reuse\:(\d+)/) { $fd = $1 }
 
+    # Connection
+    my $c = {
+        file => $args->{file} ? 1 : 0,
+        on_accept => $args->{on_accept} || $args->{accept_cb} || $args->{cb},
+        on_error  => $args->{on_error}  || $args->{error_cb},
+        on_hup    => $args->{on_hup}    || $args->{hup_cb},
+        on_read   => $args->{on_read}   || $args->{read_cb},
+    };
+    (my $id) = "$c" =~ /0x([\da-f]+)/;
+    $self->{_listen}->{$id} = $c;
+
     # Listen on UNIX domain socket
     my $socket;
     if (defined $file) {
@@ -325,18 +338,11 @@ sub listen {
         $reuse = ",$reuse" if length $ENV{MOJO_REUSE};
         $ENV{MOJO_REUSE} .= "$reuse:$fd";
     }
-    my $id = "$socket";
     $self->{_fds}->{$fd} = $id;
 
-    # Add listen socket
-    my $c = $self->{_listen}->{$id} = {
-        file => $args->{file} ? 1 : 0,
-        on_accept => $args->{on_accept} || $args->{accept_cb} || $args->{cb},
-        on_error  => $args->{on_error}  || $args->{error_cb},
-        on_hup    => $args->{on_hup}    || $args->{hup_cb},
-        on_read   => $args->{on_read}   || $args->{read_cb},
-        socket    => $socket
-    };
+    # Socket
+    $c->{socket} = $socket;
+    $self->{_reverse}->{$socket} = $id;
 
     # TLS options
     $c->{tls} = {
@@ -384,6 +390,9 @@ sub one_tick {
     # Loop
     my $loop = $self->_prepare_loop;
 
+    # Reverse map
+    my $r = $self->{_reverse};
+
     # Events
     my (@error, @hup, @read, @write);
 
@@ -422,16 +431,16 @@ sub one_tick {
         $loop->poll($timeout);
 
         # Read
-        push @read, "$_" for $loop->handles(EPOLL_POLLIN);
+        push @read, $r->{$_} for $loop->handles(EPOLL_POLLIN);
 
         # Write
-        push @write, "$_" for $loop->handles(EPOLL_POLLOUT);
+        push @write, $r->{$_} for $loop->handles(EPOLL_POLLOUT);
 
         # Error
-        push @error, "$_" for $loop->handles(EPOLL_POLLERR);
+        push @error, $r->{$_} for $loop->handles(EPOLL_POLLERR);
 
         # HUP
-        push @hup, "$_" for $loop->handles(EPOLL_POLLHUP);
+        push @hup, $r->{$_} for $loop->handles(EPOLL_POLLHUP);
     }
 
     # Poll
@@ -439,16 +448,16 @@ sub one_tick {
         $loop->poll($timeout);
 
         # Read
-        push @read, "$_" for $loop->handles(POLLIN);
+        push @read, $r->{$_} for $loop->handles(POLLIN);
 
         # Write
-        push @write, "$_" for $loop->handles(POLLOUT);
+        push @write, $r->{$_} for $loop->handles(POLLOUT);
 
         # Error
-        push @error, "$_" for $loop->handles(POLLERR);
+        push @error, $r->{$_} for $loop->handles(POLLERR);
 
         # HUP
-        push @hup, "$_" for $loop->handles(POLLHUP);
+        push @hup, $r->{$_} for $loop->handles(POLLHUP);
     }
 
     # Read
@@ -536,6 +545,7 @@ sub start_tls {
     my $fd = fileno $socket;
 
     # Cleanup
+    delete $self->{_reverse}->{$socket};
     my $writing = delete $c->{writing};
     my $loop    = $self->_prepare_loop;
     if (KQUEUE) {
@@ -548,18 +558,13 @@ sub start_tls {
     $self->drop($id) and return
       unless my $new = IO::Socket::SSL->start_SSL($socket, %options);
 
-    # Update file descriptor
-    delete $self->{_fds}->{$fd};
-    $fd = fileno $new;
-    $self->{_fds}->{$fd} = "$new";
-
     # Upgrade
-    $c->{socket}         = $new;
-    $self->{_cs}->{$new} = delete $self->{_cs}->{$id};
-    $c->{tls_connect}    = 1;
-    $self->_writing("$new");
+    $c->{socket}              = $new;
+    $self->{_reverse}->{$new} = $id;
+    $c->{tls_connect}         = 1;
+    $self->_writing($id);
 
-    return "$new";
+    return $id;
 }
 
 sub stop { delete shift->{_running} }
@@ -590,7 +595,7 @@ sub timer {
     my $timer = {after => $after, cb => $cb, started => time};
 
     # Add timer
-    my $id = "$timer";
+    (my $id) = "$timer" =~ /0x([\da-f]+)/;
     $self->{_ts}->{$id} = $timer;
 
     return $id;
@@ -632,11 +637,22 @@ sub _accept {
     # Unlock
     $self->on_unlock->($self);
 
+    # Reverse map
+    my $r = $self->{_reverse};
+
     # Listen
-    my $l = $self->{_listen}->{$listen};
+    my $l = $self->{_listen}->{$r->{$listen}};
 
     # Weaken
     weaken $self;
+
+    # Connection
+    my $c = {
+        accepting => 1,
+        buffer    => b(),
+    };
+    (my $id) = "$c" =~ /0x([\da-f]+)/;
+    $self->{_cs}->{$id} = $c;
 
     # TLS handshake
     my $tls = $l->{tls};
@@ -644,15 +660,9 @@ sub _accept {
         $tls->{SSL_error_trap} = sub { $self->_drop_immediately(shift) };
         $socket = IO::Socket::SSL->start_SSL($socket, %$tls);
     }
-
-    # Add connection
-    my $id = "$socket";
-    my $c = $self->{_cs}->{$id} = {
-        accepting => 1,
-        buffer    => b(),
-        socket    => $socket
-    };
     $c->{tls_accept} = 1 if $tls;
+    $c->{socket}     = $socket;
+    $r->{$socket}    = $id;
 
     # Timeout
     $c->{accept_timer} =
@@ -720,6 +730,7 @@ sub _drop_immediately {
 
     # Delete connection
     my $c = delete $self->{_cs}->{$id};
+    delete $self->{_reverse}->{$id};
 
     # Drop listen socket
     if (!$c && ($c = delete $self->{_listen}->{$id})) {

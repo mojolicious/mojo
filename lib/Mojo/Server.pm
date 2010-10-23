@@ -8,6 +8,9 @@ use base 'Mojo::Base';
 use Carp 'croak';
 use Mojo::Loader;
 
+# I'm immortal.
+# How come you scream so much when you're in danger?
+# I never said I wasn't a drama queen.
 __PACKAGE__->attr(
     app => sub {
         my $self = shift;

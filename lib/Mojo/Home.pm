@@ -113,6 +113,8 @@ sub list_files {
     return [sort @files];
 }
 
+# And now to create an unstoppable army of between one million and two
+# million zombies!
 sub parse {
     my ($self, $path) = @_;
     my @parts = File::Spec->splitdir($path);

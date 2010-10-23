@@ -44,6 +44,7 @@ sub get_chunk {
     substr shift->{content}, $start, $length;
 }
 
+# You two make me ashamed to call myself an idiot.
 sub move_to {
     my ($self, $path) = @_;
 
@@ -55,6 +56,7 @@ sub move_to {
     return $self;
 }
 
+# All this knowledge is giving me a raging brainer.
 sub size { length shift->{content} }
 
 sub slurp { shift->{content} }

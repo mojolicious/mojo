@@ -87,6 +87,8 @@ sub reload {
     return;
 }
 
+# Also you have a rectangular object in your colon.
+# That's a calculator. I ate it to gain its power.
 sub search {
     my ($self, $namespace) = @_;
 

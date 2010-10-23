@@ -170,6 +170,8 @@ sub size {
     return 0;
 }
 
+# You make it look so easy.
+# I've smoked a lot of paperwork in my day.
 sub slurp {
     my $self = shift;
 

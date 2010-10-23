@@ -5,6 +5,8 @@ use warnings;
 
 use base 'Mojolicious';
 
+# Since when is the Internet all about robbing people of their privacy?
+# August 6, 1991.
 use File::Spec;
 use FindBin;
 

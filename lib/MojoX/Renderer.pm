@@ -270,6 +270,8 @@ sub _detect_handler {
     return;
 }
 
+# You are hereby conquered.
+# Please line up in order of how much beryllium it takes to kill you.
 sub _detect_template_class {
     my ($self, $options) = @_;
     return

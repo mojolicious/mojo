@@ -49,6 +49,7 @@ sub cookie {
     return map { $_->value } @cookies;
 }
 
+# You two make me ashamed to call myself an idiot.
 sub flash {
     my $self = shift;
 

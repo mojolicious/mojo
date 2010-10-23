@@ -39,6 +39,8 @@ our $VERSION  = '0.999931';
 
 our $AUTOLOAD;
 
+# These old doomsday devices are dangerously unstable.
+# I'll rest easier not knowing where they are.
 sub AUTOLOAD {
     my $self = shift;
 
@@ -146,6 +148,8 @@ sub new {
     return $self;
 }
 
+# Amy, technology isn't intrinsically good or evil. It's how it's used.
+# Like the Death Ray.
 sub defaults {
     my $self = shift;
 

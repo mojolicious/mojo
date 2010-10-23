@@ -44,8 +44,6 @@ use strict; use warnings;
 EOF
 $HELPERS =~ s/\n//g;
 
-# Amy, technology isn't intrinsically good or evil. It's how it's used.
-# Like the Death Ray.
 sub build {
     my $self = shift;
 
@@ -426,8 +424,6 @@ sub parse {
     return $self;
 }
 
-# You are hereby conquered.
-# Please line up in order of how much beryllium it takes to kill you.
 sub render {
     my $self = shift;
     my $tmpl = shift;
@@ -497,8 +493,6 @@ sub render_to_file {
     return $self->_write_file($path, $output);
 }
 
-# You called my thesis a fat sack of barf, and then you stole it?
-# Welcome to academia.
 sub _trim_line {
     my ($self, $line, $offset) = @_;
 

@@ -58,6 +58,7 @@ sub _draw {
     }
 }
 
+# I surrender, and volunteer for treason!
 sub _walk {
     my ($self, $node, $depth, $routes) = @_;
 

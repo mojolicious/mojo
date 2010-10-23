@@ -151,8 +151,6 @@ sub children {
     return \@children;
 }
 
-# Dr. Zoidberg, can you note the time and declare the patient legally dead?
-# Can I! That’s my specialty!
 sub find {
     my ($self, $css) = @_;
 
@@ -243,7 +241,6 @@ sub parse {
     $self->tree($self->_parse_xml($xml));
 }
 
-# I surrender, and volunteer for treason!
 sub replace {
     my ($self, $new) = @_;
 
@@ -281,9 +278,6 @@ sub replace {
     return $self;
 }
 
-# On the count of three, you will awaken feeling refreshed,
-# as if Futurama had never been canceled by idiots,
-# then brought back by bigger idiots. One. Two.
 sub replace_inner {
     my ($self, $new) = @_;
 
@@ -307,7 +301,6 @@ sub replace_inner {
     return $self;
 }
 
-# I wax my rocket every day!
 sub root {
     my $self = shift;
 

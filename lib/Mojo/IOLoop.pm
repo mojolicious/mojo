@@ -144,9 +144,6 @@ sub new {
     return $self;
 }
 
-# Is there an app for kissing my shiny metal ass?
-# Several!
-# Oooh!
 sub connect {
     my $self = shift;
 
@@ -514,8 +511,6 @@ sub start {
     return $self;
 }
 
-# Since when is the Internet all about robbing people of their privacy?
-# August 6, 1991.
 sub start_tls {
     my $self = shift;
     my $id   = shift;
@@ -569,8 +564,6 @@ sub start_tls {
 
 sub stop { delete shift->{_running} }
 
-# Is all the work done by the children?
-# No, not the whipping.
 sub test {
     my ($self, $id) = @_;
 
@@ -590,8 +583,6 @@ sub test {
     return !$result;
 }
 
-# These old doomsday devices are dangerously unstable.
-# I'll rest easier not knowing where they are.
 sub timer {
     my ($self, $after, $cb) = @_;
 
@@ -716,8 +707,6 @@ sub _add_event {
     return $self;
 }
 
-# If you hate intolerance and being punched in the face by me,
-# please support Proposition Infinity.
 sub _drop_immediately {
     my ($self, $id) = @_;
 
@@ -1033,7 +1022,6 @@ sub _prepare_loop {
     return $self->{_loop};
 }
 
-# My parents may be evil, but at least they're stupid.
 sub _read {
     my ($self, $id) = @_;
 
@@ -1196,8 +1184,6 @@ sub _tls_connect {
     else { $self->_error($id, $error) }
 }
 
-# The path to robot hell is paved with human flesh.
-# Neat.
 sub _write {
     my ($self, $id) = @_;
 

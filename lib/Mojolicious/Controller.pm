@@ -17,6 +17,8 @@ require Carp;
 
 our $AUTOLOAD;
 
+# Is all the work done by the children?
+# No, not the whipping.
 sub AUTOLOAD {
     my $self = shift;
 
@@ -35,6 +37,7 @@ sub DESTROY { }
 
 sub client { shift->app->client }
 
+# Something's wrong, she's not responding to my poking stick.
 sub finish {
     my $self = shift;
 
@@ -59,6 +62,7 @@ sub helper {
     return $self->$name(@_);
 }
 
+# My parents may be evil, but at least they're stupid.
 sub on_finish {
     my ($self, $cb) = @_;
 
@@ -66,6 +70,9 @@ sub on_finish {
     $self->tx->on_finish(sub { shift and $self->$cb(@_) });
 }
 
+# Stop being such a spineless jellyfish!
+# You know full well I'm more closely related to the sea cucumber.
+# Not where it counts.
 sub on_message {
     my $self = shift;
 
@@ -88,6 +95,9 @@ sub on_message {
     return $self;
 }
 
+# Is there an app for kissing my shiny metal ass?
+# Several!
+# Oooh!
 sub redirect_to {
     my $self = shift;
 
@@ -184,6 +194,8 @@ sub render_data {
     return $self->render($args);
 }
 
+# The path to robot hell is paved with human flesh.
+# Neat.
 sub render_exception {
     my ($self, $e) = @_;
 
@@ -228,6 +240,8 @@ sub render_inner {
     return Mojo::ByteStream->new("$content");
 }
 
+# If you hate intolerance and being punched in the face by me,
+# please support Proposition Infinity.
 sub render_json {
     my $self = shift;
     my $json = shift;
@@ -262,6 +276,8 @@ sub render_not_found {
     $self->rendered;
 }
 
+# You called my thesis a fat sack of barf, and then you stole it?
+# Welcome to academia.
 sub render_partial {
     my $self = shift;
 
@@ -309,6 +325,9 @@ sub render_text {
     return $self->render($args);
 }
 
+# On the count of three, you will awaken feeling refreshed,
+# as if Futurama had never been canceled by idiots,
+# then brought back by bigger idiots. One. Two.
 sub rendered {
     my $self = shift;
 
@@ -358,6 +377,12 @@ sub send_message {
     return $self;
 }
 
+# Behold, a time traveling machine.
+# Time? I can't go back there!
+# Ah, but this machine only goes forward in time.
+# That way you can't accidentally change history or do something disgusting
+# like sleep with your own grandmother.
+# I wouldn't want to do that again.
 sub url_for {
     my $self = shift;
     my $target = shift || '';
@@ -379,6 +404,7 @@ sub url_for {
     return $self->match->url_for($target, @_);
 }
 
+# I wax my rocket every day!
 sub write {
     my ($self, $chunk, $cb) = @_;
 
@@ -405,6 +431,9 @@ sub write {
     $self->rendered;
 }
 
+# This calls for a party, baby.
+# I'm ordering 100 kegs, 100 hookers and 100 Elvis impersonators that aren't
+# above a little hooking should the occasion arise.
 sub write_chunk {
     my ($self, $chunk, $cb) = @_;
 

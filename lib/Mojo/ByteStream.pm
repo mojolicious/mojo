@@ -495,9 +495,6 @@ sub hmac_md5_sum { shift->_hmac(\&_md5, @_) }
 
 sub hmac_sha1_sum { shift->_hmac(\&_sha1, @_) }
 
-# Stop being such a spineless jellyfish!
-# You know full well I'm more closely related to the sea cucumber.
-# Not where it counts.
 sub html_escape {
     my $self = shift;
 

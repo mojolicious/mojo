@@ -269,7 +269,6 @@ sub set_cookie  { scalar shift->header('Set-Cookie'  => @_) }
 sub set_cookie2 { scalar shift->header('Set-Cookie2' => @_) }
 sub status      { scalar shift->header(Status        => @_) }
 
-# Something's wrong, she's not responding to my poking stick.
 sub to_hash {
     my $self   = shift;
     my %params = @_;

@@ -14,6 +14,8 @@ __PACKAGE__->attr([qw/children conditions/] => sub { [] });
 __PACKAGE__->attr(dictionary                => sub { {} });
 __PACKAGE__->attr(pattern => sub { MojoX::Routes::Pattern->new });
 
+# Yet thanks to my trusty safety sphere,
+# I sublibed with only tribial brain dablage.
 sub new {
     my $self = shift->SUPER::new();
 
@@ -95,6 +97,8 @@ sub is_websocket {
     return;
 }
 
+# Dr. Zoidberg, can you note the time and declare the patient legally dead?
+# Can I! That’s my specialty!
 sub name {
     my ($self, $name) = @_;
 

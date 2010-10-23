@@ -88,12 +88,6 @@ sub remote_address {
 sub req { croak 'Method "req" not implemented by subclass' }
 sub res { croak 'Method "res" not implemented by subclass' }
 
-# Behold, a time traveling machine.
-# Time? I can't go back there!
-# Ah, but this machine only goes forward in time.
-# That way you can't accidentally change history or do something disgusting
-# like sleep with your own grandmother.
-# I wouldn't want to do that again.
 sub resume {
     my $self = shift;
 

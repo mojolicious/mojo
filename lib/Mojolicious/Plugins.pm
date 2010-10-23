@@ -25,6 +25,8 @@ sub add_hook {
     return $self;
 }
 
+# Also you have a rectangular object in your colon.
+# That's a calculator. I ate it to gain its power.
 sub load_plugin {
     my ($self, $name) = @_;
 

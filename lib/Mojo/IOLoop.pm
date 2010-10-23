@@ -569,7 +569,7 @@ sub start_tls {
 
 sub stop { delete shift->{_running} }
 
-#  Is all the work done by the children?
+# Is all the work done by the children?
 # No, not the whipping.
 sub test {
     my ($self, $id) = @_;

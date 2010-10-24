@@ -166,6 +166,9 @@ sub url_for {
         }
     }
 
+    # Captures
+    my $captures = $self->captures;
+
     # Named
     if ($name) {
 
@@ -174,13 +177,14 @@ sub url_for {
 
         # Find
         else {
+            $captures = {};
             croak qq/Route "$name" used in url_for does not exist/
               unless $endpoint = $self->_find_route($name);
         }
     }
 
     # Merge values
-    $values = {%{$self->captures}, format => undef, %$values};
+    $values = {%$captures, format => undef, %$values};
 
     # URL
     my $url = Mojo::URL->new;

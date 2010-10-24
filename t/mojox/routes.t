@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 203;
+use Test::More tests => 205;
 
 use Mojo::Transaction::HTTP;
 
@@ -179,7 +179,10 @@ is $m->stack->[1]->{action},     'edit',     'right value';
 is $m->stack->[1]->{format},     'html',     'right value';
 is $m->url_for, '/articles/1/edit', 'right URL';
 is $m->url_for(format => 'html'), '/articles/1/edit.html', 'right URL';
-is $m->url_for('articles_delete', format => undef), '/articles/1/delete',
+is $m->url_for('articles_delete', format => undef), '/articles/delete',
+  'right URL';
+is $m->url_for('articles_delete'), '/articles/delete', 'right URL';
+is $m->url_for('articles_delete', id => 12), '/articles/12/delete',
   'right URL';
 is @{$m->stack}, 2, 'right number of elements';
 $tx = Mojo::Transaction::HTTP->new;

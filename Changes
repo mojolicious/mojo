@@ -10,6 +10,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Default to silent tests in Test::Mojo.
         - Fixed optional value support in Mojo::Cookie.
         - Fixed shortcut methods in Mojo::Headers to not be context aware.
+        - Fixed url_for to not inherit captures for new endpoints.
 
 0.999930 2010-10-18 00:00:00
         - Code name "Hot Beverage", this is a major release.

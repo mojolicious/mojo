@@ -13,13 +13,32 @@ use Mojo::Path;
 __PACKAGE__->attr([qw/fragment host port scheme userinfo/]);
 __PACKAGE__->attr(base => sub { Mojo::URL->new });
 
-# RFC 3986
+# Characters (RFC 3986)
 our $UNRESERVED = 'A-Za-z0-9\-\.\_\~';
 our $SUBDELIM   = '!\$\&\'\(\)\*\+\,\;\=';
 our $PCHAR      = "$UNRESERVED$SUBDELIM\%\:\@";
 
 # The specs for this are blurry, it's mostly a collection of w3c suggestions
 our $PARAM = "$UNRESERVED\!\$\'\(\)\*\,\:\@\/\?";
+
+# IPv4 regex (RFC 3986)
+my $DEC_OCTET_RE = qr/(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])/;
+our $IPV4_RE = qr/$DEC_OCTET_RE\.$DEC_OCTET_RE\.$DEC_OCTET_RE\.$DEC_OCTET_RE/;
+
+# IPv6 regex (RFC 3986)
+my $H16_RE  = qr/[0-9A-Fa-f]{1,4}/;
+my $LS32_RE = qr/(?:$H16_RE:$H16_RE|$IPV4_RE)/;
+our $IPV6_RE = qr/(?:
+                                             (?: $H16_RE : ){6} $LS32_RE
+    |                                     :: (?: $H16_RE : ){5} $LS32_RE
+    | (?:                      $H16_RE )? :: (?: $H16_RE : ){4} $LS32_RE
+    | (?: (?: $H16_RE : ){0,1} $H16_RE )? :: (?: $H16_RE : ){3} $LS32_RE
+    | (?: (?: $H16_RE : ){0,2} $H16_RE )? :: (?: $H16_RE : ){2} $LS32_RE
+    | (?: (?: $H16_RE : ){0,3} $H16_RE )? ::     $H16_RE :      $LS32_RE
+    | (?: (?: $H16_RE : ){0,4} $H16_RE )? ::                    $LS32_RE
+    | (?: (?: $H16_RE : ){0,5} $H16_RE )? ::                    $H16_RE
+    | (?: (?: $H16_RE : ){0,6} $H16_RE )? ::
+)/x;
 
 sub new {
     my $self = shift->SUPER::new();
@@ -124,6 +143,16 @@ sub ihost {
 sub is_abs {
     my $self = shift;
     return 1 if $self->scheme && $self->authority;
+    return;
+}
+
+sub is_ipv4 {
+    return 1 if shift->host =~ $IPV4_RE;
+    return;
+}
+
+sub is_ipv6 {
+    return 1 if shift->host =~ $IPV6_RE;
     return;
 }
 
@@ -417,6 +446,20 @@ Host part of this URL in punycode format.
     my $is_abs = $url->is_abs;
 
 Check if URL is absolute.
+
+=head2 C<is_ipv4>
+
+    my $is_ipv4 = $url->is_ipv4;
+
+Check if C<host> is an C<IPv4> address.
+Note that this method is EXPERIMENTAL and might change without warning!
+
+=head2 C<is_ipv6>
+
+    my $is_ipv6 = $url->is_ipv6;
+
+Check if C<host> is an C<IPv6> address.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<parse>
 

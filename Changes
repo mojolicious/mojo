@@ -4,6 +4,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Removed tag helpers label and img.
         - Renamed tag helper script to javascript and added CDATA support.
         - Renamed tag helper input to input_tag.
+        - Added EXPERIMENTAL non blocking DNS support to Mojo::IOLoop.
+          (und3f)
         - Added EXPERIMENTAL support for IPv4 and IPv6 addess checks to
           Mojo::URL.
         - Added stylesheet tag helper.

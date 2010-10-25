@@ -12,11 +12,13 @@ use IO::File;
 use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
 use IO::Socket;
 use Mojo::ByteStream 'b';
+use Mojo::URL;
 use Scalar::Util 'weaken';
 use Socket qw/IPPROTO_TCP TCP_NODELAY/;
 use Time::HiRes 'time';
 
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 262144;
+# Debug
+use constant DEBUG => $ENV{MOJO_IOLOOP_DEBUG} || 0;
 
 # Epoll support requires IO::Epoll
 use constant EPOLL => ($ENV{MOJO_POLL} || $ENV{MOJO_KQUEUE})
@@ -98,8 +100,34 @@ AnqxHi90n/p912ynLg2SjBq+03GaECeGzC/QqKK2gtA=
 -----END RSA PRIVATE KEY-----
 EOF
 
-__PACKAGE__->attr([qw/accept_timeout connect_timeout/] => 5);
-__PACKAGE__->attr(max_connections                      => 1000);
+# DNS server (default to Google Public DNS)
+our $DNS_SERVER = '8.8.8.8';
+
+# Try to detect DNS server
+if (-r '/etc/resolv.conf') {
+    my $file = IO::File->new;
+    $file->open('< /etc/resolv.conf');
+    for my $line (<$file>) {
+        if ($line =~ /^nameserver\s+(\S+)$/) {
+
+            # New DNS server
+            $DNS_SERVER = $1;
+
+            # Debug
+            warn qq/DETECTED DNS SERVER $DNS_SERVER\n/ if DEBUG;
+        }
+    }
+}
+
+# DNS record types
+my $DNS_TYPES = {
+    A    => 0x0001,
+    AAAA => 0x001c
+};
+
+__PACKAGE__->attr([qw/accept_timeout connect_timeout dns_timeout/] => 3);
+__PACKAGE__->attr(dns_server => sub { $ENV{MOJO_DNS_SERVER} || $DNS_SERVER });
+__PACKAGE__->attr(max_connections => 1000);
 __PACKAGE__->attr([qw/on_idle on_tick/]);
 __PACKAGE__->attr(
     [qw/on_lock on_unlock/] => sub {
@@ -156,15 +184,6 @@ sub connect {
     # Protocol
     $args->{proto} ||= 'tcp';
 
-    # Options
-    my %options = (
-        PeerAddr => $args->{address},
-        PeerPort => $args->{port} || ($args->{tls} ? 443 : 80),
-        Proto    => $args->{proto},
-        Type     => $args->{proto} eq 'udp' ? SOCK_DGRAM : SOCK_STREAM,
-        %{$args->{args} || {}}
-    );
-
     # Connection
     my $c = {
         buffer     => b(),
@@ -176,27 +195,6 @@ sub connect {
     (my $id) = "$c" =~ /0x([\da-f]+)/;
     $self->{_cs}->{$id} = $c;
 
-    # Socket
-    my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';
-    return unless my $socket = $args->{socket} || $class->new(%options);
-    $c->{socket} = $socket;
-    $self->{_reverse}->{$socket} = $id;
-
-    # File descriptor
-    return unless defined(my $fd = fileno $socket);
-    $self->{_fds}->{$fd} = $id;
-
-    # Non blocking
-    $socket->blocking(0);
-
-    # Disable Nagle's algorithm
-    setsockopt $socket, IPPROTO_TCP, TCP_NODELAY, 1;
-
-    # Timeout
-    $c->{connect_timer} =
-      $self->timer($self->connect_timeout =>
-          sub { shift->_error($id, 'Connect timeout.') });
-
     # Register callbacks
     for my $name (qw/error hup read/) {
         my $cb = $args->{"on_$name"} || $args->{"${name}_cb"};
@@ -204,11 +202,19 @@ sub connect {
         $self->$event($id => $cb) if $cb;
     }
 
-    # Add socket to poll
-    $self->_not_writing($id);
+    # Lookup
+    if (my $address = $args->{address}) {
+        $self->lookup(
+            $address => sub {
+                my $self = shift;
+                $args->{address} = shift || $args->{address};
+                $self->_connect($id, $args);
+            }
+        );
+    }
 
-    # Start TLS
-    if ($args->{tls}) { return unless $id = $self->start_tls($id => $args) }
+    # Connect
+    else { $self->_connect($id, $args) }
 
     return $id;
 }
@@ -371,6 +377,35 @@ sub local_info {
     return {address => $socket->sockhost, port => $socket->sockport};
 }
 
+sub lookup {
+    my ($self, $name, $cb) = @_;
+
+    # IPv4
+    $self->resolve(
+        $name, 'A',
+        sub {
+            my ($self, $results) = @_;
+
+            # Success
+            return $self->$cb($results->[0]) if $results->[0];
+
+            # IPv6
+            $self->resolve(
+                $name, 'AAAA',
+                sub {
+                    my ($self, $results) = @_;
+
+                    # Success
+                    return $self->$cb($results->[0]) if $results->[0];
+
+                    # Pass through
+                    $self->$cb();
+                }
+            );
+        }
+    );
+}
+
 sub on_error { shift->_add_event('error', @_) }
 sub on_hup   { shift->_add_event('hup',   @_) }
 sub on_read  { shift->_add_event('read',  @_) }
@@ -501,6 +536,138 @@ sub remote_info {
 
     # Info
     return {address => $socket->peerhost, port => $socket->peerport};
+}
+
+sub resolve {
+    my ($self, $name, $type, $cb) = @_;
+
+    # Regex
+    my $ipv4 = $Mojo::URL::IPV4_RE;
+    my $ipv6 = $Mojo::URL::IPV6_RE;
+
+    # Type
+    my $t = $DNS_TYPES->{$type};
+
+    # Server
+    my $server = $self->dns_server;
+
+    # Resolve?
+    if ($server && $t && $name !~ $ipv4 && $name !~ $ipv6) {
+
+        # Debug
+        warn "RESOLVE $type $name ($server)\n" if DEBUG;
+
+        # Timer
+        my $timer;
+
+        # Transaction
+        my $tx = int rand 0x10000;
+
+        # Request
+        my $id = $self->connect(
+            address    => $server,
+            port       => 53,
+            proto      => 'udp',
+            on_connect => sub {
+                my ($self, $id) = @_;
+
+                # Header (one question with recursion)
+                my $req = pack 'nnnnnn', $tx, 0x0100, 1, 0, 0, 0;
+
+                # Query (Internet)
+                for my $part (split /\./, $name) {
+                    $req .= pack 'C/a', $part if defined $part;
+                }
+                $req .= pack 'Cnn', 0, $t, 0x0001;
+
+                # Write
+                $self->write($id => $req);
+            },
+            on_error => sub {
+                my ($self, $id) = @_;
+
+                # Debug
+                warn "FAILED $type $name ($server)\n" if DEBUG;
+
+                $self->drop($timer) if $timer;
+                $self->$cb([]);
+            },
+            on_read => sub {
+                my ($self, $id, $chunk) = @_;
+
+                # Timer
+                $self->drop($timer) if $timer;
+
+                # Packet
+                my @packet = unpack 'nnnnnnA*', $chunk;
+
+                # Answer
+                return $self->$cb([]) unless $packet[0] eq $tx;
+
+                # Content
+                my $content = $packet[6];
+
+                # Questions
+                for (1 .. $packet[2]) {
+                    my $n;
+                    do {
+                        ($n, $content) = unpack 'C/aA*', $content;
+                    } while ($n);
+                    $content = (unpack 'nnA*', $content)[2];
+                }
+
+                # Answers
+                my @answers;
+                for (1 .. $packet[3]) {
+                    my ($t, $a);
+                    ($t, $a, $content) =
+                      (unpack 'nnnNn/AA*', $content)[1, 4, 5];
+
+                    # A
+                    if ($t eq $DNS_TYPES->{A}) {
+                        push @answers, join('.', unpack 'C' . length $a, $a);
+
+                        # Debug
+                        warn join '', 'ANSWER ', $answers[-1], "\n" if DEBUG;
+                    }
+
+                    # AAAA
+                    elsif ($t eq $DNS_TYPES->{AAAA}) {
+                        push @answers, sprintf '%x:%x:%x:%x:%x:%x:%x:%x',
+                          unpack('n' . (length($a) >> 1), $a);
+
+                        # Debug
+                        warn join '', 'ANSWER ', $answers[-1], "\n" if DEBUG;
+                    }
+                }
+
+                # Done
+                $self->$cb(\@answers);
+            }
+        );
+
+        # Timer
+        $timer = $self->timer(
+            $self->dns_timeout => sub {
+                my $self = shift;
+
+                # Debug
+                warn "RESOLVE TIMEOUT $name\n" if DEBUG;
+
+                # Disable
+                $self->dns_server(undef);
+
+                # Abort
+                $self->drop($id);
+                $self->$cb([]);
+            }
+        );
+    }
+
+    # No lookup required or record type not supported
+    else { $self->$cb([]) }
+
+    return $self;
 }
 
 sub singleton { $LOOP ||= shift->new(@_) }
@@ -717,6 +884,49 @@ sub _add_event {
     return $self;
 }
 
+sub _connect {
+    my ($self, $id, $args) = @_;
+
+    # Connection
+    return unless my $c = $self->{_cs}->{$id};
+
+    # Options
+    my %options = (
+        PeerAddr => $args->{address},
+        PeerPort => $args->{port} || ($args->{tls} ? 443 : 80),
+        Proto    => $args->{proto},
+        Type     => $args->{proto} eq 'udp' ? SOCK_DGRAM : SOCK_STREAM,
+        %{$args->{args} || {}}
+    );
+
+    # Socket
+    my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';
+    return unless my $socket = $args->{socket} || $class->new(%options);
+    $c->{socket} = $socket;
+    $self->{_reverse}->{$socket} = $id;
+
+    # File descriptor
+    return unless defined(my $fd = fileno $socket);
+    $self->{_fds}->{$fd} = $id;
+
+    # Non blocking
+    $socket->blocking(0);
+
+    # Disable Nagle's algorithm
+    setsockopt $socket, IPPROTO_TCP, TCP_NODELAY, 1;
+
+    # Timeout
+    $c->{connect_timer} =
+      $self->timer($self->connect_timeout =>
+          sub { shift->_error($id, 'Connect timeout.') });
+
+    # Add socket to poll
+    $self->_not_writing($id);
+
+    # Start TLS
+    if ($args->{tls}) { return unless $id = $self->start_tls($id => $args) }
+}
+
 sub _drop_immediately {
     my ($self, $id) = @_;
 
@@ -907,7 +1117,8 @@ sub _prepare_connect {
     my $c = $self->{_cs}->{$id};
 
     # Not yet connected
-    return unless $c->{socket}->connected;
+    return unless my $socket = $c->{socket};
+    return unless $socket->connected;
 
     # Connected
     delete $c->{connecting};
@@ -1293,7 +1504,7 @@ __END__
 
 =head1 NAME
 
-Mojo::IOLoop - Minimalistic Reactor For TCP Clients And Servers
+Mojo::IOLoop - Minimalistic Reactor For Non Blocking TCP Clients And Servers
 
 =head1 SYNOPSIS
 
@@ -1348,8 +1559,8 @@ Mojo::IOLoop - Minimalistic Reactor For TCP Clients And Servers
 =head1 DESCRIPTION
 
 L<Mojo::IOLoop> is a very minimalistic reactor that has been reduced to the
-absolute minimal feature set required to build solid and scalable TCP clients
-and servers.
+absolute minimal feature set required to build solid and scalable non
+blocking TCP clients and servers.
 
 Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::IP> and
 L<IO::Socket::SSL> are supported transparently and used if installed.
@@ -1367,7 +1578,7 @@ L<Mojo::IOLoop> implements the following attributes.
     $loop       = $loop->accept_timeout(5);
 
 Maximum time in seconds a connection can take to be accepted before being
-dropped, defaults to C<5>.
+dropped, defaults to C<3>.
 
 =head2 C<connect_timeout>
 
@@ -1375,7 +1586,22 @@ dropped, defaults to C<5>.
     $loop       = $loop->connect_timeout(5);
 
 Maximum time in seconds a conenction can take to be connected before being
-dropped, defaults to C<5>.
+dropped, defaults to C<3>.
+
+=head2 C<dns_server>
+
+    my $server = $loop->dns_server;
+    $loop      = $loop->dns_server('8.8.8.8');
+
+C<DNS> server to use for non blocking lookups, defaults to the value of
+C<MOJO_DNS_SERVER>, auto detection or C<8.8.8.8>.
+
+=head2 C<dns_timeout>
+
+    my $timeout = $loop->dns_timeout;
+    $loop       = $loop->dns_timeout(5);
+
+Maximum time in seconds a C<DNS> lookup can take, defaults to C<3>.
 
 =head2 C<max_connections>
 
@@ -1634,6 +1860,18 @@ The local port.
 
 =back
 
+=head2 C<lookup>
+
+    $loop = $loop->lookup('mojolicio.us' => sub {...});
+
+Lookup C<IPv4> or C<IPv6> address for domain.
+Note that this method is EXPERIMENTAL and might change without warning!
+
+    $loop->lookup('mojolicio.us' => sub {
+        my ($loop, $address) = @_;
+        print "Address: $address\n";
+    });
+
 =head2 C<on_error>
 
     $loop = $loop->on_error($id => sub {...});
@@ -1687,6 +1925,14 @@ The remote address.
 The remote port.
 
 =back
+
+=head2 C<resolve>
+
+    $loop = $loop->resolve('mojolicio.us', 'A', sub {...});
+    $loop = $loop->resolve('mojolicio.us', 'AAAA', sub {...});
+
+Resolve domain into C<A> or C<AAAA> records.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<singleton>
 

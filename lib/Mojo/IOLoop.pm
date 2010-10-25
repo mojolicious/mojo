@@ -916,7 +916,7 @@ sub _connect {
     return unless defined(my $fd = fileno $socket);
     $self->{_fds}->{$fd} = $id;
 
-    # Non blocking
+    # Non-blocking
     $socket->blocking(0);
 
     # Disable Nagle's algorithm
@@ -1092,7 +1092,7 @@ sub _prepare_accept {
     # Remove timeout
     $self->_drop_immediately(delete $c->{accept_timer});
 
-    # Non blocking
+    # Non-blocking
     $c->{socket}->blocking(0);
 
     # Add socket to poll
@@ -1506,7 +1506,7 @@ __END__
 
 =head1 NAME
 
-Mojo::IOLoop - Minimalistic Reactor For Non Blocking TCP Clients And Servers
+Mojo::IOLoop - Minimalistic Reactor For Non-Blocking TCP Clients And Servers
 
 =head1 SYNOPSIS
 
@@ -1595,7 +1595,7 @@ dropped, defaults to C<3>.
     my $server = $loop->dns_server;
     $loop      = $loop->dns_server('8.8.8.8');
 
-C<DNS> server to use for non blocking lookups, defaults to the value of
+C<DNS> server to use for non-blocking lookups, defaults to the value of
 C<MOJO_DNS_SERVER>, auto detection or C<8.8.8.8>.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
@@ -1672,7 +1672,7 @@ Note that exceptions in this callback are not captured.
 
 Maximum time in seconds our loop waits for new events to happen, defaults to
 C<0.25>.
-Note that a value of C<0> would make the loop non blocking.
+Note that a value of C<0> would make the loop non-blocking.
 
 =head1 METHODS
 

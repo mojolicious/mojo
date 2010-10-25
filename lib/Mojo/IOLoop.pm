@@ -122,7 +122,8 @@ if (-r '/etc/resolv.conf') {
 # DNS record types
 my $DNS_TYPES = {
     A    => 0x0001,
-    AAAA => 0x001c
+    AAAA => 0x001c,
+    TXT  => 0x0010
 };
 
 __PACKAGE__->attr([qw/accept_timeout connect_timeout dns_timeout/] => 3);
@@ -619,26 +620,31 @@ sub resolve {
                 # Answers
                 my @answers;
                 for (1 .. $packet[3]) {
-                    my ($t, $a);
+                    my ($t, $a, $answer);
                     ($t, $a, $content) =
                       (unpack 'nnnNn/AA*', $content)[1, 4, 5];
 
                     # A
                     if ($t eq $DNS_TYPES->{A}) {
-                        push @answers, join('.', unpack 'C' . length $a, $a);
-
-                        # Debug
-                        warn join '', 'ANSWER ', $answers[-1], "\n" if DEBUG;
+                        $answer = join('.', unpack 'C*', $a);
                     }
 
                     # AAAA
                     elsif ($t eq $DNS_TYPES->{AAAA}) {
-                        push @answers, sprintf '%x:%x:%x:%x:%x:%x:%x:%x',
-                          unpack('n' . (length($a) >> 1), $a);
-
-                        # Debug
-                        warn join '', 'ANSWER ', $answers[-1], "\n" if DEBUG;
+                        $answer = sprintf '%x:%x:%x:%x:%x:%x:%x:%x',
+                          unpack('n*', $a);
                     }
+
+                    # TXT
+                    elsif ($t eq $DNS_TYPES->{TXT}) {
+                        $answer = unpack '(C/a*)*', $a;
+                    }
+
+                    next unless defined $answer;
+                    push @answers, $answer;
+
+                    # Debug
+                    warn "ANSWER $answer\n" if DEBUG;
                 }
 
                 # Done
@@ -1931,9 +1937,8 @@ The remote port.
 =head2 C<resolve>
 
     $loop = $loop->resolve('mojolicio.us', 'A', sub {...});
-    $loop = $loop->resolve('mojolicio.us', 'AAAA', sub {...});
 
-Resolve domain into C<A> or C<AAAA> records.
+Resolve domain into C<A>, C<AAAA> or C<TXT> records.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<singleton>

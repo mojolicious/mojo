@@ -652,7 +652,7 @@ sub resolve {
                 my $self = shift;
 
                 # Debug
-                warn "RESOLVE TIMEOUT $name\n" if DEBUG;
+                warn "RESOLVE TIMEOUT ($server)\n" if DEBUG;
 
                 # Disable
                 $self->dns_server(undef);

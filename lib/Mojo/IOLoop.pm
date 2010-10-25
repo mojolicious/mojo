@@ -126,6 +126,9 @@ my $DNS_TYPES = {
     TXT  => 0x0010
 };
 
+# "localhost"
+our $LOCALHOST = '127.0.0.1';
+
 __PACKAGE__->attr([qw/accept_timeout connect_timeout dns_timeout/] => 3);
 __PACKAGE__->attr(dns_server => sub { $ENV{MOJO_DNS_SERVER} || $DNS_SERVER });
 __PACKAGE__->attr(max_connections => 1000);
@@ -380,6 +383,9 @@ sub local_info {
 
 sub lookup {
     my ($self, $name, $cb) = @_;
+
+    # "localhost"
+    return $self->$cb($LOCALHOST) if $name eq 'localhost';
 
     # IPv4
     $self->resolve(

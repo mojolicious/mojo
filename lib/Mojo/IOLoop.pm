@@ -1595,6 +1595,7 @@ dropped, defaults to C<3>.
 
 C<DNS> server to use for non blocking lookups, defaults to the value of
 C<MOJO_DNS_SERVER>, auto detection or C<8.8.8.8>.
+Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<dns_timeout>
 
@@ -1602,6 +1603,7 @@ C<MOJO_DNS_SERVER>, auto detection or C<8.8.8.8>.
     $loop       = $loop->dns_timeout(5);
 
 Maximum time in seconds a C<DNS> lookup can take, defaults to C<3>.
+Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<max_connections>
 

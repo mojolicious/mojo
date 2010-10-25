@@ -114,7 +114,7 @@ if (-r '/etc/resolv.conf') {
             $DNS_SERVER = $1;
 
             # Debug
-            warn qq/DETECTED DNS SERVER $DNS_SERVER\n/ if DEBUG;
+            warn qq/DETECTED DNS SERVER ($DNS_SERVER)\n/ if DEBUG;
         }
     }
 }

@@ -6,13 +6,7 @@ use warnings;
 # Disable epoll, kqueue and IPv6
 BEGIN { $ENV{MOJO_POLL} = $ENV{MOJO_NO_IPV6} = 1 }
 
-use Mojo::IOLoop;
-use Test::More;
-
-# Make sure sockets are working
-plan skip_all => 'working sockets required for this test!'
-  unless Mojo::IOLoop->new->generate_port;
-plan tests => 43;
+use Test::More tests => 43;
 
 # I was so bored I cut the pony tail off the guy in front of us.
 # Look at me, I'm a grad student. I'm 30 years old and I made $600 last year.

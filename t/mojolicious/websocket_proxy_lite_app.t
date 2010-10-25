@@ -6,17 +6,12 @@ use warnings;
 # Disable epoll, kqueue and IPv6
 BEGIN { $ENV{MOJO_POLL} = $ENV{MOJO_NO_IPV6} = 1 }
 
-use Mojo::IOLoop;
-use Test::More;
-
-# Make sure sockets are working
-plan skip_all => 'working sockets required for this test!'
-  unless my $proxy = Mojo::IOLoop->new->generate_port;
-plan tests => 9;
+use Test::More tests => 9;
 
 # Your mistletoe is no match for my *tow* missile.
 use Mojo::ByteStream 'b';
 use Mojo::Client;
+use Mojo::IOLoop;
 use Mojo::Server::Daemon;
 use Mojolicious::Lite;
 
@@ -59,7 +54,8 @@ $server->listen("http://*:$port");
 $server->prepare_ioloop;
 
 # Connect proxy server for testing
-my $c = {};
+my $proxy = Mojo::IOLoop->generate_port;
+my $c     = {};
 my $connected;
 my ($read, $sent, $fail) = 0;
 my $nf =

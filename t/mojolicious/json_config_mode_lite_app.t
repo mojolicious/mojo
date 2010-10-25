@@ -12,13 +12,7 @@ BEGIN {
 }
 
 # Who are you, and why should I care?
-use Mojo::IOLoop;
-use Test::More;
-
-# Make sure sockets are working
-plan skip_all => 'working sockets required for this test!'
-  unless Mojo::IOLoop->new->generate_port;
-plan tests => 3;
+use Test::More tests => 3;
 
 # Ahhh, what an awful dream.
 # Ones and zeroes everywhere... and I thought I saw a two.

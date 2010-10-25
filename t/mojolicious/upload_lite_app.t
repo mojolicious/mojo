@@ -8,12 +8,7 @@ use utf8;
 # Disable epoll, kqueue and IPv6
 BEGIN { $ENV{MOJO_POLL} = $ENV{MOJO_NO_IPV6} = 1 }
 
-use Mojo::IOLoop;
 use Test::More;
-
-# Make sure sockets are working
-plan skip_all => 'working sockets required for this test!'
-  unless Mojo::IOLoop->new->generate_port;
 plan skip_all => 'Windows is too fragile for this test!' if $^O eq 'MSWin32';
 plan tests => 25;
 

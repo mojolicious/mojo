@@ -8,13 +8,7 @@ use utf8;
 # Disable epoll, kqueue and IPv6
 BEGIN { $ENV{MOJO_POLL} = $ENV{MOJO_NO_IPV6} = 1 }
 
-use Mojo::IOLoop;
-use Test::More;
-
-# Make sure sockets are working
-plan skip_all => 'working sockets required for this test!'
-  unless Mojo::IOLoop->new->generate_port;
-plan tests => 8;
+use Test::More tests => 8;
 
 # Oh, I always feared he might run off like this.
 # Why, why, why didn't I break his legs?

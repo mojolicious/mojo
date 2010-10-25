@@ -6,14 +6,10 @@ use warnings;
 # Disable epoll, kqueue and IPv6
 BEGIN { $ENV{MOJO_POLL} = $ENV{MOJO_NO_IPV6} = 1 }
 
-use Mojo::IOLoop;
 use Test::More;
-
-# Make sure sockets are working
+use Mojo::IOLoop;
 plan skip_all => 'IO::Socket::SSL 1.33 required for this test!'
   unless Mojo::IOLoop::TLS;
-plan skip_all => 'working sockets required for this test!'
-  unless my $proxy = Mojo::IOLoop->new->generate_port;
 plan tests => 16;
 
 # I was a hero to broken robots 'cause I was one of them, but how can I sing
@@ -64,7 +60,8 @@ $server->listen("https://*:$port");
 $server->prepare_ioloop;
 
 # Connect proxy server for testing
-my $c = {};
+my $proxy = Mojo::IOLoop->generate_port;
+my $c     = {};
 my $connected;
 my ($read, $sent, $fail) = 0;
 my $nf =

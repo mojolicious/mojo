@@ -191,8 +191,8 @@ sub connect {
         on_connect => $args->{on_connect}
           || $args->{connect_cb}
           || $args->{cb},
-        connecting => 1,
     };
+    $c->{connecting} = 1 unless $args->{socket};
     (my $id) = "$c" =~ /0x([\da-f]+)/;
     $self->{_cs}->{$id} = $c;
 
@@ -922,16 +922,28 @@ sub _connect {
     # Disable Nagle's algorithm
     setsockopt $socket, IPPROTO_TCP, TCP_NODELAY, 1;
 
-    # Timeout
-    $c->{connect_timer} =
-      $self->timer($self->connect_timeout =>
-          sub { shift->_error($id, 'Connect timeout.') });
-
     # Add socket to poll
     $self->_not_writing($id);
 
+    # Waiting
+    if ($c->{connecting}) {
+
+        # Timer
+        $c->{connect_timer} =
+          $self->timer($self->connect_timeout =>
+              sub { shift->_error($id, 'Connect timeout.') });
+    }
+
+    # Already connected
+    else {
+
+        # Connect callback
+        my $cb = $c->{on_connect};
+        $self->_run_event('connect', $cb, $id) if $cb;
+    }
+
     # Start TLS
-    if ($args->{tls}) { return unless $id = $self->start_tls($id => $args) }
+    if ($args->{tls}) { $self->start_tls($id => $args) }
 }
 
 sub _drop_immediately {

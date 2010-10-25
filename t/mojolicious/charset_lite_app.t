@@ -8,13 +8,7 @@ use utf8;
 # Disable epoll, kqueue and IPv6
 BEGIN { $ENV{MOJO_POLL} = $ENV{MOJO_NO_IPV6} = 1 }
 
-use Mojo::IOLoop;
-use Test::More;
-
-# Make sure sockets are working
-plan skip_all => 'working sockets required for this test!'
-  unless Mojo::IOLoop->new->generate_port;
-plan tests => 38;
+use Test::More tests => 38;
 
 # In the game of chess you can never let your adversary see your pieces.
 use Mojo::ByteStream 'b';

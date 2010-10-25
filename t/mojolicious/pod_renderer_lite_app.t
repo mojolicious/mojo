@@ -6,12 +6,7 @@ use warnings;
 # Disable epoll, kqueue and IPv6
 BEGIN { $ENV{MOJO_POLL} = $ENV{MOJO_NO_IPV6} = 1 }
 
-use Mojo::IOLoop;
 use Test::More;
-
-# Make sure sockets are working
-plan skip_all => 'working sockets required for this test!'
-  unless Mojo::IOLoop->new->generate_port;
 plan skip_all => 'Perl 5.10 required for this test!'
   unless eval { require Pod::Simple::HTML; 1 };
 plan tests => 10;

@@ -596,7 +596,8 @@ sub resolve {
             on_read => sub {
                 my ($self, $id, $chunk) = @_;
 
-                # Timer
+                # Cleanup
+                $self->drop($id);
                 $self->drop($timer) if $timer;
 
                 # Packet

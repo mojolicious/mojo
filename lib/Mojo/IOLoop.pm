@@ -192,7 +192,7 @@ sub connect {
           || $args->{connect_cb}
           || $args->{cb},
     };
-    $c->{connecting} = 1 unless $args->{handle};
+    $c->{connecting} = 1 unless $args->{socket};
     (my $id) = "$c" =~ /0x([\da-f]+)/;
     $self->{_cs}->{$id} = $c;
 
@@ -908,7 +908,7 @@ sub _connect {
 
     # Socket
     my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';
-    return unless my $socket = $args->{handle} || $class->new(%options);
+    return unless my $socket = $args->{socket} || $class->new(%options);
     $c->{socket} = $socket;
     $self->{_reverse}->{$socket} = $id;
 
@@ -1267,12 +1267,7 @@ sub _read {
     my ($self, $id) = @_;
 
     # Listen socket (new connection)
-    my $found;
-    my $listen = $self->{_listen} || {};
-    if (my $l = $listen->{$id}) { $found = $l->{socket} }
-
-    # Accept new connection
-    return $self->_accept($found) if $found;
+    if (my $l = $self->{_listen}->{$id}) { $self->_accept($l->{socket}) }
 
     # Connection
     my $c = $self->{_cs}->{$id};
@@ -1745,10 +1740,6 @@ Callback to be invoked if the connection gets closed.
 
 Callback to be invoked if new data arrives on the connection.
 
-=item C<handle>
-
-Use an already prepared handle.
-
 =item C<port>
 
 Port to connect to.
@@ -1756,6 +1747,10 @@ Port to connect to.
 =item C<proto>
 
 Protocol to use, defaults to C<tcp>.
+
+=item C<socket>
+
+Use an already prepared socket handle.
 
 =item C<tls>
 

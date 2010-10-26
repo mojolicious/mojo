@@ -1563,8 +1563,8 @@ Mojo::IOLoop - Minimalistic Reactor For Non-Blocking TCP Clients And Servers
 =head1 DESCRIPTION
 
 L<Mojo::IOLoop> is a very minimalistic reactor that has been reduced to the
-absolute minimal feature set required to build solid and scalable non
-blocking TCP clients and servers.
+absolute minimal feature set required to build solid and scalable
+non-blocking TCP clients and servers.
 
 Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::IP> and
 L<IO::Socket::SSL> are supported transparently and used if installed.

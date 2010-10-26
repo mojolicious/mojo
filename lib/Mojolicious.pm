@@ -35,7 +35,7 @@ __PACKAGE__->attr(static  => sub { MojoX::Dispatcher::Static->new });
 __PACKAGE__->attr(types   => sub { MojoX::Types->new });
 
 our $CODENAME = 'Hot Beverage';
-our $VERSION  = '0.999931';
+our $VERSION  = '0.999932';
 
 our $AUTOLOAD;
 

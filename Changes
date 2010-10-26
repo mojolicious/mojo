@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-0.999931 2010-10-19 00:00:00
+0.999931 2010-10-25 00:00:00
         - Removed tag helpers label and img.
         - Renamed tag helper script to javascript and added CDATA support.
         - Renamed tag helper input to input_tag.

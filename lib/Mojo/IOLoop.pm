@@ -558,127 +558,123 @@ sub resolve {
     # Server
     my $server = $self->dns_server;
 
-    # Resolve?
-    if ($server && $t && $name !~ $ipv4 && $name !~ $ipv6) {
-
-        # Debug
-        warn "RESOLVE $type $name ($server)\n" if DEBUG;
-
-        # Timer
-        my $timer;
-
-        # Transaction
-        my $tx = int rand 0x10000;
-
-        # Request
-        my $id = $self->connect(
-            address    => $server,
-            port       => 53,
-            proto      => 'udp',
-            on_connect => sub {
-                my ($self, $id) = @_;
-
-                # Header (one question with recursion)
-                my $req = pack 'nnnnnn', $tx, 0x0100, 1, 0, 0, 0;
-
-                # Query (Internet)
-                for my $part (split /\./, $name) {
-                    $req .= pack 'C/a', $part if defined $part;
-                }
-                $req .= pack 'Cnn', 0, $t, 0x0001;
-
-                # Write
-                $self->write($id => $req);
-            },
-            on_error => sub {
-                my ($self, $id) = @_;
-
-                # Debug
-                warn "FAILED $type $name ($server)\n" if DEBUG;
-
-                $self->drop($timer) if $timer;
-                $self->$cb([]);
-            },
-            on_read => sub {
-                my ($self, $id, $chunk) = @_;
-
-                # Cleanup
-                $self->drop($id);
-                $self->drop($timer) if $timer;
-
-                # Packet
-                my @packet = unpack 'nnnnnnA*', $chunk;
-
-                # Answer
-                return $self->$cb([]) unless $packet[0] eq $tx;
-
-                # Content
-                my $content = $packet[6];
-
-                # Questions
-                for (1 .. $packet[2]) {
-                    my $n;
-                    do {
-                        ($n, $content) = unpack 'C/aA*', $content;
-                    } while ($n);
-                    $content = (unpack 'nnA*', $content)[2];
-                }
-
-                # Answers
-                my @answers;
-                for (1 .. $packet[3]) {
-                    my ($t, $a, $answer);
-                    ($t, $a, $content) =
-                      (unpack 'nnnNn/AA*', $content)[1, 4, 5];
-
-                    # A
-                    if ($t eq $DNS_TYPES->{A}) {
-                        $answer = join('.', unpack 'C*', $a);
-                    }
-
-                    # AAAA
-                    elsif ($t eq $DNS_TYPES->{AAAA}) {
-                        $answer = sprintf '%x:%x:%x:%x:%x:%x:%x:%x',
-                          unpack('n*', $a);
-                    }
-
-                    # TXT
-                    elsif ($t eq $DNS_TYPES->{TXT}) {
-                        $answer = unpack '(C/a*)*', $a;
-                    }
-
-                    next unless defined $answer;
-                    push @answers, $answer;
-
-                    # Debug
-                    warn "ANSWER $answer\n" if DEBUG;
-                }
-
-                # Done
-                $self->$cb(\@answers);
-            }
-        );
-
-        # Timer
-        $timer = $self->timer(
-            $self->dns_timeout => sub {
-                my $self = shift;
-
-                # Debug
-                warn "RESOLVE TIMEOUT ($server)\n" if DEBUG;
-
-                # Disable
-                $self->dns_server(undef);
-
-                # Abort
-                $self->drop($id);
-                $self->$cb([]);
-            }
-        );
+    # No lookup required or record type not supported
+    unless ($server && $t && $name !~ $ipv4 && $name !~ $ipv6) {
+        $self->$cb([]);
+        return $self;
     }
 
-    # No lookup required or record type not supported
-    else { $self->$cb([]) }
+    # Debug
+    warn "RESOLVE $type $name ($server)\n" if DEBUG;
+
+    # Timer
+    my $timer;
+
+    # Transaction
+    my $tx = int rand 0x10000;
+
+    # Request
+    my $id = $self->connect(
+        address    => $server,
+        port       => 53,
+        proto      => 'udp',
+        on_connect => sub {
+            my ($self, $id) = @_;
+
+            # Header (one question with recursion)
+            my $req = pack 'nnnnnn', $tx, 0x0100, 1, 0, 0, 0;
+
+            # Query (Internet)
+            for my $part (split /\./, $name) {
+                $req .= pack 'C/a', $part if defined $part;
+            }
+            $req .= pack 'Cnn', 0, $t, 0x0001;
+
+            # Write
+            $self->write($id => $req);
+        },
+        on_error => sub {
+            my ($self, $id) = @_;
+
+            # Debug
+            warn "FAILED $type $name ($server)\n" if DEBUG;
+
+            $self->drop($timer) if $timer;
+            $self->$cb([]);
+        },
+        on_read => sub {
+            my ($self, $id, $chunk) = @_;
+
+            # Cleanup
+            $self->drop($id);
+            $self->drop($timer) if $timer;
+
+            # Packet
+            my @packet = unpack 'nnnnnnA*', $chunk;
+
+            # Wrong response
+            return $self->$cb([]) unless $packet[0] eq $tx;
+
+            # Content
+            my $content = $packet[6];
+
+            # Questions
+            for (1 .. $packet[2]) {
+                my $n;
+                do { ($n, $content) = unpack 'C/aA*', $content } while ($n);
+                $content = (unpack 'nnA*', $content)[2];
+            }
+
+            # Answers
+            my @answers;
+            for (1 .. $packet[3]) {
+                my ($t, $a, $answer);
+                ($t, $a, $content) = (unpack 'nnnNn/AA*', $content)[1, 4, 5];
+
+                # A
+                if ($t eq $DNS_TYPES->{A}) {
+                    $answer = join('.', unpack 'C*', $a);
+                }
+
+                # AAAA
+                elsif ($t eq $DNS_TYPES->{AAAA}) {
+                    $answer = sprintf '%x:%x:%x:%x:%x:%x:%x:%x',
+                      unpack('n*', $a);
+                }
+
+                # TXT
+                elsif ($t eq $DNS_TYPES->{TXT}) {
+                    $answer = unpack '(C/a*)*', $a;
+                }
+
+                next unless defined $answer;
+                push @answers, $answer;
+
+                # Debug
+                warn "ANSWER $answer\n" if DEBUG;
+            }
+
+            # Done
+            $self->$cb(\@answers);
+        }
+    );
+
+    # Timer
+    $timer = $self->timer(
+        $self->dns_timeout => sub {
+            my $self = shift;
+
+            # Debug
+            warn "RESOLVE TIMEOUT ($server)\n" if DEBUG;
+
+            # Disable
+            $self->dns_server(undef);
+
+            # Abort
+            $self->drop($id);
+            $self->$cb([]);
+        }
+    );
 
     return $self;
 }

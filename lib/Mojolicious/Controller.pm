@@ -546,7 +546,7 @@ connection in progress.
     $c = $c->redirect_to('/path');
     $c = $c->redirect_to('http://127.0.0.1/foo/bar');
 
-Prepare a redirect response.
+Prepare a C<302> redirect response.
 
 =head2 C<render>
 

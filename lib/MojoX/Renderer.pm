@@ -365,8 +365,8 @@ The renderer will use L<MojoX::Types> to look up the content MIME type.
     my $default = $renderer->default_handler;
     $renderer   = $renderer->default_handler('epl');
 
-The default template handler to use for rendering.
-There are two handlers in this distribution.
+The default template handler to use for rendering in cases where auto
+detection doesn't work, like for C<inline> templates.
 
 =over 4
 
@@ -395,8 +395,6 @@ section.
 
 Template auto detection, the renderer will try to select the right template
 and renderer automatically.
-A very powerful alternative to C<default_handler> that allows parallel use of
-multiple template systems.
 
 =head2 C<encoding>
 

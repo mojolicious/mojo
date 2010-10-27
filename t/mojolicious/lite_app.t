@@ -31,9 +31,6 @@ use Test::Mojo;
 # Mojolicious::Lite and ojo
 use ojo;
 
-# Test with lite templates
-app->renderer->default_handler('epl');
-
 # Header condition plugin
 plugin 'header_condition';
 

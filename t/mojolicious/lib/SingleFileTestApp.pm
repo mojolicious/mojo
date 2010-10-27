@@ -16,9 +16,6 @@ sub startup {
     # Plugin
     $self->plugin('MojoliciousTest::Plugin::TestPlugin');
 
-    # Default handler
-    $self->renderer->default_handler('epl');
-
     # Helper route
     $self->routes->route('/helper')->to(
         cb => sub {

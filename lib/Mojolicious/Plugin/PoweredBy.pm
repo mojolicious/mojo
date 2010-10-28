@@ -18,10 +18,9 @@ sub register {
     my $name = $args->{name} || 'Mojolicious (Perl)';
 
     # Add header
-    $app->plugins->add_hook(
+    $app->hook(
         after_build_tx => sub {
-            my ($self, $tx) = @_;
-            $tx->res->headers->header('X-Powered-By' => $name);
+            shift->res->headers->header('X-Powered-By' => $name);
         }
     );
 }

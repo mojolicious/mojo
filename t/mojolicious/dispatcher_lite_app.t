@@ -14,20 +14,20 @@ use Mojolicious::Lite;
 use Test::Mojo;
 
 # Custom dispatchers /custom
-app->plugins->add_hook(
+app->hook(
     before_dispatch => sub {
-        my ($self, $c) = @_;
-        $c->render_text($c->param('a'), status => 205)
-          if $c->req->url->path eq '/custom';
+        my $self = shift;
+        $self->render_text($self->param('a'), status => 205)
+          if $self->req->url->path eq '/custom';
     }
 );
 
 # Custom dispatcher /custom_too
-app->plugins->add_hook(
+app->hook(
     after_static_dispatch => sub {
-        my ($self, $c) = @_;
-        $c->render_text('this works too')
-          if $c->req->url->path eq '/custom_too';
+        my $self = shift;
+        $self->render_text('this works too')
+          if $self->req->url->path eq '/custom_too';
     }
 );
 

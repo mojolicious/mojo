@@ -20,9 +20,9 @@ use Test::Mojo;
 
 # Upload progress
 my $cache = {};
-app->plugins->add_hook(
+app->hook(
     after_build_tx => sub {
-        my ($self, $tx) = @_;
+        my $tx = shift;
         $tx->req->on_progress(
             sub {
                 my $req = shift;

@@ -638,8 +638,7 @@ See C<render_data> for an alternative without encoding.
 
     $c->rendered;
 
-Disable automatic rendering for response and run C<after_dispatch> plugin
-hook.
+Finalize response and run C<after_dispatch> plugin hook.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<send_message>

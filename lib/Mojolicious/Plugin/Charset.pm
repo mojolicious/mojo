@@ -15,21 +15,21 @@ sub register {
     $conf ||= {};
 
     # Set charset
-    $app->plugins->add_hook(
+    $app->hook(
         before_dispatch => sub {
-            my ($self, $c) = @_;
+            my $self = shift;
 
             # Got a charset
             if (my $charset = $conf->{charset}) {
 
                 # This has to be done before params are cloned
-                $c->tx->req->default_charset($charset);
+                $self->tx->req->default_charset($charset);
 
                 # Add charset to text/html content type
-                my $type = $c->app->types->type('html');
+                my $type = $self->app->types->type('html');
                 unless ($type =~ /charset=/) {
                     $type .= ";charset=$charset";
-                    $c->app->types->type(html => $type);
+                    $self->app->types->type(html => $type);
                 }
             }
 
@@ -39,7 +39,7 @@ sub register {
               defined $conf->{encoding}
               ? $conf->{encoding}
               : $conf->{charset};
-            $c->app->renderer->encoding($encoding) if $encoding;
+            $self->app->renderer->encoding($encoding) if $encoding;
         }
     );
 }

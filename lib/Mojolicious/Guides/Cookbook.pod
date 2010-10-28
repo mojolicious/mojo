@@ -171,8 +171,8 @@ manually in your application.
     sub startup {
         my $self = shift;
 
-        # Use plugin hook to set environment variable for every request
-        $self->plugins->add_hook(
+        # Use event hook to set environment variable for every request
+        $self->hook(
             before_dispatch => sub { $ENV{SYSTEMROOT} = 'c:\\winnt' }
         );
     }

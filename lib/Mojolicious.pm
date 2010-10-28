@@ -609,8 +609,8 @@ The following events are available and run in the listed order.
 
 =item after_build_tx
 
-Runs right after the transaction is built and before the HTTP request gets
-parsed.
+Triggered right after the transaction is built and before the HTTP request
+gets parsed.
 One use case would be upload progress bars.
 (Passed the transaction and application instances)
 
@@ -620,7 +620,7 @@ One use case would be upload progress bars.
 
 =item before_dispatch
 
-Runs before the dispatchers determines what action to run.
+Triggered right before the static and routes dispatchers start their work.
 (Passed the default controller instance)
 
     $app->hook(before_dispatch => sub {
@@ -629,9 +629,10 @@ Runs before the dispatchers determines what action to run.
 
 =item after_static_dispatch
 
-Runs after the static dispatcher determines if a static file should be
-served. (Passed the default controller instance)
-Note that the callbacks of this hook run in reverse order.
+Triggered after the static dispatcher determined if a static file should be
+served and before the routes dispatcher starts its work, the callbacks of
+this hook run in reverse order.
+(Passed the default controller instance)
 
     $app->hook(after_static_dispatch => sub {
         my $self = shift;
@@ -639,9 +640,9 @@ Note that the callbacks of this hook run in reverse order.
 
 =item after_dispatch
 
-Runs after the dispatchers determines what action to run.
+Triggered after the static and routes dispatchers are finished and a response
+has been rendered, the callbacks of this hook run in reverse order.
 (Passed the current controller instance)
-Note that the callbacks of this hook run in reverse order.
 
     $app->hook(after_dispatch => sub {
         my $self = shift;

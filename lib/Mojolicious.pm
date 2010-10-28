@@ -246,6 +246,8 @@ sub helper { shift->renderer->add_helper(@_) }
 
 sub hook {
     my ($self, $name, $cb) = @_;
+
+    # DEPRECATED in Hot Beverage! (callback wrapper)
     $self->plugins->add_hook($name, sub { shift; $cb->(@_) });
 }
 

@@ -144,7 +144,7 @@ Mojolicious::Lite - Micro Web Framework
 
 =head1 DESCRIPTION
 
-L<Mojolicous::Lite> is a micro web framework built around L<Mojolicious>.
+L<Mojolicious::Lite> is a micro web framework built around L<Mojolicious>.
 
 A minimal Hello World application looks like this, L<strict> and L<warnings>
 are automatically enabled and a few functions imported when you use

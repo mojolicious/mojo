@@ -46,13 +46,13 @@ my $tx = $client->build_tx(GET => 'http://localhost:99999');
 $client->start($tx);
 ok !$tx->is_done, 'transaction is not done';
 
-# Fresh client again
-$client = Mojo::Client->new;
-
 # Host does not exist
 $tx = $client->build_tx(GET => 'http://cdeabcdeffoobarnonexisting.com');
 $client->start($tx);
 ok !$tx->is_done, 'transaction is not done';
+
+# Fresh client again
+$client = Mojo::Client->new;
 
 # Keep alive
 my $async = $client->async;

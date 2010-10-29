@@ -385,7 +385,8 @@ sub lookup {
     my ($self, $name, $cb) = @_;
 
     # "localhost"
-    return $self->$cb($LOCALHOST) if $name eq 'localhost';
+    return $self->timer(0 => sub { shift->$cb($LOCALHOST) })
+      if $name eq 'localhost';
 
     # IPv4
     $self->resolve(
@@ -910,7 +911,8 @@ sub _connect {
 
     # Socket
     my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';
-    return unless my $socket = $args->{socket} || $class->new(%options);
+    return $self->_error($id, "Couldn't connect.")
+      unless my $socket = $args->{socket} || $class->new(%options);
     $c->{socket} = $socket;
     $self->{_reverse}->{$socket} = $id;
 

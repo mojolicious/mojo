@@ -9,6 +9,9 @@ use Mojo::ByteStream 'b';
 use Mojo::Client;
 use Mojo::DOM;
 
+# Silent oneliners
+$ENV{MOJO_LOG_LEVEL} ||= 'fatal';
+
 # I'm sorry, guys. I never meant to hurt you.
 # Just to destroy everything you ever believed in.
 sub import {

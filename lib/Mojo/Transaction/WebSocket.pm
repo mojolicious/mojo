@@ -127,12 +127,13 @@ sub server_handshake {
     $res->code(101);
     $rsh->upgrade('WebSocket');
     $rsh->connection('Upgrade');
-    my $scheme   = $url->to_abs->scheme eq 'https' ? 'wss' : 'ws';
+    my $scheme = $url->to_abs->scheme eq 'https' ? 'wss' : 'ws';
     my $location = $url->to_abs->scheme($scheme)->to_string;
-    my $origin   = $rqh->origin;
-    $rsh->sec_websocket_origin($origin);
-    $rsh->sec_websocket_location($location);
-    $rsh->sec_websocket_protocol($rqh->sec_websocket_protocol);
+    $rsh->sec_websocket_location($location) if $location;
+    my $origin = $rqh->origin;
+    $rsh->sec_websocket_origin($origin) if $origin;
+    my $protocol = $rqh->sec_websocket_protocol;
+    $rsh->sec_websocket_protocol($protocol) if $protocol;
     $res->body(
         $self->_challenge(
             $rqh->sec_websocket_key1, $rqh->sec_websocket_key2, $req->body

@@ -6,6 +6,7 @@ This file documents the revision history for Perl extension Mojolicious.
 0.999932 2010-10-29 00:00:00
         - Deprecated the old plugin hook calling convention and added
           EXPERIMENTAL hook method to Mojolicious.
+        - Fixed WebSocket handshake.
         - Fixed a few small connect bugs in Mojo::IOLoop.
         - Fixed typos.
 

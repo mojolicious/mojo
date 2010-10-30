@@ -129,7 +129,7 @@ sub server_handshake {
     $rsh->connection('Upgrade');
     my $scheme = $url->to_abs->scheme eq 'https' ? 'wss' : 'ws';
     my $location = $url->to_abs->scheme($scheme)->to_string;
-    $rsh->sec_websocket_location($location) if $location;
+    $rsh->sec_websocket_location($location);
     my $origin = $rqh->origin;
     $rsh->sec_websocket_origin($origin) if $origin;
     my $protocol = $rqh->sec_websocket_protocol;

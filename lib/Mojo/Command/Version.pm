@@ -35,7 +35,7 @@ sub run {
     };
 
     # Message
-    my $message = 'Have fun!';
+    my $message = 'This version is up to date, have fun!';
     $message = 'Thanks for testing a development release, you are awesome!'
       if $latest < $mojo;
     $message = "You might want to update your Mojolicious to $latest."

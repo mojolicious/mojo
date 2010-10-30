@@ -106,9 +106,6 @@ L<Mojolicious::Lite>.
 Loosely coupled building blocks, use what you like and just ignore the rest.
 
     .---------------------------------------------------------------.
-    |                             Fun!                              |
-    '---------------------------------------------------------------'
-    .---------------------------------------------------------------.
     |                                                               |
     |                .----------------------------------------------'
     |                | .--------------------------------------------.
@@ -125,6 +122,8 @@ Loosely coupled building blocks, use what you like and just ignore the rest.
     '-------' '-----------' '--------' '------------' '-------------'
 
 =head2 Installation
+
+All you need is a oneliner.
 
     curl -L cpanmin.us | perl - http://latest.mojolicio.us
 

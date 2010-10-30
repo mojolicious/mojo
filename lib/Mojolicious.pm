@@ -35,7 +35,7 @@ __PACKAGE__->attr(static  => sub { MojoX::Dispatcher::Static->new });
 __PACKAGE__->attr(types   => sub { MojoX::Types->new });
 
 our $CODENAME = 'Hot Beverage';
-our $VERSION  = '0.999933';
+our $VERSION  = '0.999934';
 
 our $AUTOLOAD;
 
@@ -420,9 +420,6 @@ L<Mojolicious::Lite>.
 
 Loosely coupled building blocks, use what you like and just ignore the rest.
 
-    .---------------------------------------------------------------.
-    |                             Fun!                              |
-    '---------------------------------------------------------------'
     .---------------------------------------------------------------.
     |                                                               |
     |                .----------------------------------------------'

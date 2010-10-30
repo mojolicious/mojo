@@ -10,7 +10,7 @@ use Test::More;
 
 plan skip_all => 'set TEST_CLIENT to enable this test (developer only!)'
   unless $ENV{TEST_CLIENT};
-plan tests => 101;
+plan tests => 102;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -43,6 +43,11 @@ $client = Mojo::Client->new;
 # Connection refused
 $client->log->level('fatal');
 my $tx = $client->build_tx(GET => 'http://localhost:99999');
+$client->start($tx);
+ok !$tx->is_done, 'transaction is not done';
+
+# Connection refused
+$tx = $client->build_tx(GET => 'http://127.0.0.1:99999');
 $client->start($tx);
 ok !$tx->is_done, 'transaction is not done';
 

@@ -561,7 +561,7 @@ sub resolve {
 
     # No lookup required or record type not supported
     unless ($server && $t && $name !~ $ipv4 && $name !~ $ipv6) {
-        $self->$cb([]);
+        $self->timer(0 => sub { $self->$cb([]) });
         return $self;
     }
 

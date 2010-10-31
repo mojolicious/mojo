@@ -741,20 +741,20 @@ is $res->code(400)->default_message, 'Bad Request', 'right default message';
 # Parse HTTP 1.1 response start line, no headers and body
 $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.1 200 OK\x0d\x0a\x0d\x0a");
-ok $res->is_done,       'response is done';
-is $res->code,          200, 'right status';
+ok !$res->is_done, 'response is not done';
+is $res->code,          200,  'right status';
 is $res->message,       'OK', 'right message';
-is $res->major_version, 1, 'right major version';
-is $res->minor_version, 1, 'right minor version';
+is $res->major_version, 1,    'right major version';
+is $res->minor_version, 1,    'right minor version';
 
 # Parse HTTP 1.1 response start line, no headers and body (no message)
 $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.1 200\x0d\x0a\x0d\x0a");
-ok $res->is_done,       'response is done';
-is $res->code,          200, 'right status';
+ok !$res->is_done, 'response is not done';
+is $res->code,          200,   'right status';
 is $res->message,       undef, 'no message';
-is $res->major_version, 1, 'right major version';
-is $res->minor_version, 1, 'right minor version';
+is $res->major_version, 1,     'right major version';
+is $res->minor_version, 1,     'right minor version';
 
 # Parse HTTP 0.9 response
 $res = Mojo::Message::Response->new;
@@ -770,11 +770,11 @@ $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.0 404 Damn it\x0d\x0a");
 $res->parse("Content-Type: text/plain\x0d\x0a");
 $res->parse("Content-Length: 0\x0d\x0a\x0d\x0a");
-ok !$res->is_done, 'response is not done';
-is $res->code,          404,       'right status';
+ok $res->is_done,       'response is done';
+is $res->code,          404, 'right status';
 is $res->message,       'Damn it', 'right message';
-is $res->major_version, 1,         'right major version';
-is $res->minor_version, 0,         'right minor version';
+is $res->major_version, 1, 'right major version';
+is $res->minor_version, 0, 'right minor version';
 is $res->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, 0, 'right "Content-Length" value';
 
@@ -784,11 +784,11 @@ $res->parse("HTTP/1.0 500 Internal Server Error\x0d\x0a");
 $res->parse("Content-Type: text/plain\x0d\x0a");
 $res->parse("Content-Length: 27\x0d\x0a\x0d\x0a");
 $res->parse("Hello World!\n1234\nlalalala\n");
-ok !$res->is_done, 'response is not done';
-is $res->code,          500,                     'right status';
+ok $res->is_done,       'response is done';
+is $res->code,          500, 'right status';
 is $res->message,       'Internal Server Error', 'right message';
-is $res->major_version, 1,                       'right major version';
-is $res->minor_version, 0,                       'right minor version';
+is $res->major_version, 1, 'right major version';
+is $res->minor_version, 0, 'right minor version';
 is $res->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, 27, 'right "Content-Length" value';
 
@@ -2066,7 +2066,7 @@ $res->parse(
     "Content-Type: application/atom+xml; charset=UTF-8; type=feed\x0a");
 $res->parse("\x0a");
 $res->body('<p>foo <a href="/">bar</a><a href="/baz">baz</a></p>');
-ok $res->is_done, 'request is done';
+ok !$res->is_done, 'request is not done';
 is $res->headers->content_type,
   'application/atom+xml; charset=UTF-8; type=feed',
   'right "Content-Type" value';

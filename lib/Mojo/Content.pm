@@ -171,10 +171,11 @@ sub parse {
 
     # Relaxed parsing for broken web servers
     if ($self->auto_relax) {
-        my $headers = $self->headers;
+        my $headers    = $self->headers;
+        my $connection = $headers->connection;
         $self->relaxed(1)
-          if !defined $headers->content_length
-              && ($headers->connection || '') =~ /close/i;
+          if !length($headers->content_length)
+              && (!$connection || $connection =~ /close/i);
     }
 
     # Chunked

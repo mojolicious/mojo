@@ -727,13 +727,21 @@ that have been used in the past.
 
 Sebastian Riedel, C<sri@cpan.org>.
 
-=head1 CORE DEVELOPERS
+=head1 CORE DEVELOPERS EMERITUS
+
+Retired members of the core team, we thank you dearly for your service.
+
+=over 4
 
 Viacheslav Tykhanovskyi, C<vti@cpan.org>.
 
+=back
+
 =head1 CREDITS
 
-In alphabetical order:
+In alphabetical order.
+
+=over 4
 
 Adam Kennedy
 
@@ -876,6 +884,8 @@ Yaroslav Korshak
 Yuki Kimoto
 
 Zak B. Elep
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -436,6 +436,12 @@ Loosely coupled building blocks, use what you like and just ignore the rest.
     |  CGI  | |  FastCGI  | |  PSGI  | |  HTTP 1.1  | |  WebSocket  |
     '-------' '-----------' '--------' '------------' '-------------'
 
+=head2 Installation
+
+All you need is a oneliner.
+
+    curl -L cpanmin.us | perl - http://latest.mojolicio.us
+
 =head1 ATTRIBUTES
 
 L<Mojolicious> inherits all attributes from L<Mojo> and implements the

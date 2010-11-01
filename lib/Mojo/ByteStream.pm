@@ -479,10 +479,7 @@ sub get_line {
     my $self = shift;
 
     # Locate line ending
-    my $pos = index $self->{bytestream}, "\x0a";
-
-    # No full line
-    return if $pos == -1;
+    return if (my $pos = index $self->{bytestream}, "\x0a") == -1;
 
     # Extract line and ending
     my $line = substr $self->{bytestream}, 0, $pos + 1, '';

@@ -11,7 +11,6 @@ use File::Spec;
 use IO::File;
 use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
 use IO::Socket;
-use Mojo::ByteStream 'b';
 use Mojo::URL;
 use Scalar::Util 'weaken';
 use Socket qw/IPPROTO_TCP TCP_NODELAY/;
@@ -190,7 +189,7 @@ sub connect {
 
     # Connection
     my $c = {
-        buffer     => b(),
+        buffer     => '',
         on_connect => $args->{on_connect}
           || $args->{connect_cb}
           || $args->{cb},
@@ -785,8 +784,7 @@ sub write {
     my $c = $self->{_cs}->{$id};
 
     # Buffer
-    $c->{buffer} = b() unless exists $c->{buffer};
-    $c->{buffer}->add_chunk($chunk);
+    $c->{buffer} .= $chunk;
 
     # UNIX only
     unless (WINDOWS) {
@@ -802,7 +800,7 @@ sub write {
     $c->{drain} = $cb if $cb;
 
     # Writing
-    $self->_writing($id) if $cb || $c->{buffer}->size;
+    $self->_writing($id) if $cb || length $c->{buffer};
 }
 
 sub _accept {
@@ -826,7 +824,7 @@ sub _accept {
     # Connection
     my $c = {
         accepting => 1,
-        buffer    => b(),
+        buffer    => '',
     };
     (my $id) = "$c" =~ /0x([\da-f]+)/;
     $self->{_cs}->{$id} = $c;
@@ -1042,9 +1040,7 @@ sub _not_writing {
     return unless my $c = $self->{_cs}->{$id};
 
     # Chunk still in buffer
-    if (my $buffer = $c->{buffer}) {
-        return $c->{read_only} = 1 if $buffer->size;
-    }
+    return $c->{read_only} = 1 if length $c->{buffer};
 
     # Socket
     return unless my $socket = $c->{socket};
@@ -1161,7 +1157,7 @@ sub _prepare_connections {
         if ($c->{finish}) {
 
             # Buffer empty
-            unless (defined $c->{buffer} && $c->{buffer}->size) {
+            unless (length $c->{buffer}) {
                 $self->_drop_immediately($id);
                 next;
             }
@@ -1427,9 +1423,6 @@ sub _write {
     # Connect has just completed
     return if $c->{connecting};
 
-    # Buffer
-    my $buffer = $c->{buffer};
-
     # Socket
     return unless my $socket = $c->{socket};
     return unless $socket->connected;
@@ -1440,10 +1433,10 @@ sub _write {
     }
 
     # Nothing to write
-    return unless $buffer->size;
+    return unless length $c->{buffer};
 
     # Write
-    my $written = $socket->syswrite($buffer->to_string);
+    my $written = $socket->syswrite($c->{buffer});
 
     # Error
     unless (defined $written) {
@@ -1456,10 +1449,10 @@ sub _write {
     }
 
     # Remove written chunk from buffer
-    $buffer->remove($written);
+    substr $c->{buffer}, 0, $written, '';
 
     # Not writing
-    $self->_not_writing($id) unless exists $c->{drain} || $buffer->size;
+    $self->_not_writing($id) unless exists $c->{drain} || length $c->{buffer};
 
     # Active
     $c->{active} = time if $written;

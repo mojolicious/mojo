@@ -5,9 +5,9 @@ use warnings;
 
 use base 'MojoX::Controller';
 
-use Mojo::ByteStream;
 use Mojo::Cookie::Response;
 use Mojo::Transaction::HTTP;
+use Mojo::Util 'hmac_md5_sum';
 
 __PACKAGE__->attr(tx => sub { Mojo::Transaction::HTTP->new });
 
@@ -120,8 +120,7 @@ sub signed_cookie {
     if (defined $value) {
 
         # Sign value
-        my $signature =
-          Mojo::ByteStream->new($value)->hmac_md5_sum($secret)->to_string;
+        my $signature = hmac_md5_sum $value, $secret;
         $value = $value .= "--$signature";
 
         # Create cookie
@@ -137,8 +136,7 @@ sub signed_cookie {
         # Check signature
         if ($value =~ s/\-\-([^\-]+)$//) {
             my $signature = $1;
-            my $check =
-              Mojo::ByteStream->new($value)->hmac_md5_sum($secret)->to_string;
+            my $check = hmac_md5_sum $value, $secret;
 
             # Verified
             if ($signature eq $check) { push @results, $value }

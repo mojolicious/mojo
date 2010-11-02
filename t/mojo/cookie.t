@@ -35,7 +35,7 @@ is $cookies->[0]->version, '1',     'right version';
 $cookie  = Mojo::Cookie::Request->new;
 $cookies = $cookie->parse('$Version=1; foo; $Path="/test"');
 is $cookies->[0]->name,    'foo',   'right name';
-is $cookies->[0]->value,   '',      'no value';
+is $cookies->[0]->value,   undef,   'no value';
 is $cookies->[0]->path,    '/test', 'right path';
 is $cookies->[0]->version, '1',     'right version';
 is $cookies->[0]->to_string_with_prefix, '$Version=1; foo; $Path=/test',

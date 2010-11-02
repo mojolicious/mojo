@@ -1,6 +1,9 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 0.999935 2010-11-01 00:00:00
+        - Added EXPERIMENTAL module Mojo::Util as a faster low level
+          alternative to Mojo::ByteStream and rewrote many internals to use
+          it instead.
         - Improved Mojo::IOLoop performance by about 20%.
 
 0.999934 2010-11-01 00:00:00

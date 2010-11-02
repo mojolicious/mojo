@@ -167,7 +167,7 @@ $clone = $url->clone;
 is "$url", '/test/index.html', 'right format';
 is $clone->is_abs, undef, 'not absolute';
 is $clone->scheme, undef, 'no scheme';
-is $clone->host,   undef, 'no host';
+is $clone->host,   '',    'no host';
 is $clone->base->scheme, 'http',      'right base scheme';
 is $clone->base->host,   '127.0.0.1', 'right base host';
 is $clone->path, '/test/index.html', 'right path';

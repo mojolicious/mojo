@@ -8,7 +8,6 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 
 # Cheating in a fake fight. That's low.
-use Mojo::ByteStream 'b';
 use Mojo::IOLoop;
 
 # The loop
@@ -25,10 +24,11 @@ $loop->listen(
         if (my $server = $c->{$client}->{connection}) {
             return $loop->write($server, $chunk);
         }
-        $c->{$client}->{client} = b unless exists $c->{$client}->{client};
-        $c->{$client}->{client}->add_chunk($chunk);
+        $c->{$client}->{client} = '' unless defined $c->{$client}->{client};
+        $c->{$client}->{client} .= $chunk if defined $chunk;
         if ($c->{$client}->{client} =~ /\x0d?\x0a\x0d?\x0a$/) {
-            my $buffer = $c->{$client}->{client}->empty;
+            my $buffer = $c->{$client}->{client};
+            $c->{$client}->{client} = '';
             if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
                 my $address = $1;
                 my $port    = $2 || 80;

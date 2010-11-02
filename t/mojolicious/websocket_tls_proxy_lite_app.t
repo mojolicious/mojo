@@ -16,7 +16,6 @@ plan tests => 16;
 # about being damaged if I'm not?
 # That's like Christina Aguilera singing Spanish.
 # Ooh, wait! That's it! I'll fake it!
-use Mojo::ByteStream 'b';
 use Mojo::Client;
 use Mojo::Server::Daemon;
 use Mojolicious::Lite;
@@ -76,10 +75,11 @@ $loop->listen(
         if (my $server = $c->{$client}->{connection}) {
             return $loop->write($server, $chunk);
         }
-        $c->{$client}->{client} = b unless exists $c->{$client}->{client};
-        $c->{$client}->{client}->add_chunk($chunk);
+        $c->{$client}->{client} = '' unless defined $c->{$client}->{client};
+        $c->{$client}->{client} .= $chunk if defined $chunk;
         if ($c->{$client}->{client} =~ /\x0d?\x0a\x0d?\x0a$/) {
-            my $buffer = $c->{$client}->{client}->empty;
+            my $buffer = $c->{$client}->{client};
+            $c->{$client}->{client} = '';
             if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
                 $connected = "$1:$2";
                 $fail = 1 if $2 == $port + 1;

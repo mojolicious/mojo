@@ -5,7 +5,7 @@ use warnings;
 
 use base 'Mojo::Base';
 
-use Mojo::ByteStream 'b';
+use Mojo::Util 'camelize';
 
 __PACKAGE__->attr(hooks      => sub { {} });
 __PACKAGE__->attr(namespaces => sub { ['Mojolicious::Plugin'] });
@@ -37,7 +37,8 @@ sub load_plugin {
     else {
 
         # Class
-        my $class = b($name)->camelize->to_string;
+        my $class = $name;
+        camelize $class;
 
         # Try all namspaces
         for my $namespace (@{$self->namespaces}) {

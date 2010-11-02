@@ -8,24 +8,23 @@ use overload '""' => sub { shift->to_string }, fallback => 1;
 
 use Carp 'croak';
 use Mojo::Asset::Memory;
-use Mojo::ByteStream 'b';
 use Mojo::Content::Single;
 use Mojo::Loader;
 use Mojo::Parameters;
 use Mojo::Upload;
+use Mojo::Util qw/decode url_unescape/;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 262144;
 
-__PACKAGE__->attr(buffer  => sub { b() });
 __PACKAGE__->attr(content => sub { Mojo::Content::Single->new });
-__PACKAGE__->attr(default_charset                   => 'UTF-8');
-__PACKAGE__->attr(dom_class                         => 'Mojo::DOM');
-__PACKAGE__->attr(json_class                        => 'Mojo::JSON');
-__PACKAGE__->attr([qw/major_version minor_version/] => 1);
+__PACKAGE__->attr(default_charset => 'UTF-8');
+__PACKAGE__->attr(dom_class       => 'Mojo::DOM');
+__PACKAGE__->attr(json_class      => 'Mojo::JSON');
 __PACKAGE__->attr(max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 10240 });
 __PACKAGE__->attr(
     max_message_size => sub { $ENV{MOJO_MAX_MESSAGE_SIZE} || 5242880 });
 __PACKAGE__->attr([qw/on_finish on_progress/]);
+__PACKAGE__->attr(version => '1.1');
 
 # DEPRECATED in Comet!
 *finish_cb   = \&on_finish;
@@ -37,13 +36,12 @@ __PACKAGE__->attr([qw/on_finish on_progress/]);
 # business.
 sub at_least_version {
     my ($self, $version) = @_;
-    my ($major, $minor) = split /\./, $version;
+    my ($sma,  $smi)     = split /\./, $version;
+    my ($cma,  $cmi)     = split /\./, $self->version;
 
     # Version is equal or newer
-    return 1 if $major < $self->major_version;
-    if ($major == $self->major_version) {
-        return 1 if $minor <= $self->minor_version;
-    }
+    return 1 if $sma < $cma;
+    return 1 if $sma == $cma && $smi <= $cmi;
 
     # Version is older
     return;
@@ -395,23 +393,8 @@ sub param {
     return $self->{body_params}->param(@_);
 }
 
-sub parse {
-    my ($self, $chunk) = @_;
-
-    # Buffer
-    $self->buffer->add_chunk($chunk) if defined $chunk;
-
-    return $self->_parse(0);
-}
-
-sub parse_until_body {
-    my ($self, $chunk) = @_;
-
-    # Buffer
-    $self->buffer->add_chunk($chunk);
-
-    return $self->_parse(1);
-}
+sub parse            { shift->_parse(0, @_) }
+sub parse_until_body { shift->_parse(1, @_) }
 
 sub on_read { shift->content->on_read(@_) }
 
@@ -482,26 +465,6 @@ sub uploads {
     return \@uploads;
 }
 
-sub version {
-    my ($self, $version) = @_;
-
-    # Return normalized version
-    unless ($version) {
-        my $major = $self->major_version;
-        $major = 1 unless defined $major;
-        my $minor = $self->minor_version;
-        $minor = 1 unless defined $minor;
-        return "$major.$minor";
-    }
-
-    # New version
-    my ($major, $minor) = split /\./, $version;
-    $self->major_version($major);
-    $self->minor_version($minor);
-
-    return $self;
-}
-
 sub write       { shift->content->write(@_) }
 sub write_chunk { shift->content->write_chunk(@_) }
 
@@ -510,43 +473,59 @@ sub _build_start_line {
 }
 
 sub _parse {
-    my $self = shift;
-    my $until_body = @_ ? shift : 0;
+    my ($self, $until_body, $chunk) = @_;
 
-    # Start line and headers
-    my $buffer = $self->buffer;
+    # Buffer
+    $self->{_buffer}   = '' unless defined $self->{_buffer};
+    $self->{_raw_size} = 0  unless exists $self->{_raw_size};
+
+    # Add chunk
+    if (defined $chunk) {
+        $self->{_raw_size} += length $chunk;
+        $self->{_buffer} .= $chunk;
+    }
+
+    # Start line
+    $self->_parse_start_line unless $self->{_state};
+
+    # Got start line and headers
     if (!$self->{_state} || $self->{_state} eq 'headers') {
 
         # Check line size
         $self->error('Maximum line size exceeded.', 413)
-          if $buffer->size > $self->max_line_size;
+          if length $self->{_buffer} > $self->max_line_size;
     }
 
     # Check message size
     $self->error('Maximum message size exceeded.', 413)
-      if $buffer->raw_size > $self->max_message_size;
+      if $self->{_raw_size} > $self->max_message_size;
 
     # Content
     my $state = $self->{_state} || '';
     if ($state eq 'body' || $state eq 'content' || $state eq 'done') {
         my $content = $self->content;
 
-        # Parse
-        $content->chunked_buffer($buffer);
+        # Empty buffer
+        my $buffer = $self->{_buffer};
+        $self->{_buffer} = '';
 
         # Until body
-        if ($until_body) { $self->content($content->parse_until_body) }
-
-        # Whole message
-        else {
-
-            # HTTP 0.9 and CGI have no headers
-            $self->content(
-                  $self->version  eq '0.9'  ? $content->parse_body_once
-                : $self->{_state} eq 'body' ? $content->parse_body
-                : $content->parse
-            );
+        if ($until_body) {
+            $self->content($content->parse_until_body($buffer));
         }
+
+        # CGI
+        elsif ($self->{_state} eq 'body') {
+            $self->content($content->parse_body($buffer));
+        }
+
+        # HTTP 0.9
+        elsif ($self->version eq '0.9') {
+            $self->content($content->parse_body_once($buffer));
+        }
+
+        # Parse
+        else { $self->content($content->parse($buffer)) }
     }
 
     # Done
@@ -559,6 +538,10 @@ sub _parse {
     if ((my $cb = $self->on_finish) && $self->is_done) { $self->$cb }
 
     return $self;
+}
+
+sub _parse_start_line {
+    croak 'Method "_parse_start_line" not implemented by subclass';
 }
 
 sub _parse_formdata {
@@ -599,16 +582,16 @@ sub _parse_formdata {
         my $value      = $part;
 
         # Unescape
-        $name     = b($name)->url_unescape->to_string;
-        $filename = b($filename)->url_unescape->to_string;
+        url_unescape $name     if $name;
+        url_unescape $filename if $filename;
 
         # Decode
         if ($charset) {
             my $backup = $name;
-            $name     = b($name)->decode($charset)->to_string;
-            $name     = $backup unless defined $name;
-            $backup   = $filename;
-            $filename = b($filename)->decode($charset)->to_string;
+            decode $charset, $name if $name;
+            $name = $backup unless defined $name;
+            $backup = $filename;
+            decode $charset, $filename if $filename;
             $filename = $backup unless defined $filename;
         }
 
@@ -621,7 +604,7 @@ sub _parse_formdata {
             # Decode
             if ($charset && !$part->headers->content_transfer_encoding) {
                 my $backup = $value;
-                $value = b($value)->decode($charset)->to_string;
+                decode $charset, $value;
                 $value = $backup unless defined $value;
             }
         }
@@ -651,13 +634,6 @@ in RFC 2616 and RFC 2388.
 =head1 ATTRIBUTES
 
 L<Mojo::Message> implements the following attributes.
-
-=head2 C<buffer>
-
-    my $buffer = $message->buffer;
-    $message   = $message->buffer(Mojo::ByteStream->new);
-
-Input buffer for parsing.
 
 =head2 C<content>
 
@@ -690,13 +666,6 @@ Class to be used for JSON deserialization with C<json>, defaults to
 L<Mojo::JSON>.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
-=head2 C<major_version>
-
-    my $major_version = $message->major_version;
-    $message          = $message->major_version(1);
-
-Major version, defaults to C<1>.
-
 =head2 C<max_line_size>
 
     my $size = $message->max_line_size;
@@ -712,13 +681,6 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
 
 Maximum message size in bytes, defaults to C<5242880>.
 Note that this attribute is EXPERIMENTAL and might change without warning!
-
-=head2 C<minor_version>
-
-    my $minor_version = $message->minor_version;
-    $message          = $message->minor_version(1);
-
-Minor version, defaults to C<1>.
 
 =head2 C<on_finish>
 
@@ -870,7 +832,7 @@ Get a chunk of start line data starting from a specific position.
 
     my $leftovers = $message->has_leftovers;
 
-CHeck if message parser has leftover data in the buffer.
+CHeck if message parser has leftover data.
 
 =head2 C<header_size>
 
@@ -923,7 +885,7 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
     my $bytes = $message->leftovers;
 
-Remove leftover data from the parser buffer.
+Remove leftover data.
 
 =head2 C<param>
 

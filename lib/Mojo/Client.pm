@@ -8,7 +8,6 @@ use base 'Mojo::Base';
 use Carp 'croak';
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
-use Mojo::ByteStream 'b';
 use Mojo::Content::MultiPart;
 use Mojo::Content::Single;
 use Mojo::CookieJar;
@@ -18,6 +17,7 @@ use Mojo::Parameters;
 use Mojo::Server::Daemon;
 use Mojo::Transaction::HTTP;
 use Mojo::Transaction::WebSocket;
+use Mojo::Util qw/encode url_escape/;
 use Mojo::URL;
 use Scalar::Util 'weaken';
 
@@ -187,10 +187,8 @@ sub build_form_tx {
 
                 # Filename
                 $filename = delete $f->{filename} || $name;
-                $filename = b($filename);
-                $filename->encode($encoding) if $encoding;
-                $filename =
-                  $filename->url_escape($Mojo::URL::PARAM)->to_string;
+                encode $encoding, $filename if $encoding;
+                url_escape $filename, $Mojo::URL::PARAM;
 
                 # Asset
                 $part->asset(delete $f->{file});
@@ -204,7 +202,7 @@ sub build_form_tx {
 
                 # Values
                 my $chunk = join ',', ref $f ? @$f : ($f);
-                $chunk = b($chunk)->encode($encoding)->to_string if $encoding;
+                encode $encoding, $chunk if $encoding;
                 $part->asset->add_chunk($chunk);
 
                 # Content-Type
@@ -214,10 +212,9 @@ sub build_form_tx {
             }
 
             # Content-Disposition
-            my $escaped = b($name);
-            $escaped->encode($encoding) if $encoding;
-            $escaped = $escaped->url_escape($Mojo::URL::PARAM)->to_string;
-            my $disposition = qq/form-data; name="$escaped"/;
+            encode $encoding, $name if $encoding;
+            url_escape $name, $Mojo::URL::PARAM;
+            my $disposition = qq/form-data; name="$name"/;
             $disposition .= qq/; filename="$filename"/ if $filename;
             $h->content_disposition($disposition);
 

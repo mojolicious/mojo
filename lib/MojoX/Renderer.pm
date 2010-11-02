@@ -11,6 +11,7 @@ use Mojo::Command;
 use Mojo::Home;
 use Mojo::JSON;
 use MojoX::Types;
+use Mojo::Util 'encode';
 
 __PACKAGE__->attr(default_format => 'html');
 __PACKAGE__->attr([qw/default_handler default_template_class/]);
@@ -205,8 +206,7 @@ sub render {
     # Encoding (JSON is already encoded)
     unless ($partial) {
         my $encoding = $options->{encoding};
-        $output = b($output)->encode($encoding)->to_string
-          if $encoding && !$json && !$data;
+        encode $encoding, $output if $encoding && $output && !$json && !$data;
     }
 
     # Type

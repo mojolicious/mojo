@@ -53,7 +53,7 @@ is $string, "23, 24, single line, 25, 26", 'right format';
 
 # Parse headers
 $headers = Mojo::Headers->new;
-is ref $headers->parse(<<'EOF'), 'Mojo::ByteStream', 'right return value';
+is ref $headers->parse(<<'EOF'), 'Mojo::Headers', 'right return value';
 Content-Type: text/plain
 Expect: 100-continue
 
@@ -86,17 +86,17 @@ is_deeply $hash->{'X-Test2'}, [['foo']], 'right structure';
 
 # Headers in chunks
 $headers = Mojo::Headers->new;
-ok !defined($headers->parse(<<EOF)), 'right return value';
+is ref $headers->parse(<<EOF), 'Mojo::Headers', 'right return value';
 Content-Type: text/plain
 EOF
 ok !$headers->is_done, 'parser is not done';
 ok !defined($headers->content_type), 'no value';
-ok !defined($headers->parse(<<EOF)), 'right return value';
+is ref $headers->parse(<<EOF), 'Mojo::Headers', 'right return value';
 X-Bender: Bite my shiny
 EOF
 ok !$headers->is_done, 'parser is not done';
 ok !defined($headers->connection), 'no value';
-is ref $headers->parse(<<EOF), 'Mojo::ByteStream', 'right return value';
+is ref $headers->parse(<<EOF), 'Mojo::Headers', 'right return value';
 X-Bender: metal ass!
 
 EOF

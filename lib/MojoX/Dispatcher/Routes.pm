@@ -5,9 +5,9 @@ use warnings;
 
 use base 'MojoX::Routes';
 
-use Mojo::ByteStream 'b';
 use Mojo::Exception;
 use Mojo::Loader;
+use Mojo::Util 'camelize';
 use MojoX::Routes::Match;
 use Scalar::Util 'weaken';
 
@@ -226,7 +226,10 @@ sub _generate_class {
     # Class
     my $class = $field->{class};
     my $controller = $field->{controller} || '';
-    $class = b($controller)->camelize->to_string unless $class;
+    unless ($class) {
+        $class = $controller;
+        camelize $class;
+    }
 
     # Namespace
     my $namespace = $field->{namespace};

@@ -6,7 +6,7 @@ use warnings;
 use base 'Mojo::Base';
 
 use Carp 'croak';
-use Mojo::ByteStream 'b';
+use Mojo::Util qw/decode url_unescape/;
 use Mojo::URL;
 use Scalar::Util 'weaken';
 
@@ -24,9 +24,11 @@ sub new {
     weaken $self->{_controller};
 
     # Path
-    $self->{_path} = shift
-      || b($c->req->url->path->to_string)->url_unescape->decode('UTF-8')
-      ->to_string;
+    unless ($self->{_path} = shift) {
+        $self->{_path} = $c->req->url->path->to_string;
+        url_unescape $self->{_path};
+        decode 'UTF8', $self->{_path};
+    }
 
     return $self;
 }

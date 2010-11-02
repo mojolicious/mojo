@@ -6,6 +6,7 @@ use warnings;
 use base 'Mojolicious::Plugin';
 
 use Mojo::ByteStream 'b';
+use Mojo::Util 'xml_escape';
 
 # Is today's hectic lifestyle making you tense and impatient?
 # Shut up and get to the point!
@@ -250,7 +251,7 @@ sub _input {
 
     # Value
     my $p = $c->param($name);
-    $p = b($p)->xml_escape if defined $p;
+    xml_escape $p if defined $p;
 
     my $t = $attrs{type} || '';
     if (defined $p && $t ne 'submit') {

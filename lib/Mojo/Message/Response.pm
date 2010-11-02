@@ -7,18 +7,19 @@ use base 'Mojo::Message';
 
 use Mojo::Cookie::Response;
 use Mojo::Date;
+use Mojo::Util 'get_line';
 
 __PACKAGE__->attr([qw/code message/]);
 
 # Start line regex
 my $START_LINE_RE = qr/
-    ^\s*               # Start
-    HTTP\/(\d)\.(\d)   # Version
-    \s+                # Whitespace
-    (\d\d\d)           # Code
-    \s*                # Whitespace
-    ([\w\'\s]+)?       # Message (with "I'm a teapot" support)
-    $                  # End
+    ^\s*             # Start
+    HTTP\/(\d\.\d)   # Version
+    \s+              # Whitespace
+    (\d\d\d)         # Code
+    \s*              # Whitespace
+    ([\w\'\s]+)?     # Message (with "I'm a teapot" support)
+    $                # End
 /x;
 
 # Umarked codes are from RFC 2616 (mostly taken from LWP)
@@ -143,17 +144,6 @@ sub _build_start_line {
     return "HTTP/$version $code $message\x0d\x0a";
 }
 
-sub _parse {
-    my $self = shift;
-    my $until_body = @_ ? shift : 0;
-
-    # Start line
-    $self->_parse_start_line unless $self->{_state};
-
-    # Pass through
-    return $self->SUPER::_parse($until_body);
-}
-
 # Weaseling out of things is important to learn.
 # It's what separates us from the animals... except the weasel.
 sub _parse_start_line {
@@ -163,8 +153,7 @@ sub _parse_start_line {
     return $self->{_state} = 'content' if $self->version eq '0.9';
 
     # Try to detect HTTP 0.9
-    my $buffer = $self->buffer;
-    if ($buffer =~ /^\s*(\S+\s*)/) {
+    if ($self->{_buffer} =~ /^\s*(\S+\s*)/) {
         my $string = $1;
 
         # HTTP 0.9 will most likely not start with "HTTP/"
@@ -174,8 +163,7 @@ sub _parse_start_line {
 
         # Detected!
         if ($string !~ /^\s*$match/) {
-            $self->major_version(0);
-            $self->minor_version(9);
+            $self->version('0.9');
             $self->{_state} = 'content';
             $self->content->relaxed(1);
             return 1;
@@ -183,13 +171,12 @@ sub _parse_start_line {
     }
 
     # We have a full HTTP 1.0+ response line
-    my $line = $buffer->get_line;
+    my $line = get_line $self->{_buffer};
     if (defined $line) {
         if ($line =~ m/$START_LINE_RE/o) {
-            $self->major_version($1);
-            $self->minor_version($2);
-            $self->code($3);
-            $self->message($4);
+            $self->version($1);
+            $self->code($2);
+            $self->message($3);
             $self->{_state} = 'content';
             $self->content->auto_relax(1);
         }

@@ -7,8 +7,8 @@ use warnings;
 # I can't think of a way to finish that sentence.
 use base 'Mojo::Transaction';
 
-use Mojo::ByteStream 'b';
 use Mojo::Transaction::HTTP;
+use Mojo::Util qw/decode encode md5_bytes/;
 
 __PACKAGE__->attr(handshake => sub { Mojo::Transaction::HTTP->new });
 __PACKAGE__->attr(
@@ -99,7 +99,8 @@ sub send_message {
     my ($self, $message) = @_;
 
     # Encode
-    $message = b($message)->encode('UTF-8')->to_string;
+    $message = '' unless defined $message;
+    encode 'UTF-8', $message;
 
     # Send message with framing
     $self->_send_bytes("\x00$message\xff");
@@ -148,24 +149,25 @@ sub server_read {
     my ($self, $chunk) = @_;
 
     # Add chunk
-    my $buffer = $self->{_read} ||= b();
-    $buffer->add_chunk($chunk);
+    $self->{_read} = '' unless defined $self->{_read};
+    $self->{_read} .= $chunk if defined $chunk;
 
     # Full frames
-    while ((my $i = $buffer->contains("\xff")) >= 0) {
+    while ((my $i = index $self->{_read}, "\xff") >= 0) {
 
         # Closing handshake
         return $self->finish if $i == 0;
 
         # Frame
-        my $message = $buffer->remove($i + 1);
+        my $message = substr $self->{_read}, 0, $i + 1, '';
 
         # Remove framing
         $message =~ s/^[\x00]//;
         $message =~ s/[\xff]$//;
 
         # Callback
-        $self->on_message->($self, b($message)->decode('UTF-8')->to_string);
+        decode 'UTF-8', $message if $message;
+        $self->on_message->($self, $message);
     }
 
     # Resume
@@ -178,13 +180,15 @@ sub server_write {
     my $self = shift;
 
     # Not writing anymore
-    my $write = $self->{_write} ||= b();
-    unless ($write->size) {
+    $self->{_write} = '' unless defined $self->{_write};
+    unless (length $self->{_write}) {
         $self->{_state} = $self->{_finished} ? 'done' : 'read';
     }
 
     # Empty buffer
-    return $write->empty;
+    my $write = $self->{_write};
+    $self->{_write} = '';
+    return $write;
 }
 
 sub _challenge {
@@ -196,7 +200,7 @@ sub _challenge {
     # Calculate solution for challenge
     my $c1 = pack 'N', join('', $key1 =~ /(\d)/g) / ($key1 =~ tr/\ //);
     my $c2 = pack 'N', join('', $key2 =~ /(\d)/g) / ($key2 =~ tr/\ //);
-    return b("$c1$c2$key3")->md5_bytes->to_string;
+    return md5_bytes "$c1$c2$key3";
 }
 
 sub _generate_key {
@@ -228,8 +232,8 @@ sub _send_bytes {
     my ($self, $bytes) = @_;
 
     # Add to buffer
-    my $write = $self->{_write} ||= b();
-    $write->add_chunk($bytes);
+    $self->{_write} = '' unless defined $self->{_write};
+    $self->{_write} .= $bytes if defined $bytes;
 
     # Writing
     $self->{_state} = 'write';

@@ -5,7 +5,7 @@ use warnings;
 
 use base 'Mojo::Base';
 
-use Mojo::ByteStream 'b';
+use Mojo::Util qw/b64_decode b64_encode/;
 use Storable qw/freeze thaw/;
 
 __PACKAGE__->attr('cookie_domain');
@@ -21,7 +21,7 @@ sub load {
     return unless my $value = $c->signed_cookie($self->cookie_name);
 
     # Decode
-    $value = b($value)->b64_decode->to_string;
+    b64_decode $value;
 
     # Thaw
     my $session = thaw $value;
@@ -68,7 +68,7 @@ sub store {
         $value = freeze $session;
 
         # Encode
-        $value = b($value)->b64_encode('')->to_string;
+        b64_encode $value, '';
     }
 
     # Options

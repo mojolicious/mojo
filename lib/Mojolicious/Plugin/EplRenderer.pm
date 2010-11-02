@@ -5,8 +5,8 @@ use warnings;
 
 use base 'Mojolicious::Plugin';
 
-use Mojo::ByteStream 'b';
 use Mojo::Template;
+use Mojo::Util 'md5_sum';
 
 # Clever things make people feel stupid and unexpected things make them feel
 # scared.
@@ -23,7 +23,7 @@ sub register {
 
             # Template
             my $path = $r->template_path($options);
-            $path = b($inline)->md5_sum->to_string if defined $inline;
+            $path = md5_sum $inline if defined $inline;
             return unless defined $path;
             my $cache = delete $options->{cache} || $path;
 

@@ -6,7 +6,7 @@ use warnings;
 use base 'Mojo::Base';
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
-use Mojo::ByteStream 'b';
+use Mojo::Util qw/encode decode url_escape url_unescape/;
 use Mojo::URL;
 
 __PACKAGE__->attr(charset        => 'UTF-8');
@@ -106,9 +106,9 @@ sub parse {
 
         # Escaped string
         if (index($string, '%') >= 0) {
-            $string = b($string)->url_unescape->to_string;
+            url_unescape $string;
             my $backup = $string;
-            $string = b($string)->decode($charset)->to_string if $charset;
+            decode $charset, $string if $charset;
             $string = $backup unless defined $string;
         }
 
@@ -135,17 +135,17 @@ sub parse {
 
         # Escaped name
         if (index($name, '%') >= 0) {
-            $name = b($name)->url_unescape->to_string;
+            url_unescape $name;
             my $backup = $name;
-            $name = b($name)->decode($charset)->to_string if $charset;
+            decode $charset, $name if $charset;
             $name = $backup unless defined $name;
         }
 
         # Escaped value
         if (index($value, '%') >= 0) {
-            $value = b($value)->url_unescape->to_string;
+            url_unescape $value;
             my $backup = $value;
-            $value = b($value)->decode($charset)->to_string if $charset;
+            decode $charset, $value if $charset;
             $value = $backup unless defined $value;
         }
 
@@ -212,9 +212,12 @@ sub to_string {
         my $value = $params->[$i + 1];
 
         # *( pchar / "/" / "?" ) with the exception of ";", "&" and "="
-        $name  = b($name)->encode($charset)->url_escape($Mojo::URL::PARAM);
-        $value = b($value)->encode($charset)->url_escape($Mojo::URL::PARAM)
-          if $value;
+        encode $charset, $name if $charset;
+        url_escape $name, $Mojo::URL::PARAM;
+        if ($value) {
+            encode $charset, $value if $charset;
+            url_escape $value, $Mojo::URL::PARAM;
+        }
 
         # Replace whitespace with "+"
         $name =~ s/\%20/\+/g;

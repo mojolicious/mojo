@@ -5,7 +5,7 @@ use warnings;
 
 use base 'Mojo::Content';
 
-use Mojo::ByteStream 'b';
+use Mojo::Util 'b64_encode';
 
 __PACKAGE__->attr(parts => sub { [] });
 
@@ -68,8 +68,8 @@ sub build_boundary {
     while (1) {
 
         # Mostly taken from LWP
-        $boundary =
-          b(join('', map chr(rand(256)), 1 .. $size * 3))->b64_encode;
+        $boundary = join('', map chr(rand(256)), 1 .. $size * 3);
+        b64_encode $boundary;
         $boundary =~ s/\W/X/g;
 
         # Check parts for boundary
@@ -187,20 +187,19 @@ sub _parse_multipart_body {
     my ($self, $boundary) = @_;
 
     # Whole part in buffer
-    my $buffer = $self->buffer;
-    my $pos    = $buffer->contains("\x0d\x0a--$boundary");
+    my $pos = index $self->{_b2}, "\x0d\x0a--$boundary";
     if ($pos < 0) {
-        my $length = $buffer->size - (length($boundary) + 8);
+        my $length = length($self->{_b2}) - (length($boundary) + 8);
         return unless $length > 0;
 
         # Store chunk
-        my $chunk = $buffer->remove($length);
+        my $chunk = substr $self->{_b2}, 0, $length, '';
         $self->parts->[-1] = $self->parts->[-1]->parse($chunk);
         return;
     }
 
     # Store chunk
-    my $chunk = $buffer->remove($pos);
+    my $chunk = substr $self->{_b2}, 0, $pos, '';
     $self->parts->[-1] = $self->parts->[-1]->parse($chunk);
     $self->{_multi_state} = 'multipart_boundary';
     return 1;
@@ -210,9 +209,8 @@ sub _parse_multipart_boundary {
     my ($self, $boundary) = @_;
 
     # Boundary begins
-    my $buffer = $self->buffer;
-    if ($buffer->contains("\x0d\x0a--$boundary\x0d\x0a") == 0) {
-        $buffer->remove(length($boundary) + 6);
+    if ((index $self->{_b2}, "\x0d\x0a--$boundary\x0d\x0a") == 0) {
+        substr $self->{_b2}, 0, length($boundary) + 6, '';
 
         # New part
         push @{$self->parts}, Mojo::Content::Single->new(relaxed => 1);
@@ -222,8 +220,8 @@ sub _parse_multipart_boundary {
 
     # Boundary ends
     my $end = "\x0d\x0a--$boundary--";
-    if ($buffer->contains($end) == 0) {
-        $buffer->remove(length $end);
+    if ((index $self->{_b2}, $end) == 0) {
+        substr $self->{_b2}, 0, length $end, '';
 
         # Done
         $self->{_state} = $self->{_multi_state} = 'done';
@@ -236,10 +234,9 @@ sub _parse_multipart_preamble {
     my ($self, $boundary) = @_;
 
     # Replace preamble with carriage return and line feed
-    my $buffer = $self->buffer;
-    my $pos    = $buffer->contains("--$boundary");
+    my $pos = index $self->{_b2}, "--$boundary";
     unless ($pos < 0) {
-        $buffer->remove($pos, "\x0d\x0a");
+        substr $self->{_b2}, 0, $pos, "\x0d\x0a";
 
         # Parse boundary
         $self->{_multi_state} = 'multipart_boundary';

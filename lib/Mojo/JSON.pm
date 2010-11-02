@@ -5,7 +5,7 @@ use warnings;
 
 use base 'Mojo::Base';
 
-use Mojo::ByteStream 'b';
+use Mojo::Util;
 
 __PACKAGE__->attr('error');
 
@@ -121,7 +121,7 @@ sub decode {
             last;
         }
     }
-    $string = b($string)->decode($encoding)->to_string;
+    Mojo::Util::decode $encoding, $string;
 
     # Decode
     my $result = $self->_decode_structure(\$string);
@@ -145,7 +145,8 @@ sub encode {
     my $string = $self->_encode_values($ref);
 
     # Unicode
-    return b($string)->encode('UTF-8')->to_string;
+    Mojo::Util::encode 'UTF-8', $string;
+    return $string;
 }
 
 sub false {$FALSE}

@@ -6,9 +6,7 @@ use warnings;
 use base 'Mojo::Base';
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
-use Mojo::ByteStream 'b';
-
-__PACKAGE__->attr(buffer => sub { b() });
+use Mojo::Util 'get_line';
 
 # Headers
 my @GENERAL_HEADERS = qw/
@@ -200,7 +198,10 @@ sub is_done {
 }
 
 sub last_modified { scalar shift->header('Last-Modified' => @_) }
-sub location      { scalar shift->header(Location        => @_) }
+
+sub leftovers { shift->{_buffer} }
+
+sub location { scalar shift->header(Location => @_) }
 
 sub names {
     my $self = shift;
@@ -220,13 +221,13 @@ sub parse {
     my ($self, $chunk) = @_;
 
     # Buffer
-    $self->buffer->add_chunk($chunk);
+    $self->{_buffer} = '' unless defined $self->{_buffer};
+    $self->{_buffer} .= $chunk if defined $chunk;
 
     # Parse headers
-    my $buffer = $self->buffer;
-    my $headers = $self->{_buffer} || [];
+    my $headers = $self->{_cache} || [];
     $self->{_state} = 'headers';
-    while (defined(my $line = $buffer->get_line)) {
+    while (defined(my $line = get_line $self->{_buffer})) {
 
         # New header
         if ($line =~ /^(\S+)\s*:\s*(.*)/) { push @$headers, $1, $2 }
@@ -243,14 +244,14 @@ sub parse {
             }
 
             # Done
-            $self->{_state}  = 'done';
-            $self->{_buffer} = [];
-            return $buffer;
+            $self->{_state} = 'done';
+            $self->{_cache} = [];
+            return $self;
         }
     }
-    $self->{_buffer} = $headers;
+    $self->{_cache} = $headers;
 
-    return;
+    return $self;
 }
 
 sub proxy_authenticate  { scalar shift->header('Proxy-Authenticate'  => @_) }
@@ -336,18 +337,6 @@ Mojo::Headers - Headers
 =head1 DESCRIPTION
 
 L<Mojo::Headers> is a container and parser for HTTP headers.
-
-=head1 ATTRIBUTES
-
-L<Mojo::Headers> implements the following attributes.
-
-=head2 C<buffer>
-
-    my $buffer = $headers->buffer;
-    $headers   = $headers->buffer(Mojo::ByteStream->new);
-
-The Buffer to use for header parsing, by default a L<Mojo::ByteStream>
-object.
 
 =head1 METHODS
 
@@ -497,6 +486,12 @@ Check if header parser is done.
 
 Shortcut for the C<Last-Modified> header.
 
+=head2 C<leftovers>
+
+    my $leftovers = $headers->leftovers;
+
+Leftovers.
+
 =head2 C<location>
 
     my $location = $headers->location;
@@ -519,7 +514,7 @@ Shortcut for the C<Origin> header.
 
 =head2 C<parse>
 
-    my $success = $headers->parse("Content-Type: text/foo\n\n");
+    $headers = $headers->parse("Content-Type: text/foo\n\n");
 
 Parse formatted headers.
 

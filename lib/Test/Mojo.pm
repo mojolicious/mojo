@@ -5,9 +5,9 @@ use warnings;
 
 use base 'Mojo::Base';
 
-use Mojo::ByteStream 'b';
 use Mojo::Client;
 use Mojo::Message::Response;
+use Mojo::Util 'decode';
 
 require Test::More;
 
@@ -261,9 +261,9 @@ sub _get_content {
       and $charset = $1;
 
     # Content
-    return $charset
-      ? b($tx->res->body)->decode($charset)->to_string
-      : $tx->res->body;
+    my $content = $tx->res->body;
+    decode $charset, $content if $charset;
+    return $content;
 }
 
 # Are you sure this is the Sci-Fi Convention? It's full of nerds!

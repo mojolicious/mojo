@@ -242,7 +242,20 @@ sub handler {
     }
 }
 
-sub helper { shift->renderer->add_helper(@_) }
+sub helper {
+    my $self = shift;
+    my $name = shift;
+
+    # Renderer
+    my $r = $self->renderer;
+
+    # Replace helper
+    $self->log->debug(qq/Helper "$name" already exists, replacing./)
+      if exists $r->helper->{$name};
+
+    # Add helper
+    $r->add_helper($name, @_);
+}
 
 sub hook {
     my ($self, $name, $cb) = @_;

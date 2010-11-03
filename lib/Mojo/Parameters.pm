@@ -127,7 +127,7 @@ sub parse {
         my $name  = $1;
         my $value = $2;
         $name  = '' unless defined $name;
-        $value = '' unless defined $name;
+        $value = '' unless defined $value;
 
         # Replace "+" with whitespace
         $name  =~ s/\+/\ /g;

@@ -58,15 +58,6 @@ sub parse {
       : $headers->sec_websocket_location ? 16
       :                                    undef;
 
-    # Don't waste memory
-    if ($self->asset->isa('Mojo::Asset::Memory')) {
-
-        # Upgrade to file storage
-        $self->asset(Mojo::Asset::File->new)
-          if !defined $length
-              || $length > ($ENV{MOJO_MAX_MEMORY_SIZE} || 262144);
-    }
-
     # Content needs to be upgraded to multipart
     if ($self->is_multipart) {
 
@@ -75,6 +66,16 @@ sub parse {
 
         # Need to upgrade
         return Mojo::Content::MultiPart->new($self)->parse;
+    }
+
+    # Don't waste memory
+    my $asset = $self->asset;
+    if ($asset->isa('Mojo::Asset::Memory')) {
+
+        # Upgrade to file based storage on demand
+        if ($asset->size > ($ENV{MOJO_MAX_MEMORY_SIZE} || 262144)) {
+            $self->asset(Mojo::Asset::File->new->add_chunk($asset->slurp));
+        }
     }
 
     # Chunked body or relaxed content

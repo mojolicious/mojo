@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 941;
+use Test::More tests => 951;
 
 use File::Spec;
 use File::Temp;
@@ -113,6 +113,28 @@ is $req->url, '/foo/bar/baz.html', 'right URL';
 is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $req->headers->content_length, undef,        'no "Content-Length" value';
 
+# Parse full HTTP 1.0 request (file storage)
+my $backup = $ENV{MOJO_MAX_MEMORY_SIZE} || '';
+$ENV{MOJO_MAX_MEMORY_SIZE} = 12;
+$req = Mojo::Message::Request->new;
+$req->parse('GET /foo/bar/baz.html?fo');
+$req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
+$req->parse('-Type: text/');
+$req->parse("plain\x0d\x0aContent-Length: 27\x0d\x0a\x0d\x0aHell");
+$req->parse("o World!\n");
+is $req->content->asset->isa('Mojo::Asset::Memory'), 1, 'stored in memory';
+$req->parse("1234\nlalalala\n");
+is $req->content->asset->isa('Mojo::Asset::File'), 1, 'stored in file';
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.0', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
+is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
+is $req->headers->content_length, 27, 'right "Content-Length" value';
+$ENV{MOJO_MAX_MEMORY_SIZE} = $backup;
+
 # Parse HTTP 1.0 start line and headers, no body (missing Content-Length)
 $req = Mojo::Message::Request->new;
 $req->parse("GET /foo/bar/baz.html HTTP/1.0\x0d\x0a");
@@ -128,8 +150,8 @@ is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $req->headers->content_length, undef,        'no "Content-Length" value';
 
 # Parse HTTP 1.0 start line and headers, no body (with line size limit)
-$req = Mojo::Message::Request->new;
-my $backup = $ENV{MOJO_MAX_LINE_SIZE} || '';
+$req                     = Mojo::Message::Request->new;
+$backup                  = $ENV{MOJO_MAX_LINE_SIZE} || '';
 $ENV{MOJO_MAX_LINE_SIZE} = 5;
 $req->parse('GET /foo/bar/baz.html HTTP/1');
 ok $req->is_done, 'request is done';
@@ -466,7 +488,7 @@ is_deeply $req->body_params->to_hash->{text1}, "hallo welt test123\n",
   'right value';
 is_deeply $req->body_params->to_hash->{text2}, '', 'right value';
 is $req->upload('upload')->filename, 'hello.pl', 'right filename';
-is ref $req->upload('upload')->asset, 'Mojo::Asset::File', 'right file';
+is ref $req->upload('upload')->asset, 'Mojo::Asset::Memory', 'right file';
 is $req->upload('upload')->asset->size, 69, 'right size';
 my $file = File::Spec->catfile(File::Temp::tempdir(CLEANUP => 1),
     ("MOJO_TMP." . time . ".txt"));

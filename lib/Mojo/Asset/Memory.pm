@@ -20,7 +20,7 @@ sub new {
 sub add_chunk {
     my ($self, $chunk) = @_;
     utf8::encode $chunk if utf8::is_utf8 $chunk;
-    $self->{content} .= $chunk;
+    $self->{content} .= $chunk if defined $chunk;
     return $self;
 }
 

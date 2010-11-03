@@ -84,6 +84,7 @@ sub generate_body_chunk {
 
     # Get chunk
     my $chunk = $self->{_b2};
+    $chunk = '' unless defined $chunk;
     $self->{_b2} = '';
 
     # EOF

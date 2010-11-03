@@ -294,9 +294,6 @@ sub get_header_chunk {
     # HTTP 0.9 has no headers
     return '' if $self->version eq '0.9';
 
-    # Fix headers
-    $self->fix_headers;
-
     return $self->content->get_header_chunk(@_);
 }
 

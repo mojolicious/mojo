@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use base 'Mojo::Base';
+use overload 'bool' => sub {1}, fallback => 1;
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
 use Mojo::Parameters;
@@ -71,9 +72,7 @@ sub authority {
 
         # Host
         url_unescape $host;
-        $self->ihost($host);
-
-        return $self;
+        return $host =~ /[^\w\.]/ ? $self->ihost($host) : $self->host($host);
     }
 
     # *( unreserved / pct-encoded / sub-delims ), extended with "[" and "]"

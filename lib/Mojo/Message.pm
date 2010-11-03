@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use base 'Mojo::Base';
-use overload '""' => sub { shift->to_string }, fallback => 1;
 
 use Carp 'croak';
 use Mojo::Asset::Memory;
@@ -122,22 +121,6 @@ sub body_params {
 }
 
 sub body_size { shift->content->body_size }
-
-sub build {
-    my $self    = shift;
-    my $message = '';
-
-    # Start line
-    $message .= $self->build_start_line;
-
-    # Headers
-    $message .= $self->build_headers;
-
-    # Body
-    $message .= $self->build_body;
-
-    return $message;
-}
 
 # My new movie is me, standing in front of a brick wall for 90 minutes.
 # It cost 80 million dollars to make.
@@ -323,8 +306,9 @@ sub get_start_line_chunk {
     # Progress
     if (my $cb = $self->on_progress) { $self->$cb('start_line', @_) }
 
+    # Get chunk
     my $copy = $self->_build_start_line;
-    return substr($copy, $offset, CHUNK_SIZE);
+    return substr $copy, $offset, CHUNK_SIZE;
 }
 
 sub has_leftovers { shift->content->has_leftovers }
@@ -400,7 +384,21 @@ sub on_read { shift->content->on_read(@_) }
 
 sub start_line_size { length shift->build_start_line }
 
-sub to_string { shift->build(@_) }
+sub to_string {
+    my $self    = shift;
+    my $message = '';
+
+    # Start line
+    $message .= $self->build_start_line;
+
+    # Headers
+    $message .= $self->build_headers;
+
+    # Body
+    $message .= $self->build_body;
+
+    return $message;
+}
 
 sub upload {
     my ($self, $name) = @_;
@@ -746,14 +744,6 @@ C<POST> parameters.
 
 Size of the body in bytes.
 
-=head2 C<to_string>
-
-=head2 C<build>
-
-    my $string = $message->build;
-
-Render whole message.
-
 =head2 C<build_body>
 
     my $string = $message->build_body;
@@ -911,6 +901,12 @@ Parse message chunk until the body is reached.
     my $size = $message->start_line_size;
 
 Size of the start line in bytes.
+
+=head2 C<to_string>
+
+    my $string = $message->to_string;
+
+Render whole message.
 
 =head2 C<upload>
 

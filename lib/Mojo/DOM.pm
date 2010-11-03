@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use base 'Mojo::Base';
+use overload 'bool' => sub {1}, fallback => 1;
 use overload '""' => sub { shift->to_xml }, fallback => 1;
 
 use Mojo::Util qw/decode encode html_unescape xml_escape/;

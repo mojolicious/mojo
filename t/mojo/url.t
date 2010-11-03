@@ -133,7 +133,7 @@ is $url->userinfo, undef,                                     'no userinfo';
 is $url->host,     'acme.s3.amazonaws.com',                   'right host';
 is $url->port,     undef,                                     'no port';
 is $url->path,     '/mojo%2Fg++-4.2_4.2.3-2ubuntu7_i386.deb', 'right path';
-ok !$url->query, 'no query';
+ok !$url->query->to_string, 'no query';
 is_deeply $url->query->to_hash, {}, 'right structure';
 is $url->fragment, undef, 'no fragment';
 is "$url",

@@ -15,7 +15,7 @@ $cookie->name('foo');
 $cookie->value('ba =r');
 $cookie->path('/test');
 $cookie->version(1);
-is "$cookie", 'foo=ba =r; $Path=/test', 'right format';
+is $cookie->to_string, 'foo=ba =r; $Path=/test', 'right format';
 is $cookie->to_string_with_prefix, '$Version=1; foo=ba =r; $Path=/test',
   'right format';
 
@@ -67,7 +67,7 @@ $cookie->name('foo');
 $cookie->value('ba r');
 $cookie->path('/test');
 $cookie->version(1);
-is "$cookie", 'foo=ba r; Version=1; Path=/test', 'right format';
+is $cookie->to_string, 'foo=ba r; Version=1; Path=/test', 'right format';
 
 # Full response cookie as string
 $cookie = Mojo::Cookie::Response->new;
@@ -82,7 +82,7 @@ $cookie->secure(1);
 $cookie->httponly(1);
 $cookie->comment('lalalala');
 $cookie->version(1);
-is "$cookie",
+is $cookie->to_string,
     'foo=ba r; Version=1; Domain=kraih.com; Path=/test;'
   . ' Max-Age=60; expires=Thu, 07 Aug 2008 07:07:59 GMT;'
   . ' Port="80 8080"; Secure; HttpOnly; Comment=lalalala', 'right format';
@@ -133,7 +133,7 @@ $cookie->path('/');
 $cookie->max_age(0);
 $cookie->expires(0);
 $cookie->version(1);
-is "$cookie", 'foo=bar; Version=1; Path=/; Max-Age=0;'
+is $cookie->to_string, 'foo=bar; Version=1; Path=/; Max-Age=0;'
   . ' expires=Thu, 01 Jan 1970 00:00:00 GMT', 'right format';
 
 # Parse response cookie with Max-Age 0 and expires 0

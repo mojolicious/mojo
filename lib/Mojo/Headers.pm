@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use base 'Mojo::Base';
-use overload '""' => sub { shift->to_string }, fallback => 1;
 
 use Mojo::Util 'get_line';
 
@@ -103,25 +102,6 @@ sub add {
       for @_;
 
     return $self;
-}
-
-sub build {
-    my $self = shift;
-
-    # Prepare headers
-    my @headers;
-    for my $name (@{$self->names}) {
-
-        # Multiline value
-        for my $values ($self->header($name)) {
-            my $value = join "\x0d\x0a ", @$values;
-            push @headers, "$name: $value";
-        }
-    }
-
-    # Format headers
-    my $headers = join "\x0d\x0a", @headers;
-    return length $headers ? $headers : undef;
 }
 
 sub connection          { scalar shift->header(Connection            => @_) }
@@ -296,7 +276,24 @@ sub to_hash {
     return $hash;
 }
 
-sub to_string { shift->build(@_) }
+sub to_string {
+    my $self = shift;
+
+    # Prepare headers
+    my @headers;
+    for my $name (@{$self->names}) {
+
+        # Multiline value
+        for my $values ($self->header($name)) {
+            my $value = join "\x0d\x0a ", @$values;
+            push @headers, "$name: $value";
+        }
+    }
+
+    # Format headers
+    my $headers = join "\x0d\x0a", @headers;
+    return length $headers ? $headers : undef;
+}
 
 sub trailer            { scalar shift->header(Trailer              => @_) }
 sub transfer_encoding  { scalar shift->header('Transfer-Encoding'  => @_) }
@@ -332,7 +329,6 @@ Mojo::Headers - Headers
     my $headers = Mojo::Headers->new;
     $headers->content_type('text/plain');
     $headers->parse("Content-Type: text/html\n\n");
-    print "$headers";
 
 =head1 DESCRIPTION
 
@@ -369,16 +365,6 @@ Add one or more header lines.
     $headers          = $headers->authorization('Basic Zm9vOmJhcg==');
 
 Shortcut for the C<Authorization> header.
-
-=head2 C<to_string>
-
-=head2 C<build>
-
-    my $string = $headers->build;
-    my $string = $headers->to_string;
-    my $string = "$headers";
-
-Format headers suitable for HTTP 1.1 messages.
 
 =head2 C<connection>
 
@@ -623,6 +609,12 @@ Shortcut for the C<Status> header.
 
 Format headers as a hash.
 Nested arrayrefs to represent multi line values are optional.
+
+=head2 C<to_string>
+
+    my $string = $headers->to_string;
+
+Format headers suitable for HTTP 1.1 messages.
 
 =head2 C<trailer>
 

@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use base 'Mojo::Base';
+use overload 'bool' => sub {1}, fallback => 1;
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
 use Mojo::Util qw/encode decode url_escape url_unescape/;
@@ -242,7 +243,6 @@ Mojo::Parameters - Parameter Container
     use Mojo::Parameters;
 
     my $params = Mojo::Parameters->new(foo => 'bar', baz => 23);
-    print "$params";
 
 =head1 DESCRIPTION
 

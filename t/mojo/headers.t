@@ -23,7 +23,7 @@ $headers->content_type('text/html');
 $headers->expect('continue-100');
 $headers->connection('close');
 is $headers->content_type, 'text/html', 'right value';
-like "$headers", qr/.*\x0d\x0a.*\x0d\x0a.*/, 'right format';
+like $headers->to_string, qr/.*\x0d\x0a.*\x0d\x0a.*/, 'right format';
 my $hash = $headers->to_hash;
 is $hash->{Connection}, 'close',        'right value';
 is $hash->{Expect},     'continue-100', 'right value';
@@ -38,7 +38,7 @@ is_deeply [sort @{$headers->names}], [qw/Connection Content-Type Expect/],
 # Multiline values
 $headers = Mojo::Headers->new;
 $headers->header('X-Test', [23, 24], 'single line', [25, 26]);
-is "$headers",
+is $headers->to_string,
     "X-Test: 23\x0d\x0a 24\x0d\x0a"
   . "X-Test: single line\x0d\x0a"
   . "X-Test: 25\x0d\x0a 26", 'right format';

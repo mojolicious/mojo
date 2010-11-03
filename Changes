@@ -6,6 +6,8 @@ This file documents the revision history for Perl extension Mojolicious.
           it instead.
         - Improved Mojo::IOLoop performance by about 20%.
         - Made automatic file storage upgrade smarter.
+        - Fixed overload stringification and improved overall performance by
+          about 25%.
 
 0.999934 2010-11-01 00:00:00
         - Fixed relaxed HTTP parsing.

@@ -85,11 +85,8 @@ sub find {
     my ($self, $url) = @_;
 
     # Pattern
-    my $domain = $url->host;
-    my $path = $url->path || '/';
-
-    # Shortcut
-    return unless $domain;
+    return unless my $domain = $url->host;
+    my $path = $url->path->to_string || '/';
 
     # Find
     my @found;
@@ -139,6 +136,9 @@ sub find {
 
 sub inject {
     my ($self, $tx) = @_;
+
+    # Empty jar
+    return unless keys %{$self->{_jar}};
 
     # Request
     my $req = $tx->req;

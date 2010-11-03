@@ -195,7 +195,7 @@ sub _build_start_line {
 
     # Path
     my $url   = $self->url;
-    my $path  = $url->path;
+    my $path  = $url->path->to_string;
     my $query = $url->query->to_string;
     $path .= "?$query" if $query;
     $path = "/$path" unless $path =~ /^\//;

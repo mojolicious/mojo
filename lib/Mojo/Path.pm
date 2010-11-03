@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use base 'Mojo::Base';
+use overload 'bool' => sub {1}, fallback => 1;
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
 use Mojo::Util qw/url_escape url_unescape/;
@@ -136,7 +137,6 @@ Mojo::Path - Path
     use Mojo::Path;
 
     my $path = Mojo::Path->new('/foo/bar%3B/baz.html');
-    print "$path";
 
 =head1 DESCRIPTION
 

@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use base 'Mojo::Base';
+use overload 'bool' => sub {1}, fallback => 1;
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
 require Time::Local;

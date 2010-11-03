@@ -321,7 +321,7 @@ Mojolicious - The Web In A Box!
     # Say hello
     sub welcome {
         my $self = shift;
-        $self->render_text('Hi there!');
+        $self->render(text => 'Hi there!');
     }
 
     # Say goodbye from a template (foo/bye.html.ep)

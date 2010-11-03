@@ -307,7 +307,7 @@ sub get_start_line_chunk {
     if (my $cb = $self->on_progress) { $self->$cb('start_line', @_) }
 
     # Get chunk
-    my $copy = $self->_build_start_line;
+    my $copy = $self->{_buffer} ||= $self->_build_start_line;
     return substr $copy, $offset, CHUNK_SIZE;
 }
 

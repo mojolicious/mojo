@@ -8,6 +8,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Made automatic file storage upgrade smarter.
         - Fixed overload stringification and improved overall performance by
           about 25%.
+        - Fixed start line/header buffering and improved performance by 8%.
 
 0.999934 2010-11-01 00:00:00
         - Fixed relaxed HTTP parsing.

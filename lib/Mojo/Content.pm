@@ -101,7 +101,7 @@ sub get_header_chunk {
     my ($self, $offset) = @_;
 
     # Normal headers
-    my $copy = $self->_build_headers;
+    my $copy = $self->{_b1} ||= $self->_build_headers;
     return substr($copy, $offset, CHUNK_SIZE);
 }
 

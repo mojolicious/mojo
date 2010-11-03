@@ -154,25 +154,15 @@ sub leftovers {
 }
 
 sub parse {
-    my ($self, $chunk) = @_;
-
-    # Buffer
-    $self->{_b1}       = '' unless defined $self->{_b1};
-    $self->{_raw_size} = 0  unless exists $self->{_raw_size};
-
-    # Add chunk
-    if (defined $chunk) {
-        $self->{_raw_size} += length $chunk;
-        $self->{_b1} .= $chunk;
-    }
+    my $self = shift;
 
     # Parse headers
-    $self->parse_until_body;
+    $self->parse_until_body(@_);
 
     # Still parsing headers
     return $self if $self->{_state} eq 'headers';
 
-    # Relaxed parsing for broken web servers
+    # Relaxed parsing for old or broken web servers
     if ($self->auto_relax) {
         my $headers    = $self->headers;
         my $connection = $headers->connection;
@@ -182,21 +172,21 @@ sub parse {
           if !length $length && (!$connection || $connection =~ /close/i);
     }
 
-    # Chunked
+    # Parse chunked content
     $self->{_real_size} = 0 unless exists $self->{_real_size};
     if ($self->is_chunked && ($self->{_state} || '') ne 'headers') {
         $self->_parse_chunked;
         $self->{_state} = 'done' if ($self->{_chunked} || '') eq 'done';
     }
 
-    # Not chunked, pass through
+    # Not chunked, pass through to second buffer
     else {
         $self->{_real_size} += length $self->{_b1};
         $self->{_b2} .= $self->{_b1};
         $self->{_b1} = '';
     }
 
-    # Custom body parser
+    # Custom body parser callback
     if (my $cb = $self->on_read) {
 
         # Chunked or relaxed content
@@ -248,7 +238,7 @@ sub parse_body_once {
 sub parse_until_body {
     my ($self, $chunk) = @_;
 
-    # Buffer
+    # Prepare first buffer
     $self->{_b1}       = '' unless defined $self->{_b1};
     $self->{_raw_size} = 0  unless exists $self->{_raw_size};
 
@@ -285,7 +275,7 @@ sub write {
     # Dynamic content
     $self->on_read(sub { });
 
-    # Buffer
+    # Add chunk
     if (defined $chunk) {
         $self->{_b2} = '' unless defined $self->{_b2};
         $self->{_b2} .= $chunk;

@@ -152,7 +152,7 @@ $t->get_ok('/hello.txt')->status_is(200)
 
 # Try to access a file which is not under the web root via path
 # traversal
-$t->get_ok('../../mojolicious/secret.txt')->status_is(404)
+$t->get_ok('/../../mojolicious/secret.txt')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/File Not Found/);

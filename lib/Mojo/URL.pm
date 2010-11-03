@@ -72,7 +72,9 @@ sub authority {
 
         # Host
         url_unescape $host;
-        return $host =~ /[^\w\.]/ ? $self->ihost($host) : $self->host($host);
+        return $host =~ /[^\x00-\x7f]/
+          ? $self->ihost($host)
+          : $self->host($host);
     }
 
     # *( unreserved / pct-encoded / sub-delims ), extended with "[" and "]"
@@ -129,9 +131,13 @@ sub ihost {
         return $self;
     }
 
+    # Host
+    return unless $host = $self->host;
+    return $host unless $host =~ /[^\x00-\x7f]/;
+
     # Encode parts
     my @encoded;
-    for my $part (split /\./, $self->host || '') {
+    for my $part (split /\./, $host || '') {
         if ($part =~ /[^\x00-\x7f]/) {
             punycode_encode $part;
             $part = "xn--$part";

@@ -176,9 +176,10 @@ sub parse {
     if ($self->auto_relax) {
         my $headers    = $self->headers;
         my $connection = $headers->connection;
+        my $length     = $headers->content_length;
+        $length = '' unless defined $length;
         $self->relaxed(1)
-          if !length($headers->content_length)
-              && (!$connection || $connection =~ /close/i);
+          if !length $length && (!$connection || $connection =~ /close/i);
     }
 
     # Chunked

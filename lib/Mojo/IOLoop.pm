@@ -6,7 +6,7 @@ use warnings;
 use base 'Mojo::Base';
 
 use Carp 'croak';
-use Errno qw/EAGAIN EWOULDBLOCK/;
+use Errno qw/EAGAIN ECONNRESET EWOULDBLOCK/;
 use File::Spec;
 use IO::File;
 use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
@@ -1277,6 +1277,9 @@ sub _read {
 
         # Retry
         return if $! == EAGAIN || $! == EWOULDBLOCK;
+
+        # Connection reset
+        return $self->_hup($id) if $! == ECONNRESET;
 
         # Read error
         return $self->_error($id, $!);

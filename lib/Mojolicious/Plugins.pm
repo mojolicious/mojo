@@ -71,13 +71,14 @@ sub register_plugin {
 sub run_hook {
     my $self = shift;
 
-    # Shortcut
-    my $name = shift;
-    return $self unless $name;
-    return unless $self->hooks->{$name};
+    # Name
+    return $self unless my $name = shift;
+
+    # Hooks
+    return $self unless my $hooks = $self->hooks->{$name};
 
     # DEPRECATED in Hot Beverage! (passing $self)
-    for my $hook (@{$self->hooks->{$name}}) { $self->$hook(@_) }
+    for my $hook (@$hooks) { $self->$hook(@_) }
 
     return $self;
 }
@@ -86,13 +87,14 @@ sub run_hook {
 sub run_hook_reverse {
     my $self = shift;
 
-    # Shortcut
-    my $name = shift;
-    return $self unless $name;
-    return unless $self->hooks->{$name};
+    # Name
+    return $self unless my $name = shift;
+
+    # Hooks
+    return $self unless my $hooks = $self->hooks->{$name};
 
     # DEPRECATED in Hot Beverage! (passing $self)
-    for my $hook (reverse @{$self->hooks->{$name}}) { $self->$hook(@_) }
+    for my $hook (reverse @$hooks) { $self->$hook(@_) }
 
     return $self;
 }

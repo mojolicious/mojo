@@ -341,7 +341,10 @@ sub listen {
     }
 
     # File descriptor
-    if (defined $fd) { $socket->fdopen($fd, 'r') }
+    if (defined $fd) {
+        $socket->fdopen($fd, 'r')
+          or croak "Can't open file descriptor $fd: $!";
+    }
     else {
         $fd = fileno $socket;
         $reuse = ",$reuse" if length $ENV{MOJO_REUSE};
@@ -610,7 +613,7 @@ sub resolve {
             $self->drop($timer) if $timer;
 
             # Packet
-            my @packet = unpack 'nnnnnnA*', $chunk;
+            my @packet = unpack 'nnnnnna*', $chunk;
 
             # Wrong response
             return $self->$cb([]) unless $packet[0] eq $tx;
@@ -621,19 +624,19 @@ sub resolve {
             # Questions
             for (1 .. $packet[2]) {
                 my $n;
-                do { ($n, $content) = unpack 'C/aA*', $content } while ($n);
-                $content = (unpack 'nnA*', $content)[2];
+                do { ($n, $content) = unpack 'C/aa*', $content } while ($n);
+                $content = (unpack 'nna*', $content)[2];
             }
 
             # Answers
             my @answers;
             for (1 .. $packet[3]) {
                 my ($t, $a, $answer);
-                ($t, $a, $content) = (unpack 'nnnNn/AA*', $content)[1, 4, 5];
+                ($t, $a, $content) = (unpack 'nnnNn/aa*', $content)[1, 4, 5];
 
                 # A
                 if ($t eq $DNS_TYPES->{A}) {
-                    $answer = join('.', unpack 'C*', $a);
+                    $answer = join('.', unpack 'C4', $a);
                 }
 
                 # AAAA

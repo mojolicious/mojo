@@ -803,13 +803,13 @@ Note that Perl 5.10 or L<Digest::SHA> are required for C<SHA1> support.
 
     html_escape $string;
 
-HTML escape string.
+HTML escape string in-place.
 
 =head2 C<html_unescape>
 
     html_unescape $string;
 
-HTML unescape string.
+HTML unescape string in-place.
 
 =head2 C<md5_bytes>
 
@@ -895,8 +895,8 @@ URL unescape in-place.
 
     xml_escape $string;
 
-XML escape string, this is a much faster version of C<html_escape> escaping
-only the characters C<&>, C<E<lt>>, C<E<gt>>, C<"> and C<'>.
+XML escape string in-place, this is a much faster version of C<html_escape>
+escaping only the characters C<&>, C<E<lt>>, C<E<gt>>, C<"> and C<'>.
 
 =head1 SEE ALSO
 

@@ -1438,9 +1438,6 @@ sub _write {
         $self->_run_event('drain', $event, $id);
     }
 
-    # Nothing to write
-    return unless length $c->{buffer};
-
     # Write
     my $written = $socket->syswrite($c->{buffer});
 

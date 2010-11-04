@@ -38,8 +38,11 @@ sub block;
 sub escape;
 *escape = sub {
     return "$_[0]" if ref $_[0] && ref $_[0] eq 'Mojo::ByteStream';
-    my $v = $_[0];
-    $v = '' unless defined $v;
+    my $v;
+    {
+        no warnings 'uninitialized';
+        $v = "$_[0]";
+    }
     Mojo::Util::xml_escape $v;
     return $v;
 };

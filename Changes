@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 0.999936 2010-11-03 00:00:00
+        - Improved Mojo::Template performance slightly. (kimoto)
         - Fixed non-blocking DNS resolver bug.
         - Fixed connection reset handling in Mojo::IOLoop.
 

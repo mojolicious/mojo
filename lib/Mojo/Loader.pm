@@ -28,14 +28,18 @@ sub load {
     # Shortcut
     return 1 unless $module;
 
-    # Already loaded
-    return if !$ENV{MOJO_RELOAD} && $module->can('new');
+    # Forced reload
+    if ($ENV{MOJO_RELOAD}) {
 
-    # Unload (forced reload)
-    my $key = $module;
-    $key =~ s/\:\:/\//g;
-    $key .= '.pm';
-    _unload($key);
+        # Unload
+        my $key = $module;
+        $key =~ s/\:\:/\//g;
+        $key .= '.pm';
+        _unload($key);
+    }
+
+    # Already loaded
+    else { return if $module->can('new') }
 
     # Load
     eval "require $module";

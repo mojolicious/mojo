@@ -9,6 +9,7 @@ require Cwd;
 require File::Path;
 require File::Spec;
 require IO::File;
+require Encode;
 
 use Carp 'croak';
 use Mojo::Template;
@@ -217,6 +218,7 @@ sub write_file {
     $file->open(">$path") or croak qq/Can't open file "$path": $!/;
 
     # Write unbuffered
+    Encode::_utf8_off($data) if Encode::is_utf8($data);
     $file->syswrite($data);
 
     print "  [write] $path\n" unless $self->quiet;

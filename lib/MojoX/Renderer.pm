@@ -11,6 +11,7 @@ use Mojo::Command;
 use Mojo::Home;
 use Mojo::JSON;
 use MojoX::Types;
+use Mojo::Util 'encode';
 
 __PACKAGE__->attr(default_format => 'html');
 __PACKAGE__->attr([qw/default_handler default_template_class/]);
@@ -100,6 +101,9 @@ sub render {
     # Template
     my $template = delete $stash->{template};
 
+    # Template class
+    my $class = $stash->{template_class};
+
     # Format
     my $format = $stash->{format} || $self->default_format;
 
@@ -125,7 +129,7 @@ sub render {
         handler        => $handler,
         encoding       => $self->encoding,
         inline         => $inline,
-        template_class => $stash->{template_class}
+        template_class => $class
     };
     my $output;
 
@@ -177,12 +181,19 @@ sub render {
     # Extends
     while ((my $extends = $self->_extends($c)) && !$json && !$data) {
 
+        # Stash
+        my $stash = $c->stash;
+
+        # Template class
+        $class = $stash->{template_class};
+        $options->{template_class} = $class;
+
         # Handler
-        $handler = $c->stash->{handler};
+        $handler = $stash->{handler};
         $options->{handler} = $handler;
 
         # Format
-        $format = $c->stash->{format} || $self->default_format;
+        $format = $stash->{format} || $self->default_format;
         $options->{format} = $format;
 
         # Template
@@ -195,8 +206,7 @@ sub render {
     # Encoding (JSON is already encoded)
     unless ($partial) {
         my $encoding = $options->{encoding};
-        $output = b($output)->encode($encoding)->to_string
-          if $encoding && !$json && !$data;
+        encode $encoding, $output if $encoding && $output && !$json && !$data;
     }
 
     # Type
@@ -260,6 +270,8 @@ sub _detect_handler {
     return;
 }
 
+# You are hereby conquered.
+# Please line up in order of how much beryllium it takes to kill you.
 sub _detect_template_class {
     my ($self, $options) = @_;
     return
@@ -353,8 +365,8 @@ The renderer will use L<MojoX::Types> to look up the content MIME type.
     my $default = $renderer->default_handler;
     $renderer   = $renderer->default_handler('epl');
 
-The default template handler to use for rendering.
-There are two handlers in this distribution.
+The default template handler to use for rendering in cases where auto
+detection doesn't work, like for C<inline> templates.
 
 =over 4
 
@@ -383,8 +395,6 @@ section.
 
 Template auto detection, the renderer will try to select the right template
 and renderer automatically.
-A very powerful alternative to C<default_handler> that allows parallel use of
-multiple template systems.
 
 =head2 C<encoding>
 

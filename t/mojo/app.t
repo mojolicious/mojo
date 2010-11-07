@@ -6,13 +6,7 @@ use warnings;
 # Disable epoll, kqueue and IPv6
 BEGIN { $ENV{MOJO_POLL} = $ENV{MOJO_NO_IPV6} = 1 }
 
-use Mojo::IOLoop;
-use Test::More;
-
-# Make sure sockets are working
-plan skip_all => 'working sockets required for this test!'
-  unless Mojo::IOLoop->new->generate_port;
-plan tests => 39;
+use Test::More tests => 43;
 
 # I was so bored I cut the pony tail off the guy in front of us.
 # Look at me, I'm a grad student. I'm 30 years old and I made $600 last year.
@@ -173,3 +167,32 @@ ok $tx2->is_done, 'transaction is done';
 ok !$tx2->error, 'has no error';
 ok $tx3->is_done, 'transaction is done';
 ok !$tx3->error, 'has no error';
+
+# Form with chunked response
+my $params = {};
+for my $i (1 .. 10) { $params->{"test$i"} = $i }
+my $result = '';
+for my $key (sort keys %$params) { $result .= $params->{$key} }
+my ($code, $body);
+$client->post_form(
+    "http://127.0.0.1:$port/diag/chunked_params" => $params => sub {
+        my $self = shift;
+        $code = $self->res->code;
+        $body = $self->res->body;
+    }
+)->start;
+is $code, 200, 'right status';
+is $body, $result, 'right content';
+
+# Upload
+($code, $body) = undef;
+$client->post_form(
+    "http://127.0.0.1:$port/diag/upload" => {file => {content => $result}} =>
+      sub {
+        my $self = shift;
+        $code = $self->res->code;
+        $body = $self->res->body;
+    }
+)->start;
+is $code, 200, 'right status';
+is $body, $result, 'right content';

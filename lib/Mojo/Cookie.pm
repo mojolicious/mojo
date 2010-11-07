@@ -4,10 +4,11 @@ use strict;
 use warnings;
 
 use base 'Mojo::Base';
+use overload 'bool' => sub {1}, fallback => 1;
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
 use Carp 'croak';
-use Mojo::ByteStream 'b';
+use Mojo::Util 'unquote';
 
 __PACKAGE__->attr([qw/name path value version/]);
 
@@ -45,7 +46,10 @@ sub _tokenize {
             my $value;
 
             # Quoted value
-            if ($string =~ s/$VALUE_RE//o) { $value = b($1)->unquote }
+            if ($string =~ s/$VALUE_RE//o) {
+                $value = $1;
+                unquote $value if $value;
+            }
 
             # "expires" is a special case, thank you Netscape...
             elsif ($name =~ /expires/i && $string =~ s/$EXPIRES_RE//o) {

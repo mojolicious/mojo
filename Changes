@@ -1,7 +1,61 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-0.999930 2010-09-10 00:00:00
+0.999937 2010-11-04 00:00:00
+        - Improved Mojo::Loader to allow Mojolicious recovering from tricky
+          syntax errors in Controllers.
+
+0.999936 2010-11-03 00:00:00
+        - Improved Mojo::Template performance slightly. (kimoto)
+        - Fixed a serious WebSocket bug.
+        - Fixed non-blocking DNS resolver bug.
+        - Fixed connection reset handling in Mojo::IOLoop.
+
+0.999935 2010-11-03 00:00:00
+        - Added EXPERIMENTAL module Mojo::Util as a faster low level
+          alternative to Mojo::ByteStream and rewrote many internals to use
+          it instead.
+        - Improved Mojo::IOLoop performance by about 20%.
+        - Made automatic file storage upgrade smarter.
+        - Fixed overload stringification and improved overall performance by
+          about 25%.
+        - Fixed start line/header buffering and improved performance by 8%.
+
+0.999934 2010-11-01 00:00:00
+        - Fixed relaxed HTTP parsing.
+
+0.999933 2010-10-30 00:00:00
+        - Fixed small connect bug in Mojo::IOLoop.
+        - Fixed WebSocket handshake.
+
+0.999932 2010-10-29 00:00:00
+        - Deprecated the old plugin hook calling convention and added
+          EXPERIMENTAL hook method to Mojolicious.
+        - Fixed a few small connect bugs in Mojo::IOLoop.
+        - Fixed typos.
+
+0.999931 2010-10-25 00:00:00
+        - Removed tag helpers label and img.
+        - Renamed tag helper script to javascript and added CDATA support.
+        - Renamed tag helper input to input_tag.
+        - Added EXPERIMENTAL non-blocking DNS support to Mojo::IOLoop.
+          (und3f)
+        - Added EXPERIMENTAL support for IPv4 and IPv6 addess checks to
+          Mojo::URL.
+        - Added stylesheet tag helper.
+        - Added before and after methods to Mojo::DOM.
+        - Hide command overview from prove. (omega)
+        - Default to silent tests in Test::Mojo.
+        - Fixed optional value support in Mojo::Cookie.
+        - Fixed shortcut methods in Mojo::Headers to not be context aware.
+        - Fixed url_for to not inherit captures for new endpoints.
+
+0.999930 2010-10-18 00:00:00
         - Code name "Hot Beverage", this is a major release.
+        - Removed Mojo::Server::Daemon::Prefork due to unfixable design flaws
+          regarding WebSocket support, please use a PSGI server instead for
+          HTTP production setups.
+          For scalable WebSocket deployment we will introduce a whole new
+          server in one of the next releases!
         - Deprecated old Mojo::Template block syntax and added a very pretty
           replacement. (See documentation for more)
         - Deprecated helper method in Mojolicious::Controller.
@@ -9,12 +63,10 @@ This file documents the revision history for Perl extension Mojolicious.
           of on_* methods.
         - Deprecated process method in Mojo::Client and added new start
           method.
-        - Replaced Mojo::Server::Daemon::Prefork with the much more advanced
-          and for production environments optimized Mojo::Server::Hypnotoad.
-          See the new hypnotoad script and updated
-          Mojolicious::Guides::Cookbook recipes for more information.
         - Replaced the "mojolicious" command with "mojo", for convenience.
         - Removed Mojo::Command::Generate::App.
+        - Renamed the methods name and replace_content to type and
+          replace_inner in Mojo::DOM.
         - Added EXPERIMENTAL support for indented Perl lines in
           Mojo::Template.
         - Added EXPERIMENTAL support for --mode and --home options to all
@@ -31,13 +83,22 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL tag helpers to Mojolicious.
         - Added EXPERIMENTAL support for radio buttons and select fields to
           Mojolicious::Plugin::TagHelpers. (kvorg)
+        - Added EXPERIMENTAL is_limit_exceeded, max_line_size and
+          max_message_size methods to Mojo::Message.
+        - Added EXPERIMENTAL automatic relaxed parsing support for HTTP
+          responses.
         - Added while, until and inner_xml methods for Mojo::DOM collections.
           (vti)
         - Added b function to all Mojo::Template templates.
         - Added selector support to the dom method of Mojo::Message. (marcus)
+        - Added x function to ojo. (DaTa)
         - Added failed request warnings to ojo. (marcus)
         - Added support for selector groups to Mojo::DOM.
-        - Added more attribute selectors to Mojo::DOM.
+        - Added more attribute selectors, pseudo classes and combinators to
+          Mojo::DOM.
+        - Added support for mode specific config files to
+          Mojolicious::Plugin::JsonConfig. (marcus)
+        - Added reserved route name current.
         - Simplified transaction pausing by replacing it with an automatism.
         - Improved RFC3986 compliance of Mojo::Path. (janus)
         - Improved Mojo::Server::PSGI to preload applications.
@@ -46,6 +107,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved documentation. (rhaen)
         - Improved Mojo::ByteStream performance. (mons)
         - Improved Mojo::Parameters performance. (kimoto)
+        - Improved Mojo::Message::Response parser resilience.
+        - Improved template class handling in MojoX::Renderer. (vti)
         - Fixed a serious design flaw in Mojo::Message and made long poll
           much easier.
         - Fixed a bug where Mojo::IOLoop connections could be closed too
@@ -67,6 +130,10 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed multiple route condition bugs. (esskar)
         - Fixed a small relative path bug in Mojo::URL.
         - Fixed pod renderer bug. (vti)
+        - Fixed a multipart parser bug affecting mostly file uploads.
+        - Fixed input tag helper escaping. (vti)
+        - Fixed url_for WebSocket support.
+        - Fixed url_for format handling.
 
 0.999929 2010-08-17 00:00:00
         - Removed OS X resource fork files.
@@ -175,7 +242,7 @@ This file documents the revision history for Perl extension Mojolicious.
           Mojo::Message.
         - Added EXPERIMENTAL idle_cb attribute to Mojo::IOLoop.
         - Added more perlish block syntax to Mojo::Template.
-        - Added non blocking TLS handshake support to Mojo::IOLoop.
+        - Added non-blocking TLS handshake support to Mojo::IOLoop.
         - Added proxy support to Mojo::Client.
         - Added the ability to have dispatch plugins.
         - Added "under" to Mojolicious::Lite.

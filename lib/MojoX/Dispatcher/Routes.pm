@@ -5,9 +5,9 @@ use warnings;
 
 use base 'MojoX::Routes';
 
-use Mojo::ByteStream 'b';
 use Mojo::Exception;
 use Mojo::Loader;
+use Mojo::Util 'camelize';
 use MojoX::Routes::Match;
 use Scalar::Util 'weaken';
 
@@ -151,7 +151,10 @@ sub _dispatch_controller {
         if (my $e = Mojo::Loader->load($app)) {
 
             # Doesn't exist
-            return unless ref $e;
+            unless (ref $e) {
+                $c->app->log->debug("$app does not exist, maybe a typo?");
+                return;
+            }
 
             # Error
             $c->app->log->error($e);
@@ -223,7 +226,10 @@ sub _generate_class {
     # Class
     my $class = $field->{class};
     my $controller = $field->{controller} || '';
-    $class = b($controller)->camelize->to_string unless $class;
+    unless ($class) {
+        $class = $controller;
+        camelize $class;
+    }
 
     # Namespace
     my $namespace = $field->{namespace};

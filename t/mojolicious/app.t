@@ -6,13 +6,7 @@ use warnings;
 # Disable epoll, kqueue and IPv6
 BEGIN { $ENV{MOJO_POLL} = $ENV{MOJO_NO_IPV6} = 1 }
 
-use Mojo::IOLoop;
-use Test::More;
-
-# Make sure sockets are working
-plan skip_all => 'working sockets required for this test!'
-  unless Mojo::IOLoop->new->generate_port;
-plan tests => 194;
+use Test::More tests => 194;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -158,7 +152,7 @@ $t->get_ok('/hello.txt')->status_is(200)
 
 # Try to access a file which is not under the web root via path
 # traversal
-$t->get_ok('../../mojolicious/secret.txt')->status_is(404)
+$t->get_ok('/../../mojolicious/secret.txt')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/File Not Found/);

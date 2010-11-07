@@ -10,7 +10,7 @@ use Test::More;
 
 plan skip_all => 'set TEST_CLIENT to enable this test (developer only!)'
   unless $ENV{TEST_CLIENT};
-plan tests => 99;
+plan tests => 102;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -46,13 +46,18 @@ my $tx = $client->build_tx(GET => 'http://localhost:99999');
 $client->start($tx);
 ok !$tx->is_done, 'transaction is not done';
 
-# Fresh client again
-$client = Mojo::Client->new;
+# Connection refused
+$tx = $client->build_tx(GET => 'http://127.0.0.1:99999');
+$client->start($tx);
+ok !$tx->is_done, 'transaction is not done';
 
 # Host does not exist
 $tx = $client->build_tx(GET => 'http://cdeabcdeffoobarnonexisting.com');
 $client->start($tx);
 ok !$tx->is_done, 'transaction is not done';
+
+# Fresh client again
+$client = Mojo::Client->new;
 
 # Keep alive
 my $async = $client->async;
@@ -69,6 +74,19 @@ $async->get(
 )->start;
 $async->ioloop->start;
 is $kept_alive, 1, 'connection was kept alive';
+
+# Resolve TXT record
+my $record;
+$async->ioloop->resolve(
+    'google.com',
+    'TXT',
+    sub {
+        my ($self, $records) = @_;
+        $record = $records->[0];
+        $self->stop;
+    }
+)->start;
+like $record, qr/spf/, 'right record';
 
 # Nested keep alive
 my @kept_alive;
@@ -124,6 +142,7 @@ $ENV{HTTPS_PROXY} = $backup2;
 
 # Oneliner
 is g('mojolicious.org')->code,          200, 'right status';
+is h('mojolicious.org')->code,          200, 'right status';
 is p('mojolicious.org/lalalala')->code, 404, 'right status';
 is g('http://mojolicious.org')->code,   200, 'right status';
 is p('http://mojolicious.org')->code,   404, 'right status';

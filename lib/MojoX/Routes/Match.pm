@@ -6,7 +6,7 @@ use warnings;
 use base 'Mojo::Base';
 
 use Carp 'croak';
-use Mojo::ByteStream 'b';
+use Mojo::Util qw/decode url_unescape/;
 use Mojo::URL;
 use Scalar::Util 'weaken';
 
@@ -24,9 +24,11 @@ sub new {
     weaken $self->{_controller};
 
     # Path
-    $self->{_path} = shift
-      || b($c->req->url->path->to_string)->url_unescape->decode('UTF-8')
-      ->to_string;
+    unless ($self->{_path} = shift) {
+        $self->{_path} = $c->req->url->path->to_string;
+        url_unescape $self->{_path};
+        decode 'UTF8', $self->{_path};
+    }
 
     return $self;
 }
@@ -166,23 +168,49 @@ sub url_for {
         }
     }
 
+    # Captures
+    my $captures = $self->captures;
+
     # Named
     if ($name) {
-        croak qq/Route "$name" used in url_for does not exist/
-          unless $endpoint = $self->_find_route($name);
+
+        # Current route
+        if ($name eq 'current') { $name = undef }
+
+        # Find
+        else {
+            $captures = {};
+            croak qq/Route "$name" used in url_for does not exist/
+              unless $endpoint = $self->_find_route($name);
+        }
     }
 
     # Merge values
-    $values = {%{$self->captures}, %$values};
+    $values = {%$captures, format => undef, %$values};
 
+    # URL
     my $url = Mojo::URL->new;
 
     # No endpoint
     return $url unless $endpoint;
 
+    # Base
+    $url->base($self->{_controller}->req->url->base->clone);
+    my $base = $url->base;
+    $url->base->userinfo(undef);
+
     # Render
     my $path = $endpoint->render($url->path->to_string, $values);
     $url->path->parse($path);
+
+    # Fix scheme
+    if ($endpoint->is_websocket) {
+        $base->scheme(($base->scheme || '') eq 'https' ? 'wss' : 'ws');
+    }
+
+    # Fix paths
+    unshift @{$url->path->parts}, @{$base->path->parts};
+    $base->path->parts([]);
 
     return $url;
 }

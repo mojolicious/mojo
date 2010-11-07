@@ -6,13 +6,7 @@ use warnings;
 # Disable epoll, kqueue and IPv6
 BEGIN { $ENV{MOJO_POLL} = $ENV{MOJO_NO_IPV6} = 1 }
 
-use Mojo::IOLoop;
-use Test::More;
-
-# Make sure sockets are working
-plan skip_all => 'working sockets required for this test!'
-  unless Mojo::IOLoop->new->generate_port;
-plan tests => 27;
+use Test::More tests => 29;
 
 # Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
 # Well, that’s love for you.
@@ -29,6 +23,12 @@ app->log->level('fatal');
 # Avoid exception template
 app->renderer->root(app->home->rel_dir('public'));
 
+# GET /link
+get '/link' => sub {
+    my $self = shift;
+    $self->render(text => $self->url_for('index')->to_abs);
+};
+
 # WebSocket /
 my $flag;
 websocket '/' => sub {
@@ -37,16 +37,17 @@ websocket '/' => sub {
     $self->on_message(
         sub {
             my ($self, $message) = @_;
-            $self->send_message("${message}test2");
+            my $url = $self->url_for->to_abs;
+            $self->send_message("${message}test2$url");
             $flag = 20;
         }
     );
-};
+} => 'index';
 
 # WebSocket /socket
 websocket '/socket' => sub {
     my $self = shift;
-    $self->send_message(scalar $self->req->headers->host);
+    $self->send_message($self->req->headers->host);
     $self->finish;
 };
 
@@ -119,6 +120,11 @@ websocket '/deadcallback' => sub {
 
 my $client = Mojo::Client->singleton->app(app);
 
+# GET /link
+my $res = $client->get('/link')->success;
+is $res->code, 200, 'right status';
+like $res->body, qr/ws\:\/\/localhost\:\d+\//, 'right content';
+
 # WebSocket /
 my $result;
 $client->websocket(
@@ -134,7 +140,7 @@ $client->websocket(
         $self->send_message('test1');
     }
 )->start;
-is $result, 'test1test2', 'right result';
+like $result, qr/test1test2ws\:\/\/localhost\:\d+\//, 'right result';
 
 # WebSocket / (ojo)
 $result = undef;
@@ -146,7 +152,7 @@ w '/' => sub {
         }
     )->send_message('test1');
 };
-is $result, 'test1test2', 'right result';
+like $result, qr/test1test2ws\:\/\/localhost\:\d+\//, 'right result';
 
 # WebSocket /socket (using an already prepared socket)
 my $peer  = $client->test_server;

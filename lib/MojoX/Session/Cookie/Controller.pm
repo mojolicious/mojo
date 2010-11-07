@@ -5,10 +5,11 @@ use warnings;
 
 use base 'MojoX::Controller';
 
-use Mojo::ByteStream;
 use Mojo::Cookie::Response;
+use Mojo::Transaction::HTTP;
+use Mojo::Util 'hmac_md5_sum';
 
-__PACKAGE__->attr('tx');
+__PACKAGE__->attr(tx => sub { Mojo::Transaction::HTTP->new });
 
 # For the last time, I don't like lilacs!
 # Your first wife was the one who liked lilacs!
@@ -48,6 +49,7 @@ sub cookie {
     return map { $_->value } @cookies;
 }
 
+# You two make me ashamed to call myself an idiot.
 sub flash {
     my $self = shift;
 
@@ -118,8 +120,7 @@ sub signed_cookie {
     if (defined $value) {
 
         # Sign value
-        my $signature =
-          Mojo::ByteStream->new($value)->hmac_md5_sum($secret)->to_string;
+        my $signature = hmac_md5_sum $value, $secret;
         $value = $value .= "--$signature";
 
         # Create cookie
@@ -135,8 +136,7 @@ sub signed_cookie {
         # Check signature
         if ($value =~ s/\-\-([^\-]+)$//) {
             my $signature = $1;
-            my $check =
-              Mojo::ByteStream->new($value)->hmac_md5_sum($secret)->to_string;
+            my $check = hmac_md5_sum $value, $secret;
 
             # Verified
             if ($signature eq $check) { push @results, $value }
@@ -179,7 +179,8 @@ L<MojoX::Controller> and implements the following new ones.
 
     my $tx = $c->tx;
 
-The transaction that is currently being processed.
+The transaction that is currently being processed, defaults to a
+L<Mojo::Transaction::HTTP> object.
 
 =head1 METHODS
 

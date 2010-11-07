@@ -5,6 +5,8 @@ use warnings;
 
 use base 'Mojolicious';
 
+# Since when is the Internet all about robbing people of their privacy?
+# August 6, 1991.
 use File::Spec;
 use FindBin;
 
@@ -38,20 +40,15 @@ sub import {
         my $conditions = [];
 
         # Route information
-        my $condition;
         while (defined(my $arg = shift @args)) {
 
-            # Condition can be everything
-            if ($condition) {
-                push @$conditions, $condition => $arg;
-                $condition = undef;
-            }
-
             # First scalar is the pattern
-            elsif (!ref $arg && !$pattern) { $pattern = $arg }
+            if (!ref $arg && !$pattern) { $pattern = $arg }
 
             # Scalar
-            elsif (!ref $arg && @args) { $condition = $arg }
+            elsif (!ref $arg && @args) {
+                push @$conditions, $arg, shift @args;
+            }
 
             # Last scalar is the route name
             elsif (!ref $arg) { $name = $arg }
@@ -147,7 +144,7 @@ Mojolicious::Lite - Micro Web Framework
 
 =head1 DESCRIPTION
 
-L<Mojolicous::Lite> is a micro web framework built around L<Mojolicious>.
+L<Mojolicious::Lite> is a micro web framework built around L<Mojolicious>.
 
 A minimal Hello World application looks like this, L<strict> and L<warnings>
 are automatically enabled and a few functions imported when you use
@@ -176,9 +173,6 @@ will just work without commands.
 
     % ./myapp.pl daemon --listen http://*:8080
     Server available at http://127.0.0.1:8080.
-
-    % ./myapp.pl daemon_prefork
-    Server available at http://127.0.0.1:3000.
 
     % ./myapp.pl cgi
     ...CGI output...
@@ -230,12 +224,8 @@ simply equal to the route without non-word characters.
     __DATA__
 
     @@ index.html.ep
-    <%= link_to foo => begin %>
-        Foo
-    <% end %>.
-    <%= link_to bar => begin %>
-        Bar
-    <% end %>.
+    <%= link_to Foo => 'foo' %>.
+    <%= link_to Bar => 'bar' %>.
 
     @@ foo.html.ep
     <a href="<%= url_for 'index' %>">Home</a>.
@@ -662,7 +652,9 @@ Static files will be automatically served from the C<DATA> section
     % mv something.js public/something.js
 
 Testing your application is as easy as creating a C<t> directory and filling
-it with normal Perl unit tests like C<t/funky.t>.
+it with normal Perl unit tests.
+Some plugins depend on the actual script name, so a test file for the
+application C<myapp.pl> should be named C<t/myapp.t>.
 
     use Test::More tests => 3;
     use Test::Mojo;
@@ -678,10 +670,10 @@ Run all unit tests with the C<test> command.
 
     % ./myapp.pl test
 
-To make your tests less noisy you can also change the application log level
-directly in your test files.
+To make your tests more noisy and show you all log messages you can also
+change the application log level directly in your test files.
 
-    $t->app->log->level('error');
+    $t->app->log->level('debug');
 
 To disable debug messages later in a production setup you can change the
 L<Mojolicious> mode, default will be C<development>.
@@ -728,6 +720,64 @@ this tutorial applies there too. :)
     % mojo generate app
 
 Have fun!
+
+=head1 FUNCTIONS
+
+L<Mojolicious::Lite> implements the following functions.
+
+=head2 C<any>
+
+    my $route = any '/:foo' => sub {...};
+    my $route = any [qw/get post/] => '/:foo' => sub {...};
+
+Generate route matching any of the listed HTTP request methods or all.
+See also the tutorial above for more argument variations.
+
+=head2 C<app>
+
+    my $app = app;
+
+The L<Mojolicious::Lite> application.
+
+=head2 C<get>
+
+    my $route = get '/:foo' => sub {...};
+
+Generate route matching only C<GET> requests.
+See also the tutorial above for more argument variations.
+
+=head2 C<plugin>
+
+    plugin 'something';
+    plugin 'something', foo => 23;
+    plugin 'something', {foo => 23};
+    plugin 'Foo::Bar';
+    plugin 'Foo::Bar', foo => 23;
+    plugin 'Foo::Bar', {foo => 23};
+
+Load a plugin.
+
+=head2 C<post>
+
+    my $route = post '/:foo' => sub {...};
+
+Generate route matching only C<POST> requests.
+See also the tutorial above for more argument variations.
+
+=head2 C<under>
+
+    my $route = under sub {...};
+    my $route = under '/:foo';
+
+Generate bridge to which all following routes are automatically appended.
+See also the tutorial above for more argument variations.
+
+=head2 C<websocket>
+
+    my $route = websocket '/:foo' => sub {...};
+
+Generate route matching only C<WebSocket> handshakes.
+See also the tutorial above for more argument variations.
 
 =head1 ATTRIBUTES
 

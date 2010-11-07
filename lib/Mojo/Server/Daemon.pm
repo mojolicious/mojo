@@ -21,20 +21,15 @@ use constant BONJOUR => $ENV{MOJO_NO_BONJOUR}
 # Debug
 use constant DEBUG => $ENV{MOJO_DAEMON_DEBUG} || 0;
 
-__PACKAGE__->attr(
-    [qw/group listen listen_queue_size max_requests silent user/]);
+__PACKAGE__->attr([qw/group listen listen_queue_size silent user/]);
 __PACKAGE__->attr(ioloop => sub { Mojo::IOLoop->singleton });
-__PACKAGE__->attr(keep_alive_timeout      => 5);
-__PACKAGE__->attr(max_clients             => 1000);
-__PACKAGE__->attr(max_keep_alive_requests => 100);
-__PACKAGE__->attr(
-    pid_file => sub {
-        my $self = shift;
-        return File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
-            Mojo::Command->class_to_file(ref $self->app) . '.pid');
-    }
-);
-__PACKAGE__->attr(websocket_timeout => 300);
+__PACKAGE__->attr(keep_alive_timeout => 5);
+__PACKAGE__->attr(max_clients        => 1000);
+__PACKAGE__->attr(max_requests       => 100);
+__PACKAGE__->attr(websocket_timeout  => 300);
+
+# DEPRECATED in Comet!
+*max_keep_alive_requests = \&max_requests;
 
 sub DESTROY {
     my $self = shift;
@@ -57,54 +52,12 @@ sub prepare_ioloop {
     # Loop
     my $loop = $self->ioloop;
 
-    # Signals
-    $SIG{HUP} = sub {
-        $loop->max_connections(0)
-          and $self->app->log->info('Graceful shutdown.');
-      }
-      if $^O ne 'MSWin32';
-
     # Listen
     my $listen = $self->listen || 'http://*:3000';
     $self->_listen($_) for split ',', $listen;
 
     # Max clients
     $loop->max_connections($self->max_clients);
-}
-
-sub prepare_pid_file {
-    my $self = shift;
-
-    return unless my $file = $self->pid_file;
-
-    # PID file
-    my $fh;
-    if (-e $file) {
-        $fh = IO::File->new("< $file")
-          or croak qq/Can't open PID file "$file": $!/;
-        my $pid = <$fh>;
-        warn "Server already running with PID $pid.\n" if kill 0, $pid;
-        warn qq/Can't unlink PID file "$file".\n/
-          unless -w $file && unlink $file;
-    }
-
-    # Create new PID file
-    $fh = IO::File->new($file, O_WRONLY | O_CREAT | O_EXCL, 0644)
-      or croak qq/Can't create PID file "$file"/;
-
-    # PID
-    print $fh $$;
-    close $fh;
-
-    # Signals
-    $SIG{INT} = $SIG{TERM} = sub {
-
-        # Remove PID file
-        unlink $self->pid_file;
-
-        # Done
-        exit 0;
-    };
 }
 
 # 40 dollars!? This better be the best damn beer ever..
@@ -118,8 +71,8 @@ sub run {
     # User and group
     $self->setuidgid;
 
-    # Prepare PID file
-    $self->prepare_pid_file;
+    # Signals
+    $SIG{INT} = $SIG{TERM} = sub { exit 0 };
 
     # Start loop
     $self->ioloop->start;
@@ -203,16 +156,6 @@ sub _build_tx {
     # New request on the connection
     $c->{requests} ||= 0;
     $c->{requests}++;
-
-    # Request limit
-    if (my $max = $self->max_requests) {
-        $self->{_requests} ||= 0;
-        if (++$self->{_requests} >= $max) {
-            for my $id (@{$self->{_listen}}) { $loop->drop($id) }
-            $self->max_keep_alive_requests(1);
-            $self->ioloop->max_connections(0);
-        }
-    }
 
     # Kept alive if we have more than one request on the connection
     $tx->kept_alive(1) if $c->{requests} > 1;
@@ -386,7 +329,7 @@ sub _read {
 
     # Last keep alive request
     $tx->res->headers->connection('Close')
-      if ($c->{requests} || 0) >= $self->max_keep_alive_requests;
+      if ($c->{requests} || 0) >= $self->max_requests;
 
     # Finish
     if ($tx->is_done) { $self->_finish($id, $tx) }
@@ -527,27 +470,12 @@ Listen queue size, defaults to C<SOMAXCONN>.
 
 Maximum number of parallel client connections, defaults to C<1000>.
 
-=head2 C<max_keep_alive_requests>
-
-    my $max_keep_alive_requests = $daemon->max_keep_alive_requests;
-    $daemon                     = $daemon->max_keep_alive_requests(100);
-
-Maximum number of keep alive requests per connection, defaults to C<100>.
-
 =head2 C<max_requests>
 
     my $max_requests = $daemon->max_requests;
-    $daemon          = $daemon->max_requests(1);
+    $daemon          = $daemon->max_requests(100);
 
-Maximum number of requests the daemon is allowed to handle, not used by
-default.
-
-=head2 C<pid_file>
-
-    my $pid_file = $daemon->pid_file;
-    $daemon      = $daemon->pid_file('/tmp/mojo_daemon.pid');
-
-Path to process id file, defaults to a random temporary file.
+Maximum number of keep alive requests per connection, defaults to C<100>.
 
 =head2 C<silent>
 
@@ -580,12 +508,6 @@ implements the following new ones.
     $daemon->prepare_ioloop;
 
 Prepare event loop.
-
-=head2 C<prepare_pid_file>
-
-    $daemon->prepare_pid_file;
-
-Prepare process id file.
 
 =head2 C<run>
 

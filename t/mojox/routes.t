@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 193;
+use Test::More tests => 205;
 
 use Mojo::Transaction::HTTP;
 
@@ -130,7 +130,7 @@ my $edge = $r->route('/edge');
 my $auth = $edge->bridge('/auth')->to('auth#check');
 $auth->route('/about/')->to('pref#about');
 $auth->bridge->to('album#allow')->route('/album/create/')->to('album#create');
-$auth->route('/gift/')->to('gift#index');
+$auth->route('/gift/')->to('gift#index')->name('gift');
 
 # Make sure stash stays clean
 my $tx = Mojo::Transaction::HTTP->new;
@@ -158,7 +158,7 @@ $m = MojoX::Routes::Match->new($tx)->match($r);
 is $m->stack->[0]->{controller}, 'articles', 'right value';
 is $m->stack->[0]->{action},     'index',    'right value';
 is $m->stack->[0]->{format},     'html',     'right value';
-is $m->url_for, '/articles.html', 'right URL';
+is $m->url_for, '/articles', 'right URL';
 is @{$m->stack}, 1, 'right number of elements';
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
@@ -168,7 +168,7 @@ is $m->stack->[0]->{controller}, 'articles', 'right value';
 is $m->stack->[0]->{action},     'load',     'right value';
 is $m->stack->[0]->{id},         '1',        'right value';
 is $m->stack->[0]->{format},     'html',     'right value';
-is $m->url_for, '/articles/1.html', 'right URL';
+is $m->url_for(format => 'html'), '/articles/1.html', 'right URL';
 is @{$m->stack}, 1, 'right number of elements';
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
@@ -177,8 +177,12 @@ $m = MojoX::Routes::Match->new($tx)->match($r);
 is $m->stack->[1]->{controller}, 'articles', 'right value';
 is $m->stack->[1]->{action},     'edit',     'right value';
 is $m->stack->[1]->{format},     'html',     'right value';
-is $m->url_for, '/articles/1/edit.html', 'right URL';
-is $m->url_for('articles_delete', format => undef), '/articles/1/delete',
+is $m->url_for, '/articles/1/edit', 'right URL';
+is $m->url_for(format => 'html'), '/articles/1/edit.html', 'right URL';
+is $m->url_for('articles_delete', format => undef), '/articles/delete',
+  'right URL';
+is $m->url_for('articles_delete'), '/articles/delete', 'right URL';
+is $m->url_for('articles_delete', id => 12), '/articles/12/delete',
   'right URL';
 is @{$m->stack}, 2, 'right number of elements';
 $tx = Mojo::Transaction::HTTP->new;
@@ -369,7 +373,10 @@ $m = MojoX::Routes::Match->new($tx)->match($r);
 is $m->stack->[0]->{controller}, 'hello', 'right value';
 is $m->stack->[0]->{action},     'you',   'right value';
 is $m->stack->[0]->{format},     'html',  'right value';
-is $m->url_for, '/format.html', 'right URL';
+is $m->url_for, '/format', 'right URL';
+is $m->url_for(format => undef),  '/format',      'right URL';
+is $m->url_for(format => 'html'), '/format.html', 'right URL';
+is $m->url_for(format => 'txt'),  '/format.txt',  'right URL';
 is @{$m->stack}, 1, 'right number of elements';
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
@@ -378,7 +385,10 @@ $m = MojoX::Routes::Match->new($tx)->match($r);
 is $m->stack->[0]->{controller}, 'hello', 'right value';
 is $m->stack->[0]->{action},     'you',   'right value';
 is $m->stack->[0]->{format},     'html',  'right value';
-is $m->url_for, '/format.html', 'right URL';
+is $m->url_for, '/format', 'right URL';
+is $m->url_for(format => undef),  '/format',      'right URL';
+is $m->url_for(format => 'html'), '/format.html', 'right URL';
+is $m->url_for(format => 'txt'),  '/format.txt',  'right URL';
 is @{$m->stack}, 1, 'right number of elements';
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
@@ -427,7 +437,7 @@ $m = MojoX::Routes::Match->new($tx)->match($r);
 is $m->stack->[0]->{controller}, 'method', 'right value';
 is $m->stack->[0]->{action},     'get',    'right value';
 is $m->stack->[0]->{format},     'html',   'right value';
-is $m->url_for, '/method/get.html', 'right URL';
+is $m->url_for, '/method/get', 'right URL';
 is @{$m->stack}, 1, 'right number of elements';
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('POST');
@@ -484,6 +494,7 @@ is $m->stack->[0]->{controller}, 'test-test', 'right value';
 is $m->stack->[0]->{action},     'test',      'right value';
 is $m->stack->[0]->{format},     undef,       'no value';
 is $m->url_for, '/simple/form', 'right URL';
+is $m->url_for('current'), '/simple/form', 'right URL';
 is @{$m->stack}, 1, 'right number of elements';
 
 # Special edge case with nested bridges
@@ -499,4 +510,6 @@ is $m->stack->[1]->{action},     'index', 'right value';
 is $m->stack->[1]->{format},     undef,   'no value';
 is $m->stack->[2], undef, 'no value';
 is $m->url_for, '/edge/auth/gift', 'right URL';
+is $m->url_for('gift'),    '/edge/auth/gift', 'right URL';
+is $m->url_for('current'), '/edge/auth/gift', 'right URL';
 is @{$m->stack}, 2, 'right number of elements';

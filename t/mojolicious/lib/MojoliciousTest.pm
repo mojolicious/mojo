@@ -16,9 +16,6 @@ sub development_mode {
 sub startup {
     my $self = shift;
 
-    # Only log errors to STDERR
-    $self->log->level('fatal');
-
     # Plugin
     unshift @{$self->plugins->namespaces},
       $self->routes->namespace . '::Plugin';
@@ -34,9 +31,6 @@ sub startup {
 
     # Renderer for a different file extension
     $self->renderer->add_handler(xpl => $self->renderer->handler->{epl});
-
-    # Default handler
-    $self->renderer->default_handler('epl');
 
     # Session domain
     $self->session->cookie_domain('.example.com');

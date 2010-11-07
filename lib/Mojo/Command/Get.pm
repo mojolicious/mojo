@@ -5,10 +5,10 @@ use warnings;
 
 use base 'Mojo::Command';
 
-use Mojo::ByteStream 'b';
 use Mojo::Client;
 use Mojo::IOLoop;
 use Mojo::Transaction::HTTP;
+use Mojo::Util 'decode';
 
 use Getopt::Long 'GetOptions';
 
@@ -34,7 +34,7 @@ sub run {
     # URL
     my $url = $ARGV[0];
     die $self->usage unless $url;
-    $url = b($url)->decode('UTF-8')->to_string;
+    decode 'UTF-8', $url;
 
     # Client
     my $client = Mojo::Client->new(ioloop => Mojo::IOLoop->singleton);

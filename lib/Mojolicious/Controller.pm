@@ -20,14 +20,16 @@ __PACKAGE__->attr(tx => sub { Mojo::Transaction::HTTP->new });
 
 our $AUTOLOAD;
 
+# Is all the work done by the children?
+# No, not the whipping.
 sub AUTOLOAD {
     my $self = shift;
 
     # Method
-    my ($method) = $AUTOLOAD =~ /(\w+)$/;
+    my ($package, $method) = $AUTOLOAD =~ /^([\w\:]+)\:\:(\w+)$/;
 
     # Helper
-    Carp::croak(qq/Helper "$method" not found/)
+    Carp::croak(qq/Can't locate object method "$method" via "$package"/)
       unless my $helper = $self->app->renderer->helper->{$method};
 
     # Run
@@ -38,15 +40,18 @@ sub DESTROY { }
 
 sub client { shift->app->client }
 
+# Something's wrong, she's not responding to my poking stick.
 sub finish {
     my $self = shift;
 
+    # Transaction
+    my $tx = $self->tx;
+
     # WebSocket check
-    Carp::croak('No WebSocket connection to finish')
-      unless $self->tx->is_websocket;
+    Carp::croak('No WebSocket connection to finish') unless $tx->is_websocket;
 
     # Finish WebSocket
-    $self->tx->finish;
+    $tx->finish;
 }
 
 # DEPRECATED in Comet!
@@ -60,6 +65,7 @@ sub helper {
     return $self->$name(@_);
 }
 
+# My parents may be evil, but at least they're stupid.
 sub on_finish {
     my ($self, $cb) = @_;
 
@@ -67,18 +73,24 @@ sub on_finish {
     $self->tx->on_finish(sub { shift and $self->$cb(@_) });
 }
 
+# Stop being such a spineless jellyfish!
+# You know full well I'm more closely related to the sea cucumber.
+# Not where it counts.
 sub on_message {
     my $self = shift;
 
+    # Transaction
+    my $tx = $self->tx;
+
     # WebSocket check
     Carp::croak('No WebSocket connection to receive messages from')
-      unless $self->tx->is_websocket;
+      unless $tx->is_websocket;
 
     # Callback
     my $cb = shift;
 
     # Receive
-    $self->tx->on_message(sub { shift and $self->$cb(@_) });
+    $tx->on_message(sub { shift and $self->$cb(@_) });
 
     # Rendered
     $self->rendered;
@@ -86,6 +98,9 @@ sub on_message {
     return $self;
 }
 
+# Is there an app for kissing my shiny metal ass?
+# Several!
+# Oooh!
 sub redirect_to {
     my $self = shift;
 
@@ -182,6 +197,8 @@ sub render_data {
     return $self->render($args);
 }
 
+# The path to robot hell is paved with human flesh.
+# Neat.
 sub render_exception {
     my ($self, $e) = @_;
 
@@ -226,6 +243,8 @@ sub render_inner {
     return Mojo::ByteStream->new("$content");
 }
 
+# If you hate intolerance and being punched in the face by me,
+# please support Proposition Infinity.
 sub render_json {
     my $self = shift;
     my $json = shift;
@@ -260,6 +279,8 @@ sub render_not_found {
     $self->rendered;
 }
 
+# You called my thesis a fat sack of barf, and then you stole it?
+# Welcome to academia.
 sub render_partial {
     my $self = shift;
 
@@ -307,6 +328,9 @@ sub render_text {
     return $self->render($args);
 }
 
+# On the count of three, you will awaken feeling refreshed,
+# as if Futurama had never been canceled by idiots,
+# then brought back by bigger idiots. One. Two.
 sub rendered {
     my $self = shift;
 
@@ -321,9 +345,6 @@ sub rendered {
 
     # Already finished
     return $self if $stash->{'mojo.finished'};
-
-    # Transaction
-    my $tx = $self->tx;
 
     # Application
     my $app = $self->app;
@@ -343,12 +364,15 @@ sub rendered {
 sub send_message {
     my $self = shift;
 
+    # Transaction
+    my $tx = $self->tx;
+
     # WebSocket check
     Carp::croak('No WebSocket connection to send message to')
-      unless $self->tx->is_websocket;
+      unless $tx->is_websocket;
 
     # Send
-    $self->tx->send_message(@_);
+    $tx->send_message(@_);
 
     # Rendered
     $self->rendered;
@@ -356,6 +380,12 @@ sub send_message {
     return $self;
 }
 
+# Behold, a time traveling machine.
+# Time? I can't go back there!
+# Ah, but this machine only goes forward in time.
+# That way you can't accidentally change history or do something disgusting
+# like sleep with your own grandmother.
+# I wouldn't want to do that again.
 sub url_for {
     my $self = shift;
     my $target = shift || '';
@@ -373,22 +403,11 @@ sub url_for {
     # URL
     elsif ($target =~ /^\w+\:\/\//) { return Mojo::URL->new($target) }
 
-    # Use match or root
-    my $url = $self->match->url_for($target, @_);
-
-    # Base
-    unless ($url->is_abs) {
-        $url->base($self->tx->req->url->base->clone);
-        $url->base->userinfo(undef);
-    }
-
-    # Fix paths
-    unshift @{$url->path->parts}, @{$url->base->path->parts};
-    $url->base->path->parts([]);
-
-    return $url;
+    # Route
+    return $self->match->url_for($target, @_);
 }
 
+# I wax my rocket every day!
 sub write {
     my ($self, $chunk, $cb) = @_;
 
@@ -415,6 +434,9 @@ sub write {
     $self->rendered;
 }
 
+# This calls for a party, baby.
+# I'm ordering 100 kegs, 100 hookers and 100 Elvis impersonators that aren't
+# above a little hooking should the occasion arise.
 sub write_chunk {
     my ($self, $chunk, $cb) = @_;
 
@@ -499,12 +521,6 @@ For async processing you can use C<finish>.
 
 Gracefully end WebSocket connection.
 
-=head2 C<helper>
-
-This method is DEPRECATED, helpers can now be called like normal methods.
-
-    $c->foo(23);
-
 =head2 C<on_finish>
 
     $c->on_finish(sub {...});
@@ -533,7 +549,7 @@ connection in progress.
     $c = $c->redirect_to('/path');
     $c = $c->redirect_to('http://127.0.0.1/foo/bar');
 
-Prepare a redirect response.
+Prepare a C<302> redirect response.
 
 =head2 C<render>
 
@@ -625,8 +641,7 @@ See C<render_data> for an alternative without encoding.
 
     $c->rendered;
 
-Disable automatic rendering for response and run C<after_dispatch> plugin
-hook.
+Finalize response and run C<after_dispatch> plugin hook.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<send_message>

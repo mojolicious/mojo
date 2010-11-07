@@ -5,13 +5,17 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 188;
+use Test::More tests => 316;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
 use_ok 'Mojo::DOM';
+use_ok 'ojo';
 
 my $dom = Mojo::DOM->new;
+
+# ojo
+is x('<div>Hello ♥!</div>')->at('div')->text, 'Hello ♥!', 'right text';
 
 # Simple (basics)
 $dom->parse('<div><div id="a">A</div><div id="b">B</div></div>');
@@ -105,17 +109,17 @@ EOF
 my $simple = $dom->at('foo simple.working[class^="wor"]');
 like $simple->parent->all_text,
   qr/test\s+easy\s+works\s+well\s+yada\s+yada\s+more\s+text/;
-is $simple->name, 'simple', 'right name';
+is $simple->type, 'simple', 'right type';
 is $simple->attrs->{class}, 'working', 'right class attribute';
 is $simple->text, 'easy', 'right text';
-is $simple->parent->name, 'foo', 'right parent name';
+is $simple->parent->type, 'foo', 'right parent type';
 is $simple->parent->attrs->{bar}, 'ba<z', 'right parent attribute';
-is $simple->parent->children->[1]->name, 'test', 'right sibling';
+is $simple->parent->children->[1]->type, 'test', 'right sibling';
 is $simple->to_xml, '<simple class="working">easy</simple>',
   'stringified right';
-is $dom->at('test#test')->name,         'test',   'right name';
-is $dom->at('[class$="ing"]')->name,    'simple', 'right name';
-is $dom->at('[class="working"]')->name, 'simple', 'right name';
+is $dom->at('test#test')->type,         'test',   'right type';
+is $dom->at('[class$="ing"]')->type,    'simple', 'right type';
+is $dom->at('[class="working"]')->type, 'simple', 'right type';
 
 # Deep nesting (parent combinator)
 $dom->parse(<<EOF);
@@ -175,7 +179,7 @@ is $dom->at('[foo="ba"]'), undef, 'no result';
 is $dom->at('.tset')->text, 'works', 'right text';
 
 # Already decoded unicode snowman and quotes in selector
-$dom->charset(undef)->parse('<div id="sno&quot;wman">☃</div>');
+$dom->parse('<div id="sno&quot;wman">☃</div>');
 is $dom->at('[id="sno\"wman"]')->text, '☃', 'right text';
 
 # Unicode and escaped selectors
@@ -253,29 +257,35 @@ $dom->replace('<div>foo<p>lalala</p>bar</div>');
 is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right text';
 $dom->find('p')->each(sub { shift->replace('') });
 is "$dom", '<div>foobar</div>', 'right text';
+$dom->parse('<div>♥</div>');
+$dom->at('div')->replace_inner('☃');
+is "$dom", '<div>☃</div>', 'right text';
+$dom->parse('<div>♥</div>');
+$dom->at('div')->replace_inner("\x{2603}");
+is "$dom", '<div>☃</div>', 'right text';
 
 # Replace element content
 $dom->parse('<div>foo<p>lalala</p>bar</div>');
-$dom->at('p')->replace_content('bar');
+$dom->at('p')->replace_inner('bar');
 is "$dom", '<div>foo<p>bar</p>bar</div>', 'right text';
-$dom->at('p')->replace_content(Mojo::DOM->new->parse('text'));
+$dom->at('p')->replace_inner(Mojo::DOM->new->parse('text'));
 is "$dom", '<div>foo<p>text</p>bar</div>', 'right text';
 $dom->parse('<div>foo</div><div>bar</div>');
-$dom->find('div')->each(sub { shift->replace_content('<p>test</p>') });
+$dom->find('div')->each(sub { shift->replace_inner('<p>test</p>') });
 is "$dom", '<div><p>test</p></div><div><p>test</p></div>', 'right text';
-$dom->find('p')->each(sub { shift->replace_content('') });
+$dom->find('p')->each(sub { shift->replace_inner('') });
 is "$dom", '<div><p /></div><div><p /></div>', 'right text';
 $dom->parse('<div><p id="☃" /></div>');
-$dom->at('#☃')->replace_content('♥');
+$dom->at('#☃')->replace_inner('♥');
 is "$dom", '<div><p id="☃">♥</p></div>', 'right text';
 $dom->parse('<div>foo<p>lalala</p>bar</div>');
-$dom->replace_content('♥');
+$dom->replace_inner('♥');
 is "$dom", '♥', 'right text';
-$dom->replace_content('<div>foo<p>lalala</p>bar</div>');
+$dom->replace_inner('<div>foo<p>lalala</p>bar</div>');
 is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right text';
-$dom->replace_content('');
+$dom->replace_inner('');
 is "$dom", '', 'right text';
-$dom->replace_content('<div>foo<p>lalala</p>bar</div>');
+$dom->replace_inner('<div>foo<p>lalala</p>bar</div>');
 is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right text';
 
 # Mixed search and tree walk
@@ -290,7 +300,7 @@ EOF
 my @data;
 for my $tr ($dom->find('table tr')->each) {
     for my $td (@{$tr->children}) {
-        push @data, $td->name, $td->all_text;
+        push @data, $td->type, $td->all_text;
     }
 }
 is $data[0], 'td',    'right tag';
@@ -485,3 +495,361 @@ is_deeply \@div, [qw/A C/], 'found all div elements with the right atributes';
 $dom->find('div[foo^="b"][foo$="r"]')->each(sub { push @div, shift->text });
 is_deeply \@div, [qw/A B C/],
   'found all div elements with the right atributes';
+
+# Pseudo classes
+$dom->parse(<<EOF);
+<form action="/foo">
+    <input type="text" name="user" value="test" />
+    <input type="checkbox" checked="checked" name="groovy">
+    <select name="a">
+        <option value="b">b</option>
+        <optgroup label="c">
+            <option value="d">d</option>
+            <option selected="selected" value="e">E</option>
+            <option value="f">f</option>
+        </optgroup>
+        <option value="g">g</option>
+    </select>
+    <input type="submit" value="Ok!" />
+</form>
+EOF
+is($dom->find(':root')->[0]->type,             'form',   'right type');
+is($dom->find('*:root')->[0]->type,            'form',   'right type');
+is($dom->find('form:root')->[0]->type,         'form',   'right type');
+is($dom->find(':root')->[1],                   undef,    'no element');
+is($dom->find(':checked')->[0]->attrs->{name}, 'groovy', 'right name');
+is($dom->find('option:checked')->[0]->attrs->{value},    'e', 'right value');
+is($dom->find(':checked')->[1]->text,                    'E', 'right text');
+is($dom->find('*:checked')->[1]->text,                   'E', 'right text');
+is($dom->find(':checked[value="e"]')->[0]->text,         'E', 'right text');
+is($dom->find('*:checked[value="e"]')->[0]->text,        'E', 'right text');
+is($dom->find('option:checked[value="e"]')->[0]->text,   'E', 'right text');
+is($dom->at('optgroup option:checked[value="e"]')->text, 'E', 'right text');
+is($dom->at('select option:checked[value="e"]')->text,   'E', 'right text');
+is($dom->at('select :checked[value="e"]')->text,         'E', 'right text');
+is($dom->at('optgroup > :checked[value="e"]')->text,     'E', 'right text');
+is($dom->at('select *:checked[value="e"]')->text,        'E', 'right text');
+is($dom->at('optgroup > *:checked[value="e"]')->text,    'E', 'right text');
+is($dom->find(':checked[value="e"]')->[1],        undef,    'no element');
+is($dom->find(':empty')->[0]->attrs->{name},      'user',   'right name');
+is($dom->find('input:empty')->[0]->attrs->{name}, 'user',   'right name');
+is($dom->at(':empty[type^="ch"]')->attrs->{name}, 'groovy', 'right name');
+
+# More pseudo classes
+$dom->parse(<<EOF);
+<ul>
+    <li>A</li>
+    <li>B</li>
+    <li>C</li>
+    <li>D</li>
+    <li>E</li>
+    <li>F</li>
+    <li>G</li>
+    <li>H</li>
+</ul>
+EOF
+my @li;
+$dom->find('li:nth-child(odd)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/A C E G/], 'found all odd li elements';
+@li = ();
+$dom->find('li:nth-last-child(odd)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/B D F H/], 'found all odd li elements';
+is($dom->find(':nth-child(odd)')->[0]->type,       'ul', 'right type');
+is($dom->find(':nth-child(odd)')->[1]->text,       'A',  'right text');
+is($dom->find(':nth-child(1)')->[0]->type,         'ul', 'right type');
+is($dom->find(':nth-child(1)')->[1]->text,         'A',  'right text');
+is($dom->find(':nth-last-child(odd)')->[0]->type,  'ul', 'right type');
+is($dom->find(':nth-last-child(odd)')->[-1]->text, 'H',  'right text');
+is($dom->find(':nth-last-child(1)')->[0]->type,    'ul', 'right type');
+is($dom->find(':nth-last-child(1)')->[1]->text,    'H',  'right text');
+@li = ();
+$dom->find('li:nth-child(2n+1)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/A C E G/], 'found all odd li elements';
+@li = ();
+$dom->find('li:nth-last-child(2n+1)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/B D F H/], 'found all odd li elements';
+@li = ();
+$dom->find('li:nth-child(even)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/B D F H/], 'found all even li elements';
+@li = ();
+$dom->find('li:nth-last-child(even)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/A C E G/], 'found all even li elements';
+@li = ();
+$dom->find('li:nth-child(2n+2)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/B D F H/], 'found all even li elements';
+@li = ();
+$dom->find('li:nth-last-child(2n+2)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/A C E G/], 'found all even li elements';
+@li = ();
+$dom->find('li:nth-child(4n+1)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/A E/], 'found the right li elements';
+@li = ();
+$dom->find('li:nth-last-child(4n+1)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/D H/], 'found the right li elements';
+@li = ();
+$dom->find('li:nth-child(4n+4)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/D H/], 'found the right li element';
+@li = ();
+$dom->find('li:nth-last-child(4n+4)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/A E/], 'found the right li element';
+@li = ();
+$dom->find('li:nth-child(4n)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/D H/], 'found the right li element';
+@li = ();
+$dom->find('li:nth-last-child(4n)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/A E/], 'found the right li element';
+@li = ();
+$dom->find('li:nth-child(5n-2)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/C H/], 'found the right li element';
+@li = ();
+$dom->find('li:nth-last-child(5n-2)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/A F/], 'found the right li element';
+@li = ();
+$dom->find('li:nth-child(-n+3)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/A B C/], 'found first three li elements';
+@li = ();
+$dom->find('li:nth-last-child(-n+3)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/F G H/], 'found last three li elements';
+@li = ();
+$dom->find('li:nth-child(-1n+3)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/A B C/], 'found first three li elements';
+@li = ();
+$dom->find('li:nth-last-child(-1n+3)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/F G H/], 'found first three li elements';
+@li = ();
+$dom->find('li:nth-child(3n)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/C F/], 'found every third li elements';
+@li = ();
+$dom->find('li:nth-last-child(3n)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/C F/], 'found every third li elements';
+@li = ();
+$dom->find('li:nth-child(3)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/C/], 'found third li element';
+@li = ();
+$dom->find('li:nth-last-child(3)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/F/], 'found third last li element';
+
+# Even more pseudo classes
+$dom->parse(<<EOF);
+<ul>
+    <li>A</li>
+    <p>B</p>
+    <li class="test ♥">C</li>
+    <p>D</p>
+    <li>E</li>
+    <li>F</li>
+    <p>G</p>
+    <li>H</li>
+    <li>I</li>
+</ul>
+<div>
+    <div class="☃">J</div>
+</div>
+<div>
+    <a href="http://mojolicio.us">Mojo!</a>
+    <div class="☃">K</div>
+    <a href="http://mojolicio.us">Mojolicious!</a>
+</div>
+EOF
+my @e;
+$dom->find('ul :nth-child(odd)')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/A C E G I/], 'found all odd elements';
+@e = ();
+$dom->find('li:nth-of-type(odd)')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/A E H/], 'found all odd li elements';
+@e = ();
+$dom->find('li:nth-last-of-type(odd)')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/C F I/], 'found all odd li elements';
+@e = ();
+$dom->find('p:nth-of-type(odd)')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/B G/], 'found all odd p elements';
+@e = ();
+$dom->find('p:nth-last-of-type(odd)')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/B G/], 'found all odd li elements';
+@e = ();
+$dom->find('ul :nth-child(1)')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/A/], 'found first child';
+@e = ();
+$dom->find('ul :first-child')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/A/], 'found first child';
+@e = ();
+$dom->find('p:nth-of-type(1)')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/B/], 'found first child';
+@e = ();
+$dom->find('p:first-of-type')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/B/], 'found first child';
+@e = ();
+$dom->find('li:nth-of-type(1)')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/A/], 'found first child';
+@e = ();
+$dom->find('li:first-of-type')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/A/], 'found first child';
+@e = ();
+$dom->find('ul :nth-last-child(-n+1)')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/I/], 'found last child';
+@e = ();
+$dom->find('ul :last-child')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/I/], 'found last child';
+@e = ();
+$dom->find('p:nth-last-of-type(-n+1)')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/G/], 'found last child';
+@e = ();
+$dom->find('p:last-of-type')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/G/], 'found last child';
+@e = ();
+$dom->find('li:nth-last-of-type(-n+1)')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/I/], 'found last child';
+@e = ();
+$dom->find('li:last-of-type')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/I/], 'found last child';
+@e = ();
+$dom->find('ul :nth-child(-n+3):not(li)')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/B/], 'found first p element';
+@e = ();
+$dom->find('ul :nth-child(-n+3):not(:first-child)')
+  ->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/B C/], 'found second and third element';
+@e = ();
+$dom->find('ul :nth-child(-n+3):not(.♥)')
+  ->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/A B/], 'found first and second element';
+@e = ();
+$dom->find('ul :nth-child(-n+3):not([class$="♥"])')
+  ->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/A B/], 'found first and second element';
+@e = ();
+$dom->find('ul :nth-child(-n+3):not(li[class$="♥"])')
+  ->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/A B/], 'found first and second element';
+@e = ();
+$dom->find('ul :nth-child(-n+3):not([class$="♥"][class^="test"])')
+  ->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/A B/], 'found first and second element';
+@e = ();
+$dom->find('ul :nth-child(-n+3):not(*[class$="♥"])')
+  ->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/A B/], 'found first and second element';
+@e = ();
+$dom->find('ul :nth-child(-n+3):not(:nth-child(-n+2))')
+  ->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/C/], 'found third element';
+@e = ();
+$dom->find('ul :nth-child(-n+3):not(:nth-child(1)):not(:nth-child(2))')
+  ->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/C/], 'found third element';
+@e = ();
+$dom->find(':only-child')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/J/], 'found only child';
+@e = ();
+$dom->find('div :only-of-type')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/J K/], 'found only child';
+@e = ();
+$dom->find('div:only-child')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/J/], 'found only child';
+@e = ();
+$dom->find('div div:only-of-type')->each(sub { push @e, shift->text });
+is_deeply \@e, [qw/J K/], 'found only child';
+
+# Sibling combinator
+$dom->parse(<<EOF);
+<ul>
+    <li>A</li>
+    <p>B</p>
+    <li>C</li>
+</ul>
+<h1>D</h1>
+<p id="♥">E</p>
+<p id="☃">F</p>
+<div>G</div>
+EOF
+is($dom->at('li ~ p')->text,                            'B',   'right text');
+is($dom->at('li + p')->text,                            'B',   'right text');
+is($dom->at('h1 ~ p ~ p')->text,                        'F',   'right text');
+is($dom->at('h1 + p ~ p')->text,                        'F',   'right text');
+is($dom->at('h1 ~ p + p')->text,                        'F',   'right text');
+is($dom->at('h1 + p + p')->text,                        'F',   'right text');
+is($dom->at('ul > li ~ li')->text,                      'C',   'right text');
+is($dom->at('ul li ~ li')->text,                        'C',   'right text');
+is($dom->at('ul li li'),                                undef, 'no result');
+is($dom->at('ul ~ li ~ li'),                            undef, 'no result');
+is($dom->at('ul + li ~ li'),                            undef, 'no result');
+is($dom->at('ul > li + li'),                            undef, 'no result');
+is($dom->at('h1 ~ div')->text,                          'G',   'right text');
+is($dom->at('h1 + div'),                                undef, 'no result');
+is($dom->at('p + div')->text,                           'G',   'right text');
+is($dom->at('ul + h1 + p + p + div')->text,             'G',   'right text');
+is($dom->at('ul + h1 ~ p + div')->text,                 'G',   'right text');
+is($dom->at('h1 ~ #♥')->text,                         'E',   'right text');
+is($dom->at('h1 + #♥')->text,                         'E',   'right text');
+is($dom->at('#♥ ~ #☃')->text,                       'F',   'right text');
+is($dom->at('#♥ + #☃')->text,                       'F',   'right text');
+is($dom->at('#♥ > #☃'),                             undef, 'no result');
+is($dom->at('#♥ #☃'),                               undef, 'no result');
+is($dom->at('#♥ + #☃ + :nth-last-child(1)')->text,  'G',   'right text');
+is($dom->at('#♥ ~ #☃ + :nth-last-child(1)')->text,  'G',   'right text');
+is($dom->at('#♥ + #☃ ~ :nth-last-child(1)')->text,  'G',   'right text');
+is($dom->at('#♥ ~ #☃ ~ :nth-last-child(1)')->text,  'G',   'right text');
+is($dom->at('#♥ + :nth-last-child(2)')->text,         'F',   'right text');
+is($dom->at('#♥ ~ :nth-last-child(2)')->text,         'F',   'right text');
+is($dom->at('#♥ + #☃ + *:nth-last-child(1)')->text, 'G',   'right text');
+is($dom->at('#♥ ~ #☃ + *:nth-last-child(1)')->text, 'G',   'right text');
+is($dom->at('#♥ + #☃ ~ *:nth-last-child(1)')->text, 'G',   'right text');
+is($dom->at('#♥ ~ #☃ ~ *:nth-last-child(1)')->text, 'G',   'right text');
+is($dom->at('#♥ + *:nth-last-child(2)')->text,        'F',   'right text');
+is($dom->at('#♥ ~ *:nth-last-child(2)')->text,        'F',   'right text');
+
+# Adding nodes
+$dom->parse(<<EOF);
+<ul>
+    <li>A</li>
+    <p>B</p>
+    <li>C</li>
+</ul>
+<div>D</div>
+EOF
+$dom->at('li')->after('<p>A1</p>23');
+is "$dom", <<EOF, 'right result';
+<ul>
+    <li>A</li><p>A1</p>23
+    <p>B</p>
+    <li>C</li>
+</ul>
+<div>D</div>
+EOF
+$dom->at('li')->before('24')->before('<div>A-1</div>25');
+is "$dom", <<EOF, 'right result';
+<ul>
+    24<div>A-1</div>25<li>A</li><p>A1</p>23
+    <p>B</p>
+    <li>C</li>
+</ul>
+<div>D</div>
+EOF
+is $dom->at('div')->text, 'A-1', 'right text';
+$dom->before('l')->before('alal')->before('a');
+is "$dom", <<EOF, 'no change';
+<ul>
+    24<div>A-1</div>25<li>A</li><p>A1</p>23
+    <p>B</p>
+    <li>C</li>
+</ul>
+<div>D</div>
+EOF
+$dom->after('lalala');
+is "$dom", <<EOF, 'no change';
+<ul>
+    24<div>A-1</div>25<li>A</li><p>A1</p>23
+    <p>B</p>
+    <li>C</li>
+</ul>
+<div>D</div>
+EOF
+$dom->find('div')->each(sub { shift->after('works') });
+is "$dom", <<EOF, 'right result';
+<ul>
+    24<div>A-1</div>works25<li>A</li><p>A1</p>23
+    <p>B</p>
+    <li>C</li>
+</ul>
+<div>D</div>works
+EOF

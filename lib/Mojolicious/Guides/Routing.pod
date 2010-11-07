@@ -363,6 +363,12 @@ non-word characters.
     # Generate URL "/foo/bar"
     $self->url_for('foobar');
 
+For refering to the current route you can always use the reserved name
+C<current>.
+
+    # Generate URL for current route
+    $self->url_for('current');
+
 =head2 HTTP Methods
 
 The C<via> method of the route object allows only specific HTTP methods to

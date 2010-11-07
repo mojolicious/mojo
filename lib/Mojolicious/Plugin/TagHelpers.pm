@@ -6,6 +6,7 @@ use warnings;
 use base 'Mojolicious::Plugin';
 
 use Mojo::ByteStream 'b';
+use Mojo::Util 'xml_escape';
 
 # Is today's hectic lifestyle making you tense and impatient?
 # Shut up and get to the point!
@@ -35,13 +36,13 @@ sub register {
     # Add "form_for" helper
     $app->helper(
         form_for => sub {
-            my $c    = shift;
-            my $name = shift;
+            my $c   = shift;
+            my @url = (shift);
 
             # Captures
-            my $captures = ref $_[0] eq 'HASH' ? shift : {};
+            push @url, shift if ref $_[0] eq 'HASH';
 
-            $self->_tag('form', action => $c->url_for($name, $captures), @_);
+            $self->_tag('form', action => $c->url_for(@url), @_);
         }
     );
 
@@ -59,30 +60,52 @@ sub register {
         }
     );
 
-    # Add "img" helper
-    $app->helper(img => sub { shift; $self->_tag('img', src => shift, @_) });
+    # Add "input_tag" helper
+    $app->helper(input_tag => sub { $self->_input(@_) });
 
-    # Add "input" helper
-    $app->helper(input => sub { $self->_input(@_) });
-
-    # Add "label" helper
+    # Add "javascript" helper
     $app->helper(
-        label => sub { shift; $self->_tag('label', for => shift, @_) });
+        javascript => sub {
+            my $c = shift;
+
+            # CDATA
+            my $cb;
+            my $old = $cb = pop if ref $_[-1] && ref $_[-1] eq 'CODE';
+            $cb = sub { '<![CDATA[' . $old->() . ']]>' }
+              if $cb;
+
+            # Path
+            if (@_ % 2 ? ref $_[-1] ne 'CODE' : ref $_[-1] eq 'CODE') {
+                return $self->_tag(
+                    'script',
+                    src  => shift,
+                    type => 'text/javascript',
+                    @_
+                );
+            }
+
+            # Block
+            $self->_tag('script', type => 'text/javascript', @_, $cb);
+        }
+    );
 
     # Add "link_to" helper
     $app->helper(
         link_to => sub {
-            my $c    = shift;
-            my $name = shift;
+            my $c       = shift;
+            my $content = shift;
+            my @url     = ($content);
+
+            # Content
+            unless (defined $_[-1] && ref $_[-1] eq 'CODE') {
+                @url = (shift);
+                push @_, sub {$content}
+            }
 
             # Captures
-            my $captures = ref $_[0] eq 'HASH' ? shift : {};
+            push @url, shift if ref $_[0] eq 'HASH';
 
-            # Default content
-            push @_, sub { ucfirst $name }
-              unless defined $_[-1] && ref $_[-1] eq 'CODE';
-
-            $self->_tag('a', href => $c->url_for($name, $captures), @_);
+            $self->_tag('a', href => $c->url_for(@url), @_);
         }
     );
 
@@ -159,24 +182,31 @@ sub register {
         }
     );
 
-
-    # Add "script" helper
+    # Add "stylesheet" helper
     $app->helper(
-        script => sub {
+        stylesheet => sub {
             my $c = shift;
+
+            # CDATA
+            my $cb;
+            my $old = $cb = pop if ref $_[-1] && ref $_[-1] eq 'CODE';
+            $cb = sub { '<![CDATA[' . $old->() . ']]>' }
+              if $cb;
 
             # Path
             if (@_ % 2 ? ref $_[-1] ne 'CODE' : ref $_[-1] eq 'CODE') {
                 return $self->_tag(
-                    'script',
-                    src  => shift,
-                    type => 'text/javascript',
+                    'link',
+                    href  => shift,
+                    media => 'screen',
+                    rel   => 'stylesheet',
+                    type  => 'text/css',
                     @_
                 );
             }
 
             # Block
-            $self->_tag('script', type => 'text/javascript', @_);
+            $self->_tag('style', type => 'text/css', @_, $cb);
         }
     );
 
@@ -221,6 +251,8 @@ sub _input {
 
     # Value
     my $p = $c->param($name);
+    xml_escape $p if defined $p;
+
     my $t = $attrs{type} || '';
     if (defined $p && $t ne 'submit') {
 
@@ -246,6 +278,7 @@ sub _input {
     $self->_tag('input', name => $name, %attrs);
 }
 
+# We’ve lost power of the forward Gameboy! Mario not responding!
 sub _tag {
     my $self = shift;
     my $name = shift;
@@ -309,7 +342,6 @@ Note that this module is EXPERIMENTAL and might change without warning!
     <%= check_box employed => 1, id => 'foo' %>
 
 Generate checkbox input element.
-Note that this helper is EXPERIMENTAL and might change without warning!
 
     <input name="employed" type="checkbox" value="1" />
     <input id="foo" name="employed" type="checkbox" value="1" />
@@ -320,7 +352,6 @@ Note that this helper is EXPERIMENTAL and might change without warning!
     <%= file_field 'avatar', id => 'foo' %>
 
 Generate file input element.
-Note that this helper is EXPERIMENTAL and might change without warning!
 
     <input name="avatar" type="file" />
     <input id="foo" name="avatar" type="file" />
@@ -347,19 +378,19 @@ Note that this helper is EXPERIMENTAL and might change without warning!
 Generate form for route, path or URL.
 
     <form action="/path/to/login" method="post">
-        <input name="first_name" type="text" />
+        <input name="first_name" />
         <input value="Ok" type="submit" />
     </form>
     <form action="/path/to/login/bar" method="post">
-        <input name="first_name" type="text" />
+        <input name="first_name" />
         <input value="Ok" type="submit" />
     </form>
     <form action="/login" method="post">
-        <input name="first_name" type="text" />
+        <input name="first_name" />
         <input value="Ok" type="submit" />
     </form>
     <form action="http://kraih.com/login" method="post">
-        <input name="first_name" type="text" />
+        <input name="first_name" />
         <input value="Ok" type="submit" />
     </form>
 
@@ -369,46 +400,41 @@ Generate form for route, path or URL.
     <%= hidden_field foo => 'bar', id => 'bar' %>
 
 Generate hidden input element.
-Note that this helper is EXPERIMENTAL and might change without warning!
 
     <input name="foo" type="hidden" value="bar" />
     <input id="bar" name="foo" type="hidden" value="bar" />
 
-=item img
+=item input_tag
 
-    <%= img '/foo.jpg' %>
-    <%= img '/foo.jpg', alt => 'Image' %>
-
-Generate image tag.
-
-    <img src="/foo.jpg" />
-    <img alt="Image" src="/foo.jpg" />
-
-=item input
-
-    <%= input 'first_name' %>
-    <%= input 'first_name', value => 'Default name' %>
-    <%= input 'employed', type => 'checkbox' %>
-    <%= input 'country', type => 'radio', value => 'germany' %>
+    <%= input_tag 'first_name' %>
+    <%= input_tag 'first_name', value => 'Default name' %>
+    <%= input_tag 'employed', type => 'checkbox' %>
+    <%= input_tag 'country', type => 'radio', value => 'germany' %>
 
 Generate form input element.
 
-    <input name="first_name" type="text" />
-    <input name="first_name" type="text" value="Default name" />
+    <input name="first_name" />
+    <input name="first_name" value="Default name" />
     <input name="employed" type="checkbox" />
     <input name="country" type="radio" value="germany" />
 
-=item label
+=item javascript
 
-    <%= label first_name => begin %>First name<% end %>
+    <%= javascript 'script.js' %>
+    <%= javascript begin %>
+        var a = 'b';
+    <% end %>
 
-Generate form label.
+Generate script tag for C<Javascript> asset.
 
-    <label for="first_name">First name</label>
+    <script src="script.js" type="text/javascript" />
+    <script type="text/javascript"><![CDATA[
+        var a = 'b';
+    ]]></script>
 
 =item link_to
 
-    <%= link_to 'index' %>
+    <%= link_to Home => 'index' %>
     <%= link_to index => begin %>Home<% end %>
     <%= link_to index => {foo => 'bar'} => (class => 'links') => begin %>
         Home
@@ -420,7 +446,7 @@ Generate form label.
 Generate link to route, path or URL, by default the capitalized link target
 will be used as content.
 
-    <a href="/path/to/index">Index</a>
+    <a href="/path/to/index">Home</a>
     <a href="/path/to/index">Home</a>
     <a class="links" href="/path/to/index/bar">Home</a>
     <a href="/path/to/file">File</a>
@@ -433,7 +459,6 @@ will be used as content.
     <%= password_field 'pass', id => 'foo' %>
 
 Generate password input element.
-Note that this helper is EXPERIMENTAL and might change without warning!
 
     <input name="pass" type="password" />
     <input id="foo" name="pass" type="password" />
@@ -444,7 +469,6 @@ Note that this helper is EXPERIMENTAL and might change without warning!
     <%= radio_button country => 'germany', id => 'foo' %>
 
 Generate radio input element.
-Note that this helper is EXPERIMENTAL and might change without warning!
 
     <input name="country" type="radio" value="germany" />
     <input id="foo" name="country" type="radio" value="germany" />
@@ -457,7 +481,6 @@ Note that this helper is EXPERIMENTAL and might change without warning!
     <%= select_field country => [[Europe => [Germany => 'de']]] %>
 
 Generate select, option and optgroup elements.
-Note that this helper is EXPERIMENTAL and might change without warning!
 
     <select name="language">
         <option name="de">de</option>
@@ -478,19 +501,19 @@ Note that this helper is EXPERIMENTAL and might change without warning!
         </optgroup>
     </select>
 
-=item script
+=item stylesheet
 
-    <%= script '/script.js' %>
-    <%= script begin %>
-        var a = 'b';
+    <%= stylesheet 'foo.css %>
+    <%= stylesheet begin %>
+        body {color: #000}
     <% end %>
 
-Generate script tag.
+Generate style or link tag for C<CSS> asset.
 
-    <script src="/script.js" type="text/javascript" />
-    <script type="text/javascript">
-        var a = 'b';
-    </script>
+    <link href="foo.css" media="screen" rel="stylesheet" type="text/css" />
+    <style type="text/css"><![CDATA[
+        body {color: #000}
+    ]]></style>
 
 =item submit_button
 
@@ -498,7 +521,6 @@ Generate script tag.
     <%= submit_button 'Ok!', id => 'foo' %>
 
 Generate submit input element.
-Note that this helper is EXPERIMENTAL and might change without warning!
 
     <input type="submit" value="Ok" />
     <input id="foo" type="submit" value="Ok!" />
@@ -521,10 +543,9 @@ HTML5 tag generator.
     <%= text_field 'first_name', value => 'Default name' %>
 
 Generate text input element.
-Note that this helper is EXPERIMENTAL and might change without warning!
 
-    <input name="first_name" type="text" />
-    <input name="first_name" type="text" value="Default name" />
+    <input name="first_name" />
+    <input name="first_name" value="Default name" />
 
 =item text_area
 
@@ -534,7 +555,6 @@ Note that this helper is EXPERIMENTAL and might change without warning!
     <% end %>
 
 Generate textarea element.
-Note that this helper is EXPERIMENTAL and might change without warning!
 
     <textarea name="foo"></textarea>
     <textarea name="foo">

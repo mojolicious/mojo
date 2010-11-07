@@ -11,7 +11,7 @@ use Carp 'croak';
 use File::Copy ();
 use File::Spec;
 use IO::File;
-use Mojo::ByteStream 'b';
+use Mojo::Util 'md5_sum';
 
 __PACKAGE__->attr([qw/cleanup path/]);
 __PACKAGE__->attr(tmpdir => sub { $ENV{MOJO_TMPDIR} || File::Spec->tmpdir });
@@ -40,7 +40,7 @@ __PACKAGE__->attr(
         my $base = File::Spec->catfile($self->tmpdir, 'mojo.tmp');
         $file = $base;
         while (-e $file) {
-            my $sum = b(time . rand(999999999))->md5_sum;
+            my $sum = md5_sum time . rand 999999999;
             $file = "$base.$sum";
         }
         $self->path($file);

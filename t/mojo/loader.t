@@ -60,8 +60,8 @@ ok LoaderTest::A->can('new'), 'loaded successfully';
 ok LoaderTest::B->can('new'), 'loaded successfully';
 ok LoaderTest::C->can('new'), 'loaded successfully';
 
-# Load unrelated class
-ok $loader->load('LoaderTest'), 'loaded successfully';
+# Class does not exist
+ok $loader->load('LoaderTest'), 'nothing to load';
 
 # Reload
 my $file = IO::File->new;

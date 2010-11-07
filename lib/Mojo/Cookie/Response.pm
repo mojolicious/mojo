@@ -5,8 +5,8 @@ use warnings;
 
 use base 'Mojo::Cookie';
 
-use Mojo::ByteStream 'b';
 use Mojo::Date;
+use Mojo::Util 'unquote';
 
 __PACKAGE__->attr([qw/comment domain httponly max_age port secure/]);
 
@@ -57,7 +57,7 @@ sub parse {
             my ($name, $value) = @{$knot->[$i]};
 
             # Value might be quoted
-            $value = b($value)->unquote->to_string if $value;
+            unquote $value if $value;
 
             # This will only run once
             if (not $i) {
@@ -88,8 +88,10 @@ sub to_string {
     return '' unless $self->name;
 
     # Version
-    my $cookie = sprintf "%s=%s; Version=%d",
-      $self->name, $self->value, ($self->version || 1);
+    my $cookie = $self->name;
+    my $value  = $self->value;
+    $cookie .= "=$value" if defined $value && length $value;
+    $cookie .= sprintf "; Version=%d", ($self->version || 1);
 
     # Domain
     if (my $domain = $self->domain) { $cookie .= "; Domain=$domain" }

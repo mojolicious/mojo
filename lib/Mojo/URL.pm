@@ -4,22 +4,42 @@ use strict;
 use warnings;
 
 use base 'Mojo::Base';
+use overload 'bool' => sub {1}, fallback => 1;
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
-use Mojo::ByteStream 'b';
 use Mojo::Parameters;
 use Mojo::Path;
+use Mojo::Util qw/punycode_decode punycode_encode url_escape url_unescape/;
 
 __PACKAGE__->attr([qw/fragment host port scheme userinfo/]);
 __PACKAGE__->attr(base => sub { Mojo::URL->new });
 
-# RFC 3986
+# Characters (RFC 3986)
 our $UNRESERVED = 'A-Za-z0-9\-\.\_\~';
 our $SUBDELIM   = '!\$\&\'\(\)\*\+\,\;\=';
 our $PCHAR      = "$UNRESERVED$SUBDELIM\%\:\@";
 
-# The specs for this are blurry, it's mostly a colelction of w3c suggestions
+# The specs for this are blurry, it's mostly a collection of w3c suggestions
 our $PARAM = "$UNRESERVED\!\$\'\(\)\*\,\:\@\/\?";
+
+# IPv4 regex (RFC 3986)
+my $DEC_OCTET_RE = qr/(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])/;
+our $IPV4_RE = qr/$DEC_OCTET_RE\.$DEC_OCTET_RE\.$DEC_OCTET_RE\.$DEC_OCTET_RE/;
+
+# IPv6 regex (RFC 3986)
+my $H16_RE  = qr/[0-9A-Fa-f]{1,4}/;
+my $LS32_RE = qr/(?:$H16_RE:$H16_RE|$IPV4_RE)/;
+our $IPV6_RE = qr/(?:
+                                             (?: $H16_RE : ){6} $LS32_RE
+    |                                     :: (?: $H16_RE : ){5} $LS32_RE
+    | (?:                      $H16_RE )? :: (?: $H16_RE : ){4} $LS32_RE
+    | (?: (?: $H16_RE : ){0,1} $H16_RE )? :: (?: $H16_RE : ){3} $LS32_RE
+    | (?: (?: $H16_RE : ){0,2} $H16_RE )? :: (?: $H16_RE : ){2} $LS32_RE
+    | (?: (?: $H16_RE : ){0,3} $H16_RE )? ::     $H16_RE :      $LS32_RE
+    | (?: (?: $H16_RE : ){0,4} $H16_RE )? ::                    $LS32_RE
+    | (?: (?: $H16_RE : ){0,5} $H16_RE )? ::                    $H16_RE
+    | (?: (?: $H16_RE : ){0,6} $H16_RE )? ::
+)/x;
 
 sub new {
     my $self = shift->SUPER::new();
@@ -39,23 +59,22 @@ sub authority {
         if ($authority =~ /^([^\@]+)\@(.+)$/) {
             $userinfo = $1;
             $host     = $2;
+            url_unescape $userinfo;
+            $self->userinfo($userinfo);
         }
 
         # Port
         my $port = undef;
         if ($host =~ /^(.+)\:(\d+)$/) {
             $host = $1;
-            $port = $2;
+            $self->port($2);
         }
 
-        $self->userinfo(
-            $userinfo ? b($userinfo)->url_unescape->to_string : undef);
-        $host
-          ? $self->ihost(b($host)->url_unescape->to_string)
-          : $self->host(undef);
-        $self->port($port);
-
-        return $self;
+        # Host
+        url_unescape $host;
+        return $host =~ /[^\x00-\x7f]/
+          ? $self->ihost($host)
+          : $self->host($host);
     }
 
     # *( unreserved / pct-encoded / sub-delims ), extended with "[" and "]"
@@ -64,7 +83,8 @@ sub authority {
     my $port = $self->port;
 
     # *( unreserved / pct-encoded / sub-delims / ":" )
-    my $userinfo = b($self->userinfo)->url_escape("$UNRESERVED$SUBDELIM\:");
+    my $userinfo = $self->userinfo;
+    url_escape $userinfo, "$UNRESERVED$SUBDELIM\:" if $userinfo;
 
     # Format
     $authority .= "$userinfo\@" if $userinfo;
@@ -101,7 +121,8 @@ sub ihost {
         my @decoded;
         for my $part (split /\./, $_[1]) {
             if ($part =~ /^xn--(.+)$/) {
-                $part = b($1)->punycode_decode->to_string;
+                $part = $1;
+                punycode_decode $part;
             }
             push @decoded, $part;
         }
@@ -110,11 +131,17 @@ sub ihost {
         return $self;
     }
 
+    # Host
+    return unless $host = $self->host;
+    return $host unless $host =~ /[^\x00-\x7f]/;
+
     # Encode parts
     my @encoded;
-    for my $part (split /\./, $self->host || '') {
-        $part = 'xn--' . b($part)->punycode_encode->to_string
-          if $part =~ /[^\x00-\x7f]/;
+    for my $part (split /\./, $host || '') {
+        if ($part =~ /[^\x00-\x7f]/) {
+            punycode_encode $part;
+            $part = "xn--$part";
+        }
         push @encoded, $part;
     }
 
@@ -124,6 +151,16 @@ sub ihost {
 sub is_abs {
     my $self = shift;
     return 1 if $self->scheme && $self->authority;
+    return;
+}
+
+sub is_ipv4 {
+    return 1 if shift->host =~ $IPV4_RE;
+    return;
+}
+
+sub is_ipv6 {
+    return 1 if shift->host =~ $IPV6_RE;
     return;
 }
 
@@ -280,16 +317,26 @@ sub to_string {
     my $path      = $self->path;
     my $query     = $self->query;
 
-    # *( pchar / "/" / "?" )
-    my $fragment = b($self->fragment)->url_escape("$PCHAR\/\?");
-
     # Format
     my $url = '';
 
-    $url .= lc "$scheme://" if $scheme && $authority;
-    $url .= "$authority$path";
+    # Scheme and authority
+    if ($scheme && $authority) {
+        $url .= lc "$scheme://";
+        $url .= "$authority";
+    }
+
+    # Path and query
+    $url .= $path;
     $url .= "?$query" if @{$query->params};
-    $url .= "#$fragment" if $fragment->size;
+
+    # Fragment
+    if (my $fragment = $self->fragment) {
+
+        # *( pchar / "/" / "?" )
+        url_escape $fragment, "$PCHAR\/\?";
+        $url .= "#$fragment";
+    }
 
     return $url;
 }
@@ -417,6 +464,20 @@ Host part of this URL in punycode format.
     my $is_abs = $url->is_abs;
 
 Check if URL is absolute.
+
+=head2 C<is_ipv4>
+
+    my $is_ipv4 = $url->is_ipv4;
+
+Check if C<host> is an C<IPv4> address.
+Note that this method is EXPERIMENTAL and might change without warning!
+
+=head2 C<is_ipv6>
+
+    my $is_ipv6 = $url->is_ipv6;
+
+Check if C<host> is an C<IPv6> address.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<parse>
 

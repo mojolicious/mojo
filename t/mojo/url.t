@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 124;
+use Test::More tests => 154;
 
 # I don't want you driving around in a car you built yourself.
 # You can sit there complaining, or you can knit me some seat belts.
@@ -133,7 +133,7 @@ is $url->userinfo, undef,                                     'no userinfo';
 is $url->host,     'acme.s3.amazonaws.com',                   'right host';
 is $url->port,     undef,                                     'no port';
 is $url->path,     '/mojo%2Fg++-4.2_4.2.3-2ubuntu7_i386.deb', 'right path';
-ok !$url->query, 'no query';
+ok !$url->query->to_string, 'no query';
 is_deeply $url->query->to_hash, {}, 'right structure';
 is $url->fragment, undef, 'no fragment';
 is "$url",
@@ -167,7 +167,7 @@ $clone = $url->clone;
 is "$url", '/test/index.html', 'right format';
 is $clone->is_abs, undef, 'not absolute';
 is $clone->scheme, undef, 'no scheme';
-is $clone->host,   undef, 'no host';
+is $clone->host,   '',    'no host';
 is $clone->base->scheme, 'http',      'right base scheme';
 is $clone->base->host,   '127.0.0.1', 'right base host';
 is $clone->path, '/test/index.html', 'right path';
@@ -254,3 +254,45 @@ $url = Mojo::URL->new('http://kraih.com/foo///bar/23/');
 $url->base->parse('http://kraih.com/');
 is $url->is_abs, 1;
 is $url->to_rel, '/foo///bar/23/';
+
+# Check host for IPv4 and IPv6 addresses
+$url = Mojo::URL->new('http://mojolicio.us');
+is $url->host,    'mojolicio.us', 'right host';
+is $url->is_ipv4, undef,          'not an IPv4 address';
+is $url->is_ipv6, undef,          'not an IPv6 address';
+$url = Mojo::URL->new('http://[::1]');
+is $url->host,    '[::1]', 'right host';
+is $url->is_ipv4, undef,   'not an IPv4 address';
+is $url->is_ipv6, 1,       'is an IPv6 address';
+$url = Mojo::URL->new('http://127.0.0.1');
+is $url->host,    '127.0.0.1', 'right host';
+is $url->is_ipv4, 1,           'is an IPv4 address';
+is $url->is_ipv6, undef,       'not an IPv6 address';
+$url = Mojo::URL->new('http://0::127.0.0.1');
+is $url->host,    '0::127.0.0.1', 'right host';
+is $url->is_ipv4, 1,              'is an IPv4 address';
+is $url->is_ipv6, 1,              'is an IPv6 address';
+$url = Mojo::URL->new('http://[0::127.0.0.1]');
+is $url->host,    '[0::127.0.0.1]', 'right host';
+is $url->is_ipv4, 1,                'is an IPv4 address';
+is $url->is_ipv6, 1,                'is an IPv6 address';
+$url = Mojo::URL->new('http://mojolicio.us:3000');
+is $url->host,    'mojolicio.us', 'right host';
+is $url->is_ipv4, undef,          'not an IPv4 address';
+is $url->is_ipv6, undef,          'not an IPv6 address';
+$url = Mojo::URL->new('http://[::1]:3000');
+is $url->host,    '[::1]', 'right host';
+is $url->is_ipv4, undef,   'not an IPv4 address';
+is $url->is_ipv6, 1,       'is an IPv6 address';
+$url = Mojo::URL->new('http://127.0.0.1:3000');
+is $url->host,    '127.0.0.1', 'right host';
+is $url->is_ipv4, 1,           'is an IPv4 address';
+is $url->is_ipv6, undef,       'not an IPv6 address';
+$url = Mojo::URL->new('http://0::127.0.0.1:3000');
+is $url->host,    '0::127.0.0.1', 'right host';
+is $url->is_ipv4, 1,              'is an IPv4 address';
+is $url->is_ipv6, 1,              'is an IPv6 address';
+$url = Mojo::URL->new('http://[0::127.0.0.1]:3000');
+is $url->host,    '[0::127.0.0.1]', 'right host';
+is $url->is_ipv4, 1,                'is an IPv4 address';
+is $url->is_ipv6, 1,                'is an IPv6 address';

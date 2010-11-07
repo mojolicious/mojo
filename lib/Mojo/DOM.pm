@@ -4,9 +4,10 @@ use strict;
 use warnings;
 
 use base 'Mojo::Base';
+use overload 'bool' => sub {1}, fallback => 1;
 use overload '""' => sub { shift->to_xml }, fallback => 1;
 
-use Mojo::ByteStream 'b';
+use Mojo::Util qw/decode encode html_unescape xml_escape/;
 use Scalar::Util 'weaken';
 
 # How are the kids supposed to get home?
@@ -29,11 +30,11 @@ my $CSS_ATTR_RE   = qr/
 my $CSS_CLASS_RE        = qr/\.((?:\\\.|[^\.])+)/;
 my $CSS_ELEMENT_RE      = qr/^((?:\\\.|\\\#|[^\.\#])+)/;
 my $CSS_ID_RE           = qr/\#((?:\\\#|[^\#])+)/;
-my $CSS_PSEUDO_CLASS_RE = qr/(?:\:(\w+)(?:\(([^\)]+)\))?)/;
+my $CSS_PSEUDO_CLASS_RE = qr/(?:\:([\w\-]+)(?:\(((?:\([^\)]+\)|[^\)])+)\))?)/;
 my $CSS_TOKEN_RE        = qr/
     (\s*,\s*)?                                                   # Separator
     ((?:[^\[\\\:\s\,]|$CSS_ESCAPE_RE\s?)+)?                      # Element
-    ((?:\:\w+(?:\([^\)]+\))?)*)?                                 # Pseudoclass
+    ((?:\:[\w\-]+(?:\((?:\([^\)]+\)|[^\)])+\))?)*)?              # Pseudoclass
     ((?:\[(?:$CSS_ESCAPE_RE|\w)+(?:\W?="(?:\\"|[^"])+")?\])*)?   # Attributes
     (?:
     \s*
@@ -81,6 +82,8 @@ my $XML_TOKEN_RE = qr/
     )??
 /xis;
 
+sub after { shift->_add(1, @_) }
+
 sub all_text {
     my $self = shift;
 
@@ -124,6 +127,8 @@ sub attrs {
     return $tree->[2];
 }
 
+sub before { shift->_add(0, @_) }
+
 sub children {
     my $self = shift;
 
@@ -154,7 +159,7 @@ sub find {
     my $pattern = $self->_parse_css($css);
 
     # Filter tree
-    return $self->_select($self->tree, $pattern);
+    return $self->_match_tree($self->tree, $pattern);
 }
 
 sub inner_xml {
@@ -174,27 +179,9 @@ sub inner_xml {
 
     # Encode
     my $charset = $self->charset;
-    $result = b($result)->encode($charset)->to_string if $charset;
+    encode $charset, $result if $charset;
 
     return $result;
-}
-
-sub name {
-    my ($self, $name) = @_;
-
-    # Tree
-    my $tree = $self->tree;
-
-    # Root
-    return if $tree->[0] eq 'root';
-
-    # Get
-    return $tree->[1] unless $name;
-
-    # Set
-    $tree->[1] = $name;
-
-    return $self;
 }
 
 sub namespace {
@@ -248,6 +235,9 @@ sub parent {
 sub parse {
     my ($self, $xml) = @_;
 
+    # Detect Perl characters
+    $self->charset(undef) if utf8::is_utf8 $xml;
+
     # Parse
     $self->tree($self->_parse_xml($xml));
 }
@@ -262,7 +252,7 @@ sub replace {
     my $tree = $self->tree;
 
     # Root
-    return $self->replace_content(
+    return $self->replace_inner(
         $self->new(charset => $self->charset, tree => $new))
       if $tree->[0] eq 'root';
 
@@ -289,7 +279,7 @@ sub replace {
     return $self;
 }
 
-sub replace_content {
+sub replace_inner {
     my ($self, $new) = @_;
 
     # Parse
@@ -358,9 +348,62 @@ sub to_xml {
 
     # Encode
     my $charset = $self->charset;
-    $result = b($result)->encode($charset)->to_string if $charset;
+    encode $charset, $result if $charset;
 
     return $result;
+}
+
+sub type {
+    my ($self, $type) = @_;
+
+    # Tree
+    my $tree = $self->tree;
+
+    # Root
+    return if $tree->[0] eq 'root';
+
+    # Get
+    return $tree->[1] unless $type;
+
+    # Set
+    $tree->[1] = $type;
+
+    return $self;
+}
+
+sub _add {
+    my ($self, $offset, $new) = @_;
+
+    # Parse
+    $new = ref $new ? $new->tree : $self->_parse_xml($new);
+
+    # Tree
+    my $tree = $self->tree;
+
+    # Root
+    return $self if $tree->[0] eq 'root';
+
+    # Parent
+    my $parent = $tree->[3];
+
+    # Siblings
+    my @new;
+    for my $e (@$new[1 .. $#$new]) {
+        $e->[3] = $parent if $e->[0] eq 'tag';
+        push @new, $e;
+    }
+
+    # Find
+    my $i = $parent->[0] eq 'root' ? 1 : 4;
+    for my $e (@$parent[$i .. $#$parent]) {
+        last if $e == $tree;
+        $i++;
+    }
+
+    # Add
+    splice @$parent, $i + $offset, 0, @new;
+
+    return $self;
 }
 
 # Woah! God is so in your face!
@@ -379,57 +422,54 @@ sub _comment {
     push @$$current, ['comment', $comment];
 }
 
-sub _compare {
-    my ($self, $selector, $current) = @_;
+sub _css_equation {
+    my ($self, $equation) = @_;
+    my $num = [1, 1];
 
-    # Selectors
-    for my $c (@$selector[1 .. $#$selector]) {
-        my $type = $c->[0];
+    # "even"
+    if ($equation eq 'even') { $num = [2, 2] }
 
-        # Tag
-        if ($type eq 'tag') {
-            my $name = $c->[1];
+    # "odd"
+    elsif ($equation eq 'odd') { $num = [2, 1] }
 
-            # Wildcard
-            next if $name eq '*';
-
-            # Name (ignore namespace prefix)
-            next if $current->[1] =~ /\:?$name$/;
-        }
-
-        # Attribute
-        elsif ($type eq 'attribute') {
-            my $key   = $c->[1];
-            my $regex = $c->[2];
-            my $attrs = $current->[2];
-
-            # Find attributes (ignore namespace prefix)
-            my $found = 0;
-            for my $name (keys %$attrs) {
-                if ($name =~ /\:?$key$/) {
-                    ++$found and last
-                      if !$regex || ($attrs->{$name} || '') =~ /$regex/;
-                }
-            }
-            next if $found;
-        }
-
-        # Pseudo class
-        elsif ($type eq 'pseudoclass') {
-            my $class = $c->[1];
-
-            # ":root"
-            if ($class eq 'root') {
-                if (my $parent = $current->[3]) {
-                    next if $parent->[0] eq 'root';
-                }
-            }
-        }
-
-        return;
+    # Equation
+    elsif ($equation =~ /(?:(\-?(?:\d+)?)?n)?\+?(\-?\d+)?$/) {
+        $num->[0] = $1 || 0;
+        $num->[0] = -1 if $num->[0] eq '-';
+        $num->[1] = $2 || 0;
     }
 
-    return 1;
+    return $num;
+}
+
+sub _css_regex {
+    my ($self, $op, $value) = @_;
+
+    # Shortcut
+    return unless $value;
+
+    # Quote
+    $value = quotemeta $self->_css_unescape($value);
+
+    # Regex
+    my $regex;
+
+    # "~=" (word)
+    if ($op eq '~') { $regex = qr/(?:^|.*\s+)$value(?:\s+.*|$)/ }
+
+    # "*=" (contains)
+    elsif ($op eq '*') { $regex = qr/$value/ }
+
+    # "^=" (begins with)
+    elsif ($op eq '^') { $regex = qr/^$value/ }
+
+    # "$=" (ends with)
+    elsif ($op eq '$') { $regex = qr/$value$/ }
+
+    # Everything else
+    else { $regex = qr/^$value$/ }
+
+    return $regex;
 }
 
 sub _css_unescape {
@@ -486,7 +526,7 @@ sub _end {
     }
 }
 
-sub _match {
+sub _match_element {
     my ($self, $candidate, $selectors) = @_;
 
     # Selectors
@@ -496,6 +536,7 @@ sub _match {
     my $first = 2;
     my ($current, $marker, $snapback);
     my $parentonly = 0;
+    my $siblings;
     for (my $i = 0; $i <= $#selectors; $i++) {
         my $selector = $selectors[$i];
 
@@ -503,29 +544,68 @@ sub _match {
         $parentonly-- if $parentonly > 0;
         if ($selector->[0] eq 'combinator') {
 
+            # Combinator
+            my $c = $selector->[1];
+
             # Parent only ">"
-            if ($selector->[1] eq '>') {
+            if ($c eq '>') {
                 $parentonly += 2;
                 $marker   = $i - 1   unless defined $marker;
                 $snapback = $current unless $snapback;
+            }
+
+            # Preceding siblings "~" and "+"
+            elsif ($c eq '~' || $c eq '+') {
+                my $parent = $current->[3];
+                my $start = $parent->[0] eq 'root' ? 1 : 4;
+                $siblings = [];
+
+                # Siblings
+                for my $i ($start .. $#$parent) {
+                    my $sibling = $parent->[$i];
+                    next unless $sibling->[0] eq 'tag';
+
+                    # Reached current
+                    if ($sibling eq $current) {
+                        @$siblings = ($siblings->[-1]) if $c eq '+';
+                        last;
+                    }
+                    push @$siblings, $sibling;
+                }
             }
 
             # Move on
             next;
         }
 
+        # Walk backwards
         while (1) {
             $first-- if $first != 0;
 
+            # Next sibling
+            if ($siblings) {
+
+                # Last sibling
+                unless ($current = shift @$siblings) {
+                    $siblings = undef;
+                    return;
+                }
+            }
+
             # Next parent
-            return
-              unless $current = $current ? $current->[3] : $candidate;
+            else {
+                return
+                  unless $current = $current ? $current->[3] : $candidate;
+            }
 
             # Root
             return if $current->[0] ne 'tag';
 
             # Compare part to element
-            last if $self->_compare($selector, $current);
+            if ($self->_match_selector($selector, $current)) {
+                $siblings = undef;
+                last;
+            }
 
             # First selector needs to match
             return if $first;
@@ -542,6 +622,189 @@ sub _match {
     }
 
     return 1;
+}
+
+sub _match_selector {
+    my ($self, $selector, $current) = @_;
+
+    # Selectors
+    for my $c (@$selector[1 .. $#$selector]) {
+        my $type = $c->[0];
+
+        # Tag
+        if ($type eq 'tag') {
+            my $type = $c->[1];
+
+            # Wildcard
+            next if $type eq '*';
+
+            # Type (ignore namespace prefix)
+            next if $current->[1] =~ /\:?$type$/;
+        }
+
+        # Attribute
+        elsif ($type eq 'attribute') {
+            my $key   = $c->[1];
+            my $regex = $c->[2];
+            my $attrs = $current->[2];
+
+            # Find attributes (ignore namespace prefix)
+            my $found = 0;
+            for my $name (keys %$attrs) {
+                if ($name =~ /\:?$key$/) {
+                    ++$found and last
+                      if !$regex || ($attrs->{$name} || '') =~ /$regex/;
+                }
+            }
+            next if $found;
+        }
+
+        # Pseudo class
+        elsif ($type eq 'pseudoclass') {
+            my $class = $c->[1];
+            my $args  = $c->[2];
+
+            # "first-*"
+            if ($class =~ /^first\-(?:(child)|of-type)$/) {
+                $class = defined $1 ? 'nth-child' : 'nth-of-type';
+                $args = 1;
+            }
+
+            # "last-*"
+            elsif ($class =~ /^last\-(?:(child)|of-type)$/) {
+                $class = defined $1 ? 'nth-last-child' : 'nth-last-of-type';
+                $args = '-n+1';
+            }
+
+            # ":checked"
+            if ($class eq 'checked') {
+                my $attrs = $current->[2];
+                next if ($attrs->{checked}  || '') eq 'checked';
+                next if ($attrs->{selected} || '') eq 'selected';
+            }
+
+            # ":empty"
+            elsif ($class eq 'empty') { next unless exists $current->[4] }
+
+            # ":root"
+            elsif ($class eq 'root') {
+                if (my $parent = $current->[3]) {
+                    next if $parent->[0] eq 'root';
+                }
+            }
+
+            # "not"
+            elsif ($class eq 'not') {
+                next unless $self->_match_selector($args, $current);
+            }
+
+            # "nth-*"
+            elsif ($class =~ /^nth-/) {
+
+                # Numbers
+                $args = $c->[2] = $self->_css_equation($args)
+                  unless ref $args;
+
+                # Parent
+                my $parent = $current->[3];
+
+                # Siblings
+                my $start = $parent->[0] eq 'root' ? 1 : 4;
+                my @siblings;
+                my $type = $class =~ /of-type$/ ? $current->[1] : undef;
+                for my $j ($start .. $#$parent) {
+                    my $sibling = $parent->[$j];
+                    next unless $sibling->[0] eq 'tag';
+                    next if defined $type && $type ne $sibling->[1];
+                    push @siblings, $sibling;
+                }
+
+                # Reverse
+                @siblings = reverse @siblings if $class =~ /^nth-last/;
+
+                # Find
+                my $found = 0;
+                for my $i (0 .. $#siblings) {
+                    my $result = $args->[0] * $i + $args->[1];
+                    next if $result < 1;
+                    last unless my $sibling = $siblings[$result - 1];
+                    if ($sibling eq $current) {
+                        $found = 1;
+                        last;
+                    }
+                }
+                next if $found;
+            }
+
+            # "only-*"
+            elsif ($class =~ /^only-(?:child|(of-type))$/) {
+                my $type = $1 ? $current->[1] : undef;
+
+                # Parent
+                my $parent = $current->[3];
+
+                # Siblings
+                my $start = $parent->[0] eq 'root' ? 1 : 4;
+                for my $j ($start .. $#$parent) {
+                    my $sibling = $parent->[$j];
+                    next unless $sibling->[0] eq 'tag';
+                    next if $sibling eq $current;
+                    next if defined $type && $sibling->[1] ne $type;
+                    return if $sibling ne $current;
+                }
+
+                # No siblings
+                next;
+            }
+        }
+
+        return;
+    }
+
+    return 1;
+}
+
+sub _match_tree {
+    my ($self, $tree, $pattern) = @_;
+
+    # Walk tree
+    my @results;
+    my @queue = ($tree);
+    while (my $current = shift @queue) {
+
+        # Type
+        my $type = $current->[0];
+
+        # Root
+        if ($type eq 'root') {
+
+            # Fill queue
+            unshift @queue, @$current[1 .. $#$current];
+            next;
+        }
+
+        # Tag
+        elsif ($type eq 'tag') {
+
+            # Fill queue
+            unshift @queue, @$current[4 .. $#$current];
+
+            # Parts
+            for my $part (@$pattern) {
+
+                # Match
+                push(@results, $current) and last
+                  if $self->_match_element($current, $part);
+            }
+        }
+    }
+
+    # Upgrade results
+    @results =
+      map { $self->new(charset => $self->charset, tree => $_) } @results;
+
+    # Collection
+    return bless \@results, 'Mojo::DOM::_Collection';
 }
 
 sub _parse_css {
@@ -580,20 +843,26 @@ sub _parse_css {
 
         # Classes
         while ($element =~ /$CSS_CLASS_RE/g) {
-            my $class = $self->_css_unescape($1);
             push @$selector,
-              ['attribute', 'class', qr/(?:^|.*\s+)$class(?:\s+.*|$)/];
+              ['attribute', 'class', $self->_css_regex('~', $1)];
         }
 
         # ID
         if ($element =~ /$CSS_ID_RE/) {
-            my $id = $self->_css_unescape($1);
-            push @$selector, ['attribute', 'id', qr/^$id$/];
+            push @$selector, ['attribute', 'id', $self->_css_regex('', $1)];
         }
 
         # Pseudo classes
         while ($pc =~ /$CSS_PSEUDO_CLASS_RE/g) {
-            push @$selector, ['pseudoclass', $1, $2];
+
+            # "not"
+            if ($1 eq 'not') {
+                my $subpattern = $self->_parse_css($2)->[-1]->[-1];
+                push @$selector, ['pseudoclass', 'not', $subpattern];
+            }
+
+            # Everything else
+            else { push @$selector, ['pseudoclass', $1, $2] }
         }
 
         # Attributes
@@ -602,32 +871,8 @@ sub _parse_css {
             my $op    = $2 || '';
             my $value = $3;
 
-            # Regex
-            my $regex;
-
-            # Value
-            if ($value) {
-
-                # Quote
-                $value = quotemeta $self->_css_unescape($value);
-
-                # "~=" (word)
-                if ($op eq '~') { $regex = qr/(?:^|.*\s+)$value(?:\s+.*|$)/ }
-
-                # "*=" (contains)
-                elsif ($op eq '*') { $regex = qr/$value/ }
-
-                # "^=" (begins with)
-                elsif ($op eq '^') { $regex = qr/^$value/ }
-
-                # "$=" (ends with)
-                elsif ($op eq '$') { $regex = qr/$value$/ }
-
-                # Everything else
-                else { $regex = qr/^$value$/ }
-            }
-
-            push @$selector, ['attribute', $key, $regex];
+            push @$selector,
+              ['attribute', $key, $self->_css_regex($op, $value)];
         }
 
         # Combinator
@@ -646,7 +891,7 @@ sub _parse_xml {
 
     # Decode
     my $charset = $self->charset;
-    $xml = b($xml)->decode($charset)->to_string if $charset;
+    decode $charset, $xml if $charset && !utf8::is_utf8 $xml;
     return $tree unless $xml;
 
     # Tokenize
@@ -662,7 +907,7 @@ sub _parse_xml {
         if (length $text) {
 
             # Unescape
-            $text = b($text)->html_unescape->to_string if $text =~ /&/;
+            html_unescape $text if (index $text, '&') >= 0;
 
             $self->_text($text, \$current);
         }
@@ -705,8 +950,7 @@ sub _parse_xml {
                 next if $key eq '/';
 
                 # Unescape
-                $value = b($value)->html_unescape->to_string
-                  if $value && $value =~ /&/;
+                html_unescape $value if $value && (index $value, '&') >= 0;
 
                 # Merge
                 $attrs->{$key} = $value;
@@ -737,7 +981,11 @@ sub _render {
     my $e = $tree->[0];
 
     # Text (escaped)
-    return b($tree->[1])->xml_escape->to_string if $e eq 'text';
+    if ($e eq 'text') {
+        my $escaped = $tree->[1];
+        xml_escape $escaped;
+        return $escaped;
+    }
 
     # DOCTYPE
     return "<!DOCTYPE" . $tree->[1] . ">" if $e eq 'doctype';
@@ -775,7 +1023,7 @@ sub _render {
             push @attrs, $key and next unless $value;
 
             # Escape
-            $value = b($value)->xml_escape->to_string;
+            xml_escape $value;
 
             # Key and value
             push @attrs, qq/$key="$value"/;
@@ -801,49 +1049,6 @@ sub _render {
     $content .= '</' . $tree->[1] . '>' if $e eq 'tag';
 
     return $content;
-}
-
-sub _select {
-    my ($self, $tree, $pattern) = @_;
-
-    # Walk tree
-    my @results;
-    my @queue = ($tree);
-    while (my $current = shift @queue) {
-
-        # Type
-        my $type = $current->[0];
-
-        # Root
-        if ($type eq 'root') {
-
-            # Fill queue
-            unshift @queue, @$current[1 .. $#$current];
-            next;
-        }
-
-        # Tag
-        elsif ($type eq 'tag') {
-
-            # Fill queue
-            unshift @queue, @$current[4 .. $#$current];
-
-            # Parts
-            for my $part (@$pattern) {
-
-                # Match
-                push(@results, $current) and last
-                  if $self->_match($current, $part);
-            }
-        }
-    }
-
-    # Upgrade results
-    @results =
-      map { $self->new(charset => $self->charset, tree => $_) } @results;
-
-    # Collection
-    return bless \@results, 'Mojo::DOM::_Collection';
 }
 
 # It's not important to talk about who got rich off of whom,
@@ -898,7 +1103,7 @@ __END__
 
 =head1 NAME
 
-Mojo::DOM - Minimalistic XML DOM Parser With CSS3 Selectors
+Mojo::DOM - Minimalistic XML/HTML5 DOM Parser With CSS3 Selectors
 
 =head1 SYNOPSIS
 
@@ -915,6 +1120,11 @@ Mojo::DOM - Minimalistic XML DOM Parser With CSS3 Selectors
     # Iterate
     $dom->find('div[id]')->each(sub { print shift->text });
 
+    # Loop
+    for my $e ($dom->find('div[id]')->each) {
+        print $e->text;
+    }
+
     # Get the first 10 links
     $dom->find('a[href]')
       ->while(sub { print shift->attrs->{href} && pop() < 10 });
@@ -925,13 +1135,13 @@ Mojo::DOM - Minimalistic XML DOM Parser With CSS3 Selectors
 
 =head1 DESCRIPTION
 
-L<Mojo::DOM> is a minimalistic and very relaxed XML DOM parser with support
-for CSS3 selectors.
+L<Mojo::DOM> is a minimalistic and very relaxed XML/HTML5 DOM parser with
+support for CSS3 selectors.
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head2 Selectors
 
-These selectors are currently implemented.
+All CSS3 selectors that make sense for a standalone parser are supported.
 
 =over 4
 
@@ -990,6 +1200,97 @@ An C<E> element whose C<foo> attribute value contains the substring C<bar>.
 
 An C<E> element, root of the document.
 
+=item C<E:checked>
+
+    my $input = $dom->at(':checked');
+
+A user interface element C<E> which is checked (for instance a radio-button
+or checkbox).
+
+=item C<E:empty>
+
+    my $empty = $dom->find(':empty');
+
+An C<E> element that has no children (including text nodes).
+
+=item C<E:nth-child(n)>
+
+    my $third = $dom->at('div:nth-child(3)');
+    my $odd   = $dom->find('div:nth-child(odd)');
+    my $even  = $dom->find('div:nth-child(even)');
+    my $top3  = $dom->find('div:nth-child(-n+3)');
+
+An C<E> element, the C<n-th> child of its parent.
+
+=item C<E:nth-last-child(n)>
+
+    my $third    = $dom->at('div:nth-last-child(3)');
+    my $odd      = $dom->find('div:nth-last-child(odd)');
+    my $even     = $dom->find('div:nth-last-child(even)');
+    my $bottom3  = $dom->find('div:nth-last-child(-n+3)');
+
+An C<E> element, the C<n-th> child of its parent, counting from the last one.
+
+=item C<E:nth-of-type(n)>
+
+    my $third = $dom->at('div:nth-of-type(3)');
+    my $odd   = $dom->find('div:nth-of-type(odd)');
+    my $even  = $dom->find('div:nth-of-type(even)');
+    my $top3  = $dom->find('div:nth-of-type(-n+3)');
+
+An C<E> element, the C<n-th> sibling of its type.
+
+=item C<E:nth-last-of-type(n)>
+
+    my $third    = $dom->at('div:nth-last-of-type(3)');
+    my $odd      = $dom->find('div:nth-last-of-type(odd)');
+    my $even     = $dom->find('div:nth-last-of-type(even)');
+    my $bottom3  = $dom->find('div:nth-last-of-type(-n+3)');
+
+An C<E> element, the C<n-th> sibling of its type, counting from the last one.
+
+=item C<E:first-child>
+
+    my $first = $dom->at('div p:first-child');
+
+An C<E> element, first child of its parent.
+
+=item C<E:last-child>
+
+    my $last = $dom->at('div p:last-child');
+
+An C<E> element, last child of its parent.
+
+=item C<E:first-of-type>
+
+    my $first = $dom->at('div p:first-of-type');
+
+An C<E> element, first sibling of its type.
+
+=item C<E:last-of-type>
+
+    my $last = $dom->at('div p:last-of-type');
+
+An C<E> element, last sibling of its type.
+
+=item C<E:only-child>
+
+    my $lonely = $dom->at('div p:only-child');
+
+An C<E> element, only child of its parent.
+
+=item C<E:only-of-type>
+
+    my $lonely = $dom->at('div p:only-of-type');
+
+an C<E> element, only sibling of its type.
+
+=item C<E:not(s)>
+
+    my $others = $dom->at('div p:not(:first-child)');
+
+An C<E> element that does not match simple selector C<s>.
+
 =item C<E F>
 
     my $headlines = $dom->find('div h1');
@@ -1001,6 +1302,18 @@ An C<F> element descendant of an C<E> element.
     my $headlines = $dom->find('html > body > div > h1');
 
 An C<F> element child of an C<E> element.
+
+=item C<E + F>
+
+    my $second = $dom->find('h1 + h2');
+
+An C<F> element immediately preceded by an C<E> element.
+
+=item C<E ~ F>
+
+    my $second = $dom->find('h1 ~ h2');
+
+An C<F> element preceded by an C<E> element.
 
 =item C<E, F, G>
 
@@ -1039,6 +1352,14 @@ Document Object Model.
 L<Mojo::DOM> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
+=head2 C<after>
+
+    $dom = $dom->after('<p>Hi!</p>');
+
+Add after element.
+
+    $dom->parse('<div><h1>A</h1></div>')->at('h1')->after('<h2>B</h2>');
+
 =head2 C<all_text>
 
     my $text = $dom->all_text;
@@ -1056,6 +1377,14 @@ Find a single element with CSS3 selectors.
     my $attrs = $dom->attrs;
 
 Element attributes.
+
+=head2 C<before>
+
+    $dom = $dom->before('<p>Hi!</p>');
+
+Add before element.
+
+    $dom->parse('<div><h2>A</h2></div>')->at('h2')->before('<h1>B</h1>');
 
 =head2 C<children>
 
@@ -1079,13 +1408,6 @@ Find elements with CSS3 selectors.
     my $xml = $dom->inner_xml;
 
 Render content of this element to XML.
-
-=head2 C<name>
-
-    my $name = $dom->name;
-    $dom     = $dom->name('html');
-
-Element name.
 
 =head2 C<namespace>
 
@@ -1111,11 +1433,15 @@ Parse XML document.
 
 Replace elements.
 
-=head2 C<replace_content>
+    $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace('<h2>B</h2>');
 
-    $dom = $dom->replace_content('test');
+=head2 C<replace_inner>
+
+    $dom = $dom->replace_inner('test');
 
 Replace element content.
+
+    $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace_inner('B');
 
 =head2 C<root>
 
@@ -1134,6 +1460,13 @@ Extract text content from element only, not including child elements.
     my $xml = $dom->to_xml;
 
 Render DOM to XML.
+
+=head2 C<type>
+
+    my $type = $dom->type;
+    $dom     = $dom->type('html');
+
+Element type.
 
 =head1 SEE ALSO
 

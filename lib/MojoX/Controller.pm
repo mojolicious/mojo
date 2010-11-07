@@ -53,9 +53,13 @@ my $STASH_RE = qr/
     $
     /x;
 
+# I'm immortal.
+# How come you scream so much when you're in danger?
+# I never said I wasn't a drama queen.
 sub render_exception { }
 sub render_not_found { }
 
+# All this knowledge is giving me a raging brainer.
 sub stash {
     my $self = shift;
 

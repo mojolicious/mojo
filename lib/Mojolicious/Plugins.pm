@@ -5,7 +5,7 @@ use warnings;
 
 use base 'Mojo::Base';
 
-use Mojo::ByteStream 'b';
+use Mojo::Util 'camelize';
 
 __PACKAGE__->attr(hooks      => sub { {} });
 __PACKAGE__->attr(namespaces => sub { ['Mojolicious::Plugin'] });
@@ -25,6 +25,8 @@ sub add_hook {
     return $self;
 }
 
+# Also you have a rectangular object in your colon.
+# That's a calculator. I ate it to gain its power.
 sub load_plugin {
     my ($self, $name) = @_;
 
@@ -35,7 +37,8 @@ sub load_plugin {
     else {
 
         # Class
-        my $class = b($name)->camelize->to_string;
+        my $class = $name;
+        camelize $class;
 
         # Try all namspaces
         for my $namespace (@{$self->namespaces}) {
@@ -52,6 +55,7 @@ sub load_plugin {
     die qq/Plugin "$name" missing, maybe you need to install it?\n/;
 }
 
+# Let's see how crazy I am now, Nixon. The correct answer is very.
 sub register_plugin {
     my $self = shift;
     my $name = shift;
@@ -67,27 +71,30 @@ sub register_plugin {
 sub run_hook {
     my $self = shift;
 
-    # Shortcut
-    my $name = shift;
-    return $self unless $name;
-    return unless $self->hooks->{$name};
+    # Name
+    return $self unless my $name = shift;
 
-    # Run
-    for my $hook (@{$self->hooks->{$name}}) { $self->$hook(@_) }
+    # Hooks
+    return $self unless my $hooks = $self->hooks->{$name};
+
+    # DEPRECATED in Hot Beverage! (passing $self)
+    for my $hook (@$hooks) { $self->$hook(@_) }
 
     return $self;
 }
 
+# Everybody's a jerk. You, me, this jerk.
 sub run_hook_reverse {
     my $self = shift;
 
-    # Shortcut
-    my $name = shift;
-    return $self unless $name;
-    return unless $self->hooks->{$name};
+    # Name
+    return $self unless my $name = shift;
 
-    # Run
-    for my $hook (reverse @{$self->hooks->{$name}}) { $self->$hook(@_) }
+    # Hooks
+    return $self unless my $hooks = $self->hooks->{$name};
+
+    # DEPRECATED in Hot Beverage! (passing $self)
+    for my $hook (reverse @$hooks) { $self->$hook(@_) }
 
     return $self;
 }
@@ -153,54 +160,8 @@ implements the following new ones.
     $plugins = $plugins->add_hook(event => sub {...});
 
 Hook into an event.
-The following events are available and run in the listed order.
-
-=over 4
-
-=item after_build_tx
-
-Runs right after the transaction is built and before the HTTP request gets
-parsed.
-One usage case would be upload progress bars.
-(Passed the transaction instance)
-
-    $plugins->add_hook(before_request => sub {
-        my ($self, $tx) = @_;
-    });
-
-=item before_dispatch
-
-Runs before the dispatchers determines what action to run.
-(Passed the default controller instance)
-
-    $plugins->add_hook(before_dispatch => sub {
-        my ($self, $c) = @_;
-    });
-
-=item after_static_dispatch
-
-Runs after the static dispatcher determines if a static file should be
-served. (Passed the default controller instance)
-Note that the callbacks of this hook run in reverse order.
-
-    $plugins->add_hook(after_static_dispatch => sub {
-        my ($self, $c) = @_;
-    });
-
-=item after_dispatch
-
-Runs after the dispatchers determines what action to run.
-(Passed the default controller instance)
-Note that the callbacks of this hook run in reverse order.
-
-    $plugins->add_hook(after_dispatch => sub {
-        my ($self, $c) = @_;
-    });
-
-=back
-
-You could also add custom events by using C<run_hook> and C<run_hook_reverse>
-in your application.
+You can also add custom events by calling C<run_hook> and C<run_hook_reverse>
+from your application.
 
 =head2 C<load_plugin>
 

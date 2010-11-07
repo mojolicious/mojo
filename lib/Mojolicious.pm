@@ -5,6 +5,7 @@ use warnings;
 
 use base 'Mojo';
 
+use Carp 'croak';
 use Mojolicious::Commands;
 use Mojolicious::Plugins;
 use MojoX::Dispatcher::Routes;
@@ -34,7 +35,37 @@ __PACKAGE__->attr(static  => sub { MojoX::Dispatcher::Static->new });
 __PACKAGE__->attr(types   => sub { MojoX::Types->new });
 
 our $CODENAME = 'Hot Beverage';
-our $VERSION  = '0.999930';
+our $VERSION  = '0.999937';
+
+our $AUTOLOAD;
+
+# These old doomsday devices are dangerously unstable.
+# I'll rest easier not knowing where they are.
+sub AUTOLOAD {
+    my $self = shift;
+
+    # Method
+    my ($package, $method) = $AUTOLOAD =~ /^([\w\:]+)\:\:(\w+)$/;
+
+    # Helper
+    croak qq/Can't locate object method "$method" via "$package"/
+      unless my $helper = $self->renderer->helper->{$method};
+
+    # Load controller class
+    my $class = $self->controller_class;
+    if (my $e = Mojo::Loader->load($class)) {
+        $self->log->error(
+            ref $e
+            ? qq/Can't load controller class "$class": $e/
+            : qq/Controller class "$class" doesn't exist./
+        );
+    }
+
+    # Run
+    return $class->new(app => $self)->$helper(@_);
+}
+
+sub DESTROY { }
 
 # I personalized each of your meals.
 # For example, Amy: you're cute, so I baked you a pony.
@@ -50,7 +81,7 @@ sub new {
             my $tx = Mojo::Transaction::HTTP->new;
 
             # Hook
-            $self->plugins->run_hook(after_build_tx => $tx);
+            $self->plugins->run_hook(after_build_tx => ($tx, $self));
 
             return $tx;
         }
@@ -64,7 +95,6 @@ sub new {
 
     # Renderer
     my $renderer = $self->renderer;
-    $renderer->default_handler('ep');
 
     # Static
     my $static = $self->static;
@@ -117,6 +147,8 @@ sub new {
     return $self;
 }
 
+# Amy, technology isn't intrinsically good or evil. It's how it's used.
+# Like the Death Ray.
 sub defaults {
     my $self = shift;
 
@@ -210,7 +242,27 @@ sub handler {
     }
 }
 
-sub helper { shift->renderer->add_helper(@_) }
+sub helper {
+    my $self = shift;
+    my $name = shift;
+
+    # Renderer
+    my $r = $self->renderer;
+
+    # Replace helper
+    $self->log->debug(qq/Helper "$name" already exists, replacing./)
+      if exists $r->helper->{$name};
+
+    # Add helper
+    $r->add_helper($name, @_);
+}
+
+sub hook {
+    my ($self, $name, $cb) = @_;
+
+    # DEPRECATED in Hot Beverage! (callback wrapper)
+    $self->plugins->add_hook($name, sub { shift; $cb->(@_) });
+}
 
 sub plugin {
     my $self = shift;
@@ -269,7 +321,7 @@ Mojolicious - The Web In A Box!
     # Say hello
     sub welcome {
         my $self = shift;
-        $self->render_text('Hi there!');
+        $self->render(text => 'Hi there!');
     }
 
     # Say goodbye from a template (foo/bye.html.ep)
@@ -290,6 +342,8 @@ art technology.
 
 =over 4
 
+=item *
+
 An amazing MVC web framework supporting a simplified single file mode through
 L<Mojolicious::Lite>.
 
@@ -301,18 +355,30 @@ I18N, first class unicode support and much more for you to discover.
 
 =back
 
+=item *
+
 Very clean, portable and Object Oriented pure Perl API without any hidden
 magic and no requirements besides Perl 5.8.7.
+
+=item *
 
 Full stack HTTP 1.1 and WebSocket client/server implementation with IPv6,
 TLS, Bonjour, IDNA, Comet (long polling), chunking and multipart support.
 
-Builtin async IO and prefork web server supporting epoll, kqueue, UNIX domain
-sockets and hot deployment, perfect for embedding.
+=item *
+
+Builtin async IO web server supporting epoll, kqueue, UNIX domain sockets and
+hot deployment, perfect for embedding.
+
+=item *
 
 Automatic CGI, FastCGI and L<PSGI> detection.
 
+=item *
+
 JSON and XML/HTML5 parser with CSS3 selector support.
+
+=item *
 
 Fresh code based upon years of experience developing L<Catalyst>.
 
@@ -368,9 +434,6 @@ L<Mojolicious::Lite>.
 Loosely coupled building blocks, use what you like and just ignore the rest.
 
     .---------------------------------------------------------------.
-    |                             Fun!                              |
-    '---------------------------------------------------------------'
-    .---------------------------------------------------------------.
     |                                                               |
     |                .----------------------------------------------'
     |                | .--------------------------------------------.
@@ -385,6 +448,12 @@ Loosely coupled building blocks, use what you like and just ignore the rest.
     .-------. .-----------. .--------. .------------. .-------------.
     |  CGI  | |  FastCGI  | |  PSGI  | |  HTTP 1.1  | |  WebSocket  |
     '-------' '-----------' '--------' '------------' '-------------'
+
+=head2 Installation
+
+All you need is a oneliner.
+
+    curl -L cpanmin.us | perl - http://latest.mojolicio.us
 
 =head1 ATTRIBUTES
 
@@ -537,11 +606,65 @@ Note that this method is EXPERIMENTAL and might change without warning!
     # Helper
     $app->helper(add => sub { $_[1] + $_[2] });
 
-    # Controller
+    # Controller/Application
     my $result = $self->add(2, 3);
 
     # Template
     <%= add 2, 3 %>
+
+=head2 C<hook>
+
+    $app->hook(after_dispatch => sub { ... });
+
+Add hooks to named events.
+Note that this method is EXPERIMENTAL and might change without warning!
+
+The following events are available and run in the listed order.
+
+=over 4
+
+=item after_build_tx
+
+Triggered right after the transaction is built and before the HTTP request
+gets parsed.
+One use case would be upload progress bars.
+(Passed the transaction and application instances)
+
+    $app->hook(before_request => sub {
+        my ($tx, $app) = @_;
+    });
+
+=item before_dispatch
+
+Triggered right before the static and routes dispatchers start their work.
+(Passed the default controller instance)
+
+    $app->hook(before_dispatch => sub {
+        my $self = shift;
+    });
+
+=item after_static_dispatch
+
+Triggered after the static dispatcher determined if a static file should be
+served and before the routes dispatcher starts its work, the callbacks of
+this hook run in reverse order.
+(Passed the default controller instance)
+
+    $app->hook(after_static_dispatch => sub {
+        my $self = shift;
+    });
+
+=item after_dispatch
+
+Triggered after the static and routes dispatchers are finished and a response
+has been rendered, the callbacks of this hook run in reverse order.
+(Passed the current controller instance)
+
+    $app->hook(after_dispatch => sub {
+        my $self = shift;
+    });
+
+=back
 
 =head2 C<plugin>
 
@@ -623,13 +746,21 @@ that have been used in the past.
 
 Sebastian Riedel, C<sri@cpan.org>.
 
-=head1 CORE DEVELOPERS
+=head1 CORE DEVELOPERS EMERITUS
+
+Retired members of the core team, we thank you dearly for your service.
+
+=over 4
 
 Viacheslav Tykhanovskyi, C<vti@cpan.org>.
 
+=back
+
 =head1 CREDITS
 
-In alphabetical order:
+In alphabetical order.
+
+=over 4
 
 Adam Kennedy
 
@@ -662,6 +793,8 @@ Breno G. de Oliveira
 Burak Gursoy
 
 Ch Lamprecht
+
+Chas. J. Owens IV
 
 Christian Hansen
 
@@ -770,6 +903,8 @@ Yaroslav Korshak
 Yuki Kimoto
 
 Zak B. Elep
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

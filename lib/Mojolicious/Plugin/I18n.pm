@@ -29,24 +29,24 @@ sub register {
     die qq/Couldn't initialize I18N class "$namespace": $@/ if $@;
 
     # Start timer
-    $app->plugins->add_hook(
+    $app->hook(
         before_dispatch => sub {
-            my ($self, $c) = @_;
+            my $self = shift;
 
             # Header detection
             my @languages = I18N::LangTags::implicate_supers(
                 I18N::LangTags::Detect->http_accept_langs(
-                    scalar $c->req->headers->accept_language
+                    $self->req->headers->accept_language
                 )
             );
 
             # Handler
-            $c->stash->{i18n} =
+            $self->stash->{i18n} =
               Mojolicious::Plugin::I18n::_Handler->new(
                 _namespace => $namespace);
 
             # Languages
-            $c->stash->{i18n}->languages(@languages, $default);
+            $self->stash->{i18n}->languages(@languages, $default);
         }
     );
 

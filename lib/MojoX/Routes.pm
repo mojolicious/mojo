@@ -14,6 +14,8 @@ __PACKAGE__->attr([qw/children conditions/] => sub { [] });
 __PACKAGE__->attr(dictionary                => sub { {} });
 __PACKAGE__->attr(pattern => sub { MojoX::Routes::Pattern->new });
 
+# Yet thanks to my trusty safety sphere,
+# I sublibed with only tribial brain dablage.
 sub new {
     my $self = shift->SUPER::new();
 
@@ -88,6 +90,15 @@ sub is_endpoint {
     return 1;
 }
 
+sub is_websocket {
+    my $self = shift;
+    return 1 if $self->{_websocket};
+    if (my $parent = $self->parent) { return $parent->is_websocket }
+    return;
+}
+
+# Dr. Zoidberg, can you note the time and declare the patient legally dead?
+# Can I! That’s my specialty!
 sub name {
     my ($self, $name) = @_;
 
@@ -254,6 +265,7 @@ sub websocket {
 
     # Condition
     push @{$self->conditions}, websocket => 1;
+    $self->{_websocket} = 1;
 
     return $self;
 }
@@ -407,13 +419,21 @@ Add a new bridge to this route as a nested child.
 
 Returns true if this route qualifies as an endpoint.
 
+=head2 C<is_websocket>
+
+    my $is_websocket = $r->is_websocket;
+
+Returns true if this route leads to a WebSocket.
+
 =head2 C<name>
 
     my $name = $r->name;
     $r       = $r->name('foo');
     $r       = $r->name('*');
 
-The name of this route.
+The name of this route, the special value C<*> will generate a name based on
+the route pattern.
+Note that the name C<current> is reserved for refering to the current route.
 
 =head2 C<over>
 

@@ -5,8 +5,8 @@ use warnings;
 
 use base 'Mojo::Command';
 
-use Mojo::ByteStream 'b';
 use Mojo::Loader;
+use Mojo::Util qw/camelize decamelize/;
 
 __PACKAGE__->attr(hint => <<"EOF");
 
@@ -65,7 +65,9 @@ sub run {
         for my $namespace (@{$self->namespaces}) {
 
             # Generate module
-            my $try = $namespace . '::' . b($name)->camelize;
+            my $camelized = $name;
+            camelize $camelized;
+            my $try = "$namespace\::$camelized";
 
             # Load
             if (my $e = Mojo::Loader->load($try)) {
@@ -93,6 +95,9 @@ sub run {
         my $command = $module->new;
         return $help ? $command->help : $command->run(@args);
     }
+
+    # Test
+    return $self if $ENV{HARNESS_ACTIVE};
 
     # Try all namespaces
     my $commands = [];
@@ -126,7 +131,7 @@ sub run {
 
         # Generate name
         my $name = $command->[0];
-        $name = b($name)->decamelize;
+        decamelize $name;
 
         # Add to list
         my $l = length $name;
@@ -227,13 +232,6 @@ Start application with FastCGI backend.
    script/myapp get /foo
 
 Perform GET request to remote host or local application.
-
-=item C<hypnotoad>
-
-    mojo hypnotoad
-    script/myapp hypnotoad
-
-Start application with C<Mojo::Server::Hypnotoad> backend.
 
 =item C<test>
 

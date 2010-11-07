@@ -11,8 +11,8 @@ require File::Spec;
 require IO::File;
 
 use Carp 'croak';
-use Mojo::ByteStream 'b';
 use Mojo::Template;
+use Mojo::Util qw/b64_decode decamelize/;
 
 __PACKAGE__->attr(description => 'No description.');
 __PACKAGE__->attr(quiet       => 0);
@@ -45,7 +45,7 @@ sub class_to_file {
 
     # Class to file
     $class =~ s/:://g;
-    $class = b($class)->decamelize->to_string;
+    decamelize $class;
 
     return $class;
 }
@@ -118,8 +118,7 @@ sub get_all_data {
         my ($name, $content) = splice @data, 0, 2;
 
         # Base 64
-        $content = b($content)->b64_decode->to_string
-          if $name =~ s/\s*\(\s*base64\s*\)$//;
+        b64_decode $content if $name =~ s/\s*\(\s*base64\s*\)$//;
 
         $all->{$name} = $content;
     }

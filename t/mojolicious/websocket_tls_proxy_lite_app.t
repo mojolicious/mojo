@@ -6,21 +6,16 @@ use warnings;
 # Disable epoll, kqueue and IPv6
 BEGIN { $ENV{MOJO_POLL} = $ENV{MOJO_NO_IPV6} = 1 }
 
-use Mojo::IOLoop;
 use Test::More;
-
-# Make sure sockets are working
+use Mojo::IOLoop;
 plan skip_all => 'IO::Socket::SSL 1.33 required for this test!'
   unless Mojo::IOLoop::TLS;
-plan skip_all => 'working sockets required for this test!'
-  unless my $proxy = Mojo::IOLoop->new->generate_port;
 plan tests => 16;
 
 # I was a hero to broken robots 'cause I was one of them, but how can I sing
 # about being damaged if I'm not?
 # That's like Christina Aguilera singing Spanish.
 # Ooh, wait! That's it! I'll fake it!
-use Mojo::ByteStream 'b';
 use Mojo::Client;
 use Mojo::Server::Daemon;
 use Mojolicious::Lite;
@@ -64,10 +59,14 @@ $server->listen("https://*:$port");
 $server->prepare_ioloop;
 
 # Connect proxy server for testing
-my $c = {};
+my $proxy = Mojo::IOLoop->generate_port;
+my $c     = {};
 my $connected;
 my ($read, $sent, $fail) = 0;
-my $nf = "HTTP/1.1 404 NOT FOUND\x0d\x0aConnection: close\x0d\x0a\x0d\x0a";
+my $nf =
+    "HTTP/1.1 404 NOT FOUND\x0d\x0a"
+  . "Content-Length: 0\x0d\x0a"
+  . "Connection: close\x0d\x0a\x0d\x0a";
 my $ok = "HTTP/1.1 200 OK\x0d\x0aConnection: keep-alive\x0d\x0a\x0d\x0a";
 $loop->listen(
     port    => $proxy,
@@ -76,10 +75,11 @@ $loop->listen(
         if (my $server = $c->{$client}->{connection}) {
             return $loop->write($server, $chunk);
         }
-        $c->{$client}->{client} = b unless exists $c->{$client}->{client};
-        $c->{$client}->{client}->add_chunk($chunk);
+        $c->{$client}->{client} = '' unless defined $c->{$client}->{client};
+        $c->{$client}->{client} .= $chunk if defined $chunk;
         if ($c->{$client}->{client} =~ /\x0d?\x0a\x0d?\x0a$/) {
-            my $buffer = $c->{$client}->{client}->empty;
+            my $buffer = $c->{$client}->{client};
+            $c->{$client}->{client} = '';
             if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
                 $connected = "$1:$2";
                 $fail = 1 if $2 == $port + 1;

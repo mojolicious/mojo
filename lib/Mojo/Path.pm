@@ -4,9 +4,10 @@ use strict;
 use warnings;
 
 use base 'Mojo::Base';
+use overload 'bool' => sub {1}, fallback => 1;
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
-use Mojo::ByteStream 'b';
+use Mojo::Util qw/url_escape url_unescape/;
 use Mojo::URL;
 
 __PACKAGE__->attr([qw/leading_slash trailing_slash/] => 0);
@@ -25,7 +26,7 @@ sub append {
         my $value = "$_";
 
         # *( pchar / "/" / "?" )
-        $value = b($value)->url_escape($Mojo::URL::PCHAR)->to_string;
+        url_escape $value, $Mojo::URL::PCHAR;
 
         push @{$self->parts}, $value;
     }
@@ -94,7 +95,8 @@ sub parse {
         $part = '' unless defined $part;
 
         # Store
-        push @parts, b($part)->url_unescape($Mojo::URL::PCHAR)->to_string;
+        url_unescape $part;
+        push @parts, $part;
     }
 
     $self->parts(\@parts);
@@ -110,7 +112,9 @@ sub to_string {
     for my $part (@{$self->parts}) {
 
         # *( pchar / "/" / "?" )
-        push @path, b($part)->url_escape($Mojo::URL::PCHAR)->to_string;
+        my $escaped = $part;
+        url_escape $escaped, $Mojo::URL::PCHAR;
+        push @path, $escaped;
     }
 
     # Format
@@ -133,7 +137,6 @@ Mojo::Path - Path
     use Mojo::Path;
 
     my $path = Mojo::Path->new('/foo/bar%3B/baz.html');
-    print "$path";
 
 =head1 DESCRIPTION
 

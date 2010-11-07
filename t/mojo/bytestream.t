@@ -12,48 +12,12 @@ use Test::More;
 
 plan skip_all => 'Perl 5.10 required for this test!'
   unless eval { require Digest::SHA; 1 };
-plan tests => 80;
+plan tests => 64;
 
 use_ok 'Mojo::ByteStream', 'b';
 
-# Empty
-my $stream = Mojo::ByteStream->new;
-is $stream->size,     0, 'size is 0';
-is $stream->raw_size, 0, 'raw size is 0';
-
-# Chunk
-$stream->add_chunk("line1\nline2");
-is $stream->size,     11, 'size is 11';
-is $stream->raw_size, 11, 'raw size is 11';
-
-# Clean
-my $buffer = $stream->empty;
-is $stream->size,     0,  'size is 0';
-is $stream->raw_size, 11, 'raw size is 11';
-is $buffer, "line1\nline2", 'right buffer content';
-
-# Add
-$stream->add_chunk("first\nsec");
-is $stream->size,     9,  'size is 9';
-is $stream->raw_size, 20, 'raw size is 20';
-
-# Remove
-$buffer = $stream->remove(2);
-is $buffer, 'fi', 'removed chunk is "fi"';
-is $stream->size,     7,  'size is 7';
-is $stream->raw_size, 20, 'raw size is 20';
-
-# Get
-is $stream->get_line, 'rst', 'line is "rst"';
-is $stream->get_line, undef, 'no more lines';
-
-# Stringify
-$stream = Mojo::ByteStream->new->add_chunk('abc');
-is "$stream", 'abc', 'right buffer content';
-is $stream->to_string, 'abc', 'right buffer content';
-
 # camelize
-$stream = b('foo_bar_baz');
+my $stream = b('foo_bar_baz');
 is $stream->camelize, 'FooBarBaz', 'right camelized result';
 $stream = b('FooBarBaz');
 is $stream->camelize, 'Foobarbaz', 'right camelized result';
@@ -111,10 +75,6 @@ is "$stream", 'foo%C3%9F%C4%80bar%E2%98%BA', 'right url escaped result';
 $stream = b('foo%C3%9F%C4%80bar%E2%98%BA')->url_unescape->decode('UTF-8');
 is "$stream", "foo\x{df}\x{0100}bar\x{263a}", 'right url unescaped result';
 
-# url_sanitize
-$stream = b('t%c3est%6a1%7E23%30')->url_sanitize;
-is "$stream", 't%C3estj1~230', 'right url sanitized result';
-
 # qp_encode
 $stream = b("foo\x{99}bar$%^&3217");
 like $stream->qp_encode, qr/^foo\=99bar0\^\&3217/, 'right qp encoded result';
@@ -157,7 +117,7 @@ is $stream->size, 11, 'size is 11';
 # "0"
 $stream = b('0');
 is $stream->size,      1,   'size is 1';
-is $stream->to_string, '0', 'right buffer content';
+is $stream->to_string, '0', 'right content';
 
 # hmac_md5_sum (RFC2202)
 is b("Hi There")->hmac_md5_sum(chr(0x0b) x 16),
@@ -202,8 +162,9 @@ is b(
   'e8e99d0f45237d786d6bbaa7965c7808bbff1a91', 'right hmac sha1 checksum';
 
 # html_escape
-$stream = b('foobar<baz>');
-is $stream->html_escape, 'foobar&lt;baz&gt;', 'right html escaped result';
+$stream = b("foobar'<baz>");
+is $stream->html_escape, "foobar&#39;&lt;baz&gt;",
+  'right html escaped result';
 
 # html_escape (nothing to escape)
 $stream = b('foobar');
@@ -212,6 +173,10 @@ is $stream->html_escape, 'foobar', 'right html escaped result';
 # html_unescape
 $stream = b('foobar&lt;baz&gt;&#x26;&#34;');
 is $stream->html_unescape, "foobar<baz>&\"", 'right html unescaped result';
+
+# html_unescape (apos)
+$stream = b('foobar&apos;&lt;baz&gt;&#x26;&#34;');
+is $stream->html_unescape, "foobar'<baz>&\"", 'right html unescaped result';
 
 # html_unescape (nothing to unescape)
 $stream = b('foobar');
@@ -235,7 +200,7 @@ is "$stream", '/usr/local/lib/perl5/site_perl/5.10.0/Mojo/ByteStream.pm',
 
 # xml_escape
 $stream = b(qq/la<f>\nbar"baz"'yada\n'&lt;la/)->xml_escape;
-is "$stream", "la&lt;f&gt;\nbar&quot;baz&quot;&apos;yada\n&apos;&amp;lt;la",
+is "$stream", "la&lt;f&gt;\nbar&quot;baz&quot;&#39;yada\n&#39;&amp;lt;la",
   'right xml escaped result';
 
 # utf8 xml_escape with nothing to escape
@@ -269,7 +234,7 @@ $stream = b(" \nla\nla\nla\n ")->trim;
 is "$stream", "la\nla\nla", 'right trimmed result';
 
 # say and autojoin
-$buffer = '';
+my $buffer = '';
 open my $handle, '>', \$buffer;
 b('te', 'st')->say($handle);
 my $backup = *STDOUT;

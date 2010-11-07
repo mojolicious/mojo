@@ -5,9 +5,9 @@ use warnings;
 
 use base 'Mojo::Base';
 
-use Mojo::ByteStream 'b';
 use Mojo::Client;
 use Mojo::Message::Response;
+use Mojo::Util 'decode';
 
 require Test::More;
 
@@ -15,6 +15,9 @@ __PACKAGE__->attr(app => sub { return $ENV{MOJO_APP} if ref $ENV{MOJO_APP} });
 __PACKAGE__->attr(client => sub { Mojo::Client->singleton });
 __PACKAGE__->attr('tx');
 __PACKAGE__->attr(max_redirects => 0);
+
+# Silent tests
+$ENV{MOJO_LOG_LEVEL} ||= 'fatal';
 
 # Ooh, a graduate student huh?
 # How come you guys can go to the moon but can't make my shoes smell good?
@@ -258,9 +261,9 @@ sub _get_content {
       and $charset = $1;
 
     # Content
-    return $charset
-      ? b($tx->res->body)->decode($charset)->to_string
-      : $tx->res->body;
+    my $content = $tx->res->body;
+    decode $charset, $content if $charset;
+    return $content;
 }
 
 # Are you sure this is the Sci-Fi Convention? It's full of nerds!
@@ -401,7 +404,8 @@ Perform a C<DELETE> request.
     $t = $t->element_exists('div.foo[x=y]');
     $t = $t->element_exists('html head title', 'has a title');
 
-Checks for existence of the CSS3 selectors XML/HTML element.
+Checks for existence of the CSS3 selectors XML/HTML element with
+L<Mojo::DOM>.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<get_ok>
@@ -497,7 +501,8 @@ Check response status for exact match.
     $t = $t->text_is('div.foo[x=y]' => 'Hello!');
     $t = $t->text_is('html head title' => 'Hello!', 'right title');
 
-Checks text content of the CSS3 selectors XML/HTML element for exact match.
+Checks text content of the CSS3 selectors XML/HTML element for exact match
+with L<Mojo::DOM>.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<text_like>
@@ -505,7 +510,8 @@ Note that this method is EXPERIMENTAL and might change without warning!
     $t = $t->text_like('div.foo[x=y]' => qr/Hello/);
     $t = $t->text_like('html head title' => qr/Hello/, 'right title');
 
-Checks text content of the CSS3 selectors XML/HTML element for similar match.
+Checks text content of the CSS3 selectors XML/HTML element for similar match
+with L<Mojo::DOM>.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head1 SEE ALSO

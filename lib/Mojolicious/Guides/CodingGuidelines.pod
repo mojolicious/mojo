@@ -33,6 +33,8 @@ distribution an example application.
 
 Web development should be easy and fun, this is what we optimize for.
 
+The web is a moving target, to stay relevant we have to stay in motion too.
+
 Keep it simple, no magic unless absolutely necessary.
 
 Code should be written with a Perl6 port in mind.
@@ -61,6 +63,12 @@ Domain specific languages should be avoided in favor of Perl'ish solutions.
 No inline POD.
 
 Documentation belongs to the guides, module POD is just an API reference.
+
+The main focus of the included documentation should be on examples, no walls
+of text. (An example for every one or two sentences is a good rule of thumb)
+
+The master source code repository should always be kept in a stable state,
+use feature branches for actual development.
 
 Lines should not be longer than 78 characters and we indent with 4
 whitespaces.

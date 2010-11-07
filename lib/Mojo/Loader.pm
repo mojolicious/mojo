@@ -28,10 +28,20 @@ sub load {
     # Shortcut
     return 1 unless $module;
 
-    # Already loaded
-    return if $module->can('new');
+    # Forced reload
+    if ($ENV{MOJO_RELOAD}) {
 
-    # Try
+        # Unload
+        my $key = $module;
+        $key =~ s/\:\:/\//g;
+        $key .= '.pm';
+        _unload($key);
+    }
+
+    # Already loaded
+    else { return if $module->can('new') }
+
+    # Load
     eval "require $module";
 
     # Catch
@@ -62,17 +72,10 @@ sub reload {
         if ($mtime > $STATS->{$file}) {
 
             # Debug
-            warn "\n$key -> $file modified, reloading!\n" if DEBUG;
+            warn "$key -> $file modified, reloading!\n" if DEBUG;
 
             # Unload
-            delete $INC{$key};
-            my @subs = grep { index($DB::sub{$_}, "$file:") == 0 }
-              keys %DB::sub;
-            for my $sub (@subs) {
-                eval { undef &$sub };
-                carp "Can't unload sub '$sub' in '$file': $@" if $@;
-                delete $DB::sub{$sub};
-            }
+            _unload($key);
 
             # Try
             eval { require $key };
@@ -123,6 +126,22 @@ sub search {
 
     return unless @$modules;
     return $modules;
+}
+
+sub _unload {
+    my $key = shift;
+
+    # Unload
+    my $file = $INC{$key};
+    delete $INC{$key};
+    return unless $file;
+    my @subs = grep { index($DB::sub{$_}, "$file:") == 0 }
+      keys %DB::sub;
+    for my $sub (@subs) {
+        eval { undef &$sub };
+        carp "Can't unload sub '$sub' in '$file': $@" if $@;
+        delete $DB::sub{$sub};
+    }
 }
 
 1;

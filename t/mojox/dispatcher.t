@@ -37,18 +37,57 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 32;
+use Test::More tests => 41;
 
 use Mojo;
 use Mojo::Transaction::HTTP;
 use MojoX::Dispatcher::Routes;
+use MojoX::Dispatcher::Routes::Controller;
 
-my $c = Test::Controller->new(app => Mojo->new);
+my $c = MojoX::Dispatcher::Routes::Controller->new;
 
-# Silence
+# Set
+$c->stash(foo => 'bar');
+is $c->stash('foo'), 'bar', 'set and return a stash value';
+
+# Ref value
+my $stash = $c->stash;
+is_deeply $stash, {foo => 'bar'}, 'return a hashref';
+
+# Replace
+$c->stash(foo => 'baz');
+is $c->stash('foo'), 'baz', 'replace and return a stash value';
+
+# Set 0
+$c->stash(zero => 0);
+is $c->stash('zero'), 0, 'set and return 0 value';
+
+# Replace with 0
+$c->stash(foo => 0);
+is $c->stash('foo'), 0, 'replace and return 0 value';
+
+# Use 0 as key
+$c->stash(0 => 'boo');
+is $c->stash('0'), 'boo', 'set and get with 0 as key';
+
+# Delete
+$stash = $c->stash;
+delete $stash->{foo};
+delete $stash->{0};
+delete $stash->{zero};
+is_deeply $stash, {}, 'elements can be deleted';
+$c->stash('foo' => 'zoo');
+delete $c->stash->{foo};
+is_deeply $c->stash, {}, 'elements can be deleted';
+
+# Set via hash
+$c->stash({a => 1, b => 2});
+$stash = $c->stash;
+is_deeply $stash, {a => 1, b => 2}, 'set via hashref';
+
+$c = Test::Controller->new(app => Mojo->new);
 $c->app->log->path(undef);
-$c->app->log->level('error');
-
+$c->app->log->level('fatal');
 my $d = MojoX::Dispatcher::Routes->new;
 ok $d, 'initialized';
 

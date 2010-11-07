@@ -5,9 +5,9 @@ use warnings;
 
 use base 'Mojo::Message';
 
-use Mojo::ByteStream 'b';
 use Mojo::Cookie::Request;
 use Mojo::Parameters;
+use Mojo::Util qw/b64_encode b64_decode get_line/;
 use Mojo::URL;
 
 __PACKAGE__->attr(env => sub { {} });
@@ -22,7 +22,7 @@ my $START_LINE_RE = qr/
     (
     [0-9a-zA-Z\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\%]+   # Path
     )
-    (?:\s+HTTP\/(\d+)\.(\d+))?                                   # Version
+    (?:\s+HTTP\/(\d+\.\d+))?                                     # Version
     $                                                            # End
 /x;
 
@@ -70,14 +70,15 @@ sub fix_headers {
 
     # Basic authorization
     if ((my $u = $url->userinfo) && !$headers->authorization) {
-        $headers->authorization('Basic ' . b($u)->b64_encode('')->to_string);
+        b64_encode $u, '';
+        $headers->authorization("Basic $u");
     }
 
     # Basic proxy authorization
     if (my $proxy = $self->proxy) {
         if ((my $u = $proxy->userinfo) && !$headers->proxy_authorization) {
-            $headers->proxy_authorization(
-                'Basic ' . b($u)->b64_encode('')->to_string);
+            b64_encode $u, '';
+            $headers->proxy_authorization("Basic $u");
         }
     }
 
@@ -130,15 +131,15 @@ sub parse {
     if   (exists $_[1]) { $env = {@_} }
     else                { $env = $_[0] if ref $_[0] eq 'HASH' }
 
-    # Parse CGI like environment or add chunk
-    my $chunk = shift;
-    $env ? $self->_parse_env($env) : $self->buffer->add_chunk($chunk);
+    # Parse CGI like environment
+    my $chunk;
+    if ($env) { $self->_parse_env($env) }
 
-    # Start line
-    $self->_parse_start_line unless $self->{_state};
+    # Parse chunk
+    else { $chunk = shift }
 
     # Pass through
-    $self->SUPER::parse();
+    $self->SUPER::parse($chunk);
 
     # Fix things we only know after parsing headers
     if (!$self->{_state} || $self->{_state} ne 'headers') {
@@ -194,7 +195,7 @@ sub _build_start_line {
 
     # Path
     my $url   = $self->url;
-    my $path  = $url->path;
+    my $path  = $url->path->to_string;
     my $query = $url->query->to_string;
     $path .= "?$query" if $query;
     $path = "/$path" unless $path =~ /^\//;
@@ -233,7 +234,9 @@ sub _parse_basic_auth {
     return unless $header =~ /Basic (.+)$/;
 
     # Decode
-    return b($1)->b64_decode->to_string;
+    my $auth = $1;
+    b64_decode $auth;
+    return $auth;
 }
 
 sub _parse_env {
@@ -374,10 +377,9 @@ sub _parse_start_line {
     my $self = shift;
 
     # Ignore any leading empty lines
-    my $buffer = $self->buffer;
-    my $line   = $buffer->get_line;
+    my $line = get_line $self->{_buffer};
     while ((defined $line) && ($line =~ m/^\s*$/)) {
-        $line = $buffer->get_line;
+        $line = get_line $self->{_buffer};
     }
 
     # We have a (hopefully) full request line
@@ -390,19 +392,17 @@ sub _parse_start_line {
               : $url->parse($2);
 
             # HTTP 0.9 is identified by the missing version
-            if (defined $3 && defined $4) {
-                $self->major_version($3);
-                $self->minor_version($4);
+            if (defined $3) {
+                $self->version($3);
                 $self->{_state} = 'content';
             }
             else {
-                $self->major_version(0);
-                $self->minor_version(9);
+                $self->version('0.9');
                 $self->{_state} = 'done';
 
                 # HTTP 0.9 has no headers or body and does not support
                 # pipelining
-                $buffer->empty;
+                $self->{_buffer} = '';
             }
         }
         else { $self->error('Bad request start line.', 400) }

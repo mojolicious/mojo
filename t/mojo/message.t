@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 806;
+use Test::More tests => 951;
 
 use File::Spec;
 use File::Temp;
@@ -30,11 +30,12 @@ use_ok 'Mojo::Message::Response';
 # Parse HTTP 1.1 start line, no headers and body
 my $req = Mojo::Message::Request->new;
 $req->parse("GET / HTTP/1.1\x0d\x0a\x0d\x0a");
-ok $req->is_done,       'request is done';
-is $req->method,        'GET', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 1, 'right minor version';
-is $req->url,           '/', 'right URL';
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.1'), 1,     'at least version 1.1';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/', 'right URL';
 
 # Parse pipelined HTTP 1.1 start line, no headers and body
 $req = Mojo::Message::Request->new;
@@ -47,11 +48,12 @@ is $req->leftovers, "GET / HTTP/1.1\x0d\x0a\x0d\x0a",
 # (SHOULD be ignored, RFC2616, Section 4.1)
 $req = Mojo::Message::Request->new;
 $req->parse("\x0d\x0aGET / HTTP/1.1\x0d\x0a\x0d\x0a");
-ok $req->is_done,       'request is done';
-is $req->method,        'GET', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 1, 'right minor version';
-is $req->url,           '/', 'right URL';
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.1'), 1,     'at least version 1.1';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/', 'right URL';
 
 # Parse WebSocket handshake request
 $req = Mojo::Message::Request->new;
@@ -66,11 +68,12 @@ $req->parse("Origin: http://example.com\x0d\x0a\x0d\x0a");
 $req->parse('^');
 $req->parse('n:ds');
 $req->parse('[4U');
-ok $req->is_done,       'request is done';
-is $req->method,        'GET', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 1, 'right minor version';
-is $req->url,           '/demo', 'right URL';
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.1'), 1,     'at least version 1.1';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/demo', 'right URL';
 is $req->headers->host,       'example.com', 'right "Host" value';
 is $req->headers->connection, 'Upgrade',     'right "Connection" value';
 is $req->headers->sec_websocket_key2, '12998 5 Y3 1  .P00',
@@ -88,17 +91,67 @@ $req = Mojo::Message::Request->new;
 $req->parse("GET /foo/bar/baz.html HTTP/1.0\x0d\x0a");
 $req->parse("Content-Type: text/plain\x0d\x0a");
 $req->parse("Content-Length: 0\x0d\x0a\x0d\x0a");
-ok $req->is_done,       'request is done';
-is $req->method,        'GET', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 0, 'right minor version';
-is $req->url,           '/foo/bar/baz.html', 'right URL';
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.0', 'right version';
+is $req->at_least_version('0.9'), 1,     'at least version 0.9';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar/baz.html', 'right URL';
 is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $req->headers->content_length, 0, 'right "Content-Length" value';
 
-# Parse HTTP 1.0 start line and headers, no body (with line size limit)
+# Parse HTTP 1.0 start line and headers, no body (missing Content-Length)
 $req = Mojo::Message::Request->new;
-my $backup = $ENV{MOJO_MAX_LINE_SIZE} || '';
+$req->parse("GET /foo/bar/baz.html HTTP/1.0\x0d\x0a");
+$req->parse("Content-Type: text/plain\x0d\x0a\x0d\x0a");
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.0', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar/baz.html', 'right URL';
+is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
+is $req->headers->content_length, undef,        'no "Content-Length" value';
+
+# Parse full HTTP 1.0 request (file storage)
+my $backup = $ENV{MOJO_MAX_MEMORY_SIZE} || '';
+$ENV{MOJO_MAX_MEMORY_SIZE} = 12;
+$req = Mojo::Message::Request->new;
+$req->parse('GET /foo/bar/baz.html?fo');
+$req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
+$req->parse('-Type: text/');
+$req->parse("plain\x0d\x0aContent-Length: 27\x0d\x0a\x0d\x0aHell");
+$req->parse("o World!\n");
+is $req->content->asset->isa('Mojo::Asset::Memory'), 1, 'stored in memory';
+$req->parse("1234\nlalalala\n");
+is $req->content->asset->isa('Mojo::Asset::File'), 1, 'stored in file';
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.0', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
+is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
+is $req->headers->content_length, 27, 'right "Content-Length" value';
+$ENV{MOJO_MAX_MEMORY_SIZE} = $backup;
+
+# Parse HTTP 1.0 start line and headers, no body (missing Content-Length)
+$req = Mojo::Message::Request->new;
+$req->parse("GET /foo/bar/baz.html HTTP/1.0\x0d\x0a");
+$req->parse("Content-Type: text/plain\x0d\x0a");
+$req->parse("Connection: Close\x0d\x0a\x0d\x0a");
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.0', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar/baz.html', 'right URL';
+is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
+is $req->headers->content_length, undef,        'no "Content-Length" value';
+
+# Parse HTTP 1.0 start line and headers, no body (with line size limit)
+$req                     = Mojo::Message::Request->new;
+$backup                  = $ENV{MOJO_MAX_LINE_SIZE} || '';
 $ENV{MOJO_MAX_LINE_SIZE} = 5;
 $req->parse('GET /foo/bar/baz.html HTTP/1');
 ok $req->is_done, 'request is done';
@@ -121,11 +174,12 @@ $req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
 $req->parse('-Type: text/');
 $req->parse("plain\x0d\x0aContent-Length: 27\x0d\x0a\x0d\x0aHell");
 $req->parse("o World!\n1234\nlalalala\n");
-ok $req->is_done,       'request is done';
-is $req->method,        'GET', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 0, 'right minor version';
-is $req->url,           '/foo/bar/baz.html?foo=13#23', 'right URL';
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.0', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
 is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $req->headers->content_length, 27, 'right "Content-Length" value';
 
@@ -138,11 +192,12 @@ $req->parse("plain\x0d\x0aContent-Length: 27\x0d\x0a");
 $req->parse("Host: mojolicious.org\x0d\x0a");
 $req->parse("X-Forwarded-For: 192.168.2.1, 127.0.0.1\x0d\x0a\x0d\x0a");
 $req->parse("Hello World!\n1234\nlalalala\n");
-ok $req->is_done,       'request is done';
-is $req->method,        'GET', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 0, 'right minor version';
-is $req->url,           '/foo/bar/baz.html?foo=13#23', 'right URL';
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.0', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
 is $req->url->to_abs, 'http://mojolicious.org/foo/bar/baz.html?foo=13#23',
   'right absolute URL';
 is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
@@ -160,11 +215,12 @@ $req->parse("o World!\n123");
 $req->parse('0');
 $req->parse("\nlalalala\n");
 ok $finished, 'finish callback was called';
-ok $req->is_done,       'request is done';
-is $req->method,        'GET', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 0, 'right minor version';
-is $req->url,           '/foo/bar/baz.html?foo=13#23', 'right URL';
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.0', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
 is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $req->headers->content_length, 27, 'right "Content-Length" value';
 
@@ -176,11 +232,12 @@ $req->parse('-Type: application/');
 $req->parse("x-www-form-urlencoded\x0d\x0aContent-Length: 53");
 $req->parse("\x0d\x0a\x0d\x0a");
 $req->parse('name=%D0%92%D1%8F%D1%87%D0%B5%D1%81%D0%BB%D0%B0%D0%B2');
-ok $req->is_done,       'request is done';
-is $req->method,        'GET', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 0, 'right minor version';
-is $req->url,           '/foo/bar/baz.html?foo=13#23', 'right URL';
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.0', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
 is $req->headers->content_type, 'application/x-www-form-urlencoded',
   'right "Content-Type" value';
 is $req->headers->content_length, 53, 'right "Content-Length" value';
@@ -189,11 +246,12 @@ is $req->param('name'), 'Вячеслав', 'right value';
 # Parse HTTP 0.9 request
 $req = Mojo::Message::Request->new;
 $req->parse("GET /\x0d\x0a\x0d\x0a");
-ok $req->is_done,       'request is done';
-is $req->method,        'GET', 'right method';
-is $req->major_version, 0, 'right major version';
-is $req->minor_version, 9, 'right minor version';
-is $req->url,           '/', 'right URL';
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '0.9', 'right version';
+is $req->at_least_version('0.9'), 1,     'at least version 0.9';
+is $req->at_least_version('1.0'), undef, 'not version 1.0';
+is $req->url, '/', 'right URL';
 
 # Parse HTTP 1.1 chunked request
 $req = Mojo::Message::Request->new;
@@ -205,11 +263,12 @@ $req->parse("abcd\x0d\x0a");
 $req->parse("9\x0d\x0a");
 $req->parse("abcdefghi\x0d\x0a");
 $req->parse("0\x0d\x0a\x0d\x0a");
-ok $req->is_done,       'request is done';
-is $req->method,        'POST', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 1, 'right minor version';
-is $req->url,           '/foo/bar/baz.html?foo=13#23', 'right URL';
+ok $req->is_done, 'request is done';
+is $req->method,  'POST', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
 is $req->headers->content_length, 13, 'right "Content-Length" value';
 is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $req->content->asset->size, 13, 'right size';
@@ -227,11 +286,12 @@ $req->parse("abcd\x0d\x0a");
 $req->parse("9\x0d\x0a");
 $req->parse("abcdefghi\x0d\x0a");
 $req->parse("0\x0d\x0a\x0d\x0a");
-ok $req->is_done,       'request is done';
-is $req->method,        'POST', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 1, 'right minor version';
-is $req->url,           '/foo/bar/baz.html?foo=13#23', 'right URL';
+ok $req->is_done, 'request is done';
+is $req->method,  'POST', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
 is $req->headers->content_length, 13, 'right "Content-Length" value';
 is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $buffer, 'abcdabcdefghi', 'right content';
@@ -242,11 +302,12 @@ $req->parse("POST /foo/bar/baz.html?foo=13#23 HTTP/1.1\x0d\x0a");
 $req->parse("Content-Length: 26\x0d\x0a");
 $req->parse("Content-Type: x-application-urlencoded\x0d\x0a\x0d\x0a");
 $req->parse('foo=bar& tset=23+;&foo=bar');
-ok $req->is_done,       'request is done';
-is $req->method,        'POST', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 1, 'right minor version';
-is $req->url,           '/foo/bar/baz.html?foo=13#23', 'right URL';
+ok $req->is_done, 'request is done';
+is $req->method,  'POST', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
 is $req->headers->content_type,
   'x-application-urlencoded', 'right "Content-Type" value';
 is $req->content->asset->size, 26, 'right size';
@@ -262,11 +323,12 @@ $req->parse("POST /foo/bar/baz.html?foo=13#23 HTTP/1.1\x0d\x0a");
 $req->parse("Content-Length: 26\x0d\x0a");
 $req->parse("Content-Type: application/x-www-form-urlencoded\x0d\x0a");
 $req->parse("\x0d\x0afoo=bar&+tset=23+;&foo=bar");
-ok $req->is_done,       'request is done';
-is $req->method,        'POST', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 1, 'right minor version';
-is $req->url,           '/foo/bar/baz.html?foo=13#23', 'right URL';
+ok $req->is_done, 'request is done';
+is $req->method,  'POST', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
 is $req->headers->content_type,
   'application/x-www-form-urlencoded',
   'right "Content-Type" value';
@@ -298,12 +360,13 @@ $req->parse("abcdefghi\x0d\x0a");
 $req->parse("0\x0d\x0a");
 $req->parse("X-Trailer1: test\x0d\x0a");
 $req->parse("X-Trailer2: 123\x0d\x0a\x0d\x0a");
-ok $req->is_done,       'request is done';
-is $req->method,        'POST', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 1, 'right minor version';
-is $req->url,           '/foo/bar/baz.html?foo=13&bar=23#23', 'right URL';
-is $req->query_params,  'foo=13&bar=23', 'right parameters';
+ok $req->is_done, 'request is done';
+is $req->method,  'POST', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar/baz.html?foo=13&bar=23#23', 'right URL';
+is $req->query_params, 'foo=13&bar=23', 'right parameters';
 is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $req->headers->header('X-Trailer1'), 'test', 'right "X-Trailer1" value';
 is $req->headers->header('X-Trailer2'), '123',  'right "X-Trailer2" value';
@@ -322,12 +385,13 @@ $req->parse("abcd\x0d\x0a");
 $req->parse("9\x0d\x0a");
 $req->parse("abcdefghi\x0d\x0a");
 $req->parse("0\x0d\x0aX-Trailer: 777\x0d\x0a\x0d\x0aLEFTOVER");
-ok $req->is_done,       'request is done';
-is $req->method,        'POST', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 1, 'right minor version';
-is $req->url,           '/foo/bar/baz.html?foo=13&bar=23#23', 'right URL';
-is $req->query_params,  'foo=13&bar=23', 'right parameters';
+ok $req->is_done, 'request is done';
+is $req->method,  'POST', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar/baz.html?foo=13&bar=23#23', 'right URL';
+is $req->query_params, 'foo=13&bar=23', 'right parameters';
 ok !defined $req->headers->transfer_encoding, 'no "Transfer-Encoding" value';
 is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $req->headers->header('X-Trailer'), '777', 'right "X-Trailer" value';
@@ -347,12 +411,13 @@ $req->parse("9\x0d\x0a");
 $req->parse("abcdefghi\x0d\x0a");
 $req->parse(
     "0\x0d\x0aX-Trailer1: test\x0d\x0aX-Trailer2: 123\x0d\x0a\x0d\x0a");
-ok $req->is_done,       'request is done';
-is $req->method,        'POST', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 1, 'right minor version';
-is $req->url,           '/foo/bar/baz.html?foo=13&bar=23#23', 'right URL';
-is $req->query_params,  'foo=13&bar=23', 'right parameters';
+ok $req->is_done, 'request is done';
+is $req->method,  'POST', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar/baz.html?foo=13&bar=23#23', 'right URL';
+is $req->query_params, 'foo=13&bar=23', 'right parameters';
 is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $req->headers->header('X-Trailer1'), 'test', 'right "X-Trailer1" value';
 is $req->headers->header('X-Trailer2'), '123',  'right "X-Trailer2" value';
@@ -371,12 +436,13 @@ $req->parse("9\x0d\x0a");
 $req->parse("abcdefghi\x0d\x0a");
 $req->parse(
     "0\x0d\x0aX-Trailer1: test\x0d\x0aX-Trailer2: 123\x0d\x0a\x0d\x0a");
-ok $req->is_done,       'request is done';
-is $req->method,        'POST', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 1, 'right minor version';
-is $req->url,           '/foo/bar/baz.html?foo=13&bar=23#23', 'right URL';
-is $req->query_params,  'foo=13&bar=23', 'right parameters';
+ok $req->is_done, 'request is done';
+is $req->method,  'POST', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar/baz.html?foo=13&bar=23#23', 'right URL';
+is $req->query_params, 'foo=13&bar=23', 'right parameters';
 is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $req->headers->header('X-Trailer1'), 'test', 'right "X-Trailer1" value';
 is $req->headers->header('X-Trailer2'), '123',  'right "X-Trailer2" value';
@@ -404,12 +470,13 @@ $req->parse("use strict;\n");
 $req->parse("use warnings;\n\n");
 $req->parse("print \"Hello World :)\\n\"\n");
 $req->parse("\x0d\x0a------------0xKhTmLbOuNdArY--");
-ok $req->is_done,       'request is done';
-is $req->method,        'GET', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 1, 'right minor version';
-is $req->url,           '/foo/bar/baz.html?foo13#23', 'right URL';
-is $req->query_params,  'foo13', 'right parameters';
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar/baz.html?foo13#23', 'right URL';
+is $req->query_params, 'foo13', 'right parameters';
 like $req->headers->content_type,
   qr/multipart\/form-data/, 'right "Content-Type" value';
 is ref $req->content->parts->[0], 'Mojo::Content::Single', 'right part';
@@ -421,7 +488,7 @@ is_deeply $req->body_params->to_hash->{text1}, "hallo welt test123\n",
   'right value';
 is_deeply $req->body_params->to_hash->{text2}, '', 'right value';
 is $req->upload('upload')->filename, 'hello.pl', 'right filename';
-is ref $req->upload('upload')->asset, 'Mojo::Asset::File', 'right file';
+is ref $req->upload('upload')->asset, 'Mojo::Asset::Memory', 'right file';
 is $req->upload('upload')->asset->size, 69, 'right size';
 my $file = File::Spec->catfile(File::Temp::tempdir(CLEANUP => 1),
     ("MOJO_TMP." . time . ".txt"));
@@ -437,10 +504,11 @@ $req->parse(
     "Proxy-Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==\x0d\x0a");
 $req->parse("Content-Length: 13\x0d\x0a\x0d\x0a");
 $req->parse("Hello World!\n");
-ok $req->is_done,       'request is done';
-is $req->method,        'GET', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 1, 'right minor version';
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->url->base, 'http://Aladdin:open%20sesame@127.0.0.1',
   'right base URL';
 is $req->url->base->userinfo, 'Aladdin:open sesame', 'right base userinfo';
@@ -454,23 +522,27 @@ $req->parse("Host: 127.0.0.1\x0d\x0a");
 $req->parse(
     "Proxy-Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==\x0d\x0a");
 $req->parse("Content-Length: 0\x0d\x0a\x0d\x0a");
-ok $req->is_done,       'request is done';
-is $req->method,        'CONNECT', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 1, 'right minor version';
-is $req->url,           '127.0.0.1:3000', 'right URL';
+ok $req->is_done, 'request is done';
+is $req->method,  'CONNECT', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '', 'no full URL';
+is $req->url->host,       '127.0.0.1',           'right host';
+is $req->url->port,       '3000',                'right port';
 is $req->proxy->userinfo, 'Aladdin:open sesame', 'right proxy userinfo';
 
 # Build minimal HTTP 1.1 request
 $req = Mojo::Message::Request->new;
 $req->method('GET');
 $req->url->parse('http://127.0.0.1/');
-$req = Mojo::Message::Request->new->parse($req->build);
-ok $req->is_done,       'request is done';
-is $req->method,        'GET', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 1, 'right minor version';
-is $req->url,           '/', 'right URL';
+$req = Mojo::Message::Request->new->parse($req->to_string);
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/', 'right URL';
 is $req->url->to_abs,   'http://127.0.0.1/', 'right absolute URL';
 is $req->headers->host, '127.0.0.1',         'right "Host" value';
 
@@ -479,12 +551,13 @@ $req = Mojo::Message::Request->new;
 $req->method('GET');
 $req->url->parse('http://127.0.0.1/foo/bar');
 $req->headers->expect('100-continue');
-$req = Mojo::Message::Request->new->parse($req->build);
-ok $req->is_done,       'request is done';
-is $req->method,        'GET', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 1, 'right minor version';
-is $req->url,           '/foo/bar', 'right URL';
+$req = Mojo::Message::Request->new->parse($req->to_string);
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar', 'right URL';
 is $req->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL';
 is $req->headers->expect, '100-continue',             'right "Expect" value';
 is $req->headers->host,   '127.0.0.1',                'right "Host" value';
@@ -497,12 +570,13 @@ $req->method('get');
 $req->url->parse('http://127.0.0.1/foo/bar');
 $req->headers->expect('100-continue');
 $req->body("Hello World!\n");
-$req = Mojo::Message::Request->new->parse($req->build);
-ok $req->is_done,       'request is done';
-is $req->method,        'GET', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 1, 'right minor version';
-is $req->url,           '/foo/bar', 'right URL';
+$req = Mojo::Message::Request->new->parse($req->to_string);
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar', 'right URL';
 is $req->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL';
 is $req->headers->expect, '100-continue',             'right "Expect" value';
 is $req->headers->host,   '127.0.0.1',                'right "Host" value';
@@ -536,12 +610,13 @@ $req->headers->upgrade('WebSocket');
 $req->headers->sec_websocket_key1('4 @1  46546xW%0l 1 5');
 $req->headers->origin('http://example.com');
 $req->body('^n:ds[4U');
-$req = Mojo::Message::Request->new->parse($req->build);
-ok $req->is_done,       'request is done';
-is $req->method,        'GET', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 1, 'right minor version';
-is $req->url,           '/demo', 'right URL';
+$req = Mojo::Message::Request->new->parse($req->to_string);
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/demo', 'right URL';
 is $req->url->to_abs, 'http://example.com/demo', 'right absolute URL';
 is $req->headers->connection, 'Upgrade',     'right "Connection" value';
 is $req->headers->upgrade,    'WebSocket',   'right "Upgrade" value';
@@ -566,12 +641,13 @@ $req->url->parse('http://127.0.0.1/foo/bar');
 $req->headers->expect('100-continue');
 $req->body("Hello World!\n");
 $req->proxy('http://127.0.0.2:8080');
-$req = Mojo::Message::Request->new->parse($req->build);
-ok $req->is_done,       'request is done';
-is $req->method,        'GET', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 1, 'right minor version';
-is $req->url,           'http://127.0.0.1/foo/bar', 'right URL';
+$req = Mojo::Message::Request->new->parse($req->to_string);
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, 'http://127.0.0.1/foo/bar', 'right URL';
 is $req->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL';
 is $req->headers->expect, '100-continue',             'right "Expect" value';
 is $req->headers->host,   '127.0.0.1',                'right "Host" value';
@@ -585,12 +661,13 @@ $req->url->parse('http://Aladdin:open%20sesame@127.0.0.1/foo/bar');
 $req->headers->expect('100-continue');
 $req->body("Hello World!\n");
 $req->proxy('http://Aladdin:open%20sesame@127.0.0.2:8080');
-$req = Mojo::Message::Request->new->parse($req->build);
-ok $req->is_done,       'request is done';
-is $req->method,        'GET', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 1, 'right minor version';
-is $req->url,           'http://127.0.0.1/foo/bar', 'right URL';
+$req = Mojo::Message::Request->new->parse($req->to_string);
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, 'http://127.0.0.1/foo/bar', 'right URL';
 is $req->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL';
 is $req->proxy->userinfo, 'Aladdin:open sesame',      'right proxy userinfo';
 is $req->headers->authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
@@ -607,12 +684,15 @@ $req = Mojo::Message::Request->new;
 $req->method('CONNECT');
 $req->url->parse('http://Aladdin:open%20sesame@127.0.0.1:3000/foo/bar');
 $req->proxy('http://Aladdin:open%20sesame@127.0.0.2:8080');
-$req = Mojo::Message::Request->new->parse($req->build);
-ok $req->is_done,       'request is done';
-is $req->method,        'CONNECT', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 1, 'right minor version';
-is $req->url,           '127.0.0.1:3000', 'right URL';
+$req = Mojo::Message::Request->new->parse($req->to_string);
+ok $req->is_done, 'request is done';
+is $req->method,  'CONNECT', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '', 'no full URL';
+is $req->url->host, '127.0.0.1', 'right host';
+is $req->url->port, '3000',      'right port';
 is $req->url->to_abs, 'http://Aladdin:open%20sesame@127.0.0.1:3000/',
   'right absolute URL';
 is $req->proxy->userinfo, 'Aladdin:open sesame', 'right proxy userinfo';
@@ -634,12 +714,13 @@ my $content = Mojo::Content::Single->new;
 $content->asset->add_chunk("lala\nfoobar\nperl rocks\n");
 $content->headers->content_type('text/plain');
 push @{$req->content->parts}, $content;
-$req = Mojo::Message::Request->new->parse($req->build);
-ok $req->is_done,       'request is done';
-is $req->method,        'GET', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 1, 'right minor version';
-is $req->url,           '/foo/bar', 'right URL';
+$req = Mojo::Message::Request->new->parse($req->to_string);
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar', 'right URL';
 is $req->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
 is $req->headers->host, '127.0.0.1', 'right "Host" value';
 is $req->headers->content_length, '104', 'right "Content-Length" value';
@@ -669,12 +750,13 @@ $req->write_chunk(
         );
     }
 );
-$req = Mojo::Message::Request->new->parse($req->build);
-ok $req->is_done,       'request is done';
-is $req->method,        'GET', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 1, 'right minor version';
-is $req->url,           '/foo/bar', 'right URL';
+$req = Mojo::Message::Request->new->parse($req->to_string);
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar', 'right URL';
 is $req->url->to_abs, 'http://127.0.0.1:8080/foo/bar', 'right absolute URL';
 is $req->headers->host, '127.0.0.1:8080', 'right "Host" value';
 is $req->headers->transfer_encoding, undef, 'no "Transfer-Encoding" value';
@@ -688,12 +770,13 @@ $req->url->parse('http://127.0.0.1/foo/bar');
 $req->write_chunk('hello world!');
 $req->write_chunk("hello world2!\n\n");
 $req->write_chunk('');
-$req = Mojo::Message::Request->new->parse($req->build);
-ok $req->is_done,       'request is done';
-is $req->method,        'GET', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 1, 'right minor version';
-is $req->url,           '/foo/bar', 'right URL';
+$req = Mojo::Message::Request->new->parse($req->to_string);
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar', 'right URL';
 is $req->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
 is $req->headers->host, '127.0.0.1', 'right "Host" value';
 is $req->headers->transfer_encoding, undef, 'no "Transfer-Encoding" value';
@@ -716,18 +799,30 @@ is $res->code(400)->default_message, 'Bad Request', 'right default message';
 # Parse HTTP 1.1 response start line, no headers and body
 $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.1 200 OK\x0d\x0a\x0d\x0a");
-ok $res->is_done,       'response is done';
-is $res->code,          200, 'right status';
-is $res->message,       'OK', 'right message';
-is $res->major_version, 1, 'right major version';
-is $res->minor_version, 1, 'right minor version';
+ok !$res->is_done, 'response is not done';
+is $res->code,    200,   'right status';
+is $res->message, 'OK',  'right message';
+is $res->version, '1.1', 'right version';
+is $res->at_least_version('1.0'), 1,     'at least version 1.0';
+is $res->at_least_version('1.2'), undef, 'not version 1.2';
+
+# Parse HTTP 1.1 response start line, no headers and body (no message)
+$res = Mojo::Message::Response->new;
+$res->parse("HTTP/1.1 200\x0d\x0a\x0d\x0a");
+ok !$res->is_done, 'response is not done';
+is $res->code,    200,   'right status';
+is $res->message, undef, 'no message';
+is $res->version, '1.1', 'right version';
+is $res->at_least_version('1.0'), 1,     'at least version 1.0';
+is $res->at_least_version('1.2'), undef, 'not version 1.2';
 
 # Parse HTTP 0.9 response
 $res = Mojo::Message::Response->new;
 $res->parse("HTT... this is just a document and valid HTTP 0.9\n\n");
-ok $res->is_done,       'response is done';
-is $res->major_version, 0, 'right major version';
-is $res->minor_version, 9, 'right minor version';
+ok $res->is_done, 'response is done';
+is $res->version, '0.9', 'right version';
+is $res->at_least_version('0.9'), 1,     'at least version 0.9';
+is $res->at_least_version('1.2'), undef, 'not version 1.2';
 is $res->body, "HTT... this is just a document and valid HTTP 0.9\n\n",
   'right content';
 
@@ -736,11 +831,12 @@ $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.0 404 Damn it\x0d\x0a");
 $res->parse("Content-Type: text/plain\x0d\x0a");
 $res->parse("Content-Length: 0\x0d\x0a\x0d\x0a");
-ok $res->is_done,       'response is done';
-is $res->code,          404, 'right status';
-is $res->message,       'Damn it', 'right message';
-is $res->major_version, 1, 'right major version';
-is $res->minor_version, 0, 'right minor version';
+ok $res->is_done, 'response is done';
+is $res->code,    404, 'right status';
+is $res->message, 'Damn it', 'right message';
+is $res->version, '1.0', 'right version';
+is $res->at_least_version('1.0'), 1,     'at least version 1.0';
+is $res->at_least_version('1.2'), undef, 'not version 1.2';
 is $res->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, 0, 'right "Content-Length" value';
 
@@ -750,13 +846,61 @@ $res->parse("HTTP/1.0 500 Internal Server Error\x0d\x0a");
 $res->parse("Content-Type: text/plain\x0d\x0a");
 $res->parse("Content-Length: 27\x0d\x0a\x0d\x0a");
 $res->parse("Hello World!\n1234\nlalalala\n");
-ok $res->is_done,       'response is done';
-is $res->code,          500, 'right status';
-is $res->message,       'Internal Server Error', 'right message';
-is $res->major_version, 1, 'right major version';
-is $res->minor_version, 0, 'right minor version';
+ok $res->is_done, 'response is done';
+is $res->code,    500, 'right status';
+is $res->message, 'Internal Server Error', 'right message';
+is $res->version, '1.0', 'right version';
+is $res->at_least_version('1.0'), 1,     'at least version 1.0';
+is $res->at_least_version('1.2'), undef, 'not version 1.2';
 is $res->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, 27, 'right "Content-Length" value';
+
+# Parse full HTTP 1.0 response (missing Content-Length)
+$res = Mojo::Message::Response->new;
+$res->parse("HTTP/1.0 500 Internal Server Error\x0d\x0a");
+$res->parse("Content-Type: text/plain\x0d\x0a");
+$res->parse("Connection: close\x0d\x0a\x0d\x0a");
+$res->parse("Hello World!\n1234\nlalalala\n");
+ok !$res->is_done, 'response is not done';
+is $res->code,    500,                     'right status';
+is $res->message, 'Internal Server Error', 'right message';
+is $res->version, '1.0',                   'right version';
+is $res->at_least_version('1.0'), 1,     'at least version 1.0';
+is $res->at_least_version('1.2'), undef, 'not version 1.2';
+is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
+is $res->headers->content_length, undef,        'no "Content-Length" value';
+is $res->body, "Hello World!\n1234\nlalalala\n", 'right content';
+
+# Parse full HTTP 1.0 response (missing Content-Length and Connection)
+$res = Mojo::Message::Response->new;
+$res->parse("HTTP/1.0 500 Internal Server Error\x0d\x0a");
+$res->parse("Content-Type: text/plain\x0d\x0a\x0d\x0a");
+$res->parse("Hello World!\n1234\nlalalala\n");
+ok !$res->is_done, 'response is not done';
+is $res->code,    500,                     'right status';
+is $res->message, 'Internal Server Error', 'right message';
+is $res->version, '1.0',                   'right version';
+is $res->at_least_version('1.0'), 1,     'at least version 1.0';
+is $res->at_least_version('1.2'), undef, 'not version 1.2';
+is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
+is $res->headers->content_length, undef,        'no "Content-Length" value';
+is $res->body, "Hello World!\n1234\nlalalala\n", 'right content';
+
+# Parse full HTTP 1.1 response (missing Content-Length)
+$res = Mojo::Message::Response->new;
+$res->parse("HTTP/1.1 500 Internal Server Error\x0d\x0a");
+$res->parse("Content-Type: text/plain\x0d\x0a");
+$res->parse("Connection: close\x0d\x0a\x0d\x0a");
+$res->parse("Hello World!\n1234\nlalalala\n");
+ok !$res->is_done, 'response is not done';
+is $res->code,    500,                     'right status';
+is $res->message, 'Internal Server Error', 'right message';
+is $res->version, '1.1',                   'right version';
+is $res->at_least_version('1.0'), 1,     'at least version 1.0';
+is $res->at_least_version('1.2'), undef, 'not version 1.2';
+is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
+is $res->headers->content_length, undef,        'no "Content-Length" value';
+is $res->body, "Hello World!\n1234\nlalalala\n", 'right content';
 
 # Parse HTTP 1.1 response (413 error in one big chunk)
 $res = Mojo::Message::Response->new;
@@ -765,11 +909,12 @@ $res->parse("HTTP/1.1 413 Request Entity Too Large\x0d\x0a"
       . "Date: Tue, 09 Feb 2010 16:34:51 GMT\x0d\x0a"
       . "Server: Mojolicious (Perl)\x0d\x0a"
       . "X-Powered-By: Mojolicious (Perl)\x0d\x0a\x0d\x0a");
-ok $res->is_done,       'response is done';
-is $res->code,          413, 'right status';
-is $res->message,       'Request Entity Too Large', 'right message';
-is $res->major_version, 1, 'right major version';
-is $res->minor_version, 1, 'right minor version';
+ok !$res->is_done, 'response is not done';
+is $res->code,    413,                        'right status';
+is $res->message, 'Request Entity Too Large', 'right message';
+is $res->version, '1.1',                      'right version';
+is $res->at_least_version('1.0'), 1,     'at least version 1.0';
+is $res->at_least_version('1.2'), undef, 'not version 1.2';
 is $res->headers->content_length, undef, 'right "Content-Length" value';
 
 # Parse HTTP 1.1 chunked response
@@ -782,11 +927,12 @@ $res->parse("abcd\x0d\x0a");
 $res->parse("9\x0d\x0a");
 $res->parse("abcdefghi\x0d\x0a");
 $res->parse("0\x0d\x0a\x0d\x0a");
-ok $res->is_done,       'response is done';
-is $res->code,          500, 'right status';
-is $res->message,       'Internal Server Error', 'right message';
-is $res->major_version, 1, 'right major version';
-is $res->minor_version, 1, 'right minor version';
+ok $res->is_done, 'response is done';
+is $res->code,    500, 'right status';
+is $res->message, 'Internal Server Error', 'right message';
+is $res->version, '1.1', 'right version';
+is $res->at_least_version('1.0'), 1,     'at least version 1.0';
+is $res->at_least_version('1.2'), undef, 'not version 1.2';
 is $res->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, 13, 'right "Content-Length" value';
 is $res->content->body_size,      13, 'right size';
@@ -811,11 +957,12 @@ $res->parse("use strict;\n");
 $res->parse("use warnings;\n\n");
 $res->parse("print \"Hello World :)\\n\"\n");
 $res->parse("\x0d\x0a------------0xKhTmLbOuNdArY--");
-ok $res->is_done,       'response is done';
-is $res->code,          200, 'right status';
-is $res->message,       'OK', 'right message';
-is $res->major_version, 1, 'right major version';
-is $res->minor_version, 1, 'right minor version';
+ok $res->is_done, 'response is done';
+is $res->code,    200, 'right status';
+is $res->message, 'OK', 'right message';
+is $res->version, '1.1', 'right version';
+is $res->at_least_version('1.0'), 1,     'at least version 1.0';
+is $res->at_least_version('1.2'), undef, 'not version 1.2';
 ok $res->headers->content_type =~ /multipart\/form-data/,
   'right "Content-Type" value';
 is ref $res->content->parts->[0], 'Mojo::Content::Single', 'right part';
@@ -828,12 +975,13 @@ is $res->content->parts->[0]->asset->slurp, "hallo welt test123\n",
 $res = Mojo::Message::Response->new;
 $res->code(404);
 $res->headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
-$res = Mojo::Message::Response->new->parse($res->build);
-ok $res->is_done,       'request is done';
-is $res->code,          '404', 'right status';
-is $res->message,       'Not Found', 'right message';
-is $res->major_version, 1, 'right major version';
-is $res->minor_version, 1, 'right minor version';
+$res = Mojo::Message::Response->new->parse($res->to_string);
+ok $res->is_done, 'response is done';
+is $res->code,    '404', 'right status';
+is $res->message, 'Not Found', 'right message';
+is $res->version, '1.1', 'right version';
+is $res->at_least_version('1.0'), 1,     'at least version 1.0';
+is $res->at_least_version('1.2'), undef, 'not version 1.2';
 is $res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT', 'right "Date" value';
 is $res->headers->content_length, 0, 'right "Content-Length" value';
 
@@ -842,12 +990,13 @@ $res = Mojo::Message::Response->new;
 $res->code(200);
 $res->headers->connection('keep-alive');
 $res->headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
-$res = Mojo::Message::Response->new->parse($res->build);
-ok $res->is_done,       'request is done';
-is $res->code,          '200', 'right status';
-is $res->message,       'OK', 'right message';
-is $res->major_version, 1, 'right major version';
-is $res->minor_version, 1, 'right minor version';
+$res = Mojo::Message::Response->new->parse($res->to_string);
+ok $res->is_done, 'response is done';
+is $res->code,    '200', 'right status';
+is $res->message, 'OK', 'right message';
+is $res->version, '1.1', 'right version';
+is $res->at_least_version('1.0'), 1,     'at least version 1.0';
+is $res->at_least_version('1.2'), undef, 'not version 1.2';
 is $res->headers->connection, 'keep-alive', 'right "Connection" value';
 is $res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT', 'right "Date" value';
 is $res->headers->content_length, 0, 'right "Content-Length" value';
@@ -858,12 +1007,13 @@ $res->code(200);
 $res->headers->connection('keep-alive');
 $res->headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
 $res->body("Hello World!\n");
-$res = Mojo::Message::Response->new->parse($res->build);
-ok $res->is_done,       'request is done';
-is $res->code,          '200', 'right status';
-is $res->message,       'OK', 'right message';
-is $res->major_version, 1, 'right major version';
-is $res->minor_version, 1, 'right minor version';
+$res = Mojo::Message::Response->new->parse($res->to_string);
+ok $res->is_done, 'response is done';
+is $res->code,    '200', 'right status';
+is $res->message, 'OK', 'right message';
+is $res->version, '1.1', 'right version';
+is $res->at_least_version('1.0'), 1,     'at least version 1.0';
+is $res->at_least_version('1.2'), undef, 'not version 1.2';
 is $res->headers->connection, 'keep-alive', 'right "Connection" value';
 is $res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT', 'right "Date" value';
 is $res->headers->content_length, '13', 'right "Content-Length" value';
@@ -871,17 +1021,17 @@ is $res->body, "Hello World!\n", 'right content';
 
 # Build HTTP 0.9 response
 $res = Mojo::Message::Response->new;
-$res->major_version(0);
-$res->minor_version(9);
+$res->version('0.9');
 $res->body("this is just a document and valid HTTP 0.9\nlalala\n");
-is $res->build, "this is just a document and valid HTTP 0.9\nlalala\n",
+is $res->to_string, "this is just a document and valid HTTP 0.9\nlalala\n",
   'right message';
-$res = Mojo::Message::Response->new->parse($res->build);
-ok $res->is_done,       'request is done';
-is $res->code,          undef, 'no status';
-is $res->message,       undef, 'no message';
-is $res->major_version, 0, 'right major version';
-is $res->minor_version, 9, 'right minor version';
+$res = Mojo::Message::Response->new->parse($res->to_string);
+ok $res->is_done, 'response is done';
+is $res->code,    undef, 'no status';
+is $res->message, undef, 'no message';
+is $res->version, '0.9', 'right version';
+is $res->at_least_version('0.9'), 1,     'at least version 0.9';
+is $res->at_least_version('1.2'), undef, 'not version 1.2';
 is $res->body, "this is just a document and valid HTTP 0.9\nlalala\n",
   'right content';
 
@@ -898,12 +1048,13 @@ $content = Mojo::Content::Single->new;
 $content->asset->add_chunk("lala\nfoobar\nperl rocks\n");
 $content->headers->content_type('text/plain');
 push @{$res->content->parts}, $content;
-$res = Mojo::Message::Response->new->parse($res->build);
-ok $res->is_done,       'request is done';
-is $res->code,          200, 'right status';
-is $res->message,       'OK', 'right message';
-is $res->major_version, 1, 'right major version';
-is $res->minor_version, 1, 'right minor version';
+$res = Mojo::Message::Response->new->parse($res->to_string);
+ok $res->is_done, 'response is done';
+is $res->code,    200, 'right status';
+is $res->message, 'OK', 'right message';
+is $res->version, '1.1', 'right version';
+is $res->at_least_version('1.0'), 1,     'at least version 1.0';
+is $res->at_least_version('1.2'), undef, 'not version 1.2';
 is $res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT', 'right "Date" value';
 is $res->headers->content_length, '108', 'right "Content-Length" value';
 is $res->headers->content_type, 'multipart/mixed; boundary=7am1X',
@@ -939,9 +1090,10 @@ is $req->headers->header('Accept'),
 is $req->url->path, '/', 'right URL';
 is $req->url->base->path, '/index.pl/', 'right path';
 is $req->url->base->host, 'test',       'right host';
-ok !$req->url->query, 'no query';
-is $req->minor_version, '1', 'right minor version';
-is $req->major_version, '1', 'right major version';
+ok !$req->url->query->to_string, 'no query';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
 
 # Parse IIS 7.5 like CGI environment (with path)
 $req = Mojo::Message::Request->new;
@@ -967,9 +1119,10 @@ is $req->headers->header('Accept'),
 is $req->url->path, '/foo', 'right URL';
 is $req->url->base->path, '/index.pl/', 'right path';
 is $req->url->base->host, 'test',       'right host';
-ok !$req->url->query, 'no query';
-is $req->minor_version, '1', 'right minor version';
-is $req->major_version, '1', 'right major version';
+ok !$req->url->query->to_string, 'no query';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
 
 # Parse IIS 6.0 like CGI environment variables and a body
 $req = Mojo::Message::Request->new;
@@ -995,9 +1148,10 @@ is $req->url->base->path, '/foo/',     'right base path';
 is $req->url->base->host, 'localhost', 'right base host';
 is $req->url->base->port, 8080,        'right base port';
 is $req->url->query, 'lalala=23&bar=baz', 'right query';
-is $req->minor_version, '0',           'right minor version';
-is $req->major_version, '1',           'right major version';
-is $req->body,          'hello=world', 'right content';
+is $req->version, '1.0', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right value';
 is $req->url->to_abs->to_string,
   'http://localhost:8080/foo/bar?lalala=23&bar=baz', 'right absolute URL';
@@ -1027,9 +1181,10 @@ is $req->url->base->path, '/',         'right base path';
 is $req->url->base->host, 'localhost', 'right base host';
 is $req->url->base->port, 8080,        'right base port';
 is $req->url->query, 'lalala=23&bar=baz', 'right query';
-is $req->minor_version, '0',           'right minor version';
-is $req->major_version, '1',           'right major version';
-is $req->body,          'hello=world', 'right content';
+is $req->version, '1.0', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right value';
 is $req->url->to_abs->to_string,
   'http://localhost:8080/foo/bar?lalala=23&bar=baz', 'right absolute URL';
@@ -1058,9 +1213,10 @@ is $req->url->base->path, '/',         'right base path';
 is $req->url->base->host, 'localhost', 'right base host';
 is $req->url->base->port, 8080,        'right base port';
 is $req->url->query, 'lalala=23&bar=baz', 'right query';
-is $req->minor_version, '0',           'right minor version';
-is $req->major_version, '1',           'right major version';
-is $req->body,          'hello=world', 'right content';
+is $req->version, '1.0', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right value';
 is $req->url->to_abs->to_string,
   'http://localhost:8080/foo/bar/?lalala=23&bar=baz', 'right absolute URL';
@@ -1090,9 +1246,10 @@ is $req->url->base->path, '/foo/bar/', 'right base path';
 is $req->url->base->host, 'localhost', 'right base host';
 is $req->url->base->port, 8080,        'right base port';
 is $req->url->query, 'lalala=23&bar=baz', 'right query';
-is $req->minor_version, '0',           'right minor version';
-is $req->major_version, '1',           'right major version';
-is $req->body,          'hello=world', 'right content';
+is $req->version, '1.0', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right value';
 is $req->url->to_abs->to_string,
   'http://localhost:8080/foo/bar/?lalala=23&bar=baz', 'right absolute URL';
@@ -1121,9 +1278,10 @@ is $req->url->base->path, '/',         'right base path';
 is $req->url->base->host, 'localhost', 'right base host';
 is $req->url->base->port, 8080,        'right base port';
 is $req->url->query, 'lalala=23&bar=baz', 'right query';
-is $req->minor_version, '0',           'right minor version';
-is $req->major_version, '1',           'right major version';
-is $req->body,          'hello=world', 'right content';
+is $req->version, '1.0', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right value';
 is $req->url->to_abs->to_string, 'http://localhost:8080/?lalala=23&bar=baz',
   'right absolute URL';
@@ -1149,9 +1307,10 @@ is $req->url->base->path, '/test/index.cgi/', 'right base path';
 is $req->url->base->host, 'localhost',        'right base host';
 is $req->url->base->port, 8080,               'right base port';
 is $req->url->query, 'lalala=23&bar=baz', 'right query';
-is $req->minor_version, '0',           'right minor version';
-is $req->major_version, '1',           'right major version';
-is $req->body,          'Hello World', 'right content';
+is $req->version, '1.0', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->body, 'Hello World', 'right content';
 is $req->url->to_abs->to_string,
   'http://localhost:8080/test/index.cgi/foo/bar?lalala=23&bar=baz',
   'right absolute URL';
@@ -1179,9 +1338,10 @@ is $req->url->base->path, '/test/index.cgi/', 'right base path';
 is $req->url->base->host, 'mojolicious.org',  'right base host';
 is $req->url->base->port, '',                 'right base port';
 is $req->url->query, 'lalala=23&bar=baz', 'right query';
-is $req->minor_version, '0',           'right minor version';
-is $req->major_version, '1',           'right major version';
-is $req->body,          'Hello World', 'right content';
+is $req->version, '1.0', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->body, 'Hello World', 'right content';
 is $req->url->to_abs->to_string,
   'http://mojolicious.org/test/index.cgi/foo/bar?lalala=23&bar=baz',
   'right absolute URL';
@@ -1208,9 +1368,10 @@ is $req->url->base->path, '/test/index.cgi/', 'right base path';
 is $req->url->base->host, 'localhost',        'right base host';
 is $req->url->base->port, 8080,               'right base port';
 is $req->url->query, 'lalala=23&bar=baz', 'right query';
-is $req->minor_version, '0',           'right minor version';
-is $req->major_version, '1',           'right major version';
-is $req->body,          'hello=world', 'right content';
+is $req->version, '1.0', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right value';
 is $req->url->to_abs->to_string,
   'http://localhost:8080/test/index.cgi/foo/bar?lalala=23&bar=baz',
@@ -1240,9 +1401,10 @@ is $req->url->base->path, '/test/index.cgi/', 'right base path';
 is $req->url->base->host, 'localhost',        'right base host';
 is $req->url->base->port, 8080,               'right base port';
 is $req->url->query, 'lalala=23&bar=baz', 'right query';
-is $req->minor_version, '0',           'right minor version';
-is $req->major_version, '1',           'right major version';
-is $req->body,          'hello=world', 'right content';
+is $req->version, '1.0', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right value';
 is $req->url->to_abs->to_string, 'http://Aladdin:open%20sesame@localhost:8080'
   . '/test/index.cgi/foo/bar?lalala=23&bar=baz', 'right absolute URL';
@@ -1273,9 +1435,10 @@ is $req->url->path, '', 'right path';
 is $req->url->base->path, '/index.pl/', 'right base path';
 is $req->url->base->host, 'test1',      'right base host';
 is $req->url->base->port, '',           'right base port';
-ok !$req->url->query, 'no query';
-is $req->minor_version, '1', 'right minor version';
-is $req->major_version, '1', 'right major version';
+ok !$req->url->query->to_string, 'no query';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->body, 'request=&ajax=true&login=test&password=111&'
   . 'edition=db6d8b30-16df-4ecd-be2f-c8194f94e1f4', 'right content';
 is $req->param('ajax'),     'true', 'right value';
@@ -1304,10 +1467,11 @@ is $req->method, 'GET', 'right method';
 is $req->url->base->host, 'localhost', 'right base host';
 is $req->url->path, '/foo/bar', 'right path';
 is $req->url->base->path, '/test/index.cgi/', 'right base path';
-is $req->minor_version, '0',           'right minor version';
-is $req->major_version, '1',           'right major version';
-is $req->is_secure,     undef,         'not secure';
-is $req->body,          'hello=world', 'right content';
+is $req->version, '1.0', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->is_secure, undef,         'not secure';
+is $req->body,      'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right parameters';
 is $req->url->to_abs->to_string, 'http://localhost/test/index.cgi/foo/bar',
   'right absolute URL';
@@ -1331,10 +1495,11 @@ is $req->method, 'GET', 'right method';
 is $req->url->base->host, 'localhost', 'right base host';
 is $req->url->path, '/foo/bar', 'right path';
 is $req->url->base->path, '/test/index.cgi/', 'right base path';
-is $req->minor_version, '0',           'right minor version';
-is $req->major_version, '1',           'right major version';
-is $req->is_secure,     1,             'is secure';
-is $req->body,          'hello=world', 'right content';
+is $req->version, '1.0', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->is_secure, 1,             'is secure';
+is $req->body,      'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right parameters';
 is $req->url->to_abs->to_string, 'https://localhost/test/index.cgi/foo/bar',
   'right absolute URL';
@@ -1358,9 +1523,10 @@ is $req->method, 'GET', 'right method';
 is $req->url->base->host, 'localhost', 'right base host';
 is $req->url->path, '/foo/bar/', 'right path';
 is $req->url->base->path, '/test/index.cgi/', 'right base path';
-is $req->minor_version, '0',           'right minor version';
-is $req->major_version, '1',           'right major version';
-is $req->body,          'hello=world', 'right content';
+is $req->version, '1.0', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right parameters';
 is $req->url->to_abs->to_string, 'http://localhost/test/index.cgi/foo/bar/',
   'right absolute URL';
@@ -1383,9 +1549,10 @@ is $req->method, 'GET', 'right method';
 is $req->url->base->host, 'localhost', 'right base host';
 is $req->url->path, '/foo/bar', 'right path';
 is $req->url->base->path, '', 'right base path';
-is $req->minor_version, '0',           'right minor version';
-is $req->major_version, '1',           'right major version';
-is $req->body,          'hello=world', 'right content';
+is $req->version, '1.0', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right parameters';
 is $req->url->to_abs->to_string, 'http://localhost/foo/bar',
   'right absolute URL';
@@ -1408,9 +1575,10 @@ is $req->method, 'GET', 'right method';
 is $req->url->base->host, 'localhost', 'right base host';
 is $req->url->path, '', 'right path';
 is $req->url->base->path, '/test/index.cgi/', 'right base path';
-is $req->minor_version, '0',           'right minor version';
-is $req->major_version, '1',           'right major version';
-is $req->body,          'hello=world', 'right content';
+is $req->version, '1.0', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right paramaters';
 is $req->url->to_abs->to_string, 'http://localhost/test/index.cgi',
   'right absolute URL';
@@ -1432,11 +1600,61 @@ is $req->url->base->host, 'getbootylicious.org', 'right base host';
 is $req->url->path, '/', 'right path';
 is $req->url->base->path, '/cgi-bin/bootylicious/bootylicious.pl/',
   'right base path';
-is $req->minor_version, '1', 'right minor version';
-is $req->major_version, '1', 'right major version';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->url->to_abs->to_string,
   'http://getbootylicious.org/cgi-bin/bootylicious/bootylicious.pl',
   'right absolute URL';
+
+# Parse Apache mod_fastcgi like CGI environment variables
+# (multipart file upload)
+$req = Mojo::Message::Request->new;
+$req->parse(
+    SCRIPT_NAME      => '',
+    SERVER_NAME      => '127.0.0.1',
+    SERVER_ADMIN     => '[no address given]',
+    PATH_INFO        => '/diag/upload',
+    HTTP_CONNECTION  => 'Keep-Alive',
+    REQUEST_METHOD   => 'POST',
+    CONTENT_LENGTH   => '135',
+    SCRIPT_FILENAME  => '/tmp/SnLu1cQ3t2/test.fcgi',
+    SERVER_SOFTWARE  => 'Apache/2.2.14 (Unix) mod_fastcgi/2.4.2',
+    QUERY_STRING     => '',
+    REMOTE_PORT      => '58232',
+    HTTP_USER_AGENT  => 'Mojolicious (Perl)',
+    SERVER_PORT      => '13028',
+    SERVER_SIGNATURE => '',
+    REMOTE_ADDR      => '127.0.0.1',
+    CONTENT_TYPE     => 'multipart/form-data; boundary=8jXGX',
+    SERVER_PROTOCOL  => 'HTTP/1.1',
+    PATH => '/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin',
+    REQUEST_URI       => '/diag/upload',
+    GATEWAY_INTERFACE => 'CGI/1.1',
+    SERVER_ADDR       => '127.0.0.1',
+    DOCUMENT_ROOT     => '/tmp/SnLu1cQ3t2',
+    PATH_TRANSLATED   => '/tmp/test.fcgi/diag/upload',
+    HTTP_HOST         => '127.0.0.1:13028'
+);
+$req->parse("--8jXGX\x0d\x0a");
+$req->parse(
+    "Content-Disposition: form-data; name=\"file\"; filename=\"file\"\x0d\x0a"
+      . "Content-Type: application/octet-stream\x0d\x0a\x0d\x0a");
+$req->parse('11023456789');
+$req->parse("\x0d\x0a--8jXGX--");
+ok $req->is_done, 'request is done';
+is $req->method, 'POST', 'right method';
+is $req->url->base->host, '127.0.0.1', 'right base host';
+is $req->url->path, '/diag/upload', 'right path';
+is $req->url->base->path, '', 'no base path';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url->to_abs->to_string,
+  'http://127.0.0.1:13028/diag/upload',
+  'right absolute URL';
+$file = $req->upload('file');
+is $file->slurp, '11023456789', 'right uploaded content';
 
 # Parse response with cookie
 $res = Mojo::Message::Response->new;
@@ -1445,11 +1663,12 @@ $res->parse("Content-Type: text/plain\x0d\x0a");
 $res->parse("Content-Length: 27\x0d\x0a");
 $res->parse("Set-Cookie: foo=bar; Version=1; Path=/test\x0d\x0a\x0d\x0a");
 $res->parse("Hello World!\n1234\nlalalala\n");
-ok $req->is_done,       'request is done';
-is $res->code,          200, 'right status';
-is $res->message,       'OK', 'right message';
-is $res->major_version, 1, 'right major version';
-is $res->minor_version, 0, 'right minor version';
+ok $res->is_done, 'response is done';
+is $res->code,    200, 'right status';
+is $res->message, 'OK', 'right message';
+is $res->version, '1.0', 'right version';
+is $res->at_least_version('1.0'), 1,     'at least version 1.0';
+is $res->at_least_version('1.2'), undef, 'not version 1.2';
 is $res->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, 27, 'right "Content-Length" value';
 is $res->headers->set_cookie, 'foo=bar; Version=1; Path=/test',
@@ -1471,11 +1690,12 @@ $res->parse("Sec-WebSocket-Origin: http://example.com\x0d\x0a");
 $res->parse("Sec-WebSocket-Location: ws://example.com/demo\x0d\x0a");
 $res->parse("Sec-WebSocket-Protocol: sample\x0d\x0a\x0d\x0a");
 $res->parse('8jKS\'y:G*Co,Wxa-');
-ok $req->is_done,       'request is done';
-is $res->code,          101, 'right status';
-is $res->message,       'WebSocket Protocol Handshake', 'right message';
-is $res->major_version, 1, 'right major version';
-is $res->minor_version, 1, 'right minor version';
+ok $res->is_done, 'response is done';
+is $res->code,    101, 'right status';
+is $res->message, 'WebSocket Protocol Handshake', 'right message';
+is $res->version, '1.1', 'right version';
+is $res->at_least_version('1.0'), 1,     'at least version 1.0';
+is $res->at_least_version('1.2'), undef, 'not version 1.2';
 is $res->headers->upgrade,    'WebSocket', 'right "Upgrade" value';
 is $res->headers->connection, 'Upgrade',   'right "Connection" value';
 is $res->headers->sec_websocket_origin, 'http://example.com',
@@ -1496,12 +1716,13 @@ $res->headers->sec_websocket_origin('http://example.com');
 $res->headers->sec_websocket_location('ws://example.com/demo');
 $res->headers->sec_websocket_protocol('sample');
 $res->body('8jKS\'y:G*Co,Wxa-');
-$res = Mojo::Message::Response->new->parse($res->build);
-ok $res->is_done,       'request is done';
-is $res->code,          '101', 'right status';
-is $res->message,       'WebSocket Protocol Handshake', 'right message';
-is $res->major_version, 1, 'right major version';
-is $res->minor_version, 1, 'right minor version';
+$res = Mojo::Message::Response->new->parse($res->to_string);
+ok $res->is_done, 'response is done';
+is $res->code,    '101', 'right status';
+is $res->message, 'WebSocket Protocol Handshake', 'right message';
+is $res->version, '1.1', 'right version';
+is $res->at_least_version('1.0'), 1,     'at least version 1.0';
+is $res->at_least_version('1.2'), undef, 'not version 1.2';
 is $res->headers->connection, 'Upgrade', 'right "Connection" value';
 is $res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT', 'right "Date" value';
 is $res->headers->upgrade,        'WebSocket', 'right "Upgrade" value';
@@ -1529,13 +1750,14 @@ $res->headers->set_cookie2(
         path  => '/foobar'
     )
 );
-ok !!$res->build, 'message built';
+ok !!$res->to_string, 'message built';
 my $res2 = Mojo::Message::Response->new;
-$res2->parse($res->build);
-ok $res2->is_done,       'response is done';
-is $res2->code,          404, 'right status';
-is $res2->major_version, 1, 'right major version';
-is $res2->minor_version, 1, 'right minor version';
+$res2->parse($res->to_string);
+ok $res2->is_done, 'response is done';
+is $res2->code,    404, 'right status';
+is $res2->version, '1.1', 'right version';
+is $res2->at_least_version('1.0'), 1,     'at least version 1.0';
+is $res2->at_least_version('1.2'), undef, 'not version 1.2';
 is $res2->headers->content_length, 0, 'right "Content-Length" value';
 is defined $res2->cookie('foo'), 1, 'right value';
 is defined $res2->cookie('baz'), 1, 'right value';
@@ -1596,13 +1818,14 @@ $req->cookies(
     )
 );
 $req->body("Hello World!\n");
-ok !!$req->build, 'message built';
+ok !!$req->to_string, 'message built';
 my $req2 = Mojo::Message::Request->new;
-$req2->parse($req->build);
-ok $req2->is_done,       'request is done';
-is $req2->method,        'GET', 'right method';
-is $req2->major_version, 1, 'right major version';
-is $req2->minor_version, 1, 'right minor version';
+$req2->parse($req->to_string);
+ok $req2->is_done, 'request is done';
+is $req2->method,  'GET', 'right method';
+is $req2->version, '1.1', 'right version';
+is $req2->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req2->at_least_version('1.2'), undef, 'not version 1.2';
 is $req2->headers->expect, '100-continue', 'right "Expect" value';
 is $req2->headers->host,   '127.0.0.1',    'right "Host" value';
 is $req2->headers->content_length, 13, 'right "Content-Length" value';
@@ -1633,11 +1856,12 @@ $req->parse("est/23\x0d\x0a");
 $req->parse("Content-Length: 27\x0d\x0a\x0d\x0aHell");
 $req->parse("o World!\n1234\nlalalala\n");
 is $counter, 8, 'right count';
-ok $req->is_done,       'request is done';
-is $req->method,        'GET', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 0, 'right minor version';
-is $req->url,           '/foo/bar/baz.html?foo=13#23', 'right URL';
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.0', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
 is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $req->headers->content_length, 27, 'right "Content-Length" value';
 $cookies = $req->cookies;
@@ -1713,11 +1937,12 @@ $req->parse("POST / HTTP/1.0\x0d\x0a"
       . "Content-Disposition: form-data; name=\"submit\"\x0d\x0a\x0d\x0a"
       . "Сохранить"
       . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX--\x0d\x0a");
-ok $req->is_done,       'request is done';
-is $req->method,        'POST', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 0, 'right minor version';
-is $req->url,           '/', 'right URL';
+ok $req->is_done, 'request is done';
+is $req->method,  'POST', 'right method';
+is $req->version, '1.0', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/', 'right URL';
 is $req->cookie('mojolicious')->value,
   'BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQAAAB1c2VyBp6FjksAAAAABwA'
   . 'AAGV4cGlyZXM=--1641adddfe885276cda0deb7475f153a', 'right value';
@@ -1784,11 +2009,12 @@ $req->parse("POST / HTTP/1.0\x0d\x0a"
       . "Сохранить"
       . "\x0d\x0a-----------------------------2130907227147213000020304999"
       . "22--");
-ok $req->is_done,       'request is done';
-is $req->method,        'POST', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 0, 'right minor version';
-is $req->url,           '/', 'right URL';
+ok $req->is_done, 'request is done';
+is $req->method,  'POST', 'right method';
+is $req->version, '1.0', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/', 'right URL';
 is $req->cookie('mojolicious')->value,
   'BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQAAAB1c2VyBiWFjksAAAAABwA'
   . 'AAGV4cGlyZXM=--cd933a37999e0fa8d7804205e89193a7', 'right value';
@@ -1850,11 +2076,12 @@ $req->parse("POST / HTTP/1.0\x0d\x0a"
       . "Content-Disposition: form-data; name=\"submit\"\x0d\x0a\x0d\x0a"
       . "Сохранить"
       . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0--");
-ok $req->is_done,       'request is done';
-is $req->method,        'POST', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 0, 'right minor version';
-is $req->url,           '/', 'right URL';
+ok $req->is_done, 'request is done';
+is $req->method,  'POST', 'right method';
+is $req->version, '1.0', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/', 'right URL';
 is $req->cookie('mojolicious')->value,
   'BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQAAAB1c2VyBhaIjksAAAAABwA'
   . 'AAGV4cGlyZXM=--78a58a94f98ae5b75a489be1189f2672', 'right value';
@@ -1875,20 +2102,22 @@ is $upload->slurp,    '1234',             'right content';
 # Parse ~ in URL
 $req = Mojo::Message::Request->new;
 $req->parse("GET /~foobar/ HTTP/1.1\x0d\x0a\x0d\x0a");
-ok $req->is_done,       'request is done';
-is $req->method,        'GET', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 1, 'right minor version';
-is $req->url,           '/~foobar/', 'right URL';
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/~foobar/', 'right URL';
 
 # Parse : in URL
 $req = Mojo::Message::Request->new;
 $req->parse("GET /perldoc?Mojo::Message::Request HTTP/1.1\x0d\x0a\x0d\x0a");
-ok $req->is_done,       'request is done';
-is $req->method,        'GET', 'right method';
-is $req->major_version, 1, 'right major version';
-is $req->minor_version, 1, 'right minor version';
-is $req->url,           '/perldoc?Mojo::Message::Request', 'right URL';
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/perldoc?Mojo::Message::Request', 'right URL';
 
 # Body helper
 $req = Mojo::Message::Request->new;
@@ -1917,17 +2146,18 @@ is $req->body, 'hi!', 'right content';
 
 # Version management
 my $m = Mojo::Message->new;
-is $m->major_version, 1, 'major_version defaults to 1';
-is $m->minor_version, 1, 'minor_version defaults to 1';
-ok $m->at_least_version('1.1'), '1.1 passes at_least_version("1.1")';
-ok $m->at_least_version('1.0'), '1.1 passes at_least_version("1.0")';
-$m = Mojo::Message->new(minor_version => 0);
-is $m->minor_version, 0, 'minor_version set to 0';
-ok !$m->at_least_version('1.1'), '1.0 fails at_least_version("1.1")';
-ok $m->at_least_version('1.0'), '1.0 passes at_least_version("1.0")';
-$m = Mojo::Message->new(major_version => 0, minor_version => 9);
-ok !$m->at_least_version('1.0'), '0.9 fails at_least_version("1.0")';
-ok $m->at_least_version('0.9'), '0.9 passes at_least_version("0.9")';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+ok $m->at_least_version('1.1'), 'at least version 1.1';
+ok $m->at_least_version('1.0'), 'at least version 1.0';
+$m = Mojo::Message->new(version => '1.0');
+is $m->version, '1.0', 'right version';
+ok !$m->at_least_version('1.1'), 'not version 1.1';
+ok $m->at_least_version('1.0'), 'at least version 1.0';
+$m = Mojo::Message->new(version => '0.9');
+ok !$m->at_least_version('1.0'), 'not version 1.0';
+ok $m->at_least_version('0.9'), 'at least version 0.9';
 
 # "headers" chaining
 $req = Mojo::Message::Request->new->headers(Mojo::Headers->new);
@@ -1940,7 +2170,7 @@ $res->parse(
     "Content-Type: application/atom+xml; charset=UTF-8; type=feed\x0a");
 $res->parse("\x0a");
 $res->body('<p>foo <a href="/">bar</a><a href="/baz">baz</a></p>');
-ok $res->is_done, 'request is done';
+ok !$res->is_done, 'request is not done';
 is $res->headers->content_type,
   'application/atom+xml; charset=UTF-8; type=feed',
   'right "Content-Type" value';

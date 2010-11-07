@@ -31,14 +31,20 @@ __PACKAGE__->attr(trim_mark => '=');
 # Helpers
 my $HELPERS = <<'EOF';
 use Mojo::ByteStream 'b';
+use Mojo::Util;
 no strict 'refs'; no warnings 'redefine';
 sub block;
 *block = sub { shift->(@_) };
 sub escape;
 *escape = sub {
-    ref $_[0] && ref $_[0] eq 'Mojo::ByteStream'
-      ? "$_[0]"
-      : b($_[0])->xml_escape->to_string;
+    return "$_[0]" if ref $_[0] && ref $_[0] eq 'Mojo::ByteStream';
+    my $v;
+    {
+        no warnings 'uninitialized';
+        $v = "$_[0]";
+    }
+    Mojo::Util::xml_escape $v;
+    return $v;
 };
 use strict; use warnings;
 EOF
@@ -191,36 +197,40 @@ sub parse {
     my $capture_end   = quotemeta $self->capture_end;
 
     # DEPRECATED in Comet!
-    # Use "block" and "end" instead of "{" and "}"
+    # Use "begin" and "end" instead of "{" and "}"
     my $mixed_re = qr/
         (
-        $tag_start$expr$escp                 # Escaped expression
+        $tag_start$expr$escp\s*$capture_end   # Escaped expression (end)
         |
-        $tag_start$expr                      # Expression
+        $tag_start$expr$escp                  # Escaped expression
         |
-        $tag_start$cmnt\s*$capture_end       # Comment (end)
+        $tag_start$expr\s*$capture_end        # Expression (end)
         |
-        $tag_start$cmnt\}                    # DEPRECATED Comment (end)
+        $tag_start$expr                       # Expression
         |
-        $tag_start$cmnt                      # Comment
+        $tag_start$cmnt\s*$capture_end        # Comment (end)
         |
-        $tag_start\s*$capture_end            # Code (end)
+        $tag_start$cmnt\}                     # DEPRECATED Comment (end)
         |
-        $tag_start\}                         # DEPRECATED Code (end)
+        $tag_start$cmnt                       # Comment
         |
-        $tag_start                           # Code
+        $tag_start\s*$capture_end             # Code (end)
         |
-        $capture_start\s*$trim$tag_end       # Trim end (start)
+        $tag_start\}                          # DEPRECATED Code (end)
         |
-        \{$trim$tag_end                      # DEPRECATED Trim end (start)
+        $tag_start                            # Code
         |
-        $trim$tag_end                        # Trim end
+        $capture_start\s*$trim$tag_end        # Trim end (start)
         |
-        $capture_start\s*$tag_end            # End (start)
+        \{$trim$tag_end                       # DEPRECATED Trim end (start)
         |
-        \{$tag_end                           # DEPRECATED End (start)
+        $trim$tag_end                         # Trim end
         |
-        $tag_end                             # End
+        $capture_start\s*$tag_end             # End (start)
+        |
+        \{$tag_end                            # DEPRECATED End (start)
+        |
+        $tag_end                              # End
         )
     /x;
 
@@ -229,6 +239,12 @@ sub parse {
         ^(
         $tag_start        # Start
         )
+        (?:
+        $expr             # Expression
+        )?
+        (?:
+        $escp             # Escaped expression
+        )?
         (?:
         \s*$capture_end   # (end)
         |

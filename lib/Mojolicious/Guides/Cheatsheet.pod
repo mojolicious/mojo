@@ -161,6 +161,12 @@ operations but will also use more memory, defaults to C<262144>.
 
     MOJO_CHUNK_SIZE=1024
 
+=head2 C<MOJO_DNS_SERVER>
+
+C<DNS> server to use for non-blocking lookups.
+
+    MOJO_DNS_SERVER=8.8.8.8
+
 =head2 C<MOJO_EPOLL>
 
 Force epoll mainloop for IO operations.

@@ -9,7 +9,6 @@ use File::stat;
 use File::Spec;
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
-use Mojo::ByteStream 'b';
 use Mojo::Command;
 use Mojo::Content::Single;
 use Mojo::Path;

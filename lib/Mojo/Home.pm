@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use base 'Mojo::Base';
+use overload 'bool' => sub {1}, fallback => 1;
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
 use File::Spec;
@@ -113,6 +114,8 @@ sub list_files {
     return [sort @files];
 }
 
+# And now to create an unstoppable army of between one million and two
+# million zombies!
 sub parse {
     my ($self, $path) = @_;
     my @parts = File::Spec->splitdir($path);

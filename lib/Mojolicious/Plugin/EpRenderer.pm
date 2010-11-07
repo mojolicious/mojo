@@ -5,8 +5,8 @@ use warnings;
 
 use base 'Mojolicious::Plugin';
 
-use Mojo::ByteStream 'b';
 use Mojo::Template;
+use Mojo::Util 'md5_sum';
 
 # What do you want?
 # I'm here to kick your ass!
@@ -31,8 +31,7 @@ sub register {
             my $path = $r->template_path($options) || $options->{inline};
             return unless defined $path;
             my $list = join ', ', sort keys %{$c->stash};
-            my $cache = $options->{cache} =
-              b("$path($list)")->md5_sum->to_string;
+            my $cache = $options->{cache} = md5_sum "$path($list)";
 
             # Stash defaults
             $c->stash->{layout} ||= undef;

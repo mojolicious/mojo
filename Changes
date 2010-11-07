@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojolicious.
 0.999937 2010-11-04 00:00:00
         - Improved Mojo::Loader to allow Mojolicious recovering from tricky
           syntax errors in Controllers.
+        - Fixed a small inflate command bug.
 
 0.999936 2010-11-03 00:00:00
         - Improved Mojo::Template performance slightly. (kimoto)

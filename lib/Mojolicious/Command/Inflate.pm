@@ -44,9 +44,11 @@ sub run {
     # Generate
     my $all = $self->get_all_data($class);
     for my $file (keys %$all) {
-        my $prefix = $file =~ /\.\w+\.\w+$/ ? $templates : $public;
-        my $path = $self->rel_file("$prefix/$file");
-        $self->write_file($path, $all->{$file});
+        my $prefix  = $file =~ /\.\w+\.\w+$/ ? $templates : $public;
+        my $path    = $self->rel_file("$prefix/$file");
+        my $content = $all->{$file};
+        utf8::encode $content if utf8::is_utf8 $content;
+        $self->write_file($path, $content);
     }
 
     return $self;

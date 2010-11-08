@@ -426,9 +426,6 @@ Web development for humans, making hard things possible and everything fun.
         The time is <%= $hour %>:<%= $minute %>:<%= $second %>.
     <% end %>
 
-For more user friendly documentation see L<Mojolicious::Guides> and
-L<Mojolicious::Lite>.
-
 =head2 Have Some Cake
 
 Loosely coupled building blocks, use what you like and just ignore the rest.
@@ -449,11 +446,57 @@ Loosely coupled building blocks, use what you like and just ignore the rest.
     |  CGI  | |  FastCGI  | |  PSGI  | |  HTTP 1.1  | |  WebSocket  |
     '-------' '-----------' '--------' '------------' '-------------'
 
-=head2 Installation
+=head2 Highlights
 
-All you need is a oneliner.
+These are some of the most important building blocks of L<Mojolicious>.
 
-    curl -L cpanmin.us | perl - http://latest.mojolicio.us
+=over 4
+
+=item L<Mojolicious::Lite>
+
+Micro Web Framework built on top of L<Mojolicious> for prototypes and small
+applications.
+
+=item L<Mojo::Client>
+
+Full featured async io HTTP 1.1 and WebSocket client.
+
+=item L<Mojo::DOM>
+
+Very fun and minimalistic XML/HTML5 DOM parser with CSS3 selector support.
+
+=item L<Mojo::JSON>
+
+Minimalistic JSON implementation that just works.
+
+=item L<Mojo::Server::Daemon>
+
+Full featured async io HTTP 1.1 and WebSocket server.
+
+=item L<Mojo::Server::CGI>, L<Mojo::Server::FastCGI>, L<Mojo::Server::PSGI>
+
+Transparent CGI, FastCGI and PSGI support out of the box.
+
+=item L<Mojo::Template>
+
+A minimalstic and very perlish template system.
+
+=item L<Mojo::ByteStream>
+
+Countless portable and very convenient bytestream manipulation methods.
+
+=item L<Test::Mojo>
+
+Test driven development toolkit for web applications.
+
+=item L<ojo>
+
+Fun oneliners using everything above.
+
+=back
+
+For more documentation see L<Mojolicious::Guides> and the tutorial in
+L<Mojolicious::Lite>!
 
 =head1 ATTRIBUTES
 

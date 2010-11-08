@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 0.999937 2010-11-04 00:00:00
+        - Added important module overview to Mojolicious. (rhaen)
         - Improved Mojo::Loader to allow Mojolicious recovering from tricky
           syntax errors in Controllers.
         - Fixed a small inflate command bug.

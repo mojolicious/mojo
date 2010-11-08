@@ -910,11 +910,10 @@ sub _connect {
         %{$args->{args} || {}}
     );
 
-    # DEPRECATED in Hot Beverage! (socket argument)
+    # Socket
     my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';
     return $self->_error($id, "Couldn't connect.")
-      unless my $socket = $args->{handle}
-          || $args->{socket}
+      unless my $socket = $args->{socket}
           || $class->new(%options);
     $c->{socket} = $socket;
     $self->{_reverse}->{$socket} = $id;
@@ -1508,7 +1507,7 @@ __END__
 
 =head1 NAME
 
-Mojo::IOLoop - Minimalistic Reactor For Non-Blocking TCP Clients And Servers
+Mojo::IOLoop - Minimalistic Reactor For Async TCP Clients And Servers
 
 =head1 SYNOPSIS
 
@@ -1563,8 +1562,8 @@ Mojo::IOLoop - Minimalistic Reactor For Non-Blocking TCP Clients And Servers
 =head1 DESCRIPTION
 
 L<Mojo::IOLoop> is a very minimalistic reactor that has been reduced to the
-absolute minimal feature set required to build solid and scalable
-non-blocking TCP clients and servers.
+absolute minimal feature set required to build solid and scalable async TCP
+clients and servers.
 
 Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::IP> and
 L<IO::Socket::SSL> are supported transparently and used if installed.
@@ -1714,10 +1713,6 @@ These options are currently available.
 
 Address or host name of the peer to connect to.
 
-=item C<handle>
-
-Use an already prepared handle.
-
 =item C<on_connect>
 
 Callback to be invoked once the connection is established.
@@ -1741,6 +1736,10 @@ Port to connect to.
 =item C<proto>
 
 Protocol to use, defaults to C<tcp>.
+
+=item C<socket>
+
+Use an already prepared socket handle.
 
 =item C<tls>
 

@@ -617,7 +617,7 @@ sub _connect {
         $id = $loop->connect(
             address => $address,
             port    => $port,
-            handle  => $id,
+            socket  => $id,
             tls     => $scheme eq 'https' ? 1 : 0,
             on_connect => sub { $self->_connected($_[1]) },
             on_error   => sub { $self->_error(@_) },

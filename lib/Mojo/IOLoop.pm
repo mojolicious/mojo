@@ -910,10 +910,12 @@ sub _connect {
         %{$args->{args} || {}}
     );
 
-    # Socket
+    # DEPRECATED in Hot Beverage! (socket argument)
     my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';
     return $self->_error($id, "Couldn't connect.")
-      unless my $socket = $args->{socket} || $class->new(%options);
+      unless my $socket = $args->{handle}
+          || $args->{socket}
+          || $class->new(%options);
     $c->{socket} = $socket;
     $self->{_reverse}->{$socket} = $id;
 
@@ -1712,6 +1714,10 @@ These options are currently available.
 
 Address or host name of the peer to connect to.
 
+=item C<handle>
+
+Use an already prepared handle.
+
 =item C<on_connect>
 
 Callback to be invoked once the connection is established.
@@ -1735,10 +1741,6 @@ Port to connect to.
 =item C<proto>
 
 Protocol to use, defaults to C<tcp>.
-
-=item C<socket>
-
-Use an already prepared socket handle.
 
 =item C<tls>
 

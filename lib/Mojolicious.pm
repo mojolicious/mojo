@@ -479,11 +479,15 @@ Transparent CGI, FastCGI and PSGI support out of the box.
 
 =item L<Mojo::Template>
 
-A minimalstic and very perlish template system.
+Very perlish and minimalistic template system.
 
 =item L<Mojo::ByteStream>
 
 Countless portable and very convenient bytestream manipulation methods.
+
+=item L<Mojo::Commands>, L<Mojolicious::Commands>
+
+A pluggable command line system for L<Mojolicious> applications.
 
 =item L<Test::Mojo>
 

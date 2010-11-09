@@ -49,6 +49,8 @@ Mojolicious::Plugin::AgentCondition - Agent Condition Plugin
 
 L<Mojolicous::Plugin::AgentCondition> is a routes condition for user agent
 based routes.
+This is a core plugin, that means it is always enabled and its code a good
+example for learning to build new plugins.
 
 =head1 METHODS
 

@@ -55,6 +55,8 @@ Mojolicious::Plugin::RequestTimer - Request Timer Plugin
 
 L<Mojolicous::Plugin::RequestTimer> is a plugin to gather and log request
 timing information.
+This is a core plugin, that means it is always enabled and its code a good
+example for learning to build new plugins.
 
 =head1 METHODS
 

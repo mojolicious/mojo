@@ -1034,13 +1034,19 @@ Write dynamic content chunk wise with the C<chunked> C<Transfer-Encoding>
 which doesn't require a C<Content-Length> header, the optional drain callback
 will be invoked once all data has been written to the kernel send buffer or
 equivalent.
-An empty chunk marks the end of the stream.
+Note that this method is EXPERIMENTAL and might change without warning!
 
     $c->write_chunk('Hel');
     $c->write_chunk('lo!');
     $c->write_chunk('');
 
-Note that this method is EXPERIMENTAL and might change without warning!
+An empty chunk marks the end of the stream.
+
+    3
+    Hel
+    3
+    lo!
+    0
 
 =head1 SEE ALSO
 

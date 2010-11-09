@@ -37,7 +37,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 44;
+use Test::More tests => 47;
 
 use Mojo;
 use Mojo::Transaction::HTTP;
@@ -125,6 +125,10 @@ $c->param(capture => 'bye');
 is $c->param('controller'), 'foo', 'right value';
 is $c->param('action'),     'bar', 'right value';
 is $c->param('capture'),    'bye', 'right value';
+$c->param(capture => undef);
+is $c->param('controller'), 'foo', 'right value';
+is $c->param('action'),     'bar', 'right value';
+is $c->param('capture'),    undef, 'no value';
 ok $c->render_called, 'rendered';
 
 # Escaping

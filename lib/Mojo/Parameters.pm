@@ -306,9 +306,10 @@ Merge parameters.
 
 =head2 C<param>
 
-    my $foo = $params->param('foo');
-    my @foo = $params->param('foo');
-    my $foo = $params->param(foo => 'ba;r');
+    my @names = $params->param;
+    my $foo   = $params->param('foo');
+    my @foo   = $params->param('foo');
+    my $foo   = $params->param(foo => 'ba;r');
 
 Check parameter values.
 

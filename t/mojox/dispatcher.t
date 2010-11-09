@@ -37,7 +37,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 47;
+use Test::More tests => 67;
 
 use Mojo;
 use Mojo::Transaction::HTTP;
@@ -121,14 +121,37 @@ is ref $c->stash->{'mojo.captures'}, 'HASH', 'right captures';
 is $c->param('controller'), 'foo',   'right value';
 is $c->param('action'),     'bar',   'right value';
 is $c->param('capture'),    'hello', 'right value';
+is_deeply [$c->param], [qw/action capture controller/], 'right names';
 $c->param(capture => 'bye');
 is $c->param('controller'), 'foo', 'right value';
 is $c->param('action'),     'bar', 'right value';
 is $c->param('capture'),    'bye', 'right value';
+is_deeply [$c->param], [qw/action capture controller/], 'right names';
 $c->param(capture => undef);
 is $c->param('controller'), 'foo', 'right value';
 is $c->param('action'),     'bar', 'right value';
 is $c->param('capture'),    undef, 'no value';
+is_deeply [$c->param], [qw/action capture controller/], 'right names';
+$c->req->param(foo => 'bar');
+is $c->param('controller'), 'foo', 'right value';
+is $c->param('action'),     'bar', 'right value';
+is $c->param('capture'),    undef, 'no value';
+is $c->param('foo'),        'bar', 'right value';
+is_deeply [$c->param], [qw/action capture controller foo/], 'right names';
+$c->req->param(bar => 'baz');
+is $c->param('controller'), 'foo', 'right value';
+is $c->param('action'),     'bar', 'right value';
+is $c->param('capture'),    undef, 'no value';
+is $c->param('foo'),        'bar', 'right value';
+is $c->param('bar'),        'baz', 'right value';
+is_deeply [$c->param], [qw/action bar capture controller foo/], 'right names';
+$c->req->param(action => 'baz');
+is $c->param('controller'), 'foo', 'right value';
+is $c->param('action'),     'bar', 'right value';
+is $c->param('capture'),    undef, 'no value';
+is $c->param('foo'),        'bar', 'right value';
+is $c->param('bar'),        'baz', 'right value';
+is_deeply [$c->param], [qw/action bar capture controller foo/], 'right names';
 ok $c->render_called, 'rendered';
 
 # Escaping

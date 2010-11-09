@@ -16,6 +16,12 @@ sub param {
     # Captures
     my $p = $self->stash->{'mojo.captures'} || {};
 
+    # List
+    unless (defined $name) {
+        my %seen;
+        return sort grep { !$seen{$_}++ } keys %$p, $self->req->param;
+    }
+
     # Override value
     if (@_) {
         $p->{$name} = $_[0];
@@ -63,9 +69,10 @@ L<MojoX::Session::Cookie::Controller> and implements the following new ones.
 
 =head2 C<param>
 
-    my $foo = $c->param('foo');
-    my @foo = $c->param('foo');
-    $c      = $c->param(foo => 'ba;r');
+    my @names = $c->param;
+    my $foo   = $c->param('foo');
+    my @foo   = $c->param('foo');
+    $c        = $c->param(foo => 'ba;r');
 
 Request parameters and routes captures.
 

@@ -37,7 +37,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 41;
+use Test::More tests => 44;
 
 use Mojo;
 use Mojo::Transaction::HTTP;
@@ -121,6 +121,10 @@ is ref $c->stash->{'mojo.captures'}, 'HASH', 'right captures';
 is $c->param('controller'), 'foo',   'right value';
 is $c->param('action'),     'bar',   'right value';
 is $c->param('capture'),    'hello', 'right value';
+$c->param(capture => 'bye');
+is $c->param('controller'), 'foo', 'right value';
+is $c->param('action'),     'bar', 'right value';
+is $c->param('capture'),    'bye', 'right value';
 ok $c->render_called, 'rendered';
 
 # Escaping

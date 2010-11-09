@@ -10,13 +10,22 @@ __PACKAGE__->attr('match');
 # Just make a simple cake. And this time, if someone's going to jump out of
 # it make sure to put them in *after* you cook it.
 sub param {
-    my ($self, $name) = @_;
+    my $self = shift;
+    my $name = shift;
 
     # Captures
     my $p = $self->stash->{'mojo.captures'} || {};
+
+    # Override value
+    if (@_) {
+        $p->{$name} = $_[0];
+        return $self;
+    }
+
+    # Captured value
     return $p->{$name} if exists $p->{$name};
 
-    # Params
+    # Param value
     return $self->req->param($name);
 }
 
@@ -54,8 +63,9 @@ L<MojoX::Session::Cookie::Controller> and implements the following new ones.
 
 =head2 C<param>
 
-    my $param  = $c->param('foo');
-    my @params = $c->param('foo');
+    my $foo = $c->param('foo');
+    my @foo = $c->param('foo');
+    $c      = $c->param(foo => 'ba;r');
 
 Request parameters and routes captures.
 

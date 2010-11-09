@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 951;
+use Test::More tests => 952;
 
 use File::Spec;
 use File::Temp;
@@ -2117,7 +2117,8 @@ is $req->method,  'GET', 'right method';
 is $req->version, '1.1', 'right version';
 is $req->at_least_version('1.0'), 1,     'at least version 1.0';
 is $req->at_least_version('1.2'), undef, 'not version 1.2';
-is $req->url, '/perldoc?Mojo::Message::Request', 'right URL';
+is $req->url, '/perldoc?Mojo%3A%3AMessage%3A%3ARequest', 'right URL';
+is $req->url->query->params->[0], 'Mojo::Message::Request', 'right value';
 
 # Body helper
 $req = Mojo::Message::Request->new;

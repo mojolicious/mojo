@@ -19,9 +19,6 @@ our $UNRESERVED = 'A-Za-z0-9\-\.\_\~';
 our $SUBDELIM   = '!\$\&\'\(\)\*\+\,\;\=';
 our $PCHAR      = "$UNRESERVED$SUBDELIM\%\:\@";
 
-# The specs for this are blurry, it's mostly a collection of w3c suggestions
-our $PARAM = "$UNRESERVED\!\$\'\(\)\*\,\:\@\/\?";
-
 # IPv4 regex (RFC 3986)
 my $DEC_OCTET_RE = qr/(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])/;
 our $IPV4_RE = qr/$DEC_OCTET_RE\.$DEC_OCTET_RE\.$DEC_OCTET_RE\.$DEC_OCTET_RE/;

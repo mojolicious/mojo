@@ -214,10 +214,10 @@ sub to_string {
 
         # *( pchar / "/" / "?" ) with the exception of ";", "&" and "="
         encode $charset, $name if $charset;
-        url_escape $name, $Mojo::URL::PARAM;
+        url_escape $name, $Mojo::URL::UNRESERVED;
         if ($value) {
             encode $charset, $value if $charset;
-            url_escape $value, $Mojo::URL::PARAM;
+            url_escape $value, $Mojo::URL::UNRESERVED;
         }
 
         # Replace whitespace with "+"

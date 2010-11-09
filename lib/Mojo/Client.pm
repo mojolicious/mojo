@@ -188,7 +188,7 @@ sub build_form_tx {
                 # Filename
                 $filename = delete $f->{filename} || $name;
                 encode $encoding, $filename if $encoding;
-                url_escape $filename, $Mojo::URL::PARAM;
+                url_escape $filename, $Mojo::URL::UNRESERVED;
 
                 # Asset
                 $part->asset(delete $f->{file});
@@ -213,7 +213,7 @@ sub build_form_tx {
 
             # Content-Disposition
             encode $encoding, $name if $encoding;
-            url_escape $name, $Mojo::URL::PARAM;
+            url_escape $name, $Mojo::URL::UNRESERVED;
             my $disposition = qq/form-data; name="$name"/;
             $disposition .= qq/; filename="$filename"/ if $filename;
             $h->content_disposition($disposition);

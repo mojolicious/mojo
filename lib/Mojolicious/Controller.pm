@@ -773,12 +773,11 @@ A L<Mojo::Client> prepared for the current environment.
         $c->render_data($client->res->body);
     })->start;
 
-For async processing you can use C<finish>.
+Some environments such as L<Mojo::Server::Daemon> even allow async requests.
 
     $c->client->async->get('http://mojolicious.org' => sub {
         my $client = shift;
         $c->render_data($client->res->body);
-        $c->finish;
     })->start;
 
 =head2 C<cookie>

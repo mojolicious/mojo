@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+0.999938 2010-11-09 00:00:00
+        - Fixed typo.
+
 0.999937 2010-11-09 00:00:00
         - Deprecated the MojoX namespace merged affected modules into the
           Mojolicious namespace, this will make reference documentation a lot

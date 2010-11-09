@@ -485,7 +485,7 @@ Very perlish and minimalistic template system.
 
 Countless portable and very convenient bytestream manipulation methods.
 
-=item L<Mojo::Commands>, L<Mojolicious::Commands>
+=item L<Mojolicious::Commands>
 
 Pluggable command line system and the backbone of the C<mojo> script.
 

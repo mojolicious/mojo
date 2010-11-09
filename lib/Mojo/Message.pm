@@ -771,8 +771,8 @@ Access message cookies.
     my $dom        = $message->dom;
     my $collection = $message->dom('a[href]');
 
-Parses content into a L<Mojo::DOM> object and takes an optional selector to
-perform a find on it right away.
+Turns content into a L<Mojo::DOM> object and takes an optional selector to
+perform a C<find> on it right away, which returns a collection.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<error>

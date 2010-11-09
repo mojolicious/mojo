@@ -1394,9 +1394,9 @@ Children of element.
 
 =head2 C<find>
 
-    my $results = $dom->find('html title');
+    my $collection = $dom->find('html title');
 
-Find elements with CSS3 selectors.
+Find elements with CSS3 selectors and return a collection.
 
     print $dom->find('div')->[23]->text;
     $dom->find('div')->each(sub { print shift->text });

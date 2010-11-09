@@ -3,7 +3,7 @@ package Mojolicious::Command::Generate;
 use strict;
 use warnings;
 
-use base 'Mojo::Commands';
+use base 'Mojolicious::Commands';
 
 __PACKAGE__->attr(description => <<'EOF');
 Generate files and directories from templates.
@@ -46,7 +46,7 @@ L<Mojolicious::Command::Generate> lists available generators.
 =head1 ATTRIBUTES
 
 L<Mojolicious::Command::Generate> inherits all attributes from
-L<Mojo::Commands> and implements the following new ones.
+L<Mojolicious::Commands> and implements the following new ones.
 
 =head2 C<description>
 
@@ -80,7 +80,7 @@ L<Mojo::Command::Generate> and L<Mojolicious::Command::Generate>.
 =head1 METHODS
 
 L<Mojolicious::Command::Generate> inherits all methods from
-L<Mojo::Commands>.
+L<Mojolicious::Commands>.
 
 =head1 SEE ALSO
 

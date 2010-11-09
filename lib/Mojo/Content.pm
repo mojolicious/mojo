@@ -68,6 +68,8 @@ sub build_headers {
     return $headers;
 }
 
+# Aren't we forgetting the true meaning of Christmas?
+# You know, the birth of Santa.
 sub finish { shift->{_eof} = 1 }
 
 sub generate_body_chunk {

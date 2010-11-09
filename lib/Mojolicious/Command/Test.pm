@@ -1,4 +1,4 @@
-package Mojo::Command::Test;
+package Mojolicious::Command::Test;
 
 use strict;
 use warnings;
@@ -72,23 +72,23 @@ __END__
 
 =head1 NAME
 
-Mojo::Command::Test - Test Command
+Mojolicious::Command::Test - Test Command
 
 =head1 SYNOPSIS
 
-    use Mojo::Command::Test;
+    use Mojolicious::Command::Test;
 
-    my $test = Mojo::Command::Test->new;
+    my $test = Mojolicious::Command::Test->new;
     $test->run(@ARGV);
 
 =head1 DESCRIPTION
 
-L<Mojo::Command::Test> is a test script.
+L<Mojolicious::Command::Test> is a test script.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Command::Test> inherits all attributes from L<Mojo::Command> and
-implements the following new ones.
+L<Mojolicious::Command::Test> inherits all attributes from L<Mojo::Command>
+and implements the following new ones.
 
 =head2 C<description>
 
@@ -106,7 +106,7 @@ Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
-L<Mojo::Command::Test> inherits all methods from L<Mojo::Command> and
+L<Mojolicious::Command::Test> inherits all methods from L<Mojo::Command> and
 implements the following new ones.
 
 =head2 C<run>

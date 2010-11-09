@@ -1,4 +1,4 @@
-package Mojo::Command::Get;
+package Mojolicious::Command::Get;
 
 use strict;
 use warnings;
@@ -73,23 +73,23 @@ __END__
 
 =head1 NAME
 
-Mojo::Command::Get - Get Command
+Mojolicious::Command::Get - Get Command
 
 =head1 SYNOPSIS
 
-    use Mojo::Command::Get;
+    use Mojolicious::Command::Get;
 
-    my $get = Mojo::Command::Get->new;
+    my $get = Mojolicious::Command::Get->new;
     $get->run(@ARGV);
 
 =head1 DESCRIPTION
 
-L<Mojo::Command::Get> is a command interface to L<Mojo::Client>.
+L<Mojolicious::Command::Get> is a command interface to L<Mojo::Client>.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Command::Get> inherits all attributes from L<Mojo::Command> and
-implements the following new ones.
+L<Mojolicious::Command::Get> inherits all attributes from L<Mojo::Command>
+and implements the following new ones.
 
 =head2 C<description>
 
@@ -107,8 +107,8 @@ Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
-L<Mojo::Command::Get> inherits all methods from L<Mojo::Command> and implements
-the following new ones.
+L<Mojolicious::Command::Get> inherits all methods from L<Mojo::Command> and
+implements the following new ones.
 
 =head2 C<run>
 

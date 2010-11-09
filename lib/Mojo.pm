@@ -7,7 +7,6 @@ use base 'Mojo::Base';
 
 use Carp 'croak';
 use Mojo::Client;
-use Mojo::Commands;
 use Mojo::Home;
 use Mojo::Log;
 use Mojo::Transaction::HTTP;
@@ -52,20 +51,6 @@ sub new {
 }
 
 sub handler { croak 'Method "handler" not implemented in subclass' }
-
-# Start command system
-sub start {
-    my $class = shift;
-
-    # We can be called on class or instance
-    $class = ref $class || $class;
-
-    # We are the application
-    $ENV{MOJO_APP} ||= $class;
-
-    # Start!
-    return Mojo::Commands->start(@_);
-}
 
 1;
 __END__
@@ -170,13 +155,6 @@ or L<Mojo::Transaction::WebSocket> object.
     sub handler {
         my ($self, $tx) = @_;
     }
-
-=head2 C<start>
-
-    Mojo->start;
-    Mojo->start('daemon');
-
-Start the L<Mojo::Commands> command line interface for your application.
 
 =head1 SEE ALSO
 

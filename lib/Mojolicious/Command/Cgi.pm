@@ -1,4 +1,4 @@
-package Mojo::Command::Cgi;
+package Mojolicious::Command::Cgi;
 
 use strict;
 use warnings;
@@ -39,23 +39,23 @@ __END__
 
 =head1 NAME
 
-Mojo::Command::Cgi - CGI Command
+Mojolicious::Command::Cgi - CGI Command
 
 =head1 SYNOPSIS
 
-    use Mojo::Command::CGI;
+    use Mojolicious::Command::CGI;
 
-    my $cgi = Mojo::Command::CGI->new;
+    my $cgi = Mojolicious::Command::CGI->new;
     $cgi->run(@ARGV);
 
 =head1 DESCRIPTION
 
-L<Mojo::Command::Cgi> is a command interface to L<Mojo::Server::CGI>.
+L<Mojolicious::Command::Cgi> is a command interface to L<Mojo::Server::CGI>.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Command::Cgi> inherits all attributes from L<Mojo::Command> and
-implements the following new ones.
+L<Mojolicious::Command::Cgi> inherits all attributes from L<Mojo::Command>
+and implements the following new ones.
 
 =head2 C<description>
 
@@ -73,8 +73,8 @@ Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
-L<Mojo::Command::Cgi> inherits all methods from L<Mojo::Command> and implements
-the following new ones.
+L<Mojolicious::Command::Cgi> inherits all methods from L<Mojo::Command> and
+implements the following new ones.
 
 =head2 C<run>
 

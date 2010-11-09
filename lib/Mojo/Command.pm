@@ -278,7 +278,8 @@ Mojo::Command - Command Base Class
 =head1 DESCRIPTION
 
 L<Mojo::Command> is an abstract base class for L<Mojo> commands.
-See L<Mojo::Commands> for a list of commands that are available by default.
+See L<Mojolicious::Commands> for a list of commands that are available by
+default.
 
 =head1 ATTRIBUTES
 

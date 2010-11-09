@@ -1,4 +1,4 @@
-package Mojo::Command::Psgi;
+package Mojolicious::Command::Psgi;
 
 use strict;
 use warnings;
@@ -34,23 +34,24 @@ __END__
 
 =head1 NAME
 
-Mojo::Command::Psgi - PSGI Command
+Mojolicious::Command::Psgi - PSGI Command
 
 =head1 SYNOPSIS
 
-    use Mojo::Command::Psgi;
+    use Mojolicious::Command::Psgi;
 
-    my $psgi = Mojo::Command::Psgi->new;
+    my $psgi = Mojolicious::Command::Psgi->new;
     my $app = $psgi->run;
 
 =head1 DESCRIPTION
 
-L<Mojo::Command::Psgi> is a command interface to L<Mojo::Server::PSGI>.
+L<Mojolicious::Command::Psgi> is a command interface to
+L<Mojo::Server::PSGI>.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Command::Psgi> inherits all attributes from L<Mojo::Command> and
-implements the following new ones.
+L<Mojolicious::Command::Psgi> inherits all attributes from L<Mojo::Command>
+and implements the following new ones.
 
 =head2 C<description>
 
@@ -68,7 +69,7 @@ Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
-L<Mojo::Command::Psgi> inherits all methods from L<Mojo::Command> and
+L<Mojolicious::Command::Psgi> inherits all methods from L<Mojo::Command> and
 implements the following new ones.
 
 =head2 C<run>

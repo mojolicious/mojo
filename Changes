@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojolicious.
 0.999938 2010-11-09 00:00:00
         - Moved all commands into the Mojolicious namespace.
         - Fixed typo.
+        - Removed OS X resource fork files.
 
 0.999937 2010-11-09 00:00:00
         - Deprecated the MojoX namespace and merged affected modules into the

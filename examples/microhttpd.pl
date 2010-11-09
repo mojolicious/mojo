@@ -33,7 +33,7 @@ $loop->listen(
         $buffer->{$id} .= $chunk;
 
         # Check if we got start line and headers (no body support)
-        if (index $buffer->{$id}, "\x0d\x0a\x0d\x0a") {
+        if (index($buffer->{$id}, "\x0d\x0a\x0d\x0a") >= 0) {
 
             # Clean buffer
             delete $buffer->{$id};

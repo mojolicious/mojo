@@ -35,7 +35,7 @@ __PACKAGE__->attr(static  => sub { Mojolicious::Static->new });
 __PACKAGE__->attr(types   => sub { Mojolicious::Types->new });
 
 our $CODENAME = 'Hot Beverage';
-our $VERSION  = '0.999938';
+our $VERSION  = '0.999939';
 
 our $AUTOLOAD;
 

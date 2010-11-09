@@ -1121,8 +1121,8 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
     my $client = Mojo::Client->new;
 
     # Grab the latest Mojolicious release :)
-    my $latest = 'http://mojolicious.org/Mojolicious-latest.tar.gz';
-    print $client->get($latest)->res->body;
+    my $latest = 'http://latest.mojolicio.us';
+    print $client->max_redirects(3)->get($latest)->res->body;
 
     # Quick JSON request
     my $trends = 'http://search.twitter.com/trends.json';

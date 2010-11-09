@@ -1,6 +1,9 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 0.999937 2010-11-04 00:00:00
+        - Deprecated the MojoX namespace merged affected modules into the
+          Mojolicious namespace, this will make reference documentation a lot
+          more accessible.
         - Added important module overview to Mojolicious. (rhaen)
         - Improved Mojo::Loader to allow Mojolicious recovering from tricky
           syntax errors in Controllers.

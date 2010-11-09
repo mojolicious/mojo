@@ -5,7 +5,7 @@ package Test::Foo;
 use strict;
 use warnings;
 
-use base 'MojoX::Dispatcher::Routes::Controller';
+use base 'Mojolicious::Controller';
 
 sub bar  {1}
 sub home {1}
@@ -15,7 +15,7 @@ package Test::Controller;
 use strict;
 use warnings;
 
-use base 'MojoX::Dispatcher::Routes::Controller';
+use base 'Mojolicious::Controller';
 
 __PACKAGE__->attr('render_called');
 
@@ -41,10 +41,10 @@ use Test::More tests => 67;
 
 use Mojo;
 use Mojo::Transaction::HTTP;
-use MojoX::Dispatcher::Routes;
-use MojoX::Dispatcher::Routes::Controller;
+use Mojolicious::Controller;
+use Mojolicious::Routes;
 
-my $c = MojoX::Dispatcher::Routes::Controller->new;
+my $c = Mojolicious::Controller->new;
 
 # Set
 $c->stash(foo => 'bar');
@@ -88,7 +88,7 @@ is_deeply $stash, {a => 1, b => 2}, 'set via hashref';
 $c = Test::Controller->new(app => Mojo->new);
 $c->app->log->path(undef);
 $c->app->log->level('fatal');
-my $d = MojoX::Dispatcher::Routes->new;
+my $d = Mojolicious::Routes->new;
 ok $d, 'initialized';
 
 $d->namespace('Test');

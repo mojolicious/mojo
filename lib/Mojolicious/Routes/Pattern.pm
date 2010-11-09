@@ -1,11 +1,11 @@
-package MojoX::Routes::Pattern;
+package Mojolicious::Routes::Pattern;
 
 use strict;
 use warnings;
 
 use base 'Mojo::Base';
 
-use constant DEBUG => $ENV{MOJOX_ROUTES_DEBUG} || 0;
+use constant DEBUG => $ENV{MOJO_ROUTES_DEBUG} || 0;
 
 __PACKAGE__->attr(defaults => sub { {} });
 __PACKAGE__->attr([qw/format pattern regex/]);
@@ -317,23 +317,20 @@ __END__
 
 =head1 NAME
 
-MojoX::Routes::Pattern - Routes Pattern
+Mojolicious::Routes::Pattern - Routes Pattern
 
 =head1 SYNOPSIS
 
-    use MojoX::Routes::Pattern;
-
-    # New pattern object
-    my $pattern = MojoX::Routes::Pattern->new;
+    use Mojolicious::Routes::Pattern;
 
 =head1 DESCRIPTION
 
-L<MojoX::Routes::Pattern> is a container for routes pattern which are used to
-match paths against.
+L<Mojolicious::Routes::Pattern> is a container for routes pattern which are
+used to match paths against.
 
 =head1 ATTRIBUTES
 
-L<MojoX::Routes::Pattern> implements the following attributes.
+L<Mojolicious::Routes::Pattern> implements the following attributes.
 
 =head2 C<defaults>
 
@@ -414,12 +411,12 @@ Character indicating the start of a wildcard placeholder, defaults to C<*>.
 
 =head1 METHODS
 
-L<MojoX::Routes::Pattern> inherits all methods from L<Mojo::Base> and
+L<Mojolicious::Routes::Pattern> inherits all methods from L<Mojo::Base> and
 implements the following ones.
 
 =head2 C<new>
 
-    my $pattern = MojoX::Routes::Pattern->new('/:controller/:action',
+    my $pattern = Mojolicious::Routes::Pattern->new('/:controller/:action',
         action => qr/\w+/
     );
 

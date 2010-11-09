@@ -1,18 +1,26 @@
-package MojoX::Routes;
+package Mojolicious::Routes;
 
 use strict;
 use warnings;
 
 use base 'Mojo::Base';
 
+use Mojo::Exception;
+use Mojo::Loader;
 use Mojo::URL;
-use MojoX::Routes::Pattern;
+use Mojo::Util 'camelize';
+use Mojolicious::Routes::Match;
+use Mojolicious::Routes::Pattern;
 use Scalar::Util 'weaken';
 
 __PACKAGE__->attr([qw/block inline parent partial/]);
 __PACKAGE__->attr([qw/children conditions/] => sub { [] });
-__PACKAGE__->attr(dictionary                => sub { {} });
-__PACKAGE__->attr(pattern => sub { MojoX::Routes::Pattern->new });
+__PACKAGE__->attr(controller_base_class => 'Mojolicious::Controller');
+__PACKAGE__->attr(dictionary => sub { {} });
+__PACKAGE__->attr(hidden => sub { [qw/new app attr render req res stash tx/] }
+);
+__PACKAGE__->attr('namespace');
+__PACKAGE__->attr(pattern => sub { Mojolicious::Routes::Pattern->new });
 
 # Yet thanks to my trusty safety sphere,
 # I sublibed with only tribial brain dablage.
@@ -80,7 +88,84 @@ sub add_condition {
     return $self;
 }
 
+# Hey. What kind of party is this? There's no booze and only one hooker.
+sub auto_render {
+    my ($self, $c) = @_;
+
+    # Transaction
+    my $tx = $c->tx;
+
+    # Rendering
+    my $success = eval {
+
+        # Render
+        $c->render unless $c->stash->{'mojo.rendered'} || $tx->is_websocket;
+
+        # Success
+        1;
+    };
+
+    # Renderer error
+    $c->render_exception($@) if !$success && $@;
+
+    # Rendered
+    return;
+}
+
 sub bridge { shift->route(@_)->inline(1) }
+
+sub detour {
+    my $self = shift;
+
+    # Partial
+    $self->partial('path');
+
+    # Defaults
+    $self->to(@_);
+
+    return $self;
+}
+
+sub dispatch {
+    my ($self, $c) = @_;
+
+    # Response
+    my $res = $c->res;
+
+    # Already rendered
+    return if $res->code;
+
+    # Path
+    my $path = $c->stash->{path};
+    $path = "/$path" if defined $path && $path !~ /^\//;
+
+    # Match
+    my $m = Mojolicious::Routes::Match->new($c, $path);
+    $m->match($self);
+    $c->match($m);
+
+    # No match
+    return 1 unless $m && @{$m->stack};
+
+    # Status
+    unless ($res->code) {
+
+        # Websocket handshake
+        $res->code(101) if !$res->code && $c->tx->is_websocket;
+
+        # Error or 200
+        my ($error, $code) = $c->req->error;
+        $res->code($code) if $code;
+    }
+
+    # Walk the stack
+    return 1 if $self->_walk_stack($c);
+
+    # Render
+    return $self->auto_render($c);
+}
+
+sub hide { push @{shift->hidden}, @_ }
 
 sub is_endpoint {
     my $self = shift;
@@ -270,19 +355,245 @@ sub websocket {
     return $self;
 }
 
+sub _dispatch_callback {
+    my ($self, $c, $staging) = @_;
+
+    # Debug
+    $c->app->log->debug(qq/Dispatching callback./);
+
+    # Dispatch
+    my $continue;
+    my $cb      = $c->match->captures->{cb};
+    my $success = eval {
+
+        # Callback
+        $continue = $cb->($c);
+
+        # Success
+        1;
+    };
+
+    # Callback error
+    if (!$success && $@) {
+        my $e = Mojo::Exception->new($@);
+        $c->app->log->error($e);
+        return $e;
+    }
+
+    # Success!
+    return 1 unless $staging;
+    return 1 if $continue;
+
+    return;
+}
+
+sub _dispatch_controller {
+    my ($self, $c, $staging) = @_;
+
+    # Application
+    my $app = $c->match->captures->{app};
+
+    # Class
+    $app ||= $self->_generate_class($c);
+    return 1 unless $app;
+
+    # Method
+    my $method = $self->_generate_method($c);
+
+    # Debug
+    my $dispatch = ref $app || $app;
+    $dispatch .= "->$method" if $method;
+    $c->app->log->debug("Dispatching $dispatch.");
+
+    # Load class
+    unless (ref $app && $self->{_loaded}->{$app}) {
+
+        # Load
+        if (my $e = Mojo::Loader->load($app)) {
+
+            # Doesn't exist
+            unless (ref $e) {
+                $c->app->log->debug("$app does not exist, maybe a typo?");
+                return;
+            }
+
+            # Error
+            $c->app->log->error($e);
+            return $e;
+        }
+
+        # Loaded
+        $self->{_loaded}->{$app}++;
+    }
+
+    # Dispatch
+    my $continue;
+    my $success = eval {
+
+        # Instantiate
+        $app = $app->new($c) unless ref $app;
+
+        # Action
+        if ($method && $app->isa($self->controller_base_class)) {
+
+            # Call action
+            $continue = $app->$method if $app->can($method);
+
+            # Merge stash
+            my $new = $app->stash;
+            @{$c->stash}{keys %$new} = values %$new;
+        }
+
+        # Handler
+        elsif ($app->isa('Mojo')) {
+
+            # Connect routes
+            if ($app->can('routes')) {
+                my $r = $app->routes;
+                unless ($r->parent) {
+                    $r->parent($c->match->endpoint);
+                    weaken $r->{parent};
+                }
+            }
+
+            # Handler
+            $app->handler($c);
+        }
+
+        # Success
+        1;
+    };
+
+    # Controller error
+    if (!$success && $@) {
+        my $e = Mojo::Exception->new($@);
+        $c->app->log->error($e);
+        return $e;
+    }
+
+    # Success!
+    return 1 unless $staging;
+    return 1 if $continue;
+
+    return;
+}
+
+sub _generate_class {
+    my ($self, $c) = @_;
+
+    # Field
+    my $field = $c->match->captures;
+
+    # Class
+    my $class = $field->{class};
+    my $controller = $field->{controller} || '';
+    unless ($class) {
+        $class = $controller;
+        camelize $class;
+    }
+
+    # Namespace
+    my $namespace = $field->{namespace};
+    $namespace = $self->namespace unless defined $namespace;
+    $class = length $class ? "${namespace}::$class" : $namespace
+      if length $namespace;
+
+    # Invalid
+    return unless $class =~ /^[a-zA-Z0-9_:]+$/;
+
+    return $class;
+}
+
+sub _generate_method {
+    my ($self, $c) = @_;
+
+    # Field
+    my $field = $c->match->captures;
+
+    # Prepare hidden
+    unless ($self->{_hidden}) {
+        $self->{_hidden} = {};
+        $self->{_hidden}->{$_}++ for @{$self->hidden};
+    }
+
+    my $method = $field->{method};
+    $method ||= $field->{action};
+
+    # Shortcut
+    return unless $method;
+
+    # Shortcut for hidden methods
+    if ($self->{_hidden}->{$method} || index($method, '_') == 0) {
+        $c->app->log->debug(qq/Action "$method" is not allowed./);
+        return;
+    }
+
+    # Invalid
+    unless ($method =~ /^[a-zA-Z0-9_:]+$/) {
+        $c->app->log->debug(qq/Action "$method" is invalid./);
+        return;
+    }
+
+    return $method;
+}
+
+sub _walk_stack {
+    my ($self, $c) = @_;
+
+    # Stack
+    my $stack = $c->match->stack;
+
+    # Walk the stack
+    my $staging = @$stack;
+    for my $field (@$stack) {
+        $staging--;
+
+        # Stash
+        my $stash = $c->stash;
+
+        # Captures
+        my $captures = $stash->{'mojo.captures'} ||= {};
+        $stash->{'mojo.captures'} = {%$captures, %$field};
+
+        # Merge in captures
+        @{$c->stash}{keys %$field} = values %$field;
+
+        # Captures
+        $c->match->captures($field);
+
+        # Dispatch
+        my $e =
+            $field->{cb}
+          ? $self->_dispatch_callback($c, $staging)
+          : $self->_dispatch_controller($c, $staging);
+
+        # Exception
+        if (ref $e) {
+            $c->render_exception($e);
+            return 1;
+        }
+
+        # Break the chain
+        return 1 if $staging && !$e;
+    }
+
+    # Done
+    return;
+}
+
 1;
 __END__
 
 =head1 NAME
 
-MojoX::Routes - Always Find Your Destination With Routes
+Mojolicious::Routes - Always Find Your Destination With Routes
 
 =head1 SYNOPSIS
 
-    use MojoX::Routes;
+    use Mojolicious::Routes;
 
     # New routes tree
-    my $r = MojoX::Routes->new;
+    my $r = Mojolicious::Routes->new;
 
     # Normal route matching "/articles" with parameters "controller" and
     # "action"
@@ -315,12 +626,12 @@ MojoX::Routes - Always Find Your Destination With Routes
 
 =head1 DESCRIPTION
 
-L<MojoX::Routes> is a very powerful implementation of the famous routes
+L<Mojolicious::Routes> is a very powerful implementation of the famous routes
 pattern and the core of the L<Mojolicious> web framework.
 
 =head1 ATTRIBUTES
 
-L<MojoX::Routes> implements the following attributes.
+L<Mojolicious::Routes> implements the following attributes.
 
 =head2 C<block>
 
@@ -332,7 +643,7 @@ Allow this route to match even if it's not an endpoint, used for waypoints.
 =head2 C<children>
 
     my $children = $r->children;
-    $r           = $r->children([MojoX::Routes->new]);
+    $r           = $r->children([Mojolicious::Routes->new]);
 
 The children of this routes object, used for nesting routes.
 
@@ -343,6 +654,14 @@ The children of this routes object, used for nesting routes.
 
 Contains condition parameters for this route, used for C<over>.
 
+=head2 C<controller_base_class>
+
+    my $base = $r->controller_base_class;
+    $r       = $r->controller_base_class('Mojolicious::Controller');
+
+Base class used to identify controllers, defaults to
+L<Mojolicious::Controller>.
+
 =head2 C<dictionary>
 
     my $dictionary = $r->dictionary;
@@ -351,6 +670,13 @@ Contains condition parameters for this route, used for C<over>.
 Contains all available conditions for this route.
 There are currently two conditions built in, C<method> and C<websocket>.
 
+=head2 C<hidden>
+
+    my $hidden = $r->hidden;
+    $r         = $r->hidden([qw/new attr tx render req res stash/]);
+
+Controller methods and attributes that are hidden from routes.
+
 =head2 C<inline>
 
     my $inline = $r->inline;
@@ -358,10 +684,17 @@ There are currently two conditions built in, C<method> and C<websocket>.
 
 Allow C<bridge> semantics for this route.
 
+=head2 C<namespace>
+
+    my $namespace = $r->namespace;
+    $r            = $r->namespace('Foo::Bar::Controller');
+
+Namespace to search for controllers.
+
 =head2 C<parent>
 
     my $parent = $r->parent;
-    $r         = $r->parent(MojoX::Routes->new);
+    $r         = $r->parent(Mojolicious::Routes->new);
 
 The parent of this route, used for nesting routes.
 
@@ -377,26 +710,26 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
 =head2 C<pattern>
 
     my $pattern = $r->pattern;
-    $r          = $r->pattern(MojoX::Routes::Pattern->new);
+    $r          = $r->pattern(Mojolicious::Routes::Pattern->new);
 
-Pattern for this route, by default a L<MojoX::Routes::Pattern> object and
-used for matching.
+Pattern for this route, by default a L<Mojolicious::Routes::Pattern> object
+and used for matching.
 
 =head1 METHODS
 
-L<MojoX::Routes> inherits all methods from L<Mojo::Base> and implements the
-following ones.
+L<Mojolicious::Routes> inherits all methods from L<Mojo::Base> and implements
+the following ones.
 
 =head2 C<new>
 
-    my $r = MojoX::Routes->new;
-    my $r = MojoX::Routes->new('/:controller/:action');
+    my $r = Mojolicious::Routes->new;
+    my $r = Mojolicious::Routes->new('/:controller/:action');
 
 Construct a new route object.
 
 =head2 C<add_child>
 
-    $r = $r->add_child(MojoX::Route->new);
+    $r = $r->add_child(Mojolicious::Route->new);
 
 Add a new child to this route.
 
@@ -406,12 +739,48 @@ Add a new child to this route.
 
 Add a new condition for this route.
 
+=head2 C<auto_render>
+
+    $r->auto_render(Mojolicious::Controller->new);
+
+Automatic rendering.
+
 =head2 C<bridge>
 
     my $bridge = $r->bridge;
     my $bridge = $r->bridge('/:controller/:action');
 
 Add a new bridge to this route as a nested child.
+
+=head2 C<detour>
+
+    $r = $r->detour(action => 'foo');
+    $r = $r->detour({action => 'foo'});
+    $r = $r->detour('controller#action');
+    $r = $r->detour('controller#action', foo => 'bar');
+    $r = $r->detour('controller#action', {foo => 'bar'});
+    $r = $r->detour($app);
+    $r = $r->detour($app, foo => 'bar');
+    $r = $r->detour($app, {foo => 'bar'});
+    $r = $r->detour('MyApp');
+    $r = $r->detour('MyApp', foo => 'bar');
+    $r = $r->detour('MyApp', {foo => 'bar'});
+
+Set default parameters for this route and allow partial matching to simplify
+application embedding.
+Note that this method is EXPERIMENTAL and might change without warning!
+
+=head2 C<dispatch>
+
+    my $e = $r->dispatch(Mojolicious::Controller->new);
+
+Match routes and dispatch.
+
+=head2 C<hide>
+
+    $r = $r->hide('new');
+
+Hide controller method or attribute from routes.
 
 =head2 C<is_endpoint>
 

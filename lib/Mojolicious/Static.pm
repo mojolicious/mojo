@@ -1,4 +1,4 @@
-package MojoX::Dispatcher::Static;
+package Mojolicious::Static;
 
 use strict;
 use warnings;
@@ -12,10 +12,8 @@ use Mojo::Asset::Memory;
 use Mojo::Command;
 use Mojo::Content::Single;
 use Mojo::Path;
-use MojoX::Types;
 
 __PACKAGE__->attr([qw/default_static_class prefix root/]);
-__PACKAGE__->attr(types => sub { MojoX::Types->new });
 
 # Valentine's Day's coming? Aw crap! I forgot to get a girlfriend again!
 sub dispatch {
@@ -56,7 +54,7 @@ sub serve {
     my $ext = $1;
 
     # Type
-    my $type = $self->types->type($ext) || 'text/plain';
+    my $type = $c->app->types->type($ext) || 'text/plain';
 
     # Response
     my $res = $c->res;
@@ -264,93 +262,77 @@ __END__
 
 =head1 NAME
 
-MojoX::Dispatcher::Static - Serve Static Files
+Mojolicious::Static - Serve Static Files
 
 =head1 SYNOPSIS
 
-    use MojoX::Dispatcher::Static;
-
-    # New dispatcher
-    my $dispatcher = MojoX::Dispatcher::Static->new(
-        prefix => '/images',
-        root   => '/ftp/pub/images'
-    );
-
-    # Dispatch
-    my $success = $dispatcher->dispatch($c);
+    use Mojolicious::Static;
 
 =head1 DESCRIPTION
 
-L<MojoX::Dispatcher::Static> is a dispatcher for static files with C<Range>
-and C<If-Modified-Since> support.
+L<Mojolicious::Static> is a dispatcher for static files with C<Range> and
+C<If-Modified-Since> support.
 
 =head1 ATTRIBUTES
 
-L<MojoX::Dispatcher::Static> implements the following attributes.
+L<Mojolicious::Static> implements the following attributes.
 
 =head2 C<default_static_class>
 
-    my $class   = $dispatcher->default_static_class;
-    $dispatcher = $dispatcher->default_static_class('main');
+    my $class = $static->default_static_class;
+    $static   = $static->default_static_class('main');
 
 The dispatcher will use this class to look for files in the C<DATA> section.
 
 =head2 C<prefix>
 
-    my $prefix  = $dispatcher->prefix;
-    $dispatcher = $dispatcher->prefix('/static');
+    my $prefix = $static->prefix;
+    $static    = $static->prefix('/static');
 
 Prefix path to remove from incoming paths before dispatching.
 
-=head2 C<types>
-
-    my $types   = $dispatcher->types;
-    $dispatcher = $dispatcher->types(MojoX::Types->new);
-
-MIME types, by default a L<MojoX::Types> object.
-
 =head2 C<root>
 
-    my $root    = $dispatcher->root;
-    $dispatcher = $dispatcher->root('/foo/bar/files');
+    my $root = $static->root;
+    $static  = $static->root('/foo/bar/files');
 
 Directory to serve static files from.
 
 =head1 METHODS
 
-L<MojoX::Dispatcher::Static> inherits all methods from L<Mojo::Base> and
-implements the following ones.
+L<Mojolicious::Static> inherits all methods from L<Mojo::Base>
+and implements the following ones.
 
 =head2 C<dispatch>
 
-    my $success = $dispatcher->dispatch($c);
+    my $success = $static->dispatch($c);
 
-Dispatch a L<MojoX::Controller> object.
+Dispatch a L<Mojolicious::Controller> object.
 
 =head2 C<serve>
 
-    my $success = $dispatcher->serve($c, 'foo/bar.html');
+    my $success = $static->serve($c, 'foo/bar.html');
 
 Serve a specific file.
 
 =head2 C<serve_404>
 
-    my $success = $dispatcher->serve_404($c);
-    my $success = $dispatcher->serve_404($c, '404.html');
+    my $success = $static->serve_404($c);
+    my $success = $static->serve_404($c, '404.html');
 
 Serve a C<404> error page, guaranteed to render at least a default page.
 
 =head2 C<serve_500>
 
-    my $success = $dispatcher->serve_500($c);
-    my $success = $dispatcher->serve_500($c, '500.html');
+    my $success = $static->serve_500($c);
+    my $success = $static->serve_500($c, '500.html');
 
 Serve a C<500> error page, guaranteed to render at least a default page.
 
 =head2 C<serve_error>
 
-    my $success = $dispatcher->serve_error($c, 404);
-    my $success = $dispatcher->serve_error($c, 404, '404.html');
+    my $success = $static->serve_error($c, 404);
+    my $success = $static->serve_error($c, 404, '404.html');
 
 Serve error page, guaranteed to render at least a default page.
 

@@ -1,4 +1,4 @@
-package MojoX::Session::Cookie;
+package Mojolicious::Session;
 
 use strict;
 use warnings;
@@ -85,29 +85,22 @@ __END__
 
 =head1 NAME
 
-MojoX::Session::Cookie - Signed Cookie Based Sessions
+Mojolicious::Session - Signed Cookie Based Sessions
 
 =head1 SYNOPSIS
 
-    use MojoX::Session::Cookie;
-    use MojoX::Session::Cookie::Controller;
-
-    my $session = MojoX::Session::Cookie->new;
-    my $c = MojoX::Session::Cookie::Controller->new;
-    $session->load($c);
-    $c->session(foo => 'bar');
-    $session->store($c);
+    use Mojolicious::Session;
 
 =head1 DESCRIPTION
 
-L<MojoX::Session::Cookie> is a very simple signed cookie based session
+L<Mojolicious::Session> is a very simple signed cookie based session
 implementation.
 All data gets stored on the client side, but is protected from unwanted
 changes with a signature.
 
 =head1 ATTRIBUTES
 
-L<MojoX::Session::Cookie> implements the following attributes.
+L<Mojolicious::Session> implements the following attributes.
 
 =head2 C<cookie_domain>
 
@@ -141,7 +134,7 @@ The expiration timeout gets refreshed for every request.
 
 =head1 METHODS
 
-L<MojoX::Session::Cookie> inherits all methods from L<Mojo::Base> and
+L<Mojolicious::Session> inherits all methods from L<Mojo::Base> and
 implements the following ones.
 
 =head2 C<load>

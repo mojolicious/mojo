@@ -1,4 +1,4 @@
-package MojoX::Renderer;
+package Mojolicious::Renderer;
 
 use strict;
 use warnings;
@@ -10,7 +10,6 @@ use Mojo::ByteStream 'b';
 use Mojo::Command;
 use Mojo::Home;
 use Mojo::JSON;
-use MojoX::Types;
 use Mojo::Util 'encode';
 
 __PACKAGE__->attr(default_format => 'html');
@@ -21,7 +20,6 @@ __PACKAGE__->attr(handler          => sub { {} });
 __PACKAGE__->attr(helper           => sub { {} });
 __PACKAGE__->attr(layout_prefix    => 'layouts');
 __PACKAGE__->attr(root             => '/');
-__PACKAGE__->attr(types            => sub { MojoX::Types->new });
 
 # This is not how Xmas is supposed to be.
 # In my day Xmas was about bringing people together, not blowing them apart.
@@ -210,7 +208,7 @@ sub render {
     }
 
     # Type
-    my $type = $self->types->type($format) || 'text/plain';
+    my $type = $c->app->types->type($format) || 'text/plain';
 
     return ($output, $type);
 }
@@ -335,22 +333,22 @@ __END__
 
 =head1 NAME
 
-MojoX::Renderer - MIME Type Based Renderer
+Mojolicious::Renderer - MIME Type Based Renderer
 
 =head1 SYNOPSIS
 
-    use MojoX::Renderer;
+    use Mojolicious::Renderer;
 
-    my $renderer = MojoX::Renderer->new;
+    my $renderer = Mojolicious::Renderer->new;
 
 =head1 DESCRIPTION
 
-L<MojoX::Renderer> is the standard L<Mojolicious> renderer.
+L<Mojolicious::Renderer> is the standard L<Mojolicious> renderer.
 It turns your stashed data structures into content.
 
 =head1 ATTRIBUTES
 
-L<MojoX::Types> implements the following attributes.
+L<Mojolicious::Renderer> implements the following attributes.
 
 =head2 C<default_format>
 
@@ -358,7 +356,7 @@ L<MojoX::Types> implements the following attributes.
     $renderer   = $renderer->default_format('html');
 
 The default format to render if C<format> is not set in the stash.
-The renderer will use L<MojoX::Types> to look up the content MIME type.
+The renderer will use L<Mojolicious::Types> to look up the content MIME type.
 
 =head2 C<default_handler>
 
@@ -431,21 +429,14 @@ Directory to look for layouts in, defaults to C<layouts>.
    
 Directory to look for templates in.
 
-=head2 C<types>
-
-    my $types = $renderer->types;
-    $renderer = $renderer->types(MojoX::Types->new);
-
-L<MojoX::Types> object to use for looking up MIME types.
-
 =head1 METHODS
 
-L<MojoX::Renderer> inherits all methods from L<Mojo::Base> and implements the
+L<Mojolicious::Renderer> inherits all methods from L<Mojo::Base> and implements the
 following ones.
 
 =head2 C<new>
 
-    my $renderer = MojoX::Renderer->new;
+    my $renderer = Mojolicious::Renderer->new;
 
 Construct a new renderer.
 

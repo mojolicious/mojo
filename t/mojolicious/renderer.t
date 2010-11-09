@@ -5,16 +5,16 @@ use warnings;
 
 use Test::More tests => 5;
 
-use Mojo;
-use MojoX::Dispatcher::Routes::Controller;
-use MojoX::Renderer;
+use Mojolicious;
+use Mojolicious::Controller;
+use Mojolicious::Renderer;
 
 # Actually, she wasn't really my girlfriend,
 # she just lived nextdoor and never closed her curtains.
-my $c = MojoX::Dispatcher::Routes::Controller->new(app => Mojo->new);
+my $c = Mojolicious::Controller->new(app => Mojolicious->new);
 $c->app->log->path(undef);
 $c->app->log->level('fatal');
-my $r = MojoX::Renderer->new(default_format => 'debug');
+my $r = Mojolicious::Renderer->new(default_format => 'debug');
 $r->add_handler(
     debug => sub {
         my ($self, $c, $output) = @_;

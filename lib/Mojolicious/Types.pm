@@ -1,4 +1,4 @@
-package MojoX::Types;
+package Mojolicious::Types;
 
 use strict;
 use warnings;
@@ -52,28 +52,19 @@ __END__
 
 =head1 NAME
 
-MojoX::Types - MIME Types
+Mojolicious::Types - MIME Types
 
 =head1 SYNOPSIS
 
-    use MojoX::Types;
-
-    # New type list
-    my $types = MojoX::Types->new;
-
-    # Get MIME type for ".png"
-    my $type = $types->type('png');
-
-    # Add MIME type for ".foo"
-    $types->type(foo => 'mojo/foo');
+    use Mojolicious::Types;
 
 =head1 DESCRIPTION
 
-L<MojoX::Types> is a container for MIME types.
+L<Mojolicious::Types> is a container for MIME types.
 
 =head1 ATTRIBUTES
 
-L<MojoX::Types> implements the following attributes.
+L<Mojolicious::Types> implements the following attributes.
 
 =head2 C<types>
 
@@ -84,7 +75,7 @@ List of MIME types.
 
 =head1 METHODS
 
-L<MojoX::Types> inherits all methods from L<Mojo::Base> and implements the
+L<Mojolicious::Types> inherits all methods from L<Mojo::Base> and implements the
 following ones.
 
 =head2 C<type>

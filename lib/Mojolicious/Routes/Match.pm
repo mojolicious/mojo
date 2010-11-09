@@ -1,4 +1,4 @@
-package MojoX::Routes::Match;
+package Mojolicious::Routes::Match;
 
 use strict;
 use warnings;
@@ -244,25 +244,20 @@ __END__
 
 =head1 NAME
 
-MojoX::Routes::Match - Routes Visitor
+Mojolicious::Routes::Match - Routes Visitor
 
 =head1 SYNOPSIS
 
-    use MojoX::Routes::Match;
-
-    # New match object
-    my $m = MojoX::Routes::Match->new($c);
-
-    # Match
-    $m->match($routes);
+    use Mojolicious::Routes::Match;
 
 =head1 DESCRIPTION
 
-L<MojoX::Routes::Match> is a visitor for L<MojoX::Routes> structures.
+L<Mojolicious::Routes::Match> is a visitor for L<Mojolicious::Routes>
+structures.
 
 =head1 ATTRIBUTES
 
-L<MojoX::Routes::Match> implements the following attributes.
+L<Mojolicious::Routes::Match> implements the following attributes.
 
 =head2 C<captures>
 
@@ -274,7 +269,7 @@ Captured parameters.
 =head2 C<endpoint>
 
     my $endpoint = $m->endpoint;
-    $m           = $m->endpoint(MojoX::Routes->new);
+    $m           = $m->endpoint(Mojolicious::Routes->new);
 
 The routes endpoint that actually matched.
 
@@ -294,18 +289,18 @@ Captured parameters with nesting history.
 
 =head1 METHODS
 
-L<MojoX::Routes::Match> inherits all methods from L<Mojo::Base> and
+L<Mojolicious::Routes::Match> inherits all methods from L<Mojo::Base> and
 implements the following ones.
 
 =head2 C<new>
 
-    my $m = MojoX::Routes::Match->new(MojoX:Controller->new);
+    my $m = Mojolicious::Routes::Match->new(Mojolicious:Controller->new);
 
 Construct a new match object.
 
 =head2 C<match>
 
-    $m->match(MojoX::Routes->new);
+    $m->match(Mojolicious::Routes->new);
 
 Match against a routes tree.
 

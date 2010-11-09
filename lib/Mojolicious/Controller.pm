@@ -3,17 +3,69 @@ package Mojolicious::Controller;
 use strict;
 use warnings;
 
-use base 'MojoX::Dispatcher::Routes::Controller';
+use base 'Mojo::Base';
 
 use Mojo::ByteStream;
+use Mojo::Cookie::Response;
 use Mojo::Exception;
+use Mojo::Transaction::HTTP;
 use Mojo::URL;
+use Mojo::Util;
 
 require Carp;
+
+# Scalpel... blood bucket... priest.
+__PACKAGE__->attr([qw/app match/]);
+__PACKAGE__->attr(tx => sub { Mojo::Transaction::HTTP->new });
 
 # DEPRECATED in Comet!
 *finished        = \&on_finish;
 *receive_message = \&on_message;
+
+# Reserved stash values
+my $STASH_RE = qr/
+    ^
+    (?:
+    action
+    |
+    app
+    |
+    cb
+    |
+    class
+    |
+    controller
+    |
+    data
+    |
+    exception
+    |
+    extends
+    |
+    format
+    |
+    handler
+    |
+    json
+    |
+    layout
+    |
+    method
+    |
+    namespace
+    |
+    partial
+    |
+    path
+    |
+    status
+    |
+    template
+    |
+    text
+    )
+    $
+    /x;
 
 our $AUTOLOAD;
 
@@ -37,6 +89,44 @@ sub DESTROY { }
 
 sub client { shift->app->client }
 
+# For the last time, I don't like lilacs!
+# Your first wife was the one who liked lilacs!
+# She also liked to shut up!
+sub cookie {
+    my ($self, $name, $value, $options) = @_;
+
+    # Shortcut
+    return unless $name;
+
+    # Response cookie
+    if (defined $value) {
+
+        # Cookie too big
+        $self->app->log->error(qq/Cookie "$name" is bigger than 4096 bytes./)
+          if length $value > 4096;
+
+        # Create new cookie
+        $options ||= {};
+        my $cookie = Mojo::Cookie::Response->new(
+            name  => $name,
+            value => $value,
+            %$options
+        );
+        $self->res->cookies($cookie);
+        return $self;
+    }
+
+    # Request cookie
+    unless (wantarray) {
+        return unless my $cookie = $self->req->cookie($name);
+        return $cookie->value;
+    }
+
+    # Request cookies
+    my @cookies = $self->req->cookie($name);
+    return map { $_->value } @cookies;
+}
+
 # Something's wrong, she's not responding to my poking stick.
 sub finish {
     my $self = shift;
@@ -49,6 +139,35 @@ sub finish {
 
     # Finish WebSocket
     $tx->finish;
+}
+
+# You two make me ashamed to call myself an idiot.
+sub flash {
+    my $self = shift;
+
+    # Get
+    my $session = $self->stash->{'mojo.session'};
+    if ($_[0] && !defined $_[1] && !ref $_[0]) {
+        return unless $session && ref $session eq 'HASH';
+        return unless my $flash = $session->{old_flash};
+        return unless ref $flash eq 'HASH';
+        return $flash->{$_[0]};
+    }
+
+    # Initialize
+    $session = $self->session;
+    my $flash = $session->{flash};
+    $flash = {} unless $flash && ref $flash eq 'HASH';
+    $session->{flash} = $flash;
+
+    # Hash
+    return $flash unless @_;
+
+    # Set
+    my $values = exists $_[1] ? {@_} : $_[0];
+    $session->{flash} = {%$flash, %$values};
+
+    return $self;
 }
 
 # DEPRECATED in Comet!
@@ -93,6 +212,34 @@ sub on_message {
     $self->rendered;
 
     return $self;
+}
+
+# Just make a simple cake. And this time, if someone's going to jump out of
+# it make sure to put them in *after* you cook it.
+sub param {
+    my $self = shift;
+    my $name = shift;
+
+    # Captures
+    my $p = $self->stash->{'mojo.captures'} || {};
+
+    # List
+    unless (defined $name) {
+        my %seen;
+        return sort grep { !$seen{$_}++ } keys %$p, $self->req->param;
+    }
+
+    # Override value
+    if (@_) {
+        $p->{$name} = $_[0];
+        return $self;
+    }
+
+    # Captured value
+    return $p->{$name} if exists $p->{$name};
+
+    # Param value
+    return $self->req->param($name);
 }
 
 # Is there an app for kissing my shiny metal ass?
@@ -358,6 +505,9 @@ sub rendered {
     return $self;
 }
 
+sub req { shift->tx->req }
+sub res { shift->tx->res }
+
 sub send_message {
     my $self = shift;
 
@@ -377,6 +527,104 @@ sub send_message {
     return $self;
 }
 
+# Why am I sticky and naked? Did I miss something fun?
+sub session {
+    my $self = shift;
+
+    # Get
+    my $stash   = $self->stash;
+    my $session = $stash->{'mojo.session'};
+    if ($_[0] && !defined $_[1] && !ref $_[0]) {
+        return unless $session && ref $session eq 'HASH';
+        return $session->{$_[0]};
+    }
+
+    # Initialize
+    $session = {} unless $session && ref $session eq 'HASH';
+    $stash->{'mojo.session'} = $session;
+
+    # Hash
+    return $session unless @_;
+
+    # Set
+    my $values = exists $_[1] ? {@_} : $_[0];
+    $stash->{'mojo.session'} = {%$session, %$values};
+
+    return $self;
+}
+
+sub signed_cookie {
+    my ($self, $name, $value, $options) = @_;
+
+    # Shortcut
+    return unless $name;
+
+    # Secret
+    my $secret = $self->app->secret;
+
+    # Response cookie
+    if (defined $value) {
+
+        # Sign value
+        my $signature = Mojo::Util::hmac_md5_sum $value, $secret;
+        $value = $value .= "--$signature";
+
+        # Create cookie
+        my $cookie = $self->cookie($name, $value, $options);
+        return $cookie;
+    }
+
+    # Request cookies
+    my @values = $self->cookie($name);
+    my @results;
+    for my $value (@values) {
+
+        # Check signature
+        if ($value =~ s/\-\-([^\-]+)$//) {
+            my $signature = $1;
+            my $check = Mojo::Util::hmac_md5_sum $value, $secret;
+
+            # Verified
+            if ($signature eq $check) { push @results, $value }
+
+            # Bad cookie
+            else {
+                $self->app->log->debug(
+                    qq/Bad signed cookie "$name", possible hacking attempt./);
+            }
+        }
+
+        # Not signed
+        else { $self->app->log->debug(qq/Cookie "$name" not signed./) }
+    }
+
+    return wantarray ? @results : $results[0];
+}
+
+# All this knowledge is giving me a raging brainer.
+sub stash {
+    my $self = shift;
+
+    # Initialize
+    $self->{stash} ||= {};
+
+    # Hash
+    return $self->{stash} unless @_;
+
+    # Get
+    return $self->{stash}->{$_[0]} unless @_ > 1 || ref $_[0];
+
+    # Set
+    my $values = ref $_[0] ? $_[0] : {@_};
+    for my $key (keys %$values) {
+        $self->app->log->debug(qq/Careful, "$key" is a reserved stash value./)
+          if $key =~ $STASH_RE;
+        $self->{stash}->{$key} = $values->{$key};
+    }
+
+    return $self;
+}
+
 # Behold, a time traveling machine.
 # Time? I can't go back there!
 # Ah, but this machine only goes forward in time.
@@ -388,7 +636,8 @@ sub url_for {
     my $target = shift || '';
 
     # Make sure we have a match for named routes
-    $self->match(MojoX::Routes::Match->new($self)->root($self->app->routes))
+    $self->match(
+        Mojolicious::Routes::Match->new($self)->root($self->app->routes))
       unless $self->match;
 
     # Path
@@ -480,14 +729,34 @@ C<controller_class> in your application.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Controller> inherits all attributes from
-L<MojoX::Dispatcher::Routes::Controller>.
+L<Mojolicious::Controller> inherits all attributes from L<Mojo::Base> and
+implements the following new ones.
+
+=head2 C<app>
+
+    my $app = $c->app;
+    $c      = $c->app(Mojolicious->new);
+
+A reference back to the application that dispatched to this controller.
+
+=head2 C<match>
+
+    my $m = $c->match;
+
+A L<Mojolicious::Routes::Match> object containing the routes results for the
+current request.
+
+=head2 C<tx>
+
+    my $tx = $c->tx;
+
+The transaction that is currently being processed, defaults to a
+L<Mojo::Transaction::HTTP> object.
 
 =head1 METHODS
 
-L<Mojolicious::Controller> inherits all methods from
-L<MojoX::Dispatcher::Routes::Controller> and implements the following new
-ones.
+L<Mojolicious::Controller> inherits all methods from L<Mojo::Base> and
+implements the following new ones.
 
 =head2 C<client>
 
@@ -512,11 +781,33 @@ For async processing you can use C<finish>.
         $c->finish;
     })->start;
 
+=head2 C<cookie>
+
+    $c         = $c->cookie(foo => 'bar');
+    $c         = $c->cookie(foo => 'bar', {path => '/'});
+    my $value  = $c->cookie('foo');
+    my @values = $c->cookie('foo');
+
+Access request cookie values and create new response cookies.
+
 =head2 C<finish>
 
     $c->finish;
 
 Gracefully end WebSocket connection.
+
+=head2 C<flash>
+
+    my $flash = $c->flash;
+    my $foo   = $c->flash('foo');
+    $c        = $c->flash({foo => 'bar'});
+    $c        = $c->flash(foo => 'bar');
+
+Data storage persistent for the next request, stored in the session.
+
+    $c->flash->{foo} = 'bar';
+    my $foo = $c->flash->{foo};
+    delete $c->flash->{foo};
 
 =head2 C<on_finish>
 
@@ -538,6 +829,15 @@ connection in progress.
     $c->on_message(sub {
         my ($self, $message) = @_;
     });
+
+=head2 C<param>
+
+    my @names = $c->param;
+    my $foo   = $c->param('foo');
+    my @foo   = $c->param('foo');
+    $c        = $c->param(foo => 'ba;r');
+
+Request parameters and routes captures.
 
 =head2 C<redirect_to>
 
@@ -561,7 +861,7 @@ Prepare a C<302> redirect response.
     $c->render('foo/bar');
     $c->render('foo/bar', format => 'html');
 
-This is a wrapper around L<MojoX::Renderer> exposing pretty much all
+This is a wrapper around L<Mojolicious::Renderer> exposing pretty much all
 functionality provided by it.
 It will set a default template to use based on the controller and action name
 or fall back to the route name.
@@ -583,7 +883,7 @@ Render binary data, similar to C<render_text> but data will not be encoded.
 Render the exception template C<exception.html.$handler>.
 Will set the status code to C<500> meaning C<Internal Server Error>.
 Takes a L<Mojo::Exception> object or error message and will fall back to
-rendering a static C<500> page using L<MojoX::Renderer::Static>.
+rendering a static C<500> page using L<Mojolicious::Static>.
 
 =head2 C<render_inner>
 
@@ -609,7 +909,7 @@ Render a data structure as JSON.
     
 Render the not found template C<not_found.html.$handler>.
 Also sets the response status code to C<404>, will fall back to rendering a
-static C<404> page using L<MojoX::Renderer::Static>.
+static C<404> page using L<Mojolicious::Static>.
 
 =head2 C<render_partial>
 
@@ -623,7 +923,7 @@ Same as C<render> but returns the rendered result.
     $c->render_static('images/logo.png');
     $c->render_static('../lib/MyApp.pm');
 
-Render a static file using L<MojoX::Dispatcher::Static> relative to the
+Render a static file using L<Mojolicious::Static> relative to the
 C<public> directory of your application.
 
 =head2 C<render_text>
@@ -641,12 +941,63 @@ See C<render_data> for an alternative without encoding.
 Finalize response and run C<after_dispatch> plugin hook.
 Note that this method is EXPERIMENTAL and might change without warning!
 
+=head2 C<req>
+
+    my $req = $c->req;
+
+Alias for C<$c->tx->req>.
+Usually refers to a L<Mojo::Message::Request> object.
+
+=head2 C<res>
+
+    my $res = $c->res;
+
+Alias for C<$c->tx->res>.
+Usually refers to a L<Mojo::Message::Response> object.
+
 =head2 C<send_message>
 
     $c = $c->send_message('Hi there!');
 
 Send a message via WebSocket, only works if there is currently a WebSocket
 connection in progress.
+
+=head2 C<session>
+
+    my $session = $c->session;
+    my $foo     = $c->session('foo');
+    $c          = $c->session({foo => 'bar'});
+    $c          = $c->session(foo => 'bar');
+
+Persistent data storage, by default stored in a signed cookie.
+Note that cookies are generally limited to 4096 bytes of data.
+
+    $c->session->{foo} = 'bar';
+    my $foo = $c->session->{foo};
+    delete $c->session->{foo};
+
+=head2 C<signed_cookie>
+
+    $c         = $c->signed_cookie(foo => 'bar');
+    $c         = $c->signed_cookie(foo => 'bar', {path => '/'});
+    my $value  = $c->signed_cookie('foo');
+    my @values = $c->signed_cookie('foo');
+
+Access signed request cookie values and create new signed response cookies.
+Cookies failing signature verification will be automatically discarded.
+
+=head2 C<stash>
+
+    my $stash = $c->stash;
+    my $foo   = $c->stash('foo');
+    $c        = $c->stash({foo => 'bar'});
+    $c        = $c->stash(foo => 'bar');
+
+Non persistent data storage and exchange.
+
+    $c->stash->{foo} = 'bar';
+    my $foo = $c->stash->{foo};
+    delete $c->stash->{foo};
 
 =head2 C<url_for>
 

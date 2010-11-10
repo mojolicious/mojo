@@ -628,6 +628,7 @@ Mojolicious::Routes - Always Find Your Destination With Routes
 
 L<Mojolicious::Routes> is a very powerful implementation of the famous routes
 pattern and the core of the L<Mojolicious> web framework.
+See L<Mojolicious::Guide::Routing> for more.
 
 =head1 ATTRIBUTES
 

@@ -19,14 +19,6 @@ These options are available for all commands:
 
 See '$0 help COMMAND' for more information on a specific command.
 EOF
-__PACKAGE__->attr(message => <<"EOF");
-usage: $0 COMMAND [OPTIONS]
-
-Tip: CGI, FastCGI and PSGI environments can be automatically detected very
-     often and work without commands.
-
-These commands are currently available:
-EOF
 __PACKAGE__->attr(
     namespaces => sub { [qw/Mojolicious::Command Mojo::Command/] });
 
@@ -174,13 +166,6 @@ implements the following new ones.
     $commands = $commands->hint('Foo!');
 
 Short hint shown after listing available commands.
-
-=head2 C<message>
-
-    my $message = $commands->message;
-    $commands   = $commands->message('Hello World!');
-
-Short usage message shown before listing available commands.
 
 =head2 C<namespaces>
 

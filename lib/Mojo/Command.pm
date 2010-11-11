@@ -15,10 +15,23 @@ use Mojo::Template;
 use Mojo::Loader;
 use Mojo::Util qw/b64_decode camelize decamelize/;
 
+__PACKAGE__->attr(hint => <<"EOF");
+
+See '$0 help COMMAND' for more information on a specific command.
+EOF
 __PACKAGE__->attr(description => 'No description.');
-__PACKAGE__->attr(quiet       => 0);
-__PACKAGE__->attr(renderer    => sub { Mojo::Template->new });
-__PACKAGE__->attr(usage       => "usage: $0\n");
+__PACKAGE__->attr(message     => <<"EOF");
+usage: $0 COMMAND [OPTIONS]
+
+Tip: CGI, FastCGI and PSGI environments can be automatically detected very
+     often and work without commands.
+
+These commands are currently available:
+EOF
+__PACKAGE__->attr(namespaces => sub { ['Mojo::Command'] });
+__PACKAGE__->attr(quiet      => 0);
+__PACKAGE__->attr(renderer   => sub { Mojo::Template->new });
+__PACKAGE__->attr(usage      => "usage: $0\n");
 
 sub chmod_file {
     my ($self, $path, $mod) = @_;
@@ -433,6 +446,27 @@ L<Mojo::Command> implements the following attributes.
     $command        = $command->description('Foo!');
 
 Short description of command, used for the command list.
+
+=head2 C<hint>
+
+    my $hint  = $commands->hint;
+    $commands = $commands->hint('Foo!');
+
+Short hint shown after listing available commands.
+
+=head2 C<message>
+
+    my $message = $commands->message;
+    $commands   = $commands->message('Hello World!');
+
+Short usage message shown before listing available commands.
+
+=head2 C<namespaces>
+
+    my $namespaces = $commands->namespaces;
+    $commands      = $commands->namespaces(['Mojolicious::Commands']);
+
+Namespaces to search for available commands, defaults to L<Mojo::Command>.
 
 =head2 C<quiet>
 

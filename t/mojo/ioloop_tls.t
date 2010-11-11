@@ -19,21 +19,26 @@ my $loop   = Mojo::IOLoop->new;
 my $port   = Mojo::IOLoop->generate_port;
 my $server = '';
 my $client = '';
-my $l      = $loop->listen(
+$loop->listen(
     port      => $port,
     tls       => 1,
-    on_accept => sub { shift->write(shift, 'test') },
-    on_read   => sub { $server .= pop }
+    on_accept => sub {
+        shift->write(shift, 'test', sub { shift->write(shift, '321') });
+    },
+    on_read => sub { $server .= pop },
+    on_hup  => sub { $server .= 'hup' }
 );
 my $c = $loop->connect(
     address    => 'localhost',
     port       => $port,
     tls        => 1,
-    on_connect => sub { shift->write(shift, 'tset') },
-    on_read    => sub { $client .= pop },
+    on_connect => sub {
+        shift->write(shift, 'tset', sub { shift->write(shift, '123') });
+    },
+    on_read => sub { $client .= pop },
     on_hup => sub { shift->stop }
 );
 $loop->connection_timeout($c => '0.5');
 $loop->start;
-is $server, 'tset', 'right content';
-is $client, 'test', 'right content';
+is $server, 'tset123hup', 'right content';
+is $client, 'test321',    'right content';

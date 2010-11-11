@@ -796,7 +796,7 @@ sub write {
         $c->{drain} = 0 if $cb;
 
         # Fast write
-        $self->_write($id);
+        $self->_write($id) unless $c->{tls_accept};
     }
 
     # Callback
@@ -1371,7 +1371,7 @@ sub _tls_accept {
     # Connection
     my $c = $self->{_cs}->{$id};
 
-    # Connected
+    # Accepted
     if ($c->{socket}->accept_SSL) {
         delete $c->{tls_accept};
         return;

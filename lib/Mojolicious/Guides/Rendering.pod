@@ -448,6 +448,36 @@ executed more than once.
 
 Less commonly used and more powerful features.
 
+=head2 Chunked Transfer Encoding
+
+For very dynamic content you might not know the response C<Content-Length>
+in advance, thats where the C<chunked> C<Transfer-Encoding> comes in handy.
+A common use would be to send the HTML header section to the browser in
+advance and speed up preloading of referenced images and stylesheets.
+
+    $self->write_chunk('<html><head><title>Example</title>');
+    $self->write_chunk('<link href="example.css" rel="stylesheet"');
+    $self->write_chunk(' type="text/css" /></head>');
+    $self->write_chunk('<body>Example</body></html>');
+    $self->write_chunk('');
+
+An empty chunk marks the end of the stream.
+
+    22
+    <html><head><title>Example</title>
+    29
+    <link href="example.css" rel="stylesheet"
+    19
+     type="text/css" /></head>
+    1C
+    <body>Example</body></html>
+    0
+
+Especially in combination with long connection timeouts this can be very
+useful for Comet (C<long polling>).
+Due to limitations in some web servers this might not work perfectly in all
+deployment environments.
+
 =head2 Encoding
 
 Templates stored in files are expected to be C<UTF-8> by default, but that

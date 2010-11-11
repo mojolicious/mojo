@@ -458,8 +458,8 @@ Ports and files to listen on, defaults to C<http://*:3000>.
 
 =head2 C<listen_queue_size>
 
-    my $listen_queue_size = $daemon->listen_queue_zise;
-    $daemon               = $daemon->listen_queue_zise(128);
+    my $listen_queue_size = $daemon->listen_queue_size;
+    $daemon               = $daemon->listen_queue_size(128);
 
 Listen queue size, defaults to C<SOMAXCONN>.
 

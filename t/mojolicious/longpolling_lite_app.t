@@ -70,13 +70,13 @@ get '/longpoll/nested' => sub {
 my $longpoll_plain;
 get '/longpoll/plain' => sub {
     my $self = shift;
-    $self->on_finish(sub { $longpoll_plain = 'finished!' });
     $self->res->code(200);
     $self->res->headers->content_type('text/plain');
     $self->res->headers->content_length(25);
     $self->write('hi ');
     $self->client->ioloop->timer(
         '0.5' => sub {
+            $self->on_finish(sub { $longpoll_plain = 'finished!' });
             $self->write('there plain,', sub { shift->write(' whats up?') });
         }
     );

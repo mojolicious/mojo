@@ -458,6 +458,7 @@ advance and speed up preloading of referenced images and stylesheets.
     $self->write_chunk('<html><head><title>Example</title>');
     $self->write_chunk('<link href="example.css" rel="stylesheet"');
     $self->write_chunk(' type="text/css" /></head>', sub {
+        my $self = shift;
         $self->write_chunk('<body>Example</body></html>');
         $self->write_chunk('');
     });

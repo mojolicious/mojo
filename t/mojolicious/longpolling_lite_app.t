@@ -6,7 +6,7 @@ use warnings;
 # Disable epoll, kqueue and IPv6
 BEGIN { $ENV{MOJO_POLL} = $ENV{MOJO_NO_IPV6} = 1 }
 
-use Test::More tests => 49;
+use Test::More tests => 56;
 
 # I was God once.
 # Yes, I saw. You were doing well until everyone died.
@@ -14,10 +14,11 @@ use Mojolicious::Lite;
 use Test::Mojo;
 
 # GET /shortpoll
-my $shortpoll;
+my $shortpoll = 0;
 get '/shortpoll' => sub {
     my $self = shift;
-    $self->on_finish(sub { $shortpoll = 'finished!' });
+    $self->res->headers->connection('close');
+    $self->on_finish(sub { $shortpoll++ });
     $self->res->code(200);
     $self->res->headers->content_type('text/plain');
     $self->write_chunk('this was short.');
@@ -133,13 +134,17 @@ $t->get_ok('/shortpoll')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/plain')->content_is('this was short.');
-is $shortpoll, 'finished!', 'finished';
+is $t->tx->kept_alive, undef, 'connection was not kept alive';
+is $t->tx->keep_alive, 0,     'connection will not be kept alive';
+is $shortpoll, 1, 'finished';
 
 # GET /shortpoll/plain
 $t->get_ok('/shortpoll/plain')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/plain')->content_is('this was short and plain.');
+is $t->tx->kept_alive, undef, 'connection was not kept alive';
+is $t->tx->keep_alive, 1,     'connection will be kept alive';
 is $shortpoll_plain, 'finished!', 'finished';
 
 # GET /longpoll
@@ -147,6 +152,27 @@ $t->get_ok('/longpoll')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/plain')->content_is('hi there, whats up?');
+is $t->tx->kept_alive, 1, 'connection was kept alive';
+is $t->tx->keep_alive, 1, 'connection will be kept alive';
+is $longpoll, 'finished!', 'finished';
+
+# GET /longpoll (interrupted)
+$longpoll = undef;
+my $port = $t->client->test_server;
+$t->client->ioloop->connect(
+    address    => 'localhost',
+    port       => $port,
+    on_connect => sub {
+        my ($self, $id) = @_;
+        $self->write($id => "GET /longpoll HTTP/1.1\x0d\x0a\x0d\x0a");
+    },
+    on_read => sub {
+        my ($self, $id, $chunk) = @_;
+        $self->drop($id);
+        $self->timer('0.5', sub { shift->stop });
+    }
+);
+$t->client->ioloop->start;
 is $longpoll, 'finished!', 'finished';
 
 # GET /longpoll/nested

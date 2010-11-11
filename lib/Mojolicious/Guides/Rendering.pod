@@ -457,10 +457,13 @@ advance and speed up preloading of referenced images and stylesheets.
 
     $self->write_chunk('<html><head><title>Example</title>');
     $self->write_chunk('<link href="example.css" rel="stylesheet"');
-    $self->write_chunk(' type="text/css" /></head>');
-    $self->write_chunk('<body>Example</body></html>');
-    $self->write_chunk('');
+    $self->write_chunk(' type="text/css" /></head>', sub {
+        $self->write_chunk('<body>Example</body></html>');
+        $self->write_chunk('');
+    });
 
+The optional drain callback ensures that all previous chunks have been
+written before processing continues.
 An empty chunk marks the end of the stream.
 
     22

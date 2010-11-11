@@ -796,7 +796,7 @@ sub write {
         $c->{drain} = 0 if $cb;
 
         # Fast write
-        $self->_write($id) unless $c->{tls_accept};
+        $self->_write($id) unless exists $c->{tls_accept};
     }
 
     # Callback

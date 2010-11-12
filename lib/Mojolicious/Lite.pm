@@ -379,8 +379,15 @@ Routes can be restricted to specific request methods.
 All placeholders get compiled to a regex internally, with regex constraints
 this process can be easily customized.
 
-    # /*
-    any '/:bar' => [bar => qr/\d+/] => sub {
+    # /* (digits)
+    any '/:foo' => [foo => qr/\d+/] => sub {
+        my $self = shift;
+        my $foo  = $self->param('foo');
+        $self->render(text => "Our :foo placeholder matched $foo");
+    };
+
+    # /* (everything else)
+    any '/:bar' => [bar => qr/.*/] => sub {
         my $self = shift;
         my $bar  = $self->param('bar');
         $self->render(text => "Our :bar placeholder matched $bar");

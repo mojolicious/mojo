@@ -193,7 +193,8 @@ sub connect {
         on_connect => $args->{on_connect}
           || $args->{connect_cb}
           || $args->{cb},
-        connecting => 1
+        connecting => 1,
+        tls        => $args->{tls}
     };
     (my $id) = "$c" =~ /0x([\da-f]+)/;
     $self->{_cs}->{$id} = $c;
@@ -796,7 +797,7 @@ sub write {
         $c->{drain} = 0 if $cb;
 
         # Fast write
-        $self->_write($id) unless exists $c->{tls_accept};
+        $self->_write($id);
     }
 
     # Callback
@@ -861,8 +862,8 @@ sub _accept {
     }
 
     # Accept callback
-    my $cb = $l->{on_accept};
-    $self->_run_event('accept', $cb, $id) if $cb;
+    my $cb = $c->{on_accept} = $l->{on_accept};
+    $self->_run_event('accept', $cb, $id) if $cb && !$l->{tls};
 
     # Remove listen sockets
     $listen = $self->{_listen} || {};
@@ -1139,7 +1140,7 @@ sub _prepare_connect {
 
     # Connect callback
     my $cb = $c->{on_connect};
-    $self->_run_event('connect', $cb, $id) if $cb;
+    $self->_run_event('connect', $cb, $id) if $cb && !$c->{tls};
 }
 
 sub _prepare_connections {
@@ -1373,7 +1374,14 @@ sub _tls_accept {
 
     # Accepted
     if ($c->{socket}->accept_SSL) {
+
+        # Cleanup
         delete $c->{tls_accept};
+
+        # Accept callback
+        my $cb = $c->{on_accept};
+        $self->_run_event('accept', $cb, $id) if $cb;
+
         return;
     }
 
@@ -1398,7 +1406,14 @@ sub _tls_connect {
 
     # Connected
     if ($c->{socket}->connect_SSL) {
+
+        # Cleanup
         delete $c->{tls_connect};
+
+        # Connect callback
+        my $cb = $c->{on_connect};
+        $self->_run_event('connect', $cb, $id) if $cb;
+
         return;
     }
 

@@ -67,15 +67,13 @@ my $STASH_RE = qr/
     $
     /x;
 
-our $AUTOLOAD;
-
 # Is all the work done by the children?
 # No, not the whipping.
 sub AUTOLOAD {
     my $self = shift;
 
     # Method
-    my ($package, $method) = $AUTOLOAD =~ /^([\w\:]+)\:\:(\w+)$/;
+    my ($package, $method) = our $AUTOLOAD =~ /^([\w\:]+)\:\:(\w+)$/;
 
     # Helper
     Carp::croak(qq/Can't locate object method "$method" via "$package"/)

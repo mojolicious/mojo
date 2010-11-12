@@ -37,15 +37,13 @@ __PACKAGE__->attr(types   => sub { Mojolicious::Types->new });
 our $CODENAME = 'Hot Beverage';
 our $VERSION  = '0.999939';
 
-our $AUTOLOAD;
-
 # These old doomsday devices are dangerously unstable.
 # I'll rest easier not knowing where they are.
 sub AUTOLOAD {
     my $self = shift;
 
     # Method
-    my ($package, $method) = $AUTOLOAD =~ /^([\w\:]+)\:\:(\w+)$/;
+    my ($package, $method) = our $AUTOLOAD =~ /^([\w\:]+)\:\:(\w+)$/;
 
     # Helper
     croak qq/Can't locate object method "$method" via "$package"/

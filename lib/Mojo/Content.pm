@@ -70,8 +70,6 @@ sub build_headers {
 
 # Aren't we forgetting the true meaning of Christmas?
 # You know, the birth of Santa.
-sub finish { shift->{_eof} = 1 }
-
 sub generate_body_chunk {
     my ($self, $offset) = @_;
 
@@ -302,7 +300,7 @@ sub write_chunk {
     $self->write(defined $chunk ? $self->_build_chunk($chunk) : $chunk, $cb);
 
     # Finish
-    $self->finish if defined $chunk && $chunk eq '';
+    $self->{_eof} = 1 if defined $chunk && $chunk eq '';
 }
 
 sub _build_chunk {
@@ -505,13 +503,6 @@ Render whole body.
     my $string = $content->build_headers;
 
 Render all headers.
-
-=head2 C<finish>
-
-    $content->finish;
-
-Finish dynamic content generation.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<generate_body_chunk>
 

@@ -6,7 +6,7 @@ use warnings;
 # Disable epoll, kqueue and IPv6
 BEGIN { $ENV{MOJO_POLL} = $ENV{MOJO_NO_IPV6} = 1 }
 
-use Test::More tests => 56;
+use Test::More tests => 59;
 
 # I was God once.
 # Yes, I saw. You were doing well until everyone died.
@@ -174,6 +174,21 @@ $t->client->ioloop->connect(
 );
 $t->client->ioloop->start;
 is $longpoll, 'finished!', 'finished';
+
+# GET /longpoll (also interrupted)
+my $tx = $t->client->build_tx(GET => '/longpoll');
+my $buffer = '';
+$tx->res->body(
+    sub {
+        my ($self, $chunk) = @_;
+        $buffer .= $chunk;
+        $self->error('Interrupted!');
+    }
+);
+$t->client->process($tx);
+is $tx->res->code,  200,            'right status';
+is $tx->res->error, 'Interrupted!', 'right error';
+is $buffer, 'hi ', 'right content';
 
 # GET /longpoll/nested
 $t->get_ok('/longpoll/nested')->status_is(200)

@@ -28,7 +28,6 @@ __PACKAGE__->attr(version => '1.1');
 # DEPRECATED in Comet!
 *finish_cb   = \&on_finish;
 *progress_cb = \&on_progress;
-*read_cb     = \&on_read;
 
 # I'll keep it short and sweet. Family. Religion. Friendship.
 # These are the three demons you must slay if you wish to succeed in
@@ -53,28 +52,33 @@ sub body {
     $self->content(Mojo::Content::Single->new)
       if $self->content->isa('Mojo::Content::MultiPart');
 
+    # Content
+    my $content = $self->content;
+
     # Get
     unless (@_) {
-        return $self->on_read
-          ? $self->on_read
+        return $content->on_read
+          ? $content->on_read
           : return $self->content->asset->slurp;
     }
 
     # New content
-    my $content = shift;
+    my $new = shift;
 
     # Cleanup
-    $self->on_read(undef);
-    $self->content->asset(Mojo::Asset::Memory->new);
+    $content->on_read(undef);
+    $content->asset(Mojo::Asset::Memory->new);
 
     # Shortcut
-    return $self unless defined $content;
+    return $self unless defined $new;
 
     # Callback
-    if (ref $content eq 'CODE') { $self->on_read($content) }
+    if (ref $new eq 'CODE') {
+        $content->on_read(sub { shift and $self->$new(@_) });
+    }
 
     # Set text content
-    elsif (length $content) { $self->content->asset->add_chunk($content) }
+    elsif (length $new) { $content->asset->add_chunk($new) }
 
     return $self;
 }
@@ -253,8 +257,6 @@ sub error {
     return $self;
 }
 
-sub finish { shift->content->finish(@_) }
-
 sub fix_headers {
     my $self = shift;
 
@@ -376,8 +378,6 @@ sub param {
 
 sub parse            { shift->_parse(0, @_) }
 sub parse_until_body { shift->_parse(1, @_) }
-
-sub on_read { shift->content->on_read(@_) }
 
 sub start_line_size { length shift->build_start_line }
 
@@ -696,20 +696,6 @@ Callback called after message building or parsing is finished.
 
 Progress callback.
 
-=head2 C<on_read>
-
-    my $cb   = $message->on_read;
-    $message = $message->on_read(sub {...});
-
-Content parser callback.
-
-    $message = $message->on_read(sub {
-        my ($self, $chunk) = @_;
-        print $chunk;
-    });
-
-Note that this attribute is EXPERIMENTAL and might change without warning!
-
 =head1 METHODS
 
 L<Mojo::Message> inherits all methods from L<Mojo::Base> and implements the
@@ -783,13 +769,6 @@ Note that this method is EXPERIMENTAL and might change without warning!
     $message             = $message->error('Parser error.', 500);
 
 Parser errors and codes.
-
-=head2 C<finish>
-
-    $message->finish;
-
-Finish dynamic content generation.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<fix_headers>
 

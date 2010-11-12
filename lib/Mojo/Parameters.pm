@@ -23,7 +23,7 @@ sub new {
     my $self = shift->SUPER::new();
 
     # Hash/Array
-    if (defined $_[1]) { $self->append(@_) }
+    if (@_ > 1) { $self->append(@_) }
 
     # String
     else { $self->parse(@_) }

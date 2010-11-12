@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 42;
+use Test::More tests => 44;
 
 # Now that's a wave of destruction that's easy on the eyes.
 use_ok 'Mojo::Parameters';
@@ -59,6 +59,10 @@ is_deeply [$params->param], [qw/q t w/], 'right structure';
 $params->append('a', 4, 'a', 5, 'b', 6, 'b', 7);
 is_deeply $params->to_hash,
   {a => [4, 5], b => [6, 7], q => 1, w => 2, t => 7}, 'right structure';
+$params = Mojo::Parameters->new(foo => undef, bar => 'bar');
+is $params->to_string, 'foo=&bar=bar', 'right format';
+$params = Mojo::Parameters->new(bar => 'bar', foo => undef);
+is $params->to_string, 'bar=bar&foo=', 'right format';
 
 # 0 value
 $params = Mojo::Parameters->new(foo => 0);
@@ -105,7 +109,10 @@ is_deeply [$params->param('foo')], [qw/bar baz/], 'right values';
 is $params->param('a'), 'b', 'right value';
 is_deeply [$params->param('bar')], [qw/bas test/], 'right values';
 is_deeply $params->to_hash,
-  {foo => ['bar', 'baz'], a => 'b', bar => ['bas', 'test']},
+  { foo => ['bar', 'baz'],
+    a   => 'b',
+    bar => ['bas', 'test']
+  },
   'right structure';
 
 # Unicode

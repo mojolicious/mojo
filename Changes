@@ -4,6 +4,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed a bug that prevented on_finish to be triggered for
           interrupted connections.
         - Fixed a TLS accept bug in Mojo::IOLoop.
+        - Fixed a small bug in Mojo::Parameters. (spleenjack)
         - Fixed typos.
 
 0.999938 2010-11-09 00:00:00

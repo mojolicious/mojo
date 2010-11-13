@@ -288,6 +288,9 @@ sub listen {
         %{$args->{args} || {}}
     );
 
+    # IO::Socket::IP does not yet support the "Blocking" argument
+    $options{Blocking} = 0 unless IPV6;
+
     # File
     my $file = $args->{file};
 
@@ -910,6 +913,9 @@ sub _connect {
         Type     => $args->{proto} eq 'udp' ? SOCK_DGRAM : SOCK_STREAM,
         %{$args->{args} || {}}
     );
+
+    # IO::Socket::IP does not yet support the "Blocking" argument
+    $options{Blocking} = 0 unless IPV6;
 
     # Socket
     my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';

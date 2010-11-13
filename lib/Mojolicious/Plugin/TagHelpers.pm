@@ -187,24 +187,30 @@ sub register {
 
             # CDATA
             my $cb;
-            my $old = $cb = pop if ref $_[-1] && ref $_[-1] eq 'CODE';
-            $cb = sub { "/*<![CDATA[*/\n" . $old->() . "\n/*]]>*/" }
-              if $cb;
-
-            # Path
-            if (@_ % 2 ? ref $_[-1] ne 'CODE' : ref $_[-1] eq 'CODE') {
-                return $self->_tag(
-                    'link',
-                    href  => shift,
-                    media => 'screen',
-                    rel   => 'stylesheet',
-                    type  => 'text/css',
-                    @_
-                );
+            if (ref $_[-1] && ref $_[-1] eq 'CODE') {
+                my $old = pop;
+                $cb = sub { "/*<![CDATA[*/\n" . $old->() . "\n/*]]>*/" }
             }
 
-            # Block
-            $self->_tag('style', type => 'text/css', @_, $cb);
+            # Path
+            my $href;
+            $href = shift if @_ % 2;
+
+            # Attributes
+            my %attrs = @_;
+
+            # Link
+            return $self->_tag(
+                'link',
+                href  => $href,
+                media => 'screen',
+                rel   => 'stylesheet',
+                type  => 'text/css',
+                %attrs
+            ) if $href;
+
+            # Style
+            $self->_tag('style', type => 'text/css', %attrs, $cb);
         }
     );
 

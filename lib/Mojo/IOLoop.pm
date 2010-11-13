@@ -288,9 +288,6 @@ sub listen {
         %{$args->{args} || {}}
     );
 
-    # IO::Socket::IP does not yet support the "Blocking" argument
-    $options{Blocking} = 0 unless IPV6;
-
     # File
     my $file = $args->{file};
 

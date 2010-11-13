@@ -74,7 +74,7 @@ sub register {
             # CDATA
 	    if(ref $_[-1] && ref $_[-1] eq 'CODE') {	      
 	      my $old = pop;
-	      $cb = sub { "//<![CDATA[" . $old->() . "//]]>" }
+	      $cb = sub { "//<![CDATA[\n" . $old->() . "\n//]]>" }
 	    }
 
 	    # Path
@@ -189,7 +189,7 @@ sub register {
             # CDATA
             my $cb;
             my $old = $cb = pop if ref $_[-1] && ref $_[-1] eq 'CODE';
-            $cb = sub { '/*<![CDATA[*/' . $old->() . '/*]]>*/' }
+            $cb = sub { "/*<![CDATA[*/\n" . $old->() . "\n/*]]>*/" }
               if $cb;
 
             # Path

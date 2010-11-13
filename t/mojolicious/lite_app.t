@@ -828,17 +828,25 @@ $t->get_ok('/tags/lala?a=b&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
 <input name="a" value="b" />
 <script src="script.js" type="text/javascript"></script>
 <script type="text/javascript">//<![CDATA[
+
     var a = 'b';
+
 //]]></script>
 <script type="foo">//<![CDATA[
+
     var a = 'b';
+
 //]]></script>
 <link href="foo.css" media="screen" rel="stylesheet" type="text/css" />
 <style type="text/css">/*<![CDATA[*/
+
     body {color: #000}
+
 /*]]>*/</style>
 <style type="foo">/*<![CDATA[*/
+
     body {color: #000}
+
 /*]]>*/</style>
 EOF
 
@@ -878,17 +886,25 @@ $t->get_ok('/tags/lala?c=b&d=3&e=4&f=5')->status_is(200)->content_is(<<EOF);
 <input name="a" value="c" />
 <script src="script.js" type="text/javascript"></script>
 <script type="text/javascript">//<![CDATA[
+
     var a = 'b';
+
 //]]></script>
 <script type="foo">//<![CDATA[
+
     var a = 'b';
+
 //]]></script>
 <link href="foo.css" media="screen" rel="stylesheet" type="text/css" />
 <style type="text/css">/*<![CDATA[*/
+
     body {color: #000}
+
 /*]]>*/</style>
 <style type="foo">/*<![CDATA[*/
+
     body {color: #000}
+
 /*]]>*/</style>
 EOF
 

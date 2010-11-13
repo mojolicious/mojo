@@ -68,21 +68,20 @@ sub register {
         javascript => sub {
             my $c = shift;
 
-	    # Tag must not be an empty element
-            my $cb = sub { '' };
-
             # CDATA
-	    if(ref $_[-1] && ref $_[-1] eq 'CODE') {	      
-	      my $old = pop;
-	      $cb = sub { "//<![CDATA[\n" . $old->() . "\n//]]>" }
-	    }
+            my $cb = sub {''};
+            if (ref $_[-1] && ref $_[-1] eq 'CODE') {
+                my $old = pop;
+                $cb = sub { "//<![CDATA[\n" . $old->() . "\n//]]>" }
+            }
 
-	    # Path
-	    my $src;	  
+            # Path
+            my $src;
             $src = shift if @_ % 2;
 
-	    my %attrs = @_;
-	    $attrs{src} = $src if $src;
+            # Attributes
+            my %attrs = @_;
+            $attrs{src} = $src if $src;
 
             $self->_tag('script', type => 'text/javascript', %attrs, $cb);
         }

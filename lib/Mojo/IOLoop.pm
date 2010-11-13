@@ -28,11 +28,6 @@ use constant EPOLL_POLLHUP => EPOLL ? IO::Epoll::POLLHUP() : 0;
 use constant EPOLL_POLLIN  => EPOLL ? IO::Epoll::POLLIN()  : 0;
 use constant EPOLL_POLLOUT => EPOLL ? IO::Epoll::POLLOUT() : 0;
 
-# IPv6 support requires IO::Socket::IP
-use constant IPV6 => $ENV{MOJO_NO_IPV6}
-  ? 0
-  : eval 'use IO::Socket::IP 0.04 (); 1';
-
 # KQueue support requires IO::KQueue
 use constant KQUEUE => ($ENV{MOJO_POLL} || $ENV{MOJO_EPOLL})
   ? 0
@@ -44,9 +39,9 @@ use constant KQUEUE_READ   => KQUEUE ? IO::KQueue::EVFILT_READ()  : 0;
 use constant KQUEUE_WRITE  => KQUEUE ? IO::KQueue::EVFILT_WRITE() : 0;
 
 # TLS support requires IO::Socket::SSL
-use constant TLS => $ENV{MOJO_NO_TLS} ? 0
-  : IPV6 ? eval 'use IO::Socket::SSL 1.33 (); 1'
-  :        eval 'use IO::Socket::SSL 1.33 "inet4"; 1';
+use constant TLS => $ENV{MOJO_NO_TLS}
+  ? 0
+  : eval 'use IO::Socket::SSL 1.33 (); 1';
 use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
@@ -330,14 +325,16 @@ sub listen {
     else {
 
         # Socket options
-        $options{LocalAddr} = $args->{address} || (IPV6 ? '::' : '0.0.0.0');
+        $options{LocalAddr} = $args->{address} || '0.0.0.0';
         $options{LocalPort} = $port;
         $options{Proto}     = 'tcp';
         $options{ReuseAddr} = 1;
 
         # Create socket
-        my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';
-        $socket = defined $fd ? $class->new : $class->new(%options)
+        $socket =
+          defined $fd
+          ? IO::Socket::INET->new
+          : IO::Socket::INET->new(%options)
           or croak "Can't create listen socket: $!";
     }
 
@@ -904,6 +901,7 @@ sub _connect {
 
     # Options
     my %options = (
+        Blocking => 0,
         PeerAddr => $args->{address},
         PeerPort => $args->{port} || ($args->{tls} ? 443 : 80),
         Proto    => $args->{proto},
@@ -911,14 +909,10 @@ sub _connect {
         %{$args->{args} || {}}
     );
 
-    # IO::Socket::IP does not yet support the "Blocking" argument
-    $options{Blocking} = 0 unless IPV6;
-
     # Socket
-    my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';
     return $self->_error($id, "Couldn't connect.")
       unless my $socket = $args->{socket}
-          || $class->new(%options);
+          || IO::Socket::INET->new(%options);
     $c->{socket} = $socket;
     $self->{_reverse}->{$socket} = $id;
 
@@ -1583,8 +1577,8 @@ L<Mojo::IOLoop> is a very minimalistic reactor that has been reduced to the
 absolute minimal feature set required to build solid and scalable async TCP
 clients and servers.
 
-Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::IP> and
-L<IO::Socket::SSL> are supported transparently and used if installed.
+Optional modules L<IO::KQueue>, L<IO::Epoll> and L<IO::Socket::SSL> are
+supported transparently and used if installed.
 
 A TLS certificate and key are also built right in to make writing test
 servers as easy as possible.
@@ -1718,10 +1712,8 @@ possible.
         tls     => 1
     });
 
-Open a TCP connection to a remote host, IPv6 will be used automatically if
-available.
-Note that IPv6 support depends on L<IO::Socket::IP> and TLS support on
-L<IO::Socket::SSL>.
+Open a TCP connection to a remote host.
+Note that TLS support depends on L<IO::Socket::SSL>.
 
 These options are currently available.
 
@@ -1807,9 +1799,8 @@ Check if loop is running.
         tls_key  => '/foo/server.key'
     );
 
-Create a new listen socket, IPv6 will be used automatically if available.
-Note that IPv6 support depends on L<IO::Socket::IP> and TLS support on
-L<IO::Socket::SSL>.
+Create a new listen socket.
+Note that TLS support depends on L<IO::Socket::SSL>.
 
 These options are currently available.
 

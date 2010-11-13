@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 
-# Disable epoll, kqueue and IPv6
-BEGIN { $ENV{MOJO_POLL} = $ENV{MOJO_NO_IPV6} = $ENV{MOJO_NO_TLS} = 1 }
+# Disable epoll, kqueue and TLS
+BEGIN { $ENV{MOJO_POLL} = $ENV{MOJO_NO_TLS} = 1 }
 
 use Test::More;
 

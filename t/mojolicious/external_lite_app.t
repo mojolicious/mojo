@@ -5,9 +5,9 @@ use warnings;
 
 use utf8;
 
-# Disable epoll, kqueue and IPv6
+# Disable epoll and kqueue
 BEGIN {
-    $ENV{MOJO_POLL} = $ENV{MOJO_NO_IPV6} = 1;
+    $ENV{MOJO_POLL} = 1;
     $ENV{MOJO_MODE} = 'testing';
 }
 

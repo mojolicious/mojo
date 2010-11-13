@@ -5,8 +5,8 @@ use warnings;
 
 use utf8;
 
-# Disable epoll and kqueue
-BEGIN { $ENV{MOJO_POLL} = 1 }
+# Disable epoll, kqueue and IPv6
+BEGIN { $ENV{MOJO_POLL} = $ENV{MOJO_NO_IPV6} = 1 }
 
 use Test::More tests => 664;
 
@@ -826,20 +826,20 @@ $t->get_ok('/tags/lala?a=b&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
 <input name="escaped" value="1&quot; &quot;2" />
 <input name="a" value="b" />
 <input name="a" value="b" />
-<script src="script.js" type="text/javascript" />
-<script type="text/javascript"><![CDATA[
+<script src="script.js" type="text/javascript"></script>
+<script type="text/javascript">//<![CDATA[
     var a = 'b';
-]]></script>
-<script type="foo"><![CDATA[
+//]]></script>
+<script type="foo">//<![CDATA[
     var a = 'b';
-]]></script>
+//]]></script>
 <link href="foo.css" media="screen" rel="stylesheet" type="text/css" />
-<style type="text/css"><![CDATA[
+<style type="text/css">/*<![CDATA[*/
     body {color: #000}
-]]></style>
-<style type="foo"><![CDATA[
+/*]]>*/</style>
+<style type="foo">/*<![CDATA[*/
     body {color: #000}
-]]></style>
+/*]]>*/</style>
 EOF
 
 # GET /tags (alternative)
@@ -876,20 +876,20 @@ $t->get_ok('/tags/lala?c=b&d=3&e=4&f=5')->status_is(200)->content_is(<<EOF);
 <input name="escaped" />
 <input name="a" />
 <input name="a" value="c" />
-<script src="script.js" type="text/javascript" />
-<script type="text/javascript"><![CDATA[
+<script src="script.js" type="text/javascript"></script>
+<script type="text/javascript">//<![CDATA[
     var a = 'b';
-]]></script>
-<script type="foo"><![CDATA[
+//]]></script>
+<script type="foo">//<![CDATA[
     var a = 'b';
-]]></script>
+//]]></script>
 <link href="foo.css" media="screen" rel="stylesheet" type="text/css" />
-<style type="text/css"><![CDATA[
+<style type="text/css">/*<![CDATA[*/
     body {color: #000}
-]]></style>
-<style type="foo"><![CDATA[
+/*]]>*/</style>
+<style type="foo">/*<![CDATA[*/
     body {color: #000}
-]]></style>
+/*]]>*/</style>
 EOF
 
 # GET /selection (empty)

@@ -8,9 +8,9 @@ BEGIN { $ENV{MOJO_POLL} = $ENV{MOJO_NO_TLS} = 1 }
 
 use Test::More;
 
-plan skip_all => 'set TEST_CLIENT to enable this test (developer only!)'
-  unless $ENV{TEST_CLIENT};
-plan tests => 103;
+plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
+  unless $ENV{TEST_ONLINE};
+plan tests => 101;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -74,34 +74,6 @@ $async->get(
 )->start;
 $async->ioloop->start;
 is $kept_alive, 1, 'connection was kept alive';
-
-# Resolve TXT record
-my $record;
-$async->ioloop->resolve(
-    'google.com',
-    'TXT',
-    sub {
-        my ($self, $records) = @_;
-        $record = $records->[0];
-        $self->stop;
-    }
-)->start;
-like $record, qr/spf/, 'right record';
-
-# Resolve MX records
-my $found = 0;
-$async->ioloop->resolve(
-    'gmail.com',
-    'MX',
-    sub {
-        my ($self, $records) = @_;
-        for my $record (@$records) {
-            $found++ if $record =~ /gmail-smtp-in\.l\.google\.com/;
-        }
-        $self->stop;
-    }
-)->start;
-ok $found, 'found MX records';
 
 # Nested keep alive
 my @kept_alive;

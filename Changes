@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojolicious.
 0.999939 2010-11-13 00:00:00
         - Removed IPv6 support until Perl itself gets better support for it.
         - Added MX and PTR record type support to the Mojo::IOLoop resolver.
+          (und3f)
         - Fixed a bug that forced connect in Mojo::IOLoop to block.
         - Fixed a bug that prevented on_finish to be triggered for
           interrupted connections.

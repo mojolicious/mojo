@@ -555,7 +555,7 @@ sub remote_info {
 sub resolve {
     my ($self, $name, $type, $cb) = @_;
 
-    # Regex (IPv6 support requires Perl 5.12)
+    # Regex
     my $ipv4;
     $ipv4 = 1 if $name =~ $Mojo::URL::IPV4_RE;
     my $ipv6;

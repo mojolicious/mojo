@@ -19,6 +19,10 @@ use Time::HiRes 'time';
 # Debug
 use constant DEBUG => $ENV{MOJO_IOLOOP_DEBUG} || 0;
 
+# IPv6 support requires Perl 5.12
+use constant IPV6 => eval 'use 5.12.0; 1';
+use constant IPV6_AF_INET6 => IPV6 ? Socket::AF_INET6() : 0;
+
 # Epoll support requires IO::Epoll
 use constant EPOLL => ($ENV{MOJO_POLL} || $ENV{MOJO_KQUEUE})
   ? 0
@@ -118,6 +122,7 @@ my $DNS_TYPES = {
     A    => 0x0001,
     AAAA => 0x001c,
     MX   => 0x000f,
+    PTR  => 0x000c,
     TXT  => 0x0010
 };
 
@@ -550,9 +555,11 @@ sub remote_info {
 sub resolve {
     my ($self, $name, $type, $cb) = @_;
 
-    # Regex
-    my $ipv4 = $Mojo::URL::IPV4_RE;
-    my $ipv6 = $Mojo::URL::IPV6_RE;
+    # Regex (IPv6 support requires Perl 5.12)
+    my $ipv4;
+    $ipv4 = 1 if $name =~ $Mojo::URL::IPV4_RE;
+    my $ipv6;
+    $ipv6 = 1 if IPV6 && $name =~ $Mojo::URL::IPV6_RE;
 
     # Type
     my $t = $DNS_TYPES->{$type};
@@ -561,7 +568,7 @@ sub resolve {
     my $server = $self->dns_server;
 
     # No lookup required or record type not supported
-    unless ($server && $t && $name !~ $ipv4 && $name !~ $ipv6) {
+    if (!$server || !$t || ($t ne $DNS_TYPES->{PTR} && ($ipv4 || $ipv6))) {
         $self->timer(0 => sub { $self->$cb([]) });
         return $self;
     }
@@ -586,8 +593,24 @@ sub resolve {
             # Header (one question with recursion)
             my $req = pack 'nnnnnn', $tx, 0x0100, 1, 0, 0, 0;
 
+            # Parts
+            my @parts = split /\./, $name;
+
+            # Reverse
+            if ($t eq $DNS_TYPES->{PTR}) {
+
+                # IPv4
+                if ($ipv4) { @parts = reverse 'arpa', 'in-addr', @parts }
+
+                # IPv6
+                elsif ($ipv6) {
+                    @parts = reverse 'arpa', 'ip6', split //, unpack 'H32',
+                      Socket::inet_pton(IPV6_AF_INET6, $name);
+                }
+            }
+
             # Query (Internet)
-            for my $part (split /\./, $name) {
+            for my $part (@parts) {
                 $req .= pack 'C/a', $part if defined $part;
             }
             $req .= pack 'Cnn', 0, $t, 0x0001;
@@ -623,7 +646,8 @@ sub resolve {
             # Questions
             for (1 .. $packet[2]) {
                 my $n;
-                do { ($n, $content) = unpack 'C/aa*', $content } while ($n);
+                do { ($n, $content) = unpack 'C/aa*', $content }
+                  while ($n ne '');
                 $content = (unpack 'nna*', $content)[2];
             }
 
@@ -649,6 +673,13 @@ sub resolve {
                     $answer =
                       _parse_name($chunk,
                         length($chunk) - length($content) - length($a) + 2);
+                }
+
+                # PTR
+                elsif ($t eq $DNS_TYPES->{PTR}) {
+                    $answer =
+                      _parse_name($chunk,
+                        length($chunk) - length($content) - length($a));
                 }
 
                 # TXT
@@ -1978,7 +2009,7 @@ The remote port.
 
     $loop = $loop->resolve('mojolicio.us', 'A', sub {...});
 
-Resolve domain into C<A>, C<AAAA>, C<MX> or C<TXT> records.
+Resolve domain into C<A>, C<AAAA>, C<MX>, C<PTR> or C<TXT> records.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<singleton>

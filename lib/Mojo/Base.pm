@@ -82,6 +82,7 @@ sub attr {
         $code .= '};';
 
         # We compile custom attribute code for speed
+        no warnings 'redefine';
         *{"${class}::$attr"} = eval $code;
 
         # This should never happen (hopefully)

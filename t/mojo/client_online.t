@@ -10,7 +10,7 @@ use Test::More;
 
 plan skip_all => 'set TEST_CLIENT to enable this test (developer only!)'
   unless $ENV{TEST_CLIENT};
-plan tests => 102;
+plan tests => 103;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -87,6 +87,21 @@ $async->ioloop->resolve(
     }
 )->start;
 like $record, qr/spf/, 'right record';
+
+# Resolve MX records
+my $found = 0;
+$async->ioloop->resolve(
+    'gmail.com',
+    'MX',
+    sub {
+        my ($self, $records) = @_;
+        for my $record (@$records) {
+            $found++ if $record =~ /gmail-smtp-in\.l\.google\.com/;
+        }
+        $self->stop;
+    }
+)->start;
+ok $found, 'found MX records';
 
 # Nested keep alive
 my @kept_alive;

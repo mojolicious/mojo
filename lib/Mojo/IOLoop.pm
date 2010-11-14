@@ -117,6 +117,7 @@ if (-r '/etc/resolv.conf') {
 my $DNS_TYPES = {
     A    => 0x0001,
     AAAA => 0x001c,
+    MX   => 0x000f,
     TXT  => 0x0010
 };
 
@@ -643,6 +644,13 @@ sub resolve {
                       unpack('n*', $a);
                 }
 
+                # MX
+                elsif ($t eq $DNS_TYPES->{MX}) {
+                    $answer =
+                      _parse_name($chunk,
+                        length($chunk) - length($content) - length($a) + 2);
+                }
+
                 # TXT
                 elsif ($t eq $DNS_TYPES->{TXT}) {
                     $answer = unpack '(C/a*)*', $a;
@@ -667,9 +675,6 @@ sub resolve {
 
             # Debug
             warn "RESOLVE TIMEOUT ($server)\n" if DEBUG;
-
-            # Disable
-            $self->dns_server(undef);
 
             # Abort
             $self->drop($id);
@@ -1077,6 +1082,41 @@ sub _not_writing {
 
     # Not writing anymore
     $c->{writing} = 0;
+}
+
+# Domain name helper for "resolve"
+sub _parse_name {
+    my ($packet, $offset) = @_;
+
+    # First pointer
+    my $pointer = $offset;
+
+    # Elements
+    my @elements;
+    my $counter = 0;
+    while (1) {
+
+        # Recursion limit
+        return undef if $counter++ > 128;
+
+        # Element length
+        my $length = ord substr $packet, $pointer++, 1;
+
+        # Pointer
+        if ($length >= 0xc0) {
+            $pointer =
+              (unpack 'n', substr $packet, ++$pointer - 2, 2) & 0x3fff;
+        }
+
+        # Real element
+        elsif ($length) {
+            push @elements, substr $packet, $pointer, $length;
+            $pointer += $length;
+        }
+
+        # Zero length element (the end)
+        else { return join '.', @elements }
+    }
 }
 
 sub _prepare_accept {
@@ -1944,7 +1984,7 @@ The remote port.
 
     $loop = $loop->resolve('mojolicio.us', 'A', sub {...});
 
-Resolve domain into C<A>, C<AAAA> or C<TXT> records.
+Resolve domain into C<A>, C<AAAA>, C<MX> or C<TXT> records.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<singleton>

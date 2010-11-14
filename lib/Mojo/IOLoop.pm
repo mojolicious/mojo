@@ -1088,35 +1088,29 @@ sub _not_writing {
 sub _parse_name {
     my ($packet, $offset) = @_;
 
-    # First pointer
-    my $pointer = $offset;
-
     # Elements
     my @elements;
-    my $counter = 0;
-    while (1) {
-
-        # Recursion limit
-        return undef if $counter++ > 128;
+    for (1 .. 128) {
 
         # Element length
-        my $length = ord substr $packet, $pointer++, 1;
+        my $length = ord substr $packet, $offset++, 1;
 
-        # Pointer
+        # Offset
         if ($length >= 0xc0) {
-            $pointer =
-              (unpack 'n', substr $packet, ++$pointer - 2, 2) & 0x3fff;
+            $offset = (unpack 'n', substr $packet, ++$offset - 2, 2) & 0x3fff;
         }
 
-        # Real element
+        # Element
         elsif ($length) {
-            push @elements, substr $packet, $pointer, $length;
-            $pointer += $length;
+            push @elements, substr $packet, $offset, $length;
+            $offset += $length;
         }
 
         # Zero length element (the end)
         else { return join '.', @elements }
     }
+
+    return;
 }
 
 sub _prepare_accept {

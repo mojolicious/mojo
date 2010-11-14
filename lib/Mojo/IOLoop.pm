@@ -118,7 +118,8 @@ my $DNS_TYPES = {
     A    => 0x0001,
     AAAA => 0x001c,
     MX   => 0x000f,
-    TXT  => 0x0010
+    TXT  => 0x0010,
+    PTR  => 0x000c
 };
 
 # "localhost"
@@ -561,7 +562,11 @@ sub resolve {
     my $server = $self->dns_server;
 
     # No lookup required or record type not supported
-    unless ($server && $t && $name !~ $ipv4 && $name !~ $ipv6) {
+    if (   !$server
+        || !$t
+        || ($type ne 'PTR' && ($name =~ $ipv4 || $name =~ $ipv6)))
+    {
+
         $self->timer(0 => sub { $self->$cb([]) });
         return $self;
     }
@@ -587,7 +592,32 @@ sub resolve {
             my $req = pack 'nnnnnn', $tx, 0x0100, 1, 0, 0, 0;
 
             # Query (Internet)
-            for my $part (split /\./, $name) {
+            my @parties = split /\./, $name;
+            if ($type eq 'PTR') {
+                if ($name =~ $ipv4) {
+                    @parties = reverse('arpa', 'in-addr', @parties);
+                }
+                else {
+
+                    # ip6 address (must be in full format)
+                    @parties = ();
+                    foreach my $part (split /:/, $name) {
+
+                        # break into bytes (4 bytes in one part
+                        $part = hex $part;
+                        my @word;
+                        for (1 .. 4) {
+                            push @word, sprintf('%x', $part % 0x10);
+                            $part = int($part / 0x10);
+                        }
+                        unshift @parties, @word;
+                    }
+                    @parties = (@parties, 'ip6', 'arpa');
+                }
+            }
+
+            for my $part (@parties) {
+
                 $req .= pack 'C/a', $part if defined $part;
             }
             $req .= pack 'Cnn', 0, $t, 0x0001;
@@ -623,7 +653,8 @@ sub resolve {
             # Questions
             for (1 .. $packet[2]) {
                 my $n;
-                do { ($n, $content) = unpack 'C/aa*', $content } while ($n);
+                do { ($n, $content) = unpack 'C/aa*', $content }
+                  while ($n ne '');
                 $content = (unpack 'nna*', $content)[2];
             }
 
@@ -654,6 +685,13 @@ sub resolve {
                 # TXT
                 elsif ($t eq $DNS_TYPES->{TXT}) {
                     $answer = unpack '(C/a*)*', $a;
+                }
+
+                # PTR
+                elsif ($t eq $DNS_TYPES->{PTR}) {
+                    $answer =
+                      _parse_name($chunk,
+                        length($chunk) - length($content) - length($a));
                 }
 
                 next unless defined $answer;
@@ -1978,7 +2016,7 @@ The remote port.
 
     $loop = $loop->resolve('mojolicio.us', 'A', sub {...});
 
-Resolve domain into C<A>, C<AAAA>, C<MX> or C<TXT> records.
+Resolve domain into C<A>, C<AAAA>, C<MX>, C<PTR> or C<TXT> records.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<singleton>

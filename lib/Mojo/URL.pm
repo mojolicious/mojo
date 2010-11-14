@@ -21,7 +21,8 @@ our $PCHAR      = "$UNRESERVED$SUBDELIM\%\:\@";
 
 # IPv4 regex (RFC 3986)
 my $DEC_OCTET_RE = qr/(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])/;
-our $IPV4_RE = qr/$DEC_OCTET_RE\.$DEC_OCTET_RE\.$DEC_OCTET_RE\.$DEC_OCTET_RE/;
+our $IPV4_RE =
+  qr/^$DEC_OCTET_RE\.$DEC_OCTET_RE\.$DEC_OCTET_RE\.$DEC_OCTET_RE$/;
 
 # IPv6 regex (RFC 3986)
 my $H16_RE  = qr/[0-9A-Fa-f]{1,4}/;

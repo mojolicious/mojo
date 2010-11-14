@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 154;
+use Test::More tests => 160;
 
 # I don't want you driving around in a car you built yourself.
 # You can sit there complaining, or you can knit me some seat belts.
@@ -270,11 +270,11 @@ is $url->is_ipv4, 1,           'is an IPv4 address';
 is $url->is_ipv6, undef,       'not an IPv6 address';
 $url = Mojo::URL->new('http://0::127.0.0.1');
 is $url->host,    '0::127.0.0.1', 'right host';
-is $url->is_ipv4, 1,              'is an IPv4 address';
+is $url->is_ipv4, undef,          'not an IPv4 address';
 is $url->is_ipv6, 1,              'is an IPv6 address';
 $url = Mojo::URL->new('http://[0::127.0.0.1]');
 is $url->host,    '[0::127.0.0.1]', 'right host';
-is $url->is_ipv4, 1,                'is an IPv4 address';
+is $url->is_ipv4, undef,            'not an IPv4 address';
 is $url->is_ipv6, 1,                'is an IPv6 address';
 $url = Mojo::URL->new('http://mojolicio.us:3000');
 is $url->host,    'mojolicio.us', 'right host';
@@ -290,9 +290,17 @@ is $url->is_ipv4, 1,           'is an IPv4 address';
 is $url->is_ipv6, undef,       'not an IPv6 address';
 $url = Mojo::URL->new('http://0::127.0.0.1:3000');
 is $url->host,    '0::127.0.0.1', 'right host';
-is $url->is_ipv4, 1,              'is an IPv4 address';
+is $url->is_ipv4, undef,          'not an IPv4 address';
 is $url->is_ipv6, 1,              'is an IPv6 address';
 $url = Mojo::URL->new('http://[0::127.0.0.1]:3000');
 is $url->host,    '[0::127.0.0.1]', 'right host';
-is $url->is_ipv4, 1,                'is an IPv4 address';
+is $url->is_ipv4, undef,            'not an IPv4 address';
 is $url->is_ipv6, 1,                'is an IPv6 address';
+$url = Mojo::URL->new('http://foo.1.1.1.1.de/');
+is $url->host,    'foo.1.1.1.1.de', 'right host';
+is $url->is_ipv4, undef,            'not an IPv4 address';
+is $url->is_ipv6, undef,            'not an IPv4 address';
+$url = Mojo::URL->new('http://1.1.1.1.1.1/');
+is $url->host,    '1.1.1.1.1.1', 'right host';
+is $url->is_ipv4, undef,         'not an IPv4 address';
+is $url->is_ipv6, undef,         'not an IPv4 address';

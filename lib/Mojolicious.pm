@@ -35,7 +35,7 @@ __PACKAGE__->attr(static  => sub { Mojolicious::Static->new });
 __PACKAGE__->attr(types   => sub { Mojolicious::Types->new });
 
 our $CODENAME = 'Hot Beverage';
-our $VERSION  = '0.999939';
+our $VERSION  = '0.999940';
 
 # These old doomsday devices are dangerously unstable.
 # I'll rest easier not knowing where they are.

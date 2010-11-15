@@ -94,12 +94,12 @@ is $a1, $a2, 'PTR roundtrip succeeded';
 # Resolve PTR record (IPv6)
 $found = 0;
 $loop->resolve(
-    '2001:470:b825:0:0:0:0:1',
+    '2001:4f8:0:2:0:0:0:e',
     'PTR',
     sub {
         my ($self, $records) = @_;
         for my $record (@$records) {
-            $found++ if $record eq 'ipv6tools.org';
+            $found++ if $record eq 'freebsd.isc.org';
         }
         $self->stop;
     }

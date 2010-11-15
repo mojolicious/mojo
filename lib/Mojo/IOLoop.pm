@@ -45,7 +45,7 @@ use constant KQUEUE_WRITE  => KQUEUE ? IO::KQueue::EVFILT_WRITE() : 0;
 # TLS support requires IO::Socket::SSL
 use constant TLS => $ENV{MOJO_NO_TLS}
   ? 0
-  : eval 'use IO::Socket::SSL 1.33 (); 1';
+  : eval 'use IO::Socket::SSL 1.34 "inet4"; 1';
 use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
@@ -278,7 +278,7 @@ sub listen {
     my $args = ref $_[0] ? $_[0] : {@_};
 
     # TLS check
-    croak "IO::Socket::SSL 1.33 required for TLS support"
+    croak "IO::Socket::SSL 1.34 required for TLS support"
       if $args->{tls} && !TLS;
 
     # Options
@@ -868,10 +868,7 @@ sub _accept {
 
     # TLS handshake
     my $tls = $l->{tls};
-    if ($tls) {
-        $tls->{SSL_error_trap} = sub { $self->_drop_immediately(shift) };
-        $socket = IO::Socket::SSL->start_SSL($socket, %$tls);
-    }
+    $socket = IO::Socket::SSL->start_SSL($socket, %$tls) if $tls;
     $c->{tls_accept} = 1 if $tls;
     $c->{socket}     = $socket;
     $r->{$socket}    = $id;

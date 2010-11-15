@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension Mojolicious.
 
 0.999940 2010-11-15 00:00:00
         - Improved resolver tests.
+        - Fixed IO::Socket::SSL 1.34 compatibility.
 
 0.999939 2010-11-15 00:00:00
         - Removed IPv6 support until Perl itself gets better support for it.

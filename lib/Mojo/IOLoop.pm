@@ -19,9 +19,9 @@ use Time::HiRes 'time';
 # Debug
 use constant DEBUG => $ENV{MOJO_IOLOOP_DEBUG} || 0;
 
-# IPv6 support requires Perl 5.12
-use constant IPV6 => eval 'use 5.12.0; 1';
-use constant IPV6_AF_INET6 => IPV6 ? Socket::AF_INET6() : 0;
+# Perl 5.12 required for "inet_pton"
+use constant PTON => eval 'use 5.12.0; 1';
+use constant PTON_AF_INET6 => PTON ? Socket::AF_INET6() : 0;
 
 # Epoll support requires IO::Epoll
 use constant EPOLL => ($ENV{MOJO_POLL} || $ENV{MOJO_KQUEUE})
@@ -559,7 +559,7 @@ sub resolve {
     my $ipv4;
     $ipv4 = 1 if $name =~ $Mojo::URL::IPV4_RE;
     my $ipv6;
-    $ipv6 = 1 if IPV6 && $name =~ $Mojo::URL::IPV6_RE;
+    $ipv6 = 1 if PTON && $name =~ $Mojo::URL::IPV6_RE;
 
     # Type
     my $t = $DNS_TYPES->{$type};
@@ -605,7 +605,7 @@ sub resolve {
                 # IPv6
                 elsif ($ipv6) {
                     @parts = reverse 'arpa', 'ip6', split //, unpack 'H32',
-                      Socket::inet_pton(IPV6_AF_INET6, $name);
+                      Socket::inet_pton(PTON_AF_INET6, $name);
                 }
             }
 

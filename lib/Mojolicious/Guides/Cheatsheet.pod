@@ -167,26 +167,12 @@ C<DNS> server to use for non-blocking lookups.
 
     MOJO_DNS_SERVER=8.8.8.8
 
-=head2 C<MOJO_EPOLL>
-
-Force epoll mainloop for IO operations.
-Note that L<IO::Epoll> must be installed for epoll support.
-
-    MOJO_EPOLL=1
-
 =head2 C<MOJO_HOME>
 
 Home directory for the L<Mojolicious> application, should always contain a
 path like C</home/sri/myapp>.
 
     MOJO_HOME=/home/sri/myapp
-
-=head2 C<MOJO_KQUEUE>
-
-Force kqueue mainloop for IO operations.
-Note that L<IO::KQueue> must be installed for kqueue support.
-
-    MOJO_KQUEUE=1
 
 =head2 C<MOJO_LOG_LEVEL>
 

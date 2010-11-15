@@ -24,7 +24,7 @@ use constant PTON => eval 'use 5.12.0; 1';
 use constant PTON_AF_INET6 => PTON ? Socket::AF_INET6() : 0;
 
 # Epoll support requires IO::Epoll
-use constant EPOLL => ($ENV{MOJO_POLL} || $ENV{MOJO_KQUEUE})
+use constant EPOLL => $ENV{MOJO_POLL}
   ? 0
   : eval 'use IO::Epoll 0.02 (); 1';
 use constant EPOLL_POLLERR => EPOLL ? IO::Epoll::POLLERR() : 0;
@@ -33,7 +33,7 @@ use constant EPOLL_POLLIN  => EPOLL ? IO::Epoll::POLLIN()  : 0;
 use constant EPOLL_POLLOUT => EPOLL ? IO::Epoll::POLLOUT() : 0;
 
 # KQueue support requires IO::KQueue
-use constant KQUEUE => ($ENV{MOJO_POLL} || $ENV{MOJO_EPOLL})
+use constant KQUEUE => $ENV{MOJO_POLL}
   ? 0
   : eval 'use IO::KQueue 0.34 (); 1';
 use constant KQUEUE_ADD    => KQUEUE ? IO::KQueue::EV_ADD()       : 0;

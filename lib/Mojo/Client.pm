@@ -814,6 +814,10 @@ sub _handle {
         # Idle connection
         return unless $old;
 
+        # Interrupted
+        $old->res->error('Interrupted, maybe a timeout?')
+          unless $old->is_done;
+
         # Extract cookies
         if (my $jar = $self->cookie_jar) { $jar->extract($old) }
 

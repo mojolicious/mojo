@@ -6,7 +6,7 @@ use warnings;
 # Disable epoll and kqueue
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 47;
+use Test::More tests => 48;
 
 use_ok 'Mojo::Client';
 
@@ -83,9 +83,10 @@ is $tx->res->body, 'works', 'right content';
 
 # GET / (missing Content-Lengt header)
 $tx = $client->get("http://localhost:$port2/");
-ok $tx->success,    'successful';
+ok !$tx->success, 'not successful';
+is $tx->error, 'Interrupted, maybe a timeout?', 'right error';
 is $tx->kept_alive, undef, 'kept connection not alive';
-is $tx->keep_alive, 0, 'keep connection not alive';
+is $tx->keep_alive, 0,     'keep connection not alive';
 is $tx->res->code, 200,          'right status';
 is $tx->res->body, 'works too!', 'no content';
 

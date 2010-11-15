@@ -11,6 +11,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed a small bug in Mojo::Parameters. (spleenjack)
         - Fixed javascript and stylesheet helper. (sshaw)
         - Fixed IPv4 address detection bug in Mojo::URL.
+        - Fixed a Mojo::Client bug where interrupted transactions were still
+          successful.
         - Fixed a small reloader bug.
         - Fixed typos.
 

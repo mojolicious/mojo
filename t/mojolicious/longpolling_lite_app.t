@@ -6,7 +6,7 @@ use warnings;
 # Disable epoll and kqueue
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 59;
+use Test::More tests => 62;
 
 # I was God once.
 # Yes, I saw. You were doing well until everyone died.
@@ -127,6 +127,27 @@ get '/longpoll/plain/delayed' => sub {
     );
 };
 
+# GET /too_long
+my $too_long;
+get '/too_long' => sub {
+    my $self = shift;
+    $self->on_finish(sub { $too_long = 'finished!' });
+    $self->res->code(200);
+    $self->res->headers->content_type('text/plain');
+    $self->res->headers->content_length(12);
+    $self->write('how');
+    $self->client->ioloop->timer(
+        '5' => sub {
+            $self->write(
+                sub {
+                    my $self = shift;
+                    $self->write('dy plain!');
+                }
+            );
+        }
+    );
+};
+
 my $t = Test::Mojo->new;
 
 # GET /shortpoll
@@ -217,3 +238,17 @@ $t->get_ok('/longpoll/plain/delayed')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/plain')->content_is('howdy plain!');
 is $longpoll_plain_delayed, 'finished!', 'finished';
+
+# GET /too_long (timeout)
+$tx = $t->client->keep_alive_timeout(1)->build_tx(GET => '/too_long');
+$buffer = '';
+$tx->res->body(
+    sub {
+        my ($self, $chunk) = @_;
+        $buffer .= $chunk;
+    }
+);
+$t->client->process($tx);
+is $tx->res->code, 200, 'right status';
+is $tx->error, 'Interrupted, maybe a timeout?', 'right error';
+is $buffer, 'how', 'right content';

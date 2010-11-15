@@ -6,7 +6,7 @@ use warnings;
 # Disable epoll and kqueue
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 62;
+use Test::More tests => 69;
 
 # I was God once.
 # Yes, I saw. You were doing well until everyone died.
@@ -127,6 +127,15 @@ get '/longpoll/plain/delayed' => sub {
     );
 };
 
+# GET /longpoll/static/delayed
+my $longpoll_static_delayed;
+get '/longpoll/static/delayed' => sub {
+    my $self = shift;
+    $self->on_finish(sub { $longpoll_static_delayed = 'finished!' });
+    $self->client->ioloop->timer(
+        '0.5' => sub { $self->render_static('hello.txt') });
+};
+
 # GET /too_long
 my $too_long;
 get '/too_long' => sub {
@@ -238,6 +247,14 @@ $t->get_ok('/longpoll/plain/delayed')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/plain')->content_is('howdy plain!');
 is $longpoll_plain_delayed, 'finished!', 'finished';
+
+# GET /longpoll/static/delayed
+$t->get_ok('/longpoll/static/delayed')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_type_is('text/plain')
+  ->content_is('Hello Mojo from a static file!');
+is $longpoll_static_delayed, 'finished!', 'finished';
 
 # GET /too_long (timeout)
 $tx = $t->client->keep_alive_timeout(1)->build_tx(GET => '/too_long');

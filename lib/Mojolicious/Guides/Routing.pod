@@ -413,10 +413,17 @@ ones.
 L<Mojolicious::Lite> routes are in fact just a small convenience layer around
 everything described above and also part of the normal router.
 
-    # GET  /foo -> {controller => 'foo', action => 'abc'}
-    # POST /bar -> {controller => 'foo', action => 'bar'}
+    # GET /foo -> {controller => 'foo', action => 'abc'}
     $r->get('/foo')->to(controller => 'foo', action => 'abc');
-    $r->post('/bar')->(controller => 'foo', action => 'bar');
+
+This makes the process of growing your L<Mojolicious::Lite> prototypes into
+full L<Mojolicious> applications very straightforward.
+
+    # POST /bar
+    $r->post('/bar' => sub {
+        my $self = shift;
+        $self->render(text => 'Just like a Mojolicious::Lite action!');
+    });
 
 Even the more abstract concepts are available.
 
@@ -431,9 +438,6 @@ Even the more abstract concepts are available.
         my $self = shift;
         $self->render(text => 'Go away!');
     });
-
-This will be very useful once your L<Mojolicious::Lite> prototypes grow into
-full L<Mojolicious> applications.
 
 =head1 ADVANCED
 

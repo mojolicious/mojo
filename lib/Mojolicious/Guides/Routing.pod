@@ -424,22 +424,14 @@ Even the more abstract concepts are available.
 
     # GET  /yada
     # POST /yada
-    my $yada = $r->under('/yada' => sub {
-        my $self = shift;
-
-        # Authenticated
-        return 1 if $self->req->headers->header('X-Bender');
-
-        # Not authenticated
-        return;
-    });
+    my $yada = $r->under('/yada');
     $yada->get(sub {
         my $self = shift;
-        $self->render(text => 'Hello Bender!');
+        $self->render(text => 'Hello!');
     });
     $yada->post(sub {
         my $self = shift;
-        $self->render(text => 'Go away Bender!');
+        $self->render(text => 'Go away!');
     });
 
 This can be very useful once your L<Mojolicious::Lite> prototypes grow into

@@ -88,6 +88,8 @@ sub add_condition {
     return $self;
 }
 
+sub any { shift->_generate_route(ref $_[0] ? shift : [], @_) }
+
 # Hey. What kind of party is this? There's no booze and only one hooker.
 sub auto_render {
     my ($self, $c) = @_;
@@ -165,6 +167,8 @@ sub dispatch {
     return $self->auto_render($c);
 }
 
+sub get { shift->_generate_route('get', @_) }
+
 sub hide { push @{shift->hidden}, @_ }
 
 sub is_endpoint {
@@ -224,6 +228,8 @@ sub parse {
 
     return $self;
 }
+
+sub post { shift->_generate_route('post', @_) }
 
 sub render {
     my ($self, $path, $values) = @_;
@@ -328,6 +334,8 @@ sub to_string {
     return $pattern;
 }
 
+sub under { shift->_generate_route('under', @_) }
+
 sub via {
     my $self = shift;
 
@@ -348,11 +356,14 @@ sub waypoint { shift->route(@_)->block(1) }
 sub websocket {
     my $self = shift;
 
-    # Condition
-    push @{$self->conditions}, websocket => 1;
-    $self->{_websocket} = 1;
+    # Route
+    my $route = $self->any(@_);
 
-    return $self;
+    # Condition
+    push @{$route->conditions}, websocket => 1;
+    $route->{_websocket} = 1;
+
+    return $route;
 }
 
 sub _dispatch_callback {
@@ -537,6 +548,59 @@ sub _generate_method {
     return $method;
 }
 
+sub _generate_route {
+    my ($self, $methods, @args) = @_;
+
+    my ($cb, $constraints, $defaults, $name, $pattern);
+    my $conditions = [];
+
+    # Route information
+    while (defined(my $arg = shift @args)) {
+
+        # First scalar is the pattern
+        if (!ref $arg && !$pattern) { $pattern = $arg }
+
+        # Scalar
+        elsif (!ref $arg && @args) {
+            push @$conditions, $arg, shift @args;
+        }
+
+        # Last scalar is the route name
+        elsif (!ref $arg) { $name = $arg }
+
+        # Callback
+        elsif (ref $arg eq 'CODE') { $cb = $arg }
+
+        # Constraints
+        elsif (ref $arg eq 'ARRAY') { $constraints = $arg }
+
+        # Defaults
+        elsif (ref $arg eq 'HASH') { $defaults = $arg }
+    }
+
+    # Defaults
+    $constraints ||= [];
+
+    # Defaults
+    $defaults ||= {};
+    $defaults->{cb} = $cb if $cb;
+
+    # Name
+    $name ||= '';
+
+    # Create bridge
+    return $self->bridge($pattern, {@$constraints})->over($conditions)
+      ->to($defaults)->name($name)
+      if !ref $methods && $methods eq 'under';
+
+    # Create route
+    my $route =
+      $self->route($pattern, {@$constraints})->over($conditions)
+      ->via($methods)->to($defaults)->name($name);
+
+    return $route;
+}
+
 sub _walk_stack {
     my ($self, $c) = @_;
 
@@ -623,6 +687,12 @@ Mojolicious::Routes - Always Find Your Destination With Routes
     # if they are not the actual endpoint of the whole route
     my $b = $r->waypoint('/books')->to(controller => 'books', action => 'list');
     $b->route('/:id', id => qr/\d+/)->to(action => 'view');
+
+    # Simplified Mojolicious::Lite style route generation is also possible
+    $r->get('/')->to(controller => 'blog', action => 'welcome');
+    my $blog = $r->under('/blog');
+    $blog->post('/list')->to('blog#list');
+    $blog->get(sub { shift->render(text => 'Go away!') });
 
 =head1 DESCRIPTION
 
@@ -740,6 +810,15 @@ Add a new child to this route.
 
 Add a new condition for this route.
 
+=head2 C<any>
+
+    my $any = $route->any('/:foo' => sub {...});
+    my $any = $route->any([qw/get post/] => '/:foo' => sub {...});
+
+Generate route matching any of the listed HTTP request methods or all.
+See also the L<Mojolicious::Lite> tutorial for more argument variations.
+Note that this method is EXPERIMENTAL and might change without warning!
+
 =head2 C<auto_render>
 
     $r->auto_render(Mojolicious::Controller->new);
@@ -776,6 +855,14 @@ Note that this method is EXPERIMENTAL and might change without warning!
     my $e = $r->dispatch(Mojolicious::Controller->new);
 
 Match routes and dispatch.
+
+=head2 C<get>
+
+    my $get = $route->get('/:foo' => sub {...});
+
+Generate route matching only C<GET> requests.
+See also the L<Mojolicious::Lite> tutorial for more argument variations.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<hide>
 
@@ -817,6 +904,14 @@ Apply condition parameters to this route.
 
 Parse a pattern.
 
+=head2 C<post>
+
+    my $post = $route->post('/:foo' => sub {...});
+
+Generate route matching only C<POST> requests.
+See also the L<Mojolicious::Lite> tutorial for more argument variations.
+Note that this method is EXPERIMENTAL and might change without warning!
+
 =head2 C<render>
 
     my $path = $r->render($path);
@@ -853,6 +948,15 @@ Set default parameters for this route.
 
 Stringifies the whole route.
 
+=head2 C<under>
+
+    my $under = $route->under(sub {...});
+    my $under = $route->under('/:foo');
+
+Generate bridges.
+See also the L<Mojolicious::Lite> tutorial for more argument variations.
+Note that this method is EXPERIMENTAL and might change without warning!
+
 =head2 C<via>
 
     $r = $r->via('get');
@@ -869,9 +973,11 @@ Add a waypoint to this route as nested child.
 
 =head2 C<websocket>
 
-    $route->websocket;
+    my $websocket = $route->websocket('/:foo' => sub {...});
 
-Apply C<websocket> constraint to this route.
+Generate route matching only C<WebSocket> handshakes.
+See also the L<Mojolicious::Lite> tutorial for more argument variations.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head1 SEE ALSO
 

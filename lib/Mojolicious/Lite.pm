@@ -32,68 +32,6 @@ sub import {
     my $routes = $app->routes;
     $routes->namespace('');
 
-    # Route generator
-    my $route = sub {
-        my ($methods, @args) = @_;
-
-        my ($cb, $constraints, $defaults, $name, $pattern);
-        my $conditions = [];
-
-        # Route information
-        while (defined(my $arg = shift @args)) {
-
-            # First scalar is the pattern
-            if (!ref $arg && !$pattern) { $pattern = $arg }
-
-            # Scalar
-            elsif (!ref $arg && @args) {
-                push @$conditions, $arg, shift @args;
-            }
-
-            # Last scalar is the route name
-            elsif (!ref $arg) { $name = $arg }
-
-            # Callback
-            elsif (ref $arg eq 'CODE') { $cb = $arg }
-
-            # Constraints
-            elsif (ref $arg eq 'ARRAY') { $constraints = $arg }
-
-            # Defaults
-            elsif (ref $arg eq 'HASH') { $defaults = $arg }
-        }
-
-        # Defaults
-        $constraints ||= [];
-
-        # Defaults
-        $defaults ||= {};
-        $defaults->{cb} = $cb if $cb;
-
-        # Name
-        $name ||= '';
-
-        # Create bridge
-        return $routes =
-          $app->routes->bridge($pattern, {@$constraints})->over($conditions)
-          ->to($defaults)->name($name)
-          if !ref $methods && $methods eq 'under';
-
-        # WebSocket
-        my $websocket = 1 if !ref $methods && $methods eq 'websocket';
-        $methods = [] if $websocket;
-
-        # Create route
-        my $route =
-          $routes->route($pattern, {@$constraints})->over($conditions)
-          ->via($methods)->to($defaults)->name($name);
-
-        # WebSocket
-        $route->websocket if $websocket;
-
-        return $route;
-    };
-
     # Prepare exports
     my $caller = caller;
     no strict 'refs';
@@ -103,15 +41,18 @@ sub import {
     $app->static->default_static_class($caller);
     $app->renderer->default_template_class($caller);
 
+    # Root
+    my $root = $routes;
+
     # Export
     *{"${caller}::new"} = *{"${caller}::app"} = sub {$app};
-    *{"${caller}::any"} = sub { $route->(ref $_[0] ? shift : [], @_) };
-    *{"${caller}::get"} = sub { $route->('get', @_) };
+    *{"${caller}::any"} = sub { $routes->any(@_) };
+    *{"${caller}::get"} = sub { $routes->get(@_) };
     *{"${caller}::under"} = *{"${caller}::ladder"} =
-      sub { $route->('under', @_) };
+      sub { $routes = $root->under(@_) };
     *{"${caller}::plugin"}    = sub { $app->plugin(@_) };
-    *{"${caller}::post"}      = sub { $route->('post', @_) };
-    *{"${caller}::websocket"} = sub { $route->('websocket', @_) };
+    *{"${caller}::post"}      = sub { $routes->post(@_) };
+    *{"${caller}::websocket"} = sub { $routes->websocket(@_) };
 
     # We are most likely the app in a lite environment
     $ENV{MOJO_APP} = $app;

@@ -13,6 +13,10 @@ use Mojo::Util 'xml_escape';
 sub register {
     my ($self, $app) = @_;
 
+    # Add "base_tag" helper
+    $app->helper(base_tag =>
+          sub { $self->_tag('base', href => shift->url_for->base, @_) });
+
     # Add "checkbox" helper
     $app->helper(
         check_box => sub {
@@ -341,6 +345,14 @@ Note that this module is EXPERIMENTAL and might change without warning!
 =head2 Helpers
 
 =over 4
+
+=item base_tag
+
+    <%= base_tag %>
+
+Generate C<base> tag refering to the current base URL.
+
+    <base href="http://localhost/cgi-bin/myapp.pl" />
 
 =item check_box
 

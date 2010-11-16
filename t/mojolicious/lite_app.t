@@ -1012,7 +1012,7 @@ $t->get_ok('/foo_wildcard/')->status_is(404);
 
 # GET /with/header/condition
 $t->get_ok('/with/header/condition', {'X-Secret-Header' => 'bar'})
-  ->status_is(200)->content_like(qr/^Test ok/);
+  ->status_is(200)->content_like(qr/^Test ok<base href="http:\/\/localhost/);
 
 # GET /with/header/condition (not found)
 $t->get_ok('/with/header/condition')->status_is(404)->content_like(qr/Oops!/);
@@ -1674,8 +1674,8 @@ text!
 @@ static2.txt (base64)
 dGVzdCAxMjMKbGFsYWxh
 
-@@ with_header_condition.html.epl
-Test ok
+@@ with_header_condition.html.ep
+Test ok<%= base_tag %>
 
 @@ template_inheritance.html.ep
 % layout 'template_inheritance';

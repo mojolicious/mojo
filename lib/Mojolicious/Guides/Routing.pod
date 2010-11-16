@@ -408,6 +408,43 @@ ones.
     $foo->route('/baz')->to(action => 'baz');
     $foo->route('/cde');
 
+=head2 Mojolicious:Lite routes
+
+By now you might be wondering how the routes described in the
+L<Mojolicious::Lite> tutorial fit into all of this.
+They are in fact just a small convenience layer around everything described
+above and also part of the normal router.
+
+    # GET  /foo -> {controller => 'foo', action => 'abc'}
+    # POST /bar -> {controller => 'foo', action => 'bar'}
+    $r->get('/foo')->to(controller => 'foo', action => 'abc');
+    $r->post('/bar')->(controller => 'foo', action => 'bar');
+
+Even the more abstract concepts are available.
+
+    # GET  /yada
+    # POST /yada
+    my $yada = $r->under('/yada' => sub {
+        my $self = shift;
+
+        # Authenticated
+        return 1 if $self->req->headers->header('X-Bender');
+
+        # Not authenticated
+        return;
+    });
+    $yada->get(sub {
+        my $self = shift;
+        $self->render(text => 'Hello Bender!');
+    });
+    $yada->post(sub {
+        my $self = shift;
+        $self->render(text => 'Go away Bender!');
+    });
+
+This can be very useful once your L<Mojolicious::Lite> prototypes grow into
+normal L<Mojolicious> applications.
+
 =head1 ADVANCED
 
 Less commonly used and more powerful features.

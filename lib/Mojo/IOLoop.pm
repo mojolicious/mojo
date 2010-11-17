@@ -138,7 +138,7 @@ __PACKAGE__->attr(
         sub {1}
     }
 );
-__PACKAGE__->attr(timeout => '0.25');
+__PACKAGE__->attr(timeout => '0.025');
 
 # Singleton
 our $LOOP;

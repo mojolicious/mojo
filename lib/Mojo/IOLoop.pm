@@ -637,6 +637,9 @@ sub resolve {
             # Packet
             my @packet = unpack 'nnnnnna*', $chunk;
 
+            # Debug
+            warn "$packet[3] ANSWERS ($server)\n" if DEBUG;
+
             # Wrong response
             return $self->$cb([]) unless $packet[0] eq $tx;
 
@@ -1391,17 +1394,8 @@ sub _tls_accept {
         return;
     }
 
-    # Error
-    my $error = $IO::Socket::SSL::SSL_ERROR;
-
-    # Reading
-    if ($error == TLS_READ) { $self->_not_writing($id) }
-
-    # Writing
-    elsif ($error == TLS_WRITE) { $self->_writing($id) }
-
-    # Real error
-    else { $self->_error($id, $error) }
+    # Handle error
+    $self->_tls_error($id);
 }
 
 sub _tls_connect {
@@ -1422,6 +1416,13 @@ sub _tls_connect {
 
         return;
     }
+
+    # Handle error
+    $self->_tls_error($id);
+}
+
+sub _tls_error {
+    my ($self, $id) = @_;
 
     # Error
     my $error = $IO::Socket::SSL::SSL_ERROR;
@@ -1448,11 +1449,12 @@ sub _write {
     # TLS connect
     return $self->_tls_connect($id) if $c->{tls_connect};
 
-    # Connecting
-    if ($c->{connecting} && (my $socket = $c->{socket})) {
+    # Socket
+    return unless my $socket = $c->{socket};
+    return unless $socket->connected;
 
-        # Not yet connected
-        return if $socket->can('connected') && !$socket->connected;
+    # Connecting
+    if ($c->{connecting}) {
 
         # Cleanup
         delete $c->{connecting};
@@ -1462,10 +1464,6 @@ sub _write {
         my $cb = $c->{on_connect};
         $self->_run_event('connect', $cb, $id) if $cb && !$c->{tls};
     }
-
-    # Socket
-    return unless my $socket = $c->{socket};
-    return unless $socket->connected;
 
     # Callback
     if ($c->{drain} && (my $event = delete $c->{drain})) {

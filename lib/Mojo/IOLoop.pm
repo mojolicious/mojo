@@ -638,7 +638,7 @@ sub resolve {
             my @packet = unpack 'nnnnnna*', $chunk;
 
             # Debug
-            warn "$packet[3] ANSWERS ($server)\n" if DEBUG;
+            warn "ANSWERS $packet[3] ($server)\n" if DEBUG;
 
             # Wrong response
             return $self->$cb([]) unless $packet[0] eq $tx;
@@ -892,6 +892,9 @@ sub _accept {
     # Add socket to poll
     $self->_not_writing($id);
 
+    # Debug
+    warn "ACCEPTED $id\n" if DEBUG;
+
     # Accept callback
     my $cb = $c->{on_accept} = $l->{on_accept};
     $self->_run_event('accept', $cb, $id) if $cb && !$l->{tls};
@@ -1004,6 +1007,9 @@ sub _drop_immediately {
 
     # Drop socket
     if (my $socket = $c->{socket}) {
+
+        # Debug
+        warn "DISCONNECTED $id\n" if DEBUG;
 
         # Remove file descriptor
         return unless my $fd = fileno $socket;
@@ -1459,6 +1465,9 @@ sub _write {
         # Cleanup
         delete $c->{connecting};
         $self->_drop_immediately(delete $c->{connect_timer});
+
+        # Debug
+        warn "CONNECTED $id\n" if DEBUG;
 
         # Connect callback
         my $cb = $c->{on_connect};

@@ -859,10 +859,7 @@ sub _accept {
     weaken $self;
 
     # Connection
-    my $c = {
-        accepting => 1,
-        buffer    => '',
-    };
+    my $c = {buffer => ''};
     (my $id) = "$c" =~ /0x([\da-f]+)/;
     $self->{_cs}->{$id} = $c;
 
@@ -873,10 +870,8 @@ sub _accept {
     $c->{socket}     = $socket;
     $r->{$socket}    = $id;
 
-    # Timeout
-    $c->{accept_timer} =
-      $self->timer($self->accept_timeout, =>
-          sub { shift->_error($id, 'Accept timeout.') });
+    # Non-blocking
+    $socket->blocking(0);
 
     # Disable Nagle's algorithm
     setsockopt($socket, IPPROTO_TCP, TCP_NODELAY, 1) unless $l->{file};
@@ -890,6 +885,9 @@ sub _accept {
         my $cb = $l->{$name};
         $self->$name($id => $cb) if $cb;
     }
+
+    # Add socket to poll
+    $self->_not_writing($id);
 
     # Accept callback
     my $cb = $c->{on_accept} = $l->{on_accept};
@@ -965,7 +963,7 @@ sub _connect {
           sub { shift->_error($id, 'Connect timeout.') });
 
     # Add socket to poll
-    $self->_not_writing($id);
+    $self->_writing($id);
 
     # Start TLS
     if ($args->{tls}) { $self->start_tls($id => $args) }
@@ -1141,28 +1139,6 @@ sub _parse_name {
     return;
 }
 
-sub _prepare_accept {
-    my ($self, $id) = @_;
-
-    # Connection
-    my $c = $self->{_cs}->{$id};
-
-    # Connected
-    return unless $c->{socket}->connected;
-
-    # Accepted
-    delete $c->{accepting};
-
-    # Remove timeout
-    $self->_drop_immediately(delete $c->{accept_timer});
-
-    # Non-blocking
-    $c->{socket}->blocking(0);
-
-    # Add socket to poll
-    $self->_not_writing($id);
-}
-
 sub _prepare_cert {
     my $self = shift;
 
@@ -1181,27 +1157,6 @@ sub _prepare_cert {
     return $self->{_cert} = $cert;
 }
 
-sub _prepare_connect {
-    my ($self, $id) = @_;
-
-    # Connection
-    my $c = $self->{_cs}->{$id};
-
-    # Not yet connected
-    return unless my $socket = $c->{socket};
-    if ($socket->can('connected')) { return unless $socket->connected }
-
-    # Connected
-    delete $c->{connecting};
-
-    # Remove timeout
-    $self->_drop_immediately(delete $c->{connect_timer});
-
-    # Connect callback
-    my $cb = $c->{on_connect};
-    $self->_run_event('connect', $cb, $id) if $cb && !$c->{tls};
-}
-
 sub _prepare_connections {
     my $self = shift;
 
@@ -1211,20 +1166,12 @@ sub _prepare_connections {
     # Prepare
     while (my ($id, $c) = each %$cs) {
 
-        # Accepting
-        $self->_prepare_accept($id) if $c->{accepting};
-
-        # Connecting
-        $self->_prepare_connect($id) if $c->{connecting};
-
         # Connection needs to be finished
-        if ($c->{finish}) {
+        if ($c->{finish} && !length $c->{buffer}) {
 
             # Buffer empty
-            unless (length $c->{buffer}) {
-                $self->_drop_immediately($id);
-                next;
-            }
+            $self->_drop_immediately($id);
+            next;
         }
 
         # Read only
@@ -1501,8 +1448,20 @@ sub _write {
     # TLS connect
     return $self->_tls_connect($id) if $c->{tls_connect};
 
-    # Connect has just completed
-    return if $c->{connecting};
+    # Connecting
+    if ($c->{connecting} && (my $socket = $c->{socket})) {
+
+        # Not yet connected
+        return if $socket->can('connected') && !$socket->connected;
+
+        # Cleanup
+        delete $c->{connecting};
+        $self->_drop_immediately(delete $c->{connect_timer});
+
+        # Connect callback
+        my $cb = $c->{on_connect};
+        $self->_run_event('connect', $cb, $id) if $cb && !$c->{tls};
+    }
 
     # Socket
     return unless my $socket = $c->{socket};

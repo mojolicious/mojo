@@ -740,7 +740,7 @@ sub _drop {
         # Don't keep CONNECTed connections alive
         my $method = $tx->req->method || '';
         my $code   = $tx->res->code   || '';
-        unless ($method eq 'CONNECT' && $code eq '200') {
+        unless ($method =~ /^connect$/i && $code eq '200') {
 
             # Keep connection alive
             $self->_cache(join(':', $self->_tx_info($tx)), $id);

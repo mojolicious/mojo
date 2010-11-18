@@ -35,7 +35,7 @@ sub client_read {
     $self->{_state} = 'done' if $read == 0;
 
     # HEAD response
-    if ($req->method eq 'HEAD') {
+    if ($req->method =~ /^head$/i) {
         $res->parse_until_body($chunk);
         $self->{_state} = 'done' if $res->content->is_parsing_body;
     }
@@ -338,7 +338,7 @@ sub server_write {
         if ($self->{_write} <= 0) {
 
             # HEAD request
-            if ($req->method eq 'HEAD') {
+            if ($req->method =~ /^head$/i) {
 
                 # Don't send body if request method is HEAD
                 $self->{_state} = 'done';

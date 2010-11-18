@@ -1746,7 +1746,7 @@ Note that exceptions in this callback are not captured.
     $loop       = $loop->timeout(5);
 
 Maximum time in seconds our loop waits for new events to happen, defaults to
-C<0.25>.
+C<0.025>.
 Note that a value of C<0> would make the loop non-blocking.
 
 =head1 METHODS

@@ -665,68 +665,9 @@ sub resolve {
             # Answers
             my @answers;
             for (1 .. $packet[3]) {
-                my ($t, $a, @answer);
-                ($t, $a, $content) = (unpack 'nnnNn/aa*', $content)[1, 4, 5];
-
-                # A
-                if ($t eq $DNS_TYPES->{A}) {
-                    @answer = (A => join('.', unpack 'C4', $a));
-                }
-
-                # AAAA
-                elsif ($t eq $DNS_TYPES->{AAAA}) {
-                    @answer = (
-                        AAAA => sprintf(
-                            '%x:%x:%x:%x:%x:%x:%x:%x', unpack('n*', $a)
-                        )
-                    );
-                }
-
-                # CNAME
-                elsif ($t eq $DNS_TYPES->{CNAME}) {
-                    @answer = (
-                        CNAME => _parse_name(
-                            $chunk,
-                            length($chunk) - length($content) - length($a)
-                        )
-                    );
-                }
-
-                # MX
-                elsif ($t eq $DNS_TYPES->{MX}) {
-                    @answer = (
-                        MX => _parse_name(
-                            $chunk,
-                            length($chunk) - length($content) - length($a) + 2
-                        )
-                    );
-                }
-
-                # NS
-                elsif ($t eq $DNS_TYPES->{NS}) {
-                    @answer = (
-                        NS => _parse_name(
-                            $chunk,
-                            length($chunk) - length($content) - length($a)
-                        )
-                    );
-                }
-
-                # PTR
-                elsif ($t eq $DNS_TYPES->{PTR}) {
-                    @answer = (
-                        PTR => _parse_name(
-                            $chunk,
-                            length($chunk) - length($content) - length($a)
-                        )
-                    );
-                }
-
-                # TXT
-                elsif ($t eq $DNS_TYPES->{TXT}) {
-                    @answer = (TXT => unpack('(C/a*)*', $a));
-                }
-
+                (my ($t, $a), $content) =
+                  (unpack 'nnnNn/aa*', $content)[1, 4, 5];
+                my @answer = _parse_answer($t, $a, $chunk, $content);
                 next unless @answer;
                 push @answers, \@answer;
 
@@ -1154,6 +1095,46 @@ sub _not_writing {
 
     # Not writing anymore
     $c->{writing} = 0;
+}
+
+# Answer helper for "resolve"
+sub _parse_answer {
+    my ($t, $a, $packet, $rest) = @_;
+
+    # A
+    if ($t eq $DNS_TYPES->{A}) { return A => join('.', unpack 'C4', $a) }
+
+    # AAAA
+    elsif ($t eq $DNS_TYPES->{AAAA}) {
+        return AAAA => sprintf('%x:%x:%x:%x:%x:%x:%x:%x', unpack('n*', $a));
+    }
+
+    # MX
+    elsif ($t eq $DNS_TYPES->{MX}) {
+        return MX => _parse_name($packet,
+            length($packet) - length($rest) - length($a) + 2);
+    }
+
+    # TXT
+    elsif ($t eq $DNS_TYPES->{TXT}) { return TXT => unpack('(C/a*)*', $a) }
+
+    # CNAME
+    my $type;
+    if ($t eq $DNS_TYPES->{CNAME}) { $type = 'CNAME' }
+
+    # NS
+    elsif ($t eq $DNS_TYPES->{NS}) { $type = 'NS' }
+
+    # PTR
+    elsif ($t eq $DNS_TYPES->{PTR}) { $type = 'PTR' }
+
+    # Domain name
+    return $type =>
+      _parse_name($packet, length($packet) - length($rest) - length($a))
+      if $type;
+
+    # Not supported
+    return;
 }
 
 # Domain name helper for "resolve"

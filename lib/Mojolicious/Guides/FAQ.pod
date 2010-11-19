@@ -41,7 +41,7 @@ More capable editors can handle this accordingly and force the change.
 
 Quite possibly this oneliner.
 
-    sudo -s 'curl -L cpanmin.us | perl - "Mojolicious"'
+    curl -L cpanmin.us | perl - http://latest.mojolicio.us
 
 =head2 I think L<Mojolicious> is awesome, how can i support you guys?
 
@@ -49,9 +49,11 @@ Share your success story via blog or twitter, get more people hooked! :)
 
 =head2 I think i have found a bug, what should i do now?
 
-Prepare a test case demonstrating the bug, you are not expected to fix it
-yourself, but you'll have to make sure the developers can replicate your
-problem.
+First make sure you are using the latest version of L<Mojolicious>, it is
+quite likely that the bug has already been fixed.
+If that doesn't help prepare a test case demonstrating the bug, you are not
+expected to fix it yourself, but you'll have to make sure the developers can
+replicate your problem.
 Sending in your whole application generally does more harm than good, the
 C<t> directory of this distribution has many good examples for how to do it
 right.

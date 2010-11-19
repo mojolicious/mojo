@@ -669,9 +669,7 @@ sub resolve {
                 # Parse
                 (my ($t, $a), $content) =
                   (unpack 'nnnNn/aa*', $content)[1, 4, 5];
-                my @answer =
-                  _parse_answer($t, $a, $chunk,
-                    length($chunk) - length($content) - length($a));
+                my @answer = _parse_answer($t, $a, $chunk, $content);
 
                 # No answer
                 next unless @answer;
@@ -1107,7 +1105,7 @@ sub _not_writing {
 
 # Answer helper for "resolve"
 sub _parse_answer {
-    my ($t, $a, $packet, $offset) = @_;
+    my ($t, $a, $packet, $rest) = @_;
 
     # A
     if ($t eq $DNS_TYPES->{A}) { return A => join('.', unpack 'C4', $a) }
@@ -1119,6 +1117,9 @@ sub _parse_answer {
 
     # TXT
     elsif ($t eq $DNS_TYPES->{TXT}) { return TXT => unpack('(C/a*)*', $a) }
+
+    # Offset
+    my $offset = length($packet) - length($rest) - length($a);
 
     # CNAME
     my $type;

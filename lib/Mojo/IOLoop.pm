@@ -11,6 +11,7 @@ use File::Spec;
 use IO::File;
 use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
 use IO::Socket;
+use List::Util 'first';
 use Mojo::URL;
 use Scalar::Util 'weaken';
 use Socket qw/IPPROTO_TCP TCP_NODELAY/;
@@ -403,10 +404,8 @@ sub lookup {
             my ($self, $results) = @_;
 
             # Success
-            for my $result (@$results) {
-                return $self->$cb($results->[0]->[1])
-                  if $results->[0] && $results->[0]->[0] eq 'A';
-            }
+            my $result = first { $_->[0] eq 'A' } @$results;
+            return $self->$cb($result->[1]) if $result;
 
             # IPv6
             $self->resolve(
@@ -415,10 +414,8 @@ sub lookup {
                     my ($self, $results) = @_;
 
                     # Success
-                    for my $result (@$results) {
-                        return $self->$cb($results->[0]->[1])
-                          if $results->[0] && $results->[0]->[0] eq 'AAAA';
-                    }
+                    my $result = first { $_->[0] eq 'AAA' } @$results;
+                    return $self->$cb($result->[1]) if $result;
 
                     # Pass through
                     $self->$cb();

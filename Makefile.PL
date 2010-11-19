@@ -64,6 +64,7 @@ WriteMakefile(
         'IO::File'              => 0,
         'IO::Poll'              => 0,
         'IO::Socket'            => 0,
+        'List::Util'            => 0,
         'Locale::Maketext'      => 0,
         'MIME::Base64'          => 0,
         'MIME::QuotedPrint'     => 0,

@@ -15,6 +15,7 @@ plan tests => 9;
 
 use_ok 'Mojo::IOLoop';
 
+use List::Util 'first';
 use Mojo::URL;
 
 # Your guilty consciences may make you vote Democratic, but secretly you all
@@ -29,9 +30,7 @@ $loop->resolve(
     'TXT',
     sub {
         my ($self, $records) = @_;
-        for my $record (@$records) {
-            $result = $record->[1] if $record->[0] eq 'TXT';
-        }
+        $result = (first { $_->[0] eq 'TXT' } @$records)->[1];
         $self->stop;
     }
 )->start;
@@ -44,9 +43,7 @@ $loop->resolve(
     'NS',
     sub {
         my ($self, $records) = @_;
-        for my $record (@$records) {
-            $found++ if $record->[1] =~ /ns\d*.google\.com/;
-        }
+        $found++ if first { $_->[1] =~ /ns\d*.google\.com/ } @$records;
         $self->stop;
     }
 )->start;
@@ -59,9 +56,7 @@ $loop->resolve(
     'AAAA',
     sub {
         my ($self, $records) = @_;
-        for my $record (@$records) {
-            $result = $record->[1] if $record->[0] eq 'AAAA';
-        }
+        $result = (first { $_->[0] eq 'AAAA' } @$records)->[1];
         $self->stop;
     }
 )->start;
@@ -74,9 +69,7 @@ $loop->resolve(
     'CNAME',
     sub {
         my ($self, $records) = @_;
-        for my $record (@$records) {
-            $result = $record->[1] if $record->[0] eq 'CNAME';
-        }
+        $result = (first { $_->[0] eq 'CNAME' } @$records)->[1];
         $self->stop;
     }
 )->start;
@@ -89,9 +82,8 @@ $loop->resolve(
     'MX',
     sub {
         my ($self, $records) = @_;
-        for my $record (@$records) {
-            $found++ if $record->[1] =~ /gmail-smtp-in\.l\.google\.com/;
-        }
+        $found++
+          if first { $_->[1] =~ /gmail-smtp-in\.l\.google\.com/ } @$records;
         $self->stop;
     }
 )->start;
@@ -104,9 +96,7 @@ $loop->resolve(
     'A',
     sub {
         my ($self, $records) = @_;
-        for my $record (@$records) {
-            $a1 = $record->[1] if $record->[0] eq 'A';
-        }
+        $a1 = (first { $_->[0] eq 'A' } @$records)->[1];
         $self->resolve(
             $a1, 'PTR',
             sub {
@@ -116,9 +106,7 @@ $loop->resolve(
                     $ptr, 'A',
                     sub {
                         my ($self, $records) = @_;
-                        for my $record (@$records) {
-                            $a2 = $record->[1] if $record->[0] eq 'A';
-                        }
+                        $a2 = (first { $_->[0] eq 'A' } @$records)->[1];
                         $self->stop;
                     }
                 );
@@ -136,9 +124,7 @@ $loop->resolve(
     'PTR',
     sub {
         my ($self, $records) = @_;
-        for my $record (@$records) {
-            $found++ if $record->[1] eq 'freebsd.isc.org';
-        }
+        $found++ if first { $_->[1] eq 'freebsd.isc.org' } @$records;
         $self->stop;
     }
 )->start;

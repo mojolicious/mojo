@@ -29,7 +29,7 @@ $loop->resolve(
     'TXT',
     sub {
         my ($self, $records) = @_;
-        $record = $records->[0];
+        $record = $records->[0]->[1];
         $self->stop;
     }
 )->start;
@@ -42,7 +42,7 @@ $loop->resolve(
     'AAAA',
     sub {
         my ($self, $records) = @_;
-        $record = $records->[0];
+        $record = $records->[0]->[1];
         $self->stop;
     }
 )->start;
@@ -56,7 +56,7 @@ $loop->resolve(
     sub {
         my ($self, $records) = @_;
         for my $record (@$records) {
-            $found++ if $record =~ /gmail-smtp-in\.l\.google\.com/;
+            $found++ if $record->[1] =~ /gmail-smtp-in\.l\.google\.com/;
         }
         $self->stop;
     }
@@ -66,21 +66,21 @@ ok $found, 'found MX records';
 # Resolve A record and perform PTR roundtrip
 my ($a1, $ptr, $a2);
 $loop->resolve(
-    'google.com',
+    'perl.org',
     'A',
     sub {
         my ($self, $records) = @_;
-        $a1 = $records->[0];
+        $a1 = $records->[0]->[1];
         $self->resolve(
             $a1, 'PTR',
             sub {
                 my ($self, $records) = @_;
-                $ptr = $records->[0];
+                $ptr = $records->[0]->[1];
                 $self->resolve(
                     $ptr, 'A',
                     sub {
                         my ($self, $records) = @_;
-                        $a2 = $records->[0];
+                        $a2 = $records->[0]->[1];
                         $self->stop;
                     }
                 );
@@ -99,7 +99,7 @@ $loop->resolve(
     sub {
         my ($self, $records) = @_;
         for my $record (@$records) {
-            $found++ if $record eq 'freebsd.isc.org';
+            $found++ if $record->[1] eq 'freebsd.isc.org';
         }
         $self->stop;
     }

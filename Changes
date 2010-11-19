@@ -4,6 +4,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Allow Mojolicious::Lite style routes in Mojolicious.
         - Added base_tag helper to Mojolicious::Plugin::TagHelpers.
         - Improved Mojo::IOLoop responsiveness.
+        - Made Mojo::IOLoop resolver results more useful.
 
 0.999940 2010-11-15 00:00:00
         - Improved resolver tests.

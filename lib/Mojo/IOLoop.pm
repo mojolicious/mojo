@@ -401,7 +401,7 @@ sub lookup {
             my ($self, $results) = @_;
 
             # Success
-            return $self->$cb($results->[0]) if $results->[0];
+            return $self->$cb($results->[0]->[1]) if $results->[0];
 
             # IPv6
             $self->resolve(
@@ -410,7 +410,7 @@ sub lookup {
                     my ($self, $results) = @_;
 
                     # Success
-                    return $self->$cb($results->[0]) if $results->[0];
+                    return $self->$cb($results->[0]->[1]) if $results->[0];
 
                     # Pass through
                     $self->$cb();
@@ -657,44 +657,53 @@ sub resolve {
             # Answers
             my @answers;
             for (1 .. $packet[3]) {
-                my ($t, $a, $answer);
+                my ($t, $a, @answer);
                 ($t, $a, $content) = (unpack 'nnnNn/aa*', $content)[1, 4, 5];
 
                 # A
                 if ($t eq $DNS_TYPES->{A}) {
-                    $answer = join('.', unpack 'C4', $a);
+                    @answer = (A => join('.', unpack 'C4', $a));
                 }
 
                 # AAAA
                 elsif ($t eq $DNS_TYPES->{AAAA}) {
-                    $answer = sprintf '%x:%x:%x:%x:%x:%x:%x:%x',
-                      unpack('n*', $a);
+                    @answer = (
+                        AAAA => sprintf(
+                            '%x:%x:%x:%x:%x:%x:%x:%x', unpack('n*', $a)
+                        )
+                    );
                 }
 
                 # MX
                 elsif ($t eq $DNS_TYPES->{MX}) {
-                    $answer =
-                      _parse_name($chunk,
-                        length($chunk) - length($content) - length($a) + 2);
+                    @answer = (
+                        MX => _parse_name(
+                            $chunk,
+                            length($chunk) - length($content) - length($a) + 2
+                        )
+                    );
                 }
 
                 # PTR
                 elsif ($t eq $DNS_TYPES->{PTR}) {
-                    $answer =
-                      _parse_name($chunk,
-                        length($chunk) - length($content) - length($a));
+                    @answer = (
+                        PTR => _parse_name(
+                            $chunk,
+                            length($chunk) - length($content) - length($a)
+                        )
+                    );
                 }
 
                 # TXT
                 elsif ($t eq $DNS_TYPES->{TXT}) {
-                    $answer = unpack '(C/a*)*', $a;
+                    @answer = (TXT => unpack('(C/a*)*', $a));
                 }
 
-                next unless defined $answer;
-                push @answers, $answer;
+                next unless @answer;
+                push @answers, \@answer;
 
                 # Debug
-                warn "ANSWER $answer\n" if DEBUG;
+                warn "ANSWER $answer[0] $answer[1]\n" if DEBUG;
             }
 
             # Done

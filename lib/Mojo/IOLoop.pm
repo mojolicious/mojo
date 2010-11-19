@@ -665,10 +665,18 @@ sub resolve {
             # Answers
             my @answers;
             for (1 .. $packet[3]) {
+
+                # Parse
                 (my ($t, $a), $content) =
                   (unpack 'nnnNn/aa*', $content)[1, 4, 5];
-                my @answer = _parse_answer($t, $a, $chunk, $content);
+                my @answer =
+                  _parse_answer($t, $a, $chunk,
+                    length($chunk) - length($content) - length($a));
+
+                # No answer
                 next unless @answer;
+
+                # Answer
                 push @answers, \@answer;
 
                 # Debug
@@ -1099,7 +1107,7 @@ sub _not_writing {
 
 # Answer helper for "resolve"
 sub _parse_answer {
-    my ($t, $a, $packet, $rest) = @_;
+    my ($t, $a, $packet, $offset) = @_;
 
     # A
     if ($t eq $DNS_TYPES->{A}) { return A => join('.', unpack 'C4', $a) }
@@ -1109,18 +1117,18 @@ sub _parse_answer {
         return AAAA => sprintf('%x:%x:%x:%x:%x:%x:%x:%x', unpack('n*', $a));
     }
 
-    # MX
-    elsif ($t eq $DNS_TYPES->{MX}) {
-        return MX => _parse_name($packet,
-            length($packet) - length($rest) - length($a) + 2);
-    }
-
     # TXT
     elsif ($t eq $DNS_TYPES->{TXT}) { return TXT => unpack('(C/a*)*', $a) }
 
     # CNAME
     my $type;
     if ($t eq $DNS_TYPES->{CNAME}) { $type = 'CNAME' }
+
+    # MX
+    elsif ($t eq $DNS_TYPES->{MX}) {
+        $type = 'MX';
+        $offset += 2;
+    }
 
     # NS
     elsif ($t eq $DNS_TYPES->{NS}) { $type = 'NS' }
@@ -1129,9 +1137,7 @@ sub _parse_answer {
     elsif ($t eq $DNS_TYPES->{PTR}) { $type = 'PTR' }
 
     # Domain name
-    return $type =>
-      _parse_name($packet, length($packet) - length($rest) - length($a))
-      if $type;
+    return $type => _parse_name($packet, $offset) if $type;
 
     # Not supported
     return;

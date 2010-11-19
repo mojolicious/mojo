@@ -11,7 +11,7 @@ plan skip_all => 'Perl 5.12 required for this test!'
   unless eval 'use 5.12.0; 1';
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
-plan tests => 7;
+plan tests => 9;
 
 use_ok 'Mojo::IOLoop';
 
@@ -23,33 +23,67 @@ use Mojo::URL;
 my $loop = Mojo::IOLoop->new;
 
 # Resolve TXT record
-my $record;
+my $result;
 $loop->resolve(
     'google.com',
     'TXT',
     sub {
         my ($self, $records) = @_;
-        $record = $records->[0]->[1];
+        for my $record (@$records) {
+            $result = $record->[1] if $record->[0] eq 'TXT';
+        }
         $self->stop;
     }
 )->start;
-like $record, qr/spf/, 'right record';
+like $result, qr/spf/, 'right record';
+
+# Resolve NS records
+my $found = 0;
+$loop->resolve(
+    'gmail.com',
+    'NS',
+    sub {
+        my ($self, $records) = @_;
+        for my $record (@$records) {
+            $found++ if $record->[1] =~ /ns\d*.google\.com/;
+        }
+        $self->stop;
+    }
+)->start;
+ok $found, 'found NS records';
 
 # Resolve AAAA record
-$record = undef;
+$result = undef;
 $loop->resolve(
     'ipv6.google.com',
     'AAAA',
     sub {
         my ($self, $records) = @_;
-        $record = $records->[0]->[1];
+        for my $record (@$records) {
+            $result = $record->[1] if $record->[0] eq 'AAAA';
+        }
         $self->stop;
     }
 )->start;
-like $record, $Mojo::URL::IPV6_RE, 'valid IPv6 record';
+like $result, $Mojo::URL::IPV6_RE, 'valid IPv6 record';
+
+# Resolve CNAME record
+$result = undef;
+$loop->resolve(
+    'ipv6.google.com',
+    'CNAME',
+    sub {
+        my ($self, $records) = @_;
+        for my $record (@$records) {
+            $result = $record->[1] if $record->[0] eq 'CNAME';
+        }
+        $self->stop;
+    }
+)->start;
+is $result, 'ipv6.l.google.com', 'right CNAME record';
 
 # Resolve MX records
-my $found = 0;
+$found = 0;
 $loop->resolve(
     'gmail.com',
     'MX',
@@ -70,7 +104,9 @@ $loop->resolve(
     'A',
     sub {
         my ($self, $records) = @_;
-        $a1 = $records->[0]->[1];
+        for my $record (@$records) {
+            $a1 = $record->[1] if $record->[0] eq 'A';
+        }
         $self->resolve(
             $a1, 'PTR',
             sub {
@@ -80,7 +116,9 @@ $loop->resolve(
                     $ptr, 'A',
                     sub {
                         my ($self, $records) = @_;
-                        $a2 = $records->[0]->[1];
+                        for my $record (@$records) {
+                            $a2 = $record->[1] if $record->[0] eq 'A';
+                        }
                         $self->stop;
                     }
                 );

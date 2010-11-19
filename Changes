@@ -1,8 +1,10 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-0.999941 2010-11-15 00:00:00
+0.999941 2010-11-19 00:00:00
         - Allow Mojolicious::Lite style routes in Mojolicious.
         - Added base_tag helper to Mojolicious::Plugin::TagHelpers.
+        - Added CNAME and NS record type support to the Mojo::IOLoop
+          resolver.
         - Improved Mojo::IOLoop responsiveness.
         - Made Mojo::IOLoop resolver results more useful.
 

@@ -119,11 +119,13 @@ if (-r '/etc/resolv.conf') {
 
 # DNS record types
 my $DNS_TYPES = {
-    A    => 0x0001,
-    AAAA => 0x001c,
-    MX   => 0x000f,
-    PTR  => 0x000c,
-    TXT  => 0x0010
+    A     => 0x0001,
+    AAAA  => 0x001c,
+    CNAME => 0x0005,
+    MX    => 0x000f,
+    NS    => 0x0002,
+    PTR   => 0x000c,
+    TXT   => 0x0010
 };
 
 # "localhost"
@@ -401,7 +403,10 @@ sub lookup {
             my ($self, $results) = @_;
 
             # Success
-            return $self->$cb($results->[0]->[1]) if $results->[0];
+            for my $result (@$results) {
+                return $self->$cb($results->[0]->[1])
+                  if $results->[0] && $results->[0]->[0] eq 'A';
+            }
 
             # IPv6
             $self->resolve(
@@ -410,7 +415,10 @@ sub lookup {
                     my ($self, $results) = @_;
 
                     # Success
-                    return $self->$cb($results->[0]->[1]) if $results->[0];
+                    for my $result (@$results) {
+                        return $self->$cb($results->[0]->[1])
+                          if $results->[0] && $results->[0]->[0] eq 'AAAA';
+                    }
 
                     # Pass through
                     $self->$cb();
@@ -674,12 +682,32 @@ sub resolve {
                     );
                 }
 
+                # CNAME
+                elsif ($t eq $DNS_TYPES->{CNAME}) {
+                    @answer = (
+                        CNAME => _parse_name(
+                            $chunk,
+                            length($chunk) - length($content) - length($a)
+                        )
+                    );
+                }
+
                 # MX
                 elsif ($t eq $DNS_TYPES->{MX}) {
                     @answer = (
                         MX => _parse_name(
                             $chunk,
                             length($chunk) - length($content) - length($a) + 2
+                        )
+                    );
+                }
+
+                # NS
+                elsif ($t eq $DNS_TYPES->{NS}) {
+                    @answer = (
+                        NS => _parse_name(
+                            $chunk,
+                            length($chunk) - length($content) - length($a)
                         )
                     );
                 }
@@ -1981,7 +2009,8 @@ The remote port.
 
     $loop = $loop->resolve('mojolicio.us', 'A', sub {...});
 
-Resolve domain into C<A>, C<AAAA>, C<MX>, C<PTR> or C<TXT> records.
+Resolve domain into C<A>, C<AAAA>, C<CNAME>, C<MX>, C<NS>, C<PTR> or C<TXT>
+records.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<singleton>

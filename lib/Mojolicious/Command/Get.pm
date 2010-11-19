@@ -48,6 +48,7 @@ sub run {
 
     # Transaction
     my $tx = $client->build_tx(GET => $url);
+    my $chunks = 0;
     $tx->res->body(
         sub {
             my ($res, $chunk) = @_;
@@ -55,6 +56,7 @@ sub run {
             print STDERR $res->headers->to_string, "\n\n" if $verbose;
             print $chunk;
             $verbose = 0;
+            $chunks++;
         }
     );
 
@@ -63,7 +65,8 @@ sub run {
 
     # Error
     my ($message, $code) = $tx->error;
-    print qq/Couldn't open page "$url". ($message)\n/ if $message && !$code;
+    print qq/Couldn't open page "$url". ($message)\n/
+      if $message && !$code && !$chunks;
 
     return $self;
 }

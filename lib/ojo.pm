@@ -63,7 +63,7 @@ sub _request {
 
     # Error
     my ($message, $code) = $tx->error;
-    warn qq/Couldn't open URL "$_[0]". ($message)\n/ if $message && !$code;
+    warn qq/Problem loading URL "$_[0]". ($message)\n/ if $message && !$code;
 
     return $tx->res;
 }

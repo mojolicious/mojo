@@ -48,15 +48,13 @@ sub run {
 
     # Transaction
     my $tx = $client->build_tx(GET => $url);
-    my $chunks = 0;
     $tx->res->body(
         sub {
             my ($res, $chunk) = @_;
-            print STDERR $tx->res->build_start_line if $verbose;
-            print STDERR $res->headers->to_string, "\n\n" if $verbose;
+            warn $tx->res->build_start_line if $verbose;
+            warn $res->headers->to_string, "\n\n" if $verbose;
             print $chunk;
             $verbose = 0;
-            $chunks++;
         }
     );
 
@@ -65,8 +63,7 @@ sub run {
 
     # Error
     my ($message, $code) = $tx->error;
-    print qq/Couldn't open page "$url". ($message)\n/
-      if $message && !$code && !$chunks;
+    warn qq/Problem loading URL "$url". ($message)\n/ if $message && !$code;
 
     return $self;
 }

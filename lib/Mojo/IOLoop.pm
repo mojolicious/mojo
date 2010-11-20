@@ -1658,8 +1658,8 @@ dropped, defaults to C<3>.
     my $server = $loop->dns_server;
     $loop      = $loop->dns_server('8.8.8.8');
 
-C<DNS> server to use for non-blocking lookups, defaults to the value of
-C<MOJO_DNS_SERVER>, auto detection or C<8.8.8.8>.
+IP address of C<DNS> server to use for non-blocking lookups, defaults to the
+value of C<MOJO_DNS_SERVER>, auto detection or C<8.8.8.8>.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<dns_timeout>

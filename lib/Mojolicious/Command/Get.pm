@@ -53,8 +53,8 @@ sub run {
             my ($res, $chunk) = @_;
             warn $tx->res->build_start_line if $verbose;
             warn $res->headers->to_string, "\n\n" if $verbose;
-            print $chunk;
             $verbose = 0;
+            print $chunk;
         }
     );
 

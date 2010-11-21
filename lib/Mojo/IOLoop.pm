@@ -1745,11 +1745,6 @@ possible.
         address => '127.0.0.1',
         port    => 3000
     );
-    my $id = $loop->connect({
-        address => '[::1]',
-        port    => 443,
-        tls     => 1
-    });
 
 Open a TCP connection to a remote host.
 Note that TLS support depends on L<IO::Socket::SSL>.

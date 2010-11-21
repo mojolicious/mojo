@@ -135,7 +135,6 @@ our $LOCALHOST = '127.0.0.1';
 __PACKAGE__->attr([qw/accept_timeout connect_timeout dns_timeout/] => 3);
 __PACKAGE__->attr(dns_server => sub { $ENV{MOJO_DNS_SERVER} || $DNS_SERVER });
 __PACKAGE__->attr(max_connections => 1000);
-__PACKAGE__->attr([qw/on_idle on_tick/]);
 __PACKAGE__->attr(
     [qw/on_lock on_unlock/] => sub {
         sub {1}
@@ -427,7 +426,9 @@ sub lookup {
 
 sub on_error { shift->_add_event('error', @_) }
 sub on_hup   { shift->_add_event('hup',   @_) }
-sub on_read  { shift->_add_event('read',  @_) }
+sub on_idle { shift->_add_loop_event('idle', @_) }
+sub on_read { shift->_add_event('read', @_) }
+sub on_tick { shift->_add_loop_event('tick', @_) }
 
 sub one_tick {
     my ($self, $timeout) = @_;
@@ -529,14 +530,14 @@ sub one_tick {
     # Timers
     my $timers = $self->_timer;
 
-    # Tick callback
-    if (my $cb = $self->on_tick) {
-        $self->_run_callback('tick', $cb);
+    # Tick
+    for my $tick (keys %{$self->{_tick}}) {
+        $self->_run_callback('tick', $self->{_tick}->{$tick}->{cb});
     }
 
-    # Idle callback
-    if (my $cb = $self->on_idle) {
-        $self->_run_callback('idle', $cb)
+    # Idle
+    for my $idle (keys %{$self->{_idle}}) {
+        $self->_run_callback('idle', $self->{_idle}->{$idle}->{cb})
           unless @read || @write || @error || @hup || $timers;
     }
 }
@@ -787,15 +788,11 @@ sub test {
 
 sub timer {
     my ($self, $after, $cb) = @_;
-
-    # Timer
-    my $timer = {after => $after, cb => $cb, started => time};
-
-    # Add timer
-    (my $id) = "$timer" =~ /0x([\da-f]+)/;
-    $self->{_ts}->{$id} = $timer;
-
-    return $id;
+    return $self->_add_loop_event(
+        'timer', $cb,
+        started => time,
+        after   => $after
+    );
 }
 
 sub write {
@@ -911,6 +908,21 @@ sub _add_event {
     return $self;
 }
 
+sub _add_loop_event {
+    my $self  = shift;
+    my $event = shift;
+    my $cb    = shift;
+
+    # Event
+    my $e = {cb => $cb, @_};
+
+    # Add event
+    (my $id) = "$e" =~ /0x([\da-f]+)/;
+    $self->{"_$event"}->{$id} = $e;
+
+    return $id;
+}
+
 sub _connect {
     my ($self, $id, $args) = @_;
 
@@ -959,12 +971,14 @@ sub _connect {
 sub _drop_immediately {
     my ($self, $id) = @_;
 
-    # Drop timer
-    if ($self->{_ts}->{$id}) {
+    # Drop loop events
+    for my $event (qw/idle tick timer/) {
+        if ($self->{"_$event"}->{$id}) {
 
-        # Drop
-        delete $self->{_ts}->{$id};
-        return $self;
+            # Drop
+            delete $self->{"_$event"}->{$id};
+            return $self;
+        }
     }
 
     # Delete connection
@@ -1378,7 +1392,7 @@ sub _timer {
     my $self = shift;
 
     # Timers
-    return unless my $ts = $self->{_ts};
+    return unless my $ts = $self->{_timer};
 
     # Check
     my $count = 0;
@@ -1683,14 +1697,6 @@ Setting the value to C<0> will make this loop stop accepting new connections
 and allow it to shutdown gracefully without interrupting existing
 connections.
 
-=head2 C<on_idle>
-
-    my $cb = $loop->on_idle;
-    $loop  = $loop->on_idle(sub {...});
-
-Callback to be invoked on every reactor tick if no events occurred.
-Note that this attribute is EXPERIMENTAL and might change without warning!
-
 =head2 C<on_lock>
 
     my $cb = $loop->on_lock;
@@ -1707,20 +1713,6 @@ Note that exceptions in this callback are not captured.
         # Got the lock, listen for new connections
         return 1;
     });
-
-=head2 C<on_tick>
-
-    my $cb = $loop->on_tick;
-    $loop  = $loop->on_tick(sub {...});
-
-Callback to be invoked on every reactor tick, this for example allows you to
-run multiple reactors next to each other.
-
-    my $loop2 = Mojo::IOLoop->new(timeout => 0);
-    Mojo::IOLoop->singleton->on_tick(sub { $loop2->one_tick });
-
-Note that the loop timeout can be changed dynamically at any time to adjust
-responsiveness.
 
 =head2 C<on_unlock>
 
@@ -1950,6 +1942,13 @@ Callback to be invoked if an error event happens on the connection.
 
 Callback to be invoked if the connection gets closed.
 
+=head2 C<on_idle>
+
+    my $id = $loop->on_idle(sub {...});
+
+Callback to be invoked on every reactor tick if no other events occurred.
+Note that this attribute is EXPERIMENTAL and might change without warning!
+
 =head2 C<on_read>
 
     $loop = $loop->on_read($id => sub {...});
@@ -1961,6 +1960,19 @@ Callback to be invoked if new data arrives on the connection.
 
         # Process chunk
     });
+
+=head2 C<on_tick>
+
+    my $id = $loop->on_tick(sub {...});
+
+Callback to be invoked on every reactor tick, this for example allows you to
+run multiple reactors next to each other.
+
+    my $loop2 = Mojo::IOLoop->new(timeout => 0);
+    Mojo::IOLoop->singleton->on_tick(sub { $loop2->one_tick });
+
+Note that the loop timeout can be changed dynamically at any time to adjust
+responsiveness.
 
 =head2 C<one_tick>
 

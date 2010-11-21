@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 5;
+use Test::More tests => 7;
 
 use_ok 'Mojo::IOLoop';
 
@@ -15,7 +15,7 @@ my $loop = Mojo::IOLoop->new;
 
 # Ticks
 my $ticks = 0;
-$loop->on_tick(sub { $ticks++ });
+my $id = $loop->on_tick(sub { $ticks++ });
 
 # Timer
 my $flag = 0;
@@ -58,3 +58,13 @@ ok $ticks > 2, 'more than two ticks';
 
 # Idle callback
 is $idle, 1, 'on_idle was called';
+
+# Run again without first tick event handler
+my $before = $ticks;
+my $new    = 0;
+$loop->on_tick(sub { $new++ });
+$loop->drop($id);
+$loop->timer(1 => sub { shift->stop });
+$loop->start;
+ok $new > 2, 'more than two ticks';
+is $ticks, $before, 'tick dropped successfully';

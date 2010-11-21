@@ -1479,10 +1479,12 @@ sub _write {
 
     # Socket
     return unless my $socket = $c->{socket};
-    return unless $socket->connected;
 
     # Connecting
     if ($c->{connecting}) {
+
+        # Connected
+        return unless $socket->connected;
 
         # Cleanup
         delete $c->{connecting};

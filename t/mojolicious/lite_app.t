@@ -148,11 +148,11 @@ get ':number' => [number => qr/0/] => sub {
 # GET /tags
 get 'tags/:test' => 'tags';
 
-# GET /selection
-get 'selection' => '*';
+# PUT /selection
+put 'selection' => '*';
 
-# GET /inline/epl
-get '/inline/epl' => sub { shift->render(inline => '<%= 1 + 1%>') };
+# DELETE /inline/epl
+del '/inline/epl' => sub { shift->render(inline => '<%= 1 + 1%>') };
 
 # GET /inline/ep
 get '/inline/ep' =>
@@ -908,8 +908,8 @@ $t->get_ok('/tags/lala?c=b&d=3&e=4&f=5')->status_is(200)->content_is(<<EOF);
 /*]]>*/</style>
 EOF
 
-# GET /selection (empty)
-$t->get_ok('/selection')->status_is(200)
+# PUT /selection (empty)
+$t->put_ok('/selection')->status_is(200)
   ->content_is("<form action=\"/selection\">\n    "
       . '<select name="a">'
       . '<option value="b">b</option>'
@@ -930,8 +930,8 @@ $t->get_ok('/selection')->status_is(200)
       . '</form>'
       . "\n");
 
-# GET /selection (values)
-$t->get_ok('/selection?a=e&foo=bar')->status_is(200)
+# PUT /selection (values)
+$t->put_ok('/selection?a=e&foo=bar')->status_is(200)
   ->content_is("<form action=\"/selection\">\n    "
       . '<select name="a">'
       . '<option value="b">b</option>'
@@ -952,8 +952,8 @@ $t->get_ok('/selection?a=e&foo=bar')->status_is(200)
       . '</form>'
       . "\n");
 
-# GET /selection (multiple values)
-$t->get_ok('/selection?foo=bar&a=e&foo=baz')->status_is(200)
+# PUT /selection (multiple values)
+$t->put_ok('/selection?foo=bar&a=e&foo=baz')->status_is(200)
   ->content_is("<form action=\"/selection\">\n    "
       . '<select name="a">'
       . '<option value="b">b</option>'
@@ -974,8 +974,8 @@ $t->get_ok('/selection?foo=bar&a=e&foo=baz')->status_is(200)
       . '</form>'
       . "\n");
 
-# GET /inline/epl
-$t->get_ok('/inline/epl')->status_is(200)->content_is("2\n");
+# DELETE /inline/epl
+$t->delete_ok('/inline/epl')->status_is(200)->content_is("2\n");
 
 # GET /inline/ep
 $t->get_ok('/inline/ep?foo=bar')->status_is(200)->content_is("barworks!\n");

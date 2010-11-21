@@ -787,12 +787,7 @@ sub test {
 }
 
 sub timer {
-    my ($self, $after, $cb) = @_;
-    return $self->_add_loop_event(
-        'timer', $cb,
-        started => time,
-        after   => $after
-    );
+    shift->_add_loop_event(timer => pop, after => pop, started => time);
 }
 
 sub write {

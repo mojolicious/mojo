@@ -61,10 +61,10 @@ is $idle, 1, 'on_idle was called';
 
 # Run again without first tick event handler
 my $before = $ticks;
-my $new    = 0;
-$loop->on_tick(sub { $new++ });
+my $after  = 0;
+$loop->on_tick(sub { $after++ });
 $loop->drop($id);
 $loop->timer(1 => sub { shift->stop });
 $loop->start;
-ok $new > 2, 'more than two ticks';
-is $ticks, $before, 'tick dropped successfully';
+ok $after > 2, 'more than two ticks';
+is $ticks, $before, 'no additional ticks';

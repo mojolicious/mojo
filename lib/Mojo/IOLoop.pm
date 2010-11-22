@@ -126,7 +126,8 @@ my $DNS_TYPES = {
     MX    => 0x000f,
     NS    => 0x0002,
     PTR   => 0x000c,
-    TXT   => 0x0010
+    TXT   => 0x0010,
+    ANY   => 0x00ff
 };
 
 # "localhost"

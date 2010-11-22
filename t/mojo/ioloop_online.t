@@ -11,7 +11,7 @@ plan skip_all => 'Perl 5.12 required for this test!'
   unless eval 'use 5.12.0; 1';
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
-plan tests => 9;
+plan tests => 10;
 
 use_ok 'Mojo::IOLoop';
 
@@ -61,6 +61,21 @@ $loop->resolve(
     }
 )->start;
 like $result, $Mojo::URL::IPV6_RE, 'valid IPv6 record';
+
+# ANY resolve
+$result = undef;
+$loop->resolve(
+    'gmail.com',
+    'ANY',
+    sub {
+        my ($self, $records) = @_;
+        $result = @$records;
+        $self->stop;
+    }
+)->start;
+
+ok
+    $result, 'ANY request records';
 
 # Resolve CNAME record
 $result = undef;

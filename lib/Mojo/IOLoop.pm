@@ -1808,7 +1808,7 @@ dropped.
 
 Drop anything with an id.
 Connections will be dropped gracefully by allowing them to finish writing all
-data in it's write buffer.
+data in its write buffer.
 
 =head2 C<generate_port>
 

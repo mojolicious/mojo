@@ -1806,7 +1806,7 @@ dropped.
 
     $loop = $loop->drop($id);
 
-Drop a anything with an id.
+Drop anything with an id.
 Connections will be dropped gracefully by allowing them to finish writing all
 data in it's write buffer.
 

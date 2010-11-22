@@ -936,26 +936,30 @@ sub _connect {
     );
 
     # Socket
-    return $self->_error($id, "Couldn't connect.")
-      unless my $socket = $args->{socket}
-          || IO::Socket::INET->new(%options);
+    my $socket;
+    unless ($socket = $args->{socket}) {
+
+        # New socket
+        return $self->_error($id, "Couldn't connect.")
+          unless $socket = IO::Socket::INET->new(%options);
+
+        # Non-blocking
+        $socket->blocking(0);
+
+        # Disable Nagle's algorithm
+        setsockopt $socket, IPPROTO_TCP, TCP_NODELAY, 1;
+
+        # Timer
+        $c->{connect_timer} =
+          $self->timer($self->connect_timeout =>
+              sub { shift->_error($id, 'Connect timeout.') });
+    }
     $c->{socket} = $socket;
     $self->{_reverse}->{$socket} = $id;
 
     # File descriptor
     return unless defined(my $fd = fileno $socket);
     $self->{_fds}->{$fd} = $id;
-
-    # Non-blocking
-    $socket->blocking(0);
-
-    # Disable Nagle's algorithm
-    setsockopt $socket, IPPROTO_TCP, TCP_NODELAY, 1;
-
-    # Timer
-    $c->{connect_timer} =
-      $self->timer($self->connect_timeout =>
-          sub { shift->_error($id, 'Connect timeout.') });
 
     # Add socket to poll
     $self->_writing($id);
@@ -1495,7 +1499,8 @@ sub _write {
 
         # Cleanup
         delete $c->{connecting};
-        $self->_drop_immediately(delete $c->{connect_timer});
+        my $timer = delete $c->{connect_timer};
+        $self->_drop_immediately($timer) if $timer;
 
         # Debug
         warn "CONNECTED $id\n" if DEBUG;

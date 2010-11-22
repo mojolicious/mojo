@@ -943,9 +943,6 @@ sub _connect {
         return $self->_error($id, "Couldn't connect.")
           unless $handle = IO::Socket::INET->new(%options);
 
-        # Non-blocking
-        $handle->blocking(0);
-
         # Disable Nagle's algorithm
         setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1;
 
@@ -956,6 +953,9 @@ sub _connect {
     }
     $c->{handle} = $handle;
     $self->{_reverse}->{$handle} = $id;
+
+    # Non-blocking
+    $handle->blocking(0);
 
     # File descriptor
     return unless defined(my $fd = fileno $handle);

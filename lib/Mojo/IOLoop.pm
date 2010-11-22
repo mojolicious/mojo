@@ -1493,9 +1493,6 @@ sub _write {
     # Connecting
     if ($c->{connecting}) {
 
-        # Connected
-        return unless $socket->connected;
-
         # Cleanup
         delete $c->{connecting};
         $self->_drop_immediately(delete $c->{connect_timer});

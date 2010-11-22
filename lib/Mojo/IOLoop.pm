@@ -360,7 +360,7 @@ sub listen {
     $self->{_fds}->{$fd} = $id;
 
     # Socket
-    $c->{socket} = $socket;
+    $c->{handle} = $socket;
     $self->{_reverse}->{$socket} = $id;
 
     # TLS options
@@ -381,7 +381,7 @@ sub local_info {
     return {} unless my $c = $self->{_cs}->{$id};
 
     # Socket
-    return {} unless my $socket = $c->{socket};
+    return {} unless my $socket = $c->{handle};
 
     # UNIX domain socket info
     return {path => $socket->hostpath} if $socket->can('hostpath');
@@ -550,7 +550,7 @@ sub remote_info {
     return {} unless my $c = $self->{_cs}->{$id};
 
     # Socket
-    return {} unless my $socket = $c->{socket};
+    return {} unless my $socket = $c->{handle};
 
     # UNIX domain socket info
     return {path => $socket->peerpath} if $socket->can('peerpath');
@@ -740,7 +740,7 @@ sub start_tls {
     $self->drop($id) and return unless my $c = $self->{_cs}->{$id};
 
     # Socket
-    $self->drop($id) and return unless my $socket = $c->{socket};
+    $self->drop($id) and return unless my $socket = $c->{handle};
     my $fd = fileno $socket;
 
     # Cleanup
@@ -758,7 +758,7 @@ sub start_tls {
       unless my $new = IO::Socket::SSL->start_SSL($socket, %options);
 
     # Upgrade
-    $c->{socket}              = $new;
+    $c->{handle}              = $new;
     $self->{_reverse}->{$new} = $id;
     $c->{tls_connect}         = 1;
     $self->_writing($id);
@@ -775,7 +775,7 @@ sub test {
     return unless my $c = $self->{_cs}->{$id};
 
     # Socket
-    return unless my $socket = $c->{socket};
+    return unless my $socket = $c->{handle};
 
     # Test
     my $test = $self->{_test} ||= IO::Poll->new;
@@ -844,7 +844,7 @@ sub _accept {
     my $tls = $l->{tls};
     $socket = IO::Socket::SSL->start_SSL($socket, %$tls) if $tls;
     $c->{tls_accept} = 1 if $tls;
-    $c->{socket}     = $socket;
+    $c->{handle}     = $socket;
     $r->{$socket}    = $id;
 
     # Non-blocking
@@ -877,7 +877,7 @@ sub _accept {
     $listen = $self->{_listen} || {};
     my $loop = $self->{_loop};
     for my $lid (keys %$listen) {
-        my $socket = $listen->{$lid}->{socket};
+        my $socket = $listen->{$lid}->{handle};
 
         # Remove listen socket from kqueue
         if (KQUEUE) {
@@ -935,33 +935,33 @@ sub _connect {
         %{$args->{args} || {}}
     );
 
-    # Socket
-    my $socket;
-    unless ($socket = $args->{socket}) {
+    # Handle
+    my $handle;
+    unless ($handle = $args->{handle} || $args->{socket}) {
 
-        # New socket
+        # Socket
         return $self->_error($id, "Couldn't connect.")
-          unless $socket = IO::Socket::INET->new(%options);
+          unless $handle = IO::Socket::INET->new(%options);
 
         # Non-blocking
-        $socket->blocking(0);
+        $handle->blocking(0);
 
         # Disable Nagle's algorithm
-        setsockopt $socket, IPPROTO_TCP, TCP_NODELAY, 1;
+        setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1;
 
         # Timer
         $c->{connect_timer} =
           $self->timer($self->connect_timeout =>
               sub { shift->_error($id, 'Connect timeout.') });
     }
-    $c->{socket} = $socket;
-    $self->{_reverse}->{$socket} = $id;
+    $c->{handle} = $handle;
+    $self->{_reverse}->{$handle} = $id;
 
     # File descriptor
-    return unless defined(my $fd = fileno $socket);
+    return unless defined(my $fd = fileno $handle);
     $self->{_fds}->{$fd} = $id;
 
-    # Add socket to poll
+    # Add handle to poll
     $self->_writing($id);
 
     # Start TLS
@@ -1000,17 +1000,17 @@ sub _drop_immediately {
         $self->_drop_immediately($t);
     }
 
-    # Drop socket
-    if (my $socket = $c->{socket}) {
+    # Drop handle
+    if (my $handle = $c->{handle}) {
 
         # Debug
         warn "DISCONNECTED $id\n" if DEBUG;
 
         # Remove file descriptor
-        return unless my $fd = fileno $socket;
+        return unless my $fd = fileno $handle;
         delete $self->{_fds}->{$fd};
 
-        # Remove socket from kqueue
+        # Remove handle from kqueue
         if (my $loop = $self->_prepare_loop) {
             if (KQUEUE) {
 
@@ -1021,12 +1021,12 @@ sub _drop_immediately {
                 $loop->EV_SET($fd, KQUEUE_WRITE, KQUEUE_DELETE) if $writing;
             }
 
-            # Remove socket from poll or epoll
-            else { $loop->remove($socket) }
+            # Remove handle from poll or epoll
+            else { $loop->remove($handle) }
         }
 
-        # Close socket
-        close $socket;
+        # Close handle
+        close $handle;
     }
 
     return $self;
@@ -1079,8 +1079,8 @@ sub _not_writing {
     # Chunk still in buffer
     return $c->{read_only} = 1 if length $c->{buffer};
 
-    # Socket
-    return unless my $socket = $c->{socket};
+    # Handle
+    return unless my $handle = $c->{handle};
 
     # Writing
     my $writing = $c->{writing};
@@ -1089,7 +1089,7 @@ sub _not_writing {
     # KQueue
     my $loop = $self->_prepare_loop;
     if (KQUEUE) {
-        my $fd = fileno $socket;
+        my $fd = fileno $handle;
 
         # Writing
         $loop->EV_SET($fd, KQUEUE_READ, KQUEUE_ADD) unless defined $writing;
@@ -1101,13 +1101,13 @@ sub _not_writing {
 
         # Not writing anymore
         if ($writing) {
-            $loop->remove($socket);
+            $loop->remove($handle);
             $writing = undef;
         }
 
         # Reading
         my $mask = EPOLL ? EPOLL_POLLIN : POLLIN;
-        $loop->mask($socket, $mask) unless defined $writing;
+        $loop->mask($handle, $mask) unless defined $writing;
     }
 
     # Not writing anymore
@@ -1273,7 +1273,7 @@ sub _prepare_listen {
 
     # Add listen sockets
     for my $lid (keys %$listen) {
-        my $socket = $listen->{$lid}->{socket};
+        my $socket = $listen->{$lid}->{handle};
 
         # KQueue
         if (KQUEUE) { $loop->EV_SET(fileno $socket, KQUEUE_READ, KQUEUE_ADD) }
@@ -1311,7 +1311,7 @@ sub _read {
     my ($self, $id) = @_;
 
     # Listen socket (new connection)
-    if (my $l = $self->{_listen}->{$id}) { $self->_accept($l->{socket}) }
+    if (my $l = $self->{_listen}->{$id}) { $self->_accept($l->{handle}) }
 
     # Connection
     my $c = $self->{_cs}->{$id};
@@ -1322,11 +1322,11 @@ sub _read {
     # TLS connect
     return $self->_tls_connect($id) if $c->{tls_connect};
 
-    # Socket
-    return unless defined(my $socket = $c->{socket});
+    # Handle
+    return unless defined(my $handle = $c->{handle});
 
     # Read as much as possible
-    my $read = $socket->sysread(my $buffer, 4194304, 0);
+    my $read = $handle->sysread(my $buffer, 4194304, 0);
 
     # Error
     unless (defined $read) {
@@ -1424,7 +1424,7 @@ sub _tls_accept {
     my $c = $self->{_cs}->{$id};
 
     # Accepted
-    if ($c->{socket}->accept_SSL) {
+    if ($c->{handle}->accept_SSL) {
 
         # Cleanup
         delete $c->{tls_accept};
@@ -1447,7 +1447,7 @@ sub _tls_connect {
     my $c = $self->{_cs}->{$id};
 
     # Connected
-    if ($c->{socket}->connect_SSL) {
+    if ($c->{handle}->connect_SSL) {
 
         # Cleanup
         delete $c->{tls_connect};
@@ -1491,8 +1491,8 @@ sub _write {
     # TLS connect
     return $self->_tls_connect($id) if $c->{tls_connect};
 
-    # Socket
-    return unless my $socket = $c->{socket};
+    # Handle
+    return unless my $handle = $c->{handle};
 
     # Connecting
     if ($c->{connecting}) {
@@ -1516,7 +1516,7 @@ sub _write {
     }
 
     # Write
-    my $written = $socket->syswrite($c->{buffer});
+    my $written = $handle->syswrite($c->{buffer});
 
     # Error
     unless (defined $written) {
@@ -1550,13 +1550,13 @@ sub _writing {
     # Writing
     return if my $writing = $c->{writing};
 
-    # Socket
-    return unless my $socket = $c->{socket};
+    # Handle
+    return unless my $handle = $c->{handle};
 
     # KQueue
     my $loop = $self->_prepare_loop;
     if (KQUEUE) {
-        my $fd = fileno $socket;
+        my $fd = fileno $handle;
 
         # Writing
         $loop->EV_SET($fd, KQUEUE_READ,  KQUEUE_ADD) unless defined $writing;
@@ -1567,11 +1567,11 @@ sub _writing {
     else {
 
         # Cleanup
-        $loop->remove($socket);
+        $loop->remove($handle);
 
         # Writing
         my $mask = EPOLL ? EPOLL_POLLIN | EPOLL_POLLOUT : POLLIN | POLLOUT;
-        $loop->mask($socket, $mask);
+        $loop->mask($handle, $mask);
     }
 
     # Writing
@@ -1760,6 +1760,10 @@ These options are currently available.
 
 Address or host name of the peer to connect to.
 
+=item C<handle>
+
+Use an already prepared handle.
+
 =item C<on_connect>
 
 Callback to be invoked once the connection is established.
@@ -1784,10 +1788,6 @@ Port to connect to.
 
 Protocol to use, defaults to C<tcp>.
 
-=item C<socket>
-
-Use an already prepared socket handle.
-
 =item C<tls>
 
 Enable TLS.
@@ -1806,7 +1806,7 @@ dropped.
 
     $loop = $loop->drop($id);
 
-Drop a connection, listen socket or timer.
+Drop a anything with an id.
 Connections will be dropped gracefully by allowing them to finish writing all
 data in it's write buffer.
 

@@ -11,7 +11,7 @@ plan skip_all => 'Perl 5.12 required for this test!'
   unless eval 'use 5.12.0; 1';
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
-plan tests => 9;
+plan tests => 10;
 
 use_ok 'Mojo::IOLoop';
 
@@ -22,6 +22,19 @@ use Mojo::URL;
 # yearn for a Republican president to lower taxes, brutalize criminals, and
 # rule you like a king!
 my $loop = Mojo::IOLoop->new;
+
+# Resolve all record
+my %types;
+$loop->resolve(
+    'www.google.com',
+    '*',
+    sub {
+        my ($self, $records) = @_;
+        $types{$_->[0]}++ for @$records;
+        $self->stop;
+    }
+)->start;
+ok keys %types > 1, 'multiple record types';
 
 # Resolve TXT record
 my $result;

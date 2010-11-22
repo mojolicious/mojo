@@ -120,6 +120,7 @@ if (-r '/etc/resolv.conf') {
 
 # DNS record types
 my $DNS_TYPES = {
+    '*'   => 0x00ff,
     A     => 0x0001,
     AAAA  => 0x001c,
     CNAME => 0x0005,
@@ -1999,7 +2000,7 @@ The remote port.
     $loop = $loop->resolve('mojolicio.us', 'A', sub {...});
 
 Resolve domain into C<A>, C<AAAA>, C<CNAME>, C<MX>, C<NS>, C<PTR> or C<TXT>
-records.
+records, C<*> will query for all at once.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<singleton>

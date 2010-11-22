@@ -414,7 +414,7 @@ sub lookup {
                     my ($self, $results) = @_;
 
                     # Success
-                    my $result = first { $_->[0] eq 'AAA' } @$results;
+                    my $result = first { $_->[0] eq 'AAAA' } @$results;
                     return $self->$cb($result->[1]) if $result;
 
                     # Pass through

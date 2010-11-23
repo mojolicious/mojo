@@ -580,6 +580,9 @@ sub _connect {
     # Info
     my ($scheme, $address, $port) = $self->_tx_info($tx);
 
+    # Weaken
+    weaken $self;
+
     # Keep alive connection
     $id ||= $self->_cache("$scheme:$address:$port");
     if ($id && !ref $id) {
@@ -610,19 +613,13 @@ sub _connect {
         # Debug
         warn "NEW CONNECTION ($scheme:$address:$port)\n" if DEBUG;
 
-        # Weaken
-        weaken $self;
-
         # Connect
         $id = $loop->connect(
             address => $address,
             port    => $port,
             handle  => $id,
             tls     => $scheme eq 'https' ? 1 : 0,
-            on_connect => sub { $self->_connected($_[1]) },
-            on_error   => sub { $self->_error(@_) },
-            on_hup     => sub { $self->_hup(@_) },
-            on_read    => sub { $self->_read(@_) }
+            on_connect => sub { $self->_connected($_[1]) }
         );
 
         # Error
@@ -635,6 +632,11 @@ sub _connect {
         # Add new connection
         $self->{_cs}->{$id} = {cb => $cb, tx => $tx};
     }
+
+    # Callbacks
+    $loop->on_error($id => sub { $self->_error(@_) });
+    $loop->on_hup($id => sub { $self->_hup(@_) });
+    $loop->on_read($id => sub { $self->_read(@_) });
 
     return $id;
 }

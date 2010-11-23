@@ -6,7 +6,7 @@ use warnings;
 # Disable epoll and kqueue
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 48;
+use Test::More tests => 51;
 
 use_ok 'Mojo::Client';
 
@@ -77,6 +77,32 @@ $client->ioloop->listen(
 
 # GET /
 my $tx = $client->get('/');
+ok $tx->success, 'successful';
+is $tx->res->code, 200,     'right status';
+is $tx->res->body, 'works', 'right content';
+
+# GET / (custom connection)
+my ($success, $code, $body);
+$client->ioloop->connect(
+    address    => 'localhost',
+    port       => $port,
+    on_connect => sub {
+        my ($loop, $id) = @_;
+        my $tx = $client->build_tx(GET => "http://localhost:$port/");
+        $tx->connection($id);
+        $client->start(
+            $tx => sub {
+                my $self = shift;
+                $self->ioloop->stop;
+                $self->drop($id);
+                $success = $tx->success;
+                $code    = $tx->res->code;
+                $body    = $tx->res->body;
+            }
+        );
+    }
+);
+$client->ioloop->start;
 ok $tx->success, 'successful';
 is $tx->res->code, 200,     'right status';
 is $tx->res->body, 'works', 'right content';

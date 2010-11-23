@@ -94,18 +94,18 @@ $client->ioloop->connect(
             $tx => sub {
                 my $self = shift;
                 $self->ioloop->stop;
-                $self->drop($id);
-                $success = $tx->success;
-                $code    = $tx->res->code;
-                $body    = $tx->res->body;
+                $self->ioloop->drop($id);
+                $success = $self->tx->success;
+                $code    = $self->res->code;
+                $body    = $self->res->body;
             }
         );
     }
 );
 $client->ioloop->start;
-ok $tx->success, 'successful';
-is $tx->res->code, 200,     'right status';
-is $tx->res->body, 'works', 'right content';
+ok $success, 'successful';
+is $code,    200, 'right status';
+is $body,    'works!', 'right content';
 
 # GET / (missing Content-Lengt header)
 $tx = $client->get("http://localhost:$port2/");

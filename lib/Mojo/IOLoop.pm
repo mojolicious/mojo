@@ -533,12 +533,12 @@ sub one_tick {
 
     # Tick
     for my $tick (keys %{$self->{_tick}}) {
-        $self->_run_callback('tick', $self->{_tick}->{$tick}->{cb});
+        $self->_run_callback('tick', $self->{_tick}->{$tick}->{cb}, $tick);
     }
 
     # Idle
     for my $idle (keys %{$self->{_idle}}) {
-        $self->_run_callback('idle', $self->{_idle}->{$idle}->{cb})
+        $self->_run_callback('idle', $self->{_idle}->{$idle}->{cb}, $idle)
           unless @read || @write || @error || @hup || $timers;
     }
 }

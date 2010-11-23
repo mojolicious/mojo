@@ -1,9 +1,10 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-0.999942 2010-11-19 00:00:00
+0.999942 2010-11-23 00:00:00
         - Added put and del functions to Mojolicious::Lite.
         - Added on_idle and on_tick event handlers to Mojo::IOLoop.
         - Added "*" query support to the Mojo::IOLoop resolver.
+        - Added ability to pass plain connection ids to Mojo::Client.
         - Fixed typos.
 
 0.999941 2010-11-19 00:00:00

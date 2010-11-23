@@ -139,6 +139,8 @@ option, so you don't have to restart the server after every change.
 
 Routes are basically just fancy paths that can contain different kinds of
 placeholders.
+C<$self> is an instance of L<Mojolicious::Controller> containing both the
+HTTP request and response.
 
     # /foo
     get '/foo' => sub {

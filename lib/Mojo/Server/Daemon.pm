@@ -351,7 +351,7 @@ sub _upgrade {
     my $c = $self->{_cs}->{$id};
 
     # WebSocket handshake handler
-    my $ws = $c->{websocket} = $self->on_websocket_handshake->($self, $tx);
+    my $ws = $c->{websocket} = $self->on_websocket->($self, $tx);
 
     # Upgrade connection timeout
     $self->ioloop->connection_timeout($id, $self->websocket_timeout);

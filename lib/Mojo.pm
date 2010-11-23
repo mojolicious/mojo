@@ -21,7 +21,7 @@ __PACKAGE__->attr(
     }
 );
 __PACKAGE__->attr(
-    on_websocket_handshake => sub {
+    on_websocket => sub {
         sub {
             return Mojo::Transaction::WebSocket->new(handshake => pop)
               ->server_handshake;
@@ -30,8 +30,7 @@ __PACKAGE__->attr(
 );
 
 # DEPRECATED in Comet!
-*build_tx_cb            = \&on_build_tx;
-*websocket_handshake_cb = \&on_websocket_handshake;
+*build_tx_cb = \&on_build_tx;
 
 # Oh, so they have internet on computers now!
 sub new {
@@ -122,10 +121,10 @@ The logging layer of your application, by default a L<Mojo::Log> object.
 The transaction builder callback, by default it builds a
 L<Mojo::Transaction::HTTP> object.
 
-=head2 C<on_websocket_handshake>
+=head2 C<on_websocket>
 
-    my $cb = $app->on_websocket_handshake;
-    $app   = $app->on_websocket_handshake(sub { ... });
+    my $cb = $app->on_websocket;
+    $app   = $app->on_websocket(sub { ... });
 
 The websocket handshake callback, by default it builds a
 L<Mojo::Transaction::WebSocket> object and handles the response for the

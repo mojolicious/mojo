@@ -61,19 +61,18 @@ __PACKAGE__->attr(
     }
 );
 __PACKAGE__->attr(
-    on_websocket_handshake => sub {
+    on_websocket => sub {
         sub {
             my $self = shift;
-            return $self->app->on_websocket_handshake->($self->app, @_);
+            return $self->app->on_websocket->($self->app, @_);
           }
     }
 );
 __PACKAGE__->attr(reload => sub { $ENV{MOJO_RELOAD} || 0 });
 
 # DEPRECATED in Comet!
-*build_tx_cb            = \&on_build_tx;
-*handler_cb             = \&on_handler;
-*websocket_handshake_cb = \&on_websocket_handshake;
+*build_tx_cb = \&on_build_tx;
+*handler_cb  = \&on_handler;
 
 # Are you saying you're never going to eat any animal again? What about bacon?
 # No.
@@ -147,10 +146,10 @@ Transaction builder callback.
 
 Handler callback.
 
-=head2 C<on_websocket_handshake>
+=head2 C<on_websocket>
 
-    my $handshake = $server->on_websocket_handshake;
-    $server       = $server->on_websocket_handshake(sub {
+    my $handshake = $server->on_websocket;
+    $server       = $server->on_websocket(sub {
         my ($self, $tx) = @_;
     });
 

@@ -379,8 +379,7 @@ sub _encode_values {
     # Number
     my $flags = B::svref_2object(\$value)->FLAGS;
     return $value
-      if $flags & (B::SVp_IOK | B::SVp_NOK)
-          and !($flags & B::SVp_POK);
+      if $flags & (B::SVp_IOK | B::SVp_NOK) && !($flags & B::SVp_POK);
 
     # String
     return $self->_encode_string($value);

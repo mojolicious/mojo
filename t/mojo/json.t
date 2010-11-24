@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 101;
+use Test::More tests => 102;
 
 use Mojo::ByteStream 'b';
 
@@ -154,6 +154,8 @@ is $string, '[true,false]', 'encode [$json->true, $json->false]';
 # Encode number
 $string = $json->encode([1]);
 is $string, '[1]', 'encode [1]';
+$string = $json->encode(["1"]);
+is $string, '["1"]', 'encode ["1"]';
 $string = $json->encode(['-122.026020']);
 is $string, '["-122.026020"]', 'encode [\'-122.026020\']';
 $string = $json->encode([-122.026020]);

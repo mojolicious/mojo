@@ -29,6 +29,7 @@ __DATA__
 !.gitignore
 !.perltidyrc
 *~
+*.swp
 log/
 blib/
 Makefile*

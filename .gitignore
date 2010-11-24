@@ -2,6 +2,7 @@
 !.gitignore
 !.perltidyrc
 *~
+*.swp
 blib/
 Makefile*
 !Makefile.PL

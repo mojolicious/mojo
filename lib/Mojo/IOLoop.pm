@@ -1304,7 +1304,7 @@ sub _prepare_loop {
     # "poll"
     else { $self->{_loop} = IO::Poll->new }
 
-    # Workaround for empty poll mainloop not blocking
+    # Dummy handle to make empty poll respect the timeout and block
     $self->{_loop}->mask(IO::Socket::INET->new(Listen => 1),
         EPOLL ? EPOLL_POLLIN : POLLIN);
 

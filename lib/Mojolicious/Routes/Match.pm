@@ -66,7 +66,7 @@ sub match {
 
         # Match
         return
-          if !$condition->($r, $self->{_controller}, $self->captures, $value);
+          if !$condition->($r, $self->{_controller}, $captures, $value);
     }
 
     # Partial

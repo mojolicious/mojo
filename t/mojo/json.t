@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 97;
+use Test::More tests => 101;
 
 use Mojo::ByteStream 'b';
 
@@ -23,8 +23,10 @@ $array = $json->decode('[0]');
 is_deeply $array, [0], 'decode [0]';
 $array = $json->decode('[1]');
 is_deeply $array, [1], 'decode [1]';
-$array = $json->decode('[ -122.026020 ]');
+$array = $json->decode('[ "-122.026020" ]');
 is_deeply $array, ['-122.026020'], 'decode [ -122.026020 ]';
+$array = $json->decode('[ -122.026020 ]');
+is_deeply $array, ['-122.02602'], 'decode [ -122.026020 ]';
 $array = $json->decode('[0.0]');
 isa_ok $array, 'ARRAY', 'decode [0.0]';
 cmp_ok $array->[0], '==', 0, 'value is 0';
@@ -33,8 +35,10 @@ isa_ok $array, 'ARRAY', 'decode [0e0]';
 cmp_ok $array->[0], '==', 0, 'value is 0';
 $array = $json->decode('[1,-2]');
 is_deeply $array, [1, -2], 'decode [1,-2]';
+$array = $json->decode('["10e12" , [2 ]]');
+is_deeply $array, ['10e12', [2]], 'decode ["10e12" , [2 ]]';
 $array = $json->decode('[10e12 , [2 ]]');
-is_deeply $array, ['10e12', [2]], 'decode [10e12 , [2 ]]';
+is_deeply $array, [10000000000000, [2]], 'decode [10e12 , [2 ]]';
 $array = $json->decode('[37.7668 , [ 20 ]] ');
 is_deeply $array, [37.7668, [20]], 'decode [37.7668 , [ 20 ]] ';
 $array = $json->decode('[1e3]');
@@ -151,11 +155,15 @@ is $string, '[true,false]', 'encode [$json->true, $json->false]';
 $string = $json->encode([1]);
 is $string, '[1]', 'encode [1]';
 $string = $json->encode(['-122.026020']);
-is $string, '[-122.026020]', 'encode [\'-122.026020\']';
+is $string, '["-122.026020"]', 'encode [\'-122.026020\']';
+$string = $json->encode([-122.026020]);
+is $string, '[-122.02602]', 'encode [-122.026020]';
 $string = $json->encode([1, -2]);
 is $string, '[1,-2]', 'encode [1, -2]';
 $string = $json->encode(['10e12', [2]]);
-is $string, '[10e12,[2]]', 'encode [\'10e12\', [2]]';
+is $string, '["10e12",[2]]', 'encode [\'10e12\', [2]]';
+$string = $json->encode([10e12, [2]]);
+is $string, '[10000000000000,[2]]', 'encode [10e12, [2]]';
 $string = $json->encode([37.7668, [20]]);
 is $string, '[37.7668,[20]]', 'encode [37.7668, [20]]';
 

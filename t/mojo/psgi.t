@@ -38,7 +38,7 @@ is $res->[0], 200, 'right status';
 my %headers = @{$res->[1]};
 is keys(%headers), 3, 'right number of headers';
 ok $headers{Date}, 'right "Date" value';
-is $headers{'Content-Length'}, 41, 'right "Content-Length" value';
+is $headers{'Content-Length'}, 43, 'right "Content-Length" value';
 is $headers{'Content-Type'}, 'application/json', 'right "Content-Type" value';
 my $params = '';
 while (defined(my $chunk = $res->[2]->getline)) { $params .= $chunk }
@@ -76,7 +76,7 @@ is $res->[0], 200, 'right status';
 %headers = @{$res->[1]};
 is keys(%headers), 3, 'right number of headers';
 ok $headers{Date}, 'right "Date" value';
-is $headers{'Content-Length'}, 41, 'right "Content-Length" value';
+is $headers{'Content-Length'}, 43, 'right "Content-Length" value';
 is $headers{'Content-Type'}, 'application/json', 'right "Content-Type" value';
 $params = '';
 while (defined(my $chunk = $res->[2]->getline)) { $params .= $chunk }

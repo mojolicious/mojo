@@ -44,6 +44,7 @@ WriteMakefile(
 
     EXE_FILES => ['script/mojo'],
     PREREQ_PM => {
+        'B'                     => 0,
         'Carp'                  => 0,
         'Cwd'                   => 0,
         'Data::Dumper'          => 0,

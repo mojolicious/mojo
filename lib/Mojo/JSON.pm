@@ -5,6 +5,7 @@ use warnings;
 
 use base 'Mojo::Base';
 
+use B;
 use Mojo::Util;
 
 __PACKAGE__->attr('error');
@@ -196,7 +197,7 @@ sub _decode_number {
     my ($self, $ref) = @_;
 
     # Number found
-    if ($$ref =~ s/$NUMBER_RE//o) { return $1 }
+    if ($$ref =~ s/$NUMBER_RE//o) { return 0 + $1 }
 
     # No number
     return;
@@ -376,7 +377,10 @@ sub _encode_values {
     return 'true' if ref $value eq 'Mojo::JSON::_Bool' && $value;
 
     # Number
-    return $value if $value =~ m/$NUMBER_RE$/o;
+    my $flags = B::svref_2object(\$value)->FLAGS;
+    return $value
+      if $flags & (B::SVp_IOK | B::SVp_NOK)
+          and !($flags & B::SVp_POK);
 
     # String
     return $self->_encode_string($value);

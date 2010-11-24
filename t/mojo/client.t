@@ -88,7 +88,7 @@ $client->ioloop->connect(
     port       => $port,
     on_connect => sub {
         my ($loop, $id) = @_;
-        my $tx = $client->build_tx(GET => "http://localhost:$port/");
+        my $tx = $client->build_tx(GET => "http://mojolicio.us:$port/");
         $tx->connection($id);
         $client->start(
             $tx => sub {

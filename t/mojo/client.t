@@ -93,7 +93,6 @@ $client->ioloop->connect(
         $client->start(
             $tx => sub {
                 my $self = shift;
-                $self->ioloop->stop;
                 $self->ioloop->drop($id);
                 $success = $self->tx->success;
                 $code    = $self->res->code;

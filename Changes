@@ -6,6 +6,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added "*" query support to the Mojo::IOLoop resolver.
         - Added ability to pass plain connection ids to Mojo::Client.
         - Fixed a bug where an empty Mojo::IOLoop would never block.
+        - Fixed a small route condition bug.
         - Fixed typos.
 
 0.999941 2010-11-19 00:00:00

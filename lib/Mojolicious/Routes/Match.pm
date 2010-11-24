@@ -49,16 +49,24 @@ sub match {
     # Path
     my $path = $self->{_path};
 
+    # Pattern
+    my $pattern = $r->pattern;
+
     # Match
-    my $captures = $r->pattern->shape_match(\$path);
+    my $captures = $pattern->shape_match(\$path);
 
     # No match
     return unless $captures;
 
+    # Merge captures
+    $captures = {%{$self->captures}, %$captures};
+    $self->captures($captures);
+
     # Conditions
-    for (my $i = 0; $i < @{$r->conditions}; $i += 2) {
-        my $name      = $r->conditions->[$i];
-        my $value     = $r->conditions->[$i + 1];
+    my $conditions = $r->conditions;
+    for (my $i = 0; $i < @$conditions; $i += 2) {
+        my $name      = $conditions->[$i];
+        my $value     = $conditions->[$i + 1];
         my $condition = $dictionary->{$name};
 
         # No condition
@@ -66,7 +74,7 @@ sub match {
 
         # Match
         return
-          if !$condition->($r, $self->{_controller}, $self->captures, $value);
+          if !$condition->($r, $self->{_controller}, $captures, $value);
     }
 
     # Partial
@@ -76,18 +84,14 @@ sub match {
     }
     $self->{_path} = $path;
 
-    # Merge captures
-    $captures = {%{$self->captures}, %$captures};
-    $self->captures($captures);
-
     # Format
-    if ($r->is_endpoint && !$r->pattern->format) {
+    if ($r->is_endpoint && !$pattern->format) {
         if ($path =~ /^\.([^\/]+)$/) {
-            $self->captures->{format} = $1;
-            $self->{_path} = '';
+            $captures->{format} = $1;
+            $self->{_path}      = '';
         }
     }
-    $self->captures->{format} ||= $r->pattern->format if $r->pattern->format;
+    $captures->{format} ||= $pattern->format if $pattern->format;
 
     # Update stack
     if ($r->inline || ($r->is_endpoint && $self->_is_path_empty)) {

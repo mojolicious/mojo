@@ -29,6 +29,7 @@ __DATA__
 !.gitignore
 !.perltidyrc
 *~
+log/
 blib
 Makefile*
 !Makefile.PL

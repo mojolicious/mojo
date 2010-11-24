@@ -1296,13 +1296,17 @@ sub _prepare_loop {
     return $self->{_loop} if $self->{_loop};
 
     # "kqueue"
-    if (KQUEUE) { $self->{_loop} = IO::KQueue->new }
+    if (KQUEUE) { return $self->{_loop} = IO::KQueue->new }
 
     # "epoll"
     elsif (EPOLL) { $self->{_loop} = IO::Epoll->new }
 
     # "poll"
     else { $self->{_loop} = IO::Poll->new }
+
+    # Workaround for empty poll mainloop not blocking
+    $self->{_loop}->mask(IO::Socket::INET->new(Listen => 1),
+        EPOLL ? EPOLL_POLLIN : POLLIN);
 
     return $self->{_loop};
 }

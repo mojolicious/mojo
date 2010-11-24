@@ -76,7 +76,7 @@ Start application with CGI backend.
 
 =item C<daemon>
 
-    mojo cgi
+    mojo daemon
     script/myapp daemon
 
 Start application with standalone HTTP 1.1 server backend.

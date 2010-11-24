@@ -26,6 +26,15 @@ __END__
 
 mojo - The Mojolicious Command System
 
+=head1 SYNOPSIS
+
+    mojo help
+
+=head1 DESCRIPTION
+
+List and run L<Mojolicious> commands as described in
+L<Mojolicious::Commands>.
+
 =head1 SEE ALSO
 
 L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.

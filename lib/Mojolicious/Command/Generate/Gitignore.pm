@@ -30,7 +30,7 @@ __DATA__
 !.perltidyrc
 *~
 log/
-blib
+blib/
 Makefile*
 !Makefile.PL
 META.yml

@@ -882,6 +882,7 @@ Unquote string in-place.
 =head2 C<url_escape>
 
     url_escape $string;
+    url_escape $string, 'A-Za-z0-9\-\.\_\~';
 
 URL escape in-place.
 

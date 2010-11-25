@@ -158,6 +158,12 @@ our $LOOP;
 sub DESTROY {
     my $self = shift;
 
+    # Cleanup connections
+    for my $id (keys %{$self->{_cs}}) { $self->_drop_immediately($id) }
+
+    # Cleanup listen sockets
+    for my $id (keys %{$self->{_listen}}) { $self->_drop_immediately($id) }
+
     # Cleanup temporary cert file
     if (my $cert = $self->{_cert}) { unlink $cert if -w $cert }
 
@@ -242,7 +248,7 @@ sub connection_timeout {
 sub drop {
     my ($self, $id) = @_;
 
-    # Connection
+    # Drop connection gracefully
     if (my $c = $self->{_cs}->{$id}) { return $c->{finish} = 1 }
 
     # Drop
@@ -1296,13 +1302,31 @@ sub _prepare_loop {
     return $self->{_loop} if $self->{_loop};
 
     # "kqueue"
-    if (KQUEUE) { return $self->{_loop} = IO::KQueue->new }
+    if (KQUEUE) {
+
+        # Debug
+        warn "KQUEUE MAINLOOP\n" if DEBUG;
+
+        return $self->{_loop} = IO::KQueue->new;
+    }
 
     # "epoll"
-    elsif (EPOLL) { $self->{_loop} = IO::Epoll->new }
+    elsif (EPOLL) {
+
+        # Debug
+        warn "EPOLL MAINLOOP\n" if DEBUG;
+
+        $self->{_loop} = IO::Epoll->new;
+    }
 
     # "poll"
-    else { $self->{_loop} = IO::Poll->new }
+    else {
+
+        # Debug
+        warn "POLL MAINLOOP\n" if DEBUG;
+
+        $self->{_loop} = IO::Poll->new;
+    }
 
     # Dummy handle to make empty poll respect the timeout and block
     $self->{_loop}->mask(IO::Socket::INET->new(Listen => 1),

@@ -129,8 +129,7 @@ sub from_hash {
     }
 
     # Merge
-    foreach my $header (keys %{$hash}) {
-        my $value = $hash->{$header};
+    while (my ($header, $value) = each %$hash) {
         $self->add($header => ref $value eq 'ARRAY' ? @$value : $value);
     }
 

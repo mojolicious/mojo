@@ -247,7 +247,7 @@ sub _parse_env {
     $self->env($env);
 
     # Headers
-    for my $name (keys %{$env}) {
+    while (my ($name, $value) = each %$env) {
         my $value = $env->{$name};
 
         # Header

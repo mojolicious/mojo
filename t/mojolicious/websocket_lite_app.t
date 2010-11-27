@@ -160,7 +160,7 @@ my $local = $client->ioloop->generate_port;
 $result = undef;
 my $tx     = $client->build_websocket_tx('ws://lalala/socket');
 my $socket = IO::Socket::INET->new(
-    PeerAddr  => 'localhost',
+    PeerAddr  => '127.0.0.1',
     PeerPort  => $peer,
     LocalPort => $local
 );

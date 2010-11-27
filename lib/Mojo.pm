@@ -75,6 +75,8 @@ Mojo - The Box!
         $tx->res->code(200);
         $tx->res->headers->content_type('text/plain');
         $tx->res->body("$method request for $path!");
+
+        # Resume transaction
         $tx->resume;
     }
 

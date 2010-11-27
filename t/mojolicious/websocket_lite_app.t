@@ -155,14 +155,14 @@ w '/' => sub {
 like $result, qr/test1test2ws\:\/\/localhost\:\d+\//, 'right result';
 
 # WebSocket /socket (using an already prepared socket)
-my $peer = $client->test_server;
+my $port = $client->test_server;
 $result = undef;
 my $tx = $client->build_websocket_tx('ws://lalala/socket');
 my $socket =
-  IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $peer);
+  IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $port);
 $socket->blocking(0);
 $tx->connection($socket);
-my $port;
+my $local;
 $client->start(
     $tx => sub {
         my $self = shift;
@@ -173,11 +173,11 @@ $client->start(
                 $self->finish;
             }
         );
-        $port = $self->ioloop->local_info($self->tx->connection)->{port};
+        $local = $self->ioloop->local_info($self->tx->connection)->{port};
     }
 );
 is $result, 'lalala', 'right result';
-ok $port, 'local port';
+ok $local, 'local port';
 
 # WebSocket /early_start (server directly sends a message)
 my $flag2;

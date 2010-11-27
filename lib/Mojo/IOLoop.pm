@@ -217,7 +217,7 @@ sub connect {
     }
 
     # Lookup
-    if (my $address = $args->{address}) {
+    if (!$args->{handle} && (my $address = $args->{address})) {
         $self->lookup(
             $address => sub {
                 my $self = shift;

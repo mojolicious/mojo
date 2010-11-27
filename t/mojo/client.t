@@ -113,21 +113,21 @@ is $tx->error, 'Interrupted, maybe a timeout?', 'right error';
 is $tx->kept_alive, undef, 'kept connection not alive';
 is $tx->keep_alive, 0,     'keep connection not alive';
 is $tx->res->code, 200,          'right status';
-is $tx->res->body, 'works too!', 'no content';
+is $tx->res->body, 'works too!', 'right content';
 
 # GET / (mock server)
 $tx = $client->get("http://localhost:$port/mock");
 ok $tx->success, 'successful';
 is $tx->kept_alive, undef, 'kept connection not alive';
 is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'no content';
+is $tx->res->body, 'works!', 'right content';
 
 # GET / (mock server again)
 $tx = $client->get("http://localhost:$port/mock");
 ok $tx->success, 'successful';
 is $tx->kept_alive, 1, 'kept connection alive';
 is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'no content';
+is $tx->res->body, 'works!', 'right content';
 
 # Close connection (bypassing safety net)
 $client->ioloop->_drop_immediately($last);
@@ -137,14 +137,14 @@ $tx = $client->get("http://localhost:$port/mock");
 ok $tx->success, 'successful';
 is $tx->kept_alive, undef, 'kept connection not alive';
 is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'no content';
+is $tx->res->body, 'works!', 'right content';
 
 # GET / (mock server again)
 $tx = $client->get("http://localhost:$port/mock");
 ok $tx->success, 'successful';
 is $tx->kept_alive, 1, 'kept connection alive';
 is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'no content';
+is $tx->res->body, 'works!', 'right content';
 
 # Close connection (bypassing safety net)
 $client->ioloop->_drop_immediately($last);
@@ -154,14 +154,14 @@ $tx = $client->get("http://localhost:$port/mock");
 ok $tx->success, 'successful';
 is $tx->kept_alive, undef, 'kept connection not alive';
 is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'no content';
+is $tx->res->body, 'works!', 'right content';
 
 # GET / (mock server again)
 $tx = $client->get("http://localhost:$port/mock");
 ok $tx->success, 'successful';
 is $tx->kept_alive, 1, 'kept connection alive';
 is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'no content';
+is $tx->res->body, 'works!', 'right content';
 
 # Taint connection (on UNIX)
 $^O eq 'MSWin32'
@@ -173,14 +173,14 @@ $tx = $client->get("http://localhost:$port/mock");
 ok $tx->success, 'successful';
 is $tx->kept_alive, undef, 'kept connection not alive';
 is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'no content';
+is $tx->res->body, 'works!', 'right content';
 
 # GET / (mock server again)
 $tx = $client->get("http://localhost:$port/mock");
 ok $tx->success, 'successful';
 is $tx->kept_alive, 1, 'kept connection alive';
 is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'no content';
+is $tx->res->body, 'works!', 'right content';
 
 # Taint connection (on UNIX)
 $^O eq 'MSWin32'
@@ -192,7 +192,7 @@ $tx = $client->get("http://localhost:$port/mock");
 ok $tx->success, 'successful';
 is $tx->kept_alive, undef, 'kept connection not alive';
 is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'no content';
+is $tx->res->body, 'works!', 'right content';
 
 # Nested keep alive
 my @kept_alive;

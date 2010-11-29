@@ -6,7 +6,9 @@ use warnings;
 # Disable epoll and kqueue
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 51;
+use Test::More;
+plan skip_all => 'Windows is too fragile for this test!' if $^O eq 'MSWin32';
+plan tests => 51;
 
 use_ok 'Mojo::Client';
 
@@ -163,10 +165,8 @@ is $tx->kept_alive, 1, 'kept connection alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
-# Taint connection (on UNIX)
-$^O eq 'MSWin32'
-  ? $client->ioloop->_drop_immediately($last)
-  : $client->ioloop->write($last => 'broken!');
+# Taint connection
+$client->ioloop->write($last => 'broken!');
 
 # GET / (mock server tainted connection)
 $tx = $client->get("http://localhost:$port/mock");
@@ -182,10 +182,8 @@ is $tx->kept_alive, 1, 'kept connection alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
-# Taint connection (on UNIX)
-$^O eq 'MSWin32'
-  ? $client->ioloop->_drop_immediately($last)
-  : $client->ioloop->write($last => 'broken!');
+# Taint connection
+$client->ioloop->write($last => 'broken!');
 
 # GET / (mock server tainted connection)
 $tx = $client->get("http://localhost:$port/mock");

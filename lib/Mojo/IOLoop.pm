@@ -21,7 +21,7 @@ use Time::HiRes 'time';
 use constant DEBUG => $ENV{MOJO_IOLOOP_DEBUG} || 0;
 
 # Perl 5.12 required for "inet_pton"
-use constant PTON => eval 'use 5.12.0; 1';
+use constant PTON => eval 'use 5.012000; 1';
 use constant PTON_AF_INET6 => PTON ? Socket::AF_INET6() : 0;
 
 # Epoll support requires IO::Epoll

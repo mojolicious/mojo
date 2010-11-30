@@ -8,7 +8,7 @@ BEGIN { $ENV{MOJO_POLL} = 1 }
 
 use Test::More;
 plan skip_all => 'Perl 5.12 required for this test!'
-  unless eval 'use 5.12.0; 1';
+  unless eval 'use 5.012000; 1';
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
 plan tests => 10;

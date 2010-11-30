@@ -41,8 +41,8 @@ $help = 1 unless my $app = shift || $ENV{HYPNOTOAD_APP};
 die <<"EOF" if $help;
 usage: $0 [OPTIONS] [APPLICATION]
 
-    $0 script/myapp
-    $0 myapp.pl
+  hypnotoad script/myapp
+  hypnotoad myapp.pl
 
 These options are available:
   --config <path>   Configuration file, defaults to "hypnotoad.conf" in the

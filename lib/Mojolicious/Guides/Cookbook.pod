@@ -61,8 +61,8 @@ Config files are plain Perl scripts for maximal customizability.
 But one of its biggest advantages is the support for effortless zero downtime
 software upgrades.
 That means you can upgrade L<Mojolicious>, Perl or even system libraries at
-runtime without ever stopping the server, just by sending it a C<USR2>
-signal.
+runtime without ever stopping the server or losing a single incoming
+connection, just by sending it a C<USR2> signal.
 
     % kill -s 'USR2' `cat hypnotoad.pid`
 

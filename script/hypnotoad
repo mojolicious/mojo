@@ -35,7 +35,7 @@ GetOptions(
 );
 
 # Application
-$help = 1 unless my $app = shift;
+$help = 1 unless my $app = shift || $ENV{HYPNOTOAD_APP};
 
 # Usage
 die <<"EOF" if $help;

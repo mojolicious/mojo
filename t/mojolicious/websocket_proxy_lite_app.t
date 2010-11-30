@@ -49,7 +49,7 @@ my $client = Mojo::Client->new;
 my $loop   = $client->ioloop;
 my $server = Mojo::Server::Daemon->new(app => app, ioloop => $loop);
 my $port   = Mojo::IOLoop->new->generate_port;
-$server->listen("http://*:$port");
+$server->listen(["http://*:$port"]);
 $server->prepare_ioloop;
 
 # Connect proxy server for testing

@@ -35,7 +35,7 @@ __PACKAGE__->attr(static  => sub { Mojolicious::Static->new });
 __PACKAGE__->attr(types   => sub { Mojolicious::Types->new });
 
 our $CODENAME = 'Hot Beverage';
-our $VERSION  = '0.999942';
+our $VERSION  = '0.999950';
 
 # These old doomsday devices are dangerously unstable.
 # I'll rest easier not knowing where they are.
@@ -465,7 +465,13 @@ Minimalistic JSON implementation that just works.
 
 =item L<Mojo::Server::Daemon>
 
-Full featured async io HTTP 1.1 and WebSocket server.
+Highly portable async io HTTP 1.1 and WebSocket server, perfect for
+development and testing.
+
+=item L<Mojo::Server::Hypnotoad>
+
+Full featured UNIX optimized preforking async io HTTP 1.1 and WebSocket
+server with support for zero downtime software upgrades (hot deployment).
 
 =item L<Mojo::Server::CGI>, L<Mojo::Server::FastCGI>, L<Mojo::Server::PSGI>
 

@@ -42,7 +42,7 @@ WriteMakefile(
         )
     ),
 
-    EXE_FILES => ['script/mojo'],
+    EXE_FILES => ['script/mojo', 'script/hypnotoad'],
     PREREQ_PM => {
         'B'                     => 0,
         'Carp'                  => 0,

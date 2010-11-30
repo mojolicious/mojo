@@ -21,7 +21,7 @@ use constant BONJOUR => $ENV{MOJO_NO_BONJOUR}
 # Debug
 use constant DEBUG => $ENV{MOJO_DAEMON_DEBUG} || 0;
 
-__PACKAGE__->attr([qw/group listen listen_queue_size silent user/]);
+__PACKAGE__->attr([qw/backlog group listen silent user/]);
 __PACKAGE__->attr(ioloop => sub { Mojo::IOLoop->singleton });
 __PACKAGE__->attr(keep_alive_timeout => 5);
 __PACKAGE__->attr(max_clients        => 1000);
@@ -53,8 +53,8 @@ sub prepare_ioloop {
     my $loop = $self->ioloop;
 
     # Listen
-    my $listen = $self->listen || 'http://*:3000';
-    $self->_listen($_) for split ',', $listen;
+    my $listen = $self->listen || ['http://*:3000'];
+    $self->_listen($_) for @$listen;
 
     # Max clients
     $loop->max_connections($self->max_clients);
@@ -254,22 +254,23 @@ sub _listen {
 
     # Options
     my $options = {};
+    my $tls;
 
     # UNIX domain socket
     if ($listen =~ /^file\:\/\/(.+)$/) { unlink $options->{file} = $1 }
 
     # Internet socket
     elsif ($listen =~ /^(http(?:s)?)\:\/\/(.+)\:(\d+)(?:\:(.*)\:(.*))?$/) {
-        $options->{tls} = 1 if $1 eq 'https';
+        $tls = $options->{tls} = 1 if $1 eq 'https';
         $options->{address}  = $2 if $2 ne '*';
         $options->{port}     = $3;
         $options->{tls_cert} = $4 if $4;
         $options->{tls_key}  = $5 if $5;
     }
 
-    # Listen queue size
-    my $queue = $self->listen_queue_size;
-    $options->{queue_size} = $queue if $queue;
+    # Listen backlog size
+    my $backlog = $self->backlog;
+    $options->{backlog} = $backlog if $backlog;
 
     # Weaken
     weaken $self;
@@ -279,7 +280,7 @@ sub _listen {
         my ($loop, $id) = @_;
 
         # Add new connection
-        $self->{_cs}->{$id} = {tls => $options->{tls} ? 1 : 0};
+        $self->{_cs}->{$id} = {tls => $tls};
 
         # Keep alive timeout
         $loop->connection_timeout($id => $self->keep_alive_timeout);
@@ -302,7 +303,7 @@ sub _listen {
             type   => '_http._tcp',
             domain => 'local',
             port   => $port
-        ) if $port && !$options->{tls};
+        ) if $port && !$tls;
     }
 
     # Log
@@ -413,14 +414,13 @@ Mojo::Server::Daemon - Async IO HTTP 1.1 And WebSocket Server
     use Mojo::Server::Daemon;
 
     my $daemon = Mojo::Server::Daemon->new;
-    $daemon->listen('http://*:8080');
+    $daemon->listen(['http://*:8080']);
     $daemon->run;
 
 =head1 DESCRIPTION
 
 L<Mojo::Server::Daemon> is a full featured async io HTTP 1.1 and WebSocket
-server with C<TLS>, C<Bonjour>, C<epoll>, C<kqueue> and UNIX domain socket
-sharing support.
+server with C<TLS>, C<Bonjour>, C<epoll> and C<kqueue> support.
 
 Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::SSL> and
 L<Net::Rendezvous::Publish> are supported transparently and used if
@@ -430,6 +430,13 @@ installed.
 
 L<Mojo::Server::Daemon> inherits all attributes from L<Mojo::Server> and
 implements the following new ones.
+
+=head2 C<backlog>
+
+    my $backlog = $daemon->backlog;
+    $daemon     = $daemon->backlog(128);
+
+Listen backlog size, defaults to C<SOMAXCONN>.
 
 =head2 C<group>
 
@@ -455,16 +462,9 @@ Timeout for keep alive connections in seconds, defaults to C<5>.
 =head2 C<listen>
 
     my $listen = $daemon->listen;
-    $daemon    = $daemon->listen('https://localhost:3000,file:///my.sock');
+    $daemon    = $daemon->listen(['https://localhost:3000']);
 
-Ports and files to listen on, defaults to C<http://*:3000>.
-
-=head2 C<listen_queue_size>
-
-    my $listen_queue_size = $daemon->listen_queue_size;
-    $daemon               = $daemon->listen_queue_size(128);
-
-Listen queue size, defaults to C<SOMAXCONN>.
+List of ports and files to listen on, defaults to C<http://*:3000>.
 
 =head2 C<max_clients>
 

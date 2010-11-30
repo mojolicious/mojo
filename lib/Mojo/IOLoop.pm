@@ -292,7 +292,7 @@ sub listen {
 
     # Options
     my %options = (
-        Listen => $args->{queue_size} || SOMAXCONN,
+        Listen => $args->{backlog} || SOMAXCONN,
         Proto  => 'tcp',
         Type   => SOCK_STREAM,
         %{$args->{args} || {}}
@@ -320,6 +320,9 @@ sub listen {
     };
     (my $id) = "$c" =~ /0x([\da-f]+)/;
     $self->{_listen}->{$id} = $c;
+
+    # Allow file descriptor inheritance
+    local $^F = 1000;
 
     # Listen on UNIX domain socket
     my $socket;
@@ -1875,6 +1878,10 @@ These options are currently available.
 
 Local address to listen on, defaults to all.
 
+=item C<backlog>
+
+Maximum backlog size, defaults to C<SOMAXCONN>.
+
 =item C<file>
 
 A unix domain socket to listen on.
@@ -1898,10 +1905,6 @@ Callback to be invoked if new data arrives on the connection.
 =item C<port>
 
 Port to listen on.
-
-=item C<queue_size>
-
-Maximum queue size, defaults to C<SOMAXCONN>.
 
 =item C<tls>
 

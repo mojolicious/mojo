@@ -489,7 +489,7 @@ sub test_server {
           Mojo::Server::Daemon->new(ioloop => $self->ioloop, silent => 1);
         my $port = $self->{_port} = $self->ioloop->generate_port;
         die "Couldn't find a free TCP port for testing.\n" unless $port;
-        $server->listen("http://*:$port");
+        $server->listen(["http://*:$port"]);
         $server->prepare_ioloop;
     }
 

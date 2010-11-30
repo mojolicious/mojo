@@ -35,6 +35,56 @@ Another huge advantage is that it supports TLS and WebSockets out of the box.
 A development certificate for testing purposes is built right in, so it just
 works.
 
+=head2 Hypnotoad
+
+For bigger applications L<Mojolicious> contains the UNIX optimized preforking
+web server C<Mojo::Server::Hypnotoad> that will allow you to take advantage
+of multiple cpu cores and copy-on-write.
+
+    Mojo::Server::Hypnotoad
+    |- Mojo::Server::Daemon [1]
+    |- Mojo::Server::Daemon [2]
+    |- Mojo::Server::Daemon [3]
+    `- Mojo::Server::Daemon [4]
+
+It is based on the normal builtin web server but optimized specifically for
+production environments out of the box.
+
+    % hypnotoad script/myapp
+    Server available at http://*:8080.
+
+Config files are plain Perl scripts for maximal customizability.
+
+    # hypnotoad.conf
+    {listen => ['http://*:80'], workers => 10};
+
+But one of its biggest advantages is the support for effortless zero downtime
+software upgrades.
+That means you can upgrade L<Mojolicious>, Perl or even system libraries at
+runtime without ever stopping the server, just by sending it a C<USR2>
+signal.
+
+    % kill -s 'USR2' `cat hypnotoad.pid`
+
+=head2 Nginx
+
+One of the most popular setups these days is the builtin web server behind a
+Nginx reverse proxy.
+
+    upstream myapp {
+        server 127.0.0.1:8080;
+    }
+    server {
+        listen 80;
+        server_name localhost;
+        location / {
+            proxy_read_timeout 300;
+            proxy_pass http://myapp;
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+    }
+
 =head2 Apache/CGI
 
 C<CGI> is supported out of the box and your L<Mojolicious> application will

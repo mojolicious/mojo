@@ -38,7 +38,7 @@ works.
 =head2 Hypnotoad
 
 For bigger applications L<Mojolicious> contains the UNIX optimized preforking
-web server C<Mojo::Server::Hypnotoad> that will allow you to take advantage
+web server L<Mojo::Server::Hypnotoad> that will allow you to take advantage
 of multiple cpu cores and copy-on-write.
 
     Mojo::Server::Hypnotoad

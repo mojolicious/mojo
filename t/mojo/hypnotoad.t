@@ -18,7 +18,7 @@ use Mojo::IOLoop;
 use Mojo::Template;
 use Mojo::Transaction::HTTP;
 
-plan skip_all => 'set TEST_HYPPNOTOAD to enable this test (developer only!)'
+plan skip_all => 'set TEST_HYPNOTOAD to enable this test (developer only!)'
   unless $ENV{TEST_HYPNOTOAD};
 plan tests => 40;
 

@@ -34,6 +34,9 @@ GetOptions(
     test       => sub { $ENV{HYPNOTOAD_TEST}       = 1 },
 );
 
+# Application
+$help = 1 unless my $app = shift;
+
 # Usage
 die <<"EOF" if $help;
 usage: $0 [OPTIONS] [APPLICATION]
@@ -45,10 +48,6 @@ These options are available:
   --help            Show this message.
   --test            Test application/configuration and exit.
 EOF
-
-# Application
-my $app = shift
-  || File::Spec->catdir(File::Spec->splitdir(dirname(__FILE__)), 'mojo');
 
 # Start
 $toad->run($app, $config);

@@ -13,6 +13,8 @@ Inflate embedded files to real files.
 EOF
 __PACKAGE__->attr(usage => <<"EOF");
 usage: $0 inflate [OPTIONS]
+
+These options are available:
   --class <class>      Class to inflate.
   --public <path>      Path prefix for generated static files, defaults to
                        public.

@@ -11,6 +11,7 @@ require File::Spec;
 require IO::File;
 
 use Carp 'croak';
+use Mojo::Server;
 use Mojo::Template;
 use Mojo::Loader;
 use Mojo::Util qw/b64_decode camelize decamelize/;
@@ -100,9 +101,6 @@ sub create_rel_dir {
 
 sub detect {
     my ($self, $guess) = @_;
-
-    # Hypnotoad
-    return 'hypnotoad' if defined $ENV{HYPNOTOAD_APP};
 
     # PSGI (Plack only for now)
     return 'psgi' if defined $ENV{PLACK_ENV};
@@ -240,6 +238,9 @@ sub render_to_rel_file {
 # My cat's breath smells like cat food.
 sub run {
     my ($self, $name, @args) = @_;
+
+    # Hypnotoad
+    return return Mojo::Server->new->app if defined $ENV{HYPNOTOAD_APP};
 
     # Try to detect environment
     $name = $self->detect($name) unless $ENV{MOJO_NO_DETECT};

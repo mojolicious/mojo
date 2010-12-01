@@ -85,7 +85,7 @@ Nginx reverse proxy.
         }
     }
 
-You might also want to enable reverse proxy support in L<hypnotoad> if your
+You might also want to enable reverse proxy support in C<hypnotoad> if your
 proxy is on a different physical machine than your application and can't be
 auto detected.
 

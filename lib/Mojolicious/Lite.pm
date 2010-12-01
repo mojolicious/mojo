@@ -10,9 +10,6 @@ use base 'Mojolicious';
 use File::Spec;
 use FindBin;
 
-# Make reloading work
-BEGIN { $INC{$0} = $0 }
-
 # It's the future, my parents, my co-workers, my girlfriend,
 # I'll never see any of them ever again... YAHOOO!
 sub import {

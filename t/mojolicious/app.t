@@ -40,7 +40,7 @@ $t->get_ok('/foo/syntaxerror')->status_is(500)
 $t->get_ok('/foo/badtemplate')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/File Not Found/);
+  ->content_like(qr/Not Found/);
 
 # Foo::authenticated (authentication bridge)
 $t->get_ok('/auth/authenticated', {'X-Bender' => 'Hi there!'})->status_is(200)
@@ -52,7 +52,7 @@ $t->get_ok('/auth/authenticated', {'X-Bender' => 'Hi there!'})->status_is(200)
 $t->get_ok('/auth/authenticated')->status_is(404)
   ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/File Not Found/);
+  ->content_like(qr/Not Found/);
 
 # Foo::test
 $t->get_ok('/foo/test', {'X-Test' => 'Hi there!'})->status_is(200)
@@ -135,7 +135,7 @@ $t->get_ok('/test6', {'X-Test' => 'Hi there!'})->status_is(200)
 $t->get_ok('/', {'X-Test' => 'Hi there!'})->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/File Not Found/);
+  ->content_like(qr/Not Found/);
 
 # Check Last-Modified header for static files
 my $path  = File::Spec->catdir($FindBin::Bin, 'public_dev', 'hello.txt');
@@ -155,7 +155,7 @@ $t->get_ok('/hello.txt')->status_is(200)
 $t->get_ok('/../../mojolicious/secret.txt')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/File Not Found/);
+  ->content_like(qr/Not Found/);
 
 # Check If-Modified-Since
 $t->get_ok('/hello.txt', {'If-Modified-Since' => $mtime})->status_is(304)
@@ -228,7 +228,7 @@ $t->get_ok('/foo/bar')->status_is(200)
 $t->get_ok('/baz/does_not_exist')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/File Not Found/);
+  ->content_like(qr/Not Found/);
 
 $t = Test::Mojo->new(app => 'MojoliciousTest');
 

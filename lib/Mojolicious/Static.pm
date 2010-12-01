@@ -172,67 +172,6 @@ sub serve {
     return 1;
 }
 
-sub serve_404 { shift->serve_error(shift, 404) }
-
-sub serve_500 { shift->serve_error(shift, 500) }
-
-sub serve_error {
-    my ($self, $c, $code, $rel) = @_;
-
-    # Shortcut
-    return 1 unless $c && $code;
-
-    my $res = $c->res;
-
-    # Render once
-    return if ($res->code || '') eq $code;
-
-    # Code
-    $res->code($code);
-
-    # Default to "code.html"
-    $rel ||= "$code.html";
-
-    # File
-    if (!$self->serve($c, $rel)) {
-
-        # Log
-        $c->app->log->debug(qq/Serving error file "$rel"./);
-    }
-
-    # 404
-    elsif ($code == 404) {
-
-        # Log
-        $c->app->log->debug('Serving 404 error.');
-
-        $res->headers->content_type('text/html');
-        $res->body(<<'EOF');
-<!doctype html><html>
-    <head><title>File Not Found</title></head>
-    <body><h2>File Not Found</h2></body>
-</html>
-EOF
-    }
-
-    # Error
-    else {
-
-        # Log
-        $c->app->log->debug(qq/Serving error "$code"./);
-
-        $res->headers->content_type('text/html');
-        $res->body(<<'EOF');
-<!doctype html><html>
-    <head><title>Internal Server Error</title></head>
-    <body><h2>Internal Server Error</h2></body>
-</html>
-EOF
-    }
-
-    return;
-}
-
 sub _get_inline_file {
     my ($self, $c, $rel) = @_;
 
@@ -319,27 +258,6 @@ Dispatch a L<Mojolicious::Controller> object.
     my $success = $static->serve($c, 'foo/bar.html');
 
 Serve a specific file.
-
-=head2 C<serve_404>
-
-    my $success = $static->serve_404($c);
-    my $success = $static->serve_404($c, '404.html');
-
-Serve a C<404> error page, guaranteed to render at least a default page.
-
-=head2 C<serve_500>
-
-    my $success = $static->serve_500($c);
-    my $success = $static->serve_500($c, '500.html');
-
-Serve a C<500> error page, guaranteed to render at least a default page.
-
-=head2 C<serve_error>
-
-    my $success = $static->serve_error($c, 404);
-    my $success = $static->serve_error($c, 404, '404.html');
-
-Serve error page, guaranteed to render at least a default page.
 
 =head1 SEE ALSO
 

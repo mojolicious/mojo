@@ -11,6 +11,7 @@ use Mojo::Util;
 sub import {
     my $caller = caller;
     no strict 'refs';
+    no warnings 'redefine';
     *{"${caller}::b"} = sub {
         bless {
             bytestream => @_ < 2 ? defined $_[0] ? "$_[0]" : '' : join('', @_)

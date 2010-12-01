@@ -35,6 +35,9 @@ sub attr {
     Carp::croak('Default has to be a code reference or constant value')
       if ref $default && ref $default ne 'CODE';
 
+    # Allow app->attr(...)
+    $class = ref $class || $class;
+
     # Allow symbolic references
     no strict 'refs';
 

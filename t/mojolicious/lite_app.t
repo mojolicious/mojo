@@ -8,7 +8,7 @@ use utf8;
 # Disable epoll and kqueue
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 664;
+use Test::More tests => 666;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -51,6 +51,13 @@ is app->test_helper2, 'Mojolicious::Controller', 'right value';
 
 # Test renderer
 app->renderer->add_handler(dead => sub { die 'renderer works!' });
+
+# Custom attributes
+(ref app)->attr(my_ref_app_attr => 'ref_app');
+app->attr(my_app_attr => 'app');
+
+is app->my_ref_app_attr => 'ref_app', 'ref app attr';
+is app->my_app_attr => 'app', 'app attr';
 
 # GET /
 get '/' => 'root';

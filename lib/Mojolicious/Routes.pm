@@ -620,18 +620,22 @@ sub _walk_stack {
         my $stash = $c->stash;
 
         # Captures
+        $c->match->captures({%$field});
+
+        # Cleanup
+        my $cb = delete $field->{cb};
+        delete $field->{app};
+
+        # Captures
         my $captures = $stash->{'mojo.captures'} ||= {};
         $stash->{'mojo.captures'} = {%$captures, %$field};
 
         # Merge in captures
         @{$c->stash}{keys %$field} = values %$field;
 
-        # Captures
-        $c->match->captures($field);
-
         # Dispatch
         my $e =
-            $field->{cb}
+            $cb
           ? $self->_dispatch_callback($c, $staging)
           : $self->_dispatch_controller($c, $staging);
 

@@ -12,7 +12,7 @@ use Test::More;
 
 plan skip_all => 'Perl 5.10 required for this test!'
   unless eval { require Digest::SHA; 1 };
-plan tests => 64;
+plan tests => 65;
 
 use_ok 'Mojo::ByteStream', 'b';
 
@@ -51,6 +51,11 @@ is "$stream", "Zm9vw5/EgGJhciUyM+KYug==\n", 'right base64 encoded result';
 
 # utf8 b64_decode
 $stream = b("Zm9vw5/EgGJhciUyM+KYug==\n")->b64_decode->decode('UTF-8');
+is "$stream", "foo\x{df}\x{0100}bar%23\x{263a}",
+  'right base64 decoded result';
+
+# utf8 b64_decode
+$stream = b("Zm9vw5/EgGJhciUyM+KYug==\n")->b64_decode->decode;
 is "$stream", "foo\x{df}\x{0100}bar%23\x{263a}",
   'right base64 decoded result';
 

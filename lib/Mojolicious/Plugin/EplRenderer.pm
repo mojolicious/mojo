@@ -81,7 +81,7 @@ sub register {
             # Exception
             if (ref $$output) {
                 my $e = $$output;
-                $$output = '';
+                $$output = undef;
                 $c->render_exception($e);
             }
 

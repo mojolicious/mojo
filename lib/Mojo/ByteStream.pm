@@ -66,13 +66,13 @@ sub decamelize {
 # Number 3: "It was like that when I got here."
 sub decode {
     my $self = shift;
-    Mojo::Util::decode shift, $self->{bytestream};
+    Mojo::Util::decode shift || 'UTF-8', $self->{bytestream};
     return $self;
 }
 
 sub encode {
     my $self = shift;
-    Mojo::Util::encode shift, $self->{bytestream};
+    Mojo::Util::encode shift || 'UTF-8', $self->{bytestream};
     return $self;
 }
 
@@ -304,17 +304,19 @@ Decamelize bytestream.
 
 =head2 C<decode>
 
+    $stream = $stream->decode;
     $stream = $stream->decode($encoding);
 
-Decode bytestream.
+Decode bytestream, defaults to C<UTF-8>.
 
     $stream->decode('UTF-8')->to_string;
 
 =head2 C<encode>
 
+    $stream = $stream->encode;
     $stream = $stream->encode($encoding);
 
-Encode bytestream.
+Encode bytestream, defaults to C<UTF-8>.
 
     $stream->encode('UTF-8')->to_string;
 

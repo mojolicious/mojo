@@ -2,11 +2,13 @@ This file documents the revision history for Perl extension Mojolicious.
 
 0.999950 2010-11-30 00:00:00
         - Added EXPERIMENTAL Hypnotoad web server.
+        - Added EXPERIMENTAL built in exception template.
         - Added put and del functions to Mojolicious::Lite.
         - Added on_idle and on_tick event handlers to Mojo::IOLoop.
         - Added "*" query support to the Mojo::IOLoop resolver.
         - Added ability to pass plain connection ids to Mojo::Client.
         - Improved number detection in Mojo::JSON.
+        - Improved Mojo::ByteStream encode/decode. (marcus)
         - Fixed a bug where an empty Mojo::IOLoop would never block.
         - Fixed a possible Mojo::IOLoop descriptor leak.
         - Fixed a small route condition bug.

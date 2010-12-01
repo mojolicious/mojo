@@ -25,7 +25,7 @@ sub new {
 
     # Trace name and line
     my @trace;
-    while ($message =~ /at\s+(.+)\s+line\s+(\d+)/g) {
+    while ($message =~ /at\s+(.+?)\s+line\s+(\d+)/g) {
         push @trace, {file => $1, line => $2};
     }
 

@@ -1225,8 +1225,8 @@ $t->post_form_ok('/utf8', 'UTF-8' => {name => 'Вячеслав'})
   ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
   ->header_is('Content-Length' => 40)->content_type_is('text/html')
-  ->content_is(b("Вячеслав Тихановский\n")->encode('UTF-8')
-      ->to_string);
+  ->content_is(
+    b("Вячеслав Тихановский\n")->encode->to_string);
 
 # POST /utf8 (multipart/form-data)
 $t->post_form_ok(

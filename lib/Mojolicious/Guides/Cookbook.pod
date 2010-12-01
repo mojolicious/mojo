@@ -85,6 +85,13 @@ Nginx reverse proxy.
         }
     }
 
+You might also want to enable reverse proxy support in L<hypnotoad> if your
+proxy is on a different physical machine than your application and can't be
+auto detected.
+
+    # hypnotoad.conf
+    {proxy => 1};
+
 =head2 Apache/CGI
 
 C<CGI> is supported out of the box and your L<Mojolicious> application will

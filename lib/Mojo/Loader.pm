@@ -60,8 +60,9 @@ sub load {
 
 sub reload {
 
-    # Allow script reloading
+    # Force script reloading
     delete $INC{$0};
+    $STATS->{$0} = $^T - 1;
     $INC{$0} = $0;
 
     # Reload

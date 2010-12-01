@@ -27,9 +27,6 @@ sub register {
             return unless defined $path;
             my $cache = delete $options->{cache} || $path;
 
-            # Reload
-            delete $r->{_epl_cache} if $ENV{MOJO_RELOAD};
-
             # Check cache
             my $ec    = $r->{_epl_cache} ||= {};
             my $stack = $r->{_epl_stack} ||= [];

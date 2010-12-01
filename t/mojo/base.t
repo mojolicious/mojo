@@ -21,7 +21,7 @@ package main;
 use strict;
 use warnings;
 
-use Test::More tests => 404;
+use Test::More tests => 405;
 
 # I've done everything the Bible says,
 # even the stuff that contradicts the other stuff!
@@ -38,6 +38,12 @@ for my $i (51 .. 100) {
     $monkeys->[$i] = BaseTest->new(bananas => $i);
     is $monkeys->[$i]->bananas, $i, 'right attribute value';
 }
+
+# Instance method
+my $monkey = BaseTest->new;
+$monkey->attr('mojo');
+$monkey->mojo(23);
+is $monkey->mojo, 23, 'monkey has mojo';
 
 # "default" defined but false
 my $m = $monkeys->[1];

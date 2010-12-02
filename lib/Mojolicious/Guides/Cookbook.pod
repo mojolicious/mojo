@@ -12,6 +12,19 @@ Cooking with L<Mojolicious>, recipes for every taste.
 Getting L<Mojolicious> and L<Mojolicious::Lite> applications running on
 different platforms.
 
+=head2 Rewriting
+
+Sometimes you might have to deploy your application in a broken blackbox
+environment where you can't just fix the server configuration.
+In such cases you can use a C<before_dispatch> hook to rewrite incoming
+requests.
+
+    app->hook(before_dispatch => sub {
+        my $self = shift;
+        my $secure = $self->req->headers->header('X-Is-Secure');
+        $self->req->url->base->scheme('https') if $secure;
+    });
+
 =head2 Builtin Server
 
 L<Mojolicious> contains a very portable HTTP 1.1 compliant web server.

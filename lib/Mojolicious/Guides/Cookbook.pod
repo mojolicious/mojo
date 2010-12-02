@@ -21,8 +21,8 @@ requests.
 
     app->hook(before_dispatch => sub {
         my $self = shift;
-        my $secure = $self->req->headers->header('X-Is-Secure');
-        $self->req->url->base->scheme('https') if $secure;
+        $self->req->url->base->scheme('https')
+          if $self->req->headers->header('X-Forwarded-Porotcol') eq 'https';
     });
 
 =head2 Builtin Server

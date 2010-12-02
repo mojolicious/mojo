@@ -463,13 +463,13 @@ Conditions such as C<agent> allow even more powerful route constructs.
     get '/foo' => (agent => qr/Firefox/) => sub {
         shift->render(
             text => 'Congratulations, you are using a cool browser!');
-    }
+    };
 
     # /foo
     get '/foo' => (agent => qr/Internet Explorer/) => sub {
         shift->render(
             text => 'Dude, you really need to upgrade to Firefox!');
-    }
+    };
 
 Formats can be automatically detected by looking at file extensions.
 

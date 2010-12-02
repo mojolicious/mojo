@@ -13,6 +13,7 @@ use Mojo::URL;
 use Mojo::Util;
 
 require Carp;
+require Scalar::Util;
 
 # Scalpel... blood bucket... priest.
 __PACKAGE__->attr([qw/app match/]);
@@ -407,7 +408,8 @@ sub render_exception {
     my ($self, $e) = @_;
 
     # Exception
-    $e = Mojo::Exception->new($e) unless ref $e;
+    $e = Mojo::Exception->new($e)
+      unless Scalar::Util::blessed $e && $e->isa('Mojo::Exception');
 
     # Error
     $self->app->log->error($e);
@@ -965,12 +967,11 @@ Render binary data, similar to C<render_text> but data will not be encoded.
 
 =head2 C<render_exception>
 
-    $c->render_exception($e);
+    $c->render_exception('Oops!');
+    $c->render_exception(Mojo::Exception->new('Oops!'));
 
-Render the exception template C<exception.html.$handler>.
-Will set the status code to C<500> meaning C<Internal Server Error>.
-Takes a L<Mojo::Exception> object or error message and will fall back to
-rendering a static C<500> page using L<Mojolicious::Static>.
+Render the exception template C<exception.html.$handler> and set the response
+status code to C<500>.
 
 =head2 C<render_inner>
 
@@ -994,9 +995,8 @@ Render a data structure as JSON.
     $c->render_not_found;
     $c->render_not_found($resource);
     
-Render the not found template C<not_found.html.$handler>.
-Also sets the response status code to C<404>, will fall back to rendering a
-static C<404> page using L<Mojolicious::Static>.
+Render the not found template C<not_found.html.$handler> and set the response
+status code to C<404>.
 
 =head2 C<render_partial>
 

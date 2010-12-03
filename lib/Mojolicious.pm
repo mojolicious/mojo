@@ -384,7 +384,7 @@ Web development for humans, making hard things possible and everything fun.
 
     use Mojolicious::Lite;
 
-    get '/hello' => sub { shift->render(text => 'Hello World!') }
+    get '/hello' => sub { shift->render(text => 'Hello World!') };
 
     get '/time' => 'clock';
 

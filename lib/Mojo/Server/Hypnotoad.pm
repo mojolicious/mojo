@@ -201,7 +201,7 @@ sub _config {
     $daemon->group($c->{group}) if $c->{group};
 
     # Keep alive requests
-    $daemon->max_requests($c->{keep_alive_requests} || 100);
+    $daemon->max_requests($c->{keep_alive_requests} || 25);
 
     # Keep alive timeout
     $daemon->keep_alive_timeout($c->{keep_alive_timeout} || 5);
@@ -608,7 +608,7 @@ to C<2>.
 
     keep_alive_requests => 50
 
-Number of keep alive requests per connection, defaults to C<100>.
+Number of keep alive requests per connection, defaults to C<25>.
 
 =item keep_alive_timeout
 

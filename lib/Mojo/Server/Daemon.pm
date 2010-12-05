@@ -25,7 +25,7 @@ __PACKAGE__->attr([qw/backlog group listen silent user/]);
 __PACKAGE__->attr(ioloop => sub { Mojo::IOLoop->singleton });
 __PACKAGE__->attr(keep_alive_timeout => 5);
 __PACKAGE__->attr(max_clients        => 1000);
-__PACKAGE__->attr(max_requests       => 100);
+__PACKAGE__->attr(max_requests       => 25);
 __PACKAGE__->attr(websocket_timeout  => 300);
 
 # DEPRECATED in Comet!
@@ -478,7 +478,7 @@ Maximum number of parallel client connections, defaults to C<1000>.
     my $max_requests = $daemon->max_requests;
     $daemon          = $daemon->max_requests(100);
 
-Maximum number of keep alive requests per connection, defaults to C<100>.
+Maximum number of keep alive requests per connection, defaults to C<25>.
 
 =head2 C<silent>
 

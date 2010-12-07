@@ -270,11 +270,8 @@ sub process { shift->dispatch(@_) }
 sub start {
     my $class = shift;
 
-    # We can be called on class or instance
-    $class = ref $class || $class;
-
     # We are the application
-    $ENV{MOJO_APP} ||= $class;
+    $ENV{MOJO_APP} = ref $class ? $class : $class->new;
 
     # Start!
     return Mojolicious::Commands->start(@_);

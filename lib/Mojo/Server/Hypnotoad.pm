@@ -217,7 +217,7 @@ sub _config {
     # WebSocket timeout
     $daemon->websocket_timeout($c->{websocket_timeout} || 300);
 
-    # Accept
+    # Accept limit
     $daemon->ioloop->max_accepts($c->{accepts} || 1000);
 }
 

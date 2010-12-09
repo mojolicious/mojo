@@ -251,7 +251,7 @@ L<Mojo::Client> makes it actually easy.
     $client->start($tx);
 
 The C<body> callback will be called for every chunk of data that is received,
-C<chunked> encoding will be handled transparently.
+even C<chunked> encoding will be handled transparently if neccessary.
 
 =head1 HACKS
 

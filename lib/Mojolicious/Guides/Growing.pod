@@ -344,8 +344,8 @@ Quick C<GET> requests can be performed right from the command line.
 
 =head2 State Keeping
 
-Sessions in L<Mojolicious> pretty much C<just work> out of the box and there
-is no setup required.
+Sessions in L<Mojolicious> pretty much just work out of the box and there is
+no setup required.
 
     $self->session(user => 'sri');
     my $user = $self->session('user');

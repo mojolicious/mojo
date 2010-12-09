@@ -572,8 +572,8 @@ The following parameters are currently available.
 
     accepts => 100
 
-Maximum number of connections a worker is allowed to accept before shutting
-down gracefully, defaults to C<1000>.
+Maximum number of connections a worker is allowed to accept before stopping
+gracefully, defaults to C<1000>.
 
 =item backlog
 

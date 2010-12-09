@@ -345,7 +345,12 @@ Quick C<GET> requests can be performed right from the command line.
 =head2 State Keeping
 
 Sessions in L<Mojolicious> pretty much just work out of the box and there is
-no setup required.
+no setup required, but we suggest using a more secure C<secret> passphrase.
+
+    app->secret('Mojolicious rocks!');
+
+This passphrase is used by the C<HMAC-MD5> algorithm to make signed cookies
+secure and can be changed at any time to invalidate all existing sessions.
 
     $self->session(user => 'sri');
     my $user = $self->session('user');
@@ -374,6 +379,9 @@ like this.
 
     use lib 'lib';
     use MyUsers;
+
+    # Make signed cookies secure
+    app->secret('Mojolicious rocks!');
 
     app->defaults(users => MyUsers->new);
 
@@ -494,6 +502,7 @@ actual action code needs to be changed.
     sub startup {
         my $self = shift;
 
+        $self->secret('Mojolicious rocks!');
         $self->defaults(users => MyUsers->new);
 
         # Router
@@ -612,6 +621,7 @@ information.
     sub startup {
         my $self = shift;
 
+        $self->secret('Mojolicious rocks!');
         $self->defaults(users => MyUsers->new);
 
         my $r = $self->routes;

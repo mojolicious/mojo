@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojolicious.
 0.999960 2010-12-01 00:00:00
         - Improved Hypnotoad web server to restart workers regularly.
         - Improved documentation.
+        - Fixed exception handling for included templates.
         - Fixed typos. (punytan)
 
 0.999950 2010-11-30 00:00:00

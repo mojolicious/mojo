@@ -376,7 +376,7 @@ sub render {
     $res->code(200) unless $res->code;
 
     # Output
-    $res->body($output);
+    $res->body($output) unless $res->body;
 
     # Type
     my $headers = $res->headers;

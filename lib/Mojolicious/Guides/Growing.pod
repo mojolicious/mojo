@@ -14,7 +14,7 @@ Essentials every L<Mojolicious> developer should know.
 
 =head2 Model View Controller
 
-MVC is a software architectual pattern for graphical user iterface
+MVC is a software architectural pattern for graphical user iterface
 programming originating in Smalltalk-80, that separates application logic,
 presentation and input.
 
@@ -43,8 +43,8 @@ costs.
 
 =head2 Representational State Transfer
 
-REST is a software architectual style for distributed hypermedia systems such
-as the web.
+REST is a software architectural style for distributed hypermedia systems
+such as the web.
 While it can be applied to many protocols it is most commonly used with
 C<HTTP> these days.
 In REST terms, when you are opening a URL like C<http://mojolicio.us/foo>

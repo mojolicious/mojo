@@ -208,8 +208,8 @@ business logic, that means L<Mojolicious> is by design entirely L<model>
 layer agnostic and you just use whatever Perl modules you like most.
 
     % mkdir lib
-    % touch lib/MyUser.pm
-    % chmod 644 lib/MyUser.pm
+    % touch lib/MyUsers.pm
+    % chmod 644 lib/MyUsers.pm
 
 Our login manager will simply use a plain old Perl module abstracting away
 all logic related to matching user names and passwords.

@@ -236,6 +236,23 @@ manually in your application.
 
     1;
 
+=head1 CLIENT
+
+When we say L<Mojolicious> is a web framework we actually mean it.
+
+=head2 Streaming
+
+Receiving a streaming response can be really tricky in most HTTP clients,
+L<Mojo::Client> makes it actually easy.
+
+    my $client = Mojo::Client->new;
+    my $tx = $client->build_tx(GET => 'http://mojolicious.org');
+    $tx->res->body(sub { print $_[1] });
+    $client->start($tx);
+
+The C<body> callback will be called for every chunk of data that is received,
+C<chunked> encoding will be handled transparently.
+
 =head1 HACKS
 
 Fun hacks you might not use very often but that might come in handy some day.

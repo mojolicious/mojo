@@ -5,10 +5,10 @@ Mojolicious::Guides - Mojolicious Guide To The Galaxy
 
 =head1 DON'T PANIC!
 
-These guides are currently being written, to get status updates and/or read
-early drafts you can visit L<http://kraih.com>, L<http://twitter.com/kraih>
-and L<http://github.com/kraih/mojo> or join the official IRC channel C<#mojo>
-on C<irc.perl.org>.
+We are constantly working on new documentation, follow us on
+L<http://twitter.com/kraih> and L<http://github.com/kraih/mojo> or join the
+official IRC channel C<#mojo> on C<irc.perl.org> to get all the latest
+updates.
 
 =head1 TUTORIAL
 
@@ -16,8 +16,6 @@ A really fast and fun way to get started developing web applications with
 Mojolicious is the tutorial in L<Mojolicious::Lite>, you should take a look.
 
 =head1 GUIDES
-
-New guides will be added over time, so keep a close eye on this.
 
 =over 4
 

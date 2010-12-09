@@ -135,6 +135,7 @@ our $LOCALHOST = '127.0.0.1';
 
 __PACKAGE__->attr([qw/accept_timeout connect_timeout dns_timeout/] => 3);
 __PACKAGE__->attr(dns_server => sub { $ENV{MOJO_DNS_SERVER} || $DNS_SERVER });
+__PACKAGE__->attr(max_accepts     => 0);
 __PACKAGE__->attr(max_connections => 1000);
 __PACKAGE__->attr(
     [qw/on_lock on_unlock/] => sub {
@@ -379,6 +380,9 @@ sub listen {
         SSL_key_file       => $args->{tls_key} || $self->_prepare_key
       }
       if $args->{tls};
+
+    # Accept limit
+    $self->{_accepts} = $self->max_accepts if $self->max_accepts;
 
     return $id;
 }
@@ -874,6 +878,11 @@ sub _accept {
 
     # Add socket to poll
     $self->_not_writing($id);
+
+    # Accept limit
+    if (defined $self->{_accepts}) {
+        $self->max_connections(0) if --$self->{_accepts} == 0;
+    }
 
     # Debug
     warn "ACCEPTED $id\n" if DEBUG;
@@ -1715,13 +1724,25 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
 Maximum time in seconds a C<DNS> lookup can take, defaults to C<3>.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
+=head2 C<max_accepts>
+
+    my $max = $loop->max_accepts;
+    $loop   = $loop->max_accepts(1000);
+
+The maximum number of connections this loop is allowed to accept before
+shutting down gracefully without interrupting existing connections, defaults
+to C<0>.
+Setting the value to C<0> will allow this loop to accept new connections
+infinitely.
+Note that this attribute is EXPERIMENTAL and might change without warning!
+
 =head2 C<max_connections>
 
     my $max = $loop->max_connections;
     $loop   = $loop->max_connections(1000);
 
-The maximum number of connections this loop is allowed to handle before
-stopping to accept new incoming connections, defaults to C<1000>.
+The maximum number of parallel connections this loop is allowed to handle
+before stopping to accept new incoming connections, defaults to C<1000>.
 Setting the value to C<0> will make this loop stop accepting new connections
 and allow it to shutdown gracefully without interrupting existing
 connections.

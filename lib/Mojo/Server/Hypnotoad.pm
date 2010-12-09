@@ -216,6 +216,9 @@ sub _config {
 
     # WebSocket timeout
     $daemon->websocket_timeout($c->{websocket_timeout} || 300);
+
+    # Accept
+    $daemon->ioloop->max_accepts($c->{accepts} || 1000);
 }
 
 sub _heartbeat {
@@ -236,7 +239,7 @@ sub _heartbeat {
         my $pid = $1;
 
         # Heartbeat
-        $self->{_workers}->{$pid}->{time} = time;
+        $self->{_workers}->{$pid}->{time} = time if $self->{_workers}->{$pid};
     }
 }
 
@@ -440,7 +443,7 @@ sub _spawn {
     my $cb;
     $cb = sub {
         my $loop = shift;
-        $loop->timer($c->{heartbeat} => $cb);
+        $loop->timer($c->{heartbeat} => $cb) if $loop->max_connections;
         $self->{_writer}->syswrite("$$\n") or exit 0;
     };
     $cb->($loop);
@@ -564,6 +567,13 @@ C<Hypnotoad> configuration files are normal Perl scripts returning a hash.
 The following parameters are currently available.
 
 =over 4
+
+=item accepts
+
+    accepts => 100
+
+Maximum number of connections a worker is allowed to accept before shutting
+down gracefully, defaults to C<1000>.
 
 =item backlog
 

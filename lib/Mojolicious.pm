@@ -417,6 +417,8 @@ Web development for humans, making hard things possible and everything fun.
         The time is <%= $hour %>:<%= $minute %>:<%= $second %>.
     <% end %>
 
+Single file prototypes can easily grow into well structured applications.
+
 =head2 Have Some Cake
 
 Loosely coupled building blocks, use what you like and just ignore the rest.

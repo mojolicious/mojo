@@ -220,8 +220,17 @@ sub query {
     if (@_) {
 
         # Replace with array
-        if (@_ > 1 || (ref $_[0] && ref $_[0] eq 'ARRAY')) {
+        if (@_ > 1) {
             $self->{query} = Mojo::Parameters->new(ref $_[0] ? @{$_[0]} : @_);
+        }
+
+        # Merge with array
+        elsif (ref $_[0] && ref $_[0] eq 'ARRAY') {
+            my $q = $self->{query} ||= Mojo::Parameters->new;
+            my $merge = Mojo::Parameters->new(@{$_[0]});
+            foreach ($merge->param) {
+                $q->param($_ => $merge->param($_));
+            }
         }
 
         # Append hash
@@ -497,7 +506,7 @@ defaults to a L<Mojo::Path> object.
 
     my $query = $url->query;
     $url      = $url->query(replace => 'with');
-    $url      = $url->query([replace => 'with']);
+    $url      = $url->query([merge => 'with']);
     $url      = $url->query({append => 'to'});
     $url      = $url->query(Mojo::Parameters->new);
 

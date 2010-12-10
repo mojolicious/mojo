@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 160;
+use Test::More tests => 161;
 
 # I don't want you driving around in a car you built yourself.
 # You can sit there complaining, or you can knit me some seat belts.
@@ -51,8 +51,10 @@ is "$url", 'http://sri:foobar@kraih.com:8080?_monkey=biz%3B&_monkey=23#23',
   'right format';
 $url->query(monkey => 'foo');
 is "$url", 'http://sri:foobar@kraih.com:8080?monkey=foo#23', 'right format';
+$url->query([monkey => 'bar']);
+is "$url", 'http://sri:foobar@kraih.com:8080?monkey=bar#23', 'right format';
 $url->query({foo => 'bar'});
-is "$url", 'http://sri:foobar@kraih.com:8080?monkey=foo&foo=bar#23',
+is "$url", 'http://sri:foobar@kraih.com:8080?monkey=bar&foo=bar#23',
   'right format';
 $url->query('foo');
 is "$url", 'http://sri:foobar@kraih.com:8080?foo#23', 'right format';

@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 316;
+use Test::More tests => 317;
 
 # Homer gave me a kidney: it wasn't his, I didn't need it,
 # and it came postage due- but I appreciated the gesture!
@@ -826,6 +826,7 @@ is "$dom", <<EOF, 'right result';
 <div>D</div>
 EOF
 is $dom->at('div')->text, 'A-1', 'right text';
+is $dom->at('iv'), undef, 'no result';
 $dom->before('l')->before('alal')->before('a');
 is "$dom", <<EOF, 'no change';
 <ul>

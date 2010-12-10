@@ -639,7 +639,7 @@ sub _match_selector {
             next if $type eq '*';
 
             # Type (ignore namespace prefix)
-            next if $current->[1] =~ /\:?$type$/;
+            next if $current->[1] =~ /(?:^|\:)$type$/;
         }
 
         # Attribute

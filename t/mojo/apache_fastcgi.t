@@ -6,6 +6,9 @@ use warnings;
 # Disable epoll and kqueue
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
+# mod_fastcgi doesn't like small chunks
+BEGIN { $ENV{MOJO_CHUNK_SIZE} = 262144 }
+
 use Test::More;
 
 use File::Spec;

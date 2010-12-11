@@ -811,6 +811,10 @@ __DATA__
                 margin-right: 3em;
                 text-shadow: #ddd 0 1px 0;
             }
+            pre {
+                margin: 0;
+                white-space: pre-wrap;
+            }
             table {
                 border-collapse: collapse;
                 margin-top: 1em;
@@ -896,7 +900,7 @@ __DATA__
             <tr>
                 <td class="key"><%= $key %>:</td>
                 <td class="value" width="100%">
-                    <code><%= $value %></code>
+                    <pre><%= $value %></pre>
                 </td>
             </tr>
         <% end %>

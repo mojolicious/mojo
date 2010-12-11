@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 15;
+use Test::More tests => 18;
 
 use Mojo::JSON;
 
@@ -88,3 +88,28 @@ is_deeply $params,
   },
   'right structure';
 is $ENV{MOJO_HELLO}, 'world', 'on_finish callback';
+
+# Cookies
+$env = {
+    CONTENT_LENGTH      => 0,
+    PATH_INFO           => '/diag/cookies',
+    QUERY_STRING        => 'lalala=23&bar=baz',
+    REQUEST_METHOD      => 'GET',
+    SCRIPT_NAME         => '/',
+    HTTP_HOST           => 'localhost:8080',
+    SERVER_PROTOCOL     => 'HTTP/1.1',
+    'psgi.version'      => [1, 0],
+    'psgi.url_scheme'   => 'http',
+    'psgi.input'        => *STDIN,
+    'psgi.errors'       => *STDERR,
+    'psgi.multithread'  => 0,
+    'psgi.multiprocess' => 1,
+    'psgi.run_once'     => 0
+};
+$app = Mojolicious::Command::Psgi->new->run;
+$res = $app->($env);
+is $res->[0], 200, 'right status';
+is scalar @{$res->[1]}, 10, 'right number of values';
+my $i = 0;
+for my $header (@{$res->[1]}) { $i++ if $header eq 'Set-Cookie' }
+is $i, 2, 'right number of "Set-Cookie" headers';

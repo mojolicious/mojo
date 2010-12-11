@@ -23,7 +23,7 @@ package main;
 use strict;
 use warnings;
 
-use Test::More tests => 124;
+use Test::More tests => 133;
 
 use File::Spec;
 use File::Temp;
@@ -505,6 +505,24 @@ $output = $mt->render(<<'EOF');
 %= foo
 EOF
 is $output, "Mojo::Template\nworks!\n", 'right result';
+
+# Unusable error message (stacktrace required)
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+test
+123
+% die "x\n";
+test
+EOF
+is ref $output, 'Mojo::Exception', 'right exception';
+is $output->message, "x\n", 'right message';
+is $output->lines_before->[0]->[0], 1,      'right number';
+is $output->lines_before->[0]->[1], 'test', 'right line';
+is $output->lines_before->[1]->[0], 2,      'right number';
+is $output->lines_before->[1]->[1], '123',  'right line';
+is $output->line->[0], 3, 'right number';
+is $output->line->[1], '% die "x\n";', 'right line';
+like "$output", qr/^x/, 'right result';
 
 # Compile time exception
 $mt     = Mojo::Template->new;

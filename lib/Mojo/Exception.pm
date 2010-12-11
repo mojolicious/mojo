@@ -20,6 +20,44 @@ sub new {
     my $self = shift->SUPER::new();
 
     # Message
+    return $self unless @_;
+
+    # Detect
+    return $self->_detect(@_);
+}
+
+sub throw {
+    my $self = shift;
+
+    # Trace
+    my @trace;
+    my $i = 1;
+    while (my ($p, $f, $l) = caller($i++)) {
+
+        # Append
+        push @trace, [$p, $f, $l];
+
+        # Line
+        if (-r $f) {
+            next unless my $handle = IO::File->new("< $f");
+            my @lines = <$handle>;
+            push @{$trace[-1]}, $lines[$l - 1];
+        }
+    }
+
+    # Exception
+    my $e = Mojo::Exception->new;
+    $e->trace(\@trace);
+    $e->_detect(@_);
+
+    # Throw
+    die $e;
+}
+
+sub _detect {
+    my $self = shift;
+
+    # Message
     my $message = shift;
     return $message if blessed $message && $message->isa('Mojo::Exception');
     $self->message($message);
@@ -29,6 +67,12 @@ sub new {
     my @trace;
     while ($message =~ /at\s+(.+?)\s+line\s+(\d+)/g) {
         push @trace, {file => $1, line => $2};
+    }
+
+    # Stacktrace
+    if (my $first = $self->trace->[0]) {
+        unshift @trace, {file => $first->[1], line => $first->[2]}
+          if $first->[1];
     }
 
     # Frames
@@ -49,7 +93,7 @@ sub new {
             $self->_parse_context($line, [\@lines]);
 
             # Done
-            last;
+            return $self;
         }
     }
 
@@ -76,37 +120,20 @@ sub new {
     my $line;
     $line = $1 if $self->message =~ /at\s+template\s+line\s+(\d+)/;
 
+    # Stacktrace
+    unless ($line) {
+        for my $frame (@{$self->trace}) {
+            if ($frame->[1] =~ /^\(eval\ \d+\)$/) {
+                $line = $frame->[2];
+                last;
+            }
+        }
+    }
+
     # Context
     $self->_parse_context($line, \@lines) if $line;
 
     return $self;
-}
-
-sub throw {
-    my $self = shift;
-
-    # Trace
-    my @trace;
-    my $i = 1;
-    while (my ($p, $f, $l) = caller($i++)) {
-
-        # Append
-        push @trace, [$p, $f, $l];
-
-        # Line
-        if (-r $f) {
-            next unless my $handle = IO::File->new("< $f");
-            my @lines = <$handle>;
-            push @{$trace[-1]}, $lines[$l - 1];
-        }
-    }
-
-    # Exception
-    my $e = Mojo::Exception->new(@_);
-    $e->trace(\@trace);
-
-    # Throw
-    die $e;
 }
 
 # You killed zombie Flanders!

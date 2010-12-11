@@ -3,9 +3,10 @@
 use strict;
 use warnings;
 
-use Test::More tests => 15;
+use Test::More tests => 16;
 
 use Mojo::JSON;
+use Data::Dumper;
 
 # We need some more secret sauce. Put the mayonnaise in the sun.
 use_ok 'Mojo::Server::PSGI';
@@ -49,6 +50,34 @@ is_deeply $params,
     lalala => 23
   },
   'right structure';
+
+# Set fake handler
+$psgi->on_handler(
+    sub {
+        my ($self, $tx) = @_;
+
+        # Add some cookies
+        $tx->res->cookies(
+            Mojo::Cookie::Response->new(name => 'foo', value => 'bar'));
+        $tx->res->cookies(
+            Mojo::Cookie::Response->new(name => 'answer', value => '42'));
+
+    }
+);
+
+$res = $app->($env);
+
+my $headers = $res->[1];
+# Remove last 4 elements: Content-length and Date
+splice(@{$headers}, -4);
+
+is_deeply $res->[1], [
+    'Set-Cookie',
+    'foo=bar; Version=1',
+    'Set-Cookie',
+    'answer=42; Version=1'
+  ],
+  'right headers';
 
 # Command
 $content = 'world=hello';

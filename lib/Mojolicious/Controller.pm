@@ -796,11 +796,11 @@ __DATA__
 <!doctype html><html>
     <head>
         <title>Mojolicious Exception</title>
-        <%= base_tag %>
-        <%= javascript '/js/jquery.js' %>
-        <%= stylesheet '/css/prettify.css' %>
-        <%= stylesheet '/css/prettify-mojo.css' %>
-        <%= javascript '/js/prettify.js' %>
+        %= base_tag
+        %= javascript '/js/jquery.js'
+        %= stylesheet '/css/prettify.css'
+        %= stylesheet '/css/prettify-mojo.css'
+        %= javascript '/js/prettify.js'
         <style type="text/css">
             body {
                 background-color: #f5f6f8;
@@ -885,51 +885,51 @@ __DATA__
         </style>
     </head>
     <body onload="prettyPrint()">
-    <% if ($self->app->mode eq 'development') { %>
-        <% my $cv = begin %>
-            <% my ($key, $value, $class) = @_; %>
-            <tr<%= qq/ class="$class"/ if $class %>>
+    % if ($self->app->mode eq 'development') {
+        % my $cv = begin
+            % my ($key, $value, $i) = @_;
+            <tr<%== ' class="important"' if $i %>>
                 <td class="key"><%= $key %>.</td>
                 <td class="value" width="100%">
                     <code class="prettyprint"><%= $value %></code>
                 </td>
             </tr>
-        <% end %>
-        <% my $kv = begin %>
-            <% my ($key, $value) = @_; %>
+        % end
+        % my $kv = begin
+            % my ($key, $value) = @_;
             <tr>
                 <td class="key"><%= $key %>:</td>
                 <td class="value" width="100%">
                     <pre><%= $value %></pre>
                 </td>
             </tr>
-        <% end %>
+        % end
         <div id="showcase" class="code box">
             <div class="headline"><%= $e->message %></div>
             <div id="context">
                 <table width="100%">
-                <% for my $line (@{$e->lines_before}) { %>
-                    <%== $cv->($line->[0], $line->[1]) %>
-                <% } %>
-                <%== $kv->($e->line->[0], $e->line->[1], 'important') %>
-                <% for my $line (@{$e->lines_after}) { %>
-                    <%== $cv->($line->[0], $line->[1]) %>
-                <% } %>
+                % for my $line (@{$e->lines_before}) {
+                    %== $cv->($line->[0], $line->[1])
+                % }
+                %== $cv->($e->line->[0], $e->line->[1], 1)
+                % for my $line (@{$e->lines_after}) {
+                    %== $cv->($line->[0], $line->[1])
+                % }
                 </table>
             </div>
-            <% if (defined $e->line->[2]) { %>
+            % if (defined $e->line->[2]) {
                 <div id="insight">
                     <table width="100%">
-                    <% for my $line (@{$e->lines_before}) { %>
-                        <%== $cv->($line->[0], $line->[2]) %>
-                    <% } %>
-                    <%== $kv->($e->line->[0], $e->line->[2], 'important') %>
-                    <% for my $line (@{$e->lines_after}) { %>
-                        <%== $cv->($line->[0], $line->[2]) %>
-                    <% } %>
+                    % for my $line (@{$e->lines_before}) {
+                        %== $cv->($line->[0], $line->[2])
+                    % }
+                    %== $cv->($e->line->[0], $e->line->[2], 1)
+                    % for my $line (@{$e->lines_after}) {
+                        %== $cv->($line->[0], $line->[2])
+                    % }
                     </table>
                 </div>
-                <%= javascript begin %>
+                %= javascript begin
                     var current = '#context';
                     $('#showcase').click(function() {
                         $(current).slideToggle('slow', function() {
@@ -943,51 +943,51 @@ __DATA__
                         });
                     });
                     $('#insight').toggle();
-                <% end %>
-            <% } %>
+                % end
+            % }
         </div>
         <div class="box" id="trace">
             <div class="title">Trace</div>
             <div id="frames">
-            <% for my $frame (@{$e->trace}) { %>
-                <% if (my $line = $frame->[3]) { %>
+            % for my $frame (@{$e->trace}) {
+                % if (my $line = $frame->[3]) {
                     <div class="file"><%= $frame->[1] %></div>
                     <div class="code preview">
-                        <%= $frame->[2]%>.
+                        %= "$frame->[2]."
                         <code class="prettyprint"><%= $line %></code>
                     </div>
-                <% } %>
-            <% } %>
+                % }
+            % }
             </div>
         </div>
         <div class="box infobox" id="request">
             <div class="title">Request</div>
             <table width="100%">
-            <% for (my $i = 0; $i < @$request; $i += 2) { %>
-                <% my $key = $request->[$i]; %>
-                <% my $value = $request->[$i + 1]; %>
-                <%== $kv->($key, $value) %>
-            <% } %>
-            <% for my $name (@{$self->req->headers->names}) { %>
-                <% my $value = $self->req->headers->header($name); %>
-                <%== $kv->($name, $value) %>
-            <% } %>
+            % for (my $i = 0; $i < @$request; $i += 2) {
+                % my $key = $request->[$i];
+                % my $value = $request->[$i + 1];
+                %== $kv->($key, $value)
+            % }
+            % for my $name (@{$self->req->headers->names}) {
+                % my $value = $self->req->headers->header($name);
+                %== $kv->($name, $value)
+            % }
             </table>
         </div>
         <div class="box infobox" id="more">
             <div class="title">More</div>
             <div id="infos">
                 <table width="100%">
-                <% for (my $i = 0; $i < @$info; $i += 2) { %>
-                    <%== $kv->($info->[$i], $info->[$i + 1]) %>
-                <% } %>
+                % for (my $i = 0; $i < @$info; $i += 2) {
+                    %== $kv->($info->[$i], $info->[$i + 1])
+                % }
                 </table>
             </div>
         </div>
         <div id="footer">
             <img src="/mojolicious-black.png" alt="Mojolicious logo" />
         </div>
-        <%= javascript begin %>
+        %= javascript begin
             $('#trace').click(function() {
                 $('#frames').slideToggle('slow');
             });
@@ -996,8 +996,10 @@ __DATA__
                 $('#infos').slideToggle('slow');
             });
             $('#infos').toggle();
-        <% end %>
-    <% } else { %>Page temporarily unavailable, please come back later.<% } %>
+        % end
+    % } else {
+        Page temporarily unavailable, please come back later.
+    % }
     </body>
 </html>
 

@@ -891,6 +891,9 @@ __DATA__
                 background-color: #2f3032;
                 padding: 0.5em;
             }
+            img {
+                border: none;
+            }
         </style>
     </head>
     <body onload="prettyPrint()">
@@ -1002,7 +1005,10 @@ __DATA__
             </table>
         </div>
         <div id="footer">
-            <img src="/mojolicious-black.png" alt="Mojolicious logo" />
+            <a href="http://mojolicious.org"
+               title="Mojolicious Web Framework - Join the revolution!">
+              <img src="/mojolicious-black.png" alt="Mojolicious logo" />
+            </a>
         </div>
         <%= javascript begin %>
             $('#trace').click(function() {

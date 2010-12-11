@@ -145,6 +145,10 @@ sub compile {
     my $code = $self->code;
     return unless $code;
 
+    # Stacktrace
+    local $SIG{__DIE__} =
+      sub { Mojo::Exception->throw(shift, $self->template, $self->code) };
+
     # Compile
     my $compiled = eval $code;
 
@@ -169,6 +173,10 @@ sub interpret {
 
     # Shortcut
     return unless $compiled;
+
+    # Stacktrace
+    local $SIG{__DIE__} =
+      sub { Mojo::Exception->throw(shift, $self->template, $self->code) };
 
     # Interpret
     my $output = eval { $compiled->(@_) };

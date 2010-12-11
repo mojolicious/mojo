@@ -23,7 +23,7 @@ package main;
 use strict;
 use warnings;
 
-use Test::More tests => 114;
+use Test::More tests => 124;
 
 use File::Spec;
 use File::Temp;
@@ -519,10 +519,14 @@ is ref $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/^Missing right curly or square bracket/,
   'right message';
 like $output->message, qr/syntax error at template line 5.$/, 'right message';
-is $output->lines_before->[0]->[0], 3,          'right number';
-is $output->lines_before->[0]->[1], '% {',      'right line';
-is $output->lines_before->[1]->[0], 4,          'right number';
-is $output->lines_before->[1]->[1], '%= 1 + 1', 'right line';
+is $output->lines_before->[0]->[0], 1,          'right number';
+is $output->lines_before->[0]->[1], 'test',     'right line';
+is $output->lines_before->[1]->[0], 2,          'right number';
+is $output->lines_before->[1]->[1], '123',      'right line';
+is $output->lines_before->[2]->[0], 3,          'right number';
+is $output->lines_before->[2]->[1], '% {',      'right line';
+is $output->lines_before->[3]->[0], 4,          'right number';
+is $output->lines_before->[3]->[1], '%= 1 + 1', 'right line';
 is $output->line->[0], 5,      'right number';
 is $output->line->[1], 'test', 'right line';
 like "$output", qr/^Missing right curly or square bracket/, 'right result';
@@ -538,10 +542,17 @@ test
 EOF
 is ref $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/ohoh/, 'right message';
-is $output->lines_before->[0]->[0], 17,              'right number';
-is $output->lines_before->[0]->[1], 'use warnings;', 'right line';
-is $output->lines_before->[1]->[0], 18,              'right number';
+is $output->lines_before->[0]->[0], 14, 'right number';
+is $output->lines_before->[0]->[1], 'package MyTemplateException;',
+  'right line';
+is $output->lines_before->[1]->[0], 15,              'right number';
 is $output->lines_before->[1]->[1], '',              'right line';
+is $output->lines_before->[2]->[0], 16,              'right number';
+is $output->lines_before->[2]->[1], 'use strict;',   'right line';
+is $output->lines_before->[3]->[0], 17,              'right number';
+is $output->lines_before->[3]->[1], 'use warnings;', 'right line';
+is $output->lines_before->[4]->[0], 18,              'right number';
+is $output->lines_before->[4]->[1], '',              'right line';
 is $output->line->[0], 19, 'right number';
 is $output->line->[1], "sub exception { die 'ohoh' }", 'right line';
 is $output->lines_after->[0]->[0], 20,              'right number';

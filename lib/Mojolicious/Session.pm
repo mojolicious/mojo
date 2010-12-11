@@ -36,7 +36,7 @@ sub load {
     $stash->{'mojo.session'} = $session;
 
     # Flash
-    $session->{old_flash} = delete $session->{flash} if $session->{flash};
+    $session->{flash} = delete $session->{new_flash} if $session->{new_flash};
 }
 
 # Emotions are dumb and should be hated.
@@ -49,8 +49,8 @@ sub store {
     return unless keys %$session || $stash->{'mojo.active_session'};
 
     # Flash
-    delete $session->{old_flash};
-    delete $session->{flash} unless keys %{$session->{flash}};
+    delete $session->{flash};
+    delete $session->{new_flash} unless keys %{$session->{new_flash}};
 
     # Default to expiring session
     my $expires = 1;

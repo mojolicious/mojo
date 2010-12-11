@@ -8,8 +8,9 @@ use overload 'bool' => sub {1}, fallback => 1;
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
 use IO::File;
+use Scalar::Util 'blessed';
 
-__PACKAGE__->attr([qw/line lines_before lines_after/] => sub { [] });
+__PACKAGE__->attr([qw/line lines_before lines_after trace/] => sub { [] });
 __PACKAGE__->attr([qw/message raw_message/] => 'Exception!');
 __PACKAGE__->attr(verbose => sub { $ENV{MOJO_EXCEPTION_VERBOSE} || 0 });
 
@@ -19,8 +20,9 @@ sub new {
     my $self = shift->SUPER::new();
 
     # Message
-    $self->message(shift);
-    my $message = $self->message;
+    my $message = shift;
+    return $message if blessed $message && $message->isa('Mojo::Exception');
+    $self->message($message);
     $self->raw_message($message);
 
     # Trace name and line
@@ -44,7 +46,7 @@ sub new {
             my @lines  = <$handle>;
 
             # Line
-            $self->_parse_context(\@lines, $line);
+            $self->_parse_context($line, [\@lines]);
 
             # Done
             last;
@@ -52,15 +54,16 @@ sub new {
     }
 
     # Parse specific file
-    return $self unless my $lines = shift;
-    my @lines = split /\n/, $lines;
+    return $self unless @_;
+    my @lines;
+    for my $lines (@_) { push @lines, [split /\n/, $lines] }
 
     # Cleanup plain messages
     unless (ref $message) {
         my $filter = sub {
             my $num  = shift;
             my $new  = "template line $num";
-            my $line = $lines[$num];
+            my $line = $lines[0]->[$num];
             $new .= qq/, near "$line"/ if defined $line;
             $new .= '.';
             return $new;
@@ -74,9 +77,36 @@ sub new {
     $line = $1 if $self->message =~ /at\s+template\s+line\s+(\d+)/;
 
     # Context
-    $self->_parse_context(\@lines, $line) if $line;
+    $self->_parse_context($line, \@lines) if $line;
 
     return $self;
+}
+
+sub throw {
+    my $self = shift;
+
+    # Trace
+    my @trace;
+    my $i = 1;
+    while (my ($p, $f, $l) = caller($i++)) {
+
+        # Append
+        push @trace, [$p, $f, $l];
+
+        # Line
+        if (-r $f) {
+            next unless my $handle = IO::File->new("< $f");
+            my @lines = <$handle>;
+            push @{$trace[-1]}, $lines[$l - 1];
+        }
+    }
+
+    # Exception
+    my $e = Mojo::Exception->new(@_);
+    $e->trace(\@trace);
+
+    # Throw
+    die $e;
 }
 
 # You killed zombie Flanders!
@@ -110,50 +140,49 @@ sub to_string {
 }
 
 sub _parse_context {
-    my ($self, $lines, $line) = @_;
+    my ($self, $line, $lines) = @_;
 
     # Wrong file
-    return unless defined $lines->[$line - 1];
+    return unless defined $lines->[0]->[$line - 1];
 
     # Context
-    my $code = $lines->[$line - 1];
-    chomp $code;
-    $self->line([$line, $code]);
+    $self->line([$line]);
+    for my $l (@$lines) {
+        my $code = $l->[$line - 1];
+        chomp $code;
+        push @{$self->line}, $code;
+    }
 
     # Cleanup
     $self->lines_before([]);
     $self->lines_after([]);
 
-    # -2
-    my $previous_line = $line - 3;
-    $code = $previous_line >= 0 ? $lines->[$previous_line] : undef;
-    if (defined $code) {
-        chomp $code;
-        push @{$self->lines_before}, [$line - 2, $code];
+    # Before
+    for my $i (2 .. 6) {
+        my $previous = $line - $i;
+        last if $previous < 0;
+        if (defined($lines->[0]->[$previous])) {
+            unshift @{$self->lines_before}, [$previous + 1];
+            for my $l (@$lines) {
+                my $code = $l->[$previous];
+                chomp $code;
+                push @{$self->lines_before->[0]}, $code;
+            }
+        }
     }
 
-    # -1
-    $previous_line = $line - 2;
-    $code = $previous_line >= 0 ? $lines->[$previous_line] : undef;
-    if (defined $code) {
-        chomp $code;
-        push @{$self->lines_before}, [$line - 1, $code];
-    }
-
-    # +1
-    my $next_line = $line;
-    $code = $next_line >= 0 ? $lines->[$next_line] : undef;
-    if (defined $code) {
-        chomp $code;
-        push @{$self->lines_after}, [$line + 1, $code];
-    }
-
-    # +2
-    $next_line = $line + 1;
-    $code = $next_line >= 0 ? $lines->[$next_line] : undef;
-    if (defined $code) {
-        chomp $code;
-        push @{$self->lines_after}, [$line + 2, $code];
+    # After
+    for my $i (0 .. 4) {
+        my $next = $line + $i;
+        next if $next < 0;
+        if (defined($lines->[0]->[$next])) {
+            push @{$self->lines_after}, [$next + 1];
+            for my $l (@$lines) {
+                my $code = $l->[$next];
+                chomp $code;
+                push @{$self->lines_after->[-1]}, $code;
+            }
+        }
     }
 
     return $self;
@@ -214,6 +243,13 @@ Exception message.
 
 Raw unprocessed exception message.
 
+=head2 C<trace>
+
+    my $trace = $e->trace;
+    $e        = $e->trace($trace);
+
+Stacktrace.
+
 =head2 C<verbose>
 
     my $verbose = $e->verbose;
@@ -232,6 +268,13 @@ following new ones.
     my $e = Mojo::Exception->new('Oops!', $file);
 
 Construct a new L<Mojo::Exception> object.
+
+=head2 C<throw>
+
+    Mojo::Exception->throw('Oops!');
+    Mojo::Exception->throw('Oops!', $file);
+
+Throw exception with stacktrace.
 
 =head2 C<to_string>
 

@@ -253,6 +253,25 @@ L<Mojo::Client> makes it actually easy.
 The C<body> callback will be called for every chunk of data that is received,
 even C<chunked> encoding will be handled transparently if neccessary.
 
+=head1 JAVASCRIPT
+
+=head2 jQuery (Content Distribution Network)
+
+These days L<Mojolicious> ships with a bundled version of jQuery, which you
+can easily use as a fallback for applications that might be used offline from
+time to time.
+
+    <%= javascript
+        'http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js' %>
+    <%= javascript begin %>
+        if (typeof jQuery == 'undefined') {
+            var e = document.createElement('script');
+            e.src = '/js/jquery.js';
+            e.type = 'text/javascript';
+            document.getElementsByTagName("head")[0].appendChild(e);
+        }
+    <% end %>
+
 =head1 HACKS
 
 Fun hacks you might not use very often but that might come in handy some day.

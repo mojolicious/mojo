@@ -608,6 +608,9 @@ sub _generate_route {
 sub _walk_stack {
     my ($self, $c) = @_;
 
+    # Stacktrace
+    local $SIG{__DIE__} = sub { Mojo::Exception->throw(@_) };
+
     # Stack
     my $stack = $c->match->stack;
 

@@ -172,7 +172,7 @@ sub render {
         return unless $self->_render_template($c, \$output, $options);
 
         # Extends
-        $content->{content} = b("$output")
+        $content->{content} = b($output)
           if ($c->stash->{extends} || $c->stash->{layout});
     }
 

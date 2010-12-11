@@ -6,6 +6,7 @@ use warnings;
 use base 'Mojo::Base';
 
 use Mojo::ByteStream;
+use Mojo::Command;
 use Mojo::Cookie::Response;
 use Mojo::Exception;
 use Mojo::Transaction::HTTP;
@@ -13,7 +14,6 @@ use Mojo::URL;
 use Mojo::Util;
 
 require Carp;
-require Scalar::Util;
 
 # Scalpel... blood bucket... priest.
 __PACKAGE__->attr([qw/app match/]);
@@ -24,66 +24,12 @@ __PACKAGE__->attr(tx => sub { Mojo::Transaction::HTTP->new });
 *receive_message = \&on_message;
 
 # Exception template
-our $EXCEPTION = <<'EOF';
-% my $e = delete $self->stash->{'exception'};
-<!doctype html><html>
-    <head>
-        <title>Exception</title>
-        <style type="text/css">
-            body {
-                font: 0.9em Verdana, "Bitstream Vera Sans", sans-serif;
-            }
-            .snippet {
-                font: 115% Monaco, "Courier New", monospace;
-            }
-        </style>
-    </head>
-    <body>
-        <% if ($self->app->mode eq 'development') { %>
-            <div class="snippet"><pre><%= $e->message %></pre></div>
-            <div>
-                <% for my $line (@{$e->lines_before}) { %>
-                    <div class="snippet">
-                        <%= $line->[0] %>: <%= $line->[1] %>
-                    </div>
-                <% } %>
-                <% if ($e->line->[0]) { %>
-                    <div class="snippet">
-                        <b><%= $e->line->[0] %>: <%= $e->line->[1] %></b>
-                    </div>
-                <% } %>
-                <% for my $line (@{$e->lines_after}) { %>
-                    <div class="snippet">
-                        <%= $line->[0] %>: <%= $line->[1] %>
-                    </div>
-                <% } %>
-            </div>
-            <div class="snippet"><pre><%= dumper $self->stash %></pre></div>
-        <% } else { %>
-            <div>Page temporarily unavailable, please come back later.</div>
-        <% } %>
-    </body>
-</html>
-EOF
+our $EXCEPTION =
+  Mojo::Command->new->get_data('exception.html.ep', __PACKAGE__);
 
 # Not found template
-our $NOT_FOUND = <<'EOF';
-<!doctype html><html>
-    <head>
-        <title>Not Found</title>
-        <style type="text/css">
-            body {
-                font: 0.9em Verdana, "Bitstream Vera Sans", sans-serif;
-            }
-        </style>
-    </head>
-    <body>
-        <div>
-            Page not found, want to go <%= link_to home => url_for->base %>?
-        </div>
-    </body>
-</html>
-EOF
+our $NOT_FOUND =
+  Mojo::Command->new->get_data('not_found.html.ep', __PACKAGE__);
 
 # Reserved stash values
 my $STASH_RE = qr/
@@ -210,23 +156,23 @@ sub flash {
     my $session = $self->stash->{'mojo.session'};
     if ($_[0] && !defined $_[1] && !ref $_[0]) {
         return unless $session && ref $session eq 'HASH';
-        return unless my $flash = $session->{old_flash};
+        return unless my $flash = $session->{flash};
         return unless ref $flash eq 'HASH';
         return $flash->{$_[0]};
     }
 
     # Initialize
     $session = $self->session;
-    my $flash = $session->{flash};
+    my $flash = $session->{new_flash};
     $flash = {} unless $flash && ref $flash eq 'HASH';
-    $session->{flash} = $flash;
+    $session->{new_flash} = $flash;
 
     # Hash
     return $flash unless @_;
 
     # Set
     my $values = exists $_[1] ? {@_} : $_[0];
-    $session->{flash} = {%$flash, %$values};
+    $session->{new_flash} = {%$flash, %$values};
 
     return $self;
 }
@@ -408,8 +354,7 @@ sub render_exception {
     my ($self, $e) = @_;
 
     # Exception
-    $e = Mojo::Exception->new($e)
-      unless Scalar::Util::blessed $e && $e->isa('Mojo::Exception');
+    $e = Mojo::Exception->new($e);
 
     # Error
     $self->app->log->error($e);
@@ -417,12 +362,48 @@ sub render_exception {
     # Recursion
     return if $self->stash->{'mojo.exception'};
 
+    # Request
+    my $s     = {};
+    my $stash = $self->stash;
+    for my $key (keys %$stash) {
+        next if $key =~ /^mojo\./;
+        next unless defined(my $value = $stash->{$key});
+        $s->{$key} = $value;
+    }
+    my $req = $self->req;
+    my $url = $req->url;
+    my @r   = (
+        Method     => $req->method,
+        Path       => $url->to_string,
+        Base       => $url->base->to_string,
+        Parameters => $self->dumper($req->params->to_hash),
+        Stash      => $self->dumper($s),
+        Session    => $self->dumper($self->session),
+        Version    => $req->version
+    );
+
+    # Info
+    my @i = (
+        Perl        => "$] ($^O)",
+        Mojolicious => "$Mojolicious::VERSION ($Mojolicious::CODENAME)",
+        Include     => $self->dumper(\@INC),
+        PID         => $$,
+        Executable  => $^X,
+        Name        => $0,
+        Time        => scalar localtime(time)
+    );
+
+
     # Exception template
     my $options = {
         template         => 'exception',
         format           => 'html',
         handler          => undef,
         status           => 500,
+        layout           => undef,
+        extends          => undef,
+        request          => \@r,
+        info             => \@i,
         exception        => $e,
         'mojo.exception' => 1
     };
@@ -434,6 +415,10 @@ sub render_exception {
             format           => 'html',
             handler          => 'ep',
             status           => 500,
+            layout           => undef,
+            extends          => undef,
+            request          => \@r,
+            info             => \@i,
             exception        => $e,
             'mojo.exception' => 1
         );
@@ -498,6 +483,8 @@ sub render_not_found {
         template         => 'not_found',
         format           => 'html',
         status           => 404,
+        layout           => undef,
+        extends          => undef,
         'mojo.not_found' => 1
     };
 
@@ -508,6 +495,8 @@ sub render_not_found {
             format           => 'html',
             handler          => 'ep',
             status           => 404,
+            layout           => undef,
+            extends          => undef,
             'mojo.not_found' => 1
         );
     }
@@ -800,6 +789,239 @@ sub write_chunk {
 }
 
 1;
+__DATA__
+
+@@ exception.html.ep
+% my $e = delete $self->stash->{'exception'};
+<!doctype html><html>
+    <head>
+        <title>Mojolicious Exception</title>
+        <%= base_tag %>
+        <%= javascript '/js/jquery.js' %>
+        <%= stylesheet '/css/prettify.css' %>
+        <%= stylesheet '/css/prettify-mojo.css' %>
+        <%= javascript '/js/prettify.js' %>
+        <style type="text/css">
+            body {
+                background-color: #f5f6f8;
+                color: #333;
+                font: 0.9em Verdana, sans-serif;
+                margin-top: 0em;
+                margin-left: 3em;
+                margin-right: 3em;
+                text-shadow: #ddd 0 1px 0;
+            }
+            table {
+                border-collapse: collapse;
+                margin-top: 1em;
+            }
+            td { padding: 0.3em; }
+            #footer {
+                margin-top: 1em;
+                text-align: center;
+                width: 100%;
+            }
+            .box {
+                background-color: #fff;
+                -moz-box-shadow: 0px 0px 2px #ccc;
+                -webkit-box-shadow: 0px 0px 2px #ccc;
+                box-shadow: 0px 0px 2px #ccc;
+                overflow: hidden;
+                padding: 1em;
+            }
+            .important { background-color: #2f3032; }
+            .key {
+                text-align: right;
+                text-weight: bold;
+            }
+            .headline {
+                font: 1.5em Georgia, Times, serif;
+                text-shadow: #333 0 1px 0;
+            }
+            .title {
+                color: #000;
+                font: 1.5em Georgia, Times, serif;
+            }
+            .value { padding-left: 1em; }
+            .code {
+                background-color: #1a1a1a;
+                color: #eee;
+                text-shadow: #333 0 1px 0;
+            }
+            #showcase {
+                -moz-border-radius-topright: 5px;
+                border-top-right-radius: 5px;
+                -moz-border-radius-topleft: 5px;
+                border-top-left-radius: 5px;
+                margin-top: 1em;
+            }
+            #more, #trace {
+                -moz-border-radius-bottomright: 5px;
+                border-bottom-right-radius: 5px;
+                -moz-border-radius-bottomleft: 5px;
+                border-bottom-left-radius: 5px;
+            }
+            #request {
+                -moz-border-radius-topright: 5px;
+                border-top-right-radius: 5px;
+                -moz-border-radius-topleft: 5px;
+                border-top-left-radius: 5px;
+                margin-top: 1em;
+            }
+            .infobox tr:nth-child(odd) .value { background-color: #ddeeff; }
+            .infobox tr:nth-child(even) .value { background-color: #eef9ff; }
+            .file {
+                margin-top: 1.5em;
+                margin-bottom: 0.5em;
+            }
+            .preview {
+                background-color: #2f3032;
+                padding: 0.5em;
+            }
+        </style>
+    </head>
+    <body onload="prettyPrint()">
+    <% if ($self->app->mode eq 'development') { %>
+        <% my $cv = begin %>
+            <% my ($key, $value) = @_; %>
+            <tr>
+                <td class="key"><%= $key %>.</td>
+                <td class="value" width="100%">
+                    <code class="prettyprint"><%= $value %></code>
+                </td>
+            </tr>
+        <% end %>
+        <% my $kv = begin %>
+            <% my ($key, $value) = @_; %>
+            <tr>
+                <td class="key"><%= $key %>:</td>
+                <td class="value" width="100%">
+                    <code><%= $value %></code>
+                </td>
+            </tr>
+        <% end %>
+        <div id="showcase" class="code box">
+            <div class="headline"><%= $e->message %></div>
+            <div id="context">
+                <table width="100%">
+                <% for my $line (@{$e->lines_before}) { %>
+                    <%== $cv->($line->[0], $line->[1]) %>
+                <% } %>
+                <tr class="important">
+                    <td class="key"><%= $e->line->[0] %>.</td>
+                    <td class="value" width="100%">
+                        <code class="prettyprint"><%= $e->line->[1] %></code>
+                    </td>
+                </tr>
+                <% for my $line (@{$e->lines_after}) { %>
+                    <%== $cv->($line->[0], $line->[1]) %>
+                <% } %>
+                </table>
+            </div>
+            <% if (defined $e->line->[2]) { %>
+                <div id="insight">
+                    <table width="100%">
+                    <% for my $line (@{$e->lines_before}) { %>
+                        <%== $cv->($line->[0], $line->[2]) %>
+                    <% } %>
+                <tr class="important">
+                    <td class="key"><%= $e->line->[0] %>.</td>
+                    <td class="value" width="100%">
+                        <code class="prettyprint"><%= $e->line->[2] %></code>
+                    </td>
+                </tr>
+                <% for my $line (@{$e->lines_after}) { %>
+                    <%== $cv->($line->[0], $line->[2]) %>
+                <% } %>
+                </table>
+            </div>
+            <%= javascript begin %>
+                var current = '#context';
+                $('#showcase').click(function() {
+                    $(current).slideToggle('slow', function() {
+                        if (current == '#context') {
+                            current = '#insight';
+                        }
+                        else {
+                            current = '#context';
+                        }
+                        $(current).slideToggle('slow');
+                    });
+                });
+                $('#insight').toggle();
+            <% end %>
+            <% } %>
+        </div>
+        <div class="box" id="trace">
+            <div class="title">Trace</div>
+            <div id="frames">
+            <% for my $frame (@{$e->trace}) { %>
+                <% if (my $line = $frame->[3]) { %>
+                    <div class="file"><%= $frame->[1] %></div>
+                    <div class="code preview">
+                        <%= $frame->[2]%>.
+                        <code class="prettyprint"><%= $line %></code>
+                    </div>
+                <% } %>
+            <% } %>
+            </div>
+        </div>
+        <div class="box infobox" id="request">
+            <div class="title">Request</div>
+            <table width="100%">
+            <% for (my $i = 0; $i < @$request; $i += 2) { %>
+                <% my $key = $request->[$i]; %>
+                <% my $value = $request->[$i + 1]; %>
+                <%== $kv->($key, $value) %>
+            <% } %>
+            <% for my $name (@{$self->req->headers->names}) { %>
+                <% my $value = $self->req->headers->header($name); %>
+                <%== $kv->($name, $value) %>
+            <% } %>
+            </table>
+        </div>
+        <div class="box infobox" id="more">
+            <div class="title">More</div>
+            <div id="infos">
+                <table width="100%">
+                <% for (my $i = 0; $i < @$info; $i += 2) { %>
+                    <%== $kv->($info->[$i], $info->[$i + 1]) %>
+                <% } %>
+                </table>
+            </div>
+        </div>
+        <div id="footer">
+            <img src="/mojolicious-black.png" alt="Mojolicious logo" />
+        </div>
+        <%= javascript begin %>
+            $('#trace').click(function() {
+                $('#frames').slideToggle('slow');
+            });
+            $('#frames').toggle();
+            $('#more').click(function() {
+                $('#infos').slideToggle('slow');
+            });
+            $('#infos').toggle();
+        <% end %>
+    <% } else { %>Page temporarily unavailable, please come back later.<% } %>
+    </body>
+</html>
+
+@@ not_found.html.ep
+<!doctype html><html>
+    <head>
+        <title>Not Found</title>
+        <style type="text/css">
+            body {
+                font: 0.9em Verdana, "Bitstream Vera Sans", sans-serif;
+            }
+        </style>
+    </head>
+    <body>
+        Page not found, want to go <%= link_to home => url_for->base %>?
+    </body>
+</html>
+
 __END__
 
 =head1 NAME

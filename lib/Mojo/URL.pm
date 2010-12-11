@@ -219,7 +219,7 @@ sub query {
     # Set
     if (@_) {
 
-        # Replace with array
+        # Replace with list
         if (@_ > 1) {
             $self->{query} = Mojo::Parameters->new(ref $_[0] ? @{$_[0]} : @_);
         }
@@ -228,8 +228,8 @@ sub query {
         elsif (ref $_[0] && ref $_[0] eq 'ARRAY') {
             my $q = $self->{query} ||= Mojo::Parameters->new;
             my $merge = Mojo::Parameters->new(@{$_[0]});
-            foreach ($merge->param) {
-                $q->param($_ => $merge->param($_));
+            for my $name ($merge->param) {
+                $q->param($name => $merge->param($name));
             }
         }
 

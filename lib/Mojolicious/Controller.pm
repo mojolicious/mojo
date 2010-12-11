@@ -887,8 +887,8 @@ __DATA__
     <body onload="prettyPrint()">
     <% if ($self->app->mode eq 'development') { %>
         <% my $cv = begin %>
-            <% my ($key, $value) = @_; %>
-            <tr>
+            <% my ($key, $value, $class) = @_; %>
+            <tr<%= qq/ class="$class"/ if $class %>>
                 <td class="key"><%= $key %>.</td>
                 <td class="value" width="100%">
                     <code class="prettyprint"><%= $value %></code>
@@ -911,12 +911,7 @@ __DATA__
                 <% for my $line (@{$e->lines_before}) { %>
                     <%== $cv->($line->[0], $line->[1]) %>
                 <% } %>
-                <tr class="important">
-                    <td class="key"><%= $e->line->[0] %>.</td>
-                    <td class="value" width="100%">
-                        <code class="prettyprint"><%= $e->line->[1] %></code>
-                    </td>
-                </tr>
+                <%== $kv->($e->line->[0], $e->line->[1], 'important') %>
                 <% for my $line (@{$e->lines_after}) { %>
                     <%== $cv->($line->[0], $line->[1]) %>
                 <% } %>
@@ -928,32 +923,27 @@ __DATA__
                     <% for my $line (@{$e->lines_before}) { %>
                         <%== $cv->($line->[0], $line->[2]) %>
                     <% } %>
-                <tr class="important">
-                    <td class="key"><%= $e->line->[0] %>.</td>
-                    <td class="value" width="100%">
-                        <code class="prettyprint"><%= $e->line->[2] %></code>
-                    </td>
-                </tr>
-                <% for my $line (@{$e->lines_after}) { %>
-                    <%== $cv->($line->[0], $line->[2]) %>
-                <% } %>
-                </table>
-            </div>
-            <%= javascript begin %>
-                var current = '#context';
-                $('#showcase').click(function() {
-                    $(current).slideToggle('slow', function() {
-                        if (current == '#context') {
-                            current = '#insight';
-                        }
-                        else {
-                            current = '#context';
-                        }
-                        $(current).slideToggle('slow');
+                    <%== $kv->($e->line->[0], $e->line->[2], 'important') %>
+                    <% for my $line (@{$e->lines_after}) { %>
+                        <%== $cv->($line->[0], $line->[2]) %>
+                    <% } %>
+                    </table>
+                </div>
+                <%= javascript begin %>
+                    var current = '#context';
+                    $('#showcase').click(function() {
+                        $(current).slideToggle('slow', function() {
+                            if (current == '#context') {
+                                current = '#insight';
+                            }
+                            else {
+                                current = '#context';
+                            }
+                            $(current).slideToggle('slow');
+                        });
                     });
-                });
-                $('#insight').toggle();
-            <% end %>
+                    $('#insight').toggle();
+                <% end %>
             <% } %>
         </div>
         <div class="box" id="trace">

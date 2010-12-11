@@ -1011,14 +1011,17 @@ __DATA__
             </a>
         </div>
         <%= javascript begin %>
-            $('#trace').click(function() {
-                $('#frames').slideToggle('slow');
-            });
-            $('#frames').toggle();
-            $('#more').click(function() {
-                $('#infos').slideToggle('slow');
-            });
-            $('#infos').toggle();
+            var $headings = $('h2'),
+                toggler = function(e) {
+                   if (e) {
+                       $(this).next().slideToggle('slow');
+                   }
+                    else {
+                        $headings.eq(1).next().show();
+                    }
+            };
+            $headings.click(toggler).next().hide();
+            toggler();
         <% end %>
     <% } else { %>Page temporarily unavailable, please come back later.<% } %>
     </body>

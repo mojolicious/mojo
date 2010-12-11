@@ -816,6 +816,7 @@ __DATA__
                 white-space: pre-wrap;
             }
             table {
+                width: 100%;
                 border-collapse: collapse;
                 margin-top: 1em;
             }
@@ -838,15 +839,23 @@ __DATA__
                 text-align: right;
                 text-weight: bold;
             }
-            .headline {
+            h1 {
                 font: 1.5em Georgia, Times, serif;
                 text-shadow: #333 0 1px 0;
             }
-            .title {
+            h2 {
                 color: #000;
                 font: 1.5em Georgia, Times, serif;
+                cursor: pointer;
+                padding: 0.3em;
             }
-            .value { padding-left: 1em; }
+            h2:hover {
+                background-color: #ddeeff;
+            }
+            .value {
+                width: 100%;
+                padding-left: 1em;
+            }
             .code {
                 background-color: #1a1a1a;
                 color: #eee;
@@ -890,7 +899,7 @@ __DATA__
             <% my ($key, $value) = @_; %>
             <tr>
                 <td class="key"><%= $key %>.</td>
-                <td class="value" width="100%">
+                <td class="value">
                     <code class="prettyprint"><%= $value %></code>
                 </td>
             </tr>
@@ -899,21 +908,21 @@ __DATA__
             <% my ($key, $value) = @_; %>
             <tr>
                 <td class="key"><%= $key %>:</td>
-                <td class="value" width="100%">
+                <td class="value">
                     <pre><%= $value %></pre>
                 </td>
             </tr>
         <% end %>
         <div id="showcase" class="code box">
-            <div class="headline"><%= $e->message %></div>
+            <h1><%= $e->message %></h1>
             <div id="context">
-                <table width="100%">
+                <table>
                 <% for my $line (@{$e->lines_before}) { %>
                     <%== $cv->($line->[0], $line->[1]) %>
                 <% } %>
                 <tr class="important">
                     <td class="key"><%= $e->line->[0] %>.</td>
-                    <td class="value" width="100%">
+                    <td class="value">
                         <code class="prettyprint"><%= $e->line->[1] %></code>
                     </td>
                 </tr>
@@ -924,13 +933,13 @@ __DATA__
             </div>
             <% if (defined $e->line->[2]) { %>
                 <div id="insight">
-                    <table width="100%">
+                    <table>
                     <% for my $line (@{$e->lines_before}) { %>
                         <%== $cv->($line->[0], $line->[2]) %>
                     <% } %>
                 <tr class="important">
                     <td class="key"><%= $e->line->[0] %>.</td>
-                    <td class="value" width="100%">
+                    <td class="value">
                         <code class="prettyprint"><%= $e->line->[2] %></code>
                     </td>
                 </tr>
@@ -956,8 +965,8 @@ __DATA__
             <% end %>
             <% } %>
         </div>
-        <div class="box" id="trace">
-            <div class="title">Trace</div>
+        <div class="box">
+            <h2>Trace</h2>
             <div id="frames">
             <% for my $frame (@{$e->trace}) { %>
                 <% if (my $line = $frame->[3]) { %>
@@ -970,9 +979,9 @@ __DATA__
             <% } %>
             </div>
         </div>
-        <div class="box infobox" id="request">
-            <div class="title">Request</div>
-            <table width="100%">
+        <div class="box infobox">
+            <h2>Request</h2>
+            <table>
             <% for (my $i = 0; $i < @$request; $i += 2) { %>
                 <% my $key = $request->[$i]; %>
                 <% my $value = $request->[$i + 1]; %>
@@ -984,15 +993,13 @@ __DATA__
             <% } %>
             </table>
         </div>
-        <div class="box infobox" id="more">
-            <div class="title">More</div>
-            <div id="infos">
-                <table width="100%">
-                <% for (my $i = 0; $i < @$info; $i += 2) { %>
-                    <%== $kv->($info->[$i], $info->[$i + 1]) %>
-                <% } %>
-                </table>
-            </div>
+        <div class="box infobox">
+            <h2>More</h2>
+            <table>
+            <% for (my $i = 0; $i < @$info; $i += 2) { %>
+                <%== $kv->($info->[$i], $info->[$i + 1]) %>
+            <% } %>
+            </table>
         </div>
         <div id="footer">
             <img src="/mojolicious-black.png" alt="Mojolicious logo" />

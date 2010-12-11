@@ -827,7 +827,10 @@ __DATA__
                 width: 100%;
             }
             .box {
+                margin-top: 1em;
                 background-color: #fff;
+                -moz-border-radius: 5px;
+                -webkit-border-radius: 5px;
                 -moz-box-shadow: 0px 0px 2px #ccc;
                 -webkit-box-shadow: 0px 0px 2px #ccc;
                 box-shadow: 0px 0px 2px #ccc;
@@ -860,26 +863,6 @@ __DATA__
                 background-color: #1a1a1a;
                 color: #eee;
                 text-shadow: #333 0 1px 0;
-            }
-            #showcase {
-                -moz-border-radius-topright: 5px;
-                border-top-right-radius: 5px;
-                -moz-border-radius-topleft: 5px;
-                border-top-left-radius: 5px;
-                margin-top: 1em;
-            }
-            #more, #trace {
-                -moz-border-radius-bottomright: 5px;
-                border-bottom-right-radius: 5px;
-                -moz-border-radius-bottomleft: 5px;
-                border-bottom-left-radius: 5px;
-            }
-            #request {
-                -moz-border-radius-topright: 5px;
-                border-top-right-radius: 5px;
-                -moz-border-radius-topleft: 5px;
-                border-top-left-radius: 5px;
-                margin-top: 1em;
             }
             .infobox tr:nth-child(odd) .value { background-color: #ddeeff; }
             .infobox tr:nth-child(even) .value { background-color: #eef9ff; }

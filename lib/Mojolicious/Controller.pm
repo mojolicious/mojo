@@ -818,6 +818,7 @@ __DATA__
             table {
                 border-collapse: collapse;
                 margin-top: 1em;
+                margin-bottom: 1em;
             }
             td { padding: 0.3em; }
             #footer {
@@ -841,6 +842,10 @@ __DATA__
             .headline {
                 font: 1.5em Georgia, Times, serif;
                 text-shadow: #333 0 1px 0;
+            }
+            .tap {
+                font: 0.5em Verdana, sans-serif;
+                text-align: center;
             }
             .title {
                 color: #000;
@@ -875,12 +880,13 @@ __DATA__
             .infobox tr:nth-child(odd) .value { background-color: #ddeeff; }
             .infobox tr:nth-child(even) .value { background-color: #eef9ff; }
             .file {
-                margin-top: 1.5em;
+                margin-top: 1em;
                 margin-bottom: 0.5em;
             }
             .preview {
                 background-color: #2f3032;
                 padding: 0.5em;
+                margin-bottom: 1em;
             }
         </style>
     </head>
@@ -931,6 +937,7 @@ __DATA__
                     % }
                     </table>
                 </div>
+                <div class="tap">tap for more</div>
                 %= javascript begin
                     var current = '#context';
                     $('#showcase').click(function() {
@@ -949,18 +956,26 @@ __DATA__
             % }
         </div>
         <div class="box" id="trace">
-            <div class="title">Trace</div>
-            <div id="frames">
-            % for my $frame (@{$e->trace}) {
-                % if (my $line = $frame->[3]) {
-                    <div class="file"><%= $frame->[1] %></div>
-                    <div class="code preview">
-                        %= "$frame->[2]."
-                        <code class="prettyprint"><%= $line %></code>
-                    </div>
+            % if (@{$e->trace}) {
+                <div id="frames">
+                % for my $frame (@{$e->trace}) {
+                    % if (my $line = $frame->[3]) {
+                        <div class="file"><%= $frame->[1] %></div>
+                        <div class="code preview">
+                            %= "$frame->[2]."
+                            <code class="prettyprint"><%= $line %></code>
+                        </div>
+                    % }
                 % }
+                </div>
+                <div class="tap">tap for more</div>
+                %= javascript begin
+                    $('#trace').click(function() {
+                        $('#frames').slideToggle('slow');
+                    });
+                    $('#frames').toggle();
+                % end
             % }
-            </div>
         </div>
         <div class="box infobox" id="request">
             <div class="title">Request</div>
@@ -977,7 +992,6 @@ __DATA__
             </table>
         </div>
         <div class="box infobox" id="more">
-            <div class="title">More</div>
             <div id="infos">
                 <table width="100%">
                 % for (my $i = 0; $i < @$info; $i += 2) {
@@ -985,15 +999,14 @@ __DATA__
                 % }
                 </table>
             </div>
+            <div class="tap">tap for more</div>
         </div>
         <div id="footer">
-            <img src="/mojolicious-black.png" alt="Mojolicious logo" />
+            %= link_to 'http://mojolicio.us' => begin
+                <img src="/mojolicious-black.png" alt="Mojolicious logo" />
+            % end
         </div>
         %= javascript begin
-            $('#trace').click(function() {
-                $('#frames').slideToggle('slow');
-            });
-            $('#frames').toggle();
             $('#more').click(function() {
                 $('#infos').slideToggle('slow');
             });

@@ -888,12 +888,12 @@ __DATA__
     % if ($self->app->mode eq 'development') {
         % my $cv = begin
             % my ($key, $value, $i) = @_;
-            <tr<%== ' class="important"' if $i %>>
+            %= tag 'tr', $i ? (class => 'important') : undef, begin
                 <td class="key"><%= $key %>.</td>
                 <td class="value" width="100%">
                     <code class="prettyprint"><%= $value %></code>
                 </td>
-            </tr>
+            % end
         % end
         % my $kv = begin
             % my ($key, $value) = @_;

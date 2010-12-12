@@ -388,8 +388,8 @@ sub render_exception {
         Mojolicious => "$Mojolicious::VERSION ($Mojolicious::CODENAME)",
         Include     => $self->dumper(\@INC),
         PID         => $$,
-        Executable  => $^X,
         Name        => $0,
+        Executable  => $^X,
         Time        => scalar localtime(time)
     );
 
@@ -811,6 +811,21 @@ __DATA__
                 margin-right: 3em;
                 text-shadow: #ddd 0 1px 0;
             }
+            footer {
+                margin-top: 1em;
+                text-align: center;
+                width: 100%;
+            }
+            h1 {
+                font: 1.5em Georgia, Times, serif;
+                text-shadow: #333 0 1px 0;
+                margin: 0;
+            }
+            h2 {
+                color: #000;
+                font: 1.5em Georgia, Times, serif;
+                margin: 0;
+            }
             pre {
                 margin: 0;
                 white-space: pre-wrap;
@@ -819,13 +834,9 @@ __DATA__
                 border-collapse: collapse;
                 margin-top: 1em;
                 margin-bottom: 1em;
-            }
-            td { padding: 0.3em; }
-            #footer {
-                margin-top: 1em;
-                text-align: center;
                 width: 100%;
             }
+            td { padding: 0.3em; }
             .box {
                 background-color: #fff;
                 -moz-box-shadow: 0px 0px 2px #ccc;
@@ -834,28 +845,34 @@ __DATA__
                 overflow: hidden;
                 padding: 1em;
             }
+            .code {
+                background-color: #1a1a1a;
+                color: #eee;
+                text-shadow: #333 0 1px 0;
+            }
+            .file {
+                margin-top: 1em;
+                margin-bottom: 0.5em;
+            }
             .important { background-color: #2f3032; }
+            .infobox tr:nth-child(odd) .value { background-color: #ddeeff; }
+            .infobox tr:nth-child(even) .value { background-color: #eef9ff; }
             .key {
                 text-align: right;
                 text-weight: bold;
             }
-            .headline {
-                font: 1.5em Georgia, Times, serif;
-                text-shadow: #333 0 1px 0;
+            .preview {
+                background-color: #2f3032;
+                padding: 0.5em;
+                margin-bottom: 1em;
             }
             .tap {
                 font: 0.5em Verdana, sans-serif;
                 text-align: center;
             }
-            .title {
-                color: #000;
-                font: 1.5em Georgia, Times, serif;
-            }
-            .value { padding-left: 1em; }
-            .code {
-                background-color: #1a1a1a;
-                color: #eee;
-                text-shadow: #333 0 1px 0;
+            .value {
+                padding-left: 1em;
+                width: 100%;
             }
             #showcase {
                 -moz-border-radius-topright: 5px;
@@ -877,17 +894,6 @@ __DATA__
                 border-top-left-radius: 5px;
                 margin-top: 1em;
             }
-            .infobox tr:nth-child(odd) .value { background-color: #ddeeff; }
-            .infobox tr:nth-child(even) .value { background-color: #eef9ff; }
-            .file {
-                margin-top: 1em;
-                margin-bottom: 0.5em;
-            }
-            .preview {
-                background-color: #2f3032;
-                padding: 0.5em;
-                margin-bottom: 1em;
-            }
         </style>
     </head>
     <body onload="prettyPrint()">
@@ -896,7 +902,7 @@ __DATA__
             % my ($key, $value, $i) = @_;
             %= tag 'tr', $i ? (class => 'important') : undef, begin
                 <td class="key"><%= $key %>.</td>
-                <td class="value" width="100%">
+                <td class="value">
                     <code class="prettyprint"><%= $value %></code>
                 </td>
             % end
@@ -905,15 +911,15 @@ __DATA__
             % my ($key, $value) = @_;
             <tr>
                 <td class="key"><%= $key %>:</td>
-                <td class="value" width="100%">
+                <td class="value">
                     <pre><%= $value %></pre>
                 </td>
             </tr>
         % end
-        <div id="showcase" class="code box">
-            <div class="headline"><%= $e->message %></div>
-            <div id="context">
-                <table width="100%">
+        <section id="showcase" class="code box">
+            <h1><%= $e->message %></h1>
+            <section id="context">
+                <table>
                 % for my $line (@{$e->lines_before}) {
                     %== $cv->($line->[0], $line->[1])
                 % }
@@ -924,10 +930,10 @@ __DATA__
                     %== $cv->($line->[0], $line->[1])
                 % }
                 </table>
-            </div>
+            </section>
             % if (defined $e->line->[2]) {
-                <div id="insight">
-                    <table width="100%">
+                <section id="insight">
+                    <table>
                     % for my $line (@{$e->lines_before}) {
                         %== $cv->($line->[0], $line->[2])
                     % }
@@ -936,7 +942,7 @@ __DATA__
                         %== $cv->($line->[0], $line->[2])
                     % }
                     </table>
-                </div>
+                </section>
                 <div class="tap">tap for more</div>
                 %= javascript begin
                     var current = '#context';
@@ -954,8 +960,8 @@ __DATA__
                     $('#insight').toggle();
                 % end
             % }
-        </div>
-        <div class="box" id="trace">
+        </section>
+        <section class="box" id="trace">
             % if (@{$e->trace}) {
                 <div id="frames">
                 % for my $frame (@{$e->trace}) {
@@ -976,10 +982,10 @@ __DATA__
                     $('#frames').toggle();
                 % end
             % }
-        </div>
-        <div class="box infobox" id="request">
-            <div class="title">Request</div>
-            <table width="100%">
+        </section>
+        <section class="box infobox" id="request">
+            <h2>Request</h2>
+            <table>
             % for (my $i = 0; $i < @$request; $i += 2) {
                 % my $key = $request->[$i];
                 % my $value = $request->[$i + 1];
@@ -990,22 +996,22 @@ __DATA__
                 %== $kv->($name, $value)
             % }
             </table>
-        </div>
-        <div class="box infobox" id="more">
+        </section>
+        <section class="box infobox" id="more">
             <div id="infos">
-                <table width="100%">
+                <table>
                 % for (my $i = 0; $i < @$info; $i += 2) {
                     %== $kv->($info->[$i], $info->[$i + 1])
                 % }
                 </table>
             </div>
             <div class="tap">tap for more</div>
-        </div>
-        <div id="footer">
+        </section>
+        <footer>
             %= link_to 'http://mojolicio.us' => begin
                 <img src="/mojolicious-black.png" alt="Mojolicious logo" />
             % end
-        </div>
+        </footer>
         %= javascript begin
             $('#more').click(function() {
                 $('#infos').slideToggle('slow');

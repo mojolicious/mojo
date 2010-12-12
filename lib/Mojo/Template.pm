@@ -142,18 +142,14 @@ sub compile {
     my $self = shift;
 
     # Shortcut
-    my $code = $self->code;
-    return unless $code;
-
-    # Stacktrace
-    local $SIG{__DIE__} =
-      sub { Mojo::Exception->throw(shift, $self->template, $self->code) };
+    return unless my $code = $self->code;
 
     # Compile
     my $compiled = eval $code;
 
-    # Exception
-    return Mojo::Exception->new($@, $self->template)->verbose(1) if $@;
+    # Use local stacktrace for compile exceptions
+    return Mojo::Exception->new($@, $self->template, $code)->trace->verbose(1)
+      if $@;
 
     $self->compiled($compiled);
     return;

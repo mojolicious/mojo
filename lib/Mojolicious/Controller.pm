@@ -962,9 +962,9 @@ __DATA__
             % }
         </section>
         <section class="box" id="trace">
-            % if (@{$e->trace}) {
+            % if (@{$e->frames}) {
                 <div id="frames">
-                % for my $frame (@{$e->trace}) {
+                % for my $frame (@{$e->frames}) {
                     % if (my $line = $frame->[3]) {
                         <div class="file"><%= $frame->[1] %></div>
                         <div class="code preview">

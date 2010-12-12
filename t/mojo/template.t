@@ -23,7 +23,7 @@ package main;
 use strict;
 use warnings;
 
-use Test::More tests => 133;
+use Test::More tests => 134;
 
 use File::Spec;
 use File::Temp;
@@ -548,6 +548,7 @@ is $output->lines_before->[3]->[1], '%= 1 + 1', 'right line';
 is $output->line->[0], 5,      'right number';
 is $output->line->[1], 'test', 'right line';
 like "$output", qr/^Missing right curly or square bracket/, 'right result';
+like $output->frames->[0]->[1], qr/Template\.pm$/, 'right file';
 
 # Exception in module
 $mt     = Mojo::Template->new;

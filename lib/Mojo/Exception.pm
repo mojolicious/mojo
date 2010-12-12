@@ -10,7 +10,7 @@ use overload '""' => sub { shift->to_string }, fallback => 1;
 use IO::File;
 use Scalar::Util 'blessed';
 
-__PACKAGE__->attr([qw/line lines_before lines_after trace/] => sub { [] });
+__PACKAGE__->attr([qw/frames line lines_before lines_after/] => sub { [] });
 __PACKAGE__->attr([qw/message raw_message/] => 'Exception!');
 __PACKAGE__->attr(verbose => sub { $ENV{MOJO_EXCEPTION_VERBOSE} || 0 });
 
@@ -29,29 +29,42 @@ sub new {
 sub throw {
     my $self = shift;
 
+    # Exception
+    my $e = Mojo::Exception->new;
+
     # Trace
-    my @trace;
-    my $i = 1;
-    while (my ($p, $f, $l) = caller($i++)) {
+    $e->trace(2);
+
+    # Detect
+    $e->_detect(@_);
+
+    # Throw
+    die $e;
+}
+
+sub trace {
+    my ($e, $start) = @_;
+
+    # Start
+    $start = 1 unless defined $start;
+
+    # Trace
+    my @frames;
+    while (my ($p, $f, $l) = caller($start++)) {
 
         # Append
-        push @trace, [$p, $f, $l];
+        push @frames, [$p, $f, $l];
 
         # Line
         if (-r $f) {
             next unless my $handle = IO::File->new("< $f");
             my @lines = <$handle>;
-            push @{$trace[-1]}, $lines[$l - 1];
+            push @{$frames[-1]}, $lines[$l - 1];
         }
     }
+    $e->frames(\@frames);
 
-    # Exception
-    my $e = Mojo::Exception->new;
-    $e->trace(\@trace);
-    $e->_detect(@_);
-
-    # Throw
-    die $e;
+    return $e;
 }
 
 sub _detect {
@@ -70,7 +83,7 @@ sub _detect {
     }
 
     # Stacktrace
-    if (my $first = $self->trace->[0]) {
+    if (my $first = $self->frames->[0]) {
         unshift @trace, {file => $first->[1], line => $first->[2]}
           if $first->[1];
     }
@@ -122,7 +135,7 @@ sub _detect {
 
     # Stacktrace
     unless ($line) {
-        for my $frame (@{$self->trace}) {
+        for my $frame (@{$self->frames}) {
             if ($frame->[1] =~ /^\(eval\ \d+\)$/) {
                 $line = $frame->[2];
                 last;
@@ -205,7 +218,7 @@ sub _parse_context {
         if (defined($lines->[0]->[$next])) {
             push @{$self->lines_after}, [$next + 1];
             for my $l (@$lines) {
-                my $code = $l->[$next];
+                next unless defined(my $code = $l->[$next]);
                 chomp $code;
                 push @{$self->lines_after->[-1]}, $code;
             }
@@ -234,6 +247,13 @@ L<Mojo::Exception> is a container for exceptions with context information.
 =head1 ATTRIBUTES
 
 L<Mojo::Exception> implements the following attributes.
+
+=head2 C<frames>
+
+    my $frames = $e->frames;
+    $e         = $e->frames($frames);
+
+Stacktrace.
 
 =head2 C<line>
 
@@ -270,13 +290,6 @@ Exception message.
 
 Raw unprocessed exception message.
 
-=head2 C<trace>
-
-    my $trace = $e->trace;
-    $e        = $e->trace($trace);
-
-Stacktrace.
-
 =head2 C<verbose>
 
     my $verbose = $e->verbose;
@@ -302,6 +315,12 @@ Construct a new L<Mojo::Exception> object.
     Mojo::Exception->throw('Oops!', $file);
 
 Throw exception with stacktrace.
+
+=head2 C<trace>
+
+    $e = $e->trace;
+
+Perform stacktrace.
 
 =head2 C<to_string>
 

@@ -911,7 +911,9 @@ __DATA__
                 % for my $line (@{$e->lines_before}) {
                     %== $cv->($line->[0], $line->[1])
                 % }
-                %== $cv->($e->line->[0], $e->line->[1], 1)
+                % if (defined $e->line->[1]) {
+                    %== $cv->($e->line->[0], $e->line->[1], 1)
+                % }
                 % for my $line (@{$e->lines_after}) {
                     %== $cv->($line->[0], $line->[1])
                 % }

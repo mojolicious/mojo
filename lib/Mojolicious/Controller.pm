@@ -812,7 +812,7 @@ __DATA__
                 text-shadow: #ddd 0 1px 0;
             }
             footer {
-                margin-top: 1em;
+                margin-top: 1.5em;
                 text-align: center;
                 width: 100%;
             }

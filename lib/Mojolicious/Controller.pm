@@ -821,11 +821,6 @@ __DATA__
                 text-shadow: #333 0 1px 0;
                 margin: 0;
             }
-            h2 {
-                color: #000;
-                font: 1.5em Georgia, Times, serif;
-                margin: 0;
-            }
             pre {
                 margin: 0;
                 white-space: pre-wrap;
@@ -984,7 +979,6 @@ __DATA__
             % }
         </section>
         <section class="box infobox" id="request">
-            <h2>Request</h2>
             <table>
             % for (my $i = 0; $i < @$request; $i += 2) {
                 % my $key = $request->[$i];

@@ -796,6 +796,8 @@ __DATA__
 <!doctype html><html>
     <head>
         <title>Mojolicious Exception</title>
+        <meta http-equiv="Pragma" content="no-cache" />
+        <meta http-equiv="Expires" content="-1" />
         %= base_tag
         %= javascript 'js/jquery.js'
         %= stylesheet 'css/prettify.css'

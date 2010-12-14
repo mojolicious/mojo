@@ -27,7 +27,7 @@ use constant PUNYCODE_INITIAL_N    => 128;
 # Punycode delimiter
 my $DELIMITER = chr 0x2D;
 
-# XHTML 1.0 entities for html_unescape (without "apos")
+# HTML5 entities for html_unescape (without "apos")
 my %ENTITIES = (
     Aacute   => 193,
     aacute   => 225,

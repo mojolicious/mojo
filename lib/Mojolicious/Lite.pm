@@ -534,21 +534,21 @@ request), this is very useful in combination with C<redirect_to>.
     % layout 'default';
     <%= form_for login => begin %>
         <% if (param 'name') { %>
-            <b>Wrong name or password, please try again.</b><br />
+            <b>Wrong name or password, please try again.</b><br>
         <% } %>
-        Name:<br />
-        <%= text_field 'name' %><br />
-        Password:<br />
-        <%= password_field 'pass' %><br />
+        Name:<br>
+        <%= text_field 'name' %><br>
+        Password:<br>
+        <%= password_field 'pass' %><br>
         <%= submit_button 'Login' %>
     <% end %>
 
     @@ index.html.ep
     % layout 'default';
     <% if (my $message = flash 'message' ) { %>
-        <b><%= $message %></b><br />
+        <b><%= $message %></b><br>
     <% } %>
-    Welcome <%= session 'name' %>!<br />
+    Welcome <%= session 'name' %>!<br>
     <%= link_to logout => begin %>
         Logout
     <% end %>

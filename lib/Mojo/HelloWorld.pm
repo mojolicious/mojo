@@ -117,11 +117,11 @@ sub _diag {
     <head><title>Mojo Diagnostics</title></head>
     <body>
         <a href="/diag/cookies">Cookies</a>
-        <a href="/diag/chunked_params">Chunked Request Parameters</a><br />
-        <a href="/diag/dump_env">Dump Environment Variables</a><br />
-        <a href="/diag/dump_params">Dump Request Parameters</a><br />
-        <a href="/diag/proxy">Proxy</a><br />
-        <a href="/diag/upload">Upload</a><br />
+        <a href="/diag/chunked_params">Chunked Request Parameters</a><br>
+        <a href="/diag/dump_env">Dump Environment Variables</a><br>
+        <a href="/diag/dump_params">Dump Request Parameters</a><br>
+        <a href="/diag/proxy">Proxy</a><br>
+        <a href="/diag/upload">Upload</a><br>
         <a href="/diag/websocket">WebSocket</a>
     </body>
 </html>
@@ -207,14 +207,14 @@ sub _proxy {
     <body>
         Sync:
         <form action="$url" method="GET">
-            <input type="text" name="url" value="http://"/>
-            <input type="submit" value="Fetch" />
+            <input type="text" name="url" value="http://">
+            <input type="submit" value="Fetch">
         </form>
-        <br />
+        <br>
         Async:
         <form action="$url" method="GET">
-            <input type="text" name="async_url" value="http://"/>
-            <input type="submit" value="Fetch" />
+            <input type="text" name="async_url" value="http://">
+            <input type="submit" value="Fetch">
         </form>
     </body>
 </html>
@@ -253,8 +253,8 @@ sub _upload {
     <body>
         File:
         <form action="$url" method="POST" enctype="multipart/form-data">
-            <input type="file" name="file" />
-            <input type="submit" value="Upload" />
+            <input type="file" name="file">
+            <input type="submit" value="Upload">
         </form>
     </body>
 </html>

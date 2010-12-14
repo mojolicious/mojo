@@ -458,7 +458,7 @@ stylesheets.
 
     $self->write_chunk('<html><head><title>Example</title>');
     $self->write_chunk('<link href="example.css" rel="stylesheet"');
-    $self->write_chunk(' type="text/css" /></head>', sub {
+    $self->write_chunk(' type="text/css"></head>', sub {
         my $self = shift;
         $self->write_chunk('<body>Example</body></html>');
         $self->write_chunk('');
@@ -472,8 +472,8 @@ An empty chunk marks the end of the stream.
     <html><head><title>Example</title>
     29
     <link href="example.css" rel="stylesheet"
-    19
-     type="text/css" /></head>
+    17
+     type="text/css"></head>
     1C
     <body>Example</body></html>
     0

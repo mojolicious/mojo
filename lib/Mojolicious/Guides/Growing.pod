@@ -439,21 +439,21 @@ like this.
     % layout 'default';
     <%= form_for index => begin %>
         <% if (param 'user') { %>
-            <b>Wrong name or password, please try again.</b><br />
+            <b>Wrong name or password, please try again.</b><br>
         <% } %>
-        Name:<br />
-        <%= text_field 'user' %><br />
-        Password:<br />
-        <%= password_field 'pass' %><br />
+        Name:<br>
+        <%= text_field 'user' %><br>
+        Password:<br>
+        <%= password_field 'pass' %><br>
         <%= submit_button 'Login' %>
     <% end %>
 
     @@ protected.html.ep
     % layout 'default';
     <% if (my $message = flash 'message') { %>
-        <b><%= $message %></b><br />
+        <b><%= $message %></b><br>
     <% } %>
-    Welcome <%= session 'user' %>!<br />
+    Welcome <%= session 'user' %>!<br>
     <%= link_to Logout => 'logout' %>
 
 More information about template helpers can be found in

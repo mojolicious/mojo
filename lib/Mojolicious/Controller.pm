@@ -796,8 +796,8 @@ __DATA__
 <!doctype html><html>
     <head>
         <title>Mojolicious Exception</title>
-        <meta http-equiv="Pragma" content="no-cache" />
-        <meta http-equiv="Expires" content="-1" />
+        <meta http-equiv="Pragma" content="no-cache">
+        <meta http-equiv="Expires" content="-1">
         %= base_tag
         %= javascript 'js/jquery.js'
         %= stylesheet 'css/prettify.css'
@@ -1005,7 +1005,7 @@ __DATA__
         </section>
         <footer>
             %= link_to 'http://mojolicio.us' => begin
-                <img src="/mojolicious-black.png" alt="Mojolicious logo" />
+                <img src="/mojolicious-black.png" alt="Mojolicious logo">
             % end
         </footer>
         %= javascript begin

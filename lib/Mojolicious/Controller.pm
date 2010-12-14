@@ -797,10 +797,10 @@ __DATA__
     <head>
         <title>Mojolicious Exception</title>
         %= base_tag
-        %= javascript '/js/jquery.js'
-        %= stylesheet '/css/prettify.css'
-        %= stylesheet '/css/prettify-mojo.css'
-        %= javascript '/js/prettify.js'
+        %= javascript 'js/jquery.js'
+        %= stylesheet 'css/prettify.css'
+        %= stylesheet 'css/prettify-mojo.css'
+        %= javascript 'js/prettify.js'
         <style type="text/css">
             body {
                 background-color: #f5f6f8;

@@ -167,6 +167,7 @@ is $tx->res->body, 'works!', 'right content';
 
 # Taint connection
 $client->ioloop->write($last => 'broken!');
+sleep 1;
 
 # GET / (mock server tainted connection)
 $tx = $client->get("http://localhost:$port/mock");
@@ -184,6 +185,7 @@ is $tx->res->body, 'works!', 'right content';
 
 # Taint connection
 $client->ioloop->write($last => 'broken!');
+sleep 1;
 
 # GET / (mock server tainted connection)
 $tx = $client->get("http://localhost:$port/mock");

@@ -792,8 +792,8 @@ $ENV{MOJO_REVERSE_PROXY} = $backup;
 # GET /tags
 $t->get_ok('/tags/lala?a=b&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
   ->content_is(<<EOF);
-<foo>
-<foo bar="baz">
+<foo />
+<foo bar="baz" />
 <foo one="two" three="four">Hello</foo>
 <a href="/path">Path</a>
 <a href="http://example.com/" title="Foo">Foo</a>
@@ -801,31 +801,31 @@ $t->get_ok('/tags/lala?a=b&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
 <a href="/template">Home</a>
 <a href="/tags/23" title="Foo">Foo</a>
 <form action="/template" method="post">
-    <input name="foo">
+    <input name="foo" />
 </form>
 <form action="/tags/24" method="post">
-    <input name="foo">
-    <input name="foo" type="checkbox" value="1">
-    <input checked="checked" name="a" type="checkbox" value="2">
-    <input name="b" type="radio" value="1">
-    <input checked="checked" name="b" type="radio" value="0">
-    <input name="c" type="hidden" value="foo">
-    <input name="d" type="file">
+    <input name="foo" />
+    <input name="foo" type="checkbox" value="1" />
+    <input checked="checked" name="a" type="checkbox" value="2" />
+    <input name="b" type="radio" value="1" />
+    <input checked="checked" name="b" type="radio" value="0" />
+    <input name="c" type="hidden" value="foo" />
+    <input name="d" type="file" />
     <textarea cols="40" name="e" rows="50">
         default!
     </textarea>
     <textarea name="f"></textarea>
-    <input name="g" type="password">
-    <input id="foo" name="h" type="password">
-    <input type="submit" value="Ok!">
-    <input id="bar" type="submit" value="Ok too!">
+    <input name="g" type="password" />
+    <input id="foo" name="h" type="password" />
+    <input type="submit" value="Ok!" />
+    <input id="bar" type="submit" value="Ok too!" />
 </form>
 <form action="/">
-    <input name="foo">
+    <input name="foo" />
 </form>
-<input name="escaped" value="1&quot; &quot;2">
-<input name="a" value="b">
-<input name="a" value="b">
+<input name="escaped" value="1&quot; &quot;2" />
+<input name="a" value="b" />
+<input name="a" value="b" />
 <script src="script.js" type="text/javascript"></script>
 <script type="text/javascript">//<![CDATA[
 
@@ -837,7 +837,7 @@ $t->get_ok('/tags/lala?a=b&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
     var a = 'b';
 
 //]]></script>
-<link href="foo.css" media="screen" rel="stylesheet" type="text/css">
+<link href="foo.css" media="screen" rel="stylesheet" type="text/css" />
 <style type="text/css">/*<![CDATA[*/
 
     body {color: #000}
@@ -852,8 +852,8 @@ EOF
 
 # GET /tags (alternative)
 $t->get_ok('/tags/lala?c=b&d=3&e=4&f=5')->status_is(200)->content_is(<<EOF);
-<foo>
-<foo bar="baz">
+<foo />
+<foo bar="baz" />
 <foo one="two" three="four">Hello</foo>
 <a href="/path">Path</a>
 <a href="http://example.com/" title="Foo">Foo</a>
@@ -861,29 +861,29 @@ $t->get_ok('/tags/lala?c=b&d=3&e=4&f=5')->status_is(200)->content_is(<<EOF);
 <a href="/template">Home</a>
 <a href="/tags/23" title="Foo">Foo</a>
 <form action="/template" method="post">
-    <input name="foo">
+    <input name="foo" />
 </form>
 <form action="/tags/24" method="post">
-    <input name="foo">
-    <input name="foo" type="checkbox" value="1">
-    <input name="a" type="checkbox" value="2">
-    <input name="b" type="radio" value="1">
-    <input name="b" type="radio" value="0">
-    <input name="c" type="hidden" value="foo">
-    <input name="d" type="file">
+    <input name="foo" />
+    <input name="foo" type="checkbox" value="1" />
+    <input name="a" type="checkbox" value="2" />
+    <input name="b" type="radio" value="1" />
+    <input name="b" type="radio" value="0" />
+    <input name="c" type="hidden" value="foo" />
+    <input name="d" type="file" />
     <textarea cols="40" name="e" rows="50">4</textarea>
     <textarea name="f">5</textarea>
-    <input name="g" type="password">
-    <input id="foo" name="h" type="password">
-    <input type="submit" value="Ok!">
-    <input id="bar" type="submit" value="Ok too!">
+    <input name="g" type="password" />
+    <input id="foo" name="h" type="password" />
+    <input type="submit" value="Ok!" />
+    <input id="bar" type="submit" value="Ok too!" />
 </form>
 <form action="/">
-    <input name="foo">
+    <input name="foo" />
 </form>
-<input name="escaped">
-<input name="a">
-<input name="a" value="c">
+<input name="escaped" />
+<input name="a" />
+<input name="a" value="c" />
 <script src="script.js" type="text/javascript"></script>
 <script type="text/javascript">//<![CDATA[
 
@@ -895,7 +895,7 @@ $t->get_ok('/tags/lala?c=b&d=3&e=4&f=5')->status_is(200)->content_is(<<EOF);
     var a = 'b';
 
 //]]></script>
-<link href="foo.css" media="screen" rel="stylesheet" type="text/css">
+<link href="foo.css" media="screen" rel="stylesheet" type="text/css" />
 <style type="text/css">/*<![CDATA[*/
 
     body {color: #000}
@@ -926,7 +926,7 @@ $t->put_ok('/selection')->status_is(200)
       . '<option value="baz">baz</option>'
       . '</select>'
       . "\n    "
-      . '<input type="submit" value="Ok">' . "\n"
+      . '<input type="submit" value="Ok" />' . "\n"
       . '</form>'
       . "\n");
 
@@ -948,7 +948,7 @@ $t->put_ok('/selection?a=e&foo=bar')->status_is(200)
       . '<option value="baz">baz</option>'
       . '</select>'
       . "\n    "
-      . '<input type="submit" value="Ok">' . "\n"
+      . '<input type="submit" value="Ok" />' . "\n"
       . '</form>'
       . "\n");
 
@@ -970,7 +970,7 @@ $t->put_ok('/selection?foo=bar&a=e&foo=baz')->status_is(200)
       . '<option selected="selected" value="baz">baz</option>'
       . '</select>'
       . "\n    "
-      . '<input type="submit" value="Ok">' . "\n"
+      . '<input type="submit" value="Ok" />' . "\n"
       . '</form>'
       . "\n");
 

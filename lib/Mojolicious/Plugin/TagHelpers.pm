@@ -313,7 +313,7 @@ sub _tag {
     }
 
     # Empty element
-    else { $tag .= '>' }
+    else { $tag .= ' />' }
 
     # Prevent escaping
     return b($tag);
@@ -352,7 +352,7 @@ Note that this module is EXPERIMENTAL and might change without warning!
 
 Generate C<base> tag refering to the current base URL.
 
-    <base href="http://localhost/cgi-bin/myapp.pl">
+    <base href="http://localhost/cgi-bin/myapp.pl" />
 
 =item check_box
 
@@ -361,8 +361,8 @@ Generate C<base> tag refering to the current base URL.
 
 Generate checkbox input element.
 
-    <input name="employed" type="checkbox" value="1">
-    <input id="foo" name="employed" type="checkbox" value="1">
+    <input name="employed" type="checkbox" value="1" />
+    <input id="foo" name="employed" type="checkbox" value="1" />
 
 =item file_field
 
@@ -371,8 +371,8 @@ Generate checkbox input element.
 
 Generate file input element.
 
-    <input name="avatar" type="file">
-    <input id="foo" name="avatar" type="file">
+    <input name="avatar" type="file" />
+    <input id="foo" name="avatar" type="file" />
 
 =item form_for
 
@@ -396,20 +396,20 @@ Generate file input element.
 Generate form for route, path or URL.
 
     <form action="/path/to/login" method="post">
-        <input name="first_name">
-        <input value="Ok" type="submit">
+        <input name="first_name" />
+        <input value="Ok" type="submit" />
     </form>
     <form action="/path/to/login/bar" method="post">
-        <input name="first_name">
-        <input value="Ok" type="submit">
+        <input name="first_name" />
+        <input value="Ok" type="submit" />
     </form>
     <form action="/login" method="post">
-        <input name="first_name">
-        <input value="Ok" type="submit">
+        <input name="first_name" />
+        <input value="Ok" type="submit" />
     </form>
     <form action="http://kraih.com/login" method="post">
-        <input name="first_name">
-        <input value="Ok" type="submit">
+        <input name="first_name" />
+        <input value="Ok" type="submit" />
     </form>
 
 =item hidden_field
@@ -419,8 +419,8 @@ Generate form for route, path or URL.
 
 Generate hidden input element.
 
-    <input name="foo" type="hidden" value="bar">
-    <input id="bar" name="foo" type="hidden" value="bar">
+    <input name="foo" type="hidden" value="bar" />
+    <input id="bar" name="foo" type="hidden" value="bar" />
 
 =item input_tag
 
@@ -431,10 +431,10 @@ Generate hidden input element.
 
 Generate form input element.
 
-    <input name="first_name">
-    <input name="first_name" value="Default name">
-    <input name="employed" type="checkbox">
-    <input name="country" type="radio" value="germany">
+    <input name="first_name" />
+    <input name="first_name" value="Default name" />
+    <input name="employed" type="checkbox" />
+    <input name="country" type="radio" value="germany" />
 
 =item javascript
 
@@ -445,7 +445,7 @@ Generate form input element.
 
 Generate script tag for C<Javascript> asset.
 
-    <script src="script.js" type="text/javascript">
+    <script src="script.js" type="text/javascript" />
     <script type="text/javascript"><![CDATA[
         var a = 'b';
     ]]></script>
@@ -478,8 +478,8 @@ will be used as content.
 
 Generate password input element.
 
-    <input name="pass" type="password">
-    <input id="foo" name="pass" type="password">
+    <input name="pass" type="password" />
+    <input id="foo" name="pass" type="password" />
 
 =item radio_button
 
@@ -488,8 +488,8 @@ Generate password input element.
 
 Generate radio input element.
 
-    <input name="country" type="radio" value="germany">
-    <input id="foo" name="country" type="radio" value="germany">
+    <input name="country" type="radio" value="germany" />
+    <input id="foo" name="country" type="radio" value="germany" />
 
 =item select_field
 
@@ -528,7 +528,7 @@ Generate select, option and optgroup elements.
 
 Generate style or link tag for C<CSS> asset.
 
-    <link href="foo.css" media="screen" rel="stylesheet" type="text/css">
+    <link href="foo.css" media="screen" rel="stylesheet" type="text/css" />
     <style type="text/css"><![CDATA[
         body {color: #000}
     ]]></style>
@@ -540,8 +540,8 @@ Generate style or link tag for C<CSS> asset.
 
 Generate submit input element.
 
-    <input type="submit" value="Ok">
-    <input id="foo" type="submit" value="Ok!">
+    <input type="submit" value="Ok" />
+    <input id="foo" type="submit" value="Ok!" />
 
 =item tag
 
@@ -551,8 +551,8 @@ Generate submit input element.
 
 HTML5 tag generator.
 
-    <div>
-    <div id="foo">
+    <div />
+    <div id="foo" />
     <div>Content</div>
 
 =item text_field
@@ -562,8 +562,8 @@ HTML5 tag generator.
 
 Generate text input element.
 
-    <input name="first_name">
-    <input name="first_name" value="Default name">
+    <input name="first_name" />
+    <input name="first_name" value="Default name" />
 
 =item text_area
 

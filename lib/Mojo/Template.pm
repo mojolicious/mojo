@@ -13,7 +13,7 @@ use Mojo::Exception;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 262144;
 
-__PACKAGE__->attr([qw/auto_escape compiled namespace/]);
+__PACKAGE__->attr([qw/auto_escape compiled/]);
 __PACKAGE__->attr([qw/append code prepend/] => '');
 __PACKAGE__->attr(capture_end               => 'end');
 __PACKAGE__->attr(capture_start             => 'begin');
@@ -22,6 +22,7 @@ __PACKAGE__->attr(encoding                  => 'UTF-8');
 __PACKAGE__->attr(escape_mark               => '=');
 __PACKAGE__->attr(expression_mark           => '=');
 __PACKAGE__->attr(line_start                => '%');
+__PACKAGE__->attr(namespace                 => 'Mojo::Template::Context');
 __PACKAGE__->attr(tag_start                 => '<%');
 __PACKAGE__->attr(tag_end                   => '%>');
 __PACKAGE__->attr(template                  => '');
@@ -127,7 +128,7 @@ sub build {
     # Wrap
     my $prepend   = $self->prepend;
     my $append    = $self->append;
-    my $namespace = $self->namespace || ref $self;
+    my $namespace = $self->namespace;
     $lines[0] ||= '';
     $lines[0] =
       "package $namespace; $HELPERS sub { my \$_M = ''; $prepend; do {"
@@ -794,7 +795,7 @@ Character indicating the start of a code line, defaults to C<%>.
     my $namespace = $mt->namespace;
     $mt           = $mt->namespace('main');
 
-Namespace used to compile templates.
+Namespace used to compile templates, defaults to C<Mojo::Template::Context>.
 
 =head2 C<prepend>
 

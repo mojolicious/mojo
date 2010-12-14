@@ -28,9 +28,8 @@ sub register {
             my $cache = delete $options->{cache} || $path;
 
             # Check cache
-            my $ec    = $r->{_epl_cache} ||= {};
-            my $stack = $r->{_epl_stack} ||= [];
-            my $mt    = $ec->{$cache};
+            my $ec = $r->{_epl_cache} ||= {};
+            my $mt = $ec->{$cache};
 
             # Initialize
             $mt ||= Mojo::Template->new;
@@ -69,6 +68,7 @@ sub register {
                 }
 
                 # Cache
+                my $stack = $r->{_epl_stack} ||= [];
                 delete $ec->{shift @$stack}
                   while @$stack > ($ENV{MOJO_TEMPLATE_CACHE} || 100);
                 push @$stack, $cache;

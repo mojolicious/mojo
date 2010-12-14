@@ -34,6 +34,9 @@ __PACKAGE__->attr(quiet      => 0);
 __PACKAGE__->attr(renderer   => sub { Mojo::Template->new });
 __PACKAGE__->attr(usage      => "usage: $0\n");
 
+# Cache
+my $CACHE = {};
+
 sub chmod_file {
     my ($self, $path, $mod) = @_;
 
@@ -126,14 +129,21 @@ sub get_all_data {
     # Handle
     my $d = do { no strict 'refs'; \*{"$class\::DATA"} };
 
-    # Shortcut
-    return unless fileno $d;
+    # Refresh
+    if (fileno $d) {
 
-    # Reset
-    seek $d, 0, 0;
+        # Reset
+        seek $d, 0, 0;
 
-    # Slurp
-    my $content = join '', <$d>;
+        # Slurp
+        $CACHE->{$class} = join '', <$d>;
+
+        # Close
+        close $d or die "DAMN: $!\n";
+    }
+
+    # Content
+    return unless defined(my $content = $CACHE->{$class});
 
     # Ignore everything before __DATA__ (windows will seek to start of file)
     $content =~ s/^.*\n__DATA__\n/\n/s;

@@ -41,7 +41,6 @@ sub register {
             unless ($ec->{$cache}) {
 
                 # Initialize
-                $template->{namespace} ||= "Mojo::Template::$cache";
                 my $mt = $ec->{$cache} = Mojo::Template->new($template);
 
                 # Self
@@ -62,7 +61,7 @@ sub register {
                 }
 
                 # Be less relaxed for everything else
-                $prepend .= q/use strict; use warnings;/;
+                $prepend .= 'use strict;';
 
                 # Stash
                 for my $var (keys %{$c->stash}) {

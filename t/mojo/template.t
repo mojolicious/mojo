@@ -498,13 +498,13 @@ $output = $mt->render(<<'EOF');
 %= __PACKAGE__
 %= foo
 EOF
-is $output, "Mojo::Template\nworks!\n", 'right result';
+is $output, "Mojo::Template::Context\nworks!\n", 'right result';
 $output = $mt->render(<<'EOF');
 % BEGIN { MyTemplateExporter->import }
 %= __PACKAGE__
 %= foo
 EOF
-is $output, "Mojo::Template\nworks!\n", 'right result';
+is $output, "Mojo::Template::Context\nworks!\n", 'right result';
 
 # Unusable error message (stacktrace required)
 $mt     = Mojo::Template->new;

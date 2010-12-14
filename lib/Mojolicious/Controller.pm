@@ -386,6 +386,7 @@ sub render_exception {
     my @i = (
         Perl        => "$] ($^O)",
         Mojolicious => "$Mojolicious::VERSION ($Mojolicious::CODENAME)",
+        Home        => $self->app->home,
         Include     => $self->dumper(\@INC),
         PID         => $$,
         Name        => $0,

@@ -88,7 +88,7 @@ sub build {
                 $value = quotemeta($value);
                 $value .= '\n' if $newline;
 
-                $lines[-1] .= "\$_M .= \"" . $value . "\";";
+                $lines[-1] .= "\$_M .= \"" . $value . "\";" if length $value;
             }
 
             # Code or multiline expression

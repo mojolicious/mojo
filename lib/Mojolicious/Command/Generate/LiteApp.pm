@@ -33,23 +33,21 @@ __DATA__
 
 use Mojolicious::Lite;
 
-get '/' => 'index';
-
-get '/:groovy' => sub {
+get '/welcome' => sub {
     my $self = shift;
-    $self->render(text => $self->param('groovy'), layout => 'funky');
+    $self->render('index');
 };
 
 app->start;
 <%%= '__DATA__' %%>
 
 <%%= '@@ index.html.ep' %%>
-% layout 'funky';
-Yea baby!
+% layout 'default';
+Welcome to Mojolicious!
 
-<%%= '@@ layouts/funky.html.ep' %%>
+<%%= '@@ layouts/default.html.ep' %%>
 <!doctype html><html>
-    <head><title>Funky!</title></head>
+    <head><title>Welcome!</title></head>
     <body><%== content %></body>
 </html>
 __END__

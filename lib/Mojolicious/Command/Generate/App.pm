@@ -95,8 +95,8 @@ sub startup {
     # Routes
     my $r = $self->routes;
 
-    # Default route
-    $r->route('/:controller/:action/:id')->to('example#welcome', id => 1);
+    # Normal route to controller
+    $r->route('/welcome')->to('example#welcome', id => 1);
 }
 
 1;
@@ -124,7 +124,7 @@ sub welcome {
     <body>
         <h2>Welcome to the Mojolicious Web Framework!</h2>
         This is the static document "public/index.html",
-        <a href="/">click here</a> to get back to the start.
+        <a href="/welcome">click here</a> to get back to the start.
     </body>
 </html>
 @@ test

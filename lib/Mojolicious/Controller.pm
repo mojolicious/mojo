@@ -796,7 +796,7 @@ __DATA__
 % my $e = delete $self->stash->{'exception'};
 <!doctype html><html>
     <head>
-        <title>Mojolicious Exception</title>
+        <title>Exception</title>
         <meta http-equiv="Pragma" content="no-cache">
         <meta http-equiv="Expires" content="-1">
         %= base_tag
@@ -1006,7 +1006,7 @@ __DATA__
         </section>
         <footer>
             %= link_to 'http://mojolicio.us' => begin
-                <img src="/mojolicious-black.png" alt="Mojolicious logo">
+                <img src="mojolicious-black.png" alt="Mojolicious logo">
             % end
         </footer>
         %= javascript begin
@@ -1025,14 +1025,108 @@ __DATA__
 <!doctype html><html>
     <head>
         <title>Not Found</title>
+        %= stylesheet 'css/prettify.css'
+        %= stylesheet 'css/prettify-mojo.css'
+        %= javascript 'js/prettify.js'
         <style type="text/css">
             body {
-                font: 0.9em Verdana, "Bitstream Vera Sans", sans-serif;
+                background-color: #f5f6f8;
+                color: #333;
+                font: 0.9em Verdana, sans-serif;
+                margin: 0;
+                text-align: center;
+                text-shadow: #ddd 0 1px 0;
+            }
+            footer {
+                background-color: #caecf6;
+                padding-top: 20em;
+                width: 100%;
+            }
+            footer a img { margin-top: 20em; }
+            h1 {
+                font: 1.5em Georgia, Times, serif;
+                text-shadow: #333 0 1px 0;
+                margin-bottom: 1em;
+                margin-top: 1em;
+            }
+            header {
+                margin-bottom: 20em;
+                margin-top: 20em;
+                width: 100%;
+            }
+            #documentation {
+                background-color: #ecf1da;
+                padding-bottom: 20em;
+                padding-top: 20em;
+            }
+            #documentation h1 { margin-bottom: 3em; }
+            #documentation a {
+                background-color: #eee;
+                border: 2px dashed #1a1a1a;
+                color: #000;
+                padding: 0.5em;
+                text-decoration: none;
+            }
+            #preview {
+                -moz-border-radius: 5px;
+                border-radius: 5px;
+                background-color: #1a1a1a;
+                font-size: 1.5em;
+                margin: 0;
+                text-align: left;
+                width: 500px;
+                margin-left: auto;
+                margin-right: auto;
+                padding: 1em;
+            }
+            #suggestion {
+                background-color: #2f3032;
+                color: #eee;
+                padding-bottom: 20em;
+                padding-top: 20em;
+                text-shadow: #333 0 1px 0;
             }
         </style>
     </head>
-    <body>
+    <body onload="prettyPrint()">
+    % if ($self->app->mode eq 'development') {
+        <header>
+            <img src="mojolicious-box.png" alt="Mojolicious banner">
+            <h1>This page is brand new and has not been unboxed yet!</h1>
+        </header>
+        <section id="suggestion">
+            <img src="mojolicious-arrow.png" alt="Arrow">
+            <h1>Perhaps you would like to add a route for it?</h1>
+            <div id="preview">
+                <pre>
+                    <code class="prettyprint">
+get '<%= $self->req->url->path %>' => sub {
+    my $self = shift;
+    $self->render(text => 'Hello world!');
+};
+                    </code>
+                </pre>
+            </div>
+        </section>
+        <section id="documentation">
+            <h1>
+                You might also enjoy our excellent documentation in
+                <%= link_to 'perldoc Mojolicious::Guides',
+                  'http://search.cpan.org' .
+                  '/dist/Mojolicious/lib/Mojolicious/Guides.pod' %>
+            </h1>
+            <img src="amelia.png" alt="Amelia">
+        </section>
+        <footer>
+            <h1>And don't forget to have fun!</h1>
+            <p><img src="mojolicious-clouds.png" alt="Clouds"></p>
+            %= link_to 'http://mojolicio.us' => begin
+                <img src="mojolicious-black.png" alt="Mojolicious logo">
+            % end
+        </footer>
+    % } else {
         Page not found, want to go <%= link_to home => url_for->base %>?
+    % }
     </body>
 </html>
 

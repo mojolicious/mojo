@@ -64,9 +64,10 @@ sub register {
                 $prepend .= 'use strict;';
 
                 # Stash
+                $prepend .= 'my $_S = $self->stash;';
                 for my $var (keys %{$c->stash}) {
                     next unless $var =~ /^\w+$/;
-                    $prepend .= " my \$$var = \$self->stash->{'$var'};";
+                    $prepend .= " my \$$var = \$_S->{'$var'};";
                 }
 
                 # Prepend

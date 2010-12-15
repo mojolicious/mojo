@@ -373,11 +373,15 @@ sub listen {
     $c->{handle} = $socket;
     $self->{_reverse}->{$socket} = $id;
 
+    # Weaken
+    weaken $self;
+
     # TLS options
     $c->{tls} = {
         SSL_startHandshake => 0,
-        SSL_cert_file      => $args->{tls_cert} || $self->_prepare_cert,
-        SSL_key_file       => $args->{tls_key} || $self->_prepare_key
+        SSL_error_trap     => sub { $self->_error($id, $_[1]) },
+        SSL_cert_file => $args->{tls_cert} || $self->_prepare_cert,
+        SSL_key_file  => $args->{tls_key}  || $self->_prepare_key
       }
       if $args->{tls};
 

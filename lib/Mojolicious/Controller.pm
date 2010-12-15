@@ -1051,7 +1051,7 @@ __DATA__
             }
             header {
                 margin-bottom: 20em;
-                margin-top: 20em;
+                margin-top: 15em;
                 width: 100%;
             }
             #documentation {

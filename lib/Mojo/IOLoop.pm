@@ -373,15 +373,11 @@ sub listen {
     $c->{handle} = $socket;
     $self->{_reverse}->{$socket} = $id;
 
-    # Weaken
-    weaken $self;
-
     # TLS options
     $c->{tls} = {
         SSL_startHandshake => 0,
-        SSL_error_trap     => sub { $self->_error($id, $_[1]) },
-        SSL_cert_file => $args->{tls_cert} || $self->_prepare_cert,
-        SSL_key_file  => $args->{tls_key}  || $self->_prepare_key
+        SSL_cert_file      => $args->{tls_cert} || $self->_prepare_cert,
+        SSL_key_file       => $args->{tls_key} || $self->_prepare_key
       }
       if $args->{tls};
 
@@ -862,11 +858,15 @@ sub _accept {
     $self->{_cs}->{$id} = $c;
 
     # TLS handshake
-    my $tls = $l->{tls};
-    $socket = IO::Socket::SSL->start_SSL($socket, %$tls) if $tls;
-    $c->{tls_accept} = 1 if $tls;
-    $c->{handle}     = $socket;
-    $r->{$socket}    = $id;
+    if (my $tls = $l->{tls}) {
+        $tls->{SSL_error_trap} = sub { $self->_error($id, $_[1]) };
+        $socket = IO::Socket::SSL->start_SSL($socket, %$tls);
+        $c->{tls_accept} = 1;
+    }
+
+    # Socket
+    $c->{handle} = $socket;
+    $r->{$socket} = $id;
 
     # Non-blocking
     $socket->blocking(0);

@@ -742,9 +742,13 @@ sub start_tls {
     # Arguments
     my $args = ref $_[0] ? $_[0] : {@_};
 
+    # Weaken
+    weaken $self;
+
     # Options
     my %options = (
         SSL_startHandshake => 0,
+        SSL_error_trap     => sub { $self->_error($id, $_[1]) },
         Timeout            => $self->connect_timeout,
         %{$args->{tls_args} || {}}
     );
@@ -1514,9 +1518,6 @@ sub _tls_error {
 
     # Writing
     elsif ($error == TLS_WRITE) { $self->_writing($id) }
-
-    # Real error
-    else { $self->_error($id, $error) }
 }
 
 sub _write {

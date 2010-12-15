@@ -5,6 +5,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved Hypnotoad web server to restart workers regularly.
         - Improved documentation.
         - Improved query manipulation in Mojo::URL. (yko)
+        - Improved TLS exception handling.
         - Fixed multiple --reload related leaks and reduced overall memory
           usage.
         - Fixed exception handling for included templates.

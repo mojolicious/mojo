@@ -6,6 +6,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved documentation.
         - Improved query manipulation in Mojo::URL. (yko)
         - Improved TLS exception handling.
+        - Fixed support for multiline expressions in Mojo::Template.
         - Fixed multiple --reload related leaks and reduced overall memory
           usage.
         - Fixed exception handling for included templates.

@@ -57,6 +57,7 @@ sub build {
     # Compile
     my @lines;
     my $cpst;
+    my $multi = 0;
     for my $line (@{$self->tree}) {
 
         # New line
@@ -90,24 +91,32 @@ sub build {
                 $lines[-1] .= "\$_M .= \"" . $value . "\";";
             }
 
-            # Code
-            if ($type eq 'code') { $lines[-1] .= "$value" }
+            # Code or multiline expression
+            if ($type eq 'code' || $multi) { $lines[-1] .= "$value" }
 
             # Expression
             if ($type eq 'expr' || $type eq 'escp') {
 
-                # Escaped
-                my $a = $self->auto_escape;
-                if (($type eq 'escp' && !$a) || ($type eq 'expr' && $a)) {
-                    $lines[-1] .= "\$_M .= escape";
-                    $lines[-1] .= " +$value" if length $value;
+                # Start
+                unless ($multi) {
+
+                    # Escaped
+                    my $a = $self->auto_escape;
+                    if (($type eq 'escp' && !$a) || ($type eq 'expr' && $a)) {
+                        $lines[-1] .= "\$_M .= escape";
+                        $lines[-1] .= " +$value" if length $value;
+                    }
+
+                    # Raw
+                    else { $lines[-1] .= "\$_M .= $value" }
                 }
 
-                # Raw
-                else { $lines[-1] .= "\$_M .= $value" }
+                # Multiline
+                $multi = ($line->[$j + 2] || '') eq 'text'
+                  && ($line->[$j + 3] || '') eq '' ? 0 : 1;
 
                 # Append semicolon
-                $lines[-1] .= ';' unless $cpst;
+                $lines[-1] .= ';' if !$multi && !$cpst;
             }
 
             # Capture started
@@ -292,8 +301,7 @@ sub parse {
     /x;
 
     # Tokenize
-    my $state                = 'text';
-    my $multiline_expression = 0;
+    my $state = 'text';
     my @capture_token;
     my $trimming = 0;
     for my $line (split /\n/, $tmpl) {
@@ -313,20 +321,24 @@ sub parse {
             # Expression
             if ($2) {
                 unshift @token, 'text', $1;
-                push @token, $3 ? 'escp' : 'expr', $5, 'text', "\n";
+                push @token, $3 ? 'escp' : 'expr', $5;
+
+                # Hint at end
+                push @token, 'text', '';
+
+                # Line ending
+                push @token, 'text', "\n";
             }
 
             # Code
             else { push @token, 'code', $5 }
 
             push @{$self->tree}, \@token;
-            $multiline_expression = 0;
             next;
         }
 
         # Comment line, dummy token needed for line count
         if ($line =~ /^\s*$line_start$cmnt(.+)?$/) {
-            $multiline_expression = 0;
             next;
         }
 
@@ -380,9 +392,11 @@ sub parse {
                     }
                 }
 
+                # Hint at end
+                push @token, 'text', '';
+
                 # Back to business as usual
-                $state                = 'text';
-                $multiline_expression = 0;
+                $state = 'text';
             }
 
             # Code
@@ -418,11 +432,6 @@ sub parse {
 
                 # Comments are ignored
                 next if $state eq 'cmnt';
-
-                # Multiline expressions are a bit complicated,
-                # only the first line can be compiled as 'expr'
-                $state = 'code' if $multiline_expression;
-                $multiline_expression = 1 if $state eq 'expr';
 
                 # Store value
                 push @token, @capture_token, $state, $token;

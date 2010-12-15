@@ -23,7 +23,7 @@ package main;
 use strict;
 use warnings;
 
-use Test::More tests => 134;
+use Test::More tests => 137;
 
 use File::Spec;
 use File::Temp;
@@ -822,6 +822,35 @@ $output = $mt->render(<<'EOF');
 %>\
 EOF
 is $output, '2222', 'multiline expression';
+
+# Yet another multiline expression
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+<%= 'hello' .
+    ' world' %>\
+EOF
+is $output, 'hello world', 'multiline expression';
+
+# And another multiline expression
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+<%= 'hello' .
+
+    ' world' %>\
+EOF
+is $output, 'hello world', 'multiline expression';
+
+# And another multiline expression
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+<%= 'hello' .
+
+ ' wo' .
+
+    'rld'
+%>\
+EOF
+is $output, 'hello world', 'multiline expression';
 
 # Scoped scalar
 $mt     = Mojo::Template->new;

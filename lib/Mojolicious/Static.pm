@@ -42,8 +42,8 @@ sub dispatch {
     # Serve static file
     unless ($self->serve($c, join('/', @parts))) {
 
-        # Resume
-        $c->tx->resume;
+        # Finish
+        $c->rendered;
 
         return;
     }
@@ -95,7 +95,7 @@ sub serve {
 
         # Exists, but is forbidden
         else {
-            $c->app->log->debug('File forbidden.');
+            $c->app->log->debug(qq/File "$rel" forbidden./);
             $res->code(403) and return;
         }
     }
@@ -108,9 +108,6 @@ sub serve {
 
     # Found
     if ($asset) {
-
-        # Log
-        $c->app->log->debug(qq/Serving static file "$rel"./);
 
         # Request
         my $req = $c->req;
@@ -127,7 +124,6 @@ sub serve {
             # Not modified
             my $since = Mojo::Date->new($date)->epoch;
             if (defined $since && $since == $modified) {
-                $c->app->log->debug('File not modified.');
                 $res->code(304);
                 $rsh->remove('Content-Type');
                 $rsh->remove('Content-Length');
@@ -148,7 +144,6 @@ sub serve {
                 $res->code(206);
                 $rsh->content_length($end - $start + 1);
                 $rsh->content_range("bytes $start-$end/$size");
-                $c->app->log->debug("Range request: $start-$end/$size.");
             }
             else {
 

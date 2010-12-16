@@ -177,13 +177,6 @@ sub dispatch {
     # Hook
     $self->plugins->run_hook(before_dispatch => $c);
 
-    # New request
-    my $req    = $c->req;
-    my $method = $req->method;
-    my $path   = $req->url->path || '/';
-    my $ua     = $req->headers->user_agent || 'Anonymojo';
-    $self->log->debug(qq/$method $path ($ua)./);
-
     # Try to find a static file
     $self->static->dispatch($c);
 

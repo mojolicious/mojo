@@ -5,14 +5,22 @@ use warnings;
 
 use base 'Mojolicious::Plugin';
 
+use IO::File;
 use Mojo::ByteStream 'b';
+use Mojo::Command;
+use Mojo::DOM;
 
 # Core module since Perl 5.9.3, so it might not always be present
 BEGIN {
     die <<'EOF' unless eval { require Pod::Simple::HTML; 1 } }
-Module "Pod::Simple::HTML" not present in this version of Perl.
+Module "Pod::Simple" not present in this version of Perl.
 Please install it manually or upgrade Perl to at least version 5.10.
 EOF
+
+use Pod::Simple::Search;
+
+# Perldoc template
+our $PERLDOC = Mojo::Command->new->get_data('perldoc.html.ep', __PACKAGE__);
 
 # This is my first visit to the Galaxy of Terror and I'd like it to be a
 # pleasant one.
@@ -23,6 +31,7 @@ sub register {
     $conf ||= {};
     my $name       = $conf->{name}       || 'pod';
     my $preprocess = $conf->{preprocess} || 'ep';
+    my $prefix     = $conf->{prefix}     || 'perldoc';
 
     # Add "pod" handler
     $app->renderer->add_handler(
@@ -37,6 +46,60 @@ sub register {
 
     # Add "pod_to_html" helper
     $app->helper(pod_to_html => sub { shift; b($self->_pod_to_html(@_)) });
+
+    # Perldoc
+    $app->routes->any(
+        $prefix => sub {
+            my $self = shift;
+
+            # Module
+            my $module = $self->req->url->query->params->[0]
+              || 'Mojolicious::Lite';
+
+            # Path
+            my $path = Pod::Simple::Search->new->find($module);
+
+            # Redirect to CPAN
+            my $cpan = 'http://search.cpan.org/perldoc';
+            return $self->redirect_to(
+                "$cpan?" . $self->req->url->query->to_string)
+              unless $path && -r $path;
+
+            # POD
+            my $file = IO::File->new;
+            $file->open("< $path");
+            my $dom =
+              Mojo::DOM->new->parse($self->pod_to_html(join '', <$file>));
+            $dom->find('a[href]')->each(
+                sub {
+                    my $attrs = shift->attrs;
+                    if ($attrs->{href} =~ /^$cpan/) {
+                        my $url = $self->url_for("/$prefix");
+                        $attrs->{href} =~ s/^$cpan/$url/;
+                    }
+                }
+            );
+            $dom->find('pre')->each(
+                sub {
+                    my $attrs = shift->attrs;
+                    my $class = $attrs->{class};
+                    $attrs->{class} =
+                      defined $class ? "$class prettyprint" : 'prettyprint';
+                }
+            );
+
+            # Title
+            my $title = 'Perldoc';
+            $dom->find('h1 + p')->until(sub { $title = shift->text });
+
+            # Render
+            $self->render(
+                inline  => $PERLDOC,
+                perldoc => "$dom",
+                title   => $title
+            );
+        }
+    ) if $prefix;
 }
 
 sub _pod_to_html {
@@ -58,7 +121,7 @@ sub _pod_to_html {
     # Parse
     my $output;
     $parser->output_string(\$output);
-    eval { $parser->parse_string_document("=pod\n\n$pod") };
+    eval { $parser->parse_string_document($pod) };
     return $@ if $@;
 
     # Filter
@@ -69,6 +132,69 @@ sub _pod_to_html {
 }
 
 1;
+__DATA__
+
+@@ perldoc.html.ep
+<!doctype html><html>
+    <head>
+        <title><%= $title %></title>
+        %= stylesheet 'css/prettify-mojo.css'
+        %= javascript 'js/prettify.js'
+        <style type="text/css">
+            a { color: inherit; }
+            body {
+                background-color: #f5f6f8;
+                color: #333;
+                font: 0.9em Verdana, sans-serif;
+                margin-top: 0;
+                margin-left: 5em;
+                margin-right: 5em;
+                text-shadow: #ddd 0 1px 0;
+            }
+            footer {
+                text-align: center;
+                padding-top: 1em;
+            }
+            h1, h2, h3 {
+                font: 1.5em Georgia, Times, serif;
+                margin: 0;
+            }
+            pre {
+                -moz-border-radius: 5px;
+                border-radius: 5px;
+                background-color: #1a1a1a;
+                color: #eee;
+                font-family: 'Menlo', 'Monaco', Courier, monospace !important;
+                text-shadow: #333 0 1px 0;
+                text-align: left;
+                padding-bottom: 1.5em;
+                padding-top: 1.5em;
+            }
+            #perldoc {
+                -moz-border-radius-bottomleft: 5px;
+                border-bottom-left-radius: 5px;
+                -moz-border-radius-bottomright: 5px;
+                border-bottom-right-radius: 5px;
+                -moz-box-shadow: 0px 0px 2px #ccc;
+                -webkit-box-shadow: 0px 0px 2px #ccc;
+                box-shadow: 0px 0px 2px #ccc;
+                background-color: #fff;
+                padding: 3em;
+            }
+        </style>
+    </head>
+    <body onload="prettyPrint()">
+        <section id="perldoc">
+        %== $perldoc
+        </section>
+        <footer>
+            %= link_to 'http://mojolicio.us' => begin
+                <img src="mojolicious-black.png" alt="Mojolicious logo">
+            % end
+        </footer>
+    </body>
+</html>
+
 __END__
 
 =head1 NAME

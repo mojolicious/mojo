@@ -464,6 +464,13 @@ sub render_not_found {
     # Recursion
     return if $stash->{'mojo.not_found'};
 
+    # Check for POD plugin
+    my $guide =
+        $self->app->renderer->helpers->{pod_to_html}
+      ? $self->url_for('/perldoc?Mojolicious::Guides')
+      : 'http://search.cpan.org/dist/Mojolicious/lib/Mojolicious/Guides.pod';
+
+
     # Render not found template
     my $options = {
         template         => 'not_found',
@@ -471,6 +478,7 @@ sub render_not_found {
         status           => 404,
         layout           => undef,
         extends          => undef,
+        guide            => $guide,
         'mojo.not_found' => 1
     };
 
@@ -483,6 +491,7 @@ sub render_not_found {
             status           => 404,
             layout           => undef,
             extends          => undef,
+            guide            => $guide,
             'mojo.not_found' => 1
         );
     }
@@ -786,7 +795,6 @@ __DATA__
         <meta http-equiv="Expires" content="-1">
         %= base_tag
         %= javascript 'js/jquery.js'
-        %= stylesheet 'css/prettify.css'
         %= stylesheet 'css/prettify-mojo.css'
         %= javascript 'js/prettify.js'
         <style type="text/css">
@@ -794,7 +802,7 @@ __DATA__
                 background-color: #f5f6f8;
                 color: #333;
                 font: 0.9em Verdana, sans-serif;
-                margin-top: 0em;
+                margin-top: 0;
                 margin-left: 3em;
                 margin-right: 3em;
                 text-shadow: #ddd 0 1px 0;
@@ -831,6 +839,7 @@ __DATA__
             .code {
                 background-color: #1a1a1a;
                 color: #eee;
+                font-family: 'Menlo', 'Monaco', Courier, monospace !important;
                 text-shadow: #333 0 1px 0;
             }
             .file {
@@ -845,7 +854,9 @@ __DATA__
                 text-weight: bold;
             }
             .preview {
-                background-color: #2f3032;
+                -moz-border-radius: 5px;
+                border-radius: 5px;
+                background-color: #1a1a1a;
                 padding: 0.5em;
                 margin-bottom: 1em;
             }
@@ -1010,7 +1021,6 @@ __DATA__
 <!doctype html><html>
     <head>
         <title>Not Found</title>
-        %= stylesheet 'css/prettify.css'
         %= stylesheet 'css/prettify-mojo.css'
         %= javascript 'js/prettify.js'
         <style type="text/css">
@@ -1056,6 +1066,7 @@ __DATA__
                 -moz-border-radius: 5px;
                 border-radius: 5px;
                 background-color: #1a1a1a;
+                font-family: 'Menlo', 'Monaco', Courier, monospace !important;
                 font-size: 1.5em;
                 margin: 0;
                 text-align: left;
@@ -1096,9 +1107,7 @@ get '<%= $self->req->url->path %>' => sub {
         <section id="documentation">
             <h1>
                 You might also enjoy our excellent documentation in
-                <%= link_to 'perldoc Mojolicious::Guides',
-                  'http://search.cpan.org' .
-                  '/dist/Mojolicious/lib/Mojolicious/Guides.pod' %>
+                <%= link_to 'perldoc Mojolicious::Guides', $guide %>
             </h1>
             <img src="amelia.png" alt="Amelia">
         </section>

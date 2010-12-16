@@ -92,6 +92,9 @@ use base 'Mojolicious';
 sub startup {
     my $self = shift;
 
+    # Perldoc browser under "/perldoc" (this plugin requires Perl 5.10)
+    $self->plugin('pod_renderer');
+
     # Routes
     my $r = $self->routes;
 

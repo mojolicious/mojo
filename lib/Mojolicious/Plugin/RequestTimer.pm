@@ -14,8 +14,26 @@ sub register {
 
     # Start timer
     $app->hook(
-        before_dispatch => sub {
-            shift->stash('mojo.started' => [Time::HiRes::gettimeofday()]);
+        after_static_dispatch => sub {
+            my $self = shift;
+
+            # Stash
+            my $stash = $self->stash;
+
+            # Static file
+            $stash->{'mojo.static'} = 1 if $self->res->code;
+
+
+            # New request
+            my $req    = $self->req;
+            my $method = $req->method;
+            my $path   = $req->url->path || '/';
+            my $ua     = $req->headers->user_agent || 'Anonymojo';
+            $self->app->log->debug(qq/$method $path ($ua)./)
+              unless $stash->{'mojo.static'};
+
+            # Start
+            $self->stash('mojo.started' => [Time::HiRes::gettimeofday()]);
         }
     );
 
@@ -23,7 +41,12 @@ sub register {
     $app->hook(
         after_dispatch => sub {
             my $self = shift;
-            return unless my $started = $self->stash('mojo.started');
+
+            # Stash
+            my $stash = $self->stash;
+
+            # Time
+            return unless my $started = $stash->{'mojo.started'};
             my $elapsed = sprintf '%f',
               Time::HiRes::tv_interval($started,
                 [Time::HiRes::gettimeofday()]);
@@ -31,7 +54,8 @@ sub register {
             my $res     = $self->res;
             my $code    = $res->code || 200;
             my $message = $res->message || $res->default_message($code);
-            $self->app->log->debug("$code $message (${elapsed}s, $rps/s).");
+            $self->app->log->debug("$code $message (${elapsed}s, $rps/s).")
+              unless $stash->{'mojo.static'};
         }
     );
 }

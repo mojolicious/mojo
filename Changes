@@ -4,6 +4,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Code name "Snowflake", this is a major release.
         - Deprecated handler and helper attributes in Mojolicious::Renderer.
         - Added new exception and not_found templates.
+        - Added POD browser to Mojolicious::Plugin::PodRenderer.
+        - Disabled debug log messages for static files.
         - Improved Hypnotoad web server to restart workers regularly.
         - Improved documentation.
         - Improved query manipulation in Mojo::URL. (yko)

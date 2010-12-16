@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-0.999960 2010-12-01 00:00:00
+1.0_001 2010-12-16 00:00:00
+        - Code name "Snowflake", this is a major release.
         - Added new exception and not_found templates.
         - Improved Hypnotoad web server to restart workers regularly.
         - Improved documentation.

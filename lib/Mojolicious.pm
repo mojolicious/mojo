@@ -34,8 +34,8 @@ __PACKAGE__->attr(session => sub { Mojolicious::Session->new });
 __PACKAGE__->attr(static  => sub { Mojolicious::Static->new });
 __PACKAGE__->attr(types   => sub { Mojolicious::Types->new });
 
-our $CODENAME = 'Hot Beverage';
-our $VERSION  = '0.999960';
+our $CODENAME = 'Snowflake';
+our $VERSION  = '1.0_001';
 
 # These old doomsday devices are dangerously unstable.
 # I'll rest easier not knowing where they are.
@@ -790,6 +790,8 @@ startup.
 
 Every major release of L<Mojolicious> has a code name, these are the ones
 that have been used in the past.
+
+1.0, C<Snowflake> (u2744)
 
 0.999930, C<Hot Beverage> (u2615)
 

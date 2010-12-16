@@ -53,8 +53,8 @@ sub register {
                 $prepend .= q/no strict 'refs'; no warnings 'redefine';/;
 
                 # Helpers
-                $prepend .= 'my $_H = $self->app->renderer->helper;';
-                for my $name (sort keys %{$r->helper}) {
+                $prepend .= 'my $_H = $self->app->renderer->helpers;';
+                for my $name (sort keys %{$r->helpers}) {
                     next unless $name =~ /^\w+$/;
                     $prepend .= "sub $name; *$name = sub { ";
                     $prepend .= "return \$_H->{'$name'}->(\$self, \@_) };";

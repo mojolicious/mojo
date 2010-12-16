@@ -16,10 +16,14 @@ __PACKAGE__->attr(default_format => 'html');
 __PACKAGE__->attr([qw/default_handler default_template_class/]);
 __PACKAGE__->attr(detect_templates => 1);
 __PACKAGE__->attr(encoding         => 'UTF-8');
-__PACKAGE__->attr(handler          => sub { {} });
-__PACKAGE__->attr(helper           => sub { {} });
+__PACKAGE__->attr(handlers         => sub { {} });
+__PACKAGE__->attr(helpers          => sub { {} });
 __PACKAGE__->attr(layout_prefix    => 'layouts');
 __PACKAGE__->attr(root             => '/');
+
+# DEPRECATED in Hot Beverage!
+*handler = \&handlers;
+*helper  = \&helpers;
 
 # This is not how Xmas is supposed to be.
 # In my day Xmas was about bringing people together, not blowing them apart.
@@ -55,13 +59,13 @@ sub new {
 
 sub add_handler {
     my ($self, $name, $cb) = @_;
-    $self->handler->{$name} = $cb;
+    $self->handlers->{$name} = $cb;
     return $self;
 }
 
 sub add_helper {
     my ($self, $name, $cb) = @_;
-    $self->helper->{$name} = $cb;
+    $self->helpers->{$name} = $cb;
     return $self;
 }
 
@@ -135,7 +139,7 @@ sub render {
     if (defined $text) {
 
         # Render
-        $self->handler->{text}->($self, $c, \$output, {text => $text});
+        $self->handlers->{text}->($self, $c, \$output, {text => $text});
 
         # Extends
         $content->{content} = b("$output")
@@ -146,7 +150,7 @@ sub render {
     elsif (defined $data) {
 
         # Render
-        $self->handler->{data}->($self, $c, \$output, {data => $data});
+        $self->handlers->{data}->($self, $c, \$output, {data => $data});
 
         # Extends
         $content->{content} = b("$output")
@@ -157,7 +161,7 @@ sub render {
     elsif (defined $json) {
 
         # Render
-        $self->handler->{json}->($self, $c, \$output, {json => $json});
+        $self->handlers->{json}->($self, $c, \$output, {json => $json});
         $format = 'json';
 
         # Extends
@@ -313,7 +317,7 @@ sub _render_template {
       || $self->_detect_handler($options)
       || $self->default_handler;
     $options->{handler} = $handler;
-    my $renderer = $self->handler->{$handler};
+    my $renderer = $self->handlers->{$handler};
 
     # No handler
     unless ($renderer) {
@@ -402,17 +406,17 @@ and renderer automatically.
 
 Will encode the content if set, defaults to C<UTF-8>.
 
-=head2 C<handler>
+=head2 C<handlers>
 
-    my $handler = $renderer->handler;
-    $renderer   = $renderer->handler({epl => sub { ... }});
+    my $handlers = $renderer->handlers;
+    $renderer    = $renderer->handlers({epl => sub { ... }});
 
 Registered handlers.
 
-=head2 C<helper>
+=head2 C<helpers>
 
-    my $helper = $renderer->helper;
-    $renderer  = $renderer->helper({url_for => sub { ... }});
+    my $helpers = $renderer->helpers;
+    $renderer   = $renderer->helpers({url_for => sub { ... }});
 
 Registered helpers.
 

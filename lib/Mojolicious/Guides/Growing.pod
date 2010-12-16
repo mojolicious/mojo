@@ -239,8 +239,8 @@ all logic related to matching user names and passwords.
 
     1;
 
-The C<defaults> method from the L<Mojolicious> instance can be used to make
-our C<model> available to all actions through the C<stash>.
+A C<helper> function can be registered with the C<helper> method of
+L<Mojolicious> to make our C<model> available to all actions and templates.
 
     #!/usr/bin/env perl
     use Mojolicious::Lite;
@@ -248,7 +248,8 @@ our C<model> available to all actions through the C<stash>.
     use lib 'lib';
     use MyUsers;
 
-    app->defaults(users => MyUsers->new);
+    my $users = MyUsers->new;
+    app->helper(users => sub { $users });
 
     # /?user=sri&pass=secr3t
     any '/' => sub {
@@ -260,7 +261,7 @@ our C<model> available to all actions through the C<stash>.
 
         # Check password
         return $self->render(text => "Welcome $user!")
-          if $self->stash('users')->check($user, $pass);
+          if $self->users->check($user, $pass);
 
         # Failed
         $self->render(text => 'Wrong username or password!');
@@ -383,7 +384,8 @@ like this.
     # Make signed cookies secure
     app->secret('Mojolicious rocks!');
 
-    app->defaults(users => MyUsers->new);
+    my $users = MyUsers->new;
+    app->helper(users => sub { $users });
 
     # Main login action
     any '/' => sub {
@@ -394,8 +396,7 @@ like this.
         my $pass = $self->param('pass') || '';
 
         # Check password and render "index.html.ep" if neccessary
-        return $self->render
-          unless $self->stash('users')->check($user, $pass);
+        return $self->render unless $self->users->check($user, $pass);
 
         # Store user name in session
         $self->session(user => $user);
@@ -456,7 +457,7 @@ like this.
     Welcome <%= session 'user' %>!<br>
     <%= link_to Logout => 'logout' %>
 
-More information about template helpers can be found in
+More information about built in template helpers can be found in
 L<Mojolicious::Plugin::DefaultHelpers> and
 L<Mojolicious::Plugin::TagHelpers>.
 
@@ -503,7 +504,8 @@ actual action code needs to be changed.
         my $self = shift;
 
         $self->secret('Mojolicious rocks!');
-        $self->defaults(users => MyUsers->new);
+        my $users = MyUsers->new;
+        $self->helper(users => sub { $users });
 
         # Router
         my $r = $self->routes;
@@ -514,8 +516,7 @@ actual action code needs to be changed.
             my $user = $self->param('user') || '';
             my $pass = $self->param('pass') || '';
 
-            return $self->render
-              unless $self->stash('users')->check($user, $pass);
+            return $self->render unless $self->users->check($user, $pass);
 
             $self->session(user => $user);
             $self->flash(message => 'Thanks for logging in!');
@@ -580,8 +581,7 @@ Once again the actual action code does not change at all.
         my $user = $self->param('user') || '';
         my $pass = $self->param('pass') || '';
 
-        return $self->render
-          unless $self->stash('users')->check($user, $pass);
+        return $self->render unless $self->users->check($user, $pass);
 
         $self->session(user => $user);
         $self->flash(message => 'Thanks for logging in!');
@@ -622,7 +622,8 @@ information.
         my $self = shift;
 
         $self->secret('Mojolicious rocks!');
-        $self->defaults(users => MyUsers->new);
+        my $users = MyUsers->new;
+        $self->helper(users => sub { $users });
 
         my $r = $self->routes;
         $r->any('/')->to('login#index')->name('index');

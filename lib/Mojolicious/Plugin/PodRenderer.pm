@@ -54,7 +54,7 @@ sub register {
 
             # Module
             my $module = $self->req->url->query->params->[0]
-              || 'Mojolicious::Lite';
+              || 'Mojolicious::Guides';
 
             # Path
             my $path = Pod::Simple::Search->new->find($module);

@@ -25,10 +25,6 @@ __PACKAGE__->attr(
 __PACKAGE__->attr([qw/on_finish on_progress/]);
 __PACKAGE__->attr(version => '1.1');
 
-# DEPRECATED in Comet!
-*finish_cb   = \&on_finish;
-*progress_cb = \&on_progress;
-
 # I'll keep it short and sweet. Family. Religion. Friendship.
 # These are the three demons you must slay if you wish to succeed in
 # business.

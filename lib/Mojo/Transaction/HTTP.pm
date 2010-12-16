@@ -12,10 +12,6 @@ __PACKAGE__->attr([qw/on_handler on_upgrade/]);
 __PACKAGE__->attr(req => sub { Mojo::Message::Request->new });
 __PACKAGE__->attr(res => sub { Mojo::Message::Response->new });
 
-# DEPRECATED in Comet!
-*handler_cb = \&on_handler;
-*upgrade_cb = \&on_upgrade;
-
 # What's a wedding?  Webster's dictionary describes it as the act of removing
 # weeds from one's garden.
 sub client_read {

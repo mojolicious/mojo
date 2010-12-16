@@ -19,10 +19,6 @@ require Carp;
 __PACKAGE__->attr([qw/app match/]);
 __PACKAGE__->attr(tx => sub { Mojo::Transaction::HTTP->new });
 
-# DEPRECATED in Comet!
-*finished        = \&on_finish;
-*receive_message = \&on_message;
-
 # Exception template
 our $EXCEPTION =
   Mojo::Command->new->get_data('exception.html.ep', __PACKAGE__);
@@ -175,17 +171,6 @@ sub flash {
     $session->{new_flash} = {%$flash, %$values};
 
     return $self;
-}
-
-# DEPRECATED in Comet!
-sub helper {
-    my $self = shift;
-
-    # Name
-    return unless my $name = shift;
-
-    # Run
-    return $self->$name(@_);
 }
 
 # My parents may be evil, but at least they're stupid.

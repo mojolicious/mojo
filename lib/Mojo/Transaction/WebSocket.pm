@@ -17,9 +17,6 @@ __PACKAGE__->attr(
     }
 );
 
-# DEPRECATED in Comet!
-*receive_message = \&on_message;
-
 sub client_challenge {
     my $self = shift;
 

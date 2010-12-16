@@ -29,9 +29,6 @@ __PACKAGE__->attr(
     }
 );
 
-# DEPRECATED in Comet!
-*build_tx_cb = \&on_build_tx;
-
 # Oh, so they have internet on computers now!
 sub new {
     my $self = shift->SUPER::new(@_);

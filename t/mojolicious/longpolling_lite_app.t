@@ -215,7 +215,7 @@ $tx->res->body(
         $self->error('Interrupted!');
     }
 );
-$t->client->process($tx);
+$t->client->start($tx);
 is $tx->res->code,  200,            'right status';
 is $tx->res->error, 'Interrupted!', 'right error';
 is $buffer, 'hi ', 'right content';
@@ -265,7 +265,7 @@ $tx->res->body(
         $buffer .= $chunk;
     }
 );
-$t->client->process($tx);
+$t->client->start($tx);
 is $tx->res->code, 200, 'right status';
 is $tx->error, 'Interrupted, maybe a timeout?', 'right error';
 is $buffer, 'how', 'right content';

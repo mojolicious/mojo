@@ -34,12 +34,6 @@ __PACKAGE__->attr(max_connections    => 5);
 __PACKAGE__->attr(max_redirects     => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 });
 __PACKAGE__->attr(websocket_timeout => 300);
 
-# DEPRECATED in Comet!
-*finished                   = \&on_finish;
-*max_keep_alive_connections = \&max_connections;
-*process                    = \&start;
-*receive_message            = \&on_message;
-
 # Singleton
 our $CLIENT;
 

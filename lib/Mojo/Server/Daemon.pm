@@ -28,9 +28,6 @@ __PACKAGE__->attr(max_clients        => 1000);
 __PACKAGE__->attr(max_requests       => 25);
 __PACKAGE__->attr(websocket_timeout  => 300);
 
-# DEPRECATED in Comet!
-*max_keep_alive_requests = \&max_requests;
-
 sub DESTROY {
     my $self = shift;
 

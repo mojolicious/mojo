@@ -147,15 +147,6 @@ __PACKAGE__->attr(timeout => '0.025');
 # Singleton
 our $LOOP;
 
-# DEPRECATED in Comet!
-*error_cb  = \&on_error;
-*hup_cb    = \&on_hup;
-*idle_cb   = \&on_idle;
-*lock_cb   = \&on_lock;
-*read_cb   = \&on_read;
-*tick_cb   = \&on_tick;
-*unlock_cb = \&on_unlock;
-
 sub DESTROY {
     my $self = shift;
 
@@ -201,9 +192,7 @@ sub connect {
     # Connection
     my $c = {
         buffer     => '',
-        on_connect => $args->{on_connect}
-          || $args->{connect_cb}
-          || $args->{cb},
+        on_connect => $args->{on_connect},
         connecting => 1,
         tls        => $args->{tls}
     };
@@ -212,7 +201,7 @@ sub connect {
 
     # Register callbacks
     for my $name (qw/error hup read/) {
-        my $cb = $args->{"on_$name"} || $args->{"${name}_cb"};
+        my $cb    = $args->{"on_$name"};
         my $event = "on_$name";
         $self->$event($id => $cb) if $cb;
     }
@@ -314,10 +303,10 @@ sub listen {
     # Connection
     my $c = {
         file => $args->{file} ? 1 : 0,
-        on_accept => $args->{on_accept} || $args->{accept_cb} || $args->{cb},
-        on_error  => $args->{on_error}  || $args->{error_cb},
-        on_hup    => $args->{on_hup}    || $args->{hup_cb},
-        on_read   => $args->{on_read}   || $args->{read_cb},
+        on_accept => $args->{on_accept},
+        on_error  => $args->{on_error},
+        on_hup    => $args->{on_hup},
+        on_read   => $args->{on_read},
     };
     (my $id) = "$c" =~ /0x([\da-f]+)/;
     $self->{_listen}->{$id} = $c;

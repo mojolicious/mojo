@@ -210,8 +210,7 @@ sub parse {
     my $capture_start = quotemeta $self->capture_start;
     my $capture_end   = quotemeta $self->capture_end;
 
-    # DEPRECATED in Comet!
-    # Use "begin" and "end" instead of "{" and "}"
+    # Mixed
     my $mixed_re = qr/
         (
         $tag_start$expr$escp\s*$capture_end   # Escaped expression (end)
@@ -224,25 +223,17 @@ sub parse {
         |
         $tag_start$cmnt\s*$capture_end        # Comment (end)
         |
-        $tag_start$cmnt\}                     # DEPRECATED Comment (end)
-        |
         $tag_start$cmnt                       # Comment
         |
         $tag_start\s*$capture_end             # Code (end)
-        |
-        $tag_start\}                          # DEPRECATED Code (end)
         |
         $tag_start                            # Code
         |
         $capture_start\s*$trim$tag_end        # Trim end (start)
         |
-        \{$trim$tag_end                       # DEPRECATED Trim end (start)
-        |
         $trim$tag_end                         # Trim end
         |
         $capture_start\s*$tag_end             # End (start)
-        |
-        \{$tag_end                            # DEPRECATED End (start)
         |
         $tag_end                              # End
         )
@@ -259,31 +250,19 @@ sub parse {
         (?:
         $escp             # Escaped expression
         )?
-        (?:
         \s*$capture_end   # (end)
-        |
-        \}                # DEPRECATED (end)
-        )
     /x;
 
     # Tag end regex
     my $end_re = qr/
         ^(
-            (?:
-            $capture_start\s*$trim$tag_end   # Trim end (start)
-            |
-            \{$trim$tag_end                  # DEPRECATED Trim end (start)
-            )
+        $capture_start\s*$trim$tag_end   # Trim end (start)
         )|(
-            (?:
-            $capture_start\s*$tag_end        # End (start)
-            |
-            \{$tag_end                       # DEPRECATED End (start)
-            )
+        $capture_start\s*$tag_end        # End (start)
         )|(
-        $trim$tag_end                        # Trim end
+        $trim$tag_end                    # Trim end
         )|
-        $tag_end                             # End
+        $tag_end                         # End
         $
     /x;
 

@@ -145,19 +145,20 @@ HTTP request and response.
         $self->render(text => 'Hello World!');
     };
 
-The C<stash> can be used to pass data to templates.
+The C<stash> can be used to pass data to templates, which can be inlined in
+the C<DATA> section.
 
     # /bar
     get '/bar' => sub {
         my $self = shift;
-        $self->stash(number => 23);
-        $self->render('baz');
+        $self->stash(one => 23);
+        $self->render('baz', two => 24);
     };
 
     __DATA__
 
     @@ baz.html.ep
-    The magic number is <%= $number %>.
+    The magic numbers are <%= $one %> and <%= $two %>.
 
 All routes can have a name associated with them, this allows automatic
 template detection and back referencing with C<url_for>, C<link_to> and

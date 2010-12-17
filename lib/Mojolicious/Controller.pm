@@ -802,9 +802,9 @@ __DATA__
                 background-color: #f5f6f8;
                 color: #333;
                 font: 0.9em Verdana, sans-serif;
-                margin-top: 0;
                 margin-left: 3em;
                 margin-right: 3em;
+                margin-top: 0;
                 text-shadow: #ddd 0 1px 0;
             }
             footer {
@@ -814,8 +814,8 @@ __DATA__
             }
             h1 {
                 font: 1.5em Georgia, Times, serif;
-                text-shadow: #333 0 1px 0;
                 margin: 0;
+                text-shadow: #333 0 1px 0;
             }
             pre {
                 margin: 0;
@@ -843,8 +843,8 @@ __DATA__
                 text-shadow: #333 0 1px 0;
             }
             .file {
-                margin-top: 1em;
                 margin-bottom: 0.5em;
+                margin-top: 1em;
             }
             .important { background-color: #2f3032; }
             .infobox tr:nth-child(odd) .value { background-color: #ddeeff; }
@@ -854,11 +854,11 @@ __DATA__
                 text-weight: bold;
             }
             .preview {
+                background-color: #1a1a1a;
                 -moz-border-radius: 5px;
                 border-radius: 5px;
-                background-color: #1a1a1a;
-                padding: 0.5em;
                 margin-bottom: 1em;
+                padding: 0.5em;
             }
             .tap {
                 font: 0.5em Verdana, sans-serif;
@@ -869,23 +869,23 @@ __DATA__
                 width: 100%;
             }
             #showcase {
-                -moz-border-radius-topright: 5px;
-                border-top-right-radius: 5px;
+                margin-top: 1em;
                 -moz-border-radius-topleft: 5px;
                 border-top-left-radius: 5px;
-                margin-top: 1em;
+                -moz-border-radius-topright: 5px;
+                border-top-right-radius: 5px;
             }
             #more, #trace {
-                -moz-border-radius-bottomright: 5px;
-                border-bottom-right-radius: 5px;
                 -moz-border-radius-bottomleft: 5px;
                 border-bottom-left-radius: 5px;
+                -moz-border-radius-bottomright: 5px;
+                border-bottom-right-radius: 5px;
             }
             #request {
-                -moz-border-radius-topright: 5px;
-                border-top-right-radius: 5px;
                 -moz-border-radius-topleft: 5px;
                 border-top-left-radius: 5px;
+                -moz-border-radius-topright: 5px;
+                border-top-right-radius: 5px;
                 margin-top: 1em;
             }
         </style>
@@ -1040,9 +1040,9 @@ __DATA__
             footer a img { margin-top: 20em; }
             h1 {
                 font: 1.5em Georgia, Times, serif;
-                text-shadow: #333 0 1px 0;
                 margin-bottom: 1em;
                 margin-top: 1em;
+                text-shadow: #333 0 1px 0;
             }
             header {
                 margin-bottom: 20em;
@@ -1063,17 +1063,17 @@ __DATA__
                 text-decoration: none;
             }
             #preview {
+                background-color: #1a1a1a;
                 -moz-border-radius: 5px;
                 border-radius: 5px;
-                background-color: #1a1a1a;
                 font-family: 'Menlo', 'Monaco', Courier, monospace !important;
                 font-size: 1.5em;
                 margin: 0;
-                text-align: left;
-                width: 500px;
                 margin-left: auto;
                 margin-right: auto;
                 padding: 1em;
+                text-align: left;
+                width: 500px;
             }
             #suggestion {
                 background-color: #2f3032;

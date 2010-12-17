@@ -13,7 +13,7 @@ use Mojo::Command;
 use Mojo::Content::Single;
 use Mojo::Path;
 
-__PACKAGE__->attr([qw/default_static_class prefix root/]);
+__PACKAGE__->attr([qw/default_static_class root/]);
 
 # Valentine's Day's coming? Aw crap! I forgot to get a girlfriend again!
 sub dispatch {
@@ -24,11 +24,6 @@ sub dispatch {
 
     # Canonical path
     my $path = $c->req->url->path->clone->canonicalize->to_string;
-
-    # Prefix
-    if (my $prefix = $self->prefix) {
-        return 1 unless $path =~ s/^$prefix//;
-    }
 
     # Parts
     my @parts = @{Mojo::Path->new->parse($path)->parts};
@@ -3377,13 +3372,6 @@ L<Mojolicious::Static> implements the following attributes.
     $static   = $static->default_static_class('main');
 
 The dispatcher will use this class to look for files in the C<DATA> section.
-
-=head2 C<prefix>
-
-    my $prefix = $static->prefix;
-    $static    = $static->prefix('/static');
-
-Prefix path to remove from incoming paths before dispatching.
 
 =head2 C<root>
 

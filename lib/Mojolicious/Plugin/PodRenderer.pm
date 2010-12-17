@@ -146,31 +146,32 @@ __DATA__
                 background-color: #f5f6f8;
                 color: #333;
                 font: 0.9em Verdana, sans-serif;
-                margin-top: 0;
                 margin-left: 5em;
                 margin-right: 5em;
+                margin-top: 0;
                 text-shadow: #ddd 0 1px 0;
             }
             footer {
-                text-align: center;
                 padding-top: 1em;
+                text-align: center;
             }
             h1, h2, h3 {
                 font: 1.5em Georgia, Times, serif;
                 margin: 0;
             }
             pre {
+                background-color: #1a1a1a;
                 -moz-border-radius: 5px;
                 border-radius: 5px;
-                background-color: #1a1a1a;
                 color: #eee;
                 font-family: 'Menlo', 'Monaco', Courier, monospace !important;
-                text-shadow: #333 0 1px 0;
                 text-align: left;
+                text-shadow: #333 0 1px 0;
                 padding-bottom: 1.5em;
                 padding-top: 1.5em;
             }
             #perldoc {
+                background-color: #fff;
                 -moz-border-radius-bottomleft: 5px;
                 border-bottom-left-radius: 5px;
                 -moz-border-radius-bottomright: 5px;
@@ -178,15 +179,12 @@ __DATA__
                 -moz-box-shadow: 0px 0px 2px #ccc;
                 -webkit-box-shadow: 0px 0px 2px #ccc;
                 box-shadow: 0px 0px 2px #ccc;
-                background-color: #fff;
                 padding: 3em;
             }
         </style>
     </head>
     <body onload="prettyPrint()">
-        <section id="perldoc">
-        %== $perldoc
-        </section>
+        <section id="perldoc"><%== $perldoc %></section>
         <footer>
             %= link_to 'http://mojolicio.us' => begin
                 <img src="mojolicious-black.png" alt="Mojolicious logo">

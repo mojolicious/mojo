@@ -145,8 +145,8 @@ HTTP request and response.
         $self->render(text => 'Hello World!');
     };
 
-The C<stash> can be used to pass data to templates, which can be inlined in
-the C<DATA> section.
+The C<stash> is used to pass data to templates, which can be inlined in the
+C<DATA> section.
 
     # /bar
     get '/bar' => sub {

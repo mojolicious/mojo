@@ -1021,6 +1021,7 @@ __DATA__
 <!doctype html><html>
     <head>
         <title>Not Found</title>
+        %= base_tag
         %= stylesheet 'css/prettify-mojo.css'
         %= javascript 'js/prettify.js'
         <style type="text/css">

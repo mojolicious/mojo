@@ -138,6 +138,7 @@ __DATA__
 <!doctype html><html>
     <head>
         <title><%= $title %></title>
+        %= base_tag
         %= stylesheet 'css/prettify-mojo.css'
         %= javascript 'js/prettify.js'
         <style type="text/css">

@@ -143,6 +143,7 @@ __DATA__
         %= javascript 'js/prettify.js'
         <style type="text/css">
             a { color: inherit; }
+            a img { border: 0; }
             body {
                 background-color: #f5f6f8;
                 color: #333;
@@ -151,10 +152,6 @@ __DATA__
                 margin-right: 5em;
                 margin-top: 0;
                 text-shadow: #ddd 0 1px 0;
-            }
-            footer {
-                padding-top: 1em;
-                text-align: center;
             }
             h1, h2, h3 {
                 font: 1.5em Georgia, Times, serif;
@@ -171,6 +168,10 @@ __DATA__
                 padding-bottom: 1.5em;
                 padding-top: 1.5em;
             }
+            #footer {
+                padding-top: 1em;
+                text-align: center;
+            }
             #perldoc {
                 background-color: #fff;
                 -moz-border-radius-bottomleft: 5px;
@@ -185,12 +186,12 @@ __DATA__
         </style>
     </head>
     <body onload="prettyPrint()">
-        <section id="perldoc"><%== $perldoc %></section>
-        <footer>
+        <div id="perldoc"><%== $perldoc %></div>
+        <div id="footer">
             %= link_to 'http://mojolicio.us' => begin
                 <img src="mojolicious-black.png" alt="Mojolicious logo">
             % end
-        </footer>
+        </div>
     </body>
 </html>
 

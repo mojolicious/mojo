@@ -798,6 +798,7 @@ __DATA__
         %= stylesheet 'css/prettify-mojo.css'
         %= javascript 'js/prettify.js'
         <style type="text/css">
+            a img { border: 0; }
             body {
                 background-color: #f5f6f8;
                 color: #333;
@@ -806,11 +807,6 @@ __DATA__
                 margin-right: 3em;
                 margin-top: 0;
                 text-shadow: #ddd 0 1px 0;
-            }
-            footer {
-                margin-top: 1.5em;
-                text-align: center;
-                width: 100%;
             }
             h1 {
                 font: 1.5em Georgia, Times, serif;
@@ -868,6 +864,11 @@ __DATA__
                 padding-left: 1em;
                 width: 100%;
             }
+            #footer {
+                margin-top: 1.5em;
+                text-align: center;
+                width: 100%;
+            }
             #showcase {
                 margin-top: 1em;
                 -moz-border-radius-topleft: 5px;
@@ -910,9 +911,9 @@ __DATA__
                 </td>
             </tr>
         % end
-        <section id="showcase" class="code box">
+        <div id="showcase" class="code box">
             <h1><%= $e->message %></h1>
-            <section id="context">
+            <div id="context">
                 <table>
                 % for my $line (@{$e->lines_before}) {
                     %== $cv->($line->[0], $line->[1])
@@ -924,9 +925,9 @@ __DATA__
                     %== $cv->($line->[0], $line->[1])
                 % }
                 </table>
-            </section>
+            </div>
             % if (defined $e->line->[2]) {
-                <section id="insight">
+                <div id="insight">
                     <table>
                     % for my $line (@{$e->lines_before}) {
                         %== $cv->($line->[0], $line->[2])
@@ -936,7 +937,7 @@ __DATA__
                         %== $cv->($line->[0], $line->[2])
                     % }
                     </table>
-                </section>
+                </div>
                 <div class="tap">tap for more</div>
                 %= javascript begin
                     var current = '#context';
@@ -954,8 +955,8 @@ __DATA__
                     $('#insight').toggle();
                 % end
             % }
-        </section>
-        <section class="box" id="trace">
+        </div>
+        <div class="box" id="trace">
             % if (@{$e->frames}) {
                 <div id="frames">
                 % for my $frame (@{$e->frames}) {
@@ -976,8 +977,8 @@ __DATA__
                     $('#frames').toggle();
                 % end
             % }
-        </section>
-        <section class="box infobox" id="request">
+        </div>
+        <div class="box infobox" id="request">
             <table>
             % for (my $i = 0; $i < @$request; $i += 2) {
                 % my $key = $request->[$i];
@@ -989,8 +990,8 @@ __DATA__
                 %== $kv->($name, $value)
             % }
             </table>
-        </section>
-        <section class="box infobox" id="more">
+        </div>
+        <div class="box infobox" id="more">
             <div id="infos">
                 <table>
                 % for (my $i = 0; $i < @$info; $i += 2) {
@@ -999,12 +1000,12 @@ __DATA__
                 </table>
             </div>
             <div class="tap">tap for more</div>
-        </section>
-        <footer>
+        </div>
+        <div id="footer">
             %= link_to 'http://mojolicio.us' => begin
                 <img src="mojolicious-black.png" alt="Mojolicious logo">
             % end
-        </footer>
+        </div>
         %= javascript begin
             $('#more').click(function() {
                 $('#infos').slideToggle('slow');
@@ -1025,6 +1026,8 @@ __DATA__
         %= stylesheet 'css/prettify-mojo.css'
         %= javascript 'js/prettify.js'
         <style type="text/css">
+            a { text-decoration: none; }
+            a img { border: 0; }
             body {
                 background-color: #f5f6f8;
                 color: #333;
@@ -1033,23 +1036,18 @@ __DATA__
                 text-align: center;
                 text-shadow: #ddd 0 1px 0;
             }
-            footer {
-                background-color: #caecf6;
-                padding-top: 20em;
-                width: 100%;
-            }
-            footer a img { margin-top: 20em; }
             h1 {
                 font: 1.5em Georgia, Times, serif;
                 margin-bottom: 1em;
                 margin-top: 1em;
                 text-shadow: #333 0 1px 0;
             }
-            header {
-                margin-bottom: 20em;
-                margin-top: 15em;
+            #footer {
+                background-color: #caecf6;
+                padding-top: 20em;
                 width: 100%;
             }
+            #footer a img { margin-top: 20em; }
             #documentation {
                 background-color: #ecf1da;
                 padding-bottom: 20em;
@@ -1061,7 +1059,11 @@ __DATA__
                 border: 2px dashed #1a1a1a;
                 color: #000;
                 padding: 0.5em;
-                text-decoration: none;
+            }
+            #header {
+                margin-bottom: 20em;
+                margin-top: 15em;
+                width: 100%;
             }
             #preview {
                 background-color: #1a1a1a;
@@ -1087,11 +1089,11 @@ __DATA__
     </head>
     <body onload="prettyPrint()">
     % if ($self->app->mode eq 'development') {
-        <header>
+        <div id="header">
             <img src="mojolicious-box.png" alt="Mojolicious banner">
             <h1>This page is brand new and has not been unboxed yet!</h1>
-        </header>
-        <section id="suggestion">
+        </div>
+        <div id="suggestion">
             <img src="mojolicious-arrow.png" alt="Arrow">
             <h1>Perhaps you would like to add a route for it?</h1>
             <div id="preview">
@@ -1104,21 +1106,21 @@ get '<%= $self->req->url->path %>' => sub {
                     </code>
                 </pre>
             </div>
-        </section>
-        <section id="documentation">
+        </div>
+        <div id="documentation">
             <h1>
                 You might also enjoy our excellent documentation in
                 <%= link_to 'perldoc Mojolicious::Guides', $guide %>
             </h1>
             <img src="amelia.png" alt="Amelia">
-        </section>
-        <footer>
+        </div>
+        <div id="footer">
             <h1>And don't forget to have fun!</h1>
             <p><img src="mojolicious-clouds.png" alt="Clouds"></p>
             %= link_to 'http://mojolicio.us' => begin
                 <img src="mojolicious-black.png" alt="Mojolicious logo">
             % end
-        </footer>
+        </div>
     % } else {
         Page not found, want to go <%= link_to home => url_for->base %>?
     % }

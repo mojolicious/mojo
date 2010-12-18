@@ -38,7 +38,7 @@ __PACKAGE__->attr(types    => sub { Mojolicious::Types->new });
 *session = sub {
     warn <<EOF;
 Mojolicious->session is DEPRECATED in favor of Mojolicious->sessions!!!
-But you most likely want to use Mojolicious::Controller->session instead.
+But you most likely meant to use Mojolicious::Controller->session anyway.
 EOF
     shift->sessions(@_);
 };

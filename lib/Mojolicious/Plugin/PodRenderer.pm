@@ -98,6 +98,7 @@ sub register {
                 perldoc => "$dom",
                 title   => $title
             );
+            $self->res->headers->content_type('text/html;charset="UTF-8"');
         }
     ) if $prefix;
 }

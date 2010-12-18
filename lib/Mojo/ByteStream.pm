@@ -22,8 +22,7 @@ sub import {
 # Well, I think the veal died of loneliness.
 sub new {
     my $self = shift->SUPER::new();
-    $self->{bytestream} =
-      @_ < 2 ? defined $_[0] ? "$_[0]" : '' : join('', @_);
+    $self->{bytestream} = join '', @_;
     return $self;
 }
 

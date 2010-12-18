@@ -18,8 +18,10 @@ sub run {
     $class ||= 'MyMojoliciousApp';
 
     # Prevent bad applications
-    die "Application name has to be a well formed Perl module name.\n"
-      unless $class =~ /^[A-Z](?:\w|\:\:)+$/;
+    die <<EOF unless $class =~ /^[A-Z](?:\w|\:\:)+$/;
+Your application name has to be a well formed (camel case) Perl module name
+like "MyApp".
+EOF
 
     my $name = $self->class_to_file($class);
 

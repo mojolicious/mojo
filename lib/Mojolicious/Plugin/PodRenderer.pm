@@ -68,8 +68,8 @@ sub register {
             # POD
             my $file = IO::File->new;
             $file->open("< $path");
-            my $dom =
-              Mojo::DOM->new->parse($self->pod_to_html(join '', <$file>));
+            my $html = $self->pod_to_html(join '', <$file>);
+            my $dom = Mojo::DOM->new->parse("$html");
             $dom->find('a[href]')->each(
                 sub {
                     my $attrs = shift->attrs;

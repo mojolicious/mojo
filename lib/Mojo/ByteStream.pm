@@ -13,9 +13,7 @@ sub import {
     no strict 'refs';
     no warnings 'redefine';
     *{"${caller}::b"} = sub {
-        bless {
-            bytestream => @_ < 2 ? defined $_[0] ? "$_[0]" : '' : join('', @_)
-        }, 'Mojo::ByteStream';
+        bless {bytestream => join('', @_)}, 'Mojo::ByteStream';
       }
       if @_ > 1;
 }

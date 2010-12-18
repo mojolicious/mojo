@@ -33,7 +33,7 @@ sub startup {
     $self->renderer->add_handler(xpl => $self->renderer->handler->{epl});
 
     # Session domain
-    $self->session->cookie_domain('.example.com');
+    $self->sessions->cookie_domain('.example.com');
 
     # Routes
     my $r = $self->routes;

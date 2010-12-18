@@ -574,7 +574,7 @@ sub rendered {
     $app->plugins->run_hook_reverse(after_dispatch => $self);
 
     # Session
-    $app->session->store($self);
+    $app->sessions->store($self);
 
     # Finished
     $stash->{'mojo.finished'} = 1;

@@ -1,4 +1,4 @@
-package Mojolicious::Session;
+package Mojolicious::Sessions;
 
 use strict;
 use warnings;
@@ -85,22 +85,22 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Session - Signed Cookie Based Sessions
+Mojolicious::Sessions - Signed Cookie Based Sessions
 
 =head1 SYNOPSIS
 
-    use Mojolicious::Session;
+    use Mojolicious::Sessions;
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Session> is a very simple signed cookie based session
+L<Mojolicious::Sessions> is a very simple signed cookie based session
 implementation.
 All data gets stored on the client side, but is protected from unwanted
 changes with a signature.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Session> implements the following attributes.
+L<Mojolicious::Sessions> implements the following attributes.
 
 =head2 C<cookie_domain>
 
@@ -134,7 +134,7 @@ The expiration timeout gets refreshed for every request.
 
 =head1 METHODS
 
-L<Mojolicious::Session> inherits all methods from L<Mojo::Base> and
+L<Mojolicious::Sessions> inherits all methods from L<Mojo::Base> and
 implements the following ones.
 
 =head2 C<load>

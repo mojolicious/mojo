@@ -10,7 +10,7 @@ use Mojolicious::Commands;
 use Mojolicious::Plugins;
 use Mojolicious::Renderer;
 use Mojolicious::Routes;
-use Mojolicious::Session;
+use Mojolicious::Sessions;
 use Mojolicious::Static;
 use Mojolicious::Types;
 
@@ -30,9 +30,18 @@ __PACKAGE__->attr(
         return ref $self;
     }
 );
-__PACKAGE__->attr(session => sub { Mojolicious::Session->new });
-__PACKAGE__->attr(static  => sub { Mojolicious::Static->new });
-__PACKAGE__->attr(types   => sub { Mojolicious::Types->new });
+__PACKAGE__->attr(sessions => sub { Mojolicious::Sessions->new });
+__PACKAGE__->attr(static   => sub { Mojolicious::Static->new });
+__PACKAGE__->attr(types    => sub { Mojolicious::Types->new });
+
+# DEPRECATED in Hot Beverage!
+*session = sub {
+    warn <<EOF;
+Mojolicious->session is DEPRECATED in favor of Mojolicious->sessions!!!
+But you most likely want to use Mojolicious::Controller->session instead.
+EOF
+    shift->sessions(@_);
+};
 
 our $CODENAME = 'Snowflake';
 our $VERSION  = '1.0_001';
@@ -172,7 +181,7 @@ sub dispatch {
     $c->res->code(undef) if $c->tx->is_websocket;
 
     # Session
-    $self->session->load($c);
+    $self->sessions->load($c);
 
     # Hook
     $self->plugins->run_hook(before_dispatch => $c);
@@ -574,12 +583,12 @@ application name which is not very secure, so you should change it!!!
 As long as you are using the unsecure default there will be debug messages in
 the log file reminding you to change your passphrase.
 
-=head2 C<session>
+=head2 C<sessions>
 
-    my $session = $app->session;
-    $app        = $app->session(Mojolicious::Session->new);
+    my $sessions = $app->sessions;
+    $app         = $app->sessions(Mojolicious::Sessions->new);
 
-Simple singed cookie based sessions, by default a L<Mojolicious::Session>
+Simple singed cookie based sessions, by default a L<Mojolicious::Sessions>
 object.
 
 =head2 C<static>

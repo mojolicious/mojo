@@ -93,7 +93,7 @@ sub register {
                     my $tag    = shift;
                     my $text   = $tag->all_text;
                     my $anchor = $text;
-                    $anchor =~ s/\W+/_/;
+                    $anchor =~ s/\W/_/g;
                     $tag->replace_inner(
                         qq/<a href="$abs#$anchor" name="$anchor">$text<\/a>/);
                 }

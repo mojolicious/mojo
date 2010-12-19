@@ -467,7 +467,7 @@ sub render_not_found {
     # Check for POD plugin
     my $guide =
         $self->app->renderer->helpers->{pod_to_html}
-      ? $self->url_for('/perldoc?Mojolicious::Guides')
+      ? $self->url_for('/perldoc')
       : 'http://search.cpan.org/dist/Mojolicious/lib/Mojolicious/Guides.pod';
 
 
@@ -797,7 +797,7 @@ __DATA__
         %= javascript 'js/jquery.js'
         %= stylesheet 'css/prettify-mojo.css'
         %= javascript 'js/prettify.js'
-        <style type="text/css">
+        %= stylesheet begin
             a img { border: 0; }
             body {
                 background-color: #f5f6f8;
@@ -889,7 +889,7 @@ __DATA__
                 border-top-right-radius: 5px;
                 margin-top: 1em;
             }
-        </style>
+        % end
     </head>
     <body onload="prettyPrint()">
     % if ($self->app->mode eq 'development') {
@@ -1025,7 +1025,7 @@ __DATA__
         %= base_tag
         %= stylesheet 'css/prettify-mojo.css'
         %= javascript 'js/prettify.js'
-        <style type="text/css">
+        %= stylesheet begin
             a { text-decoration: none; }
             a img { border: 0; }
             body {
@@ -1087,7 +1087,7 @@ __DATA__
                 padding-top: 20em;
                 text-shadow: #333 0 1px 0;
             }
-        </style>
+        % end
     </head>
     <body onload="prettyPrint()">
     % if ($self->app->mode eq 'development') {

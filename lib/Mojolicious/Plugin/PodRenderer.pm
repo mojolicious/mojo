@@ -55,6 +55,7 @@ sub register {
             # Module
             my $module = $self->req->url->query->params->[0]
               || 'Mojolicious::Guides';
+            $module =~ s/\//\:\:/g;
 
             # Path
             my $path = Pod::Simple::Search->new->find($module);
@@ -76,6 +77,7 @@ sub register {
                     my $attrs = shift->attrs;
                     if ($attrs->{href} =~ /^$cpan/) {
                         $attrs->{href} =~ s/^$cpan/$url/;
+                        $attrs->{href} =~ s/%3A%3A/\//gi;
                     }
                 }
             );
@@ -88,6 +90,7 @@ sub register {
                 }
             );
             my $abs = $self->req->url->clone->to_abs;
+            $abs =~ s/%2F/\//gi;
             $dom->find('h1, h2, h3')->each(
                 sub {
                     my $tag    = shift;
@@ -153,7 +156,7 @@ __DATA__
         %= base_tag
         %= stylesheet 'css/prettify-mojo.css'
         %= javascript 'js/prettify.js'
-        <style type="text/css">
+        %= stylesheet begin
             a { color: inherit; }
             a img { border: 0; }
             body {
@@ -196,7 +199,7 @@ __DATA__
                 box-shadow: 0px 0px 2px #ccc;
                 padding: 3em;
             }
-        </style>
+        % end
     </head>
     <body onload="prettyPrint()">
         <div id="perldoc"><%== $perldoc %></div>

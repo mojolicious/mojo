@@ -48,8 +48,9 @@ $t->post_ok('/block')->status_is(200)
   ->content_like(qr/test321\s+<h2>lalala<\/h2>\s+<p><code>test<\/code><\/p>/);
 
 # Perldoc browser
-$t->get_ok('/perldoc?Mojolicious')->status_is(200)->text_is('h1', 'NAME')
-  ->text_like('p', qr/Mojolicious/)->content_like(qr/Sebastian\ Riedel/);
+$t->get_ok('/perldoc?Mojolicious')->status_is(200)
+  ->text_is('h1 a[name="NAME"]', 'NAME')->text_like('p', qr/Mojolicious/)
+  ->content_like(qr/Sebastian\ Riedel/);
 
 __DATA__
 

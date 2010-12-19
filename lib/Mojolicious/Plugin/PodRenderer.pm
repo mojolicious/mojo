@@ -39,13 +39,13 @@ sub register {
             my ($r, $c, $output, $options) = @_;
 
             # Preprocess with ep and then render
-            $$output = $self->_pod_to_html($$output)
+            $$output = _pod_to_html($$output)
               if $r->handler->{$preprocess}->($r, $c, $output, $options);
         }
     );
 
     # Add "pod_to_html" helper
-    $app->helper(pod_to_html => sub { shift; b($self->_pod_to_html(@_)) });
+    $app->helper(pod_to_html => sub { shift; b(_pod_to_html(@_)) });
 
     # Perldoc
     $app->routes->any(
@@ -68,7 +68,7 @@ sub register {
             # POD
             my $file = IO::File->new;
             $file->open("< $path");
-            my $html = $self->pod_to_html(join '', <$file>);
+            my $html = _pod_to_html(join '', <$file>);
             my $dom = Mojo::DOM->new->parse("$html");
             $dom->find('a[href]')->each(
                 sub {
@@ -85,6 +85,15 @@ sub register {
                     my $class = $attrs->{class};
                     $attrs->{class} =
                       defined $class ? "$class prettyprint" : 'prettyprint';
+                }
+            );
+            $dom->find('h1, h2, h3')->each(
+                sub {
+                    my $tag    = shift;
+                    my $text   = $tag->text;
+                    my $anchor = $text;
+                    $anchor =~ s/\W/_/g;
+                    $tag->replace_inner(qq/<a name="$anchor">$text<\/a>/);
                 }
             );
 
@@ -104,7 +113,7 @@ sub register {
 }
 
 sub _pod_to_html {
-    my ($self, $pod) = @_;
+    my $pod = shift;
 
     # Shortcut
     return unless defined $pod;
@@ -230,6 +239,11 @@ L<Mojolicous::Plugin::PodRenderer> is a renderer for true Perl hackers, rawr!
 
     # Mojolicious::Lite
     plugin pod_renderer => {name => 'foo'};
+
+=item prefix
+
+    # Mojolicious::Lite
+    plugin pod_renderer => {prefix => 'docs'};
 
 =item preprocess
 

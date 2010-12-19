@@ -33,7 +33,7 @@ __DATA__
 
 use Mojolicious::Lite;
 
-# Perldoc browser under "/perldoc" (this plugin requires Perl 5.10)
+# Documentation browser under "/perldoc" (this plugin requires Perl 5.10)
 plugin 'pod_renderer';
 
 get '/welcome' => sub {

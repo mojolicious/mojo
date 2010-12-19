@@ -3335,7 +3335,7 @@ L<http://creativecommons.org/licenses/by-nc-nd/3.0>.
 
 =head2 C<mojolicious-pinstripe.gif>
 
-Mojolicious pinstripe effect for multiple template.
+Mojolicious pinstripe effect for multiple templates.
 
     Copyright (C) 2010, Sebastian Riedel.
 

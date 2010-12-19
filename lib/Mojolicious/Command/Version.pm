@@ -22,12 +22,9 @@ EOF
 sub run {
     my $self = shift;
 
-    # Mojo
-    my $mojo     = $Mojolicious::VERSION;
-    my $codename = $Mojolicious::CODENAME;
-
     # Latest version
-    my $latest = $mojo;
+    my $current = $Mojolicious::VERSION =~ /^([^_]+)/;
+    my $latest = $current;
     eval {
         Mojo::Client->new->max_redirects(3)
           ->get('search.cpan.org/dist/Mojolicious')->res->dom('.version')
@@ -37,9 +34,9 @@ sub run {
     # Message
     my $message = 'This version is up to date, have fun!';
     $message = 'Thanks for testing a development release, you are awesome!'
-      if $latest < $mojo;
+      if $latest < $current;
     $message = "You might want to update your Mojolicious to $latest."
-      if $latest > $mojo;
+      if $latest > $current;
 
     # Epoll
     my $epoll = Mojo::IOLoop::EPOLL() ? $IO::Epoll::VERSION : 'not installed';
@@ -61,7 +58,7 @@ sub run {
     print <<"EOF";
 CORE
   Perl        ($], $^O)
-  Mojolicious ($mojo, $codename)
+  Mojolicious ($Mojolicious::VERSION, $Mojolicious::CODENAME)
 
 OPTIONAL
   IO::Epoll                ($epoll)

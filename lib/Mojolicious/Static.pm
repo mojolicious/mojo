@@ -1277,6 +1277,10 @@ gbZBwBNi2wyFB+IIOAKtRsATYqtHwNt3BByBtkHAE2LbDIUH4gg4Aq1GwBNiq0fA23cEHIG2QcAT
 YtsMhQfiCDgCrUbAE2KrR8DbdwQcgbZBwBNi2wyFB+IIOAKtRuB/ADIrjrgbTV5dAAAAAElFTkSu
 QmCC
 
+@@ mojolicious-pinstripe.gif (base64)
+R0lGODlhGAAMAJEAAA4ODhkZGQAAAAAAACH5BAkKAAIALAAAAAAYAAwAAAIjBGKJedzqFmTyzWuq
+szl6zIWVRn4dZZ7qKqIuqKXtO8N0fRYAOw==
+
 @@ css/prettify.css (base64)
 LnN0cntjb2xvcjojMDgwfS5rd2R7Y29sb3I6IzAwOH0uY29te2NvbG9yOiM4MDB9LnR5cHtjb2xv
 cjojNjA2fS5saXR7Y29sb3I6IzA2Nn0ucHVue2NvbG9yOiM2NjB9LnBsbntjb2xvcjojMDAwfS50
@@ -3323,6 +3327,15 @@ L<http://creativecommons.org/licenses/by-nc-nd/3.0>.
 =head2 C<mojolicious-clouds.png>
 
 Mojolicious clouds for C<not_found> template.
+
+    Copyright (C) 2010, Sebastian Riedel.
+
+Licensed under the CC-NC-ND License, Version 3.0
+L<http://creativecommons.org/licenses/by-nc-nd/3.0>.
+
+=head2 C<mojolicious-pinstripe.gif>
+
+Mojolicious pinstripe effect for multiple template.
 
     Copyright (C) 2010, Sebastian Riedel.
 

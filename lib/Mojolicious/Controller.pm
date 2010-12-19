@@ -834,6 +834,7 @@ __DATA__
             }
             .code {
                 background-color: #1a1a1a;
+                background: url("mojolicious-pinstripe.gif") fixed;
                 color: #eee;
                 font-family: 'Menlo', 'Monaco', Courier, monospace !important;
                 text-shadow: #333 0 1px 0;
@@ -842,7 +843,7 @@ __DATA__
                 margin-bottom: 0.5em;
                 margin-top: 1em;
             }
-            .important { background-color: #2f3032; }
+            .important { background-color: rgba(47, 48, 50, .75); }
             .infobox tr:nth-child(odd) .value { background-color: #ddeeff; }
             .infobox tr:nth-child(even) .value { background-color: #eef9ff; }
             .key {
@@ -851,6 +852,7 @@ __DATA__
             }
             .preview {
                 background-color: #1a1a1a;
+                background: url("mojolicious-pinstripe.gif") fixed;
                 -moz-border-radius: 5px;
                 border-radius: 5px;
                 margin-bottom: 1em;
@@ -1068,6 +1070,7 @@ __DATA__
             }
             #preview {
                 background-color: #1a1a1a;
+                background: url("mojolicious-pinstripe.gif") fixed;
                 -moz-border-radius: 5px;
                 border-radius: 5px;
                 font-family: 'Menlo', 'Monaco', Courier, monospace !important;

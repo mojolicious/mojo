@@ -91,9 +91,9 @@ sub register {
             $dom->find('h1, h2, h3')->each(
                 sub {
                     my $tag    = shift;
-                    my $text   = $tag->text;
+                    my $text   = $tag->all_text;
                     my $anchor = $text;
-                    $anchor =~ s/\W/_/g;
+                    $anchor =~ s/\W+/_/;
                     $tag->replace_inner(
                         qq/<a href="$abs#$anchor" name="$anchor">$text<\/a>/);
                 }

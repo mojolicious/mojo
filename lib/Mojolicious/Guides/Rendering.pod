@@ -269,9 +269,9 @@ We differentiate between C<default helpers> which are more general purpose
 like C<dumper> and C<tag helpers>, which are template specific and mostly
 used to generate C<HTML> tags.
 
-    <%= script '/script.js' %>
+    <%= javascript 'script.js' %>
 
-    <%= script begin %>
+    <%= javascript begin %>
         var a = 'b';
     <% end %>
 

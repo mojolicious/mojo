@@ -1058,6 +1058,7 @@ __DATA__
                 background-color: #eee;
                 border: 2px dashed #1a1a1a;
                 color: #000;
+                margin-left: 0.1em;
                 padding: 0.5em;
             }
             #header {
@@ -1074,7 +1075,8 @@ __DATA__
                 margin: 0;
                 margin-left: auto;
                 margin-right: auto;
-                padding: 1em;
+                padding: 0.5em;
+                padding-left: 1em;
                 text-align: left;
                 width: 500px;
             }
@@ -1097,14 +1099,11 @@ __DATA__
             <img src="mojolicious-arrow.png" alt="Arrow">
             <h1>Perhaps you would like to add a route for it?</h1>
             <div id="preview">
-                <pre>
-                    <code class="prettyprint">
+                <pre class="prettyprint">
 get '<%= $self->req->url->path %>' => sub {
     my $self = shift;
     $self->render(text => 'Hello world!');
-};
-                    </code>
-                </pre>
+};</pre>
             </div>
         </div>
         <div id="documentation">

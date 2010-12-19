@@ -69,12 +69,12 @@ sub register {
             my $file = IO::File->new;
             $file->open("< $path");
             my $html = _pod_to_html(join '', <$file>);
-            my $dom = Mojo::DOM->new->parse("$html");
+            my $dom  = Mojo::DOM->new->parse("$html");
+            my $url  = $self->url_for("/$prefix");
             $dom->find('a[href]')->each(
                 sub {
                     my $attrs = shift->attrs;
                     if ($attrs->{href} =~ /^$cpan/) {
-                        my $url = $self->url_for("/$prefix");
                         $attrs->{href} =~ s/^$cpan/$url/;
                     }
                 }
@@ -87,13 +87,15 @@ sub register {
                       defined $class ? "$class prettyprint" : 'prettyprint';
                 }
             );
+            my $abs = $self->req->url->clone->to_abs;
             $dom->find('h1, h2, h3')->each(
                 sub {
                     my $tag    = shift;
                     my $text   = $tag->text;
                     my $anchor = $text;
                     $anchor =~ s/\W/_/g;
-                    $tag->replace_inner(qq/<a name="$anchor">$text<\/a>/);
+                    $tag->replace_inner(
+                        qq/<a href="$abs#$anchor" name="$anchor">$text<\/a>/);
                 }
             );
 
@@ -167,6 +169,7 @@ __DATA__
                 font: 1.5em Georgia, Times, serif;
                 margin: 0;
             }
+            h1 a, h2 a, h3 a { text-decoration: none; }
             pre {
                 background-color: #1a1a1a;
                 -moz-border-radius: 5px;

@@ -19,6 +19,9 @@ EOF
 
 use Pod::Simple::Search;
 
+# Paths
+our @PATHS = map { $_, "$_/pods" } @INC;
+
 # Perldoc template
 our $PERLDOC = Mojo::Command->new->get_data('perldoc.html.ep', __PACKAGE__);
 
@@ -57,7 +60,7 @@ sub register {
             $module =~ s/\//\:\:/g;
 
             # Path
-            my $path = Pod::Simple::Search->new->find($module);
+            my $path = Pod::Simple::Search->new->find($module, @PATHS);
 
             # Redirect to CPAN
             my $cpan = 'http://search.cpan.org/perldoc';

@@ -9,7 +9,7 @@ BEGIN { $ENV{MOJO_POLL} = 1 }
 use Test::More;
 plan skip_all => 'Perl 5.10 required for this test!'
   unless eval { require Pod::Simple::HTML; 1 };
-plan tests => 16;
+plan tests => 20;
 
 # Amy get your pants back on and get to work.
 # They think were making out.
@@ -52,6 +52,10 @@ $t->get_ok('/perldoc?Mojolicious')->status_is(200)
   ->text_is('h1 a[name="NAME"]', 'NAME')
   ->text_is('a[name="handler"]', 'handler')->text_like('p', qr/Mojolicious/)
   ->content_like(qr/Sebastian\ Riedel/);
+
+# Perldoc browser (special POD file)
+$t->get_ok('/perldoc?perlboot')->status_is(200)
+  ->text_is('h1 a[name="NAME"]', 'NAME')->content_like(qr/Tutorial/);
 
 __DATA__
 

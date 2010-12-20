@@ -31,7 +31,6 @@ sub register {
     $conf ||= {};
     my $name       = $conf->{name}       || 'pod';
     my $preprocess = $conf->{preprocess} || 'ep';
-    my $prefix     = $conf->{prefix}     || 'perldoc';
 
     # Add "pod" handler
     $app->renderer->add_handler(
@@ -49,7 +48,7 @@ sub register {
 
     # Perldoc
     $app->routes->any(
-        $prefix => sub {
+        '/perldoc' => sub {
             my $self = shift;
 
             # Module
@@ -71,7 +70,7 @@ sub register {
             $file->open("< $path");
             my $html = _pod_to_html(join '', <$file>);
             my $dom  = Mojo::DOM->new->parse("$html");
-            my $url  = $self->url_for("/$prefix");
+            my $url  = $self->url_for("/perldoc");
             $dom->find('a[href]')->each(
                 sub {
                     my $attrs = shift->attrs;
@@ -114,7 +113,7 @@ sub register {
             );
             $self->res->headers->content_type('text/html;charset="UTF-8"');
         }
-    ) if $prefix;
+    ) unless $conf->{no_perldoc};
 }
 
 sub _pod_to_html {
@@ -247,10 +246,12 @@ L<Mojolicous::Plugin::PodRenderer> is a renderer for true Perl hackers, rawr!
     # Mojolicious::Lite
     plugin pod_renderer => {name => 'foo'};
 
-=item prefix
+=item no_perldoc
 
     # Mojolicious::Lite
-    plugin pod_renderer => {prefix => 'docs'};
+    plugin pod_renderer => {no_perldoc => 1};
+
+Note that this option is EXPERIMENTAL and might change without warning!
 
 =item preprocess
 

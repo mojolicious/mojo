@@ -35,11 +35,8 @@ sub throw {
     # Trace
     $e->trace(2);
 
-    # Detect
-    $e->_detect(@_);
-
-    # Throw
-    die $e;
+    # Detect and throw
+    die $e->_detect(@_);
 }
 
 sub trace {

@@ -250,7 +250,7 @@ sub run {
     my ($self, $name, @args) = @_;
 
     # Hypnotoad
-    return return Mojo::Server->new->app if defined $ENV{HYPNOTOAD_APP};
+    return Mojo::Server->new->app if defined $ENV{HYPNOTOAD_APP};
 
     # Try to detect environment
     $name = $self->detect($name) unless $ENV{MOJO_NO_DETECT};

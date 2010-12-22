@@ -834,7 +834,7 @@ __DATA__
             }
             .code {
                 background-color: #1a1a1a;
-                background: url("mojolicious-pinstripe.gif") fixed;
+                background: url("/mojolicious-pinstripe.gif") fixed;
                 color: #eee;
                 font-family: 'Menlo', 'Monaco', Courier, monospace !important;
                 text-shadow: #333 0 1px 0;
@@ -852,7 +852,7 @@ __DATA__
             }
             .preview {
                 background-color: #1a1a1a;
-                background: url("mojolicious-pinstripe.gif") fixed;
+                background: url("/mojolicious-pinstripe.gif") fixed;
                 -moz-border-radius: 5px;
                 border-radius: 5px;
                 margin-bottom: 1em;
@@ -1005,7 +1005,7 @@ __DATA__
         </div>
         <div id="footer">
             %= link_to 'http://mojolicio.us' => begin
-                <img src="mojolicious-black.png" alt="Mojolicious logo">
+                <img src="/mojolicious-black.png" alt="Mojolicious logo">
             % end
         </div>
         %= javascript begin
@@ -1070,7 +1070,7 @@ __DATA__
             }
             #preview {
                 background-color: #1a1a1a;
-                background: url("mojolicious-pinstripe.gif") fixed;
+                background: url("/mojolicious-pinstripe.gif") fixed;
                 -moz-border-radius: 5px;
                 border-radius: 5px;
                 font-family: 'Menlo', 'Monaco', Courier, monospace !important;
@@ -1095,11 +1095,11 @@ __DATA__
     <body onload="prettyPrint()">
     % if ($self->app->mode eq 'development') {
         <div id="header">
-            <img src="mojolicious-box.png" alt="Mojolicious banner">
+            <img src="/mojolicious-box.png" alt="Mojolicious banner">
             <h1>This page is brand new and has not been unboxed yet!</h1>
         </div>
         <div id="suggestion">
-            <img src="mojolicious-arrow.png" alt="Arrow">
+            <img src="/mojolicious-arrow.png" alt="Arrow">
             <h1>Perhaps you would like to add a route for it?</h1>
             <div id="preview">
                 <pre class="prettyprint">
@@ -1114,13 +1114,13 @@ get '<%= $self->req->url->path %>' => sub {
                 You might also enjoy our excellent documentation in
                 <%= link_to 'perldoc Mojolicious::Guides', $guide %>
             </h1>
-            <img src="amelia.png" alt="Amelia">
+            <img src="/amelia.png" alt="Amelia">
         </div>
         <div id="footer">
             <h1>And don't forget to have fun!</h1>
-            <p><img src="mojolicious-clouds.png" alt="Clouds"></p>
+            <p><img src="/mojolicious-clouds.png" alt="Clouds"></p>
             %= link_to 'http://mojolicio.us' => begin
-                <img src="mojolicious-black.png" alt="Mojolicious logo">
+                <img src="/mojolicious-black.png" alt="Mojolicious logo">
             % end
         </div>
     % } else {

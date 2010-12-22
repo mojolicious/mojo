@@ -158,8 +158,8 @@ __DATA__
     <head>
         <title><%= $title %></title>
         %= base_tag
-        %= stylesheet 'css/prettify-mojo.css'
-        %= javascript 'js/prettify.js'
+        %= stylesheet '/css/prettify-mojo.css'
+        %= javascript '/js/prettify.js'
         %= stylesheet begin
             a { color: inherit; }
             a img { border: 0; }

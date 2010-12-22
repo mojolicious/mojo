@@ -794,9 +794,9 @@ __DATA__
         <meta http-equiv="Pragma" content="no-cache">
         <meta http-equiv="Expires" content="-1">
         %= base_tag
-        %= javascript 'js/jquery.js'
-        %= stylesheet 'css/prettify-mojo.css'
-        %= javascript 'js/prettify.js'
+        %= javascript '/js/jquery.js'
+        %= stylesheet '/css/prettify-mojo.css'
+        %= javascript '/js/prettify.js'
         %= stylesheet begin
             a img { border: 0; }
             body {
@@ -1025,8 +1025,8 @@ __DATA__
     <head>
         <title>Not Found</title>
         %= base_tag
-        %= stylesheet 'css/prettify-mojo.css'
-        %= javascript 'js/prettify.js'
+        %= stylesheet '/css/prettify-mojo.css'
+        %= javascript '/js/prettify.js'
         %= stylesheet begin
             a { text-decoration: none; }
             a img { border: 0; }

@@ -78,9 +78,9 @@ sub clone {
 
 sub parse {
     my ($self, $path) = @_;
-    $path ||= '';
 
     # Meta
+    $path = '' unless defined $path;
     $self->leading_slash(1)  if $path =~ /^\//;
     $self->trailing_slash(1) if $path =~ /\/$/;
 

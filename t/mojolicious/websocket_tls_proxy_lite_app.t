@@ -116,7 +116,7 @@ $loop->listen(
 
 # GET / (normal request)
 is $client->get("https://localhost:$port/")->success->body,
-  "Hello World! / https://localhost:$port/", 'right content';
+  "Hello World!  https://localhost:$port/", 'right content';
 
 # WebSocket /test (normal websocket)
 my $result;

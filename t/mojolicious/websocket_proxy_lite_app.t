@@ -110,7 +110,7 @@ $loop->listen(
 
 # GET / (normal request)
 is $client->get("http://localhost:$port/")->success->body,
-  "Hello World! / http://localhost:$port/", 'right content';
+  "Hello World!  http://localhost:$port/", 'right content';
 
 # WebSocket /test (normal websocket)
 my $result;

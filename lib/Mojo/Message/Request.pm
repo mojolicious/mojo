@@ -247,12 +247,21 @@ sub _parse_env {
     $self->env($env);
 
     # Headers
+    my $headers = $self->headers;
+
+    # URL
+    my $url = $self->url;
+
+    # Base
+    my $base = $url->base;
+
+    # Headers
     while (my ($name, $value) = each %$env) {
 
         # Header
         if ($name =~ s/^HTTP_//i) {
             $name =~ s/_/-/g;
-            $self->headers->header($name, $value);
+            $headers->header($name, $value);
 
             # Host/Port
             if ($name eq 'HOST') {
@@ -264,27 +273,25 @@ sub _parse_env {
                     $port = $2;
                 }
 
-                $self->url->base->host($host);
-                $self->url->base->port($port);
+                $base->host($host);
+                $base->port($port);
             }
         }
     }
 
     # Content-Type is a special case on some servers
-    if (my $value = $env->{CONTENT_TYPE}) {
-        $self->headers->content_type($value);
-    }
+    if (my $value = $env->{CONTENT_TYPE}) { $headers->content_type($value) }
 
     # Content-Length is a special case on some servers
     if (my $value = $env->{CONTENT_LENGTH}) {
-        $self->headers->content_length($value);
+        $headers->content_length($value);
     }
 
     # Path is a special case on some servers
-    if (my $value = $env->{REQUEST_URI}) { $self->url->parse($value) }
+    if (my $value = $env->{REQUEST_URI}) { $url->parse($value) }
 
     # Query
-    if (my $value = $env->{QUERY_STRING}) { $self->url->query->parse($value) }
+    if (my $value = $env->{QUERY_STRING}) { $url->query->parse($value) }
 
     # Method
     if (my $value = $env->{REQUEST_METHOD}) { $self->method($value) }
@@ -292,28 +299,33 @@ sub _parse_env {
     # Scheme/Version
     if (my $value = $env->{SERVER_PROTOCOL}) {
         $value =~ /^([^\/]*)\/*(.*)$/;
-        $self->url->base->scheme($1) if $1;
+        $base->scheme($1)  if $1;
         $self->version($2) if $2;
     }
 
     # HTTPS
-    if ($env->{HTTPS}) { $self->url->base->scheme('https') }
+    if ($env->{HTTPS}) { $base->scheme('https') }
 
     # Base path
+    my $bpath = $base->path;
     if (my $value = $env->{SCRIPT_NAME}) {
 
         # Make sure there is a trailing slash (important for merging)
         $value .= '/' unless $value =~ /\/$/;
 
-        $self->url->base->path->parse($value);
+        $bpath->parse($value);
     }
 
     # Path
-    if (my $value = $env->{PATH_INFO}) { $self->url->path->parse($value) }
+    my $upath = $url->path;
+    if (my $value = $env->{PATH_INFO}) {
+        $value =~ s/^\///;
+        $upath->parse($value);
+    }
 
-    # Fix paths
-    my $base = $self->url->base->path->to_string;
-    my $path = $self->url->path->to_string;
+    # Path buffer
+    my $bb = $bpath->to_string;
+    my $ub = $upath->to_string;
 
     # IIS is so fucked up, nobody should ever have to use it...
     my $software = $env->{SERVER_SOFTWARE} || '';
@@ -321,7 +333,7 @@ sub _parse_env {
 
         # This is a horrible hack, just like IIS itself
         if (my $t = $env->{PATH_TRANSLATED}) {
-            my @p = split /\//,    $path;
+            my @p = split /\//,    $ub;
             my @t = split /\\\\?/, $t;
 
             # Try to generate correct PATH_INFO and SCRIPT_NAME
@@ -333,36 +345,24 @@ sub _parse_env {
                 pop @t;
                 unshift @n, pop @p;
             }
-            unshift @n, '', '';
 
-            $base = join '/', @p;
-            $path = join '/', @n;
+            $bb = join '/', @p;
+            $ub = join '/', @n;
 
-            $self->url->base->path->parse($base);
-            $self->url->path->parse($path);
+            $bpath->parse($bb);
+            $upath->parse($ub);
         }
     }
 
     # Fix paths for normal screwed up CGI environments
-    if ($path && $base) {
-
-        # Path ends with a slash
-        my $slash;
-        $slash = 1 if $path =~ /\/$/;
-
-        # Make sure path has a slash, because base has one
-        $path .= '/' unless $slash;
+    if (defined($ub) && defined($bb)) {
 
         # Remove SCRIPT_NAME prefix if it's there
-        $path =~ s/^$base//;
+        $bb =~ s/^\///;
+        $bb =~ s/\/$//;
+        $ub =~ s/^\/?$bb\/?//;
 
-        # Remove unwanted trailing slash
-        $path =~ s/\/$// unless $slash;
-
-        # Make sure we have a leading slash
-        $path = "/$path" if $path && $path !~ /^\//;
-
-        $self->url->path->parse($path);
+        $upath->parse($ub);
     }
 
     # There won't be a start line or header when you parse environment

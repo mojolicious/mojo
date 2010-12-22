@@ -27,9 +27,9 @@ sub register {
             # New request
             my $req    = $self->req;
             my $method = $req->method;
-            my $path   = $req->url->path || '/';
+            my $path   = $req->url->path;
             my $ua     = $req->headers->user_agent || 'Anonymojo';
-            $self->app->log->debug(qq/$method $path ($ua)./)
+            $self->app->log->debug("$method /$path ($ua).")
               unless $stash->{'mojo.static'};
 
             # Start

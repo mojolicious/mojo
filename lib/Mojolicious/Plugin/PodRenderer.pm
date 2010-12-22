@@ -72,13 +72,12 @@ sub register {
             my $file = IO::File->new;
             $file->open("< $path");
             my $html = _pod_to_html(join '', <$file>);
-            my $dom  = Mojo::DOM->new->parse("$html");
-            my $url  = $self->url_for("/perldoc");
+            my $dom = Mojo::DOM->new->parse("$html");
             $dom->find('a[href]')->each(
                 sub {
                     my $attrs = shift->attrs;
                     if ($attrs->{href} =~ /^$cpan/) {
-                        $attrs->{href} =~ s/^$cpan/$url/;
+                        $attrs->{href} =~ s/^$cpan/perldoc/;
                         $attrs->{href} =~ s/%3A%3A/\//gi;
                     }
                 }
@@ -91,8 +90,8 @@ sub register {
                       defined $class ? "$class prettyprint" : 'prettyprint';
                 }
             );
-            my $abs = $self->req->url->clone->to_abs;
-            $abs =~ s/%2F/\//gi;
+            my $url = $self->req->url->clone;
+            $url =~ s/%2F/\//gi;
             $dom->find('h1, h2, h3')->each(
                 sub {
                     my $tag    = shift;
@@ -102,7 +101,7 @@ sub register {
                     $anchor =~ s/^_+//;
                     $anchor =~ s/_+$//;
                     $tag->replace_inner(
-                        qq/<a href="$abs#$anchor" name="$anchor">$text<\/a>/);
+                        qq/<a href="$url#$anchor" name="$anchor">$text<\/a>/);
                 }
             );
 
@@ -158,8 +157,8 @@ __DATA__
     <head>
         <title><%= $title %></title>
         %= base_tag
-        %= stylesheet '/css/prettify-mojo.css'
-        %= javascript '/js/prettify.js'
+        %= stylesheet 'css/prettify-mojo.css'
+        %= javascript 'js/prettify.js'
         %= stylesheet begin
             a { color: inherit; }
             a img { border: 0; }
@@ -179,7 +178,7 @@ __DATA__
             h1 a, h2 a, h3 a { text-decoration: none; }
             pre {
                 background-color: #1a1a1a;
-                background: url("/mojolicious-pinstripe.gif") fixed;
+                background: url("mojolicious-pinstripe.gif") fixed;
                 -moz-border-radius: 5px;
                 border-radius: 5px;
                 color: #eee;

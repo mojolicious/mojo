@@ -174,6 +174,7 @@ sub parse {
 
     $self->scheme($scheme);
     $self->authority($authority);
+    $path =~ s/^\/// unless defined $scheme;
     $self->path->parse($path);
     $self->query->parse($query);
     $self->fragment($fragment);
@@ -308,7 +309,7 @@ sub to_rel {
     splice @{$path->parts}, 0, $splice if $splice;
 
     $rel->path($path);
-    $rel->path->leading_slash(0) if $splice;
+    $rel->path->leading_slash(0);
 
     return $rel;
 }

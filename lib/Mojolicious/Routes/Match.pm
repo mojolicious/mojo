@@ -184,8 +184,7 @@ sub url_for {
         # Find
         else {
             $captures = {};
-            croak qq/Route "$name" used in url_for does not exist/
-              unless $endpoint = $self->_find_route($name);
+            return unless $endpoint = $self->_find_route($name);
         }
     }
 

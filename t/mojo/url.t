@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 161;
+use Test::More tests => 168;
 
 # I don't want you driving around in a car you built yourself.
 # You can sit there complaining, or you can knit me some seat belts.
@@ -78,10 +78,16 @@ is "$url", 'http://sri:foobar@kraih.com:8080?_monkeybiz%3B%26_monkey%3B23#23',
   'right format';
 
 # Relative
+$url = Mojo::URL->new('foo?foo=bar#23');
+is $url->is_abs, undef, 'is not absolute';
+is "$url", 'foo?foo=bar#23', 'right relative version';
+$url = Mojo::URL->new('/foo?foo=bar#23');
+is $url->is_abs, undef, 'is not absolute';
+is "$url", 'foo?foo=bar#23', 'right relative version';
 $url = Mojo::URL->new('http://sri:foobar@kraih.com:8080/foo?foo=bar#23');
 $url->base->parse('http://sri:foobar@kraih.com:8080/');
 is $url->is_abs, 1, 'is absolute';
-is $url->to_rel, '/foo?foo=bar#23', 'right relative version';
+is $url->to_rel, 'foo?foo=bar#23', 'right relative version';
 
 # Relative with path
 $url = Mojo::URL->new('http://kraih.com/foo/index.html?foo=bar#23');
@@ -164,15 +170,15 @@ is "$clone", 'http://sri:foobar@kraih.com:8080/index.xml?monkey=biz&foo=1#23',
 # Clone (with base)
 $url = Mojo::URL->new('/test/index.html');
 $url->base->parse('http://127.0.0.1');
-is "$url", '/test/index.html', 'right format';
+is "$url", 'test/index.html', 'right format';
 $clone = $url->clone;
-is "$url", '/test/index.html', 'right format';
+is "$url", 'test/index.html', 'right format';
 is $clone->is_abs, undef, 'not absolute';
 is $clone->scheme, undef, 'no scheme';
 is $clone->host,   '',    'no host';
 is $clone->base->scheme, 'http',      'right base scheme';
 is $clone->base->host,   '127.0.0.1', 'right base host';
-is $clone->path, '/test/index.html', 'right path';
+is $clone->path, 'test/index.html', 'right path';
 is $clone->to_abs->to_string, 'http://127.0.0.1/test/index.html',
   'right absolute version';
 
@@ -212,7 +218,7 @@ is $url->to_abs, 'http://foo.com/', 'right absolute version';
 $url = Mojo::URL->new('http://sri:foobar@kraih.com:8080/foo?foo=bar#23');
 $url->base->parse('http://sri:foobar@kraih.com:8080/');
 my $url2 = $url->to_rel;
-is $url->to_rel, '/foo?foo=bar#23', 'right relative version';
+is $url->to_rel, 'foo?foo=bar#23', 'right relative version';
 
 # IRI
 $url =
@@ -246,16 +252,19 @@ is "$url",
 # Empty path elements
 $url = Mojo::URL->new('http://kraih.com/foo//bar/23/');
 $url->base->parse('http://kraih.com/');
-is $url->is_abs, 1;
-is $url->to_rel, '/foo//bar/23/';
+is $url->is_abs, 1, 'is absolute';
+is $url->to_rel, 'foo//bar/23/', 'right relative version';
 $url = Mojo::URL->new('http://kraih.com//foo//bar/23/');
 $url->base->parse('http://kraih.com/');
-is $url->is_abs, 1;
-is $url->to_rel, '/foo//bar/23/';
+is $url->is_abs, 1, 'is absolute';
+is $url->to_rel, 'foo//bar/23/', 'right relative version';
 $url = Mojo::URL->new('http://kraih.com/foo///bar/23/');
 $url->base->parse('http://kraih.com/');
-is $url->is_abs, 1;
-is $url->to_rel, '/foo///bar/23/';
+is $url->is_abs, 1,                                'is absolute';
+is $url->to_rel, 'foo///bar/23/',                  'right relative version';
+is $url->to_abs, 'http://kraih.com/foo///bar/23/', 'right absolute version';
+is $url->is_abs, 1,                                'is absolute';
+is $url->to_rel, 'foo///bar/23/',                  'right relative version';
 
 # Check host for IPv4 and IPv6 addresses
 $url = Mojo::URL->new('http://mojolicio.us');

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 205;
+use Test::More tests => 207;
 
 use Mojo::Transaction::HTTP;
 
@@ -19,6 +19,9 @@ $r->route('/clean')->to(clean => 1);
 
 # /clean/too
 $r->route('/clean/too')->to(something => 1);
+
+# /0
+$r->route('/0')->to(null => 1);
 
 # /*/test
 my $test = $r->route('/:controller/test')->to(action => 'test');
@@ -149,6 +152,14 @@ is $m->stack->[0]->{clean},     undef, 'no value';
 is $m->stack->[0]->{something}, 1,     'right value';
 is $m->url_for, '/clean/too', 'right URL';
 is @{$m->stack}, 1, 'right number of elements';
+
+# Null route
+$tx = Mojo::Transaction::HTTP->new;
+$tx->req->method('GET');
+$tx->req->url->parse('/0');
+$m = Mojolicious::Routes::Match->new($tx)->match($r);
+is $m->stack->[0]->{null}, 1, 'right value';
+is $m->url_for, '/0', 'right URL';
 
 # Real world example using most features at once
 $tx = Mojo::Transaction::HTTP->new;

@@ -13,6 +13,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved TLS exception handling.
         - Improved nested exception handling. (spleenjack)
         - Improved tests. (janus)
+        - Fixed relative path handling.
         - Fixed support for multiline expressions in Mojo::Template.
         - Fixed multiple --reload related leaks and reduced overall memory
           usage.

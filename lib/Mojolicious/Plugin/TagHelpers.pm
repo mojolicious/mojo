@@ -15,7 +15,7 @@ sub register {
 
     # Add "base_tag" helper
     $app->helper(base_tag =>
-          sub { $self->_tag('base', href => shift->url_for->base, @_) });
+          sub { $self->_tag('base', href => shift->req->url->base, @_) });
 
     # Add "checkbox" helper
     $app->helper(

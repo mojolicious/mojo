@@ -226,39 +226,35 @@ Template blocks can be reused like functions in Perl scripts.
         </body>
     </html>
 
-Templates can also pass around blocks of captured content and extend each
-other.
+The C<content_for> helper can be used to pass around blocks of captured
+content.
 
-    # GET /
-    get '/' => 'first';
-
-    # GET /second
-    get '/second' => 'second';
+    # GET /captured
+    get '/captured' => sub {
+        my $self = shift;
+        $self->render('captured');
+    };
 
     __DATA__
 
-    @@ first.html.ep
+    @@ captured.html.ep
+    % layout 'blue';
+    <% content_for header => begin %>
+        <meta http-equiv="Pragma" content="no-cache">
+    <% end %>
+    We've got content!
+    <% content_for header => begin %>
+        <meta http-equiv="Expires" content="-1">
+    <% end %>
+
+    @@ layouts/blue.html.ep
     <!doctype html><html>
         <head>
-            <%= content header => begin %>
-                <title>Hi!</title>
-            <% end %>
+            <title>Green!</title>
+            <%= content_for 'header' %>
         </head>
-        <body>
-            <%= content body => begin %>
-                First page!
-            <% end %>
-        </body>
+        <body><%= content %></body>
     </html>
-
-    @@ second.html.ep
-    % extends 'first';
-    <% content header => begin %>
-        <title>Howdy!</title>
-    <% end %>
-    <% content body => begin %>
-        Second page!
-    <% end %>
 
 Route placeholders allow capturing parts of a request path until a C</> or
 C<.> separator occurs, results will be stored by name in the C<stash> and

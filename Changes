@@ -6,6 +6,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Deprecated handler and helper attributes in Mojolicious::Renderer.
         - Added new exception and not_found templates.
         - Added POD browser to Mojolicious::Plugin::PodRenderer.
+        - Added EXPERIMENTAL content_for helper.
         - Disabled debug log messages for static files.
         - Improved Hypnotoad web server to restart workers regularly.
         - Improved documentation.

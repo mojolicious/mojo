@@ -18,6 +18,15 @@ sub register {
     # Add "content" helper
     $app->helper(content => sub { shift->render_inner(@_) });
 
+    # Add "content_for" helper
+    $app->helper(
+        content_for => sub {
+            my $self = shift;
+            my $name = shift;
+            $self->render_inner($name, $self->render_inner($name), @_);
+        }
+    );
+
     # Add "dumper" helper
     $app->helper(
         dumper => sub {
@@ -139,6 +148,18 @@ example for learning to build new plugins.
     <%= content %>
 
 Insert content into a layout template.
+
+=item content_for
+
+    <% content_for foo => begin %>test<% end %>
+    <%= content_for 'foo' %>
+
+Append content to named buffer or retrieve it.
+Note that this helper is EXPERIMENTAL and might change without warning!
+
+    <% content_for message => begin %>Hello <% end %>
+    <% content_for message => begin %>world!<% end %>
+    <%= content_for 'message' %>
 
 =item dumper
 

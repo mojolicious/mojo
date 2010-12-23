@@ -383,29 +383,32 @@ A naive translation to equivalent Perl code could look like this.
 
 =head2 Content Blocks
 
-Blocks and the C<content> helper can also be used to pass whole sections of
-the template to the layout.
+Blocks and the C<content_for> helper can also be used to pass whole sections
+of the template to the layout.
 
    @@ foo/bar.html.ep
    % layout 'mylayout';
-   <% content header => begin %>
+   <% content_for header => begin %>
        <title>MyApp!</title>
    <% end %>
    Hello World!
+   <% content_for header => begin %>
+       <meta http-equiv="Pragma" content="no-cache">
+   <% end %>
 
    @@ layouts/mylayout.html.ep
    <!doctype html><html>
-       <head><%= content 'header' %></head>
+       <head><%= content_for 'header' %></head>
        <body><%= content %></body>
    </html>
 
 =head2 Template Inheritance
 
-Inheritance takes the layout concept above one step further, allowing you to
-use the C<content> helper to overload whole template sections of normal
-templates.
-The difference between the C<layout> and the C<extends> helper is that
-extended templates don't get prefixed with C<layout/>.
+Inheritance takes the layout concept above one step further.
+Unlike C<content_for> the C<content> helper does not allow appending to
+existing values, this makes it possible to overload whole template sections.
+The only difference between C<layout> and the C<extends> is that extended
+templates don't get prefixed with C<layout/>.
 
     @@ first.html.ep
     %# "<div>First header!First footer!</div>"

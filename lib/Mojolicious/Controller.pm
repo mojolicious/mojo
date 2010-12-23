@@ -415,20 +415,34 @@ sub render_exception {
 }
 
 sub render_inner {
-    my ($self, $name, $content) = @_;
+    my $self    = shift;
+    my $name    = shift;
+    my $content = pop;
 
     # Initialize
     my $stash = $self->stash;
-    $stash->{'mojo.content'} ||= {};
+    my $c = $stash->{'mojo.content'} ||= {};
     $name ||= 'content';
 
     # Set
-    $stash->{'mojo.content'}->{$name}
-      ||= ref $content eq 'CODE' ? $content->() : $content
-      if defined $content;
+    if (defined $content) {
+
+        # Reset with multiple values
+        if (@_) {
+            $c->{$name} = '';
+            for my $part (@_, $content) {
+                $c->{$name} .= ref $part eq 'CODE' ? $part->() : $part;
+            }
+        }
+
+        # First come
+        else {
+            $c->{$name} ||= ref $content eq 'CODE' ? $content->() : $content;
+        }
+    }
 
     # Get
-    $content = $stash->{'mojo.content'}->{$name};
+    $content = $c->{$name};
     $content = '' unless defined $content;
     return Mojo::ByteStream->new("$content");
 }

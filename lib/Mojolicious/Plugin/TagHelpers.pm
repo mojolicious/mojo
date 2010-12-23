@@ -521,7 +521,7 @@ Generate select, option and optgroup elements.
 
 =item stylesheet
 
-    <%= stylesheet 'foo.css %>
+    <%= stylesheet 'foo.css' %>
     <%= stylesheet begin %>
         body {color: #000}
     <% end %>

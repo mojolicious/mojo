@@ -8,7 +8,7 @@ use utf8;
 # Disable epoll and kqueue
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 664;
+use Test::More tests => 669;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -213,6 +213,9 @@ post '/with/body/and/headers/desc' => sub {
           || $self->req->body ne 'body';
     $self->render_text('bar');
 };
+
+# GET /content_for
+get '/content_for' => '*';
 
 # GET /template_inheritance
 get '/template_inheritance' => sub { shift->render('template_inheritance') };
@@ -1033,6 +1036,12 @@ $t->post_ok('/with/body/and/desc', 'body', 'desc')->status_is(200)
 $t->post_ok('/with/body/and/headers/desc', {with => 'header'}, 'body', 'desc')
   ->status_is(200)->content_is('bar');
 
+# GET /content_for
+$t->get_ok('/content_for')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("This\nseems\nto\nHello    world!\n\nwork!\n");
+
 # GET /template_inheritance
 $t->get_ok('/template_inheritance')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
@@ -1676,6 +1685,17 @@ dGVzdCAxMjMKbGFsYWxh
 
 @@ with_header_condition.html.ep
 Test ok<%= base_tag %>
+
+@@ content_for.html.ep
+This
+<% content_for message => begin =%>Hello<% end %>
+seems
+% content_for message => begin
+    world!
+% end
+to
+<%= content_for 'message' %>
+work!
 
 @@ template_inheritance.html.ep
 % layout 'template_inheritance';

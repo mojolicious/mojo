@@ -65,17 +65,17 @@ is $output, 'test', 'multiple empty lines trimmed';
 
 # Trim expression tags
 $mt     = Mojo::Template->new;
-$output = $mt->render('    <%= block begin =%><html><% end =%>    ');
+$output = $mt->render('    <%= capture begin =%><html><% end =%>    ');
 is $output, '<html>', 'expression tags trimmed';
 
 # Trim expression tags (relaxed expression end)
 $mt     = Mojo::Template->new;
-$output = $mt->render('    <%= block begin =%><html><%= end =%>    ');
+$output = $mt->render('    <%= capture begin =%><html><%= end =%>    ');
 is $output, '<html>', 'expression tags trimmed';
 
 # Trim expression tags (relaxed escaped expression end)
 $mt     = Mojo::Template->new;
-$output = $mt->render('    <%= block begin =%><html><%== end =%>    ');
+$output = $mt->render('    <%= capture begin =%><html><%== end =%>    ');
 is $output, '<html>', 'expression tags trimmed';
 
 # Recursive block
@@ -180,7 +180,7 @@ is $output, "&lt;html&gt;\n\n", 'escaped expression block';
 # Captured escaped expression block (extra whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<%== my $result = block begin  =%>
+<%== my $result = capture begin  =%>
 <html>
 <%  end =%>
 <%= $result =%>
@@ -190,7 +190,7 @@ is $output, '&lt;html&gt;<html>', 'captured escaped expression block';
 # Captured escaped expression block (perl lines and extra whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-%== my $result = block  begin
+%== my $result = capture  begin
 <html>
 %  end
 <%= $result =%>
@@ -205,7 +205,7 @@ EOF
 # Captured escaped expression block (indented perl lines and extra whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-%== my $result = block  begin
+%== my $result = capture  begin
 <html>
  %  end
 <%= $result =%>
@@ -220,7 +220,7 @@ EOF
 # Capture lines (extra whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = escape block begin                  %>
+<% my $result = escape capture begin                  %>
 <html>
 <%                        end %>
 %= $result
@@ -230,36 +230,36 @@ is $output, "\n\n&lt;html&gt;\n\n", 'captured lines';
 # Capture tags
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = escape block begin %><html><% end %><%= $result %>
+<% my $result = escape capture begin %><html><% end %><%= $result %>
 EOF
 is $output, "&lt;html&gt;\n", 'capture tags';
 
 # Capture tags (alternative)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = escape block begin %><html><% end %><%= $result %>
+<% my $result = escape capture begin %><html><% end %><%= $result %>
 EOF
 is $output, "&lt;html&gt;\n", 'capture tags';
 
 # Capture tags with appended code
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = escape( block begin %><html><% end ); %><%= $result %>
+<% my $result = escape( capture begin %><html><% end ); %><%= $result %>
 EOF
 is $output, "&lt;html&gt;\n", 'capture tags with appended code';
 
 # Capture tags with appended code (alternative)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = escape( block begin %><html><% end ); %><%= $result %>
+<% my $result = escape( capture begin %><html><% end ); %><%= $result %>
 EOF
 is $output, "&lt;html&gt;\n", 'capture tags with appended code';
 
 # Nested capture tags
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = block
-  begin %><%= escape block begin %><html><% end
+<% my $result = capture
+  begin %><%= escape capture begin %><html><% end
   %><% end %><%= $result %>
 EOF
 is $output, "&lt;html&gt;\n", 'nested capture tags';
@@ -267,8 +267,8 @@ is $output, "&lt;html&gt;\n", 'nested capture tags';
 # Nested capture tags (alternative)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = block begin =%>
-    <%= escape block begin =%>
+<% my $result = capture begin =%>
+    <%= escape capture begin =%>
         <html>
     <% end =%>
 <% end =%>
@@ -449,7 +449,7 @@ EOF
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 % my $i = 2;
-<%= block begin %>
+<%= capture begin %>
     <%= $i++ %>
 <% end for 1 .. 3; %>
 EOF
@@ -467,7 +467,7 @@ EOF
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 % my $i = 2;
-%= block begin
+%= capture begin
     <%= $i++ =%>
 % end for 1 .. 3;
 EOF
@@ -477,7 +477,7 @@ is $output, '234', 'block loop';
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
   % my $i = 2;
- %= block begin
+ %= capture begin
     %= $i++
    % end for 1 .. 3;
 EOF

@@ -34,8 +34,8 @@ my $HELPERS = <<'EOF';
 use Mojo::ByteStream 'b';
 use Mojo::Util;
 no strict 'refs'; no warnings 'redefine';
-sub block;
-*block = sub { shift->(@_) };
+sub capture;
+*capture = sub { shift->(@_) };
 sub escape;
 *escape = sub {
     return "$_[0]" if ref $_[0] && ref $_[0] eq 'Mojo::ByteStream';

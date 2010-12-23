@@ -120,7 +120,7 @@ Generate C<Makefile.PL> file for application.
 
 =item C<get>
 
-   mojo get http://mojolicious.org
+   mojo get http://mojolicio.us
    script/myapp get /foo
 
 Perform GET request to remote host or local application.
@@ -181,6 +181,6 @@ L<Mojolicious::Commands> inherits all methods from L<Mojo::Command>.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
 
 =cut

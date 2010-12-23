@@ -128,13 +128,13 @@ $ENV{HTTP_PROXY}  = $backup;
 $ENV{HTTPS_PROXY} = $backup2;
 
 # Oneliner
-is g('mojolicious.org')->code,          200, 'right status';
-is h('mojolicious.org')->code,          200, 'right status';
-is p('mojolicious.org/lalalala')->code, 404, 'right status';
-is g('http://mojolicious.org')->code,   200, 'right status';
-is p('http://mojolicious.org')->code,   404, 'right status';
-is oO('http://mojolicious.org')->code,  200, 'right status';
-is oO(POST => 'http://mojolicious.org')->code, 404, 'right status';
+is g('mojolicio.us')->code,          200, 'right status';
+is h('mojolicio.us')->code,          200, 'right status';
+is p('mojolicio.us/lalalala')->code, 404, 'right status';
+is g('http://mojolicio.us')->code,   200, 'right status';
+is p('http://mojolicio.us')->code,   404, 'right status';
+is oO('http://mojolicio.us')->code,  200, 'right status';
+is oO(POST => 'http://mojolicio.us')->code, 404, 'right status';
 my $res = f('search.cpan.org/search' => {query => 'mojolicious'});
 like $res->body, qr/Mojolicious/, 'right content';
 is $res->code,   200,             'right status';
@@ -159,9 +159,9 @@ $tx = $client->get('https://www.google.com');
 ok !!$tx->error, 'request failed';
 
 # Simple request with body
-$tx = $client->get('http://mojolicious.org' => 'Hi there!');
+$tx = $client->get('http://mojolicio.us' => 'Hi there!');
 is $tx->req->method, 'GET', 'right method';
-is $tx->req->url, 'http://mojolicious.org', 'right url';
+is $tx->req->url, 'http://mojolicio.us', 'right url';
 is $tx->req->headers->content_length, 9, 'right content length';
 is $tx->req->body, 'Hi there!', 'right content';
 is $tx->res->code, 200,         'right status';

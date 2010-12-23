@@ -458,7 +458,7 @@ Generate script tag for C<Javascript> asset.
         Home
     <% end %>
     <%= link_to '/path/to/file' => begin %>File<% end %>
-    <%= link_to 'http://mojolicious.org' => begin %>Mojolicious<% end %>
+    <%= link_to 'http://mojolicio.us' => begin %>Mojolicious<% end %>
     <%= link_to url_for->query(foo => $foo) => begin %>Retry<% end %>
 
 Generate link to route, path or URL, by default the capitalized link target
@@ -468,7 +468,7 @@ will be used as content.
     <a href="/path/to/index">Home</a>
     <a class="links" href="/path/to/index/bar">Home</a>
     <a href="/path/to/file">File</a>
-    <a href="http://mojolicious.org">Mojolicious</a>
+    <a href="http://mojolicio.us">Mojolicious</a>
     <a href="/current/path?foo=something">Retry</a>
 
 =item password_field
@@ -594,6 +594,6 @@ Register helpers in L<Mojolicious> application.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
 
 =cut

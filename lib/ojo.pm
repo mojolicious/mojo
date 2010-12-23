@@ -158,7 +158,7 @@ object.
 One redirect will be followed by default, you can change this behavior with
 the C<MOJO_MAX_REDIRECTS> environment variable.
 
-    MOJO_MAX_REDIRECTS=0 perl -Mojo -e 'b(g("mojolicious.org")->code)->say'
+    MOJO_MAX_REDIRECTS=0 perl -Mojo -e 'b(g("mojolicio.us")->code)->say'
 
 =head2 C<h>
 
@@ -215,6 +215,6 @@ Turn HTML5/XML input into L<Mojo::DOM> object.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
 
 =cut

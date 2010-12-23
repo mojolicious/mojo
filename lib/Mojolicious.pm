@@ -383,10 +383,28 @@ Web development for humans, making hard things possible and everything fun.
 
     use Mojolicious::Lite;
 
+    # Simple route with plain text response
     get '/hello' => sub { shift->render(text => 'Hello World!') };
 
+    # Route to template in DATA section
     get '/time' => 'clock';
 
+    # RESTful web service sending JSON responses
+    get '/:offset' => sub {
+        my $self   = shift;
+        my $offset = $self->param('offset') || 23;
+        $self->render(json => {list => [0 .. $offset]});
+    };
+
+    # Scrape information from remote sites
+    post '/title' => sub {
+        my $self = shift;
+        my $url  = $self->param('url') || 'http://mojolicio.us';
+        $self->render(text =>
+              $self->client->get($url)->res->dom->at('head > title')->text);
+    };
+
+    # WebSocket echo service
     websocket '/echo' => sub {
         my $self = shift;
         $self->on_message(
@@ -395,19 +413,6 @@ Web development for humans, making hard things possible and everything fun.
                 $self->send_message("echo: $message");
             }
         );
-    };
-
-    get '/title' => sub {
-        my $self = shift;
-        my $url  = $self->param('url');
-        $self->render(text =>
-              $self->client->get($url)->res->dom->at('title')->text);
-    };
-
-    post '/:offset' => sub {
-        my $self   = shift;
-        my $offset = $self->param('offset') || 23;
-        $self->render(json => {list => [0 .. $offset]});
     };
 
     app->start;
@@ -419,7 +424,8 @@ Web development for humans, making hard things possible and everything fun.
         The time is <%= $hour %>:<%= $minute %>:<%= $second %>.
     <% end %>
 
-Single file prototypes can easily grow into well structured applications.
+Single file prototypes like this one can easily grow into well structured
+applications.
 
 =head2 Have Some Cake
 
@@ -772,7 +778,7 @@ startup.
 
 =head2 Web
 
-    http://mojolicious.org
+    http://mojolicio.us
 
 =head2 IRC
 

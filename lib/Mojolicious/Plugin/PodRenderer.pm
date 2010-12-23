@@ -22,6 +22,9 @@ use Pod::Simple::Search;
 # Paths
 our @PATHS = map { $_, "$_/pods" } @INC;
 
+# Mojobar template
+our $MOJOBAR = Mojo::Command->new->get_data('mojobar.html.ep', __PACKAGE__);
+
 # Perldoc template
 our $PERLDOC = Mojo::Command->new->get_data('perldoc.html.ep', __PACKAGE__);
 
@@ -110,10 +113,11 @@ sub register {
             $dom->find('h1 + p')->until(sub { $title = shift->text });
 
             # Render
+            $self->content_for(mojobar => $self->include(inline => $MOJOBAR));
+            $self->content_for(perldoc => "$dom");
             $self->render(
-                inline  => $PERLDOC,
-                perldoc => "$dom",
-                title   => $title
+                inline => $PERLDOC,
+                title  => $title
             );
             $self->res->headers->content_type('text/html;charset="UTF-8"');
         }
@@ -152,6 +156,90 @@ sub _pod_to_html {
 1;
 __DATA__
 
+@@ mojobar.html.ep
+% content_for header => begin
+    %= javascript 'js/jquery.js'
+    %= stylesheet begin
+        #mojobar {
+            background-color: #1a1a1a;
+            background: -webkit-gradient(
+                linear,
+                0% 0%,
+                0% 100%,
+                color-stop(0%, #2a2a2a),
+                color-stop(100%, #000)
+            );
+            background: -moz-linear-gradient(
+                top,
+                #2a2a2a 0%,
+                #000 100%
+            );
+            background: linear-gradient(top, #2a2a2a 0%, #000 100%);
+            -moz-box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.6);
+            -webkit-box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.6);
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.6);
+            color: #eee;
+            padding-bottom: 0.1em;
+            padding-top: 0.1em;
+            position: absolute;
+            text-shadow: 0;
+            width: 100%;
+        }
+        #mojobar-logo {
+            float: left;
+            margin-left: 5em;
+            margin-top: 0.2em;
+        }
+        #mojobar-links {
+            float: right;
+            margin-right: 5em;
+            margin-top: 1.5em;
+        }
+        #mojobar-links a {
+            color: #ccc;
+            font: 1.1em Georgia, Times, serif;
+            margin-left: 1em;
+            text-decoration: none;
+            text-shadow: 0px -1px 0px #555;
+        }
+        #mojobar-links a:hover { color: #fff; }
+    % end
+% end
+<div id="mojobar">
+    <div id="mojobar-logo">
+        %= link_to 'http://mojolicio.us' => begin
+            <img src="mojolicious-white.png" alt="Mojolicious logo">
+        % end
+    </div>
+    <div id="mojobar-links">
+        %= link_to Documentation => 'http://mojolicio.us/perldoc'
+        %= link_to Wiki => 'https://github.com/kraih/mojo/wiki'
+        %= link_to GitHub => 'https://github.com/kraih/mojo'
+        %= link_to CPAN => 'http://search.cpan.org/dist/Mojolicious'
+        %= link_to MailingList => 'http://groups.google.com/group/mojolicious'
+        %= link_to Blog => 'http://blog.kraih.com'
+        %= link_to Twitter => 'http://twitter.com/kraih'
+    </div>
+</div>
+%= javascript begin
+    $(window).load(function () {
+        var mojobar = $('#mojobar');
+        var start = mojobar.offset().top;
+        var fixed;
+        $(window).scroll(function () {
+            if (!fixed && (mojobar.offset().top - $(window).scrollTop() < 0)) {
+                mojobar.css('top', 0);
+                mojobar.css('position', 'fixed');
+                fixed = true;
+            } else if (fixed && $(window).scrollTop() <= start) {
+                mojobar.css('position', 'absolute');
+                mojobar.css('top', start + 'px');
+                fixed = false;
+            }
+        });
+    });
+% end
+
 @@ perldoc.html.ep
 <!doctype html><html>
     <head>
@@ -159,6 +247,7 @@ __DATA__
         %= base_tag
         %= stylesheet 'css/prettify-mojo.css'
         %= javascript 'js/prettify.js'
+        %= content_for 'header'
         %= stylesheet begin
             a { color: inherit; }
             a img { border: 0; }
@@ -166,9 +255,7 @@ __DATA__
                 background-color: #f5f6f8;
                 color: #333;
                 font: 0.9em Verdana, sans-serif;
-                margin-left: 5em;
-                margin-right: 5em;
-                margin-top: 0;
+                margin: 0;
                 text-shadow: #ddd 0 1px 0;
             }
             h1, h2, h3 {
@@ -201,12 +288,16 @@ __DATA__
                 -moz-box-shadow: 0px 0px 2px #ccc;
                 -webkit-box-shadow: 0px 0px 2px #ccc;
                 box-shadow: 0px 0px 2px #ccc;
+                margin-left: 5em;
+                margin-right: 5em;
                 padding: 3em;
+                padding-top: 6em;
             }
         % end
     </head>
     <body onload="prettyPrint()">
-        <div id="perldoc"><%== $perldoc %></div>
+        %= content_for 'mojobar'
+        <div id="perldoc"><%= content_for 'perldoc' %></div>
         <div id="footer">
             %= link_to 'http://mojolicio.us' => begin
                 <img src="mojolicious-black.png" alt="Mojolicious logo">
@@ -290,6 +381,6 @@ Register renderer in L<Mojolicious> application.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
 
 =cut

@@ -43,7 +43,7 @@ disposal and can use many more variables than just the request path, such as
 request method and headers like C<Host>, C<User-Agent> and C<Accept>.
 
     GET /user/show/23 HTTP/1.1
-    Host: mojolicious.org
+    Host: mojolicio.us
     User-Agent: Mozilla/5.0 (compatible; Mojolicious; Perl)
     Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
 

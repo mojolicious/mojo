@@ -26,7 +26,7 @@ WriteMakefile(
         : ( META_MERGE => {
                 requires  => {perl => '5.008007'},
                 resources => {
-                    homepage => 'http://mojolicious.org',
+                    homepage => 'http://mojolicio.us',
                     license  => 'http://dev.perl.org/licenses/',
                     MailingList =>
                       'http://groups.google.com/group/mojolicious',

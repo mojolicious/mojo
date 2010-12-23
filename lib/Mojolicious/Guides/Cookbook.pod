@@ -246,7 +246,7 @@ Receiving a streaming response can be really tricky in most HTTP clients,
 L<Mojo::Client> makes it actually easy.
 
     my $client = Mojo::Client->new;
-    my $tx = $client->build_tx(GET => 'http://mojolicious.org');
+    my $tx = $client->build_tx(GET => 'http://mojolicio.us');
     $tx->res->body(sub { print $_[1] });
     $client->start($tx);
 

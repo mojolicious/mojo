@@ -221,7 +221,7 @@ Template blocks can be reused like functions in Perl scripts.
     <!doctype html><html>
         <head><title>Sebastians Frameworks!</title></head>
         <body>
-            <%== $link->('http://mojolicious.org', 'Mojolicious') %>
+            <%== $link->('http://mojolicio.us', 'Mojolicious') %>
             <%== $link->('http://catalystframework.org', 'Catalyst') %>
         </body>
     </html>
@@ -575,7 +575,7 @@ very powerful tool.
     get '/test' => sub {
         my $self = shift;
         $self->render(
-            data => $self->client->get('http://mojolicious.org')->res->body);
+            data => $self->client->get('http://mojolicio.us')->res->body);
     };
 
 WebSocket applications have never been this easy before.
@@ -763,6 +763,6 @@ L<Mojolicious::Lite> inherits all methods from L<Mojolicious>.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
 
 =cut

@@ -675,7 +675,7 @@ environments.
     eval 'use Mojolicious::Commands';
     die <<EOF if $@;
     It looks like you don't have the Mojolicious Framework installed.
-    Please visit http://mojolicious.org for detailed installation instructions.
+    Please visit http://mojolicio.us for detailed installation instructions.
 
     EOF
 

@@ -76,7 +76,7 @@ use lib join '/', File::Spec->splitdir(dirname(__FILE__)), '..', 'lib';
 eval 'use Mojolicious::Commands';
 die <<EOF if $@;
 It looks like you don't have the Mojolicious Framework installed.
-Please visit http://mojolicious.org for detailed installation instructions.
+Please visit http://mojolicio.us for detailed installation instructions.
 
 EOF
 
@@ -215,6 +215,6 @@ Run this command.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
 
 =cut

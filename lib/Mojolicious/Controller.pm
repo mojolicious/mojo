@@ -482,7 +482,7 @@ sub render_not_found {
     my $guide =
         $self->app->renderer->helpers->{pod_to_html}
       ? $self->url_for('/perldoc')
-      : 'http://search.cpan.org/dist/Mojolicious/lib/Mojolicious/Guides.pod';
+      : 'http://mojolicio.us/perldoc';
 
 
     # Render not found template
@@ -1194,18 +1194,18 @@ implements the following new ones.
     
 A L<Mojo::Client> prepared for the current environment.
 
-    my $tx = $c->client->get('http://mojolicious.org');
+    my $tx = $c->client->get('http://mojolicio.us');
 
     $c->client->post_form('http://kraih.com/login' => {user => 'mojo'});
 
-    $c->client->get('http://mojolicious.org' => sub {
+    $c->client->get('http://mojolicio.us' => sub {
         my $client = shift;
         $c->render_data($client->res->body);
     })->start;
 
 Some environments such as L<Mojo::Server::Daemon> even allow async requests.
 
-    $c->client->async->get('http://mojolicious.org' => sub {
+    $c->client->async->get('http://mojolicio.us' => sub {
         my $client = shift;
         $c->render_data($client->res->body);
     })->start;
@@ -1478,6 +1478,6 @@ An empty chunk marks the end of the stream.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
 
 =cut

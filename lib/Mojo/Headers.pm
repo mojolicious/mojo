@@ -527,7 +527,7 @@ Shortcut for the C<Range> header.
 =head2 C<referrer>
 
     my $referrer = $headers->referrer;
-    $headers     = $headers->referrer('http://mojolicious.org');
+    $headers     = $headers->referrer('http://mojolicio.us');
 
 Shortcut for the C<Referer> header, there was a typo in RFC 2068 which
 resulted in C<Referer> becoming an official header.
@@ -652,6 +652,6 @@ Shortcut for the C<WWW-Authenticate> header.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
 
 =cut

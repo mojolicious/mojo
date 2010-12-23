@@ -67,8 +67,7 @@ sub register {
 
             # Redirect to CPAN
             my $cpan = 'http://search.cpan.org/perldoc';
-            return $self->redirect_to(
-                "$cpan?" . $self->req->url->query->to_string)
+            return $self->redirect_to("$cpan?$module")
               unless $path && -r $path;
 
             # POD

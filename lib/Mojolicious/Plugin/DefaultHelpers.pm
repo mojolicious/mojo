@@ -154,7 +154,7 @@ Insert content into a layout template.
     <% content_for foo => begin %>test<% end %>
     <%= content_for 'foo' %>
 
-Append content to named buffer or retrieve it.
+Append content to named buffer and retrieve it.
 Note that this helper is EXPERIMENTAL and might change without warning!
 
     <% content_for message => begin %>Hello <% end %>

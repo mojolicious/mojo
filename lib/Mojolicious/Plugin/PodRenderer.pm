@@ -179,26 +179,33 @@ __DATA__
             -webkit-box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.6);
             box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.6);
             color: #eee;
-            padding-bottom: 0.1em;
-            padding-top: 0.1em;
+            height: 60px;
+            overflow: hidden;
             position: absolute;
+            text-align: right;
             text-shadow: 0;
+            vertical-align: middle;
             width: 100%;
+            z-index: 1000;
         }
         #mojobar-logo {
             float: left;
             margin-left: 5em;
-            margin-top: 0.2em;
+            padding-top: 2px;
         }
         #mojobar-links {
+            display:table-cell;
             float: right;
+            height: 60px;
             margin-right: 5em;
             margin-top: 1.5em;
         }
         #mojobar-links a {
             color: #ccc;
             font: 1.1em Georgia, Times, serif;
-            margin-left: 1em;
+            margin-left: 0.5em;
+            padding-bottom: 1em;
+            padding-top: 1em;
             text-decoration: none;
             text-shadow: 0px -1px 0px #555;
         }
@@ -274,6 +281,7 @@ __DATA__
                 text-shadow: #333 0 1px 0;
                 padding-bottom: 1.5em;
                 padding-top: 1.5em;
+                white-space: pre-wrap;
             }
             #footer {
                 padding-top: 1em;
@@ -291,7 +299,7 @@ __DATA__
                 margin-left: 5em;
                 margin-right: 5em;
                 padding: 3em;
-                padding-top: 6em;
+                padding-top: 7em;
             }
         % end
     </head>

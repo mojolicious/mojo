@@ -88,7 +88,9 @@ L<Mojolicious::Lite> is a micro web framework built around L<Mojolicious>.
 
 =head1 TUTORIAL
 
-Have fun!
+A quick example driven introduction to the wonders of L<Mojolicious::Lite>.
+Most of what you'll learn here also applies to normal L<Mojolicious>
+applications.
 
 =head2 Hello World!
 

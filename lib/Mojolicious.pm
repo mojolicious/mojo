@@ -447,65 +447,6 @@ Loosely coupled building blocks, use what you like and just ignore the rest.
     |  CGI  | |  FastCGI  | |  PSGI  | |  HTTP 1.1  | |  WebSocket  |
     '-------' '-----------' '--------' '------------' '-------------'
 
-=head2 Highlights
-
-These are some of the most important building blocks of L<Mojolicious>.
-
-=over 4
-
-=item L<Mojolicious::Lite>
-
-Micro Web Framework built on top of L<Mojolicious> for prototypes and small
-applications.
-
-=item L<Mojo::Client>
-
-Full featured async io HTTP 1.1 and WebSocket client.
-
-=item L<Mojo::DOM>
-
-Very fun and minimalistic XML/HTML5 DOM parser with CSS3 selector support.
-
-=item L<Mojo::JSON>
-
-Minimalistic JSON implementation that just works.
-
-=item L<Mojo::Server::Daemon>
-
-Highly portable async io HTTP 1.1 and WebSocket server, perfect for
-development and testing.
-
-=item L<Mojo::Server::Hypnotoad>
-
-Full featured UNIX optimized preforking async io HTTP 1.1 and WebSocket
-server with support for zero downtime software upgrades (hot deployment).
-
-=item L<Mojo::Server::CGI>, L<Mojo::Server::FastCGI>, L<Mojo::Server::PSGI>
-
-Transparent CGI, FastCGI and PSGI support out of the box.
-
-=item L<Mojo::Template>
-
-Very perlish and minimalistic template system.
-
-=item L<Mojo::ByteStream>
-
-Countless portable and very convenient bytestream manipulation methods.
-
-=item L<Mojolicious::Commands>
-
-Pluggable command line system and the backbone of the C<mojo> script.
-
-=item L<Test::Mojo>
-
-Test driven development toolkit for web applications.
-
-=item L<ojo>
-
-Fun oneliners using everything above.
-
-=back
-
 For more documentation see L<Mojolicious::Guides> and the tutorial in
 L<Mojolicious::Lite>!
 

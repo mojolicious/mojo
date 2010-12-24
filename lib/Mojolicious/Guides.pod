@@ -54,8 +54,8 @@ A must read for developers and contributors!
 =head2 HIGHLIGHTS
 
 L<Mojolicious> and L<Mojolicious::Lite> are the sum of many parts, small
-building blocks that can be used independently, here is a small list of the
-most prominent ones.
+building blocks that can be used independently, these are the most prominent
+ones.
 
 =over 4
 

@@ -256,6 +256,30 @@ content.
         <body><%= content %></body>
     </html>
 
+You can also extend L<Mojolicious> with your own helpers, a list of all built
+in ones can be found in L<Mojolicious::Plugin::DefaultHelpers> and
+L<Mojolicious::Plugin::TagHelpers>.
+
+    # "whois" helper
+    app->helper(whois => sub {
+        my $self  = shift;
+        my $agent = $self->req->headers->user_agent || 'Anonymous';
+        my $ip    = $self->tx->remote_address;
+        return "$agent ($ip)";
+    });
+
+    # GET /secret
+    get '/secret' => sub {
+        my $self = shift;
+        my $user = $self->whois;
+        $self->app->log->debug("Request from $user.");
+    } => '*';
+
+    __DATA__
+
+    @@ secret.html.ep
+    We know who you are <%= whois %>.
+
 Route placeholders allow capturing parts of a request path until a C</> or
 C<.> separator occurs, results will be stored by name in the C<stash> and
 C<param>.

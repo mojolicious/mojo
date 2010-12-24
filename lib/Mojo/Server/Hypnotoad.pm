@@ -498,6 +498,8 @@ installed.
 
 Note that this module is EXPERIMENTAL and might change without warning!
 
+See L<Mojolicious::Guides::Cookbook> for deployment recipes.
+
 =head1 SIGNALS
 
 You can control C<hypnotoad> at runtime with signals.

@@ -423,6 +423,8 @@ Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::SSL> and
 L<Net::Rendezvous::Publish> are supported transparently and used if
 installed.
 
+See L<Mojolicious::Guides::Cookbook> for deployment recipes.
+
 =head1 ATTRIBUTES
 
 L<Mojo::Server::Daemon> inherits all attributes from L<Mojo::Server> and

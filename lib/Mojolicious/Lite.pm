@@ -86,6 +86,12 @@ Mojolicious::Lite - Micro Web Framework
 
 L<Mojolicious::Lite> is a micro web framework built around L<Mojolicious>.
 
+=head1 TUTORIAL
+
+Have fun!
+
+=head2 Hello World!
+
 A minimal Hello World application looks like this, L<strict> and L<warnings>
 are automatically enabled and a few functions imported when you use
 L<Mojolicious::Lite>, turning your script into a full featured web
@@ -99,9 +105,13 @@ application.
 
     app->start;
 
+=head2 Generator
+
 There is also a helper command to generate a small example application.
 
     % mojo generate lite_app
+
+=head2 Commands
 
 All the normal L<Mojolicious> command options are available from the command
 line.
@@ -123,16 +133,22 @@ will just work without commands.
     % ./myapp.pl
     ...List of available commands (or automatically detected environment)...
 
+=head2 Start
+
 The app->start call that starts the L<Mojolicious> command system can be
 customized to override normal C<@ARGV> use.
 
     app->start('cgi');
+
+=head2 Reloading
 
 Your application will automatically reload itself if you set the C<--reload>
 option, so you don't have to restart the server after every change.
 
     % ./myapp.pl daemon --reload
     Server available at http://127.0.0.1:3000.
+
+=head2 Routes
 
 Routes are basically just fancy paths that can contain different kinds of
 placeholders.
@@ -144,6 +160,8 @@ HTTP request and response.
         my $self = shift;
         $self->render(text => 'Hello World!');
     };
+
+=head2 Stash
 
 The C<stash> is used to pass data to templates, which can be inlined in the
 C<DATA> section.
@@ -159,6 +177,8 @@ C<DATA> section.
 
     @@ baz.html.ep
     The magic numbers are <%= $one %> and <%= $two %>.
+
+=head2 Route Names
 
 All routes can have a name associated with them, this allows automatic
 template detection and back referencing with C<url_for>, C<link_to> and
@@ -187,6 +207,8 @@ simply equal to the route without non-word characters.
     @@ foo.html.ep
     <a href="<%= url_for 'index' %>">Home</a>.
 
+=head2 Layouts
+
 Templates can have layouts.
 
     # GET /with_layout
@@ -205,6 +227,8 @@ Templates can have layouts.
         <head><title>Green!</title></head>
         <body><%= content %></body>
     </html>
+
+=head2 Blocks
 
 Template blocks can be reused like functions in Perl scripts.
 
@@ -225,6 +249,8 @@ Template blocks can be reused like functions in Perl scripts.
             <%== $link->('http://catalystframework.org', 'Catalyst') %>
         </body>
     </html>
+
+=head2 Captured Content
 
 The C<content_for> helper can be used to pass around blocks of captured
 content.
@@ -256,6 +282,8 @@ content.
         <body><%= content %></body>
     </html>
 
+=head2 Helpers
+
 You can also extend L<Mojolicious> with your own helpers, a list of all built
 in ones can be found in L<Mojolicious::Plugin::DefaultHelpers> and
 L<Mojolicious::Plugin::TagHelpers>.
@@ -280,6 +308,8 @@ L<Mojolicious::Plugin::TagHelpers>.
     @@ secret.html.ep
     We know who you are <%= whois %>.
 
+=head2 Placeholders
+
 Route placeholders allow capturing parts of a request path until a C</> or
 C<.> separator occurs, results will be stored by name in the C<stash> and
 C<param>.
@@ -302,6 +332,8 @@ C<param>.
         $self->render(text => "Our :bar placeholder matched $bar");
     };
 
+=head2 Relaxed Placeholders
+
 Relaxed placeholders allow matching of everything until a C</> occurs.
 
     # /*/hello (everything except "/")
@@ -316,6 +348,8 @@ Relaxed placeholders allow matching of everything until a C</> occurs.
 
     @@ groovy.html.ep
     Your name is <%= $you %>.
+
+=head2 Wildcard Placeholders
 
 Wildcard placeholders allow matching absolutely everything, including
 C</> and C<.>.
@@ -332,6 +366,8 @@ C</> and C<.>.
 
     @@ groovy.html.ep
     Your name is <%= $you %>.
+
+=head2 HTTP Methods
 
 Routes can be restricted to specific request methods.
 
@@ -353,6 +389,8 @@ Routes can be restricted to specific request methods.
         $self->render(text => "You called /baz with $method");
     };
 
+=head2 Route Constraints
+
 All placeholders get compiled to a regex internally, with regex constraints
 this process can be easily customized.
 
@@ -370,6 +408,8 @@ this process can be easily customized.
         $self->render(text => "Our :bar placeholder matched $bar");
     };
 
+=head2 Optional Placeholders
+
 Routes allow default values to make placeholders optional.
 
     # /hello/*
@@ -382,6 +422,8 @@ Routes allow default values to make placeholders optional.
 
     @@ groovy.txt.ep
     My name is <%= $name %>.
+
+=head2 A Little Bit Of Everything
 
 All those features can be easily used together.
 
@@ -445,6 +487,8 @@ multiple features at once.
         </body>
     </html>
 
+=head2 Under
+
 Authentication and code shared between multiple routes can be realized easily
 with the C<under> statement.
 All following routes are only evaluated if the C<under> callback returned a
@@ -492,6 +536,8 @@ Prefixing multiple routes is another good use for C<under>.
 
     app->start;
 
+=head2 Conditions
+
 Conditions such as C<agent> allow even more powerful route constructs.
 
     # /foo
@@ -505,6 +551,8 @@ Conditions such as C<agent> allow even more powerful route constructs.
         shift->render(
             text => 'Dude, you really need to upgrade to Firefox!');
     };
+
+=head2 Formats
 
 Formats can be automatically detected by looking at file extensions.
 
@@ -525,6 +573,8 @@ Formats can be automatically detected by looking at file extensions.
 
     @@ detected.txt.ep
     TXT was detected.
+
+=head2 Sessions
 
 Signed cookie based sessions just work out of the box as soon as you start
 using them.
@@ -588,9 +638,13 @@ request), this is very useful in combination with C<redirect_to>.
         Logout
     <% end %>
 
+=head2 Secret
+
 Note that you should use a custom C<secret> to make signed cookies really secure.
 
     app->secret('My secret passphrase here!');
+
+=head2 HTTP Client
 
 A full featured HTTP 1.1 and WebSocket client is built right in.
 Especially in combination with L<Mojo::JSON> and L<Mojo::DOM> this can be a
@@ -602,6 +656,8 @@ very powerful tool.
             data => $self->client->get('http://mojolicio.us')->res->body);
     };
 
+=head2 WebSockets
+
 WebSocket applications have never been this easy before.
 
     websocket '/echo' => sub {
@@ -611,6 +667,8 @@ WebSocket applications have never been this easy before.
             $self->send_message("echo: $message");
         });
     };
+
+=head2 External Templates
 
 External templates will be searched by the renderer in a C<templates>
 directory.
@@ -623,6 +681,8 @@ directory.
         $self->render('foo/bar');
     };
 
+=head2 Static Files
+
 Static files will be automatically served from the C<DATA> section
 (even Base 64 encoded) or a C<public> directory if it exists.
 
@@ -634,6 +694,8 @@ Static files will be automatically served from the C<DATA> section
 
     % mkdir public
     % mv something.js public/something.js
+
+=head2 Testing
 
 Testing your application is as easy as creating a C<t> directory and filling
 it with normal Perl unit tests.
@@ -659,10 +721,14 @@ change the application log level directly in your test files.
 
     $t->app->log->level('debug');
 
+=head2 Mode
+
 To disable debug messages later in a production setup you can change the
 L<Mojolicious> mode, default will be C<development>.
 
     % ./myapp.pl --mode production
+
+=head2 Logging
 
 Log messages will be automatically written to a C<log/$mode.log> file if a
 C<log> directory exists.
@@ -676,6 +742,8 @@ For more control the L<Mojolicious> instance can be accessed directly.
         my $self = shift;
         $self->render(text => 'Hello Mojo!');
     });
+
+=head2 Growing
 
 In case a lite app needs to grow, lite and real L<Mojolicous> applications
 can be easily mixed to make the transition process very smooth.

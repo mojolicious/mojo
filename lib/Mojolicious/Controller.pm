@@ -1059,7 +1059,7 @@ __DATA__
                 font: 1.5em Georgia, Times, serif;
                 margin-bottom: 1em;
                 margin-top: 1em;
-                text-shadow: #333 0 1px 0;
+                text-shadow: #666 0 1px 0;
             }
             #footer {
                 background-color: #caecf6;
@@ -1122,7 +1122,7 @@ __DATA__
                 <h1>Perhaps you would like to add a route for it?</h1>
                 <div id="preview">
                     <pre class="prettyprint">
-get '<%= $self->req->url->path %>' => sub {
+get '/<%= $self->req->url->path %>' => sub {
     my $self = shift;
     $self->render(text => 'Hello world!');
 };</pre>

@@ -614,6 +614,9 @@ to do is add a new C<handler>.
         mine => sub {
             my ($r, $c, $output, $options) = @_;
 
+            # One time use inline template
+            my $inline = $options->{inline};
+
             # Generate relative template path
             my $name = $r->template_name($options);
 

@@ -94,6 +94,7 @@ sub register {
             );
             my $url = $self->req->url->clone;
             $url =~ s/%2F/\//gi;
+            my $sections = [];
             $dom->find('h1, h2, h3')->each(
                 sub {
                     my $tag    = shift;
@@ -102,8 +103,15 @@ sub register {
                     $anchor =~ s/[^\w\-]/_/g;
                     $anchor =~ s/^_+//;
                     $anchor =~ s/_+$//;
+                    push @$sections, [] if $tag->type eq 'h1' || !@$sections;
+                    push @{$sections->[-1]}, $text, "$url#$anchor";
                     $tag->replace_inner(
-                        qq/<a href="$url#$anchor" name="$anchor">$text<\/a>/);
+                        $self->link_to(
+                            $text => "$url#toc",
+                            class => 'mojoscroll',
+                            id    => $anchor
+                          )->to_string
+                    );
                 }
             );
 
@@ -115,8 +123,9 @@ sub register {
             $self->content_for(mojobar => $self->include(inline => $MOJOBAR));
             $self->content_for(perldoc => "$dom");
             $self->render(
-                inline => $PERLDOC,
-                title  => $title
+                inline   => $PERLDOC,
+                title    => $title,
+                sections => $sections
             );
             $self->res->headers->content_type('text/html;charset="UTF-8"');
         }
@@ -230,7 +239,7 @@ __DATA__
 %= javascript begin
     $(window).load(function () {
         var mojobar = $('#mojobar');
-        var start = mojobar.offset().top;
+        var start   = mojobar.offset().top;
         var fixed;
         $(window).scroll(function () {
             if (!fixed && (mojobar.offset().top - $(window).scrollTop() < 0)) {
@@ -242,6 +251,21 @@ __DATA__
                 mojobar.css('top', start + 'px');
                 fixed = false;
             }
+        });
+    });
+    $(document).ready(function(){
+        $(".mojoscroll").click(function(e){
+            e.preventDefault();
+            e.stopPropagation();
+            var parts  = this.href.split("#");
+            var hash   = "#" + parts[1];
+            var target = $(hash);
+            var top    = target.offset().top - 70;
+            var old    = target.attr('id');
+            target.attr('id', '');
+            location.hash = hash;
+            target.attr('id', old);
+            $('html, body').animate({scrollTop:top}, 500);
         });
     });
 % end
@@ -300,11 +324,34 @@ __DATA__
                 padding: 3em;
                 padding-top: 7em;
             }
+            #perldoc > ul:first-of-type a { text-decoration: none; }
         % end
     </head>
     <body onload="prettyPrint()">
         %= content_for 'mojobar'
-        <div id="perldoc"><%= content_for 'perldoc' %></div>
+        % my $link = begin
+            %= link_to shift, shift, class => "mojoscroll"
+        % end
+        <div id="perldoc">
+            <h1><a id="toc">TABLE OF CONTENTS</a></h1>
+            <ul>
+                % for my $section (@$sections) {
+                    <li>
+                        %== $link->(splice @$section, 0, 2)
+                        % if (@$section) {
+                            <ul>
+                                % while (@$section) {
+                                    <li>
+                                        %== $link->(splice @$section, 0, 2)
+                                    </li>
+                                % }
+                            </ul>
+                        % }
+                    </li>
+                % }
+            </ul>
+            %= content_for 'perldoc'
+        </div>
         <div id="footer">
             %= link_to 'http://mojolicio.us' => begin
                 <img src="mojolicious-black.png" alt="Mojolicious logo">

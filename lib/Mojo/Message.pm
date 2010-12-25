@@ -406,7 +406,7 @@ sub upload {
             my $uname = $upload->name;
 
             # Multiple uploads with same name
-            if (exists $uploads->{$name}) {
+            if (exists $uploads->{$uname}) {
                 $uploads->{$uname} = [$uploads->{$uname}]
                   unless ref $uploads->{$uname} eq 'ARRAY';
                 push @{$uploads->{$uname}}, $upload;

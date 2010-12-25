@@ -10,7 +10,7 @@ BEGIN { $ENV{MOJO_POLL} = 1 }
 
 use Test::More;
 plan skip_all => 'Windows is too fragile for this test!' if $^O eq 'MSWin32';
-plan tests => 25;
+plan tests => 31;
 
 # Um, Leela, Armondo and I are going to the back seat of his car for coffee.
 use Mojo::Asset::File;
@@ -61,6 +61,28 @@ post '/upload' => sub {
           . ($h->header('X-X') || ''));
 };
 
+# POST /multi_reverse
+post '/multi_reverse' => sub {
+    my $self  = shift;
+    my $file2 = $self->req->upload('file2');
+    my $file1 = $self->req->upload('file1');
+    $self->render_text($file1->filename
+          . $file1->asset->slurp
+          . $file2->filename
+          . $file2->asset->slurp);
+};
+
+# POST /multi
+post '/multi' => sub {
+    my $self  = shift;
+    my $file1 = $self->req->upload('file1');
+    my $file2 = $self->req->upload('file2');
+    $self->render_text($file1->filename
+          . $file1->asset->slurp
+          . $file2->filename
+          . $file2->asset->slurp);
+};
+
 # GET /progress
 get '/progress/:id' => sub {
     my $self = shift;
@@ -105,6 +127,16 @@ $t->post_form_ok('/upload', {file => $hash, test => 'tset'})->status_is(200)
 $t->post_form_ok('/upload?upload_id=23',
     {file => {content => 'alalal'}, test => 'tset'})->status_is(200)
   ->content_is('filealalaltsetapplication/octet-stream');
+
+# POST /multi_reverse
+$t->post_form_ok('/multi_reverse',
+    {file1 => {content => '1111'}, file2 => {content => '11112222'},})
+  ->status_is(200)->content_is('file11111file211112222');
+
+# POST /multi
+$t->post_form_ok('/multi',
+    {file1 => {content => '1111'}, file2 => {content => '11112222'},})
+  ->status_is(200)->content_is('file11111file211112222');
 
 # GET/progress/23
 $t->get_ok('/progress/23')->status_is(200)->content_is('100%');

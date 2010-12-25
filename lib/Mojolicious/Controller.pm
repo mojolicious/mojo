@@ -905,129 +905,132 @@ __DATA__
         % end
     </head>
     <body onload="prettyPrint()">
-    % if ($self->app->mode eq 'development') {
-        % my $cv = begin
-            % my ($key, $value, $i) = @_;
-            %= tag 'tr', $i ? (class => 'important') : undef, begin
-                <td class="key"><%= $key %>.</td>
-                <td class="value">
-                    <code class="prettyprint"><%= $value %></code>
-                </td>
+        % if ($self->app->mode eq 'development') {
+            % my $code = begin
+                <code class="prettyprint"><%= shift %></code>
             % end
-        % end
-        % my $kv = begin
-            % my ($key, $value) = @_;
-            <tr>
-                <td class="key"><%= $key %>:</td>
-                <td class="value">
-                    <pre><%= $value %></pre>
-                </td>
-            </tr>
-        % end
-        <div id="showcase" class="code box">
-            <h1><%= $e->message %></h1>
-            <div id="context">
+            % my $cv = begin
+                % my ($key, $value, $i) = @_;
+                %= tag 'tr', $i ? (class => 'important') : undef, begin
+                    <td class="key"><%= $key %>.</td>
+                    <td class="value">
+                       %== $code->($value)
+                    </td>
+                % end
+            % end
+            % my $kv = begin
+                % my ($key, $value) = @_;
+                <tr>
+                    <td class="key"><%= $key %>:</td>
+                    <td class="value">
+                        <pre><%= $value %></pre>
+                    </td>
+                </tr>
+            % end
+            <div id="showcase" class="code box">
+                <h1><%= $e->message %></h1>
+                <div id="context">
+                    <table>
+                        % for my $line (@{$e->lines_before}) {
+                            %== $cv->($line->[0], $line->[1])
+                        % }
+                        % if (defined $e->line->[1]) {
+                            %== $cv->($e->line->[0], $e->line->[1], 1)
+                        % }
+                        % for my $line (@{$e->lines_after}) {
+                            %== $cv->($line->[0], $line->[1])
+                        % }
+                    </table>
+                </div>
+                % if (defined $e->line->[2]) {
+                    <div id="insight">
+                        <table>
+                            % for my $line (@{$e->lines_before}) {
+                                %== $cv->($line->[0], $line->[2])
+                            % }
+                            %== $cv->($e->line->[0], $e->line->[2], 1)
+                            % for my $line (@{$e->lines_after}) {
+                                %== $cv->($line->[0], $line->[2])
+                            % }
+                        </table>
+                    </div>
+                    <div class="tap">tap for more</div>
+                    %= javascript begin
+                        var current = '#context';
+                        $('#showcase').click(function() {
+                            $(current).slideToggle('slow', function() {
+                                if (current == '#context') {
+                                    current = '#insight';
+                                }
+                                else {
+                                    current = '#context';
+                                }
+                                $(current).slideToggle('slow');
+                            });
+                        });
+                        $('#insight').toggle();
+                    % end
+                % }
+            </div>
+            <div class="box" id="trace">
+                % if (@{$e->frames}) {
+                    <div id="frames">
+                        % for my $frame (@{$e->frames}) {
+                            % if (my $line = $frame->[3]) {
+                                <div class="file"><%= $frame->[1] %></div>
+                                <div class="code preview">
+                                    %= "$frame->[2]."
+                                    %== $code->($line)
+                                </div>
+                            % }
+                        % }
+                    </div>
+                    <div class="tap">tap for more</div>
+                    %= javascript begin
+                        $('#trace').click(function() {
+                            $('#frames').slideToggle('slow');
+                        });
+                        $('#frames').toggle();
+                    % end
+                % }
+            </div>
+            <div class="box infobox" id="request">
                 <table>
-                % for my $line (@{$e->lines_before}) {
-                    %== $cv->($line->[0], $line->[1])
-                % }
-                % if (defined $e->line->[1]) {
-                    %== $cv->($e->line->[0], $e->line->[1], 1)
-                % }
-                % for my $line (@{$e->lines_after}) {
-                    %== $cv->($line->[0], $line->[1])
-                % }
+                    % for (my $i = 0; $i < @$request; $i += 2) {
+                        % my $key = $request->[$i];
+                        % my $value = $request->[$i + 1];
+                        %== $kv->($key, $value)
+                    % }
+                    % for my $name (@{$self->req->headers->names}) {
+                        % my $value = $self->req->headers->header($name);
+                        %== $kv->($name, $value)
+                    % }
                 </table>
             </div>
-            % if (defined $e->line->[2]) {
-                <div id="insight">
+            <div class="box infobox" id="more">
+                <div id="infos">
                     <table>
-                    % for my $line (@{$e->lines_before}) {
-                        %== $cv->($line->[0], $line->[2])
-                    % }
-                    %== $cv->($e->line->[0], $e->line->[2], 1)
-                    % for my $line (@{$e->lines_after}) {
-                        %== $cv->($line->[0], $line->[2])
-                    % }
+                        % for (my $i = 0; $i < @$info; $i += 2) {
+                            %== $kv->($info->[$i], $info->[$i + 1])
+                        % }
                     </table>
                 </div>
                 <div class="tap">tap for more</div>
-                %= javascript begin
-                    var current = '#context';
-                    $('#showcase').click(function() {
-                        $(current).slideToggle('slow', function() {
-                            if (current == '#context') {
-                                current = '#insight';
-                            }
-                            else {
-                                current = '#context';
-                            }
-                            $(current).slideToggle('slow');
-                        });
-                    });
-                    $('#insight').toggle();
-                % end
-            % }
-        </div>
-        <div class="box" id="trace">
-            % if (@{$e->frames}) {
-                <div id="frames">
-                % for my $frame (@{$e->frames}) {
-                    % if (my $line = $frame->[3]) {
-                        <div class="file"><%= $frame->[1] %></div>
-                        <div class="code preview">
-                            %= "$frame->[2]."
-                            <code class="prettyprint"><%= $line %></code>
-                        </div>
-                    % }
-                % }
-                </div>
-                <div class="tap">tap for more</div>
-                %= javascript begin
-                    $('#trace').click(function() {
-                        $('#frames').slideToggle('slow');
-                    });
-                    $('#frames').toggle();
-                % end
-            % }
-        </div>
-        <div class="box infobox" id="request">
-            <table>
-            % for (my $i = 0; $i < @$request; $i += 2) {
-                % my $key = $request->[$i];
-                % my $value = $request->[$i + 1];
-                %== $kv->($key, $value)
-            % }
-            % for my $name (@{$self->req->headers->names}) {
-                % my $value = $self->req->headers->header($name);
-                %== $kv->($name, $value)
-            % }
-            </table>
-        </div>
-        <div class="box infobox" id="more">
-            <div id="infos">
-                <table>
-                % for (my $i = 0; $i < @$info; $i += 2) {
-                    %== $kv->($info->[$i], $info->[$i + 1])
-                % }
-                </table>
             </div>
-            <div class="tap">tap for more</div>
-        </div>
-        <div id="footer">
-            %= link_to 'http://mojolicio.us' => begin
-                <img src="mojolicious-black.png" alt="Mojolicious logo">
+            <div id="footer">
+                %= link_to 'http://mojolicio.us' => begin
+                    <img src="mojolicious-black.png" alt="Mojolicious logo">
+                % end
+            </div>
+            %= javascript begin
+                $('#more').click(function() {
+                    $('#infos').slideToggle('slow');
+                });
+                $('#infos').toggle();
             % end
-        </div>
-        %= javascript begin
-            $('#more').click(function() {
-                $('#infos').slideToggle('slow');
-            });
-            $('#infos').toggle();
-        % end
-    % } else {
-        Page temporarily unavailable, please come back later.
-    % }
+        % } else {
+            Page temporarily unavailable, please come back later.
+        % }
     </body>
 </html>
 
@@ -1039,7 +1042,10 @@ __DATA__
         %= stylesheet 'css/prettify-mojo.css'
         %= javascript 'js/prettify.js'
         %= stylesheet begin
-            a { text-decoration: none; }
+            a {
+                color: inherit;
+                text-decoration: none;
+            }
             a img { border: 0; }
             body {
                 background-color: #f5f6f8;
@@ -1067,17 +1073,19 @@ __DATA__
                 padding-top: 20em;
             }
             #documentation h1 { margin-bottom: 3em; }
-            #documentation a {
-                background-color: #eee;
-                border: 2px dashed #1a1a1a;
-                color: #000;
-                margin-left: 0.1em;
-                padding: 0.5em;
-            }
             #header {
                 margin-bottom: 20em;
                 margin-top: 15em;
                 width: 100%;
+            }
+            #perldoc {
+                background-color: #eee;
+                border: 2px dashed #1a1a1a;
+                color: #000;
+                display: inline-block;
+                margin-left: 0.1em;
+                padding: 0.5em;
+                white-space: nowrap;
             }
             #preview {
                 background-color: #1a1a1a;
@@ -1104,39 +1112,41 @@ __DATA__
         % end
     </head>
     <body onload="prettyPrint()">
-    % if ($self->app->mode eq 'development') {
-        <div id="header">
-            <img src="mojolicious-box.png" alt="Mojolicious banner">
-            <h1>This page is brand new and has not been unboxed yet!</h1>
-        </div>
-        <div id="suggestion">
-            <img src="mojolicious-arrow.png" alt="Arrow">
-            <h1>Perhaps you would like to add a route for it?</h1>
-            <div id="preview">
-                <pre class="prettyprint">
+        % if ($self->app->mode eq 'development') {
+            <div id="header">
+                <img src="mojolicious-box.png" alt="Mojolicious banner">
+                <h1>This page is brand new and has not been unboxed yet!</h1>
+            </div>
+            <div id="suggestion">
+                <img src="mojolicious-arrow.png" alt="Arrow">
+                <h1>Perhaps you would like to add a route for it?</h1>
+                <div id="preview">
+                    <pre class="prettyprint">
 get '<%= $self->req->url->path %>' => sub {
     my $self = shift;
     $self->render(text => 'Hello world!');
 };</pre>
+                </div>
             </div>
-        </div>
-        <div id="documentation">
-            <h1>
-                You might also enjoy our excellent documentation in
-                <%= link_to 'perldoc Mojolicious::Guides', $guide %>
-            </h1>
-            <img src="amelia.png" alt="Amelia">
-        </div>
-        <div id="footer">
-            <h1>And don't forget to have fun!</h1>
-            <p><img src="mojolicious-clouds.png" alt="Clouds"></p>
-            %= link_to 'http://mojolicio.us' => begin
-                <img src="mojolicious-black.png" alt="Mojolicious logo">
-            % end
-        </div>
-    % } else {
-        Page not found, want to go <%= link_to home => url_for->base %>?
-    % }
+            <div id="documentation">
+                <h1>
+                    You might also enjoy our excellent documentation in
+                    <div id="perldoc">
+                        <%= link_to 'perldoc Mojolicious::Guides', $guide %>
+                    </div>
+                </h1>
+                <img src="amelia.png" alt="Amelia">
+            </div>
+            <div id="footer">
+                <h1>And don't forget to have fun!</h1>
+                <p><img src="mojolicious-clouds.png" alt="Clouds"></p>
+                %= link_to 'http://mojolicio.us' => begin
+                    <img src="mojolicious-black.png" alt="Mojolicious logo">
+                % end
+            </div>
+        % } else {
+            Page not found, want to go <%= link_to home => url_for->base %>?
+        % }
     </body>
 </html>
 

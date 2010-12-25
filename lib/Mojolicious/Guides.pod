@@ -51,7 +51,7 @@ A must read for developers and contributors!
 
 =back
 
-=head2 HIGHLIGHTS
+=head1 HIGHLIGHTS
 
 L<Mojolicious> and L<Mojolicious::Lite> are the sum of many parts, small
 building blocks that can be used independently, these are the most prominent

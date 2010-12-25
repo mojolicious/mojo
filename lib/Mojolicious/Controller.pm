@@ -462,6 +462,8 @@ sub render_json {
     return $self->render($args);
 }
 
+# Excuse me, sir, you're snowboarding off the trail.
+# Lick my frozen metal ass.
 sub render_not_found {
     my ($self, $resource) = @_;
 

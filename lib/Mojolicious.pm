@@ -44,7 +44,7 @@ EOF
 };
 
 our $CODENAME = 'Snowflake';
-our $VERSION  = '1.0_001';
+our $VERSION  = '1.0';
 
 # These old doomsday devices are dangerously unstable.
 # I'll rest easier not knowing where they are.
@@ -238,6 +238,8 @@ sub handler {
     }
 }
 
+# This snow is beautiful. I'm glad global warming never happened.
+# Actually, it did. But thank God nuclear winter canceled it out.
 sub helper {
     my $self = shift;
     my $name = shift;
@@ -253,6 +255,13 @@ sub helper {
     $r->add_helper($name, @_);
 }
 
+# He knows when you are sleeping.
+# He knows when you're on the can.
+# He'll hunt you down and blast your ass, from here to Pakistan.
+# Oh...
+# You better not breathe, you better not move.
+# You're better off dead, I'm tellin' you, dude.
+# Santa Claus is gunning you down!
 sub hook {
     my ($self, $name, $cb) = @_;
 

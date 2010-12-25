@@ -33,7 +33,7 @@ __DATA__
 % my ($class, $path, $name) = @_;
 #!/usr/bin/env perl
 
-use 5.008001;
+use 5.008007;
 
 use strict;
 use warnings;
@@ -47,7 +47,7 @@ WriteMakefile(
     VERSION_FROM => 'lib/<%= $path %>',
     AUTHOR       => 'A Good Programmer <nospam@cpan.org>',
     EXE_FILES => ['script/<%= $name %>'],
-    PREREQ_PM => { 'Mojo' => '0.9003' },
+    PREREQ_PM => { 'Mojolicious' => '1.0' },
     test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t'}
 );
 __END__

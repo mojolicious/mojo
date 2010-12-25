@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-1.0 2010-12-25 00:00:00
+1.0 2010-12-26 00:00:00
         - Code name "Snowflake", this is a major release.
         - Deprecated session method in Mojolicious.
         - Deprecated handler and helper attributes in Mojolicious::Renderer.

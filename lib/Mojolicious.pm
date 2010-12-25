@@ -634,7 +634,7 @@ gets parsed.
 One use case would be upload progress bars.
 (Passed the transaction and application instances)
 
-    $app->hook(before_request => sub {
+    $app->hook(after_build_tx => sub {
         my ($tx, $app) = @_;
     });
 

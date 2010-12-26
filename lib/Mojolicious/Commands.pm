@@ -106,6 +106,18 @@ List available options for generator command with short descriptions.
 Generate application directory structure for a fully functional
 L<Mojolicious> application.
 
+=item C<generate gitignore>
+
+    mojo generate gitignore
+
+Generate C<.gitignore> file.
+
+=item C<generate hypnotoad>
+
+    mojo generate hypnotoad
+
+Generate C<hypnotoad.conf> file.
+
 =item C<generate lite_app>
 
     mojo generate lite_app

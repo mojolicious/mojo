@@ -232,8 +232,8 @@ Templates can have layouts.
 
 =head2 Blocks
 
-Template blocks that can be used like functions in Perl scripts are built
-with C<begin> and C<end>.
+Template blocks can be used like normal Perl functions and are always
+delimited by the C<begin> and C<end> keywords.
 
     # GET /with_block
     get '/with_block' => 'block';

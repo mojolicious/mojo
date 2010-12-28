@@ -269,8 +269,7 @@ content.
     __DATA__
 
     @@ captured.html.ep
-    % layout 'blue';
-    % title 'Green!';
+    % layout 'blue', title => 'Green!';
     <% content_for header => begin %>
         <meta http-equiv="Pragma" content="no-cache">
     <% end %>

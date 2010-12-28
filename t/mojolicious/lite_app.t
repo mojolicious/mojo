@@ -309,7 +309,12 @@ get '/foo' => sub {
 
 # GET /layout
 get '/layout' => sub {
-    shift->render_text('Yea baby!', layout => 'layout', handler => 'epl');
+    shift->render_text(
+        'Yea baby!',
+        layout  => 'layout',
+        handler => 'epl',
+        title   => 'Layout'
+    );
 };
 
 # POST /template
@@ -1217,7 +1222,7 @@ $t->post_ok('/bar/baz')->status_is(200)
 $t->get_ok('/layout')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("Yea baby! with layout\n");
+  ->content_is("LayoutYea baby! with layout\n");
 
 # GET /firefox
 $t->get_ok('/firefox/bar', {'User-Agent' => 'Firefox'})->status_is(200)
@@ -1776,7 +1781,8 @@ Just works!\
 <%= shift->param('name') %> Тихановский
 
 @@ layouts/layout.html.epl
-<%= shift->render_inner %> with layout
+% my $self = shift;
+<%= $self->title %><%= $self->render_inner %> with layout
 
 @@ autostash.html.ep
 % $self->layout('layout');

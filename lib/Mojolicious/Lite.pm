@@ -222,8 +222,8 @@ Templates can have layouts.
     __DATA__
 
     @@ with_layout.html.ep
-    % layout 'green';
     % title 'Green!';
+    % layout 'green';
     We've got content!
 
     @@ layouts/green.html.ep
@@ -460,6 +460,7 @@ multiple features at once.
 
         $self->render(
             template => 'welcome',
+            title    => 'Welcome!',
             layout   => 'funky',
             groovy   => $groovy
         );
@@ -469,8 +470,8 @@ multiple features at once.
     __DATA__
 
     @@ index.html.ep
-    % layout 'funky';
     % title 'Groovy!';
+    % layout 'funky';
     Who is groovy?
     <%= form_for test => (method => 'post') => begin %>
         <%= text_field 'groovy' %>
@@ -478,7 +479,6 @@ multiple features at once.
     <% end %>
 
     @@ welcome.html.ep
-    % title 'Welcome!';
     <%= $groovy %> is groovy!
     <%= include 'menu' %>
 

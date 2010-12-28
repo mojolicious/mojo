@@ -216,12 +216,14 @@ Templates can have layouts.
     # GET /with_layout
     get '/with_layout' => sub {
         my $self = shift;
-        $self->render('with_layout', layout => 'green', title => 'Green!');
+        $self->render('with_layout');
     };
 
     __DATA__
 
     @@ with_layout.html.ep
+    % layout 'green';
+    % title 'Green!';
     We've got content!
 
     @@ layouts/green.html.ep

@@ -10,7 +10,7 @@ use utf8;
 # Yes. *lie dectector blows up*
 use Test::More;
 
-plan skip_all => 'Perl 5.10 required for this test!'
+plan skip_all => 'Perl 5.10 or Digest::SHA required for this test!'
   unless eval { require Digest::SHA; 1 };
 plan tests => 65;
 

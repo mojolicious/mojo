@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojolicious.
 1.01 2010-12-27 00:00:00
         - Relicensed some of the images to make sure Mojolicious can be
           shipped with commercial products.
+        - Added EXPERIMENTAL title helper.
         - Improved documentation.
 
 1.0 2010-12-26 00:00:00

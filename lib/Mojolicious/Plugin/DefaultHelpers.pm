@@ -113,6 +113,9 @@ sub register {
     # Add "stash" helper
     $app->helper(stash => sub { shift->stash(@_) });
 
+    # Add "title" helper
+    $app->helper(title => sub { shift->render_inner('title', @_) });
+
     # Add "url_for" helper
     $app->helper(url_for => sub { shift->url_for(@_) });
 }
@@ -228,6 +231,13 @@ Access session values.
     <% stash foo => 'bar'; %>
 
 Access stash values.
+
+=item title
+
+    <% title 'Welcome!'; %>
+
+Page title.
+Note that this helper is EXPERIMENTAL and might change without warning!
 
 =item url_for
 

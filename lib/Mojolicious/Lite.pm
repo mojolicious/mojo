@@ -222,11 +222,12 @@ Templates can have layouts.
     __DATA__
 
     @@ with_layout.html.ep
+    % title 'Green!';
     We've got content!
 
     @@ layouts/green.html.ep
     <!doctype html><html>
-        <head><title>Green!</title></head>
+        <head><title><%= title %></title></head>
         <body><%= content %></body>
     </html>
 
@@ -268,6 +269,7 @@ content.
 
     @@ captured.html.ep
     % layout 'blue';
+    % title 'Green!';
     <% content_for header => begin %>
         <meta http-equiv="Pragma" content="no-cache">
     <% end %>
@@ -279,7 +281,7 @@ content.
     @@ layouts/blue.html.ep
     <!doctype html><html>
         <head>
-            <title>Green!</title>
+            <title><%= title %></title>
             <%= content_for 'header' %>
         </head>
         <body><%= content %></body>
@@ -468,6 +470,7 @@ multiple features at once.
 
     @@ index.html.ep
     % layout 'funky';
+    % title 'Groovy!';
     Who is groovy?
     <%= form_for test => (method => 'post') => begin %>
         <%= text_field 'groovy' %>
@@ -475,6 +478,7 @@ multiple features at once.
     <% end %>
 
     @@ welcome.html.ep
+    % title 'Welcome!';
     <%= $groovy %> is groovy!
     <%= include 'menu' %>
 
@@ -485,7 +489,7 @@ multiple features at once.
 
     @@ layouts/funky.html.ep
     <!doctype html><html>
-        <head><title>Funky!</title></head>
+        <head><title><%= title %></title></head>
         <body><%= content %>
         </body>
     </html>
@@ -614,12 +618,13 @@ request), this is very useful in combination with C<redirect_to>.
 
     @@ layouts/default.html.ep
     <!doctype html><html>
-        <head><title>Mojolicious rocks!</title></head>
+        <head><title><%= title %></title></head>
         <body><%= content %></body>
     </html>
 
     @@ login.html.ep
     % layout 'default';
+    % title 'Login';
     <%= form_for login => begin %>
         <% if (param 'name') { %>
             <b>Wrong name or password, please try again.</b><br>
@@ -633,6 +638,7 @@ request), this is very useful in combination with C<redirect_to>.
 
     @@ index.html.ep
     % layout 'default';
+    % title 'Welcome';
     <% if (my $message = flash 'message' ) { %>
         <b><%= $message %></b><br>
     <% } %>

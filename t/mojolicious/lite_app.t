@@ -1046,19 +1046,21 @@ $t->get_ok('/content_for')->status_is(200)
 $t->get_ok('/template_inheritance')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("<title>Welcome</title>Sidebar!Hello World!\nDefault footer!");
+  ->content_is(
+    "<title>Works!</title>\n<br>Sidebar!Hello World!\nDefault footer!");
 
 # GET /layout_without_inheritance
 $t->get_ok('/layout_without_inheritance')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('Default header!Default sidebar!Default footer!');
+  ->content_is(
+    "<title></title>\nDefault header!Default sidebar!Default footer!");
 
 # GET /double_inheritance
 $t->get_ok('/double_inheritance')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('<title>Welcome</title>Sidebar too!Default footer!');
+  ->content_is("<title>Works!</title>\n<br>Sidebar too!Default footer!");
 
 # GET /plugin_with_template
 $t->get_ok('/plugin_with_template')->status_is(200)
@@ -1699,8 +1701,9 @@ work!
 
 @@ template_inheritance.html.ep
 % layout 'template_inheritance';
+% title 'Works!';
 <% content header => begin =%>
-<%= b('<title>Welcome</title>') %>
+<%= b('<br>') %>
 <% end =%>
 <% content sidebar => begin =%>
 Sidebar!
@@ -1708,6 +1711,7 @@ Sidebar!
 Hello World!
 
 @@ layouts/template_inheritance.html.ep
+<title><%= title %></title>
 % stash foo => 'Default';
 <%= content header => begin =%>
 Default header!

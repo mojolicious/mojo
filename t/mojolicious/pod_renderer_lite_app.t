@@ -7,7 +7,7 @@ use warnings;
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
 use Test::More;
-plan skip_all => 'Perl 5.10 required for this test!'
+plan skip_all => 'Perl 5.10 or Pod::Simple required for this test!'
   unless eval { require Pod::Simple::HTML; 1 };
 plan tests => 16;
 

@@ -243,6 +243,7 @@ Access stash values.
 =item title
 
     <% title 'Welcome!'; %>
+    <%= title %>
 
 Page title.
 Note that this helper is EXPERIMENTAL and might change without warning!

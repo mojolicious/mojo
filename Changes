@@ -1,8 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.01 2010-12-27 00:00:00
-        - Mojolicious will require Perl 5.10 in the not too distant future.
-          The official requirements have been updated as a warning.
         - Relicensed some of the images to make sure Mojolicious can be
           shipped with commercial products.
         - Improved documentation.

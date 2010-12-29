@@ -10,7 +10,7 @@ use Test::More;
 
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
-plan tests => 101;
+plan tests => 102;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -54,6 +54,7 @@ ok !$tx->is_done, 'transaction is not done';
 # Host does not exist
 $tx = $client->build_tx(GET => 'http://cdeabcdeffoobarnonexisting.com');
 $client->start($tx);
+is $tx->error, "Couldn't connect.", 'right error';
 ok !$tx->is_done, 'transaction is not done';
 
 # Fresh client again

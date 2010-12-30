@@ -437,6 +437,7 @@ sub md5_sum {
 }
 
 sub punycode_decode {
+    use integer;
 
     # Defaults
     my $n    = PUNYCODE_INITIAL_N;
@@ -491,6 +492,7 @@ sub punycode_decode {
 }
 
 sub punycode_encode {
+    use integer;
 
     # Input
     my $output = $_[0];
@@ -657,6 +659,7 @@ sub xml_escape {
 
 # Helper for punycode
 sub _adapt {
+    use integer;
     my ($delta, $numpoints, $firsttime) = @_;
 
     # Delta

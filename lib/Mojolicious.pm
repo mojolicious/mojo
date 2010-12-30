@@ -851,6 +851,8 @@ Kazuhiro Shibuya
 
 Kevin Old
 
+KITAMURA Akatsuki
+
 Lars Balker Rasmussen
 
 Leon Brocard

@@ -6,6 +6,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL title helper.
         - Improved documentation.
         - Improved test. (Charlie Brady)
+        - Fixed punycode bug. (kits)
 
 1.0 2010-12-26 00:00:00
         - Code name "Snowflake", this is a major release.

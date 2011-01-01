@@ -362,13 +362,8 @@ sub listen {
     $c->{handle} = $socket;
     $self->{_reverse}->{$socket} = $id;
 
-    # TLS options
-    $c->{tls} = {
-        SSL_startHandshake => 0,
-        SSL_cert_file      => $args->{tls_cert} || $self->_prepare_cert,
-        SSL_key_file       => $args->{tls_key} || $self->_prepare_key
-      }
-      if $args->{tls};
+    # TLS
+    $c->{tls} = $self->_tls_listen($id, $args) if defined $args->{tls};
 
     # Accept limit
     $self->{_accepts} = $self->max_accepts if $self->max_accepts;
@@ -543,6 +538,15 @@ sub one_tick {
         $self->_run_callback('idle', $self->{_idle}->{$idle}->{cb}, $idle)
           unless @read || @write || @error || @hup || $timers;
     }
+}
+
+sub handle {
+    my ($self, $id) = @_;
+
+    # Connection
+    return {} unless my $c = $self->{_cs}->{$id};
+
+    return $c->{handle};
 }
 
 sub remote_info {
@@ -738,6 +742,8 @@ sub start_tls {
     my %options = (
         SSL_startHandshake => 0,
         SSL_error_trap     => sub { $self->_error($id, $_[1]) },
+        SSL_cert_file      => $args->{tls_cert},
+        SSL_key_file       => $args->{tls_key},
         Timeout            => $self->connect_timeout,
         %{$args->{tls_args} || {}}
     );
@@ -1454,6 +1460,36 @@ sub _timer {
     return $count;
 }
 
+sub _tls_listen {
+    my ($self, $id, $args) = @_;
+
+    # Options
+    my %options = (
+        SSL_startHandshake => 0,
+        SSL_cert_file      => $args->{tls_cert} || $self->_prepare_cert,
+        SSL_key_file       => $args->{tls_key} || $self->_prepare_key,
+    );
+
+    # CA client cert verification
+    %options = (
+        SSL_verify_callback => $args->{tls_verify},
+        SSL_ca_file         => -T $args->{tls_ca} ? $args->{tls_ca} : undef,
+        SSL_ca_path         => -d $args->{tls_ca} ? $args->{tls_ca} : undef,
+        SSL_verify_mode     => $args->{tls_ca} ? 0x03 : undef,
+        SSL_error_trap      => $args->{on_error},
+        %options
+    ) if $args->{tls_ca};
+
+    %options = (%options, %{$args->{tls_args}}) if $args->{tls_args};
+
+    warn "Certificate authority not found: $args->{tls_ca}\n"
+      if DEBUG
+          and $args->{tls_ca}
+          and !-e $args->{tls_ca};
+
+    return \%options;
+}
+
 sub _tls_accept {
     my ($self, $id) = @_;
 
@@ -1838,6 +1874,14 @@ Protocol to use, defaults to C<tcp>.
 
 Enable TLS.
 
+=item C<tls_cert>
+
+Path to the TLS cert file for authenticating against server's CA.
+
+=item C<tls_key>
+
+Path to the TLS key file for authenticating against server's CA.
+
 =back
 
 =head2 C<connection_timeout>
@@ -1932,6 +1976,17 @@ Path to the TLS cert file, defaulting to a built in test certificate.
 =item C<tls_key>
 
 Path to the TLS key file, defaulting to a built in test key.
+
+=item C<tls_ca>
+
+CA cert file or CA cert path (directory with multiple CA certs)
+for authenticating client certificates.
+
+If tls_ca is specified, all connections without a signed certificate will fail.
+
+=item C<tls_args>
+
+Additional parameters passed to L<IO::Socket::SSL>
 
 =back
 

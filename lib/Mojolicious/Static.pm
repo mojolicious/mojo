@@ -3415,7 +3415,7 @@ L<Mojolicious::Static> has a few popular static files bundled.
 
 Amelia Perl logo.
 
-    Copyright (C) 2010, Sebastian Riedel.
+    Copyright (C) 2010-2011, Sebastian Riedel.
 
 Licensed under the CC-SA License, Version 3.0
 L<http://creativecommons.org/licenses/by-sa/3.0>.
@@ -3424,7 +3424,7 @@ L<http://creativecommons.org/licenses/by-sa/3.0>.
 
 Mojolicious favicon.
 
-    Copyright (C) 2010, Sebastian Riedel.
+    Copyright (C) 2010-2011, Sebastian Riedel.
 
 Licensed under the CC-ND License, Version 3.0
 L<http://creativecommons.org/licenses/by-nc-nd/3.0>.
@@ -3433,7 +3433,7 @@ L<http://creativecommons.org/licenses/by-nc-nd/3.0>.
 
 Mojolicious arrow for C<not_found> template.
 
-    Copyright (C) 2010, Sebastian Riedel.
+    Copyright (C) 2010-2011, Sebastian Riedel.
 
 Licensed under the CC-ND License, Version 3.0
 L<http://creativecommons.org/licenses/by-nc-nd/3.0>.
@@ -3442,7 +3442,7 @@ L<http://creativecommons.org/licenses/by-nc-nd/3.0>.
 
 Black Mojolicious logo.
 
-    Copyright (C) 2010, Sebastian Riedel.
+    Copyright (C) 2010-2011, Sebastian Riedel.
 
 Licensed under the CC-ND License, Version 3.0
 L<http://creativecommons.org/licenses/by-nc-nd/3.0>.
@@ -3451,7 +3451,7 @@ L<http://creativecommons.org/licenses/by-nc-nd/3.0>.
 
 Mojolicious box for C<not_found> template.
 
-    Copyright (C) 2010, Sebastian Riedel.
+    Copyright (C) 2010-2011, Sebastian Riedel.
 
 Licensed under the CC-ND License, Version 3.0
 L<http://creativecommons.org/licenses/by-nc-nd/3.0>.
@@ -3460,7 +3460,7 @@ L<http://creativecommons.org/licenses/by-nc-nd/3.0>.
 
 Mojolicious clouds for C<not_found> template.
 
-    Copyright (C) 2010, Sebastian Riedel.
+    Copyright (C) 2010-2011, Sebastian Riedel.
 
 Licensed under the CC-ND License, Version 3.0
 L<http://creativecommons.org/licenses/by-nc-nd/3.0>.
@@ -3469,7 +3469,7 @@ L<http://creativecommons.org/licenses/by-nc-nd/3.0>.
 
 Mojolicious pinstripe effect for multiple templates.
 
-    Copyright (C) 2010, Sebastian Riedel.
+    Copyright (C) 2010-2011, Sebastian Riedel.
 
 Licensed under the CC-ND License, Version 3.0
 L<http://creativecommons.org/licenses/by-nc-nd/3.0>.
@@ -3478,7 +3478,7 @@ L<http://creativecommons.org/licenses/by-nc-nd/3.0>.
 
 White Mojolicious logo.
 
-    Copyright (C) 2010, Sebastian Riedel.
+    Copyright (C) 2010-2011, Sebastian Riedel.
 
 Licensed under the CC-ND License, Version 3.0
 L<http://creativecommons.org/licenses/by-nc-nd/3.0>.
@@ -3487,7 +3487,7 @@ L<http://creativecommons.org/licenses/by-nc-nd/3.0>.
 
 Mojolicious theme for C<prettify.js>.
 
-    Copyright (C) 2010, Sebastian Riedel.
+    Copyright (C) 2010-2011, Sebastian Riedel.
 
 Licensed under the CC-ND License, Version 3.0
 L<http://creativecommons.org/licenses/by-nc-nd/3.0>.

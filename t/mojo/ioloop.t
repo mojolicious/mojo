@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 8;
 
 use_ok 'Mojo::IOLoop';
 
@@ -68,3 +68,18 @@ $loop->timer(1 => sub { shift->stop });
 $loop->start;
 ok $after > 2, 'more than two ticks';
 is $ticks, $before, 'no additional ticks';
+
+# Get handle
+my $port   = Mojo::IOLoop->generate_port;
+my $handle = '';
+$loop->listen(
+    port      => $port,
+    on_accept => sub { $handle = ref shift->handle(pop) }
+);
+$loop->connect(
+    address => 'localhost',
+    port    => $port,
+);
+$loop->timer(1 => sub { shift->stop });
+$loop->start;
+is $handle, 'IO::Socket::INET', 'socket ref name';

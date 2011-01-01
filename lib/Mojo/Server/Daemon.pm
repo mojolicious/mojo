@@ -257,12 +257,25 @@ sub _listen {
     if ($listen =~ /^file\:\/\/(.+)$/) { unlink $options->{file} = $1 }
 
     # Internet socket
-    elsif ($listen =~ /^(http(?:s)?)\:\/\/(.+)\:(\d+)(?:\:(.*)\:(.*))?$/) {
+    elsif (
+        $listen =~ /^
+        (http(?:s)?)
+        \:\/\/(.+)
+        \:(\d+)
+        (?:
+            \:(.*?)
+            \:(.*?)
+            (?:\:(.+)?)
+        ?)
+        ?$/x
+      )
+    {
         $tls = $options->{tls} = 1 if $1 eq 'https';
         $options->{address}  = $2 if $2 ne '*';
         $options->{port}     = $3;
         $options->{tls_cert} = $4 if $4;
         $options->{tls_key}  = $5 if $5;
+        $options->{tls_ca}   = $6 if $6;
     }
 
     # Listen backlog size

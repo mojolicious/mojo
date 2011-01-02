@@ -1181,7 +1181,8 @@ implements the following new ones.
     my $app = $c->app;
     $c      = $c->app(Mojolicious->new);
 
-A reference back to the application that dispatched to this controller.
+A reference back to the L<Mojolicious> application that dispatched to this
+controller.
 
 =head2 C<match>
 
@@ -1393,14 +1394,14 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
     my $req = $c->req;
 
-Alias for C<$c->tx->req>.
+Alias for C<$c-E<gt>tx-E<gt>req>.
 Usually refers to a L<Mojo::Message::Request> object.
 
 =head2 C<res>
 
     my $res = $c->res;
 
-Alias for C<$c->tx->res>.
+Alias for C<$c-E<gt>tx-E<gt>res>.
 Usually refers to a L<Mojo::Message::Response> object.
 
 =head2 C<send_message>

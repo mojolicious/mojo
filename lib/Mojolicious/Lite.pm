@@ -191,23 +191,17 @@ simply equal to the route without non-word characters.
     # /
     get '/' => 'index';
 
-    # /foo
-    get '/foo' => '*';
-
-    # /bar
-    get '/bar' => sub {
-        my $self = shift;
-        $self->render(text => 'Hi!')
-    } => 'bar';
+    # /hello
+    get '/hello' => '*';
 
     __DATA__
 
     @@ index.html.ep
-    <%= link_to Foo => 'foo' %>.
-    <%= link_to Bar => 'bar' %>.
+    <%= link_to Hello => 'hello' %>.
+    <%= link_to Reload => 'index' %>.
 
-    @@ foo.html.ep
-    <a href="/<%= url_for 'index' %>">Home</a>.
+    @@ hello.html.ep
+    Hello World!
 
 =head2 Layouts
 

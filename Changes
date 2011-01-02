@@ -4,7 +4,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Relicensed some of the images to make sure Mojolicious can be
           shipped with commercial products.
         - Added EXPERIMENTAL title helper.
-        - Added EXPERIMENTAL delayed method to Mojolicious::Controller.
+        - Added EXPERIMENTAL render_later method to Mojolicious::Controller.
         - Improved documentation.
         - Improved test. (Charlie Brady)
         - Fixed punycode bug. (kits)

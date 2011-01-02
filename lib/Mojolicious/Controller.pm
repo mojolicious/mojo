@@ -130,8 +130,6 @@ sub cookie {
     return map { $_->value } @cookies;
 }
 
-sub delayed { shift->stash->{'mojo.rendered'} = 1 }
-
 # Something's wrong, she's not responding to my poking stick.
 sub finish {
     my $self = shift;
@@ -464,6 +462,8 @@ sub render_json {
     return $self->render($args);
 }
 
+sub render_later { shift->stash->{'mojo.rendered'} = 1 }
+
 # Excuse me, sir, you're snowboarding off the trail.
 # Lick my frozen metal ass.
 sub render_not_found {
@@ -577,7 +577,7 @@ sub rendered {
     $self->tx->resume;
 
     # Disable auto rendering
-    $self->delayed;
+    $self->render_later;
 
     # Stash
     my $stash = $self->stash;
@@ -1233,13 +1233,6 @@ Some environments such as L<Mojo::Server::Daemon> even allow async requests.
 
 Access request cookie values and create new response cookies.
 
-=head2 C<delayed>
-
-    $c->delayed;
-
-Disable auto rendering and prepare L<Mojolicious> for a delayed response.
-Note that this method is EXPERIMENTAL and might change without warning!
-
 =head2 C<finish>
 
     $c->finish;
@@ -1350,6 +1343,13 @@ C<extends> features.
     $c->render_json([1, 2, -3]);
 
 Render a data structure as JSON.
+
+=head2 C<render_later>
+
+    $c->render_later;
+
+Disable auto rendering and prepare L<Mojolicious> for a delayed response.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<render_not_found>
 

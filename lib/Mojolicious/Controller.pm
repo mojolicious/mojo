@@ -130,6 +130,8 @@ sub cookie {
     return map { $_->value } @cookies;
 }
 
+sub delayed { shift->stash->{'mojo.rendered'} = 1 }
+
 # Something's wrong, she's not responding to my poking stick.
 sub finish {
     my $self = shift;
@@ -574,8 +576,8 @@ sub rendered {
     # Resume
     $self->tx->resume;
 
-    # Rendered
-    $self->stash->{'mojo.rendered'} = 1;
+    # Disable auto rendering
+    $self->delayed;
 
     # Stash
     my $stash = $self->stash;
@@ -1230,6 +1232,13 @@ Some environments such as L<Mojo::Server::Daemon> even allow async requests.
     my @values = $c->cookie('foo');
 
 Access request cookie values and create new response cookies.
+
+=head2 C<delayed>
+
+    $c->delayed;
+
+Disable auto rendering and prepare L<Mojolicious> for a delayed response.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<finish>
 

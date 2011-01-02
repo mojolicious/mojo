@@ -141,10 +141,10 @@ my $longpoll_static_delayed_too;
 get '/longpoll/static/delayed_too' => sub {
     my $self = shift;
     $self->on_finish(sub { $longpoll_static_delayed_too = 'finished!' });
-    $self->res->code(200);
+    $self->delayed;
     $self->client->ioloop->timer(
         '0.5' => sub { $self->render_static('hello.txt') });
-};
+} => 'delayed_too';
 
 # GET /too_long
 my $too_long;

@@ -114,8 +114,8 @@ sub new {
     $static->root($home->rel_dir('public'));
 
     # Hide own controller methods
-    $r->hide(qw/AUTOLOAD DESTROY client cookie finish finished flash/);
-    $r->hide(qw/handler helper on_message param redirect_to render/);
+    $r->hide(qw/AUTOLOAD DESTROY client cookie delayed finish finished/);
+    $r->hide(qw/flash handler helper on_message param redirect_to render/);
     $r->hide(qw/render_data render_exception render_inner render_json/);
     $r->hide(qw/render_not_found render_partial render_static render_text/);
     $r->hide(qw/rendered send_message session signed_cookie url_for/);

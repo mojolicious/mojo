@@ -207,7 +207,7 @@ simply equal to the route without non-word characters.
     <%= link_to Bar => 'bar' %>.
 
     @@ foo.html.ep
-    <a href="<%= url_for 'index' %>">Home</a>.
+    <a href="/<%= url_for 'index' %>">Home</a>.
 
 =head2 Layouts
 
@@ -228,9 +228,16 @@ Templates can have layouts.
 
     @@ layouts/green.html.ep
     <!doctype html><html>
-        <head><title><%= title %></title></head>
+        <head>
+            <title><%= title %></title>
+            <%= base_tag %>
+        </head>
         <body><%= content %></body>
     </html>
+
+All helper generated URLs are usually relative, in combination with the
+C<base_tag> helper this will keep your applications portable across many
+different deployment scenarios.
 
 =head2 Blocks
 
@@ -282,6 +289,7 @@ content.
     <!doctype html><html>
         <head>
             <title><%= title %></title>
+            <%= base_tag %>
             <%= content_for 'header' %>
         </head>
         <body><%= content %></body>
@@ -489,7 +497,10 @@ multiple features at once.
 
     @@ layouts/funky.html.ep
     <!doctype html><html>
-        <head><title><%= title %></title></head>
+        <head>
+            <title><%= title %></title>
+            <%= base_tag %>
+        </head>
         <body><%= content %>
         </body>
     </html>
@@ -618,7 +629,10 @@ request), this is very useful in combination with C<redirect_to>.
 
     @@ layouts/default.html.ep
     <!doctype html><html>
-        <head><title><%= title %></title></head>
+        <head>
+            <title><%= title %></title>
+        </head>
+        <%= base_tag %>
         <body><%= content %></body>
     </html>
 

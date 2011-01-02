@@ -1348,7 +1348,7 @@ Render a data structure as JSON.
 
     $c->render_later;
 
-Disable auto rendering and prepare L<Mojolicious> for a delayed response.
+Disable auto rendering.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<render_not_found>

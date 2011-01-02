@@ -631,8 +631,8 @@ request), this is very useful in combination with C<redirect_to>.
     <!doctype html><html>
         <head>
             <title><%= title %></title>
+            <%= base_tag %>
         </head>
-        <%= base_tag %>
         <body><%= content %></body>
     </html>
 

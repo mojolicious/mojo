@@ -14,34 +14,25 @@ sub register {
     # Config
     $conf ||= {};
 
-    # Set charset
-    $app->hook(
-        before_dispatch => sub {
-            my $self = shift;
 
-            # Got a charset
-            if (my $charset = $conf->{charset}) {
+    # Got a charset
+    if (my $charset = $conf->{charset}) {
 
-                # This has to be done before params are cloned
-                $self->tx->req->default_charset($charset);
+        # Add charset to text/html content type
+        $app->types->type(html => "text/html;charset=$charset");
 
-                # Add charset to text/html content type
-                my $type = $self->app->types->type('html');
-                unless ($type =~ /charset=/) {
-                    $type .= ";charset=$charset";
-                    $self->app->types->type(html => $type);
-                }
-            }
+        # Allow defined but blank encoding to suppress unwanted
+        # conversion
+        my $encoding =
+          defined $conf->{encoding}
+          ? $conf->{encoding}
+          : $conf->{charset};
+        $app->renderer->encoding($encoding) if $encoding;
 
-            # Allow defined but blank encoding to suppress unwanted
-            # conversion
-            my $encoding =
-              defined $conf->{encoding}
-              ? $conf->{encoding}
-              : $conf->{charset};
-            $self->app->renderer->encoding($encoding) if $encoding;
-        }
-    );
+        # This has to be done before params are cloned
+        $app->hook(
+            after_build_tx => sub { shift->req->default_charset($charset) });
+    }
 }
 
 1;

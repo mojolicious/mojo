@@ -7,6 +7,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL render_later method to Mojolicious::Controller.
         - Improved documentation.
         - Improved test. (Charlie Brady)
+        - Improved charset handling in Mojolicious slightly.
         - Fixed punycode bug. (kits)
 
 1.0 2010-12-26 00:00:00

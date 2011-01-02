@@ -16,7 +16,7 @@ __PACKAGE__->attr(
             gif  => 'image/gif',
             gz   => 'application/gzip',
             htm  => 'text/html',
-            html => 'text/html',
+            html => 'text/html;charset=UTF-8',
             ico  => 'image/x-icon',
             jpeg => 'image/jpeg',
             jpg  => 'image/jpeg',

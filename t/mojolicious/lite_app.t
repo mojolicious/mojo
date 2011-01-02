@@ -774,9 +774,8 @@ is $finished, 23, 'finished';
 
 # GET / (IRI)
 $t->get_ok('/привет/мир')->status_is(200)
-  ->content_type_is('text/html');
-is b($t->tx->res->body)->decode('UTF-8'), 'привет мир',
-  'right content';
+  ->content_type_is('text/html;charset=UTF-8')
+  ->content_is('привет мир');
 
 # GET /root
 $t->get_ok('/root.html')->status_is(200)
@@ -1240,9 +1239,9 @@ $t->get_ok('/firefox/bar', {'User-Agent' => 'Explorer'})->status_is(404)
 $t->post_form_ok('/utf8', 'UTF-8' => {name => 'Вячеслав'})
   ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
-  ->header_is('Content-Length' => 40)->content_type_is('text/html')
-  ->content_is(
-    b("Вячеслав Тихановский\n")->encode->to_string);
+  ->header_is('Content-Length' => 40)
+  ->content_type_is('text/html;charset=UTF-8')
+  ->content_is("Вячеслав Тихановский\n");
 
 # POST /utf8 (multipart/form-data)
 $t->post_form_ok(
@@ -1251,9 +1250,9 @@ $t->post_form_ok(
     {'Content-Type' => 'multipart/form-data'}
   )->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
-  ->header_is('Content-Length' => 40)->content_type_is('text/html')
-  ->content_is(b("Вячеслав Тихановский\n")->encode('UTF-8')
-      ->to_string);
+  ->header_is('Content-Length' => 40)
+  ->content_type_is('text/html;charset=UTF-8')
+  ->content_is("Вячеслав Тихановский\n");
 
 # POST /malformed_utf8
 my $tx = Mojo::Transaction::HTTP->new;

@@ -154,8 +154,11 @@ $t->get_ok('/welcome')->status_is(200)->content_type_is('text/html')
   ->content_like(qr/Mojolicious Web Framework/i);
 @@ layout
 <!doctype html><html>
-    <head><title><%= title %></title></head>
-    <body><%== content %></body>
+    <head>
+        <title><%= title %></title>
+        <%= base_tag %>
+    </head>
+    <body><%= content %></body>
 </html>
 @@ welcome
 % layout 'default';

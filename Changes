@@ -8,6 +8,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved documentation.
         - Improved test. (Charlie Brady)
         - Improved charset handling in Mojolicious slightly.
+        - Updated application generators with base tags.
         - Fixed punycode bug. (kits)
 
 1.0 2010-12-26 00:00:00

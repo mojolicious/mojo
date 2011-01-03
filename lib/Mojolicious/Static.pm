@@ -37,7 +37,8 @@ sub dispatch {
     # Serve static file
     unless ($self->serve($c, join('/', @parts))) {
 
-        # Finish
+        # Rendered
+        $c->stash->{'mojo.static'} = 1;
         $c->rendered;
 
         return;

@@ -8,7 +8,7 @@ use utf8;
 # Disable epoll and kqueue
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 669;
+use Test::More tests => 671;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -1507,6 +1507,9 @@ $t->get_ok('/redirect/condition/1' => {'X-Condition-Test' => 1})
 # GET /bridge2stash
 $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
   ->content_is("stash too!!!!!!!!\n");
+
+# GET /favicon.ico (random static request)
+$t->get_ok('/favicon.ico')->status_is(200);
 
 # GET /bridge2stash (with cookies, session and flash)
 $t->get_ok('/bridge2stash')->status_is(200)

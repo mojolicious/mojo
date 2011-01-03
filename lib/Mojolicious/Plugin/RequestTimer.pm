@@ -20,10 +20,6 @@ sub register {
             # Stash
             my $stash = $self->stash;
 
-            # Static file
-            $stash->{'mojo.static'} = 1 if $self->res->code;
-
-
             # New request
             my $req    = $self->req;
             my $method = $req->method;
@@ -33,7 +29,7 @@ sub register {
               unless $stash->{'mojo.static'};
 
             # Start
-            $self->stash('mojo.started' => [Time::HiRes::gettimeofday()]);
+            $stash->{'mojo.started'} = [Time::HiRes::gettimeofday()];
         }
     );
 

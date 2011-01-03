@@ -49,7 +49,9 @@ sub store {
     return unless keys %$session || $stash->{'mojo.active_session'};
 
     # Flash
-    delete $session->{flash};
+    my $old = delete $session->{flash};
+    @{$session->{new_flash}}{keys %$old} = values %$old
+      if $stash->{'mojo.static'};
     delete $session->{new_flash} unless keys %{$session->{new_flash}};
 
     # Default to expiring session

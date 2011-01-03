@@ -8,7 +8,7 @@ use utf8;
 # Disable epoll and kqueue
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 671;
+use Test::More tests => 686;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -1508,7 +1508,10 @@ $t->get_ok('/redirect/condition/1' => {'X-Condition-Test' => 1})
 $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
   ->content_is("stash too!!!!!!!!\n");
 
-# GET /favicon.ico (random static request)
+# GET /favicon.ico (random static requests)
+$t->get_ok('/favicon.ico')->status_is(200);
+$t->get_ok('/mojolicious-white.png')->status_is(200);
+$t->get_ok('/mojolicious-black.png')->status_is(200);
 $t->get_ok('/favicon.ico')->status_is(200);
 
 # GET /bridge2stash (with cookies, session and flash)
@@ -1531,6 +1534,22 @@ $t->get_ok('/with/under/count', {'X-Bender' => 'Rodriguez'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->header_is('X-Under'      => 1)->content_is("counter\n");
+
+# GET /bridge2stash (again)
+$t->get_ok('/bridge2stash', {'X-Flash' => 1})->status_is(200)
+  ->content_is(
+    "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!!/!\n");
+
+# GET /bridge2stash (with cookies, session and flash)
+$t->get_ok('/bridge2stash')->status_is(200)
+  ->content_is(
+    "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!flash!/!\n"
+  );
+
+# GET /bridge2stash (with cookies and session but no flash)
+$t->get_ok('/bridge2stash' => {'X-Flash2' => 1})->status_is(200)
+  ->content_is(
+    "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!!/!\n");
 
 # GET /possible
 $t->get_ok('/possible')->status_is(200)

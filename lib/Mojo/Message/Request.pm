@@ -318,10 +318,7 @@ sub _parse_env {
 
     # Path
     my $upath = $url->path;
-    if (my $value = $env->{PATH_INFO}) {
-        $value =~ s/^\///;
-        $upath->parse($value);
-    }
+    if (my $value = $env->{PATH_INFO}) { $upath->parse($value) }
 
     # Path buffer
     my $bb = $bpath->to_string;

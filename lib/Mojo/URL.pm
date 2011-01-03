@@ -174,7 +174,6 @@ sub parse {
 
     $self->scheme($scheme);
     $self->authority($authority);
-    $path =~ s/^\/// unless defined $scheme;
     $self->path->parse($path);
     $self->query->parse($query);
     $self->fragment($fragment);
@@ -334,8 +333,13 @@ sub to_string {
         $url .= "$authority";
     }
 
-    # Path and query
+    # Path
+    my $slash = $path->leading_slash;
+    $path->leading_slash(0) if !$scheme && @{$self->base->path->parts};
     $url .= $path;
+    $path->leading_slash($slash);
+
+    # Query
     $url .= "?$query" if @{$query->params};
 
     # Fragment

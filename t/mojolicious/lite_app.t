@@ -802,7 +802,7 @@ $t->get_ok('/tags/lala?a=b&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
 <foo />
 <foo bar="baz" />
 <foo one="two" three="four">Hello</foo>
-<a href="path">Path</a>
+<a href="/path">Path</a>
 <a href="http://example.com/" title="Foo">Foo</a>
 <a href="http://example.com/">Example</a>
 <a href="/template">Home</a>
@@ -827,7 +827,7 @@ $t->get_ok('/tags/lala?a=b&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
     <input type="submit" value="Ok!" />
     <input id="bar" type="submit" value="Ok too!" />
 </form>
-<form action="">
+<form action="/">
     <input name="foo" />
 </form>
 <input name="escaped" value="1&quot; &quot;2" />
@@ -862,7 +862,7 @@ $t->get_ok('/tags/lala?c=b&d=3&e=4&f=5')->status_is(200)->content_is(<<EOF);
 <foo />
 <foo bar="baz" />
 <foo one="two" three="four">Hello</foo>
-<a href="path">Path</a>
+<a href="/path">Path</a>
 <a href="http://example.com/" title="Foo">Foo</a>
 <a href="http://example.com/">Example</a>
 <a href="/template">Home</a>
@@ -885,7 +885,7 @@ $t->get_ok('/tags/lala?c=b&d=3&e=4&f=5')->status_is(200)->content_is(<<EOF);
     <input type="submit" value="Ok!" />
     <input id="bar" type="submit" value="Ok too!" />
 </form>
-<form action="">
+<form action="/">
     <input name="foo" />
 </form>
 <input name="escaped" />

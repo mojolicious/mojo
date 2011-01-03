@@ -92,7 +92,7 @@ sub _diag {
 
     # Path
     my $path = $tx->req->url->path;
-    $path =~ s/^diag// or return $self->_hello($tx);
+    $path =~ s/^\/diag// or return $self->_hello($tx);
 
     # WebSocket
     return $self->_websocket($tx) if $path =~ /^\/websocket/;

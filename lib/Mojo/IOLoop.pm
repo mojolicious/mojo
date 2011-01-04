@@ -194,7 +194,9 @@ sub connect {
         buffer     => '',
         on_connect => $args->{on_connect},
         connecting => 1,
-        tls        => $args->{tls}
+        tls        => $args->{tls},
+        tls_cert   => $args->{tls_cert},
+        tls_key    => $args->{tls_key}
     };
     (my $id) = "$c" =~ /0x([\da-f]+)/;
     $self->{_cs}->{$id} = $c;

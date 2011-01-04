@@ -16,16 +16,12 @@ plan tests => 9;
 # Really?
 # Well, it computes a little.
 use Mojo::Client;
-use Mojolicious::Lite;
-
-# Silence
-app->log->level('fatal');
-
-# GET /
-get '/' => {text => 'works'};
 
 # Client
-my $client = Mojo::Client->singleton->app(app);
+my $client = Mojo::Client->singleton;
+
+# Silence
+$client->log->level('fatal');
 
 # Server
 my $port = $client->ioloop->generate_port;

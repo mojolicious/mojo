@@ -8,7 +8,7 @@ BEGIN { $ENV{MOJO_POLL} = 1 }
 
 use Test::More;
 use Mojo::IOLoop;
-plan skip_all => 'IO::Socket::SSL 1.34 required for this test!'
+plan skip_all => 'IO::Socket::SSL 1.37 required for this test!'
   unless Mojo::IOLoop::TLS;
 plan tests => 9;
 

@@ -25,7 +25,7 @@ use Scalar::Util 'weaken';
 use constant DEBUG => $ENV{MOJO_CLIENT_DEBUG} || 0;
 
 # You can't let a single bad experience scare you away from drugs.
-__PACKAGE__->attr([qw/app http_proxy https_proxy tx/]);
+__PACKAGE__->attr([qw/app http_proxy https_proxy tx cert key/]);
 __PACKAGE__->attr(cookie_jar => sub { Mojo::CookieJar->new });
 __PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->new });
 __PACKAGE__->attr(keep_alive_timeout => 15);
@@ -609,10 +609,12 @@ sub _connect {
 
         # Connect
         $id = $loop->connect(
-            address => $address,
-            port    => $port,
-            handle  => $id,
-            tls     => $scheme eq 'https' ? 1 : 0,
+            address  => $address,
+            port     => $port,
+            handle   => $id,
+            tls      => $scheme eq 'https' ? 1 : 0,
+            tls_cert => $self->cert,
+            tls_key  => $self->key,
             on_connect => sub { $self->_connected($_[1]) }
         );
 
@@ -1150,6 +1152,9 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
         print "Error: $message";
     }
 
+    # SSL certificate authentication
+    $client->cert('ssl.crt')->key('ssl.key')->get('https://domain.com');
+    
     # Parallel requests
     my $callback = sub { print shift->res->body };
     $client->get('http://mojolicio.us' => $callback);
@@ -1265,6 +1270,20 @@ L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object.
     $client               = $client->websocket_timeout(300);
 
 Timeout in seconds for WebSockets to be idle, defaults to C<300>.
+
+=head2 C<cert>
+
+    A text file with a x.509 PEM certificate.
+
+    my $cert = $client->cert;
+    $client  = $client('ssl.crt');
+
+=head2 C<key>
+
+    A text file with a x.509 PEM private key.
+
+    my $key = $client->key;
+    $client  = $client('ssl.crt');
 
 =head1 METHODS
 

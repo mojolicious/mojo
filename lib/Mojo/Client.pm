@@ -25,7 +25,7 @@ use Scalar::Util 'weaken';
 use constant DEBUG => $ENV{MOJO_CLIENT_DEBUG} || 0;
 
 # You can't let a single bad experience scare you away from drugs.
-__PACKAGE__->attr([qw/app http_proxy https_proxy tx cert key/]);
+__PACKAGE__->attr([qw/app cert http_proxy https_proxy tx key/]);
 __PACKAGE__->attr(cookie_jar => sub { Mojo::CookieJar->new });
 __PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->new });
 __PACKAGE__->attr(keep_alive_timeout => 15);
@@ -1152,8 +1152,8 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
         print "Error: $message";
     }
 
-    # SSL certificate authentication
-    $client->cert('ssl.crt')->key('ssl.key')->get('https://domain.com');
+    # TLS certificate authentication
+    $client->cert('tls.crt')->key('tls.key')->get('https://mojolicio.us');
     
     # Parallel requests
     my $callback = sub { print shift->res->body };
@@ -1196,6 +1196,14 @@ L<Mojo::Client> implements the following attributes.
 A Mojo application to associate this client with.
 If set, local requests will be processed in this application.
 
+=head2 C<cert>
+
+    my $cert = $client->cert;
+    $client  = $client('tls.crt');
+
+Path to TLS certificate file.
+Note that this attribute is EXPERIMENTAL and might change without warning!
+
 =head2 C<cookie_jar>
 
     my $cookie_jar = $client->cookie_jar;
@@ -1232,6 +1240,14 @@ will be used.
     $client                = $client->keep_alive_timeout(15);
 
 Timeout in seconds for keep alive between requests, defaults to C<15>.
+
+=head2 C<key>
+
+    my $key = $client->key;
+    $client = $client('tls.crt');
+
+Path to TLS key file.
+Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<log>
 
@@ -1270,20 +1286,6 @@ L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object.
     $client               = $client->websocket_timeout(300);
 
 Timeout in seconds for WebSockets to be idle, defaults to C<300>.
-
-=head2 C<cert>
-
-    A text file with a x.509 PEM certificate.
-
-    my $cert = $client->cert;
-    $client  = $client('ssl.crt');
-
-=head2 C<key>
-
-    A text file with a x.509 PEM private key.
-
-    my $key = $client->key;
-    $client  = $client('ssl.crt');
 
 =head1 METHODS
 

@@ -3,6 +3,8 @@ This file documents the revision history for Perl extension Mojolicious.
 1.01 2011-01-01 00:00:00
         - Relicensed some of the images to make sure Mojolicious can be
           shipped with commercial products.
+        - Added EXPERIMENTAL TLS certificate authentication support.
+          (tempire)
         - Added EXPERIMENTAL title helper.
         - Added EXPERIMENTAL render_later method to Mojolicious::Controller.
         - Improved documentation.

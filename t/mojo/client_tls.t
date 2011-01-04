@@ -7,12 +7,15 @@ use warnings;
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
 use Test::More;
-plan skip_all => 'Windows is too fragile for this test!' if $^O eq 'MSWin32';
-
+use Mojo::IOLoop;
+plan skip_all => 'IO::Socket::SSL 1.34 required for this test!'
+  unless Mojo::IOLoop::TLS;
 plan tests => 9;
 
-use_ok 'Mojo::Client';
-
+# That does not compute.
+# Really?
+# Well, it computes a little.
+use Mojo::Client;
 use Mojolicious::Lite;
 
 # Silence
@@ -21,17 +24,18 @@ app->log->level('fatal');
 # GET /
 get '/' => {text => 'works'};
 
+# Client
 my $client = Mojo::Client->singleton->app(app);
 
 # Server
 my $port = $client->ioloop->generate_port;
 my $error;
 my $id = $client->ioloop->listen(
-    tls      => 1,
-    tls_cert => 't/certs/server/server.crt',
-    tls_key  => 't/certs/server/server.key',
-    tls_ca   => 't/certs/ca/ca.crt',
     port     => $port,
+    tls      => 1,
+    tls_cert => 't/mojo/certs/server.crt',
+    tls_key  => 't/mojo/certs/server.key',
+    tls_ca   => 't/mojo/certs/ca.crt',
     on_read  => sub {
         my ($loop, $id) = @_;
         $loop->write($id => "HTTP/1.1 200 OK\x0d\x0a"
@@ -40,35 +44,35 @@ my $id = $client->ioloop->listen(
         $loop->drop($id);
     },
     on_error => sub {
-        my ($self, $id) = @_;
-        $self->drop($id);
-        $error = pop;
+        shift->drop(shift);
+        $error = shift;
     }
 );
 
-# Fail - no cert
+# No certificate
 my $tx = $client->get("https://localhost:$port");
-ok !$tx->success, 'failed';
-like $error, qr/peer did not return a certificate$/, 'no client cert';
-
-# Fail - clear cert
+ok !$tx->success, 'not successful';
+ok $error, 'has error';
 $error = '';
 $tx    = $client->cert('')->key('')->get("https://localhost:$port");
-ok !$tx->success, 'failed';
-like $error, qr/peer did not return a certificate$/, 'no client cert';
+ok !$tx->success, 'not successful';
+ok $error, 'has error';
 
-# Success - good cert
+# Valid certificate
 $tx =
-  $client->cert('t/certs/client/client.crt')->key('t/certs/client/client.key')
+  $client->cert('t/mojo/certs/client.crt')->key('t/mojo/certs/client.key')
   ->get("https://localhost:$port");
 ok $tx->success, 'successful';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
-# Fail - bad cert
-$client->ioloop->timer(1 => sub { shift->stop });
+# Invalid certificate
 $tx =
-  $client->cert('t/certs/badclient/badclient.crt')
-  ->key('t/certs/badclient/badclient.key')->get("https://localhost:$port");
-like $error, qr/^SSL connect accept failed because of handshake problems/,
-  'bad client cert';
+  $client->cert('t/mojo/certs/badclient.crt')
+  ->key('t/mojo/certs/badclient.key')->get("https://localhost:$port");
+ok $error, 'has error';
+
+# Empty certificate
+$tx =
+  $client->cert('no file')->key('no file')->get("https://localhost:$port");
+ok $error, 'has error';

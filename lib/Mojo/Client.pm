@@ -1199,7 +1199,7 @@ If set, local requests will be processed in this application.
 =head2 C<cert>
 
     my $cert = $client->cert;
-    $client  = $client('tls.crt');
+    $client  = $client->cert('tls.crt');
 
 Path to TLS certificate file.
 Note that this attribute is EXPERIMENTAL and might change without warning!
@@ -1244,7 +1244,7 @@ Timeout in seconds for keep alive between requests, defaults to C<15>.
 =head2 C<key>
 
     my $key = $client->key;
-    $client = $client('tls.crt');
+    $client = $client->key('tls.crt');
 
 Path to TLS key file.
 Note that this attribute is EXPERIMENTAL and might change without warning!

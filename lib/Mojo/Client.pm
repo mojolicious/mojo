@@ -25,7 +25,7 @@ use Scalar::Util 'weaken';
 use constant DEBUG => $ENV{MOJO_CLIENT_DEBUG} || 0;
 
 # You can't let a single bad experience scare you away from drugs.
-__PACKAGE__->attr([qw/app cert http_proxy https_proxy tx key/]);
+__PACKAGE__->attr([qw/app cert http_proxy https_proxy key tx/]);
 __PACKAGE__->attr(cookie_jar => sub { Mojo::CookieJar->new });
 __PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->new });
 __PACKAGE__->attr(keep_alive_timeout => 15);

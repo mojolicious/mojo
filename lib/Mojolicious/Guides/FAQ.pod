@@ -10,6 +10,25 @@ L<Mojolicious> together with the right answers.
 
 =head1 QUESTIONS
 
+=head2 What does the error C<Maximum message size exceeded.> mean?
+
+To protect your applications from excessively large requests and responses,
+our HTTP parser has a cap after which it will automatically stop accepting
+new data, and in most cases force the connection to be dropped.
+This limit is around C<5MB> by default, you can use the
+C<MOJO_MAX_MESSAGE_SIZE> environment variable or the C<max_message_size>
+attribute of L<Mojo::Message> to change this value.
+
+=head2 What does the error C<Maximum line size exceeded.> mean?
+
+This is a very similar protection mechanism to the one described in the
+previous answer, but a little more specific.
+It limits the maximum length of any C<\r\n> terminated part of a HTTP
+message, such as request line, status line and headers.
+This limit is around C<10KB> by default, you can use the
+C<MOJO_MAX_LINE_SIZE> environment variable or the C<max_line_size> attribute
+of L<Mojo::Message> to change this value.
+
 =head2 Does L<Mojolicious> run on Windows systems?
 
 Sure it does!

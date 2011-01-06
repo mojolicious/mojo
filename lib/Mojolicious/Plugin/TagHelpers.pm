@@ -165,10 +165,10 @@ sub register {
 
                         # OptGroup
                         if (ref $o eq 'HASH') {
-                            my ($key, $values) = each %$o;
+                            my ($label, $values) = each %$o;
                             $parts .= $self->_tag(
                                 'optgroup',
-                                label => $key,
+                                label => $label,
                                 sub {
                                     join '', map { $cb->($_) } @$values;
                                 }

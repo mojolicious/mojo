@@ -1674,7 +1674,7 @@ controller and action!
 
 @@ selection.html.ep
 %= form_for selection => begin
-    %= select_field a => ['b', [c => ['d', [ E => 'e'], 'f']], 'g']
+    %= select_field a => ['b', {c => ['d', [ E => 'e'], 'f']}, 'g']
     %= select_field foo => [qw/bar baz/], multiple => 'multiple'
     %= submit_button
 %= end

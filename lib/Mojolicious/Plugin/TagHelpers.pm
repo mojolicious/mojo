@@ -164,12 +164,13 @@ sub register {
                     for my $o (@$options) {
 
                         # OptGroup
-                        if (ref $o eq 'ARRAY' && ref $o->[1] eq 'ARRAY') {
+                        if (ref $o eq 'HASH') {
+                            my ($key, $values) = each %$o;
                             $parts .= $self->_tag(
                                 'optgroup',
-                                label => $o->[0],
+                                label => $key,
                                 sub {
-                                    join '', map { $cb->($_) } @{$o->[1]};
+                                    join '', map { $cb->($_) } @$values;
                                 }
                             );
                         }
@@ -496,7 +497,7 @@ Generate radio input element.
     <%= select_field language => [qw/de en/] %>
     <%= select_field language => [qw/de en/], id => 'lang' %>
     <%= select_field country => [[Germany => 'de'], 'en'] %>
-    <%= select_field country => [[Europe => [[Germany => 'de'], 'en']]] %>
+    <%= select_field country => [{Europe => [[Germany => 'de'], 'en']}] %>
 
 Generate select, option and optgroup elements.
 

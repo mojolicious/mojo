@@ -44,7 +44,7 @@ EOF
 };
 
 our $CODENAME = 'Snowflake';
-our $VERSION  = '1.01';
+our $VERSION  = '1.02';
 
 # These old doomsday devices are dangerously unstable.
 # I'll rest easier not knowing where they are.

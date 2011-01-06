@@ -496,7 +496,7 @@ Generate radio input element.
     <%= select_field language => [qw/de en/] %>
     <%= select_field language => [qw/de en/], id => 'lang' %>
     <%= select_field country => [[Germany => 'de'], 'en'] %>
-    <%= select_field country => [[Europe => [Germany => 'de']]] %>
+    <%= select_field country => [[Europe => [[Germany => 'de'], 'en']]] %>
 
 Generate select, option and optgroup elements.
 

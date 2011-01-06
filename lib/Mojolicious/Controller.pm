@@ -1126,7 +1126,7 @@ __DATA__
                 <h1>Perhaps you would like to add a route for it?</h1>
                 <div id="preview">
                     <pre class="prettyprint">
-get '/<%= $self->req->url->path %>' => sub {
+get '<%= $self->req->url->path %>' => sub {
     my $self = shift;
     $self->render(text => 'Hello world!');
 };</pre>

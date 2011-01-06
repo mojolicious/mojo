@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension Mojolicious.
 
 1.02 2011-01-06 00:00:00
         - Fixed optgroup support in select_field helper.
+        - Fixed typo.
 
 1.01 2011-01-06 00:00:00
         - Relicensed some of the images to make sure Mojolicious can be

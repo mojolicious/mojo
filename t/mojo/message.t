@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 952;
+use Test::More tests => 969;
 
 use File::Spec;
 use File::Temp;
@@ -1449,31 +1449,81 @@ is $req->param('edition'), 'db6d8b30-16df-4ecd-be2f-c8194f94e1f4',
 is $req->url->to_abs->to_string, 'http://test1/index.pl',
   'right absolute URL';
 
-# Parse Apache 2.2.11 like CGI environment variables and a body
+# Parse Apache 2.2 (win32) like CGI environment variables and a body
 $req = Mojo::Message::Request->new;
 $req->parse(
-    CONTENT_LENGTH  => 11,
-    CONTENT_TYPE    => 'application/x-www-form-urlencoded',
-    PATH_INFO       => '/foo/bar',
+    CONTENT_LENGTH  => 87,
+    CONTENT_TYPE    => 'application/x-www-form-urlencoded; charset=UTF-8',
+    PATH_INFO       => '',
     QUERY_STRING    => '',
-    REQUEST_METHOD  => 'GET',
-    SCRIPT_NAME     => '/test/index.cgi',
-    HTTP_HOST       => 'localhost',
-    SERVER_PROTOCOL => 'HTTP/1.0'
+    REQUEST_METHOD  => 'POST',
+    SCRIPT_NAME     => '/index.pl',
+    HTTP_HOST       => 'test1',
+    SERVER_PROTOCOL => 'HTTP/1.1'
+);
+$req->parse('request=&ajax=true&login=test&password=111&');
+$req->parse('edition=db6d8b30-16df-4ecd-be2f-c8194f94e1f4');
+ok $req->is_done, 'request is done';
+is $req->method, 'POST', 'right method';
+is $req->url->path, '', 'right path';
+is $req->url->base->path, '/index.pl/', 'right base path';
+is $req->url->base->host, 'test1',      'right base host';
+is $req->url->base->port, '',           'right base port';
+ok !$req->url->query->to_string, 'no query';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->body, 'request=&ajax=true&login=test&password=111&'
+  . 'edition=db6d8b30-16df-4ecd-be2f-c8194f94e1f4', 'right content';
+is $req->param('ajax'),     'true', 'right value';
+is $req->param('login'),    'test', 'right value';
+is $req->param('password'), '111',  'right value';
+is $req->param('edition'), 'db6d8b30-16df-4ecd-be2f-c8194f94e1f4',
+  'right value';
+is $req->url->to_abs->to_string, 'http://test1/index.pl',
+  'right absolute URL';
+
+# Parse Apache 2.2.14 like CGI environment variables and a body (root)
+$req = Mojo::Message::Request->new;
+$req->parse(
+    SCRIPT_NAME       => '/diag/upload',
+    SERVER_NAME       => '127.0.0.1',
+    SERVER_ADMIN      => '[no address given]',
+    PATH_INFO         => '/diag/upload',
+    HTTP_CONNECTION   => 'Keep-Alive',
+    REQUEST_METHOD    => 'POST',
+    CONTENT_LENGTH    => '11',
+    SCRIPT_FILENAME   => '/tmp/SnLu1cQ3t2/test.fcgi',
+    SERVER_SOFTWARE   => 'Apache/2.2.14 (Unix) mod_fastcgi/2.4.2',
+    QUERY_STRING      => '',
+    REMOTE_PORT       => '58232',
+    HTTP_USER_AGENT   => 'Mojolicious (Perl)',
+    SERVER_PORT       => '13028',
+    SERVER_SIGNATURE  => '',
+    REMOTE_ADDR       => '127.0.0.1',
+    CONTENT_TYPE      => 'application/x-www-form-urlencoded; charset=UTF-8',
+    SERVER_PROTOCOL   => 'HTTP/1.1',
+    REQUEST_URI       => '/diag/upload',
+    GATEWAY_INTERFACE => 'CGI/1.1',
+    SERVER_ADDR       => '127.0.0.1',
+    DOCUMENT_ROOT     => '/tmp/SnLu1cQ3t2',
+    PATH_TRANSLATED   => '/tmp/test.fcgi/diag/upload',
+    HTTP_HOST         => '127.0.0.1:13028'
 );
 $req->parse('hello=world');
 ok $req->is_done, 'request is done';
-is $req->method, 'GET', 'right method';
-is $req->url->base->host, 'localhost', 'right base host';
-is $req->url->path, '/foo/bar', 'right path';
-is $req->url->base->path, '/test/index.cgi/', 'right base path';
-is $req->version, '1.0', 'right version';
+is $req->method, 'POST', 'right method';
+is $req->url->base->host, '127.0.0.1', 'right base host';
+is $req->url->base->port, 13028,       'right base port';
+is $req->url->path, '/', 'right path';
+is $req->url->base->path, '/diag/upload/', 'right base path';
+is $req->version, '1.1', 'right version';
 is $req->at_least_version('1.0'), 1,     'at least version 1.0';
 is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->is_secure, undef,         'not secure';
 is $req->body,      'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right parameters';
-is $req->url->to_abs->to_string, 'http://localhost/test/index.cgi/foo/bar',
+is $req->url->to_abs->to_string, 'http://127.0.0.1:13028/diag/upload',
   'right absolute URL';
 
 # Parse Apache 2.2.11 like CGI environment variables and a body (HTTPS)

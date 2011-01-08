@@ -2029,7 +2029,7 @@ Callback to be invoked if the connection gets closed.
     my $id = $loop->on_idle(sub {...});
 
 Callback to be invoked on every reactor tick if no other events occurred.
-Note that this attribute is EXPERIMENTAL and might change without warning!
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<on_read>
 

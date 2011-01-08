@@ -57,7 +57,7 @@ sub import {
     $ENV{MOJO_APP} = $app;
 
     # Shagadelic!
-    *{"${caller}::shagadelic"} = sub { Mojolicious::Lite->start(@_) };
+    *{"${caller}::shagadelic"} = sub { $app->start(@_) };
 }
 
 1;

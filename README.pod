@@ -130,6 +130,6 @@ Loosely coupled building blocks, use what you like and just ignore the rest.
 
 All you need is a oneliner.
 
-    curl -L cpanmin.us | perl - http://latest.mojolicio.us
+    curl -L cpanmin.us | perl - -S http://latest.mojolicio.us
 
 =cut

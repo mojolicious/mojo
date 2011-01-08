@@ -60,7 +60,7 @@ More capable editors can handle this accordingly and force the change.
 
 Quite possibly this oneliner.
 
-    curl -L cpanmin.us | perl - http://latest.mojolicio.us
+    curl -L cpanmin.us | perl - -S http://latest.mojolicio.us
 
 =head2 I think L<Mojolicious> is awesome, how can i support you guys?
 

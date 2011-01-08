@@ -349,7 +349,7 @@ Mojolicious::Renderer - MIME Type Based Renderer
 
 L<Mojolicious::Renderer> is the standard L<Mojolicious> renderer.
 It turns your stashed data structures into content.
-See L<Mojolicious::Guide::Rendering> for more.
+See L<Mojolicious::Guides::Rendering> for more.
 
 =head1 ATTRIBUTES
 

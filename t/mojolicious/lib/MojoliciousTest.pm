@@ -38,6 +38,9 @@ sub startup {
     # Routes
     my $r = $self->routes;
 
+    # Empty route
+    $r->route('/empty')->name('*');
+
     # /auth (authentication bridge)
     my $auth = $r->bridge('/auth')->to(
         cb => sub {

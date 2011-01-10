@@ -511,6 +511,7 @@ sub _generate_class {
 
     # Namespace
     my $namespace = $field->{namespace};
+    return unless $class || $namespace;
     $namespace = $self->namespace unless defined $namespace;
     $class = length $class ? "${namespace}::$class" : $namespace
       if length $namespace;

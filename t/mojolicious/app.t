@@ -6,7 +6,7 @@ use warnings;
 # Disable epoll and kqueue
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 194;
+use Test::More tests => 199;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -35,6 +35,12 @@ $t->get_ok('/foo/syntaxerror')->status_is(500)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/^Missing right curly/);
+
+# Empty route
+$t->get_ok('/empty')->status_is(404)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_like(qr/Not Found/);
 
 # Foo::badtemplate (template missing)
 $t->get_ok('/foo/badtemplate')->status_is(404)

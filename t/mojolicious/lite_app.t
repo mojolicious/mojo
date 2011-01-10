@@ -8,7 +8,7 @@ use utf8;
 # Disable epoll and kqueue
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 686;
+use Test::More tests => 696;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -54,6 +54,12 @@ app->renderer->add_handler(dead => sub { die 'renderer works!' });
 
 # GET /
 get '/' => 'root';
+
+# DELETE /
+del sub { shift->render(text => 'Hello!') };
+
+# /
+any sub { shift->render(text => 'Bye!') };
 
 # GET /with-format
 get '/with-format' => {format => 'html'} => 'with-format';
@@ -636,6 +642,14 @@ $t->head_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
 $t->get_ok('/', '1234' x 1024)->status_is(200)
   ->content_is(
     "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
+
+# DELETE /
+$t->delete_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('Hello!');
+
+# POST /
+$t->post_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('Bye!');
 
 # GET /with-format
 $t->get_ok('/with-format')->content_is("/without-format\n");

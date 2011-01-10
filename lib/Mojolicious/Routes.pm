@@ -88,7 +88,9 @@ sub add_condition {
     return $self;
 }
 
-sub any { shift->_generate_route(ref $_[0] ? shift : [], @_) }
+sub any {
+    shift->_generate_route((ref $_[0] || '') eq 'ARRAY' ? shift : [], @_);
+}
 
 # Hey. What kind of party is this? There's no booze and only one hooker.
 sub auto_render {

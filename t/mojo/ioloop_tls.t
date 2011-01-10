@@ -31,7 +31,7 @@ use Mojo::IOLoop;
 plan skip_all => 'IO::Socket::SSL 1.37 required for this test!'
   unless Mojo::IOLoop::TLS;
 plan skip_all => 'Windows is too fragile for this test!'
-  if $^O eq 'MSWin32' || $^O =~ /cygwin/;
+  if Mojo::IOLoop::WINDOWS;
 plan tests => 14;
 
 # To the panic room!

@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojolicious.
 1.02 2011-01-06 00:00:00
         - Fixed shagadelic function of Mojolicious::Lite.
         - Fixed optgroup support in select_field helper.
+        - Fixed tests that can't run on Windows.
         - Fixed typos.
 
 1.01 2011-01-06 00:00:00

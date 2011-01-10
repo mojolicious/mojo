@@ -51,7 +51,7 @@ use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
 # Windows
-use constant WINDOWS => $^O eq 'MSWin32' ? 1 : 0;
+use constant WINDOWS => $^O eq 'MSWin32' || $^O =~ /cygwin/ ? 1 : 0;
 
 # Default TLS cert (20.03.2010)
 # (openssl req -new -x509 -keyout cakey.pem -out cacert.pem -nodes -days 7300)

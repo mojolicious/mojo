@@ -9,7 +9,8 @@ use utf8;
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
 use Test::More;
-plan skip_all => 'Windows is too fragile for this test!' if $^O eq 'MSWin32';
+plan skip_all => 'Windows is too fragile for this test!'
+  if $^O eq 'MSWin32' || $^O =~ /cygwin/;
 plan tests => 31;
 
 # Um, Leela, Armondo and I are going to the back seat of his car for coffee.

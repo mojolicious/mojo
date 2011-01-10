@@ -164,7 +164,7 @@ like $tx2->res->content->asset->slurp, qr/Mojo/, 'right content';
 is $tx3->res->content->asset->slurp,   'foo12',  'right content';
 
 # Stop
-kill $^O eq 'MSWin32' ? 'KILL' : 'INT', $pid;
+kill 'INT', $pid;
 sleep 1
   while IO::Socket::INET->new(
     Proto    => 'tcp',

@@ -122,9 +122,6 @@ sub shape_match {
     # Debug
     warn "    $regex\n" if DEBUG;
 
-    # Make sure path starts with a slash
-    $$pathref = "/$$pathref" unless $$pathref =~ /^\//;
-
     # Match
     if (my @captures = $$pathref =~ /$regex/) {
 

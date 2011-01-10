@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 226;
+use Test::More tests => 232;
 
 use Mojo::Transaction::HTTP;
 
@@ -28,6 +28,9 @@ my $test = $r->route('/:controller/test')->to(action => 'test');
 
 # /*/test/edit
 $test->route('/edit')->to(action => 'edit')->name('test_edit');
+
+# /*/testedit
+$r->route('/:controller/testedit')->to(action => 'testedit');
 
 # /*/test/delete/*
 $test->route('/delete/(id)', id => qr/\d+/)->to(action => 'delete', id => 23);
@@ -233,6 +236,16 @@ is $m->captures->{action},     'edit', 'right value';
 is $m->stack->[0]->{controller}, 'foo',  'right value';
 is $m->stack->[0]->{action},     'edit', 'right value';
 is $m->url_for, '/foo/test/edit', 'right URL';
+is @{$m->stack}, 1, 'right number of elements';
+$tx = Mojo::Transaction::HTTP->new;
+$tx->req->method('GET');
+$tx->req->url->parse('/foo/testedit');
+$m = Mojolicious::Routes::Match->new($tx)->match($r);
+is $m->captures->{controller}, 'foo',      'right value';
+is $m->captures->{action},     'testedit', 'right value';
+is $m->stack->[0]->{controller}, 'foo',      'right value';
+is $m->stack->[0]->{action},     'testedit', 'right value';
+is $m->url_for, '/foo/testedit', 'right URL';
 is @{$m->stack}, 1, 'right number of elements';
 
 # Optional captures in sub route with requirement

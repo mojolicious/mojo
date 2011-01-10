@@ -8,7 +8,7 @@ use utf8;
 # Disable epoll and kqueue
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 696;
+use Test::More tests => 714;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -60,6 +60,11 @@ del sub { shift->render(text => 'Hello!') };
 
 # /
 any sub { shift->render(text => 'Bye!') };
+
+# GET /waypoint
+# GET /waypoint/foo
+app->routes->waypoint('/waypoint')->to(text => 'waypoints rule!')
+  ->get('/foo' => {text => 'waypoints work!'});
 
 # GET /with-format
 get '/with-format' => {format => 'html'} => 'with-format';
@@ -650,6 +655,28 @@ $t->delete_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
 # POST /
 $t->post_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('Bye!');
+
+# GET /waypoint
+$t->get_ok('/waypoint')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('waypoints rule!');
+
+# GET /waypoint/foo
+$t->get_ok('/waypoint/foo')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('waypoints work!');
+
+# POST /waypoint/foo
+$t->post_ok('/waypoint/foo')->status_is(404)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)');
+
+# GET /waypoint/bar
+$t->get_ok('/waypoint/bar')->status_is(404)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)');
 
 # GET /with-format
 $t->get_ok('/with-format')->content_is("/without-format\n");

@@ -18,9 +18,9 @@ Essentials every L<Mojolicious> developer should know.
 The renderer is a tiny black box turning stash data into actual responses
 utilizing multiple template systems and data encoding modules.
 
-    {text => 'Hello!'}                 -> 200 OK, text/plain, 'Hello!'
+    {text => 'Hello!'}                 -> 200 OK, text/html, 'Hello!'
     {json => {x => 3}}                 -> 200 OK, application/json, '{"x":3}'
-    {text => 'Oops!', status => '410'} -> 410 Gone, text/plain, 'Oops!'
+    {text => 'Oops!', status => '410'} -> 410 Gone, text/html, 'Oops!'
 
 Templates can be automatically detected if enough information is provided by
 the developer or routes.
@@ -178,8 +178,8 @@ too.
 
 =head2 Rendering Text (C<text>)
 
-Plain text can be rendered with the C<text> stash value, characters get
-automatically encoded to bytes.
+Perl characters can be rendered with the C<text> stash value, the given
+content will be automatically encoded to bytes.
 
     $self->render(text => 'Hello Wörld!');
 

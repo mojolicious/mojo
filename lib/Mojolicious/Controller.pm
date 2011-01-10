@@ -1318,7 +1318,8 @@ changed after the render call.
 
     $c->render_data($bits);
 
-Render binary data, similar to C<render_text> but data will not be encoded.
+Render the given content as raw bytes, similar to C<render_text> but data
+will not be encoded.
 
 =head2 C<render_exception>
 
@@ -1380,7 +1381,7 @@ C<public> directory of your application.
     $c->render_text('Hello World!');
     $c->render_text('Hello World', layout => 'green');
 
-Render the given content as plain text, note that text will be encoded.
+Render the given content as Perl characters, which will be encoded to bytes.
 See C<render_data> for an alternative without encoding.
 
 =head2 C<rendered>

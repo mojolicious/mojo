@@ -125,7 +125,11 @@ sub decode {
     Mojo::Util::decode $encoding, $string;
 
     # Decode
-    my $result = $self->_decode_structure(\$string);
+    my $result;
+    if (!eval { $result = _decode_structure(\$string); 1 } && (my $e = $@)) {
+        chomp $e;
+        $self->error($e);
+    }
 
     # Exception
     return if $self->error;
@@ -143,7 +147,7 @@ sub encode {
     my ($self, $ref) = @_;
 
     # Encode
-    my $string = $self->_encode_values($ref);
+    my $string = _encode_values($ref);
 
     # Unicode
     Mojo::Util::encode 'UTF-8', $string;
@@ -155,7 +159,7 @@ sub false {$FALSE}
 sub true {$TRUE}
 
 sub _decode_array {
-    my ($self, $ref) = @_;
+    my $ref = shift;
 
     # New array
     my $array = [];
@@ -170,21 +174,21 @@ sub _decode_array {
         return $array if $$ref =~ s/$ARRAY_END_RE//o;
 
         # Value
-        if (my $values = $self->_decode_values($ref)) {
+        if (my $values = _decode_values($ref)) {
             push @$array, @$values;
         }
 
         # Invalid format
-        else { return $self->_exception($ref) }
+        else { _exception($ref) }
 
     }
 
     # Exception
-    return $self->_exception($ref, 'Missing right square bracket');
+    _exception($ref, 'Missing right square bracket');
 }
 
 sub _decode_object {
-    my ($self, $ref) = @_;
+    my $ref = shift;
 
     # New object
     my $hash = {};
@@ -203,7 +207,7 @@ sub _decode_object {
         return $hash if $$ref =~ s/$OBJECT_END_RE//o;
 
         # Value
-        if (my $values = $self->_decode_values($ref)) {
+        if (my $values = _decode_values($ref)) {
 
             # Value
             if ($key) {
@@ -217,28 +221,28 @@ sub _decode_object {
         }
 
         # Invalid format
-        else { return $self->_exception($ref) }
+        else { _exception($ref) }
 
     }
 
     # Exception
-    return $self->_exception($ref, 'Missing right curly bracket');
+    _exception($ref, 'Missing right curly bracket');
 }
 
 sub _decode_structure {
-    my ($self, $ref) = @_;
+    my $ref = shift;
 
     # Shortcut
     return unless $$ref;
 
     # Object
     if ($$ref =~ s/$OBJECT_BEGIN_RE//o) {
-        return [$self->_decode_object($ref)];
+        return [_decode_object($ref)];
     }
 
     # Array
     elsif ($$ref =~ s/$ARRAY_BEGIN_RE//o) {
-        return [$self->_decode_array($ref)];
+        return [_decode_array($ref)];
     }
 
     # Nothing
@@ -246,7 +250,7 @@ sub _decode_structure {
 }
 
 sub _decode_values {
-    my ($self, $ref) = @_;
+    my $ref = shift;
 
     # Number
     if ($$ref =~ s/$NUMBER_RE//o) { return [0 + $1] }
@@ -275,16 +279,16 @@ sub _decode_values {
     }
 
     # Object or array
-    return $self->_decode_structure($ref);
+    return _decode_structure($ref);
 }
 
 sub _encode_array {
-    my ($self, $array) = @_;
+    my $array = shift;
 
     # Values
     my @array;
     for my $value (@$array) {
-        push @array, $self->_encode_values($value);
+        push @array, _encode_values($value);
     }
 
     # Stringify
@@ -293,13 +297,13 @@ sub _encode_array {
 }
 
 sub _encode_object {
-    my ($self, $object) = @_;
+    my $object = shift;
 
     # Values
     my @values;
     for my $key (keys %$object) {
-        my $name  = $self->_encode_string($key);
-        my $value = $self->_encode_values($object->{$key});
+        my $name  = _encode_string($key);
+        my $value = _encode_values($object->{$key});
         push @values, "$name:$value";
     }
 
@@ -309,7 +313,7 @@ sub _encode_object {
 }
 
 sub _encode_string {
-    my ($self, $string) = @_;
+    my $string = shift;
 
     # Escape
     $string =~ s/$ESCAPE_RE/_escape($1, $2)/gex;
@@ -319,16 +323,16 @@ sub _encode_string {
 }
 
 sub _encode_values {
-    my ($self, $value) = @_;
+    my $value = shift;
 
     # Reference
     if (my $ref = ref $value) {
 
         # Array
-        return $self->_encode_array($value) if $ref eq 'ARRAY';
+        return _encode_array($value) if $ref eq 'ARRAY';
 
         # Object
-        return $self->_encode_object($value) if $ref eq 'HASH';
+        return _encode_object($value) if $ref eq 'HASH';
     }
 
     # "null"
@@ -346,7 +350,7 @@ sub _encode_values {
       if $flags & (B::SVp_IOK | B::SVp_NOK) && !($flags & B::SVp_POK);
 
     # String
-    return $self->_encode_string($value);
+    return _encode_string($value);
 }
 
 sub _escape {
@@ -380,7 +384,7 @@ sub _unescape {
 }
 
 sub _exception {
-    my ($self, $ref, $error) = @_;
+    my ($ref, $error) = @_;
 
     # Message
     $error ||= 'Syntax error';
@@ -391,7 +395,7 @@ sub _exception {
     $context ||= 'end of file';
 
     # Error
-    $self->error(qq/$error near $context./) and return;
+    die "$error near $context.\n";
 }
 
 # Emulate boolean type

@@ -1139,81 +1139,79 @@ L<Mojo::DOM> is a minimalistic and very relaxed XML/HTML5 DOM parser with
 support for CSS3 selectors.
 Note that this module is EXPERIMENTAL and might change without warning!
 
-=head2 Selectors
+=head1 SELECTORS
 
 All CSS3 selectors that make sense for a standalone parser are supported.
 
-=over 4
-
-=item C<*>
+=head2 C<*>
 
 Any element.
 
-=item C<E>
+=head2 C<E>
 
     my $title = $dom->at('title');
 
 An element of type C<E>.
 
-=item C<E[foo]>
+=head2 C<E[foo]>
 
     my $links = $dom->find('a[href]');
 
 An C<E> element with a C<foo> attribute.
 
-=item C<E[foo="bar"]>
+=head2 C<E[foo="bar"]>
 
     my $fields = $dom->find('input[name="foo"]');
 
 An C<E> element whose C<foo> attribute value is exactly equal to C<bar>.
 
-=item C<E[foo~="bar"]>
+=head2 C<E[foo~="bar"]>
 
     my $fields = $dom->find('input[name~="foo"]');
 
 An C<E> element whose C<foo> attribute value is a list of
 whitespace-separated values, one of which is exactly equal to C<bar>.
 
-=item C<E[foo^="bar"]>
+=head2 C<E[foo^="bar"]>
 
     my $fields = $dom->find('input[name^="f"]');
 
 An C<E> element whose C<foo> attribute value begins exactly with the string
 C<bar>.
 
-=item C<E[foo$="bar"]>
+=head2 C<E[foo$="bar"]>
 
     my $fields = $dom->find('input[name$="o"]');
 
 An C<E> element whose C<foo> attribute value ends exactly with the string
 C<bar>.
 
-=item C<E[foo*="bar"]>
+=head2 C<E[foo*="bar"]>
 
     my $fields = $dom->find('input[name*="fo"]');
 
 An C<E> element whose C<foo> attribute value contains the substring C<bar>.
 
-=item C<E:root>
+=head2 C<E:root>
 
     my $root = $dom->at(':root');
 
 An C<E> element, root of the document.
 
-=item C<E:checked>
+=head2 C<E:checked>
 
     my $input = $dom->at(':checked');
 
 A user interface element C<E> which is checked (for instance a radio-button
 or checkbox).
 
-=item C<E:empty>
+=head2 C<E:empty>
 
     my $empty = $dom->find(':empty');
 
 An C<E> element that has no children (including text nodes).
 
-=item C<E:nth-child(n)>
+=head2 C<E:nth-child(n)>
 
     my $third = $dom->at('div:nth-child(3)');
     my $odd   = $dom->find('div:nth-child(odd)');
@@ -1222,7 +1220,7 @@ An C<E> element that has no children (including text nodes).
 
 An C<E> element, the C<n-th> child of its parent.
 
-=item C<E:nth-last-child(n)>
+=head2 C<E:nth-last-child(n)>
 
     my $third    = $dom->at('div:nth-last-child(3)');
     my $odd      = $dom->find('div:nth-last-child(odd)');
@@ -1231,7 +1229,7 @@ An C<E> element, the C<n-th> child of its parent.
 
 An C<E> element, the C<n-th> child of its parent, counting from the last one.
 
-=item C<E:nth-of-type(n)>
+=head2 C<E:nth-of-type(n)>
 
     my $third = $dom->at('div:nth-of-type(3)');
     my $odd   = $dom->find('div:nth-of-type(odd)');
@@ -1240,7 +1238,7 @@ An C<E> element, the C<n-th> child of its parent, counting from the last one.
 
 An C<E> element, the C<n-th> sibling of its type.
 
-=item C<E:nth-last-of-type(n)>
+=head2 C<E:nth-last-of-type(n)>
 
     my $third    = $dom->at('div:nth-last-of-type(3)');
     my $odd      = $dom->find('div:nth-last-of-type(odd)');
@@ -1249,85 +1247,83 @@ An C<E> element, the C<n-th> sibling of its type.
 
 An C<E> element, the C<n-th> sibling of its type, counting from the last one.
 
-=item C<E:first-child>
+=head2 C<E:first-child>
 
     my $first = $dom->at('div p:first-child');
 
 An C<E> element, first child of its parent.
 
-=item C<E:last-child>
+=head2 C<E:last-child>
 
     my $last = $dom->at('div p:last-child');
 
 An C<E> element, last child of its parent.
 
-=item C<E:first-of-type>
+=head2 C<E:first-of-type>
 
     my $first = $dom->at('div p:first-of-type');
 
 An C<E> element, first sibling of its type.
 
-=item C<E:last-of-type>
+=head2 C<E:last-of-type>
 
     my $last = $dom->at('div p:last-of-type');
 
 An C<E> element, last sibling of its type.
 
-=item C<E:only-child>
+=head2 C<E:only-child>
 
     my $lonely = $dom->at('div p:only-child');
 
 An C<E> element, only child of its parent.
 
-=item C<E:only-of-type>
+=head2 C<E:only-of-type>
 
     my $lonely = $dom->at('div p:only-of-type');
 
 an C<E> element, only sibling of its type.
 
-=item C<E:not(s)>
+=head2 C<E:not(s)>
 
     my $others = $dom->at('div p:not(:first-child)');
 
 An C<E> element that does not match simple selector C<s>.
 
-=item C<E F>
+=head2 C<E F>
 
     my $headlines = $dom->find('div h1');
 
 An C<F> element descendant of an C<E> element.
 
-=item C<E E<gt> F>
+=head2 C<E E<gt> F>
 
     my $headlines = $dom->find('html > body > div > h1');
 
 An C<F> element child of an C<E> element.
 
-=item C<E + F>
+=head2 C<E + F>
 
     my $second = $dom->find('h1 + h2');
 
 An C<F> element immediately preceded by an C<E> element.
 
-=item C<E ~ F>
+=head2 C<E ~ F>
 
     my $second = $dom->find('h1 ~ h2');
 
 An C<F> element preceded by an C<E> element.
 
-=item C<E, F, G>
+=head2 C<E, F, G>
 
     my $headlines = $dom->find('h1, h2, h3');
 
 Elements of type C<E>, C<F> and C<G>.
 
-=item C<E[foo=bar][bar=baz]>
+=head2 C<E[foo=bar][bar=baz]>
 
     my $links = $dom->find('a[foo^="b"][foo$="ar"]');
 
 An C<E> element whose attributes match all following attribute selectors.
-
-=back
 
 =head1 ATTRIBUTES
 

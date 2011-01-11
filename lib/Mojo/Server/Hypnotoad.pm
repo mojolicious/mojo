@@ -569,9 +569,7 @@ C<Hypnotoad> configuration files are normal Perl scripts returning a hash.
 
 The following parameters are currently available.
 
-=over 4
-
-=item accepts
+=head2 C<accepts>
 
     accepts => 100
 
@@ -580,110 +578,108 @@ gracefully, defaults to C<1000>.
 Setting the value to C<0> will allow workers to accept new connections
 infinitely.
 
-=item backlog
+=head2 C<backlog>
 
     backlog => 128
 
 Listen backlog size, defaults to C<SOMAXCONN>.
 
-=item clients
+=head2 C<clients>
 
     clients => 100
 
 Maximum number of parallel client connections per worker process, defaults to
 C<1000>.
 
-=item graceful_timeout
+=head2 C<graceful_timeout>
 
     graceful_timeout => 15
 
 Time in seconds a graceful worker stop may take before being forced, defaults
 to C<30>.
 
-=item group
+=head2 C<group>
 
     group => 'staff'
 
 Group name for worker processes.
 
-=item heartbeat_interval
+=head2 C<heartbeat_interval>
 
     heartbeat_interval => 3
 
 Heartbeat interval in seconds, defaults to C<5>.
 
-=item heartbeat_timeout
+=head2 C<heartbeat_timeout>
 
     heartbeat_timeout => 5
 
 Time in seconds before a worker without a heartbeat will be stopped, defaults
 to C<2>.
 
-=item keep_alive_requests
+=head2 C<keep_alive_requests>
 
     keep_alive_requests => 50
 
 Number of keep alive requests per connection, defaults to C<25>.
 
-=item keep_alive_timeout
+=head2 C<keep_alive_timeout>
 
     keep_alive_timeout => 10
 
 Time in seconds a connection may be idle, defaults to C<5>.
 
-=item listen
+=head2 C<listen>
 
     listen => ['http://*:80']
 
 List of ports and files to listen on, defaults to C<http://*:8080>.
 
-=item lock_file
+=head2 C<lock_file>
 
     lock_file => '/tmp/hypnotoad.lock'
 
 Full path to accept mutex lock file, defaults to a random temporary file.
 
-=item pid_file
+=head2 C<pid_file>
 
     pid_file => '/var/run/hypnotoad.pid'
 
 Full path to PID file, defaults to C<hypnotoad.pid> in the same directory as
 the application.
 
-=item proxy
+=head2 C<proxy>
 
     proxy => 1
 
 Activate reverse proxy support, defaults to the value of
 C<MOJO_REVERSE_PROXY>.
 
-=item upgrade_timeout
+=head2 C<upgrade_timeout>
 
     upgrade_timeout => 15
 
 Time in seconds a zero downtime software upgrade may take before being
 aborted, defaults to C<30>.
 
-=item user
+=head2 C<user>
 
     user => 'sri'
 
 User name for worker processes.
 
-=item websocket_timeout
+=head2 C<websocket_timeout>
 
     websocket_timeout => 150
 
 Time in seconds a WebSocket connection may be idle, defaults to C<300>.
 
-=item workers
+=head2 C<workers>
 
     workers => 10
 
 Number of worker processes, defaults to C<4>.
 A good rule of thumb is two worker processes per cpu core.
-
-=back
 
 =head1 METHODS
 

@@ -150,17 +150,15 @@ L<Mojolicious>.
 This is a core plugin, that means it is always enabled and its code a good
 example for learning to build new plugins.
 
-=head2 Helpers
+=head1 HELPERS
 
-=over 4
-
-=item content
+=head2 C<content>
 
     <%= content %>
 
 Insert content into a layout template.
 
-=item content_for
+=head2 C<content_for>
 
     <% content_for foo => begin %>test<% end %>
     <%= content_for 'foo' %>
@@ -172,38 +170,38 @@ Note that this helper is EXPERIMENTAL and might change without warning!
     <% content_for message => begin %>world!<% end %>
     <%= content_for 'message' %>
 
-=item dumper
+=head2 C<dumper>
 
     <%= dumper $foo %>
 
 Dump a Perl data structure using L<Data::Dumper>.
 
-=item extends
+=head2 C<extends>
 
     <% extends 'foo'; %>
 
 Extend a template.
 
-=item flash
+=head2 C<flash>
 
     <%= flash 'foo' %>
 
 Access flash values.
 
-=item include
+=head2 C<include>
 
     <%= include 'menubar' %>
     <%= include 'menubar', format => 'txt' %>
 
 Include a partial template.
 
-=item layout
+=head2 C<layout>
 
     <% layout 'green'; %>
 
 Render this template with a layout.
 
-=item memorize
+=head2 C<memorize>
 
     <%= memorize begin %>
         <%= time %>
@@ -221,26 +219,26 @@ Render this template with a layout.
 Memorize block result in memory and prevent future execution.
 Note that this helper is EXPERIMENTAL and might change without warning!
 
-=item param
+=head2 C<param>
 
     <%= param 'foo' %>
 
 Access request parameters and routes captures.
 
-=item session
+=head2 C<session>
 
     <%= session 'foo' %>
 
 Access session values.
 
-=item stash
+=head2 C<stash>
 
     <%= stash 'foo' %>
     <% stash foo => 'bar'; %>
 
 Access stash values.
 
-=item title
+=head2 C<title>
 
     <% title 'Welcome!'; %>
     <%= title %>
@@ -248,15 +246,13 @@ Access stash values.
 Page title.
 Note that this helper is EXPERIMENTAL and might change without warning!
 
-=item url_for
+=head2 C<url_for>
 
     <%= url_for %>
     <%= url_for 'index' %>
     <%= url_for 'index', foo => 'bar' %>
 
 Generate URLs.
-
-=back
 
 =head1 METHODS
 

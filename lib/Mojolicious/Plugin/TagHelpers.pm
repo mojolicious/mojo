@@ -343,11 +343,9 @@ This is a core plugin, that means it is always enabled and its code a good
 example for learning to build new plugins.
 Note that this module is EXPERIMENTAL and might change without warning!
 
-=head2 Helpers
+=head1 HELPERS
 
-=over 4
-
-=item base_tag
+=head2 C<base_tag>
 
     <%= base_tag %>
 
@@ -355,7 +353,7 @@ Generate C<base> tag refering to the current base URL.
 
     <base href="http://localhost/cgi-bin/myapp.pl" />
 
-=item check_box
+=head2 C<check_box>
 
     <%= check_box employed => 1 %>
     <%= check_box employed => 1, id => 'foo' %>
@@ -365,7 +363,7 @@ Generate checkbox input element.
     <input name="employed" type="checkbox" value="1" />
     <input id="foo" name="employed" type="checkbox" value="1" />
 
-=item file_field
+=head2 C<file_field>
 
     <%= file_field 'avatar' %>
     <%= file_field 'avatar', id => 'foo' %>
@@ -375,7 +373,7 @@ Generate file input element.
     <input name="avatar" type="file" />
     <input id="foo" name="avatar" type="file" />
 
-=item form_for
+=head2 C<form_for>
 
     <%= form_for login => (method => 'post') => begin %>
         <%= text_field 'first_name' %>
@@ -413,7 +411,7 @@ Generate form for route, path or URL.
         <input value="Ok" type="submit" />
     </form>
 
-=item hidden_field
+=head2 C<hidden_field>
 
     <%= hidden_field foo => 'bar' %>
     <%= hidden_field foo => 'bar', id => 'bar' %>
@@ -423,7 +421,7 @@ Generate hidden input element.
     <input name="foo" type="hidden" value="bar" />
     <input id="bar" name="foo" type="hidden" value="bar" />
 
-=item input_tag
+=head2 C<input_tag>
 
     <%= input_tag 'first_name' %>
     <%= input_tag 'first_name', value => 'Default name' %>
@@ -437,7 +435,7 @@ Generate form input element.
     <input name="employed" type="checkbox" />
     <input name="country" type="radio" value="germany" />
 
-=item javascript
+=head2 C<javascript>
 
     <%= javascript 'script.js' %>
     <%= javascript begin %>
@@ -451,7 +449,7 @@ Generate script tag for C<Javascript> asset.
         var a = 'b';
     ]]></script>
 
-=item link_to
+=head2 C<link_to>
 
     <%= link_to Home => 'index' %>
     <%= link_to index => begin %>Home<% end %>
@@ -472,7 +470,7 @@ will be used as content.
     <a href="http://mojolicio.us">Mojolicious</a>
     <a href="/current/path?foo=something">Retry</a>
 
-=item password_field
+=head2 C<password_field>
 
     <%= password_field 'pass' %>
     <%= password_field 'pass', id => 'foo' %>
@@ -482,7 +480,7 @@ Generate password input element.
     <input name="pass" type="password" />
     <input id="foo" name="pass" type="password" />
 
-=item radio_button
+=head2 C<radio_button>
 
     <%= radio_button country => 'germany' %>
     <%= radio_button country => 'germany', id => 'foo' %>
@@ -492,7 +490,7 @@ Generate radio input element.
     <input name="country" type="radio" value="germany" />
     <input id="foo" name="country" type="radio" value="germany" />
 
-=item select_field
+=head2 C<select_field>
 
     <%= select_field language => [qw/de en/] %>
     <%= select_field language => [qw/de en/], id => 'lang' %>
@@ -520,7 +518,7 @@ Generate select, option and optgroup elements.
         </optgroup>
     </select>
 
-=item stylesheet
+=head2 C<stylesheet>
 
     <%= stylesheet 'foo.css' %>
     <%= stylesheet begin %>
@@ -534,7 +532,7 @@ Generate style or link tag for C<CSS> asset.
         body {color: #000}
     ]]></style>
 
-=item submit_button
+=head2 C<submit_button>
 
     <%= submit_button %>
     <%= submit_button 'Ok!', id => 'foo' %>
@@ -544,7 +542,7 @@ Generate submit input element.
     <input type="submit" value="Ok" />
     <input id="foo" type="submit" value="Ok!" />
 
-=item tag
+=head2 C<tag>
 
     <%= tag 'div' %>
     <%= tag 'div', id => 'foo' %>
@@ -556,7 +554,7 @@ HTML5 tag generator.
     <div id="foo" />
     <div>Content</div>
 
-=item text_field
+=head2 C<text_field>
 
     <%= text_field 'first_name' %>
     <%= text_field 'first_name', value => 'Default name' %>
@@ -566,7 +564,7 @@ Generate text input element.
     <input name="first_name" />
     <input name="first_name" value="Default name" />
 
-=item text_area
+=head2 C<text_area>
 
     <%= text_area 'foo' %>
     <%= text_area foo => begin %>
@@ -579,8 +577,6 @@ Generate textarea element.
     <textarea name="foo">
         Default!
     </textarea>
-
-=back
 
 =head1 METHODS
 

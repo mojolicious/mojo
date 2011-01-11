@@ -55,13 +55,14 @@ Mojolicious::Plugin::Charset - Charset Plugin
 L<Mojolicous::Plugin::Charset> is a plugin to easily set the default charset
 and encoding on all layers of L<Mojolicious>.
 
-=head2 Options
+=head1 OPTIONS
 
-=over 4
+=head2 C<charset>
 
-=item charset
+    # Mojolicious::Lite
+    plugin charset => {charset => 'Shift_JIS'};
 
-=back
+Application charset.
 
 =head1 METHODS
 

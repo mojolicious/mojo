@@ -117,21 +117,21 @@ perl variables.
 This is a core plugin, that means it is always enabled and its code a good
 example for learning to build new plugins.
 
-=head2 Options
+=head1 OPTIONS
 
-=over 4
-
-=item name
+=head2 C<name>
 
     # Mojolicious::Lite
     plugin ep_renderer => {name => 'foo'};
 
-=item template
+Handler name.
+
+=head2 C<template>
 
     # Mojolicious::Lite
     plugin ep_renderer => {template => {line_start => '.'}};
 
-=back
+Template options.
 
 =head1 METHODS
 

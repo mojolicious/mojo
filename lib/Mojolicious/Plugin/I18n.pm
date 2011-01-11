@@ -125,39 +125,35 @@ classes as you need.
 Languages can usually be detected automatically from the C<Accept-Languages>
 request header.
 
-=head2 Options
+=head1 OPTIONS
 
-=over 4
-
-=item default
+=head2 C<default>
 
     # Mojolicious::Lite
     plugin i18n => {default => 'en'};
 
-=item namespace
+Default language.
+
+=head2 C<namespace>
 
     # Mojolicious::Lite
     plugin i18n => {namespace => 'MyApp::I18N'};
 
-=back
+Lexicon namespace.
 
-=head2 Helpers
+=head1 HELPERS
 
-=over 4
-
-=item l
+=head2 C<l>
 
     <%=l 'hello' %>
 
 Translate sentence.
 
-=item languages
+=head2 C<languages>
 
     <% languages 'de'; %>
 
 Change languages.
-
-=back
 
 =head1 METHODS
 

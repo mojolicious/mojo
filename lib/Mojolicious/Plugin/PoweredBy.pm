@@ -49,13 +49,13 @@ header which defaults to C<Mojolicious (Perl)>.
 This is a core plugin, that means it is always enabled and its code a good
 example for learning to build new plugins.
 
-=head2 Options
+=head1 OPTIONS
 
-=over 4
+=head2 C<powered_by>
 
-=item powered_by
+    plugin powered_by => (name => 'MyApp 1.0');
 
-=back
+Value for C<X-Powered-By> header.
 
 =head1 METHODS
 

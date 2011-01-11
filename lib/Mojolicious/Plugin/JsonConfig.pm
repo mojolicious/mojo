@@ -171,23 +171,23 @@ The application object can be accessed via C<$app> or the C<app> helper.
 You can extend the normal config file C<myapp.json> with C<mode> specific
 ones like C<myapp.$mode.json>.
 
-=head2 Options
+=head1 OPTIONS
 
-=over 4
-
-=item default
+=head2 C<default>
 
     # Mojolicious::Lite
     plugin json_config => {default => {foo => 'bar'}};
 
-=item ext
+Default configuration.
+
+=head2 C<ext>
 
     # Mojolicious::Lite
     plugin json_config => {ext => 'conf'};
 
 File extension of config file, defaults to C<json>.
 
-=item file
+=head2 C<file>
 
     # Mojolicious::Lite
     plugin json_config => {file => 'myapp.conf'};
@@ -195,17 +195,19 @@ File extension of config file, defaults to C<json>.
 
 By default C<myapp.json> is searched in the application home directory.
 
-=item stash_key
+=head2 C<stash_key>
 
     # Mojolicious::Lite
     plugin json_config => {stash_key => 'conf'};
 
-=item template
+Configuration stash key.
+
+=head2 C<template>
 
     # Mojolicious::Lite
     plugin json_config => {template => {line_start => '.'}};
 
-=back
+Template options.
 
 =head1 METHODS
 

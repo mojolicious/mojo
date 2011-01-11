@@ -386,41 +386,38 @@ Mojolicious::Plugin::PodRenderer - POD Renderer Plugin
 
 L<Mojolicous::Plugin::PodRenderer> is a renderer for true Perl hackers, rawr!
 
-=head2 Options
+=head1 OPTIONS
 
-=over 4
-
-=item name
+=head2 C<name>
 
     # Mojolicious::Lite
     plugin pod_renderer => {name => 'foo'};
 
-=item no_perldoc
+Handler name.
+
+=head2 C<no_perldoc>
 
     # Mojolicious::Lite
     plugin pod_renderer => {no_perldoc => 1};
 
+Disable perldoc browser.
 Note that this option is EXPERIMENTAL and might change without warning!
 
-=item preprocess
+=head2 C<preprocess>
 
     # Mojolicious::Lite
     plugin pod_renderer => {preprocess => 'epl'};
 
-=back
+Handler name of preprocessor.
 
-=head2 Helpers
+=head1 HELPERS
 
-=over 4
-
-=item pod_to_html
+=head2 C<pod_to_html>
 
     <%= pod_to_html '=head2 lalala' %>
     <%= pod_to_html begin %>=head2 lalala<% end %>
 
 Render POD to HTML.
-
-=back
 
 =head1 METHODS
 

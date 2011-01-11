@@ -1145,6 +1145,8 @@ All CSS3 selectors that make sense for a standalone parser are supported.
 
 =head2 C<*>
 
+    my $first = $dom->at('*');
+
 Any element.
 
 =head2 C<E>

@@ -1151,181 +1151,181 @@ Any element.
 
 =head2 C<E>
 
-    my $title = $dom->at('title');
-
 An element of type C<E>.
+
+    my $title = $dom->at('title');
 
 =head2 C<E[foo]>
 
-    my $links = $dom->find('a[href]');
-
 An C<E> element with a C<foo> attribute.
+
+    my $links = $dom->find('a[href]');
 
 =head2 C<E[foo="bar"]>
 
-    my $fields = $dom->find('input[name="foo"]');
-
 An C<E> element whose C<foo> attribute value is exactly equal to C<bar>.
 
-=head2 C<E[foo~="bar"]>
+    my $fields = $dom->find('input[name="foo"]');
 
-    my $fields = $dom->find('input[name~="foo"]');
+=head2 C<E[foo~="bar"]>
 
 An C<E> element whose C<foo> attribute value is a list of
 whitespace-separated values, one of which is exactly equal to C<bar>.
 
-=head2 C<E[foo^="bar"]>
+    my $fields = $dom->find('input[name~="foo"]');
 
-    my $fields = $dom->find('input[name^="f"]');
+=head2 C<E[foo^="bar"]>
 
 An C<E> element whose C<foo> attribute value begins exactly with the string
 C<bar>.
 
-=head2 C<E[foo$="bar"]>
+    my $fields = $dom->find('input[name^="f"]');
 
-    my $fields = $dom->find('input[name$="o"]');
+=head2 C<E[foo$="bar"]>
 
 An C<E> element whose C<foo> attribute value ends exactly with the string
 C<bar>.
 
-=head2 C<E[foo*="bar"]>
+    my $fields = $dom->find('input[name$="o"]');
 
-    my $fields = $dom->find('input[name*="fo"]');
+=head2 C<E[foo*="bar"]>
 
 An C<E> element whose C<foo> attribute value contains the substring C<bar>.
 
-=head2 C<E:root>
+    my $fields = $dom->find('input[name*="fo"]');
 
-    my $root = $dom->at(':root');
+=head2 C<E:root>
 
 An C<E> element, root of the document.
 
-=head2 C<E:checked>
+    my $root = $dom->at(':root');
 
-    my $input = $dom->at(':checked');
+=head2 C<E:checked>
 
 A user interface element C<E> which is checked (for instance a radio-button
 or checkbox).
 
-=head2 C<E:empty>
+    my $input = $dom->at(':checked');
 
-    my $empty = $dom->find(':empty');
+=head2 C<E:empty>
 
 An C<E> element that has no children (including text nodes).
 
+    my $empty = $dom->find(':empty');
+
 =head2 C<E:nth-child(n)>
+
+An C<E> element, the C<n-th> child of its parent.
 
     my $third = $dom->at('div:nth-child(3)');
     my $odd   = $dom->find('div:nth-child(odd)');
     my $even  = $dom->find('div:nth-child(even)');
     my $top3  = $dom->find('div:nth-child(-n+3)');
 
-An C<E> element, the C<n-th> child of its parent.
-
 =head2 C<E:nth-last-child(n)>
+
+An C<E> element, the C<n-th> child of its parent, counting from the last one.
 
     my $third    = $dom->at('div:nth-last-child(3)');
     my $odd      = $dom->find('div:nth-last-child(odd)');
     my $even     = $dom->find('div:nth-last-child(even)');
     my $bottom3  = $dom->find('div:nth-last-child(-n+3)');
 
-An C<E> element, the C<n-th> child of its parent, counting from the last one.
-
 =head2 C<E:nth-of-type(n)>
+
+An C<E> element, the C<n-th> sibling of its type.
 
     my $third = $dom->at('div:nth-of-type(3)');
     my $odd   = $dom->find('div:nth-of-type(odd)');
     my $even  = $dom->find('div:nth-of-type(even)');
     my $top3  = $dom->find('div:nth-of-type(-n+3)');
 
-An C<E> element, the C<n-th> sibling of its type.
-
 =head2 C<E:nth-last-of-type(n)>
+
+An C<E> element, the C<n-th> sibling of its type, counting from the last one.
 
     my $third    = $dom->at('div:nth-last-of-type(3)');
     my $odd      = $dom->find('div:nth-last-of-type(odd)');
     my $even     = $dom->find('div:nth-last-of-type(even)');
     my $bottom3  = $dom->find('div:nth-last-of-type(-n+3)');
 
-An C<E> element, the C<n-th> sibling of its type, counting from the last one.
-
 =head2 C<E:first-child>
-
-    my $first = $dom->at('div p:first-child');
 
 An C<E> element, first child of its parent.
 
-=head2 C<E:last-child>
+    my $first = $dom->at('div p:first-child');
 
-    my $last = $dom->at('div p:last-child');
+=head2 C<E:last-child>
 
 An C<E> element, last child of its parent.
 
-=head2 C<E:first-of-type>
+    my $last = $dom->at('div p:last-child');
 
-    my $first = $dom->at('div p:first-of-type');
+=head2 C<E:first-of-type>
 
 An C<E> element, first sibling of its type.
 
-=head2 C<E:last-of-type>
+    my $first = $dom->at('div p:first-of-type');
 
-    my $last = $dom->at('div p:last-of-type');
+=head2 C<E:last-of-type>
 
 An C<E> element, last sibling of its type.
 
-=head2 C<E:only-child>
+    my $last = $dom->at('div p:last-of-type');
 
-    my $lonely = $dom->at('div p:only-child');
+=head2 C<E:only-child>
 
 An C<E> element, only child of its parent.
 
-=head2 C<E:only-of-type>
+    my $lonely = $dom->at('div p:only-child');
 
-    my $lonely = $dom->at('div p:only-of-type');
+=head2 C<E:only-of-type>
 
 an C<E> element, only sibling of its type.
 
-=head2 C<E:not(s)>
+    my $lonely = $dom->at('div p:only-of-type');
 
-    my $others = $dom->at('div p:not(:first-child)');
+=head2 C<E:not(s)>
 
 An C<E> element that does not match simple selector C<s>.
 
-=head2 C<E F>
+    my $others = $dom->at('div p:not(:first-child)');
 
-    my $headlines = $dom->find('div h1');
+=head2 C<E F>
 
 An C<F> element descendant of an C<E> element.
 
-=head2 C<E E<gt> F>
+    my $headlines = $dom->find('div h1');
 
-    my $headlines = $dom->find('html > body > div > h1');
+=head2 C<E E<gt> F>
 
 An C<F> element child of an C<E> element.
 
-=head2 C<E + F>
+    my $headlines = $dom->find('html > body > div > h1');
 
-    my $second = $dom->find('h1 + h2');
+=head2 C<E + F>
 
 An C<F> element immediately preceded by an C<E> element.
 
-=head2 C<E ~ F>
+    my $second = $dom->find('h1 + h2');
 
-    my $second = $dom->find('h1 ~ h2');
+=head2 C<E ~ F>
 
 An C<F> element preceded by an C<E> element.
 
-=head2 C<E, F, G>
+    my $second = $dom->find('h1 ~ h2');
 
-    my $headlines = $dom->find('h1, h2, h3');
+=head2 C<E, F, G>
 
 Elements of type C<E>, C<F> and C<G>.
 
+    my $headlines = $dom->find('h1, h2, h3');
+
 =head2 C<E[foo=bar][bar=baz]>
 
-    my $links = $dom->find('a[foo^="b"][foo$="ar"]');
-
 An C<E> element whose attributes match all following attribute selectors.
+
+    my $links = $dom->find('a[foo^="b"][foo$="ar"]');
 
 =head1 ATTRIBUTES
 

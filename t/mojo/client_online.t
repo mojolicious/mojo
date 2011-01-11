@@ -10,7 +10,7 @@ use Test::More;
 
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
-plan tests => 109;
+plan tests => 116;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -132,9 +132,22 @@ $ENV{HTTPS_PROXY} = $https_proxy;
 $client = Mojo::Client->new;
 $http_proxy  = $ENV{HTTP_PROXY}  || '';
 $https_proxy = $ENV{HTTPS_PROXY} || '';
-my $no_proxy = $ENV{NO_PROXY}  || '';
+my $NO_PROXY = $ENV{NO_PROXY}  || '';
+my $no_proxy = $ENV{no_proxy}  || '';
 $ENV{HTTP_PROXY}  = 'http://127.0.0.1';
 $ENV{HTTPS_PROXY} = 'https://127.0.0.1';
+$ENV{NO_PROXY} = '';
+$ENV{no_proxy} = '';
+$client->detect_proxy;
+is $client->_need_proxy('localhost'), 1, 'right conclusion';
+is $client->_need_proxy('example.org'), 1, 'right conclusion';
+is $client->_need_proxy('example.com'), 1, 'right conclusion';
+is $client->_need_proxy('www.example.com'), 1, 'right conclusion';
+is $client->_need_proxy('someexample.com'), 1, 'right conclusion';
+is $client->_need_proxy('example.net'), 1, 'right conclusion';
+is $client->_need_proxy('example.com.com'), 1, 'right conclusion';
+
+$client = Mojo::Client->new;
 $ENV{NO_PROXY} = 'localhost,example.org,example.com';
 $client->detect_proxy;
 is $client->_need_proxy('localhost'), 0, 'right conclusion';
@@ -146,7 +159,8 @@ is $client->_need_proxy('example.net'), 1, 'right conclusion';
 is $client->_need_proxy('example.com.com'), 1, 'right conclusion';
 $ENV{HTTP_PROXY}  = $http_proxy;
 $ENV{HTTPS_PROXY} = $https_proxy;
-$ENV{NO_PROXY}    = $no_proxy;
+$ENV{NO_PROXY}    = $NO_PROXY;
+$ENV{no_proxy}    = $no_proxy;
 
 # Oneliner
 is g('mojolicio.us')->code,          200, 'right status';

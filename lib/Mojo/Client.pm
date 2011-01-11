@@ -319,7 +319,8 @@ sub detect_proxy {
     my $self = shift;
     $self->http_proxy($ENV{HTTP_PROXY}   || $ENV{http_proxy});
     $self->https_proxy($ENV{HTTPS_PROXY} || $ENV{https_proxy});
-    $self->no_proxy([split(/,/, $ENV{NO_PROXY} || $ENV{no_proxy} || '')]);
+    my $no_proxy = $ENV{NO_PROXY} || $ENV{no_proxy};
+    $self->no_proxy([split(/,/, $no_proxy)]) if ($no_proxy);
     return $self;
 }
 

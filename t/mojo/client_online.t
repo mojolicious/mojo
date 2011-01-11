@@ -273,24 +273,27 @@ is $code3,      200,                     'right status';
 # Simple requests with redirect
 ($method, $url, $code, $method2, $url2, $code2) = undef;
 $client->max_redirects(3);
-$client->get(
-    'http://www.google.com' => sub {
-        my ($self, $tx) = @_;
-        $method  = $tx->req->method;
-        $url     = $tx->req->url;
-        $code    = $tx->res->code;
-        $method2 = $tx->previous->req->method;
-        $url2    = $tx->previous->req->url;
-        $code2   = $tx->previous->res->code;
-    }
-)->start;
-$client->max_redirects(0);
-is $method,  'GET',                   'right method';
-is $url,     'http://www.google.de/', 'right url';
-is $code,    200,                     'right status';
-is $method2, 'GET',                   'right method';
-is $url2,    'http://www.google.com', 'right url';
-is $code2,   302,                     'right status';
+SKIP: {
+    skip 'No previous tx succeeded', 6 unless defined $tx->previous;
+    $client->get(
+        'http://www.google.com' => sub {
+            my ($self, $tx) = @_;
+            $method  = $tx->req->method;
+            $url     = $tx->req->url;
+            $code    = $tx->res->code;
+            $method2 = $tx->previous->req->method;
+            $url2    = $tx->previous->req->url;
+            $code2   = $tx->previous->res->code;
+        }
+    )->start;
+    $client->max_redirects(0);
+    is $method,  'GET',                   'right method';
+    is $url,     'http://www.google.de/', 'right url';
+    is $code,    200,                     'right status';
+    is $method2, 'GET',                   'right method';
+    is $url2,    'http://www.google.com', 'right url';
+    is $code2,   302,                     'right status';
+}
 
 # Simple requests with redirect and no callback
 $client->max_redirects(3);
@@ -299,9 +302,12 @@ $client->max_redirects(0);
 is $tx->req->method, 'GET',                   'right method';
 is $tx->req->url,    'http://www.google.de/', 'right url';
 is $tx->res->code,   200,                     'right status';
-is $tx->previous->req->method, 'GET',                   'right method';
-is $tx->previous->req->url,    'http://www.google.com', 'right url';
-is $tx->previous->res->code,   302,                     'right status';
+SKIP: {
+    skip 'No previous tx succeeded', 3 unless defined $tx->previous;
+    is $tx->previous->req->method, 'GET',                   'right method';
+    is $tx->previous->req->url,    'http://www.google.com', 'right url';
+    is $tx->previous->res->code,   302,                     'right status';
+}
 
 # Custom chunked request without callback
 $tx = Mojo::Transaction::HTTP->new;

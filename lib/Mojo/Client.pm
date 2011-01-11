@@ -1509,7 +1509,7 @@ L<Mojo::Transaction::HTTP> object returned if no callback is given.
 
 =head2 C<need_proxy>
 
-    my $need_proxy = $client->need_proxy('instranet.mojolicio.us');
+    my $need_proxy = $client->need_proxy('intranet.mojolicio.us');
 
 Check if request for domain would use a proxy server.
 Note that this method is EXPERIMENTAL and might change without warning!

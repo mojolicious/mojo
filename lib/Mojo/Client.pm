@@ -25,7 +25,7 @@ use Scalar::Util 'weaken';
 use constant DEBUG => $ENV{MOJO_CLIENT_DEBUG} || 0;
 
 # You can't let a single bad experience scare you away from drugs.
-__PACKAGE__->attr([qw/app cert http_proxy https_proxy key tx/]);
+__PACKAGE__->attr([qw/app cert http_proxy https_proxy no_proxy key tx/]);
 __PACKAGE__->attr(cookie_jar => sub { Mojo::CookieJar->new });
 __PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->new });
 __PACKAGE__->attr(keep_alive_timeout => 15);
@@ -319,6 +319,7 @@ sub detect_proxy {
     my $self = shift;
     $self->http_proxy($ENV{HTTP_PROXY}   || $ENV{http_proxy});
     $self->https_proxy($ENV{HTTPS_PROXY} || $ENV{https_proxy});
+    $self->no_proxy([split(/,/, $ENV{NO_PROXY} || $ENV{no_proxy} || '')]);
     return $self;
 }
 
@@ -966,6 +967,18 @@ sub _tx_queue_or_start {
     $self->queue($tx, $cb);
 }
 
+sub _need_proxy {
+    my($self, $host) = @_;
+    if ($self->no_proxy) {
+        for my $domain (@{$self->no_proxy}) {
+            if ($host =~ /\Q$domain\E$/) {
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
 # It's greeat! We can do *anything* now that Science has invented Magic.
 sub _tx_start {
     my ($self, $tx, $cb) = @_;
@@ -993,14 +1006,16 @@ sub _tx_start {
     # Detect proxy
     $self->detect_proxy if $ENV{MOJO_PROXY};
 
-    # HTTP proxy
-    if (my $proxy = $self->http_proxy) {
-        $req->proxy($proxy) if !$req->proxy && $scheme eq 'http';
-    }
-
-    # HTTPS proxy
-    if (my $proxy = $self->https_proxy) {
-        $req->proxy($proxy) if !$req->proxy && $scheme eq 'https';
+    if ($self->_need_proxy($req->url->host)) {
+        # HTTP proxy
+        if (my $proxy = $self->http_proxy) {
+            $req->proxy($proxy) if !$req->proxy && $scheme eq 'http';
+        }
+    
+        # HTTPS proxy
+        if (my $proxy = $self->https_proxy) {
+            $req->proxy($proxy) if !$req->proxy && $scheme eq 'https';
+        }
     }
 
     # Make sure WebSocket requests have an origin header

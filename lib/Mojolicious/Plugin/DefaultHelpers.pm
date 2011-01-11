@@ -160,14 +160,20 @@ Insert content into a layout template.
 
 =head2 C<content_for>
 
-    <% content_for foo => begin %>test<% end %>
+    <% content_for foo => begin %>
+        test
+    <% end %>
     <%= content_for 'foo' %>
 
 Append content to named buffer and retrieve it.
 Note that this helper is EXPERIMENTAL and might change without warning!
 
-    <% content_for message => begin %>Hello <% end %>
-    <% content_for message => begin %>world!<% end %>
+    <% content_for message => begin %>
+        Hello
+    <% end %>
+    <% content_for message => begin %>
+        world!
+    <% end %>
     <%= content_for 'message' %>
 
 =head2 C<dumper>

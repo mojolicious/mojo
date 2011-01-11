@@ -9,6 +9,7 @@ use IO::File;
 use Mojo::ByteStream 'b';
 use Mojo::Command;
 use Mojo::DOM;
+use Mojo::Util 'url_escape';
 
 # Core module since Perl 5.9.3, so it might not always be present
 BEGIN {
@@ -100,9 +101,9 @@ sub register {
                     my $tag    = shift;
                     my $text   = $tag->all_text;
                     my $anchor = $text;
-                    $anchor =~ s/[^\w\-]/_/g;
-                    $anchor =~ s/^_+//;
-                    $anchor =~ s/_+$//;
+                    $anchor =~ s/\s+/_/g;
+                    url_escape $anchor, 'A-Za-z0-9_';
+                    $anchor =~ s/\%//g;
                     push @$sections, [] if $tag->type eq 'h1' || !@$sections;
                     push @{$sections->[-1]}, $text, "$url#$anchor";
                     $tag->replace_inner(

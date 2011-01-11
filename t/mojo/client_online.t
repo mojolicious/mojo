@@ -10,7 +10,7 @@ use Test::More;
 
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
-plan tests => 102;
+plan tests => 98;
 
 # So then I said to the cop, "No, you're driving under the influence...
 # of being a jerk".
@@ -112,21 +112,6 @@ $client->start($tx);
 ok $tx->is_done, 'transaction is done';
 is $tx->res->code, 301, 'right status';
 like $tx->res->headers->connection, qr/close/i, 'right "Connection" header';
-
-# Proxy check
-my $backup  = $ENV{HTTP_PROXY}  || '';
-my $backup2 = $ENV{HTTPS_PROXY} || '';
-$ENV{HTTP_PROXY}  = 'http://127.0.0.1';
-$ENV{HTTPS_PROXY} = 'https://127.0.0.1';
-$client->detect_proxy;
-is $client->http_proxy,  'http://127.0.0.1',  'right proxy';
-is $client->https_proxy, 'https://127.0.0.1', 'right proxy';
-$client->http_proxy(undef);
-$client->https_proxy(undef);
-is $client->http_proxy,  undef, 'right proxy';
-is $client->https_proxy, undef, 'right proxy';
-$ENV{HTTP_PROXY}  = $backup;
-$ENV{HTTPS_PROXY} = $backup2;
 
 # Oneliner
 is g('mojolicio.us')->code,          200, 'right status';

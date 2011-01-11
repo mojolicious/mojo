@@ -25,7 +25,7 @@ use Scalar::Util 'weaken';
 use constant DEBUG => $ENV{MOJO_CLIENT_DEBUG} || 0;
 
 # You can't let a single bad experience scare you away from drugs.
-__PACKAGE__->attr([qw/app cert http_proxy https_proxy key tx/]);
+__PACKAGE__->attr([qw/app cert http_proxy https_proxy key no_proxy tx/]);
 __PACKAGE__->attr(cookie_jar => sub { Mojo::CookieJar->new });
 __PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->new });
 __PACKAGE__->attr(keep_alive_timeout => 15);
@@ -319,6 +319,9 @@ sub detect_proxy {
     my $self = shift;
     $self->http_proxy($ENV{HTTP_PROXY}   || $ENV{http_proxy});
     $self->https_proxy($ENV{HTTPS_PROXY} || $ENV{https_proxy});
+    if (my $no = $ENV{NO_PROXY} || $ENV{no_proxy}) {
+        $self->no_proxy([split /,/, $no]);
+    }
     return $self;
 }
 
@@ -344,6 +347,19 @@ sub get {
 sub head {
     my $self = shift;
     return $self->_tx_queue_or_start($self->build_tx('HEAD', @_));
+}
+
+sub need_proxy {
+    my ($self, $host) = @_;
+
+    # No proxy list
+    return 1 unless my $no = $self->no_proxy;
+
+    # No proxy needed
+    $host =~ /\Q$_\E$/ and return for @$no;
+
+    # Proxy needed
+    return 1;
 }
 
 sub on_finish {
@@ -987,26 +1003,32 @@ sub _tx_start {
     # Request
     my $req = $tx->req;
 
+    # URL
+    my $url = $req->url;
+
     # Scheme
-    my $scheme = $req->url->scheme || '';
+    my $scheme = $url->scheme || '';
 
     # Detect proxy
     $self->detect_proxy if $ENV{MOJO_PROXY};
 
-    # HTTP proxy
-    if (my $proxy = $self->http_proxy) {
-        $req->proxy($proxy) if !$req->proxy && $scheme eq 'http';
-    }
+    # Proxy
+    if ($self->need_proxy($url->host)) {
 
-    # HTTPS proxy
-    if (my $proxy = $self->https_proxy) {
-        $req->proxy($proxy) if !$req->proxy && $scheme eq 'https';
+        # HTTP proxy
+        if (my $proxy = $self->http_proxy) {
+            $req->proxy($proxy) if !$req->proxy && $scheme eq 'http';
+        }
+
+        # HTTPS proxy
+        if (my $proxy = $self->https_proxy) {
+            $req->proxy($proxy) if !$req->proxy && $scheme eq 'https';
+        }
     }
 
     # Make sure WebSocket requests have an origin header
     my $headers = $req->headers;
-    $headers->origin($req->url)
-      if $headers->upgrade && !$headers->origin;
+    $headers->origin($url) if $headers->upgrade && !$headers->origin;
 
     # We identify ourself
     $headers->user_agent('Mojolicious (Perl)') unless $headers->user_agent;
@@ -1273,6 +1295,14 @@ it starts closing the oldest cached ones, defaults to C<5>.
 Maximum number of redirects the client will follow before it fails, defaults
 to C<0>.
 
+=head2 C<no_proxy>
+
+    my $no_proxy = $client->no_proxy;
+    $client      = $client->no_proxy(['localhost', 'intranet.mojolicio.us']);
+
+Domains that don't require a proxy server to be used.
+Note that this attribute is EXPERIMENTAL and might change without warning!
+
 =head2 C<tx>
 
     $client->tx;
@@ -1416,7 +1446,8 @@ L<Mojo::Transaction::HTTP> object returned if no callback is given.
 
     $client = $client->detect_proxy;
 
-Check environment variables for proxy information.
+Check environment variables C<HTTP_PROXY>, C<http_proxy>, C<HTTPS_PROXY>,
+C<https_proxy>, C<NO_PROXY> and C<no_proxy> for proxy information.
 
 =head2 C<finish>
 
@@ -1475,6 +1506,13 @@ The request will be performed right away and the resulting
 L<Mojo::Transaction::HTTP> object returned if no callback is given.
 
     print $client->head('http://kraih.com')->res->headers->content_length;
+
+=head2 C<need_proxy>
+
+    my $need_proxy = $client->need_proxy('instranet.mojolicio.us');
+
+Check if request for domain would use a proxy server.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<on_finish>
 

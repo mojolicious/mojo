@@ -9,7 +9,7 @@ BEGIN { $ENV{MOJO_POLL} = 1 }
 use Test::More;
 plan skip_all => 'Windows is too fragile for this test!'
   if $^O eq 'MSWin32' || $^O =~ /cygwin/;
-plan tests => 51;
+plan tests => 68;
 
 use_ok 'Mojo::Client';
 
@@ -22,7 +22,53 @@ app->log->level('fatal');
 # GET /
 get '/' => {text => 'works'};
 
-my $client = Mojo::Client->singleton->app(app);
+# Proxy detection
+my $client  = Mojo::Client->new;
+my $backup  = $ENV{HTTP_PROXY} || '';
+my $backup2 = $ENV{HTTPS_PROXY} || '';
+my $backup3 = $ENV{NO_PROXY} || '';
+my $backup4 = $ENV{http_proxy} || '';
+my $backup5 = $ENV{https_proxy} || '';
+my $backup6 = $ENV{no_proxy} || '';
+$ENV{HTTP_PROXY}  = 'http://127.0.0.1';
+$ENV{HTTPS_PROXY} = 'https://127.0.0.1';
+$ENV{NO_PROXY}    = 'mojolicio.us';
+$client->detect_proxy;
+is $client->http_proxy,  'http://127.0.0.1',  'right proxy';
+is $client->https_proxy, 'https://127.0.0.1', 'right proxy';
+$client->http_proxy(undef);
+$client->https_proxy(undef);
+is $client->http_proxy,  undef, 'right proxy';
+is $client->https_proxy, undef, 'right proxy';
+is $client->need_proxy('dummy.mojolicio.us'), undef, 'no proxy needed';
+is $client->need_proxy('icio.us'),            1,     'proxy needed';
+is $client->need_proxy('localhost'),          1,     'proxy needed';
+$ENV{HTTP_PROXY}  = undef;
+$ENV{HTTPS_PROXY} = undef;
+$ENV{NO_PROXY}    = undef;
+$ENV{http_proxy}  = 'proxy.kraih.com';
+$ENV{https_proxy} = 'tunnel.kraih.com';
+$ENV{no_proxy}    = 'localhost,localdomain,foo.com,kraih.com';
+$client->detect_proxy;
+is $client->http_proxy,  'proxy.kraih.com',  'right proxy';
+is $client->https_proxy, 'tunnel.kraih.com', 'right proxy';
+is $client->need_proxy('dummy.mojolicio.us'),    1,     'proxy needed';
+is $client->need_proxy('icio.us'),               1,     'proxy needed';
+is $client->need_proxy('localhost'),             undef, 'proxy needed';
+is $client->need_proxy('localhost.localdomain'), undef, 'no proxy needed';
+is $client->need_proxy('foo.com'),               undef, 'no proxy needed';
+is $client->need_proxy('kraih.com'),             undef, 'no proxy needed';
+is $client->need_proxy('www.kraih.com'),         undef, 'no proxy needed';
+is $client->need_proxy('www.kraih.com.com'),     1,     'proxy needed';
+$ENV{HTTP_PROXY}  = $backup;
+$ENV{HTTPS_PROXY} = $backup2;
+$ENV{NO_PROXY}    = $backup3;
+$ENV{http_proxy}  = $backup4;
+$ENV{https_proxy} = $backup5;
+$ENV{no_proxy}    = $backup6;
+
+# Fresh client
+$client = Mojo::Client->singleton->app(app);
 
 # Server
 my $port   = $client->ioloop->generate_port;

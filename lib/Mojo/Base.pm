@@ -149,9 +149,9 @@ You can pass it either a hash or a hash reference with attribute values.
     __PACKAGE__->attr([qw/name1 name2 name3/] => 'foo');
     __PACKAGE__->attr([qw/name1 name2 name3/] => sub { ... });
     __PACKAGE__->attr(
-        name1 => sub {...},
-        name2 => sub {...}.
-        name3 => 'foo'
+        name1             => sub {...},
+        name2             => 'foo',
+        [qw/name2 name4/] => 'bar'
     );
 
 Create attributes.

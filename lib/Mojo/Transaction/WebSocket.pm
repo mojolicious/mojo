@@ -254,6 +254,7 @@ Mojo::Transaction::WebSocket - WebSocket Transaction Container
 
 L<Mojo::Transaction::WebSocket> is a container for WebSocket transactions as
 described in C<The WebSocket protocol>.
+Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 ATTRIBUTES
 
@@ -288,7 +289,6 @@ L<Mojo::Transaction> and implements the following new ones.
     my $success = $ws->client_challenge;
 
 Check WebSocket handshake challenge, only used by client.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<client_close>
 
@@ -301,7 +301,6 @@ Connection got closed, only used by clients.
     $ws = $ws->client_handshake;
 
 WebSocket handshake, only used by clients.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<client_read>
 
@@ -387,7 +386,6 @@ transparently.
     $ws = $ws->server_handshake;
 
 WebSocket handshake, only used by servers.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<server_read>
 

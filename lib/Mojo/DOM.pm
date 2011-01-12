@@ -1136,7 +1136,6 @@ Mojo::DOM - Minimalistic XML/HTML5 DOM Parser With CSS3 Selectors
 
 L<Mojo::DOM> is a minimalistic and very relaxed XML/HTML5 DOM parser with
 support for CSS3 selectors.
-Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 SELECTORS
 

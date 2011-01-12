@@ -2,6 +2,9 @@ This file documents the revision history for Perl extension Mojolicious.
 
 1.02 2011-01-06 00:00:00
         - Added EXPERIMENTAL support for NO_PROXY. (l0b0)
+        - Removed experimental status from Mojo::DOM and ojo.
+        - Removed experimental status from many attributes and methods all
+          over Mojolicious.
         - Renamed after and before in Mojo::DOM to add_after and add_before.
         - Improved documentation browser slightly.
         - Fixed shagadelic function of Mojolicious::Lite.

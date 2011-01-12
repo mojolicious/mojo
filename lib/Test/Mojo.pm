@@ -406,7 +406,6 @@ Perform a C<DELETE> request.
 
 Checks for existence of the CSS3 selectors XML/HTML element with
 L<Mojo::DOM>.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<get_ok>
 
@@ -503,7 +502,6 @@ Check response status for exact match.
 
 Checks text content of the CSS3 selectors XML/HTML element for exact match
 with L<Mojo::DOM>.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<text_like>
 
@@ -512,7 +510,6 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
 Checks text content of the CSS3 selectors XML/HTML element for similar match
 with L<Mojo::DOM>.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head1 SEE ALSO
 

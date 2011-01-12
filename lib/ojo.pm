@@ -82,7 +82,6 @@ ojo - Fun Oneliners With Mojo!
 =head1 DESCRIPTION
 
 A collection of automatically exported functions for fun Perl oneliners.
-Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 FUNCTIONS
 

@@ -169,7 +169,6 @@ from your application.
     my $plugin = $plugins->load_plugin('Foo::Bar');
 
 Load a plugin from the configured namespaces or by full module name.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<register_plugin>
 
@@ -183,7 +182,6 @@ Note that this method is EXPERIMENTAL and might change without warning!
 Load a plugin from the configured namespaces or by full module name and run
 C<register>.
 Optional arguments are passed to register.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<run_hook>
 

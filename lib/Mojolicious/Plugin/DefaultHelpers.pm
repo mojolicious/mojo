@@ -166,7 +166,6 @@ Insert content into a layout template.
     <%= content_for 'foo' %>
 
 Append content to named buffer and retrieve it.
-Note that this helper is EXPERIMENTAL and might change without warning!
 
     <% content_for message => begin %>
         Hello
@@ -223,7 +222,6 @@ Render this template with a layout.
     <% end %>
 
 Memorize block result in memory and prevent future execution.
-Note that this helper is EXPERIMENTAL and might change without warning!
 
 =head2 C<param>
 
@@ -250,7 +248,6 @@ Access stash values.
     <%= title %>
 
 Page title.
-Note that this helper is EXPERIMENTAL and might change without warning!
 
 =head2 C<url_for>
 

@@ -646,7 +646,6 @@ Default charset used for form data parsing.
     $message  = $message->dom_class('Mojo::DOM');
 
 Class to be used for DOM manipulation, defaults to L<Mojo::DOM>.
-Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<json_class>
 
@@ -655,7 +654,6 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
 
 Class to be used for JSON deserialization with C<json>, defaults to
 L<Mojo::JSON>.
-Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<max_line_size>
 
@@ -755,7 +753,6 @@ Access message cookies.
 
 Turns content into a L<Mojo::DOM> object and takes an optional selector to
 perform a C<find> on it right away, which returns a collection.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<error>
 
@@ -841,7 +838,6 @@ Check if message content is multipart.
 
 Decode JSON message body directly using L<Mojo::JSON> if possible, returns
 C<undef> otherwise.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<leftovers>
 
@@ -907,7 +903,6 @@ HTTP version of message.
 
 Write dynamic content, the optional drain callback will be invoked once all
 data has been written.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<write_chunk>
 
@@ -916,7 +911,6 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
 Write chunked content, the optional drain callback will be invoked once all
 data has been written.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head1 SEE ALSO
 

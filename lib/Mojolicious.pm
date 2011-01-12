@@ -588,7 +588,6 @@ Also sets up the renderer, static dispatcher and a default set of plugins.
     $app         = $app->defaults(foo => 'bar');
 
 Default values for the stash.
-Note that this method is EXPERIMENTAL and might change without warning!
 
     $app->defaults->{foo} = 'bar';
     my $foo = $app->defaults->{foo};
@@ -614,7 +613,6 @@ Sets up the default controller and calls process for every request.
 
 Add a new helper that will be available as a method of the controller object
 and the application object, as well as a function in C<ep> templates.
-Note that this method is EXPERIMENTAL and might change without warning!
 
     # Helper
     $app->helper(add => sub { $_[1] + $_[2] });
@@ -630,7 +628,6 @@ Note that this method is EXPERIMENTAL and might change without warning!
     $app->hook(after_dispatch => sub { ... });
 
 Add hooks to named events.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 The following events are available and run in the listed order.
 
@@ -689,7 +686,6 @@ has been rendered, the callbacks of this hook run in reverse order.
     $app->plugin('Foo::Bar', {foo => 23});
 
 Load a plugin.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 The following plugins are included in the L<Mojolicious> distribution as
 examples.

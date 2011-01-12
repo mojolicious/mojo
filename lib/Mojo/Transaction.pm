@@ -298,7 +298,6 @@ Returns the L<Mojo::Message::Response> object (C<res>) if transaction was
 successful or C<undef> otherwise.
 Connection and parser errors have only a message in C<error>, 400 and 500
 responses also a code.
-Note that this method is EXPERIMENTAL and might change without warning!
 
     if (my $res = $tx->success) {
         print $res->body;

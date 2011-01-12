@@ -463,8 +463,6 @@ Content parser callback.
         print $chunk;
     });
 
-Note that this attribute is EXPERIMENTAL and might change without warning!
-
 =head2 C<relaxed>
 
     my $relaxed = $content->relaxed;
@@ -601,7 +599,6 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
 Write dynamic content, the optional drain callback will be invoked once all
 data has been written.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<write_chunk>
 
@@ -610,7 +607,6 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
 Write chunked content, the optional drain callback will be invoked once all
 data has been written.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head1 SEE ALSO
 

@@ -790,7 +790,6 @@ The parent of this route, used for nesting routes.
 
 Route has no specific end, remaining characters will be captured with the
 partial name.
-Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<pattern>
 
@@ -831,7 +830,6 @@ Add a new condition for this route.
 
 Generate route matching any of the listed HTTP request methods or all.
 See also the L<Mojolicious::Lite> tutorial for more argument variations.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<auto_render>
 
@@ -852,7 +850,6 @@ Add a new bridge to this route as a nested child.
 
 Generate route matching only C<DELETE> requests.
 See also the L<Mojolicious::Lite> tutorial for more argument variations.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<detour>
 
@@ -870,7 +867,6 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
 Set default parameters for this route and allow partial matching to simplify
 application embedding.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<dispatch>
 
@@ -884,7 +880,6 @@ Match routes and dispatch.
 
 Generate route matching only C<GET> requests.
 See also the L<Mojolicious::Lite> tutorial for more argument variations.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<hide>
 
@@ -932,7 +927,6 @@ Parse a pattern.
 
 Generate route matching only C<POST> requests.
 See also the L<Mojolicious::Lite> tutorial for more argument variations.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<put>
 
@@ -940,7 +934,6 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
 Generate route matching only C<PUT> requests.
 See also the L<Mojolicious::Lite> tutorial for more argument variations.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<render>
 
@@ -985,7 +978,6 @@ Stringifies the whole route.
 
 Generate bridges.
 See also the L<Mojolicious::Lite> tutorial for more argument variations.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<via>
 

@@ -1389,7 +1389,6 @@ See C<render_data> for an alternative without encoding.
     $c->rendered;
 
 Finalize response and run C<after_dispatch> plugin hook.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<req>
 
@@ -1472,8 +1471,6 @@ been written to the kernel send buffer or equivalent.
     $c->write('Hel');
     $c->write('lo!');
 
-Note that this method is EXPERIMENTAL and might change without warning!
-
 =head2 C<write_chunk>
 
     $c->write_chunk;
@@ -1485,7 +1482,6 @@ Write dynamic content chunk wise with the C<chunked> C<Transfer-Encoding>
 which doesn't require a C<Content-Length> header, the optional drain callback
 will be invoked once all data has been written to the kernel send buffer or
 equivalent.
-Note that this method is EXPERIMENTAL and might change without warning!
 
     $c->write_chunk('Hel');
     $c->write_chunk('lo!');

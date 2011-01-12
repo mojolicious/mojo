@@ -1,17 +1,13 @@
 package Mojolicious::Command::Routes;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Command';
+use Mojo::Base 'Mojo::Command';
 
 use Mojo::Server;
 
-__PACKAGE__->attr(
-    description => <<'EOF',
+has description => <<'EOF';
 Show available routes.
 EOF
-    usage => <<"EOF");
+has usage => <<"EOF";
 usage: $0 routes
 EOF
 

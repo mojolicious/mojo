@@ -1,9 +1,6 @@
 package Mojo::Command;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 
 require Cwd;
 require File::Path;
@@ -16,13 +13,12 @@ use Mojo::Template;
 use Mojo::Loader;
 use Mojo::Util qw/b64_decode camelize decamelize/;
 
-__PACKAGE__->attr(
-    hint => <<"EOF",
+has hint => <<"EOF";
 
 See '$0 help COMMAND' for more information on a specific command.
 EOF
-    description => 'No description.',
-    message     => <<"EOF",
+has description => 'No description.';
+has message     => <<"EOF";
 usage: $0 COMMAND [OPTIONS]
 
 Tip: CGI, FastCGI and PSGI environments can be automatically detected very
@@ -30,11 +26,10 @@ Tip: CGI, FastCGI and PSGI environments can be automatically detected very
 
 These commands are currently available:
 EOF
-    namespaces => sub { ['Mojo::Command'] },
-    quiet      => 0,
-    renderer   => sub { Mojo::Template->new },
-    usage      => "usage: $0\n"
-);
+has namespaces => sub { ['Mojo::Command'] };
+has quiet      => 0;
+has renderer   => sub { Mojo::Template->new };
+has usage      => "usage: $0\n";
 
 # Cache
 my $CACHE = {};
@@ -414,18 +409,18 @@ Mojo::Command - Command Base Class
     package Mojo::Command::Mycommand;
 
     # Subclass
-    use base 'Mojo::Command';
+    use Mojo::Base 'Mojo::Command';
 
     # Take care of command line options
     use Getopt::Long 'GetOptions';
 
     # Short description
-    __PACKAGE__->attr(description => <<'EOF');
+    has description => <<'EOF';
     My first Mojo command.
     EOF
 
     # Short usage message
-    __PACKAGE__->attr(usage => <<"EOF");
+    has usage => <<"EOF";
     usage: $0 mycommand [OPTIONS]
 
     These options are available:

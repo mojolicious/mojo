@@ -1,18 +1,13 @@
 package Mojo::Transaction::HTTP;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Transaction';
+use Mojo::Base 'Mojo::Transaction';
 
 use Mojo::Message::Request;
 use Mojo::Message::Response;
 
-__PACKAGE__->attr([qw/on_handler on_upgrade/]);
-__PACKAGE__->attr(
-    req => sub { Mojo::Message::Request->new },
-    res => sub { Mojo::Message::Response->new }
-);
+has [qw/on_handler on_upgrade/];
+has req => sub { Mojo::Message::Request->new };
+has res => sub { Mojo::Message::Response->new };
 
 # What's a wedding?  Webster's dictionary describes it as the act of removing
 # weeds from one's garden.

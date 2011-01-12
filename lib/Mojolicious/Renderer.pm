@@ -1,9 +1,6 @@
 package Mojolicious::Renderer;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 
 use File::Spec;
 use Mojo::ByteStream 'b';
@@ -12,16 +9,14 @@ use Mojo::Home;
 use Mojo::JSON;
 use Mojo::Util 'encode';
 
-__PACKAGE__->attr(
-    default_format   => 'html',
-    detect_templates => 1,
-    encoding         => 'UTF-8',
-    handlers         => sub { {} },
-    helpers          => sub { {} },
-    layout_prefix    => 'layouts',
-    root             => '/'
-);
-__PACKAGE__->attr([qw/default_handler default_template_class/]);
+has default_format   => 'html';
+has detect_templates => 1;
+has encoding         => 'UTF-8';
+has handlers         => sub { {} };
+has helpers          => sub { {} };
+has layout_prefix    => 'layouts';
+has root             => '/';
+has [qw/default_handler default_template_class/];
 
 # DEPRECATED in Hot Beverage!
 *handler = \&handlers;

@@ -1,9 +1,6 @@
 package Mojolicious::Plugin::TagHelpers;
 
-use strict;
-use warnings;
-
-use base 'Mojolicious::Plugin';
+use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::ByteStream 'b';
 use Mojo::Util 'xml_escape';

@@ -1,16 +1,12 @@
 package Mojolicious::Commands;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Command';
+use Mojo::Base 'Mojo::Command';
 
 use Getopt::Long qw/GetOptions :config pass_through/;
 
 # One day a man has everything, the next day he blows up a $400 billion
 # space station, and the next day he has nothing. It makes you think.
-__PACKAGE__->attr(
-    hint => <<"EOF",
+has hint => <<"EOF";
 
 These options are available for all commands:
     --home <path>   Path to your applications home directory, defaults to
@@ -20,8 +16,7 @@ These options are available for all commands:
 
 See '$0 help COMMAND' for more information on a specific command.
 EOF
-    namespaces => sub { [qw/Mojolicious::Command Mojo::Command/] }
-);
+has namespaces => sub { [qw/Mojolicious::Command Mojo::Command/] };
 
 # Command line options for MOJO_HOME and MOJO_MODE
 BEGIN {

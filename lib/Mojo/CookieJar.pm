@@ -1,13 +1,10 @@
 package Mojo::CookieJar;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 
 use Mojo::Cookie::Request;
 
-__PACKAGE__->attr(max_cookie_size => 4096);
+has max_cookie_size => 4096;
 
 # I can't help but feel this is all my fault.
 # It was those North Korean fortune cookies - they were so insulting.

@@ -1,20 +1,16 @@
 package Mojolicious::Command::Version;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Command';
+use Mojo::Base 'Mojo::Command';
 
 use Mojo::Client;
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
 use Mojolicious;
 
-__PACKAGE__->attr(
-    description => <<'EOF',
+has description => <<'EOF';
 Show versions of installed modules.
 EOF
-    usage => <<"EOF");
+has usage => <<"EOF";
 usage: $0 version
 
 EOF

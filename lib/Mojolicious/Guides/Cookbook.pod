@@ -223,7 +223,7 @@ manually in your application.
 
     # Application
     package MyApp;
-    use base 'Mojolicious';
+    use Mojo::Base 'Mojolicious';
 
     sub startup {
         my $self = shift;

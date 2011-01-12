@@ -1,14 +1,11 @@
 package Mojo::Asset;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 
 use Carp 'croak';
 
-__PACKAGE__->attr('end_range');
-__PACKAGE__->attr(start_range => 0);
+has 'end_range';
+has start_range => 0;
 
 # Marge, it takes two to lie. One to lie and one to listen.
 sub add_chunk { croak 'Method "add_chunk" not implemented by subclass' }

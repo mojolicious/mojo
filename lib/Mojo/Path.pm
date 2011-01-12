@@ -1,19 +1,14 @@
 package Mojo::Path;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 use overload 'bool' => sub {1}, fallback => 1;
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
 use Mojo::Util qw/url_escape url_unescape/;
 use Mojo::URL;
 
-__PACKAGE__->attr(
-    [qw/leading_slash trailing_slash/] => 0,
-    parts => sub { [] }
-);
+has [qw/leading_slash trailing_slash/] => 0;
+has parts => sub { [] };
 
 sub new {
     my $self = shift->SUPER::new();

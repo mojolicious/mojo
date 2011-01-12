@@ -1,9 +1,6 @@
 package Mojolicious::Controller;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base 'Mojo::Command';
 
 use Mojo::ByteStream;
 use Mojo::Command;
@@ -16,8 +13,8 @@ use Mojo::Util;
 require Carp;
 
 # Scalpel... blood bucket... priest.
-__PACKAGE__->attr([qw/app match/]);
-__PACKAGE__->attr(tx => sub { Mojo::Transaction::HTTP->new });
+has [qw/app match/];
+has tx => sub { Mojo::Transaction::HTTP->new };
 
 # Exception template
 our $EXCEPTION =

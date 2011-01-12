@@ -1,9 +1,6 @@
 package Mojo::ByteStream;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
 use Mojo::Util;

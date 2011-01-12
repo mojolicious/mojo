@@ -1,20 +1,15 @@
 package Mojolicious::Routes::Match;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 
 use Carp 'croak';
 use Mojo::Util qw/decode url_unescape/;
 use Mojo::URL;
 use Scalar::Util 'weaken';
 
-__PACKAGE__->attr(
-    captures => sub { {} },
-    stack    => sub { [] }
-);
-__PACKAGE__->attr([qw/endpoint root/]);
+has captures => sub { {} };
+has stack    => sub { [] };
+has [qw/endpoint root/];
 
 # I'm Bender, baby, please insert liquor!
 sub new {

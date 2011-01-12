@@ -1,9 +1,6 @@
 package Mojolicious::Plugin::PodRenderer;
 
-use strict;
-use warnings;
-
-use base 'Mojolicious::Plugin';
+use Mojo::Base 'Mojolicious::Plugin';
 
 use IO::File;
 use Mojo::ByteStream 'b';

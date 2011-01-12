@@ -1,9 +1,6 @@
 package Mojolicious::Plugin::Charset;
 
-use strict;
-use warnings;
-
-use base 'Mojolicious::Plugin';
+use Mojo::Base 'Mojolicious::Plugin';
 
 # Shut up friends. My internet browser heard us saying the word Fry and it
 # found a movie about Philip J. Fry for us.

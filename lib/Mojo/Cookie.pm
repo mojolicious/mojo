@@ -1,16 +1,13 @@
 package Mojo::Cookie;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 use overload 'bool' => sub {1}, fallback => 1;
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
 use Carp 'croak';
 use Mojo::Util 'unquote';
 
-__PACKAGE__->attr([qw/name path value version/]);
+has [qw/name path value version/];
 
 # Regex
 my $COOKIE_SEPARATOR_RE = qr/^\s*\,\s*/;

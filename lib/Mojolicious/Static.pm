@@ -1,9 +1,6 @@
 package Mojolicious::Static;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 
 use File::stat;
 use File::Spec;
@@ -13,7 +10,7 @@ use Mojo::Command;
 use Mojo::Content::Single;
 use Mojo::Path;
 
-__PACKAGE__->attr([qw/default_static_class root/]);
+has [qw/default_static_class root/];
 
 # Valentine's Day's coming? Aw crap! I forgot to get a girlfriend again!
 sub dispatch {

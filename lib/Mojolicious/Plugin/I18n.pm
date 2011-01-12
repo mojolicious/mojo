@@ -1,9 +1,6 @@
 package Mojolicious::Plugin::I18n;
 
-use strict;
-use warnings;
-
-use base 'Mojolicious::Plugin';
+use Mojo::Base 'Mojolicious::Plugin';
 
 use I18N::LangTags;
 use I18N::LangTags::Detect;

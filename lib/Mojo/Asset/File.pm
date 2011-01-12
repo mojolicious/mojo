@@ -1,9 +1,6 @@
 package Mojo::Asset::File;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Asset';
+use Mojo::Base 'Mojo::Asset';
 
 # We can't use File::Temp because there is no seek support in the version
 # shipped with Perl 5.8
@@ -13,46 +10,44 @@ use File::Spec;
 use IO::File;
 use Mojo::Util 'md5_sum';
 
-__PACKAGE__->attr([qw/cleanup path/]);
-__PACKAGE__->attr(
-    tmpdir => sub { $ENV{MOJO_TMPDIR} || File::Spec->tmpdir },
-    handle => sub {
-        my $self   = shift;
-        my $handle = IO::File->new;
+has [qw/cleanup path/];
+has handle => sub {
+    my $self   = shift;
+    my $handle = IO::File->new;
 
-        # Already got a file without handle
-        my $file = $self->path;
-        if ($file) {
+    # Already got a file without handle
+    my $file = $self->path;
+    if ($file) {
 
-            # New file
-            my $mode = '+>>';
+        # New file
+        my $mode = '+>>';
 
-            # File exists
-            $mode = '<' if -s $file;
+        # File exists
+        $mode = '<' if -s $file;
 
-            # Open
-            $handle->open("$mode $file")
-              or croak qq/Can't open file "$file": $!/;
-            return $handle;
-        }
-
-        # Generate temporary file
-        my $base = File::Spec->catfile($self->tmpdir, 'mojo.tmp');
-        $file = $base;
-        while (-e $file) {
-            my $sum = md5_sum time . rand 999999999;
-            $file = "$base.$sum";
-        }
-        $self->path($file);
-
-        # Enable automatic cleanup
-        $self->cleanup(1);
-
-        # Open for read/write access
-        $handle->open("+> $file") or croak qq/Can't open file "$file": $!/;
+        # Open
+        $handle->open("$mode $file")
+          or croak qq/Can't open file "$file": $!/;
         return $handle;
     }
-);
+
+    # Generate temporary file
+    my $base = File::Spec->catfile($self->tmpdir, 'mojo.tmp');
+    $file = $base;
+    while (-e $file) {
+        my $sum = md5_sum time . rand 999999999;
+        $file = "$base.$sum";
+    }
+    $self->path($file);
+
+    # Enable automatic cleanup
+    $self->cleanup(1);
+
+    # Open for read/write access
+    $handle->open("+> $file") or croak qq/Can't open file "$file": $!/;
+    return $handle;
+};
+has tmpdir => sub { $ENV{MOJO_TMPDIR} || File::Spec->tmpdir };
 
 sub DESTROY {
     my $self = shift;

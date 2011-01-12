@@ -1,20 +1,16 @@
 package Mojolicious::Command::Psgi;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Command';
+use Mojo::Base 'Mojo::Command';
 
 use Mojo::Server::PSGI;
 
 # Don't let Krusty's death get you down, boy.
 # People die all the time, just like that.
 # Why, you could wake up dead tomorrow! Well, good night.
-__PACKAGE__->attr(
-    description => <<'EOF',
+has description => <<'EOF';
 Start application with PSGI.
 EOF
-    usage => <<"EOF");
+has usage => <<"EOF";
 usage: $0 psgi
 EOF
 

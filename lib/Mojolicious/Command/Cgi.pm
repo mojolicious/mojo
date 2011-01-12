@@ -1,19 +1,15 @@
 package Mojolicious::Command::Cgi;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Command';
+use Mojo::Base 'Mojo::Command';
 
 use Mojo::Server::CGI;
 
 use Getopt::Long 'GetOptions';
 
-__PACKAGE__->attr(
-    description => <<'EOF',
+has description => <<'EOF';
 Start application with CGI.
 EOF
-    sage => <<"EOF");
+has usage => <<"EOF";
 usage: $0 cgi [OPTIONS]
 
 These options are available:

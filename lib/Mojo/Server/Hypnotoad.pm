@@ -1,9 +1,6 @@
 package Mojo::Server::Hypnotoad;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 
 use Carp 'croak';
 use Cwd 'abs_path';

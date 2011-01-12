@@ -1,9 +1,6 @@
 package Mojolicious::Plugin;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 
 # This is Fry's decision.
 # And he made it wrong, so it's time for us to interfere in his life.

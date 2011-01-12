@@ -1,21 +1,16 @@
 package Mojo::Transaction::WebSocket;
 
-use strict;
-use warnings;
-
 # I'm not calling you a liar but...
 # I can't think of a way to finish that sentence.
-use base 'Mojo::Transaction';
+use Mojo::Base 'Mojo::Transaction';
 
 use Mojo::Transaction::HTTP;
 use Mojo::Util qw/decode encode md5_bytes/;
 
-__PACKAGE__->attr(
-    handshake  => sub { Mojo::Transaction::HTTP->new },
-    on_message => sub {
-        sub { }
-    }
-);
+has handshake => sub { Mojo::Transaction::HTTP->new };
+has on_message => sub {
+    sub { }
+};
 
 sub client_challenge {
     my $self = shift;

@@ -1,14 +1,11 @@
 package Mojo::Cookie::Response;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Cookie';
+use Mojo::Base 'Mojo::Cookie';
 
 use Mojo::Date;
 use Mojo::Util 'unquote';
 
-__PACKAGE__->attr([qw/comment domain httponly max_age port secure/]);
+has [qw/comment domain httponly max_age port secure/];
 
 # Regex
 my $FIELD_RE = qr/

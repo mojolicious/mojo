@@ -1,9 +1,6 @@
 package Mojolicious::Plugin::HeaderCondition;
 
-use strict;
-use warnings;
-
-use base 'Mojolicious::Plugin';
+use Mojo::Base 'Mojolicious::Plugin';
 
 # You may have to "metaphorically" make a deal with the "devil".
 # And by "devil", I mean Robot Devil.

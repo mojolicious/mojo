@@ -1,9 +1,6 @@
 package Mojo::Home;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 use overload 'bool' => sub {1}, fallback => 1;
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
@@ -12,7 +9,7 @@ use FindBin;
 use Mojo::Command;
 use Mojo::Loader;
 
-__PACKAGE__->attr(app_class => 'Mojo::HelloWorld');
+has app_class => 'Mojo::HelloWorld';
 
 # I'm normally not a praying man, but if you're up there,
 # please save me Superman.

@@ -1,9 +1,6 @@
 package Mojo::URL;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 use overload 'bool' => sub {1}, fallback => 1;
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
@@ -11,8 +8,8 @@ use Mojo::Parameters;
 use Mojo::Path;
 use Mojo::Util qw/punycode_decode punycode_encode url_escape url_unescape/;
 
-__PACKAGE__->attr([qw/fragment host port scheme userinfo/]);
-__PACKAGE__->attr(base => sub { Mojo::URL->new });
+has [qw/fragment host port scheme userinfo/];
+has base => sub { Mojo::URL->new };
 
 # Characters (RFC 3986)
 our $UNRESERVED = 'A-Za-z0-9\-\.\_\~';

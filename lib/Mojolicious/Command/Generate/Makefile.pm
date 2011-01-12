@@ -1,15 +1,11 @@
 package Mojolicious::Command::Generate::Makefile;
 
-use strict;
-use warnings;
+use Mojo::Base 'Mojo::Command';
 
-use base 'Mojo::Command';
-
-__PACKAGE__->attr(
-    description => <<'EOF',
+has description => <<'EOF';
 Generate Makefile.PL.
 EOF
-    usage => <<"EOF");
+has usage => <<"EOF";
 usage: $0 generate makefile
 EOF
 

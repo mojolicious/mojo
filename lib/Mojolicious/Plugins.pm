@@ -1,16 +1,11 @@
 package Mojolicious::Plugins;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 
 use Mojo::Util 'camelize';
 
-__PACKAGE__->attr(
-    hooks      => sub { {} },
-    namespaces => sub { ['Mojolicious::Plugin'] }
-);
+has hooks      => sub { {} };
+has namespaces => sub { ['Mojolicious::Plugin'] };
 
 # Who would have thought Hell would really exist?
 # And that it would be in New Jersey?

@@ -1,9 +1,6 @@
 package Mojo::Message;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 
 use Carp 'croak';
 use Mojo::Asset::Memory;
@@ -15,16 +12,14 @@ use Mojo::Util qw/decode url_unescape/;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 262144;
 
-__PACKAGE__->attr(
-    content         => sub { Mojo::Content::Single->new },
-    default_charset => 'UTF-8',
-    dom_class       => 'Mojo::DOM',
-    json_class      => 'Mojo::JSON',
-    max_line_size    => sub { $ENV{MOJO_MAX_LINE_SIZE}    || 10240 },
-    max_message_size => sub { $ENV{MOJO_MAX_MESSAGE_SIZE} || 5242880 },
-    version          => '1.1'
-);
-__PACKAGE__->attr([qw/on_finish on_progress/]);
+has content => sub { Mojo::Content::Single->new };
+has default_charset  => 'UTF-8';
+has dom_class        => 'Mojo::DOM';
+has json_class       => 'Mojo::JSON';
+has max_line_size    => sub { $ENV{MOJO_MAX_LINE_SIZE} || 10240 };
+has max_message_size => sub { $ENV{MOJO_MAX_MESSAGE_SIZE} || 5242880 };
+has version          => '1.1';
+has [qw/on_finish on_progress/];
 
 # I'll keep it short and sweet. Family. Religion. Friendship.
 # These are the three demons you must slay if you wish to succeed in

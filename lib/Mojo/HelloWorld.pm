@@ -1,9 +1,6 @@
 package Mojo::HelloWorld;
 
-use strict;
-use warnings;
-
-use base 'Mojo';
+use Mojo::Base 'Mojo';
 
 use Mojo::JSON;
 use Mojo::Cookie::Response;

@@ -1,68 +1,63 @@
 package Mojo::Server;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 
 use Carp 'croak';
 use Mojo::Loader;
 
-__PACKAGE__->attr(
-    app => sub {
+has app => sub {
+    my $self = shift;
+
+    # App in environment
+    return $ENV{MOJO_APP} if ref $ENV{MOJO_APP};
+
+    # Load
+    if (my $e = Mojo::Loader->load($self->app_class)) {
+        die $e if ref $e;
+    }
+
+    $self->app_class->new;
+};
+has app_class =>
+  sub { ref $ENV{MOJO_APP} || $ENV{MOJO_APP} || 'Mojo::HelloWorld' };
+has on_build_tx => sub {
+    sub {
         my $self = shift;
 
-        # App in environment
-        return $ENV{MOJO_APP} if ref $ENV{MOJO_APP};
-
-        # Load
-        if (my $e = Mojo::Loader->load($self->app_class)) {
-            die $e if ref $e;
+        # Reload
+        if ($self->reload) {
+            if (my $e = Mojo::Loader->reload) { warn $e }
+            delete $self->{app};
         }
 
-        return $self->app_class->new;
-    },
-    app_class =>
-      sub { ref $ENV{MOJO_APP} || $ENV{MOJO_APP} || 'Mojo::HelloWorld' },
-    on_build_tx => sub {
-        sub {
-            my $self = shift;
+        $self->app->on_build_tx->($self->app);
+      }
+};
+has on_handler => sub {
+    sub {
 
-            # Reload
-            if ($self->reload) {
-                if (my $e = Mojo::Loader->reload) { warn $e }
-                delete $self->{app};
-            }
+        # Application
+        my $app = shift->app;
 
-            return $self->app->on_build_tx->($self->app);
-          }
-    },
-    on_handler => sub {
-        sub {
+        # Transaction
+        my $tx = shift;
 
-            # Application
-            my $app = shift->app;
+        # Handler
+        $app->handler($tx);
 
-            # Transaction
-            my $tx = shift;
-
-            # Handler
-            $app->handler($tx);
-
-            # Delayed
-            $app->log->debug(
-                'Waiting for delayed response, forgot to render or resume?')
-              unless $tx->is_writing;
-          }
-    },
-    on_websocket => sub {
-        sub {
-            my $self = shift;
-            return $self->app->on_websocket->($self->app, @_);
-          }
-    },
-    reload => sub { $ENV{MOJO_RELOAD} || 0 }
-);
+        # Delayed
+        $app->log->debug(
+            'Waiting for delayed response, forgot to render or resume?')
+          unless $tx->is_writing;
+      }
+};
+has on_websocket => sub {
+    sub {
+        my $self = shift;
+        $self->app->on_websocket->($self->app, @_)->server_handshake;
+      }
+};
+has reload => sub { $ENV{MOJO_RELOAD} || 0 };
 
 # Are you saying you're never going to eat any animal again? What about bacon?
 # No.

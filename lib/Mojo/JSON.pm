@@ -1,14 +1,11 @@
 package Mojo::JSON;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 
 use B;
 use Mojo::Util;
 
-__PACKAGE__->attr('error');
+has 'error';
 
 # Literal names
 our $FALSE = Mojo::JSON::_Bool->new(0);
@@ -401,10 +398,7 @@ sub _exception {
 # Emulate boolean type
 package Mojo::JSON::_Bool;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 use overload (
     '0+' => sub { $_[0]->{_value} },
     '""' => sub { $_[0]->{_value} }

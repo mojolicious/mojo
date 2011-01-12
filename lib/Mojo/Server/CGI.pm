@@ -1,13 +1,10 @@
 package Mojo::Server::CGI;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Server';
+use Mojo::Base 'Mojo::Server';
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 262144;
 
-__PACKAGE__->attr(nph => 0);
+has nph => 0;
 
 # Lisa, you're a Buddhist, so you believe in reincarnation.
 # Eventually, Snowball will be reborn as a higher lifeform... like a snowman.

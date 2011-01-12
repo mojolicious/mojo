@@ -1,17 +1,13 @@
 package Mojolicious::Command::Fastcgi;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Command';
+use Mojo::Base 'Mojo::Command';
 
 use Mojo::Server::FastCGI;
 
-__PACKAGE__->attr(
-    description => <<'EOF',
+has description => <<'EOF';
 Start application with FastCGI.
 EOF
-    usage => <<"EOF");
+has usage => <<"EOF";
 usage: $0 fastcgi
 EOF
 

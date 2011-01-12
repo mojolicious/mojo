@@ -1,9 +1,6 @@
 package Mojolicious::Plugin::RequestTimer;
 
-use strict;
-use warnings;
-
-use base 'Mojolicious::Plugin';
+use Mojo::Base 'Mojolicious::Plugin';
 
 use Time::HiRes ();
 

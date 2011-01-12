@@ -1,19 +1,15 @@
 package Mojolicious::Command::Daemon;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Command';
+use Mojo::Base 'Mojo::Command';
 
 use Mojo::Server::Daemon;
 
 use Getopt::Long 'GetOptions';
 
-__PACKAGE__->attr(
-    description => <<'EOF',
+has description => <<'EOF';
 Start application with HTTP 1.1 and WebSocket server.
 EOF
-    usage => <<"EOF");
+has usage => <<"EOF";
 usage: $0 daemon [OPTIONS]
 
 These options are available:
@@ -33,7 +29,6 @@ These options are available:
   --user <name>           Set user name for process.
   --websocket <seconds>   Set WebSocket timeout, defaults to 300.
 EOF
-
 
 # This is the worst thing you've ever done.
 # You say that so often that it lost its meaning.

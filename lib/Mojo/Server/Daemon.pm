@@ -1,9 +1,6 @@
 package Mojo::Server::Daemon;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Server';
+use Mojo::Base 'Mojo::Server';
 
 use Carp 'croak';
 use File::Spec;
@@ -21,14 +18,12 @@ use constant BONJOUR => $ENV{MOJO_NO_BONJOUR}
 # Debug
 use constant DEBUG => $ENV{MOJO_DAEMON_DEBUG} || 0;
 
-__PACKAGE__->attr([qw/backlog group listen silent user/]);
-__PACKAGE__->attr(
-    ioloop             => sub { Mojo::IOLoop->singleton },
-    keep_alive_timeout => 5,
-    max_clients        => 1000,
-    max_requests       => 25,
-    websocket_timeout  => 300
-);
+has [qw/backlog group listen silent user/];
+has ioloop => sub { Mojo::IOLoop->singleton };
+has keep_alive_timeout => 5;
+has max_clients        => 1000;
+has max_requests       => 25;
+has websocket_timeout  => 300;
 
 my $SOCKET_RE = qr/^
     (http(?:s)?)\:\/\/   # Scheme

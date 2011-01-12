@@ -1,18 +1,14 @@
 package Mojolicious::Command::Inflate;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Command';
+use Mojo::Base 'Mojo::Command';
 
 use Getopt::Long 'GetOptions';
 use Mojo::Loader;
 
-__PACKAGE__->attr(
-    description => <<'EOF',
+has description => <<'EOF';
 Inflate embedded files to real files.
 EOF
-    usage => <<"EOF");
+has usage => <<"EOF";
 usage: $0 inflate [OPTIONS]
 
 These options are available:

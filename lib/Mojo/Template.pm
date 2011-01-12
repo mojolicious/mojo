@@ -1,9 +1,6 @@
 package Mojo::Template;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 
 use Carp 'croak';
 use Encode qw/decode encode/;
@@ -13,23 +10,21 @@ use Mojo::Exception;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 262144;
 
-__PACKAGE__->attr([qw/auto_escape compiled/]);
-__PACKAGE__->attr(
-    [qw/append code prepend/] => '',
-    capture_end               => 'end',
-    capture_start             => 'begin',
-    comment_mark              => '#',
-    encoding                  => 'UTF-8',
-    escape_mark               => '=',
-    expression_mark           => '=',
-    line_start                => '%',
-    namespace                 => 'Mojo::Template::Context',
-    tag_start                 => '<%',
-    tag_end                   => '%>',
-    template                  => '',
-    tree      => sub { [] },
-    trim_mark => '='
-);
+has [qw/auto_escape compiled/];
+has [qw/append code prepend/] => '';
+has capture_end     => 'end';
+has capture_start   => 'begin';
+has comment_mark    => '#';
+has encoding        => 'UTF-8';
+has escape_mark     => '=';
+has expression_mark => '=';
+has line_start      => '%';
+has namespace       => 'Mojo::Template::Context';
+has tag_start       => '<%';
+has tag_end         => '%>';
+has template        => '';
+has tree            => sub { [] };
+has trim_mark       => '=';
 
 # Helpers
 my $HELPERS = <<'EOF';

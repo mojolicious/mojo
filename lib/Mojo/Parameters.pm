@@ -1,20 +1,15 @@
 package Mojo::Parameters;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 use overload 'bool' => sub {1}, fallback => 1;
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
 use Mojo::Util qw/encode decode url_escape url_unescape/;
 use Mojo::URL;
 
-__PACKAGE__->attr(
-    charset        => 'UTF-8',
-    pair_separator => '&',
-    params         => sub { [] }
-);
+has charset        => 'UTF-8';
+has pair_separator => '&';
+has params         => sub { [] };
 
 # Yeah, Moe, that team sure did suck last night. They just plain sucked!
 # I've seen teams suck before,

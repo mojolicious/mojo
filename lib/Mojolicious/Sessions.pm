@@ -1,19 +1,14 @@
 package Mojolicious::Sessions;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 
 use Mojo::Util qw/b64_decode b64_encode/;
 use Storable qw/freeze thaw/;
 
-__PACKAGE__->attr('cookie_domain');
-__PACKAGE__->attr(
-    cookie_name        => 'mojolicious',
-    cookie_path        => '/',
-    default_expiration => 3600
-);
+has 'cookie_domain';
+has cookie_name        => 'mojolicious';
+has cookie_path        => '/';
+has default_expiration => 3600;
 
 # Bender, quit destroying the universe!
 sub load {

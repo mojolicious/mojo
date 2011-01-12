@@ -1,9 +1,6 @@
 package Mojolicious::Command::Get;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Command';
+use Mojo::Base 'Mojo::Command';
 
 use Mojo::Client;
 use Mojo::IOLoop;
@@ -12,11 +9,10 @@ use Mojo::Util 'decode';
 
 use Getopt::Long 'GetOptions';
 
-__PACKAGE__->attr(
-    description => <<'EOF',
+has description => <<'EOF';
 Get file from URL.
 EOF
-    usage => <<"EOF");
+has usage => <<"EOF";
 usage: $0 get [OPTIONS] [URL]
 
 These options are available:

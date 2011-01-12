@@ -1,20 +1,15 @@
 package Mojo::Exception;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 use overload 'bool' => sub {1}, fallback => 1;
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
 use IO::File;
 use Scalar::Util 'blessed';
 
-__PACKAGE__->attr(
-    [qw/frames line lines_before lines_after/] => sub { [] },
-    [qw/message raw_message/]                  => 'Exception!',
-    verbose => sub { $ENV{MOJO_EXCEPTION_VERBOSE} || 0 }
-);
+has [qw/frames line lines_before lines_after/] => sub { [] };
+has [qw/message raw_message/] => 'Exception!';
+has verbose => sub { $ENV{MOJO_EXCEPTION_VERBOSE} || 0 };
 
 # Attempted murder? Now honestly, what is that?
 # Do they give a Nobel Prize for attempted chemistry?

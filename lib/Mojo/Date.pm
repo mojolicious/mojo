@@ -1,15 +1,12 @@
 package Mojo::Date;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 use overload 'bool' => sub {1}, fallback => 1;
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
 require Time::Local;
 
-__PACKAGE__->attr('epoch');
+has 'epoch';
 
 # Days and months
 my @DAYS   = qw/Sun Mon Tue Wed Thu Fri Sat/;

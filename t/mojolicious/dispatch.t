@@ -15,9 +15,9 @@ package Test::Controller;
 use strict;
 use warnings;
 
-use base 'Mojolicious::Controller';
+use Mojo::Base 'Mojolicious::Controller';
 
-__PACKAGE__->attr('render_called');
+has 'render_called';
 
 sub render { shift->render_called(1) }
 

@@ -1,15 +1,12 @@
 package Mojo::Message::Response;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Message';
+use Mojo::Base 'Mojo::Message';
 
 use Mojo::Cookie::Response;
 use Mojo::Date;
 use Mojo::Util 'get_line';
 
-__PACKAGE__->attr([qw/code message/]);
+has [qw/code message/];
 
 # Start line regex
 my $START_LINE_RE = qr/

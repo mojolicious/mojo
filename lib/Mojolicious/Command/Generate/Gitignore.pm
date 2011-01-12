@@ -1,15 +1,11 @@
 package Mojolicious::Command::Generate::Gitignore;
 
-use strict;
-use warnings;
+use Mojo::Base 'Mojo::Command';
 
-use base 'Mojo::Command';
-
-__PACKAGE__->attr(
-    description => <<'EOF',
+has description => <<'EOF';
 Generate .gitignore.
 EOF
-    usage => <<"EOF");
+has usage => <<"EOF";
 usage: $0 generate gitignore
 EOF
 

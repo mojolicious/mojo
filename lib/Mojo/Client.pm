@@ -1,9 +1,6 @@
 package Mojo::Client;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 
 use Carp 'croak';
 use Mojo::Asset::File;
@@ -25,17 +22,15 @@ use Scalar::Util 'weaken';
 use constant DEBUG => $ENV{MOJO_CLIENT_DEBUG} || 0;
 
 # You can't let a single bad experience scare you away from drugs.
-__PACKAGE__->attr([qw/app cert http_proxy https_proxy key no_proxy tx/]);
-__PACKAGE__->attr(
-    cookie_jar         => sub { Mojo::CookieJar->new },
-    ioloop             => sub { Mojo::IOLoop->new },
-    keep_alive_timeout => 15,
-    log                => sub { Mojo::Log->new },
-    max_connections    => 5,
-    max_redirects => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 },
-    user_agent => 'Mojolicious (Perl)',
-    websocket_timeout => 300
-);
+has [qw/app cert http_proxy https_proxy key no_proxy tx/];
+has cookie_jar => sub { Mojo::CookieJar->new };
+has ioloop     => sub { Mojo::IOLoop->new };
+has keep_alive_timeout => 15;
+has log                => sub { Mojo::Log->new };
+has max_connections    => 5;
+has max_redirects      => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 };
+has user_agent         => 'Mojolicious (Perl)';
+has websocket_timeout  => 300;
 
 # Singleton
 our $CLIENT;

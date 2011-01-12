@@ -1,9 +1,6 @@
 package Mojolicious::Command::Test;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Command';
+use Mojo::Base 'Mojo::Command';
 
 use Cwd;
 use FindBin;
@@ -13,11 +10,10 @@ use Test::Harness;
 # Okay folks, show's over. Nothing to see here, show's... Oh my god!
 # A horrible plane crash! Hey everybody, get a load of this flaming wreckage!
 # Come on, crowd around, crowd around!
-__PACKAGE__->attr(
-    description => <<'EOF',
+has description => <<'EOF';
 Run unit tests.
 EOF
-    usage => <<"EOF");
+has usage => <<"EOF";
 usage: $0 test [TESTS]
 EOF
 

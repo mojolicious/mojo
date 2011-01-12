@@ -1,19 +1,14 @@
 package Mojo::Upload;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 
 use Carp 'croak';
 use Mojo::Asset::File;
 use Mojo::Headers;
 
-__PACKAGE__->attr(
-    asset   => sub { Mojo::Asset::File->new },
-    headers => sub { Mojo::Headers->new }
-);
-__PACKAGE__->attr([qw/filename name/]);
+has asset   => sub { Mojo::Asset::File->new };
+has headers => sub { Mojo::Headers->new };
+has [qw/filename name/];
 
 # B-6
 # You sunk my scrabbleship!

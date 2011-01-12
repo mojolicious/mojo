@@ -1,9 +1,6 @@
 package Mojo::Asset::Memory;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Asset';
+use Mojo::Base 'Mojo::Asset';
 
 use Carp 'croak';
 use IO::File;

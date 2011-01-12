@@ -1,20 +1,14 @@
 package Mojo::Transaction;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 
 use Carp 'croak';
 
-__PACKAGE__->attr([qw/connection kept_alive local_address local_port/]);
-__PACKAGE__->attr([qw/previous remote_port/]);
-__PACKAGE__->attr(
-    [qw/on_finish on_resume/] => sub {
-        sub {1}
-    },
-    keep_alive => 0
-);
+has [qw/connection kept_alive local_address local_port previous remote_port/];
+has [qw/on_finish on_resume/] => sub {
+    sub {1}
+};
+has keep_alive => 0;
 
 # Please don't eat me! I have a wife and kids. Eat them!
 sub client_read  { croak 'Method "client_read" not implemented by subclass' }

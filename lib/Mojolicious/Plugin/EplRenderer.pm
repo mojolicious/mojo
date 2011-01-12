@@ -1,9 +1,6 @@
 package Mojolicious::Plugin::EplRenderer;
 
-use strict;
-use warnings;
-
-use base 'Mojolicious::Plugin';
+use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::Template;
 use Mojo::Util 'md5_sum';

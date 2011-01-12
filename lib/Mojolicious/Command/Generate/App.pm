@@ -1,15 +1,11 @@
 package Mojolicious::Command::Generate::App;
 
-use strict;
-use warnings;
+use Mojo::Base 'Mojo::Command';
 
-use base 'Mojo::Command';
-
-__PACKAGE__->attr(
-    description => <<'EOF',
+has description => <<'EOF';
 Generate application directory structure.
 EOF
-    usage => <<"EOF");
+has usage => <<"EOF";
 usage: $0 generate app [NAME]
 EOF
 

@@ -1,9 +1,6 @@
 package Mojolicious::Routes;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 
 use Mojo::Exception;
 use Mojo::Loader;
@@ -13,14 +10,12 @@ use Mojolicious::Routes::Match;
 use Mojolicious::Routes::Pattern;
 use Scalar::Util 'weaken';
 
-__PACKAGE__->attr([qw/block inline parent partial namespace/]);
-__PACKAGE__->attr(
-    [qw/children conditions/] => sub { [] },
-    controller_base_class     => 'Mojolicious::Controller',
-    dictionary                => sub { {} },
-    hidden  => sub { [qw/new app attr render req res stash tx/] },
-    pattern => sub { Mojolicious::Routes::Pattern->new }
-);
+has [qw/block inline parent partial namespace/];
+has [qw/children conditions/] => sub { [] };
+has controller_base_class => 'Mojolicious::Controller';
+has dictionary => sub { {} };
+has hidden => sub { [qw/new app attr render req res stash tx/] };
+has pattern => sub { Mojolicious::Routes::Pattern->new };
 
 # Yet thanks to my trusty safety sphere,
 # I sublibed with only tribial brain dablage.

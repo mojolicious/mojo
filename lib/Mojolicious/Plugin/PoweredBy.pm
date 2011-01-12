@@ -1,9 +1,6 @@
 package Mojolicious::Plugin::PoweredBy;
 
-use strict;
-use warnings;
-
-use base 'Mojolicious::Plugin';
+use Mojo::Base 'Mojolicious::Plugin';
 
 # It's just like the story of the grasshopper and the octopus.
 # All year long, the grasshopper kept burying acorns for the winter,

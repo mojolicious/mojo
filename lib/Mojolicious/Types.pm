@@ -1,38 +1,33 @@
 package Mojolicious::Types;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 
 # Once again, the conservative, sandwich-heavy portfolio pays off for the
 # hungry investor.
-__PACKAGE__->attr(
-    types => sub {
-        return {
-            atom => 'application/atom+xml',
-            bin  => 'application/octet-stream',
-            css  => 'text/css',
-            gif  => 'image/gif',
-            gz   => 'application/gzip',
-            htm  => 'text/html',
-            html => 'text/html;charset=UTF-8',
-            ico  => 'image/x-icon',
-            jpeg => 'image/jpeg',
-            jpg  => 'image/jpeg',
-            js   => 'application/x-javascript',
-            json => 'application/json',
-            mp3  => 'audio/mpeg',
-            png  => 'image/png',
-            rss  => 'application/rss+xml',
-            svg  => 'image/svg+xml',
-            tar  => 'application/x-tar',
-            txt  => 'text/plain',
-            xml  => 'text/xml',
-            zip  => 'application/zip'
-        };
-    }
-);
+has types => sub {
+    return {
+        atom => 'application/atom+xml',
+        bin  => 'application/octet-stream',
+        css  => 'text/css',
+        gif  => 'image/gif',
+        gz   => 'application/gzip',
+        htm  => 'text/html',
+        html => 'text/html;charset=UTF-8',
+        ico  => 'image/x-icon',
+        jpeg => 'image/jpeg',
+        jpg  => 'image/jpeg',
+        js   => 'application/x-javascript',
+        json => 'application/json',
+        mp3  => 'audio/mpeg',
+        png  => 'image/png',
+        rss  => 'application/rss+xml',
+        svg  => 'image/svg+xml',
+        tar  => 'application/x-tar',
+        txt  => 'text/plain',
+        xml  => 'text/xml',
+        zip  => 'application/zip'
+    };
+};
 
 # Magic. Got it.
 sub type {

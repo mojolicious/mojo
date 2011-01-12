@@ -1,24 +1,19 @@
 package Mojolicious::Routes::Pattern;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 
 use constant DEBUG => $ENV{MOJO_ROUTES_DEBUG} || 0;
 
-__PACKAGE__->attr(
-    defaults       => sub { {} },
-    quote_end      => ')',
-    quote_start    => '(',
-    relaxed_start  => '.',
-    reqs           => sub { {} },
-    symbol_start   => ':',
-    symbols        => sub { [] },
-    tree           => sub { [] },
-    wildcard_start => '*'
-);
-__PACKAGE__->attr([qw/format pattern regex/]);
+has defaults => sub { {} };
+has quote_end      => ')';
+has quote_start    => '(';
+has relaxed_start  => '.';
+has reqs           => sub { {} };
+has symbol_start   => ':';
+has symbols        => sub { [] };
+has tree           => sub { [] };
+has wildcard_start => '*';
+has [qw/format pattern regex/];
 
 # This is the worst kind of discrimination. The kind against me!
 sub new {

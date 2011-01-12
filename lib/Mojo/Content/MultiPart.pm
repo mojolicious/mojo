@@ -1,13 +1,10 @@
 package Mojo::Content::MultiPart;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Content';
+use Mojo::Base 'Mojo::Content';
 
 use Mojo::Util 'b64_encode';
 
-__PACKAGE__->attr(parts => sub { [] });
+has parts => sub { [] };
 
 sub body_contains {
     my ($self, $chunk) = @_;

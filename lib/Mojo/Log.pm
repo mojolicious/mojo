@@ -1,37 +1,32 @@
 package Mojo::Log;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 
 use Carp 'croak';
 use Fcntl ':flock';
 use IO::File;
 
-__PACKAGE__->attr(
-    handle => sub {
-        my $self = shift;
+has handle => sub {
+    my $self = shift;
 
-        # Need a log file
-        unless ($self->path) {
-            binmode STDERR, ':utf8';
-            return \*STDERR;
-        }
+    # Need a log file
+    unless ($self->path) {
+        binmode STDERR, ':utf8';
+        return \*STDERR;
+    }
 
-        # Open
-        my $file = IO::File->new;
-        my $path = $self->path;
-        $file->open(">> $path") or croak qq/Can't open log file "$path": $!/;
+    # Open
+    my $file = IO::File->new;
+    my $path = $self->path;
+    $file->open(">> $path") or croak qq/Can't open log file "$path": $!/;
 
-        # utf8
-        binmode $file, ':utf8';
+    # utf8
+    binmode $file, ':utf8';
 
-        return $file;
-    },
-    level => 'debug'
-);
-__PACKAGE__->attr('path');
+    return $file;
+};
+has level => 'debug';
+has 'path';
 
 my $LEVEL = {debug => 1, info => 2, warn => 3, error => 4, fatal => 5};
 

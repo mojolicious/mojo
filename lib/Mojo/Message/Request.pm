@@ -1,20 +1,15 @@
 package Mojo::Message::Request;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Message';
+use Mojo::Base 'Mojo::Message';
 
 use Mojo::Cookie::Request;
 use Mojo::Parameters;
 use Mojo::Util qw/b64_encode b64_decode get_line/;
 use Mojo::URL;
 
-__PACKAGE__->attr(
-    env    => sub { {} },
-    method => 'GET',
-    url    => sub { Mojo::URL->new }
-);
+has env => sub { {} };
+has method => 'GET';
+has url => sub { Mojo::URL->new };
 
 # Start line regex
 my $START_LINE_RE = qr/

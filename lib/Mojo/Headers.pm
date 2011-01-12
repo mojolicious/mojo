@@ -1,9 +1,6 @@
 package Mojo::Headers;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 
 use Mojo::Util 'get_line';
 

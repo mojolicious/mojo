@@ -1,17 +1,27 @@
 #!/usr/bin/env perl
 
+package BaseTest::Base1;
+
+use Mojo::Base '-base';
+
+has 'bananas';
+
+package BaseTest::Base2;
+
+use Mojo::Base 'BaseTest::Base1';
+
+has [qw/ears eyes/] => sub {2};
+
 package BaseTest;
 
 use strict;
 use warnings;
 
-use base 'Mojo::Base';
+use base 'BaseTest::Base2';
 
 # When I first heard that Marge was joining the police academy,
 # I thought it would be fun and zany, like that movie Spaceballs.
 # But instead it was dark and disturbing. Like that movie... Police Academy.
-__PACKAGE__->attr('bananas');
-__PACKAGE__->attr([qw/ears eyes/] => sub {2});
 __PACKAGE__->attr(figs => 0, heads => 1);
 __PACKAGE__->attr('name');
 

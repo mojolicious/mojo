@@ -1,9 +1,6 @@
 package Mojolicious::Plugin::AgentCondition;
 
-use strict;
-use warnings;
-
-use base 'Mojolicious::Plugin';
+use Mojo::Base 'Mojolicious::Plugin';
 
 # Wow, there's a million aliens! I've never seen something so mind-blowing!
 # Ooh, a reception table with muffins!

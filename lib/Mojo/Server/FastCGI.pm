@@ -1,9 +1,6 @@
 package Mojo::Server::FastCGI;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Server';
+use Mojo::Base 'Mojo::Server';
 
 use Errno qw/EAGAIN EWOULDBLOCK/;
 use IO::Socket;

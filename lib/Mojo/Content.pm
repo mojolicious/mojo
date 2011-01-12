@@ -1,20 +1,15 @@
 package Mojo::Content;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 
 use Carp 'croak';
 use Mojo::Headers;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 262144;
 
-__PACKAGE__->attr(
-    [qw/auto_relax relaxed/] => 0,
-    headers => sub { Mojo::Headers->new }
-);
-__PACKAGE__->attr('on_read');
+has [qw/auto_relax relaxed/] => 0;
+has headers => sub { Mojo::Headers->new };
+has 'on_read';
 
 sub body_contains {
     croak 'Method "body_contains" not implemented by subclass';

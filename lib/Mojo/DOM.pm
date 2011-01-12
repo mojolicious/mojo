@@ -1,9 +1,6 @@
 package Mojo::DOM;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 use overload 'bool' => sub {1}, fallback => 1;
 use overload '""' => sub { shift->to_xml }, fallback => 1;
 
@@ -12,10 +9,8 @@ use Scalar::Util 'weaken';
 
 # How are the kids supposed to get home?
 # I dunno. Internet?
-__PACKAGE__->attr(
-    charset => 'UTF-8',
-    tree    => sub { ['root'] }
-);
+has charset => 'UTF-8';
+has tree => sub { ['root'] };
 
 # Regex
 my $CSS_ESCAPE_RE = qr/\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}/;

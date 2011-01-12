@@ -1,9 +1,6 @@
 package Mojolicious;
 
-use strict;
-use warnings;
-
-use base 'Mojo';
+use Mojo::Base 'Mojo';
 
 use Carp 'croak';
 use Mojolicious::Commands;
@@ -14,25 +11,23 @@ use Mojolicious::Sessions;
 use Mojolicious::Static;
 use Mojolicious::Types;
 
-__PACKAGE__->attr(
-    controller_class => 'Mojolicious::Controller',
-    mode             => sub { ($ENV{MOJO_MODE} || 'development') },
-    plugins  => sub { Mojolicious::Plugins->new },
-    renderer => sub { Mojolicious::Renderer->new },
-    routes   => sub { Mojolicious::Routes->new },
-    secret   => sub {
-        my $self = shift;
+has controller_class => 'Mojolicious::Controller';
+has mode => sub { ($ENV{MOJO_MODE} || 'development') };
+has plugins  => sub { Mojolicious::Plugins->new };
+has renderer => sub { Mojolicious::Renderer->new };
+has routes   => sub { Mojolicious::Routes->new };
+has secret   => sub {
+    my $self = shift;
 
-        # Warn developers about unsecure default
-        $self->log->debug('Your secret passphrase needs to be changed!!!');
+    # Warn developers about unsecure default
+    $self->log->debug('Your secret passphrase needs to be changed!!!');
 
-        # Application name
-        return ref $self;
-    },
-    sessions => sub { Mojolicious::Sessions->new },
-    static   => sub { Mojolicious::Static->new },
-    types    => sub { Mojolicious::Types->new }
-);
+    # Application name
+    return ref $self;
+};
+has sessions => sub { Mojolicious::Sessions->new };
+has static   => sub { Mojolicious::Static->new };
+has types    => sub { Mojolicious::Types->new };
 
 # DEPRECATED in Hot Beverage!
 *session = sub {

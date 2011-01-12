@@ -1,9 +1,6 @@
 package Mojo::IOLoop;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 
 use Carp 'croak';
 use Errno qw/EAGAIN ECONNRESET EWOULDBLOCK/;
@@ -133,16 +130,14 @@ my $DNS_TYPES = {
 # "localhost"
 our $LOCALHOST = '127.0.0.1';
 
-__PACKAGE__->attr(
-    [qw/accept_timeout connect_timeout dns_timeout/] => 3,
-    dns_server => sub { $ENV{MOJO_DNS_SERVER} || $DNS_SERVER },
-    max_accepts             => 0,
-    max_connections         => 1000,
-    [qw/on_lock on_unlock/] => sub {
-        sub {1}
-    },
-    timeout => '0.025'
-);
+has [qw/accept_timeout connect_timeout dns_timeout/] => 3;
+has dns_server => sub { $ENV{MOJO_DNS_SERVER} || $DNS_SERVER };
+has max_accepts     => 0;
+has max_connections => 1000;
+has [qw/on_lock on_unlock/] => sub {
+    sub {1}
+};
+has timeout => '0.025';
 
 # Singleton
 our $LOOP;

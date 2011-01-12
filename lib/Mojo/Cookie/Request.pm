@@ -1,9 +1,6 @@
 package Mojo::Cookie::Request;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Cookie';
+use Mojo::Base 'Mojo::Cookie';
 
 use Mojo::Util 'unquote';
 

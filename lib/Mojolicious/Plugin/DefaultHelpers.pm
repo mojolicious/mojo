@@ -1,9 +1,6 @@
 package Mojolicious::Plugin::DefaultHelpers;
 
-use strict;
-use warnings;
-
-use base 'Mojolicious::Plugin';
+use Mojo::Base 'Mojolicious::Plugin';
 
 require Data::Dumper;
 

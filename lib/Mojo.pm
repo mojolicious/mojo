@@ -1,9 +1,6 @@
 package Mojo;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 
 use Carp 'croak';
 use Mojo::Client;
@@ -12,20 +9,15 @@ use Mojo::Log;
 use Mojo::Transaction::HTTP;
 use Mojo::Transaction::WebSocket;
 
-__PACKAGE__->attr(
-    client      => sub { Mojo::Client->singleton },
-    home        => sub { Mojo::Home->new },
-    log         => sub { Mojo::Log->new },
-    on_build_tx => sub {
-        sub { return Mojo::Transaction::HTTP->new }
-    },
-    on_websocket => sub {
-        sub {
-            return Mojo::Transaction::WebSocket->new(handshake => pop)
-              ->server_handshake;
-          }
-    }
-);
+has client => sub { Mojo::Client->singleton };
+has home   => sub { Mojo::Home->new };
+has log    => sub { Mojo::Log->new };
+has on_build_tx => sub {
+    sub { Mojo::Transaction::HTTP->new }
+};
+has on_websocket => sub {
+    sub { Mojo::Transaction::WebSocket->new(handshake => pop) }
+};
 
 # Oh, so they have internet on computers now!
 sub new {

@@ -1,15 +1,12 @@
 package Mojo::Content::Single;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Content';
+use Mojo::Base 'Mojo::Content';
 
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
 use Mojo::Content::MultiPart;
 
-__PACKAGE__->attr(asset => sub { Mojo::Asset::Memory->new });
+has asset => sub { Mojo::Asset::Memory->new };
 
 sub body_contains {
     my ($self, $chunk) = @_;

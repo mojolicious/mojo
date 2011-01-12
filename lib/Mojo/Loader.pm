@@ -1,9 +1,6 @@
 package Mojo::Loader;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base '-base';
 
 use Carp 'carp';
 use File::Basename;

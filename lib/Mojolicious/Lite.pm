@@ -1,9 +1,6 @@
 package Mojolicious::Lite;
 
-use strict;
-use warnings;
-
-use base 'Mojolicious';
+use Mojo::Base 'Mojolicious';
 
 # Since when is the Internet all about robbing people of their privacy?
 # August 6, 1991.

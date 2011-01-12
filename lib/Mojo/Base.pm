@@ -8,6 +8,44 @@ require Carp;
 
 # Kids, you tried your best and you failed miserably.
 # The lesson is, never try.
+sub import {
+    my $class = shift;
+
+    # Flag
+    return unless my $flag = shift;
+
+    # Caller
+    my $caller = caller;
+
+    # No limits!
+    no strict 'refs';
+    no warnings 'redefine';
+
+    # Base
+    if ($flag eq '-base') { $flag = 'Mojo::Base' }
+
+    # Module
+    else {
+        my $file = $flag;
+        $file =~ s/::|'/\//g;
+        require "$file.pm" unless $flag->can('new');
+    }
+
+    # ISA
+    push @{"${caller}::ISA"}, $flag;
+
+    # Check caller
+    Carp::croak("$caller is not a subclass of Mojo::Base")
+      unless $caller->isa('Mojo::Base');
+
+    # Can haz?
+    *{"${caller}::has"} = sub { $caller->attr(@_) };
+
+    # Mojo modules are strict!
+    strict->import;
+    warnings->import;
+}
+
 sub new {
     my $class = shift;
 
@@ -109,27 +147,54 @@ Mojo::Base - Minimal Base Class For Mojo Projects
 
 =head1 SYNOPSIS
 
-    package Car;
-    use base 'Mojo::Base';
+    package Cat;
+    use Mojo::Base '--base';
 
-    __PACKAGE__->attr('driver');
-    __PACKAGE__->attr('doors' => 2);
-    __PACKAGE__->attr([qw/passengers seats/] => sub { 2 });
+    has 'mouse';
+    has paws => 4;
+    has [qw/ears eyes/] => 2;
+
+    package Tiger;
+    use Mojo::Base 'Cat';
+
+    has stripes => 42;
 
     package main;
 
-    my $bmw = Car->new;
-    print $bmw->doors;
-    print $bmw->doors(5)->doors;
+    my $mew = Cat->new(mouse => 'Mickey');
+    print $bmw->paws;
+    print $bmw->paws(5)->paws;
 
-    my $mercedes = Car->new(driver => 'Sebastian');
-    print $mercedes->passengers(7)->passengers;
+    my $rawr = Tiger->new(stripes => 23);
+    print $rawr->ears * $rawr->stripes;
 
 =head1 DESCRIPTION
 
 L<Mojo::Base> is a simple base class for L<Mojo> projects.
 
+=head1 FUNCTIONS
+
+L<Mojo::Base> exports the following functions if imported with the C<-base>
+flag or a base class.
+
+=head2 C<has>
+
+    has 'name';
+    has [qw/name1 name2 name3/];
+    has name => 'foo';
+    has name => sub { ... };
+    has [qw/name1 name2 name3/] => 'foo';
+    has [qw/name1 name2 name3/] => sub { ... };
+    has name1             => sub {...},
+        name2             => 'foo',
+        [qw/name2 name4/] => 'bar';
+
+Create attributes, just like the C<attr> method.
+Note that this function is EXPERIMENTAL and might change without warning!
+
 =head1 METHODS
+
+L<Mojo::Base> implements the following methods.
 
 =head2 C<new>
 

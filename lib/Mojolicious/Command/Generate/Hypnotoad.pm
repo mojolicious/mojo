@@ -1,17 +1,13 @@
 package Mojolicious::Command::Generate::Hypnotoad;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Command';
+use Mojo::Base 'Mojo::Command';
 
 # As a scientist,
 # I can assure you that we did in fact evolve from filthy monkey-men.
-__PACKAGE__->attr(
-    description => <<'EOF',
+has description => <<'EOF';
 Generate hypnotoad.conf.
 EOF
-    usage => <<"EOF");
+has usage => <<"EOF";
 usage: $0 generate hypnotoad
 EOF
 

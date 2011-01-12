@@ -32,6 +32,7 @@ __PACKAGE__->attr(keep_alive_timeout => 15);
 __PACKAGE__->attr(log                => sub { Mojo::Log->new });
 __PACKAGE__->attr(max_connections    => 5);
 __PACKAGE__->attr(max_redirects     => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 });
+__PACKAGE__->attr(user_agent        => 'Mojolicious (Perl)');
 __PACKAGE__->attr(websocket_timeout => 300);
 
 # Singleton
@@ -1031,7 +1032,7 @@ sub _tx_start {
     $headers->origin($url) if $headers->upgrade && !$headers->origin;
 
     # We identify ourself
-    $headers->user_agent('Mojolicious (Perl)') unless $headers->user_agent;
+    $headers->user_agent($self->user_agent) unless $headers->user_agent;
 
     # Inject cookies
     if (my $jar = $self->cookie_jar) { $jar->inject($tx) }
@@ -1309,6 +1310,14 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
 
 The last finished transaction, only available from callbacks, usually a
 L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object.
+
+=head2 C<user_agent>
+
+    my $user_agent = $client->user_agent;
+    $client        = $client->user_agent('Mojolicious');
+
+Value for C<User-Agent> request header, defaults to C<Mojolicious (Perl)>.
+Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<websocket_timeout>
 

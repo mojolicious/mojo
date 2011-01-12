@@ -12,9 +12,9 @@ __PACKAGE__->attr([qw/previous remote_port/]);
 __PACKAGE__->attr(
     [qw/on_finish on_resume/] => sub {
         sub {1}
-    }
+    },
+    keep_alive => 0
 );
-__PACKAGE__->attr(keep_alive => 0);
 
 # Please don't eat me! I have a wife and kids. Eat them!
 sub client_read  { croak 'Method "client_read" not implemented by subclass' }

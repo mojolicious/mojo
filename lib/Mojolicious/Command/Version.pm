@@ -10,10 +10,11 @@ use Mojo::IOLoop;
 use Mojo::Server::Daemon;
 use Mojolicious;
 
-__PACKAGE__->attr(description => <<'EOF');
+__PACKAGE__->attr(
+    description => <<'EOF',
 Show versions of installed modules.
 EOF
-__PACKAGE__->attr(usage => <<"EOF");
+    usage => <<"EOF");
 usage: $0 version
 
 EOF

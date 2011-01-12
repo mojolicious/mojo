@@ -12,8 +12,7 @@ use base 'Mojo::Base';
 # But instead it was dark and disturbing. Like that movie... Police Academy.
 __PACKAGE__->attr('bananas');
 __PACKAGE__->attr([qw/ears eyes/] => sub {2});
-__PACKAGE__->attr(figs            => 0);
-__PACKAGE__->attr(heads           => 1);
+__PACKAGE__->attr(figs => 0, heads => 1);
 __PACKAGE__->attr('name');
 
 package main;

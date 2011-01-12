@@ -14,20 +14,22 @@ use Mojo::Exception;
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 262144;
 
 __PACKAGE__->attr([qw/auto_escape compiled/]);
-__PACKAGE__->attr([qw/append code prepend/] => '');
-__PACKAGE__->attr(capture_end               => 'end');
-__PACKAGE__->attr(capture_start             => 'begin');
-__PACKAGE__->attr(comment_mark              => '#');
-__PACKAGE__->attr(encoding                  => 'UTF-8');
-__PACKAGE__->attr(escape_mark               => '=');
-__PACKAGE__->attr(expression_mark           => '=');
-__PACKAGE__->attr(line_start                => '%');
-__PACKAGE__->attr(namespace                 => 'Mojo::Template::Context');
-__PACKAGE__->attr(tag_start                 => '<%');
-__PACKAGE__->attr(tag_end                   => '%>');
-__PACKAGE__->attr(template                  => '');
-__PACKAGE__->attr(tree => sub { [] });
-__PACKAGE__->attr(trim_mark => '=');
+__PACKAGE__->attr(
+    [qw/append code prepend/] => '',
+    capture_end               => 'end',
+    capture_start             => 'begin',
+    comment_mark              => '#',
+    encoding                  => 'UTF-8',
+    escape_mark               => '=',
+    expression_mark           => '=',
+    line_start                => '%',
+    namespace                 => 'Mojo::Template::Context',
+    tag_start                 => '<%',
+    tag_end                   => '%>',
+    template                  => '',
+    tree      => sub { [] },
+    trim_mark => '='
+);
 
 # Helpers
 my $HELPERS = <<'EOF';

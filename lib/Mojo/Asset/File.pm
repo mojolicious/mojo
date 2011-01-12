@@ -14,8 +14,8 @@ use IO::File;
 use Mojo::Util 'md5_sum';
 
 __PACKAGE__->attr([qw/cleanup path/]);
-__PACKAGE__->attr(tmpdir => sub { $ENV{MOJO_TMPDIR} || File::Spec->tmpdir });
 __PACKAGE__->attr(
+    tmpdir => sub { $ENV{MOJO_TMPDIR} || File::Spec->tmpdir },
     handle => sub {
         my $self   = shift;
         my $handle = IO::File->new;

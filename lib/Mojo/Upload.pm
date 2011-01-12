@@ -9,9 +9,11 @@ use Carp 'croak';
 use Mojo::Asset::File;
 use Mojo::Headers;
 
-__PACKAGE__->attr(asset => sub { Mojo::Asset::File->new });
+__PACKAGE__->attr(
+    asset   => sub { Mojo::Asset::File->new },
+    headers => sub { Mojo::Headers->new }
+);
 __PACKAGE__->attr([qw/filename name/]);
-__PACKAGE__->attr(headers => sub { Mojo::Headers->new });
 
 # B-6
 # You sunk my scrabbleship!

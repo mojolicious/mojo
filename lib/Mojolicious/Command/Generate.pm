@@ -5,21 +5,22 @@ use warnings;
 
 use base 'Mojolicious::Commands';
 
-__PACKAGE__->attr(description => <<'EOF');
+__PACKAGE__->attr(
+    description => <<'EOF',
 Generate files and directories from templates.
 EOF
-__PACKAGE__->attr(hint => <<"EOF");
+    hint => <<"EOF",
 
 See '$0 generate help GENERATOR' for more information on a specific generator.
 EOF
-__PACKAGE__->attr(message => <<"EOF");
+    message => <<"EOF",
 usage: $0 generate GENERATOR [OPTIONS]
 
 These generators are currently available:
 EOF
-__PACKAGE__->attr(namespaces =>
-      sub { [qw/Mojolicious::Command::Generate Mojo::Command::Generate/] });
-__PACKAGE__->attr(usage => <<"EOF");
+    namespaces =>
+      sub { [qw/Mojolicious::Command::Generate Mojo::Command::Generate/] },
+    usage => <<"EOF");
 usage: $0 generate GENERATOR [OPTIONS]
 EOF
 

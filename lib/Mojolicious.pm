@@ -14,13 +14,13 @@ use Mojolicious::Sessions;
 use Mojolicious::Static;
 use Mojolicious::Types;
 
-__PACKAGE__->attr(controller_class => 'Mojolicious::Controller');
-__PACKAGE__->attr(mode => sub { ($ENV{MOJO_MODE} || 'development') });
-__PACKAGE__->attr(plugins  => sub { Mojolicious::Plugins->new });
-__PACKAGE__->attr(renderer => sub { Mojolicious::Renderer->new });
-__PACKAGE__->attr(routes   => sub { Mojolicious::Routes->new });
 __PACKAGE__->attr(
-    secret => sub {
+    controller_class => 'Mojolicious::Controller',
+    mode             => sub { ($ENV{MOJO_MODE} || 'development') },
+    plugins  => sub { Mojolicious::Plugins->new },
+    renderer => sub { Mojolicious::Renderer->new },
+    routes   => sub { Mojolicious::Routes->new },
+    secret   => sub {
         my $self = shift;
 
         # Warn developers about unsecure default
@@ -28,11 +28,11 @@ __PACKAGE__->attr(
 
         # Application name
         return ref $self;
-    }
+    },
+    sessions => sub { Mojolicious::Sessions->new },
+    static   => sub { Mojolicious::Static->new },
+    types    => sub { Mojolicious::Types->new }
 );
-__PACKAGE__->attr(sessions => sub { Mojolicious::Sessions->new });
-__PACKAGE__->attr(static   => sub { Mojolicious::Static->new });
-__PACKAGE__->attr(types    => sub { Mojolicious::Types->new });
 
 # DEPRECATED in Hot Beverage!
 *session = sub {

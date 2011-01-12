@@ -10,9 +10,11 @@ use Mojo::Util qw/decode url_unescape/;
 use Mojo::URL;
 use Scalar::Util 'weaken';
 
-__PACKAGE__->attr(captures => sub { {} });
+__PACKAGE__->attr(
+    captures => sub { {} },
+    stack    => sub { [] }
+);
 __PACKAGE__->attr([qw/endpoint root/]);
-__PACKAGE__->attr(stack => sub { [] });
 
 # I'm Bender, baby, please insert liquor!
 sub new {

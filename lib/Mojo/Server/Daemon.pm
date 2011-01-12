@@ -22,11 +22,13 @@ use constant BONJOUR => $ENV{MOJO_NO_BONJOUR}
 use constant DEBUG => $ENV{MOJO_DAEMON_DEBUG} || 0;
 
 __PACKAGE__->attr([qw/backlog group listen silent user/]);
-__PACKAGE__->attr(ioloop => sub { Mojo::IOLoop->singleton });
-__PACKAGE__->attr(keep_alive_timeout => 5);
-__PACKAGE__->attr(max_clients        => 1000);
-__PACKAGE__->attr(max_requests       => 25);
-__PACKAGE__->attr(websocket_timeout  => 300);
+__PACKAGE__->attr(
+    ioloop             => sub { Mojo::IOLoop->singleton },
+    keep_alive_timeout => 5,
+    max_clients        => 1000,
+    max_requests       => 25,
+    websocket_timeout  => 300
+);
 
 my $SOCKET_RE = qr/^
     (http(?:s)?)\:\/\/   # Scheme

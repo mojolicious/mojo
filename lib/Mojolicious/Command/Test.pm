@@ -13,10 +13,11 @@ use Test::Harness;
 # Okay folks, show's over. Nothing to see here, show's... Oh my god!
 # A horrible plane crash! Hey everybody, get a load of this flaming wreckage!
 # Come on, crowd around, crowd around!
-__PACKAGE__->attr(description => <<'EOF');
+__PACKAGE__->attr(
+    description => <<'EOF',
 Run unit tests.
 EOF
-__PACKAGE__->attr(usage => <<"EOF");
+    usage => <<"EOF");
 usage: $0 test [TESTS]
 EOF
 

@@ -12,15 +12,13 @@ use Mojo::Log;
 use Mojo::Transaction::HTTP;
 use Mojo::Transaction::WebSocket;
 
-__PACKAGE__->attr(client => sub { Mojo::Client->singleton });
-__PACKAGE__->attr(home   => sub { Mojo::Home->new });
-__PACKAGE__->attr(log    => sub { Mojo::Log->new });
 __PACKAGE__->attr(
+    client      => sub { Mojo::Client->singleton },
+    home        => sub { Mojo::Home->new },
+    log         => sub { Mojo::Log->new },
     on_build_tx => sub {
         sub { return Mojo::Transaction::HTTP->new }
-    }
-);
-__PACKAGE__->attr(
+    },
     on_websocket => sub {
         sub {
             return Mojo::Transaction::WebSocket->new(handshake => pop)

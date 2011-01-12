@@ -16,12 +16,13 @@ use Mojo::Template;
 use Mojo::Loader;
 use Mojo::Util qw/b64_decode camelize decamelize/;
 
-__PACKAGE__->attr(hint => <<"EOF");
+__PACKAGE__->attr(
+    hint => <<"EOF",
 
 See '$0 help COMMAND' for more information on a specific command.
 EOF
-__PACKAGE__->attr(description => 'No description.');
-__PACKAGE__->attr(message     => <<"EOF");
+    description => 'No description.',
+    message     => <<"EOF",
 usage: $0 COMMAND [OPTIONS]
 
 Tip: CGI, FastCGI and PSGI environments can be automatically detected very
@@ -29,10 +30,11 @@ Tip: CGI, FastCGI and PSGI environments can be automatically detected very
 
 These commands are currently available:
 EOF
-__PACKAGE__->attr(namespaces => sub { ['Mojo::Command'] });
-__PACKAGE__->attr(quiet      => 0);
-__PACKAGE__->attr(renderer   => sub { Mojo::Template->new });
-__PACKAGE__->attr(usage      => "usage: $0\n");
+    namespaces => sub { ['Mojo::Command'] },
+    quiet      => 0,
+    renderer   => sub { Mojo::Template->new },
+    usage      => "usage: $0\n"
+);
 
 # Cache
 my $CACHE = {};

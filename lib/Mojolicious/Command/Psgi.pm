@@ -10,10 +10,11 @@ use Mojo::Server::PSGI;
 # Don't let Krusty's death get you down, boy.
 # People die all the time, just like that.
 # Why, you could wake up dead tomorrow! Well, good night.
-__PACKAGE__->attr(description => <<'EOF');
+__PACKAGE__->attr(
+    description => <<'EOF',
 Start application with PSGI.
 EOF
-__PACKAGE__->attr(usage => <<"EOF");
+    usage => <<"EOF");
 usage: $0 psgi
 EOF
 

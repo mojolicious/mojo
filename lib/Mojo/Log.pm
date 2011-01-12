@@ -28,9 +28,9 @@ __PACKAGE__->attr(
         binmode $file, ':utf8';
 
         return $file;
-    }
+    },
+    level => 'debug'
 );
-__PACKAGE__->attr(level => 'debug');
 __PACKAGE__->attr('path');
 
 my $LEVEL = {debug => 1, info => 2, warn => 3, error => 4, fatal => 5};

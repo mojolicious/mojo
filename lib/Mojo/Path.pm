@@ -10,8 +10,10 @@ use overload '""' => sub { shift->to_string }, fallback => 1;
 use Mojo::Util qw/url_escape url_unescape/;
 use Mojo::URL;
 
-__PACKAGE__->attr([qw/leading_slash trailing_slash/] => 0);
-__PACKAGE__->attr(parts => sub { [] });
+__PACKAGE__->attr(
+    [qw/leading_slash trailing_slash/] => 0,
+    parts => sub { [] }
+);
 
 sub new {
     my $self = shift->SUPER::new();

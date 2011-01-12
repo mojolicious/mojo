@@ -10,9 +10,11 @@ use Mojo::Parameters;
 use Mojo::Util qw/b64_encode b64_decode get_line/;
 use Mojo::URL;
 
-__PACKAGE__->attr(env => sub { {} });
-__PACKAGE__->attr(method => 'GET');
-__PACKAGE__->attr(url => sub { Mojo::URL->new });
+__PACKAGE__->attr(
+    env    => sub { {} },
+    method => 'GET',
+    url    => sub { Mojo::URL->new }
+);
 
 # Start line regex
 my $START_LINE_RE = qr/

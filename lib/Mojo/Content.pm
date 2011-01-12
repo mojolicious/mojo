@@ -10,8 +10,10 @@ use Mojo::Headers;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 262144;
 
-__PACKAGE__->attr([qw/auto_relax relaxed/] => 0);
-__PACKAGE__->attr(headers => sub { Mojo::Headers->new });
+__PACKAGE__->attr(
+    [qw/auto_relax relaxed/] => 0,
+    headers => sub { Mojo::Headers->new }
+);
 __PACKAGE__->attr('on_read');
 
 sub body_contains {

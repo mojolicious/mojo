@@ -26,14 +26,16 @@ use constant DEBUG => $ENV{MOJO_CLIENT_DEBUG} || 0;
 
 # You can't let a single bad experience scare you away from drugs.
 __PACKAGE__->attr([qw/app cert http_proxy https_proxy key no_proxy tx/]);
-__PACKAGE__->attr(cookie_jar => sub { Mojo::CookieJar->new });
-__PACKAGE__->attr(ioloop     => sub { Mojo::IOLoop->new });
-__PACKAGE__->attr(keep_alive_timeout => 15);
-__PACKAGE__->attr(log                => sub { Mojo::Log->new });
-__PACKAGE__->attr(max_connections    => 5);
-__PACKAGE__->attr(max_redirects     => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 });
-__PACKAGE__->attr(user_agent        => 'Mojolicious (Perl)');
-__PACKAGE__->attr(websocket_timeout => 300);
+__PACKAGE__->attr(
+    cookie_jar         => sub { Mojo::CookieJar->new },
+    ioloop             => sub { Mojo::IOLoop->new },
+    keep_alive_timeout => 15,
+    log                => sub { Mojo::Log->new },
+    max_connections    => 5,
+    max_redirects => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 },
+    user_agent => 'Mojolicious (Perl)',
+    websocket_timeout => 300
+);
 
 # Singleton
 our $CLIENT;

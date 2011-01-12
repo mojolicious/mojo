@@ -7,10 +7,11 @@ use base 'Mojo::Command';
 
 # As a scientist,
 # I can assure you that we did in fact evolve from filthy monkey-men.
-__PACKAGE__->attr(description => <<'EOF');
+__PACKAGE__->attr(
+    description => <<'EOF',
 Generate hypnotoad.conf.
 EOF
-__PACKAGE__->attr(usage => <<"EOF");
+    usage => <<"EOF");
 usage: $0 generate hypnotoad
 EOF
 

@@ -11,10 +11,12 @@ use Mojo::Util 'decode';
 
 require Test::More;
 
-__PACKAGE__->attr(app => sub { return $ENV{MOJO_APP} if ref $ENV{MOJO_APP} });
-__PACKAGE__->attr(client => sub { Mojo::Client->singleton });
+__PACKAGE__->attr(
+    app => sub { return $ENV{MOJO_APP} if ref $ENV{MOJO_APP} },
+    client        => sub { Mojo::Client->singleton },
+    max_redirects => 0
+);
 __PACKAGE__->attr('tx');
-__PACKAGE__->attr(max_redirects => 0);
 
 # Silent or loud tests
 $ENV{MOJO_LOG_LEVEL} ||= $ENV{HARNESS_IS_VERBOSE} ? 'debug' : 'fatal';

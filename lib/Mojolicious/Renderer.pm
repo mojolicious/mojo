@@ -12,14 +12,16 @@ use Mojo::Home;
 use Mojo::JSON;
 use Mojo::Util 'encode';
 
-__PACKAGE__->attr(default_format => 'html');
+__PACKAGE__->attr(
+    default_format   => 'html',
+    detect_templates => 1,
+    encoding         => 'UTF-8',
+    handlers         => sub { {} },
+    helpers          => sub { {} },
+    layout_prefix    => 'layouts',
+    root             => '/'
+);
 __PACKAGE__->attr([qw/default_handler default_template_class/]);
-__PACKAGE__->attr(detect_templates => 1);
-__PACKAGE__->attr(encoding         => 'UTF-8');
-__PACKAGE__->attr(handlers         => sub { {} });
-__PACKAGE__->attr(helpers          => sub { {} });
-__PACKAGE__->attr(layout_prefix    => 'layouts');
-__PACKAGE__->attr(root             => '/');
 
 # DEPRECATED in Hot Beverage!
 *handler = \&handlers;

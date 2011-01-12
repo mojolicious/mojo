@@ -65,18 +65,16 @@ use warnings;
 
 use base 'Mojo::Base';
 
-__PACKAGE__->attr(_offset => 0);
-__PACKAGE__->attr('_res');
-
 sub close { }
 
 sub getline {
     my $self = shift;
 
     # Blocking read
-    my $offset = $self->_offset;
+    $self->{_offset} = 0 unless defined $self->{_offset};
+    my $offset = $self->{_offset};
     while (1) {
-        my $chunk = $self->_res->get_body_chunk($offset);
+        my $chunk = $self->{_res}->get_body_chunk($offset);
 
         # No content yet, try again
         unless (defined $chunk) {
@@ -89,7 +87,7 @@ sub getline {
 
         # Content
         $offset += length $chunk;
-        $self->_offset($offset);
+        $self->{_offset} = $offset;
         return $chunk;
     }
 

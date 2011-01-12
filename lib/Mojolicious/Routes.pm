@@ -13,14 +13,14 @@ use Mojolicious::Routes::Match;
 use Mojolicious::Routes::Pattern;
 use Scalar::Util 'weaken';
 
-__PACKAGE__->attr([qw/block inline parent partial/]);
-__PACKAGE__->attr([qw/children conditions/] => sub { [] });
-__PACKAGE__->attr(controller_base_class => 'Mojolicious::Controller');
-__PACKAGE__->attr(dictionary => sub { {} });
-__PACKAGE__->attr(hidden => sub { [qw/new app attr render req res stash tx/] }
+__PACKAGE__->attr([qw/block inline parent partial namespace/]);
+__PACKAGE__->attr(
+    [qw/children conditions/] => sub { [] },
+    controller_base_class     => 'Mojolicious::Controller',
+    dictionary                => sub { {} },
+    hidden  => sub { [qw/new app attr render req res stash tx/] },
+    pattern => sub { Mojolicious::Routes::Pattern->new }
 );
-__PACKAGE__->attr('namespace');
-__PACKAGE__->attr(pattern => sub { Mojolicious::Routes::Pattern->new });
 
 # Yet thanks to my trusty safety sphere,
 # I sublibed with only tribial brain dablage.

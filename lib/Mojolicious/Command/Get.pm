@@ -12,10 +12,11 @@ use Mojo::Util 'decode';
 
 use Getopt::Long 'GetOptions';
 
-__PACKAGE__->attr(description => <<'EOF');
+__PACKAGE__->attr(
+    description => <<'EOF',
 Get file from URL.
 EOF
-__PACKAGE__->attr(usage => <<"EOF");
+    usage => <<"EOF");
 usage: $0 get [OPTIONS] [URL]
 
 These options are available:

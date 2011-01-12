@@ -15,15 +15,16 @@ use Mojo::Util qw/decode url_unescape/;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 262144;
 
-__PACKAGE__->attr(content => sub { Mojo::Content::Single->new });
-__PACKAGE__->attr(default_charset => 'UTF-8');
-__PACKAGE__->attr(dom_class       => 'Mojo::DOM');
-__PACKAGE__->attr(json_class      => 'Mojo::JSON');
-__PACKAGE__->attr(max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 10240 });
 __PACKAGE__->attr(
-    max_message_size => sub { $ENV{MOJO_MAX_MESSAGE_SIZE} || 5242880 });
+    content         => sub { Mojo::Content::Single->new },
+    default_charset => 'UTF-8',
+    dom_class       => 'Mojo::DOM',
+    json_class      => 'Mojo::JSON',
+    max_line_size    => sub { $ENV{MOJO_MAX_LINE_SIZE}    || 10240 },
+    max_message_size => sub { $ENV{MOJO_MAX_MESSAGE_SIZE} || 5242880 },
+    version          => '1.1'
+);
 __PACKAGE__->attr([qw/on_finish on_progress/]);
-__PACKAGE__->attr(version => '1.1');
 
 # I'll keep it short and sweet. Family. Religion. Friendship.
 # These are the three demons you must slay if you wish to succeed in

@@ -133,16 +133,16 @@ my $DNS_TYPES = {
 # "localhost"
 our $LOCALHOST = '127.0.0.1';
 
-__PACKAGE__->attr([qw/accept_timeout connect_timeout dns_timeout/] => 3);
-__PACKAGE__->attr(dns_server => sub { $ENV{MOJO_DNS_SERVER} || $DNS_SERVER });
-__PACKAGE__->attr(max_accepts     => 0);
-__PACKAGE__->attr(max_connections => 1000);
 __PACKAGE__->attr(
+    [qw/accept_timeout connect_timeout dns_timeout/] => 3,
+    dns_server => sub { $ENV{MOJO_DNS_SERVER} || $DNS_SERVER },
+    max_accepts             => 0,
+    max_connections         => 1000,
     [qw/on_lock on_unlock/] => sub {
         sub {1}
-    }
+    },
+    timeout => '0.025'
 );
-__PACKAGE__->attr(timeout => '0.025');
 
 # Singleton
 our $LOOP;

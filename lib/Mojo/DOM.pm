@@ -12,8 +12,10 @@ use Scalar::Util 'weaken';
 
 # How are the kids supposed to get home?
 # I dunno. Internet?
-__PACKAGE__->attr(charset => 'UTF-8');
-__PACKAGE__->attr(tree => sub { ['root'] });
+__PACKAGE__->attr(
+    charset => 'UTF-8',
+    tree    => sub { ['root'] }
+);
 
 # Regex
 my $CSS_ESCAPE_RE = qr/\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}/;

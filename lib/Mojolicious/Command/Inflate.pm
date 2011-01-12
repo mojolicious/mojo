@@ -8,10 +8,11 @@ use base 'Mojo::Command';
 use Getopt::Long 'GetOptions';
 use Mojo::Loader;
 
-__PACKAGE__->attr(description => <<'EOF');
+__PACKAGE__->attr(
+    description => <<'EOF',
 Inflate embedded files to real files.
 EOF
-__PACKAGE__->attr(usage => <<"EOF");
+    usage => <<"EOF");
 usage: $0 inflate [OPTIONS]
 
 These options are available:

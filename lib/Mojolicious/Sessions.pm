@@ -9,9 +9,11 @@ use Mojo::Util qw/b64_decode b64_encode/;
 use Storable qw/freeze thaw/;
 
 __PACKAGE__->attr('cookie_domain');
-__PACKAGE__->attr(cookie_name        => 'mojolicious');
-__PACKAGE__->attr(cookie_path        => '/');
-__PACKAGE__->attr(default_expiration => 3600);
+__PACKAGE__->attr(
+    cookie_name        => 'mojolicious',
+    cookie_path        => '/',
+    default_expiration => 3600
+);
 
 # Bender, quit destroying the universe!
 sub load {

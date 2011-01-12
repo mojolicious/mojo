@@ -9,10 +9,11 @@ use Mojo::Server::Daemon;
 
 use Getopt::Long 'GetOptions';
 
-__PACKAGE__->attr(description => <<'EOF');
+__PACKAGE__->attr(
+    description => <<'EOF',
 Start application with HTTP 1.1 and WebSocket server.
 EOF
-__PACKAGE__->attr(usage => <<"EOF");
+    usage => <<"EOF");
 usage: $0 daemon [OPTIONS]
 
 These options are available:

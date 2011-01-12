@@ -10,8 +10,8 @@ use base 'Mojo::Transaction';
 use Mojo::Transaction::HTTP;
 use Mojo::Util qw/decode encode md5_bytes/;
 
-__PACKAGE__->attr(handshake => sub { Mojo::Transaction::HTTP->new });
 __PACKAGE__->attr(
+    handshake  => sub { Mojo::Transaction::HTTP->new },
     on_message => sub {
         sub { }
     }

@@ -21,11 +21,9 @@ __PACKAGE__->attr(
         }
 
         return $self->app_class->new;
-    }
-);
-__PACKAGE__->attr(app_class =>
-      sub { ref $ENV{MOJO_APP} || $ENV{MOJO_APP} || 'Mojo::HelloWorld' });
-__PACKAGE__->attr(
+    },
+    app_class =>
+      sub { ref $ENV{MOJO_APP} || $ENV{MOJO_APP} || 'Mojo::HelloWorld' },
     on_build_tx => sub {
         sub {
             my $self = shift;
@@ -38,9 +36,7 @@ __PACKAGE__->attr(
 
             return $self->app->on_build_tx->($self->app);
           }
-    }
-);
-__PACKAGE__->attr(
+    },
     on_handler => sub {
         sub {
 
@@ -58,17 +54,15 @@ __PACKAGE__->attr(
                 'Waiting for delayed response, forgot to render or resume?')
               unless $tx->is_writing;
           }
-    }
-);
-__PACKAGE__->attr(
+    },
     on_websocket => sub {
         sub {
             my $self = shift;
             return $self->app->on_websocket->($self->app, @_);
           }
-    }
+    },
+    reload => sub { $ENV{MOJO_RELOAD} || 0 }
 );
-__PACKAGE__->attr(reload => sub { $ENV{MOJO_RELOAD} || 0 });
 
 # Are you saying you're never going to eat any animal again? What about bacon?
 # No.

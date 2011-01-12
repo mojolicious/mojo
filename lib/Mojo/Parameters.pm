@@ -10,9 +10,11 @@ use overload '""' => sub { shift->to_string }, fallback => 1;
 use Mojo::Util qw/encode decode url_escape url_unescape/;
 use Mojo::URL;
 
-__PACKAGE__->attr(charset        => 'UTF-8');
-__PACKAGE__->attr(pair_separator => '&');
-__PACKAGE__->attr(params         => sub { [] });
+__PACKAGE__->attr(
+    charset        => 'UTF-8',
+    pair_separator => '&',
+    params         => sub { [] }
+);
 
 # Yeah, Moe, that team sure did suck last night. They just plain sucked!
 # I've seen teams suck before,

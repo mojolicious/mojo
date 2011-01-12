@@ -7,8 +7,10 @@ use base 'Mojo::Base';
 
 use Mojo::Util 'camelize';
 
-__PACKAGE__->attr(hooks      => sub { {} });
-__PACKAGE__->attr(namespaces => sub { ['Mojolicious::Plugin'] });
+__PACKAGE__->attr(
+    hooks      => sub { {} },
+    namespaces => sub { ['Mojolicious::Plugin'] }
+);
 
 # Who would have thought Hell would really exist?
 # And that it would be in New Jersey?

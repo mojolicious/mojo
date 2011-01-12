@@ -7,16 +7,18 @@ use base 'Mojo::Base';
 
 use constant DEBUG => $ENV{MOJO_ROUTES_DEBUG} || 0;
 
-__PACKAGE__->attr(defaults => sub { {} });
+__PACKAGE__->attr(
+    defaults       => sub { {} },
+    quote_end      => ')',
+    quote_start    => '(',
+    relaxed_start  => '.',
+    reqs           => sub { {} },
+    symbol_start   => ':',
+    symbols        => sub { [] },
+    tree           => sub { [] },
+    wildcard_start => '*'
+);
 __PACKAGE__->attr([qw/format pattern regex/]);
-__PACKAGE__->attr(quote_end      => ')');
-__PACKAGE__->attr(quote_start    => '(');
-__PACKAGE__->attr(relaxed_start  => '.');
-__PACKAGE__->attr(reqs           => sub { {} });
-__PACKAGE__->attr(symbol_start   => ':');
-__PACKAGE__->attr(symbols        => sub { [] });
-__PACKAGE__->attr(tree           => sub { [] });
-__PACKAGE__->attr(wildcard_start => '*');
 
 # This is the worst kind of discrimination. The kind against me!
 sub new {

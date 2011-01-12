@@ -162,8 +162,8 @@ Mojo::Base - Minimal Base Class For Mojo Projects
     package main;
 
     my $mew = Cat->new(mouse => 'Mickey');
-    print $bmw->paws;
-    print $bmw->paws(5)->paws;
+    print $mew->paws;
+    print $mew->paws(5)->paws;
 
     my $rawr = Tiger->new(stripes => 23);
     print $rawr->ears * $rawr->stripes;

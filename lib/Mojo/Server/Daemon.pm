@@ -423,8 +423,22 @@ Mojo::Server::Daemon - Async IO HTTP 1.1 And WebSocket Server
 
     use Mojo::Server::Daemon;
 
-    my $daemon = Mojo::Server::Daemon->new;
-    $daemon->listen(['http://*:8080']);
+    my $daemon = Mojo::Server::Daemon->new(listen => ['http://*:8080']);
+    $daemon->on_handler(sub {
+        my ($self, $tx) = @_;
+
+        # Request
+        my $method = $tx->req->method;
+        my $path   = $tx->req->url->path;
+
+        # Response
+        $tx->res->code(200);
+        $tx->res->headers->content_type('text/plain');
+        $tx->res->body("$method request for $path!");
+
+        # Resume transaction
+        $tx->resume;
+    });
     $daemon->run;
 
 =head1 DESCRIPTION

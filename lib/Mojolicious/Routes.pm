@@ -14,7 +14,7 @@ has [qw/block inline parent partial namespace/];
 has [qw/children conditions/] => sub { [] };
 has controller_base_class => 'Mojolicious::Controller';
 has dictionary => sub { {} };
-has hidden => sub { [qw/new app attr render req res stash tx/] };
+has hidden => sub { [qw/new app attr has render req res stash tx/] };
 has pattern => sub { Mojolicious::Routes::Pattern->new };
 
 # Yet thanks to my trusty safety sphere,

@@ -177,6 +177,10 @@ L<Mojo::Base> is a simple base class for L<Mojo> projects.
 L<Mojo::Base> exports the following functions if imported with the C<-base>
 flag or a base class.
 
+    # Automatically enables "strict" and "warnings"
+    use Mojo::Base '-base';
+    use Mojo::Base 'SomeBaseClass';
+
 =head2 C<has>
 
     has 'name';

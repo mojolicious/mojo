@@ -82,7 +82,8 @@ my $XML_TOKEN_RE = qr/
     )??
 /xis;
 
-sub after { shift->_add(1, @_) }
+sub add_after  { shift->_add(1, @_) }
+sub add_before { shift->_add(0, @_) }
 
 sub all_text {
     my $self = shift;
@@ -126,8 +127,6 @@ sub attrs {
 
     return $tree->[2];
 }
-
-sub before { shift->_add(0, @_) }
 
 sub children {
     my $self = shift;
@@ -1350,13 +1349,21 @@ Document Object Model.
 L<Mojo::DOM> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 C<after>
+=head2 C<add_after>
 
-    $dom = $dom->after('<p>Hi!</p>');
+    $dom = $dom->add_after('<p>Hi!</p>');
 
 Add after element.
 
-    $dom->parse('<div><h1>A</h1></div>')->at('h1')->after('<h2>B</h2>');
+    $dom->parse('<div><h1>A</h1></div>')->at('h1')->add_after('<h2>B</h2>');
+
+=head2 C<add_before>
+
+    $dom = $dom->add_before('<p>Hi!</p>');
+
+Add before element.
+
+    $dom->parse('<div><h2>A</h2></div>')->at('h2')->add_before('<h1>B</h1>');
 
 =head2 C<all_text>
 
@@ -1375,14 +1382,6 @@ Find a single element with CSS3 selectors.
     my $attrs = $dom->attrs;
 
 Element attributes.
-
-=head2 C<before>
-
-    $dom = $dom->before('<p>Hi!</p>');
-
-Add before element.
-
-    $dom->parse('<div><h2>A</h2></div>')->at('h2')->before('<h1>B</h1>');
 
 =head2 C<children>
 

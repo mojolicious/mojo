@@ -807,7 +807,7 @@ $dom->parse(<<EOF);
 </ul>
 <div>D</div>
 EOF
-$dom->at('li')->after('<p>A1</p>23');
+$dom->at('li')->add_after('<p>A1</p>23');
 is "$dom", <<EOF, 'right result';
 <ul>
     <li>A</li><p>A1</p>23
@@ -816,7 +816,7 @@ is "$dom", <<EOF, 'right result';
 </ul>
 <div>D</div>
 EOF
-$dom->at('li')->before('24')->before('<div>A-1</div>25');
+$dom->at('li')->add_before('24')->add_before('<div>A-1</div>25');
 is "$dom", <<EOF, 'right result';
 <ul>
     24<div>A-1</div>25<li>A</li><p>A1</p>23
@@ -827,7 +827,7 @@ is "$dom", <<EOF, 'right result';
 EOF
 is $dom->at('div')->text, 'A-1', 'right text';
 is $dom->at('iv'), undef, 'no result';
-$dom->before('l')->before('alal')->before('a');
+$dom->add_before('l')->add_before('alal')->add_before('a');
 is "$dom", <<EOF, 'no change';
 <ul>
     24<div>A-1</div>25<li>A</li><p>A1</p>23
@@ -836,7 +836,7 @@ is "$dom", <<EOF, 'no change';
 </ul>
 <div>D</div>
 EOF
-$dom->after('lalala');
+$dom->add_after('lalala');
 is "$dom", <<EOF, 'no change';
 <ul>
     24<div>A-1</div>25<li>A</li><p>A1</p>23
@@ -845,7 +845,7 @@ is "$dom", <<EOF, 'no change';
 </ul>
 <div>D</div>
 EOF
-$dom->find('div')->each(sub { shift->after('works') });
+$dom->find('div')->each(sub { shift->add_after('works') });
 is "$dom", <<EOF, 'right result';
 <ul>
     24<div>A-1</div>works25<li>A</li><p>A1</p>23

@@ -52,11 +52,11 @@ L<Mojolicious> framework.
 It will automatically detect available commands in the
 L<Mojolicious::Command> namespace.
 
+=head1 COMMANDS
+
 These commands are available by default.
 
-=over 4
-
-=item C<help>
+=head2 C<help>
 
     mojo
     mojo help
@@ -67,28 +67,28 @@ List available commands with short descriptions.
 
 List available options for the command with short descriptions.
 
-=item C<cgi>
+=head2 C<cgi>
 
     mojo cgi
     script/myapp cgi
 
 Start application with CGI backend.
 
-=item C<daemon>
+=head2 C<daemon>
 
     mojo daemon
     script/myapp daemon
 
 Start application with standalone HTTP 1.1 server backend.
 
-=item C<fastcgi>
+=head2 C<fastcgi>
 
     mojo fastcgi
     script/myapp fastcgi
 
 Start application with FastCGI backend.
 
-=item C<generate>
+=head2 C<generate>
 
     mojo generate
     mojo generate help
@@ -99,58 +99,58 @@ List available generator commands with short descriptions.
 
 List available options for generator command with short descriptions.
 
-=item C<generate app>
+=head2 C<generate app>
 
     mojo generate app <AppName>
 
 Generate application directory structure for a fully functional
 L<Mojolicious> application.
 
-=item C<generate gitignore>
+=head2 C<generate gitignore>
 
     mojo generate gitignore
 
 Generate C<.gitignore> file.
 
-=item C<generate hypnotoad>
+=head2 C<generate hypnotoad>
 
     mojo generate hypnotoad
 
 Generate C<hypnotoad.conf> file.
 
-=item C<generate lite_app>
+=head2 C<generate lite_app>
 
     mojo generate lite_app
 
 Generate a fully functional L<Mojolicious::Lite> application.
 
-=item C<generate makefile>
+=head2 C<generate makefile>
 
     mojo generate makefile
 
 Generate C<Makefile.PL> file for application.
 
-=item C<get>
+=head2 C<get>
 
    mojo get http://mojolicio.us
    script/myapp get /foo
 
 Perform GET request to remote host or local application.
 
-=item C<inflate>
+=head2 C<inflate>
 
     myapp.pl inflate
 
 Turn embedded files from the C<DATA> section into real files.
 
-=item C<routes>
+=head2 C<routes>
 
     myapp.pl routes
     script/myapp routes
 
 List application routes.
 
-=item C<test>
+=head2 C<test>
 
    mojo test
    script/myapp test
@@ -158,14 +158,12 @@ List application routes.
 
 Runs application tests from the C<t> directory.
 
-=item C<version>
+=head2 C<version>
 
     mojo version
 
 List version information for installed core and optional modules, very useful
 for debugging.
-
-=back
 
 =head1 ATTRIBUTES
 

@@ -691,6 +691,61 @@ has been rendered, the callbacks of this hook run in reverse order.
 Load a plugin.
 Note that this method is EXPERIMENTAL and might change without warning!
 
+The following plugins are included in the L<Mojolicious> distribution as
+examples.
+
+=over 4
+
+=item L<Mojolicious::Plugin::AgentCondition>
+
+Route condition for C<User-Agent> headers.
+
+=item L<Mojolicious::Plugin::Charset>
+
+Change the application charset.
+
+=item L<Mojolicious::Plugin::DefaultHelpers>
+
+General purpose helper collection.
+
+=item L<Mojolicious::Plugin::EplRenderer>
+
+Renderer for plain embedded Perl templates.
+
+=item L<Mojolicious::Plugin::EpRenderer>
+
+Renderer for more sophisiticated embedded Perl templates.
+
+=item L<Mojolicious::Plugin::HeaderCondition>
+
+Route condition for all kinds of headers.
+
+=item L<Mojolicious::Plugin::I18n>
+
+Internationalization helpers.
+
+=item L<Mojolicious::Plugin::JsonConfig>
+
+JSON configuration files.
+
+=item L<Mojolicious::Plugin::PodRenderer>
+
+Renderer for POD files and documentation browser.
+
+=item L<Mojolicious::Plugin::PoweredBy>
+
+Add an C<X-Powered-By> header to outgoing responses.
+
+=item L<Mojolicious::Plugin::RequestTimer>
+
+Log timing information.
+
+=item L<Mojolicious::Plugin::TagHelpers>
+
+Template specific helper collection.
+
+=back
+
 =head2 C<process>
 
     $app->process($c);

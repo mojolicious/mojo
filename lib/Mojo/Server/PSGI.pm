@@ -105,9 +105,24 @@ Mojo::Server::PSGI - PSGI Server
 
 =head1 SYNOPSIS
 
-    # myapp.psgi
     use Mojo::Server::PSGI;
-    my $psgi = Mojo::Server::PSGI->new(app_class => 'MyApp');
+
+    my $psgi = Mojo::Server::PSGI->new;
+    $psgi->on_handler(sub {
+        my ($self, $tx) = @_;
+
+        # Request
+        my $method = $tx->req->method;
+        my $path   = $tx->req->url->path;
+
+        # Response
+        $tx->res->code(200);
+        $tx->res->headers->content_type('text/plain');
+        $tx->res->body("$method request for $path!");
+
+        # Resume transaction
+        $tx->resume;
+    });
     my $app  = sub { $psgi->run(@_) };
 
 =head1 DESCRIPTION

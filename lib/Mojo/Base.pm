@@ -148,7 +148,7 @@ Mojo::Base - Minimal Base Class For Mojo Projects
 =head1 SYNOPSIS
 
     package Cat;
-    use Mojo::Base '--base';
+    use Mojo::Base '-base';
 
     has 'mouse';
     has paws => 4;

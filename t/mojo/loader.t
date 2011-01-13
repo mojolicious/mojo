@@ -3,7 +3,10 @@
 use strict;
 use warnings;
 
-use Test::More tests => 36;
+use Test::More;
+plan skip_all => 'Windows is too fragile for this test!'
+  if $^O eq 'MSWin32' || $^O =~ /cygwin/;
+plan tests => 36;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -62,9 +65,9 @@ is_deeply \@modules, [qw/LoaderTest::A LoaderTest::B LoaderTest::C/],
 
 # Load
 $loader->load($_) for @modules;
-ok LoaderTest::A->can('new'), 'loaded successfully';
-ok LoaderTest::B->can('new'), 'loaded successfully';
-ok LoaderTest::C->can('new'), 'loaded successfully';
+ok !!LoaderTest::A->can('new'), 'loaded successfully';
+ok !!LoaderTest::B->can('new'), 'loaded successfully';
+ok !!LoaderTest::C->can('new'), 'loaded successfully';
 
 # Class does not exist
 ok $loader->load('LoaderTest'), 'nothing to load';

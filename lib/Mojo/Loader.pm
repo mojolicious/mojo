@@ -57,10 +57,9 @@ sub load {
 
 sub reload {
 
-    # Force script reloading
+    # Cleanup script
     delete $INC{$0};
     $STATS->{$0} = 1;
-    $INC{$0} = $0;
 
     # Reload
     while (my ($key, $file) = each %INC) {
@@ -75,23 +74,16 @@ sub reload {
         # Modified
         if ($mtime > $STATS->{$file}) {
 
-            # Debug
-            warn "$key -> $file modified, reloading!\n" if DEBUG;
+            # Reload
+            if (my $e = _reload($key)) { return $e }
 
+            # Reloaded
             $STATS->{$file} = $mtime;
-
-            # Unload
-            _unload($key);
-
-            # Try
-            eval { require $key };
-
-            # Catch
-            return Mojo::Exception->new($@) if $@;
         }
     }
 
-    return;
+    # Force script reloading
+    return _reload($0);
 }
 
 sub search {
@@ -130,6 +122,22 @@ sub search {
 
     return unless @$modules;
     return $modules;
+}
+
+sub _reload {
+    my $key = shift;
+
+    # Debug
+    warn "$key modified, reloading!\n" if DEBUG;
+
+    # Unload
+    _unload($key);
+
+    # Failed
+    return Mojo::Exception->new($@) unless eval { require $key; 1 };
+
+    # Success
+    return;
 }
 
 sub _unload {

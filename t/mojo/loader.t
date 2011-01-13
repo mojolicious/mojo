@@ -3,10 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More;
-plan skip_all => 'Windows is too fragile for this test!'
-  if $^O eq 'MSWin32' || $^O =~ /cygwin/;
-plan tests => 36;
+use Test::More tests => 36;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";

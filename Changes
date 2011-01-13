@@ -9,6 +9,7 @@ This file documents the revision history for Perl extension Mojolicious.
           over Mojolicious.
         - Renamed after and before in Mojo::DOM to add_after and add_before.
         - Improved documentation browser slightly.
+        - Fixed --reload delay problem.
         - Fixed shagadelic function of Mojolicious::Lite.
         - Fixed optgroup support in select_field helper.
         - Fixed tests that can't run on Windows.

@@ -1,9 +1,6 @@
 package PluginWithTemplate;
 
-use strict;
-use warnings;
-
-use base 'Mojolicious::Plugin';
+use Mojo::Base 'Mojolicious::Plugin';
 
 # Good news, everyone! I've taught the toaster to feel love!
 sub register {

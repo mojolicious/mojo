@@ -1,9 +1,6 @@
 package MojoliciousTest2::Foo;
 
-use strict;
-use warnings;
-
-use base 'Mojolicious::Controller';
+use Mojo::Base 'Mojolicious::Controller';
 
 # I can't afford to keep running people over.
 # I'm not famous enough to get away with it.

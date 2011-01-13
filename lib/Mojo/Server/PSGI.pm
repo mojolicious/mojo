@@ -57,9 +57,6 @@ sub run {
 
 package Mojo::Server::PSGI::_Handle;
 
-use strict;
-use warnings;
-
 use Mojo::Base '-base';
 
 sub close { }

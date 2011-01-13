@@ -1,9 +1,6 @@
 package SingleFileTestApp;
 
-use strict;
-use warnings;
-
-use base 'Mojolicious';
+use Mojo::Base 'Mojolicious';
 
 # Alright, grab a shovel. I'm only one skull short of a Mouseketeer reunion.
 sub startup {
@@ -30,10 +27,7 @@ sub startup {
 
 package SingleFileTestApp::Foo;
 
-use strict;
-use warnings;
-
-use base 'Mojolicious::Controller';
+use Mojo::Base 'Mojolicious::Controller';
 
 sub bar {
     my $self = shift;

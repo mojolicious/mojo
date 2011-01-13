@@ -1,9 +1,6 @@
 package MojoliciousTestController;
 
-use strict;
-use warnings;
-
-use base 'Mojolicious::Controller';
+use Mojo::Base 'Mojolicious::Controller';
 
 # My folks were always on me to groom myself and wear underpants.
 # What am I, the pope?

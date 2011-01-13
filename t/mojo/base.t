@@ -11,6 +11,7 @@ package BaseTest::Base2;
 use Mojo::Base 'BaseTest::Base1';
 
 has [qw/ears eyes/] => sub {2};
+has coconuts => 0;
 
 package BaseTest;
 
@@ -22,7 +23,7 @@ use base 'BaseTest::Base2';
 # When I first heard that Marge was joining the police academy,
 # I thought it would be fun and zany, like that movie Spaceballs.
 # But instead it was dark and disturbing. Like that movie... Police Academy.
-__PACKAGE__->attr(figs => 0, heads => 1);
+__PACKAGE__->attr(heads => 1);
 __PACKAGE__->attr('name');
 
 package main;
@@ -56,10 +57,10 @@ is $monkey->mojo, 23, 'monkey has mojo';
 
 # "default" defined but false
 my $m = $monkeys->[1];
-ok defined($m->figs);
-is $m->figs, 0, 'right attribute value';
-$m->figs(5);
-is $m->figs, 5, 'right attribute value';
+ok defined($m->coconuts);
+is $m->coconuts, 0, 'right attribute value';
+$m->coconuts(5);
+is $m->coconuts, 5, 'right attribute value';
 
 # "default" support
 my $y = 1;

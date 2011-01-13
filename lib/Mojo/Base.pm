@@ -55,10 +55,15 @@ sub new {
 # so we optimize them by compiling our own code, don't be scared, we have
 # tests for every single case
 sub attr {
-    my $class = shift;
+    my $class   = shift;
+    my $attrs   = shift;
+    my $default = shift;
+
+    # Check for more arguments
+    Carp::croak('Attribute generator called with too many arguments') if @_;
 
     # Shortcut
-    return unless $class && @_;
+    return unless $class && $attrs;
 
     # Instance
     $class = ref $class || $class;
@@ -66,70 +71,64 @@ sub attr {
     # Allow symbolic references
     no strict 'refs';
 
-    # Attributes
-    for (my $i = 0; $i < @_; $i += 2) {
-        my $attrs   = $_[$i];
-        my $default = $_[$i + 1];
+    # Check default
+    Carp::croak('Default has to be a code reference or constant value')
+      if ref $default && ref $default ne 'CODE';
 
-        # Check default
-        Carp::croak('Default has to be a code reference or constant value')
-          if ref $default && ref $default ne 'CODE';
+    # Create attributes
+    $attrs = [$attrs] unless ref $attrs eq 'ARRAY';
+    my $ws = '    ';
+    for my $attr (@$attrs) {
 
-        # Create attributes
-        $attrs = [$attrs] unless ref $attrs eq 'ARRAY';
-        my $ws = '    ';
-        for my $attr (@$attrs) {
+        Carp::croak(qq/Attribute "$attr" invalid/)
+          unless $attr =~ /^[a-zA-Z_]\w*$/;
 
-            Carp::croak(qq/Attribute "$attr" invalid/)
-              unless $attr =~ /^[a-zA-Z_]\w*$/;
+        # Header
+        my $code = "sub {\n";
 
-            # Header
-            my $code = "sub {\n";
+        # No value
+        $code .= "${ws}if (\@_ == 1) {\n";
+        unless (defined $default) {
 
-            # No value
-            $code .= "${ws}if (\@_ == 1) {\n";
-            unless (defined $default) {
+            # Return value
+            $code .= "$ws${ws}return \$_[0]->{'$attr'};\n";
+        }
+        else {
 
-                # Return value
-                $code .= "$ws${ws}return \$_[0]->{'$attr'};\n";
-            }
-            else {
+            # Return value
+            $code .= "$ws${ws}return \$_[0]->{'$attr'} ";
+            $code .= "if exists \$_[0]->{'$attr'};\n";
 
-                # Return value
-                $code .= "$ws${ws}return \$_[0]->{'$attr'} ";
-                $code .= "if exists \$_[0]->{'$attr'};\n";
+            # Return default value
+            $code .= "$ws${ws}return \$_[0]->{'$attr'} = ";
+            $code .=
+              ref $default eq 'CODE'
+              ? '$default->($_[0])'
+              : '$default';
+            $code .= ";\n";
+        }
+        $code .= "$ws}\n";
 
-                # Return default value
-                $code .= "$ws${ws}return \$_[0]->{'$attr'} = ";
-                $code .=
-                  ref $default eq 'CODE'
-                  ? '$default->($_[0])'
-                  : '$default';
-                $code .= ";\n";
-            }
-            $code .= "$ws}\n";
+        # Store value
+        $code .= "$ws\$_[0]->{'$attr'} = \$_[1];\n";
 
-            # Store value
-            $code .= "$ws\$_[0]->{'$attr'} = \$_[1];\n";
+        # Return invocant
+        $code .= "${ws}return \$_[0];\n";
 
-            # Return invocant
-            $code .= "${ws}return \$_[0];\n";
+        # Footer
+        $code .= '};';
 
-            # Footer
-            $code .= '};';
+        # We compile custom attribute code for speed
+        no warnings 'redefine';
+        *{"${class}::$attr"} = eval $code;
 
-            # We compile custom attribute code for speed
-            no warnings 'redefine';
-            *{"${class}::$attr"} = eval $code;
+        # This should never happen (hopefully)
+        Carp::croak("Mojo::Base compiler error: \n$code\n$@\n") if $@;
 
-            # This should never happen (hopefully)
-            Carp::croak("Mojo::Base compiler error: \n$code\n$@\n") if $@;
-
-            # Debug mode
-            if ($ENV{MOJO_BASE_DEBUG}) {
-                warn "\nATTRIBUTE: $class->$attr\n";
-                warn "$code\n\n";
-            }
+        # Debug mode
+        if ($ENV{MOJO_BASE_DEBUG}) {
+            warn "\nATTRIBUTE: $class->$attr\n";
+            warn "$code\n\n";
         }
     }
 }
@@ -185,9 +184,6 @@ flag or a base class.
     has name => sub { ... };
     has [qw/name1 name2 name3/] => 'foo';
     has [qw/name1 name2 name3/] => sub { ... };
-    has name1             => sub {...},
-        name2             => 'foo',
-        [qw/name2 name4/] => 'bar';
 
 Create attributes, just like the C<attr> method.
 Note that this function is EXPERIMENTAL and might change without warning!
@@ -213,11 +209,6 @@ You can pass it either a hash or a hash reference with attribute values.
     __PACKAGE__->attr(name => sub { ... });
     __PACKAGE__->attr([qw/name1 name2 name3/] => 'foo');
     __PACKAGE__->attr([qw/name1 name2 name3/] => sub { ... });
-    __PACKAGE__->attr(
-        name1             => sub {...},
-        name2             => 'foo',
-        [qw/name2 name4/] => 'bar'
-    );
 
 Create attributes.
 An arrayref can be used to create more than one attribute.

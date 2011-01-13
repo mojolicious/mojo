@@ -34,12 +34,8 @@ sub import {
     # ISA
     push @{"${caller}::ISA"}, $flag;
 
-    # Check caller
-    Carp::croak("$caller is not a subclass of Mojo::Base")
-      unless $caller->isa('Mojo::Base');
-
     # Can haz?
-    *{"${caller}::has"} = sub { $caller->attr(@_) };
+    *{"${caller}::has"} = sub { attr($caller, @_) };
 
     # Mojo modules are strict!
     strict->import;

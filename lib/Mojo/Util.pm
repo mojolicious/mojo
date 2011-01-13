@@ -3,7 +3,7 @@ package Mojo::Util;
 use strict;
 use warnings;
 
-use base 'Exporter';
+use Exporter 'import';
 
 # These are core modules since 5.8, no need for pure-Perl implementations
 # (even though they would be simple)

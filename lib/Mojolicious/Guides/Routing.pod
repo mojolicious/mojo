@@ -184,6 +184,11 @@ destination in the form of a hash using the chained C<to> method.
 
     # /welcome -> {controller => 'foo', action => 'welcome'}
     $r->route('/welcome')->to(controller => 'foo', action => 'welcome');
+    
+or
+
+    # /welcome -> {controller => 'foo', action => 'welcome'}
+    $r->route('/welcome')->to('foo#welcome');
 
 Now if the route matches an incoming request it will use the content of this
 hash to try and find appropriate code to generate a response.

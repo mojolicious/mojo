@@ -176,6 +176,20 @@ flag or a base class.
     use Mojo::Base '-base';
     use Mojo::Base 'SomeBaseClass';
 
+Both forms save a lot of typing.
+
+    # use Mojo::Base '-base';
+    use strict;
+    use warnings;
+    use base 'Mojo::Base';
+    sub has { Mojo::Base::attr(__PACKAGE__, @_) }
+
+    # use Mojo::Base 'SomeBaseClass';
+    use strict;
+    use warnings;
+    use base 'SomeBaseClass';
+    sub has { Mojo::Base::attr(__PACKAGE__, @_) }
+
 =head2 C<has>
 
     has 'name';

@@ -160,11 +160,12 @@ sub parse {
     # Relaxed parsing for old or broken web servers
     if ($self->auto_relax) {
         my $headers    = $self->headers;
-        my $connection = $headers->connection;
+        my $connection = $headers->connection || '';
         my $length     = $headers->content_length;
         $length = '' unless defined $length;
         $self->relaxed(1)
-          if !length $length && (!$connection || $connection =~ /close/i);
+          if !length $length
+              && ($connection =~ /close/i || $headers->content_type);
     }
 
     # Parse chunked content

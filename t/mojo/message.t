@@ -799,9 +799,9 @@ is $res->code(400)->default_message, 'Bad Request', 'right default message';
 # Parse HTTP 1.1 response start line, no headers and body
 $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.1 200 OK\x0d\x0a\x0d\x0a");
-ok !$res->is_done, 'response is not done';
-is $res->code,    200,   'right status';
-is $res->message, 'OK',  'right message';
+ok $res->is_done, 'response is done';
+is $res->code,    200, 'right status';
+is $res->message, 'OK', 'right message';
 is $res->version, '1.1', 'right version';
 is $res->at_least_version('1.0'), 1,     'at least version 1.0';
 is $res->at_least_version('1.2'), undef, 'not version 1.2';
@@ -809,8 +809,8 @@ is $res->at_least_version('1.2'), undef, 'not version 1.2';
 # Parse HTTP 1.1 response start line, no headers and body (no message)
 $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.1 200\x0d\x0a\x0d\x0a");
-ok !$res->is_done, 'response is not done';
-is $res->code,    200,   'right status';
+ok $res->is_done, 'response is done';
+is $res->code,    200, 'right status';
 is $res->message, undef, 'no message';
 is $res->version, '1.1', 'right version';
 is $res->at_least_version('1.0'), 1,     'at least version 1.0';

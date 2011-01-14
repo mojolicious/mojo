@@ -22,7 +22,7 @@ has [qw/default_handler default_template_class/];
 *handler = sub {
     warn <<EOF;
 Mojolicious::Renderer->handler is DEPRECATED in favor of
-Mojolicious::Renderer->handler!!!
+Mojolicious::Renderer->handlers!!!
 EOF
     shift->handlers(@_);
 };

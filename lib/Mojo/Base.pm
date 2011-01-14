@@ -188,6 +188,7 @@ Both forms save a lot of typing.
     use strict;
     use warnings;
     use base 'SomeBaseClass';
+    use Mojo::Base;
     sub has { Mojo::Base::attr(__PACKAGE__, @_) }
 
 =head2 C<has>

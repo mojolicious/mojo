@@ -896,9 +896,10 @@ sub _redirect {
     # Request
     my $req = $old->req;
 
-    # Fix broken location without authority
-    $location->authority($req->url->authority)
-      unless $location->authority;
+    # Fix broken location without authority and/or scheme
+    my $url = $req->url;
+    $location->authority($url->authority) unless $location->authority;
+    $location->scheme($url->scheme)       unless $location->scheme;
 
     # Method
     my $method = $req->method;

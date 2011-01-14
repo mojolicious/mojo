@@ -12,7 +12,7 @@ plan skip_all => 'IO::Socket::SSL 1.37 required for this test!'
   unless Mojo::IOLoop::TLS;
 plan skip_all => 'Windows is too fragile for this test!'
   if Mojo::IOLoop::WINDOWS;
-plan tests => 16;
+plan tests => 17;
 
 # I was a hero to broken robots 'cause I was one of them, but how can I sing
 # about being damaged if I'm not?
@@ -31,6 +31,13 @@ get '/' => sub {
     my $rel  = $self->req->url;
     my $abs  = $rel->to_abs;
     $self->render_text("Hello World! $rel $abs");
+};
+
+# GET /broken_redirect
+get '/broken_redirect' => sub {
+    my $self = shift;
+    $self->render(text => 'Redirecting!', status => 302);
+    $self->res->headers->location('/');
 };
 
 # GET /proxy
@@ -118,6 +125,11 @@ $loop->listen(
 
 # GET / (normal request)
 is $client->get("https://localhost:$port/")->success->body,
+  "Hello World! / https://localhost:$port/", 'right content';
+
+# GET /broken_redirect (broken redirect)
+is $client->max_redirects(3)->get("https://localhost:$port/broken_redirect")
+  ->success->body,
   "Hello World! / https://localhost:$port/", 'right content';
 
 # WebSocket /test (normal websocket)

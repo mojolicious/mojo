@@ -48,8 +48,13 @@ sub run {
     $tx->res->body(
         sub {
             my ($res, $chunk) = @_;
-            warn $tx->res->build_start_line if $verbose;
-            warn $res->headers->to_string, "\n\n" if $verbose;
+            if ($verbose) {
+                my $version = $res->version;
+                my $code    = $res->code;
+                my $message = $res->message;
+                warn "HTTP/$version $code $message\n",
+                  $res->headers->to_string, "\n\n";
+            }
             $verbose = 0;
             print $chunk;
         }

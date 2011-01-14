@@ -45,20 +45,19 @@ sub run {
 
     # Transaction
     my $tx = $client->build_tx(GET => $url);
-    $tx->res->body(
+    $tx->res->on_progress(
         sub {
-            my ($res, $chunk) = @_;
-            if ($verbose) {
-                my $version = $res->version;
-                my $code    = $res->code;
-                my $message = $res->message;
-                warn "HTTP/$version $code $message\n",
-                  $res->headers->to_string, "\n\n";
-            }
+            return unless $verbose;
+            my $res     = shift;
+            my $version = $res->version;
+            my $code    = $res->code;
+            my $message = $res->message;
+            warn "HTTP/$version $code $message\n",
+              $res->headers->to_string, "\n\n";
             $verbose = 0;
-            print $chunk;
         }
     );
+    $tx->res->body(sub { print pop });
 
     # Request
     $client->start($tx);

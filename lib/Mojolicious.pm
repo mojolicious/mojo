@@ -51,7 +51,7 @@ sub AUTOLOAD {
 
     # Helper
     croak qq/Can't locate object method "$method" via "$package"/
-      unless my $helper = $self->renderer->helper->{$method};
+      unless my $helper = $self->renderer->helpers->{$method};
 
     # Load controller class
     my $class = $self->controller_class;
@@ -244,7 +244,7 @@ sub helper {
 
     # Replace helper
     $self->log->debug(qq/Helper "$name" already exists, replacing./)
-      if exists $r->helper->{$name};
+      if exists $r->helpers->{$name};
 
     # Add helper
     $r->add_helper($name, @_);

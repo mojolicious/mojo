@@ -19,8 +19,20 @@ has root             => '/';
 has [qw/default_handler default_template_class/];
 
 # DEPRECATED in Hot Beverage!
-*handler = \&handlers;
-*helper  = \&helpers;
+*handler = sub {
+    warn <<EOF;
+Mojolicious::Renderer->handler is DEPRECATED in favor of
+Mojolicious::Renderer->handler!!!
+EOF
+    shift->handlers(@_);
+};
+*helper = sub {
+    warn <<EOF;
+Mojolicious::Renderer->helper is DEPRECATED in favor of
+Mojolicious::Renderer->helpers!!!
+EOF
+    shift->helpers(@_);
+};
 
 # This is not how Xmas is supposed to be.
 # In my day Xmas was about bringing people together, not blowing them apart.

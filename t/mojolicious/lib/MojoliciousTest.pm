@@ -27,7 +27,7 @@ sub startup {
     );
 
     # Renderer for a different file extension
-    $self->renderer->add_handler(xpl => $self->renderer->handler->{epl});
+    $self->renderer->add_handler(xpl => $self->renderer->handlers->{epl});
 
     # Session domain
     $self->sessions->cookie_domain('.example.com');

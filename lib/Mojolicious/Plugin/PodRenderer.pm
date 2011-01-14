@@ -43,7 +43,7 @@ sub register {
 
             # Preprocess with ep and then render
             $$output = _pod_to_html($$output)
-              if $r->handler->{$preprocess}->($r, $c, $output, $options);
+              if $r->handlers->{$preprocess}->($r, $c, $output, $options);
         }
     );
 

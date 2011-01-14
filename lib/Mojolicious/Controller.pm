@@ -79,7 +79,7 @@ sub AUTOLOAD {
 
     # Helper
     Carp::croak(qq/Can't locate object method "$method" via "$package"/)
-      unless my $helper = $self->app->renderer->helper->{$method};
+      unless my $helper = $self->app->renderer->helpers->{$method};
 
     # Run
     return $self->$helper(@_);

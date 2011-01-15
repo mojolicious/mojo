@@ -103,7 +103,7 @@ Mojolicious::Plugin::I18n - Intenationalization Plugin
     plugin 'i18n' => {namespace => 'MyApp::I18N'};
     <%=l 'hello' %>
 
-    # Lexicon "lib/MyApp/I18N/de.pm"
+    # Lexicon
     package MyApp::I18N::de;
     use Mojo::Base 'MyApp::I18N';
 

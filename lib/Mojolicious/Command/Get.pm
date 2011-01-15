@@ -43,9 +43,11 @@ sub run {
     # Silence
     $client->log->level('fatal');
 
+    # Absolute URL
+    if ($url =~ /^\w+:\/\//) { $client->detect_proxy }
+
     # Application
-    $client->app($ENV{MOJO_APP} || 'Mojo::HelloWorld')
-      unless $url =~ /^\w+:\/\//;
+    else { $client->app($ENV{MOJO_APP} || 'Mojo::HelloWorld') }
 
     # Follow redirects
     $client->max_redirects(5) if $redirect;

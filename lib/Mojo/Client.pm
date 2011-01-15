@@ -1036,8 +1036,7 @@ sub _tx_start {
     if (my $jar = $self->cookie_jar) { $jar->inject($tx) }
 
     # Start
-    my $start = $self->on_start;
-    $self->$start($tx) if $start;
+    if (my $start = $self->on_start) { $self->$start($tx) }
 
     # Connect
     return unless my $id = $self->_connect($tx, $cb);
@@ -1311,7 +1310,7 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
     my $cb  = $client->on_start;
     $client = $client->on_start(sub {...});
 
-Callback to be invoked whenever a new transaction has been prepared, this
+Callback to be invoked whenever a new transaction is about to start, this
 includes automatically prepared proxy C<CONNECT> requests and followed
 redirects.
 Note that this attribute is EXPERIMENTAL and might change without warning!

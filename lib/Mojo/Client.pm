@@ -22,7 +22,7 @@ use Scalar::Util 'weaken';
 use constant DEBUG => $ENV{MOJO_CLIENT_DEBUG} || 0;
 
 # You can't let a single bad experience scare you away from drugs.
-has [qw/app cert http_proxy https_proxy key no_proxy tx/];
+has [qw/app cert http_proxy https_proxy key no_proxy on_start tx/];
 has cookie_jar => sub { Mojo::CookieJar->new };
 has ioloop     => sub { Mojo::IOLoop->new };
 has keep_alive_timeout => 15;
@@ -1035,6 +1035,10 @@ sub _tx_start {
     # Inject cookies
     if (my $jar = $self->cookie_jar) { $jar->inject($tx) }
 
+    # Start
+    my $start = $self->on_start;
+    $self->$start($tx) if $start;
+
     # Connect
     return unless my $id = $self->_connect($tx, $cb);
 
@@ -1301,6 +1305,21 @@ to C<0>.
 
 Domains that don't require a proxy server to be used.
 Note that this attribute is EXPERIMENTAL and might change without warning!
+
+=head2 C<on_start>
+
+    my $cb  = $client->on_start;
+    $client = $client->on_start(sub {...});
+
+Callback to be invoked whenever a new transaction has been prepared, this
+includes automatically prepared proxy C<CONNECT> requests and followed
+redirects.
+Note that this attribute is EXPERIMENTAL and might change without warning!
+
+    $client->on_start(sub {
+        my ($client, $tx) = @_;
+        $tx->req->headers->header('X-Bender', 'Bite my shiny metal ass!');
+    });
 
 =head2 C<tx>
 

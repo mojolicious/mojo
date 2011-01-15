@@ -12,7 +12,7 @@ plan skip_all => 'IO::Socket::SSL 1.37 required for this test!'
   unless Mojo::IOLoop::TLS;
 plan skip_all => 'Windows is too fragile for this test!'
   if Mojo::IOLoop::WINDOWS;
-plan tests => 17;
+plan tests => 19;
 
 # I was a hero to broken robots 'cause I was one of them, but how can I sing
 # about being damaged if I'm not?
@@ -28,8 +28,10 @@ app->log->level('fatal');
 # GET /
 get '/' => sub {
     my $self = shift;
-    my $rel  = $self->req->url;
-    my $abs  = $rel->to_abs;
+    $self->res->headers->header('X-Works',
+        $self->req->headers->header('X-Works'));
+    my $rel = $self->req->url;
+    my $abs = $rel->to_abs;
     $self->render_text("Hello World! $rel $abs");
 };
 
@@ -128,9 +130,20 @@ is $client->get("https://localhost:$port/")->success->body,
   "Hello World! / https://localhost:$port/", 'right content';
 
 # GET /broken_redirect (broken redirect)
-is $client->max_redirects(3)->get("https://localhost:$port/broken_redirect")
-  ->success->body,
-  "Hello World! / https://localhost:$port/", 'right content';
+my $start = 0;
+$client->on_start(
+    sub {
+        $start++;
+        pop->req->headers->header('X-Works', 'it does!');
+    }
+);
+my $tx =
+  $client->max_redirects(3)->get("https://localhost:$port/broken_redirect");
+is $tx->success->body, "Hello World! / https://localhost:$port/",
+  'right content';
+is $tx->res->headers->header('X-Works'), 'it does!', 'right header';
+is $start, 2, 'redirected once';
+$client->on_start(undef);
 
 # WebSocket /test (normal websocket)
 my $result;
@@ -156,7 +169,7 @@ is $client->get("https://localhost:$port/proxy")->success->body,
 
 # GET /proxy (kept alive proxy request)
 $client->https_proxy("http://localhost:$proxy");
-my $tx = $client->build_tx(GET => "https://localhost:$port/proxy");
+$tx = $client->build_tx(GET => "https://localhost:$port/proxy");
 $client->start($tx);
 is $tx->success->body, "https://localhost:$port/proxy", 'right content';
 is $tx->kept_alive, 1, 'kept alive';

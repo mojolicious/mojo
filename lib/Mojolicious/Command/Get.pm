@@ -16,7 +16,8 @@ has usage => <<"EOF";
 usage: $0 get [OPTIONS] [URL]
 
 These options are available:
-  --verbose   Print response start line and headers to STDERR.
+  --redirect   Follow up to 5 redirects.
+  --verbose    Print response start line and headers to STDERR.
 EOF
 
 # I hope this has taught you kids a lesson: kids never learn.
@@ -25,8 +26,11 @@ sub run {
 
     # Options
     local @ARGV = @_ if @_;
-    my $verbose = 0;
-    GetOptions('verbose' => sub { $verbose = 1 });
+    my ($redirect, $verbose) = 0;
+    GetOptions(
+        'redirect' => sub { $redirect = 1 },
+        'verbose'  => sub { $verbose  = 1 }
+    );
 
     # URL
     my $url = $ARGV[0];
@@ -43,24 +47,37 @@ sub run {
     $client->app($ENV{MOJO_APP} || 'Mojo::HelloWorld')
       unless $url =~ /^\w+:\/\//;
 
-    # Transaction
-    my $tx = $client->build_tx(GET => $url);
-    $tx->res->on_progress(
+    # Follow redirects
+    $client->max_redirects(5) if $redirect;
+
+    # Start
+    my $v;
+    $client->on_start(
         sub {
-            return unless $verbose;
-            my $res     = shift;
-            my $version = $res->version;
-            my $code    = $res->code;
-            my $message = $res->message;
-            warn "HTTP/$version $code $message\n",
-              $res->headers->to_string, "\n\n";
-            $verbose = 0;
+            my $tx = pop;
+            my $v  = $verbose;
+            $tx->res->on_progress(
+                sub {
+                    return unless $v;
+                    my $res     = shift;
+                    my $version = $res->version;
+                    my $code    = $res->code;
+                    my $message = $res->message;
+                    warn "HTTP/$version $code $message\n",
+                      $res->headers->to_string, "\n\n";
+                    $v = 0;
+                }
+            );
+            $tx->res->body(sub { print pop });
+            return unless $v;
+            my $req = $tx->req;
+            warn $req->build_start_line;
+            warn $req->build_headers;
         }
     );
-    $tx->res->body(sub { print pop });
 
     # Request
-    $client->start($tx);
+    my $tx = $client->get($url);
 
     # Error
     my ($message, $code) = $tx->error;

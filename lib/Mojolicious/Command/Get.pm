@@ -93,8 +93,8 @@ sub run {
                 sub {
                     $cb->(my $res = shift);
 
-                    # Redirect
-                    return if $res->is_status_class(300);
+                    # Ignore intermediate content
+                    return if $redirect && $res->is_status_class(300);
 
                     # Chunk
                     print pop;

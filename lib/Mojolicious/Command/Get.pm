@@ -56,14 +56,23 @@ sub run {
         sub {
             my $tx = pop;
 
+            # Request
+            my $req       = $tx->req;
+            my $startline = $req->build_start_line;
+            my $headers   = $req->build_headers;
+
             # Progress
             my $v = $verbose;
             $tx->res->on_progress(
                 sub {
                     my $res = shift;
 
-                    # Response
                     return unless $v && $res->headers->is_done;
+
+                    # Request
+                    warn "$startline$headers";
+
+                    # Response
                     my $version = $res->version;
                     my $code    = $res->code;
                     my $message = $res->message;
@@ -84,12 +93,6 @@ sub run {
                     print pop;
                 }
             );
-
-            # Request
-            return unless $v;
-            my $req = $tx->req;
-            warn $req->build_start_line;
-            warn $req->build_headers;
         }
     );
 

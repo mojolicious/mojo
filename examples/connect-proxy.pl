@@ -66,7 +66,7 @@ $loop->listen(
 
 print <<'EOF';
 Starting connect proxy on port 3000.
-For testing use something like "HTTPS_PROXY=https://127.0.0.1:3000".
+For testing use something like "HTTPS_PROXY=http://127.0.0.1:3000".
 EOF
 
 # Start loop

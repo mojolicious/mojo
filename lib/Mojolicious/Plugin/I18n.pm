@@ -55,7 +55,7 @@ sub register {
 
 # Container
 package Mojolicious::Plugin::I18n::_Handler;
-use Mojo::Base 'Mojo::Base';
+use Mojo::Base '-base';
 
 sub languages {
     my ($self, @languages) = @_;

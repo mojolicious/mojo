@@ -17,7 +17,7 @@ usage: $0 get [OPTIONS] [URL]
 
 These options are available:
   --redirect   Follow up to 5 redirects.
-  --verbose    Print response start line and headers to STDERR.
+  --verbose    Print verbose debug information to STDERR.
 EOF
 
 # I hope this has taught you kids a lesson: kids never learn.

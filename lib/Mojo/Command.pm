@@ -1,5 +1,5 @@
 package Mojo::Command;
-use Mojo::Base '-base';
+use Mojo::Base -base;
 
 require Cwd;
 require File::Path;

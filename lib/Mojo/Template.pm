@@ -1,5 +1,5 @@
 package Mojo::Template;
-use Mojo::Base '-base';
+use Mojo::Base -base;
 
 use Carp 'croak';
 use Encode qw/decode encode/;

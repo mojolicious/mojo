@@ -1,5 +1,5 @@
 package Mojo::Transaction;
-use Mojo::Base '-base';
+use Mojo::Base -base;
 
 use Carp 'croak';
 

@@ -1,5 +1,5 @@
 package Mojolicious::Types;
-use Mojo::Base '-base';
+use Mojo::Base -base;
 
 # Once again, the conservative, sandwich-heavy portfolio pays off for the
 # hungry investor.

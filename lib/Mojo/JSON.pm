@@ -1,5 +1,5 @@
 package Mojo::JSON;
-use Mojo::Base '-base';
+use Mojo::Base -base;
 
 use B;
 use Mojo::Util;
@@ -396,7 +396,7 @@ sub _exception {
 
 # Emulate boolean type
 package Mojo::JSON::_Bool;
-use Mojo::Base '-base';
+use Mojo::Base -base;
 use overload (
     '0+' => sub { $_[0]->{_value} },
     '""' => sub { $_[0]->{_value} }

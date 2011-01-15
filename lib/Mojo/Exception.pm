@@ -1,5 +1,5 @@
 package Mojo::Exception;
-use Mojo::Base '-base';
+use Mojo::Base -base;
 use overload 'bool' => sub {1}, fallback => 1;
 use overload '""' => sub { shift->to_string }, fallback => 1;
 

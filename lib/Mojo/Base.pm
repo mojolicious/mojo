@@ -143,7 +143,7 @@ Mojo::Base - Minimal Base Class For Mojo Projects
 =head1 SYNOPSIS
 
     package Cat;
-    use Mojo::Base '-base';
+    use Mojo::Base -base;
 
     has 'mouse';
     has paws => 4;
@@ -173,12 +173,12 @@ L<Mojo::Base> exports the following functions if imported with the C<-base>
 flag or a base class.
 
     # Automatically enables "strict" and "warnings"
-    use Mojo::Base '-base';
+    use Mojo::Base -base;
     use Mojo::Base 'SomeBaseClass';
 
 Both forms save a lot of typing.
 
-    # use Mojo::Base '-base';
+    # use Mojo::Base -base;
     use strict;
     use warnings;
     use base 'Mojo::Base';

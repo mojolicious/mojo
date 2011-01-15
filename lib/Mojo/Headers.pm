@@ -1,5 +1,5 @@
 package Mojo::Headers;
-use Mojo::Base '-base';
+use Mojo::Base -base;
 
 use Mojo::Util 'get_line';
 

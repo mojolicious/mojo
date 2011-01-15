@@ -1,5 +1,5 @@
 package Mojo::Client;
-use Mojo::Base '-base';
+use Mojo::Base -base;
 
 use Carp 'croak';
 use Mojo::Asset::File;

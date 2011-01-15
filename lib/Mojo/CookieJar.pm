@@ -1,5 +1,5 @@
 package Mojo::CookieJar;
-use Mojo::Base '-base';
+use Mojo::Base -base;
 
 use Mojo::Cookie::Request;
 

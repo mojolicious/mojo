@@ -1,5 +1,5 @@
 package Mojo::Loader;
-use Mojo::Base '-base';
+use Mojo::Base -base;
 
 use Carp 'carp';
 use File::Basename;

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 package BaseTest::Base1;
-use Mojo::Base '-base';
+use Mojo::Base -base;
 
 has 'bananas';
 

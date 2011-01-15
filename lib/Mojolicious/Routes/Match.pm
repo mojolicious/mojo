@@ -1,5 +1,5 @@
 package Mojolicious::Routes::Match;
-use Mojo::Base '-base';
+use Mojo::Base -base;
 
 use Carp 'croak';
 use Mojo::Util qw/decode url_unescape/;

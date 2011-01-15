@@ -1,5 +1,5 @@
 package Mojolicious::Routes;
-use Mojo::Base '-base';
+use Mojo::Base -base;
 
 use Mojo::Exception;
 use Mojo::Loader;

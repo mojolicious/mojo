@@ -1,5 +1,5 @@
 package Mojo::IOLoop;
-use Mojo::Base '-base';
+use Mojo::Base -base;
 
 use Carp 'croak';
 use Errno qw/EAGAIN ECONNRESET EWOULDBLOCK/;

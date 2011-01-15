@@ -1,5 +1,5 @@
 package Mojolicious::Renderer;
-use Mojo::Base '-base';
+use Mojo::Base -base;
 
 use File::Spec;
 use Mojo::ByteStream 'b';

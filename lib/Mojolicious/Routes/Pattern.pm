@@ -1,5 +1,5 @@
 package Mojolicious::Routes::Pattern;
-use Mojo::Base '-base';
+use Mojo::Base -base;
 
 use constant DEBUG => $ENV{MOJO_ROUTES_DEBUG} || 0;
 

@@ -1,5 +1,4 @@
 package Mojolicious::Command::Psgi;
-
 use Mojo::Base 'Mojo::Command';
 
 use Mojo::Server::PSGI;

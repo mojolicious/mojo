@@ -1,5 +1,4 @@
 package Mojo::Util;
-
 use Mojo::Base 'Exporter';
 
 # These are core modules since 5.8, no need for pure-Perl implementations

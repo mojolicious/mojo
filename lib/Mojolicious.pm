@@ -1,5 +1,4 @@
 package Mojolicious;
-
 use Mojo::Base 'Mojo';
 
 use Carp 'croak';
@@ -297,8 +296,7 @@ Mojolicious - The Web In A Box!
 
     # Mojolicious application
     package MyApp;
-
-    use base 'Mojolicious';
+    use Mojo::Base 'Mojolicious';
 
     sub startup {
         my $self = shift;
@@ -312,8 +310,7 @@ Mojolicious - The Web In A Box!
 
     # Mojolicious controller
     package MyApp::Foo;
-
-    use base 'Mojolicious::Controller';
+    use Mojo::Base 'Mojolicious::Controller';
 
     # Say hello
     sub welcome {

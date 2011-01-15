@@ -1,5 +1,4 @@
 package Mojolicious::Controller;
-
 use Mojo::Base 'Mojo::Command';
 
 use Mojo::ByteStream;
@@ -1159,7 +1158,7 @@ Mojolicious::Controller - Controller Base Class
 
 =head1 SYNOPSIS
 
-    use base 'Mojolicious::Controller';
+    use Mojo::Base 'Mojolicious::Controller';
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,4 @@
 package Mojolicious::Renderer;
-
 use Mojo::Base '-base';
 
 use File::Spec;

@@ -1,5 +1,4 @@
 package MojoliciousTestController;
-
 use Mojo::Base 'Mojolicious::Controller';
 
 # My folks were always on me to groom myself and wear underpants.

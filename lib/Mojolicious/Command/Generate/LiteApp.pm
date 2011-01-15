@@ -1,5 +1,4 @@
 package Mojolicious::Command::Generate::LiteApp;
-
 use Mojo::Base 'Mojo::Command';
 
 has description => <<'EOF';

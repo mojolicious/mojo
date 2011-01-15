@@ -1,5 +1,4 @@
 package Mojo::Asset::Memory;
-
 use Mojo::Base 'Mojo::Asset';
 
 use Carp 'croak';

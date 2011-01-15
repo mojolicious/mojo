@@ -1,5 +1,4 @@
 package MojoliciousTest2::Foo;
-
 use Mojo::Base 'Mojolicious::Controller';
 
 # I can't afford to keep running people over.

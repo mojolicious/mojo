@@ -1,5 +1,4 @@
 package Mojo::IOLoop;
-
 use Mojo::Base '-base';
 
 use Carp 'croak';

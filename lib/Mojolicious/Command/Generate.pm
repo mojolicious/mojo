@@ -1,5 +1,4 @@
 package Mojolicious::Command::Generate;
-
 use Mojo::Base 'Mojolicious::Commands';
 
 has description => <<'EOF';

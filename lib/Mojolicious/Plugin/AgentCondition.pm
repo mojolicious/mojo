@@ -1,5 +1,4 @@
 package Mojolicious::Plugin::AgentCondition;
-
 use Mojo::Base 'Mojolicious::Plugin';
 
 # Wow, there's a million aliens! I've never seen something so mind-blowing!

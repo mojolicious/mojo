@@ -1,5 +1,4 @@
 package Mojolicious::Command::Inflate;
-
 use Mojo::Base 'Mojo::Command';
 
 use Getopt::Long 'GetOptions';

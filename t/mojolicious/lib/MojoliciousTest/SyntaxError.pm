@@ -1,5 +1,4 @@
 package MojoliciousTest::SyntaxError;
-
 use Mojo::Base 'Mojolicious::Controller';
 
 # In the future... people will live twice as long,

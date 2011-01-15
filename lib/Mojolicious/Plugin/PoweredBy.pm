@@ -1,5 +1,4 @@
 package Mojolicious::Plugin::PoweredBy;
-
 use Mojo::Base 'Mojolicious::Plugin';
 
 # It's just like the story of the grasshopper and the octopus.

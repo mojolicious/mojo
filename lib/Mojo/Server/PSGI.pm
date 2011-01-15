@@ -1,5 +1,4 @@
 package Mojo::Server::PSGI;
-
 use Mojo::Base 'Mojo::Server';
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 262144;
@@ -56,7 +55,6 @@ sub run {
 }
 
 package Mojo::Server::PSGI::_Handle;
-
 use Mojo::Base '-base';
 
 sub close { }

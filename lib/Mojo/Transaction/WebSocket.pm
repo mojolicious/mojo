@@ -1,9 +1,8 @@
 package Mojo::Transaction::WebSocket;
+use Mojo::Base 'Mojo::Transaction';
 
 # I'm not calling you a liar but...
 # I can't think of a way to finish that sentence.
-use Mojo::Base 'Mojo::Transaction';
-
 use Mojo::Transaction::HTTP;
 use Mojo::Util qw/decode encode md5_bytes/;
 

@@ -1,5 +1,4 @@
 package Mojo::Content::Single;
-
 use Mojo::Base 'Mojo::Content';
 
 use Mojo::Asset::File;

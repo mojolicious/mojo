@@ -1,5 +1,4 @@
 package Mojolicious::Plugin::JsonConfig;
-
 use Mojo::Base 'Mojolicious::Plugin';
 
 require File::Basename;

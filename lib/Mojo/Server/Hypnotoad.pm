@@ -1,5 +1,4 @@
 package Mojo::Server::Hypnotoad;
-
 use Mojo::Base '-base';
 
 use Carp 'croak';

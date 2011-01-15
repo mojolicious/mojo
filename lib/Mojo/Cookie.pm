@@ -1,5 +1,4 @@
 package Mojo::Cookie;
-
 use Mojo::Base '-base';
 use overload 'bool' => sub {1}, fallback => 1;
 use overload '""' => sub { shift->to_string }, fallback => 1;
@@ -89,7 +88,7 @@ Mojo::Cookie - HTTP 1.1 Cookie Base Class
 
 =head1 SYNOPSIS
 
-    use base 'Mojo::Cookie';
+    use Mojo::Base 'Mojo::Cookie';
 
 =head1 DESCRIPTION
 

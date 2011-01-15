@@ -495,11 +495,7 @@ simplified hybrid routes in the L<Mojolicious::Routes> router, none of the
 actual action code needs to be changed.
 
     package MyApp;
-
-    use strict;
-    use warnings;
-
-    use base 'Mojolicious';
+    use Mojo::Base 'Mojolicious';
 
     use MyUsers;
 
@@ -572,11 +568,7 @@ it makes sense to split our action code from its routing information.
 Once again the actual action code does not change at all.
 
     package MyApp::Login;
-
-    use strict;
-    use warnings;
-
-    use base 'Mojolicious::Controller';
+    use Mojo::Base 'Mojolicious::Controller';
 
     sub index {
         my $self = shift;
@@ -613,11 +605,7 @@ The application class C<lib/MyApp.pm> can now be reduced to model and routing
 information.
 
     package MyApp;
-
-    use strict;
-    use warnings;
-
-    use base 'Mojolicious';
+    use Mojo::Base 'Mojolicious';
 
     use MyUsers;
 

@@ -1,5 +1,4 @@
 package Mojo::Transaction::HTTP;
-
 use Mojo::Base 'Mojo::Transaction';
 
 use Mojo::Message::Request;

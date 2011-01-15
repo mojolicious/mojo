@@ -1,5 +1,4 @@
 package Mojolicious::Plugin::HeaderCondition;
-
 use Mojo::Base 'Mojolicious::Plugin';
 
 # You may have to "metaphorically" make a deal with the "devil".

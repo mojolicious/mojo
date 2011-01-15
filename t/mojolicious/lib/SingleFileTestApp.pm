@@ -1,5 +1,4 @@
 package SingleFileTestApp;
-
 use Mojo::Base 'Mojolicious';
 
 # Alright, grab a shovel. I'm only one skull short of a Mouseketeer reunion.
@@ -26,7 +25,6 @@ sub startup {
 }
 
 package SingleFileTestApp::Foo;
-
 use Mojo::Base 'Mojolicious::Controller';
 
 sub bar {

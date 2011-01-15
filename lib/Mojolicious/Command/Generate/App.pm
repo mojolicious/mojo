@@ -1,5 +1,4 @@
 package Mojolicious::Command::Generate::App;
-
 use Mojo::Base 'Mojo::Command';
 
 has description => <<'EOF';
@@ -85,11 +84,7 @@ Mojolicious::Commands->start;
 @@ appclass
 % my $class = shift;
 package <%= $class %>;
-
-use strict;
-use warnings;
-
-use base 'Mojolicious';
+use Mojo::Base 'Mojolicious';
 
 # This method will run once at server start
 sub startup {
@@ -109,11 +104,7 @@ sub startup {
 @@ controller
 % my $class = shift;
 package <%= $class %>;
-
-use strict;
-use warnings;
-
-use base 'Mojolicious::Controller';
+use Mojo::Base 'Mojolicious::Controller';
 
 # This action will render a template
 sub welcome {

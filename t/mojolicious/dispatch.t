@@ -1,20 +1,12 @@
 #!/usr/bin/env perl
 
 package Test::Foo;
-
-use strict;
-use warnings;
-
-use base 'Mojolicious::Controller';
+use Mojo::Base 'Mojolicious::Controller';
 
 sub bar  {1}
 sub home {1}
 
 package Test::Controller;
-
-use strict;
-use warnings;
-
 use Mojo::Base 'Mojolicious::Controller';
 
 has 'render_called';

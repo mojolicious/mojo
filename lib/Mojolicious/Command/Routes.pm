@@ -1,5 +1,4 @@
 package Mojolicious::Command::Routes;
-
 use Mojo::Base 'Mojo::Command';
 
 use Mojo::Server;

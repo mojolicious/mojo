@@ -1,5 +1,4 @@
 package Mojolicious::Command::Cgi;
-
 use Mojo::Base 'Mojo::Command';
 
 use Mojo::Server::CGI;

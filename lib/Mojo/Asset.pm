@@ -1,5 +1,4 @@
 package Mojo::Asset;
-
 use Mojo::Base '-base';
 
 use Carp 'croak';
@@ -24,7 +23,7 @@ Mojo::Asset - Asset Base Class
 
 =head1 SYNOPSIS
 
-    use base 'Mojo::Asset';
+    use Mojo::Base 'Mojo::Asset';
 
 =head1 DESCRIPTION
 

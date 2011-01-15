@@ -14,7 +14,6 @@ use lib "$FindBin::Bin/lib";
 # I heard you went off and became a rich doctor.
 # I've performed a few mercy killings.
 package TestApp;
-
 use Mojolicious::Lite;
 
 # GET /hello (embedded)
@@ -29,7 +28,6 @@ get '/hello' => sub {
 # How's the family, Morbo?
 # Belligerent and numerous.
 package MyTestApp::Test1;
-
 use Mojolicious::Lite;
 
 get '/yada' => sub {
@@ -53,7 +51,7 @@ get '/bye' => sub {
 };
 
 package Mojolicious::Plugin::MyEmbeddedApp;
-use base 'Mojolicious::Plugin';
+use Mojo::Base 'Mojolicious::Plugin';
 
 sub register {
     my ($self, $app) = @_;
@@ -68,7 +66,6 @@ use Mojolicious::Lite;
 get '/bar' => {text => 'plugin works!'};
 
 package MyTestApp::Test2;
-
 use Mojolicious::Lite;
 
 # GET / (embedded)
@@ -80,8 +77,7 @@ get '/' => sub {
 };
 
 package MyTestApp::Basic;
-
-use base 'Mojo';
+use Mojo::Base 'Mojo';
 
 sub handler {
     my ($self, $c) = @_;
@@ -92,7 +88,6 @@ sub handler {
 }
 
 package main;
-
 use Mojolicious::Lite;
 use Test::Mojo;
 

@@ -1,5 +1,4 @@
 package Mojolicious::Command::Generate::Makefile;
-
 use Mojo::Base 'Mojo::Command';
 
 has description => <<'EOF';

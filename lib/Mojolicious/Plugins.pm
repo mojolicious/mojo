@@ -1,5 +1,4 @@
 package Mojolicious::Plugins;
-
 use Mojo::Base '-base';
 
 use Mojo::Util 'camelize';

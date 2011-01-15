@@ -1,5 +1,4 @@
 package MojoliciousTest::Foo;
-
 use Mojo::Base 'Mojolicious::Controller';
 
 # If you're programmed to jump off a bridge, would you do it?

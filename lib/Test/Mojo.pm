@@ -1,5 +1,4 @@
 package Test::Mojo;
-
 use Mojo::Base '-base';
 
 use Mojo::Client;

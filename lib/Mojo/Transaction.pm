@@ -1,5 +1,4 @@
 package Mojo::Transaction;
-
 use Mojo::Base '-base';
 
 use Carp 'croak';
@@ -122,7 +121,7 @@ Mojo::Transaction - Transaction Base Class
 
 =head1 SYNOPSIS
 
-    use base 'Mojo::Transaction';
+    use Mojo::Base 'Mojo::Transaction';
 
 =head1 DESCRIPTION
 

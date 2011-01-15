@@ -1,5 +1,4 @@
 package Mojolicious::Plugin::TagHelpers;
-
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::ByteStream 'b';

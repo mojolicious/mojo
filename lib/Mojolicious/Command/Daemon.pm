@@ -1,5 +1,4 @@
 package Mojolicious::Command::Daemon;
-
 use Mojo::Base 'Mojo::Command';
 
 use Mojo::Server::Daemon;

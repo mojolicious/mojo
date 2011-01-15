@@ -1,5 +1,4 @@
 package Mojolicious::Plugin::I18n;
-
 use Mojo::Base 'Mojolicious::Plugin';
 
 use I18N::LangTags;
@@ -20,8 +19,8 @@ sub register {
     my $default = $conf->{default} || 'en';
 
     # Initialize
-    eval "package $namespace; use base 'Locale::Maketext'; 1;";
-    eval "package ${namespace}::$default; use base '$namespace';"
+    eval "package $namespace; use Mojo::Base 'Locale::Maketext'; 1;";
+    eval "package ${namespace}::$default; use Mojo::Base '$namespace';"
       . 'our %Lexicon = (_AUTO => 1); 1;';
     die qq/Couldn't initialize I18N class "$namespace": $@/ if $@;
 
@@ -56,8 +55,7 @@ sub register {
 
 # Container
 package Mojolicious::Plugin::I18n::_Handler;
-
-use base 'Mojo::Base';
+use Mojo::Base 'Mojo::Base';
 
 sub languages {
     my ($self, @languages) = @_;
@@ -105,9 +103,9 @@ Mojolicious::Plugin::I18n - Intenationalization Plugin
     plugin 'i18n' => {namespace => 'MyApp::I18N'};
     <%=l 'hello' %>
 
-    # Lexicon
+    # Lexicon "lib/MyApp/I18N/de.pm"
     package MyApp::I18N::de;
-    use base 'MyApp::I18N';
+    use Mojo::Base 'MyApp::I18N';
 
     our %Lexicon = (hello => 'hallo');
 

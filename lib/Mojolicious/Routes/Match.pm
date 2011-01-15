@@ -1,5 +1,4 @@
 package Mojolicious::Routes::Match;
-
 use Mojo::Base '-base';
 
 use Carp 'croak';

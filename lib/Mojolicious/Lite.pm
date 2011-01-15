@@ -1,5 +1,4 @@
 package Mojolicious::Lite;
-
 use Mojo::Base 'Mojolicious';
 
 # Since when is the Internet all about robbing people of their privacy?
@@ -763,7 +762,7 @@ In case a lite app needs to grow, lite and real L<Mojolicous> applications
 can be easily mixed to make the transition process very smooth.
 
     package MyApp::Foo;
-    use base 'Mojolicious::Controller';
+    use Mojo::Base 'Mojolicious::Controller';
 
     sub index { shift->render(text => 'It works!') }
 

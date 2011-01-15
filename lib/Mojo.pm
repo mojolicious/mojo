@@ -1,5 +1,4 @@
 package Mojo;
-
 use Mojo::Base '-base';
 
 use Carp 'croak';
@@ -47,7 +46,7 @@ Mojo - The Box!
 
 =head1 SYNOPSIS
 
-    use base 'Mojo';
+    use Mojo::Base 'Mojo';
 
     # All the complexities of CGI, FastCGI, PSGI, HTTP and WebSockets get
     # reduced to a single method call!

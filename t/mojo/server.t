@@ -7,10 +7,10 @@ use warnings;
 use Test::More tests => 5;
 
 package Mojo::TestServerViaEnv;
-use base 'Mojo';
+use Mojo::Base 'Mojo';
 
 package Mojo::TestServerViaApp;
-use base 'Mojo';
+use Mojo::Base 'Mojo';
 
 package main;
 

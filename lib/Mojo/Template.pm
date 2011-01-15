@@ -1,5 +1,4 @@
 package Mojo::Template;
-
 use Mojo::Base '-base';
 
 use Carp 'croak';

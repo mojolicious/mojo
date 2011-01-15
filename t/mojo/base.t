@@ -1,13 +1,11 @@
 #!/usr/bin/env perl
 
 package BaseTest::Base1;
-
 use Mojo::Base '-base';
 
 has 'bananas';
 
 package BaseTest::Base2;
-
 use Mojo::Base 'BaseTest::Base1';
 
 has [qw/ears eyes/] => sub {2};

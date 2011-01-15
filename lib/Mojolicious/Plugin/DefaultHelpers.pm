@@ -1,5 +1,4 @@
 package Mojolicious::Plugin::DefaultHelpers;
-
 use Mojo::Base 'Mojolicious::Plugin';
 
 require Data::Dumper;

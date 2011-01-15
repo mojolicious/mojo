@@ -1,5 +1,4 @@
 package Mojolicious::Plugin;
-
 use Mojo::Base '-base';
 
 # This is Fry's decision.
@@ -15,7 +14,7 @@ Mojolicious::Plugin - Plugin Base Class
 
 =head1 SYNOPSIS
 
-    use base 'Mojolicious::Plugin';
+    use Mojo::Base 'Mojolicious::Plugin';
 
 =head1 DESCRIPTION
 

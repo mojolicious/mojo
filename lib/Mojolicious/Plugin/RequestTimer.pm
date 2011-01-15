@@ -1,5 +1,4 @@
 package Mojolicious::Plugin::RequestTimer;
-
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Time::HiRes ();

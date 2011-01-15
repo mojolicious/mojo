@@ -1,5 +1,4 @@
 package Mojolicious::Plugin::PodRenderer;
-
 use Mojo::Base 'Mojolicious::Plugin';
 
 use IO::File;

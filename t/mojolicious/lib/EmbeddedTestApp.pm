@@ -1,5 +1,4 @@
 package EmbeddedTestApp;
-
 use Mojolicious::Lite;
 
 # But you're better than normal, you're abnormal.

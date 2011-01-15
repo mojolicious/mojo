@@ -1,5 +1,4 @@
 package Mojolicious::Plugin::EplRenderer;
-
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::Template;

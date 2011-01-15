@@ -1,5 +1,4 @@
 package Mojo::Server::Daemon;
-
 use Mojo::Base 'Mojo::Server';
 
 use Carp 'croak';

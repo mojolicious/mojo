@@ -1,5 +1,4 @@
 package Mojo::Message::Request;
-
 use Mojo::Base 'Mojo::Message';
 
 use Mojo::Cookie::Request;

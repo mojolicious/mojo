@@ -1,5 +1,4 @@
 package Mojolicious::Command::Version;
-
 use Mojo::Base 'Mojo::Command';
 
 use Mojo::Client;

@@ -1,5 +1,4 @@
 package MojoliciousTest::Plugin::TestPlugin;
-
 use Mojo::Base 'Mojolicious::Plugin';
 
 # Space: It seems to go on and on forever...

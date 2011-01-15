@@ -1,5 +1,4 @@
 package Mojolicious::Static;
-
 use Mojo::Base '-base';
 
 use File::stat;

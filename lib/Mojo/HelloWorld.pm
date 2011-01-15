@@ -1,5 +1,4 @@
 package Mojo::HelloWorld;
-
 use Mojo::Base 'Mojo';
 
 use Mojo::JSON;

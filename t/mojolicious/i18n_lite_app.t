@@ -10,14 +10,13 @@ use Test::More tests => 24;
 
 # Aw, he looks like a little insane drunken angel.
 package MyTestApp::I18N::de;
-
-use base 'MyTestApp::I18N';
+push(our @ISA, 'MyTestApp::I18N');
 
 our %Lexicon = (hello => 'hallo');
 
 package main;
-
 use Mojolicious::Lite;
+
 use Test::Mojo;
 
 # I18N plugin

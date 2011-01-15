@@ -1,5 +1,4 @@
 package Mojolicious::Sessions;
-
 use Mojo::Base '-base';
 
 use Mojo::Util qw/b64_decode b64_encode/;

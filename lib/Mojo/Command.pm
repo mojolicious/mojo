@@ -1,5 +1,4 @@
 package Mojo::Command;
-
 use Mojo::Base '-base';
 
 require Cwd;

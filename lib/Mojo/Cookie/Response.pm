@@ -1,5 +1,4 @@
 package Mojo::Cookie::Response;
-
 use Mojo::Base 'Mojo::Cookie';
 
 use Mojo::Date;

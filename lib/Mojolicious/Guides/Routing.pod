@@ -143,7 +143,7 @@ routes structures.
 
     # Application
     package MyApp;
-    use base 'Mojolicious';
+    use Mojo::Base 'Mojolicious';
 
     sub startup {
         my $self = shift;
@@ -162,7 +162,7 @@ C<MyApp::Foo> and call its C<welcome> method.
 
     # Controller
     package MyApp::Foo;
-    use base 'Mojolicious::Controller';
+    use Mojo::Base 'Mojolicious::Controller';
 
     # Action
     sub welcome {
@@ -224,7 +224,7 @@ at all, because of this both values are case sensitive.
 
     # Application
     package MyApp;
-    use base 'Mojolicious';
+    use Mojo::Base 'Mojolicious';
 
     sub startup {
         my $self = shift;
@@ -240,7 +240,7 @@ at all, because of this both values are case sensitive.
 
     # Controller
     package MyApp::Foo;
-    use base 'Mojolicious::Controller';
+    use Mojo::Base 'Mojolicious::Controller';
 
     # Action
     sub bye {
@@ -536,7 +536,7 @@ You can also package your conditions as reusable plugins.
 
     # Plugin
     package Mojolicious::Plugin::WerewolfCondition;
-    use base 'Mojolicious::Plugin';
+    use Mojo::Base 'Mojolicious::Plugin';
 
     use Astro::MoonPhase;
 
@@ -564,7 +564,7 @@ applications.
 
     # Application
     package MyApp;
-    use base 'Mojolicious';
+    use Mojo::Base 'Mojolicious';
 
     sub startup {
         my $self = shift;
@@ -613,7 +613,7 @@ A minimal embeddable application is nothing more than a subclass of L<Mojo>,
 containing a C<handler> method accepting L<Mojolicious::Controller> objects.
 
     package MyApp::Bar;
-    use base 'Mojo';
+    use Mojo::Base 'Mojo';
 
     sub handler {
         my ($self, $c) = @_;
@@ -637,7 +637,7 @@ package the whole thing as a self contained reusable plugin.
 
     # Plugin
     package Mojolicious::Plugin::MyEmbeddedApp;
-    use base 'Mojolicious::Plugin';
+    use Mojo::Base 'Mojolicious::Plugin';
 
     sub register {
         my ($self, $app) = @_;
@@ -661,7 +661,7 @@ Now just load the plugin and you're done.
 
     # Application
     package MyApp;
-    use base 'Mojolicious';
+    use Mojo::Base 'Mojolicious';
 
     sub startup {
         my $self = shift;
@@ -681,7 +681,7 @@ You can restrict access to WebSocket handshakes using the C<websocket> method.
 
     # Controller
     package MyApp::Foo;
-    use base 'Mojolicious::Controller';
+    use Mojo::Base 'Mojolicious::Controller';
 
     # Action
     sub echo {

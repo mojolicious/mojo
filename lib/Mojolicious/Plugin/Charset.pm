@@ -1,5 +1,4 @@
 package Mojolicious::Plugin::Charset;
-
 use Mojo::Base 'Mojolicious::Plugin';
 
 # Shut up friends. My internet browser heard us saying the word Fry and it

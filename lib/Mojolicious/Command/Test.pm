@@ -1,5 +1,4 @@
 package Mojolicious::Command::Test;
-
 use Mojo::Base 'Mojo::Command';
 
 use Cwd;

@@ -1,5 +1,4 @@
 package Mojolicious::Commands;
-
 use Mojo::Base 'Mojo::Command';
 
 use Getopt::Long qw/GetOptions :config pass_through/;

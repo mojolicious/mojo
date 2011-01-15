@@ -1,5 +1,4 @@
 package Mojolicious::Command::Generate::Hypnotoad;
-
 use Mojo::Base 'Mojo::Command';
 
 # As a scientist,

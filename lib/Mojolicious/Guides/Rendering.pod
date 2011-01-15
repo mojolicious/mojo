@@ -221,7 +221,7 @@ These mappings can be easily extended or changed.
 
     # Application
     package MyApp;
-    use base 'Mojolicious';
+    use Mojo::Base 'Mojolicious';
 
     sub startup {
         my $self = shift;
@@ -493,7 +493,7 @@ can be easily changed.
 
     # Application
     package MyApp;
-    use base 'Mojolicious';
+    use Mojo::Base 'Mojolicious';
 
     sub startup {
         my $self = shift;

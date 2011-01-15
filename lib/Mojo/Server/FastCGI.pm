@@ -1,5 +1,4 @@
 package Mojo::Server::FastCGI;
-
 use Mojo::Base 'Mojo::Server';
 
 use Errno qw/EAGAIN EWOULDBLOCK/;

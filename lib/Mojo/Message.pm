@@ -1,5 +1,4 @@
 package Mojo::Message;
-
 use Mojo::Base '-base';
 
 use Carp 'croak';
@@ -611,7 +610,7 @@ Mojo::Message - HTTP 1.1 Message Base Class
 
 =head1 SYNOPSIS
 
-    use base 'Mojo::Message';
+    use Mojo::Base 'Mojo::Message';
 
 =head1 DESCRIPTION
 

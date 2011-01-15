@@ -1,5 +1,4 @@
 package Mojo::Loader;
-
 use Mojo::Base '-base';
 
 use Carp 'carp';

@@ -1,5 +1,4 @@
 package Mojo::Content;
-
 use Mojo::Base '-base';
 
 use Carp 'croak';
@@ -424,7 +423,7 @@ Mojo::Content - HTTP 1.1 Content Base Class
 
 =head1 SYNOPSIS
 
-    use base 'Mojo::Content';
+    use Mojo::Base 'Mojo::Content';
 
 =head1 DESCRIPTION
 

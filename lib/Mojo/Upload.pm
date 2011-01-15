@@ -1,5 +1,4 @@
 package Mojo::Upload;
-
 use Mojo::Base '-base';
 
 use Carp 'croak';

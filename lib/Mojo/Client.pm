@@ -1,5 +1,4 @@
 package Mojo::Client;
-
 use Mojo::Base '-base';
 
 use Carp 'croak';

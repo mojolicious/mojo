@@ -1,5 +1,4 @@
 package Mojo::Server;
-
 use Mojo::Base '-base';
 
 use Carp 'croak';
@@ -77,7 +76,7 @@ Mojo::Server - HTTP Server Base Class
 
 =head1 SYNOPSIS
 
-    use base 'Mojo::Server';
+    use Mojo::Base 'Mojo::Server';
 
     sub run {
         my $self = shift;

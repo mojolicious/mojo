@@ -1,5 +1,4 @@
 package Mojo::Cookie::Request;
-
 use Mojo::Base 'Mojo::Cookie';
 
 use Mojo::Util 'unquote';

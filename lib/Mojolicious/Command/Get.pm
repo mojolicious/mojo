@@ -56,38 +56,43 @@ sub run {
         sub {
             my $tx = pop;
 
-            # Request
+            # Prepare request information
             my $req       = $tx->req;
             my $startline = $req->build_start_line;
             my $headers   = $req->build_headers;
 
+            # Verbose callback
+            my $v  = $verbose;
+            my $cb = sub {
+                my $res = shift;
+
+                # Wait for headers
+                return unless $v && $res->headers->is_done;
+
+                # Request
+                warn "$startline$headers";
+
+                # Response
+                my $version = $res->version;
+                my $code    = $res->code;
+                my $message = $res->message;
+                warn "HTTP/$version $code $message\n",
+                  $res->headers->to_string, "\n\n";
+
+                # Done
+                $v = 0;
+            };
+
             # Progress
-            my $v = $verbose;
-            $tx->res->on_progress(
-                sub {
-                    my $res = shift;
-
-                    return unless $v && $res->headers->is_done;
-
-                    # Request
-                    warn "$startline$headers";
-
-                    # Response
-                    my $version = $res->version;
-                    my $code    = $res->code;
-                    my $message = $res->message;
-                    warn "HTTP/$version $code $message\n",
-                      $res->headers->to_string, "\n\n";
-                    $v = 0;
-                }
-            );
+            $tx->res->on_progress(sub { $cb->(shift) });
 
             # Stream content
             $tx->res->body(
                 sub {
+                    $cb->(my $res = shift);
 
                     # Redirect
-                    return if shift->is_status_class(300);
+                    return if $res->is_status_class(300);
 
                     # Chunk
                     print pop;

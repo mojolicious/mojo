@@ -58,8 +58,8 @@ sub run {
             my $v  = $verbose;
             $tx->res->on_progress(
                 sub {
-                    return unless $v;
-                    my $res     = shift;
+                    my $res = shift;
+                    return unless $v && $res->headers->is_done;
                     my $version = $res->version;
                     my $code    = $res->code;
                     my $message = $res->message;

@@ -55,10 +55,14 @@ sub run {
     $client->on_start(
         sub {
             my $tx = pop;
-            my $v  = $verbose;
+
+            # Progress
+            my $v = $verbose;
             $tx->res->on_progress(
                 sub {
                     my $res = shift;
+
+                    # Response
                     return unless $v && $res->headers->is_done;
                     my $version = $res->version;
                     my $code    = $res->code;
@@ -68,7 +72,20 @@ sub run {
                     $v = 0;
                 }
             );
-            $tx->res->body(sub { print pop });
+
+            # Stream content
+            $tx->res->body(
+                sub {
+
+                    # Redirect
+                    return if shift->is_status_class(300);
+
+                    # Chunk
+                    print pop;
+                }
+            );
+
+            # Request
             return unless $v;
             my $req = $tx->req;
             warn $req->build_start_line;
@@ -76,7 +93,7 @@ sub run {
         }
     );
 
-    # Request
+    # Get
     my $tx = $client->get($url);
 
     # Error

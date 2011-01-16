@@ -197,6 +197,6 @@ designed from the ground up for this very unique and fun workflow.
 
 =head2 Want to know more?
 
-See our excellent L<documentation|http://mojolicio.us/perldoc>!
+See our excellent documentaion at L<http://mojolicio.us/perldoc>!
 
 =cut

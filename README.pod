@@ -105,8 +105,8 @@ Web development for humans, making hard things possible and everything fun.
 
 =head2 Growing
 
-Single file prototypes like this one can easily grow into well structured
-applications.
+Single file prototypes like the one above can easily grow into well
+structured applications.
 
     package MyApp;
     use Mojo::Base 'Mojolicious';
@@ -188,26 +188,6 @@ designed from the ground up for this very unique and fun workflow.
     <%= link_to clock => begin %>
         The time is <%= $hour %>:<%= $minute %>:<%= $second %>.
     <% end %>
-
-=head2 Have Some Cake
-
-Loosely coupled building blocks, use what you like and just ignore the rest.
-
-    .---------------------------------------------------------------.
-    |                                                               |
-    |                .----------------------------------------------'
-    |                | .--------------------------------------------.
-    |   Application  | |              Mojolicious::Lite             |
-    |                | '--------------------------------------------'
-    |                | .--------------------------------------------.
-    |                | |                 Mojolicious                |
-    '----------------' '--------------------------------------------'
-    .---------------------------------------------------------------.
-    |                             Mojo                              |
-    '---------------------------------------------------------------'
-    .-------. .-----------. .--------. .------------. .-------------.
-    |  CGI  | |  FastCGI  | |  PSGI  | |  HTTP 1.1  | |  WebSocket  |
-    '-------' '-----------' '--------' '------------' '-------------'
 
 =head2 Installation
 

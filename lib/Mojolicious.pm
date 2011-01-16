@@ -425,8 +425,91 @@ Web development for humans, making hard things possible and everything fun.
         The time is <%= $hour %>:<%= $minute %>:<%= $second %>.
     <% end %>
 
-Single file prototypes like this one can easily grow into well structured
-applications.
+=head2 Growing
+
+Single file prototypes like the one above can easily grow into well
+structured applications.
+
+    package MyApp;
+    use Mojo::Base 'Mojolicious';
+
+    # Runs once on application startup
+    sub startup {
+        my $self = shift;
+        my $r = $self->routes;
+
+        # Route prefix for "MyApp::Example" controller
+        my $example = $r->under('/example')->to('example#');
+
+        # GET routes connecting the controller prefix with actions
+        $example->get('/hello')->to('#hello');
+        $example->get('/time')->to('#clock');
+        $example->get('/:offset')->to('#restful');
+
+        # All common verbs are supported
+        $example->post('/title')->to('#title');
+
+        # And much more
+        $r->websocket('/echo')->to('realtime#echo');
+    }
+
+    1;
+
+Bigger applications are a lot easier to maintain once routing information has
+been separated from action code, especially when working in teams.
+
+    package MyApp::Example;
+    use Mojo::Base 'Mojolicious::Controller';
+
+    # Plain text response
+    sub hello { shift->render(text => 'Hello World!') }
+
+    # Render external template "templates/example/clock.html.ep"
+    sub clock { shift->render }
+
+    # RESTful web service sending JSON responses
+    sub restful {
+        my $self   = shift;
+        my $offset = $self->param('offset') || 23;
+        $self->render(json => {list => [0 .. $offset]});
+    }
+
+    # Scrape information from remote sites
+    sub title {
+        my $self = shift;
+        my $url  = $self->param('url') || 'http://mojolicio.us';
+        $self->render(text =>
+              $self->client->get($url)->res->dom->at('head > title')->text);
+    }
+
+    1;
+
+While the application class is unique, you can have as many controllers as
+you like.
+
+    package MyApp::Realtime;
+    use Mojo::Base 'Mojolicious::Controller';
+
+    # WebSocket echo service
+    sub echo {
+        my $self = shift;
+        $self->on_message(
+            sub {
+                my ($self, $message) = @_;
+                $self->send_message("echo: $message");
+            }
+        );
+    }
+
+    1;
+
+Action code and templates can stay almost exactly the same, everything was
+designed from the ground up for this very unique and fun workflow.
+
+    % my ($second, $minute, $hour) = (localtime(time))[0, 1, 2];
+    <%= link_to clock => begin %>
+        The time is <%= $hour %>:<%= $minute %>:<%= $second %>.
+    <% end %>
 
 =head2 Have Some Cake
 

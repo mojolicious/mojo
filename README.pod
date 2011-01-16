@@ -120,7 +120,7 @@ structured applications.
     # Runs once on application startup
     sub startup {
         my $self = shift;
-        my $r = $self->routes;
+        my $r    = $self->routes;
 
         # Route prefix for "MyApp::Example" controller
         my $example = $r->under('/example')->to('example#');

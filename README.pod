@@ -103,6 +103,8 @@ Web development for humans, making hard things possible and everything fun.
         The time is <%= $hour %>:<%= $minute %>:<%= $second %>.
     <% end %>
 
+=head2 Growing
+
 Single file prototypes like this one can easily grow into well structured
 applications.
 
@@ -158,8 +160,10 @@ been separated from action code, especially when working in teams.
               $self->client->get($url)->res->dom->at('head > title')->text);
     }
 
+    1;
+
 While the application class is unique, you can have as many controllers as
-you want.
+you like.
 
     package MyApp::Realtime;
     use Mojo::Base 'Mojolicious::Controller';

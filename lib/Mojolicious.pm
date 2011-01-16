@@ -408,12 +408,10 @@ Web development for humans, making hard things possible and everything fun.
     # WebSocket echo service
     websocket '/echo' => sub {
         my $self = shift;
-        $self->on_message(
-            sub {
-                my ($self, $message) = @_;
-                $self->send_message("echo: $message");
-            }
-        );
+        $self->on_message(sub {
+            my ($self, $message) = @_;
+            $self->send_message("echo: $message");
+        });
     };
 
     app->start;
@@ -493,12 +491,10 @@ you like.
     # WebSocket echo service
     sub echo {
         my $self = shift;
-        $self->on_message(
-            sub {
-                my ($self, $message) = @_;
-                $self->send_message("echo: $message");
-            }
-        );
+        $self->on_message(sub {
+            my ($self, $message) = @_;
+            $self->send_message("echo: $message");
+        });
     }
 
     1;

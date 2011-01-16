@@ -56,6 +56,12 @@ Fresh code based upon years of experience developing L<Catalyst>.
 
 =back
 
+=head2 Installation
+
+All you need is a oneliner.
+
+    curl -L cpanmin.us | perl - -S http://latest.mojolicio.us
+
 =head2 Duct Tape For The HTML5 Web
 
 Web development for humans, making hard things possible and everything fun.
@@ -189,10 +195,8 @@ designed from the ground up for this very unique and fun workflow.
         The time is <%= $hour %>:<%= $minute %>:<%= $second %>.
     <% end %>
 
-=head2 Installation
+=head2 Want to know more?
 
-All you need is a oneliner.
-
-    curl -L cpanmin.us | perl - -S http://latest.mojolicio.us
+See our excellent L<documentation|Mojolicious::Guides>!
 
 =cut

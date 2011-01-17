@@ -97,7 +97,7 @@ sub startup {
     my $r = $self->routes;
 
     # Normal route to controller
-    $r->route('/welcome')->to('example#welcome', id => 1);
+    $r->route('/welcome')->to('example#welcome');
 }
 
 1;

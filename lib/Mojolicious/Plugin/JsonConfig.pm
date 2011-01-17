@@ -7,6 +7,8 @@ require File::Spec;
 use Mojo::JSON;
 use Mojo::Template;
 
+use constant DEBUG => $ENV{MOJO_JSON_CONFIG_DEBUG} || 0;
+
 # And so we say goodbye to our beloved pet, Nibbler, who's gone to a place
 # where I, too, hope one day to go. The toilet.
 sub register {
@@ -16,8 +18,7 @@ sub register {
     $conf ||= {};
 
     # File
-    my $file = $conf->{file};
-    my $mode_file;
+    my $file = $conf->{file} || $ENV{MOJO_JSON_CONFIG};
     unless ($file) {
 
         # Basename
@@ -26,18 +27,27 @@ sub register {
         # Remove .pl, .p6 and .t extentions
         $file =~ s/(?:\.p(?:l|6))|\.t$//i;
 
-        # Mode specific config file
-        $mode_file = join '.', $file, $app->mode, ($conf->{ext} || 'json');
-
         # Default extension
         $file .= '.' . ($conf->{ext} || 'json');
+    }
+
+    # Debug
+    warn "JSON CONFIG FILE $file\n" if DEBUG;
+
+    # Mode specific config file
+    my $mode;
+    if ($file =~ /^(.*)\.([^\.]+)$/) {
+        $mode = join '.', $1, $app->mode, $2;
+
+        # Debug
+        warn "MODE SPECIFIC JSON CONFIG FILE $mode\n" if DEBUG;
     }
 
     # Absolute path
     $file = $app->home->rel_file($file)
       unless File::Spec->file_name_is_absolute($file);
-    $mode_file = $app->home->rel_file($mode_file)
-      if defined $mode_file && !File::Spec->file_name_is_absolute($mode_file);
+    $mode = $app->home->rel_file($mode)
+      if defined $mode && !File::Spec->file_name_is_absolute($mode);
 
     # Read config file
     my $config = {};
@@ -57,19 +67,15 @@ sub register {
     }
 
     # Merge with mode specific config file
-    if (defined $mode_file && -e $mode_file) {
-        my $mode_config = $self->_read_config($mode_file, $template, $app);
-        $config = {%$config, %$mode_config};
+    if (defined $mode && -e $mode) {
+        $config = {%$config, %{$self->_read_config($mode, $template, $app)}};
     }
-
-    # Stash key
-    my $stash_key = $conf->{stash_key} || 'config';
 
     # Merge
     $config = {%{$conf->{default}}, %$config} if $conf->{default};
 
     # Default
-    $app->defaults($stash_key => $config);
+    $app->defaults(($conf->{stash_key} || 'config') => $config);
 
     return $config;
 }
@@ -189,7 +195,8 @@ File extension of config file, defaults to C<json>.
     plugin json_config => {file => 'myapp.conf'};
     plugin json_config => {file => '/etc/foo.json'};
 
-By default C<myapp.json> is searched in the application home directory.
+Configuration file, defaults to the value of C<MOJO_JSON_CONFIG> or
+C<myapp.json> in the application home directory.
 
 =head2 C<stash_key>
 

@@ -15,4 +15,4 @@ get '/' => 'index';
 app->start;
 __DATA__
 @@ index.html.ep
-<%= $config->{just} %>
+<%= $config->{just} . $config->{works} %>

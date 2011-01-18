@@ -253,6 +253,7 @@ sub to_abs {
     my $self = shift;
     my $base = shift || $self->base->clone;
 
+    # Absolute URL
     my $abs = $self->clone;
 
     # Already absolute
@@ -262,16 +263,32 @@ sub to_abs {
     $abs->scheme($base->scheme);
     $abs->authority($base->authority);
 
+    # New base
     $abs->base($base->clone);
-    my $path = $base->path->clone;
 
-    # Characters after the right-most '/' need to go
-    pop @{$path->parts} unless $path->trailing_slash;
+    # New path
+    my $new = $base->path->clone;
 
-    $path->append($_) for @{$abs->path->parts};
-    $path->leading_slash(1);
-    $path->trailing_slash($abs->path->trailing_slash);
-    $abs->path($path);
+    # Old path
+    my $old = $self->path;
+
+    # Replace path
+    if ($old->leading_slash) { $new->parts([@{$old->parts}]) }
+
+    # Merge paths
+    else {
+
+        # Characters after the right-most '/' need to go
+        pop @{$new->parts} unless $new->trailing_slash;
+
+        # Append
+        $new->append($_) for @{$old->parts};
+    }
+
+    # Update
+    $new->leading_slash(1);
+    $new->trailing_slash($old->trailing_slash);
+    $abs->path($new);
 
     return $abs;
 }

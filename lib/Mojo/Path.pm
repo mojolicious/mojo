@@ -77,8 +77,8 @@ sub parse {
 
     # Meta
     $path = '' unless defined $path;
-    $self->leading_slash(1)  if $path =~ /^\//;
-    $self->trailing_slash(1) if $path =~ /\/$/;
+    $path =~ /^\// ? $self->leading_slash(1)  : $self->leading_slash(0);
+    $path =~ /\/$/ ? $self->trailing_slash(1) : $self->trailing_slash(0);
 
     # Parse
     my @parts;
@@ -98,6 +98,12 @@ sub parse {
     $self->parts(\@parts);
 
     return $self;
+}
+
+sub to_abs_string {
+    my $self = shift;
+    return $self->to_string if $self->leading_slash;
+    return '/' . $self->to_string;
 }
 
 sub to_string {
@@ -198,6 +204,13 @@ Clone path.
     $path = $path->parse('/foo/bar%3B/baz.html');
 
 Parse path.
+
+=head2 C<to_abs_string>
+
+    my $string = $path->to_abs_string;
+
+Turn path into absolute string.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<to_string>
 

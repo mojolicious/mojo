@@ -88,7 +88,7 @@ is_deeply $params->to_hash, {c => '', '' => ['c', '']}, 'right structure';
 $params->remove('c');
 is $params->to_string, "=c&=", 'right format';
 $params->remove(undef);
-ok !defined $params->to_string, 'empty';
+ok !$params->to_string, 'empty';
 
 # +
 $params = Mojo::Parameters->new('foo=%2B');

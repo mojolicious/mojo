@@ -86,11 +86,11 @@ sub parse {
     my $self   = shift;
     my $string = shift;
 
-    # Shortcut
-    return $self unless defined $string;
-
     # Clear
     $self->params([]);
+
+    # Shortcut
+    return $self unless defined $string;
 
     # Charset
     my $charset = $self->charset;
@@ -199,7 +199,7 @@ sub to_string {
     my $params = $self->params;
 
     # Shortcut
-    return unless @{$self->params};
+    return '' unless @{$self->params};
 
     # Format
     my @params;

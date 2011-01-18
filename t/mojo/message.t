@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 969;
+use Test::More tests => 878;
 
 use File::Spec;
 use File::Temp;
@@ -1066,226 +1066,6 @@ is $res->content->parts->[1]->headers->content_type, 'text/plain',
 is $res->content->parts->[1]->asset->slurp, "lala\nfoobar\nperl rocks\n",
   'right content';
 
-# Parse IIS 7.5 like CGI environment (root)
-$req = Mojo::Message::Request->new;
-$req->parse(
-    CONTENT_LENGTH => 0,
-    HTTP_ACCEPT =>
-      'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-    CONTENT_TYPE    => '',
-    PATH_INFO       => '/index.pl/',
-    PATH_TRANSLATED => 'C:\\inetpub\\wwwroot\\test\\www\\index.pl\\',
-    SERVER_SOFTWARE => 'Microsoft-IIS/7.5',
-    QUERY_STRING    => '',
-    REQUEST_METHOD  => 'GET',
-    SCRIPT_NAME     => '/index.pl',
-    HTTP_HOST       => 'test',
-    SERVER_PROTOCOL => 'HTTP/1.1'
-);
-ok $req->is_done, 'request is done';
-is $req->method, 'GET', 'right method';
-is $req->headers->header('Accept'),
-  'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-  'right "Accept" value';
-is $req->url->path, '/', 'right URL';
-is $req->url->base->path, '/index.pl/', 'right path';
-is $req->url->base->host, 'test',       'right host';
-ok !$req->url->query->to_string, 'no query';
-is $req->version, '1.1', 'right version';
-is $req->at_least_version('1.0'), 1,     'at least version 1.0';
-is $req->at_least_version('1.2'), undef, 'not version 1.2';
-
-# Parse IIS 7.5 like CGI environment (with path)
-$req = Mojo::Message::Request->new;
-$req->parse(
-    CONTENT_LENGTH => 0,
-    HTTP_ACCEPT =>
-      'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-    CONTENT_TYPE    => '',
-    PATH_INFO       => '/index.pl/foo',
-    PATH_TRANSLATED => 'C:\\inetpub\\wwwroot\\test\\www\\index.pl\\foo',
-    SERVER_SOFTWARE => 'Microsoft-IIS/7.5',
-    QUERY_STRING    => '',
-    REQUEST_METHOD  => 'GET',
-    SCRIPT_NAME     => '/index.pl',
-    HTTP_HOST       => 'test',
-    SERVER_PROTOCOL => 'HTTP/1.1'
-);
-ok $req->is_done, 'request is done';
-is $req->method, 'GET', 'right method';
-is $req->headers->header('Accept'),
-  'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-  'right "Accept" value';
-is $req->url->path, '/foo', 'right URL';
-is $req->url->base->path, '/index.pl/', 'right path';
-is $req->url->base->host, 'test',       'right host';
-ok !$req->url->query->to_string, 'no query';
-is $req->version, '1.1', 'right version';
-is $req->at_least_version('1.0'), 1,     'at least version 1.0';
-is $req->at_least_version('1.2'), undef, 'not version 1.2';
-
-# Parse IIS 6.0 like CGI environment variables and a body
-$req = Mojo::Message::Request->new;
-$req->parse(
-    CONTENT_LENGTH  => 11,
-    HTTP_EXPECT     => '100-continue',
-    CONTENT_TYPE    => 'application/x-www-form-urlencoded',
-    PATH_INFO       => '/foo/bar',
-    PATH_TRANSLATED => 'C:\\FOO\\myapp\\bar',
-    SERVER_SOFTWARE => 'Microsoft-IIS/6.0',
-    QUERY_STRING    => 'lalala=23&bar=baz',
-    REQUEST_METHOD  => 'POST',
-    SCRIPT_NAME     => '/foo/bar',
-    HTTP_HOST       => 'localhost:8080',
-    SERVER_PROTOCOL => 'HTTP/1.0'
-);
-$req->parse('hello=world');
-ok $req->is_done, 'request is done';
-is $req->method, 'POST', 'right method';
-is $req->headers->expect, '100-continue', 'right "Expect" value';
-is $req->url->path,       '/bar',         'right URL';
-is $req->url->base->path, '/foo/',     'right base path';
-is $req->url->base->host, 'localhost', 'right base host';
-is $req->url->base->port, 8080,        'right base port';
-is $req->url->query, 'lalala=23&bar=baz', 'right query';
-is $req->version, '1.0', 'right version';
-is $req->at_least_version('1.0'), 1,     'at least version 1.0';
-is $req->at_least_version('1.2'), undef, 'not version 1.2';
-is $req->body, 'hello=world', 'right content';
-is_deeply $req->param('hello'), 'world', 'right value';
-is $req->url->to_abs->to_string,
-  'http://localhost:8080/foo/bar?lalala=23&bar=baz', 'right absolute URL';
-is $req->env->{HTTP_EXPECT}, '100-continue', 'right "Expect" value';
-
-# Parse IIS 6.0 like CGI environment variables and a body (root)
-$req = Mojo::Message::Request->new;
-$req->parse(
-    CONTENT_LENGTH  => 11,
-    HTTP_EXPECT     => '100-continue',
-    CONTENT_TYPE    => 'application/x-www-form-urlencoded',
-    PATH_INFO       => '/foo/bar',
-    PATH_TRANSLATED => 'C:\\FOO\\myapp\\foo\\bar',
-    SERVER_SOFTWARE => 'Microsoft-IIS/6.0',
-    QUERY_STRING    => 'lalala=23&bar=baz',
-    REQUEST_METHOD  => 'POST',
-    SCRIPT_NAME     => '/foo/bar',
-    HTTP_HOST       => 'localhost:8080',
-    SERVER_PROTOCOL => 'HTTP/1.0'
-);
-$req->parse('hello=world');
-ok $req->is_done, 'request is done';
-is $req->method, 'POST', 'right method';
-is $req->headers->expect, '100-continue', 'right "Expect" value';
-is $req->url->path,       '/foo/bar',     'right URL';
-is $req->url->base->path, '/',         'right base path';
-is $req->url->base->host, 'localhost', 'right base host';
-is $req->url->base->port, 8080,        'right base port';
-is $req->url->query, 'lalala=23&bar=baz', 'right query';
-is $req->version, '1.0', 'right version';
-is $req->at_least_version('1.0'), 1,     'at least version 1.0';
-is $req->at_least_version('1.2'), undef, 'not version 1.2';
-is $req->body, 'hello=world', 'right content';
-is_deeply $req->param('hello'), 'world', 'right value';
-is $req->url->to_abs->to_string,
-  'http://localhost:8080/foo/bar?lalala=23&bar=baz', 'right absolute URL';
-
-# Parse IIS 6.0 like CGI environment variables and a body (trailing slash)
-$req = Mojo::Message::Request->new;
-$req->parse(
-    CONTENT_LENGTH  => 11,
-    HTTP_EXPECT     => '100-continue',
-    CONTENT_TYPE    => 'application/x-www-form-urlencoded',
-    PATH_INFO       => '/foo/bar/',
-    PATH_TRANSLATED => 'C:\\FOO\\myapp\\foo\\bar\\',
-    SERVER_SOFTWARE => 'Microsoft-IIS/6.0',
-    QUERY_STRING    => 'lalala=23&bar=baz',
-    REQUEST_METHOD  => 'POST',
-    SCRIPT_NAME     => '/foo/bar/',
-    HTTP_HOST       => 'localhost:8080',
-    SERVER_PROTOCOL => 'HTTP/1.0'
-);
-$req->parse('hello=world');
-ok $req->is_done, 'request is done';
-is $req->method, 'POST', 'right method';
-is $req->headers->expect, '100-continue', 'right "Expect" value';
-is $req->url->path,       '/foo/bar/',    'right path';
-is $req->url->base->path, '/',         'right base path';
-is $req->url->base->host, 'localhost', 'right base host';
-is $req->url->base->port, 8080,        'right base port';
-is $req->url->query, 'lalala=23&bar=baz', 'right query';
-is $req->version, '1.0', 'right version';
-is $req->at_least_version('1.0'), 1,     'at least version 1.0';
-is $req->at_least_version('1.2'), undef, 'not version 1.2';
-is $req->body, 'hello=world', 'right content';
-is_deeply $req->param('hello'), 'world', 'right value';
-is $req->url->to_abs->to_string,
-  'http://localhost:8080/foo/bar/?lalala=23&bar=baz', 'right absolute URL';
-
-# Parse IIS 6.0 like CGI environment variables and a body
-# (root and trailing slash)
-$req = Mojo::Message::Request->new;
-$req->parse(
-    CONTENT_LENGTH  => 11,
-    HTTP_EXPECT     => '100-continue',
-    CONTENT_TYPE    => 'application/x-www-form-urlencoded',
-    PATH_INFO       => '/foo/bar/',
-    PATH_TRANSLATED => 'C:\\FOO\\myapp\\',
-    SERVER_SOFTWARE => 'Microsoft-IIS/6.0',
-    QUERY_STRING    => 'lalala=23&bar=baz',
-    REQUEST_METHOD  => 'POST',
-    SCRIPT_NAME     => '/foo/bar/',
-    HTTP_HOST       => 'localhost:8080',
-    SERVER_PROTOCOL => 'HTTP/1.0'
-);
-$req->parse('hello=world');
-ok $req->is_done, 'request is done';
-is $req->method, 'POST', 'right method';
-is $req->headers->expect, '100-continue', 'right "Expect" value';
-is $req->url->path,       '/',            'right path';
-is $req->url->base->path, '/foo/bar/', 'right base path';
-is $req->url->base->host, 'localhost', 'right base host';
-is $req->url->base->port, 8080,        'right base port';
-is $req->url->query, 'lalala=23&bar=baz', 'right query';
-is $req->version, '1.0', 'right version';
-is $req->at_least_version('1.0'), 1,     'at least version 1.0';
-is $req->at_least_version('1.2'), undef, 'not version 1.2';
-is $req->body, 'hello=world', 'right content';
-is_deeply $req->param('hello'), 'world', 'right value';
-is $req->url->to_abs->to_string,
-  'http://localhost:8080/foo/bar/?lalala=23&bar=baz', 'right absolute URL';
-
-# Parse IIS 6.0 like CGI environment variables and a body (root)
-$req = Mojo::Message::Request->new;
-$req->parse(
-    CONTENT_LENGTH  => 11,
-    HTTP_EXPECT     => '100-continue',
-    CONTENT_TYPE    => 'application/x-www-form-urlencoded',
-    PATH_INFO       => '/',
-    PATH_TRANSLATED => 'C:\\FOO\\myapp\\',
-    SERVER_SOFTWARE => 'Microsoft-IIS/6.0',
-    QUERY_STRING    => 'lalala=23&bar=baz',
-    REQUEST_METHOD  => 'POST',
-    SCRIPT_NAME     => '/',
-    HTTP_HOST       => 'localhost:8080',
-    SERVER_PROTOCOL => 'HTTP/1.0'
-);
-$req->parse('hello=world');
-ok $req->is_done, 'request is done';
-is $req->method, 'POST', 'right method';
-is $req->headers->expect, '100-continue', 'right "Expect" value';
-is $req->url->path,       '/',            'right path';
-is $req->url->base->path, '/',         'right base path';
-is $req->url->base->host, 'localhost', 'right base host';
-is $req->url->base->port, 8080,        'right base port';
-is $req->url->query, 'lalala=23&bar=baz', 'right query';
-is $req->version, '1.0', 'right version';
-is $req->at_least_version('1.0'), 1,     'at least version 1.0';
-is $req->at_least_version('1.2'), undef, 'not version 1.2';
-is $req->body, 'hello=world', 'right content';
-is_deeply $req->param('hello'), 'world', 'right value';
-is $req->url->to_abs->to_string, 'http://localhost:8080/?lalala=23&bar=baz',
-  'right absolute URL';
-
 # Parse Lighttpd like CGI environment variables and a body
 $req = Mojo::Message::Request->new;
 $req->parse(
@@ -1302,7 +1082,7 @@ $req->parse('Hello World');
 ok $req->is_done, 'request is done';
 is $req->method, 'POST', 'right method';
 is $req->headers->expect, '100-continue', 'right "Expect" value';
-is $req->url->path,       '/foo/bar',     'right path';
+is $req->url->path,       'foo/bar',      'right path';
 is $req->url->base->path, '/test/index.cgi/', 'right base path';
 is $req->url->base->host, 'localhost',        'right base host';
 is $req->url->base->port, 8080,               'right base port';
@@ -1333,7 +1113,7 @@ $req->parse('Hello World');
 ok $req->is_done, 'request is done';
 is $req->method, 'POST', 'right method';
 is $req->headers->expect, '100-continue', 'right "Expect" value';
-is $req->url->path,       '/foo/bar',     'right path';
+is $req->url->path,       'foo/bar',      'right path';
 is $req->url->base->path, '/test/index.cgi/', 'right base path';
 is $req->url->base->host, 'mojolicio.us',     'right base host';
 is $req->url->base->port, '',                 'right base port';
@@ -1363,7 +1143,7 @@ $req->parse('hello=world');
 ok $req->is_done, 'request is done';
 is $req->method, 'POST', 'right method';
 is $req->headers->expect, '100-continue', 'right "Expect" value';
-is $req->url->path,       '/foo/bar',     'right path';
+is $req->url->path,       'foo/bar',      'right path';
 is $req->url->base->path, '/test/index.cgi/', 'right base path';
 is $req->url->base->host, 'localhost',        'right base host';
 is $req->url->base->port, 8080,               'right base port';
@@ -1396,7 +1176,7 @@ $req->parse('hello=world');
 ok $req->is_done, 'request is done';
 is $req->method, 'POST', 'right method';
 is $req->headers->expect, '100-continue', 'right "Expect" value';
-is $req->url->path,       '/foo/bar',     'right path';
+is $req->url->path,       'foo/bar',      'right path';
 is $req->url->base->path, '/test/index.cgi/', 'right base path';
 is $req->url->base->host, 'localhost',        'right base host';
 is $req->url->base->port, 8080,               'right base port';
@@ -1515,7 +1295,7 @@ ok $req->is_done, 'request is done';
 is $req->method, 'POST', 'right method';
 is $req->url->base->host, '127.0.0.1', 'right base host';
 is $req->url->base->port, 13028,       'right base port';
-is $req->url->path, '/', 'right path';
+is $req->url->path, '', 'right path';
 is $req->url->base->path, '/diag/upload/', 'right base path';
 is $req->version, '1.1', 'right version';
 is $req->at_least_version('1.0'), 1,     'at least version 1.0';
@@ -1543,7 +1323,7 @@ $req->parse('hello=world');
 ok $req->is_done, 'request is done';
 is $req->method, 'GET', 'right method';
 is $req->url->base->host, 'localhost', 'right base host';
-is $req->url->path, '/foo/bar', 'right path';
+is $req->url->path, 'foo/bar', 'right path';
 is $req->url->base->path, '/test/index.cgi/', 'right base path';
 is $req->version, '1.0', 'right version';
 is $req->at_least_version('1.0'), 1,     'at least version 1.0';
@@ -1571,7 +1351,7 @@ $req->parse('hello=world');
 ok $req->is_done, 'request is done';
 is $req->method, 'GET', 'right method';
 is $req->url->base->host, 'localhost', 'right base host';
-is $req->url->path, '/foo/bar/', 'right path';
+is $req->url->path, 'foo/bar/', 'right path';
 is $req->url->base->path, '/test/index.cgi/', 'right base path';
 is $req->version, '1.0', 'right version';
 is $req->at_least_version('1.0'), 1,     'at least version 1.0';
@@ -1647,7 +1427,7 @@ $req->parse(
 ok $req->is_done, 'request is done';
 is $req->method, 'GET', 'right method';
 is $req->url->base->host, 'getbootylicious.org', 'right base host';
-is $req->url->path, '/', 'right path';
+is $req->url->path, '', 'right path';
 is $req->url->base->path, '/cgi-bin/bootylicious/bootylicious.pl/',
   'right base path';
 is $req->version, '1.1', 'right version';

@@ -21,9 +21,10 @@ sub new {
 
     # Path
     unless ($self->{_path} = shift) {
-        $self->{_path} = $c->req->url->path->to_string;
-        url_unescape $self->{_path};
-        decode 'UTF8', $self->{_path};
+        my $path = $c->req->url->path->to_abs_string;
+        url_unescape $path;
+        decode 'UTF8', $path;
+        $self->{_path} = $path;
     }
 
     return $self;

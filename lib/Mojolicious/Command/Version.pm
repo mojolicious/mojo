@@ -19,7 +19,7 @@ sub run {
     my $self = shift;
 
     # Latest version
-    my $current = $Mojolicious::VERSION =~ /^([^_]+)/;
+    my ($current) = $Mojolicious::VERSION =~ /^([^_]+)/;
     my $latest = $current;
     eval {
         Mojo::Client->new->max_redirects(3)

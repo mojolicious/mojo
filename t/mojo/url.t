@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 177;
+use Test::More tests => 321;
 
 # I don't want you driving around in a car you built yourself.
 # You can sit there complaining, or you can knit me some seat belts.
@@ -183,7 +183,7 @@ is $clone->to_abs->to_string, 'http://127.0.0.1/test/index.html',
   'right absolute version';
 
 # Clone (with base path)
-$url = Mojo::URL->new('/test/index.html');
+$url = Mojo::URL->new('test/index.html');
 $url->base->parse('http://127.0.0.1/foo/');
 is "$url", 'test/index.html', 'right format';
 $clone = $url->clone;
@@ -193,7 +193,7 @@ is $clone->scheme, undef, 'no scheme';
 is $clone->host,   '',    'no host';
 is $clone->base->scheme, 'http',      'right base scheme';
 is $clone->base->host,   '127.0.0.1', 'right base host';
-is $clone->path, '/test/index.html', 'right path';
+is $clone->path, 'test/index.html', 'right path';
 is $clone->to_abs->to_string, 'http://127.0.0.1/foo/test/index.html',
   'right absolute version';
 
@@ -330,3 +330,186 @@ $url = Mojo::URL->new('http://1.1.1.1.1.1/');
 is $url->host,    '1.1.1.1.1.1', 'right host';
 is $url->is_ipv4, undef,         'not an IPv4 address';
 is $url->is_ipv6, undef,         'not an IPv4 address';
+
+# Merge relative path
+$url = Mojo::URL->new('http://foo.bar/baz?yada');
+is $url->base,     '',        'no base';
+is $url->scheme,   'http',    'right scheme';
+is $url->userinfo, undef,     'no userinfo';
+is $url->host,     'foo.bar', 'right host';
+is $url->port,     undef,     'no port';
+is $url->path,     '/baz',    'right path';
+is $url->query,    'yada',    'right query';
+is $url->fragment, undef,     'no fragment';
+is "$url", 'http://foo.bar/baz?yada', 'right absolute URL';
+$url = $url->clone->base($url)->parse('zzz?Zzz')->to_abs;
+is $url->base,     'http://foo.bar/baz?yada', 'right base';
+is $url->scheme,   'http',                    'right scheme';
+is $url->userinfo, undef,                     'no userinfo';
+is $url->host,     'foo.bar',                 'right host';
+is $url->port,     undef,                     'no port';
+is $url->path,     '/zzz',                    'right path';
+is $url->query,    'Zzz',                     'right query';
+is $url->fragment, undef,                     'no fragment';
+is "$url", 'http://foo.bar/zzz?Zzz', 'right absolute URL';
+
+# Merge relative path with directory
+$url = Mojo::URL->new('http://foo.bar/baz/index.html?yada');
+is $url->base,     '',                'no base';
+is $url->scheme,   'http',            'right scheme';
+is $url->userinfo, undef,             'no userinfo';
+is $url->host,     'foo.bar',         'right host';
+is $url->port,     undef,             'no port';
+is $url->path,     '/baz/index.html', 'right path';
+is $url->query,    'yada',            'right query';
+is $url->fragment, undef,             'no fragment';
+is "$url", 'http://foo.bar/baz/index.html?yada', 'right absolute URL';
+$url->base(undef);
+$url = $url->clone->base($url)->parse('zzz?Zzz')->to_abs;
+is $url->base,     'http://foo.bar/baz/index.html?yada', 'right base';
+is $url->scheme,   'http',                               'right scheme';
+is $url->userinfo, undef,                                'no userinfo';
+is $url->host,     'foo.bar',                            'right host';
+is $url->port,     undef,                                'no port';
+is $url->path,     '/baz/zzz',                           'right path';
+is $url->query,    'Zzz',                                'right query';
+is $url->fragment, undef,                                'no fragment';
+is "$url", 'http://foo.bar/baz/zzz?Zzz', 'right absolute URL';
+
+# Merge absolute path
+$url = Mojo::URL->new('http://foo.bar/baz/index.html?yada');
+is $url->base,     '',                'no base';
+is $url->scheme,   'http',            'right scheme';
+is $url->userinfo, undef,             'no userinfo';
+is $url->host,     'foo.bar',         'right host';
+is $url->port,     undef,             'no port';
+is $url->path,     '/baz/index.html', 'right path';
+is $url->query,    'yada',            'right query';
+is $url->fragment, undef,             'no fragment';
+is "$url", 'http://foo.bar/baz/index.html?yada', 'right absolute URL';
+$url->base(undef);
+$url = $url->clone->base($url)->parse('/zzz?Zzz')->to_abs;
+is $url->base,     'http://foo.bar/baz/index.html?yada', 'right base';
+is $url->scheme,   'http',                               'right scheme';
+is $url->userinfo, undef,                                'no userinfo';
+is $url->host,     'foo.bar',                            'right host';
+is $url->port,     undef,                                'no port';
+is $url->path,     '/zzz',                               'right path';
+is $url->query,    'Zzz',                                'right query';
+is $url->fragment, undef,                                'no fragment';
+is "$url", 'http://foo.bar/zzz?Zzz', 'right absolute URL';
+
+# Merge absolute path without query
+$url = Mojo::URL->new('http://foo.bar/baz/index.html?yada');
+is $url->base,     '',                'no base';
+is $url->scheme,   'http',            'right scheme';
+is $url->userinfo, undef,             'no userinfo';
+is $url->host,     'foo.bar',         'right host';
+is $url->port,     undef,             'no port';
+is $url->path,     '/baz/index.html', 'right path';
+is $url->query,    'yada',            'right query';
+is $url->fragment, undef,             'no fragment';
+is "$url", 'http://foo.bar/baz/index.html?yada', 'right absolute URL';
+$url->base(undef);
+$url = $url->clone->base($url)->parse('/zzz')->to_abs;
+is $url->base,     'http://foo.bar/baz/index.html?yada', 'right base';
+is $url->scheme,   'http',                               'right scheme';
+is $url->userinfo, undef,                                'no userinfo';
+is $url->host,     'foo.bar',                            'right host';
+is $url->port,     undef,                                'no port';
+is $url->path,     '/zzz',                               'right path';
+is $url->query,    '',                                   'no query';
+is $url->fragment, undef,                                'no fragment';
+is "$url", 'http://foo.bar/zzz', 'right absolute URL';
+
+# Merge absolute path with fragment
+$url = Mojo::URL->new('http://foo.bar/baz/index.html?yada#test1');
+is $url->base,     '',                'no base';
+is $url->scheme,   'http',            'right scheme';
+is $url->userinfo, undef,             'no userinfo';
+is $url->host,     'foo.bar',         'right host';
+is $url->port,     undef,             'no port';
+is $url->path,     '/baz/index.html', 'right path';
+is $url->query,    'yada',            'right query';
+is $url->fragment, 'test1',           'right fragment';
+is "$url", 'http://foo.bar/baz/index.html?yada#test1', 'right absolute URL';
+$url->base(undef);
+$url = $url->clone->base($url)->parse('/zzz#test2')->to_abs;
+is $url->base,     'http://foo.bar/baz/index.html?yada#test1', 'right base';
+is $url->scheme,   'http',                                     'right scheme';
+is $url->userinfo, undef,                                      'no userinfo';
+is $url->host,     'foo.bar',                                  'right host';
+is $url->port,     undef,                                      'no port';
+is $url->path,     '/zzz',                                     'right path';
+is $url->query,    '',                                         'right query';
+is $url->fragment, 'test2', 'right fragment';
+is "$url", 'http://foo.bar/zzz#test2', 'right absolute URL';
+
+# Merge relative path with fragment
+$url = Mojo::URL->new('http://foo.bar/baz/index.html?yada#test1');
+is $url->base,     '',                'no base';
+is $url->scheme,   'http',            'right scheme';
+is $url->userinfo, undef,             'no userinfo';
+is $url->host,     'foo.bar',         'right host';
+is $url->port,     undef,             'no port';
+is $url->path,     '/baz/index.html', 'right path';
+is $url->query,    'yada',            'right query';
+is $url->fragment, 'test1',           'right fragment';
+is "$url", 'http://foo.bar/baz/index.html?yada#test1', 'right absolute URL';
+$url->base(undef);
+$url = $url->clone->base($url)->parse('zzz#test2')->to_abs;
+is $url->base,     'http://foo.bar/baz/index.html?yada#test1', 'right base';
+is $url->scheme,   'http',                                     'right scheme';
+is $url->userinfo, undef,                                      'no userinfo';
+is $url->host,     'foo.bar',                                  'right host';
+is $url->port,     undef,                                      'no port';
+is $url->path,     '/baz/zzz',                                 'right path';
+is $url->query,    '',                                         'right query';
+is $url->fragment, 'test2', 'right fragment';
+is "$url", 'http://foo.bar/baz/zzz#test2', 'right absolute URL';
+
+# Merge absolute path without fragment
+$url = Mojo::URL->new('http://foo.bar/baz/index.html?yada#test1');
+is $url->base,     '',                'no base';
+is $url->scheme,   'http',            'right scheme';
+is $url->userinfo, undef,             'no userinfo';
+is $url->host,     'foo.bar',         'right host';
+is $url->port,     undef,             'no port';
+is $url->path,     '/baz/index.html', 'right path';
+is $url->query,    'yada',            'right query';
+is $url->fragment, 'test1',           'right fragment';
+is "$url", 'http://foo.bar/baz/index.html?yada#test1', 'right absolute URL';
+$url->base(undef);
+$url = $url->clone->base($url)->parse('/zzz')->to_abs;
+is $url->base,     'http://foo.bar/baz/index.html?yada#test1', 'right base';
+is $url->scheme,   'http',                                     'right scheme';
+is $url->userinfo, undef,                                      'no userinfo';
+is $url->host,     'foo.bar',                                  'right host';
+is $url->port,     undef,                                      'no port';
+is $url->path,     '/zzz',                                     'right path';
+is $url->query,    '',                                         'right query';
+is $url->fragment, undef,                                      'no fragment';
+is "$url", 'http://foo.bar/zzz', 'right absolute URL';
+
+# Merge relative path without fragment
+$url = Mojo::URL->new('http://foo.bar/baz/index.html?yada#test1');
+is $url->base,     '',                'no base';
+is $url->scheme,   'http',            'right scheme';
+is $url->userinfo, undef,             'no userinfo';
+is $url->host,     'foo.bar',         'right host';
+is $url->port,     undef,             'no port';
+is $url->path,     '/baz/index.html', 'right path';
+is $url->query,    'yada',            'right query';
+is $url->fragment, 'test1',           'right fragment';
+is "$url", 'http://foo.bar/baz/index.html?yada#test1', 'right absolute URL';
+$url->base(undef);
+$url = $url->clone->base($url)->parse('zzz')->to_abs;
+is $url->base,     'http://foo.bar/baz/index.html?yada#test1', 'right base';
+is $url->scheme,   'http',                                     'right scheme';
+is $url->userinfo, undef,                                      'no userinfo';
+is $url->host,     'foo.bar',                                  'right host';
+is $url->port,     undef,                                      'no port';
+is $url->path,     '/baz/zzz',                                 'right path';
+is $url->query,    '',                                         'right query';
+is $url->fragment, undef,                                      'no fragment';
+is "$url", 'http://foo.bar/baz/zzz', 'right absolute URL';

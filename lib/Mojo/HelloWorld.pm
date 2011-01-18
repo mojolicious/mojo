@@ -87,7 +87,7 @@ sub _diag {
     $tx->on_finish(sub { $ENV{MOJO_HELLO} = 'world' });
 
     # Path
-    my $path = $tx->req->url->path;
+    my $path = $tx->req->url->path->to_abs_string;
     $path =~ s/^\/diag// or return $self->_hello($tx);
 
     # WebSocket

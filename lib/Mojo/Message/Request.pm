@@ -320,40 +320,14 @@ sub _parse_env {
     my $bb = $bpath->to_string;
     my $ub = $upath->to_string;
 
-    # IIS is so fucked up, nobody should ever have to use it...
-    my $software = $env->{SERVER_SOFTWARE} || '';
-    if ($software =~ /IIS\/\d+/ && $env->{SCRIPT_NAME} eq $env->{PATH_INFO}) {
-
-        # This is a horrible hack, just like IIS itself
-        if (my $t = $env->{PATH_TRANSLATED}) {
-            my @p = split /\//,    $ub;
-            my @t = split /\\\\?/, $t;
-
-            # Try to generate correct PATH_INFO and SCRIPT_NAME
-            my @n;
-            while (defined(my $p = $p[$#p])) {
-                $p ||= '';
-                my $t = $t[$#t] || '';
-                last unless $p eq $t;
-                pop @t;
-                unshift @n, pop @p;
-            }
-
-            $bb = join '/', @p;
-            $ub = join '/', @n;
-
-            $bpath->parse($bb);
-            $upath->parse($ub);
-        }
-    }
-
-    # Fix paths for normal screwed up CGI environments
-    if (defined($ub) && defined($bb)) {
+    # Fix paths for broken CGI environments
+    if (defined $ub && defined $bb && length $bb) {
 
         # Remove SCRIPT_NAME prefix if it's there
         $bb =~ s/^\///;
         $bb =~ s/\/$//;
         $ub =~ s/^\/?$bb\/?//;
+        $ub =~ s/^\///;
 
         $upath->parse($ub);
     }

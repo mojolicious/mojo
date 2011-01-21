@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 901;
+use Test::More tests => 902;
 
 use File::Spec;
 use File::Temp;
@@ -1486,14 +1486,13 @@ is $req->url->to_abs->to_string,
 $file = $req->upload('file');
 is $file->slurp, '11023456789', 'right uploaded content';
 
-# Parse Apache 2.2.9 like CGI environment variables (random file with & w/o mod_rewrite)
-## RewriteRule ^(.*)$ monkey.cgi/$1 [L]
+# Parse Apache 2.2.9 like CGI environment variables with mod_rewrite
+# (random file and "RewriteRule ^(.*)$ monkey.cgi/$1 [L]")
 $req = Mojo::Message::Request->new;
 $req->parse(
     HTTP_CONNECTION => 'keep-alive',
-    HTTP_HOST       => 'dev.bob.com',
+    HTTP_HOST       => 'kraih.com',
     QUERY_STRING    => '',
-    REDIRECT_URL    => '/sandbox-myapp/feed/bannana', #Apache creates this, not used by Mojo afaik
     REQUEST_METHOD  => 'GET',
     REQUEST_URI     => '/sandbox-myapp/feed/bannana',
     SCRIPT_NAME     => '/sandbox-myapp/monkey.cgi',
@@ -1502,62 +1501,48 @@ $req->parse(
 );
 ok $req->is_done, 'request is done';
 is $req->method, 'GET', 'right method';
-is $req->url->base->host, 'dev.bob.com', 'right base host';
+is $req->url->base->host, 'kraih.com', 'right base host';
 is $req->url->path, 'feed/bannana', 'right path';
-is $req->url->base->path, '/sandbox-myapp/monkey.cgi/',
-  'right base path';
+is $req->url->base->path, '/sandbox-myapp/monkey.cgi/', 'right base path';
 is $req->version, '1.1', 'right version';
 is $req->at_least_version('1.0'), 1,     'at least version 1.0';
 is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->url->to_abs->to_string,
-  'http://dev.bob.com/sandbox-myapp/monkey.cgi/feed/bannana',
+  'http://kraih.com/sandbox-myapp/monkey.cgi/feed/bannana',
   'right absolute URL';
-# and if the base is being rewritten with mod_rewrite.. ?
-is $req->url->base(Mojo::URL->new(
-   q{http://dev.bob.com/sandbox-myapp/})),
-   'feed/bannana',
-  'right relative URL';
+ok $req->url->base->parse('http://kraih.com/sandbox-myapp/'), 'rewritten';
+is $req->url, 'feed/bannana', 'right relative URL';
 is $req->url->to_abs->to_string,
-  'http://dev.bob.com/sandbox-myapp/feed/bannana',
+  'http://kraih.com/sandbox-myapp/feed/bannana',
   'right absolute URL';
 
-# Parse Apache 2.2.9 like CGI environment variables (root with & w/o mod_rewrite)
-## RewriteRule ^(.*)$ monkey.cgi/$1 [L]
+# Parse Apache 2.2.9 like CGI environment variables with mod_rewrite
+# (root and "RewriteRule ^(.*)$ monkey.cgi/$1 [L]")
 $req = Mojo::Message::Request->new;
 $req->parse(
     HTTP_CONNECTION => 'keep-alive',
-    HTTP_HOST       => 'dev.bob.com',
+    HTTP_HOST       => 'kraih.com',
     QUERY_STRING    => '',
     REQUEST_METHOD  => 'GET',
     REQUEST_URI     => '/sandbox-myapp/',
     SCRIPT_NAME     => '/sandbox-myapp/monkey.cgi',
-    PATH_INFO       => undef,
     SERVER_PROTOCOL => 'HTTP/1.1',
 );
 ok $req->is_done, 'request is done';
 is $req->method, 'GET', 'right method';
-is $req->url->base->host, 'dev.bob.com', 'right base host';
+is $req->url->base->host, 'kraih.com', 'right base host';
 is $req->url->path, '', 'right path';
-is $req->url->base->path, '/sandbox-myapp/monkey.cgi/',
-  'right base path';
+is $req->url->base->path, '/sandbox-myapp/monkey.cgi/', 'right base path';
 is $req->version, '1.1', 'right version';
 is $req->at_least_version('1.0'), 1,     'at least version 1.0';
 is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->url->to_abs->to_string,
-  'http://dev.bob.com/sandbox-myapp/monkey.cgi',
+  'http://kraih.com/sandbox-myapp/monkey.cgi',
   'right absolute URL';
-## $self->hook(before_dispatch => sub {
-##     $_[0]->req->url->base(Mojo::URL->new(q{http://...com/sandbox-myapp/}))
-## }
-ok $req->url->base(Mojo::URL->new(q{http://dev.bob.com/sandbox-myapp/})),
-  'set rewritten url base-path';
-is $req->url->base->path,
-  '/sandbox-myapp/',
-  'right base path after rewrite';
-is $req->url->to_abs->to_string,
-  'http://dev.bob.com/sandbox-myapp',
-  'right absolute URL after rewrite';
-
+ok $req->url->base->parse('http://kraih.com/sandbox-myapp/'), 'rewritten';
+is $req->url->base->path, '/sandbox-myapp/', 'right base path';
+is $req->url->to_abs->to_string, 'http://kraih.com/sandbox-myapp',
+  'right absolute URL';
 
 # Parse response with cookie
 $res = Mojo::Message::Response->new;

@@ -176,18 +176,39 @@ required for L<Mojolicious> L<PSGI> detection.
 
 When we say L<Mojolicious> is a web framework we actually mean it.
 
-=head2 Streaming
+=head2 Streaming Response
 
 Receiving a streaming response can be really tricky in most HTTP clients,
 L<Mojo::Client> makes it actually easy.
 
     my $client = Mojo::Client->new;
-    my $tx = $client->build_tx(GET => 'http://mojolicio.us');
+    my $tx     = $client->build_tx(GET => 'http://mojolicio.us');
     $tx->res->body(sub { print $_[1] });
     $client->start($tx);
 
 The C<body> callback will be called for every chunk of data that is received,
 even C<chunked> encoding will be handled transparently if neccessary.
+
+=head2 Streaming Request
+
+Sending a streaming request is almost just as easy.
+
+    my $client  = Mojo::Client->new;
+    my $tx      = $client->build_tx(GET => 'http://mojolicio.us');
+    my $content = 'Hello world!';
+    $tx->req->headers->content_length(length $content);
+    my $drain;
+    $drain = sub {
+        my $req   = shift;
+        my $chunk = substr $content, 0, 1, '';
+        $drain    = undef unless length $content;
+        $req->write($chunk, $drain);
+    };
+    $drain->($tx->req);
+    $client->start($tx);
+
+The drain callback passed to C<write> will be invoked whenever the entire
+previous chunk has been written to the kernel send buffer.
 
 =head1 JAVASCRIPT
 

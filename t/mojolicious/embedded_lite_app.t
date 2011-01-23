@@ -41,6 +41,7 @@ get '/bye' => sub {
     my $self  = shift;
     my $name  = $self->stash('name');
     my $async = '';
+    $self->render_later;
     $self->client->async->get(
         '/hello/hello' => sub {
             my $client = shift;

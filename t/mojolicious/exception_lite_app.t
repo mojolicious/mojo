@@ -17,10 +17,10 @@ use Test::Mojo;
 app->renderer->root(app->home->rel_dir('does_not_exist'));
 
 # GET /dead_template
-get '/dead_template' => '*';
+get '/dead_template';
 
 # GET /dead_included_template
-get '/dead_included_template' => '*';
+get '/dead_included_template';
 
 # GET /dead_action
 get '/dead_action' => sub { die 'dead action!' };

@@ -35,7 +35,7 @@ sub startup {
     my $r = $self->routes;
 
     # Empty route
-    $r->route('/empty')->name('*');
+    $r->route('/empty');
 
     # /auth (authentication bridge)
     my $auth = $r->bridge('/auth')->to(

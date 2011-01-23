@@ -133,6 +133,7 @@ my $longpoll_static_delayed;
 get '/longpoll/static/delayed' => sub {
     my $self = shift;
     $self->on_finish(sub { $longpoll_static_delayed = 'finished!' });
+    $self->render_later;
     $self->client->async->ioloop->timer(
         '0.5' => sub { $self->render_static('hello.txt') });
 };

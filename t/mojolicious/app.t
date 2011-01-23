@@ -89,7 +89,7 @@ $t->get_ok('/somethingtest', {'X-Test' => 'Hi there!'})->status_is(200)
 $t->get_ok('/something_missing', {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('something_missing');
+  ->content_is('does_not_exist');
 
 # Foo::templateless
 $t->get_ok('/foo/templateless', {'X-Test' => 'Hi there!'})->status_is(200)

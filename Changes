@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.02 2011-01-06 00:00:00
+        - Deprecated wildcard route names in favor of automatically generated
+          default names for all routes.
         - Removed native IIS support since it has become unmaintainable.
         - Added EXPERIMENTAL much prettier attribute generator to Mojo::Base.
         - Added EXPERIMNETAL on_start attribute to Mojo::Client.

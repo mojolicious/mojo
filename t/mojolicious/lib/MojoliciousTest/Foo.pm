@@ -61,8 +61,7 @@ sub test {
 
 sub url_for_missing {
     my $self = shift;
-    $self->render_text(
-        $self->url_for('something_missing', something => '42'));
+    $self->render_text($self->url_for('does_not_exist', something => '42'));
 }
 
 sub willdie { die 'for some reason' }

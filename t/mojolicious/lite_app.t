@@ -160,7 +160,7 @@ get ':number' => [number => qr/0/] => sub {
 get 'tags/:test' => 'tags';
 
 # PUT /selection
-put 'selection' => '*';
+put 'selection';
 
 # DELETE /inline/epl
 del '/inline/epl' => sub { shift->render(inline => '<%= 1 + 1%>') };
@@ -226,7 +226,7 @@ post '/with/body/and/headers/desc' => sub {
 };
 
 # GET /content_for
-get '/content_for' => '*';
+get '/content_for';
 
 # GET /template_inheritance
 get '/template_inheritance' => sub { shift->render('template_inheritance') };
@@ -378,11 +378,10 @@ get '/json' =>
   sub { shift->render_json({foo => [1, -2, 3, 'b☃r']}, layout => 'layout') };
 
 # GET /autostash
-get '/autostash' => sub { shift->render(handler => 'ep', foo => 'bar') } =>
-  '*';
+get '/autostash' => sub { shift->render(handler => 'ep', foo => 'bar') };
 
 # GET /app
-get '/app' => {layout => 'app'} => '*';
+get '/app' => {layout => 'app'};
 
 # GET /helper
 get '/helper' => sub { shift->render(handler => 'ep') } => 'helper';
@@ -430,6 +429,7 @@ app->hook(after_dispatch => sub { shift->stash->{async} = 'broken!' });
 my $async;
 get '/subrequest_async' => sub {
     my $self = shift;
+    $self->render_later;
     $self->client->async->post(
         '/template' => sub {
             my $client = shift;
@@ -458,12 +458,12 @@ get '/redirect_named' => sub {
 # GET /redirect_no_render
 get '/redirect_no_render' => sub {
     shift->redirect_to('index', format => 'txt');
-} => '*';
+};
 
 # GET /static_render
 get '/static_render' => sub {
     shift->render_static('hello.txt');
-} => '*';
+};
 
 # GET /koi8-r
 app->types->type('koi8-r' => 'text/html; charset=koi8-r');
@@ -553,7 +553,7 @@ under sub {
 };
 
 # GET /param_auth
-get '/param_auth' => '*';
+get '/param_auth';
 
 # GET /param_auth/too
 get '/param_auth/too' =>
@@ -580,7 +580,7 @@ under sub {
 };
 
 # GET /with_under_count
-get '/with/under/count' => '*';
+get '/with/under/count';
 
 # Everything gets past this
 under sub {

@@ -187,21 +187,26 @@ sub is_websocket {
 # Dr. Zoidberg, can you note the time and declare the patient legally dead?
 # Can I! That’s my specialty!
 sub name {
-    my ($self, $name) = @_;
+    my $self = shift;
 
     # New name
-    if (defined $name) {
+    if (defined $_[0]) {
 
-        # Generate
-        if ($name eq '*') {
-            $name = $self->pattern->pattern;
-            $name =~ s/\W+//g;
+        # DEPRECATED in Snowflake!
+        if ($_[0] eq '*') {
+            warn <<EOF;
+Wildcard names are DEPRECATED, all routes have an automatically generated name now.
+EOF
         }
-        $self->{_name} = $name;
+        else { $self->{_name} = $_[0] }
 
         return $self;
     }
 
+    # Nothing
+    elsif (@_) { return $self }
+
+    # Name
     return $self->{_name};
 }
 
@@ -223,6 +228,12 @@ sub parse {
 
     # Pattern does the real work
     $self->pattern->parse(@_);
+
+    # Default name
+    if (defined(my $name = $self->pattern->pattern)) {
+        $name =~ s/\W+//g;
+        $self->{_name} = $name;
+    }
 
     return $self;
 }
@@ -586,9 +597,6 @@ sub _generate_route {
     $defaults ||= {};
     $defaults->{cb} = $cb if $cb;
 
-    # Name
-    $name ||= '';
-
     # Create bridge
     return $self->bridge($pattern, {@$constraints})->over($conditions)
       ->to($defaults)->name($name)
@@ -897,9 +905,8 @@ Returns true if this route leads to a WebSocket.
 
     my $name = $r->name;
     $r       = $r->name('foo');
-    $r       = $r->name('*');
 
-The name of this route, the special value C<*> will generate a name based on
+The name of this route, defaults to an automatically generated name based on
 the route pattern.
 Note that the name C<current> is reserved for refering to the current route.
 

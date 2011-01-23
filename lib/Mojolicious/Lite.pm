@@ -181,14 +181,14 @@ C<DATA> section.
 All routes can have a name associated with them, this allows automatic
 template detection and back referencing with C<url_for>, C<link_to> and
 C<form_for>.
-Names are always the last argument, the value C<*> means that the name is
-simply equal to the route without non-word characters.
+Nameless routes get an automatically generated one assigned that is simply
+equal to the route itself without non-word characters.
 
     # /
     get '/' => 'index';
 
     # /hello
-    get '/hello' => '*';
+    get '/hello';
 
     __DATA__
 
@@ -304,7 +304,7 @@ L<Mojolicious::Plugin::TagHelpers>.
         my $self = shift;
         my $user = $self->whois;
         $self->app->log->debug("Request from $user.");
-    } => '*';
+    };
 
     __DATA__
 

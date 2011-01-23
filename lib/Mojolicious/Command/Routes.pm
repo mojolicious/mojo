@@ -32,10 +32,12 @@ sub _draw {
     my ($self, $routes) = @_;
 
     # Length
-    my $length = 0;
+    my $pl = my $nl = 0;
     for my $node (@$routes) {
         my $l = length $node->[0];
-        $length = $l if $l > $length;
+        $pl = $l if $l > $pl;
+        my $l2 = length($node->[1]->name || '');
+        $nl = $l2 if $l2 > $nl;
     }
 
     # Draw
@@ -45,12 +47,16 @@ sub _draw {
         $node->[1]->pattern->_compile;
         my $regex = $node->[1]->pattern->regex;
 
-        # Padding
-        my $name = $node->[0];
-        my $padding = ' ' x ($length - length $name);
+        # Pattern
+        my $pattern = $node->[0];
+        my $pp = ' ' x ($pl - length $pattern);
+
+        # Name
+        my $name = $node->[1]->name;
+        my $np = ' ' x ($nl - length $name);
 
         # Print
-        print "$name$padding   $regex\n";
+        print "$pattern$pp    $name$np   $regex\n";
     }
 }
 

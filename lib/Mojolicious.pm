@@ -217,7 +217,7 @@ sub handler {
 
     # Defaults
     my $defaults = $self->defaults;
-    $stash = {%$stash, %$defaults};
+    @{$stash}{keys %$defaults} = values %$defaults;
 
     # Build default controller and process
     eval {

@@ -569,17 +569,11 @@ sub render_text {
 sub rendered {
     my $self = shift;
 
-    # Resume
-    $self->tx->resume;
-
     # Disable auto rendering
     $self->render_later;
 
-    # Stash
-    my $stash = $self->stash;
-
     # Already finished
-    return $self if $stash->{'mojo.finished'};
+    return $self->finish_render if $self->stash->{'mojo.finished'};
 
     # Application
     my $app = $self->app;
@@ -590,10 +584,20 @@ sub rendered {
     # Session
     $app->sessions->store($self);
 
-    # Finished
-    $stash->{'mojo.finished'} = 1;
+    # Finish
+    $self->finish_render;
+}
 
-    return $self;
+sub finish_render {
+    my $self = shift;
+
+    # Resume transaction
+    $self->tx->resume;
+
+    # Finished
+    $self->stash->{'mojo.finished'} = 1;
+
+    $self;
 }
 
 sub req { shift->tx->req }
@@ -1385,6 +1389,12 @@ See C<render_data> for an alternative without encoding.
     $c->rendered;
 
 Finalize response and run C<after_dispatch> plugin hook.
+
+=head2 C<finish_render>
+
+    $c->finish_render;
+
+Output transaction response to client.
 
 =head2 C<req>
 

@@ -8,7 +8,7 @@ use utf8;
 # Disable epoll and kqueue
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 714;
+use Test::More tests => 720;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -310,6 +310,24 @@ get '/session_cookie/2' => sub {
     my $session = $self->req->cookie('session');
     my $value   = $session ? $session->value : 'missing';
     $self->render_text("Session is $value!");
+};
+
+my $delayed_controller;
+
+# GET /session_cookie/delayed
+get '/session_cookie/delayed' => sub {
+    my $self = shift;
+    $self->res->cookies(
+        Mojo::Cookie::Response->new(
+            path  => '/session_cookie/delayed',
+            name  => 'session',
+            value => '42'
+        )
+    );
+
+    # Store controller for later render
+    $delayed_controller = $self;
+    $self->render_later;
 };
 
 # GET /foo
@@ -1167,6 +1185,18 @@ $t->get_ok('/session_cookie/2')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('Session is missing!');
+
+# GET /session_cookie/delayed
+app->client->ioloop->timer(
+    '0.1' => sub {
+        $delayed_controller->render_text("Delayed response");
+    }
+);
+
+$t->get_ok('/session_cookie/delayed')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('Delayed response')->header_like('Set-Cookie' => qr/session=42/);
 
 # GET /foo
 $t->get_ok('/foo')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')

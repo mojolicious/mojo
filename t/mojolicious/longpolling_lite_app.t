@@ -153,10 +153,14 @@ my $longpoll_dynamic_delayed;
 get '/longpoll/dynamic/delayed' => sub {
     my $self = shift;
     $self->on_finish(sub { $longpoll_dynamic_delayed = 'finished!' });
-    $self->cookie(baz => 'yada');
     $self->render_later;
     $self->client->async->ioloop->timer(
-        '0.5' => sub { $self->res->body('Dynamic!'); $self->rendered });
+        '0.5' => sub {
+            $self->cookie(baz => 'yada');
+            $self->res->body('Dynamic!');
+            $self->rendered;
+        }
+    );
 } => 'dynamic';
 
 # GET /too_long

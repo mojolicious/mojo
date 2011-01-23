@@ -6,7 +6,7 @@ use warnings;
 # Disable epoll and kqueue
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 76;
+use Test::More tests => 85;
 
 # I was God once.
 # Yes, I saw. You were doing well until everyone died.
@@ -60,6 +60,7 @@ get '/longpoll/nested' => sub {
     $self->on_finish(sub { $longpoll_nested = 'finished!' });
     $self->res->code(200);
     $self->res->headers->content_type('text/plain');
+    $self->cookie(foo => 'bar');
     $self->write_chunk(
         sub {
             shift->write_chunk('nested!', sub { shift->write_chunk('') });
@@ -141,10 +142,22 @@ my $longpoll_static_delayed_too;
 get '/longpoll/static/delayed_too' => sub {
     my $self = shift;
     $self->on_finish(sub { $longpoll_static_delayed_too = 'finished!' });
+    $self->cookie(bar => 'baz');
     $self->render_later;
     $self->client->async->ioloop->timer(
         '0.5' => sub { $self->render_static('hello.txt') });
 } => 'delayed_too';
+
+# GET /longpoll/dynamic/delayed
+my $longpoll_dynamic_delayed;
+get '/longpoll/dynamic/delayed' => sub {
+    my $self = shift;
+    $self->on_finish(sub { $longpoll_dynamic_delayed = 'finished!' });
+    $self->cookie(baz => 'yada');
+    $self->render_later;
+    $self->client->async->ioloop->timer(
+        '0.5' => sub { $self->res->body('Dynamic!'); $self->rendered });
+} => 'dynamic';
 
 # GET /too_long
 my $too_long;
@@ -234,7 +247,8 @@ is $buffer, 'hi ', 'right content';
 $t->get_ok('/longpoll/nested')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_type_is('text/plain')->content_is('nested!');
+  ->header_like('Set-Cookie' => qr/foo=bar/)->content_type_is('text/plain')
+  ->content_is('nested!');
 is $longpoll_nested, 'finished!', 'finished';
 
 # GET /longpoll/plain
@@ -270,9 +284,16 @@ is $longpoll_static_delayed, 'finished!', 'finished';
 $t->get_ok('/longpoll/static/delayed_too')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_type_is('text/plain')
+  ->header_like('Set-Cookie' => qr/bar=baz/)->content_type_is('text/plain')
   ->content_is('Hello Mojo from a static file!');
 is $longpoll_static_delayed_too, 'finished!', 'finished';
+
+# GET /longpoll/dynamic/delayed
+$t->get_ok('/longpoll/dynamic/delayed')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->header_like('Set-Cookie' => qr/baz=yada/)->content_is('Dynamic!');
+is $longpoll_dynamic_delayed, 'finished!', 'finished';
 
 # GET /too_long (timeout)
 $tx = $t->client->keep_alive_timeout(1)->build_tx(GET => '/too_long');

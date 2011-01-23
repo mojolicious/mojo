@@ -68,7 +68,12 @@ sub _walk {
     # Line
     my $pattern = $node->pattern->pattern || '/';
     my $name    = $node->name;
-    my $line    = ' ' x ($depth * 4);
+    my $line    = '';
+    my $i       = $depth * 4;
+    if ($i) {
+        $line .= ' ' x $i;
+        $line .= '+ ';
+    }
     $line .= $pattern;
 
     # Store

@@ -224,7 +224,22 @@ Sending a streaming request is almost just as easy.
 The drain callback passed to C<write> will be invoked whenever the entire
 previous chunk has been written to the kernel send buffer.
 
-=head1 JAVASCRIPT
+=head1 HACKS
+
+Fun hacks you might not use very often but that might come in handy some day.
+
+=head2 Hello World
+
+If every byte matters this is the smallest C<Hello World> application you can
+write with L<Mojolicious::Lite>.
+
+    use Mojolicious::Lite;
+    get '/' => {text => 'Hello World!'};
+    app->start;
+
+It works because automatic rendering kicks in even if no actual code gets
+executed by the router, the renderer just picks up the C<text> value from the
+stash and generates a response.
 
 =head2 jQuery (Content Distribution Network)
 
@@ -242,22 +257,5 @@ time to time.
             document.getElementsByTagName("head")[0].appendChild(e);
         }
     <% end %>
-
-=head1 HACKS
-
-Fun hacks you might not use very often but that might come in handy some day.
-
-=head2 Hello World
-
-If every byte matters this is the smallest C<Hello World> application you can
-write with L<Mojolicious::Lite>.
-
-    use Mojolicious::Lite;
-    get '/' => {text => 'Hello World!'};
-    app->start;
-
-It works because automatic rendering kicks in even if no actual code gets
-executed by the router, the renderer just picks up the C<text> value from the
-stash and generates a response.
 
 =cut

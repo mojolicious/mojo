@@ -53,6 +53,7 @@ sub _draw {
 
         # Name
         my $name = $node->[1]->name;
+        $name = '' unless defined $name;
         my $np = ' ' x ($nl - length $name);
 
         # Print

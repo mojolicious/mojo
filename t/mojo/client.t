@@ -97,7 +97,7 @@ my $id = $client->ioloop->listen(
     }
 );
 
-# Broken server (missing Content-Length header)
+# Wonky server (missing Content-Length header)
 my $port2   = $client->ioloop->generate_port;
 my $buffer2 = {};
 $client->ioloop->listen(
@@ -157,8 +157,8 @@ is $body,    'works!', 'right content';
 
 # GET / (missing Content-Lengt header)
 $tx = $client->get("http://localhost:$port2/");
-ok !$tx->success, 'not successful';
-is $tx->error, 'Interrupted, maybe a timeout?', 'right error';
+ok $tx->success, 'successful';
+ok !$tx->error, 'no error';
 is $tx->kept_alive, undef, 'kept connection not alive';
 is $tx->keep_alive, 0,     'keep connection not alive';
 is $tx->res->code, 200,          'right status';

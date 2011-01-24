@@ -156,7 +156,7 @@ sub parse {
     # Still parsing headers
     return $self if $self->{_state} eq 'headers';
 
-    # Relaxed parsing for old or broken web servers
+    # Relaxed parsing for wonky web servers
     if ($self->auto_relax) {
         my $headers    = $self->headers;
         my $connection = $headers->connection || '';

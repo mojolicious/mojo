@@ -244,7 +244,7 @@ time.
         my $num = shift;
 
         # Dequeue or wait for more URLs
-        return $client->ioloop->timer(2 => sub { $crawl->($num) })
+        return $client->async->ioloop->timer(2 => sub { $crawl->($num) })
           unless my $url = shift @urls;
 
         # Fetch

@@ -233,7 +233,7 @@ useful, because you can keep many parallel connections active at the same
 time.
 
     # FIFO queue
-    my @urls = qw/mojolicio.us/;
+    my @urls = qw/google.com/;
 
     # Client following up to 5 redirects
     my $client = Mojo::Client->new(max_redirects => 5);

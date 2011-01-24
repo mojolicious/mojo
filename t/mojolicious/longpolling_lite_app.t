@@ -6,7 +6,7 @@ use warnings;
 # Disable epoll and kqueue
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 85;
+use Test::More tests => 86;
 
 # I was God once.
 # Yes, I saw. You were doing well until everyone died.
@@ -144,6 +144,7 @@ get '/longpoll/static/delayed_too' => sub {
     my $self = shift;
     $self->on_finish(sub { $longpoll_static_delayed_too = 'finished!' });
     $self->cookie(bar => 'baz');
+    $self->session(foo => 'bar');
     $self->render_later;
     $self->client->async->ioloop->timer(
         '0.5' => sub { $self->render_static('hello.txt') });
@@ -289,7 +290,9 @@ is $longpoll_static_delayed, 'finished!', 'finished';
 $t->get_ok('/longpoll/static/delayed_too')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->header_like('Set-Cookie' => qr/bar=baz/)->content_type_is('text/plain')
+  ->header_like('Set-Cookie' => qr/bar=baz/)
+  ->header_like('Set-Cookie' => qr/mojolicious=/)
+  ->content_type_is('text/plain')
   ->content_is('Hello Mojo from a static file!');
 is $longpoll_static_delayed_too, 'finished!', 'finished';
 

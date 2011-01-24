@@ -569,9 +569,6 @@ sub render_text {
 sub rendered {
     my $self = shift;
 
-    # Resume
-    $self->tx->resume;
-
     # Disable auto rendering
     $self->render_later;
 
@@ -579,19 +576,23 @@ sub rendered {
     my $stash = $self->stash;
 
     # Already finished
-    return $self if $stash->{'mojo.finished'};
+    unless ($stash->{'mojo.finished'}) {
 
-    # Application
-    my $app = $self->app;
+        # Application
+        my $app = $self->app;
 
-    # Hook
-    $app->plugins->run_hook_reverse(after_dispatch => $self);
+        # Hook
+        $app->plugins->run_hook_reverse(after_dispatch => $self);
 
-    # Session
-    $app->sessions->store($self);
+        # Session
+        $app->sessions->store($self);
 
-    # Finished
-    $stash->{'mojo.finished'} = 1;
+        # Finished
+        $stash->{'mojo.finished'} = 1;
+    }
+
+    # Resume
+    $self->tx->resume;
 
     return $self;
 }

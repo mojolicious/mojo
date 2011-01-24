@@ -241,10 +241,10 @@ time.
     # Crawler
     my $crawl;
     $crawl = sub {
-        my $num = shift;
+        my $id = shift;
 
         # Dequeue or wait for more URLs
-        return $client->async->ioloop->timer(2 => sub { $crawl->($num) })
+        return $client->async->ioloop->timer(2 => sub { $crawl->($id) })
           unless my $url = shift @urls;
 
         # Fetch
@@ -252,7 +252,7 @@ time.
             my $tx = pop;
 
             # Extract URLs
-            print "[$num] $url\n";
+            print "[$id] $url\n";
             $tx->res->dom('a[href]')->each(sub {
 
                 # Build absolute URL
@@ -265,7 +265,7 @@ time.
             });
 
             # Next
-            $crawl->($num);
+            $crawl->($id);
         })->start;
     };
 

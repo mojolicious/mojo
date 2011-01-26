@@ -24,8 +24,8 @@ use_ok 'MojoliciousTest';
 
 my $t = Test::Mojo->new(app => 'MojoliciousTest');
 
-# Foo::badtemplate (template missing)
-$t->get_ok('/foo/badtemplate')->status_is(404)
+# Foo::baz (missing action)
+$t->get_ok('/foo/baz')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/Not Found/);

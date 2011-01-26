@@ -39,7 +39,7 @@ $t->get_ok('/hello.txt')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/Hello Mojo from a static file!/);
 
-# Foo::bar in production mode (non existing action)
+# Foo::bar in production mode (missing action)
 $t->get_ok('/foo/baz')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')

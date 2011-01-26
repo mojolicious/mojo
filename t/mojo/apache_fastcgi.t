@@ -7,7 +7,7 @@ use warnings;
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
 # mod_fastcgi doesn't like small chunks
-BEGIN { $ENV{MOJO_CHUNK_SIZE} = 262144 }
+BEGIN { $ENV{MOJO_CHUNK_SIZE} = 256000 }
 
 use Test::More;
 

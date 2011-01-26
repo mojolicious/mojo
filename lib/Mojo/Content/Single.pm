@@ -69,7 +69,7 @@ sub parse {
     if ($asset->isa('Mojo::Asset::Memory')) {
 
         # Upgrade to file based storage on demand
-        if ($asset->size > ($ENV{MOJO_MAX_MEMORY_SIZE} || 262144)) {
+        if ($asset->size > ($ENV{MOJO_MAX_MEMORY_SIZE} || 256000)) {
             $self->asset(Mojo::Asset::File->new->add_chunk($asset->slurp));
         }
     }

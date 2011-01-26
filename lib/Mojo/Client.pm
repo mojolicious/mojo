@@ -1377,13 +1377,13 @@ you can quickly run out of file descriptors with too many active clients.
     my $tx = $client->build_form_tx(
         'http://kraih.com/foo',
         {test => 123},
-        {Expect => 'fun'}
+        {Connection => 'close'}
     );
     my $tx = $client->build_form_tx(
         'http://kraih.com/foo',
         'UTF-8',
         {test => 123},
-        {Expect => 'fun'}
+        {Connection => 'close'}
     );
     my $tx = $client->build_form_tx(
         'http://kraih.com/foo',
@@ -1605,13 +1605,13 @@ L<Mojo::Transaction::HTTP> object returned if no callback is given.
     my $tx  = $client->post_form(
         'http://kraih.com/foo',
         {test => 123},
-        {Expect => 'fun'}
+        {Connection => 'close'}
     );
     my $tx  = $client->post_form(
         'http://kraih.com/foo',
         'UTF-8',
         {test => 123},
-        {Expect => 'fun'}
+        {Connection => 'close'}
     );
     my $tx = $client->post_form(
         'http://kraih.com/foo',
@@ -1635,14 +1635,14 @@ L<Mojo::Transaction::HTTP> object returned if no callback is given.
     $client = $client->post_form(
         'http://kraih.com/foo',
         {test => 123},
-        {Expect => 'fun'},
+        {Connection => 'close'},
         sub {...}
     );
     $client = $client->post_form(
         'http://kraih.com/foo',
         'UTF-8',
         {test => 123},
-        {Expect => 'fun'},
+        {Connection => 'close'},
         sub {...}
     );
     $client = $client->post_form(

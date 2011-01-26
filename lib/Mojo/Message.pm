@@ -9,7 +9,7 @@ use Mojo::Parameters;
 use Mojo::Upload;
 use Mojo::Util qw/decode url_unescape/;
 
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 262144;
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 256000;
 
 has content => sub { Mojo::Content::Single->new };
 has default_charset  => 'UTF-8';

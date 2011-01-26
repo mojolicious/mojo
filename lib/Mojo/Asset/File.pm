@@ -169,7 +169,7 @@ sub slurp {
 
     # Slurp
     my $content = '';
-    while ($self->handle->sysread(my $buffer, 262144)) { $content .= $buffer }
+    while ($self->handle->sysread(my $buffer, 256000)) { $content .= $buffer }
 
     return $content;
 }

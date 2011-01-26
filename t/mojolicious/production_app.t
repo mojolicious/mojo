@@ -6,7 +6,7 @@ use warnings;
 # Disable epoll and kqueue
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 21;
+use Test::More tests => 26;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -38,6 +38,12 @@ $t->get_ok('/hello.txt')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/Hello Mojo from a static file!/);
+
+# Foo::bar in production mode (non existing action)
+$t->get_ok('/foo/baz')->status_is(404)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_like(qr/Not Found/);
 
 # Try to access a file which is not under the web root via path
 # traversal in production mode

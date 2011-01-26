@@ -6,7 +6,7 @@ use warnings;
 # Disable epoll and kqueue
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 184;
+use Test::More tests => 189;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -23,6 +23,12 @@ use Mojolicious;
 use_ok 'MojoliciousTest';
 
 my $t = Test::Mojo->new(app => 'MojoliciousTest');
+
+# Foo::badtemplate (template missing)
+$t->get_ok('/foo/badtemplate')->status_is(404)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_like(qr/Not Found/);
 
 # SyntaxError::foo (syntax error in controller)
 $t->get_ok('/syntax_error/foo')->status_is(500)

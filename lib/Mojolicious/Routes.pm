@@ -459,7 +459,8 @@ sub _dispatch_controller {
         if ($method && $app->isa($self->controller_base_class)) {
 
             # Call action
-            $continue = $app->$method if $app->can($method);
+            if ($app->can($method)) { $continue = $app->$method }
+            else                    { $app->render_not_found("->$method") }
 
             # Merge stash
             my $new = $app->stash;

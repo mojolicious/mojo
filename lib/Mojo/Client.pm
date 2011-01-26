@@ -744,33 +744,35 @@ sub _connected {
 sub _drop {
     my ($self, $id) = @_;
 
-    # Keep alive
-    my $tx = $self->{_cs}->{$id}->{tx};
-    if ($tx && $tx->keep_alive && !$tx->error) {
+    # Drop connection
+    my $c = delete $self->{_cs}->{$id};
+
+    # Transaction
+    my $tx = $c->{tx};
+    if ($tx && $tx->keep_alive) {
 
         # Response
         my $res = $tx->res;
 
-        # Don't keep CONNECTed connections alive
-        my $method = $tx->req->method || '';
-        my $code   = $res->code       || '';
-        unless ($method =~ /^connect$/i && $code eq '200') {
+        # Interrupted
+        $res->error('Interrupted, maybe a timeout?') unless $res->is_done;
 
-            # Keep connection alive
-            !$res->is_done && $tx->keep_alive
-              ? $res->error('Interrupted, maybe a timeout?')
-              : $self->_cache(join(':', $self->_tx_info($tx)), $id);
+        # No errors
+        unless ($tx->error) {
+
+            # Keep non-CONNECTed connection alive
+            $self->_cache(join(':', $self->_tx_info($tx)), $id)
+              unless (($tx->req->method || '') =~ /^connect$/i
+                && ($res->code || '') eq '200');
+
+            # Still active
+            return;
         }
     }
 
     # Connection close
-    else {
-        $self->_cache($id);
-        $self->ioloop->drop($id);
-    }
-
-    # Drop connection
-    delete $self->{_cs}->{$id};
+    $self->_cache($id);
+    $self->ioloop->drop($id);
 }
 
 sub _error {

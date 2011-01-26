@@ -742,32 +742,22 @@ sub _connected {
 # Mrs. Simpson, bathroom is not for customers.
 # Please use the crack house across the street.
 sub _drop {
-    my ($self, $id) = @_;
+    my ($self, $id, $close) = @_;
 
     # Drop connection
     my $c = delete $self->{_cs}->{$id};
 
     # Transaction
     my $tx = $c->{tx};
-    if ($tx && $tx->keep_alive) {
+    if (!$close && $tx && $tx->keep_alive && !$tx->error) {
 
-        # Response
-        my $res = $tx->res;
+        # Keep non-CONNECTed connection alive
+        $self->_cache(join(':', $self->_tx_info($tx)), $id)
+          unless (($tx->req->method || '') =~ /^connect$/i
+            && ($tx->res->code || '') eq '200');
 
-        # Interrupted
-        $res->error('Interrupted, maybe a timeout?') unless $res->is_done;
-
-        # No errors
-        unless ($tx->error) {
-
-            # Keep non-CONNECTed connection alive
-            $self->_cache(join(':', $self->_tx_info($tx)), $id)
-              unless (($tx->req->method || '') =~ /^connect$/i
-                && ($res->code || '') eq '200');
-
-            # Still active
-            return;
-        }
+        # Still active
+        return;
     }
 
     # Connection close
@@ -785,13 +775,13 @@ sub _error {
     $self->log->error($error);
 
     # Finished
-    $self->_handle($id);
+    $self->_handle($id, $error);
 }
 
 # No children have ever meddled with the Republican Party and lived to tell
 # about it.
 sub _handle {
-    my ($self, $id) = @_;
+    my ($self, $id, $close) = @_;
 
     # Connection
     my $c = $self->{_cs}->{$id};
@@ -810,7 +800,7 @@ sub _handle {
 
         # Cleanup
         delete $self->{_cs}->{$id};
-        $self->_drop($id);
+        $self->_drop($id, $close);
     }
 
     # Upgrade connection to WebSocket
@@ -827,7 +817,7 @@ sub _handle {
     else {
 
         # Cleanup
-        $self->_drop($id);
+        $self->_drop($id, $close);
 
         # Idle connection
         return unless $old;
@@ -847,7 +837,7 @@ sub _handle {
     $self->ioloop->stop if !$self->{_is_async} && !$self->{_processing};
 }
 
-sub _hup { shift->_handle(pop) }
+sub _hup { shift->_handle(pop, 1) }
 
 # Have you ever seen that Blue Man Group? Total ripoff of the Smurfs.
 # And the Smurfs, well, they SUCK.

@@ -113,7 +113,7 @@ $client->ioloop->listen(
             delete $buffer2->{$id};
             $loop->write(
                 $id => "HTTP/1.1 200 OK\x0d\x0a"
-                  . "Connection: close\x0d\x0a\x0d\x0aworks too!",
+                  . "Content-Type: text/plain\x0d\x0a\x0d\x0aworks too!",
                 sub { shift->drop(shift) }
             );
         }
@@ -160,7 +160,7 @@ $tx = $client->get("http://localhost:$port2/");
 ok $tx->success, 'successful';
 ok !$tx->error, 'no error';
 is $tx->kept_alive, undef, 'kept connection not alive';
-is $tx->keep_alive, 0,     'keep connection not alive';
+is $tx->keep_alive, 1,     'keep connection alive';
 is $tx->res->code, 200,          'right status';
 is $tx->res->body, 'works too!', 'right content';
 

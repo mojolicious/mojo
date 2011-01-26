@@ -314,5 +314,5 @@ $tx->res->body(
 );
 $t->client->start($tx);
 is $tx->res->code, 200, 'right status';
-is $tx->error, 'Interrupted, maybe a timeout?', 'right error';
+ok !$tx->error, 'no error';
 is $buffer, 'how', 'right content';

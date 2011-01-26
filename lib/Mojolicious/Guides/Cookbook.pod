@@ -299,6 +299,62 @@ You can take full control of the L<Mojo::IOLoop> event loop.
 
 Fun hacks you might not use very often but that might come in handy some day.
 
+=head2 Making Your Application Installable
+
+Ever thought about releasing your L<Mojolicious> application to CPAN?
+It's actually much easier than you might think.
+
+    % mojo generate app
+    ...
+    % cd my_mojolicious_app
+    % mv public lib/MyMojoliciousApp/
+    % mv templates lib/MyMojoliciousApp/
+
+The trick is to move the C<public> and C<templates> directories so they can
+get automatically installed with the modules.
+
+    package MyMojoliciousApp;
+    use Mojo::Base 'Mojolicious';
+
+    use File::Basename 'dirname';
+    use File::Spec;
+
+    # Every CPAN module needs a version
+    our $VERSION = '1.0';
+
+    sub startup {
+        my $self = shift;
+
+        # Switch to installable home directory
+        $self->home->parse(
+            File::Spec->catdir(dirname(__FILE__), 'MyMojoliciousApp'));
+
+        # Switch to installable "public" directory
+        $self->static->root($self->home->rel_dir('public'));
+
+        # Switch to installable "templates" directory
+        $self->renderer->root($self->home->rel_dir('templates'));
+
+        $self->plugin('pod_renderer');
+
+        my $r = $self->routes;
+        $r->route('/welcome')->to('example#welcome');
+    }
+
+    1;
+
+Thats really everything, now you can package your application like any other
+CPAN module.
+
+    % ./script/my_mojolicious_app generate makefile
+    ...
+    % perl Makefile.PL
+    ...
+    % make test
+    ...
+    % make dist
+    ...
+
 =head2 Hello World
 
 If every byte matters this is the smallest C<Hello World> application you can

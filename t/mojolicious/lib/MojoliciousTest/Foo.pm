@@ -8,8 +8,6 @@ sub authenticated {
     $self->render(text => $self->stash('action'));
 }
 
-sub badtemplate { shift->render(template => 'badtemplate') }
-
 sub config {
     my $self = shift;
     $self->render_text($self->stash('config')->{test});

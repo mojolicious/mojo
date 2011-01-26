@@ -6,7 +6,7 @@ use warnings;
 # Disable epoll and kqueue
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 26;
+use Test::More tests => 21;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -20,12 +20,6 @@ my $t = Test::Mojo->new(app => 'MojoliciousTest');
 
 my $backup = $ENV{MOJO_MODE} || '';
 $ENV{MOJO_MODE} = 'production';
-
-# Foo::bar in production mode (non existing action)
-$t->get_ok('/foo/bar')->status_is(404)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/Not Found/);
 
 # SyntaxError::foo in production mode (syntax error in controller)
 $t->get_ok('/syntax_error/foo')->status_is(500)

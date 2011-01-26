@@ -58,8 +58,8 @@ sub register {
 
                     # No template
                     else {
-                        $c->render_not_found($t);
-                        return;
+                        $c->app->log->debug(qq/Template "$t" not found./)
+                          and return;
                     }
                 }
 

@@ -6,7 +6,7 @@ use warnings;
 # Disable epoll and kqueue
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 199;
+use Test::More tests => 184;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -35,18 +35,6 @@ $t->get_ok('/foo/syntaxerror')->status_is(500)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/^Missing right curly/);
-
-# Empty route
-$t->get_ok('/empty')->status_is(404)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/Not Found/);
-
-# Foo::badtemplate (template missing)
-$t->get_ok('/foo/badtemplate')->status_is(404)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/Not Found/);
 
 # Foo::authenticated (authentication bridge)
 $t->get_ok('/auth/authenticated', {'X-Bender' => 'Hi there!'})->status_is(200)
@@ -228,12 +216,6 @@ $t->get_ok('/foo/bar')->status_is(200)
   ->header_is('X-Bender'     => 'Bite my shiny metal ass!')
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('/foo/bar');
-
-# SingleFileTestApp::Baz::does_not_exist
-$t->get_ok('/baz/does_not_exist')->status_is(404)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/Not Found/);
 
 $t = Test::Mojo->new(app => 'MojoliciousTest');
 

@@ -748,13 +748,18 @@ sub _drop {
     my $tx = $self->{_cs}->{$id}->{tx};
     if ($tx && $tx->keep_alive && !$tx->error) {
 
+        # Response
+        my $res = $tx->res;
+
         # Don't keep CONNECTed connections alive
         my $method = $tx->req->method || '';
-        my $code   = $tx->res->code   || '';
+        my $code   = $res->code       || '';
         unless ($method =~ /^connect$/i && $code eq '200') {
 
             # Keep connection alive
-            $self->_cache(join(':', $self->_tx_info($tx)), $id);
+            !$res->is_done && $tx->keep_alive
+              ? $res->error('Interrupted, maybe a timeout?')
+              : $self->_cache(join(':', $self->_tx_info($tx)), $id);
         }
     }
 
@@ -824,13 +829,6 @@ sub _handle {
 
         # Idle connection
         return unless $old;
-
-        # Response
-        my $res = $old->res;
-
-        # Interrupted
-        $res->error('Interrupted, maybe a timeout?')
-          if !$res->is_done && $old->keep_alive;
 
         # Extract cookies
         if (my $jar = $self->cookie_jar) { $jar->extract($old) }

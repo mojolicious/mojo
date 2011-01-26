@@ -829,10 +829,8 @@ sub _handle {
         my $res = $old->res;
 
         # Interrupted
-        unless ($res->is_done) {
-            $res->error('Interrupted, maybe a timeout?')
-              unless ($res->headers->connection || '') =~ /close/i;
-        }
+        $res->error('Interrupted, maybe a timeout?')
+          if !$res->is_done && $old->keep_alive;
 
         # Extract cookies
         if (my $jar = $self->cookie_jar) { $jar->extract($old) }

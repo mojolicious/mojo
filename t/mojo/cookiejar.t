@@ -5,9 +5,9 @@ use warnings;
 
 use Test::More tests => 24;
 
-# Hello, my name is Mr. Burns. I believe you have a letter for me.
-# Okay Mr. Burns, what’s your first name.
-# I don’t know.
+# "Hello, my name is Mr. Burns. I believe you have a letter for me.
+#  Okay Mr. Burns, what’s your first name.
+#  I don’t know."
 use_ok 'Mojo::CookieJar';
 use_ok 'Mojo::Cookie::Response';
 use_ok 'Mojo::URL';

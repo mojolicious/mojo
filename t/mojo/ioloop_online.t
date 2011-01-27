@@ -18,9 +18,9 @@ use_ok 'Mojo::IOLoop';
 use List::Util 'first';
 use Mojo::URL;
 
-# Your guilty consciences may make you vote Democratic, but secretly you all
-# yearn for a Republican president to lower taxes, brutalize criminals, and
-# rule you like a king!
+# "Your guilty consciences may make you vote Democratic, but secretly you all
+#  yearn for a Republican president to lower taxes, brutalize criminals, and
+#  rule you like a king!"
 my $loop = Mojo::IOLoop->new;
 
 # Resolve all record

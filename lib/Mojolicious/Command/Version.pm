@@ -14,7 +14,7 @@ usage: $0 version
 
 EOF
 
-# If at first you don't succeed, give up.
+# "If at first you don't succeed, give up."
 sub run {
     my $self = shift;
 

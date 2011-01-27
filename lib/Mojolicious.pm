@@ -40,8 +40,8 @@ EOF
 our $CODENAME = 'Snowflake';
 our $VERSION  = '1.02';
 
-# These old doomsday devices are dangerously unstable.
-# I'll rest easier not knowing where they are.
+# "These old doomsday devices are dangerously unstable.
+#  I'll rest easier not knowing where they are."
 sub AUTOLOAD {
     my $self = shift;
 
@@ -68,8 +68,8 @@ sub AUTOLOAD {
 
 sub DESTROY { }
 
-# I personalized each of your meals.
-# For example, Amy: you're cute, so I baked you a pony.
+# "I personalized each of your meals.
+#  For example, Amy: you're cute, so I baked you a pony."
 sub new {
     my $self = shift->SUPER::new(@_);
 
@@ -144,8 +144,8 @@ sub new {
     return $self;
 }
 
-# Amy, technology isn't intrinsically good or evil. It's how it's used.
-# Like the Death Ray.
+# "Amy, technology isn't intrinsically good or evil. It's how it's used.
+#  Like the Death Ray."
 sub defaults {
     my $self = shift;
 
@@ -194,7 +194,7 @@ sub dispatch {
     }
 }
 
-# Bite my shiny metal ass!
+# "Bite my shiny metal ass!"
 sub handler {
     my ($self, $tx) = @_;
 
@@ -232,8 +232,8 @@ sub handler {
     }
 }
 
-# This snow is beautiful. I'm glad global warming never happened.
-# Actually, it did. But thank God nuclear winter canceled it out.
+# "This snow is beautiful. I'm glad global warming never happened.
+#  Actually, it did. But thank God nuclear winter canceled it out."
 sub helper {
     my $self = shift;
     my $name = shift;
@@ -249,13 +249,13 @@ sub helper {
     $r->add_helper($name, @_);
 }
 
-# He knows when you are sleeping.
-# He knows when you're on the can.
-# He'll hunt you down and blast your ass, from here to Pakistan.
-# Oh...
-# You better not breathe, you better not move.
-# You're better off dead, I'm tellin' you, dude.
-# Santa Claus is gunning you down!
+# "He knows when you are sleeping.
+#  He knows when you're on the can.
+#  He'll hunt you down and blast your ass, from here to Pakistan.
+#  Oh...
+#  You better not breathe, you better not move.
+#  You're better off dead, I'm tellin' you, dude.
+#  Santa Claus is gunning you down!"
 sub hook {
     my ($self, $name, $cb) = @_;
 

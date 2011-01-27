@@ -10,8 +10,8 @@ has [qw/frames line lines_before lines_after/] => sub { [] };
 has [qw/message raw_message/] => 'Exception!';
 has verbose => sub { $ENV{MOJO_EXCEPTION_VERBOSE} || 0 };
 
-# Attempted murder? Now honestly, what is that?
-# Do they give a Nobel Prize for attempted chemistry?
+# "Attempted murder? Now honestly, what is that?
+#  Do they give a Nobel Prize for attempted chemistry?"
 sub new {
     my $self = shift->SUPER::new();
 
@@ -142,8 +142,8 @@ sub _detect {
     return $self;
 }
 
-# You killed zombie Flanders!
-# He was a zombie?
+# "You killed zombie Flanders!
+#  He was a zombie?"
 sub to_string {
     my $self = shift;
 

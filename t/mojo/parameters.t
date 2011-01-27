@@ -7,7 +7,7 @@ use utf8;
 
 use Test::More tests => 44;
 
-# Now that's a wave of destruction that's easy on the eyes.
+# "Now that's a wave of destruction that's easy on the eyes."
 use_ok 'Mojo::Parameters';
 
 # Basics with custom pair separator

@@ -7,7 +7,7 @@ use Test::More tests => 18;
 
 use Mojo::JSON;
 
-# We need some more secret sauce. Put the mayonnaise in the sun.
+# "We need some more secret sauce. Put the mayonnaise in the sun."
 use_ok 'Mojo::Server::PSGI';
 use_ok 'Mojolicious::Command::Psgi';
 

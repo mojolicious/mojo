@@ -11,9 +11,9 @@ use File::Spec;
 use File::Temp;
 use Mojo::Headers;
 
-# When will I learn?
-# The answer to life's problems aren't at the bottom of a bottle,
-# they're on TV!
+# "When will I learn?
+#  The answer to life's problems aren't at the bottom of a bottle,
+#  they're on TV!"
 use_ok 'Mojo::Asset::File';
 use_ok 'Mojo::Content::Single';
 use_ok 'Mojo::Content::MultiPart';

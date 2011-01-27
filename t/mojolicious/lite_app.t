@@ -13,11 +13,11 @@ use Test::More tests => 714;
 # Pollution
 123 =~ m/(\d+)/;
 
-# Wait you're the only friend I have...
-# You really want a robot for a friend?
-# Yeah ever since I was six.
-# Well, ok but I don't want people thinking we're robosexuals,
-# so if anyone asks you're my debugger.
+# "Wait you're the only friend I have...
+#  You really want a robot for a friend?
+#  Yeah ever since I was six.
+#  Well, ok but I don't want people thinking we're robosexuals,
+#  so if anyone asks you're my debugger."
 use Mojo::Client;
 use Mojo::Content::MultiPart;
 use Mojo::Content::Single;

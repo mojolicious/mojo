@@ -7,8 +7,8 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-# Kif, I'm feeling the Captain's Itch.
-# I'll get the powder, sir.
+# "Kif, I'm feeling the Captain's Itch.
+#  I'll get the powder, sir."
 use Mojo::IOLoop;
 
 # The loop

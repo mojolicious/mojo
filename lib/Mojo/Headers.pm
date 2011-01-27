@@ -132,7 +132,7 @@ sub from_hash {
     return $self;
 }
 
-# Will you be my mommy? You smell like dead bunnies...
+# "Will you be my mommy? You smell like dead bunnies..."
 sub header {
     my $self = shift;
     my $name = shift;

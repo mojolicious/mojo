@@ -26,20 +26,20 @@ sub DESTROY {
     unlink $file if -f $file;
 }
 
-# Marge? Since I'm not talking to Lisa,
-# would you please ask her to pass me the syrup?
-# Dear, please pass your father the syrup, Lisa.
-# Bart, tell Dad I will only pass the syrup if it won't be used on any meat
-# product.
-# You dunkin' your sausages in that syrup homeboy?
-# Marge, tell Bart I just want to drink a nice glass of syrup like I do every
-# morning.
-# Tell him yourself, you're ignoring Lisa, not Bart.
-# Bart, thank your mother for pointing that out.
-# Homer, you're not not-talking to me and secondly I heard what you said.
-# Lisa, tell your mother to get off my case.
-# Uhhh, dad, Lisa's the one you're not talking to.
-# Bart, go to your room.
+# "Marge? Since I'm not talking to Lisa,
+#  would you please ask her to pass me the syrup?
+#  Dear, please pass your father the syrup, Lisa.
+#  Bart, tell Dad I will only pass the syrup if it won't be used on any meat
+#  product.
+#  You dunkin' your sausages in that syrup homeboy?
+#  Marge, tell Bart I just want to drink a nice glass of syrup like I do
+#  every morning.
+#  Tell him yourself, you're ignoring Lisa, not Bart.
+#  Bart, thank your mother for pointing that out.
+#  Homer, you're not not-talking to me and secondly I heard what you said.
+#  Lisa, tell your mother to get off my case.
+#  Uhhh, dad, Lisa's the one you're not talking to.
+#  Bart, go to your room."
 sub run {
     my ($self, $app, $config) = @_;
 
@@ -356,9 +356,9 @@ sub _pid {
     print $pid $$;
 }
 
-# Dear Mr. President, there are too many states nowadays.
-# Please eliminate three.
-# P.S. I am not a crackpot.
+# "Dear Mr. President, there are too many states nowadays.
+#  Please eliminate three.
+#  P.S. I am not a crackpot."
 sub _reap {
     my ($self, $pid) = @_;
 

@@ -13,6 +13,6 @@ plan skip_all => 'set TEST_POD to enable this test (developer only!)'
 # DEPRECATED in Hot Beverage!
 my @hot_beverage = qw/handler helper session/;
 
-# Marge, I'm going to miss you so much. And it's not just the sex.
-# It's also the food preparation.
+# "Marge, I'm going to miss you so much. And it's not just the sex.
+#  It's also the food preparation."
 all_pod_coverage_ok({also_private => [@hot_beverage]});

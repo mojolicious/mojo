@@ -8,7 +8,7 @@ sub development_mode {
     $self->static->root($self->home->rel_dir('public_dev'));
 }
 
-# Let's face it, comedy's a dead art form. Tragedy, now that's funny.
+# "Let's face it, comedy's a dead art form. Tragedy, now that's funny."
 sub startup {
     my $self = shift;
 

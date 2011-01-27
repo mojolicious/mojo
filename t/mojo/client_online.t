@@ -12,8 +12,8 @@ plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
 plan tests => 98;
 
-# So then I said to the cop, "No, you're driving under the influence...
-# of being a jerk".
+# "So then I said to the cop, "No, you're driving under the influence...
+#  of being a jerk"."
 use_ok 'Mojo::Client';
 use_ok 'Mojo::IOLoop';
 use_ok 'Mojo::Transaction::HTTP';

@@ -5,10 +5,10 @@ use warnings;
 
 use Test::More tests => 42;
 
-# And now, in the spirit of the season: start shopping.
-# And for every dollar of Krusty merchandise you buy,
-# I will be nice to a sick kid.
-# For legal purposes, sick kids may include hookers with a cold.
+# "And now, in the spirit of the season: start shopping.
+#  And for every dollar of Krusty merchandise you buy,
+#  I will be nice to a sick kid.
+#  For legal purposes, sick kids may include hookers with a cold."
 use_ok 'Mojo::Asset::File';
 use_ok 'Mojo::Asset::Memory';
 

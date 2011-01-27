@@ -16,8 +16,8 @@ has dictionary => sub { {} };
 has hidden => sub { [qw/new app attr has render req res stash tx/] };
 has pattern => sub { Mojolicious::Routes::Pattern->new };
 
-# Yet thanks to my trusty safety sphere,
-# I sublibed with only tribial brain dablage.
+# "Yet thanks to my trusty safety sphere,
+#  I sublibed with only tribial brain dablage."
 sub new {
     my $self = shift->SUPER::new();
 
@@ -86,7 +86,7 @@ sub any {
     shift->_generate_route((ref $_[0] || '') eq 'ARRAY' ? shift : [], @_);
 }
 
-# Hey. What kind of party is this? There's no booze and only one hooker.
+# "Hey. What kind of party is this? There's no booze and only one hooker."
 sub auto_render {
     my ($self, $c) = @_;
 
@@ -184,8 +184,8 @@ sub is_websocket {
     return;
 }
 
-# Dr. Zoidberg, can you note the time and declare the patient legally dead?
-# Can I! That’s my specialty!
+# "Dr. Zoidberg, can you note the time and declare the patient legally dead?
+#  Can I! That’s my specialty!"
 sub name {
     my $self = shift;
 
@@ -263,8 +263,8 @@ sub render {
     return $path;
 }
 
-# Morbo forget how you spell that letter that looks like a man wearing a hat.
-# Hello, tiny man. I will destroy you!
+# "Morbo forget how you spell that letter that looks like a man wearing a hat.
+#  Hello, tiny man. I will destroy you!"
 sub route {
     my $self = shift;
 

@@ -9,8 +9,8 @@ use Mojolicious;
 use Mojolicious::Controller;
 use Mojolicious::Renderer;
 
-# Actually, she wasn't really my girlfriend,
-# she just lived nextdoor and never closed her curtains.
+# "Actually, she wasn't really my girlfriend,
+#  she just lived nextdoor and never closed her curtains."
 my $c = Mojolicious::Controller->new(app => Mojolicious->new);
 $c->app->log->path(undef);
 $c->app->log->level('fatal');

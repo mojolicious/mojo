@@ -3,12 +3,12 @@
 use strict;
 use warnings;
 
-# Remember, you can always find East by staring directly at the sun.
+# "Remember, you can always find East by staring directly at the sun."
 use Test::More tests => 37;
 
-# So, have a merry Christmas, a happy Hanukkah, a kwaazy Kwanza,
-# a tip-top Tet, and a solemn, dignified, Ramadan.
-# And now a word from MY god, our sponsors!
+# "So, have a merry Christmas, a happy Hanukkah, a kwaazy Kwanza,
+#  a tip-top Tet, and a solemn, dignified, Ramadan.
+#  And now a word from MY god, our sponsors!"
 use_ok 'Mojo::Headers';
 
 # Basic functionality

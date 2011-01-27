@@ -7,7 +7,7 @@ use Test::More tests => 232;
 
 use Mojo::Transaction::HTTP;
 
-# They're not very heavy, but you don't hear me not complaining.
+# "They're not very heavy, but you don't hear me not complaining."
 use_ok 'Mojolicious::Routes';
 use_ok 'Mojolicious::Routes::Match';
 

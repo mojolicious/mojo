@@ -20,9 +20,9 @@ has max_message_size => sub { $ENV{MOJO_MAX_MESSAGE_SIZE} || 5242880 };
 has version          => '1.1';
 has [qw/on_finish on_progress/];
 
-# I'll keep it short and sweet. Family. Religion. Friendship.
-# These are the three demons you must slay if you wish to succeed in
-# business.
+# "I'll keep it short and sweet. Family. Religion. Friendship.
+#  These are the three demons you must slay if you wish to succeed in
+#  business."
 sub at_least_version {
     my ($self, $version) = @_;
     my ($sma,  $smi)     = split /\./, $version;
@@ -117,10 +117,10 @@ sub body_params {
 
 sub body_size { shift->content->body_size }
 
-# My new movie is me, standing in front of a brick wall for 90 minutes.
-# It cost 80 million dollars to make.
-# How do you sleep at night?
-# On top of a pile of money, with many beautiful women.
+# "My new movie is me, standing in front of a brick wall for 90 minutes.
+#  It cost 80 million dollars to make.
+#  How do you sleep at night?
+#  On top of a pile of money, with many beautiful women."
 sub build_body {
     my $self = shift;
 

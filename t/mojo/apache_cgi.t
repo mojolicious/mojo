@@ -22,9 +22,9 @@ plan skip_all => 'set TEST_APACHE to enable this test (developer only!)'
   unless $ENV{TEST_APACHE};
 plan tests => 8;
 
-# I'm not a robot!
-# I don't like having discs crammed into me, unless they're Oreos.
-# And then, only in the mouth.
+# "I'm not a robot!
+#  I don't like having discs crammed into me, unless they're Oreos.
+#  And then, only in the mouth."
 use_ok 'Mojo::Server::CGI';
 
 # Apache setup

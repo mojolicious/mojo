@@ -15,8 +15,8 @@ has 'tx';
 # Silent or loud tests
 $ENV{MOJO_LOG_LEVEL} ||= $ENV{HARNESS_IS_VERBOSE} ? 'debug' : 'fatal';
 
-# Ooh, a graduate student huh?
-# How come you guys can go to the moon but can't make my shoes smell good?
+# "Ooh, a graduate student huh?
+#  How come you guys can go to the moon but can't make my shoes smell good?"
 sub content_is {
     my ($self, $value, $desc) = @_;
 
@@ -49,9 +49,9 @@ sub content_like {
     return $self;
 }
 
-# Marge, I can't wear a pink shirt to work.
-# Everybody wears white shirts.
-# I'm not popular enough to be different.
+# "Marge, I can't wear a pink shirt to work.
+#  Everybody wears white shirts.
+#  I'm not popular enough to be different."
 sub content_type_is {
     my ($self, $type) = @_;
 
@@ -82,9 +82,9 @@ sub content_type_like {
     return $self;
 }
 
-# A job's a job. I mean, take me.
-# If my plant pollutes the water and poisons the town,
-# by your logic, that would make me a criminal.
+# "A job's a job. I mean, take me.
+#  If my plant pollutes the water and poisons the town,
+#  by your logic, that would make me a criminal."
 sub delete_ok { shift->_request_ok('delete', @_) }
 
 sub element_exists {
@@ -149,10 +149,10 @@ sub json_content_is {
     return $self;
 }
 
-# God bless those pagans.
+# "God bless those pagans."
 sub post_ok { shift->_request_ok('post', @_) }
 
-# Hey, I asked for ketchup! I'm eatin' salad here!
+# "Hey, I asked for ketchup! I'm eatin' salad here!"
 sub post_form_ok {
     my $self = shift;
     my $url  = $_[0];
@@ -176,7 +176,7 @@ sub post_form_ok {
     return $self;
 }
 
-# WHO IS FONZY!?! Don't they teach you anything at school?
+# "WHO IS FONZY!?! Don't they teach you anything at school?"
 sub put_ok { shift->_request_ok('put', @_) }
 
 sub reset_session {
@@ -192,7 +192,7 @@ sub reset_session {
     return $self;
 }
 
-# Internet! Is that thing still around?
+# "Internet! Is that thing still around?"
 sub status_is {
     my ($self, $status) = @_;
 
@@ -226,9 +226,9 @@ sub text_is {
     return $self;
 }
 
-# Hello, my name is Barney Gumble, and I'm an alcoholic.
-# Mr Gumble, this is a girl scouts meeting.
-# Is it, or is it you girls can't admit that you have a problem?
+# "Hello, my name is Barney Gumble, and I'm an alcoholic.
+#  Mr Gumble, this is a girl scouts meeting.
+#  Is it, or is it you girls can't admit that you have a problem?"
 sub text_like {
     my ($self, $selector, $regex, $desc) = @_;
 
@@ -262,7 +262,7 @@ sub _get_content {
     return $content;
 }
 
-# Are you sure this is the Sci-Fi Convention? It's full of nerds!
+# "Are you sure this is the Sci-Fi Convention? It's full of nerds!"
 sub _request_ok {
     my ($self, $method, $url, $headers, $body) = @_;
 

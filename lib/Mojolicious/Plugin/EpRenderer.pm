@@ -4,9 +4,9 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Template;
 use Mojo::Util 'md5_sum';
 
-# What do you want?
-# I'm here to kick your ass!
-# Wishful thinking. We have long since evolved beyond the need for asses.
+# "What do you want?
+#  I'm here to kick your ass!
+#  Wishful thinking. We have long since evolved beyond the need for asses."
 sub register {
     my ($self, $app, $conf) = @_;
 

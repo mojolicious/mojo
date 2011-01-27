@@ -9,7 +9,7 @@ use Cwd;
 use File::Spec;
 use FindBin;
 
-# Uh, no, you got the wrong number. This is 9-1... 2
+# "Uh, no, you got the wrong number. This is 9-1... 2"
 use_ok 'Mojo::Home';
 
 # detect env

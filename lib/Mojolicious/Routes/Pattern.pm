@@ -14,7 +14,7 @@ has tree           => sub { [] };
 has wildcard_start => '*';
 has [qw/format pattern regex/];
 
-# This is the worst kind of discrimination. The kind against me!
+# "This is the worst kind of discrimination. The kind against me!"
 sub new {
     my $self = shift->SUPER::new();
     $self->parse(@_);

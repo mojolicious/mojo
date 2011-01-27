@@ -7,8 +7,8 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-# After all this time, somebody else with one eye... who ISN'T a clumsy
-# carpenter or a kid with a BB gun.
+# "After all this time, somebody else with one eye... who ISN'T a clumsy
+#  carpenter or a kid with a BB gun."
 use Mojo::IOLoop;
 
 # Run as root only

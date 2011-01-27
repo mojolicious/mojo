@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-# Would you kindly shut your noise-hole?
+# "Would you kindly shut your noise-hole?"
 use Test::More tests => 5;
 
 package Mojo::TestServerViaEnv;

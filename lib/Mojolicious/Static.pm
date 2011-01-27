@@ -11,7 +11,7 @@ use Mojo::Path;
 
 has [qw/default_static_class root/];
 
-# Valentine's Day's coming? Aw crap! I forgot to get a girlfriend again!
+# "Valentine's Day's coming? Aw crap! I forgot to get a girlfriend again!"
 sub dispatch {
     my ($self, $c) = @_;
 

@@ -23,10 +23,10 @@ get '/hello' => sub {
     $self->render_text("Hello from the $name app!");
 };
 
-# Morbo will now introduce the candidates - Puny Human Number One,
-# Puny Human Number Two, and Morbo's good friend Richard Nixon.
-# How's the family, Morbo?
-# Belligerent and numerous.
+# "Morbo will now introduce the candidates - Puny Human Number One,
+#  Puny Human Number Two, and Morbo's good friend Richard Nixon.
+#  How's the family, Morbo?
+#  Belligerent and numerous."
 package MyTestApp::Test1;
 use Mojolicious::Lite;
 

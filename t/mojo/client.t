@@ -13,7 +13,7 @@ plan tests => 68;
 
 use_ok 'Mojo::Client';
 
-# The strong must protect the sweet.
+# "The strong must protect the sweet."
 use Mojolicious::Lite;
 
 # Silence

@@ -3,8 +3,8 @@ use Mojo::Base 'Mojo::Command';
 
 use Getopt::Long qw/GetOptions :config pass_through/;
 
-# One day a man has everything, the next day he blows up a $400 billion
-# space station, and the next day he has nothing. It makes you think.
+# "One day a man has everything, the next day he blows up a $400 billion
+#  space station, and the next day he has nothing. It makes you think."
 has hint => <<"EOF";
 
 These options are available for all commands:

@@ -289,7 +289,7 @@ $ENTITIES{apos} = 39;
 # Encode cache
 my %ENCODE;
 
-# Bart, stop pestering Satan!
+# "Bart, stop pestering Satan!"
 our @EXPORT_OK = qw/b64_decode b64_encode camelize decamelize decode encode/;
 push @EXPORT_OK, qw/get_line hmac_md5_sum hmac_sha1_sum/;
 push @EXPORT_OK, qw/html_escape html_unescape md5_bytes md5_sum/;

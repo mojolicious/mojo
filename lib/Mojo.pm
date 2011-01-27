@@ -18,7 +18,7 @@ has on_websocket => sub {
     sub { Mojo::Transaction::WebSocket->new(handshake => pop) }
 };
 
-# Oh, so they have internet on computers now!
+# "Oh, so they have internet on computers now!"
 sub new {
     my $self = shift->SUPER::new(@_);
 

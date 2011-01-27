@@ -4,8 +4,8 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::ByteStream 'b';
 use Mojo::Util 'xml_escape';
 
-# Is today's hectic lifestyle making you tense and impatient?
-# Shut up and get to the point!
+# "Is today's hectic lifestyle making you tense and impatient?
+#  Shut up and get to the point!"
 sub register {
     my ($self, $app) = @_;
 
@@ -283,7 +283,7 @@ sub _input {
     $self->_tag('input', name => $name, %attrs);
 }
 
-# We’ve lost power of the forward Gameboy! Mario not responding!
+# "We’ve lost power of the forward Gameboy! Mario not responding!"
 sub _tag {
     my $self = shift;
     my $name = shift;

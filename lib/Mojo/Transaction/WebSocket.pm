@@ -1,8 +1,8 @@
 package Mojo::Transaction::WebSocket;
 use Mojo::Base 'Mojo::Transaction';
 
-# I'm not calling you a liar but...
-# I can't think of a way to finish that sentence.
+# "I'm not calling you a liar but...
+#  I can't think of a way to finish that sentence."
 use Mojo::Transaction::HTTP;
 use Mojo::Util qw/decode encode md5_bytes/;
 
@@ -135,7 +135,8 @@ sub server_handshake {
     return $self;
 }
 
-# Being eaten by crocodile is just like going to sleep... in a giant blender.
+# "Being eaten by crocodile is just like going to sleep...
+#  in a giant blender."
 sub server_read {
     my ($self, $chunk) = @_;
 

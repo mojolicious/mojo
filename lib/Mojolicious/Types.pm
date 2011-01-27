@@ -1,8 +1,8 @@
 package Mojolicious::Types;
 use Mojo::Base -base;
 
-# Once again, the conservative, sandwich-heavy portfolio pays off for the
-# hungry investor.
+# "Once again, the conservative, sandwich-heavy portfolio pays off for the
+#  hungry investor."
 has types => sub {
     return {
         atom => 'application/atom+xml',
@@ -28,7 +28,7 @@ has types => sub {
     };
 };
 
-# Magic. Got it.
+# "Magic. Got it."
 sub type {
     my ($self, $ext, $type) = @_;
 

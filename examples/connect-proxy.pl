@@ -7,7 +7,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-# Cheating in a fake fight. That's low.
+# "Cheating in a fake fight. That's low."
 use Mojo::IOLoop;
 
 # The loop

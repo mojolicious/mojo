@@ -17,7 +17,7 @@ BEGIN {
     $^P |= 0x10;
 }
 
-# Homer no function beer well without.
+# "Homer no function beer well without."
 sub load {
     my ($self, $module) = @_;
 

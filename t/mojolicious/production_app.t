@@ -13,7 +13,7 @@ use lib "$FindBin::Bin/lib";
 
 use Test::Mojo;
 
-# This concludes the part of the tour where you stay alive.
+# "This concludes the part of the tour where you stay alive."
 use_ok 'MojoliciousTest';
 
 my $t = Test::Mojo->new(app => 'MojoliciousTest');

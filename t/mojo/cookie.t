@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More tests => 59;
 
-# What good is money if it can't inspire terror in your fellow man?
+# "What good is money if it can't inspire terror in your fellow man?"
 use_ok 'Mojo::Cookie::Request';
 use_ok 'Mojo::Cookie::Response';
 

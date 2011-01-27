@@ -18,8 +18,8 @@ use Mojo::Transaction::HTTP;
 use Test::Mojo;
 use Mojolicious;
 
-# Congratulations Fry, you've snagged the perfect girlfriend.
-# Amy's rich, she's probably got other characteristics...
+# "Congratulations Fry, you've snagged the perfect girlfriend.
+#  Amy's rich, she's probably got other characteristics..."
 use_ok 'MojoliciousTest';
 
 my $t = Test::Mojo->new(app => 'MojoliciousTest');

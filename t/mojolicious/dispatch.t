@@ -20,8 +20,8 @@ sub reset_state {
     delete $stash->{$_} for keys %$stash;
 }
 
-# I was all of history's greatest acting robots -- Acting Unit 0.8,
-# Thespomat, David Duchovny!
+# "I was all of history's greatest acting robots -- Acting Unit 0.8,
+#  Thespomat, David Duchovny!"
 package main;
 
 use strict;

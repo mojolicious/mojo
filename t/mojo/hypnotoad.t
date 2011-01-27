@@ -8,7 +8,7 @@ BEGIN { $ENV{MOJO_POLL} = 1 }
 
 use Test::More;
 
-# I ate the blue ones... they taste like burning.
+# "I ate the blue ones... they taste like burning."
 use File::Spec;
 use File::Temp;
 use FindBin;
@@ -22,8 +22,8 @@ plan skip_all => 'set TEST_HYPNOTOAD to enable this test (developer only!)'
   unless $ENV{TEST_HYPNOTOAD};
 plan tests => 40;
 
-# Daddy, I'm scared. Too scared to even wet my pants.
-# Just relax and it'll come, son.
+# "Daddy, I'm scared. Too scared to even wet my pants.
+#  Just relax and it'll come, son."
 use_ok 'Mojo::Server::Hypnotoad';
 
 # Config

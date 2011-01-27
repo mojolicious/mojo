@@ -338,8 +338,8 @@ sub _parse_env {
     $self->{_state} = 'body';
 }
 
-# Bart, with $10,000, we'd be millionaires!
-# We could buy all kinds of useful things like...love!
+# "Bart, with $10,000, we'd be millionaires!
+#  We could buy all kinds of useful things like...love!"
 sub _parse_start_line {
     my $self = shift;
 

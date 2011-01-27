@@ -4,10 +4,11 @@ use Mojo::Base 'Mojo';
 use Mojo::JSON;
 use Mojo::Cookie::Response;
 
-# How is education supposed to make me feel smarter? Besides,
-# every time I learn something new, it pushes some old stuff out of my brain.
-# Remember when I took that home winemaking course,
-# and I forgot how to drive?
+# "How is education supposed to make me feel smarter? Besides,
+#  every time I learn something new,
+#  it pushes some old stuff out of my brain.
+#  Remember when I took that home winemaking course,
+#  and I forgot how to drive?"
 sub new {
     my $self = shift->SUPER::new(@_);
 

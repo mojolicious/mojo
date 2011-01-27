@@ -5,8 +5,9 @@ use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 256000;
 
 has nph => 0;
 
-# Lisa, you're a Buddhist, so you believe in reincarnation.
-# Eventually, Snowball will be reborn as a higher lifeform... like a snowman.
+# "Lisa, you're a Buddhist, so you believe in reincarnation.
+#  Eventually, Snowball will be reborn as a higher lifeform...
+#  like a snowman."
 sub run {
     my $self = shift;
 

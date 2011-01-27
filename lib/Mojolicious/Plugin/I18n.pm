@@ -4,8 +4,8 @@ use Mojo::Base 'Mojolicious::Plugin';
 use I18N::LangTags;
 use I18N::LangTags::Detect;
 
-# Can we have Bender burgers again?
-# No, the cat shelter’s onto me.
+# "Can we have Bender burgers again?
+#  No, the cat shelter’s onto me."
 sub register {
     my ($self, $app, $conf) = @_;
 

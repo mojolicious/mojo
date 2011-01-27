@@ -15,7 +15,7 @@ These options are available:
   --nph   Enable non-parsed-header mode.
 EOF
 
-# Hi, Super Nintendo Chalmers!
+# "Hi, Super Nintendo Chalmers!"
 sub run {
     my $self = shift;
     my $cgi  = Mojo::Server::CGI->new;

@@ -8,8 +8,8 @@ BEGIN { $ENV{MOJO_POLL} = 1 }
 
 use Test::More tests => 29;
 
-# Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
-# Well, that’s love for you.
+# "Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
+#  Well, that’s love for you."
 use IO::Socket::INET;
 use Mojolicious::Lite;
 use Mojo::Client;

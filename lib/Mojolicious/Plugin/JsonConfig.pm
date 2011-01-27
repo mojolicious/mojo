@@ -9,8 +9,8 @@ use Mojo::Template;
 
 use constant DEBUG => $ENV{MOJO_JSON_CONFIG_DEBUG} || 0;
 
-# And so we say goodbye to our beloved pet, Nibbler, who's gone to a place
-# where I, too, hope one day to go. The toilet.
+# "And so we say goodbye to our beloved pet, Nibbler, who's gone to a place
+#  where I, too, hope one day to go. The toilet."
 sub register {
     my ($self, $app, $conf) = @_;
 

@@ -140,8 +140,8 @@ sub _build_start_line {
     return "HTTP/$version $code $message\x0d\x0a";
 }
 
-# Weaseling out of things is important to learn.
-# It's what separates us from the animals... except the weasel.
+# "Weaseling out of things is important to learn.
+#  It's what separates us from the animals... except the weasel."
 sub _parse_start_line {
     my $self = shift;
 

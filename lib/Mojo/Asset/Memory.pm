@@ -4,9 +4,9 @@ use Mojo::Base 'Mojo::Asset';
 use Carp 'croak';
 use IO::File;
 
-# There's your giraffe, little girl.
-# I'm a boy.
-# That's the spirit. Never give up.
+# "There's your giraffe, little girl.
+#  I'm a boy.
+#  That's the spirit. Never give up."
 sub new {
     my $self = shift->SUPER::new(@_);
     $self->{content} = '';

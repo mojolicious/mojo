@@ -34,9 +34,9 @@ plan skip_all => 'Windows is too fragile for this test!'
   if Mojo::IOLoop::WINDOWS;
 plan tests => 14;
 
-# To the panic room!
-# We don't have a panic room.
-# To the panic room store!
+# "To the panic room!
+#  We don't have a panic room.
+#  To the panic room store!"
 my $loop = Mojo::IOLoop->new;
 my $port = Mojo::IOLoop->generate_port;
 my ($server, $client) = '';

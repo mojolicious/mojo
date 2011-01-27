@@ -6,8 +6,8 @@ use overload '""' => sub { shift->to_xml }, fallback => 1;
 use Mojo::Util qw/decode encode html_unescape xml_escape/;
 use Scalar::Util 'weaken';
 
-# How are the kids supposed to get home?
-# I dunno. Internet?
+# "How are the kids supposed to get home?
+#  I dunno. Internet?"
 has charset => 'UTF-8';
 has tree => sub { ['root'] };
 
@@ -401,8 +401,8 @@ sub _add {
     return $self;
 }
 
-# Woah! God is so in your face!
-# Yeah, he's my favorite fictional character.
+# "Woah! God is so in your face!
+#  Yeah, he's my favorite fictional character."
 sub _cdata {
     my ($self, $cdata, $current) = @_;
 
@@ -1046,8 +1046,8 @@ sub _render {
     return $content;
 }
 
-# It's not important to talk about who got rich off of whom,
-# or who got exposed to tainted what...
+# "It's not important to talk about who got rich off of whom,
+#  or who got exposed to tainted what..."
 sub _start {
     my ($self, $start, $attrs, $current) = @_;
 

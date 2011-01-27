@@ -41,9 +41,9 @@ sub expires {
     return $self->{expires};
 }
 
-# Remember the time he ate my goldfish?
-# And you lied and said I never had goldfish.
-# Then why did I have the bowl Bart? Why did I have the bowl?
+# "Remember the time he ate my goldfish?
+#  And you lied and said I never had goldfish.
+#  Then why did I have the bowl Bart? Why did I have the bowl?"
 sub parse {
     my ($self, $string) = @_;
     my @cookies;

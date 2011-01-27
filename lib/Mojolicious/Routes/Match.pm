@@ -10,7 +10,7 @@ has captures => sub { {} };
 has stack    => sub { [] };
 has [qw/endpoint root/];
 
-# I'm Bender, baby, please insert liquor!
+# "I'm Bender, baby, please insert liquor!"
 sub new {
     my $self = shift->SUPER::new();
     my $c    = shift;
@@ -30,7 +30,7 @@ sub new {
     return $self;
 }
 
-# Life can be hilariously cruel.
+# "Life can be hilariously cruel."
 sub match {
     my ($self, $r) = @_;
 

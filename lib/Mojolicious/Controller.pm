@@ -11,7 +11,7 @@ use Mojo::Util;
 
 require Carp;
 
-# Scalpel... blood bucket... priest.
+# "Scalpel... blood bucket... priest."
 has [qw/app match/];
 has tx => sub { Mojo::Transaction::HTTP->new };
 
@@ -68,8 +68,8 @@ my $STASH_RE = qr/
     $
     /x;
 
-# Is all the work done by the children?
-# No, not the whipping.
+# "Is all the work done by the children?
+#  No, not the whipping."
 sub AUTOLOAD {
     my $self = shift;
 
@@ -88,9 +88,9 @@ sub DESTROY { }
 
 sub client { shift->app->client }
 
-# For the last time, I don't like lilacs!
-# Your first wife was the one who liked lilacs!
-# She also liked to shut up!
+# "For the last time, I don't like lilacs!
+#  Your first wife was the one who liked lilacs!
+#  She also liked to shut up!"
 sub cookie {
     my ($self, $name, $value, $options) = @_;
 
@@ -126,7 +126,7 @@ sub cookie {
     return map { $_->value } @cookies;
 }
 
-# Something's wrong, she's not responding to my poking stick.
+# "Something's wrong, she's not responding to my poking stick."
 sub finish {
     my $self = shift;
 
@@ -140,7 +140,7 @@ sub finish {
     $tx->finish;
 }
 
-# You two make me ashamed to call myself an idiot.
+# "You two make me ashamed to call myself an idiot."
 sub flash {
     my $self = shift;
 
@@ -169,7 +169,7 @@ sub flash {
     return $self;
 }
 
-# My parents may be evil, but at least they're stupid.
+# "My parents may be evil, but at least they're stupid."
 sub on_finish {
     my ($self, $cb) = @_;
 
@@ -177,9 +177,9 @@ sub on_finish {
     $self->tx->on_finish(sub { shift and $self->$cb(@_) });
 }
 
-# Stop being such a spineless jellyfish!
-# You know full well I'm more closely related to the sea cucumber.
-# Not where it counts.
+# "Stop being such a spineless jellyfish!
+#  You know full well I'm more closely related to the sea cucumber.
+#  Not where it counts."
 sub on_message {
     my $self = shift;
 
@@ -202,8 +202,8 @@ sub on_message {
     return $self;
 }
 
-# Just make a simple cake. And this time, if someone's going to jump out of
-# it make sure to put them in *after* you cook it.
+# "Just make a simple cake. And this time, if someone's going to jump out of
+#  it make sure to put them in *after* you cook it."
 sub param {
     my $self = shift;
     my $name = shift;
@@ -230,9 +230,9 @@ sub param {
     return $self->req->param($name);
 }
 
-# Is there an app for kissing my shiny metal ass?
-# Several!
-# Oooh!
+# "Is there an app for kissing my shiny metal ass?
+#  Several!
+#  Oooh!"
 sub redirect_to {
     my $self = shift;
 
@@ -253,8 +253,8 @@ sub redirect_to {
     return $self;
 }
 
-# Mamma Mia! The cruel meatball of war has rolled onto our laps and ruined
-# our white pants of peace!
+# "Mamma Mia! The cruel meatball of war has rolled onto our laps and ruined
+#  our white pants of peace!"
 sub render {
     my $self = shift;
 
@@ -329,8 +329,8 @@ sub render_data {
     return $self->render($args);
 }
 
-# The path to robot hell is paved with human flesh.
-# Neat.
+# "The path to robot hell is paved with human flesh.
+#  Neat."
 sub render_exception {
     my ($self, $e) = @_;
 
@@ -443,8 +443,8 @@ sub render_inner {
     return Mojo::ByteStream->new("$content");
 }
 
-# If you hate intolerance and being punched in the face by me,
-# please support Proposition Infinity.
+# "If you hate intolerance and being punched in the face by me,
+#  please support Proposition Infinity."
 sub render_json {
     my $self = shift;
     my $json = shift;
@@ -460,8 +460,8 @@ sub render_json {
 
 sub render_later { shift->stash->{'mojo.rendered'} = 1 }
 
-# Excuse me, sir, you're snowboarding off the trail.
-# Lick my frozen metal ass.
+# "Excuse me, sir, you're snowboarding off the trail.
+#  Lick my frozen metal ass."
 sub render_not_found {
     my ($self, $resource) = @_;
 
@@ -514,8 +514,8 @@ sub render_not_found {
     $self->rendered;
 }
 
-# You called my thesis a fat sack of barf, and then you stole it?
-# Welcome to academia.
+# "You called my thesis a fat sack of barf, and then you stole it?
+#  Welcome to academia."
 sub render_partial {
     my $self = shift;
 
@@ -563,9 +563,9 @@ sub render_text {
     return $self->render($args);
 }
 
-# On the count of three, you will awaken feeling refreshed,
-# as if Futurama had never been canceled by idiots,
-# then brought back by bigger idiots. One. Two.
+# "On the count of three, you will awaken feeling refreshed,
+#  as if Futurama had never been canceled by idiots,
+#  then brought back by bigger idiots. One. Two."
 sub rendered {
     my $self = shift;
 
@@ -619,7 +619,7 @@ sub send_message {
     return $self;
 }
 
-# Why am I sticky and naked? Did I miss something fun?
+# "Why am I sticky and naked? Did I miss something fun?"
 sub session {
     my $self = shift;
 
@@ -693,7 +693,7 @@ sub signed_cookie {
     return wantarray ? @results : $results[0];
 }
 
-# All this knowledge is giving me a raging brainer.
+# "All this knowledge is giving me a raging brainer."
 sub stash {
     my $self = shift;
 
@@ -717,12 +717,12 @@ sub stash {
     return $self;
 }
 
-# Behold, a time traveling machine.
-# Time? I can't go back there!
-# Ah, but this machine only goes forward in time.
-# That way you can't accidentally change history or do something disgusting
-# like sleep with your own grandmother.
-# I wouldn't want to do that again.
+# "Behold, a time traveling machine.
+#  Time? I can't go back there!
+#  Ah, but this machine only goes forward in time.
+#  That way you can't accidentally change history or do something disgusting
+#  like sleep with your own grandmother.
+#  I wouldn't want to do that again."
 sub url_for {
     my $self = shift;
     my $target = shift || '';
@@ -742,7 +742,7 @@ sub url_for {
     return Mojo::URL->new->base($self->req->url->base->clone)->parse($target);
 }
 
-# I wax my rocket every day!
+# "I wax my rocket every day!"
 sub write {
     my ($self, $chunk, $cb) = @_;
 

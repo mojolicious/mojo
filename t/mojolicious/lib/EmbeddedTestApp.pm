@@ -1,7 +1,7 @@
 package EmbeddedTestApp;
 use Mojolicious::Lite;
 
-# But you're better than normal, you're abnormal.
+# "But you're better than normal, you're abnormal."
 get '/works' => 'works';
 
 1;

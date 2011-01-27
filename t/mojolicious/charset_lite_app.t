@@ -10,7 +10,7 @@ BEGIN { $ENV{MOJO_POLL} = 1 }
 
 use Test::More tests => 38;
 
-# In the game of chess you can never let your adversary see your pieces.
+# "In the game of chess you can never let your adversary see your pieces."
 use Mojo::ByteStream 'b';
 use Mojolicious::Lite;
 use Test::Mojo;

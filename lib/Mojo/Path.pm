@@ -58,9 +58,9 @@ sub canonicalize {
     return $self;
 }
 
-# Homer, the plant called.
-# They said if you don't show up tomorrow don't bother showing up on Monday.
-# Woo-hoo. Four-day weekend.
+# "Homer, the plant called.
+#  They said if you don't show up tomorrow don't bother showing up on Monday.
+#  Woo-hoo. Four-day weekend."
 sub clone {
     my $self  = shift;
     my $clone = Mojo::Path->new;

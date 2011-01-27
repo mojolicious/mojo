@@ -25,8 +25,9 @@ my $VALUE_RE     = qr/
     \")                # Quote
 /x;
 
-# My Homer is not a communist.
-# He may be a liar, a pig, an idiot, a communist, but he is not a porn star.
+# "My Homer is not a communist.
+#  He may be a liar, a pig, an idiot, a communist,
+#  but he is not a porn star."
 sub to_string { croak 'Method "to_string" not implemented by subclass' }
 
 sub _tokenize {

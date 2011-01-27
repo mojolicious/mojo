@@ -65,8 +65,8 @@ sub prepare_ioloop {
     $loop->max_connections($self->max_clients);
 }
 
-# 40 dollars!? This better be the best damn beer ever..
-# *drinks beer* You got lucky.
+# "40 dollars!? This better be the best damn beer ever..
+#  *drinks beer* You got lucky."
 sub run {
     my $self = shift;
 

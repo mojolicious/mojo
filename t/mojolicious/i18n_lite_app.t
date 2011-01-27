@@ -8,7 +8,7 @@ BEGIN { $ENV{MOJO_POLL} = 1 }
 
 use Test::More tests => 24;
 
-# Aw, he looks like a little insane drunken angel.
+# "Aw, he looks like a little insane drunken angel."
 package main;
 use Mojolicious::Lite;
 

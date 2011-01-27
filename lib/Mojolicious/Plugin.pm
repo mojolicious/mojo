@@ -1,8 +1,8 @@
 package Mojolicious::Plugin;
 use Mojo::Base -base;
 
-# This is Fry's decision.
-# And he made it wrong, so it's time for us to interfere in his life.
+# "This is Fry's decision.
+#  And he made it wrong, so it's time for us to interfere in his life."
 sub register { }
 
 1;

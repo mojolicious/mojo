@@ -19,7 +19,7 @@ These options are available:
   --verbose    Print verbose debug information to STDERR.
 EOF
 
-# I hope this has taught you kids a lesson: kids never learn.
+# "I hope this has taught you kids a lesson: kids never learn."
 sub run {
     my $self = shift;
 

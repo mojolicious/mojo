@@ -7,8 +7,8 @@ use utf8;
 
 use Test::More tests => 321;
 
-# I don't want you driving around in a car you built yourself.
-# You can sit there complaining, or you can knit me some seat belts.
+# "I don't want you driving around in a car you built yourself.
+#  You can sit there complaining, or you can knit me some seat belts."
 use_ok 'Mojo::URL';
 
 # Simple

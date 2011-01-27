@@ -9,7 +9,7 @@ has [qw/on_finish on_resume/] => sub {
 };
 has keep_alive => 0;
 
-# Please don't eat me! I have a wife and kids. Eat them!
+# "Please don't eat me! I have a wife and kids. Eat them!"
 sub client_read  { croak 'Method "client_read" not implemented by subclass' }
 sub client_write { croak 'Method "client_write" not implemented by subclass' }
 

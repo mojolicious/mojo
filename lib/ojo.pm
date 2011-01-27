@@ -3,8 +3,8 @@ package ojo;
 use strict;
 use warnings;
 
-# I heard beer makes you stupid.
-# No I'm... doesn't.
+# "I heard beer makes you stupid.
+#  No I'm... doesn't."
 use Mojo::ByteStream 'b';
 use Mojo::Client;
 use Mojo::DOM;
@@ -12,8 +12,8 @@ use Mojo::DOM;
 # Silent oneliners
 $ENV{MOJO_LOG_LEVEL} ||= 'fatal';
 
-# I'm sorry, guys. I never meant to hurt you.
-# Just to destroy everything you ever believed in.
+# "I'm sorry, guys. I never meant to hurt you.
+#  Just to destroy everything you ever believed in."
 sub import {
 
     # Prepare exports
@@ -43,7 +43,7 @@ sub import {
     *{"${caller}::x"} = sub { Mojo::DOM->new->parse(@_) };
 }
 
-# I wonder what the shroud of Turin tastes like.
+# "I wonder what the shroud of Turin tastes like."
 sub _request {
 
     # Method

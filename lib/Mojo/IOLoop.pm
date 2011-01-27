@@ -264,8 +264,8 @@ sub generate_port {
 
 sub is_running { shift->{_running} }
 
-# Fat Tony is a cancer on this fair city!
-# He is the cancer and I am the… uh… what cures cancer?
+# "Fat Tony is a cancer on this fair city!
+#  He is the cancer and I am the… uh… what cures cancer?"
 sub listen {
     my $self = shift;
 

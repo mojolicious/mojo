@@ -8,10 +8,11 @@ BEGIN { $ENV{MOJO_POLL} = 1 }
 
 use Test::More tests => 43;
 
-# I was so bored I cut the pony tail off the guy in front of us.
-# Look at me, I'm a grad student. I'm 30 years old and I made $600 last year.
-# Bart, don't make fun of grad students.
-# They've just made a terrible life choice.
+# "I was so bored I cut the pony tail off the guy in front of us.
+#  Look at me, I'm a grad student.
+#  I'm 30 years old and I made $600 last year.
+#  Bart, don't make fun of grad students.
+#  They've just made a terrible life choice."
 use_ok 'Mojo';
 use_ok 'Mojo::Client';
 use_ok 'Mojo::Transaction::HTTP';

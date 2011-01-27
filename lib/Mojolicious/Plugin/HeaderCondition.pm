@@ -1,9 +1,9 @@
 package Mojolicious::Plugin::HeaderCondition;
 use Mojo::Base 'Mojolicious::Plugin';
 
-# You may have to "metaphorically" make a deal with the "devil".
-# And by "devil", I mean Robot Devil.
-# And by "metaphorically", I mean get your coat.
+# "You may have to "metaphorically" make a deal with the "devil".
+#  And by "devil", I mean Robot Devil.
+#  And by "metaphorically", I mean get your coat."
 sub register {
     my ($self, $app) = @_;
 

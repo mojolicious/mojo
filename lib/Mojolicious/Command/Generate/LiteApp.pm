@@ -8,7 +8,7 @@ has usage => <<"EOF";
 usage: $0 generate lite_app [NAME]
 EOF
 
-# If for any reason you're not completely satisfied, I hate you.
+# "If for any reason you're not completely satisfied, I hate you."
 sub run {
     my ($self, $name) = @_;
     $name ||= 'myapp.pl';

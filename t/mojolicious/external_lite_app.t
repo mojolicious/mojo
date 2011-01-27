@@ -11,11 +11,11 @@ BEGIN {
     $ENV{MOJO_MODE} = 'testing';
 }
 
-# Who are you, and why should I care?
+# "Who are you, and why should I care?"
 use Test::More tests => 3;
 
-# Of all the parasites I've had over the years,
-# these worms are among the best.
+# "Of all the parasites I've had over the years,
+#  these worms are among the best."
 use FindBin;
 $ENV{MOJO_JSON_CONFIG} = 'external.json';
 $ENV{MOJO_HOME}        = $FindBin::Bin;

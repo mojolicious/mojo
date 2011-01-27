@@ -33,8 +33,9 @@ EOF
     shift->helpers(@_);
 };
 
-# This is not how Xmas is supposed to be.
-# In my day Xmas was about bringing people together, not blowing them apart.
+# "This is not how Xmas is supposed to be.
+#  In my day Xmas was about bringing people together,
+#  not blowing them apart."
 sub new {
     my $self = shift->SUPER::new(@_);
 
@@ -83,7 +84,7 @@ sub get_inline_template {
         $self->_detect_template_class($options));
 }
 
-# Bodies are for hookers and fat people.
+# "Bodies are for hookers and fat people."
 sub render {
     my ($self, $c, $args) = @_;
 
@@ -280,8 +281,8 @@ sub _detect_handler {
     return;
 }
 
-# You are hereby conquered.
-# Please line up in order of how much beryllium it takes to kill you.
+# "You are hereby conquered.
+#  Please line up in order of how much beryllium it takes to kill you."
 sub _detect_template_class {
     my ($self, $options) = @_;
     return
@@ -314,8 +315,8 @@ sub _list_inline_templates {
     return [keys %$all];
 }
 
-# Well, at least here you'll be treated with dignity.
-# Now strip naked and get on the probulator.
+# "Well, at least here you'll be treated with dignity.
+#  Now strip naked and get on the probulator."
 sub _render_template {
     my ($self, $c, $output, $options) = @_;
 

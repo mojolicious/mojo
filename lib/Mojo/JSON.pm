@@ -97,7 +97,7 @@ my $UTF_PATTERNS = {
     "[^\0]\0[^\0]\0" => 'UTF-16LE'
 };
 
-# Hey...That's not the wallet inspector...
+# "Hey...That's not the wallet inspector..."
 sub decode {
     my ($self, $string) = @_;
 

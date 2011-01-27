@@ -10,8 +10,8 @@ BEGIN { $ENV{MOJO_POLL} = 1 }
 
 use Test::More tests => 8;
 
-# Oh, I always feared he might run off like this.
-# Why, why, why didn't I break his legs?
+# "Oh, I always feared he might run off like this.
+#  Why, why, why didn't I break his legs?"
 use Mojolicious::Lite;
 use Test::Mojo;
 

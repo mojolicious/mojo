@@ -1,8 +1,8 @@
 package Mojolicious::Plugin::AgentCondition;
 use Mojo::Base 'Mojolicious::Plugin';
 
-# Wow, there's a million aliens! I've never seen something so mind-blowing!
-# Ooh, a reception table with muffins!
+# "Wow, there's a million aliens! I've never seen something so mind-blowing!
+#  Ooh, a reception table with muffins!"
 sub register {
     my ($self, $app) = @_;
 

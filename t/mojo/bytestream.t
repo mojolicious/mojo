@@ -5,9 +5,9 @@ use warnings;
 
 use utf8;
 
-# Homer, we're going to ask you a few simple yes or no questions.
-# Do you understand?
-# Yes. *lie dectector blows up*
+# "Homer, we're going to ask you a few simple yes or no questions.
+#  Do you understand?
+#  Yes. *lie dectector blows up*"
 use Test::More;
 
 plan skip_all => 'Perl 5.10 or Digest::SHA required for this test!'

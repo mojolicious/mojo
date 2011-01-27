@@ -326,9 +326,9 @@ sub to_rel {
     return $rel;
 }
 
-# Dad, what's a Muppet?
-# Well, it's not quite a mop, not quite a puppet, but man... *laughs*
-# So, to answer you question, I don't know.
+# "Dad, what's a Muppet?
+#  Well, it's not quite a mop, not quite a puppet, but man... *laughs*
+#  So, to answer you question, I don't know."
 sub to_string {
     my $self = shift;
 

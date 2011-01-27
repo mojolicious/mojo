@@ -58,13 +58,14 @@ has on_websocket => sub {
 };
 has reload => sub { $ENV{MOJO_RELOAD} || 0 };
 
-# Are you saying you're never going to eat any animal again? What about bacon?
-# No.
-# Ham?
-# No.
-# Pork chops?
-# Dad, those all come from the same animal.
-# Heh heh heh. Ooh, yeah, right, Lisa. A wonderful, magical animal.
+# "Are you saying you're never going to eat any animal again? What about
+#  bacon?
+#  No.
+#  Ham?
+#  No.
+#  Pork chops?
+#  Dad, those all come from the same animal.
+#  Heh heh heh. Ooh, yeah, right, Lisa. A wonderful, magical animal."
 sub run { croak 'Method "run" not implemented by subclass' }
 
 1;

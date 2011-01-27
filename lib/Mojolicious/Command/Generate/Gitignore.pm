@@ -8,10 +8,10 @@ has usage => <<"EOF";
 usage: $0 generate gitignore
 EOF
 
-# I want to see the edge of the universe.
-# Ooh, that sounds cool.
-# It's funny, you live in the universe, but you never get to do this things
-# until someone comes to visit.
+# "I want to see the edge of the universe.
+#  Ooh, that sounds cool.
+#  It's funny, you live in the universe, but you never get to do this things
+#  until someone comes to visit."
 sub run {
     my $self = shift;
     $self->render_to_rel_file('gitignore', '.gitignore');

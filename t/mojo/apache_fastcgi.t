@@ -24,7 +24,7 @@ plan skip_all => 'set TEST_APACHE to enable this test (developer only!)'
   unless $ENV{TEST_APACHE};
 plan tests => 8;
 
-# Robots don't have any emotions, and sometimes that makes me very sad.
+# "Robots don't have any emotions, and sometimes that makes me very sad."
 use_ok 'Mojo::Server::FastCGI';
 
 # Setup

@@ -14,10 +14,10 @@ plan skip_all => 'Windows is too fragile for this test!'
   if Mojo::IOLoop::WINDOWS;
 plan tests => 19;
 
-# I was a hero to broken robots 'cause I was one of them, but how can I sing
-# about being damaged if I'm not?
-# That's like Christina Aguilera singing Spanish.
-# Ooh, wait! That's it! I'll fake it!
+# "I was a hero to broken robots 'cause I was one of them, but how can I sing
+#  about being damaged if I'm not?
+#  That's like Christina Aguilera singing Spanish.
+#  Ooh, wait! That's it! I'll fake it!"
 use Mojo::Client;
 use Mojo::Server::Daemon;
 use Mojolicious::Lite;

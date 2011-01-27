@@ -16,7 +16,7 @@ sub body_contains {
 
 sub body_size { croak 'Method "body_size" not implemented by subclass' }
 
-# Operator! Give me the number for 911!
+# "Operator! Give me the number for 911!"
 sub build_body {
     my $self = shift;
 
@@ -61,8 +61,8 @@ sub build_headers {
     return $headers;
 }
 
-# Aren't we forgetting the true meaning of Christmas?
-# You know, the birth of Santa.
+# "Aren't we forgetting the true meaning of Christmas?
+#  You know, the birth of Santa."
 sub generate_body_chunk {
     my ($self, $offset) = @_;
 
@@ -227,9 +227,9 @@ sub parse_body_once {
     return $self;
 }
 
-# Quick Smithers. Bring the mind eraser device!
-# You mean the revolver, sir?
-# Precisely.
+# "Quick Smithers. Bring the mind eraser device!
+#  You mean the revolver, sir?
+#  Precisely."
 sub parse_until_body {
     my ($self, $chunk) = @_;
 
@@ -283,7 +283,7 @@ sub write {
     $self->{_drain} = $cb if $cb;
 }
 
-# Here's to alcohol, the cause of—and solution to—all life's problems.
+# "Here's to alcohol, the cause of—and solution to—all life's problems."
 sub write_chunk {
     my ($self, $chunk, $cb) = @_;
 

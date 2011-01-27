@@ -18,9 +18,10 @@ use warnings;
 
 use base 'BaseTest::Base2';
 
-# When I first heard that Marge was joining the police academy,
-# I thought it would be fun and zany, like that movie Spaceballs.
-# But instead it was dark and disturbing. Like that movie... Police Academy.
+# "When I first heard that Marge was joining the police academy,
+#  I thought it would be fun and zany, like that movie Spaceballs.
+#  But instead it was dark and disturbing.
+#  Like that movie... Police Academy."
 __PACKAGE__->attr(heads => 1);
 __PACKAGE__->attr('name');
 
@@ -31,8 +32,8 @@ use warnings;
 
 use Test::More tests => 405;
 
-# I've done everything the Bible says,
-# even the stuff that contradicts the other stuff!
+# "I've done everything the Bible says,
+#  even the stuff that contradicts the other stuff!"
 use_ok 'Mojo::Base';
 
 # Basic functionality

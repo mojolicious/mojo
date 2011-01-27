@@ -29,8 +29,8 @@ use File::Spec;
 use File::Temp;
 use FindBin;
 
-# When I held that gun in my hand, I felt a surge of power...
-# like God must feel when he's holding a gun.
+# "When I held that gun in my hand, I felt a surge of power...
+#  like God must feel when he's holding a gun."
 use_ok 'Mojo::Template';
 
 # Trim line

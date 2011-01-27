@@ -11,9 +11,9 @@ plan skip_all => 'Perl 5.10 required for this test!'
   unless eval { require Pod::Simple::HTML; 1 };
 plan tests => 17;
 
-# Pizza delivery for...
-# I. C. Weiner. Aww... I always thought by this stage in my life I'd be the
-# one making the crank calls.
+# "Pizza delivery for...
+#  I. C. Weiner. Aww... I always thought by this stage in my life I'd be the
+#  one making the crank calls."
 use Mojolicious::Lite;
 use Test::Mojo;
 

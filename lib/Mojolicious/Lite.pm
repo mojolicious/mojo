@@ -1,13 +1,13 @@
 package Mojolicious::Lite;
 use Mojo::Base 'Mojolicious';
 
-# Since when is the Internet all about robbing people of their privacy?
-# August 6, 1991.
+# "Since when is the Internet all about robbing people of their privacy?
+#  August 6, 1991."
 use File::Spec;
 use FindBin;
 
-# It's the future, my parents, my co-workers, my girlfriend,
-# I'll never see any of them ever again... YAHOOO!
+# "It's the future, my parents, my co-workers, my girlfriend,
+#  I'll never see any of them ever again... YAHOOO!"
 sub import {
     my $class = shift;
 

@@ -3,9 +3,9 @@ use Mojo::Base 'Mojo::Cookie';
 
 use Mojo::Util 'unquote';
 
-# Lisa, would you like a donut?
-# No thanks. Do you have any fruit?
-# This has purple in it. Purple is a fruit.
+# "Lisa, would you like a donut?
+#  No thanks. Do you have any fruit?
+#  This has purple in it. Purple is a fruit."
 sub parse {
     my ($self, $string) = @_;
 

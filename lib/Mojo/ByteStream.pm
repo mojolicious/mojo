@@ -14,8 +14,8 @@ sub import {
       if @_ > 1;
 }
 
-# Do we have any food that wasn't brutally slaughtered?
-# Well, I think the veal died of loneliness.
+# "Do we have any food that wasn't brutally slaughtered?
+#  Well, I think the veal died of loneliness."
 sub new {
     my $self = shift->SUPER::new();
     $self->{bytestream} = join '', @_;
@@ -40,8 +40,6 @@ sub camelize {
     return $self;
 }
 
-# The only monster here is the gambling monster that has enslaved your mother!
-# I call him Gamblor, and it's time to snatch your mother from his neon claws!
 sub clone {
     my $self = shift;
     return $self->new($self->{bytestream});
@@ -53,11 +51,11 @@ sub decamelize {
     return $self;
 }
 
-# I want to share something with you: The three little sentences that will
-# get you through life.
-# Number 1: "Cover for me."
-# Number 2: "Oh, good idea, Boss!"
-# Number 3: "It was like that when I got here."
+# "I want to share something with you: The three little sentences that will
+#  get you through life.
+#  Number 1: 'Cover for me.'
+#  Number 2: 'Oh, good idea, Boss!'
+#  Number 3: 'It was like that when I got here.'"
 sub decode {
     my $self = shift;
     Mojo::Util::decode shift || 'UTF-8', $self->{bytestream};
@@ -118,9 +116,9 @@ sub punycode_encode {
     return $self;
 }
 
-# Old people don't need companionship.
-# They need to be isolated and studied so it can be determined what nutrients
-# they have that might be extracted for our personal use.
+# "Old people don't need companionship.
+#  They need to be isolated and studied so it can be determined what
+#  nutrients they have that might be extracted for our personal use."
 sub qp_decode {
     my $self = shift;
     Mojo::Util::qp_decode $self->{bytestream};

@@ -8,8 +8,8 @@ BEGIN { $ENV{MOJO_POLL} = 1 }
 
 use Test::More tests => 86;
 
-# I was God once.
-# Yes, I saw. You were doing well until everyone died.
+# "I was God once.
+#  Yes, I saw. You were doing well until everyone died."
 use Mojolicious::Lite;
 use Test::Mojo;
 

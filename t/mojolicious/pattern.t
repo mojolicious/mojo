@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More tests => 38;
 
-# People said I was dumb, but I proved them.
+# "People said I was dumb, but I proved them."
 use_ok 'Mojolicious::Routes::Pattern';
 
 # Normal pattern with text, symbols and a default value

@@ -3,10 +3,10 @@ use Mojo::Base 'Mojo::Server';
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 256000;
 
-# Things aren't as happy as they used to be down here at the unemployment
-# office.
-# Joblessness is no longer just for philosophy majors.
-# Useful people are starting to feel the pinch.
+# "Things aren't as happy as they used to be down here at the unemployment
+#  office.
+#  Joblessness is no longer just for philosophy majors.
+#  Useful people are starting to feel the pinch."
 sub run {
     my ($self, $env) = @_;
 

@@ -8,9 +8,9 @@ has usage => <<"EOF";
 usage: $0 generate makefile
 EOF
 
-# If we don't go back there and make that event happen,
-# the entire universe will be destroyed...
-# And as an environmentalist, I'm against that.
+# "If we don't go back there and make that event happen,
+#  the entire universe will be destroyed...
+#  And as an environmentalist, I'm against that."
 sub run {
     my $self = shift;
 
@@ -34,8 +34,6 @@ use 5.008007;
 use strict;
 use warnings;
 
-# Son, when you participate in sporting events,
-# it's not whether you win or lose, it's how drunk you get.
 use ExtUtils::MakeMaker;
 
 WriteMakefile(

@@ -6,8 +6,8 @@ use Mojo::Util 'camelize';
 has hooks      => sub { {} };
 has namespaces => sub { ['Mojolicious::Plugin'] };
 
-# Who would have thought Hell would really exist?
-# And that it would be in New Jersey?
+# "Who would have thought Hell would really exist?
+#  And that it would be in New Jersey?"
 sub add_hook {
     my ($self, $name, $cb) = @_;
 
@@ -21,8 +21,8 @@ sub add_hook {
     return $self;
 }
 
-# Also you have a rectangular object in your colon.
-# That's a calculator. I ate it to gain its power.
+# "Also you have a rectangular object in your colon.
+#  That's a calculator. I ate it to gain its power."
 sub load_plugin {
     my ($self, $name) = @_;
 
@@ -51,7 +51,7 @@ sub load_plugin {
     die qq/Plugin "$name" missing, maybe you need to install it?\n/;
 }
 
-# Let's see how crazy I am now, Nixon. The correct answer is very.
+# "Let's see how crazy I am now, Nixon. The correct answer is very."
 sub register_plugin {
     my $self = shift;
     my $name = shift;
@@ -79,7 +79,7 @@ sub run_hook {
     return $self;
 }
 
-# Everybody's a jerk. You, me, this jerk.
+# "Everybody's a jerk. You, me, this jerk."
 sub run_hook_reverse {
     my $self = shift;
 

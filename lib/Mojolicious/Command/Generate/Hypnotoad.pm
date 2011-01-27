@@ -1,8 +1,8 @@
 package Mojolicious::Command::Generate::Hypnotoad;
 use Mojo::Base 'Mojo::Command';
 
-# As a scientist,
-# I can assure you that we did in fact evolve from filthy monkey-men.
+# "As a scientist,
+#  I can assure you that we did in fact evolve from filthy monkey-men."
 has description => <<'EOF';
 Generate hypnotoad.conf.
 EOF
@@ -10,8 +10,8 @@ has usage => <<"EOF";
 usage: $0 generate hypnotoad
 EOF
 
-# Oh no! Can we switch back using four or more bodies?
-# I'm not sure. I'm afraid we need to use... MATH.
+# "Oh no! Can we switch back using four or more bodies?
+#  I'm not sure. I'm afraid we need to use... MATH."
 sub run {
     my $self = shift;
     $self->render_to_rel_file('hypnotoad', 'hypnotoad.conf');

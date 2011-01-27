@@ -7,10 +7,10 @@ use Test::More tests => 8;
 
 use_ok 'Mojo::IOLoop';
 
-# Marge, you being a cop makes you the man!
-# Which makes me the woman, and I have no interest in that,
-# besides occasionally wearing the underwear,
-# which as we discussed, is strictly a comfort thing.
+# "Marge, you being a cop makes you the man!
+#  Which makes me the woman, and I have no interest in that,
+#  besides occasionally wearing the underwear,
+#  which as we discussed, is strictly a comfort thing."
 my $loop = Mojo::IOLoop->new;
 
 # Ticks

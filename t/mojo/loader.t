@@ -12,8 +12,8 @@ use File::Spec;
 use File::Temp;
 use IO::File;
 
-# Bad bees. Get away from my sugar.
-# Ow. OW. Oh, they're defending themselves somehow.
+# "Bad bees. Get away from my sugar.
+#  Ow. OW. Oh, they're defending themselves somehow."
 use_ok 'Mojo::Loader';
 
 # Exception

@@ -19,7 +19,7 @@ has usage => <<"EOF";
 usage: $0 generate GENERATOR [OPTIONS]
 EOF
 
-# Ah, nothing like a warm fire and a SuperSoaker of fine cognac.
+# "Ah, nothing like a warm fire and a SuperSoaker of fine cognac."
 
 1;
 __END__

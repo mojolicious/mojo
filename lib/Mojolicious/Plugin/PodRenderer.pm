@@ -25,8 +25,8 @@ our $MOJOBAR = Mojo::Command->new->get_data('mojobar.html.ep', __PACKAGE__);
 # Perldoc template
 our $PERLDOC = Mojo::Command->new->get_data('perldoc.html.ep', __PACKAGE__);
 
-# This is my first visit to the Galaxy of Terror and I'd like it to be a
-# pleasant one.
+# "This is my first visit to the Galaxy of Terror and I'd like it to be a
+#  pleasant one."
 sub register {
     my ($self, $app, $conf) = @_;
 

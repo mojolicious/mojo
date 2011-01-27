@@ -176,8 +176,8 @@ sub get_data {
     return $all->{$data};
 }
 
-# You don’t like your job, you don’t strike.
-# You go in every day and do it really half-assed. That’s the American way.
+# "You don’t like your job, you don’t strike.
+#  You go in every day and do it really half-assed. That’s the American way."
 sub help {
     my $self = shift;
     print $self->usage;
@@ -241,7 +241,7 @@ sub render_to_rel_file {
     $self->render_to_file($data, $path, @_);
 }
 
-# My cat's breath smells like cat food.
+# "My cat's breath smells like cat food."
 sub run {
     my ($self, $name, @args) = @_;
 

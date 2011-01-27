@@ -8,7 +8,7 @@ BEGIN { $ENV{MOJO_POLL} = 1 }
 
 use Test::More tests => 9;
 
-# Your mistletoe is no match for my *tow* missile.
+# "Your mistletoe is no match for my *tow* missile."
 use Mojo::Client;
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;

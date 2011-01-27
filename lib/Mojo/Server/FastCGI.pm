@@ -40,9 +40,9 @@ my %TYPE_NUMBERS;
     }
 }
 
-# Wow! Homer must have got one of those robot cars!
-# *Car crashes in background*
-# Yeah, one of those AMERICAN robot cars.
+# "Wow! Homer must have got one of those robot cars!
+#  *Car crashes in background*
+#  Yeah, one of those AMERICAN robot cars."
 sub accept_connection {
     my $self = shift;
 

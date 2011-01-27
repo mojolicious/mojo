@@ -187,7 +187,7 @@ sub interpret {
     return $output;
 }
 
-# I am so smart! I am so smart! S-M-R-T! I mean S-M-A-R-T...
+# "I am so smart! I am so smart! S-M-R-T! I mean S-M-A-R-T..."
 sub parse {
     my ($self, $tmpl) = @_;
     $self->template($tmpl);

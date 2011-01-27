@@ -6,9 +6,10 @@ use FindBin;
 use File::Spec;
 use Test::Harness;
 
-# Okay folks, show's over. Nothing to see here, show's... Oh my god!
-# A horrible plane crash! Hey everybody, get a load of this flaming wreckage!
-# Come on, crowd around, crowd around!
+# "Okay folks, show's over. Nothing to see here, show's... Oh my god!
+#  A horrible plane crash!
+#  Hey everybody, get a load of this flaming wreckage!
+#  Come on, crowd around, crowd around!"
 has description => <<'EOF';
 Run unit tests.
 EOF
@@ -16,7 +17,7 @@ has usage => <<"EOF";
 usage: $0 test [TESTS]
 EOF
 
-# My eyes! The goggles do nothing!
+# "My eyes! The goggles do nothing!"
 sub run {
     my ($self, @tests) = @_;
 

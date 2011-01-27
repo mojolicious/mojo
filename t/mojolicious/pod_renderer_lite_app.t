@@ -11,9 +11,9 @@ plan skip_all => 'Perl 5.10 or Pod::Simple required for this test!'
   unless eval { require Pod::Simple::HTML; 1 };
 plan tests => 16;
 
-# Amy get your pants back on and get to work.
-# They think were making out.
-# Why aren't we making out?
+# "Amy get your pants back on and get to work.
+#  They think were making out.
+#  Why aren't we making out?"
 use Mojolicious::Lite;
 use Test::Mojo;
 

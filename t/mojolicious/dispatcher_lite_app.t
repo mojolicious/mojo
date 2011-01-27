@@ -8,8 +8,8 @@ BEGIN { $ENV{MOJO_POLL} = 1 }
 
 use Test::More tests => 9;
 
-# Just once I'd like to eat dinner with a celebrity who isn't bound and
-# gagged.
+# "Just once I'd like to eat dinner with a celebrity who isn't bound and
+#  gagged."
 use Mojolicious::Lite;
 use Test::Mojo;
 

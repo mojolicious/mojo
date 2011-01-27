@@ -20,7 +20,7 @@ use Scalar::Util 'weaken';
 # Debug
 use constant DEBUG => $ENV{MOJO_CLIENT_DEBUG} || 0;
 
-# You can't let a single bad experience scare you away from drugs.
+# "You can't let a single bad experience scare you away from drugs."
 has [qw/app cert http_proxy https_proxy key no_proxy on_start tx/];
 has cookie_jar => sub { Mojo::CookieJar->new };
 has ioloop     => sub { Mojo::IOLoop->new };
@@ -52,8 +52,8 @@ sub DESTROY {
     }
 }
 
-# Homer, it's easy to criticize.
-# Fun, too.
+# "Homer, it's easy to criticize.
+#  Fun, too."
 sub async {
     my $self = shift;
 
@@ -79,7 +79,7 @@ sub async {
     return $self->{_async};
 }
 
-# Ah, alcohol and night-swimming. It's a winning combination.
+# "Ah, alcohol and night-swimming. It's a winning combination."
 sub build_form_tx {
     my $self = shift;
 
@@ -305,8 +305,8 @@ sub clone {
     return $clone;
 }
 
-# The only thing I asked you to do for this party was put on clothes,
-# and you didn't do it.
+# "The only thing I asked you to do for this party was put on clothes,
+#  and you didn't do it."
 sub delete {
     my $self = shift;
     return $self->_tx_queue_or_start($self->build_tx('DELETE', @_));
@@ -335,7 +335,7 @@ sub finish {
     $tx->finish;
 }
 
-# "What are you lookin' at?" - the innocent words of a drunken child.
+# "'What are you lookin at?' - the innocent words of a drunken child."
 sub get {
     my $self = shift;
     return $self->_tx_queue_or_start($self->build_tx('GET', @_));
@@ -416,8 +416,8 @@ sub put {
     $self->_tx_queue_or_start($self->build_tx('PUT', @_));
 }
 
-# And I gave that man directions, even though I didn't know the way,
-# because that's the kind of guy I am this week.
+# "And I gave that man directions, even though I didn't know the way,
+#  because that's the kind of guy I am this week."
 sub queue {
     my $self = shift;
 
@@ -436,8 +436,8 @@ sub res { shift->tx->res(@_) }
 
 sub singleton { $CLIENT ||= shift->new(@_) }
 
-# Wow, Barney. You brought a whole beer keg.
-# Yeah... where do I fill it up?
+# "Wow, Barney. You brought a whole beer keg.
+#  Yeah... where do I fill it up?"
 sub send_message {
     my $self = shift;
 
@@ -453,8 +453,8 @@ sub send_message {
     return $self;
 }
 
-# Olive oil? Asparagus? If your mother wasn't so fancy,
-# we could just shop at the gas station like normal people.
+# "Olive oil? Asparagus? If your mother wasn't so fancy,
+#  we could just shop at the gas station like normal people."
 sub start {
     my $self = shift;
 
@@ -486,7 +486,7 @@ sub start {
     return $self;
 }
 
-# It's like my dad always said: eventually, everybody gets shot.
+# "It's like my dad always said: eventually, everybody gets shot."
 sub test_server {
     my $self = shift;
 
@@ -510,13 +510,13 @@ sub test_server {
     return $self->{_port};
 }
 
-# Are we there yet?
-# No
-# Are we there yet?
-# No
-# Are we there yet?
-# No
-# ...Where are we going?
+# "Are we there yet?
+#  No
+#  Are we there yet?
+#  No
+#  Are we there yet?
+#  No
+#  ...Where are we going?"
 sub websocket {
     my $self = shift;
     $self->queue($self->build_websocket_tx(@_));
@@ -573,8 +573,8 @@ sub _cache {
     return $result;
 }
 
-# Where on my badge does it say anything about protecting people?
-# Uh, second word, chief.
+# "Where on my badge does it say anything about protecting people?
+#  Uh, second word, chief."
 sub _connect {
     my ($self, $tx, $cb) = @_;
 
@@ -650,7 +650,7 @@ sub _connect {
     return $id;
 }
 
-# Hey, Weener Boy... where do you think you're going?
+# "Hey, Weener Boy... where do you think you're going?"
 sub _connect_proxy {
     my ($self, $old, $cb) = @_;
 
@@ -710,8 +710,8 @@ sub _connect_proxy {
     return 1;
 }
 
-# I don't mind being called a liar when I'm lying, or about to lie,
-# or just finished lying, but NOT WHEN I'M TELLING THE TRUTH.
+# "I don't mind being called a liar when I'm lying, or about to lie,
+#  or just finished lying, but NOT WHEN I'M TELLING THE TRUTH."
 sub _connected {
     my ($self, $id) = @_;
 
@@ -739,8 +739,8 @@ sub _connected {
     $self->_write($id);
 }
 
-# Mrs. Simpson, bathroom is not for customers.
-# Please use the crack house across the street.
+# "Mrs. Simpson, bathroom is not for customers.
+#  Please use the crack house across the street."
 sub _drop {
     my ($self, $id, $close) = @_;
 
@@ -778,8 +778,8 @@ sub _error {
     $self->_handle($id, $error);
 }
 
-# No children have ever meddled with the Republican Party and lived to tell
-# about it.
+# "No children have ever meddled with the Republican Party and lived to tell
+#  about it."
 sub _handle {
     my ($self, $id, $close) = @_;
 
@@ -839,8 +839,8 @@ sub _handle {
 
 sub _hup { shift->_handle(pop, 1) }
 
-# Have you ever seen that Blue Man Group? Total ripoff of the Smurfs.
-# And the Smurfs, well, they SUCK.
+# "Have you ever seen that Blue Man Group? Total ripoff of the Smurfs.
+#  And the Smurfs, well, they SUCK."
 sub _read {
     my ($self, $loop, $id, $chunk) = @_;
 
@@ -915,8 +915,8 @@ sub _redirect {
     return 1;
 }
 
-# Oh, I'm in no condition to drive. Wait a minute.
-# I don't have to listen to myself. I'm drunk.
+# "Oh, I'm in no condition to drive. Wait a minute.
+#  I don't have to listen to myself. I'm drunk."
 sub _tx_finish {
     my ($self, $tx, $cb) = @_;
 
@@ -971,7 +971,7 @@ sub _tx_queue_or_start {
     $self->queue($tx, $cb);
 }
 
-# It's greeat! We can do *anything* now that Science has invented Magic.
+# "It's greeat! We can do *anything* now that Science has invented Magic."
 sub _tx_start {
     my ($self, $tx, $cb) = @_;
 
@@ -1044,7 +1044,7 @@ sub _tx_start {
     return $id;
 }
 
-# Once the government approves something, it's no longer immoral!
+# "Once the government approves something, it's no longer immoral!"
 sub _upgrade {
     my ($self, $id) = @_;
 
@@ -1090,7 +1090,7 @@ sub _upgrade {
     return $new;
 }
 
-# Oh well. At least we'll die doing what we love: inhaling molten rock.
+# "Oh well. At least we'll die doing what we love: inhaling molten rock."
 sub _write {
     my ($self, $id) = @_;
 

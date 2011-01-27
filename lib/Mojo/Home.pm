@@ -10,8 +10,8 @@ use Mojo::Loader;
 
 has app_class => 'Mojo::HelloWorld';
 
-# I'm normally not a praying man, but if you're up there,
-# please save me Superman.
+# "I'm normally not a praying man, but if you're up there,
+#  please save me Superman."
 sub detect {
     my ($self, $class) = @_;
 
@@ -110,8 +110,8 @@ sub list_files {
     return [sort @files];
 }
 
-# And now to create an unstoppable army of between one million and two
-# million zombies!
+# "And now to create an unstoppable army of between one million and two
+#  million zombies!"
 sub parse {
     my ($self, $path) = @_;
     my @parts = File::Spec->splitdir($path);

@@ -242,6 +242,25 @@ environment variable.
     # Increase limit to 1GB
     $ENV{MOJO_MAX_MESSAGE_SIZE} = 1073741824;
 
+=head2 Large File Upload
+
+Uploading a large file is even easier.
+
+    # Upload file via POST and "multipart/form-data"
+    my $client = Mojo::Client->new;
+    $client->post_form('mojolicio.us/upload',
+        {image => {file => '/Users/sri/hello.png'}});
+
+And once again you don't have to worry about memory usage, all data will be
+streamed directly from the file.
+
+    # Upload file via PUT
+    my $client = Mojo::Client->new;
+    my $asset  = Mojo::Asset::File->new(path => '/Users/sri/hello.png');
+    my $tx     = $client->build_tx(PUT => 'mojolicio.us/upload');
+    $tx->req->content->asset($asset);
+    $client->start($tx);
+
 =head2 Non-Blocking
 
 L<Mojo::Client> has been designed from the ground up to be non-blocking, the

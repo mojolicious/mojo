@@ -171,8 +171,11 @@ sub defaults {
 sub dispatch {
     my ($self, $c) = @_;
 
+    # Transaction
+    my $tx = $c->tx;
+
     # Websocket handshake
-    $c->res->code(undef) if $c->tx->is_websocket;
+    $c->res->code(undef) if $tx->is_websocket;
 
     # Session
     $self->sessions->load($c);
@@ -186,21 +189,24 @@ sub dispatch {
     # Hook
     $self->plugins->run_hook_reverse(after_static_dispatch => $c);
 
+    # Response
+    my $res = $tx->res;
+
     # Already rendered
-    return if $c->res->code;
+    return if $res->code;
 
     # Websocket handshake
-    $c->res->code(101) if $c->tx->is_websocket;
+    $c->res->code(101) if $tx->is_websocket;
 
     # Error or 200
-    my ($error, $code) = $c->req->error;
-    $c->res->code($code) if $code;
+    my ($error, $code) = $tx->req->error;
+    $res->code($code) if $code;
 
     # Routes
     if ($self->routes->dispatch($c)) {
 
         # Nothing found
-        $c->render_not_found unless $c->res->code;
+        $c->render_not_found unless $res->code;
     }
 }
 

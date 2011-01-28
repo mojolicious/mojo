@@ -28,11 +28,25 @@ sub startup {
     # Renderer for a different file extension
     $self->renderer->add_handler(xpl => $self->renderer->handlers->{epl});
 
+    # Keyword for "/fun*" routes
+    $self->routes->add_keyword(
+        fun => sub {
+            my ($r, $append) = @_;
+            $r->route("/fun$append");
+        }
+    );
+
     # Session domain
     $self->sessions->cookie_domain('.example.com');
 
     # Routes
     my $r = $self->routes;
+
+    # /fun/time
+    $r->fun('/time')->to('foo#fun');
+
+    # /happy/fun/time
+    $r->route('/happy')->fun('/time')->to('foo#fun');
 
     # /auth (authentication bridge)
     my $auth = $r->bridge('/auth')->to(

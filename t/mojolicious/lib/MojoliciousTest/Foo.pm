@@ -15,6 +15,8 @@ sub config {
     $self->render_text($self->stash('config')->{test});
 }
 
+sub fun { shift->render(text => 'Have fun!') }
+
 sub index {
     my $self = shift;
     $self->layout('default');

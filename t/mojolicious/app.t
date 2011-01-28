@@ -6,7 +6,7 @@ use warnings;
 # Disable epoll and kqueue
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 189;
+use Test::More tests => 201;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -41,6 +41,18 @@ $t->get_ok('/foo/syntaxerror')->status_is(500)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/^Missing right curly/);
+
+# Foo::fun
+$t->get_ok('/fun/time', {'X-Test' => 'Hi there!'})->status_is(200)
+  ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('Have fun!');
+
+# Foo::fun
+$t->get_ok('/happy/fun/time', {'X-Test' => 'Hi there!'})->status_is(200)
+  ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('Have fun!');
 
 # Foo::authenticated (authentication bridge)
 $t->get_ok('/auth/authenticated', {'X-Bender' => 'Hi there!'})->status_is(200)

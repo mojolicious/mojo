@@ -12,12 +12,28 @@ use Scalar::Util 'weaken';
 has [qw/block inline parent partial namespace/];
 has [qw/children conditions/] => sub { [] };
 has controller_base_class => 'Mojolicious::Controller';
-has dictionary => sub { {} };
-has hidden => sub { [qw/new app attr has render req res stash tx/] };
+has [qw/dictionary keywords/] => sub { {} };
+has hidden  => sub { [qw/new app attr has render req res stash tx/] };
 has pattern => sub { Mojolicious::Routes::Pattern->new };
 
 # "Yet thanks to my trusty safety sphere,
 #  I sublibed with only tribial brain dablage."
+sub AUTOLOAD {
+    my $self = shift;
+
+    # Method
+    my ($package, $method) = our $AUTOLOAD =~ /^([\w\:]+)\:\:(\w+)$/;
+
+    # Keyword
+    Carp::croak(qq/Can't locate object method "$method" via "$package"/)
+      unless my $keyword = $self->keywords->{$method};
+
+    # Run
+    return $self->$keyword(@_);
+}
+
+sub DESTROY { }
+
 sub new {
     my $self = shift->SUPER::new();
 
@@ -67,6 +83,9 @@ sub add_child {
     $route->parent($self);
     weaken $route->{parent};
 
+    # Keywords
+    $route->keywords($self->keywords);
+
     # Add to tree
     push @{$self->children}, $route;
 
@@ -79,6 +98,12 @@ sub add_condition {
     # Add
     $self->dictionary->{$name} = $condition;
 
+    return $self;
+}
+
+sub add_keyword {
+    my ($self, $name, $cb) = @_;
+    $self->keywords->{$name} = $cb;
     return $self;
 }
 
@@ -772,6 +797,14 @@ Controller methods and attributes that are hidden from routes.
 
 Allow C<bridge> semantics for this route.
 
+=head2 C<keywords>
+
+    my $keywords = $r->keywords;
+    $r           = $r->keywords({foo => sub { ... }});
+
+Contains all additional route keywords available for this route.
+Note that this attribute is EXPERIMENTAL and might change without warning!
+
 =head2 C<namespace>
 
     my $namespace = $r->namespace;
@@ -825,6 +858,13 @@ Add a new child to this route.
     $r = $r->add_condition(foo => sub { ... });
 
 Add a new condition for this route.
+
+=head2 C<add_keyword>
+
+    $r = $r->add_keyword(foo => sub { ... });
+
+Add a new keyword for this route.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<any>
 

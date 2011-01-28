@@ -500,6 +500,31 @@ placeholders become part of a larger regular expression internally.
 This way you get easily readable routes and the raw power of regular
 expressions.
 
+=head2 Keywords
+
+You can also add your own route keywords to make route generation more
+expressive.
+
+    # Simple "resource" keyword
+    $r->add_keyword(resource => sub {
+        my ($r, $name) = @_;
+
+        # Generate "/$name" route
+        my $resource = $r->route("/$name")->to("$name#");
+
+        # Handle POST requests
+        $resource->post->to('#create');
+
+        # Handle GET requests
+        $resource->get->to('#show');
+
+        return $resource;
+    });
+
+    # POST /user -> {controller => 'foo', action => 'create'}
+    # GET  /user -> {controller => 'foo', action => 'show'}
+    $r->resource('user');
+
 =head2 Conditions
 
 Sometimes you might need a little more power, for example to check the

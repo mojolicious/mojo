@@ -524,7 +524,8 @@ You can also add your own shortcuts to make route generation more expressive.
     # GET  /user -> {controller => 'user', action => 'show'}
     $r->resource('user');
 
-Shortcuts can lead to anything, a route, a bridge or maybe even both!
+Shortcuts can lead to anything, routes, bridges or maybe even both.
+And watch out for quicksand!
 
 =head2 Conditions
 

@@ -6,7 +6,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Removed native IIS support since it has become unmaintainable.
         - Added EXPERIMENTAL much prettier attribute generator to Mojo::Base.
         - Added EXPERIMNETAL on_start attribute to Mojo::Client.
-        - Added EXPERIMENTAL support for additional route keywords.
+        - Added EXPERIMENTAL support for route shortcuts.
         - Added EXPERIMENTAL support for NO_PROXY. (l0b0)
         - Added EXPERIMENTAL user_agent attribute to Mojo::Client.
         - Removed experimental status from Mojo::DOM and ojo.

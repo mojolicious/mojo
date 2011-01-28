@@ -12,7 +12,7 @@ use Scalar::Util 'weaken';
 has [qw/block inline parent partial namespace/];
 has [qw/children conditions/] => sub { [] };
 has controller_base_class => 'Mojolicious::Controller';
-has [qw/dictionary keywords/] => sub { {} };
+has [qw/dictionary shortcuts/] => sub { {} };
 has hidden  => sub { [qw/new app attr has render req res stash tx/] };
 has pattern => sub { Mojolicious::Routes::Pattern->new };
 
@@ -24,12 +24,12 @@ sub AUTOLOAD {
     # Method
     my ($package, $method) = our $AUTOLOAD =~ /^([\w\:]+)\:\:(\w+)$/;
 
-    # Keyword
+    # Shortcuts
     Carp::croak(qq/Can't locate object method "$method" via "$package"/)
-      unless my $keyword = $self->keywords->{$method};
+      unless my $shortcut = $self->shortcuts->{$method};
 
     # Run
-    return $self->$keyword(@_);
+    return $self->$shortcut(@_);
 }
 
 sub DESTROY { }
@@ -83,8 +83,8 @@ sub add_child {
     $route->parent($self);
     weaken $route->{parent};
 
-    # Keywords
-    $route->keywords($self->keywords);
+    # Shortcuts
+    $route->shortcuts($self->shortcuts);
 
     # Add to tree
     push @{$self->children}, $route;
@@ -101,9 +101,9 @@ sub add_condition {
     return $self;
 }
 
-sub add_keyword {
+sub add_shortcut {
     my ($self, $name, $cb) = @_;
-    $self->keywords->{$name} = $cb;
+    $self->shortcuts->{$name} = $cb;
     return $self;
 }
 
@@ -797,14 +797,6 @@ Controller methods and attributes that are hidden from routes.
 
 Allow C<bridge> semantics for this route.
 
-=head2 C<keywords>
-
-    my $keywords = $r->keywords;
-    $r           = $r->keywords({foo => sub { ... }});
-
-Contains all additional route keywords available for this route.
-Note that this attribute is EXPERIMENTAL and might change without warning!
-
 =head2 C<namespace>
 
     my $namespace = $r->namespace;
@@ -835,6 +827,14 @@ partial name.
 Pattern for this route, by default a L<Mojolicious::Routes::Pattern> object
 and used for matching.
 
+=head2 C<shortcuts>
+
+    my $shortcuts = $r->shortcuts;
+    $r            = $r->shortcuts({foo => sub { ... }});
+
+Contains all additional route shortcuts available for this route.
+Note that this attribute is EXPERIMENTAL and might change without warning!
+
 =head1 METHODS
 
 L<Mojolicious::Routes> inherits all methods from L<Mojo::Base> and implements
@@ -859,11 +859,11 @@ Add a new child to this route.
 
 Add a new condition for this route.
 
-=head2 C<add_keyword>
+=head2 C<add_shortcut>
 
-    $r = $r->add_keyword(foo => sub { ... });
+    $r = $r->add_shortcut(foo => sub { ... });
 
-Add a new keyword for this route.
+Add a new shortcut for this route.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<any>

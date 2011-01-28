@@ -500,13 +500,12 @@ placeholders become part of a larger regular expression internally.
 This way you get easily readable routes and the raw power of regular
 expressions.
 
-=head2 Keywords
+=head2 Shortcuts
 
-You can also add your own route keywords to make route generation more
-expressive.
+You can also add your own shortcuts to make route generation more expressive.
 
-    # Simple "resource" keyword
-    $r->add_keyword(resource => sub {
+    # Simple "resource" shortcut
+    $r->add_shortcut(resource => sub {
         my ($r, $name) = @_;
 
         # Generate "/$name" route
@@ -524,6 +523,8 @@ expressive.
     # POST /user -> {controller => 'user', action => 'create'}
     # GET  /user -> {controller => 'user', action => 'show'}
     $r->resource('user');
+
+Shortcuts can lead to anything, a route, a bridge or maybe even both!
 
 =head2 Conditions
 

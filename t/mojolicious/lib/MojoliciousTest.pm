@@ -28,8 +28,8 @@ sub startup {
     # Renderer for a different file extension
     $self->renderer->add_handler(xpl => $self->renderer->handlers->{epl});
 
-    # Keyword for "/fun*" routes
-    $self->routes->add_keyword(
+    # Shortcut for "/fun*" routes
+    $self->routes->add_shortcut(
         fun => sub {
             my ($r, $append) = @_;
             $r->route("/fun$append");

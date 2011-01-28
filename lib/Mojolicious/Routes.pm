@@ -160,6 +160,13 @@ sub dispatch {
     # Already rendered
     return if $res->code;
 
+    # Websocket handshake
+    $res->code(101) if $c->tx->is_websocket;
+
+    # Error or 200
+    my ($error, $code) = $c->req->error;
+    $res->code($code) if $code;
+
     # Path
     my $path = $c->stash->{path};
     $path = "/$path" if defined $path && $path !~ /^\//;
@@ -171,17 +178,6 @@ sub dispatch {
 
     # No match
     return 1 unless $m && @{$m->stack};
-
-    # Status
-    unless ($res->code) {
-
-        # Websocket handshake
-        $res->code(101) if $c->tx->is_websocket;
-
-        # Error or 200
-        my ($error, $code) = $c->req->error;
-        $res->code($code) if $code;
-    }
 
     # Walk the stack
     return 1 if $self->_walk_stack($c);

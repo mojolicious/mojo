@@ -521,8 +521,8 @@ expressive.
         return $resource;
     });
 
-    # POST /user -> {controller => 'foo', action => 'create'}
-    # GET  /user -> {controller => 'foo', action => 'show'}
+    # POST /user -> {controller => 'user', action => 'create'}
+    # GET  /user -> {controller => 'user', action => 'show'}
     $r->resource('user');
 
 =head2 Conditions

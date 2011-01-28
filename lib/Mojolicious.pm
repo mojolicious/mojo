@@ -186,6 +186,16 @@ sub dispatch {
     # Hook
     $self->plugins->run_hook_reverse(after_static_dispatch => $c);
 
+    # Already rendered
+    return if $c->res->code;
+
+    # Websocket handshake
+    $c->res->code(101) if $c->tx->is_websocket;
+
+    # Error or 200
+    my ($error, $code) = $c->req->error;
+    $c->res->code($code) if $code;
+
     # Routes
     if ($self->routes->dispatch($c)) {
 

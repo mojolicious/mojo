@@ -154,19 +154,6 @@ sub detour {
 sub dispatch {
     my ($self, $c) = @_;
 
-    # Response
-    my $res = $c->res;
-
-    # Already rendered
-    return if $res->code;
-
-    # Websocket handshake
-    $res->code(101) if $c->tx->is_websocket;
-
-    # Error or 200
-    my ($error, $code) = $c->req->error;
-    $res->code($code) if $code;
-
     # Path
     my $path = $c->stash->{path};
     $path = "/$path" if defined $path && $path !~ /^\//;

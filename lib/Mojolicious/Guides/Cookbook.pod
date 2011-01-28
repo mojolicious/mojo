@@ -190,6 +190,27 @@ requests.
 
 When we say L<Mojolicious> is a web framework we actually mean it.
 
+=head2 Web Scraping
+
+Scraping information from web sites has never been this much fun before.
+The built in XML/HTML5 parser L<Mojo::DOM> supports all CSS3 selectors that
+make sense for a standalone parser.
+
+    # Fetch web site
+    my $client = Mojo::Client->new;
+    my $tx     = $client->get('mojolicio.us/perldoc');
+
+    # Extract title
+    print 'Title: ', $tx->res->dom->at('head > title')->text, "\n";
+
+    # Extract headers
+    $tx->res->dom('h1, h2, h3')->each(sub {
+        print 'Header: ', shift->all_text, "\n";
+    });
+
+Especially for unit testing your L<Mojolicious> applications this can be a
+very powerful tool.
+
 =head2 Streaming Response
 
 Receiving a streaming response can be really tricky in most HTTP clients,

@@ -176,7 +176,7 @@ sub dispatch {
     unless ($res->code) {
 
         # Websocket handshake
-        $res->code(101) if !$res->code && $c->tx->is_websocket;
+        $res->code(101) if $c->tx->is_websocket;
 
         # Error or 200
         my ($error, $code) = $c->req->error;

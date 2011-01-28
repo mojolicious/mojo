@@ -513,10 +513,10 @@ expressive.
         my $resource = $r->route("/$name")->to("$name#");
 
         # Handle POST requests
-        $resource->post->to('#create');
+        $resource->post->to('#create')->name("create_$name");
 
         # Handle GET requests
-        $resource->get->to('#show');
+        $resource->get->to('#show')->name("show_$name");
 
         return $resource;
     });

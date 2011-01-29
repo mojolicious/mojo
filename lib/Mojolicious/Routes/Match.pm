@@ -8,31 +8,27 @@ use Scalar::Util 'weaken';
 
 has captures => sub { {} };
 has stack    => sub { [] };
-has [qw/endpoint root/];
+has [qw/endpoint is_websocket root/];
 
 # "I'm Bender, baby, please insert liquor!"
 sub new {
     my $self = shift->SUPER::new();
-    my $c    = shift;
-
-    # Controller
-    $self->{_controller} = $c;
-    weaken $self->{_controller};
 
     # Path
-    unless ($self->{_path} = shift) {
-        my $path = $c->req->url->path->to_abs_string;
-        url_unescape $path;
-        decode 'UTF8', $path;
-        $self->{_path} = $path;
-    }
+    my $path = shift || Carp::croak(qq/Missing path/);
+    url_unescape $path;
+    decode 'UTF8', $path;
+    $self->{_path} = $path;
+
+    # Method
+    $self->{_method} = shift || Carp::croak(qq/Missing method/);
 
     return $self;
 }
 
 # "Life can be hilariously cruel."
 sub match {
-    my ($self, $r) = @_;
+    my ($self, $r, $c) = @_;
 
     # Shortcut
     return unless $r;
@@ -59,6 +55,11 @@ sub match {
     $captures = {%{$self->captures}, %$captures};
     $self->captures($captures);
 
+    # Request method
+    if ($r->{_via}) {
+      return unless $self->_method($self->{_method}, $r->{_via});
+    }
+
     # Conditions
     my $conditions = $r->conditions;
     for (my $i = 0; $i < @$conditions; $i += 2) {
@@ -70,8 +71,7 @@ sub match {
         return unless $condition;
 
         # Match
-        return
-          if !$condition->($r, $self->{_controller}, $captures, $value);
+        return if !$condition->($r, $c, $captures, $value);
     }
 
     # Partial
@@ -108,7 +108,7 @@ sub match {
     for my $child (@{$r->children}) {
 
         # Match
-        $self->match($child);
+        $self->match($child, $c);
 
         # Endpoint found
         return $self if $self->endpoint;
@@ -129,11 +129,36 @@ sub match {
     return $self;
 }
 
+# Method condition
+sub _method {
+    my $self   = shift;
+    my $method = shift;
+    my $valid  = shift;
+
+    # Lowercase
+    $method = lc($method);
+
+    # Default
+    $valid = ['get'] unless $valid;
+
+    # Methods
+    return unless $valid && ref $valid eq 'ARRAY';
+
+    # Match
+    $method = 'get' if $method eq 'head';
+    for my $v (@$valid) {
+        return 1 if $method eq $v;
+    }
+
+    # Nothing
+    return;
+}
+
+
 sub url_for {
-    my $self     = shift;
-    my $endpoint = $self->endpoint;
-    my $values   = {};
-    my $name     = undef;
+    my $self   = shift;
+    my $values = {};
+    my $name   = undef;
 
     # Single argument
     if (@_ == 1) {
@@ -172,43 +197,28 @@ sub url_for {
     # Captures
     my $captures = $self->captures;
 
-    # URL
-    my $url = Mojo::URL->new;
+    # Endpoint
+    my $endpoint;
 
-    # Base
-    $url->base($self->{_controller}->req->url->base->clone);
-    my $base = $url->base;
-    $base->userinfo(undef);
-
-    # Named
-    if ($name) {
-
-        # Current route
-        if ($name eq 'current') { $name = undef }
-
-        # Find
-        else {
-            $captures = {};
-            return $url->parse($name)
-              unless $endpoint = $self->_find_route($name);
-        }
+    # Current route
+    if ($name && $name eq 'current' || !$name) {
+        return undef unless $endpoint = $self->endpoint;
+    }
+    # Find
+    else {
+        $captures = {};
+        return $name unless $endpoint = $self->_find_route($name);
     }
 
     # Merge values
     $values = {%$captures, format => undef, %$values};
 
-    # No endpoint
-    return $url unless $endpoint;
+    # Endpoint is websocket
+    $self->is_websocket($endpoint->is_websocket);
 
     # Render
-    my $path = $endpoint->render('', $values);
-    $url->path->parse($path);
+    return $endpoint->render('', $values);
 
-    # Fix scheme for WebSockets
-    $base->scheme(($base->scheme || '') eq 'https' ? 'wss' : 'ws')
-      if $endpoint->is_websocket;
-
-    return $url;
 }
 
 sub _find_route {
@@ -269,6 +279,12 @@ Captured parameters.
 
 The routes endpoint that actually matched.
 
+=head2 C<is_websocket>
+
+    my $is_websocket = $m->is_websocket;
+
+Returns true if endpoint leads to a WebSocket.
+
 =head2 C<root>
 
     my $root = $m->root;
@@ -290,15 +306,17 @@ implements the following ones.
 
 =head2 C<new>
 
-    my $m = Mojolicious::Routes::Match->new(Mojolicious:Controller->new);
+    my $m = Mojolicious::Routes::Match->new('/foo/bar.html', 'post');
 
-Construct a new match object.
+Construct a new match object. Expects the path and request method.
 
 =head2 C<match>
 
-    $m->match(Mojolicious::Routes->new);
+    $m->match(Mojolicious::Routes->new, Mojolicious::Controller->new);
 
-Match against a routes tree.
+Match against a routes tree. A controller object can be passed as a second
+argument which will then be passed to conditions (defined via C<over> command
+in L<Mojolicious::Routes>).
 
 =head2 C<url_for>
 

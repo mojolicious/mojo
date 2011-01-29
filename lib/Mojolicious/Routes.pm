@@ -3,7 +3,6 @@ use Mojo::Base -base;
 
 use Mojo::Exception;
 use Mojo::Loader;
-use Mojo::URL;
 use Mojo::Util 'camelize';
 use Mojolicious::Routes::Match;
 use Mojolicious::Routes::Pattern;
@@ -39,24 +38,6 @@ sub new {
 
     # Parse
     $self->parse(@_);
-
-    # Method condition
-    $self->add_condition(
-        method => sub {
-            my ($r, $c, $captures, $methods) = @_;
-
-            # Methods
-            return unless $methods && ref $methods eq 'ARRAY';
-
-            # Match
-            my $method = lc $c->req->method;
-            $method = 'get' if $method eq 'head';
-            for my $m (@$methods) { return 1 if $m eq $method }
-
-            # Nothing
-            return;
-        }
-    );
 
     # WebSocket condition
     $self->add_condition(
@@ -153,9 +134,13 @@ sub dispatch {
     my $path = $c->stash->{path};
     $path = "/$path" if defined $path && $path !~ /^\//;
 
+    unless ($path) {
+        $path = $c->req->url->path->to_abs_string;
+    }
+
     # Match
-    my $m = Mojolicious::Routes::Match->new($c, $path);
-    $m->match($self);
+    my $m = Mojolicious::Routes::Match->new($path, $c->req->method);
+    $m->match($self, $c);
     $c->match($m);
 
     # No match
@@ -360,7 +345,9 @@ sub via {
     return $self unless @$methods;
 
     # Condition
-    push @{$self->conditions}, method => [map { lc $_ } @$methods];
+    $self->{_via} ||= [];
+
+    push @{$self->{_via}}, map { lc $_ } @$methods;
 
     return $self;
 }

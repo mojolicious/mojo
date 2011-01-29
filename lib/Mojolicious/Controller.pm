@@ -727,16 +727,34 @@ sub url_for {
     my $self = shift;
     my $target = shift || '';
 
+    my $path   = $self->req->url->path->to_abs_string;
+    my $method = $self->req->method;
+
     # Make sure we have a match for named routes
     $self->match(
-        Mojolicious::Routes::Match->new($self)->root($self->app->routes))
+        Mojolicious::Routes::Match->new($path, $method)->root($self->app->routes))
       unless $self->match;
 
     # URL
     return Mojo::URL->new($target) if $target =~ /^\w+\:\/\//;
 
-    # Route
-    return $self->match->url_for($target, @_);
+    # Route name and params
+    my $url = Mojo::URL->new;
+    $url->base($self->req->url->base->clone);
+    $url->base->userinfo(undef);
+
+    if (my $path = $self->match->url_for($target, @_)) {
+
+        # Path
+        $url->parse($path);
+
+        # Fix scheme for WebSockets
+        my $base = $url->base;
+        $base->scheme(($base->scheme || '') eq 'https' ? 'wss' : 'ws')
+          if $self->match->is_websocket;
+
+    }
+    return $url;
 }
 
 # "I wax my rocket every day!"

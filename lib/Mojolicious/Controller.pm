@@ -733,13 +733,10 @@ sub url_for {
       unless $self->match;
 
     # URL
-    if ($target =~ /^\w+\:\/\//) { return Mojo::URL->new($target) }
+    return Mojo::URL->new($target) if $target =~ /^\w+\:\/\//;
 
     # Route
-    elsif (my $url = $self->match->url_for($target, @_)) { return $url }
-
-    # Path
-    return Mojo::URL->new->base($self->req->url->base->clone)->parse($target);
+    return $self->match->url_for($target, @_);
 }
 
 # "I wax my rocket every day!"

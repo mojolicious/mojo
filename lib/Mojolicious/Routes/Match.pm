@@ -172,6 +172,14 @@ sub url_for {
     # Captures
     my $captures = $self->captures;
 
+    # URL
+    my $url = Mojo::URL->new;
+
+    # Base
+    $url->base($self->{_controller}->req->url->base->clone);
+    my $base = $url->base;
+    $base->userinfo(undef);
+
     # Named
     if ($name) {
 
@@ -181,23 +189,16 @@ sub url_for {
         # Find
         else {
             $captures = {};
-            return unless $endpoint = $self->_find_route($name);
+            return $url->parse($name)
+              unless $endpoint = $self->_find_route($name);
         }
     }
 
     # Merge values
     $values = {%$captures, format => undef, %$values};
 
-    # URL
-    my $url = Mojo::URL->new;
-
     # No endpoint
     return $url unless $endpoint;
-
-    # Base
-    $url->base($self->{_controller}->req->url->base->clone);
-    my $base = $url->base;
-    $url->base->userinfo(undef);
 
     # Render
     my $path = $endpoint->render('', $values);

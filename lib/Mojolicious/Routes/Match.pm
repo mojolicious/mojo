@@ -200,7 +200,7 @@ sub url_for {
     $url->base->userinfo(undef);
 
     # Render
-    my $path = $endpoint->render($url->path->to_string, $values);
+    my $path = $endpoint->render('', $values);
     $url->path->parse($path);
 
     # Fix scheme

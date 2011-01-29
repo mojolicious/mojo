@@ -49,11 +49,9 @@ sub new {
             return unless $methods && ref $methods eq 'ARRAY';
 
             # Match
-            my $m = lc $c->req->method;
-            $m = 'get' if $m eq 'head';
-            for my $method (@$methods) {
-                return 1 if $method eq $m;
-            }
+            my $method = lc $c->req->method;
+            $method = 'get' if $method eq 'head';
+            for my $m (@$methods) { return 1 if $m eq $method }
 
             # Nothing
             return;
@@ -93,11 +91,8 @@ sub add_child {
 }
 
 sub add_condition {
-    my ($self, $name, $condition) = @_;
-
-    # Add
-    $self->dictionary->{$name} = $condition;
-
+    my ($self, $name, $cb) = @_;
+    $self->dictionary->{$name} = $cb;
     return $self;
 }
 

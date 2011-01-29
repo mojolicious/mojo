@@ -111,15 +111,14 @@ sub shape_match {
     }
 
     # Compile on demand
-    $self->_compile unless $self->regex;
-
-    my $regex = $self->regex;
+    my $regex;
+    $regex = $self->_compile unless $regex = $self->regex;
 
     # Debug
     warn "    $regex\n" if DEBUG;
 
     # Match
-    if (my @captures = $$pathref =~ /$regex/) {
+    if (my @captures = $$pathref =~ $regex) {
 
         # Substitute
         $$pathref =~ s/$regex//;
@@ -202,7 +201,7 @@ sub _compile {
     $regex = qr/^$regex/;
     $self->regex($regex);
 
-    return $self;
+    return $regex;
 }
 
 sub _tokenize {

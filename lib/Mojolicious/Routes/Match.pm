@@ -204,10 +204,9 @@ sub url_for {
     my $path = $endpoint->render('', $values);
     $url->path->parse($path);
 
-    # Fix scheme
-    if ($endpoint->is_websocket) {
-        $base->scheme(($base->scheme || '') eq 'https' ? 'wss' : 'ws');
-    }
+    # Fix scheme for WebSockets
+    $base->scheme(($base->scheme || '') eq 'https' ? 'wss' : 'ws')
+      if $endpoint->is_websocket;
 
     # Fix paths
     unshift @{$url->path->parts}, @{$base->path->parts};

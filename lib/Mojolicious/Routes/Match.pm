@@ -110,6 +110,10 @@ sub match {
         return $self;
     }
 
+    # Endpoint
+    $self->endpoint($r) if $r->is_endpoint && $self->_is_path_empty;
+    return $self if $self->endpoint;
+
     # Match children
     my $snapshot = [@{$self->stack}];
     for my $child (@{$r->children}) {
@@ -130,9 +134,6 @@ sub match {
             $self->stack([]);
         }
     }
-
-    # Endpoint
-    $self->endpoint($r) if $r->is_endpoint && $self->_is_path_empty;
 
     return $self;
 }

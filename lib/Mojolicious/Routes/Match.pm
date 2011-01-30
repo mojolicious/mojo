@@ -234,7 +234,18 @@ Mojolicious::Routes::Match - Routes Visitor
 
 =head1 SYNOPSIS
 
+    use Mojolicious::Routes;
     use Mojolicious::Routes::Match;
+
+    # Routes
+    my $r = Mojolicious::Routes->new;
+    $r->route('/foo')->to(action => 'foo');
+    $r->route('/bar')->to(action => 'bar');
+
+    # Match
+    my $m = Mojolicious::Routes::Match->new(GET => '/bar');
+    $m->match($r);
+    print $m->captures->{action};
 
 =head1 DESCRIPTION
 

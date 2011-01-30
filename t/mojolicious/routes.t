@@ -144,302 +144,291 @@ $r->route('/regex/alternatives/:alternatives',
   ->to(controller => 'regex', action => 'alternatives');
 
 # Make sure stash stays clean
-my $m = Mojolicious::Routes::Match->new('/clean', 'get')->match($r);
+my $m = Mojolicious::Routes::Match->new(get => '/clean')->match($r);
 is $m->stack->[0]->{clean},     1,     'right value';
 is $m->stack->[0]->{something}, undef, 'no value';
-is $m->url_for, '/clean', 'right path';
+is $m->path_for, '/clean', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
-
-$m = Mojolicious::Routes::Match->new('/clean/too', 'get')->match($r);
+$m = Mojolicious::Routes::Match->new(get => '/clean/too')->match($r);
 is $m->stack->[0]->{clean},     undef, 'no value';
 is $m->stack->[0]->{something}, 1,     'right value';
-is $m->url_for, '/clean/too', 'right path';
+is $m->path_for, '/clean/too', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
 
 # Null route
-$m = Mojolicious::Routes::Match->new('/0', 'get')->match($r);
+$m = Mojolicious::Routes::Match->new(get => '/0')->match($r);
 is $m->stack->[0]->{null}, 1, 'right value';
-is $m->url_for, '/0', 'right path';
+is $m->path_for, '/0', 'right path';
 
 # Real world example using most features at once
-$m = Mojolicious::Routes::Match->new('/articles.html', 'get')->match($r);
+$m = Mojolicious::Routes::Match->new(get => '/articles.html')->match($r);
 is $m->stack->[0]->{controller}, 'articles', 'right value';
 is $m->stack->[0]->{action},     'index',    'right value';
 is $m->stack->[0]->{format},     'html',     'right value';
-is $m->url_for, '/articles', 'right path';
+is $m->path_for, '/articles', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
-
-$m = Mojolicious::Routes::Match->new('/articles/1.html', 'get')->match($r);
+$m = Mojolicious::Routes::Match->new(get => '/articles/1.html')->match($r);
 is $m->stack->[0]->{controller}, 'articles', 'right value';
 is $m->stack->[0]->{action},     'load',     'right value';
 is $m->stack->[0]->{id},         '1',        'right value';
 is $m->stack->[0]->{format},     'html',     'right value';
-is $m->url_for(format => 'html'), '/articles/1.html', 'right path';
+is $m->path_for(format => 'html'), '/articles/1.html', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
-
-$m = Mojolicious::Routes::Match->new('/articles/1/edit', 'get')->match($r);
+$m = Mojolicious::Routes::Match->new(get => '/articles/1/edit')->match($r);
 is $m->stack->[1]->{controller}, 'articles', 'right value';
 is $m->stack->[1]->{action},     'edit',     'right value';
 is $m->stack->[1]->{format},     'html',     'right value';
-is $m->url_for, '/articles/1/edit', 'right path';
-is $m->url_for(format => 'html'), '/articles/1/edit.html', 'right path';
-is $m->url_for('articles_delete', format => undef), '/articles/delete',
+is $m->path_for, '/articles/1/edit', 'right path';
+is $m->path_for(format => 'html'), '/articles/1/edit.html', 'right path';
+is $m->path_for('articles_delete', format => undef), '/articles/delete',
   'right path';
-is $m->url_for('articles_delete'), '/articles/delete', 'right path';
-is $m->url_for('articles_delete', id => 12), '/articles/12/delete',
+is $m->path_for('articles_delete'), '/articles/delete', 'right path';
+is $m->path_for('articles_delete', id => 12), '/articles/12/delete',
   'right path';
 is @{$m->stack}, 2, 'right number of elements';
-
-$m = Mojolicious::Routes::Match->new('/articles/1/delete', 'get')->match($r);
+$m = Mojolicious::Routes::Match->new(get => '/articles/1/delete')->match($r);
 is $m->stack->[1]->{controller}, 'articles', 'right value';
 is $m->stack->[1]->{action},     'delete',   'right value';
 is $m->stack->[1]->{format},     undef,      'no value';
-is $m->url_for, '/articles/1/delete', 'right path';
+is $m->path_for, '/articles/1/delete', 'right path';
 is @{$m->stack}, 2, 'right number of elements';
 
 # Root
-$m = Mojolicious::Routes::Match->new('/', 'get')->match($r);
+$m = Mojolicious::Routes::Match->new(get => '/')->match($r);
 is $m->captures->{controller}, 'hello', 'right value';
 is $m->captures->{action},     'world', 'right value';
 is $m->stack->[0]->{controller}, 'hello', 'right value';
 is $m->stack->[0]->{action},     'world', 'right value';
-is $m->url_for, '/', 'right path';
+is $m->path_for, '/', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
 
 # Path and captures
-$m = Mojolicious::Routes::Match->new('/foo/test/edit', 'get')->match($r);
+$m = Mojolicious::Routes::Match->new(get => '/foo/test/edit')->match($r);
 is $m->captures->{controller}, 'foo',  'right value';
 is $m->captures->{action},     'edit', 'right value';
 is $m->stack->[0]->{controller}, 'foo',  'right value';
 is $m->stack->[0]->{action},     'edit', 'right value';
-is $m->url_for, '/foo/test/edit', 'right path';
+is $m->path_for, '/foo/test/edit', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
-
-$m = Mojolicious::Routes::Match->new('/foo/testedit', 'get')->match($r);
+$m = Mojolicious::Routes::Match->new(get => '/foo/testedit')->match($r);
 is $m->captures->{controller}, 'foo',      'right value';
 is $m->captures->{action},     'testedit', 'right value';
 is $m->stack->[0]->{controller}, 'foo',      'right value';
 is $m->stack->[0]->{action},     'testedit', 'right value';
-is $m->url_for, '/foo/testedit', 'right path';
+is $m->path_for, '/foo/testedit', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
 
 # Optional captures in sub route with requirement
-$m = Mojolicious::Routes::Match->new('/bar/test/delete/22', 'get')->match($r);
+$m = Mojolicious::Routes::Match->new(get => '/bar/test/delete/22')->match($r);
 is $m->captures->{controller}, 'bar',    'right value';
 is $m->captures->{action},     'delete', 'right value';
 is $m->captures->{id},         22,       'right value';
 is $m->stack->[0]->{controller}, 'bar',    'right value';
 is $m->stack->[0]->{action},     'delete', 'right value';
 is $m->stack->[0]->{id},         22,       'right value';
-is $m->url_for, '/bar/test/delete/22', 'right path';
+is $m->path_for, '/bar/test/delete/22', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
 
 # Defaults in sub route
-$m = Mojolicious::Routes::Match->new('/bar/test/delete', 'get')->match($r);
+$m = Mojolicious::Routes::Match->new(get => '/bar/test/delete')->match($r);
 is $m->captures->{controller}, 'bar',    'right value';
 is $m->captures->{action},     'delete', 'right value';
 is $m->captures->{id},         23,       'right value';
 is $m->stack->[0]->{controller}, 'bar',    'right value';
 is $m->stack->[0]->{action},     'delete', 'right value';
 is $m->stack->[0]->{id},         23,       'right value';
-is $m->url_for, '/bar/test/delete', 'right path';
+is $m->path_for, '/bar/test/delete', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
 
 # Chained routes
-$m = Mojolicious::Routes::Match->new('/test2/foo', 'get')->match($r);
+$m = Mojolicious::Routes::Match->new(get => '/test2/foo')->match($r);
 is $m->stack->[0]->{controller}, 'test2', 'right value';
 is $m->stack->[1]->{controller}, 'index', 'right value';
 is $m->stack->[2]->{controller}, 'baz',   'right value';
 is $m->captures->{controller}, 'baz', 'right value';
-is $m->url_for, '/test2/foo', 'right path';
+is $m->path_for, '/test2/foo', 'right path';
 is @{$m->stack}, 3, 'right number of elements';
-
-$m = Mojolicious::Routes::Match->new('/test2/bar', 'get')->match($r);
+$m = Mojolicious::Routes::Match->new(get => '/test2/bar')->match($r);
 is $m->stack->[0]->{controller}, 'test2',  'right value';
 is $m->stack->[1]->{controller}, 'index',  'right value';
 is $m->stack->[2]->{controller}, 'lalala', 'right value';
 is $m->captures->{controller}, 'lalala', 'right value';
-is $m->url_for, '/test2/bar', 'right path';
+is $m->path_for, '/test2/bar', 'right path';
 is @{$m->stack}, 3, 'right number of elements';
-
-$m = Mojolicious::Routes::Match->new('/test2/baz', 'get')->match($r);
+$m = Mojolicious::Routes::Match->new(get => '/test2/baz')->match($r);
 is $m->stack->[0]->{controller}, 'test2', 'right value';
 is $m->stack->[1]->{controller}, 'just',  'right value';
 is $m->stack->[1]->{action},     'works', 'right value';
 is $m->stack->[2], undef, 'no value';
 is $m->captures->{controller}, 'just', 'right value';
-is $m->url_for, '/test2/baz', 'right path';
+is $m->path_for, '/test2/baz', 'right path';
 is @{$m->stack}, 2, 'right number of elements';
 
 # Waypoints
-$m = Mojolicious::Routes::Match->new('/test3', 'get')->match($r);
+$m = Mojolicious::Routes::Match->new(get => '/test3')->match($r);
 is $m->stack->[0]->{controller}, 's', 'right value';
 is $m->stack->[0]->{action},     'l', 'right value';
-is $m->url_for, '/test3', 'right path';
+is $m->path_for, '/test3', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
-
-$m = Mojolicious::Routes::Match->new('/test3/', 'get')->match($r);
+$m = Mojolicious::Routes::Match->new(get => '/test3/')->match($r);
 is $m->stack->[0]->{controller}, 's', 'right value';
 is $m->stack->[0]->{action},     'l', 'right value';
-is $m->url_for, '/test3', 'right path';
+is $m->path_for, '/test3', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
-
-$m = Mojolicious::Routes::Match->new('/test3/edit', 'get')->match($r);
+$m = Mojolicious::Routes::Match->new(get => '/test3/edit')->match($r);
 is $m->stack->[0]->{controller}, 's',    'right value';
 is $m->stack->[0]->{action},     'edit', 'right value';
-is $m->url_for, '/test3/edit', 'right path';
+is $m->path_for, '/test3/edit', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
 
-# Named url_for
-$m = Mojolicious::Routes::Match->new('/test3', 'get')->match($r);
-is $m->url_for, '/test3', 'right path';
-is $m->url_for('test_edit', controller => 'foo'), '/foo/test/edit',
+# Named path_for
+$m = Mojolicious::Routes::Match->new(get => '/test3')->match($r);
+is $m->path_for, '/test3', 'right path';
+is $m->path_for('test_edit', controller => 'foo'), '/foo/test/edit',
   'right path';
-is $m->url_for('test_edit', {controller => 'foo'}), '/foo/test/edit',
+is $m->path_for('test_edit', {controller => 'foo'}), '/foo/test/edit',
   'right path';
 is @{$m->stack}, 1, 'right number of elements';
 
 # Wildcards
-$m = Mojolicious::Routes::Match->new('/wildcards/1/hello/there', 'get')->match($r);
+$m =
+  Mojolicious::Routes::Match->new(get => '/wildcards/1/hello/there')
+  ->match($r);
 is $m->stack->[0]->{controller}, 'wild',        'right value';
 is $m->stack->[0]->{action},     'card',        'right value';
 is $m->stack->[0]->{wildcard},   'hello/there', 'right value';
-is $m->url_for, '/wildcards/1/hello/there', 'right path';
+is $m->path_for, '/wildcards/1/hello/there', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
-
-$m = Mojolicious::Routes::Match->new('/wildcards/2/hello/there', 'get')->match($r);
+$m =
+  Mojolicious::Routes::Match->new(get => '/wildcards/2/hello/there')
+  ->match($r);
 is $m->stack->[0]->{controller}, 'card',        'right value';
 is $m->stack->[0]->{action},     'wild',        'right value';
 is $m->stack->[0]->{wildcard},   'hello/there', 'right value';
-is $m->url_for, '/wildcards/2/hello/there', 'right path';
+is $m->path_for, '/wildcards/2/hello/there', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
-
-$m = Mojolicious::Routes::Match->new('/wildcards/3/hello/there/foo', 'get')->match($r);
+$m =
+  Mojolicious::Routes::Match->new(get => '/wildcards/3/hello/there/foo')
+  ->match($r);
 is $m->stack->[0]->{controller}, 'very',        'right value';
 is $m->stack->[0]->{action},     'dangerous',   'right value';
 is $m->stack->[0]->{wildcard},   'hello/there', 'right value';
-is $m->url_for, '/wildcards/3/hello/there/foo', 'right path';
+is $m->path_for, '/wildcards/3/hello/there/foo', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
 
 # Escaped
-$m = Mojolicious::Routes::Match->new('/wildcards/1/http://www.google.com', 'get')->match($r);
+$m =
+  Mojolicious::Routes::Match->new(get => '/wildcards/1/http://www.google.com')
+  ->match($r);
 is $m->stack->[0]->{controller}, 'wild',                  'right value';
 is $m->stack->[0]->{action},     'card',                  'right value';
 is $m->stack->[0]->{wildcard},   'http://www.google.com', 'right value';
-is $m->url_for, '/wildcards/1/http://www.google.com', 'right path';
+is $m->path_for, '/wildcards/1/http://www.google.com', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
-
-$m = Mojolicious::Routes::Match->new('/wildcards/1/http%3A%2F%2Fwww.google.com', 'get')->match($r);
+$m =
+  Mojolicious::Routes::Match->new(
+    get => '/wildcards/1/http%3A%2F%2Fwww.google.com')->match($r);
 is $m->stack->[0]->{controller}, 'wild',                  'right value';
 is $m->stack->[0]->{action},     'card',                  'right value';
 is $m->stack->[0]->{wildcard},   'http://www.google.com', 'right value';
-is $m->url_for, '/wildcards/1/http://www.google.com', 'right path';
+is $m->path_for, '/wildcards/1/http://www.google.com', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
 
 # Format
-$m = Mojolicious::Routes::Match->new('/format', 'get')->match($r);
+$m = Mojolicious::Routes::Match->new(get => '/format')->match($r);
 is $m->stack->[0]->{controller}, 'hello', 'right value';
 is $m->stack->[0]->{action},     'you',   'right value';
 is $m->stack->[0]->{format},     'html',  'right value';
-is $m->url_for, '/format', 'right path';
-is $m->url_for(format => undef),  '/format',      'right path';
-is $m->url_for(format => 'html'), '/format.html', 'right path';
-is $m->url_for(format => 'txt'),  '/format.txt',  'right path';
+is $m->path_for, '/format', 'right path';
+is $m->path_for(format => undef),  '/format',      'right path';
+is $m->path_for(format => 'html'), '/format.html', 'right path';
+is $m->path_for(format => 'txt'),  '/format.txt',  'right path';
 is @{$m->stack}, 1, 'right number of elements';
-
-$m = Mojolicious::Routes::Match->new('/format.html', 'get')->match($r);
+$m = Mojolicious::Routes::Match->new(get => '/format.html')->match($r);
 is $m->stack->[0]->{controller}, 'hello', 'right value';
 is $m->stack->[0]->{action},     'you',   'right value';
 is $m->stack->[0]->{format},     'html',  'right value';
-is $m->url_for, '/format', 'right path';
-is $m->url_for(format => undef),  '/format',      'right path';
-is $m->url_for(format => 'html'), '/format.html', 'right path';
-is $m->url_for(format => 'txt'),  '/format.txt',  'right path';
+is $m->path_for, '/format', 'right path';
+is $m->path_for(format => undef),  '/format',      'right path';
+is $m->path_for(format => 'html'), '/format.html', 'right path';
+is $m->path_for(format => 'txt'),  '/format.txt',  'right path';
 is @{$m->stack}, 1, 'right number of elements';
-
-$m = Mojolicious::Routes::Match->new('/format2.html', 'get')->match($r);
+$m = Mojolicious::Routes::Match->new(get => '/format2.html')->match($r);
 is $m->stack->[0]->{controller}, 'you',   'right value';
 is $m->stack->[0]->{action},     'hello', 'right value';
 is $m->stack->[0]->{format},     'html',  'right value';
-is $m->url_for, '/format2.html', 'right path';
+is $m->path_for, '/format2.html', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
-
-$m = Mojolicious::Routes::Match->new('/format2.json', 'get')->match($r);
+$m = Mojolicious::Routes::Match->new(get => '/format2.json')->match($r);
 is $m->stack->[0]->{controller}, 'you',        'right value';
 is $m->stack->[0]->{action},     'hello_json', 'right value';
 is $m->stack->[0]->{format},     'json',       'right value';
-is $m->url_for, '/format2.json', 'right path';
+is $m->path_for, '/format2.json', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
-
-$m = Mojolicious::Routes::Match->new('/format3/baz.html', 'get')->match($r);
+$m = Mojolicious::Routes::Match->new(get => '/format3/baz.html')->match($r);
 is $m->stack->[0]->{controller}, 'me',   'right value';
 is $m->stack->[0]->{action},     'bye',  'right value';
 is $m->stack->[0]->{format},     'html', 'right value';
 is $m->stack->[0]->{foo},        'baz',  'right value';
-is $m->url_for, '/format3/baz.html', 'right path';
+is $m->path_for, '/format3/baz.html', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
-
-$m = Mojolicious::Routes::Match->new('/format3/baz.json', 'get')->match($r);
+$m = Mojolicious::Routes::Match->new(get => '/format3/baz.json')->match($r);
 is $m->stack->[0]->{controller}, 'me',       'right value';
 is $m->stack->[0]->{action},     'bye_json', 'right value';
 is $m->stack->[0]->{format},     'json',     'right value';
 is $m->stack->[0]->{foo},        'baz',      'right value';
-is $m->url_for, '/format3/baz.json', 'right path';
+is $m->path_for, '/format3/baz.json', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
 
 # Request methods
-$m = Mojolicious::Routes::Match->new('/method/get.html', 'get')->match($r);
+$m = Mojolicious::Routes::Match->new(get => '/method/get.html')->match($r);
 is $m->stack->[0]->{controller}, 'method', 'right value';
 is $m->stack->[0]->{action},     'get',    'right value';
 is $m->stack->[0]->{format},     'html',   'right value';
-is $m->url_for, '/method/get', 'right path';
+is $m->path_for, '/method/get', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
-
-$m = Mojolicious::Routes::Match->new('/method/post', 'post')->match($r);
+$m = Mojolicious::Routes::Match->new(post => '/method/post')->match($r);
 is $m->stack->[0]->{controller}, 'method', 'right value';
 is $m->stack->[0]->{action},     'post',   'right value';
 is $m->stack->[0]->{format},     undef,    'no value';
-is $m->url_for, '/method/post', 'right path';
+is $m->path_for, '/method/post', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
-
-$m = Mojolicious::Routes::Match->new('/method/post_get', 'get')->match($r);
+$m = Mojolicious::Routes::Match->new(get => '/method/post_get')->match($r);
 is $m->stack->[0]->{controller}, 'method',   'right value';
 is $m->stack->[0]->{action},     'post_get', 'right value';
 is $m->stack->[0]->{format},     undef,      'no value';
-is $m->url_for, '/method/post_get', 'right path';
+is $m->path_for, '/method/post_get', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
-
-$m = Mojolicious::Routes::Match->new('/method/post_get', 'post')->match($r);
+$m = Mojolicious::Routes::Match->new(post => '/method/post_get')->match($r);
 is $m->stack->[0]->{controller}, 'method',   'right value';
 is $m->stack->[0]->{action},     'post_get', 'right value';
 is $m->stack->[0]->{format},     undef,      'no value';
-is $m->url_for, '/method/post_get', 'right path';
+is $m->path_for, '/method/post_get', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
-
-$m = Mojolicious::Routes::Match->new('/method/post_get', 'delete')->match($r);
+$m = Mojolicious::Routes::Match->new(delete => '/method/post_get')->match($r);
 is $m->stack->[0]->{controller}, undef, 'no value';
 is $m->stack->[0]->{action},     undef, 'no value';
 is $m->stack->[0]->{format},     undef, 'no value';
-is $m->url_for, undef, 'no path';
+is $m->path_for, undef, 'no path';
 is @{$m->stack}, 1, 'right number of elements';
 
 # Not found
-$m = Mojolicious::Routes::Match->new('/not_found', 'get')->match($r);
-is $m->url_for('test_edit', controller => 'foo'), '/foo/test/edit',
+$m = Mojolicious::Routes::Match->new(get => '/not_found')->match($r);
+is $m->path_for('test_edit', controller => 'foo'), '/foo/test/edit',
   'right path';
 is @{$m->stack}, 0, 'no elements';
 
 # Simplified form
-$m = Mojolicious::Routes::Match->new('/simple/form', 'get')->match($r);
+$m = Mojolicious::Routes::Match->new(get => '/simple/form')->match($r);
 is $m->stack->[0]->{controller}, 'test-test', 'right value';
 is $m->stack->[0]->{action},     'test',      'right value';
 is $m->stack->[0]->{format},     undef,       'no value';
-is $m->url_for, '/simple/form', 'right path';
-is $m->url_for('current'), '/simple/form', 'right path';
+is $m->path_for, '/simple/form', 'right path';
+is $m->path_for('current'), '/simple/form', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
 
 # Special edge case with nested bridges
-$m = Mojolicious::Routes::Match->new('/edge/auth/gift', 'get')->match($r);
+$m = Mojolicious::Routes::Match->new(get => '/edge/auth/gift')->match($r);
 is $m->stack->[0]->{controller}, 'auth',  'right value';
 is $m->stack->[0]->{action},     'check', 'right value';
 is $m->stack->[0]->{format},     undef,   'no value';
@@ -447,36 +436,40 @@ is $m->stack->[1]->{controller}, 'gift',  'right value';
 is $m->stack->[1]->{action},     'index', 'right value';
 is $m->stack->[1]->{format},     undef,   'no value';
 is $m->stack->[2], undef, 'no value';
-is $m->url_for, '/edge/auth/gift', 'right path';
-is $m->url_for('gift'),    '/edge/auth/gift', 'right path';
-is $m->url_for('current'), '/edge/auth/gift', 'right path';
+is $m->path_for, '/edge/auth/gift', 'right path';
+is $m->path_for('gift'),    '/edge/auth/gift', 'right path';
+is $m->path_for('current'), '/edge/auth/gift', 'right path';
 is @{$m->stack}, 2, 'right number of elements';
 
-# Regex
-# Special edge case with nested bridges
-$m = Mojolicious::Routes::Match->new('/regex/alternatives/foo', 'get')->match($r);
+# Special edge case with nested bridges (regex)
+$m =
+  Mojolicious::Routes::Match->new(get => '/regex/alternatives/foo')
+  ->match($r);
 is $m->stack->[0]->{controller},   'regex',        'right value';
 is $m->stack->[0]->{action},       'alternatives', 'right value';
 is $m->stack->[0]->{alternatives}, 'foo',          'right value';
 is $m->stack->[0]->{format},       undef,          'no value';
 is $m->stack->[1], undef, 'no value';
-is $m->url_for, '/regex/alternatives/foo', 'right path';
-
-$m = Mojolicious::Routes::Match->new('/regex/alternatives/bar', 'get')->match($r);
+is $m->path_for, '/regex/alternatives/foo', 'right path';
+$m =
+  Mojolicious::Routes::Match->new(get => '/regex/alternatives/bar')
+  ->match($r);
 is $m->stack->[0]->{controller},   'regex',        'right value';
 is $m->stack->[0]->{action},       'alternatives', 'right value';
 is $m->stack->[0]->{alternatives}, 'bar',          'right value';
 is $m->stack->[0]->{format},       undef,          'no value';
 is $m->stack->[1], undef, 'no value';
-is $m->url_for, '/regex/alternatives/bar', 'right path';
-
-$m = Mojolicious::Routes::Match->new('/regex/alternatives/baz', 'get')->match($r);
+is $m->path_for, '/regex/alternatives/bar', 'right path';
+$m =
+  Mojolicious::Routes::Match->new(get => '/regex/alternatives/baz')
+  ->match($r);
 is $m->stack->[0]->{controller},   'regex',        'right value';
 is $m->stack->[0]->{action},       'alternatives', 'right value';
 is $m->stack->[0]->{alternatives}, 'baz',          'right value';
 is $m->stack->[0]->{format},       undef,          'no value';
 is $m->stack->[1], undef, 'no value';
-is $m->url_for, '/regex/alternatives/baz', 'right path';
-
-$m = Mojolicious::Routes::Match->new('/regex/alternatives/yada', 'get')->match($r);
+is $m->path_for, '/regex/alternatives/baz', 'right path';
+$m =
+  Mojolicious::Routes::Match->new(get => '/regex/alternatives/yada')
+  ->match($r);
 is $m->stack->[0], undef, 'no value';

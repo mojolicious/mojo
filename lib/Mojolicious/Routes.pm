@@ -35,23 +35,7 @@ sub DESTROY { }
 
 sub new {
     my $self = shift->SUPER::new();
-
-    # Parse
     $self->parse(@_);
-
-    # WebSocket condition
-    $self->add_condition(
-        websocket => sub {
-            my ($r, $c, $captures) = @_;
-
-            # WebSocket
-            return 1 if $c->tx->is_websocket;
-
-            # Not a WebSocket
-            return;
-        }
-    );
-
     return $self;
 }
 
@@ -130,16 +114,19 @@ sub detour {
 sub dispatch {
     my ($self, $c) = @_;
 
+    # Request
+    my $req = $c->req;
+
     # Path
     my $path = $c->stash->{path};
     $path = "/$path" if defined $path && $path !~ /^\//;
-
-    unless ($path) {
-        $path = $c->req->url->path->to_abs_string;
-    }
+    $path = $req->url->path->to_abs_string unless $path;
 
     # Match
-    my $m = Mojolicious::Routes::Match->new($path, $c->req->method);
+    my $m = Mojolicious::Routes::Match->new(
+        $req->method => $path,
+        $c->tx->is_websocket
+    );
     $m->match($self, $c);
     $c->match($m);
 
@@ -155,6 +142,13 @@ sub dispatch {
 
 sub get { shift->_generate_route('get', @_) }
 
+sub has_websocket {
+    my $self = shift;
+    return 1 if $self->is_websocket;
+    if (my $parent = $self->parent) { return $parent->is_websocket }
+    return;
+}
+
 sub hide { push @{shift->hidden}, @_ }
 
 sub is_endpoint {
@@ -166,9 +160,7 @@ sub is_endpoint {
 }
 
 sub is_websocket {
-    my $self = shift;
-    return 1 if $self->{_websocket};
-    if (my $parent = $self->parent) { return $parent->is_websocket }
+    return 1 if shift->{_websocket};
     return;
 }
 
@@ -338,32 +330,23 @@ sub under { shift->_generate_route('under', @_) }
 sub via {
     my $self = shift;
 
-    # Methods
-    my $methods = ref $_[0] ? $_[0] : [@_];
+    # Set
+    if (@_) {
+        my $methods = [map { lc $_ } @{ref $_[0] ? $_[0] : [@_]}];
+        $self->{_via} = $methods if @$methods;
+        return $self;
+    }
 
-    # Shortcut
-    return $self unless @$methods;
-
-    # Condition
-    $self->{_via} ||= [];
-
-    push @{$self->{_via}}, map { lc $_ } @$methods;
-
-    return $self;
+    # Get
+    return $self->{_via};
 }
 
 sub waypoint { shift->route(@_)->block(1) }
 
 sub websocket {
-    my $self = shift;
-
-    # Route
+    my $self  = shift;
     my $route = $self->any(@_);
-
-    # Condition
-    push @{$route->conditions}, websocket => 1;
     $route->{_websocket} = 1;
-
     return $route;
 }
 
@@ -746,7 +729,6 @@ L<Mojolicious::Controller>.
     $r             = $r->dictionary({foo => sub { ... }});
 
 Contains all available conditions for this route.
-There are currently two conditions built in, C<method> and C<websocket>.
 
 =head2 C<hidden>
 
@@ -889,6 +871,13 @@ Match routes and dispatch.
 Generate route matching only C<GET> requests.
 See also the L<Mojolicious::Lite> tutorial for more argument variations.
 
+=head2 C<has_websocket>
+
+    my $has_websocket = $r->has_websocket;
+
+Returns true if this route has a WebSocket ancestor.
+Note that this method is EXPERIMENTAL and might change without warning!
+
 =head2 C<hide>
 
     $r = $r->hide('new');
@@ -905,7 +894,8 @@ Returns true if this route qualifies as an endpoint.
 
     my $is_websocket = $r->is_websocket;
 
-Returns true if this route leads to a WebSocket.
+Returns true if this route is a WebSocket.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<name>
 
@@ -988,9 +978,10 @@ See also the L<Mojolicious::Lite> tutorial for more argument variations.
 
 =head2 C<via>
 
-    $r = $r->via('get');
-    $r = $r->via(qw/get post/);
-    $r = $r->via([qw/get post/]);
+    my $methods = $r->via;
+    $r          = $r->via('get');
+    $r          = $r->via(qw/get post/);
+    $r          = $r->via([qw/get post/]);
 
 Apply C<method> constraint to this route.
 

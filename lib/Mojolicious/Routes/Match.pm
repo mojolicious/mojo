@@ -8,20 +8,23 @@ use Scalar::Util 'weaken';
 
 has captures => sub { {} };
 has stack    => sub { [] };
-has [qw/endpoint is_websocket root/];
+has [qw/endpoint root/];
 
 # "I'm Bender, baby, please insert liquor!"
 sub new {
     my $self = shift->SUPER::new();
 
+    # Method
+    $self->{_method} = lc shift;
+
     # Path
-    my $path = shift || Carp::croak(qq/Missing path/);
+    my $path = shift;
     url_unescape $path;
     decode 'UTF8', $path;
     $self->{_path} = $path;
 
-    # Method
-    $self->{_method} = shift || Carp::croak(qq/Missing method/);
+    # WebSocket
+    $self->{_websocket} = shift;
 
     return $self;
 }
@@ -55,9 +58,13 @@ sub match {
     $captures = {%{$self->captures}, %$captures};
     $self->captures($captures);
 
-    # Request method
-    if ($r->{_via}) {
-      return unless $self->_method($self->{_method}, $r->{_via});
+    # Method
+    if (my $methods = $r->via) {
+        my $method = lc $self->{_method};
+        $method = 'get' if $method eq 'head';
+        my $found = 0;
+        for my $m (@$methods) { ++$found and last if $method eq $m }
+        return unless $found;
     }
 
     # Conditions
@@ -73,6 +80,9 @@ sub match {
         # Match
         return if !$condition->($r, $c, $captures, $value);
     }
+
+    # WebSocket
+    return if $r->is_websocket && !$self->{_websocket};
 
     # Partial
     if (my $partial = $r->partial) {
@@ -124,38 +134,13 @@ sub match {
         }
     }
 
+    # Endpoint
     $self->endpoint($r) if $r->is_endpoint && $self->_is_path_empty;
 
     return $self;
 }
 
-# Method condition
-sub _method {
-    my $self   = shift;
-    my $method = shift;
-    my $valid  = shift;
-
-    # Lowercase
-    $method = lc($method);
-
-    # Default
-    $valid = ['get'] unless $valid;
-
-    # Methods
-    return unless $valid && ref $valid eq 'ARRAY';
-
-    # Match
-    $method = 'get' if $method eq 'head';
-    for my $v (@$valid) {
-        return 1 if $method eq $v;
-    }
-
-    # Nothing
-    return;
-}
-
-
-sub url_for {
+sub path_for {
     my $self   = shift;
     my $values = {};
     my $name   = undef;
@@ -204,6 +189,7 @@ sub url_for {
     if ($name && $name eq 'current' || !$name) {
         return undef unless $endpoint = $self->endpoint;
     }
+
     # Find
     else {
         $captures = {};
@@ -213,12 +199,9 @@ sub url_for {
     # Merge values
     $values = {%$captures, format => undef, %$values};
 
-    # Endpoint is websocket
-    $self->is_websocket($endpoint->is_websocket);
-
     # Render
-    return $endpoint->render('', $values);
-
+    my $path = $endpoint->render('', $values);
+    return wantarray ? ($path, $endpoint->has_websocket) : $path;
 }
 
 sub _find_route {
@@ -279,12 +262,6 @@ Captured parameters.
 
 The routes endpoint that actually matched.
 
-=head2 C<is_websocket>
-
-    my $is_websocket = $m->is_websocket;
-
-Returns true if endpoint leads to a WebSocket.
-
 =head2 C<root>
 
     my $root = $m->root;
@@ -306,28 +283,33 @@ implements the following ones.
 
 =head2 C<new>
 
-    my $m = Mojolicious::Routes::Match->new('/foo/bar.html', 'post');
+    my $m = Mojolicious::Routes::Match->new(post => '/foo/bar.html');
+    my $m = Mojolicious::Routes::Match->new(get  => '/echo', $ws);
 
-Construct a new match object. Expects the path and request method.
+Construct a new match object.
 
 =head2 C<match>
 
     $m->match(Mojolicious::Routes->new, Mojolicious::Controller->new);
 
-Match against a routes tree. A controller object can be passed as a second
-argument which will then be passed to conditions (defined via C<over> command
-in L<Mojolicious::Routes>).
+Match against a routes tree.
 
-=head2 C<url_for>
+=head2 C<path_for>
 
-    my $url = $m->url_for;
-    my $url = $m->url_for(foo => 'bar');
-    my $url = $m->url_for({foo => 'bar'});
-    my $url = $m->url_for('named');
-    my $url = $m->url_for('named', foo => 'bar');
-    my $url = $m->url_for('named', {foo => 'bar'});
+    my $path        = $m->path_for;
+    my $path        = $m->path_for(foo => 'bar');
+    my $path        = $m->path_for({foo => 'bar'});
+    my $path        = $m->path_for('named');
+    my $path        = $m->path_for('named', foo => 'bar');
+    my $path        = $m->path_for('named', {foo => 'bar'});
+    my ($path, $ws) = $m->path_for;
+    my ($path, $ws) = $m->path_for(foo => 'bar');
+    my ($path, $ws) = $m->path_for({foo => 'bar'});
+    my ($path, $ws) = $m->path_for('named');
+    my ($path, $ws) = $m->path_for('named', foo => 'bar');
+    my ($path, $ws) = $m->path_for('named', {foo => 'bar'});
 
-Render matching route with parameters into a L<Mojo::URL> object.
+Render matching route with parameters into path.
 
 =head1 SEE ALSO
 

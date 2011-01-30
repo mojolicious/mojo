@@ -51,6 +51,9 @@ sub match {
     # No match
     return unless $captures;
 
+    # Update path
+    $self->{_path} = $path;
+
     # Merge captures
     $captures = {%{$self->captures}, %$captures};
     $self->captures($captures);
@@ -81,37 +84,40 @@ sub match {
     # WebSocket
     return if $r->is_websocket && !$self->{_websocket};
 
+    # Empty Path
+    my $is_path_empty = $self->_is_path_empty;
+
     # Partial
     if (my $partial = $r->partial) {
         $captures->{$partial} = $path;
-        $path = '';
+        $self->endpoint($r);
+        $is_path_empty = 1;
     }
-    $self->{_path} = $path;
 
     # Format
     if ($r->is_endpoint && !$pattern->format) {
         if ($path =~ /^\.([^\/]+)$/) {
             $captures->{format} = $1;
-            $self->{_path}      = '';
+            $is_path_empty      = 1;
         }
     }
     $captures->{format} ||= $pattern->format if $pattern->format;
 
     # Update stack
-    if ($r->inline || ($r->is_endpoint && $self->_is_path_empty)) {
+    if ($r->inline || ($r->is_endpoint && $is_path_empty)) {
         push @{$self->stack}, {%$captures};
         delete $captures->{cb};
         delete $captures->{app};
     }
 
     # Waypoint match
-    if ($r->block && $self->_is_path_empty) {
+    if ($r->block && $is_path_empty) {
         $self->endpoint($r);
         return $self;
     }
 
     # Endpoint
-    $self->endpoint($r) if $r->is_endpoint && $self->_is_path_empty;
+    $self->endpoint($r) if $r->is_endpoint && $is_path_empty;
     return $self if $self->endpoint;
 
     # Match children

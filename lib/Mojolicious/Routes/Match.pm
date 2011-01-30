@@ -51,6 +51,9 @@ sub match {
     # No match
     return unless $captures;
 
+    # Path
+    $self->{_path} = $path;
+
     # Merge captures
     $captures = {%{$self->captures}, %$captures};
     $self->captures($captures);
@@ -81,34 +84,38 @@ sub match {
     # WebSocket
     return if $r->is_websocket && !$self->{_websocket};
 
+    # Empty path
+    my $empty = !length $path || $path eq '/' ? 1 : 0;
+
     # Partial
     if (my $partial = $r->partial) {
         $captures->{$partial} = $path;
-        $path = '';
+        $self->endpoint($r);
+        $empty = 1;
     }
-    $self->{_path} = $path;
 
     # Format
-    if ($r->is_endpoint && !$pattern->format) {
-        if ($path =~ /^\.([^\/]+)$/) {
-            $captures->{format} = $1;
-            $self->{_path}      = '';
-        }
+    if ($r->is_endpoint && !$pattern->format && $path =~ /^\.([^\/]+)$/) {
+        $captures->{format} = $1;
+        $empty = 1;
     }
     $captures->{format} ||= $pattern->format if $pattern->format;
 
     # Update stack
-    if ($r->inline || ($r->is_endpoint && $self->_is_path_empty)) {
+    if ($r->inline || ($r->is_endpoint && $empty)) {
         push @{$self->stack}, {%$captures};
         delete $captures->{cb};
         delete $captures->{app};
     }
 
     # Waypoint match
-    if ($r->block && $self->_is_path_empty) {
+    if ($r->block && $empty) {
         $self->endpoint($r);
         return $self;
     }
+
+    # Endpoint
+    return $self->endpoint($r) if $r->is_endpoint && $empty;
 
     # Match children
     my $snapshot = [@{$self->stack}];
@@ -130,9 +137,6 @@ sub match {
             $self->stack([]);
         }
     }
-
-    # Endpoint
-    $self->endpoint($r) if $r->is_endpoint && $self->_is_path_empty;
 
     return $self;
 }
@@ -187,10 +191,23 @@ sub path_for {
         return undef unless $endpoint = $self->endpoint;
     }
 
-    # Find
+    # Find endpoint
     else {
         $captures = {};
-        return $name unless $endpoint = $self->_find_route($name);
+
+        # Find
+        my @children = ($self->root);
+        while (my $child = shift @children) {
+
+            # Match
+            ($endpoint = $child) and last if ($child->name || '') eq $name;
+
+            # Append
+            push @children, @{$child->children};
+        }
+
+        # Nothing
+        return $name unless $endpoint;
     }
 
     # Merge values
@@ -199,30 +216,6 @@ sub path_for {
     # Render
     my $path = $endpoint->render('', $values);
     return wantarray ? ($path, $endpoint->has_websocket) : $path;
-}
-
-sub _find_route {
-    my ($self, $name) = @_;
-
-    # Find endpoint
-    my @children = ($self->root);
-    while (my $child = shift @children) {
-
-        # Match
-        return $child if ($child->name || '') eq $name;
-
-        # Append
-        push @children, @{$child->children};
-    }
-
-    # Not found
-    return;
-}
-
-sub _is_path_empty {
-    my $self = shift;
-    return 1 if !length $self->{_path} || $self->{_path} eq '/';
-    return;
 }
 
 1;

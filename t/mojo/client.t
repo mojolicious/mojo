@@ -9,7 +9,7 @@ BEGIN { $ENV{MOJO_POLL} = 1 }
 use Test::More;
 plan skip_all => 'Windows is too fragile for this test!'
   if $^O eq 'MSWin32' || $^O =~ /cygwin/;
-plan tests => 68;
+plan tests => 80;
 
 use_ok 'Mojo::Client';
 
@@ -50,22 +50,50 @@ $ENV{http_proxy}  = 'proxy.kraih.com';
 $ENV{https_proxy} = 'tunnel.kraih.com';
 $ENV{no_proxy}    = 'localhost,localdomain,foo.com,kraih.com';
 $client->detect_proxy;
-is $client->http_proxy,  'proxy.kraih.com',  'right proxy';
-is $client->https_proxy, 'tunnel.kraih.com', 'right proxy';
-is $client->need_proxy('dummy.mojolicio.us'),    1,     'proxy needed';
-is $client->need_proxy('icio.us'),               1,     'proxy needed';
-is $client->need_proxy('localhost'),             undef, 'proxy needed';
-is $client->need_proxy('localhost.localdomain'), undef, 'no proxy needed';
-is $client->need_proxy('foo.com'),               undef, 'no proxy needed';
-is $client->need_proxy('kraih.com'),             undef, 'no proxy needed';
-is $client->need_proxy('www.kraih.com'),         undef, 'no proxy needed';
-is $client->need_proxy('www.kraih.com.com'),     1,     'proxy needed';
+my $client2 = $client->clone;
+is $client2->http_proxy,  'proxy.kraih.com',  'right proxy';
+is $client2->https_proxy, 'tunnel.kraih.com', 'right proxy';
+is $client2->need_proxy('dummy.mojolicio.us'),    1,     'proxy needed';
+is $client2->need_proxy('icio.us'),               1,     'proxy needed';
+is $client2->need_proxy('localhost'),             undef, 'proxy needed';
+is $client2->need_proxy('localhost.localdomain'), undef, 'no proxy needed';
+is $client2->need_proxy('foo.com'),               undef, 'no proxy needed';
+is $client2->need_proxy('kraih.com'),             undef, 'no proxy needed';
+is $client2->need_proxy('www.kraih.com'),         undef, 'no proxy needed';
+is $client2->need_proxy('www.kraih.com.com'),     1,     'proxy needed';
 $ENV{HTTP_PROXY}  = $backup;
 $ENV{HTTPS_PROXY} = $backup2;
 $ENV{NO_PROXY}    = $backup3;
 $ENV{http_proxy}  = $backup4;
 $ENV{https_proxy} = $backup5;
 $ENV{no_proxy}    = $backup6;
+
+# Cloning
+$client = Mojo::Client->new;
+$client->on_start(sub {23});
+$client->cert('/cert');
+$client->key('/key');
+$client->http_proxy('http://127.0.0.1:3000');
+$client->https_proxy('http://127.0.0.1:4000');
+$client->no_proxy('127.0.0.1');
+$client->user_agent('Trololo');
+$client->keep_alive_timeout(23);
+$client->max_connections(13);
+$client->max_redirects(7);
+$client->websocket_timeout(333);
+$client2 = $client->clone;
+is $client2->on_start,           $client->on_start,           'right value';
+is $client2->cert,               $client->cert,               'right value';
+is $client2->key,                $client->key,                'right value';
+is $client2->http_proxy,         $client->http_proxy,         'right value';
+is $client2->https_proxy,        $client->https_proxy,        'right value';
+is $client2->no_proxy,           $client->no_proxy,           'right value';
+is $client2->user_agent,         $client->user_agent,         'right value';
+is $client2->cookie_jar,         $client->cookie_jar,         'right value';
+is $client2->keep_alive_timeout, $client->keep_alive_timeout, 'right value';
+is $client2->max_connections,    $client->max_connections,    'right value';
+is $client2->max_redirects,      $client->max_redirects,      'right value';
+is $client2->websocket_timeout,  $client->websocket_timeout,  'right value';
 
 # Fresh client
 $client = Mojo::Client->singleton->app(app);

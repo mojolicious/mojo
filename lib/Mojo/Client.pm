@@ -296,6 +296,13 @@ sub clone {
     my $clone = $self->new;
     $clone->app($self->app);
     $clone->log($self->log);
+    $clone->on_start($self->on_start);
+    $clone->cert($self->cert);
+    $clone->key($self->key);
+    $clone->http_proxy($self->http_proxy);
+    $clone->https_proxy($self->https_proxy);
+    $clone->no_proxy($self->no_proxy);
+    $clone->user_agent($self->user_agent);
     $clone->cookie_jar($self->cookie_jar);
     $clone->keep_alive_timeout($self->keep_alive_timeout);
     $clone->max_connections($self->max_connections);

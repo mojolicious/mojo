@@ -34,6 +34,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed small empty route bug.
         - Fixed URL merging in Mojo::URL.
         - Fixed version detection in Mojolicious::Command::Version.
+        - Fixed Mojo::Client cloning.
         - Fixed typos.
 
 1.01 2011-01-06 00:00:00

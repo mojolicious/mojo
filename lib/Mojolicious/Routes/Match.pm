@@ -283,8 +283,8 @@ implements the following ones.
 
 =head2 C<new>
 
-    my $m = Mojolicious::Routes::Match->new(post => '/foo/bar.html');
-    my $m = Mojolicious::Routes::Match->new(get  => '/echo', $ws);
+    my $m = Mojolicious::Routes::Match->new(get => '/foo');
+    my $m = Mojolicious::Routes::Match->new(get => '/foo', $ws);
 
 Construct a new match object.
 

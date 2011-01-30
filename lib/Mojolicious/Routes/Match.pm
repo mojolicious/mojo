@@ -1,10 +1,7 @@
 package Mojolicious::Routes::Match;
 use Mojo::Base -base;
 
-use Carp 'croak';
 use Mojo::Util qw/decode url_unescape/;
-use Mojo::URL;
-use Scalar::Util 'weaken';
 
 has captures => sub { {} };
 has stack    => sub { [] };

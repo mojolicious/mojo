@@ -1132,6 +1132,8 @@ Mojo::DOM - Minimalistic XML/HTML5 DOM Parser With CSS3 Selectors
 
 L<Mojo::DOM> is a minimalistic and very relaxed XML/HTML5 DOM parser with
 support for CSS3 selectors.
+It will even try to interpret broken XML, so you should not use it for
+validation.
 
 =head1 SELECTORS
 

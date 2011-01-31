@@ -9,6 +9,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL support for route shortcuts.
         - Added EXPERIMENTAL support for NO_PROXY. (l0b0)
         - Added EXPERIMENTAL user_agent attribute to Mojo::Client.
+        - Added EXPERIMENTAL support for mode specific not_found and
+          exception templates.
         - Removed experimental status from Mojo::DOM and ojo.
         - Removed experimental status from many attributes and methods all
           over Mojolicious.

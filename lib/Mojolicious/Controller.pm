@@ -19,9 +19,17 @@ has tx => sub { Mojo::Transaction::HTTP->new };
 our $EXCEPTION =
   Mojo::Command->new->get_data('exception.html.ep', __PACKAGE__);
 
+# Exception template (development)
+our $DEVELOPMENT_EXCEPTION =
+  Mojo::Command->new->get_data('exception.development.html.ep', __PACKAGE__);
+
 # Not found template
 our $NOT_FOUND =
   Mojo::Command->new->get_data('not_found.html.ep', __PACKAGE__);
+
+# Not found template (development)
+our $DEVELOPMENT_NOT_FOUND =
+  Mojo::Command->new->get_data('not_found.development.html.ep', __PACKAGE__);
 
 # Reserved stash values
 my $STASH_RE = qr/
@@ -375,10 +383,12 @@ sub render_exception {
         Time        => scalar localtime(time)
     );
 
+    # Mode
+    my $mode = $self->app->mode;
 
     # Exception template
     my $options = {
-        template         => 'exception',
+        template         => "exception.$mode",
         format           => 'html',
         handler          => undef,
         status           => 500,
@@ -390,20 +400,23 @@ sub render_exception {
         'mojo.exception' => 1
     };
 
-    # Inline template
+    # Mode specific template
     unless ($self->render($options)) {
-        $self->render(
-            inline           => $EXCEPTION,
-            format           => 'html',
-            handler          => 'ep',
-            status           => 500,
-            layout           => undef,
-            extends          => undef,
-            request          => \@r,
-            info             => \@i,
-            exception        => $e,
-            'mojo.exception' => 1
-        );
+
+        # Template
+        $options->{template} = 'exception';
+        unless ($self->render($options)) {
+
+            # Inline template
+            delete $options->{template};
+            $options->{inline} =
+              $mode eq 'development' ? $DEVELOPMENT_EXCEPTION : $EXCEPTION;
+            $options->{handler} = 'ep';
+            $self->render($options);
+
+            # Render
+            $self->render($options);
+        }
     }
 
     # Rendered
@@ -484,10 +497,12 @@ sub render_not_found {
       ? $self->url_for('/perldoc')
       : 'http://mojolicio.us/perldoc';
 
+    # Mode
+    my $mode = $self->app->mode;
 
     # Render not found template
     my $options = {
-        template         => 'not_found',
+        template         => "not_found.$mode",
         format           => 'html',
         status           => 404,
         layout           => undef,
@@ -496,18 +511,22 @@ sub render_not_found {
         'mojo.not_found' => 1
     };
 
-    # Inline template
+    # Mode specific template
     unless ($self->render($options)) {
-        $self->render(
-            inline           => $NOT_FOUND,
-            format           => 'html',
-            handler          => 'ep',
-            status           => 404,
-            layout           => undef,
-            extends          => undef,
-            guide            => $guide,
-            'mojo.not_found' => 1
-        );
+
+        # Template
+        $options->{template} = 'not_found';
+        unless ($self->render($options)) {
+
+            # Inline template
+            delete $options->{template};
+            $options->{inline} =
+              $mode eq 'development' ? $DEVELOPMENT_NOT_FOUND : $NOT_FOUND;
+            $options->{handler} = 'ep';
+
+            # Render
+            $self->render($options);
+        }
     }
 
     # Rendered
@@ -818,6 +837,12 @@ sub write_chunk {
 __DATA__
 
 @@ exception.html.ep
+<!doctype html><html>
+    <head><title>Exception</title></head>
+    <body>Page temporarily unavailable, please come back later.</body>
+</html>
+
+@@ exception.development.html.ep
 % my $e = delete $self->stash->{'exception'};
 <!doctype html><html>
     <head>
@@ -925,136 +950,140 @@ __DATA__
         % end
     </head>
     <body onload="prettyPrint()">
-        % if ($self->app->mode eq 'development') {
-            % my $code = begin
-                <code class="prettyprint"><%= shift %></code>
+        % my $code = begin
+            <code class="prettyprint"><%= shift %></code>
+        % end
+        % my $cv = begin
+            % my ($key, $value, $i) = @_;
+            %= tag 'tr', $i ? (class => 'important') : undef, begin
+                <td class="key"><%= $key %>.</td>
+                <td class="value">
+                   %== $code->($value)
+                </td>
             % end
-            % my $cv = begin
-                % my ($key, $value, $i) = @_;
-                %= tag 'tr', $i ? (class => 'important') : undef, begin
-                    <td class="key"><%= $key %>.</td>
-                    <td class="value">
-                       %== $code->($value)
-                    </td>
-                % end
-            % end
-            % my $kv = begin
-                % my ($key, $value) = @_;
-                <tr>
-                    <td class="key"><%= $key %>:</td>
-                    <td class="value">
-                        <pre><%= $value %></pre>
-                    </td>
-                </tr>
-            % end
-            <div id="showcase" class="code box">
-                <h1><%= $e->message %></h1>
-                <div id="context">
-                    <table>
-                        % for my $line (@{$e->lines_before}) {
-                            %== $cv->($line->[0], $line->[1])
-                        % }
-                        % if (defined $e->line->[1]) {
-                            %== $cv->($e->line->[0], $e->line->[1], 1)
-                        % }
-                        % for my $line (@{$e->lines_after}) {
-                            %== $cv->($line->[0], $line->[1])
-                        % }
-                    </table>
-                </div>
-                % if (defined $e->line->[2]) {
-                    <div id="insight">
-                        <table>
-                            % for my $line (@{$e->lines_before}) {
-                                %== $cv->($line->[0], $line->[2])
-                            % }
-                            %== $cv->($e->line->[0], $e->line->[2], 1)
-                            % for my $line (@{$e->lines_after}) {
-                                %== $cv->($line->[0], $line->[2])
-                            % }
-                        </table>
-                    </div>
-                    <div class="tap">tap for more</div>
-                    %= javascript begin
-                        var current = '#context';
-                        $('#showcase').click(function() {
-                            $(current).slideToggle('slow', function() {
-                                if (current == '#context') {
-                                    current = '#insight';
-                                }
-                                else {
-                                    current = '#context';
-                                }
-                                $(current).slideToggle('slow');
-                            });
-                        });
-                        $('#insight').toggle();
-                    % end
-                % }
-            </div>
-            <div class="box" id="trace">
-                % if (@{$e->frames}) {
-                    <div id="frames">
-                        % for my $frame (@{$e->frames}) {
-                            % if (my $line = $frame->[3]) {
-                                <div class="file"><%= $frame->[1] %></div>
-                                <div class="code preview">
-                                    %= "$frame->[2]."
-                                    %== $code->($line)
-                                </div>
-                            % }
-                        % }
-                    </div>
-                    <div class="tap">tap for more</div>
-                    %= javascript begin
-                        $('#trace').click(function() {
-                            $('#frames').slideToggle('slow');
-                        });
-                        $('#frames').toggle();
-                    % end
-                % }
-            </div>
-            <div class="box infobox" id="request">
+        % end
+        % my $kv = begin
+            % my ($key, $value) = @_;
+            <tr>
+                <td class="key"><%= $key %>:</td>
+                <td class="value">
+                    <pre><%= $value %></pre>
+                </td>
+            </tr>
+        % end
+        <div id="showcase" class="code box">
+            <h1><%= $e->message %></h1>
+            <div id="context">
                 <table>
-                    % for (my $i = 0; $i < @$request; $i += 2) {
-                        % my $key = $request->[$i];
-                        % my $value = $request->[$i + 1];
-                        %== $kv->($key, $value)
+                    % for my $line (@{$e->lines_before}) {
+                        %== $cv->($line->[0], $line->[1])
                     % }
-                    % for my $name (@{$self->req->headers->names}) {
-                        % my $value = $self->req->headers->header($name);
-                        %== $kv->($name, $value)
+                    % if (defined $e->line->[1]) {
+                        %== $cv->($e->line->[0], $e->line->[1], 1)
+                    % }
+                    % for my $line (@{$e->lines_after}) {
+                        %== $cv->($line->[0], $line->[1])
                     % }
                 </table>
             </div>
-            <div class="box infobox" id="more">
-                <div id="infos">
+            % if (defined $e->line->[2]) {
+                <div id="insight">
                     <table>
-                        % for (my $i = 0; $i < @$info; $i += 2) {
-                            %== $kv->($info->[$i], $info->[$i + 1])
+                        % for my $line (@{$e->lines_before}) {
+                            %== $cv->($line->[0], $line->[2])
+                        % }
+                        %== $cv->($e->line->[0], $e->line->[2], 1)
+                        % for my $line (@{$e->lines_after}) {
+                            %== $cv->($line->[0], $line->[2])
                         % }
                     </table>
                 </div>
                 <div class="tap">tap for more</div>
-            </div>
-            <div id="footer">
-                %= link_to 'http://mojolicio.us' => begin
-                    <img src="mojolicious-black.png" alt="Mojolicious logo">
+                %= javascript begin
+                    var current = '#context';
+                    $('#showcase').click(function() {
+                        $(current).slideToggle('slow', function() {
+                            if (current == '#context') {
+                                current = '#insight';
+                            }
+                            else {
+                                current = '#context';
+                            }
+                            $(current).slideToggle('slow');
+                        });
+                    });
+                    $('#insight').toggle();
                 % end
+            % }
+        </div>
+        <div class="box" id="trace">
+            % if (@{$e->frames}) {
+                <div id="frames">
+                    % for my $frame (@{$e->frames}) {
+                        % if (my $line = $frame->[3]) {
+                            <div class="file"><%= $frame->[1] %></div>
+                            <div class="code preview">
+                                %= "$frame->[2]."
+                                %== $code->($line)
+                            </div>
+                        % }
+                    % }
+                </div>
+                <div class="tap">tap for more</div>
+                %= javascript begin
+                    $('#trace').click(function() {
+                        $('#frames').slideToggle('slow');
+                    });
+                    $('#frames').toggle();
+                % end
+            % }
+        </div>
+        <div class="box infobox" id="request">
+            <table>
+                % for (my $i = 0; $i < @$request; $i += 2) {
+                    % my $key = $request->[$i];
+                    % my $value = $request->[$i + 1];
+                    %== $kv->($key, $value)
+                % }
+                % for my $name (@{$self->req->headers->names}) {
+                    % my $value = $self->req->headers->header($name);
+                    %== $kv->($name, $value)
+                % }
+            </table>
+        </div>
+        <div class="box infobox" id="more">
+            <div id="infos">
+                <table>
+                    % for (my $i = 0; $i < @$info; $i += 2) {
+                        %== $kv->($info->[$i], $info->[$i + 1])
+                    % }
+                </table>
             </div>
-            %= javascript begin
-                $('#more').click(function() {
-                    $('#infos').slideToggle('slow');
-                });
-                $('#infos').toggle();
+            <div class="tap">tap for more</div>
+        </div>
+        <div id="footer">
+            %= link_to 'http://mojolicio.us' => begin
+                <img src="mojolicious-black.png" alt="Mojolicious logo">
             % end
-        % } else {
-            Page temporarily unavailable, please come back later.
-        % }
+        </div>
+        %= javascript begin
+            $('#more').click(function() {
+                $('#infos').slideToggle('slow');
+            });
+            $('#infos').toggle();
+        % end
     </body>
 </html>
 
 @@ not_found.html.ep
+<!doctype html><html>
+    <head><title>Not Found</title></head>
+    <body>
+        Page not found, want to go <%= link_to home => url_for->base %>?
+    </body>
+</html>
+
+@@ not_found.development.html.ep
 <!doctype html><html>
     <head>
         <title>Not Found</title>
@@ -1132,41 +1161,37 @@ __DATA__
         % end
     </head>
     <body onload="prettyPrint()">
-        % if ($self->app->mode eq 'development') {
-            <div id="header">
-                <img src="mojolicious-box.png" alt="Mojolicious banner">
-                <h1>This page is brand new and has not been unboxed yet!</h1>
-            </div>
-            <div id="suggestion">
-                <img src="mojolicious-arrow.png" alt="Arrow">
-                <h1>Perhaps you would like to add a route for it?</h1>
-                <div id="preview">
-                    <pre class="prettyprint">
+        <div id="header">
+            <img src="mojolicious-box.png" alt="Mojolicious banner">
+            <h1>This page is brand new and has not been unboxed yet!</h1>
+        </div>
+        <div id="suggestion">
+            <img src="mojolicious-arrow.png" alt="Arrow">
+            <h1>Perhaps you would like to add a route for it?</h1>
+            <div id="preview">
+                <pre class="prettyprint">
 get '<%= $self->req->url->path->to_abs_string %>' => sub {
     my $self = shift;
     $self->render(text => 'Hello world!');
 };</pre>
+            </div>
+        </div>
+        <div id="documentation">
+            <h1>
+                You might also enjoy our excellent documentation in
+                <div id="perldoc">
+                    <%= link_to 'perldoc Mojolicious::Guides', $guide %>
                 </div>
-            </div>
-            <div id="documentation">
-                <h1>
-                    You might also enjoy our excellent documentation in
-                    <div id="perldoc">
-                        <%= link_to 'perldoc Mojolicious::Guides', $guide %>
-                    </div>
-                </h1>
-                <img src="amelia.png" alt="Amelia">
-            </div>
-            <div id="footer">
-                <h1>And don't forget to have fun!</h1>
-                <p><img src="mojolicious-clouds.png" alt="Clouds"></p>
-                %= link_to 'http://mojolicio.us' => begin
-                    <img src="mojolicious-black.png" alt="Mojolicious logo">
-                % end
-            </div>
-        % } else {
-            Page not found, want to go <%= link_to home => url_for->base %>?
-        % }
+            </h1>
+            <img src="amelia.png" alt="Amelia">
+        </div>
+        <div id="footer">
+            <h1>And don't forget to have fun!</h1>
+            <p><img src="mojolicious-clouds.png" alt="Clouds"></p>
+            %= link_to 'http://mojolicio.us' => begin
+                <img src="mojolicious-black.png" alt="Mojolicious logo">
+            % end
+        </div>
     </body>
 </html>
 

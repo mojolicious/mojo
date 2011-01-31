@@ -25,10 +25,9 @@ use Mojo::Cookie::Response;
 use Mojo::Date;
 use Mojo::JSON;
 use Mojo::Transaction::HTTP;
-use Mojolicious::Lite;
 use Test::Mojo;
 
-# Mojolicious::Lite and ojo
+# Load Mojolicious::Lite via ojo
 use ojo;
 
 # Header condition plugin

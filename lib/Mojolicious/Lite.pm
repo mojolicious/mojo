@@ -16,7 +16,8 @@ sub import {
     warnings->import;
 
     # Home
-    $ENV{MOJO_HOME} ||= File::Spec->catdir(split '/', $FindBin::Bin);
+    local $ENV{MOJO_HOME} = File::Spec->catdir(split '/', $FindBin::Bin)
+      unless $ENV{MOJO_HOME};
 
     # Initialize app
     my $app = $class->new;
@@ -50,7 +51,7 @@ sub import {
     *{"${caller}::websocket"} = sub { $routes->websocket(@_) };
 
     # We are most likely the app in a lite environment
-    $ENV{MOJO_APP} = $app;
+    $ENV{MOJO_APP} ||= $app;
 
     # Shagadelic!
     *{"${caller}::shagadelic"} = sub { $app->start(@_) };

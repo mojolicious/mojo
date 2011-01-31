@@ -21,6 +21,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Made Simpsons and Futurama quotes easier to distinguish from normal
           comments.
         - Made routes reusable outside of Mojolicious. (forwardever)
+        - Fixed a complicated application embedding bug.
         - Fixed a Apache mod_rewrite compatibility bug in
           Mojo::Message::Request. (dekimsey)
         - Fixed a small bug in the relaxed HTTP parser.

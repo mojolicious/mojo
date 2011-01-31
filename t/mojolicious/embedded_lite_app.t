@@ -11,8 +11,9 @@ use Test::More tests => 35;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-# I heard you went off and became a rich doctor.
-# I've performed a few mercy killings.
+use Mojolicious::Lite;
+use Test::Mojo;
+
 package TestApp;
 use Mojolicious::Lite;
 
@@ -51,21 +52,6 @@ get '/bye' => sub {
     $async .= 'success!';
 };
 
-package Mojolicious::Plugin::MyEmbeddedApp;
-use Mojo::Base 'Mojolicious::Plugin';
-
-sub register {
-    my ($self, $app) = @_;
-    $app->routes->route('/foo')
-      ->detour(Mojolicious::Plugin::MyEmbeddedApp::App::app());
-}
-
-package Mojolicious::Plugin::MyEmbeddedApp::App;
-use Mojolicious::Lite;
-
-# GET /bar
-get '/bar' => {text => 'plugin works!'};
-
 package MyTestApp::Test2;
 use Mojolicious::Lite;
 
@@ -89,11 +75,9 @@ sub handler {
 }
 
 package main;
-use Mojolicious::Lite;
-use Test::Mojo;
 
 # /foo/* (plugin app)
-plugin 'my_embedded_app';
+plugin 'PluginWithEmbeddedApp';
 
 app->routes->namespace('MyTestApp');
 

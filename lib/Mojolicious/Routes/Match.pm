@@ -94,15 +94,18 @@ sub match {
         $empty = 1;
     }
 
+    # Endpoint
+    my $endpoint = $r->is_endpoint;
+
     # Format
-    if ($r->is_endpoint && !$pattern->format && $path =~ /^\.([^\/]+)$/) {
+    if ($endpoint && !$pattern->format && $path =~ /^\.([^\/]+)$/) {
         $captures->{format} = $1;
         $empty = 1;
     }
     $captures->{format} ||= $pattern->format if $pattern->format;
 
     # Update stack
-    if ($r->inline || ($r->is_endpoint && $empty)) {
+    if ($r->inline || ($endpoint && $empty)) {
         push @{$self->stack}, {%$captures};
         delete $captures->{cb};
         delete $captures->{app};
@@ -115,7 +118,7 @@ sub match {
     }
 
     # Endpoint
-    return $self->endpoint($r) if $r->is_endpoint && $empty;
+    return $self->endpoint($r) if $endpoint && $empty;
 
     # Match children
     my $snapshot = [@{$self->stack}];

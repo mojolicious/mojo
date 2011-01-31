@@ -87,6 +87,9 @@ sub match {
     # Empty path
     my $empty = !length $path || $path eq '/' ? 1 : 0;
 
+    # Endpoint
+    my $is_endpoint = $r->is_endpoint;
+
     # Partial
     if (my $partial = $r->partial) {
         $captures->{$partial} = $path;
@@ -95,14 +98,14 @@ sub match {
     }
 
     # Format
-    if ($r->is_endpoint && !$pattern->format && $path =~ /^\.([^\/]+)$/) {
+    if ($is_endpoint && !$pattern->format && $path =~ /^\.([^\/]+)$/) {
         $captures->{format} = $1;
         $empty = 1;
     }
     $captures->{format} ||= $pattern->format if $pattern->format;
 
     # Update stack
-    if ($r->inline || ($r->is_endpoint && $empty)) {
+    if ($r->inline || ($is_endpoint && $empty)) {
         push @{$self->stack}, {%$captures};
         delete $captures->{cb};
         delete $captures->{app};
@@ -115,7 +118,7 @@ sub match {
     }
 
     # Endpoint
-    return $self->endpoint($r) if $r->is_endpoint && $empty;
+    return $self->endpoint($r) if $is_endpoint && $empty;
 
     # Match children
     my $snapshot = [@{$self->stack}];

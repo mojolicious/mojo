@@ -3593,13 +3593,13 @@ L<http://creativecommons.org/licenses/by-nc-nd/3.0>.
 
 =head2 C</js/jquery.js>
 
-   Version 1.4.4
+   Version 1.5
 
 jQuery is a fast and concise JavaScript Library that simplifies HTML document
 traversing, event handling, animating, and Ajax interactions for rapid web
 development. jQuery is designed to change the way that you write JavaScript.
 
-    Copyright 2010, John Resig.
+    Copyright 2011, John Resig.
 
 Licensed under the MIT License, L<http://creativecommons.org/licenses/MIT>.
 

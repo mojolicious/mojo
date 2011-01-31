@@ -429,7 +429,6 @@ app->hook(after_dispatch => sub { shift->stash->{async} = 'broken!' });
 my $async;
 get '/subrequest_async' => sub {
     my $self = shift;
-    $self->render_later;
     $self->client->async->post(
         '/template' => sub {
             my $client = shift;

@@ -282,6 +282,28 @@ streamed directly from the file.
     $tx->req->content->asset($asset);
     $client->start($tx);
 
+=head2 Parallel Requests
+
+You can perform multiple requests asynchronously just by adding callbacks.
+
+    # Scrape title from main site
+    my $client = Mojo::Client->new;
+    $client->get('http://mojolicio.us' => sub {
+        print 'Title: ', shift->res->dom->at('head > title')->text, "\n";
+    });
+
+    # Scrape headers from documentation site
+    $client->get('http://mojolicio.us/perldoc' => sub {
+        shift->res->dom('h1, h2, h3')->each(sub {
+            print 'Header: ', shift->all_text, "\n";
+        });
+    });
+
+    # Start
+    $client->start;
+
+The C<start> method will block until all requests are finished.
+
 =head2 Non-Blocking
 
 L<Mojo::Client> has been designed from the ground up to be non-blocking, the

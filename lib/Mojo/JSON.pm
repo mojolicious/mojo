@@ -421,7 +421,7 @@ Mojo::JSON - Minimalistic JSON
 
 =head1 DESCRIPTION
 
-L<Mojo::JSON> is a minimalistic and relaxed implementation of RFC4627.
+L<Mojo::JSON> is a minimalistic and very relaxed implementation of RFC4627.
 
 It supports normal Perl data types like C<Scalar>, C<Array> and C<Hash>, but
 not blessed references.

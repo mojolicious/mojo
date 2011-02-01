@@ -227,7 +227,7 @@ initialized and before a connection gets associated with them.
         print 'Request: ', $tx->req->url->clone->to_abs, "\n";
     });
 
-    # Request that will most likely get redircted
+    # Request that will most likely get redirected
     print 'Title: ',
       $client->get('google.com')->res->dom->at('head > title')->text, "\n";
 

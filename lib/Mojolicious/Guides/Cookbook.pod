@@ -211,6 +211,28 @@ make sense for a standalone parser.
 Especially for unit testing your L<Mojolicious> applications this can be a
 very powerful tool.
 
+=head2 Decorating Followup Requests
+
+L<Mojo::Client> can automatically follow redirects, the C<on_start> callback
+allows you direct access to the transaction right after it has been
+initialized.
+
+    # Client following up to 10 redirects
+    my $client = Mojo::Client->new(max_redirects => 10);
+
+    # Add a witty header to every request
+    $client->on_start(sub {
+        my $tx = pop;
+        $tx->req->headers->header('X-Bender' => 'Bite my shiny metal ass!');
+        print 'Request: ', $tx->req->url->clone->to_abs, "\n";
+    });
+
+    # Request that will most likely get redircted
+    print 'Title: ',
+      $client->get('google.com')->res->dom->at('head > title')->text, "\n";
+
+This even works for proxy C<CONNECT> requests.
+
 =head2 Streaming Response
 
 Receiving a streaming response can be really tricky in most HTTP clients,

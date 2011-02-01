@@ -214,8 +214,8 @@ very powerful tool.
 =head2 Decorating Followup Requests
 
 L<Mojo::Client> can automatically follow redirects, the C<on_start> callback
-allows you direct access to the transaction right after it has been
-initialized.
+allows you direct access to each transaction right after they have been
+initialized and before a connection gets associated with them.
 
     # Client following up to 10 redirects
     my $client = Mojo::Client->new(max_redirects => 10);

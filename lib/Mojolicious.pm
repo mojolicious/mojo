@@ -291,6 +291,9 @@ sub process { shift->dispatch(@_) }
 sub start {
     my $class = shift;
 
+    # Executable
+    $ENV{MOJO_EXE} ||= (caller)[1];
+
     # We are the application
     $ENV{MOJO_APP} = ref $class ? $class : $class->new;
 

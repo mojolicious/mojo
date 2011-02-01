@@ -76,9 +76,6 @@ Please visit http://mojolicio.us for detailed installation instructions.
 
 EOF
 
-# Executable
-$ENV{MOJO_EXE} ||= __FILE__;
-
 # Application
 $ENV{MOJO_APP} ||= '<%= $class %>';
 

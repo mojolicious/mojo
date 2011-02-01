@@ -150,10 +150,10 @@ Mojolicious::Plugin::JsonConfig - JSON Configuration Plugin
     }
 
     # Mojolicious
-    $self->plugin('json_config');
+    my $config = $self->plugin('json_config');
 
     # Mojolicious::Lite
-    plugin 'json_config';
+    my $config = plugin 'json_config';
 
     # Reads myapp.json by default and puts the parsed version into the stash
     my $config = $self->stash('config');

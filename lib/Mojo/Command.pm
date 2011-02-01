@@ -358,6 +358,9 @@ sub start {
     return $self if $ENV{MOJO_COMMANDS_DONE};
     $ENV{MOJO_COMMANDS_DONE} ||= 1;
 
+    # Executable
+    $ENV{MOJO_EXE} ||= (caller)[1];
+
     # Arguments
     my @args = @_ ? @_ : @ARGV;
 

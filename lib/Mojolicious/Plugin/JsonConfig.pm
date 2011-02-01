@@ -22,7 +22,7 @@ sub register {
     unless ($file) {
 
         # Basename
-        $file = File::Basename::basename($0);
+        $file = File::Basename::basename($ENV{MOJO_EXE} || $0);
 
         # Remove .pl, .p6 and .t extentions
         $file =~ s/(?:\.p(?:l|6))|\.t$//i;

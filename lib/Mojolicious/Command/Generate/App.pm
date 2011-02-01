@@ -79,6 +79,9 @@ EOF
 # Application
 $ENV{MOJO_APP} ||= '<%= $class %>';
 
+# Executable
+$ENV{MOJO_EXE} ||= __FILE__;
+
 # Start commands
 Mojolicious::Commands->start;
 @@ appclass

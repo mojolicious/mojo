@@ -3,8 +3,8 @@ use Mojo::Base 'Mojolicious';
 
 # "Since when is the Internet all about robbing people of their privacy?
 #  August 6, 1991."
+use File::Basename 'dirname';
 use File::Spec;
-use FindBin;
 
 # "It's the future, my parents, my co-workers, my girlfriend,
 #  I'll never see any of them ever again... YAHOOO!"
@@ -15,8 +15,12 @@ sub import {
     strict->import;
     warnings->import;
 
+    # Executable
+    $ENV{MOJO_EXE} ||= (caller)[1];
+
     # Home
-    local $ENV{MOJO_HOME} = File::Spec->catdir(split '/', $FindBin::Bin)
+    local $ENV{MOJO_HOME} =
+      File::Spec->catdir(split '/', dirname($ENV{MOJO_EXE}))
       unless $ENV{MOJO_HOME};
 
     # Initialize app

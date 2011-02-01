@@ -21,6 +21,9 @@ sub import {
     no strict 'refs';
     no warnings 'redefine';
 
+    # Executable
+    $ENV{MOJO_EXE} ||= (caller)[1];
+
     # Mojolicious::Lite
     eval "package $caller; use Mojolicious::Lite;";
 

@@ -60,7 +60,7 @@ Fresh code based upon years of experience developing L<Catalyst>.
 
 All you need is a oneliner.
 
-    curl -L cpanmin.us | perl - -S http://latest.mojolicio.us
+    sudo -s 'curl -L cpanmin.us | perl - Mojolicious'
 
 =head2 Duct Tape For The HTML5 Web
 

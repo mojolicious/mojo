@@ -479,6 +479,12 @@ It works because automatic rendering kicks in even if no actual code gets
 executed by the router, the renderer just picks up the C<text> value from the
 stash and generates a response.
 
+=head2 Installing The Latest Mojolicious From GitHub
+
+All you need is this oneliner.
+
+    sudo -s 'curl -L cpanmin.us | perl - http://latest.mojolicio.us'
+
 =head2 jQuery (Content Distribution Network)
 
 These days L<Mojolicious> ships with a bundled version of jQuery, which you

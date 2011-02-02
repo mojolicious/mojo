@@ -359,7 +359,7 @@ sub start {
     $ENV{MOJO_COMMANDS_DONE} ||= 1;
 
     # Executable
-    $ENV{MOJO_EXE} ||= (caller)[1];
+    $ENV{MOJO_EXE} ||= (caller)[1] if $ENV{MOJO_APP};
 
     # Arguments
     my @args = @_ ? @_ : @ARGV;

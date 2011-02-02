@@ -241,7 +241,7 @@ sub replace {
     my ($self, $new) = @_;
 
     # Parse
-    $new = ref $new ? $new->tree : $self->_parse_xml($new);
+    $new = $self->_parse_xml("$new");
 
     # Tree
     my $tree = $self->tree;
@@ -278,7 +278,7 @@ sub replace_inner {
     my ($self, $new) = @_;
 
     # Parse
-    $new = ref $new ? $new->tree : $self->_parse_xml($new);
+    $new = $self->_parse_xml("$new");
 
     # Tree
     my $tree = $self->tree;
@@ -370,7 +370,7 @@ sub _add {
     my ($self, $offset, $new) = @_;
 
     # Parse
-    $new = ref $new ? $new->tree : $self->_parse_xml($new);
+    $new = $self->_parse_xml("$new");
 
     # Tree
     my $tree = $self->tree;

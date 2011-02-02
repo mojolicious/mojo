@@ -217,14 +217,22 @@ Most web services these days are based on the JSON data-interchange format.
 That's why L<Mojolicious> comes with the possibly fastest pure-Perl
 implementation L<Mojo::JSON> built right in.
 
-    # Fetch the latest news about Mojolicious from Twitter
+    # Fresh client
     my $client = Mojo::Client->new;
+
+    # Fetch the latest news about Mojolicious from Twitter
     my $search = 'search.twitter.com/search.json?q=Mojolicious';
     for $tweet (@{$client->get($search)->res->json->{results}}) {
+
+        # Tweet text
         my $text = $tweet->{text};
         utf8::encode $text;
+
+        # Twitter user
         my $user = $tweet->{from_user};
         utf8::encode $user;
+
+        # List both
         print qq/$text --$user\n\n/;
     }
 

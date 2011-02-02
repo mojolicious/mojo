@@ -221,19 +221,19 @@ implementation L<Mojo::JSON> built right in.
     my $client = Mojo::Client->new;
 
     # Fetch the latest news about Mojolicious from Twitter
-    my $search = 'search.twitter.com/search.json?q=Mojolicious';
+    my $search = 'http://search.twitter.com/search.json?q=Mojolicious';
     for $tweet (@{$client->get($search)->res->json->{results}}) {
 
         # Tweet text
         my $text = $tweet->{text};
-        utf8::encode $text;
 
         # Twitter user
         my $user = $tweet->{from_user};
-        utf8::encode $user;
 
-        # List both
-        print qq/$text --$user\n\n/;
+        # Show both
+        my $result = "$text --$user\n\n";
+        utf8::encode $result;
+        print $result;
     }
 
 =head2 Decorating Followup Requests

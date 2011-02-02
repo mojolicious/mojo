@@ -479,11 +479,11 @@ It works because automatic rendering kicks in even if no actual code gets
 executed by the router, the renderer just picks up the C<text> value from the
 stash and generates a response.
 
-=head2 Installing The Latest Mojolicious From GitHub
+=head2 Keeping Mojolicious Up-To-Date
 
-All you need is this oneliner.
+This tasty oneliner will keep your L<Mojolicious> as fresh as possible.
 
-    sudo -s 'curl -L cpanmin.us | perl - http://latest.mojolicio.us'
+    sudo -s 'mojo get -r cpanmin.us | perl - http://latest.mojolicio.us'
 
 =head2 jQuery (Content Distribution Network)
 

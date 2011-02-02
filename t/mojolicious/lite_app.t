@@ -8,7 +8,7 @@ use utf8;
 # Disable epoll and kqueue
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 714;
+use Test::More tests => 719;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -59,6 +59,15 @@ del sub { shift->render(text => 'Hello!') };
 
 # /
 any sub { shift->render(text => 'Bye!') };
+
+# GET /auto_name
+get '/auto_name' => sub {
+    my $self = shift;
+    $self->render(text => $self->url_for('auto_name'));
+};
+
+# GET /custom_name
+get '/custom_name' => 'auto_name';
 
 # GET /waypoint
 # GET /waypoint/foo
@@ -653,6 +662,12 @@ $t->delete_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
 # POST /
 $t->post_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('Bye!');
+
+# GET /auto_name
+$t->get_ok('/auto_name')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('/custom_name');
 
 # GET /waypoint
 $t->get_ok('/waypoint')->status_is(200)

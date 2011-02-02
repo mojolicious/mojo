@@ -142,6 +142,11 @@ sub dispatch {
 
 sub get { shift->_generate_route('get', @_) }
 
+sub has_custom_name {
+    return 1 if shift->{_custom};
+    return;
+}
+
 sub has_websocket {
     my $self = shift;
     return 1 if $self->is_websocket;
@@ -178,7 +183,10 @@ sub name {
 Wildcard names are DEPRECATED, all routes have an automatically generated name now.
 EOF
         }
-        else { $self->{_name} = $_[0] }
+        else {
+            $self->{_name}   = $_[0];
+            $self->{_custom} = 1;
+        }
 
         return $self;
     }
@@ -212,7 +220,10 @@ sub parse {
     # Default name
     if (defined(my $name = $self->pattern->pattern)) {
         $name =~ s/\W+//g;
-        $self->{_name} = $name;
+        if (length $name) {
+            $self->{_name}   = "$name";
+            $self->{_custom} = 0;
+        }
     }
 
     return $self;
@@ -870,6 +881,13 @@ Match routes and dispatch.
 
 Generate route matching only C<GET> requests.
 See also the L<Mojolicious::Lite> tutorial for more argument variations.
+
+=head2 C<has_custom_name>
+
+    my $has_custom_name = $r->has_custom_name;
+
+Returns true if this route has a custom user defined name.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<has_websocket>
 

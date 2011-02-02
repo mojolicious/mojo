@@ -200,14 +200,19 @@ sub path_for {
 
         # Find
         my @children = ($self->root);
+        my $candidate;
         while (my $child = shift @children) {
 
             # Match
-            ($endpoint = $child) and last if ($child->name || '') eq $name;
+            if (($child->name || '') eq $name) {
+                $candidate = $child;
+                last if $child->has_custom_name;
+            }
 
             # Append
             push @children, @{$child->children};
         }
+        $endpoint = $candidate;
 
         # Nothing
         return $name unless $endpoint;

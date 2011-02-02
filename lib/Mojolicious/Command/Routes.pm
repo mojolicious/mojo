@@ -36,7 +36,8 @@ sub _draw {
     for my $node (@$routes) {
         my $l = length $node->[0];
         $pl = $l if $l > $pl;
-        my $l2 = length($node->[1]->name || '');
+        my $l2 = length($node->[1]->name);
+        $l2 += 2 if $node->[1]->has_custom_name;
         $nl = $l2 if $l2 > $nl;
     }
 
@@ -53,7 +54,7 @@ sub _draw {
 
         # Name
         my $name = $node->[1]->name;
-        $name = '' unless defined $name;
+        $name = qq/"$name"/ if $node->[1]->has_custom_name;
         my $np = ' ' x ($nl - length $name);
 
         # Print
@@ -67,7 +68,6 @@ sub _walk {
 
     # Line
     my $pattern = $node->pattern->pattern || '/';
-    my $name    = $node->name;
     my $line    = '';
     my $i       = $depth * 4;
     if ($i) {

@@ -204,7 +204,7 @@ sub path_for {
         while (my $child = shift @children) {
 
             # Match
-            if (($child->name || '') eq $name) {
+            if ($child->name eq $name) {
                 $candidate = $child;
                 last if $child->has_custom_name;
             }

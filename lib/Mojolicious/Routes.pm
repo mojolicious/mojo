@@ -218,13 +218,11 @@ sub parse {
     $self->pattern->parse(@_);
 
     # Default name
-    if (defined(my $name = $self->pattern->pattern)) {
-        $name =~ s/\W+//g;
-        if (length $name) {
-            $self->{_name}   = "$name";
-            $self->{_custom} = 0;
-        }
-    }
+    my $name = $self->pattern->pattern;
+    $name = '' unless defined $name;
+    $name =~ s/\W+//g;
+    $self->{_name}   = $name;
+    $self->{_custom} = 0;
 
     return $self;
 }

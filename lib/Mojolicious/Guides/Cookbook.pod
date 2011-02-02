@@ -211,6 +211,23 @@ make sense for a standalone parser.
 Especially for unit testing your L<Mojolicious> applications this can be a
 very powerful tool.
 
+=head2 JSON Web Services
+
+Most web services these days are based on the JSON data-interchange format.
+That's why L<Mojolicious> comes with the possibly fastest pure-Perl
+implementation L<Mojo::JSON> built right in.
+
+    # Fetch the latest news about Mojolicious from Twitter
+    my $client = Mojo::Client->new;
+    my $search = 'search.twitter.com/search.json?q=Mojolicious';
+    for $tweet (@{$client->get($search)->res->json->{results}}) {
+        my $text = $tweet->{text};
+        utf8::encode $text;
+        my $user = $tweet->{from_user};
+        utf8::encode $user;
+        print qq/$text --$user\n\n/;
+    }
+
 =head2 Decorating Followup Requests
 
 L<Mojo::Client> can automatically follow redirects, the C<on_start> callback

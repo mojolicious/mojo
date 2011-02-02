@@ -739,11 +739,11 @@ snowman very sad.
 =head2 Introspection
 
 The C<routes> command can be used from the command line to list all available
-routes together with underlying regular expressions.
+routes together with name and underlying regular expressions.
 
     % script/myapp routes
-    /foo/:name           (?-xism:^/foo/([^\/\.]+))
-    /bar/(.test)         (?-xism:^/bar/([^\/]+))
-    /baz/(*everything)   (?-xism:^/baz/(.+))
+    /foo/:name           fooname          (?-xism:^/foo/([^\/\.]+))
+    /bar/(.test)         bartest          (?-xism:^/bar/([^\/]+))
+    /baz/(*everything)   bazeverything    (?-xism:^/baz/(.+))
 
 =cut

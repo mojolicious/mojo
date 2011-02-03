@@ -767,21 +767,25 @@ sub url_for {
     my $base = $url->base;
     $base->userinfo(undef);
 
-    # Search target
-    my ($path, $websocket) = $match->path_for($target, @_);
-    if ($path) {
+    # Path
+    if ($target =~ /^\//) { $url->parse($target) }
+
+    # Route
+    else {
+        my ($path, $websocket) = $match->path_for($target, @_);
 
         # Path
-        $url->parse($path);
-        my $bpath = $base->path;
-        unshift @{$url->path->parts}, @{$bpath->parts};
-        $bpath->parts([]);
+        $url->parse($path) if $path;
 
         # Fix scheme for WebSockets
-        my $base = $url->base;
         $base->scheme(($base->scheme || '') eq 'https' ? 'wss' : 'ws')
           if $websocket;
     }
+
+    # Make path absolute
+    my $bpath = $base->path;
+    unshift @{$url->path->parts}, @{$bpath->parts};
+    $bpath->parts([]);
 
     return $url;
 }

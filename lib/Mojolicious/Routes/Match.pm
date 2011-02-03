@@ -189,11 +189,8 @@ sub path_for {
     # Endpoint
     my $endpoint;
 
-    # Path
-    if ($name && $name =~ /^\//) { return $name }
-
     # Current route
-    elsif ($name && $name eq 'current' || !$name) {
+    if ($name && $name eq 'current' || !$name) {
         return undef unless $endpoint = $self->endpoint;
     }
 

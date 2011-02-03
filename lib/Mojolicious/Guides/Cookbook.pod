@@ -481,12 +481,12 @@ stash and generates a response.
 
 =head2 Hello World Oneliner
 
-The C<Hello World> above can get even a little bit shorter in an L<ojo>
-oneliner.
+The C<Hello World> example above can get even a little bit shorter in an
+L<ojo> oneliner.
 
     perl -Mojo -e'a({text => "Hello World!"})->start' daemon
 
-You can even use different commands.
+And you can use all the commands from L<Mojolicious::Commands>.
 
     perl -Mojo -e'a({text => "Hello World!"})->start' get -v /
 

@@ -47,10 +47,7 @@ Welcome to Mojolicious!
 
 <%%= '@@ layouts/default.html.ep' %%>
 <!doctype html><html>
-    <head>
-        <title><%= title %></title>
-        <%= base_tag %>
-    </head>
+    <head><title><%= title %></title></head>
     <body><%= content %></body>
 </html>
 __END__

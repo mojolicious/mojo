@@ -887,7 +887,7 @@ $t->get_ok('/tags/lala?a=b&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
 <input name="escaped" value="1&quot; &quot;2" />
 <input name="a" value="b" />
 <input name="a" value="b" />
-<script src="script.js" type="text/javascript"></script>
+<script src="/script.js" type="text/javascript"></script>
 <script type="text/javascript">//<![CDATA[
 
     var a = 'b';
@@ -898,7 +898,7 @@ $t->get_ok('/tags/lala?a=b&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
     var a = 'b';
 
 //]]></script>
-<link href="foo.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="/foo.css" media="screen" rel="stylesheet" type="text/css" />
 <style type="text/css">/*<![CDATA[*/
 
     body {color: #000}
@@ -945,7 +945,7 @@ $t->get_ok('/tags/lala?c=b&d=3&e=4&f=5')->status_is(200)->content_is(<<EOF);
 <input name="escaped" />
 <input name="a" />
 <input name="a" value="c" />
-<script src="script.js" type="text/javascript"></script>
+<script src="/script.js" type="text/javascript"></script>
 <script type="text/javascript">//<![CDATA[
 
     var a = 'b';
@@ -956,7 +956,7 @@ $t->get_ok('/tags/lala?c=b&d=3&e=4&f=5')->status_is(200)->content_is(<<EOF);
     var a = 'b';
 
 //]]></script>
-<link href="foo.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="/foo.css" media="screen" rel="stylesheet" type="text/css" />
 <style type="text/css">/*<![CDATA[*/
 
     body {color: #000}
@@ -1711,14 +1711,14 @@ controller and action!
 <%= input_tag 'escaped' %>
 <%= input_tag 'a' %>
 <%= input_tag 'a', value => 'c' %>
-<%= javascript 'script.js' %>
+<%= javascript '/script.js' %>
 <%= javascript begin %>
     var a = 'b';
 <% end %>
 <%= javascript type => 'foo' => begin %>
     var a = 'b';
 <% end %>
-<%= stylesheet 'foo.css' %>
+<%= stylesheet '/foo.css' %>
 <%= stylesheet begin %>
     body {color: #000}
 <% end %>

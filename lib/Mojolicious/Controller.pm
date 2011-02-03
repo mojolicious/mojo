@@ -773,7 +773,9 @@ sub url_for {
 
         # Path
         $url->parse($path);
-        $url->path->leading_slash(0) if @{$base->path->parts};
+        my $bpath = $base->path;
+        unshift @{$url->path->parts}, @{$bpath->parts};
+        $bpath->parts([]);
 
         # Fix scheme for WebSockets
         my $base = $url->base;
@@ -853,10 +855,9 @@ __DATA__
         <title>Exception</title>
         <meta http-equiv="Pragma" content="no-cache">
         <meta http-equiv="Expires" content="-1">
-        %= base_tag
-        %= javascript 'js/jquery.js'
-        %= stylesheet 'css/prettify-mojo.css'
-        %= javascript 'js/prettify.js'
+        %= javascript '/js/jquery.js'
+        %= stylesheet '/css/prettify-mojo.css'
+        %= javascript '/js/prettify.js'
         %= stylesheet begin
             a img { border: 0; }
             body {
@@ -1067,7 +1068,7 @@ __DATA__
         </div>
         <div id="footer">
             %= link_to 'http://mojolicio.us' => begin
-                <img src="mojolicious-black.png" alt="Mojolicious logo">
+                %= image '/mojolicious-black.png', alt => 'Mojolicious logo'
             % end
         </div>
         %= javascript begin
@@ -1091,9 +1092,8 @@ __DATA__
 <!doctype html><html>
     <head>
         <title>Not Found</title>
-        %= base_tag
-        %= stylesheet 'css/prettify-mojo.css'
-        %= javascript 'js/prettify.js'
+        %= stylesheet '/css/prettify-mojo.css'
+        %= javascript '/js/prettify.js'
         %= stylesheet begin
             a {
                 color: inherit;
@@ -1166,11 +1166,11 @@ __DATA__
     </head>
     <body onload="prettyPrint()">
         <div id="header">
-            <img src="mojolicious-box.png" alt="Mojolicious banner">
+            %= image '/mojolicious-box.png', alt => 'Mojolicious banner'
             <h1>This page is brand new and has not been unboxed yet!</h1>
         </div>
         <div id="suggestion">
-            <img src="mojolicious-arrow.png" alt="Arrow">
+            %= image '/mojolicious-arrow.png', alt => 'Arrow'
             <h1>Perhaps you would like to add a route for it?</h1>
             <div id="preview">
                 <pre class="prettyprint">
@@ -1187,13 +1187,13 @@ get '<%= $self->req->url->path->to_abs_string %>' => sub {
                     <%= link_to 'perldoc Mojolicious::Guides', $guide %>
                 </div>
             </h1>
-            <img src="amelia.png" alt="Amelia">
+            %= image 'amelia.png', alt => 'Amelia'
         </div>
         <div id="footer">
             <h1>And don't forget to have fun!</h1>
-            <p><img src="mojolicious-clouds.png" alt="Clouds"></p>
+            <p><%= image '/mojolicious-clouds.png', alt => 'Clouds' %></p>
             %= link_to 'http://mojolicio.us' => begin
-                <img src="mojolicious-black.png" alt="Mojolicious logo">
+                %= image '/mojolicious-black.png', alt => 'Mojolicious logo'
             % end
         </div>
     </body>

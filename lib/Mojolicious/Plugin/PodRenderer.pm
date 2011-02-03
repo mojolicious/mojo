@@ -163,7 +163,7 @@ __DATA__
 
 @@ mojobar.html.ep
 % content_for header => begin
-    %= javascript 'js/jquery.js'
+    %= javascript '/js/jquery.js'
     %= stylesheet begin
         #mojobar {
             background-color: #1a1a1a;
@@ -220,7 +220,7 @@ __DATA__
 <div id="mojobar">
     <div id="mojobar-logo">
         %= link_to 'http://mojolicio.us' => begin
-            <img src="mojolicious-white.png" alt="Mojolicious logo">
+            %= image '/mojolicious-white.png', alt => 'Mojolicious logo'
         % end
     </div>
     <div id="mojobar-links">
@@ -271,9 +271,8 @@ __DATA__
 <!doctype html><html>
     <head>
         <title><%= $title %></title>
-        %= base_tag
-        %= stylesheet 'css/prettify-mojo.css'
-        %= javascript 'js/prettify.js'
+        %= stylesheet '/css/prettify-mojo.css'
+        %= javascript '/js/prettify.js'
         %= content_for 'header'
         %= stylesheet begin
             a { color: inherit; }
@@ -351,7 +350,7 @@ __DATA__
         </div>
         <div id="footer">
             %= link_to 'http://mojolicio.us' => begin
-                <img src="mojolicious-black.png" alt="Mojolicious logo">
+                %= image '/mojolicious-black.png', alt => 'Mojolicious logo'
             % end
         </div>
     </body>

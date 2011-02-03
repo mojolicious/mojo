@@ -11,6 +11,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL user_agent attribute to Mojo::Client.
         - Added EXPERIMENTAL support for mode specific not_found and
           exception templates.
+        - Added image helper to Mojolicious::Plugin::TagHelpers.
         - Updated to jQuery to version 1.5.
         - Removed experimental status from Mojo::DOM and ojo.
         - Removed experimental status from many attributes and methods all

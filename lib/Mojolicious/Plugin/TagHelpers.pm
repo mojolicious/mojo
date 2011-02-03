@@ -60,6 +60,11 @@ sub register {
         }
     );
 
+    # Add "image" helper
+    $app->helper(
+        image => sub { $self->_tag('img', src => shift->url_for(shift), @_) }
+    );
+
     # Add "input_tag" helper
     $app->helper(input_tag => sub { $self->_input(@_) });
 
@@ -81,7 +86,7 @@ sub register {
 
             # Attributes
             my %attrs = @_;
-            $attrs{src} = $src if $src;
+            $attrs{src} = $c->url_for($src) if $src;
 
             $self->_tag('script', type => 'text/javascript', %attrs, $cb);
         }
@@ -203,7 +208,7 @@ sub register {
             # Link
             return $self->_tag(
                 'link',
-                href  => $href,
+                href  => $c->url_for($href),
                 media => 'screen',
                 rel   => 'stylesheet',
                 type  => 'text/css',
@@ -417,6 +422,16 @@ Generate hidden input element.
     <input name="foo" type="hidden" value="bar" />
     <input id="bar" name="foo" type="hidden" value="bar" />
 
+=head2 C<image>
+
+    <%= image '/images/foo.png' %>
+    <%= image '/images/foo.png', alt => 'Foo' %>
+
+Generate image tag.
+
+    <img src="/images/foo.png" />
+    <img alt="Foo" src="/images/foo.png" />
+
 =head2 C<input_tag>
 
     <%= input_tag 'first_name' %>
@@ -433,14 +448,14 @@ Generate form input element.
 
 =head2 C<javascript>
 
-    <%= javascript 'script.js' %>
+    <%= javascript '/script.js' %>
     <%= javascript begin %>
         var a = 'b';
     <% end %>
 
 Generate script tag for C<Javascript> asset.
 
-    <script src="script.js" type="text/javascript" />
+    <script src="/script.js" type="text/javascript" />
     <script type="text/javascript"><![CDATA[
         var a = 'b';
     ]]></script>
@@ -516,14 +531,14 @@ Generate select, option and optgroup elements.
 
 =head2 C<stylesheet>
 
-    <%= stylesheet 'foo.css' %>
+    <%= stylesheet '/foo.css' %>
     <%= stylesheet begin %>
         body {color: #000}
     <% end %>
 
 Generate style or link tag for C<CSS> asset.
 
-    <link href="foo.css" media="screen" rel="stylesheet" type="text/css" />
+    <link href="/foo.css" media="screen" rel="stylesheet" type="text/css" />
     <style type="text/css"><![CDATA[
         body {color: #000}
     ]]></style>

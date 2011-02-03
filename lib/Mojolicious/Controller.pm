@@ -761,8 +761,11 @@ sub url_for {
 
     # URL
     my $url = Mojo::URL->new;
+
+    # Base
     $url->base($req->url->base->clone);
-    $url->base->userinfo(undef);
+    my $base = $url->base;
+    $base->userinfo(undef);
 
     # Search target
     my ($path, $websocket) = $match->path_for($target, @_);
@@ -770,6 +773,7 @@ sub url_for {
 
         # Path
         $url->parse($path);
+        $url->path->leading_slash(0) if @{$base->path->parts};
 
         # Fix scheme for WebSockets
         my $base = $url->base;

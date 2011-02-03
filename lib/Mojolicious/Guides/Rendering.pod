@@ -386,21 +386,21 @@ A naive translation to equivalent Perl code could look like this.
 Blocks and the C<content_for> helper can also be used to pass whole sections
 of the template to the layout.
 
-   @@ foo/bar.html.ep
-   % layout 'mylayout';
-   <% content_for header => begin %>
-       <title>MyApp!</title>
-   <% end %>
-   Hello World!
-   <% content_for header => begin %>
-       <meta http-equiv="Pragma" content="no-cache">
-   <% end %>
+    @@ foo/bar.html.ep
+    % layout 'mylayout';
+    <% content_for header => begin %>
+        <title>MyApp!</title>
+    <% end %>
+    Hello World!
+    <% content_for header => begin %>
+        <meta http-equiv="Pragma" content="no-cache">
+    <% end %>
 
-   @@ layouts/mylayout.html.ep
-   <!doctype html><html>
-       <head><%= content_for 'header' %></head>
-       <body><%= content %></body>
-   </html>
+    @@ layouts/mylayout.html.ep
+    <!doctype html><html>
+        <head><%= content_for 'header' %></head>
+        <body><%= content %></body>
+    </html>
 
 =head2 Template Inheritance
 

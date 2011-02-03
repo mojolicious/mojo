@@ -1507,8 +1507,10 @@ Non persistent data storage and exchange.
     my $url = $c->url_for;
     my $url = $c->url_for(controller => 'bar', action => 'baz');
     my $url = $c->url_for('named', controller => 'bar', action => 'baz');
+    my $url = $c->url_for('/perldoc');
+    my $url = $c->url_for('http://mojolicio.us/perldoc');
 
-Generate a L<Mojo::URL> for the current or a named route.
+Generate a portable L<Mojo::URL> object with base for a route, path or URL.
 
 =head2 C<write>
 

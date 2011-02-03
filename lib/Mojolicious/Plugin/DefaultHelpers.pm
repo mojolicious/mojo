@@ -248,10 +248,12 @@ Page title.
 =head2 C<url_for>
 
     <%= url_for %>
-    <%= url_for 'index' %>
-    <%= url_for 'index', foo => 'bar' %>
+    <%= url_for controller => 'bar', action => 'baz' %>
+    <%= url_for 'named', controller => 'bar', action => 'baz' %>
+    <%= url_for '/perldoc' %>
+    <%= url_for 'http://mojolicio.us/perldoc' %>
 
-Generate URLs.
+Generate a portable L<Mojo::URL> object with base for a route, path or URL.
 
 =head1 METHODS
 

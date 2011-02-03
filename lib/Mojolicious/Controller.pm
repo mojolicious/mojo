@@ -899,7 +899,7 @@ __DATA__
             }
             .code {
                 background-color: #1a1a1a;
-                background: url("mojolicious-pinstripe.gif");
+                background: url(<%= url_for '/mojolicious-pinstripe.gif' %>);
                 color: #eee;
                 font-family: 'Menlo', 'Monaco', Courier, monospace !important;
                 text-shadow: #333 0 1px 0;
@@ -917,7 +917,7 @@ __DATA__
             }
             .preview {
                 background-color: #1a1a1a;
-                background: url("mojolicious-pinstripe.gif");
+                background: url(<%= url_for '/mojolicious-pinstripe.gif' %>);
                 -moz-border-radius: 5px;
                 border-radius: 5px;
                 margin-bottom: 1em;
@@ -1146,7 +1146,7 @@ __DATA__
             }
             #preview {
                 background-color: #1a1a1a;
-                background: url("mojolicious-pinstripe.gif");
+                background: url(<%= url_for '/mojolicious-pinstripe.gif' %>);
                 -moz-border-radius: 5px;
                 border-radius: 5px;
                 font-family: 'Menlo', 'Monaco', Courier, monospace !important;

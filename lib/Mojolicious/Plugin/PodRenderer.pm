@@ -291,7 +291,7 @@ __DATA__
             h1 a, h2 a, h3 a { text-decoration: none; }
             pre {
                 background-color: #1a1a1a;
-                background: url("mojolicious-pinstripe.gif");
+                background: url(<%= url_for '/mojolicious-pinstripe.gif' %>);
                 -moz-border-radius: 5px;
                 border-radius: 5px;
                 color: #eee;

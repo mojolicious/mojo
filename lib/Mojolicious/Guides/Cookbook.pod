@@ -472,12 +472,13 @@ If every byte matters this is the smallest C<Hello World> application you can
 write with L<Mojolicious::Lite>.
 
     use Mojolicious::Lite;
-    get '/' => {text => 'Hello World!'};
+    any {text => 'Hello World!'};
     app->start;
 
-It works because automatic rendering kicks in even if no actual code gets
-executed by the router, the renderer just picks up the C<text> value from the
-stash and generates a response.
+It works because all routes without a pattern default to C</> and automatic
+rendering kicks in even if no actual code gets executed by the router.
+The renderer just picks up the C<text> value from the stash and generates a
+response.
 
 =head2 Hello World Oneliner
 

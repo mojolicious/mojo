@@ -160,10 +160,10 @@ sub parse {
     if ($self->auto_relax) {
         my $headers    = $self->headers;
         my $connection = $headers->connection || '';
-        my $length     = $headers->content_length;
-        $length = '' unless defined $length;
+        my $len        = $headers->content_length;
+        $len = '' unless defined $len;
         $self->relaxed(1)
-          if !length $length
+          if !length $len
               && ($connection =~ /close/i || $headers->content_type);
     }
 
@@ -195,9 +195,9 @@ sub parse {
         else {
 
             # Need
-            my $length = $self->headers->content_length || 0;
+            my $len = $self->headers->content_length || 0;
             $self->{_size} ||= 0;
-            my $need = $length - $self->{_size};
+            my $need = $len - $self->{_size};
 
             # Slurp
             if ($need > 0) {
@@ -207,7 +207,7 @@ sub parse {
             }
 
             # Done
-            $self->{_state} = 'done' if $length <= $self->progress;
+            $self->{_state} = 'done' if $len <= $self->progress;
         }
     }
 
@@ -342,23 +342,23 @@ sub _parse_chunked {
     # New chunk (ignore the chunk extension)
     while ($self->{_b1} =~ /^((?:\x0d?\x0a)?([\da-fA-F]+).*\x0d?\x0a)/) {
         my $header = $1;
-        my $length = hex($2);
+        my $len    = hex($2);
 
         # Whole chunk
-        if (length($self->{_b1}) >= (length($header) + $length)) {
+        if (length($self->{_b1}) >= (length($header) + $len)) {
 
             # Remove header
             substr $self->{_b1}, 0, length $header, '';
 
             # Last chunk
-            if ($length == 0) {
+            if ($len == 0) {
                 $self->{_chunked} = 'trailing_headers';
                 last;
             }
 
             # Remove payload
-            $self->{_real_size} += $length;
-            $self->{_b2} .= substr $self->{_b1}, 0, $length, '';
+            $self->{_real_size} += $len;
+            $self->{_b2} .= substr $self->{_b1}, 0, $len, '';
 
             # Remove newline at end of chunk
             $self->{_b1} =~ s/^(\x0d?\x0a)//;

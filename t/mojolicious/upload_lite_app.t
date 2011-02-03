@@ -37,15 +37,15 @@ app->hook(
 
                 # Expected content length
                 return
-                  unless my $length = $req->headers->content_length;
+                  unless my $len = $req->headers->content_length;
 
                 # Current progress
                 my $progress = $req->content->progress;
 
                 # Update cache
-                push @$c, $progress == $length
+                push @$c, $progress == $len
                   ? 100
-                  : int($progress / ($length / 100));
+                  : int($progress / ($len / 100));
             }
         );
     }

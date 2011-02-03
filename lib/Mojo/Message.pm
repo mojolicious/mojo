@@ -25,12 +25,15 @@ has [qw/on_finish on_progress/];
 #  business."
 sub at_least_version {
     my ($self, $version) = @_;
-    my ($sma,  $smi)     = split /\./, $version;
-    my ($cma,  $cmi)     = split /\./, $self->version;
+
+    # Major and minor
+    my ($search_major,  $search_minor)  = split /\./, $version;
+    my ($current_major, $current_minor) = split /\./, $self->version;
 
     # Version is equal or newer
-    return 1 if $sma < $cma;
-    return 1 if $sma == $cma && $smi <= $cmi;
+    return 1 if $search_major < $current_major;
+    return 1
+      if $search_major == $current_major && $search_minor <= $current_minor;
 
     # Version is older
     return;
@@ -178,17 +181,17 @@ sub cookie {
     unless ($self->{_cookies}) {
         my $cookies = {};
         for my $cookie (@{$self->cookies}) {
-            my $cname = $cookie->name;
+            my $cookie_name = $cookie->name;
 
             # Multiple cookies with same name
-            if (exists $cookies->{$cname}) {
-                $cookies->{$cname} = [$cookies->{$cname}]
-                  unless ref $cookies->{$cname} eq 'ARRAY';
-                push @{$cookies->{$cname}}, $cookie;
+            if (exists $cookies->{$cookie_name}) {
+                $cookies->{$cookie_name} = [$cookies->{$cookie_name}]
+                  unless ref $cookies->{$cookie_name} eq 'ARRAY';
+                push @{$cookies->{$cookie_name}}, $cookie;
             }
 
             # Cookie
-            else { $cookies->{$cname} = $cookie }
+            else { $cookies->{$cookie_name} = $cookie }
         }
 
         # Cache

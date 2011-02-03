@@ -107,28 +107,30 @@ sub server_handshake {
     my $res = $self->res;
 
     # Request headers
-    my $rqh = $req->headers;
+    my $req_headers = $req->headers;
 
     # Response headers
-    my $rsh = $res->headers;
+    my $res_headers = $res->headers;
 
     # URL
     my $url = $req->url;
 
     # Handshake
     $res->code(101);
-    $rsh->upgrade('WebSocket');
-    $rsh->connection('Upgrade');
+    $res_headers->upgrade('WebSocket');
+    $res_headers->connection('Upgrade');
     my $scheme = $url->to_abs->scheme eq 'https' ? 'wss' : 'ws';
     my $location = $url->to_abs->scheme($scheme)->to_string;
-    $rsh->sec_websocket_location($location);
-    my $origin = $rqh->origin;
-    $rsh->sec_websocket_origin($origin) if $origin;
-    my $protocol = $rqh->sec_websocket_protocol;
-    $rsh->sec_websocket_protocol($protocol) if $protocol;
+    $res_headers->sec_websocket_location($location);
+    my $origin = $req_headers->origin;
+    $res_headers->sec_websocket_origin($origin) if $origin;
+    my $protocol = $req_headers->sec_websocket_protocol;
+    $res_headers->sec_websocket_protocol($protocol) if $protocol;
     $res->body(
         $self->_challenge(
-            $rqh->sec_websocket_key1, $rqh->sec_websocket_key2, $req->body
+            $req_headers->sec_websocket_key1,
+            $req_headers->sec_websocket_key2,
+            $req->body
         )
     );
 

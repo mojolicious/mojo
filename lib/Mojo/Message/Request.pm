@@ -303,34 +303,34 @@ sub _parse_env {
     if ($env->{HTTPS}) { $base->scheme('https') }
 
     # Base path
-    my $bpath = $base->path;
+    my $base_path = $base->path;
     if (my $value = $env->{SCRIPT_NAME}) {
 
         # Make sure there is a trailing slash (important for merging)
         $value .= '/' unless $value =~ /\/$/;
 
-        $bpath->parse($value);
+        $base_path->parse($value);
     }
 
     # Path
-    my $upath = $url->path;
-    if   (my $value = $env->{PATH_INFO}) { $upath->parse($value) }
-    else                                 { $upath->parse('') }
+    my $path = $url->path;
+    if   (my $value = $env->{PATH_INFO}) { $path->parse($value) }
+    else                                 { $path->parse('') }
 
     # Path buffer
-    my $bb = $bpath->to_string;
-    my $ub = $upath->to_string;
+    my $base_buffer = $base_path->to_string;
+    my $buffer      = $path->to_string;
 
     # Fix paths for broken CGI environments
-    if (defined $ub && defined $bb && length $bb) {
+    if (defined $buffer && defined $base_buffer && length $base_buffer) {
 
         # Remove SCRIPT_NAME prefix if it's there
-        $bb =~ s/^\///;
-        $bb =~ s/\/$//;
-        $ub =~ s/^\/?$bb\/?//;
-        $ub =~ s/^\///;
+        $base_buffer =~ s/^\///;
+        $base_buffer =~ s/\/$//;
+        $buffer      =~ s/^\/?$base_buffer\/?//;
+        $buffer      =~ s/^\///;
 
-        $upath->parse($ub);
+        $path->parse($buffer);
     }
 
     # There won't be a start line or header when you parse environment

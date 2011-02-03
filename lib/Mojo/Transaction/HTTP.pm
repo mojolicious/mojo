@@ -171,15 +171,17 @@ sub keep_alive {
     $self->{keep_alive} ||= 0 if $version eq '0.9' || $version eq '1.0';
 
     # Connection headers
-    my $reqc = $req->headers->connection || '';
-    my $resc = $res->headers->connection || '';
+    my $req_connection = $req->headers->connection || '';
+    my $res_connection = $res->headers->connection || '';
 
     # Keep alive
     $self->{keep_alive} = 1
-      if $reqc =~ /^keep-alive$/i || $resc =~ /^keep-alive$/i;
+      if $req_connection =~ /^keep-alive$/i
+          || $res_connection =~ /^keep-alive$/i;
 
     # Close
-    $self->{keep_alive} = 0 if $reqc =~ /^close$/i || $resc =~ /^close$/i;
+    $self->{keep_alive} = 0
+      if $req_connection =~ /^close$/i || $res_connection =~ /^close$/i;
 
     # Default
     $self->{keep_alive} = 1 unless defined $self->{keep_alive};

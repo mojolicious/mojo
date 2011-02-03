@@ -128,8 +128,8 @@ sub read_request {
     $ENV{FCGI_ROLE} = $tx->{fcgi_role} = $self->role_name($role);
 
     # Slurp
-    my $parambuffer = '';
-    my $env         = {};
+    my $buffer = '';
+    my $env    = {};
     while (($type, $id, $body) = $self->read_record($c)) {
 
         # Wrong id
@@ -140,20 +140,20 @@ sub read_request {
 
             # Normal param chunk
             if ($body) {
-                $parambuffer .= $body;
+                $buffer .= $body;
                 next;
             }
 
             # Params done
-            while (length $parambuffer) {
+            while (length $buffer) {
 
                 # Name and value length
-                my $nlen = $self->_nv_length(\$parambuffer);
-                my $vlen = $self->_nv_length(\$parambuffer);
+                my $name_len  = $self->_nv_length(\$buffer);
+                my $value_len = $self->_nv_length(\$buffer);
 
                 # Name and value
-                my $name  = substr $parambuffer, 0, $nlen, '';
-                my $value = substr $parambuffer, 0, $vlen, '';
+                my $name  = substr $buffer, 0, $name_len,  '';
+                my $value = substr $buffer, 0, $value_len, '';
 
                 # Environment
                 $env->{$name} = $value;
@@ -254,30 +254,31 @@ sub write_records {
 
     # Defaults
     $body ||= '';
-    my $length = length $body;
+    my $body_len = length $body;
 
     # Write records
     my $empty = $body ? 0 : 1;
     my $offset = 0;
-    while (($length > 0) || $empty) {
+    while (($body_len > 0) || $empty) {
 
         # Need to split content
-        my $len = $length > 32 * 1024 ? 32 * 1024 : $length;
-        my $padlen = (8 - ($len % 8)) % 8;
+        my $payload_len = $body_len > 32 * 1024 ? 32 * 1024 : $body_len;
+        my $pad_len = (8 - ($payload_len % 8)) % 8;
 
         # FCGI version 1 record
-        my $template = "CCnnCxa${len}x$padlen";
+        my $template = "CCnnCxa${payload_len}x$pad_len";
 
         # Debug
         if (DEBUG) {
-            my $chunk = substr($body, $offset, $len);
+            my $chunk = substr($body, $offset, $payload_len);
             $self->app->log->debug(
                 qq/Writing FastCGI record: $type - $id - "$chunk"./);
         }
 
-        my $record = pack $template, 1, $self->type_number($type), $id, $len,
-          $padlen,
-          substr($body, $offset, $len);
+        my $record = pack $template, 1, $self->type_number($type), $id,
+          $payload_len,
+          $pad_len,
+          substr($body, $offset, $payload_len);
 
         my $woffset = 0;
         while ($woffset < length $record) {
@@ -296,8 +297,8 @@ sub write_records {
             $woffset += $written;
         }
 
-        $length -= $len;
-        $offset += $len;
+        $body_len -= $payload_len;
+        $offset += $payload_len;
 
         last if $empty;
     }
@@ -384,12 +385,12 @@ sub _nv_length {
 }
 
 sub _read_chunk {
-    my ($self, $c, $length) = @_;
+    my ($self, $c, $len) = @_;
 
     # Read
     my $chunk = '';
-    while (length $chunk < $length) {
-        my $read = $c->sysread(my $buffer, $length - length $chunk, 0);
+    while (length $chunk < $len) {
+        my $read = $c->sysread(my $buffer, $len - length $chunk, 0);
         unless (defined $read) {
             next if $! == EAGAIN || $! == EWOULDBLOCK;
             last;

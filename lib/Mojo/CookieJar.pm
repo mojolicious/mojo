@@ -40,10 +40,7 @@ sub add {
         for my $old (@{$self->{_jar}->{$domain}}) {
 
             # Unique cookie id
-            my $opath = $old->path;
-            my $oname = $old->name;
-
-            push @new, $old unless $opath eq $path && $oname eq $name;
+            push @new, $old unless $old->path eq $path && $old->name eq $name;
         }
 
         # Add

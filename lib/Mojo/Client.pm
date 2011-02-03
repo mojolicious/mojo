@@ -695,15 +695,15 @@ sub _connect_proxy {
             if ($tx->req->url->scheme eq 'https') {
 
                 # Connection from keep alive cache
-                return unless my $oid = $tx->connection;
+                return unless my $old_id = $tx->connection;
 
                 # Start TLS
-                my $nid = $self->ioloop->start_tls($oid);
+                my $new_id = $self->ioloop->start_tls($old_id);
 
                 # Cleanup
                 $old->req->proxy(undef);
-                delete $self->{_cs}->{$oid};
-                $tx->connection($nid);
+                delete $self->{_cs}->{$old_id};
+                $tx->connection($new_id);
             }
 
             # Share connection
@@ -913,10 +913,10 @@ sub _redirect {
     $new->previous($old);
 
     # Start redirected request
-    return 1 unless my $nid = $self->_tx_start($new, $c->{cb});
+    return 1 unless my $new_id = $self->_tx_start($new, $c->{cb});
 
     # Create new connection
-    $self->{_cs}->{$nid}->{redirects} = $r + 1;
+    $self->{_cs}->{$new_id}->{redirects} = $r + 1;
 
     # Redirecting
     return 1;

@@ -1197,17 +1197,17 @@ sub _parse_name {
     for (1 .. 128) {
 
         # Element length
-        my $length = ord substr $packet, $offset++, 1;
+        my $len = ord substr $packet, $offset++, 1;
 
         # Offset
-        if ($length >= 0xc0) {
+        if ($len >= 0xc0) {
             $offset = (unpack 'n', substr $packet, ++$offset - 2, 2) & 0x3fff;
         }
 
         # Element
-        elsif ($length) {
-            push @elements, substr $packet, $offset, $length;
-            $offset += $length;
+        elsif ($len) {
+            push @elements, substr $packet, $offset, $len;
+            $offset += $len;
         }
 
         # Zero length element (the end)

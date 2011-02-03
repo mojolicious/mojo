@@ -32,21 +32,21 @@ sub body_size {
 
     # Calculate length of whole body
     my $boundary_length = length($boundary) + 6;
-    my $length          = 0;
-    $length += $boundary_length - 2;
+    my $len             = 0;
+    $len += $boundary_length - 2;
     for my $part (@{$self->parts}) {
 
         # Header
-        $length += $part->header_size;
+        $len += $part->header_size;
 
         # Body
-        $length += $part->body_size;
+        $len += $part->body_size;
 
         # Boundary
-        $length += $boundary_length;
+        $len += $boundary_length;
     }
 
-    return $length;
+    return $len;
 }
 
 sub build_boundary {
@@ -91,10 +91,10 @@ sub get_body_chunk {
     # Multipart
     my $boundary        = $self->build_boundary;
     my $boundary_length = length($boundary) + 6;
-    my $length          = $boundary_length - 2;
+    my $len             = $boundary_length - 2;
 
     # First boundary
-    return substr "--$boundary\x0d\x0a", $offset if $length > $offset;
+    return substr "--$boundary\x0d\x0a", $offset if $len > $offset;
 
     # Parts
     my $parts = $self->parts;
@@ -103,27 +103,27 @@ sub get_body_chunk {
 
         # Headers
         my $header_length = $part->header_size;
-        return $part->get_header_chunk($offset - $length)
-          if ($length + $header_length) > $offset;
-        $length += $header_length;
+        return $part->get_header_chunk($offset - $len)
+          if ($len + $header_length) > $offset;
+        $len += $header_length;
 
         # Content
         my $content_length = $part->body_size;
-        return $part->get_body_chunk($offset - $length)
-          if ($length + $content_length) > $offset;
-        $length += $content_length;
+        return $part->get_body_chunk($offset - $len)
+          if ($len + $content_length) > $offset;
+        $len += $content_length;
 
         # Boundary
-        if (($length + $boundary_length) > $offset) {
+        if (($len + $boundary_length) > $offset) {
 
             # Last boundary
-            return substr "\x0d\x0a--$boundary--", $offset - $length
+            return substr "\x0d\x0a--$boundary--", $offset - $len
               if $#{$parts} == $i;
 
             # Middle boundary
-            return substr "\x0d\x0a--$boundary\x0d\x0a", $offset - $length;
+            return substr "\x0d\x0a--$boundary\x0d\x0a", $offset - $len;
         }
-        $length += $boundary_length;
+        $len += $boundary_length;
     }
 }
 
@@ -185,11 +185,11 @@ sub _parse_multipart_body {
     # Whole part in buffer
     my $pos = index $self->{_b2}, "\x0d\x0a--$boundary";
     if ($pos < 0) {
-        my $length = length($self->{_b2}) - (length($boundary) + 8);
-        return unless $length > 0;
+        my $len = length($self->{_b2}) - (length($boundary) + 8);
+        return unless $len > 0;
 
         # Store chunk
-        my $chunk = substr $self->{_b2}, 0, $length, '';
+        my $chunk = substr $self->{_b2}, 0, $len, '';
         $self->parts->[-1] = $self->parts->[-1]->parse($chunk);
         return;
     }

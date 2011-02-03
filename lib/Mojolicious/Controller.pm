@@ -352,27 +352,27 @@ sub render_exception {
     return if $self->stash->{'mojo.exception'};
 
     # Request
-    my $s     = {};
-    my $stash = $self->stash;
+    my $filtered_stash = {};
+    my $stash          = $self->stash;
     for my $key (keys %$stash) {
         next if $key =~ /^mojo\./;
         next unless defined(my $value = $stash->{$key});
-        $s->{$key} = $value;
+        $filtered_stash->{$key} = $value;
     }
-    my $req = $self->req;
-    my $url = $req->url;
-    my @r   = (
+    my $req     = $self->req;
+    my $url     = $req->url;
+    my @request = (
         Method     => $req->method,
         Path       => $url->to_string,
         Base       => $url->base->to_string,
         Parameters => $self->dumper($req->params->to_hash),
-        Stash      => $self->dumper($s),
+        Stash      => $self->dumper($filtered_stash),
         Session    => $self->dumper($self->session),
         Version    => $req->version
     );
 
     # Info
-    my @i = (
+    my @info = (
         Perl        => "$] ($^O)",
         Mojolicious => "$Mojolicious::VERSION ($Mojolicious::CODENAME)",
         Home        => $self->app->home,
@@ -394,8 +394,8 @@ sub render_exception {
         status           => 500,
         layout           => undef,
         extends          => undef,
-        request          => \@r,
-        info             => \@i,
+        request          => \@request,
+        info             => \@info,
         exception        => $e,
         'mojo.exception' => 1
     };
@@ -783,9 +783,9 @@ sub url_for {
     }
 
     # Make path absolute
-    my $bpath = $base->path;
-    unshift @{$url->path->parts}, @{$bpath->parts};
-    $bpath->parts([]);
+    my $base_path = $base->path;
+    unshift @{$url->path->parts}, @{$base_path->parts};
+    $base_path->parts([]);
 
     return $url;
 }

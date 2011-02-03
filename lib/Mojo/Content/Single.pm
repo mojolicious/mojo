@@ -46,10 +46,10 @@ sub parse {
     my $headers = $self->headers;
 
     # Content-Length
-    my $length = $self->headers->content_length;
+    my $len = $self->headers->content_length;
 
     # WebSocket handshakes have a static Content-Length
-    $length ||=
+    $len ||=
         $headers->sec_websocket_key1     ? 8
       : $headers->sec_websocket_location ? 16
       :                                    undef;
@@ -84,13 +84,13 @@ sub parse {
     else {
 
         # Slurp
-        $length ||= $self->headers->content_length || 0;
+        $len ||= $self->headers->content_length || 0;
         my $asset = $self->asset;
-        my $need  = $length - $asset->size;
+        my $need  = $len - $asset->size;
         $asset->add_chunk(substr $self->{_b2}, 0, $need, '') if $need > 0;
 
         # Done
-        $self->{_state} = 'done' if $length <= $self->progress;
+        $self->{_state} = 'done' if $len <= $self->progress;
     }
 
     return $self;

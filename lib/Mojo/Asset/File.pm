@@ -11,7 +11,9 @@ use Mojo::Util 'md5_sum';
 
 has [qw/cleanup path/];
 has handle => sub {
-    my $self   = shift;
+    my $self = shift;
+
+    # Handle
     my $handle = IO::File->new;
 
     # Already got a file without handle
@@ -27,16 +29,14 @@ has handle => sub {
         # Open
         $handle->open("$mode $file")
           or croak qq/Can't open file "$file": $!/;
+
         return $handle;
     }
 
     # Generate temporary file
     my $base = File::Spec->catfile($self->tmpdir, 'mojo.tmp');
     $file = $base;
-    while (-e $file) {
-        my $sum = md5_sum time . rand 999999999;
-        $file = "$base.$sum";
-    }
+    while (-e $file) { $file = $base . md5_sum(time . rand 999999999) }
     $self->path($file);
 
     # Enable automatic cleanup
@@ -44,6 +44,7 @@ has handle => sub {
 
     # Open for read/write access
     $handle->open("+> $file") or croak qq/Can't open file "$file": $!/;
+
     return $handle;
 };
 has tmpdir => sub { $ENV{MOJO_TMPDIR} || File::Spec->tmpdir };
@@ -54,9 +55,9 @@ has tmpdir => sub { $ENV{MOJO_TMPDIR} || File::Spec->tmpdir };
 #  claws!"
 sub DESTROY {
     my $self = shift;
-    my $file = $self->path;
 
     # Cleanup
+    my $file = $self->path;
     unlink $file if $self->cleanup && -f $file;
 }
 
@@ -75,33 +76,31 @@ sub add_chunk {
 }
 
 sub contains {
-    my ($self, $bytestream) = @_;
-    my ($buffer, $window);
+    my ($self, $pattern) = @_;
 
     # Seek to start
     $self->handle->sysseek($self->start_range, SEEK_SET);
     my $end = defined $self->end_range ? $self->end_range : $self->size;
-    my $rlen = length($bytestream) * 2;
-    if ($rlen > $end - $self->start_range) {
-        $rlen = $end - $self->start_range;
-    }
+    my $window_size = length($pattern) * 2;
+    $window_size = $end - $self->start_range
+      if $window_size > $end - $self->start_range;
 
     # Read
-    my $read    = $self->handle->sysread($window, $rlen);
-    my $offset  = $read;
-    my $readlen = length($bytestream);
+    my $read         = $self->handle->sysread(my $window, $window_size);
+    my $offset       = $read;
+    my $pattern_size = length($pattern);
 
     # Moving window search
     my $range = $self->end_range;
     while ($offset <= $end) {
         if (defined $range) {
-            $readlen = $end + 1 - $offset;
-            return -1 if $readlen <= 0;
+            $pattern_size = $end + 1 - $offset;
+            return -1 if $pattern_size <= 0;
         }
-        $read = $self->handle->sysread($buffer, $readlen);
+        $read = $self->handle->sysread(my $buffer, $pattern_size);
         $offset += $read;
         $window .= $buffer;
-        my $pos = index $window, $bytestream;
+        my $pos = index $window, $pattern;
         return $pos if $pos >= 0;
         return -1   if $read == 0;
         substr $window, 0, $read, '';
@@ -111,11 +110,11 @@ sub contains {
 }
 
 sub get_chunk {
-    my ($self, $offset) = @_;
+    my ($self, $start) = @_;
 
     # Seek to start
-    my $off = $offset + $self->start_range;
-    $self->handle->sysseek($off, SEEK_SET);
+    $start += $self->start_range;
+    $self->handle->sysseek($start, SEEK_SET);
     my $end = $self->end_range;
     my $buffer;
 
@@ -124,7 +123,7 @@ sub get_chunk {
 
     # Range support
     if (defined $end) {
-        my $chunk = $end + 1 - $off;
+        my $chunk = $end + 1 - $start;
         return '' if $chunk <= 0;
         $chunk = $size if $chunk > $size;
         $self->handle->sysread($buffer, $chunk);
@@ -251,7 +250,7 @@ Check if asset contains a specific string.
 
 =head2 C<get_chunk>
 
-    my $chunk = $asset->get_chunk($offset);
+    my $chunk = $asset->get_chunk($start);
 
 Get chunk of data starting from a specific position.
 

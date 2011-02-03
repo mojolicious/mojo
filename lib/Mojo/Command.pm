@@ -323,8 +323,8 @@ sub run {
     print $self->message;
 
     # Make list
-    my $list   = [];
-    my $length = 0;
+    my $list = [];
+    my $len  = 0;
     foreach my $command (@$commands) {
 
         # Generate name
@@ -333,7 +333,7 @@ sub run {
 
         # Add to list
         my $l = length $name;
-        $length = $l if $l > $length;
+        $len = $l if $l > $len;
         push @$list, [$name, $command->[1]->new->description];
     }
 
@@ -341,7 +341,7 @@ sub run {
     foreach my $command (@$list) {
         my $name        = $command->[0];
         my $description = $command->[1];
-        my $padding     = ' ' x ($length - length $name);
+        my $padding     = ' ' x ($len - length $name);
         print "  $name$padding   $description";
     }
 

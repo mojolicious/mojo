@@ -319,15 +319,13 @@ sub parse {
 
         # Escaped line ending
         if ($line =~ /(\\+)$/) {
-            my $length = length $1;
+            my $len = length $1;
 
             # Newline escaped
-            if ($length == 1) {
-                $line =~ s/\\$//;
-            }
+            if ($len == 1) { $line =~ s/\\$// }
 
             # Backslash escaped
-            if ($length >= 2) {
+            if ($len >= 2) {
                 $line =~ s/\\\\$/\\/;
                 $line .= "\n";
             }

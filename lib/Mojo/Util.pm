@@ -496,7 +496,7 @@ sub punycode_encode {
 
     # Input
     my $output = $_[0];
-    my $length = length $_[0];
+    my $len    = length $_[0];
 
     # Remove non basic characters
     $output =~ s/[^\x00-\x7f]+//ogs;
@@ -525,7 +525,7 @@ sub punycode_encode {
 
         # Walk all code points in order
         $n = $m;
-        for (my $i = 0; $i < $length; $i++) {
+        for (my $i = 0; $i < $len; $i++) {
             my $c = $input[$i];
 
             # Basic character

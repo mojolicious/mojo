@@ -76,29 +76,38 @@ sub decode {
   Mojo::Util::decode $encoding, $string;
 
   # Object or array
-  my $ref = eval {
+  my $res = eval {
     local $_ = $string;
 
     # Leading whitespace
     m/\G$WHITESPACE_RE/xogc;
 
     # Array
-    if (m/\G\[/xgc) { _decode_array() }
+    my $ref;
+    if (m/\G\[/xgc) { $ref = _decode_array() }
 
     # Object
-    elsif (m/\G\{/xgc) { _decode_object() }
+    elsif (m/\G\{/xgc) { $ref = _decode_object() }
 
     # Unexpected
     else { _exception('Expected array or object') }
+
+    # Leftover data
+    unless (m/\G$WHITESPACE_RE\z/xogc) {
+      my $got = ref $ref eq 'ARRAY' ? 'array' : 'object';
+      _exception("Unexpected data after $got");
+    }
+
+    $ref;
   };
 
   # Exception
-  if (!$ref && (my $e = $@)) {
+  if (!$res && (my $e = $@)) {
     chomp $e;
     $self->error($e);
   }
 
-  return $ref;
+  return $res;
 }
 
 sub encode {

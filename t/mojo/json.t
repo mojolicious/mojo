@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 104;
+use Test::More tests => 106;
 
 use Mojo::ByteStream 'b';
 
@@ -270,6 +270,10 @@ is $json->error, 'Malformed JSON: Expected string, array, object, number,'
   . ' boolean or null at character offset 1.', 'right error';
 is $json->decode('["foo]'), undef, 'syntax error';
 is $json->error, 'Malformed JSON: Unterminated string at character offset 6.',
+  'right error';
+is $json->decode('["foo"]lala'), undef, 'syntax error';
+is $json->error,
+  'Malformed JSON: Unexpected data after array at character offset 7.',
   'right error';
 is $json->decode('false'), undef, 'no object or array';
 is $json->error,

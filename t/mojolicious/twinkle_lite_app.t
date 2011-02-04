@@ -19,14 +19,14 @@ use Test::Mojo;
 
 # Twinkle template syntax
 my $twinkle = {
-    capture_end     => '-',
-    capture_start   => '+',
-    escape_mark     => '*',
-    expression_mark => '*',
-    line_start      => '.',
-    tag_end         => '**',
-    tag_start       => '**',
-    trim_mark       => '*'
+  capture_end     => '-',
+  capture_start   => '+',
+  escape_mark     => '*',
+  expression_mark => '*',
+  line_start      => '.',
+  tag_end         => '**',
+  tag_start       => '**',
+  trim_mark       => '*'
 };
 
 # Plugins

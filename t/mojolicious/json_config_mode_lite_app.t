@@ -7,8 +7,8 @@ use utf8;
 
 # Disable epoll and kqueue
 BEGIN {
-    $ENV{MOJO_POLL} = 1;
-    $ENV{MOJO_MODE} = 'testing';
+  $ENV{MOJO_POLL} = 1;
+  $ENV{MOJO_MODE} = 'testing';
 }
 
 # "Who are you, and why should I care?"

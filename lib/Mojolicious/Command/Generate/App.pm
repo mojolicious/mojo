@@ -10,47 +10,47 @@ EOF
 
 # "Why can't she just drink herself happy like a normal person?"
 sub run {
-    my ($self, $class) = @_;
-    $class ||= 'MyMojoliciousApp';
+  my ($self, $class) = @_;
+  $class ||= 'MyMojoliciousApp';
 
-    # Prevent bad applications
-    die <<EOF unless $class =~ /^[A-Z](?:\w|\:\:)+$/;
+  # Prevent bad applications
+  die <<EOF unless $class =~ /^[A-Z](?:\w|\:\:)+$/;
 Your application name has to be a well formed (camel case) Perl module name
 like "MyApp".
 EOF
 
-    my $name = $self->class_to_file($class);
+  my $name = $self->class_to_file($class);
 
-    # Script
-    $self->render_to_rel_file('mojo', "$name/script/$name", $class);
-    $self->chmod_file("$name/script/$name", 0744);
+  # Script
+  $self->render_to_rel_file('mojo', "$name/script/$name", $class);
+  $self->chmod_file("$name/script/$name", 0744);
 
-    # Appclass
-    my $app = $self->class_to_path($class);
-    $self->render_to_rel_file('appclass', "$name/lib/$app", $class);
+  # Appclass
+  my $app = $self->class_to_path($class);
+  $self->render_to_rel_file('appclass', "$name/lib/$app", $class);
 
-    # Controller
-    my $controller = "${class}::Example";
-    my $path       = $self->class_to_path($controller);
-    $self->render_to_rel_file('controller', "$name/lib/$path", $controller);
+  # Controller
+  my $controller = "${class}::Example";
+  my $path       = $self->class_to_path($controller);
+  $self->render_to_rel_file('controller', "$name/lib/$path", $controller);
 
-    # Test
-    $self->render_to_rel_file('test', "$name/t/basic.t", $class);
+  # Test
+  $self->render_to_rel_file('test', "$name/t/basic.t", $class);
 
-    # Log
-    $self->create_rel_dir("$name/log");
+  # Log
+  $self->create_rel_dir("$name/log");
 
-    # Static
-    $self->render_to_rel_file('static', "$name/public/index.html");
+  # Static
+  $self->render_to_rel_file('static', "$name/public/index.html");
 
-    # Layout and Templates
-    $self->renderer->line_start('%%');
-    $self->renderer->tag_start('<%%');
-    $self->renderer->tag_end('%%>');
-    $self->render_to_rel_file('layout',
-        "$name/templates/layouts/default.html.ep");
-    $self->render_to_rel_file('welcome',
-        "$name/templates/example/welcome.html.ep");
+  # Layout and Templates
+  $self->renderer->line_start('%%');
+  $self->renderer->tag_start('<%%');
+  $self->renderer->tag_end('%%>');
+  $self->render_to_rel_file('layout',
+    "$name/templates/layouts/default.html.ep");
+  $self->render_to_rel_file('welcome',
+    "$name/templates/example/welcome.html.ep");
 }
 
 1;
@@ -88,16 +88,16 @@ use Mojo::Base 'Mojolicious';
 
 # This method will run once at server start
 sub startup {
-    my $self = shift;
+  my $self = shift;
 
-    # Documentation browser under "/perldoc" (this plugin requires Perl 5.10)
-    $self->plugin('pod_renderer');
+  # Documentation browser under "/perldoc" (this plugin requires Perl 5.10)
+  $self->plugin('pod_renderer');
 
-    # Routes
-    my $r = $self->routes;
+  # Routes
+  my $r = $self->routes;
 
-    # Normal route to controller
-    $r->route('/welcome')->to('example#welcome');
+  # Normal route to controller
+  $r->route('/welcome')->to('example#welcome');
 }
 
 1;
@@ -108,21 +108,21 @@ use Mojo::Base 'Mojolicious::Controller';
 
 # This action will render a template
 sub welcome {
-    my $self = shift;
+  my $self = shift;
 
-    # Render template "example/welcome.html.ep" with message
-    $self->render(message => 'Welcome to the Mojolicious Web Framework!');
+  # Render template "example/welcome.html.ep" with message
+  $self->render(message => 'Welcome to the Mojolicious Web Framework!');
 }
 
 1;
 @@ static
 <!doctype html><html>
-    <head><title>Welcome to the Mojolicious Web Framework!</title></head>
-    <body>
-        <h2>Welcome to the Mojolicious Web Framework!</h2>
-        This is the static document "public/index.html",
-        <a href="/welcome">click here</a> to get back to the start.
-    </body>
+  <head><title>Welcome to the Mojolicious Web Framework!</title></head>
+  <body>
+    <h2>Welcome to the Mojolicious Web Framework!</h2>
+    This is the static document "public/index.html",
+    <a href="/welcome">click here</a> to get back to the start.
+  </body>
 </html>
 @@ test
 % my $class = shift;
@@ -143,8 +143,8 @@ $t->get_ok('/welcome')->status_is(200)
   ->content_like(qr/Mojolicious Web Framework/i);
 @@ layout
 <!doctype html><html>
-    <head><title><%= title %></title></head>
-    <body><%= content %></body>
+  <head><title><%= title %></title></head>
+  <body><%= content %></body>
 </html>
 @@ welcome
 % layout 'default';
@@ -164,10 +164,10 @@ Mojolicious::Command::Generate::App - App Generator Command
 
 =head1 SYNOPSIS
 
-    use Mojolicious::Command::Generate::App;
+  use Mojolicious::Command::Generate::App;
 
-    my $app = Mojolicious::Command::Generate::App->new;
-    $app->run(@ARGV);
+  my $app = Mojolicious::Command::Generate::App->new;
+  $app->run(@ARGV);
 
 =head1 DESCRIPTION
 
@@ -180,15 +180,15 @@ L<Mojo::Command> and implements the following new ones.
 
 =head2 C<description>
 
-    my $description = $app->description;
-    $app            = $app->description('Foo!');
+  my $description = $app->description;
+  $app            = $app->description('Foo!');
 
 Short description of this command, used for the command list.
 
 =head2 C<usage>
 
-    my $usage = $app->usage;
-    $app      = $app->usage('Foo!');
+  my $usage = $app->usage;
+  $app      = $app->usage('Foo!');
 
 Usage information for this command, used for the help screen.
 
@@ -199,7 +199,7 @@ L<Mojo::Command> and implements the following new ones.
 
 =head2 C<run>
 
-    $app->run(@ARGV);
+  $app->run(@ARGV);
 
 Run this command.
 

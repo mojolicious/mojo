@@ -17,7 +17,7 @@ Mojolicious is the tutorial in L<Mojolicious::Lite>, you should take a look.
 
 =head1 GUIDES
 
-=over 4
+=over 2
 
 =item L<Mojolicious::Guides::Routing>
 
@@ -57,7 +57,7 @@ L<Mojolicious> and L<Mojolicious::Lite> are the sum of many parts, small
 building blocks that can be used independently, these are the most prominent
 ones.
 
-=over 4
+=over 2
 
 =item L<Mojo::Client>
 

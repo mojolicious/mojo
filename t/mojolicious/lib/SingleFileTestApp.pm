@@ -4,45 +4,45 @@ use Mojo::Base 'Mojolicious';
 # "Alright, grab a shovel.
 #  I'm only one skull short of a Mouseketeer reunion."
 sub startup {
-    my $self = shift;
+  my $self = shift;
 
-    # Only log errors to STDERR
-    $self->log->path(undef);
-    $self->log->level('fatal');
+  # Only log errors to STDERR
+  $self->log->path(undef);
+  $self->log->level('fatal');
 
-    # Plugin
-    $self->plugin('MojoliciousTest::Plugin::TestPlugin');
+  # Plugin
+  $self->plugin('MojoliciousTest::Plugin::TestPlugin');
 
-    # Helper route
-    $self->routes->route('/helper')->to(
-        cb => sub {
-            my $self = shift;
-            $self->render(text => $self->test_plugin);
-        }
-    );
+  # Helper route
+  $self->routes->route('/helper')->to(
+    cb => sub {
+      my $self = shift;
+      $self->render(text => $self->test_plugin);
+    }
+  );
 
-    # /*/* - the default route
-    $self->routes->route('/:controller/:action')->to(action => 'index');
+  # /*/* - the default route
+  $self->routes->route('/:controller/:action')->to(action => 'index');
 }
 
 package SingleFileTestApp::Foo;
 use Mojo::Base 'Mojolicious::Controller';
 
 sub bar {
-    my $self = shift;
-    $self->res->headers->header('X-Bender' => 'Bite my shiny metal ass!');
-    $self->render_text($self->url_for);
+  my $self = shift;
+  $self->res->headers->header('X-Bender' => 'Bite my shiny metal ass!');
+  $self->render_text($self->url_for);
 }
 
 sub data_template {
-    shift->render('index', template_class => 'SingleFileTestApp::Foo');
+  shift->render('index', template_class => 'SingleFileTestApp::Foo');
 }
 
 sub data_template2 {
-    shift->stash(
-        template       => 'too',
-        template_class => 'SingleFileTestApp::Foo'
-    );
+  shift->stash(
+    template       => 'too',
+    template_class => 'SingleFileTestApp::Foo'
+  );
 }
 
 sub index { shift->stash(template => 'withlayout', msg => 'works great!') }

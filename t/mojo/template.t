@@ -6,9 +6,9 @@ use strict;
 use warnings;
 
 sub import {
-    my $caller = caller;
-    no strict 'refs';
-    *{$caller . '::foo'} = sub {'works!'};
+  my $caller = caller;
+  no strict 'refs';
+  *{$caller . '::foo'} = sub {'works!'};
 }
 
 package MyTemplateException;
@@ -765,7 +765,7 @@ EOF
 is $output, "23\nsomething\nelse\n23\n", 'prepending code';
 $mt = Mojo::Template->new;
 $mt->prepend(
-    q/{no warnings 'redefine'; no strict 'refs'; *foo = sub { 23 }}/);
+  q/{no warnings 'redefine'; no strict 'refs'; *foo = sub { 23 }}/);
 $output = $mt->render('<%= foo() %>');
 is $output, "23\n", 'right result';
 $output = $mt->render('%= foo()');

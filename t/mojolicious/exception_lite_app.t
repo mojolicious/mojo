@@ -27,8 +27,8 @@ get '/dead_action' => sub { die 'dead action!' };
 
 # GET /double_dead_action
 get '/double_dead_action' => sub {
-    eval { die 'double dead action!' };
-    die $@;
+  eval { die 'double dead action!' };
+  die $@;
 };
 
 my $t = Test::Mojo->new;

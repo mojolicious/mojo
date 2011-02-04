@@ -7,71 +7,71 @@ use Mojo::Util 'unquote';
 #  No thanks. Do you have any fruit?
 #  This has purple in it. Purple is a fruit."
 sub parse {
-    my ($self, $string) = @_;
+  my ($self, $string) = @_;
 
-    my @cookies;
-    my $version = 1;
+  my @cookies;
+  my $version = 1;
 
-    # Walk tree
-    for my $knot ($self->_tokenize($string)) {
-        for my $token (@{$knot}) {
+  # Walk tree
+  for my $knot ($self->_tokenize($string)) {
+    for my $token (@{$knot}) {
 
-            # Token
-            my ($name, $value) = @{$token};
+      # Token
+      my ($name, $value) = @{$token};
 
-            # Value might be quoted
-            unquote $value if $value;
+      # Value might be quoted
+      unquote $value if $value;
 
-            # Path
-            if ($name =~ /^\$Path$/i) { $cookies[-1]->path($value) }
+      # Path
+      if ($name =~ /^\$Path$/i) { $cookies[-1]->path($value) }
 
-            # Version
-            elsif ($name =~ /^\$Version$/i) { $version = $value }
+      # Version
+      elsif ($name =~ /^\$Version$/i) { $version = $value }
 
-            # Name and value
-            else {
-                push @cookies, Mojo::Cookie::Request->new;
-                $cookies[-1]->name($name);
-                unquote $value if $value;
-                $cookies[-1]->value($value);
-                $cookies[-1]->version($version);
-            }
-        }
+      # Name and value
+      else {
+        push @cookies, Mojo::Cookie::Request->new;
+        $cookies[-1]->name($name);
+        unquote $value if $value;
+        $cookies[-1]->value($value);
+        $cookies[-1]->version($version);
+      }
     }
+  }
 
-    return \@cookies;
+  return \@cookies;
 }
 
 sub prefix {
-    my $self = shift;
+  my $self = shift;
 
-    # Prefix
-    my $version = $self->version || 1;
-    return "\$Version=$version";
+  # Prefix
+  my $version = $self->version || 1;
+  return "\$Version=$version";
 }
 
 sub to_string {
-    my $self = shift;
+  my $self = shift;
 
-    # Shortcut
-    return '' unless $self->name;
+  # Shortcut
+  return '' unless $self->name;
 
-    # Render
-    my $cookie = $self->name;
-    my $value  = $self->value;
-    $cookie .= "=$value" if defined $value && length $value;
-    if (my $path = $self->path) { $cookie .= "; \$Path=$path" }
+  # Render
+  my $cookie = $self->name;
+  my $value  = $self->value;
+  $cookie .= "=$value" if defined $value && length $value;
+  if (my $path = $self->path) { $cookie .= "; \$Path=$path" }
 
-    return $cookie;
+  return $cookie;
 }
 
 sub to_string_with_prefix {
-    my $self = shift;
+  my $self = shift;
 
-    # Render with prefix
-    my $prefix = $self->prefix;
-    my $cookie = $self->to_string;
-    return "$prefix; $cookie";
+  # Render with prefix
+  my $prefix = $self->prefix;
+  my $cookie = $self->to_string;
+  return "$prefix; $cookie";
 }
 
 1;
@@ -83,13 +83,13 @@ Mojo::Cookie::Request - HTTP 1.1 Request Cookie Container
 
 =head1 SYNOPSIS
 
-    use Mojo::Cookie::Request;
+  use Mojo::Cookie::Request;
 
-    my $cookie = Mojo::Cookie::Request->new;
-    $cookie->name('foo');
-    $cookie->value('bar');
+  my $cookie = Mojo::Cookie::Request->new;
+  $cookie->name('foo');
+  $cookie->value('bar');
 
-    print "$cookie";
+  print "$cookie";
 
 =head1 DESCRIPTION
 
@@ -107,25 +107,25 @@ implements the following new ones.
 
 =head2 C<parse>
 
-    my $cookies = $cookie->parse('$Version=1; f=b; $Path=/');
+  my $cookies = $cookie->parse('$Version=1; f=b; $Path=/');
 
 Parse cookies.
 
 =head2 C<prefix>
 
-    my $prefix = $cookie->prefix;
+  my $prefix = $cookie->prefix;
 
 Prefix for cookies.
 
 =head2 C<to_string>
 
-    my $string = $cookie->to_string;
+  my $string = $cookie->to_string;
 
 Render cookie.
 
 =head2 C<to_string_with_prefix>
 
-    my $string = $cookie->to_string_with_prefix;
+  my $string = $cookie->to_string_with_prefix;
 
 Render cookie with prefix.
 

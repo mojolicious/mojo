@@ -8,116 +8,116 @@ has [qw/comment domain httponly max_age port secure/];
 
 # Regex
 my $FIELD_RE = qr/
-    (
-      Comment
-    | Domain
-    | expires
-    | HttpOnly   # IE6 FF3 Opera 9.5
-    | Max-Age
-    | Path
-    | Port
-    | Secure
-    | Version
-    )
+  (
+    Comment
+  | Domain
+  | expires
+  | HttpOnly   # IE6 FF3 Opera 9.5
+  | Max-Age
+  | Path
+  | Port
+  | Secure
+  | Version
+  )
 /xmsi;
 my $FLAG_RE = qr/(?:Secure|HttpOnly)/i;
 
 sub expires {
-    my ($self, $expires) = @_;
+  my ($self, $expires) = @_;
 
-    # Set
-    if (defined $expires) {
-        $self->{expires} = $expires;
-        return $self;
-    }
+  # Set
+  if (defined $expires) {
+    $self->{expires} = $expires;
+    return $self;
+  }
 
-    # Shortcut
-    return unless defined $self->{expires};
+  # Shortcut
+  return unless defined $self->{expires};
 
-    # Upgrade
-    $self->{expires} = Mojo::Date->new($self->{expires})
-      unless ref $self->{expires};
+  # Upgrade
+  $self->{expires} = Mojo::Date->new($self->{expires})
+    unless ref $self->{expires};
 
-    return $self->{expires};
+  return $self->{expires};
 }
 
 # "Remember the time he ate my goldfish?
 #  And you lied and said I never had goldfish.
 #  Then why did I have the bowl Bart? Why did I have the bowl?"
 sub parse {
-    my ($self, $string) = @_;
-    my @cookies;
+  my ($self, $string) = @_;
+  my @cookies;
 
-    for my $knot ($self->_tokenize($string)) {
-        for my $i (0 .. $#{$knot}) {
-            my ($name, $value) = @{$knot->[$i]};
+  for my $knot ($self->_tokenize($string)) {
+    for my $i (0 .. $#{$knot}) {
+      my ($name, $value) = @{$knot->[$i]};
 
-            # Value might be quoted
-            unquote $value if $value;
+      # Value might be quoted
+      unquote $value if $value;
 
-            # This will only run once
-            if (not $i) {
-                push @cookies, Mojo::Cookie::Response->new;
-                $cookies[-1]->name($name);
-                $cookies[-1]->value($value);
-                next;
-            }
+      # This will only run once
+      if (not $i) {
+        push @cookies, Mojo::Cookie::Response->new;
+        $cookies[-1]->name($name);
+        $cookies[-1]->value($value);
+        next;
+      }
 
-            # Field
-            if (my @match = $name =~ m/$FIELD_RE/o) {
+      # Field
+      if (my @match = $name =~ m/$FIELD_RE/o) {
 
-                # Underscore
-                (my $id = lc $match[0]) =~ tr/-/_/;
+        # Underscore
+        (my $id = lc $match[0]) =~ tr/-/_/;
 
-                # Flag
-                $cookies[-1]->$id($id =~ m/$FLAG_RE/o ? 1 : $value);
-            }
-        }
+        # Flag
+        $cookies[-1]->$id($id =~ m/$FLAG_RE/o ? 1 : $value);
+      }
     }
+  }
 
-    return \@cookies;
+  return \@cookies;
 }
 
 sub to_string {
-    my $self = shift;
+  my $self = shift;
 
-    return '' unless $self->name;
+  return '' unless $self->name;
 
-    # Version
-    my $cookie = $self->name;
-    my $value  = $self->value;
-    $cookie .= "=$value" if defined $value && length $value;
-    $cookie .= sprintf "; Version=%d", ($self->version || 1);
+  # Version
+  my $cookie = $self->name;
+  my $value  = $self->value;
+  $cookie .= "=$value" if defined $value && length $value;
+  $cookie .= sprintf "; Version=%d", ($self->version || 1);
 
-    # Domain
-    if (my $domain = $self->domain) { $cookie .= "; Domain=$domain" }
+  # Domain
+  if (my $domain = $self->domain) { $cookie .= "; Domain=$domain" }
 
-    # Path
-    if (my $path = $self->path) { $cookie .= "; Path=$path" }
+  # Path
+  if (my $path = $self->path) { $cookie .= "; Path=$path" }
 
-    # Max-Age
-    if (defined(my $max_age = $self->max_age)) {
-        $cookie .= "; Max-Age=$max_age";
-    }
+  # Max-Age
+  if (defined(my $max_age = $self->max_age)) {
+    $cookie .= "; Max-Age=$max_age";
+  }
 
-    # Expires
-    if (defined(my $expires = $self->expires)) {
-        $cookie .= "; expires=$expires";
-    }
+  # Expires
+  if (defined(my $expires = $self->expires)) {
+    $cookie .= "; expires=$expires";
+  }
 
-    # Port
-    if (my $port = $self->port) { $cookie .= qq/; Port="$port"/ }
+  # Port
+  if (my $port = $self->port) { $cookie .= qq/; Port="$port"/ }
 
-    # Secure
-    if (my $secure = $self->secure) { $cookie .= "; Secure" }
+  # Secure
+  if (my $secure = $self->secure) { $cookie .= "; Secure" }
 
-    # HttpOnly
-    if (my $httponly = $self->httponly) { $cookie .= "; HttpOnly" }
+  # HttpOnly
+  if (my $httponly = $self->httponly) { $cookie .= "; HttpOnly" }
 
-    # Comment
-    if (my $comment = $self->comment) { $cookie .= "; Comment=$comment" }
+  # Comment
+  if (my $comment = $self->comment) { $cookie .= "; Comment=$comment" }
 
-    return $cookie;
+  return $cookie;
 }
 
 1;
@@ -129,13 +129,13 @@ Mojo::Cookie::Response - HTTP 1.1 Response Cookie Container
 
 =head1 SYNOPSIS
 
-    use Mojo::Cookie::Response;
+  use Mojo::Cookie::Response;
 
-    my $cookie = Mojo::Cookie::Response->new;
-    $cookie->name('foo');
-    $cookie->value('bar');
+  my $cookie = Mojo::Cookie::Response->new;
+  $cookie->name('foo');
+  $cookie->value('bar');
 
-    print "$cookie";
+  print "$cookie";
 
 =head1 DESCRIPTION
 
@@ -149,43 +149,43 @@ implements the followign new ones.
 
 =head2 C<comment>
 
-    my $comment = $cookie->comment;
-    $cookie     = $cookie->comment('test 123');
+  my $comment = $cookie->comment;
+  $cookie     = $cookie->comment('test 123');
 
 Cookie comment.
 
 =head2 C<domain>
 
-    my $domain = $cookie->domain;
-    $cookie    = $cookie->domain('localhost');
+  my $domain = $cookie->domain;
+  $cookie    = $cookie->domain('localhost');
 
 Cookie domain.
 
 =head2 C<httponly>
 
-    my $httponly = $cookie->httponly;
-    $cookie      = $cookie->httponly(1);
+  my $httponly = $cookie->httponly;
+  $cookie      = $cookie->httponly(1);
 
 HTTP only flag.
 
 =head2 C<max_age>
 
-    my $max_age = $cookie->max_age;
-    $cookie     = $cookie->max_age(60);
+  my $max_age = $cookie->max_age;
+  $cookie     = $cookie->max_age(60);
 
 Max age for cookie in seconds.
 
 =head2 C<port>
 
-    my $port = $cookie->port;
-    $cookie  = $cookie->port('80 8080');
+  my $port = $cookie->port;
+  $cookie  = $cookie->port('80 8080');
 
 Cookie port.
 
 =head2 C<secure>
 
-    my $secure = $cookie->secure;
-    $cookie    = $cookie->secure(1);
+  my $secure = $cookie->secure;
+  $cookie    = $cookie->secure(1);
 
 Secure flag.
 
@@ -196,20 +196,20 @@ implements the following new ones.
 
 =head2 C<expires>
 
-    my $expires = $cookie->expires;
-    $cookie     = $cookie->expires(time + 60);
+  my $expires = $cookie->expires;
+  $cookie     = $cookie->expires(time + 60);
 
 Expiration for cookie in seconds.
 
 =head2 C<parse>
 
-    my $cookies = $cookie->parse('f=b; Version=1; Path=/');
+  my $cookies = $cookie->parse('f=b; Version=1; Path=/');
 
 Parse cookies.
 
 =head2 C<to_string>
 
-    my $string = $cookie->to_string;
+  my $string = $cookie->to_string;
 
 Render cookie.
 

@@ -184,7 +184,7 @@ is $dom->at('[id="sno\"wman"]')->text, '☃', 'right text';
 
 # Unicode and escaped selectors
 $dom->parse(
-    qq/<p><div id="☃x">Snowman<\/div><div class="x ♥">Heart<\/div><\/p>/);
+  qq/<p><div id="☃x">Snowman<\/div><div class="x ♥">Heart<\/div><\/p>/);
 is $dom->at("#\\\n\\002603x")->text,               'Snowman', 'right text';
 is $dom->at('#\\2603 x')->text,                    'Snowman', 'right text';
 is $dom->at("#\\\n\\2603 x")->text,                'Snowman', 'right text';
@@ -299,9 +299,9 @@ $dom->parse(<<EOF);
 EOF
 my @data;
 for my $tr ($dom->find('table tr')->each) {
-    for my $td (@{$tr->children}) {
-        push @data, $td->type, $td->all_text;
-    }
+  for my $td (@{$tr->children}) {
+    push @data, $td->type, $td->all_text;
+  }
 }
 is $data[0], 'td',    'right tag';
 is $data[1], 'text1', 'right text';
@@ -443,7 +443,7 @@ is_deeply \@div, ['A1'], 'found last element only';
 
 # Defined but false text
 $dom->parse(
-    '<div><div id="a">A</div><div id="b">B</div></div><div id="0">0</div>');
+  '<div><div id="a">A</div><div id="b">B</div></div><div id="0">0</div>');
 @div = ();
 $dom->find('div[id]')->each(sub { push @div, shift->text });
 is_deeply \@div, [qw/A B 0/], 'found all div elements with id';

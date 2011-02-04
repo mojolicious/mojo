@@ -28,11 +28,11 @@ Mojo::Upload - Upload Container
 
 =head1 SYNOPSIS
 
-    use Mojo::Upload;
+  use Mojo::Upload;
 
-    my $upload = Mojo::Upload->new;
-    print $upload->filename;
-    $upload->move_to('/foo/bar/baz.txt');
+  my $upload = Mojo::Upload->new;
+  print $upload->filename;
+  $upload->move_to('/foo/bar/baz.txt');
 
 =head1 DESCRIPTION
 
@@ -44,29 +44,29 @@ L<Mojo::Upload> implements the following attributes.
 
 =head2 C<asset>
 
-    my $asset = $upload->asset;
-    $upload   = $upload->asset(Mojo::Asset::File->new);
+  my $asset = $upload->asset;
+  $upload   = $upload->asset(Mojo::Asset::File->new);
 
 Asset containing the uploaded data.
 
 =head2 C<filename>
 
-    my $filename = $upload->filename;
-    $upload      = $upload->filename('foo.txt');
+  my $filename = $upload->filename;
+  $upload      = $upload->filename('foo.txt');
 
 Name of the uploaded file.
 
 =head2 C<headers>
 
-    my $headers = $upload->headers;
-    $upload     = $upload->headers(Mojo::Headers->new);
+  my $headers = $upload->headers;
+  $upload     = $upload->headers(Mojo::Headers->new);
 
 Headers for upload.
 
 =head2 C<name>
 
-    my $name = $upload->name;
-    $upload  = $upload->name('foo');
+  my $name = $upload->name;
+  $upload  = $upload->name('foo');
 
 Name of the upload.
 
@@ -77,19 +77,19 @@ following new ones.
 
 =head2 C<move_to>
 
-    $upload->move_to('/foo/bar/baz.txt');
+  $upload->move_to('/foo/bar/baz.txt');
 
 Move uploaded data to a specific file.
 
 =head2 C<size>
 
-    my $size = $upload->size;
+  my $size = $upload->size;
 
 Size of upload in bytes.
 
 =head2 C<slurp>
 
-    my $string = $upload->slurp;
+  my $string = $upload->slurp;
 
 Read all upload data at once.
 

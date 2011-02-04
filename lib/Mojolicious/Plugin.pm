@@ -14,7 +14,7 @@ Mojolicious::Plugin - Plugin Base Class
 
 =head1 SYNOPSIS
 
-    use Mojo::Base 'Mojolicious::Plugin';
+  use Mojo::Base 'Mojolicious::Plugin';
 
 =head1 DESCRIPTION
 
@@ -29,7 +29,7 @@ the following new ones.
 
 =head2 C<register>
 
-    $plugin->register;
+  $plugin->register;
     
 This method will be called by L<Mojolicious::Plugins> at startup time,
 your plugin should use this to hook into the application.

@@ -68,15 +68,15 @@ my @WEBSOCKET_HEADERS = qw/
   Sec-WebSocket-Protocol
   /;
 my @HEADERS = (
-    @GENERAL_HEADERS, @REQUEST_HEADERS, @RESPONSE_HEADERS,
-    @ENTITY_HEADERS,  @WEBSOCKET_HEADERS
+  @GENERAL_HEADERS, @REQUEST_HEADERS, @RESPONSE_HEADERS,
+  @ENTITY_HEADERS,  @WEBSOCKET_HEADERS
 );
 
 # Lower case headers
 my %NORMALCASE_HEADERS;
 for my $name (@HEADERS) {
-    my $lowercase = lc $name;
-    $NORMALCASE_HEADERS{$lowercase} = $name;
+  my $lowercase = lc $name;
+  $NORMALCASE_HEADERS{$lowercase} = $name;
 }
 
 sub accept_language { scalar shift->header('Accept-Language' => @_) }
@@ -84,20 +84,20 @@ sub accept_ranges   { scalar shift->header('Accept-Ranges'   => @_) }
 sub authorization   { scalar shift->header('Authorization'   => @_) }
 
 sub add {
-    my $self = shift;
-    my $name = shift;
+  my $self = shift;
+  my $name = shift;
 
-    # Make sure we have a normal case entry for name
-    my $lcname = lc $name;
-    $NORMALCASE_HEADERS{$lcname} = $name
-      unless exists $NORMALCASE_HEADERS{$lcname};
-    $name = $lcname;
+  # Make sure we have a normal case entry for name
+  my $lcname = lc $name;
+  $NORMALCASE_HEADERS{$lcname} = $name
+    unless exists $NORMALCASE_HEADERS{$lcname};
+  $name = $lcname;
 
-    # Add lines
-    push @{$self->{_headers}->{$name}}, (ref $_ || '') eq 'ARRAY' ? $_ : [$_]
-      for @_;
+  # Add lines
+  push @{$self->{_headers}->{$name}}, (ref $_ || '') eq 'ARRAY' ? $_ : [$_]
+    for @_;
 
-    return $self;
+  return $self;
 }
 
 sub connection          { scalar shift->header(Connection            => @_) }
@@ -106,7 +106,7 @@ sub content_length      { scalar shift->header('Content-Length'      => @_) }
 sub content_range       { scalar shift->header('Content-Range'       => @_) }
 
 sub content_transfer_encoding {
-    scalar shift->header('Content-Transfer-Encoding' => @_);
+  scalar shift->header('Content-Transfer-Encoding' => @_);
 }
 
 sub content_type { scalar shift->header('Content-Type' => @_) }
@@ -115,61 +115,61 @@ sub date         { scalar shift->header(Date           => @_) }
 sub expect       { scalar shift->header(Expect         => @_) }
 
 sub from_hash {
-    my $self = shift;
-    my $hash = shift;
+  my $self = shift;
+  my $hash = shift;
 
-    # Empty hash deletes all headers
-    if (keys %{$hash} == 0) {
-        $self->{_headers} = {};
-        return $self;
-    }
-
-    # Merge
-    while (my ($header, $value) = each %$hash) {
-        $self->add($header => ref $value eq 'ARRAY' ? @$value : $value);
-    }
-
+  # Empty hash deletes all headers
+  if (keys %{$hash} == 0) {
+    $self->{_headers} = {};
     return $self;
+  }
+
+  # Merge
+  while (my ($header, $value) = each %$hash) {
+    $self->add($header => ref $value eq 'ARRAY' ? @$value : $value);
+  }
+
+  return $self;
 }
 
 # "Will you be my mommy? You smell like dead bunnies..."
 sub header {
-    my $self = shift;
-    my $name = shift;
+  my $self = shift;
+  my $name = shift;
 
-    # Set
-    if (@_) {
-        $self->remove($name);
-        return $self->add($name, @_);
+  # Set
+  if (@_) {
+    $self->remove($name);
+    return $self->add($name, @_);
+  }
+
+  # Get
+  my $headers;
+  return unless $headers = $self->{_headers}->{lc $name};
+
+  # String
+  unless (wantarray) {
+
+    # Format
+    my $string = '';
+    for my $header (@$headers) {
+      $string .= ', ' if $string;
+      $string .= join ', ', @$header;
     }
 
-    # Get
-    my $headers;
-    return unless $headers = $self->{_headers}->{lc $name};
+    return $string;
+  }
 
-    # String
-    unless (wantarray) {
-
-        # Format
-        my $string = '';
-        for my $header (@$headers) {
-            $string .= ', ' if $string;
-            $string .= join ', ', @$header;
-        }
-
-        return $string;
-    }
-
-    # Array
-    return @$headers;
+  # Array
+  return @$headers;
 }
 
 sub host { scalar shift->header(Host => @_) }
 sub if_modified_since { scalar shift->header('If-Modified-Since' => @_) }
 
 sub is_done {
-    return 1 if (shift->{_state} || '') eq 'done';
-    return;
+  return 1 if (shift->{_state} || '') eq 'done';
+  return;
 }
 
 sub last_modified { scalar shift->header('Last-Modified' => @_) }
@@ -179,54 +179,54 @@ sub leftovers { shift->{_buffer} }
 sub location { scalar shift->header(Location => @_) }
 
 sub names {
-    my $self = shift;
+  my $self = shift;
 
-    # Normal case
-    my @headers;
-    for my $name (keys %{$self->{_headers}}) {
-        push @headers, $NORMALCASE_HEADERS{$name} || $name;
-    }
+  # Normal case
+  my @headers;
+  for my $name (keys %{$self->{_headers}}) {
+    push @headers, $NORMALCASE_HEADERS{$name} || $name;
+  }
 
-    return \@headers;
+  return \@headers;
 }
 
 sub origin { scalar shift->header(Origin => @_) }
 
 sub parse {
-    my ($self, $chunk) = @_;
+  my ($self, $chunk) = @_;
 
-    # Buffer
-    $self->{_buffer} = '' unless defined $self->{_buffer};
-    $self->{_buffer} .= $chunk if defined $chunk;
+  # Buffer
+  $self->{_buffer} = '' unless defined $self->{_buffer};
+  $self->{_buffer} .= $chunk if defined $chunk;
 
-    # Parse headers
-    my $headers = $self->{_cache} || [];
-    $self->{_state} = 'headers';
-    while (defined(my $line = get_line $self->{_buffer})) {
+  # Parse headers
+  my $headers = $self->{_cache} || [];
+  $self->{_state} = 'headers';
+  while (defined(my $line = get_line $self->{_buffer})) {
 
-        # New header
-        if ($line =~ /^(\S+)\s*:\s*(.*)/) { push @$headers, $1, $2 }
+    # New header
+    if ($line =~ /^(\S+)\s*:\s*(.*)/) { push @$headers, $1, $2 }
 
-        # Multiline
-        elsif (@$headers && $line =~ s/^\s+//) { $headers->[-1] .= " $line" }
+    # Multiline
+    elsif (@$headers && $line =~ s/^\s+//) { $headers->[-1] .= " $line" }
 
-        # Empty line
-        else {
+    # Empty line
+    else {
 
-            # Store headers
-            for (my $i = 0; $i < @$headers; $i += 2) {
-                $self->add($headers->[$i], $headers->[$i + 1]);
-            }
+      # Store headers
+      for (my $i = 0; $i < @$headers; $i += 2) {
+        $self->add($headers->[$i], $headers->[$i + 1]);
+      }
 
-            # Done
-            $self->{_state} = 'done';
-            $self->{_cache} = [];
-            return $self;
-        }
+      # Done
+      $self->{_state} = 'done';
+      $self->{_cache} = [];
+      return $self;
     }
-    $self->{_cache} = $headers;
+  }
+  $self->{_cache} = $headers;
 
-    return $self;
+  return $self;
 }
 
 sub proxy_authenticate  { scalar shift->header('Proxy-Authenticate'  => @_) }
@@ -235,9 +235,9 @@ sub range               { scalar shift->header(Range                 => @_) }
 sub referrer            { scalar shift->header(Referer               => @_) }
 
 sub remove {
-    my ($self, $name) = @_;
-    delete $self->{_headers}->{lc $name};
-    return $self;
+  my ($self, $name) = @_;
+  delete $self->{_headers}->{lc $name};
+  return $self;
 }
 
 sub server      { scalar shift->header(Server        => @_) }
@@ -246,48 +246,48 @@ sub set_cookie2 { scalar shift->header('Set-Cookie2' => @_) }
 sub status      { scalar shift->header(Status        => @_) }
 
 sub to_hash {
-    my $self   = shift;
-    my %params = @_;
+  my $self   = shift;
+  my %params = @_;
 
-    # Build
-    my $hash = {};
-    foreach my $header (@{$self->names}) {
+  # Build
+  my $hash = {};
+  foreach my $header (@{$self->names}) {
 
-        # Header
-        my @headers = $self->header($header);
+    # Header
+    my @headers = $self->header($header);
 
-        # Nested arrayrefs
-        if ($params{arrayref}) { $hash->{$header} = [@headers] }
+    # Nested arrayrefs
+    if ($params{arrayref}) { $hash->{$header} = [@headers] }
 
-        # Flat arrayref
-        else {
+    # Flat arrayref
+    else {
 
-            # Turn single value arrayrefs into strings
-            foreach my $h (@headers) { $h = $h->[0] if @$h == 1 }
-            $hash->{$header} = @headers > 1 ? [@headers] : $headers[0];
-        }
+      # Turn single value arrayrefs into strings
+      foreach my $h (@headers) { $h = $h->[0] if @$h == 1 }
+      $hash->{$header} = @headers > 1 ? [@headers] : $headers[0];
     }
+  }
 
-    return $hash;
+  return $hash;
 }
 
 sub to_string {
-    my $self = shift;
+  my $self = shift;
 
-    # Prepare headers
-    my @headers;
-    for my $name (@{$self->names}) {
+  # Prepare headers
+  my @headers;
+  for my $name (@{$self->names}) {
 
-        # Multiline value
-        for my $values ($self->header($name)) {
-            my $value = join "\x0d\x0a ", @$values;
-            push @headers, "$name: $value";
-        }
+    # Multiline value
+    for my $values ($self->header($name)) {
+      my $value = join "\x0d\x0a ", @$values;
+      push @headers, "$name: $value";
     }
+  }
 
-    # Format headers
-    my $headers = join "\x0d\x0a", @headers;
-    return length $headers ? $headers : undef;
+  # Format headers
+  my $headers = join "\x0d\x0a", @headers;
+  return length $headers ? $headers : undef;
 }
 
 sub trailer            { scalar shift->header(Trailer              => @_) }
@@ -298,15 +298,15 @@ sub sec_websocket_key1 { scalar shift->header('Sec-WebSocket-Key1' => @_) }
 sub sec_websocket_key2 { scalar shift->header('Sec-WebSocket-Key2' => @_) }
 
 sub sec_websocket_location {
-    scalar shift->header('Sec-WebSocket-Location' => @_);
+  scalar shift->header('Sec-WebSocket-Location' => @_);
 }
 
 sub sec_websocket_origin {
-    scalar shift->header('Sec-WebSocket-Origin' => @_);
+  scalar shift->header('Sec-WebSocket-Origin' => @_);
 }
 
 sub sec_websocket_protocol {
-    scalar shift->header('Sec-WebSocket-Protocol' => @_);
+  scalar shift->header('Sec-WebSocket-Protocol' => @_);
 }
 sub www_authenticate { scalar shift->header('WWW-Authenticate' => @_) }
 
@@ -319,11 +319,11 @@ Mojo::Headers - Headers
 
 =head1 SYNOPSIS
 
-    use Mojo::Headers;
+  use Mojo::Headers;
 
-    my $headers = Mojo::Headers->new;
-    $headers->content_type('text/plain');
-    $headers->parse("Content-Type: text/html\n\n");
+  my $headers = Mojo::Headers->new;
+  $headers->content_type('text/plain');
+  $headers->parse("Content-Type: text/html\n\n");
 
 =head1 DESCRIPTION
 
@@ -336,105 +336,105 @@ following new ones.
 
 =head2 C<accept_language>
 
-    my $accept_language = $headers->accept_language;
-    $headers            = $headers->accept_language('de, en');
+  my $accept_language = $headers->accept_language;
+  $headers            = $headers->accept_language('de, en');
 
 Shortcut for the C<Accept-Language> header.
 
 =head2 C<accept_ranges>
 
-    my $ranges = $headers->accept_ranges;
-    $headers   = $headers->accept_ranges('bytes');
+  my $ranges = $headers->accept_ranges;
+  $headers   = $headers->accept_ranges('bytes');
 
 Shortcut for the C<Accept-Ranges> header.
 
 =head2 C<add>
 
-    $headers = $headers->add('Content-Type', 'text/plain');
+  $headers = $headers->add('Content-Type', 'text/plain');
 
 Add one or more header lines.
 
 =head2 C<authorization>
 
-    my $authorization = $headers->authorization;
-    $headers          = $headers->authorization('Basic Zm9vOmJhcg==');
+  my $authorization = $headers->authorization;
+  $headers          = $headers->authorization('Basic Zm9vOmJhcg==');
 
 Shortcut for the C<Authorization> header.
 
 =head2 C<connection>
 
-    my $connection = $headers->connection;
-    $headers       = $headers->connection('close');
+  my $connection = $headers->connection;
+  $headers       = $headers->connection('close');
 
 Shortcut for the C<Connection> header.
 
 =head2 C<content_disposition>
 
-    my $content_disposition = $headers->content_disposition;
-    $headers                = $headers->content_disposition('foo');
+  my $content_disposition = $headers->content_disposition;
+  $headers                = $headers->content_disposition('foo');
 
 Shortcut for the C<Content-Disposition> header.
 
 =head2 C<content_length>
 
-    my $content_length = $headers->content_length;
-    $headers           = $headers->content_length(4000);
+  my $content_length = $headers->content_length;
+  $headers           = $headers->content_length(4000);
 
 Shortcut for the C<Content-Length> header.
 
 =head2 C<content_range>
 
-    my $range = $headers->content_range;
-    $headers  = $headers->content_range('bytes 2-8/100');
+  my $range = $headers->content_range;
+  $headers  = $headers->content_range('bytes 2-8/100');
 
 Shortcut for the C<Content-Range> header.
 
 =head2 C<content_transfer_encoding>
 
-    my $encoding = $headers->content_transfer_encoding;
-    $headers     = $headers->content_transfer_encoding('foo');
+  my $encoding = $headers->content_transfer_encoding;
+  $headers     = $headers->content_transfer_encoding('foo');
 
 Shortcut for the C<Content-Transfer-Encoding> header.
 
 =head2 C<content_type>
 
-    my $content_type = $headers->content_type;
-    $headers         = $headers->content_type('text/plain');
+  my $content_type = $headers->content_type;
+  $headers         = $headers->content_type('text/plain');
 
 Shortcut for the C<Content-Type> header.
 
 =head2 C<cookie>
 
-    my $cookie = $headers->cookie;
-    $headers   = $headers->cookie('$Version=1; f=b; $Path=/');
+  my $cookie = $headers->cookie;
+  $headers   = $headers->cookie('$Version=1; f=b; $Path=/');
 
 Shortcut for the C<Cookie> header.
 
 =head2 C<date>
 
-    my $date = $headers->date;
-    $headers = $headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
+  my $date = $headers->date;
+  $headers = $headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
 
 Shortcut for the C<Date> header.
 
 =head2 C<expect>
 
-    my $expect = $headers->expect;
-    $headers   = $headers->expect('100-continue');
+  my $expect = $headers->expect;
+  $headers   = $headers->expect('100-continue');
 
 Shortcut for the C<Expect> header.
 
 =head2 C<from_hash>
 
-    $headers = $headers->from_hash({'Content-Type' => 'text/html'});
+  $headers = $headers->from_hash({'Content-Type' => 'text/html'});
 
 Parse headers from a hash.
 
 =head2 C<header>
 
-    my $string = $headers->header('Content-Type');
-    my @lines  = $headers->header('Content-Type');
-    $headers   = $headers->header('Content-Type' => 'text/plain');
+  my $string = $headers->header('Content-Type');
+  my @lines  = $headers->header('Content-Type');
+  $headers   = $headers->header('Content-Type' => 'text/plain');
 
 Get or replace the current header values.
 Note that this method is context sensitive and will turn all header lines
@@ -442,207 +442,207 @@ into a single one in scalar context.
 
 =head2 C<host>
 
-    my $host = $headers->host;
-    $headers = $headers->host('127.0.0.1');
+  my $host = $headers->host;
+  $headers = $headers->host('127.0.0.1');
 
 Shortcut for the C<Host> header.
 
 =head2 C<if_modified_since>
 
-    my $m    = $headers->if_modified_since;
-    $headers = $headers->if_modified_since('Sun, 17 Aug 2008 16:27:35 GMT');
+  my $m    = $headers->if_modified_since;
+  $headers = $headers->if_modified_since('Sun, 17 Aug 2008 16:27:35 GMT');
 
 Shortcut for the C<If-Modified-Since> header.
 
 =head2 C<is_done>
 
-    my $done = $headers->is_done;
+  my $done = $headers->is_done;
 
 Check if header parser is done.
 
 =head2 C<last_modified>
 
-    my $m    = $headers->last_modified;
-    $headers = $headers->last_modified('Sun, 17 Aug 2008 16:27:35 GMT');
+  my $m    = $headers->last_modified;
+  $headers = $headers->last_modified('Sun, 17 Aug 2008 16:27:35 GMT');
 
 Shortcut for the C<Last-Modified> header.
 
 =head2 C<leftovers>
 
-    my $leftovers = $headers->leftovers;
+  my $leftovers = $headers->leftovers;
 
 Leftovers.
 
 =head2 C<location>
 
-    my $location = $headers->location;
-    $headers     = $headers->location('http://127.0.0.1/foo');
+  my $location = $headers->location;
+  $headers     = $headers->location('http://127.0.0.1/foo');
 
 Shortcut for the C<Location> header.
 
 =head2 C<names>
 
-    my $names = $headers->names;
+  my $names = $headers->names;
 
 Generate a list of all currently defined headers.
 
 =head2 C<origin>
 
-    my $origin = $headers->origin;
-    $headers   = $headers->origin('http://example.com');
+  my $origin = $headers->origin;
+  $headers   = $headers->origin('http://example.com');
 
 Shortcut for the C<Origin> header.
 
 =head2 C<parse>
 
-    $headers = $headers->parse("Content-Type: text/foo\n\n");
+  $headers = $headers->parse("Content-Type: text/foo\n\n");
 
 Parse formatted headers.
 
 =head2 C<proxy_authenticate>
 
-    my $authenticate = $headers->proxy_authenticate;
-    $headers         = $headers->proxy_authenticate('Basic "realm"');
+  my $authenticate = $headers->proxy_authenticate;
+  $headers         = $headers->proxy_authenticate('Basic "realm"');
 
 Shortcut for the C<Proxy-Authenticate> header.
 
 =head2 C<proxy_authorization>
 
-    my $proxy_authorization = $headers->proxy_authorization;
-    $headers = $headers->proxy_authorization('Basic Zm9vOmJhcg==');
+  my $proxy_authorization = $headers->proxy_authorization;
+  $headers = $headers->proxy_authorization('Basic Zm9vOmJhcg==');
 
 Shortcut for the C<Proxy-Authorization> header.
 
 =head2 C<range>
 
-    my $range = $headers->range;
-    $headers  = $headers->range('bytes=2-8');
+  my $range = $headers->range;
+  $headers  = $headers->range('bytes=2-8');
 
 Shortcut for the C<Range> header.
 
 =head2 C<referrer>
 
-    my $referrer = $headers->referrer;
-    $headers     = $headers->referrer('http://mojolicio.us');
+  my $referrer = $headers->referrer;
+  $headers     = $headers->referrer('http://mojolicio.us');
 
 Shortcut for the C<Referer> header, there was a typo in RFC 2068 which
 resulted in C<Referer> becoming an official header.
 
 =head2 C<remove>
 
-    $headers = $headers->remove('Content-Type');
+  $headers = $headers->remove('Content-Type');
 
 Remove a header.
 
 =head2 C<sec_websocket_key1>
 
-    my $key1 = $headers->sec_websocket_key1;
-    $headers = $headers->sec_websocket_key1('4 @1  46546xW%0l 1 5');
+  my $key1 = $headers->sec_websocket_key1;
+  $headers = $headers->sec_websocket_key1('4 @1  46546xW%0l 1 5');
 
 Shortcut for the C<Sec-WebSocket-Key1> header.
 
 =head2 C<sec_websocket_key2>
 
-    my $key2 = $headers->sec_websocket_key2;
-    $headers = $headers->sec_websocket_key2('12998 5 Y3 1  .P00');
+  my $key2 = $headers->sec_websocket_key2;
+  $headers = $headers->sec_websocket_key2('12998 5 Y3 1  .P00');
 
 Shortcut for the C<Sec-WebSocket-Key2> header.
 
 =head2 C<sec_websocket_location>
 
-    my $location = $headers->sec_websocket_location;
-    $headers     = $headers->sec_websocket_location('ws://example.com/demo');
+  my $location = $headers->sec_websocket_location;
+  $headers     = $headers->sec_websocket_location('ws://example.com/demo');
 
 Shortcut for the C<Sec-WebSocket-Location> header.
 
 =head2 C<sec_websocket_origin>
 
-    my $origin = $headers->sec_websocket_origin;
-    $headers   = $headers->sec_websocket_origin('http://example.com');
+  my $origin = $headers->sec_websocket_origin;
+  $headers   = $headers->sec_websocket_origin('http://example.com');
 
 Shortcut for the C<Sec-WebSocket-Origin> header.
 
 =head2 C<sec_websocket_protocol>
 
-    my $protocol = $headers->sec_websocket_protocol;
-    $headers     = $headers->sec_websocket_protocol('sample');
+  my $protocol = $headers->sec_websocket_protocol;
+  $headers     = $headers->sec_websocket_protocol('sample');
 
 Shortcut for the C<Sec-WebSocket-Protocol> header.
 
 =head2 C<server>
 
-    my $server = $headers->server;
-    $headers   = $headers->server('Mojo');
+  my $server = $headers->server;
+  $headers   = $headers->server('Mojo');
 
 Shortcut for the C<Server> header.
 
 =head2 C<set_cookie>
 
-    my $set_cookie = $headers->set_cookie;
-    $headers       = $headers->set_cookie('f=b; Version=1; Path=/');
+  my $set_cookie = $headers->set_cookie;
+  $headers       = $headers->set_cookie('f=b; Version=1; Path=/');
 
 Shortcut for the C<Set-Cookie> header.
 
 =head2 C<set_cookie2>
 
-    my $set_cookie2 = $headers->set_cookie2;
-    $headers        = $headers->set_cookie2('f=b; Version=1; Path=/');
+  my $set_cookie2 = $headers->set_cookie2;
+  $headers        = $headers->set_cookie2('f=b; Version=1; Path=/');
 
 Shortcut for the C<Set-Cookie2> header.
 
 =head2 C<status>
 
-    my $status = $headers->status;
-    $headers   = $headers->status('200 OK');
+  my $status = $headers->status;
+  $headers   = $headers->status('200 OK');
 
 Shortcut for the C<Status> header.
 
 =head2 C<to_hash>
 
-    my $hash = $headers->to_hash;
-    my $hash = $headers->to_hash(arrayref => 1);
+  my $hash = $headers->to_hash;
+  my $hash = $headers->to_hash(arrayref => 1);
 
 Format headers as a hash.
 Nested arrayrefs to represent multi line values are optional.
 
 =head2 C<to_string>
 
-    my $string = $headers->to_string;
+  my $string = $headers->to_string;
 
 Format headers suitable for HTTP 1.1 messages.
 
 =head2 C<trailer>
 
-    my $trailer = $headers->trailer;
-    $headers    = $headers->trailer('X-Foo');
+  my $trailer = $headers->trailer;
+  $headers    = $headers->trailer('X-Foo');
 
 Shortcut for the C<Trailer> header.
 
 =head2 C<transfer_encoding>
 
-    my $transfer_encoding = $headers->transfer_encoding;
-    $headers              = $headers->transfer_encoding('chunked');
+  my $transfer_encoding = $headers->transfer_encoding;
+  $headers              = $headers->transfer_encoding('chunked');
 
 Shortcut for the C<Transfer-Encoding> header.
 
 =head2 C<upgrade>
 
-    my $upgrade = $headers->upgrade;
-    $headers    = $headers->upgrade('WebSocket');
+  my $upgrade = $headers->upgrade;
+  $headers    = $headers->upgrade('WebSocket');
 
 Shortcut for the C<Upgrade> header.
 
 =head2 C<user_agent>
 
-    my $user_agent = $headers->user_agent;
-    $headers       = $headers->user_agent('Mojo/1.0');
+  my $user_agent = $headers->user_agent;
+  $headers       = $headers->user_agent('Mojo/1.0');
 
 Shortcut for the C<User-Agent> header.
 
 =head2 C<www_authenticate>
 
-    my $authenticate = $headers->www_authenticate;
-    $headers         = $headers->www_authenticate('Basic "realm"');
+  my $authenticate = $headers->www_authenticate;
+  $headers         = $headers->www_authenticate('Basic "realm"');
 
 Shortcut for the C<WWW-Authenticate> header.
 

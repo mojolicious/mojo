@@ -22,6 +22,7 @@
 --nohanging-side-comments             # Troublesome for commented out code
 
 -isbc   # Block comments may only be indented if they have some space characters before the #
+-i=2    # Indent level is 2 cols
 -ci=2   # Continuation indent is 2 cols
 
 # We use version control, so just rewrite the file

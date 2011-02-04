@@ -12,15 +12,14 @@ EOF
 #  the entire universe will be destroyed...
 #  And as an environmentalist, I'm against that."
 sub run {
-    my $self = shift;
+  my $self = shift;
 
-    my $class = $ENV{MOJO_APP} || 'MyApp';
-    my $path  = $self->class_to_path($class);
-    my $name  = $self->class_to_file($class);
+  my $class = $ENV{MOJO_APP} || 'MyApp';
+  my $path  = $self->class_to_path($class);
+  my $name  = $self->class_to_file($class);
 
-    $self->render_to_rel_file('makefile', 'Makefile.PL', $class, $path,
-        $name);
-    $self->chmod_file('Makefile.PL', 0744);
+  $self->render_to_rel_file('makefile', 'Makefile.PL', $class, $path, $name);
+  $self->chmod_file('Makefile.PL', 0744);
 }
 
 1;
@@ -37,12 +36,12 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-    NAME         => '<%= $class %>',
-    VERSION_FROM => 'lib/<%= $path %>',
-    AUTHOR       => 'A Good Programmer <nospam@cpan.org>',
-    EXE_FILES => ['script/<%= $name %>'],
-    PREREQ_PM => { 'Mojolicious' => '1.0' },
-    test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t'}
+  NAME         => '<%= $class %>',
+  VERSION_FROM => 'lib/<%= $path %>',
+  AUTHOR       => 'A Good Programmer <nospam@cpan.org>',
+  EXE_FILES => ['script/<%= $name %>'],
+  PREREQ_PM => { 'Mojolicious' => '1.0' },
+  test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t'}
 );
 __END__
 =head1 NAME
@@ -51,10 +50,10 @@ Mojolicious::Command::Generate::Makefile - Makefile Generator Command
 
 =head1 SYNOPSIS
 
-    use Mojolicious::Command::Generate::Makefile;
+  use Mojolicious::Command::Generate::Makefile;
 
-    my $makefile = Mojolicious::Command::Generate::Makefile->new;
-    $makefile->run(@ARGV);
+  my $makefile = Mojolicious::Command::Generate::Makefile->new;
+  $makefile->run(@ARGV);
 
 =head1 DESCRIPTION
 
@@ -67,15 +66,15 @@ L<Mojo::Command> and implements the following new ones.
 
 =head2 C<description>
 
-    my $description = $makefile->description;
-    $makefile       = $makefile->description('Foo!');
+  my $description = $makefile->description;
+  $makefile       = $makefile->description('Foo!');
 
 Short description of this command, used for the command list.
 
 =head2 C<usage>
 
-    my $usage = $makefile->usage;
-    $makefile = $makefile->usage('Foo!');
+  my $usage = $makefile->usage;
+  $makefile = $makefile->usage('Foo!');
 
 Usage information for this command, used for the help screen.
 
@@ -86,7 +85,7 @@ L<Mojo::Command> and implements the following new ones.
 
 =head2 C<run>
 
-    $makefile = $makefile->run(@ARGV);
+  $makefile = $makefile->run(@ARGV);
 
 Run this command.
 

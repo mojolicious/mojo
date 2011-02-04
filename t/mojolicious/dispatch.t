@@ -14,10 +14,10 @@ has 'render_called';
 sub render { shift->render_called(1) }
 
 sub reset_state {
-    my $self = shift;
-    $self->render_called(0);
-    my $stash = $self->stash;
-    delete $stash->{$_} for keys %$stash;
+  my $self = shift;
+  $self->render_called(0);
+  my $stash = $self->stash;
+  delete $stash->{$_} for keys %$stash;
 }
 
 # "I was all of history's greatest acting robots -- Acting Unit 0.8,

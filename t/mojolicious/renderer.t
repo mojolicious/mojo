@@ -16,10 +16,10 @@ $c->app->log->path(undef);
 $c->app->log->level('fatal');
 my $r = Mojolicious::Renderer->new(default_format => 'debug');
 $r->add_handler(
-    debug => sub {
-        my ($self, $c, $output) = @_;
-        $$output .= 'Hello Mojo!';
-    }
+  debug => sub {
+    my ($self, $c, $output) = @_;
+    $$output .= 'Hello Mojo!';
+  }
 );
 $c->stash->{format} = 'something';
 

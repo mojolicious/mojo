@@ -12,8 +12,8 @@ package LoaderException2_2;
 use Carp 'croak';
 
 sub throw_error {
-    eval { LoaderException2_3::throw_error() };
-    croak $@ if $@;
+  eval { LoaderException2_3::throw_error() };
+  croak $@ if $@;
 }
 
 # "Shoplifting is a victimless crime. Like punching someone in the dark."
@@ -22,7 +22,7 @@ package LoaderException2_3;
 use Carp 'croak';
 
 sub throw_error {
-    croak "Exception";
+  croak "Exception";
 }
 
 1;

@@ -28,10 +28,10 @@ my $config = 'hypnotoad.conf';
 # Options
 my $help;
 GetOptions(
-    'config=s' => sub { $config                    = $_[1] },
-    foreground => sub { $ENV{HYPNOTOAD_FOREGROUND} = 1 },
-    help       => sub { $help                      = 1 },
-    test       => sub { $ENV{HYPNOTOAD_TEST}       = 1 },
+  'config=s' => sub { $config                    = $_[1] },
+  foreground => sub { $ENV{HYPNOTOAD_FOREGROUND} = 1 },
+  help       => sub { $help                      = 1 },
+  test       => sub { $ENV{HYPNOTOAD_TEST}       = 1 },
 );
 
 # Application

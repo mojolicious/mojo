@@ -43,9 +43,9 @@ my $pid = open my $server, '-|', $^X, "$prefix/hypnotoad", '--foreground',
   $config, "$prefix/mojo";
 sleep 1
   while !IO::Socket::INET->new(
-    Proto    => 'tcp',
-    PeerAddr => 'localhost',
-    PeerPort => $port
+  Proto    => 'tcp',
+  PeerAddr => 'localhost',
+  PeerPort => $port
   );
 
 my $client = Mojo::Client->new;
@@ -147,7 +147,7 @@ $tx2->req->body('foo bar baz');
 $tx3 = Mojo::Transaction::HTTP->new;
 $tx3->req->method('GET');
 $tx3->req->url->parse(
-    "http://127.0.0.1:$port/diag/chunked_params?a=foo&b=12");
+  "http://127.0.0.1:$port/diag/chunked_params?a=foo&b=12");
 $tx4 = Mojo::Transaction::HTTP->new;
 $tx4->req->method('GET');
 $tx4->req->url->parse("http://127.0.0.1:$port/13/");
@@ -167,7 +167,7 @@ is $tx3->res->content->asset->slurp,   'foo12',  'right content';
 kill 'INT', $pid;
 sleep 1
   while IO::Socket::INET->new(
-    Proto    => 'tcp',
-    PeerAddr => 'localhost',
-    PeerPort => $port
+  Proto    => 'tcp',
+  PeerAddr => 'localhost',
+  PeerPort => $port
   );

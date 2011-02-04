@@ -29,7 +29,7 @@ distribution an example application.
 
 =head1 RULES
 
-=over 4
+=over 2
 
 Web development should be easy and fun, this is what we optimize for.
 
@@ -70,7 +70,7 @@ of text. (An example for every one or two sentences is a good rule of thumb)
 The master source code repository should always be kept in a stable state,
 use feature branches for actual development.
 
-Lines should not be longer than 78 characters and we indent with 4
+Lines should not be longer than 78 characters and we indent with 2
 whitespaces.
 
 Code should be run through L<Perl::Tidy> with the included C<.perltidyrc>.

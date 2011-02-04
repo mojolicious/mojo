@@ -93,25 +93,25 @@ $r->route('/format3/:foo.json')->to(controller => 'me', action => 'bye_json');
 # /articles/1/edit
 # /articles/1/delete
 my $articles = $r->waypoint('/articles')->to(
-    controller => 'articles',
-    action     => 'index',
-    format     => 'html'
+  controller => 'articles',
+  action     => 'index',
+  format     => 'html'
 );
 my $wp = $articles->waypoint('/:id')->to(
-    controller => 'articles',
-    action     => 'load',
-    format     => 'html'
+  controller => 'articles',
+  action     => 'load',
+  format     => 'html'
 );
 my $bridge = $wp->bridge->to(
-    controller => 'articles',
-    action     => 'load',
-    format     => 'html'
+  controller => 'articles',
+  action     => 'load',
+  format     => 'html'
 );
 $bridge->route('/edit')->to(controller => 'articles', action => 'edit');
 $bridge->route('/delete')->to(
-    controller => 'articles',
-    action     => 'delete',
-    format     => undef
+  controller => 'articles',
+  action     => 'delete',
+  format     => undef
 )->name('articles_delete');
 
 # GET /method/get
@@ -138,7 +138,7 @@ $auth->route('/gift/')->to('gift#index')->name('gift');
 
 # /regex/alternatives/*
 $r->route('/regex/alternatives/:alternatives',
-    alternatives => qr/foo|bar|baz/)
+  alternatives => qr/foo|bar|baz/)
   ->to(controller => 'regex', action => 'alternatives');
 
 # Make sure stash stays clean
@@ -325,7 +325,7 @@ is $m->path_for, '/wildcards/1/http://www.google.com', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
 $m =
   Mojolicious::Routes::Match->new(
-    get => '/wildcards/1/http%3A%2F%2Fwww.google.com')->match($r);
+  get => '/wildcards/1/http%3A%2F%2Fwww.google.com')->match($r);
 is $m->stack->[0]->{controller}, 'wild',                  'right value';
 is $m->stack->[0]->{action},     'card',                  'right value';
 is $m->stack->[0]->{wildcard},   'http://www.google.com', 'right value';

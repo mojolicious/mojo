@@ -13,146 +13,145 @@ my $STATS = {};
 
 BEGIN {
 
-    # Debugger sub tracking
-    $^P |= 0x10;
+  # Debugger sub tracking
+  $^P |= 0x10;
 }
 
 # "Homer no function beer well without."
 sub load {
-    my ($self, $module) = @_;
+  my ($self, $module) = @_;
 
-    # Shortcut
-    return 1 unless $module;
+  # Shortcut
+  return 1 unless $module;
 
-    # Forced reload
-    if ($ENV{MOJO_RELOAD}) {
+  # Forced reload
+  if ($ENV{MOJO_RELOAD}) {
 
-        # Unload
-        my $key = $module;
-        $key =~ s/\:\:/\//g;
-        $key .= '.pm';
-        _unload($key);
-    }
+    # Unload
+    my $key = $module;
+    $key =~ s/\:\:/\//g;
+    $key .= '.pm';
+    _unload($key);
+  }
 
-    # Already loaded
-    else { return if $module->can('new') }
+  # Already loaded
+  else { return if $module->can('new') }
 
-    # Load
-    eval "require $module";
+  # Load
+  eval "require $module";
 
-    # Catch
-    if ($@) {
+  # Catch
+  if ($@) {
 
-        # Exists
-        my $path = Mojo::Command->class_to_path($module);
-        return 1 if $@ =~ /^Can't locate $path in \@INC/;
+    # Exists
+    my $path = Mojo::Command->class_to_path($module);
+    return 1 if $@ =~ /^Can't locate $path in \@INC/;
 
-        # Real error
-        return Mojo::Exception->new($@);
-    }
+    # Real error
+    return Mojo::Exception->new($@);
+  }
 
-    return;
+  return;
 }
 
 sub reload {
 
-    # Cleanup script
-    delete $INC{$0};
-    $STATS->{$0} = 1;
+  # Cleanup script
+  delete $INC{$0};
+  $STATS->{$0} = 1;
 
-    # Reload
-    while (my ($key, $file) = each %INC) {
+  # Reload
+  while (my ($key, $file) = each %INC) {
 
-        # Modified time
-        next unless $file;
-        my $mtime = (stat $file)[9];
+    # Modified time
+    next unless $file;
+    my $mtime = (stat $file)[9];
 
-        # Startup time as default
-        $STATS->{$file} = $^T unless defined $STATS->{$file};
+    # Startup time as default
+    $STATS->{$file} = $^T unless defined $STATS->{$file};
 
-        # Modified
-        if ($mtime > $STATS->{$file}) {
+    # Modified
+    if ($mtime > $STATS->{$file}) {
 
-            # Reload
-            if (my $e = _reload($key)) { return $e }
+      # Reload
+      if (my $e = _reload($key)) { return $e }
 
-            # Reloaded
-            $STATS->{$file} = $mtime;
-        }
+      # Reloaded
+      $STATS->{$file} = $mtime;
     }
+  }
 
-    # Force script reloading
-    return _reload($0);
+  # Force script reloading
+  return _reload($0);
 }
 
 sub search {
-    my ($self, $namespace) = @_;
+  my ($self, $namespace) = @_;
 
-    # Directories
-    my @directories = exists $INC{'blib.pm'} ? grep {/blib/} @INC : @INC;
+  # Directories
+  my @directories = exists $INC{'blib.pm'} ? grep {/blib/} @INC : @INC;
 
-    # Scan
-    my $modules = [];
-    my %found;
-    foreach my $directory (@directories) {
-        my $path = File::Spec->catdir($directory, (split /::/, $namespace));
-        next unless (-e $path && -d $path);
+  # Scan
+  my $modules = [];
+  my %found;
+  foreach my $directory (@directories) {
+    my $path = File::Spec->catdir($directory, (split /::/, $namespace));
+    next unless (-e $path && -d $path);
 
-        # Get files
-        opendir(my $dir, $path);
-        my @files = grep /\.pm$/, readdir($dir);
-        closedir($dir);
+    # Get files
+    opendir(my $dir, $path);
+    my @files = grep /\.pm$/, readdir($dir);
+    closedir($dir);
 
-        # Check files
-        for my $file (@files) {
-            my $full =
-              File::Spec->catfile(File::Spec->splitdir($path), $file);
+    # Check files
+    for my $file (@files) {
+      my $full = File::Spec->catfile(File::Spec->splitdir($path), $file);
 
-            # Directory
-            next if -d $full;
+      # Directory
+      next if -d $full;
 
-            # Found
-            my $name = File::Basename::fileparse($file, qr/\.pm/);
-            my $class = "$namespace\::$name";
-            push @$modules, $class unless $found{$class};
-            $found{$class} ||= 1;
-        }
+      # Found
+      my $name = File::Basename::fileparse($file, qr/\.pm/);
+      my $class = "$namespace\::$name";
+      push @$modules, $class unless $found{$class};
+      $found{$class} ||= 1;
     }
+  }
 
-    return unless @$modules;
-    return $modules;
+  return unless @$modules;
+  return $modules;
 }
 
 sub _reload {
-    my $key = shift;
+  my $key = shift;
 
-    # Debug
-    warn "$key modified, reloading!\n" if DEBUG;
+  # Debug
+  warn "$key modified, reloading!\n" if DEBUG;
 
-    # Unload
-    _unload($key);
+  # Unload
+  _unload($key);
 
-    # Failed
-    return Mojo::Exception->new($@) unless eval { require $key; 1 };
+  # Failed
+  return Mojo::Exception->new($@) unless eval { require $key; 1 };
 
-    # Success
-    return;
+  # Success
+  return;
 }
 
 sub _unload {
-    my $key = shift;
+  my $key = shift;
 
-    # Unload
-    my $file = $INC{$key};
-    delete $INC{$key};
-    return unless $file;
-    my @subs = grep { index($DB::sub{$_}, "$file:") == 0 }
-      keys %DB::sub;
-    for my $sub (@subs) {
-        eval { undef &$sub };
-        carp "Can't unload sub '$sub' in '$file': $@" if $@;
-        delete $DB::sub{$sub};
-    }
+  # Unload
+  my $file = $INC{$key};
+  delete $INC{$key};
+  return unless $file;
+  my @subs = grep { index($DB::sub{$_}, "$file:") == 0 }
+    keys %DB::sub;
+  for my $sub (@subs) {
+    eval { undef &$sub };
+    carp "Can't unload sub '$sub' in '$file': $@" if $@;
+    delete $DB::sub{$sub};
+  }
 }
 
 1;
@@ -164,14 +163,14 @@ Mojo::Loader - Loader
 
 =head1 SYNOPSIS
 
-    use Mojo::Loader;
+  use Mojo::Loader;
 
-    my $loader = Mojo::Loader->new;
-    my $modules = $loader->search('Some::Namespace');
-    $loader->load($modules->[0]);
+  my $loader = Mojo::Loader->new;
+  my $modules = $loader->search('Some::Namespace');
+  $loader->load($modules->[0]);
 
-    # Reload
-    Mojo::Loader->reload;
+  # Reload
+  Mojo::Loader->reload;
 
 =head1 DESCRIPTION
 
@@ -184,20 +183,20 @@ following new ones.
 
 =head2 C<load>
 
-    my $e = $loader->load('Foo::Bar');
+  my $e = $loader->load('Foo::Bar');
 
 Load a class, note that classes are checked for a C<new> method to see if
 they are already loaded.
 
 =head2 C<reload>
 
-    my $e = Mojo::Loader->reload;
+  my $e = Mojo::Loader->reload;
 
 Reload all Perl files with changes.
 
 =head2 C<search>
 
-    my $modules = $loader->search('MyApp::Namespace');
+  my $modules = $loader->search('MyApp::Namespace');
 
 Search modules in a namespace.
 

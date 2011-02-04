@@ -19,29 +19,29 @@ app->log->level('fatal');
 
 # GET /
 get '/' => sub {
-    my $self = shift;
-    my $rel  = $self->req->url;
-    my $abs  = $rel->to_abs;
-    $self->render_text("Hello World! $rel $abs");
+  my $self = shift;
+  my $rel  = $self->req->url;
+  my $abs  = $rel->to_abs;
+  $self->render_text("Hello World! $rel $abs");
 };
 
 # GET /proxy
 get '/proxy' => sub {
-    my $self = shift;
-    $self->render_text($self->req->url);
+  my $self = shift;
+  $self->render_text($self->req->url);
 };
 
 # Websocket /test
 websocket '/test' => sub {
-    my $self = shift;
-    my $flag = 0;
-    $self->on_message(
-        sub {
-            my ($self, $message) = @_;
-            $self->send_message("${message}test2");
-            $flag = 24;
-        }
-    );
+  my $self = shift;
+  my $flag = 0;
+  $self->on_message(
+    sub {
+      my ($self, $message) = @_;
+      $self->send_message("${message}test2");
+      $flag = 24;
+    }
+  );
 };
 
 # HTTP server for testing
@@ -63,49 +63,49 @@ my $nf =
   . "Connection: close\x0d\x0a\x0d\x0a";
 my $ok = "HTTP/1.1 200 OK\x0d\x0aConnection: keep-alive\x0d\x0a\x0d\x0a";
 $loop->listen(
-    port    => $proxy,
-    on_read => sub {
-        my ($loop, $client, $chunk) = @_;
-        if (my $server = $c->{$client}->{connection}) {
-            return $loop->write($server, $chunk);
-        }
-        $c->{$client}->{client} = '' unless defined $c->{$client}->{client};
-        $c->{$client}->{client} .= $chunk if defined $chunk;
-        if ($c->{$client}->{client} =~ /\x0d?\x0a\x0d?\x0a$/) {
-            my $buffer = $c->{$client}->{client};
-            $c->{$client}->{client} = '';
-            if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
-                $connected = "$1:$2";
-                $fail = 1 if $2 == $port + 1;
-                my $server = $loop->connect(
-                    address    => $1,
-                    port       => $fail ? $port : $2,
-                    on_connect => sub {
-                        my ($loop, $server) = @_;
-                        $c->{$client}->{connection} = $server;
-                        $loop->write($client, $fail ? $nf : $ok);
-                    },
-                    on_error => sub {
-                        shift->drop($client);
-                        delete $c->{$client};
-                    },
-                    on_read => sub {
-                        my ($loop, $server, $chunk) = @_;
-                        $read += length $chunk;
-                        $sent += length $chunk;
-                        $loop->write($client, $chunk);
-                    }
-                );
-            }
-            else { $loop->drop($client) }
-        }
-    },
-    on_error => sub {
-        my ($self, $client) = @_;
-        shift->drop($c->{$client}->{connection})
-          if $c->{$client}->{connection};
-        delete $c->{$client};
+  port    => $proxy,
+  on_read => sub {
+    my ($loop, $client, $chunk) = @_;
+    if (my $server = $c->{$client}->{connection}) {
+      return $loop->write($server, $chunk);
     }
+    $c->{$client}->{client} = '' unless defined $c->{$client}->{client};
+    $c->{$client}->{client} .= $chunk if defined $chunk;
+    if ($c->{$client}->{client} =~ /\x0d?\x0a\x0d?\x0a$/) {
+      my $buffer = $c->{$client}->{client};
+      $c->{$client}->{client} = '';
+      if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
+        $connected = "$1:$2";
+        $fail = 1 if $2 == $port + 1;
+        my $server = $loop->connect(
+          address    => $1,
+          port       => $fail ? $port : $2,
+          on_connect => sub {
+            my ($loop, $server) = @_;
+            $c->{$client}->{connection} = $server;
+            $loop->write($client, $fail ? $nf : $ok);
+          },
+          on_error => sub {
+            shift->drop($client);
+            delete $c->{$client};
+          },
+          on_read => sub {
+            my ($loop, $server, $chunk) = @_;
+            $read += length $chunk;
+            $sent += length $chunk;
+            $loop->write($client, $chunk);
+          }
+        );
+      }
+      else { $loop->drop($client) }
+    }
+  },
+  on_error => sub {
+    my ($self, $client) = @_;
+    shift->drop($c->{$client}->{connection})
+      if $c->{$client}->{connection};
+    delete $c->{$client};
+  }
 );
 
 # GET / (normal request)
@@ -115,17 +115,17 @@ is $client->get("http://localhost:$port/")->success->body,
 # WebSocket /test (normal websocket)
 my $result;
 $client->websocket(
-    "ws://localhost:$port/test" => sub {
-        my $self = shift;
-        $self->on_message(
-            sub {
-                my ($self, $message) = @_;
-                $result = $message;
-                $self->finish;
-            }
-        );
-        $self->send_message('test1');
-    }
+  "ws://localhost:$port/test" => sub {
+    my $self = shift;
+    $self->on_message(
+      sub {
+        my ($self, $message) = @_;
+        $result = $message;
+        $self->finish;
+      }
+    );
+    $self->send_message('test1');
+  }
 )->start;
 is $result, 'test1test2', 'right result';
 
@@ -138,17 +138,17 @@ is $client->get("http://kraih.com/proxy")->success->body,
 $client->http_proxy("http://localhost:$proxy");
 $result = undef;
 $client->websocket(
-    "ws://localhost:$port/test" => sub {
-        my $self = shift;
-        $self->on_message(
-            sub {
-                my ($self, $message) = @_;
-                $result = $message;
-                $self->finish;
-            }
-        );
-        $self->send_message('test1');
-    }
+  "ws://localhost:$port/test" => sub {
+    my $self = shift;
+    $self->on_message(
+      sub {
+        my ($self, $message) = @_;
+        $result = $message;
+        $self->finish;
+      }
+    );
+    $self->send_message('test1');
+  }
 )->start;
 is $connected, "localhost:$port", 'connected';
 is $result,    'test1test2',      'right result';
@@ -160,11 +160,11 @@ $client->http_proxy("http://localhost:$proxy");
 my $port2 = $port + 1;
 my ($success, $error);
 $client->websocket(
-    "ws://localhost:$port2/test" => sub {
-        my ($self, $tx) = @_;
-        $success = $tx->success;
-        $error   = $tx->error;
-    }
+  "ws://localhost:$port2/test" => sub {
+    my ($self, $tx) = @_;
+    $success = $tx->success;
+    $error   = $tx->error;
+  }
 )->start;
 is $success, undef, 'no success';
 is $error, 'Proxy connection failed.', 'right message';

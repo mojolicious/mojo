@@ -19,7 +19,7 @@ is "$url", 'http://kraih.com', 'right format';
 
 # Advanced
 $url = Mojo::URL->new(
-    'http://sri:foobar@kraih.com:8080/test/index.html?monkey=biz&foo=1#23');
+  'http://sri:foobar@kraih.com:8080/test/index.html?monkey=biz&foo=1#23');
 is $url->is_abs,   1,                  'is absolute';
 is $url->scheme,   'http',             'right scheme';
 is $url->userinfo, 'sri:foobar',       'right userinfo';
@@ -37,7 +37,7 @@ is "$url", 'http://sri:foobar@kraih.com:8080/index.xml?monkey=biz&foo=1#23',
 
 # Parameters
 $url = Mojo::URL->new(
-    'http://sri:foobar@kraih.com:8080?_monkey=biz%3B&_monkey=23#23');
+  'http://sri:foobar@kraih.com:8080?_monkey=biz%3B&_monkey=23#23');
 is $url->is_abs,   1,                           'is absolute';
 is $url->scheme,   'http',                      'right scheme';
 is $url->userinfo, 'sri:foobar',                'right userinfo';
@@ -63,7 +63,7 @@ is "$url", 'http://sri:foobar@kraih.com:8080?foo%3Dbar#23', 'right format';
 
 # Query string
 $url = Mojo::URL->new(
-    'http://sri:foobar@kraih.com:8080?_monkeybiz%3B&_monkey;23#23');
+  'http://sri:foobar@kraih.com:8080?_monkeybiz%3B&_monkey;23#23');
 is $url->is_abs,   1,                              'is absolute';
 is $url->scheme,   'http',                         'right scheme';
 is $url->userinfo, 'sri:foobar',                   'right userinfo';
@@ -134,7 +134,7 @@ is $url->to_abs->base, 'http://kraih.com/bar/baz/', 'right base';
 
 # Real world tests
 $url = Mojo::URL->new('http://acme.s3.amazonaws.com'
-      . '/mojo%2Fg%2B%2B-4%2E2_4%2E2%2E3-2ubuntu7_i386%2Edeb');
+    . '/mojo%2Fg%2B%2B-4%2E2_4%2E2%2E3-2ubuntu7_i386%2Edeb');
 is $url->is_abs,   1,                                         'is absolute';
 is $url->scheme,   'http',                                    'right scheme';
 is $url->userinfo, undef,                                     'no userinfo';
@@ -150,7 +150,7 @@ is "$url",
 
 # Clone (advanced)
 $url = Mojo::URL->new(
-    'http://sri:foobar@kraih.com:8080/test/index.html?monkey=biz&foo=1#23');
+  'http://sri:foobar@kraih.com:8080/test/index.html?monkey=biz&foo=1#23');
 my $clone = $url->clone;
 is $clone->is_abs,   1,                  'is absolute';
 is $clone->scheme,   'http',             'right scheme';
@@ -246,7 +246,7 @@ is $url->query->param('q'), 'шарифулин', 'right query value';
 
 # IRI/IDNA
 $url = Mojo::URL->new(
-    'http://☃.net/привет/привет/?привет=шарифулин'
+  'http://☃.net/привет/привет/?привет=шарифулин'
 );
 is $url->is_abs, 1,             'is absolute';
 is $url->scheme, 'http',        'right scheme';

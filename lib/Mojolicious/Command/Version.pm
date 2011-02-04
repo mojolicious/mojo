@@ -16,42 +16,41 @@ EOF
 
 # "If at first you don't succeed, give up."
 sub run {
-    my $self = shift;
+  my $self = shift;
 
-    # Latest version
-    my ($current) = $Mojolicious::VERSION =~ /^([^_]+)/;
-    my $latest = $current;
-    eval {
-        Mojo::Client->new->max_redirects(3)
-          ->get('search.cpan.org/dist/Mojolicious')->res->dom('.version')
-          ->each(sub { $latest = $_->text if $_->text =~ /^[\d\.]+$/ });
-    };
+  # Latest version
+  my ($current) = $Mojolicious::VERSION =~ /^([^_]+)/;
+  my $latest = $current;
+  eval {
+    Mojo::Client->new->max_redirects(3)
+      ->get('search.cpan.org/dist/Mojolicious')->res->dom('.version')
+      ->each(sub { $latest = $_->text if $_->text =~ /^[\d\.]+$/ });
+  };
 
-    # Message
-    my $message = 'This version is up to date, have fun!';
-    $message = 'Thanks for testing a development release, you are awesome!'
-      if $latest < $current;
-    $message = "You might want to update your Mojolicious to $latest."
-      if $latest > $current;
+  # Message
+  my $message = 'This version is up to date, have fun!';
+  $message = 'Thanks for testing a development release, you are awesome!'
+    if $latest < $current;
+  $message = "You might want to update your Mojolicious to $latest."
+    if $latest > $current;
 
-    # Epoll
-    my $epoll = Mojo::IOLoop::EPOLL() ? $IO::Epoll::VERSION : 'not installed';
+  # Epoll
+  my $epoll = Mojo::IOLoop::EPOLL() ? $IO::Epoll::VERSION : 'not installed';
 
-    # KQueue
-    my $kqueue =
-      Mojo::IOLoop::KQUEUE() ? $IO::KQueue::VERSION : 'not installed';
+  # KQueue
+  my $kqueue =
+    Mojo::IOLoop::KQUEUE() ? $IO::KQueue::VERSION : 'not installed';
 
-    # TLS
-    my $tls =
-      Mojo::IOLoop::TLS() ? $IO::Socket::SSL::VERSION : 'not installed';
+  # TLS
+  my $tls = Mojo::IOLoop::TLS() ? $IO::Socket::SSL::VERSION : 'not installed';
 
-    # Bonjour
-    my $bonjour =
-      eval 'Mojo::Server::Daemon::BONJOUR()'
-      ? $Net::Rendezvous::Publish::VERSION
-      : 'not installed';
+  # Bonjour
+  my $bonjour =
+    eval 'Mojo::Server::Daemon::BONJOUR()'
+    ? $Net::Rendezvous::Publish::VERSION
+    : 'not installed';
 
-    print <<"EOF";
+  print <<"EOF";
 CORE
   Perl        ($], $^O)
   Mojolicious ($Mojolicious::VERSION, $Mojolicious::CODENAME)
@@ -65,7 +64,7 @@ OPTIONAL
 $message
 EOF
 
-    return $self;
+  return $self;
 }
 
 1;
@@ -77,10 +76,10 @@ Mojolicious::Command::Version - Version Command
 
 =head1 SYNOPSIS
 
-    use Mojolicious::Command::Version;
+  use Mojolicious::Command::Version;
 
-    my $v = Mojolicious::Command::Version->new;
-    $v->run(@ARGV);
+  my $v = Mojolicious::Command::Version->new;
+  $v->run(@ARGV);
 
 =head1 DESCRIPTION
 
@@ -93,15 +92,15 @@ L<Mojo::Command> and implements the following new ones.
 
 =head2 C<description>
 
-    my $description = $v->description;
-    $v              = $v->description('Foo!');
+  my $description = $v->description;
+  $v              = $v->description('Foo!');
 
 Short description of this command, used for the command list.
 
 =head2 C<usage>
 
-    my $usage = $v->usage;
-    $v        = $v->usage('Foo!');
+  my $usage = $v->usage;
+  $v        = $v->usage('Foo!');
 
 Usage information for this command, used for the help screen.
 
@@ -112,7 +111,7 @@ and implements the following new ones.
 
 =head2 C<run>
 
-    $get = $v->run(@ARGV);
+  $get = $v->run(@ARGV);
 
 Run this command.
 

@@ -22,8 +22,8 @@ plugin 'pod_renderer';
 
 # GET /
 get '/' => sub {
-    my $self = shift;
-    $self->render('simple', handler => 'pod');
+  my $self = shift;
+  $self->render('simple', handler => 'pod');
 };
 
 # POST /

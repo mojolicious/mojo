@@ -12,13 +12,13 @@ EOF
 
 # "Oh boy! Sleep! That's when I'm a Viking!"
 sub run {
-    my $self    = shift;
-    my $fastcgi = Mojo::Server::FastCGI->new;
+  my $self    = shift;
+  my $fastcgi = Mojo::Server::FastCGI->new;
 
-    # Run
-    $fastcgi->run;
+  # Run
+  $fastcgi->run;
 
-    return $self;
+  return $self;
 }
 
 1;
@@ -30,10 +30,10 @@ Mojolicious::Command::Fastcgi - FastCGI Command
 
 =head1 SYNOPSIS
 
-    use Mojolicious::Command::Fastcgi;
+  use Mojolicious::Command::Fastcgi;
 
-    my $fastcgi = Mojolicious::Command::Fastcgi->new;
-    $fastcgi->run;
+  my $fastcgi = Mojolicious::Command::Fastcgi->new;
+  $fastcgi->run;
 
 =head1 DESCRIPTION
 
@@ -47,15 +47,15 @@ L<Mojo::Command> and implements the following new ones.
 
 =head2 C<description>
 
-    my $description = $fastcgi->description;
-    $fastcgi        = $fastcgi->description('Foo!');
+  my $description = $fastcgi->description;
+  $fastcgi        = $fastcgi->description('Foo!');
 
 Short description of this command, used for the command list.
 
 =head2 C<usage>
 
-    my $usage = $fastcgi->usage;
-    $fastcgi  = $fastcgi->usage('Foo!');
+  my $usage = $fastcgi->usage;
+  $fastcgi  = $fastcgi->usage('Foo!');
 
 Usage information for this command, used for the help screen.
 
@@ -66,7 +66,7 @@ and implements the following new ones.
 
 =head2 C<run>
 
-    $fastcgi = $fastcgi->run;
+  $fastcgi = $fastcgi->run;
 
 Run this command.
 

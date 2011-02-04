@@ -109,9 +109,10 @@ is_deeply [$params->param('foo')], [qw/bar baz/], 'right values';
 is $params->param('a'), 'b', 'right value';
 is_deeply [$params->param('bar')], [qw/bas test/], 'right values';
 is_deeply $params->to_hash,
-  { foo => ['bar', 'baz'],
-    a   => 'b',
-    bar => ['bas', 'test']
+  {
+  foo => ['bar', 'baz'],
+  a   => 'b',
+  bar => ['bas', 'test']
   },
   'right structure';
 

@@ -23,7 +23,7 @@ Mojo::Asset - Asset Base Class
 
 =head1 SYNOPSIS
 
-    use Mojo::Base 'Mojo::Asset';
+  use Mojo::Base 'Mojo::Asset';
 
 =head1 DESCRIPTION
 
@@ -35,15 +35,15 @@ L<Mojo::Asset> implements the following attributes.
 
 =head2 C<end_range>
 
-    my $end = $asset->end_range;
-    $asset  = $asset->end_range(8);
+  my $end = $asset->end_range;
+  $asset  = $asset->end_range(8);
 
 Pretend file ends earlier.
 
 =head2 C<start_range>
 
-    my $start = $asset->start_range;
-    $asset    = $asset->start_range(0);
+  my $start = $asset->start_range;
+  $asset    = $asset->start_range(0);
 
 Pretend file starts later.
 
@@ -54,37 +54,37 @@ following new ones.
 
 =head2 C<add_chunk>
 
-    $asset = $asset->add_chunk('foo bar baz');
+  $asset = $asset->add_chunk('foo bar baz');
 
 Add chunk of data to asset.
 
 =head2 C<contains>
 
-    my $position = $asset->contains('bar');
+  my $position = $asset->contains('bar');
 
 Check if asset contains a specific string.
 
 =head2 C<get_chunk>
 
-    my $chunk = $asset->get_chunk($offset);
+  my $chunk = $asset->get_chunk($offset);
 
 Get chunk of data starting from a specific position.
 
 =head2 C<move_to>
 
-    $asset = $asset->move_to('/foo/bar/baz.txt');
+  $asset = $asset->move_to('/foo/bar/baz.txt');
 
 Move asset data into a specific file.
 
 =head2 C<size>
 
-    my $size = $asset->size;
+  my $size = $asset->size;
 
 Size of asset data in bytes.
 
 =head2 C<slurp>
 
-    my $string = $file->slurp;
+  my $string = $file->slurp;
 
 Read all asset data at once.
 

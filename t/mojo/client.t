@@ -103,53 +103,53 @@ my $port   = $client->ioloop->generate_port;
 my $buffer = {};
 my $last;
 my $id = $client->ioloop->listen(
-    port      => $port,
-    on_accept => sub {
-        my ($loop, $id) = @_;
-        $last = $id;
-        $buffer->{$id} = '';
-    },
-    on_read => sub {
-        my ($loop, $id, $chunk) = @_;
-        $buffer->{$id} .= $chunk;
-        if (index $buffer->{$id}, "\x0d\x0a\x0d\x0a") {
-            delete $buffer->{$id};
-            $loop->write($id => "HTTP/1.1 200 OK\x0d\x0a"
-                  . "Connection: keep-alive\x0d\x0a"
-                  . "Content-Length: 6\x0d\x0a\x0d\x0aworks!");
-        }
-    },
-    on_error => sub {
-        my ($self, $id) = @_;
-        delete $buffer->{$id};
+  port      => $port,
+  on_accept => sub {
+    my ($loop, $id) = @_;
+    $last = $id;
+    $buffer->{$id} = '';
+  },
+  on_read => sub {
+    my ($loop, $id, $chunk) = @_;
+    $buffer->{$id} .= $chunk;
+    if (index $buffer->{$id}, "\x0d\x0a\x0d\x0a") {
+      delete $buffer->{$id};
+      $loop->write($id => "HTTP/1.1 200 OK\x0d\x0a"
+          . "Connection: keep-alive\x0d\x0a"
+          . "Content-Length: 6\x0d\x0a\x0d\x0aworks!");
     }
+  },
+  on_error => sub {
+    my ($self, $id) = @_;
+    delete $buffer->{$id};
+  }
 );
 
 # Wonky server (missing Content-Length header)
 my $port2   = $client->ioloop->generate_port;
 my $buffer2 = {};
 $client->ioloop->listen(
-    port      => $port2,
-    on_accept => sub {
-        my ($loop, $id) = @_;
-        $buffer2->{$id} = '';
-    },
-    on_read => sub {
-        my ($loop, $id, $chunk) = @_;
-        $buffer2->{$id} .= $chunk;
-        if (index($buffer2->{$id}, "\x0d\x0a\x0d\x0a") >= 0) {
-            delete $buffer2->{$id};
-            $loop->write(
-                $id => "HTTP/1.1 200 OK\x0d\x0a"
-                  . "Content-Type: text/plain\x0d\x0a\x0d\x0aworks too!",
-                sub { shift->drop(shift) }
-            );
-        }
-    },
-    on_error => sub {
-        my ($self, $id) = @_;
-        delete $buffer2->{$id};
+  port      => $port2,
+  on_accept => sub {
+    my ($loop, $id) = @_;
+    $buffer2->{$id} = '';
+  },
+  on_read => sub {
+    my ($loop, $id, $chunk) = @_;
+    $buffer2->{$id} .= $chunk;
+    if (index($buffer2->{$id}, "\x0d\x0a\x0d\x0a") >= 0) {
+      delete $buffer2->{$id};
+      $loop->write(
+        $id => "HTTP/1.1 200 OK\x0d\x0a"
+          . "Content-Type: text/plain\x0d\x0a\x0d\x0aworks too!",
+        sub { shift->drop(shift) }
+      );
     }
+  },
+  on_error => sub {
+    my ($self, $id) = @_;
+    delete $buffer2->{$id};
+  }
 );
 
 # GET /
@@ -161,22 +161,22 @@ is $tx->res->body, 'works', 'right content';
 # GET / (custom connection)
 my ($success, $code, $body);
 $client->ioloop->connect(
-    address    => 'localhost',
-    port       => $port,
-    on_connect => sub {
-        my ($loop, $id) = @_;
-        my $tx = $client->build_tx(GET => "http://mojolicio.us:$port/");
-        $tx->connection($id);
-        $client->start(
-            $tx => sub {
-                my $self = shift;
-                $self->ioloop->drop($id);
-                $success = $self->tx->success;
-                $code    = $self->res->code;
-                $body    = $self->res->body;
-            }
-        );
-    }
+  address    => 'localhost',
+  port       => $port,
+  on_connect => sub {
+    my ($loop, $id) = @_;
+    my $tx = $client->build_tx(GET => "http://mojolicio.us:$port/");
+    $tx->connection($id);
+    $client->start(
+      $tx => sub {
+        my $self = shift;
+        $self->ioloop->drop($id);
+        $success = $self->tx->success;
+        $code    = $self->res->code;
+        $body    = $self->res->body;
+      }
+    );
+  }
 );
 $client->ioloop->start;
 ok $success, 'successful';
@@ -272,26 +272,26 @@ is $tx->res->body, 'works!', 'right content';
 # Nested keep alive
 my @kept_alive;
 $client->async->get(
-    '/',
-    sub {
+  '/',
+  sub {
+    my ($self, $tx) = @_;
+    push @kept_alive, $tx->kept_alive;
+    $self->async->get(
+      '/',
+      sub {
         my ($self, $tx) = @_;
         push @kept_alive, $tx->kept_alive;
         $self->async->get(
-            '/',
-            sub {
-                my ($self, $tx) = @_;
-                push @kept_alive, $tx->kept_alive;
-                $self->async->get(
-                    '/',
-                    sub {
-                        my ($self, $tx) = @_;
-                        push @kept_alive, $tx->kept_alive;
-                        $self->async->ioloop->stop;
-                    }
-                )->start;
-            }
+          '/',
+          sub {
+            my ($self, $tx) = @_;
+            push @kept_alive, $tx->kept_alive;
+            $self->async->ioloop->stop;
+          }
         )->start;
-    }
+      }
+    )->start;
+  }
 )->start;
 $client->async->ioloop->start;
 is_deeply \@kept_alive, [undef, 1, 1], 'connections kept alive';
@@ -301,21 +301,21 @@ is_deeply \@kept_alive, [undef, 1, 1], 'connections kept alive';
 my $async = $client->async;
 my $loop  = $async->ioloop;
 $async->get(
-    '/',
-    sub {
-        push @kept_alive, pop->kept_alive;
-        $loop->timer(
-            '0.25' => sub {
-                $async->get(
-                    '/',
-                    sub {
-                        push @kept_alive, pop->kept_alive;
-                        $loop->timer('0.25' => sub { $loop->stop });
-                    }
-                )->start;
-            }
-        );
-    }
+  '/',
+  sub {
+    push @kept_alive, pop->kept_alive;
+    $loop->timer(
+      '0.25' => sub {
+        $async->get(
+          '/',
+          sub {
+            push @kept_alive, pop->kept_alive;
+            $loop->timer('0.25' => sub { $loop->stop });
+          }
+        )->start;
+      }
+    );
+  }
 )->start;
 $loop->start;
 is_deeply \@kept_alive, [1, 1], 'connections kept alive';

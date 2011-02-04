@@ -23,11 +23,11 @@ plugin charset => {charset => 'Shift_JIS'};
 
 # UTF-8 text renderer
 app->renderer->add_handler(
-    test => sub {
-        my ($r, $c, $output, $options) = @_;
-        delete $options->{encoding};
-        $$output = b($c->stash->{test})->encode('UTF-8')->to_string;
-    }
+  test => sub {
+    my ($r, $c, $output, $options) = @_;
+    delete $options->{encoding};
+    $$output = b($c->stash->{test})->encode('UTF-8')->to_string;
+  }
 );
 
 # GET /
@@ -35,20 +35,20 @@ get '/' => 'index';
 
 # POST /
 post '/' => sub {
-    my $self = shift;
-    $self->render_text("foo: " . $self->param('foo'));
+  my $self = shift;
+  $self->render_text("foo: " . $self->param('foo'));
 };
 
 # POST /data
 post '/data' => sub {
-    my $self = shift;
-    $self->render_data($self->req->body, format => 'bin');
+  my $self = shift;
+  $self->render_data($self->req->body, format => 'bin');
 };
 
 # GET /unicode
 get '/unicode' => sub {
-    my $self = shift;
-    $self->render(test => $yatta, handler => 'test', format => 'txt');
+  my $self = shift;
+  $self->render(test => $yatta, handler => 'test', format => 'txt');
 };
 
 # GET /json
@@ -69,9 +69,9 @@ $t->post_form_ok('/', '', {foo => $yatta_sjis})->status_is(200)
 
 # Send raw Shift_JIS octets (like browsers do, multipart message)
 $t->post_form_ok(
-    '/', '',
-    {foo            => $yatta_sjis},
-    {'Content-Type' => 'multipart/form-data'}
+  '/', '',
+  {foo            => $yatta_sjis},
+  {'Content-Type' => 'multipart/form-data'}
   )->status_is(200)->content_type_like(qr/Shift_JIS/)
   ->content_like(qr/$yatta/);
 
@@ -81,9 +81,9 @@ $t->post_form_ok('/', 'shift_jis', {foo => $yatta})->status_is(200)
 
 # Send as string (multipart message)
 $t->post_form_ok(
-    '/', 'shift_jis',
-    {foo            => $yatta},
-    {'Content-Type' => 'multipart/form-data'}
+  '/', 'shift_jis',
+  {foo            => $yatta},
+  {'Content-Type' => 'multipart/form-data'}
   )->status_is(200)->content_type_like(qr/Shift_JIS/)
   ->content_like(qr/$yatta/);
 

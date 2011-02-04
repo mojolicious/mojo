@@ -10,15 +10,15 @@ EOF
 
 # "If for any reason you're not completely satisfied, I hate you."
 sub run {
-    my ($self, $name) = @_;
-    $name ||= 'myapp.pl';
+  my ($self, $name) = @_;
+  $name ||= 'myapp.pl';
 
-    # App
-    $self->renderer->line_start('%%');
-    $self->renderer->tag_start('<%%');
-    $self->renderer->tag_end('%%>');
-    $self->render_to_rel_file('liteapp', $name);
-    $self->chmod_file($name, 0744);
+  # App
+  $self->renderer->line_start('%%');
+  $self->renderer->tag_start('<%%');
+  $self->renderer->tag_end('%%>');
+  $self->render_to_rel_file('liteapp', $name);
+  $self->chmod_file($name, 0744);
 }
 
 1;
@@ -33,8 +33,8 @@ use Mojolicious::Lite;
 plugin 'pod_renderer';
 
 get '/welcome' => sub {
-    my $self = shift;
-    $self->render('index');
+  my $self = shift;
+  $self->render('index');
 };
 
 app->start;
@@ -47,8 +47,8 @@ Welcome to Mojolicious!
 
 <%%= '@@ layouts/default.html.ep' %%>
 <!doctype html><html>
-    <head><title><%= title %></title></head>
-    <body><%= content %></body>
+  <head><title><%= title %></title></head>
+  <body><%= content %></body>
 </html>
 __END__
 =head1 NAME
@@ -57,10 +57,10 @@ Mojolicious::Command::Generate::LiteApp - Lite App Generator Command
 
 =head1 SYNOPSIS
 
-    use Mojolicious::Command::Generate::LiteApp;
+  use Mojolicious::Command::Generate::LiteApp;
 
-    my $app = Mojolicious::Command::Generate::LiteApp->new;
-    $app->run(@ARGV);
+  my $app = Mojolicious::Command::Generate::LiteApp->new;
+  $app->run(@ARGV);
 
 =head1 DESCRIPTION
 
@@ -73,15 +73,15 @@ L<Mojo::Command> and implements the following new ones.
 
 =head2 C<description>
 
-    my $description = $app->description;
-    $app            = $app->description('Foo!');
+  my $description = $app->description;
+  $app            = $app->description('Foo!');
 
 Short description of this command, used for the command list.
 
 =head2 C<usage>
 
-    my $usage = $app->usage;
-    $app      = $app->usage('Foo!');
+  my $usage = $app->usage;
+  $app      = $app->usage('Foo!');
 
 Usage information for this command, used for the help screen.
 
@@ -92,7 +92,7 @@ L<Mojo::Command> and implements the following new ones.
 
 =head2 C<run>
 
-    $app->run(@ARGV);
+  $app->run(@ARGV);
 
 Run this command.
 

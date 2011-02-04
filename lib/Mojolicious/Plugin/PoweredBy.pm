@@ -8,17 +8,17 @@ use Mojo::Base 'Mojolicious::Plugin';
 #  and the octopus ate all his acorns.
 #  And also he got a racecar. Is any of this getting through to you?"
 sub register {
-    my ($self, $app, $args) = @_;
+  my ($self, $app, $args) = @_;
 
-    # Name
-    my $name = $args->{name} || 'Mojolicious (Perl)';
+  # Name
+  my $name = $args->{name} || 'Mojolicious (Perl)';
 
-    # Add header
-    $app->hook(
-        after_build_tx => sub {
-            shift->res->headers->header('X-Powered-By' => $name);
-        }
-    );
+  # Add header
+  $app->hook(
+    after_build_tx => sub {
+      shift->res->headers->header('X-Powered-By' => $name);
+    }
+  );
 }
 
 1;
@@ -30,13 +30,13 @@ Mojolicious::Plugin::PoweredBy - Powered By Plugin
 
 =head1 SYNOPSIS
 
-    # Mojolicious
-    $self->plugin('powered_by');
-    $self->plugin(powered_by => (name => 'MyApp 1.0'));
+  # Mojolicious
+  $self->plugin('powered_by');
+  $self->plugin(powered_by => (name => 'MyApp 1.0'));
 
-    # Mojolicious::Lite
-    plugin 'powered_by';
-    plugin powered_by => (name => 'MyApp 1.0');
+  # Mojolicious::Lite
+  plugin 'powered_by';
+  plugin powered_by => (name => 'MyApp 1.0');
 
 =head1 DESCRIPTION
 
@@ -49,7 +49,7 @@ example for learning to build new plugins.
 
 =head2 C<powered_by>
 
-    plugin powered_by => (name => 'MyApp 1.0');
+  plugin powered_by => (name => 'MyApp 1.0');
 
 Value for C<X-Powered-By> header.
 
@@ -60,7 +60,7 @@ L<Mojolicious::Plugin> and implements the following new ones.
 
 =head2 C<register>
 
-    $plugin->register;
+  $plugin->register;
 
 Register plugin hooks in L<Mojolicious> application.
 

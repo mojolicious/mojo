@@ -15,14 +15,14 @@ EOF
 
 # "D’oh."
 sub run {
-    my $self = shift;
-    my $psgi = Mojo::Server::PSGI->new;
+  my $self = shift;
+  my $psgi = Mojo::Server::PSGI->new;
 
-    # Preload
-    $psgi->app;
+  # Preload
+  $psgi->app;
 
-    # Return app callback
-    return sub { $psgi->run(@_) };
+  # Return app callback
+  return sub { $psgi->run(@_) };
 }
 
 1;
@@ -34,10 +34,10 @@ Mojolicious::Command::Psgi - PSGI Command
 
 =head1 SYNOPSIS
 
-    use Mojolicious::Command::Psgi;
+  use Mojolicious::Command::Psgi;
 
-    my $psgi = Mojolicious::Command::Psgi->new;
-    my $app = $psgi->run;
+  my $psgi = Mojolicious::Command::Psgi->new;
+  my $app = $psgi->run;
 
 =head1 DESCRIPTION
 
@@ -51,15 +51,15 @@ and implements the following new ones.
 
 =head2 C<description>
 
-    my $description = $psgi->description;
-    $psgi           = $psgi->description('Foo!');
+  my $description = $psgi->description;
+  $psgi           = $psgi->description('Foo!');
 
 Short description of this command, used for the command list.
 
 =head2 C<usage>
 
-    my $usage = $psgi->usage;
-    $psgi     = $psgi->usage('Foo!');
+  my $usage = $psgi->usage;
+  $psgi     = $psgi->usage('Foo!');
 
 Usage information for this command, used for the help screen.
 
@@ -70,7 +70,7 @@ implements the following new ones.
 
 =head2 C<run>
 
-    my $app = $psgi->run;
+  my $app = $psgi->run;
 
 Run this command.
 

@@ -5,38 +5,38 @@ use Mojo::Base 'Mojolicious::Plugin';
 #  And by "devil", I mean Robot Devil.
 #  And by "metaphorically", I mean get your coat."
 sub register {
-    my ($self, $app) = @_;
+  my ($self, $app) = @_;
 
-    # Header
-    $app->routes->add_condition(
-        headers => sub {
-            my ($r, $c, $captures, $patterns) = @_;
+  # Header
+  $app->routes->add_condition(
+    headers => sub {
+      my ($r, $c, $captures, $patterns) = @_;
 
-            # Patterns
-            return unless $patterns && ref $patterns eq 'HASH';
+      # Patterns
+      return unless $patterns && ref $patterns eq 'HASH';
 
-            # Match
-            my $passed;
-            while (my ($k, $v) = each(%$patterns)) {
-                my $header = $c->req->headers->header($k);
-                if ($header && $v && ref $v eq 'Regexp' && $header =~ $v) {
-                    $passed = 1;
-                    next;
-                }
-                elsif ($header && defined $v && $v eq $header) {
-                    $passed = 1;
-                    next;
-                }
-                $passed = undef;
-            }
-
-            # Success
-            return 1 if $passed;
-
-            # Robot 1-X, save my friends! And Zoidberg!
-            return;
+      # Match
+      my $passed;
+      while (my ($k, $v) = each(%$patterns)) {
+        my $header = $c->req->headers->header($k);
+        if ($header && $v && ref $v eq 'Regexp' && $header =~ $v) {
+          $passed = 1;
+          next;
         }
-    );
+        elsif ($header && defined $v && $v eq $header) {
+          $passed = 1;
+          next;
+        }
+        $passed = undef;
+      }
+
+      # Success
+      return 1 if $passed;
+
+      # Robot 1-X, save my friends! And Zoidberg!
+      return;
+    }
+  );
 }
 
 1;
@@ -48,19 +48,19 @@ Mojolicious::Plugin::HeaderCondition - Header Condition Plugin
 
 =head1 SYNOPSIS
 
-    # Mojolicious
-    $self->plugin('header_condition');
+  # Mojolicious
+  $self->plugin('header_condition');
 
-    # Must match all of these headers
-    $self->routes->route('/:controller/:action')->over(headers => {
-        X-Secret-Header => 'Foo',
-        Referer => qr/^https?:\/\/example\.com\//
-    })->to('foo#bar');
+  # Must match all of these headers
+  $self->routes->route('/:controller/:action')->over(headers => {
+    X-Secret-Header => 'Foo',
+    Referer => qr/^https?:\/\/example\.com\//
+  })->to('foo#bar');
 
-    # Mojolicious::Lite
-    plugin 'header_condition';
-    get '/' => (headers => {'Referer' => qr/^https?:\/\/example\.com\//})
-      => sub {...};
+  # Mojolicious::Lite
+  plugin 'header_condition';
+  get '/' => (headers => {'Referer' => qr/^https?:\/\/example\.com\//})
+    => sub {...};
 
 =head1 DESCRIPTION
 
@@ -74,7 +74,7 @@ L<Mojolicious::Plugin> and implements the following new ones.
 
 =head2 C<register>
 
-    $plugin->register;
+  $plugin->register;
 
 Register condition in L<Mojolicious> application.
 

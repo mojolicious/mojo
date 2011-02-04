@@ -6,122 +6,123 @@ require Data::Dumper;
 # "You're watching Futurama,
 #  the show that doesn't condone the cool crime of robbery."
 sub register {
-    my ($self, $app) = @_;
+  my ($self, $app) = @_;
 
-    # Add "app" helper
-    $app->helper(app => sub { shift->app });
+  # Add "app" helper
+  $app->helper(app => sub { shift->app });
 
-    # Add "content" helper
-    $app->helper(content => sub { shift->render_inner(@_) });
+  # Add "content" helper
+  $app->helper(content => sub { shift->render_inner(@_) });
 
-    # Add "content_for" helper
-    $app->helper(
-        content_for => sub {
-            my $self = shift;
-            my $name = shift;
-            $self->render_inner($name, $self->render_inner($name), @_);
-        }
-    );
+  # Add "content_for" helper
+  $app->helper(
+    content_for => sub {
+      my $self = shift;
+      my $name = shift;
+      $self->render_inner($name, $self->render_inner($name), @_);
+    }
+  );
 
-    # Add "dumper" helper
-    $app->helper(
-        dumper => sub {
-            shift;
-            Data::Dumper->new([@_])->Maxdepth(2)->Indent(1)->Terse(1)->Dump;
-        }
-    );
+  # Add "dumper" helper
+  $app->helper(
+    dumper => sub {
+      shift;
+      Data::Dumper->new([@_])->Maxdepth(2)->Indent(1)->Terse(1)->Dump;
+    }
+  );
 
-    # Add "extends" helper
-    $app->helper(
-        extends => sub {
-            my $self  = shift;
-            my $stash = $self->stash;
-            $stash->{extends} = shift if @_;
-            $self->stash(@_) if @_;
-            return $stash->{extends};
-        }
-    );
+  # Add "extends" helper
+  $app->helper(
+    extends => sub {
+      my $self  = shift;
+      my $stash = $self->stash;
+      $stash->{extends} = shift if @_;
+      $self->stash(@_) if @_;
+      return $stash->{extends};
+    }
+  );
 
-    # Add "flash" helper
-    $app->helper(flash => sub { shift->flash(@_) });
+  # Add "flash" helper
+  $app->helper(flash => sub { shift->flash(@_) });
 
-    # Add "include" helper
-    $app->helper(include => sub { shift->render_partial(@_) });
+  # Add "include" helper
+  $app->helper(include => sub { shift->render_partial(@_) });
 
-    # Add "layout" helper
-    $app->helper(
-        layout => sub {
-            my $self  = shift;
-            my $stash = $self->stash;
-            $stash->{layout} = shift if @_;
-            $self->stash(@_) if @_;
-            return $stash->{layout};
-        }
-    );
+  # Add "layout" helper
+  $app->helper(
+    layout => sub {
+      my $self  = shift;
+      my $stash = $self->stash;
+      $stash->{layout} = shift if @_;
+      $self->stash(@_) if @_;
+      return $stash->{layout};
+    }
+  );
 
-    # Add "memorize" helper
-    my $memorize = {};
-    $app->helper(
-        memorize => sub {
-            shift;
+  # Add "memorize" helper
+  my $memorize = {};
+  $app->helper(
+    memorize => sub {
+      shift;
 
-            # Callback
-            my $cb = pop;
-            return '' unless ref $cb && ref $cb eq 'CODE';
+      # Callback
+      my $cb = pop;
+      return '' unless ref $cb && ref $cb eq 'CODE';
 
-            # Name
-            my $name = shift;
+      # Name
+      my $name = shift;
 
-            # Arguments
-            my $args;
-            if (ref $name && ref $name eq 'HASH') {
-                $args = $name;
-                $name = undef;
-            }
-            else { $args = shift || {} }
+      # Arguments
+      my $args;
+      if (ref $name && ref $name eq 'HASH') {
+        $args = $name;
+        $name = undef;
+      }
+      else { $args = shift || {} }
 
-            # Default name
-            $name ||= join '', map { $_ || '' } caller(1);
+      # Default name
+      $name ||= join '', map { $_ || '' } caller(1);
 
-            # Expire
-            my $expires = $args->{expires} || 0;
-            delete $memorize->{$name}
-              if exists $memorize->{$name}
-                  && $expires > 0
-                  && $memorize->{$name}->{expires} < time;
+      # Expire
+      my $expires = $args->{expires} || 0;
+      delete $memorize->{$name}
+        if exists $memorize->{$name}
+          && $expires > 0
+          && $memorize->{$name}->{expires} < time;
 
-            # Memorized
-            return $memorize->{$name}->{content} if exists $memorize->{$name};
+      # Memorized
+      return $memorize->{$name}->{content} if exists $memorize->{$name};
 
-            # Memorize
-            $memorize->{$name}->{expires} = $expires;
-            $memorize->{$name}->{content} = $cb->();
-        }
-    );
+      # Memorize
+      $memorize->{$name}->{expires} = $expires;
+      $memorize->{$name}->{content} = $cb->();
+    }
+  );
 
-    # Add "param" helper
-    $app->helper(param =>
-          sub { wantarray ? (shift->param(@_)) : scalar shift->param(@_); });
+  # Add "param" helper
+  $app->helper(
+    param => sub { wantarray ? (shift->param(@_)) : scalar shift->param(@_); }
+  );
 
-    # Add "session" helper
-    $app->helper(session => sub { shift->session(@_) });
+  # Add "session" helper
+  $app->helper(session => sub { shift->session(@_) });
 
-    # Add "stash" helper
-    $app->helper(stash => sub { shift->stash(@_) });
+  # Add "stash" helper
+  $app->helper(stash => sub { shift->stash(@_) });
 
-    # Add "title" helper
-    $app->helper(
-        title => sub {
-            my $self  = shift;
-            my $stash = $self->stash;
-            $stash->{title} = shift if @_;
-            $self->stash(@_) if @_;
-            return $stash->{title};
-        }
-    );
+  # Add "title" helper
+  $app->helper(
+    title => sub {
+      my $self  = shift;
+      my $stash = $self->stash;
+      $stash->{title} = shift if @_;
+      $self->stash(@_) if @_;
+      return $stash->{title};
+    }
+  );
 
-    # Add "url_for" helper
-    $app->helper(url_for => sub { shift->url_for(@_) });
+  # Add "url_for" helper
+  $app->helper(url_for => sub { shift->url_for(@_) });
 }
 
 1;
@@ -133,11 +134,11 @@ Mojolicious::Plugin::DefaultHelpers - Default Helpers Plugin
 
 =head1 SYNOPSIS
 
-    # Mojolicious
-    $self->plugin('default_helpers');
+  # Mojolicious
+  $self->plugin('default_helpers');
 
-    # Mojolicious::Lite
-    plugin 'default_helpers';
+  # Mojolicious::Lite
+  plugin 'default_helpers';
 
 =head1 DESCRIPTION
 
@@ -150,108 +151,108 @@ example for learning to build new plugins.
 
 =head2 C<content>
 
-    <%= content %>
+  <%= content %>
 
 Insert content into a layout template.
 
 =head2 C<content_for>
 
-    <% content_for foo => begin %>
-        test
-    <% end %>
-    <%= content_for 'foo' %>
+  <% content_for foo => begin %>
+    test
+  <% end %>
+  <%= content_for 'foo' %>
 
 Append content to named buffer and retrieve it.
 
-    <% content_for message => begin %>
-        Hello
-    <% end %>
-    <% content_for message => begin %>
-        world!
-    <% end %>
-    <%= content_for 'message' %>
+  <% content_for message => begin %>
+    Hello
+  <% end %>
+  <% content_for message => begin %>
+    world!
+  <% end %>
+  <%= content_for 'message' %>
 
 =head2 C<dumper>
 
-    <%= dumper $foo %>
+  <%= dumper $foo %>
 
 Dump a Perl data structure using L<Data::Dumper>.
 
 =head2 C<extends>
 
-    <% extends 'foo'; %>
+  <% extends 'foo'; %>
 
 Extend a template.
 
 =head2 C<flash>
 
-    <%= flash 'foo' %>
+  <%= flash 'foo' %>
 
 Access flash values.
 
 =head2 C<include>
 
-    <%= include 'menubar' %>
-    <%= include 'menubar', format => 'txt' %>
+  <%= include 'menubar' %>
+  <%= include 'menubar', format => 'txt' %>
 
 Include a partial template.
 
 =head2 C<layout>
 
-    <% layout 'green'; %>
+  <% layout 'green'; %>
 
 Render this template with a layout.
 
 =head2 C<memorize>
 
-    <%= memorize begin %>
-        <%= time %>
-    <% end %>
-    <%= memorize {expires => time + 1} => begin %>
-        <%= time %>
-    <% end %>
-    <%= memorize foo => begin %>
-        <%= time %>
-    <% end %>
-    <%= memorize foo => {expires => time + 1} => begin %>
-        <%= time %>
-    <% end %>
+  <%= memorize begin %>
+    <%= time %>
+  <% end %>
+  <%= memorize {expires => time + 1} => begin %>
+    <%= time %>
+  <% end %>
+  <%= memorize foo => begin %>
+    <%= time %>
+  <% end %>
+  <%= memorize foo => {expires => time + 1} => begin %>
+    <%= time %>
+  <% end %>
 
 Memorize block result in memory and prevent future execution.
 
 =head2 C<param>
 
-    <%= param 'foo' %>
+  <%= param 'foo' %>
 
 Access request parameters and routes captures.
 
 =head2 C<session>
 
-    <%= session 'foo' %>
+  <%= session 'foo' %>
 
 Access session values.
 
 =head2 C<stash>
 
-    <%= stash 'foo' %>
-    <% stash foo => 'bar'; %>
+  <%= stash 'foo' %>
+  <% stash foo => 'bar'; %>
 
 Access stash values.
 
 =head2 C<title>
 
-    <% title 'Welcome!'; %>
-    <%= title %>
+  <% title 'Welcome!'; %>
+  <%= title %>
 
 Page title.
 
 =head2 C<url_for>
 
-    <%= url_for %>
-    <%= url_for controller => 'bar', action => 'baz' %>
-    <%= url_for 'named', controller => 'bar', action => 'baz' %>
-    <%= url_for '/perldoc' %>
-    <%= url_for 'http://mojolicio.us/perldoc' %>
+  <%= url_for %>
+  <%= url_for controller => 'bar', action => 'baz' %>
+  <%= url_for 'named', controller => 'bar', action => 'baz' %>
+  <%= url_for '/perldoc' %>
+  <%= url_for 'http://mojolicio.us/perldoc' %>
 
 Generate a portable L<Mojo::URL> object with base for a route, path or URL.
 
@@ -262,7 +263,7 @@ L<Mojolicious::Plugin> and implements the following new ones.
 
 =head2 C<register>
 
-    $plugin->register;
+  $plugin->register;
 
 Register helpers in L<Mojolicious> application.
 

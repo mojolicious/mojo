@@ -18,21 +18,21 @@ MVC is a software architectural pattern for graphical user iterface
 programming originating in Smalltalk-80, that separates application logic,
 presentation and input.
 
-             .------------.    .-------.    .------.
-    Input -> | Controller | -> | Model | -> | View | -> Output
-             '------------'    '-------'    '------'
+           .------------.    .-------.    .------.
+  Input -> | Controller | -> | Model | -> | View | -> Output
+           '------------'    '-------'    '------'
 
 A slightly modified version of the pattern moving some application logic into
 the C<controller> is the foundation of pretty much every web framework these
 days, including L<Mojolicious>.
 
-                .----------------.     .-------.
-    Request  -> |                | <-> | Model |
-                |                |     '-------'
-                |   Controller   |
-                |                |     .-------.
-    Response <- |                | <-> | View  |
-                '----------------'     '-------'
+              .----------------.     .-------.
+  Request  -> |                | <-> | Model |
+              |                |     '-------'
+              |   Controller   |
+              |                |     .-------.
+  Response <- |                | <-> | View  |
+              '----------------'     '-------'
 
 The C<controller> receives a request from a user, passes incoming data to the
 C<model> and retrieves data from it, which then gets turned into an actual
@@ -51,11 +51,11 @@ In REST terms, when you are opening a URL like C<http://mojolicio.us/foo>
 with your browser, you are basically asking the web server for the HTML
 C<representation> of the C<http://mojolicio.us/foo> C<resource>.
 
-    .--------.                                .--------.
-    |        | ->  http://mojolici.us/foo  -> |        |
-    | Client |                                | Server |
-    |        | <- <html>Mojo rocks!</html> <- |        |
-    '--------'                                '--------'
+  .--------.                                .--------.
+  |        | ->  http://mojolici.us/foo  -> |        |
+  | Client |                                | Server |
+  |        | <- <html>Mojo rocks!</html> <- |        |
+  '--------'                                '--------'
 
 The fundamental idea here is that all resources are uniquely addressable with
 URLs and every resource can have different representations such as HTML, RSS
@@ -63,21 +63,21 @@ or JSON.
 User interface concerns are separated from data storage concerns and all
 session state is kept client side.
 
-    .---------.                        .------------.
-    |         | ->    PUT /foo      -> |            |
-    |         | ->    Hello world!  -> |            |
-    |         |                        |            |
-    |         | <-    201 CREATED   <- |            |
-    |         |                        |            |
-    |         | ->    GET /foo      -> |            |
-    | Browser |                        | Web Server |
-    |         | <-    200 OK        <- |            |
-    |         | <-    Hello world!  <- |            |
-    |         |                        |            |
-    |         | ->    DELETE /foo   -> |            |
-    |         |                        |            |
-    |         | <-    200 OK        <- |            |
-    '---------'                        '------------'
+  .---------.                        .------------.
+  |         | ->    PUT /foo      -> |            |
+  |         | ->    Hello world!  -> |            |
+  |         |                        |            |
+  |         | <-    201 CREATED   <- |            |
+  |         |                        |            |
+  |         | ->    GET /foo      -> |            |
+  | Browser |                        | Web Server |
+  |         | <-    200 OK        <- |            |
+  |         | <-    Hello world!  <- |            |
+  |         |                        |            |
+  |         | ->    DELETE /foo   -> |            |
+  |         |                        |            |
+  |         | <-    200 OK        <- |            |
+  '---------'                        '------------'
 
 While HTTP methods such as C<PUT>, C<GET> and C<DELETE> are not directly part
 of REST they go very well with it and are commonly used to manipulate
@@ -90,28 +90,28 @@ about previous requests, which makes user friendly login systems very tricky.
 Sessions solve this problem by allowing web applications to keep stateful
 information across several HTTP requests.
 
-    GET /login?user=sri&pass=s3cret HTTP/1.1
-    Host: mojolicio.us
+  GET /login?user=sri&pass=s3cret HTTP/1.1
+  Host: mojolicio.us
 
-    HTTP/1.1 200 OK
-    Set-Cookie: sessionid=987654321
-    Content-Length: 10
-    Hello sri!
+  HTTP/1.1 200 OK
+  Set-Cookie: sessionid=987654321
+  Content-Length: 10
+  Hello sri!
 
-    GET /protected HTTP/1.1
-    Host: mojolicio.us
-    Cookie: $Version=1; sessionid=987654321
+  GET /protected HTTP/1.1
+  Host: mojolicio.us
+  Cookie: $Version=1; sessionid=987654321
 
-    HTTP/1.1 200 OK
-    Set-Cookie: sessionid=987654321
-    Content-Length: 16
-    Hello again sri!
+  HTTP/1.1 200 OK
+  Set-Cookie: sessionid=987654321
+  Content-Length: 16
+  Hello again sri!
 
 Traditionally all session data was stored on the server side and only session
 ids were exchanged between browser and web server in the form of cookies.
 
-    HTTP/1.1 200 OK
-    Set-Cookie: session=base64(hmac-md5(storable($session)))
+  HTTP/1.1 200 OK
+  Set-Cookie: session=base64(hmac-md5(storable($session)))
 
 In L<Mojolicious> however we are taking this concept one step further by
 storing everything in C<HMAC-MD5> signed cookies, which is more compatible
@@ -139,64 +139,64 @@ You likely know the feeling, you've got a really cool idea and want to try it
 as quickly as possible, thats exactly why L<Mojolicious::Lite> applications
 don't need more than a single file.
 
-    myapp.pl   # Templates and even static files can be inlined
+  myapp.pl   # Templates and even static files can be inlined
 
 Full L<Mojolicious> applications on the other hand are much closer to a well
 organized CPAN distribution to maximize maintainability.
 
-    myapp                      # Application directory
-    |- script                  # Script directory
-    |  `- myapp                # Application script
-    |- lib                     # Library directory
-    |  |- MyApp.pm             # Application class
-    |  `- MyApp                # Application namespace
-    |     `- Example.pm        # Controller class
-    |- t                       # Test directory
-    |  `- basic.t              # Random test
-    |- log                     # Log directory
-    |  `- development.log      # Development mode log file
-    |- public                  # Static file directory (served automatically)
-    |  `- index.html           # Static HTML file
-    `- templates               # Template directory
-       |- layouts              # Template directory for layouts
-       |  `- default.html.ep   # Layout template
-       `- example              # Template directory for "Example" controller
-          `- welcome.html.ep   # Template for "welcome" action
+  myapp                      # Application directory
+  |- script                  # Script directory
+  |  `- myapp                # Application script
+  |- lib                     # Library directory
+  |  |- MyApp.pm             # Application class
+  |  `- MyApp                # Application namespace
+  |     `- Example.pm        # Controller class
+  |- t                       # Test directory
+  |  `- basic.t              # Random test
+  |- log                     # Log directory
+  |  `- development.log      # Development mode log file
+  |- public                  # Static file directory (served automatically)
+  |  `- index.html           # Static HTML file
+  `- templates               # Template directory
+     |- layouts              # Template directory for layouts
+     |  `- default.html.ep   # Layout template
+     `- example              # Template directory for "Example" controller
+        `- welcome.html.ep   # Template for "welcome" action
 
 Both application skeletons can be automatically generated.
 
-    % mojo generate lite_app
-    ...
+  % mojo generate lite_app
+  ...
 
-    % mojo generate app
-    ...
+  % mojo generate app
+  ...
 
 =head2 Foundation
 
 We start our new application with a single executable Perl script.
 
-    % mkdir myapp
-    % cd myapp
-    % touch myapp.pl
-    % chmod 744 myapp.pl
+  % mkdir myapp
+  % cd myapp
+  % touch myapp.pl
+  % chmod 744 myapp.pl
 
 This will be the foundation for our login manager example application.
 
-    #!/usr/bin/env perl
-    use Mojolicious::Lite;
+  #!/usr/bin/env perl
+  use Mojolicious::Lite;
 
-    get '/' => sub {
-        my $self = shift;
-        $self->render(text => 'Hello world!');
-    };
+  get '/' => sub {
+    my $self = shift;
+    $self->render(text => 'Hello world!');
+  };
 
-    app->start;
+  app->start;
 
 The built in web server makes working on your application a lot of fun thanks
 to automatic reloading.
 
-    % ./myapp.pl daemon --reload
-    Server available at http://*:3000.
+  % ./myapp.pl daemon --reload
+  Server available at http://*:3000.
 
 Just save your changes and they will be automatically in effect the next time
 you refresh your browser.
@@ -207,70 +207,70 @@ In L<Mojolicious> we consider web applications simple frontends for existing
 business logic, that means L<Mojolicious> is by design entirely L<model>
 layer agnostic and you just use whatever Perl modules you like most.
 
-    % mkdir lib
-    % touch lib/MyUsers.pm
-    % chmod 644 lib/MyUsers.pm
+  % mkdir lib
+  % touch lib/MyUsers.pm
+  % chmod 644 lib/MyUsers.pm
 
 Our login manager will simply use a plain old Perl module abstracting away
 all logic related to matching user names and passwords.
 
-    package MyUsers;
+  package MyUsers;
 
-    use strict;
-    use warnings;
+  use strict;
+  use warnings;
 
-    my $USERS = {
-        sri    => 'secr3t',
-        marcus => 'lulz',
-        yko    => 'zeecaptain'
-    };
+  my $USERS = {
+    sri    => 'secr3t',
+    marcus => 'lulz',
+    yko    => 'zeecaptain'
+  };
 
-    sub new { bless {}, shift }
+  sub new { bless {}, shift }
 
-    sub check {
-        my ($self, $user, $pass) = @_;
+  sub check {
+    my ($self, $user, $pass) = @_;
 
-        # Success
-        return 1 if $USERS->{$user} && $USERS->{$user} eq $pass;
+    # Success
+    return 1 if $USERS->{$user} && $USERS->{$user} eq $pass;
 
-        # Fail
-        return;
-    }
+    # Fail
+    return;
+  }
 
-    1;
+  1;
 
 A simple C<helper> function can be registered with the C<helper> method of
 L<Mojolicious> to make our C<model> available to all actions and templates.
 
-    #!/usr/bin/env perl
-    use Mojolicious::Lite;
+  #!/usr/bin/env perl
+  use Mojolicious::Lite;
 
-    use lib 'lib';
-    use MyUsers;
+  use lib 'lib';
+  use MyUsers;
 
-    # Model instance
-    my $users = MyUsers->new;
+  # Model instance
+  my $users = MyUsers->new;
 
-    # Helper function returning our model instance
-    app->helper(users => sub { return $users });
+  # Helper function returning our model instance
+  app->helper(users => sub { return $users });
 
-    # /?user=sri&pass=secr3t
-    any '/' => sub {
-        my $self = shift;
+  # /?user=sri&pass=secr3t
+  any '/' => sub {
+    my $self = shift;
 
-        # Query parameters
-        my $user = $self->param('user') || '';
-        my $pass = $self->param('pass') || '';
+    # Query parameters
+    my $user = $self->param('user') || '';
+    my $pass = $self->param('pass') || '';
 
-        # Check password
-        return $self->render(text => "Welcome $user!")
-          if $self->users->check($user, $pass);
+    # Check password
+    return $self->render(text => "Welcome $user!")
+      if $self->users->check($user, $pass);
 
-        # Failed
-        $self->render(text => 'Wrong username or password!');
-    };
+    # Failed
+    $self->render(text => 'Wrong username or password!');
+  };
 
-    app->start;
+  app->start;
 
 The C<param> method of our L<Mojolicious::Controller> instance is used to
 access query parameters, POST parameters and route placeholders, all at once.
@@ -280,95 +280,95 @@ access query parameters, POST parameters and route placeholders, all at once.
 In L<Mojolicious> we take test driven development very serious and try to
 promote it wherever we can.
 
-    % mkdir t
-    % touch t/login.t
-    % chmod 644 t/login.t
+  % mkdir t
+  % touch t/login.t
+  % chmod 644 t/login.t
 
 L<Test::Mojo> is a scriptable HTTP user agent designed specifically for
 testing, with many fun state of the art features such as CSS3 selectors based
 on L<Mojo::DOM>.
 
-    use Test::More tests => 16;
-    use Test::Mojo;
+  use Test::More tests => 16;
+  use Test::Mojo;
 
-    # Include application and help with home directory detection
-    use FindBin;
-    $ENV{MOJO_HOME} = "$FindBin::Bin/../";
-    require "$ENV{MOJO_HOME}/myapp.pl";
+  # Include application and help with home directory detection
+  use FindBin;
+  $ENV{MOJO_HOME} = "$FindBin::Bin/../";
+  require "$ENV{MOJO_HOME}/myapp.pl";
 
-    # Allow 302 redirect responses
-    my $t = Test::Mojo->new(max_redirects => 1);
+  # Allow 302 redirect responses
+  my $t = Test::Mojo->new(max_redirects => 1);
 
-    # Test if the HTML login form exists
-    $t->get_ok('/')->status_is(200)
-      ->element_exists('form input[name="user"]')
-      ->element_exists('form input[name="pass"]')
-      ->element_exists('form input[type="submit"]');
+  # Test if the HTML login form exists
+  $t->get_ok('/')->status_is(200)
+    ->element_exists('form input[name="user"]')
+    ->element_exists('form input[name="pass"]')
+    ->element_exists('form input[type="submit"]');
 
-    # Test login with valid credentials
-    $t->post_form_ok('/' => {user => 'sri', pass => 'secr3t'})
-      ->status_is(200)->text_like('html body' => qr/Welcome sri/);
+  # Test login with valid credentials
+  $t->post_form_ok('/' => {user => 'sri', pass => 'secr3t'})
+    ->status_is(200)->text_like('html body' => qr/Welcome sri/);
 
-    # Test accessing a protected page
-    $t->get_ok('/protected')->status_is(200)->text_like('a' => qr/Logout/);
+  # Test accessing a protected page
+  $t->get_ok('/protected')->status_is(200)->text_like('a' => qr/Logout/);
 
-    # Test if HTML login form shows up again after logout
-    $t->get_ok('/logout')->status_is(200)
-      ->element_exists('form input[name="user"]')
-      ->element_exists('form input[name="pass"]')
-      ->element_exists('form input[type="submit"]');
+  # Test if HTML login form shows up again after logout
+  $t->get_ok('/logout')->status_is(200)
+    ->element_exists('form input[name="user"]')
+    ->element_exists('form input[name="pass"]')
+    ->element_exists('form input[type="submit"]');
 
 From now on you can always check your progress by running these unit tests
 against your application.
 
-    % ./myapp.pl test
-    ...
-    % perl t/login.t
-    ...
+  % ./myapp.pl test
+  ...
+  % perl t/login.t
+  ...
 
 To make the tests less noisy and limit log output to just C<error> messages
 you can also add a line like this.
 
-    $t->app->log->level('error');
+  $t->app->log->level('error');
 
 Quick C<GET> requests can be performed right from the command line.
 
-    % ./myapp.pl get /
-    Wrong username or password!
+  % ./myapp.pl get /
+  Wrong username or password!
 
-    % ./myapp.pl get -v /?user=sri&pass=secr3t
-    HTTP/1.1 200 OK
-    Connection: Keep-Alive
-    Date: Sun, 18 Jul 2010 13:09:58 GMT
-    Server: Mojolicious (Perl)
-    Content-Length: 12
-    Content-Type: text/plain
+  % ./myapp.pl get -v /?user=sri&pass=secr3t
+  HTTP/1.1 200 OK
+  Connection: Keep-Alive
+  Date: Sun, 18 Jul 2010 13:09:58 GMT
+  Server: Mojolicious (Perl)
+  Content-Length: 12
+  Content-Type: text/plain
 
-    Welcome sri!
+  Welcome sri!
 
 =head2 State Keeping
 
 Sessions in L<Mojolicious> pretty much just work out of the box and there is
 no setup required, but we suggest using a more secure C<secret> passphrase.
 
-    app->secret('Mojolicious rocks!');
+  app->secret('Mojolicious rocks!');
 
 This passphrase is used by the C<HMAC-MD5> algorithm to make signed cookies
 secure and can be changed at any time to invalidate all existing sessions.
 
-    $self->session(user => 'sri');
-    my $user = $self->session('user');
+  $self->session(user => 'sri');
+  my $user = $self->session('user');
 
 By default all sessions expire after one hour, and the whole session can be
 deleted by setting an expiration date in the past.
 
-    $self->session(expires => 1);
+  $self->session(expires => 1);
 
 For data that should only be visible on the next request, like a confirmation
 message after a 302 redirect, you can use the C<flash>.
 
-    $self->flash(message => 'Everything is fine!');
-    $self->redirect_to('goodbye');
+  $self->flash(message => 'Everything is fine!');
+  $self->redirect_to('goodbye');
 
 Just remember that everything is stored in C<HMAC-MD5> signed cookies, so
 there is usually a 4096 byte limit, depending on the browser.
@@ -378,87 +378,87 @@ there is usually a 4096 byte limit, depending on the browser.
 A final C<myapp.pl> prototype passing all of the unit tests above could look
 like this.
 
-    #!/usr/bin/env perl
-    use Mojolicious::Lite;
+  #!/usr/bin/env perl
+  use Mojolicious::Lite;
 
-    use lib 'lib';
-    use MyUsers;
+  use lib 'lib';
+  use MyUsers;
 
-    # Make signed cookies secure
-    app->secret('Mojolicious rocks!');
+  # Make signed cookies secure
+  app->secret('Mojolicious rocks!');
 
-    my $users = MyUsers->new;
-    app->helper(users => sub { return $users });
+  my $users = MyUsers->new;
+  app->helper(users => sub { return $users });
 
-    # Main login action
-    any '/' => sub {
-        my $self = shift;
+  # Main login action
+  any '/' => sub {
+    my $self = shift;
 
-        # Query or POST parameters
-        my $user = $self->param('user') || '';
-        my $pass = $self->param('pass') || '';
+    # Query or POST parameters
+    my $user = $self->param('user') || '';
+    my $pass = $self->param('pass') || '';
 
-        # Check password and render "index.html.ep" if neccessary
-        return $self->render unless $self->users->check($user, $pass);
+    # Check password and render "index.html.ep" if neccessary
+    return $self->render unless $self->users->check($user, $pass);
 
-        # Store user name in session
-        $self->session(user => $user);
+    # Store user name in session
+    $self->session(user => $user);
 
-        # Store a friendly message for the next page in flash
-        $self->flash(message => 'Thanks for logging in!');
+    # Store a friendly message for the next page in flash
+    $self->flash(message => 'Thanks for logging in!');
 
-        # Redirect to protected page with a 302 response
-        $self->redirect_to('protected');
-    } => 'index';
+    # Redirect to protected page with a 302 response
+    $self->redirect_to('protected');
+  } => 'index';
 
-    # A protected page auto rendering "protected.html.ep"
-    get '/protected' => sub {
-        my $self = shift;
+  # A protected page auto rendering "protected.html.ep"
+  get '/protected' => sub {
+    my $self = shift;
 
-        # Redirect to main page with a 302 response if user is not logged in
-        return $self->redirect_to('index') unless $self->session('user');
-    } => 'protected';
+    # Redirect to main page with a 302 response if user is not logged in
+    return $self->redirect_to('index') unless $self->session('user');
+  } => 'protected';
 
-    # Logout action
-    get '/logout' => sub {
-        my $self = shift;
+  # Logout action
+  get '/logout' => sub {
+    my $self = shift;
 
-        # Expire and in turn clear session automatically
-        $self->session(expires => 1);
+    # Expire and in turn clear session automatically
+    $self->session(expires => 1);
 
-        # Redirect to main page with a 302 response
-        $self->redirect_to('index');
-    } => 'logout';
+    # Redirect to main page with a 302 response
+    $self->redirect_to('index');
+  } => 'logout';
 
-    app->start;
-    __DATA__
+  app->start;
+  __DATA__
 
-    @@ layouts/default.html.ep
-    <!doctype html><html>
-        <head><title>Login Manager</title></head>
-        <body><%= content %></body>
-    </html>
+  @@ layouts/default.html.ep
+  <!doctype html><html>
+    <head><title>Login Manager</title></head>
+    <body><%= content %></body>
+  </html>
 
-    @@ index.html.ep
-    % layout 'default';
-    <%= form_for index => begin %>
-        <% if (param 'user') { %>
-            <b>Wrong name or password, please try again.</b><br>
-        <% } %>
-        Name:<br>
-        <%= text_field 'user' %><br>
-        Password:<br>
-        <%= password_field 'pass' %><br>
-        <%= submit_button 'Login' %>
-    <% end %>
-
-    @@ protected.html.ep
-    % layout 'default';
-    <% if (my $message = flash 'message') { %>
-        <b><%= $message %></b><br>
+  @@ index.html.ep
+  % layout 'default';
+  <%= form_for index => begin %>
+    <% if (param 'user') { %>
+      <b>Wrong name or password, please try again.</b><br>
     <% } %>
-    Welcome <%= session 'user' %>!<br>
-    <%= link_to Logout => 'logout' %>
+    Name:<br>
+    <%= text_field 'user' %><br>
+    Password:<br>
+    <%= password_field 'pass' %><br>
+    <%= submit_button 'Login' %>
+  <% end %>
+
+  @@ protected.html.ep
+  % layout 'default';
+  <% if (my $message = flash 'message') { %>
+    <b><%= $message %></b><br>
+  <% } %>
+  Welcome <%= session 'user' %>!<br>
+  <%= link_to Logout => 'logout' %>
 
 More information about built in template helpers can be found in
 L<Mojolicious::Plugin::DefaultHelpers> and
@@ -476,8 +476,8 @@ All templates and static files inlined in the C<DATA> section can be
 automatically turned into separate files in the C<templates> and C<public>
 directories.
 
-    % ./myapp.pl inflate
-    ...
+  % ./myapp.pl inflate
+  ...
 
 Those directories always get priority, so inflating can also be a great way
 to allow your users to customize their applications.
@@ -487,54 +487,54 @@ to allow your users to customize their applications.
 This is the heart of every full L<Mojolicious> application and always gets
 instantiated during server startup.
 
-    % touch lib/MyApp.pm
-    % chmod 644 lib/MyApp.pm
+  % touch lib/MyApp.pm
+  % chmod 644 lib/MyApp.pm
 
 We will start by extracting all actions from C<myapp.pl> and turn them into
 simplified hybrid routes in the L<Mojolicious::Routes> router, none of the
 actual action code needs to be changed.
 
-    package MyApp;
-    use Mojo::Base 'Mojolicious';
+  package MyApp;
+  use Mojo::Base 'Mojolicious';
 
-    use MyUsers;
+  use MyUsers;
 
-    sub startup {
-        my $self = shift;
+  sub startup {
+    my $self = shift;
 
-        $self->secret('Mojolicious rocks!');
-        my $users = MyUsers->new;
-        $self->helper(users => sub { return $users });
+    $self->secret('Mojolicious rocks!');
+    my $users = MyUsers->new;
+    $self->helper(users => sub { return $users });
 
-        # Router
-        my $r = $self->routes;
+    # Router
+    my $r = $self->routes;
 
-        $r->any('/' => sub {
-            my $self = shift;
+    $r->any('/' => sub {
+      my $self = shift;
 
-            my $user = $self->param('user') || '';
-            my $pass = $self->param('pass') || '';
+      my $user = $self->param('user') || '';
+      my $pass = $self->param('pass') || '';
 
-            return $self->render unless $self->users->check($user, $pass);
+      return $self->render unless $self->users->check($user, $pass);
 
-            $self->session(user => $user);
-            $self->flash(message => 'Thanks for logging in!');
-            $self->redirect_to('protected');
-        } => 'index');
+      $self->session(user => $user);
+      $self->flash(message => 'Thanks for logging in!');
+      $self->redirect_to('protected');
+    } => 'index');
 
-        $r->get('/protected' => sub {
-            my $self = shift;
-            return $self->redirect_to('index') unless $self->session('user');
-        } => 'protected');
+    $r->get('/protected' => sub {
+      my $self = shift;
+      return $self->redirect_to('index') unless $self->session('user');
+    } => 'protected');
 
-        $r->get('/logout' => sub {
-            my $self = shift;
-            $self->session(expires => 1);
-            $self->redirect_to('index');
-        } => 'logout');
-    }
+    $r->get('/logout' => sub {
+      my $self = shift;
+      $self->session(expires => 1);
+      $self->redirect_to('index');
+    } => 'logout');
+  }
 
-    1;
+  1;
 
 The C<startup> method of L<Mojolicious> gets called right after instantiation
 and is the place where the whole application gets set up.
@@ -544,57 +544,57 @@ and is the place where the whole application gets set up.
 C<myapp.pl> itself can now be turned into a simplified application script to
 allow running unit tests again.
 
-    #!/usr/bin/env perl
+  #!/usr/bin/env perl
 
-    use strict;
-    use warnings;
+  use strict;
+  use warnings;
 
-    # Load application class
-    use lib 'lib';
-    use MyApp;
+  # Load application class
+  use lib 'lib';
+  use MyApp;
 
-    # Start application
-    MyApp->start;
+  # Start application
+  MyApp->start;
 
 =head2 Controller Class
 
 Hybrid routes are a nice intermediate step, but to maximize maintainability
 it makes sense to split our action code from its routing information.
 
-    % mkdir lib/MyApp
-    % touch lib/MyApp/Login.pm
-    % chmod 644 lib/MyApp/Login.pm
+  % mkdir lib/MyApp
+  % touch lib/MyApp/Login.pm
+  % chmod 644 lib/MyApp/Login.pm
 
 Once again the actual action code does not change at all.
 
-    package MyApp::Login;
-    use Mojo::Base 'Mojolicious::Controller';
+  package MyApp::Login;
+  use Mojo::Base 'Mojolicious::Controller';
 
-    sub index {
-        my $self = shift;
+  sub index {
+    my $self = shift;
 
-        my $user = $self->param('user') || '';
-        my $pass = $self->param('pass') || '';
+    my $user = $self->param('user') || '';
+    my $pass = $self->param('pass') || '';
 
-        return $self->render unless $self->users->check($user, $pass);
+    return $self->render unless $self->users->check($user, $pass);
 
-        $self->session(user => $user);
-        $self->flash(message => 'Thanks for logging in!');
-        $self->redirect_to('protected');
-    }
+    $self->session(user => $user);
+    $self->flash(message => 'Thanks for logging in!');
+    $self->redirect_to('protected');
+  }
 
-    sub protected {
-        my $self = shift;
-        return $self->redirect_to('index') unless $self->session('user');
-    }
+  sub protected {
+    my $self = shift;
+    return $self->redirect_to('index') unless $self->session('user');
+  }
 
-    sub logout {
-        my $self = shift;
-        $self->session(expires => 1);
-        $self->redirect_to('index');
-    }
+  sub logout {
+    my $self = shift;
+    $self->session(expires => 1);
+    $self->redirect_to('index');
+  }
 
-    1;
+  1;
 
 All L<Mojolicious::Controller> controllers are plain old Perl classes and get
 instantiated on demand.
@@ -604,25 +604,25 @@ instantiated on demand.
 The application class C<lib/MyApp.pm> can now be reduced to model and routing
 information.
 
-    package MyApp;
-    use Mojo::Base 'Mojolicious';
+  package MyApp;
+  use Mojo::Base 'Mojolicious';
 
-    use MyUsers;
+  use MyUsers;
 
-    sub startup {
-        my $self = shift;
+  sub startup {
+    my $self = shift;
 
-        $self->secret('Mojolicious rocks!');
-        my $users = MyUsers->new;
-        $self->helper(users => sub { return $users });
+    $self->secret('Mojolicious rocks!');
+    my $users = MyUsers->new;
+    $self->helper(users => sub { return $users });
 
-        my $r = $self->routes;
-        $r->any('/')->to('login#index')->name('index');
-        $r->get('/protected')->to('login#protected')->name('protected');
-        $r->get('/logout')->to('login#logout')->name('logout');
-    }
+    my $r = $self->routes;
+    $r->any('/')->to('login#index')->name('index');
+    $r->get('/protected')->to('login#protected')->name('protected');
+    $r->get('/logout')->to('login#logout')->name('logout');
+  }
 
-    1;
+  1;
 
 L<Mojolicious::Routes> allows many route variations, choose whatever you like
 most.
@@ -632,72 +632,72 @@ most.
 Templates are usually bound to controllers, so they need to be moved into the
 appropriate directories.
 
-    % mkdir templates/login
-    % mv templates/index.html.ep templates/login/index.html.ep
-    % mv templates/protected.html.ep templates/login/protected.html.ep
+  % mkdir templates/login
+  % mv templates/index.html.ep templates/login/index.html.ep
+  % mv templates/protected.html.ep templates/login/protected.html.ep
 
 =head2 Script
 
 Finally C<myapp.pl> can be replaced with a proper L<Mojolicious> script.
 
-    % rm myapp.pl
-    % mkdir script
-    % touch script/myapp
-    % chmod 744 script/myapp
+  % rm myapp.pl
+  % mkdir script
+  % touch script/myapp
+  % chmod 744 script/myapp
 
 The library detection code was specifically designed for tricky production
 environments.
 
-    #!/usr/bin/env perl
+  #!/usr/bin/env perl
 
-    use strict;
-    use warnings;
+  use strict;
+  use warnings;
 
-    use File::Basename 'dirname';
-    use File::Spec;
+  use File::Basename 'dirname';
+  use File::Spec;
 
-    use lib join '/', File::Spec->splitdir(dirname(__FILE__)), 'lib';
-    use lib join '/', File::Spec->splitdir(dirname(__FILE__)), '..', 'lib';
+  use lib join '/', File::Spec->splitdir(dirname(__FILE__)), 'lib';
+  use lib join '/', File::Spec->splitdir(dirname(__FILE__)), '..', 'lib';
 
-    # Check if Mojo is installed
-    eval 'use Mojolicious::Commands';
-    die <<EOF if $@;
-    It looks like you don't have the Mojolicious Framework installed.
-    Please visit http://mojolicio.us for detailed installation instructions.
+  # Check if Mojo is installed
+  eval 'use Mojolicious::Commands';
+  die <<EOF if $@;
+  It looks like you don't have the Mojolicious Framework installed.
+  Please visit http://mojolicio.us for detailed installation instructions.
 
-    EOF
+  EOF
 
-    # Application
-    $ENV{MOJO_APP} ||= 'MyApp';
+  # Application
+  $ENV{MOJO_APP} ||= 'MyApp';
 
-    # Start commands
-    Mojolicious::Commands->start;
+  # Start commands
+  Mojolicious::Commands->start;
 
 =head2 Simplified Tests
 
 Normal L<Mojolicious> applications are a little easier to test and don't need
 help with home directory detection, so C<t/login.t> can be simplified.
 
-    use Test::More tests => 16;
-    use Test::Mojo;
+  use Test::More tests => 16;
+  use Test::Mojo;
 
-    # Load application class
-    my $t = Test::Mojo->new(app => 'MyApp', max_redirects => 1);
+  # Load application class
+  my $t = Test::Mojo->new(app => 'MyApp', max_redirects => 1);
 
-    $t->get_ok('/')->status_is(200)
-      ->element_exists('form input[name="user"]')
-      ->element_exists('form input[name="pass"]')
-      ->element_exists('form input[type="submit"]');
+  $t->get_ok('/')->status_is(200)
+    ->element_exists('form input[name="user"]')
+    ->element_exists('form input[name="pass"]')
+    ->element_exists('form input[type="submit"]');
 
-    $t->post_form_ok('/' => {user => 'sri', pass => 'secr3t'})
-      ->status_is(200)->text_like('html body' => qr/Welcome sri/);
+  $t->post_form_ok('/' => {user => 'sri', pass => 'secr3t'})
+    ->status_is(200)->text_like('html body' => qr/Welcome sri/);
 
-    $t->get_ok('/protected')->status_is(200)->text_like('a' => qr/Logout/);
+  $t->get_ok('/protected')->status_is(200)->text_like('a' => qr/Logout/);
 
-    $t->get_ok('/logout')->status_is(200)
-      ->element_exists('form input[name="user"]')
-      ->element_exists('form input[name="pass"]')
-      ->element_exists('form input[type="submit"]');
+  $t->get_ok('/logout')->status_is(200)
+    ->element_exists('form input[name="user"]')
+    ->element_exists('form input[name="pass"]')
+    ->element_exists('form input[type="submit"]');
 
 Test driven development takes a little getting used to, but is very well
 worth it!

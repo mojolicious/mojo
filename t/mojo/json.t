@@ -185,7 +185,7 @@ is_deeply $array, ["\x{10346}"], 'decode \x{feff}[\"\\ud800\\udf46\"]';
 
 # Decode UTF-16LE with faihu surrogate pair and BOM value
 $array = $json->decode(
-    b("\x{feff}[\"\\ud800\\udf46\x{feff}\"]")->encode('UTF-16LE'));
+  b("\x{feff}[\"\\ud800\\udf46\x{feff}\"]")->encode('UTF-16LE'));
 is_deeply $array, ["\x{10346}\x{feff}"],
   'decode \x{feff}[\"\\ud800\\udf46\x{feff}\"]';
 

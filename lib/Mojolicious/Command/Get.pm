@@ -21,95 +21,95 @@ EOF
 
 # "I hope this has taught you kids a lesson: kids never learn."
 sub run {
-    my $self = shift;
+  my $self = shift;
 
-    # Options
-    local @ARGV = @_ if @_;
-    my ($redirect, $verbose) = 0;
-    GetOptions(
-        'redirect' => sub { $redirect = 1 },
-        'verbose'  => sub { $verbose  = 1 }
-    );
+  # Options
+  local @ARGV = @_ if @_;
+  my ($redirect, $verbose) = 0;
+  GetOptions(
+    'redirect' => sub { $redirect = 1 },
+    'verbose'  => sub { $verbose  = 1 }
+  );
 
-    # URL
-    my $url = $ARGV[0];
-    die $self->usage unless $url;
-    decode 'UTF-8', $url;
+  # URL
+  my $url = $ARGV[0];
+  die $self->usage unless $url;
+  decode 'UTF-8', $url;
 
-    # Client
-    my $client = Mojo::Client->new(ioloop => Mojo::IOLoop->singleton);
+  # Client
+  my $client = Mojo::Client->new(ioloop => Mojo::IOLoop->singleton);
 
-    # Silence
-    $client->log->level('fatal');
+  # Silence
+  $client->log->level('fatal');
 
-    # Absolute URL
-    if ($url =~ /^\w+:\/\//) { $client->detect_proxy }
+  # Absolute URL
+  if ($url =~ /^\w+:\/\//) { $client->detect_proxy }
 
-    # Application
-    else { $client->app($ENV{MOJO_APP} || 'Mojo::HelloWorld') }
+  # Application
+  else { $client->app($ENV{MOJO_APP} || 'Mojo::HelloWorld') }
 
-    # Follow redirects
-    $client->max_redirects(5) if $redirect;
+  # Follow redirects
+  $client->max_redirects(5) if $redirect;
 
-    # Start
-    my $v;
-    $client->on_start(
+  # Start
+  my $v;
+  $client->on_start(
+    sub {
+      my $tx = pop;
+
+      # Prepare request information
+      my $req       = $tx->req;
+      my $startline = $req->build_start_line;
+      my $headers   = $req->build_headers;
+
+      # Verbose callback
+      my $v  = $verbose;
+      my $cb = sub {
+        my $res = shift;
+
+        # Wait for headers
+        return unless $v && $res->headers->is_done;
+
+        # Request
+        warn "$startline$headers";
+
+        # Response
+        my $version = $res->version;
+        my $code    = $res->code;
+        my $message = $res->message;
+        warn "HTTP/$version $code $message\n",
+          $res->headers->to_string, "\n\n";
+
+        # Done
+        $v = 0;
+      };
+
+      # Progress
+      $tx->res->on_progress(sub { $cb->(shift) });
+
+      # Stream content
+      $tx->res->body(
         sub {
-            my $tx = pop;
+          $cb->(my $res = shift);
 
-            # Prepare request information
-            my $req       = $tx->req;
-            my $startline = $req->build_start_line;
-            my $headers   = $req->build_headers;
+          # Ignore intermediate content
+          return if $redirect && $res->is_status_class(300);
 
-            # Verbose callback
-            my $v  = $verbose;
-            my $cb = sub {
-                my $res = shift;
-
-                # Wait for headers
-                return unless $v && $res->headers->is_done;
-
-                # Request
-                warn "$startline$headers";
-
-                # Response
-                my $version = $res->version;
-                my $code    = $res->code;
-                my $message = $res->message;
-                warn "HTTP/$version $code $message\n",
-                  $res->headers->to_string, "\n\n";
-
-                # Done
-                $v = 0;
-            };
-
-            # Progress
-            $tx->res->on_progress(sub { $cb->(shift) });
-
-            # Stream content
-            $tx->res->body(
-                sub {
-                    $cb->(my $res = shift);
-
-                    # Ignore intermediate content
-                    return if $redirect && $res->is_status_class(300);
-
-                    # Chunk
-                    print pop;
-                }
-            );
+          # Chunk
+          print pop;
         }
-    );
+      );
+    }
+  );
 
-    # Get
-    my $tx = $client->get($url);
+  # Get
+  my $tx = $client->get($url);
 
-    # Error
-    my ($message, $code) = $tx->error;
-    warn qq/Problem loading URL "$url". ($message)\n/ if $message && !$code;
+  # Error
+  my ($message, $code) = $tx->error;
+  warn qq/Problem loading URL "$url". ($message)\n/ if $message && !$code;
 
-    return $self;
+  return $self;
 }
 
 1;
@@ -121,10 +121,10 @@ Mojolicious::Command::Get - Get Command
 
 =head1 SYNOPSIS
 
-    use Mojolicious::Command::Get;
+  use Mojolicious::Command::Get;
 
-    my $get = Mojolicious::Command::Get->new;
-    $get->run(@ARGV);
+  my $get = Mojolicious::Command::Get->new;
+  $get->run(@ARGV);
 
 =head1 DESCRIPTION
 
@@ -137,15 +137,15 @@ and implements the following new ones.
 
 =head2 C<description>
 
-    my $description = $get->description;
-    $get            = $get->description('Foo!');
+  my $description = $get->description;
+  $get            = $get->description('Foo!');
 
 Short description of this command, used for the command list.
 
 =head2 C<usage>
 
-    my $usage = $get->usage;
-    $get      = $get->usage('Foo!');
+  my $usage = $get->usage;
+  $get      = $get->usage('Foo!');
 
 Usage information for this command, used for the help screen.
 
@@ -156,7 +156,7 @@ implements the following new ones.
 
 =head2 C<run>
 
-    $get = $get->run(@ARGV);
+  $get = $get->run(@ARGV);
 
 Run this command.
 

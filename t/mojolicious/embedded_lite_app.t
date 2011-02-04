@@ -19,9 +19,9 @@ use Mojolicious::Lite;
 
 # GET /hello (embedded)
 get '/hello' => sub {
-    my $self = shift;
-    my $name = $self->stash('name');
-    $self->render_text("Hello from the $name app!");
+  my $self = shift;
+  my $name = $self->stash('name');
+  $self->render_text("Hello from the $name app!");
 };
 
 # "Morbo will now introduce the candidates - Puny Human Number One,
@@ -32,24 +32,24 @@ package MyTestApp::Test1;
 use Mojolicious::Lite;
 
 get '/yada' => sub {
-    my $self = shift;
-    my $name = $self->stash('name');
-    $self->render(text => "yada $name works!");
+  my $self = shift;
+  my $name = $self->stash('name');
+  $self->render(text => "yada $name works!");
 };
 
 # GET /bye (embedded)
 get '/bye' => sub {
-    my $self  = shift;
-    my $name  = $self->stash('name');
-    my $async = '';
-    $self->render_later;
-    $self->client->async->get(
-        '/hello/hello' => sub {
-            my $client = shift;
-            $self->render_text($client->res->body . "$name! $async");
-        }
-    )->start;
-    $async .= 'success!';
+  my $self  = shift;
+  my $name  = $self->stash('name');
+  my $async = '';
+  $self->render_later;
+  $self->client->async->get(
+    '/hello/hello' => sub {
+      my $client = shift;
+      $self->render_text($client->res->body . "$name! $async");
+    }
+  )->start;
+  $async .= 'success!';
 };
 
 package MyTestApp::Test2;
@@ -57,21 +57,21 @@ use Mojolicious::Lite;
 
 # GET / (embedded)
 get '/' => sub {
-    my $self = shift;
-    my $name = $self->param('name');
-    my $url  = $self->url_for;
-    $self->render_text("Bye from the $name app! $url!");
+  my $self = shift;
+  my $name = $self->param('name');
+  my $url  = $self->url_for;
+  $self->render_text("Bye from the $name app! $url!");
 };
 
 package MyTestApp::Basic;
 use Mojo::Base 'Mojo';
 
 sub handler {
-    my ($self, $c) = @_;
-    $c->res->code(200);
-    my $test = $c->param('test');
-    $c->res->body("Hello $test!");
-    $c->rendered;
+  my ($self, $c) = @_;
+  $c->res->code(200);
+  my $test = $c->param('test');
+  $c->res->body("Hello $test!");
+  $c->rendered;
 }
 
 package main;

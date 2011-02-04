@@ -24,10 +24,10 @@ my $loop   = Mojo::IOLoop->new;
 my $client = Mojo::Client->new;
 my $code;
 $client->get(
-    'http://cpan.org' => sub {
-        my $self = shift;
-        $code = $self->res->code;
-    }
+  'http://cpan.org' => sub {
+    my $self = shift;
+    $code = $self->res->code;
+  }
 )->start;
 $client = undef;
 my $ticks = 0;
@@ -66,12 +66,12 @@ $async->get('http://mojolicio.us', sub { shift->ioloop->stop })->start;
 $async->ioloop->start;
 my $kept_alive = undef;
 $async->get(
-    'http://mojolicio.us',
-    sub {
-        my $self = shift;
-        $self->ioloop->stop;
-        $kept_alive = shift->kept_alive;
-    }
+  'http://mojolicio.us',
+  sub {
+    my $self = shift;
+    $self->ioloop->stop;
+    $kept_alive = shift->kept_alive;
+  }
 )->start;
 $async->ioloop->start;
 is $kept_alive, 1, 'connection was kept alive';
@@ -79,26 +79,26 @@ is $kept_alive, 1, 'connection was kept alive';
 # Nested keep alive
 my @kept_alive;
 $client->async->get(
-    'http://mojolicio.us',
-    sub {
+  'http://mojolicio.us',
+  sub {
+    my ($self, $tx) = @_;
+    push @kept_alive, $tx->kept_alive;
+    $self->async->get(
+      'http://mojolicio.us',
+      sub {
         my ($self, $tx) = @_;
         push @kept_alive, $tx->kept_alive;
         $self->async->get(
-            'http://mojolicio.us',
-            sub {
-                my ($self, $tx) = @_;
-                push @kept_alive, $tx->kept_alive;
-                $self->async->get(
-                    'http://mojolicio.us',
-                    sub {
-                        my ($self, $tx) = @_;
-                        push @kept_alive, $tx->kept_alive;
-                        $self->ioloop->stop;
-                    }
-                )->start;
-            }
+          'http://mojolicio.us',
+          sub {
+            my ($self, $tx) = @_;
+            push @kept_alive, $tx->kept_alive;
+            $self->ioloop->stop;
+          }
         )->start;
-    }
+      }
+    )->start;
+  }
 )->start;
 $client->ioloop->start;
 is_deeply \@kept_alive, [1, 1, 1], 'connections kept alive';
@@ -129,12 +129,12 @@ is $res->code,   200,             'right status';
 my ($method, $url);
 $code = undef;
 $client->get(
-    'cpan.org' => sub {
-        my $self = shift;
-        $method = $self->req->method;
-        $url    = $self->req->url;
-        $code   = $self->res->code;
-    }
+  'cpan.org' => sub {
+    my $self = shift;
+    $method = $self->req->method;
+    $url    = $self->req->url;
+    $code   = $self->res->code;
+  }
 )->start;
 is $method, 'GET',             'right method';
 is $url,    'http://cpan.org', 'right url';
@@ -154,7 +154,7 @@ is $tx->res->code, 200,         'right status';
 
 # Simple form post
 $tx = $client->post_form(
-    'http://search.cpan.org/search' => {query => 'mojolicious'});
+  'http://search.cpan.org/search' => {query => 'mojolicious'});
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->url, 'http://search.cpan.org/search', 'right url';
 is $tx->req->headers->content_length, 17, 'right content length';
@@ -166,13 +166,13 @@ is $tx->res->code,   200,                 'right status';
 my $body;
 ($method, $url, $code) = undef;
 $client->get(
-    'http://www.apache.org' => sub {
-        my $self = shift;
-        $method = $self->req->method;
-        $url    = $self->req->url;
-        $body   = $self->req->body;
-        $code   = $self->res->code;
-    }
+  'http://www.apache.org' => sub {
+    my $self = shift;
+    $method = $self->req->method;
+    $url    = $self->req->url;
+    $body   = $self->req->body;
+    $code   = $self->res->code;
+  }
 )->start;
 is $method, 'GET',                   'right method';
 is $url,    'http://www.apache.org', 'right url';
@@ -182,32 +182,32 @@ is $code,   200,                     'right status';
 # Simple parallel requests with keep alive
 ($method, $url, $code) = undef;
 $client->get(
-    'http://google.com' => sub {
-        my $self = shift;
-        $method = $self->req->method;
-        $url    = $self->req->url;
-        $code   = $self->res->code;
-    }
+  'http://google.com' => sub {
+    my $self = shift;
+    $method = $self->req->method;
+    $url    = $self->req->url;
+    $code   = $self->res->code;
+  }
 );
 my ($method2, $url2, $code2);
 $kept_alive = undef;
 $client->get(
-    'http://www.apache.org' => sub {
-        my $self = shift;
-        $method2    = $self->req->method;
-        $url2       = $self->req->url;
-        $code2      = $self->res->code;
-        $kept_alive = $self->tx->kept_alive;
-    }
+  'http://www.apache.org' => sub {
+    my $self = shift;
+    $method2    = $self->req->method;
+    $url2       = $self->req->url;
+    $code2      = $self->res->code;
+    $kept_alive = $self->tx->kept_alive;
+  }
 );
 my ($method3, $url3, $code3);
 $client->get(
-    'http://www.google.de' => sub {
-        my $self = shift;
-        $method3 = $self->req->method;
-        $url3    = $self->req->url;
-        $code3   = $self->res->code;
-    }
+  'http://www.google.de' => sub {
+    my $self = shift;
+    $method3 = $self->req->method;
+    $url3    = $self->req->url;
+    $code3   = $self->res->code;
+  }
 );
 $client->start;
 is $method,     'GET',                   'right method';
@@ -225,15 +225,15 @@ is $code3,      200,                     'right status';
 ($method, $url, $code, $method2, $url2, $code2) = undef;
 $client->max_redirects(3);
 $client->get(
-    'http://www.google.com' => sub {
-        my ($self, $tx) = @_;
-        $method  = $tx->req->method;
-        $url     = $tx->req->url;
-        $code    = $tx->res->code;
-        $method2 = $tx->previous->req->method;
-        $url2    = $tx->previous->req->url;
-        $code2   = $tx->previous->res->code;
-    }
+  'http://www.google.com' => sub {
+    my ($self, $tx) = @_;
+    $method  = $tx->req->method;
+    $url     = $tx->req->url;
+    $code    = $tx->res->code;
+    $method2 = $tx->previous->req->method;
+    $url2    = $tx->previous->req->url;
+    $code2   = $tx->previous->res->code;
+  }
 )->start;
 $client->max_redirects(0);
 is $method,  'GET',                   'right method';
@@ -260,9 +260,9 @@ $tx->req->method('GET');
 $tx->req->url->parse('http://www.google.com');
 $tx->req->headers->transfer_encoding('chunked');
 $tx->req->write_chunk(
-    'hello world!' => sub {
-        shift->write_chunk('hello world2!' => sub { shift->write_chunk('') });
-    }
+  'hello world!' => sub {
+    shift->write_chunk('hello world2!' => sub { shift->write_chunk('') });
+  }
 );
 $client->start($tx);
 is_deeply([$tx->error],      ['Bad Request', 400], 'right error');
@@ -276,11 +276,11 @@ ok(!$tx->kept_alive, 'connection was not kept alive');
 my $done;
 $kept_alive = undef;
 $client->queue(
-    $tx => sub {
-        my ($self, $tx) = @_;
-        $done       = $tx->is_done;
-        $kept_alive = $tx->kept_alive;
-    }
+  $tx => sub {
+    my ($self, $tx) = @_;
+    $done       = $tx->is_done;
+    $kept_alive = $tx->kept_alive;
+  }
 );
 $client->start;
 ok($done,        'transaction is done');
@@ -293,14 +293,14 @@ ok(!$tx->kept_alive, 'connection was not kept alive');
 my ($address, $port, $port2);
 ($done, $kept_alive) = undef;
 $client->start(
-    $tx => sub {
-        my ($self, $tx) = @_;
-        $done       = $tx->is_done;
-        $kept_alive = $tx->kept_alive;
-        $address    = $tx->local_address;
-        $port       = $tx->local_port;
-        $port2      = $tx->remote_port, 80;
-    }
+  $tx => sub {
+    my ($self, $tx) = @_;
+    $done       = $tx->is_done;
+    $kept_alive = $tx->kept_alive;
+    $address    = $tx->local_address;
+    $port       = $tx->local_port;
+    $port2      = $tx->remote_port, 80;
+  }
 );
 ok($done,        'transaction is done');
 ok($kept_alive,  'connection was kept alive');

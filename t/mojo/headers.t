@@ -74,7 +74,7 @@ is_deeply $headers->to_hash, {}, 'right structure';
 
 $headers = Mojo::Headers->new;
 $headers->from_hash(
-    {'X-Test' => [[23, 24], ['single line'], [25, 26]], 'X-Test2' => 'foo'});
+  {'X-Test' => [[23, 24], ['single line'], [25, 26]], 'X-Test2' => 'foo'});
 $hash = $headers->to_hash;
 is_deeply $hash->{'X-Test'}, [[23, 24], 'single line', [25, 26]],
   'right structure';

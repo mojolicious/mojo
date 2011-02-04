@@ -15,20 +15,20 @@ use Test::Mojo;
 
 # Custom dispatchers /custom
 app->hook(
-    before_dispatch => sub {
-        my $self = shift;
-        $self->render_text($self->param('a'), status => 205)
-          if $self->req->url->path eq '/custom';
-    }
+  before_dispatch => sub {
+    my $self = shift;
+    $self->render_text($self->param('a'), status => 205)
+      if $self->req->url->path eq '/custom';
+  }
 );
 
 # Custom dispatcher /custom_too
 app->hook(
-    after_static_dispatch => sub {
-        my $self = shift;
-        $self->render_text('this works too')
-          if $self->req->url->path eq '/custom_too';
-    }
+  after_static_dispatch => sub {
+    my $self = shift;
+    $self->render_text('this works too')
+      if $self->req->url->path eq '/custom_too';
+  }
 );
 
 # GET /

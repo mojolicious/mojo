@@ -13,9 +13,9 @@ EOF
 # "Oh no! Can we switch back using four or more bodies?
 #  I'm not sure. I'm afraid we need to use... MATH."
 sub run {
-    my $self = shift;
-    $self->render_to_rel_file('hypnotoad', 'hypnotoad.conf');
-    $self->chmod_file('hypnotoad.conf', 0644);
+  my $self = shift;
+  $self->render_to_rel_file('hypnotoad', 'hypnotoad.conf');
+  $self->chmod_file('hypnotoad.conf', 0644);
 }
 
 1;
@@ -23,8 +23,8 @@ __DATA__
 @@ hypnotoad
 # See "perldoc Mojo::Server::Hypnotoad" for a full list of options
 {
-    listen  => ['http://*:8080'],
-    workers => 4
+  listen  => ['http://*:8080'],
+  workers => 4
 };
 __END__
 =head1 NAME
@@ -33,10 +33,10 @@ Mojolicious::Command::Generate::Hypnotoad - Hypnotoad Generator Command
 
 =head1 SYNOPSIS
 
-    use Mojolicious::Command::Generate::Hypnotoad;
+  use Mojolicious::Command::Generate::Hypnotoad;
 
-    my $hypnotoad = Mojolicious::Command::Generate::Hypnotoad->new;
-    $hypnotoad->run(@ARGV);
+  my $hypnotoad = Mojolicious::Command::Generate::Hypnotoad->new;
+  $hypnotoad->run(@ARGV);
 
 =head1 DESCRIPTION
 
@@ -50,15 +50,15 @@ L<Mojo::Command> and implements the following new ones.
 
 =head2 C<description>
 
-    my $description = $hypnotoad->description;
-    $hypnotoad      = $hypnotoad->description('Foo!');
+  my $description = $hypnotoad->description;
+  $hypnotoad      = $hypnotoad->description('Foo!');
 
 Short description of this command, used for the command list.
 
 =head2 C<usage>
 
-    my $usage  = $hypnotoad->usage;
-    $hypnotoad = $hypnotoad->usage('Foo!');
+  my $usage  = $hypnotoad->usage;
+  $hypnotoad = $hypnotoad->usage('Foo!');
 
 Usage information for this command, used for the help screen.
 
@@ -69,7 +69,7 @@ L<Mojo::Command> and implements the following new ones.
 
 =head2 C<run>
 
-    $hypnotoad = $hypnotoad->run(@ARGV);
+  $hypnotoad = $hypnotoad->run(@ARGV);
 
 Run this command.
 

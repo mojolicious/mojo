@@ -21,36 +21,36 @@ EOF
 # "Eternity with nerds.
 #  It's the Pasadena Star Trek convention all over again."
 sub run {
-    my $self = shift;
+  my $self = shift;
 
-    # Class
-    my $class     = 'main';
-    my $public    = 'public';
-    my $templates = 'templates';
+  # Class
+  my $class     = 'main';
+  my $public    = 'public';
+  my $templates = 'templates';
 
-    # Options
-    local @ARGV = @_ if @_;
-    GetOptions(
-        'class=s'     => sub { $class     = $_[1] },
-        'public=s'    => sub { $public    = $_[1] },
-        'templates=s' => sub { $templates = $_[1] },
-    );
+  # Options
+  local @ARGV = @_ if @_;
+  GetOptions(
+    'class=s'     => sub { $class     = $_[1] },
+    'public=s'    => sub { $public    = $_[1] },
+    'templates=s' => sub { $templates = $_[1] },
+  );
 
-    # Load class
-    my $e = Mojo::Loader->load($class);
-    die $e if ref $e;
+  # Load class
+  my $e = Mojo::Loader->load($class);
+  die $e if ref $e;
 
-    # Generate
-    my $all = $self->get_all_data($class);
-    for my $file (keys %$all) {
-        my $prefix  = $file =~ /\.\w+\.\w+$/ ? $templates : $public;
-        my $path    = $self->rel_file("$prefix/$file");
-        my $content = $all->{$file};
-        utf8::encode $content if utf8::is_utf8 $content;
-        $self->write_file($path, $content);
-    }
+  # Generate
+  my $all = $self->get_all_data($class);
+  for my $file (keys %$all) {
+    my $prefix  = $file =~ /\.\w+\.\w+$/ ? $templates : $public;
+    my $path    = $self->rel_file("$prefix/$file");
+    my $content = $all->{$file};
+    utf8::encode $content if utf8::is_utf8 $content;
+    $self->write_file($path, $content);
+  }
 
-    return $self;
+  return $self;
 }
 
 1;
@@ -62,10 +62,10 @@ Mojolicious::Command::Inflate - Inflate Command
 
 =head1 SYNOPSIS
 
-    use Mojolicious::Command::Inflate;
+  use Mojolicious::Command::Inflate;
 
-    my $inflate = Mojolicious::Command::Inflate->new;
-    $inflate->run(@ARGV);
+  my $inflate = Mojolicious::Command::Inflate->new;
+  $inflate->run(@ARGV);
 
 =head1 DESCRIPTION
 
@@ -78,15 +78,15 @@ L<Mojo::Command> and implements the following new ones.
 
 =head2 C<description>
 
-    my $description = $inflate->description;
-    $inflate        = $inflate->description('Foo!');
+  my $description = $inflate->description;
+  $inflate        = $inflate->description('Foo!');
 
 Short description of this command, used for the command list.
 
 =head2 C<usage>
 
-    my $usage = $inflate->usage;
-    $inflate  = $inflate->usage('Foo!');
+  my $usage = $inflate->usage;
+  $inflate  = $inflate->usage('Foo!');
 
 Usage information for this command, used for the help screen.
 
@@ -97,7 +97,7 @@ and implements the following new ones.
 
 =head2 C<run>
 
-    $inflate = $inflate->run(@ARGV);
+  $inflate = $inflate->run(@ARGV);
 
 Run this command.
 

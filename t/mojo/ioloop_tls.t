@@ -41,23 +41,23 @@ my $loop = Mojo::IOLoop->new;
 my $port = Mojo::IOLoop->generate_port;
 my ($server, $client) = '';
 $loop->listen(
-    port      => $port,
-    tls       => 1,
-    on_accept => sub {
-        shift->write(shift, 'test', sub { shift->write(shift, '321') });
-    },
-    on_read => sub { $server .= pop },
-    on_hup  => sub { $server .= 'hup' }
+  port      => $port,
+  tls       => 1,
+  on_accept => sub {
+    shift->write(shift, 'test', sub { shift->write(shift, '321') });
+  },
+  on_read => sub { $server .= pop },
+  on_hup  => sub { $server .= 'hup' }
 );
 my $id = $loop->connect(
-    address    => 'localhost',
-    port       => $port,
-    tls        => 1,
-    on_connect => sub {
-        shift->write(shift, 'tset', sub { shift->write(shift, '123') });
-    },
-    on_read => sub { $client .= pop },
-    on_hup => sub { shift->stop }
+  address    => 'localhost',
+  port       => $port,
+  tls        => 1,
+  on_connect => sub {
+    shift->write(shift, 'tset', sub { shift->write(shift, '123') });
+  },
+  on_read => sub { $client .= pop },
+  on_hup => sub { shift->stop }
 );
 $loop->connection_timeout($id => '0.5');
 $loop->start;
@@ -70,29 +70,29 @@ $port   = Mojo::IOLoop->generate_port;
 $server = $client = '';
 my $error = '';
 $loop->listen(
-    port      => $port,
-    tls       => 1,
-    tls_cert  => 't/mojo/certs/server.crt',
-    tls_key   => 't/mojo/certs/server.key',
-    tls_ca    => 't/mojo/certs/ca.crt',
-    on_accept => sub {
-        shift->write(shift, 'test', sub { shift->write(shift, '321') });
-    },
-    on_read => sub { $server .= pop },
-    on_hup  => sub { $server .= 'hup' },
-    on_error => sub { $error = pop },
+  port      => $port,
+  tls       => 1,
+  tls_cert  => 't/mojo/certs/server.crt',
+  tls_key   => 't/mojo/certs/server.key',
+  tls_ca    => 't/mojo/certs/ca.crt',
+  on_accept => sub {
+    shift->write(shift, 'test', sub { shift->write(shift, '321') });
+  },
+  on_read => sub { $server .= pop },
+  on_hup  => sub { $server .= 'hup' },
+  on_error => sub { $error = pop },
 );
 $id = $loop->connect(
-    address    => 'localhost',
-    port       => $port,
-    tls        => 1,
-    tls_cert   => 't/mojo/certs/client.crt',
-    tls_key    => 't/mojo/certs/client.key',
-    on_connect => sub {
-        shift->write(shift, 'tset', sub { shift->write(shift, '123') });
-    },
-    on_read => sub { $client .= pop },
-    on_hup => sub { shift->stop },
+  address    => 'localhost',
+  port       => $port,
+  tls        => 1,
+  tls_cert   => 't/mojo/certs/client.crt',
+  tls_key    => 't/mojo/certs/client.key',
+  on_connect => sub {
+    shift->write(shift, 'tset', sub { shift->write(shift, '123') });
+  },
+  on_read => sub { $client .= pop },
+  on_hup => sub { shift->stop },
 );
 $loop->connection_timeout($id => '0.5');
 $loop->timer(1 => sub { shift->stop });
@@ -104,12 +104,12 @@ ok !$error, 'no error';
 # Invalid client certificate
 $error = '';
 $id    = $loop->connect(
-    address  => 'localhost',
-    port     => $port,
-    tls      => 1,
-    tls_cert => 't/mojo/certs/badcert.key',
-    tls_key  => 't/mojo/certs/badcert.crt',
-    on_error => sub { $error = pop },
+  address  => 'localhost',
+  port     => $port,
+  tls      => 1,
+  tls_cert => 't/mojo/certs/badcert.key',
+  tls_key  => 't/mojo/certs/badcert.crt',
+  on_error => sub { $error = pop },
 );
 $loop->connection_timeout($id => '0.5');
 $loop->timer(1 => sub { shift->stop });
@@ -121,21 +121,21 @@ $loop = Mojo::IOLoop->new;
 $port = Mojo::IOLoop->generate_port;
 my $cerror = $error = '';
 $loop->listen(
-    port       => $port,
-    tls        => 1,
-    tls_cert   => 't/mojo/certs/server.crt',
-    tls_key    => 't/mojo/certs/server.key',
-    tls_ca     => 't/mojo/certs/ca.crt',
-    tls_verify => sub {0},
-    on_error   => sub { $error = pop },
+  port       => $port,
+  tls        => 1,
+  tls_cert   => 't/mojo/certs/server.crt',
+  tls_key    => 't/mojo/certs/server.key',
+  tls_ca     => 't/mojo/certs/ca.crt',
+  tls_verify => sub {0},
+  on_error   => sub { $error = pop },
 );
 $id = $loop->connect(
-    address  => 'localhost',
-    port     => $port,
-    tls      => 1,
-    tls_cert => 't/mojo/certs/client.crt',
-    tls_key  => 't/mojo/certs/client.key',
-    on_error => sub { $cerror = pop }
+  address  => 'localhost',
+  port     => $port,
+  tls      => 1,
+  tls_cert => 't/mojo/certs/client.crt',
+  tls_key  => 't/mojo/certs/client.key',
+  on_error => sub { $cerror = pop }
 );
 $loop->connection_timeout($id => '0.5');
 $loop->timer(1 => sub { shift->stop });
@@ -148,30 +148,30 @@ $loop   = Mojo::IOLoop->new;
 $port   = Mojo::IOLoop->generate_port;
 $server = $client = '';
 $loop->listen(
-    port       => $port,
-    tls        => 1,
-    tls_cert   => 't/mojo/certs/server.crt',
-    tls_key    => 't/mojo/certs/server.key',
-    tls_ca     => 't/mojo/certs/ca.crt',
-    tls_verify => sub {1},
-    on_accept  => sub {
-        shift->write(shift, 'test', sub { shift->write(shift, '321') });
-    },
-    on_read => sub { $server .= pop },
-    on_hup  => sub { $server .= 'hup' },
-    on_error => sub { $error = pop }
+  port       => $port,
+  tls        => 1,
+  tls_cert   => 't/mojo/certs/server.crt',
+  tls_key    => 't/mojo/certs/server.key',
+  tls_ca     => 't/mojo/certs/ca.crt',
+  tls_verify => sub {1},
+  on_accept  => sub {
+    shift->write(shift, 'test', sub { shift->write(shift, '321') });
+  },
+  on_read => sub { $server .= pop },
+  on_hup  => sub { $server .= 'hup' },
+  on_error => sub { $error = pop }
 );
 $id = $loop->connect(
-    address    => 'localhost',
-    port       => $port,
-    tls        => 1,
-    tls_cert   => 't/mojo/certs/client.crt',
-    tls_key    => 't/mojo/certs/client.key',
-    on_connect => sub {
-        shift->write(shift, 'tset', sub { shift->write(shift, '123') });
-    },
-    on_read => sub { $client .= pop },
-    on_hup => sub { shift->stop },
+  address    => 'localhost',
+  port       => $port,
+  tls        => 1,
+  tls_cert   => 't/mojo/certs/client.crt',
+  tls_key    => 't/mojo/certs/client.key',
+  on_connect => sub {
+    shift->write(shift, 'tset', sub { shift->write(shift, '123') });
+  },
+  on_read => sub { $client .= pop },
+  on_hup => sub { shift->stop },
 );
 $loop->connection_timeout($id => '0.5');
 $loop->timer(1 => sub { shift->stop });
@@ -182,10 +182,10 @@ is $client, 'test321',    'right content';
 # Missing client certificate
 $error = $cerror = '';
 $id = $loop->connect(
-    address  => 'localhost',
-    port     => $port,
-    tls      => 1,
-    on_error => sub { $cerror = pop }
+  address  => 'localhost',
+  port     => $port,
+  tls      => 1,
+  on_error => sub { $cerror = pop }
 );
 $loop->connection_timeout($id => '0.5');
 $loop->start;
@@ -197,23 +197,23 @@ $loop  = Mojo::IOLoop->new;
 $port  = Mojo::IOLoop->generate_port;
 $error = $cerror = '';
 $loop->listen(
-    port      => $port,
-    tls       => 1,
-    tls_cert  => 't/mojo/certs/server.crt',
-    tls_key   => 't/mojo/certs/server.key',
-    tls_ca    => 'no cert',
-    on_accept => sub {
-        shift->write(shift, 'test', sub { shift->write(shift, '321') });
-    },
-    on_error => sub { $error = pop }
+  port      => $port,
+  tls       => 1,
+  tls_cert  => 't/mojo/certs/server.crt',
+  tls_key   => 't/mojo/certs/server.key',
+  tls_ca    => 'no cert',
+  on_accept => sub {
+    shift->write(shift, 'test', sub { shift->write(shift, '321') });
+  },
+  on_error => sub { $error = pop }
 );
 $id = $loop->connect(
-    address  => 'localhost',
-    port     => $port,
-    tls      => 1,
-    tls_cert => 't/mojo/certs/client.crt',
-    tls_key  => 't/mojo/certs/client.key',
-    on_error => sub { $cerror = pop }
+  address  => 'localhost',
+  port     => $port,
+  tls      => 1,
+  tls_cert => 't/mojo/certs/client.crt',
+  tls_key  => 't/mojo/certs/client.key',
+  on_error => sub { $cerror = pop }
 );
 $loop->connection_timeout($id => '0.5');
 $loop->timer(1 => sub { shift->stop });

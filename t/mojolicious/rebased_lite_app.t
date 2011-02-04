@@ -16,9 +16,9 @@ use Test::Mojo;
 
 # Rebase hook
 app->hook(
-    before_dispatch => sub {
-        shift->req->url->base(Mojo::URL->new('http://kraih.com/rebased/'));
-    }
+  before_dispatch => sub {
+    shift->req->url->base(Mojo::URL->new('http://kraih.com/rebased/'));
+  }
 );
 
 # GET /

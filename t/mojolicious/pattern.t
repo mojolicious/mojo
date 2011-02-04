@@ -36,7 +36,7 @@ is $pattern->render, '/', 'right result';
 # Regex in pattern
 $pattern =
   Mojolicious::Routes::Pattern->new('/test/(controller)/:action/(id)',
-    id => '\d+');
+  id => '\d+');
 $pattern->defaults({action => 'index', id => 1});
 $result = $pattern->match('/test/foo/bar/203');
 is $result->{controller}, 'foo', 'right value';

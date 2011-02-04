@@ -9,105 +9,105 @@ has nph => 0;
 #  Eventually, Snowball will be reborn as a higher lifeform...
 #  like a snowman."
 sub run {
-    my $self = shift;
+  my $self = shift;
 
-    my $tx  = $self->on_build_tx->($self);
-    my $req = $tx->req;
+  my $tx  = $self->on_build_tx->($self);
+  my $req = $tx->req;
 
-    # Environment
-    $req->parse(\%ENV);
+  # Environment
+  $req->parse(\%ENV);
 
-    # Store connection information
-    $tx->remote_address($ENV{REMOTE_ADDR});
-    $tx->local_port($ENV{SERVER_PORT});
+  # Store connection information
+  $tx->remote_address($ENV{REMOTE_ADDR});
+  $tx->local_port($ENV{SERVER_PORT});
 
-    # Request body
-    while (!$req->is_done) {
-        my $read = STDIN->sysread(my $buffer, CHUNK_SIZE, 0);
-        last unless $read;
-        $req->parse($buffer);
-    }
+  # Request body
+  while (!$req->is_done) {
+    my $read = STDIN->sysread(my $buffer, CHUNK_SIZE, 0);
+    last unless $read;
+    $req->parse($buffer);
+  }
 
-    # Handle
-    $self->on_handler->($self, $tx);
+  # Handle
+  $self->on_handler->($self, $tx);
 
-    my $res = $tx->res;
+  my $res = $tx->res;
 
-    # Response start line
-    my $offset = 0;
-    if ($self->nph) {
-        while (1) {
-            my $chunk = $res->get_start_line_chunk($offset);
-
-            # No start line yet, try again
-            unless (defined $chunk) {
-                sleep 1;
-                next;
-            }
-
-            # End of start line
-            last unless length $chunk;
-
-            # Start line
-            return unless STDOUT->opened;
-            my $written = STDOUT->syswrite($chunk);
-            return unless defined $written;
-            $offset += $written;
-        }
-    }
-
-    # Status
-    if (my $code = $res->code) {
-        my $message = $res->message || $res->default_message;
-        $res->headers->header(Status => "$code $message") unless $self->nph;
-    }
-
-    # Response headers
-    $offset = 0;
+  # Response start line
+  my $offset = 0;
+  if ($self->nph) {
     while (1) {
-        my $chunk = $res->get_header_chunk($offset);
+      my $chunk = $res->get_start_line_chunk($offset);
 
-        # No headers yet, try again
-        unless (defined $chunk) {
-            sleep 1;
-            next;
-        }
+      # No start line yet, try again
+      unless (defined $chunk) {
+        sleep 1;
+        next;
+      }
 
-        # End of headers
-        last unless length $chunk;
+      # End of start line
+      last unless length $chunk;
 
-        # Headers
-        return unless STDOUT->opened;
-        my $written = STDOUT->syswrite($chunk);
-        return unless defined $written;
-        $offset += $written;
+      # Start line
+      return unless STDOUT->opened;
+      my $written = STDOUT->syswrite($chunk);
+      return unless defined $written;
+      $offset += $written;
+    }
+  }
+
+  # Status
+  if (my $code = $res->code) {
+    my $message = $res->message || $res->default_message;
+    $res->headers->header(Status => "$code $message") unless $self->nph;
+  }
+
+  # Response headers
+  $offset = 0;
+  while (1) {
+    my $chunk = $res->get_header_chunk($offset);
+
+    # No headers yet, try again
+    unless (defined $chunk) {
+      sleep 1;
+      next;
     }
 
-    # Response body
-    $offset = 0;
-    while (1) {
-        my $chunk = $res->get_body_chunk($offset);
+    # End of headers
+    last unless length $chunk;
 
-        # No content yet, try again
-        unless (defined $chunk) {
-            sleep 1;
-            next;
-        }
+    # Headers
+    return unless STDOUT->opened;
+    my $written = STDOUT->syswrite($chunk);
+    return unless defined $written;
+    $offset += $written;
+  }
 
-        # End of content
-        last unless length $chunk;
+  # Response body
+  $offset = 0;
+  while (1) {
+    my $chunk = $res->get_body_chunk($offset);
 
-        # Content
-        return unless STDOUT->opened;
-        my $written = STDOUT->syswrite($chunk);
-        return unless defined $written;
-        $offset += $written;
+    # No content yet, try again
+    unless (defined $chunk) {
+      sleep 1;
+      next;
     }
 
-    # Finish transaction
-    $tx->on_finish->($tx);
+    # End of content
+    last unless length $chunk;
 
-    return $res->code;
+    # Content
+    return unless STDOUT->opened;
+    my $written = STDOUT->syswrite($chunk);
+    return unless defined $written;
+    $offset += $written;
+  }
+
+  # Finish transaction
+  $tx->on_finish->($tx);
+
+  return $res->code;
 }
 
 1;
@@ -119,25 +119,25 @@ Mojo::Server::CGI - CGI Server
 
 =head1 SYNOPSIS
 
-    use Mojo::Server::CGI;
+  use Mojo::Server::CGI;
 
-    my $cgi = Mojo::Server::CGI->new;
-    $cgi->on_handler(sub {
-        my ($self, $tx) = @_;
+  my $cgi = Mojo::Server::CGI->new;
+  $cgi->on_handler(sub {
+    my ($self, $tx) = @_;
 
-        # Request
-        my $method = $tx->req->method;
-        my $path   = $tx->req->url->path;
+    # Request
+    my $method = $tx->req->method;
+    my $path   = $tx->req->url->path;
 
-        # Response
-        $tx->res->code(200);
-        $tx->res->headers->content_type('text/plain');
-        $tx->res->body("$method request for $path!");
+    # Response
+    $tx->res->code(200);
+    $tx->res->headers->content_type('text/plain');
+    $tx->res->body("$method request for $path!");
 
-        # Resume transaction
-        $tx->resume;
-    });
-    $cgi->run;
+    # Resume transaction
+    $tx->resume;
+  });
+  $cgi->run;
 
 =head1 DESCRIPTION
 
@@ -152,8 +152,8 @@ implements the following new ones.
 
 =head2 C<nph>
 
-    my $nph = $cgi->nph;
-    $cgi    = $cgi->nph(1);
+  my $nph = $cgi->nph;
+  $cgi    = $cgi->nph(1);
 
 Activate non parsed header mode.
 
@@ -164,7 +164,7 @@ implements the following new ones.
 
 =head2 C<run>
 
-    $cgi->run;
+  $cgi->run;
 
 Process CGI.
 

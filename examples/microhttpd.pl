@@ -19,37 +19,37 @@ my $buffer = {};
 
 # Minimal ioloop example demonstrating how to cheat at HTTP benchmarks :)
 $loop->listen(
-    port      => 3000,
-    on_accept => sub {
-        my ($loop, $id) = @_;
+  port      => 3000,
+  on_accept => sub {
+    my ($loop, $id) = @_;
 
-        # Initialize buffer
-        $buffer->{$id} = '';
-    },
-    on_read => sub {
-        my ($loop, $id, $chunk) = @_;
+    # Initialize buffer
+    $buffer->{$id} = '';
+  },
+  on_read => sub {
+    my ($loop, $id, $chunk) = @_;
 
-        # Append chunk to buffer
-        $buffer->{$id} .= $chunk;
+    # Append chunk to buffer
+    $buffer->{$id} .= $chunk;
 
-        # Check if we got start line and headers (no body support)
-        if (index($buffer->{$id}, "\x0d\x0a\x0d\x0a") >= 0) {
+    # Check if we got start line and headers (no body support)
+    if (index($buffer->{$id}, "\x0d\x0a\x0d\x0a") >= 0) {
 
-            # Clean buffer
-            delete $buffer->{$id};
+      # Clean buffer
+      delete $buffer->{$id};
 
-            # Write a minimal HTTP response
-            # (not spec compliant but benchmarks won't care)
-            $loop->write($id => "HTTP/1.1 200 OK\x0d\x0a"
-                  . "Connection: keep-alive\x0d\x0a\x0d\x0a");
-        }
-    },
-    on_error => sub {
-        my ($self, $id) = @_;
-
-        # Clean buffer
-        delete $buffer->{$id};
+      # Write a minimal HTTP response
+      # (not spec compliant but benchmarks won't care)
+      $loop->write($id => "HTTP/1.1 200 OK\x0d\x0a"
+          . "Connection: keep-alive\x0d\x0a\x0d\x0a");
     }
+  },
+  on_error => sub {
+    my ($self, $id) = @_;
+
+    # Clean buffer
+    delete $buffer->{$id};
+  }
 ) or die "Couldn't create listen socket!\n";
 
 print <<'EOF';

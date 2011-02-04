@@ -30,13 +30,13 @@ EOF
 
 # Flash policy server
 $loop->listen(
-    port    => 843,
-    on_read => sub {
-        my ($loop, $id) = @_;
+  port    => 843,
+  on_read => sub {
+    my ($loop, $id) = @_;
 
-        # Write XML
-        $loop->write($id, $xml, sub { shift->drop($id) });
-    }
+    # Write XML
+    $loop->write($id, $xml, sub { shift->drop($id) });
+  }
 ) or die "Couldn't create listen socket!\n";
 
 print "Starting server on port 843.\n";

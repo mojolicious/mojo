@@ -8,92 +8,92 @@ use Mojo::Content::MultiPart;
 has asset => sub { Mojo::Asset::Memory->new };
 
 sub body_contains {
-    my ($self, $chunk) = @_;
+  my ($self, $chunk) = @_;
 
-    # Found
-    return 1 if $self->asset->contains($chunk) >= 0;
+  # Found
+  return 1 if $self->asset->contains($chunk) >= 0;
 
-    # Not found
-    return 0;
+  # Not found
+  return 0;
 }
 
 sub body_size {
-    my $self = shift;
-    return ($self->headers->content_length || 0) if $self->on_read;
-    return $self->asset->size;
+  my $self = shift;
+  return ($self->headers->content_length || 0) if $self->on_read;
+  return $self->asset->size;
 }
 
 sub get_body_chunk {
-    my ($self, $offset) = @_;
+  my ($self, $offset) = @_;
 
-    # Body generator
-    return $self->generate_body_chunk($offset) if $self->on_read;
+  # Body generator
+  return $self->generate_body_chunk($offset) if $self->on_read;
 
-    # Normal content
-    return $self->asset->get_chunk($offset);
+  # Normal content
+  return $self->asset->get_chunk($offset);
 }
 
 sub parse {
-    my $self = shift;
+  my $self = shift;
 
-    # Parse headers and chunked body
-    $self->SUPER::parse(@_);
+  # Parse headers and chunked body
+  $self->SUPER::parse(@_);
 
-    # Still parsing headers or using a custom body parser
-    return $self if ($self->{_state} || '') eq 'headers' || $self->on_read;
+  # Still parsing headers or using a custom body parser
+  return $self if ($self->{_state} || '') eq 'headers' || $self->on_read;
 
-    # Headers
-    my $headers = $self->headers;
+  # Headers
+  my $headers = $self->headers;
 
-    # Content-Length
-    my $len = $self->headers->content_length;
+  # Content-Length
+  my $len = $self->headers->content_length;
 
-    # WebSocket handshakes have a static Content-Length
-    $len ||=
-        $headers->sec_websocket_key1     ? 8
-      : $headers->sec_websocket_location ? 16
-      :                                    undef;
+  # WebSocket handshakes have a static Content-Length
+  $len ||=
+      $headers->sec_websocket_key1     ? 8
+    : $headers->sec_websocket_location ? 16
+    :                                    undef;
 
-    # Content needs to be upgraded to multipart
-    if ($self->is_multipart) {
+  # Content needs to be upgraded to multipart
+  if ($self->is_multipart) {
 
-        # Shortcut
-        return $self if $self->isa('Mojo::Content::MultiPart');
+    # Shortcut
+    return $self if $self->isa('Mojo::Content::MultiPart');
 
-        # Need to upgrade
-        return Mojo::Content::MultiPart->new($self)->parse;
+    # Need to upgrade
+    return Mojo::Content::MultiPart->new($self)->parse;
+  }
+
+  # Don't waste memory
+  my $asset = $self->asset;
+  if ($asset->isa('Mojo::Asset::Memory')) {
+
+    # Upgrade to file based storage on demand
+    if ($asset->size > ($ENV{MOJO_MAX_MEMORY_SIZE} || 256000)) {
+      $self->asset(Mojo::Asset::File->new->add_chunk($asset->slurp));
     }
+  }
 
-    # Don't waste memory
+  # Chunked body or relaxed content
+  if ($self->is_chunked || $self->relaxed) {
+    $self->asset->add_chunk($self->{_b2});
+    $self->{_b2} = '';
+  }
+
+  # Normal body
+  else {
+
+    # Slurp
+    $len ||= $self->headers->content_length || 0;
     my $asset = $self->asset;
-    if ($asset->isa('Mojo::Asset::Memory')) {
+    my $need  = $len - $asset->size;
+    $asset->add_chunk(substr $self->{_b2}, 0, $need, '') if $need > 0;
 
-        # Upgrade to file based storage on demand
-        if ($asset->size > ($ENV{MOJO_MAX_MEMORY_SIZE} || 256000)) {
-            $self->asset(Mojo::Asset::File->new->add_chunk($asset->slurp));
-        }
-    }
+    # Done
+    $self->{_state} = 'done' if $len <= $self->progress;
+  }
 
-    # Chunked body or relaxed content
-    if ($self->is_chunked || $self->relaxed) {
-        $self->asset->add_chunk($self->{_b2});
-        $self->{_b2} = '';
-    }
-
-    # Normal body
-    else {
-
-        # Slurp
-        $len ||= $self->headers->content_length || 0;
-        my $asset = $self->asset;
-        my $need  = $len - $asset->size;
-        $asset->add_chunk(substr $self->{_b2}, 0, $need, '') if $need > 0;
-
-        # Done
-        $self->{_state} = 'done' if $len <= $self->progress;
-    }
-
-    return $self;
+  return $self;
 }
 
 1;
@@ -105,10 +105,10 @@ Mojo::Content::Single - HTTP 1.1 Content Container
 
 =head1 SYNOPSIS
 
-    use Mojo::Content::Single;
+  use Mojo::Content::Single;
 
-    my $content = Mojo::Content::Single->new;
-    $content->parse("Content-Length: 12\r\n\r\nHello World!");
+  my $content = Mojo::Content::Single->new;
+  $content->parse("Content-Length: 12\r\n\r\nHello World!");
 
 =head1 DESCRIPTION
 
@@ -122,8 +122,8 @@ implements the following new ones.
 
 =head2 C<asset>
 
-    my $asset = $content->asset;
-    $content  = $content->asset(Mojo::Asset::Memory->new);
+  my $asset = $content->asset;
+  $content  = $content->asset(Mojo::Asset::Memory->new);
 
 The actual content.
 
@@ -134,25 +134,25 @@ implements the following new ones.
 
 =head2 C<body_contains>
 
-    my $found = $content->body_contains('1234567');
+  my $found = $content->body_contains('1234567');
 
 Check if content contains a specific string.
 
 =head2 C<body_size>
 
-    my $size = $content->body_size;
+  my $size = $content->body_size;
 
 Content size in bytes.
 
 =head2 C<get_body_chunk>
 
-    my $chunk = $content->get_body_chunk(0);
+  my $chunk = $content->get_body_chunk(0);
 
 Get a chunk of content starting from a specfic position.
 
 =head2 C<parse>
 
-    $content = $content->parse("Content-Length: 12\r\n\r\nHello World!");
+  $content = $content->parse("Content-Length: 12\r\n\r\nHello World!");
 
 Parse content.
 

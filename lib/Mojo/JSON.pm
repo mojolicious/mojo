@@ -11,70 +11,6 @@ our $FALSE = Mojo::JSON::_Bool->new(0);
 our $TRUE  = Mojo::JSON::_Bool->new(1);
 
 # Regex
-my $WHITESPACE_RE  = qr/[\x20\x09\x0a\x0d]*/;
-my $ARRAY_BEGIN_RE = qr/^$WHITESPACE_RE\[/;
-my $ARRAY_END_RE   = qr/^$WHITESPACE_RE\]/;
-my $ESCAPE_RE      = qr/
-    ([\\\"\/\b\f\n\r\t])   # Special character
-    |
-    ([\x00-\x1f])          # Control character
-/x;
-my $NAME_SEPARATOR_RE = qr/^$WHITESPACE_RE\:/;
-my $NAMES_RE          = qr/^$WHITESPACE_RE(false|null|true)/;
-my $NUMBER_RE         = qr/
-    ^
-    $WHITESPACE_RE
-    (
-    -?                  # Minus
-    (?:0|[1-9]\d*)      # Digits
-    (?:\.\d+)?          # Fraction
-    (?:[eE][+-]?\d+)?   # Exponent
-    )
-/x;
-my $OBJECT_BEGIN_RE = qr/^$WHITESPACE_RE\{/;
-my $OBJECT_END_RE   = qr/^$WHITESPACE_RE\}/;
-my $STRING_RE       = qr/
-    ^
-    $WHITESPACE_RE
-    \"                                    # Quotation mark
-    ((?:
-    \\u[0-9a-fA-F]{4}                     # Escaped unicode character
-    |
-    \\[\"\/\\bfnrt]                       # Escaped special characters
-    |
-    [\x20-\x21\x23-\x5b\x5d-\x{10ffff}]   # Unescaped characters
-    )*)
-    \"                                    # Quotation mark
-/x;
-my $UNESCAPE_RE = qr/
-    (\\[\"\/\\bfnrt])                 # Special character
-    |
-    \\u([dD][89abAB][0-9a-fA-F]{2})   # High surrogate
-    \\u([dD][c-fC-F][0-9a-fA-F]{2})   # Low surrogate
-    |
-    \\u(                              # Unicode character (no surrogates)
-    [0-9A-Ca-cE-Fe-f][0-9A-Fa-f]{3}   # U+0000 - U+CEEE, U+E000 - U+FFFF
-    |
-    [Dd][0-7][0-9A-Fa-f]{2}           # U+D000 - U+D7FF
-    )
-/x;
-my $VALUE_SEPARATOR_RE = qr/^$WHITESPACE_RE\,/;
-
-# Escaped special character map
-my $ESCAPE = {
-    '\"'   => "\x22",
-    '\\\\' => "\x5c",
-    '\/'   => "\x2f",
-    '\b'   => "\x8",
-    '\f'   => "\xC",
-    '\n'   => "\xA",
-    '\r'   => "\xD",
-    '\t'   => "\x9"
-};
-my $REVERSE_ESCAPE = {};
-for my $key (keys %$ESCAPE) { $REVERSE_ESCAPE->{$ESCAPE->{$key}} = $key }
-
-# Byte order marks
 my $BOM_RE = qr/
     (?:
     \357\273\277   # UTF-8
@@ -88,6 +24,21 @@ my $BOM_RE = qr/
     \377\376       # UTF-16LE
     )
 /x;
+my $WHITESPACE_RE = qr/[\x20\x09\x0a\x0d]*/;
+
+# Escaped special character map
+my %ESCAPE = (
+    '"'  => '"',
+    '\\' => '\\',
+    '/'  => '/',
+    'b'  => "\x07",
+    'f'  => "\x0C",
+    'n'  => "\x0A",
+    'r'  => "\x0D",
+    't'  => "\x09"
+);
+my %REVERSE;
+for my $key (keys %ESCAPE) { $REVERSE{$ESCAPE{$key}} = "\\$key" }
 
 # Unicode encoding detection
 my $UTF_PATTERNS = {
@@ -101,14 +52,18 @@ my $UTF_PATTERNS = {
 sub decode {
     my ($self, $string) = @_;
 
-    # Shortcut
-    return unless $string;
-
     # Cleanup
     $self->error(undef);
 
+    # Missing input
+    $self->error('Missing or empty input.') and return unless $string;
+
     # Remove BOM
     $string =~ s/^$BOM_RE//go;
+
+    # Wide characters
+    $self->error('Wide character in input.') and return
+      unless utf8::downgrade($_, 1);
 
     # Detect and decode unicode
     my $encoding = 'UTF-8';
@@ -120,23 +75,30 @@ sub decode {
     }
     Mojo::Util::decode $encoding, $string;
 
-    # Decode
-    my $result;
-    if (!eval { $result = _decode_structure(\$string); 1 } && (my $e = $@)) {
+    # Object or array
+    my $ref = eval {
+        local $_ = $string;
+
+        # Leading whitespace
+        m/\G$WHITESPACE_RE/xogc;
+
+        # Array
+        if (m/\G\[/xgc) { _decode_array() }
+
+        # Object
+        elsif (m/\G\{/xgc) { _decode_object() }
+
+        # Unexpected
+        else { _exception('Expected array or object') }
+    };
+
+    # Exception
+    if (!$ref && (my $e = $@)) {
         chomp $e;
         $self->error($e);
     }
 
-    # Exception
-    return if $self->error;
-
-    # Bad input
-    $self->error('JSON text has to be a serialized object or array.')
-      and return
-      unless ref $result->[0];
-
-    # Done
-    return $result->[0];
+    return $ref;
 }
 
 sub encode {
@@ -155,127 +117,156 @@ sub false {$FALSE}
 sub true {$TRUE}
 
 sub _decode_array {
-    my $ref = shift;
 
-    # New array
-    my $array = [];
-
-    # Decode array
-    while ($$ref) {
-
-        # Separator
-        next if $$ref =~ s/$VALUE_SEPARATOR_RE//o;
-
-        # End
-        return $array if $$ref =~ s/$ARRAY_END_RE//o;
+    # Array
+    my @array;
+    until (m/\G$WHITESPACE_RE\]/xogc) {
 
         # Value
-        if (my $values = _decode_values($ref)) {
-            push @$array, @$values;
-        }
+        push @array, _decode_value();
 
-        # Invalid format
-        else { _exception($ref) }
+        # Separator
+        redo if m/\G$WHITESPACE_RE,/xogc;
 
+        # End
+        last if m/\G$WHITESPACE_RE\]/xogc;
+
+        # Exception
+        _exception(
+            'Expected comma or right square bracket while parsing array');
     }
 
-    # Exception
-    _exception($ref, 'Missing right square bracket');
+    return \@array;
 }
 
 sub _decode_object {
-    my $ref = shift;
-
-    # New object
-    my $hash = {};
-
-    # Decode object
-    my $key;
-    while ($$ref) {
-
-        # Name separator
-        next if $$ref =~ s/$NAME_SEPARATOR_RE//o;
-
-        # Value separator
-        next if $$ref =~ s/$VALUE_SEPARATOR_RE//o;
-
-        # End
-        return $hash if $$ref =~ s/$OBJECT_END_RE//o;
-
-        # Value
-        if (my $values = _decode_values($ref)) {
-
-            # Value
-            if ($key) {
-                $hash->{$key} = $values->[0];
-                $key = undef;
-            }
-
-            # Key
-            else { $key = $values->[0] }
-
-        }
-
-        # Invalid format
-        else { _exception($ref) }
-
-    }
-
-    # Exception
-    _exception($ref, 'Missing right curly bracket');
-}
-
-sub _decode_structure {
-    my $ref = shift;
-
-    # Shortcut
-    return unless $$ref;
 
     # Object
-    if ($$ref =~ s/$OBJECT_BEGIN_RE//o) {
-        return [_decode_object($ref)];
+    my %hash;
+    until (m/\G$WHITESPACE_RE\}/xogc) {
+
+        # Quote
+        m/\G$WHITESPACE_RE"/xogc
+          or _exception("Expected string while parsing object");
+
+        # Key
+        my $key = _decode_string();
+
+        # Colon
+        m/\G$WHITESPACE_RE:/xogc
+          or _exception('Expected colon while parsing object');
+
+        # Value
+        $hash{$key} = _decode_value();
+
+        # Separator
+        redo if m/\G$WHITESPACE_RE,/xogc;
+
+        # End
+        last if m/\G$WHITESPACE_RE\}/xogc;
+
+        # Exception
+        _exception(
+            q/Expected comma or right curly bracket while parsing object/);
     }
 
-    # Array
-    elsif ($$ref =~ s/$ARRAY_BEGIN_RE//o) {
-        return [_decode_array($ref)];
-    }
-
-    # Nothing
-    return;
+    return \%hash;
 }
 
-sub _decode_values {
-    my $ref = shift;
+sub _decode_string {
 
-    # Number
-    if ($$ref =~ s/$NUMBER_RE//o) { return [0 + $1] }
+    # Position
+    my $pos = pos;
 
     # String
-    elsif ($$ref =~ s/$STRING_RE//o) {
-        my $string = $1;
+    m/\G((?:[^\x00-\x1F\\"]|\\(?:["\\\/bfnrt]|u[A-Fa-f0-9]{4}))*)/xgc;
+    my $str = $1;
 
-        # Unescape
-        $string =~ s/$UNESCAPE_RE/_unescape($1, $2, $3, $4)/gex;
-
-        return [$string];
+    # Missing quote
+    unless (m/\G"/xgc) {
+        _exception(
+            'Unexpected character or invalid escape while parsing string')
+          if m/\G[\x00-\x1F\\]/x;
+        _exception('Unterminated string');
     }
 
-    # Name
-    elsif ($$ref =~ s/$NAMES_RE//o) {
-
-        # "false"
-        if ($1 eq 'false') { return [$FALSE] }
-
-        # "null"
-        elsif ($1 eq 'null') { return [undef] }
-
-        # "true"
-        elsif ($1 eq 'true') { return [$TRUE] }
+    # Popular characters
+    if (index($str, '\\u') < 0) {
+        $str =~ s/\\(["\\\/bfnrt])/$ESCAPE{$1}/gs;
+        return $str;
     }
 
-    # Object or array
-    return _decode_structure($ref);
+    # Everything else
+    my $buffer = '';
+    while ($str =~ m/\G([^\\]*)\\(?:([^u])|u(.{4}))/xgc) {
+
+        # Pass through
+        $buffer .= $1;
+
+        # Popular character
+        if ($2) { $buffer .= $ESCAPE{$2} }
+
+        # Escaped
+        else {
+            my $ord = hex $3;
+
+            # Surrogate pair
+            if (($ord & 0xF800) == 0xD800) {
+
+                # High surrogate
+                ($ord & 0xFC00) == 0xD800
+                  or pos($_) = $pos + pos($str),
+                  _exception('Missing high-surrogate');
+
+                # Low surrogate
+                $str =~ m/\G\\u([Dd][C-Fc-f]..)/xgc
+                  or pos($_) = $pos + pos($str),
+                  _exception('Missing low-surrogate');
+
+                # Pair
+                $ord = 0x10000 + ($ord - 0xD800) * 0x400 + (hex($1) - 0xDC00);
+            }
+
+            # Character
+            $buffer .= pack 'U', $ord;
+        }
+    }
+
+    # The rest
+    $buffer .= substr $str, pos($str), length($str);
+
+    return $buffer;
+}
+
+sub _decode_value {
+
+    # Leading whitespace
+    m/\G$WHITESPACE_RE/xogc;
+
+    # String
+    return _decode_string() if m/\G"/xgc;
+
+    # Array
+    return _decode_array() if m/\G\[/xgc;
+
+    # Object
+    return _decode_object() if m/\G\{/xgc;
+
+    # Number
+    return 0 + $1
+      if m/\G([-]?(?:0|[1-9][0-9]*)(?:\.[0-9]*)?(?:[eE][+-]?[0-9]+)?)/xgc;
+
+    # True
+    return $TRUE if m/\Gtrue/xgc;
+
+    # False
+    return $FALSE if m/\Gfalse/xgc;
+
+    # Null
+    return undef if m/\Gnull/xgc;
+
+    # Exception
+    _exception('Expected string, array, object, number, boolean or null');
 }
 
 sub _encode_array {
@@ -312,7 +303,7 @@ sub _encode_string {
     my $string = shift;
 
     # Escape
-    $string =~ s/$ESCAPE_RE/_escape($1, $2)/gex;
+    $string =~ s/([\\\"\/\b\f\n\r\t])|([\x00-\x1f])/_escape($1, $2)/gex;
 
     # Stringify
     return "\"$string\"";
@@ -353,7 +344,7 @@ sub _escape {
     my ($special, $control) = @_;
 
     # Special character
-    if ($special) { return $REVERSE_ESCAPE->{$special} }
+    if ($special) { return $REVERSE{$special} }
 
     # Control character
     elsif ($control) { return '\\u00' . unpack('H2', $control) }
@@ -361,37 +352,18 @@ sub _escape {
     return;
 }
 
-sub _unescape {
-    my ($special, $high, $low, $normal) = @_;
-
-    # Special character
-    if ($special) { return $ESCAPE->{$special} }
-
-    # Normal unicode character
-    elsif ($normal) { return pack('U', hex($normal)) }
-
-    # Surrogate pair
-    elsif ($high && $low) {
-        return pack('U*',
-            (0x10000 + (hex($high) - 0xD800) * 0x400 + (hex($low) - 0xDC00)));
-    }
-
-    return;
-}
-
 sub _exception {
-    my ($ref, $error) = @_;
 
-    # Message
-    $error ||= 'Syntax error';
+    # Leading whitespace
+    m/\G$WHITESPACE_RE/xogc;
 
     # Context
-    my $context = substr $$ref, 0, 25;
-    $context = "\"$context\"" if $context;
-    $context ||= 'end of file';
+    my $context = 'Malformed JSON: ' . shift;
+    $context
+      .= m/\G\z/xgc ? ' before end of data' : ' at character offset ' . pos;
 
-    # Error
-    die "$error near $context.\n";
+    # Throw
+    die "$context.\n";
 }
 
 # Emulate boolean type
@@ -421,7 +393,7 @@ Mojo::JSON - Minimalistic JSON
 
 =head1 DESCRIPTION
 
-L<Mojo::JSON> is a minimalistic and very relaxed implementation of RFC4627.
+L<Mojo::JSON> is a minimalistic and relaxed implementation of RFC4627.
 While it is possibly the fastest pure-Perl JSON parser available, you should
 not use it for validation.
 

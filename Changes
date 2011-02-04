@@ -12,6 +12,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL support for mode specific not_found and
           exception templates.
         - Added image helper to Mojolicious::Plugin::TagHelpers.
+        - Replaced Mojo::JSON parser with a much faster and stricter
+          implementation. (chansen)
         - Updated to jQuery to version 1.5.
         - Removed experimental status from Mojo::DOM and ojo.
         - Removed experimental status from many attributes and methods all

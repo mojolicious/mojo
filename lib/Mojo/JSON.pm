@@ -38,6 +38,7 @@ my %ESCAPE = (
   't'  => "\x09"
 );
 my %REVERSE;
+for (0x00 .. 0x1F, 0x7F) { $REVERSE{pack 'C', $_} = sprintf '\u%.4X', $_ }
 for my $key (keys %ESCAPE) { $REVERSE{$ESCAPE{$key}} = "\\$key" }
 
 # Unicode encoding detection
@@ -309,7 +310,7 @@ sub _encode_string {
   my $string = shift;
 
   # Escape
-  $string =~ s/([\\\"\/\b\f\n\r\t])|([\x00-\x1f])/_escape($1, $2)/gex;
+  $string =~ s/([\x00-\x1F\x7F\\\"\/\b\f\n\r\t])/$REVERSE{$1}/gs;
 
   # Stringify
   return "\"$string\"";
@@ -344,18 +345,6 @@ sub _encode_values {
 
   # String
   return _encode_string($value);
-}
-
-sub _escape {
-  my ($special, $control) = @_;
-
-  # Special character
-  if ($special) { return $REVERSE{$special} }
-
-  # Control character
-  elsif ($control) { return '\\u00' . unpack('H2', $control) }
-
-  return;
 }
 
 sub _exception {

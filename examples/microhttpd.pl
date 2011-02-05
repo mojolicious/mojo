@@ -39,7 +39,7 @@ $loop->listen(
       delete $buffer->{$id};
 
       # Write a minimal HTTP response
-      # (not spec compliant but benchmarks won't care)
+      # (the "Hello World!" message has been optimized away!)
       $loop->write($id => "HTTP/1.1 200 OK\x0d\x0a"
           . "Connection: keep-alive\x0d\x0a\x0d\x0a");
     }

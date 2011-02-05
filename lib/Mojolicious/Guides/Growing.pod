@@ -323,7 +323,7 @@ against your application.
 
   % ./myapp.pl test
   ...
-  % perl t/login.t
+  % ./myapp.pl test t/login.t
   ...
 
 To make the tests less noisy and limit log output to just C<error> messages

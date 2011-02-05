@@ -41,7 +41,7 @@ Code should be written with a Perl6 port in mind.
 
 No refactoring unless a very important feature absolutely depends on it.
 
-It's not a feature without a test.
+It's not a feature without a test and documentation.
 
 A feature is only needed when the majority of the userbase benefits from it.
 

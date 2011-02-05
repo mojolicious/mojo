@@ -3,6 +3,7 @@ use Mojo::Base -base;
 use overload 'bool' => sub {1}, fallback => 1;
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
+use Cwd 'abs_path';
 use File::Spec;
 use FindBin;
 use Mojo::Command;
@@ -21,7 +22,7 @@ sub detect {
 
   # Environment variable
   if ($ENV{MOJO_HOME}) {
-    my @parts = File::Spec->splitdir($ENV{MOJO_HOME});
+    my @parts = File::Spec->splitdir(abs_path $ENV{MOJO_HOME});
     $self->{_parts} = \@parts;
     return $self;
   }
@@ -38,6 +39,7 @@ sub detect {
     # Detect
     if (my $path = $INC{$file}) {
 
+      # Directory
       $path =~ s/$file$//;
       my @home = File::Spec->splitdir($path);
 
@@ -47,7 +49,9 @@ sub detect {
         pop @home;
       }
 
-      $self->{_parts} = \@home;
+      # Turn into absolute path
+      $self->{_parts} =
+        [File::Spec->splitdir(abs_path(File::Spec->catdir(@home)))];
     }
   }
 

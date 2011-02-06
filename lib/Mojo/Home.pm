@@ -22,8 +22,7 @@ sub detect {
 
   # Environment variable
   if ($ENV{MOJO_HOME}) {
-    my @parts = File::Spec->splitdir(
-      abs_path(File::Spec->catdir(split '/', $ENV{MOJO_HOME})));
+    my @parts = File::Spec->splitdir(abs_path $ENV{MOJO_HOME});
     $self->{_parts} = \@parts;
     return $self;
   }
@@ -42,7 +41,7 @@ sub detect {
 
       # Directory
       $path =~ s/$file$//;
-      my @home = split '/', $path;
+      my @home = File::Spec->splitdir($path);
 
       # Remove "lib" and "blib"
       while (@home) {

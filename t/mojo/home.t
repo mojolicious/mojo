@@ -16,7 +16,8 @@ use_ok 'Mojo::Home';
 my $backup = $ENV{MOJO_HOME} || '';
 $ENV{MOJO_HOME} = '.';
 my $home = Mojo::Home->new->detect;
-is_deeply [split /\\|\//, File::Spec->canonpath($home->to_string)], [split /\\|\//, File::Spec->canonpath(cwd())],
+is_deeply [split /\\|\//, File::Spec->canonpath($home->to_string)],
+  [split /\\|\//, File::Spec->canonpath(cwd())],
   'right path detected';
 $ENV{MOJO_HOME} = $backup;
 

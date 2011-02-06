@@ -16,16 +16,19 @@ use_ok 'Mojo::Home';
 my $backup = $ENV{MOJO_HOME} || '';
 $ENV{MOJO_HOME} = '.';
 my $home = Mojo::Home->new->detect;
-is $home->to_string, cwd(), 'right path detected';
+is_deeply [split /\\|\//, $home->to_string], [split /\\|\//, cwd()],
+  'right path detected';
 $ENV{MOJO_HOME} = $backup;
 
 # Class detection
 my $original =
   File::Spec->catdir(File::Spec->splitdir($FindBin::Bin), '..', '..');
 $home = Mojo::Home->new->detect;
-is realpath($original), $home, 'right path detected';
+is_deeply [split /\\|\//, realpath($original)], [split /\\|\//, $home],
+  'right path detected';
 
 # FindBin detection
 $home = Mojo::Home->new->app_class(undef)->detect;
-is(File::Spec->catdir(File::Spec->splitdir($FindBin::Bin)),
-  $home, 'right path detected');
+is_deeply [split /\\|\//,
+  File::Spec->catdir(File::Spec->splitdir($FindBin::Bin))],
+  [split /\\|\//, $home], 'right path detected';

@@ -236,6 +236,13 @@ implementation L<Mojo::JSON> built right in.
     print $result;
   }
 
+=head2 Basic Authentication
+
+You can just add username and password to the URL.
+
+  my $client = Mojo::Client->new;
+  print $client->get('https://sri:secret@mojolicio.us/hideout')->res->body;
+
 =head2 Decorating Followup Requests
 
 L<Mojo::Client> can automatically follow redirects, the C<on_start> callback

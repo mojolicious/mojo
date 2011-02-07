@@ -872,11 +872,6 @@ __DATA__
         margin-top: 0;
         text-shadow: #ddd 0 1px 0;
       }
-      h1 {
-        font: 1.5em Georgia, Times, serif;
-        margin: 0;
-        text-shadow: #333 0 1px 0;
-      }
       pre {
         margin: 0;
         white-space: pre-wrap;
@@ -942,6 +937,11 @@ __DATA__
         -moz-border-radius-topright: 5px;
         border-top-right-radius: 5px;
       }
+      #showcase pre {
+        font: 1.5em Georgia, Times, serif;
+        margin: 0;
+        text-shadow: #333 0 1px 0;
+      }
       #more, #trace {
         -moz-border-radius-bottomleft: 5px;
         border-bottom-left-radius: 5px;
@@ -980,7 +980,7 @@ __DATA__
       </tr>
     % end
     <div id="showcase" class="code box">
-      <h1><%= $e->message %></h1>
+      <pre><%= $e->message %></pre>
       <div id="context">
         <table>
           % for my $line (@{$e->lines_before}) {

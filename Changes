@@ -24,6 +24,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved documentation browser slightly.
         - Changed Mojolicious::Plugin::EplRenderer to not render 404 errors
           for missing templates.
+        - Changed exception template to use pre instead of h1 tags for error
+          messages. (vaneska)
         - Made Simpsons and Futurama quotes easier to distinguish from normal
           comments.
         - Made routes reusable outside of Mojolicious. (forwardever)

@@ -18,9 +18,6 @@ sub register {
   # Auto escape by default to prevent XSS attacks
   $template->{auto_escape} = 1 unless defined $template->{auto_escape};
 
-  # Cache
-  my $cache = $app->renderer->{_cache};
-
   # Add "ep" handler
   $app->renderer->add_handler(
     $name => sub {
@@ -36,6 +33,7 @@ sub register {
       $c->stash->{layout} ||= undef;
 
       # Cache
+      my $cache = $r->cache;
       unless ($cache->get($key)) {
 
         # Initialize

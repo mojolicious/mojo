@@ -3,11 +3,13 @@ use Mojo::Base -base;
 
 use File::Spec;
 use Mojo::ByteStream 'b';
+use Mojo::Cache;
 use Mojo::Command;
 use Mojo::Home;
 use Mojo::JSON;
 use Mojo::Util 'encode';
 
+has cache => sub { Mojo::Cache->new };
 has default_format   => 'html';
 has detect_templates => 1;
 has encoding         => 'UTF-8';
@@ -363,6 +365,14 @@ See L<Mojolicious::Guides::Rendering> for more.
 =head1 ATTRIBUTES
 
 L<Mojolicious::Renderer> implements the following attributes.
+
+=head2 C<cache>
+
+  my $cache = $renderer->cache;
+  $renderer = $renderer->cache(Mojo::Cache->new);
+
+Renderer cache, by default a L<Mojo::Cache> object.
+Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<default_format>
 

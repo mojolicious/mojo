@@ -1,7 +1,6 @@
 package Mojolicious::Plugin::EplRenderer;
 use Mojo::Base 'Mojolicious::Plugin';
 
-use Mojo::Cache;
 use Mojo::Template;
 use Mojo::Util 'md5_sum';
 
@@ -9,9 +8,6 @@ use Mojo::Util 'md5_sum';
 #  scared."
 sub register {
   my ($self, $app) = @_;
-
-  # Cache
-  my $cache = $app->renderer->{_cache} = Mojo::Cache->new;
 
   # Add "epl" handler
   $app->renderer->add_handler(
@@ -27,8 +23,9 @@ sub register {
       return unless defined $path;
 
       # Cache
-      my $key = delete $options->{cache} || $path;
-      my $mt = $cache->get($key);
+      my $cache = $r->cache;
+      my $key   = delete $options->{cache} || $path;
+      my $mt    = $cache->get($key);
 
       # Initialize
       $mt ||= Mojo::Template->new;

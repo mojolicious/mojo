@@ -10,6 +10,7 @@ use Mojolicious::Routes::Pattern;
 use Scalar::Util 'weaken';
 
 has [qw/block inline parent partial namespace/];
+has cache => sub { Mojo::Cache->new };
 has [qw/children conditions/] => sub { [] };
 has controller_base_class => 'Mojolicious::Controller';
 has [qw/dictionary shortcuts/] => sub { {} };
@@ -123,9 +124,6 @@ sub dispatch {
   $path = "/$path" if defined $path && $path !~ /^\//;
   $path = $req->url->path->to_abs_string unless $path;
 
-  # Cache
-  my $cache = $self->{_cache} ||= Mojo::Cache->new;
-
   # Method
   my $method = $req->method;
 
@@ -135,6 +133,9 @@ sub dispatch {
   # Match
   my $m = Mojolicious::Routes::Match->new($method => $path, $websocket);
   $c->match($m);
+
+  # Cache
+  my $cache = $self->cache;
 
   # Cached
   if (my $cached = $cache->get("$method:$path:$websocket")) {
@@ -749,6 +750,14 @@ Allow this route to match even if it's not an endpoint, used for waypoints.
   $r           = $r->children([Mojolicious::Routes->new]);
 
 The children of this routes object, used for nesting routes.
+
+=head2 C<cache>
+
+  my $cache = $r->cache;
+  $r        = $r->cache(Mojo::Cache->new);
+
+Routing cache, by default a L<Mojo::Cache> object.
+Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<conditions>
 

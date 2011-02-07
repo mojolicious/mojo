@@ -11,6 +11,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL user_agent attribute to Mojo::Client.
         - Added EXPERIMENTAL support for mode specific not_found and
           exception templates.
+        - Added EXPERIMENTAL support for route caching.
         - Added image helper to Mojolicious::Plugin::TagHelpers.
         - Replaced Mojo::JSON parser with a much faster and stricter
           implementation. (chansen)

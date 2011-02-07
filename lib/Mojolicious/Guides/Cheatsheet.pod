@@ -278,12 +278,6 @@ templates, defaults to C<main>.
 
   MOJO_STATIC_CLASS=MyApp
 
-=head2 C<MOJO_TEMPLATE_CACHE>
-
-Number of compiled templates to cache in memory, defaults to C<100>.
-
-  MOJO_TEMPLATE_CACHE=20
-
 =head2 C<MOJO_TEMPLATE_CLASS>
 
 Class the L<Mojolicious> renderer should use to find C<DATA> templates,

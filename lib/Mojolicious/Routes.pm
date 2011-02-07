@@ -1,6 +1,7 @@
 package Mojolicious::Routes;
 use Mojo::Base -base;
 
+use Mojo::Cache;
 use Mojo::Exception;
 use Mojo::Loader;
 use Mojo::Util 'camelize';
@@ -122,13 +123,46 @@ sub dispatch {
   $path = "/$path" if defined $path && $path !~ /^\//;
   $path = $req->url->path->to_abs_string unless $path;
 
+  # Cache
+  my $cache = $self->{_cache} ||= Mojo::Cache->new;
+
+  # Method
+  my $method = $req->method;
+
+  # WebSocket
+  my $websocket = $c->tx->is_websocket ? 1 : 0;
+
   # Match
-  my $m = Mojolicious::Routes::Match->new(
-    $req->method => $path,
-    $c->tx->is_websocket
-  );
-  $m->match($self, $c);
+  my $m = Mojolicious::Routes::Match->new($method => $path, $websocket);
   $c->match($m);
+
+  # Cached
+  if (my $cached = $cache->get("$method:$path:$websocket")) {
+    $m->root($self);
+    $m->stack($cached->{stack});
+    $m->captures($cached->{captures});
+    $m->endpoint($cached->{endpoint});
+  }
+
+  # Lookup
+  else {
+
+    # Match
+    $m->match($self, $c);
+
+    # Endpoint found
+    if (my $endpoint = $m->endpoint) {
+
+      # Cache routes without conditions
+      $cache->set(
+        "$method:$path:$websocket" => {
+          endpoint => $endpoint,
+          stack    => $m->stack,
+          captures => $m->captures
+        }
+      ) unless $endpoint->has_conditions;
+    }
+  }
 
   # No match
   return 1 unless $m && @{$m->stack};
@@ -141,6 +175,13 @@ sub dispatch {
 }
 
 sub get { shift->_generate_route('get', @_) }
+
+sub has_conditions {
+  my $self = shift;
+  return 1 if @{$self->conditions};
+  if (my $parent = $self->parent) { return $parent->has_conditions }
+  return;
+}
 
 sub has_custom_name {
   return 1 if shift->{_custom};
@@ -360,14 +401,13 @@ sub websocket {
 }
 
 sub _dispatch_callback {
-  my ($self, $c, $staging) = @_;
+  my ($self, $c, $cb, $staging) = @_;
 
   # Debug
   $c->app->log->debug(qq/Dispatching callback./);
 
   # Dispatch
   my $continue;
-  my $cb      = $c->match->captures->{cb};
   my $success = eval {
 
     # Callback
@@ -392,17 +432,14 @@ sub _dispatch_callback {
 }
 
 sub _dispatch_controller {
-  my ($self, $c, $staging) = @_;
-
-  # Application
-  my $app = $c->match->captures->{app};
+  my ($self, $c, $app, $field, $staging) = @_;
 
   # Class
-  $app ||= $self->_generate_class($c);
+  $app ||= $self->_generate_class($field, $c);
   return 1 unless $app;
 
   # Method
-  my $method = $self->_generate_method($c);
+  my $method = $self->_generate_method($field, $c);
 
   # Debug
   my $dispatch = ref $app || $app;
@@ -484,10 +521,7 @@ sub _dispatch_controller {
 }
 
 sub _generate_class {
-  my ($self, $c) = @_;
-
-  # Field
-  my $field = $c->match->captures;
+  my ($self, $field, $c) = @_;
 
   # Class
   my $class = $field->{class};
@@ -511,10 +545,7 @@ sub _generate_class {
 }
 
 sub _generate_method {
-  my ($self, $c) = @_;
-
-  # Field
-  my $field = $c->match->captures;
+  my ($self, $field, $c) = @_;
 
   # Prepare hidden
   unless ($self->{_hidden}) {
@@ -602,33 +633,35 @@ sub _walk_stack {
   # Stack
   my $stack = $c->match->stack;
 
+  # Stash
+  my $stash = $c->stash;
+  $stash->{'mojo.captures'} ||= {};
+
   # Walk the stack
   my $staging = @$stack;
   for my $field (@$stack) {
     $staging--;
 
-    # Stash
-    my $stash = $c->stash;
-
-    # Captures
-    $c->match->captures({%$field});
-
-    # Cleanup
-    my $cb = delete $field->{cb};
+    # Hide callback and app
+    my $cb = $field->{cb};
+    local $field->{cb};
+    delete $field->{cb};
+    my $app = $field->{app};
+    local $field->{app};
     delete $field->{app};
 
-    # Captures
-    my $captures = $stash->{'mojo.captures'} ||= {};
-    $stash->{'mojo.captures'} = {%$captures, %$field};
-
     # Merge in captures
-    @{$c->stash}{keys %$field} = values %$field;
+    if (my @keys = keys %$field) {
+      my @values = values %$field;
+      @{$stash->{'mojo.captures'}}{@keys} = @values;
+      @{$c->stash}{@keys} = @values;
+    }
 
     # Dispatch
     my $e =
         $cb
-      ? $self->_dispatch_callback($c, $staging)
-      : $self->_dispatch_controller($c, $staging);
+      ? $self->_dispatch_callback($c, $cb, $staging)
+      : $self->_dispatch_controller($c, $app, $field, $staging);
 
     # Exception
     if (ref $e) {
@@ -879,6 +912,13 @@ Match routes and dispatch.
 
 Generate route matching only C<GET> requests.
 See also the L<Mojolicious::Lite> tutorial for more argument variations.
+
+=head2 C<has_conditions>
+
+  my $has_conditions = $r->has_conditions;
+
+Returns true if this route contains conditions.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<has_custom_name>
 

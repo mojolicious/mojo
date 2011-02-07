@@ -1,6 +1,7 @@
 package Mojolicious::Plugin::EplRenderer;
 use Mojo::Base 'Mojolicious::Plugin';
 
+use Mojo::Cache;
 use Mojo::Template;
 use Mojo::Util 'md5_sum';
 
@@ -8,6 +9,9 @@ use Mojo::Util 'md5_sum';
 #  scared."
 sub register {
   my ($self, $app) = @_;
+
+  # Cache
+  my $cache = $app->renderer->{_cache} = Mojo::Cache->new;
 
   # Add "epl" handler
   $app->renderer->add_handler(
@@ -21,17 +25,16 @@ sub register {
       my $path = $r->template_path($options);
       $path = md5_sum $inline if defined $inline;
       return unless defined $path;
-      my $cache = delete $options->{cache} || $path;
 
-      # Check cache
-      my $ec = $r->{_epl_cache} ||= {};
-      my $mt = $ec->{$cache};
+      # Cache
+      my $key = delete $options->{cache} || $path;
+      my $mt = $cache->get($key);
 
       # Initialize
       $mt ||= Mojo::Template->new;
 
       # Cached
-      if ($mt && $mt->compiled) { $$output = $mt->interpret($c) }
+      if ($mt->compiled) { $$output = $mt->interpret($c) }
 
       # Not cached
       else {
@@ -64,11 +67,7 @@ sub register {
         }
 
         # Cache
-        my $stack = $r->{_epl_stack} ||= [];
-        delete $ec->{shift @$stack}
-          while @$stack > ($ENV{MOJO_TEMPLATE_CACHE} || 100);
-        push @$stack, $cache;
-        $ec->{$cache} = $mt;
+        $cache->set($key => $mt);
       }
 
       # Exception

@@ -18,6 +18,9 @@ sub register {
   # Auto escape by default to prevent XSS attacks
   $template->{auto_escape} = 1 unless defined $template->{auto_escape};
 
+  # Cache
+  my $cache = $app->renderer->{_cache};
+
   # Add "ep" handler
   $app->renderer->add_handler(
     $name => sub {
@@ -27,17 +30,16 @@ sub register {
       my $path = $r->template_path($options) || $options->{inline};
       return unless defined $path;
       my $list = join ', ', sort keys %{$c->stash};
-      my $cache = $options->{cache} = md5_sum "$path($list)";
+      my $key = $options->{cache} = md5_sum "$path($list)";
 
       # Stash defaults
       $c->stash->{layout} ||= undef;
 
       # Cache
-      my $ec = $r->{_epl_cache} ||= {};
-      unless ($ec->{$cache}) {
+      unless ($cache->get($key)) {
 
         # Initialize
-        my $mt = $ec->{$cache} = Mojo::Template->new($template);
+        my $mt = Mojo::Template->new($template);
 
         # Self
         my $prepend = 'my $self = shift;';
@@ -68,6 +70,9 @@ sub register {
 
         # Prepend
         $mt->prepend($prepend);
+
+        # Cache
+        $cache->set($key => $mt);
       }
 
       # Render with epl

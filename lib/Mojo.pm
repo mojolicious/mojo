@@ -2,15 +2,24 @@ package Mojo;
 use Mojo::Base -base;
 
 use Carp 'croak';
-use Mojo::Client;
 use Mojo::Home;
 use Mojo::Log;
 use Mojo::Transaction::HTTP;
 use Mojo::Transaction::WebSocket;
 
-has client => sub { Mojo::Client->singleton };
-has home   => sub { Mojo::Home->new };
-has log    => sub { Mojo::Log->new };
+has client => sub {
+
+  # Singleton client
+  require Mojo::Client;
+  my $client = Mojo::Client->singleton;
+
+  # Inherit logger
+  $client->log(shift->log);
+
+  return $client;
+};
+has home => sub { Mojo::Home->new };
+has log  => sub { Mojo::Log->new };
 has on_build_tx => sub {
   sub { Mojo::Transaction::HTTP->new }
 };
@@ -24,9 +33,6 @@ sub new {
 
   # Home
   $self->home->detect(ref $self);
-
-  # Client logger
-  $self->client->log($self->log);
 
   # Log directory
   $self->log->path($self->home->rel_file('log/mojo.log'))

@@ -85,10 +85,10 @@ sub decode {
 
     # Array
     my $ref;
-    if (m/\G\[/xgc) { $ref = _decode_array() }
+    if (m/\G\[/gc) { $ref = _decode_array() }
 
     # Object
-    elsif (m/\G\{/xgc) { $ref = _decode_object() }
+    elsif (m/\G\{/gc) { $ref = _decode_object() }
 
     # Unexpected
     else { _exception('Expected array or object') }
@@ -187,11 +187,11 @@ sub _decode_string {
   my $pos = pos;
 
   # String
-  m/\G((?:[^\x00-\x1F\\"]|\\(?:["\\\/bfnrt]|u[A-Fa-f0-9]{4}))*)/xgc;
+  m/\G((?:[^\x00-\x1F\\"]|\\(?:["\\\/bfnrt]|u[A-Fa-f0-9]{4}))*)/gc;
   my $str = $1;
 
   # Missing quote
-  unless (m/\G"/xgc) {
+  unless (m/\G"/gc) {
     _exception('Unexpected character or invalid escape while parsing string')
       if m/\G[\x00-\x1F\\]/x;
     _exception('Unterminated string');
@@ -205,7 +205,7 @@ sub _decode_string {
 
   # Everything else
   my $buffer = '';
-  while ($str =~ m/\G([^\\]*)\\(?:([^u])|u(.{4}))/xgc) {
+  while ($str =~ m/\G([^\\]*)\\(?:([^u])|u(.{4}))/gc) {
 
     # Pass through
     $buffer .= $1;
@@ -226,7 +226,7 @@ sub _decode_string {
           _exception('Missing high-surrogate');
 
         # Low surrogate
-        $str =~ m/\G\\u([Dd][C-Fc-f]..)/xgc
+        $str =~ m/\G\\u([Dd][C-Fc-f]..)/gc
           or pos($_) = $pos + pos($str),
           _exception('Missing low-surrogate');
 
@@ -251,26 +251,26 @@ sub _decode_value {
   m/\G$WHITESPACE_RE/xogc;
 
   # String
-  return _decode_string() if m/\G"/xgc;
+  return _decode_string() if m/\G"/gc;
 
   # Array
-  return _decode_array() if m/\G\[/xgc;
+  return _decode_array() if m/\G\[/gc;
 
   # Object
-  return _decode_object() if m/\G\{/xgc;
+  return _decode_object() if m/\G\{/gc;
 
   # Number
   return 0 + $1
-    if m/\G([-]?(?:0|[1-9][0-9]*)(?:\.[0-9]*)?(?:[eE][+-]?[0-9]+)?)/xgc;
+    if m/\G([-]?(?:0|[1-9][0-9]*)(?:\.[0-9]*)?(?:[eE][+-]?[0-9]+)?)/gc;
 
   # True
-  return $TRUE if m/\Gtrue/xgc;
+  return $TRUE if m/\Gtrue/gc;
 
   # False
-  return $FALSE if m/\Gfalse/xgc;
+  return $FALSE if m/\Gfalse/gc;
 
   # Null
-  return undef if m/\Gnull/xgc;
+  return undef if m/\Gnull/gc;
 
   # Exception
   _exception('Expected string, array, object, number, boolean or null');
@@ -355,7 +355,7 @@ sub _exception {
   # Context
   my $context = 'Malformed JSON: ' . shift;
   $context
-    .= m/\G\z/xgc ? ' before end of data' : ' at character offset ' . pos;
+    .= m/\G\z/gc ? ' before end of data' : ' at character offset ' . pos;
 
   # Throw
   die "$context.\n";

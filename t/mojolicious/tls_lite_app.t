@@ -8,55 +8,67 @@ BEGIN { $ENV{MOJO_POLL} = 1 }
 
 use Test::More;
 use Mojo::IOLoop;
-use Mojo::Cookie::Response;
 plan skip_all => 'IO::Socket::SSL 1.37 required for this test!'
   unless Mojo::IOLoop::TLS;
 plan skip_all => 'Windows is too fragile for this test!'
   if Mojo::IOLoop::WINDOWS;
-plan tests => 5;
+plan tests => 18;
 
-# Homer: Look at these low, low prices on famous brand-name electronics!
-# Bart:  Don't be a sap, Dad. These are just crappy knockoffs.
-# Homer: Pfft. I know a genuine Panaphonics when I see it. And look,
-#        there's a Magnetbox and Sorny.
+# "Look at these low, low prices on famous brand-name electronics!
+#  Don't be a sap, Dad. These are just crappy knockoffs.
+#  Pfft. I know a genuine Panaphonics when I see it.
+#  And look, there's a Magnetbox and Sorny."
 use Mojo::Client;
-use Mojo::Server::Daemon;
 use Mojolicious::Lite;
+use Test::Mojo;
 
 # Silence
 app->log->level('fatal');
+
+# Secure sessions
 app->sessions->secure(1);
 
-# GET /
-get '/' => sub {
+# GET /login
+get '/login' => sub {
   my $self = shift;
-  my $rel  = $self->req->url;
-  my $abs  = $rel->to_abs;
-  $self->render_text("Hello World! $rel $abs");
+  my $name = $self->param('name');
+  $self->session(name => $name);
+  $self->render_text("Welcome $name!");
 };
 
-get '/cookie' => sub {
+get '/again' => sub {
   my $self = shift;
-  $self->session(foo => 42);
-  $self->render_text("Here, have a cookie");
+  my $name = $self->session('name') || 'anonymous';
+  $self->render_text("Welcome back $name!");
 };
 
-# HTTP server for testing
-my $client = Mojo::Client->new;
-my $loop   = $client->ioloop;
-my $server = Mojo::Server::Daemon->new(app => app, ioloop => $loop);
-my $port   = Mojo::IOLoop->new->generate_port;
-$server->listen(["https://*:$port"]);
-$server->prepare_ioloop;
+my $t = Test::Mojo->new;
 
-# GET / (normal request)
-is $client->get("https://localhost:$port/")->success->body,
-  "Hello World! / https://localhost:$port/", 'right content';
+# Use HTTPS
+$t->client->test_server('https');
 
-# GET /cookie (to test secure flag)
-my $res = $client->get("https://localhost:$port/cookie")->success;
-ok defined $res, 'got response';
-is $res->body, "Here, have a cookie", 'right content';
-my $c = $res->cookies;
-is @$c, 1, 'got a cookie';
-ok $c->[0]->secure, 'cookie is secure';
+# GET /login
+$t->get_ok('/login?name=sri')->status_is(200)->content_is('Welcome sri!');
+
+# GET /again
+$t->get_ok('/again')->status_is(200)->content_is('Welcome back sri!');
+
+# Use HTTP
+$t->client(Mojo::Client->new);
+$t->client->test_server('http');
+
+# GET /login
+$t->get_ok('/login?name=sri')->status_is(200)->content_is('Welcome sri!');
+
+# GET /again
+$t->get_ok('/again')->status_is(200)->content_is('Welcome back anonymous!');
+
+# Use HTTPS again
+$t->client(Mojo::Client->new);
+$t->client->test_server('https');
+
+# GET /login
+$t->get_ok('/login?name=sri')->status_is(200)->content_is('Welcome sri!');
+
+# GET /again
+$t->get_ok('/again')->status_is(200)->content_is('Welcome back sri!');

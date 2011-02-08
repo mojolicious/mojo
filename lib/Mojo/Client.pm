@@ -495,7 +495,7 @@ sub start {
 
 # "It's like my dad always said: eventually, everybody gets shot."
 sub test_server {
-  my $self = shift;
+  my ($self, $protocol) = @_;
 
   # Server
   unless ($self->{_port}) {
@@ -503,7 +503,8 @@ sub test_server {
       Mojo::Server::Daemon->new(ioloop => $self->ioloop, silent => 1);
     my $port = $self->{_port} = $self->ioloop->generate_port;
     die "Couldn't find a free TCP port for testing.\n" unless $port;
-    $server->listen(["http://*:$port"]);
+    $self->{_protocol} = $protocol ||= 'http';
+    $server->listen(["$protocol://*:$port"]);
     $server->prepare_ioloop;
   }
 
@@ -989,7 +990,7 @@ sub _tx_start {
 
     # Relative
     unless ($url->host) {
-      $url->scheme('http');
+      $url->scheme($self->{_protocol});
       $url->host('localhost');
       $url->port($self->test_server);
       $req->url($url);
@@ -1736,6 +1737,7 @@ method.
 =head2 C<test_server>
 
   my $port = $client->test_server;
+  my $port = $client->test_server('https');
 
 Starts a test server for C<app> if neccessary and returns the port number.
 Note that this method is EXPERIMENTAL and might change without warning!

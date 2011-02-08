@@ -918,6 +918,8 @@ In alphabetical order.
 
 =over 2
 
+Abhijit Menon-Sen
+
 Adam Kennedy
 
 Adriano Ferreira

@@ -13,6 +13,7 @@ This file documents the revision history for Perl extension Mojolicious.
           exception templates.
         - Added EXPERIMENTAL support for route caching.
         - Added image helper to Mojolicious::Plugin::TagHelpers.
+        - Added support for secure session cookies. (crab)
         - Replaced Mojo::JSON parser with a much faster and stricter
           implementation. (chansen)
         - Improved Mojo::JSON string encoding. (chansen)

@@ -124,11 +124,10 @@ $jar->add(
 );
 @cookies = $jar->find(Mojo::URL->new('http://kraih.com/foo'));
 is $cookies[0], undef, 'no cookie for port 80';
-
 @cookies = $jar->find(Mojo::URL->new('http://kraih.com:88/foo'));
-is $cookies[0] && $cookies[0]->value, 'bar', 'cookie for port 88';
+is $cookies[0]->value, 'bar', 'cookie for port 88';
 
-# Switch between secure (HTTPS only) and normal cookies
+# Switch between secure and normal cookies
 $jar = Mojo::CookieJar->new;
 $jar->add(
   Mojo::Cookie::Response->new(
@@ -142,8 +141,7 @@ $jar->add(
 @cookies = $jar->find(Mojo::URL->new('https://kraih.com/foo'));
 is $cookies[0]->value, 'foo', 'right value';
 @cookies = $jar->find(Mojo::URL->new('http://kraih.com/foo'));
-is @cookies, 0, 'secure cookie, http url';
-
+is @cookies, 0, 'no insecure cookie';
 $jar->add(
   Mojo::Cookie::Response->new(
     domain => 'kraih.com',
@@ -152,7 +150,6 @@ $jar->add(
     value  => 'bar'
   )
 );
-
 @cookies = $jar->find(Mojo::URL->new('http://kraih.com/foo'));
 is $cookies[0]->value, 'bar', 'right value';
 @cookies = $jar->find(Mojo::URL->new('https://kraih.com/foo'));

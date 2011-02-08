@@ -35,7 +35,7 @@ sub add {
     # Initialize
     $self->{_jar}->{$domain} ||= [];
 
-    # Collect old cookies which are not superseded by the new one
+    # Check if we already have a similar cookie
     my @new;
     for my $old (@{$self->{_jar}->{$domain}}) {
 
@@ -100,7 +100,7 @@ sub find {
         next if time > ($cookie->expires->epoch || 0);
       }
 
-      # Not expired; retain
+      # Not expired
       push @new, $cookie;
 
       # Port

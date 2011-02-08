@@ -15,11 +15,11 @@ has tree => sub { ['root'] };
 my $CSS_ESCAPE_RE = qr/\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}/;
 my $CSS_ATTR_RE   = qr/
   \[
-  ((?:$CSS_ESCAPE_RE|\w)+)   # Key
+  ((?:$CSS_ESCAPE_RE|\w)+)      # Key
   (?:
-  (\W)?                      # Operator
+  (\W)?                         # Operator
   =
-  "((?:\\"|[^"])+)"          # Value
+  (?:"((?:\\"|[^"])+)"|(\S+))   # Value
   )?
   \]
 /x;
@@ -28,13 +28,18 @@ my $CSS_ELEMENT_RE      = qr/^((?:\\\.|\\\#|[^\.\#])+)/;
 my $CSS_ID_RE           = qr/\#((?:\\\#|[^\#])+)/;
 my $CSS_PSEUDO_CLASS_RE = qr/(?:\:([\w\-]+)(?:\(((?:\([^\)]+\)|[^\)])+)\))?)/;
 my $CSS_TOKEN_RE        = qr/
-  (\s*,\s*)?                                                   # Separator
-  ((?:[^\[\\\:\s\,]|$CSS_ESCAPE_RE\s?)+)?                      # Element
-  ((?:\:[\w\-]+(?:\((?:\([^\)]+\)|[^\)])+\))?)*)?              # Pseudoclass
-  ((?:\[(?:$CSS_ESCAPE_RE|\w)+(?:\W?="(?:\\"|[^"])+")?\])*)?   # Attributes
+  (\s*,\s*)?                                        # Separator
+  ((?:[^\[\\\:\s\,]|$CSS_ESCAPE_RE\s?)+)?           # Element
+  ((?:\:[\w\-]+(?:\((?:\([^\)]+\)|[^\)])+\))?)*)?   # Pseudoclass
+  ((?:\[
+    (?:$CSS_ESCAPE_RE|\w)+                          # Key
+    (?:\W?=                                         # Operator
+      (?:"(?:\\"|[^"])+"|\S+)                       # Value
+    )?
+  \])*)?
   (?:
   \s*
-  ([\>\+\~])                                                   # Combinator
+  ([\>\+\~])                                        # Combinator
   )?
 /x;
 my $XML_ATTR_RE = qr/
@@ -428,10 +433,11 @@ sub _css_equation {
   elsif ($equation eq 'odd') { $num = [2, 1] }
 
   # Equation
-  elsif ($equation =~ /(?:(\-?(?:\d+)?)?n)?\+?(\-?\d+)?$/) {
+  elsif ($equation =~ /(?:(\-?(?:\d+)?)?n)?\s*\+?\s*(\-?\s*\d+)?\s*$/) {
     $num->[0] = $1 || 0;
     $num->[0] = -1 if $num->[0] eq '-';
     $num->[1] = $2 || 0;
+    $num->[1] =~ s/\s+//g;
   }
 
   return $num;
@@ -864,6 +870,7 @@ sub _parse_css {
       my $key   = $self->_css_unescape($1);
       my $op    = $2 || '';
       my $value = $3;
+      $value = $4 unless defined $3;
 
       push @$selector, ['attribute', $key, $self->_css_regex($op, $value)];
     }

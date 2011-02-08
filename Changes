@@ -22,6 +22,7 @@ This file documents the revision history for Perl extension Mojolicious.
           over Mojolicious.
         - Renamed after and before in Mojo::DOM to add_after and add_before.
         - Improved documentation browser slightly.
+        - Improved CSS3 support in Mojo::DOM.
         - Changed Mojolicious::Plugin::EplRenderer to not render 404 errors
           for missing templates.
         - Changed exception template to use pre instead of h1 tags for error

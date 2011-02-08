@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 317;
+use Test::More tests => 344;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -120,6 +120,8 @@ is $simple->to_xml, '<simple class="working">easy</simple>',
 is $dom->at('test#test')->type,         'test',   'right type';
 is $dom->at('[class$="ing"]')->type,    'simple', 'right type';
 is $dom->at('[class="working"]')->type, 'simple', 'right type';
+is $dom->at('[class$=ing]')->type,      'simple', 'right type';
+is $dom->at('[class=working]')->type,   'simple', 'right type';
 
 # Deep nesting (parent combinator)
 $dom->parse(<<EOF);
@@ -168,6 +170,8 @@ is $dom->at('#test')->text,       'works', 'right text';
 is $dom->at('div')->text,         'works', 'right text';
 is $dom->at('[foo="bar"]')->text, 'works', 'right text';
 is $dom->at('[foo="ba"]'), undef, 'no result';
+is $dom->at('[foo=bar]')->text, 'works', 'right text';
+is $dom->at('[foo=ba]'), undef, 'no result';
 is $dom->at('.tset')->text, 'works', 'right text';
 
 # HTML1 (single quotes, uppercase tags and whitespace in attributes)
@@ -176,6 +180,8 @@ is $dom->at('#test')->text,       'works', 'right text';
 is $dom->at('div')->text,         'works', 'right text';
 is $dom->at('[foo="bar"]')->text, 'works', 'right text';
 is $dom->at('[foo="ba"]'), undef, 'no result';
+is $dom->at('[foo=bar]')->text, 'works', 'right text';
+is $dom->at('[foo=ba]'), undef, 'no result';
 is $dom->at('.tset')->text, 'works', 'right text';
 
 # Already decoded unicode snowman and quotes in selector
@@ -204,6 +210,10 @@ is $dom->at('[id^="☃"]')->text,                  'Snowman', 'right text';
 is $dom->at('div[id^="☃"]')->text,               'Snowman', 'right text';
 is $dom->at('p div[id^="☃"]')->text,             'Snowman', 'right text';
 is $dom->at('p > div[id^="☃"]')->text,           'Snowman', 'right text';
+is $dom->at('[id^=☃]')->text,                    'Snowman', 'right text';
+is $dom->at('div[id^=☃]')->text,                 'Snowman', 'right text';
+is $dom->at('p div[id^=☃]')->text,               'Snowman', 'right text';
+is $dom->at('p > div[id^=☃]')->text,             'Snowman', 'right text';
 is $dom->at(".\\\n\\002665")->text,                'Heart',   'right text';
 is $dom->at('.\\2665')->text,                      'Heart',   'right text';
 is $dom->at("p .\\\n\\002665")->text,              'Heart',   'right text';
@@ -222,14 +232,26 @@ is $dom->at('[class$="♥"]')->text,               'Heart',   'right text';
 is $dom->at('div[class$="♥"]')->text,            'Heart',   'right text';
 is $dom->at('p div[class$="♥"]')->text,          'Heart',   'right text';
 is $dom->at('p > div[class$="♥"]')->text,        'Heart',   'right text';
+is $dom->at('[class$=♥]')->text,                 'Heart',   'right text';
+is $dom->at('div[class$=♥]')->text,              'Heart',   'right text';
+is $dom->at('p div[class$=♥]')->text,            'Heart',   'right text';
+is $dom->at('p > div[class$=♥]')->text,          'Heart',   'right text';
 is $dom->at('[class~="♥"]')->text,               'Heart',   'right text';
 is $dom->at('div[class~="♥"]')->text,            'Heart',   'right text';
 is $dom->at('p div[class~="♥"]')->text,          'Heart',   'right text';
 is $dom->at('p > div[class~="♥"]')->text,        'Heart',   'right text';
+is $dom->at('[class~=♥]')->text,                 'Heart',   'right text';
+is $dom->at('div[class~=♥]')->text,              'Heart',   'right text';
+is $dom->at('p div[class~=♥]')->text,            'Heart',   'right text';
+is $dom->at('p > div[class~=♥]')->text,          'Heart',   'right text';
 is $dom->at('[class~="x"]')->text,                 'Heart',   'right text';
 is $dom->at('div[class~="x"]')->text,              'Heart',   'right text';
 is $dom->at('p div[class~="x"]')->text,            'Heart',   'right text';
 is $dom->at('p > div[class~="x"]')->text,          'Heart',   'right text';
+is $dom->at('[class~=x]')->text,                   'Heart',   'right text';
+is $dom->at('div[class~=x]')->text,                'Heart',   'right text';
+is $dom->at('p div[class~=x]')->text,              'Heart',   'right text';
+is $dom->at('p > div[class~=x]')->text,            'Heart',   'right text';
 
 # Looks remotely like HTML
 $dom->parse('<!DOCTYPE H "-/W/D HT 4/E">☃<title class=test>♥</title>☃');
@@ -566,6 +588,9 @@ is($dom->find(':nth-last-child(1)')->[1]->text,    'H',  'right text');
 $dom->find('li:nth-child(2n+1)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/A C E G/], 'found all odd li elements';
 @li = ();
+$dom->find('li:nth-child(2n + 1)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/A C E G/], 'found all odd li elements';
+@li = ();
 $dom->find('li:nth-last-child(2n+1)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/B D F H/], 'found all odd li elements';
 @li = ();
@@ -576,6 +601,9 @@ $dom->find('li:nth-last-child(even)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/A C E G/], 'found all even li elements';
 @li = ();
 $dom->find('li:nth-child(2n+2)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/B D F H/], 'found all even li elements';
+@li = ();
+$dom->find('li:nth-child( 2n + 2 )')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/B D F H/], 'found all even li elements';
 @li = ();
 $dom->find('li:nth-last-child(2n+2)')->each(sub { push @li, shift->text });
@@ -596,16 +624,25 @@ is_deeply \@li, [qw/A E/], 'found the right li element';
 $dom->find('li:nth-child(4n)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/D H/], 'found the right li element';
 @li = ();
+$dom->find('li:nth-child( 4n )')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/D H/], 'found the right li element';
+@li = ();
 $dom->find('li:nth-last-child(4n)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/A E/], 'found the right li element';
 @li = ();
 $dom->find('li:nth-child(5n-2)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/C H/], 'found the right li element';
 @li = ();
+$dom->find('li:nth-child( 5n - 2 )')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/C H/], 'found the right li element';
+@li = ();
 $dom->find('li:nth-last-child(5n-2)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/A F/], 'found the right li element';
 @li = ();
 $dom->find('li:nth-child(-n+3)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/A B C/], 'found first three li elements';
+@li = ();
+$dom->find('li:nth-child( -n + 3 )')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/A B C/], 'found first three li elements';
 @li = ();
 $dom->find('li:nth-last-child(-n+3)')->each(sub { push @li, shift->text });

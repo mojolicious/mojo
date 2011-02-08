@@ -83,8 +83,15 @@ sub auto_render {
   # Rendering
   my $success = eval {
 
+    # Stash
+    my $stash = $c->stash;
+
     # Render
-    $c->render unless $c->stash->{'mojo.rendered'} || $tx->is_websocket;
+    unless ($stash->{'mojo.rendered'} || $tx->is_websocket) {
+
+      # Render template or not_found if the route never reached an action
+      $c->render or ($stash->{'mojo.routed'} or $c->render_not_found);
+    }
 
     # Success
     1;
@@ -404,6 +411,9 @@ sub websocket {
 sub _dispatch_callback {
   my ($self, $c, $cb, $staging) = @_;
 
+  # Routed
+  $c->stash->{'mojo.routed'} = 1;
+
   # Debug
   $c->app->log->debug(qq/Dispatching callback./);
 
@@ -478,13 +488,22 @@ sub _dispatch_controller {
     # Action
     if ($method && $app->isa($self->controller_base_class)) {
 
+      # Stash
+      my $stash = $c->stash;
+
       # Call action
-      if ($app->can($method)) { $continue = $app->$method }
-      else                    { $app->render_not_found("->$method") }
+      if ($app->can($method)) {
+
+        # Routed
+        $stash->{'mojo.routed'} = 1;
+
+        # Action
+        $continue = $app->$method;
+      }
 
       # Merge stash
       my $new = $app->stash;
-      @{$c->stash}{keys %$new} = values %$new;
+      @{$stash}{keys %$new} = values %$new;
     }
 
     # Handler

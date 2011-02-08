@@ -6,7 +6,7 @@ use warnings;
 # Disable epoll and kqueue
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 201;
+use Test::More tests => 206;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -24,11 +24,17 @@ use_ok 'MojoliciousTest';
 
 my $t = Test::Mojo->new(app => 'MojoliciousTest');
 
-# Foo::baz (missing action)
+# Foo::baz (missing action without template)
 $t->get_ok('/foo/baz')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/Not Found/);
+
+# Foo::yada (action-less template)
+$t->get_ok('/foo/yada')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("look ma! no action!\n");
 
 # SyntaxError::foo (syntax error in controller)
 $t->get_ok('/syntax_error/foo')->status_is(500)

@@ -8,6 +8,7 @@ has 'cookie_domain';
 has cookie_name        => 'mojolicious';
 has cookie_path        => '/';
 has default_expiration => 3600;
+has secure             => 0;
 
 # "Bender, quit destroying the universe!"
 sub load {
@@ -73,6 +74,7 @@ sub store {
   my $options = {expires => $expires, path => $self->cookie_path};
   my $domain = $self->cookie_domain;
   $options->{domain} = $domain if $domain;
+  $options->{secure} = 1 if $self->secure;
 
   # Session cookie
   $c->signed_cookie($self->cookie_name, $value, $options);
@@ -129,6 +131,14 @@ Path for session cookie, defaults to C</>.
 
 Time for the session to expire in seconds from now, defaults to C<3600>.
 The expiration timeout gets refreshed for every request.
+
+=head2 C<secure>
+
+  my $secure = $session->secure;
+  $session   = $session->secure(1);
+
+A flag to indicate whether or not the session cookie is secure
+(i.e., HTTPS-only), defaults to false.
 
 =head1 METHODS
 

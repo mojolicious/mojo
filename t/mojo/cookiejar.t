@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 24;
+use Test::More tests => 30;
 
 # "Hello, my name is Mr. Burns. I believe you have a letter for me.
 #  Okay Mr. Burns, what’s your first name.
@@ -110,3 +110,50 @@ $jar->add(
 @cookies = $jar->find(Mojo::URL->new('http://kraih.com/foo'));
 is $cookies[0]->value, 'bar2', 'right value';
 is $cookies[1], undef, 'no second cookie';
+
+# Non-standard port
+$jar = Mojo::CookieJar->new;
+$jar->add(
+  Mojo::Cookie::Response->new(
+    domain => 'kraih.com',
+    path   => '/foo',
+    name   => 'foo',
+    value  => 'bar',
+    port   => 88
+  )
+);
+@cookies = $jar->find(Mojo::URL->new('http://kraih.com/foo'));
+is $cookies[0], undef, 'no cookie for port 80';
+
+@cookies = $jar->find(Mojo::URL->new('http://kraih.com:88/foo'));
+is $cookies[0] && $cookies[0]->value, 'bar', 'cookie for port 88';
+
+# Switch between secure (HTTPS only) and normal cookies
+$jar = Mojo::CookieJar->new;
+$jar->add(
+  Mojo::Cookie::Response->new(
+    domain => 'kraih.com',
+    path   => '/foo',
+    name   => 'foo',
+    value  => 'foo',
+    secure => 1
+  )
+);
+@cookies = $jar->find(Mojo::URL->new('https://kraih.com/foo'));
+is $cookies[0]->value, 'foo', 'right value';
+@cookies = $jar->find(Mojo::URL->new('http://kraih.com/foo'));
+is @cookies, 0, 'secure cookie, http url';
+
+$jar->add(
+  Mojo::Cookie::Response->new(
+    domain => 'kraih.com',
+    path   => '/foo',
+    name   => 'foo',
+    value  => 'bar'
+  )
+);
+
+@cookies = $jar->find(Mojo::URL->new('http://kraih.com/foo'));
+is $cookies[0]->value, 'bar', 'right value';
+@cookies = $jar->find(Mojo::URL->new('https://kraih.com/foo'));
+is $cookies[0]->value, 'bar', 'right value';

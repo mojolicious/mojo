@@ -35,7 +35,7 @@ sub add {
     # Initialize
     $self->{_jar}->{$domain} ||= [];
 
-    # Check if we already have the same cookie
+    # Collect old cookies which are not superseded by the new one
     my @new;
     for my $old (@{$self->{_jar}->{$domain}}) {
 
@@ -100,9 +100,15 @@ sub find {
         next if time > ($cookie->expires->epoch || 0);
       }
 
+      # Not expired; retain
+      push @new, $cookie;
+
       # Port
       my $port = $url->port || 80;
       next if $cookie->port && $port != $cookie->port;
+
+      # Protocol
+      next if $cookie->secure && $url->scheme ne 'https';
 
       # Path
       my $cpath = $cookie->path;
@@ -111,11 +117,9 @@ sub find {
         name    => $cookie->name,
         value   => $cookie->value,
         path    => $cookie->path,
-        version => $cookie->version
+        version => $cookie->version,
+        secure  => $cookie->secure
         ) if $path =~ /^$cpath/;
-
-      # Not expired
-      push @new, $cookie;
     }
     $self->{_jar}->{$domain} = \@new;
   }

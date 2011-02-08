@@ -6,7 +6,7 @@ has 'max_keys' => 100;
 # "Maybe I should hook up with you guys.
 #  After all, how long do any of us have to live?
 #  Well, if you like the ribwich, not very.
-#  *holds up ribwich box with Krusy saying 'WILL CAUSE EARLY DEATH'*
+#  *holds up ribwich box with Krusty saying 'WILL CAUSE EARLY DEATH'*
 #  D'oh!"
 sub get { (shift->{_cache} || {})->{shift()} }
 

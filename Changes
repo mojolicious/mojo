@@ -14,6 +14,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL support for mode specific not_found and
           exception templates.
         - Added EXPERIMENTAL support for route caching.
+        - Added EXPERIMENTAL support for CSS3 selectors to the get command.
         - Added image helper to Mojolicious::Plugin::TagHelpers.
         - Added support for secure session cookies. (crab)
         - Replaced Mojo::JSON parser with a much faster and stricter

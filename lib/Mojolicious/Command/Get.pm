@@ -2,6 +2,7 @@ package Mojolicious::Command::Get;
 use Mojo::Base 'Mojo::Command';
 
 use Mojo::Client;
+use Mojo::DOM;
 use Mojo::IOLoop;
 use Mojo::Transaction::HTTP;
 use Mojo::Util 'decode';
@@ -12,9 +13,22 @@ has description => <<'EOF';
 Get file from URL.
 EOF
 has usage => <<"EOF";
-usage: $0 get [OPTIONS] [URL]
+usage: $0 get [OPTIONS] [URL] [SELECTOR] [COMMANDS]
+
+  mojo get /
+  mojo get mojolicio.us
+  mojo get -v -r google.com
+  mojo get --method POST --content 'trololo' mojolicio.us
+  mojo get --header 'X-Bender: Bite my shiny metal ass!' mojolicio.us
+  mojo get mojolicio.us 'head > title' text
+  mojo get mojolicio.us .footer all
+  mojo get mojolicio.us a attr href
+  mojo get mojolicio.us '*' attr id
+  mojo get mojolicio.us 'h1, h2, h3' 3 text
 
 These options are available:
+  --header     Additional HTTP header.
+  --method     HTTP method to use.
   --redirect   Follow up to 5 redirects.
   --verbose    Print verbose debug information to STDERR.
 EOF
@@ -25,16 +39,35 @@ sub run {
 
   # Options
   local @ARGV = @_ if @_;
+  my $method = 'GET';
+  my @headers;
+  my $content = '';
   my ($redirect, $verbose) = 0;
   GetOptions(
-    'redirect' => sub { $redirect = 1 },
-    'verbose'  => sub { $verbose  = 1 }
+    'content=s' => sub { $content  = $_[1] },
+    'header=s'  => \@headers,
+    'method=s'  => sub { $method   = $_[1] },
+    'redirect'  => sub { $redirect = 1 },
+    'verbose'   => sub { $verbose  = 1 }
   );
 
+  # Headers
+  my $headers = {};
+  for my $header (@headers) {
+    next unless $header =~ /^\s*([^\:]+)\s*:\s*([^\:]+)\s*$/;
+    $headers->{$1} = $2;
+  }
+
   # URL
-  my $url = $ARGV[0];
+  my $url = shift @ARGV;
   die $self->usage unless $url;
   decode 'UTF-8', $url;
+
+  # Selector
+  my $selector = shift @ARGV;
+
+  # Buffer
+  my $buffer = '';
 
   # Client
   my $client = Mojo::Client->new(ioloop => Mojo::IOLoop->singleton);
@@ -96,20 +129,90 @@ sub run {
           return if $redirect && $res->is_status_class(300);
 
           # Chunk
-          print pop;
+          $selector ? ($buffer .= pop) : print(pop);
         }
       );
     }
   );
 
+  # Transaction
+  my $tx = $client->build_tx($method, $url, $headers, $content);
+
   # Get
-  my $tx = $client->get($url);
+  $client->start($tx);
 
   # Error
   my ($message, $code) = $tx->error;
   warn qq/Problem loading URL "$url". ($message)\n/ if $message && !$code;
 
+  # Charset
+  my $charset = 'UTF-8';
+  ($tx->res->headers->content_type || '') =~ /charset=\"?([^\"\s;]+)\"?/
+    and $charset = $1;
+
+  # Select
+  $self->_select($buffer, $charset, $selector) if $selector;
+
   return $self;
+}
+
+sub _select {
+  my ($self, $buffer, $charset, $selector) = @_;
+
+  # DOM
+  my $dom = Mojo::DOM->new(charset => $charset)->parse($buffer);
+  my $results = $dom->find($selector);
+
+  # Commands
+  my $done = 0;
+  while (my $command = shift @ARGV) {
+
+    # Number
+    if ($command =~ /^\d+$/) {
+      $results = [$results->[$command]];
+      next;
+    }
+
+    # Text
+    elsif ($command eq 'text') {
+      for my $e (@$results) {
+        next unless defined(my $text = $e->text);
+        utf8::encode $text;
+        print "$text\n";
+      }
+    }
+
+    # All text
+    elsif ($command eq 'all') {
+      for my $e (@$results) {
+        next unless defined(my $text = $e->all_text);
+        utf8::encode $text;
+        print "$text\n";
+      }
+    }
+
+    # Attribute
+    elsif ($command eq 'attr') {
+      next unless my $name = shift @ARGV;
+      for my $e (@$results) {
+        next unless defined(my $value = $e->attrs->{$name});
+        utf8::encode $value;
+        print "$value\n";
+      }
+    }
+
+    # Unknown
+    else { die qq/Unknown command "$command".\n/ }
+
+    # Done
+    $done++;
+  }
+
+  # Raw
+  unless ($done) {
+    print "$_\n" for @$results;
+    return;
+  }
 }
 
 1;

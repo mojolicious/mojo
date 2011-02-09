@@ -443,7 +443,7 @@ You can also extract all text from nested child elements.
 
 The request can be customized as well.
 
-  % mojo get --method post --header 'X-Foo: Bar' --content 'Hello!' h1
+  % mojo get --method post --header 'X-Foo: Bar' --content 'Hi!' kraih.com h1
   ...
 
 You can follow redirects and view the headers for all messages.

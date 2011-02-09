@@ -8,6 +8,10 @@ use utf8;
 # Disable epoll and kqueue
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
+# Development
+my $backup;
+BEGIN { $backup = $ENV{MOJO_MODE} || ''; $ENV{MOJO_MODE} = 'development' }
+
 use Test::More tests => 719;
 
 # Pollution
@@ -843,11 +847,11 @@ $t->get_ok('/.html')->status_is(200)
   "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
 
 # GET /0 (reverse proxy)
-my $backup = $ENV{MOJO_REVERSE_PROXY};
+my $backup2 = $ENV{MOJO_REVERSE_PROXY};
 $ENV{MOJO_REVERSE_PROXY} = 1;
 $t->get_ok('/0', {'X-Forwarded-For' => '192.168.2.2, 192.168.2.1'})
   ->status_is(200)->content_is('192.168.2.10');
-$ENV{MOJO_REVERSE_PROXY} = $backup;
+$ENV{MOJO_REVERSE_PROXY} = $backup2;
 
 # GET /tags
 $t->get_ok('/tags/lala?a=b&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
@@ -1045,12 +1049,12 @@ $t->get_ok('/inline/ep/partial')->status_is(200)
 $t->get_ok('/source')->status_is(200)->content_like(qr/get_ok\('\/source/);
 
 # GET / (with body and max message size)
-$backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
+$backup2 = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
 $ENV{MOJO_MAX_MESSAGE_SIZE} = 1024;
 $t->get_ok('/', '1234' x 1024)->status_is(413)
   ->content_is(
   "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
-$ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
+$ENV{MOJO_MAX_MESSAGE_SIZE} = $backup2;
 
 # GET /foo_relaxed/123
 $t->get_ok('/foo_relaxed/123')->status_is(200)->content_is('123');
@@ -1653,6 +1657,8 @@ $client->ioloop->one_tick('0.1');
 is $timer,
   "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\nworks!",
   'right content';
+
+$ENV{MOJO_MODE} = $backup;
 
 __DATA__
 @@ with-format.html.ep

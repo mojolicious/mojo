@@ -24,6 +24,9 @@ use_ok 'MojoliciousTest';
 
 my $t = Test::Mojo->new(app => 'MojoliciousTest');
 
+my $backup = $ENV{MOJO_MODE} || '';
+$ENV{MOJO_MODE} = 'development';
+
 # Foo::baz (missing action without template)
 $t->get_ok('/foo/baz')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
@@ -277,4 +280,6 @@ $t->get_ok('/foo/session')->status_is(200)
 
 # Mixed formats
 $t->get_ok('/rss.xml')->status_is(200)->content_type_is('application/rss+xml')
-  ->content_like(qr/<\?xml version="1.0" encoding="UTF-8"\?><rss \/>/)
+  ->content_like(qr/<\?xml version="1.0" encoding="UTF-8"\?><rss \/>/);
+
+$ENV{MOJO_MODE} = $backup;

@@ -415,7 +415,7 @@ You can take full control of the L<Mojo::IOLoop> event loop.
 
 Don't you hate checking huge HTML files from the command line?
 Thanks to the C<mojo get> command that is about to change.
-You can just pick the parts that actually matter with the CSS3 selectors of
+You can just pick the parts that actually matter with the CSS3 selectors from
 L<Mojo::DOM>.
 
   % mojo get http://mojolicio.us 'head > title'
@@ -443,7 +443,9 @@ You can also extract all text from nested child elements.
 
 The request can be customized as well.
 
-  % mojo get --method post --header 'X-Foo: Bar' --content 'Hi!' kraih.com h1
+  % mojo get --method post --content 'Hello!' http://mojolicio.us
+  ...
+  % mojo get --header 'X-Bender: Bite my shiny metal ass!' http://google.com
   ...
 
 You can follow redirects and view the headers for all messages.

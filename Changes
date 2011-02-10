@@ -17,6 +17,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL support for CSS3 selectors to the get command.
         - Added image helper to Mojolicious::Plugin::TagHelpers.
         - Added support for secure session cookies. (crab)
+        - Improved HTML5 compatibility of Mojo::DOM.
         - Replaced Mojo::JSON parser with a much faster and stricter
           implementation. (chansen)
         - Improved Mojo::JSON string encoding. (chansen)

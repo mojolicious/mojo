@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 344;
+use Test::More tests => 406;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -190,68 +190,69 @@ is $dom->at('[id="sno\"wman"]')->text, '☃', 'right text';
 
 # Unicode and escaped selectors
 $dom->parse(
-  qq/<p><div id="☃x">Snowman<\/div><div class="x ♥">Heart<\/div><\/p>/);
-is $dom->at("#\\\n\\002603x")->text,               'Snowman', 'right text';
-is $dom->at('#\\2603 x')->text,                    'Snowman', 'right text';
-is $dom->at("#\\\n\\2603 x")->text,                'Snowman', 'right text';
-is $dom->at(qq/[id="\\\n\\2603 x"]/)->text,        'Snowman', 'right text';
-is $dom->at(qq/[id="\\\n\\002603x"]/)->text,       'Snowman', 'right text';
-is $dom->at(qq/[id="\\\\2603 x"]/)->text,          'Snowman', 'right text';
-is $dom->at("p #\\\n\\002603x")->text,             'Snowman', 'right text';
-is $dom->at('p #\\2603 x')->text,                  'Snowman', 'right text';
-is $dom->at("p #\\\n\\2603 x")->text,              'Snowman', 'right text';
-is $dom->at(qq/p [id="\\\n\\2603 x"]/)->text,      'Snowman', 'right text';
-is $dom->at(qq/p [id="\\\n\\002603x"]/)->text,     'Snowman', 'right text';
-is $dom->at(qq/p [id="\\\\2603 x"]/)->text,        'Snowman', 'right text';
-is $dom->at('#☃x')->text,                        'Snowman', 'right text';
-is $dom->at('div#☃x')->text,                     'Snowman', 'right text';
-is $dom->at('p div#☃x')->text,                   'Snowman', 'right text';
-is $dom->at('[id^="☃"]')->text,                  'Snowman', 'right text';
-is $dom->at('div[id^="☃"]')->text,               'Snowman', 'right text';
-is $dom->at('p div[id^="☃"]')->text,             'Snowman', 'right text';
-is $dom->at('p > div[id^="☃"]')->text,           'Snowman', 'right text';
-is $dom->at('[id^=☃]')->text,                    'Snowman', 'right text';
-is $dom->at('div[id^=☃]')->text,                 'Snowman', 'right text';
-is $dom->at('p div[id^=☃]')->text,               'Snowman', 'right text';
-is $dom->at('p > div[id^=☃]')->text,             'Snowman', 'right text';
-is $dom->at(".\\\n\\002665")->text,                'Heart',   'right text';
-is $dom->at('.\\2665')->text,                      'Heart',   'right text';
-is $dom->at("p .\\\n\\002665")->text,              'Heart',   'right text';
-is $dom->at('p .\\2665')->text,                    'Heart',   'right text';
-is $dom->at(qq/p [class\$="\\\n\\002665"]/)->text, 'Heart',   'right text';
-is $dom->at(qq/p [class\$="\\2665"]/)->text,       'Heart',   'right text';
-is $dom->at(qq/[class\$="\\\n\\002665"]/)->text,   'Heart',   'right text';
-is $dom->at(qq/[class\$="\\2665"]/)->text,         'Heart',   'right text';
-is $dom->at('.x')->text,                           'Heart',   'right text';
-is $dom->at('p .x')->text,                         'Heart',   'right text';
-is $dom->at('.♥')->text,                         'Heart',   'right text';
-is $dom->at('p .♥')->text,                       'Heart',   'right text';
-is $dom->at('div.♥')->text,                      'Heart',   'right text';
-is $dom->at('p div.♥')->text,                    'Heart',   'right text';
-is $dom->at('[class$="♥"]')->text,               'Heart',   'right text';
-is $dom->at('div[class$="♥"]')->text,            'Heart',   'right text';
-is $dom->at('p div[class$="♥"]')->text,          'Heart',   'right text';
-is $dom->at('p > div[class$="♥"]')->text,        'Heart',   'right text';
-is $dom->at('[class$=♥]')->text,                 'Heart',   'right text';
-is $dom->at('div[class$=♥]')->text,              'Heart',   'right text';
-is $dom->at('p div[class$=♥]')->text,            'Heart',   'right text';
-is $dom->at('p > div[class$=♥]')->text,          'Heart',   'right text';
-is $dom->at('[class~="♥"]')->text,               'Heart',   'right text';
-is $dom->at('div[class~="♥"]')->text,            'Heart',   'right text';
-is $dom->at('p div[class~="♥"]')->text,          'Heart',   'right text';
-is $dom->at('p > div[class~="♥"]')->text,        'Heart',   'right text';
-is $dom->at('[class~=♥]')->text,                 'Heart',   'right text';
-is $dom->at('div[class~=♥]')->text,              'Heart',   'right text';
-is $dom->at('p div[class~=♥]')->text,            'Heart',   'right text';
-is $dom->at('p > div[class~=♥]')->text,          'Heart',   'right text';
-is $dom->at('[class~="x"]')->text,                 'Heart',   'right text';
-is $dom->at('div[class~="x"]')->text,              'Heart',   'right text';
-is $dom->at('p div[class~="x"]')->text,            'Heart',   'right text';
-is $dom->at('p > div[class~="x"]')->text,          'Heart',   'right text';
-is $dom->at('[class~=x]')->text,                   'Heart',   'right text';
-is $dom->at('div[class~=x]')->text,                'Heart',   'right text';
-is $dom->at('p div[class~=x]')->text,              'Heart',   'right text';
-is $dom->at('p > div[class~=x]')->text,            'Heart',   'right text';
+  qq/<html><div id="☃x">Snowman<\/div><div class="x ♥">Heart<\/div><\/html>/
+);
+is $dom->at("#\\\n\\002603x")->text,                  'Snowman', 'right text';
+is $dom->at('#\\2603 x')->text,                       'Snowman', 'right text';
+is $dom->at("#\\\n\\2603 x")->text,                   'Snowman', 'right text';
+is $dom->at(qq/[id="\\\n\\2603 x"]/)->text,           'Snowman', 'right text';
+is $dom->at(qq/[id="\\\n\\002603x"]/)->text,          'Snowman', 'right text';
+is $dom->at(qq/[id="\\\\2603 x"]/)->text,             'Snowman', 'right text';
+is $dom->at("html #\\\n\\002603x")->text,             'Snowman', 'right text';
+is $dom->at('html #\\2603 x')->text,                  'Snowman', 'right text';
+is $dom->at("html #\\\n\\2603 x")->text,              'Snowman', 'right text';
+is $dom->at(qq/html [id="\\\n\\2603 x"]/)->text,      'Snowman', 'right text';
+is $dom->at(qq/html [id="\\\n\\002603x"]/)->text,     'Snowman', 'right text';
+is $dom->at(qq/html [id="\\\\2603 x"]/)->text,        'Snowman', 'right text';
+is $dom->at('#☃x')->text,                           'Snowman', 'right text';
+is $dom->at('div#☃x')->text,                        'Snowman', 'right text';
+is $dom->at('html div#☃x')->text,                   'Snowman', 'right text';
+is $dom->at('[id^="☃"]')->text,                     'Snowman', 'right text';
+is $dom->at('div[id^="☃"]')->text,                  'Snowman', 'right text';
+is $dom->at('html div[id^="☃"]')->text,             'Snowman', 'right text';
+is $dom->at('html > div[id^="☃"]')->text,           'Snowman', 'right text';
+is $dom->at('[id^=☃]')->text,                       'Snowman', 'right text';
+is $dom->at('div[id^=☃]')->text,                    'Snowman', 'right text';
+is $dom->at('html div[id^=☃]')->text,               'Snowman', 'right text';
+is $dom->at('html > div[id^=☃]')->text,             'Snowman', 'right text';
+is $dom->at(".\\\n\\002665")->text,                   'Heart',   'right text';
+is $dom->at('.\\2665')->text,                         'Heart',   'right text';
+is $dom->at("html .\\\n\\002665")->text,              'Heart',   'right text';
+is $dom->at('html .\\2665')->text,                    'Heart',   'right text';
+is $dom->at(qq/html [class\$="\\\n\\002665"]/)->text, 'Heart',   'right text';
+is $dom->at(qq/html [class\$="\\2665"]/)->text,       'Heart',   'right text';
+is $dom->at(qq/[class\$="\\\n\\002665"]/)->text,      'Heart',   'right text';
+is $dom->at(qq/[class\$="\\2665"]/)->text,            'Heart',   'right text';
+is $dom->at('.x')->text,                              'Heart',   'right text';
+is $dom->at('html .x')->text,                         'Heart',   'right text';
+is $dom->at('.♥')->text,                            'Heart',   'right text';
+is $dom->at('html .♥')->text,                       'Heart',   'right text';
+is $dom->at('div.♥')->text,                         'Heart',   'right text';
+is $dom->at('html div.♥')->text,                    'Heart',   'right text';
+is $dom->at('[class$="♥"]')->text,                  'Heart',   'right text';
+is $dom->at('div[class$="♥"]')->text,               'Heart',   'right text';
+is $dom->at('html div[class$="♥"]')->text,          'Heart',   'right text';
+is $dom->at('html > div[class$="♥"]')->text,        'Heart',   'right text';
+is $dom->at('[class$=♥]')->text,                    'Heart',   'right text';
+is $dom->at('div[class$=♥]')->text,                 'Heart',   'right text';
+is $dom->at('html div[class$=♥]')->text,            'Heart',   'right text';
+is $dom->at('html > div[class$=♥]')->text,          'Heart',   'right text';
+is $dom->at('[class~="♥"]')->text,                  'Heart',   'right text';
+is $dom->at('div[class~="♥"]')->text,               'Heart',   'right text';
+is $dom->at('html div[class~="♥"]')->text,          'Heart',   'right text';
+is $dom->at('html > div[class~="♥"]')->text,        'Heart',   'right text';
+is $dom->at('[class~=♥]')->text,                    'Heart',   'right text';
+is $dom->at('div[class~=♥]')->text,                 'Heart',   'right text';
+is $dom->at('html div[class~=♥]')->text,            'Heart',   'right text';
+is $dom->at('html > div[class~=♥]')->text,          'Heart',   'right text';
+is $dom->at('[class~="x"]')->text,                    'Heart',   'right text';
+is $dom->at('div[class~="x"]')->text,                 'Heart',   'right text';
+is $dom->at('html div[class~="x"]')->text,            'Heart',   'right text';
+is $dom->at('html > div[class~="x"]')->text,          'Heart',   'right text';
+is $dom->at('[class~=x]')->text,                      'Heart',   'right text';
+is $dom->at('div[class~=x]')->text,                   'Heart',   'right text';
+is $dom->at('html div[class~=x]')->text,              'Heart',   'right text';
+is $dom->at('html > div[class~=x]')->text,            'Heart',   'right text';
 
 # Looks remotely like HTML
 $dom->parse('<!DOCTYPE H "-/W/D HT 4/E">☃<title class=test>♥</title>☃');
@@ -665,6 +666,15 @@ is_deeply \@li, [qw/C/], 'found third li element';
 @li = ();
 $dom->find('li:nth-last-child(3)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/F/], 'found third last li element';
+@li = ();
+$dom->find('li:nth-child(1n+0)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/A B C D E F G/], 'found first three li elements';
+@li = ();
+$dom->find('li:nth-child(n+0)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/A B C D E F G/], 'found first three li elements';
+@li = ();
+$dom->find('li:nth-child(n)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/A B C D E F G/], 'found first three li elements';
 
 # Even more pseudo classes
 $dom->parse(<<EOF);
@@ -891,3 +901,219 @@ is "$dom", <<EOF, 'right result';
 </ul>
 <div>D</div>works
 EOF
+
+# Optional "head" and "body" tags
+$dom->parse(<<EOF);
+<html>
+  <head>
+    <title>foo</title>
+  <body>bar
+EOF
+is $dom->at('html > head > title')->text, 'foo',   'right text';
+is $dom->at('html > body')->text,         "bar\n", 'right text';
+
+# Optional "li" tag
+$dom->parse(<<EOF);
+<ul>
+  <li>A</li>
+  <LI>B
+  <li>C</li>
+  <li>D
+  <li>E
+</ul>
+EOF
+is $dom->find('ul > li')->[0]->text, 'A',     'right text';
+is $dom->find('ul > li')->[1]->text, "B\n  ", 'right text';
+is $dom->find('ul > li')->[2]->text, 'C',     'right text';
+is $dom->find('ul > li')->[3]->text, "D\n  ", 'right text';
+is $dom->find('ul > li')->[4]->text, "E\n",   'right text';
+
+# Optional "p" tag
+$dom->parse(<<EOF);
+<div>
+  <p>A</p>
+  <P>B
+  <p>C</p>
+  <p>D<div>X</div>
+  <p>E
+  <p>F
+</div>
+EOF
+is $dom->find('div > p')->[0]->text, 'A',     'right text';
+is $dom->find('div > p')->[1]->text, "B\n  ", 'right text';
+is $dom->find('div > p')->[2]->text, 'C',     'right text';
+is $dom->find('div > p')->[3]->text, 'D',     'right text';
+is $dom->find('div > p')->[4]->text, "E\n  ", 'right text';
+is $dom->find('div > p')->[5]->text, "F\n",   'right text';
+is $dom->at('div > div')->text, 'X', 'right text';
+
+# Optional "dt" and "dd" tags
+$dom->parse(<<EOF);
+<dl>
+  <dt>A</dt>
+  <DD>B
+  <dt>C</dt>
+  <dd>D
+  <dt>E
+  <dd>F
+</dl>
+EOF
+is $dom->find('dl > dt')->[0]->text, 'A',     'right text';
+is $dom->find('dl > dd')->[0]->text, "B\n  ", 'right text';
+is $dom->find('dl > dt')->[1]->text, 'C',     'right text';
+is $dom->find('dl > dd')->[1]->text, "D\n  ", 'right text';
+is $dom->find('dl > dt')->[2]->text, "E\n  ", 'right text';
+is $dom->find('dl > dd')->[2]->text, "F\n",   'right text';
+
+# Optional "rp" and "rt" tags
+$dom->parse(<<EOF);
+<ruby>
+  <rp>A</rp>
+  <RT>B
+  <rp>C</rp>
+  <rt>D
+  <rp>E
+  <rt>F
+</ruby>
+EOF
+is $dom->find('ruby > rp')->[0]->text, 'A',     'right text';
+is $dom->find('ruby > rt')->[0]->text, "B\n  ", 'right text';
+is $dom->find('ruby > rp')->[1]->text, 'C',     'right text';
+is $dom->find('ruby > rt')->[1]->text, "D\n  ", 'right text';
+is $dom->find('ruby > rp')->[2]->text, "E\n  ", 'right text';
+is $dom->find('ruby > rt')->[2]->text, "F\n",   'right text';
+
+# Optional "optgroup" and "option" tags
+$dom->parse(<<EOF);
+<div>
+  <optgroup>A
+    <option id="foo">B
+    <option>C</option>
+    <option>D
+  <OPTGROUP>E
+    <option>F
+  <optgroup>G
+    <option>H
+</div>
+EOF
+is $dom->find('div > optgroup')->[0]->text,          "A\n    ", 'right text';
+is $dom->find('div > optgroup > #foo')->[0]->text,   "B\n    ", 'right text';
+is $dom->find('div > optgroup > option')->[1]->text, 'C',       'right text';
+is $dom->find('div > optgroup > option')->[2]->text, "D\n  ",   'right text';
+is $dom->find('div > optgroup')->[1]->text,          "E\n    ", 'right text';
+is $dom->find('div > optgroup > option')->[3]->text, "F\n  ",   'right text';
+is $dom->find('div > optgroup')->[2]->text,          "G\n    ", 'right text';
+is $dom->find('div > optgroup > option')->[4]->text, "H\n",     'right text';
+
+# Optional "colgroup" tag
+$dom->parse(<<EOF);
+<table>
+  <col id=morefail>
+  <col id=fail>
+  <colgroup>
+    <col id=foo>
+    <col class=foo>
+  <colgroup>
+    <col id=bar>
+</table>
+EOF
+is $dom->find('table > col')->[0]->attrs->{id}, 'morefail', 'right attribute';
+is $dom->find('table > col')->[1]->attrs->{id}, 'fail',     'right attribute';
+is $dom->find('table > colgroup > col')->[0]->attrs->{id}, 'foo',
+  'right attribute';
+is $dom->find('table > colgroup > col')->[1]->attrs->{class}, 'foo',
+  'right attribute';
+is $dom->find('table > colgroup > col')->[2]->attrs->{id}, 'bar',
+  'right attribute';
+
+# Optional "thead", "tbody", "tfoot", "tr", "th" and "td" tags
+$dom->parse(<<EOF);
+<table>
+  <thead>
+    <tr>
+      <th>A</th>
+      <th>D
+  <tbody>
+    <tr>
+      <td>B
+  <tfoot>
+    <tr>
+      <td>C
+</table>
+EOF
+is $dom->at('table > thead > tr > th')->text, 'A', 'right text';
+is $dom->find('table > thead > tr > th')->[1]->text, "D\n  ", 'right text';
+is $dom->at('table > tbody > tr > td')->text, "B\n  ", 'right text';
+is $dom->at('table > tfoot > tr > td')->text, "C\n",   'right text';
+
+# Optional "colgroup", "thead", "tbody", "tr", "th" and "td" tags
+$dom->parse(<<EOF);
+<table>
+  <col id=morefail>
+  <col id=fail>
+  <colgroup>
+    <col id=foo />
+    <col class=foo>
+  <colgroup>
+    <col id=bar>
+  </colgroup>
+  <thead>
+    <tr>
+      <th>A</th>
+      <th>D
+  <tbody>
+    <tr>
+      <td>B
+</table>
+EOF
+is $dom->find('table > col')->[0]->attrs->{id}, 'morefail', 'right attribute';
+is $dom->find('table > col')->[1]->attrs->{id}, 'fail',     'right attribute';
+is $dom->find('table > colgroup > col')->[0]->attrs->{id}, 'foo',
+  'right attribute';
+is $dom->find('table > colgroup > col')->[1]->attrs->{class}, 'foo',
+  'right attribute';
+is $dom->find('table > colgroup > col')->[2]->attrs->{id}, 'bar',
+  'right attribute';
+is $dom->at('table > thead > tr > th')->text, 'A', 'right text';
+is $dom->find('table > thead > tr > th')->[1]->text, "D\n  ", 'right text';
+is $dom->at('table > tbody > tr > td')->text, "B\n", 'right text';
+
+# Optional "colgroup", "tbody", "tr", "th" and "td" tags
+$dom->parse(<<EOF);
+<table>
+  <colgroup>
+    <col id=foo />
+    <col class=foo>
+  <colgroup>
+    <col id=bar>
+  </colgroup>
+  <tbody>
+    <tr>
+      <td>B
+</table>
+EOF
+is $dom->find('table > colgroup > col')->[0]->attrs->{id}, 'foo',
+  'right attribute';
+is $dom->find('table > colgroup > col')->[1]->attrs->{class}, 'foo',
+  'right attribute';
+is $dom->find('table > colgroup > col')->[2]->attrs->{id}, 'bar',
+  'right attribute';
+is $dom->at('table > tbody > tr > td')->text, "B\n", 'right text';
+
+# Optional "tr" and "td" tags
+$dom->parse(<<EOF);
+<table>
+    <tr>
+      <td>A
+      <td>B</td>
+    <tr>
+      <td>C
+    </tr>
+    <tr>
+      <td>D
+</table>
+EOF
+is $dom->find('table > tr > td')->[0]->text, "A\n      ", 'right text';
+is $dom->find('table > tr > td')->[1]->text, 'B',         'right text';
+is $dom->find('table > tr > td')->[2]->text, "C\n    ",   'right text';
+is $dom->find('table > tr > td')->[3]->text, "D\n",       'right text';

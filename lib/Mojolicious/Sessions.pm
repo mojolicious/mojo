@@ -137,8 +137,8 @@ The expiration timeout gets refreshed for every request.
   my $secure = $session->secure;
   $session   = $session->secure(1);
 
-Sets the secure flag on all session cookies, so that browsers send them
-only over HTTPS connections.
+Set the secure flag on all session cookies, so that browsers send them only
+over HTTPS connections.
 
 =head1 METHODS
 

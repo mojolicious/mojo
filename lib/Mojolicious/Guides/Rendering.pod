@@ -642,7 +642,7 @@ to do is add a new C<handler>.
   @@ index.html.mine
   ...
 
-Since most template systems don't support templates in the C<DATA> section the
-renderer provides methods to help you with that.
+Since most template systems don't support templates in the C<DATA> section
+the renderer provides methods to help you with that.
 
 =cut

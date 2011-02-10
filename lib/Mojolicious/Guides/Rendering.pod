@@ -95,7 +95,7 @@ Only L<Mojo::ByteStream> objects are excluded from automatic escaping.
   <%= b('<p>test</p>') %>
 
 You can also add an additional equal sign to the end of a tag to have it
-automatically remove all surrounding whitespaces, this allows free indenting
+automatically remove all surrounding whitespace, this allows free indenting
 without ruining the result.
 
   <% for (1 .. 3) { %>
@@ -620,7 +620,7 @@ to do is add a new C<handler>.
       # Generate relative template path
       my $name = $r->template_name($options);
 
-      # Try to find approprite template in DATA section
+      # Try to find appropriate template in DATA section
       my $content = $r->get_inline_template($options, $name);
 
       # Generate absolute template path
@@ -642,7 +642,7 @@ to do is add a new C<handler>.
   @@ index.html.mine
   ...
 
-Since most template systems don't support temlates in the C<DATA> section the
+Since most template systems don't support templates in the C<DATA> section the
 renderer provides methods to help you with that.
 
 =cut

@@ -1437,6 +1437,9 @@ C<public> directory of your application.
 Render the given content as Perl characters, which will be encoded to bytes.
 See C<render_data> for an alternative without encoding.
 
+(This does not change the content type of the response, which is
+C<text/html> by default. Add C<format =E<gt> 'txt'> for C<text/plain>.)
+
 =head2 C<rendered>
 
   $c->rendered;

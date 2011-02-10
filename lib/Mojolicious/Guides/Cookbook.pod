@@ -15,7 +15,7 @@ different platforms.
 =head2 Builtin Server
 
 L<Mojolicious> contains a very portable HTTP 1.1 compliant web server.
-It is usally used during development but is solid and fast enough for small
+It is usually used during development but is solid and fast enough for small
 to mid sized applications.
 
   % ./script/myapp daemon
@@ -276,7 +276,7 @@ L<Mojo::Client> makes it actually easy.
   $client->start($tx);
 
 The C<body> callback will be called for every chunk of data that is received,
-even C<chunked> encoding will be handled transparently if neccessary.
+even C<chunked> encoding will be handled transparently if necessary.
 
 =head2 Streaming Request
 

@@ -412,7 +412,7 @@ L<Mojo::URL> implements the following attributes.
 
 =head2 C<authority>
 
-  my $authority = $url->autority;
+  my $authority = $url->authority;
   $url          = $url->authority('root:pass%3Bw0rd@localhost:8080');
 
 Authority part of this URL.

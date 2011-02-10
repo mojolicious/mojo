@@ -7,7 +7,7 @@ This file documents the revision history for Perl extension Mojolicious.
           default names for all routes.
         - Removed native IIS support since it has become unmaintainable.
         - Added EXPERIMENTAL much prettier attribute generator to Mojo::Base.
-        - Added EXPERIMNETAL on_start attribute to Mojo::Client.
+        - Added EXPERIMENTAL on_start attribute to Mojo::Client.
         - Added EXPERIMENTAL support for route shortcuts.
         - Added EXPERIMENTAL support for NO_PROXY. (l0b0)
         - Added EXPERIMENTAL user_agent attribute to Mojo::Client.
@@ -196,7 +196,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Renamed tag helper input to input_tag.
         - Added EXPERIMENTAL non-blocking DNS support to Mojo::IOLoop.
           (und3f)
-        - Added EXPERIMENTAL support for IPv4 and IPv6 addess checks to
+        - Added EXPERIMENTAL support for IPv4 and IPv6 address checks to
           Mojo::URL.
         - Added stylesheet tag helper.
         - Added before and after methods to Mojo::DOM.

@@ -49,6 +49,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed tests that can't run on Windows.
         - Fixed delayed rendering bug. (yko)
         - Fixed nested route bug.
+        - Fixed a small multipart parser bug.
         - Fixed small any route bug.
         - Fixed small empty route bug.
         - Fixed URL merging in Mojo::URL.

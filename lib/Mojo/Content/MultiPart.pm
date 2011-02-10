@@ -149,12 +149,7 @@ sub _parse_multipart {
   my $self = shift;
 
   # Need a boundary
-  $self->headers->content_type
-    =~ /.*boundary=\"*([a-zA-Z0-9\'\(\)\,\.\:\?\-\_\+\/]+).*/;
-  my $boundary = $1;
-
-  # Boundary missing
-  return $self->error('Multipart boundary missing.', 400) unless $boundary;
+  my $boundary = $self->is_multipart;
 
   # Parse
   while (1) {

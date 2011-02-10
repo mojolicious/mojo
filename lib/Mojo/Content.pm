@@ -128,7 +128,9 @@ sub is_multipart {
 
   # Multipart
   my $type = $self->headers->content_type || '';
-  return $type =~ /multipart/i ? 1 : 0;
+  $type =~ /multipart.*boundary=\"*([a-zA-Z0-9\'\(\)\,\.\:\?\-\_\+\/]+)/i
+    and return $1;
+  return;
 }
 
 sub is_parsing_body {

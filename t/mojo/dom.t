@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 406;
+use Test::More tests => 408;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -935,16 +935,19 @@ $dom->parse(<<EOF);
   <P>B
   <p>C</p>
   <p>D<div>X</div>
-  <p>E
-  <p>F
+  <p>E<img src="foo.png">
+  <p>F<br>G
+  <p>H
 </div>
 EOF
-is $dom->find('div > p')->[0]->text, 'A',     'right text';
-is $dom->find('div > p')->[1]->text, "B\n  ", 'right text';
-is $dom->find('div > p')->[2]->text, 'C',     'right text';
-is $dom->find('div > p')->[3]->text, 'D',     'right text';
-is $dom->find('div > p')->[4]->text, "E\n  ", 'right text';
-is $dom->find('div > p')->[5]->text, "F\n",   'right text';
+is $dom->find('div > p')->[0]->text, 'A',      'right text';
+is $dom->find('div > p')->[1]->text, "B\n  ",  'right text';
+is $dom->find('div > p')->[2]->text, 'C',      'right text';
+is $dom->find('div > p')->[3]->text, 'D',      'right text';
+is $dom->find('div > p')->[4]->text, 'E',      'right text';
+is $dom->find('div > p')->[5]->text, "FG\n  ", 'right text';
+is $dom->find('div > p')->[6]->text, "H\n",    'right text';
+is $dom->at('div > p > img')->attrs->{src}, 'foo.png', 'right attribute';
 is $dom->at('div > div')->text, 'X', 'right text';
 
 # Optional "dt" and "dd" tags

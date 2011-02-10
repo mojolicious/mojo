@@ -138,17 +138,23 @@ sub run {
   # Transaction
   my $tx = $client->build_tx($method, $url, $headers, $content);
 
-  # Get
-  $client->start($tx);
-
-  # Error
-  my ($message, $code) = $tx->error;
-  warn qq/Problem loading URL "$url". ($message)\n/ if $message && !$code;
-
-  # Charset
+  # Default charset
   my $charset = 'UTF-8';
-  ($tx->res->headers->content_type || '') =~ /charset=\"?([^\"\s;]+)\"?/
-    and $charset = $1;
+
+  # Get
+  $client->start(
+    $tx => sub {
+      my $tx = pop;
+
+      # Error
+      my ($message, $code) = $tx->error;
+      warn qq/Problem loading URL "$url". ($message)\n/ if $message && !$code;
+
+      # Charset
+      ($tx->res->headers->content_type || '') =~ /charset=\"?([^\"\s;]+)\"?/
+        and $charset = $1;
+    }
+  );
 
   # Select
   $self->_select($buffer, $charset, $selector) if $selector;

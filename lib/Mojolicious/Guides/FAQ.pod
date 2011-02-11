@@ -10,6 +10,27 @@ L<Mojolicious> together with the right answers.
 
 =head1 QUESTIONS
 
+=head2 Why doesn't Mojolicious have any dependencies?
+
+We are optimizing L<Mojolicious> for usability and development speed without
+compromises.
+While there are no rules in L<Mojolicious::Guides::CodingGuidelines> that
+forbid dependencies, we do currently discourage adding non-optional ones in
+favor of a faster and more painless installation process.
+And we do in fact already use several optional CPAN modules such as
+L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::SSL>, L<Net::Rendezvous::Publish>
+and L<Plack> if they are installed to provide advanced functionality.
+
+=head2 Why reinvent wheels?
+
+Because we can make them rounder.
+Components specifically optimized for usability and development speed are not
+as common on CPAN as you might think.
+While we are strong believers of the Perl mantra
+"There is more than one way to do it.", we also believe that well designed
+defaults result in a much more pleasant user experience.
+We want the best of both worlds.
+
 =head2 What does the error "Maximum message size exceeded." mean?
 
 To protect your applications from excessively large requests and responses,

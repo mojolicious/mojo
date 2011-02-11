@@ -24,8 +24,8 @@ and L<Plack> if they are installed to provide advanced functionality.
 =head2 Why reinvent wheels?
 
 Because we can make them rounder.
-Components specifically optimized for usability and development speed are not
-as common on CPAN as you might think.
+Components trading flexibility for more usability and development speed are
+not as common on CPAN as you might think.
 While we are strong believers of the Perl mantra
 "There is more than one way to do it.", we also believe that well designed
 defaults result in a much more pleasant user experience.

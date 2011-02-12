@@ -25,7 +25,7 @@ and L<Plack> to provide advanced functionality if they are installed.
 
 Because we can make them rounder.
 Components specifically designed for user-friendliness and development speed
-are not as common on CPAN as you might think.
+are not easy to come by.
 While we are strong believers of the Perl mantra
 "There is more than one way to do it.", we also believe that well designed
 defaults result in a much more pleasant user experience.

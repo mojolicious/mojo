@@ -12,8 +12,8 @@ L<Mojolicious> together with the right answers.
 
 =head2 Why doesn't Mojolicious have any dependencies?
 
-We are optimizing L<Mojolicious> for usability and development speed without
-compromises.
+We are optimizing L<Mojolicious> for user-friendliness and development speed
+without compromises.
 While there are no rules in L<Mojolicious::Guides::CodingGuidelines> that
 forbid dependencies, we do currently discourage adding non-optional ones in
 favor of a faster and more painless installation process.
@@ -24,8 +24,8 @@ and L<Plack> to provide advanced functionality if they are installed.
 =head2 Why reinvent wheels?
 
 Because we can make them rounder.
-Components trading flexibility for more usability and development speed are
-not as common on CPAN as you might think.
+Components specifically designed for user-friendliness and development speed
+are not as common on CPAN as you might think.
 While we are strong believers of the Perl mantra
 "There is more than one way to do it.", we also believe that well designed
 defaults result in a much more pleasant user experience.

@@ -19,7 +19,7 @@ forbid dependencies, we do currently discourage adding non-optional ones in
 favor of a faster and more painless installation process.
 And we do in fact already use several optional CPAN modules such as
 L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::SSL>, L<Net::Rendezvous::Publish>
-and L<Plack> if they are installed to provide advanced functionality.
+and L<Plack> to provide advanced functionality if they are installed.
 
 =head2 Why reinvent wheels?
 

@@ -702,4 +702,9 @@ help with home directory detection, so C<t/login.t> can be simplified.
 Test driven development takes a little getting used to, but is very well
 worth it!
 
+=head1 MORE
+
+A lot more documentation and examples by many different authors can be found
+in the Mojolicious wiki at L<http://github.com/kraih/mojo/wiki>.
+
 =cut

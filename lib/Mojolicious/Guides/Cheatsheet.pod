@@ -292,4 +292,9 @@ specific temporary directory will be used.
 
   MOJO_TMPDIR=/tmp/mojo
 
+=head1 MORE
+
+A lot more documentation and examples by many different authors can be found
+in the Mojolicious wiki at L<http://github.com/kraih/mojo/wiki>.
+
 =cut

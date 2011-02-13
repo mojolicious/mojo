@@ -772,7 +772,8 @@ this tutorial applies there too. :)
 
   % mojo generate app
 
-Have fun!
+Make sure to check out L<Mojolicious::Guides> too, and don't forget to have
+fun!
 
 =head1 FUNCTIONS
 

@@ -645,4 +645,9 @@ to do is add a new C<handler>.
 Since most template systems don't support templates in the C<DATA> section
 the renderer provides methods to help you with that.
 
+=head1 MORE
+
+A lot more documentation and examples by many different authors can be found
+in the Mojolicious wiki at L<http://github.com/kraih/mojo/wiki>.
+
 =cut

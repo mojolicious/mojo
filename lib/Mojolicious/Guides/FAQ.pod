@@ -108,4 +108,9 @@ Once thats done you can contact the developers via GitHub
 If you decide to fix the bug yourself make sure to also take a look at
 L<Mojolicious::Guides::CodingGuidelines>.
 
+=head1 MORE
+
+A lot more documentation and examples by many different authors can be found
+in the Mojolicious wiki at L<http://github.com/kraih/mojo/wiki>.
+
 =cut

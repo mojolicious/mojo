@@ -12,7 +12,7 @@ BEGIN { $ENV{MOJO_POLL} = 1 }
 my $backup;
 BEGIN { $backup = $ENV{MOJO_MODE} || ''; $ENV{MOJO_MODE} = 'development' }
 
-use Test::More tests => 719;
+use Test::More tests => 724;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -374,6 +374,12 @@ get '/firefox/:stuff' => (agent => qr/Firefox/) => sub {
   my $self = shift;
   $self->render_text($self->url_for('foxy', stuff => 'foo'));
 } => 'foxy';
+
+# GET /url_for_foxy
+get '/url_for_foxy' => sub {
+  my $self = shift;
+  $self->render(text => $self->url_for('foxy', stuff => '#test'));
+};
 
 # POST /utf8
 post '/utf8' => 'form';
@@ -1285,6 +1291,12 @@ $t->get_ok('/firefox/bar', {'User-Agent' => 'Explorer'})->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/Oops!/);
+
+# GET /url_for_foxy
+$t->get_ok('/url_for_foxy')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('/firefox/%23test');
 
 # POST /utf8
 $t->post_form_ok('/utf8', 'UTF-8' => {name => 'Вячеслав'})

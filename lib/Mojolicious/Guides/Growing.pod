@@ -704,7 +704,8 @@ worth it!
 
 =head1 MORE
 
-A lot more documentation and examples by many different authors can be found
-in the Mojolicious wiki at L<http://github.com/kraih/mojo/wiki>.
+You can continue with L<Mojolicious::Guides> now or take a look at the
+Mojolicious wiki L<http://github.com/kraih/mojo/wiki>, which contains a lot
+more documentation and examples by many different authors.
 
 =cut

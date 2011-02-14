@@ -37,7 +37,7 @@ $test->route('/delete/(id)', id => qr/\d+/)->to(action => 'delete', id => 23);
 my $test2 = $r->bridge('/test2')->to(controller => 'test2');
 
 # /test2 (inline)
-my $test4 = $test2->bridge->to(controller => 'index');
+my $test4 = $test2->bridge('/')->to(controller => 'index');
 
 # /test2/foo
 $test4->route('/foo')->to(controller => 'baz');

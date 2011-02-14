@@ -39,7 +39,7 @@ sub parse {
   my $pattern = shift;
 
   # Shortcut
-  return $self unless defined $pattern;
+  return $self if !defined $pattern || $pattern eq '/';
 
   # Make sure pattern starts with a slash
   $pattern = "/$pattern" unless $pattern =~ /^\//;

@@ -98,7 +98,7 @@ sub match {
   my $endpoint = $r->is_endpoint;
 
   # Format
-  if ($endpoint && !$pattern->format && $path =~ /^\.([^\/]+)$/) {
+  if ($endpoint && !$pattern->format && $path =~ /^\/?\.([^\/]+)$/) {
     $captures->{format} = $1;
     $empty = 1;
   }

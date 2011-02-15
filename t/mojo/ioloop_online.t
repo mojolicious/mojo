@@ -11,7 +11,7 @@ plan skip_all => 'Perl 5.12 required for this test!'
   unless eval 'use 5.012000; 1';
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
-plan tests => 10;
+plan tests => 11;
 
 use_ok 'Mojo::IOLoop';
 
@@ -64,16 +64,19 @@ ok $found, 'found NS records';
 
 # Resolve AAAA record
 $result = undef;
+my $ttl;
 $loop->resolve(
   'ipv6.google.com',
   'AAAA',
   sub {
     my ($self, $records) = @_;
     $result = (first { $_->[0] eq 'AAAA' } @$records)->[1];
+    $ttl    = (first { $_->[0] eq 'AAAA' } @$records)->[2];
     $self->stop;
   }
 )->start;
 like $result, $Mojo::URL::IPV6_RE, 'valid IPv6 record';
+ok $ttl, 'got a TTL value';
 
 # Resolve CNAME record
 $result = undef;

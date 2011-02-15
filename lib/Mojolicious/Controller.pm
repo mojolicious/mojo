@@ -1192,7 +1192,7 @@ get '<%= $self->req->url->path->to_abs_string %>' => sub {
           %= link_to 'perldoc Mojolicious::Guides', $guide
         </div>
       </h1>
-      %= image 'amelia.png', alt => 'Amelia'
+      %= image '/amelia.png', alt => 'Amelia'
     </div>
     <div id="footer">
       <h1>And don't forget to have fun!</h1>

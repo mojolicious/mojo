@@ -97,12 +97,7 @@ auto detected.
 C<CGI> is supported out of the box and your L<Mojolicious> application will
 automatically detect that it is executed as a C<CGI> script.
 
-  <VirtualHost *:80>
-    ServerName localhost
-    DocumentRoot /home/sri/myapp/public
-
-    ScriptAlias /myapp "/home/sri/myapp/script/myapp"
-  </VirtualHost>
+  ScriptAlias / /home/sri/myapp/script/myapp
 
 =head2 Apache/FastCGI
 
@@ -110,13 +105,9 @@ C<FastCGI> is also supported out of the box and your L<Mojolicious>
 application will automatically detect that it is executed as a C<FastCGI>
 script.
 
-  <VirtualHost *:80>
-    ServerName localhost
-    DocumentRoot /home/sri/myapp/public
-
-    FastCgiServer /home/sri/myapp/script/myapp -processes 10
-    Alias /myapp /home/sri/myapp/script/myapp
-  </VirtualHost>
+  FastCgiIpcDir /home/sri/myapp
+  FastCgiServer /home/sri/myapp/script/myapp -processes 1
+  Alias / /home/sri/myapp/script/myapp/
 
 =head2 PSGI/Plack
 

@@ -38,6 +38,7 @@ $mt->render_to_file(<<'EOF', $config, $dir, $port);
 % use File::Spec::Functions 'catfile';
 ServerName 127.0.0.1
 Listen <%= $port %>
+DocumentRoot  <%= $dir %>
 
 LoadModule log_config_module libexec/apache2/mod_log_config.so
 
@@ -48,8 +49,6 @@ LoadModule cgi_module libexec/apache2/mod_cgi.so
 
 PidFile <%= catfile $dir, 'httpd.pid' %>
 LockFile <%= catfile $dir, 'accept.lock' %>
-
-DocumentRoot  <%= $dir %>
 
 ScriptAlias /cgi-bin <%= $dir %>
 EOF

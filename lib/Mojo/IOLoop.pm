@@ -683,14 +683,15 @@ sub resolve {
       for (1 .. $packet[3]) {
 
         # Parse
-        (my ($t, $a), $content) = (unpack 'nnnNn/aa*', $content)[1, 4, 5];
+        (my ($t, $ttl, $a), $content) =
+          (unpack 'nnnNn/aa*', $content)[1, 3, 4, 5];
         my @answer = _parse_answer($t, $a, $chunk, $content);
 
         # No answer
         next unless @answer;
 
         # Answer
-        push @answers, \@answer;
+        push @answers, [@answer, $ttl];
 
         # Debug
         warn "ANSWER $answer[0] $answer[1]\n" if DEBUG;

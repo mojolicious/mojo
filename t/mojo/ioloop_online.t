@@ -11,7 +11,7 @@ plan skip_all => 'Perl 5.12 required for this test!'
   unless eval 'use 5.012000; 1';
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
-plan tests => 10;
+plan tests => 11;
 
 use_ok 'Mojo::IOLoop';
 
@@ -142,3 +142,27 @@ $loop->resolve(
   }
 )->start;
 ok $found, 'found IPv6 PTR record';
+
+# Check TLS
+# For this purpose get google.com A record from google's NS server
+# TTL must be 300
+my $old_dns = $loop->dns_server;
+my $ttl;
+$loop->lookup(
+  'ns1.google.com',
+  sub {
+    my ($self, $ns_address) = @_;
+    $loop->dns_server($ns_address);
+
+    $loop->resolve(
+      'google.com',
+      'A',
+      sub {
+        my ($self, $records) = @_;
+        $ttl = (first { $_->[0] eq 'A' } @$records)->[2];
+        $self->stop;
+      }
+    );
+  }
+)->start;
+is $ttl, 300, 'right TTL';

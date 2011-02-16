@@ -12,6 +12,8 @@ use Test::More tests => 408;
 use_ok 'Mojo::DOM';
 use_ok 'ojo';
 
+use Mojo::Util 'encode';
+
 my $dom = Mojo::DOM->new;
 
 # ojo
@@ -189,9 +191,11 @@ $dom->parse('<div id="sno&quot;wman">☃</div>');
 is $dom->at('[id="sno\"wman"]')->text, '☃', 'right text';
 
 # Unicode and escaped selectors
-$dom->parse(
-  qq/<html><div id="☃x">Snowman<\/div><div class="x ♥">Heart<\/div><\/html>/
-);
+my $unicode =
+  qq/<html><div id="☃x">Snowman<\/div><div class="x ♥">Heart<\/div><\/html>/;
+encode 'UTF-8', $unicode;
+$dom->charset('UTF-8');
+$dom->parse($unicode);
 is $dom->at("#\\\n\\002603x")->text,                  'Snowman', 'right text';
 is $dom->at('#\\2603 x')->text,                       'Snowman', 'right text';
 is $dom->at("#\\\n\\2603 x")->text,                   'Snowman', 'right text';
@@ -253,6 +257,7 @@ is $dom->at('[class~=x]')->text,                      'Heart',   'right text';
 is $dom->at('div[class~=x]')->text,                   'Heart',   'right text';
 is $dom->at('html div[class~=x]')->text,              'Heart',   'right text';
 is $dom->at('html > div[class~=x]')->text,            'Heart',   'right text';
+$dom->charset(undef);
 
 # Looks remotely like HTML
 $dom->parse('<!DOCTYPE H "-/W/D HT 4/E">☃<title class=test>♥</title>☃');

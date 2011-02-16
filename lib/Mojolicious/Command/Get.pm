@@ -27,6 +27,8 @@ usage: $0 get [OPTIONS] [URL] [SELECTOR] [COMMANDS]
   mojo get mojolicio.us 'h1, h2, h3' 3 text
 
 These options are available:
+  --charset    Charset of HTML/XML response, defaults to auto detection or
+               UTF-8.
   --header     Additional HTTP header.
   --method     HTTP method to use.
   --redirect   Follow up to 5 redirects.
@@ -42,8 +44,9 @@ sub run {
   my $method = 'GET';
   my @headers;
   my $content = '';
-  my ($redirect, $verbose) = 0;
+  my ($charset, $redirect, $verbose) = 0;
   GetOptions(
+    'charset=s' => sub { $charset  = $_[1] },
     'content=s' => sub { $content  = $_[1] },
     'header=s'  => \@headers,
     'method=s'  => sub { $method   = $_[1] },
@@ -138,9 +141,6 @@ sub run {
   # Transaction
   my $tx = $client->build_tx($method, $url, $headers, $content);
 
-  # Default charset
-  my $charset = 'UTF-8';
-
   # Get
   $client->start(
     $tx => sub {
@@ -152,7 +152,8 @@ sub run {
 
       # Charset
       ($tx->res->headers->content_type || '') =~ /charset=\"?([^\"\s;]+)\"?/
-        and $charset = $1;
+        and $charset = $1
+        unless defined $charset;
     }
   );
 
@@ -166,7 +167,7 @@ sub _select {
   my ($self, $buffer, $charset, $selector) = @_;
 
   # DOM
-  my $dom = Mojo::DOM->new(charset => $charset)->parse($buffer);
+  my $dom     = Mojo::DOM->new->charset($charset)->parse($buffer);
   my $results = $dom->find($selector);
 
   # Commands

@@ -8,7 +8,7 @@ use Scalar::Util 'weaken';
 
 # "How are the kids supposed to get home?
 #  I dunno. Internet?"
-has charset => 'UTF-8';
+has 'charset';
 has tree => sub { ['root'] };
 
 # Regex

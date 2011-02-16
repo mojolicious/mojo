@@ -222,7 +222,7 @@ sub dom {
   }
 
   # Charset
-  my $charset = $self->default_charset;
+  my $charset;
   ($self->headers->content_type || '') =~ /charset=\"?([^\"\s;]+)\"?/
     and $charset = $1;
 

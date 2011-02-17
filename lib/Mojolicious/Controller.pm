@@ -32,49 +32,12 @@ our $DEVELOPMENT_NOT_FOUND =
   Mojo::Command->new->get_data('not_found.development.html.ep', __PACKAGE__);
 
 # Reserved stash values
-my $STASH_RE = qr/
-  ^
-  (?:
-  action
-  |
-  app
-  |
-  cb
-  |
-  class
-  |
-  controller
-  |
-  data
-  |
-  exception
-  |
-  extends
-  |
-  format
-  |
-  handler
-  |
-  json
-  |
-  layout
-  |
-  method
-  |
-  namespace
-  |
-  partial
-  |
-  path
-  |
-  status
-  |
-  template
-  |
-  text
-  )
-  $
-  /x;
+my @RESERVED =
+  qw/action app cb class controller data exception extends format/;
+push @RESERVED,
+  qw/handler json layout method namespace partial path status template text/;
+my $STASH_RE = join '|', @RESERVED;
+$STASH_RE = qr/^(?:$STASH_RE)$/;
 
 # "Is all the work done by the children?
 #  No, not the whipping."

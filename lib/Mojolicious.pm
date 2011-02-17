@@ -950,6 +950,8 @@ Audrey Tang
 
 Breno G. de Oliveira
 
+Brian Duggan
+
 Burak Gursoy
 
 Ch Lamprecht

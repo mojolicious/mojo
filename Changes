@@ -4,6 +4,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added TTL support to resolve in Mojo::IOLoop. (und3f)
         - Relaxed charset handling in and around Mojo::DOM a bit.
         - Fixed small route bug.
+        - Fixed small hypnotoad bug. (bduggan)
 
 1.1 2011-02-14 00:00:00
         - Code name "Smiling Cat Face With Heart-Shaped Eyes", this is a

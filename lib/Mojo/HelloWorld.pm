@@ -181,6 +181,13 @@ sub _proxy {
   # Async proxy
   if (my $url = $tx->req->param('async_url')) {
 
+    # Sync environment
+    unless (Mojo::IOLoop->singleton->is_running) {
+      $tx->res->body('Async not available in this deployment environment!');
+      $tx->resume;
+      return;
+    }
+
     # Fetch
     $self->async->get(
       $url => sub {
@@ -191,7 +198,7 @@ sub _proxy {
         $tx->res->body($tx2->res->content->asset->slurp);
         $tx->resume;
       }
-    )->start;
+    );
 
     return;
   }

@@ -1231,13 +1231,6 @@ A L<Mojo::Client> prepared for the current environment.
     $c->render_data($client->res->body);
   })->start;
 
-Some environments such as L<Mojo::Server::Daemon> even allow async requests.
-
-  $c->client->async->get('http://mojolicio.us' => sub {
-    my $client = shift;
-    $c->render_data($client->res->body);
-  })->start;
-
 =head2 C<cookie>
 
   $c         = $c->cookie(foo => 'bar');

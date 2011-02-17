@@ -17,6 +17,10 @@ use Mojo::Client;
 # Mojolicious::Lite and ojo
 use ojo;
 
+# Clients
+my $client       = app->client->app(app);
+my $async_client = $client->clone->ioloop($client->ioloop)->app(app)->async;
+
 # Silence
 app->log->level('fatal');
 
@@ -77,20 +81,20 @@ websocket '/denied' => sub {
 my $subreq = 0;
 websocket '/subreq' => sub {
   my $self = shift;
-  $self->client->async->websocket(
+  $async_client->websocket(
     '/echo' => sub {
-      my $client = shift;
-      $client->on_message(
+      my $async_client = shift;
+      $async_client->on_message(
         sub {
-          my ($client, $message) = @_;
+          my ($async_client, $message) = @_;
           $self->send_message($message);
-          $client->finish;
+          $async_client->finish;
           $self->finish;
         }
       );
-      $client->send_message('test1');
+      $async_client->send_message('test1');
     }
-  )->start;
+  );
   $self->send_message('test0');
   $self->on_finish(sub { $subreq += 3 });
 };
@@ -117,8 +121,6 @@ websocket '/deadcallback' => sub {
   my $self = shift;
   $self->on_message(sub { die 'i see dead callbacks' });
 };
-
-my $client = Mojo::Client->singleton->app(app);
 
 # GET /link
 my $res = $client->get('/link')->success;
@@ -233,7 +235,7 @@ is $subreq,   3,            'finished server websocket';
 my $running = 2;
 my ($code2, $result2);
 ($code, $result) = undef;
-$client->async->websocket(
+$async_client->websocket(
   '/subreq' => sub {
     my $self = shift;
     $code   = $self->res->code;
@@ -248,8 +250,8 @@ $client->async->websocket(
     );
     $self->on_finish(sub { $finished += 1 });
   }
-)->start;
-$client->async->websocket(
+);
+$async_client->websocket(
   '/subreq' => sub {
     my $self = shift;
     $code2   = $self->res->code;
@@ -264,8 +266,8 @@ $client->async->websocket(
     );
     $self->on_finish(sub { $finished += 2 });
   }
-)->start;
-$client->ioloop->start;
+);
+$async_client->ioloop->start;
 is $code,     101,          'right status';
 is $result,   'test0test1', 'right result';
 is $code2,    101,          'right status';

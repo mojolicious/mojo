@@ -360,8 +360,8 @@ time.
   # FIFO queue
   my @urls = qw/google.com/;
 
-  # Client following up to 5 redirects
-  my $client = Mojo::Client->new(max_redirects => 5);
+  # Async client following up to 5 redirects
+  my $client = Mojo::Client->new(max_redirects => 5)->async;
 
   # Crawler
   my $crawl;
@@ -369,11 +369,11 @@ time.
     my $id = shift;
 
     # Dequeue or wait for more URLs
-    return $client->async->ioloop->timer(2 => sub { $crawl->($id) })
+    return $client->ioloop->timer(2 => sub { $crawl->($id) })
       unless my $url = shift @urls;
 
     # Fetch
-    $client->async->get($url => sub {
+    $client->get($url => sub {
       my $tx = pop;
 
       # Extract URLs
@@ -391,14 +391,14 @@ time.
 
       # Next
       $crawl->($id);
-    })->start;
+    });
   };
 
   # Start a bunch of parallel crawlers sharing the same client
   $crawl->($_) for 1 .. 3;
 
   # Start event loop
-  $client->async->ioloop->start;
+  $client->ioloop->start;
 
 You can take full control of the L<Mojo::IOLoop> event loop.
 

@@ -8,7 +8,8 @@ use Mojo::Util 'decode';
 require Test::More;
 
 has app => sub { return $ENV{MOJO_APP} if ref $ENV{MOJO_APP} };
-has client => sub { Mojo::Client->singleton };
+has client =>
+  sub { Mojo::Client->singleton->ioloop(Mojo::IOLoop->singleton) };
 has max_redirects => 0;
 has 'tx';
 

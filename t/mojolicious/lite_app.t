@@ -27,12 +27,17 @@ use Mojo::Content::MultiPart;
 use Mojo::Content::Single;
 use Mojo::Cookie::Response;
 use Mojo::Date;
+use Mojo::IOLoop;
 use Mojo::JSON;
 use Mojo::Transaction::HTTP;
 use Test::Mojo;
 
 # Load Mojolicious::Lite via ojo
 use ojo;
+
+# Clients
+my $client       = Mojo::Client->singleton->ioloop(Mojo::IOLoop->singleton);
+my $async_client = $client->clone->ioloop($client->ioloop)->app(app)->async;
 
 # Header condition plugin
 plugin 'header_condition';
@@ -446,13 +451,13 @@ app->hook(after_dispatch => sub { shift->stash->{async} = 'broken!' });
 my $async;
 get '/subrequest_async' => sub {
   my $self = shift;
-  $self->client->async->post(
+  $async_client->post(
     '/template' => sub {
       my $client = shift;
       $self->render_text($client->res->body . $self->stash->{'async'});
       $async = $self->stash->{async};
     }
-  )->start;
+  );
   $self->stash->{'async'} = 'success!';
 };
 
@@ -630,15 +635,14 @@ get '/works' => sub { shift->render(text => 'prefix works!') };
 
 # Oh Fry, I love you more than the moon, and the stars,
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
-my $client = app->client;
-my $t      = Test::Mojo->new;
+my $t = Test::Mojo->new;
 
 # Client timer
 my $timer;
 $client->ioloop->timer(
   '0.1' => sub {
     my $async = '';
-    $client->async->get(
+    $async_client->get(
       '/' => sub {
         my $self = shift;
         $timer = $self->res->body . $async;

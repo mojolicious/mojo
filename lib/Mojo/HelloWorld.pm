@@ -1,8 +1,12 @@
 package Mojo::HelloWorld;
 use Mojo::Base 'Mojo';
 
+use Mojo::IOLoop;
 use Mojo::JSON;
 use Mojo::Cookie::Response;
+
+has async =>
+  sub { shift->client->clone->ioloop(Mojo::IOLoop->singleton)->async };
 
 # "How is education supposed to make me feel smarter? Besides,
 #  every time I learn something new,
@@ -178,7 +182,7 @@ sub _proxy {
   if (my $url = $tx->req->param('async_url')) {
 
     # Fetch
-    $self->client->async->get(
+    $self->async->get(
       $url => sub {
         my ($self, $tx2) = @_;
 
@@ -329,6 +333,17 @@ Mojo::HelloWorld - Hello World!
 
 L<Mojo::HelloWorld> is the default L<Mojo> application, used mostly for
 testing.
+
+=head1 ATTRIBUTES
+
+L<Mojo::HelloWorld> implements the following attributes.
+
+=head2 C<async>
+
+  my $async = $hello->async;
+  $hello    = $hello->async($async);
+
+L<Mojo::Client> instance using the global shared L<Mojo::IOLoop> singleton.
 
 =head1 METHODS
 

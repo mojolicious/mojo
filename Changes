@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojolicious.
 1.11 2011-02-14 00:00:00
         - Added TTL support to resolve in Mojo::IOLoop. (und3f)
         - Relaxed charset handling in and around Mojo::DOM a bit.
+        - Fixed Mojo::Client async mode.
         - Fixed session cookie encoding bug.
         - Fixed small route bug.
         - Fixed small hypnotoad bug. (bduggan)

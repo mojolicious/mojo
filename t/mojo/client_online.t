@@ -61,47 +61,50 @@ ok !$tx->is_done, 'transaction is not done';
 $client = Mojo::Client->new;
 
 # Keep alive
-my $async = $client->async;
-$async->get('http://mojolicio.us', sub { shift->ioloop->stop })->start;
-$async->ioloop->start;
+$client->async;
+$client->get('http://mojolicio.us', sub { shift->ioloop->stop });
+$client->ioloop->start;
 my $kept_alive = undef;
-$async->get(
+$client->get(
   'http://mojolicio.us',
   sub {
     my $self = shift;
     $self->ioloop->stop;
     $kept_alive = shift->kept_alive;
   }
-)->start;
-$async->ioloop->start;
+);
+$client->ioloop->start;
 is $kept_alive, 1, 'connection was kept alive';
 
 # Nested keep alive
 my @kept_alive;
-$client->async->get(
+$client->get(
   'http://mojolicio.us',
   sub {
     my ($self, $tx) = @_;
     push @kept_alive, $tx->kept_alive;
-    $self->async->get(
+    $self->get(
       'http://mojolicio.us',
       sub {
         my ($self, $tx) = @_;
         push @kept_alive, $tx->kept_alive;
-        $self->async->get(
+        $self->get(
           'http://mojolicio.us',
           sub {
             my ($self, $tx) = @_;
             push @kept_alive, $tx->kept_alive;
             $self->ioloop->stop;
           }
-        )->start;
+        );
       }
-    )->start;
+    );
   }
-)->start;
+);
 $client->ioloop->start;
 is_deeply \@kept_alive, [1, 1, 1], 'connections kept alive';
+
+# Fresh client again
+$client = Mojo::Client->new;
 
 # Custom non keep alive request
 $tx = Mojo::Transaction::HTTP->new;

@@ -56,27 +56,7 @@ sub DESTROY {
 #  Fun, too."
 sub async {
   my $self = shift;
-
-  # Already async or async not possible
-  return $self if $self->{_is_async};
-
-  # Create async client
-  unless ($self->{_async}) {
-
-    # Clone and cache async client
-    my $clone = $self->{_async} = $self->clone;
-    $clone->{_is_async} = 1;
-
-    # Make async client use the global ioloop if available
-    my $singleton = Mojo::IOLoop->singleton;
-    $clone->ioloop($singleton->is_running ? $singleton : $self->ioloop);
-
-    # Inherit test server
-    $clone->{_server} = $self->{_server};
-    $clone->{_port}   = $self->{_port};
-  }
-
-  return $self->{_async};
+  ++$self->{_async} and return $self;
 }
 
 # "Ah, alcohol and night-swimming. It's a winning combination."
@@ -470,7 +450,7 @@ sub start {
   my $queue = delete $self->{_queue} || [];
 
   # Process sync subrequests in new client
-  if (!$self->{_is_async} && $self->{_processing}) {
+  if (!$self->{_async} && $self->{_processing}) {
     my $clone = $self->clone;
     $clone->queue(@$_) for @$queue;
     return $clone->start;
@@ -480,7 +460,7 @@ sub start {
   else { $self->_tx_start(@$_) for @$queue }
 
   # Process sync requests
-  if (!$self->{_is_async} && $self->{_processing}) {
+  if (!$self->{_async} && $self->{_processing}) {
 
     # Start loop
     my $loop = $self->ioloop;
@@ -527,7 +507,7 @@ sub test_server {
 #  ...Where are we going?"
 sub websocket {
   my $self = shift;
-  $self->queue($self->build_websocket_tx(@_));
+  $self->_tx_queue_or_start($self->build_websocket_tx(@_));
 }
 
 sub _cache {
@@ -842,7 +822,7 @@ sub _handle {
   }
 
   # Cleanup
-  $self->ioloop->stop if !$self->{_is_async} && !$self->{_processing};
+  $self->ioloop->stop if !$self->{_async} && !$self->{_processing};
 }
 
 sub _hup { shift->_handle(pop, 1) }
@@ -971,9 +951,11 @@ sub _tx_info {
 sub _tx_queue_or_start {
   my ($self, $tx, $cb) = @_;
 
+  # Async
+  return $self->start($tx, $cb) if $self->{_async};
+
   # Quick start
-  $self->start($tx, sub { $tx = $_[1] }) and return $tx
-    if !$cb && !$self->{_is_async};
+  $self->start($tx, sub { $tx = $_[1] }) and return $tx unless $cb;
 
   # Queue transaction with callback
   $self->queue($tx, $cb);
@@ -1351,20 +1333,16 @@ clients.
 
 =head2 C<async>
 
-  my $async = $client->async;
+  $client = $client->async;
 
-Clone client instance and start using the global shared L<Mojo::IOLoop>
-singleton if it is running.
-Note that all cloned clients have their own keep alive connection queue, so
-you can quickly run out of file descriptors with too many active clients.
+Disable automatic L<Mojo::IOLoop> management and the need to call C<start>.
 
-  my $async = $client->async;
-  $async->get('http://mojolicio.us' => sub {
-    my $async = shift;
-    print $async->res->body;
-    $async->ioloop->stop;
-  })->start;
-  $async->ioloop->start;
+  $client->async->get('http://mojolicio.us' => sub {
+    my $client = shift;
+    print shift->res->body;
+    $client->ioloop->stop;
+  });
+  $client->ioloop->start;
 
 =head2 C<build_form_tx>
 

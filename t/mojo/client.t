@@ -271,51 +271,51 @@ is $tx->res->body, 'works!', 'right content';
 
 # Nested keep alive
 my @kept_alive;
-$client->async->get(
+my $async_client = $client->clone->app(app)->async;
+$async_client->async->get(
   '/',
   sub {
     my ($self, $tx) = @_;
     push @kept_alive, $tx->kept_alive;
-    $self->async->get(
+    $self->get(
       '/',
       sub {
         my ($self, $tx) = @_;
         push @kept_alive, $tx->kept_alive;
-        $self->async->get(
+        $self->get(
           '/',
           sub {
             my ($self, $tx) = @_;
             push @kept_alive, $tx->kept_alive;
-            $self->async->ioloop->stop;
+            $self->ioloop->stop;
           }
-        )->start;
+        );
       }
-    )->start;
+    );
   }
-)->start;
-$client->async->ioloop->start;
+);
+$async_client->ioloop->start;
 is_deeply \@kept_alive, [undef, 1, 1], 'connections kept alive';
 
 # Simple nested keep alive with timers
 @kept_alive = ();
-my $async = $client->async;
-my $loop  = $async->ioloop;
-$async->get(
+my $loop = $async_client->ioloop;
+$async_client->get(
   '/',
   sub {
     push @kept_alive, pop->kept_alive;
     $loop->timer(
       '0.25' => sub {
-        $async->get(
+        $async_client->get(
           '/',
           sub {
             push @kept_alive, pop->kept_alive;
             $loop->timer('0.25' => sub { $loop->stop });
           }
-        )->start;
+        );
       }
     );
   }
-)->start;
+);
 $loop->start;
 is_deeply \@kept_alive, [1, 1], 'connections kept alive';

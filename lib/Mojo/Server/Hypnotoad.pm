@@ -214,7 +214,7 @@ sub _config {
   $daemon->listen($listen);
 
   # User
-  $daemon->group($c->{user}) if $c->{user};
+  $daemon->user($c->{user}) if $c->{user};
 
   # WebSocket timeout
   $daemon->websocket_timeout($c->{websocket_timeout} || 300);

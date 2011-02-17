@@ -18,7 +18,7 @@ sub load {
   return unless my $value = $c->signed_cookie($self->cookie_name);
 
   # Decode
-  $value =~ s/\+/\-/g;
+  $value =~ s/\-/\=/g;
   b64_decode $value;
 
   # Thaw

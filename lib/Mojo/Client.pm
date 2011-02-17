@@ -1358,6 +1358,14 @@ singleton if it is running.
 Note that all cloned clients have their own keep alive connection queue, so
 you can quickly run out of file descriptors with too many active clients.
 
+  my $async = $client->async;
+  $async->get('http://mojolicio.us' => sub {
+    my $async = shift;
+    print $async->res->body;
+    $async->ioloop->stop;
+  })->start;
+  $async->ioloop->start;
+
 =head2 C<build_form_tx>
 
   my $tx = $client->build_form_tx('http://kraih.com/foo' => {test => 123});

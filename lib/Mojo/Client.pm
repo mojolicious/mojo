@@ -1717,8 +1717,6 @@ Send a message via WebSocket, only available from callbacks.
   $client = $client->start(@transactions => sub {...});
 
 Start processing all queued transactions.
-Will be blocking unless you have a global shared ioloop and use the C<async>
-method.
 
 =head2 C<test_server>
 

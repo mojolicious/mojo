@@ -1260,10 +1260,9 @@ be used.
   my $managed = $client->managed;
   $client     = $client->managed(0);
 
-Disable automatic L<Mojo::IOLoop> management and allow multiple clients to
-share the same event loop, defaults to C<1>.
-Also disables the queue system, so you can just start new requests at any
-time without having to call C<start> anymore.
+Control automatic L<Mojo::IOLoop> management, defaults to C<1>.
+Disabling it will for example allow you to share the same event loop with
+multiple clients.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
   $client->managed(0)->get('http://mojolicio.us' => sub {

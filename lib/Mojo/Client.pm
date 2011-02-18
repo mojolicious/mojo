@@ -40,8 +40,8 @@ our $CLIENT;
   warn <<EOF;
 Mojo::Client->async is DEPRECATED in favor of Mojo::Client->managed!!!
 EOF
-  my $self  = shift;
-  my $clone = $self->clone;
+  my $self = shift;
+  my $clone = $self->{_async} ||= $self->clone;
   $clone->ioloop(
       Mojo::IOLoop->singleton->is_running
     ? Mojo::IOLoop->singleton

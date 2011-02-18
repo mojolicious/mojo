@@ -44,7 +44,7 @@ EOF
   my $clone = $self->clone;
   $clone->ioloop(
       Mojo::IOLoop->singleton->is_running
-    ? Mojo::Client->singleton
+    ? Mojo::IOLoop->singleton
     : $self->ioloop
   );
   $clone->managed(0);

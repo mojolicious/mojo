@@ -1269,7 +1269,7 @@ be used.
   my $managed = $client->managed;
   $client     = $client->managed(0);
 
-Control automatic L<Mojo::IOLoop> management, defaults to C<1>.
+Automatic L<Mojo::IOLoop> management, defaults to C<1>.
 Disabling it will for example allow you to share the same event loop with
 multiple clients.
 Note that this attribute is EXPERIMENTAL and might change without warning!

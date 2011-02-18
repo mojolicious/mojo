@@ -1336,7 +1336,7 @@ clients.
   $client = $client->async;
 
 Disable automatic L<Mojo::IOLoop> management and allow multiple clients to
-run parallel.
+share the same event loop.
 Also disables the queue system, so you can just start new requests at any
 time without having to call C<start> anymore.
 

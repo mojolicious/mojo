@@ -1359,11 +1359,6 @@ Render a data structure as JSON.
 Disable auto rendering.
 Note that this method is EXPERIMENTAL and might change without warning!
 
-  $c->render_later;
-  $c->client->async->get(
-    'http://mojolicio.us' => sub { $c->render(data => shift->res->body) }
-  )->start;
-
 =head2 C<render_not_found>
 
   $c->render_not_found;

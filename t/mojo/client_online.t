@@ -61,7 +61,7 @@ ok !$tx->is_done, 'transaction is not done';
 $client = Mojo::Client->new;
 
 # Keep alive
-$client->async;
+$client->managed(0);
 $client->get('http://mojolicio.us', sub { shift->ioloop->stop });
 $client->ioloop->start;
 my $kept_alive = undef;

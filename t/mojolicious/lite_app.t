@@ -36,8 +36,8 @@ use Test::Mojo;
 use ojo;
 
 # Clients
-my $client       = Mojo::Client->singleton->ioloop(Mojo::IOLoop->singleton);
-my $async_client = $client->clone->ioloop($client->ioloop)->app(app)->async;
+my $client    = Mojo::Client->singleton->ioloop(Mojo::IOLoop->singleton);
+my $unmanaged = $client->clone->ioloop($client->ioloop)->app(app)->managed(0);
 
 # Header condition plugin
 plugin 'header_condition';
@@ -451,7 +451,7 @@ app->hook(after_dispatch => sub { shift->stash->{async} = 'broken!' });
 my $async;
 get '/subrequest_async' => sub {
   my $self = shift;
-  $async_client->post(
+  $unmanaged->post(
     '/template' => sub {
       my $client = shift;
       $self->render_text($client->res->body . $self->stash->{'async'});
@@ -642,7 +642,7 @@ my $timer;
 $client->ioloop->timer(
   '0.1' => sub {
     my $async = '';
-    $async_client->get(
+    $unmanaged->get(
       '/' => sub {
         my $self = shift;
         $timer = $self->res->body . $async;

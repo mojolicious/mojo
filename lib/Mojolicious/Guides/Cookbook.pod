@@ -360,8 +360,8 @@ time.
   # FIFO queue
   my @urls = qw/google.com/;
 
-  # Async client following up to 5 redirects
-  my $client = Mojo::Client->new(max_redirects => 5)->async;
+  # Unmanaged client following up to 5 redirects
+  my $client = Mojo::Client->new(max_redirects => 5)->managed(0);
 
   # Crawler
   my $crawl;

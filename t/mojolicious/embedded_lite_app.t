@@ -34,9 +34,9 @@ use Mojolicious::Lite;
 use Mojo::IOLoop;
 
 app->attr(
-  async => sub {
+  unmanaged => sub {
     shift->client->clone->app(main::app())->ioloop(Mojo::IOLoop->singleton)
-      ->async;
+      ->managed(0);
   }
 );
 
@@ -52,7 +52,7 @@ get '/bye' => sub {
   my $name  = $self->stash('name');
   my $async = '';
   $self->render_later;
-  $self->app->async->get(
+  $self->app->unmanaged->get(
     '/hello/hello' => sub {
       my $client = shift;
       $self->render_text($client->res->body . "$name! $async");

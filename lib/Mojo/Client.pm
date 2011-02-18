@@ -26,6 +26,7 @@ has cookie_jar => sub { Mojo::CookieJar->new };
 has ioloop     => sub { Mojo::IOLoop->new };
 has keep_alive_timeout => 15;
 has log                => sub { Mojo::Log->new };
+has managed            => 1;
 has max_connections    => 5;
 has max_redirects      => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 };
 has user_agent         => 'Mojolicious (Perl)';
@@ -33,6 +34,15 @@ has websocket_timeout  => 300;
 
 # Singleton
 our $CLIENT;
+
+# DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
+*async = sub {
+  warn <<EOF;
+Mojo::Client->async is DEPRECATED in favor of Mojo::Client->managed!!!
+In the meantime it will always fallback to blocking.
+EOF
+  return shift;
+};
 
 # Make sure we leave a clean ioloop behind
 sub DESTROY {
@@ -50,13 +60,6 @@ sub DESTROY {
   for my $cached (@$cache) {
     $loop->drop($cached->[1]);
   }
-}
-
-# "Homer, it's easy to criticize.
-#  Fun, too."
-sub async {
-  my $self = shift;
-  ++$self->{_async} and return $self;
 }
 
 # "Ah, alcohol and night-swimming. It's a winning combination."
@@ -212,6 +215,8 @@ sub build_form_tx {
   return $tx, $cb;
 }
 
+# "Homer, it's easy to criticize.
+#  Fun, too."
 sub build_tx {
   my $self = shift;
 
@@ -450,7 +455,7 @@ sub start {
   my $queue = delete $self->{_queue} || [];
 
   # Process sync subrequests in new client
-  if (!$self->{_async} && $self->{_processing}) {
+  if ($self->managed && $self->{_processing}) {
     my $clone = $self->clone;
     $clone->queue(@$_) for @$queue;
     return $clone->start;
@@ -460,7 +465,7 @@ sub start {
   else { $self->_tx_start(@$_) for @$queue }
 
   # Process sync requests
-  if (!$self->{_async} && $self->{_processing}) {
+  if ($self->managed && $self->{_processing}) {
 
     # Start loop
     my $loop = $self->ioloop;
@@ -815,7 +820,7 @@ sub _handle {
   }
 
   # Cleanup
-  $self->ioloop->stop if !$self->{_async} && !$self->{_processing};
+  $self->ioloop->stop if $self->managed && !$self->{_processing};
 }
 
 sub _hup { shift->_handle(pop, 1) }
@@ -945,7 +950,7 @@ sub _tx_queue_or_start {
   my ($self, $tx, $cb) = @_;
 
   # Async
-  return $self->start($tx, $cb) if $self->{_async};
+  return $self->start($tx, $cb) unless $self->managed;
 
   # Quick start
   $self->start($tx, sub { $tx = $_[1] }) and return $tx unless $cb;
@@ -1250,6 +1255,24 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
 A L<Mojo::Log> object used for logging, by default the application log will
 be used.
 
+=head2 C<managed>
+
+  my $managed = $client->managed;
+  $client     = $client->managed(0);
+
+Disable automatic L<Mojo::IOLoop> management and allow multiple clients to
+share the same event loop, defaults to C<1>.
+Also disables the queue system, so you can just start new requests at any
+time without having to call C<start> anymore.
+Note that this attribute is EXPERIMENTAL and might change without warning!
+
+  $client->managed(0)->get('http://mojolicio.us' => sub {
+    my $client = shift;
+    print shift->res->body;
+    $client->ioloop->stop;
+  });
+  $client->ioloop->start;
+
 =head2 C<max_connections>
 
   my $max_connections = $client->max_connections;
@@ -1323,22 +1346,6 @@ following new ones.
 Construct a new L<Mojo::Client> object.
 Use C<singleton> if you want to share keep alive connections with other
 clients.
-
-=head2 C<async>
-
-  $client = $client->async;
-
-Disable automatic L<Mojo::IOLoop> management and allow multiple clients to
-share the same event loop.
-Also disables the queue system, so you can just start new requests at any
-time without having to call C<start> anymore.
-
-  $client->async->get('http://mojolicio.us' => sub {
-    my $client = shift;
-    print shift->res->body;
-    $client->ioloop->stop;
-  });
-  $client->ioloop->start;
 
 =head2 C<build_form_tx>
 

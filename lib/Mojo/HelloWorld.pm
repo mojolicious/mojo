@@ -5,8 +5,8 @@ use Mojo::IOLoop;
 use Mojo::JSON;
 use Mojo::Cookie::Response;
 
-has async =>
-  sub { shift->client->clone->ioloop(Mojo::IOLoop->singleton)->async };
+has unmanaged =>
+  sub { shift->client->clone->ioloop(Mojo::IOLoop->singleton)->managed(0) };
 
 # "How is education supposed to make me feel smarter? Besides,
 #  every time I learn something new,
@@ -189,7 +189,7 @@ sub _proxy {
     }
 
     # Fetch
-    $self->async->get(
+    $self->unmanaged->get(
       $url => sub {
         my ($self, $tx2) = @_;
 
@@ -345,10 +345,10 @@ testing.
 
 L<Mojo::HelloWorld> implements the following attributes.
 
-=head2 C<async>
+=head2 C<unmanaged>
 
-  my $async = $hello->async;
-  $hello    = $hello->async($async);
+  my $unmanaged = $hello->unmanaged;
+  $hello        = $hello->unmanaged($unmanaged);
 
 L<Mojo::Client> instance using the global shared L<Mojo::IOLoop> singleton.
 

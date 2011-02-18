@@ -18,8 +18,8 @@ use Mojo::Client;
 use ojo;
 
 # Clients
-my $client       = app->client->app(app);
-my $async_client = $client->clone->ioloop($client->ioloop)->app(app)->async;
+my $client    = app->client->app(app);
+my $unmanaged = $client->clone->ioloop($client->ioloop)->app(app)->managed(0);
 
 # Silence
 app->log->level('fatal');
@@ -81,18 +81,18 @@ websocket '/denied' => sub {
 my $subreq = 0;
 websocket '/subreq' => sub {
   my $self = shift;
-  $async_client->websocket(
+  $unmanaged->websocket(
     '/echo' => sub {
-      my $async_client = shift;
-      $async_client->on_message(
+      my $unmanaged = shift;
+      $unmanaged->on_message(
         sub {
-          my ($async_client, $message) = @_;
+          my ($unmanaged, $message) = @_;
           $self->send_message($message);
-          $async_client->finish;
+          $unmanaged->finish;
           $self->finish;
         }
       );
-      $async_client->send_message('test1');
+      $unmanaged->send_message('test1');
     }
   );
   $self->send_message('test0');
@@ -235,7 +235,7 @@ is $subreq,   3,            'finished server websocket';
 my $running = 2;
 my ($code2, $result2);
 ($code, $result) = undef;
-$async_client->websocket(
+$unmanaged->websocket(
   '/subreq' => sub {
     my $self = shift;
     $code   = $self->res->code;
@@ -251,7 +251,7 @@ $async_client->websocket(
     $self->on_finish(sub { $finished += 1 });
   }
 );
-$async_client->websocket(
+$unmanaged->websocket(
   '/subreq' => sub {
     my $self = shift;
     $code2   = $self->res->code;
@@ -267,7 +267,7 @@ $async_client->websocket(
     $self->on_finish(sub { $finished += 2 });
   }
 );
-$async_client->ioloop->start;
+$unmanaged->ioloop->start;
 is $code,     101,          'right status';
 is $result,   'test0test1', 'right result';
 is $code2,    101,          'right status';

@@ -39,9 +39,18 @@ our $CLIENT;
 *async = sub {
   warn <<EOF;
 Mojo::Client->async is DEPRECATED in favor of Mojo::Client->managed!!!
-In the meantime it will always fallback to blocking.
 EOF
-  return shift;
+  my $self  = shift;
+  my $clone = $self->clone;
+  $clone->ioloop(
+      Mojo::IOLoop->singleton->is_running
+    ? Mojo::Client->singleton
+    : $self->ioloop
+  );
+  $clone->managed(0);
+  $clone->{_server} = $self->{_server};
+  $clone->{_port}   = $self->{_port};
+  return $clone;
 };
 
 # Make sure we leave a clean ioloop behind

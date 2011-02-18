@@ -1335,7 +1335,10 @@ clients.
 
   $client = $client->async;
 
-Disable automatic L<Mojo::IOLoop> management and the need to call C<start>.
+Disable automatic L<Mojo::IOLoop> management and allow multiple clients to
+run parallel.
+Also disables the queue system, so you can just start new requests at any
+time without having to call C<start> anymore.
 
   $client->async->get('http://mojolicio.us' => sub {
     my $client = shift;

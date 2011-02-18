@@ -177,9 +177,6 @@ sub connect {
   # Arguments
   my $args = ref $_[0] ? $_[0] : {@_};
 
-  # TLS check
-  return if $args->{tls} && !TLS;
-
   # Protocol
   $args->{proto} ||= 'tcp';
 
@@ -743,8 +740,11 @@ sub start_tls {
   my $self = shift;
   my $id   = shift;
 
-  # Shortcut
-  $self->drop($id) and return unless TLS;
+  # No TLS support
+  unless (TLS) {
+    $self->_error($id, 'IO::Socket::SSL 1.37 required for TLS support.');
+    return;
+  }
 
   # Arguments
   my $args = ref $_[0] ? $_[0] : {@_};

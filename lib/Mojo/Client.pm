@@ -619,13 +619,6 @@ sub _connect {
       on_connect => sub { $self->_connected($_[1]) }
     );
 
-    # Error
-    unless (defined $id) {
-      $tx->req->error("Couldn't connect.");
-      $self->_tx_finish($tx, $cb);
-      return;
-    }
-
     # Add new connection
     $self->{_cs}->{$id} = {cb => $cb, tx => $tx};
   }

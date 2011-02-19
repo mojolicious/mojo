@@ -440,7 +440,7 @@ sub singleton { $CLIENT ||= shift->new(@_) }
 # "Wow, Barney. You brought a whole beer keg.
 #  Yeah... where do I fill it up?"
 sub send_message {
-  my $self = shift;
+  my ($self, $message, $cb) = @_;
 
   # Transaction
   my $tx = $self->tx;
@@ -448,8 +448,22 @@ sub send_message {
   # WebSocket
   croak 'Transaction is not a WebSocket' unless $tx->is_websocket;
 
+  # Weaken
+  weaken $self;
+  weaken $tx;
+
   # Send
-  $tx->send_message(@_);
+  $tx->send_message(
+    $message,
+    sub {
+
+      # Cleanup
+      shift;
+      local $self->{tx} = $tx;
+
+      $self->$cb(@_) if $cb;
+    }
+  );
 
   return $self;
 }
@@ -1718,6 +1732,7 @@ everywhere inside the process.
 =head2 C<send_message>
 
   $client = $client->send_message('Hi there!');
+  $client = $client->send_message('Hi there!', sub {...});
 
 Send a message via WebSocket, only available from callbacks.
 

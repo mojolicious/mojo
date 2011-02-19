@@ -582,7 +582,7 @@ sub req { shift->tx->req }
 sub res { shift->tx->res }
 
 sub send_message {
-  my $self = shift;
+  my ($self, $message, $cb) = @_;
 
   # Transaction
   my $tx = $self->tx;
@@ -592,7 +592,17 @@ sub send_message {
     unless $tx->is_websocket;
 
   # Send
-  $tx->send_message(@_);
+  $tx->send_message(
+    $message,
+    sub {
+
+      # Cleanup
+      shift;
+
+      # Callback
+      $self->$cb(@_) if $cb;
+    }
+  );
 
   # Rendered
   $self->rendered;
@@ -1417,6 +1427,7 @@ Usually refers to a L<Mojo::Message::Response> object.
 =head2 C<send_message>
 
   $c = $c->send_message('Hi there!');
+  $c = $c->send_message('Hi there!', sub {...});
 
 Send a message via WebSocket, only works if there is currently a WebSocket
 connection in progress.

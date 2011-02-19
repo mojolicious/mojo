@@ -6,7 +6,7 @@ use warnings;
 # Disable epoll and kqueue
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 29;
+use Test::More tests => 33;
 
 # "Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
 #  Well, that’s love for you."
@@ -105,6 +105,17 @@ websocket '/echo' => sub {
     sub {
       my ($self, $message) = @_;
       $self->send_message($message);
+    }
+  );
+};
+
+# WebSocket /double_echo
+my $buffer = '';
+websocket '/double_echo' => sub {
+  shift->on_message(
+    sub {
+      my ($self, $message) = @_;
+      $self->send_message($message, sub { shift->send_message($message) });
     }
   );
 };
@@ -274,6 +285,50 @@ is $code2,    101,          'right status';
 is $result2,  'test0test1', 'right result';
 is $finished, 7,            'finished client websocket';
 is $subreq,   9,            'finished server websocket';
+
+# WebSocket /echo (client side drain callback)
+$flag2  = undef;
+$result = '';
+my $counter = 0;
+$client->websocket(
+  '/echo' => sub {
+    my $self = shift;
+    $self->on_finish(sub { $flag2 += 5 });
+    $self->on_message(
+      sub {
+        my ($self, $message) = @_;
+        $result .= $message;
+        $self->finish if ++$counter == 2;
+      }
+    );
+    $flag2 = 20;
+    $self->send_message('hi!', sub { shift->send_message('there!') });
+  }
+)->start;
+is $result, 'hi!there!', 'right result';
+is $flag2,  25,          'finished callback';
+
+# WebSocket /double_echo (server side drain callback)
+$flag2   = undef;
+$result  = '';
+$counter = 0;
+$client->websocket(
+  '/double_echo' => sub {
+    my $self = shift;
+    $self->on_finish(sub { $flag2 += 5 });
+    $self->on_message(
+      sub {
+        my ($self, $message) = @_;
+        $result .= $message;
+        $self->finish if ++$counter == 2;
+      }
+    );
+    $flag2 = 19;
+    $self->send_message('hi!');
+  }
+)->start;
+is $result, 'hi!hi!', 'right result';
+is $flag2,  24,       'finished callback';
 
 # WebSocket /dead (dies)
 $code = undef;

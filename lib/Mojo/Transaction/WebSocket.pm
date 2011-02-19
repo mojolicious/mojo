@@ -87,7 +87,10 @@ sub resume {
 }
 
 sub send_message {
-  my ($self, $message) = @_;
+  my ($self, $message, $cb) = @_;
+
+  # Drain callback
+  $self->{_drain} = $cb if $cb;
 
   # Encode
   $message = '' unless defined $message;
@@ -176,6 +179,10 @@ sub server_write {
   $self->{_write} = '' unless defined $self->{_write};
   unless (length $self->{_write}) {
     $self->{_state} = $self->{_finished} ? 'done' : 'read';
+
+    # Drain callback
+    my $cb = delete $self->{_drain};
+    $self->$cb if $cb;
   }
 
   # Empty buffer
@@ -373,6 +380,7 @@ Resume transaction.
 =head2 C<send_message>
 
   $ws->send_message('Hi there!');
+  $ws->send_message('Hi there!', sub {...});
 
 Send a message over the WebSocket, encoding and framing will be handled
 transparently.

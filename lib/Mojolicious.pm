@@ -38,7 +38,7 @@ EOF
 };
 
 our $CODENAME = 'Smiling Cat Face With Heart-Shaped Eyes';
-our $VERSION  = '1.11';
+our $VERSION  = '1.12';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -456,7 +456,7 @@ structured applications.
     my $r    = $self->routes;
 
     # Route prefix for "MyApp::Example" controller
-    my $example = $r->under('/example')->to('example#');
+    my $example = $r->route('/example')->to('example#');
 
     # GET routes connecting the controller prefix with actions
     $example->get('/hello')->to('#hello');

@@ -121,7 +121,7 @@ structured applications.
     my $r    = $self->routes;
 
     # Route prefix for "MyApp::Example" controller
-    my $example = $r->under('/example')->to('example#');
+    my $example = $r->route('/example')->to('example#');
 
     # GET routes connecting the controller prefix with actions
     $example->get('/hello')->to('#hello');

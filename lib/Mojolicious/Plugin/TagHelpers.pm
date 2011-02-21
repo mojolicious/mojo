@@ -149,8 +149,6 @@ sub register {
         # Attributes
         my %attrs = (value => $pair->[1]);
         $attrs{selected} = 'selected' if exists $v{$pair->[1]};
-
-        # Advanced attributes
         %attrs = (%attrs, @$pair[2 .. $#$pair]);
 
         # Option tag
@@ -510,7 +508,7 @@ Generate radio input element.
   <%= select_field language => [qw/de en/], id => 'lang' %>
   <%= select_field country => [[Germany => 'de'], 'en'] %>
   <%= select_field country => [{Europe => [[Germany => 'de'], 'en']}] %>
-  <%= select_field country => [[Germany => 'de', selected => 'selected'], 'en'] %>
+  <%= select_field country => [[Germany => 'de', class => 'europe'], 'en'] %>
 
 Generate select, option and optgroup elements.
 
@@ -533,7 +531,7 @@ Generate select, option and optgroup elements.
     </optgroup>
   </select>
   <select name="country">
-    <option selected="selected" value="de">Germany</option>
+    <option class="europe" value="de">Germany</option>
     <option value="en">en</option>
   </select>
 

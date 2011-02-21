@@ -998,12 +998,16 @@ $t->put_ok('/selection')->status_is(200)
     . '<option value="bar">bar</option>'
     . '<option value="baz">baz</option>'
     . '</select>' . "\n  "
+    . '<select name="bar">'
+    . '<option disabled="disabled" value="disabled_option">Disabled</option>'
+    . '<option value="baz">baz</option>'
+    . '</select>' . "\n  "
     . '<input type="submit" value="Ok" />' . "\n"
     . '</form>'
     . "\n");
 
 # PUT /selection (values)
-$t->put_ok('/selection?a=e&foo=bar')->status_is(200)
+$t->put_ok('/selection?a=e&foo=bar&bar=baz')->status_is(200)
   ->content_is("<form action=\"/selection\">\n  "
     . '<select name="a">'
     . '<option value="b">b</option>'
@@ -1018,12 +1022,17 @@ $t->put_ok('/selection?a=e&foo=bar')->status_is(200)
     . '<option selected="selected" value="bar">bar</option>'
     . '<option value="baz">baz</option>'
     . '</select>' . "\n  "
+    . '<select name="bar">'
+    . '<option disabled="disabled" value="disabled_option">Disabled</option>'
+    . '<option selected="selected" value="baz">baz</option>'
+    . '</select>' . "\n  "
     . '<input type="submit" value="Ok" />' . "\n"
     . '</form>'
     . "\n");
 
 # PUT /selection (multiple values)
-$t->put_ok('/selection?foo=bar&a=e&foo=baz')->status_is(200)
+$t->put_ok('/selection?foo=bar&a=e&foo=baz&bar=disabled_option')
+  ->status_is(200)
   ->content_is("<form action=\"/selection\">\n  "
     . '<select name="a">'
     . '<option value="b">b</option>'
@@ -1037,6 +1046,10 @@ $t->put_ok('/selection?foo=bar&a=e&foo=baz')->status_is(200)
     . '<select multiple="multiple" name="foo">'
     . '<option selected="selected" value="bar">bar</option>'
     . '<option selected="selected" value="baz">baz</option>'
+    . '</select>' . "\n  "
+    . '<select name="bar">'
+    . '<option disabled="disabled" selected="selected" value="disabled_option">Disabled</option>'
+    . '<option value="baz">baz</option>'
     . '</select>' . "\n  "
     . '<input type="submit" value="Ok" />' . "\n"
     . '</form>'
@@ -1743,6 +1756,7 @@ controller and action!
 %= form_for selection => begin
   %= select_field a => ['b', {c => ['d', [ E => 'e'], 'f']}, 'g']
   %= select_field foo => [qw/bar baz/], multiple => 'multiple'
+  %= select_field bar => [['Disabled' => 'disabled_option', disabled => 'disabled'], 'baz']
   %= submit_button
 %= end
 

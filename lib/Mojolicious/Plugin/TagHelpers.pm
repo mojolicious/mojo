@@ -150,6 +150,9 @@ sub register {
         my %attrs = (value => $pair->[1]);
         $attrs{selected} = 'selected' if exists $v{$pair->[1]};
 
+        # Advanced attributes
+        %attrs = (%attrs, @$pair[2 .. $#$pair]);
+
         # Option tag
         $self->_tag('option', %attrs, sub { $pair->[0] });
       };
@@ -507,26 +510,31 @@ Generate radio input element.
   <%= select_field language => [qw/de en/], id => 'lang' %>
   <%= select_field country => [[Germany => 'de'], 'en'] %>
   <%= select_field country => [{Europe => [[Germany => 'de'], 'en']}] %>
+  <%= select_field country => [[Germany => 'de', selected => 'selected'], 'en'] %>
 
 Generate select, option and optgroup elements.
 
   <select name="language">
-    <option name="de">de</option>
-    <option name="en">en</option>
+    <option value="de">de</option>
+    <option value="en">en</option>
   </select>
   <select id="lang" name="language">
-    <option name="de">de</option>
-    <option name="en">en</option>
+    <option value="de">de</option>
+    <option value="en">en</option>
   </select>
   <select name="country">
-    <option name="de">Germany</option>
-    <option name="en">en</option>
+    <option value="de">Germany</option>
+    <option value="en">en</option>
   </select>
   <select id="lang" name="language">
     <optgroup label="Europe">
-      <option name="de">Germany</option>
-      <option name="en">en</option>
+      <option value="de">Germany</option>
+      <option value="en">en</option>
     </optgroup>
+  </select>
+  <select name="country">
+    <option selected="selected" value="de">Germany</option>
+    <option value="en">en</option>
   </select>
 
 =head2 C<stylesheet>

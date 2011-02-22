@@ -41,6 +41,10 @@ sub run {
   my $kqueue =
     Mojo::IOLoop::KQUEUE() ? $IO::KQueue::VERSION : 'not installed';
 
+  # IPv6
+  my $ipv6 =
+    Mojo::IOLoop::IPV6() ? $IO::Socket::IP::VERSION : 'not installed';
+
   # TLS
   my $tls = Mojo::IOLoop::TLS() ? $IO::Socket::SSL::VERSION : 'not installed';
 
@@ -58,6 +62,7 @@ CORE
 OPTIONAL
   IO::Epoll                ($epoll)
   IO::KQueue               ($kqueue)
+  IO::Socket::IP           ($ipv6)
   IO::Socket::SSL          ($tls)
   Net::Rendezvous::Publish ($bonjour)
 

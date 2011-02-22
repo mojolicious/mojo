@@ -82,4 +82,4 @@ $loop->connect(
 );
 $loop->timer('0.5' => sub { shift->stop });
 $loop->start;
-isa_ok $handle, 'IO::Socket::INET', 'right reference';
+isa_ok $handle, 'IO::Socket', 'right reference';

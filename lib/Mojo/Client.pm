@@ -1200,10 +1200,10 @@ Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
 =head1 DESCRIPTION
 
 L<Mojo::Client> is a full featured async io HTTP 1.1 and WebSocket client
-with C<TLS>, C<epoll> and C<kqueue> support.
+with C<IPv6>, C<TLS>, C<epoll> and C<kqueue> support.
 
-Optional modules L<IO::KQueue>, L<IO::Epoll> and L<IO::Socket::SSL> are
-supported transparently and used if installed.
+Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::IP> and
+L<IO::Socket::SSL> are supported transparently and used if installed.
 
 =head1 ATTRIBUTES
 

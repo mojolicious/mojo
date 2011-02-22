@@ -34,8 +34,8 @@ magic and no requirements besides Perl 5.8.7.
 
 =item *
 
-Full stack HTTP 1.1 and WebSocket client/server implementation with TLS,
-Bonjour, IDNA, Comet (long polling), chunking and multipart support.
+Full stack HTTP 1.1 and WebSocket client/server implementation with IPv6,
+TLS, Bonjour, IDNA, Comet (long polling), chunking and multipart support.
 
 =item *
 

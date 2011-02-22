@@ -758,6 +758,7 @@ sub start_tls {
     SSL_error_trap     => sub { $self->_error($id, $_[1]) },
     SSL_cert_file      => $args->{tls_cert},
     SSL_key_file       => $args->{tls_key},
+    SSL_verify_mode    => 0x00,
     Timeout            => $self->connect_timeout,
     %{$args->{tls_args} || {}}
   );

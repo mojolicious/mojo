@@ -36,7 +36,7 @@ my $t = Test::Mojo->new;
 $t->get_ok('/tags')->status_is(200)->content_is(<<EOF);
 <foo />
 <foo bar="baz" />
-<foo one="two" three="four">Hello</foo>
+<foo one="t&lt;wo" three="four">Hello</foo>
 EOF
 
 # GET /links
@@ -213,7 +213,7 @@ __DATA__
 @@ tags.html.ep
 <%= tag 'foo' %>
 <%= tag 'foo', bar => 'baz' %>
-<%= tag 'foo', one => 'two', three => 'four' => begin %>Hello<% end %>
+<%= tag 'foo', one => 't<wo', three => 'four' => begin %>Hello<% end %>
 
 @@ links.html.ep
 <%= link_to Path => '/path' %>

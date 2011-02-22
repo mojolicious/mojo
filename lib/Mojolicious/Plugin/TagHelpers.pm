@@ -262,7 +262,6 @@ sub _input {
 
   # Value
   my $p = $c->param($name);
-  xml_escape $p if defined $p;
 
   my $t = $attrs{type} || '';
   if (defined $p && $t ne 'submit') {
@@ -305,6 +304,7 @@ sub _tag {
   my %attrs = @_;
   for my $key (sort keys %attrs) {
     my $value = $attrs{$key};
+    xml_escape $value;
     $tag .= qq/ $key="$value"/;
   }
 

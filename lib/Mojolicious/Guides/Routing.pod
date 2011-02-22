@@ -481,6 +481,21 @@ will be broken, this makes bridges a very powerful tool for authentication.
   });
   $foo->route('/bar')->to(controller => 'foo', action => 'bar');
 
+To apply a bridge to routes under the root URL, use an empty bridge path:
+
+  # /test1   -> setup stash values for 
+  # /test2      both of these URLs
+  my $with_setup = $r->bridge()->to(cb => sub {
+    my $self = shift;
+
+    $self->stash('thing') = 'some value';
+    return 1;
+  });
+  $with_setup->route('/test1')->to(controller => 'foo', 
+                                   action     => 'test1');
+  $with_setup->route('/test2')->to(controller => 'foo', 
+                                   action     => 'test2');
+  
 =head2 More Restrictive Placeholders
 
 You can adjust the regular expressions behind placeholders to better suit

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 43;
+use Test::More tests => 48;
 
 use Mojo::ByteStream 'b';
 
@@ -107,15 +107,20 @@ $pattern = Mojolicious::Routes::Pattern->new('/:test');
 my $value = b('abc%E4cba')->url_unescape->to_string;
 $result = $pattern->match("/$value");
 is $result->{test}, $value, 'right value';
+is $pattern->render({test => $value}), "/$value", 'right result';
 $value  = b('abc%FCcba')->url_unescape->to_string;
 $result = $pattern->match("/$value");
 is $result->{test}, $value, 'right value';
+is $pattern->render({test => $value}), "/$value", 'right result';
 $value  = b('abc%DFcba')->url_unescape->to_string;
 $result = $pattern->match("/$value");
 is $result->{test}, $value, 'right value';
+is $pattern->render({test => $value}), "/$value", 'right result';
 $value  = b('abc%24cba')->url_unescape->to_string;
 $result = $pattern->match("/$value");
 is $result->{test}, $value, 'right value';
+is $pattern->render({test => $value}), "/$value", 'right result';
 $value  = b('abc%20cba')->url_unescape->to_string;
 $result = $pattern->match("/$value");
 is $result->{test}, $value, 'right value';
+is $pattern->render({test => $value}), "/$value", 'right result';

@@ -3,7 +3,9 @@
 use strict;
 use warnings;
 
-use Test::More tests => 38;
+use Test::More tests => 43;
+
+use Mojo::ByteStream 'b';
 
 # "People said I was dumb, but I proved them."
 use_ok 'Mojolicious::Routes::Pattern';
@@ -99,3 +101,21 @@ $pattern = Mojolicious::Routes::Pattern->new('/:test');
 $result  = $pattern->match('/test(test)(\Qtest\E)(');
 is $result->{test}, 'test(test)(\Qtest\E)(', 'right value';
 is $pattern->render({test => '23'}), '/23', 'right result';
+
+# Unusual values
+$pattern = Mojolicious::Routes::Pattern->new('/:test');
+my $value = b('abc%E4cba')->url_unescape->to_string;
+$result = $pattern->match("/$value");
+is $result->{test}, $value, 'right value';
+$value  = b('abc%FCcba')->url_unescape->to_string;
+$result = $pattern->match("/$value");
+is $result->{test}, $value, 'right value';
+$value  = b('abc%DFcba')->url_unescape->to_string;
+$result = $pattern->match("/$value");
+is $result->{test}, $value, 'right value';
+$value  = b('abc%24cba')->url_unescape->to_string;
+$result = $pattern->match("/$value");
+is $result->{test}, $value, 'right value';
+$value  = b('abc%20cba')->url_unescape->to_string;
+$result = $pattern->match("/$value");
+is $result->{test}, $value, 'right value';

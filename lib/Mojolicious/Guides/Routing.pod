@@ -494,7 +494,7 @@ placeholders become part of a larger regular expression internally.
 
   # /23   -> undef
   # /test -> {controller => 'foo', action => 'bar', name => 'test'}
-  $r->route('/:name', name => qr/\[a-zA-Z]+/)
+  $r->route('/:name', name => qr/[a-zA-Z]+/)
     ->to(controller => 'foo', action => 'bar');
 
 This way you get easily readable routes and the raw power of regular

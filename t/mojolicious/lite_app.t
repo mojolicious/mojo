@@ -12,7 +12,7 @@ BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 my $backup;
 BEGIN { $backup = $ENV{MOJO_MODE} || ''; $ENV{MOJO_MODE} = 'development' }
 
-use Test::More tests => 712;
+use Test::More tests => 715;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -64,6 +64,12 @@ app->renderer->add_handler(dead => sub { die 'renderer works!' });
 get '/unicode/aäb' => sub {
   my $self = shift;
   $self->render(text => $self->url_for);
+};
+
+# GET /unicode/*
+get '/unicode/:stuff' => sub {
+  my $self = shift;
+  $self->render(text => $self->param('stuff') . $self->url_for);
 };
 
 # GET /
@@ -654,6 +660,10 @@ $client->ioloop->timer(
 
 # GET /unicode/a%E4b
 $t->get_ok('/unicode/a%E4b')->status_is(200)->content_is('/unicode/a%E4b');
+
+# GET /unicode/☃
+$t->get_ok('/unicode/☃')->status_is(200)
+  ->content_is('☃/unicode/%E2%98%83');
 
 # GET /
 $t->get_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')

@@ -12,7 +12,7 @@ BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 my $backup;
 BEGIN { $backup = $ENV{MOJO_MODE} || ''; $ENV{MOJO_MODE} = 'development' }
 
-use Test::More tests => 709;
+use Test::More tests => 712;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -645,6 +645,9 @@ $client->ioloop->timer(
     $async = 'works!';
   }
 );
+
+# GET /does/not/exist/a%E4b (not found)
+$t->get_ok('/does/not/exist/a%E4b')->status_is(404)->content_like(qr/Oops!/);
 
 # GET /
 $t->get_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')

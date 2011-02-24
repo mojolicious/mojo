@@ -17,7 +17,9 @@ sub new {
   # Path
   my $path = shift;
   url_unescape $path;
-  decode 'UTF8', $path;
+  my $backup = $path;
+  decode 'UTF-8', $path;
+  $path = $backup unless defined $path;
   $self->{_path} = $path;
 
   # WebSocket

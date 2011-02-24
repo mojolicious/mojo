@@ -156,6 +156,7 @@ get '/longpoll/dynamic/delayed' => sub {
   $self->on_finish(sub { $longpoll_dynamic_delayed = 'finished!' });
   Mojo::IOLoop->singleton->timer(
     '0.5' => sub {
+      $self->res->code(201);
       $self->cookie(baz => 'yada');
       $self->res->body('Dynamic!');
       $self->rendered;
@@ -295,7 +296,7 @@ $t->get_ok('/longpoll/static/delayed_too')->status_is(200)
 is $longpoll_static_delayed_too, 'finished!', 'finished';
 
 # GET /longpoll/dynamic/delayed
-$t->get_ok('/longpoll/dynamic/delayed')->status_is(200)
+$t->get_ok('/longpoll/dynamic/delayed')->status_is(201)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->header_like('Set-Cookie' => qr/baz=yada/)->content_is('Dynamic!');

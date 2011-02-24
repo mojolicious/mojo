@@ -60,6 +60,12 @@ is app->test_helper2, 'Mojolicious::Controller', 'right value';
 # Test renderer
 app->renderer->add_handler(dead => sub { die 'renderer works!' });
 
+# GET /unicode/a%E4b
+get '/unicode/aäb' => sub {
+  my $self = shift;
+  $self->render(text => $self->url_for);
+};
+
 # GET /
 get '/' => 'root';
 
@@ -646,8 +652,8 @@ $client->ioloop->timer(
   }
 );
 
-# GET /does/not/exist/a%E4b (not found)
-$t->get_ok('/does/not/exist/a%E4b')->status_is(404)->content_like(qr/Oops!/);
+# GET /unicode/a%E4b
+$t->get_ok('/unicode/a%E4b')->status_is(200)->content_is('/unicode/a%E4b');
 
 # GET /
 $t->get_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')

@@ -8,7 +8,7 @@ use utf8;
 # Disable IPv6, epoll and kqueue
 BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 8;
+use Test::More tests => 9;
 
 # "Oh, I always feared he might run off like this.
 #  Why, why, why didn't I break his legs?"
@@ -37,6 +37,10 @@ is $config->{foo}, 'qux', 'right value';
 
 # No config file, no default
 ok !(eval { plugin json_config => {file => 'nonexisted'} }), 'no config file';
+
+$ENV{MOJO_JSON_CONFIG} = 'json_custom_lite_app.json';
+$config = plugin 'json_config';
+is $config->{foo}, 'not bar', 'right value from custom config';
 
 __DATA__
 @@ index.html.ep

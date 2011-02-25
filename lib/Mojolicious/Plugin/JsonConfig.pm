@@ -26,6 +26,9 @@ sub parse {
 
 sub register {
   my ($self, $app, $conf) = @_;
+  if (!exists $conf->{file} && exists $ENV{MOJO_JSON_CONFIG}) {
+    $conf->{file} = $ENV{MOJO_JSON_CONFIG};
+  }
   $conf->{ext} = 'json' unless exists $conf->{ext};
   $self->SUPER::register($app, $conf);
 }

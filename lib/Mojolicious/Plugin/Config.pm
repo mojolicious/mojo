@@ -14,10 +14,9 @@ sub load {
   $app->log->debug(qq/Reading config file "$file"./);
 
   # Slurp UTF-8 file
-  open FILE, "<:encoding(UTF-8)", $file
+  open my $handle, "<:encoding(UTF-8)", $file
     or die qq/Couldn't open config file "$file": $!/;
-  my $content = do { local $/; <FILE> };
-  close FILE;
+  my $content = do { local $/; <$handle> };
 
   # Process
   return $self->parse($content, $file, $conf, $app);

@@ -7,20 +7,7 @@ require File::Spec;
 use constant DEBUG => $ENV{MOJO_CONFIG_DEBUG} || 0;
 
 # "Who are you, my warranty?!"
-sub parse_config {
-  my ($self, $content, $file, $conf, $app) = @_;
-
-  # Run Perl code
-  no warnings 'redefine';
-  die qq/Couldn't parse config file "$file": $@/
-    unless my $config = eval "sub app { \$app }; $content";
-  die qq/Config file "$file" did not return a hashref.\n/
-    unless ref $config && ref $config eq 'HASH';
-
-  return $config;
-}
-
-sub read_config {
+sub load {
   my ($self, $file, $conf, $app) = @_;
 
   # Debug
@@ -33,7 +20,20 @@ sub read_config {
   close FILE;
 
   # Process
-  return $self->parse_config($content, $file, $conf, $app);
+  return $self->parse($content, $file, $conf, $app);
+}
+
+sub parse {
+  my ($self, $content, $file, $conf, $app) = @_;
+
+  # Run Perl code
+  no warnings 'redefine';
+  die qq/Couldn't parse config file "$file": $@/
+    unless my $config = eval "sub app { \$app }; $content";
+  die qq/Config file "$file" did not return a hashref.\n/
+    unless ref $config && ref $config eq 'HASH';
+
+  return $config;
 }
 
 sub register {
@@ -76,7 +76,7 @@ sub register {
 
   # Read config file
   my $config = {};
-  if (-e $file) { $config = $self->read_config($file, $conf, $app) }
+  if (-e $file) { $config = $self->load($file, $conf, $app) }
 
   # Check for default
   else {
@@ -91,7 +91,7 @@ sub register {
 
   # Merge with mode specific config file
   if (defined $mode && -e $mode) {
-    $config = {%$config, %{$self->read_config($mode, $conf, $app)}};
+    $config = {%$config, %{$self->load($mode, $conf, $app)}};
   }
 
   # Merge
@@ -178,28 +178,28 @@ Configuration stash key.
 L<Mojolicious::Plugin::Config> inherits all methods from
 L<Mojolicious::Plugin> and implements the following new ones.
 
-=head2 C<parse_config>
+=head2 C<load>
 
-  $plugin->parse_config($content, $file, $conf, $app);
+  $plugin->load($file, $conf, $app);
+
+Loads config file and passes the content to C<parse>.
+
+  sub load {
+    my ($self, $file, $conf, $app) = @_;
+    ...
+    return $self->parse($content, $file, $conf, $app);
+  }
+
+=head2 C<parse>
+
+  $plugin->parse($content, $file, $conf, $app);
 
 Parse config file.
 
-  sub parse_config {
+  sub parse {
     my ($self, $content, $file, $conf, $app) = @_;
     ...
     return $config_hash;
-  }
-
-=head2 C<read_config>
-
-  $plugin->read_config($file, $conf, $app);
-
-Reads config file and passes the content to C<parse_config>.
-
-  sub read_config {
-    my ($self, $file, $conf, $app) = @_;
-    ...
-    return $self->parse_config($content, $file, $conf, $app);
   }
 
 =head2 C<register>

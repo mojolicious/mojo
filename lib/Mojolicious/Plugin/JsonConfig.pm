@@ -8,11 +8,11 @@ use constant DEBUG => $ENV{MOJO_CONFIG_DEBUG} || 0;
 
 # "And so we say goodbye to our beloved pet, Nibbler, who's gone to a place
 #  where I, too, hope one day to go. The toilet."
-sub parse_config {
+sub parse {
   my ($self, $content, $file, $conf, $app) = @_;
 
   # Render
-  $content = $self->render_config($content, $file, $conf, $app);
+  $content = $self->render($content, $file, $conf, $app);
 
   # Parse
   my $json   = Mojo::JSON->new;
@@ -30,7 +30,7 @@ sub register {
   $self->SUPER::register($app, $conf);
 }
 
-sub render_config {
+sub render {
   my ($self, $content, $file, $conf, $app) = @_;
 
   # Instance
@@ -109,18 +109,18 @@ Template options.
 L<Mojolicious::Plugin::JsonConfig> inherits all methods from
 L<Mojolicious::Plugin::Config> and implements the following new ones.
 
-=head2 C<parse_config>
+=head2 C<parse>
 
-  $plugin->parse_config($content, $file, $conf, $app);
+  $plugin->parse($content, $file, $conf, $app);
 
-Process content with C<render_config> and parse it with L<Mojo::JSON>.
+Process content with C<render> and parse it with L<Mojo::JSON>.
 
-  sub parse_config {
+  sub parse {
     my ($self, $content, $file, $conf, $app) = @_;
     ...
-    $content = $self->render_content($content, $file, $conf, $app);
+    $content = $self->render($content, $file, $conf, $app);
     ...
-    return $config_hash;
+    return $hash;
   }
 
 =head2 C<register>
@@ -129,13 +129,13 @@ Process content with C<render_config> and parse it with L<Mojo::JSON>.
 
 Register plugin in L<Mojolicious> application.
 
-=head2 C<render_config>
+=head2 C<render>
 
-  $plugin->render_config($content, $file, $conf, $app);
+  $plugin->render($content, $file, $conf, $app);
 
 Process configuration file with L<Mojo::Template>.
 
-  sub render_config {
+  sub render {
     my ($self, $content, $file, $conf, $app) = @_;
     ...
     return $content;

@@ -8,6 +8,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added drain callback support for WebSockets.
         - Improved attribute support of the select_field tag helper. (yko)
         - Improved tag helper attribute escaping.
+        - Improved attrs method in Mojo::DOM.
         - Updated to jQuery to version 1.5.1.
         - Fixed route unescaping bug.
         - Fixed small documentation bug.

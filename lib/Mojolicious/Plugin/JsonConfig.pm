@@ -26,7 +26,18 @@ sub parse {
 
 sub register {
   my ($self, $app, $conf) = @_;
+
+  # "json" extension
   $conf->{ext} = 'json' unless exists $conf->{ext};
+
+  # DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
+  warn <<EOF if $ENV{MOJO_JSON_CONFIG};
+The MOJO_JSON_CONFIG environment variable is DEPRECATED in favor of
+MOJO_CONFIG!!!
+EOF
+  $conf->{file} = $ENV{MOJO_JSON_CONFIG}
+    if !exists $conf->{file} && exists $ENV{MOJO_JSON_CONFIG};
+
   $self->SUPER::register($app, $conf);
 }
 

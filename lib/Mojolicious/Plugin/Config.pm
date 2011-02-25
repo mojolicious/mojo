@@ -199,7 +199,7 @@ Parse config file.
   sub parse {
     my ($self, $content, $file, $conf, $app) = @_;
     ...
-    return $config_hash;
+    return $hash;
   }
 
 =head2 C<register>

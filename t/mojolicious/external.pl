@@ -7,7 +7,7 @@ use warnings;
 use Mojolicious::Lite;
 
 # Load plugin
-plugin 'json_config';
+plugin 'config';
 
 # GET /
 get '/' => 'index';
@@ -15,4 +15,4 @@ get '/' => 'index';
 app->start;
 __DATA__
 @@ index.html.ep
-<%= $config->{just} . $config->{works} %>
+<%= $config->{just} . $config->{works} . stash('also') %>

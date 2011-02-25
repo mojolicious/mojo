@@ -790,6 +790,10 @@ Route condition for C<User-Agent> headers.
 
 Change the application charset.
 
+=item L<Mojolicious::Plugin::Config>
+
+Perl-ish configuration files.
+
 =item L<Mojolicious::Plugin::DefaultHelpers>
 
 General purpose helper collection.

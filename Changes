@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension Mojolicious.
 
 1.12 2011-02-19 00:00:00
         - Added EXPERIMENTAL support for IPv6.
+        - Added EXPERIMENTAL more Perl-ish configuration plugin.
         - Added drain callback support for WebSockets.
         - Improved attribute support of the select_field tag helper. (yko)
         - Improved tag helper attribute escaping.

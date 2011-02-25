@@ -161,6 +161,13 @@ operations but will also use more memory, defaults to C<256000>.
 
   MOJO_CHUNK_SIZE=1024
 
+=head2 C<MOJO_CONFIG>
+
+Config file to be used by L<Mojolicious::Plugin::Config> and
+L<Mojolicious::Plugin::JsonConfig>, quite useful for testing.
+
+   MOJO_CONFIG=myapp.conf
+
 =head2 C<MOJO_DNS_SERVER>
 
 C<DNS> server to use for non-blocking lookups.
@@ -173,13 +180,6 @@ Home directory for the L<Mojolicious> application, should always contain a
 path like C</home/sri/myapp>.
 
   MOJO_HOME=/home/sri/myapp
-
-=head2 C<MOJO_JSON_CONFIG>
-
-Config file to be used by L<Mojolicious::Plugin::JsonConfig>, quite useful
-for testing.
-
-   MOJO_JSON_CONFIG=myapp.conf
 
 =head2 C<MOJO_LOG_LEVEL>
 

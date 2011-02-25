@@ -17,12 +17,12 @@ use Test::More tests => 3;
 # "Of all the parasites I've had over the years,
 #  these worms are among the best."
 use FindBin;
-$ENV{MOJO_JSON_CONFIG} = 'external.json';
-$ENV{MOJO_HOME}        = $FindBin::Bin;
+$ENV{MOJO_CONFIG} = 'external.conf';
+$ENV{MOJO_HOME}   = $FindBin::Bin;
 require "$ENV{MOJO_HOME}/external.pl";
 use Test::Mojo;
 
 my $t = Test::Mojo->new;
 
 # GET /
-$t->get_ok('/')->status_is(200)->content_is("works!too!\n");
+$t->get_ok('/')->status_is(200)->content_is("works!too!works!!!\n");

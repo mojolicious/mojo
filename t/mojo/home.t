@@ -25,7 +25,8 @@ $ENV{MOJO_HOME} = $backup;
 my $original =
   File::Spec->catdir(File::Spec->splitdir($FindBin::Bin), '..', '..');
 $home = Mojo::Home->new->detect;
-is_deeply [split /\\|\//, scalar realpath($original)], [split /\\|\//, $home],
+my $target = realpath $original;
+is_deeply [split /\\|\//, $target], [split /\\|\//, $home],
   'right path detected';
 
 # FindBin detection

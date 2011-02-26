@@ -41,7 +41,7 @@ New features can however be marked as experimental to explicitly exclude them
 from these rules.
 This gives us the neccessary freedom to ensure a healthy future for
 L<Mojolicious>.
-So, as long as you are not using anything maked experimental, untested or
+So, as long as you are not using anything marked experimental, untested or
 undocumented, you can always count on backwards compatibility, everything
 else would be considered a bug.
 

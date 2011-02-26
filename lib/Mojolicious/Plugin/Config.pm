@@ -82,7 +82,7 @@ sub register {
 
     # All missing
     die qq/Config file "$file" missing, maybe you need to create it?\n/
-      unless (defined $mode && -e $mode) |  $conf->{default};
+      unless (defined $mode && -e $mode) || $conf->{default};
 
     # Debug
     $app->log->debug(qq/Config file "$file" missing, trying environment and default config./);

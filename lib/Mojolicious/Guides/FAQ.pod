@@ -39,7 +39,7 @@ deprecate a feature for at least one major release before removing or
 changing it in incompatible ways.
 New features can however be marked as experimental to explicitly exclude them
 from these rules.
-This gives us the neccessary freedom to ensure a healthy future for
+This gives us the necessary freedom to ensure a healthy future for
 L<Mojolicious>.
 So, as long as you are not using anything marked experimental, untested or
 undocumented, you can always count on backwards compatibility, everything

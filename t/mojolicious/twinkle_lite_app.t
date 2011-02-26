@@ -3,30 +3,30 @@
 use strict;
 use warnings;
 
-# Disable epoll and kqueue
-BEGIN { $ENV{MOJO_POLL} = 1 }
+# Disable IPv6, epoll and kqueue
+BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
 use Test::More;
 plan skip_all => 'Perl 5.10 required for this test!'
   unless eval { require Pod::Simple::HTML; 1 };
 plan tests => 17;
 
-# Pizza delivery for...
-# I. C. Weiner. Aww... I always thought by this stage in my life I'd be the
-# one making the crank calls.
+# "Pizza delivery for...
+#  I. C. Weiner. Aww... I always thought by this stage in my life I'd be the
+#  one making the crank calls."
 use Mojolicious::Lite;
 use Test::Mojo;
 
 # Twinkle template syntax
 my $twinkle = {
-    capture_end     => '-',
-    capture_start   => '+',
-    escape_mark     => '*',
-    expression_mark => '*',
-    line_start      => '.',
-    tag_end         => '**',
-    tag_start       => '**',
-    trim_mark       => '*'
+  capture_end     => '-',
+  capture_start   => '+',
+  escape_mark     => '*',
+  expression_mark => '*',
+  line_start      => '.',
+  tag_end         => '**',
+  tag_start       => '**',
+  trim_mark       => '*'
 };
 
 # Plugins
@@ -85,7 +85,7 @@ test<%= content %>123\
  ** for my $i (@$numbers) { ***
  *** $i ***
  ** } ***
- ** my $foo = block +*** 23 **-*** *** $foo ***
+ ** my $foo = capture +*** 23 **-*** *** $foo ***
 
 @@ docs.html.pod
 % no warnings;

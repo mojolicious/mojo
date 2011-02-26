@@ -3,15 +3,16 @@
 use strict;
 use warnings;
 
-# Disable epoll and kqueue
-BEGIN { $ENV{MOJO_POLL} = 1 }
+# Disable IPv6, epoll and kqueue
+BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
 use Test::More tests => 43;
 
-# I was so bored I cut the pony tail off the guy in front of us.
-# Look at me, I'm a grad student. I'm 30 years old and I made $600 last year.
-# Bart, don't make fun of grad students.
-# They've just made a terrible life choice.
+# "I was so bored I cut the pony tail off the guy in front of us.
+#  Look at me, I'm a grad student.
+#  I'm 30 years old and I made $600 last year.
+#  Bart, don't make fun of grad students.
+#  They've just made a terrible life choice."
 use_ok 'Mojo';
 use_ok 'Mojo::Client';
 use_ok 'Mojo::Transaction::HTTP';
@@ -29,22 +30,22 @@ my $client = Mojo::Client->new->app($app);
 my $port   = $client->test_server;
 my $buffer = '';
 $client->ioloop->connect(
-    address    => 'localhost',
-    port       => $port,
-    on_connect => sub {
-        my ($self, $id, $chunk) = @_;
-        $self->write($id,
-                "GET /1/ HTTP/1.1\x0d\x0a"
-              . "Expect: 100-continue\x0d\x0a"
-              . "Content-Length: 4\x0d\x0a\x0d\x0a");
-    },
-    on_read => sub {
-        my ($self, $id, $chunk) = @_;
-        $buffer .= $chunk;
-        $self->drop($id) and $self->stop if $buffer =~ /Mojo is working!/;
-        $self->write($id, '4321')
-          if $buffer =~ /HTTP\/1.1 100 Continue.*\x0d\x0a\x0d\x0a/gs;
-    }
+  address    => 'localhost',
+  port       => $port,
+  on_connect => sub {
+    my ($self, $id, $chunk) = @_;
+    $self->write($id,
+          "GET /1/ HTTP/1.1\x0d\x0a"
+        . "Expect: 100-continue\x0d\x0a"
+        . "Content-Length: 4\x0d\x0a\x0d\x0a");
+  },
+  on_read => sub {
+    my ($self, $id, $chunk) = @_;
+    $buffer .= $chunk;
+    $self->drop($id) and $self->stop if $buffer =~ /Mojo is working!/;
+    $self->write($id, '4321')
+      if $buffer =~ /HTTP\/1.1 100 Continue.*\x0d\x0a\x0d\x0a/gs;
+  }
 );
 $client->ioloop->start;
 like $buffer, qr/HTTP\/1.1 100 Continue/, 'request was continued';
@@ -52,21 +53,21 @@ like $buffer, qr/HTTP\/1.1 100 Continue/, 'request was continued';
 # Pipelined
 $buffer = '';
 $client->ioloop->connect(
-    address    => 'localhost',
-    port       => $port,
-    on_connect => sub {
-        my ($self, $id) = @_;
-        $self->write($id,
-                "GET /2/ HTTP/1.1\x0d\x0a"
-              . "Content-Length: 0\x0d\x0a\x0d\x0a"
-              . "GET /3/ HTTP/1.1\x0d\x0a"
-              . "Content-Length: 0\x0d\x0a\x0d\x0a");
-    },
-    on_read => sub {
-        my ($self, $id, $chunk) = @_;
-        $buffer .= $chunk;
-        $self->drop($id) and $self->stop if $buffer =~ /Mojo.*Mojo/gs;
-    }
+  address    => 'localhost',
+  port       => $port,
+  on_connect => sub {
+    my ($self, $id) = @_;
+    $self->write($id,
+          "GET /2/ HTTP/1.1\x0d\x0a"
+        . "Content-Length: 0\x0d\x0a\x0d\x0a"
+        . "GET /3/ HTTP/1.1\x0d\x0a"
+        . "Content-Length: 0\x0d\x0a\x0d\x0a");
+  },
+  on_read => sub {
+    my ($self, $id, $chunk) = @_;
+    $buffer .= $chunk;
+    $self->drop($id) and $self->stop if $buffer =~ /Mojo.*Mojo/gs;
+  }
 );
 $client->ioloop->start;
 like $buffer, qr/Mojo/, 'transactions were pipelined';
@@ -175,11 +176,11 @@ my $result = '';
 for my $key (sort keys %$params) { $result .= $params->{$key} }
 my ($code, $body);
 $client->post_form(
-    "http://127.0.0.1:$port/diag/chunked_params" => $params => sub {
-        my $self = shift;
-        $code = $self->res->code;
-        $body = $self->res->body;
-    }
+  "http://127.0.0.1:$port/diag/chunked_params" => $params => sub {
+    my $self = shift;
+    $code = $self->res->code;
+    $body = $self->res->body;
+  }
 )->start;
 is $code, 200, 'right status';
 is $body, $result, 'right content';
@@ -187,12 +188,12 @@ is $body, $result, 'right content';
 # Upload
 ($code, $body) = undef;
 $client->post_form(
-    "http://127.0.0.1:$port/diag/upload" => {file => {content => $result}} =>
-      sub {
-        my $self = shift;
-        $code = $self->res->code;
-        $body = $self->res->body;
-    }
+  "http://127.0.0.1:$port/diag/upload" => {file => {content => $result}} =>
+    sub {
+    my $self = shift;
+    $code = $self->res->code;
+    $body = $self->res->body;
+  }
 )->start;
 is $code, 200, 'right status';
 is $body, $result, 'right content';

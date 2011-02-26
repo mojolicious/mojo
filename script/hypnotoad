@@ -1,0 +1,79 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Basename 'dirname';
+use File::Spec;
+
+use lib join '/', File::Spec->splitdir(dirname(__FILE__)), 'lib';
+use lib join '/', File::Spec->splitdir(dirname(__FILE__)), '..', 'lib';
+
+# Check if Mojo is installed
+eval 'use Mojo::Server::Hypnotoad';
+die <<EOF if $@;
+It looks like you don't have the Mojolicious Framework installed.
+Please visit http://mojolicio.us for detailed installation instructions.
+
+EOF
+
+use Getopt::Long 'GetOptions';
+
+# Hypnotoad
+my $toad = Mojo::Server::Hypnotoad->new;
+
+# Config
+my $config = 'hypnotoad.conf';
+
+# Options
+my $help;
+GetOptions(
+  'config=s' => sub { $config                    = $_[1] },
+  foreground => sub { $ENV{HYPNOTOAD_FOREGROUND} = 1 },
+  help       => sub { $help                      = 1 },
+  test       => sub { $ENV{HYPNOTOAD_TEST}       = 1 },
+);
+
+# Application
+$help = 1 unless my $app = shift || $ENV{HYPNOTOAD_APP};
+
+# Usage
+die <<"EOF" if $help;
+usage: $0 [OPTIONS] [APPLICATION]
+
+  hypnotoad script/myapp
+  hypnotoad myapp.pl
+
+These options are available:
+  --config <path>   Configuration file, defaults to "hypnotoad.conf" in the
+                    same directory as the application script.
+  --foreground      Keep manager process in foreground.
+  --help            Show this message.
+  --test            Test application/configuration and exit.
+EOF
+
+# Start
+$toad->run($app, $config);
+
+__END__
+
+=head1 NAME
+
+hypnotoad - Hypnotoad HTTP 1.1 And WebSocket Server
+
+=head1 SYNOPSIS
+
+    hypnotoad myapp.pl
+
+=head1 DESCRIPTION
+
+Start L<Mojolicious> and L<Mojolicious::Lite> applications with the
+L<Mojo::Server::Hypnotoad> web server.
+
+Note that this script is EXPERIMENTAL and might change without warning!
+
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
+
+=cut

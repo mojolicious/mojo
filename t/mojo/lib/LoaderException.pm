@@ -1,12 +1,9 @@
 package LoaderException;
 
-use warnings;
-use strict;
+use Mojo::Base -base;
 
-use base 'Mojo::Base';
-
-# No offence Apu, but when they’re handing out religions you must be out
-# taking a whizz.
+# "No offence Apu, but when they’re handing out religions you must be out
+#  taking a whizz."
 
 foo {
 

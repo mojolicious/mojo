@@ -5,31 +5,39 @@ use warnings;
 
 use utf8;
 
-# Disable epoll, kqueue and IPv6
-BEGIN { $ENV{MOJO_POLL} = $ENV{MOJO_NO_IPV6} = 1 }
+# Disable IPv6, epoll and kqueue
+BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 664;
+# Development
+my $backup;
+BEGIN { $backup = $ENV{MOJO_MODE} || ''; $ENV{MOJO_MODE} = 'development' }
+
+use Test::More tests => 721;
 
 # Pollution
 123 =~ m/(\d+)/;
 
-# Wait you're the only friend I have...
-# You really want a robot for a friend?
-# Yeah ever since I was six.
-# Well, ok but I don't want people thinking we're robosexuals,
-# so if anyone asks you're my debugger.
+# "Wait you're the only friend I have...
+#  You really want a robot for a friend?
+#  Yeah ever since I was six.
+#  Well, ok but I don't want people thinking we're robosexuals,
+#  so if anyone asks you're my debugger."
 use Mojo::Client;
 use Mojo::Content::MultiPart;
 use Mojo::Content::Single;
 use Mojo::Cookie::Response;
 use Mojo::Date;
+use Mojo::IOLoop;
 use Mojo::JSON;
 use Mojo::Transaction::HTTP;
-use Mojolicious::Lite;
 use Test::Mojo;
 
-# Mojolicious::Lite and ojo
+# Load Mojolicious::Lite via ojo
 use ojo;
+
+# Clients
+my $client    = Mojo::Client->singleton->ioloop(Mojo::IOLoop->singleton);
+my $unmanaged = $client->clone->ioloop($client->ioloop)->app(app)->managed(0);
 
 # Header condition plugin
 plugin 'header_condition';
@@ -52,8 +60,40 @@ is app->test_helper2, 'Mojolicious::Controller', 'right value';
 # Test renderer
 app->renderer->add_handler(dead => sub { die 'renderer works!' });
 
+# GET /unicode/a%E4b
+get '/unicode/aäb' => sub {
+  my $self = shift;
+  $self->render(text => $self->url_for);
+};
+
+# GET /unicode/*
+get '/unicode/:stuff' => sub {
+  my $self = shift;
+  $self->render(text => $self->param('stuff') . $self->url_for);
+};
+
 # GET /
 get '/' => 'root';
+
+# DELETE /
+del sub { shift->render(text => 'Hello!') };
+
+# /
+any sub { shift->render(text => 'Bye!') };
+
+# GET /auto_name
+get '/auto_name' => sub {
+  my $self = shift;
+  $self->render(text => $self->url_for('auto_name'));
+};
+
+# GET /custom_name
+get '/custom_name' => 'auto_name';
+
+# GET /waypoint
+# GET /waypoint/foo
+app->routes->waypoint('/waypoint')->to(text => 'waypoints rule!')
+  ->get('/foo' => {text => 'waypoints work!'});
 
 # GET /with-format
 get '/with-format' => {format => 'html'} => 'with-format';
@@ -66,22 +106,22 @@ a '/ojo' => {json => {hello => 'world'}};
 
 # GET /null/0
 get '/null/:null' => sub {
-    my $self = shift;
-    $self->render(text => $self->param('null'), layout => 'layout');
+  my $self = shift;
+  $self->render(text => $self->param('null'), layout => 'layout');
 };
 
 # GET /action_template
 get '/action_template' => {controller => 'foo'} => sub {
-    my $self = shift;
-    $self->render(action => 'bar');
-    $self->rendered;
+  my $self = shift;
+  $self->render(action => 'bar');
+  $self->rendered;
 };
 
 # GET /dead
 get '/dead' => sub {
-    my $self = shift;
-    $self->dead;
-    $self->render(text => 'failed!');
+  my $self = shift;
+  $self->dead;
+  $self->render(text => 'failed!');
 };
 
 # GET /dead_template
@@ -98,35 +138,35 @@ get '/regex/in/template' => 'test(test)(\Qtest\E)(';
 
 # GET /maybe/ajax
 get '/maybe/ajax' => sub {
-    my $self = shift;
-    return $self->render(text => 'is ajax') if $self->req->is_xhr;
-    $self->render(text => 'not ajax');
+  my $self = shift;
+  return $self->render(text => 'is ajax') if $self->req->is_xhr;
+  $self->render(text => 'not ajax');
 };
 
 # GET /stream
 get '/stream' => sub {
+  my $self = shift;
+  my $chunks =
+    [qw/foo bar/, $self->req->url->to_abs->userinfo, $self->url_for->to_abs];
+  $self->res->code(200);
+  $self->res->headers->content_type('text/plain');
+  my $cb;
+  $cb = sub {
     my $self = shift;
-    my $chunks = [qw/foo bar/, $self->req->url->to_abs->userinfo,
-        $self->url_for->to_abs];
-    $self->res->code(200);
-    $self->res->headers->content_type('text/plain');
-    my $cb;
-    $cb = sub {
-        my $self = shift;
-        my $chunk = shift @$chunks || '';
-        $self->write_chunk($chunk, $chunk ? $cb : undef);
-    };
-    $cb->($self->res);
-    $self->rendered;
+    my $chunk = shift @$chunks || '';
+    $self->write_chunk($chunk, $chunk ? $cb : undef);
+  };
+  $cb->($self->res);
+  $self->rendered;
 };
 
 # GET /finished
 my $finished;
 get '/finished' => sub {
-    my $self = shift;
-    $self->on_finish(sub { $finished += 3 });
-    $finished = 20;
-    $self->render(text => 'so far so good!');
+  my $self = shift;
+  $self->on_finish(sub { $finished += 3 });
+  $finished = 20;
+  $self->render(text => 'so far so good!');
 };
 
 # GET /привет/мир
@@ -141,18 +181,12 @@ get '/template.txt' => 'template';
 
 # GET /0
 get ':number' => [number => qr/0/] => sub {
-    my $self = shift;
-    $self->render_text($self->tx->remote_address . $self->param('number'));
+  my $self = shift;
+  $self->render_text($self->tx->remote_address . $self->param('number'));
 };
 
-# GET /tags
-get 'tags/:test' => 'tags';
-
-# GET /selection
-get 'selection' => '*';
-
-# GET /inline/epl
-get '/inline/epl' => sub { shift->render(inline => '<%= 1 + 1%>') };
+# DELETE /inline/epl
+del '/inline/epl' => sub { shift->render(inline => '<%= 1 + 1%>') };
 
 # GET /inline/ep
 get '/inline/ep' =>
@@ -163,12 +197,12 @@ get '/inline/ep/too' => sub { shift->render(inline => '0', handler => 'ep') };
 
 # GET /inline/ep/partial
 get '/inline/ep/partial' => sub {
-    my $self = shift;
-    $self->stash(inline_template => "<%= 'just' %>");
-    $self->render(
-        inline  => '<%= include inline => $inline_template %>works!',
-        handler => 'ep'
-    );
+  my $self = shift;
+  $self->stash(inline_template => "<%= 'just' %>");
+  $self->render(
+    inline  => '<%= include inline => $inline_template %>works!',
+    handler => 'ep'
+  );
 };
 
 # GET /source
@@ -176,14 +210,14 @@ get '/source' => sub { shift->render_static('../lite_app.t') };
 
 # GET /foo_relaxed/*
 get '/foo_relaxed/(.test)' => sub {
-    my $self = shift;
-    $self->render_text($self->stash('test'));
+  my $self = shift;
+  $self->render_text($self->stash('test'));
 };
 
 # GET /foo_wildcard/*
 get '/foo_wildcard/(*test)' => sub {
-    my $self = shift;
-    $self->render_text($self->stash('test'));
+  my $self = shift;
+  $self->render_text($self->stash('test'));
 };
 
 # GET /with/header/condition
@@ -193,36 +227,38 @@ get '/with/header/condition' => (headers => {'X-Secret-Header' => 'bar'}) =>
 # POST /with/header/condition
 post '/with/header/condition' => (headers => {'X-Secret-Header' => 'bar'}) =>
   sub {
-    my $self = shift;
-    $self->render_text(
-        'foo ' . $self->req->headers->header('X-Secret-Header'));
+  my $self = shift;
+  $self->render_text('foo ' . $self->req->headers->header('X-Secret-Header'));
   };
 
 # POST /with/body/and/desc
 post '/with/body/and/desc' => sub {
-    my $self = shift;
-    return if $self->req->body ne 'body';
-    $self->render_text('bar');
+  my $self = shift;
+  return if $self->req->body ne 'body';
+  $self->render_text('bar');
 };
 
 # POST /with/body/and/headers/desc
 post '/with/body/and/headers/desc' => sub {
-    my $self = shift;
-    return
-      if $self->req->headers->header('with') ne 'header'
-          || $self->req->body ne 'body';
-    $self->render_text('bar');
+  my $self = shift;
+  return
+    if $self->req->headers->header('with') ne 'header'
+      || $self->req->body ne 'body';
+  $self->render_text('bar');
 };
+
+# GET /content_for
+get '/content_for';
 
 # GET /template_inheritance
 get '/template_inheritance' => sub { shift->render('template_inheritance') };
 
 # GET /layout_without_inheritance
 get '/layout_without_inheritance' => sub {
-    shift->render(
-        template => 'layouts/template_inheritance',
-        handler  => 'ep'
-    );
+  shift->render(
+    template => 'layouts/template_inheritance',
+    handler  => 'ep'
+  );
 };
 
 # GET /double_inheritance
@@ -231,82 +267,87 @@ get '/double_inheritance' =>
 
 # GET /nested-includes
 get '/nested-includes' => sub {
-    my $self = shift;
-    $self->render(
-        template => 'nested-includes',
-        layout   => 'layout',
-        handler  => 'ep'
-    );
+  my $self = shift;
+  $self->render(
+    template => 'nested-includes',
+    layout   => 'layout',
+    handler  => 'ep'
+  );
 };
 
 # GET /outerlayout
 get '/outerlayout' => sub {
-    my $self = shift;
-    $self->render(
-        template => 'outerlayout',
-        layout   => 'layout',
-        handler  => 'ep'
-    );
+  my $self = shift;
+  $self->render(
+    template => 'outerlayout',
+    layout   => 'layout',
+    handler  => 'ep'
+  );
 };
 
 # GET /outerlayouttwo
 get '/outerlayouttwo' => {layout => 'layout'} => sub {
-    my $self = shift;
-    is($self->stash->{layout}, 'layout', 'right value');
-    $self->render(handler => 'ep');
-    is($self->stash->{layout}, 'layout', 'right value');
+  my $self = shift;
+  is($self->stash->{layout}, 'layout', 'right value');
+  $self->render(handler => 'ep');
+  is($self->stash->{layout}, 'layout', 'right value');
 } => 'outerlayout';
 
 # GET /outerinnerlayout
 get '/outerinnerlayout' => sub {
-    my $self = shift;
-    $self->render(
-        template => 'outerinnerlayout',
-        layout   => 'layout',
-        handler  => 'ep'
-    );
+  my $self = shift;
+  $self->render(
+    template => 'outerinnerlayout',
+    layout   => 'layout',
+    handler  => 'ep'
+  );
 };
 
 # GET /withblocklayout
 get '/withblocklayout' => sub {
-    my $self = shift;
-    $self->render(
-        template => 'index',
-        layout   => 'with_block',
-        handler  => 'epl'
-    );
+  my $self = shift;
+  $self->render(
+    template => 'index',
+    layout   => 'with_block',
+    handler  => 'epl'
+  );
 };
 
 # GET /session_cookie
 get '/session_cookie' => sub {
-    my $self = shift;
-    $self->render_text('Cookie set!');
-    $self->res->cookies(
-        Mojo::Cookie::Response->new(
-            path  => '/session_cookie',
-            name  => 'session',
-            value => '23'
-        )
-    );
+  my $self = shift;
+  $self->render_text('Cookie set!');
+  $self->res->cookies(
+    Mojo::Cookie::Response->new(
+      path  => '/session_cookie',
+      name  => 'session',
+      value => '23'
+    )
+  );
 };
 
 # GET /session_cookie/2
 get '/session_cookie/2' => sub {
-    my $self    = shift;
-    my $session = $self->req->cookie('session');
-    my $value   = $session ? $session->value : 'missing';
-    $self->render_text("Session is $value!");
+  my $self    = shift;
+  my $session = $self->req->cookie('session');
+  my $value   = $session ? $session->value : 'missing';
+  $self->render_text("Session is $value!");
 };
 
 # GET /foo
 get '/foo' => sub {
-    my $self = shift;
-    $self->render_text('Yea baby!');
+  my $self = shift;
+  $self->render_text('Yea baby!');
 };
 
 # GET /layout
 get '/layout' => sub {
-    shift->render_text('Yea baby!', layout => 'layout', handler => 'epl');
+  shift->render_text(
+    'Yea baby!',
+    layout  => 'layout',
+    handler => 'epl',
+    title   => 'Layout'
+  );
 };
 
 # POST /template
@@ -317,41 +358,47 @@ get '/memorized' => 'memorized';
 
 # * /something
 any '/something' => sub {
-    my $self = shift;
-    $self->render_text('Just works!');
+  my $self = shift;
+  $self->render_text('Just works!');
 };
 
 # GET|POST /something/else
 any [qw/get post/] => '/something/else' => sub {
-    my $self = shift;
-    $self->render_text('Yay!');
+  my $self = shift;
+  $self->render_text('Yay!');
 };
 
 # GET /regex/*
 get '/regex/:test' => [test => qr/\d+/] => sub {
-    my $self = shift;
-    $self->render_text($self->stash('test'));
+  my $self = shift;
+  $self->render_text($self->stash('test'));
 };
 
 # POST /bar/*
 post '/bar/:test' => {test => 'default'} => sub {
-    my $self = shift;
-    $self->render_text($self->stash('test'));
+  my $self = shift;
+  $self->render_text($self->stash('test'));
 };
 
 # GET /firefox/*
 get '/firefox/:stuff' => (agent => qr/Firefox/) => sub {
-    my $self = shift;
-    $self->render_text($self->url_for('foxy', stuff => 'foo'));
+  my $self = shift;
+  $self->render_text($self->url_for('foxy', stuff => 'foo'));
 } => 'foxy';
+
+# GET /url_for_foxy
+get '/url_for_foxy' => sub {
+  my $self = shift;
+  $self->render(text => $self->url_for('foxy', stuff => '#test'));
+};
 
 # POST /utf8
 post '/utf8' => 'form';
 
 # POST /malformed_UTF-8
 post '/malformed_utf8' => sub {
-    my $c = shift;
-    $c->render_text(b($c->param('foo'))->url_escape->to_string);
+  my $c = shift;
+  $c->render_text(b($c->param('foo'))->url_escape->to_string);
 };
 
 # GET /json
@@ -359,11 +406,10 @@ get '/json' =>
   sub { shift->render_json({foo => [1, -2, 3, 'b☃r']}, layout => 'layout') };
 
 # GET /autostash
-get '/autostash' => sub { shift->render(handler => 'ep', foo => 'bar') } =>
-  '*';
+get '/autostash' => sub { shift->render(handler => 'ep', foo => 'bar') };
 
 # GET /app
-get '/app' => {layout => 'app'} => '*';
+get '/app' => {layout => 'app'};
 
 # GET /helper
 get '/helper' => sub { shift->render(handler => 'ep') } => 'helper';
@@ -374,34 +420,34 @@ get '/eperror' => sub { shift->render(handler => 'ep') } => 'eperror';
 
 # GET /subrequest
 get '/subrequest' => sub {
-    my $self = shift;
-    $self->client->post(
-        '/template' => sub {
-            my $client = shift;
-            $self->render_text($client->tx->success->body);
-        }
-    )->start;
+  my $self = shift;
+  $self->client->post(
+    '/template' => sub {
+      my $client = shift;
+      $self->render_text($client->tx->success->body);
+    }
+  )->start;
 };
 
 # GET /subrequest_simple
 get '/subrequest_simple' => sub {
-    shift->render_text(p('/template')->body);
+  shift->render_text(p('/template')->body);
 };
 
 # GET /subrequest_sync
 get '/subrequest_sync' => sub {
-    my $self = shift;
-    $self->client->post(
+  my $self = shift;
+  $self->client->post(
+    '/template' => sub {
+      my $client = shift;
+      $client->post(
         '/template' => sub {
-            my $client = shift;
-            $client->post(
-                '/template' => sub {
-                    my $client = shift;
-                    $self->render_text($client->res->body);
-                }
-            )->start;
+          my $client = shift;
+          $self->render_text($client->res->body);
         }
-    )->start;
+      )->start;
+    }
+  )->start;
 };
 
 # Make sure hook runs async
@@ -410,48 +456,48 @@ app->hook(after_dispatch => sub { shift->stash->{async} = 'broken!' });
 # GET /subrequest_async
 my $async;
 get '/subrequest_async' => sub {
-    my $self = shift;
-    $self->client->async->post(
-        '/template' => sub {
-            my $client = shift;
-            $self->render_text($client->res->body . $self->stash->{'async'});
-            $async = $self->stash->{async};
-        }
-    )->start;
-    $self->stash->{'async'} = 'success!';
+  my $self = shift;
+  $unmanaged->post(
+    '/template' => sub {
+      my $client = shift;
+      $self->render_text($client->res->body . $self->stash->{'async'});
+      $async = $self->stash->{async};
+    }
+  );
+  $self->stash->{'async'} = 'success!';
 };
 
 # GET /redirect_url
 get '/redirect_url' => sub {
-    shift->redirect_to('http://127.0.0.1/foo')->render_text('Redirecting!');
+  shift->redirect_to('http://127.0.0.1/foo')->render_text('Redirecting!');
 };
 
 # GET /redirect_path
 get '/redirect_path' => sub {
-    shift->redirect_to('/foo/bar?foo=bar')->render_text('Redirecting!');
+  shift->redirect_to('/foo/bar?foo=bar')->render_text('Redirecting!');
 };
 
 # GET /redirect_named
 get '/redirect_named' => sub {
-    shift->redirect_to('index', format => 'txt')->render_text('Redirecting!');
+  shift->redirect_to('index', format => 'txt')->render_text('Redirecting!');
 };
 
 # GET /redirect_no_render
 get '/redirect_no_render' => sub {
-    shift->redirect_to('index', format => 'txt');
-} => '*';
+  shift->redirect_to('index', format => 'txt');
+};
 
 # GET /static_render
 get '/static_render' => sub {
-    shift->render_static('hello.txt');
-} => '*';
+  shift->render_static('hello.txt');
+};
 
 # GET /koi8-r
 app->types->type('koi8-r' => 'text/html; charset=koi8-r');
 get '/koi8-r' => sub {
-    app->renderer->encoding('koi8-r');
-    shift->render('encoding', format => 'koi8-r', handler => 'ep');
-    app->renderer->encoding(undef);
+  app->renderer->encoding('koi8-r');
+  shift->render('encoding', format => 'koi8-r', handler => 'ep');
+  app->renderer->encoding(undef);
 };
 
 # GET /hello3.txt
@@ -459,42 +505,42 @@ get '/hello3.txt' => sub { shift->render_static('hello2.txt') };
 
 # GET /captures/*/*
 get '/captures/:foo/:bar' => sub {
-    my $self = shift;
-    $self->render(text => $self->url_for);
+  my $self = shift;
+  $self->render(text => $self->url_for);
 };
 
 # Default condition
 app->routes->add_condition(
-    default => sub {
-        my ($r, $c, $captures, $num) = @_;
-        $captures->{test} = "$num works!";
-        return 1 if $c->stash->{default} == $num;
-        return;
-    }
+  default => sub {
+    my ($r, $c, $captures, $num) = @_;
+    $captures->{test} = $captures->{text} . "$num works!";
+    return 1 if $c->stash->{default} == $num;
+    return;
+  }
 );
 
 # GET /default/condition
-get '/default/condition' => (default => 23) => sub {
-    my $self    = shift;
-    my $default = $self->stash('default');
-    my $test    = $self->stash('test');
-    $self->render(text => "works $default $test");
+get '/default/:text' => (default => 23) => sub {
+  my $self    = shift;
+  my $default = $self->stash('default');
+  my $test    = $self->stash('test');
+  $self->render(text => "works $default $test");
 };
 
 # Redirect condition
 app->routes->add_condition(
-    redirect => sub {
-        my ($r, $c, $captures, $active) = @_;
-        return 1 unless $active;
-        $c->redirect_to('index') and return
-          unless $c->req->headers->header('X-Condition-Test');
-        return 1;
-    }
+  redirect => sub {
+    my ($r, $c, $captures, $active) = @_;
+    return 1 unless $active;
+    $c->redirect_to('index') and return
+      unless $c->req->headers->header('X-Condition-Test');
+    return 1;
+  }
 );
 
 # GET /redirect/condition/0
 get '/redirect/condition/0' => (redirect => 0) => sub {
-    shift->render(text => 'condition works!');
+  shift->render(text => 'condition works!');
 };
 
 # GET /redirect/condition/1
@@ -502,51 +548,51 @@ get '/redirect/condition/1' => (redirect => 1) =>
   {text => 'condition works too!'};
 
 under sub {
-    my $self = shift;
-    return unless $self->req->headers->header('X-Bender');
-    $self->res->headers->add('X-Under' => 23);
-    $self->res->headers->add('X-Under' => 24);
-    return 1;
+  my $self = shift;
+  return unless $self->req->headers->header('X-Bender');
+  $self->res->headers->add('X-Under' => 23);
+  $self->res->headers->add('X-Under' => 24);
+  return 1;
 };
 
 # GET /with_under
 get '/with_under' => sub {
-    my $self = shift;
-    $self->render_text('Unders are cool!');
+  my $self = shift;
+  $self->render_text('Unders are cool!');
 };
 
 # GET /with_under_too
 get '/with_under_too' => sub {
-    my $self = shift;
-    $self->render_text('Unders are cool too!');
+  my $self = shift;
+  $self->render_text('Unders are cool too!');
 };
 
 under sub {
-    my $self = shift;
+  my $self = shift;
 
-    # Authenticated
-    my $name = $self->param('name') || '';
-    return 1 if $name eq 'Bender';
+  # Authenticated
+  my $name = $self->param('name') || '';
+  return 1 if $name eq 'Bender';
 
-    # Not authenticated
-    $self->render('param_auth_denied');
-    return;
+  # Not authenticated
+  $self->render('param_auth_denied');
+  return;
 };
 
 # GET /param_auth
-get '/param_auth' => '*';
+get '/param_auth';
 
 # GET /param_auth/too
 get '/param_auth/too' =>
   sub { shift->render_text('You could be Bender too!') };
 
 under sub {
-    my $self = shift;
-    $self->stash(_name => 'stash');
-    $self->cookie(foo => 'cookie', {expires => (time + 60)});
-    $self->signed_cookie(bar => 'signed_cookie', {expires => (time + 120)});
-    $self->cookie(bad => 'bad_cookie--12345678');
-    return 1;
+  my $self = shift;
+  $self->stash(_name => 'stash');
+  $self->cookie(foo => 'cookie', {expires => (time + 60)});
+  $self->signed_cookie(bar => 'signed_cookie', {expires => (time + 120)});
+  $self->cookie(bad => 'bad_cookie--12345678');
+  return 1;
 };
 
 # GET /bridge2stash
@@ -556,17 +602,17 @@ get '/bridge2stash' =>
 # Counter
 my $under = 0;
 under sub {
-    shift->res->headers->header('X-Under' => ++$under);
-    return 1;
+  shift->res->headers->header('X-Under' => ++$under);
+  return 1;
 };
 
 # GET /with_under_count
-get '/with/under/count' => '*';
+get '/with/under/count';
 
 # Everything gets past this
 under sub {
-    shift->res->headers->header('X-Possible' => 1);
-    return 1;
+  shift->res->headers->header('X-Possible' => 1);
+  return 1;
 };
 
 # GET /possible
@@ -574,8 +620,8 @@ get '/possible' => 'possible';
 
 # Nothing gets past this
 under sub {
-    shift->res->headers->header('X-Impossible' => 1);
-    return 0;
+  shift->res->headers->header('X-Impossible' => 1);
+  return 0;
 };
 
 # GET /impossible
@@ -595,29 +641,41 @@ get '/works' => sub { shift->render(text => 'prefix works!') };
 
 # Oh Fry, I love you more than the moon, and the stars,
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
-my $client = app->client;
-my $t      = Test::Mojo->new;
+my $t = Test::Mojo->new;
 
 # Client timer
 my $timer;
 $client->ioloop->timer(
-    '0.1' => sub {
-        my $async = '';
-        $client->async->get(
-            '/' => sub {
-                my $self = shift;
-                $timer = $self->res->body . $async;
-            }
-        )->start;
-        $async = 'works!';
-    }
+  '0.1' => sub {
+    my $async = '';
+    $unmanaged->get(
+      '/' => sub {
+        my $self = shift;
+        $timer = $self->res->body . $async;
+      }
+    )->start;
+    $async = 'works!';
+  }
 );
+
+# GET /unicode/a%E4b
+$t->get_ok('/unicode/a%E4b')->status_is(200)->content_is('/unicode/a%E4b');
+
+# GET /unicode/☃
+$t->get_ok('/unicode/☃')->status_is(200)
+  ->content_is('☃/unicode/%E2%98%83');
+
+# GET /unicode/a b
+$t->get_ok('/unicode/a b')->status_is(200)->content_is('a b/unicode/a%20b');
+
+# GET /unicode/a\b
+$t->get_ok('/unicode/a\\b')->status_is(200)->content_is('a\\b/unicode/a%5Cb');
 
 # GET /
 $t->get_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is(
-    "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
+  "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
 
 # HEAD /
 $t->head_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
@@ -627,7 +685,43 @@ $t->head_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
 # GET / (with body)
 $t->get_ok('/', '1234' x 1024)->status_is(200)
   ->content_is(
-    "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
+  "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
+
+# DELETE /
+$t->delete_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('Hello!');
+
+# POST /
+$t->post_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('Bye!');
+
+# GET /auto_name
+$t->get_ok('/auto_name')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('/custom_name');
+
+# GET /waypoint
+$t->get_ok('/waypoint')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('waypoints rule!');
+
+# GET /waypoint/foo
+$t->get_ok('/waypoint/foo')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('waypoints work!');
+
+# POST /waypoint/foo
+$t->post_ok('/waypoint/foo')->status_is(404)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)');
+
+# GET /waypoint/bar
+$t->get_ok('/waypoint/bar')->status_is(404)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)');
 
 # GET /with-format
 $t->get_ok('/with-format')->content_is("/without-format\n");
@@ -766,9 +860,8 @@ is $finished, 23, 'finished';
 
 # GET / (IRI)
 $t->get_ok('/привет/мир')->status_is(200)
-  ->content_type_is('text/html');
-is b($t->tx->res->body)->decode('UTF-8'), 'привет мир',
-  'right content';
+  ->content_type_is('text/html;charset=UTF-8')
+  ->content_is('привет мир');
 
 # GET /root
 $t->get_ok('/root.html')->status_is(200)
@@ -780,202 +873,17 @@ $t->get_ok('/.html')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is(
-    "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
+  "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
 
 # GET /0 (reverse proxy)
-my $backup = $ENV{MOJO_REVERSE_PROXY};
+my $backup2 = $ENV{MOJO_REVERSE_PROXY};
 $ENV{MOJO_REVERSE_PROXY} = 1;
 $t->get_ok('/0', {'X-Forwarded-For' => '192.168.2.2, 192.168.2.1'})
   ->status_is(200)->content_is('192.168.2.10');
-$ENV{MOJO_REVERSE_PROXY} = $backup;
+$ENV{MOJO_REVERSE_PROXY} = $backup2;
 
-# GET /tags
-$t->get_ok('/tags/lala?a=b&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
-  ->content_is(<<EOF);
-<foo />
-<foo bar="baz" />
-<foo one="two" three="four">Hello</foo>
-<a href="/path">Path</a>
-<a href="http://example.com/" title="Foo">Foo</a>
-<a href="http://example.com/">Example</a>
-<a href="/template">Home</a>
-<a href="/tags/23" title="Foo">Foo</a>
-<form action="/template" method="post">
-    <input name="foo" />
-</form>
-<form action="/tags/24" method="post">
-    <input name="foo" />
-    <input name="foo" type="checkbox" value="1" />
-    <input checked="checked" name="a" type="checkbox" value="2" />
-    <input name="b" type="radio" value="1" />
-    <input checked="checked" name="b" type="radio" value="0" />
-    <input name="c" type="hidden" value="foo" />
-    <input name="d" type="file" />
-    <textarea cols="40" name="e" rows="50">
-        default!
-    </textarea>
-    <textarea name="f"></textarea>
-    <input name="g" type="password" />
-    <input id="foo" name="h" type="password" />
-    <input type="submit" value="Ok!" />
-    <input id="bar" type="submit" value="Ok too!" />
-</form>
-<form action="/">
-    <input name="foo" />
-</form>
-<input name="escaped" value="1&quot; &quot;2" />
-<input name="a" value="b" />
-<input name="a" value="b" />
-<script src="script.js" type="text/javascript"></script>
-<script type="text/javascript">//<![CDATA[
-
-    var a = 'b';
-
-//]]></script>
-<script type="foo">//<![CDATA[
-
-    var a = 'b';
-
-//]]></script>
-<link href="foo.css" media="screen" rel="stylesheet" type="text/css" />
-<style type="text/css">/*<![CDATA[*/
-
-    body {color: #000}
-
-/*]]>*/</style>
-<style type="foo">/*<![CDATA[*/
-
-    body {color: #000}
-
-/*]]>*/</style>
-EOF
-
-# GET /tags (alternative)
-$t->get_ok('/tags/lala?c=b&d=3&e=4&f=5')->status_is(200)->content_is(<<EOF);
-<foo />
-<foo bar="baz" />
-<foo one="two" three="four">Hello</foo>
-<a href="/path">Path</a>
-<a href="http://example.com/" title="Foo">Foo</a>
-<a href="http://example.com/">Example</a>
-<a href="/template">Home</a>
-<a href="/tags/23" title="Foo">Foo</a>
-<form action="/template" method="post">
-    <input name="foo" />
-</form>
-<form action="/tags/24" method="post">
-    <input name="foo" />
-    <input name="foo" type="checkbox" value="1" />
-    <input name="a" type="checkbox" value="2" />
-    <input name="b" type="radio" value="1" />
-    <input name="b" type="radio" value="0" />
-    <input name="c" type="hidden" value="foo" />
-    <input name="d" type="file" />
-    <textarea cols="40" name="e" rows="50">4</textarea>
-    <textarea name="f">5</textarea>
-    <input name="g" type="password" />
-    <input id="foo" name="h" type="password" />
-    <input type="submit" value="Ok!" />
-    <input id="bar" type="submit" value="Ok too!" />
-</form>
-<form action="/">
-    <input name="foo" />
-</form>
-<input name="escaped" />
-<input name="a" />
-<input name="a" value="c" />
-<script src="script.js" type="text/javascript"></script>
-<script type="text/javascript">//<![CDATA[
-
-    var a = 'b';
-
-//]]></script>
-<script type="foo">//<![CDATA[
-
-    var a = 'b';
-
-//]]></script>
-<link href="foo.css" media="screen" rel="stylesheet" type="text/css" />
-<style type="text/css">/*<![CDATA[*/
-
-    body {color: #000}
-
-/*]]>*/</style>
-<style type="foo">/*<![CDATA[*/
-
-    body {color: #000}
-
-/*]]>*/</style>
-EOF
-
-# GET /selection (empty)
-$t->get_ok('/selection')->status_is(200)
-  ->content_is("<form action=\"/selection\">\n    "
-      . '<select name="a">'
-      . '<option value="b">b</option>'
-      . '<optgroup label="c">'
-      . '<option value="d">d</option>'
-      . '<option value="e">E</option>'
-      . '<option value="f">f</option>'
-      . '</optgroup>'
-      . '<option value="g">g</option>'
-      . '</select>'
-      . "\n    "
-      . '<select multiple="multiple" name="foo">'
-      . '<option value="bar">bar</option>'
-      . '<option value="baz">baz</option>'
-      . '</select>'
-      . "\n    "
-      . '<input type="submit" value="Ok" />' . "\n"
-      . '</form>'
-      . "\n");
-
-# GET /selection (values)
-$t->get_ok('/selection?a=e&foo=bar')->status_is(200)
-  ->content_is("<form action=\"/selection\">\n    "
-      . '<select name="a">'
-      . '<option value="b">b</option>'
-      . '<optgroup label="c">'
-      . '<option value="d">d</option>'
-      . '<option selected="selected" value="e">E</option>'
-      . '<option value="f">f</option>'
-      . '</optgroup>'
-      . '<option value="g">g</option>'
-      . '</select>'
-      . "\n    "
-      . '<select multiple="multiple" name="foo">'
-      . '<option selected="selected" value="bar">bar</option>'
-      . '<option value="baz">baz</option>'
-      . '</select>'
-      . "\n    "
-      . '<input type="submit" value="Ok" />' . "\n"
-      . '</form>'
-      . "\n");
-
-# GET /selection (multiple values)
-$t->get_ok('/selection?foo=bar&a=e&foo=baz')->status_is(200)
-  ->content_is("<form action=\"/selection\">\n    "
-      . '<select name="a">'
-      . '<option value="b">b</option>'
-      . '<optgroup label="c">'
-      . '<option value="d">d</option>'
-      . '<option selected="selected" value="e">E</option>'
-      . '<option value="f">f</option>'
-      . '</optgroup>'
-      . '<option value="g">g</option>'
-      . '</select>'
-      . "\n    "
-      . '<select multiple="multiple" name="foo">'
-      . '<option selected="selected" value="bar">bar</option>'
-      . '<option selected="selected" value="baz">baz</option>'
-      . '</select>'
-      . "\n    "
-      . '<input type="submit" value="Ok" />' . "\n"
-      . '</form>'
-      . "\n");
-
-# GET /inline/epl
-$t->get_ok('/inline/epl')->status_is(200)->content_is("2\n");
+# DELETE /inline/epl
+$t->delete_ok('/inline/epl')->status_is(200)->content_is("2\n");
 
 # GET /inline/ep
 $t->get_ok('/inline/ep?foo=bar')->status_is(200)->content_is("barworks!\n");
@@ -991,12 +899,12 @@ $t->get_ok('/inline/ep/partial')->status_is(200)
 $t->get_ok('/source')->status_is(200)->content_like(qr/get_ok\('\/source/);
 
 # GET / (with body and max message size)
-$backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
+$backup2 = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
 $ENV{MOJO_MAX_MESSAGE_SIZE} = 1024;
 $t->get_ok('/', '1234' x 1024)->status_is(413)
   ->content_is(
-    "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
-$ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
+  "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
+$ENV{MOJO_MAX_MESSAGE_SIZE} = $backup2;
 
 # GET /foo_relaxed/123
 $t->get_ok('/foo_relaxed/123')->status_is(200)->content_is('123');
@@ -1012,7 +920,7 @@ $t->get_ok('/foo_wildcard/')->status_is(404);
 
 # GET /with/header/condition
 $t->get_ok('/with/header/condition', {'X-Secret-Header' => 'bar'})
-  ->status_is(200)->content_like(qr/^Test ok/);
+  ->status_is(200)->content_like(qr/^Test ok<base href="http:\/\/localhost/);
 
 # GET /with/header/condition (not found)
 $t->get_ok('/with/header/condition')->status_is(404)->content_like(qr/Oops!/);
@@ -1033,23 +941,31 @@ $t->post_ok('/with/body/and/desc', 'body', 'desc')->status_is(200)
 $t->post_ok('/with/body/and/headers/desc', {with => 'header'}, 'body', 'desc')
   ->status_is(200)->content_is('bar');
 
+# GET /content_for
+$t->get_ok('/content_for')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("This\nseems\nto\nHello    world!\n\nwork!\n");
+
 # GET /template_inheritance
 $t->get_ok('/template_inheritance')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("<title>Welcome</title>Sidebar!Hello World!\nDefault footer!");
+  ->content_is(
+  "<title>Works!</title>\n<br>Sidebar!Hello World!\nDefault footer!");
 
 # GET /layout_without_inheritance
 $t->get_ok('/layout_without_inheritance')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('Default header!Default sidebar!Default footer!');
+  ->content_is(
+  "<title></title>\nDefault header!Default sidebar!Default footer!");
 
 # GET /double_inheritance
 $t->get_ok('/double_inheritance')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('<title>Welcome</title>Sidebar too!Default footer!');
+  ->content_is("<title>Works!</title>\n<br>Sidebar too!Default footer!");
 
 # GET /plugin_with_template
 $t->get_ok('/plugin_with_template')->status_is(200)
@@ -1059,26 +975,26 @@ $t->get_ok('/plugin_with_template')->status_is(200)
 $t->get_ok('/nested-includes')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("layouted Nested Hello\n[\n  1,\n  2\n]\nthere<br/>!\n\n\n\n");
+  ->content_is("layouted Nested Hello\n[\n  1,\n  2\n]\nthere<br>!\n\n\n\n");
 
 # GET /outerlayout
 $t->get_ok('/outerlayout')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("layouted Hello\n[\n  1,\n  2\n]\nthere<br/>!\n\n\n");
+  ->content_is("layouted Hello\n[\n  1,\n  2\n]\nthere<br>!\n\n\n");
 
 # GET /outerlayouttwo
 $t->get_ok('/outerlayouttwo')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("layouted Hello\n[\n  1,\n  2\n]\nthere<br/>!\n\n\n");
+  ->content_is("layouted Hello\n[\n  1,\n  2\n]\nthere<br>!\n\n\n");
 
 # GET /outerinnerlayout
 $t->get_ok('/outerinnerlayout')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is(
-    "layouted Hello\nlayouted [\n  1,\n  2\n]\nthere<br/>!\n\n\n\n");
+  "layouted Hello\nlayouted [\n  1,\n  2\n]\nthere<br>!\n\n\n\n");
 
 # GET /withblocklayout
 $t->get_ok('/withblocklayout')->status_is(200)
@@ -1206,7 +1122,7 @@ $t->post_ok('/bar/baz')->status_is(200)
 $t->get_ok('/layout')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("Yea baby! with layout\n");
+  ->content_is("LayoutYea baby! with layout\n");
 
 # GET /firefox
 $t->get_ok('/firefox/bar', {'User-Agent' => 'Firefox'})->status_is(200)
@@ -1220,24 +1136,30 @@ $t->get_ok('/firefox/bar', {'User-Agent' => 'Explorer'})->status_is(404)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/Oops!/);
 
+# GET /url_for_foxy
+$t->get_ok('/url_for_foxy')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('/firefox/%23test');
+
 # POST /utf8
 $t->post_form_ok('/utf8', 'UTF-8' => {name => 'Вячеслав'})
   ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
-  ->header_is('Content-Length' => 40)->content_type_is('text/html')
-  ->content_is(b("Вячеслав Тихановский\n")->encode('UTF-8')
-      ->to_string);
+  ->header_is('Content-Length' => 40)
+  ->content_type_is('text/html;charset=UTF-8')
+  ->content_is("Вячеслав Тихановский\n");
 
 # POST /utf8 (multipart/form-data)
 $t->post_form_ok(
-    '/utf8',
-    'UTF-8' => {name => 'Вячеслав'},
-    {'Content-Type' => 'multipart/form-data'}
+  '/utf8',
+  'UTF-8' => {name => 'Вячеслав'},
+  {'Content-Type' => 'multipart/form-data'}
   )->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
-  ->header_is('Content-Length' => 40)->content_type_is('text/html')
-  ->content_is(b("Вячеслав Тихановский\n")->encode('UTF-8')
-      ->to_string);
+  ->header_is('Content-Length' => 40)
+  ->content_type_is('text/html;charset=UTF-8')
+  ->content_is("Вячеслав Тихановский\n");
 
 # POST /malformed_utf8
 my $tx = Mojo::Transaction::HTTP->new;
@@ -1247,13 +1169,13 @@ $tx->req->headers->content_type('application/x-www-form-urlencoded');
 $tx->req->body('foo=%E1');
 my ($code, $server, $powered, $body);
 $client->queue(
-    $tx => sub {
-        my ($self, $tx) = @_;
-        $code    = $tx->res->code;
-        $server  = $tx->res->headers->server;
-        $powered = $tx->res->headers->header('X-Powered-By');
-        $body    = $tx->res->body;
-    }
+  $tx => sub {
+    my ($self, $tx) = @_;
+    $code    = $tx->res->code;
+    $server  = $tx->res->headers->server;
+    $powered = $tx->res->headers->header('X-Powered-By');
+    $body    = $tx->res->body;
+  }
 )->start;
 is $code,    200,                  'right status';
 is $server,  'Mojolicious (Perl)', 'right "Server" value';
@@ -1281,13 +1203,13 @@ $t->get_ok('/app')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
 $t->get_ok('/helper')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("23\n<br/>\n&lt;...\n/template\n(Mojolicious (Perl))");
+  ->content_is("23\n<br>\n&lt;...\n/template\n(Mojolicious (Perl))");
 
 # GET /helper
 $t->get_ok('/helper', {'User-Agent' => 'Explorer'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("23\n<br/>\n&lt;...\n/template\n(Explorer)");
+  ->content_is("23\n<br>\n&lt;...\n/template\n(Explorer)");
 
 # GET /eperror
 $t->get_ok('/eperror')->status_is(500)
@@ -1469,7 +1391,7 @@ $t->get_ok('/hello3.txt', {'Range' => 'bytes=0-0'})->status_is(206)
 $t->get_ok('/default/condition')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('works 23 23 works!');
+  ->content_is('works 23 condition23 works!');
 
 # GET /redirect/condition/0
 $t->get_ok('/redirect/condition/0')->status_is(200)
@@ -1493,16 +1415,21 @@ $t->get_ok('/redirect/condition/1' => {'X-Condition-Test' => 1})
 $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
   ->content_is("stash too!!!!!!!!\n");
 
+# GET /favicon.ico (random static requests)
+$t->get_ok('/favicon.ico')->status_is(200);
+$t->get_ok('/mojolicious-white.png')->status_is(200);
+$t->get_ok('/mojolicious-black.png')->status_is(200);
+$t->get_ok('/favicon.ico')->status_is(200);
+
 # GET /bridge2stash (with cookies, session and flash)
 $t->get_ok('/bridge2stash')->status_is(200)
   ->content_is(
-    "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!flash!/!\n"
-  );
+  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!flash!/!\n");
 
 # GET /bridge2stash (with cookies and session but no flash)
 $t->get_ok('/bridge2stash' => {'X-Flash2' => 1})->status_is(200)
   ->content_is(
-    "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!!/!\n");
+  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!!/!\n");
 
 # GET /bridge2stash (with cookies and session cleared)
 $t->get_ok('/bridge2stash')->status_is(200)
@@ -1513,6 +1440,21 @@ $t->get_ok('/with/under/count', {'X-Bender' => 'Rodriguez'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->header_is('X-Under'      => 1)->content_is("counter\n");
+
+# GET /bridge2stash (again)
+$t->get_ok('/bridge2stash', {'X-Flash' => 1})->status_is(200)
+  ->content_is(
+  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!!/!\n");
+
+# GET /bridge2stash (with cookies, session and flash)
+$t->get_ok('/bridge2stash')->status_is(200)
+  ->content_is(
+  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!flash!/!\n");
+
+# GET /bridge2stash (with cookies and session but no flash)
+$t->get_ok('/bridge2stash' => {'X-Flash2' => 1})->status_is(200)
+  ->content_is(
+  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!!/!\n");
 
 # GET /possible
 $t->get_ok('/possible')->status_is(200)
@@ -1572,6 +1514,8 @@ is $timer,
   "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\nworks!",
   'right content';
 
+$ENV{MOJO_MODE} = $backup;
+
 __DATA__
 @@ with-format.html.ep
 <%= url_for 'without-format' %>
@@ -1584,63 +1528,6 @@ controller and action!
 
 @@ dead_template.html.ep
 <%= dead 'works too!' %>
-
-@@ tags.html.ep
-<%= tag 'foo' %>
-<%= tag 'foo', bar => 'baz' %>
-<%= tag 'foo', one => 'two', three => 'four' => begin %>Hello<% end %>
-<%= link_to Path => '/path' %>
-<%= link_to 'http://example.com/', title => 'Foo', sub { 'Foo' } %>
-<%= link_to 'http://example.com/' => begin %>Example<% end %>
-<%= link_to Home => 'index' %>
-<%= link_to Foo => 'tags', {test => 23}, title => 'Foo' %>
-<%= form_for 'index', method => 'post' => begin %>
-    <%= input_tag 'foo' %>
-<% end %>
-%= form_for 'tags', {test => 24}, method => 'post' => begin
-    %= text_field 'foo'
-    %= check_box foo => 1
-    %= check_box a => 2
-    %= radio_button b => '1'
-    %= radio_button b => '0'
-    %= hidden_field c => 'foo'
-    %= file_field 'd'
-    %= text_area e => (cols => 40, rows => 50) => begin
-        default!
-    %= end
-    %= text_area 'f'
-    %= password_field 'g'
-    %= password_field 'h', id => 'foo'
-    %= submit_button 'Ok!'
-    %= submit_button 'Ok too!', id => 'bar'
-%= end
-<%= form_for '/' => begin %>
-    <%= input_tag 'foo' %>
-<% end %>
-<%= input_tag 'escaped' %>
-<%= input_tag 'a' %>
-<%= input_tag 'a', value => 'c' %>
-<%= javascript 'script.js' %>
-<%= javascript begin %>
-    var a = 'b';
-<% end %>
-<%= javascript type => 'foo' => begin %>
-    var a = 'b';
-<% end %>
-<%= stylesheet 'foo.css' %>
-<%= stylesheet begin %>
-    body {color: #000}
-<% end %>
-<%= stylesheet type => 'foo' => begin %>
-    body {color: #000}
-<% end %>
-
-@@ selection.html.ep
-%= form_for selection => begin
-    %= select_field a => ['b', [c => ['d', [ E => 'e'], 'f']], 'g']
-    %= select_field foo => [qw/bar baz/], multiple => 'multiple'
-    %= submit_button
-%= end
 
 @@ static.txt
 Just some
@@ -1674,13 +1561,25 @@ text!
 @@ static2.txt (base64)
 dGVzdCAxMjMKbGFsYWxh
 
-@@ with_header_condition.html.epl
-Test ok
+@@ with_header_condition.html.ep
+Test ok<%= base_tag %>
+
+@@ content_for.html.ep
+This
+<% content_for message => begin =%>Hello<% end %>
+seems
+% content_for message => begin
+    world!
+% end
+to
+<%= content_for 'message' %>
+work!
 
 @@ template_inheritance.html.ep
 % layout 'template_inheritance';
+% title 'Works!';
 <% content header => begin =%>
-<%= b('<title>Welcome</title>') %>
+<%= b('<br>') %>
 <% end =%>
 <% content sidebar => begin =%>
 Sidebar!
@@ -1688,6 +1587,7 @@ Sidebar!
 Hello World!
 
 @@ layouts/template_inheritance.html.ep
+<title><%= title %></title>
 % stash foo => 'Default';
 <%= content header => begin =%>
 Default header!
@@ -1736,7 +1636,7 @@ Hello
 
 @@ outermenu.html.ep
 % stash test => 'there';
-<%= dumper [1, 2] %><%= stash 'test' %><br/>!
+<%= dumper [1, 2] %><%= stash 'test' %><br>!
 
 @@ outerinnerlayout.html.ep
 Hello
@@ -1752,7 +1652,8 @@ Just works!\
 <%= shift->param('name') %> Тихановский
 
 @@ layouts/layout.html.epl
-<%= shift->render_inner %> with layout
+% my $self = shift;
+<%= $self->title %><%= $self->render_inner %> with layout
 
 @@ autostash.html.ep
 % $self->layout('layout');
@@ -1781,7 +1682,7 @@ app layout <%= content %><%= app->mode %>
 
 @@ helper.html.ep
 %= $default
-%== '<br/>'
+%== '<br>'
 %= '<...'
 %= url_for 'index'
 (<%= agent %>)\

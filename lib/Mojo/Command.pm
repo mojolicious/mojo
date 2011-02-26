@@ -1,9 +1,5 @@
 package Mojo::Command;
-
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base -base;
 
 require Cwd;
 require File::Path;
@@ -11,16 +7,17 @@ require File::Spec;
 require IO::File;
 
 use Carp 'croak';
+use Mojo::Server;
 use Mojo::Template;
 use Mojo::Loader;
 use Mojo::Util qw/b64_decode camelize decamelize/;
 
-__PACKAGE__->attr(hint => <<"EOF");
+has hint => <<"EOF";
 
 See '$0 help COMMAND' for more information on a specific command.
 EOF
-__PACKAGE__->attr(description => 'No description.');
-__PACKAGE__->attr(message     => <<"EOF");
+has description => 'No description.';
+has message     => <<"EOF";
 usage: $0 COMMAND [OPTIONS]
 
 Tip: CGI, FastCGI and PSGI environments can be automatically detected very
@@ -28,364 +25,377 @@ Tip: CGI, FastCGI and PSGI environments can be automatically detected very
 
 These commands are currently available:
 EOF
-__PACKAGE__->attr(namespaces => sub { ['Mojo::Command'] });
-__PACKAGE__->attr(quiet      => 0);
-__PACKAGE__->attr(renderer   => sub { Mojo::Template->new });
-__PACKAGE__->attr(usage      => "usage: $0\n");
+has namespaces => sub { ['Mojo::Command'] };
+has quiet      => 0;
+has renderer   => sub { Mojo::Template->new };
+has usage      => "usage: $0\n";
+
+# Cache
+my $CACHE = {};
 
 sub chmod_file {
-    my ($self, $path, $mod) = @_;
+  my ($self, $path, $mod) = @_;
 
-    # chmod
-    chmod $mod, $path or croak qq/Can't chmod path "$path": $!/;
+  # chmod
+  chmod $mod, $path or croak qq/Can't chmod path "$path": $!/;
 
-    $mod = sprintf '%lo', $mod;
-    print "  [chmod] $path $mod\n" unless $self->quiet;
-    return $self;
+  $mod = sprintf '%lo', $mod;
+  print "  [chmod] $path $mod\n" unless $self->quiet;
+  return $self;
 }
 
 sub chmod_rel_file {
-    my ($self, $path, $mod) = @_;
+  my ($self, $path, $mod) = @_;
 
-    # Path
-    $path = $self->rel_file($path);
+  # Path
+  $path = $self->rel_file($path);
 
-    # chmod
-    $self->chmod_file($path, $mod);
+  # chmod
+  $self->chmod_file($path, $mod);
 }
 
 sub class_to_file {
-    my ($self, $class) = @_;
+  my ($self, $class) = @_;
 
-    # Class to file
-    $class =~ s/:://g;
-    decamelize $class;
+  # Class to file
+  $class =~ s/:://g;
+  decamelize $class;
 
-    return $class;
+  return $class;
 }
 
 sub class_to_path {
-    my ($self, $class) = @_;
+  my ($self, $class) = @_;
 
-    # Class to path
-    my $path = join '/', split /::/, $class;
+  # Class to path
+  my $path = join '/', split /::/, $class;
 
-    return "$path.pm";
+  return "$path.pm";
 }
 
 sub create_dir {
-    my ($self, $path) = @_;
+  my ($self, $path) = @_;
 
-    # Exists
-    if (-d $path) {
-        print "  [exist] $path\n" unless $self->quiet;
-        return $self;
-    }
-
-    # Make
-    File::Path::mkpath($path) or croak qq/Can't make directory "$path": $!/;
-    print "  [mkdir] $path\n" unless $self->quiet;
+  # Exists
+  if (-d $path) {
+    print "  [exist] $path\n" unless $self->quiet;
     return $self;
+  }
+
+  # Make
+  File::Path::mkpath($path) or croak qq/Can't make directory "$path": $!/;
+  print "  [mkdir] $path\n" unless $self->quiet;
+  return $self;
 }
 
 sub create_rel_dir {
-    my ($self, $path) = @_;
+  my ($self, $path) = @_;
 
-    # Path
-    $path = $self->rel_dir($path);
+  # Path
+  $path = $self->rel_dir($path);
 
-    # Create
-    $self->create_dir($path);
+  # Create
+  $self->create_dir($path);
 }
 
 sub detect {
-    my ($self, $guess) = @_;
+  my ($self, $guess) = @_;
 
-    # Hypnotoad
-    return 'hypnotoad' if defined $ENV{HYPNOTOAD_APP};
+  # PSGI (Plack only for now)
+  return 'psgi' if defined $ENV{PLACK_ENV};
 
-    # PSGI (Plack only for now)
-    return 'psgi' if defined $ENV{PLACK_ENV};
+  # CGI
+  return 'cgi'
+    if defined $ENV{PATH_INFO} || defined $ENV{GATEWAY_INTERFACE};
 
-    # CGI
-    return 'cgi'
-      if defined $ENV{PATH_INFO} || defined $ENV{GATEWAY_INTERFACE};
+  # No further detection if we have a guess
+  return $guess if $guess;
 
-    # No further detection if we have a guess
-    return $guess if $guess;
+  # FastCGI (detect absence of WINDIR for Windows and USER for UNIX)
+  return 'fastcgi' if !defined $ENV{WINDIR} && !defined $ENV{USER};
 
-    # FastCGI (detect absence of WINDIR for Windows and USER for UNIX)
-    return 'fastcgi' if !defined $ENV{WINDIR} && !defined $ENV{USER};
-
-    # Nothing
-    return;
+  # Nothing
+  return;
 }
 
 sub get_all_data {
-    my ($self, $class) = @_;
-    $class ||= ref $self;
+  my ($self, $class) = @_;
+  $class ||= ref $self;
 
-    # Handle
-    my $d = do { no strict 'refs'; \*{"$class\::DATA"} };
+  # Handle
+  my $d = do { no strict 'refs'; \*{"$class\::DATA"} };
 
-    # Shortcut
-    return unless fileno $d;
+  # Refresh
+  if (fileno $d) {
 
     # Reset
     seek $d, 0, 0;
 
     # Slurp
-    my $content = join '', <$d>;
+    $CACHE->{$class} = join '', <$d>;
 
-    # Ignore everything before __DATA__ (windows will seek to start of file)
-    $content =~ s/^.*\n__DATA__\n/\n/s;
+    # Close
+    close $d or die "DAMN: $!\n";
+  }
 
-    # Ignore everything after __END__
-    $content =~ s/\n__END__\n.*$/\n/s;
+  # Content
+  return unless defined(my $content = $CACHE->{$class});
 
-    # Split
-    my @data = split /^@@\s+(.+)\s*\r?\n/m, $content;
+  # Ignore everything before __DATA__ (windows will seek to start of file)
+  $content =~ s/^.*\n__DATA__\n/\n/s;
 
-    # Remove split garbage
-    shift @data;
+  # Ignore everything after __END__
+  $content =~ s/\n__END__\n.*$/\n/s;
 
-    # Find data
-    my $all = {};
-    while (@data) {
-        my ($name, $content) = splice @data, 0, 2;
+  # Split
+  my @data = split /^@@\s+(.+)\s*\r?\n/m, $content;
 
-        # Base 64
-        b64_decode $content if $name =~ s/\s*\(\s*base64\s*\)$//;
+  # Remove split garbage
+  shift @data;
 
-        $all->{$name} = $content;
-    }
+  # Find data
+  my $all = {};
+  while (@data) {
+    my ($name, $content) = splice @data, 0, 2;
 
-    return $all;
+    # Base 64
+    b64_decode $content if $name =~ s/\s*\(\s*base64\s*\)$//;
+
+    $all->{$name} = $content;
+  }
+
+  return $all;
 }
 
 sub get_data {
-    my ($self, $data, $class) = @_;
+  my ($self, $data, $class) = @_;
 
-    # All data
-    my $all = $self->get_all_data($class);
+  # All data
+  my $all = $self->get_all_data($class);
 
-    return $all->{$data};
+  return $all->{$data};
 }
 
-# You don’t like your job, you don’t strike.
-# You go in every day and do it really half-assed. That’s the American way.
+# "You don’t like your job, you don’t strike.
+#  You go in every day and do it really half-assed. That’s the American way."
 sub help {
-    my $self = shift;
-    print $self->usage;
-    exit;
+  my $self = shift;
+  print $self->usage;
+  exit;
 }
 
 sub rel_dir {
-    my ($self, $path) = @_;
+  my ($self, $path) = @_;
 
-    # Parts
-    my @parts = split /\//, $path;
+  # Parts
+  my @parts = split /\//, $path;
 
-    # Render
-    return File::Spec->catdir(Cwd::getcwd(), @parts);
+  # Render
+  return File::Spec->catdir(Cwd::getcwd(), @parts);
 }
 
 sub rel_file {
-    my ($self, $path) = @_;
+  my ($self, $path) = @_;
 
-    # Parts
-    my @parts = split /\//, $path;
+  # Parts
+  my @parts = split /\//, $path;
 
-    # Render
-    return File::Spec->catfile(Cwd::getcwd(), @parts);
+  # Render
+  return File::Spec->catfile(Cwd::getcwd(), @parts);
 }
 
 sub render_data {
-    my $self = shift;
-    my $data = shift;
+  my $self = shift;
+  my $data = shift;
 
-    # Get data
-    my $template = $self->get_data($data);
+  # Get data
+  my $template = $self->get_data($data);
 
-    # Render
-    return $self->renderer->render($template, @_);
+  # Render
+  return $self->renderer->render($template, @_);
 }
 
 sub render_to_file {
-    my $self = shift;
-    my $data = shift;
-    my $path = shift;
+  my $self = shift;
+  my $data = shift;
+  my $path = shift;
 
-    # Render
-    my $content = $self->render_data($data, @_);
+  # Render
+  my $content = $self->render_data($data, @_);
 
-    # Write
-    $self->write_file($path, $content);
+  # Write
+  $self->write_file($path, $content);
 
-    return $self;
+  return $self;
 }
 
 sub render_to_rel_file {
-    my $self = shift;
-    my $data = shift;
-    my $path = shift;
+  my $self = shift;
+  my $data = shift;
+  my $path = shift;
 
-    # Path
-    $path = $self->rel_dir($path);
+  # Path
+  $path = $self->rel_dir($path);
 
-    # Render
-    $self->render_to_file($data, $path, @_);
+  # Render
+  $self->render_to_file($data, $path, @_);
 }
 
-# My cat's breath smells like cat food.
+# "My cat's breath smells like cat food."
 sub run {
-    my ($self, $name, @args) = @_;
+  my ($self, $name, @args) = @_;
 
-    # Try to detect environment
-    $name = $self->detect($name) unless $ENV{MOJO_NO_DETECT};
+  # Hypnotoad
+  return Mojo::Server->new->app if defined $ENV{HYPNOTOAD_APP};
 
-    # Run command
-    if ($name && $name =~ /^\w+$/ && ($name ne 'help' || $args[0])) {
+  # Try to detect environment
+  $name = $self->detect($name) unless $ENV{MOJO_NO_DETECT};
 
-        # Help
-        my $help = $name eq 'help' ? 1 : 0;
-        $name = shift @args if $help;
+  # Run command
+  if ($name && $name =~ /^\w+$/ && ($name ne 'help' || $args[0])) {
 
-        # Try all namespaces
-        my $module;
-        for my $namespace (@{$self->namespaces}) {
-
-            # Generate module
-            my $camelized = $name;
-            camelize $camelized;
-            my $try = "$namespace\::$camelized";
-
-            # Load
-            if (my $e = Mojo::Loader->load($try)) {
-
-                # Module missing
-                next unless ref $e;
-
-                # Real error
-                die $e;
-            }
-
-            # Module is a command
-            next unless $try->can('new') && $try->can('run');
-
-            # Found
-            $module = $try;
-            last;
-        }
-
-        # Command missing
-        die qq/Command "$name" missing, maybe you need to install it?\n/
-          unless $module;
-
-        # Run
-        my $command = $module->new;
-        return $help ? $command->help : $command->run(@args);
-    }
-
-    # Test
-    return $self if $ENV{HARNESS_ACTIVE};
+    # Help
+    my $help = $name eq 'help' ? 1 : 0;
+    $name = shift @args if $help;
 
     # Try all namespaces
-    my $commands = [];
-    my $seen     = {};
+    my $module;
     for my $namespace (@{$self->namespaces}) {
 
-        # Search
-        if (my $modules = Mojo::Loader->search($namespace)) {
-            for my $module (@$modules) {
+      # Generate module
+      my $camelized = $name;
+      camelize $camelized;
+      my $try = "$namespace\::$camelized";
 
-                # Load
-                if (my $e = Mojo::Loader->load($module)) { die $e }
+      # Load
+      if (my $e = Mojo::Loader->load($try)) {
 
-                # Seen
-                my $command = $module;
-                $command =~ s/^$namespace\:://;
-                push @$commands, [$command => $module]
-                  unless $seen->{$command};
-                $seen->{$command} = 1;
-            }
-        }
+        # Module missing
+        next unless ref $e;
+
+        # Real error
+        die $e;
+      }
+
+      # Module is a command
+      next unless $try->can('new') && $try->can('run');
+
+      # Found
+      $module = $try;
+      last;
     }
 
-    # Print overview
-    print $self->message;
+    # Command missing
+    die qq/Command "$name" missing, maybe you need to install it?\n/
+      unless $module;
 
-    # Make list
-    my $list   = [];
-    my $length = 0;
-    foreach my $command (@$commands) {
+    # Run
+    my $command = $module->new;
+    return $help ? $command->help : $command->run(@args);
+  }
 
-        # Generate name
-        my $name = $command->[0];
-        decamelize $name;
+  # Test
+  return $self if $ENV{HARNESS_ACTIVE};
 
-        # Add to list
-        my $l = length $name;
-        $length = $l if $l > $length;
-        push @$list, [$name, $command->[1]->new->description];
+  # Try all namespaces
+  my $commands = [];
+  my $seen     = {};
+  for my $namespace (@{$self->namespaces}) {
+
+    # Search
+    if (my $modules = Mojo::Loader->search($namespace)) {
+      for my $module (@$modules) {
+
+        # Load
+        if (my $e = Mojo::Loader->load($module)) { die $e }
+
+        # Seen
+        my $command = $module;
+        $command =~ s/^$namespace\:://;
+        push @$commands, [$command => $module]
+          unless $seen->{$command};
+        $seen->{$command} = 1;
+      }
     }
+  }
 
-    # Print list
-    foreach my $command (@$list) {
-        my $name        = $command->[0];
-        my $description = $command->[1];
-        my $padding     = ' ' x ($length - length $name);
-        print "  $name$padding   $description";
-    }
+  # Print overview
+  print $self->message;
 
-    # Hint
-    print $self->hint;
+  # Make list
+  my $list = [];
+  my $len  = 0;
+  foreach my $command (@$commands) {
 
-    return $self;
+    # Generate name
+    my $name = $command->[0];
+    decamelize $name;
+
+    # Add to list
+    my $l = length $name;
+    $len = $l if $l > $len;
+    push @$list, [$name, $command->[1]->new->description];
+  }
+
+  # Print list
+  foreach my $command (@$list) {
+    my $name        = $command->[0];
+    my $description = $command->[1];
+    my $padding     = ' ' x ($len - length $name);
+    print "  $name$padding   $description";
+  }
+
+  # Hint
+  print $self->hint;
+
+  return $self;
 }
 
 sub start {
-    my $self = shift;
+  my $self = shift;
 
-    # Don't run commands if we are reloading
-    return $self if $ENV{MOJO_COMMANDS_DONE};
-    $ENV{MOJO_COMMANDS_DONE} ||= 1;
+  # Don't run commands if we are reloading
+  return $self if $ENV{MOJO_COMMANDS_DONE};
+  $ENV{MOJO_COMMANDS_DONE} ||= 1;
 
-    # Arguments
-    my @args = @_ ? @_ : @ARGV;
+  # Executable
+  $ENV{MOJO_EXE} ||= (caller)[1] if $ENV{MOJO_APP};
 
-    # Run
-    return ref $self ? $self->run(@args) : $self->new->run(@args);
+  # Arguments
+  my @args = @_ ? @_ : @ARGV;
+
+  # Run
+  return ref $self ? $self->run(@args) : $self->new->run(@args);
 }
 
 sub write_file {
-    my ($self, $path, $data) = @_;
+  my ($self, $path, $data) = @_;
 
-    # Directory
-    my @parts = File::Spec->splitdir($path);
-    pop @parts;
-    my $dir = File::Spec->catdir(@parts);
-    $self->create_dir($dir);
+  # Directory
+  my @parts = File::Spec->splitdir($path);
+  pop @parts;
+  my $dir = File::Spec->catdir(@parts);
+  $self->create_dir($dir);
 
-    # Open file
-    my $file = IO::File->new;
-    $file->open(">$path") or croak qq/Can't open file "$path": $!/;
+  # Open file
+  my $file = IO::File->new;
+  $file->open(">$path") or croak qq/Can't open file "$path": $!/;
 
-    # Write unbuffered
-    $file->syswrite($data);
+  # Write unbuffered
+  $file->syswrite($data);
 
-    print "  [write] $path\n" unless $self->quiet;
-    return $self;
+  print "  [write] $path\n" unless $self->quiet;
+  return $self;
 }
 
 sub write_rel_file {
-    my ($self, $path, $data) = @_;
+  my ($self, $path, $data) = @_;
 
-    # Path
-    $path = $self->rel_file($path);
+  # Path
+  $path = $self->rel_file($path);
 
-    # Write
-    $self->write_file($path, $data);
+  # Write
+  $self->write_file($path, $data);
 }
 
 1;
@@ -397,42 +407,43 @@ Mojo::Command - Command Base Class
 
 =head1 SYNOPSIS
 
-    # Camel case command name
-    package Mojo::Command::Mycommand;
+  # Camel case command name
+  package Mojo::Command::Mycommand;
 
-    # Subclass
-    use base 'Mojo::Command';
+  # Subclass
+  use Mojo::Base 'Mojo::Command';
 
-    # Take care of command line options
-    use Getopt::Long 'GetOptions';
+  # Take care of command line options
+  use Getopt::Long 'GetOptions';
 
-    # Short description
-    __PACKAGE__->attr(description => <<'EOF');
-    My first Mojo command.
-    EOF
+  # Short description
+  has description => <<'EOF';
+  My first Mojo command.
+  EOF
 
-    # Short usage message
-    __PACKAGE__->attr(usage => <<"EOF");
-    usage: $0 mycommand [OPTIONS]
+  # Short usage message
+  has usage => <<"EOF";
+  usage: $0 mycommand [OPTIONS]
 
-    These options are available:
-      --something   Does something.
-    EOF
+  These options are available:
+    --something   Does something.
+  EOF
 
-    # <suitable Futurama quote here>
-    sub run {
-        my $self = shift;
+  # <suitable Futurama quote here>
+  sub run {
+    my $self = shift;
 
-        # Handle options
-        local @ARGV = @_ if @_;
-        GetOptions('something' => sub { $something = 1 });
+    # Handle options
+    local @ARGV = @_ if @_;
+    GetOptions('something' => sub { $something = 1 });
 
-        # Magic here! :)
-    }
+    # Magic here! :)
+  }
 
 =head1 DESCRIPTION
 
 L<Mojo::Command> is an abstract base class for L<Mojo> commands.
+
 See L<Mojolicious::Commands> for a list of commands that are available by
 default.
 
@@ -442,43 +453,43 @@ L<Mojo::Command> implements the following attributes.
 
 =head2 C<description>
 
-    my $description = $command->description;
-    $command        = $command->description('Foo!');
+  my $description = $command->description;
+  $command        = $command->description('Foo!');
 
 Short description of command, used for the command list.
 
 =head2 C<hint>
 
-    my $hint  = $commands->hint;
-    $commands = $commands->hint('Foo!');
+  my $hint  = $commands->hint;
+  $commands = $commands->hint('Foo!');
 
 Short hint shown after listing available commands.
 
 =head2 C<message>
 
-    my $message = $commands->message;
-    $commands   = $commands->message('Hello World!');
+  my $message = $commands->message;
+  $commands   = $commands->message('Hello World!');
 
 Short usage message shown before listing available commands.
 
 =head2 C<namespaces>
 
-    my $namespaces = $commands->namespaces;
-    $commands      = $commands->namespaces(['Mojolicious::Commands']);
+  my $namespaces = $commands->namespaces;
+  $commands      = $commands->namespaces(['Mojolicious::Commands']);
 
 Namespaces to search for available commands, defaults to L<Mojo::Command>.
 
 =head2 C<quiet>
 
-    my $quiet = $command->quiet;
-    $command  = $command->quiet(1);
+  my $quiet = $command->quiet;
+  $command  = $command->quiet(1);
 
 Limited command output.
 
 =head2 C<usage>
 
-    my $usage = $command->usage;
-    $command  = $command->usage('Foo!');
+  my $usage = $command->usage;
+  $command  = $command->usage('Foo!');
 
 Usage information for command, used for the help screen.
 
@@ -489,130 +500,130 @@ following new ones.
 
 =head2 C<chmod_file>
 
-    $command = $command->chmod_file('/foo/bar.txt', 0644);
+  $command = $command->chmod_file('/foo/bar.txt', 0644);
 
 Portably change mode of a file.
 
 =head2 C<chmod_rel_file>
 
-    $command = $command->chmod_rel_file('foo/bar.txt', 0644);
+  $command = $command->chmod_rel_file('foo/bar.txt', 0644);
 
 Portably change mode of a relative file.
 
 =head2 C<class_to_file>
 
-    my $file = $command->class_to_file('Foo::Bar');
+  my $file = $command->class_to_file('Foo::Bar');
 
 Convert a class name to a file.
 
-    FooBar -> foo_bar
+  FooBar -> foo_bar
 
 =head2 C<class_to_path>
 
-    my $path = $command->class_to_path('Foo::Bar');
+  my $path = $command->class_to_path('Foo::Bar');
 
 Convert class name to path.
 
-    Foo::Bar -> Foo/Bar.pm
+  Foo::Bar -> Foo/Bar.pm
 
 =head2 C<create_dir>
 
-    $command = $command->create_dir('/foo/bar/baz');
+  $command = $command->create_dir('/foo/bar/baz');
 
 Portably create a directory.
 
 =head2 C<create_rel_dir>
 
-    $command = $command->create_rel_dir('foo/bar/baz');
+  $command = $command->create_rel_dir('foo/bar/baz');
 
 Portably create a relative directory.
 
 =head2 C<detect>
 
-    my $env = $commands->detect;
-    my $env = $commands->detect($guess);
+  my $env = $commands->detect;
+  my $env = $commands->detect($guess);
 
 Try to detect environment.
 
 =head2 C<get_all_data>
 
-    my $all = $command->get_all_data;
-    my $all = $command->get_all_data('Some::Class');
+  my $all = $command->get_all_data;
+  my $all = $command->get_all_data('Some::Class');
 
 Extract all embedded files from the C<DATA> section of a class.
 
 =head2 C<get_data>
 
-    my $data = $command->get_data('foo_bar');
-    my $data = $command->get_data('foo_bar', 'Some::Class');
+  my $data = $command->get_data('foo_bar');
+  my $data = $command->get_data('foo_bar', 'Some::Class');
 
 Extract embedded file from the C<DATA> section of a class.
 
 =head2 C<help>
 
-    $command->help;
+  $command->help;
 
 Print usage information for command.
 
 =head2 C<rel_dir>
 
-    my $path = $command->rel_dir('foo/bar');
+  my $path = $command->rel_dir('foo/bar');
 
 Portably generate an absolute path from a relative UNIX style path.
 
 =head2 C<rel_file>
 
-    my $path = $command->rel_file('foo/bar.txt');
+  my $path = $command->rel_file('foo/bar.txt');
 
 Portably generate an absolute path from a relative UNIX style path.
 
 =head2 C<render_data>
 
-    my $data = $command->render_data('foo_bar', @arguments);
+  my $data = $command->render_data('foo_bar', @arguments);
 
 Render a template from the C<DATA> section of the command class.
 
 =head2 C<render_to_file>
 
-    $command = $command->render_to_file('foo_bar', '/foo/bar.txt');
+  $command = $command->render_to_file('foo_bar', '/foo/bar.txt');
 
 Render a template from the C<DATA> section of the command class to a file.
 
 =head2 C<render_to_rel_file>
 
-    $command = $command->render_to_rel_file('foo_bar', 'foo/bar.txt');
+  $command = $command->render_to_rel_file('foo_bar', 'foo/bar.txt');
 
 Portably render a template from the C<DATA> section of the command class to a
 relative file.
 
 =head2 C<run>
 
-    $commands->run;
-    $commands->run(@ARGV);
+  $commands->run;
+  $commands->run(@ARGV);
 
 Load and run commands.
 
 =head2 C<start>
 
-    Mojo::Command->start;
-    Mojo::Command->start(@ARGV);
+  Mojo::Command->start;
+  Mojo::Command->start(@ARGV);
 
 Start the command line interface.
 
 =head2 C<write_file>
 
-    $command = $command->write_file('/foo/bar.txt', 'Hello World!');
+  $command = $command->write_file('/foo/bar.txt', 'Hello World!');
 
 Portably write text to a file.
 
 =head2 C<write_rel_file>
 
-    $command = $command->write_rel_file('foo/bar.txt', 'Hello World!');
+  $command = $command->write_rel_file('foo/bar.txt', 'Hello World!');
 
 Portably write text to a relative file.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
 
 =cut

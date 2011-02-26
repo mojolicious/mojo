@@ -3,10 +3,10 @@
 use strict;
 use warnings;
 
-# Disable epoll and kqueue
-BEGIN { $ENV{MOJO_POLL} = 1 }
+# Disable IPv6, epoll and kqueue
+BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 194;
+use Test::More tests => 206;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -18,11 +18,26 @@ use Mojo::Transaction::HTTP;
 use Test::Mojo;
 use Mojolicious;
 
-# Congratulations Fry, you've snagged the perfect girlfriend.
-# Amy's rich, she's probably got other characteristics...
+# "Congratulations Fry, you've snagged the perfect girlfriend.
+#  Amy's rich, she's probably got other characteristics..."
 use_ok 'MojoliciousTest';
 
 my $t = Test::Mojo->new(app => 'MojoliciousTest');
+
+my $backup = $ENV{MOJO_MODE} || '';
+$ENV{MOJO_MODE} = 'development';
+
+# Foo::baz (missing action without template)
+$t->get_ok('/foo/baz')->status_is(404)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_like(qr/Not Found/);
+
+# Foo::yada (action-less template)
+$t->get_ok('/foo/yada')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("look ma! no action!\n");
 
 # SyntaxError::foo (syntax error in controller)
 $t->get_ok('/syntax_error/foo')->status_is(500)
@@ -36,11 +51,17 @@ $t->get_ok('/foo/syntaxerror')->status_is(500)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/^Missing right curly/);
 
-# Foo::badtemplate (template missing)
-$t->get_ok('/foo/badtemplate')->status_is(404)
-  ->header_is(Server         => 'Mojolicious (Perl)')
+# Foo::fun
+$t->get_ok('/fun/time', {'X-Test' => 'Hi there!'})->status_is(200)
+  ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/File Not Found/);
+  ->content_is('Have fun!');
+
+# Foo::fun
+$t->get_ok('/happy/fun/time', {'X-Test' => 'Hi there!'})->status_is(200)
+  ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('Have fun!');
 
 # Foo::authenticated (authentication bridge)
 $t->get_ok('/auth/authenticated', {'X-Bender' => 'Hi there!'})->status_is(200)
@@ -52,7 +73,7 @@ $t->get_ok('/auth/authenticated', {'X-Bender' => 'Hi there!'})->status_is(200)
 $t->get_ok('/auth/authenticated')->status_is(404)
   ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/File Not Found/);
+  ->content_like(qr/Not Found/);
 
 # Foo::test
 $t->get_ok('/foo/test', {'X-Test' => 'Hi there!'})->status_is(200)
@@ -80,11 +101,10 @@ $t->get_ok('/somethingtest', {'X-Test' => 'Hi there!'})->status_is(200)
   ->content_is('/test4/42');
 
 # Foo::url_for_missing
-$t->get_ok('/something_missing', {'X-Test' => 'Hi there!'})->status_is(500)
+$t->get_ok('/something_missing', {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(
-    qr/Route "something_missing" used in url_for does not exist/);
+  ->content_is('does_not_exist');
 
 # Foo::templateless
 $t->get_ok('/foo/templateless', {'X-Test' => 'Hi there!'})->status_is(200)
@@ -135,7 +155,7 @@ $t->get_ok('/test6', {'X-Test' => 'Hi there!'})->status_is(200)
 $t->get_ok('/', {'X-Test' => 'Hi there!'})->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/File Not Found/);
+  ->content_like(qr/Not Found/);
 
 # Check Last-Modified header for static files
 my $path  = File::Spec->catdir($FindBin::Bin, 'public_dev', 'hello.txt');
@@ -155,7 +175,7 @@ $t->get_ok('/hello.txt')->status_is(200)
 $t->get_ok('/../../mojolicious/secret.txt')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/File Not Found/);
+  ->content_like(qr/Not Found/);
 
 # Check If-Modified-Since
 $t->get_ok('/hello.txt', {'If-Modified-Since' => $mtime})->status_is(304)
@@ -224,12 +244,6 @@ $t->get_ok('/foo/bar')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('/foo/bar');
 
-# SingleFileTestApp::Baz::does_not_exist
-$t->get_ok('/baz/does_not_exist')->status_is(404)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/File Not Found/);
-
 $t = Test::Mojo->new(app => 'MojoliciousTest');
 
 # MojoliciousTestController::Foo::stage2
@@ -266,4 +280,6 @@ $t->get_ok('/foo/session')->status_is(200)
 
 # Mixed formats
 $t->get_ok('/rss.xml')->status_is(200)->content_type_is('application/rss+xml')
-  ->content_like(qr/<\?xml version="1.0" encoding="UTF-8"\?><rss \/>/)
+  ->content_like(qr/<\?xml version="1.0" encoding="UTF-8"\?><rss \/>/);
+
+$ENV{MOJO_MODE} = $backup;

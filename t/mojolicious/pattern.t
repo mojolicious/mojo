@@ -3,9 +3,11 @@
 use strict;
 use warnings;
 
-use Test::More tests => 38;
+use Test::More tests => 48;
 
-# People said I was dumb, but I proved them.
+use Mojo::ByteStream 'b';
+
+# "People said I was dumb, but I proved them."
 use_ok 'Mojolicious::Routes::Pattern';
 
 # Normal pattern with text, symbols and a default value
@@ -36,7 +38,7 @@ is $pattern->render, '/', 'right result';
 # Regex in pattern
 $pattern =
   Mojolicious::Routes::Pattern->new('/test/(controller)/:action/(id)',
-    id => '\d+');
+  id => '\d+');
 $pattern->defaults({action => 'index', id => 1});
 $result = $pattern->match('/test/foo/bar/203');
 is $result->{controller}, 'foo', 'right value';
@@ -99,3 +101,26 @@ $pattern = Mojolicious::Routes::Pattern->new('/:test');
 $result  = $pattern->match('/test(test)(\Qtest\E)(');
 is $result->{test}, 'test(test)(\Qtest\E)(', 'right value';
 is $pattern->render({test => '23'}), '/23', 'right result';
+
+# Unusual values
+$pattern = Mojolicious::Routes::Pattern->new('/:test');
+my $value = b('abc%E4cba')->url_unescape->to_string;
+$result = $pattern->match("/$value");
+is $result->{test}, $value, 'right value';
+is $pattern->render({test => $value}), "/$value", 'right result';
+$value  = b('abc%FCcba')->url_unescape->to_string;
+$result = $pattern->match("/$value");
+is $result->{test}, $value, 'right value';
+is $pattern->render({test => $value}), "/$value", 'right result';
+$value  = b('abc%DFcba')->url_unescape->to_string;
+$result = $pattern->match("/$value");
+is $result->{test}, $value, 'right value';
+is $pattern->render({test => $value}), "/$value", 'right result';
+$value  = b('abc%24cba')->url_unescape->to_string;
+$result = $pattern->match("/$value");
+is $result->{test}, $value, 'right value';
+is $pattern->render({test => $value}), "/$value", 'right result';
+$value  = b('abc%20cba')->url_unescape->to_string;
+$result = $pattern->match("/$value");
+is $result->{test}, $value, 'right value';
+is $pattern->render({test => $value}), "/$value", 'right result';

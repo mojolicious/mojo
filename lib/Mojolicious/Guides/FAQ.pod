@@ -10,6 +10,47 @@ L<Mojolicious> together with the right answers.
 
 =head1 QUESTIONS
 
+=head2 Why doesn't Mojolicious have any dependencies?
+
+We are optimizing L<Mojolicious> for user-friendliness and development speed
+without compromises.
+While there are no rules in L<Mojolicious::Guides::CodingGuidelines> that
+forbid dependencies, we do currently discourage adding non-optional ones in
+favor of a faster and more painless installation process.
+And we do in fact already use several optional CPAN modules such as
+L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::IP>, L<IO::Socket::SSL>,
+L<Net::Rendezvous::Publish> and L<Plack> to provide advanced functionality if
+they are installed.
+
+=head2 Why reinvent wheels?
+
+Because we can make them rounder.
+Components specifically designed for user-friendliness and development speed
+are not easy to come by.
+While we are strong believers of the Perl mantra
+"There is more than one way to do it.", we also believe that well designed
+defaults result in a much more pleasant user experience.
+We want the best of both worlds.
+
+=head2 What does the error "Maximum message size exceeded." mean?
+
+To protect your applications from excessively large requests and responses,
+our HTTP parser has a cap after which it will automatically stop accepting
+new data, and in most cases force the connection to be dropped.
+This limit is around C<5MB> by default, you can use the
+C<MOJO_MAX_MESSAGE_SIZE> environment variable or the C<max_message_size>
+attribute of L<Mojo::Message> to change this value.
+
+=head2 What does the error "Maximum line size exceeded." mean?
+
+This is a very similar protection mechanism to the one described in the
+previous answer, but a little more specific.
+It limits the maximum length of any C<\r\n> terminated part of a HTTP
+message, such as request line, status line and headers.
+This limit is around C<10KB> by default, you can use the
+C<MOJO_MAX_LINE_SIZE> environment variable or the C<max_line_size> attribute
+of L<Mojo::Message> to change this value.
+
 =head2 Does L<Mojolicious> run on Windows systems?
 
 Sure it does!
@@ -41,7 +82,7 @@ More capable editors can handle this accordingly and force the change.
 
 Quite possibly this oneliner.
 
-    sudo -s 'curl -L cpanmin.us | perl - "Mojolicious"'
+  sudo -s 'curl -L cpanmin.us | perl - Mojolicious'
 
 =head2 I think L<Mojolicious> is awesome, how can i support you guys?
 
@@ -49,9 +90,11 @@ Share your success story via blog or twitter, get more people hooked! :)
 
 =head2 I think i have found a bug, what should i do now?
 
-Prepare a test case demonstrating the bug, you are not expected to fix it
-yourself, but you'll have to make sure the developers can replicate your
-problem.
+First make sure you are using the latest version of L<Mojolicious>, it is
+quite likely that the bug has already been fixed.
+If that doesn't help prepare a test case demonstrating the bug, you are not
+expected to fix it yourself, but you'll have to make sure the developers can
+replicate your problem.
 Sending in your whole application generally does more harm than good, the
 C<t> directory of this distribution has many good examples for how to do it
 right.
@@ -59,11 +102,17 @@ Writing a test is usually the hardest part of fixing a bug, so the better
 your test case the faster it can be fixed. ;)
 
 Once thats done you can contact the developers via GitHub
-(http://github.com/kraih/mojo), mailing list
+(L<https://github.com/kraih/mojo/issues>), mailing list
 (L<http://groups.google.com/group/mojolicious>) or IRC
 (C<#mojo> on C<irc.perl.org>).
 
 If you decide to fix the bug yourself make sure to also take a look at
 L<Mojolicious::Guides::CodingGuidelines>.
+
+=head1 MORE
+
+You can continue with L<Mojolicious::Guides> now or take a look at the
+Mojolicious wiki L<http://github.com/kraih/mojo/wiki>, which contains a lot
+more documentation and examples by many different authors.
 
 =cut

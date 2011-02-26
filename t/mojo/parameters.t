@@ -7,7 +7,7 @@ use utf8;
 
 use Test::More tests => 44;
 
-# Now that's a wave of destruction that's easy on the eyes.
+# "Now that's a wave of destruction that's easy on the eyes."
 use_ok 'Mojo::Parameters';
 
 # Basics with custom pair separator
@@ -88,7 +88,7 @@ is_deeply $params->to_hash, {c => '', '' => ['c', '']}, 'right structure';
 $params->remove('c');
 is $params->to_string, "=c&=", 'right format';
 $params->remove(undef);
-ok !defined $params->to_string, 'empty';
+ok !$params->to_string, 'empty';
 
 # +
 $params = Mojo::Parameters->new('foo=%2B');
@@ -109,9 +109,10 @@ is_deeply [$params->param('foo')], [qw/bar baz/], 'right values';
 is $params->param('a'), 'b', 'right value';
 is_deeply [$params->param('bar')], [qw/bas test/], 'right values';
 is_deeply $params->to_hash,
-  { foo => ['bar', 'baz'],
-    a   => 'b',
-    bar => ['bas', 'test']
+  {
+  foo => ['bar', 'baz'],
+  a   => 'b',
+  bar => ['bas', 'test']
   },
   'right structure';
 

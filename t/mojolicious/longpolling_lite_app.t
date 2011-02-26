@@ -3,128 +3,186 @@
 use strict;
 use warnings;
 
-# Disable epoll and kqueue
-BEGIN { $ENV{MOJO_POLL} = 1 }
+# Disable IPv6, epoll and kqueue
+BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 59;
+use Test::More tests => 86;
 
-# I was God once.
-# Yes, I saw. You were doing well until everyone died.
+# "I was God once.
+#  Yes, I saw. You were doing well until everyone died."
+use Mojo::IOLoop;
 use Mojolicious::Lite;
 use Test::Mojo;
 
 # GET /shortpoll
 my $shortpoll = 0;
 get '/shortpoll' => sub {
-    my $self = shift;
-    $self->res->headers->connection('close');
-    $self->on_finish(sub { $shortpoll++ });
-    $self->res->code(200);
-    $self->res->headers->content_type('text/plain');
-    $self->write_chunk('this was short.');
-    $self->write_chunk('');
-};
+  my $self = shift;
+  $self->res->headers->connection('close');
+  $self->on_finish(sub { $shortpoll++ });
+  $self->res->code(200);
+  $self->res->headers->content_type('text/plain');
+  $self->write_chunk('this was short.');
+  $self->write_chunk('');
+} => 'shortpoll';
 
 # GET /shortpoll/plain
 my $shortpoll_plain;
 get '/shortpoll/plain' => sub {
-    my $self = shift;
-    $self->on_finish(sub { $shortpoll_plain = 'finished!' });
-    $self->res->code(200);
-    $self->res->headers->content_type('text/plain');
-    $self->res->headers->content_length(25);
-    $self->write('this was short and plain.');
+  my $self = shift;
+  $self->on_finish(sub { $shortpoll_plain = 'finished!' });
+  $self->res->code(200);
+  $self->res->headers->content_type('text/plain');
+  $self->res->headers->content_length(25);
+  $self->write('this was short and plain.');
 };
 
 # GET /longpoll
 my $longpoll;
 get '/longpoll' => sub {
-    my $self = shift;
-    $self->on_finish(sub { $longpoll = 'finished!' });
-    $self->res->code(200);
-    $self->res->headers->content_type('text/plain');
-    $self->write_chunk('hi ');
-    $self->client->ioloop->timer(
-        '0.5' => sub {
-            $self->write_chunk('there,',
-                sub { shift->write_chunk(' whats up?'); });
-            shift->timer('0.5' => sub { $self->write_chunk('') });
-        }
-    );
+  my $self = shift;
+  $self->on_finish(sub { $longpoll = 'finished!' });
+  $self->res->code(200);
+  $self->res->headers->content_type('text/plain');
+  $self->write_chunk('hi ');
+  Mojo::IOLoop->singleton->timer(
+    '0.5' => sub {
+      $self->write_chunk('there,', sub { shift->write_chunk(' whats up?'); });
+      shift->timer('0.5' => sub { $self->write_chunk('') });
+    }
+  );
 };
 
 # GET /longpoll/nested
 my $longpoll_nested;
 get '/longpoll/nested' => sub {
-    my $self = shift;
-    $self->on_finish(sub { $longpoll_nested = 'finished!' });
-    $self->res->code(200);
-    $self->res->headers->content_type('text/plain');
-    $self->write_chunk(
-        sub {
-            shift->write_chunk('nested!', sub { shift->write_chunk('') });
-        }
-    );
+  my $self = shift;
+  $self->on_finish(sub { $longpoll_nested = 'finished!' });
+  $self->res->code(200);
+  $self->res->headers->content_type('text/plain');
+  $self->cookie(foo => 'bar');
+  $self->write_chunk(
+    sub {
+      shift->write_chunk('nested!', sub { shift->write_chunk('') });
+    }
+  );
 };
 
 # GET /longpoll/plain
 my $longpoll_plain;
 get '/longpoll/plain' => sub {
-    my $self = shift;
-    $self->res->code(200);
-    $self->res->headers->content_type('text/plain');
-    $self->res->headers->content_length(25);
-    $self->write('hi ');
-    $self->client->ioloop->timer(
-        '0.5' => sub {
-            $self->on_finish(sub { $longpoll_plain = 'finished!' });
-            $self->write('there plain,', sub { shift->write(' whats up?') });
-        }
-    );
+  my $self = shift;
+  $self->res->code(200);
+  $self->res->headers->content_type('text/plain');
+  $self->res->headers->content_length(25);
+  $self->write('hi ');
+  Mojo::IOLoop->singleton->timer(
+    '0.5' => sub {
+      $self->on_finish(sub { $longpoll_plain = 'finished!' });
+      $self->write('there plain,', sub { shift->write(' whats up?') });
+    }
+  );
 };
 
 # GET /longpoll/delayed
 my $longpoll_delayed;
 get '/longpoll/delayed' => sub {
-    my $self = shift;
-    $self->on_finish(sub { $longpoll_delayed = 'finished!' });
-    $self->res->code(200);
-    $self->res->headers->content_type('text/plain');
-    $self->write_chunk;
-    $self->client->ioloop->timer(
-        '0.5' => sub {
-            $self->write_chunk(
-                sub {
-                    my $self = shift;
-                    $self->write_chunk('how');
-                    $self->write_chunk('dy!');
-                    $self->write_chunk('');
-                }
-            );
+  my $self = shift;
+  $self->on_finish(sub { $longpoll_delayed = 'finished!' });
+  $self->res->code(200);
+  $self->res->headers->content_type('text/plain');
+  $self->write_chunk;
+  Mojo::IOLoop->singleton->timer(
+    '0.5' => sub {
+      $self->write_chunk(
+        sub {
+          my $self = shift;
+          $self->write_chunk('how');
+          $self->write_chunk('dy!');
+          $self->write_chunk('');
         }
-    );
+      );
+    }
+  );
 };
 
 # GET /longpoll/plain/delayed
 my $longpoll_plain_delayed;
 get '/longpoll/plain/delayed' => sub {
-    my $self = shift;
-    $self->on_finish(sub { $longpoll_plain_delayed = 'finished!' });
-    $self->res->code(200);
-    $self->res->headers->content_type('text/plain');
-    $self->res->headers->content_length(12);
-    $self->write;
-    $self->client->ioloop->timer(
-        '0.5' => sub {
-            $self->write(
-                sub {
-                    my $self = shift;
-                    $self->write('how');
-                    $self->write('dy plain!');
-                }
-            );
+  my $self = shift;
+  $self->on_finish(sub { $longpoll_plain_delayed = 'finished!' });
+  $self->res->code(200);
+  $self->res->headers->content_type('text/plain');
+  $self->res->headers->content_length(12);
+  $self->write;
+  Mojo::IOLoop->singleton->timer(
+    '0.5' => sub {
+      $self->write(
+        sub {
+          my $self = shift;
+          $self->write('how');
+          $self->write('dy plain!');
         }
-    );
+      );
+    }
+  );
+} => 'delayed';
+
+# GET /longpoll/static/delayed
+my $longpoll_static_delayed;
+get '/longpoll/static/delayed' => sub {
+  my $self = shift;
+  $self->on_finish(sub { $longpoll_static_delayed = 'finished!' });
+  Mojo::IOLoop->singleton->timer(
+    '0.5' => sub { $self->render_static('hello.txt') });
+};
+
+# GET /longpoll/static/delayed_too
+my $longpoll_static_delayed_too;
+get '/longpoll/static/delayed_too' => sub {
+  my $self = shift;
+  $self->on_finish(sub { $longpoll_static_delayed_too = 'finished!' });
+  $self->cookie(bar => 'baz');
+  $self->session(foo => 'bar');
+  $self->render_later;
+  Mojo::IOLoop->singleton->timer(
+    '0.5' => sub { $self->render_static('hello.txt') });
+} => 'delayed_too';
+
+# GET /longpoll/dynamic/delayed
+my $longpoll_dynamic_delayed;
+get '/longpoll/dynamic/delayed' => sub {
+  my $self = shift;
+  $self->on_finish(sub { $longpoll_dynamic_delayed = 'finished!' });
+  Mojo::IOLoop->singleton->timer(
+    '0.5' => sub {
+      $self->res->code(201);
+      $self->cookie(baz => 'yada');
+      $self->res->body('Dynamic!');
+      $self->rendered;
+    }
+  );
+} => 'dynamic';
+
+# GET /too_long
+my $too_long;
+get '/too_long' => sub {
+  my $self = shift;
+  $self->on_finish(sub { $too_long = 'finished!' });
+  $self->res->code(200);
+  $self->res->headers->content_type('text/plain');
+  $self->res->headers->content_length(12);
+  $self->write('how');
+  Mojo::IOLoop->singleton->timer(
+    '5' => sub {
+      $self->write(
+        sub {
+          my $self = shift;
+          $self->write('dy plain!');
+        }
+      );
+    }
+  );
 };
 
 my $t = Test::Mojo->new;
@@ -159,33 +217,33 @@ is $longpoll, 'finished!', 'finished';
 # GET /longpoll (interrupted)
 $longpoll = undef;
 my $port = $t->client->test_server;
-$t->client->ioloop->connect(
-    address    => 'localhost',
-    port       => $port,
-    on_connect => sub {
-        my ($self, $id) = @_;
-        $self->write($id => "GET /longpoll HTTP/1.1\x0d\x0a\x0d\x0a");
-    },
-    on_read => sub {
-        my ($self, $id, $chunk) = @_;
-        $self->drop($id);
-        $self->timer('0.5', sub { shift->stop });
-    }
+Mojo::IOLoop->singleton->connect(
+  address    => 'localhost',
+  port       => $port,
+  on_connect => sub {
+    my ($self, $id) = @_;
+    $self->write($id => "GET /longpoll HTTP/1.1\x0d\x0a\x0d\x0a");
+  },
+  on_read => sub {
+    my ($self, $id, $chunk) = @_;
+    $self->drop($id);
+    $self->timer('0.5', sub { shift->stop });
+  }
 );
-$t->client->ioloop->start;
+Mojo::IOLoop->singleton->start;
 is $longpoll, 'finished!', 'finished';
 
 # GET /longpoll (also interrupted)
 my $tx = $t->client->build_tx(GET => '/longpoll');
 my $buffer = '';
 $tx->res->body(
-    sub {
-        my ($self, $chunk) = @_;
-        $buffer .= $chunk;
-        $self->error('Interrupted!');
-    }
+  sub {
+    my ($self, $chunk) = @_;
+    $buffer .= $chunk;
+    $self->error('Interrupted!');
+  }
 );
-$t->client->process($tx);
+$t->client->start($tx);
 is $tx->res->code,  200,            'right status';
 is $tx->res->error, 'Interrupted!', 'right error';
 is $buffer, 'hi ', 'right content';
@@ -194,7 +252,8 @@ is $buffer, 'hi ', 'right content';
 $t->get_ok('/longpoll/nested')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_type_is('text/plain')->content_is('nested!');
+  ->header_like('Set-Cookie' => qr/foo=bar/)->content_type_is('text/plain')
+  ->content_is('nested!');
 is $longpoll_nested, 'finished!', 'finished';
 
 # GET /longpoll/plain
@@ -217,3 +276,42 @@ $t->get_ok('/longpoll/plain/delayed')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/plain')->content_is('howdy plain!');
 is $longpoll_plain_delayed, 'finished!', 'finished';
+
+# GET /longpoll/static/delayed
+$t->get_ok('/longpoll/static/delayed')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_type_is('text/plain')
+  ->content_is('Hello Mojo from a static file!');
+is $longpoll_static_delayed, 'finished!', 'finished';
+
+# GET /longpoll/static/delayed_too
+$t->get_ok('/longpoll/static/delayed_too')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->header_like('Set-Cookie' => qr/bar=baz/)
+  ->header_like('Set-Cookie' => qr/mojolicious=/)
+  ->content_type_is('text/plain')
+  ->content_is('Hello Mojo from a static file!');
+is $longpoll_static_delayed_too, 'finished!', 'finished';
+
+# GET /longpoll/dynamic/delayed
+$t->get_ok('/longpoll/dynamic/delayed')->status_is(201)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->header_like('Set-Cookie' => qr/baz=yada/)->content_is('Dynamic!');
+is $longpoll_dynamic_delayed, 'finished!', 'finished';
+
+# GET /too_long (timeout)
+$tx = $t->client->keep_alive_timeout(1)->build_tx(GET => '/too_long');
+$buffer = '';
+$tx->res->body(
+  sub {
+    my ($self, $chunk) = @_;
+    $buffer .= $chunk;
+  }
+);
+$t->client->start($tx);
+is $tx->res->code, 200, 'right status';
+ok !$tx->error, 'no error';
+is $buffer, 'how', 'right content';

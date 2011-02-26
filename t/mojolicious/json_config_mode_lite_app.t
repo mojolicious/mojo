@@ -5,17 +5,17 @@ use warnings;
 
 use utf8;
 
-# Disable epoll and kqueue
+# Disable IPv6, epoll and kqueue
 BEGIN {
-    $ENV{MOJO_POLL} = 1;
-    $ENV{MOJO_MODE} = 'testing';
+  $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1;
+  $ENV{MOJO_MODE} = 'testing';
 }
 
-# Who are you, and why should I care?
+# "Who are you, and why should I care?"
 use Test::More tests => 3;
 
-# Ahhh, what an awful dream.
-# Ones and zeroes everywhere... and I thought I saw a two.
+# "Ahhh, what an awful dream.
+#  Ones and zeroes everywhere... and I thought I saw a two."
 use Mojolicious::Lite;
 use Test::Mojo;
 

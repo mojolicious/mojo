@@ -14,121 +14,121 @@ are reserved for routes and the renderer.
 
 =head2 C<action>
 
-    $r->route('/welcome')->to(action => 'hello');
+  $r->route('/welcome')->to(action => 'hello');
 
 Action to dispatch to.
 
 =head2 C<app>
 
-    $r->route('/welcome')->to(app => MyApp->new);
+  $r->route('/welcome')->to(app => MyApp->new);
 
 Embedded application to dispatch to.
 
 =head2 C<cb>
 
-    $r->route('/welcome')->to(cb => sub {...});
+  $r->route('/welcome')->to(cb => sub {...});
 
 Callback to dispatch to.
 
 =head2 C<class>
 
-    $r->route('/welcome')->to(class => 'Greeting');
+  $r->route('/welcome')->to(class => 'Greeting');
 
 Camelized alternative to C<controller>.
 
 =head2 C<controller>
 
-    $r->route('/welcome')->to(controller => 'greetings');
+  $r->route('/welcome')->to(controller => 'greetings');
 
 Controller to dispatch to.
 
 =head2 C<data>
 
-    $self->render(data => 'raw bytes');
+  $self->render(data => 'raw bytes');
 
 Turn raw bytes into a response.
 
 =head2 C<exception>
 
-    <%= $exception %>
+  <%= $exception %>
 
 L<Mojo::Exception> object for exception templates.
 
 =head2 C<extends>
 
-    $self->render(extends => 'template');
+  $self->render(extends => 'template');
 
 Template to extend.
 
 =head2 C<format>
 
-    $self->render(format => 'rss');
+  $self->render(format => 'rss');
 
 Format to render.
 
 =head2 C<handler>
 
-    $self->render(handler => 'ep');
+  $self->render(handler => 'ep');
 
 Handler to use for rendering.
 
 =head2 C<inline>
 
-    $self->render(inline => '<%= 1 + 1%>');
+  $self->render(inline => '<%= 1 + 1%>');
 
 Inline template to render.
 
 =head2 C<json>
 
-    $self->render(json => {foo => 23});
+  $self->render(json => {foo => 23});
 
 Turn Perl structure into JSON response.
 
 =head2 C<layout>
 
-    $self->render(layout => 'green');
+  $self->render(layout => 'green');
 
 Layout to render.
 
 =head2 C<method>
 
-    $r->route('/welcome')->to(method => 'hello');
+  $r->route('/welcome')->to(method => 'hello');
 
 Alternative to C<action>.
 
 =head2 C<namespace>
 
-    $r->route('/welcome')->to(namespace => 'TestApp', method => 'lulz');
+  $r->route('/welcome')->to(namespace => 'TestApp', method => 'lulz');
 
 Namespace to dispatch to.
 
 =head2 C<partial>
 
-    my $result = $self->render(partial => 1);
+  my $result = $self->render(partial => 1);
 
 Return rendering result instead of turning it into a response.
 
 =head2 C<path>
 
-    $r->route('/welcome')->to(path => '/test', app => MyApp->new);
+  $r->route('/welcome')->to(path => '/test', app => MyApp->new);
 
 Base path to use for dispatching to embedded applications.
 
 =head2 C<status>
 
-    $self->render(status => 404);
+  $self->render(status => 404);
 
 Status code to use for rendered response.
 
 =head2 C<template>
 
-    $self->render(template => 'bye');
+  $self->render(template => 'bye');
 
 Template to render.
 
 =head2 C<text>
 
-    $self->render(text => 'Hello World!');
+  $self->render(text => 'Hello World!');
 
 Turn characters into a response.
 
@@ -144,7 +144,7 @@ Decides which L<Mojolicious> or L<Mojo> application will be used, should
 always contain a class name like C<MyApp>, usually defaults to
 L<Mojo::HelloWorld>.
 
-    MOJO_APP=MyApp
+  MOJO_APP=MyApp
 
 =head2 C<MOJO_CA_FILE>
 
@@ -152,73 +152,66 @@ The path to the TLS CA authority file, should always contain a path like
 C</etc/tls/cacerts.pem>.
 Note that L<IO::Socket::SSL> must be installed for TLS support.
 
-    MOJO_CA_FILE=/etc/tls/cacerts.pem
+  MOJO_CA_FILE=/etc/tls/cacerts.pem
 
 =head2 C<MOJO_CHUNK_SIZE>
 
 Chunk size used for IO operations in bytes, a bigger chunk size speeds up IO
-operations but will also use more memory, defaults to C<262144>.
+operations but will also use more memory, defaults to C<256000>.
 
-    MOJO_CHUNK_SIZE=1024
+  MOJO_CHUNK_SIZE=1024
+
+=head2 C<MOJO_CONFIG>
+
+Config file to be used by L<Mojolicious::Plugin::Config> and
+L<Mojolicious::Plugin::JsonConfig>, quite useful for testing.
+
+   MOJO_CONFIG=myapp.conf
 
 =head2 C<MOJO_DNS_SERVER>
 
 C<DNS> server to use for non-blocking lookups.
 
-    MOJO_DNS_SERVER=8.8.8.8
-
-=head2 C<MOJO_EPOLL>
-
-Force epoll mainloop for IO operations.
-Note that L<IO::Epoll> must be installed for epoll support.
-
-    MOJO_EPOLL=1
+  MOJO_DNS_SERVER=8.8.8.8
 
 =head2 C<MOJO_HOME>
 
 Home directory for the L<Mojolicious> application, should always contain a
 path like C</home/sri/myapp>.
 
-    MOJO_HOME=/home/sri/myapp
-
-=head2 C<MOJO_KQUEUE>
-
-Force kqueue mainloop for IO operations.
-Note that L<IO::KQueue> must be installed for kqueue support.
-
-    MOJO_KQUEUE=1
+  MOJO_HOME=/home/sri/myapp
 
 =head2 C<MOJO_LOG_LEVEL>
 
 Log level for the L<Mojolicious> application, should contain a valid log
 level like C<debug> or C<error>.
 
-    MOJO_LOG_LEVEL=debug
-    MOJO_LOG_LEVEL=error
+  MOJO_LOG_LEVEL=debug
+  MOJO_LOG_LEVEL=error
 
 =head2 C<MOJO_MAX_LINE_SIZE>
 
 Maximum line size for HTTP message start lines and headers in bytes, defaults
 to C<10240>.
 
-    MOJO_MAX_LINE_SIZE=2048
+  MOJO_MAX_LINE_SIZE=2048
 
 =head2 C<MOJO_MAX_MEMORY_SIZE>
 
 Maximum size in bytes for HTTP content to keep in memory, bigger content will
-be written to temporary files, defaults to C<262144>.
+be written to temporary files, defaults to C<256000>.
 
-    MOJO_MAX_MEMORY_SIZE=2048
+  MOJO_MAX_MEMORY_SIZE=2048
 
 =head2 C<MOJO_MAX_MESSAGE_SIZE>
 
 Maximum size for HTTP messages in bytes, defaults to C<5242880>.
 
-    MOJO_MAX_MESSAGE_SIZE=1024
+  MOJO_MAX_MESSAGE_SIZE=1024
 
 =head2 C<MOJO_MAX_REDIRECTS>
 
-    MOJO_MAX_REDIRECTS=3
+  MOJO_MAX_REDIRECTS=3
 
 Maximum number of redirects L<Mojo::Client> will follow, defaults to C<0>.
 
@@ -227,15 +220,28 @@ Maximum number of redirects L<Mojo::Client> will follow, defaults to C<0>.
 Run mode for the L<Mojolicious> application, should contain a valid mode like
 C<development> or C<production>.
 
-    MOJO_MODE=development
-    MOJO_MODE=production
+  MOJO_MODE=development
+  MOJO_MODE=production
 
 =head2 C<MOJO_NO_BONJOUR>
 
 Disable Bonjour support.
 Note that L<Net::Rendezvous::Publish> must be installed for Bonjour support.
 
-    MOJO_NO_BONJOUR=1
+  MOJO_NO_BONJOUR=1
+
+=head2 C<MOJO_NO_DETECT>
+
+Disable L<Mojolicious> deployment environment detection.
+
+  MOJO_NO_DETECT=1
+
+=head2 C<MOJO_NO_IPV6>
+
+Disable IPv6 support.
+Note that L<IO::Socket::IP> must be installed for IPv6 support.
+
+  MOJO_NO_IPV6=1
 
 =head2 C<MOJO_NO_TLS>
 
@@ -243,60 +249,60 @@ Disable TLS support, this might result in slightly better performance and
 less memory use.
 Note that L<IO::Socket::SSL> must be installed for TLS support.
 
-    MOJO_NO_TLS=1
+  MOJO_NO_TLS=1
 
 =head2 C<MOJO_POLL>
 
 Force poll mainloop for IO operations, this should only be used for testing
 since other mainloops are generally faster and scale better.
 
-    MOJO_POLL=1
+  MOJO_POLL=1
 
 =head2 C<MOJO_PROXY>
 
 Enable automatic HTTP and HTTPS proxy detection in L<Mojo::Client>, for
 security reasons this is disabled by default.
 
-    MOJO_PROXY=1
+  MOJO_PROXY=1
 
 =head2 C<MOJO_RELOAD>
 
 Enable L<Mojolicious> application reloading, changes to your application will
 be detected automatically so you don't have to restart the server manually.
 
-    MOJO_RELOAD=1
+  MOJO_RELOAD=1
 
 =head2 C<MOJO_REVERSE_PROXY>
 
 Enable reverse proxy support for L<Mojolicious> application.
 
-    MOJO_REVERSE_PROXY=1
+  MOJO_REVERSE_PROXY=1
 
 =head2 C<MOJO_STATIC_CLASS>
 
 Class the L<Mojolicious> static file dispatcher should use to find C<DATA>
 templates, defaults to C<main>.
 
-    MOJO_STATIC_CLASS=MyApp
-
-=head2 C<MOJO_TEMPLATE_CACHE>
-
-Number of compiled templates to cache in memory, defaults to C<100>.
-
-    MOJO_TEMPLATE_CACHE=20
+  MOJO_STATIC_CLASS=MyApp
 
 =head2 C<MOJO_TEMPLATE_CLASS>
 
 Class the L<Mojolicious> renderer should use to find C<DATA> templates,
 defaults to C<main>.
 
-    MOJO_TEMPLATE_CLASS=MyApp
+  MOJO_TEMPLATE_CLASS=MyApp
 
 =head2 C<MOJO_TMPDIR>
 
 Directory for temporary files like huge uploads, by default a random platform
 specific temporary directory will be used.
 
-    MOJO_TMPDIR=/tmp/mojo
+  MOJO_TMPDIR=/tmp/mojo
+
+=head1 MORE
+
+You can continue with L<Mojolicious::Guides> now or take a look at the
+Mojolicious wiki L<http://github.com/kraih/mojo/wiki>, which contains a lot
+more documentation and examples by many different authors.
 
 =cut

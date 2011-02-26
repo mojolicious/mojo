@@ -1,12 +1,8 @@
 package Mojolicious::Plugin;
+use Mojo::Base -base;
 
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
-
-# This is Fry's decision.
-# And he made it wrong, so it's time for us to interfere in his life.
+# "This is Fry's decision.
+#  And he made it wrong, so it's time for us to interfere in his life."
 sub register { }
 
 1;
@@ -18,11 +14,12 @@ Mojolicious::Plugin - Plugin Base Class
 
 =head1 SYNOPSIS
 
-    use base 'Mojolicious::Plugin';
+  use Mojo::Base 'Mojolicious::Plugin';
 
 =head1 DESCRIPTION
 
 L<Mojolicous::Plugin> is an abstract base class for L<Mojolicious> plugins.
+
 See L<Mojolicious::Plugins> for more information.
 
 =head1 METHODS
@@ -32,7 +29,7 @@ the following new ones.
 
 =head2 C<register>
 
-    $plugin->register;
+  $plugin->register;
     
 This method will be called by L<Mojolicious::Plugins> at startup time,
 your plugin should use this to hook into the application.
@@ -41,6 +38,6 @@ C<add_hooks> method of L<Mojolicious::Plugins> to hook into the request flow.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
 
 =cut

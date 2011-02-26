@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 
-# Disable epoll and kqueue
-BEGIN { $ENV{MOJO_POLL} = 1 }
+# Disable IPv6, epoll and kqueue
+BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
 use Test::More;
 
@@ -22,9 +22,9 @@ plan skip_all => 'set TEST_APACHE to enable this test (developer only!)'
   unless $ENV{TEST_APACHE};
 plan tests => 8;
 
-# I'm not a robot!
-# I don't like having discs crammed into me, unless they're Oreos.
-# And then, only in the mouth.
+# "I'm not a robot!
+#  I don't like having discs crammed into me, unless they're Oreos.
+#  And then, only in the mouth."
 use_ok 'Mojo::Server::CGI';
 
 # Apache setup
@@ -38,6 +38,7 @@ $mt->render_to_file(<<'EOF', $config, $dir, $port);
 % use File::Spec::Functions 'catfile';
 ServerName 127.0.0.1
 Listen <%= $port %>
+DocumentRoot  <%= $dir %>
 
 LoadModule log_config_module libexec/apache2/mod_log_config.so
 
@@ -48,8 +49,6 @@ LoadModule cgi_module libexec/apache2/mod_cgi.so
 
 PidFile <%= catfile $dir, 'httpd.pid' %>
 LockFile <%= catfile $dir, 'accept.lock' %>
-
-DocumentRoot  <%= $dir %>
 
 ScriptAlias /cgi-bin <%= $dir %>
 EOF
@@ -78,20 +77,20 @@ ok -x $cgi, 'script is executable';
 my $pid = open my $server, '-|', '/usr/sbin/httpd', '-X', '-f', $config;
 sleep 1
   while !IO::Socket::INET->new(
-    Proto    => 'tcp',
-    PeerAddr => 'localhost',
-    PeerPort => $port
+  Proto    => 'tcp',
+  PeerAddr => 'localhost',
+  PeerPort => $port
   );
 
 # Request
 my $client = Mojo::Client->new;
 my ($code, $body);
 $client->get(
-    "http://127.0.0.1:$port/cgi-bin/test.cgi" => sub {
-        my $self = shift;
-        $code = $self->res->code;
-        $body = $self->res->body;
-    }
+  "http://127.0.0.1:$port/cgi-bin/test.cgi" => sub {
+    my $self = shift;
+    $code = $self->res->code;
+    $body = $self->res->body;
+  }
 )->start;
 is $code,   200,      'right status';
 like $body, qr/Mojo/, 'right content';
@@ -103,12 +102,12 @@ my $result = '';
 for my $key (sort keys %$params) { $result .= $params->{$key} }
 ($code, $body) = undef;
 $client->post_form(
-    "http://127.0.0.1:$port/cgi-bin/test.cgi/diag/chunked_params" =>
-      $params => sub {
-        my $self = shift;
-        $code = $self->res->code;
-        $body = $self->res->body;
-    }
+  "http://127.0.0.1:$port/cgi-bin/test.cgi/diag/chunked_params" => $params =>
+    sub {
+    my $self = shift;
+    $code = $self->res->code;
+    $body = $self->res->body;
+  }
 )->start;
 is $code, 200, 'right status';
 is $body, $result, 'right content';
@@ -116,12 +115,12 @@ is $body, $result, 'right content';
 # Upload
 ($code, $body) = undef;
 $client->post_form(
-    "http://127.0.0.1:$port/cgi-bin/test.cgi/diag/upload" =>
-      {file => {content => $result}} => sub {
-        my $self = shift;
-        $code = $self->res->code;
-        $body = $self->res->body;
-    }
+  "http://127.0.0.1:$port/cgi-bin/test.cgi/diag/upload" =>
+    {file => {content => $result}} => sub {
+    my $self = shift;
+    $code = $self->res->code;
+    $body = $self->res->body;
+  }
 )->start;
 is $code, 200, 'right status';
 is $body, $result, 'right content';
@@ -130,7 +129,7 @@ is $body, $result, 'right content';
 kill 'INT', $pid;
 sleep 1
   while IO::Socket::INET->new(
-    Proto    => 'tcp',
-    PeerAddr => 'localhost',
-    PeerPort => $port
+  Proto    => 'tcp',
+  PeerAddr => 'localhost',
+  PeerPort => $port
   );

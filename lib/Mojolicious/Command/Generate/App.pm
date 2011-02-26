@@ -1,58 +1,56 @@
 package Mojolicious::Command::Generate::App;
+use Mojo::Base 'Mojo::Command';
 
-use strict;
-use warnings;
-
-use base 'Mojo::Command';
-
-__PACKAGE__->attr(description => <<'EOF');
+has description => <<'EOF';
 Generate application directory structure.
 EOF
-__PACKAGE__->attr(usage => <<"EOF");
+has usage => <<"EOF";
 usage: $0 generate app [NAME]
 EOF
 
-# Why can't she just drink herself happy like a normal person?
+# "Why can't she just drink herself happy like a normal person?"
 sub run {
-    my ($self, $class) = @_;
-    $class ||= 'MyMojoliciousApp';
+  my ($self, $class) = @_;
+  $class ||= 'MyMojoliciousApp';
 
-    my $name = $self->class_to_file($class);
+  # Prevent bad applications
+  die <<EOF unless $class =~ /^[A-Z](?:\w|\:\:)+$/;
+Your application name has to be a well formed (camel case) Perl module name
+like "MyApp".
+EOF
 
-    # Script
-    $self->render_to_rel_file('mojo', "$name/script/$name", $class);
-    $self->chmod_file("$name/script/$name", 0744);
+  my $name = $self->class_to_file($class);
 
-    # Appclass
-    my $app = $self->class_to_path($class);
-    $self->render_to_rel_file('appclass', "$name/lib/$app", $class);
+  # Script
+  $self->render_to_rel_file('mojo', "$name/script/$name", $class);
+  $self->chmod_file("$name/script/$name", 0744);
 
-    # Controller
-    my $controller = "${class}::Example";
-    my $path       = $self->class_to_path($controller);
-    $self->render_to_rel_file('controller', "$name/lib/$path", $controller);
+  # Appclass
+  my $app = $self->class_to_path($class);
+  $self->render_to_rel_file('appclass', "$name/lib/$app", $class);
 
-    # Test
-    $self->render_to_rel_file('test', "$name/t/basic.t", $class);
+  # Controller
+  my $controller = "${class}::Example";
+  my $path       = $self->class_to_path($controller);
+  $self->render_to_rel_file('controller', "$name/lib/$path", $controller);
 
-    # Log
-    $self->create_rel_dir("$name/log");
+  # Test
+  $self->render_to_rel_file('test', "$name/t/basic.t", $class);
 
-    # Static
-    $self->render_to_rel_file('static', "$name/public/index.html");
+  # Log
+  $self->create_rel_dir("$name/log");
 
-    # Layout and Templates
-    $self->renderer->line_start('%%');
-    $self->renderer->tag_start('<%%');
-    $self->renderer->tag_end('%%>');
-    $self->render_to_rel_file('not_found',
-        "$name/templates/not_found.html.ep");
-    $self->render_to_rel_file('exception',
-        "$name/templates/exception.html.ep");
-    $self->render_to_rel_file('layout',
-        "$name/templates/layouts/default.html.ep");
-    $self->render_to_rel_file('welcome',
-        "$name/templates/example/welcome.html.ep");
+  # Static
+  $self->render_to_rel_file('static', "$name/public/index.html");
+
+  # Layout and Templates
+  $self->renderer->line_start('%%');
+  $self->renderer->tag_start('<%%');
+  $self->renderer->tag_end('%%>');
+  $self->render_to_rel_file('layout',
+    "$name/templates/layouts/default.html.ep");
+  $self->render_to_rel_file('welcome',
+    "$name/templates/example/welcome.html.ep");
 }
 
 1;
@@ -74,7 +72,7 @@ use lib join '/', File::Spec->splitdir(dirname(__FILE__)), '..', 'lib';
 eval 'use Mojolicious::Commands';
 die <<EOF if $@;
 It looks like you don't have the Mojolicious Framework installed.
-Please visit http://mojolicious.org for detailed installation instructions.
+Please visit http://mojolicio.us for detailed installation instructions.
 
 EOF
 
@@ -86,50 +84,45 @@ Mojolicious::Commands->start;
 @@ appclass
 % my $class = shift;
 package <%= $class %>;
-
-use strict;
-use warnings;
-
-use base 'Mojolicious';
+use Mojo::Base 'Mojolicious';
 
 # This method will run once at server start
 sub startup {
-    my $self = shift;
+  my $self = shift;
 
-    # Routes
-    my $r = $self->routes;
+  # Documentation browser under "/perldoc" (this plugin requires Perl 5.10)
+  $self->plugin('pod_renderer');
 
-    # Default route
-    $r->route('/:controller/:action/:id')->to('example#welcome', id => 1);
+  # Routes
+  my $r = $self->routes;
+
+  # Normal route to controller
+  $r->route('/welcome')->to('example#welcome');
 }
 
 1;
 @@ controller
 % my $class = shift;
 package <%= $class %>;
-
-use strict;
-use warnings;
-
-use base 'Mojolicious::Controller';
+use Mojo::Base 'Mojolicious::Controller';
 
 # This action will render a template
 sub welcome {
-    my $self = shift;
+  my $self = shift;
 
-    # Render template "example/welcome.html.ep" with message
-    $self->render(message => 'Welcome to the Mojolicious Web Framework!');
+  # Render template "example/welcome.html.ep" with message
+  $self->render(message => 'Welcome to the Mojolicious Web Framework!');
 }
 
 1;
 @@ static
 <!doctype html><html>
-    <head><title>Welcome to the Mojolicious Web Framework!</title></head>
-    <body>
-        <h2>Welcome to the Mojolicious Web Framework!</h2>
-        This is the static document "public/index.html",
-        <a href="/">click here</a> to get back to the start.
-    </body>
+  <head><title>Welcome to the Mojolicious Web Framework!</title></head>
+  <body>
+    <h2>Welcome to the Mojolicious Web Framework!</h2>
+    This is the static document "public/index.html",
+    <a href="/welcome">click here</a> to get back to the start.
+  </body>
 </html>
 @@ test
 % my $class = shift;
@@ -145,68 +138,17 @@ use_ok('<%= $class %>');
 
 # Test
 my $t = Test::Mojo->new(app => '<%= $class %>');
-$t->get_ok('/')->status_is(200)->content_type_is('text/html')
+$t->get_ok('/welcome')->status_is(200)
+  ->content_type_is('text/html;charset=UTF-8')
   ->content_like(qr/Mojolicious Web Framework/i);
-@@ not_found
-<!doctype html><html>
-    <head><title>Not Found</title></head>
-    <body>
-        The page you were requesting
-        "<%= $self->req->url->path || '/' %>"
-        could not be found.
-    </body>
-</html>
-@@ exception
-% my $e = delete $self->stash->{'exception'};
-<!doctype html><html>
-    <head>
-	    <title>Exception</title>
-	    <style type="text/css">
-	        body {
-		        font: 0.9em Verdana, "Bitstream Vera Sans", sans-serif;
-	        }
-	        .snippet {
-                font: 115% Monaco, "Courier New", monospace;
-	        }
-	    </style>
-    </head>
-    <body>
-        <% if ($self->app->mode eq 'development') { %>
-	        <div>
-                This page was generated from the template
-                "templates/exception.html.ep".
-            </div>
-            <div class="snippet"><pre><%= $e->message %></pre></div>
-            <div>
-                <% for my $line (@{$e->lines_before}) { %>
-                    <div class="snippet">
-                        <%= $line->[0] %>: <%= $line->[1] %>
-                    </div>
-                <% } %>
-                <% if ($e->line->[0]) { %>
-                    <div class="snippet">
-	                    <b><%= $e->line->[0] %>: <%= $e->line->[1] %></b>
-	                </div>
-                <% } %>
-                <% for my $line (@{$e->lines_after}) { %>
-                    <div class="snippet">
-                        <%= $line->[0] %>: <%= $line->[1] %>
-                    </div>
-                <% } %>
-            </div>
-            <div class="snippet"><pre><%= dumper $self->stash %></pre></div>
-        <% } else { %>
-            <div>Page temporarily unavailable, please come back later.</div>
-        <% } %>
-    </body>
-</html>
 @@ layout
 <!doctype html><html>
-    <head><title>Welcome</title></head>
-    <body><%== content %></body>
+  <head><title><%= title %></title></head>
+  <body><%= content %></body>
 </html>
 @@ welcome
 % layout 'default';
+% title 'Welcome';
 <h2><%= $message %></h2>
 This page was generated from the template
 "templates/example/welcome.html.ep" and the layout
@@ -222,10 +164,10 @@ Mojolicious::Command::Generate::App - App Generator Command
 
 =head1 SYNOPSIS
 
-    use Mojolicious::Command::Generate::App;
+  use Mojolicious::Command::Generate::App;
 
-    my $app = Mojolicious::Command::Generate::App->new;
-    $app->run(@ARGV);
+  my $app = Mojolicious::Command::Generate::App->new;
+  $app->run(@ARGV);
 
 =head1 DESCRIPTION
 
@@ -238,15 +180,15 @@ L<Mojo::Command> and implements the following new ones.
 
 =head2 C<description>
 
-    my $description = $app->description;
-    $app            = $app->description('Foo!');
+  my $description = $app->description;
+  $app            = $app->description('Foo!');
 
 Short description of this command, used for the command list.
 
 =head2 C<usage>
 
-    my $usage = $app->usage;
-    $app      = $app->usage('Foo!');
+  my $usage = $app->usage;
+  $app      = $app->usage('Foo!');
 
 Usage information for this command, used for the help screen.
 
@@ -257,12 +199,12 @@ L<Mojo::Command> and implements the following new ones.
 
 =head2 C<run>
 
-    $app->run(@ARGV);
+  $app->run(@ARGV);
 
 Run this command.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
 
 =cut

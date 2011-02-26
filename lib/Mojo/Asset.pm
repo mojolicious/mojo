@@ -1,16 +1,12 @@
 package Mojo::Asset;
-
-use strict;
-use warnings;
-
-use base 'Mojo::Base';
+use Mojo::Base -base;
 
 use Carp 'croak';
 
-__PACKAGE__->attr('end_range');
-__PACKAGE__->attr(start_range => 0);
+has 'end_range';
+has start_range => 0;
 
-# Marge, it takes two to lie. One to lie and one to listen.
+# "Marge, it takes two to lie. One to lie and one to listen."
 sub add_chunk { croak 'Method "add_chunk" not implemented by subclass' }
 sub contains  { croak 'Method "contains" not implemented by subclass' }
 sub get_chunk { croak 'Method "get_chunk" not implemented by subclass' }
@@ -27,7 +23,7 @@ Mojo::Asset - Asset Base Class
 
 =head1 SYNOPSIS
 
-    use base 'Mojo::Asset';
+  use Mojo::Base 'Mojo::Asset';
 
 =head1 DESCRIPTION
 
@@ -39,15 +35,15 @@ L<Mojo::Asset> implements the following attributes.
 
 =head2 C<end_range>
 
-    my $end = $asset->end_range;
-    $asset  = $asset->end_range(8);
+  my $end = $asset->end_range;
+  $asset  = $asset->end_range(8);
 
 Pretend file ends earlier.
 
 =head2 C<start_range>
 
-    my $start = $asset->start_range;
-    $asset    = $asset->start_range(0);
+  my $start = $asset->start_range;
+  $asset    = $asset->start_range(0);
 
 Pretend file starts later.
 
@@ -58,42 +54,42 @@ following new ones.
 
 =head2 C<add_chunk>
 
-    $asset = $asset->add_chunk('foo bar baz');
+  $asset = $asset->add_chunk('foo bar baz');
 
 Add chunk of data to asset.
 
 =head2 C<contains>
 
-    my $position = $asset->contains('bar');
+  my $position = $asset->contains('bar');
 
 Check if asset contains a specific string.
 
 =head2 C<get_chunk>
 
-    my $chunk = $asset->get_chunk($offset);
+  my $chunk = $asset->get_chunk($offset);
 
 Get chunk of data starting from a specific position.
 
 =head2 C<move_to>
 
-    $asset = $asset->move_to('/foo/bar/baz.txt');
+  $asset = $asset->move_to('/foo/bar/baz.txt');
 
 Move asset data into a specific file.
 
 =head2 C<size>
 
-    my $size = $asset->size;
+  my $size = $asset->size;
 
 Size of asset data in bytes.
 
 =head2 C<slurp>
 
-    my $string = $file->slurp;
+  my $string = $file->slurp;
 
 Read all asset data at once.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
 
 =cut

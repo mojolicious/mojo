@@ -3,11 +3,11 @@
 use strict;
 use warnings;
 
-use Test::More tests => 97;
+use Test::More tests => 106;
 
 use Mojo::ByteStream 'b';
 
-# We should be safe up here. I'm pretty sure fires can't climb trees.
+# "We should be safe up here. I'm pretty sure fires can't climb trees."
 use_ok 'Mojo::JSON';
 
 my $json = Mojo::JSON->new;
@@ -23,8 +23,10 @@ $array = $json->decode('[0]');
 is_deeply $array, [0], 'decode [0]';
 $array = $json->decode('[1]');
 is_deeply $array, [1], 'decode [1]';
-$array = $json->decode('[ -122.026020 ]');
+$array = $json->decode('[ "-122.026020" ]');
 is_deeply $array, ['-122.026020'], 'decode [ -122.026020 ]';
+$array = $json->decode('[ -122.026020 ]');
+is_deeply $array, ['-122.02602'], 'decode [ -122.026020 ]';
 $array = $json->decode('[0.0]');
 isa_ok $array, 'ARRAY', 'decode [0.0]';
 cmp_ok $array->[0], '==', 0, 'value is 0';
@@ -33,8 +35,10 @@ isa_ok $array, 'ARRAY', 'decode [0e0]';
 cmp_ok $array->[0], '==', 0, 'value is 0';
 $array = $json->decode('[1,-2]');
 is_deeply $array, [1, -2], 'decode [1,-2]';
+$array = $json->decode('["10e12" , [2 ]]');
+is_deeply $array, ['10e12', [2]], 'decode ["10e12" , [2 ]]';
 $array = $json->decode('[10e12 , [2 ]]');
-is_deeply $array, ['10e12', [2]], 'decode [10e12 , [2 ]]';
+is_deeply $array, [10000000000000, [2]], 'decode [10e12 , [2 ]]';
 $array = $json->decode('[37.7668 , [ 20 ]] ');
 is_deeply $array, [37.7668, [20]], 'decode [37.7668 , [ 20 ]] ';
 $array = $json->decode('[1e3]');
@@ -150,12 +154,18 @@ is $string, '[true,false]', 'encode [$json->true, $json->false]';
 # Encode number
 $string = $json->encode([1]);
 is $string, '[1]', 'encode [1]';
+$string = $json->encode(["1"]);
+is $string, '["1"]', 'encode ["1"]';
 $string = $json->encode(['-122.026020']);
-is $string, '[-122.026020]', 'encode [\'-122.026020\']';
+is $string, '["-122.026020"]', 'encode [\'-122.026020\']';
+$string = $json->encode([-122.026020]);
+is $string, '[-122.02602]', 'encode [-122.026020]';
 $string = $json->encode([1, -2]);
 is $string, '[1,-2]', 'encode [1, -2]';
 $string = $json->encode(['10e12', [2]]);
-is $string, '[10e12,[2]]', 'encode [\'10e12\', [2]]';
+is $string, '["10e12",[2]]', 'encode [\'10e12\', [2]]';
+$string = $json->encode([10e12, [2]]);
+is $string, '[10000000000000,[2]]', 'encode [10e12, [2]]';
 $string = $json->encode([37.7668, [20]]);
 is $string, '[37.7668,[20]]', 'encode [37.7668, [20]]';
 
@@ -175,17 +185,9 @@ is_deeply $array, ["\x{10346}"], 'decode \x{feff}[\"\\ud800\\udf46\"]';
 
 # Decode UTF-16LE with faihu surrogate pair and BOM value
 $array = $json->decode(
-    b("\x{feff}[\"\\ud800\\udf46\x{feff}\"]")->encode('UTF-16LE'));
+  b("\x{feff}[\"\\ud800\\udf46\x{feff}\"]")->encode('UTF-16LE'));
 is_deeply $array, ["\x{10346}\x{feff}"],
   'decode \x{feff}[\"\\ud800\\udf46\x{feff}\"]';
-
-# Decode UTF-16LE with missing high surrogate
-$array = $json->decode(b("\x{feff}[\"\\ud800\"]")->encode('UTF-16LE'));
-is_deeply $array, ['\ud800'], 'decode \x{feff}[\"\\ud800\"]';
-
-# Decode UTF-16LE with missing low surrogate
-$array = $json->decode(b("\x{feff}[\"\\udf46\"]")->encode('UTF-16LE'));
-is_deeply $array, ['\udf46'], 'decode \x{feff}[\"\\udf46\"]';
 
 # Decode UTF-16BE with faihu surrogate pair
 $array = $json->decode(b("\x{feff}[\"\\ud800\\udf46\"]")->encode('UTF-16BE'));
@@ -238,23 +240,44 @@ is_deeply $hash, {foo => 'c:\progra~1\mozill~1\firefox.exe'},
   'successful roundtrip';
 
 # Errors
+is $json->decode(b("\x{feff}[\"\\ud800\"]")->encode('UTF-16LE')), undef,
+  'missing high surrogate';
+is $json->error,
+  'Malformed JSON: Missing low-surrogate at character offset 8.',
+  'right error';
+is $json->decode(b("\x{feff}[\"\\udf46\"]")->encode('UTF-16LE')), undef,
+  'missing low surrogate';
+is $json->error,
+  'Malformed JSON: Missing high-surrogate at character offset 8.',
+  'right error';
 is $json->decode('[[]'), undef, 'missing right square bracket';
-is $json->error, 'Missing right square bracket near end of file.',
-  'right error';
+is $json->error,
+  'Malformed JSON: Expected comma or right square bracket while'
+  . ' parsing array at character offset 3.', 'right error';
 is $json->decode('{{}'), undef, 'missing right curly bracket';
-is $json->error, 'Missing right curly bracket near end of file.',
-  'right error';
+is $json->error,
+  'Malformed JSON: Expected string while'
+  . ' parsing object at character offset 1.', 'right error';
 is $json->decode('[[]...'), undef, 'syntax error';
-is $json->error, 'Syntax error near "...".', 'right error';
+is $json->error,
+  'Malformed JSON: Expected comma or right square bracket while'
+  . ' parsing array at character offset 3.', 'right error';
 is $json->decode('{{}...'), undef, 'syntax error';
-is $json->error, 'Syntax error near "...".', 'right error';
+is $json->error, 'Malformed JSON: Expected string while'
+  . ' parsing object at character offset 1.', 'right error';
 is $json->decode('[nan]'), undef, 'syntax error';
-is $json->error, 'Syntax error near "nan]".', 'right error';
+is $json->error, 'Malformed JSON: Expected string, array, object, number,'
+  . ' boolean or null at character offset 1.', 'right error';
 is $json->decode('["foo]'), undef, 'syntax error';
-is $json->error, 'Syntax error near ""foo]".', 'right error';
+is $json->error, 'Malformed JSON: Unterminated string at character offset 6.',
+  'right error';
+is $json->decode('["foo"]lala'), undef, 'syntax error';
+is $json->error,
+  'Malformed JSON: Unexpected data after array at character offset 7.',
+  'right error';
 is $json->decode('false'), undef, 'no object or array';
-is $json->error, 'JSON text has to be a serialized object or array.',
+is $json->error,
+  'Malformed JSON: Expected array or object at character offset 0.',
   'right error';
 is $json->decode(''), undef, 'no object or array';
-is $json->error, 'JSON text has to be a serialized object or array.',
-  'right error';
+is $json->error, 'Missing or empty input.', 'right error';

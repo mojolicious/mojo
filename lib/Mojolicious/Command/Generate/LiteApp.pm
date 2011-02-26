@@ -1,28 +1,24 @@
 package Mojolicious::Command::Generate::LiteApp;
+use Mojo::Base 'Mojo::Command';
 
-use strict;
-use warnings;
-
-use base 'Mojo::Command';
-
-__PACKAGE__->attr(description => <<'EOF');
+has description => <<'EOF';
 Generate a minimalistic web application.
 EOF
-__PACKAGE__->attr(usage => <<"EOF");
+has usage => <<"EOF";
 usage: $0 generate lite_app [NAME]
 EOF
 
-# If for any reason you're not completely satisfied, I hate you.
+# "If for any reason you're not completely satisfied, I hate you."
 sub run {
-    my ($self, $name) = @_;
-    $name ||= 'myapp.pl';
+  my ($self, $name) = @_;
+  $name ||= 'myapp.pl';
 
-    # App
-    $self->renderer->line_start('%%');
-    $self->renderer->tag_start('<%%');
-    $self->renderer->tag_end('%%>');
-    $self->render_to_rel_file('liteapp', $name);
-    $self->chmod_file($name, 0744);
+  # App
+  $self->renderer->line_start('%%');
+  $self->renderer->tag_start('<%%');
+  $self->renderer->tag_end('%%>');
+  $self->render_to_rel_file('liteapp', $name);
+  $self->chmod_file($name, 0744);
 }
 
 1;
@@ -33,24 +29,26 @@ __DATA__
 
 use Mojolicious::Lite;
 
-get '/' => 'index';
+# Documentation browser under "/perldoc" (this plugin requires Perl 5.10)
+plugin 'pod_renderer';
 
-get '/:groovy' => sub {
-    my $self = shift;
-    $self->render(text => $self->param('groovy'), layout => 'funky');
+get '/welcome' => sub {
+  my $self = shift;
+  $self->render('index');
 };
 
 app->start;
 <%%= '__DATA__' %%>
 
 <%%= '@@ index.html.ep' %%>
-% layout 'funky';
-Yea baby!
+% layout 'default';
+% title 'Welcome';
+Welcome to Mojolicious!
 
-<%%= '@@ layouts/funky.html.ep' %%>
+<%%= '@@ layouts/default.html.ep' %%>
 <!doctype html><html>
-    <head><title>Funky!</title></head>
-    <body><%== content %></body>
+  <head><title><%= title %></title></head>
+  <body><%= content %></body>
 </html>
 __END__
 =head1 NAME
@@ -59,10 +57,10 @@ Mojolicious::Command::Generate::LiteApp - Lite App Generator Command
 
 =head1 SYNOPSIS
 
-    use Mojolicious::Command::Generate::LiteApp;
+  use Mojolicious::Command::Generate::LiteApp;
 
-    my $app = Mojolicious::Command::Generate::LiteApp->new;
-    $app->run(@ARGV);
+  my $app = Mojolicious::Command::Generate::LiteApp->new;
+  $app->run(@ARGV);
 
 =head1 DESCRIPTION
 
@@ -75,15 +73,15 @@ L<Mojo::Command> and implements the following new ones.
 
 =head2 C<description>
 
-    my $description = $app->description;
-    $app            = $app->description('Foo!');
+  my $description = $app->description;
+  $app            = $app->description('Foo!');
 
 Short description of this command, used for the command list.
 
 =head2 C<usage>
 
-    my $usage = $app->usage;
-    $app      = $app->usage('Foo!');
+  my $usage = $app->usage;
+  $app      = $app->usage('Foo!');
 
 Usage information for this command, used for the help screen.
 
@@ -94,12 +92,12 @@ L<Mojo::Command> and implements the following new ones.
 
 =head2 C<run>
 
-    $app->run(@ARGV);
+  $app->run(@ARGV);
 
 Run this command.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
 
 =cut

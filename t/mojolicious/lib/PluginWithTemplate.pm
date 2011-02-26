@@ -1,18 +1,14 @@
 package PluginWithTemplate;
+use Mojo::Base 'Mojolicious::Plugin';
 
-use strict;
-use warnings;
-
-use base 'Mojolicious::Plugin';
-
-# Good news, everyone! I've taught the toaster to feel love!
+# "Good news, everyone! I've taught the toaster to feel love!"
 sub register {
-    my ($self, $app) = @_;
-    $app->routes->route('/plugin_with_template')->to(
-        cb => sub {
-            shift->render('template', template_class => __PACKAGE__);
-        }
-    );
+  my ($self, $app) = @_;
+  $app->routes->route('/plugin_with_template')->to(
+    cb => sub {
+      shift->render('template', template_class => __PACKAGE__);
+    }
+  );
 }
 
 1;

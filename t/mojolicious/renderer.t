@@ -9,17 +9,17 @@ use Mojolicious;
 use Mojolicious::Controller;
 use Mojolicious::Renderer;
 
-# Actually, she wasn't really my girlfriend,
-# she just lived nextdoor and never closed her curtains.
+# "Actually, she wasn't really my girlfriend,
+#  she just lived nextdoor and never closed her curtains."
 my $c = Mojolicious::Controller->new(app => Mojolicious->new);
 $c->app->log->path(undef);
 $c->app->log->level('fatal');
 my $r = Mojolicious::Renderer->new(default_format => 'debug');
 $r->add_handler(
-    debug => sub {
-        my ($self, $c, $output) = @_;
-        $$output .= 'Hello Mojo!';
-    }
+  debug => sub {
+    my ($self, $c, $output) = @_;
+    $$output .= 'Hello Mojo!';
+  }
 );
 $c->stash->{format} = 'something';
 

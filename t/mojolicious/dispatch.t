@@ -1,35 +1,27 @@
 #!/usr/bin/env perl
 
 package Test::Foo;
-
-use strict;
-use warnings;
-
-use base 'Mojolicious::Controller';
+use Mojo::Base 'Mojolicious::Controller';
 
 sub bar  {1}
 sub home {1}
 
 package Test::Controller;
+use Mojo::Base 'Mojolicious::Controller';
 
-use strict;
-use warnings;
-
-use base 'Mojolicious::Controller';
-
-__PACKAGE__->attr('render_called');
+has 'render_called';
 
 sub render { shift->render_called(1) }
 
 sub reset_state {
-    my $self = shift;
-    $self->render_called(0);
-    my $stash = $self->stash;
-    delete $stash->{$_} for keys %$stash;
+  my $self = shift;
+  $self->render_called(0);
+  my $stash = $self->stash;
+  delete $stash->{$_} for keys %$stash;
 }
 
-# I was all of history's greatest acting robots -- Acting Unit 0.8,
-# Thespomat, David Duchovny!
+# "I was all of history's greatest acting robots -- Acting Unit 0.8,
+#  Thespomat, David Duchovny!"
 package main;
 
 use strict;

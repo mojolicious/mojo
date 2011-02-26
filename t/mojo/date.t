@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More tests => 10;
 
-# Can't we have one meeting that doesn't end with digging up a corpse?
+# "Can't we have one meeting that doesn't end with digging up a corpse?"
 use_ok 'Mojo::Date';
 
 # RFC822/1123

@@ -6,9 +6,9 @@ use strict;
 use warnings;
 
 sub import {
-    my $caller = caller;
-    no strict 'refs';
-    *{$caller . '::foo'} = sub {'works!'};
+  my $caller = caller;
+  no strict 'refs';
+  *{$caller . '::foo'} = sub {'works!'};
 }
 
 package MyTemplateException;
@@ -23,14 +23,14 @@ package main;
 use strict;
 use warnings;
 
-use Test::More tests => 114;
+use Test::More tests => 137;
 
 use File::Spec;
 use File::Temp;
 use FindBin;
 
-# When I held that gun in my hand, I felt a surge of power...
-# like God must feel when he's holding a gun.
+# "When I held that gun in my hand, I felt a surge of power...
+#  like God must feel when he's holding a gun."
 use_ok 'Mojo::Template';
 
 # Trim line
@@ -65,17 +65,17 @@ is $output, 'test', 'multiple empty lines trimmed';
 
 # Trim expression tags
 $mt     = Mojo::Template->new;
-$output = $mt->render('    <%= block begin =%><html><% end =%>    ');
+$output = $mt->render('    <%= capture begin =%><html><% end =%>    ');
 is $output, '<html>', 'expression tags trimmed';
 
 # Trim expression tags (relaxed expression end)
 $mt     = Mojo::Template->new;
-$output = $mt->render('    <%= block begin =%><html><%= end =%>    ');
+$output = $mt->render('    <%= capture begin =%><html><%= end =%>    ');
 is $output, '<html>', 'expression tags trimmed';
 
 # Trim expression tags (relaxed escaped expression end)
 $mt     = Mojo::Template->new;
-$output = $mt->render('    <%= block begin =%><html><%== end =%>    ');
+$output = $mt->render('    <%= capture begin =%><html><%== end =%>    ');
 is $output, '<html>', 'expression tags trimmed';
 
 # Recursive block
@@ -180,7 +180,7 @@ is $output, "&lt;html&gt;\n\n", 'escaped expression block';
 # Captured escaped expression block (extra whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<%== my $result = block begin  =%>
+<%== my $result = capture begin  =%>
 <html>
 <%  end =%>
 <%= $result =%>
@@ -190,7 +190,7 @@ is $output, '&lt;html&gt;<html>', 'captured escaped expression block';
 # Captured escaped expression block (perl lines and extra whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-%== my $result = block  begin
+%== my $result = capture  begin
 <html>
 %  end
 <%= $result =%>
@@ -205,7 +205,7 @@ EOF
 # Captured escaped expression block (indented perl lines and extra whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-%== my $result = block  begin
+%== my $result = capture  begin
 <html>
  %  end
 <%= $result =%>
@@ -220,7 +220,7 @@ EOF
 # Capture lines (extra whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = escape block begin                  %>
+<% my $result = escape capture begin                  %>
 <html>
 <%                        end %>
 %= $result
@@ -230,36 +230,36 @@ is $output, "\n\n&lt;html&gt;\n\n", 'captured lines';
 # Capture tags
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = escape block begin %><html><% end %><%= $result %>
+<% my $result = escape capture begin %><html><% end %><%= $result %>
 EOF
 is $output, "&lt;html&gt;\n", 'capture tags';
 
 # Capture tags (alternative)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = escape block begin %><html><% end %><%= $result %>
+<% my $result = escape capture begin %><html><% end %><%= $result %>
 EOF
 is $output, "&lt;html&gt;\n", 'capture tags';
 
 # Capture tags with appended code
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = escape( block begin %><html><% end ); %><%= $result %>
+<% my $result = escape( capture begin %><html><% end ); %><%= $result %>
 EOF
 is $output, "&lt;html&gt;\n", 'capture tags with appended code';
 
 # Capture tags with appended code (alternative)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = escape( block begin %><html><% end ); %><%= $result %>
+<% my $result = escape( capture begin %><html><% end ); %><%= $result %>
 EOF
 is $output, "&lt;html&gt;\n", 'capture tags with appended code';
 
 # Nested capture tags
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = block
-  begin %><%= escape block begin %><html><% end
+<% my $result = capture
+  begin %><%= escape capture begin %><html><% end
   %><% end %><%= $result %>
 EOF
 is $output, "&lt;html&gt;\n", 'nested capture tags';
@@ -267,8 +267,8 @@ is $output, "&lt;html&gt;\n", 'nested capture tags';
 # Nested capture tags (alternative)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-<% my $result = block begin =%>
-    <%= escape block begin =%>
+<% my $result = capture begin =%>
+    <%= escape capture begin =%>
         <html>
     <% end =%>
 <% end =%>
@@ -449,7 +449,7 @@ EOF
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 % my $i = 2;
-<%= block begin %>
+<%= capture begin %>
     <%= $i++ %>
 <% end for 1 .. 3; %>
 EOF
@@ -467,7 +467,7 @@ EOF
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 % my $i = 2;
-%= block begin
+%= capture begin
     <%= $i++ =%>
 % end for 1 .. 3;
 EOF
@@ -477,7 +477,7 @@ is $output, '234', 'block loop';
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
   % my $i = 2;
- %= block begin
+ %= capture begin
     %= $i++
    % end for 1 .. 3;
 EOF
@@ -498,13 +498,31 @@ $output = $mt->render(<<'EOF');
 %= __PACKAGE__
 %= foo
 EOF
-is $output, "Mojo::Template\nworks!\n", 'right result';
+is $output, "Mojo::Template::Context\nworks!\n", 'right result';
 $output = $mt->render(<<'EOF');
 % BEGIN { MyTemplateExporter->import }
 %= __PACKAGE__
 %= foo
 EOF
-is $output, "Mojo::Template\nworks!\n", 'right result';
+is $output, "Mojo::Template::Context\nworks!\n", 'right result';
+
+# Unusable error message (stacktrace required)
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+test
+123
+% die "x\n";
+test
+EOF
+is ref $output, 'Mojo::Exception', 'right exception';
+is $output->message, "x\n", 'right message';
+is $output->lines_before->[0]->[0], 1,      'right number';
+is $output->lines_before->[0]->[1], 'test', 'right line';
+is $output->lines_before->[1]->[0], 2,      'right number';
+is $output->lines_before->[1]->[1], '123',  'right line';
+is $output->line->[0], 3, 'right number';
+is $output->line->[1], '% die "x\n";', 'right line';
+like "$output", qr/^x/, 'right result';
 
 # Compile time exception
 $mt     = Mojo::Template->new;
@@ -519,13 +537,18 @@ is ref $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/^Missing right curly or square bracket/,
   'right message';
 like $output->message, qr/syntax error at template line 5.$/, 'right message';
-is $output->lines_before->[0]->[0], 3,          'right number';
-is $output->lines_before->[0]->[1], '% {',      'right line';
-is $output->lines_before->[1]->[0], 4,          'right number';
-is $output->lines_before->[1]->[1], '%= 1 + 1', 'right line';
+is $output->lines_before->[0]->[0], 1,          'right number';
+is $output->lines_before->[0]->[1], 'test',     'right line';
+is $output->lines_before->[1]->[0], 2,          'right number';
+is $output->lines_before->[1]->[1], '123',      'right line';
+is $output->lines_before->[2]->[0], 3,          'right number';
+is $output->lines_before->[2]->[1], '% {',      'right line';
+is $output->lines_before->[3]->[0], 4,          'right number';
+is $output->lines_before->[3]->[1], '%= 1 + 1', 'right line';
 is $output->line->[0], 5,      'right number';
 is $output->line->[1], 'test', 'right line';
 like "$output", qr/^Missing right curly or square bracket/, 'right result';
+like $output->frames->[0]->[1], qr/Template\.pm$/, 'right file';
 
 # Exception in module
 $mt     = Mojo::Template->new;
@@ -538,10 +561,17 @@ test
 EOF
 is ref $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/ohoh/, 'right message';
-is $output->lines_before->[0]->[0], 17,              'right number';
-is $output->lines_before->[0]->[1], 'use warnings;', 'right line';
-is $output->lines_before->[1]->[0], 18,              'right number';
+is $output->lines_before->[0]->[0], 14, 'right number';
+is $output->lines_before->[0]->[1], 'package MyTemplateException;',
+  'right line';
+is $output->lines_before->[1]->[0], 15,              'right number';
 is $output->lines_before->[1]->[1], '',              'right line';
+is $output->lines_before->[2]->[0], 16,              'right number';
+is $output->lines_before->[2]->[1], 'use strict;',   'right line';
+is $output->lines_before->[3]->[0], 17,              'right number';
+is $output->lines_before->[3]->[1], 'use warnings;', 'right line';
+is $output->lines_before->[4]->[0], 18,              'right number';
+is $output->lines_before->[4]->[1], '',              'right line';
 is $output->line->[0], 19, 'right number';
 is $output->line->[1], "sub exception { die 'ohoh' }", 'right line';
 is $output->lines_after->[0]->[0], 20,              'right number';
@@ -735,7 +765,7 @@ EOF
 is $output, "23\nsomething\nelse\n23\n", 'prepending code';
 $mt = Mojo::Template->new;
 $mt->prepend(
-    q/{no warnings 'redefine'; no strict 'refs'; *foo = sub { 23 }}/);
+  q/{no warnings 'redefine'; no strict 'refs'; *foo = sub { 23 }}/);
 $output = $mt->render('<%= foo() %>');
 is $output, "23\n", 'right result';
 $output = $mt->render('%= foo()');
@@ -792,6 +822,35 @@ $output = $mt->render(<<'EOF');
 %>\
 EOF
 is $output, '2222', 'multiline expression';
+
+# Yet another multiline expression
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+<%= 'hello' .
+    ' world' %>\
+EOF
+is $output, 'hello world', 'multiline expression';
+
+# And another multiline expression
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+<%= 'hello' .
+
+    ' world' %>\
+EOF
+is $output, 'hello world', 'multiline expression';
+
+# And another multiline expression
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+<%= 'hello' .
+
+ ' wo' .
+
+    'rld'
+%>\
+EOF
+is $output, 'hello world', 'multiline expression';
 
 # Scoped scalar
 $mt     = Mojo::Template->new;

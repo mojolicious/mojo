@@ -3,11 +3,11 @@
 use strict;
 use warnings;
 
-# Boy, who knew a cooler could also make a handy wang coffin?
+# "Boy, who knew a cooler could also make a handy wang coffin?"
 use Mojolicious::Lite;
 
 # Load plugin
-plugin 'json_config';
+plugin 'config';
 
 # GET /
 get '/' => 'index';
@@ -15,4 +15,4 @@ get '/' => 'index';
 app->start;
 __DATA__
 @@ index.html.ep
-<%= $config->{just} %>
+<%= $config->{just} . $config->{works} . stash('also') %>

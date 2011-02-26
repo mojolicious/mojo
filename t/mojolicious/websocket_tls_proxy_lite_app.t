@@ -3,19 +3,21 @@
 use strict;
 use warnings;
 
-# Disable epoll and kqueue
-BEGIN { $ENV{MOJO_POLL} = 1 }
+# Disable IPv6, epoll and kqueue
+BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
 use Test::More;
 use Mojo::IOLoop;
-plan skip_all => 'IO::Socket::SSL 1.33 required for this test!'
+plan skip_all => 'IO::Socket::SSL 1.37 required for this test!'
   unless Mojo::IOLoop::TLS;
-plan tests => 16;
+plan skip_all => 'Windows is too fragile for this test!'
+  if Mojo::IOLoop::WINDOWS;
+plan tests => 19;
 
-# I was a hero to broken robots 'cause I was one of them, but how can I sing
-# about being damaged if I'm not?
-# That's like Christina Aguilera singing Spanish.
-# Ooh, wait! That's it! I'll fake it!
+# "I was a hero to broken robots 'cause I was one of them, but how can I sing
+#  about being damaged if I'm not?
+#  That's like Christina Aguilera singing Spanish.
+#  Ooh, wait! That's it! I'll fake it!"
 use Mojo::Client;
 use Mojo::Server::Daemon;
 use Mojolicious::Lite;
@@ -25,29 +27,38 @@ app->log->level('fatal');
 
 # GET /
 get '/' => sub {
-    my $self = shift;
-    my $rel  = $self->req->url;
-    my $abs  = $rel->to_abs;
-    $self->render_text("Hello World! $rel $abs");
+  my $self = shift;
+  $self->res->headers->header('X-Works',
+    $self->req->headers->header('X-Works'));
+  my $rel = $self->req->url;
+  my $abs = $rel->to_abs;
+  $self->render_text("Hello World! $rel $abs");
+};
+
+# GET /broken_redirect
+get '/broken_redirect' => sub {
+  my $self = shift;
+  $self->render(text => 'Redirecting!', status => 302);
+  $self->res->headers->location('/');
 };
 
 # GET /proxy
 get '/proxy' => sub {
-    my $self = shift;
-    $self->render_text($self->req->url);
+  my $self = shift;
+  $self->render_text($self->req->url);
 };
 
 # Websocket /test
 websocket '/test' => sub {
-    my $self = shift;
-    my $flag = 0;
-    $self->on_message(
-        sub {
-            my ($self, $message) = @_;
-            $self->send_message("${message}test2");
-            $flag = 24;
-        }
-    );
+  my $self = shift;
+  my $flag = 0;
+  $self->on_message(
+    sub {
+      my ($self, $message) = @_;
+      $self->send_message("${message}test2");
+      $flag = 24;
+    }
+  );
 };
 
 # HTTP server for testing
@@ -55,7 +66,7 @@ my $client = Mojo::Client->new;
 my $loop   = $client->ioloop;
 my $server = Mojo::Server::Daemon->new(app => app, ioloop => $loop);
 my $port   = Mojo::IOLoop->new->generate_port;
-$server->listen("https://*:$port");
+$server->listen(["https://*:$port"]);
 $server->prepare_ioloop;
 
 # Connect proxy server for testing
@@ -67,71 +78,87 @@ my $nf =
     "HTTP/1.1 404 NOT FOUND\x0d\x0a"
   . "Content-Length: 0\x0d\x0a"
   . "Connection: close\x0d\x0a\x0d\x0a";
-my $ok = "HTTP/1.1 200 OK\x0d\x0aConnection: keep-alive\x0d\x0a\x0d\x0a";
+my $ok = "HTTP/1.0 200 OK\x0d\x0aX-Something: unimportant\x0d\x0a\x0d\x0a";
 $loop->listen(
-    port    => $proxy,
-    on_read => sub {
-        my ($loop, $client, $chunk) = @_;
-        if (my $server = $c->{$client}->{connection}) {
-            return $loop->write($server, $chunk);
-        }
-        $c->{$client}->{client} = '' unless defined $c->{$client}->{client};
-        $c->{$client}->{client} .= $chunk if defined $chunk;
-        if ($c->{$client}->{client} =~ /\x0d?\x0a\x0d?\x0a$/) {
-            my $buffer = $c->{$client}->{client};
-            $c->{$client}->{client} = '';
-            if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
-                $connected = "$1:$2";
-                $fail = 1 if $2 == $port + 1;
-                my $server = $loop->connect(
-                    address    => $1,
-                    port       => $fail ? $port : $2,
-                    on_connect => sub {
-                        my ($loop, $server) = @_;
-                        $c->{$client}->{connection} = $server;
-                        $loop->write($client, $fail ? $nf : $ok);
-                    },
-                    on_error => sub {
-                        shift->drop($client);
-                        delete $c->{$client};
-                    },
-                    on_read => sub {
-                        my ($loop, $server, $chunk) = @_;
-                        $read += length $chunk;
-                        $sent += length $chunk;
-                        $loop->write($client, $chunk);
-                    }
-                );
-            }
-            else { $loop->drop($client) }
-        }
-    },
-    on_error => sub {
-        my ($self, $client) = @_;
-        shift->drop($c->{$client}->{connection})
-          if $c->{$client}->{connection};
-        delete $c->{$client};
+  port    => $proxy,
+  on_read => sub {
+    my ($loop, $client, $chunk) = @_;
+    if (my $server = $c->{$client}->{connection}) {
+      return $loop->write($server, $chunk);
     }
+    $c->{$client}->{client} = '' unless defined $c->{$client}->{client};
+    $c->{$client}->{client} .= $chunk if defined $chunk;
+    if ($c->{$client}->{client} =~ /\x0d?\x0a\x0d?\x0a$/) {
+      my $buffer = $c->{$client}->{client};
+      $c->{$client}->{client} = '';
+      if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
+        $connected = "$1:$2";
+        $fail = 1 if $2 == $port + 1;
+        my $server = $loop->connect(
+          address    => $1,
+          port       => $fail ? $port : $2,
+          on_connect => sub {
+            my ($loop, $server) = @_;
+            $c->{$client}->{connection} = $server;
+            $loop->write($client, $fail ? $nf : $ok);
+          },
+          on_error => sub {
+            shift->drop($client);
+            delete $c->{$client};
+          },
+          on_read => sub {
+            my ($loop, $server, $chunk) = @_;
+            $read += length $chunk;
+            $sent += length $chunk;
+            $loop->write($client, $chunk);
+          }
+        );
+      }
+      else { $loop->drop($client) }
+    }
+  },
+  on_error => sub {
+    my ($self, $client) = @_;
+    shift->drop($c->{$client}->{connection})
+      if $c->{$client}->{connection};
+    delete $c->{$client};
+  }
 );
 
 # GET / (normal request)
 is $client->get("https://localhost:$port/")->success->body,
   "Hello World! / https://localhost:$port/", 'right content';
 
+# GET /broken_redirect (broken redirect)
+my $start = 0;
+$client->on_start(
+  sub {
+    $start++;
+    pop->req->headers->header('X-Works', 'it does!');
+  }
+);
+my $tx =
+  $client->max_redirects(3)->get("https://localhost:$port/broken_redirect");
+is $tx->success->body, "Hello World! / https://localhost:$port/",
+  'right content';
+is $tx->res->headers->header('X-Works'), 'it does!', 'right header';
+is $start, 2, 'redirected once';
+$client->on_start(undef);
+
 # WebSocket /test (normal websocket)
 my $result;
 $client->websocket(
-    "wss://localhost:$port/test" => sub {
-        my $self = shift;
-        $self->on_message(
-            sub {
-                my ($self, $message) = @_;
-                $result = $message;
-                $self->finish;
-            }
-        );
-        $self->send_message('test1');
-    }
+  "wss://localhost:$port/test" => sub {
+    my $self = shift;
+    $self->on_message(
+      sub {
+        my ($self, $message) = @_;
+        $result = $message;
+        $self->finish;
+      }
+    );
+    $self->send_message('test1');
+  }
 )->start;
 is $result, 'test1test2', 'right result';
 
@@ -142,7 +169,7 @@ is $client->get("https://localhost:$port/proxy")->success->body,
 
 # GET /proxy (kept alive proxy request)
 $client->https_proxy("http://localhost:$proxy");
-my $tx = $client->build_tx(GET => "https://localhost:$port/proxy");
+$tx = $client->build_tx(GET => "https://localhost:$port/proxy");
 $client->start($tx);
 is $tx->success->body, "https://localhost:$port/proxy", 'right content';
 is $tx->kept_alive, 1, 'kept alive';
@@ -152,18 +179,18 @@ $client->https_proxy("http://localhost:$proxy");
 $result = undef;
 my $kept_alive;
 $client->websocket(
-    "wss://localhost:$port/test" => sub {
-        my $self = shift;
-        $kept_alive = $self->tx->kept_alive;
-        $self->on_message(
-            sub {
-                my ($self, $message) = @_;
-                $result = $message;
-                $self->finish;
-            }
-        );
-        $self->send_message('test1');
-    }
+  "wss://localhost:$port/test" => sub {
+    my $self = shift;
+    $kept_alive = $self->tx->kept_alive;
+    $self->on_message(
+      sub {
+        my ($self, $message) = @_;
+        $result = $message;
+        $self->finish;
+      }
+    );
+    $self->send_message('test1');
+  }
 )->start;
 is $kept_alive, 1,                 'kept alive';
 is $connected,  "localhost:$port", 'connected';
@@ -175,17 +202,17 @@ ok $sent > 25, 'sent enough';
 $client->https_proxy("http://localhost:$proxy");
 ($connected, $result, $read, $sent) = undef;
 $client->websocket(
-    "wss://localhost:$port/test" => sub {
-        my $self = shift;
-        $self->on_message(
-            sub {
-                my ($self, $message) = @_;
-                $result = $message;
-                $self->finish;
-            }
-        );
-        $self->send_message('test1');
-    }
+  "wss://localhost:$port/test" => sub {
+    my $self = shift;
+    $self->on_message(
+      sub {
+        my ($self, $message) = @_;
+        $result = $message;
+        $self->finish;
+      }
+    );
+    $self->send_message('test1');
+  }
 )->start;
 is $connected, "localhost:$port", 'connected';
 is $result,    'test1test2',      'right result';
@@ -197,11 +224,11 @@ $client->https_proxy("http://localhost:$proxy");
 my $port2 = $port + 1;
 my ($success, $error);
 $client->websocket(
-    "wss://localhost:$port2/test" => sub {
-        my ($self, $tx) = @_;
-        $success = $tx->success;
-        $error   = $tx->error;
-    }
+  "wss://localhost:$port2/test" => sub {
+    my ($self, $tx) = @_;
+    $success = $tx->success;
+    $error   = $tx->error;
+  }
 )->start;
 is $success, undef, 'no success';
 is $error, 'Proxy connection failed.', 'right message';

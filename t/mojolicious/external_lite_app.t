@@ -5,23 +5,24 @@ use warnings;
 
 use utf8;
 
-# Disable epoll and kqueue
+# Disable IPv6, epoll and kqueue
 BEGIN {
-    $ENV{MOJO_POLL} = 1;
-    $ENV{MOJO_MODE} = 'testing';
+  $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1;
+  $ENV{MOJO_MODE} = 'testing';
 }
 
-# Who are you, and why should I care?
+# "Who are you, and why should I care?"
 use Test::More tests => 3;
 
-# Of all the parasites I've had over the years,
-# these worms are among the best.
+# "Of all the parasites I've had over the years,
+#  these worms are among the best."
 use FindBin;
-$ENV{MOJO_HOME} = $FindBin::Bin;
-require "$ENV{MOJO_HOME}/external_lite_app.pl";
+$ENV{MOJO_CONFIG} = 'external.conf';
+$ENV{MOJO_HOME}   = $FindBin::Bin;
+require "$ENV{MOJO_HOME}/external.pl";
 use Test::Mojo;
 
 my $t = Test::Mojo->new;
 
 # GET /
-$t->get_ok('/')->status_is(200)->content_is("works!\n");
+$t->get_ok('/')->status_is(200)->content_is("works!too!works!!!\n");

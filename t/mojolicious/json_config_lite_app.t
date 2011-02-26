@@ -5,13 +5,13 @@ use warnings;
 
 use utf8;
 
-# Disable epoll and kqueue
-BEGIN { $ENV{MOJO_POLL} = 1 }
+# Disable IPv6, epoll and kqueue
+BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
 use Test::More tests => 8;
 
-# Oh, I always feared he might run off like this.
-# Why, why, why didn't I break his legs?
+# "Oh, I always feared he might run off like this.
+#  Why, why, why didn't I break his legs?"
 use Mojolicious::Lite;
 use Test::Mojo;
 

@@ -1,12 +1,8 @@
 package MojoliciousTest::SyntaxError;
+use Mojo::Base 'Mojolicious::Controller';
 
-use strict;
-use warnings;
-
-use base 'Mojolicious::Controller';
-
-# In the future... people will live twice as long,
-# computers will die twice as fast.
+# "In the future... people will live twice as long,
+#  computers will die twice as fast."
 sub foo {
 
 1;

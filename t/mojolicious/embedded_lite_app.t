@@ -3,101 +3,90 @@
 use strict;
 use warnings;
 
-# Disable epoll and kqueue
-BEGIN { $ENV{MOJO_POLL} = 1 }
+# Disable IPv6, epoll and kqueue
+BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
 use Test::More tests => 35;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-# I heard you went off and became a rich doctor.
-# I've performed a few mercy killings.
-package TestApp;
+use Mojolicious::Lite;
+use Test::Mojo;
 
+package TestApp;
 use Mojolicious::Lite;
 
 # GET /hello (embedded)
 get '/hello' => sub {
-    my $self = shift;
-    my $name = $self->stash('name');
-    $self->render_text("Hello from the $name app!");
+  my $self = shift;
+  my $name = $self->stash('name');
+  $self->render_text("Hello from the $name app!");
 };
 
-# Morbo will now introduce the candidates - Puny Human Number One,
-# Puny Human Number Two, and Morbo's good friend Richard Nixon.
-# How's the family, Morbo?
-# Belligerent and numerous.
+# "Morbo will now introduce the candidates - Puny Human Number One,
+#  Puny Human Number Two, and Morbo's good friend Richard Nixon.
+#  How's the family, Morbo?
+#  Belligerent and numerous."
 package MyTestApp::Test1;
-
 use Mojolicious::Lite;
 
+use Mojo::IOLoop;
+
+app->attr(
+  unmanaged => sub {
+    shift->client->clone->app(main::app())->ioloop(Mojo::IOLoop->singleton)
+      ->managed(0);
+  }
+);
+
 get '/yada' => sub {
-    my $self = shift;
-    my $name = $self->stash('name');
-    $self->render(text => "yada $name works!");
+  my $self = shift;
+  my $name = $self->stash('name');
+  $self->render(text => "yada $name works!");
 };
 
 # GET /bye (embedded)
 get '/bye' => sub {
-    my $self  = shift;
-    my $name  = $self->stash('name');
-    my $async = '';
-    $self->client->async->get(
-        '/hello/hello' => sub {
-            my $client = shift;
-            $self->render_text($client->res->body . "$name! $async");
-        }
-    )->start;
-    $async .= 'success!';
+  my $self  = shift;
+  my $name  = $self->stash('name');
+  my $async = '';
+  $self->render_later;
+  $self->app->unmanaged->get(
+    '/hello/hello' => sub {
+      my $client = shift;
+      $self->render_text($client->res->body . "$name! $async");
+    }
+  );
+  $async .= 'success!';
 };
 
-package Mojolicious::Plugin::MyEmbeddedApp;
-use base 'Mojolicious::Plugin';
-
-sub register {
-    my ($self, $app) = @_;
-    $app->routes->route('/foo')
-      ->detour(Mojolicious::Plugin::MyEmbeddedApp::App::app());
-}
-
-package Mojolicious::Plugin::MyEmbeddedApp::App;
-use Mojolicious::Lite;
-
-# GET /bar
-get '/bar' => {text => 'plugin works!'};
-
 package MyTestApp::Test2;
-
 use Mojolicious::Lite;
 
 # GET / (embedded)
 get '/' => sub {
-    my $self = shift;
-    my $name = $self->param('name');
-    my $url  = $self->url_for;
-    $self->render_text("Bye from the $name app! $url!");
+  my $self = shift;
+  my $name = $self->param('name');
+  my $url  = $self->url_for;
+  $self->render_text("Bye from the $name app! $url!");
 };
 
 package MyTestApp::Basic;
-
-use base 'Mojo';
+use Mojo::Base 'Mojo';
 
 sub handler {
-    my ($self, $c) = @_;
-    $c->res->code(200);
-    my $test = $c->param('test');
-    $c->res->body("Hello $test!");
-    $c->rendered;
+  my ($self, $c) = @_;
+  $c->res->code(200);
+  my $test = $c->param('test');
+  $c->res->body("Hello $test!");
+  $c->rendered;
 }
 
 package main;
 
-use Mojolicious::Lite;
-use Test::Mojo;
-
 # /foo/* (plugin app)
-plugin 'my_embedded_app';
+plugin 'PluginWithEmbeddedApp';
 
 app->routes->namespace('MyTestApp');
 

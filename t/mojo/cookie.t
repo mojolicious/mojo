@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More tests => 59;
 
-# What good is money if it can't inspire terror in your fellow man?
+# "What good is money if it can't inspire terror in your fellow man?"
 use_ok 'Mojo::Cookie::Request';
 use_ok 'Mojo::Cookie::Response';
 
@@ -51,7 +51,7 @@ is $cookies->[0]->version, '1',         'right version';
 
 # Parse multiple cookie request
 $cookies = Mojo::Cookie::Request->parse(
-    '$Version=1; foo=bar; $Path=/test; baz=la la; $Path=/tset');
+  '$Version=1; foo=bar; $Path=/test; baz=la la; $Path=/tset');
 is $cookies->[0]->name,    'foo',   'right name';
 is $cookies->[0]->value,   'bar',   'right value';
 is $cookies->[0]->path,    '/test', 'right path';
@@ -89,9 +89,9 @@ is $cookie->to_string,
 
 # Parse response cookie
 $cookies = Mojo::Cookie::Response->parse(
-        'foo=ba r; Version=1; Domain=kraih.com; Path=/test; Max-Age=60;'
-      . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; Port="80 8080"; Secure;'
-      . ' Comment=lalalala');
+      'foo=ba r; Version=1; Domain=kraih.com; Path=/test; Max-Age=60;'
+    . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; Port="80 8080"; Secure;'
+    . ' Comment=lalalala');
 is $cookies->[0]->name,    'foo',       'right name';
 is $cookies->[0]->value,   'ba r',      'right value';
 is $cookies->[0]->domain,  'kraih.com', 'right domain';
@@ -106,9 +106,9 @@ is $cookies->[0]->version, '1',        'right version';
 
 # Parse response cookie without value
 $cookies = Mojo::Cookie::Response->parse(
-        'foo; Version=1; Domain=kraih.com; Path=/test; Max-Age=60;'
-      . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; Port="80 8080"; Secure;'
-      . ' Comment=lalalala');
+      'foo; Version=1; Domain=kraih.com; Path=/test; Max-Age=60;'
+    . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; Port="80 8080"; Secure;'
+    . ' Comment=lalalala');
 is $cookies->[0]->name,    'foo',       'right name';
 is $cookies->[0]->value,   undef,       'no value';
 is $cookies->[0]->domain,  'kraih.com', 'right domain';
@@ -138,8 +138,8 @@ is $cookie->to_string, 'foo=bar; Version=1; Path=/; Max-Age=0;'
 
 # Parse response cookie with Max-Age 0 and expires 0
 $cookies = Mojo::Cookie::Response->parse(
-        'foo=bar; Version=1; Domain=kraih.com; Path=/; Max-Age=0;'
-      . ' expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; Comment=lalalala');
+      'foo=bar; Version=1; Domain=kraih.com; Path=/; Max-Age=0;'
+    . ' expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; Comment=lalalala');
 is $cookies->[0]->name,    'foo',       'right name';
 is $cookies->[0]->value,   'bar',       'right value';
 is $cookies->[0]->domain,  'kraih.com', 'right domain';

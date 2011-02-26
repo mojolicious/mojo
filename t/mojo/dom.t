@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 408;
+use Test::More tests => 411;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -112,13 +112,17 @@ my $simple = $dom->at('foo simple.working[class^="wor"]');
 like $simple->parent->all_text,
   qr/test\s+easy\s+works\s+well\s+yada\s+yada\s+more\s+text/;
 is $simple->type, 'simple', 'right type';
-is $simple->attrs->{class}, 'working', 'right class attribute';
+is $simple->attrs('class'), 'working', 'right class attribute';
 is $simple->text, 'easy', 'right text';
 is $simple->parent->type, 'foo', 'right parent type';
 is $simple->parent->attrs->{bar}, 'ba<z', 'right parent attribute';
 is $simple->parent->children->[1]->type, 'test', 'right sibling';
 is $simple->to_xml, '<simple class="working">easy</simple>',
   'stringified right';
+$simple->parent->attrs(bar => 'baz')->attrs({this => 'works', too => 'yea'});
+is $simple->parent->attrs('bar'),  'baz',   'right parent attribute';
+is $simple->parent->attrs('this'), 'works', 'right parent attribute';
+is $simple->parent->attrs('too'),  'yea',   'right parent attribute';
 is $dom->at('test#test')->type,         'test',   'right type';
 is $dom->at('[class$="ing"]')->type,    'simple', 'right type';
 is $dom->at('[class="working"]')->type, 'simple', 'right type';
@@ -150,12 +154,12 @@ $dom->parse(<<EOF);
 </html>
 EOF
 my $p = $dom->find('body > #container > div p[id]');
-is $p->[0]->attrs->{id}, 'foo', 'right id attribute';
+is $p->[0]->attrs('id'), 'foo', 'right id attribute';
 is $p->[1], undef, 'no second result';
 my @p;
 @div = ();
-$dom->find('div')->each(sub { push @div, $_->attrs->{id} })->find('p')
-  ->each(sub { push @p, $_->attrs->{id} });
+$dom->find('div')->each(sub { push @div, $_->attrs('id') })->find('p')
+  ->each(sub { push @p, $_->attrs('id') });
 is_deeply \@p, [qw/foo bar/], 'found all p elements';
 my $ids = [qw/container header logo buttons buttons content/];
 is_deeply \@div, $ids, 'found all div elements';
@@ -363,8 +367,8 @@ $dom->parse(<<EOF);
   </channel>
 </rss>
 EOF
-is $dom->find('rss')->[0]->attrs->{version}, '2.0', 'right version';
-is $dom->at('extension')->attrs->{'foo:id'}, 'works', 'right id';
+is $dom->find('rss')->[0]->attrs('version'), '2.0', 'right version';
+is $dom->at('extension')->attrs('foo:id'), 'works', 'right id';
 like $dom->at('#works')->text,       qr/\[awesome\]\]/, 'right text';
 like $dom->at('[id="works"]')->text, qr/\[awesome\]\]/, 'right text';
 is $dom->find('description')->[1]->text, '<p>trololololo>', 'right text';
@@ -440,8 +444,8 @@ is_deeply \@numbers, [1, 1, 2, 2, 3, 3], 'right order';
 
 # Attributes on multiple lines
 $dom->parse("<div test=23 id='a' \n class='x' foo=bar />");
-is $dom->at('div.x')->attrs->{test},        23,  'right attribute';
-is $dom->at('[foo="bar"]')->attrs->{class}, 'x', 'right attribute';
+is $dom->at('div.x')->attrs('test'),        23,  'right attribute';
+is $dom->at('[foo="bar"]')->attrs('class'), 'x', 'right attribute';
 
 # Markup characters in attribute values
 $dom->parse(qq/<div id="<a>" \n test='='>Test<div id='><' \/><\/div>/);

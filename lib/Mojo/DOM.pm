@@ -140,7 +140,22 @@ sub attrs {
   # Root
   return if $tree->[0] eq 'root';
 
-  return $tree->[2];
+  # Attributes
+  my $attrs = $tree->[2];
+
+  # Hash
+  return $attrs unless @_;
+
+  # Get
+  return $attrs->{$_[0]} unless @_ > 1 || ref $_[0];
+
+  # Set
+  my $values = ref $_[0] ? $_[0] : {@_};
+  for my $key (keys %$values) {
+    $attrs->{$key} = $values->{$key};
+  }
+
+  return $self;
 }
 
 sub children {
@@ -1490,6 +1505,9 @@ Find a single element with CSS3 selectors.
 =head2 C<attrs>
 
   my $attrs = $dom->attrs;
+  my $foo   = $dom->attrs('foo');
+  $dom      = $dom->attrs({foo => 'bar'});
+  $dom      = $dom->attrs(foo => 'bar');
 
 Element attributes.
 

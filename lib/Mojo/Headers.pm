@@ -440,6 +440,16 @@ Get or replace the current header values.
 Note that this method is context sensitive and will turn all header lines
 into a single one in scalar context.
 
+  # Multiple headers with the same name
+  for my $header ($headers->header('Set-Cookie')) {
+    print "Set-Cookie:\n";
+
+    # Each header contains an array of lines
+    for my line (@$header) {
+      print "line\n";
+    }
+  }
+
 =head2 C<host>
 
   my $host = $headers->host;

@@ -677,7 +677,7 @@ Also sets up the renderer, static dispatcher and a default set of plugins.
   $app         = $app->defaults({foo => 'bar'});
   $app         = $app->defaults(foo => 'bar');
 
-Default values for the stash.
+Default values for the stash, assigned for every new request.
 
   $app->defaults->{foo} = 'bar';
   my $foo = $app->defaults->{foo};
@@ -717,7 +717,7 @@ and the application object, as well as a function in C<ep> templates.
 
   $app->hook(after_dispatch => sub { ... });
 
-Add hooks to named events.
+Extend L<Mojolicious> by adding hooks to named events.
 
 The following events are available and run in the listed order.
 

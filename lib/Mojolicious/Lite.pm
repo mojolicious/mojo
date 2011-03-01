@@ -746,7 +746,7 @@ For more control the L<Mojolicious> instance can be accessed directly.
 
 =head2 Growing
 
-In case a lite app needs to grow, lite and real L<Mojolicous> applications
+In case a lite app needs to grow, lite and real L<Mojolicious> applications
 can be easily mixed to make the transition process very smooth.
 
   package MyApp::Foo;

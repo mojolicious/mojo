@@ -121,7 +121,7 @@ Mojolicious::Plugins - Plugins
 
 =head1 DESCRIPTION
 
-L<Mojolicous::Plugins> is the plugin manager of L<Mojolicious>.
+L<Mojolicious::Plugins> is the plugin manager of L<Mojolicious>.
 In your application you will usually use it to load plugins.
 To implement your own plugins see L<Mojolicious::Plugin> and the C<add_hook>
 method below.

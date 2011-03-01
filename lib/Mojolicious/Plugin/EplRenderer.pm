@@ -97,7 +97,7 @@ Mojolicious::Plugin::EplRenderer - EPL Renderer Plugin
 
 =head1 DESCRIPTION
 
-L<Mojolicous::Plugin::EplRenderer> is a renderer for C<epl> templates.
+L<Mojolicious::Plugin::EplRenderer> is a renderer for C<epl> templates.
 C<epl> templates are pretty much just raw L<Mojo::Template>.
 This is a core plugin, that means it is always enabled and its code a good
 example for learning to build new plugins.

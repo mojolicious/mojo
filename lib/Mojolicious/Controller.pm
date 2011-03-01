@@ -1195,7 +1195,7 @@ Mojolicious::Controller - Controller Base Class
 
 =head1 DESCRIPTION
 
-L<Mojolicous::Controller> is the base class for your L<Mojolicious>
+L<Mojolicious::Controller> is the base class for your L<Mojolicious>
 controllers.
 It is also the default controller class for L<Mojolicious> unless you set
 C<controller_class> in your application.

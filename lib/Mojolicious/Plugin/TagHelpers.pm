@@ -339,7 +339,7 @@ Mojolicious::Plugin::TagHelpers - Tag Helpers Plugin
 
 =head1 DESCRIPTION
 
-L<Mojolicous::Plugin::TagHelpers> is a collection of HTML5 tag helpers for
+L<Mojolicious::Plugin::TagHelpers> is a collection of HTML5 tag helpers for
 L<Mojolicious>.
 This is a core plugin, that means it is always enabled and its code a good
 example for learning to build new plugins.

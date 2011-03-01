@@ -381,7 +381,8 @@ Mojolicious::Plugin::PodRenderer - POD Renderer Plugin
 
 =head1 DESCRIPTION
 
-L<Mojolicous::Plugin::PodRenderer> is a renderer for true Perl hackers, rawr!
+L<Mojolicious::Plugin::PodRenderer> is a renderer for true Perl hackers,
+rawr!
 
 =head1 OPTIONS
 

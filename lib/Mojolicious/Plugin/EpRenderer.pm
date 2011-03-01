@@ -103,7 +103,7 @@ Mojolicious::Plugin::EpRenderer - EP Renderer Plugin
 
 =head1 DESCRIPTION
 
-L<Mojolicous::Plugin::EpRenderer> is a renderer for C<ep> templates.
+L<Mojolicious::Plugin::EpRenderer> is a renderer for C<ep> templates.
 
 =head1 TEMPLATES
 

@@ -112,7 +112,7 @@ Mojolicious::Plugin::I18n - Intenationalization Plugin
 
 =head1 DESCRIPTION
 
-L<Mojolicous::Plugin::I18n> adds L<Locale::Maketext> support to
+L<Mojolicious::Plugin::I18n> adds L<Locale::Maketext> support to
 L<Mojolicious>.
 All you have to do besides using this plugin is to add as many lexicon
 classes as you need.

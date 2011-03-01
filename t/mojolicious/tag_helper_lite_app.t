@@ -41,9 +41,9 @@ EOF
 
 # GET /links
 $t->get_ok('/links')->status_is(200)->content_is(<<EOF);
-<a href="/path">Path</a>
+<a href="/path">Pa&lt;th</a>
 <a href="http://example.com/" title="Foo">Foo</a>
-<a href="http://example.com/">Example</a>
+<a href="http://example.com/"><foo>Example</foo></a>
 <a href="/links">Home</a>
 <a href="/form/23" title="Foo">Foo</a>
 EOF
@@ -216,9 +216,9 @@ __DATA__
 <%= tag 'foo', one => 't<wo', three => 'four' => begin %>Hello<% end %>
 
 @@ links.html.ep
-<%= link_to Path => '/path' %>
+<%= link_to 'Pa<th' => '/path' %>
 <%= link_to 'http://example.com/', title => 'Foo', sub { 'Foo' } %>
-<%= link_to 'http://example.com/' => begin %>Example<% end %>
+<%= link_to 'http://example.com/' => begin %><foo>Example</foo><% end %>
 <%= link_to Home => 'links' %>
 <%= link_to Foo => 'form', {test => 23}, title => 'Foo' %>
 

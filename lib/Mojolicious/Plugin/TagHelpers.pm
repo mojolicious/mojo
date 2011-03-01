@@ -102,6 +102,7 @@ sub register {
       # Content
       unless (defined $_[-1] && ref $_[-1] eq 'CODE') {
         @url = (shift);
+        xml_escape $content;
         push @_, sub {$content}
       }
 

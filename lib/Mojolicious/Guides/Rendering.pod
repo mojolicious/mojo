@@ -581,13 +581,14 @@ Helpers can also accept template blocks as last argument, this for example
 allows very pleasant to use tag helpers and filters.
 
   use Mojolicious::Lite;
+  use Mojo::ByteStream;
 
   app->helper(
     trim_newline => sub {
       my ($self, $block) = @_;
       my $result = $block->();
       $result =~ s/\n//g;
-      return $result;
+      return Mojo::ByteStream->new($result);
     }
   );
 
@@ -602,6 +603,9 @@ allows very pleasant to use tag helpers and filters.
     <%= 1 + 1 %>
     More text.
   <% end %>
+
+Wrapping the helper result into a L<Mojo::ByteStream> object can prevent
+accidental double escaping.
 
 =head2 Adding Your Favorite Template System
 

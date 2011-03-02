@@ -6,7 +6,7 @@ use warnings;
 # Disable IPv6, epoll and kqueue
 BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 27;
+use Test::More tests => 30;
 
 # "Hey! Bite my glorious golden ass!"
 use Mojolicious::Lite;
@@ -23,6 +23,9 @@ get 'script';
 
 # GET /style
 get 'style';
+
+# GET /basicform
+get '/basicform';
 
 # GET /form
 get 'form/:test' => 'form';
@@ -76,6 +79,16 @@ $t->get_ok('/style')->status_is(200)->content_is(<<EOF);
   body {color: #000}
 
 /*]]>*/</style>
+EOF
+
+# GET /basicform
+$t->get_ok('/basicform')->status_is(200)->content_is(<<EOF);
+<form action="/links">
+  <input name="foo" value="bar" />
+  <input class="test" name="bar" value="baz" />
+  <input class="tset" name="baz" value="yada" />
+  <input type="submit" value="Ok" />
+</form>
 EOF
 
 # GET /form
@@ -239,6 +252,14 @@ __DATA__
 <%= stylesheet type => 'foo' => begin %>
   body {color: #000}
 <% end %>
+
+@@ basicform.html.ep
+%= form_for links => begin
+  %= text_field foo => 'bar'
+  %= text_field bar => 'baz', class => 'test'
+  %= input_tag baz => 'yada', class => 'tset'
+  %= submit_button
+%= end
 
 @@ form.html.ep
 <%= form_for 'links', method => 'post' => begin %>

@@ -256,10 +256,22 @@ sub register {
 }
 
 sub _input {
-  my $self  = shift;
-  my $c     = shift;
-  my $name  = shift;
-  my %attrs = @_;
+  my $self = shift;
+  my $c    = shift;
+  my $name = shift;
+
+  # Attributes
+  my %attrs;
+
+  # Odd
+  if (@_ % 2) {
+    my $value = shift;
+    %attrs = @_;
+    $attrs{value} = $value;
+  }
+
+  # Even
+  else { %attrs = @_ }
 
   # Value
   my $p = $c->param($name);
@@ -437,7 +449,7 @@ Generate image tag.
 =head2 C<input_tag>
 
   <%= input_tag 'first_name' %>
-  <%= input_tag 'first_name', value => 'Default name' %>
+  <%= input_tag first_name => 'Default name' %>
   <%= input_tag 'employed', type => 'checkbox' %>
   <%= input_tag 'country', type => 'radio', value => 'germany' %>
 
@@ -575,12 +587,14 @@ HTML5 tag generator.
 =head2 C<text_field>
 
   <%= text_field 'first_name' %>
-  <%= text_field 'first_name', value => 'Default name' %>
+  <%= text_field first_name => 'Default name' %>
+  <%= text_field first_name => 'Default name', class => 'user' %>
 
 Generate text input element.
 
   <input name="first_name" />
   <input name="first_name" value="Default name" />
+  <input class="user" name="first_name" value="Default name" />
 
 =head2 C<text_area>
 

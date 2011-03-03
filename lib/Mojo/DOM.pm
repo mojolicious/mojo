@@ -481,7 +481,7 @@ sub _css_equation {
   # Equation
   elsif ($equation =~ /(?:(\-?(?:\d+)?)?(n))?\s*\+?\s*(\-?\s*\d+)?\s*$/) {
     $num->[0] = $1;
-    $num->[0] = $2 ? 1 : 0 unless length $num->[0];
+    $num->[0] = $2 ? 1 : 0 unless defined($num->[0]) && length($num->[0]);
     $num->[0] = -1 if $num->[0] eq '-';
     $num->[1] = $3 || 0;
     $num->[1] =~ s/\s+//g;

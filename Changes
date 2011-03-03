@@ -13,6 +13,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Updated to jQuery to version 1.5.1.
         - Fixed XSS issue in link_to helper.
         - Fixed route unescaping bug.
+        - Fixed small Mojo::DOM bug. (yko)
         - Fixed small documentation bug.
 
 1.11 2011-02-18 00:00:00

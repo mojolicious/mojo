@@ -498,8 +498,6 @@ Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::IP>,
 L<IO::Socket::SSL> and L<Net::Rendezvous::Publish> are supported
 transparently and used if installed.
 
-Note that this module is EXPERIMENTAL and might change without warning!
-
 See L<Mojolicious::Guides::Cookbook> for deployment recipes.
 
 =head1 SIGNALS

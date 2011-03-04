@@ -138,7 +138,6 @@ L<Mojolicious::Plugin::Config> is a Perl-ish configuration plugin.
 The application object can be accessed via the C<app> helper.
 You can extend the normal config file C<myapp.conf> with C<mode> specific
 ones like C<myapp.$mode.conf>.
-Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 OPTIONS
 

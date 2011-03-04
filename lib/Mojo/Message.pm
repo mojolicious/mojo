@@ -659,7 +659,6 @@ L<Mojo::JSON>.
   $message = $message->max_line_size(1024);
 
 Maximum line size in bytes, defaults to C<10240>.
-Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<max_message_size>
 
@@ -667,7 +666,6 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
   $message = $message->max_message_size(1024);
 
 Maximum message size in bytes, defaults to C<5242880>.
-Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<on_finish>
 
@@ -821,7 +819,6 @@ Check if parser is done.
   my $limit = $message->is_limit_exceeded;
 
 Check if message has exceeded C<max_line_size> or C<max_message_size>.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<is_multipart>
 

@@ -850,7 +850,6 @@ and used for matching.
   $r            = $r->shortcuts({foo => sub { ... }});
 
 Contains all additional route shortcuts available for this route.
-Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS
 
@@ -881,7 +880,6 @@ Add a new condition for this route.
   $r = $r->add_shortcut(foo => sub { ... });
 
 Add a new shortcut for this route.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<any>
 

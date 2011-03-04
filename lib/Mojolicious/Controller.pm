@@ -1373,7 +1373,6 @@ Render a data structure as JSON.
   $c->render_later;
 
 Disable auto rendering, especially for long polling this can be quite useful.
-Note that this method is EXPERIMENTAL and might change without warning!
 
   $c->render_later;
   Mojo::IOLoop->singleton->timer(2 => sub {

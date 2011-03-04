@@ -201,7 +201,6 @@ Both forms save a lot of typing.
   has [qw/name1 name2 name3/] => sub { ... };
 
 Create attributes, just like the C<attr> method.
-Note that this function is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS
 

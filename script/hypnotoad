@@ -70,8 +70,6 @@ hypnotoad - Hypnotoad HTTP 1.1 And WebSocket Server
 Start L<Mojolicious> and L<Mojolicious::Lite> applications with the
 L<Mojo::Server::Hypnotoad> web server.
 
-Note that this script is EXPERIMENTAL and might change without warning!
-
 =head1 SEE ALSO
 
 L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.

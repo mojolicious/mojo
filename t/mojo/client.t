@@ -9,7 +9,7 @@ BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 use Test::More;
 plan skip_all => 'Windows is too fragile for this test!'
   if $^O eq 'MSWin32' || $^O =~ /cygwin/;
-plan tests => 80;
+plan tests => 81;
 
 use_ok 'Mojo::Client';
 
@@ -67,6 +67,11 @@ $ENV{NO_PROXY}    = $backup3;
 $ENV{http_proxy}  = $backup4;
 $ENV{https_proxy} = $backup5;
 $ENV{no_proxy}    = $backup6;
+
+# Missing callback
+$client = Mojo::Client->new;
+eval { $client->managed(0)->get('/') };
+like $@, qr/^Unmanaged client requests require a callback/, 'right error';
 
 # Cloning
 $client = Mojo::Client->new;

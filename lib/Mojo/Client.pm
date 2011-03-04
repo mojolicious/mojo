@@ -986,6 +986,10 @@ sub _tx_queue_or_start {
 sub _tx_start {
   my ($self, $tx, $cb) = @_;
 
+  # Callback needed
+  croak 'Unmanaged client requests require a callback'
+    if !$self->managed && !$cb;
+
   # Embedded server
   if ($self->app) {
     my $req = $tx->req;
@@ -1347,7 +1351,6 @@ L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object.
   $client        = $client->user_agent('Mojolicious');
 
 Value for C<User-Agent> request header, defaults to C<Mojolicious (Perl)>.
-Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<websocket_timeout>
 

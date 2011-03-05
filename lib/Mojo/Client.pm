@@ -1227,7 +1227,6 @@ If set, local requests will be processed in this application.
   $client  = $client->cert('tls.crt');
 
 Path to TLS certificate file.
-Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<cookie_jar>
 
@@ -1272,7 +1271,6 @@ Timeout in seconds for keep alive between requests, defaults to C<15>.
   $client = $client->key('tls.crt');
 
 Path to TLS key file.
-Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<log>
 
@@ -1331,7 +1329,6 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
 Callback to be invoked whenever a new transaction is about to start, this
 includes automatically prepared proxy C<CONNECT> requests and followed
 redirects.
-Note that this attribute is EXPERIMENTAL and might change without warning!
 
   $client->on_start(sub {
     my ($client, $tx) = @_;

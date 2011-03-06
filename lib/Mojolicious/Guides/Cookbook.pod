@@ -361,7 +361,7 @@ time.
   my @urls = qw/google.com/;
 
   # Unmanaged client following up to 5 redirects
-  my $client = Mojo::Client->new(max_redirects => 5)->managed(0);
+  my $client = Mojo::Client->new(managed => 0, max_redirects => 5);
 
   # Crawler
   my $crawl;

@@ -21,8 +21,8 @@ BEGIN {
 sub load {
   my ($self, $module) = @_;
 
-  # Shortcut
-  return 1 unless $module;
+  # Check module name
+  return 1 if !$module || $module !~ /^[\w\:\']+$/;
 
   # Forced reload
   if ($ENV{MOJO_RELOAD}) {

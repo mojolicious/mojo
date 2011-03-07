@@ -458,7 +458,7 @@ sub _dispatch_controller {
   $c->app->log->debug("Dispatching $dispatch.");
 
   # Load class
-  unless (ref $app && $self->{_loaded}->{$app}) {
+  if (!ref $app && !$self->{_loaded}->{$app}) {
 
     # Load
     if (my $e = Mojo::Loader->load($app)) {

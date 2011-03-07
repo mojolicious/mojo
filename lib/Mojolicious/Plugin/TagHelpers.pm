@@ -373,6 +373,7 @@ Generate C<base> tag refering to the current base URL.
   <%= check_box employed => 1, id => 'foo' %>
 
 Generate checkbox input element.
+Previous input values will automatically get picked up and shown as default.
 
   <input name="employed" type="checkbox" value="1" />
   <input id="foo" name="employed" type="checkbox" value="1" />
@@ -453,6 +454,7 @@ Generate image tag.
   <%= input_tag 'country', type => 'radio', value => 'germany' %>
 
 Generate form input element.
+Previous input values will automatically get picked up and shown as default.
 
   <input name="first_name" />
   <input name="first_name" value="Default name" />
@@ -510,6 +512,7 @@ Generate password input element.
   <%= radio_button country => 'germany', id => 'foo' %>
 
 Generate radio input element.
+Previous input values will automatically get picked up and shown as default.
 
   <input name="country" type="radio" value="germany" />
   <input id="foo" name="country" type="radio" value="germany" />
@@ -523,6 +526,7 @@ Generate radio input element.
   <%= select_field country => [[Germany => 'de', class => 'europe'], 'en'] %>
 
 Generate select, option and optgroup elements.
+Previous input values will automatically get picked up and shown as default.
 
   <select name="language">
     <option value="de">de</option>
@@ -590,6 +594,7 @@ HTML5 tag generator.
   <%= text_field first_name => 'Default name', class => 'user' %>
 
 Generate text input element.
+Previous input values will automatically get picked up and shown as default.
 
   <input name="first_name" />
   <input name="first_name" value="Default name" />
@@ -603,6 +608,7 @@ Generate text input element.
   <% end %>
 
 Generate textarea element.
+Previous input values will automatically get picked up and shown as default.
 
   <textarea name="foo"></textarea>
   <textarea name="foo">

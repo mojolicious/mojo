@@ -134,7 +134,7 @@ use warnings;
 use Test::More tests => 5;
 use Test::Mojo;
 
-use_ok('<%= $class %>');
+use_ok '<%= $class %>';
 
 # Test
 my $t = Test::Mojo->new(app => '<%= $class %>');

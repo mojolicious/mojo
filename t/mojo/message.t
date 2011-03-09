@@ -479,16 +479,16 @@ is $req->url, '/foo/bar/baz.html?foo13#23', 'right URL';
 is $req->query_params, 'foo13', 'right parameters';
 like $req->headers->content_type,
   qr/multipart\/form-data/, 'right "Content-Type" value';
-is ref $req->content->parts->[0], 'Mojo::Content::Single', 'right part';
-is ref $req->content->parts->[1], 'Mojo::Content::Single', 'right part';
-is ref $req->content->parts->[2], 'Mojo::Content::Single', 'right part';
+isa_ok $req->content->parts->[0], 'Mojo::Content::Single', 'right part';
+isa_ok $req->content->parts->[1], 'Mojo::Content::Single', 'right part';
+isa_ok $req->content->parts->[2], 'Mojo::Content::Single', 'right part';
 is $req->content->parts->[0]->asset->slurp, "hallo welt test123\n",
   'right content';
 is_deeply $req->body_params->to_hash->{text1}, "hallo welt test123\n",
   'right value';
 is_deeply $req->body_params->to_hash->{text2}, '', 'right value';
-is $req->upload('upload')->filename, 'hello.pl', 'right filename';
-is ref $req->upload('upload')->asset, 'Mojo::Asset::Memory', 'right file';
+is $req->upload('upload')->filename,  'hello.pl',            'right filename';
+isa_ok $req->upload('upload')->asset, 'Mojo::Asset::Memory', 'right file';
 is $req->upload('upload')->asset->size, 69, 'right size';
 my $file = File::Spec->catfile(File::Temp::tempdir(CLEANUP => 1),
   ("MOJO_TMP." . time . ".txt"));
@@ -965,9 +965,9 @@ is $res->at_least_version('1.0'), 1,     'at least version 1.0';
 is $res->at_least_version('1.2'), undef, 'not version 1.2';
 ok $res->headers->content_type =~ /multipart\/form-data/,
   'right "Content-Type" value';
-is ref $res->content->parts->[0], 'Mojo::Content::Single', 'right part';
-is ref $res->content->parts->[1], 'Mojo::Content::Single', 'right part';
-is ref $res->content->parts->[2], 'Mojo::Content::Single', 'right part';
+isa_ok $res->content->parts->[0], 'Mojo::Content::Single', 'right part';
+isa_ok $res->content->parts->[1], 'Mojo::Content::Single', 'right part';
+isa_ok $res->content->parts->[2], 'Mojo::Content::Single', 'right part';
 is $res->content->parts->[0]->asset->slurp, "hallo welt test123\n",
   'right content';
 
@@ -998,7 +998,7 @@ is $res->at_least_version('1.0'), 1,     'at least version 1.0';
 is $res->at_least_version('1.2'), undef, 'not version 1.2';
 ok $res->headers->content_type =~ /multipart\/form-data/,
   'right "Content-Type" value';
-is ref $res->content, 'Mojo::Content::Single', 'right content';
+isa_ok $res->content, 'Mojo::Content::Single', 'right content';
 like $res->content->asset->slurp, qr/hallo\ welt/, 'right content';
 
 # Build HTTP 1.1 response start line with minimal headers
@@ -2049,13 +2049,13 @@ is $req->body, 'hi there!', 'right content';
 $req->body(undef);
 is $req->body, '', 'right content';
 $req->body(sub { });
-is ref $req->body, 'CODE', 'body is callback';
+isa_ok $req->body, 'CODE', 'body is callback';
 $req->body(undef);
 is $req->body, '', 'right content';
 $req->body(0);
 is $req->body, 0, 'right content';
 $req->body(sub { });
-is ref $req->body, 'CODE', 'body is callback';
+isa_ok $req->body, 'CODE', 'body is callback';
 $req->body('hello!');
 is $req->body, 'hello!', 'right content';
 is $req->content->on_read, undef, 'no read callback';

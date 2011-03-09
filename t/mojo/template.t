@@ -488,7 +488,7 @@ $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 % $foo = 1;
 EOF
-is ref $output, 'Mojo::Exception', 'right exception';
+isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/^Global symbol "\$foo" requires/, 'right message';
 
 # Importing into a template
@@ -514,7 +514,7 @@ test
 % die "x\n";
 test
 EOF
-is ref $output, 'Mojo::Exception', 'right exception';
+isa_ok $output, 'Mojo::Exception', 'right exception';
 is $output->message, "x\n", 'right message';
 is $output->lines_before->[0]->[0], 1,      'right number';
 is $output->lines_before->[0]->[1], 'test', 'right line';
@@ -533,7 +533,7 @@ test
 %= 1 + 1
 test
 EOF
-is ref $output, 'Mojo::Exception', 'right exception';
+isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/^Missing right curly or square bracket/,
   'right message';
 like $output->message, qr/syntax error at template line 5.$/, 'right message';
@@ -559,7 +559,7 @@ test
 %= 1 + 1
 test
 EOF
-is ref $output, 'Mojo::Exception', 'right exception';
+isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/ohoh/, 'right message';
 is $output->lines_before->[0]->[0], 14, 'right number';
 is $output->lines_before->[0]->[1], 'package MyTemplateException;',
@@ -589,7 +589,7 @@ test
 %= 1 + 1
 test
 EOF
-is ref $output, 'Mojo::Exception', 'right exception';
+isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/oops\!/, 'right message';
 is $output->lines_before->[0]->[0], 1,      'right number';
 is $output->lines_before->[0]->[1], 'test', 'right line';
@@ -660,7 +660,7 @@ like $mt->code,   qr/lala/,             'right code';
 unlike $mt->code, qr/ comment lalala /, 'right code';
 ok !defined($mt->compiled), 'nothing compiled';
 $mt->compile;
-is ref($mt->compiled), 'CODE', 'code compiled';
+isa_ok $mt->compiled, 'CODE', 'code compiled';
 $output = $mt->interpret(2);
 is $output, "<html foo=\"bar\">\n3 test 4 lala \n4\n\</html>\n", 'all tags';
 

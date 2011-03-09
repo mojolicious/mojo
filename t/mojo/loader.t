@@ -19,7 +19,7 @@ use_ok 'Mojo::Loader';
 # Exception
 my $loader = Mojo::Loader->new;
 my $e      = $loader->load('LoaderException');
-is ref $e, 'Mojo::Exception', 'right object';
+isa_ok $e, 'Mojo::Exception', 'right object';
 like $e->message, qr/Missing right curly/, 'right message';
 is $e->lines_before->[0]->[0],   5,         'right line';
 like $e->lines_before->[0]->[1], qr/Apu/,   'right value';
@@ -38,7 +38,7 @@ like "$e", qr/Missing right curly/, 'right message';
 # Complicated exception
 $loader = Mojo::Loader->new;
 $e      = $loader->load('LoaderException2');
-is ref $e, 'Mojo::Exception', 'right object';
+isa_ok $e, 'Mojo::Exception', 'right object';
 like $e->message, qr/Exception/, 'right message';
 is $e->lines_before->[0]->[0], 1,                           'right line';
 is $e->lines_before->[0]->[1], 'package LoaderException2;', 'right value';

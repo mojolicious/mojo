@@ -354,11 +354,12 @@ sub _exception {
 
   # Context
   my $context = 'Malformed JSON: ' . shift;
-  if(m/\G\z/gc) { $context .= ' before end of data'; }
+  if (m/\G\z/gc) { $context .= ' before end of data'; }
   else {
-      my @lines=split /\n/, substr($_,0,pos);
-      $context .= ' at line '.@lines.', offset '.length(pop @lines||'');
-  } 
+    my @lines = split /\n/, substr($_, 0, pos);
+    $context .= ' at line ' . @lines . ', offset ' . length(pop @lines || '');
+  }
+
   # Throw
   die "$context.\n";
 }

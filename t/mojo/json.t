@@ -285,7 +285,8 @@ is $json->decode("[\"foo\",\n\"bar\"]lala"), undef, 'syntax error';
 is $json->error,
   'Malformed JSON: Unexpected data after array at line 2, offset 6.',
   'right error';
-is $json->decode("[\"foo\",\n\"bar\",\n\"bazra\"]lalala"), undef, 'syntax error';
+is $json->decode("[\"foo\",\n\"bar\",\n\"bazra\"]lalala"), undef,
+  'syntax error';
 is $json->error,
   'Malformed JSON: Unexpected data after array at line 3, offset 8.',
   'right error';

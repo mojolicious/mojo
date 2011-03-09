@@ -8,6 +8,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL support for IPv6.
         - Added more Perl-ish configuration plugin.
         - Added drain callback support for WebSockets.
+        - Added line numbers to Mojo::JSON error messages. (marcus)
         - Removed experimental status from hypnotoad and
           Mojolicious::Plugin::TagHelpers.
         - Removed experimental status from many attributes and methods all

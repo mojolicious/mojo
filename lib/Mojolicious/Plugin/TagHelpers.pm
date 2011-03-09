@@ -357,6 +357,16 @@ L<Mojolicious>.
 This is a core plugin, that means it is always enabled and its code a good
 example for learning to build new plugins.
 
+Most form helpers can automatically pick up previous input values and will
+show them as default.
+You can also use C<param> to set them manually and let neccessary attributes
+always be generated automatically.
+
+  <% param country => 'germany' unless param 'country' %>
+  <%= radio_button 'country', value => 'germany' %> Germany
+  <%= radio_button 'country', value => 'france'  %> France
+  <%= radio_button 'country', value => 'uk'      %> UK
+
 =head1 HELPERS
 
 =head2 C<base_tag>
@@ -460,11 +470,6 @@ Previous input values will automatically get picked up and shown as default.
   <input name="first_name" value="Default name" />
   <input name="employed" type="checkbox" />
   <input name="country" type="radio" value="germany" />
-
-You can also use C<param> to set default values for all tag helpers that can
-pick them up automatically.
-
-  <% param first_name => 'Sebastian' unless param 'first_name' %>
 
 =head2 C<javascript>
 

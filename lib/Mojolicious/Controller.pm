@@ -1408,7 +1408,7 @@ C<public> directory of your application.
 Render the given content as Perl characters, which will be encoded to bytes.
 See C<render_data> for an alternative without encoding.
 Note that this does not change the content type of the response, which is
-C<text/html> by default.
+C<text/html;charset=UTF-8> by default.
 
   $c->render_text('Hello World!', format => 'txt');
 

@@ -32,10 +32,10 @@ our $DEVELOPMENT_NOT_FOUND =
   Mojo::Command->new->get_data('not_found.development.html.ep', __PACKAGE__);
 
 # Reserved stash values
-my @RESERVED =
-  qw/action app cb class controller data exception extends format/;
-push @RESERVED,
-  qw/handler json layout method namespace partial path status template text/;
+my @RESERVED = (
+  qw/action app cb class controller data exception extends format handler/,
+  qw/json layout method namespace partial path status template text/
+);
 my $STASH_RE = join '|', @RESERVED;
 $STASH_RE = qr/^(?:$STASH_RE)$/;
 

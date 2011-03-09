@@ -1333,8 +1333,6 @@ It will set a default template to use based on the controller and action name
 or fall back to the route name.
 You can call it with a hash of options which can be preceded by an optional
 template name.
-Note that all render arguments get localized, so stash values won't be
-changed after the render call.
 
 =head2 C<render_data>
 

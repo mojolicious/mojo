@@ -461,6 +461,11 @@ Previous input values will automatically get picked up and shown as default.
   <input name="employed" type="checkbox" />
   <input name="country" type="radio" value="germany" />
 
+You can also use C<param> to set default values for all tag helpers that can
+pick them up automatically.
+
+  <% param first_name => 'Sebastian' unless param 'first_name' %>
+
 =head2 C<javascript>
 
   <%= javascript '/script.js' %>

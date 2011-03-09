@@ -1387,8 +1387,8 @@ status code to C<404>.
 
 =head2 C<render_partial>
 
-  my $output = $c->render_partial;
-  my $output = $c->render_partial(action => 'foo');
+  my $output = $c->render_partial('menubar');
+  my $output = $c->render_partial('menubar', format => 'txt');
     
 Same as C<render> but returns the rendered result.
 

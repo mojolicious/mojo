@@ -22,6 +22,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed route unescaping bug.
         - Fixed small Mojo::DOM bug. (yko)
         - Fixed small documentation bug.
+        - Fixed typos. (kimoto)
 
 1.11 2011-02-18 00:00:00
         - Deprecated Mojo::Client async method in favor of the managed

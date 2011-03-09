@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 106;
+use Test::More tests => 110;
 
 use Mojo::ByteStream 'b';
 
@@ -243,41 +243,49 @@ is_deeply $hash, {foo => 'c:\progra~1\mozill~1\firefox.exe'},
 is $json->decode(b("\x{feff}[\"\\ud800\"]")->encode('UTF-16LE')), undef,
   'missing high surrogate';
 is $json->error,
-  'Malformed JSON: Missing low-surrogate at character offset 8.',
+  'Malformed JSON: Missing low-surrogate at line 1, offset 8.',
   'right error';
 is $json->decode(b("\x{feff}[\"\\udf46\"]")->encode('UTF-16LE')), undef,
   'missing low surrogate';
 is $json->error,
-  'Malformed JSON: Missing high-surrogate at character offset 8.',
+  'Malformed JSON: Missing high-surrogate at line 1, offset 8.',
   'right error';
 is $json->decode('[[]'), undef, 'missing right square bracket';
 is $json->error,
   'Malformed JSON: Expected comma or right square bracket while'
-  . ' parsing array at character offset 3.', 'right error';
+  . ' parsing array at line 1, offset 3.', 'right error';
 is $json->decode('{{}'), undef, 'missing right curly bracket';
 is $json->error,
   'Malformed JSON: Expected string while'
-  . ' parsing object at character offset 1.', 'right error';
+  . ' parsing object at line 1, offset 1.', 'right error';
 is $json->decode('[[]...'), undef, 'syntax error';
 is $json->error,
   'Malformed JSON: Expected comma or right square bracket while'
-  . ' parsing array at character offset 3.', 'right error';
+  . ' parsing array at line 1, offset 3.', 'right error';
 is $json->decode('{{}...'), undef, 'syntax error';
 is $json->error, 'Malformed JSON: Expected string while'
-  . ' parsing object at character offset 1.', 'right error';
+  . ' parsing object at line 1, offset 1.', 'right error';
 is $json->decode('[nan]'), undef, 'syntax error';
 is $json->error, 'Malformed JSON: Expected string, array, object, number,'
-  . ' boolean or null at character offset 1.', 'right error';
+  . ' boolean or null at line 1, offset 1.', 'right error';
 is $json->decode('["foo]'), undef, 'syntax error';
-is $json->error, 'Malformed JSON: Unterminated string at character offset 6.',
+is $json->error, 'Malformed JSON: Unterminated string at line 1, offset 6.',
   'right error';
 is $json->decode('["foo"]lala'), undef, 'syntax error';
 is $json->error,
-  'Malformed JSON: Unexpected data after array at character offset 7.',
+  'Malformed JSON: Unexpected data after array at line 1, offset 7.',
   'right error';
 is $json->decode('false'), undef, 'no object or array';
 is $json->error,
-  'Malformed JSON: Expected array or object at character offset 0.',
+  'Malformed JSON: Expected array or object at line 0, offset 0.',
   'right error';
 is $json->decode(''), undef, 'no object or array';
 is $json->error, 'Missing or empty input.', 'right error';
+is $json->decode("[\"foo\",\n\"bar\"]lala"), undef, 'syntax error';
+is $json->error,
+  'Malformed JSON: Unexpected data after array at line 2, offset 6.',
+  'right error';
+is $json->decode("[\"foo\",\n\"bar\",\n\"bazra\"]lalala"), undef, 'syntax error';
+is $json->error,
+  'Malformed JSON: Unexpected data after array at line 3, offset 8.',
+  'right error';

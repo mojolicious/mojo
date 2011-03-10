@@ -359,7 +359,7 @@ example for learning to build new plugins.
 
 Most form helpers can automatically pick up previous input values and will
 show them as default.
-You can also use C<param> to set them manually and let neccessary attributes
+You can also use C<param> to set them manually and let necessary attributes
 always be generated automatically.
 
   <% param country => 'germany' unless param 'country' %>

@@ -1749,7 +1749,7 @@ Start processing all queued transactions.
   my $port = $client->test_server;
   my $port = $client->test_server('https');
 
-Starts a test server for C<app> if neccessary and returns the port number.
+Starts a test server for C<app> if necessary and returns the port number.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<websocket>

@@ -145,7 +145,7 @@ $t->get_ok('/progress/23')->status_is(200)->content_is('100%');
 ok @{$cache->{23}} > 1, 'made progress';
 ok $cache->{23}->[0] < $cache->{23}->[-1], 'progress increased';
 
-my $client = $t->client;
+my $ua = $t->ua;
 
 # POST /uploadlimit (huge upload without appropriate max message size)
 my $backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
@@ -164,7 +164,7 @@ $content->parts([$part]);
 $tx->req->method('POST');
 $tx->req->url->parse('/uploadlimit');
 $tx->req->content($content);
-$client->start($tx);
+$ua->start($tx);
 is $tx->res->code, 413,        'right status';
 is $tx->res->body, 'called, ', 'right content';
 $ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
@@ -186,7 +186,7 @@ $content->parts([$part]);
 $tx->req->method('POST');
 $tx->req->url->parse('/uploadlimit');
 $tx->req->content($content);
-$client->start($tx);
+$ua->start($tx);
 ok $tx->is_done, 'transaction is done';
 is $tx->res->code, 200, 'right status';
 is b($tx->res->body)->decode('UTF-8')->to_string,

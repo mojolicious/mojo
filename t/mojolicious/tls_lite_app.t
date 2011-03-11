@@ -18,7 +18,7 @@ plan tests => 18;
 #  Don't be a sap, Dad. These are just crappy knockoffs.
 #  Pfft. I know a genuine Panaphonics when I see it.
 #  And look, there's a Magnetbox and Sorny."
-use Mojo::Client;
+use Mojo::UserAgent;
 use Mojolicious::Lite;
 use Test::Mojo;
 
@@ -45,7 +45,7 @@ get '/again' => sub {
 my $t = Test::Mojo->new;
 
 # Use HTTPS
-$t->client->test_server('https');
+$t->ua->test_server('https');
 
 # GET /login
 $t->get_ok('/login?name=sri')->status_is(200)->content_is('Welcome sri!');
@@ -54,8 +54,8 @@ $t->get_ok('/login?name=sri')->status_is(200)->content_is('Welcome sri!');
 $t->get_ok('/again')->status_is(200)->content_is('Welcome back sri!');
 
 # Use HTTP
-$t->client(Mojo::Client->new);
-$t->client->test_server('http');
+$t->ua(Mojo::UserAgent->new);
+$t->ua->test_server('http');
 
 # GET /login
 $t->get_ok('/login?name=sri')->status_is(200)->content_is('Welcome sri!');
@@ -64,8 +64,8 @@ $t->get_ok('/login?name=sri')->status_is(200)->content_is('Welcome sri!');
 $t->get_ok('/again')->status_is(200)->content_is('Welcome back anonymous!');
 
 # Use HTTPS again
-$t->client(Mojo::Client->new);
-$t->client->test_server('https');
+$t->ua(Mojo::UserAgent->new);
+$t->ua->test_server('https');
 
 # GET /login
 $t->get_ok('/login?name=sri')->status_is(200)->content_is('Welcome sri!');

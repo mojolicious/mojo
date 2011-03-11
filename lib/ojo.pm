@@ -6,11 +6,14 @@ use warnings;
 # "I heard beer makes you stupid.
 #  No I'm... doesn't."
 use Mojo::ByteStream 'b';
-use Mojo::Client;
 use Mojo::DOM;
+use Mojo::UserAgent;
 
 # Silent oneliners
 $ENV{MOJO_LOG_LEVEL} ||= 'fatal';
+
+# User agent
+my $UA = Mojo::UserAgent->new;
 
 # "I'm sorry, guys. I never meant to hurt you.
 #  Just to destroy everything you ever believed in."
@@ -28,8 +31,10 @@ sub import {
   eval "package $caller; use Mojolicious::Lite;";
 
   # Allow redirects
-  Mojo::Client->singleton->max_redirects(1)
-    unless defined $ENV{MOJO_MAX_REDIRECTS};
+  $UA->max_redirects(1) unless defined $ENV{MOJO_MAX_REDIRECTS};
+
+  # Application
+  $UA->app(*{"${caller}::app"}->());
 
   # Functions
   *{"${caller}::Oo"} = *{"${caller}::b"} = \&b;
@@ -42,7 +47,6 @@ sub import {
   *{"${caller}::h"} = sub { _request('head',      @_) };
   *{"${caller}::p"} = sub { _request('post',      @_) };
   *{"${caller}::u"} = sub { _request('put',       @_) };
-  *{"${caller}::w"} = sub { Mojo::Client->singleton->websocket(@_)->start };
   *{"${caller}::x"} = sub { Mojo::DOM->new->parse(@_) };
 }
 
@@ -52,17 +56,14 @@ sub _request {
   # Method
   my $method = $_[0] =~ /:|\// ? 'get' : lc shift;
 
-  # Client
-  my $client = Mojo::Client->singleton;
-
   # Transaction
   my $tx =
       $method eq 'post_form'
-    ? $client->build_form_tx(@_)
-    : $client->build_tx($method, @_);
+    ? $UA->build_form_tx(@_)
+    : $UA->build_tx($method, @_);
 
   # Process
-  $client->start($tx, sub { $tx = $_[1] });
+  $tx = $UA->start($tx);
 
   # Error
   my ($message, $code) = $tx->error;
@@ -200,12 +201,6 @@ object.
 
 Perform C<PUT> request and turn response into a L<Mojo::Message::Response>
 object.
-
-=head2 C<w>
-
-  w('ws://mojolicio.us' => sub {...});
-
-Open a WebSocket connection.
 
 =head2 C<x>
 

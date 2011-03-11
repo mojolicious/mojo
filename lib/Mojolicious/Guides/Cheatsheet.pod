@@ -213,7 +213,7 @@ Maximum size for HTTP messages in bytes, defaults to C<5242880>.
 
   MOJO_MAX_REDIRECTS=3
 
-Maximum number of redirects L<Mojo::Client> will follow, defaults to C<0>.
+Maximum number of redirects L<Mojo::UserAgent> will follow, defaults to C<0>.
 
 =head2 C<MOJO_MODE>
 
@@ -260,7 +260,7 @@ since other mainloops are generally faster and scale better.
 
 =head2 C<MOJO_PROXY>
 
-Enable automatic HTTP and HTTPS proxy detection in L<Mojo::Client>, for
+Enable automatic HTTP and HTTPS proxy detection in L<Mojo::UserAgent>, for
 security reasons this is disabled by default.
 
   MOJO_PROXY=1

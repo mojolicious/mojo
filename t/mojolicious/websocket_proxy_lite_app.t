@@ -9,9 +9,9 @@ BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 use Test::More tests => 9;
 
 # "Your mistletoe is no match for my *tow* missile."
-use Mojo::Client;
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
+use Mojo::UserAgent;
 use Mojolicious::Lite;
 
 # Silence
@@ -45,8 +45,8 @@ websocket '/test' => sub {
 };
 
 # HTTP server for testing
-my $client = Mojo::Client->new;
-my $loop   = $client->ioloop;
+my $ua     = Mojo::UserAgent->new;
+my $loop   = Mojo::IOLoop->singleton;
 my $server = Mojo::Server::Daemon->new(app => app, ioloop => $loop);
 my $port   = Mojo::IOLoop->new->generate_port;
 $server->listen(["http://*:$port"]);
@@ -109,62 +109,82 @@ $loop->listen(
 );
 
 # GET / (normal request)
-is $client->get("http://localhost:$port/")->success->body,
-  "Hello World! / http://localhost:$port/", 'right content';
+my $result;
+$ua->get(
+  "http://localhost:$port/" => sub {
+    $result = pop->success->body;
+    $loop->stop;
+  }
+);
+$loop->start;
+is $result, "Hello World! / http://localhost:$port/", 'right content';
 
 # WebSocket /test (normal websocket)
-my $result;
-$client->websocket(
+$result = undef;
+$ua->websocket(
   "ws://localhost:$port/test" => sub {
-    my $self = shift;
-    $self->on_message(
+    my $tx = pop;
+    $tx->on_finish(sub { $loop->stop });
+    $tx->on_message(
       sub {
-        my ($self, $message) = @_;
+        my ($tx, $message) = @_;
         $result = $message;
-        $self->finish;
+        $tx->finish;
       }
     );
-    $self->send_message('test1');
+    $tx->send_message('test1');
   }
-)->start;
+);
+$loop->start;
 is $result, 'test1test2', 'right result';
 
 # GET http://kraih.com/proxy (proxy request)
-$client->http_proxy("http://localhost:$port");
-is $client->get("http://kraih.com/proxy")->success->body,
-  'http://kraih.com/proxy', 'right content';
+$ua->http_proxy("http://localhost:$port");
+$result = undef;
+$ua->get(
+  "http://kraih.com/proxy" => sub {
+    $result = pop->success->body;
+    $loop->stop;
+  }
+);
+$loop->start;
+is $result, 'http://kraih.com/proxy', 'right content';
 
 # WebSocket /test (proxy websocket)
-$client->http_proxy("http://localhost:$proxy");
+$ua->http_proxy("http://localhost:$proxy");
 $result = undef;
-$client->websocket(
+$ua->websocket(
   "ws://localhost:$port/test" => sub {
-    my $self = shift;
-    $self->on_message(
+    my $tx = pop;
+    $tx->on_finish(sub { $loop->stop });
+    $tx->on_message(
       sub {
-        my ($self, $message) = @_;
+        my ($tx, $message) = @_;
         $result = $message;
-        $self->finish;
+        $tx->finish;
       }
     );
-    $self->send_message('test1');
+    $tx->send_message('test1');
   }
-)->start;
+);
+$loop->start;
 is $connected, "localhost:$port", 'connected';
 is $result,    'test1test2',      'right result';
 ok $read > 25, 'read enough';
 ok $sent > 25, 'sent enough';
 
 # WebSocket /test (proxy websocket with bad target)
-$client->http_proxy("http://localhost:$proxy");
+$ua->http_proxy("http://localhost:$proxy");
 my $port2 = $port + 1;
 my ($success, $error);
-$client->websocket(
+$ua->websocket(
   "ws://localhost:$port2/test" => sub {
-    my ($self, $tx) = @_;
+    my $tx = pop;
     $success = $tx->success;
     $error   = $tx->error;
+    $loop->stop;
   }
-)->start;
+);
+$loop->start;
 is $success, undef, 'no success';
 is $error, 'Proxy connection failed.', 'right message';

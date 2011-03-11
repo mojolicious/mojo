@@ -11,7 +11,12 @@ plan skip_all => 'set TEST_POD to enable this test (developer only!)'
   unless $ENV{TEST_POD};
 
 # DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
-my @smiling_cat = qw/async/;
+my @smiling_cat = (
+  qw/async build_form_tx build_tx build_websocket_tx client clone delete/,
+  qw/detect_proxy finish get head need_proxy on_finish on_message/,
+  qw/post post_form put queue req res send_message singleton start/,
+  qw/test_server websocket/
+);
 
 # DEPRECATED in Hot Beverage!
 my @hot_beverage = qw/handler helper session/;

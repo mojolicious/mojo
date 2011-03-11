@@ -12,9 +12,9 @@ use File::Spec;
 use File::Temp;
 use FindBin;
 use IO::Socket::INET;
-use Mojo::Client;
 use Mojo::IOLoop;
 use Mojo::Template;
+use Mojo::UserAgent;
 
 # Mac OS X only test
 plan skip_all => 'Mac OS X required for this test!' unless $^O eq 'darwin';
@@ -83,17 +83,11 @@ sleep 1
   );
 
 # Request
-my $client = Mojo::Client->new;
+my $ua = Mojo::UserAgent->new;
 my ($code, $body);
-$client->get(
-  "http://127.0.0.1:$port/cgi-bin/test.cgi" => sub {
-    my $self = shift;
-    $code = $self->res->code;
-    $body = $self->res->body;
-  }
-)->start;
-is $code,   200,      'right status';
-like $body, qr/Mojo/, 'right content';
+my $tx = $ua->get("http://127.0.0.1:$port/cgi-bin/test.cgi");
+is $tx->res->code,   200,      'right status';
+like $tx->res->body, qr/Mojo/, 'right content';
 
 # Form with chunked response
 my $params = {};
@@ -101,29 +95,18 @@ for my $i (1 .. 10) { $params->{"test$i"} = $i }
 my $result = '';
 for my $key (sort keys %$params) { $result .= $params->{$key} }
 ($code, $body) = undef;
-$client->post_form(
-  "http://127.0.0.1:$port/cgi-bin/test.cgi/diag/chunked_params" => $params =>
-    sub {
-    my $self = shift;
-    $code = $self->res->code;
-    $body = $self->res->body;
-  }
-)->start;
-is $code, 200, 'right status';
-is $body, $result, 'right content';
+$tx = $ua->post_form(
+  "http://127.0.0.1:$port/cgi-bin/test.cgi/diag/chunked_params" => $params);
+is $tx->res->code, 200, 'right status';
+is $tx->res->body, $result, 'right content';
 
 # Upload
 ($code, $body) = undef;
-$client->post_form(
-  "http://127.0.0.1:$port/cgi-bin/test.cgi/diag/upload" =>
-    {file => {content => $result}} => sub {
-    my $self = shift;
-    $code = $self->res->code;
-    $body = $self->res->body;
-  }
-)->start;
-is $code, 200, 'right status';
-is $body, $result, 'right content';
+$tx =
+  $ua->post_form("http://127.0.0.1:$port/cgi-bin/test.cgi/diag/upload" =>
+    {file => {content => $result}});
+is $tx->res->code, 200, 'right status';
+is $tx->res->body, $result, 'right content';
 
 # Stop
 kill 'INT', $pid;

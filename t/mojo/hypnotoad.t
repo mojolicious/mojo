@@ -13,10 +13,10 @@ use File::Spec;
 use File::Temp;
 use FindBin;
 use IO::Socket::INET;
-use Mojo::Client;
 use Mojo::IOLoop;
 use Mojo::Template;
 use Mojo::Transaction::HTTP;
+use Mojo::UserAgent;
 
 plan skip_all => 'set TEST_HYPNOTOAD to enable this test (developer only!)'
   unless $ENV{TEST_HYPNOTOAD};
@@ -48,14 +48,14 @@ sleep 1
   PeerPort => $port
   );
 
-my $client = Mojo::Client->new;
+my $ua = Mojo::UserAgent->new;
 
 # Single request without keep alive
 my $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse("http://127.0.0.1:$port/0/");
 $tx->req->headers->connection('close');
-$client->start($tx);
+$ua->start($tx);
 ok $tx->is_done, 'transaction is done';
 is $tx->res->code, 200, 'right status';
 like $tx->res->headers->connection, qr/close/i, 'right "Connection" header';
@@ -76,7 +76,10 @@ $tx3->req->url->parse("http://127.0.0.1:$port/3/");
 my $tx4 = Mojo::Transaction::HTTP->new;
 $tx4->req->method('GET');
 $tx4->req->url->parse("http://127.0.0.1:$port/4/");
-$client->start($tx, $tx2, $tx3, $tx4);
+$ua->start($tx);
+$ua->start($tx2);
+$ua->start($tx3);
+$ua->start($tx4);
 ok $tx->is_done,  'transaction is done';
 ok $tx2->is_done, 'transaction is done';
 ok $tx3->is_done, 'transaction is done';
@@ -93,7 +96,7 @@ $tx->req->method('GET');
 $tx->req->url->parse("http://127.0.0.1:$port/5/");
 $tx->req->headers->expect('fun');
 $tx->req->body('Hello Mojo!');
-$client->start($tx);
+$ua->start($tx);
 is $tx->res->code, 200, 'right status';
 like $tx->res->headers->connection, qr/Keep-Alive/i,
   'right "Connection" header';
@@ -103,7 +106,7 @@ like $tx->res->body, qr/Mojo/, 'right content';
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse("http://127.0.0.1:$port/6/");
-$client->start($tx);
+$ua->start($tx);
 is $tx->res->code, 200, 'right status';
 is $tx->kept_alive, 1, 'connection was alive';
 like $tx->res->headers->connection,
@@ -114,7 +117,7 @@ like $tx->res->body, qr/Mojo/, 'right content';
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse("http://127.0.0.1:$port/7/");
-$client->start($tx);
+$ua->start($tx);
 is $tx->res->code, 200, 'right status';
 is $tx->kept_alive, 1, 'connection was kept alive';
 like $tx->res->headers->connection,
@@ -128,7 +131,8 @@ $tx->req->url->parse("http://127.0.0.1:$port/8/");
 $tx2 = Mojo::Transaction::HTTP->new;
 $tx2->req->method('GET');
 $tx2->req->url->parse("http://127.0.0.1:$port/9/");
-$client->start($tx, $tx2);
+$ua->start($tx);
+$ua->start($tx2);
 ok $tx->is_done,  'transaction is done';
 ok $tx2->is_done, 'transaction is done';
 is $tx->res->code,  200, 'right status';
@@ -151,7 +155,10 @@ $tx3->req->url->parse(
 $tx4 = Mojo::Transaction::HTTP->new;
 $tx4->req->method('GET');
 $tx4->req->url->parse("http://127.0.0.1:$port/13/");
-$client->start($tx, $tx2, $tx3, $tx4);
+$ua->start($tx);
+$ua->start($tx2);
+$ua->start($tx3);
+$ua->start($tx4);
 ok $tx->is_done,  'transaction is done';
 ok $tx2->is_done, 'transaction is done';
 ok $tx3->is_done, 'transaction is done';

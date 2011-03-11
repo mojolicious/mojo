@@ -9,11 +9,12 @@ BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 use Test::More;
 plan skip_all => 'Windows is too fragile for this test!'
   if $^O eq 'MSWin32' || $^O =~ /cygwin/;
-plan tests => 81;
+plan tests => 68;
 
-use_ok 'Mojo::Client';
+use_ok 'Mojo::UserAgent';
 
 # "The strong must protect the sweet."
+use Mojo::IOLoop;
 use Mojolicious::Lite;
 
 # Silence
@@ -23,7 +24,7 @@ app->log->level('fatal');
 get '/' => {text => 'works'};
 
 # Proxy detection
-my $client  = Mojo::Client->new;
+my $ua      = Mojo::UserAgent->new;
 my $backup  = $ENV{HTTP_PROXY} || '';
 my $backup2 = $ENV{HTTPS_PROXY} || '';
 my $backup3 = $ENV{NO_PROXY} || '';
@@ -33,34 +34,33 @@ my $backup6 = $ENV{no_proxy} || '';
 $ENV{HTTP_PROXY}  = 'http://127.0.0.1';
 $ENV{HTTPS_PROXY} = 'http://127.0.0.1:8080';
 $ENV{NO_PROXY}    = 'mojolicio.us';
-$client->detect_proxy;
-is $client->http_proxy,  'http://127.0.0.1',      'right proxy';
-is $client->https_proxy, 'http://127.0.0.1:8080', 'right proxy';
-$client->http_proxy(undef);
-$client->https_proxy(undef);
-is $client->http_proxy,  undef, 'right proxy';
-is $client->https_proxy, undef, 'right proxy';
-is $client->need_proxy('dummy.mojolicio.us'), undef, 'no proxy needed';
-is $client->need_proxy('icio.us'),            1,     'proxy needed';
-is $client->need_proxy('localhost'),          1,     'proxy needed';
+$ua->detect_proxy;
+is $ua->http_proxy,  'http://127.0.0.1',      'right proxy';
+is $ua->https_proxy, 'http://127.0.0.1:8080', 'right proxy';
+$ua->http_proxy(undef);
+$ua->https_proxy(undef);
+is $ua->http_proxy,  undef, 'right proxy';
+is $ua->https_proxy, undef, 'right proxy';
+is $ua->need_proxy('dummy.mojolicio.us'), undef, 'no proxy needed';
+is $ua->need_proxy('icio.us'),            1,     'proxy needed';
+is $ua->need_proxy('localhost'),          1,     'proxy needed';
 $ENV{HTTP_PROXY}  = undef;
 $ENV{HTTPS_PROXY} = undef;
 $ENV{NO_PROXY}    = undef;
 $ENV{http_proxy}  = 'proxy.kraih.com';
 $ENV{https_proxy} = 'tunnel.kraih.com';
 $ENV{no_proxy}    = 'localhost,localdomain,foo.com,kraih.com';
-$client->detect_proxy;
-my $client2 = $client->clone;
-is $client2->http_proxy,  'proxy.kraih.com',  'right proxy';
-is $client2->https_proxy, 'tunnel.kraih.com', 'right proxy';
-is $client2->need_proxy('dummy.mojolicio.us'),    1,     'proxy needed';
-is $client2->need_proxy('icio.us'),               1,     'proxy needed';
-is $client2->need_proxy('localhost'),             undef, 'proxy needed';
-is $client2->need_proxy('localhost.localdomain'), undef, 'no proxy needed';
-is $client2->need_proxy('foo.com'),               undef, 'no proxy needed';
-is $client2->need_proxy('kraih.com'),             undef, 'no proxy needed';
-is $client2->need_proxy('www.kraih.com'),         undef, 'no proxy needed';
-is $client2->need_proxy('www.kraih.com.com'),     1,     'proxy needed';
+$ua->detect_proxy;
+is $ua->http_proxy,  'proxy.kraih.com',  'right proxy';
+is $ua->https_proxy, 'tunnel.kraih.com', 'right proxy';
+is $ua->need_proxy('dummy.mojolicio.us'),    1,     'proxy needed';
+is $ua->need_proxy('icio.us'),               1,     'proxy needed';
+is $ua->need_proxy('localhost'),             undef, 'proxy needed';
+is $ua->need_proxy('localhost.localdomain'), undef, 'no proxy needed';
+is $ua->need_proxy('foo.com'),               undef, 'no proxy needed';
+is $ua->need_proxy('kraih.com'),             undef, 'no proxy needed';
+is $ua->need_proxy('www.kraih.com'),         undef, 'no proxy needed';
+is $ua->need_proxy('www.kraih.com.com'),     1,     'proxy needed';
 $ENV{HTTP_PROXY}  = $backup;
 $ENV{HTTPS_PROXY} = $backup2;
 $ENV{NO_PROXY}    = $backup3;
@@ -68,46 +68,17 @@ $ENV{http_proxy}  = $backup4;
 $ENV{https_proxy} = $backup5;
 $ENV{no_proxy}    = $backup6;
 
-# Missing callback
-$client = Mojo::Client->new;
-eval { $client->managed(0)->get('/') };
-like $@, qr/^Unmanaged client requests require a callback/, 'right error';
+# User agent
+$ua = Mojo::UserAgent->new(app => app);
 
-# Cloning
-$client = Mojo::Client->new;
-$client->on_start(sub {23});
-$client->cert('/cert');
-$client->key('/key');
-$client->http_proxy('http://127.0.0.1:3000');
-$client->https_proxy('http://127.0.0.1:4000');
-$client->no_proxy('127.0.0.1');
-$client->user_agent('Trololo');
-$client->keep_alive_timeout(23);
-$client->max_connections(13);
-$client->max_redirects(7);
-$client->websocket_timeout(333);
-$client2 = $client->clone;
-is $client2->on_start,           $client->on_start,           'right value';
-is $client2->cert,               $client->cert,               'right value';
-is $client2->key,                $client->key,                'right value';
-is $client2->http_proxy,         $client->http_proxy,         'right value';
-is $client2->https_proxy,        $client->https_proxy,        'right value';
-is $client2->no_proxy,           $client->no_proxy,           'right value';
-is $client2->user_agent,         $client->user_agent,         'right value';
-is $client2->cookie_jar,         $client->cookie_jar,         'right value';
-is $client2->keep_alive_timeout, $client->keep_alive_timeout, 'right value';
-is $client2->max_connections,    $client->max_connections,    'right value';
-is $client2->max_redirects,      $client->max_redirects,      'right value';
-is $client2->websocket_timeout,  $client->websocket_timeout,  'right value';
-
-# Fresh client
-$client = Mojo::Client->singleton->app(app);
+# Loop
+my $loop = Mojo::IOLoop->singleton;
 
 # Server
-my $port   = $client->ioloop->generate_port;
+my $port   = $loop->generate_port;
 my $buffer = {};
 my $last;
-my $id = $client->ioloop->listen(
+my $id = $loop->listen(
   port      => $port,
   on_accept => sub {
     my ($loop, $id) = @_;
@@ -131,9 +102,9 @@ my $id = $client->ioloop->listen(
 );
 
 # Wonky server (missing Content-Length header)
-my $port2   = $client->ioloop->generate_port;
+my $port2   = $loop->generate_port;
 my $buffer2 = {};
-$client->ioloop->listen(
+$loop->listen(
   port      => $port2,
   on_accept => sub {
     my ($loop, $id) = @_;
@@ -158,38 +129,42 @@ $client->ioloop->listen(
 );
 
 # GET /
-my $tx = $client->get('/');
+my $tx = $ua->get('/');
 ok $tx->success, 'successful';
 is $tx->res->code, 200,     'right status';
 is $tx->res->body, 'works', 'right content';
 
 # GET / (custom connection)
 my ($success, $code, $body);
-$client->ioloop->connect(
+$loop->connect(
   address    => 'localhost',
   port       => $port,
   on_connect => sub {
     my ($loop, $id) = @_;
-    my $tx = $client->build_tx(GET => "http://mojolicio.us:$port/");
+    my $tx = $ua->build_tx(GET => "http://mojolicio.us:$port/");
     $tx->connection($id);
-    $client->start(
+    $ua->start(
       $tx => sub {
-        my $self = shift;
-        $self->ioloop->drop($id);
-        $success = $self->tx->success;
-        $code    = $self->res->code;
-        $body    = $self->res->body;
+        my $tx = pop;
+        $loop->drop($id);
+        $success = $tx->success;
+        $code    = $tx->res->code;
+        $body    = $tx->res->body;
+        $loop->stop;
       }
     );
   }
 );
-$client->ioloop->start;
+$loop->start;
 ok $success, 'successful';
 is $code,    200, 'right status';
 is $body,    'works!', 'right content';
 
+# Fresh blocking user agent
+$ua = Mojo::UserAgent->new(ioloop => $loop, app => app);
+
 # GET / (missing Content-Lengt header)
-$tx = $client->get("http://localhost:$port2/");
+$tx = $ua->get("http://localhost:$port2/");
 ok $tx->success, 'successful';
 ok !$tx->error, 'no error';
 is $tx->kept_alive, undef, 'kept connection not alive';
@@ -198,77 +173,77 @@ is $tx->res->code, 200,          'right status';
 is $tx->res->body, 'works too!', 'right content';
 
 # GET / (mock server)
-$tx = $client->get("http://localhost:$port/mock");
+$tx = $ua->get("http://localhost:$port/mock");
 ok $tx->success, 'successful';
 is $tx->kept_alive, undef, 'kept connection not alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
 # GET / (mock server again)
-$tx = $client->get("http://localhost:$port/mock");
+$tx = $ua->get("http://localhost:$port/mock");
 ok $tx->success, 'successful';
 is $tx->kept_alive, 1, 'kept connection alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
 # Close connection (bypassing safety net)
-$client->ioloop->_drop_immediately($last);
+$loop->_drop_immediately($last);
 
 # GET / (mock server closed connection)
-$tx = $client->get("http://localhost:$port/mock");
+$tx = $ua->get("http://localhost:$port/mock");
 ok $tx->success, 'successful';
 is $tx->kept_alive, undef, 'kept connection not alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
 # GET / (mock server again)
-$tx = $client->get("http://localhost:$port/mock");
+$tx = $ua->get("http://localhost:$port/mock");
 ok $tx->success, 'successful';
 is $tx->kept_alive, 1, 'kept connection alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
 # Close connection (bypassing safety net)
-$client->ioloop->_drop_immediately($last);
+$loop->_drop_immediately($last);
 
 # GET / (mock server closed connection)
-$tx = $client->get("http://localhost:$port/mock");
+$tx = $ua->get("http://localhost:$port/mock");
 ok $tx->success, 'successful';
 is $tx->kept_alive, undef, 'kept connection not alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
 # GET / (mock server again)
-$tx = $client->get("http://localhost:$port/mock");
+$tx = $ua->get("http://localhost:$port/mock");
 ok $tx->success, 'successful';
 is $tx->kept_alive, 1, 'kept connection alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
 # Taint connection
-$client->ioloop->write($last => 'broken!');
+$loop->write($last => 'broken!');
 sleep 1;
 
 # GET / (mock server tainted connection)
-$tx = $client->get("http://localhost:$port/mock");
+$tx = $ua->get("http://localhost:$port/mock");
 ok $tx->success, 'successful';
 is $tx->kept_alive, undef, 'kept connection not alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
 # GET / (mock server again)
-$tx = $client->get("http://localhost:$port/mock");
+$tx = $ua->get("http://localhost:$port/mock");
 ok $tx->success, 'successful';
 is $tx->kept_alive, 1, 'kept connection alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
 # Taint connection
-$client->ioloop->write($last => 'broken!');
+$loop->write($last => 'broken!');
 sleep 1;
 
 # GET / (mock server tainted connection)
-$tx = $client->get("http://localhost:$port/mock");
+$tx = $ua->get("http://localhost:$port/mock");
 ok $tx->success, 'successful';
 is $tx->kept_alive, undef, 'kept connection not alive';
 is $tx->res->code, 200,      'right status';
@@ -276,8 +251,7 @@ is $tx->res->body, 'works!', 'right content';
 
 # Nested keep alive
 my @kept_alive;
-$client = $client->clone->app(app)->managed(0);
-$client->get(
+$ua->get(
   '/',
   sub {
     my ($self, $tx) = @_;
@@ -292,26 +266,25 @@ $client->get(
           sub {
             my ($self, $tx) = @_;
             push @kept_alive, $tx->kept_alive;
-            $self->ioloop->stop;
+            $loop->stop;
           }
         );
       }
     );
   }
 );
-$client->ioloop->start;
+$loop->start;
 is_deeply \@kept_alive, [undef, 1, 1], 'connections kept alive';
 
 # Simple nested keep alive with timers
 @kept_alive = ();
-my $loop = $client->ioloop;
-$client->get(
+$ua->get(
   '/',
   sub {
     push @kept_alive, pop->kept_alive;
     $loop->timer(
       '0.25' => sub {
-        $client->get(
+        $ua->get(
           '/',
           sub {
             push @kept_alive, pop->kept_alive;

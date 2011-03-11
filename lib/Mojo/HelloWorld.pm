@@ -5,9 +5,6 @@ use Mojo::IOLoop;
 use Mojo::JSON;
 use Mojo::Cookie::Response;
 
-has unmanaged =>
-  sub { shift->client->clone->ioloop(Mojo::IOLoop->singleton)->managed(0) };
-
 # "How is education supposed to make me feel smarter? Besides,
 #  every time I learn something new,
 #  it pushes some old stuff out of my brain.
@@ -164,16 +161,12 @@ sub _proxy {
   if (my $url = $tx->req->param('url')) {
 
     # Fetch
-    $self->client->get(
-      $url => sub {
-        my ($self, $tx2) = @_;
+    my $tx2 = $self->ua->get($url);
 
-        # Pass through content
-        $tx->res->headers->content_type($tx2->res->headers->content_type);
-        $tx->res->body($tx2->res->content->asset->slurp);
-        $tx->resume;
-      }
-    )->start;
+    # Pass through content
+    $tx->res->headers->content_type($tx2->res->headers->content_type);
+    $tx->res->body($tx2->res->content->asset->slurp);
+    $tx->resume;
 
     return;
   }
@@ -189,7 +182,7 @@ sub _proxy {
     }
 
     # Fetch
-    $self->unmanaged->get(
+    $self->ua->get(
       $url => sub {
         my ($self, $tx2) = @_;
 
@@ -340,17 +333,6 @@ Mojo::HelloWorld - Hello World!
 
 L<Mojo::HelloWorld> is the default L<Mojo> application, used mostly for
 testing.
-
-=head1 ATTRIBUTES
-
-L<Mojo::HelloWorld> implements the following attributes.
-
-=head2 C<unmanaged>
-
-  my $unmanaged = $hello->unmanaged;
-  $hello        = $hello->unmanaged($unmanaged);
-
-L<Mojo::Client> instance using the global shared L<Mojo::IOLoop> singleton.
 
 =head1 METHODS
 

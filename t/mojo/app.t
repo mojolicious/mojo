@@ -14,9 +14,9 @@ use Test::More tests => 43;
 #  Bart, don't make fun of grad students.
 #  They've just made a terrible life choice."
 use_ok 'Mojo';
-use_ok 'Mojo::Client';
-use_ok 'Mojo::Transaction::HTTP';
 use_ok 'Mojo::HelloWorld';
+use_ok 'Mojo::Transaction::HTTP';
+use_ok 'Mojo::UserAgent';
 
 # Logger
 my $logger = Mojo::Log->new;
@@ -24,12 +24,12 @@ my $app = Mojo->new({log => $logger});
 is $app->log, $logger, 'right logger';
 
 $app = Mojo::HelloWorld->new;
-my $client = Mojo::Client->new->app($app);
+my $ua = Mojo::UserAgent->new->app($app);
 
 # Continue
-my $port   = $client->test_server;
+my $port   = $ua->test_server;
 my $buffer = '';
-$client->ioloop->connect(
+$ua->ioloop->connect(
   address    => 'localhost',
   port       => $port,
   on_connect => sub {
@@ -47,12 +47,12 @@ $client->ioloop->connect(
       if $buffer =~ /HTTP\/1.1 100 Continue.*\x0d\x0a\x0d\x0a/gs;
   }
 );
-$client->ioloop->start;
+$ua->ioloop->start;
 like $buffer, qr/HTTP\/1.1 100 Continue/, 'request was continued';
 
 # Pipelined
 $buffer = '';
-$client->ioloop->connect(
+$ua->ioloop->connect(
   address    => 'localhost',
   port       => $port,
   on_connect => sub {
@@ -69,14 +69,14 @@ $client->ioloop->connect(
     $self->drop($id) and $self->stop if $buffer =~ /Mojo.*Mojo/gs;
   }
 );
-$client->ioloop->start;
+$ua->ioloop->start;
 like $buffer, qr/Mojo/, 'transactions were pipelined';
 
 # Normal request
 my $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/5/');
-$client->start($tx);
+$ua->start($tx);
 ok $tx->keep_alive, 'will be kept alive';
 is $tx->res->code,   200,      'right status';
 like $tx->res->body, qr/Mojo/, 'right content';
@@ -85,7 +85,7 @@ like $tx->res->body, qr/Mojo/, 'right content';
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/6/');
-$client->start($tx);
+$ua->start($tx);
 ok $tx->keep_alive, 'will be kept alive';
 ok $tx->kept_alive, 'was kept alive';
 is $tx->res->code,   200,      'right status';
@@ -96,7 +96,7 @@ $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/7/');
 $tx->req->headers->connection('close');
-$client->start($tx);
+$ua->start($tx);
 ok !$tx->keep_alive, 'will not be kept alive';
 ok $tx->kept_alive, 'was kept alive';
 is $tx->res->code, 200, 'right status';
@@ -108,7 +108,7 @@ $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/8/');
 $tx->req->headers->connection('close');
-$client->start($tx);
+$ua->start($tx);
 ok !$tx->keep_alive, 'will not be kept alive';
 ok !$tx->kept_alive, 'was not kept alive';
 is $tx->res->code, 200, 'right status';
@@ -121,7 +121,7 @@ $tx->req->method('POST');
 $tx->req->url->parse('/9/');
 $tx->req->headers->expect('fun');
 $tx->req->body('foo bar baz' x 128);
-$client->start($tx);
+$ua->start($tx);
 is $tx->res->code,   200,      'right status';
 like $tx->res->body, qr/Mojo/, 'right content';
 
@@ -131,7 +131,7 @@ $tx->req->method('POST');
 $tx->req->url->parse('/10/');
 $tx->req->headers->expect('fun');
 $tx->req->body('bar baz foo' x 128);
-$client->start($tx);
+$ua->start($tx);
 ok defined $tx->connection, 'has connection id';
 is $tx->res->code,   200,      'right status';
 like $tx->res->body, qr/Mojo/, 'right content';
@@ -143,7 +143,8 @@ $tx->req->url->parse('/11/');
 my $tx2 = Mojo::Transaction::HTTP->new;
 $tx2->req->method('GET');
 $tx2->req->url->parse('/12/');
-$client->start($tx, $tx2);
+$ua->start($tx);
+$ua->start($tx2);
 ok defined $tx->connection,  'has connection id';
 ok defined $tx2->connection, 'has connection id';
 ok $tx->is_done,  'transaction is done';
@@ -161,7 +162,9 @@ $tx2->req->body('bar baz foo' x 128);
 my $tx3 = Mojo::Transaction::HTTP->new;
 $tx3->req->method('GET');
 $tx3->req->url->parse('/15/');
-$client->start($tx, $tx2, $tx3);
+$ua->start($tx);
+$ua->start($tx2);
+$ua->start($tx3);
 ok $tx->is_done, 'transaction is done';
 ok !$tx->error, 'has no errors';
 ok $tx2->is_done, 'transaction is done';
@@ -175,25 +178,13 @@ for my $i (1 .. 10) { $params->{"test$i"} = $i }
 my $result = '';
 for my $key (sort keys %$params) { $result .= $params->{$key} }
 my ($code, $body);
-$client->post_form(
-  "http://127.0.0.1:$port/diag/chunked_params" => $params => sub {
-    my $self = shift;
-    $code = $self->res->code;
-    $body = $self->res->body;
-  }
-)->start;
-is $code, 200, 'right status';
-is $body, $result, 'right content';
+$tx = $ua->post_form("http://127.0.0.1:$port/diag/chunked_params" => $params);
+is $tx->res->code, 200, 'right status';
+is $tx->res->body, $result, 'right content';
 
 # Upload
 ($code, $body) = undef;
-$client->post_form(
-  "http://127.0.0.1:$port/diag/upload" => {file => {content => $result}} =>
-    sub {
-    my $self = shift;
-    $code = $self->res->code;
-    $body = $self->res->body;
-  }
-)->start;
-is $code, 200, 'right status';
-is $body, $result, 'right content';
+$tx = $ua->post_form(
+  "http://127.0.0.1:$port/diag/upload" => {file => {content => $result}});
+is $tx->res->code, 200, 'right status';
+is $tx->res->body, $result, 'right content';

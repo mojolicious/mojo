@@ -1,10 +1,10 @@
 package Mojolicious::Command::Get;
 use Mojo::Base 'Mojo::Command';
 
-use Mojo::Client;
 use Mojo::DOM;
 use Mojo::IOLoop;
 use Mojo::Transaction::HTTP;
+use Mojo::UserAgent;
 use Mojo::Util 'decode';
 
 use Getopt::Long 'GetOptions';
@@ -72,24 +72,24 @@ sub run {
   # Buffer
   my $buffer = '';
 
-  # Client
-  my $client = Mojo::Client->new(ioloop => Mojo::IOLoop->singleton);
+  # User agent
+  my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
 
   # Silence
-  $client->log->level('fatal');
+  $ua->log->level('fatal');
 
   # Absolute URL
-  if ($url =~ /^\w+:\/\//) { $client->detect_proxy }
+  if ($url =~ /^\w+:\/\//) { $ua->detect_proxy }
 
   # Application
-  else { $client->app($ENV{MOJO_APP} || 'Mojo::HelloWorld') }
+  else { $ua->app($ENV{MOJO_APP} || 'Mojo::HelloWorld') }
 
   # Follow redirects
-  $client->max_redirects(5) if $redirect;
+  $ua->max_redirects(5) if $redirect;
 
   # Start
   my $v;
-  $client->on_start(
+  $ua->on_start(
     sub {
       my $tx = pop;
 
@@ -139,23 +139,19 @@ sub run {
   );
 
   # Transaction
-  my $tx = $client->build_tx($method, $url, $headers, $content);
+  my $tx = $ua->build_tx($method, $url, $headers, $content);
 
   # Get
-  $client->start(
-    $tx => sub {
-      my $tx = pop;
+  $tx = $ua->start($tx);
 
-      # Error
-      my ($message, $code) = $tx->error;
-      warn qq/Problem loading URL "$url". ($message)\n/ if $message && !$code;
+  # Error
+  my ($message, $code) = $tx->error;
+  warn qq/Problem loading URL "$url". ($message)\n/ if $message && !$code;
 
-      # Charset
-      ($tx->res->headers->content_type || '') =~ /charset=\"?([^\"\s;]+)\"?/
-        and $charset = $1
-        unless defined $charset;
-    }
-  );
+  # Charset
+  ($tx->res->headers->content_type || '') =~ /charset=\"?([^\"\s;]+)\"?/
+    and $charset = $1
+    unless defined $charset;
 
   # Select
   $self->_select($buffer, $charset, $selector) if $selector;
@@ -238,7 +234,7 @@ Mojolicious::Command::Get - Get Command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::Get> is a command interface to L<Mojo::Client>.
+L<Mojolicious::Command::Get> is a command interface to L<Mojo::UserAgent>.
 
 =head1 ATTRIBUTES
 

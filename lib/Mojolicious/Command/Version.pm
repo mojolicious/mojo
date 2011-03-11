@@ -1,9 +1,9 @@
 package Mojolicious::Command::Version;
 use Mojo::Base 'Mojo::Command';
 
-use Mojo::Client;
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
+use Mojo::UserAgent;
 use Mojolicious;
 
 has description => <<'EOF';
@@ -22,7 +22,7 @@ sub run {
   my ($current) = $Mojolicious::VERSION =~ /^([^_]+)/;
   my $latest = $current;
   eval {
-    Mojo::Client->new->max_redirects(3)
+    Mojo::UserAgent->new->max_redirects(3)
       ->get('search.cpan.org/dist/Mojolicious')->res->dom('.version')
       ->each(sub { $latest = $_->text if $_->text =~ /^[\d\.]+$/ });
   };

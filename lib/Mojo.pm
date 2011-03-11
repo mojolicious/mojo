@@ -7,7 +7,29 @@ use Mojo::Log;
 use Mojo::Transaction::HTTP;
 use Mojo::Transaction::WebSocket;
 
-has client => sub {
+has home => sub { Mojo::Home->new };
+has log  => sub { Mojo::Log->new };
+has on_build_tx => sub {
+  sub { Mojo::Transaction::HTTP->new }
+};
+has on_websocket => sub {
+  sub { Mojo::Transaction::WebSocket->new(handshake => pop) }
+};
+has ua => sub {
+  my $self = shift;
+
+  # Singleton user agent
+  require Mojo::UserAgent;
+  my $ua = Mojo::UserAgent->new(app => $self, log => $self->log);
+
+  return $ua;
+};
+
+# DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
+*client = sub {
+  warn <<EOF;
+Mojo->client is DEPRECATED in favor of Mojo->us!!!
+EOF
 
   # Singleton client
   require Mojo::Client;
@@ -17,14 +39,6 @@ has client => sub {
   $client->log(shift->log);
 
   return $client;
-};
-has home => sub { Mojo::Home->new };
-has log  => sub { Mojo::Log->new };
-has on_build_tx => sub {
-  sub { Mojo::Transaction::HTTP->new }
-};
-has on_websocket => sub {
-  sub { Mojo::Transaction::WebSocket->new(handshake => pop) }
 };
 
 # "Oh, so they have internet on computers now!"
@@ -84,14 +98,6 @@ See L<Mojolicious> for more!
 
 L<Mojo> implements the following attributes.
 
-=head2 C<client>
-
-  my $client = $app->client;
-  $app       = $app->client(Mojo::Client->new);
-
-A full featured HTTP 1.1 client for use in your applications, by default a
-L<Mojo::Client> object.
-
 =head2 C<home>
 
   my $home = $app->home;
@@ -123,6 +129,14 @@ L<Mojo::Transaction::HTTP> object.
 The websocket handshake callback, by default it builds a
 L<Mojo::Transaction::WebSocket> object and handles the response for the
 handshake request.
+
+=head2 C<ua>
+
+  my $ua = $app->ua;
+  $app   = $app->ua(Mojo::UserAgent->new);
+
+A full featured HTTP 1.1 user agent for use in your applications, by default
+a L<Mojo::UserAgent> object.
 
 =head1 METHODS
 

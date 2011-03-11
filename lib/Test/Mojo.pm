@@ -1,17 +1,25 @@
 package Test::Mojo;
 use Mojo::Base -base;
 
-use Mojo::Client;
+use Mojo::IOLoop;
 use Mojo::Message::Response;
+use Mojo::UserAgent;
 use Mojo::Util 'decode';
 
 require Test::More;
 
 has app => sub { return $ENV{MOJO_APP} if ref $ENV{MOJO_APP} };
-has client =>
-  sub { Mojo::Client->singleton->ioloop(Mojo::IOLoop->singleton) };
+has ua => sub { Mojo::UserAgent->new->ioloop(Mojo::IOLoop->singleton) };
 has max_redirects => 0;
 has 'tx';
+
+# DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
+*client = sub {
+  warn <<EOF;
+Test::Mojo->client is DEPRECATED in favor of Test::Mojo->ua!!!
+EOF
+  return shift->ua;
+};
 
 # Silent or loud tests
 $ENV{MOJO_LOG_LEVEL} ||= $ENV{HARNESS_IS_VERBOSE} ? 'debug' : 'fatal';
@@ -162,13 +170,13 @@ sub post_form_ok {
   my $desc = "post $url";
   utf8::encode $desc;
 
-  # Client
-  my $client = $self->client;
-  $client->app($self->app);
-  $client->max_redirects($self->max_redirects);
+  # User agent
+  my $ua = $self->ua;
+  $ua->app($self->app);
+  $ua->max_redirects($self->max_redirects);
 
   # Request
-  $client->post_form(@_, sub { $self->tx($_[-1]) })->start;
+  $self->tx($ua->post_form(@_));
 
   # Test
   local $Test::Builder::Level = $Test::Builder::Level + 1;
@@ -183,9 +191,9 @@ sub put_ok { shift->_request_ok('put', @_) }
 sub reset_session {
   my $self = shift;
 
-  # Client
-  $self->client->cookie_jar->empty;
-  $self->client->max_redirects($self->max_redirects);
+  # User agent
+  $self->ua->cookie_jar->empty;
+  $self->ua->max_redirects($self->max_redirects);
 
   # Transaction
   $self->tx(undef);
@@ -275,13 +283,13 @@ sub _request_ok {
   $body = $headers if !ref $headers && @_ > 3;
   $headers = {} if !ref $headers;
 
-  # Client
-  my $client = $self->client;
-  $client->app($self->app);
-  $client->max_redirects($self->max_redirects);
+  # User agent
+  my $ua = $self->ua;
+  $ua->app($self->app);
+  $ua->max_redirects($self->max_redirects);
 
   # Request
-  $client->$method($url, %$headers, $body, sub { $self->tx($_[-1]) })->start;
+  $self->tx($ua->$method($url, %$headers, $body));
 
   # Test
   local $Test::Builder::Level = $Test::Builder::Level + 2;
@@ -333,19 +341,19 @@ L<Test::Mojo> implements the following attributes.
 
 Application to be tested.
 
-=head2 C<client>
-
-  my $client = $t->client;
-  $t         = $t->client(Mojo::Client->new);
-
-Client used for testing.
-
 =head2 C<tx>
 
   my $tx = $t->tx;
-  $t     = $t->tx(Mojo::Transaction::Simple->new);
+  $t     = $t->tx(Mojo::Transaction::HTTP->new);
 
-Current transaction.
+Current transaction, usually a L<Mojo::Transaction::HTTP> object.
+
+=head2 C<ua>
+
+  my $ua = $t->ua;
+  $t     = $t->ua(Mojo::UserAgent->new);
+
+User agent used for testing.
 
 =head2 C<max_redirects>
 

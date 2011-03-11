@@ -216,7 +216,7 @@ is $longpoll, 'finished!', 'finished';
 
 # GET /longpoll (interrupted)
 $longpoll = undef;
-my $port = $t->client->test_server;
+my $port = $t->ua->test_server;
 Mojo::IOLoop->singleton->connect(
   address    => 'localhost',
   port       => $port,
@@ -234,7 +234,7 @@ Mojo::IOLoop->singleton->start;
 is $longpoll, 'finished!', 'finished';
 
 # GET /longpoll (also interrupted)
-my $tx = $t->client->build_tx(GET => '/longpoll');
+my $tx = $t->ua->build_tx(GET => '/longpoll');
 my $buffer = '';
 $tx->res->body(
   sub {
@@ -243,7 +243,7 @@ $tx->res->body(
     $self->error('Interrupted!');
   }
 );
-$t->client->start($tx);
+$t->ua->start($tx);
 is $tx->res->code,  200,            'right status';
 is $tx->res->error, 'Interrupted!', 'right error';
 is $buffer, 'hi ', 'right content';
@@ -303,7 +303,7 @@ $t->get_ok('/longpoll/dynamic/delayed')->status_is(201)
 is $longpoll_dynamic_delayed, 'finished!', 'finished';
 
 # GET /too_long (timeout)
-$tx = $t->client->keep_alive_timeout(1)->build_tx(GET => '/too_long');
+$tx = $t->ua->keep_alive_timeout(1)->build_tx(GET => '/too_long');
 $buffer = '';
 $tx->res->body(
   sub {
@@ -311,7 +311,7 @@ $tx->res->body(
     $buffer .= $chunk;
   }
 );
-$t->client->start($tx);
+$t->ua->start($tx);
 is $tx->res->code, 200, 'right status';
 ok !$tx->error, 'no error';
 is $buffer, 'how', 'right content';

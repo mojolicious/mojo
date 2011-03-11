@@ -421,7 +421,7 @@ Web development for humans, making hard things possible and everything fun.
     my $self = shift;
     my $url  = $self->param('url') || 'http://mojolicio.us';
     $self->render(text =>
-      $self->client->get($url)->res->dom->at('head > title')->text);
+      $self->ua->get($url)->res->dom->at('head > title')->text);
   };
 
   # WebSocket echo service
@@ -496,7 +496,7 @@ been separated from action code, especially when working in teams.
     my $self = shift;
     my $url  = $self->param('url') || 'http://mojolicio.us';
     $self->render(text =>
-      $self->client->get($url)->res->dom->at('head > title')->text);
+      $self->ua->get($url)->res->dom->at('head > title')->text);
   }
 
   1;
@@ -654,7 +654,7 @@ Responsible for tracking the types of content you want to serve in your
 application, by default a L<Mojolicious::Types> object.
 You can easily register new types.
 
-  $app->types->type(vti => 'help/vampire');
+  $app->types->type(twitter => 'text/tweet');
 
 =head1 METHODS
 

@@ -12,7 +12,7 @@ BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 my $backup;
 BEGIN { $backup = $ENV{MOJO_MODE} || ''; $ENV{MOJO_MODE} = 'development' }
 
-use Test::More tests => 721;
+use Test::More tests => 720;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -22,7 +22,7 @@ use Test::More tests => 721;
 #  Yeah ever since I was six.
 #  Well, ok but I don't want people thinking we're robosexuals,
 #  so if anyone asks you're my debugger."
-use Mojo::Client;
+use Mojo::ByteStream 'b';
 use Mojo::Content::MultiPart;
 use Mojo::Content::Single;
 use Mojo::Cookie::Response;
@@ -30,14 +30,12 @@ use Mojo::Date;
 use Mojo::IOLoop;
 use Mojo::JSON;
 use Mojo::Transaction::HTTP;
+use Mojo::UserAgent;
+use Mojolicious::Lite;
 use Test::Mojo;
 
-# Load Mojolicious::Lite via ojo
-use ojo;
-
-# Clients
-my $client    = Mojo::Client->singleton->ioloop(Mojo::IOLoop->singleton);
-my $unmanaged = $client->clone->ioloop($client->ioloop)->app(app)->managed(0);
+# User agent
+my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton, app => app);
 
 # Header condition plugin
 plugin 'header_condition';
@@ -101,8 +99,8 @@ get '/with-format' => {format => 'html'} => 'with-format';
 # GET /without-format
 get '/without-format' => 'without-format';
 
-# /ojo
-a '/ojo' => {json => {hello => 'world'}};
+# /json_too
+any '/json_too' => {json => {hello => 'world'}};
 
 # GET /null/0
 get '/null/:null' => sub {
@@ -421,33 +419,21 @@ get '/eperror' => sub { shift->render(handler => 'ep') } => 'eperror';
 # GET /subrequest
 get '/subrequest' => sub {
   my $self = shift;
-  $self->client->post(
-    '/template' => sub {
-      my $client = shift;
-      $self->render_text($client->tx->success->body);
-    }
-  )->start;
+  my $tx   = $self->ua->post('/template');
+  $self->render_text($tx->success->body);
 };
 
 # GET /subrequest_simple
 get '/subrequest_simple' => sub {
-  shift->render_text(p('/template')->body);
+  my $self = shift;
+  $self->render_text($self->ua->post('/template')->res->body);
 };
 
 # GET /subrequest_sync
 get '/subrequest_sync' => sub {
   my $self = shift;
-  $self->client->post(
-    '/template' => sub {
-      my $client = shift;
-      $client->post(
-        '/template' => sub {
-          my $client = shift;
-          $self->render_text($client->res->body);
-        }
-      )->start;
-    }
-  )->start;
+  $self->ua->post('/template');
+  $self->render_text($self->ua->post('/template')->res->body);
 };
 
 # Make sure hook runs async
@@ -457,10 +443,10 @@ app->hook(after_dispatch => sub { shift->stash->{async} = 'broken!' });
 my $async;
 get '/subrequest_async' => sub {
   my $self = shift;
-  $unmanaged->post(
+  $self->ua->post(
     '/template' => sub {
-      my $client = shift;
-      $self->render_text($client->res->body . $self->stash->{'async'});
+      my $tx = pop;
+      $self->render_text($tx->res->body . $self->stash->{'async'});
       $async = $self->stash->{async};
     }
   );
@@ -643,17 +629,18 @@ get '/works' => sub { shift->render(text => 'prefix works!') };
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
 my $t = Test::Mojo->new;
 
-# Client timer
+# User agent timer
+my $tua = Mojo::UserAgent->new(ioloop => $ua->ioloop, app => app);
 my $timer;
-$client->ioloop->timer(
+$tua->ioloop->timer(
   '0.1' => sub {
     my $async = '';
-    $unmanaged->get(
+    $tua->get(
       '/' => sub {
-        my $self = shift;
-        $timer = $self->res->body . $async;
+        my $tx = pop;
+        $timer = $tx->res->body . $async;
       }
-    )->start;
+    );
     $async = 'works!';
   }
 );
@@ -732,8 +719,8 @@ $t->get_ok('/without-format')->content_is("/without-format\n");
 # GET /without-format.html
 $t->get_ok('/without-format.html')->content_is("/without-format\n");
 
-# GET /ojo (ojo)
-$t->get_ok('/ojo')->status_is(200)->json_content_is({hello => 'world'});
+# GET /json_too
+$t->get_ok('/json_too')->status_is(200)->json_content_is({hello => 'world'});
 
 # GET /static.txt (static inline file)
 $t->get_ok('/static.txt')->status_is(200)
@@ -831,15 +818,11 @@ $t->get_ok('/regex/in/template')->status_is(200)
   ->content_is("test(test)(\\Qtest\\E)(\n");
 
 # GET /stream (with basic auth)
-my $port = $t->client->test_server;
+my $port = $t->ua->test_server;
 $t->get_ok("sri:foo\@localhost:$port/stream?foo=bar")->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/^foobarsri\:foohttp:\/\/localhost\:\d+\/stream$/);
-
-# GET /stream (with basic auth and ojo)
-my $b = g("http://sri:foo\@localhost:$port/stream?foo=bar")->body;
-like $b, qr/^foobarsri\:foohttp:\/\/localhost\:\d+\/stream$/, 'right content';
 
 # GET /maybe/ajax (not ajax)
 $t->get_ok('/maybe/ajax')->status_is(200)
@@ -1143,23 +1126,23 @@ $t->get_ok('/url_for_foxy')->status_is(200)
   ->content_is('/firefox/%23test');
 
 # POST /utf8
-$t->post_form_ok('/utf8', 'UTF-8' => {name => 'Вячеслав'})
-  ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+$t->post_form_ok('/utf8', 'UTF-8' => {name => 'табак'})->status_is(200)
+  ->header_is(Server           => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
-  ->header_is('Content-Length' => 40)
+  ->header_is('Content-Length' => 22)
   ->content_type_is('text/html;charset=UTF-8')
-  ->content_is("Вячеслав Тихановский\n");
+  ->content_is("табак ангел\n");
 
 # POST /utf8 (multipart/form-data)
 $t->post_form_ok(
   '/utf8',
-  'UTF-8' => {name => 'Вячеслав'},
+  'UTF-8' => {name => 'табак'},
   {'Content-Type' => 'multipart/form-data'}
   )->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
-  ->header_is('Content-Length' => 40)
+  ->header_is('Content-Length' => 22)
   ->content_type_is('text/html;charset=UTF-8')
-  ->content_is("Вячеслав Тихановский\n");
+  ->content_is("табак ангел\n");
 
 # POST /malformed_utf8
 my $tx = Mojo::Transaction::HTTP->new;
@@ -1167,20 +1150,13 @@ $tx->req->method('POST');
 $tx->req->url->parse('/malformed_utf8');
 $tx->req->headers->content_type('application/x-www-form-urlencoded');
 $tx->req->body('foo=%E1');
-my ($code, $server, $powered, $body);
-$client->queue(
-  $tx => sub {
-    my ($self, $tx) = @_;
-    $code    = $tx->res->code;
-    $server  = $tx->res->headers->server;
-    $powered = $tx->res->headers->header('X-Powered-By');
-    $body    = $tx->res->body;
-  }
-)->start;
-is $code,    200,                  'right status';
-is $server,  'Mojolicious (Perl)', 'right "Server" value';
-is $powered, 'Mojolicious (Perl)', 'right "X-Powered-By" value';
-is $body,    '%E1',                'right content';
+$ua->start($tx);
+is $tx->res->code, 200, 'right status';
+is scalar $tx->res->headers->server, 'Mojolicious (Perl)',
+  'right "Server" value';
+is scalar $tx->res->headers->header('X-Powered-By'), 'Mojolicious (Perl)',
+  'right "X-Powered-By" value';
+is $tx->res->body, '%E1', 'right content';
 
 # GET /json
 $t->get_ok('/json')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
@@ -1277,7 +1253,7 @@ $t->get_ok('/static_render')->status_is(200)
   ->header_is('Content-Length' => 30)
   ->content_is('Hello Mojo from a static file!');
 
-# GET /redirect_named (with redirecting enabled in client)
+# GET /redirect_named (with redirecting enabled in user agent)
 $t->max_redirects(3);
 $t->get_ok('/redirect_named')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
@@ -1508,8 +1484,8 @@ $t->get_ok('/captures/♥/☃')->status_is(200)
 is b($t->tx->res->body)->url_unescape->decode('UTF-8'),
   '/captures/♥/☃', 'right result';
 
-# Client timer
-$client->ioloop->one_tick('0.1');
+# User agent timer
+$tua->ioloop->one_tick('0.1');
 is $timer,
   "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\nworks!",
   'right content';
@@ -1649,7 +1625,7 @@ Oops!
 Just works!\
 
 @@ form.html.epl
-<%= shift->param('name') %> Тихановский
+<%= shift->param('name') %> ангел
 
 @@ layouts/layout.html.epl
 % my $self = shift;

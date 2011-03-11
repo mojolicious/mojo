@@ -59,9 +59,9 @@ ones.
 
 =over 2
 
-=item L<Mojo::Client>
+=item L<Mojo::UserAgent>
 
-Full featured async io HTTP 1.1 and WebSocket client.
+Full featured async io HTTP 1.1 and WebSocket user agent.
 
 =item L<Mojo::DOM>
 

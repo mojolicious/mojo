@@ -20,7 +20,6 @@ use Scalar::Util 'weaken';
 # Debug
 use constant DEBUG => $ENV{MOJO_CLIENT_DEBUG} || 0;
 
-# "You can't let a single bad experience scare you away from drugs."
 has [qw/app cert http_proxy https_proxy key no_proxy on_start tx/];
 has cookie_jar => sub { Mojo::CookieJar->new };
 has ioloop     => sub { Mojo::IOLoop->new };
@@ -36,22 +35,11 @@ has websocket_timeout  => 300;
 our $CLIENT;
 
 # DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
-*async = sub {
+BEGIN {
   warn <<EOF;
-Mojo::Client->async is DEPRECATED in favor of Mojo::Client->managed!!!
+Mojo::Client is DEPRECATED in favor of Mojo::UserAgent!!!
 EOF
-  my $self = shift;
-  my $clone = $self->{_async} ||= $self->clone;
-  $clone->ioloop(
-      Mojo::IOLoop->singleton->is_running
-    ? Mojo::IOLoop->singleton
-    : $self->ioloop
-  );
-  $clone->managed(0);
-  $clone->{_server} = $self->{_server};
-  $clone->{_port}   = $self->{_port};
-  return $clone;
-};
+}
 
 # Make sure we leave a clean ioloop behind
 sub DESTROY {
@@ -71,7 +59,20 @@ sub DESTROY {
   }
 }
 
-# "Ah, alcohol and night-swimming. It's a winning combination."
+sub async {
+  my $self = shift;
+  my $clone = $self->{_async} ||= $self->clone;
+  $clone->ioloop(
+      Mojo::IOLoop->singleton->is_running
+    ? Mojo::IOLoop->singleton
+    : $self->ioloop
+  );
+  $clone->managed(0);
+  $clone->{_server} = $self->{_server};
+  $clone->{_port}   = $self->{_port};
+  return $clone;
+}
+
 sub build_form_tx {
   my $self = shift;
 
@@ -224,8 +225,6 @@ sub build_form_tx {
   return $tx, $cb;
 }
 
-# "Homer, it's easy to criticize.
-#  Fun, too."
 sub build_tx {
   my $self = shift;
 
@@ -306,8 +305,6 @@ sub clone {
   return $clone;
 }
 
-# "The only thing I asked you to do for this party was put on clothes,
-#  and you didn't do it."
 sub delete {
   my $self = shift;
   return $self->_tx_queue_or_start($self->build_tx('DELETE', @_));
@@ -336,7 +333,6 @@ sub finish {
   $tx->finish;
 }
 
-# "'What are you lookin at?' - the innocent words of a drunken child."
 sub get {
   my $self = shift;
   return $self->_tx_queue_or_start($self->build_tx('GET', @_));
@@ -417,8 +413,6 @@ sub put {
   $self->_tx_queue_or_start($self->build_tx('PUT', @_));
 }
 
-# "And I gave that man directions, even though I didn't know the way,
-#  because that's the kind of guy I am this week."
 sub queue {
   my $self = shift;
 
@@ -437,8 +431,6 @@ sub res { shift->tx->res(@_) }
 
 sub singleton { $CLIENT ||= shift->new(@_) }
 
-# "Wow, Barney. You brought a whole beer keg.
-#  Yeah... where do I fill it up?"
 sub send_message {
   my ($self, $message, $cb) = @_;
 
@@ -468,8 +460,6 @@ sub send_message {
   return $self;
 }
 
-# "Olive oil? Asparagus? If your mother wasn't so fancy,
-#  we could just shop at the gas station like normal people."
 sub start {
   my $self = shift;
 
@@ -501,7 +491,6 @@ sub start {
   return $self;
 }
 
-# "It's like my dad always said: eventually, everybody gets shot."
 sub test_server {
   my ($self, $protocol) = @_;
 
@@ -526,13 +515,6 @@ sub test_server {
   return $self->{_port};
 }
 
-# "Are we there yet?
-#  No
-#  Are we there yet?
-#  No
-#  Are we there yet?
-#  No
-#  ...Where are we going?"
 sub websocket {
   my $self = shift;
   $self->_tx_queue_or_start($self->build_websocket_tx(@_));
@@ -589,8 +571,6 @@ sub _cache {
   return $result;
 }
 
-# "Where on my badge does it say anything about protecting people?
-#  Uh, second word, chief."
 sub _connect {
   my ($self, $tx, $cb) = @_;
 
@@ -659,7 +639,6 @@ sub _connect {
   return $id;
 }
 
-# "Hey, Weener Boy... where do you think you're going?"
 sub _connect_proxy {
   my ($self, $old, $cb) = @_;
 
@@ -719,8 +698,6 @@ sub _connect_proxy {
   return 1;
 }
 
-# "I don't mind being called a liar when I'm lying, or about to lie,
-#  or just finished lying, but NOT WHEN I'M TELLING THE TRUTH."
 sub _connected {
   my ($self, $id) = @_;
 
@@ -748,8 +725,6 @@ sub _connected {
   $self->_write($id);
 }
 
-# "Mrs. Simpson, bathroom is not for customers.
-#  Please use the crack house across the street."
 sub _drop {
   my ($self, $id, $close) = @_;
 
@@ -787,8 +762,6 @@ sub _error {
   $self->_handle($id, $error);
 }
 
-# "No children have ever meddled with the Republican Party and lived to tell
-#  about it."
 sub _handle {
   my ($self, $id, $close) = @_;
 
@@ -848,8 +821,6 @@ sub _handle {
 
 sub _hup { shift->_handle(pop, 1) }
 
-# "Have you ever seen that Blue Man Group? Total ripoff of the Smurfs.
-#  And the Smurfs, well, they SUCK."
 sub _read {
   my ($self, $loop, $id, $chunk) = @_;
 
@@ -924,8 +895,6 @@ sub _redirect {
   return 1;
 }
 
-# "Oh, I'm in no condition to drive. Wait a minute.
-#  I don't have to listen to myself. I'm drunk."
 sub _tx_finish {
   my ($self, $tx, $cb) = @_;
 
@@ -982,7 +951,6 @@ sub _tx_queue_or_start {
   $self->queue($tx, $cb);
 }
 
-# "It's greeat! We can do *anything* now that Science has invented Magic."
 sub _tx_start {
   my ($self, $tx, $cb) = @_;
 
@@ -1059,7 +1027,6 @@ sub _tx_start {
   return $id;
 }
 
-# "Once the government approves something, it's no longer immoral!"
 sub _upgrade {
   my ($self, $id) = @_;
 
@@ -1105,7 +1072,6 @@ sub _upgrade {
   return $new;
 }
 
-# "Oh well. At least we'll die doing what we love: inhaling molten rock."
 sub _write {
   my ($self, $id) = @_;
 
@@ -1146,620 +1112,15 @@ __END__
 
 =head1 NAME
 
-Mojo::Client - Async IO HTTP 1.1 And WebSocket Client
+Mojo::Client - DEPRECATED!
 
 =head1 SYNOPSIS
 
   use Mojo::Client;
-  my $client = Mojo::Client->new;
-
-  # Grab the latest Mojolicious release :)
-  my $latest = 'http://latest.mojolicio.us';
-  print $client->max_redirects(3)->get($latest)->res->body;
-
-  # Quick JSON request
-  my $trends = 'http://search.twitter.com/trends.json';
-  print $client->get($trends)->res->json->{trends}->[0]->{name};
-
-  # Extract data from HTML and XML resources
-  print $client->get('mojolicio.us')->res->dom->at('title')->text;
-
-  # Scrape the latest headlines from a news site
-  my $news = 'http://digg.com';
-  $client->max_redirects(3);
-  $client->get($news)->res->dom('h3 > a.story-title')->each(sub {
-    print shift->text . "\n";
-  });
-
-  # Form post with exception handling
-  my $cpan   = 'http://search.cpan.org/search';
-  my $search = {q => 'mojo'};
-  my $tx     = $client->post_form($cpan => $search);
-  if (my $res = $tx->success) { print $res->body }
-  else {
-    my ($message, $code) = $tx->error;
-    print "Error: $message";
-  }
-
-  # TLS certificate authentication
-  $client->cert('tls.crt')->key('tls.key')->get('https://mojolicio.us');
-    
-  # Parallel requests
-  my $callback = sub { print shift->res->body };
-  $client->get('http://mojolicio.us' => $callback);
-  $client->get('http://search.cpan.org' => $callback);
-  $client->start;
-
-  # Websocket request
-  $client->websocket('ws://websockets.org:8787' => sub {
-    my $client = shift;
-    $client->on_message(sub {
-      my ($client, $message) = @_;
-      print "$message\n";
-      $client->finish;
-    });
-    $client->send_message('hi there!');
-  })->start;
 
 =head1 DESCRIPTION
 
-L<Mojo::Client> is a full featured async io HTTP 1.1 and WebSocket client
-with C<IPv6>, C<TLS>, C<epoll> and C<kqueue> support.
-
-Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::IP> and
-L<IO::Socket::SSL> are supported transparently and used if installed.
-
-=head1 ATTRIBUTES
-
-L<Mojo::Client> implements the following attributes.
-
-=head2 C<app>
-
-  my $app = $client->app;
-  $client = $client->app(MyApp->new);
-
-A Mojo application to associate this client with.
-If set, local requests will be processed in this application.
-
-=head2 C<cert>
-
-  my $cert = $client->cert;
-  $client  = $client->cert('tls.crt');
-
-Path to TLS certificate file.
-
-=head2 C<cookie_jar>
-
-  my $cookie_jar = $client->cookie_jar;
-  $client        = $client->cookie_jar(Mojo::CookieJar->new);
-
-Cookie jar to use for this clients requests, by default a L<Mojo::CookieJar>
-object.
-
-=head2 C<http_proxy>
-
-  my $proxy = $client->http_proxy;
-  $client   = $client->http_proxy('http://sri:secret@127.0.0.1:8080');
-
-Proxy server to use for HTTP and WebSocket requests.
-
-=head2 C<https_proxy>
-
-  my $proxy = $client->https_proxy;
-  $client   = $client->https_proxy('http://sri:secret@127.0.0.1:8080');
-
-Proxy server to use for HTTPS and WebSocket requests.
-
-=head2 C<ioloop>
-
-  my $loop = $client->ioloop;
-  $client  = $client->ioloop(Mojo::IOLoop->new);
-
-Loop object to use for io operations, by default a L<Mojo::IOLoop> object
-will be used.
-
-=head2 C<keep_alive_timeout>
-
-  my $keep_alive_timeout = $client->keep_alive_timeout;
-  $client                = $client->keep_alive_timeout(15);
-
-Timeout in seconds for keep alive between requests, defaults to C<15>.
-
-=head2 C<key>
-
-  my $key = $client->key;
-  $client = $client->key('tls.crt');
-
-Path to TLS key file.
-
-=head2 C<log>
-
-  my $log = $client->log;
-  $client = $client->log(Mojo::Log->new);
-
-A L<Mojo::Log> object used for logging, by default the application log will
-be used.
-
-=head2 C<managed>
-
-  my $managed = $client->managed;
-  $client     = $client->managed(0);
-
-Automatic L<Mojo::IOLoop> management, defaults to C<1>.
-Disabling it will for example allow you to share the same event loop with
-multiple clients.
-Note that this attribute is EXPERIMENTAL and might change without warning!
-
-  $client->managed(0)->get('http://mojolicio.us' => sub {
-    my $client = shift;
-    print shift->res->body;
-    $client->ioloop->stop;
-  });
-  $client->ioloop->start;
-
-=head2 C<max_connections>
-
-  my $max_connections = $client->max_connections;
-  $client             = $client->max_connections(5);
-
-Maximum number of keep alive connections that the client will retain before
-it starts closing the oldest cached ones, defaults to C<5>.
-
-=head2 C<max_redirects>
-
-  my $max_redirects = $client->max_redirects;
-  $client           = $client->max_redirects(3);
-
-Maximum number of redirects the client will follow before it fails, defaults
-to C<0>.
-
-=head2 C<no_proxy>
-
-  my $no_proxy = $client->no_proxy;
-  $client      = $client->no_proxy(['localhost', 'intranet.mojolicio.us']);
-
-Domains that don't require a proxy server to be used.
-Note that this attribute is EXPERIMENTAL and might change without warning!
-
-=head2 C<on_start>
-
-  my $cb  = $client->on_start;
-  $client = $client->on_start(sub {...});
-
-Callback to be invoked whenever a new transaction is about to start, this
-includes automatically prepared proxy C<CONNECT> requests and followed
-redirects.
-
-  $client->on_start(sub {
-    my ($client, $tx) = @_;
-    $tx->req->headers->header('X-Bender', 'Bite my shiny metal ass!');
-  });
-
-=head2 C<tx>
-
-  $client->tx;
-
-The last finished transaction, only available from callbacks, usually a
-L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object.
-
-=head2 C<user_agent>
-
-  my $user_agent = $client->user_agent;
-  $client        = $client->user_agent('Mojolicious');
-
-Value for C<User-Agent> request header, defaults to C<Mojolicious (Perl)>.
-
-=head2 C<websocket_timeout>
-
-  my $websocket_timeout = $client->websocket_timeout;
-  $client               = $client->websocket_timeout(300);
-
-Timeout in seconds for WebSockets to be idle, defaults to C<300>.
-
-=head1 METHODS
-
-L<Mojo::Client> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
-
-=head2 C<new>
-
-  my $client = Mojo::Client->new;
-
-Construct a new L<Mojo::Client> object.
-Use C<singleton> if you want to share keep alive connections with other
-clients.
-
-=head2 C<build_form_tx>
-
-  my $tx = $client->build_form_tx('http://kraih.com/foo' => {test => 123});
-  my $tx = $client->build_form_tx(
-    'http://kraih.com/foo',
-    'UTF-8',
-    {test => 123}
-  );
-  my $tx = $client->build_form_tx(
-    'http://kraih.com/foo',
-    {test => 123},
-    {Connection => 'close'}
-  );
-  my $tx = $client->build_form_tx(
-    'http://kraih.com/foo',
-    'UTF-8',
-    {test => 123},
-    {Connection => 'close'}
-  );
-  my $tx = $client->build_form_tx(
-    'http://kraih.com/foo',
-    {file => {file => '/foo/bar.txt'}}
-  );
-  my $tx = $client->build_form_tx(
-    'http://kraih.com/foo',
-    {file => {content => 'lalala'}}
-  );
-  my $tx = $client->build_form_tx(
-    'http://kraih.com/foo',
-    {myzip => {file => $asset, filename => 'foo.zip'}}
-  );
-
-Versatile L<Mojo::Transaction::HTTP> builder for forms.
-
-  my $tx = $client->build_form_tx('http://kraih.com/foo' => {test => 123});
-  $tx->res->body(sub { print $_[1] });
-  $client->start($tx);
-
-=head2 C<build_tx>
-
-  my $tx = $client->build_tx(GET => 'mojolicio.us');
-  my $tx = $client->build_tx(POST => 'http://mojolicio.us');
-  my $tx = $client->build_tx(
-    GET => 'http://kraih.com' => {Connection => 'close'}
-  );
-  my $tx = $client->build_tx(
-    POST => 'http://kraih.com' => {Connection => 'close'} => 'Hi!'
-  );
-
-Versatile general purpose L<Mojo::Transaction::HTTP> builder.
-
-  # Streaming response
-  my $tx = $client->build_tx(GET => 'http://mojolicio.us');
-  $tx->res->body(sub { print $_[1] });
-  $client->start($tx);
-
-  # Custom socket
-  my $tx = $client->build_tx(GET => 'http://mojolicio.us');
-  $tx->connection($socket);
-  $client->start($tx);
-
-=head2 C<build_websocket_tx>
-
-  my $tx = $client->build_websocket_tx('ws://localhost:3000');
-
-Versatile L<Mojo::Transaction::HTTP> builder for WebSocket handshakes.
-An upgrade to L<Mojo::Transaction::WebSocket> will happen automatically after
-a successful handshake is performed.
-
-=head2 C<clone>
-
-  my $clone = $client->clone;
-
-Clone client the instance.
-Note that all cloned clients have their own keep alive connection queue, so
-you can quickly run out of file descriptors with too many active clients.
-
-=head2 C<delete>
-
-  my $tx  = $client->delete('http://kraih.com');
-  my $tx  = $client->delete('http://kraih.com' => {Connection => 'close'});
-  my $tx  = $client->delete(
-    'http://kraih.com' => {Connection => 'close'} => 'Hi!'
-  );
-  $client = $client->delete('http://kraih.com' => sub {...});
-  $client = $client->delete(
-    'http://kraih.com' => {Connection => 'close'} => sub {...}
-  );
-  $client = $client->delete(
-    'http://kraih.com' => {Connection => 'close'} => 'Hi!' => sub {...}
-  );
-
-Prepare HTTP C<DELETE> request.
-
-  $client->delete('http://kraih.com' => sub {
-    print shift->res->body;
-  })->start;
-
-The request will be performed right away and the resulting
-L<Mojo::Transaction::HTTP> object returned if no callback is given.
-
-  print $client->delete('http://kraih.com')->res->body;
-
-=head2 C<detect_proxy>
-
-  $client = $client->detect_proxy;
-
-Check environment variables C<HTTP_PROXY>, C<http_proxy>, C<HTTPS_PROXY>,
-C<https_proxy>, C<NO_PROXY> and C<no_proxy> for proxy information.
-
-=head2 C<finish>
-
-  $client->finish;
-
-Finish the WebSocket connection, only available from callbacks.
-
-=head2 C<get>
-
-  my $tx  = $client->get('http://kraih.com');
-  my $tx  = $client->get('http://kraih.com' => {Connection => 'close'});
-  my $tx  = $client->get(
-    'http://kraih.com' => {Connection => 'close'} => 'Hi!'
-  );
-  $client = $client->get('http://kraih.com' => sub {...});
-  $client = $client->get(
-    'http://kraih.com' => {Connection => 'close'} => sub {...}
-  );
-  $client = $client->get(
-    'http://kraih.com' => {Connection => 'close'} => 'Hi!' => sub {...}
-  );
-
-Prepare HTTP C<GET> request.
-
-  $client->get('http://kraih.com' => sub {
-    print shift->res->body;
-  })->start;
-
-The request will be performed right away and the resulting
-L<Mojo::Transaction::HTTP> object returned if no callback is given.
-
-  print $client->get('http://kraih.com')->res->body;
-
-=head2 C<head>
-
-  my $tx  = $client->head('http://kraih.com');
-  my $tx  = $client->head('http://kraih.com' => {Connection => 'close'});
-  my $tx  = $client->head(
-    'http://kraih.com' => {Connection => 'close'} => 'Hi!'
-  );
-  $client = $client->head('http://kraih.com' => sub {...});
-  $client = $client->head(
-    'http://kraih.com' => {Connection => 'close'} => sub {...}
-  );
-  $client = $client->head(
-    'http://kraih.com' => {Connection => 'close'} => 'Hi!' => sub {...}
-  );
-
-Prepare HTTP C<HEAD> request.
-
-  $client->head('http://kraih.com' => sub {
-    print shift->res->headers->content_length;
-  })->start;
-
-The request will be performed right away and the resulting
-L<Mojo::Transaction::HTTP> object returned if no callback is given.
-
-  print $client->head('http://kraih.com')->res->headers->content_length;
-
-=head2 C<need_proxy>
-
-  my $need_proxy = $client->need_proxy('intranet.mojolicio.us');
-
-Check if request for domain would use a proxy server.
-Note that this method is EXPERIMENTAL and might change without warning!
-
-=head2 C<on_finish>
-
-  $client->on_finish(sub {...});
-
-Callback signaling that peer finished the WebSocket connection, only
-available from callbacks.
-
-  $client->on_finish(sub {
-    my $client = shift;
-  });
-
-=head2 C<on_message>
-
-  $client = $client->on_message(sub {...});
-
-Receive messages via WebSocket, only available from callbacks.
-
-  $client->on_message(sub {
-    my ($client, $message) = @_;
-  });
-
-=head2 C<post>
-
-  my $tx  = $client->post('http://kraih.com');
-  my $tx  = $client->post('http://kraih.com' => {Connection => 'close'});
-  my $tx  = $client->post(
-    'http://kraih.com' => {Connection => 'close'} => 'Hi!'
-  );
-  $client = $client->post('http://kraih.com' => sub {...});
-  $client = $client->post(
-    'http://kraih.com' => {Connection => 'close'} => sub {...}
-  );
-  $client = $client->post(
-    'http://kraih.com',
-    {Connection => 'close'},
-    'message body',
-    sub {...}
-  );
-  $client = $client->post(
-    'http://kraih.com' => {Connection => 'close'} => 'Hi!' => sub {...}
-  );
-
-Prepare HTTP C<POST> request.
-
-  $client->post('http://kraih.com' => sub {
-    print shift->res->body;
-  })->start;
-
-The request will be performed right away and the resulting
-L<Mojo::Transaction::HTTP> object returned if no callback is given.
-
-  print $client->post('http://kraih.com')->res->body;
-
-=head2 C<post_form>
-
-  my $tx  = $client->post_form('http://kraih.com/foo' => {test => 123});
-  my $tx  = $client->post_form(
-    'http://kraih.com/foo'
-    'UTF-8',
-    {test => 123}
-  );
-  my $tx  = $client->post_form(
-    'http://kraih.com/foo',
-    {test => 123},
-    {Connection => 'close'}
-  );
-  my $tx  = $client->post_form(
-    'http://kraih.com/foo',
-    'UTF-8',
-    {test => 123},
-    {Connection => 'close'}
-  );
-  my $tx = $client->post_form(
-    'http://kraih.com/foo',
-    {file => {file => '/foo/bar.txt'}}
-  );
-  my $tx= $client->post_form(
-    'http://kraih.com/foo',
-    {file => {content => 'lalala'}}
-  );
-  my $tx = $client->post_form(
-    'http://kraih.com/foo',
-    {myzip => {file => $asset, filename => 'foo.zip'}}
-  );
-  $client = $client->post_form('/foo' => {test => 123}, sub {...});
-  $client = $client->post_form(
-    'http://kraih.com/foo',
-    'UTF-8',
-    {test => 123},
-    sub {...}
-  );
-  $client = $client->post_form(
-    'http://kraih.com/foo',
-    {test => 123},
-    {Connection => 'close'},
-    sub {...}
-  );
-  $client = $client->post_form(
-    'http://kraih.com/foo',
-    'UTF-8',
-    {test => 123},
-    {Connection => 'close'},
-    sub {...}
-  );
-  $client = $client->post_form(
-    'http://kraih.com/foo',
-    {file => {file => '/foo/bar.txt'}},
-    sub {...}
-  );
-  $client = $client->post_form(
-    'http://kraih.com/foo',
-    {file => {content => 'lalala'}},
-    sub {...}
-  );
-  $client = $client->post_form(
-    'http://kraih.com/foo',
-    {myzip => {file => $asset, filename => 'foo.zip'}},
-    sub {...}
-  );
-
-Prepare HTTP C<POST> request with form data.
-
-  $client->post_form('http://kraih.com' => {q => 'test'} => sub {
-    print shift->res->body;
-  })->start;
-
-The request will be performed right away and the resulting
-L<Mojo::Transaction::HTTP> object returned if no callback is given.
-
-  print $client->post_form('http://kraih.com' => {q => 'test'})->res->body;
-
-=head2 C<put>
-
-  my $tx  = $client->put('http://kraih.com');
-  my $tx  = $client->put('http://kraih.com' => {Connection => 'close'});
-  my $tx  = $client->put(
-    'http://kraih.com' => {Connection => 'close'} => 'Hi!'
-  );
-  $client = $client->put('http://kraih.com' => sub {...});
-  $client = $client->put(
-    'http://kraih.com' => {Connection => 'close'} => sub {...}
-  );
-  $client = $client->put(
-    'http://kraih.com' => {Connection => 'close'} => 'Hi!' => sub {...}
-  );
-
-Prepare HTTP C<PUT> request.
-
-  $client->put('http://kraih.com' => sub {
-    print shift->res->body;
-  })->start;
-
-The request will be performed right away and the resulting
-L<Mojo::Transaction::HTTP> object returned if no callback is given.
-
-  print $client->put('http://kraih.com')->res->body;
-
-=head2 C<queue>
-
-  $client = $client->queue(@transactions);
-  $client = $client->queue(@transactions => sub {...});
-
-Queue a list of transactions for processing.
-
-=head2 C<req>
-
-  my $req = $client->req;
-
-The request object of the last finished transaction, only available from
-callbacks, usually a L<Mojo::Message::Request> object.
-
-=head2 C<res>
-
-  my $res = $client->res;
-
-The response object of the last finished transaction, only available from
-callbacks, usually a L<Mojo::Message::Response> object.
-
-=head2 C<singleton>
-
-  my $client = Mojo::Client->singleton;
-
-The global client object, used to access a single shared client instance from
-everywhere inside the process.
-
-=head2 C<send_message>
-
-  $client = $client->send_message('Hi there!');
-  $client = $client->send_message('Hi there!', sub {...});
-
-Send a message via WebSocket, only available from callbacks.
-
-=head2 C<start>
-
-  $client = $client->start;
-  $client = $client->start(@transactions);
-  $client = $client->start(@transactions => sub {...});
-
-Start processing all queued transactions.
-
-=head2 C<test_server>
-
-  my $port = $client->test_server;
-  my $port = $client->test_server('https');
-
-Starts a test server for C<app> if necessary and returns the port number.
-Note that this method is EXPERIMENTAL and might change without warning!
-
-=head2 C<websocket>
-
-  $client = $client->websocket('ws://localhost:3000' => sub {...});
-  $client = $client->websocket(
-    'ws://localhost:3000' => {'User-Agent' => 'Agent 1.0'} => sub {...}
-  );
-
-Open a WebSocket connection with transparent handshake.
+This module has been DEPRECATED in favor of L<Mojo::UserAgent>!
 
 =head1 SEE ALSO
 

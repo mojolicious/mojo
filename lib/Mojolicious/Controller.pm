@@ -39,6 +39,15 @@ my @RESERVED = (
 my $STASH_RE = join '|', @RESERVED;
 $STASH_RE = qr/^(?:$STASH_RE)$/;
 
+# DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
+*client = sub {
+  warn <<EOF;
+Mojolicious::Controller->client is DEPRECATED in favor of
+Mojolicious::Controller->us!!!
+EOF
+  return shift->app->client;
+};
+
 # "Is all the work done by the children?
 #  No, not the whipping."
 sub AUTOLOAD {
@@ -56,8 +65,6 @@ sub AUTOLOAD {
 }
 
 sub DESTROY { }
-
-sub client { shift->app->client }
 
 # "For the last time, I don't like lilacs!
 #  Your first wife was the one who liked lilacs!
@@ -708,6 +715,8 @@ sub stash {
   return $self;
 }
 
+sub ua { shift->app->ua }
+
 # "Behold, a time traveling machine.
 #  Time? I can't go back there!
 #  Ah, but this machine only goes forward in time.
@@ -1232,21 +1241,6 @@ L<Mojo::Transaction::HTTP> object.
 L<Mojolicious::Controller> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
 
-=head2 C<client>
-
-  my $client = $c->client;
-    
-A L<Mojo::Client> prepared for the current environment.
-
-  my $tx = $c->client->get('http://mojolicio.us');
-
-  $c->client->post_form('http://kraih.com/login' => {user => 'mojo'});
-
-  $c->client->get('http://mojolicio.us' => sub {
-    my $client = shift;
-    $c->render_data($client->res->body);
-  })->start;
-
 =head2 C<cookie>
 
   $c         = $c->cookie(foo => 'bar');
@@ -1476,6 +1470,21 @@ Non persistent data storage and exchange.
   $c->stash->{foo} = 'bar';
   my $foo = $c->stash->{foo};
   delete $c->stash->{foo};
+
+=head2 C<ua>
+
+  my $ua = $c->ua;
+    
+A L<Mojo::UserAgent> prepared for the current environment.
+
+  my $tx = $c->ua->get('http://mojolicio.us');
+
+  $c->ua->post_form('http://kraih.com/login' => {user => 'mojo'});
+
+  $c->ua->get('http://mojolicio.us' => sub {
+    my $ua = shift;
+    $c->render_data($ua->res->body);
+  });
 
 =head2 C<url_for>
 

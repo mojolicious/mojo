@@ -15,18 +15,19 @@ plan tests => 9;
 # "That does not compute.
 #  Really?
 #  Well, it computes a little."
-use Mojo::Client;
+use Mojo::IOLoop;
+use Mojo::UserAgent;
 
-# Client
-my $client = Mojo::Client->singleton;
+# User agent
+my $ua = Mojo::UserAgent->new;
 
 # Silence
-$client->log->level('fatal');
+$ua->log->level('fatal');
 
 # Server
-my $port = $client->ioloop->generate_port;
+my $port = $ua->ioloop->generate_port;
 my $error;
-my $id = $client->ioloop->listen(
+my $id = $ua->ioloop->listen(
   port     => $port,
   tls      => 1,
   tls_cert => 't/mojo/certs/server.crt',
@@ -46,17 +47,17 @@ my $id = $client->ioloop->listen(
 );
 
 # No certificate
-my $tx = $client->get("https://localhost:$port");
+my $tx = $ua->get("https://localhost:$port");
 ok !$tx->success, 'not successful';
 ok $error, 'has error';
 $error = '';
-$tx    = $client->cert('')->key('')->get("https://localhost:$port");
+$tx    = $ua->cert('')->key('')->get("https://localhost:$port");
 ok !$tx->success, 'not successful';
 ok $error, 'has error';
 
 # Valid certificate
 $tx =
-  $client->cert('t/mojo/certs/client.crt')->key('t/mojo/certs/client.key')
+  $ua->cert('t/mojo/certs/client.crt')->key('t/mojo/certs/client.key')
   ->get("https://localhost:$port");
 ok $tx->success, 'successful';
 is $tx->res->code, 200,      'right status';
@@ -64,11 +65,10 @@ is $tx->res->body, 'works!', 'right content';
 
 # Invalid certificate
 $tx =
-  $client->cert('t/mojo/certs/badclient.crt')
-  ->key('t/mojo/certs/badclient.key')->get("https://localhost:$port");
+  $ua->cert('t/mojo/certs/badclient.crt')->key('t/mojo/certs/badclient.key')
+  ->get("https://localhost:$port");
 ok $error, 'has error';
 
 # Empty certificate
-$tx =
-  $client->cert('no file')->key('no file')->get("https://localhost:$port");
+$tx = $ua->cert('no file')->key('no file')->get("https://localhost:$port");
 ok $error, 'has error';

@@ -9,7 +9,7 @@ BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 use Test::More;
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
-plan tests => 11;
+plan tests => 12;
 
 use_ok 'Mojo::IOLoop';
 
@@ -34,9 +34,21 @@ $loop->resolve(
 )->start;
 ok keys %types > 1, 'multiple record types';
 
-# Resolve TXT record
+# Lookup
 my $result;
-$loop->resolve(
+Mojo::IOLoop->lookup(
+  'google.com',
+  sub {
+    my ($self, $address) = @_;
+    $result = $address;
+    $self->stop;
+  }
+)->start;
+ok $result, 'got an address';
+
+# Resolve TXT record
+$result = undef;
+Mojo::IOLoop->resolve(
   'google.com',
   'TXT',
   sub {

@@ -430,6 +430,9 @@ sub local_info {
 sub lookup {
   my ($self, $name, $cb) = @_;
 
+  # Singleton
+  $self = $self->singleton unless ref $self;
+
   # "localhost"
   return $self->timer(0 => sub { shift->$cb($LOCALHOST) })
     if $name eq 'localhost';
@@ -604,6 +607,9 @@ sub remote_info {
 
 sub resolve {
   my ($self, $name, $type, $cb) = @_;
+
+  # Singleton
+  $self = $self->singleton unless ref $self;
 
   # Regex
   my $ipv4;
@@ -2067,6 +2073,7 @@ The local port.
 =head2 C<lookup>
 
   $loop = $loop->lookup('mojolicio.us' => sub {...});
+  $loop = Mojo::IOLoop->lookup('mojolicio.us' => sub {...});
 
 Lookup C<IPv4> or C<IPv6> address for domain.
 Note that this method is EXPERIMENTAL and might change without warning!
@@ -2153,6 +2160,7 @@ The remote port.
 =head2 C<resolve>
 
   $loop = $loop->resolve('mojolicio.us', 'A', sub {...});
+  $loop = Mojo::IOLoop->resolve('mojolicio.us', 'A', sub {...});
 
 Resolve domain into C<A>, C<AAAA>, C<CNAME>, C<MX>, C<NS>, C<PTR> or C<TXT>
 records, C<*> will query for all at once.

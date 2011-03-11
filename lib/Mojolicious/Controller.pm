@@ -43,7 +43,7 @@ $STASH_RE = qr/^(?:$STASH_RE)$/;
 *client = sub {
   warn <<EOF;
 Mojolicious::Controller->client is DEPRECATED in favor of
-Mojolicious::Controller->us!!!
+Mojolicious::Controller->ua!!!
 EOF
   return shift->app->client;
 };

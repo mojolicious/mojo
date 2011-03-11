@@ -71,14 +71,11 @@ $ENV{no_proxy}    = $backup6;
 # User agent
 $ua = Mojo::UserAgent->new(app => app);
 
-# Loop
-my $loop = Mojo::IOLoop->singleton;
-
 # Server
-my $port   = $loop->generate_port;
+my $port   = Mojo::IOLoop->generate_port;
 my $buffer = {};
 my $last;
-my $id = $loop->listen(
+my $id = Mojo::IOLoop->listen(
   port      => $port,
   on_accept => sub {
     my ($loop, $id) = @_;
@@ -102,9 +99,9 @@ my $id = $loop->listen(
 );
 
 # Wonky server (missing Content-Length header)
-my $port2   = $loop->generate_port;
+my $port2   = Mojo::IOLoop->generate_port;
 my $buffer2 = {};
-$loop->listen(
+Mojo::IOLoop->listen(
   port      => $port2,
   on_accept => sub {
     my ($loop, $id) = @_;
@@ -136,7 +133,7 @@ is $tx->res->body, 'works', 'right content';
 
 # GET / (custom connection)
 my ($success, $code, $body);
-$loop->connect(
+Mojo::IOLoop->connect(
   address    => 'localhost',
   port       => $port,
   on_connect => sub {
@@ -150,18 +147,18 @@ $loop->connect(
         $success = $tx->success;
         $code    = $tx->res->code;
         $body    = $tx->res->body;
-        $loop->stop;
+        Mojo::IOLoop->stop;
       }
     );
   }
 );
-$loop->start;
+Mojo::IOLoop->start;
 ok $success, 'successful';
 is $code,    200, 'right status';
 is $body,    'works!', 'right content';
 
 # Fresh blocking user agent
-$ua = Mojo::UserAgent->new(ioloop => $loop, app => app);
+$ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton, app => app);
 
 # GET / (missing Content-Lengt header)
 $tx = $ua->get("http://localhost:$port2/");
@@ -187,7 +184,7 @@ is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
 # Close connection (bypassing safety net)
-$loop->_drop_immediately($last);
+Mojo::IOLoop->singleton->_drop_immediately($last);
 
 # GET / (mock server closed connection)
 $tx = $ua->get("http://localhost:$port/mock");
@@ -204,7 +201,7 @@ is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
 # Close connection (bypassing safety net)
-$loop->_drop_immediately($last);
+Mojo::IOLoop->singleton->_drop_immediately($last);
 
 # GET / (mock server closed connection)
 $tx = $ua->get("http://localhost:$port/mock");
@@ -221,7 +218,7 @@ is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
 # Taint connection
-$loop->write($last => 'broken!');
+Mojo::IOLoop->singleton->write($last => 'broken!');
 sleep 1;
 
 # GET / (mock server tainted connection)
@@ -239,7 +236,7 @@ is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
 # Taint connection
-$loop->write($last => 'broken!');
+Mojo::IOLoop->singleton->write($last => 'broken!');
 sleep 1;
 
 # GET / (mock server tainted connection)
@@ -266,14 +263,14 @@ $ua->get(
           sub {
             my ($self, $tx) = @_;
             push @kept_alive, $tx->kept_alive;
-            $loop->stop;
+            Mojo::IOLoop->stop;
           }
         );
       }
     );
   }
 );
-$loop->start;
+Mojo::IOLoop->start;
 is_deeply \@kept_alive, [undef, 1, 1], 'connections kept alive';
 
 # Simple nested keep alive with timers
@@ -282,18 +279,18 @@ $ua->get(
   '/',
   sub {
     push @kept_alive, pop->kept_alive;
-    $loop->timer(
+    Mojo::IOLoop->timer(
       '0.25' => sub {
         $ua->get(
           '/',
           sub {
             push @kept_alive, pop->kept_alive;
-            $loop->timer('0.25' => sub { $loop->stop });
+            Mojo::IOLoop->timer('0.25' => sub { Mojo::IOLoop->stop });
           }
         );
       }
     );
   }
 );
-$loop->start;
+Mojo::IOLoop->start;
 is_deeply \@kept_alive, [1, 1], 'connections kept alive';

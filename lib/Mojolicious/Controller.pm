@@ -1367,7 +1367,7 @@ Render a data structure as JSON.
 Disable auto rendering, especially for long polling this can be quite useful.
 
   $c->render_later;
-  Mojo::IOLoop->singleton->timer(2 => sub {
+  Mojo::IOLoop->timer(2 => sub {
     $c->render(text => 'Delayed by 2 seconds!');
   });
 

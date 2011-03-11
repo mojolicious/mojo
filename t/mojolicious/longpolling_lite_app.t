@@ -45,7 +45,7 @@ get '/longpoll' => sub {
   $self->res->code(200);
   $self->res->headers->content_type('text/plain');
   $self->write_chunk('hi ');
-  Mojo::IOLoop->singleton->timer(
+  Mojo::IOLoop->timer(
     '0.5' => sub {
       $self->write_chunk('there,', sub { shift->write_chunk(' whats up?'); });
       shift->timer('0.5' => sub { $self->write_chunk('') });
@@ -76,7 +76,7 @@ get '/longpoll/plain' => sub {
   $self->res->headers->content_type('text/plain');
   $self->res->headers->content_length(25);
   $self->write('hi ');
-  Mojo::IOLoop->singleton->timer(
+  Mojo::IOLoop->timer(
     '0.5' => sub {
       $self->on_finish(sub { $longpoll_plain = 'finished!' });
       $self->write('there plain,', sub { shift->write(' whats up?') });
@@ -92,7 +92,7 @@ get '/longpoll/delayed' => sub {
   $self->res->code(200);
   $self->res->headers->content_type('text/plain');
   $self->write_chunk;
-  Mojo::IOLoop->singleton->timer(
+  Mojo::IOLoop->timer(
     '0.5' => sub {
       $self->write_chunk(
         sub {
@@ -115,7 +115,7 @@ get '/longpoll/plain/delayed' => sub {
   $self->res->headers->content_type('text/plain');
   $self->res->headers->content_length(12);
   $self->write;
-  Mojo::IOLoop->singleton->timer(
+  Mojo::IOLoop->timer(
     '0.5' => sub {
       $self->write(
         sub {
@@ -133,8 +133,7 @@ my $longpoll_static_delayed;
 get '/longpoll/static/delayed' => sub {
   my $self = shift;
   $self->on_finish(sub { $longpoll_static_delayed = 'finished!' });
-  Mojo::IOLoop->singleton->timer(
-    '0.5' => sub { $self->render_static('hello.txt') });
+  Mojo::IOLoop->timer('0.5' => sub { $self->render_static('hello.txt') });
 };
 
 # GET /longpoll/static/delayed_too
@@ -145,8 +144,7 @@ get '/longpoll/static/delayed_too' => sub {
   $self->cookie(bar => 'baz');
   $self->session(foo => 'bar');
   $self->render_later;
-  Mojo::IOLoop->singleton->timer(
-    '0.5' => sub { $self->render_static('hello.txt') });
+  Mojo::IOLoop->timer('0.5' => sub { $self->render_static('hello.txt') });
 } => 'delayed_too';
 
 # GET /longpoll/dynamic/delayed
@@ -154,7 +152,7 @@ my $longpoll_dynamic_delayed;
 get '/longpoll/dynamic/delayed' => sub {
   my $self = shift;
   $self->on_finish(sub { $longpoll_dynamic_delayed = 'finished!' });
-  Mojo::IOLoop->singleton->timer(
+  Mojo::IOLoop->timer(
     '0.5' => sub {
       $self->res->code(201);
       $self->cookie(baz => 'yada');
@@ -173,7 +171,7 @@ get '/too_long' => sub {
   $self->res->headers->content_type('text/plain');
   $self->res->headers->content_length(12);
   $self->write('how');
-  Mojo::IOLoop->singleton->timer(
+  Mojo::IOLoop->timer(
     '5' => sub {
       $self->write(
         sub {
@@ -217,7 +215,7 @@ is $longpoll, 'finished!', 'finished';
 # GET /longpoll (interrupted)
 $longpoll = undef;
 my $port = $t->ua->test_server;
-Mojo::IOLoop->singleton->connect(
+Mojo::IOLoop->connect(
   address    => 'localhost',
   port       => $port,
   on_connect => sub {
@@ -227,10 +225,10 @@ Mojo::IOLoop->singleton->connect(
   on_read => sub {
     my ($self, $id, $chunk) = @_;
     $self->drop($id);
-    $self->timer('0.5', sub { shift->stop });
+    $self->timer('0.5', sub { Mojo::IOLoop->stop });
   }
 );
-Mojo::IOLoop->singleton->start;
+Mojo::IOLoop->start;
 is $longpoll, 'finished!', 'finished';
 
 # GET /longpoll (also interrupted)

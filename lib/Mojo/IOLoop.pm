@@ -193,6 +193,9 @@ sub new {
 sub connect {
   my $self = shift;
 
+  # Singleton
+  $self = $self->singleton unless ref $self;
+
   # Arguments
   my $args = ref $_[0] ? $_[0] : {@_};
 
@@ -258,7 +261,6 @@ sub drop {
 }
 
 sub generate_port {
-  my $self = shift;
 
   # Ports
   my $port = 1 . int(rand 10) . int(rand 10) . int(rand 10) . int(rand 10);
@@ -284,6 +286,9 @@ sub is_running { shift->{_running} }
 #  He is the cancer and I am the… uh… what cures cancer?"
 sub listen {
   my $self = shift;
+
+  # Singleton
+  $self = $self->singleton unless ref $self;
 
   # Arguments
   my $args = ref $_[0] ? $_[0] : {@_};
@@ -744,6 +749,9 @@ sub singleton { $LOOP ||= shift->new(@_) }
 sub start {
   my $self = shift;
 
+  # Singleton
+  $self = $self->singleton unless ref $self;
+
   # Already running
   return if $self->{_running};
 
@@ -813,7 +821,15 @@ sub start_tls {
   return $id;
 }
 
-sub stop { delete shift->{_running} }
+sub stop {
+  my $self = shift;
+
+  # Singleton
+  $self = $self->singleton unless ref $self;
+
+  # Stop
+  delete $self->{_running};
+}
 
 sub test {
   my ($self, $id) = @_;
@@ -835,7 +851,13 @@ sub test {
 }
 
 sub timer {
-  shift->_add_loop_event(timer => pop, after => pop, started => time);
+  my $self = shift;
+
+  # Singleton
+  $self = $self->singleton unless ref $self;
+
+  # Timer
+  $self->_add_loop_event(timer => pop, after => pop, started => time);
 }
 
 sub write {
@@ -1852,6 +1874,10 @@ possible.
     address => '127.0.0.1',
     port    => 3000
   );
+  my $id = Mojo::IOLoop->connect(
+    address => '127.0.0.1',
+    port    => 3000
+  );
 
 Open a TCP connection to a remote host.
 Note that TLS support depends on L<IO::Socket::SSL> and IPv6 support on
@@ -1926,6 +1952,7 @@ data in its write buffer.
 =head2 C<generate_port>
 
   my $port = $loop->generate_port;
+  my $port = Mojo::IOLoop->generate_port;
 
 Find a free TCP port, this is a utility function primarily used for tests.
 
@@ -1955,6 +1982,7 @@ Check if loop is running.
     tls_cert => '/foo/server.cert',
     tls_key  => '/foo/server.key'
   );
+  my $id = Mojo::IOLoop->listen(port => 3000);
 
 Create a new listen socket.
 Note that TLS support depends on L<IO::Socket::SSL> and IPv6 support on
@@ -2140,6 +2168,7 @@ everywhere inside the process.
 =head2 C<start>
 
   $loop->start;
+  Mojo::IOLoop->start;
 
 Start the loop, this will block until C<stop> is called or return immediately
 if the loop is already running.
@@ -2154,6 +2183,7 @@ Note that TLS support depends on L<IO::Socket::SSL>.
 =head2 C<stop>
 
   $loop->stop;
+  Mojo::IOLoop->stop;
 
 Stop the loop immediately, this will not interrupt any existing connections
 and the loop can be restarted by running C<start> again.
@@ -2169,6 +2199,7 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
   my $id = $loop->timer(5 => sub {...});
   my $id = $loop->timer(0.25 => sub {...});
+  my $id = Mojo::IOLoop->timer(5 => sub {...});
 
 Create a new timer, invoking the callback afer a given amount of seconds.
 

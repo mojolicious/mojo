@@ -1080,7 +1080,7 @@ Mojo::UserAgent - Async IO HTTP 1.1 And WebSocket User Agent
   # Websocket request
   $ua->websocket('ws://websockets.org:8787' => sub {
     my $tx = pop;
-    $tx->on_finish(sub { Mojo::IOLoop->singleton->stop });
+    $tx->on_finish(sub { Mojo::IOLoop->stop });
     $tx->on_message(sub {
       my ($tx, $message) = @_;
       print "$message\n";
@@ -1088,7 +1088,7 @@ Mojo::UserAgent - Async IO HTTP 1.1 And WebSocket User Agent
     });
     $tx->send_message('hi there!');
   });
-  Mojo::IOLoop->singleton->start;
+  Mojo::IOLoop->start;
 
 =head1 DESCRIPTION
 
@@ -1308,9 +1308,9 @@ You can also append a callback to perform requests non-blocking.
 
   $ua->delete('http://kraih.com' => sub {
     print shift->res->body;
-    Mojo::IOLoop->singleton->stop;
+    Mojo::IOLoop->stop;
   });
-  Mojo::IOLoop->singleton->start;
+  Mojo::IOLoop->start;
 
 =head2 C<detect_proxy>
 
@@ -1332,9 +1332,9 @@ You can also append a callback to perform requests non-blocking.
 
   $ua->get('http://kraih.com' => sub {
     print shift->res->body;
-    Mojo::IOLoop->singleton->stop;
+    Mojo::IOLoop->stop;
   });
-  Mojo::IOLoop->singleton->start;
+  Mojo::IOLoop->start;
 
 =head2 C<head>
 
@@ -1349,9 +1349,9 @@ You can also append a callback to perform requests non-blocking.
 
   $ua->head('http://kraih.com' => sub {
     print shift->res->body;
-    Mojo::IOLoop->singleton->stop;
+    Mojo::IOLoop->stop;
   });
-  Mojo::IOLoop->singleton->start;
+  Mojo::IOLoop->start;
 
 =head2 C<need_proxy>
 
@@ -1373,9 +1373,9 @@ You can also append a callback to perform requests non-blocking.
 
   $ua->post('http://kraih.com' => sub {
     print shift->res->body;
-    Mojo::IOLoop->singleton->stop;
+    Mojo::IOLoop->stop;
   });
-  Mojo::IOLoop->singleton->start;
+  Mojo::IOLoop->start;
 
 =head2 C<post_form>
 
@@ -1414,9 +1414,9 @@ You can also append a callback to perform requests non-blocking.
 
   $ua->post_form('http://kraih.com' => {q => 'test'} => sub {
     print shift->res->body;
-    Mojo::IOLoop->singleton->stop;
+    Mojo::IOLoop->stop;
   });
-  Mojo::IOLoop->singleton->start;
+  Mojo::IOLoop->start;
 
 =head2 C<put>
 
@@ -1431,9 +1431,9 @@ You can also append a callback to perform requests non-blocking.
 
   $ua->put('http://kraih.com' => sub {
     print shift->res->body;
-    Mojo::IOLoop->singleton->stop;
+    Mojo::IOLoop->stop;
   });
-  Mojo::IOLoop->singleton->start;
+  Mojo::IOLoop->start;
 
 =head2 C<start>
 
@@ -1445,9 +1445,9 @@ You can also append a callback to perform transactions non-blocking.
 
   $ua->start($tx => sub {
     print shift->res->body;
-    Mojo::IOLoop->singleton->stop;
+    Mojo::IOLoop->stop;
   });
-  Mojo::IOLoop->singleton->start;
+  Mojo::IOLoop->start;
 
 =head2 C<test_server>
 
@@ -1468,11 +1468,11 @@ Open a non-blocking WebSocket connection with transparent handshake.
 
   $ua->websocket('ws://localhost:3000' => sub {
     my $tx = pop;
-    $tx->on_finish(sub { Mojo::IOLoop->singleton->stop });
+    $tx->on_finish(sub { Mojo::IOLoop->stop });
     $tx->on_message(sub { say pop });
     $tx->send_message('Hi!');
   });
-  Mojo::IOLoop->singleton->start;
+  Mojo::IOLoop->start;
 
 =head1 SEE ALSO
 

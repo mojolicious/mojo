@@ -280,7 +280,15 @@ sub generate_port {
   return;
 }
 
-sub is_running { shift->{_running} }
+sub is_running {
+  my $self = shift;
+
+  # Singleton
+  $self = $self->singleton unless ref $self;
+
+  # Running
+  $self->{_running};
+}
 
 # "Fat Tony is a cancer on this fair city!
 #  He is the cancer and I am the… uh… what cures cancer?"
@@ -1876,11 +1884,11 @@ possible.
 
 =head2 C<connect>
 
-  my $id = $loop->connect(
+  my $id = Mojo::IOLoop->connect(
     address => '127.0.0.1',
     port    => 3000
   );
-  my $id = Mojo::IOLoop->connect(
+  my $id = $loop->connect(
     address => '127.0.0.1',
     port    => 3000
   );
@@ -1957,8 +1965,8 @@ data in its write buffer.
 
 =head2 C<generate_port>
 
-  my $port = $loop->generate_port;
   my $port = Mojo::IOLoop->generate_port;
+  my $port = $loop->generate_port;
 
 Find a free TCP port, this is a utility function primarily used for tests.
 
@@ -1971,14 +1979,16 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<is_running>
 
+  my $running = Mojo::IOLoop->is_running;
   my $running = $loop->is_running;
 
 Check if loop is running.
 
-  exit unless Mojo::IOLoop->singleton->is_running;
+  exit unless Mojo::IOLoop->is_running;
 
 =head2 C<listen>
 
+  my $id = Mojo::IOLoop->listen(port => 3000);
   my $id = $loop->listen(port => 3000);
   my $id = $loop->listen({port => 3000});
   my $id = $loop->listen(file => '/foo/myapp.sock');
@@ -1988,7 +1998,6 @@ Check if loop is running.
     tls_cert => '/foo/server.cert',
     tls_key  => '/foo/server.key'
   );
-  my $id = Mojo::IOLoop->listen(port => 3000);
 
 Create a new listen socket.
 Note that TLS support depends on L<IO::Socket::SSL> and IPv6 support on
@@ -2072,8 +2081,8 @@ The local port.
 
 =head2 C<lookup>
 
-  $loop = $loop->lookup('mojolicio.us' => sub {...});
   $loop = Mojo::IOLoop->lookup('mojolicio.us' => sub {...});
+  $loop = $loop->lookup('mojolicio.us' => sub {...});
 
 Lookup C<IPv4> or C<IPv6> address for domain.
 Note that this method is EXPERIMENTAL and might change without warning!
@@ -2159,8 +2168,8 @@ The remote port.
 
 =head2 C<resolve>
 
-  $loop = $loop->resolve('mojolicio.us', 'A', sub {...});
   $loop = Mojo::IOLoop->resolve('mojolicio.us', 'A', sub {...});
+  $loop = $loop->resolve('mojolicio.us', 'A', sub {...});
 
 Resolve domain into C<A>, C<AAAA>, C<CNAME>, C<MX>, C<NS>, C<PTR> or C<TXT>
 records, C<*> will query for all at once.
@@ -2175,8 +2184,8 @@ everywhere inside the process.
 
 =head2 C<start>
 
-  $loop->start;
   Mojo::IOLoop->start;
+  $loop->start;
 
 Start the loop, this will block until C<stop> is called or return immediately
 if the loop is already running.
@@ -2190,8 +2199,8 @@ Note that TLS support depends on L<IO::Socket::SSL>.
 
 =head2 C<stop>
 
-  $loop->stop;
   Mojo::IOLoop->stop;
+  $loop->stop;
 
 Stop the loop immediately, this will not interrupt any existing connections
 and the loop can be restarted by running C<start> again.
@@ -2205,9 +2214,9 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<timer>
 
+  my $id = Mojo::IOLoop->timer(5 => sub {...});
   my $id = $loop->timer(5 => sub {...});
   my $id = $loop->timer(0.25 => sub {...});
-  my $id = Mojo::IOLoop->timer(5 => sub {...});
 
 Create a new timer, invoking the callback afer a given amount of seconds.
 

@@ -32,7 +32,7 @@ plan skip_all => 'IO::Socket::SSL 1.37 required for this test!'
   unless Mojo::IOLoop::TLS;
 plan skip_all => 'Windows is too fragile for this test!'
   if Mojo::IOLoop::WINDOWS;
-plan tests => 14;
+plan tests => 15;
 
 # "To the panic room!
 #  We don't have a panic room.
@@ -65,10 +65,11 @@ is $server, 'tset123hup', 'right content';
 is $client, 'test321',    'right content';
 
 # Valid client certificate
-$loop   = Mojo::IOLoop->new;
+$loop   = Mojo::IOLoop->singleton;
 $port   = Mojo::IOLoop->generate_port;
 $server = $client = '';
 my $error = '';
+my $running;
 $loop->listen(
   port      => $port,
   tls       => 1,
@@ -77,6 +78,7 @@ $loop->listen(
   tls_ca    => 't/mojo/certs/ca.crt',
   on_accept => sub {
     shift->write(shift, 'test', sub { shift->write(shift, '321') });
+    $running = Mojo::IOLoop->is_running;
   },
   on_read => sub { $server .= pop },
   on_hup  => sub { $server .= 'hup' },
@@ -99,6 +101,7 @@ $loop->timer(1 => sub { shift->stop });
 $loop->start;
 is $server, 'tset123hup', 'right content';
 is $client, 'test321',    'right content';
+ok $running, 'loop was running';
 ok !$error, 'no error';
 
 # Invalid client certificate

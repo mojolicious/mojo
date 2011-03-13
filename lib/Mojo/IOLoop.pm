@@ -2185,6 +2185,11 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
 The global loop object, used to access a single shared loop instance from
 everywhere inside the process.
+Many methods also allow you to take shortcuts when using the L<Mojo::IOLoop>
+singleton.
+
+  Mojo::IOLoop->timer(2 => sub { Mojo::IOLoop->stop });
+  Mojo::IOLoop->start;
 
 =head2 C<start>
 

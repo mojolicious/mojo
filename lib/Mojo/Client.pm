@@ -1116,7 +1116,7 @@ Mojo::Client - DEPRECATED!
 
 =head1 SYNOPSIS
 
-  use Mojo::Client;
+  use Mojo::UserAgent;
 
 =head1 DESCRIPTION
 

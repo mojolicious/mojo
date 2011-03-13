@@ -253,6 +253,9 @@ sub connection_timeout {
 sub drop {
   my ($self, $id) = @_;
 
+  # Singleton
+  $self = $self->singleton unless ref $self;
+
   # Drop connection gracefully
   if (my $c = $self->{_cs}->{$id}) { return $c->{finish} = 1 }
 
@@ -1957,6 +1960,7 @@ dropped.
 
 =head2 C<drop>
 
+  $loop = Mojo::IOLoop->drop($id)
   $loop = $loop->drop($id);
 
 Drop anything with an id.

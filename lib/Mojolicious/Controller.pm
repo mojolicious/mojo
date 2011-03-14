@@ -1477,13 +1477,14 @@ Non persistent data storage and exchange.
     
 A L<Mojo::UserAgent> prepared for the current environment.
 
+  # Blocking
   my $tx = $c->ua->get('http://mojolicio.us');
+  my $tx = $c->ua->post_form('http://kraih.com/login' => {user => 'mojo'});
 
-  $c->ua->post_form('http://kraih.com/login' => {user => 'mojo'});
-
+  # Non-blocking
   $c->ua->get('http://mojolicio.us' => sub {
-    my $ua = shift;
-    $c->render_data($ua->res->body);
+    my $tx = pop;
+    $c->render_data($tx->res->body);
   });
 
 =head2 C<url_for>

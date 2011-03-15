@@ -115,6 +115,11 @@ L<Mojolicious::Plugin::Config> and the following new ones.
 
 Template options.
 
+=head1 HELPERS
+
+L<Mojolicious::Plugin::JsonConfig> defines the same helpers as
+L<Mojolicious::Plugin::Config>.
+
 =head1 METHODS
 
 L<Mojolicious::Plugin::JsonConfig> inherits all methods from

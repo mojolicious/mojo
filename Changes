@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.14 2011-03-14 00:00:00
+        - Added config helper to Mojolicious::Plugin::Config.
         - Fixed typos.
 
 1.13 2011-03-14 00:00:00

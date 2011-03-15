@@ -1297,7 +1297,13 @@ connection in progress.
   my @foo   = $c->param('foo');
   $c        = $c->param(foo => 'ba;r');
 
-Request parameters and routes captures.
+Access GET/POST parameters and route captures.
+
+  # Only GET parameters
+  my $foo = $c->req->url->query->param('foo');
+
+  # Only GET and POST parameters
+  my $foo = $c->req->param('foo');
 
 =head2 C<redirect_to>
 

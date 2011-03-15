@@ -224,7 +224,7 @@ Memorize block result in memory and prevent future execution.
 
   <%= param 'foo' %>
 
-Access request parameters and routes captures.
+Access GET/POST parameters and route captures.
 
 =head2 C<session>
 

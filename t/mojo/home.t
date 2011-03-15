@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
+use Test::More tests => 5;
 
 use Cwd qw/cwd realpath/;
 use File::Spec;
@@ -27,6 +27,13 @@ my $original =
 $home = Mojo::Home->new->detect;
 my $target = realpath $original;
 is_deeply [split /\\|\//, $target], [split /\\|\//, $home],
+  'right path detected';
+
+# Specific class detection
+$INC{'MyClass.pm'} = 'MyClass.pm';
+$home = Mojo::Home->new->detect('MyClass');
+is_deeply [split /\\|\//, File::Spec->canonpath($home->to_string)],
+  [split /\\|\//, File::Spec->canonpath(cwd())],
   'right path detected';
 
 # FindBin detection

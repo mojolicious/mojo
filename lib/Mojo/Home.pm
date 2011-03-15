@@ -51,7 +51,7 @@ sub detect {
 
       # Turn into absolute path
       $self->{_parts} =
-        [File::Spec->splitdir(abs_path(File::Spec->catdir(@home)))];
+        [File::Spec->splitdir(abs_path(File::Spec->catdir(@home) || '.'))];
     }
   }
 

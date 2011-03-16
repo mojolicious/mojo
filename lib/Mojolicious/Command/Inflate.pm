@@ -69,7 +69,8 @@ Mojolicious::Command::Inflate - Inflate Command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::Inflate> prints all your application routes.
+L<Mojolicious::Command::Inflate> turns all your embedded templates into real
+ones.
 
 =head1 ATTRIBUTES
 

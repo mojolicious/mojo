@@ -9,7 +9,7 @@ BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 use Test::More;
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
-plan tests => 19;
+plan tests => 18;
 
 use_ok 'Mojo::IOLoop';
 
@@ -157,20 +157,11 @@ $loop->resolve(
 ok $found, 'found IPv6 PTR record';
 
 # Invalid DNS server
-ok Mojo::IOLoop->dns_server, 'got a dns server';
-Mojo::IOLoop->dns_server('192.0.2.1');
-is Mojo::IOLoop->dns_server, '192.0.2.1', 'new invalid dns server';
-$result = undef;
-Mojo::IOLoop->lookup(
-  'google.com',
-  sub {
-    my ($self, $address) = @_;
-    $result = $address;
-    $self->stop;
-  }
-)->start;
-ok !$result, 'no address';
-my $fallback = Mojo::IOLoop->dns_server;
+ok scalar Mojo::IOLoop->dns_servers, 'got a dns server';
+Mojo::IOLoop->dns_servers('192.0.2.1', Mojo::IOLoop->dns_servers);
+is Mojo::IOLoop->dns_servers, '192.0.2.1', 'new invalid dns server';
+Mojo::IOLoop->lookup('google.com', sub { Mojo::IOLoop->stop })->start;
+my $fallback = Mojo::IOLoop->dns_servers;
 isnt $fallback, '192.0.2.1', 'valid dns server';
 $result = undef;
 Mojo::IOLoop->lookup(
@@ -182,5 +173,5 @@ Mojo::IOLoop->lookup(
   }
 )->start;
 ok $result, 'got an address';
-is $loop->dns_server, $fallback, 'still the same dns server';
+is scalar $loop->dns_servers, $fallback, 'still the same dns server';
 isnt $fallback, '192.0.2.1', 'still valid dns server';

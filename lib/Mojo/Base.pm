@@ -196,9 +196,9 @@ Both forms save a lot of typing.
   has 'name';
   has [qw/name1 name2 name3/];
   has name => 'foo';
-  has name => sub { ... };
+  has name => sub {...};
   has [qw/name1 name2 name3/] => 'foo';
-  has [qw/name1 name2 name3/] => sub { ... };
+  has [qw/name1 name2 name3/] => sub {...};
 
 Create attributes, just like the C<attr> method.
 
@@ -220,9 +220,9 @@ You can pass it either a hash or a hash reference with attribute values.
   __PACKAGE__->attr('name');
   __PACKAGE__->attr([qw/name1 name2 name3/]);
   __PACKAGE__->attr(name => 'foo');
-  __PACKAGE__->attr(name => sub { ... });
+  __PACKAGE__->attr(name => sub {...});
   __PACKAGE__->attr([qw/name1 name2 name3/] => 'foo');
-  __PACKAGE__->attr([qw/name1 name2 name3/] => sub { ... });
+  __PACKAGE__->attr([qw/name1 name2 name3/] => sub {...});
 
 Create attributes.
 An arrayref can be used to create more than one attribute.

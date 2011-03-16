@@ -796,7 +796,7 @@ L<Mojolicious::Controller>.
 =head2 C<dictionary>
 
   my $dictionary = $r->dictionary;
-  $r             = $r->dictionary({foo => sub { ... }});
+  $r             = $r->dictionary({foo => sub {...}});
 
 Contains all available conditions for this route.
 
@@ -847,7 +847,7 @@ and used for matching.
 =head2 C<shortcuts>
 
   my $shortcuts = $r->shortcuts;
-  $r            = $r->shortcuts({foo => sub { ... }});
+  $r            = $r->shortcuts({foo => sub {...}});
 
 Contains all additional route shortcuts available for this route.
 
@@ -871,13 +871,13 @@ Add a new child to this route.
 
 =head2 C<add_condition>
 
-  $r = $r->add_condition(foo => sub { ... });
+  $r = $r->add_condition(foo => sub {...});
 
 Add a new condition for this route.
 
 =head2 C<add_shortcut>
 
-  $r = $r->add_shortcut(foo => sub { ... });
+  $r = $r->add_shortcut(foo => sub {...});
 
 Add a new shortcut for this route.
 

@@ -428,14 +428,14 @@ Will encode the content if set, defaults to C<UTF-8>.
 =head2 C<handlers>
 
   my $handlers = $renderer->handlers;
-  $renderer    = $renderer->handlers({epl => sub { ... }});
+  $renderer    = $renderer->handlers({epl => sub {...}});
 
 Registered handlers.
 
 =head2 C<helpers>
 
   my $helpers = $renderer->helpers;
-  $renderer   = $renderer->helpers({url_for => sub { ... }});
+  $renderer   = $renderer->helpers({url_for => sub {...}});
 
 Registered helpers.
 
@@ -466,14 +466,14 @@ Construct a new renderer.
 
 =head2 C<add_handler>
 
-  $renderer = $renderer->add_handler(epl => sub { ... });
+  $renderer = $renderer->add_handler(epl => sub {...});
     
 Add a new handler to the renderer.
 See L<Mojolicious::Plugin::EpRenderer> for a sample renderer.
 
 =head2 C<add_helper>
 
-  $renderer = $renderer->add_helper(url_for => sub { ... });
+  $renderer = $renderer->add_helper(url_for => sub {...});
 
 Add a new helper to the renderer.
 See L<Mojolicious::Plugin::EpRenderer> for sample helpers.

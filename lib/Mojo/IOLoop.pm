@@ -115,8 +115,7 @@ AnqxHi90n/p912ynLg2SjBq+03GaECeGzC/QqKK2gtA=
 EOF
 
 # DNS server (default to Google Public DNS)
-our $DNS_SERVERS = ['8.8.8.8', '8.8.4.4'];
-unshift @$DNS_SERVERS, $ENV{MOJO_DNS_SERVER} if $ENV{MOJO_DNS_SERVER};
+my $DNS_SERVERS = ['8.8.8.8', '8.8.4.4'];
 
 # Try to detect DNS server
 if (-r '/etc/resolv.conf') {
@@ -135,6 +134,12 @@ if (-r '/etc/resolv.conf') {
   }
   unshift @$DNS_SERVERS, @servers;
 }
+
+# User defined DNS server
+unshift @$DNS_SERVERS, $ENV{MOJO_DNS_SERVER} if $ENV{MOJO_DNS_SERVER};
+
+# Always start with first DNS server
+my $CURRENT_DNS_SERVER = 0;
 
 # DNS record types
 my $DNS_TYPES = {
@@ -252,22 +257,25 @@ sub connection_timeout {
   return $c->{timeout};
 }
 
-sub dns_server {
-  my ($self, $server) = @_;
+sub dns_servers {
+  my $self = shift;
 
   # Singleton
   $self = $self->singleton unless ref $self;
 
-  # Add new server
-  if ($server) {
-    unshift @$DNS_SERVERS, $server;
-    $self->{_dns} = 0;
+  # New servers
+  if (@_) {
+    @$DNS_SERVERS       = @_;
+    $CURRENT_DNS_SERVER = 0;
     return $self;
   }
 
+  # List all
+  return @$DNS_SERVERS if wantarray;
+
   # Current server
-  my $dns = $self->{_dns} || 0;
-  return $DNS_SERVERS->[$dns];
+  $CURRENT_DNS_SERVER = 0 unless $DNS_SERVERS->[$CURRENT_DNS_SERVER];
+  return $DNS_SERVERS->[$CURRENT_DNS_SERVER];
 }
 
 sub drop {
@@ -652,7 +660,7 @@ sub resolve {
   my $t = $DNS_TYPES->{$type};
 
   # Server
-  my $server = $self->dns_server;
+  my $server = $self->dns_servers;
 
   # No lookup required or record type not supported
   if (!$server || !$t || ($t ne $DNS_TYPES->{PTR} && ($ipv4 || $ipv6))) {
@@ -712,7 +720,7 @@ sub resolve {
       warn "FAILED $type $name ($server)\n" if DEBUG;
 
       # Next server
-      $self->_next_dns_server;
+      $CURRENT_DNS_SERVER++;
 
       $self->drop($timer) if $timer;
       $self->$cb([]);
@@ -776,7 +784,7 @@ sub resolve {
       warn "RESOLVE TIMEOUT ($server)\n" if DEBUG;
 
       # Next server
-      $self->_next_dns_server;
+      $CURRENT_DNS_SERVER++;
 
       # Abort
       $self->drop($id);
@@ -1176,20 +1184,6 @@ sub _hup {
 
   # HUP callback
   $self->_run_event('hup', $event, $id);
-}
-
-sub _next_dns_server {
-  my $self = shift;
-
-  # Next server
-  my $dns = $self->{_dns} || 0;
-  $dns++;
-  $dns = 0 unless $DNS_SERVERS->[$dns];
-
-  # Debug
-  warn "NEXT DNS SERVER ($DNS_SERVERS->[$dns])\n" if DEBUG;
-
-  $self->{_dns} = $dns;
 }
 
 sub _not_listening {
@@ -1989,13 +1983,15 @@ Path to the TLS key file.
 Maximum amount of time in seconds a connection can be inactive before being
 dropped.
 
-=head2 C<dns_server>
+=head2 C<dns_servers>
 
-  my $server = $loop->dns_server;
-  $loop      = $loop->dns_server('8.8.8.8');
+  my @all     = Mojo::IOLoop->dns_servers;
+  my @all     = $loop->dns_servers;
+  my $current = $loop->dns_servers;
+  $loop       = $loop->dns_servers('8.8.8.8', '8.8.4.4');
 
-IP address of current C<DNS> server used for non-blocking lookups, defaults
-to the value of C<MOJO_DNS_SERVER>, auto detection, C<8.8.8.8> or C<8.8.4.4>.
+IP addresses of C<DNS> servers used for non-blocking lookups, defaults to the
+value of C<MOJO_DNS_SERVER>, auto detection, C<8.8.8.8> or C<8.8.4.4>.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<drop>

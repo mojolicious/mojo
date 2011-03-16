@@ -116,7 +116,7 @@ The logging layer of your application, by default a L<Mojo::Log> object.
 =head2 C<on_build_tx>
 
   my $cb = $app->on_build_tx;
-  $app   = $app->on_build_tx(sub { ... });
+  $app   = $app->on_build_tx(sub {...});
 
 The transaction builder callback, by default it builds a
 L<Mojo::Transaction::HTTP> object.
@@ -124,7 +124,7 @@ L<Mojo::Transaction::HTTP> object.
 =head2 C<on_websocket>
 
   my $cb = $app->on_websocket;
-  $app   = $app->on_websocket(sub { ... });
+  $app   = $app->on_websocket(sub {...});
 
 The websocket handshake callback, by default it builds a
 L<Mojo::Transaction::WebSocket> object and handles the response for the

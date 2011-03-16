@@ -699,7 +699,7 @@ Sets up the default controller and calls process for every request.
 
 =head2 C<helper>
 
-  $app->helper(foo => sub { ... });
+  $app->helper(foo => sub {...});
 
 Add a new helper that will be available as a method of the controller object
 and the application object, as well as a function in C<ep> templates.
@@ -715,7 +715,7 @@ and the application object, as well as a function in C<ep> templates.
 
 =head2 C<hook>
 
-  $app->hook(after_dispatch => sub { ... });
+  $app->hook(after_dispatch => sub {...});
 
 Extend L<Mojolicious> by adding hooks to named events.
 

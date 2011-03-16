@@ -129,6 +129,9 @@ if (-r '/etc/resolv.conf') {
 
       # Debug
       warn qq/DETECTED DNS SERVER ($DNS_SERVER)\n/ if DEBUG;
+
+      # Done
+      last;
     }
   }
 }

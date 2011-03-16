@@ -444,17 +444,22 @@ sub _cdata {
   push @$$current, ['cdata', $cdata];
 }
 
-sub _close_table {
-  my ($self, $current) = @_;
+sub _close {
+  my ($self, $current, $pattern, $stop) = @_;
+
+  # Default to table pattern
+  $pattern ||= qr/^(col|colgroup|tbody|td|th|thead|tr)$/;
+
+  # Default to table tag
+  $stop ||= 'table';
 
   # Check parents
   my $parent = $$current;
   while ($parent) {
-    last if $parent->[0] eq 'root' || $parent->[1] eq 'table';
+    last if $parent->[0] eq 'root' || $parent->[1] eq $stop;
 
     # Match
-    ($parent->[1] =~ qr/^(col|colgroup|tbody|td|th|thead|tr)$/)
-      and $self->_end($1, $current);
+    ($parent->[1] =~ $pattern) and $self->_end($1, $current);
 
     # Next
     $parent = $parent->[3];
@@ -572,7 +577,7 @@ sub _end {
 
       # Table
       elsif ($end eq 'table') {
-        $self->_close_table($current);
+        $self->_close($current);
         next;
       }
     }
@@ -1127,7 +1132,7 @@ sub _start {
     my $t = $$current->[1];
 
     # "<li>"
-    if ($t eq 'li' && $start eq 'li') { $self->_end('li', $current) }
+    if ($start eq 'li') { $self->_close($current, qr/^(li)$/, 'ul') }
 
     # "<p>"
     elsif ($t eq 'p' && $start =~ $HTML_PARAGRAPH_RE) {
@@ -1149,16 +1154,16 @@ sub _start {
     }
 
     # "<colgroup>"
-    elsif ($start eq 'colgroup') { $self->_close_table($current) }
+    elsif ($start eq 'colgroup') { $self->_close($current) }
 
     # "<thead>"
-    elsif ($start eq 'thead') { $self->_close_table($current) }
+    elsif ($start eq 'thead') { $self->_close($current) }
 
     # "<tbody>"
-    elsif ($start eq 'tbody') { $self->_close_table($current) }
+    elsif ($start eq 'tbody') { $self->_close($current) }
 
     # "<tfoot>"
-    elsif ($start eq 'tfoot') { $self->_close_table($current) }
+    elsif ($start eq 'tfoot') { $self->_close($current) }
 
     # "<tr>"
     elsif (($t eq 'tr' || $t eq 'td') && $start eq 'tr') {

@@ -5,7 +5,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added config helper to Mojolicious::Plugin::Config.
         - Changed resolv.conf parser in Mojo::IOLoop to use the first
           nameserver.
-        - Fixed small autoclosing tag bug in Mojo::DOM.
+        - Fixed small optional tag bugs in Mojo::DOM.
         - Fixed Windows home directory detection bug. (akron)
         - Fixed a few warnings.
         - Fixed typos.

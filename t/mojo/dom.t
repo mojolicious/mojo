@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 421;
+use Test::More tests => 426;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -1130,7 +1130,7 @@ is $dom->find('table > tr > td')->[1]->text, 'B',         'right text';
 is $dom->find('table > tr > td')->[2]->text, "C\n    ",   'right text';
 is $dom->find('table > tr > td')->[3]->text, "D\n",       'right text';
 
-# Real world example
+# Real world table
 $dom->parse(<<EOF);
 <html>
   <head>
@@ -1172,3 +1172,33 @@ is $dom->find('tbody > tr > .alpha')->[1]->text, "Alpha Two\n          ",
   'right text';
 is $dom->find('tbody > tr > .gamma > a')->[1]->text, 'Gamma Two',
   'right text';
+
+# Real world list
+$dom->parse(<<EOF);
+<html>
+  <head>
+    <title>Real World!</title>
+  <body>
+    <ul>
+      <li>
+        Test
+        <br>
+        123
+        <p>
+
+      <li>
+        Test
+        <br>
+        321
+        <p>
+    </ul>
+EOF
+is $dom->find('html > head > title')->[0]->text, 'Real World!', 'right text';
+is $dom->find('body > ul > li')->[0]->text,
+  "\n        Test\n        \n        123\n        ",
+  'right text';
+is $dom->find('body > ul > li > p')->[0]->text, '', 'no text';
+is $dom->find('body > ul > li')->[1]->text,
+  "\n        Test\n        \n        321\n        ",
+  'right text';
+is $dom->find('body > ul > li > p')->[1]->text, '', 'no text';

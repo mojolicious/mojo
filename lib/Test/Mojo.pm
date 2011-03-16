@@ -13,16 +13,16 @@ has ua => sub { Mojo::UserAgent->new->ioloop(Mojo::IOLoop->singleton) };
 has max_redirects => 0;
 has 'tx';
 
+# Silent or loud tests
+$ENV{MOJO_LOG_LEVEL} ||= $ENV{HARNESS_IS_VERBOSE} ? 'debug' : 'fatal';
+
 # DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
-*client = sub {
+sub client {
   warn <<EOF;
 Test::Mojo->client is DEPRECATED in favor of Test::Mojo->ua!!!
 EOF
   return shift->ua;
-};
-
-# Silent or loud tests
-$ENV{MOJO_LOG_LEVEL} ||= $ENV{HARNESS_IS_VERBOSE} ? 'debug' : 'fatal';
+}
 
 # "Ooh, a graduate student huh?
 #  How come you guys can go to the moon but can't make my shoes smell good?"

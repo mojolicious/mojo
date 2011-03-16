@@ -28,15 +28,6 @@ has sessions => sub { Mojolicious::Sessions->new };
 has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
-# DEPRECATED in Hot Beverage!
-*session = sub {
-  warn <<EOF;
-Mojolicious->session is DEPRECATED in favor of Mojolicious->sessions!!!
-But you most likely meant to use Mojolicious::Controller->session anyway.
-EOF
-  shift->sessions(@_);
-};
-
 our $CODENAME = 'Smiling Cat Face With Heart-Shaped Eyes';
 our $VERSION  = '1.14';
 
@@ -286,6 +277,15 @@ sub plugin {
 
 # This will run for each request
 sub process { shift->dispatch(@_) }
+
+# DEPRECATED in Hot Beverage!
+sub session {
+  warn <<EOF;
+Mojolicious->session is DEPRECATED in favor of Mojolicious->sessions!!!
+But you most likely meant to use Mojolicious::Controller->session anyway.
+EOF
+  shift->sessions(@_);
+}
 
 # Start command system
 sub start {

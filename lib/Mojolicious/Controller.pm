@@ -39,15 +39,6 @@ my @RESERVED = (
 my $STASH_RE = join '|', @RESERVED;
 $STASH_RE = qr/^(?:$STASH_RE)$/;
 
-# DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
-*client = sub {
-  warn <<EOF;
-Mojolicious::Controller->client is DEPRECATED in favor of
-Mojolicious::Controller->ua!!!
-EOF
-  return shift->app->client;
-};
-
 # "Is all the work done by the children?
 #  No, not the whipping."
 sub AUTOLOAD {
@@ -65,6 +56,15 @@ sub AUTOLOAD {
 }
 
 sub DESTROY { }
+
+# DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
+sub client {
+  warn <<EOF;
+Mojolicious::Controller->client is DEPRECATED in favor of
+Mojolicious::Controller->ua!!!
+EOF
+  return shift->app->client;
+}
 
 # "For the last time, I don't like lilacs!
 #  Your first wife was the one who liked lilacs!

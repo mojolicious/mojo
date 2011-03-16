@@ -25,22 +25,6 @@ has ua => sub {
   return $ua;
 };
 
-# DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
-*client = sub {
-  warn <<EOF;
-Mojo->client is DEPRECATED in favor of Mojo->us!!!
-EOF
-
-  # Singleton client
-  require Mojo::Client;
-  my $client = Mojo::Client->singleton;
-
-  # Inherit logger
-  $client->log(shift->log);
-
-  return $client;
-};
-
 # "Oh, so they have internet on computers now!"
 sub new {
   my $self = shift->SUPER::new(@_);
@@ -53,6 +37,22 @@ sub new {
     if -w $self->home->rel_file('log');
 
   return $self;
+}
+
+# DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
+sub client {
+  warn <<EOF;
+Mojo->client is DEPRECATED in favor of Mojo->us!!!
+EOF
+
+  # Singleton client
+  require Mojo::Client;
+  my $client = Mojo::Client->singleton;
+
+  # Inherit logger
+  $client->log(shift->log);
+
+  return $client;
 }
 
 sub handler { croak 'Method "handler" not implemented in subclass' }

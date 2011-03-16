@@ -1161,7 +1161,9 @@ sub _start {
     elsif ($start eq 'tfoot') { $self->_close_table($current) }
 
     # "<tr>"
-    elsif ($t eq 'tr' && $start eq 'tr') { $self->_end('tr', $current) }
+    elsif (($t eq 'tr' || $t eq 'td') && $start eq 'tr') {
+      $self->_end('tr', $current);
+    }
 
     # "<th>" and "<td>"
     elsif (($t eq 'th' || $t eq 'td') && ($start eq 'th' || $start eq 'td')) {

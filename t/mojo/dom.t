@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 411;
+use Test::More tests => 421;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -1129,3 +1129,46 @@ is $dom->find('table > tr > td')->[0]->text, "A\n      ", 'right text';
 is $dom->find('table > tr > td')->[1]->text, 'B',         'right text';
 is $dom->find('table > tr > td')->[2]->text, "C\n    ",   'right text';
 is $dom->find('table > tr > td')->[3]->text, "D\n",       'right text';
+
+# Real world example
+$dom->parse(<<EOF);
+<html>
+  <head>
+    <title>Real World!</title>
+  <body>
+    <p>Just a test
+    <table class=RealWorld>
+      <thead>
+        <tr>
+          <th class=one>One
+          <th class=two>Two
+          <th class=three>Three
+          <th class=four>Four
+      <tbody>
+        <tr>
+          <td class=alpha>Alpha
+          <td class=beta>Beta
+          <td class=gamma><a href="#gamma">Gamma</a>
+          <td class=delta>Delta
+        <tr>
+          <td class=alpha>Alpha Two
+          <td class=beta>Beta Two
+          <td class=gamma><a href="#gamma-two">Gamma Two</a>
+          <td class=delta>Delta Two
+    </table>
+EOF
+is $dom->find('html > head > title')->[0]->text, 'Real World!', 'right text';
+is $dom->find('html > body > p')->[0]->text, "Just a test\n    ",
+  'right text';
+is $dom->find('p')->[0]->text, "Just a test\n    ", 'right text';
+is $dom->find('thead > tr > .three')->[0]->text, "Three\n          ",
+  'right text';
+is $dom->find('thead > tr > .four')->[0]->text, "Four\n      ", 'right text';
+is $dom->find('tbody > tr > .beta')->[0]->text, "Beta\n          ",
+  'right text';
+is $dom->find('tbody > tr > .gamma')->[0]->text,     '',      'no text';
+is $dom->find('tbody > tr > .gamma > a')->[0]->text, 'Gamma', 'right text';
+is $dom->find('tbody > tr > .alpha')->[1]->text, "Alpha Two\n          ",
+  'right text';
+is $dom->find('tbody > tr > .gamma > a')->[1]->text, 'Gamma Two',
+  'right text';

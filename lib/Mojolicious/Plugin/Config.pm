@@ -26,7 +26,7 @@ sub parse {
   my ($self, $content, $file, $conf, $app) = @_;
 
   # Run Perl code
-  no warnings 'redefine';
+  no warnings;
   die qq/Couldn't parse config file "$file": $@/
     unless my $config = eval "sub app { \$app }; $content";
   die qq/Config file "$file" did not return a hashref.\n/

@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-1.14 2011-03-14 00:00:00
+1.14 2011-03-17 00:00:00
         - Added support for multiple dns servers to Mojo::IOLoop.
         - Added config helper to Mojolicious::Plugin::Config.
         - Changed resolv.conf parser in Mojo::IOLoop to use the first

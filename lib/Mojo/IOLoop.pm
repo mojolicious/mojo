@@ -479,20 +479,21 @@ sub lookup {
   $self->resolve(
     $name, 'A',
     sub {
-      my ($self, $results) = @_;
+      my ($self, $records) = @_;
 
       # Success (pick random A record)
-      my @results = map { $_->[1] if $_->[0] eq 'A' } @$results;
+      my @results;
+      $_->[0] eq 'A' and push @results, $_->[1] for @$records;
       return $self->$cb($results[int(rand($#results))]) if @results;
 
       # IPv6
       $self->resolve(
         $name, 'AAAA',
         sub {
-          my ($self, $results) = @_;
+          my ($self, $records) = @_;
 
           # Success (pick random AAAA record)
-          my @results = map { $_->[0] eq 'AAAA' } @$results;
+          $_->[0] eq 'AAAA' and push @results, $_->[1] for @$records;
           return $self->$cb($results[int(rand($#results))]) if @results;
 
           # Pass through

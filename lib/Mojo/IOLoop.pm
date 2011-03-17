@@ -7,7 +7,6 @@ use File::Spec;
 use IO::File;
 use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
 use IO::Socket;
-use List::Util 'first';
 use Mojo::URL;
 use Scalar::Util 'weaken';
 use Socket qw/IPPROTO_TCP TCP_NODELAY/;
@@ -482,9 +481,9 @@ sub lookup {
     sub {
       my ($self, $results) = @_;
 
-      # Success
-      my $result = first { $_->[0] eq 'A' } @$results;
-      return $self->$cb($result->[1]) if $result;
+      # Success (pick random A record)
+      my @results = map { $_->[1] if $_->[0] eq 'A' } @$results;
+      return $self->$cb($results[int(rand($#results))]) if @results;
 
       # IPv6
       $self->resolve(
@@ -492,9 +491,9 @@ sub lookup {
         sub {
           my ($self, $results) = @_;
 
-          # Success
-          my $result = first { $_->[0] eq 'AAAA' } @$results;
-          return $self->$cb($result->[1]) if $result;
+          # Success (pick random AAAA record)
+          my @results = map { $_->[0] eq 'AAAA' } @$results;
+          return $self->$cb($results[int(rand($#results))]) if @results;
 
           # Pass through
           $self->$cb();

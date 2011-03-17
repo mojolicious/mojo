@@ -29,7 +29,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Smiling Cat Face With Heart-Shaped Eyes';
-our $VERSION  = '1.14';
+our $VERSION  = '1.15';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."

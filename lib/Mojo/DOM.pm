@@ -43,43 +43,40 @@ my $CSS_TOKEN_RE        = qr/
   )?
 /x;
 my $XML_ATTR_RE = qr/
-  ([^=\s]+)                                   # Key
-  (?:\s*=\s*(?:"([^"]*)"|'([^']*)'|(\S+)))?   # Value
+  \s*
+  ([^=\s>"']+)     # Key
+  (?:
+    \s*
+    =
+    \s*
+    (?:
+      "([^"]*?)"   # Quotation marks
+      |
+      '([^']*?)'   # Apostrophes
+      |
+      ([^>\s]+)    # Unquoted
+    )
+  )?
+  \s*
 /x;
 my $XML_END_RE   = qr/^\s*\/\s*(.+)\s*/;
 my $XML_START_RE = qr/([^\s\/]+)([\s\S]*)/;
 my $XML_TOKEN_RE = qr/
-  ([^<]*)                  # Text
+  ([^<]*)                    # Text
   (?:
-  <\?(.*?)\?>              # Processing Instruction
-  |
-  <\!--(.*?)-->            # Comment
-  |
-  <\!\[CDATA\[(.*?)\]\]>   # CDATA
-  |
-  <\!DOCTYPE([^>]*)>       # DOCTYPE
-  |
-  <(
-  \s*
-  [^>\s]+                  # Tag
-  (?:
-    \s*
-    [^=\s>"']+           # Key
-    (?:
+    <\?(.*?)\?>              # Processing Instruction
+    |
+    <\!--(.*?)-->            # Comment
+    |
+    <\!\[CDATA\[(.*?)\]\]>   # CDATA
+    |
+    <\!DOCTYPE([^>]*)>       # DOCTYPE
+    |
+    <(
       \s*
-      =
-      \s*
-      (?:
-      "[^"]*?"         # Quotation marks
-      |
-      '[^']*?'         # Apostrophes
-      |
-      [^>\s]+          # Unquoted
-      )
-    )?
-    \s*
-  )*
-  )>
+      [^>\s]+                # Tag
+      (?:$XML_ATTR_RE)*      # Attributes
+    )>
   )??
 /xis;
 
@@ -120,7 +117,7 @@ sub all_text {
     unshift @stack, @$e[4 .. $#$e] and next if $type eq 'tag';
 
     # Text or CDATA
-    if ($type eq 'text' || $type eq 'cdata') {
+    if ($type eq 'text' || $type eq 'cdata' || $type eq 'raw') {
       my $content = $e->[1];
       $text .= $content if $content =~ /\S+/;
     }
@@ -360,7 +357,7 @@ sub text {
     my $type = $e->[0];
 
     # Text or CDATA
-    if ($type eq 'text' || $type eq 'cdata') {
+    if ($type eq 'text' || $type eq 'cdata' || $type eq 'raw') {
       my $content = $e->[1];
       $text .= $content if $content =~ /\S+/;
     }
@@ -964,7 +961,7 @@ sub _parse_xml {
   return $tree unless $xml;
 
   # Tokenize
-  while ($xml =~ /$XML_TOKEN_RE/g) {
+  while ($xml =~ m/\G$XML_TOKEN_RE/gc) {
     my $text    = $1;
     my $pi      = $2;
     my $comment = $3;
@@ -1030,6 +1027,14 @@ sub _parse_xml {
 
       # Empty tag
       $self->_end($start, \$current) if $attr =~ /\/\s*$/;
+
+      # Relaxed "script" or "style"
+      if ($start eq 'script' || $start eq 'style') {
+        if ($xml =~ /\G(.+?)<\s*\/\s*$start\s*>/gsi) {
+          $self->_raw($1, \$current);
+          $self->_end($start, \$current);
+        }
+      }
     }
   }
 
@@ -1041,6 +1046,13 @@ sub _pi {
 
   # Append
   push @$$current, ['pi', $pi];
+}
+
+sub _raw {
+  my ($self, $raw, $current) = @_;
+
+  # Append
+  push @$$current, ['raw', $raw];
 }
 
 sub _render {
@@ -1055,6 +1067,9 @@ sub _render {
     xml_escape $escaped;
     return $escaped;
   }
+
+  # Raw text
+  return $tree->[1] if $e eq 'raw';
 
   # DOCTYPE
   return "<!DOCTYPE" . $tree->[1] . ">" if $e eq 'doctype';

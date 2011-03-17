@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 426;
+use Test::More tests => 430;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -1202,3 +1202,25 @@ is $dom->find('body > ul > li')->[1]->text,
   "\n        Test\n        \n        321\n        ",
   'right text';
 is $dom->find('body > ul > li > p')->[1]->text, '', 'no text';
+
+# Real world JavaScript and CSS
+$dom->parse(<<EOF);
+<html>
+  <head>
+    <style test=works>#style { foo: style('<test>'); }</style>
+    <script>
+      if (a < b) {
+        alert('<123>');
+      }
+    </script>
+    < sCriPt two="23" >if (b > c) { alert('&<ohoh>') }< / scRiPt >
+  <body>Foo!</body>
+EOF
+is $dom->find('html > body')->[0]->text, 'Foo!', 'right text';
+is $dom->find('html > head > style')->[0]->text,
+  "#style { foo: style('<test>'); }", 'right text';
+is $dom->find('html > head > script')->[0]->text,
+  "\n      if (a < b) {\n        alert('<123>');\n      }\n    ",
+  'right text';
+is $dom->find('html > head > script')->[1]->text,
+  "if (b > c) { alert('&<ohoh>') }", 'right text';

@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 430;
+use Test::More tests => 440;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -1224,3 +1224,47 @@ is $dom->find('html > head > script')->[0]->text,
   'right text';
 is $dom->find('html > head > script')->[1]->text,
   "if (b > c) { alert('&<ohoh>') }", 'right text';
+
+# More real world JavaScript
+$dom->parse(<<EOF);
+<!doctype html><html>
+  <head>
+    <title>Foo</title>
+    <script type="text/javascript" src="/js/one.js"></script>
+    <script type="text/javascript" src="/js/two.js"></script>
+    <script type="text/javascript" src="/js/three.js"></script>
+  </head>
+  <body>
+  </body>
+</html>
+EOF
+is $dom->at('title')->text, 'Foo', 'right text';
+is $dom->find('html > head > script')->[0]->attrs('src'), '/js/one.js',
+  'right attribute';
+is $dom->find('html > head > script')->[1]->attrs('src'), '/js/two.js',
+  'right attribute';
+is $dom->find('html > head > script')->[2]->attrs('src'), '/js/three.js',
+  'right attribute';
+is $dom->find('html > head > script')->[2]->text, '', 'no text';
+
+# Even more real world JavaScript
+$dom->parse(<<EOF);
+<!doctype html><html>
+  <head>
+    <title>Foo</title>
+    <script type="text/javascript" src="/js/one.js"></script>
+    <script type="text/javascript" src="/js/two.js"></script>
+    <script type="text/javascript" src="/js/three.js">
+  </head>
+  <body>
+  </body>
+</html>
+EOF
+is $dom->at('title')->text, 'Foo', 'right text';
+is $dom->find('html > head > script')->[0]->attrs('src'), '/js/one.js',
+  'right attribute';
+is $dom->find('html > head > script')->[1]->attrs('src'), '/js/two.js',
+  'right attribute';
+is $dom->find('html > head > script')->[2]->attrs('src'), '/js/three.js',
+  'right attribute';
+is $dom->find('html > head > script')->[2]->text, '', 'no text';

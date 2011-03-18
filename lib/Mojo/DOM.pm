@@ -961,7 +961,7 @@ sub _parse_xml {
   return $tree unless $xml;
 
   # Tokenize
-  while ($xml =~ m/\G$XML_TOKEN_RE/gc) {
+  while ($xml =~ m/\G$XML_TOKEN_RE/gcs) {
     my $text    = $1;
     my $pi      = $2;
     my $comment = $3;
@@ -1030,7 +1030,7 @@ sub _parse_xml {
 
       # Relaxed "script" or "style"
       if ($start eq 'script' || $start eq 'style') {
-        if ($xml =~ /\G(.+?)<\s*\/\s*$start\s*>/gsi) {
+        if ($xml =~ /\G(.*?)<\s*\/\s*$start\s*>/gcsi) {
           $self->_raw($1, \$current);
           $self->_end($start, \$current);
         }

@@ -123,7 +123,7 @@ sub new {
   $self->plugin('powered_by');
 
   # Reduced log output outside of development mode
-  $self->log->level('error') unless $mode eq 'development';
+  $self->log->level('info') unless $mode eq 'development';
 
   # Run mode
   $mode = $mode . '_mode';

@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 440;
+use Test::More tests => 442;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -1234,8 +1234,7 @@ $dom->parse(<<EOF);
     <script type="text/javascript" src="/js/two.js"></script>
     <script type="text/javascript" src="/js/three.js"></script>
   </head>
-  <body>
-  </body>
+  <body>Bar</body>
 </html>
 EOF
 is $dom->at('title')->text, 'Foo', 'right text';
@@ -1246,6 +1245,7 @@ is $dom->find('html > head > script')->[1]->attrs('src'), '/js/two.js',
 is $dom->find('html > head > script')->[2]->attrs('src'), '/js/three.js',
   'right attribute';
 is $dom->find('html > head > script')->[2]->text, '', 'no text';
+is $dom->at('html > body')->text, 'Bar', 'right text';
 
 # Even more real world JavaScript
 $dom->parse(<<EOF);
@@ -1256,8 +1256,7 @@ $dom->parse(<<EOF);
     <script type="text/javascript" src="/js/two.js"></script>
     <script type="text/javascript" src="/js/three.js">
   </head>
-  <body>
-  </body>
+  <body>Bar</body>
 </html>
 EOF
 is $dom->at('title')->text, 'Foo', 'right text';
@@ -1268,3 +1267,4 @@ is $dom->find('html > head > script')->[1]->attrs('src'), '/js/two.js',
 is $dom->find('html > head > script')->[2]->attrs('src'), '/js/three.js',
   'right attribute';
 is $dom->find('html > head > script')->[2]->text, '', 'no text';
+is $dom->at('html > body')->text, 'Bar', 'right text';

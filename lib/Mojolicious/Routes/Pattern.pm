@@ -164,7 +164,7 @@ sub _compile {
 
     # Text
     elsif ($op eq 'text') {
-      $compiled = $token->[1];
+      $compiled = quotemeta $token->[1];
       $optional = 0;
     }
 

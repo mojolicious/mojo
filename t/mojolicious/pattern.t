@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 48;
+use Test::More tests => 50;
 
 use Mojo::ByteStream 'b';
 
@@ -101,6 +101,12 @@ $pattern = Mojolicious::Routes::Pattern->new('/:test');
 $result  = $pattern->match('/test(test)(\Qtest\E)(');
 is $result->{test}, 'test(test)(\Qtest\E)(', 'right value';
 is $pattern->render({test => '23'}), '/23', 'right result';
+
+# Regex in pattern
+$pattern = Mojolicious::Routes::Pattern->new('/.+.*(:test)');
+$result  = $pattern->match('/.+.*test');
+is $result->{test}, 'test', 'right value';
+is $pattern->render({test => '23'}), '/.+.*23', 'right result';
 
 # Unusual values
 $pattern = Mojolicious::Routes::Pattern->new('/:test');

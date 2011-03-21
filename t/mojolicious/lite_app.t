@@ -196,7 +196,7 @@ get '/inline/ep/too' => sub { shift->render(inline => '0', handler => 'ep') };
 # GET /inline/ep/partial
 get '/inline/ep/partial' => sub {
   my $self = shift;
-  $self->stash(inline_template => "<% use utf8; %><%= 'just ♥' %>");
+  $self->stash(inline_template => "♥<%= 'just ♥' %>");
   $self->render(
     inline  => '<%= include inline => $inline_template %>works!',
     handler => 'ep'
@@ -876,7 +876,7 @@ $t->get_ok('/inline/ep/too')->status_is(200)->content_is("0\n");
 
 # GET /inline/ep/partial
 $t->get_ok('/inline/ep/partial')->status_is(200)
-  ->content_is("just ♥\nworks!\n");
+  ->content_is("♥just ♥\nworks!\n");
 
 # GET /source
 $t->get_ok('/source')->status_is(200)->content_like(qr/get_ok\('\/source/);

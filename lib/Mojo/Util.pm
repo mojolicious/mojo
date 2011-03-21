@@ -421,13 +421,15 @@ sub html_unescape {
 }
 
 sub md5_bytes {
-  utf8::encode $_[0] if utf8::is_utf8 $_[0];
-  return _md5($_[0]);
+  my $data = shift;
+  utf8::encode $data if utf8::is_utf8 $data;
+  return _md5($data);
 }
 
 sub md5_sum {
-  utf8::encode $_[0] if utf8::is_utf8 $_[0];
-  return Digest::MD5::md5_hex($_[0]);
+  my $data = shift;
+  utf8::encode $data if utf8::is_utf8 $data;
+  return Digest::MD5::md5_hex($data);
 }
 
 sub punycode_decode {
@@ -588,8 +590,9 @@ sub quote {
 }
 
 sub sha1_bytes {
-  utf8::encode $_[0] if utf8::is_utf8 $_[0];
-  return _sha1($_[0]);
+  my $data = shift;
+  utf8::encode $data if utf8::is_utf8 $data;
+  return _sha1($data);
 }
 
 sub sha1_sum {
@@ -597,8 +600,9 @@ sub sha1_sum {
 Module "Digest::SHA" not present in this version of Perl.
 Please install it manually or upgrade Perl to at least version 5.10.
 EOF
-  utf8::encode $_[0] if utf8::is_utf8 $_[0];
-  return Digest::SHA::sha1_hex($_[0]);
+  my $data = shift;
+  utf8::encode $data if utf8::is_utf8 $data;
+  return Digest::SHA::sha1_hex($data);
 }
 
 sub trim {

@@ -12,8 +12,9 @@ use Test::More;
 
 plan skip_all => 'Perl 5.10 or Digest::SHA required for this test!'
   unless eval { require Digest::SHA; 1 };
-plan tests => 103;
+plan tests => 106;
 
+use_ok 'Mojo::Util',       'md5_bytes';
 use_ok 'Mojo::ByteStream', 'b';
 
 # camelize
@@ -97,9 +98,14 @@ $stream = b('"foo 23 \"bar"');
 is $stream->unquote, 'foo 23 "bar', 'right unquoted result';
 
 # md5_bytes
-$stream = b('foo bar baz');
-is unpack('H*', $stream->md5_bytes), "ab07acbb1e496801937adfa772424bf7",
+my $original = 'foo bar baz ♥';
+my $copy     = $original;
+$stream = b($copy);
+is unpack('H*', $stream->md5_bytes), "a740aeb6e066f158cbf19fd92e890d2d",
   'right binary md5 checksum';
+is unpack('H*', md5_bytes($copy)), "a740aeb6e066f158cbf19fd92e890d2d",
+  'right binary md5 checksum';
+is $copy, $original, 'still equal';
 
 # md5_sum
 $stream = b('foo bar baz');

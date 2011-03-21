@@ -23,6 +23,8 @@ package main;
 use strict;
 use warnings;
 
+use utf8;
+
 use Test::More tests => 137;
 
 use File::Spec;
@@ -35,8 +37,8 @@ use_ok 'Mojo::Template';
 
 # Trim line
 my $mt     = Mojo::Template->new;
-my $output = $mt->render("    <%= 'test' =%> \n");
-is $output, 'test', 'line trimmed';
+my $output = $mt->render(" ♥    <%= 'test♥' =%> \n");
+is $output, ' ♥test♥', 'line trimmed';
 
 # Trim line (with expression)
 $mt     = Mojo::Template->new;

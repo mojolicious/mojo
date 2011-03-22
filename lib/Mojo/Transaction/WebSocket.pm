@@ -199,16 +199,17 @@ sub _build_frame {
   # Length
   my $len = length $payload;
 
+  # Empty prefix
+  my $prefix = 0;
+
   # Small payload
   if ($len < 126) {
-    my $prefix = 0;
     vec($prefix, 0, 8) = $len;
     $frame .= $prefix;
   }
 
   # Extended payload (16bit)
   elsif ($len < 65536) {
-    my $prefix = 0;
     vec($prefix, 0, 8) = 126;
     $frame .= $prefix;
     $frame .= pack 'n', $len;
@@ -216,7 +217,6 @@ sub _build_frame {
 
   # Extended payload (64bit)
   else {
-    my $prefix = 0;
     vec($prefix, 0, 8) = 127;
     $frame .= $prefix;
     $frame .= pack 'NN', $len >> 32, $len & 0xFFFFFFFF;

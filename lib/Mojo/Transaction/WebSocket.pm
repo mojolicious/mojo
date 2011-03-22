@@ -15,6 +15,7 @@ use constant GUID => '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 use constant SHA1 => eval 'use Digest::SHA (); 1';
 
 has handshake => sub { Mojo::Transaction::HTTP->new };
+has max_websocket_size => sub { $ENV{MOJO_MAX_WEBSOCKET_SIZE} || 5242880 };
 has on_message => sub {
   sub { }
 };
@@ -154,10 +155,14 @@ sub server_read {
     }
 
     # Callback
-    my $message = delete $self->{_message};
+    my $message = $self->{_message};
+    $self->{_message} = '';
     decode 'UTF-8', $message if $message;
     $self->on_message->($self, $message);
   }
+
+  # Check message size
+  $self->finish if length $self->{_message} > $self->max_websocket_size;
 
   # Resume
   $self->on_resume->($self);
@@ -363,6 +368,13 @@ L<Mojo::Transaction> and implements the following new ones.
   $ws           = $ws->handshake(Mojo::Transaction::HTTP->new);
 
 The original handshake transaction.
+
+=head2 C<max_websocket_size>
+
+  my $size = $message->max_websocket_size;
+  $message = $message->max_websocket_size(1024);
+
+Maximum WebSocket message size in bytes, defaults to C<5242880>.
 
 =head2 C<on_message>
 

@@ -215,6 +215,12 @@ Maximum size for HTTP messages in bytes, defaults to C<5242880>.
 
 Maximum number of redirects L<Mojo::UserAgent> will follow, defaults to C<0>.
 
+=head2 C<MOJO_MAX_WEBSOCKET_SIZE>
+
+Maximum size for WebSocket messages in bytes, defaults to C<5242880>.
+
+  MOJO_MAX_WEBSOCKET_SIZE=1024
+
 =head2 C<MOJO_MODE>
 
 Run mode for the L<Mojolicious> application, should contain a valid mode like

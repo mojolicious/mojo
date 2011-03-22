@@ -45,15 +45,6 @@ sub parse {
   # Headers
   my $headers = $self->headers;
 
-  # Content-Length
-  my $len = $self->headers->content_length;
-
-  # WebSocket handshakes have a static Content-Length
-  $len ||=
-      $headers->sec_websocket_key1     ? 8
-    : $headers->sec_websocket_location ? 16
-    :                                    undef;
-
   # Content needs to be upgraded to multipart
   if ($self->is_multipart) {
 
@@ -84,7 +75,7 @@ sub parse {
   else {
 
     # Slurp
-    $len ||= $self->headers->content_length || 0;
+    my $len   = $self->headers->content_length || 0;
     my $asset = $self->asset;
     my $need  = $len - $asset->size;
     $asset->add_chunk(substr $self->{_b2}, 0, $need, '') if $need > 0;

@@ -551,7 +551,7 @@ sub _connect_proxy {
 
   # WebSocket and/or HTTPS
   return
-    unless ($req->headers->upgrade || '') eq 'WebSocket'
+    unless ($req->headers->upgrade || '') eq 'websocket'
     || ($url->scheme || '') eq 'https';
 
   # CONNECT request
@@ -862,11 +862,8 @@ sub _start_tx {
     }
   }
 
-  # Make sure WebSocket requests have an origin header
-  my $headers = $req->headers;
-  $headers->origin($url) if $headers->upgrade && !$headers->origin;
-
   # We identify ourself
+  my $headers = $req->headers;
   $headers->user_agent($self->name) unless $headers->user_agent;
 
   # Inject cookies

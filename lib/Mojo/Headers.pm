@@ -60,11 +60,9 @@ my @ENTITY_HEADERS = qw/
   Last-Modified
   /;
 my @WEBSOCKET_HEADERS = qw/
-  Origin
-  Sec-WebSocket-Key1
-  Sec-WebSocket-Key2
+  Sec-WebSocket-Accept
+  Sec-WebSocket-Key
   Sec-WebSocket-Origin
-  Sec-WebSocket-Location
   Sec-WebSocket-Protocol
   /;
 my @HEADERS = (
@@ -190,8 +188,6 @@ sub names {
   return \@headers;
 }
 
-sub origin { scalar shift->header(Origin => @_) }
-
 sub parse {
   my ($self, $chunk) = @_;
 
@@ -290,16 +286,16 @@ sub to_string {
   return length $headers ? $headers : undef;
 }
 
-sub trailer            { scalar shift->header(Trailer              => @_) }
-sub transfer_encoding  { scalar shift->header('Transfer-Encoding'  => @_) }
-sub upgrade            { scalar shift->header(Upgrade              => @_) }
-sub user_agent         { scalar shift->header('User-Agent'         => @_) }
-sub sec_websocket_key1 { scalar shift->header('Sec-WebSocket-Key1' => @_) }
-sub sec_websocket_key2 { scalar shift->header('Sec-WebSocket-Key2' => @_) }
+sub trailer           { scalar shift->header(Trailer             => @_) }
+sub transfer_encoding { scalar shift->header('Transfer-Encoding' => @_) }
+sub upgrade           { scalar shift->header(Upgrade             => @_) }
+sub user_agent        { scalar shift->header('User-Agent'        => @_) }
 
-sub sec_websocket_location {
-  scalar shift->header('Sec-WebSocket-Location' => @_);
+sub sec_websocket_accept {
+  scalar shift->header('Sec-WebSocket-Accept' => @_);
 }
+
+sub sec_websocket_key { scalar shift->header('Sec-WebSocket-Key' => @_) }
 
 sub sec_websocket_origin {
   scalar shift->header('Sec-WebSocket-Origin' => @_);
@@ -496,13 +492,6 @@ Shortcut for the C<Location> header.
 
 Generate a list of all currently defined headers.
 
-=head2 C<origin>
-
-  my $origin = $headers->origin;
-  $headers   = $headers->origin('http://example.com');
-
-Shortcut for the C<Origin> header.
-
 =head2 C<parse>
 
   $headers = $headers->parse("Content-Type: text/foo\n\n");
@@ -544,26 +533,19 @@ resulted in C<Referer> becoming an official header.
 
 Remove a header.
 
-=head2 C<sec_websocket_key1>
+=head2 C<sec_websocket_accept>
 
-  my $key1 = $headers->sec_websocket_key1;
-  $headers = $headers->sec_websocket_key1('4 @1  46546xW%0l 1 5');
+  my $accept = $headers->sec_websocket_accept;
+  $headers   = $headers->sec_websocket_accept('s3pPLMBiTxaQ9kYGzzhZRbK+xOo=');
 
-Shortcut for the C<Sec-WebSocket-Key1> header.
+Shortcut for the C<Sec-WebSocket-Accept> header.
 
-=head2 C<sec_websocket_key2>
+=head2 C<sec_websocket_key>
 
-  my $key2 = $headers->sec_websocket_key2;
-  $headers = $headers->sec_websocket_key2('12998 5 Y3 1  .P00');
+  my $key  = $headers->sec_websocket_key;
+  $headers = $headers->sec_websocket_key('dGhlIHNhbXBsZSBub25jZQ==');
 
-Shortcut for the C<Sec-WebSocket-Key2> header.
-
-=head2 C<sec_websocket_location>
-
-  my $location = $headers->sec_websocket_location;
-  $headers     = $headers->sec_websocket_location('ws://example.com/demo');
-
-Shortcut for the C<Sec-WebSocket-Location> header.
+Shortcut for the C<Sec-WebSocket-Key> header.
 
 =head2 C<sec_websocket_origin>
 

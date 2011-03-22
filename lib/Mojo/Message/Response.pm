@@ -21,7 +21,7 @@ my $START_LINE_RE = qr/
 # Umarked codes are from RFC 2616 (mostly taken from LWP)
 my %MESSAGES = (
   100 => 'Continue',
-  101 => 'WebSocket Protocol Handshake',    # WebSocket
+  101 => 'Switching Protocols',
   102 => 'Processing',                      # RFC 2518 (WebDAV)
   200 => 'OK',
   201 => 'Created',

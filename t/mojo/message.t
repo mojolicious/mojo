@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 911;
+use Test::More tests => 905;
 
 use File::Spec;
 use File::Temp;
@@ -60,14 +60,9 @@ $req = Mojo::Message::Request->new;
 $req->parse("GET /demo HTTP/1.1\x0d\x0a");
 $req->parse("Host: example.com\x0d\x0a");
 $req->parse("Connection: Upgrade\x0d\x0a");
-$req->parse("Sec-WebSocket-Key2: 12998 5 Y3 1  .P00\x0d\x0a");
+$req->parse("Sec-WebSocket-Key: abcdef=\x0d\x0a");
 $req->parse("Sec-WebSocket-Protocol: sample\x0d\x0a");
-$req->parse("Upgrade: WebSocket\x0d\x0a");
-$req->parse("Sec-WebSocket-Key1: 4 \@1  46546xW%0l 1 5\x0d\x0a");
-$req->parse("Origin: http://example.com\x0d\x0a\x0d\x0a");
-$req->parse('^');
-$req->parse('n:ds');
-$req->parse('[4U');
+$req->parse("Upgrade: WebSocket\x0d\x0a\x0d\x0a");
 ok $req->is_done, 'request is done';
 is $req->method,  'GET', 'right method';
 is $req->version, '1.1', 'right version';
@@ -76,15 +71,12 @@ is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->url, '/demo', 'right URL';
 is $req->headers->host,       'example.com', 'right "Host" value';
 is $req->headers->connection, 'Upgrade',     'right "Connection" value';
-is $req->headers->sec_websocket_key2, '12998 5 Y3 1  .P00',
-  'right "Sec-WebSocket-Key2" value';
 is $req->headers->sec_websocket_protocol, 'sample',
   'right "Sec-WebSocket-Protocol" value';
 is $req->headers->upgrade, 'WebSocket', 'right "Upgrade" value';
-is $req->headers->sec_websocket_key1, '4 @1  46546xW%0l 1 5',
-  'right "Sec-WebSocket-Key1" value';
-is $req->headers->origin, 'http://example.com', 'right "Origin" value';
-is $req->body, '^n:ds[4U', 'right content';
+is $req->headers->sec_websocket_key, 'abcdef=',
+  'right "Sec-WebSocket-Key" value';
+is $req->body, '', 'no content';
 
 # Parse HTTP 1.0 start line and headers, no body
 $req = Mojo::Message::Request->new;
@@ -604,12 +596,9 @@ $req->method('GET');
 $req->url->parse('http://example.com/demo');
 $req->headers->host('example.com');
 $req->headers->connection('Upgrade');
-$req->headers->sec_websocket_key2('12998 5 Y3 1  .P00');
+$req->headers->sec_websocket_accept('abcdef=');
 $req->headers->sec_websocket_protocol('sample');
 $req->headers->upgrade('WebSocket');
-$req->headers->sec_websocket_key1('4 @1  46546xW%0l 1 5');
-$req->headers->origin('http://example.com');
-$req->body('^n:ds[4U');
 $req = Mojo::Message::Request->new->parse($req->to_string);
 ok $req->is_done, 'request is done';
 is $req->method,  'GET', 'right method';
@@ -621,18 +610,14 @@ is $req->url->to_abs, 'http://example.com/demo', 'right absolute URL';
 is $req->headers->connection, 'Upgrade',     'right "Connection" value';
 is $req->headers->upgrade,    'WebSocket',   'right "Upgrade" value';
 is $req->headers->host,       'example.com', 'right "Host" value';
-is $req->headers->content_length, '8', 'right "Content-Length" value';
-is $req->headers->origin, 'http://example.com', 'right "Origin" value';
-is $req->headers->sec_websocket_key1, "4 \@1  46546xW%0l 1 5",
-  'right "Sec-WebSocket-Key1" value';
-is $req->headers->sec_websocket_key2, '12998 5 Y3 1  .P00',
-  'right "Sec-WebSocket-Key2" value';
+is $req->headers->content_length, 0, 'right "Content-Length" value';
+is $req->headers->sec_websocket_accept, 'abcdef=',
+  'right "Sec-WebSocket-Key" value';
 is $req->headers->sec_websocket_protocol, 'sample',
   'right "Sec-WebSocket-Protocol" value';
-is $req->body, '^n:ds[4U', 'right content';
+is $req->body, '', 'no content';
 ok $finished, 'finish callback was called';
 ok $req->is_done, 'request is done';
-
 
 # Build full HTTP 1.1 proxy request
 $req = Mojo::Message::Request->new;
@@ -1601,28 +1586,24 @@ is $res->cookie('foo')->path,  '/test', 'right path';
 
 # Parse WebSocket handshake response
 $res = Mojo::Message::Response->new;
-$res->parse("HTTP/1.1 101 WebSocket Protocol Handshake\x0d\x0a");
+$res->parse("HTTP/1.1 101 Switching Protocols\x0d\x0a");
 $res->parse("Upgrade: WebSocket\x0d\x0a");
 $res->parse("Connection: Upgrade\x0d\x0a");
-$res->parse("Sec-WebSocket-Origin: http://example.com\x0d\x0a");
-$res->parse("Sec-WebSocket-Location: ws://example.com/demo\x0d\x0a");
+$res->parse("Sec-WebSocket-Accept: abcdef=\x0d\x0a");
 $res->parse("Sec-WebSocket-Protocol: sample\x0d\x0a\x0d\x0a");
-$res->parse('8jKS\'y:G*Co,Wxa-');
 ok $res->is_done, 'response is done';
 is $res->code,    101, 'right status';
-is $res->message, 'WebSocket Protocol Handshake', 'right message';
+is $res->message, 'Switching Protocols', 'right message';
 is $res->version, '1.1', 'right version';
 is $res->at_least_version('1.0'), 1,     'at least version 1.0';
 is $res->at_least_version('1.2'), undef, 'not version 1.2';
 is $res->headers->upgrade,    'WebSocket', 'right "Upgrade" value';
 is $res->headers->connection, 'Upgrade',   'right "Connection" value';
-is $res->headers->sec_websocket_origin, 'http://example.com',
-  'right "Sec-WebSocket-Origin" value';
-is $res->headers->sec_websocket_location, 'ws://example.com/demo',
-  'right "Sec-WebSocket-Location" value';
+is $res->headers->sec_websocket_accept, 'abcdef=',
+  'right "Sec-WebSocket-Accept" value';
 is $res->headers->sec_websocket_protocol, 'sample',
   'right "Sec-WebSocket-Protocol" value';
-is $res->body, '8jKS\'y:G*Co,Wxa-', 'right content';
+is $res->body, '', 'no content';
 
 # Build WebSocket handshake response
 $res = Mojo::Message::Response->new;
@@ -1630,28 +1611,24 @@ $res->code(101);
 $res->headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
 $res->headers->upgrade('WebSocket');
 $res->headers->connection('Upgrade');
-$res->headers->sec_websocket_origin('http://example.com');
-$res->headers->sec_websocket_location('ws://example.com/demo');
+$res->headers->sec_websocket_accept('abcdef=');
 $res->headers->sec_websocket_protocol('sample');
-$res->body('8jKS\'y:G*Co,Wxa-');
 $res = Mojo::Message::Response->new->parse($res->to_string);
 ok $res->is_done, 'response is done';
 is $res->code,    '101', 'right status';
-is $res->message, 'WebSocket Protocol Handshake', 'right message';
+is $res->message, 'Switching Protocols', 'right message';
 is $res->version, '1.1', 'right version';
 is $res->at_least_version('1.0'), 1,     'at least version 1.0';
 is $res->at_least_version('1.2'), undef, 'not version 1.2';
 is $res->headers->connection, 'Upgrade', 'right "Connection" value';
 is $res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT', 'right "Date" value';
 is $res->headers->upgrade,        'WebSocket', 'right "Upgrade" value';
-is $res->headers->content_length, '16',        'right "Content-Length" value';
-is $res->headers->sec_websocket_origin, 'http://example.com',
-  'right "Sec-WebSocket-Origin" value';
-is $res->headers->sec_websocket_location,
-  'ws://example.com/demo', 'right "Sec-WebSocket-Location" value';
+is $res->headers->content_length, 0,           'right "Content-Length" value';
+is $res->headers->sec_websocket_accept, 'abcdef=',
+  'right "Sec-WebSocket-Accept" value';
 is $res->headers->sec_websocket_protocol,
   'sample', 'right "Sec-WebSocket-Protocol" value';
-is $res->body, '8jKS\'y:G*Co,Wxa-', 'right content';
+is $res->body, '', 'no content';
 
 # Build and parse HTTP 1.1 response with 3 cookies
 $res = Mojo::Message::Response->new;

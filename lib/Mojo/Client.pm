@@ -998,11 +998,8 @@ sub _tx_start {
     }
   }
 
-  # Make sure WebSocket requests have an origin header
-  my $headers = $req->headers;
-  $headers->origin($url) if $headers->upgrade && !$headers->origin;
-
   # We identify ourself
+  my $headers = $req->headers;
   $headers->user_agent($self->user_agent) unless $headers->user_agent;
 
   # Inject cookies

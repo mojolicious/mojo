@@ -90,6 +90,7 @@ sub _diag {
 
   # Path
   my $path = $tx->req->url->path->to_abs_string;
+  $path = '/diag/websocket' if $path eq '/chat';
   $path =~ s/^\/diag// or return $self->_hello($tx);
 
   # WebSocket
@@ -267,12 +268,10 @@ sub _websocket {
 
   # WebSocket request
   if ($tx->is_websocket) {
-    $tx->send_message('Congratulations, your Mojo is working!');
     $tx->on_message(
       sub {
         my ($tx, $message) = @_;
-        return unless $message eq 'test 123';
-        $tx->send_message('With WebSocket support!');
+        $tx->send_message($message);
         $tx->resume;
       }
     );

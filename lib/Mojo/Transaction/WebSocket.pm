@@ -141,18 +141,20 @@ sub server_read {
 
   # Full frames
   while (my $frame = $self->_parse_frame) {
-    $self->{_message} .= $frame->[2];
-
-    # Continuation
-    next unless $frame->[0];
 
     # Ping
-    if ($frame->[0] == 2) {
+    if ($frame->[0] && $frame->[0] == 2) {
 
       # Pong
       $self->_send_frame(3, $frame->[2]);
       next;
     }
+
+    # Append
+    $self->{_message} .= $frame->[2];
+
+    # Continuation
+    next unless $frame->[0];
 
     # Callback
     my $message = $self->{_message};

@@ -371,8 +371,8 @@ The original handshake transaction.
 
 =head2 C<max_websocket_size>
 
-  my $size = $message->max_websocket_size;
-  $message = $message->max_websocket_size(1024);
+  my $size = $ws->max_websocket_size;
+  $ws      = $ws->max_websocket_size(1024);
 
 Maximum WebSocket message size in bytes, defaults to C<5242880>.
 

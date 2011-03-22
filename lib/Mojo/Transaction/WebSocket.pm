@@ -203,6 +203,9 @@ sub server_write {
 sub _build_frame {
   my ($self, $op, $payload) = @_;
 
+  # Debug
+  warn "BUILDING FRAME\n" if DEBUG;
+
   # Head
   my $frame = 0;
   vec($frame, 0, 8) = $op | 0b10000000;
@@ -231,6 +234,13 @@ sub _build_frame {
     vec($prefix, 0, 8) = 127;
     $frame .= $prefix;
     $frame .= pack 'NN', $len >> 32, $len & 0xFFFFFFFF;
+  }
+
+  # Debug
+  if (DEBUG) {
+    warn 'HEAD: ' . unpack('B*', $frame) . "\n";
+    warn "OPCODE: $op\n";
+    warn "PAYLOAD: $payload\n";
   }
 
   # Payload
@@ -263,6 +273,12 @@ sub _parse_frame {
   # Head
   return unless length $buffer > 2;
   my $head = substr $buffer, 0, 2;
+
+  # Debug
+  if (DEBUG) {
+    warn "PARSING FRAME\n";
+    warn 'HEAD: ' . unpack('B*', $head) . "\n";
+  }
 
   # FIN
   my $fin = (vec($head, 0, 8) & 0b10000000) == 0b10000000 ? 1 : 0;

@@ -1304,7 +1304,7 @@ Perform blocking HTTP C<DELETE> request.
 You can also append a callback to perform requests non-blocking.
 
   $ua->delete('http://kraih.com' => sub {
-    print shift->res->body;
+    print pop->res->body;
     Mojo::IOLoop->stop;
   });
   Mojo::IOLoop->start;
@@ -1328,7 +1328,7 @@ Perform blocking HTTP C<GET> request.
 You can also append a callback to perform requests non-blocking.
 
   $ua->get('http://kraih.com' => sub {
-    print shift->res->body;
+    print pop->res->body;
     Mojo::IOLoop->stop;
   });
   Mojo::IOLoop->start;
@@ -1345,7 +1345,7 @@ Perform blocking HTTP C<HEAD> request.
 You can also append a callback to perform requests non-blocking.
 
   $ua->head('http://kraih.com' => sub {
-    print shift->res->body;
+    print pop->res->body;
     Mojo::IOLoop->stop;
   });
   Mojo::IOLoop->start;
@@ -1369,7 +1369,7 @@ Perform blocking HTTP C<POST> request.
 You can also append a callback to perform requests non-blocking.
 
   $ua->post('http://kraih.com' => sub {
-    print shift->res->body;
+    print pop->res->body;
     Mojo::IOLoop->stop;
   });
   Mojo::IOLoop->start;
@@ -1410,7 +1410,7 @@ Perform blocking HTTP C<POST> request with form data.
 You can also append a callback to perform requests non-blocking.
 
   $ua->post_form('http://kraih.com' => {q => 'test'} => sub {
-    print shift->res->body;
+    print pop->res->body;
     Mojo::IOLoop->stop;
   });
   Mojo::IOLoop->start;
@@ -1427,7 +1427,7 @@ Perform blocking HTTP C<PUT> request.
 You can also append a callback to perform requests non-blocking.
 
   $ua->put('http://kraih.com' => sub {
-    print shift->res->body;
+    print pop->res->body;
     Mojo::IOLoop->stop;
   });
   Mojo::IOLoop->start;
@@ -1441,7 +1441,7 @@ Process blocking transaction.
 You can also append a callback to perform transactions non-blocking.
 
   $ua->start($tx => sub {
-    print shift->res->body;
+    print pop->res->body;
     Mojo::IOLoop->stop;
   });
   Mojo::IOLoop->start;

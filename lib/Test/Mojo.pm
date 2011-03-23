@@ -385,14 +385,14 @@ Check response content for similar match.
 
   $t = $t->content_type_is('text/html');
 
-Check response content type for exact match.
+Check response C<Content-Type> header for exact match.
 
 =head2 C<content_type_like>
 
   $t = $t->content_type_like(qr/text/);
   $t = $t->content_type_like(qr/text/, 'right content type!');
 
-Check response content type for similar match.
+Check response C<Content-Type> header for similar match.
 
 =head2 C<delete_ok>
 
@@ -401,15 +401,15 @@ Check response content type for similar match.
   $t = $t->delete_ok('/foo', 'Hi!');
   $t = $t->delete_ok('/foo', {Connection => 'close'}, 'Hi!');
 
-Perform a C<DELETE> request.
+Perform a C<DELETE> request and check for success.
 
 =head2 C<element_exists>
 
   $t = $t->element_exists('div.foo[x=y]');
   $t = $t->element_exists('html head title', 'has a title');
 
-Checks for existence of the CSS3 selectors XML/HTML element with
-L<Mojo::DOM>.
+Checks for existence of the CSS3 selectors first matching XML/HTML element
+with L<Mojo::DOM>.
 
 =head2 C<get_ok>
 
@@ -418,7 +418,7 @@ L<Mojo::DOM>.
   $t = $t->get_ok('/foo', 'Hi!');
   $t = $t->get_ok('/foo', {Connection => 'close'}, 'Hi!');
 
-Perform a C<GET> request.
+Perform a C<GET> request and check for success.
 
 =head2 C<head_ok>
 
@@ -427,7 +427,7 @@ Perform a C<GET> request.
   $t = $t->head_ok('/foo', 'Hi!');
   $t = $t->head_ok('/foo', {Connection => 'close'}, 'Hi!');
 
-Perform a C<HEAD> request.
+Perform a C<HEAD> request and check for success.
 
 =head2 C<header_is>
 
@@ -457,7 +457,7 @@ Check response content for JSON data.
   $t = $t->post_ok('/foo', {Connection => 'close'}, 'Hi!');
   $t = $t->post_ok('/foo', 'Hi!', 'request worked!');
 
-Perform a C<POST> request.
+Perform a C<POST> request and check for success.
 
 =head2 C<post_form_ok>
 
@@ -485,7 +485,7 @@ Perform a C<POST> request.
     'Hi!'
   );
 
-Submit a C<POST> form.
+Submit a C<POST> form and check for success.
 
 =head2 C<put_ok>
 
@@ -494,7 +494,7 @@ Submit a C<POST> form.
   $t = $t->put_ok('/foo', 'Hi!');
   $t = $t->put_ok('/foo', {Connection => 'close'}, 'Hi!');
 
-Perform a C<PUT> request.
+Perform a C<PUT> request and check for success.
 
 =head2 C<reset_session>
 
@@ -513,16 +513,16 @@ Check response status for exact match.
   $t = $t->text_is('div.foo[x=y]' => 'Hello!');
   $t = $t->text_is('html head title' => 'Hello!', 'right title');
 
-Checks text content of the CSS3 selectors XML/HTML element for exact match
-with L<Mojo::DOM>.
+Checks text content of the CSS3 selectors first matching XML/HTML element for
+exact match with L<Mojo::DOM>.
 
 =head2 C<text_like>
 
   $t = $t->text_like('div.foo[x=y]' => qr/Hello/);
   $t = $t->text_like('html head title' => qr/Hello/, 'right title');
 
-Checks text content of the CSS3 selectors XML/HTML element for similar match
-with L<Mojo::DOM>.
+Checks text content of the CSS3 selectors first matching XML/HTML element for
+similar match with L<Mojo::DOM>.
 
 =head1 SEE ALSO
 

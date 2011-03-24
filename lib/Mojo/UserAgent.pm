@@ -1435,7 +1435,6 @@ You can also append a callback to perform requests non-blocking.
 =head2 C<start>
 
   $ua = $ua->start($tx);
-  $ua = $ua->start($tx => sub {...});
 
 Process blocking transaction.
 You can also append a callback to perform transactions non-blocking.

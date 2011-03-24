@@ -452,6 +452,11 @@ are not endpoints themselves.
   # /foo/bar -> {controller => 'foo', action => 'bar'}
   my $foo = $r->waypoint('/foo')->to(controller => 'foo', action => 'baz');
   $foo->route('/bar')->to(action => 'bar');
+  
+  my $articles = $r->waypoint('/articles')->to('articles#list')->name('list_articles');
+  $articles->route('/create')->to('#create')->name('create_article');
+  my $article = $articles->route('/id', id => qr/\d+/)->to('#view')->name('view_article');
+  $article->route('/edit')->to('#edit')->name('edit_article');
 
 =head2 Bridges
 

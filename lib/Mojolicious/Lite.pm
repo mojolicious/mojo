@@ -420,6 +420,10 @@ this process can be easily customized.
     $self->render(text => "Our :bar placeholder matched $bar");
   };
 
+Just make sure not to use C<^> and C<$> or capturing groups C<(...)>, because
+placeholders become part of a larger regular expression internally,
+C<(?:...)> is fine though.
+
 =head2 Optional Placeholders
 
 Routes allow default values to make placeholders optional.

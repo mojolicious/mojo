@@ -484,8 +484,10 @@ will be broken, this makes bridges a very powerful tool for authentication.
 =head2 More Restrictive Placeholders
 
 You can adjust the regular expressions behind placeholders to better suit
-your needs, just make sure not to use C<^>, C<$> and C<()>, because
-placeholders become part of a larger regular expression internally.
+your needs.
+Just make sure not to use C<^> and C<$> or capturing groups C<(...)>, because
+placeholders become part of a larger regular expression internally,
+C<(?:...)> is fine though.
 
   # /23   -> {controller => 'foo', action => 'bar', number => 23}
   # /test -> undef

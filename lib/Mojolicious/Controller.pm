@@ -320,37 +320,14 @@ sub render_exception {
   # Recursion
   return if $self->stash->{'mojo.exception'};
 
-  # Request
-  my $filtered_stash = {};
-  my $stash          = $self->stash;
+  # Filtered stash snapshot
+  my $snapshot = {};
+  my $stash    = $self->stash;
   for my $key (keys %$stash) {
     next if $key =~ /^mojo\./;
     next unless defined(my $value = $stash->{$key});
-    $filtered_stash->{$key} = $value;
+    $snapshot->{$key} = $value;
   }
-  my $req     = $self->req;
-  my $url     = $req->url;
-  my @request = (
-    Method     => $req->method,
-    Path       => $url->to_string,
-    Base       => $url->base->to_string,
-    Parameters => $self->dumper($req->params->to_hash),
-    Stash      => $self->dumper($filtered_stash),
-    Session    => $self->dumper($self->session),
-    Version    => $req->version
-  );
-
-  # Info
-  my @info = (
-    Perl        => "$] ($^O)",
-    Mojolicious => "$Mojolicious::VERSION ($Mojolicious::CODENAME)",
-    Home        => $self->app->home,
-    Include     => $self->dumper(\@INC),
-    PID         => $$,
-    Name        => $0,
-    Executable  => $^X,
-    Time        => scalar localtime(time)
-  );
 
   # Mode
   my $mode = $self->app->mode;
@@ -363,8 +340,7 @@ sub render_exception {
     status           => 500,
     layout           => undef,
     extends          => undef,
-    request          => \@request,
-    info             => \@info,
+    snapshot         => $snapshot,
     exception        => $e,
     'mojo.exception' => 1
   };
@@ -1032,11 +1008,15 @@ __DATA__
     </div>
     <div class="box infobox" id="request">
       <table>
-        % for (my $i = 0; $i < @$request; $i += 2) {
-          % my $key = $request->[$i];
-          % my $value = $request->[$i + 1];
-          %== $kv->($key, $value)
-        % }
+        % my $req = $self->req;
+        %== $kv->(Method => $req->method)
+        % my $url = $req->url;
+        %== $kv->(Path => $url->to_string)
+        %== $kv->(Base => $url->base->to_string)
+        %== $kv->(Parameters => dumper $req->params->to_hash)
+        %== $kv->(Stash => dumper $snapshot)
+        %== $kv->(Session => dumper session)
+        %== $kv->(Version => $req->version)
         % for my $name (@{$self->req->headers->names}) {
           % my $value = $self->req->headers->header($name);
           %== $kv->($name, $value)
@@ -1046,9 +1026,16 @@ __DATA__
     <div class="box infobox" id="more">
       <div id="infos">
         <table>
-          % for (my $i = 0; $i < @$info; $i += 2) {
-            %== $kv->($info->[$i], $info->[$i + 1])
-          % }
+          %== $kv->(Perl => "$] ($^O)")
+          % my $version  = $Mojolicious::VERSION;
+          % my $codename = $Mojolicious::CODENAME;
+          %== $kv->(Mojolicious => "$version ($codename)")
+          %== $kv->(Home => app->home)
+          %== $kv->(Include => dumper \@INC)
+          %== $kv->(PID => $$)
+          %== $kv->(Name => $0)
+          %== $kv->(Executable => $^X)
+          %== $kv->(Time => scalar localtime(time))
         </table>
       </div>
       <div class="tap">tap for more</div>

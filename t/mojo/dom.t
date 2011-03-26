@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 442;
+use Test::More tests => 452;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -1268,3 +1268,75 @@ is $dom->find('html > head > script')->[2]->attrs('src'), '/js/three.js',
   'right attribute';
 is $dom->find('html > head > script')->[2]->text, '', 'no text';
 is $dom->at('html > body')->text, 'Bar', 'right text';
+
+# Inline DTD
+$dom->parse(<<EOF);
+<?xml version="1.0"?>
+<!-- This is a Test! -->
+<!DOCTYPE root [
+  <!ELEMENT root (#PCDATA)>
+  <!ATTLIST root att CDATA #REQUIRED>
+]>
+<root att="test">
+  <![CDATA[<hello>world</hello>]]>
+</root>
+EOF
+is $dom->at('root')->attrs('att'), 'test', 'right attribute';
+is $dom->tree->[5]->[1], ' root [
+  <!ELEMENT root (#PCDATA)>
+  <!ATTLIST root att CDATA #REQUIRED>
+]', 'right doctype';
+is $dom->at('root')->text, '<hello>world</hello>', 'right content';
+$dom->parse(<<EOF);
+<!doctype book
+SYSTEM "usr.dtd"
+[
+  <!ENTITY test "yeah">
+]>
+<foo />
+EOF
+is $dom->tree->[1]->[1], ' book
+SYSTEM "usr.dtd"
+[
+  <!ENTITY test "yeah">
+]', 'right doctype';
+is $dom->at('foo'), '<foo />', 'right element';
+$dom->parse(<<EOF);
+<?xml version="1.0" encoding = 'utf-8'?>
+<!DOCTYPE foo [
+  <!ELEMENT foo ANY>
+  <!ATTLIST foo xml:lang CDATA #IMPLIED>
+  <!ENTITY % e SYSTEM "myentities.ent">
+  %myentities;
+]  >
+<foo xml:lang="de">Check!</fOo>
+EOF
+is $dom->tree->[3]->[1], ' foo [
+  <!ELEMENT foo ANY>
+  <!ATTLIST foo xml:lang CDATA #IMPLIED>
+  <!ENTITY % e SYSTEM "myentities.ent">
+  %myentities;
+]  ', 'right doctype';
+is $dom->at('foo')->attrs->{'xml:lang'}, 'de', 'right attribute';
+is $dom->at('foo')->text, 'Check!', 'right content';
+$dom->parse(<<EOF);
+<!DOCTYPE TESTSUITE PUBLIC "my.dtd" 'mhhh' [
+  <!ELEMENT foo ANY>
+  <!ATTLIST foo bar ENTITY 'true'>
+  <!ENTITY system_entities SYSTEM 'systems.xml'>
+  <!ENTITY leertaste '&#32;'>
+  <!-- This is a comment -->
+  <!NOTATION hmmm SYSTEM "hmmm">
+]   >
+<?check for-nothing?>
+<foo bar='false'>&leertaste;!!!</foo>
+EOF
+is $dom->tree->[1]->[1], ' TESTSUITE PUBLIC "my.dtd" \'mhhh\' [
+  <!ELEMENT foo ANY>
+  <!ATTLIST foo bar ENTITY \'true\'>
+  <!ENTITY system_entities SYSTEM \'systems.xml\'>
+  <!ENTITY leertaste \'&#32;\'>
+  <!-- This is a comment -->
+  <!NOTATION hmmm SYSTEM "hmmm">
+]   ', 'right doctype';
+is $dom->at('foo')->attrs('bar'), 'false', 'right attribute';

@@ -62,20 +62,25 @@ my $XML_ATTR_RE = qr/
 my $XML_END_RE   = qr/^\s*\/\s*(.+)\s*/;
 my $XML_START_RE = qr/([^\s\/]+)([\s\S]*)/;
 my $XML_TOKEN_RE = qr/
-  ([^<]*)                    # Text
+  ([^<]*)                                           # Text
   (?:
-    <\?(.*?)\?>              # Processing Instruction
+    <\?(.*?)\?>                                     # Processing Instruction
     |
-    <\!--(.*?)-->            # Comment
+    <\!--(.*?)-->                                   # Comment
     |
-    <\!\[CDATA\[(.*?)\]\]>   # CDATA
+    <\!\[CDATA\[(.*?)\]\]>                          # CDATA
     |
-    <\!DOCTYPE([^>]*)>       # DOCTYPE
+    <!DOCTYPE(
+      \s+\w+
+      (?:(?:\s+\w+)?(?:\s+(?:"[^"]*"|'[^']*'))+)?   # External ID
+      (?:\s+\[.+?\])?                               # Int Subset
+      \s*
+    )>
     |
     <(
       \s*
-      [^>\s]+                # Tag
-      (?:$XML_ATTR_RE)*      # Attributes
+      [^>\s]+                                       # Tag
+      (?:$XML_ATTR_RE)*                             # Attributes
     )>
   )??
 /xis;

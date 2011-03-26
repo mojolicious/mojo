@@ -15,6 +15,7 @@ use constant GUID => '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 use constant SHA1 => eval 'use Digest::SHA (); 1';
 
 has handshake => sub { Mojo::Transaction::HTTP->new };
+has 'masked';
 has max_websocket_size => sub { $ENV{MOJO_MAX_WEBSOCKET_SIZE} || 5242880 };
 has on_message => sub {
   sub { }
@@ -206,6 +207,17 @@ sub _build_frame {
   # Debug
   warn "BUILDING FRAME\n" if DEBUG;
 
+  # Mask payload
+  if ($self->masked) {
+
+    # Debug
+    warn "MASKING\n" if DEBUG;
+
+    # Mask
+    my $key = pack 'N', int(rand 9999999);
+    $payload = $key . _xor_mask($payload, $key);
+  }
+
   # Head
   my $frame = 0;
   vec($frame, 0, 8) = $op | 0b10000000;
@@ -344,6 +356,17 @@ sub _parse_frame {
   # Payload
   my $payload = $length ? substr($buffer, 0, $length, '') : '';
 
+  # Unmask payload
+  unless ($self->masked) {
+
+    # Debug
+    warn "UNMASKING\n" if DEBUG;
+
+    # Unmask
+    my $key = substr $payload, 0, 4, '';
+    $payload = _xor_mask($payload, $key);
+  }
+
   # Debug
   warn "PAYLOAD: $payload\n" if DEBUG;
 
@@ -365,6 +388,21 @@ sub _send_frame {
 
   # Resume
   $self->on_resume->($self);
+}
+
+sub _xor_mask {
+  my $input = shift;
+
+  # 512 byte key
+  my $key = shift() x 128;
+
+  # Mask
+  my $output = '';
+  $output .= $_ ^ $key while length($_ = substr($input, 0, 512, '')) == 512;
+  substr($key, length) = '';
+  $output .= $_ ^ $key;
+
+  return $output;
 }
 
 1;
@@ -395,6 +433,13 @@ L<Mojo::Transaction> and implements the following new ones.
   $ws           = $ws->handshake(Mojo::Transaction::HTTP->new);
 
 The original handshake transaction.
+
+=head2 C<masked>
+
+  my $masked = $ws->masked;
+  $ws        = $ws->masked(1);
+
+Mask outgoing frames with XOR cipher and a random 32bit key.
 
 =head2 C<max_websocket_size>
 

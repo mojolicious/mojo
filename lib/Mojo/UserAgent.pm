@@ -240,7 +240,8 @@ sub build_websocket_tx {
   }
 
   # Handshake
-  Mojo::Transaction::WebSocket->new(handshake => $tx)->client_handshake;
+  Mojo::Transaction::WebSocket->new(handshake => $tx, masked => 1)
+    ->client_handshake;
 
   return $tx unless wantarray;
   return $tx, $cb;
@@ -975,7 +976,7 @@ sub _upgrade {
   return unless ($res->code || '') eq '101';
 
   # Upgrade to WebSocket transaction
-  my $new = Mojo::Transaction::WebSocket->new(handshake => $old);
+  my $new = Mojo::Transaction::WebSocket->new(handshake => $old, masked => 1);
   $new->kept_alive($old->kept_alive);
 
   # WebSocket challenge

@@ -135,13 +135,9 @@ sub get_chunk {
 
 sub move_to {
   my ($self, $path) = @_;
-  my $src = $self->path;
-
-  # Close handle
-  close $self->handle;
-  $self->handle(undef);
 
   # Move
+  my $src = $self->path;
   File::Copy::move($src, $path)
     or croak qq/Can't move file "$src" to "$path": $!/;
 

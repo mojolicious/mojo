@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 42;
+use Test::More tests => 44;
 
 # "And now, in the spirit of the season: start shopping.
 #  And for every dollar of Krusty merchandise you buy,
@@ -99,3 +99,21 @@ is $chunk, 'c', 'chunk from position 0 with size 1';
 $chunk = $mem->get_chunk(5);
 is $chunk, 'h', 'chunk from position 5 with size 1';
 $ENV{MOJO_CHUNK_SIZE} = $backup;
+
+# Move memory asset to file
+$mem = Mojo::Asset::Memory->new;
+$mem->add_chunk('abc');
+my $tmp = Mojo::Asset::File->new;
+$tmp->add_chunk('x');
+$mem->move_to($tmp->path);
+is $mem->slurp, 'abc', 'right content';
+undef $tmp;
+
+# Move file asset to file
+$file = Mojo::Asset::File->new;
+$file->add_chunk('bcd');
+$tmp = Mojo::Asset::File->new;
+$tmp->add_chunk('x');
+$file->move_to($tmp->path);
+is $file->slurp, 'bcd', 'right content';
+undef $tmp;

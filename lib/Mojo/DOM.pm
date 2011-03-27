@@ -243,7 +243,7 @@ sub namespace {
     }
 
     # Namespace attribute
-    if (my $namespace = $attrs->{xmlns}) { return $namespace }
+    elsif (defined $attrs->{xmlns}) { return $attrs->{xmlns} || undef }
 
     # Parent
     $current = $current->[3];

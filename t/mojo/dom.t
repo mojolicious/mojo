@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 452;
+use Test::More tests => 454;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -377,6 +377,24 @@ like $dom->at('[id*="ork"]')->text, qr/\[awesome\]\]/,           'right text';
 like $dom->at('[id*="orks"]')->text, qr/\[awesome\]\]/, 'right text';
 like $dom->at('[id*="work"]')->text, qr/\[awesome\]\]/, 'right text';
 like $dom->at('[id*="or"]')->text,   qr/\[awesome\]\]/, 'right text';
+
+# Namespace
+$dom->parse(<<EOF);
+<?xml version="1.0"?>
+<bk:book xmlns='uri:default-ns'
+         xmlns:bk='uri:book-ns'
+         xmlns:isbn='uri:isbn-ns'>
+  <bk:title>Programming Perl</bk:title>
+  <nons xmlns=''>
+    <section>I have no namespace.</section>
+  </nons>
+  <meta xmlns='uri:meta-ns'>
+    <isbn:number>0-596-00027-8</isbn:number>
+  </meta>
+</bk:book>
+EOF
+is $dom->at('book nons section')->namespace, undef,         'right namespace';
+is $dom->at('book meta number')->namespace,  'uri:isbn-ns', 'right namespace';
 
 # Yadis
 $dom->parse(<<'EOF');

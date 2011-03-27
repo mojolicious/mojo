@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 456;
+use Test::More tests => 458;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -385,6 +385,7 @@ $dom->parse(<<EOF);
          xmlns:bk='uri:book-ns'
          xmlns:isbn='uri:isbn-ns'>
   <bk:title>Programming Perl</bk:title>
+  <comment>rocks!</comment>
   <nons xmlns=''>
     <section>Nothing</section>
   </nons>
@@ -393,6 +394,8 @@ $dom->parse(<<EOF);
   </meta>
 </bk:book>
 EOF
+is $dom->at('book comment')->namespace, 'uri:default-ns', 'right namespace';
+is $dom->at('book comment')->text,      'rocks!',         'right content';
 is $dom->at('book nons section')->namespace, undef,         'right namespace';
 is $dom->at('book nons section')->text,      'Nothing',     'right content';
 is $dom->at('book meta number')->namespace,  'uri:isbn-ns', 'right namespace';

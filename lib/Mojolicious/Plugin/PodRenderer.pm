@@ -231,7 +231,7 @@ __DATA__
     %= link_to MailingList => 'http://groups.google.com/group/mojolicious'
     %= link_to Blog => 'http://blog.kraih.com'
     %= link_to Twitter => 'http://twitter.com/kraih'
-    %= link_to Shop => 'http://kraih.spreadshirt.net'
+    %= link_to 'T-Shirts' => 'http://kraih.spreadshirt.net'
   </div>
 </div>
 %= javascript begin

@@ -447,6 +447,27 @@ executed more than once.
     This template was compiled at <%= localtime time %>.
   <% end %>
 
+=head2 Mode Specific C<exception> And C<not_found> Templates
+
+While the built in C<exception> and C<not_found> templates are very useful
+during development, you most likely want to show your users something more
+related to your application in production.
+That's why L<Mojolicious> will always try to render C<exception.$mode.html.*>
+or C<not_found.$mode.html.*> before falling back to the built in default
+templates.
+
+  @@ exception.production.html.ep
+  <!doctype html><html>
+    <head><title>Server Error</title></head>
+    <body>Something bad happened!</body>
+  </html>
+
+  @@ not_found.production.html.ep
+  <!doctype html><html>
+    <head><title>Page Not Found</title></head>
+    <body>Page does not seem to exist.</body>
+  </html>
+
 =head1 ADVANCED
 
 Less commonly used and more powerful features.

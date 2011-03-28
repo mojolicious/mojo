@@ -807,7 +807,7 @@ __DATA__
 
 @@ exception.html.ep
 <!doctype html><html>
-  <head><title>Exception</title></head>
+  <head><title>Server Error</title></head>
   <body>Page temporarily unavailable, please come back later.</body>
 </html>
 
@@ -815,7 +815,7 @@ __DATA__
 % my $e = delete $self->stash->{'exception'};
 <!doctype html><html>
   <head>
-    <title>Exception</title>
+    <title>Server Error</title>
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="-1">
     %= javascript '/js/jquery.js'

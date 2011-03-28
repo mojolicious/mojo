@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.16 2011-03-19 00:00:00
+        - Added Failraptor.
         - Updated WebSocket implementation to ietf-06. (sri, crab)
         - Improved documentation.
         - Improved Mojo::DOM inline DTD support. (akron)

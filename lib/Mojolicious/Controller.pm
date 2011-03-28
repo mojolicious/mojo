@@ -808,7 +808,21 @@ __DATA__
 @@ exception.html.ep
 <!doctype html><html>
   <head><title>Server Error</title></head>
-  <body>Page temporarily unavailable, please come back later.</body>
+   %= stylesheet begin
+      a img { border: 0; }
+      body {
+        background-color: #caecf6;
+        text-align: center;
+      }
+      #raptor {
+        margin-top: -244px;
+        position: relative;
+        top: 50%;
+      }
+    % end
+  <body>
+    %= image '/failraptor.png', alt => 'Server error!', id => 'raptor'
+  </body>
 </html>
 
 @@ exception.development.html.ep

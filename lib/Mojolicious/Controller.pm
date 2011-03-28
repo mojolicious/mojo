@@ -1056,7 +1056,7 @@ __DATA__
 
 @@ not_found.html.ep
 <!doctype html><html>
-  <head><title>Not Found</title></head>
+  <head><title>Page Not Found</title></head>
   <body>
     Page not found, want to go <%= link_to home => url_for->base %>?
   </body>
@@ -1071,7 +1071,7 @@ __DATA__
 @@ not_found.development.html.ep
 <!doctype html><html>
   <head>
-    <title>Not Found</title>
+    <title>Page Not Found</title>
     %= stylesheet '/css/prettify-mojo.css'
     %= javascript '/js/prettify.js'
     %= stylesheet begin

@@ -809,20 +809,19 @@ __DATA__
 <!doctype html><html>
   <head><title>Server Error</title></head>
    %= stylesheet begin
-      a img { border: 0; }
-      body {
-        background-color: #caecf6;
-        text-align: center;
-      }
+      body { background-color: #caecf6; }
       #raptor {
+        background: url(<%= url_for '/failraptor.png' %>);
+        height: 488px;
+        left: 50%;
+        margin-left: -371px;
         margin-top: -244px;
-        position: relative;
+        position:absolute;
         top: 50%;
+        width: 743px;
       }
     % end
-  <body>
-    %= image '/failraptor.png', alt => 'Server error!', id => 'raptor'
-  </body>
+  <body><div id="raptor"></div></body>
 </html>
 
 @@ exception.development.html.ep
@@ -1073,26 +1072,28 @@ __DATA__
   <head><title>Page Not Found</title></head>
    %= stylesheet begin
       a img { border: 0; }
-      body {
-        background-color: #caecf6;
-        text-align: center;
-      }
-      #notfound {
-        margin-top: -31px;
-        position: relative;
-        top: 50%;
-      }
+      body { background-color: #caecf6; }
       #noraptor {
         left: 0%;
         position: fixed;
         top: 60%;
       }
+      #notfound {
+        background: url(<%= url_for '/mojolicious-notfound.png' %>);
+        height: 62px;
+        left: 50%;
+        margin-left: -153px;
+        margin-top: -31px;
+        position:absolute;
+        top: 50%;
+        width: 306px;
+      }
     % end
   <body>
     %= link_to url_for->base => begin
-      %= image '/noraptor.png', alt => 'Raptor not found!', id => 'noraptor'
+      %= image '/mojolicious-noraptor.png', alt => 'Bye!', id => 'noraptor'
     % end
-    %= image '/notfound.png', alt => 'Page not found!', id => 'notfound'
+    <div id="notfound"></div>
   </body>
 </html>
 <!-- a padding to disable MSIE and Chrome friendly error page -->

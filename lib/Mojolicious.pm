@@ -889,6 +889,42 @@ startup.
 
   http://github.com/kraih/mojo
 
+=head1 BUNDLED FILES
+
+L<Mojolicious> ships with a few popular static files bundled in the C<public>
+directory.
+
+=head2 Mojolicious Artwork
+
+  Copyright (C) 2010-2011, Sebastian Riedel.
+
+Licensed under the CC-SA License, Version 3.0
+L<http://creativecommons.org/licenses/by-sa/3.0>.
+
+=head2 jQuery
+
+  Version 1.5.1
+
+jQuery is a fast and concise JavaScript Library that simplifies HTML document
+traversing, event handling, animating, and Ajax interactions for rapid web
+development. jQuery is designed to change the way that you write JavaScript.
+
+  Copyright 2011, John Resig.
+
+Licensed under the MIT License, L<http://creativecommons.org/licenses/MIT>.
+
+=head2 Prettify.js
+
+  Version 21-Jul-2010
+
+A Javascript module and CSS file that allows syntax highlighting of source
+code snippets in an html page.
+
+  Copyright (C) 2006, Google Inc.
+
+Licensed under the Apache License, Version 2.0
+L<http://www.apache.org/licenses/LICENSE-2.0>.
+
 =head1 CODE NAMES
 
 Every major release of L<Mojolicious> has a code name, these are the ones

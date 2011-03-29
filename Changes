@@ -5,6 +5,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Updated WebSocket implementation to ietf-06. (sri, crab)
         - Improved documentation.
         - Improved Mojo::DOM inline DTD support. (akron)
+        - Moved all bundled static files to "lib/Mojolicious/public".
         - Fixed small Mojo::Asset::File bug. (crab)
         - Fixed small Mojo::DOM namespace detection bug. (akron)
         - Fixed small route pattern escaping bug.

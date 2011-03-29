@@ -274,6 +274,9 @@ sub _listen {
     $options->{tls_ca}   = $6 if $6;
   }
 
+  # Invalid
+  else { croak qq/Invalid listen value "$listen"/ }
+
   # Listen backlog size
   my $backlog = $self->backlog;
   $options->{backlog} = $backlog if $backlog;

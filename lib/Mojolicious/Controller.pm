@@ -1071,8 +1071,28 @@ __DATA__
 @@ not_found.html.ep
 <!doctype html><html>
   <head><title>Page Not Found</title></head>
+   %= stylesheet begin
+      a img { border: 0; }
+      body {
+        background-color: #caecf6;
+        text-align: center;
+      }
+      #notfound {
+        margin-top: -31px;
+        position: relative;
+        top: 50%;
+      }
+      #noraptor {
+        left: 0%;
+        position: fixed;
+        top: 60%;
+      }
+    % end
   <body>
-    Page not found, want to go <%= link_to home => url_for->base %>?
+    %= link_to url_for->base => begin
+      %= image '/noraptor.png', alt => 'Raptor not found!', id => 'noraptor'
+    % end
+    %= image '/notfound.png', alt => 'Page not found!', id => 'notfound'
   </body>
 </html>
 <!-- a padding to disable MSIE and Chrome friendly error page -->

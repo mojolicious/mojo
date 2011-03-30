@@ -177,6 +177,28 @@ requests.
       if $self->req->headers->header('X-Forwarded-Protocol') eq 'https';
   });
 
+=head2 Embedding
+
+You can also use the builtin web server to embed L<Mojolicious> applications
+into alien environments like foreign event loops.
+
+  use Mojolicious::Lite;
+  use Mojo::Server::Daemon;
+
+  # Normal action
+  get '/' => sub {
+    my $self = shift;
+    $self->render(text => 'Hello World!');
+  };
+
+  # Connect application with custom daemon
+  my $daemon =
+    Mojo::Server::Daemon->new(app => app, listen => ['http://*:8080']);
+  $daemon->prepare_ioloop;
+
+  # Call "one_tick" repeatedly from the alien environment
+  $daemon->ioloop->one_tick while 1;
+
 =head1 USER AGENT
 
 When we say L<Mojolicious> is a web framework we actually mean it.

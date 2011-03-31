@@ -1183,7 +1183,7 @@ before it starts closing the oldest cached ones, defaults to C<5>.
   $ua               = $ua->max_redirects(3);
 
 Maximum number of redirects the user agent will follow before it fails,
-defaults to C<0>.
+defaults to the value of C<MOJO_MAX_REDIRECTS> or C<0>.
 
 =head2 C<name>
 

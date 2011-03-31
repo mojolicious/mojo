@@ -5,6 +5,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added support for MOJO_CERT_FILE and MOJO_KEY_FILE environment
           variables.
         - Updated WebSocket implementation to ietf-06. (sri, crab)
+        - Updated jQuery to version 1.5.2.
         - Improved documentation.
         - Improved Mojo::DOM inline DTD support. (akron)
         - Moved all bundled static files to "lib/Mojolicious/public".
@@ -55,7 +56,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved text_field tag helper.
         - Improved tag helper attribute escaping.
         - Improved attrs method in Mojo::DOM.
-        - Updated to jQuery to version 1.5.1.
+        - Updated jQuery to version 1.5.1.
         - Fixed XSS issue in link_to helper.
         - Fixed route unescaping bug.
         - Fixed small Mojo::DOM bug. (yko)

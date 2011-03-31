@@ -32,6 +32,8 @@ These options are available:
   --header     Additional HTTP header.
   --method     HTTP method to use.
   --redirect   Follow up to 5 redirects.
+  --cert       TLS client certificate to use with HTTPS connection.
+  --key        TLS private key to use with HTTPS connection.
   --verbose    Print verbose debug information to STDERR.
 EOF
 
@@ -44,14 +46,16 @@ sub run {
   my $method = 'GET';
   my @headers;
   my $content = '';
-  my ($charset, $redirect, $verbose) = 0;
+  my ($charset, $redirect, $verbose, $cert, $key) = 0;
   GetOptions(
     'charset=s' => sub { $charset  = $_[1] },
     'content=s' => sub { $content  = $_[1] },
     'header=s'  => \@headers,
     'method=s'  => sub { $method   = $_[1] },
     'redirect'  => sub { $redirect = 1 },
-    'verbose'   => sub { $verbose  = 1 }
+    'verbose'   => sub { $verbose  = 1 },
+    'cert=s'      => sub { $cert     = 1 },
+    'key=s'       => sub { $key      = 1 },
   );
 
   # Headers
@@ -86,6 +90,13 @@ sub run {
 
   # Follow redirects
   $ua->max_redirects(5) if $redirect;
+
+  # Use certificate
+  $ua->cert($cert) if $cert;
+
+  # Use key
+  $ua->key($key) if $cert and $key;
+
 
   # Start
   my $v;

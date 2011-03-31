@@ -21,10 +21,12 @@ use Scalar::Util 'weaken';
 use constant DEBUG => $ENV{MOJO_USERAGENT_DEBUG} || 0;
 
 # "You can't let a single bad experience scare you away from drugs."
-has [qw/app cert http_proxy https_proxy key no_proxy on_start/];
+has [qw/app http_proxy https_proxy no_proxy on_start/];
+has cert       => sub { $ENV{MOJO_CERT_FILE} };
 has cookie_jar => sub { Mojo::CookieJar->new };
 has ioloop     => sub { Mojo::IOLoop->new };
 has keep_alive_timeout => 15;
+has key                => sub { $ENV{MOJO_KEY_FILE} };
 has log                => sub { Mojo::Log->new };
 has max_connections    => 5;
 has max_redirects      => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 };
@@ -1113,7 +1115,7 @@ If set, local requests will be processed in this application.
   my $cert = $ua->cert;
   $ua      = $ua->cert('tls.crt');
 
-Path to TLS certificate file.
+Path to TLS certificate file, defaults to the value of C<MOJO_CERT_FILE>.
 
 =head2 C<cookie_jar>
 
@@ -1157,7 +1159,7 @@ Timeout in seconds for keep alive between requests, defaults to C<15>.
   my $key = $ua->key;
   $ua     = $ua->key('tls.crt');
 
-Path to TLS key file.
+Path to TLS key file, defaults to the value of C<MOJO_KEY_FILE>.
 
 =head2 C<log>
 

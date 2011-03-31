@@ -10,7 +10,7 @@ use Test::More;
 use Mojo::IOLoop;
 plan skip_all => 'IO::Socket::SSL 1.37 required for this test!'
   unless Mojo::IOLoop::TLS;
-plan tests => 9;
+plan tests => 12;
 
 # "That does not compute.
 #  Really?
@@ -20,8 +20,6 @@ use Mojo::UserAgent;
 
 # User agent
 my $ua = Mojo::UserAgent->new;
-
-# Silence
 $ua->log->level('fatal');
 
 # Server
@@ -62,6 +60,22 @@ $tx =
 ok $tx->success, 'successful';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
+
+# Fresh user agent
+$ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);
+$ua->log->level('fatal');
+
+# Valid certificate (env)
+my $backup = $ENV{MOJO_CERT_FILE} || '';
+$ENV{MOJO_CERT_FILE} = 't/mojo/certs/client.crt';
+my $backup2 = $ENV{MOJO_KEY_FILE} || '';
+$ENV{MOJO_KEY_FILE} = 't/mojo/certs/client.key';
+$tx = $ua->get("https://localhost:$port");
+ok $tx->success, 'successful';
+is $tx->res->code, 200,      'right status';
+is $tx->res->body, 'works!', 'right content';
+$ENV{MOJO_CERT_FILE} = $backup;
+$ENV{MOJO_KEY_FILE}  = $backup2;
 
 # Invalid certificate
 $tx =

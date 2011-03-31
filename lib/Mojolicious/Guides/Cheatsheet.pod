@@ -154,6 +154,14 @@ Note that L<IO::Socket::SSL> must be installed for TLS support.
 
   MOJO_CA_FILE=/etc/tls/cacerts.pem
 
+=head2 C<MOJO_CERT_FILE>
+
+The path to the TLS certificate, should always contain a path like
+C</etc/tls/client.crt>.
+Note that L<IO::Socket::SSL> must be installed for TLS support.
+
+  MOJO_CERT_FILE=/etc/tls/client.crt
+
 =head2 C<MOJO_CHUNK_SIZE>
 
 Chunk size used for IO operations in bytes, a bigger chunk size speeds up IO
@@ -180,6 +188,14 @@ Home directory for the L<Mojolicious> application, should always contain a
 path like C</home/sri/myapp>.
 
   MOJO_HOME=/home/sri/myapp
+
+=head2 C<MOJO_KEY_FILE>
+
+The path to the TLS key, should always contain a path like
+C</etc/tls/client.key>.
+Note that L<IO::Socket::SSL> must be installed for TLS support.
+
+  MOJO_KEY_FILE=/etc/tls/client.key
 
 =head2 C<MOJO_LOG_LEVEL>
 

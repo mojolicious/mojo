@@ -446,6 +446,7 @@ Check response header for similar match.
 
   $t = $t->json_content_is([1, 2, 3]);
   $t = $t->json_content_is([1, 2, 3], 'right content!');
+  $t = $t->json_content_is({foo => 'bar', baz => 23}, 'right content!');
 
 Check response content for JSON data.
 

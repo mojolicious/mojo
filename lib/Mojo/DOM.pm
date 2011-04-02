@@ -1432,9 +1432,21 @@ An C<E> element, only child of its parent.
 
 =head2 C<E:only-of-type>
 
-an C<E> element, only sibling of its type.
+An C<E> element, only sibling of its type.
 
   my $lonely = $dom->at('div p:only-of-type');
+
+=head2 C<E.warning>
+
+  my $warning = $dom->at('div.warning');
+
+An C<E> element whose class is "warning".
+
+=head2 C<E#myid>
+
+  my $foo = $dom->at('div#foo');
+
+An C<E> element with C<ID> equal to "myid".
 
 =head2 C<E:not(s)>
 

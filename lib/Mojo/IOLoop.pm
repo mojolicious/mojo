@@ -2215,6 +2215,8 @@ The remote port.
 
 Resolve domain into C<A>, C<AAAA>, C<CNAME>, C<MX>, C<NS>, C<PTR> or C<TXT>
 records, C<*> will query for all at once.
+Since this is a "stub resolver" it depends on a recursive name server for DNS
+resolution.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<singleton>

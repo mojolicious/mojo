@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 458;
+use Test::More tests => 459;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -128,6 +128,10 @@ is $dom->at('[class$="ing"]')->type,    'simple', 'right type';
 is $dom->at('[class="working"]')->type, 'simple', 'right type';
 is $dom->at('[class$=ing]')->type,      'simple', 'right type';
 is $dom->at('[class=working]')->type,   'simple', 'right type';
+
+# Class and ID
+$dom->parse('<div id="id" class="class">a</div>');
+is $dom->at('div#id.class')->text, 'a', 'right content';
 
 # Deep nesting (parent combinator)
 $dom->parse(<<EOF);

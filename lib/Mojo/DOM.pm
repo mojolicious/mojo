@@ -23,9 +23,14 @@ my $CSS_ATTR_RE   = qr/
   )?
   \]
 /x;
-my $CSS_CLASS_RE        = qr/\.((?:\\\.|[^\.])+)/;
+my $CSS_CLASS_ID_RE = qr/
+  (?:
+    (?:\.((?:\\\.|[^\#\.])+))   # Class
+  |
+    (?:\#((?:\\\#|[^\.\#])+))   # ID
+  )
+/x;
 my $CSS_ELEMENT_RE      = qr/^((?:\\\.|\\\#|[^\.\#])+)/;
-my $CSS_ID_RE           = qr/\#((?:\\\#|[^\#])+)/;
 my $CSS_PSEUDO_CLASS_RE = qr/(?:\:([\w\-]+)(?:\(((?:\([^\)]+\)|[^\)])+)\))?)/;
 my $CSS_TOKEN_RE        = qr/
   (\s*,\s*)?                                        # Separator
@@ -913,14 +918,16 @@ sub _parse_css {
     # Tag
     push @$selector, ['tag', $tag];
 
-    # Classes
-    while ($element =~ /$CSS_CLASS_RE/g) {
-      push @$selector, ['attribute', 'class', $self->_css_regex('~', $1)];
-    }
+    # Class or ID
+    while ($element =~ /$CSS_CLASS_ID_RE/g) {
 
-    # ID
-    if ($element =~ /$CSS_ID_RE/) {
-      push @$selector, ['attribute', 'id', $self->_css_regex('', $1)];
+      # Class
+      push @$selector, ['attribute', 'class', $self->_css_regex('~', $1)]
+        if defined $1;
+
+      # ID
+      push @$selector, ['attribute', 'id', $self->_css_regex('', $2)]
+        if defined $2;
     }
 
     # Pseudo classes

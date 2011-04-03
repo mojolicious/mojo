@@ -35,8 +35,10 @@ sub run {
   # Status
   my $status = $res->code;
 
-  # Response headers
+  # Fix headers
   $res->fix_headers;
+
+  # Response headers
   my $headers = $res->content->headers;
   my @headers;
   for my $name (@{$headers->names}) {

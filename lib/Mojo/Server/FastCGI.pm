@@ -319,6 +319,9 @@ sub write_response {
   my $message = $res->message || $res->default_message;
   $res->headers->status("$code $message") unless $res->headers->status;
 
+  # Fix headers
+  $res->fix_headers;
+
   # Headers
   my $offset = 0;
   while (1) {

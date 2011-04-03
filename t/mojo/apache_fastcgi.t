@@ -22,7 +22,7 @@ use Mojo::UserAgent;
 plan skip_all => 'Mac OS X required for this test!' unless $^O eq 'darwin';
 plan skip_all => 'set TEST_APACHE to enable this test (developer only!)'
   unless $ENV{TEST_APACHE};
-plan tests => 8;
+plan tests => 12;
 
 # "Robots don't have any emotions, and sometimes that makes me very sad."
 use_ok 'Mojo::Server::FastCGI';
@@ -87,17 +87,23 @@ sleep 1
 
 # Request
 my $ua = Mojo::UserAgent->new;
-my ($code, $body);
 my $tx = $ua->get("http://127.0.0.1:$port/");
-is $tx->res->code,   200,      'right status';
-like $tx->res->body, qr/Mojo/, 'right content';
+is $tx->res->code, 200, 'right status';
+is $tx->res->headers->content_length, 21, 'right "Content-Length" value';
+is $tx->res->body, 'Your Mojo is working!', 'right content';
+
+# HEAD request
+$tx = $ua->head("http://127.0.0.1:$port/");
+is $tx->res->code, 200, 'right status';
+is $tx->res->headers->content_length, 21, 'right "Content-Length" value';
+is $tx->res->body, '', 'no content';
 
 # Form with chunked response
 my $params = {};
 for my $i (1 .. 10) { $params->{"test$i"} = $i }
 my $result = '';
 for my $key (sort keys %$params) { $result .= $params->{$key} }
-($code, $body) = undef;
+my ($code, $body);
 $tx = $ua->post_form("http://127.0.0.1:$port/diag/chunked_params" => $params);
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, $result, 'right content';

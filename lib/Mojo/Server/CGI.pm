@@ -56,6 +56,9 @@ sub run {
     }
   }
 
+  # Fix headers
+  $res->fix_headers;
+
   # Status
   if (my $code = $res->code) {
     my $message = $res->message || $res->default_message;

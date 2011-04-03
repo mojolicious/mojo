@@ -9,6 +9,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved documentation.
         - Improved Mojo::DOM inline DTD support. (akron)
         - Moved all bundled static files to "lib/Mojolicious/public".
+        - Fixed small CGI/FastCGI header generation bug.
         - Fixed small Mojo::Asset::File bug. (crab)
         - Fixed small Mojo::DOM selector bug. (tempire)
         - Fixed small Mojo::DOM namespace detection bug. (akron)

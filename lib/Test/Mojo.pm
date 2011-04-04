@@ -9,7 +9,9 @@ use Mojo::Util 'decode';
 require Test::More;
 
 has app => sub { return $ENV{MOJO_APP} if ref $ENV{MOJO_APP} };
-has ua => sub { Mojo::UserAgent->new->ioloop(Mojo::IOLoop->singleton) };
+has ua => sub {
+  Mojo::UserAgent->new->ioloop(Mojo::IOLoop->singleton)->app(shift->app);
+};
 has max_redirects => 0;
 has 'tx';
 

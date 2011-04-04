@@ -6,7 +6,7 @@ use warnings;
 # Disable IPv6, epoll and kqueue
 BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 206;
+use Test::More tests => 212;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -54,6 +54,14 @@ $t->get_ok('/foo/syntaxerror')->status_is(500)
 # Foo::fun
 $t->get_ok('/fun/time', {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('Have fun!');
+
+# Foo::fun
+my $port = $t->ua->test_server;
+$t->get_ok("http://localhost:$port/fun/time", {'X-Test' => 'Hi there!'})
+  ->status_is(200)->header_is('X-Bender' => undef)
+  ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('Have fun!');
 

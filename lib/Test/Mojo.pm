@@ -3,6 +3,7 @@ use Mojo::Base -base;
 
 use Mojo::IOLoop;
 use Mojo::Message::Response;
+use Mojo::URL;
 use Mojo::UserAgent;
 use Mojo::Util 'decode';
 
@@ -24,6 +25,10 @@ sub client {
 Test::Mojo->client is DEPRECATED in favor of Test::Mojo->ua!!!
 EOF
   return shift->ua;
+}
+
+sub build_url {
+  Mojo::URL->new('http://localhost:' . shift->ua->test_server . '/');
 }
 
 # "Ooh, a graduate student huh?
@@ -368,6 +373,18 @@ Maximum number of redirects, defaults to C<0>.
 
 L<Test::Mojo> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
+
+=head2 C<build_url>
+
+  my $url = $t->build_url;
+
+Build absolute L<Mojo::URL> object for test server.
+Note that this method is EXPERIMENTAL and might change without warning!
+
+  my $url = $t->build_url;
+  $url->userinfo('sri:secr3t');
+  $url->path('/protected');
+  $t->get_ok($url);
 
 =head2 C<content_is>
 

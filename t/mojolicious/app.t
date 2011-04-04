@@ -28,10 +28,10 @@ my $backup = $ENV{MOJO_MODE} || '';
 $ENV{MOJO_MODE} = 'development';
 
 # Foo::fun
-my $port = $t->ua->test_server;
-$t->get_ok("http://localhost:$port/fun/time", {'X-Test' => 'Hi there!'})
-  ->status_is(200)->header_is('X-Bender' => undef)
-  ->header_is(Server         => 'Mojolicious (Perl)')
+my $url = $t->build_url;
+$url->path('/fun/time');
+$t->get_ok($url, {'X-Test' => 'Hi there!'})->status_is(200)
+  ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('Have fun!');
 
@@ -66,10 +66,10 @@ $t->get_ok('/fun/time', {'X-Test' => 'Hi there!'})->status_is(200)
   ->content_is('Have fun!');
 
 # Foo::fun
-$port = $t->ua->test_server;
-$t->get_ok("http://localhost:$port/fun/time", {'X-Test' => 'Hi there!'})
-  ->status_is(200)->header_is('X-Bender' => undef)
-  ->header_is(Server         => 'Mojolicious (Perl)')
+$url = $t->build_url;
+$url->path('/fun/time');
+$t->get_ok($url, {'X-Test' => 'Hi there!'})->status_is(200)
+  ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('Have fun!');
 

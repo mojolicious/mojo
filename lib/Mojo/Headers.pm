@@ -79,7 +79,7 @@ for my $name (@HEADERS) {
 
 sub accept_language { scalar shift->header('Accept-Language' => @_) }
 sub accept_ranges   { scalar shift->header('Accept-Ranges'   => @_) }
-sub authorization   { scalar shift->header('Authorization'   => @_) }
+sub authorization   { scalar shift->header(Authorization     => @_) }
 
 sub add {
   my $self = shift;
@@ -135,28 +135,17 @@ sub header {
   my $self = shift;
   my $name = shift;
 
-  # Set
+  # Replace
   if (@_) {
     $self->remove($name);
     return $self->add($name, @_);
   }
 
-  # Get
-  my $headers;
-  return unless $headers = $self->{_headers}->{lc $name};
+  # Headers
+  return unless my $headers = $self->{_headers}->{lc $name};
 
   # String
-  unless (wantarray) {
-
-    # Format
-    my $string = '';
-    for my $header (@$headers) {
-      $string .= ', ' if $string;
-      $string .= join ', ', @$header;
-    }
-
-    return $string;
-  }
+  return join ', ', map { join ', ', @$_ } @$headers unless wantarray;
 
   # Array
   return @$headers;

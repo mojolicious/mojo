@@ -381,10 +381,7 @@ following new ones.
 Build absolute L<Mojo::URL> object for test server.
 Note that this method is EXPERIMENTAL and might change without warning!
 
-  my $url = $t->build_url;
-  $url->userinfo('sri:secr3t');
-  $url->path('/protected');
-  $t->get_ok($url);
+  $t->get_ok($t->build_url->userinfo('sri:secr3t')->path('/protected'));
 
 =head2 C<content_is>
 

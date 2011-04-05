@@ -818,11 +818,9 @@ $t->get_ok('/regex/in/template')->status_is(200)
   ->content_is("test(test)(\\Qtest\\E)(\n");
 
 # GET /stream (with basic auth)
-my $url = $t->build_url;
-$url->userinfo('sri:foo');
-$url->path('/stream');
-$url->query(foo => 'bar');
-$t->get_ok($url)->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+$t->get_ok(
+  $t->build_url->userinfo('sri:foo')->path('/stream')->query(foo => 'bar'))
+  ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/^foobarsri\:foohttp:\/\/localhost\:\d+\/stream$/);
 

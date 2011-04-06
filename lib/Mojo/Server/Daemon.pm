@@ -319,6 +319,7 @@ sub _listen {
   $self->app->log->info("Server listening ($listen)");
 
   # Friendly message
+  $listen =~ s/^(https?\:\/\/)\*/${1}127.0.0.1/i;
   print "Server available at $listen.\n" unless $self->silent;
 }
 

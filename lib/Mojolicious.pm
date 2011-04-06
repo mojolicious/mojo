@@ -446,7 +446,7 @@ To run this example with the built in development server just put the code
 into a file and execute it with C<perl>.
 
   % perl example.pl daemon
-  Server available at http://*:3000.
+  Server available at http://127.0.0.1:3000.
 
 =head2 Growing
 

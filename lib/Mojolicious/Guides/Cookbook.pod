@@ -30,7 +30,7 @@ Perl works on.
 Another huge advantage is that it supports TLS and WebSockets out of the box.
 
   % ./script/myapp daemon --listen https://*:3000
-  Server available at https://*:3000.
+  Server available at https://127.0.0.1:3000.
 
 A development certificate for testing purposes is built right in, so it just
 works.
@@ -51,7 +51,7 @@ It is based on the normal builtin web server but optimized specifically for
 production environments out of the box.
 
   % hypnotoad script/myapp
-  Server available at http://*:8080.
+  Server available at http://127.0.0.1:8080.
 
 Config files are plain Perl scripts for maximal customizability.
 

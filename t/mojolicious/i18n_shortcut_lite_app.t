@@ -11,14 +11,20 @@ use Test::More tests => 24;
 package MyTestApp::I18N::en;
 use base 'MyTestApp::I18N';
 
+use strict;
+use warnings;
+
 our %Lexicon = (hello => 'Hello World');
 
 package MyTestApp::I18N::de;
 use base 'MyTestApp::I18N';
 
+use strict;
+use warnings;
+
 our %Lexicon = (hello => 'Hallo Welt');
 
-# "Aw, he looks like a little insane drunken angel."
+# "Planet Express - Our crew is replaceable, your package isn't."
 package main;
 use Mojolicious::Lite;
 
@@ -45,8 +51,6 @@ get '/nothing' => 'nothing';
 # GET /unknown
 get '/unknown' => 'unknown';
 
-# Hey, I don’t see you planning for your old age.
-# I got plans. I’m gonna turn my on/off switch to off.
 my $t = Test::Mojo->new;
 
 # German (detected)

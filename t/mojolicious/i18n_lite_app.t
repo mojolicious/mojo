@@ -11,6 +11,9 @@ use Test::More tests => 24;
 package MyTestApp::I18N::de;
 use base 'MyTestApp::I18N';
 
+use strict;
+use warnings;
+
 our %Lexicon = (hello => 'hallo');
 
 # "Aw, he looks like a little insane drunken angel."

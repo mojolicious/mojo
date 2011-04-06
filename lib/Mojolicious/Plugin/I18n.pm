@@ -21,7 +21,6 @@ sub register {
   # Initialize
   eval "package $namespace; use base 'Locale::Maketext'; 1;";
   eval "require ${namespace}::${default};";
-
   unless (eval "\%${namespace}::${default}::Lexicon") {
     eval "package ${namespace}::$default; use base '$namespace';"
       . 'our %Lexicon = (_AUTO => 1); 1;';
@@ -128,14 +127,15 @@ code by default.
 
   # $self->plugin('i18n');
   package MyApp::I18N;
-  use Mojo::Base 'Locale::Maketext';
+  use base 'Locale::Maketext';
   package MyApp::I18N::en;
-  use Mojo::Base 'MyApp::I18N';
+  use base 'MyApp::I18N';
   our %Lexicon = (_AUTO => 1);
   1;
 
 Namespace and default language of generated code are affected by their
 respective options.
+The default lexicon class will only be generated if it doesn't already exist.
 
 =head1 OPTIONS
 
@@ -145,9 +145,6 @@ respective options.
   plugin i18n => {default => 'en'};
 
 Default language, defaults to C<en>.
-You don't need to define lexicon for default language,
-if you are using default language as keys.
-But it can be useful to use short keys instead of full text as keys.
 
 =head2 C<namespace>
 

@@ -708,7 +708,7 @@ sub resolve {
 
       # Query (Internet)
       for my $part (@parts) {
-        $req .= pack 'C/a', $part if defined $part;
+        $req .= pack 'C/a*', $part if defined $part;
       }
       $req .= pack 'Cnn', 0, $t, 0x0001;
 

@@ -132,7 +132,8 @@ sub _reload {
   _unload($key);
 
   # Failed
-  return Mojo::Exception->new($@) unless eval { require $key; 1 };
+  return Mojo::Exception->new($@)
+    unless eval { package main; require $key; 1 };
 
   # Success
   return;

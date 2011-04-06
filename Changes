@@ -18,6 +18,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed small Mojo::DOM selector bug. (tempire)
         - Fixed small Mojo::DOM namespace detection bug. (akron)
         - Fixed small route pattern escaping bug.
+        - Fixed small reload bug.
 
 1.15 2011-03-18 00:00:00
         - Changed default log level in "production" mode from "error" to

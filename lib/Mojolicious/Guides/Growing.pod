@@ -336,7 +336,7 @@ Quick C<GET> requests can be performed right from the command line.
   % ./myapp.pl get /
   Wrong username or password!
 
-  % ./myapp.pl get -v /?user=sri&pass=secr3t
+  % ./myapp.pl get -v '/?user=sri&pass=secr3t'
   HTTP/1.1 200 OK
   Connection: Keep-Alive
   Date: Sun, 18 Jul 2010 13:09:58 GMT

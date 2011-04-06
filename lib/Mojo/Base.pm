@@ -181,13 +181,15 @@ Both forms save a lot of typing.
   # use Mojo::Base -base;
   use strict;
   use warnings;
-  use base 'Mojo::Base';
+  use Mojo::Base;
+  push @ISA, 'Mojo::Base';
   sub has { Mojo::Base::attr(__PACKAGE__, @_) }
 
   # use Mojo::Base 'SomeBaseClass';
   use strict;
   use warnings;
-  use base 'SomeBaseClass';
+  require SomeBaseClass;
+  push @ISA, 'SomeBaseClass';
   use Mojo::Base;
   sub has { Mojo::Base::attr(__PACKAGE__, @_) }
 

@@ -19,10 +19,14 @@ sub register {
   my $default = $conf->{default} || 'en';
 
   # Initialize
-  eval "package $namespace; use Mojo::Base 'Locale::Maketext'; 1;";
-  eval "package ${namespace}::$default; use Mojo::Base '$namespace';"
-    . 'our %Lexicon = (_AUTO => 1); 1;';
-  die qq/Couldn't initialize I18N class "$namespace": $@/ if $@;
+  eval "package $namespace; use base 'Locale::Maketext'; 1;";
+  eval "require ${namespace}::${default};";
+
+  unless (eval "\%${namespace}::${default}::Lexicon") {
+    eval "package ${namespace}::$default; use base '$namespace';"
+      . 'our %Lexicon = (_AUTO => 1); 1;';
+    die qq/Couldn't initialize I18N class "$namespace": $@/ if $@;
+  }
 
   # Start timer
   $app->hook(
@@ -141,6 +145,9 @@ respective options.
   plugin i18n => {default => 'en'};
 
 Default language, defaults to C<en>.
+You don't need to define lexicon for default language,
+if you are using default language as keys.
+But it can be useful to use short keys instead of full text as keys.
 
 =head2 C<namespace>
 

@@ -251,11 +251,11 @@ sub _build_frame {
   if ($self->masked) {
 
     # Debug
-    warn "MASKING\n" if DEBUG;
+    warn "MASKING FRAME\n" if DEBUG;
 
     # Mask
-    my $key = pack 'N', int(rand 9999999);
-    $frame = $key . _xor_mask($frame, $key);
+    my $mask = pack 'N', int(rand 9999999);
+    $frame = $mask . _xor_mask($frame, $mask);
   }
 
   return $frame;
@@ -279,31 +279,33 @@ sub _challenge {
 sub _parse_frame {
   my $self = shift;
 
-  # Debug
-  warn "PARSING FRAME\n" if DEBUG;
-
   # Buffer
   my $buffer = $self->{_read};
 
   # Masked
-  my $key;
+  my $mask;
   unless ($self->masked) {
-
-    # Debug
-    warn "UNMASKING\n" if DEBUG;
 
     # Mask
     return unless length $buffer > 6;
-    $key = substr $buffer, 0, 4, '';
+    $mask = substr $buffer, 0, 4, '';
+
+    # Debug
+    warn "PARSING MASKED FRAME\n" if DEBUG;
   }
 
   # Unmasked
-  else { return unless length $buffer > 2 }
+  else {
+    return unless length $buffer > 2;
+
+    # Debug
+    warn "PARSING UNMASKED FRAME\n" if DEBUG;
+  }
 
   # Head
   my $head = substr $buffer, 0, 2, '';
-  my $mask;
-  ($head, $mask) = _xor_mask($head, $key) if defined $key;
+  my $offset;
+  ($head, $offset) = _xor_mask($head, $mask) if defined $mask;
 
   # Debug
   warn 'HEAD: ' . unpack('B*', $head) . "\n" if DEBUG;
@@ -330,38 +332,36 @@ sub _parse_frame {
   if ($len == 0) { warn "NOTHING\n" if DEBUG }
 
   # Small payload
-  elsif ($len < 126) {
-
-    # Debug
-    warn "SMALL\n" if DEBUG;
-  }
+  elsif ($len < 126) { warn "SMALL\n" if DEBUG }
 
   # Extended payload (16bit)
   elsif ($len == 126) {
     return unless length $buffer > 2;
     $head = substr $buffer, 0, 2, '';
-    ($head, $mask) = _xor_mask($head, $key, $mask) if defined $key;
+    ($head, $offset) = _xor_mask($head, $mask, $offset)
+      if defined $mask;
     $len = unpack 'n', $head;
 
     # Debug
-    warn "EXTENDED (16): $len\n" if DEBUG;
+    warn "EXTENDED (16bit): $len\n" if DEBUG;
   }
 
   # Extended payload (64bit)
   elsif ($len == 127) {
     return unless length $buffer > 8;
-    $head = substr($buffer, 0, 8, '');
-    ($head, $mask) = _xor_mask($head, $key, $mask) if defined $key;
+    $head = substr $buffer, 0, 8, '';
+    ($head, $offset) = _xor_mask($head, $mask, $offset)
+      if defined $mask;
     $len = unpack 'N', substr($head, 4, 4);
 
     # Debug
-    warn "EXTENDED (64): $len\n" if DEBUG;
+    warn "EXTENDED (64bit): $len\n" if DEBUG;
   }
 
   # Payload
   return unless length $buffer >= $len;
   my $payload = $len ? substr($buffer, 0, $len, '') : '';
-  $payload = _xor_mask($payload, $key, $mask) if defined $key;
+  $payload = _xor_mask($payload, $mask, $offset) if defined $mask;
 
   # Debug
   warn "PAYLOAD: $payload\n" if DEBUG;
@@ -387,24 +387,21 @@ sub _send_frame {
 }
 
 sub _xor_mask {
-  my $input = shift;
+  my ($input, $mask, $offset) = @_;
 
-  # 512 byte key
-  my $key = shift() x 128;
+  # 512 byte mask
+  $mask = $mask x 128;
 
-  # Remaining key
-  if (defined(my $rest = shift)) {
-    my $len = length $rest;
-    substr $key, 512 - $len, $len, '';
-    $key = "$rest$key";
-  }
+  # Offset mask
+  $mask = substr($mask, $offset, 512 - $offset, '') . $mask if $offset;
 
   # Mask
   my $output = '';
-  $output .= $_ ^ $key while length($_ = substr($input, 0, 512, '')) == 512;
-  $output .= $_ ^ substr($key, 0, length, '');
+  $output .= $_ ^ $mask while length($_ = substr($input, 0, 512, '')) == 512;
+  $output .= $_ ^ substr($mask, 0, length, '');
 
-  return wantarray ? ($output, $key) : $output;
+  return
+    wantarray ? ($output, (length($output) + ($offset || 0)) % 512) : $output;
 }
 
 1;

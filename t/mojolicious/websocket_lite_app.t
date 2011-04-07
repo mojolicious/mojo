@@ -6,7 +6,7 @@ use warnings;
 # Disable IPv6, epoll and kqueue
 BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 32;
+use Test::More tests => 34;
 
 # "Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
 #  Well, that’s love for you."
@@ -398,3 +398,41 @@ $loop->start;
 
 # Server side "finished" callback
 is $flag, 24, 'finished callback';
+
+# WebSocket /echo (16bit length)
+$result = undef;
+$ua->websocket(
+  '/echo' => sub {
+    my $tx = pop;
+    $tx->on_finish(sub { $loop->stop });
+    $tx->on_message(
+      sub {
+        my ($tx, $message) = @_;
+        $result = $message;
+        $tx->finish;
+      }
+    );
+    $tx->send_message('hi!' x 100);
+  }
+);
+$loop->start;
+is $result, 'hi!' x 100, 'right result';
+
+# WebSocket /echo (64bit length)
+$result = undef;
+$ua->websocket(
+  '/echo' => sub {
+    my $tx = pop;
+    $tx->on_finish(sub { $loop->stop });
+    $tx->on_message(
+      sub {
+        my ($tx, $message) = @_;
+        $result = $message;
+        $tx->finish;
+      }
+    );
+    $tx->send_message('hi!' x 100000);
+  }
+);
+$loop->start;
+is $result, 'hi!' x 100000, 'right result';

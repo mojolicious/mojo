@@ -207,17 +207,6 @@ sub _build_frame {
   # Debug
   warn "BUILDING FRAME\n" if DEBUG;
 
-  # Mask payload
-  if ($self->masked) {
-
-    # Debug
-    warn "MASKING\n" if DEBUG;
-
-    # Mask
-    my $key = pack 'N', int(rand 9999999);
-    $payload = $key . _xor_mask($payload, $key);
-  }
-
   # Head
   my $frame = 0;
   vec($frame, 0, 8) = $op | 0b10000000;
@@ -258,6 +247,17 @@ sub _build_frame {
   # Payload
   $frame .= $payload;
 
+  # Mask frame
+  if ($self->masked) {
+
+    # Debug
+    warn "MASKING\n" if DEBUG;
+
+    # Mask
+    my $key = pack 'N', int(rand 9999999);
+    $frame = $key . _xor_mask($frame, $key);
+  }
+
   return $frame;
 }
 
@@ -279,18 +279,34 @@ sub _challenge {
 sub _parse_frame {
   my $self = shift;
 
+  # Debug
+  warn "PARSING FRAME\n" if DEBUG;
+
   # Buffer
   my $buffer = $self->{_read};
 
+  # Masked
+  my $key;
+  unless ($self->masked) {
+
+    # Debug
+    warn "UNMASKING\n" if DEBUG;
+
+    # Mask
+    return unless length $buffer > 6;
+    $key = substr $buffer, 0, 4, '';
+  }
+
+  # Unmasked
+  else { return unless length $buffer > 2 }
+
   # Head
-  return unless length $buffer > 2;
-  my $head = substr $buffer, 0, 2;
+  my $head = substr $buffer, 0, 2, '';
+  my $mask;
+  ($head, $mask) = _xor_mask($head, $key) if defined $key;
 
   # Debug
-  if (DEBUG) {
-    warn "PARSING FRAME\n";
-    warn 'HEAD: ' . unpack('B*', $head) . "\n";
-  }
+  warn 'HEAD: ' . unpack('B*', $head) . "\n" if DEBUG;
 
   # FIN
   my $fin = (vec($head, 0, 8) & 0b10000000) == 0b10000000 ? 1 : 0;
@@ -305,67 +321,47 @@ sub _parse_frame {
   warn "OPCODE: $op\n" if DEBUG;
 
   # Length
-  my $length = vec($head, 1, 8) & 0b01111111;
+  my $len = vec($head, 1, 8) & 0b01111111;
 
   # Debug
-  warn "LENGTH: $length\n" if DEBUG;
+  warn "LENGTH: $len\n" if DEBUG;
 
   # No payload
-  if ($length == 0) { warn "NOTHING\n" if DEBUG }
+  if ($len == 0) { warn "NOTHING\n" if DEBUG }
 
   # Small payload
-  elsif ($length < 126) {
+  elsif ($len < 126) {
 
     # Debug
     warn "SMALL\n" if DEBUG;
-
-    # Still receiving
-    return unless length $buffer >= $length + 2;
   }
 
   # Extended payload (16bit)
-  elsif ($length == 126) {
-    $length = unpack 'n', substr($buffer, 2, 2);
+  elsif ($len == 126) {
+    return unless length $buffer > 2;
+    $head = substr $buffer, 0, 2, '';
+    ($head, $mask) = _xor_mask($head, $key, $mask) if defined $key;
+    $len = unpack 'n', $head;
 
     # Debug
-    warn "EXTENDED (16): $length\n" if DEBUG;
-
-    # Still receiving
-    return unless length $buffer >= $length + 4;
-
-    # Chop off head
-    substr $buffer, 0, 2, '';
+    warn "EXTENDED (16): $len\n" if DEBUG;
   }
 
   # Extended payload (64bit)
-  elsif ($length == 127) {
-    $length = unpack 'N', substr($buffer, 5, 4);
-
-    warn "EXTENDED (64): $length\n" if DEBUG;
-
-    # Still receiving
-    return unless length $buffer >= $length + 10;
-
-    # Chop off head
-    substr $buffer, 0, 8, '';
-  }
-
-  # Chop off head
-  substr $buffer, 0, 2, '';
-
-  # Payload
-  my $payload = $length ? substr($buffer, 0, $length, '') : '';
-
-  # Unmask payload
-  unless ($self->masked) {
+  elsif ($len == 127) {
+    return unless length $buffer > 8;
+    $head = substr($buffer, 0, 8, '');
+    ($head, $mask) = _xor_mask($head, $key, $mask) if defined $key;
+    $len = unpack 'N', substr($head, 4, 4);
 
     # Debug
-    warn "UNMASKING\n" if DEBUG;
-
-    # Unmask
-    my $key = substr $payload, 0, 4, '';
-    $payload = _xor_mask($payload, $key);
+    warn "EXTENDED (64): $len\n" if DEBUG;
   }
+
+  # Payload
+  return unless length $buffer >= $len;
+  my $payload = $len ? substr($buffer, 0, $len, '') : '';
+  $payload = _xor_mask($payload, $key, $mask) if defined $key;
 
   # Debug
   warn "PAYLOAD: $payload\n" if DEBUG;
@@ -396,13 +392,19 @@ sub _xor_mask {
   # 512 byte key
   my $key = shift() x 128;
 
+  # Remaining key
+  if (defined(my $rest = shift)) {
+    my $len = length $rest;
+    substr $key, 512 - $len, $len, '';
+    $key = "$rest$key";
+  }
+
   # Mask
   my $output = '';
   $output .= $_ ^ $key while length($_ = substr($input, 0, 512, '')) == 512;
-  substr($key, length) = '';
-  $output .= $_ ^ $key;
+  $output .= $_ ^ substr($key, 0, length, '');
 
-  return $output;
+  return wantarray ? ($output, $key) : $output;
 }
 
 1;

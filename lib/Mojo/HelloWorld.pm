@@ -295,7 +295,7 @@ sub _websocket {
           alert(data);
         }
         function wsopen(event) {
-          ws.send("test 123");
+          ws.send("WebSocket support works!");
         }
         ws.onmessage = wsmessage;
         ws.onopen = wsopen;

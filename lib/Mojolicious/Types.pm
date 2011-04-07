@@ -23,6 +23,7 @@ has types => sub {
     svg  => 'image/svg+xml',
     tar  => 'application/x-tar',
     txt  => 'text/plain',
+    woff => 'application/x-woff',
     xml  => 'text/xml',
     zip  => 'application/zip'
   };

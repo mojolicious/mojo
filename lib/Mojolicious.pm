@@ -762,8 +762,10 @@ this hook run in reverse order.
 
 =item after_dispatch
 
-Triggered after the static and routes dispatchers are finished and a response
-has been rendered, the callbacks of this hook run in reverse order.
+Triggered after a response has been rendered, the callbacks of this hook run
+in reverse order.
+Note that this hook can trigger before C<after_static_dispatch> due to its
+dynamic nature.
 (Passed the current controller instance)
 
   $app->hook(after_dispatch => sub {

@@ -743,6 +743,7 @@ One use case would be upload progress bars.
 =item before_dispatch
 
 Triggered right before the static and routes dispatchers start their work.
+Very useful for rewriting incoming requests and other preprocessing tasks.
 (Passed the default controller instance)
 
   $app->hook(before_dispatch => sub {
@@ -754,6 +755,7 @@ Triggered right before the static and routes dispatchers start their work.
 Triggered after the static dispatcher determined if a static file should be
 served and before the routes dispatcher starts its work, the callbacks of
 this hook run in reverse order.
+Mostly used for custom dispatchers and postprocessing static file responses.
 (Passed the default controller instance)
 
   $app->hook(after_static_dispatch => sub {
@@ -766,6 +768,7 @@ Triggered after a response has been rendered, the callbacks of this hook run
 in reverse order.
 Note that this hook can trigger before C<after_static_dispatch> due to its
 dynamic nature.
+Useful for all kinds of postprocessing tasks.
 (Passed the current controller instance)
 
   $app->hook(after_dispatch => sub {

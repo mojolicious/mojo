@@ -264,8 +264,8 @@ sub _build_frame {
 sub _challenge {
   my ($self, $key) = @_;
 
-  # Shortcut
-  return unless $key && SHA1;
+  # No key or SHA1 support
+  return '' unless $key && SHA1;
 
   # Checksum
   my $challenge = sha1_bytes($key . GUID);

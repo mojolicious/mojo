@@ -97,7 +97,7 @@ auto detected.
 C<CGI> is supported out of the box and your L<Mojolicious> application will
 automatically detect that it is executed as a C<CGI> script.
 
-  ScriptAlias / /home/sri/myapp/script/myapp
+  ScriptAlias / /home/sri/myapp/script/myapp/
 
 =head2 Apache/FastCGI
 

@@ -104,8 +104,13 @@ my @PARAGRAPH_TAGS = (
   qw/address article aside blockquote dir div dl fieldset footer form h1 h2/,
   qw/h3 h4 h5 h6 header hgroup hr menu nav ol p pre section table or ul/
 );
-my $HTML_PARAGRAPH_RE = join '|', @PARAGRAPH_TAGS;
-$HTML_PARAGRAPH_RE = qr/^(?:$HTML_PARAGRAPH_RE)$/;
+my %HTML_PARAGRAPH;
+$HTML_PARAGRAPH{$_}++ for @PARAGRAPH_TAGS;
+
+# HTML table tags
+my @TABLE_TAGS = qw/col colgroup tbody td th thead tr/;
+my %HTML_TABLE;
+$HTML_TABLE{$_}++ for @TABLE_TAGS;
 
 sub add_after  { shift->_add(1, @_) }
 sub add_before { shift->_add(0, @_) }
@@ -455,10 +460,10 @@ sub _cdata {
 }
 
 sub _close {
-  my ($self, $current, $pattern, $stop) = @_;
+  my ($self, $current, $tags, $stop) = @_;
 
-  # Default to table pattern
-  $pattern ||= qr/^(col|colgroup|tbody|td|th|thead|tr)$/;
+  # Default to table tags
+  $tags ||= \%HTML_TABLE;
 
   # Default to table tag
   $stop ||= 'table';
@@ -469,7 +474,7 @@ sub _close {
     last if $parent->[0] eq 'root' || $parent->[1] eq $stop;
 
     # Match
-    ($parent->[1] =~ $pattern) and $self->_end($1, $current);
+    $tags->{$parent->[1]} and $self->_end($parent->[1], $current);
 
     # Next
     $parent = $parent->[3];
@@ -1186,10 +1191,10 @@ sub _start {
     my $t = $$current->[1];
 
     # "<li>"
-    if ($start eq 'li') { $self->_close($current, qr/^(li)$/, 'ul') }
+    if ($start eq 'li') { $self->_close($current, {li => 1}, 'ul') }
 
     # "<p>"
-    elsif ($t eq 'p' && $start =~ $HTML_PARAGRAPH_RE) {
+    elsif ($t eq 'p' && $HTML_PARAGRAPH{$start}) {
       $self->_end('p', $current);
     }
 

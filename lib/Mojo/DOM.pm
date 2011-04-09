@@ -6,6 +6,9 @@ use overload '""' => sub { shift->to_xml }, fallback => 1;
 use Mojo::Util qw/decode encode html_unescape xml_escape/;
 use Scalar::Util 'weaken';
 
+# Debug
+use constant DEBUG => $ENV{MOJO_DOM_DEBUG} || 0;
+
 # "How are the kids supposed to get home?
 #  I dunno. Internet?"
 has 'charset';
@@ -557,11 +560,32 @@ sub _doctype {
 sub _end {
   my ($self, $end, $current) = @_;
 
+  # Debug
+  warn "END $end\n" if DEBUG;
+
   # Root
   return if $$current->[0] eq 'root';
 
+  # Search stack for start tag
+  my $found = 0;
+  my $next  = $$current;
+  while ($next) {
+
+    # Root
+    last if $next->[0] eq 'root';
+
+    # Found
+    ++$found and last if $next->[1] eq $end;
+
+    # Next
+    $next = $next->[3];
+  }
+
+  # Ignore useless end tag
+  return unless $found;
+
   # Walk backwards
-  my $next = $$current;
+  $next = $$current;
   while ($$current = $next) {
 
     # Root
@@ -1151,6 +1175,9 @@ sub _render {
 #  or who got exposed to tainted what..."
 sub _start {
   my ($self, $start, $attrs, $current) = @_;
+
+  # Debug
+  warn "START $start\n" if DEBUG;
 
   # Autoclose optional HTML tags
   if ($$current->[0] ne 'root') {

@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 459;
+use Test::More tests => 461;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -1367,3 +1367,18 @@ is $dom->tree->[1]->[1], ' TESTSUITE PUBLIC "my.dtd" \'mhhh\' [
   <!NOTATION hmmm SYSTEM "hmmm">
 ]   ', 'right doctype';
 is $dom->at('foo')->attrs('bar'), 'false', 'right attribute';
+
+# Useless end tags
+$dom->parse(<<EOF);
+<html>
+  <head><title>Test</title></head>
+  <body>
+    <table>
+      <tr><td><font>test</td></font></tr>
+      </tr>
+    </table>
+  </body>
+</html>
+EOF
+is $dom->at('html > head > title')->text,           'Test', 'right content';
+is $dom->at('html > body > table > tr > td')->text, 'test', 'right content';

@@ -1145,7 +1145,7 @@ sub _render {
       my $value = $tree->[2]->{$key};
 
       # No value
-      push @attrs, $key and next unless $value;
+      push @attrs, $key and next unless defined $value;
 
       # Escape
       xml_escape $value;

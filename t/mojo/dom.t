@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 461;
+use Test::More tests => 463;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -20,7 +20,7 @@ my $dom = Mojo::DOM->new;
 is x('<div>Hello ♥!</div>')->at('div')->text, 'Hello ♥!', 'right text';
 
 # Simple (basics)
-$dom->parse('<div><div id="a">A</div><div id="b">B</div></div>');
+$dom->parse('<div><div foo="0" id="a">A</div><div id="b">B</div></div>');
 is $dom->at('#b')->text, 'B', 'right text';
 my @div;
 $dom->find('div[id]')->each(sub { push @div, shift->text });
@@ -40,6 +40,9 @@ is_deeply \@div, [qw/A/], 'found first div elements with id';
 @div = ();
 $dom->find('div[id]')->while(sub { pop() < 2 && push @div, $_->text });
 is_deeply \@div, [qw/A/], 'found first div elements with id';
+is $dom->at('#a')->attrs('foo'), 0, 'right attribute';
+is "$dom", '<div><div foo="0" id="a">A</div><div id="b">B</div></div>',
+  'right result';
 
 # Simple nesting (tree structure)
 $dom->parse(<<EOF);

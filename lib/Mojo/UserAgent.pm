@@ -1237,13 +1237,13 @@ following new ones.
   my $tx = $ua->build_form_tx(
     'http://kraih.com/foo',
     {test => 123},
-    {Connection => 'close'}
+    {Accept => '*/*'}
   );
   my $tx = $ua->build_form_tx(
     'http://kraih.com/foo',
     'UTF-8',
     {test => 123},
-    {Connection => 'close'}
+    {Accept => '*/*'}
   );
   my $tx = $ua->build_form_tx(
     'http://kraih.com/foo',
@@ -1268,11 +1268,9 @@ Versatile L<Mojo::Transaction::HTTP> builder for forms.
 
   my $tx = $ua->build_tx(GET => 'mojolicio.us');
   my $tx = $ua->build_tx(POST => 'http://mojolicio.us');
+  my $tx = $ua->build_tx(GET => 'http://kraih.com' => {Accept => '*/*'});
   my $tx = $ua->build_tx(
-    GET => 'http://kraih.com' => {Connection => 'close'}
-  );
-  my $tx = $ua->build_tx(
-    POST => 'http://kraih.com' => {Connection => 'close'} => 'Hi!'
+    POST => 'http://kraih.com' => {{Accept => '*/*'} => 'Hi!'
   );
 
 Versatile general purpose L<Mojo::Transaction::HTTP> builder.
@@ -1298,10 +1296,8 @@ a successful handshake is performed.
 =head2 C<delete>
 
   my $tx = $ua->delete('http://kraih.com');
-  my $tx = $ua->delete('http://kraih.com' => {Connection => 'close'});
-  my $tx = $ua->delete(
-    'http://kraih.com' => {Connection => 'close'} => 'Hi!'
-  );
+  my $tx = $ua->delete('http://kraih.com' => {Accept => '*/*'};
+  my $tx = $ua->delete('http://kraih.com' => {Accept => '*/*'} => 'Hi!');
 
 Perform blocking HTTP C<DELETE> request.
 You can also append a callback to perform requests non-blocking.
@@ -1322,10 +1318,8 @@ C<https_proxy>, C<NO_PROXY> and C<no_proxy> for proxy information.
 =head2 C<get>
 
   my $tx = $ua->get('http://kraih.com');
-  my $tx = $ua->get('http://kraih.com' => {Connection => 'close'});
-  my $tx = $ua->get(
-    'http://kraih.com' => {Connection => 'close'} => 'Hi!'
-  );
+  my $tx = $ua->get('http://kraih.com' => {Accept => '*/*'});
+  my $tx = $ua->get('http://kraih.com' => {Accept => '*/*'} => 'Hi!');
 
 Perform blocking HTTP C<GET> request.
 You can also append a callback to perform requests non-blocking.
@@ -1339,10 +1333,8 @@ You can also append a callback to perform requests non-blocking.
 =head2 C<head>
 
   my $tx = $ua->head('http://kraih.com');
-  my $tx = $ua->head('http://kraih.com' => {Connection => 'close'});
-  my $tx = $ua->head(
-    'http://kraih.com' => {Connection => 'close'} => 'Hi!'
-  );
+  my $tx = $ua->head('http://kraih.com' => {Accept => '*/*'});
+  my $tx = $ua->head('http://kraih.com' => {Accept => '*/*'} => 'Hi!');
 
 Perform blocking HTTP C<HEAD> request.
 You can also append a callback to perform requests non-blocking.
@@ -1363,10 +1355,8 @@ Note that this method is EXPERIMENTAL and might change without warning!
 =head2 C<post>
 
   my $tx = $ua->post('http://kraih.com');
-  my $tx = $ua->post('http://kraih.com' => {Connection => 'close'});
-  my $tx = $ua->post(
-    'http://kraih.com' => {Connection => 'close'} => 'Hi!'
-  );
+  my $tx = $ua->post('http://kraih.com' => {Accept => '*/*'});
+  my $tx = $ua->post('http://kraih.com' => {Accept => '*/*'} => 'Hi!');
 
 Perform blocking HTTP C<POST> request.
 You can also append a callback to perform requests non-blocking.
@@ -1388,13 +1378,13 @@ You can also append a callback to perform requests non-blocking.
   my $tx  = $ua->post_form(
     'http://kraih.com/foo',
     {test => 123},
-    {Connection => 'close'}
+    {Accept => '*/*'}
   );
   my $tx  = $ua->post_form(
     'http://kraih.com/foo',
     'UTF-8',
     {test => 123},
-    {Connection => 'close'}
+    {Accept => '*/*'}
   );
   my $tx = $ua->post_form(
     'http://kraih.com/foo',
@@ -1421,10 +1411,8 @@ You can also append a callback to perform requests non-blocking.
 =head2 C<put>
 
   my $tx = $ua->put('http://kraih.com');
-  my $tx = $ua->put('http://kraih.com' => {Connection => 'close'});
-  my $tx = $ua->put(
-    'http://kraih.com' => {Connection => 'close'} => 'Hi!'
-  );
+  my $tx = $ua->put('http://kraih.com' => {Accept => '*/*'});
+  my $tx = $ua->put('http://kraih.com' => {Accept => '*/*'} => 'Hi!');
 
 Perform blocking HTTP C<PUT> request.
 You can also append a callback to perform requests non-blocking.

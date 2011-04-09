@@ -413,9 +413,9 @@ Check response C<Content-Type> header for similar match.
 =head2 C<delete_ok>
 
   $t = $t->delete_ok('/foo');
-  $t = $t->delete_ok('/foo', {Connection => 'close'});
+  $t = $t->delete_ok('/foo', {Accept => '*/*'});
   $t = $t->delete_ok('/foo', 'Hi!');
-  $t = $t->delete_ok('/foo', {Connection => 'close'}, 'Hi!');
+  $t = $t->delete_ok('/foo', {Accept => '*/*'}, 'Hi!');
 
 Perform a C<DELETE> request and check for success.
 
@@ -430,18 +430,18 @@ with L<Mojo::DOM>.
 =head2 C<get_ok>
 
   $t = $t->get_ok('/foo');
-  $t = $t->get_ok('/foo', {Connection => 'close'});
+  $t = $t->get_ok('/foo', {Accept => '*/*'});
   $t = $t->get_ok('/foo', 'Hi!');
-  $t = $t->get_ok('/foo', {Connection => 'close'}, 'Hi!');
+  $t = $t->get_ok('/foo', {Accept => '*/*'}, 'Hi!');
 
 Perform a C<GET> request and check for success.
 
 =head2 C<head_ok>
 
   $t = $t->head_ok('/foo');
-  $t = $t->head_ok('/foo', {Connection => 'close'});
+  $t = $t->head_ok('/foo', {Accept => '*/*'});
   $t = $t->head_ok('/foo', 'Hi!');
-  $t = $t->head_ok('/foo', {Connection => 'close'}, 'Hi!');
+  $t = $t->head_ok('/foo', {Accept => '*/*'}, 'Hi!');
 
 Perform a C<HEAD> request and check for success.
 
@@ -469,9 +469,9 @@ Check response content for JSON data.
 =head2 C<post_ok>
 
   $t = $t->post_ok('/foo');
-  $t = $t->post_ok('/foo', {Connection => 'close'});
+  $t = $t->post_ok('/foo', {Accept => '*/*'});
   $t = $t->post_ok('/foo', 'Hi!');
-  $t = $t->post_ok('/foo', {Connection => 'close'}, 'Hi!');
+  $t = $t->post_ok('/foo', {Accept => '*/*'}, 'Hi!');
   $t = $t->post_ok('/foo', 'Hi!', 'request worked!');
 
 Perform a C<POST> request and check for success.
@@ -480,25 +480,16 @@ Perform a C<POST> request and check for success.
 
   $t = $t->post_form_ok('/foo' => {test => 123});
   $t = $t->post_form_ok('/foo' => 'UTF-8' => {test => 123});
-  $t = $t->post_form_ok('/foo', {test => 123}, {Connection => 'close'});
-  $t = $t->post_form_ok(
-    '/foo', 'UTF-8',
-    {test => 123},
-    {Connection => 'close'}
-  );
+  $t = $t->post_form_ok('/foo', {test => 123}, {Accept => '*/*'});
+  $t = $t->post_form_ok('/foo', 'UTF-8', {test => 123}, {Accept => '*/*'});
   $t = $t->post_form_ok('/foo', {test => 123}, 'Hi!');
   $t = $t->post_form_ok('/foo', 'UTF-8', {test => 123}, 'Hi!');
-  $t = $t->post_form_ok(
-    '/foo',
-    {test   => 123},
-    {Connection => 'close'},
-    'Hi!'
-  );
+  $t = $t->post_form_ok('/foo', {test => 123}, {Accept => '*/*'}, 'Hi!');
   $t = $t->post_form_ok(
     '/foo',
     'UTF-8',
     {test   => 123},
-    {Connection => 'close'},
+    {Accept => '*/*'},
     'Hi!'
   );
 
@@ -507,9 +498,9 @@ Submit a C<POST> form and check for success.
 =head2 C<put_ok>
 
   $t = $t->put_ok('/foo');
-  $t = $t->put_ok('/foo', {Connection => 'close'});
+  $t = $t->put_ok('/foo', {Accept => '*/*'});
   $t = $t->put_ok('/foo', 'Hi!');
-  $t = $t->put_ok('/foo', {Connection => 'close'}, 'Hi!');
+  $t = $t->put_ok('/foo', {Accept => '*/*'}, 'Hi!');
 
 Perform a C<PUT> request and check for success.
 

@@ -96,8 +96,8 @@ my $XML_TOKEN_RE = qr/
 # Optional HTML tags
 my @OPTIONAL_TAGS =
   qw/body colgroup dd head li optgroup option p rt rp tbody td tfoot th/;
-my $HTML_AUTOCLOSE_RE = join '|', @OPTIONAL_TAGS;
-$HTML_AUTOCLOSE_RE = qr/^(?:$HTML_AUTOCLOSE_RE)$/;
+my %HTML_OPTIONAL;
+$HTML_OPTIONAL{$_}++ for @OPTIONAL_TAGS;
 
 # Tags that break HTML paragraphs
 my @PARAGRAPH_TAGS = (
@@ -606,7 +606,7 @@ sub _end {
     else {
 
       # Optional tags
-      if ($$current->[1] =~ $HTML_AUTOCLOSE_RE) {
+      if ($HTML_OPTIONAL{$$current->[1]}) {
         $self->_end($$current->[1], $current);
         next;
       }

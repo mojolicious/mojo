@@ -18,11 +18,11 @@ has tree => sub { ['root'] };
 my $CSS_ESCAPE_RE = qr/\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}/;
 my $CSS_ATTR_RE   = qr/
   \[
-  ((?:$CSS_ESCAPE_RE|\w)+)      # Key
+  ((?:$CSS_ESCAPE_RE|\w)+)        # Key
   (?:
-  (\W)?                         # Operator
-  =
-  (?:"((?:\\"|[^"])+)"|(\S+))   # Value
+    (\W)?                         # Operator
+    =
+    (?:"((?:\\"|[^"])+)"|(\S+))   # Value
   )?
   \]
 /x;
@@ -36,18 +36,13 @@ my $CSS_CLASS_ID_RE = qr/
 my $CSS_ELEMENT_RE      = qr/^((?:\\\.|\\\#|[^\.\#])+)/;
 my $CSS_PSEUDO_CLASS_RE = qr/(?:\:([\w\-]+)(?:\(((?:\([^\)]+\)|[^\)])+)\))?)/;
 my $CSS_TOKEN_RE        = qr/
-  (\s*,\s*)?                                        # Separator
-  ((?:[^\[\\\:\s\,]|$CSS_ESCAPE_RE\s?)+)?           # Element
-  ((?:\:[\w\-]+(?:\((?:\([^\)]+\)|[^\)])+\))?)*)?   # Pseudoclass
-  ((?:\[
-    (?:$CSS_ESCAPE_RE|\w)+                          # Key
-    (?:\W?=                                         # Operator
-      (?:"(?:\\"|[^"])+"|\S+)                       # Value
-    )?
-  \])*)?
+  (\s*,\s*)?                                # Separator
+  ((?:[^\[\\\:\s\,]|$CSS_ESCAPE_RE\s?)+)?   # Element
+  ($CSS_PSEUDO_CLASS_RE*)?                  # Pseudoclass
+  ((?:$CSS_ATTR_RE)*)?                      # Attributes
   (?:
   \s*
-  ([\>\+\~])                                        # Combinator
+  ([\>\+\~])                                # Combinator
   )?
 /x;
 my $XML_ATTR_RE = qr/
@@ -922,8 +917,8 @@ sub _parse_css {
     my $separator  = $1;
     my $element    = $2;
     my $pc         = $3;
-    my $attributes = $4;
-    my $combinator = $5;
+    my $attributes = $6;
+    my $combinator = $11;
 
     # Trash
     next

@@ -9,6 +9,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Updated WebSocket implementation to ietf-06. (sri, crab)
         - Updated jQuery to version 1.5.2.
         - Improved documentation.
+        - Improved HTML healing capabilities of Mojo::DOM.
         - Improved Mojo::DOM to ignore useless end tags.
         - Improved Mojo::DOM inline DTD support. (akron)
         - Improved Mojolicious::Plugin::I18n default lexicon handling. (yko)

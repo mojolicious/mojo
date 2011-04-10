@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 463;
+use Test::More tests => 466;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -44,7 +44,7 @@ is $dom->at('#a')->attrs('foo'), 0, 'right attribute';
 is "$dom", '<div><div foo="0" id="a">A</div><div id="b">B</div></div>',
   'right result';
 
-# Simple nesting (tree structure)
+# Simple nesting with healing (tree structure)
 $dom->parse(<<EOF);
 <foo><bar a="b&lt;c">ju<baz a23>s<bazz />t</bar>works</foo>
 EOF
@@ -63,18 +63,19 @@ is $dom->tree->[1]->[4]->[5]->[0], 'tag',  'right element';
 is $dom->tree->[1]->[4]->[5]->[1], 'baz',  'right tag';
 is_deeply $dom->tree->[1]->[4]->[5]->[2], {a23 => undef}, 'right attributes';
 is $dom->tree->[1]->[4]->[5]->[3], $dom->tree->[1]->[4], 'right parent';
-is $dom->tree->[1]->[4]->[6]->[0], 'text', 'right element';
-is $dom->tree->[1]->[4]->[6]->[1], 's',    'right text';
-is $dom->tree->[1]->[4]->[7]->[0], 'tag',  'right element';
-is $dom->tree->[1]->[4]->[7]->[1], 'bazz', 'right tag';
-is_deeply $dom->tree->[1]->[4]->[7]->[2], {}, 'empty attributes';
-is $dom->tree->[1]->[4]->[7]->[3], $dom->tree->[1]->[4], 'right parent';
-is $dom->tree->[1]->[4]->[8]->[0], 'text', 'right element';
-is $dom->tree->[1]->[4]->[8]->[1], 't',    'right text';
+is $dom->tree->[1]->[4]->[5]->[4]->[0], 'text', 'right element';
+is $dom->tree->[1]->[4]->[5]->[4]->[1], 's',    'right text';
+is $dom->tree->[1]->[4]->[5]->[5]->[0], 'tag',  'right element';
+is $dom->tree->[1]->[4]->[5]->[5]->[1], 'bazz', 'right tag';
+is_deeply $dom->tree->[1]->[4]->[5]->[5]->[2], {}, 'empty attributes';
+is $dom->tree->[1]->[4]->[5]->[5]->[3], $dom->tree->[1]->[4]->[5],
+  'right parent';
+is $dom->tree->[1]->[4]->[5]->[6]->[0], 'text', 'right element';
+is $dom->tree->[1]->[4]->[5]->[6]->[1], 't',    'right text';
 is $dom->tree->[1]->[5]->[0], 'text',  'right element';
 is $dom->tree->[1]->[5]->[1], 'works', 'right text';
 is "$dom", <<EOF, 'stringified right';
-<foo><bar a="b&lt;c">ju<baz a23 />s<bazz />t</bar>works</foo>
+<foo><bar a="b&lt;c">ju<baz a23>s<bazz />t</baz></bar>works</foo>
 EOF
 
 # A bit of everything (basic navigation)
@@ -106,10 +107,10 @@ is "$dom", <<EOF, 'stringified right';
   works well
   <![CDATA[ yada yada]]>
   <?boom lalalala ?>
-  <a bit broken little />
+  <a bit broken little>
   <very <br broken />
   more text
-</foo>
+</a></foo>
 EOF
 my $simple = $dom->at('foo simple.working[class^="wor"]');
 like $simple->parent->all_text,
@@ -986,6 +987,7 @@ is $dom->find('div > p')->[3]->text, 'D',      'right text';
 is $dom->find('div > p')->[4]->text, 'E',      'right text';
 is $dom->find('div > p')->[5]->text, "FG\n  ", 'right text';
 is $dom->find('div > p')->[6]->text, "H\n",    'right text';
+is $dom->find('div > p > p')->[0], undef, 'no results';
 is $dom->at('div > p > img')->attrs->{src}, 'foo.png', 'right attribute';
 is $dom->at('div > div')->text, 'X', 'right text';
 
@@ -1371,7 +1373,7 @@ is $dom->tree->[1]->[1], ' TESTSUITE PUBLIC "my.dtd" \'mhhh\' [
 ]   ', 'right doctype';
 is $dom->at('foo')->attrs('bar'), 'false', 'right attribute';
 
-# Useless end tags
+# Broken "font" block and useless end tags
 $dom->parse(<<EOF);
 <html>
   <head><title>Test</title></head>
@@ -1383,5 +1385,23 @@ $dom->parse(<<EOF);
   </body>
 </html>
 EOF
-is $dom->at('html > head > title')->text,           'Test', 'right content';
-is $dom->at('html > body > table > tr > td')->text, 'test', 'right content';
+is $dom->at('html > head > title')->text, 'Test', 'right content';
+is $dom->at('html > body > table > tr > td > font')->text, 'test',
+  'right content';
+
+# Different broken "font" block and useless end tags
+$dom->parse(<<EOF);
+<html>
+  <head><title>Test</title></head>
+  <body>
+    <font>
+    <table>
+      <tr><td>test</td></font></tr>
+      </tr>
+    </table>
+  </body>
+</html>
+EOF
+is $dom->at('html > head > title')->text, 'Test', 'right content';
+is $dom->at('html > body > font > table > tr > td')->text, 'test',
+  'right content';

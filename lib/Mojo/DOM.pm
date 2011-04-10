@@ -107,6 +107,24 @@ my @TABLE_TAGS = qw/col colgroup tbody td th thead tr/;
 my %HTML_TABLE;
 $HTML_TABLE{$_}++ for @TABLE_TAGS;
 
+# HTML5 void tags
+my @VOID_TAGS = (
+  qw/area base br col command embed hr img input keygen link meta param/,
+  qw/source track wbr/
+);
+my %HTML_VOID;
+$HTML_VOID{$_}++ for @VOID_TAGS;
+
+# HTML5 block tags + "<head>" + "<html>"
+my @BLOCK_TAGS = (
+  qw/article aside blockquote body br button canvas caption col colgroup dd/,
+  qw/div dl dt embed fieldset figcaption figure footer form h1 h2 h3 h4 h5/,
+  qw/h6 head header hgroup hr html li map object ol output p pre progress/,
+  qw/section table tbody textarea tfooter th thead tr ul video/
+);
+my %HTML_BLOCK;
+$HTML_BLOCK{$_}++ for @BLOCK_TAGS;
+
 sub add_after  { shift->_add(1, @_) }
 sub add_before { shift->_add(0, @_) }
 
@@ -577,6 +595,9 @@ sub _end {
     # Found
     ++$found and last if $next->[1] eq $end;
 
+    # Inline tags stop here
+    return if $HTML_BLOCK{$next->[1]} && !$HTML_BLOCK{$end};
+
     # Next
     $next = $next->[3];
   }
@@ -597,33 +618,38 @@ sub _end {
     # Match
     if ($end eq $$current->[1]) { return $$current = $$current->[3] }
 
-    # Autoclose optional HTML tags
+    # Optional tags
+    elsif ($HTML_OPTIONAL{$$current->[1]}) {
+      $self->_end($$current->[1], $current);
+      next;
+    }
+
+    # Table
+    elsif ($end eq 'table') {
+      $self->_close($current);
+      next;
+    }
+
+    # Missing end tag
+    unless ($HTML_VOID{$$current->[1]}) {
+      $self->_end($$current->[1], $current);
+    }
+
+    # Void tag
     else {
 
-      # Optional tags
-      if ($HTML_OPTIONAL{$$current->[1]}) {
-        $self->_end($$current->[1], $current);
-        next;
+      # Children to move to parent
+      my @buffer = splice @$$current, 4;
+
+      # Update parent reference
+      for my $e (@buffer) {
+        $e->[3] = $next if $e->[0] eq 'tag';
+        weaken $e->[3];
       }
 
-      # Table
-      elsif ($end eq 'table') {
-        $self->_close($current);
-        next;
-      }
+      # Move children
+      push @$next, @buffer;
     }
-
-    # Children to move to parent
-    my @buffer = splice @$$current, 4;
-
-    # Update parent reference
-    for my $e (@buffer) {
-      $e->[3] = $next if $e->[0] eq 'tag';
-      weaken $e->[3];
-    }
-
-    # Move children
-    push @$next, @buffer;
   }
 }
 
@@ -1182,27 +1208,20 @@ sub _start {
   # Autoclose optional HTML tags
   if ($$current->[0] ne 'root') {
 
-    # Tag
-    my $t = $$current->[1];
-
     # "<li>"
     if ($start eq 'li') { $self->_close($current, {li => 1}, 'ul') }
 
     # "<p>"
-    elsif ($t eq 'p' && $HTML_PARAGRAPH{$start}) {
-      $self->_end('p', $current);
-    }
+    elsif ($HTML_PARAGRAPH{$start}) { $self->_end('p', $current) }
 
     # "<head>"
-    elsif ($t eq 'head' && $start eq 'body') { $self->_end('head', $current) }
+    elsif ($start eq 'body') { $self->_end('head', $current) }
 
     # "<optgroup>"
-    elsif ($t eq 'optgroup' && $start eq 'optgroup') {
-      $self->_end('optgroup', $current);
-    }
+    elsif ($start eq 'optgroup') { $self->_end('optgroup', $current) }
 
     # "<option>"
-    elsif ($t eq 'option' && ($start eq 'option' || $start eq 'optgroup')) {
+    elsif ($start eq 'option' || $start eq 'optgroup') {
       $self->_end('option', $current);
       $self->_end('optgroup', $current) if $start eq 'optgroup';
     }
@@ -1220,23 +1239,24 @@ sub _start {
     elsif ($start eq 'tfoot') { $self->_close($current) }
 
     # "<tr>"
-    elsif (($t eq 'tr' || $t eq 'td') && $start eq 'tr') {
-      $self->_end('tr', $current);
-    }
+    elsif ($start eq 'tr') { $self->_end('tr', $current) }
 
     # "<th>" and "<td>"
-    elsif (($t eq 'th' || $t eq 'td') && ($start eq 'th' || $start eq 'td')) {
-      $self->_end($t, $current);
+    elsif ($start eq 'th' || $start eq 'td') {
+      $self->_end('th', $current);
+      $self->_end('td', $current);
     }
 
     # "<dt>" and "<dd>"
-    elsif (($t eq 'dt' || $t eq 'dd') && ($start eq 'dt' || $start eq 'dd')) {
-      $self->_end($t, $current);
+    elsif ($start eq 'dt' || $start eq 'dd') {
+      $self->_end('dt', $current);
+      $self->_end('dd', $current);
     }
 
     # "<rt>" and "<rp>"
-    elsif (($t eq 'rt' || $t eq 'rp') && ($start eq 'rt' || $start eq 'rp')) {
-      $self->_end($t, $current);
+    elsif ($start eq 'rt' || $start eq 'rp') {
+      $self->_end('rt', $current);
+      $self->_end('rp', $current);
     }
   }
 

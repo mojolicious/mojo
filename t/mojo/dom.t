@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 469;
+use Test::More tests => 472;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -1406,6 +1406,25 @@ is $dom->at('html > head > title')->text, 'Test', 'right content';
 is $dom->find('html > body > font > table > tr > td')->[0]->text, 'test1',
   'right content';
 is $dom->find('html > body > font > table > tr > td')->[1]->text, 'test2',
+  'right content';
+
+# Broken "font" and "div" blocks
+$dom->parse(<<EOF);
+<html>
+  <head><title>Test</title></head>
+  <body>
+    <font>
+    <div>
+      test1<br>
+      <div>test2<br></font>
+    </div>
+  </body>
+</html>
+EOF
+is $dom->at('html > head > title')->text, 'Test', 'right content';
+is $dom->find('html > body > font > div')->[0]->text, "\n      test1",
+  'right content';
+is $dom->find('html > body > font > div > div')->[0]->text, 'test2',
   'right content';
 
 # Broken "div" blocks

@@ -88,7 +88,7 @@ EOF
 is $dom->find('body > div')->[0]->text, 'test1', 'right content';
 is $dom->find('body > div')->[1]->text, '',      'no content';
 is $dom->find('body > div')->[2], undef, 'no result';
-is $dom->find('body > div > div')->[0]->text, 'test2', 'no content';
+is $dom->find('body > div > div')->[0]->text, 'test2', 'right content';
 is $dom->find('body > div > div')->[1], undef, 'no result';
 
 # A bit of everything (basic navigation)
@@ -592,7 +592,7 @@ EOF
 is($dom->find(':root')->[0]->type,             'form',   'right type');
 is($dom->find('*:root')->[0]->type,            'form',   'right type');
 is($dom->find('form:root')->[0]->type,         'form',   'right type');
-is($dom->find(':root')->[1],                   undef,    'no element');
+is($dom->find(':root')->[1],                   undef,    'no result');
 is($dom->find(':checked')->[0]->attrs->{name}, 'groovy', 'right name');
 is($dom->find('option:checked')->[0]->attrs->{value},    'e', 'right value');
 is($dom->find(':checked')->[1]->text,                    'E', 'right text');
@@ -606,7 +606,7 @@ is($dom->at('select :checked[value="e"]')->text,         'E', 'right text');
 is($dom->at('optgroup > :checked[value="e"]')->text,     'E', 'right text');
 is($dom->at('select *:checked[value="e"]')->text,        'E', 'right text');
 is($dom->at('optgroup > *:checked[value="e"]')->text,    'E', 'right text');
-is($dom->find(':checked[value="e"]')->[1],        undef,    'no element');
+is($dom->find(':checked[value="e"]')->[1],        undef,    'no result');
 is($dom->find(':empty')->[0]->attrs->{name},      'user',   'right name');
 is($dom->find('input:empty')->[0]->attrs->{name}, 'user',   'right name');
 is($dom->at(':empty[type^="ch"]')->attrs->{name}, 'groovy', 'right name');

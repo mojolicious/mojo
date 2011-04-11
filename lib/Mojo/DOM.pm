@@ -595,11 +595,8 @@ sub _end {
     # Found
     ++$found and last if $next->[1] eq $end;
 
-    # Inline tags stop here
-    return
-      if $HTML_BLOCK{$next->[1]}
-        && !$HTML_VOID{$next->[1]}
-        && !$HTML_BLOCK{$end};
+    # HTML inline tags stop here
+    return if !$self->{_xml} && $HTML_BLOCK{$next->[1]} && !$HTML_BLOCK{$end};
 
     # Next
     $next = $next->[3];
@@ -630,25 +627,7 @@ sub _end {
     elsif ($end eq 'table') { $self->_close($current) }
 
     # Missing end tag
-    unless ($HTML_VOID{$$current->[1]}) {
-      $self->_end($$current->[1], $current);
-    }
-
-    # Void tag
-    else {
-
-      # Children to move to parent
-      my @buffer = splice @$$current, 4;
-
-      # Update parent reference
-      for my $e (@buffer) {
-        $e->[3] = $next if $e->[0] eq 'tag';
-        weaken $e->[3];
-      }
-
-      # Move children
-      push @$next, @buffer;
-    }
+    $self->_end($$current->[1], $current);
   }
 }
 
@@ -676,8 +655,12 @@ sub _match_element {
       # Parent only ">"
       if ($c eq '>') {
         $parentonly += 2;
-        $marker   = $i - 1   unless defined $marker;
-        $snapback = $current unless $snapback;
+
+        # Can't go back to the first
+        unless ($first) {
+          $marker   = $i       unless defined $marker;
+          $snapback = $current unless $snapback;
+        }
       }
 
       # Preceding siblings "~" and "+"
@@ -706,7 +689,7 @@ sub _match_element {
 
     # Walk backwards
     while (1) {
-      $first-- if $first != 0;
+      $first-- if $first > 0;
 
       # Next sibling
       if ($siblings) {
@@ -738,7 +721,12 @@ sub _match_element {
 
       # Parent only
       if ($parentonly) {
-        $i        = $marker - 1;
+
+        # First parent needs to match
+        return unless defined $marker;
+
+        # Reset
+        $i        = $marker - 2;
         $current  = $snapback;
         $snapback = undef;
         $marker   = undef;
@@ -1012,6 +1000,9 @@ sub _parse_css {
 sub _parse_xml {
   my ($self, $xml) = @_;
 
+  # Fresh start
+  delete $self->{_xml};
+
   # State
   my $tree    = ['root'];
   my $current = $tree;
@@ -1087,7 +1078,8 @@ sub _parse_xml {
       $self->_start($start, $attrs, \$current);
 
       # Empty tag
-      $self->_end($start, \$current) if $attr =~ /\/\s*$/;
+      $self->_end($start, \$current)
+        if (!$self->{_xml} && $HTML_VOID{$start}) || $attr =~ /\/\s*$/;
 
       # Relaxed "script" or "style"
       if ($start eq 'script' || $start eq 'style') {
@@ -1104,6 +1096,9 @@ sub _parse_xml {
 
 sub _pi {
   my ($self, $pi, $current) = @_;
+
+  # Try to detect XML
+  $self->{_xml} = 1 if $pi =~ /xml/i;
 
   # Append
   push @$$current, ['pi', $pi];

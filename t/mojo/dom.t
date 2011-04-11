@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 479;
+use Test::More tests => 486;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -77,6 +77,19 @@ is $dom->tree->[1]->[5]->[1], 'works', 'right text';
 is "$dom", <<EOF, 'stringified right';
 <foo><bar a="b&lt;c">ju<baz a23>s<bazz />t</baz></bar>works</foo>
 EOF
+
+# Select based on parent
+$dom->parse(<<EOF);
+<body>
+  <div>test1</div>
+  <div><div>test2</div></div>
+<body>
+EOF
+is $dom->find('body > div')->[0]->text, 'test1', 'right content';
+is $dom->find('body > div')->[1]->text, '',      'no content';
+is $dom->find('body > div')->[2], undef, 'no result';
+is $dom->find('body > div > div')->[0]->text, 'test2', 'no content';
+is $dom->find('body > div > div')->[1], undef, 'no result';
 
 # A bit of everything (basic navigation)
 $dom->parse(<<EOF);
@@ -404,7 +417,7 @@ $dom->parse(<<EOF);
 EOF
 is $dom->at('book comment')->namespace, 'uri:default-ns', 'right namespace';
 is $dom->at('book comment')->text,      'rocks!',         'right content';
-is $dom->at('book nons section')->namespace, undef,         'right namespace';
+is $dom->at('book nons section')->namespace, undef,         'no namespace';
 is $dom->at('book nons section')->text,      'Nothing',     'right content';
 is $dom->at('book meta number')->namespace,  'uri:isbn-ns', 'right namespace';
 is $dom->at('book meta number')->text, '978-0596000271', 'right content';
@@ -1461,8 +1474,10 @@ is $dom->find('html body table tr > td > font')->[0]->text, 'test1',
 is $dom->find('html body table tr > td')->[1]->text, 'x1',    'right content';
 is $dom->find('html body table tr > td')->[2]->text, 'test2', 'right content';
 is $dom->find('html body table tr > td')->[3]->text, 'x2',    'right content';
+is $dom->find('html body table tr > td')->[5], undef, 'no result';
 is $dom->find('html body table tr > td > font')->[1]->text, 'test3',
   'right content';
+is $dom->find('html body table tr > td > font')->[2], undef, 'no result';
 is $dom, <<EOF, 'right result';
 <html>
   <head><title>Test</title></head>

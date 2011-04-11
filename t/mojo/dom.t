@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 468;
+use Test::More tests => 469;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -1389,21 +1389,23 @@ is $dom->at('html > head > title')->text, 'Test', 'right content';
 is $dom->at('html > body > table > tr > td > font')->text, 'test',
   'right content';
 
-# Different broken "font" block and useless end tags
+# Different broken "font" block
 $dom->parse(<<EOF);
 <html>
   <head><title>Test</title></head>
   <body>
     <font>
     <table>
-      <tr><td>test</td></font></tr>
-      </tr>
+      <tr><td>test1<br>
+      <tr><td>test2<br></font>
     </table>
   </body>
 </html>
 EOF
 is $dom->at('html > head > title')->text, 'Test', 'right content';
-is $dom->at('html > body > font > table > tr > td')->text, 'test',
+is $dom->find('html > body > font > table > tr > td')->[0]->text, 'test1',
+  'right content';
+is $dom->find('html > body > font > table > tr > td')->[1]->text, 'test2',
   'right content';
 
 # Broken "div" blocks

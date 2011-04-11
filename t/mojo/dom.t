@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 486;
+use Test::More tests => 490;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -1492,3 +1492,28 @@ is $dom, <<EOF, 'right result';
   </body>
 </html>
 EOF
+
+# A collection of wonderful screwups
+$dom->parse(<<'EOF');
+<!doctype html>
+<html lang="en">
+  <head><title>Wonderful Screwups</title></head>
+  <body id="screw-up">
+    <div>
+      <div class="ewww">
+        <a href="/test" target='_blank'><img src="/test.png"></a>
+        <a href='/real bad' screwup: http://localhost/bad' target='_blank'>
+          <img src="/test2.png">
+      </div>
+      </mt:If>
+    </div>
+    <b>lalala</b>
+  </body>
+</html>
+EOF
+is $dom->at('#screw-up > b')->text, 'lalala', 'right content';
+is $dom->at('#screw-up .ewww > a > img')->attrs('src'), '/test.png',
+  'right attribute';
+is $dom->find('#screw-up .ewww > a > img')->[1]->attrs('src'), '/test2.png',
+  'right attribute';
+is $dom->find('#screw-up .ewww > a > img')->[2], undef, 'no result';

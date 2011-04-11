@@ -47,7 +47,7 @@ my $CSS_TOKEN_RE        = qr/
 /x;
 my $XML_ATTR_RE = qr/
   \s*
-  ([^=\s>"']+)     # Key
+  ([^=\s>]+)       # Key
   (?:
     \s*
     =

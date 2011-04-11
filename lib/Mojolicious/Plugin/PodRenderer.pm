@@ -101,10 +101,10 @@ sub register {
           url_escape $anchor, 'A-Za-z0-9_';
           $anchor =~ s/\%//g;
           push @$sections, [] if $tag->type eq 'h1' || !@$sections;
-          push @{$sections->[-1]}, $text, "$url#$anchor";
+          push @{$sections->[-1]}, $text, "/$url#$anchor";
           $tag->replace_inner(
             $self->link_to(
-              $text => "$url#toc",
+              $text => "/$url#toc",
               class => 'mojoscroll',
               id    => $anchor
               )->to_string

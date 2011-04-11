@@ -1385,9 +1385,8 @@ $dom->parse(<<EOF);
   </body>
 </html>
 EOF
-is $dom->at('html > head > title')->text, 'Test', 'right content';
-is $dom->at('html > body > table > tr > td > font')->text, 'test',
-  'right content';
+is $dom->at('html > head > title')->text,          'Test', 'right content';
+is $dom->at('html body table tr td > font')->text, 'test', 'right content';
 
 # Different broken "font" block
 $dom->parse(<<EOF);
@@ -1414,18 +1413,15 @@ $dom->parse(<<EOF);
   <head><title>Test</title></head>
   <body>
     <font>
-    <div>
-      test1<br>
+    <div>test1<br>
       <div>test2<br></font>
     </div>
   </body>
 </html>
 EOF
-is $dom->at('html > head > title')->text, 'Test', 'right content';
-is $dom->find('html > body > font > div')->[0]->text, "\n      test1",
-  'right content';
-is $dom->find('html > body > font > div > div')->[0]->text, 'test2',
-  'right content';
+is $dom->at('html head title')->text,            'Test',  'right content';
+is $dom->at('html body font > div')->text,       'test1', 'right content';
+is $dom->at('html body font > div > div')->text, 'test2', 'right content';
 
 # Broken "div" blocks
 $dom->parse(<<EOF);
@@ -1440,6 +1436,5 @@ $dom->parse(<<EOF);
   </body>
 </html>
 EOF
-is $dom->at('html > head > title')->text, 'Test', 'right content';
-is $dom->at('html > body > div > table > tr > td > div')->text, 'test',
-  'right content';
+is $dom->at('html head title')->text,                 'Test', 'right content';
+is $dom->at('html body div table tr td > div')->text, 'test', 'right content';

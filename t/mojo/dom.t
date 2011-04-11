@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 466;
+use Test::More tests => 468;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -1404,4 +1404,21 @@ $dom->parse(<<EOF);
 EOF
 is $dom->at('html > head > title')->text, 'Test', 'right content';
 is $dom->at('html > body > font > table > tr > td')->text, 'test',
+  'right content';
+
+# Broken "div" blocks
+$dom->parse(<<EOF);
+<html>
+  <head><title>Test</title></head>
+  <body>
+    <div>
+    <table>
+      <tr><td><div>test</td></div></tr>
+      </div>
+    </table>
+  </body>
+</html>
+EOF
+is $dom->at('html > head > title')->text, 'Test', 'right content';
+is $dom->at('html > body > div > table > tr > td > div')->text, 'test',
   'right content';

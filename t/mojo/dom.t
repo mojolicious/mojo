@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 472;
+use Test::More tests => 479;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -1395,8 +1395,9 @@ $dom->parse(<<EOF);
   <body>
     <font>
     <table>
-      <tr><td>test1<br>
-      <tr><td>test2<br></font>
+      <tr>
+        <td>test1<br></td></font>
+        <td>test2<br>
     </table>
   </body>
 </html>
@@ -1438,3 +1439,41 @@ $dom->parse(<<EOF);
 EOF
 is $dom->at('html head title')->text,                 'Test', 'right content';
 is $dom->at('html body div table tr td > div')->text, 'test', 'right content';
+
+# And another broken "font" block
+$dom->parse(<<EOF);
+<html>
+  <head><title>Test</title></head>
+  <body>
+    <table>
+      <tr>
+        <td><font><br>te<br>st<br>1</td></font>
+        <td>x1<td><img>tes<br>t2</td>
+        <td>x2<td><font>t<br>est3</font></td>
+      </tr>
+    </table>
+  </body>
+</html>
+EOF
+is $dom->at('html > head > title')->text, 'Test', 'right content';
+is $dom->find('html body table tr > td > font')->[0]->text, 'test1',
+  'right content';
+is $dom->find('html body table tr > td')->[1]->text, 'x1',    'right content';
+is $dom->find('html body table tr > td')->[2]->text, 'test2', 'right content';
+is $dom->find('html body table tr > td')->[3]->text, 'x2',    'right content';
+is $dom->find('html body table tr > td > font')->[1]->text, 'test3',
+  'right content';
+is $dom, <<EOF, 'right result';
+<html>
+  <head><title>Test</title></head>
+  <body>
+    <table>
+      <tr>
+        <td><font><br />te<br />st<br />1</font></td>
+        <td>x1</td><td><img />tes<br />t2</td>
+        <td>x2</td><td><font>t<br />est3</font></td>
+      </tr>
+    </table>
+  </body>
+</html>
+EOF

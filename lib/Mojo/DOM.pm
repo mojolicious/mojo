@@ -115,6 +115,16 @@ my @VOID_TAGS = (
 my %HTML_VOID;
 $HTML_VOID{$_}++ for @VOID_TAGS;
 
+# HTML5 block tags + "<head>" + "<html>"
+my @BLOCK_TAGS = (
+  qw/article aside blockquote body br button canvas caption col colgroup dd/,
+  qw/div dl dt embed fieldset figcaption figure footer form h1 h2 h3 h4 h5/,
+  qw/h6 head header hgroup hr html li map object ol output p pre progress/,
+  qw/section table tbody textarea tfooter th thead tr ul video/
+);
+my %HTML_BLOCK;
+$HTML_BLOCK{$_}++ for @BLOCK_TAGS;
+
 sub add_after  { shift->_add(1, @_) }
 sub add_before { shift->_add(0, @_) }
 
@@ -584,6 +594,12 @@ sub _end {
 
     # Found
     ++$found and last if $next->[1] eq $end;
+
+    # Inline tags stop here
+    return
+      if $HTML_BLOCK{$next->[1]}
+        && !$HTML_VOID{$next->[1]}
+        && !$HTML_BLOCK{$end};
 
     # Next
     $next = $next->[3];

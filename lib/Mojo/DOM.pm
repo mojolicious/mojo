@@ -149,14 +149,7 @@ sub all_text {
 
     # Text
     my $content = '';
-    if ($type eq 'text') {
-      $content = $e->[1];
-
-      # Trim
-      $content =~ s/^\s*\n+\s*//;
-      $content =~ s/\s*\n+\s*$//;
-      $content = " $content" if $text =~ /\S$/;
-    }
+    if ($type eq 'text') { $content = $self->_trim($e->[1], $text =~ /\S$/) }
 
     # CDATA or raw text
     elsif ($type eq 'cdata' || $type eq 'raw') { $content = $e->[1] }
@@ -400,14 +393,7 @@ sub text {
 
     # Text
     my $content = '';
-    if ($type eq 'text') {
-      $content = $e->[1];
-
-      # Trim
-      $content =~ s/^\s*\n+\s*//;
-      $content =~ s/\s*\n+\s*$//;
-      $content = " $content" if $text =~ /\S$/;
-    }
+    if ($type eq 'text') { $content = $self->_trim($e->[1], $text =~ /\S$/) }
 
     # CDATA or raw text
     elsif ($type eq 'cdata' || $type eq 'raw') { $content = $e->[1] }
@@ -1290,6 +1276,20 @@ sub _text {
 
   # Append
   push @$$current, ['text', $text];
+}
+
+sub _trim {
+  my ($self, $text, $ws) = @_;
+
+  # Trim whitespace
+  $text =~ s/^\s*\n+\s*//;
+  $text =~ s/\s*\n+\s*$//;
+  $text =~ s/\s*\n+\s*/\ /g;
+
+  # Add leading whitespace
+  $text = " $text" if $ws;
+
+  return $text;
 }
 
 package Mojo::DOM::_Collection;

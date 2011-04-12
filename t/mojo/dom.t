@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 490;
+use Test::More tests => 496;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -1232,6 +1232,12 @@ $dom->parse(<<EOF);
         <br>
         321
         <p>
+      <li>
+        Test
+        3
+        2
+        1
+        <p>
     </ul>
 EOF
 is $dom->find('html > head > title')->[0]->text, 'Real World!', 'right text';
@@ -1239,6 +1245,12 @@ is $dom->find('body > ul > li')->[0]->text,      'Test 123',    'right text';
 is $dom->find('body > ul > li > p')->[0]->text,  '',            'no text';
 is $dom->find('body > ul > li')->[1]->text,      'Test 321',    'right text';
 is $dom->find('body > ul > li > p')->[1]->text,  '',            'no text';
+is $dom->find('body > ul > li')->[1]->all_text,  'Test 321',    'right text';
+is $dom->find('body > ul > li > p')->[1]->all_text, '', 'no text';
+is $dom->find('body > ul > li')->[2]->text,     'Test 3 2 1', 'right text';
+is $dom->find('body > ul > li > p')->[2]->text, '',           'no text';
+is $dom->find('body > ul > li')->[2]->all_text, 'Test 3 2 1', 'right text';
+is $dom->find('body > ul > li > p')->[2]->all_text, '', 'no text';
 
 # Real world JavaScript and CSS
 $dom->parse(<<EOF);

@@ -12,6 +12,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved HTML healing capabilities of Mojo::DOM.
         - Improved Mojo::DOM to ignore useless end tags.
         - Improved Mojo::DOM inline DTD support. (akron)
+        - Improved Mojo::DOM text extraction.
         - Improved Mojolicious::Plugin::I18n default lexicon handling. (yko)
         - Moved all bundled static files to "lib/Mojolicious/public".
         - Made Test::Mojo a little more user friendly.

@@ -85,10 +85,10 @@ $dom->parse(<<EOF);
   <div><div>test2</div></div>
 <body>
 EOF
-is $dom->find('body > div')->[0]->text, 'test1', 'right content';
+is $dom->find('body > div')->[0]->text, 'test1', 'right text';
 is $dom->find('body > div')->[1]->text, '',      'no content';
 is $dom->find('body > div')->[2], undef, 'no result';
-is $dom->find('body > div > div')->[0]->text, 'test2', 'right content';
+is $dom->find('body > div > div')->[0]->text, 'test2', 'right text';
 is $dom->find('body > div > div')->[1], undef, 'no result';
 
 # A bit of everything (basic navigation)
@@ -126,8 +126,8 @@ is "$dom", <<EOF, 'stringified right';
 </a></foo>
 EOF
 my $simple = $dom->at('foo simple.working[class^="wor"]');
-like $simple->parent->all_text,
-  qr/test\s+easy\s+works\s+well\s+yada\s+yada\s+more\s+text/;
+is $simple->parent->all_text, 'test easy works well yada yada more text',
+  'right text';
 is $simple->type, 'simple', 'right type';
 is $simple->attrs('class'), 'working', 'right class attribute';
 is $simple->text, 'easy', 'right text';
@@ -148,7 +148,7 @@ is $dom->at('[class=working]')->type,   'simple', 'right type';
 
 # Class and ID
 $dom->parse('<div id="id" class="class">a</div>');
-is $dom->at('div#id.class')->text, 'a', 'right content';
+is $dom->at('div#id.class')->text, 'a', 'right text';
 
 # Deep nesting (parent combinator)
 $dom->parse(<<EOF);
@@ -416,11 +416,11 @@ $dom->parse(<<EOF);
 </bk:book>
 EOF
 is $dom->at('book comment')->namespace, 'uri:default-ns', 'right namespace';
-is $dom->at('book comment')->text,      'rocks!',         'right content';
+is $dom->at('book comment')->text,      'rocks!',         'right text';
 is $dom->at('book nons section')->namespace, undef,         'no namespace';
-is $dom->at('book nons section')->text,      'Nothing',     'right content';
+is $dom->at('book nons section')->text,      'Nothing',     'right text';
 is $dom->at('book meta number')->namespace,  'uri:isbn-ns', 'right namespace';
-is $dom->at('book meta number')->text, '978-0596000271', 'right content';
+is $dom->at('book meta number')->text, '978-0596000271', 'right text';
 
 # Yadis
 $dom->parse(<<'EOF');
@@ -962,8 +962,8 @@ $dom->parse(<<EOF);
     <title>foo</title>
   <body>bar
 EOF
-is $dom->at('html > head > title')->text, 'foo',   'right text';
-is $dom->at('html > body')->text,         "bar\n", 'right text';
+is $dom->at('html > head > title')->text, 'foo', 'right text';
+is $dom->at('html > body')->text,         'bar', 'right text';
 
 # Optional "li" tag
 $dom->parse(<<EOF);
@@ -975,11 +975,11 @@ $dom->parse(<<EOF);
   <li>E
 </ul>
 EOF
-is $dom->find('ul > li')->[0]->text, 'A',     'right text';
-is $dom->find('ul > li')->[1]->text, "B\n  ", 'right text';
-is $dom->find('ul > li')->[2]->text, 'C',     'right text';
-is $dom->find('ul > li')->[3]->text, "D\n  ", 'right text';
-is $dom->find('ul > li')->[4]->text, "E\n",   'right text';
+is $dom->find('ul > li')->[0]->text, 'A', 'right text';
+is $dom->find('ul > li')->[1]->text, 'B', 'right text';
+is $dom->find('ul > li')->[2]->text, 'C', 'right text';
+is $dom->find('ul > li')->[3]->text, 'D', 'right text';
+is $dom->find('ul > li')->[4]->text, 'E', 'right text';
 
 # Optional "p" tag
 $dom->parse(<<EOF);
@@ -993,13 +993,13 @@ $dom->parse(<<EOF);
   <p>H
 </div>
 EOF
-is $dom->find('div > p')->[0]->text, 'A',      'right text';
-is $dom->find('div > p')->[1]->text, "B\n  ",  'right text';
-is $dom->find('div > p')->[2]->text, 'C',      'right text';
-is $dom->find('div > p')->[3]->text, 'D',      'right text';
-is $dom->find('div > p')->[4]->text, 'E',      'right text';
-is $dom->find('div > p')->[5]->text, "FG\n  ", 'right text';
-is $dom->find('div > p')->[6]->text, "H\n",    'right text';
+is $dom->find('div > p')->[0]->text, 'A',   'right text';
+is $dom->find('div > p')->[1]->text, 'B',   'right text';
+is $dom->find('div > p')->[2]->text, 'C',   'right text';
+is $dom->find('div > p')->[3]->text, 'D',   'right text';
+is $dom->find('div > p')->[4]->text, 'E',   'right text';
+is $dom->find('div > p')->[5]->text, 'F G', 'right text';
+is $dom->find('div > p')->[6]->text, 'H',   'right text';
 is $dom->find('div > p > p')->[0], undef, 'no results';
 is $dom->at('div > p > img')->attrs->{src}, 'foo.png', 'right attribute';
 is $dom->at('div > div')->text, 'X', 'right text';
@@ -1015,12 +1015,12 @@ $dom->parse(<<EOF);
   <dd>F
 </dl>
 EOF
-is $dom->find('dl > dt')->[0]->text, 'A',     'right text';
-is $dom->find('dl > dd')->[0]->text, "B\n  ", 'right text';
-is $dom->find('dl > dt')->[1]->text, 'C',     'right text';
-is $dom->find('dl > dd')->[1]->text, "D\n  ", 'right text';
-is $dom->find('dl > dt')->[2]->text, "E\n  ", 'right text';
-is $dom->find('dl > dd')->[2]->text, "F\n",   'right text';
+is $dom->find('dl > dt')->[0]->text, 'A', 'right text';
+is $dom->find('dl > dd')->[0]->text, 'B', 'right text';
+is $dom->find('dl > dt')->[1]->text, 'C', 'right text';
+is $dom->find('dl > dd')->[1]->text, 'D', 'right text';
+is $dom->find('dl > dt')->[2]->text, 'E', 'right text';
+is $dom->find('dl > dd')->[2]->text, 'F', 'right text';
 
 # Optional "rp" and "rt" tags
 $dom->parse(<<EOF);
@@ -1033,12 +1033,12 @@ $dom->parse(<<EOF);
   <rt>F
 </ruby>
 EOF
-is $dom->find('ruby > rp')->[0]->text, 'A',     'right text';
-is $dom->find('ruby > rt')->[0]->text, "B\n  ", 'right text';
-is $dom->find('ruby > rp')->[1]->text, 'C',     'right text';
-is $dom->find('ruby > rt')->[1]->text, "D\n  ", 'right text';
-is $dom->find('ruby > rp')->[2]->text, "E\n  ", 'right text';
-is $dom->find('ruby > rt')->[2]->text, "F\n",   'right text';
+is $dom->find('ruby > rp')->[0]->text, 'A', 'right text';
+is $dom->find('ruby > rt')->[0]->text, 'B', 'right text';
+is $dom->find('ruby > rp')->[1]->text, 'C', 'right text';
+is $dom->find('ruby > rt')->[1]->text, 'D', 'right text';
+is $dom->find('ruby > rp')->[2]->text, 'E', 'right text';
+is $dom->find('ruby > rt')->[2]->text, 'F', 'right text';
 
 # Optional "optgroup" and "option" tags
 $dom->parse(<<EOF);
@@ -1053,14 +1053,14 @@ $dom->parse(<<EOF);
     <option>H
 </div>
 EOF
-is $dom->find('div > optgroup')->[0]->text,          "A\n    ", 'right text';
-is $dom->find('div > optgroup > #foo')->[0]->text,   "B\n    ", 'right text';
-is $dom->find('div > optgroup > option')->[1]->text, 'C',       'right text';
-is $dom->find('div > optgroup > option')->[2]->text, "D\n  ",   'right text';
-is $dom->find('div > optgroup')->[1]->text,          "E\n    ", 'right text';
-is $dom->find('div > optgroup > option')->[3]->text, "F\n  ",   'right text';
-is $dom->find('div > optgroup')->[2]->text,          "G\n    ", 'right text';
-is $dom->find('div > optgroup > option')->[4]->text, "H\n",     'right text';
+is $dom->find('div > optgroup')->[0]->text,          'A', 'right text';
+is $dom->find('div > optgroup > #foo')->[0]->text,   'B', 'right text';
+is $dom->find('div > optgroup > option')->[1]->text, 'C', 'right text';
+is $dom->find('div > optgroup > option')->[2]->text, 'D', 'right text';
+is $dom->find('div > optgroup')->[1]->text,          'E', 'right text';
+is $dom->find('div > optgroup > option')->[3]->text, 'F', 'right text';
+is $dom->find('div > optgroup')->[2]->text,          'G', 'right text';
+is $dom->find('div > optgroup > option')->[4]->text, 'H', 'right text';
 
 # Optional "colgroup" tag
 $dom->parse(<<EOF);
@@ -1099,9 +1099,9 @@ $dom->parse(<<EOF);
 </table>
 EOF
 is $dom->at('table > thead > tr > th')->text, 'A', 'right text';
-is $dom->find('table > thead > tr > th')->[1]->text, "D\n  ", 'right text';
-is $dom->at('table > tbody > tr > td')->text, "B\n  ", 'right text';
-is $dom->at('table > tfoot > tr > td')->text, "C\n",   'right text';
+is $dom->find('table > thead > tr > th')->[1]->text, 'D', 'right text';
+is $dom->at('table > tbody > tr > td')->text, 'B', 'right text';
+is $dom->at('table > tfoot > tr > td')->text, 'C', 'right text';
 
 # Optional "colgroup", "thead", "tbody", "tr", "th" and "td" tags
 $dom->parse(<<EOF);
@@ -1132,8 +1132,8 @@ is $dom->find('table > colgroup > col')->[1]->attrs->{class}, 'foo',
 is $dom->find('table > colgroup > col')->[2]->attrs->{id}, 'bar',
   'right attribute';
 is $dom->at('table > thead > tr > th')->text, 'A', 'right text';
-is $dom->find('table > thead > tr > th')->[1]->text, "D\n  ", 'right text';
-is $dom->at('table > tbody > tr > td')->text, "B\n", 'right text';
+is $dom->find('table > thead > tr > th')->[1]->text, 'D', 'right text';
+is $dom->at('table > tbody > tr > td')->text, 'B', 'right text';
 
 # Optional "colgroup", "tbody", "tr", "th" and "td" tags
 $dom->parse(<<EOF);
@@ -1155,7 +1155,7 @@ is $dom->find('table > colgroup > col')->[1]->attrs->{class}, 'foo',
   'right attribute';
 is $dom->find('table > colgroup > col')->[2]->attrs->{id}, 'bar',
   'right attribute';
-is $dom->at('table > tbody > tr > td')->text, "B\n", 'right text';
+is $dom->at('table > tbody > tr > td')->text, 'B', 'right text';
 
 # Optional "tr" and "td" tags
 $dom->parse(<<EOF);
@@ -1170,10 +1170,10 @@ $dom->parse(<<EOF);
       <td>D
 </table>
 EOF
-is $dom->find('table > tr > td')->[0]->text, "A\n      ", 'right text';
-is $dom->find('table > tr > td')->[1]->text, 'B',         'right text';
-is $dom->find('table > tr > td')->[2]->text, "C\n    ",   'right text';
-is $dom->find('table > tr > td')->[3]->text, "D\n",       'right text';
+is $dom->find('table > tr > td')->[0]->text, 'A', 'right text';
+is $dom->find('table > tr > td')->[1]->text, 'B', 'right text';
+is $dom->find('table > tr > td')->[2]->text, 'C', 'right text';
+is $dom->find('table > tr > td')->[3]->text, 'D', 'right text';
 
 # Real world table
 $dom->parse(<<EOF);
@@ -1203,18 +1203,14 @@ $dom->parse(<<EOF);
     </table>
 EOF
 is $dom->find('html > head > title')->[0]->text, 'Real World!', 'right text';
-is $dom->find('html > body > p')->[0]->text, "Just a test\n    ",
-  'right text';
-is $dom->find('p')->[0]->text, "Just a test\n    ", 'right text';
-is $dom->find('thead > tr > .three')->[0]->text, "Three\n          ",
-  'right text';
-is $dom->find('thead > tr > .four')->[0]->text, "Four\n      ", 'right text';
-is $dom->find('tbody > tr > .beta')->[0]->text, "Beta\n          ",
-  'right text';
-is $dom->find('tbody > tr > .gamma')->[0]->text,     '',      'no text';
+is $dom->find('html > body > p')->[0]->text,     'Just a test', 'right text';
+is $dom->find('p')->[0]->text,                   'Just a test', 'right text';
+is $dom->find('thead > tr > .three')->[0]->text, 'Three',       'right text';
+is $dom->find('thead > tr > .four')->[0]->text,  'Four',        'right text';
+is $dom->find('tbody > tr > .beta')->[0]->text,  'Beta',        'right text';
+is $dom->find('tbody > tr > .gamma')->[0]->text, '',            'no text';
 is $dom->find('tbody > tr > .gamma > a')->[0]->text, 'Gamma', 'right text';
-is $dom->find('tbody > tr > .alpha')->[1]->text, "Alpha Two\n          ",
-  'right text';
+is $dom->find('tbody > tr > .alpha')->[1]->text, 'Alpha Two', 'right text';
 is $dom->find('tbody > tr > .gamma > a')->[1]->text, 'Gamma Two',
   'right text';
 
@@ -1239,14 +1235,10 @@ $dom->parse(<<EOF);
     </ul>
 EOF
 is $dom->find('html > head > title')->[0]->text, 'Real World!', 'right text';
-is $dom->find('body > ul > li')->[0]->text,
-  "\n        Test\n        \n        123\n        ",
-  'right text';
-is $dom->find('body > ul > li > p')->[0]->text, '', 'no text';
-is $dom->find('body > ul > li')->[1]->text,
-  "\n        Test\n        \n        321\n        ",
-  'right text';
-is $dom->find('body > ul > li > p')->[1]->text, '', 'no text';
+is $dom->find('body > ul > li')->[0]->text,      'Test 123',    'right text';
+is $dom->find('body > ul > li > p')->[0]->text,  '',            'no text';
+is $dom->find('body > ul > li')->[1]->text,      'Test 321',    'right text';
+is $dom->find('body > ul > li > p')->[1]->text,  '',            'no text';
 
 # Real world JavaScript and CSS
 $dom->parse(<<EOF);
@@ -1331,7 +1323,7 @@ is $dom->tree->[5]->[1], ' root [
   <!ELEMENT root (#PCDATA)>
   <!ATTLIST root att CDATA #REQUIRED>
 ]', 'right doctype';
-is $dom->at('root')->text, '<hello>world</hello>', 'right content';
+is $dom->at('root')->text, '<hello>world</hello>', 'right text';
 $dom->parse(<<EOF);
 <!doctype book
 SYSTEM "usr.dtd"
@@ -1363,7 +1355,7 @@ is $dom->tree->[3]->[1], ' foo [
   %myentities;
 ]  ', 'right doctype';
 is $dom->at('foo')->attrs->{'xml:lang'}, 'de', 'right attribute';
-is $dom->at('foo')->text, 'Check!', 'right content';
+is $dom->at('foo')->text, 'Check!', 'right text';
 $dom->parse(<<EOF);
 <!DOCTYPE TESTSUITE PUBLIC "my.dtd" 'mhhh' [
   <!ELEMENT foo ANY>
@@ -1398,8 +1390,8 @@ $dom->parse(<<EOF);
   </body>
 </html>
 EOF
-is $dom->at('html > head > title')->text,          'Test', 'right content';
-is $dom->at('html body table tr td > font')->text, 'test', 'right content';
+is $dom->at('html > head > title')->text,          'Test', 'right text';
+is $dom->at('html body table tr td > font')->text, 'test', 'right text';
 
 # Different broken "font" block
 $dom->parse(<<EOF);
@@ -1415,11 +1407,11 @@ $dom->parse(<<EOF);
   </body>
 </html>
 EOF
-is $dom->at('html > head > title')->text, 'Test', 'right content';
+is $dom->at('html > head > title')->text, 'Test', 'right text';
 is $dom->find('html > body > font > table > tr > td')->[0]->text, 'test1',
-  'right content';
+  'right text';
 is $dom->find('html > body > font > table > tr > td')->[1]->text, 'test2',
-  'right content';
+  'right text';
 
 # Broken "font" and "div" blocks
 $dom->parse(<<EOF);
@@ -1433,9 +1425,9 @@ $dom->parse(<<EOF);
   </body>
 </html>
 EOF
-is $dom->at('html head title')->text,            'Test',  'right content';
-is $dom->at('html body font > div')->text,       'test1', 'right content';
-is $dom->at('html body font > div > div')->text, 'test2', 'right content';
+is $dom->at('html head title')->text,            'Test',  'right text';
+is $dom->at('html body font > div')->text,       'test1', 'right text';
+is $dom->at('html body font > div > div')->text, 'test2', 'right text';
 
 # Broken "div" blocks
 $dom->parse(<<EOF);
@@ -1450,8 +1442,8 @@ $dom->parse(<<EOF);
   </body>
 </html>
 EOF
-is $dom->at('html head title')->text,                 'Test', 'right content';
-is $dom->at('html body div table tr td > div')->text, 'test', 'right content';
+is $dom->at('html head title')->text,                 'Test', 'right text';
+is $dom->at('html body div table tr td > div')->text, 'test', 'right text';
 
 # And another broken "font" block
 $dom->parse(<<EOF);
@@ -1468,15 +1460,15 @@ $dom->parse(<<EOF);
   </body>
 </html>
 EOF
-is $dom->at('html > head > title')->text, 'Test', 'right content';
-is $dom->find('html body table tr > td > font')->[0]->text, 'test1',
-  'right content';
-is $dom->find('html body table tr > td')->[1]->text, 'x1',    'right content';
-is $dom->find('html body table tr > td')->[2]->text, 'test2', 'right content';
-is $dom->find('html body table tr > td')->[3]->text, 'x2',    'right content';
+is $dom->at('html > head > title')->text, 'Test', 'right text';
+is $dom->find('html body table tr > td > font')->[0]->text, 'te st 1',
+  'right text';
+is $dom->find('html body table tr > td')->[1]->text, 'x1',     'right text';
+is $dom->find('html body table tr > td')->[2]->text, 'tes t2', 'right text';
+is $dom->find('html body table tr > td')->[3]->text, 'x2',     'right text';
 is $dom->find('html body table tr > td')->[5], undef, 'no result';
-is $dom->find('html body table tr > td > font')->[1]->text, 'test3',
-  'right content';
+is $dom->find('html body table tr > td > font')->[1]->text, 't est3',
+  'right text';
 is $dom->find('html body table tr > td > font')->[2], undef, 'no result';
 is $dom, <<EOF, 'right result';
 <html>
@@ -1511,7 +1503,7 @@ $dom->parse(<<'EOF');
   </body>
 </html>
 EOF
-is $dom->at('#screw-up > b')->text, 'lalala', 'right content';
+is $dom->at('#screw-up > b')->text, 'lalala', 'right text';
 is $dom->at('#screw-up .ewww > a > img')->attrs('src'), '/test.png',
   'right attribute';
 is $dom->find('#screw-up .ewww > a > img')->[1]->attrs('src'), '/test2.png',

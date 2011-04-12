@@ -147,11 +147,22 @@ sub all_text {
 
     unshift @stack, @$e[4 .. $#$e] and next if $type eq 'tag';
 
-    # Text or CDATA
-    if ($type eq 'text' || $type eq 'cdata' || $type eq 'raw') {
-      my $content = $e->[1];
-      $text .= $content if $content =~ /\S+/;
+    # Text
+    my $content = '';
+    if ($type eq 'text') {
+      $content = $e->[1];
+
+      # Trim
+      $content =~ s/^\s*\n+\s*//;
+      $content =~ s/\s*\n+\s*$//;
+      $content = " $content" if $text =~ /\S$/;
     }
+
+    # CDATA or raw text
+    elsif ($type eq 'cdata' || $type eq 'raw') { $content = $e->[1] }
+
+    # Append
+    $text .= $content if $content =~ /\S+/;
   }
 
   return $text;
@@ -387,11 +398,22 @@ sub text {
     # Type
     my $type = $e->[0];
 
-    # Text or CDATA
-    if ($type eq 'text' || $type eq 'cdata' || $type eq 'raw') {
-      my $content = $e->[1];
-      $text .= $content if $content =~ /\S+/;
+    # Text
+    my $content = '';
+    if ($type eq 'text') {
+      $content = $e->[1];
+
+      # Trim
+      $content =~ s/^\s*\n+\s*//;
+      $content =~ s/\s*\n+\s*$//;
+      $content = " $content" if $text =~ /\S$/;
     }
+
+    # CDATA or raw text
+    elsif ($type eq 'cdata' || $type eq 'raw') { $content = $e->[1] }
+
+    # Append
+    $text .= $content if $content =~ /\S+/;
   }
 
   return $text;

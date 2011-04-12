@@ -1468,8 +1468,9 @@ sub _prepare_loop {
   }
 
   # Dummy handle to make empty poll respect the timeout and block
-  open my $dummy, '<', \(my $variable);
-  $self->{_loop}->mask($dummy, EPOLL ? EPOLL_POLLIN : POLLIN);
+  $self->{_loop}
+    ->mask(IO::Socket::INET->new(Listen => 1, LocalAddr => '127.0.0.1'),
+    EPOLL ? EPOLL_POLLIN : POLLIN);
 
   return $self->{_loop};
 }

@@ -53,7 +53,7 @@ sub body {
   unless (@_) {
     return $content->on_read
       ? $content->on_read
-      : return $self->content->asset->slurp;
+      : $self->content->asset->slurp;
   }
 
   # New content

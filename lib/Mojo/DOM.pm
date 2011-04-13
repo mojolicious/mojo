@@ -11,7 +11,7 @@ use constant DEBUG => $ENV{MOJO_DOM_DEBUG} || 0;
 
 # "How are the kids supposed to get home?
 #  I dunno. Internet?"
-has 'charset';
+has [qw/charset xml/];
 has tree => sub { ['root'] };
 
 # Regex
@@ -295,6 +295,9 @@ sub parent {
 
 sub parse {
   my ($self, $xml) = @_;
+
+  # Fresh start
+  $self->xml(undef);
 
   # Detect Perl characters
   $self->charset(undef) if utf8::is_utf8 $xml;
@@ -604,7 +607,7 @@ sub _end {
     ++$found and last if $next->[1] eq $end;
 
     # HTML inline tags stop here
-    return if !$self->{_xml} && $HTML_BLOCK{$next->[1]} && !$HTML_BLOCK{$end};
+    return if !$self->xml && $HTML_BLOCK{$next->[1]} && !$HTML_BLOCK{$end};
 
     # Next
     $next = $next->[3];
@@ -1008,9 +1011,6 @@ sub _parse_css {
 sub _parse_xml {
   my ($self, $xml) = @_;
 
-  # Fresh start
-  delete $self->{_xml};
-
   # State
   my $tree    = ['root'];
   my $current = $tree;
@@ -1087,7 +1087,7 @@ sub _parse_xml {
 
       # Empty tag
       $self->_end($start, \$current)
-        if (!$self->{_xml} && $HTML_VOID{$start}) || $attr =~ /\/\s*$/;
+        if (!$self->xml && $HTML_VOID{$start}) || $attr =~ /\/\s*$/;
 
       # Relaxed "script" or "style"
       if ($start eq 'script' || $start eq 'style') {
@@ -1106,7 +1106,7 @@ sub _pi {
   my ($self, $pi, $current) = @_;
 
   # Try to detect XML
-  $self->{_xml} = 1 if $pi =~ /xml/i;
+  $self->xml(1) if !defined $self->xml && $pi =~ /xml/i;
 
   # Append
   push @$$current, ['pi', $pi];
@@ -1577,6 +1577,15 @@ Charset used for decoding and encoding XML.
   $dom      = $dom->tree(['root', ['text', 'lalala']]);
 
 Document Object Model.
+
+=head2 C<xml>
+
+  my $xml = $dom->xml;
+  $dom    = $dom->xml(1);
+
+Disable HTML5 semantics in parser, defaults to auto detection based on
+processing instructions.
+Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS
 

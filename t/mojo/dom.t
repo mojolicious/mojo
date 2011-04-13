@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 496;
+use Test::More tests => 503;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -108,6 +108,7 @@ $dom->parse(<<EOF);
   more text
 </foo>
 EOF
+is $dom->xml, undef, 'xml mode not detected';
 is $dom->tree->[1]->[0], 'doctype', 'right element';
 is $dom->tree->[1]->[1], ' foo',    'right doctype';
 is "$dom", <<EOF, 'stringified right';
@@ -388,6 +389,7 @@ $dom->parse(<<EOF);
   </channel>
 </rss>
 EOF
+is $dom->xml, 1, 'xml mode detected';
 is $dom->find('rss')->[0]->attrs('version'), '2.0', 'right version';
 is $dom->at('extension')->attrs('foo:id'), 'works', 'right id';
 like $dom->at('#works')->text,       qr/\[awesome\]\]/, 'right text';
@@ -415,6 +417,7 @@ $dom->parse(<<EOF);
   </meta>
 </bk:book>
 EOF
+is $dom->xml, 1, 'xml mode detected';
 is $dom->at('book comment')->namespace, 'uri:default-ns', 'right namespace';
 is $dom->at('book comment')->text,      'rocks!',         'right text';
 is $dom->at('book nons section')->namespace, undef,         'no namespace';
@@ -436,6 +439,7 @@ $dom->parse(<<'EOF');
   </XRD>
 </XRDS>
 EOF
+is $dom->xml, 1, 'xml mode detected';
 is $dom->at('xrds')->namespace, 'xri://$xrds',         'right namespace';
 is $dom->at('xrd')->namespace,  'xri://$xrd*($v*2.0)', 'right namespace';
 my $s = $dom->find('xrds xrd service');
@@ -467,6 +471,7 @@ $dom->parse(<<'EOF');
   </XRD>
 </xrds:XRDS>
 EOF
+is $dom->xml, 1, 'xml mode detected';
 is $dom->at('xrds')->namespace, 'xri://$xrds',         'right namespace';
 is $dom->at('xrd')->namespace,  'xri://$xrd*($v*2.0)', 'right namespace';
 $s = $dom->find('xrds xrd service');
@@ -1330,6 +1335,7 @@ $dom->parse(<<EOF);
   <![CDATA[<hello>world</hello>]]>
 </root>
 EOF
+is $dom->xml, 1, 'xml mode detected';
 is $dom->at('root')->attrs('att'), 'test', 'right attribute';
 is $dom->tree->[5]->[1], ' root [
   <!ELEMENT root (#PCDATA)>
@@ -1360,6 +1366,7 @@ $dom->parse(<<EOF);
 ]  >
 <foo xml:lang="de">Check!</fOo>
 EOF
+is $dom->xml, 1, 'xml mode detected';
 is $dom->tree->[3]->[1], ' foo [
   <!ELEMENT foo ANY>
   <!ATTLIST foo xml:lang CDATA #IMPLIED>

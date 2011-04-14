@@ -545,11 +545,11 @@ sub rendered {
     # Application
     my $app = $self->app;
 
-    # Hook
-    $app->plugins->run_hook_reverse(after_dispatch => $self);
-
     # Session
     $app->sessions->store($self);
+
+    # Hook
+    $app->plugins->run_hook_reverse(after_dispatch => $self);
 
     # Finished
     $stash->{'mojo.finished'} = 1;

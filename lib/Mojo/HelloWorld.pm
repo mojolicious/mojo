@@ -301,12 +301,12 @@ sub _websocket {
         ws.onopen = wsopen;
       }
       else {
-        alert("Sorry, your browser does not support WebSocket.");
+        alert("Sorry, your browser does not support WebSockets.");
       }
     </script>
   </head>
   <body>
-    Testing WebSocket, please make sure you have JavaScript enabled.
+    Testing WebSockets, please make sure you have JavaScript enabled.
   </body>
 </html>
 EOF

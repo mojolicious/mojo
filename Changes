@@ -1,9 +1,12 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.16 2011-03-19 00:00:00
+        - Deprecated Mojolicious process method in favor of the on_process
+          attribute.
         - Added Failraptor.
         - Added support for MOJO_CERT_FILE and MOJO_KEY_FILE environment
           variables.
+        - Added EXPERIMENTAL xml attribute to Mojo::DOM.
         - Added EXPERIMENTAL build_url method to Test::Mojo.
         - Added WOFF mime type. (reezer)
         - Updated WebSocket implementation to ietf-06. (sri, crab)
@@ -12,6 +15,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved HTML healing capabilities of Mojo::DOM.
         - Improved Mojo::DOM to ignore useless end tags.
         - Improved Mojo::DOM inline DTD support. (akron)
+        - Improved Mojo::DOM text extraction.
         - Improved Mojolicious::Plugin::I18n default lexicon handling. (yko)
         - Moved all bundled static files to "lib/Mojolicious/public".
         - Made Test::Mojo a little more user friendly.

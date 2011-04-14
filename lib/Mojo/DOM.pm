@@ -11,7 +11,7 @@ use constant DEBUG => $ENV{MOJO_DOM_DEBUG} || 0;
 
 # "How are the kids supposed to get home?
 #  I dunno. Internet?"
-has 'charset';
+has [qw/charset xml/];
 has tree => sub { ['root'] };
 
 # Regex
@@ -47,7 +47,7 @@ my $CSS_TOKEN_RE        = qr/
 /x;
 my $XML_ATTR_RE = qr/
   \s*
-  ([^=\s>"']+)     # Key
+  ([^=\s>]+)       # Key
   (?:
     \s*
     =
@@ -147,11 +147,15 @@ sub all_text {
 
     unshift @stack, @$e[4 .. $#$e] and next if $type eq 'tag';
 
-    # Text or CDATA
-    if ($type eq 'text' || $type eq 'cdata' || $type eq 'raw') {
-      my $content = $e->[1];
-      $text .= $content if $content =~ /\S+/;
-    }
+    # Text
+    my $content = '';
+    if ($type eq 'text') { $content = $self->_trim($e->[1], $text =~ /\S$/) }
+
+    # CDATA or raw text
+    elsif ($type eq 'cdata' || $type eq 'raw') { $content = $e->[1] }
+
+    # Append
+    $text .= $content if $content =~ /\S+/;
   }
 
   return $text;
@@ -387,11 +391,15 @@ sub text {
     # Type
     my $type = $e->[0];
 
-    # Text or CDATA
-    if ($type eq 'text' || $type eq 'cdata' || $type eq 'raw') {
-      my $content = $e->[1];
-      $text .= $content if $content =~ /\S+/;
-    }
+    # Text
+    my $content = '';
+    if ($type eq 'text') { $content = $self->_trim($e->[1], $text =~ /\S$/) }
+
+    # CDATA or raw text
+    elsif ($type eq 'cdata' || $type eq 'raw') { $content = $e->[1] }
+
+    # Append
+    $text .= $content if $content =~ /\S+/;
   }
 
   return $text;
@@ -596,7 +604,7 @@ sub _end {
     ++$found and last if $next->[1] eq $end;
 
     # HTML inline tags stop here
-    return if !$self->{_xml} && $HTML_BLOCK{$next->[1]} && !$HTML_BLOCK{$end};
+    return if !$self->xml && $HTML_BLOCK{$next->[1]} && !$HTML_BLOCK{$end};
 
     # Next
     $next = $next->[3];
@@ -1000,9 +1008,6 @@ sub _parse_css {
 sub _parse_xml {
   my ($self, $xml) = @_;
 
-  # Fresh start
-  delete $self->{_xml};
-
   # State
   my $tree    = ['root'];
   my $current = $tree;
@@ -1079,7 +1084,7 @@ sub _parse_xml {
 
       # Empty tag
       $self->_end($start, \$current)
-        if (!$self->{_xml} && $HTML_VOID{$start}) || $attr =~ /\/\s*$/;
+        if (!$self->xml && $HTML_VOID{$start}) || $attr =~ /\/\s*$/;
 
       # Relaxed "script" or "style"
       if ($start eq 'script' || $start eq 'style') {
@@ -1098,7 +1103,7 @@ sub _pi {
   my ($self, $pi, $current) = @_;
 
   # Try to detect XML
-  $self->{_xml} = 1 if $pi =~ /xml/i;
+  $self->xml(1) if !defined $self->xml && $pi =~ /xml/i;
 
   # Append
   push @$$current, ['pi', $pi];
@@ -1268,6 +1273,20 @@ sub _text {
 
   # Append
   push @$$current, ['text', $text];
+}
+
+sub _trim {
+  my ($self, $text, $ws) = @_;
+
+  # Trim whitespace
+  $text =~ s/^\s*\n+\s*//;
+  $text =~ s/\s*\n+\s*$//;
+  $text =~ s/\s*\n+\s*/\ /g;
+
+  # Add leading whitespace
+  $text = " $text" if $ws;
+
+  return $text;
 }
 
 package Mojo::DOM::_Collection;
@@ -1555,6 +1574,15 @@ Charset used for decoding and encoding XML.
   $dom      = $dom->tree(['root', ['text', 'lalala']]);
 
 Document Object Model.
+
+=head2 C<xml>
+
+  my $xml = $dom->xml;
+  $dom    = $dom->xml(1);
+
+Disable HTML5 semantics in parser, defaults to auto detection based on
+processing instructions.
+Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS
 

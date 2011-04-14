@@ -50,11 +50,8 @@ sub body {
   my $content = $self->content;
 
   # Get
-  unless (@_) {
-    return $content->on_read
-      ? $content->on_read
-      : return $self->content->asset->slurp;
-  }
+  return $content->on_read ? $content->on_read : $self->content->asset->slurp
+    unless @_;
 
   # New content
   my $new = shift;

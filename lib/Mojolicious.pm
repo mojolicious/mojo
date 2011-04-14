@@ -11,7 +11,20 @@ use Mojolicious::Static;
 use Mojolicious::Types;
 
 has controller_class => 'Mojolicious::Controller';
-has mode => sub { ($ENV{MOJO_MODE} || 'development') };
+has mode             => sub { ($ENV{MOJO_MODE} || 'development') };
+has on_process       => sub {
+  sub {
+    my ($self, $c) = @_;
+
+    # DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
+    warn <<EOF and return $self->process($c) if $self->can('process');
+Mojolicious->process is DEPRECATED in favor of Mojolicious->on_process!!!
+EOF
+
+    # Dispatch
+    $self->dispatch($c);
+  };
+};
 has plugins  => sub { Mojolicious::Plugins->new };
 has renderer => sub { Mojolicious::Renderer->new };
 has routes   => sub { Mojolicious::Routes->new };
@@ -228,7 +241,9 @@ sub handler {
 
   # Build default controller and process
   eval {
-    $self->process($class->new(app => $self, stash => $stash, tx => $tx));
+    $self->on_process->(
+      $self, $class->new(app => $self, stash => $stash, tx => $tx)
+    );
   };
 
   # Fatal exception
@@ -274,9 +289,6 @@ sub plugin {
   my $self = shift;
   $self->plugins->register_plugin(shift, $self, @_);
 }
-
-# This will run for each request
-sub process { shift->dispatch(@_) }
 
 # DEPRECATED in Hot Beverage!
 sub session {
@@ -590,6 +602,20 @@ to your application named C<$mode_mode>.
     my $self = shift;
   }
 
+=head2 C<on_process>
+
+  my $process = $app->on_process;
+  $app        = $app->on_process(sub {...});
+
+Request processing callback, defaults to calling the C<dispatch> method.
+Generally you will use a plugin or controller instead of this, consider it
+the sledgehammer in your toolbox.
+
+  $app->on_process(sub {
+    my ($self, $c) = @_;
+    $self->dispatch($c);
+  });
+
 =head2 C<plugins>
 
   my $plugins = $app->plugins;
@@ -846,20 +872,6 @@ Log timing information.
 Template specific helper collection.
 
 =back
-
-=head2 C<process>
-
-  $app->process($c);
-
-This method can be overloaded to do logic on a per request basis, by default
-just calls dispatch and passes it a L<Mojolicious::Controller> object.
-Generally you will use a plugin or controller instead of this, consider it
-the sledgehammer in your toolbox.
-
-  sub process {
-      my ($self, $c) = @_;
-      $self->dispatch($c);
-  }
 
 =head2 C<start>
 

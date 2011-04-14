@@ -18,7 +18,7 @@ has on_websocket => sub {
 has ua => sub {
   my $self = shift;
 
-  # Singleton user agent
+  # Fresh user agent
   require Mojo::UserAgent;
   my $ua = Mojo::UserAgent->new(app => $self, log => $self->log);
 

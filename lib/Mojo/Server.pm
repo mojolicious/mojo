@@ -30,7 +30,7 @@ has on_build_tx => sub {
     }
 
     $self->app->on_build_tx->($self->app);
-    }
+  };
 };
 has on_handler => sub {
   sub {
@@ -48,13 +48,13 @@ has on_handler => sub {
     $app->log->debug(
       'Waiting for delayed response, forgot to render or resume?')
       unless $tx->is_writing;
-    }
+  };
 };
 has on_websocket => sub {
   sub {
     my $self = shift;
     $self->app->on_websocket->($self->app, @_)->server_handshake;
-    }
+  };
 };
 has reload => sub { $ENV{MOJO_RELOAD} || 0 };
 

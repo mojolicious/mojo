@@ -17,13 +17,13 @@ has on_process       => sub {
     my ($self, $c) = @_;
 
     # DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
-    warn <<EOF and $self->process($c) if $self->can('process');
+    warn <<EOF and return $self->process($c) if $self->can('process');
 Mojolicious->process is DEPRECATED in favor of Mojolicious->on_process!!!
 EOF
 
     # Dispatch
     $self->dispatch($c);
-    }
+  };
 };
 has plugins  => sub { Mojolicious::Plugins->new };
 has renderer => sub { Mojolicious::Renderer->new };

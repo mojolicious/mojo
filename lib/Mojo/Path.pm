@@ -80,6 +80,9 @@ sub parse {
   $path =~ /^\// ? $self->leading_slash(1)  : $self->leading_slash(0);
   $path =~ /\/$/ ? $self->trailing_slash(1) : $self->trailing_slash(0);
 
+  # Unescape
+  url_unescape $path;
+
   # Parse
   my @parts;
   for my $part (split '/', $path) {
@@ -91,7 +94,6 @@ sub parse {
     $part = '' unless defined $part;
 
     # Store
-    url_unescape $part;
     push @parts, $part;
   }
 

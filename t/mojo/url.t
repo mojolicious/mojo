@@ -135,17 +135,17 @@ is $url->to_abs->base, 'http://kraih.com/bar/baz/', 'right base';
 # Real world tests
 $url = Mojo::URL->new('http://acme.s3.amazonaws.com'
     . '/mojo%2Fg%2B%2B-4%2E2_4%2E2%2E3-2ubuntu7_i386%2Edeb');
-is $url->is_abs,   1,                                         'is absolute';
-is $url->scheme,   'http',                                    'right scheme';
-is $url->userinfo, undef,                                     'no userinfo';
-is $url->host,     'acme.s3.amazonaws.com',                   'right host';
-is $url->port,     undef,                                     'no port';
-is $url->path,     '/mojo%2Fg++-4.2_4.2.3-2ubuntu7_i386.deb', 'right path';
+is $url->is_abs,   1,                                       'is absolute';
+is $url->scheme,   'http',                                  'right scheme';
+is $url->userinfo, undef,                                   'no userinfo';
+is $url->host,     'acme.s3.amazonaws.com',                 'right host';
+is $url->port,     undef,                                   'no port';
+is $url->path,     '/mojo/g++-4.2_4.2.3-2ubuntu7_i386.deb', 'right path';
 ok !$url->query->to_string, 'no query';
 is_deeply $url->query->to_hash, {}, 'right structure';
 is $url->fragment, undef, 'no fragment';
 is "$url",
-  'http://acme.s3.amazonaws.com/mojo%2Fg++-4.2_4.2.3-2ubuntu7_i386.deb',
+  'http://acme.s3.amazonaws.com/mojo/g++-4.2_4.2.3-2ubuntu7_i386.deb',
   'right format';
 
 # Clone (advanced)

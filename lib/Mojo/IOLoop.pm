@@ -1757,11 +1757,8 @@ Mojo::IOLoop - Minimalistic Reactor For Async TCP Clients And Servers
 
   use Mojo::IOLoop;
 
-  # Create loop
-  my $loop = Mojo::IOLoop->new;
-
   # Listen on port 3000
-  $loop->listen(
+  Mojo::IOLoop->listen(
     port => 3000,
     on_read => sub {
       my ($self, $id, $chunk) = @_;
@@ -1775,7 +1772,7 @@ Mojo::IOLoop - Minimalistic Reactor For Async TCP Clients And Servers
   );
 
   # Connect to port 3000 with TLS activated
-  my $id = $loop->connect(
+  my $id = Mojo::IOLoop->connect(
     address => 'localhost',
     port => 3000,
     tls => 1,
@@ -1794,14 +1791,14 @@ Mojo::IOLoop - Minimalistic Reactor For Async TCP Clients And Servers
   );
 
   # Add a timer
-  $loop->timer(5 => sub {
+  Mojo::IOLoop->timer(5 => sub {
     my $self = shift;
     $self->drop($id);
   });
 
   # Start and stop loop
-  $loop->start;
-  $loop->stop;
+  Mojo::IOLoop->start;
+  Mojo::IOLoop->stop;
 
 =head1 DESCRIPTION
 

@@ -77,7 +77,7 @@ sub attr {
 
   # Create attributes
   $attrs = [$attrs] unless ref $attrs eq 'ARRAY';
-  my $ws = '    ';
+  my $ws = '  ';
   for my $attr (@$attrs) {
 
     Carp::croak(qq/Attribute "$attr" invalid/)

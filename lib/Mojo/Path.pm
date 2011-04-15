@@ -77,6 +77,7 @@ sub parse {
 
   # Meta
   $path = '' unless defined $path;
+  url_unescape $path;
   $path =~ /^\// ? $self->leading_slash(1)  : $self->leading_slash(0);
   $path =~ /\/$/ ? $self->trailing_slash(1) : $self->trailing_slash(0);
 

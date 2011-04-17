@@ -12,7 +12,7 @@ BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 my $backup;
 BEGIN { $backup = $ENV{MOJO_MODE} || ''; $ENV{MOJO_MODE} = 'development' }
 
-use Test::More tests => 720;
+use Test::More tests => 723;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -209,7 +209,8 @@ get '/source' => sub { shift->render_static('../lite_app.t') };
 # GET /foo_relaxed/*
 get '/foo_relaxed/(.test)' => sub {
   my $self = shift;
-  $self->render_text($self->stash('test'));
+  $self->render_text(
+    $self->stash('test') . ($self->req->headers->dnt ? 1 : 0));
 };
 
 # GET /foo_wildcard/*
@@ -890,7 +891,11 @@ $t->get_ok('/', '1234' x 1024)->status_is(413)
 $ENV{MOJO_MAX_MESSAGE_SIZE} = $backup2;
 
 # GET /foo_relaxed/123
-$t->get_ok('/foo_relaxed/123')->status_is(200)->content_is('123');
+$t->get_ok('/foo_relaxed/123')->status_is(200)->content_is('1230');
+
+# GET /foo_relaxed/123 (Do Not Track)
+$t->get_ok('/foo_relaxed/123', {DNT => 1})->status_is(200)
+  ->content_is('1231');
 
 # GET /foo_relaxed
 $t->get_ok('/foo_relaxed/')->status_is(404);

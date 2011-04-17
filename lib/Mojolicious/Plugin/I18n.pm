@@ -158,12 +158,14 @@ Lexicon namespace, defaults to the application class followed by C<::I18N>.
 =head2 C<l>
 
   <%=l 'hello' %>
+  $self->l('hello');
 
 Translate sentence.
 
 =head2 C<languages>
 
   <% languages 'de'; %>
+  $self->languages('de');
 
 Change languages.
 

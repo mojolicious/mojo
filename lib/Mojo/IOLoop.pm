@@ -1062,9 +1062,11 @@ sub _connect {
 
     # Timer
     $c->{connect_timer} =
-      $self->timer(
-      $self->connect_timeout => sub { shift->_error($id, 'Connect timeout.') }
-      );
+      $self->timer($self->connect_timeout,
+      sub { shift->_error($id, 'Connect timeout.') });
+
+    # IPv6
+    $handle->connect if IPV6;
   }
   $c->{handle} = $handle;
   $self->{_reverse}->{$handle} = $id;
@@ -1072,15 +1074,14 @@ sub _connect {
   # Non-blocking
   $handle->blocking(0);
 
-  # IPv6
-  $handle->connect if IPV6;
-
   # File descriptor
   return unless defined(my $fd = fileno $handle);
   $self->{_fds}->{$fd} = $id;
 
-  # Add handle to poll
-  $self->_writing($id);
+  # Sockets start writing right away
+  $handle->isa('IO::Socket')
+    ? $self->_writing($id)
+    : $self->_not_writing($id);
 
   # Start TLS
   if ($args->{tls}) { $self->start_tls($id => $args) }

@@ -3,15 +3,26 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8;
+use Test::More tests => 9;
 
 use_ok 'Mojo::IOLoop';
+
+use IO::Handle;
 
 # "Marge, you being a cop makes you the man!
 #  Which makes me the woman, and I have no interest in that,
 #  besides occasionally wearing the underwear,
 #  which as we discussed, is strictly a comfort thing."
 my $loop = Mojo::IOLoop->new;
+
+# Readonly handle
+my $ro = IO::Handle->new;
+$ro->fdopen(fileno(STDIN), 'r');
+my $error;
+$loop->connect(
+  handle   => $ro,
+  on_error => sub { $error = pop }
+);
 
 # Ticks
 my $ticks = 0;
@@ -83,3 +94,6 @@ $loop->connect(
 $loop->timer('0.5' => sub { shift->stop });
 $loop->start;
 isa_ok $handle, 'IO::Socket', 'right reference';
+
+# Readonly handle
+is $error, undef, 'no error';

@@ -65,9 +65,10 @@ my @WEBSOCKET_HEADERS = qw/
   Sec-WebSocket-Origin
   Sec-WebSocket-Protocol
   /;
-my @HEADERS = (
-  @GENERAL_HEADERS, @REQUEST_HEADERS, @RESPONSE_HEADERS,
-  @ENTITY_HEADERS,  @WEBSOCKET_HEADERS
+my @MISC_HEADERS = qw/DNT/;
+my @HEADERS      = (
+  @GENERAL_HEADERS, @REQUEST_HEADERS,   @RESPONSE_HEADERS,
+  @ENTITY_HEADERS,  @WEBSOCKET_HEADERS, @MISC_HEADERS
 );
 
 # Lower case headers
@@ -110,6 +111,7 @@ sub content_transfer_encoding {
 sub content_type { scalar shift->header('Content-Type' => @_) }
 sub cookie       { scalar shift->header(Cookie         => @_) }
 sub date         { scalar shift->header(Date           => @_) }
+sub dnt          { scalar shift->header(DNT            => @_) }
 sub expect       { scalar shift->header(Expect         => @_) }
 
 sub from_hash {
@@ -401,6 +403,14 @@ Shortcut for the C<Cookie> header.
   $headers = $headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
 
 Shortcut for the C<Date> header.
+
+=head2 C<dnt>
+
+  my $dnt  = $headers->dnt;
+  $headers = $headers->dnt(1);
+
+Shortcut for the C<DNT> (Do Not Track) header.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<expect>
 

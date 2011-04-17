@@ -8,6 +8,7 @@ This file documents the revision history for Perl extension Mojolicious.
           variables.
         - Added EXPERIMENTAL xml attribute to Mojo::DOM.
         - Added EXPERIMENTAL build_url method to Test::Mojo.
+        - Added EXPERIMENTAL dnt (Do Not Track) method to Mojo::Headers.
         - Added WOFF mime type. (reezer)
         - Updated WebSocket implementation to ietf-06. (sri, crab)
         - Updated jQuery to version 1.5.2.

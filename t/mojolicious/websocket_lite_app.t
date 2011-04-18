@@ -6,7 +6,7 @@ use warnings;
 # Disable IPv6, epoll and kqueue
 BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 37;
+use Test::More tests => 39;
 
 # "Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
 #  Well, that’s love for you."
@@ -141,6 +141,11 @@ my $res = $ua->get('/link')->success;
 is $res->code, 200, 'right status';
 like $res->body, qr/ws\:\/\/localhost\:\d+\//, 'right content';
 
+# GET /socket (plain HTTP request)
+$res = $ua->get('/socket')->res;
+is $res->code,   404,           'right status';
+like $res->body, qr/Not Found/, 'right content';
+
 # WebSocket /
 my $result;
 $ua->websocket(
@@ -160,7 +165,7 @@ $ua->websocket(
 $loop->start;
 like $result, qr/test1test2ws\:\/\/localhost\:\d+\//, 'right result';
 
-# Failed websocket connection
+# WebSocket /something/else (failed websocket connection)
 my ($code, $body, $ws);
 $ua->websocket(
   '/something/else' => sub {

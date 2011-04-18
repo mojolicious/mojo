@@ -174,6 +174,9 @@ sub on_message {
   # Receive
   $tx->on_message(sub { shift and $self->$cb(@_) });
 
+  # Websocket handshake
+  $tx->res->code(101);
+
   # Rendered
   $self->rendered;
 
@@ -586,6 +589,9 @@ sub send_message {
       $self->$cb(@_) if $cb;
     }
   );
+
+  # Websocket handshake
+  $tx->res->code(101);
 
   # Rendered
   $self->rendered;

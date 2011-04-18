@@ -6,7 +6,7 @@ use warnings;
 # Disable IPv6, epoll and kqueue
 BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 34;
+use Test::More tests => 37;
 
 # "Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
 #  Well, that’s love for you."
@@ -47,6 +47,9 @@ websocket '/' => sub {
     }
   );
 } => 'index';
+
+# GET /something/else
+get '/something/else' => sub { shift->render(text => 'failed!') };
 
 # WebSocket /socket
 websocket '/socket' => sub {
@@ -157,6 +160,22 @@ $ua->websocket(
 $loop->start;
 like $result, qr/test1test2ws\:\/\/localhost\:\d+\//, 'right result';
 
+# Failed websocket connection
+my ($code, $body, $ws);
+$ua->websocket(
+  '/something/else' => sub {
+    my $tx = pop;
+    $ws   = $tx->is_websocket;
+    $code = $tx->res->code;
+    $body = $tx->res->body;
+    $loop->stop;
+  }
+);
+$loop->start;
+is $ws,   0,         'not a websocket';
+is $code, 426,       'right code';
+is $body, 'failed!', 'right content';
+
 # WebSocket /socket (using an already prepared socket)
 my $port = $ua->test_server;
 $result = undef;
@@ -211,7 +230,7 @@ is $result, 'test3test2', 'right result';
 is $flag2,  23,           'finished callback';
 
 # WebSocket /denied (connection denied)
-my $code = undef;
+$code = undef;
 $ua->websocket(
   '/denied' => sub {
     $code = pop->res->code;

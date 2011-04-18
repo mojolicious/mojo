@@ -15,11 +15,8 @@ use constant GUID => '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 use constant SHA1 => eval 'use Digest::SHA (); 1';
 
 has handshake => sub { Mojo::Transaction::HTTP->new };
-has 'masked';
+has [qw/masked on_message/];
 has max_websocket_size => sub { $ENV{MOJO_MAX_WEBSOCKET_SIZE} || 5242880 };
-has on_message => sub {
-  sub { }
-};
 
 sub client_challenge {
   my $self = shift;
@@ -67,6 +64,8 @@ sub finish {
 
   # Finish after writing
   return $self->{_finished} = 1;
+
+  return $self;
 }
 
 sub is_websocket {1}
@@ -170,7 +169,8 @@ sub server_read {
     my $message = $self->{_message};
     $self->{_message} = '';
     decode 'UTF-8', $message if $message;
-    $self->on_message->($self, $message);
+    return $self->finish unless my $cb = $self->on_message;
+    $self->$cb($message);
   }
 
   # Check message size
@@ -484,7 +484,7 @@ The connection this websocket is using.
 
 =head2 C<finish>
 
-  $ws->finish;
+  $ws = $ws->finish;
 
 Finish the WebSocket connection gracefully.
 

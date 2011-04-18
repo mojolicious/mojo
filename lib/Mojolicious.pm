@@ -199,8 +199,8 @@ sub dispatch {
   # Already rendered
   return if $res->code;
 
-  # Websocket handshake
-  $c->res->code(101) if $tx->is_websocket;
+  # Default to failed Websocket handshake
+  $c->res->code(426) if $tx->is_websocket;
 
   # Error or 200
   my ($error, $code) = $tx->req->error;

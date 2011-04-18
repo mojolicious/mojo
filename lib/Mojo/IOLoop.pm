@@ -11,7 +11,7 @@ use List::Util 'first';
 use Mojo::URL;
 use Scalar::Util 'weaken';
 use Socket qw/IPPROTO_TCP TCP_NODELAY/;
-use Time::HiRes 'time';
+use Time::HiRes qw/time usleep/;
 
 # Debug
 use constant DEBUG => $ENV{MOJO_IOLOOP_DEBUG} || 0;
@@ -618,9 +618,13 @@ sub one_tick {
   }
 
   # Idle
-  for my $idle (keys %{$self->{_idle}}) {
-    $self->_run_callback('idle', $self->{_idle}->{$idle}->{cb}, $idle)
-      unless @read || @write || @error || @hup || $timers;
+  unless (@read || @write || @error || @hup || $timers) {
+    for my $idle (keys %{$self->{_idle}}) {
+      $self->_run_callback('idle', $self->{_idle}->{$idle}->{cb}, $idle);
+    }
+
+    # Only kqueue blocks when idle
+    usleep 1000000 * $timeout unless KQUEUE;
   }
 }
 
@@ -1467,11 +1471,6 @@ sub _prepare_loop {
 
     $self->{_loop} = IO::Poll->new;
   }
-
-  # Dummy handle to make empty poll respect the timeout and block
-  $self->{_loop}
-    ->mask(IO::Socket::INET->new(Listen => 1, LocalAddr => '127.0.0.1'),
-    EPOLL ? EPOLL_POLLIN : POLLIN);
 
   return $self->{_loop};
 }

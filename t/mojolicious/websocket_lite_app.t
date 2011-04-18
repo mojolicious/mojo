@@ -6,7 +6,7 @@ use warnings;
 # Disable IPv6, epoll and kqueue
 BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 39;
+use Test::More tests => 41;
 
 # "Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
 #  Well, that’s love for you."
@@ -188,9 +188,10 @@ $ua->websocket(
   }
 );
 $loop->start;
-is $ws,   0,          'not a websocket';
-is $code, 426,        'right code';
-is $body, '5failed!', 'right content';
+is $ws,   0,   'not a websocket';
+is $code, 426, 'right code';
+ok $body =~ /^(\d+)failed!$/, 'right content';
+ok $1 < 100, 'right timeout';
 
 # WebSocket /socket (using an already prepared socket)
 my $port = $ua->test_server;
@@ -216,7 +217,8 @@ $ua->start(
   }
 );
 $loop->start;
-is $result, 'lalala300', 'right result';
+ok $result =~ /^lalala(\d+)$/, 'right result';
+ok $1 > 100, 'right timeout';
 ok $local, 'local port';
 
 # WebSocket /early_start (server directly sends a message)

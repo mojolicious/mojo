@@ -49,12 +49,23 @@ websocket '/' => sub {
 } => 'index';
 
 # GET /something/else
-get '/something/else' => sub { shift->render(text => 'failed!') };
+get '/something/else' => sub {
+  my $self = shift;
+  my $timeout =
+    Mojo::IOLoop->singleton->connection_timeout($self->tx->connection);
+  $self->render(text => "${timeout}failed!");
+};
 
 # WebSocket /socket
 websocket '/socket' => sub {
   my $self = shift;
-  $self->send_message($self->req->headers->host);
+  $self->send_message(
+    $self->req->headers->host,
+    sub {
+      shift->send_message(
+        Mojo::IOLoop->singleton->connection_timeout($self->tx->connection));
+    }
+  );
   $self->finish;
 };
 
@@ -177,13 +188,13 @@ $ua->websocket(
   }
 );
 $loop->start;
-is $ws,   0,         'not a websocket';
-is $code, 426,       'right code';
-is $body, 'failed!', 'right content';
+is $ws,   0,          'not a websocket';
+is $code, 426,        'right code';
+is $body, '5failed!', 'right content';
 
 # WebSocket /socket (using an already prepared socket)
 my $port = $ua->test_server;
-$result = undef;
+$result = '';
 my $tx = $ua->build_websocket_tx('ws://lalala/socket');
 my $socket =
   IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $port);
@@ -197,15 +208,15 @@ $ua->start(
     $tx->on_message(
       sub {
         my ($tx, $message) = @_;
-        $result = $message;
-        $tx->finish;
+        $tx->finish if length $result;
+        $result .= $message;
       }
     );
     $local = $loop->local_info($tx->connection)->{port};
   }
 );
 $loop->start;
-is $result, 'lalala', 'right result';
+is $result, 'lalala300', 'right result';
 ok $local, 'local port';
 
 # WebSocket /early_start (server directly sends a message)

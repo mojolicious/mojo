@@ -217,6 +217,9 @@ sub _finish {
       # Make sure connection stays active
       $tx->keep_alive(1);
 
+      # Upgrade connection timeout
+      $self->ioloop->connection_timeout($id, $self->websocket_timeout);
+
       # Weaken
       weaken $self;
 
@@ -363,9 +366,6 @@ sub _upgrade {
 
   # WebSocket handshake handler
   my $ws = $c->{websocket} = $self->on_websocket->($self, $tx);
-
-  # Upgrade connection timeout
-  $self->ioloop->connection_timeout($id, $self->websocket_timeout);
 
   # Not resumable yet
   $ws->on_resume(sub {1});

@@ -63,7 +63,7 @@ sub finish {
   $self->_send_frame(1, '');
 
   # Finish after writing
-  return $self->{_finished} = 1;
+  $self->{_finished} = 1;
 
   return $self;
 }

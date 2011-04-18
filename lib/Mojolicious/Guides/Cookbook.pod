@@ -379,10 +379,10 @@ time.
       # Extract URLs
       print "[$id] $url\n";
       $tx->res->dom('a[href]')->each(sub {
+        my $e = shift;
 
         # Build absolute URL
-        my $url = Mojo::URL->new(shift->attrs->{href});
-        $url    = $url->base($tx->req->url)->to_abs;
+        my $url = Mojo::URL->new($e->attrs('href'))->to_abs($tx->req->url);
         print " -> $url\n";
 
         # Enqueue

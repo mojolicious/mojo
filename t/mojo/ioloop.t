@@ -3,6 +3,9 @@
 use strict;
 use warnings;
 
+# Disable IPv6, epoll and kqueue
+BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
+
 use Test::More tests => 9;
 
 use_ok 'Mojo::IOLoop';
@@ -21,6 +24,7 @@ $ro->fdopen(fileno(STDIN), 'r');
 my $error;
 $loop->connect(
   handle   => $ro,
+  on_read  => sub { },
   on_error => sub { $error = pop }
 );
 

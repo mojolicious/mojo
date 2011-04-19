@@ -1494,7 +1494,7 @@ sub _read {
   return unless defined(my $handle = $c->{handle});
 
   # Read as much as possible
-  my $read = $handle->sysread(my $buffer, 4194304, 0);
+  my $read = $handle->sysread(my $buffer, 256000, 0);
 
   # Error
   unless (defined $read) {

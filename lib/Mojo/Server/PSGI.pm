@@ -1,7 +1,7 @@
 package Mojo::Server::PSGI;
 use Mojo::Base 'Mojo::Server';
 
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 256000;
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 131072;
 
 # "Things aren't as happy as they used to be down here at the unemployment
 #  office.

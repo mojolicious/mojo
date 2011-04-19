@@ -1,7 +1,7 @@
 package Mojo::Server::CGI;
 use Mojo::Base 'Mojo::Server';
 
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 256000;
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 131072;
 
 has nph => 0;
 

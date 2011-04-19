@@ -7,7 +7,7 @@ use IO::File;
 use Mojo::ByteStream;
 use Mojo::Exception;
 
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 256000;
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 131072;
 
 has [qw/auto_escape compiled/];
 has [qw/append code prepend/] => '';

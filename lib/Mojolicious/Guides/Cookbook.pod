@@ -92,6 +92,9 @@ auto detected.
   # hypnotoad.conf
   {proxy => 1};
 
+This allows L<Mojolicious> to automatically pick up the C<X-Forwarded-For>,
+C<X-Forwarded-Host> and C<X-Forwarded-HTTPS> headers.
+
 =head2 Apache/CGI
 
 C<CGI> is supported out of the box and your L<Mojolicious> application will
@@ -540,7 +543,7 @@ And you can use all the commands from L<Mojolicious::Commands>.
 
 This tasty oneliner will keep your L<Mojolicious> as fresh as possible.
 
-  sudo -s 'mojo get -r cpanmin.us | perl - http://latest.mojolicio.us'
+  sudo sh -c "curl -L cpanmin.us | perl - http://latest.mojolicio.us"
 
 =head2 jQuery (Content Distribution Network)
 

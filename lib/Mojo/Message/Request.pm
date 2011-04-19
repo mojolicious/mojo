@@ -22,6 +22,9 @@ my $START_LINE_RE = qr/
   $                                                            # End
 /x;
 
+# Host regex
+my $HOST_RE = qr/^([^\:]*)\:?(.*)$/;
+
 sub cookies {
   my $self = shift;
 
@@ -161,6 +164,21 @@ sub parse {
         $self->proxy(Mojo::URL->new->userinfo($userinfo));
       }
     }
+
+    # Reverse proxy
+    if ($ENV{MOJO_REVERSE_PROXY}) {
+
+      # "X-Forwarded-Host"
+      if (my $host = $headers->header('X-Forwarded-Host')) {
+        if ($host =~ $HOST_RE) {
+          $base->host($1);
+          $base->port($2) if defined $2;
+        }
+      }
+
+      # "X-Forwarded-HTTPS"
+      if ($headers->header('X-Forwarded-HTTPS')) { $base->scheme('https') }
+    }
   }
 
   return $self;
@@ -264,7 +282,7 @@ sub _parse_env {
         my $host = $value;
         my $port = undef;
 
-        if ($host =~ /^([^\:]*)\:?(.*)$/) {
+        if ($host =~ $HOST_RE) {
           $host = $1;
           $port = $2;
         }

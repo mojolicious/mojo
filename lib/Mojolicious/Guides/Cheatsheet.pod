@@ -297,6 +297,8 @@ be detected automatically so you don't have to restart the server manually.
 =head2 C<MOJO_REVERSE_PROXY>
 
 Enable reverse proxy support for L<Mojolicious> application.
+This allows L<Mojolicious> to automatically pick up the C<X-Forwarded-For>,
+C<X-Forwarded-Host> and C<X-Forwarded-HTTPS> headers.
 
   MOJO_REVERSE_PROXY=1
 

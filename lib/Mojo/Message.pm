@@ -481,10 +481,10 @@ sub _parse {
   # Check line size
   my $headers = $self->headers;
   if (!$headers->is_done) {
-    my $blen = index $self->{_buffer}, "\x0a";
-    $blen = length $self->{_buffer} if $blen < 0;
+    my $len = index $self->{_buffer}, "\x0a";
+    $len = length $self->{_buffer} if $len < 0;
     return $self->error('Maximum line size exceeded.', 413)
-      if $blen + length $headers->leftovers > $self->max_line_size;
+      if $len + length $headers->leftovers > $self->max_line_size;
   }
 
   # Content

@@ -224,7 +224,7 @@ Access flash values.
   <%= include 'menubar', format => 'txt' %>
 
 Include a partial template, all arguments get localized automatically and are
-only available in the incuded template.
+only available in the partial template.
 
 =head2 C<layout>
 

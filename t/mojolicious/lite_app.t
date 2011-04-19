@@ -280,7 +280,7 @@ get '/nested-includes' => sub {
 # GET /localized/include
 get '/localized/include' => sub {
   my $self = shift;
-  $self->render('localized', layout => 'localized1', test => 'foo');
+  $self->render('localized', test => 'foo');
 };
 
 # GET /outerlayout
@@ -1633,6 +1633,7 @@ Not Bender!
 %== shift->url_for('root');
 
 @@ localized.html.ep
+% layout 'localized1';
 <%= $test %>
 <%= include 'localized_partial', test => 321, layout => 'localized2' %>
 <%= $test %>

@@ -46,7 +46,35 @@ sub register {
   $app->helper(flash => sub { shift->flash(@_) });
 
   # Add "include" helper
-  $app->helper(include => sub { shift->render_partial(@_) });
+  $app->helper(
+    include => sub {
+      my $self = shift;
+
+      # Template as first argument
+      my $template = @_ % 2 ? shift : undef;
+
+      # Arguments
+      my $args = {@_};
+
+      # Template
+      $args->{template} = $template if defined $template;
+
+      # "layout" and "extends" can't be localized
+      my $layout  = delete $args->{layout};
+      my $extends = delete $args->{extends};
+
+      # Localize arguments
+      my @keys  = keys %$args;
+      my $i     = 0;
+      my $stash = $self->stash;
+    START:
+      local $stash->{$keys[$i]} = $args->{$keys[$i]};
+      $i++;
+      goto START unless $i >= @keys;
+
+      return $self->render_partial(layout => $layout, extend => $extends);
+    }
+  );
 
   # Add "layout" helper
   $app->helper(
@@ -195,7 +223,8 @@ Access flash values.
   <%= include 'menubar' %>
   <%= include 'menubar', format => 'txt' %>
 
-Include a partial template.
+Include a partial template, all arguments get localized automatically and are
+only available in the incuded template.
 
 =head2 C<layout>
 

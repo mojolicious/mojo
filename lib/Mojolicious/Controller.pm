@@ -296,18 +296,7 @@ sub render {
   return 1;
 }
 
-sub render_data {
-  my $self = shift;
-  my $data = shift;
-
-  # Arguments
-  my $args = ref $_[0] ? $_[0] : {@_};
-
-  # Data
-  $args->{data} = $data;
-
-  return $self->render($args);
-}
+sub render_data { shift->render(data => shift, @_) }
 
 # "The path to robot hell is paved with human flesh.
 #  Neat."
@@ -486,15 +475,14 @@ sub render_not_found {
 sub render_partial {
   my $self = shift;
 
-  # Template as single argument
-  my $template;
-  $template = shift if (@_ % 2 && !ref $_[0]) || (!@_ % 2 && ref $_[1]);
+  # Template as first argument
+  my $template = @_ % 2 ? shift : undef;
 
   # Arguments
-  my $args = ref $_[0] ? $_[0] : {@_};
+  my $args = {@_};
 
   # Template
-  $args->{template} = $template if $template;
+  $args->{template} = $template if defined $template;
 
   # Partial
   $args->{partial} = 1;
@@ -517,18 +505,7 @@ sub render_static {
   $self->rendered;
 }
 
-sub render_text {
-  my $self = shift;
-  my $text = shift;
-
-  # Arguments
-  my $args = ref $_[0] ? $_[0] : {@_};
-
-  # Data
-  $args->{text} = $text;
-
-  return $self->render($args);
-}
+sub render_text { shift->render(text => shift, @_) }
 
 # "On the count of three, you will awaken feeling refreshed,
 #  as if Futurama had never been canceled by idiots,
@@ -1365,6 +1342,7 @@ template name.
 =head2 C<render_data>
 
   $c->render_data($bits);
+  $c->render_data($bits, format => 'png');
 
 Render the given content as raw bytes, similar to C<render_text> but data
 will not be encoded.

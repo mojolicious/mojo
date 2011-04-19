@@ -12,7 +12,7 @@ BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 my $backup;
 BEGIN { $backup = $ENV{MOJO_MODE} || ''; $ENV{MOJO_MODE} = 'development' }
 
-use Test::More tests => 729;
+use Test::More tests => 734;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -275,6 +275,12 @@ get '/nested-includes' => sub {
     layout   => 'layout',
     handler  => 'ep'
   );
+};
+
+# GET /localized/include
+get '/localized/include' => sub {
+  my $self = shift;
+  $self->render('localized', layout => 'localized1', test => 'foo');
 };
 
 # GET /outerlayout
@@ -974,6 +980,12 @@ $t->get_ok('/nested-includes')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("layouted Nested Hello\n[\n  1,\n  2\n]\nthere<br>!\n\n\n\n");
 
+# GET /localized/include
+$t->get_ok('/localized/include')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("localized1 foo\nlocalized2 321\n\n\nfoo\n\n");
+
 # GET /outerlayout
 $t->get_ok('/outerlayout')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
@@ -1619,6 +1631,20 @@ Not Bender!
 
 @@ root_path.html.epl
 %== shift->url_for('root');
+
+@@ localized.html.ep
+<%= $test %>
+<%= include 'localized_partial', test => 321, layout => 'localized2' %>
+<%= $test %>
+
+@@ localized_partial.html.ep
+<%= $test %>
+
+@@ layouts/localized1.html.ep
+localized1 <%= content %>
+
+@@ layouts/localized2.html.ep
+localized2 <%= content %>
 
 @@ outerlayout.html.ep
 Hello

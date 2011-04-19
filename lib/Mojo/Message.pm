@@ -471,9 +471,6 @@ sub _parse {
     $self->{_buffer} .= $chunk;
   }
 
-  # Start line
-  $self->_parse_start_line unless $self->{_state};
-
   # Check message size
   return $self->error('Maximum message size exceeded.', 413)
     if $self->{_raw_size} > $self->max_message_size;
@@ -486,6 +483,9 @@ sub _parse {
     return $self->error('Maximum line size exceeded.', 413)
       if $len + length $headers->leftovers > $self->max_line_size;
   }
+
+  # Start line
+  $self->_parse_start_line unless $self->{_state};
 
   # Content
   my $state = $self->{_state} || '';

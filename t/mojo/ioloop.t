@@ -99,7 +99,6 @@ $loop->connect(
   address => 'localhost',
   port    => $port,
 );
-$loop->timer(1 => sub { shift->stop });
 $loop->start;
 isa_ok $handle, 'IO::Socket', 'right reference';
 

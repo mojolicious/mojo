@@ -3,6 +3,8 @@ use Mojo::Base -base;
 
 use Mojo::Util 'get_line';
 
+has max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 10240 };
+
 # Headers
 my @GENERAL_HEADERS = qw/
   Connection
@@ -156,10 +158,9 @@ sub header {
 sub host { scalar shift->header(Host => @_) }
 sub if_modified_since { scalar shift->header('If-Modified-Since' => @_) }
 
-sub is_done {
-  return 1 if (shift->{_state} || '') eq 'done';
-  return;
-}
+sub is_done { (shift->{_state} || '') eq 'done' }
+
+sub is_limit_exceeded { shift->{_limit} }
 
 sub last_modified { scalar shift->header('Last-Modified' => @_) }
 
@@ -186,10 +187,22 @@ sub parse {
   $self->{_buffer} = '' unless defined $self->{_buffer};
   $self->{_buffer} .= $chunk if defined $chunk;
 
+  # Maximum line size
+  my $max = $self->max_line_size;
+
   # Parse headers
   my $headers = $self->{_cache} || [];
   $self->{_state} = 'headers';
   while (defined(my $line = get_line $self->{_buffer})) {
+
+    # Check line size
+    if (length $line > $max) {
+
+      # Abort
+      $self->{_state} = 'done';
+      $self->{_limit} = 1;
+      return $self;
+    }
 
     # New header
     if ($line =~ /^(\S+)\s*:\s*(.*)/) { push @$headers, $1, $2 }
@@ -315,6 +328,18 @@ Mojo::Headers - Headers
 =head1 DESCRIPTION
 
 L<Mojo::Headers> is a container and parser for HTTP headers.
+
+=head1 ATTRIBUTES
+
+L<Mojo::Headers> implements the following attributes.
+
+=head2 C<max_line_size>
+
+  my $size = $headers->max_line_size;
+  $headers = $headers->max_line_size(1024);
+
+Maximum line size in bytes, defaults to C<10240>.
+Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS
 
@@ -464,6 +489,13 @@ Shortcut for the C<If-Modified-Since> header.
   my $done = $headers->is_done;
 
 Check if header parser is done.
+
+=head2 C<is_limit_exceeded>
+
+  my $limit = $headers->is_limit_exceeded;
+
+Check if a header has exceeded C<max_line_size>.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<last_modified>
 

@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 930;
+use Test::More tests => 940;
 
 use File::Spec;
 use File::Temp;
@@ -54,6 +54,24 @@ is $req->at_least_version('1.1'), 1,     'at least version 1.1';
 is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->url, '/', 'right URL';
 is $req->cookie('a'), undef, 'no value';
+is $req->body, '', 'no content';
+
+# Parse HTTP 1.1 message with huge "Cookie" header exceeding line limit
+# (alternative)
+$req = Mojo::Message::Request->new;
+$req->parse("GET / HTTP/1.1\x0d\x0a");
+$req->parse("Content-Length: 4\x0d\x0aCookie: "
+    . ('a=b; ' x (128 * 1024))
+    . "\x0d\x0aX-Test: 23\x0d\x0a\x0d\x0aabcd");
+ok $req->is_done, 'request is done';
+is $req->error,   'Maximum line size exceeded.', 'right error';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.1'), 1,     'at least version 1.1';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/', 'right URL';
+is $req->cookie('a'), undef, 'no value';
+is $req->body, '', 'no content';
 
 # Parse HTTP 1.1 message with content exceeding line limit
 $req = Mojo::Message::Request->new;

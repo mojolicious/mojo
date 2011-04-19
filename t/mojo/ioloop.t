@@ -89,13 +89,16 @@ my $port = Mojo::IOLoop->generate_port;
 my $handle;
 $loop->listen(
   port      => $port,
-  on_accept => sub { $handle = shift->handle(pop) }
+  on_accept => sub {
+    my $self = shift;
+    $handle = $self->handle(pop);
+    $self->stop;
+  }
 );
 $loop->connect(
   address => 'localhost',
   port    => $port,
 );
-$loop->timer('0.5' => sub { shift->stop });
 $loop->start;
 isa_ok $handle, 'IO::Socket', 'right reference';
 

@@ -20,7 +20,7 @@ my $loop = Mojo::IOLoop->new;
 
 # Readonly handle
 my $ro = IO::Handle->new;
-$ro->fdopen(fileno(STDIN), 'r');
+$ro->fdopen(fileno(DATA), 'r');
 my $error;
 $loop->connect(
   handle   => $ro,
@@ -99,8 +99,11 @@ $loop->connect(
   address => 'localhost',
   port    => $port,
 );
+$loop->timer(1 => sub { shift->stop });
 $loop->start;
 isa_ok $handle, 'IO::Socket', 'right reference';
 
 # Readonly handle
 is $error, undef, 'no error';
+
+__DATA__

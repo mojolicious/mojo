@@ -93,11 +93,15 @@ $loop->listen(
     my $self = shift;
     $handle = $self->handle(pop);
     $self->stop;
-  }
+  },
+  on_read  => sub { },
+  on_error => sub { }
 );
 $loop->connect(
-  address => 'localhost',
-  port    => $port,
+  address  => 'localhost',
+  port     => $port,
+  on_read  => sub { },
+  on_error => sub { }
 );
 $loop->start;
 isa_ok $handle, 'IO::Socket', 'right reference';

@@ -1,5 +1,9 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+1.19 2011-04-19 00:00:00
+        - Improved tests.
+        - Fixed size limits in message parser.
+
 1.18 2011-04-19 00:00:00
         - Added support for "X-Forwarded-HTTPS" and "X-Forwarded-Host"
           headers.

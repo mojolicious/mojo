@@ -474,17 +474,18 @@ sub _parse {
   # Start line
   $self->_parse_start_line unless $self->{_state};
 
-  # Got start line and headers
-  if (!$self->{_state} || $self->{_state} eq 'headers') {
-
-    # Check line size
-    $self->error('Maximum line size exceeded.', 413)
-      if length $self->{_buffer} > $self->max_line_size;
-  }
-
   # Check message size
-  $self->error('Maximum message size exceeded.', 413)
+  return $self->error('Maximum message size exceeded.', 413)
     if $self->{_raw_size} > $self->max_message_size;
+
+  # Check line size
+  my $headers = $self->headers;
+  if (!$headers->is_done) {
+    my $blen = index $self->{_buffer}, "\x0a";
+    $blen = length $self->{_buffer} if $blen < 0;
+    return $self->error('Maximum line size exceeded.', 413)
+      if $blen + length $headers->leftovers > $self->max_line_size;
+  }
 
   # Content
   my $state = $self->{_state} || '';

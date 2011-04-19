@@ -12,7 +12,7 @@ BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 my $backup;
 BEGIN { $backup = $ENV{MOJO_MODE} || ''; $ENV{MOJO_MODE} = 'development' }
 
-use Test::More tests => 734;
+use Test::More tests => 743;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -868,14 +868,39 @@ $t->get_ok('/.html')->status_is(200)
   ->content_is(
   "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
 
-# GET /0 (reverse proxy)
+# GET /0 ("X-Forwarded-For")
+$t->get_ok('/0', {'X-Forwarded-For' => '192.168.2.2, 192.168.2.1'})
+  ->status_is(200)
+  ->content_like(qr/http\:\/\/localhost\:\d+\/0\-127\.0\.0\.1\-0/);
+
+# GET /0 (reverse proxy with "X-Forwarded-For")
 my $backup2 = $ENV{MOJO_REVERSE_PROXY};
 $ENV{MOJO_REVERSE_PROXY} = 1;
 $t->get_ok('/0', {'X-Forwarded-For' => '192.168.2.2, 192.168.2.1'})
   ->status_is(200)
   ->content_like(qr/http\:\/\/localhost\:\d+\/0\-192\.168\.2\.1\-0/);
+$ENV{MOJO_REVERSE_PROXY} = $backup2;
+
+# GET /0 ("X-Forwarded-Host")
+$t->get_ok('/0', {'X-Forwarded-Host' => 'mojolicio.us:8080'})->status_is(200)
+  ->content_like(qr/http\:\/\/localhost\:\d+\/0\-127\.0\.0\.1\-0/);
+
+# GET /0 (reverse proxy with "X-Forwarded-Host")
+$backup2 = $ENV{MOJO_REVERSE_PROXY};
+$ENV{MOJO_REVERSE_PROXY} = 1;
 $t->get_ok('/0', {'X-Forwarded-Host' => 'mojolicio.us:8080'})->status_is(200)
   ->content_is('http://mojolicio.us:8080/0-127.0.0.1-0');
+$ENV{MOJO_REVERSE_PROXY} = $backup2;
+
+# GET /0 ("X-Forwarded-HTTPS" and "X-Forwarded-Host")
+$t->get_ok('/0',
+  {'X-Forwarded-HTTPS' => 1, 'X-Forwarded-Host' => 'mojolicio.us'})
+  ->status_is(200)
+  ->content_like(qr/http\:\/\/localhost\:\d+\/0\-127\.0\.0\.1\-0/);
+
+# GET /0 (reverse proxy with "X-Forwarded-HTTPS" and "X-Forwarded-Host")
+$backup2 = $ENV{MOJO_REVERSE_PROXY};
+$ENV{MOJO_REVERSE_PROXY} = 1;
 $t->get_ok('/0',
   {'X-Forwarded-HTTPS' => 1, 'X-Forwarded-Host' => 'mojolicio.us'})
   ->status_is(200)->content_is('https://mojolicio.us/0-127.0.0.1-0');

@@ -85,15 +85,12 @@ Nginx reverse proxy.
     }
   }
 
-You might also want to enable reverse proxy support in C<hypnotoad> if your
-proxy is on a different physical machine than your application and can't be
-auto detected.
+You might also want to enable reverse proxy support in C<hypnotoad>.
+This allows L<Mojolicious> to automatically pick up the C<X-Forwarded-For>,
+C<X-Forwarded-Host> and C<X-Forwarded-HTTPS> headers.
 
   # hypnotoad.conf
   {proxy => 1};
-
-This allows L<Mojolicious> to automatically pick up the C<X-Forwarded-For>,
-C<X-Forwarded-Host> and C<X-Forwarded-HTTPS> headers.
 
 =head2 Apache/CGI
 

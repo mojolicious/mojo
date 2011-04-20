@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 958;
+use Test::More tests => 967;
 
 use File::Spec;
 use File::Temp;
@@ -104,6 +104,21 @@ is $req->body, '', 'no content';
 # Parse broken HTTP 1.1 message with start line exceeding line limit
 $req = Mojo::Message::Request->new;
 $req->parse('GET /' . ('abcd' x (128 * 1024)) . ' HTTP/1.1');
+ok $req->is_done, 'request is done';
+is $req->error,   'Maximum line size exceeded.', 'right error';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.1'), 1,     'at least version 1.1';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '', 'right URL';
+is $req->cookie('a'), undef, 'no value';
+is $req->body, '', 'no content';
+
+# Parse broken HTTP 1.1 message with start line exceeding line limit
+# (alternative)
+$req = Mojo::Message::Request->new;
+$req->parse('GET /');
+$req->parse('abcd' x (128 * 1024));
 ok $req->is_done, 'request is done';
 is $req->error,   'Maximum line size exceeded.', 'right error';
 is $req->method,  'GET', 'right method';

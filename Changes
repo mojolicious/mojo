@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+1.21 2011-04-20 00:00:00
+        - Fixed typos.
+
 1.20 2011-04-20 00:00:00
         - Improved size limit handling.
         - Fixed typos.
@@ -50,7 +53,7 @@ This file documents the revision history for Perl extension Mojolicious.
 
 1.16 2011-04-15 00:00:00
         - Emergency release for a critical security issue that can expose
-          files on your system, everybody should update!
+          files on your system, everybody should update! (perlninja, sri)
 
 1.15 2011-03-18 00:00:00
         - Changed default log level in "production" mode from "error" to

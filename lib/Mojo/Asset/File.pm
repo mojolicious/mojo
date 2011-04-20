@@ -4,12 +4,12 @@ use Mojo::Base 'Mojo::Asset';
 # We can't use File::Temp because there is no seek support in the version
 # shipped with Perl 5.8
 use Carp 'croak';
+use Errno;
+use Fcntl;
 use File::Copy ();
 use File::Spec;
 use IO::File;
 use Mojo::Util 'md5_sum';
-use Fcntl;
-use Errno;
 
 has [qw/cleanup path/];
 has handle => sub {
@@ -23,23 +23,17 @@ has handle => sub {
   if ($file && -f $file) {
     $handle->open("< $file")
       or croak qq/Can't open file "$file": $!/;
-
     return $handle;
   }
 
-  # Open a new file (with the given name, or a random temporary file)
+  # Open existing or temporary file
   my $base = File::Spec->catfile($self->tmpdir, 'mojo.tmp');
   my $name = $file || $base;
-
   my $fh;
-  until (sysopen($fh, $name, O_CREAT|O_EXCL|O_RDWR)) {
-    if ($file || $! != $!{EEXIST}) {
-      croak qq/Can't open file "$name": $!/;
-    }
-
-    $name = $base . md5_sum(time . rand 999999999);
+  until (sysopen $fh, $name, O_CREAT | O_EXCL | O_RDWR) {
+    croak qq/Can't open file "$name": $!/ if $file || $! != $!{EEXIST};
+    $name = $base . md5_sum(time . $$ . rand 999999999);
   }
-
   $file = $name;
   $self->path($file);
 

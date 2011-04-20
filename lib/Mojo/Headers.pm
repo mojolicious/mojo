@@ -226,6 +226,14 @@ sub parse {
   }
   $self->{_cache} = $headers;
 
+  # Check line size
+  if (length $self->{_buffer} > $max) {
+
+    # Abort
+    $self->{_state} = 'done';
+    $self->{_limit} = 1;
+  }
+
   return $self;
 }
 

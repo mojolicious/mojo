@@ -143,20 +143,28 @@ sub build_form_tx {
 
         # Headers
         $h->from_hash($f);
+
+        # Append
+        push @parts, $part;
       }
 
       # Fields
       else {
 
-        # Values
-        my $chunk = join ',', ref $f ? @$f : ($f);
-        encode $encoding, $chunk if $encoding;
-        $part->asset->add_chunk($chunk);
-
         # Content-Type
         my $type = 'text/plain';
         $type .= qq/;charset=$encoding/ if $encoding;
         $h->content_type($type);
+
+        # Values
+        for my $value (ref $f ? @$f : ($f)) {
+          $part = Mojo::Content::Single->new(headers => $h);
+          encode $encoding, $value if $encoding;
+          $part->asset->add_chunk($value);
+
+          # Append
+          push @parts, $part;
+        }
       }
 
       # Content-Disposition
@@ -165,8 +173,6 @@ sub build_form_tx {
       my $disposition = qq/form-data; name="$name"/;
       $disposition .= qq/; filename="$filename"/ if $filename;
       $h->content_disposition($disposition);
-
-      push @parts, $part;
     }
 
     # Multipart content

@@ -12,7 +12,7 @@ BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 my $backup;
 BEGIN { $backup = $ENV{MOJO_MODE} || ''; $ENV{MOJO_MODE} = 'development' }
 
-use Test::More tests => 743;
+use Test::More tests => 749;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -78,6 +78,13 @@ del sub { shift->render(text => 'Hello!') };
 
 # /
 any sub { shift->render(text => 'Bye!') };
+
+# POST /multipart/form
+post '/multipart/form' => sub {
+  my $self = shift;
+  my @test = $self->param('test');
+  $self->render_text(join "\n", @test);
+};
 
 # GET /auto_name
 get '/auto_name' => sub {
@@ -691,6 +698,15 @@ $t->delete_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
 # POST /
 $t->post_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('Bye!');
+
+# POST /multipart/form ("application/x-www-form-urlencoded")
+$t->post_form_ok('/multipart/form', {test => [1 .. 5]})->status_is(200)
+  ->content_is(join "\n", 1 .. 5);
+
+# POST /multipart/form ("multipart/form-data")
+$t->post_form_ok('/multipart/form',
+  {test => [1 .. 5], file => {content => '123'}})->status_is(200)
+  ->content_is(join "\n", 1 .. 5);
 
 # GET /auto_name
 $t->get_ok('/auto_name')->status_is(200)

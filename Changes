@@ -3,6 +3,8 @@ This file documents the revision history for Perl extension Mojolicious.
 1.21 2011-04-20 00:00:00
         - Improved temporary file handling to avoid a very unlikely race
           condition. (crab)
+        - Fixed "multipart/form-data" generation bug in Mojo::UserAgent.
+          (sugar, sharifulin, sri)
         - Fixed typos.
 
 1.20 2011-04-20 00:00:00

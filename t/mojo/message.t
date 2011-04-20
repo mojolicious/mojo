@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 967;
+use Test::More tests => 968;
 
 use File::Spec;
 use File::Temp;
@@ -883,6 +883,8 @@ is $res->message,         'Test',                  'right message';
 is $res->default_message, 'Internal Server Error', 'right default message';
 $res = Mojo::Message::Response->new;
 is $res->code(400)->default_message, 'Bad Request', 'right default message';
+$res = Mojo::Message::Response->new;
+is $res->code(1)->default_message, '', 'empty default message';
 
 # Parse HTTP 1.1 response start line, no headers and body
 $res = Mojo::Message::Response->new;

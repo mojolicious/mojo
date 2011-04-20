@@ -8,6 +8,8 @@ use File::Copy ();
 use File::Spec;
 use IO::File;
 use Mojo::Util 'md5_sum';
+use Fcntl;
+use Errno;
 
 has [qw/cleanup path/];
 has handle => sub {
@@ -18,32 +20,34 @@ has handle => sub {
 
   # Already got a file without handle
   my $file = $self->path;
-  if ($file) {
-
-    # New file
-    my $mode = '+>>';
-
-    # File exists
-    $mode = '<' if -s $file;
-
-    # Open
-    $handle->open("$mode $file")
+  if ($file && -f $file) {
+    $handle->open("< $file")
       or croak qq/Can't open file "$file": $!/;
 
     return $handle;
   }
 
-  # Generate temporary file
+  # Open a new file (with the given name, or a random temporary file)
   my $base = File::Spec->catfile($self->tmpdir, 'mojo.tmp');
-  $file = $base;
-  while (-e $file) { $file = $base . md5_sum(time . rand 999999999) }
+  my $name = $file || $base;
+
+  my $fh;
+  until (sysopen($fh, $name, O_CREAT|O_EXCL|O_RDWR)) {
+    if ($file || $! != $!{EEXIST}) {
+      croak qq/Can't open file "$name": $!/;
+    }
+
+    $name = $base . md5_sum(time . rand 999999999);
+  }
+
+  $file = $name;
   $self->path($file);
 
   # Enable automatic cleanup
   $self->cleanup(1);
 
   # Open for read/write access
-  $handle->open("+> $file") or croak qq/Can't open file "$file": $!/;
+  $handle->fdopen(fileno($fh), "+>") or croak qq/Can't open file "$name": $!/;
 
   return $handle;
 };

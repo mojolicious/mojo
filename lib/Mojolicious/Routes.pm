@@ -662,14 +662,6 @@ sub _walk_stack {
   for my $field (@$stack) {
     $staging--;
 
-    # Hide callback and app
-    my $cb = $field->{cb};
-    local $field->{cb};
-    delete $field->{cb};
-    my $app = $field->{app};
-    local $field->{app};
-    delete $field->{app};
-
     # Merge in captures
     if (my @keys = keys %$field) {
       my @values = values %$field;
@@ -679,9 +671,9 @@ sub _walk_stack {
 
     # Dispatch
     my $e =
-        $cb
-      ? $self->_dispatch_callback($c, $cb, $staging)
-      : $self->_dispatch_controller($c, $app, $field, $staging);
+        $field->{cb}
+      ? $self->_dispatch_callback($c, $field->{cb}, $staging)
+      : $self->_dispatch_controller($c, $field->{app}, $field, $staging);
 
     # Exception
     if (ref $e) {

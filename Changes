@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+1.22 2011-04-20 00:00:00
+        - Fixed small stack localization bug.
+
 1.21 2011-04-20 00:00:00
         - Improved temporary file handling to avoid a very unlikely race
           condition. (crab)

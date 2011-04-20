@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.20 2011-04-20 00:00:00
+        - Improved size limit handling.
         - Fixed typos.
 
 1.19 2011-04-20 00:00:00

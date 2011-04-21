@@ -6,7 +6,7 @@ use warnings;
 # Disable IPv6, epoll and kqueue
 BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 218;
+use Test::More tests => 233;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -58,6 +58,24 @@ $t->get_ok('/foo/syntaxerror')->status_is(500)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/^Missing right curly/);
+
+# Exceptional::this_one_dies (action dies)
+$t->get_ok('/exceptional/this_one_dies')->status_is(500)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("Action died: doh!\n");
+
+# Exceptional::this_one_might_die (bridge dies)
+$t->get_ok('/exceptional_too/this_one_dies')->status_is(500)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("Action died: double doh!\n");
+
+# Exceptional::this_one_might_die (action dies)
+$t->get_ok('/exceptional_too/this_one_dies', {'X-DoNotDie' => 1})
+  ->status_is(500)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("Action died: doh!\n");
 
 # Foo::fun
 $t->get_ok('/fun/time', {'X-Test' => 'Hi there!'})->status_is(200)

@@ -200,8 +200,6 @@ sub is_websocket {
   return;
 }
 
-# "Dr. Zoidberg, can you note the time and declare the patient legally dead?
-#  Can I! That’s my specialty!"
 sub name {
   my $self = shift;
 
@@ -505,6 +503,7 @@ sub _dispatch_controller {
   if (!$success && $@) {
     my $e = Mojo::Exception->new($@);
     $c->app->log->error($e);
+    $app->render_exception($e) if $app->can('render_exception');
     return $e;
   }
 

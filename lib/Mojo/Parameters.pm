@@ -68,9 +68,7 @@ sub param {
   $self->remove($name) if defined $_[0];
 
   # Append
-  for my $value (@_) {
-    $self->append($name, $value);
-  }
+  $self->append($name, $_) for @_;
 
   # List values
   my @values;

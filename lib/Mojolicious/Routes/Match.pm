@@ -32,28 +32,18 @@ sub new {
 sub match {
   my ($self, $r, $c) = @_;
 
-  # Shortcut
   return unless $r;
-
-  # Dictionary
   my $dictionary = $self->{_dictionary} ||= $r->dictionary;
 
   # Root
   $self->root($r) unless $self->root;
 
-  # Path
-  my $path = $self->{_path};
-
-  # Pattern
+  my $path    = $self->{_path};
   my $pattern = $r->pattern;
 
   # Match
   my $captures = $pattern->shape_match(\$path);
-
-  # No match
   return unless $captures;
-
-  # Path
   $self->{_path} = $path;
 
   # Merge captures
@@ -185,10 +175,7 @@ sub path_for {
     }
   }
 
-  # Captures
   my $captures = $self->captures;
-
-  # Endpoint
   my $endpoint;
 
   # Current route

@@ -34,7 +34,6 @@ sub new {
 sub parse {
   my ($self, $date) = @_;
 
-  # Shortcut
   return $self unless defined $date;
 
   # epoch - 784111777

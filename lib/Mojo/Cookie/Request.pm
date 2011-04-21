@@ -53,7 +53,6 @@ sub prefix {
 sub to_string {
   my $self = shift;
 
-  # Shortcut
   return '' unless $self->name;
 
   # Render

@@ -38,7 +38,6 @@ sub parse {
   my $self    = shift;
   my $pattern = shift;
 
-  # Shortcut
   return $self if !defined $pattern || $pattern eq '/';
 
   # Make sure pattern starts with a slash
@@ -117,15 +116,11 @@ sub shape_match {
 
   # Match
   if (my @captures = $$pathref =~ $regex) {
-
-    # Substitute
     $$pathref =~ s/$regex//;
 
     # Merge captures
     my $result = {%{$self->defaults}};
     for my $symbol (@{$self->symbols}) {
-
-      # No captures
       last unless @captures;
 
       # Merge

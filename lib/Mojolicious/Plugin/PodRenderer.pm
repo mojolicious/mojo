@@ -132,7 +132,6 @@ sub register {
 sub _pod_to_html {
   my $pod = shift;
 
-  # Shortcut
   return unless defined $pod;
 
   # Block

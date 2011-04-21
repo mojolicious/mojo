@@ -47,8 +47,6 @@ sub parse {
 
   # Content needs to be upgraded to multipart
   if ($self->is_multipart) {
-
-    # Shortcut
     return $self if $self->isa('Mojo::Content::MultiPart');
 
     # Need to upgrade

@@ -147,7 +147,6 @@ sub build {
 sub compile {
   my $self = shift;
 
-  # Shortcut
   return unless my $code = $self->code;
 
   # Compile
@@ -172,8 +171,6 @@ sub interpret {
     return $e if ref $e;
   }
   my $compiled = $self->compiled;
-
-  # Shortcut
   return unless $compiled;
 
   # Stacktrace

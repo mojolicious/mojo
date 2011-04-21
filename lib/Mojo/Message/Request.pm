@@ -243,11 +243,7 @@ sub _build_start_line {
 
 sub _parse_basic_auth {
   my ($self, $header) = @_;
-
-  # Shortcut
   return unless $header =~ /Basic (.+)$/;
-
-  # Decode
   my $auth = $1;
   b64_decode $auth;
   return $auth;

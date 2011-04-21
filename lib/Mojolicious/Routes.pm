@@ -77,13 +77,9 @@ sub any {
 sub auto_render {
   my ($self, $c) = @_;
 
-  # Transaction
-  my $tx = $c->tx;
-
   # Rendering
+  my $tx      = $c->tx;
   my $success = eval {
-
-    # Stash
     my $stash = $c->stash;
 
     # Render
@@ -110,41 +106,29 @@ sub del { shift->_generate_route('delete', @_) }
 
 sub detour {
   my $self = shift;
-
-  # Partial
   $self->partial('path');
-
-  # Defaults
   $self->to(@_);
-
   return $self;
 }
 
 sub dispatch {
   my ($self, $c) = @_;
 
-  # Request
-  my $req = $c->req;
-
   # Path
+  my $req  = $c->req;
   my $path = $c->stash->{path};
   $path = "/$path" if defined $path && $path !~ /^\//;
   $path = $req->url->path->to_abs_string unless $path;
 
-  # Method
   my $method = $req->method;
-
-  # WebSocket
   my $websocket = $c->tx->is_websocket ? 1 : 0;
 
   # Match
   my $m = Mojolicious::Routes::Match->new($method => $path, $websocket);
   $c->match($m);
 
-  # Cache
-  my $cache = $self->cache;
-
   # Cached
+  my $cache = $self->cache;
   if (my $cached = $cache->get("$method:$path:$websocket")) {
     $m->root($self);
     $m->stack($cached->{stack});
@@ -154,8 +138,6 @@ sub dispatch {
 
   # Lookup
   else {
-
-    # Match
     $m->match($self, $c);
 
     # Endpoint found
@@ -250,7 +232,6 @@ EOF
 sub over {
   my $self = shift;
 
-  # Shortcut
   return $self unless @_;
 
   # Conditions
@@ -316,7 +297,6 @@ sub route {
 sub to {
   my $self = shift;
 
-  # Shortcut
   return $self unless @_;
 
   # Single argument
@@ -445,11 +425,8 @@ sub _dispatch_callback {
 sub _dispatch_controller {
   my ($self, $c, $app, $field, $staging) = @_;
 
-  # Class
   $app ||= $self->_generate_class($field, $c);
   return 1 unless $app;
-
-  # Method
   my $method = $self->_generate_method($field, $c);
 
   # Debug
@@ -487,8 +464,6 @@ sub _dispatch_controller {
 
     # Action
     if ($method && $app->isa($self->controller_base_class)) {
-
-      # Stash
       my $stash = $c->stash;
 
       # Call action
@@ -576,7 +551,6 @@ sub _generate_method {
   my $method = $field->{method};
   $method ||= $field->{action};
 
-  # Shortcut
   return unless $method;
 
   # Shortcut for hidden methods
@@ -650,10 +624,7 @@ sub _walk_stack {
   # Stacktrace
   local $SIG{__DIE__} = sub { Mojo::Exception->throw(@_) };
 
-  # Stack
   my $stack = $c->match->stack;
-
-  # Stash
   my $stash = $c->stash;
   $stash->{'mojo.captures'} ||= {};
 

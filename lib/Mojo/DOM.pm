@@ -512,13 +512,9 @@ sub _css_equation {
 sub _css_regex {
   my ($self, $op, $value) = @_;
 
-  # Shortcut
   return unless $value;
-
-  # Quote
   $value = quotemeta $self->_css_unescape($value);
 
-  # Regex
   my $regex;
 
   # "~=" (word)
@@ -1259,9 +1255,7 @@ sub while { shift->_iterate(@_, 0) }
 sub _iterate {
   my ($self, $cb, $cond) = @_;
 
-  # Shortcut
   return @$self unless $cb;
-
   my $i = 1;
 
   # Iterate until condition is true

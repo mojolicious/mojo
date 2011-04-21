@@ -62,13 +62,10 @@ use Mojo::Base -base;
 sub languages {
   my ($self, @languages) = @_;
 
-  # Shortcut
   return $self->{_language} unless @languages;
 
-  # Namespace
-  my $namespace = $self->{_namespace};
-
   # Handle
+  my $namespace = $self->{_namespace};
   if (my $handle = $namespace->get_handle(@languages)) {
     $handle->fail_with(sub { $_[1] });
     $self->{_handle}   = $handle;

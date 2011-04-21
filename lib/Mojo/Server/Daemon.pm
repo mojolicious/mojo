@@ -38,7 +38,6 @@ my $SOCKET_RE = qr/^
 sub DESTROY {
   my $self = shift;
 
-  # Shortcut
   return unless my $loop = $self->ioloop;
 
   # Cleanup connections
@@ -165,7 +164,7 @@ sub _build_tx {
 sub _drop {
   my ($self, $id) = @_;
 
-  # Connection
+  # Finish
   my $c = $self->{_cs}->{$id};
   if (my $tx = $c->{websocket} || $c->{transaction}) { $tx->server_close }
 
@@ -192,7 +191,6 @@ sub _finish {
     return $self->ioloop->drop($id);
   }
 
-  # Connection
   my $c = $self->{_cs}->{$id};
 
   # Finish transaction
@@ -246,10 +244,8 @@ sub _hup {
 sub _listen {
   my ($self, $listen) = @_;
 
-  # Shortcut
   return unless $listen;
 
-  # Options
   my $options = {};
   my $tls;
 
@@ -319,11 +315,9 @@ sub _read {
 
   warn "< $chunk\n" if DEBUG;
 
-  # Connection
+  # Make sure we have a transaction
   my $c = $self->{_cs}->{$id};
   my $tx = $c->{transaction} || $c->{websocket};
-
-  # New transaction
   $tx = $c->{transaction} = $self->_build_tx($id, $c) unless $tx;
 
   # Read
@@ -346,10 +340,8 @@ sub _upgrade {
   # WebSocket
   return unless $tx->req->headers->upgrade =~ /WebSocket/i;
 
-  # Connection
-  my $c = $self->{_cs}->{$id};
-
   # WebSocket handshake handler
+  my $c = $self->{_cs}->{$id};
   my $ws = $c->{websocket} = $self->on_websocket->($self, $tx);
 
   # Not resumable yet
@@ -359,11 +351,9 @@ sub _upgrade {
 sub _write {
   my ($self, $id) = @_;
 
-  # Connection
+  # Not writing
   my $c = $self->{_cs}->{$id};
   return unless my $tx = $c->{transaction} || $c->{websocket};
-
-  # Not writing
   return unless $tx->is_writing;
 
   # Get chunk
@@ -376,8 +366,6 @@ sub _write {
 
   # Done
   if ($tx->is_done) {
-
-    # Finish
     $self->_finish($id, $tx);
 
     # No followup

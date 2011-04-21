@@ -161,7 +161,6 @@ sub is_ipv6 {
 sub parse {
   my ($self, $url) = @_;
 
-  # Shortcut
   return $self unless $url;
 
   # Official regex

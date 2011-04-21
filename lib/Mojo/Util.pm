@@ -325,8 +325,6 @@ sub camelize {
 }
 
 sub decamelize {
-
-  # Shortcut
   return if $_[0] !~ /^[A-Z\:]+/;
 
   my @parts;
@@ -632,8 +630,6 @@ sub url_escape {
 }
 
 sub url_unescape {
-
-  # Shortcut
   return if index($_[0], '%') == -1;
 
   # Unescape

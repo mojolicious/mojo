@@ -350,9 +350,9 @@ sub websocket {
 
 sub _cache {
   my ($self, $name, $id) = @_;
-  my $cache = $self->{_cache} ||= [];
 
   # Enqueue
+  my $cache = $self->{_cache} ||= [];
   if ($id) {
 
     # Limit keep alive connections

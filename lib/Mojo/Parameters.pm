@@ -89,10 +89,7 @@ sub parse {
   # Clear
   $self->params([]);
 
-  # Shortcut
   return $self unless defined $string;
-
-  # Charset
   my $charset = $self->charset;
 
   # Detect query string without key/value pairs
@@ -195,10 +192,9 @@ sub to_hash {
 }
 
 sub to_string {
-  my $self   = shift;
-  my $params = $self->params;
+  my $self = shift;
 
-  # Shortcut
+  my $params = $self->params;
   return '' unless @{$self->params};
 
   # Format

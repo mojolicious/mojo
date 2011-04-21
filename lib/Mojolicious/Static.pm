@@ -24,8 +24,6 @@ sub dispatch {
 
   # Parts
   my @parts = @{Mojo::Path->new->parse($path)->parts};
-
-  # Shortcut
   return 1 unless @parts;
 
   # Prevent directory traversal

@@ -54,8 +54,6 @@ sub body {
   my $new = shift;
   $content->on_read(undef);
   $content->asset(Mojo::Asset::Memory->new);
-
-  # Shortcut
   return $self unless defined $new;
 
   # Callback
@@ -159,7 +157,6 @@ sub build_start_line {
 sub cookie {
   my ($self, $name) = @_;
 
-  # Shortcut
   return unless $name;
 
   # Map
@@ -367,7 +364,6 @@ sub to_string {
 sub upload {
   my ($self, $name) = @_;
 
-  # Shortcut
   return unless $name;
 
   # Map

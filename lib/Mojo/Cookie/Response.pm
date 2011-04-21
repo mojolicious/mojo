@@ -31,7 +31,6 @@ sub expires {
     return $self;
   }
 
-  # Shortcut
   return unless defined $self->{expires};
 
   # Upgrade

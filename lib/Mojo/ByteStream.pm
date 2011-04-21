@@ -5,8 +5,6 @@ use overload '""' => sub { shift->to_string }, fallback => 1;
 use Mojo::Util;
 
 sub import {
-
-  # Shortcut
   return unless @_ > 1;
 
   # Alternative constructor

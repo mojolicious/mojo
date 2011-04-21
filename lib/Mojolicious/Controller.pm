@@ -72,7 +72,6 @@ EOF
 sub cookie {
   my ($self, $name, $value, $options) = @_;
 
-  # Shortcut
   return unless $name;
 
   # Response cookie
@@ -578,7 +577,6 @@ sub session {
 sub signed_cookie {
   my ($self, $name, $value, $options) = @_;
 
-  # Shortcut
   return unless $name;
 
   # Secret

@@ -122,9 +122,9 @@ if (-r '/etc/resolv.conf') {
   $file->open('< /etc/resolv.conf');
   my @servers;
   for my $line (<$file>) {
-    if ($line =~ /^nameserver\s+(\S+)$/) {
 
-      # New DNS server
+    # New DNS server
+    if ($line =~ /^nameserver\s+(\S+)$/) {
       push @servers, $1;
 
       warn qq/DETECTED DNS SERVER ($1)\n/ if DEBUG;
@@ -504,8 +504,6 @@ sub on_tick { shift->_add_loop_event('tick', @_) }
 
 sub one_tick {
   my ($self, $timeout) = @_;
-
-  # Timeout
   $timeout = $self->timeout unless defined $timeout;
 
   # Prepare listen sockets
@@ -514,13 +512,8 @@ sub one_tick {
   # Prepare connections
   $self->_prepare_connections;
 
-  # Loop
   my $loop = $self->_prepare_loop;
-
-  # Reverse map
-  my $r = $self->{_reverse};
-
-  # Events
+  my $r    = $self->{_reverse};
   my (@error, @hup, @read, @write);
 
   # KQueue
@@ -990,14 +983,9 @@ sub _add_loop_event {
   my $self  = shift;
   my $event = shift;
   my $cb    = shift;
-
-  # Event
-  my $e = {cb => $cb, @_};
-
-  # Add event
+  my $e     = {cb => $cb, @_};
   (my $id) = "$e" =~ /0x([\da-f]+)/;
   $self->{"_$event"}->{$id} = $e;
-
   return $id;
 }
 
@@ -1126,13 +1114,9 @@ sub _error {
   # Cleanup
   $self->_drop_immediately($id);
 
-  # Error
+  # Handle error
   $error ||= 'Unknown error, probably harmless.';
-
-  # No event
   warn "Unhandled event error: $error" and return unless $event;
-
-  # Error callback
   $self->_run_event('error', $event, $id, $error);
 }
 
@@ -1155,7 +1139,6 @@ sub _hup {
 sub _not_listening {
   my $self = shift;
 
-  # Loop
   return unless my $loop = $self->{_loop};
 
   # Unlock
@@ -1291,7 +1274,6 @@ sub _parse_name {
 sub _prepare_cert {
   my $self = shift;
 
-  # Shortcut
   my $cert = $self->{_cert};
   return $cert if $cert && -r $cert;
 
@@ -1339,7 +1321,6 @@ sub _prepare_connections {
 sub _prepare_key {
   my $self = shift;
 
-  # Shortcut
   my $key = $self->{_key};
   return $key if $key && -r $key;
 
@@ -1490,7 +1471,6 @@ sub _run_event {
 sub _timer {
   my $self = shift;
 
-  # Timers
   return unless my $ts = $self->{_timer};
 
   # Check
@@ -1563,7 +1543,6 @@ sub _tls_connect {
 sub _tls_error {
   my ($self, $id) = @_;
 
-  # Error
   my $error = $IO::Socket::SSL::SSL_ERROR;
 
   # Reading

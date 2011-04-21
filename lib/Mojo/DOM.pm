@@ -130,10 +130,7 @@ sub add_before { shift->_add(0, @_) }
 sub all_text {
   my $self = shift;
 
-  # Text
   my $text = '';
-
-  # Tree
   my $tree = $self->tree;
 
   # Walk tree
@@ -165,13 +162,11 @@ sub at { shift->find(@_)->[0] }
 sub attrs {
   my $self = shift;
 
-  # Tree
   my $tree = $self->tree;
 
   # Root
   return if $tree->[0] eq 'root';
 
-  # Attributes
   my $attrs = $tree->[2];
 
   # Hash
@@ -192,10 +187,7 @@ sub attrs {
 sub children {
   my $self = shift;
 
-  # Children
   my @children;
-
-  # Tree
   my $tree = $self->tree;
 
   # Walk tree
@@ -225,7 +217,6 @@ sub find {
 sub inner_xml {
   my $self = shift;
 
-  # Tree
   my $tree = $self->tree;
 
   # Walk tree
@@ -247,7 +238,6 @@ sub inner_xml {
 sub namespace {
   my $self = shift;
 
-  # Current
   my $current = $self->tree;
   return if $current->[0] eq 'root';
 
@@ -261,7 +251,6 @@ sub namespace {
     # Root
     return if $current->[0] eq 'root';
 
-    # Attributes
     my $attrs = $current->[2];
 
     # Namespace for prefix
@@ -282,7 +271,6 @@ sub namespace {
 sub parent {
   my $self = shift;
 
-  # Tree
   my $tree = $self->tree;
 
   # Root
@@ -308,7 +296,6 @@ sub replace {
   # Parse
   $new = $self->_parse_xml("$new");
 
-  # Tree
   my $tree = $self->tree;
 
   # Root
@@ -345,7 +332,6 @@ sub replace_inner {
   # Parse
   $new = $self->_parse_xml("$new");
 
-  # Tree
   my $tree = $self->tree;
 
   # Replacements
@@ -378,7 +364,6 @@ sub root {
 sub text {
   my $self = shift;
 
-  # Text
   my $text = '';
 
   # Walk stack
@@ -420,7 +405,6 @@ sub to_xml {
 sub type {
   my ($self, $type) = @_;
 
-  # Tree
   my $tree = $self->tree;
 
   # Root
@@ -441,7 +425,6 @@ sub _add {
   # Parse
   $new = $self->_parse_xml("$new");
 
-  # Tree
   my $tree = $self->tree;
 
   # Root
@@ -474,8 +457,6 @@ sub _add {
 #  Yeah, he's my favorite fictional character."
 sub _cdata {
   my ($self, $cdata, $current) = @_;
-
-  # Append
   push @$$current, ['cdata', $cdata];
 }
 
@@ -503,8 +484,6 @@ sub _close {
 
 sub _comment {
   my ($self, $comment, $current) = @_;
-
-  # Append
   push @$$current, ['comment', $comment];
 }
 
@@ -577,8 +556,6 @@ sub _css_unescape {
 
 sub _doctype {
   my ($self, $doctype, $current) = @_;
-
-  # Append
   push @$$current, ['doctype', $doctype];
 }
 
@@ -640,11 +617,9 @@ sub _end {
 sub _match_element {
   my ($self, $candidate, $selectors) = @_;
 
-  # Selectors
-  my @selectors = reverse @$selectors;
-
   # Match
-  my $first = 2;
+  my @selectors = reverse @$selectors;
+  my $first     = 2;
   my ($current, $marker, $snapback);
   my $parentonly = 0;
   my $siblings;
@@ -891,8 +866,6 @@ sub _match_tree {
   my @results;
   my @queue = ($tree);
   while (my $current = shift @queue) {
-
-    # Type
     my $type = $current->[0];
 
     # Root
@@ -946,10 +919,8 @@ sub _parse_css {
     # New selector
     push @$pattern, [] if $separator;
 
-    # Part
-    my $part = $pattern->[-1];
-
     # Selector
+    my $part = $pattern->[-1];
     push @$part, ['element'];
     my $selector = $part->[-1];
 
@@ -1103,21 +1074,17 @@ sub _pi {
   # Try to detect XML
   $self->xml(1) if !defined $self->xml && $pi =~ /xml/i;
 
-  # Append
   push @$$current, ['pi', $pi];
 }
 
 sub _raw {
   my ($self, $raw, $current) = @_;
-
-  # Append
   push @$$current, ['raw', $raw];
 }
 
 sub _render {
   my ($self, $tree) = @_;
 
-  # Element
   my $e = $tree->[0];
 
   # Text (escaped)
@@ -1145,7 +1112,6 @@ sub _render {
   # Offset
   my $start = $e eq 'root' ? 1 : 2;
 
-  # Content
   my $content = '';
 
   # Start tag
@@ -1267,8 +1233,6 @@ sub _start {
 
 sub _text {
   my ($self, $text, $current) = @_;
-
-  # Append
   push @$$current, ['text', $text];
 }
 
@@ -1298,7 +1262,6 @@ sub _iterate {
   # Shortcut
   return @$self unless $cb;
 
-  # Iterator
   my $i = 1;
 
   # Iterate until condition is true

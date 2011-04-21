@@ -473,9 +473,10 @@ sub _connect {
 sub _connect_proxy {
   my ($self, $old, $cb) = @_;
 
-  # Request
   my $req = $old->req;
   my $url = $req->url;
+
+  # No proxy
   return unless my $proxy = $req->proxy;
 
   # WebSocket and/or HTTPS
@@ -529,10 +530,9 @@ sub _connect_proxy {
 #  or just finished lying, but NOT WHEN I'M TELLING THE TRUTH."
 sub _connected {
   my ($self, $id) = @_;
-  my $loop = $self->{_loop};
 
-  # Transaction
-  my $tx = $self->{_cs}->{$id}->{tx};
+  my $loop = $self->{_loop};
+  my $tx   = $self->{_cs}->{$id}->{tx};
   $tx->connection($id);
 
   # Store connection information in transaction
@@ -609,10 +609,7 @@ sub _finish_tx {
 sub _handle {
   my ($self, $id, $close) = @_;
 
-  # Connection
-  my $c = $self->{_cs}->{$id};
-
-  # Old transaction
+  my $c   = $self->{_cs}->{$id};
   my $old = $c->{tx};
 
   # WebSocket
@@ -620,11 +617,7 @@ sub _handle {
 
     # Finish transaction
     $old->client_close;
-
-    # Counter
     $self->{_processing} -= 1;
-
-    # Cleanup
     delete $self->{_cs}->{$id};
     $self->_drop($id, $close);
   }
@@ -651,7 +644,7 @@ sub _handle {
     # Extract cookies
     if (my $jar = $self->cookie_jar) { $jar->extract($old) }
 
-    # Counter
+    # Finished transaction
     $self->{_processing} -= 1;
 
     # Redirect or callback
@@ -672,7 +665,6 @@ sub _read {
 
   warn "< $chunk\n" if DEBUG;
 
-  # Connection
   return unless my $c = $self->{_cs}->{$id};
 
   # Transaction
@@ -754,7 +746,6 @@ sub _start_tx {
     }
   }
 
-  # Request
   my $req    = $tx->req;
   my $url    = $req->url;
   my $scheme = $url->scheme || '';
@@ -834,7 +825,6 @@ sub _switch_non_blocking {
 sub _tx_info {
   my ($self, $tx) = @_;
 
-  # Info
   my $req    = $tx->req;
   my $url    = $req->url;
   my $scheme = $url->scheme || 'http';
@@ -858,7 +848,6 @@ sub _tx_info {
 sub _upgrade {
   my ($self, $id) = @_;
 
-  # Connection
   my $c   = $self->{_cs}->{$id};
   my $old = $c->{tx};
 
@@ -893,7 +882,7 @@ sub _upgrade {
 sub _write {
   my ($self, $id) = @_;
 
-  # Connection
+  # Writing
   return unless my $c  = $self->{_cs}->{$id};
   return unless my $tx = $c->{tx};
   return unless $tx->is_writing;

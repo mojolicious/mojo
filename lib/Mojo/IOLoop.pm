@@ -207,7 +207,7 @@ sub connect {
   # Protocol
   $args->{proto} ||= 'tcp';
 
-  # Connection
+  # New connection
   my $c = {
     buffer     => '',
     on_connect => $args->{on_connect},
@@ -245,13 +245,8 @@ sub connect {
 
 sub connection_timeout {
   my ($self, $id, $timeout) = @_;
-
-  # Connection
   return unless my $c = $self->{_cs}->{$id};
-
-  # Timeout
   $c->{timeout} = $timeout and return $self if $timeout;
-
   return $c->{timeout};
 }
 
@@ -404,7 +399,7 @@ sub listen {
     $ENV{MOJO_REUSE} .= "$reuse:$fd";
   }
 
-  # Connection
+  # New connection
   my $c = {
     file => $args->{file} ? 1 : 0,
     on_accept => $args->{on_accept},
@@ -453,10 +448,7 @@ sub listen {
 sub local_info {
   my ($self, $id) = @_;
 
-  # Connection
-  return {} unless my $c = $self->{_cs}->{$id};
-
-  # Socket
+  return {} unless my $c      = $self->{_cs}->{$id};
   return {} unless my $socket = $c->{handle};
 
   # UNIX domain socket info
@@ -635,10 +627,7 @@ sub handle {
 sub remote_info {
   my ($self, $id) = @_;
 
-  # Connection
-  return {} unless my $c = $self->{_cs}->{$id};
-
-  # Socket
+  return {} unless my $c      = $self->{_cs}->{$id};
   return {} unless my $socket = $c->{handle};
 
   # UNIX domain socket info
@@ -840,10 +829,7 @@ sub start_tls {
     %{$args->{tls_args} || {}}
   );
 
-  # Connection
-  $self->drop($id) and return unless my $c = $self->{_cs}->{$id};
-
-  # Socket
+  $self->drop($id) and return unless my $c      = $self->{_cs}->{$id};
   $self->drop($id) and return unless my $socket = $c->{handle};
   my $fd = fileno $socket;
 
@@ -883,10 +869,7 @@ sub stop {
 sub test {
   my ($self, $id) = @_;
 
-  # Connection
-  return unless my $c = $self->{_cs}->{$id};
-
-  # Socket
+  return unless my $c      = $self->{_cs}->{$id};
   return unless my $socket = $c->{handle};
 
   # Test
@@ -912,10 +895,7 @@ sub timer {
 sub write {
   my ($self, $id, $chunk, $cb) = @_;
 
-  # Connection
   my $c = $self->{_cs}->{$id};
-
-  # Buffer
   $c->{buffer} .= $chunk;
 
   # UNIX only
@@ -949,7 +929,7 @@ sub _accept {
 
   weaken $self;
 
-  # Connection
+  # New connection
   my $c = {buffer => ''};
   (my $id) = "$c" =~ /0x([\da-f]+)/;
   $self->{_cs}->{$id} = $c;
@@ -1001,13 +981,8 @@ sub _accept {
 
 sub _add_event {
   my ($self, $event, $id, $cb) = @_;
-
-  # Connection
   return unless my $c = $self->{_cs}->{$id};
-
-  # Add event callback
   $c->{$event} = $cb if $cb;
-
   return $self;
 }
 
@@ -1029,7 +1004,6 @@ sub _add_loop_event {
 sub _connect {
   my ($self, $id, $args) = @_;
 
-  # Connection
   return unless my $c = $self->{_cs}->{$id};
 
   # Options
@@ -1115,7 +1089,6 @@ sub _drop_immediately {
 
   # Drop handle
   if (my $handle = $c->{handle}) {
-
     warn "DISCONNECTED $id\n" if DEBUG;
 
     # Remove file descriptor
@@ -1147,10 +1120,7 @@ sub _drop_immediately {
 sub _error {
   my ($self, $id, $error) = @_;
 
-  # Connection
   return unless my $c = $self->{_cs}->{$id};
-
-  # Get error callback
   my $event = $c->{error};
 
   # Cleanup
@@ -1212,13 +1182,8 @@ sub _not_listening {
 sub _not_writing {
   my ($self, $id) = @_;
 
-  # Connection
   return unless my $c = $self->{_cs}->{$id};
-
-  # Chunk still in buffer
   return $c->{read_only} = 1 if length $c->{buffer};
-
-  # Handle
   return unless my $handle = $c->{handle};
 
   # Writing
@@ -1344,7 +1309,6 @@ sub _prepare_cert {
 sub _prepare_connections {
   my $self = shift;
 
-  # Connections
   my $cs = $self->{_cs} ||= {};
 
   # Prepare
@@ -1393,24 +1357,15 @@ sub _prepare_key {
 sub _prepare_listen {
   my $self = shift;
 
-  # Loop
-  my $loop = $self->_prepare_loop;
-
-  # Already listening
   return if $self->{_listening};
-
-  # Listen sockets
   my $listen = $self->{_listen} ||= {};
   return unless keys %$listen;
-
-  # Connections
   my $i = keys %{$self->{_cs}};
   return unless $i < $self->max_connections;
-
-  # Lock
   return unless $self->on_lock->($self, !$i);
 
   # Add listen sockets
+  my $loop = $self->_prepare_loop;
   for my $lid (keys %$listen) {
     my $socket = $listen->{$lid}->{handle};
 
@@ -1436,7 +1391,6 @@ sub _prepare_loop {
 
   # "kqueue"
   if (KQUEUE) {
-
     warn "KQUEUE MAINLOOP\n" if DEBUG;
 
     return $self->{_loop} = IO::KQueue->new;
@@ -1444,7 +1398,6 @@ sub _prepare_loop {
 
   # "epoll"
   elsif (EPOLL) {
-
     warn "EPOLL MAINLOOP\n" if DEBUG;
 
     $self->{_loop} = IO::Epoll->new;
@@ -1452,7 +1405,6 @@ sub _prepare_loop {
 
   # "poll"
   else {
-
     warn "POLL MAINLOOP\n" if DEBUG;
 
     $self->{_loop} = IO::Poll->new;
@@ -1467,16 +1419,9 @@ sub _read {
   # Listen socket (new connection)
   if (my $l = $self->{_listen}->{$id}) { $self->_accept($l->{handle}) }
 
-  # Connection
   my $c = $self->{_cs}->{$id};
-
-  # TLS accept
-  return $self->_tls_accept($id) if $c->{tls_accept};
-
-  # TLS connect
+  return $self->_tls_accept($id)  if $c->{tls_accept};
   return $self->_tls_connect($id) if $c->{tls_connect};
-
-  # Handle
   return unless defined(my $handle = $c->{handle});
 
   # Read as much as possible
@@ -1574,7 +1519,6 @@ sub _timer {
 sub _tls_accept {
   my ($self, $id) = @_;
 
-  # Connection
   my $c = $self->{_cs}->{$id};
 
   # Accepted
@@ -1597,7 +1541,6 @@ sub _tls_accept {
 sub _tls_connect {
   my ($self, $id) = @_;
 
-  # Connection
   my $c = $self->{_cs}->{$id};
 
   # Connected
@@ -1633,16 +1576,9 @@ sub _tls_error {
 sub _write {
   my ($self, $id) = @_;
 
-  # Connection
   my $c = $self->{_cs}->{$id};
-
-  # TLS accept
-  return $self->_tls_accept($id) if $c->{tls_accept};
-
-  # TLS connect
+  return $self->_tls_accept($id)  if $c->{tls_accept};
   return $self->_tls_connect($id) if $c->{tls_connect};
-
-  # Handle
   return unless my $handle = $c->{handle};
 
   # Connecting
@@ -1694,16 +1630,12 @@ sub _write {
 sub _writing {
   my ($self, $id) = @_;
 
-  # Connection
   my $c = $self->{_cs}->{$id};
 
   # Writing again
   delete $c->{read_only};
 
-  # Writing
   return if my $writing = $c->{writing};
-
-  # Handle
   return unless my $handle = $c->{handle};
 
   # KQueue

@@ -37,10 +37,8 @@ sub handler {
 sub _cookies {
   my ($self, $tx) = @_;
 
-  # Response
-  my $res = $tx->res;
-
   # Cookies
+  my $res    = $tx->res;
   my $params = $tx->req->params->to_hash;
   for my $key (sort keys %$params) {
     $res->cookies(
@@ -54,7 +52,6 @@ sub _cookies {
   # Response
   $res->code(200);
   $res->body('nomnomnom');
-
   $tx->resume;
 }
 
@@ -225,14 +222,12 @@ EOF
 sub _upload {
   my ($self, $tx) = @_;
 
-  # Request
-  my $req = $tx->req;
-
-  # Response
+  # Code
   my $res = $tx->res;
   $res->code(200);
 
   # File
+  my $req = $tx->req;
   if (my $file = $req->upload('file')) {
     my $headers = $res->headers;
     $headers->content_type($file->headers->content_type

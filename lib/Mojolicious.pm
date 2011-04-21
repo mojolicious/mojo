@@ -346,7 +346,7 @@ Mojolicious - The Web In A Box!
   # Say hello
   sub welcome {
     my $self = shift;
-    $self->render(text => 'Hi there!');
+    $self->render_text('Hi there!');
   }
 
   # Say goodbye from a template (foo/bye.html.ep)
@@ -416,7 +416,7 @@ Web development for humans, making hard things possible and everything fun.
   use Mojolicious::Lite;
 
   # Simple route with plain text response
-  get '/hello' => sub { shift->render(text => 'Hello World!') };
+  get '/hello' => sub { shift->render_text('Hello World!') };
 
   # Route to template in DATA section
   get '/time' => 'clock';
@@ -425,14 +425,14 @@ Web development for humans, making hard things possible and everything fun.
   get '/:offset' => sub {
     my $self   = shift;
     my $offset = $self->param('offset') || 23;
-    $self->render(json => {list => [0 .. $offset]});
+    $self->render_json({list => [0 .. $offset]});
   };
 
   # Scrape information from remote sites
   post '/title' => sub {
     my $self = shift;
     my $url  = $self->param('url') || 'http://mojolicio.us';
-    $self->render(text =>
+    $self->render_text(
       $self->ua->get($url)->res->dom->at('head > title')->text);
   };
 
@@ -497,7 +497,7 @@ been separated from action code, especially when working in teams.
   use Mojo::Base 'Mojolicious::Controller';
 
   # Plain text response
-  sub hello { shift->render(text => 'Hello World!') }
+  sub hello { shift->render_text('Hello World!') }
 
   # Render external template "templates/example/clock.html.ep"
   sub clock { shift->render }
@@ -506,14 +506,14 @@ been separated from action code, especially when working in teams.
   sub restful {
     my $self   = shift;
     my $offset = $self->param('offset') || 23;
-    $self->render(json => {list => [0 .. $offset]});
+    $self->render_json({list => [0 .. $offset]});
   }
 
   # Scrape information from remote sites
   sub title {
     my $self = shift;
     my $url  = $self->param('url') || 'http://mojolicio.us';
-    $self->render(text =>
+    $self->render_text(
       $self->ua->get($url)->res->dom->at('head > title')->text);
   }
 

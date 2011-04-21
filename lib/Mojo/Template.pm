@@ -141,6 +141,7 @@ sub build {
   $lines[-1] .= qq/$append; \$_M; } };/;
 
   $self->code(join "\n", @lines);
+  $self->tree([]);
   return $self;
 }
 

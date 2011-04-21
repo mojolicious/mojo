@@ -47,10 +47,8 @@ sub dispatch {
 sub serve {
   my ($self, $c, $rel, $root) = @_;
 
-  # Root
-  $root = $self->root unless defined $root;
-
   # Append path to root
+  $root = $self->root unless defined $root;
   my $file = File::Spec->catfile($root, split('/', $rel));
 
   # Extension
@@ -60,18 +58,6 @@ sub serve {
   # Type
   my $type = $c->app->types->type($ext) || 'text/plain';
 
-  # Response
-  my $res = $c->res;
-
-  # Asset
-  my $asset;
-
-  # Modified
-  my $modified = $self->{_modified} ||= time;
-
-  # Size
-  my $size = 0;
-
   # Root for bundled files
   $self->{_root}
     ||= File::Spec->catdir(File::Spec->splitdir(dirname(__FILE__)), 'public');
@@ -80,6 +66,10 @@ sub serve {
   my $bundled = File::Spec->catfile($self->{_root}, split('/', $rel));
 
   # Files
+  my $res      = $c->res;
+  my $modified = $self->{_modified} ||= time;
+  my $size     = 0;
+  my $asset;
   for my $path ($file, $bundled) {
 
     # Exists
@@ -119,16 +109,9 @@ sub serve {
   # Found
   if ($asset) {
 
-    # Request
-    my $req = $c->req;
-
-    # Request headers
-    my $rqh = $req->headers;
-
-    # Response headers
-    my $rsh = $res->headers;
-
     # If modified since
+    my $rqh = $c->req->headers;
+    my $rsh = $res->headers;
     if (my $date = $rqh->if_modified_since) {
 
       # Not modified

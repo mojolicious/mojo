@@ -13,7 +13,6 @@ use Scalar::Util 'weaken';
 use Socket qw/IPPROTO_TCP TCP_NODELAY/;
 use Time::HiRes qw/time usleep/;
 
-# Debug
 use constant DEBUG => $ENV{MOJO_IOLOOP_DEBUG} || 0;
 
 # "AF_INET6" requires Socket6 or Perl 5.12
@@ -128,7 +127,6 @@ if (-r '/etc/resolv.conf') {
       # New DNS server
       push @servers, $1;
 
-      # Debug
       warn qq/DETECTED DNS SERVER ($1)\n/ if DEBUG;
     }
   }
@@ -674,7 +672,6 @@ sub resolve {
     return $self;
   }
 
-  # Debug
   warn "RESOLVE $type $name ($server)\n" if DEBUG;
 
   # Timer
@@ -722,7 +719,6 @@ sub resolve {
     on_error => sub {
       my ($self, $id) = @_;
 
-      # Debug
       warn "FAILED $type $name ($server)\n" if DEBUG;
 
       # Next server
@@ -741,7 +737,6 @@ sub resolve {
       # Packet
       my @packet = unpack 'nnnnnna*', $chunk;
 
-      # Debug
       warn "ANSWERS $packet[3] ($server)\n" if DEBUG;
 
       # Wrong response
@@ -772,7 +767,6 @@ sub resolve {
         # Answer
         push @answers, [@answer, $ttl];
 
-        # Debug
         warn "ANSWER $answer[0] $answer[1]\n" if DEBUG;
       }
 
@@ -786,7 +780,6 @@ sub resolve {
     $self->dns_timeout => sub {
       my $self = shift;
 
-      # Debug
       warn "RESOLVE TIMEOUT ($server)\n" if DEBUG;
 
       # Next server
@@ -834,7 +827,6 @@ sub start_tls {
   # Arguments
   my $args = ref $_[0] ? $_[0] : {@_};
 
-  # Weaken
   weaken $self;
 
   # Options
@@ -955,7 +947,6 @@ sub _accept {
   # Listen
   my $l = $self->{_listen}->{$r->{$listen}};
 
-  # Weaken
   weaken $self;
 
   # Connection
@@ -998,7 +989,6 @@ sub _accept {
     $self->max_connections(0) if --$self->{_accepts} == 0;
   }
 
-  # Debug
   warn "ACCEPTED $id\n" if DEBUG;
 
   # Accept callback
@@ -1126,7 +1116,6 @@ sub _drop_immediately {
   # Drop handle
   if (my $handle = $c->{handle}) {
 
-    # Debug
     warn "DISCONNECTED $id\n" if DEBUG;
 
     # Remove file descriptor
@@ -1448,7 +1437,6 @@ sub _prepare_loop {
   # "kqueue"
   if (KQUEUE) {
 
-    # Debug
     warn "KQUEUE MAINLOOP\n" if DEBUG;
 
     return $self->{_loop} = IO::KQueue->new;
@@ -1457,7 +1445,6 @@ sub _prepare_loop {
   # "epoll"
   elsif (EPOLL) {
 
-    # Debug
     warn "EPOLL MAINLOOP\n" if DEBUG;
 
     $self->{_loop} = IO::Epoll->new;
@@ -1466,7 +1453,6 @@ sub _prepare_loop {
   # "poll"
   else {
 
-    # Debug
     warn "POLL MAINLOOP\n" if DEBUG;
 
     $self->{_loop} = IO::Poll->new;
@@ -1670,7 +1656,6 @@ sub _write {
     # Disable Nagle's algorithm
     setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1;
 
-    # Debug
     warn "CONNECTED $id\n" if DEBUG;
 
     # Connect callback

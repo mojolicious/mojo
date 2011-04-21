@@ -13,11 +13,8 @@ has res => sub { Mojo::Message::Response->new };
 sub client_read {
   my ($self, $chunk) = @_;
 
-  # Request and response
-  my $req = $self->req;
-  my $res = $self->res;
-
-  # Length
+  my $req  = $self->req;
+  my $res  = $self->res;
   my $read = length $chunk;
 
   # Preserve state
@@ -57,15 +54,12 @@ sub client_read {
 sub client_write {
   my $self = shift;
 
-  # Chunk
   my $chunk = '';
+  my $req   = $self->req;
 
   # Offsets
   $self->{_offset} ||= 0;
   $self->{_write}  ||= 0;
-
-  # Request
-  my $req = $self->req;
 
   # Writing
   unless ($self->{_state}) {
@@ -160,7 +154,6 @@ sub keep_alive {
     return $self;
   }
 
-  # Request and response
   my $req = $self->req;
   my $res = $self->res;
 
@@ -192,10 +185,8 @@ sub keep_alive {
 sub server_leftovers {
   my $self = shift;
 
-  # Request
-  my $req = $self->req;
-
   # No leftovers
+  my $req = $self->req;
   return unless $req->content->has_leftovers;
 
   # Leftovers
@@ -210,7 +201,6 @@ sub server_leftovers {
 sub server_read {
   my ($self, $chunk) = @_;
 
-  # Request and response
   my $req = $self->req;
   my $res = $self->res;
 
@@ -267,17 +257,14 @@ sub server_read {
 sub server_write {
   my $self = shift;
 
-  # Chunk
-  my $chunk = '';
-
   # Not writing
+  my $chunk = '';
   return $chunk unless $self->{_state};
 
   # Offsets
   $self->{_offset} ||= 0;
   $self->{_write}  ||= 0;
 
-  # Request and response
   my $req = $self->req;
   my $res = $self->res;
 

@@ -104,7 +104,6 @@ sub render {
 sub shape_match {
   my ($self, $pathref) = @_;
 
-  # Debug
   if (DEBUG) {
     my $pattern = $self->pattern || '';
     warn "    [$$pathref] -> [$pattern]\n";
@@ -114,7 +113,6 @@ sub shape_match {
   my $regex;
   $regex = $self->_compile unless $regex = $self->regex;
 
-  # Debug
   warn "    $regex\n" if DEBUG;
 
   # Match

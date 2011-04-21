@@ -32,13 +32,8 @@ sub client_close { shift->server_close(@_) }
 sub client_handshake {
   my $self = shift;
 
-  # Request
-  my $req = $self->req;
-
-  # Headers
-  my $headers = $req->headers;
-
   # Default headers
+  my $headers = $self->req->headers;
   $headers->upgrade('websocket')  unless $headers->upgrade;
   $headers->connection('Upgrade') unless $headers->connection;
   $headers->sec_websocket_protocol('mojo')
@@ -79,10 +74,7 @@ sub res            { shift->handshake->res(@_) }
 
 sub resume {
   my $self = shift;
-
-  # Resume
   $self->handshake->resume;
-
   return $self;
 }
 
@@ -102,16 +94,9 @@ sub send_message {
 sub server_handshake {
   my $self = shift;
 
-  # Request
-  my $req = $self->req;
-
-  # Response
-  my $res = $self->res;
-
-  # Request headers
+  my $req         = $self->req;
+  my $res         = $self->res;
   my $req_headers = $req->headers;
-
-  # Response headers
   my $res_headers = $res->headers;
 
   # Handshake
@@ -204,20 +189,17 @@ sub server_write {
 sub _build_frame {
   my ($self, $op, $payload) = @_;
 
-  # Debug
   warn "BUILDING FRAME\n" if DEBUG;
 
   # Head
   my $frame = 0;
   vec($frame, 0, 8) = $op | 0b10000000;
 
-  # Debug
   warn "PAYLOAD: $payload\n" if DEBUG;
 
   # Mask payload
   if ($self->masked) {
 
-    # Debug
     warn "MASKING PAYLOAD\n" if DEBUG;
 
     # Mask
@@ -251,7 +233,6 @@ sub _build_frame {
     $frame .= pack 'NN', $len >> 32, $len & 0xFFFFFFFF;
   }
 
-  # Debug
   if (DEBUG) {
     warn 'HEAD: ' . unpack('B*', $frame) . "\n";
     warn "OPCODE: $op\n";
@@ -284,32 +265,27 @@ sub _parse_frame {
   # Buffer
   my $buffer = $self->{_read};
 
-  # Debug
   warn "PARSING FRAME\n" if DEBUG;
 
   # Head
   return unless length $buffer > 2;
   my $head = substr $buffer, 0, 2, '';
 
-  # Debug
   warn 'HEAD: ' . unpack('B*', $head) . "\n" if DEBUG;
 
   # FIN
   my $fin = (vec($head, 0, 8) & 0b10000000) == 0b10000000 ? 1 : 0;
 
-  # Debug
   warn "FIN: $fin\n" if DEBUG;
 
   # Opcode
   my $op = vec($head, 0, 8) & 0b00001111;
 
-  # Debug
   warn "OPCODE: $op\n" if DEBUG;
 
   # Length
   my $len = vec($head, 1, 8) & 0b01111111;
 
-  # Debug
   warn "LENGTH: $len\n" if DEBUG;
 
   # No payload
@@ -324,7 +300,6 @@ sub _parse_frame {
     $head = substr $buffer, 0, 2, '';
     $len = unpack 'n', $head;
 
-    # Debug
     warn "EXTENDED (16bit): $len\n" if DEBUG;
   }
 
@@ -334,7 +309,6 @@ sub _parse_frame {
     $head = substr $buffer, 0, 8, '';
     $len = unpack 'N', substr($head, 4, 4);
 
-    # Debug
     warn "EXTENDED (64bit): $len\n" if DEBUG;
   }
 
@@ -346,11 +320,9 @@ sub _parse_frame {
   unless ($self->masked) {
     $payload = _xor_mask($payload, substr($payload, 0, 4, ''));
 
-    # Debug
     warn "UNMASKING PAYLOAD\n" if DEBUG;
   }
 
-  # Debug
   warn "PAYLOAD: $payload\n" if DEBUG;
 
   # Update buffer

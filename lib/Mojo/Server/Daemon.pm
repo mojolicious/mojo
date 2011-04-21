@@ -14,7 +14,6 @@ use constant BONJOUR => $ENV{MOJO_NO_BONJOUR}
   ? 0
   : eval 'use Net::Rendezvous::Publish 0.04 (); 1';
 
-# Debug
 use constant DEBUG => $ENV{MOJO_DAEMON_DEBUG} || 0;
 
 has [qw/backlog group listen silent user/];
@@ -54,10 +53,8 @@ sub DESTROY {
 sub prepare_ioloop {
   my $self = shift;
 
-  # Loop
-  my $loop = $self->ioloop;
-
   # Listen
+  my $loop = $self->ioloop;
   my $listen = $self->listen || ['http://*:3000'];
   $self->_listen($_) for @$listen;
 
@@ -120,12 +117,10 @@ sub _build_tx {
 
   # Build transaction
   my $tx = $self->on_build_tx->($self);
+  $tx->connection($id);
 
   # Identify
   $tx->res->headers->server('Mojolicious (Perl)');
-
-  # Connection
-  $tx->connection($id);
 
   # Store connection information
   my $loop  = $self->ioloop;
@@ -139,7 +134,6 @@ sub _build_tx {
   # TLS
   $tx->req->url->base->scheme('https') if $c->{tls};
 
-  # Weaken
   weaken $self;
 
   # Handler callback
@@ -173,8 +167,6 @@ sub _drop {
 
   # Connection
   my $c = $self->{_cs}->{$id};
-
-  # Transaction
   if (my $tx = $c->{websocket} || $c->{transaction}) { $tx->server_close }
 
   # Drop connection
@@ -220,7 +212,6 @@ sub _finish {
       # Upgrade connection timeout
       $self->ioloop->connection_timeout($id, $self->websocket_timeout);
 
-      # Weaken
       weaken $self;
 
       # Resume callback
@@ -249,8 +240,6 @@ sub _finish {
 
 sub _hup {
   my ($self, $loop, $id) = @_;
-
-  # Drop
   $self->_drop($id);
 }
 
@@ -284,7 +273,6 @@ sub _listen {
   my $backlog = $self->backlog;
   $options->{backlog} = $backlog if $backlog;
 
-  # Weaken
   weaken $self;
 
   # Callbacks
@@ -329,13 +317,10 @@ sub _listen {
 sub _read {
   my ($self, $loop, $id, $chunk) = @_;
 
-  # Debug
   warn "< $chunk\n" if DEBUG;
 
   # Connection
   my $c = $self->{_cs}->{$id};
-
-  # Transaction
   my $tx = $c->{transaction} || $c->{websocket};
 
   # New transaction
@@ -376,8 +361,6 @@ sub _write {
 
   # Connection
   my $c = $self->{_cs}->{$id};
-
-  # Transaction
   return unless my $tx = $c->{transaction} || $c->{websocket};
 
   # Not writing
@@ -386,7 +369,6 @@ sub _write {
   # Get chunk
   my $chunk = $tx->server_write;
 
-  # Weaken
   weaken $self;
 
   # Callback
@@ -408,7 +390,6 @@ sub _write {
   # Write
   $self->ioloop->write($id, $chunk, $cb);
 
-  # Debug
   warn "> $chunk\n" if DEBUG;
 }
 

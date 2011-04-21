@@ -6,7 +6,6 @@ use overload '""' => sub { shift->to_xml }, fallback => 1;
 use Mojo::Util qw/decode encode html_unescape xml_escape/;
 use Scalar::Util 'weaken';
 
-# Debug
 use constant DEBUG => $ENV{MOJO_DOM_DEBUG} || 0;
 
 # "How are the kids supposed to get home?
@@ -586,7 +585,6 @@ sub _doctype {
 sub _end {
   my ($self, $end, $current) = @_;
 
-  # Debug
   warn "END $end\n" if DEBUG;
 
   # Root
@@ -1201,7 +1199,6 @@ sub _render {
 sub _start {
   my ($self, $start, $attrs, $current) = @_;
 
-  # Debug
   warn "START $start\n" if DEBUG;
 
   # Autoclose optional HTML tags

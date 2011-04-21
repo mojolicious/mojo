@@ -260,14 +260,9 @@ sub _parse_env {
   # Make environment accessible
   $self->env($env);
 
-  # Headers
   my $headers = $self->headers;
-
-  # URL
-  my $url = $self->url;
-
-  # Base
-  my $base = $url->base;
+  my $url     = $self->url;
+  my $base    = $url->base;
 
   # Headers
   while (my ($name, $value) = each %$env) {

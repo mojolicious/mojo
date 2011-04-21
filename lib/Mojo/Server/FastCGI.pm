@@ -59,7 +59,6 @@ sub accept_connection {
     $self->{_listen} = $listen;
   }
 
-  # Debug
   $self->app->log->debug('FastCGI listen socket opened.') if DEBUG;
 
   # Accept
@@ -69,7 +68,6 @@ sub accept_connection {
     return;
   }
 
-  # Debug
   $self->app->log->debug('Accepted FastCGI connection.') if DEBUG;
 
   return $c;
@@ -93,7 +91,6 @@ sub read_record {
   # Ignore padding bytes
   $body = $plen ? substr($body, 0, $clen, '') : $body;
 
-  # Debug
   if (DEBUG) {
     my $t = $self->type_name($type);
     $self->app->log->debug(
@@ -106,7 +103,6 @@ sub read_record {
 sub read_request {
   my ($self, $c) = @_;
 
-  # Debug
   $self->app->log->debug('Reading FastCGI request.') if DEBUG;
 
   # Transaction
@@ -157,7 +153,6 @@ sub read_request {
         # Environment
         $env->{$name} = $value;
 
-        # Debug
         $self->app->log->debug(qq/FastCGI param: $name - "$value"./)
           if DEBUG;
 
@@ -219,7 +214,6 @@ sub run {
       next;
     }
 
-    # Debug
     $self->app->log->debug('Handling FastCGI request.') if DEBUG;
 
     # Handle
@@ -267,7 +261,6 @@ sub write_records {
     # FCGI version 1 record
     my $template = "CCnnCxa${payload_len}x$pad_len";
 
-    # Debug
     if (DEBUG) {
       my $chunk = substr($body, $offset, $payload_len);
       $self->app->log->debug(
@@ -308,7 +301,6 @@ sub write_records {
 sub write_response {
   my ($self, $tx) = @_;
 
-  # Debug
   $self->app->log->debug('Writing FastCGI response.') if DEBUG;
 
   my $c   = $tx->connection;

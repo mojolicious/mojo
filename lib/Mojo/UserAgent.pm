@@ -17,7 +17,6 @@ use Mojo::Util qw/encode url_escape/;
 use Mojo::URL;
 use Scalar::Util 'weaken';
 
-# Debug
 use constant DEBUG => $ENV{MOJO_USERAGENT_DEBUG} || 0;
 
 # "You can't let a single bad experience scare you away from drugs."
@@ -39,17 +38,13 @@ sub DESTROY { shift->_cleanup }
 # "Ah, alcohol and night-swimming. It's a winning combination."
 sub build_form_tx {
   my $self = shift;
-
-  # URL
-  my $url = shift;
+  my $url  = shift;
 
   # Callback
   my $cb = pop @_ if ref $_[-1] && ref $_[-1] eq 'CODE';
 
-  # Encoding
-  my $encoding = shift;
-
   # Form
+  my $encoding = shift;
   my $form = ref $encoding ? $encoding : shift;
   $encoding = undef if ref $encoding;
 
@@ -87,10 +82,7 @@ sub build_form_tx {
         $hash->{file} = Mojo::Asset::Memory->new->add_chunk($content);
       }
 
-      # Content-Type
       $hash->{'Content-Type'} ||= 'application/octet-stream';
-
-      # Append
       push @{$params->params}, $name, $hash;
     }
 
@@ -99,12 +91,8 @@ sub build_form_tx {
   }
 
   # New transaction
-  my $tx = $self->build_tx(POST => $url);
-
-  # Request
-  my $req = $tx->req;
-
-  # Headers
+  my $tx      = $self->build_tx(POST => $url);
+  my $req     = $tx->req;
   my $headers = $req->headers;
   $headers->from_hash(ref $_[0] eq 'HASH' ? $_[0] : {@_});
 
@@ -112,46 +100,28 @@ sub build_form_tx {
   $headers->content_type('multipart/form-data') if $multipart;
   my $type = $headers->content_type || '';
   if ($type eq 'multipart/form-data') {
-
-    # Formdata
     my $form = $params->to_hash;
 
     # Parts
     my @parts;
     foreach my $name (sort keys %$form) {
-
-      # Part
       my $part = Mojo::Content::Single->new;
-
-      # Headers
-      my $h = $part->headers;
-
-      # Form
-      my $f = $form->{$name};
+      my $h    = $part->headers;
+      my $f    = $form->{$name};
 
       # File
       my $filename;
       if (ref $f eq 'HASH') {
-
-        # Filename
         $filename = delete $f->{filename} || $name;
         encode $encoding, $filename if $encoding;
         url_escape $filename, $Mojo::URL::UNRESERVED;
-
-        # Asset
         $part->asset(delete $f->{file});
-
-        # Headers
         $h->from_hash($f);
-
-        # Append
         push @parts, $part;
       }
 
       # Fields
       else {
-
-        # Content-Type
         my $type = 'text/plain';
         $type .= qq/;charset=$encoding/ if $encoding;
         $h->content_type($type);
@@ -161,8 +131,6 @@ sub build_form_tx {
           $part = Mojo::Content::Single->new(headers => $h);
           encode $encoding, $value if $encoding;
           $part->asset->add_chunk($value);
-
-          # Append
           push @parts, $part;
         }
       }
@@ -201,15 +169,9 @@ sub build_tx {
   my $self = shift;
 
   # New transaction
-  my $tx = Mojo::Transaction::HTTP->new;
-
-  # Request
+  my $tx  = Mojo::Transaction::HTTP->new;
   my $req = $tx->req;
-
-  # Method
   $req->method(shift);
-
-  # URL
   my $url = shift;
   $url = "http://$url" unless $url =~ /^\/|\:\/\//;
   $req->url->parse($url);
@@ -233,14 +195,8 @@ sub build_websocket_tx {
 
   # New WebSocket
   my ($tx, $cb) = $self->build_tx(GET => @_);
-
-  # Request
   my $req = $tx->req;
-
-  # URL
   my $url = $req->url;
-
-  # Scheme
   my $abs = $url->to_abs;
   if (my $scheme = $abs->scheme) {
     $scheme = $scheme eq 'wss' ? 'https' : 'http';
@@ -326,7 +282,6 @@ sub start {
   # Non-blocking
   if ($cb) {
 
-    # Debug
     warn "NEW NON-BLOCKING REQUEST\n" if DEBUG;
 
     # Switch to non-blocking
@@ -336,7 +291,6 @@ sub start {
     return $self->_start_tx($tx, $cb);
   }
 
-  # Debug
   warn "NEW BLOCKING REQUEST\n" if DEBUG;
 
   # Switch to blocking
@@ -360,19 +314,13 @@ sub test_server {
 
   # Server
   unless ($self->{_port}) {
-
-    # Loop
     my $loop = $self->{_loop} || $self->ioloop;
 
-    # Server
     my $server = $self->{_server} =
       Mojo::Server::Daemon->new(ioloop => $loop, silent => 1);
-
-    # Port
     my $port = $self->{_port} = $loop->generate_port;
     die "Couldn't find a free TCP port for testing.\n" unless $port;
 
-    # Listen
     $self->{_protocol} = $protocol ||= 'http';
     $server->listen(["$protocol://*:$port"]);
     $server->prepare_ioloop;
@@ -402,8 +350,6 @@ sub websocket {
 
 sub _cache {
   my ($self, $name, $id) = @_;
-
-  # Cache
   my $cache = $self->{_cache} ||= [];
 
   # Enqueue
@@ -416,24 +362,18 @@ sub _cache {
       $self->_drop($cached->[1]);
     }
 
-    # Add to cache
     push @$cache, [$name, $id] if $max;
-
     return $self;
   }
 
-  # Loop
-  my $loop = $self->{_loop};
-
   # Dequeue
+  my $loop = $self->{_loop};
   my $result;
   my @cache;
   for my $cached (@$cache) {
 
     # Search for name or id
     if (!$result && ($cached->[1] eq $name || $cached->[0] eq $name)) {
-
-      # Result
       my $id = $cached->[1];
 
       # Test connection
@@ -453,15 +393,12 @@ sub _cache {
 
 sub _cleanup {
   my $self = shift;
-
-  # Loop
   return unless my $loop = $self->{_loop};
 
   # Stop server
   delete $self->{_port};
   delete $self->{_server};
 
-  # Debug
   warn "DROPPING ALL CONNECTIONS\n" if DEBUG;
 
   # Cleanup active connections
@@ -479,33 +416,23 @@ sub _cleanup {
 #  Uh, second word, chief."
 sub _connect {
   my ($self, $tx, $cb) = @_;
-
-  # Check for specific connection id
-  my $id = $tx->connection;
-
-  # Loop
   my $loop = $self->{_loop};
 
   # Info
+  my $id = $tx->connection;
   my ($scheme, $address, $port) = $self->_tx_info($tx);
 
-  # Weaken
   weaken $self;
 
   # Keep alive connection
   $id ||= $self->_cache("$scheme:$address:$port");
   if ($id && !ref $id) {
 
-    # Debug
     warn "KEEP ALIVE CONNECTION ($scheme:$address:$port)\n" if DEBUG;
 
     # Add new connection
     $self->{_cs}->{$id} = {cb => $cb, tx => $tx};
-
-    # Kept alive
     $tx->kept_alive(1);
-
-    # Connected
     $self->_connected($id);
   }
 
@@ -519,7 +446,6 @@ sub _connect {
       return if $self->_connect_proxy($tx, $cb);
     }
 
-    # Debug
     warn "NEW CONNECTION ($scheme:$address:$port)\n" if DEBUG;
 
     # Connect
@@ -532,8 +458,6 @@ sub _connect {
       tls_key  => $self->key,
       on_connect => sub { $self->_connected($_[1]) }
     );
-
-    # Add new connection
     $self->{_cs}->{$id} = {cb => $cb, tx => $tx};
   }
 
@@ -551,11 +475,7 @@ sub _connect_proxy {
 
   # Request
   my $req = $old->req;
-
-  # URL
   my $url = $req->url;
-
-  # Proxy
   return unless my $proxy = $req->proxy;
 
   # WebSocket and/or HTTPS
@@ -609,14 +529,10 @@ sub _connect_proxy {
 #  or just finished lying, but NOT WHEN I'M TELLING THE TRUTH."
 sub _connected {
   my ($self, $id) = @_;
-
-  # Loop
   my $loop = $self->{_loop};
 
   # Transaction
   my $tx = $self->{_cs}->{$id}->{tx};
-
-  # Connection
   $tx->connection($id);
 
   # Store connection information in transaction
@@ -678,10 +594,8 @@ sub _error {
 sub _finish_tx {
   my ($self, $tx, $cb) = @_;
 
-  # Response
-  my $res = $tx->res;
-
   # 400/500
+  my $res = $tx->res;
   $res->error($res->message, $res->code)
     if $res->is_status_class(400) || $res->is_status_class(500);
 
@@ -756,7 +670,6 @@ sub _hup { shift->_handle(pop, 1) }
 sub _read {
   my ($self, $loop, $id, $chunk) = @_;
 
-  # Debug
   warn "< $chunk\n" if DEBUG;
 
   # Connection
@@ -784,10 +697,8 @@ sub _read {
 sub _redirect {
   my ($self, $c, $old) = @_;
 
-  # Response
-  my $res = $old->res;
-
   # Code
+  my $res = $old->res;
   return unless $res->is_status_class('300');
   return if $res->code == 305;
 
@@ -795,10 +706,8 @@ sub _redirect {
   return unless my $location = $res->headers->location;
   $location = Mojo::URL->new($location);
 
-  # Request
-  my $req = $old->req;
-
   # Fix broken location without authority and/or scheme
+  my $req = $old->req;
   my $url = $req->url;
   $location->authority($url->authority) unless $location->authority;
   $location->scheme($url->scheme)       unless $location->scheme;
@@ -846,12 +755,8 @@ sub _start_tx {
   }
 
   # Request
-  my $req = $tx->req;
-
-  # URL
-  my $url = $req->url;
-
-  # Scheme
+  my $req    = $tx->req;
+  my $url    = $req->url;
   my $scheme = $url->scheme || '';
 
   # Detect proxy
@@ -884,7 +789,6 @@ sub _start_tx {
   # Connect
   return unless my $id = $self->_connect($tx, $cb);
 
-  # Weaken
   weaken $self;
 
   # Resume callback
@@ -903,10 +807,8 @@ sub _switch_blocking {
   # Can't switch while processing non-blocking requests
   croak 'Non-blocking requests in progress' if $self->{_processing};
 
-  # Debug
   warn "SWITCHING TO BLOCKING MODE\n" if DEBUG;
 
-  # Cleanup
   $self->_cleanup;
 
   # Normal loop
@@ -920,10 +822,8 @@ sub _switch_non_blocking {
   # Can't switch while processing blocking requests
   croak 'Blocking request in progress' if $self->{_processing};
 
-  # Debug
   warn "SWITCHING TO NON-BLOCKING MODE\n" if DEBUG;
 
-  # Cleanup
   $self->_cleanup;
 
   # Global loop
@@ -934,13 +834,9 @@ sub _switch_non_blocking {
 sub _tx_info {
   my ($self, $tx) = @_;
 
-  # Request
-  my $req = $tx->req;
-
-  # URL
-  my $url = $req->url;
-
   # Info
+  my $req    = $tx->req;
+  my $url    = $req->url;
   my $scheme = $url->scheme || 'http';
   my $host   = $url->ihost;
   my $port   = $url->port;
@@ -963,24 +859,14 @@ sub _upgrade {
   my ($self, $id) = @_;
 
   # Connection
-  my $c = $self->{_cs}->{$id};
-
-  # Last transaction
+  my $c   = $self->{_cs}->{$id};
   my $old = $c->{tx};
 
-  # Request
-  my $req = $old->req;
-
-  # Headers
-  my $headers = $req->headers;
-
   # No upgrade request
-  return unless $headers->upgrade;
-
-  # Response
-  my $res = $old->res;
+  return unless $old->req->headers->upgrade;
 
   # Handshake failed
+  my $res = $old->res;
   return unless ($res->code || '') eq '101';
 
   # Upgrade to WebSocket transaction
@@ -995,7 +881,6 @@ sub _upgrade {
   # Upgrade connection timeout
   $self->{_loop}->connection_timeout($id, $self->websocket_timeout);
 
-  # Weaken
   weaken $self;
 
   # Resume callback
@@ -1009,12 +894,8 @@ sub _write {
   my ($self, $id) = @_;
 
   # Connection
-  return unless my $c = $self->{_cs}->{$id};
-
-  # Transaction
+  return unless my $c  = $self->{_cs}->{$id};
   return unless my $tx = $c->{tx};
-
-  # Not writing
   return unless $tx->is_writing;
 
   # Chunk
@@ -1023,10 +904,7 @@ sub _write {
   # Still writing
   my $cb;
   if ($tx->is_writing) {
-
-    # Weaken
     weaken $self;
-
     $cb = sub { $self->_write($id) };
   }
 
@@ -1036,7 +914,6 @@ sub _write {
   # Finish
   $self->_handle($id) if $tx->is_done;
 
-  # Debug
   warn "> $chunk\n" if DEBUG;
 }
 

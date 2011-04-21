@@ -108,10 +108,8 @@ sub cookie {
 sub finish {
   my $self = shift;
 
-  # Transaction
-  my $tx = $self->tx;
-
   # WebSocket check
+  my $tx = $self->tx;
   Carp::croak('No WebSocket connection to finish') unless $tx->is_websocket;
 
   # Finish WebSocket
@@ -161,10 +159,8 @@ sub on_finish {
 sub on_message {
   my $self = shift;
 
-  # Transaction
-  my $tx = $self->tx;
-
   # WebSocket check
+  my $tx = $self->tx;
   Carp::croak('No WebSocket connection to receive messages from')
     unless $tx->is_websocket;
 
@@ -177,7 +173,6 @@ sub on_message {
   # Websocket handshake
   $tx->res->code(101);
 
-  # Rendered
   $self->rendered;
 
   return $self;
@@ -217,10 +212,8 @@ sub param {
 sub redirect_to {
   my $self = shift;
 
-  # Response
-  my $res = $self->res;
-
   # Code
+  my $res = $self->res;
   $res->code(302);
 
   # Headers
@@ -228,7 +221,6 @@ sub redirect_to {
   $headers->location($self->url_for(@_)->to_abs);
   $headers->content_length(0);
 
-  # Rendered
   $self->rendered;
 
   return $self;
@@ -289,7 +281,6 @@ sub render {
   my $headers = $res->headers;
   $headers->content_type($type) unless $headers->content_type;
 
-  # Rendered
   $self->rendered;
 
   # Success
@@ -356,7 +347,6 @@ sub render_exception {
     }
   }
 
-  # Rendered
   $self->rendered;
 }
 
@@ -419,10 +409,8 @@ sub render_not_found {
   $self->app->log->debug(qq/Resource "$resource" not found./)
     if $resource;
 
-  # Stash
-  my $stash = $self->stash;
-
   # Exception
+  my $stash = $self->stash;
   return if $stash->{'mojo.exception'};
 
   # Recursion
@@ -466,7 +454,6 @@ sub render_not_found {
     }
   }
 
-  # Rendered
   $self->rendered;
 }
 
@@ -492,16 +479,10 @@ sub render_partial {
 
 sub render_static {
   my ($self, $file) = @_;
-
-  # Application
   my $app = $self->app;
-
-  # Static
   $app->static->serve($self, $file)
     and $app->log->debug(
     qq/Static file "$file" not found, public directory missing?/);
-
-  # Rendered
   $self->rendered;
 }
 
@@ -516,16 +497,12 @@ sub rendered {
   # Disable auto rendering
   $self->render_later;
 
-  # Stash
-  my $stash = $self->stash;
-
   # Already finished
+  my $stash = $self->stash;
   unless ($stash->{'mojo.finished'}) {
 
-    # Application
-    my $app = $self->app;
-
     # Session
+    my $app = $self->app;
     $app->sessions->store($self);
 
     # Hook
@@ -535,7 +512,6 @@ sub rendered {
     $stash->{'mojo.finished'} = 1;
   }
 
-  # Resume
   $self->tx->resume;
 
   return $self;
@@ -547,10 +523,8 @@ sub res { shift->tx->res }
 sub send_message {
   my ($self, $message, $cb) = @_;
 
-  # Transaction
-  my $tx = $self->tx;
-
   # WebSocket check
+  my $tx = $self->tx;
   Carp::croak('No WebSocket connection to send message to')
     unless $tx->is_websocket;
 
@@ -570,7 +544,6 @@ sub send_message {
   # Websocket handshake
   $tx->res->code(101);
 
-  # Rendered
   $self->rendered;
 
   return $self;
@@ -689,9 +662,6 @@ sub url_for {
   # Absolute URL
   return Mojo::URL->new($target) if $target =~ /^\w+\:\/\//;
 
-  # Request
-  my $req = $self->req;
-
   # Make sure we have a match for named routes
   my $match;
   unless ($match = $self->match) {
@@ -699,18 +669,15 @@ sub url_for {
     $match->root($self->app->routes);
   }
 
-  # URL
-  my $url = Mojo::URL->new;
-
   # Base
+  my $url = Mojo::URL->new;
+  my $req = $self->req;
   $url->base($req->url->base->clone);
   my $base = $url->base;
   $base->userinfo(undef);
 
-  # Path
-  my $path = $url->path;
-
   # Relative URL
+  my $path = $url->path;
   if ($target =~ /^\//) { $url->parse($target) }
 
   # Route
@@ -755,7 +722,6 @@ sub write {
     }
   );
 
-  # Rendered
   $self->rendered;
 }
 
@@ -781,7 +747,6 @@ sub write_chunk {
     }
   );
 
-  # Rendered
   $self->rendered;
 }
 

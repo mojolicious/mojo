@@ -55,7 +55,6 @@ sub register {
     $file .= '.' . ($conf->{ext} || 'conf');
   }
 
-  # Debug
   warn "CONFIG FILE $file\n" if DEBUG;
 
   # Mode specific config file
@@ -63,7 +62,6 @@ sub register {
   if ($file =~ /^(.*)\.([^\.]+)$/) {
     $mode = join '.', $1, $app->mode, $2;
 
-    # Debug
     warn "MODE SPECIFIC CONFIG FILE $mode\n" if DEBUG;
   }
 

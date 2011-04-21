@@ -125,7 +125,6 @@ sub search {
 sub _reload {
   my $key = shift;
 
-  # Debug
   warn "$key modified, reloading!\n" if DEBUG;
 
   # Unload

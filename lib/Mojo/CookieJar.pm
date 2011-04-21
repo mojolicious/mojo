@@ -56,10 +56,8 @@ sub empty { shift->{_jar} = {} }
 sub extract {
   my ($self, $tx) = @_;
 
-  # URL
-  my $url = $tx->req->url;
-
   # Fix cookies
+  my $url     = $tx->req->url;
   my @cookies = @{$tx->res->cookies};
   for my $cookie (@cookies) {
 
@@ -136,14 +134,10 @@ sub inject {
   # Empty jar
   return unless keys %{$self->{_jar}};
 
-  # Request
+  # Fetch
   my $req = $tx->req;
-
-  # URL
   my $url = $req->url->clone;
   if (my $host = $req->headers->host) { $url->host($host) }
-
-  # Fetch
   $req->cookies($self->find($url));
 }
 

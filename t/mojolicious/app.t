@@ -6,7 +6,7 @@ use warnings;
 # Disable IPv6, epoll and kqueue
 BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 233;
+use Test::More tests => 243;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -71,11 +71,23 @@ $t->get_ok('/exceptional_too/this_one_dies')->status_is(500)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("Action died: double doh!\n");
 
-# Exceptional::this_one_might_die (action dies)
+# Exceptional::this_one_dies (action behind bridge dies)
 $t->get_ok('/exceptional_too/this_one_dies', {'X-DoNotDie' => 1})
   ->status_is(500)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("Action died: doh!\n");
+
+# Exceptional::this_one_does_not_exist (action does not exist)
+$t->get_ok('/exceptional/this_one_does_not_exist')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->json_content_is({error => 'not found!'});
+
+# Exceptional::this_one_does_not_exist (action behind bridge does not exist)
+$t->get_ok('/exceptional_too/this_one_does_not_exist', {'X-DoNotDie' => 1})
+  ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->json_content_is({error => 'not found!'});
 
 # Foo::fun
 $t->get_ok('/fun/time', {'X-Test' => 'Hi there!'})->status_is(200)

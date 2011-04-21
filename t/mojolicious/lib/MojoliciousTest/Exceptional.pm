@@ -8,6 +8,8 @@ sub render_exception {
   $self->render_text("Action died: $e");
 }
 
+sub render_not_found { shift->render_json({error => 'not found!'}) }
+
 sub this_one_dies { die "doh!\n" }
 
 sub this_one_might_die {

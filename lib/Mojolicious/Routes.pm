@@ -387,7 +387,7 @@ sub websocket {
 }
 
 sub _dispatch_callback {
-  my ($self, $c, $cb, $staging) = @_;
+  my ($self, $c, $field, $staging) = @_;
 
   # Routed
   $c->stash->{'mojo.routed'} = 1;
@@ -400,7 +400,7 @@ sub _dispatch_callback {
   my $success = eval {
 
     # Callback
-    $continue = $cb->($c);
+    $continue = $field->{cb}->($c);
 
     # Success
     1;
@@ -421,10 +421,11 @@ sub _dispatch_callback {
 }
 
 sub _dispatch_controller {
-  my ($self, $c, $app, $field, $staging) = @_;
+  my ($self, $c, $field, $staging) = @_;
 
-  $app ||= $self->_generate_class($field, $c);
-  return 1 unless $app;
+  # Class and method
+  return 1
+    unless my $app = $field->{app} || $self->_generate_class($field, $c);
   my $method = $self->_generate_method($field, $c);
 
   # Debug
@@ -434,8 +435,6 @@ sub _dispatch_controller {
 
   # Load class
   if (!ref $app && !$self->{_loaded}->{$app}) {
-
-    # Load
     if (my $e = Mojo::Loader->load($app)) {
 
       # Doesn't exist
@@ -456,8 +455,6 @@ sub _dispatch_controller {
   # Dispatch
   my $continue;
   my $success = eval {
-
-    # Instantiate
     $app = $app->new($c) unless ref $app;
 
     # Action
@@ -466,13 +463,12 @@ sub _dispatch_controller {
 
       # Call action
       if ($app->can($method)) {
-
-        # Routed
-        $stash->{'mojo.routed'} = 1;
-
-        # Action
+        $stash->{'mojo.routed'} = 1 unless $staging;
         $continue = $app->$method;
       }
+
+      # Render
+      elsif (!$staging) { $self->auto_render($app) }
 
       # Merge stash
       my $new = $app->stash;
@@ -491,11 +487,9 @@ sub _dispatch_controller {
         }
       }
 
-      # Handler
       $app->handler($c);
     }
 
-    # Success
     1;
   };
 
@@ -507,10 +501,7 @@ sub _dispatch_controller {
     return $e;
   }
 
-  # Success!
-  return 1 unless $staging;
-  return 1 if $continue;
-
+  return 1 if !$staging || $continue;
   return;
 }
 
@@ -547,12 +538,9 @@ sub _generate_method {
     $self->{_hidden}->{$_}++ for @{$self->hidden};
   }
 
-  my $method = $field->{method};
-  $method ||= $field->{action};
+  return unless my $method = $field->{method} || $field->{action};
 
-  return unless $method;
-
-  # Shortcut for hidden methods
+  # Hidden
   if ($self->{_hidden}->{$method} || index($method, '_') == 0) {
     $c->app->log->debug(qq/Action "$method" is not allowed./);
     return;
@@ -642,8 +630,8 @@ sub _walk_stack {
     # Dispatch
     my $e =
         $field->{cb}
-      ? $self->_dispatch_callback($c, $field->{cb}, $staging)
-      : $self->_dispatch_controller($c, $field->{app}, $field, $staging);
+      ? $self->_dispatch_callback($c, $field, $staging)
+      : $self->_dispatch_controller($c, $field, $staging);
 
     # Exception
     if (ref $e) {

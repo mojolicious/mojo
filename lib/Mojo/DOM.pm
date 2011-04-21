@@ -137,8 +137,6 @@ sub all_text {
   my $start = $tree->[0] eq 'root' ? 1 : 4;
   my @stack = @$tree[$start .. $#$tree];
   while (my $e = shift @stack) {
-
-    # Type
     my $type = $e->[0];
 
     unshift @stack, @$e[4 .. $#$e] and next if $type eq 'tag';
@@ -164,7 +162,7 @@ sub attrs {
 
   my $tree = $self->tree;
 
-  # Root
+  # Not a tag
   return if $tree->[0] eq 'root';
 
   my $attrs = $tree->[2];
@@ -247,8 +245,6 @@ sub namespace {
 
   # Walk tree
   while ($current) {
-
-    # Root
     return if $current->[0] eq 'root';
 
     my $attrs = $current->[2];
@@ -273,7 +269,7 @@ sub parent {
 
   my $tree = $self->tree;
 
-  # Root
+  # Not a tag
   return if $tree->[0] eq 'root';
 
   # Parent
@@ -372,7 +368,6 @@ sub text {
     # Meta data
     next unless ref $e eq 'ARRAY';
 
-    # Type
     my $type = $e->[0];
 
     # Text
@@ -407,7 +402,7 @@ sub type {
 
   my $tree = $self->tree;
 
-  # Root
+  # Not a tag
   return if $tree->[0] eq 'root';
 
   # Get
@@ -427,7 +422,7 @@ sub _add {
 
   my $tree = $self->tree;
 
-  # Root
+  # Not a tag
   return $self if $tree->[0] eq 'root';
 
   # Parent
@@ -560,15 +555,13 @@ sub _end {
 
   warn "END $end\n" if DEBUG;
 
-  # Root
+  # Not a tag
   return if $$current->[0] eq 'root';
 
   # Search stack for start tag
   my $found = 0;
   my $next  = $$current;
   while ($next) {
-
-    # Root
     last if $next->[0] eq 'root';
 
     # Found
@@ -577,7 +570,6 @@ sub _end {
     # HTML inline tags stop here
     return if !$self->xml && $HTML_BLOCK{$next->[1]} && !$HTML_BLOCK{$end};
 
-    # Next
     $next = $next->[3];
   }
 
@@ -587,11 +579,7 @@ sub _end {
   # Walk backwards
   $next = $$current;
   while ($$current = $next) {
-
-    # Root
     last if $$current->[0] eq 'root';
-
-    # Next
     $next = $$current->[3];
 
     # Match
@@ -684,7 +672,7 @@ sub _match_element {
           unless $current = $current ? $current->[3] : $candidate;
       }
 
-      # Root
+      # Not a tag
       return if $current->[0] ne 'tag';
 
       # Compare part to element

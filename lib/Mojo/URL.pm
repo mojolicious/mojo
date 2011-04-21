@@ -91,15 +91,12 @@ sub authority {
 sub clone {
   my $self = shift;
 
-  # Clone
   my $clone = Mojo::URL->new;
   $clone->scheme($self->scheme);
   $clone->authority($self->authority);
   $clone->path($self->path->clone);
   $clone->query($self->query->clone);
   $clone->fragment($self->fragment);
-
-  # Base
   $clone->base($self->base->clone) if $self->{base};
 
   return $clone;

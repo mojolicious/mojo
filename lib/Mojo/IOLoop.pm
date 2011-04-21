@@ -337,10 +337,7 @@ sub listen {
     %{$args->{args} || {}}
   );
 
-  # File
   my $file = $args->{file};
-
-  # Port
   my $port = $args->{port} || 3000;
 
   # File descriptor reuse
@@ -974,8 +971,10 @@ sub _accept {
 
 sub _add_event {
   my ($self, $event, $id, $cb) = @_;
+
   return unless my $c = $self->{_cs}->{$id};
   $c->{$event} = $cb if $cb;
+
   return $self;
 }
 
@@ -983,9 +982,11 @@ sub _add_loop_event {
   my $self  = shift;
   my $event = shift;
   my $cb    = shift;
-  my $e     = {cb => $cb, @_};
+
+  my $e = {cb => $cb, @_};
   (my $id) = "$e" =~ /0x([\da-f]+)/;
   $self->{"_$event"}->{$id} = $e;
+
   return $id;
 }
 

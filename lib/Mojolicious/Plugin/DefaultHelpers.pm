@@ -48,15 +48,9 @@ sub register {
   # Add "include" helper
   $app->helper(
     include => sub {
-      my $self = shift;
-
-      # Template as first argument
+      my $self     = shift;
       my $template = @_ % 2 ? shift : undef;
-
-      # Arguments
-      my $args = {@_};
-
-      # Template
+      my $args     = {@_};
       $args->{template} = $template if defined $template;
 
       # "layout" and "extends" can't be localized
@@ -92,15 +86,10 @@ sub register {
   $app->helper(
     memorize => sub {
       shift;
-
-      # Callback
       my $cb = pop;
       return '' unless ref $cb && ref $cb eq 'CODE';
-
-      # Name
       my $name = shift;
 
-      # Arguments
       my $args;
       if (ref $name && ref $name eq 'HASH') {
         $args = $name;

@@ -220,11 +220,13 @@ sub delete {
 
 sub detect_proxy {
   my $self = shift;
+
   $self->http_proxy($ENV{HTTP_PROXY}   || $ENV{http_proxy});
   $self->https_proxy($ENV{HTTPS_PROXY} || $ENV{https_proxy});
   if (my $no = $ENV{NO_PROXY} || $ENV{no_proxy}) {
     $self->no_proxy([split /,/, $no]);
   }
+
   return $self;
 }
 
@@ -665,9 +667,8 @@ sub _read {
 
   warn "< $chunk\n" if DEBUG;
 
-  return unless my $c = $self->{_cs}->{$id};
-
   # Transaction
+  return unless my $c = $self->{_cs}->{$id};
   if (my $tx = $c->{tx}) {
 
     # Read
@@ -746,12 +747,12 @@ sub _start_tx {
     }
   }
 
+  # Detect proxy
+  $self->detect_proxy if $ENV{MOJO_PROXY};
+
   my $req    = $tx->req;
   my $url    = $req->url;
   my $scheme = $url->scheme || '';
-
-  # Detect proxy
-  $self->detect_proxy if $ENV{MOJO_PROXY};
 
   # Proxy
   if ($self->need_proxy($url->host)) {
@@ -780,9 +781,8 @@ sub _start_tx {
   # Connect
   return unless my $id = $self->_connect($tx, $cb);
 
-  weaken $self;
-
   # Resume callback
+  weaken $self;
   $tx->on_resume(sub { $self->_write($id) });
 
   # Counter
@@ -870,9 +870,8 @@ sub _upgrade {
   # Upgrade connection timeout
   $self->{_loop}->connection_timeout($id, $self->websocket_timeout);
 
-  weaken $self;
-
   # Resume callback
+  weaken $self;
   $new->on_resume(sub { $self->_write($id) });
 
   return $new;
@@ -887,7 +886,7 @@ sub _write {
   return unless my $tx = $c->{tx};
   return unless $tx->is_writing;
 
-  # Chunk
+  # Get chunk
   my $chunk = $c->{tx}->client_write;
 
   # Still writing

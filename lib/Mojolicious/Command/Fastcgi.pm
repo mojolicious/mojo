@@ -14,10 +14,7 @@ EOF
 sub run {
   my $self    = shift;
   my $fastcgi = Mojo::Server::FastCGI->new;
-
-  # Run
   $fastcgi->run;
-
   return $self;
 }
 

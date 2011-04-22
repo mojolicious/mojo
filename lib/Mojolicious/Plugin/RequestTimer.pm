@@ -13,10 +13,8 @@ sub register {
     after_static_dispatch => sub {
       my $self = shift;
 
-      # Stash
-      my $stash = $self->stash;
-
       # New request
+      my $stash  = $self->stash;
       my $req    = $self->req;
       my $method = $req->method;
       my $path   = $req->url->path->to_abs_string;
@@ -34,10 +32,8 @@ sub register {
     after_dispatch => sub {
       my $self = shift;
 
-      # Stash
-      my $stash = $self->stash;
-
       # Time
+      my $stash = $self->stash;
       return unless my $started = $stash->{'mojo.started'};
       my $elapsed = sprintf '%f',
         Time::HiRes::tv_interval($started, [Time::HiRes::gettimeofday()]);

@@ -34,8 +34,6 @@ sub register {
       # Cache
       my $cache = $r->cache;
       unless ($cache->get($key)) {
-
-        # Initialize
         my $mt = Mojo::Template->new($template);
 
         # Self
@@ -65,7 +63,7 @@ sub register {
           $prepend .= " my \$$var = \$_S->{'$var'};";
         }
 
-        # Prepend
+        # Prepend generated code
         $mt->prepend($prepend);
 
         # Cache

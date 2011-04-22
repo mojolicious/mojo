@@ -183,7 +183,6 @@ sub names {
 sub parse {
   my ($self, $chunk) = @_;
 
-  # Buffer
   $self->{_buffer} = '' unless defined $self->{_buffer};
   $self->{_buffer} .= $chunk if defined $chunk;
 

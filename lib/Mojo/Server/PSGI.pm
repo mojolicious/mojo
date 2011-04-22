@@ -30,9 +30,7 @@ sub run {
   # Handle
   $self->on_handler->($self, $tx);
 
-  my $res = $tx->res;
-
-  # Status
+  my $res    = $tx->res;
   my $status = $res->code;
 
   # Fix headers

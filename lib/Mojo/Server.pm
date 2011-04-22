@@ -37,7 +37,7 @@ has on_handler => sub {
     my $app = shift->app;
     my $tx  = shift;
 
-    # Handler
+    # Handle transaction
     $app->handler($tx);
 
     # Delayed

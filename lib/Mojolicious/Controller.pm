@@ -47,11 +47,9 @@ sub AUTOLOAD {
   # Method
   my ($package, $method) = our $AUTOLOAD =~ /^([\w\:]+)\:\:(\w+)$/;
 
-  # Helper
+  # Call helper
   Carp::croak(qq/Can't locate object method "$method" via "$package"/)
     unless my $helper = $self->app->renderer->helpers->{$method};
-
-  # Run
   return $self->$helper(@_);
 }
 
@@ -71,7 +69,6 @@ EOF
 #  She also liked to shut up!"
 sub cookie {
   my ($self, $name, $value, $options) = @_;
-
   return unless $name;
 
   # Response cookie
@@ -106,12 +103,8 @@ sub cookie {
 # "Something's wrong, she's not responding to my poking stick."
 sub finish {
   my $self = shift;
-
-  # WebSocket check
-  my $tx = $self->tx;
+  my $tx   = $self->tx;
   Carp::croak('No WebSocket connection to finish') unless $tx->is_websocket;
-
-  # Finish WebSocket
   $tx->finish;
 }
 
@@ -147,8 +140,6 @@ sub flash {
 # "My parents may be evil, but at least they're stupid."
 sub on_finish {
   my ($self, $cb) = @_;
-
-  # Transaction finished
   $self->tx->on_finish(sub { shift and $self->$cb(@_) });
 }
 
@@ -158,20 +149,12 @@ sub on_finish {
 sub on_message {
   my $self = shift;
 
-  # WebSocket check
   my $tx = $self->tx;
   Carp::croak('No WebSocket connection to receive messages from')
     unless $tx->is_websocket;
-
-  # Callback
   my $cb = shift;
-
-  # Receive
   $tx->on_message(sub { shift and $self->$cb(@_) });
-
-  # Websocket handshake
   $tx->res->code(101);
-
   $self->rendered;
 
   return $self;
@@ -183,10 +166,8 @@ sub param {
   my $self = shift;
   my $name = shift;
 
-  # Captures
-  my $p = $self->stash->{'mojo.captures'} || {};
-
   # List
+  my $p = $self->stash->{'mojo.captures'} || {};
   unless (defined $name) {
     my %seen;
     return sort grep { !$seen{$_}++ } keys %$p, $self->req->param;
@@ -235,7 +216,6 @@ sub render {
   my $template;
   $template = shift if @_ % 2 && !ref $_[0];
 
-  # Arguments
   my $args = ref $_[0] ? $_[0] : {@_};
 
   # Template
@@ -266,20 +246,13 @@ sub render {
   # Partial
   return $output if $args->{partial};
 
-  # Response
+  # Prepare response
   my $res = $self->res;
-
-  # Status
   $res->code($stash->{status}) if $stash->{status};
   $res->code(200) unless $res->code;
-
-  # Output
   $res->body($output) unless $res->body;
-
-  # Type
   my $headers = $res->headers;
   $headers->content_type($type) unless $headers->content_type;
-
   $self->rendered;
 
   # Success
@@ -292,11 +265,8 @@ sub render_data { shift->render(data => shift, @_) }
 #  Neat."
 sub render_exception {
   my ($self, $e) = @_;
-
-  # Exception
   $e = Mojo::Exception->new($e);
 
-  # Error
   $self->app->log->error($e);
 
   # Recursion
@@ -311,10 +281,7 @@ sub render_exception {
     $snapshot->{$key} = $value;
   }
 
-  # Mode
-  my $mode = $self->app->mode;
-
-  # Exception template
+  my $mode    = $self->app->mode;
   my $options = {
     template         => "exception.$mode",
     format           => 'html',
@@ -387,13 +354,8 @@ sub render_inner {
 sub render_json {
   my $self = shift;
   my $json = shift;
-
-  # Arguments
   my $args = ref $_[0] ? $_[0] : {@_};
-
-  # JSON
   $args->{json} = $json;
-
   return $self->render($args);
 }
 
@@ -404,15 +366,12 @@ sub render_later { shift->stash->{'mojo.rendered'} = 1 }
 sub render_not_found {
   my ($self, $resource) = @_;
 
-  # Debug
   $self->app->log->debug(qq/Resource "$resource" not found./)
     if $resource;
 
-  # Exception
+  # Recursion
   my $stash = $self->stash;
   return if $stash->{'mojo.exception'};
-
-  # Recursion
   return if $stash->{'mojo.not_found'};
 
   # Check for POD plugin
@@ -421,10 +380,7 @@ sub render_not_found {
     ? $self->url_for('/perldoc')
     : 'http://mojolicio.us/perldoc';
 
-  # Mode
-  my $mode = $self->app->mode;
-
-  # Render not found template
+  my $mode    = $self->app->mode;
   my $options = {
     template         => "not_found.$mode",
     format           => 'html',
@@ -459,18 +415,11 @@ sub render_not_found {
 # "You called my thesis a fat sack of barf, and then you stole it?
 #  Welcome to academia."
 sub render_partial {
-  my $self = shift;
-
-  # Template as first argument
+  my $self     = shift;
   my $template = @_ % 2 ? shift : undef;
+  my $args     = {@_};
 
-  # Arguments
-  my $args = {@_};
-
-  # Template
   $args->{template} = $template if defined $template;
-
-  # Partial
   $args->{partial} = 1;
 
   return Mojo::ByteStream->new($self->render($args));
@@ -500,14 +449,11 @@ sub rendered {
   my $stash = $self->stash;
   unless ($stash->{'mojo.finished'}) {
 
-    # Session
+    # Finalize transaction
     my $app = $self->app;
     $app->sessions->store($self);
-
-    # Hook
     $app->plugins->run_hook_reverse(after_dispatch => $self);
 
-    # Finished
     $stash->{'mojo.finished'} = 1;
   }
 
@@ -522,27 +468,11 @@ sub res { shift->tx->res }
 sub send_message {
   my ($self, $message, $cb) = @_;
 
-  # WebSocket check
   my $tx = $self->tx;
   Carp::croak('No WebSocket connection to send message to')
     unless $tx->is_websocket;
-
-  # Send
-  $tx->send_message(
-    $message,
-    sub {
-
-      # Cleanup
-      shift;
-
-      # Callback
-      $self->$cb(@_) if $cb;
-    }
-  );
-
-  # Websocket handshake
+  $tx->send_message($message, sub { shift and $self->$cb(@_) if $cb });
   $tx->res->code(101);
-
   $self->rendered;
 
   return $self;
@@ -560,11 +490,9 @@ sub session {
     return $session->{$_[0]};
   }
 
-  # Initialize
+  # Hash
   $session = {} unless $session && ref $session eq 'HASH';
   $stash->{'mojo.session'} = $session;
-
-  # Hash
   return $session unless @_;
 
   # Set
@@ -576,13 +504,10 @@ sub session {
 
 sub signed_cookie {
   my ($self, $name, $value, $options) = @_;
-
   return unless $name;
 
-  # Secret
-  my $secret = $self->app->secret;
-
   # Response cookie
+  my $secret = $self->app->secret;
   if (defined $value) {
 
     # Sign value
@@ -625,10 +550,8 @@ sub signed_cookie {
 sub stash {
   my $self = shift;
 
-  # Initialize
-  $self->{stash} ||= {};
-
   # Hash
+  $self->{stash} ||= {};
   return $self->{stash} unless @_;
 
   # Get
@@ -681,8 +604,6 @@ sub url_for {
   # Route
   else {
     my ($p, $ws) = $match->path_for($target, @_);
-
-    # Path
     $path->parse($p) if $p;
 
     # Fix scheme for WebSockets
@@ -701,51 +622,27 @@ sub url_for {
 sub write {
   my ($self, $chunk, $cb) = @_;
 
-  # Callback only
   if (ref $chunk && ref $chunk eq 'CODE') {
     $cb    = $chunk;
     $chunk = undef;
   }
-
-  # Write
-  $self->res->write(
-    $chunk,
-    sub {
-
-      # Cleanup
-      shift;
-
-      # Callback
-      $self->$cb(@_) if $cb;
-    }
-  );
-
+  $self->res->write($chunk, sub { shift and $self->$cb(@_) if $cb });
   $self->rendered;
+
+  return $self;
 }
 
 sub write_chunk {
   my ($self, $chunk, $cb) = @_;
 
-  # Callback only
   if (ref $chunk && ref $chunk eq 'CODE') {
     $cb    = $chunk;
     $chunk = undef;
   }
-
-  # Write
-  $self->res->write_chunk(
-    $chunk,
-    sub {
-
-      # Cleanup
-      shift;
-
-      # Callback
-      $self->$cb(@_) if $cb;
-    }
-  );
-
+  $self->res->write_chunk($chunk, sub { shift and $self->$cb(@_) if $cb });
   $self->rendered;
+
+  return $self;
 }
 
 1;

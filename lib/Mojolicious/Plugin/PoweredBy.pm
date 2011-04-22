@@ -9,11 +9,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 #  And also he got a racecar. Is any of this getting through to you?"
 sub register {
   my ($self, $app, $args) = @_;
-
-  # Name
   my $name = $args->{name} || 'Mojolicious (Perl)';
-
-  # Add header
   $app->hook(
     after_build_tx => sub {
       shift->res->headers->header('X-Powered-By' => $name);

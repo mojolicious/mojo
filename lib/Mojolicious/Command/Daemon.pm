@@ -35,7 +35,6 @@ sub run {
   my $self   = shift;
   my $daemon = Mojo::Server::Daemon->new;
 
-  # Options
   local @ARGV = @_ if @_;
   my @listen;
   GetOptions(
@@ -50,9 +49,8 @@ sub run {
     'user=s'      => sub { $daemon->user($_[1]) },
     'websocket=i' => sub { $daemon->websocket_timeout($_[1]) }
   );
-  $daemon->listen(\@listen) if @listen;
 
-  # Run
+  $daemon->listen(\@listen) if @listen;
   $daemon->run;
 
   return $self;

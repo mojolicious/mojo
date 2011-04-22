@@ -151,7 +151,6 @@ sub parse {
 #  he'd eat you and everyone you care about!"
 sub remove {
   my ($self, $name) = @_;
-
   $name = '' unless defined $name;
 
   # Remove
@@ -166,10 +165,10 @@ sub remove {
 }
 
 sub to_hash {
-  my $self   = shift;
-  my $params = $self->params;
+  my $self = shift;
 
   # Format
+  my $params = $self->params;
   my %params;
   for (my $i = 0; $i < @$params; $i += 2) {
     my $name  = $params->[$i];

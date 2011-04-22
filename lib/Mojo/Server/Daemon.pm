@@ -133,9 +133,8 @@ sub _build_tx {
   # TLS
   $tx->req->url->base->scheme('https') if $c->{tls};
 
-  weaken $self;
-
   # Handler callback
+  weaken $self;
   $tx->on_handler(
     sub {
       my $tx = shift;
@@ -174,11 +173,7 @@ sub _drop {
 
 sub _error {
   my ($self, $loop, $id, $error) = @_;
-
-  # Log
   $self->app->log->error($error);
-
-  # Drop
   $self->_drop($id);
 }
 
@@ -191,9 +186,8 @@ sub _finish {
     return $self->ioloop->drop($id);
   }
 
-  my $c = $self->{_cs}->{$id};
-
   # Finish transaction
+  my $c = $self->{_cs}->{$id};
   delete $c->{transaction};
   $tx->server_close;
 
@@ -210,9 +204,8 @@ sub _finish {
       # Upgrade connection timeout
       $self->ioloop->connection_timeout($id, $self->websocket_timeout);
 
-      weaken $self;
-
       # Resume callback
+      weaken $self;
       $ws->on_resume(sub { $self->_write($id) });
     }
 
@@ -243,7 +236,6 @@ sub _hup {
 
 sub _listen {
   my ($self, $listen) = @_;
-
   return unless $listen;
 
   my $options = {};
@@ -269,9 +261,8 @@ sub _listen {
   my $backlog = $self->backlog;
   $options->{backlog} = $backlog if $backlog;
 
-  weaken $self;
-
   # Callbacks
+  weaken $self;
   $options->{on_accept} = sub {
     my ($loop, $id) = @_;
 
@@ -302,7 +293,6 @@ sub _listen {
     ) if $port && !$tls;
   }
 
-  # Log
   $self->app->log->info("Server listening ($listen)");
 
   # Friendly message
@@ -320,7 +310,7 @@ sub _read {
   my $tx = $c->{transaction} || $c->{websocket};
   $tx = $c->{transaction} = $self->_build_tx($id, $c) unless $tx;
 
-  # Read
+  # Parse chunk
   $tx->server_read($chunk);
 
   # Last keep alive request
@@ -359,9 +349,8 @@ sub _write {
   # Get chunk
   my $chunk = $tx->server_write;
 
-  weaken $self;
-
   # Callback
+  weaken $self;
   my $cb = sub { $self->_write($id) };
 
   # Done

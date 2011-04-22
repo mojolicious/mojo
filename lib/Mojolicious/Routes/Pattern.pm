@@ -38,9 +38,8 @@ sub parse {
   my $self    = shift;
   my $pattern = shift;
 
+  # Make sure we have a viable pattern
   return $self if !defined $pattern || $pattern eq '/';
-
-  # Make sure pattern starts with a slash
   $pattern = "/$pattern" unless $pattern =~ /^\//;
 
   # Format
@@ -206,11 +205,10 @@ sub _tokenize {
   my $relaxed_start  = $self->relaxed_start;
   my $symbol_start   = $self->symbol_start;
   my $wildcard_start = $self->wildcard_start;
+  my $tree           = [];
+  my $state          = 'text';
+  my $quoted         = 0;
 
-  my $tree  = [];
-  my $state = 'text';
-
-  my $quoted = 0;
   while (length(my $char = substr $pattern, 0, 1, '')) {
 
     # Inside a symbol
@@ -294,7 +292,6 @@ sub _tokenize {
       $tree->[-1]->[-1] .= $char;
     }
   }
-
   $self->tree($tree);
 
   return $self;

@@ -54,7 +54,6 @@ sub cookies {
 
 sub fix_headers {
   my $self = shift;
-
   $self->SUPER::fix_headers(@_);
 
   # Host header is required in HTTP 1.1 requests
@@ -98,14 +97,8 @@ sub is_secure {
 
 sub is_xhr {
   my $self = shift;
-
-  # No ajax
   return unless my $with = $self->headers->header('X-Requested-With');
-
-  # Ajax
   return 1 if $with =~ /XMLHttpRequest/i;
-
-  # No ajax
   return;
 }
 
@@ -221,10 +214,8 @@ sub _build_start_line {
     $path = $clone;
   }
 
-  # Method
-  my $method = uc $self->method;
-
   # CONNECT
+  my $method = uc $self->method;
   if ($method eq 'CONNECT') {
     my $host = $url->host;
     my $port = $url->port || ($url->scheme eq 'https' ? '443' : '80');

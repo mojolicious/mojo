@@ -82,8 +82,6 @@ sub body_params {
 
   # "x-application-urlencoded" and "application/x-www-form-urlencoded"
   if ($type =~ /(?:x-application|application\/x-www-form)-urlencoded/i) {
-
-    # Parse
     $params->parse($self->content->asset->slurp);
   }
 
@@ -156,7 +154,6 @@ sub build_start_line {
 
 sub cookie {
   my ($self, $name) = @_;
-
   return unless $name;
 
   # Map

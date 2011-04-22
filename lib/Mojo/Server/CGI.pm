@@ -31,9 +31,8 @@ sub run {
   # Handle
   $self->on_handler->($self, $tx);
 
-  my $res = $tx->res;
-
   # Response start line
+  my $res    = $tx->res;
   my $offset = 0;
   if ($self->nph) {
     while (1) {

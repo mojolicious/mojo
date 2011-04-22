@@ -31,8 +31,6 @@ sub client_read {
 
   # Normal response
   else {
-
-    # Parse
     $res->parse($chunk);
 
     # Done
@@ -185,11 +183,9 @@ sub keep_alive {
 sub server_leftovers {
   my $self = shift;
 
-  # No leftovers
+  # Check leftovers
   my $req = $self->req;
   return unless $req->content->has_leftovers;
-
-  # Leftovers
   my $leftovers = $req->leftovers;
 
   # Done
@@ -206,8 +202,6 @@ sub server_read {
 
   # Parse
   $req->parse($chunk) unless $req->error;
-
-  # State
   $self->{_state} ||= 'read';
 
   # Parser error
@@ -292,7 +286,6 @@ sub server_write {
     $self->{_write}  = $self->{_write} - $written;
     $self->{_offset} = $self->{_offset} + $written;
 
-    # Append
     $chunk .= $buffer;
 
     # Done
@@ -312,7 +305,6 @@ sub server_write {
     $self->{_write}  = $self->{_write} - $written;
     $self->{_offset} = $self->{_offset} + $written;
 
-    # Append
     $chunk .= $buffer;
 
     # Done
@@ -365,7 +357,6 @@ sub server_write {
       $self->{_write}  = $self->{_write} - $written;
       $self->{_offset} = $self->{_offset} + $written;
 
-      # Append
       if (defined $buffer) {
         $chunk .= $buffer;
         delete $self->{_delay};

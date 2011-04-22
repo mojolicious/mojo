@@ -157,7 +157,6 @@ sub is_ipv6 {
 
 sub parse {
   my ($self, $url) = @_;
-
   return $self unless $url;
 
   # Official regex
@@ -307,7 +306,6 @@ sub to_rel {
 
   my $path = $rel->path->clone;
   splice @{$path->parts}, 0, $splice if $splice;
-
   $rel->path($path);
   $rel->path->leading_slash(0);
 

@@ -433,8 +433,6 @@ sub md5_sum {
 }
 
 sub punycode_decode {
-
-  # Integer arithmetic
   use integer;
 
   # Defaults
@@ -480,14 +478,10 @@ sub punycode_decode {
     splice @output, $i, 0, chr($n);
     $i++;
   }
-
-  # Output
   $_[0] = join '', @output;
 }
 
 sub punycode_encode {
-
-  # Integer arithmetic
   use integer;
 
   # Input
@@ -562,8 +556,6 @@ sub punycode_encode {
     $delta++;
     $n++;
   }
-
-  # Output
   $_[0] = $output;
 }
 
@@ -652,7 +644,6 @@ sub xml_escape {
 sub _adapt {
   my ($delta, $numpoints, $firsttime) = @_;
 
-  # Integer arithmetic
   use integer;
 
   # Delta

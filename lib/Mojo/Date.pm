@@ -84,27 +84,23 @@ sub parse {
   # Invalid format
   else { return $self }
 
-  my $epoch;
-
   # Prevent crash
+  my $epoch;
   eval {
     $epoch =
       Time::Local::timegm($second, $minute, $hour, $day, $month, $year);
   };
-
   return $self if $@ || $epoch < 0;
-
   $self->epoch($epoch);
 
   return $self;
 }
 
 sub to_string {
-  my $self  = shift;
+  my $self = shift;
+
   my $epoch = $self->epoch;
-
   $epoch = time unless defined $epoch;
-
   my ($second, $minute, $hour, $mday, $month, $year, $wday) = gmtime $epoch;
 
   # Format

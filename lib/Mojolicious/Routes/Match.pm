@@ -31,8 +31,8 @@ sub new {
 # "Life can be hilariously cruel."
 sub match {
   my ($self, $r, $c) = @_;
-
   return unless $r;
+
   my $dictionary = $self->{_dictionary} ||= $r->dictionary;
 
   # Root
@@ -86,10 +86,8 @@ sub match {
     $empty = 1;
   }
 
-  # Endpoint
-  my $endpoint = $r->is_endpoint;
-
   # Format
+  my $endpoint = $r->is_endpoint;
   if ($endpoint && !$pattern->format && $path =~ /^\/?\.([^\/]+)$/) {
     $captures->{format} = $1;
     $empty = 1;
@@ -175,10 +173,9 @@ sub path_for {
     }
   }
 
+  # Current route
   my $captures = $self->captures;
   my $endpoint;
-
-  # Current route
   if ($name && $name eq 'current' || !$name) {
     return undef unless $endpoint = $self->endpoint;
   }
@@ -198,7 +195,7 @@ sub path_for {
         last if $child->has_custom_name;
       }
 
-      # Append
+      # Search too
       push @children, @{$child->children};
     }
     $endpoint = $candidate;

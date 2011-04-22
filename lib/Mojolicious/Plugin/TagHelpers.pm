@@ -260,10 +260,8 @@ sub _input {
   my $c    = shift;
   my $name = shift;
 
-  # Attributes
-  my %attrs;
-
   # Odd
+  my %attrs;
   if (@_ % 2) {
     my $value = shift;
     %attrs = @_;

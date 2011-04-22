@@ -33,7 +33,6 @@ sub register {
       # Success
       return 1 if $passed;
 
-      # Robot 1-X, save my friends! And Zoidberg!
       return;
     }
   );

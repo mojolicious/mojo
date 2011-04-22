@@ -9,14 +9,9 @@ use I18N::LangTags::Detect;
 sub register {
   my ($self, $app, $conf) = @_;
 
-  # Config
   $conf ||= {};
-
-  # Namespace
   my $namespace = $conf->{namespace} || ((ref $app) . "::I18N");
-
-  # Default
-  my $default = $conf->{default} || 'en';
+  my $default   = $conf->{default}   || 'en';
 
   # Initialize
   eval "package $namespace; use base 'Locale::Maketext'; 1;";
@@ -27,7 +22,7 @@ sub register {
     die qq/Couldn't initialize I18N class "$namespace": $@/ if $@;
   }
 
-  # Start timer
+  # Add hook
   $app->hook(
     before_dispatch => sub {
       my $self = shift;
@@ -59,6 +54,7 @@ sub register {
 package Mojolicious::Plugin::I18n::_Handler;
 use Mojo::Base -base;
 
+# "Robot 1-X, save my friends! And Zoidberg!"
 sub languages {
   my ($self, @languages) = @_;
 

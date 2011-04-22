@@ -37,8 +37,6 @@ sub throw {
 
 sub trace {
   my ($e, $start) = @_;
-
-  # Start
   $start = 1 unless defined $start;
 
   # Trace

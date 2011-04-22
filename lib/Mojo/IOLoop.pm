@@ -289,15 +289,12 @@ sub generate_port {
       );
   }
 
-  # Nothing
   return;
 }
 
 sub is_running {
   my $self = shift;
   $self = $self->singleton unless ref $self;
-
-  # Running
   $self->{_running};
 }
 
@@ -489,16 +486,11 @@ sub one_tick {
       my $id = $self->{_fds}->{$fd};
       next unless $id;
 
-      # Error
       if ($flags == KQUEUE_EOF) {
         if   ($fflags) { push @error, $id }
         else           { push @hup,   $id }
       }
-
-      # Read
-      push @read, $id if $filter == KQUEUE_READ;
-
-      # Write
+      push @read,  $id if $filter == KQUEUE_READ;
       push @write, $id if $filter == KQUEUE_WRITE;
     }
   }
@@ -507,57 +499,37 @@ sub one_tick {
   elsif (EPOLL) {
     $loop->poll($timeout);
 
-    # Read
-    push @read, $r->{$_} for $loop->handles(EPOLL_POLLIN);
-
-    # Write
+    push @read,  $r->{$_} for $loop->handles(EPOLL_POLLIN);
     push @write, $r->{$_} for $loop->handles(EPOLL_POLLOUT);
-
-    # Error
     push @error, $r->{$_} for $loop->handles(EPOLL_POLLERR);
-
-    # HUP
-    push @hup, $r->{$_} for $loop->handles(EPOLL_POLLHUP);
+    push @hup,   $r->{$_} for $loop->handles(EPOLL_POLLHUP);
   }
 
   # Poll
   else {
     $loop->poll($timeout);
 
-    # Read
-    push @read, $r->{$_} for $loop->handles(POLLIN);
-
-    # Write
+    push @read,  $r->{$_} for $loop->handles(POLLIN);
     push @write, $r->{$_} for $loop->handles(POLLOUT);
-
-    # Error
     push @error, $r->{$_} for $loop->handles(POLLERR);
-
-    # HUP
-    push @hup, $r->{$_} for $loop->handles(POLLHUP);
+    push @hup,   $r->{$_} for $loop->handles(POLLHUP);
   }
 
-  # Read
-  $self->_read($_) for @read;
-
-  # Write
+  # Handle events
+  $self->_read($_)  for @read;
   $self->_write($_) for @write;
-
-  # Error
   $self->_error($_) for @error;
+  $self->_hup($_)   for @hup;
 
-  # HUP
-  $self->_hup($_) for @hup;
-
-  # Timers
+  # Handle timers
   my $timers = $self->_timer;
 
-  # Tick
+  # Handle tick events
   for my $tick (keys %{$self->{_tick}}) {
     $self->_run_callback('tick', $self->{_tick}->{$tick}->{cb}, $tick);
   }
 
-  # Idle
+  # Handle idle events
   unless (@read || @write || @error || @hup || $timers) {
     for my $idle (keys %{$self->{_idle}}) {
       $self->_run_callback('idle', $self->{_idle}->{$idle}->{cb}, $idle);
@@ -619,10 +591,8 @@ sub resolve {
       # Header (one question with recursion)
       my $req = pack 'nnnnnn', $tx, 0x0100, 1, 0, 0, 0;
 
-      # Parts
-      my @parts = split /\./, $name;
-
       # Reverse
+      my @parts = split /\./, $name;
       if ($t eq $DNS_TYPES->{PTR}) {
 
         # IPv4
@@ -718,10 +688,8 @@ sub start {
   my $self = shift;
   $self = $self->singleton unless ref $self;
 
-  # Already running
+  # Check if we are already running
   return if $self->{_running};
-
-  # Running
   $self->{_running} = 1;
 
   # Mainloop
@@ -990,8 +958,6 @@ sub _drop_immediately {
     # Remove handle from kqueue
     if (my $loop = $self->_prepare_loop) {
       if (KQUEUE) {
-
-        # Writing
         my $writing = $c->{writing};
         $loop->EV_SET($fd, KQUEUE_READ, KQUEUE_DELETE)
           if defined $writing;
@@ -1026,9 +992,8 @@ sub _error {
 sub _hup {
   my ($self, $id) = @_;
 
-  my $event = $self->{_cs}->{$id}->{hup};
-
   # Cleanup
+  my $event = $self->{_cs}->{$id}->{hup};
   $self->_drop_immediately($id);
 
   # Handle HUP
@@ -1039,9 +1004,8 @@ sub _hup {
 sub _not_listening {
   my $self = shift;
 
+  # Check loop and unlock
   return unless my $loop = $self->{_loop};
-
-  # Unlock
   $self->on_unlock->($self);
 
   # Remove listen sockets
@@ -1058,7 +1022,6 @@ sub _not_listening {
     else { $loop->remove($socket) }
   }
 
-  # Not listening anymore
   delete $self->{_listening};
 }
 
@@ -1077,22 +1040,17 @@ sub _not_writing {
   my $loop = $self->_prepare_loop;
   if (KQUEUE) {
     my $fd = fileno $handle;
-
-    # Writing
     $loop->EV_SET($fd, KQUEUE_READ, KQUEUE_ADD) unless defined $writing;
     $loop->EV_SET($fd, KQUEUE_WRITE, KQUEUE_DELETE) if $writing;
   }
 
   # Poll and epoll
   else {
-
-    # Not writing anymore
     if ($writing) {
       $loop->remove($handle);
       $writing = undef;
     }
 
-    # Reading
     my $mask = EPOLL ? EPOLL_POLLIN : POLLIN;
     $loop->mask($handle, $mask) unless defined $writing;
   }
@@ -1263,7 +1221,6 @@ sub _prepare_listen {
     else { $loop->mask($socket, POLLIN) }
   }
 
-  # Listening
   $self->{_listening} = 1;
 }
 
@@ -1339,10 +1296,7 @@ sub _run_callback {
   my $event = shift;
   my $cb    = shift;
 
-  # Invoke callback
   my $value = eval { $self->$cb(@_) };
-
-  # Callback error
   warn qq/Callback "$event" failed: $@/ if $@;
 
   return $value;
@@ -1355,10 +1309,7 @@ sub _run_event {
   my $cb    = shift;
   my $id    = shift;
 
-  # Invoke callback
   my $value = eval { $self->$cb($id, @_) };
-
-  # Event error
   if ($@) {
     my $message = qq/Event "$event" failed for connection "$id": $@/;
     $event eq 'error'
@@ -1510,24 +1461,18 @@ sub _writing {
   my $loop = $self->_prepare_loop;
   if (KQUEUE) {
     my $fd = fileno $handle;
-
-    # Writing
     $loop->EV_SET($fd, KQUEUE_READ,  KQUEUE_ADD) unless defined $writing;
     $loop->EV_SET($fd, KQUEUE_WRITE, KQUEUE_ADD) unless $writing;
   }
 
   # Poll and epoll
   else {
-
-    # Cleanup
     $loop->remove($handle);
-
-    # Writing
     my $mask = EPOLL ? EPOLL_POLLIN | EPOLL_POLLOUT : POLLIN | POLLOUT;
     $loop->mask($handle, $mask);
   }
 
-  # Writing
+  # Connection is writing
   $c->{writing} = 1;
 }
 

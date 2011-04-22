@@ -38,10 +38,7 @@ sub load {
   else { return if $module->can('new') }
 
   # Load
-  eval "require $module";
-
-  # Catch
-  if ($@) {
+  unless (eval "require $module; 1") {
 
     # Exists
     my $path = Mojo::Command->class_to_path($module);
@@ -125,7 +122,6 @@ sub search {
 sub _reload {
   my $key = shift;
 
-  # Debug
   warn "$key modified, reloading!\n" if DEBUG;
 
   # Unload

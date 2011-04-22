@@ -39,7 +39,6 @@ EOF
 sub run {
   my $self = shift;
 
-  # Options
   local @ARGV = @_ if @_;
   my $method = 'GET';
   my @headers;
@@ -66,13 +65,9 @@ sub run {
   die $self->usage unless $url;
   decode 'UTF-8', $url;
 
-  # Selector
   my $selector = shift @ARGV;
 
-  # Buffer
-  my $buffer = '';
-
-  # User agent
+  # Fresh user agent
   my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
 
   # Silence
@@ -89,6 +84,7 @@ sub run {
 
   # Start
   my $v;
+  my $buffer = '';
   $ua->on_start(
     sub {
       my $tx = pop;
@@ -138,10 +134,8 @@ sub run {
     }
   );
 
-  # Transaction
-  my $tx = $ua->build_tx($method, $url, $headers, $content);
-
   # Get
+  my $tx = $ua->build_tx($method, $url, $headers, $content);
   $tx = $ua->start($tx);
 
   # Error

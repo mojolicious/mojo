@@ -29,8 +29,8 @@ C<name> defaulting to C<controller/action> or the route name, C<format>
 defaulting to C<html> and C<handler> to C<ep>.
 
   {controller => 'users', action => 'list'} -> 'users/list.html.ep'
-  {route => 'foo', format => 'txt'}         -> 'foo.txt.ep'
-  {route => 'foo', handler => 'epl'}        -> 'foo.html.epl'
+  {name => 'foo', format => 'txt'}          -> 'foo.txt.ep'
+  {name => 'foo', handler => 'epl'}         -> 'foo.html.epl'
 
 All templates should be in the C<templates> directory of the application
 or the C<DATA> section of the class C<main>.

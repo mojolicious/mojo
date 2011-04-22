@@ -46,7 +46,29 @@ sub register {
   $app->helper(flash => sub { shift->flash(@_) });
 
   # Add "include" helper
-  $app->helper(include => sub { shift->render_partial(@_) });
+  $app->helper(
+    include => sub {
+      my $self     = shift;
+      my $template = @_ % 2 ? shift : undef;
+      my $args     = {@_};
+      $args->{template} = $template if defined $template;
+
+      # "layout" and "extends" can't be localized
+      my $layout  = delete $args->{layout};
+      my $extends = delete $args->{extends};
+
+      # Localize arguments
+      my @keys  = keys %$args;
+      my $i     = 0;
+      my $stash = $self->stash;
+    START:
+      local $stash->{$keys[$i]} = $args->{$keys[$i]};
+      $i++;
+      goto START unless $i >= @keys;
+
+      return $self->render_partial(layout => $layout, extend => $extends);
+    }
+  );
 
   # Add "layout" helper
   $app->helper(
@@ -64,15 +86,10 @@ sub register {
   $app->helper(
     memorize => sub {
       shift;
-
-      # Callback
       my $cb = pop;
       return '' unless ref $cb && ref $cb eq 'CODE';
-
-      # Name
       my $name = shift;
 
-      # Arguments
       my $args;
       if (ref $name && ref $name eq 'HASH') {
         $args = $name;
@@ -195,7 +212,8 @@ Access flash values.
   <%= include 'menubar' %>
   <%= include 'menubar', format => 'txt' %>
 
-Include a partial template.
+Include a partial template, all arguments get localized automatically and are
+only available in the partial template.
 
 =head2 C<layout>
 

@@ -12,7 +12,7 @@ plan skip_all => 'IO::Socket::SSL 1.37 required for this test!'
   unless Mojo::IOLoop::TLS;
 plan skip_all => 'Windows is too fragile for this test!'
   if Mojo::IOLoop::WINDOWS;
-plan tests => 19;
+plan tests => 15;
 
 # "I was a hero to broken robots 'cause I was one of them, but how can I sing
 #  about being damaged if I'm not?
@@ -229,29 +229,6 @@ $loop->start;
 is $kept_alive, 1,                 'kept alive';
 is $connected,  "localhost:$port", 'connected';
 is $result,     'test1test2',      'right result';
-ok $read > 25, 'read enough';
-ok $sent > 25, 'sent enough';
-
-# WebSocket /test (proxy websocket)
-$ua->https_proxy("http://localhost:$proxy");
-($connected, $result, $read, $sent) = undef;
-$ua->websocket(
-  "wss://localhost:$port/test" => sub {
-    my $tx = pop;
-    $tx->on_finish(sub { $loop->stop });
-    $tx->on_message(
-      sub {
-        my ($tx, $message) = @_;
-        $result = $message;
-        $tx->finish;
-      }
-    );
-    $tx->send_message('test1');
-  }
-);
-$loop->start;
-is $connected, "localhost:$port", 'connected';
-is $result,    'test1test2',      'right result';
 ok $read > 25, 'read enough';
 ok $sent > 25, 'sent enough';
 

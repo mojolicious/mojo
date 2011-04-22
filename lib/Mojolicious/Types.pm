@@ -32,13 +32,10 @@ has types => sub {
 # "Magic. Got it."
 sub type {
   my ($self, $ext, $type) = @_;
-
-  # Set
   if ($type) {
     $self->types->{$ext} = $type;
     return $self;
   }
-
   return $self->types->{$ext || ''};
 }
 

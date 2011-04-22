@@ -10,7 +10,6 @@ use constant DEBUG => $ENV{MOJO_CONFIG_DEBUG} || 0;
 sub load {
   my ($self, $file, $conf, $app) = @_;
 
-  # Debug
   $app->log->debug(qq/Reading config file "$file"./);
 
   # Slurp UTF-8 file
@@ -37,8 +36,6 @@ sub parse {
 
 sub register {
   my ($self, $app, $conf) = @_;
-
-  # Plugin config
   $conf ||= {};
 
   # File
@@ -55,7 +52,6 @@ sub register {
     $file .= '.' . ($conf->{ext} || 'conf');
   }
 
-  # Debug
   warn "CONFIG FILE $file\n" if DEBUG;
 
   # Mode specific config file
@@ -63,7 +59,6 @@ sub register {
   if ($file =~ /^(.*)\.([^\.]+)$/) {
     $mode = join '.', $1, $app->mode, $2;
 
-    # Debug
     warn "MODE SPECIFIC CONFIG FILE $mode\n" if DEBUG;
   }
 
@@ -84,16 +79,12 @@ sub register {
     die qq/Config file "$file" missing, maybe you need to create it?\n/
       unless $conf->{default};
 
-    # Debug
     $app->log->debug(qq/Config file "$file" missing, using default config./);
   }
 
-  # Merge with mode specific config file
-  if (defined $mode && -e $mode) {
-    $config = {%$config, %{$self->load($mode, $conf, $app)}};
-  }
-
-  # Merge
+  # Merge everything
+  $config = {%$config, %{$self->load($mode, $conf, $app)}}
+    if defined $mode && -e $mode;
   $config = {%{$conf->{default}}, %$config} if $conf->{default};
 
   # Add "config" helper

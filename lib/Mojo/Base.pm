@@ -59,13 +59,9 @@ sub attr {
   my $attrs   = shift;
   my $default = shift;
 
-  # Check for more arguments
+  # Check arguments
   Carp::croak('Attribute generator called with too many arguments') if @_;
-
-  # Shortcut
   return unless $class && $attrs;
-
-  # Instance
   $class = ref $class || $class;
 
   # Allow symbolic references

@@ -13,19 +13,12 @@ sub get { (shift->{_cache} || {})->{shift()} }
 sub set {
   my ($self, $key, $value) = @_;
 
-  # Keys
-  my $keys = $self->max_keys;
-
-  # Cache
+  my $keys  = $self->max_keys;
   my $cache = $self->{_cache} ||= {};
-
-  # Stack
   my $stack = $self->{_stack} ||= [];
 
-  # Limit
+  # Cache with size limit
   delete $cache->{shift @$stack} while @$stack >= $keys;
-
-  # Add
   push @$stack, $key;
   $cache->{$key} = $value;
 

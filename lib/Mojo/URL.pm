@@ -91,15 +91,12 @@ sub authority {
 sub clone {
   my $self = shift;
 
-  # Clone
   my $clone = Mojo::URL->new;
   $clone->scheme($self->scheme);
   $clone->authority($self->authority);
   $clone->path($self->path->clone);
   $clone->query($self->query->clone);
   $clone->fragment($self->fragment);
-
-  # Base
   $clone->base($self->base->clone) if $self->{base};
 
   return $clone;
@@ -160,8 +157,6 @@ sub is_ipv6 {
 
 sub parse {
   my ($self, $url) = @_;
-
-  # Shortcut
   return $self unless $url;
 
   # Official regex
@@ -255,8 +250,6 @@ sub to_abs {
 
   # Absolute URL
   my $abs = $self->clone;
-
-  # Already absolute
   return $abs if $abs->is_abs;
 
   # Add scheme and authority
@@ -265,14 +258,10 @@ sub to_abs {
 
   # New base
   $abs->base($base->clone);
-
-  # New path
   my $new = $base->path->clone;
 
-  # Old path
-  my $old = $self->path;
-
   # Replace path
+  my $old = $self->path;
   if ($old->leading_slash) { $new->parts([@{$old->parts}]) }
 
   # Merge paths
@@ -281,7 +270,6 @@ sub to_abs {
     # Characters after the right-most '/' need to go
     pop @{$new->parts} unless $new->trailing_slash;
 
-    # Append
     $new->append($_) for @{$old->parts};
   }
 
@@ -297,9 +285,8 @@ sub to_rel {
   my $self = shift;
   my $base = shift || $self->base->clone;
 
+  # Relative
   my $rel = $self->clone;
-
-  # Already relative
   return $rel unless $rel->is_abs;
 
   # Different locations
@@ -319,7 +306,6 @@ sub to_rel {
 
   my $path = $rel->path->clone;
   splice @{$path->parts}, 0, $splice if $splice;
-
   $rel->path($path);
   $rel->path->leading_slash(0);
 
@@ -336,9 +322,7 @@ sub to_string {
   my $authority = $self->authority;
   my $path      = $self->path;
   my $query     = $self->query;
-
-  # Format
-  my $url = '';
+  my $url       = '';
 
   # Scheme and authority
   if ($scheme && $authority) {

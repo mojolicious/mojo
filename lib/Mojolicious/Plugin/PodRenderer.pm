@@ -54,12 +54,10 @@ sub register {
     '/perldoc' => sub {
       my $self = shift;
 
-      # Module
+      # Find module
       my $module = $self->req->url->query->params->[0]
         || 'Mojolicious::Guides';
       $module =~ s/\//\:\:/g;
-
-      # Path
       my $path = Pod::Simple::Search->new->find($module, @PATHS);
 
       # Redirect to CPAN
@@ -131,8 +129,6 @@ sub register {
 
 sub _pod_to_html {
   my $pod = shift;
-
-  # Shortcut
   return unless defined $pod;
 
   # Block

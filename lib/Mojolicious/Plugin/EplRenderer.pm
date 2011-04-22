@@ -13,8 +13,6 @@ sub register {
   $app->renderer->add_handler(
     epl => sub {
       my ($r, $c, $output, $options) = @_;
-
-      # Inline
       my $inline = $options->{inline};
 
       # Template
@@ -27,7 +25,6 @@ sub register {
       my $key   = delete $options->{cache} || $path;
       my $mt    = $cache->get($key);
 
-      # Initialize
       $mt ||= Mojo::Template->new;
 
       # Cached
@@ -41,11 +38,7 @@ sub register {
 
         # File
         else {
-
-          # Encoding
           $mt->encoding($r->encoding) if $r->encoding;
-
-          # Name
           return unless my $t = $r->template_name($options);
 
           # Try template

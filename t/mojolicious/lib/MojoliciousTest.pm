@@ -42,6 +42,13 @@ sub startup {
   # Routes
   my $r = $self->routes;
 
+  # /exceptional/*
+  $r->route('/exceptional/:action')->to('exceptional#');
+
+  # /exceptional_too/*
+  $r->bridge('/exceptional_too')->to('exceptional#this_one_might_die')
+    ->route('/:action');
+
   # /fun/time
   $r->fun('/time')->to('foo#fun');
 

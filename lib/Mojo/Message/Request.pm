@@ -22,6 +22,9 @@ my $START_LINE_RE = qr/
   $                                                            # End
 /x;
 
+# Host regex
+my $HOST_RE = qr/^([^\:]*)\:?(.*)$/;
+
 sub cookies {
   my $self = shift;
 
@@ -51,7 +54,6 @@ sub cookies {
 
 sub fix_headers {
   my $self = shift;
-
   $self->SUPER::fix_headers(@_);
 
   # Host header is required in HTTP 1.1 requests
@@ -95,14 +97,8 @@ sub is_secure {
 
 sub is_xhr {
   my $self = shift;
-
-  # No ajax
   return unless my $with = $self->headers->header('X-Requested-With');
-
-  # Ajax
   return 1 if $with =~ /XMLHttpRequest/i;
-
-  # No ajax
   return;
 }
 
@@ -161,6 +157,21 @@ sub parse {
         $self->proxy(Mojo::URL->new->userinfo($userinfo));
       }
     }
+
+    # Reverse proxy
+    if ($ENV{MOJO_REVERSE_PROXY}) {
+
+      # "X-Forwarded-Host"
+      if (my $host = $headers->header('X-Forwarded-Host')) {
+        if ($host =~ $HOST_RE) {
+          $base->host($1);
+          $base->port($2) if defined $2;
+        }
+      }
+
+      # "X-Forwarded-HTTPS"
+      if ($headers->header('X-Forwarded-HTTPS')) { $base->scheme('https') }
+    }
   }
 
   return $self;
@@ -203,10 +214,8 @@ sub _build_start_line {
     $path = $clone;
   }
 
-  # Method
-  my $method = uc $self->method;
-
   # CONNECT
+  my $method = uc $self->method;
   if ($method eq 'CONNECT') {
     my $host = $url->host;
     my $port = $url->port || ($url->scheme eq 'https' ? '443' : '80');
@@ -225,11 +234,7 @@ sub _build_start_line {
 
 sub _parse_basic_auth {
   my ($self, $header) = @_;
-
-  # Shortcut
   return unless $header =~ /Basic (.+)$/;
-
-  # Decode
   my $auth = $1;
   b64_decode $auth;
   return $auth;
@@ -242,14 +247,9 @@ sub _parse_env {
   # Make environment accessible
   $self->env($env);
 
-  # Headers
   my $headers = $self->headers;
-
-  # URL
-  my $url = $self->url;
-
-  # Base
-  my $base = $url->base;
+  my $url     = $self->url;
+  my $base    = $url->base;
 
   # Headers
   while (my ($name, $value) = each %$env) {
@@ -264,7 +264,7 @@ sub _parse_env {
         my $host = $value;
         my $port = undef;
 
-        if ($host =~ /^([^\:]*)\:?(.*)$/) {
+        if ($host =~ $HOST_RE) {
           $host = $1;
           $port = $2;
         }

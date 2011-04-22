@@ -45,10 +45,6 @@ sub remote_address {
   # Set
   if ($address) {
     $self->{remote_address} = $address;
-
-    # Activate reverse proxy support for local requests
-    $ENV{MOJO_REVERSE_PROXY} ||= 1 if $address eq '127.0.0.1';
-
     return $self;
   }
 

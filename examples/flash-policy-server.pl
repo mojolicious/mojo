@@ -15,9 +15,6 @@ use Mojo::IOLoop;
 die "Server needs to run as user root to be able to listen to port 843.\n"
   unless $> == 0 && $< == 0;
 
-# The loop
-my $loop = Mojo::IOLoop->new;
-
 # Flash policy XML
 my $xml = <<'EOF';
 <?xml version="1.0"?>
@@ -29,7 +26,7 @@ my $xml = <<'EOF';
 EOF
 
 # Flash policy server
-$loop->listen(
+Mojo::IOLoop->listen(
   port    => 843,
   on_read => sub {
     my ($loop, $id) = @_;
@@ -42,6 +39,6 @@ $loop->listen(
 print "Starting server on port 843.\n";
 
 # Start loop
-$loop->start;
+Mojo::IOLoop->start;
 
 1;

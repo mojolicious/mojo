@@ -18,13 +18,10 @@ EOF
 # "Hi, Super Nintendo Chalmers!"
 sub run {
   my $self = shift;
-  my $cgi  = Mojo::Server::CGI->new;
 
-  # Options
+  my $cgi = Mojo::Server::CGI->new;
   local @ARGV = @_ if @_;
   GetOptions(nph => sub { $cgi->nph(1) });
-
-  # Run
   $cgi->run;
 
   return $self;

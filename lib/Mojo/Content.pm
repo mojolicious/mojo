@@ -4,7 +4,7 @@ use Mojo::Base -base;
 use Carp 'croak';
 use Mojo::Headers;
 
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 256000;
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 131072;
 
 has [qw/auto_relax relaxed/] => 0;
 has headers => sub { Mojo::Headers->new };

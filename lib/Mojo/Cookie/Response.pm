@@ -31,7 +31,6 @@ sub expires {
     return $self;
   }
 
-  # Shortcut
   return unless defined $self->{expires};
 
   # Upgrade
@@ -81,9 +80,8 @@ sub parse {
 sub to_string {
   my $self = shift;
 
-  return '' unless $self->name;
-
   # Version
+  return '' unless $self->name;
   my $cookie = $self->name;
   my $value  = $self->value;
   $cookie .= "=$value" if defined $value && length $value;

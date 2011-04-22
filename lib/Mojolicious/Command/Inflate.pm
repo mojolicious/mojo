@@ -28,7 +28,6 @@ sub run {
   my $public    = 'public';
   my $templates = 'templates';
 
-  # Options
   local @ARGV = @_ if @_;
   GetOptions(
     'class=s'     => sub { $class     = $_[1] },

@@ -12,7 +12,7 @@ BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 my $backup;
 BEGIN { $backup = $ENV{MOJO_MODE} || ''; $ENV{MOJO_MODE} = 'development' }
 
-use Test::More tests => 720;
+use Test::More tests => 749;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -78,6 +78,13 @@ del sub { shift->render(text => 'Hello!') };
 
 # /
 any sub { shift->render(text => 'Bye!') };
+
+# POST /multipart/form
+post '/multipart/form' => sub {
+  my $self = shift;
+  my @test = $self->param('test');
+  $self->render_text(join "\n", @test);
+};
 
 # GET /auto_name
 get '/auto_name' => sub {
@@ -179,8 +186,11 @@ get '/template.txt' => 'template';
 
 # GET /0
 get ':number' => [number => qr/0/] => sub {
-  my $self = shift;
-  $self->render_text($self->tx->remote_address . $self->param('number'));
+  my $self    = shift;
+  my $url     = $self->req->url->to_abs;
+  my $address = $self->tx->remote_address;
+  my $number  = $self->param('number');
+  $self->render_text("$url-$address-$number");
 };
 
 # DELETE /inline/epl
@@ -209,7 +219,8 @@ get '/source' => sub { shift->render_static('../lite_app.t') };
 # GET /foo_relaxed/*
 get '/foo_relaxed/(.test)' => sub {
   my $self = shift;
-  $self->render_text($self->stash('test'));
+  $self->render_text(
+    $self->stash('test') . ($self->req->headers->dnt ? 1 : 0));
 };
 
 # GET /foo_wildcard/*
@@ -271,6 +282,12 @@ get '/nested-includes' => sub {
     layout   => 'layout',
     handler  => 'ep'
   );
+};
+
+# GET /localized/include
+get '/localized/include' => sub {
+  my $self = shift;
+  $self->render('localized', test => 'foo');
 };
 
 # GET /outerlayout
@@ -682,6 +699,15 @@ $t->delete_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
 $t->post_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('Bye!');
 
+# POST /multipart/form ("application/x-www-form-urlencoded")
+$t->post_form_ok('/multipart/form', {test => [1 .. 5]})->status_is(200)
+  ->content_is(join "\n", 1 .. 5);
+
+# POST /multipart/form ("multipart/form-data")
+$t->post_form_ok('/multipart/form',
+  {test => [1 .. 5], file => {content => '123'}})->status_is(200)
+  ->content_is(join "\n", 1 .. 5);
+
 # GET /auto_name
 $t->get_ok('/auto_name')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
@@ -858,11 +884,42 @@ $t->get_ok('/.html')->status_is(200)
   ->content_is(
   "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
 
-# GET /0 (reverse proxy)
+# GET /0 ("X-Forwarded-For")
+$t->get_ok('/0', {'X-Forwarded-For' => '192.168.2.2, 192.168.2.1'})
+  ->status_is(200)
+  ->content_like(qr/http\:\/\/localhost\:\d+\/0\-127\.0\.0\.1\-0/);
+
+# GET /0 (reverse proxy with "X-Forwarded-For")
 my $backup2 = $ENV{MOJO_REVERSE_PROXY};
 $ENV{MOJO_REVERSE_PROXY} = 1;
 $t->get_ok('/0', {'X-Forwarded-For' => '192.168.2.2, 192.168.2.1'})
-  ->status_is(200)->content_is('192.168.2.10');
+  ->status_is(200)
+  ->content_like(qr/http\:\/\/localhost\:\d+\/0\-192\.168\.2\.1\-0/);
+$ENV{MOJO_REVERSE_PROXY} = $backup2;
+
+# GET /0 ("X-Forwarded-Host")
+$t->get_ok('/0', {'X-Forwarded-Host' => 'mojolicio.us:8080'})->status_is(200)
+  ->content_like(qr/http\:\/\/localhost\:\d+\/0\-127\.0\.0\.1\-0/);
+
+# GET /0 (reverse proxy with "X-Forwarded-Host")
+$backup2 = $ENV{MOJO_REVERSE_PROXY};
+$ENV{MOJO_REVERSE_PROXY} = 1;
+$t->get_ok('/0', {'X-Forwarded-Host' => 'mojolicio.us:8080'})->status_is(200)
+  ->content_is('http://mojolicio.us:8080/0-127.0.0.1-0');
+$ENV{MOJO_REVERSE_PROXY} = $backup2;
+
+# GET /0 ("X-Forwarded-HTTPS" and "X-Forwarded-Host")
+$t->get_ok('/0',
+  {'X-Forwarded-HTTPS' => 1, 'X-Forwarded-Host' => 'mojolicio.us'})
+  ->status_is(200)
+  ->content_like(qr/http\:\/\/localhost\:\d+\/0\-127\.0\.0\.1\-0/);
+
+# GET /0 (reverse proxy with "X-Forwarded-HTTPS" and "X-Forwarded-Host")
+$backup2 = $ENV{MOJO_REVERSE_PROXY};
+$ENV{MOJO_REVERSE_PROXY} = 1;
+$t->get_ok('/0',
+  {'X-Forwarded-HTTPS' => 1, 'X-Forwarded-Host' => 'mojolicio.us'})
+  ->status_is(200)->content_is('https://mojolicio.us/0-127.0.0.1-0');
 $ENV{MOJO_REVERSE_PROXY} = $backup2;
 
 # DELETE /inline/epl
@@ -890,7 +947,11 @@ $t->get_ok('/', '1234' x 1024)->status_is(413)
 $ENV{MOJO_MAX_MESSAGE_SIZE} = $backup2;
 
 # GET /foo_relaxed/123
-$t->get_ok('/foo_relaxed/123')->status_is(200)->content_is('123');
+$t->get_ok('/foo_relaxed/123')->status_is(200)->content_is('1230');
+
+# GET /foo_relaxed/123 (Do Not Track)
+$t->get_ok('/foo_relaxed/123', {DNT => 1})->status_is(200)
+  ->content_is('1231');
 
 # GET /foo_relaxed
 $t->get_ok('/foo_relaxed/')->status_is(404);
@@ -959,6 +1020,12 @@ $t->get_ok('/nested-includes')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("layouted Nested Hello\n[\n  1,\n  2\n]\nthere<br>!\n\n\n\n");
+
+# GET /localized/include
+$t->get_ok('/localized/include')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("localized1 foo\nlocalized2 321\n\n\nfoo\n\n");
 
 # GET /outerlayout
 $t->get_ok('/outerlayout')->status_is(200)
@@ -1605,6 +1672,21 @@ Not Bender!
 
 @@ root_path.html.epl
 %== shift->url_for('root');
+
+@@ localized.html.ep
+% layout 'localized1';
+<%= $test %>
+<%= include 'localized_partial', test => 321, layout => 'localized2' %>
+<%= $test %>
+
+@@ localized_partial.html.ep
+<%= $test %>
+
+@@ layouts/localized1.html.ep
+localized1 <%= content %>
+
+@@ layouts/localized2.html.ep
+localized2 <%= content %>
 
 @@ outerlayout.html.ep
 Hello

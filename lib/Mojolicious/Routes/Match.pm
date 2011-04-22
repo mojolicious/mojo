@@ -31,29 +31,19 @@ sub new {
 # "Life can be hilariously cruel."
 sub match {
   my ($self, $r, $c) = @_;
-
-  # Shortcut
   return unless $r;
 
-  # Dictionary
   my $dictionary = $self->{_dictionary} ||= $r->dictionary;
 
   # Root
   $self->root($r) unless $self->root;
 
-  # Path
-  my $path = $self->{_path};
-
-  # Pattern
+  my $path    = $self->{_path};
   my $pattern = $r->pattern;
 
   # Match
   my $captures = $pattern->shape_match(\$path);
-
-  # No match
   return unless $captures;
-
-  # Path
   $self->{_path} = $path;
 
   # Merge captures
@@ -96,10 +86,8 @@ sub match {
     $empty = 1;
   }
 
-  # Endpoint
-  my $endpoint = $r->is_endpoint;
-
   # Format
+  my $endpoint = $r->is_endpoint;
   if ($endpoint && !$pattern->format && $path =~ /^\/?\.([^\/]+)$/) {
     $captures->{format} = $1;
     $empty = 1;
@@ -185,13 +173,9 @@ sub path_for {
     }
   }
 
-  # Captures
-  my $captures = $self->captures;
-
-  # Endpoint
-  my $endpoint;
-
   # Current route
+  my $captures = $self->captures;
+  my $endpoint;
   if ($name && $name eq 'current' || !$name) {
     return undef unless $endpoint = $self->endpoint;
   }
@@ -211,7 +195,7 @@ sub path_for {
         last if $child->has_custom_name;
       }
 
-      # Append
+      # Search too
       push @children, @{$child->children};
     }
     $endpoint = $candidate;

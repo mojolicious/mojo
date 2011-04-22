@@ -165,7 +165,7 @@ Note that L<IO::Socket::SSL> must be installed for TLS support.
 =head2 C<MOJO_CHUNK_SIZE>
 
 Chunk size used for IO operations in bytes, a bigger chunk size speeds up IO
-operations but will also use more memory, defaults to C<256000>.
+operations but will also use more memory, defaults to C<131072>.
 
   MOJO_CHUNK_SIZE=1024
 
@@ -215,7 +215,7 @@ to C<10240>.
 =head2 C<MOJO_MAX_MEMORY_SIZE>
 
 Maximum size in bytes for HTTP content to keep in memory, bigger content will
-be written to temporary files, defaults to C<256000>.
+be written to temporary files, defaults to C<262144>.
 
   MOJO_MAX_MEMORY_SIZE=2048
 
@@ -297,6 +297,8 @@ be detected automatically so you don't have to restart the server manually.
 =head2 C<MOJO_REVERSE_PROXY>
 
 Enable reverse proxy support for L<Mojolicious> application.
+This allows L<Mojolicious> to automatically pick up the C<X-Forwarded-For>,
+C<X-Forwarded-Host> and C<X-Forwarded-HTTPS> headers.
 
   MOJO_REVERSE_PROXY=1
 

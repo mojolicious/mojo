@@ -104,11 +104,10 @@ sub cookies {
   return $cookies;
 }
 
-sub default_message { $MESSAGES{$_[1] || $_[0]->code || 200} }
+sub default_message { $MESSAGES{$_[1] || $_[0]->code || 200} || '' }
 
 sub fix_headers {
   my $self = shift;
-
   $self->SUPER::fix_headers(@_);
 
   # Date header is required in responses

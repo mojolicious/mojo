@@ -73,7 +73,6 @@ sub run {
   # Daemon
   my $daemon = $self->{_daemon} = Mojo::Server::Daemon->new;
 
-  # Debug
   warn "APPLICATION $ENV{HYPNOTOAD_APP}\n" if DEBUG;
 
   # Preload application
@@ -135,7 +134,6 @@ sub run {
       ||= time;
   };
 
-  # Debug
   warn "MANAGER STARTED $$\n" if DEBUG;
 
   # Mainloop
@@ -148,7 +146,6 @@ sub _config {
   # File
   my $file = $ENV{HYPNOTOAD_CONFIG};
 
-  # Debug
   warn "CONFIG $file\n" if DEBUG;
 
   # Config
@@ -267,7 +264,6 @@ sub _manage {
   # Upgraded
   if ($ENV{HYPNOTOAD_PID} && $ENV{HYPNOTOAD_PID} ne $$) {
 
-    # Debug
     warn "STOPPING MANAGER $ENV{HYPNOTOAD_PID}\n" if DEBUG;
 
     kill 'QUIT', $ENV{HYPNOTOAD_PID};
@@ -283,7 +279,6 @@ sub _manage {
     # Start
     unless ($self->{_new}) {
 
-      # Debug
       warn "UPGRADING\n" if DEBUG;
 
       # Fork
@@ -307,7 +302,6 @@ sub _manage {
     my $timeout  = $c->{heartbeat_timeout};
     if ($w->{time} + $interval + $timeout <= time) {
 
-      # Debug
       warn "STOPPING WORKER $pid\n" if DEBUG;
 
       # Try graceful
@@ -318,7 +312,6 @@ sub _manage {
     $w->{graceful} ||= time if $self->{_graceful};
     if ($w->{graceful}) {
 
-      # Debug
       warn "QUIT $pid\n" if DEBUG;
 
       # Kill
@@ -332,7 +325,6 @@ sub _manage {
     # Normal stop
     if (($self->{_done} && !$self->{_graceful}) || $w->{force}) {
 
-      # Debug
       warn "TERM $pid\n" if DEBUG;
 
       # Kill
@@ -350,7 +342,6 @@ sub _pid {
   # Check
   return if -e $file;
 
-  # Debug
   warn "PID $file\n" if DEBUG;
 
   # Create
@@ -368,7 +359,6 @@ sub _reap {
   # Cleanup failed upgrade
   if (($self->{_new} || '') eq $pid) {
 
-    # Debug
     warn "UPGRADE FAILED\n" if DEBUG;
 
     delete $self->{_upgrade};
@@ -378,7 +368,6 @@ sub _reap {
   # Cleanup worker
   else {
 
-    # Debug
     warn "WORKER DIED $pid\n" if DEBUG;
 
     delete $self->{_workers}->{$pid};
@@ -411,7 +400,6 @@ sub _spawn {
   my $lock = IO::File->new("> $file")
     or croak qq/Can't open lock file "$file": $!/;
 
-  # Weaken
   weaken $self;
 
   # Accept mutex
@@ -456,7 +444,6 @@ sub _spawn {
     'DEFAULT';
   $SIG{QUIT} = sub { $loop->max_connections(0) };
 
-  # Debug
   warn "WORKER STARTED $$\n" if DEBUG;
 
   # Cleanup

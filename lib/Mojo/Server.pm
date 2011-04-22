@@ -34,14 +34,10 @@ has on_build_tx => sub {
 };
 has on_handler => sub {
   sub {
-
-    # Application
     my $app = shift->app;
+    my $tx  = shift;
 
-    # Transaction
-    my $tx = shift;
-
-    # Handler
+    # Handle transaction
     $app->handler($tx);
 
     # Delayed

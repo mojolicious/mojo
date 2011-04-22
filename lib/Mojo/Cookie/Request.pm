@@ -53,10 +53,8 @@ sub prefix {
 sub to_string {
   my $self = shift;
 
-  # Shortcut
-  return '' unless $self->name;
-
   # Render
+  return '' unless $self->name;
   my $cookie = $self->name;
   my $value  = $self->value;
   $cookie .= "=$value" if defined $value && length $value;

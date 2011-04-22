@@ -12,8 +12,6 @@ EOF
 sub run {
   my ($self, $name) = @_;
   $name ||= 'myapp.pl';
-
-  # App
   $self->renderer->line_start('%%');
   $self->renderer->tag_start('<%%');
   $self->renderer->tag_end('%%>');

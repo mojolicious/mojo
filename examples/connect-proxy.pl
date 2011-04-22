@@ -10,14 +10,11 @@ use lib "$FindBin::Bin/../lib";
 # "Cheating in a fake fight. That's low."
 use Mojo::IOLoop;
 
-# The loop
-my $loop = Mojo::IOLoop->new;
-
 # Connection buffer
 my $c = {};
 
 # Minimal connect proxy server to test TLS tunneling
-$loop->listen(
+Mojo::IOLoop->listen(
   port    => 3000,
   on_read => sub {
     my ($loop, $client, $chunk) = @_;
@@ -70,6 +67,6 @@ For testing use something like "HTTPS_PROXY=http://127.0.0.1:3000".
 EOF
 
 # Start loop
-$loop->start;
+Mojo::IOLoop->start;
 
 1;

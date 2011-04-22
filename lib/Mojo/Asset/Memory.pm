@@ -21,23 +21,27 @@ sub add_chunk {
 }
 
 sub contains {
-  my $self  = shift;
+  my $self = shift;
+
   my $start = $self->start_range;
-  my $pos   = index $self->{content}, shift, $start;
+  my $pos = index $self->{content}, shift, $start;
   $pos -= $start if $start && $pos >= 0;
   my $end = $self->end_range;
+
   return -1 if $end && $pos >= $end;
   return $pos;
 }
 
 sub get_chunk {
   my ($self, $start) = @_;
+
   $start += $self->start_range;
-  my $size = $ENV{MOJO_CHUNK_SIZE} || 256000;
+  my $size = $ENV{MOJO_CHUNK_SIZE} || 131072;
   if (my $end = $self->end_range) {
     $size = $end + 1 - $start if ($start + $size) > $end;
   }
-  substr shift->{content}, $start, $size;
+
+  return substr shift->{content}, $start, $size;
 }
 
 sub move_to {

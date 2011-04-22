@@ -325,8 +325,6 @@ sub camelize {
 }
 
 sub decamelize {
-
-  # Shortcut
   return if $_[0] !~ /^[A-Z\:]+/;
 
   my @parts;
@@ -410,13 +408,15 @@ sub html_unescape {
 
   # Unescape
   $_[0] =~ s/
-        &(?:
-            \#(\d{1,7})              # Number
-        |
-            ([A-Za-z]{1,8})          # Named
-        |
-            \#x([0-9A-Fa-f]{1,6}))   # Hex
-        ;
+    &
+    (?:
+      \#(\d{1,7})             # Number
+      |
+      ([A-Za-z]{1,8})         # Named
+      |
+      \#x([0-9A-Fa-f]{1,6})   # Hex
+    )
+    ;
     /_unescape($1, $2, $3)/gex;
 }
 
@@ -433,8 +433,6 @@ sub md5_sum {
 }
 
 sub punycode_decode {
-
-  # Integer arithmetic
   use integer;
 
   # Defaults
@@ -465,7 +463,6 @@ sub punycode_decode {
         : $t > PUNYCODE_TMAX ? PUNYCODE_TMAX
         :                      $t;
 
-      # Break
       last if $digit < $t;
 
       $w *= (PUNYCODE_BASE - $t);
@@ -479,18 +476,12 @@ sub punycode_decode {
 
     # Insert
     splice @output, $i, 0, chr($n);
-
-    # Increment
     $i++;
   }
-
-  # Output
   $_[0] = join '', @output;
 }
 
 sub punycode_encode {
-
-  # Integer arithmetic
   use integer;
 
   # Input
@@ -542,7 +533,6 @@ sub punycode_encode {
             : $t > PUNYCODE_TMAX ? PUNYCODE_TMAX
             :                      $t;
 
-          # Break
           last if $q < $t;
 
           # Code point for digit "t"
@@ -558,20 +548,14 @@ sub punycode_encode {
         # Bias
         $bias = _adapt($delta, $h + 1, $h == $b);
 
-        # Reset delta
         $delta = 0;
-
-        # Increment
         $h++;
       }
     }
 
-    # Increment
     $delta++;
     $n++;
   }
-
-  # Output
   $_[0] = $output;
 }
 
@@ -638,8 +622,6 @@ sub url_escape {
 }
 
 sub url_unescape {
-
-  # Shortcut
   return if index($_[0], '%') == -1;
 
   # Unescape
@@ -662,7 +644,6 @@ sub xml_escape {
 sub _adapt {
   my ($delta, $numpoints, $firsttime) = @_;
 
-  # Integer arithmetic
   use integer;
 
   # Delta
@@ -683,7 +664,7 @@ sub _adapt {
 
 sub _hmac {
 
-  #Secret
+  # Secret
   my $secret = $_[2] || 'Very unsecure!';
   $secret = $_[0]->($secret) if length $secret > 64;
 

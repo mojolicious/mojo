@@ -6,7 +6,7 @@ use warnings;
 # Disable IPv6, epoll and kqueue
 BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 34;
+use Test::More tests => 41;
 
 # "Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
 #  Well, that’s love for you."
@@ -48,10 +48,24 @@ websocket '/' => sub {
   );
 } => 'index';
 
+# GET /something/else
+get '/something/else' => sub {
+  my $self = shift;
+  my $timeout =
+    Mojo::IOLoop->singleton->connection_timeout($self->tx->connection);
+  $self->render(text => "${timeout}failed!");
+};
+
 # WebSocket /socket
 websocket '/socket' => sub {
   my $self = shift;
-  $self->send_message($self->req->headers->host);
+  $self->send_message(
+    $self->req->headers->host,
+    sub {
+      shift->send_message(
+        Mojo::IOLoop->singleton->connection_timeout($self->tx->connection));
+    }
+  );
   $self->finish;
 };
 
@@ -138,6 +152,11 @@ my $res = $ua->get('/link')->success;
 is $res->code, 200, 'right status';
 like $res->body, qr/ws\:\/\/localhost\:\d+\//, 'right content';
 
+# GET /socket (plain HTTP request)
+$res = $ua->get('/socket')->res;
+is $res->code,   404,           'right status';
+like $res->body, qr/Not Found/, 'right content';
+
 # WebSocket /
 my $result;
 $ua->websocket(
@@ -157,9 +176,26 @@ $ua->websocket(
 $loop->start;
 like $result, qr/test1test2ws\:\/\/localhost\:\d+\//, 'right result';
 
+# WebSocket /something/else (failed websocket connection)
+my ($code, $body, $ws);
+$ua->websocket(
+  '/something/else' => sub {
+    my $tx = pop;
+    $ws   = $tx->is_websocket;
+    $code = $tx->res->code;
+    $body = $tx->res->body;
+    $loop->stop;
+  }
+);
+$loop->start;
+is $ws,   0,   'not a websocket';
+is $code, 426, 'right code';
+ok $body =~ /^(\d+)failed!$/, 'right content';
+ok $1 < 100, 'right timeout';
+
 # WebSocket /socket (using an already prepared socket)
 my $port = $ua->test_server;
-$result = undef;
+$result = '';
 my $tx = $ua->build_websocket_tx('ws://lalala/socket');
 my $socket =
   IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $port);
@@ -173,15 +209,16 @@ $ua->start(
     $tx->on_message(
       sub {
         my ($tx, $message) = @_;
-        $result = $message;
-        $tx->finish;
+        $tx->finish if length $result;
+        $result .= $message;
       }
     );
     $local = $loop->local_info($tx->connection)->{port};
   }
 );
 $loop->start;
-is $result, 'lalala', 'right result';
+ok $result =~ /^lalala(\d+)$/, 'right result';
+ok $1 > 100, 'right timeout';
 ok $local, 'local port';
 
 # WebSocket /early_start (server directly sends a message)
@@ -211,7 +248,7 @@ is $result, 'test3test2', 'right result';
 is $flag2,  23,           'finished callback';
 
 # WebSocket /denied (connection denied)
-my $code = undef;
+$code = undef;
 $ua->websocket(
   '/denied' => sub {
     $code = pop->res->code;

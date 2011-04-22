@@ -4,6 +4,8 @@ use Mojo::Base 'Mojo::Asset';
 # We can't use File::Temp because there is no seek support in the version
 # shipped with Perl 5.8
 use Carp 'croak';
+use Errno;
+use Fcntl;
 use File::Copy ();
 use File::Spec;
 use IO::File;
@@ -18,32 +20,28 @@ has handle => sub {
 
   # Already got a file without handle
   my $file = $self->path;
-  if ($file) {
-
-    # New file
-    my $mode = '+>>';
-
-    # File exists
-    $mode = '<' if -s $file;
-
-    # Open
-    $handle->open("$mode $file")
+  if ($file && -f $file) {
+    $handle->open("< $file")
       or croak qq/Can't open file "$file": $!/;
-
     return $handle;
   }
 
-  # Generate temporary file
+  # Open existing or temporary file
   my $base = File::Spec->catfile($self->tmpdir, 'mojo.tmp');
-  $file = $base;
-  while (-e $file) { $file = $base . md5_sum(time . rand 999999999) }
+  my $name = $file || $base;
+  my $fh;
+  until (sysopen $fh, $name, O_CREAT | O_EXCL | O_RDWR) {
+    croak qq/Can't open file "$name": $!/ if $file || $! != $!{EEXIST};
+    $name = $base . md5_sum(time . $$ . rand 999999999);
+  }
+  $file = $name;
   $self->path($file);
 
   # Enable automatic cleanup
   $self->cleanup(1);
 
   # Open for read/write access
-  $handle->open("+> $file") or croak qq/Can't open file "$file": $!/;
+  $handle->fdopen(fileno($fh), "+>") or croak qq/Can't open file "$name": $!/;
 
   return $handle;
 };
@@ -168,7 +166,7 @@ sub slurp {
 
   # Slurp
   my $content = '';
-  while ($self->handle->sysread(my $buffer, 256000)) { $content .= $buffer }
+  while ($self->handle->sysread(my $buffer, 131072)) { $content .= $buffer }
 
   return $content;
 }

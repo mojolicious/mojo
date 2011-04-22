@@ -22,10 +22,8 @@ sub dispatch {
   # Canonical path
   my $path = $c->req->url->path->clone->canonicalize->to_string;
 
-  # Parts
+  # Split parts
   my @parts = @{Mojo::Path->new->parse($path)->parts};
-
-  # Shortcut
   return 1 unless @parts;
 
   # Prevent directory traversal
@@ -33,11 +31,8 @@ sub dispatch {
 
   # Serve static file
   unless ($self->serve($c, join('/', @parts))) {
-
-    # Rendered
     $c->stash->{'mojo.static'} = 1;
     $c->rendered;
-
     return;
   }
 
@@ -47,39 +42,24 @@ sub dispatch {
 sub serve {
   my ($self, $c, $rel, $root) = @_;
 
-  # Root
-  $root = $self->root unless defined $root;
-
   # Append path to root
+  $root = $self->root unless defined $root;
   my $file = File::Spec->catfile($root, split('/', $rel));
 
   # Extension
   $file =~ /\.(\w+)$/;
   my $ext = $1;
 
-  # Type
-  my $type = $c->app->types->type($ext) || 'text/plain';
-
-  # Response
-  my $res = $c->res;
-
-  # Asset
-  my $asset;
-
-  # Modified
-  my $modified = $self->{_modified} ||= time;
-
-  # Size
-  my $size = 0;
-
-  # Root for bundled files
+  # Bundled file
   $self->{_root}
     ||= File::Spec->catdir(File::Spec->splitdir(dirname(__FILE__)), 'public');
-
-  # Bundled file
   my $bundled = File::Spec->catfile($self->{_root}, split('/', $rel));
 
   # Files
+  my $res      = $c->res;
+  my $modified = $self->{_modified} ||= time;
+  my $size     = 0;
+  my $asset;
   for my $path ($file, $bundled) {
 
     # Exists
@@ -87,16 +67,10 @@ sub serve {
 
       # Readable
       if (-r $path) {
-
-        # Modified
         my $stat = stat($path);
         $modified = $stat->mtime;
-
-        # Size
-        $size = $stat->size;
-
-        # Content
-        $asset = Mojo::Asset::File->new(path => $path);
+        $size     = $stat->size;
+        $asset    = Mojo::Asset::File->new(path => $path);
       }
 
       # Exists, but is forbidden
@@ -119,16 +93,9 @@ sub serve {
   # Found
   if ($asset) {
 
-    # Request
-    my $req = $c->req;
-
-    # Request headers
-    my $rqh = $req->headers;
-
-    # Response headers
-    my $rsh = $res->headers;
-
     # If modified since
+    my $rqh = $c->req->headers;
+    my $rsh = $res->headers;
     if (my $date = $rqh->if_modified_since) {
 
       # Not modified
@@ -165,10 +132,10 @@ sub serve {
     $asset->start_range($start);
     $asset->end_range($end);
 
-    # Response
+    # Prepare response
     $res->code(200) unless $res->code;
     $res->content->asset($asset);
-    $rsh->content_type($type);
+    $rsh->content_type($c->app->types->type($ext) || 'text/plain');
     $rsh->accept_ranges('bytes');
     $rsh->last_modified(Mojo::Date->new($modified));
     return;
@@ -199,7 +166,6 @@ sub _get_inline_file {
     return Mojo::Command->new->get_data($path, $class) if $path eq $rel;
   }
 
-  # Nothing
   return;
 }
 

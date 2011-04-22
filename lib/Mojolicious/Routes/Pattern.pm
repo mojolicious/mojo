@@ -38,10 +38,8 @@ sub parse {
   my $self    = shift;
   my $pattern = shift;
 
-  # Shortcut
+  # Make sure we have a viable pattern
   return $self if !defined $pattern || $pattern eq '/';
-
-  # Make sure pattern starts with a slash
   $pattern = "/$pattern" unless $pattern =~ /^\//;
 
   # Format
@@ -104,7 +102,6 @@ sub render {
 sub shape_match {
   my ($self, $pathref) = @_;
 
-  # Debug
   if (DEBUG) {
     my $pattern = $self->pattern || '';
     warn "    [$$pathref] -> [$pattern]\n";
@@ -114,20 +111,15 @@ sub shape_match {
   my $regex;
   $regex = $self->_compile unless $regex = $self->regex;
 
-  # Debug
   warn "    $regex\n" if DEBUG;
 
   # Match
   if (my @captures = $$pathref =~ $regex) {
-
-    # Substitute
     $$pathref =~ s/$regex//;
 
     # Merge captures
     my $result = {%{$self->defaults}};
     for my $symbol (@{$self->symbols}) {
-
-      # No captures
       last unless @captures;
 
       # Merge
@@ -213,11 +205,10 @@ sub _tokenize {
   my $relaxed_start  = $self->relaxed_start;
   my $symbol_start   = $self->symbol_start;
   my $wildcard_start = $self->wildcard_start;
+  my $tree           = [];
+  my $state          = 'text';
+  my $quoted         = 0;
 
-  my $tree  = [];
-  my $state = 'text';
-
-  my $quoted = 0;
   while (length(my $char = substr $pattern, 0, 1, '')) {
 
     # Inside a symbol
@@ -301,7 +292,6 @@ sub _tokenize {
       $tree->[-1]->[-1] .= $char;
     }
   }
-
   $self->tree($tree);
 
   return $self;

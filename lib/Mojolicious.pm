@@ -21,7 +21,6 @@ has on_process       => sub {
 Mojolicious->process is DEPRECATED in favor of Mojolicious->on_process!!!
 EOF
 
-    # Dispatch
     $self->dispatch($c);
   };
 };
@@ -34,7 +33,7 @@ has secret   => sub {
   # Warn developers about unsecure default
   $self->log->debug('Your secret passphrase needs to be changed!!!');
 
-  # Application name
+  # Default to application name
   return ref $self;
 };
 has sessions => sub { Mojolicious::Sessions->new };
@@ -42,7 +41,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Smiling Cat Face With Heart-Shaped Eyes';
-our $VERSION  = '1.17';
+our $VERSION  = '1.22';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -52,7 +51,7 @@ sub AUTOLOAD {
   # Method
   my ($package, $method) = our $AUTOLOAD =~ /^([\w\:]+)\:\:(\w+)$/;
 
-  # Helper
+  # Check for helper
   croak qq/Can't locate object method "$method" via "$package"/
     unless my $helper = $self->renderer->helpers->{$method};
 
@@ -66,7 +65,7 @@ sub AUTOLOAD {
     );
   }
 
-  # Run
+  # Call helper with fresh controller
   return $class->new(app => $self)->$helper(@_);
 }
 
@@ -81,31 +80,17 @@ sub new {
   $self->on_build_tx(
     sub {
       my $self = shift;
-
-      # Build
-      my $tx = Mojo::Transaction::HTTP->new;
-
-      # Hook
+      my $tx   = Mojo::Transaction::HTTP->new;
       $self->plugins->run_hook(after_build_tx => ($tx, $self));
-
       return $tx;
     }
   );
 
-  # Routes
   my $r = $self->routes;
-
-  # Namespace
   $r->namespace(ref $self);
-
-  # Renderer
   my $renderer = $self->renderer;
-
-  # Static
-  my $static = $self->static;
-
-  # Home
-  my $home = $self->home;
+  my $static   = $self->static;
+  my $home     = $self->home;
 
   # Root
   $renderer->root($home->rel_dir('templates'));
@@ -119,14 +104,12 @@ sub new {
   $r->hide(qw/rendered send_message session signed_cookie url_for/);
   $r->hide(qw/write write_chunk/);
 
-  # Mode
+  # Prepare log
   my $mode = $self->mode;
-
-  # Log
   $self->log->path($home->rel_file("log/$mode.log"))
     if -w $home->rel_file('log');
 
-  # Plugins
+  # Load default plugins
   $self->plugin('agent_condition');
   $self->plugin('default_helpers');
   $self->plugin('tag_helpers');
@@ -153,10 +136,8 @@ sub new {
 sub defaults {
   my $self = shift;
 
-  # Initialize
-  $self->{defaults} ||= {};
-
   # Hash
+  $self->{defaults} ||= {};
   return $self->{defaults} unless @_;
 
   # Get
@@ -175,43 +156,23 @@ sub defaults {
 sub dispatch {
   my ($self, $c) = @_;
 
-  # Transaction
+  # Prepare transaction
   my $tx = $c->tx;
-
-  # Websocket handshake
   $c->res->code(undef) if $tx->is_websocket;
-
-  # Session
   $self->sessions->load($c);
-
-  # Hook
-  $self->plugins->run_hook(before_dispatch => $c);
+  my $plugins = $self->plugins;
+  $plugins->run_hook(before_dispatch => $c);
 
   # Try to find a static file
   $self->static->dispatch($c);
-
-  # Hook
-  $self->plugins->run_hook_reverse(after_static_dispatch => $c);
-
-  # Response
-  my $res = $tx->res;
-
-  # Already rendered
-  return if $res->code;
-
-  # Websocket handshake
-  $c->res->code(101) if $tx->is_websocket;
-
-  # Error or 200
-  my ($error, $code) = $tx->req->error;
-  $res->code($code) if $code;
+  $plugins->run_hook_reverse(after_static_dispatch => $c);
 
   # Routes
-  if ($self->routes->dispatch($c)) {
-
-    # Nothing found
-    $c->render_not_found unless $res->code;
-  }
+  my $res = $tx->res;
+  return if $res->code;
+  if (my $code = ($tx->req->error)[1]) { $res->code($code) }
+  elsif ($tx->is_websocket) { $res->code(426) }
+  if ($self->routes->dispatch($c)) { $c->render_not_found unless $res->code }
 }
 
 # "Bite my shiny metal ass!"
@@ -235,19 +196,11 @@ sub handler {
     $tx    = $tx->tx;
   }
 
-  # Defaults
+  # Build default controller and process
   my $defaults = $self->defaults;
   @{$stash}{keys %$defaults} = values %$defaults;
-
-  # Build default controller and process
-  eval {
-    $self->on_process->(
-      $self, $class->new(app => $self, stash => $stash, tx => $tx)
-    );
-  };
-
-  # Fatal exception
-  if ($@) {
+  my $c = $class->new(app => $self, stash => $stash, tx => $tx);
+  unless (eval { $self->on_process->($self, $c); 1 }) {
     $self->log->fatal("Processing request failed: $@");
     $tx->res->code(500);
     $tx->resume;
@@ -259,15 +212,9 @@ sub handler {
 sub helper {
   my $self = shift;
   my $name = shift;
-
-  # Renderer
-  my $r = $self->renderer;
-
-  # Replace helper
+  my $r    = $self->renderer;
   $self->log->debug(qq/Helper "$name" already exists, replacing./)
     if exists $r->helpers->{$name};
-
-  # Add helper
   $r->add_helper($name, @_);
 }
 
@@ -346,7 +293,7 @@ Mojolicious - The Web In A Box!
   # Say hello
   sub welcome {
     my $self = shift;
-    $self->render(text => 'Hi there!');
+    $self->render_text('Hi there!');
   }
 
   # Say goodbye from a template (foo/bye.html.ep)
@@ -416,7 +363,7 @@ Web development for humans, making hard things possible and everything fun.
   use Mojolicious::Lite;
 
   # Simple route with plain text response
-  get '/hello' => sub { shift->render(text => 'Hello World!') };
+  get '/hello' => sub { shift->render_text('Hello World!') };
 
   # Route to template in DATA section
   get '/time' => 'clock';
@@ -425,14 +372,14 @@ Web development for humans, making hard things possible and everything fun.
   get '/:offset' => sub {
     my $self   = shift;
     my $offset = $self->param('offset') || 23;
-    $self->render(json => {list => [0 .. $offset]});
+    $self->render_json({list => [0 .. $offset]});
   };
 
   # Scrape information from remote sites
   post '/title' => sub {
     my $self = shift;
     my $url  = $self->param('url') || 'http://mojolicio.us';
-    $self->render(text =>
+    $self->render_text(
       $self->ua->get($url)->res->dom->at('head > title')->text);
   };
 
@@ -497,7 +444,7 @@ been separated from action code, especially when working in teams.
   use Mojo::Base 'Mojolicious::Controller';
 
   # Plain text response
-  sub hello { shift->render(text => 'Hello World!') }
+  sub hello { shift->render_text('Hello World!') }
 
   # Render external template "templates/example/clock.html.ep"
   sub clock { shift->render }
@@ -506,14 +453,14 @@ been separated from action code, especially when working in teams.
   sub restful {
     my $self   = shift;
     my $offset = $self->param('offset') || 23;
-    $self->render(json => {list => [0 .. $offset]});
+    $self->render_json({list => [0 .. $offset]});
   }
 
   # Scrape information from remote sites
   sub title {
     my $self = shift;
     my $url  = $self->param('url') || 'http://mojolicio.us';
-    $self->render(text =>
+    $self->render_text(
       $self->ua->get($url)->res->dom->at('head > title')->text);
   }
 
@@ -1011,6 +958,8 @@ Ask Bjoern Hansen
 
 Audrey Tang
 
+Ben van Staveren
+
 Breno G. de Oliveira
 
 Brian Duggan
@@ -1044,6 +993,8 @@ Gisle Aas
 Glen Hinkle
 
 Graham Barr
+
+Henry Tang
 
 Hideki Yamamura
 

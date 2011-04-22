@@ -31,7 +31,7 @@ use utf8;
 
 use Test::More tests => 67;
 
-use Mojo;
+use Mojolicious;
 use Mojo::Transaction::HTTP;
 use Mojolicious::Controller;
 use Mojolicious::Routes;
@@ -77,7 +77,7 @@ $c->stash({a => 1, b => 2});
 $stash = $c->stash;
 is_deeply $stash, {a => 1, b => 2}, 'set via hashref';
 
-$c = Test::Controller->new(app => Mojo->new);
+$c = Test::Controller->new(app => Mojolicious->new);
 $c->app->log->path(undef);
 $c->app->log->level('fatal');
 my $d = Mojolicious::Routes->new;

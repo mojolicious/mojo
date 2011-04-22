@@ -19,13 +19,8 @@ EOF
 
 use Getopt::Long 'GetOptions';
 
-# Hypnotoad
-my $toad = Mojo::Server::Hypnotoad->new;
-
-# Config
+my $toad   = Mojo::Server::Hypnotoad->new;
 my $config = 'hypnotoad.conf';
-
-# Options
 my $help;
 GetOptions(
   'config=s' => sub { $config                    = $_[1] },
@@ -33,8 +28,6 @@ GetOptions(
   help       => sub { $help                      = 1 },
   test       => sub { $ENV{HYPNOTOAD_TEST}       = 1 },
 );
-
-# Application
 $help = 1 unless my $app = shift || $ENV{HYPNOTOAD_APP};
 
 # Usage
@@ -52,7 +45,7 @@ These options are available:
   --test            Test application/configuration and exit.
 EOF
 
-# Start
+# Have fun!
 $toad->run($app, $config);
 
 __END__

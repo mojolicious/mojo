@@ -89,17 +89,10 @@ sub get_inline_template {
 # "Bodies are for hookers and fat people."
 sub render {
   my ($self, $c, $args) = @_;
-
-  # Stash
-  my $stash = $c->stash;
-
-  # Arguments
   $args ||= {};
 
-  # Content
+  my $stash   = $c->stash;
   my $content = $stash->{'mojo.content'} ||= {};
-
-  # Partial
   my $partial = $args->{partial};
 
   # Localize extends and layout
@@ -107,35 +100,17 @@ sub render {
   local $stash->{extends} = $partial ? undef : $stash->{extends};
 
   # Merge stash and arguments
-  while (my ($key, $value) = each %$args) {
-    $stash->{$key} = $value;
-  }
+  while (my ($key, $value) = each %$args) { $stash->{$key} = $value }
 
-  # Template
   my $template = delete $stash->{template};
-
-  # Template class
-  my $class = $stash->{template_class};
-
-  # Format
-  my $format = $stash->{format} || $self->default_format;
-
-  # Handler
-  my $handler = $stash->{handler};
-
-  # Data
-  my $data = delete $stash->{data};
-
-  # JSON
-  my $json = delete $stash->{json};
-
-  # Text
-  my $text = delete $stash->{text};
-
-  # Inline
-  my $inline = delete $stash->{inline};
+  my $class    = $stash->{template_class};
+  my $format   = $stash->{format} || $self->default_format;
+  my $handler  = $stash->{handler};
+  my $data     = delete $stash->{data};
+  my $json     = delete $stash->{json};
+  my $text     = delete $stash->{text};
+  my $inline   = delete $stash->{inline};
   $handler = $self->default_handler if defined $inline && !defined $handler;
-
   my $options = {
     template       => $template,
     format         => $format,
@@ -148,71 +123,44 @@ sub render {
 
   # Text
   if (defined $text) {
-
-    # Render
     $self->handlers->{text}->($self, $c, \$output, {text => $text});
-
-    # Extends
     $content->{content} = b("$output")
       if ($c->stash->{extends} || $c->stash->{layout});
   }
 
   # Data
   elsif (defined $data) {
-
-    # Render
     $self->handlers->{data}->($self, $c, \$output, {data => $data});
-
-    # Extends
     $content->{content} = b("$output")
       if ($c->stash->{extends} || $c->stash->{layout});
   }
 
   # JSON
   elsif (defined $json) {
-
-    # Render
     $self->handlers->{json}->($self, $c, \$output, {json => $json});
     $format = 'json';
-
-    # Extends
     $content->{content} = b("$output")
       if ($c->stash->{extends} || $c->stash->{layout});
   }
 
   # Template or templateless handler
   else {
-
-    # Render
     return unless $self->_render_template($c, \$output, $options);
-
-    # Extends
     $content->{content} = b($output)
       if ($c->stash->{extends} || $c->stash->{layout});
   }
 
   # Extends
   while ((my $extends = $self->_extends($c)) && !$json && !$data) {
-
-    # Stash
     my $stash = $c->stash;
-
-    # Template class
-    $class = $stash->{template_class};
+    $class                     = $stash->{template_class};
     $options->{template_class} = $class;
+    $handler                   = $stash->{handler};
+    $options->{handler}        = $handler;
+    $format                    = $stash->{format} || $self->default_format;
+    $options->{format}         = $format;
+    $options->{template}       = $extends;
 
-    # Handler
-    $handler = $stash->{handler};
-    $options->{handler} = $handler;
-
-    # Format
-    $format = $stash->{format} || $self->default_format;
-    $options->{format} = $format;
-
-    # Template
-    $options->{template} = $extends;
-
-    # Render
     $self->_render_template($c, \$output, $options);
   }
 
@@ -222,27 +170,18 @@ sub render {
     encode $encoding, $output if $encoding && $output && !$json && !$data;
   }
 
-  # Type
-  my $type = $c->app->types->type($format) || 'text/plain';
-
-  return ($output, $type);
+  return ($output, $c->app->types->type($format) || 'text/plain');
 }
 
 sub template_name {
   my ($self, $options) = @_;
 
-  # Template
   return unless my $template = $options->{template} || '';
-
-  # Format
   return unless my $format = $options->{format};
 
-  # Handler
   my $handler = $options->{handler};
-
-  # File
-  my $file = "$template.$format";
-  $file = "$file.$handler" if $handler;
+  my $file    = "$template.$format";
+  $file = "$file.$handler" if defined $handler;
 
   return $file;
 }
@@ -259,9 +198,6 @@ sub _detect_handler {
   # Disabled
   return unless $self->detect_templates;
 
-  # Template class
-  my $class = $self->_detect_template_class($options);
-
   # Templates
   my $templates = $self->{_templates};
   unless ($templates) {
@@ -270,6 +206,7 @@ sub _detect_handler {
   }
 
   # Inline templates
+  my $class  = $self->_detect_template_class($options);
   my $inline = $self->{_inline_templates}->{$class}
     ||= $self->_list_inline_templates($class);
 
@@ -296,24 +233,16 @@ sub _detect_template_class {
 
 sub _extends {
   my ($self, $c) = @_;
-
-  # Layout
   my $stash = $c->stash;
   if (my $layout = delete $stash->{layout}) {
     $stash->{extends} ||= $self->layout_prefix . '/' . $layout;
   }
-
-  # Extends
   return delete $stash->{extends};
 }
 
 sub _list_inline_templates {
   my ($self, $class) = @_;
-
-  # Get all
   my $all = Mojo::Command->new->get_all_data($class);
-
-  # List
   return [keys %$all];
 }
 

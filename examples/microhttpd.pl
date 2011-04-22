@@ -11,14 +11,11 @@ use lib "$FindBin::Bin/../lib";
 #  I'll get the powder, sir."
 use Mojo::IOLoop;
 
-# The loop
-my $loop = Mojo::IOLoop->new;
-
 # Buffer for incoming data
 my $buffer = {};
 
 # Minimal ioloop example demonstrating how to cheat at HTTP benchmarks :)
-$loop->listen(
+Mojo::IOLoop->listen(
   port      => 3000,
   on_accept => sub {
     my ($loop, $id) = @_;
@@ -59,6 +56,6 @@ On a MacBook Pro 13" this results in about 25k req/s.
 EOF
 
 # Start loop
-$loop->start;
+Mojo::IOLoop->start;
 
 1;

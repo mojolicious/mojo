@@ -68,9 +68,7 @@ sub param {
   $self->remove($name) if defined $_[0];
 
   # Append
-  for my $value (@_) {
-    $self->append($name, $value);
-  }
+  $self->append($name, $_) for @_;
 
   # List values
   my @values;
@@ -89,10 +87,7 @@ sub parse {
   # Clear
   $self->params([]);
 
-  # Shortcut
   return $self unless defined $string;
-
-  # Charset
   my $charset = $self->charset;
 
   # Detect query string without key/value pairs
@@ -156,7 +151,6 @@ sub parse {
 #  he'd eat you and everyone you care about!"
 sub remove {
   my ($self, $name) = @_;
-
   $name = '' unless defined $name;
 
   # Remove
@@ -171,10 +165,10 @@ sub remove {
 }
 
 sub to_hash {
-  my $self   = shift;
-  my $params = $self->params;
+  my $self = shift;
 
   # Format
+  my $params = $self->params;
   my %params;
   for (my $i = 0; $i < @$params; $i += 2) {
     my $name  = $params->[$i];
@@ -195,10 +189,9 @@ sub to_hash {
 }
 
 sub to_string {
-  my $self   = shift;
-  my $params = $self->params;
+  my $self = shift;
 
-  # Shortcut
+  my $params = $self->params;
   return '' unless @{$self->params};
 
   # Format

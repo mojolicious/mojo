@@ -35,10 +35,7 @@ my $CACHE = {};
 
 sub chmod_file {
   my ($self, $path, $mod) = @_;
-
-  # chmod
   chmod $mod, $path or croak qq/Can't chmod path "$path": $!/;
-
   $mod = sprintf '%lo', $mod;
   print "  [chmod] $path $mod\n" unless $self->quiet;
   return $self;
@@ -46,30 +43,19 @@ sub chmod_file {
 
 sub chmod_rel_file {
   my ($self, $path, $mod) = @_;
-
-  # Path
-  $path = $self->rel_file($path);
-
-  # chmod
-  $self->chmod_file($path, $mod);
+  $self->chmod_file($self->rel_file($path), $mod);
 }
 
 sub class_to_file {
   my ($self, $class) = @_;
-
-  # Class to file
   $class =~ s/:://g;
   decamelize $class;
-
   return $class;
 }
 
 sub class_to_path {
   my ($self, $class) = @_;
-
-  # Class to path
   my $path = join '/', split /::/, $class;
-
   return "$path.pm";
 }
 
@@ -82,7 +68,7 @@ sub create_dir {
     return $self;
   }
 
-  # Make
+  # Create
   File::Path::mkpath($path) or croak qq/Can't make directory "$path": $!/;
   print "  [mkdir] $path\n" unless $self->quiet;
   return $self;
@@ -90,12 +76,7 @@ sub create_dir {
 
 sub create_rel_dir {
   my ($self, $path) = @_;
-
-  # Path
-  $path = $self->rel_dir($path);
-
-  # Create
-  $self->create_dir($path);
+  $self->create_dir($self->rel_dir($path));
 }
 
 sub detect {
@@ -157,10 +138,7 @@ sub get_all_data {
   my $all = {};
   while (@data) {
     my ($name, $content) = splice @data, 0, 2;
-
-    # Base 64
     b64_decode $content if $name =~ s/\s*\(\s*base64\s*\)$//;
-
     $all->{$name} = $content;
   }
 
@@ -169,10 +147,7 @@ sub get_all_data {
 
 sub get_data {
   my ($self, $data, $class) = @_;
-
-  # All data
   my $all = $self->get_all_data($class);
-
   return $all->{$data};
 }
 
@@ -186,46 +161,27 @@ sub help {
 
 sub rel_dir {
   my ($self, $path) = @_;
-
-  # Parts
   my @parts = split /\//, $path;
-
-  # Render
   return File::Spec->catdir(Cwd::getcwd(), @parts);
 }
 
 sub rel_file {
   my ($self, $path) = @_;
-
-  # Parts
   my @parts = split /\//, $path;
-
-  # Render
   return File::Spec->catfile(Cwd::getcwd(), @parts);
 }
 
 sub render_data {
   my $self = shift;
   my $data = shift;
-
-  # Get data
-  my $template = $self->get_data($data);
-
-  # Render
-  return $self->renderer->render($template, @_);
+  return $self->renderer->render($self->get_data($data), @_);
 }
 
 sub render_to_file {
   my $self = shift;
   my $data = shift;
   my $path = shift;
-
-  # Render
-  my $content = $self->render_data($data, @_);
-
-  # Write
-  $self->write_file($path, $content);
-
+  $self->write_file($path, $self->render_data($data, @_));
   return $self;
 }
 
@@ -233,12 +189,7 @@ sub render_to_rel_file {
   my $self = shift;
   my $data = shift;
   my $path = shift;
-
-  # Path
-  $path = $self->rel_dir($path);
-
-  # Render
-  $self->render_to_file($data, $path, @_);
+  $self->render_to_file($data, $self->rel_dir($path), @_);
 }
 
 # "My cat's breath smells like cat food."
@@ -344,8 +295,6 @@ sub run {
     my $padding     = ' ' x ($len - length $name);
     print "  $name$padding   $description";
   }
-
-  # Hint
   print $self->hint;
 
   return $self;
@@ -383,19 +332,14 @@ sub write_file {
 
   # Write unbuffered
   $file->syswrite($data);
-
   print "  [write] $path\n" unless $self->quiet;
+
   return $self;
 }
 
 sub write_rel_file {
   my ($self, $path, $data) = @_;
-
-  # Path
-  $path = $self->rel_file($path);
-
-  # Write
-  $self->write_file($path, $data);
+  $self->write_file($self->rel_file($path), $data);
 }
 
 1;

@@ -29,14 +29,11 @@ sub register {
       my $list = join ', ', sort keys %{$c->stash};
       my $key = $options->{cache} = md5_sum "$path($list)";
 
-      # Stash defaults
       $c->stash->{layout} ||= undef;
 
       # Cache
       my $cache = $r->cache;
       unless ($cache->get($key)) {
-
-        # Initialize
         my $mt = Mojo::Template->new($template);
 
         # Self
@@ -66,7 +63,7 @@ sub register {
           $prepend .= " my \$$var = \$_S->{'$var'};";
         }
 
-        # Prepend
+        # Prepend generated code
         $mt->prepend($prepend);
 
         # Cache

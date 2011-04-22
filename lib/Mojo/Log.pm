@@ -42,11 +42,7 @@ sub is_info  { shift->is_level('info') }
 
 sub is_level {
   my ($self, $level) = @_;
-
-  # Shortcut
   return unless $level;
-
-  # Check
   $level = lc $level;
   my $current = $ENV{MOJO_LOG_LEVEL} || $self->level;
   return $LEVEL->{$level} >= $LEVEL->{$current};

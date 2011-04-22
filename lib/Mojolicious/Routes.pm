@@ -25,11 +25,9 @@ sub AUTOLOAD {
   # Method
   my ($package, $method) = our $AUTOLOAD =~ /^([\w\:]+)\:\:(\w+)$/;
 
-  # Shortcuts
+  # Call shortcut
   Carp::croak(qq/Can't locate object method "$method" via "$package"/)
     unless my $shortcut = $self->shortcuts->{$method};
-
-  # Run
   return $self->$shortcut(@_);
 }
 
@@ -77,30 +75,19 @@ sub any {
 sub auto_render {
   my ($self, $c) = @_;
 
-  # Transaction
-  my $tx = $c->tx;
-
   # Rendering
-  my $success = eval {
-
-    # Stash
+  my $tx = $c->tx;
+  eval {
     my $stash = $c->stash;
-
-    # Render
     unless ($stash->{'mojo.rendered'} || $tx->is_websocket) {
 
       # Render template or not_found if the route never reached an action
       $c->render or ($stash->{'mojo.routed'} or $c->render_not_found);
     }
 
-    # Success
     1;
-  };
+  } or $c->render_exception($@);
 
-  # Renderer error
-  $c->render_exception($@) if !$success && $@;
-
-  # Rendered
   return;
 }
 
@@ -110,41 +97,28 @@ sub del { shift->_generate_route('delete', @_) }
 
 sub detour {
   my $self = shift;
-
-  # Partial
   $self->partial('path');
-
-  # Defaults
   $self->to(@_);
-
   return $self;
 }
 
 sub dispatch {
   my ($self, $c) = @_;
 
-  # Request
-  my $req = $c->req;
-
   # Path
+  my $req  = $c->req;
   my $path = $c->stash->{path};
-  $path = "/$path" if defined $path && $path !~ /^\//;
-  $path = $req->url->path->to_abs_string unless $path;
-
-  # Method
-  my $method = $req->method;
-
-  # WebSocket
-  my $websocket = $c->tx->is_websocket ? 1 : 0;
+  if (defined $path) { $path = "/$path" if $path !~ /^\// }
+  else               { $path = $req->url->path->to_abs_string }
 
   # Match
+  my $method = $req->method;
+  my $websocket = $c->tx->is_websocket ? 1 : 0;
   my $m = Mojolicious::Routes::Match->new($method => $path, $websocket);
   $c->match($m);
 
-  # Cache
-  my $cache = $self->cache;
-
   # Cached
+  my $cache = $self->cache;
   if (my $cached = $cache->get("$method:$path:$websocket")) {
     $m->root($self);
     $m->stack($cached->{stack});
@@ -154,8 +128,6 @@ sub dispatch {
 
   # Lookup
   else {
-
-    # Match
     $m->match($self, $c);
 
     # Endpoint found
@@ -218,8 +190,6 @@ sub is_websocket {
   return;
 }
 
-# "Dr. Zoidberg, can you note the time and declare the patient legally dead?
-#  Can I! That’s my specialty!"
 sub name {
   my $self = shift;
 
@@ -249,14 +219,9 @@ EOF
 
 sub over {
   my $self = shift;
-
-  # Shortcut
   return $self unless @_;
-
-  # Conditions
   my $conditions = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
   push @{$self->conditions}, @$conditions;
-
   return $self;
 }
 
@@ -304,19 +269,14 @@ sub render {
 # "Morbo forget how you spell that letter that looks like a man wearing a hat.
 #  Hello, tiny man. I will destroy you!"
 sub route {
-  my $self = shift;
-
-  # New route
+  my $self  = shift;
   my $route = $self->new(@_);
   $self->add_child($route);
-
   return $route;
 }
 
 sub to {
   my $self = shift;
-
-  # Shortcut
   return $self unless @_;
 
   # Single argument
@@ -409,58 +369,38 @@ sub websocket {
 }
 
 sub _dispatch_callback {
-  my ($self, $c, $cb, $staging) = @_;
+  my ($self, $c, $field, $staging) = @_;
 
   # Routed
   $c->stash->{'mojo.routed'} = 1;
-
-  # Debug
   $c->app->log->debug(qq/Dispatching callback./);
 
   # Dispatch
   my $continue;
-  my $success = eval {
-
-    # Callback
-    $continue = $cb->($c);
-
-    # Success
-    1;
-  };
-
-  # Callback error
-  if (!$success && $@) {
+  unless (eval { $continue = $field->{cb}->($c); 1 }) {
     my $e = Mojo::Exception->new($@);
     $c->app->log->error($e);
     return $e;
   }
 
-  # Success!
-  return 1 unless $staging;
-  return 1 if $continue;
-
+  return 1 if !$staging || $continue;
   return;
 }
 
 sub _dispatch_controller {
-  my ($self, $c, $app, $field, $staging) = @_;
+  my ($self, $c, $field, $staging) = @_;
 
-  # Class
-  $app ||= $self->_generate_class($field, $c);
-  return 1 unless $app;
-
-  # Method
+  # Class and method
+  return 1
+    unless my $app = $field->{app} || $self->_generate_class($field, $c);
   my $method = $self->_generate_method($field, $c);
 
-  # Debug
   my $dispatch = ref $app || $app;
   $dispatch .= "->$method" if $method;
   $c->app->log->debug("Dispatching $dispatch.");
 
   # Load class
   if (!ref $app && !$self->{_loaded}->{$app}) {
-
-    # Load
     if (my $e = Mojo::Loader->load($app)) {
 
       # Doesn't exist
@@ -481,25 +421,20 @@ sub _dispatch_controller {
   # Dispatch
   my $continue;
   my $success = eval {
-
-    # Instantiate
     $app = $app->new($c) unless ref $app;
 
     # Action
     if ($method && $app->isa($self->controller_base_class)) {
-
-      # Stash
       my $stash = $c->stash;
 
       # Call action
       if ($app->can($method)) {
-
-        # Routed
-        $stash->{'mojo.routed'} = 1;
-
-        # Action
+        $stash->{'mojo.routed'} = 1 unless $staging;
         $continue = $app->$method;
       }
+
+      # Render
+      elsif (!$staging) { $self->auto_render($app) }
 
       # Merge stash
       my $new = $app->stash;
@@ -518,25 +453,21 @@ sub _dispatch_controller {
         }
       }
 
-      # Handler
       $app->handler($c);
     }
 
-    # Success
     1;
   };
 
   # Controller error
-  if (!$success && $@) {
+  unless ($success) {
     my $e = Mojo::Exception->new($@);
     $c->app->log->error($e);
+    $app->render_exception($e) if $app->can('render_exception');
     return $e;
   }
 
-  # Success!
-  return 1 unless $staging;
-  return 1 if $continue;
-
+  return 1 if !$staging || $continue;
   return;
 }
 
@@ -573,13 +504,9 @@ sub _generate_method {
     $self->{_hidden}->{$_}++ for @{$self->hidden};
   }
 
-  my $method = $field->{method};
-  $method ||= $field->{action};
+  return unless my $method = $field->{method} || $field->{action};
 
-  # Shortcut
-  return unless $method;
-
-  # Shortcut for hidden methods
+  # Hidden
   if ($self->{_hidden}->{$method} || index($method, '_') == 0) {
     $c->app->log->debug(qq/Action "$method" is not allowed./);
     return;
@@ -650,10 +577,7 @@ sub _walk_stack {
   # Stacktrace
   local $SIG{__DIE__} = sub { Mojo::Exception->throw(@_) };
 
-  # Stack
   my $stack = $c->match->stack;
-
-  # Stash
   my $stash = $c->stash;
   $stash->{'mojo.captures'} ||= {};
 
@@ -661,14 +585,6 @@ sub _walk_stack {
   my $staging = @$stack;
   for my $field (@$stack) {
     $staging--;
-
-    # Hide callback and app
-    my $cb = $field->{cb};
-    local $field->{cb};
-    delete $field->{cb};
-    my $app = $field->{app};
-    local $field->{app};
-    delete $field->{app};
 
     # Merge in captures
     if (my @keys = keys %$field) {
@@ -679,9 +595,9 @@ sub _walk_stack {
 
     # Dispatch
     my $e =
-        $cb
-      ? $self->_dispatch_callback($c, $cb, $staging)
-      : $self->_dispatch_controller($c, $app, $field, $staging);
+        $field->{cb}
+      ? $self->_dispatch_callback($c, $field, $staging)
+      : $self->_dispatch_controller($c, $field, $staging);
 
     # Exception
     if (ref $e) {

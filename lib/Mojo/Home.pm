@@ -76,13 +76,8 @@ sub lib_dir {
 sub list_files {
   my ($self, $dir) = @_;
 
-  # Parts
   my $parts = $self->{_parts} || [];
-
-  # Root
   my $root = File::Spec->catdir(@$parts);
-
-  # Directory
   $dir = File::Spec->catdir($root, split '/', ($dir || ''));
 
   # Read directory

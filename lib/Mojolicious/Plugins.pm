@@ -10,14 +10,9 @@ has namespaces => sub { ['Mojolicious::Plugin'] };
 #  And that it would be in New Jersey?"
 sub add_hook {
   my ($self, $name, $cb) = @_;
-
-  # Shortcut
   return $self unless $name && $cb;
-
-  # Add
   $self->hooks->{$name} ||= [];
   push @{$self->hooks->{$name}}, $cb;
-
   return $self;
 }
 
@@ -56,21 +51,13 @@ sub register_plugin {
   my $self = shift;
   my $name = shift;
   my $app  = shift;
-
-  # Arguments
-  my $args = ref $_[0] ? $_[0] : {@_};
-
-  # Register
-  return $self->load_plugin($name)->register($app, $args);
+  return $self->load_plugin($name)->register($app, ref $_[0] ? $_[0] : {@_});
 }
 
 sub run_hook {
   my $self = shift;
 
-  # Name
-  return $self unless my $name = shift;
-
-  # Hooks
+  return $self unless my $name  = shift;
   return $self unless my $hooks = $self->hooks->{$name};
 
   # DEPRECATED in Hot Beverage! (passing $self)
@@ -83,10 +70,7 @@ sub run_hook {
 sub run_hook_reverse {
   my $self = shift;
 
-  # Name
-  return $self unless my $name = shift;
-
-  # Hooks
+  return $self unless my $name  = shift;
   return $self unless my $hooks = $self->hooks->{$name};
 
   # DEPRECATED in Hot Beverage! (passing $self)

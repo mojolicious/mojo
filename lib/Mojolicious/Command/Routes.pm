@@ -14,7 +14,6 @@ EOF
 sub run {
   my $self = shift;
 
-  # App
   my $app = Mojo::Server->new->app;
   die "Application has no routes.\n" unless $app->can('routes');
 
@@ -75,8 +74,6 @@ sub _walk {
     $line .= '+ ';
   }
   $line .= $pattern;
-
-  # Store
   push @$routes, [$line, $node];
 
   # Walk

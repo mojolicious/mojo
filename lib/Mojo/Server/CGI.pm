@@ -1,7 +1,7 @@
 package Mojo::Server::CGI;
 use Mojo::Base 'Mojo::Server';
 
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 256000;
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 131072;
 
 has nph => 0;
 
@@ -31,9 +31,8 @@ sub run {
   # Handle
   $self->on_handler->($self, $tx);
 
-  my $res = $tx->res;
-
   # Response start line
+  my $res    = $tx->res;
   my $offset = 0;
   if ($self->nph) {
     while (1) {

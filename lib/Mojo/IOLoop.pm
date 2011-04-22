@@ -197,14 +197,8 @@ sub new {
 
 sub connect {
   my $self = shift;
-
-  # Singleton
   $self = $self->singleton unless ref $self;
-
-  # Arguments
   my $args = ref $_[0] ? $_[0] : {@_};
-
-  # Protocol
   $args->{proto} ||= 'tcp';
 
   # New connection
@@ -252,8 +246,6 @@ sub connection_timeout {
 
 sub dns_servers {
   my $self = shift;
-
-  # Singleton
   $self = $self->singleton unless ref $self;
 
   # New servers
@@ -273,8 +265,6 @@ sub dns_servers {
 
 sub drop {
   my ($self, $id) = @_;
-
-  # Singleton
   $self = $self->singleton unless ref $self;
 
   # Drop connection gracefully
@@ -306,8 +296,6 @@ sub generate_port {
 
 sub is_running {
   my $self = shift;
-
-  # Singleton
   $self = $self->singleton unless ref $self;
 
   # Running
@@ -318,25 +306,18 @@ sub is_running {
 #  He is the cancer and I am the… uh… what cures cancer?"
 sub listen {
   my $self = shift;
-
-  # Singleton
   $self = $self->singleton unless ref $self;
-
-  # Arguments
   my $args = ref $_[0] ? $_[0] : {@_};
 
-  # TLS check
   croak "IO::Socket::SSL 1.37 required for TLS support"
     if $args->{tls} && !TLS;
 
-  # Options
   my %options = (
     Listen => $args->{backlog} || SOMAXCONN,
     Proto  => 'tcp',
     Type   => SOCK_STREAM,
     %{$args->{args} || {}}
   );
-
   my $file = $args->{file};
   my $port = $args->{port} || 3000;
 
@@ -355,11 +336,7 @@ sub listen {
   # Listen on UNIX domain socket
   my $socket;
   if (defined $file) {
-
-    # Path
     $options{Local} = $file;
-
-    # Create socket
     $socket =
       defined $fd
       ? IO::Socket::UNIX->new
@@ -369,8 +346,6 @@ sub listen {
 
   # Listen on port
   else {
-
-    # Socket options
     $options{LocalAddr} = $args->{address} || '0.0.0.0';
     $options{LocalPort} = $port;
     $options{Proto}     = 'tcp';
@@ -380,7 +355,6 @@ sub listen {
     $options{LocalAddr} =~ s/[\[\]]//g;
     my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';
 
-    # Create socket
     $socket = defined $fd ? $class->new : $class->new(%options)
       or croak "Can't create listen socket: $!";
   }
@@ -405,19 +379,13 @@ sub listen {
     on_read   => $args->{on_read},
   };
   (my $id) = "$c" =~ /0x([\da-f]+)/;
-  $self->{_listen}->{$id} = $c;
-
-  # File descriptor
-  $self->{_fds}->{$fd} = $id;
-
-  # Socket
-  $c->{handle} = $socket;
+  $self->{_listen}->{$id}      = $c;
+  $self->{_fds}->{$fd}         = $id;
+  $c->{handle}                 = $socket;
   $self->{_reverse}->{$socket} = $id;
 
   # TLS
   if ($args->{tls}) {
-
-    # Defaults
     my %options = (
       SSL_startHandshake => 0,
       SSL_cert_file      => $args->{tls_cert} || $self->_prepare_cert,
@@ -457,8 +425,6 @@ sub local_info {
 
 sub lookup {
   my ($self, $name, $cb) = @_;
-
-  # Singleton
   $self = $self->singleton unless ref $self;
 
   # "localhost"
@@ -503,10 +469,7 @@ sub one_tick {
   my ($self, $timeout) = @_;
   $timeout = $self->timeout unless defined $timeout;
 
-  # Prepare listen sockets
   $self->_prepare_listen;
-
-  # Prepare connections
   $self->_prepare_connections;
 
   my $loop = $self->_prepare_loop;
@@ -524,8 +487,6 @@ sub one_tick {
     # Events
     for my $kev (@ret) {
       my ($fd, $filter, $flags, $fflags) = @$kev;
-
-      # Id
       my $id = $self->{_fds}->{$fd};
       next unless $id;
 
@@ -629,20 +590,14 @@ sub remote_info {
 
 sub resolve {
   my ($self, $name, $type, $cb) = @_;
-
-  # Singleton
   $self = $self->singleton unless ref $self;
 
-  # Regex
   my $ipv4;
   $ipv4 = 1 if $name =~ $Mojo::URL::IPV4_RE;
   my $ipv6;
   $ipv6 = 1 if IPV6_DNS && $name =~ $Mojo::URL::IPV6_RE;
 
-  # Type
-  my $t = $DNS_TYPES->{$type};
-
-  # Server
+  my $t      = $DNS_TYPES->{$type};
   my $server = $self->dns_servers;
 
   # No lookup required or record type not supported
@@ -653,13 +608,9 @@ sub resolve {
 
   warn "RESOLVE $type $name ($server)\n" if DEBUG;
 
-  # Timer
-  my $timer;
-
-  # Transaction
-  my $tx = int rand 0x10000;
-
   # Request
+  my $timer;
+  my $tx = int rand 0x10000;
   my $id = $self->connect(
     address    => $server,
     port       => 53,
@@ -692,7 +643,6 @@ sub resolve {
       }
       $req .= pack 'Cnn', 0, $t, 0x0001;
 
-      # Write
       $self->write($id => $req);
     },
     on_error => sub {
@@ -713,7 +663,6 @@ sub resolve {
       $self->drop($id);
       $self->drop($timer) if $timer;
 
-      # Packet
       my @packet = unpack 'nnnnnna*', $chunk;
 
       warn "ANSWERS $packet[3] ($server)\n" if DEBUG;
@@ -721,7 +670,6 @@ sub resolve {
       # Wrong response
       return $self->$cb([]) unless $packet[0] eq $tx;
 
-      # Content
       my $content = $packet[6];
 
       # Questions
@@ -749,7 +697,6 @@ sub resolve {
         warn "ANSWER $answer[0] $answer[1]\n" if DEBUG;
       }
 
-      # Done
       $self->$cb(\@answers);
     }
   );
@@ -777,8 +724,6 @@ sub singleton { $LOOP ||= shift->new(@_) }
 
 sub start {
   my $self = shift;
-
-  # Singleton
   $self = $self->singleton unless ref $self;
 
   # Already running
@@ -803,12 +748,8 @@ sub start_tls {
     return;
   }
 
-  # Arguments
   my $args = ref $_[0] ? $_[0] : {@_};
-
   weaken $self;
-
-  # Options
   my %options = (
     SSL_startHandshake => 0,
     SSL_error_trap     => sub { $self->_error($id, $_[1]) },
@@ -821,9 +762,9 @@ sub start_tls {
 
   $self->drop($id) and return unless my $c      = $self->{_cs}->{$id};
   $self->drop($id) and return unless my $socket = $c->{handle};
-  my $fd = fileno $socket;
 
   # Cleanup
+  my $fd = fileno $socket;
   delete $self->{_reverse}->{$socket};
   my $writing = delete $c->{writing};
   my $loop    = $self->_prepare_loop;
@@ -848,11 +789,7 @@ sub start_tls {
 
 sub stop {
   my $self = shift;
-
-  # Singleton
   $self = $self->singleton unless ref $self;
-
-  # Stop
   delete $self->{_running};
 }
 
@@ -874,11 +811,7 @@ sub test {
 
 sub timer {
   my $self = shift;
-
-  # Singleton
   $self = $self->singleton unless ref $self;
-
-  # Timer
   $self->_add_loop_event(timer => pop, after => pop, started => time);
 }
 
@@ -888,20 +821,14 @@ sub write {
   my $c = $self->{_cs}->{$id};
   $c->{buffer} .= $chunk;
 
-  # UNIX only
+  # UNIX only quick write
   unless (WINDOWS) {
-
-    # Callback
     $c->{drain} = 0 if $cb;
-
-    # Fast write
     $self->_write($id);
   }
 
-  # Callback
+  # Write with roundtrip
   $c->{drain} = $cb if $cb;
-
-  # Writing
   $self->_writing($id) if $cb || length $c->{buffer};
 }
 
@@ -910,14 +837,8 @@ sub _accept {
 
   # Accept
   my $socket = $listen->accept or return;
-
-  # Reverse map
-  my $r = $self->{_reverse};
-
-  # Listen
-  my $l = $self->{_listen}->{$r->{$listen}};
-
-  weaken $self;
+  my $r      = $self->{_reverse};
+  my $l      = $self->{_listen}->{$r->{$listen}};
 
   # New connection
   my $c = {buffer => ''};
@@ -925,15 +846,17 @@ sub _accept {
   $self->{_cs}->{$id} = $c;
 
   # TLS handshake
+  weaken $self;
   if (my $tls = $l->{tls}) {
     $tls->{SSL_error_trap} = sub { $self->_error($id, $_[1]) };
     $socket = IO::Socket::SSL->start_SSL($socket, %$tls);
     $c->{tls_accept} = 1;
   }
 
-  # Socket
   $c->{handle} = $socket;
   $r->{$socket} = $id;
+  my $fd = fileno $socket;
+  $self->{_fds}->{$fd} = $id;
 
   # Non-blocking
   $socket->blocking(0);
@@ -941,23 +864,18 @@ sub _accept {
   # Disable Nagle's algorithm
   setsockopt($socket, IPPROTO_TCP, TCP_NODELAY, 1) unless $l->{file};
 
-  # File descriptor
-  my $fd = fileno $socket;
-  $self->{_fds}->{$fd} = $id;
-
   # Register callbacks
   for my $name (qw/on_error on_hup on_read/) {
     my $cb = $l->{$name};
     $self->$name($id => $cb) if $cb;
   }
 
-  # Add socket to poll
+  # Add socket to mainloop
   $self->_not_writing($id);
 
   # Accept limit
-  if (defined $self->{_accepts}) {
-    $self->max_connections(0) if --$self->{_accepts} == 0;
-  }
+  $self->max_connections(0)
+    if defined $self->{_accepts} && --$self->{_accepts} == 0;
 
   warn "ACCEPTED $id\n" if DEBUG;
 
@@ -971,10 +889,8 @@ sub _accept {
 
 sub _add_event {
   my ($self, $event, $id, $cb) = @_;
-
   return unless my $c = $self->{_cs}->{$id};
   $c->{$event} = $cb if $cb;
-
   return $self;
 }
 
@@ -995,7 +911,6 @@ sub _connect {
 
   return unless my $c = $self->{_cs}->{$id};
 
-  # Options
   my %options = (
     Blocking => 0,
     PeerAddr => $args->{address},
@@ -1013,7 +928,7 @@ sub _connect {
     $options{PeerAddr} =~ s/[\[\]]//g if $options{PeerAddr};
     my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';
 
-    # Socket
+    # New socket
     return $self->_error($id, "Couldn't connect.")
       unless $handle = $class->new(%options);
 
@@ -1022,7 +937,7 @@ sub _connect {
       $self->timer($self->connect_timeout,
       sub { shift->_error($id, 'Connect timeout.') });
 
-    # IPv6
+    # IPv6 needs an early start
     $handle->connect if IPV6;
   }
   $c->{handle} = $handle;
@@ -1031,7 +946,6 @@ sub _connect {
   # Non-blocking
   $handle->blocking(0);
 
-  # File descriptor
   return unless defined(my $fd = fileno $handle);
   $self->{_fds}->{$fd} = $id;
 
@@ -1050,8 +964,6 @@ sub _drop_immediately {
   # Drop loop events
   for my $event (qw/idle tick timer/) {
     if ($self->{"_$event"}->{$id}) {
-
-      # Drop
       delete $self->{"_$event"}->{$id};
       return $self;
     }
@@ -1099,7 +1011,6 @@ sub _drop_immediately {
       else { $loop->remove($handle) }
     }
 
-    # Close handle
     close $handle;
   }
 
@@ -1124,16 +1035,13 @@ sub _error {
 sub _hup {
   my ($self, $id) = @_;
 
-  # Get hup callback
   my $event = $self->{_cs}->{$id}->{hup};
 
   # Cleanup
   $self->_drop_immediately($id);
 
-  # No event
+  # Handle HUP
   return unless $event;
-
-  # HUP callback
   $self->_run_event('hup', $event, $id);
 }
 
@@ -1170,7 +1078,7 @@ sub _not_writing {
   return $c->{read_only} = 1 if length $c->{buffer};
   return unless my $handle = $c->{handle};
 
-  # Writing
+  # Already not writing
   my $writing = $c->{writing};
   return if defined $writing && !$writing;
 
@@ -1339,9 +1247,12 @@ sub _prepare_key {
 sub _prepare_listen {
   my $self = shift;
 
+  # Already listening or no listen sockets
   return if $self->{_listening};
   my $listen = $self->{_listen} ||= {};
   return unless keys %$listen;
+
+  # Check if we are allowed to listen
   my $i = keys %{$self->{_cs}};
   return unless $i < $self->max_connections;
   return unless $self->on_lock->($self, !$i);
@@ -1401,6 +1312,7 @@ sub _read {
   # Listen socket (new connection)
   if (my $l = $self->{_listen}->{$id}) { $self->_accept($l->{handle}) }
 
+  # Check if everything is ready to read
   my $c = $self->{_cs}->{$id};
   return $self->_tls_accept($id)  if $c->{tls_accept};
   return $self->_tls_connect($id) if $c->{tls_connect};
@@ -1425,7 +1337,7 @@ sub _read {
   # EOF
   return $self->_hup($id) if $read == 0;
 
-  # Callback
+  # Handle read
   my $event = $c->{read};
   $self->_run_event('read', $event, $id, $buffer) if $event;
 
@@ -1472,21 +1384,18 @@ sub _run_event {
 sub _timer {
   my $self = shift;
 
+  # Nothing to do
   return unless my $ts = $self->{_timer};
 
-  # Check
+  # Check timers
   my $count = 0;
   for my $id (keys %$ts) {
     my $t = $ts->{$id};
-
-    # Timer
     my $after = $t->{after} || 0;
     if ($after <= time - $t->{started}) {
 
-      # Drop
+      # Handle timer
       $self->_drop_immediately($id);
-
-      # Callback
       if (my $cb = $t->{cb}) {
         $self->_run_callback('timer', $cb);
         $count++;
@@ -1500,18 +1409,14 @@ sub _timer {
 sub _tls_accept {
   my ($self, $id) = @_;
 
-  my $c = $self->{_cs}->{$id};
-
   # Accepted
+  my $c = $self->{_cs}->{$id};
   if ($c->{handle}->accept_SSL) {
 
-    # Cleanup
+    # Handle TLS accept
     delete $c->{tls_accept};
-
-    # Accept callback
     my $cb = $c->{on_accept};
     $self->_run_event('accept', $cb, $id) if $cb;
-
     return;
   }
 
@@ -1522,18 +1427,14 @@ sub _tls_accept {
 sub _tls_connect {
   my ($self, $id) = @_;
 
-  my $c = $self->{_cs}->{$id};
-
   # Connected
+  my $c = $self->{_cs}->{$id};
   if ($c->{handle}->connect_SSL) {
 
-    # Cleanup
+    # Handle TLS connect
     delete $c->{tls_connect};
-
-    # Connect callback
     my $cb = $c->{on_connect};
     $self->_run_event('connect', $cb, $id) if $cb;
-
     return;
   }
 
@@ -1543,7 +1444,6 @@ sub _tls_connect {
 
 sub _tls_error {
   my ($self, $id) = @_;
-
   my $error = $IO::Socket::SSL::SSL_ERROR;
 
   # Reading
@@ -1556,6 +1456,7 @@ sub _tls_error {
 sub _write {
   my ($self, $id) = @_;
 
+  # Check if we are ready for writing
   my $c = $self->{_cs}->{$id};
   return $self->_tls_accept($id)  if $c->{tls_accept};
   return $self->_tls_connect($id) if $c->{tls_connect};
@@ -1574,12 +1475,12 @@ sub _write {
 
     warn "CONNECTED $id\n" if DEBUG;
 
-    # Connect callback
+    # Handle connect
     my $cb = $c->{on_connect};
     $self->_run_event('connect', $cb, $id) if $cb && !$c->{tls};
   }
 
-  # Callback
+  # Handle drain
   if ($c->{drain} && (my $event = delete $c->{drain})) {
     $self->_run_event('drain', $event, $id);
   }
@@ -1610,11 +1511,11 @@ sub _write {
 sub _writing {
   my ($self, $id) = @_;
 
-  my $c = $self->{_cs}->{$id};
-
   # Writing again
+  my $c = $self->{_cs}->{$id};
   delete $c->{read_only};
 
+  # Already writing or nothing to write to
   return if my $writing = $c->{writing};
   return unless my $handle = $c->{handle};
 

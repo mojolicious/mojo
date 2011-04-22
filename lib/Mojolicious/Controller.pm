@@ -266,7 +266,6 @@ sub render_data { shift->render(data => shift, @_) }
 sub render_exception {
   my ($self, $e) = @_;
   $e = Mojo::Exception->new($e);
-
   $self->app->log->error($e);
 
   # Recursion
@@ -307,13 +306,8 @@ sub render_exception {
         $mode eq 'development' ? $DEVELOPMENT_EXCEPTION : $EXCEPTION;
       $options->{handler} = 'ep';
       $self->render($options);
-
-      # Render
-      $self->render($options);
     }
   }
-
-  $self->rendered;
 }
 
 sub render_inner {
@@ -365,7 +359,6 @@ sub render_later { shift->stash->{'mojo.rendered'} = 1 }
 #  Lick my frozen metal ass."
 sub render_not_found {
   my ($self, $resource) = @_;
-
   $self->app->log->debug(qq/Resource "$resource" not found./)
     if $resource;
 
@@ -403,13 +396,9 @@ sub render_not_found {
       $options->{inline} =
         $mode eq 'development' ? $DEVELOPMENT_NOT_FOUND : $NOT_FOUND;
       $options->{handler} = 'ep';
-
-      # Render
       $self->render($options);
     }
   }
-
-  $self->rendered;
 }
 
 # "You called my thesis a fat sack of barf, and then you stole it?

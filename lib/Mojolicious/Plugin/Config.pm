@@ -9,7 +9,6 @@ use constant DEBUG => $ENV{MOJO_CONFIG_DEBUG} || 0;
 # "Who are you, my warranty?!"
 sub load {
   my ($self, $file, $conf, $app) = @_;
-
   $app->log->debug(qq/Reading config file "$file"./);
 
   # Slurp UTF-8 file
@@ -76,7 +75,6 @@ sub register {
     # All missing
     die qq/Config file "$file" missing, maybe you need to create it?\n/
       unless $conf->{default};
-
     $app->log->debug(qq/Config file "$file" missing, using default config./);
   }
 

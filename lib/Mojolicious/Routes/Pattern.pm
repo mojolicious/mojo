@@ -110,7 +110,6 @@ sub shape_match {
   # Compile on demand
   my $regex;
   $regex = $self->_compile unless $regex = $self->regex;
-
   warn "    $regex\n" if DEBUG;
 
   # Match

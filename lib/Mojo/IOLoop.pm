@@ -126,7 +126,6 @@ if (-r '/etc/resolv.conf') {
     # New DNS server
     if ($line =~ /^nameserver\s+(\S+)$/) {
       push @servers, $1;
-
       warn qq/DETECTED DNS SERVER ($1)\n/ if DEBUG;
     }
   }
@@ -606,9 +605,8 @@ sub resolve {
     return $self;
   }
 
-  warn "RESOLVE $type $name ($server)\n" if DEBUG;
-
   # Request
+  warn "RESOLVE $type $name ($server)\n" if DEBUG;
   my $timer;
   my $tx = int rand 0x10000;
   my $id = $self->connect(
@@ -649,8 +647,6 @@ sub resolve {
       my ($self, $id) = @_;
 
       warn "FAILED $type $name ($server)\n" if DEBUG;
-
-      # Next server
       $CURRENT_DNS_SERVER++;
 
       $self->drop($timer) if $timer;
@@ -664,7 +660,6 @@ sub resolve {
       $self->drop($timer) if $timer;
 
       my @packet = unpack 'nnnnnna*', $chunk;
-
       warn "ANSWERS $packet[3] ($server)\n" if DEBUG;
 
       # Wrong response
@@ -693,7 +688,6 @@ sub resolve {
 
         # Answer
         push @answers, [@answer, $ttl];
-
         warn "ANSWER $answer[0] $answer[1]\n" if DEBUG;
       }
 
@@ -707,8 +701,6 @@ sub resolve {
       my $self = shift;
 
       warn "RESOLVE TIMEOUT ($server)\n" if DEBUG;
-
-      # Next server
       $CURRENT_DNS_SERVER++;
 
       # Abort
@@ -877,9 +869,8 @@ sub _accept {
   $self->max_connections(0)
     if defined $self->{_accepts} && --$self->{_accepts} == 0;
 
-  warn "ACCEPTED $id\n" if DEBUG;
-
   # Accept callback
+  warn "ACCEPTED $id\n" if DEBUG;
   my $cb = $c->{on_accept} = $l->{on_accept};
   $self->_run_event('accept', $cb, $id) if $cb && !$l->{tls};
 
@@ -1285,21 +1276,18 @@ sub _prepare_loop {
   # "kqueue"
   if (KQUEUE) {
     warn "KQUEUE MAINLOOP\n" if DEBUG;
-
     return $self->{_loop} = IO::KQueue->new;
   }
 
   # "epoll"
   elsif (EPOLL) {
     warn "EPOLL MAINLOOP\n" if DEBUG;
-
     $self->{_loop} = IO::Epoll->new;
   }
 
   # "poll"
   else {
     warn "POLL MAINLOOP\n" if DEBUG;
-
     $self->{_loop} = IO::Poll->new;
   }
 
@@ -1473,9 +1461,8 @@ sub _write {
     # Disable Nagle's algorithm
     setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1;
 
-    warn "CONNECTED $id\n" if DEBUG;
-
     # Handle connect
+    warn "CONNECTED $id\n" if DEBUG;
     my $cb = $c->{on_connect};
     $self->_run_event('connect', $cb, $id) if $cb && !$c->{tls};
   }

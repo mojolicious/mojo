@@ -284,18 +284,16 @@ sub start {
   # Non-blocking
   if ($cb) {
 
-    warn "NEW NON-BLOCKING REQUEST\n" if DEBUG;
-
     # Switch to non-blocking
+    warn "NEW NON-BLOCKING REQUEST\n" if DEBUG;
     $self->_switch_non_blocking unless $self->{_nb};
 
     # Start
     return $self->_start_tx($tx, $cb);
   }
 
-  warn "NEW BLOCKING REQUEST\n" if DEBUG;
-
   # Switch to blocking
+  warn "NEW BLOCKING REQUEST\n" if DEBUG;
   $self->_switch_blocking if $self->{_nb};
 
   # Quick start
@@ -401,9 +399,8 @@ sub _cleanup {
   delete $self->{_port};
   delete $self->{_server};
 
-  warn "DROPPING ALL CONNECTIONS\n" if DEBUG;
-
   # Cleanup active connections
+  warn "DROPPING ALL CONNECTIONS\n" if DEBUG;
   my $cs = $self->{_cs} || {};
   $loop->drop($_) for keys %$cs;
 
@@ -429,10 +426,7 @@ sub _connect {
   # Keep alive connection
   $id ||= $self->_cache("$scheme:$address:$port");
   if ($id && !ref $id) {
-
     warn "KEEP ALIVE CONNECTION ($scheme:$address:$port)\n" if DEBUG;
-
-    # Add new connection
     $self->{_cs}->{$id} = {cb => $cb, tx => $tx};
     $tx->kept_alive(1);
     $self->_connected($id);
@@ -448,9 +442,8 @@ sub _connect {
       return if $self->_connect_proxy($tx, $cb);
     }
 
-    warn "NEW CONNECTION ($scheme:$address:$port)\n" if DEBUG;
-
     # Connect
+    warn "NEW CONNECTION ($scheme:$address:$port)\n" if DEBUG;
     $id = $loop->connect(
       address  => $address,
       port     => $port,
@@ -664,7 +657,6 @@ sub _hup { shift->_handle(pop, 1) }
 #  And the Smurfs, well, they SUCK."
 sub _read {
   my ($self, $loop, $id, $chunk) = @_;
-
   warn "< $chunk\n" if DEBUG;
 
   # Transaction
@@ -797,7 +789,6 @@ sub _switch_blocking {
 
   # Can't switch while processing non-blocking requests
   croak 'Non-blocking requests in progress' if $self->{_processing};
-
   warn "SWITCHING TO BLOCKING MODE\n" if DEBUG;
 
   $self->_cleanup;
@@ -812,7 +803,6 @@ sub _switch_non_blocking {
 
   # Can't switch while processing blocking requests
   croak 'Blocking request in progress' if $self->{_processing};
-
   warn "SWITCHING TO NON-BLOCKING MODE\n" if DEBUG;
 
   $self->_cleanup;
@@ -901,8 +891,7 @@ sub _write {
 
   # Finish
   $self->_handle($id) if $tx->is_done;
-
-  warn "> $chunk\n" if DEBUG;
+  warn "> $chunk\n"   if DEBUG;
 }
 
 1;

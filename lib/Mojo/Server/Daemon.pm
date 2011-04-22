@@ -302,7 +302,6 @@ sub _listen {
 
 sub _read {
   my ($self, $loop, $id, $chunk) = @_;
-
   warn "< $chunk\n" if DEBUG;
 
   # Make sure we have a transaction
@@ -366,7 +365,6 @@ sub _write {
 
   # Write
   $self->ioloop->write($id, $chunk, $cb);
-
   warn "> $chunk\n" if DEBUG;
 }
 

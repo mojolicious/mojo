@@ -195,14 +195,12 @@ sub _build_frame {
   my $frame = 0;
   vec($frame, 0, 8) = $op | 0b10000000;
 
-  warn "PAYLOAD: $payload\n" if DEBUG;
-
   # Mask payload
+  warn "PAYLOAD: $payload\n" if DEBUG;
   if ($self->masked) {
 
-    warn "MASKING PAYLOAD\n" if DEBUG;
-
     # Mask
+    warn "MASKING PAYLOAD\n" if DEBUG;
     my $mask = pack 'N', int(rand 9999999);
     $payload = $mask . _xor_mask($payload, $mask);
   }
@@ -262,30 +260,24 @@ sub _challenge {
 sub _parse_frame {
   my $self = shift;
 
-  # Buffer
-  my $buffer = $self->{_read};
-
   warn "PARSING FRAME\n" if DEBUG;
 
   # Head
+  my $buffer = $self->{_read};
   return unless length $buffer > 2;
   my $head = substr $buffer, 0, 2, '';
-
   warn 'HEAD: ' . unpack('B*', $head) . "\n" if DEBUG;
 
   # FIN
   my $fin = (vec($head, 0, 8) & 0b10000000) == 0b10000000 ? 1 : 0;
-
   warn "FIN: $fin\n" if DEBUG;
 
   # Opcode
   my $op = vec($head, 0, 8) & 0b00001111;
-
   warn "OPCODE: $op\n" if DEBUG;
 
   # Length
   my $len = vec($head, 1, 8) & 0b01111111;
-
   warn "LENGTH: $len\n" if DEBUG;
 
   # No payload
@@ -299,7 +291,6 @@ sub _parse_frame {
     return unless length $buffer > 2;
     $head = substr $buffer, 0, 2, '';
     $len = unpack 'n', $head;
-
     warn "EXTENDED (16bit): $len\n" if DEBUG;
   }
 
@@ -308,7 +299,6 @@ sub _parse_frame {
     return unless length $buffer > 8;
     $head = substr $buffer, 0, 8, '';
     $len = unpack 'N', substr($head, 4, 4);
-
     warn "EXTENDED (64bit): $len\n" if DEBUG;
   }
 
@@ -319,13 +309,10 @@ sub _parse_frame {
   # Unmask payload
   unless ($self->masked) {
     $payload = _xor_mask($payload, substr($payload, 0, 4, ''));
-
     warn "UNMASKING PAYLOAD\n" if DEBUG;
   }
 
   warn "PAYLOAD: $payload\n" if DEBUG;
-
-  # Update buffer
   $self->{_read} = $buffer;
 
   return [$fin, $op, $payload];

@@ -58,7 +58,6 @@ sub accept_connection {
 
     $self->{_listen} = $listen;
   }
-
   $self->app->log->debug('FastCGI listen socket opened.') if DEBUG;
 
   # Accept
@@ -67,7 +66,6 @@ sub accept_connection {
     $self->app->log->error("Can't accept FastCGI connection: $!");
     return;
   }
-
   $self->app->log->debug('Accepted FastCGI connection.') if DEBUG;
 
   return $c;
@@ -102,7 +100,6 @@ sub read_record {
 
 sub read_request {
   my ($self, $c) = @_;
-
   $self->app->log->debug('Reading FastCGI request.') if DEBUG;
 
   # Transaction
@@ -152,7 +149,6 @@ sub read_request {
 
         # Environment
         $env->{$name} = $value;
-
         $self->app->log->debug(qq/FastCGI param: $name - "$value"./)
           if DEBUG;
 
@@ -214,9 +210,8 @@ sub run {
       next;
     }
 
-    $self->app->log->debug('Handling FastCGI request.') if DEBUG;
-
     # Handle
+    $self->app->log->debug('Handling FastCGI request.') if DEBUG;
     $self->on_handler->($self, $tx);
 
     # Response
@@ -300,7 +295,6 @@ sub write_records {
 
 sub write_response {
   my ($self, $tx) = @_;
-
   $self->app->log->debug('Writing FastCGI response.') if DEBUG;
 
   my $c   = $tx->connection;

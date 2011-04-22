@@ -51,14 +51,12 @@ sub register {
     # Default extension
     $file .= '.' . ($conf->{ext} || 'conf');
   }
-
   warn "CONFIG FILE $file\n" if DEBUG;
 
   # Mode specific config file
   my $mode;
   if ($file =~ /^(.*)\.([^\.]+)$/) {
     $mode = join '.', $1, $app->mode, $2;
-
     warn "MODE SPECIFIC CONFIG FILE $mode\n" if DEBUG;
   }
 

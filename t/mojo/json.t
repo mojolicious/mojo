@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 110;
+use Test::More tests => 112;
 
 use Mojo::ByteStream 'b';
 
@@ -238,6 +238,11 @@ is $string, '{"foo":"c:\\\\progra~1\\\\mozill~1\\\\firefox.exe"}',
 $hash = $json->decode($string);
 is_deeply $hash, {foo => 'c:\progra~1\mozill~1\firefox.exe'},
   'successful roundtrip';
+
+# Huge string
+$string = $json->encode(['a' x 32768]);
+is_deeply $json->decode($string), ['a' x 32768], 'successful roundtrip';
+is $json->error, undef, 'no errors';
 
 # Errors
 is $json->decode(b("\x{feff}[\"\\ud800\"]")->encode('UTF-16LE')), undef,

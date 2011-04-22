@@ -187,7 +187,7 @@ sub _decode_string {
   my $pos = pos;
 
   # String
-  m/\G((?:[^\x00-\x1F\\"]|\\(?:["\\\/bfnrt]|u[A-Fa-f0-9]{4}))*)/gc;
+  m/\G(((?:[^\x00-\x1F\\"]|\\(?:["\\\/bfnrt]|u[A-Fa-f0-9]{4})){0,32766})*)/gc;
   my $str = $1;
 
   # Missing quote

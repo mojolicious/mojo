@@ -100,9 +100,7 @@ sub render {
   local $stash->{extends} = $partial ? undef : $stash->{extends};
 
   # Merge stash and arguments
-  while (my ($key, $value) = each %$args) {
-    $stash->{$key} = $value;
-  }
+  while (my ($key, $value) = each %$args) { $stash->{$key} = $value }
 
   my $template = delete $stash->{template};
   my $class    = $stash->{template_class};

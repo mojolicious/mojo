@@ -160,20 +160,18 @@ sub dispatch {
   my $tx = $c->tx;
   $c->res->code(undef) if $tx->is_websocket;
   $self->sessions->load($c);
-  $self->plugins->run_hook(before_dispatch => $c);
+  my $plugins = $self->plugins;
+  $plugins->run_hook(before_dispatch => $c);
 
   # Try to find a static file
   $self->static->dispatch($c);
-  $self->plugins->run_hook_reverse(after_static_dispatch => $c);
-
-  # Prepare transaction for routes
-  my $res = $tx->res;
-  return if $res->code;
-  $c->res->code(426) if $tx->is_websocket;
-  my ($error, $code) = $tx->req->error;
-  $res->code($code) if $code;
+  $plugins->run_hook_reverse(after_static_dispatch => $c);
 
   # Routes
+  my $res = $tx->res;
+  return if $res->code;
+  if (my $code = ($tx->req->error)[1]) { $res->code($code) }
+  elsif ($tx->is_websocket) { $res->code(426) }
   if ($self->routes->dispatch($c)) { $c->render_not_found unless $res->code }
 }
 
@@ -201,14 +199,8 @@ sub handler {
   # Build default controller and process
   my $defaults = $self->defaults;
   @{$stash}{keys %$defaults} = values %$defaults;
-  eval {
-    $self->on_process->(
-      $self, $class->new(app => $self, stash => $stash, tx => $tx)
-    );
-  };
-
-  # Fatal exception
-  if ($@) {
+  my $c = $class->new(app => $self, stash => $stash, tx => $tx);
+  unless (eval { $self->on_process->($self, $c); 1 }) {
     $self->log->fatal("Processing request failed: $@");
     $tx->res->code(500);
     $tx->resume;

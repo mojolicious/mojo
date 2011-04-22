@@ -38,10 +38,7 @@ sub load {
   else { return if $module->can('new') }
 
   # Load
-  eval "require $module";
-
-  # Catch
-  if ($@) {
+  unless (eval "require $module; 1") {
 
     # Exists
     my $path = Mojo::Command->class_to_path($module);

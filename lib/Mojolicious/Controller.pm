@@ -248,8 +248,8 @@ sub render {
 
   # Prepare response
   my $res = $self->res;
-  $res->code($stash->{status}) if $stash->{status};
-  $res->code(200) unless $res->code;
+  if    ($stash->{status}) { $res->code($stash->{status}) }
+  elsif (!$res->code)      { $res->code(200) }
   $res->body($output) unless $res->body;
   my $headers = $res->headers;
   $headers->content_type($type) unless $headers->content_type;
@@ -453,10 +453,8 @@ sub rendered {
     my $app = $self->app;
     $app->sessions->store($self);
     $app->plugins->run_hook_reverse(after_dispatch => $self);
-
     $stash->{'mojo.finished'} = 1;
   }
-
   $self->tx->resume;
 
   return $self;

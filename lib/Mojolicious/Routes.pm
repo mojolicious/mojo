@@ -25,11 +25,9 @@ sub AUTOLOAD {
   # Method
   my ($package, $method) = our $AUTOLOAD =~ /^([\w\:]+)\:\:(\w+)$/;
 
-  # Shortcuts
+  # Call shortcut
   Carp::croak(qq/Can't locate object method "$method" via "$package"/)
     unless my $shortcut = $self->shortcuts->{$method};
-
-  # Run
   return $self->$shortcut(@_);
 }
 
@@ -78,25 +76,18 @@ sub auto_render {
   my ($self, $c) = @_;
 
   # Rendering
-  my $tx      = $c->tx;
-  my $success = eval {
+  my $tx = $c->tx;
+  eval {
     my $stash = $c->stash;
-
-    # Render
     unless ($stash->{'mojo.rendered'} || $tx->is_websocket) {
 
       # Render template or not_found if the route never reached an action
       $c->render or ($stash->{'mojo.routed'} or $c->render_not_found);
     }
 
-    # Success
     1;
-  };
+  } or $c->render_exception($@);
 
-  # Renderer error
-  $c->render_exception($@) if !$success && $@;
-
-  # Rendered
   return;
 }
 
@@ -117,13 +108,12 @@ sub dispatch {
   # Path
   my $req  = $c->req;
   my $path = $c->stash->{path};
-  $path = "/$path" if defined $path && $path !~ /^\//;
-  $path = $req->url->path->to_abs_string unless $path;
-
-  my $method = $req->method;
-  my $websocket = $c->tx->is_websocket ? 1 : 0;
+  if (defined $path) { $path = "/$path" if $path !~ /^\// }
+  else               { $path = $req->url->path->to_abs_string }
 
   # Match
+  my $method = $req->method;
+  my $websocket = $c->tx->is_websocket ? 1 : 0;
   my $m = Mojolicious::Routes::Match->new($method => $path, $websocket);
   $c->match($m);
 
@@ -229,13 +219,9 @@ EOF
 
 sub over {
   my $self = shift;
-
   return $self unless @_;
-
-  # Conditions
   my $conditions = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
   push @{$self->conditions}, @$conditions;
-
   return $self;
 }
 
@@ -283,18 +269,14 @@ sub render {
 # "Morbo forget how you spell that letter that looks like a man wearing a hat.
 #  Hello, tiny man. I will destroy you!"
 sub route {
-  my $self = shift;
-
-  # New route
+  my $self  = shift;
   my $route = $self->new(@_);
   $self->add_child($route);
-
   return $route;
 }
 
 sub to {
   my $self = shift;
-
   return $self unless @_;
 
   # Single argument
@@ -391,32 +373,17 @@ sub _dispatch_callback {
 
   # Routed
   $c->stash->{'mojo.routed'} = 1;
-
-  # Debug
   $c->app->log->debug(qq/Dispatching callback./);
 
   # Dispatch
   my $continue;
-  my $success = eval {
-
-    # Callback
-    $continue = $field->{cb}->($c);
-
-    # Success
-    1;
-  };
-
-  # Callback error
-  if (!$success && $@) {
+  unless (eval { $continue = $field->{cb}->($c); 1 }) {
     my $e = Mojo::Exception->new($@);
     $c->app->log->error($e);
     return $e;
   }
 
-  # Success!
-  return 1 unless $staging;
-  return 1 if $continue;
-
+  return 1 if !$staging || $continue;
   return;
 }
 
@@ -428,7 +395,6 @@ sub _dispatch_controller {
     unless my $app = $field->{app} || $self->_generate_class($field, $c);
   my $method = $self->_generate_method($field, $c);
 
-  # Debug
   my $dispatch = ref $app || $app;
   $dispatch .= "->$method" if $method;
   $c->app->log->debug("Dispatching $dispatch.");
@@ -494,7 +460,7 @@ sub _dispatch_controller {
   };
 
   # Controller error
-  if (!$success && $@) {
+  unless ($success) {
     my $e = Mojo::Exception->new($@);
     $c->app->log->error($e);
     $app->render_exception($e) if $app->can('render_exception');

@@ -1346,11 +1346,11 @@ sub _timer {
     my $after = $t->{after} || 0;
     if ($after <= time - ($t->{started} || $t->{recurring})) {
 
-      # Recurring timer
-      $t->{recurring} += $after if $after && $t->{recurring};
-
       # Normal timer
-      $self->_drop_immediately($id) if $t->{started};
+      if ($t->{started}) { $self->_drop_immediately($id) }
+
+      # Recurring timer
+      elsif ($after && $t->{recurring}) { $t->{recurring} += $after }
 
       # Handle timer
       if (my $cb = $t->{cb}) {

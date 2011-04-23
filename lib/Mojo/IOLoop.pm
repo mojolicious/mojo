@@ -1419,9 +1419,8 @@ sub _write {
   }
 
   # Handle drain
-  if (!length($c->{buffer}) && (my $event = delete $c->{drain})) {
-    $self->_run_event('drain', $event, $id);
-  }
+  $self->_run_event('drain', delete $c->{drain}, $id)
+    if !length $c->{buffer} && $c->{drain};
 
   # Write
   my $written = $handle->syswrite($c->{buffer});

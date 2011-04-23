@@ -1,6 +1,9 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.22 2011-04-20 00:00:00
+        - Deprecated Mojo::IOLoop on_tick method in favor of the recurring
+          method. (sbertrang)
+        - Renamed on_idle method in Mojo::IOLoop to idle.
         - Reduced memory requirements of cached templates by up to 50%.
         - Fixed controller specific render_exception and render_not_found
           methods.

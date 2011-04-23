@@ -292,6 +292,12 @@ sub generate_port {
   return;
 }
 
+sub idle {
+  my $self = shift;
+  $self = $self->singleton unless ref $self;
+  $self->_add_loop_event(idle => @_);
+}
+
 sub is_running {
   my $self = shift;
   $self = $self->singleton unless ref $self;
@@ -455,19 +461,22 @@ sub lookup {
   );
 }
 
-sub on_error { shift->_add_event('error', @_) }
-sub on_hup   { shift->_add_event('hup',   @_) }
-sub on_idle { shift->_add_loop_event('idle', @_) }
-sub on_read { shift->_add_event('read', @_) }
+sub on_error { shift->_add_event(error => @_) }
+sub on_hup   { shift->_add_event(hup   => @_) }
+sub on_read  { shift->_add_event(read  => @_) }
+
+# DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
+sub on_tick {
+  warn <<EOF;
+Mojo::IOLoop->on_tick is DEPRECATED in favor of Mojo::IOLoop->recurring!!!
+EOF
+  shift->recurring(0 => @_);
+}
 
 sub recurring {
   my $self = shift;
-
-  # Singleton
   $self = $self->singleton unless ref $self;
-
-  # Ticking timer
-  $self->_add_loop_event(timer => pop, after => pop, ticked => time);
+  $self->_add_loop_event(timer => pop, after => pop, recurring => time);
 }
 
 sub one_tick {
@@ -1335,11 +1344,15 @@ sub _timer {
   for my $id (keys %$ts) {
     my $t = $ts->{$id};
     my $after = $t->{after} || 0;
-    if ($after <= time - ($t->{started} || $t->{ticked})) {
-      $t->{ticked} += $after if $after && $t->{ticked};
+    if ($after <= time - ($t->{started} || $t->{recurring})) {
+
+      # Recurring timer
+      $t->{recurring} += $after if $after && $t->{recurring};
+
+      # Normal timer
+      $self->_drop_immediately($id) if $t->{started};
 
       # Handle timer
-      $self->_drop_immediately($id) if $t->{started};
       if (my $cb = $t->{cb}) {
         $self->_run_callback('timer', $cb);
         $count++ if $t->{started};
@@ -1751,6 +1764,14 @@ Find a free TCP port, this is a utility function primarily used for tests.
 Get handle for id.
 Note that this method is EXPERIMENTAL and might change without warning!
 
+=head2 C<idle>
+
+  my $id = Mojo::IOLoop->idle(sub {...});
+  my $id = $loop->idle(sub {...});
+
+Callback to be invoked on every reactor tick if no other events occurred.
+Note that this method is EXPERIMENTAL and might change without warning!
+
 =head2 C<is_running>
 
   my $running = Mojo::IOLoop->is_running;
@@ -1878,13 +1899,6 @@ Callback to be invoked if an error event happens on the connection.
 
 Callback to be invoked if the connection gets closed.
 
-=head2 C<on_idle>
-
-  my $id = $loop->on_idle(sub {...});
-
-Callback to be invoked on every reactor tick if no other events occurred.
-Note that this method is EXPERIMENTAL and might change without warning!
-
 =head2 C<on_read>
 
   $loop = $loop->on_read($id => sub {...});
@@ -1897,19 +1911,6 @@ Callback to be invoked if new data arrives on the connection.
     # Process chunk
   });
 
-=head2 C<recurring>
-
-  my $id = $loop->recurring(0 => sub {...});
-
-Callback to be invoked on every reactor tick, this for example allows you to
-run multiple reactors next to each other.
-
-  my $loop2 = Mojo::IOLoop->new(timeout => 0);
-  Mojo::IOLoop->singleton->recurring(0 => sub { $loop2->one_tick });
-
-Note that the loop timeout can be changed dynamically at any time to adjust
-responsiveness.
-
 =head2 C<one_tick>
 
   $loop->one_tick;
@@ -1917,6 +1918,20 @@ responsiveness.
   $loop->one_tick(0);
 
 Run reactor for exactly one tick.
+
+=head2 C<recurring>
+
+  my $id = Mojo::IOLoop->recurring(0 => sub {...});
+  my $id = $loop->recurring(3 => sub {...});
+
+Callback to be invoked on every reactor tick, this for example allows you to
+run multiple reactors next to each other.
+
+  my $loop2 = Mojo::IOLoop->new(timeout => 0);
+  Mojo::IOLoop->recurring(0 => sub { $loop2->one_tick });
+
+Note that the loop timeout can be changed dynamically at any time to adjust
+responsiveness.
 
 =head2 C<remote_info>
 

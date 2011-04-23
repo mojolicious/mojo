@@ -32,11 +32,11 @@ $ua->get(
 );
 $loop->start;
 $ua = undef;
-my $ticks = 0;
-my $tick  = $loop->on_tick(sub { $ticks++ });
-my $idle  = $loop->on_idle(sub { $loop->stop });
+my $ticks     = 0;
+my $recurring = $loop->recurring(sub { $ticks++ });
+my $idle      = $loop->idle(sub { $loop->stop });
 $loop->start;
-$loop->drop($tick);
+$loop->drop($recurring);
 $loop->drop($idle);
 is $ticks, 1,   'loop not tainted';
 is $code,  301, 'right status';

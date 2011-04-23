@@ -459,7 +459,16 @@ sub on_error { shift->_add_event('error', @_) }
 sub on_hup   { shift->_add_event('hup',   @_) }
 sub on_idle { shift->_add_loop_event('idle', @_) }
 sub on_read { shift->_add_event('read', @_) }
-sub on_tick { shift->_add_loop_event('tick', @_) }
+
+sub recurring {
+  my $self = shift;
+
+  # Singleton
+  $self = $self->singleton unless ref $self;
+
+  # Ticking timer
+  $self->_add_loop_event(timer => pop, after => pop, ticked => time);
+}
 
 sub one_tick {
   my ($self, $timeout) = @_;
@@ -523,11 +532,6 @@ sub one_tick {
 
   # Handle timers
   my $timers = $self->_timer;
-
-  # Handle tick events
-  for my $tick (keys %{$self->{_tick}}) {
-    $self->_run_callback('tick', $self->{_tick}->{$tick}->{cb}, $tick);
-  }
 
   # Handle idle events
   unless (@read || @write || @error || @hup || $timers) {
@@ -921,7 +925,7 @@ sub _drop_immediately {
   my ($self, $id) = @_;
 
   # Drop loop events
-  for my $event (qw/idle tick timer/) {
+  for my $event (qw/idle timer/) {
     if ($self->{"_$event"}->{$id}) {
       delete $self->{"_$event"}->{$id};
       return $self;
@@ -1331,13 +1335,14 @@ sub _timer {
   for my $id (keys %$ts) {
     my $t = $ts->{$id};
     my $after = $t->{after} || 0;
-    if ($after <= time - $t->{started}) {
+    if ($after <= time - ($t->{started} || $t->{ticked})) {
+      $t->{ticked} += $after if $after && $t->{ticked};
 
       # Handle timer
-      $self->_drop_immediately($id);
+      $self->_drop_immediately($id) if $t->{started};
       if (my $cb = $t->{cb}) {
         $self->_run_callback('timer', $cb);
-        $count++;
+        $count++ if $t->{started};
       }
     }
   }
@@ -1892,15 +1897,15 @@ Callback to be invoked if new data arrives on the connection.
     # Process chunk
   });
 
-=head2 C<on_tick>
+=head2 C<recurring>
 
-  my $id = $loop->on_tick(sub {...});
+  my $id = $loop->recurring(0 => sub {...});
 
 Callback to be invoked on every reactor tick, this for example allows you to
 run multiple reactors next to each other.
 
   my $loop2 = Mojo::IOLoop->new(timeout => 0);
-  Mojo::IOLoop->singleton->on_tick(sub { $loop2->one_tick });
+  Mojo::IOLoop->singleton->recurring(0 => sub { $loop2->one_tick });
 
 Note that the loop timeout can be changed dynamically at any time to adjust
 responsiveness.

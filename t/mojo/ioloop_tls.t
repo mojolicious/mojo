@@ -69,7 +69,7 @@ $loop   = Mojo::IOLoop->singleton;
 $port   = Mojo::IOLoop->generate_port;
 $server = $client = '';
 my ($drop, $running);
-Mojo::IOLoop->drop($loop->on_tick(sub { $drop++ }));
+Mojo::IOLoop->drop($loop->recurring(0 => sub { $drop++ }));
 my $error = '';
 $loop->listen(
   port      => $port,

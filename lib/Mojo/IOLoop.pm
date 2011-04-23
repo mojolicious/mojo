@@ -1419,7 +1419,7 @@ sub _write {
   }
 
   # Handle drain
-  if ($c->{drain} && (my $event = delete $c->{drain})) {
+  if (!length($c->{buffer}) && (my $event = delete $c->{drain})) {
     $self->_run_event('drain', $event, $id);
   }
 

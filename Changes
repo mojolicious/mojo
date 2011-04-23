@@ -6,6 +6,7 @@ This file documents the revision history for Perl extension Mojolicious.
           methods.
         - Fixed Mojo::JSON string size limit. (henryykt)
         - Fixed small stack localization bug.
+        - Fixed typos.
 
 1.21 2011-04-20 00:00:00
         - Improved temporary file handling to avoid a very unlikely race

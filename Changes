@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-1.22 2011-04-20 00:00:00
+1.22    2011-04-24 00:00:00
         - Deprecated Mojo::IOLoop on_tick method in favor of the recurring
           method. (sbertrang)
         - Updated WebSocket implementation to ietf-07.
@@ -12,22 +12,22 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed small stack localization bug.
         - Fixed typos.
 
-1.21 2011-04-20 00:00:00
+1.21    2011-04-20 00:00:00
         - Improved temporary file handling to avoid a very unlikely race
           condition. (crab)
         - Fixed "multipart/form-data" generation bug in Mojo::UserAgent.
           (sugar, sharifulin, sri)
         - Fixed typos.
 
-1.20 2011-04-20 00:00:00
+1.20    2011-04-20 00:00:00
         - Improved size limit handling.
         - Fixed typos.
 
-1.19 2011-04-20 00:00:00
+1.19    2011-04-20 00:00:00
         - Improved tests.
         - Fixed size limits in message parser.
 
-1.18 2011-04-19 00:00:00
+1.18    2011-04-19 00:00:00
         - Added support for "X-Forwarded-HTTPS" and "X-Forwarded-Host"
           headers.
         - Added argument localization to the include helper.
@@ -35,7 +35,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved documentation.
         - Fixed test case.
 
-1.17 2011-04-18 00:00:00
+1.17    2011-04-18 00:00:00
         - Deprecated Mojolicious process method in favor of the on_process
           attribute.
         - Added Failraptor.
@@ -67,18 +67,18 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed small perldoc browser bug. (kberov)
         - Fixed cookbook recipe. (moritz)
 
-1.16 2011-04-15 00:00:00
+1.16    2011-04-15 00:00:00
         - Emergency release for a critical security issue that can expose
           files on your system, everybody should update! (perlninja, sri)
 
-1.15 2011-03-18 00:00:00
+1.15    2011-03-18 00:00:00
         - Changed default log level in "production" mode from "error" to
           "info".
         - Improved lookup method in Mojo::IOLoop.
         - Fixed small Mojo::Util bug.
         - Fixed a serious Mojo::DOM bug. (moritz)
 
-1.14 2011-03-17 00:00:00
+1.14    2011-03-17 00:00:00
         - Added support for multiple dns servers to Mojo::IOLoop.
         - Added config helper to Mojolicious::Plugin::Config.
         - Changed resolv.conf parser in Mojo::IOLoop to use the first
@@ -90,14 +90,14 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed a few warnings.
         - Fixed typos.
 
-1.13 2011-03-14 00:00:00
+1.13    2011-03-14 00:00:00
         - Deprecated Mojo::Client in favor of the much sleeker
           Mojo::UserAgent.
         - Made the most common Mojo::IOLoop methods easier to access for the
           singleton instance.
         - Fixed typos.
 
-1.12 2011-03-10 00:00:00
+1.12    2011-03-10 00:00:00
         - Relicensed all artwork to CC-SA, so the whole distribution can be
           considered "open" again.
         - Deprecated MOJO_JSON_CONFIG environment variable in favor of
@@ -121,7 +121,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed small documentation bug.
         - Fixed typos. (kimoto)
 
-1.11 2011-02-18 00:00:00
+1.11    2011-02-18 00:00:00
         - Deprecated Mojo::Client async method in favor of the managed
           attribute.
         - Added TTL support to resolve in Mojo::IOLoop. (und3f)
@@ -131,7 +131,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed small route bug.
         - Fixed small hypnotoad bug. (bduggan)
 
-1.1 2011-02-14 00:00:00
+1.1     2011-02-14 00:00:00
         - Code name "Smiling Cat Face With Heart-Shaped Eyes", this is a
           major release.
         - Deprecated wildcard route names in favor of automatically generated
@@ -188,7 +188,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed Mojo::Client cloning.
         - Fixed typos.
 
-1.01 2011-01-06 00:00:00
+1.01    2011-01-06 00:00:00
         - Relicensed some of the images to make sure Mojolicious can be
           shipped with commercial products.
         - Updated IO::Socket::SSL requirement to 1.37 due to bugs in older
@@ -205,7 +205,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed punycode bug. (kits)
         - Fixed a bug where the static dispatcher would eat the flash.
 
-1.0 2010-12-26 00:00:00
+1.0     2010-12-26 00:00:00
         - Code name "Snowflake", this is a major release.
         - Deprecated session method in Mojolicious.
         - Deprecated handler and helper attributes in Mojolicious::Renderer.

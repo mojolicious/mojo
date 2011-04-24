@@ -205,9 +205,8 @@ sub _build_frame {
 
   # Mask payload
   warn "PAYLOAD: $payload\n" if DEBUG;
-  if ($self->masked) {
-
-    # Mask
+  my $masked = $self->masked;
+  if ($masked) {
     warn "MASKING PAYLOAD\n" if DEBUG;
     my $mask = pack 'N', int(rand 9999999);
     $payload = $mask . _xor_mask($payload, $mask);
@@ -221,20 +220,20 @@ sub _build_frame {
 
   # Small payload
   if ($len < 126) {
-    vec($prefix, 0, 8) = $len;
+    vec($prefix, 0, 8) = $masked ? ($len | 0b10000000) : $len;
     $frame .= $prefix;
   }
 
   # Extended payload (16bit)
   elsif ($len < 65536) {
-    vec($prefix, 0, 8) = 126;
+    vec($prefix, 0, 8) = $masked ? (126 | 0b10000000) : 126;
     $frame .= $prefix;
     $frame .= pack 'n', $len;
   }
 
   # Extended payload (64bit)
   else {
-    vec($prefix, 0, 8) = 127;
+    vec($prefix, 0, 8) = $masked ? (127 | 0b10000000) : 127;
     $frame .= $prefix;
     $frame .= pack 'NN', $len >> 32, $len & 0xFFFFFFFF;
   }
@@ -297,16 +296,16 @@ sub _parse_frame {
   # Extended payload (16bit)
   elsif ($len == 126) {
     return unless length $buffer > 2;
-    $head = substr $buffer, 0, 2, '';
-    $len = unpack 'n', $head;
+    my $ext = substr $buffer, 0, 2, '';
+    $len = unpack 'n', $ext;
     warn "EXTENDED (16bit): $len\n" if DEBUG;
   }
 
   # Extended payload (64bit)
   elsif ($len == 127) {
     return unless length $buffer > 8;
-    $head = substr $buffer, 0, 8, '';
-    $len = unpack 'N', substr($head, 4, 4);
+    my $ext = substr $buffer, 0, 8, '';
+    $len = unpack 'N', substr($ext, 4, 4);
     warn "EXTENDED (64bit): $len\n" if DEBUG;
   }
 
@@ -315,9 +314,9 @@ sub _parse_frame {
   my $payload = $len ? substr($buffer, 0, $len, '') : '';
 
   # Unmask payload
-  unless ($self->masked) {
-    $payload = _xor_mask($payload, substr($payload, 0, 4, ''));
+  if (vec($head, 1, 8) & 0b10000000) {
     warn "UNMASKING PAYLOAD\n" if DEBUG;
+    $payload = _xor_mask($payload, substr($payload, 0, 4, ''));
   }
 
   warn "PAYLOAD: $payload\n" if DEBUG;

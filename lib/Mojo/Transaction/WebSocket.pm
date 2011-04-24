@@ -11,6 +11,14 @@ use constant DEBUG => $ENV{MOJO_WEBSOCKET_DEBUG} || 0;
 # Unique value from the spec
 use constant GUID => '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 
+# Opcodes
+use constant CONTINUATION => 0;
+use constant TEXT         => 1;
+use constant BINARY       => 2;
+use constant CLOSE        => 8;
+use constant PING         => 9;
+use constant PONG         => 10;
+
 # Core module since Perl 5.9.3
 use constant SHA1 => eval 'use Digest::SHA (); 1';
 
@@ -55,7 +63,7 @@ sub finish {
   my $self = shift;
 
   # Send closing handshake
-  $self->_send_frame(1, '');
+  $self->_send_frame(CLOSE, '');
 
   # Finish after writing
   $self->{_finished} = 1;
@@ -88,7 +96,7 @@ sub send_message {
   $message = '' unless defined $message;
   encode 'UTF-8', $message;
 
-  $self->_send_frame(4, $message);
+  $self->_send_frame(TEXT, $message);
 }
 
 sub server_handshake {
@@ -128,18 +136,18 @@ sub server_read {
   while (my $frame = $self->_parse_frame) {
 
     # Op
-    my $op = $frame->[1] || 0;
+    my $op = $frame->[1] || CONTINUATION;
 
     # Ping
-    if ($op == 2) {
+    if ($op == PING) {
 
       # Pong
-      $self->_send_frame(3, $frame->[2]);
+      $self->_send_frame(PONG, $frame->[2]);
       next;
     }
 
     # Close
-    elsif ($op == 1) {
+    elsif ($op == CLOSE) {
       $self->finish;
       next;
     }

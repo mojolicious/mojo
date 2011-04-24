@@ -66,8 +66,14 @@ sub register {
         unless $path && -r $path;
 
       # POD
+      my $encoding =
+      defined $conf->{encoding}
+      ? $conf->{encoding}
+      : $conf->{charset};
+
       my $file = IO::File->new;
       $file->open("< $path");
+      $file->binmode($encoding ? ':encoding('. $encoding . ')' : ':utf8');      
       my $html = _pod_to_html(join '', <$file>);
       my $dom = Mojo::DOM->new->parse("$html");
       $dom->find('a[href]')->each(

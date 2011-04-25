@@ -155,8 +155,8 @@ sub server_read {
     # Append
     $self->{_message} .= $frame->[2];
 
-    # Continuation
-    next unless $op;
+    # No FIN bit (Continuation)
+    next unless $frame->[0];
 
     # Callback
     my $message = $self->{_message};

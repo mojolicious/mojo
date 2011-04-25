@@ -468,8 +468,8 @@ $ua->websocket(
         $tx->finish;
       }
     );
-    $tx->send_message('hi!' x 100000);
+    $tx->send_message('hi' x 100000);
   }
 );
 $loop->start;
-is $result, 'hi!' x 100000, 'right result';
+is $result, 'hi' x 100000, 'right result';

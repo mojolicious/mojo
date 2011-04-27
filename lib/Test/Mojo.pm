@@ -610,7 +610,7 @@ exact match with L<Mojo::DOM>.
   $t = $t->text_isnt('div.foo[x=y]' => 'Hello!');
   $t = $t->text_isnt('html head title' => 'Hello!', 'different title');
 
-Opposite of C<test_is>.
+Opposite of C<text_is>.
 
 =head2 C<text_like>
 

@@ -2014,7 +2014,7 @@ Note that this method is EXPERIMENTAL and might change without warning!
   my $id = $loop->timer(5 => sub {...});
   my $id = $loop->timer(0.25 => sub {...});
 
-Create a new timer, invoking the callback afer a given amount of seconds.
+Create a new timer, invoking the callback after a given amount of seconds.
 
 =head2 C<write>
 

@@ -8,7 +8,7 @@ use utf8;
 # Disable IPv6, epoll and kqueue
 BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 38;
+use Test::More tests => 39;
 
 # "In the game of chess you can never let your adversary see your pieces."
 use Mojo::ByteStream 'b';
@@ -65,7 +65,8 @@ $t->post_form_ok('/', {foo => 'yatta'})->status_is(200)
 
 # Send raw Shift_JIS octets (like browsers do)
 $t->post_form_ok('/', '', {foo => $yatta_sjis})->status_is(200)
-  ->content_type_like(qr/Shift_JIS/)->content_like(qr/$yatta/);
+  ->content_type_unlike(qr/application/)->content_type_like(qr/Shift_JIS/)
+  ->content_like(qr/$yatta/);
 
 # Send raw Shift_JIS octets (like browsers do, multipart message)
 $t->post_form_ok(

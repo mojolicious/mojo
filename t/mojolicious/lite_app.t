@@ -12,7 +12,7 @@ BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 my $backup;
 BEGIN { $backup = $ENV{MOJO_MODE} || ''; $ENV{MOJO_MODE} = 'development' }
 
-use Test::More tests => 749;
+use Test::More tests => 751;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -1326,7 +1326,8 @@ $t->get_ok('/redirect_named')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->header_is(Location       => undef)->element_exists('#foo')
-  ->text_is('div' => 'Redirect works!')
+  ->text_isnt('div' => 'Redirect')->text_is('div' => 'Redirect works!')
+  ->text_unlike('[id="foo"]' => qr/Foo/)
   ->text_like('[id="foo"]' => qr/^Redirect/);
 $t->max_redirects(0);
 Test::Mojo->new(tx => $t->tx->previous)->status_is(302)

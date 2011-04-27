@@ -6,7 +6,7 @@ use warnings;
 # Disable IPv6, epoll and kqueue
 BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 243;
+use Test::More tests => 249;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -30,16 +30,17 @@ $ENV{MOJO_MODE} = 'development';
 # Foo::fun
 my $url = $t->build_url;
 $url->path('/fun/time');
-$t->get_ok($url, {'X-Test' => 'Hi there!'})->status_is(200)
+$t->get_ok($url, {'X-Test' => 'Hi there!'})->status_isnt(404)->status_is(200)
+  ->header_isnt('X-Bender' => 'Bite my shiny metal ass!')
   ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_isnt('Have')
   ->content_is('Have fun!');
 
 # Foo::baz (missing action without template)
 $t->get_ok('/foo/baz')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/Not Found/);
+  ->content_unlike(qr/Something/)->content_like(qr/Not Found/);
 
 # Foo::yada (action-less template)
 $t->get_ok('/foo/yada')->status_is(200)
@@ -168,7 +169,7 @@ $t->get_ok('/foo/withlayout', {'X-Test' => 'Hi there!'})->status_is(200)
 $t->get_ok('/foo/withblock.txt', {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_type_is('text/plain')
+  ->content_type_isnt('text/html')->content_type_is('text/plain')
   ->content_like(qr/Hello Baerbel\.\s+Hello Wolfgang\./);
 
 # MojoliciousTest2::Foo::test
@@ -321,6 +322,7 @@ $t->get_ok('/shortcut/act')->status_is(200)
 
 # Session with domain
 $t->get_ok('/foo/session')->status_is(200)
+  ->header_unlike('Set-Cookie', qr/foo/)
   ->header_like('Set-Cookie' => qr/; Domain=\.example\.com/)
   ->content_is('Bender rockzzz!');
 

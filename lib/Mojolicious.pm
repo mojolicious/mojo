@@ -1072,6 +1072,8 @@ Stanis Trendelenburg
 
 Tatsuhiko Miyagawa
 
+Terrence Brannon
+
 The Perl Foundation
 
 Tomas Znamenacek

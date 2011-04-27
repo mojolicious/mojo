@@ -568,6 +568,7 @@ Portably write text to a relative file.
 
 =head1 SEE ALSO
 
+L<Mojolicious::Commands>, 
 L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
 
 =cut

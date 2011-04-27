@@ -116,7 +116,7 @@ There is also a helper command to generate a small example application.
 
 =head2 Commands
 
-All the normal L<Mojolicious> command options are available from the command
+All the normal L<Mojolicious command options|Mojolicious::Commands> are available from the command
 line.
 Note that CGI, FastCGI and PSGI environments can usually be auto detected and
 will just work without commands.

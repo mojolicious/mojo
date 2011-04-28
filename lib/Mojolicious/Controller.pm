@@ -1021,7 +1021,7 @@ __DATA__
         <pre class="prettyprint">
 get '<%= $self->req->url->path->to_abs_string %>' => sub {
     my $self = shift;
-    $self->render(text => 'Hello world!');
+    $self->render_text('Hello world!');
 };</pre>
       </div>
     </div>

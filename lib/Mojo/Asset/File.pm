@@ -134,12 +134,14 @@ sub get_chunk {
 sub move_to {
   my ($self, $path) = @_;
 
+  # Windows requires that the handle is closed
+  close $self->handle;
+  delete $self->{handle};
+
   # Move
   my $src = $self->path;
   File::Copy::move($src, $path)
     or croak qq/Can't move file "$src" to "$path": $!/;
-
-  # Set new path
   $self->path($path);
 
   # Don't clean up a moved file

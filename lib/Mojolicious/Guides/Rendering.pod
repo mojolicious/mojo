@@ -408,7 +408,7 @@ Inheritance takes the layout concept above one step further.
 Unlike C<content_for> the C<content> helper does not allow appending to
 existing values, this makes it possible to overload whole template sections.
 The only difference between C<layout> and the C<extends> is that extended
-templates don't get prefixed with C<layout/>.
+templates don't get prefixed with C<layouts/>.
 
   @@ first.html.ep
   %# "<div>First header!First footer!</div>"

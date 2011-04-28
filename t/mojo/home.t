@@ -17,7 +17,7 @@ my $backup = $ENV{MOJO_HOME} || '';
 $ENV{MOJO_HOME} = '.';
 my $home = Mojo::Home->new->detect;
 is_deeply [split /\\|\//, File::Spec->canonpath($home->to_string)],
-  [split /\\|\//, File::Spec->canonpath(cwd())],
+  [split /\\|\//, File::Spec->canonpath(realpath cwd())],
   'right path detected';
 $ENV{MOJO_HOME} = $backup;
 
@@ -33,7 +33,7 @@ is_deeply [split /\\|\//, $target], [split /\\|\//, $home],
 $INC{'MyClass.pm'} = 'MyClass.pm';
 $home = Mojo::Home->new->detect('MyClass');
 is_deeply [split /\\|\//, File::Spec->canonpath($home->to_string)],
-  [split /\\|\//, File::Spec->canonpath(cwd())],
+  [split /\\|\//, File::Spec->canonpath(realpath cwd())],
   'right path detected';
 
 # FindBin detection

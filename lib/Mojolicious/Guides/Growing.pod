@@ -291,10 +291,9 @@ on L<Mojo::DOM>.
   use Test::More tests => 16;
   use Test::Mojo;
 
-  # Include application and help with home directory detection
+  # Include application
   use FindBin;
-  $ENV{MOJO_HOME} = "$FindBin::Bin/../";
-  require "$ENV{MOJO_HOME}/myapp.pl";
+  require "$FindBin::Bin/../myapp.pl";
 
   # Allow 302 redirect responses
   my $t = Test::Mojo->new(max_redirects => 1);

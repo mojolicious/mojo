@@ -715,15 +715,12 @@ Static files will be automatically served from the C<DATA> section
 
 Testing your application is as easy as creating a C<t> directory and filling
 it with normal Perl unit tests.
-Some plugins depend on the actual script name, so a test file for the
-application C<myapp.pl> should be named C<t/myapp.t>.
 
   use Test::More tests => 3;
   use Test::Mojo;
 
   use FindBin;
-  $ENV{MOJO_HOME} = "$FindBin::Bin/../";
-  require "$ENV{MOJO_HOME}/myapp.pl";
+  require "$FindBin::Bin/../myapp.pl";
 
   my $t = Test::Mojo->new;
   $t->get_ok('/')->status_is(200)->content_like(qr/Funky!/);

@@ -17,9 +17,7 @@ use Test::More tests => 3;
 # "Of all the parasites I've had over the years,
 #  these worms are among the best."
 use FindBin;
-$ENV{MOJO_CONFIG} = 'external.conf';
-$ENV{MOJO_HOME}   = $FindBin::Bin;
-require "$ENV{MOJO_HOME}/external.pl";
+require "$FindBin::Bin/external/myapp.pl";
 use Test::Mojo;
 
 my $t = Test::Mojo->new;

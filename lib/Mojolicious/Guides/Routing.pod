@@ -388,7 +388,9 @@ pass.
 =head2 Nested Routes
 
 It is also possible to build tree structures from routes to remove repetitive
-code, an endpoint is required to actually match though.
+code.
+A route with children can't match on it's own though, only the actual
+endpoints of these nested routes can.
 
   # /foo     -> undef
   # /foo/bar -> {controller => 'foo', action => 'bar'}
@@ -446,12 +448,14 @@ Less commonly used and more powerful features.
 =head2 Waypoints
 
 Waypoints are very similar to normal nested routes but can match even if they
-are not endpoints themselves.
+have children.
 
   # /foo     -> {controller => 'foo', action => 'baz'}
   # /foo/bar -> {controller => 'foo', action => 'bar'}
   my $foo = $r->waypoint('/foo')->to(controller => 'foo', action => 'baz');
   $foo->route('/bar')->to(action => 'bar');
+
+All children will be ignored if a waypoint matches.
 
 =head2 Bridges
 

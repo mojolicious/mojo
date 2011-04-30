@@ -213,6 +213,7 @@ sub _build_frame {
 
   # Length
   my $len = length $payload;
+  $len -= 4 if $masked;
 
   # Empty prefix
   my $prefix = 0;
@@ -309,11 +310,13 @@ sub _parse_frame {
   }
 
   # Payload
+  my $masked = vec($head, 1, 8) & 0b10000000;
+  $len += 4 if $masked;
   return unless length $buffer >= $len;
   my $payload = $len ? substr($buffer, 0, $len, '') : '';
 
   # Unmask payload
-  if (vec($head, 1, 8) & 0b10000000) {
+  if ($masked) {
     warn "UNMASKING PAYLOAD\n" if DEBUG;
     $payload = _xor_mask($payload, substr($payload, 0, 4, ''));
   }

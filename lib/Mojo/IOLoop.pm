@@ -13,7 +13,8 @@ use Scalar::Util 'weaken';
 use Socket qw/IPPROTO_TCP TCP_NODELAY/;
 use Time::HiRes qw/time usleep/;
 
-use constant DEBUG => $ENV{MOJO_IOLOOP_DEBUG} || 0;
+use constant DEBUG      => $ENV{MOJO_IOLOOP_DEBUG} || 0;
+use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE}   || 131072;
 
 # "AF_INET6" requires Socket6 or Perl 5.12
 use constant IPV6_AF_INET6 => eval { Socket::AF_INET6() }
@@ -486,9 +487,9 @@ sub one_tick {
   $self->_prepare_listen;
   $self->_prepare_connections;
 
-  my $loop = $self->_prepare_loop;
-  my $r    = $self->{_reverse};
-  my (@error, @hup, @read, @write);
+  my $loop  = $self->_prepare_loop;
+  my $r     = $self->{_reverse};
+  my $ready = {};
 
   # KQueue
   if (KQUEUE) {
@@ -503,47 +504,41 @@ sub one_tick {
       my ($fd, $filter, $flags, $fflags) = @$kev;
       my $id = $self->{_fds}->{$fd};
       next unless $id;
-
-      if ($flags == KQUEUE_EOF) {
-        if   ($fflags) { push @error, $id }
-        else           { push @hup,   $id }
-      }
-      push @read,  $id if $filter == KQUEUE_READ;
-      push @write, $id if $filter == KQUEUE_WRITE;
+      $ready->{$id} += 2 if $filter == KQUEUE_READ || $flags == KQUEUE_EOF;
+      $ready->{$id}++ if $filter == KQUEUE_WRITE;
     }
   }
 
   # Epoll
   elsif (EPOLL) {
     $loop->poll($timeout);
-
-    push @read,  $r->{$_} for $loop->handles(EPOLL_POLLIN);
-    push @write, $r->{$_} for $loop->handles(EPOLL_POLLOUT);
-    push @error, $r->{$_} for $loop->handles(EPOLL_POLLERR);
-    push @hup,   $r->{$_} for $loop->handles(EPOLL_POLLHUP);
+    $ready->{$r->{$_}} += 2
+      for $loop->handles(EPOLL_POLLIN | EPOLL_POLLHUP | EPOLL_POLLERR);
+    $ready->{$r->{$_}}++ for $loop->handles(EPOLL_POLLOUT);
   }
 
   # Poll
   else {
     $loop->poll($timeout);
-
-    push @read,  $r->{$_} for $loop->handles(POLLIN);
-    push @write, $r->{$_} for $loop->handles(POLLOUT);
-    push @error, $r->{$_} for $loop->handles(POLLERR);
-    push @hup,   $r->{$_} for $loop->handles(POLLHUP);
+    $ready->{$r->{$_}} += 2 for $loop->handles(POLLIN | POLLHUP | POLLERR);
+    $ready->{$r->{$_}}++ for $loop->handles(POLLOUT);
   }
 
   # Handle events
-  $self->_read($_)  for @read;
-  $self->_write($_) for @write;
-  $self->_error($_) for @error;
-  $self->_hup($_)   for @hup;
+  for my $id (keys %$ready) {
+
+    # Read
+    if ($ready->{$id} > 1) { $self->_read($id) }
+
+    # Write
+    else { $self->_write($id) }
+  }
 
   # Handle timers
   my $timers = $self->_timer;
 
   # Handle idle events
-  unless (@read || @write || @error || @hup || $timers) {
+  unless (keys %$ready || $timers) {
     for my $idle (keys %{$self->{_idle}}) {
       $self->_run_callback('idle', $self->{_idle}->{$idle}->{cb}, $idle);
     }
@@ -964,6 +959,9 @@ sub _drop_immediately {
   if (my $handle = $c->{handle}) {
     warn "DISCONNECTED $id\n" if DEBUG;
 
+    # Handle HUP
+    if (my $event = $c->{hup}) { $self->_run_event('hup', $event, $id) }
+
     # Remove file descriptor
     return unless my $fd = fileno $handle;
     delete $self->{_fds}->{$fd};
@@ -989,29 +987,15 @@ sub _drop_immediately {
 
 sub _error {
   my ($self, $id, $error) = @_;
-
-  return unless my $c = $self->{_cs}->{$id};
-  my $event = $c->{error};
-
-  # Cleanup
-  $self->_drop_immediately($id);
+  $error ||= 'Unknown error, probably harmless.';
+  warn qq/ERROR $id "$error"\n/ if DEBUG;
 
   # Handle error
-  $error ||= 'Unknown error, probably harmless.';
+  return unless my $c = $self->{_cs}->{$id};
+  my $event = $c->{error};
   warn "Unhandled event error: $error" and return unless $event;
   $self->_run_event('error', $event, $id, $error);
-}
-
-sub _hup {
-  my ($self, $id) = @_;
-
-  # Cleanup
-  my $event = $self->{_cs}->{$id}->{hup};
   $self->_drop_immediately($id);
-
-  # Handle HUP
-  return unless $event;
-  $self->_run_event('hup', $event, $id);
 }
 
 sub _not_listening {
@@ -1042,7 +1026,7 @@ sub _not_writing {
   my ($self, $id) = @_;
 
   return unless my $c = $self->{_cs}->{$id};
-  return $c->{read_only} = 1 if length $c->{buffer};
+  return $c->{read_only} = 1 if length $c->{buffer} || $c->{drain};
   return unless my $handle = $c->{handle};
 
   # Already not writing
@@ -1168,10 +1152,10 @@ sub _prepare_connections {
   while (my ($id, $c) = each %$cs) {
 
     # Connection needs to be finished
-    if ($c->{finish} && !length $c->{buffer}) {
+    if ($c->{finish} && !length $c->{buffer} && !$c->{drain}) {
 
       # Buffer empty
-      $self->_hup($id);
+      $self->_drop_immediately($id);
       next;
     }
 
@@ -1181,8 +1165,8 @@ sub _prepare_connections {
     # Last active
     my $time = $c->{active} ||= time;
 
-    # HUP
-    $self->_hup($id) if (time - $time) >= ($c->{timeout} || 15);
+    # Connection timeout
+    $self->_drop_immediately($id) if (time - $time) >= ($c->{timeout} || 15);
   }
 
   # Graceful shutdown
@@ -1276,8 +1260,8 @@ sub _read {
   return $self->_tls_connect($id) if $c->{tls_connect};
   return unless defined(my $handle = $c->{handle});
 
-  # Read as much as possible
-  my $read = $handle->sysread(my $buffer, 131072, 0);
+  # Read
+  my $read = $handle->sysread(my $buffer, CHUNK_SIZE, 0);
 
   # Error
   unless (defined $read) {
@@ -1286,18 +1270,19 @@ sub _read {
     return if $! == EAGAIN || $! == EWOULDBLOCK;
 
     # Connection reset
-    return $self->_hup($id) if $! == ECONNRESET;
+    return $self->_drop_immediately($id) if $! == ECONNRESET;
 
     # Read error
     return $self->_error($id, $!);
   }
 
   # EOF
-  return $self->_hup($id) if $read == 0;
+  return $self->_drop_immediately($id) if $read == 0;
 
   # Handle read
-  my $event = $c->{read};
-  $self->_run_event('read', $event, $id, $buffer) if $event;
+  if (my $event = $c->{read}) {
+    $self->_run_event('read', $event, $id, $buffer);
+  }
 
   # Active
   $c->{active} = time;
@@ -1345,6 +1330,7 @@ sub _timer {
     my $t = $ts->{$id};
     my $after = $t->{after} || 0;
     if ($after <= time - ($t->{started} || $t->{recurring})) {
+      warn "TIMER $id\n" if DEBUG;
 
       # Normal timer
       if ($t->{started}) { $self->_drop_immediately($id) }
@@ -1440,27 +1426,29 @@ sub _write {
   $self->_run_event('drain', delete $c->{drain}, $id)
     if !length $c->{buffer} && $c->{drain};
 
-  # Write
-  my $written = $handle->syswrite($c->{buffer});
+  # Write as much as possible
+  if (length $c->{buffer}) {
+    my $written = $handle->syswrite($c->{buffer});
 
-  # Error
-  unless (defined $written) {
+    # Error
+    unless (defined $written) {
 
-    # Retry
-    return if $! == EAGAIN || $! == EWOULDBLOCK;
+      # Retry
+      return if $! == EAGAIN || $! == EWOULDBLOCK;
 
-    # Write error
-    return $self->_error($id, $!);
+      # Write error
+      return $self->_error($id, $!);
+    }
+
+    # Active
+    else { $c->{active} = time }
+
+    # Remove written chunk from buffer
+    substr $c->{buffer}, 0, $written, '';
   }
-
-  # Remove written chunk from buffer
-  substr $c->{buffer}, 0, $written, '';
 
   # Not writing
   $self->_not_writing($id) unless exists $c->{drain} || length $c->{buffer};
-
-  # Active
-  $c->{active} = time if $written;
 }
 
 sub _writing {

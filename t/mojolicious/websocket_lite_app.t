@@ -62,11 +62,12 @@ websocket '/socket' => sub {
   $self->send_message(
     $self->req->headers->host,
     sub {
-      shift->send_message(
+      my $self = shift;
+      $self->send_message(
         Mojo::IOLoop->singleton->connection_timeout($self->tx->connection));
+      $self->finish;
     }
   );
-  $self->finish;
 };
 
 # WebSocket /early_start

@@ -238,7 +238,7 @@ $tx->res->body(
   sub {
     my ($self, $chunk) = @_;
     $buffer .= $chunk;
-    $self->error('Interrupted!');
+    $self->error('Interrupted!') if length $buffer == 3;
   }
 );
 $t->ua->start($tx);

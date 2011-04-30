@@ -10,7 +10,7 @@ use Test::More;
 use Mojo::IOLoop;
 plan skip_all => 'IO::Socket::SSL 1.37 required for this test!'
   unless Mojo::IOLoop::TLS;
-plan tests => 12;
+plan tests => 14;
 
 # "That does not compute.
 #  Really?
@@ -47,10 +47,12 @@ my $id = $ua->ioloop->listen(
 # No certificate
 my $tx = $ua->get("https://localhost:$port");
 ok !$tx->success, 'not successful';
+ok $tx->error, 'has error';
 ok $error, 'has error';
 $error = '';
 $tx    = $ua->cert('')->key('')->get("https://localhost:$port");
 ok !$tx->success, 'not successful';
+ok $tx->error, 'has error';
 ok $error, 'has error';
 
 # Valid certificate

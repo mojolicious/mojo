@@ -57,12 +57,12 @@ my $id = $loop->connect(
     shift->write(shift, 'tset', sub { shift->write(shift, '123') });
   },
   on_read => sub { $client .= pop },
-  on_hup => sub { shift->stop }
+  on_hup  => sub { $client .= 'hup' }
 );
-$loop->connection_timeout($id => '0.5');
+$loop->timer(1 => sub { shift->stop });
 $loop->start;
-is $server, 'tset123hup', 'right content';
-is $client, 'test321',    'right content';
+is $server, 'tset123', 'right content';
+is $client, 'test321', 'right content';
 
 # Valid client certificate
 $loop   = Mojo::IOLoop->singleton;

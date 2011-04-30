@@ -6,6 +6,7 @@ use Mojo::Home;
 use Mojo::Log;
 use Mojo::Transaction::HTTP;
 use Mojo::Transaction::WebSocket;
+use Scalar::Util 'weaken';
 
 has home => sub { Mojo::Home->new };
 has log  => sub { Mojo::Log->new };
@@ -21,6 +22,7 @@ has ua => sub {
   # Fresh user agent
   require Mojo::UserAgent;
   my $ua = Mojo::UserAgent->new(app => $self, log => $self->log);
+  weaken $ua->{app};
 
   return $ua;
 };

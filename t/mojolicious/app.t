@@ -46,7 +46,7 @@ $t->get_ok('/foo/baz')->status_is(404)
 $t->get_ok('/foo/yada')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("look ma! no action!\n");
+  ->content_like(qr/look ma! no action!/);
 
 # SyntaxError::foo (syntax error in controller)
 $t->get_ok('/syntax_error/foo')->status_is(500)

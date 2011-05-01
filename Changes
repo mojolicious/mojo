@@ -6,6 +6,9 @@ This file documents the revision history for Perl extension Mojolicious.
           method. (sbertrang)
         - Deprecated Mojo::IOLoop on_hup method in favor of the on_close
           method.
+        - Made Mojo::Util functions camelize, decamelize, encode, html_escape,
+          html_unescape, quote, trim, unquote, url_escape, url_unescape and
+          xml_escape initialize undef argument to empty string. (cheese)
         - Updated WebSocket implementation to ietf-07.
         - Renamed on_idle method in Mojo::IOLoop to idle.
         - Reduced memory requirements of cached templates by up to 50%.

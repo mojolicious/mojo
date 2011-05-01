@@ -85,6 +85,7 @@ EOF
 $t->get_ok('/basicform')->status_is(200)->content_is(<<EOF);
 <form action="/links">
   <input name="foo" value="bar" />
+  <input name="foo" value="" />
   <input class="test" name="bar" value="baz" />
   <input class="tset" name="baz" value="yada" />
   <input type="submit" value="Ok" />
@@ -256,6 +257,8 @@ __DATA__
 @@ basicform.html.ep
 %= form_for links => begin
   %= text_field foo => 'bar'
+  %  my $xml_undef = undef;
+  %= text_field foo => $xml_undef
   %= text_field bar => 'baz', class => 'test'
   %= input_tag baz => 'yada', class => 'tset'
   %= submit_button

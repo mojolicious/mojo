@@ -305,6 +305,8 @@ sub b64_encode {
 }
 
 sub camelize {
+  return $_[0] = '' unless defined($_[0]);
+  return if $_[0] eq '';
 
   my @parts;
   for my $part (split /-/, $_[0]) {
@@ -325,6 +327,7 @@ sub camelize {
 }
 
 sub decamelize {
+  return $_[0] = '' unless defined($_[0]);
   return if $_[0] !~ /^[A-Z\:]+/;
 
   my @parts;
@@ -363,6 +366,8 @@ sub decode {
 }
 
 sub encode {
+  return $_[1] = '' unless defined($_[1]);
+  return if $_[1] eq '';
 
   # UTF-8
   if ($_[0] eq 'UTF-8') { utf8::encode $_[1] }
@@ -390,6 +395,8 @@ sub hmac_md5_sum { _hmac(\&_md5, @_) }
 sub hmac_sha1_sum { _hmac(\&_sha1, @_) }
 
 sub html_escape {
+  return $_[0] = '' unless defined($_[0]);
+  return if $_[0] eq '';
 
   my $escaped = '';
   for (1 .. length $_[0]) {
@@ -405,6 +412,8 @@ sub html_escape {
 }
 
 sub html_unescape {
+  return $_[0] = '' unless defined($_[0]);
+  return if $_[0] eq '';
 
   # Unescape
   $_[0] =~ s/
@@ -567,6 +576,7 @@ sub qp_encode {
 }
 
 sub quote {
+  $_[0] = '' unless defined($_[0]);
 
   # Escape and quote
   $_[0] =~ s/([\"\\])/\\$1/g;
@@ -590,6 +600,8 @@ EOF
 }
 
 sub trim {
+  return $_[0] = '' unless defined($_[0]);
+  return if $_[0] eq '';
   for ($_[0]) {
     s/^\s*//;
     s/\s*$//;
@@ -597,6 +609,7 @@ sub trim {
 }
 
 sub unquote {
+  return $_[0] = '' unless defined($_[0]);
 
   # Not quoted
   return unless $_[0] =~ /^\".*\"$/g;
@@ -611,6 +624,8 @@ sub unquote {
 }
 
 sub url_escape {
+  return $_[0] = '' unless defined($_[0]);
+  return if $_[0] eq '';
 
   # Default to unreserved characters
   my $pattern = $_[1] || 'A-Za-z0-9\-\.\_\~';
@@ -622,6 +637,7 @@ sub url_escape {
 }
 
 sub url_unescape {
+  return $_[0] = '' unless defined($_[0]);
   return if index($_[0], '%') == -1;
 
   # Unescape
@@ -629,6 +645,8 @@ sub url_unescape {
 }
 
 sub xml_escape {
+  return $_[0] = '' unless defined($_[0]);
+  return if $_[0] eq '';
 
   # Replace "&", "<", ">", """ and "'"
   for ($_[0]) {
@@ -747,6 +765,8 @@ Camelize string in-place.
 
   foo_bar -> FooBar
 
+If string is undef, initialize it to empty string.
+
 =head2 C<decamelize>
 
   decamelize $string;
@@ -754,6 +774,8 @@ Camelize string in-place.
 Decamelize string in-place.
 
   FooBar -> foo_bar
+
+If string is undef, initialize it to empty string.
 
 =head2 C<decode>
 
@@ -766,6 +788,8 @@ Decode octets in-place.
   encode 'UTF-8', $chars;
 
 Encode characters in-place.
+
+If $chars is undef, initialize it to empty string.
 
 =head2 C<get_line>
 
@@ -793,11 +817,15 @@ Note that Perl 5.10 or L<Digest::SHA> are required for C<SHA1> support.
 
 HTML escape string in-place.
 
+If string is undef, initialize it to empty string.
+
 =head2 C<html_unescape>
 
   html_unescape $string;
 
 HTML unescape string in-place.
+
+If string is undef, initialize it to empty string.
 
 =head2 C<md5_bytes>
 
@@ -828,6 +856,8 @@ Punycode encode string in-place, as described in RFC 3492.
   quote $string;
 
 Quote string in-place.
+
+If string is undef, treat it as empty string.
 
 =head2 C<qp_decode>
 
@@ -861,11 +891,15 @@ Note that Perl 5.10 or L<Digest::SHA> are required for C<SHA1> support.
 
 Trim whitespace characters from both ends of string in-place.
 
+If string is undef, initialize it to empty string.
+
 =head2 C<unquote>
 
   unquote $string;
 
 Unquote string in-place.
+
+If string is undef, initialize it to empty string.
 
 =head2 C<url_escape>
 
@@ -874,11 +908,15 @@ Unquote string in-place.
 
 URL escape in-place.
 
+If string is undef, initialize it to empty string.
+
 =head2 C<url_unescape>
 
   url_unescape $string;
 
 URL unescape in-place.
+
+If string is undef, initialize it to empty string.
 
 =head2 C<xml_escape>
 
@@ -886,6 +924,8 @@ URL unescape in-place.
 
 XML escape string in-place, this is a much faster version of C<html_escape>
 escaping only the characters C<&>, C<E<lt>>, C<E<gt>>, C<"> and C<'>.
+
+If string is undef, initialize it to empty string.
 
 =head1 SEE ALSO
 

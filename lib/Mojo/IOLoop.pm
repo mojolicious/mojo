@@ -965,8 +965,6 @@ sub _drop_immediately {
     delete $self->{_listening};
   }
 
-  return $self unless $c;
-
   # Delete associated timers
   if (my $t = $c->{connect_timer} || $c->{accept_timer}) {
     $self->_drop_immediately($t);

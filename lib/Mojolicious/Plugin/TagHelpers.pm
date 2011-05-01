@@ -315,6 +315,7 @@ sub _tag {
   my %attrs = @_;
   for my $key (sort keys %attrs) {
     my $value = $attrs{$key};
+    $value = '' unless defined $value;
     xml_escape $value;
     $tag .= qq/ $key="$value"/;
   }

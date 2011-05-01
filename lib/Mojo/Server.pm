@@ -19,20 +19,7 @@ has app => sub {
 };
 has app_class =>
   sub { ref $ENV{MOJO_APP} || $ENV{MOJO_APP} || 'Mojo::HelloWorld' };
-has on_build_tx => sub {
-  sub {
-    my $self = shift;
-
-    # Reload
-    if ($self->reload) {
-      if (my $e = Mojo::Loader->reload) { warn $e }
-      delete $self->{app};
-    }
-
-    $self->app->on_build_tx->($self->app);
-  };
-};
-has on_handler => sub {
+has on_request => sub {
   sub {
     my $app = shift->app;
     my $tx  = shift;
@@ -46,6 +33,19 @@ has on_handler => sub {
       unless $tx->is_writing;
   };
 };
+has on_transaction => sub {
+  sub {
+    my $self = shift;
+
+    # Reload
+    if ($self->reload) {
+      if (my $e = Mojo::Loader->reload) { warn $e }
+      delete $self->{app};
+    }
+
+    $self->app->on_transaction->($self->app);
+  };
+};
 has on_websocket => sub {
   sub {
     my $self = shift;
@@ -53,6 +53,24 @@ has on_websocket => sub {
   };
 };
 has reload => sub { $ENV{MOJO_RELOAD} || 0 };
+
+# DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
+sub on_build_tx {
+  warn <<EOF;
+Mojo::Server->on_build_tx is DEPRECATED in favor of
+Mojo::Server->on_transaction!!!
+EOF
+  shift->on_transaction(@_);
+}
+
+# DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
+sub on_handler {
+  warn <<EOF;
+Mojo::Server->on_handler is DEPRECATED in favor of
+Mojo::Server->on_request!!!
+EOF
+  shift->on_request(@_);
+}
 
 # "Are you saying you're never going to eat any animal again? What about
 #  bacon?
@@ -79,10 +97,10 @@ Mojo::Server - HTTP Server Base Class
     my $self = shift;
 
     # Get a transaction
-    my $tx = $self->on_build_tx->($self);
+    my $tx = $self->on_transaction->($self);
 
     # Call the handler
-    $tx = $self->on_handler->($self);
+    $tx = $self->on_request->($self);
   }
 
 =head1 DESCRIPTION
@@ -108,24 +126,24 @@ Application this server handles, defaults to a L<Mojo::HelloWorld> object.
 Class of the application this server handles, defaults to
 L<Mojo::HelloWorld>.
 
-=head2 C<on_build_tx>
+=head2 C<on_request>
 
-  my $btx = $server->on_build_tx;
-  $server = $server->on_build_tx(sub {
+  my $handler = $server->on_request;
+  $server     = $server->on_request(sub {
+    my ($self, $tx) = @_;
+  });
+
+Request callback.
+
+=head2 C<on_transaction>
+
+  my $btx = $server->on_transaction;
+  $server = $server->on_transaction(sub {
     my $self = shift;
     return Mojo::Transaction::HTTP->new;
   });
 
 Transaction builder callback.
-
-=head2 C<on_handler>
-
-  my $handler = $server->on_handler;
-  $server     = $server->on_handler(sub {
-    my ($self, $tx) = @_;
-  });
-
-Handler callback.
 
 =head2 C<on_websocket>
 

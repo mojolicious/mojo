@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo::Transaction';
 use Mojo::Message::Request;
 use Mojo::Message::Response;
 
-has [qw/on_handler on_upgrade/];
+has [qw/on_upgrade on_request/];
 has req => sub { Mojo::Message::Request->new };
 has res => sub { Mojo::Message::Response->new };
 
@@ -180,6 +180,15 @@ sub keep_alive {
   return $self->{keep_alive};
 }
 
+# DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
+sub on_handler {
+  warn <<EOF;
+Mojo::Transaction::HTTP->on_handler is DEPRECATED in favor of
+Mojo::Transaction::HTTP->on_request!!!
+EOF
+  shift->on_request(@_);
+}
+
 sub server_leftovers {
   my $self = shift;
 
@@ -209,7 +218,7 @@ sub server_read {
   if ($req->error && !$handled) {
 
     # Handler callback
-    $self->on_handler->($self);
+    $self->on_request->($self);
 
     # Close connection
     $res->headers->connection('Close');
@@ -226,7 +235,7 @@ sub server_read {
     $ws = $self->on_upgrade->($self) if $req->headers->upgrade;
 
     # Handler callback
-    $self->on_handler->($ws ? ($ws, $self) : $self);
+    $self->on_request->($ws ? ($ws, $self) : $self);
 
     # Protect handler from incoming pipelined requests
     $self->{_handled} = 1;
@@ -416,19 +425,19 @@ and implements the following new ones.
 
 Connection can be kept alive.
 
-=head2 C<on_handler>
-
-  my $cb = $tx->on_handler;
-  $tx    = $tx->on_handler(sub {...});
-
-Handler callback.
-
 =head2 C<on_upgrade>
 
   my $cb = $tx->on_upgrade;
   $tx    = $tx->on_upgrade(sub {...});
 
 WebSocket upgrade callback.
+
+=head2 C<on_request>
+
+  my $cb = $tx->on_request;
+  $tx    = $tx->on_request(sub {...});
+
+Request callback.
 
 =head2 C<req>
 

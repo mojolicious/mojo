@@ -77,7 +77,7 @@ sub new {
   my $self = shift->SUPER::new(@_);
 
   # Transaction builder
-  $self->on_build_tx(
+  $self->on_transaction(
     sub {
       my $self = shift;
       my $tx   = Mojo::Transaction::HTTP->new;

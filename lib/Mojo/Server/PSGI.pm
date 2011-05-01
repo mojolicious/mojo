@@ -10,7 +10,7 @@ use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 131072;
 sub run {
   my ($self, $env) = @_;
 
-  my $tx  = $self->on_build_tx->($self);
+  my $tx  = $self->on_transaction->($self);
   my $req = $tx->req;
 
   # Environment
@@ -28,7 +28,7 @@ sub run {
   }
 
   # Handle
-  $self->on_handler->($self, $tx);
+  $self->on_request->($self, $tx);
 
   my $res    = $tx->res;
   my $status = $res->code;
@@ -98,7 +98,7 @@ Mojo::Server::PSGI - PSGI Server
   use Mojo::Server::PSGI;
 
   my $psgi = Mojo::Server::PSGI->new;
-  $psgi->on_handler(sub {
+  $psgi->on_request(sub {
     my ($self, $tx) = @_;
 
     # Request

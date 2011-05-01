@@ -103,7 +103,7 @@ sub read_request {
   $self->app->log->debug('Reading FastCGI request.') if DEBUG;
 
   # Transaction
-  my $tx = $self->on_build_tx->($self);
+  my $tx = $self->on_transaction->($self);
   $tx->connection($c);
   my $req = $tx->req;
 
@@ -212,7 +212,7 @@ sub run {
 
     # Handle
     $self->app->log->debug('Handling FastCGI request.') if DEBUG;
-    $self->on_handler->($self, $tx);
+    $self->on_request->($self, $tx);
 
     # Response
     $self->write_response($tx);
@@ -402,7 +402,7 @@ Mojo::Server::FastCGI - FastCGI Server
   use Mojo::Server::FastCGI;
 
   my $fcgi = Mojo::Server::FastCGI->new;
-  $fcgi->on_handler(sub {
+  $fcgi->on_request(sub {
     my ($self, $tx) = @_;
 
     # Request

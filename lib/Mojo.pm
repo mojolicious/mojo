@@ -10,7 +10,7 @@ use Scalar::Util 'weaken';
 
 has home => sub { Mojo::Home->new };
 has log  => sub { Mojo::Log->new };
-has on_build_tx => sub {
+has on_transaction => sub {
   sub { Mojo::Transaction::HTTP->new }
 };
 has on_websocket => sub {
@@ -58,6 +58,14 @@ EOF
 }
 
 sub handler { croak 'Method "handler" not implemented in subclass' }
+
+# DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
+sub on_build_tx {
+  warn <<EOF;
+Mojo->on_build_tx is DEPRECATED in favor of Mojo->on_transaction!!!
+EOF
+  shift->on_transaction(@_);
+}
 
 1;
 __END__
@@ -115,10 +123,10 @@ which stringifies to the actual path.
     
 The logging layer of your application, by default a L<Mojo::Log> object.
 
-=head2 C<on_build_tx>
+=head2 C<on_transaction>
 
-  my $cb = $app->on_build_tx;
-  $app   = $app->on_build_tx(sub {...});
+  my $cb = $app->on_transaction;
+  $app   = $app->on_transaction(sub {...});
 
 The transaction builder callback, by default it builds a
 L<Mojo::Transaction::HTTP> object.

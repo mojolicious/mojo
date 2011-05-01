@@ -6,6 +6,8 @@ This file documents the revision history for Perl extension Mojolicious.
           method. (sbertrang)
         - Deprecated Mojo::IOLoop on_hup method in favor of the on_close
           method.
+        - Deprecated on_build_tx methods in favor of on_transaction methods.
+        - Deprecated on_handler methods in favor of on_request methods.
         - Updated WebSocket implementation to ietf-07.
         - Renamed on_idle method in Mojo::IOLoop to idle.
         - Reduced memory requirements of cached templates by up to 50%.

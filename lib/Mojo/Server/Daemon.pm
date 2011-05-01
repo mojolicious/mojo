@@ -115,7 +115,7 @@ sub _build_tx {
   my ($self, $id, $c) = @_;
 
   # Build transaction
-  my $tx = $self->on_build_tx->($self);
+  my $tx = $self->on_transaction->($self);
   $tx->connection($id);
 
   # Identify
@@ -135,12 +135,12 @@ sub _build_tx {
 
   # Handler callback
   weaken $self;
-  $tx->on_handler(
+  $tx->on_request(
     sub {
       my $tx = shift;
 
       # Handler
-      $self->on_handler->($self, $tx);
+      $self->on_request->($self, $tx);
 
       # Resume callback
       $tx->on_resume(sub { $self->_write($id) });
@@ -379,7 +379,7 @@ Mojo::Server::Daemon - Async IO HTTP 1.1 And WebSocket Server
   use Mojo::Server::Daemon;
 
   my $daemon = Mojo::Server::Daemon->new(listen => ['http://*:8080']);
-  $daemon->on_handler(sub {
+  $daemon->on_request(sub {
     my ($self, $tx) = @_;
 
     # Request

@@ -160,6 +160,11 @@ sub _build_tx {
   return $tx;
 }
 
+sub _close {
+  my ($self, $loop, $id) = @_;
+  $self->_drop($id);
+}
+
 sub _drop {
   my ($self, $id) = @_;
 
@@ -229,11 +234,6 @@ sub _finish {
   }
 }
 
-sub _hup {
-  my ($self, $loop, $id) = @_;
-  $self->_drop($id);
-}
-
 sub _listen {
   my ($self, $listen) = @_;
   return unless $listen;
@@ -272,8 +272,8 @@ sub _listen {
     # Keep alive timeout
     $loop->connection_timeout($id => $self->keep_alive_timeout);
   };
+  $options->{on_close} = sub { $self->_close(@_) };
   $options->{on_error} = sub { $self->_error(@_) };
-  $options->{on_hup}   = sub { $self->_hup(@_) };
   $options->{on_read}  = sub { $self->_read(@_) };
 
   # Listen

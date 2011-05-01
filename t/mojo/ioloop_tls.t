@@ -46,18 +46,18 @@ $loop->listen(
   on_accept => sub {
     shift->write(shift, 'test', sub { shift->write(shift, '321') });
   },
-  on_read => sub { $server .= pop },
-  on_hup  => sub { $server .= 'hup' }
+  on_close => sub { $server .= 'close' },
+  on_read  => sub { $server .= pop }
 );
 my $id = $loop->connect(
   address    => 'localhost',
   port       => $port,
   tls        => 1,
+  on_close   => sub { $client .= 'close' },
   on_connect => sub {
     shift->write(shift, 'tset', sub { shift->write(shift, '123') });
   },
-  on_read => sub { $client .= pop },
-  on_hup  => sub { $client .= 'hup' }
+  on_read => sub { $client .= pop }
 );
 $loop->timer(1 => sub { shift->stop });
 $loop->start;
@@ -81,9 +81,9 @@ $loop->listen(
     shift->write(shift, 'test', sub { shift->write(shift, '321') });
     $running = Mojo::IOLoop->is_running;
   },
-  on_read => sub { $server .= pop },
-  on_hup  => sub { $server .= 'hup' },
+  on_close => sub { $server .= 'close' },
   on_error => sub { $error = pop },
+  on_read => sub { $server .= pop }
 );
 $id = $loop->connect(
   address    => 'localhost',
@@ -91,17 +91,17 @@ $id = $loop->connect(
   tls        => 1,
   tls_cert   => 't/mojo/certs/client.crt',
   tls_key    => 't/mojo/certs/client.key',
+  on_close   => sub { shift->stop },
   on_connect => sub {
     shift->write(shift, 'tset', sub { shift->write(shift, '123') });
   },
-  on_read => sub { $client .= pop },
-  on_hup => sub { shift->stop },
+  on_read => sub { $client .= pop }
 );
 $loop->connection_timeout($id => '0.5');
 $loop->timer(1 => sub { shift->stop });
 $loop->start;
-is $server, 'tset123hup', 'right content';
-is $client, 'test321',    'right content';
+is $server, 'tset123close', 'right content';
+is $client, 'test321',      'right content';
 ok $running, 'loop was running';
 ok !$drop,  'event dropped successfully';
 ok !$error, 'no error';
@@ -162,9 +162,9 @@ $loop->listen(
   on_accept  => sub {
     shift->write(shift, 'test', sub { shift->write(shift, '321') });
   },
-  on_read => sub { $server .= pop },
-  on_hup  => sub { $server .= 'hup' },
-  on_error => sub { $error = pop }
+  on_close => sub { $server .= 'close' },
+  on_error => sub { $error = pop },
+  on_read => sub { $server .= pop }
 );
 $id = $loop->connect(
   address    => 'localhost',
@@ -172,17 +172,17 @@ $id = $loop->connect(
   tls        => 1,
   tls_cert   => 't/mojo/certs/client.crt',
   tls_key    => 't/mojo/certs/client.key',
+  on_close   => sub { shift->stop },
   on_connect => sub {
     shift->write(shift, 'tset', sub { shift->write(shift, '123') });
   },
-  on_read => sub { $client .= pop },
-  on_hup => sub { shift->stop },
+  on_read => sub { $client .= pop }
 );
 $loop->connection_timeout($id => '0.5');
 $loop->timer(1 => sub { shift->stop });
 $loop->start;
-is $server, 'tset123hup', 'right content';
-is $client, 'test321',    'right content';
+is $server, 'tset123close', 'right content';
+is $client, 'test321',      'right content';
 
 # Missing client certificate
 $error = $cerror = '';

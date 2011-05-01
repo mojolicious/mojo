@@ -214,11 +214,14 @@ sub connect {
   $self->{_cs}->{$id} = $c;
 
   # Register callbacks
-  for my $name (qw/error hup read/) {
+  for my $name (qw/close error read/) {
     my $cb    = $args->{"on_$name"};
     my $event = "on_$name";
     $self->$event($id => $cb) if $cb;
   }
+
+  # DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
+  $self->on_close($id => $args->{on_hup}) if $args->{on_hup};
 
   # Lookup
   if (!$args->{handle} && (my $address = $args->{address})) {
@@ -377,8 +380,8 @@ sub listen {
   my $c = {
     file => $args->{file} ? 1 : 0,
     on_accept => $args->{on_accept},
+    on_close  => $args->{on_close},
     on_error  => $args->{on_error},
-    on_hup    => $args->{on_hup},
     on_read   => $args->{on_read},
   };
   (my $id) = "$c" =~ /0x([\da-f]+)/;
@@ -386,6 +389,9 @@ sub listen {
   $self->{_fds}->{$fd}         = $id;
   $c->{handle}                 = $socket;
   $self->{_reverse}->{$socket} = $id;
+
+  # DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
+  $c->{on_close} = $args->{on_hup} if $args->{on_hup};
 
   # TLS
   if ($args->{tls}) {
@@ -462,9 +468,18 @@ sub lookup {
   );
 }
 
+sub on_close { shift->_add_event(close => @_) }
 sub on_error { shift->_add_event(error => @_) }
-sub on_hup   { shift->_add_event(hup   => @_) }
-sub on_read  { shift->_add_event(read  => @_) }
+
+# DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
+sub on_hup {
+  warn <<EOF;
+Mojo::IOLoop->on_hup is DEPRECATED in favor of Mojo::IOLoop->on_close!!!
+EOF
+  shift->on_close(@_);
+}
+
+sub on_read { shift->_add_event(read => @_) }
 
 # DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
 sub on_tick {
@@ -833,7 +848,7 @@ sub _accept {
   setsockopt($socket, IPPROTO_TCP, TCP_NODELAY, 1) unless $l->{file};
 
   # Register callbacks
-  for my $name (qw/on_error on_hup on_read/) {
+  for my $name (qw/on_close on_error on_read/) {
     my $cb = $l->{$name};
     $self->$name($id => $cb) if $cb;
   }
@@ -950,6 +965,8 @@ sub _drop_immediately {
     delete $self->{_listening};
   }
 
+  return $self unless $c;
+
   # Delete associated timers
   if (my $t = $c->{connect_timer} || $c->{accept_timer}) {
     $self->_drop_immediately($t);
@@ -959,11 +976,11 @@ sub _drop_immediately {
   if (my $handle = $c->{handle}) {
     warn "DISCONNECTED $id\n" if DEBUG;
 
-    # Handle HUP
-    if (my $event = $c->{hup}) { $self->_run_event('hup', $event, $id) }
+    # Handle close
+    if (my $event = $c->{close}) { $self->_run_event('close', $event, $id) }
 
     # Remove file descriptor
-    return unless my $fd = fileno $handle;
+    return $self unless my $fd = fileno $handle;
     delete $self->{_fds}->{$fd};
 
     # Remove handle from kqueue
@@ -1676,13 +1693,13 @@ Use an already prepared handle.
 
 Callback to be invoked once the connection is established.
 
+=item C<on_close>
+
+Callback to be invoked if the connection gets closed.
+
 =item C<on_error>
 
 Callback to be invoked if an error event happens on the connection.
-
-=item C<on_hup>
-
-Callback to be invoked if the connection gets closed.
 
 =item C<on_read>
 
@@ -1806,13 +1823,13 @@ A unix domain socket to listen on.
 
 Callback to invoke for each accepted connection.
 
+=item C<on_close>
+
+Callback to be invoked if the connection gets closed.
+
 =item C<on_error>
 
 Callback to be invoked if an error event happens on the connection.
-
-=item C<on_hup>
-
-Callback to be invoked if the connection gets closed.
 
 =item C<on_read>
 
@@ -1875,17 +1892,17 @@ Note that this method is EXPERIMENTAL and might change without warning!
     print "Address: $address\n";
   });
 
+=head2 C<on_close>
+
+  $loop = $loop->on_close($id => sub {...});
+
+Callback to be invoked if the connection gets closed.
+
 =head2 C<on_error>
 
   $loop = $loop->on_error($id => sub {...});
 
 Callback to be invoked if an error event happens on the connection.
-
-=head2 C<on_hup>
-
-  $loop = $loop->on_hup($id => sub {...});
-
-Callback to be invoked if the connection gets closed.
 
 =head2 C<on_read>
 

@@ -4,6 +4,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added opposite tests to Test::Mojo.
         - Deprecated Mojo::IOLoop on_tick method in favor of the recurring
           method. (sbertrang)
+        - Deprecated Mojo::IOLoop on_hup method in favor of the on_close
+          method.
         - Updated WebSocket implementation to ietf-07.
         - Renamed on_idle method in Mojo::IOLoop to idle.
         - Reduced memory requirements of cached templates by up to 50%.

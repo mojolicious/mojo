@@ -13,8 +13,8 @@ plan skip_all => 'set TEST_POD to enable this test (developer only!)'
 # DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
 my @smiling_cat = (
   qw/async build_form_tx build_tx build_websocket_tx client clone delete/,
-  qw/detect_proxy finish get head need_proxy on_finish on_message on_tick/,
-  qw/post post_form put queue req res send_message singleton start/,
+  qw/detect_proxy finish get head need_proxy on_finish on_hup on_message/,
+  qw/on_tick post post_form put queue req res send_message singleton start/,
   qw/test_server websocket/
 );
 

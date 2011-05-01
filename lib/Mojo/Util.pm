@@ -629,6 +629,7 @@ sub url_unescape {
 }
 
 sub xml_escape {
+  return $_[0] = '' unless defined $_[0];
 
   # Replace "&", "<", ">", """ and "'"
   for ($_[0]) {

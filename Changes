@@ -17,6 +17,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed Windows bug in Mojo::Asset::File. (kimoto)
         - Fixed small memory leak.
         - Fixed small stack localization bug.
+        - Fixed small tag helper escaping bug. (cheese)
         - Fixed typos. (metaperl, cheese)
 
 1.21    2011-04-20 00:00:00

@@ -55,8 +55,11 @@ sub DESTROY {
   my $self = shift;
 
   # Cleanup
-  my $file = $self->path;
-  unlink $file if $self->cleanup && -f $file;
+  my $path = $self->path;
+  if ($self->cleanup && -f $path) {
+    close $self->handle;
+    unlink $path;
+  }
 }
 
 sub add_chunk {

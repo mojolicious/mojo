@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 44;
+use Test::More tests => 46;
 
 # "And now, in the spirit of the season: start shopping.
 #  And for every dollar of Krusty merchandise you buy,
@@ -19,6 +19,12 @@ is $file->contains(''),    0,  'empty string at position 0';
 is $file->contains('abc'), 0,  '"abc" at position 0';
 is $file->contains('bc'),  1,  '"bc" at position 1';
 is $file->contains('db'),  -1, 'does not contain "db"';
+
+# Cleanup
+my $path = $file->path;
+ok -e $path, 'temporary file exists';
+undef $file;
+ok !-e $path, 'temporary file has been cleaned up';
 
 # Memory asset
 my $mem = Mojo::Asset::Memory->new;

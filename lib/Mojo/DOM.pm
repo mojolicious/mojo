@@ -148,7 +148,7 @@ sub all_text {
     # CDATA or raw text
     elsif ($type eq 'cdata' || $type eq 'raw') { $content = $e->[1] }
 
-    # Append
+    # Ignore whitespace blocks
     $text .= $content if $content =~ /\S+/;
   }
 
@@ -377,7 +377,7 @@ sub text {
     # CDATA or raw text
     elsif ($type eq 'cdata' || $type eq 'raw') { $content = $e->[1] }
 
-    # Append
+    # Ignore whitespace blocks
     $text .= $content if $content =~ /\S+/;
   }
 
@@ -1209,8 +1209,6 @@ sub _start {
   # New
   my $new = ['tag', $start, $attrs, $$current];
   weaken $new->[3];
-
-  # Append
   push @$$current, $new;
   $$current = $new;
 }

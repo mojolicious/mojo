@@ -67,8 +67,6 @@ sub extract {
     # Path
     $cookie->path($url->path) unless $cookie->path;
   }
-
-  # Store
   $self->add(@cookies);
 }
 

@@ -65,7 +65,7 @@ sub add_chunk {
   # Seek to end
   $self->handle->sysseek(0, SEEK_END);
 
-  # Store
+  # Append to file
   $chunk = '' unless defined $chunk;
   utf8::encode $chunk if utf8::is_utf8 $chunk;
   $self->handle->syswrite($chunk, length $chunk);

@@ -145,7 +145,6 @@ sub header {
     return $self->add($name, @_);
   }
 
-  # Headers
   return unless my $headers = $self->{_headers}->{lc $name};
 
   # String
@@ -259,8 +258,6 @@ sub to_hash {
   # Build
   my $hash = {};
   foreach my $header (@{$self->names}) {
-
-    # Header
     my @headers = $self->header($header);
 
     # Nested arrayrefs

@@ -36,8 +36,6 @@ sub append {
     push @params, map { ($params[$i - 1], $_) } @{$params[$i]};
     splice @params, $i - 1, 2;
   }
-
-  # Append
   push @{$self->params}, map { defined $_ ? "$_" : '' } @params;
 
   return $self;
@@ -64,10 +62,8 @@ sub param {
   # List names
   return sort keys %{$self->to_hash} unless $name;
 
-  # Cleanup
+  # Replace values
   $self->remove($name) if defined $_[0];
-
-  # Append
   $self->append($name, $_) for @_;
 
   # List values

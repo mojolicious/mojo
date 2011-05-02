@@ -24,14 +24,8 @@ sub new {
 
 sub throw {
   my $self = shift;
-
-  # Exception
-  my $e = Mojo::Exception->new;
-
-  # Trace
+  my $e    = Mojo::Exception->new;
   $e->trace(2);
-
-  # Detect and throw
   die $e->_detect(@_);
 }
 
@@ -42,8 +36,6 @@ sub trace {
   # Trace
   my @frames;
   while (my ($p, $f, $l) = caller($start++)) {
-
-    # Append
     push @frames, [$p, $f, $l];
 
     # Line
@@ -81,8 +73,6 @@ sub _detect {
 
   # Frames
   foreach my $frame (reverse @trace) {
-
-    # Frame
     my $file = $frame->{file};
     my $line = $frame->{line};
 
@@ -95,8 +85,6 @@ sub _detect {
 
       # Line
       $self->_parse_context($line, [\@lines]);
-
-      # Done
       return $self;
     }
   }
@@ -145,7 +133,7 @@ sub _detect {
 sub to_string {
   my $self = shift;
 
-  # Verbose
+  # Message only
   return $self->message unless $self->verbose;
 
   my $string = '';

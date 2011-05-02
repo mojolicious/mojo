@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+1.23    2011-05-02 00:00:00
+        - Fixed typos.
+
 1.22    2011-05-02 00:00:00
         - Added opposite tests to Test::Mojo.
         - Deprecated Mojo::IOLoop on_tick method in favor of the recurring

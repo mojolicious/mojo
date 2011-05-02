@@ -306,19 +306,14 @@ sub b64_encode {
 
 sub camelize {
 
+  # Module parts
   my @parts;
   for my $part (split /-/, $_[0]) {
-
-    # Junk
     next unless $part;
 
-    # Split
+    # Camelcase words
     my @words = split /_/, $part;
-
-    # Case
     @words = map {ucfirst} map {lc} @words;
-
-    # Camelize
     push @parts, join '', @words;
   }
   $_[0] = join '::', @parts;
@@ -327,17 +322,14 @@ sub camelize {
 sub decamelize {
   return if $_[0] !~ /^[A-Z\:]+/;
 
+  # Module parts
   my @parts;
   for my $part (split /\:\:/, $_[0]) {
 
-    # Split
+    # Camelcase words
     my @words;
     push @words, $1 while ($part =~ s/([A-Z]{1}[^A-Z]*)//);
-
-    # Case
     @words = map {lc} @words;
-
-    # Join
     push @parts, join '_', @words;
   }
   $_[0] = join '-', @parts;
@@ -484,7 +476,6 @@ sub punycode_decode {
 sub punycode_encode {
   use integer;
 
-  # Input
   my $output = $_[0];
   my $len    = length $_[0];
 

@@ -69,7 +69,7 @@ sub log {
   my $handle = $self->handle;
   flock $handle, LOCK_EX;
 
-  # Write
+  # Log message
   $handle->syswrite("$time $level $pkg:$line [$$]: $msgs\n");
 
   # Unlock

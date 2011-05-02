@@ -9,13 +9,11 @@ use Mojo::Exception;
 
 use constant DEBUG => $ENV{MOJO_LOADER_DEBUG} || 0;
 
+# Cache stats
 my $STATS = {};
 
-BEGIN {
-
-  # Debugger sub tracking
-  $^P |= 0x10;
-}
+# Debugger sub tracking
+BEGIN { $^P |= 0x10 }
 
 # "Homer no function beer well without."
 sub load {
@@ -26,8 +24,6 @@ sub load {
 
   # Forced reload
   if ($ENV{MOJO_RELOAD}) {
-
-    # Unload
     my $key = $module;
     $key =~ s/\:\:/\//g;
     $key .= '.pm';
@@ -69,11 +65,7 @@ sub reload {
 
     # Modified
     if ($mtime > $STATS->{$file}) {
-
-      # Reload
       if (my $e = _reload($key)) { return $e }
-
-      # Reloaded
       $STATS->{$file} = $mtime;
     }
   }
@@ -85,13 +77,10 @@ sub reload {
 sub search {
   my ($self, $namespace) = @_;
 
-  # Directories
-  my @directories = exists $INC{'blib.pm'} ? grep {/blib/} @INC : @INC;
-
   # Scan
   my $modules = [];
   my %found;
-  foreach my $directory (@directories) {
+  foreach my $directory (exists $INC{'blib.pm'} ? grep {/blib/} @INC : @INC) {
     my $path = File::Spec->catdir($directory, (split /::/, $namespace));
     next unless (-e $path && -d $path);
 
@@ -123,24 +112,19 @@ sub _reload {
   my $key = shift;
   warn "$key modified, reloading!\n" if DEBUG;
 
-  # Unload
   _unload($key);
-
-  # Failed
   return Mojo::Exception->new($@)
     unless eval { package main; require $key; 1 };
-
-  # Success
   return;
 }
 
 sub _unload {
   my $key = shift;
 
-  # Unload
   my $file = $INC{$key};
   delete $INC{$key};
   return unless $file;
+
   my @subs = grep { index($DB::sub{$_}, "$file:") == 0 }
     keys %DB::sub;
   for my $sub (@subs) {

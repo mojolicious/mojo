@@ -127,9 +127,17 @@ sub delete_ok { shift->_request_ok('delete', @_) }
 
 sub element_exists {
   my ($self, $selector, $desc) = @_;
-  $desc ||= $selector;
+  $desc ||= qq/"$selector" exists/;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::ok($self->tx->res->dom->at($selector), $desc);
+  return $self;
+}
+
+sub element_exists_not {
+  my ($self, $selector, $desc) = @_;
+  $desc ||= qq/"$selector" exists not/;
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+  Test::More::ok(!$self->tx->res->dom->at($selector), $desc);
   return $self;
 }
 
@@ -488,6 +496,13 @@ Perform a C<DELETE> request and check for success.
 
 Checks for existence of the CSS3 selectors first matching XML/HTML element
 with L<Mojo::DOM>.
+
+=head2 C<element_exists_not>
+
+  $t = $t->element_exists_not('div.foo[x=y]');
+  $t = $t->element_exists_not('html head title', 'has no title');
+
+Opposite of C<element_exists>.
 
 =head2 C<get_ok>
 

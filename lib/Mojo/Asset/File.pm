@@ -56,7 +56,14 @@ sub DESTROY {
 
   # Cleanup
   my $file = $self->path;
-  unlink $file if $self->cleanup && -f $file;
+  if ($self->cleanup and -f $file) {
+    
+    # Windows requires that the handle is closed
+    close $self->handle if defined $self->handle;
+    delete $self->{handle} if exists $self->{handle};
+    
+    unlink $file; # don't worry about return code
+  }
 }
 
 sub add_chunk {

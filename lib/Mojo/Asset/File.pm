@@ -32,7 +32,7 @@ has handle => sub {
   my $fh;
   until (sysopen $fh, $name, O_CREAT | O_EXCL | O_RDWR) {
     croak qq/Can't open file "$name": $!/ if $file || $! != $!{EEXIST};
-    $name = $base . md5_sum(time . $$ . rand 999999999);
+    $name = "$base." . md5_sum(time . $$ . rand 999999999);
   }
   $file = $name;
   $self->path($file);

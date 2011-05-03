@@ -737,7 +737,7 @@ Mostly used for custom dispatchers and postprocessing static file responses.
 
 =item before_render
 
-Triggered right before teh renderer turns the stash into a response.
+Triggered right before the renderer turns the stash into a response.
 Very useful for making adjustments to the stash right before rendering.
 (Passed the current controller instance and argument hash)
 

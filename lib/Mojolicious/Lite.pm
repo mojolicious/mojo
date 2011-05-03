@@ -826,8 +826,8 @@ See also the tutorial above for more argument variations.
 
   hook after_dispatch => sub {...};
 
-Extend L<Mojolicious> by adding hooks to named events, see L<Mojolicious> for
-a list of all available events.
+Add hooks to named events, see L<Mojolicious> for a list of all available
+events.
 Note that this function is EXPERIMENTAL and might change without warning!
 
 =head2 C<plugin>
@@ -839,7 +839,7 @@ Note that this function is EXPERIMENTAL and might change without warning!
   plugin 'Foo::Bar', foo => 23;
   plugin 'Foo::Bar', {foo => 23};
 
-Load a plugin.
+Load plugins, see L<Mojolicious> for a list of all included example plugins.
 
 =head2 C<post>
 

@@ -17,13 +17,7 @@ my $NAME_RE             = qr/
   \s*\=?\s*      # '=' (optional)
 /x;
 my $SEPARATOR_RE = qr/^\s*\;\s*/;
-my $STRING_RE    = qr/^([^\;\,]+)\s*/;
-my $VALUE_RE     = qr/
-  ^\s*               # Start
-  (\"                # Quote
-  (!:\\(!:\\\")?)*   # Value
-  \")                # Quote
-/x;
+my $VALUE_RE     = qr/^([^\;\,]+)\s*/;
 
 # "My Homer is not a communist.
 #  He may be a liar, a pig, an idiot, a communist,
@@ -42,19 +36,11 @@ sub _tokenize {
       my $name = $1;
       my $value;
 
-      # Quoted value
-      if ($string =~ s/$VALUE_RE//o) {
-        $value = $1;
-        unquote $value if $value;
-      }
-
       # "expires" is a special case, thank you Netscape...
-      elsif ($name =~ /expires/i && $string =~ s/$EXPIRES_RE//o) {
-        $value = $1;
-      }
+      if ($name =~ /expires/i && $string =~ s/$EXPIRES_RE//o) { $value = $1 }
 
-      # Unquoted string
-      elsif ($string =~ s/$STRING_RE//o) { $value = $1 }
+      # Value
+      elsif ($string =~ s/$VALUE_RE//o) { $value = $1 }
 
       # Token
       push @token, [$name, $value];

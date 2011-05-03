@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 59;
+use Test::More tests => 69;
 
 # "What good is money if it can't inspire terror in your fellow man?"
 use_ok 'Mojo::Cookie::Request';
@@ -94,6 +94,23 @@ $cookies = Mojo::Cookie::Response->parse(
     . ' Comment=lalalala');
 is $cookies->[0]->name,    'foo',       'right name';
 is $cookies->[0]->value,   'ba r',      'right value';
+is $cookies->[0]->domain,  'kraih.com', 'right domain';
+is $cookies->[0]->path,    '/test',     'right path';
+is $cookies->[0]->max_age, 60,          'right max age value';
+is $cookies->[0]->expires, 'Thu, 07 Aug 2008 07:07:59 GMT',
+  'right expires value';
+is $cookies->[0]->port,    '80 8080',  'right port';
+is $cookies->[0]->secure,  '1',        'right secure flag';
+is $cookies->[0]->comment, 'lalalala', 'right comment';
+is $cookies->[0]->version, '1',        'right version';
+
+# Parse quoted response cookie
+$cookies = Mojo::Cookie::Response->parse(
+  'foo="b a\" r\"\\"; Version=1; Domain=kraih.com; Path=/test; Max-Age=60;'
+    . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; Port="80 8080"; Secure;'
+    . ' Comment=lalalala');
+is $cookies->[0]->name,    'foo',       'right name';
+is $cookies->[0]->value,   'b a" r"\\', 'right value';
 is $cookies->[0]->domain,  'kraih.com', 'right domain';
 is $cookies->[0]->path,    '/test',     'right path';
 is $cookies->[0]->max_age, 60,          'right max age value';

@@ -44,9 +44,10 @@ sub import {
 
   # Export
   *{"${caller}::new"} = *{"${caller}::app"} = sub {$app};
-  *{"${caller}::any"} = sub { $routes->any(@_) };
-  *{"${caller}::del"} = sub { $routes->del(@_) };
-  *{"${caller}::get"} = sub { $routes->get(@_) };
+  *{"${caller}::any"}  = sub { $routes->any(@_) };
+  *{"${caller}::del"}  = sub { $routes->del(@_) };
+  *{"${caller}::get"}  = sub { $routes->get(@_) };
+  *{"${caller}::hook"} = sub { $app->hook(@_) };
   *{"${caller}::under"} = *{"${caller}::ladder"} =
     sub { $routes = $root->under(@_) };
   *{"${caller}::plugin"}    = sub { $app->plugin(@_) };
@@ -820,6 +821,14 @@ See also the tutorial above for more argument variations.
 
 Generate route matching only C<GET> requests.
 See also the tutorial above for more argument variations.
+
+=head2 C<hook>
+
+  hook after_dispatch => sub {...};
+
+Extend L<Mojolicious> by adding hooks to named events, see L<Mojolicious> for
+a list of all available events.
+Note that this function is EXPERIMENTAL and might change without warning!
 
 =head2 C<plugin>
 

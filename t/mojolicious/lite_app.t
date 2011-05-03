@@ -87,12 +87,10 @@ post '/multipart/form' => sub {
 };
 
 # Reverse "partial" alias
-app->hook(
-  before_render => sub {
-    my ($self, $args) = @_;
-    $args->{partial} = 1 if $args->{laitrap};
-  }
-);
+hook before_render => sub {
+  my ($self, $args) = @_;
+  $args->{partial} = 1 if $args->{laitrap};
+};
 
 # GET /reverse/render
 get '/reverse/render' => sub {
@@ -469,7 +467,7 @@ get '/subrequest_sync' => sub {
 };
 
 # Make sure hook runs async
-app->hook(after_dispatch => sub { shift->stash->{async} = 'broken!' });
+hook after_dispatch => sub { shift->stash->{async} = 'broken!' };
 
 # GET /subrequest_async
 my $async;

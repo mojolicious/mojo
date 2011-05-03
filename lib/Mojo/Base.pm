@@ -6,6 +6,11 @@ use warnings;
 # No imports because we get subclassed, a lot!
 require Carp;
 
+# DEPRECATED!
+warn <<EOF unless eval 'use 5.010; 1';
+Support for Perl 5.8.x in Mojolicious has been deprecated, please upgrade!!!
+EOF
+
 # "Kids, you tried your best and you failed miserably.
 #  The lesson is, never try."
 sub import {

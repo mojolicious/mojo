@@ -549,7 +549,7 @@ can easily use as a fallback for applications that might be used offline from
 time to time.
 
   <%= javascript
-    'http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js' %>
+    'http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js' %>
   <%= javascript begin %>
     if (typeof jQuery == 'undefined') {
       var e = document.createElement('script');

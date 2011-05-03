@@ -91,11 +91,11 @@ sub render {
   my ($self, $c, $args) = @_;
   $args ||= {};
 
-  my $stash   = $c->stash;
+  my $stash = $c->stash;
   my $content = $stash->{'mojo.content'} ||= {};
-  my $partial = $args->{partial};
 
   # Localize extends and layout
+  my $partial = $args->{partial};
   local $stash->{layout}  = $partial ? undef : $stash->{layout};
   local $stash->{extends} = $partial ? undef : $stash->{extends};
 

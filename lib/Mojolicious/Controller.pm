@@ -238,7 +238,9 @@ sub render {
   }
 
   # Render
-  my ($output, $type) = $self->app->renderer->render($self, $args);
+  my $app = $self->app;
+  $app->plugins->run_hook_reverse(before_render => $self, $args);
+  my ($output, $type) = $app->renderer->render($self, $args);
 
   # Failed
   return unless defined $output;
@@ -1185,6 +1187,7 @@ It will set a default template to use based on the controller and action name
 or fall back to the route name.
 You can call it with a hash of options which can be preceded by an optional
 template name.
+It will also run the C<before_render> plugin hook.
 
 =head2 C<render_data>
 

@@ -735,6 +735,18 @@ Mostly used for custom dispatchers and postprocessing static file responses.
     my $self = shift;
   });
 
+=item before_render
+
+Triggered right before teh renderer turns the stash into a response.
+Very useful for making adjustments to the stash right before rendering.
+(Passed the current controller instance and argument hash)
+
+  $app->hook(before_render => sub {
+    my ($self, $args) = @_;
+  });
+
+Note that this hook is EXPERIMENTAL and might change without warning!
+
 =item after_dispatch
 
 Triggered after a response has been rendered, the callbacks of this hook run

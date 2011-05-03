@@ -12,7 +12,7 @@ BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 my $backup;
 BEGIN { $backup = $ENV{MOJO_MODE} || ''; $ENV{MOJO_MODE} = 'development' }
 
-use Test::More tests => 752;
+use Test::More tests => 757;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -84,6 +84,21 @@ post '/multipart/form' => sub {
   my $self = shift;
   my @test = $self->param('test');
   $self->render_text(join "\n", @test);
+};
+
+# Reverse "partial" alias
+app->hook(
+  before_render => sub {
+    my ($self, $args) = @_;
+    $args->{partial} = 1 if $args->{laitrap};
+  }
+);
+
+# GET /reverse/render
+get '/reverse/render' => sub {
+  my $self = shift;
+  $self->render_data(
+    scalar reverse $self->render_text('lalala', laitrap => 1));
 };
 
 # GET /auto_name
@@ -707,6 +722,11 @@ $t->post_form_ok('/multipart/form', {test => [1 .. 5]})->status_is(200)
 $t->post_form_ok('/multipart/form',
   {test => [1 .. 5], file => {content => '123'}})->status_is(200)
   ->content_is(join "\n", 1 .. 5);
+
+# GET /reverse/render
+$t->get_ok('/reverse/render')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('alalal');
 
 # GET /auto_name
 $t->get_ok('/auto_name')->status_is(200)

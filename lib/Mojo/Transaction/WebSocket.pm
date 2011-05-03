@@ -272,7 +272,7 @@ sub _parse_frame {
   # Head
   my $buffer = $self->{_read};
   return unless length $buffer > 2;
-  my $head = substr $buffer, 0, 2, '';
+  my $head = substr $buffer, 0, 2;
   warn 'HEAD: ' . unpack('B*', $head) . "\n" if DEBUG;
 
   # FIN
@@ -288,6 +288,7 @@ sub _parse_frame {
   warn "LENGTH: $len\n" if DEBUG;
 
   # No payload
+  my $hlen = 2;
   if ($len == 0) { warn "NOTHING\n" if DEBUG }
 
   # Small payload
@@ -295,24 +296,33 @@ sub _parse_frame {
 
   # Extended payload (16bit)
   elsif ($len == 126) {
-    return unless length $buffer > 2;
-    my $ext = substr $buffer, 0, 2, '';
+    return unless length $buffer > 4;
+    $hlen = 4;
+    my $ext = substr $buffer, 2, 2;
     $len = unpack 'n', $ext;
     warn "EXTENDED (16bit): $len\n" if DEBUG;
   }
 
   # Extended payload (64bit)
   elsif ($len == 127) {
-    return unless length $buffer > 8;
-    my $ext = substr $buffer, 0, 8, '';
+    return unless length $buffer > 10;
+    $hlen = 10;
+    my $ext = substr $buffer, 2, 8;
     $len = unpack 'N', substr($ext, 4, 4);
     warn "EXTENDED (64bit): $len\n" if DEBUG;
   }
 
-  # Payload
+  # Check message size
+  $self->finish and return if $len > $self->max_websocket_size;
+
+  # Check if whole packet has arrived
   my $masked = vec($head, 1, 8) & 0b10000000;
+  return if length $buffer < ($len + $hlen + $masked ? 4 : 0);
+  substr $buffer, 0, $hlen, '';
+
+  # Payload
   $len += 4 if $masked;
-  return unless length $buffer >= $len;
+  return if length $buffer < $len;
   my $payload = $len ? substr($buffer, 0, $len, '') : '';
 
   # Unmask payload

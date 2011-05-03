@@ -116,7 +116,9 @@ websocket '/subreq' => sub {
 
 # WebSocket /echo
 websocket '/echo' => sub {
-  shift->on_message(
+  my $self = shift;
+  $self->tx->max_websocket_size(500000);
+  $self->on_message(
     sub {
       my ($self, $message) = @_;
       $self->send_message($message);
@@ -461,6 +463,7 @@ $result = undef;
 $ua->websocket(
   '/echo' => sub {
     my $tx = pop;
+    $tx->max_websocket_size(500000);
     $tx->on_finish(sub { $loop->stop });
     $tx->on_message(
       sub {
@@ -469,8 +472,8 @@ $ua->websocket(
         $tx->finish;
       }
     );
-    $tx->send_message('hi' x 100000);
+    $tx->send_message('hi' x 200000);
   }
 );
 $loop->start;
-is $result, 'hi' x 100000, 'right result';
+is $result, 'hi' x 200000, 'right result';

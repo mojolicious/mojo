@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.23    2011-05-02 00:00:00
+        - Fixed 64bit WebSocket message bug.
         - Fixed small Windows bug.
         - Fixed typos.
 

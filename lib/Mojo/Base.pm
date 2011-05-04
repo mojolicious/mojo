@@ -50,7 +50,7 @@ sub import {
   strict->import;
   warnings->import;
 
-  # 5.10
+  # Mojo modules are modern!
   feature->import(':5.10') if $] <= 5.010;
 }
 

@@ -6,9 +6,13 @@ use warnings;
 # No imports because we get subclassed, a lot!
 require Carp;
 
-# DEPRECATED!
+# DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
 warn <<EOF unless eval 'use 5.010; 1';
-Support for Perl 5.8.x in Mojolicious has been deprecated, please upgrade!!!
+You are using Perl 5.8, a version that has reached the end of its life a few
+years ago and which no longer gets updated by the community.
+
+Mojolicious support for it has been deprecated and you should upgrade as soon
+as possible!!!
 EOF
 
 # "Kids, you tried your best and you failed miserably.

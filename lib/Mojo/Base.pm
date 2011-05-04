@@ -7,7 +7,7 @@ use warnings;
 require Carp;
 
 # DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
-warn <<EOF unless eval 'use 5.010; 1';
+warn <<EOF unless $] >= 5.010;
 You are using Perl 5.8, a version that has reached the end of its life a few
 years ago and which no longer gets updated by the community.
 
@@ -49,6 +49,9 @@ sub import {
   # Mojo modules are strict!
   strict->import;
   warnings->import;
+
+  # 5.10
+  feature->import(':5.10') if $] <= 5.010;
 }
 
 sub new {
@@ -186,6 +189,7 @@ Both forms save a lot of typing.
   # use Mojo::Base -base;
   use strict;
   use warnings;
+  use feature ':5.10';
   use Mojo::Base;
   push @ISA, 'Mojo::Base';
   sub has { Mojo::Base::attr(__PACKAGE__, @_) }
@@ -193,6 +197,7 @@ Both forms save a lot of typing.
   # use Mojo::Base 'SomeBaseClass';
   use strict;
   use warnings;
+  use feature ':5.10';
   require SomeBaseClass;
   push @ISA, 'SomeBaseClass';
   use Mojo::Base;

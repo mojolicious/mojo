@@ -5,6 +5,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Deprecated Perl 5.8.x support.
         - Added EXPERIMENTAL before_render hook.
         - Added EXPERIMENTAL hook function to Mojolicious::Lite.
+        - Updated Mojo::Base to enable Perl 5.10 features if available.
         - Updated jQuery to version 1.6.
         - Fixed 64bit WebSocket message bug.
         - Fixed small Windows bug.

@@ -4,8 +4,7 @@ use strict;
 use warnings;
 
 use Test::More;
-plan skip_all => 'Perl 5.10 required for this test!'
-  unless eval 'use 5.010; 1';
+plan skip_all => 'Perl 5.10 required for this test!' unless $] >= 5.010;
 plan tests => 112;
 
 use Mojo::ByteStream 'b';

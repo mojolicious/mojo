@@ -12,7 +12,7 @@ BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 my $backup;
 BEGIN { $backup = $ENV{MOJO_MODE} || ''; $ENV{MOJO_MODE} = 'development' }
 
-use Test::More tests => 757;
+use Test::More tests => 762;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -89,7 +89,10 @@ post '/multipart/form' => sub {
 # Reverse "partial" alias
 hook before_render => sub {
   my ($self, $args) = @_;
-  $args->{partial} = 1 if $args->{laitrap};
+  return unless $args->{laitrap};
+  $args->{partial} = 1;
+  $self->render_text('does not work!')
+    if ($self->param('format') || '') eq 'txt';
 };
 
 # GET /reverse/render
@@ -97,6 +100,17 @@ get '/reverse/render' => sub {
   my $self = shift;
   $self->render_data(
     scalar reverse $self->render_text('lalala', laitrap => 1));
+};
+
+# Force recursion
+hook before_render => sub {
+  my $self = shift;
+  $self->render('foo/bar') if $self->stash('before_render');
+};
+
+# GET /before/render
+get '/before/render' => {before_render => 1} => sub {
+  shift->render('foo/bar');
 };
 
 # GET /auto_name
@@ -725,6 +739,12 @@ $t->post_form_ok('/multipart/form',
 $t->get_ok('/reverse/render')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('alalal');
+
+# GET /before/render
+$t->get_ok('/before/render')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("controller and action!\n");
 
 # GET /auto_name
 $t->get_ok('/auto_name')->status_is(200)

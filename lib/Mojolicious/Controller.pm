@@ -211,8 +211,14 @@ sub redirect_to {
 sub render {
   my $self = shift;
 
-  # Template as single argument
+  # Recursion
   my $stash = $self->stash;
+  if ($stash->{'mojo.rendering'}) {
+    $self->app->log->debug(qq/Can't render from "before_render" hook./);
+    return '';
+  }
+
+  # Template as single argument
   my $template;
   $template = shift if @_ % 2 && !ref $_[0];
 
@@ -239,7 +245,10 @@ sub render {
 
   # Render
   my $app = $self->app;
-  $app->plugins->run_hook_reverse(before_render => $self, $args);
+  {
+    local $stash->{'mojo.rendering'} = 1;
+    $app->plugins->run_hook_reverse(before_render => $self, $args);
+  }
   my ($output, $type) = $app->renderer->render($self, $args);
 
   # Failed

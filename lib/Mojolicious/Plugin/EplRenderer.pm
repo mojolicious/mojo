@@ -34,7 +34,10 @@ sub register {
       else {
 
         # Inline
-        if (defined $inline) { $$output = $mt->render($inline, $c) }
+        if (defined $inline) {
+          $c->app->log->debug('Rendering inline template.');
+          $$output = $mt->render($inline, $c);
+        }
 
         # File
         else {
@@ -42,10 +45,15 @@ sub register {
           return unless my $t = $r->template_name($options);
 
           # Try template
-          if (-r $path) { $$output = $mt->render_file($path, $c) }
+          if (-r $path) {
+            $c->app->log->debug(qq/Rendering template "$t"./);
+            $$output = $mt->render_file($path, $c);
+          }
 
           # Try DATA section
-          elsif (my $d = $r->get_inline_template($options, $t)) {
+          elsif (my $d = $r->get_data_template($options, $t)) {
+            $c->app->log->debug(
+              qq/Rendering template "$t" from DATA section./);
             $$output = $mt->render($d, $c);
           }
 

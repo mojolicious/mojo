@@ -19,22 +19,6 @@ has layout_prefix    => 'layouts';
 has root             => '/';
 has [qw/default_handler default_template_class/];
 
-# DEPRECATED in Hot Beverage!
-*handler = sub {
-  warn <<EOF;
-Mojolicious::Renderer->handler is DEPRECATED in favor of
-Mojolicious::Renderer->handlers!!!
-EOF
-  shift->handlers(@_);
-};
-*helper = sub {
-  warn <<EOF;
-Mojolicious::Renderer->helper is DEPRECATED in favor of
-Mojolicious::Renderer->helpers!!!
-EOF
-  shift->helpers(@_);
-};
-
 # "This is not how Xmas is supposed to be.
 #  In my day Xmas was about bringing people together,
 #  not blowing them apart."
@@ -80,10 +64,19 @@ sub add_helper {
   return $self;
 }
 
-sub get_inline_template {
+sub get_data_template {
   my ($self, $options, $template) = @_;
   return Mojo::Command->new->get_data($template,
     $self->_detect_template_class($options));
+}
+
+# DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
+sub get_inline_template {
+  warn <<EOF;
+Mojolicious::Renderer->get_inline_template is DEPRECATED in favor of
+Mojolicious::Renderer->get_data_template!!!
+EOF
+  shift->get_data_template(@_);
 }
 
 # "Bodies are for hookers and fat people."
@@ -205,10 +198,10 @@ sub _detect_handler {
       Mojo::Home->new->parse($self->root)->list_files;
   }
 
-  # Inline templates
+  # DATA templates
   my $class  = $self->_detect_template_class($options);
-  my $inline = $self->{_inline_templates}->{$class}
-    ||= $self->_list_inline_templates($class);
+  my $inline = $self->{_data_templates}->{$class}
+    ||= $self->_list_data_templates($class);
 
   # Detect
   return unless my $file = $self->template_name($options);
@@ -240,7 +233,7 @@ sub _extends {
   return delete $stash->{extends};
 }
 
-sub _list_inline_templates {
+sub _list_data_templates {
   my ($self, $class) = @_;
   my $all = Mojo::Command->new->get_all_data($class);
   return [keys %$all];
@@ -407,16 +400,16 @@ See L<Mojolicious::Plugin::EpRenderer> for a sample renderer.
 Add a new helper to the renderer.
 See L<Mojolicious::Plugin::EpRenderer> for sample helpers.
 
-=head2 C<get_inline_template>
+=head2 C<get_data_template>
 
-  my $template = $renderer->get_inline_template({
+  my $template = $renderer->get_data_template({
     template       => 'foo/bar',
     format         => 'html',
     handler        => 'epl'
     template_class => 'main'
   }, 'foo.html.ep');
 
-Get an inline template by name, usually used by handlers.
+Get an DATA template by name, usually used by handlers.
 
 =head2 C<render>
 

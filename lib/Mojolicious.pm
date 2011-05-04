@@ -237,15 +237,6 @@ sub plugin {
   $self->plugins->register_plugin(shift, $self, @_);
 }
 
-# DEPRECATED in Hot Beverage!
-sub session {
-  warn <<EOF;
-Mojolicious->session is DEPRECATED in favor of Mojolicious->sessions!!!
-But you most likely meant to use Mojolicious::Controller->session anyway.
-EOF
-  shift->sessions(@_);
-}
-
 # Start command system
 sub start {
   my $class = shift;

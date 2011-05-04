@@ -3,8 +3,11 @@ This file documents the revision history for Perl extension Mojolicious.
 1.30    2011-05-04 00:00:00
         - Code name "Tropical Drink", this is a major release.
         - Deprecated Perl 5.8.x support.
+        - Deprecated Mojolicious::Renderer get_inline_template method in
+          favor of the get_data_template method.
         - Added EXPERIMENTAL before_render hook.
         - Added EXPERIMENTAL hook function to Mojolicious::Lite.
+        - Improved debug log messages for template rendering.
         - Updated Mojo::Base and Mojolicious::Lite to enable Perl 5.10
           features if available.
         - Updated jQuery to version 1.6.

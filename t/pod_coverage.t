@@ -13,15 +13,11 @@ plan skip_all => 'set TEST_POD to enable this test (developer only!)'
 # DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
 my @smiling_cat = (
   qw/async build_form_tx build_tx build_websocket_tx client clone delete/,
-  qw/detect_proxy finish get head need_proxy on_finish on_hup on_message/,
-  qw/on_tick post post_form put queue req res send_message singleton start/,
-  qw/test_server websocket/
+  qw/detect_proxy finish get head need_proxy on_finish on_handler on_hup/,
+  qw/on_message on_tick post post_form put queue req res send_message/,
+  qw/singleton start test_server websocket/
 );
-
-# DEPRECATED in Hot Beverage!
-my @hot_beverage = qw/handler helper session/;
 
 # "Marge, I'm going to miss you so much. And it's not just the sex.
 #  It's also the food preparation."
-all_pod_coverage_ok(
-  {also_private => ['inet_pton', @smiling_cat, @hot_beverage]});
+all_pod_coverage_ok({also_private => ['inet_pton', @smiling_cat]});

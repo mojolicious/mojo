@@ -831,7 +831,7 @@ $t->get_ok('/static2.txt', {'Range' => 'bytes=2-5'})->status_is(206)
   ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 4)
   ->content_is('st 1');
 
-# GET /template.txt.epl (protected inline template)
+# GET /template.txt.epl (protected DATA template)
 $t->get_ok('/template.txt.epl')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')

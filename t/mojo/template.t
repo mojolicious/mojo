@@ -25,7 +25,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 137;
+use Test::More tests => 138;
 
 use File::Spec;
 use File::Temp;
@@ -806,6 +806,16 @@ $= '2' x 4
 </html>\\\\
 EOF
 is $output, "<html>2222\n</html>\\\\\\\n", 'different line start';
+
+# Inline comments
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+% if (1) { # test
+works!
+% }   # tset
+great!
+EOF
+is $output, "works!\ngreat!\n", 'comments did not affect the result';
 
 # Multiline expression
 $mt     = Mojo::Template->new;

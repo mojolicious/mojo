@@ -214,7 +214,7 @@ sub render {
   # Recursion
   my $stash = $self->stash;
   if ($stash->{'mojo.rendering'}) {
-    $self->app->log->debug(qq/Can't render from "before_render" hook./);
+    $self->app->log->debug(qq/Can't render in "before_render" hook./);
     return '';
   }
 

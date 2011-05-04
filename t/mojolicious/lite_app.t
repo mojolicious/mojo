@@ -89,10 +89,7 @@ post '/multipart/form' => sub {
 # Reverse "partial" alias
 hook before_render => sub {
   my ($self, $args) = @_;
-  return unless $args->{laitrap};
-  $args->{partial} = 1;
-  $self->render_text('does not work!')
-    if ($self->param('format') || '') eq 'txt';
+  $args->{partial} = 1 if $args->{laitrap};
 };
 
 # GET /reverse/render

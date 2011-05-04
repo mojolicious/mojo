@@ -40,8 +40,8 @@ has sessions => sub { Mojolicious::Sessions->new };
 has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
-our $CODENAME = 'Smiling Cat Face With Heart-Shaped Eyes';
-our $VERSION  = '1.23';
+our $CODENAME = 'Tropical Drink';
+our $VERSION  = '1.30';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -911,6 +911,8 @@ L<http://www.apache.org/licenses/LICENSE-2.0>.
 
 Every major release of L<Mojolicious> has a code name, these are the ones
 that have been used in the past.
+
+1.3, C<Tropical Drink> (u1F379)
 
 1.1, C<Smiling Cat Face With Heart-Shaped Eyes> (u1F63B)
 

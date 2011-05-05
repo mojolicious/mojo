@@ -12,6 +12,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Updated Mojo::Base and Mojolicious::Lite to enable Perl 5.10
           features if available.
         - Updated jQuery to version 1.6.
+        - Fixed PSGI read error handling.
         - Fixed 64bit WebSocket message bug.
         - Fixed small Windows bug.
         - Fixed typos.

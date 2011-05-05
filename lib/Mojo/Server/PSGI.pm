@@ -23,7 +23,7 @@ sub run {
   # Request body
   while (!$req->is_done) {
     my $read = $env->{'psgi.input'}->read(my $buffer, CHUNK_SIZE, 0);
-    last if $read == 0;
+    last unless $read;
     $req->parse($buffer);
   }
 

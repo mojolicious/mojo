@@ -842,7 +842,7 @@ $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 % if (1) { # test
 works!
-% } # test, sub { 1; } 23.
+% } ## test, sub 1; 23.
 EOF
 is $output, "works!\n", 'comments did not affect the result';
 

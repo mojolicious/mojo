@@ -138,7 +138,6 @@ sub build {
   $lines[0] =
     "package $namespace; $HELPERS sub { my \$_M = ''; $prepend; do {"
     . $lines[0];
-  $lines[-1] =~ s/\#[\s\w\#\,\.\;]*$//;
   $lines[-1] .= "$append; \$_M; } };";
 
   # Done

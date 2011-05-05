@@ -25,7 +25,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 141;
+use Test::More tests => 138;
 
 use File::Spec;
 use File::Temp;
@@ -816,35 +816,6 @@ works!
 great!
 EOF
 is $output, "works!\ngreat!\n", 'comments did not affect the result';
-
-# Inline comments (alternative)
-$mt     = Mojo::Template->new;
-$output = $mt->render(<<'EOF');
-% if (1) { # test
-works!
-% }   # tset
-great!
-% #
-EOF
-is $output, "works!\ngreat!\n", 'comments did not affect the result';
-
-# Inline comments (alternative)
-$mt     = Mojo::Template->new;
-$output = $mt->render(<<'EOF');
-% if (1) { # test
-works!
-% }   #
-EOF
-is $output, "works!\n", 'comments did not affect the result';
-
-# Inline comments (alternative)
-$mt     = Mojo::Template->new;
-$output = $mt->render(<<'EOF');
-% if (1) { # test
-works!
-% } ## test, sub 1; 23.
-EOF
-is $output, "works!\n", 'comments did not affect the result';
 
 # Multiline expression
 $mt     = Mojo::Template->new;

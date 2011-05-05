@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-1.30    2011-05-04 00:00:00
+1.3     2011-05-05 00:00:00
         - Code name "Tropical Drink", this is a major release.
         - Deprecated Perl 5.8.x support.
         - Deprecated Mojolicious::Renderer get_inline_template method in
@@ -16,7 +16,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed PSGI read error handling.
         - Fixed 64bit WebSocket message bug.
         - Fixed small Windows bug.
-        - Fixed typos.
+        - Fixed typos. (metaperl)
 
 1.22    2011-05-02 00:00:00
         - Added opposite tests to Test::Mojo.

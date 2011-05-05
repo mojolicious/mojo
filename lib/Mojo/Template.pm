@@ -138,7 +138,8 @@ sub build {
   $lines[0] =
     "package $namespace; $HELPERS sub { my \$_M = ''; $prepend; do {"
     . $lines[0];
-  $lines[-1] .= qq/$append; \$_M; } };/;
+  $lines[-1] =~ s/\s+\#.*$//;
+  $lines[-1] .= "$append; \$_M; } };";
 
   # Done
   $self->code(join "\n", @lines);

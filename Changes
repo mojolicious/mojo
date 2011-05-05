@@ -8,6 +8,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL before_render hook.
         - Added EXPERIMENTAL hook function to Mojolicious::Lite.
         - Improved debug log messages for template rendering.
+        - Improved Mojo::Template inline comment handling.
         - Updated Mojo::Base and Mojolicious::Lite to enable Perl 5.10
           features if available.
         - Updated jQuery to version 1.6.

@@ -613,7 +613,7 @@ the log file reminding you to change your passphrase.
   my $sessions = $app->sessions;
   $app         = $app->sessions(Mojolicious::Sessions->new);
 
-Simple singed cookie based sessions, by default a L<Mojolicious::Sessions>
+Simple signed cookie based sessions, by default a L<Mojolicious::Sessions>
 object.
 
 =head2 C<static>

@@ -7,6 +7,7 @@ This file documents the revision history for Perl extension Mojolicious.
           favor of the get_data_template method.
         - Added EXPERIMENTAL before_render hook.
         - Added EXPERIMENTAL hook function to Mojolicious::Lite.
+        - Improved Mojolicious::Routes exception handling.
         - Improved debug log messages for template rendering.
         - Updated Mojo::Base and Mojolicious::Lite to enable Perl 5.10
           features if available.

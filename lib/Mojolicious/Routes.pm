@@ -575,7 +575,8 @@ sub _walk_stack {
   my ($self, $c) = @_;
 
   # Stacktrace
-  local $SIG{__DIE__} = sub { Mojo::Exception->throw(@_) };
+  local $SIG{__DIE__} =
+    sub { ref $_[0] ? CORE::die($_[0]) : Mojo::Exception->throw(@_) };
 
   my $stack = $c->match->stack;
   my $stash = $c->stash;

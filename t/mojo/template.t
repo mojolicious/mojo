@@ -25,7 +25,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 138;
+use Test::More tests => 140;
 
 use File::Spec;
 use File::Temp;
@@ -79,6 +79,31 @@ is $output, '<html>', 'expression tags trimmed';
 $mt     = Mojo::Template->new;
 $output = $mt->render('    <%= capture begin =%><html><%== end =%>    ');
 is $output, '<html>', 'expression tags trimmed';
+
+# Catched exception
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+% eval { die {foo => 'bar'} };
+%= $@->{foo}
+EOF
+is $output, "bar\n", 'exception passed through';
+
+# Dummy exception object
+package MyException;
+use Mojo::Base -base;
+use overload '""' => sub { shift->error }, fallback => 1;
+
+has 'error';
+
+package main;
+
+# Catched exception object
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+% eval { die MyException->new(error => 'works!') };
+%= $@->error
+EOF
+is $output, "works!\n", 'exception object passed through';
 
 # Recursive block
 $mt     = Mojo::Template->new;

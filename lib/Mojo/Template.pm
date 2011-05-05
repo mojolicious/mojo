@@ -177,8 +177,11 @@ sub interpret {
   return unless $compiled;
 
   # Stacktrace
-  local $SIG{__DIE__} =
-    sub { Mojo::Exception->throw(shift, $self->template, $self->code) };
+  local $SIG{__DIE__} = local $SIG{__DIE__} = sub {
+    ref $_[0]
+      ? CORE::die($_[0])
+      : Mojo::Exception->throw(shift, $self->template, $self->code);
+  };
 
   # Interpret
   my $output = eval { $compiled->(@_) };

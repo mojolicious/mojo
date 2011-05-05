@@ -21,10 +21,14 @@ sub run {
   $tx->local_port($env->{SERVER_PORT});
 
   # Request body
+  my $cl = $env->{CONTENT_LENGTH};
   while (!$req->is_done) {
-    my $read = $env->{'psgi.input'}->read(my $buffer, CHUNK_SIZE, 0);
+    my $chunk = ($cl && $cl < CHUNK_SIZE) ? $cl : CHUNK_SIZE;
+    my $read  = $env->{'psgi.input'}->read(my $buffer, $chunk, 0);
     last unless $read;
     $req->parse($buffer);
+    $cl -= $read;
+    last if $cl <= 0;
   }
 
   # Handle

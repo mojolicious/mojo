@@ -598,7 +598,8 @@ Number of keep alive requests per connection, defaults to C<25>.
 
   keep_alive_timeout => 10
 
-Time in seconds a connection may be idle, defaults to C<5>.
+Maximum amount of time in seconds a connection can be inactive before being
+dropped, defaults to C<5>.
 
 =head2 C<listen>
 
@@ -643,7 +644,8 @@ User name for worker processes.
 
   websocket_timeout => 150
 
-Time in seconds a WebSocket connection may be idle, defaults to C<300>.
+Maximum amount of time in seconds a WebSocket connection can be inactive
+before being dropped, defaults to C<300>.
 
 =head2 C<workers>
 

@@ -438,7 +438,8 @@ Event loop for server IO, defaults to the global L<Mojo::IOLoop> singleton.
   my $keep_alive_timeout = $daemon->keep_alive_timeout;
   $daemon                = $daemon->keep_alive_timeout(15);
 
-Timeout for keep alive connections in seconds, defaults to C<5>.
+Maximum amount of time in seconds a connection can be inactive before being
+dropped, defaults to C<5>.
 
 =head2 C<listen>
 
@@ -480,7 +481,8 @@ User for the server process.
   my $websocket_timeout = $server->websocket_timeout;
   $server               = $server->websocket_timeout(300);
 
-Timeout in seconds for WebSockets to be idle, defaults to C<300>.
+Maximum amount of time in seconds a WebSocket connection can be inactive
+before being dropped, defaults to C<300>.
 
 =head1 METHODS
 

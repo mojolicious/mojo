@@ -1080,7 +1080,8 @@ redirects.
   my $websocket_timeout = $ua->websocket_timeout;
   $ua                   = $ua->websocket_timeout(300);
 
-Timeout in seconds for WebSockets to be idle, defaults to C<300>.
+Maximum amount of time in seconds a WebSocket connection can be inactive
+before being dropped, defaults to C<300>.
 
 =head1 METHODS
 

@@ -196,7 +196,12 @@ sub children {
     next unless $e->[0] eq 'tag';
 
     # Add child
-    push @children, $self->new(charset => $self->charset, tree => $e);
+    push @children,
+      $self->new(
+      charset => $self->charset,
+      tree    => $e,
+      xml     => $self->xml
+      );
   }
 
   return \@children;
@@ -273,7 +278,11 @@ sub parent {
   return if $tree->[0] eq 'root';
 
   # Parent
-  return $self->new(charset => $self->charset, tree => $tree->[3]);
+  return $self->new(
+    charset => $self->charset,
+    tree    => $tree->[3],
+    xml     => $self->xml
+  );
 }
 
 sub parse {
@@ -296,8 +305,12 @@ sub replace {
 
   # Root
   return $self->replace_inner(
-    $self->new(charset => $self->charset, tree => $new))
-    if $tree->[0] eq 'root';
+    $self->new(
+      charset => $self->charset,
+      tree    => $new,
+      xml     => $self->xml
+    )
+  ) if $tree->[0] eq 'root';
 
   # Parent
   my $parent = $tree->[3];
@@ -354,7 +367,11 @@ sub root {
     $root = $parent;
   }
 
-  return $self->new(charset => $self->charset, tree => $root);
+  return $self->new(
+    charset => $self->charset,
+    tree    => $root,
+    xml     => $self->xml
+  );
 }
 
 sub text {
@@ -878,7 +895,13 @@ sub _match_tree {
 
   # Upgrade results
   @results =
-    map { $self->new(charset => $self->charset, tree => $_) } @results;
+    map {
+    $self->new(
+      charset => $self->charset,
+      tree    => $_,
+      xml     => $self->xml
+      )
+    } @results;
 
   # Collection
   return bless \@results, 'Mojo::DOM::_Collection';

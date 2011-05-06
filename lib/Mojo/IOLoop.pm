@@ -1731,7 +1731,7 @@ Path to the TLS key file.
   $loop       = $loop->connection_timeout($id => 45);
 
 Maximum amount of time in seconds a connection can be inactive before being
-dropped.
+dropped, defaults to C<15>.
 
 =head2 C<dns_servers>
 

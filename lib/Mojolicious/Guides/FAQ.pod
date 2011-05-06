@@ -62,6 +62,16 @@ message, such as request line, status line and headers.
 This limit is around C<10KB> by default, you can use the
 C<MOJO_MAX_LINE_SIZE> environment variable to change this value.
 
+=head2 What does "Your secret passphrase needs to be changed!!!" mean?
+
+L<Mojolicious> uses a secret passphrase for security features such as signed
+cookies.
+It defaults to the name of your application, which is not very secure, so we
+added this log message as a reminder.
+You can change the passphrase with the C<secret> attribute of L<Mojolicious>.
+
+  app->secret('My very secret passphrase.');
+
 =head2 Does L<Mojolicious> run on Windows systems?
 
 Sure it does!

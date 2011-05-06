@@ -1005,19 +1005,20 @@ sub _parse_xml {
     next unless $tag;
 
     # End
+    my $cs = $self->xml;
     if ($tag =~ /$XML_END_RE/) {
-      if (my $end = lc $1) { $self->_end($end, \$current) }
+      if (my $end = $cs ? $1 : lc($1)) { $self->_end($end, \$current) }
     }
 
     # Start
     elsif ($tag =~ /$XML_START_RE/) {
-      my $start = lc $1;
-      my $attr  = $2;
+      my $start = $cs ? $1 : lc($1);
+      my $attr = $2;
 
       # Attributes
       my $attrs = {};
       while ($attr =~ /$XML_ATTR_RE/g) {
-        my $key   = $1;
+        my $key = $cs ? $1 : lc($1);
         my $value = $2;
         $value = $3 unless defined $value;
         $value = $4 unless defined $value;
@@ -1520,8 +1521,8 @@ Document Object Model.
   my $xml = $dom->xml;
   $dom    = $dom->xml(1);
 
-Disable HTML5 semantics in parser, defaults to auto detection based on
-processing instructions.
+Disable HTML5 semantics in parser and activate case sensitivity, defaults to
+auto detection based on processing instructions.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS

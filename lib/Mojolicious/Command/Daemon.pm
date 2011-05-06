@@ -16,7 +16,7 @@ These options are available:
   --clients <number>      Set maximum number of concurrent clients, defaults
                           to 1000.
   --group <name>          Set group name for process.
-  --keepalive <seconds>   Set keep-alive timeout, defaults to 15.
+  --keepalive <seconds>   Set keep-alive timeout, defaults to 5.
   --listen <location>     Set one or more locations you want to listen on,
                           defaults to http://*:3000.
   --proxy                 Activate reverse proxy support, defaults to the

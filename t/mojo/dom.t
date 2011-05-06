@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 511;
+use Test::More tests => 514;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -646,6 +646,9 @@ my @li;
 $dom->find('li:nth-child(odd)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/A C E G/], 'found all odd li elements';
 @li = ();
+$dom->find('li:NTH-CHILD(ODD)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/A C E G/], 'found all odd li elements';
+@li = ();
 $dom->find('li:nth-last-child(odd)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/B D F H/], 'found all odd li elements';
 is($dom->find(':nth-child(odd)')->[0]->type,       'ul', 'right type');
@@ -669,10 +672,16 @@ is_deeply \@li, [qw/B D F H/], 'found all odd li elements';
 $dom->find('li:nth-child(even)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/B D F H/], 'found all even li elements';
 @li = ();
+$dom->find('li:NTH-CHILD(EVEN)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/B D F H/], 'found all even li elements';
+@li = ();
 $dom->find('li:nth-last-child(even)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/A C E G/], 'found all even li elements';
 @li = ();
 $dom->find('li:nth-child(2n+2)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/B D F H/], 'found all even li elements';
+@li = ();
+$dom->find('li:nTh-chILd(2N+2)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/B D F H/], 'found all even li elements';
 @li = ();
 $dom->find('li:nth-child( 2n + 2 )')->each(sub { push @li, shift->text });
@@ -731,8 +740,10 @@ is_deeply \@li, [qw/C F/], 'found every third li elements';
 @li = ();
 $dom->find('li:nth-last-child(3n)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/C F/], 'found every third li elements';
+@li = ();
 $dom->find('li:NTH-LAST-CHILD(3N)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/C F/], 'found every third li elements';
+@li = ();
 $dom->find('li:Nth-Last-Child(3N)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/C F/], 'found every third li elements';
 @li = ();
@@ -747,8 +758,10 @@ is_deeply \@li, [qw/A B C D E F G/], 'found first three li elements';
 @li = ();
 $dom->find('li:nth-child(n+0)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/A B C D E F G/], 'found first three li elements';
+@li = ();
 $dom->find('li:NTH-CHILD(N+0)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/A B C D E F G/], 'found first three li elements';
+@li = ();
 $dom->find('li:Nth-Child(N+0)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/A B C D E F G/], 'found first three li elements';
 @li = ();

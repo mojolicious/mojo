@@ -487,13 +487,13 @@ sub _css_equation {
   my $num = [1, 1];
 
   # "even"
-  if ($equation eq 'even') { $num = [2, 2] }
+  if ($equation =~ /^even$/i) { $num = [2, 2] }
 
   # "odd"
-  elsif ($equation eq 'odd') { $num = [2, 1] }
+  elsif ($equation =~ /^odd$/i) { $num = [2, 1] }
 
   # Equation
-  elsif ($equation =~ /(?:(\-?(?:\d+)?)?(n))?\s*\+?\s*(\-?\s*\d+)?\s*$/) {
+  elsif ($equation =~ /(?:(\-?(?:\d+)?)?(n))?\s*\+?\s*(\-?\s*\d+)?\s*$/i) {
     $num->[0] = $1;
     $num->[0] = $2 ? 1 : 0 unless defined($num->[0]) && length($num->[0]);
     $num->[0] = -1 if $num->[0] eq '-';

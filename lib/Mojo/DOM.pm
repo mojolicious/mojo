@@ -740,7 +740,7 @@ sub _match_selector {
 
     # Pseudo class
     elsif ($type eq 'pseudoclass') {
-      my $class = $c->[1];
+      my $class = lc $c->[1];
       my $args  = $c->[2];
 
       # "first-*"

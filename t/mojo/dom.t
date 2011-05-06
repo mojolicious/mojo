@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 507;
+use Test::More tests => 511;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -731,6 +731,10 @@ is_deeply \@li, [qw/C F/], 'found every third li elements';
 @li = ();
 $dom->find('li:nth-last-child(3n)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/C F/], 'found every third li elements';
+$dom->find('li:NTH-LAST-CHILD(3N)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/C F/], 'found every third li elements';
+$dom->find('li:Nth-Last-Child(3N)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/C F/], 'found every third li elements';
 @li = ();
 $dom->find('li:nth-child(3)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/C/], 'found third li element';
@@ -742,6 +746,10 @@ $dom->find('li:nth-child(1n+0)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/A B C D E F G/], 'found first three li elements';
 @li = ();
 $dom->find('li:nth-child(n+0)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/A B C D E F G/], 'found first three li elements';
+$dom->find('li:NTH-CHILD(N+0)')->each(sub { push @li, shift->text });
+is_deeply \@li, [qw/A B C D E F G/], 'found first three li elements';
+$dom->find('li:Nth-Child(N+0)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/A B C D E F G/], 'found first three li elements';
 @li = ();
 $dom->find('li:nth-child(n)')->each(sub { push @li, shift->text });

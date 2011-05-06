@@ -197,11 +197,7 @@ sub children {
 
     # Add child
     push @children,
-      $self->new(
-      charset => $self->charset,
-      tree    => $e,
-      xml     => $self->xml
-      );
+      $self->new(charset => $self->charset, tree => $e, xml => $self->xml);
   }
 
   return \@children;
@@ -299,18 +295,12 @@ sub replace {
   my ($self, $new) = @_;
 
   # Parse
+  my $tree = $self->tree;
+  $self->xml(undef) if $tree->[0] eq 'root';
   $new = $self->_parse_xml("$new");
 
-  my $tree = $self->tree;
-
   # Root
-  return $self->replace_inner(
-    $self->new(
-      charset => $self->charset,
-      tree    => $new,
-      xml     => $self->xml
-    )
-  ) if $tree->[0] eq 'root';
+  return $self->tree($new) if $tree->[0] eq 'root';
 
   # Parent
   my $parent = $tree->[3];
@@ -894,14 +884,9 @@ sub _match_tree {
   }
 
   # Upgrade results
-  @results =
-    map {
-    $self->new(
-      charset => $self->charset,
-      tree    => $_,
-      xml     => $self->xml
-      )
-    } @results;
+  @results = map {
+    $self->new(charset => $self->charset, tree => $_, xml => $self->xml)
+  } @results;
 
   # Collection
   return bless \@results, 'Mojo::DOM::_Collection';

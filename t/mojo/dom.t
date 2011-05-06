@@ -741,10 +741,10 @@ is_deeply \@li, [qw/F/], 'found third last li element';
 $dom->find('li:nth-child(1n+0)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/A B C D E F G/], 'found first three li elements';
 @li = ();
-$dom->find('li:nth-child(n+0)')->each(sub { push @li, shift->text });
+$dom->find('li:NTH-CHILD(n+0)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/A B C D E F G/], 'found first three li elements';
 @li = ();
-$dom->find('li:nth-child(n)')->each(sub { push @li, shift->text });
+$dom->find('li:NTH-CHILD(n)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw/A B C D E F G/], 'found first three li elements';
 
 # Even more pseudo classes

@@ -130,10 +130,9 @@ sub add_before { shift->_add(0, @_) }
 sub all_text {
   my $self = shift;
 
-  my $text = '';
-  my $tree = $self->tree;
-
   # Walk tree
+  my $text  = '';
+  my $tree  = $self->tree;
   my $start = $tree->[0] eq 'root' ? 1 : 4;
   my @stack = @$tree[$start .. $#$tree];
   while (my $e = shift @stack) {
@@ -160,14 +159,12 @@ sub at { shift->find(@_)->[0] }
 sub attrs {
   my $self = shift;
 
-  my $tree = $self->tree;
-
   # Not a tag
+  my $tree = $self->tree;
   return if $tree->[0] eq 'root';
 
-  my $attrs = $tree->[2];
-
   # Hash
+  my $attrs = $tree->[2];
   return $attrs unless @_;
 
   # Get
@@ -185,10 +182,9 @@ sub attrs {
 sub children {
   my $self = shift;
 
+  # Walk tree
   my @children;
   my $tree = $self->tree;
-
-  # Walk tree
   my $start = $tree->[0] eq 'root' ? 1 : 4;
   for my $e (@$tree[$start .. $#$tree]) {
 
@@ -216,11 +212,10 @@ sub find {
 sub inner_xml {
   my $self = shift;
 
-  my $tree = $self->tree;
-
   # Walk tree
+  my $tree   = $self->tree;
   my $result = '';
-  my $start = $tree->[0] eq 'root' ? 1 : 4;
+  my $start  = $tree->[0] eq 'root' ? 1 : 4;
   for my $e (@$tree[$start .. $#$tree]) {
 
     # Render
@@ -268,9 +263,8 @@ sub namespace {
 sub parent {
   my $self = shift;
 
-  my $tree = $self->tree;
-
   # Not a tag
+  my $tree = $self->tree;
   return if $tree->[0] eq 'root';
 
   # Parent
@@ -296,11 +290,9 @@ sub replace {
 
   # Parse
   my $tree = $self->tree;
-  $self->xml(undef) if $tree->[0] eq 'root';
+  $self->xml(undef) if my $r = $tree->[0] eq 'root';
   $new = $self->_parse_xml("$new");
-
-  # Root
-  return $self->tree($new) if $tree->[0] eq 'root';
+  return $self->tree($new) if $r;
 
   # Parent
   my $parent = $tree->[3];
@@ -331,9 +323,8 @@ sub replace_inner {
   # Parse
   $new = $self->_parse_xml("$new");
 
-  my $tree = $self->tree;
-
   # Replacements
+  my $tree = $self->tree;
   my @new;
   for my $e (@$new[1 .. $#$new]) {
     $e->[3] = $tree if $e->[0] eq 'tag';
@@ -407,9 +398,8 @@ sub to_xml {
 sub type {
   my ($self, $type) = @_;
 
-  my $tree = $self->tree;
-
   # Not a tag
+  my $tree = $self->tree;
   return if $tree->[0] eq 'root';
 
   # Get
@@ -427,9 +417,8 @@ sub _add {
   # Parse
   $new = $self->_parse_xml("$new");
 
-  my $tree = $self->tree;
-
   # Not a tag
+  my $tree = $self->tree;
   return $self if $tree->[0] eq 'root';
 
   # Parent

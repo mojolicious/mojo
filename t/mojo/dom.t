@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 514;
+use Test::More tests => 517;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -1562,3 +1562,16 @@ is $dom->at('#screw-up .ewww > a > img')->attrs('src'), '/test.png',
 is $dom->find('#screw-up .ewww > a > img')->[1]->attrs('src'), '/test2.png',
   'right attribute';
 is $dom->find('#screw-up .ewww > a > img')->[2], undef, 'no result';
+
+# Modyfing an XML document
+$dom = Mojo::DOM->new->parse(<<EOF);
+<?xml version='1.0' encoding='UTF-8'?>
+<XMLTest />
+EOF
+
+$dom->at('XMLTest')->replace_inner('<Element />');
+
+my $element = $dom->at('Element');
+isnt $element, undef, 'found element';
+is $dom->xml, 1, 'xml mode detected';
+is $element->xml, 1, 'xml mode detected';

@@ -6,7 +6,10 @@ use warnings;
 # Disable IPv6, epoll and kqueue
 BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 41;
+use Test::More;
+plan skip_all => 'WebSocket support for FreeBSD is not complete yet!'
+  if $^O =~ /freebsd/;
+plan tests => 41;
 
 # "Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
 #  Well, that’s love for you."

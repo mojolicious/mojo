@@ -1,7 +1,7 @@
 package Mojo::Server::FastCGI;
 use Mojo::Base 'Mojo::Server';
 
-use Errno qw/EAGAIN EWOULDBLOCK/;
+use Errno qw/EAGAIN EINTR EWOULDBLOCK/;
 use IO::Socket;
 
 use constant DEBUG => $ENV{MOJO_SERVER_DEBUG} || 0;
@@ -275,7 +275,7 @@ sub write_records {
       unless (defined $written) {
 
         # Retry
-        next if $! == EAGAIN || $! == EWOULDBLOCK;
+        next if $! == EAGAIN || $! == EINTR || $! == EWOULDBLOCK;
 
         # Write error
         return;
@@ -380,7 +380,7 @@ sub _read_chunk {
   while (length $chunk < $len) {
     my $read = $c->sysread(my $buffer, $len - length $chunk, 0);
     unless (defined $read) {
-      next if $! == EAGAIN || $! == EWOULDBLOCK;
+      next if $! == EAGAIN || $! == EINTR || $! == EWOULDBLOCK;
       last;
     }
     last unless $read;

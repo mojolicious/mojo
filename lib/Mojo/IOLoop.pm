@@ -2,7 +2,7 @@ package Mojo::IOLoop;
 use Mojo::Base -base;
 
 use Carp 'croak';
-use Errno qw/EAGAIN ECONNRESET EWOULDBLOCK/;
+use Errno qw/EAGAIN EINTR ECONNRESET EWOULDBLOCK/;
 use File::Spec;
 use IO::File;
 use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
@@ -1282,7 +1282,7 @@ sub _read {
   unless (defined $read) {
 
     # Retry
-    return if $! == EAGAIN || $! == EWOULDBLOCK;
+    return if $! == EAGAIN || $! == EINTR || $! == EWOULDBLOCK;
 
     # Connection reset
     return $self->_drop_immediately($id) if $! == ECONNRESET;
@@ -1449,7 +1449,7 @@ sub _write {
     unless (defined $written) {
 
       # Retry
-      return if $! == EAGAIN || $! == EWOULDBLOCK;
+      return if $! == EAGAIN || $! == EINTR || $! == EWOULDBLOCK;
 
       # Write error
       return $self->_error($id, $!);

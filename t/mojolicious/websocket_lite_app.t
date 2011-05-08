@@ -6,9 +6,9 @@ use warnings;
 # Disable IPv6, epoll and kqueue
 BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
-# Some WebSocket features require FreeBSD 8.2+
+# FreeBSD 8.0 and 8.1 are known to cause problems
 use Test::More;
-plan skip_all => 'This test does not work on older versions of FreeBSD!'
+plan skip_all => 'This test does not work on some older versions of FreeBSD!'
   if $^O =~ /freebsd/;
 plan tests => 41;
 

@@ -49,9 +49,10 @@ sub load {
 
 sub reload {
 
-  # Cleanup script
+  # Cleanup script and "main" namespace
   delete $INC{$0};
   $STATS->{$0} = 1;
+  _purge(grep { index($_, 'main::') == 0 } keys %DB::sub);
 
   # Reload
   while (my ($key, $file) = each %INC) {
@@ -108,10 +109,17 @@ sub search {
   return $modules;
 }
 
+sub _purge {
+  for my $sub (@_) {
+    eval { undef &$sub };
+    carp "Can't unload sub '$sub': $@" if $@;
+    delete $DB::sub{$sub};
+  }
+}
+
 sub _reload {
   my $key = shift;
   warn "$key modified, reloading!\n" if DEBUG;
-
   _unload($key);
   return Mojo::Exception->new($@)
     unless eval { package main; require $key; 1 };
@@ -120,18 +128,8 @@ sub _reload {
 
 sub _unload {
   my $key = shift;
-
-  my $file = $INC{$key};
-  delete $INC{$key};
-  return unless $file;
-
-  my @subs = grep { index($DB::sub{$_}, "$file:") == 0 }
-    keys %DB::sub;
-  for my $sub (@subs) {
-    eval { undef &$sub };
-    carp "Can't unload sub '$sub' in '$file': $@" if $@;
-    delete $DB::sub{$sub};
-  }
+  return unless my $file = delete $INC{$key};
+  _purge(grep { index($DB::sub{$_}, "$file:") == 0 } keys %DB::sub);
 }
 
 1;

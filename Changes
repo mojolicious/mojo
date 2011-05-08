@@ -1,5 +1,10 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+1.32    2011-05-08 00:00:00
+        - Improved reloading slightly by allowing it to clean up the main
+          namespace.
+        - Improved documentation.
+
 1.31    2011-05-08 00:00:00
         - Reverted deprecation of Perl 5.8.x support, by popular demand.
         - Added FAQ entry to clarify the Perl 5.8.x situation.

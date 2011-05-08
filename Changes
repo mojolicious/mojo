@@ -1,8 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.31    2011-05-08 00:00:00
-        - Reverted deprecation of Perl 5.8 support, by popular demand.
-        - Added FAQ entry to clarify the Perl 5.8 situation.
+        - Reverted deprecation of Perl 5.8.x support, by popular demand.
+        - Added FAQ entry to clarify the Perl 5.8.x situation.
         - Improved documentation.
         - Fixed case sensitivity of Mojo::DOM in XML mode.
         - Fixed pseudo class case handling in Mojo::DOM. (akron)

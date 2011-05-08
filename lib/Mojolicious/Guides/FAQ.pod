@@ -45,6 +45,21 @@ So, as long as you are not using anything marked experimental, untested or
 undocumented, you can always count on backwards compatibility, everything
 else would be considered a bug.
 
+=head2 Why is using Perl 5.8.x such a bad idea?
+
+Perl 5.8 has reached the end of its life a few years ago and is no longer
+getting updated by the community.
+It contains very serious flaws, especially around the regular expression
+engine, that will never get fixed and are likely put your applications at
+risk.
+While your operating system vendor might keep it compiling on their platform,
+they will not fix these issues.
+Therefore we highly recommend that you upgrade as soon as possible!
+
+While we have considered officially deprecating Perl 5.8 support in
+L<Mojolicious> altogether, it would sadly be too much of a competitive
+disadvantage at this point in time.
+
 =head2 What does the error "Maximum message size exceeded." mean?
 
 To protect your applications from excessively large requests and responses,

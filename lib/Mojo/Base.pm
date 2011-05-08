@@ -6,15 +6,6 @@ use warnings;
 # No imports because we get subclassed, a lot!
 require Carp;
 
-# DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
-warn <<EOF unless $] >= 5.010;
-You are using Perl 5.8, a version that has reached the end of its life a few
-years ago and which no longer gets updated by the community.
-
-Mojolicious support for it has been deprecated and you should upgrade as soon
-as possible!!!
-EOF
-
 # "Kids, you tried your best and you failed miserably.
 #  The lesson is, never try."
 sub import {

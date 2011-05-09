@@ -4,6 +4,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved reloading slightly by allowing it to clean up the main
           namespace.
         - Improved documentation.
+        - Fixed enabling of Perl 5.10 features in Mojo::Base and
+          Mojolicious::Lite. (garu, sri)
 
 1.31    2011-05-08 00:00:00
         - Reverted deprecation of Perl 5.8.x support, by popular demand.

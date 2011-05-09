@@ -16,7 +16,10 @@ sub import {
   warnings->import;
 
   # Lite apps are modern!
-  feature->import(':5.10') if $] >= 5.010;
+  if ($] >= 5.010) {
+    require feature;
+    feature->import(':5.10');
+  }
 
   # Executable
   $ENV{MOJO_EXE} ||= (caller)[1];

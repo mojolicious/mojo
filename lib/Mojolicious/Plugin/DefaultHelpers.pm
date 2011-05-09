@@ -98,7 +98,7 @@ sub register {
       else { $args = shift || {} }
 
       # Default name
-      $name ||= join '', map { $_ || '' } caller(1);
+      $name ||= join '', map { $_ || '' } (caller(1))[0 .. 3];
 
       # Expire
       my $expires = $args->{expires} || 0;

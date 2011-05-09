@@ -1,6 +1,9 @@
 package Mojolicious::Lite;
 use Mojo::Base 'Mojolicious';
 
+# Lite apps are modern!
+require feature if $] >= 5.010;
+
 # "Since when is the Internet all about robbing people of their privacy?
 #  August 6, 1991."
 use File::Basename 'dirname';
@@ -16,10 +19,7 @@ sub import {
   warnings->import;
 
   # Lite apps are modern!
-  if ($] >= 5.010) {
-    require feature;
-    feature->import(':5.10');
-  }
+  feature->import(':5.10') if $] >= 5.010;
 
   # Executable
   $ENV{MOJO_EXE} ||= (caller)[1];

@@ -3,6 +3,9 @@ package Mojo::Base;
 use strict;
 use warnings;
 
+# Mojo modules are modern!
+require feature if $] >= 5.010;
+
 # No imports because we get subclassed, a lot!
 require Carp;
 
@@ -42,10 +45,7 @@ sub import {
   warnings->import;
 
   # Mojo modules are modern!
-  if ($] >= 5.010) {
-    require feature;
-    feature->import(':5.10');
-  }
+  feature->import(':5.10') if $] >= 5.010;
 }
 
 sub new {

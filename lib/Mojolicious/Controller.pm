@@ -1175,7 +1175,10 @@ Access GET/POST parameters and route captures.
   $c = $c->redirect_to('/path');
   $c = $c->redirect_to('http://127.0.0.1/foo/bar');
 
-Prepare a C<302> redirect response.
+Prepare a C<302> redirect response, takes the exact same arguments as
+C<url_for>.
+
+  return $c->redirect_to('login') unless $c->session('user');
 
 =head2 C<render>
 

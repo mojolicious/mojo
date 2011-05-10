@@ -80,3 +80,20 @@ WriteMakefile(
   },
   test => {TESTS => 't/*.t t/*/*.t'}
 );
+
+warn <<'EOF' unless $] >= 5.010;
+
+***
+You are using Perl 5.8, a version that has reached the end of its life a few
+years ago and which no longer gets updated by the community. Perl 5.8
+contains very serious flaws, especially around the regular expression
+engine, that will never get fixed and are likely to put your applications
+at risk.
+
+While your operating system vendor might keep it compiling on their
+platform, they will not fix these issues. Therefore, while we haven't
+deprecated Mojolicious in Perl 5.8, we highly recommend that you
+upgrade your Perl as soon as possible!
+***
+
+EOF

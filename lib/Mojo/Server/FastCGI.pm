@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo::Server';
 use Errno qw/EAGAIN EINTR EWOULDBLOCK/;
 use IO::Socket;
 
-use constant DEBUG => $ENV{MOJO_SERVER_DEBUG} || 0;
+use constant DEBUG => $ENV{MOJO_FASTCGI_DEBUG} || 0;
 
 # Roles
 my @ROLES = qw/RESPONDER  AUTHORIZER FILTER/;
@@ -494,6 +494,14 @@ Write FastCGI record.
   $fcgi->write_response($tx);
 
 Write FastCGI response.
+
+=head1 DEBUGGING
+
+You can set the C<MOJO_FASTCGI_DEBUG> environment variable to get some
+advanced diagnostics information sent to the L<Mojo> logger as C<debug>
+messages.
+
+  MOJO_FASTCGI_DEBUG=1
 
 =head1 SEE ALSO
 

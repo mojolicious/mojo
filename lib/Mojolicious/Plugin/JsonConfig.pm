@@ -4,8 +4,6 @@ use Mojo::Base 'Mojolicious::Plugin::Config';
 use Mojo::JSON;
 use Mojo::Template;
 
-use constant DEBUG => $ENV{MOJO_CONFIG_DEBUG} || 0;
-
 # "And so we say goodbye to our beloved pet, Nibbler, who's gone to a place
 #  where I, too, hope one day to go. The toilet."
 sub parse {

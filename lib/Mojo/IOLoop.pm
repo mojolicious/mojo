@@ -2027,6 +2027,13 @@ Create a new timer, invoking the callback after a given amount of seconds.
 Write data to connection, the optional drain callback will be invoked once
 all data has been written.
 
+=head1 DEBUGGING
+
+You can set the C<MOJO_IOLOOP_DEBUG> environment variable to get some
+advanced diagnostics information printed to C<STDERR>.
+
+  MOJO_IOLOOP_DEBUG=1
+
 =head1 SEE ALSO
 
 L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.

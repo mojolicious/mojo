@@ -507,6 +507,13 @@ Start server.
 
 Set user and group for process.
 
+=head1 DEBUGGING
+
+You can set the C<MOJO_DAEMON_DEBUG> environment variable to get some
+advanced diagnostics information printed to C<STDERR>.
+
+  MOJO_DAEMON_DEBUG=1
+
 =head1 SEE ALSO
 
 L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.

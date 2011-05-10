@@ -211,6 +211,13 @@ Parse config file.
 
 Register plugin in L<Mojolicious> application.
 
+=head1 DEBUGGING
+
+You can set the C<MOJO_CONFIG_DEBUG> environment variable to get some
+advanced diagnostics information printed to C<STDERR>.
+
+  MOJO_CONFIG_DEBUG=1
+
 =head1 SEE ALSO
 
 L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.

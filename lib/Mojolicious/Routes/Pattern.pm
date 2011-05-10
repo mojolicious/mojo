@@ -1,8 +1,6 @@
 package Mojolicious::Routes::Pattern;
 use Mojo::Base -base;
 
-use constant DEBUG => $ENV{MOJO_ROUTES_DEBUG} || 0;
-
 has defaults => sub { {} };
 has quote_end      => ')';
 has quote_start    => '(';
@@ -102,15 +100,9 @@ sub render {
 sub shape_match {
   my ($self, $pathref) = @_;
 
-  if (DEBUG) {
-    my $pattern = $self->pattern || '';
-    warn "    [$$pathref] -> [$pattern]\n";
-  }
-
   # Compile on demand
   my $regex;
   $regex = $self->_compile unless $regex = $self->regex;
-  warn "    $regex\n" if DEBUG;
 
   # Match
   if (my @captures = $$pathref =~ $regex) {

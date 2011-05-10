@@ -1646,6 +1646,13 @@ Render DOM to XML.
 
 Element type.
 
+=head1 DEBUGGING
+
+You can set the C<MOJO_DOM_DEBUG> environment variable to get some advanced
+diagnostics information printed to C<STDERR>.
+
+  MOJO_DOM_DEBUG=1
+
 =head1 SEE ALSO
 
 L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.

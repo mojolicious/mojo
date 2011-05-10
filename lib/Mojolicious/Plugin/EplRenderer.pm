@@ -36,6 +36,7 @@ sub register {
         # Inline
         if (defined $inline) {
           $c->app->log->debug('Rendering inline template.');
+          $mt->name('inline template');
           $$output = $mt->render($inline, $c);
         }
 
@@ -47,6 +48,7 @@ sub register {
           # Try template
           if (-r $path) {
             $c->app->log->debug(qq/Rendering template "$t"./);
+            $mt->name(qq/template "$t"/);
             $$output = $mt->render_file($path, $c);
           }
 
@@ -54,6 +56,7 @@ sub register {
           elsif (my $d = $r->get_data_template($options, $t)) {
             $c->app->log->debug(
               qq/Rendering template "$t" from DATA section./);
+            $mt->name(qq/template from DATA section "$t"/);
             $$output = $mt->render($d, $c);
           }
 

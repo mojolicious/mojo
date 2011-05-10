@@ -12,7 +12,7 @@ BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 my $backup;
 BEGIN { $backup = $ENV{MOJO_MODE} || ''; $ENV{MOJO_MODE} = 'development' }
 
-use Test::More tests => 762;
+use Test::More tests => 777;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -118,6 +118,15 @@ get '/auto_name' => sub {
 
 # GET /custom_name
 get '/custom_name' => 'auto_name';
+
+# GET /inline/exception
+get '/inline/exception' => sub { shift->render(inline => '% die;') };
+
+# GET /data/exception
+get '/data/exception' => 'dies';
+
+# GET /template/exception
+get '/template/exception' => 'dies_too';
 
 # GET /waypoint
 # GET /waypoint/foo
@@ -748,6 +757,26 @@ $t->get_ok('/auto_name')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('/custom_name');
+
+# GET /inline/exception
+$t->get_ok('/inline/exception')->status_is(500)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("Died at inline template line 1.\n\n");
+
+# GET /data/exception
+$t->get_ok('/data/exception')->status_is(500)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is(qq/Died at template from DATA section "dies.html.ep" line 2/
+    . qq/, near "123".\n\n/);
+
+# GET /template/exception
+$t->get_ok('/template/exception')->status_is(500)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is(
+  qq/Died at template "dies_too.html.ep" line 2, near "321".\n\n/);
 
 # GET /waypoint
 $t->get_ok('/waypoint')->status_is(200)
@@ -1601,6 +1630,11 @@ __DATA__
 
 @@ without-format.html.ep
 <%= url_for 'without-format' %>
+
+@@ dies.html.ep
+test
+% die;
+123
 
 @@ foo/bar.html.ep
 controller and action!

@@ -90,15 +90,16 @@ sub _detect {
   }
 
   # Parse specific file
-  return $self unless @_;
+  return $self unless my $files = shift;
   my @lines;
-  for my $lines (@_) { push @lines, [split /\n/, $lines] }
+  for my $lines (@$files) { push @lines, [split /\n/, $lines] }
 
   # Cleanup plain messages
+  return $self unless my $name = shift;
   unless (ref $message) {
     my $filter = sub {
       my $num  = shift;
-      my $new  = "template line $num";
+      my $new  = "$name line $num";
       my $line = $lines[0]->[$num];
       $new .= qq/, near "$line"/ if defined $line;
       $new .= '.';
@@ -109,8 +110,9 @@ sub _detect {
   }
 
   # Parse message
+  $name = quotemeta $name;
   my $line;
-  $line = $1 if $self->message =~ /at\s+template\s+line\s+(\d+)/;
+  $line = $1 if $self->message =~ /at\s+$name\s+line\s+(\d+)/;
 
   # Stacktrace
   unless ($line) {
@@ -284,14 +286,14 @@ following new ones.
 =head2 C<new>
 
   my $e = Mojo::Exception->new('Oops!');
-  my $e = Mojo::Exception->new('Oops!', $file);
+  my $e = Mojo::Exception->new('Oops!', $files, $name);
 
 Construct a new L<Mojo::Exception> object.
 
 =head2 C<throw>
 
   Mojo::Exception->throw('Oops!');
-  Mojo::Exception->throw('Oops!', $file);
+  Mojo::Exception->throw('Oops!', $files, $name);
 
 Throw exception with stacktrace.
 

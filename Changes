@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.32    2011-05-08 00:00:00
+        - Added EXPERIMENTAL name support for template exceptions.
         - Improved reloading slightly by allowing it to clean up the main
           namespace.
         - Improved documentation.

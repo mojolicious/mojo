@@ -18,6 +18,7 @@ has encoding        => 'UTF-8';
 has escape_mark     => '=';
 has expression_mark => '=';
 has line_start      => '%';
+has name            => 'template';
 has namespace       => 'Mojo::Template::Context';
 has tag_start       => '<%';
 has tag_end         => '%>';
@@ -156,7 +157,8 @@ sub compile {
   my $compiled = eval $code;
 
   # Use local stacktrace for compile exceptions
-  return Mojo::Exception->new($@, $self->template, $code)->trace->verbose(1)
+  return Mojo::Exception->new($@, [$self->template, $code], $self->name)
+    ->trace->verbose(1)
     if $@;
 
   $self->compiled($compiled);
@@ -178,14 +180,16 @@ sub interpret {
 
   # Stacktrace
   local $SIG{__DIE__} = local $SIG{__DIE__} = sub {
-    ref $_[0]
-      ? CORE::die($_[0])
-      : Mojo::Exception->throw(shift, $self->template, $self->code);
+    CORE::die($_[0]) if ref $_[0];
+    Mojo::Exception->throw(shift, [$self->template, $self->code],
+      $self->name);
   };
 
   # Interpret
   my $output = eval { $compiled->(@_) };
-  $output = Mojo::Exception->new($@, $self->template)->verbose(1) if $@;
+  $output =
+    Mojo::Exception->new($@, [$self->template], $self->name)->verbose(1)
+    if $@;
 
   return $output;
 }
@@ -443,6 +447,7 @@ sub render_file {
   my $path = shift;
 
   # Open file
+  $self->name($path) unless defined $self->{name};
   my $file = IO::File->new;
   $file->open("< $path") or croak "Can't open template '$path': $!";
 
@@ -774,6 +779,14 @@ Character indicating the start of an expression, defaults to C<=>.
 Character indicating the start of a code line, defaults to C<%>.
 
   % $foo = 23;
+
+=head2 C<name>
+
+  my $name = $mt->name;
+  $mt      = $mt->name('foo.mt');
+
+Name of template currently being processed, defaults to C<template>.
+Note that this method is attribute and might change without warning!
 
 =head2 C<namespace>
 

@@ -734,15 +734,13 @@ sub start_tls {
   my $args = ref $_[0] ? $_[0] : {@_};
   weaken $self;
   my %options = (
-    SSL_startHandshake      => 0,
-    SSL_error_trap          => sub { $self->_error($id, $_[1]) },
-    SSL_cert_file           => $args->{tls_cert},
-    SSL_key_file            => $args->{tls_key},
-    SSL_verify_mode         => 0x00,
-    SSL_create_ctx_callback => sub {
-      my $ctx = shift;
-      Net::SSLeay::CTX_sess_set_cache_size($ctx, 128);
-    },
+    SSL_startHandshake => 0,
+    SSL_error_trap     => sub { $self->_error($id, $_[1]) },
+    SSL_cert_file      => $args->{tls_cert},
+    SSL_key_file       => $args->{tls_key},
+    SSL_verify_mode    => 0x00,
+    SSL_create_ctx_callback =>
+      sub { Net::SSLeay::CTX_sess_set_cache_size(shift, 128) },
     Timeout => $self->connect_timeout,
     %{$args->{tls_args} || {}}
   );

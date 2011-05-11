@@ -205,6 +205,11 @@ sub handler {
     $tx->res->code(500);
     $tx->resume;
   }
+
+  # Delayed
+  $self->log->debug(
+    'Waiting for delayed response, forgot to render or resume?')
+    unless $stash->{'mojo.rendered'} || $tx->is_writing;
 }
 
 # "This snow is beautiful. I'm glad global warming never happened.

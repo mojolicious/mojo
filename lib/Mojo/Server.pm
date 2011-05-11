@@ -23,14 +23,7 @@ has on_request => sub {
   sub {
     my $app = shift->app;
     my $tx  = shift;
-
-    # Handle transaction
     $app->handler($tx);
-
-    # Delayed
-    $app->log->debug(
-      'Waiting for delayed response, forgot to render or resume?')
-      unless $tx->is_writing;
   };
 };
 has on_transaction => sub {

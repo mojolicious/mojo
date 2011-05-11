@@ -61,7 +61,7 @@ use constant KQUEUE_WRITE  => KQUEUE ? IO::KQueue::EVFILT_WRITE() : 0;
 # TLS support requires IO::Socket::SSL
 use constant TLS => $ENV{MOJO_NO_TLS}
   ? 0
-  : eval 'use IO::Socket::SSL 1.37 "inet4"; 1';
+  : eval 'use IO::Socket::SSL 1.43 "inet4"; 1';
 use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
@@ -315,7 +315,7 @@ sub listen {
   $self = $self->singleton unless ref $self;
   my $args = ref $_[0] ? $_[0] : {@_};
 
-  croak "IO::Socket::SSL 1.37 required for TLS support"
+  croak "IO::Socket::SSL 1.43 required for TLS support"
     if $args->{tls} && !TLS;
 
   my %options = (
@@ -727,19 +727,23 @@ sub start_tls {
 
   # No TLS support
   unless (TLS) {
-    $self->_error($id, 'IO::Socket::SSL 1.37 required for TLS support.');
+    $self->_error($id, 'IO::Socket::SSL 1.43 required for TLS support.');
     return;
   }
 
   my $args = ref $_[0] ? $_[0] : {@_};
   weaken $self;
   my %options = (
-    SSL_startHandshake => 0,
-    SSL_error_trap     => sub { $self->_error($id, $_[1]) },
-    SSL_cert_file      => $args->{tls_cert},
-    SSL_key_file       => $args->{tls_key},
-    SSL_verify_mode    => 0x00,
-    Timeout            => $self->connect_timeout,
+    SSL_startHandshake      => 0,
+    SSL_error_trap          => sub { $self->_error($id, $_[1]) },
+    SSL_cert_file           => $args->{tls_cert},
+    SSL_key_file            => $args->{tls_key},
+    SSL_verify_mode         => 0x00,
+    SSL_create_ctx_callback => sub {
+      my $ctx = shift;
+      Net::SSLeay::CTX_sess_set_cache_size($ctx, 128);
+    },
+    Timeout => $self->connect_timeout,
     %{$args->{tls_args} || {}}
   );
 

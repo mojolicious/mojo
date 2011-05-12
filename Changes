@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+1.33    2011-05-12 00:00:00
+        - Improved documentation.
+
 1.32    2011-05-11 00:00:00
         - Added EXPERIMENTAL name support for template exceptions.
         - Updated IO::Socket::SSL requirement to 1.43 due to bugs in older

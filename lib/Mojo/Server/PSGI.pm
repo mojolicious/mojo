@@ -35,7 +35,7 @@ sub run {
   $self->on_request->($self, $tx);
 
   my $res = $tx->res;
-  my $status = $res->code || 404;
+  my $code = $res->code || 404;
 
   # Fix headers
   $res->fix_headers;
@@ -55,7 +55,7 @@ sub run {
   # Finish transaction
   $tx->on_finish->($tx);
 
-  return [$status, \@headers, $body];
+  return [$code, \@headers, $body];
 }
 
 package Mojo::Server::PSGI::_Handle;

@@ -59,10 +59,9 @@ sub run {
   $res->fix_headers;
 
   # Status
-  if (my $code = $res->code) {
-    my $message = $res->message || $res->default_message;
-    $res->headers->header(Status => "$code $message") unless $self->nph;
-  }
+  my $code    = $res->code    || 404;
+  my $message = $res->message || $res->default_message;
+  $res->headers->header(Status => "$code $message") unless $self->nph;
 
   # Response headers
   $offset = 0;

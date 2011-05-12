@@ -301,7 +301,7 @@ sub write_response {
   my $res = $tx->res;
 
   # Status
-  my $code = $res->code;
+  my $code    = $res->code    || 404;
   my $message = $res->message || $res->default_message;
   $res->headers->status("$code $message") unless $res->headers->status;
 

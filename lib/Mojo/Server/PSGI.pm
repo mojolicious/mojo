@@ -34,8 +34,8 @@ sub run {
   # Handle
   $self->on_request->($self, $tx);
 
-  my $res    = $tx->res;
-  my $status = $res->code;
+  my $res = $tx->res;
+  my $status = $res->code || 404;
 
   # Fix headers
   $res->fix_headers;

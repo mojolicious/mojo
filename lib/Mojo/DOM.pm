@@ -1584,8 +1584,8 @@ Collections are blessed arrays supporting these methods.
 
 =item C<each>
 
-  my @results = $dom->find('div')->each;
-  $dom        = $dom->find('div')->each(sub { print shift->text });
+  my @elements = $dom->find('div')->each;
+  $dom         = $dom->find('div')->each(sub { print shift->text });
 
 Iterate over whole collection.
 

@@ -1239,6 +1239,8 @@ package Mojo::DOM::_Collection;
 sub each  { shift->_iterate(@_) }
 sub until { shift->_iterate(@_, 1) }
 sub while { shift->_iterate(@_, 0) }
+sub count { my ($collection)=@_; 1 + $#$collection; }
+sub last  { my ($collection)=@_; $collection[ $#$collection ]; }
 
 sub _iterate {
   my ($self, $cb, $cond) = @_;

@@ -6,6 +6,7 @@ blib
 Makefile*
 !Makefile.PL
 META.yml
+MYMETA.yml
 MANIFEST*
 !MANIFEST.SKIP
 pm_to_blib

@@ -1270,23 +1270,23 @@ Mojo::DOM - Minimalistic XML/HTML5 DOM Parser With CSS3 Selectors
 
   # Find
   my $b = $dom->at('#b');
-  print $b->text;
+  say $b->text;
 
   # Iterate
-  $dom->find('div[id]')->each(sub { print shift->text });
+  $dom->find('div[id]')->each(sub { say shift->text });
 
   # Loop
   for my $e ($dom->find('div[id]')->each) {
-    print $e->text;
+    say $e->text;
   }
 
   # Get the first 10 links
   $dom->find('a[href]')
-    ->while(sub { print shift->attrs->{href} && pop() < 10 });
+    ->while(sub { say shift->attrs->{href} && pop() < 10 });
 
   # Search for a link about a specific topic
   $dom->find('a[href]')
-    ->until(sub { $_->text =~ m/kraih/ && print $_->attrs->{href} });
+    ->until(sub { $_->text =~ m/kraih/ && say $_->attrs->{href} });
 
 =head1 DESCRIPTION
 
@@ -1576,7 +1576,7 @@ Children of element.
 
 Find elements with CSS3 selectors and return a collection.
 
-  print $dom->find('div')->[23]->text;
+  say $dom->find('div')->[23]->text;
 
 Collections are blessed arrays supporting these methods.
 
@@ -1585,19 +1585,20 @@ Collections are blessed arrays supporting these methods.
 =item C<each>
 
   my @elements = $dom->find('div')->each;
-  $dom         = $dom->find('div')->each(sub { print shift->text });
+  $dom         = $dom->find('div')->each(sub { say shift->text });
+  $dom         = $dom->find('div')->each(sub { say pop, ':', shift->text });
 
 Iterate over whole collection.
 
 =item C<while>
 
-  $dom = $dom->find('div')->while(sub { print $_->text && $_->text =~ /x/ });
+  $dom = $dom->find('div')->while(sub { say $_->text && $_->text =~ /x/ });
 
 Iterate over collection while closure returns true.
 
 =item C<until>
 
-  $dom = $dom->find('div')->until(sub { $_->text =~ /x/ && print $_->text });
+  $dom = $dom->find('div')->until(sub { $_->text =~ /x/ && say $_->text });
 
 Iterate over collection until closure returns true.
 

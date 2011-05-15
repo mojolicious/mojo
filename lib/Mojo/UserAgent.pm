@@ -1161,7 +1161,8 @@ a successful handshake is performed.
   my $tx = $ua->delete('http://kraih.com' => {Accept => '*/*'};
   my $tx = $ua->delete('http://kraih.com' => {Accept => '*/*'} => 'Hi!');
 
-Perform blocking HTTP C<DELETE> request.
+Perform blocking HTTP C<DELETE> request and return resulting
+L<Mojo::Transaction::HTTP> object.
 You can also append a callback to perform requests non-blocking.
 
   $ua->delete('http://kraih.com' => sub {
@@ -1183,7 +1184,8 @@ C<https_proxy>, C<NO_PROXY> and C<no_proxy> for proxy information.
   my $tx = $ua->get('http://kraih.com' => {Accept => '*/*'});
   my $tx = $ua->get('http://kraih.com' => {Accept => '*/*'} => 'Hi!');
 
-Perform blocking HTTP C<GET> request.
+Perform blocking HTTP C<GET> request and return resulting
+L<Mojo::Transaction::HTTP> object.
 You can also append a callback to perform requests non-blocking.
 
   $ua->get('http://kraih.com' => sub {
@@ -1198,7 +1200,8 @@ You can also append a callback to perform requests non-blocking.
   my $tx = $ua->head('http://kraih.com' => {Accept => '*/*'});
   my $tx = $ua->head('http://kraih.com' => {Accept => '*/*'} => 'Hi!');
 
-Perform blocking HTTP C<HEAD> request.
+Perform blocking HTTP C<HEAD> request and return resulting
+L<Mojo::Transaction::HTTP> object.
 You can also append a callback to perform requests non-blocking.
 
   $ua->head('http://kraih.com' => sub {
@@ -1220,7 +1223,8 @@ Note that this method is EXPERIMENTAL and might change without warning!
   my $tx = $ua->post('http://kraih.com' => {Accept => '*/*'});
   my $tx = $ua->post('http://kraih.com' => {Accept => '*/*'} => 'Hi!');
 
-Perform blocking HTTP C<POST> request.
+Perform blocking HTTP C<POST> request and return resulting
+L<Mojo::Transaction::HTTP> object.
 You can also append a callback to perform requests non-blocking.
 
   $ua->post('http://kraih.com' => sub {
@@ -1261,7 +1265,8 @@ You can also append a callback to perform requests non-blocking.
     {myzip => {file => $asset, filename => 'foo.zip'}}
   );
 
-Perform blocking HTTP C<POST> request with form data.
+Perform blocking HTTP C<POST> request with form data and return resulting
+L<Mojo::Transaction::HTTP> object.
 You can also append a callback to perform requests non-blocking.
 
   $ua->post_form('http://kraih.com' => {q => 'test'} => sub {
@@ -1276,7 +1281,8 @@ You can also append a callback to perform requests non-blocking.
   my $tx = $ua->put('http://kraih.com' => {Accept => '*/*'});
   my $tx = $ua->put('http://kraih.com' => {Accept => '*/*'} => 'Hi!');
 
-Perform blocking HTTP C<PUT> request.
+Perform blocking HTTP C<PUT> request and return resulting
+L<Mojo::Transaction::HTTP> object.
 You can also append a callback to perform requests non-blocking.
 
   $ua->put('http://kraih.com' => sub {

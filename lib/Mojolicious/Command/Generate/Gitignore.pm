@@ -28,7 +28,7 @@ __DATA__
 blib
 Makefile*
 !Makefile.PL
-META.yml
+*META.yml
 MANIFEST*
 !MANIFEST.SKIP
 pm_to_blib

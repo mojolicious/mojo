@@ -1586,19 +1586,30 @@ Collections are blessed arrays supporting these methods.
 
   my @elements = $dom->find('div')->each;
   $dom         = $dom->find('div')->each(sub { say shift->text });
-  $dom         = $dom->find('div')->each(sub { say pop, ':', shift->text });
+  $dom         = $dom->find('div')->each(sub {
+    my ($e, $count) = @_;
+    say "$count: ", $e->text;
+  });
 
 Iterate over whole collection.
 
 =item C<while>
 
   $dom = $dom->find('div')->while(sub { say $_->text && $_->text =~ /x/ });
+  $dom = $dom->find('div')->each(sub {
+    my ($e, $count) = @_;
+    say("$count: ", $e->text) && $e->text =~ /x/;
+  });
 
 Iterate over collection while closure returns true.
 
 =item C<until>
 
   $dom = $dom->find('div')->until(sub { $_->text =~ /x/ && say $_->text });
+  $dom = $dom->find('div')->until(sub {
+    my ($e, $count) = @_;
+    $e->text =~ /x/ && say "$count: ", $e->text;
+  });
 
 Iterate over collection until closure returns true.
 

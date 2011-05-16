@@ -1150,7 +1150,7 @@ sub _start {
   warn "START $start\n" if DEBUG;
 
   # Autoclose optional HTML tags
-  if ($$current->[0] ne 'root') {
+  if (!$self->xml && $$current->[0] ne 'root') {
 
     # "<li>"
     if ($start eq 'li') { $self->_close($current, {li => 1}, 'ul') }
@@ -1238,11 +1238,10 @@ sub while { shift->_iterate(@_, 0) }
 
 sub _iterate {
   my ($self, $cb, $cond) = @_;
-
   return @$self unless $cb;
-  my $i = 1;
 
   # Iterate until condition is true
+  my $i = 1;
   if (defined $cond) { !!$_->$cb($i++) == $cond && last for @$self }
 
   # Iterate over all elements

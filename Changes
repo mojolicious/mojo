@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojolicious.
 1.33    2011-05-12 00:00:00
         - Updated jQuery to version 1.6.1.
         - Improved documentation.
+        - Fixed reserved GET/POST param handling in Mojolicious::Controller.
         - Fixed small XML semantics bug in Mojo::DOM.
         - Fixed all blocking server bindings to default to a 404 status code.
 

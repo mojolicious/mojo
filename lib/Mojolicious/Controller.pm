@@ -179,8 +179,8 @@ sub param {
     return $self;
   }
 
-  # Captured value
-  return $p->{$name} if exists $p->{$name};
+  # Captured unreserved value
+  return $p->{$name} if !$RESERVED{$name} && exists $p->{$name};
 
   # Param value
   return $self->req->param($name);

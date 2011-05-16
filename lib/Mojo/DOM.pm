@@ -1594,8 +1594,8 @@ Iterate over whole collection.
 
 =item C<while>
 
-  $dom = $dom->find('div')->while(sub { say $_->text && $_->text =~ /x/ });
-  $dom = $dom->find('div')->each(sub {
+  $dom = $dom->find('div')->while(sub { say($_->text) && $_->text =~ /x/ });
+  $dom = $dom->find('div')->while(sub {
     my ($e, $count) = @_;
     say("$count: ", $e->text) && $e->text =~ /x/;
   });

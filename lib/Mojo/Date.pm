@@ -163,7 +163,7 @@ Construct a new L<Mojo::Date> object.
 
   $date = $date->parse('Sun Nov  6 08:49:37 1994');
 
-Parsable formats include:
+Parse date in one of the following formats.
 
   - Epoch format (784111777)
   - RFC 822/1123 (Sun, 06 Nov 1994 08:49:37 GMT)

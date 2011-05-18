@@ -1569,6 +1569,8 @@ Element attributes.
 
 Children of element.
 
+  say $dom->children->[1]->children->[5]->text;
+
 =head2 C<find>
 
   my $collection = $dom->find('html title');
@@ -1624,7 +1626,7 @@ Render content of this element to XML.
 
   my $namespace = $dom->namespace;
 
-Element namespace.
+Find element namespace.
 
 =head2 C<parent>
 

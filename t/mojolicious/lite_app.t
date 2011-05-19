@@ -273,11 +273,10 @@ get '/with/header/condition' => (headers => {'X-Secret-Header' => 'bar'}) =>
   'with_header_condition';
 
 # POST /with/header/condition
-post '/with/header/condition' => (headers => {'X-Secret-Header' => 'bar'}) =>
-  sub {
+post '/with/header/condition' => sub {
   my $self = shift;
   $self->render_text('foo ' . $self->req->headers->header('X-Secret-Header'));
-  };
+} => (headers => {'X-Secret-Header' => 'bar'});
 
 # POST /with/body/and/desc
 post '/with/body/and/desc' => sub {

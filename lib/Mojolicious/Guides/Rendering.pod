@@ -580,12 +580,10 @@ much everything.
 
   use Mojolicious::Lite;
 
-  app->helper(
-    debug => sub {
-      my ($self, $string) = @_;
-      $self->app->log->debug($string);
-    }
-  );
+  helper debug => sub {
+    my ($self, $string) = @_;
+    $self->app->log->debug($string);
+  };
 
   get '/' => sub {
     my $self = shift;
@@ -604,14 +602,12 @@ allows very pleasant to use tag helpers and filters.
   use Mojolicious::Lite;
   use Mojo::ByteStream;
 
-  app->helper(
-    trim_newline => sub {
-      my ($self, $block) = @_;
-      my $result = $block->();
-      $result =~ s/\n//g;
-      return Mojo::ByteStream->new($result);
-    }
-  );
+  helper trim_newline => sub {
+    my ($self, $block) = @_;
+    my $result = $block->();
+    $result =~ s/\n//g;
+    return Mojo::ByteStream->new($result);
+  };
 
   get '/' => 'index';
 

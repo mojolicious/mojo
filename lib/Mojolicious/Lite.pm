@@ -50,11 +50,12 @@ sub import {
 
   # Export
   *{"${caller}::new"} = *{"${caller}::app"} = sub {$app};
-  *{"${caller}::any"}  = sub { $routes->any(@_) };
-  *{"${caller}::del"}  = sub { $routes->del(@_) };
-  *{"${caller}::get"}  = sub { $routes->get(@_) };
-  *{"${caller}::hook"} = sub { $app->hook(@_) };
-  *{"${caller}::under"} = *{"${caller}::ladder"} =
+  *{"${caller}::any"}    = sub { $routes->any(@_) };
+  *{"${caller}::del"}    = sub { $routes->del(@_) };
+  *{"${caller}::get"}    = sub { $routes->get(@_) };
+  *{"${caller}::helper"} = sub { $app->helper(@_) };
+  *{"${caller}::hook"}   = sub { $app->hook(@_) };
+  *{"${caller}::under"}  = *{"${caller}::ladder"} =
     sub { $routes = $root->under(@_) };
   *{"${caller}::plugin"}    = sub { $app->plugin(@_) };
   *{"${caller}::post"}      = sub { $routes->post(@_) };
@@ -308,12 +309,12 @@ in ones can be found in L<Mojolicious::Plugin::DefaultHelpers> and
 L<Mojolicious::Plugin::TagHelpers>.
 
   # "whois" helper
-  app->helper(whois => sub {
+  helper whois => sub {
     my $self  = shift;
     my $agent = $self->req->headers->user_agent || 'Anonymous';
     my $ip    = $self->tx->remote_address;
     return "$agent ($ip)";
-  });
+  };
 
   # GET /secret
   get '/secret' => sub {
@@ -827,6 +828,24 @@ See also the tutorial above for more argument variations.
 
 Generate route matching only C<GET> requests.
 See also the tutorial above for more argument variations.
+
+=head2 C<helper>
+
+  helper foo => sub {...};
+
+Add a new helper that will be available as a method of the controller object
+and the application object, as well as a function in C<ep> templates.
+
+  # Helper
+  helper add => sub { $_[1] + $_[2] };
+
+  # Controller/Application
+  my $result = $self->add(2, 3);
+
+  # Template
+  <%= add 2, 3 %>
+
+Note that this function is EXPERIMENTAL and might change without warning!
 
 =head2 C<hook>
 

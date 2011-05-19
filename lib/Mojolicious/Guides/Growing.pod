@@ -252,7 +252,7 @@ L<Mojolicious> to make our C<model> available to all actions and templates.
   my $users = MyUsers->new;
 
   # Helper function returning our model instance
-  app->helper(users => sub { return $users });
+  helper users => sub { return $users };
 
   # /?user=sri&pass=secr3t
   any '/' => sub {
@@ -387,7 +387,7 @@ like this.
   app->secret('Mojolicious rocks!');
 
   my $users = MyUsers->new;
-  app->helper(users => sub { return $users });
+  helper users => sub { return $users };
 
   # Main login action
   any '/' => sub {

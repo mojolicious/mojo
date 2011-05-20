@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-1.33    2011-05-12 00:00:00
+1.33    2011-05-20 00:00:00
         - Added EXPERIMENTAL helper function to Mojolicious::Lite.
         - Updated jQuery to version 1.6.1.
         - Improved Mojo::JSON string escaping to make JSONP easier.

@@ -563,8 +563,11 @@ sub _end {
     # Found
     ++$found and last if $next->[1] eq $end;
 
-    # HTML inline tags stop here
-    return if !$self->xml && $HTML_BLOCK{$next->[1]} && !$HTML_BLOCK{$end};
+    # Don't cross block tags that are not optional tags
+    return
+      if !$self->xml
+        && $HTML_BLOCK{$next->[1]}
+        && !$HTML_OPTIONAL{$next->[1]};
 
     $next = $next->[3];
   }

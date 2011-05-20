@@ -6,7 +6,7 @@ use warnings;
 # Disable IPv6, epoll and kqueue
 BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 35;
+use Test::More tests => 41;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -19,9 +19,10 @@ use Mojolicious::Lite;
 
 # GET /hello (embedded)
 get '/hello' => sub {
-  my $self = shift;
-  my $name = $self->stash('name');
-  $self->render_text("Hello from the $name app!");
+  my $self    = shift;
+  my $name    = $self->stash('name');
+  my $counter = ++$self->session->{counter};
+  $self->render_text("Hello from the $name ($counter) app!");
 };
 
 # "Morbo will now introduce the candidates - Puny Human Number One,
@@ -126,19 +127,27 @@ $t->get_ok('/hello')->status_is(200)
 
 # GET /hello/hello (from embedded app)
 $t->get_ok('/hello/hello')->status_is(200)
-  ->content_is('Hello from the embedded app!');
+  ->content_is('Hello from the embedded (1) app!');
+
+# GET /hello/hello (from embedded app again)
+$t->get_ok('/hello/hello')->status_is(200)
+  ->content_is('Hello from the embedded (2) app!');
+
+# GET /hello/hello (from embedded app again)
+$t->get_ok('/hello/hello')->status_is(200)
+  ->content_is('Hello from the embedded (3) app!');
 
 # GET /bye/bye (from embedded app)
 $t->get_ok('/bye/bye')->status_is(200)
-  ->content_is('Hello from the embedded app!second embedded! success!');
+  ->content_is('Hello from the embedded (1) app!second embedded! success!');
 
 # GET /bar/bye (from embedded app)
 $t->get_ok('/bar/bye')->status_is(200)
-  ->content_is('Hello from the embedded app!third embedded! success!');
+  ->content_is('Hello from the embedded (2) app!third embedded! success!');
 
 # GET /baz/bye (from embedded app)
 $t->get_ok('/baz/bye')->status_is(200)
-  ->content_is('Hello from the embedded app!fourth embedded! success!');
+  ->content_is('Hello from the embedded (3) app!fourth embedded! success!');
 
 # GET /yada (from embedded app)
 $t->get_ok('/yada')->status_is(200)->content_is('yada fifth embedded works!');

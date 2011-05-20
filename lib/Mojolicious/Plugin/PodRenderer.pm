@@ -1,9 +1,11 @@
 package Mojolicious::Plugin::PodRenderer;
 use Mojo::Base 'Mojolicious::Plugin';
 
+use File::Basename 'dirname';
+use File::Spec;
 use IO::File;
+use Mojo::Asset::File;
 use Mojo::ByteStream 'b';
-use Mojo::Command;
 use Mojo::DOM;
 use Mojo::Util 'url_escape';
 
@@ -19,11 +21,18 @@ use Pod::Simple::Search;
 # Paths
 our @PATHS = map { $_, "$_/pods" } @INC;
 
+# Template directory
+my $T = File::Spec->catdir(dirname(__FILE__), '..', 'templates');
+
 # Mojobar template
-our $MOJOBAR = Mojo::Command->new->get_data('mojobar.html.ep', __PACKAGE__);
+our $MOJOBAR =
+  Mojo::Asset::File->new(path => File::Spec->catfile($T, 'mojobar.html.ep'))
+  ->slurp;
 
 # Perldoc template
-our $PERLDOC = Mojo::Command->new->get_data('perldoc.html.ep', __PACKAGE__);
+our $PERLDOC =
+  Mojo::Asset::File->new(path => File::Spec->catfile($T, 'perldoc.html.ep'))
+  ->slurp;
 
 # "This is my first visit to the Galaxy of Terror and I'd like it to be a
 #  pleasant one."
@@ -161,203 +170,6 @@ sub _pod_to_html {
 }
 
 1;
-__DATA__
-
-@@ mojobar.html.ep
-% content_for header => begin
-  %= javascript '/js/jquery.js'
-  %= stylesheet begin
-    #mojobar {
-      background-color: #1a1a1a;
-      background: -webkit-gradient(
-        linear,
-        0% 0%,
-        0% 100%,
-        color-stop(0%, #2a2a2a),
-        color-stop(100%, #000)
-      );
-      background: -moz-linear-gradient(
-        top,
-        #2a2a2a 0%,
-        #000 100%
-      );
-      background: linear-gradient(top, #2a2a2a 0%, #000 100%);
-      -moz-box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.6);
-      -webkit-box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.6);
-      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.6);
-      color: #eee;
-      height: 60px;
-      overflow: hidden;
-      position: absolute;
-      text-align: right;
-      text-shadow: 0;
-      vertical-align: middle;
-      width: 100%;
-      z-index: 1000;
-    }
-    #mojobar-logo {
-      float: left;
-      margin-left: 5em;
-      padding-top: 2px;
-    }
-    #mojobar-links {
-      display:table-cell;
-      float: right;
-      height: 60px;
-      margin-right: 5em;
-      margin-top: 1.5em;
-    }
-    #mojobar-links a {
-      color: #ccc;
-      font: 1.1em Georgia, Times, serif;
-      margin-left: 0.5em;
-      padding-bottom: 1em;
-      padding-top: 1em;
-      text-decoration: none;
-      text-shadow: 0px -1px 0px #555;
-    }
-    #mojobar-links a:hover { color: #fff; }
-  % end
-% end
-<div id="mojobar">
-  <div id="mojobar-logo">
-    %= link_to 'http://mojolicio.us' => begin
-      %= image '/mojolicious-white.png', alt => 'Mojolicious logo'
-    % end
-  </div>
-  <div id="mojobar-links">
-    %= link_to Documentation => 'http://mojolicio.us/perldoc'
-    %= link_to Wiki => 'https://github.com/kraih/mojo/wiki'
-    %= link_to GitHub => 'https://github.com/kraih/mojo'
-    %= link_to CPAN => 'http://search.cpan.org/dist/Mojolicious'
-    %= link_to MailingList => 'http://groups.google.com/group/mojolicious'
-    %= link_to Blog => 'http://blog.kraih.com'
-    %= link_to Twitter => 'http://twitter.com/kraih'
-    %= link_to 'T-Shirts' => 'http://kraih.spreadshirt.net'
-  </div>
-</div>
-%= javascript begin
-  $(window).load(function () {
-    var mojobar = $('#mojobar');
-    var start   = mojobar.offset().top;
-    var fixed;
-    $(window).scroll(function () {
-      if (!fixed && (mojobar.offset().top - $(window).scrollTop() < 0)) {
-        mojobar.css('top', 0);
-        mojobar.css('position', 'fixed');
-        fixed = true;
-      } else if (fixed && $(window).scrollTop() <= start) {
-        mojobar.css('position', 'absolute');
-        mojobar.css('top', start + 'px');
-        fixed = false;
-      }
-    });
-  });
-  $(document).ready(function(){
-    $(".mojoscroll").click(function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      var parts  = this.href.split("#");
-      var hash   = "#" + parts[1];
-      var target = $(hash);
-      var top    = target.offset().top - 70;
-      var old    = target.attr('id');
-      target.attr('id', '');
-      location.hash = hash;
-      target.attr('id', old);
-      $('html, body').animate({scrollTop:top}, 500);
-    });
-  });
-% end
-
-@@ perldoc.html.ep
-<!doctype html><html>
-  <head>
-    <title><%= $title %></title>
-    %= stylesheet '/css/prettify-mojo.css'
-    %= javascript '/js/prettify.js'
-    %= content_for 'header'
-    %= stylesheet begin
-      a { color: inherit; }
-      a img { border: 0; }
-      body {
-        background-color: #f5f6f8;
-        color: #333;
-        font: 0.9em Verdana, sans-serif;
-        margin: 0;
-        text-shadow: #ddd 0 1px 0;
-      }
-      h1, h2, h3 {
-        font: 1.5em Georgia, Times, serif;
-        margin: 0;
-      }
-      h1 a, h2 a, h3 a { text-decoration: none; }
-      pre {
-        background-color: #1a1a1a;
-        background: url(<%= url_for '/mojolicious-pinstripe.gif' %>);
-        -moz-border-radius: 5px;
-        border-radius: 5px;
-        color: #eee;
-        font-family: 'Menlo', 'Monaco', Courier, monospace !important;
-        text-align: left;
-        text-shadow: #333 0 1px 0;
-        padding-bottom: 1.5em;
-        padding-top: 1.5em;
-        white-space: pre-wrap;
-      }
-      #footer {
-        padding-top: 1em;
-        text-align: center;
-      }
-      #perldoc {
-        background-color: #fff;
-        -moz-border-radius-bottomleft: 5px;
-        border-bottom-left-radius: 5px;
-        -moz-border-radius-bottomright: 5px;
-        border-bottom-right-radius: 5px;
-        -moz-box-shadow: 0px 0px 2px #ccc;
-        -webkit-box-shadow: 0px 0px 2px #ccc;
-        box-shadow: 0px 0px 2px #ccc;
-        margin-left: 5em;
-        margin-right: 5em;
-        padding: 3em;
-        padding-top: 7em;
-      }
-      #perldoc > ul:first-of-type a { text-decoration: none; }
-    % end
-  </head>
-  <body onload="prettyPrint()">
-    %= content_for 'mojobar'
-    % my $link = begin
-      %= link_to shift, shift, class => "mojoscroll"
-    % end
-    <div id="perldoc">
-      <h1><a id="toc">TABLE OF CONTENTS</a></h1>
-      <ul>
-        % for my $section (@$sections) {
-          <li>
-            %== $link->(splice @$section, 0, 2)
-            % if (@$section) {
-              <ul>
-                % while (@$section) {
-                  <li>
-                    %== $link->(splice @$section, 0, 2)
-                  </li>
-                % }
-              </ul>
-            % }
-          </li>
-        % }
-      </ul>
-      %= content_for 'perldoc'
-    </div>
-    <div id="footer">
-      %= link_to 'http://mojolicio.us' => begin
-        %= image '/mojolicious-black.png', alt => 'Mojolicious logo'
-      % end
-    </div>
-  </body>
-</html>
 
 __END__
 

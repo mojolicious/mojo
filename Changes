@@ -3,7 +3,10 @@ This file documents the revision history for Perl extension Mojolicious.
 1.33    2011-05-12 00:00:00
         - Added EXPERIMENTAL helper function to Mojolicious::Lite.
         - Updated jQuery to version 1.6.1.
+        - Improved Mojo::JSON string escaping to make JSONP easier.
+        - Improved reloader slightly.
         - Improved documentation.
+        - Moved all bundled templates to "lib/Mojolicious/templates".
         - Fixed reserved GET/POST param handling in Mojolicious::Controller.
         - Fixed small XML semantics bug in Mojo::DOM.
         - Fixed all blocking server bindings to default to a 404 status code.

@@ -1,0 +1,109 @@
+<!doctype html><html>
+  <head>
+    <title>Page Not Found</title>
+    %= stylesheet '/css/prettify-mojo.css'
+    %= javascript '/js/prettify.js'
+    %= stylesheet begin
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      a img { border: 0; }
+      body {
+        background-color: #f5f6f8;
+        color: #333;
+        font: 0.9em Verdana, sans-serif;
+        margin: 0;
+        text-align: center;
+        text-shadow: #ddd 0 1px 0;
+      }
+      h1 {
+        font: 1.5em Georgia, Times, serif;
+        margin-bottom: 1em;
+        margin-top: 1em;
+        text-shadow: #666 0 1px 0;
+      }
+      #footer {
+        background-color: #caecf6;
+        padding-top: 20em;
+        width: 100%;
+      }
+      #footer a img { margin-top: 20em; }
+      #documentation {
+        background-color: #ecf1da;
+        padding-bottom: 20em;
+        padding-top: 20em;
+      }
+      #documentation h1 { margin-bottom: 3em; }
+      #header {
+        margin-bottom: 20em;
+        margin-top: 15em;
+        width: 100%;
+      }
+      #perldoc {
+        background-color: #eee;
+        border: 2px dashed #1a1a1a;
+        color: #000;
+        display: inline-block;
+        margin-left: 0.1em;
+        padding: 0.5em;
+        white-space: nowrap;
+      }
+      #preview {
+        background-color: #1a1a1a;
+        background: url(<%= url_for '/mojolicious-pinstripe.gif' %>);
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+        font-family: 'Menlo', 'Monaco', Courier, monospace !important;
+        font-size: 1.5em;
+        margin: 0;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 0.5em;
+        padding-left: 1em;
+        text-align: left;
+        width: 500px;
+      }
+      #suggestion {
+        background-color: #2f3032;
+        color: #eee;
+        padding-bottom: 20em;
+        padding-top: 20em;
+        text-shadow: #333 0 1px 0;
+      }
+    % end
+  </head>
+  <body onload="prettyPrint()">
+    <div id="header">
+      %= image '/mojolicious-box.png', alt => 'Mojolicious banner'
+      <h1>This page is brand new and has not been unboxed yet!</h1>
+    </div>
+    <div id="suggestion">
+      %= image '/mojolicious-arrow.png', alt => 'Arrow'
+      <h1>Perhaps you would like to add a route for it?</h1>
+      <div id="preview">
+        <pre class="prettyprint">
+get '<%= $self->req->url->path->to_abs_string %>' => sub {
+    my $self = shift;
+    $self->render_text('Hello world!');
+};</pre>
+      </div>
+    </div>
+    <div id="documentation">
+      <h1>
+        You might also enjoy our excellent documentation in
+        <div id="perldoc">
+          %= link_to 'perldoc Mojolicious::Guides', $guide
+        </div>
+      </h1>
+      %= image '/amelia.png', alt => 'Amelia'
+    </div>
+    <div id="footer">
+      <h1>And don't forget to have fun!</h1>
+      <p><%= image '/mojolicious-clouds.png', alt => 'Clouds' %></p>
+      %= link_to 'http://mojolicio.us' => begin
+        %= image '/mojolicious-black.png', alt => 'Mojolicious logo'
+      % end
+    </div>
+  </body>
+</html>

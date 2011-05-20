@@ -111,16 +111,19 @@ sub search {
 
 sub _purge {
   for my $sub (@_) {
-    eval { undef &$sub };
-    carp "Can't unload sub '$sub': $@" if $@;
+    warn "PURGE $sub\n" if DEBUG;
+    carp "Can't unload sub '$sub': $@" unless eval { undef &$sub; 1 };
     delete $DB::sub{$sub};
+    no strict 'refs';
+    $sub =~ /^(.*::)(.*?)$/ and delete *{$1}->{$2};
   }
 }
 
 sub _reload {
   my $key = shift;
-  warn "$key modified, reloading!\n" if DEBUG;
+  warn "CLEANING $key\n" if DEBUG;
   _unload($key);
+  warn "RELOADING $key\n" if DEBUG;
   return Mojo::Exception->new($@)
     unless eval { package main; require $key; 1 };
   return;

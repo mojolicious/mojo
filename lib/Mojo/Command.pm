@@ -116,7 +116,7 @@ sub get_all_data {
     $CACHE->{$class} = join '', <$d>;
 
     # Close
-    close $d or die "DAMN: $!\n";
+    close $d;
   }
 
   # Content

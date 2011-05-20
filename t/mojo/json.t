@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 plan skip_all => 'Perl 5.10 required for this test!' unless $] >= 5.010;
-plan tests => 112;
+plan tests => 116;
 
 use Mojo::ByteStream 'b';
 
@@ -245,6 +245,17 @@ is_deeply $hash, {foo => 'c:\progra~1\mozill~1\firefox.exe'},
 $string = $json->encode(['a' x 32768]);
 is_deeply $json->decode($string), ['a' x 32768], 'successful roundtrip';
 is $json->error, undef, 'no errors';
+
+# u2028 and u2029
+$string = $json->encode(["\x{2028}test\x{2029}123"]);
+is index($string, b("\x{2028}")->encode), -1, 'properly escaped';
+is index($string, b("\x{2029}")->encode), -1, 'properly escaped';
+is_deeply $json->decode($string), ["\x{2028}test\x{2029}123"],
+  'right roundtrip';
+
+# Blessed reference
+$string = $json->encode([b('test')]);
+is_deeply $json->decode($string), ['test'], 'right roundtrip';
 
 # Errors
 is $json->decode(b("\x{feff}[\"\\ud800\"]")->encode('UTF-16LE')), undef,

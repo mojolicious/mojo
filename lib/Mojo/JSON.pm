@@ -26,16 +26,18 @@ my $BOM_RE = qr/
 /x;
 my $WHITESPACE_RE = qr/[\x20\x09\x0a\x0d]*/;
 
-# Escaped special character map
+# Escaped special character map (with u2028 and u2029)
 my %ESCAPE = (
-  '"'  => '"',
-  '\\' => '\\',
-  '/'  => '/',
-  'b'  => "\x07",
-  'f'  => "\x0C",
-  'n'  => "\x0A",
-  'r'  => "\x0D",
-  't'  => "\x09"
+  '"'     => '"',
+  '\\'    => '\\',
+  '/'     => '/',
+  'b'     => "\x07",
+  'f'     => "\x0C",
+  'n'     => "\x0A",
+  'r'     => "\x0D",
+  't'     => "\x09",
+  'u2028' => "\x{2028}",
+  'u2029' => "\x{2029}"
 );
 my %REVERSE;
 for (0x00 .. 0x1F, 0x7F) { $REVERSE{pack 'C', $_} = sprintf '\u%.4X', $_ }
@@ -310,7 +312,8 @@ sub _encode_string {
   my $string = shift;
 
   # Escape
-  $string =~ s/([\x00-\x1F\x7F\\\"\/\b\f\n\r\t])/$REVERSE{$1}/gs;
+  $string
+    =~ s/([\x00-\x1F\x7F\x{2028}\x{2029}\\\"\/\b\f\n\r\t])/$REVERSE{$1}/gs;
 
   # Stringify
   return "\"$string\"";
@@ -396,8 +399,8 @@ L<Mojo::JSON> is a minimalistic and relaxed implementation of RFC4627.
 While it is possibly the fastest pure-Perl JSON parser available, you should
 not use it for validation.
 
-It supports normal Perl data types like C<Scalar>, C<Array> and C<Hash>, but
-not blessed references.
+It supports normal Perl data types like C<Scalar>, C<Array>, C<Hash> and will
+try to stringify blessed references.
 
   [1, -2, 3]     -> [1, -2, 3]
   {"foo": "bar"} -> {foo => 'bar'}
@@ -411,6 +414,8 @@ similar native Perl value.
 
 Decoding UTF-16 (LE/BE) and UTF-32 (LE/BE) will be handled transparently,
 encoding will only generate UTF-8.
+The two unicode whitespace characters C<u2028> and C<u2029> will always be
+escaped to make JSONP easier.
 
 =head1 ATTRIBUTES
 

@@ -1,8 +1,8 @@
 package Mojolicious::Controller;
-use Mojo::Base 'Mojo::Command';
+use Mojo::Base -base;
 
+use Mojo::Asset::File;
 use Mojo::ByteStream;
-use Mojo::Command;
 use Mojo::Cookie::Response;
 use Mojo::Exception;
 use Mojo::Transaction::HTTP;
@@ -10,26 +10,35 @@ use Mojo::URL;
 use Mojo::Util;
 
 require Carp;
+require File::Basename;
+require File::Spec;
 
 # "Scalpel... blood bucket... priest."
 has [qw/app match/];
 has tx => sub { Mojo::Transaction::HTTP->new };
 
+# Template directory
+my $T = File::Spec->catdir(File::Basename::dirname(__FILE__), 'templates');
+
 # Exception template
 our $EXCEPTION =
-  Mojo::Command->new->get_data('exception.html.ep', __PACKAGE__);
+  Mojo::Asset::File->new(path => File::Spec->catfile($T, 'exception.html.ep'))
+  ->slurp;
 
 # Exception template (development)
 our $DEVELOPMENT_EXCEPTION =
-  Mojo::Command->new->get_data('exception.development.html.ep', __PACKAGE__);
+  Mojo::Asset::File->new(
+  path => File::Spec->catfile($T, 'exception.development.html.ep'))->slurp;
 
 # Not found template
 our $NOT_FOUND =
-  Mojo::Command->new->get_data('not_found.html.ep', __PACKAGE__);
+  Mojo::Asset::File->new(path => File::Spec->catfile($T, 'not_found.html.ep'))
+  ->slurp;
 
 # Not found template (development)
 our $DEVELOPMENT_NOT_FOUND =
-  Mojo::Command->new->get_data('not_found.development.html.ep', __PACKAGE__);
+  Mojo::Asset::File->new(
+  path => File::Spec->catfile($T, 'not_found.development.html.ep'))->slurp;
 
 # Reserved stash values
 my @RESERVED = (
@@ -644,416 +653,6 @@ sub write_chunk {
 }
 
 1;
-__DATA__
-
-@@ exception.html.ep
-<!doctype html><html>
-  <head><title>Server Error</title></head>
-   %= stylesheet begin
-      body { background-color: #caecf6; }
-      #raptor {
-        background: url(<%= url_for '/failraptor.png' %>);
-        height: 488px;
-        left: 50%;
-        margin-left: -371px;
-        margin-top: -244px;
-        position:absolute;
-        top: 50%;
-        width: 743px;
-      }
-    % end
-  <body><div id="raptor"></div></body>
-</html>
-
-@@ exception.development.html.ep
-% my $e = delete $self->stash->{'exception'};
-<!doctype html><html>
-  <head>
-    <title>Server Error</title>
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="-1">
-    %= javascript '/js/jquery.js'
-    %= stylesheet '/css/prettify-mojo.css'
-    %= javascript '/js/prettify.js'
-    %= stylesheet begin
-      a img { border: 0; }
-      body {
-        background-color: #f5f6f8;
-        color: #333;
-        font: 0.9em Verdana, sans-serif;
-        margin-left: 3em;
-        margin-right: 3em;
-        margin-top: 0;
-        text-shadow: #ddd 0 1px 0;
-      }
-      pre {
-        margin: 0;
-        white-space: pre-wrap;
-      }
-      table {
-        border-collapse: collapse;
-        margin-top: 1em;
-        margin-bottom: 1em;
-        width: 100%;
-      }
-      td { padding: 0.3em; }
-      .box {
-        background-color: #fff;
-        -moz-box-shadow: 0px 0px 2px #ccc;
-        -webkit-box-shadow: 0px 0px 2px #ccc;
-        box-shadow: 0px 0px 2px #ccc;
-        overflow: hidden;
-        padding: 1em;
-      }
-      .code {
-        background-color: #1a1a1a;
-        background: url(<%= url_for '/mojolicious-pinstripe.gif' %>);
-        color: #eee;
-        font-family: 'Menlo', 'Monaco', Courier, monospace !important;
-        text-shadow: #333 0 1px 0;
-      }
-      .file {
-        margin-bottom: 0.5em;
-        margin-top: 1em;
-      }
-      .important { background-color: rgba(47, 48, 50, .75); }
-      .infobox tr:nth-child(odd) .value { background-color: #ddeeff; }
-      .infobox tr:nth-child(even) .value { background-color: #eef9ff; }
-      .key {
-        text-align: right;
-        text-weight: bold;
-      }
-      .preview {
-        background-color: #1a1a1a;
-        background: url(<%= url_for '/mojolicious-pinstripe.gif' %>);
-        -moz-border-radius: 5px;
-        border-radius: 5px;
-        margin-bottom: 1em;
-        padding: 0.5em;
-      }
-      .tap {
-        font: 0.5em Verdana, sans-serif;
-        text-align: center;
-      }
-      .value {
-        padding-left: 1em;
-        width: 100%;
-      }
-      #footer {
-        margin-top: 1.5em;
-        text-align: center;
-        width: 100%;
-      }
-      #showcase {
-        margin-top: 1em;
-        -moz-border-radius-topleft: 5px;
-        border-top-left-radius: 5px;
-        -moz-border-radius-topright: 5px;
-        border-top-right-radius: 5px;
-      }
-      #showcase pre {
-        font: 1.5em Georgia, Times, serif;
-        margin: 0;
-        text-shadow: #333 0 1px 0;
-      }
-      #more, #trace {
-        -moz-border-radius-bottomleft: 5px;
-        border-bottom-left-radius: 5px;
-        -moz-border-radius-bottomright: 5px;
-        border-bottom-right-radius: 5px;
-      }
-      #request {
-        -moz-border-radius-topleft: 5px;
-        border-top-left-radius: 5px;
-        -moz-border-radius-topright: 5px;
-        border-top-right-radius: 5px;
-        margin-top: 1em;
-      }
-    % end
-  </head>
-  <body onload="prettyPrint()">
-    % my $code = begin
-      <code class="prettyprint"><%= shift %></code>
-    % end
-    % my $cv = begin
-      % my ($key, $value, $i) = @_;
-      %= tag 'tr', $i ? (class => 'important') : undef, begin
-        <td class="key"><%= $key %>.</td>
-        <td class="value">
-          %== $code->($value)
-        </td>
-      % end
-    % end
-    % my $kv = begin
-      % my ($key, $value) = @_;
-      <tr>
-        <td class="key"><%= $key %>:</td>
-        <td class="value">
-          <pre><%= $value %></pre>
-        </td>
-      </tr>
-    % end
-    <div id="showcase" class="code box">
-      <pre><%= $e->message %></pre>
-      <div id="context">
-        <table>
-          % for my $line (@{$e->lines_before}) {
-            %== $cv->($line->[0], $line->[1])
-          % }
-          % if (defined $e->line->[1]) {
-            %== $cv->($e->line->[0], $e->line->[1], 1)
-          % }
-          % for my $line (@{$e->lines_after}) {
-            %== $cv->($line->[0], $line->[1])
-          % }
-        </table>
-      </div>
-      % if (defined $e->line->[2]) {
-        <div id="insight">
-          <table>
-            % for my $line (@{$e->lines_before}) {
-              %== $cv->($line->[0], $line->[2])
-            % }
-            %== $cv->($e->line->[0], $e->line->[2], 1)
-            % for my $line (@{$e->lines_after}) {
-              %== $cv->($line->[0], $line->[2])
-            % }
-          </table>
-        </div>
-        <div class="tap">tap for more</div>
-        %= javascript begin
-          var current = '#context';
-          $('#showcase').click(function() {
-            $(current).slideToggle('slow', function() {
-              if (current == '#context') {
-                current = '#insight';
-              }
-              else {
-                current = '#context';
-              }
-              $(current).slideToggle('slow');
-            });
-          });
-          $('#insight').toggle();
-        % end
-      % }
-    </div>
-    <div class="box" id="trace">
-      % if (@{$e->frames}) {
-        <div id="frames">
-          % for my $frame (@{$e->frames}) {
-            % if (my $line = $frame->[3]) {
-              <div class="file"><%= $frame->[1] %></div>
-              <div class="code preview">
-                %= "$frame->[2]."
-                %== $code->($line)
-              </div>
-            % }
-          % }
-        </div>
-        <div class="tap">tap for more</div>
-        %= javascript begin
-          $('#trace').click(function() {
-            $('#frames').slideToggle('slow');
-          });
-          $('#frames').toggle();
-        % end
-      % }
-    </div>
-    <div class="box infobox" id="request">
-      <table>
-        % my $req = $self->req;
-        %== $kv->(Method => $req->method)
-        % my $url = $req->url;
-        %== $kv->(Path => $url->to_string)
-        %== $kv->(Base => $url->base->to_string)
-        %== $kv->(Parameters => dumper $req->params->to_hash)
-        %== $kv->(Stash => dumper $snapshot)
-        %== $kv->(Session => dumper session)
-        %== $kv->(Version => $req->version)
-        % for my $name (@{$self->req->headers->names}) {
-          % my $value = $self->req->headers->header($name);
-          %== $kv->($name, $value)
-        % }
-      </table>
-    </div>
-    <div class="box infobox" id="more">
-      <div id="infos">
-        <table>
-          %== $kv->(Perl => "$] ($^O)")
-          % my $version  = $Mojolicious::VERSION;
-          % my $codename = $Mojolicious::CODENAME;
-          %== $kv->(Mojolicious => "$version ($codename)")
-          %== $kv->(Home => app->home)
-          %== $kv->(Include => dumper \@INC)
-          %== $kv->(PID => $$)
-          %== $kv->(Name => $0)
-          %== $kv->(Executable => $^X)
-          %== $kv->(Time => scalar localtime(time))
-        </table>
-      </div>
-      <div class="tap">tap for more</div>
-    </div>
-    <div id="footer">
-      %= link_to 'http://mojolicio.us' => begin
-        %= image '/mojolicious-black.png', alt => 'Mojolicious logo'
-      % end
-    </div>
-    %= javascript begin
-      $('#more').click(function() {
-        $('#infos').slideToggle('slow');
-      });
-      $('#infos').toggle();
-    % end
-  </body>
-</html>
-
-@@ not_found.html.ep
-<!doctype html><html>
-  <head><title>Page Not Found</title></head>
-   %= stylesheet begin
-      a img { border: 0; }
-      body { background-color: #caecf6; }
-      #noraptor {
-        left: 0%;
-        position: fixed;
-        top: 60%;
-      }
-      #notfound {
-        background: url(<%= url_for '/mojolicious-notfound.png' %>);
-        height: 62px;
-        left: 50%;
-        margin-left: -153px;
-        margin-top: -31px;
-        position:absolute;
-        top: 50%;
-        width: 306px;
-      }
-    % end
-  <body>
-    %= link_to url_for->base => begin
-      %= image '/mojolicious-noraptor.png', alt => 'Bye!', id => 'noraptor'
-    % end
-    <div id="notfound"></div>
-  </body>
-</html>
-<!-- a padding to disable MSIE and Chrome friendly error page -->
-<!-- a padding to disable MSIE and Chrome friendly error page -->
-<!-- a padding to disable MSIE and Chrome friendly error page -->
-<!-- a padding to disable MSIE and Chrome friendly error page -->
-<!-- a padding to disable MSIE and Chrome friendly error page -->
-<!-- a padding to disable MSIE and Chrome friendly error page -->
-
-@@ not_found.development.html.ep
-<!doctype html><html>
-  <head>
-    <title>Page Not Found</title>
-    %= stylesheet '/css/prettify-mojo.css'
-    %= javascript '/js/prettify.js'
-    %= stylesheet begin
-      a {
-        color: inherit;
-        text-decoration: none;
-      }
-      a img { border: 0; }
-      body {
-        background-color: #f5f6f8;
-        color: #333;
-        font: 0.9em Verdana, sans-serif;
-        margin: 0;
-        text-align: center;
-        text-shadow: #ddd 0 1px 0;
-      }
-      h1 {
-        font: 1.5em Georgia, Times, serif;
-        margin-bottom: 1em;
-        margin-top: 1em;
-        text-shadow: #666 0 1px 0;
-      }
-      #footer {
-        background-color: #caecf6;
-        padding-top: 20em;
-        width: 100%;
-      }
-      #footer a img { margin-top: 20em; }
-      #documentation {
-        background-color: #ecf1da;
-        padding-bottom: 20em;
-        padding-top: 20em;
-      }
-      #documentation h1 { margin-bottom: 3em; }
-      #header {
-        margin-bottom: 20em;
-        margin-top: 15em;
-        width: 100%;
-      }
-      #perldoc {
-        background-color: #eee;
-        border: 2px dashed #1a1a1a;
-        color: #000;
-        display: inline-block;
-        margin-left: 0.1em;
-        padding: 0.5em;
-        white-space: nowrap;
-      }
-      #preview {
-        background-color: #1a1a1a;
-        background: url(<%= url_for '/mojolicious-pinstripe.gif' %>);
-        -moz-border-radius: 5px;
-        border-radius: 5px;
-        font-family: 'Menlo', 'Monaco', Courier, monospace !important;
-        font-size: 1.5em;
-        margin: 0;
-        margin-left: auto;
-        margin-right: auto;
-        padding: 0.5em;
-        padding-left: 1em;
-        text-align: left;
-        width: 500px;
-      }
-      #suggestion {
-        background-color: #2f3032;
-        color: #eee;
-        padding-bottom: 20em;
-        padding-top: 20em;
-        text-shadow: #333 0 1px 0;
-      }
-    % end
-  </head>
-  <body onload="prettyPrint()">
-    <div id="header">
-      %= image '/mojolicious-box.png', alt => 'Mojolicious banner'
-      <h1>This page is brand new and has not been unboxed yet!</h1>
-    </div>
-    <div id="suggestion">
-      %= image '/mojolicious-arrow.png', alt => 'Arrow'
-      <h1>Perhaps you would like to add a route for it?</h1>
-      <div id="preview">
-        <pre class="prettyprint">
-get '<%= $self->req->url->path->to_abs_string %>' => sub {
-    my $self = shift;
-    $self->render_text('Hello world!');
-};</pre>
-      </div>
-    </div>
-    <div id="documentation">
-      <h1>
-        You might also enjoy our excellent documentation in
-        <div id="perldoc">
-          %= link_to 'perldoc Mojolicious::Guides', $guide
-        </div>
-      </h1>
-      %= image '/amelia.png', alt => 'Amelia'
-    </div>
-    <div id="footer">
-      <h1>And don't forget to have fun!</h1>
-      <p><%= image '/mojolicious-clouds.png', alt => 'Clouds' %></p>
-      %= link_to 'http://mojolicio.us' => begin
-        %= image '/mojolicious-black.png', alt => 'Mojolicious logo'
-      % end
-    </div>
-  </body>
-</html>
 
 __END__
 

@@ -1,0 +1,241 @@
+% my $e = delete $self->stash->{'exception'};
+<!doctype html><html>
+  <head>
+    <title>Server Error</title>
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="-1">
+    %= javascript '/js/jquery.js'
+    %= stylesheet '/css/prettify-mojo.css'
+    %= javascript '/js/prettify.js'
+    %= stylesheet begin
+      a img { border: 0; }
+      body {
+        background-color: #f5f6f8;
+        color: #333;
+        font: 0.9em Verdana, sans-serif;
+        margin-left: 3em;
+        margin-right: 3em;
+        margin-top: 0;
+        text-shadow: #ddd 0 1px 0;
+      }
+      pre {
+        margin: 0;
+        white-space: pre-wrap;
+      }
+      table {
+        border-collapse: collapse;
+        margin-top: 1em;
+        margin-bottom: 1em;
+        width: 100%;
+      }
+      td { padding: 0.3em; }
+      .box {
+        background-color: #fff;
+        -moz-box-shadow: 0px 0px 2px #ccc;
+        -webkit-box-shadow: 0px 0px 2px #ccc;
+        box-shadow: 0px 0px 2px #ccc;
+        overflow: hidden;
+        padding: 1em;
+      }
+      .code {
+        background-color: #1a1a1a;
+        background: url(<%= url_for '/mojolicious-pinstripe.gif' %>);
+        color: #eee;
+        font-family: 'Menlo', 'Monaco', Courier, monospace !important;
+        text-shadow: #333 0 1px 0;
+      }
+      .file {
+        margin-bottom: 0.5em;
+        margin-top: 1em;
+      }
+      .important { background-color: rgba(47, 48, 50, .75); }
+      .infobox tr:nth-child(odd) .value { background-color: #ddeeff; }
+      .infobox tr:nth-child(even) .value { background-color: #eef9ff; }
+      .key {
+        text-align: right;
+        text-weight: bold;
+      }
+      .preview {
+        background-color: #1a1a1a;
+        background: url(<%= url_for '/mojolicious-pinstripe.gif' %>);
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+        margin-bottom: 1em;
+        padding: 0.5em;
+      }
+      .tap {
+        font: 0.5em Verdana, sans-serif;
+        text-align: center;
+      }
+      .value {
+        padding-left: 1em;
+        width: 100%;
+      }
+      #footer {
+        margin-top: 1.5em;
+        text-align: center;
+        width: 100%;
+      }
+      #showcase {
+        margin-top: 1em;
+        -moz-border-radius-topleft: 5px;
+        border-top-left-radius: 5px;
+        -moz-border-radius-topright: 5px;
+        border-top-right-radius: 5px;
+      }
+      #showcase pre {
+        font: 1.5em Georgia, Times, serif;
+        margin: 0;
+        text-shadow: #333 0 1px 0;
+      }
+      #more, #trace {
+        -moz-border-radius-bottomleft: 5px;
+        border-bottom-left-radius: 5px;
+        -moz-border-radius-bottomright: 5px;
+        border-bottom-right-radius: 5px;
+      }
+      #request {
+        -moz-border-radius-topleft: 5px;
+        border-top-left-radius: 5px;
+        -moz-border-radius-topright: 5px;
+        border-top-right-radius: 5px;
+        margin-top: 1em;
+      }
+    % end
+  </head>
+  <body onload="prettyPrint()">
+    % my $code = begin
+      <code class="prettyprint"><%= shift %></code>
+    % end
+    % my $cv = begin
+      % my ($key, $value, $i) = @_;
+      %= tag 'tr', $i ? (class => 'important') : undef, begin
+        <td class="key"><%= $key %>.</td>
+        <td class="value">
+          %== $code->($value)
+        </td>
+      % end
+    % end
+    % my $kv = begin
+      % my ($key, $value) = @_;
+      <tr>
+        <td class="key"><%= $key %>:</td>
+        <td class="value">
+          <pre><%= $value %></pre>
+        </td>
+      </tr>
+    % end
+    <div id="showcase" class="code box">
+      <pre><%= $e->message %></pre>
+      <div id="context">
+        <table>
+          % for my $line (@{$e->lines_before}) {
+            %== $cv->($line->[0], $line->[1])
+          % }
+          % if (defined $e->line->[1]) {
+            %== $cv->($e->line->[0], $e->line->[1], 1)
+          % }
+          % for my $line (@{$e->lines_after}) {
+            %== $cv->($line->[0], $line->[1])
+          % }
+        </table>
+      </div>
+      % if (defined $e->line->[2]) {
+        <div id="insight">
+          <table>
+            % for my $line (@{$e->lines_before}) {
+              %== $cv->($line->[0], $line->[2])
+            % }
+            %== $cv->($e->line->[0], $e->line->[2], 1)
+            % for my $line (@{$e->lines_after}) {
+              %== $cv->($line->[0], $line->[2])
+            % }
+          </table>
+        </div>
+        <div class="tap">tap for more</div>
+        %= javascript begin
+          var current = '#context';
+          $('#showcase').click(function() {
+            $(current).slideToggle('slow', function() {
+              if (current == '#context') {
+                current = '#insight';
+              }
+              else {
+                current = '#context';
+              }
+              $(current).slideToggle('slow');
+            });
+          });
+          $('#insight').toggle();
+        % end
+      % }
+    </div>
+    <div class="box" id="trace">
+      % if (@{$e->frames}) {
+        <div id="frames">
+          % for my $frame (@{$e->frames}) {
+            % if (my $line = $frame->[3]) {
+              <div class="file"><%= $frame->[1] %></div>
+              <div class="code preview">
+                %= "$frame->[2]."
+                %== $code->($line)
+              </div>
+            % }
+          % }
+        </div>
+        <div class="tap">tap for more</div>
+        %= javascript begin
+          $('#trace').click(function() {
+            $('#frames').slideToggle('slow');
+          });
+          $('#frames').toggle();
+        % end
+      % }
+    </div>
+    <div class="box infobox" id="request">
+      <table>
+        % my $req = $self->req;
+        %== $kv->(Method => $req->method)
+        % my $url = $req->url;
+        %== $kv->(Path => $url->to_string)
+        %== $kv->(Base => $url->base->to_string)
+        %== $kv->(Parameters => dumper $req->params->to_hash)
+        %== $kv->(Stash => dumper $snapshot)
+        %== $kv->(Session => dumper session)
+        %== $kv->(Version => $req->version)
+        % for my $name (@{$self->req->headers->names}) {
+          % my $value = $self->req->headers->header($name);
+          %== $kv->($name, $value)
+        % }
+      </table>
+    </div>
+    <div class="box infobox" id="more">
+      <div id="infos">
+        <table>
+          %== $kv->(Perl => "$] ($^O)")
+          % my $version  = $Mojolicious::VERSION;
+          % my $codename = $Mojolicious::CODENAME;
+          %== $kv->(Mojolicious => "$version ($codename)")
+          %== $kv->(Home => app->home)
+          %== $kv->(Include => dumper \@INC)
+          %== $kv->(PID => $$)
+          %== $kv->(Name => $0)
+          %== $kv->(Executable => $^X)
+          %== $kv->(Time => scalar localtime(time))
+        </table>
+      </div>
+      <div class="tap">tap for more</div>
+    </div>
+    <div id="footer">
+      %= link_to 'http://mojolicio.us' => begin
+        %= image '/mojolicious-black.png', alt => 'Mojolicious logo'
+      % end
+    </div>
+    %= javascript begin
+      $('#more').click(function() {
+        $('#infos').slideToggle('slow');
+      });
+      $('#infos').toggle();
+    % end
+  </body>
+</html>

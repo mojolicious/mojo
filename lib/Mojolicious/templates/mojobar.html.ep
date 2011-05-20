@@ -1,0 +1,105 @@
+% content_for header => begin
+  %= javascript '/js/jquery.js'
+  %= stylesheet begin
+    #mojobar {
+      background-color: #1a1a1a;
+      background: -webkit-gradient(
+        linear,
+        0% 0%,
+        0% 100%,
+        color-stop(0%, #2a2a2a),
+        color-stop(100%, #000)
+      );
+      background: -moz-linear-gradient(
+        top,
+        #2a2a2a 0%,
+        #000 100%
+      );
+      background: linear-gradient(top, #2a2a2a 0%, #000 100%);
+      -moz-box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.6);
+      -webkit-box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.6);
+      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.6);
+      color: #eee;
+      height: 60px;
+      overflow: hidden;
+      position: absolute;
+      text-align: right;
+      text-shadow: 0;
+      vertical-align: middle;
+      width: 100%;
+      z-index: 1000;
+    }
+    #mojobar-logo {
+      float: left;
+      margin-left: 5em;
+      padding-top: 2px;
+    }
+    #mojobar-links {
+      display:table-cell;
+      float: right;
+      height: 60px;
+      margin-right: 5em;
+      margin-top: 1.5em;
+    }
+    #mojobar-links a {
+      color: #ccc;
+      font: 1.1em Georgia, Times, serif;
+      margin-left: 0.5em;
+      padding-bottom: 1em;
+      padding-top: 1em;
+      text-decoration: none;
+      text-shadow: 0px -1px 0px #555;
+    }
+    #mojobar-links a:hover { color: #fff; }
+  % end
+% end
+<div id="mojobar">
+  <div id="mojobar-logo">
+    %= link_to 'http://mojolicio.us' => begin
+      %= image '/mojolicious-white.png', alt => 'Mojolicious logo'
+    % end
+  </div>
+  <div id="mojobar-links">
+    %= link_to Documentation => 'http://mojolicio.us/perldoc'
+    %= link_to Wiki => 'https://github.com/kraih/mojo/wiki'
+    %= link_to GitHub => 'https://github.com/kraih/mojo'
+    %= link_to CPAN => 'http://search.cpan.org/dist/Mojolicious'
+    %= link_to MailingList => 'http://groups.google.com/group/mojolicious'
+    %= link_to Blog => 'http://blog.kraih.com'
+    %= link_to Twitter => 'http://twitter.com/kraih'
+    %= link_to 'T-Shirts' => 'http://kraih.spreadshirt.net'
+  </div>
+</div>
+%= javascript begin
+  $(window).load(function () {
+    var mojobar = $('#mojobar');
+    var start   = mojobar.offset().top;
+    var fixed;
+    $(window).scroll(function () {
+      if (!fixed && (mojobar.offset().top - $(window).scrollTop() < 0)) {
+        mojobar.css('top', 0);
+        mojobar.css('position', 'fixed');
+        fixed = true;
+      } else if (fixed && $(window).scrollTop() <= start) {
+        mojobar.css('position', 'absolute');
+        mojobar.css('top', start + 'px');
+        fixed = false;
+      }
+    });
+  });
+  $(document).ready(function(){
+    $(".mojoscroll").click(function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      var parts  = this.href.split("#");
+      var hash   = "#" + parts[1];
+      var target = $(hash);
+      var top    = target.offset().top - 70;
+      var old    = target.attr('id');
+      target.attr('id', '');
+      location.hash = hash;
+      target.attr('id', old);
+      $('html, body').animate({scrollTop:top}, 500);
+    });
+  });
+% end

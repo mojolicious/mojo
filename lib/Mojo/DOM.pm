@@ -669,6 +669,9 @@ sub _match_element {
       else {
         return
           unless $current = $current ? $current->[3] : $candidate;
+
+        # Don't search beyond the current tree
+        return if $current eq $self->tree;
       }
 
       # Not a tag

@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.34    2011-05-20 00:00:00
+        - Fixed nested selector bug in Mojo::DOM.
         - Fixed small Mojo::DOM HTML5 bug.
 
 1.33    2011-05-20 00:00:00

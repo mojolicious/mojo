@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 534;
+use Test::More tests => 535;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -1638,10 +1638,31 @@ is $dom->find('table > tr > td > table > tr >td')->[0]->text, 'baz',
   'right text';
 
 # Nested find
-$dom->parse('<a>foo</a><b><a>bar</a></b>');
+$dom->parse(<<EOF);
+<c>
+  <a>foo</a>
+  <b>
+    <a>bar</a>
+    <c>
+      <a>baz</a>
+    </c>
+  </b>
+</c>
+EOF
 my @results;
-$dom->find('b')->each(sub { push @results, $_->at('a')->text });
-is_deeply \@results, ['bar'], 'right results';
+$dom->find('b')->each(
+  sub {
+    $_->find('a')->each(sub { push @results, $_->text });
+  }
+);
+is_deeply \@results, [qw/bar baz/], 'right results';
 @results = ();
 $dom->find('a')->each(sub { push @results, $_->text });
-is_deeply \@results, [qw/foo bar/], 'right results';
+is_deeply \@results, [qw/foo bar baz/], 'right results';
+@results = ();
+$dom->find('b')->each(
+  sub {
+    $_->find('c a')->each(sub { push @results, $_->text });
+  }
+);
+is_deeply \@results, ['baz'], 'right results';

@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 532;
+use Test::More tests => 534;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -1636,3 +1636,12 @@ is $dom->find('#foo > tr > td > #bar > tr >td')->[0]->text, 'baz',
   'right text';
 is $dom->find('table > tr > td > table > tr >td')->[0]->text, 'baz',
   'right text';
+
+# Nested find
+$dom->parse('<a>foo</a><b><a>bar</a></b>');
+my @results;
+$dom->find('b')->each(sub { push @results, $_->at('a')->text });
+is_deeply \@results, ['bar'], 'right results';
+@results = ();
+$dom->find('a')->each(sub { push @results, $_->text });
+is_deeply \@results, [qw/foo bar/], 'right results';

@@ -31,13 +31,15 @@ sub _draw {
   my ($self, $routes) = @_;
 
   # Length
-  my $pl = my $nl = 0;
+  my $pl = my $nl = my $vl = 0;
   for my $node (@$routes) {
     my $l = length $node->[0];
     $pl = $l if $l > $pl;
     my $l2 = length($node->[1]->name);
     $l2 += 2 if $node->[1]->has_custom_name;
     $nl = $l2 if $l2 > $nl;
+    my $l3 = defined($node->[1]->via) ? length(join ', ',@{$node->[1]->via}) : length('*');
+    $vl = $l3 if $l3 > $vl;
   }
 
   # Draw
@@ -56,8 +58,13 @@ sub _draw {
     $name = qq/"$name"/ if $node->[1]->has_custom_name;
     my $np = ' ' x ($nl - length $name);
 
+    # Via methods
+    my $via = $node->[1]->via;
+    my $methods = defined $via ? uc join ',',@$via : '*';
+    my $vp = ' ' x ($vl - length $methods);
+
     # Print
-    print "$pattern$pp    $name$np   $regex\n";
+    print "$pattern$pp   $methods$vp  $name$np   $regex\n";
   }
 }
 

@@ -1186,8 +1186,7 @@ sleep 2;
 $t->get_ok('/memorized')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/\d+a\d+b\d+c\d+d\d+e\d+/);
-isnt($memorized, $t->tx->res->body, 'memorized blocks expired');
+  ->content_like(qr/\d+a\d+b\d+c\d+d\d+e\d+/)->content_isnt($memorized);
 
 # GET /something
 $t->get_ok('/something')->status_is(200)

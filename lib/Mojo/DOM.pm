@@ -600,12 +600,13 @@ sub _end {
 sub _match_element {
   my ($self, $candidate, $selectors) = @_;
 
-  # Match
-  my @selectors = reverse @$selectors;
-  my $first     = 2;
-  my ($current, $marker, $snapback);
+  my @selectors  = reverse @$selectors;
+  my $first      = 2;
   my $parentonly = 0;
-  my $siblings;
+  my $tree       = $self->tree;
+  my ($current, $marker, $snapback, $siblings);
+
+  # Match
   for (my $i = 0; $i <= $#selectors; $i++) {
     my $selector = $selectors[$i];
 
@@ -671,7 +672,7 @@ sub _match_element {
           unless $current = $current ? $current->[3] : $candidate;
 
         # Don't search beyond the current tree
-        return if $current eq $self->tree;
+        return if $current eq $tree;
       }
 
       # Not a tag

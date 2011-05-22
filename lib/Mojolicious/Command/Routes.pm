@@ -31,15 +31,24 @@ sub _draw {
   my ($self, $routes) = @_;
 
   # Length
-  my $pl = my $nl = my $vl = 0;
+  my $pl = my $nl = my $ml = 0;
   for my $node (@$routes) {
+
+    # Path
     my $l = length $node->[0];
     $pl = $l if $l > $pl;
+
+    # Name
     my $l2 = length($node->[1]->name);
     $l2 += 2 if $node->[1]->has_custom_name;
     $nl = $l2 if $l2 > $nl;
-    my $l3 = defined($node->[1]->via) ? length(join ', ',@{$node->[1]->via}) : length('*');
-    $vl = $l3 if $l3 > $vl;
+
+    # Methods
+    my $l3 =
+      defined($node->[1]->via)
+      ? length(join ', ', @{$node->[1]->via})
+      : length('*');
+    $ml = $l3 if $l3 > $ml;
   }
 
   # Draw
@@ -58,13 +67,15 @@ sub _draw {
     $name = qq/"$name"/ if $node->[1]->has_custom_name;
     my $np = ' ' x ($nl - length $name);
 
-    # Via methods
-    my $via = $node->[1]->via;
-    my $methods = defined $via ? uc join ',',@$via : '*';
-    my $vp = ' ' x ($vl - length $methods);
+    # Methods
+    my $methods =
+      defined $node->[1]->via
+      ? uc join ',', @{$node->[1]->via}
+      : '*';
+    my $mp = ' ' x ($ml - length $methods);
 
     # Print
-    print "$pattern$pp   $methods$vp  $name$np   $regex\n";
+    print "$pattern$pp   $methods$mp  $name$np   $regex\n";
   }
 }
 
@@ -75,7 +86,7 @@ sub _walk {
   # Line
   my $pattern = $node->pattern->pattern || '/';
   my $line    = '';
-  my $i       = $depth * 4;
+  my $i       = $depth * 2;
   if ($i) {
     $line .= ' ' x $i;
     $line .= '+ ';

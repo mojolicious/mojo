@@ -982,7 +982,8 @@ See also the L<Mojolicious::Lite> tutorial for more argument variations.
   $r          = $r->via(qw/get post/);
   $r          = $r->via([qw/get post/]);
 
-Apply C<method> constraint to this route.
+Restrict HTTP methods this route is allowed to handle, defaults to no
+restrictions.
 
 =head2 C<waypoint>
 

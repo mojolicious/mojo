@@ -41,7 +41,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Tropical Drink';
-our $VERSION  = '1.34';
+our $VERSION  = '1.35';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."

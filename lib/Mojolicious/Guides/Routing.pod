@@ -746,9 +746,9 @@ The C<routes> command can be used from the command line to list all available
 routes together with name and underlying regular expressions.
 
   % script/myapp routes
-  /foo/:name           fooname          (?-xism:^/foo/([^\/\.]+))
-  /bar/(.test)         bartest          (?-xism:^/bar/([^\/]+))
-  /baz/(*everything)   bazeverything    (?-xism:^/baz/(.+))
+  /foo/:name           GET    fooname          (?-xism:^/foo/([^\/\.]+))
+  /bar/(.test)         *      bartest          (?-xism:^/bar/([^\/]+))
+  /baz/(*everything)   POST   bazeverything    (?-xism:^/baz/(.+))
 
 =head1 MORE
 

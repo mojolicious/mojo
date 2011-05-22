@@ -1078,6 +1078,8 @@ Sergey Zasenko
 
 Simon Bertrang
 
+Simone Tampieri
+
 Shu Cho
 
 Stanis Trendelenburg

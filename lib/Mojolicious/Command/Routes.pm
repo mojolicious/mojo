@@ -46,7 +46,7 @@ sub _draw {
     # Methods
     my $l3 =
       defined($node->[1]->via)
-      ? length(join ', ', @{$node->[1]->via})
+      ? length(join ',', @{$node->[1]->via})
       : length('*');
     $ml = $l3 if $l3 > $ml;
   }
@@ -74,8 +74,8 @@ sub _draw {
       : '*';
     my $mp = ' ' x ($ml - length $methods);
 
-    # Print
-    print "$pattern$pp   $methods$mp  $name$np   $regex\n";
+    # Route
+    print "$pattern$pp  $methods$mp  $name$np  $regex\n";
   }
 }
 

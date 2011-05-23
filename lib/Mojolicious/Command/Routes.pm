@@ -89,7 +89,7 @@ sub _walk {
   my $i       = $depth * 2;
   if ($i) {
     $line .= ' ' x $i;
-    $line .= '+ ';
+    $line .= '+';
   }
   $line .= $pattern;
   push @$routes, [$line, $node];

@@ -759,7 +759,8 @@ connection in progress.
   my @foo   = $c->param('foo');
   $c        = $c->param(foo => 'ba;r');
 
-Access GET/POST parameters and route captures.
+Access GET/POST parameters and route captures that are not reserved stash
+values.
 
   # Only GET parameters
   my $foo = $c->req->url->query->param('foo');
@@ -813,8 +814,8 @@ will not be encoded.
   $c->render_exception('Oops!');
   $c->render_exception(Mojo::Exception->new('Oops!'));
 
-Render the exception template C<exception.html.$handler> and set the response
-status code to C<500>.
+Render the exception template C<exception.$mode.html.$handler> or
+C<exception.html.$handler> and set the response status code to C<500>.
 
 =head2 C<render_inner>
 
@@ -849,8 +850,8 @@ Disable auto rendering, especially for long polling this can be quite useful.
   $c->render_not_found;
   $c->render_not_found($resource);
     
-Render the not found template C<not_found.html.$handler> and set the response
-status code to C<404>.
+Render the not found template C<not_found.$mode.html.$handler> or
+C<not_found.html.$handler> and set the response status code to C<404>.
 
 =head2 C<render_partial>
 
@@ -982,8 +983,7 @@ chunk wise, the optional drain callback will be invoked once all data has
 been written to the kernel send buffer or equivalent.
 
   $c->res->headers->content_length(6);
-  $c->write('Hel');
-  $c->write('lo!');
+  $c->write('Hel', sub { shift->write('lo!') });
 
 =head2 C<write_chunk>
 

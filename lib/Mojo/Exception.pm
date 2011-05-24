@@ -80,8 +80,8 @@ sub _detect {
     if (-r $file) {
 
       # Slurp
-      my $handle = IO::File->new($file, "<:utf8");
-      my @lines  = <$handle>;
+      my $handle = IO::File->new($file, '<:utf8');
+      my @lines = <$handle>;
 
       # Line
       $self->_parse_context($line, [\@lines]);

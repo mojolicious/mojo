@@ -25,7 +25,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 158;
+use Test::More tests => 165;
 
 use File::Spec;
 use File::Temp;
@@ -981,3 +981,16 @@ is $mt->render_file_to_file($file, $file2), undef, 'file rendered to file';
 $mt     = Mojo::Template->new;
 $output = $mt->render_file($file2);
 is $output, " foo bar\n\x{df}\x{0100}bar\x{263a} 23\ntest\n", 'right result';
+
+# Exception in file (i18n)
+$mt   = Mojo::Template->new;
+$file = File::Spec->catfile(File::Spec->splitdir($FindBin::Bin),
+  qw/lib exception_I18N.mt/);
+$output = $mt->render_file($file);
+isa_ok $output, 'Mojo::Exception', 'right exception';
+is $output->lines_before->[0]->[1], 'あ', 'right line';
+is $output->line->[1], '% die;あ', 'right line';
+is $output->lines_after->[0]->[1], 'あ', 'right line';
+is utf8::is_utf8($output->lines_before->[0]->[1]), 1, 'is utf8';
+is utf8::is_utf8($output->line->[1]), 1 , 'is utf8';
+is utf8::is_utf8($output->lines_after->[0]->[1]), 1, 'is utf8';

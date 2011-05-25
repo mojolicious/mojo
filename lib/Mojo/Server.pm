@@ -3,6 +3,7 @@ use Mojo::Base -base;
 
 use Carp 'croak';
 use Mojo::Loader;
+use Scalar::Util 'blessed';
 
 has app => sub {
   my $self = shift;
@@ -57,7 +58,7 @@ sub load_app {
     die qq/Can't load application' "$file".\n/ unless $app;
   }
   die qq/"$file" is not a valid application.\n/
-    unless ref $app && $app->isa('Mojo');
+    unless blessed $app && $app->isa('Mojo');
   $self->app($app);
 }
 

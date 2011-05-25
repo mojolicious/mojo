@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.35    2011-05-22 00:00:00
+        - Added EXPERIMENTAL load_app method to Mojo::Server.
         - Added HTTP method support to routes command. (trone)
         - Improved documentation.
         - Reduced memory usage of Hypnotoad workers by at least 1MB (each).

@@ -47,6 +47,20 @@ has on_websocket => sub {
 };
 has reload => sub { $ENV{MOJO_RELOAD} || 0 };
 
+sub load_app {
+  my ($self, $file) = @_;
+  my $app;
+  local $ENV{MOJO_APP_LOADER} = 1;
+  unless ($app = do $file) {
+    die qq/Can't load application "$file": $@/ if $@;
+    die qq/Can't load application "$file": $!/ unless defined $app;
+    die qq/Can't load application' "$file".\n/ unless $app;
+  }
+  die qq/"$file" is not a valid application.\n/
+    unless ref $app && $app->isa('Mojo');
+  $self->app($app);
+}
+
 # DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
 sub on_build_tx {
   warn <<EOF;
@@ -158,6 +172,13 @@ Activate automatic reloading.
 
 L<Mojo::Server> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
+
+=head2 C<load_app>
+
+  $server->load_app('./myapp.pl');
+
+Load application from script.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<run>
 

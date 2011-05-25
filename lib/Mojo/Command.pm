@@ -196,8 +196,8 @@ sub render_to_rel_file {
 sub run {
   my ($self, $name, @args) = @_;
 
-  # Hypnotoad
-  return Mojo::Server->new->app if defined $ENV{HYPNOTOAD_APP};
+  # Application loader
+  return Mojo::Server->new->app if defined $ENV{MOJO_APP_LOADER};
 
   # Try to detect environment
   $name = $self->detect($name) unless $ENV{MOJO_NO_DETECT};

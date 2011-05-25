@@ -14,7 +14,9 @@ use POSIX qw/setsid WNOHANG/;
 use Scalar::Util 'weaken';
 
 # Preload
+use Mojo::DOM;
 use Mojo::UserAgent;
+use Mojolicious::Controller;
 
 use constant DEBUG => $ENV{HYPNOTOAD_DEBUG} || 0;
 

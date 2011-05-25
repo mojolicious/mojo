@@ -1276,23 +1276,23 @@ Mojo::DOM - Minimalistic XML/HTML5 DOM Parser With CSS3 Selectors
 
   # Find
   my $b = $dom->at('#b');
-  say $b->text;
+  print $b->text;
 
   # Iterate
-  $dom->find('div[id]')->each(sub { say shift->text });
+  $dom->find('div[id]')->each(sub { print shift->text });
 
   # Loop
   for my $e ($dom->find('div[id]')->each) {
-    say $e->text;
+    print $e->text;
   }
 
   # Get the first 10 links
   $dom->find('a[href]')
-    ->while(sub { say shift->attrs->{href} && pop() < 10 });
+    ->while(sub { print shift->attrs->{href} && pop() < 10 });
 
   # Search for a link about a specific topic
   $dom->find('a[href]')
-    ->until(sub { $_->text =~ m/kraih/ && say $_->attrs->{href} });
+    ->until(sub { $_->text =~ m/kraih/ && print $_->attrs->{href} });
 
 =head1 DESCRIPTION
 
@@ -1576,7 +1576,7 @@ Element attributes.
 
 Children of element.
 
-  say $dom->children->[1]->children->[5]->text;
+  print $dom->children->[1]->children->[5]->text;
 
 =head2 C<find>
 
@@ -1584,7 +1584,7 @@ Children of element.
 
 Find elements with CSS3 selectors and return a collection.
 
-  say $dom->find('div')->[23]->text;
+  print $dom->find('div')->[23]->text;
 
 Collections are blessed arrays supporting these methods.
 
@@ -1593,30 +1593,32 @@ Collections are blessed arrays supporting these methods.
 =item C<each>
 
   my @elements = $dom->find('div')->each;
-  $dom         = $dom->find('div')->each(sub { say shift->text });
+  $dom         = $dom->find('div')->each(sub { print shift->text });
   $dom         = $dom->find('div')->each(sub {
     my ($e, $count) = @_;
-    say "$count: ", $e->text;
+    print "$count: ", $e->text;
   });
 
 Iterate over whole collection.
 
 =item C<while>
 
-  $dom = $dom->find('div')->while(sub { say($_->text) && $_->text =~ /x/ });
+  $dom = $dom->find('div')->while(sub {
+    print($_->text) && $_->text =~ /x/
+  });
   $dom = $dom->find('div')->while(sub {
     my ($e, $count) = @_;
-    say("$count: ", $e->text) && $e->text =~ /x/;
+    print("$count: ", $e->text) && $e->text =~ /x/;
   });
 
 Iterate over collection while closure returns true.
 
 =item C<until>
 
-  $dom = $dom->find('div')->until(sub { $_->text =~ /x/ && say $_->text });
+  $dom = $dom->find('div')->until(sub { $_->text =~ /x/ && print $_->text });
   $dom = $dom->find('div')->until(sub {
     my ($e, $count) = @_;
-    $e->text =~ /x/ && say "$count: ", $e->text;
+    $e->text =~ /x/ && print "$count: ", $e->text;
   });
 
 Iterate over collection until closure returns true.

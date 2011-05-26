@@ -1,17 +1,14 @@
 package Mojolicious::Sessions;
 use Mojo::Base -base;
 
-use Mojo::JSON;
 use Mojo::Util qw/b64_decode b64_encode/;
+use Storable qw/nfreeze thaw/;
 
 has 'cookie_domain';
 has cookie_name        => 'mojolicious';
 has cookie_path        => '/';
 has default_expiration => 3600;
 has secure             => 0;
-
-# JSON serializer
-my $JSON = Mojo::JSON->new;
 
 # "Bender, quit destroying the universe!"
 sub load {
@@ -24,8 +21,8 @@ sub load {
   $value =~ s/\-/\=/g;
   b64_decode $value;
 
-  # Deserialize
-  return unless my $session = $JSON->decode($value);
+  # Thaw
+  return unless my $session = thaw $value;
 
   # Expiration
   return unless my $expires = delete $session->{expires};
@@ -67,8 +64,8 @@ sub store {
     $expires = $session->{expires} = $default
       ||= time + $self->default_expiration;
 
-    # Serialize
-    $value = $JSON->encode($session);
+    # Freeze
+    $value = nfreeze $session;
 
     # Encode
     b64_encode $value, '';

@@ -1,14 +1,17 @@
 package Mojolicious::Sessions;
 use Mojo::Base -base;
 
+use Mojo::JSON;
 use Mojo::Util qw/b64_decode b64_encode/;
-use Storable qw/nfreeze thaw/;
 
 has 'cookie_domain';
 has cookie_name        => 'mojolicious';
 has cookie_path        => '/';
 has default_expiration => 3600;
 has secure             => 0;
+
+# JSON serializer
+my $JSON = Mojo::JSON->new;
 
 # "Bender, quit destroying the universe!"
 sub load {
@@ -21,8 +24,8 @@ sub load {
   $value =~ s/\-/\=/g;
   b64_decode $value;
 
-  # Thaw
-  return unless my $session = thaw $value;
+  # Deserialize
+  return unless my $session = $JSON->decode($value);
 
   # Expiration
   return unless my $expires = delete $session->{expires};
@@ -64,8 +67,8 @@ sub store {
     $expires = $session->{expires} = $default
       ||= time + $self->default_expiration;
 
-    # Freeze
-    $value = nfreeze $session;
+    # Serialize
+    $value = $JSON->encode($session);
 
     # Encode
     b64_encode $value, '';
@@ -97,8 +100,8 @@ Mojolicious::Sessions - Signed Cookie Based Sessions
 
 L<Mojolicious::Sessions> is a very simple signed cookie based session
 implementation.
-All data gets stored on the client side, but is protected from unwanted
-changes with a signature.
+All data gets serialized with L<Mojo::JSON> and stored on the client side,
+but is protected from unwanted changes with a signature.
 
 =head1 ATTRIBUTES
 

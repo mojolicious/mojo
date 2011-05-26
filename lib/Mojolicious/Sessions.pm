@@ -25,7 +25,7 @@ sub load {
   b64_decode $value;
 
   # Deserialize
-  my $session = $JSON->decode($value);
+  return unless my $session = $JSON->decode($value);
 
   # Expiration
   return unless my $expires = delete $session->{expires};

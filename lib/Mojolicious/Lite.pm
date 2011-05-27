@@ -804,8 +804,8 @@ L<Mojolicious> mode, default will be C<development>.
 
 =head2 Logging
 
-Log messages will be automatically written to a C<log/$mode.log> file by
-L<Mojo::Log> if a C<log> directory exists.
+L<Mojo::Log> messages will be automatically written to a C<log/$mode.log>
+file if a C<log> directory exists.
 
   % mkdir log
 

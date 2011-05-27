@@ -686,15 +686,15 @@ secure.
 All files uploaded via C<multipart/form-data> request are automatically
 available as L<Mojo::Upload> instances.
 And you don't have to worry about memory usage, because all files above
-C<250>KB will be automatically streamed into a temporary file.
+C<250KB> will be automatically streamed into a temporary file.
 
   use Mojolicious::Lite;
 
   any '/upload' => sub {
     my $self = shift;
-    if (my $upload = $self->req->upload('example')) {
-      my $size = $upload->size;
-      my $name = $upload->filename;
+    if (my $example = $self->req->upload('example')) {
+      my $size = $example->size;
+      my $name = $example->filename;
       $self->render(text => "Thanks for uploading $size byte file $name.");
     }
   };

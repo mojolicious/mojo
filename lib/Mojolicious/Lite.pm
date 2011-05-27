@@ -723,7 +723,8 @@ environment variable.
 
 =head2 User Agent
 
-A full featured HTTP 1.1 and WebSocket user agent is built right in.
+With L<Mojo::UserAgent> there's a full featured HTTP 1.1 and WebSocket user
+agent built right in.
 Especially in combination with L<Mojo::JSON> and L<Mojo::DOM> this can be a
 very powerful tool.
 
@@ -803,8 +804,8 @@ L<Mojolicious> mode, default will be C<development>.
 
 =head2 Logging
 
-Log messages will be automatically written to a C<log/$mode.log> file if a
-C<log> directory exists.
+Log messages will be automatically written to a C<log/$mode.log> file by
+L<Mojo::Log> if a C<log> directory exists.
 
   % mkdir log
 
@@ -813,6 +814,7 @@ For more control the L<Mojolicious> instance can be accessed directly.
   app->log->level('error');
   app->routes->route('/foo/:bar')->via('get')->to(cb => sub {
     my $self = shift;
+    $self->app->log->debug('Got a request for "Hello Mojo!".');
     $self->render(text => 'Hello Mojo!');
   });
 

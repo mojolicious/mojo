@@ -251,7 +251,7 @@ sub _parse_env {
   my $url     = $self->url;
   my $base    = $url->base;
 
-  # Headers
+  # Extract headers from environment
   for my $name (keys %$env) {
 
     # Header

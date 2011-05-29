@@ -26,7 +26,7 @@ sub AUTOLOAD {
   my ($package, $method) = our $AUTOLOAD =~ /^([\w\:]+)\:\:(\w+)$/;
 
   # Call shortcut
-  Carp::croak(qq/Can't locate object method "$method" via "$package"/)
+  Carp::croak(qq/Can't locate object method "$method" via package "$package"/)
     unless my $shortcut = $self->shortcuts->{$method};
   return $self->$shortcut(@_);
 }

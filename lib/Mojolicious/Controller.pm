@@ -57,7 +57,7 @@ sub AUTOLOAD {
   my ($package, $method) = our $AUTOLOAD =~ /^([\w\:]+)\:\:(\w+)$/;
 
   # Call helper
-  Carp::croak(qq/Can't locate object method "$method" via "$package"/)
+  Carp::croak(qq/Can't locate object method "$method" via package "$package"/)
     unless my $helper = $self->app->renderer->helpers->{$method};
   return $self->$helper(@_);
 }

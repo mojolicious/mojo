@@ -52,7 +52,7 @@ sub AUTOLOAD {
   my ($package, $method) = our $AUTOLOAD =~ /^([\w\:]+)\:\:(\w+)$/;
 
   # Check for helper
-  croak qq/Can't locate object method "$method" via "$package"/
+  croak qq/Can't locate object method "$method" via package "$package"/
     unless my $helper = $self->renderer->helpers->{$method};
 
   # Load controller class

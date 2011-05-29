@@ -130,7 +130,7 @@ sub AUTOLOAD {
   # Search children
   my @results = @{$self->children($method)};
   return @results > 1 ? \@results : $results[0] if @results;
-  croak qq/Can't locate object method "$method" via "$package"/;
+  croak qq/Can't locate object method "$method" via package "$package"/;
 }
 
 sub DESTROY { }

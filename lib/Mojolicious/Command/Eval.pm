@@ -8,7 +8,7 @@ has description => <<'EOF';
 Run code against application.
 EOF
 has usage => <<"EOF";
-usage: $0 eval [OPTIONS] [CODE]
+usage: $0 eval [OPTIONS] CODE
 
   mojo eval 'print app->ua->get("/")->res->body'
   mojo eval -v 'app->home'
@@ -31,11 +31,11 @@ sub run {
   local @ARGV = @_ if @_;
   my $verbose;
   GetOptions('verbose' => sub { $verbose = 1 });
-  my $eval = shift @ARGV || '';
+  my $code = shift @ARGV || '';
 
   # Run code against application
-  no warnings 'redefine';
-  my $result = eval "package main; sub app { \$app }; $eval";
+  no warnings;
+  my $result = eval "package main; sub app { \$app }; $code";
   print "$result\n" if $verbose && defined $result;
   die $@ if $@;
   return $result;

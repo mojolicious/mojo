@@ -12,7 +12,7 @@ has description => <<'EOF';
 Get file from URL.
 EOF
 has usage => <<"EOF";
-usage: $0 get [OPTIONS] [URL] [SELECTOR] [COMMANDS]
+usage: $0 get [OPTIONS] URL [SELECTOR] [COMMANDS]
 
   mojo get /
   mojo get mojolicio.us

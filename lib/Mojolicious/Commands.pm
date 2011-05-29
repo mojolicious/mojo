@@ -76,6 +76,13 @@ Start application with CGI backend.
 
 Start application with standalone HTTP 1.1 server backend.
 
+=head2 C<eval>
+
+  mojo eval 'print app->home'
+  script/myapp eval 'print app->home'
+
+Run code against application.
+
 =head2 C<fastcgi>
 
   mojo fastcgi

@@ -3,9 +3,6 @@ use Mojo::Base 'Mojo::Command';
 
 use Mojo::Server::PSGI;
 
-# "Don't let Krusty's death get you down, boy.
-#  People die all the time, just like that.
-#  Why, you could wake up dead tomorrow! Well, good night."
 has description => <<'EOF';
 Start application with PSGI.
 EOF

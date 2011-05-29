@@ -1,13 +1,12 @@
 package Mojolicious::Command::Get;
 use Mojo::Base 'Mojo::Command';
 
+use Getopt::Long 'GetOptions';
 use Mojo::DOM;
 use Mojo::IOLoop;
 use Mojo::Transaction::HTTP;
 use Mojo::UserAgent;
 use Mojo::Util 'decode';
-
-use Getopt::Long 'GetOptions';
 
 has description => <<'EOF';
 Get file from URL.

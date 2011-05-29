@@ -80,7 +80,7 @@ sub register {
       my $html = _pod_to_html(join '', <$file>);
 
       # Rewrite links
-      my $dom = Mojo::DOM->new->parse("$html");
+      my $dom = Mojo::DOM->new("$html");
       $dom->find('a[href]')->each(
         sub {
           my $attrs = shift->attrs;

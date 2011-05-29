@@ -47,7 +47,7 @@ sub import {
   *{"${caller}::h"} = sub { _request('head',      @_) };
   *{"${caller}::p"} = sub { _request('post',      @_) };
   *{"${caller}::u"} = sub { _request('put',       @_) };
-  *{"${caller}::x"} = sub { Mojo::DOM->new->parse(@_) };
+  *{"${caller}::x"} = sub { Mojo::DOM->new(@_) };
 }
 
 # "I wonder what the shroud of Turin tastes like."

@@ -920,8 +920,8 @@ Mojo::UserAgent - Async IO HTTP 1.1 And WebSocket User Agent
   # Scrape the latest headlines from a news site
   my $news = 'http://digg.com';
   $ua->max_redirects(3);
-  $ua->get($news)->res->dom('h3 > a.story-title')->each(sub {
-    print shift->text . "\n";
+  $ua->get($news)->res->dom('h3.story-item-title > a[href]')->each(
+    print $_->text, " ($_->{href})\n";
   });
 
   # Form post with exception handling

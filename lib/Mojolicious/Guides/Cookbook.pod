@@ -382,7 +382,7 @@ time.
         my $e = shift;
 
         # Build absolute URL
-        my $url = Mojo::URL->new($e->attrs('href'))->to_abs($tx->req->url);
+        my $url = Mojo::URL->new($e->{href})->to_abs($tx->req->url);
         print " -> $url\n";
 
         # Enqueue

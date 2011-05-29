@@ -1298,10 +1298,13 @@ sub _trim {
 }
 
 package Mojo::DOM::_Collection;
+use overload 'bool' => sub {1}, fallback => 1;
+use overload '""' => sub { shift->to_xml }, fallback => 1;
 
-sub each  { shift->_iterate(@_) }
-sub until { shift->_iterate(@_, 1) }
-sub while { shift->_iterate(@_, 0) }
+sub each   { shift->_iterate(@_) }
+sub to_xml { join '', map({"$_"} @{$_[0]}) }
+sub until  { shift->_iterate(@_, 1) }
+sub while  { shift->_iterate(@_, 0) }
 
 sub _iterate {
   my ($self, $cb, $cond) = @_;
@@ -1660,6 +1663,23 @@ Collections are blessed arrays supporting these methods.
 
 Iterate over whole collection.
 
+=item C<to_xml>
+
+  my $xml = $dom->find('div')->to_xml;
+
+Render collection to XML.
+Note that this method is EXPERIMENTAL and might change without warning!
+
+=item C<until>
+
+  $dom = $dom->find('div')->until(sub { $_->text =~ /x/ && print $_->text });
+  $dom = $dom->find('div')->until(sub {
+    my ($e, $count) = @_;
+    $e->text =~ /x/ && print "$count: ", $e->text;
+  });
+
+Iterate over collection until closure returns true.
+
 =item C<while>
 
   $dom = $dom->find('div')->while(sub {
@@ -1671,16 +1691,6 @@ Iterate over whole collection.
   });
 
 Iterate over collection while closure returns true.
-
-=item C<until>
-
-  $dom = $dom->find('div')->until(sub { $_->text =~ /x/ && print $_->text });
-  $dom = $dom->find('div')->until(sub {
-    my ($e, $count) = @_;
-    $e->text =~ /x/ && print "$count: ", $e->text;
-  });
-
-Iterate over collection until closure returns true.
 
 =back
 

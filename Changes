@@ -5,6 +5,7 @@ This file documents the revision history for Perl extension Mojolicious.
           element accessor support to Mojo::DOM.
         - Added EXPERIMENTAL support for collections to children method and
           element accessors in Mojo::DOM.
+        - Added EXPERIMENTAL to_xml method to Mojo::DOM collections.
         - Added EXPERIMENTAL load_app method to Mojo::Server.
         - Added HTTP method support to routes command. (trone)
         - Improved documentation.

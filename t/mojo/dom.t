@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 581;
+use Test::More tests => 583;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -1730,6 +1730,7 @@ is $dom->a->B->c->[2], undef, 'no result';
 @results = ();
 $dom->a->B->c->each(sub { push @results, $_->text });
 is_deeply \@results, [qw/bar baz/], 'right results';
+is $dom->a->B->c, '<c id="three">bar</c><c ID="four">baz</c>', 'right result';
 
 # Direct hash access to attributes in HTML mode
 $dom = Mojo::DOM->new(<<EOF);
@@ -1761,3 +1762,4 @@ is $dom->a->b->c->[2], undef, 'no result';
 @results = ();
 $dom->a->b->c->each(sub { push @results, $_->text });
 is_deeply \@results, [qw/bar baz/], 'right results';
+is $dom->a->b->c, '<c id="three">bar</c><c id="four">baz</c>', 'right result';

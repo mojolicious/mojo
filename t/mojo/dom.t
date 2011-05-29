@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 535;
+use Test::More tests => 579;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -14,13 +14,11 @@ use_ok 'ojo';
 
 use Mojo::Util 'encode';
 
-my $dom = Mojo::DOM->new;
-
 # ojo
 is x('<div>Hello ♥!</div>')->at('div')->text, 'Hello ♥!', 'right text';
 
 # Simple (basics)
-$dom = Mojo::DOM->new->parse(
+my $dom = Mojo::DOM->new->parse(
   '<div><div FOO="0" id="a">A</div><div id="b">B</div></div>');
 is $dom->at('#b')->text, 'B', 'right text';
 my @div;
@@ -1669,3 +1667,91 @@ $dom->find('b')->each(
   }
 );
 is_deeply \@results, [qw/baz yada/], 'right results';
+
+# Autoload children in XML mode
+$dom = Mojo::DOM->new(<<EOF, xml => 1);
+<a id="one">
+  <B class="two" test>
+    foo
+    <c id="three">bar</c>
+    <c ID="four">baz</c>
+  </B>
+</a>
+EOF
+is $dom->xml, 1, 'xml mode activated';
+is $dom->a->B->text, 'foo', 'right text';
+is $dom->a->B->c->[0]->text, 'bar', 'right text';
+is $dom->a->B->c->[1]->text, 'baz', 'right text';
+is $dom->a->B->c->[2], undef, 'no result';
+
+# Autoload children in HTML mode
+$dom = Mojo::DOM->new(<<EOF);
+<a id="one">
+  <B class="two" test>
+    foo
+    <c id="three">bar</c>
+    <c ID="four">baz</c>
+  </B>
+</a>
+EOF
+is $dom->xml, undef, 'xml mode not activated';
+is $dom->a->b->text, 'foo', 'right text';
+is $dom->a->b->c->[0]->text, 'bar', 'right text';
+is $dom->a->b->c->[1]->text, 'baz', 'right text';
+is $dom->a->b->c->[2], undef, 'no result';
+
+# Direct hash access to attributes in XML mode
+$dom = Mojo::DOM->new(<<EOF, xml => 1);
+<a id="one">
+  <B class="two" test>
+    foo
+    <c id="three">bar</c>
+    <c ID="four">baz</c>
+  </B>
+</a>
+EOF
+is $dom->xml, 1, 'xml mode activated';
+is $dom->a->{id}, 'one', 'right attribute';
+is_deeply [sort keys %{$dom->a}], ['id'], 'right attributes';
+is $dom->a->B->text, 'foo', 'right text';
+is $dom->at('a')->B->text, 'foo', 'right text';
+is $dom->find('a')->[0]->B->text, 'foo', 'right text';
+is $dom->a->B->{class}, 'two', 'right attribute';
+is $dom->at('a')->B->{class}, 'two', 'right attribute';
+is $dom->find('a')->[0]->B->{class}, 'two', 'right attribute';
+is_deeply [sort keys %{$dom->a->B}], [qw/class test/], 'right attributes';
+is $dom->a->B->c->[0]->text, 'bar', 'right text';
+is $dom->a->B->c->[0]->{id}, 'three', 'right attribute';
+is_deeply [sort keys %{$dom->a->B->c->[0]}], ['id'], 'right attributes';
+is $dom->a->B->c->[1]->text, 'baz', 'right text';
+is $dom->a->B->c->[1]->{ID}, 'four', 'right attribute';
+is_deeply [sort keys %{$dom->a->B->c->[1]}], ['ID'], 'right attributes';
+is $dom->a->B->c->[2], undef, 'no result';
+
+# Direct hash access to attributes in HTML mode
+$dom = Mojo::DOM->new(<<EOF);
+<a id="one">
+  <B class="two" test>
+    foo
+    <c id="three">bar</c>
+    <c ID="four">baz</c>
+  </B>
+</a>
+EOF
+is $dom->xml, undef, 'xml mode not activated';
+is $dom->a->{id}, 'one', 'right attribute';
+is_deeply [sort keys %{$dom->a}], ['id'], 'right attributes';
+is $dom->a->b->text, 'foo', 'right text';
+is $dom->at('a')->b->text, 'foo', 'right text';
+is $dom->find('a')->[0]->b->text, 'foo', 'right text';
+is $dom->a->b->{class}, 'two', 'right attribute';
+is $dom->at('a')->b->{class}, 'two', 'right attribute';
+is $dom->find('a')->[0]->b->{class}, 'two', 'right attribute';
+is_deeply [sort keys %{$dom->a->b}], [qw/class test/], 'right attributes';
+is $dom->a->b->c->[0]->text, 'bar', 'right text';
+is $dom->a->b->c->[0]->{id}, 'three', 'right attribute';
+is_deeply [sort keys %{$dom->a->b->c->[0]}], ['id'], 'right attributes';
+is $dom->a->b->c->[1]->text, 'baz', 'right text';
+is $dom->a->b->c->[1]->{id}, 'four', 'right attribute';
+is_deeply [sort keys %{$dom->a->b->c->[1]}], ['id'], 'right attributes';
+is $dom->a->b->c->[2], undef, 'no result';

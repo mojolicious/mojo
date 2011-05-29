@@ -2,16 +2,13 @@ package Mojo::DOM;
 use Mojo::Base -base;
 use overload 'bool' => sub {1}, fallback => 1;
 use overload '""' => sub { shift->to_xml }, fallback => 1;
+use overload '%{}' => sub { shift->attrs };
 
+use Carp 'croak';
 use Mojo::Util qw/decode encode html_unescape xml_escape/;
 use Scalar::Util 'weaken';
 
 use constant DEBUG => $ENV{MOJO_DOM_DEBUG} || 0;
-
-# "How are the kids supposed to get home?
-#  I dunno. Internet?"
-has [qw/charset xml/];
-has tree => sub { ['root'] };
 
 # Regex
 my $CSS_ESCAPE_RE = qr/\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}/;
@@ -124,6 +121,42 @@ my @BLOCK_TAGS = (
 my %HTML_BLOCK;
 $HTML_BLOCK{$_}++ for @BLOCK_TAGS;
 
+sub AUTOLOAD {
+  my $self = shift;
+
+  # Method
+  my ($package, $method) = our $AUTOLOAD =~ /^([\w\:]+)\:\:(\w+)$/;
+
+  # Search children
+  my @results = @{$self->children($method)};
+  return @results > 1 ? \@results : $results[0] if @results;
+  croak qq/Can't locate object method "$method" via "$package"/;
+}
+
+sub DESTROY { }
+
+# "How are the kids supposed to get home?
+#  I dunno. Internet?"
+sub new {
+  my $class = shift;
+  my $self = bless [], ref $class || $class;
+
+  # Input
+  my $xml;
+  $xml = shift if @_ % 2;
+
+  # Attributes
+  my %attrs = (@_);
+  $self->[0] = exists $attrs{tree} ? $attrs{tree} : ['root'];
+  $self->[1] = $attrs{charset} if exists $attrs{charset};
+  $self->[2] = $attrs{xml}     if exists $attrs{xml};
+
+  # Parse right away
+  $self->parse($xml) if defined $xml;
+
+  return $self;
+}
+
 sub add_after  { shift->_add(1, @_) }
 sub add_before { shift->_add(0, @_) }
 
@@ -142,7 +175,9 @@ sub all_text {
 
     # Text
     my $content = '';
-    if ($type eq 'text') { $content = $self->_trim($e->[1], $text =~ /\S$/) }
+    if ($type eq 'text') {
+      $content = $self->_trim($e->[1], $text =~ /\S$/);
+    }
 
     # CDATA or raw text
     elsif ($type eq 'cdata' || $type eq 'raw') { $content = $e->[1] }
@@ -179,8 +214,15 @@ sub attrs {
   return $self;
 }
 
-sub children {
+sub charset {
   my $self = shift;
+  return $self->[1] if @_ == 0;
+  $self->[1] = shift;
+  return $self;
+}
+
+sub children {
+  my ($self, $type) = @_;
 
   # Walk tree
   my @children;
@@ -190,6 +232,7 @@ sub children {
 
     # Tag
     next unless $e->[0] eq 'tag';
+    next if defined $type && $e->[1] ne $type;
 
     # Add child
     push @children,
@@ -370,7 +413,9 @@ sub text {
 
     # Text
     my $content = '';
-    if ($type eq 'text') { $content = $self->_trim($e->[1], $text =~ /\S$/) }
+    if ($type eq 'text') {
+      $content = $self->_trim($e->[1], $text =~ /\S$/);
+    }
 
     # CDATA or raw text
     elsif ($type eq 'cdata' || $type eq 'raw') { $content = $e->[1] }
@@ -395,6 +440,13 @@ sub to_xml {
   return $result;
 }
 
+sub tree {
+  my $self = shift;
+  return $self->[0] if @_ == 0;
+  $self->[0] = shift;
+  return $self;
+}
+
 sub type {
   my ($self, $type) = @_;
 
@@ -408,6 +460,13 @@ sub type {
   # Set
   $tree->[1] = $type;
 
+  return $self;
+}
+
+sub xml {
+  my $self = shift;
+  return $self->[2] if @_ == 0;
+  $self->[2] = shift;
   return $self;
 }
 
@@ -1278,6 +1337,9 @@ Mojo::DOM - Minimalistic XML/HTML5 DOM Parser With CSS3 Selectors
   my $b = $dom->at('#b');
   print $b->text;
 
+  # Walk
+  print $dom->div->div->[0]->text;
+
   # Iterate
   $dom->find('div[id]')->each(sub { print shift->text });
 
@@ -1287,12 +1349,11 @@ Mojo::DOM - Minimalistic XML/HTML5 DOM Parser With CSS3 Selectors
   }
 
   # Get the first 10 links
-  $dom->find('a[href]')
-    ->while(sub { print shift->attrs->{href} && pop() < 10 });
+  $dom->find('a[href]')->while(sub { print shift->{href} && pop() < 10 });
 
   # Search for a link about a specific topic
   $dom->find('a[href]')
-    ->until(sub { $_->text =~ m/kraih/ && print $_->attrs->{href} });
+    ->until(sub { $_->text =~ m/kraih/ && print $_->{href} });
 
 =head1 DESCRIPTION
 
@@ -1501,37 +1562,19 @@ An C<E> element whose attributes match all following attribute selectors.
 
   my $links = $dom->find('a[foo^="b"][foo$="ar"]');
 
-=head1 ATTRIBUTES
-
-L<Mojo::DOM> implements the following attributes.
-
-=head2 C<charset>
-
-  my $charset = $dom->charset;
-  $dom        = $dom->charset('UTF-8');
-
-Charset used for decoding and encoding XML.
-
-=head2 C<tree>
-
-  my $array = $dom->tree;
-  $dom      = $dom->tree(['root', ['text', 'lalala']]);
-
-Document Object Model.
-
-=head2 C<xml>
-
-  my $xml = $dom->xml;
-  $dom    = $dom->xml(1);
-
-Disable HTML5 semantics in parser and activate case sensitivity, defaults to
-auto detection based on processing instructions.
-Note that this attribute is EXPERIMENTAL and might change without warning!
-
 =head1 METHODS
 
 L<Mojo::DOM> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
+
+=head2 C<new>
+
+  my $dom = Mojo::DOM->new;
+  my $dom = Mojo::DOM->new(xml => 1);
+  my $dom = Mojo::DOM->new('<foo bar="baz">test</foo>');
+  my $dom = Mojo::DOM->new('<foo bar="baz">test</foo>', xml => 1);
+
+Construct a new L<Mojo::DOM> object.
 
 =head2 C<add_after>
 
@@ -1570,13 +1613,26 @@ Find a single element with CSS3 selectors.
 
 Element attributes.
 
+  # Direct hash access to attributes is also available
+  print $dom->{foo};
+
+=head2 C<charset>
+
+  my $charset = $dom->charset;
+  $dom        = $dom->charset('UTF-8');
+
+Charset used for decoding and encoding XML.
+
 =head2 C<children>
 
   my $children = $dom->children;
+  my $children = $dom->children('div')
 
 Children of element.
 
-  print $dom->children->[1]->children->[5]->text;
+  # Child elements are also automatically available as object methods
+  print $dom->div->text;
+  print $dom->div->[23]->text;
 
 =head2 C<find>
 
@@ -1683,12 +1739,28 @@ Extract text content from element only, not including child elements.
 
 Render DOM to XML.
 
+=head2 C<tree>
+
+  my $tree = $dom->tree;
+  $dom     = $dom->tree(['root', ['text', 'lalala']]);
+
+Document Object Model.
+
 =head2 C<type>
 
   my $type = $dom->type;
   $dom     = $dom->type('html');
 
 Element type.
+
+=head2 C<xml>
+
+  my $xml = $dom->xml;
+  $dom    = $dom->xml(1);
+
+Disable HTML5 semantics in parser and activate case sensitivity, defaults to
+auto detection based on processing instructions.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head1 DEBUGGING
 

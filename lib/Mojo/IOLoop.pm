@@ -220,9 +220,6 @@ sub connect {
     $self->$event($id => $cb) if $cb;
   }
 
-  # DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
-  $self->on_close($id => $args->{on_hup}) if $args->{on_hup};
-
   # Lookup
   if (!$args->{handle} && (my $address = $args->{address})) {
     $self->lookup(
@@ -390,9 +387,6 @@ sub listen {
   $c->{handle}                 = $socket;
   $self->{_reverse}->{$socket} = $id;
 
-  # DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
-  $c->{on_close} = $args->{on_hup} if $args->{on_hup};
-
   # TLS
   if ($args->{tls}) {
     my %options = (
@@ -470,24 +464,7 @@ sub lookup {
 
 sub on_close { shift->_add_event(close => @_) }
 sub on_error { shift->_add_event(error => @_) }
-
-# DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
-sub on_hup {
-  warn <<EOF;
-Mojo::IOLoop->on_hup is DEPRECATED in favor of Mojo::IOLoop->on_close!!!
-EOF
-  shift->on_close(@_);
-}
-
-sub on_read { shift->_add_event(read => @_) }
-
-# DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
-sub on_tick {
-  warn <<EOF;
-Mojo::IOLoop->on_tick is DEPRECATED in favor of Mojo::IOLoop->recurring!!!
-EOF
-  shift->recurring(0 => @_);
-}
+sub on_read  { shift->_add_event(read  => @_) }
 
 sub recurring {
   my $self = shift;

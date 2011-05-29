@@ -180,15 +180,6 @@ sub keep_alive {
   return $self->{keep_alive};
 }
 
-# DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
-sub on_handler {
-  warn <<EOF;
-Mojo::Transaction::HTTP->on_handler is DEPRECATED in favor of
-Mojo::Transaction::HTTP->on_request!!!
-EOF
-  shift->on_request(@_);
-}
-
 sub server_leftovers {
   my $self = shift;
 

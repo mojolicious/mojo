@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-1.35    2011-05-22 00:00:00
+1.4     2011-05-29 00:00:00
+        - Code name "Smiling Face With Sunglasses", this is a major release.
         - Added EXPERIMENTAL direct hash access for attributes and child
           element accessor support to Mojo::DOM.
         - Added EXPERIMENTAL support for collections to children method and

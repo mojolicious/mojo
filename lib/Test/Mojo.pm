@@ -19,14 +19,6 @@ has 'tx';
 # Silent or loud tests
 $ENV{MOJO_LOG_LEVEL} ||= $ENV{HARNESS_IS_VERBOSE} ? 'debug' : 'fatal';
 
-# DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
-sub client {
-  warn <<EOF;
-Test::Mojo->client is DEPRECATED in favor of Test::Mojo->ua!!!
-EOF
-  return shift->ua;
-}
-
 sub build_url {
   Mojo::URL->new('http://localhost:' . shift->ua->test_server . '/');
 }

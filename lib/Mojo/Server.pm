@@ -62,24 +62,6 @@ sub load_app {
   $self->app($app);
 }
 
-# DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
-sub on_build_tx {
-  warn <<EOF;
-Mojo::Server->on_build_tx is DEPRECATED in favor of
-Mojo::Server->on_transaction!!!
-EOF
-  shift->on_transaction(@_);
-}
-
-# DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
-sub on_handler {
-  warn <<EOF;
-Mojo::Server->on_handler is DEPRECATED in favor of
-Mojo::Server->on_request!!!
-EOF
-  shift->on_request(@_);
-}
-
 # "Are you saying you're never going to eat any animal again? What about
 #  bacon?
 #  No.

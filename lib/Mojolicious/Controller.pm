@@ -64,15 +64,6 @@ sub AUTOLOAD {
 
 sub DESTROY { }
 
-# DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
-sub client {
-  warn <<EOF;
-Mojolicious::Controller->client is DEPRECATED in favor of
-Mojolicious::Controller->ua!!!
-EOF
-  return shift->app->client;
-}
-
 # "For the last time, I don't like lilacs!
 #  Your first wife was the one who liked lilacs!
 #  She also liked to shut up!"

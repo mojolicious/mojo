@@ -195,18 +195,8 @@ sub name {
 
   # New name
   if (defined $_[0]) {
-
-    # DEPRECATED in Snowflake!
-    if ($_[0] eq '*') {
-      warn <<EOF;
-Wildcard names are DEPRECATED, all routes have an automatically generated name now.
-EOF
-    }
-    else {
-      $self->{_name}   = $_[0];
-      $self->{_custom} = 1;
-    }
-
+    $self->{_name}   = $_[0];
+    $self->{_custom} = 1;
     return $self;
   }
 

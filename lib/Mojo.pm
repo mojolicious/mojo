@@ -41,31 +41,7 @@ sub new {
   return $self;
 }
 
-# DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
-sub client {
-  warn <<EOF;
-Mojo->client is DEPRECATED in favor of Mojo->us!!!
-EOF
-
-  # Singleton client
-  require Mojo::Client;
-  my $client = Mojo::Client->singleton;
-
-  # Inherit logger
-  $client->log(shift->log);
-
-  return $client;
-}
-
 sub handler { croak 'Method "handler" not implemented in subclass' }
-
-# DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
-sub on_build_tx {
-  warn <<EOF;
-Mojo->on_build_tx is DEPRECATED in favor of Mojo->on_transaction!!!
-EOF
-  shift->on_transaction(@_);
-}
 
 1;
 __END__

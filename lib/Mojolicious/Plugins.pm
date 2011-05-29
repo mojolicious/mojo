@@ -56,26 +56,18 @@ sub register_plugin {
 
 sub run_hook {
   my $self = shift;
-
   return $self unless my $name  = shift;
   return $self unless my $hooks = $self->hooks->{$name};
-
-  # DEPRECATED in Hot Beverage! (passing $self)
-  for my $hook (@$hooks) { $self->$hook(@_) }
-
+  for my $hook (@$hooks) { $hook->(@_) }
   return $self;
 }
 
 # "Everybody's a jerk. You, me, this jerk."
 sub run_hook_reverse {
   my $self = shift;
-
   return $self unless my $name  = shift;
   return $self unless my $hooks = $self->hooks->{$name};
-
-  # DEPRECATED in Hot Beverage! (passing $self)
-  for my $hook (reverse @$hooks) { $self->$hook(@_) }
-
+  for my $hook (reverse @$hooks) { $hook->(@_) }
   return $self;
 }
 

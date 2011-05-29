@@ -70,15 +70,6 @@ sub get_data_template {
     $self->_detect_template_class($options));
 }
 
-# DEPRECATED in Smiling Cat Face With Heart-Shaped Eyes!
-sub get_inline_template {
-  warn <<EOF;
-Mojolicious::Renderer->get_inline_template is DEPRECATED in favor of
-Mojolicious::Renderer->get_data_template!!!
-EOF
-  shift->get_data_template(@_);
-}
-
 # "Bodies are for hookers and fat people."
 sub render {
   my ($self, $c, $args) = @_;

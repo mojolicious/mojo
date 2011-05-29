@@ -27,7 +27,6 @@ sub run {
   my $server = Mojo::Server->new;
   my $app    = $server->app;
 
-
   local @ARGV = @_ if @_;
   my $verbose;
   GetOptions('verbose' => sub { $verbose = 1 });

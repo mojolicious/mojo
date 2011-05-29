@@ -376,7 +376,7 @@ Web development for humans, making hard things possible and everything fun.
     my $self = shift;
     my $url  = $self->param('url') || 'http://mojolicio.us';
     $self->render_text(
-      $self->ua->get($url)->res->dom->at('head > title')->text);
+      $self->ua->get($url)->res->dom->html->head->title->text);
   };
 
   # WebSocket echo service
@@ -457,7 +457,7 @@ been separated from action code, especially when working in teams.
     my $self = shift;
     my $url  = $self->param('url') || 'http://mojolicio.us';
     $self->render_text(
-      $self->ua->get($url)->res->dom->at('head > title')->text);
+      $self->ua->get($url)->res->dom->html->head->title->text);
   }
 
   1;

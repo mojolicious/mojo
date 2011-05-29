@@ -128,8 +128,8 @@ sub AUTOLOAD {
   my ($package, $method) = our $AUTOLOAD =~ /^([\w\:]+)\:\:(\w+)$/;
 
   # Search children
-  my @results = @{$self->children($method)};
-  return @results > 1 ? \@results : $results[0] if @results;
+  my $children = $self->children($method);
+  return @$children > 1 ? $children : $children->[0] if @$children;
   croak qq/Can't locate object method "$method" via package "$package"/;
 }
 
@@ -239,7 +239,8 @@ sub children {
       $self->new(charset => $self->charset, tree => $e, xml => $self->xml);
   }
 
-  return \@children;
+  # Collection
+  return bless \@children, 'Mojo::DOM::_Collection';
 }
 
 sub find {
@@ -1625,14 +1626,16 @@ Charset used for decoding and encoding XML.
 
 =head2 C<children>
 
-  my $children = $dom->children;
-  my $children = $dom->children('div')
+  my $collection = $dom->children;
+  my $collection = $dom->children('div')
 
-Children of element.
+Return a collection containing the children of this element, similar to
+C<find>.
 
   # Child elements are also automatically available as object methods
   print $dom->div->text;
   print $dom->div->[23]->text;
+  $dom->div->each(sub { print $_->text });
 
 =head2 C<find>
 

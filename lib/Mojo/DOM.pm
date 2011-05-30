@@ -1342,21 +1342,15 @@ Mojo::DOM - Minimalistic XML/HTML5 DOM Parser With CSS3 Selectors
 
   # Walk
   print $dom->div->p->[0]->text;
+  print $dom->div->p->[1]->{id};
 
   # Iterate
-  $dom->find('p[id]')->each(sub { print shift->text });
+  $dom->find('p[id]')->each(sub { print shift->{id} });
 
   # Loop
   for my $e ($dom->find('p[id]')->each) {
     print $e->text;
   }
-
-  # Get the first 10 links
-  $dom->find('a[href]')->while(sub { print shift->{href} && pop() < 10 });
-
-  # Search for a link about a specific topic
-  $dom->find('a[href]')
-    ->until(sub { $_->text =~ m/kraih/ && print $_->{href} });
 
   # Modify
   $dom->div->p->[1]->add_after('<p id="c">C</p>');

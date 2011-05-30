@@ -196,7 +196,7 @@ sub attrs {
 
   # Not a tag
   my $tree = $self->tree;
-  return if $tree->[0] eq 'root';
+  return {} if $tree->[0] eq 'root';
 
   # Hash
   my $attrs = $tree->[2];

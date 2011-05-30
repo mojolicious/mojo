@@ -1334,21 +1334,20 @@ Mojo::DOM - Minimalistic XML/HTML5 DOM Parser With CSS3 Selectors
   use Mojo::DOM;
 
   # Parse
-  my $dom = Mojo::DOM->new;
-  $dom->parse('<div><div id="a">A</div><div id="b">B</div></div>');
+  my $dom = Mojo::DOM->new('<div><p id="a">A</p><p id="b">B</p></div>');
 
   # Find
   my $b = $dom->at('#b');
   print $b->text;
 
   # Walk
-  print $dom->div->div->[0]->text;
+  print $dom->div->p->[0]->text;
 
   # Iterate
-  $dom->find('div[id]')->each(sub { print shift->text });
+  $dom->find('p[id]')->each(sub { print shift->text });
 
   # Loop
-  for my $e ($dom->find('div[id]')->each) {
+  for my $e ($dom->find('p[id]')->each) {
     print $e->text;
   }
 
@@ -1358,6 +1357,12 @@ Mojo::DOM - Minimalistic XML/HTML5 DOM Parser With CSS3 Selectors
   # Search for a link about a specific topic
   $dom->find('a[href]')
     ->until(sub { $_->text =~ m/kraih/ && print $_->{href} });
+
+  # Modify
+  $dom->div->p->[1]->add_after('<p id="c">C</p>');
+
+  # Render
+  print $dom;
 
 =head1 DESCRIPTION
 

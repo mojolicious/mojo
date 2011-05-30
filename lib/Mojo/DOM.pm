@@ -1585,6 +1585,7 @@ Construct a new L<Mojo::DOM> object.
 
 Add after element.
 
+  # "<div><h1>A</h1><h2>B</h2></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->add_after('<h2>B</h2>');
 
 =head2 C<add_before>
@@ -1593,7 +1594,8 @@ Add after element.
 
 Add before element.
 
-  $dom->parse('<div><h2>A</h2></div>')->at('h2')->add_before('<h1>B</h1>');
+  # "<div><h1>A</h1><h2>B</h2></div>"
+  $dom->parse('<div><h2>B</h2></div>')->at('h2')->add_before('<h1>A</h1>');
 
 =head2 C<all_text>
 
@@ -1618,6 +1620,7 @@ Element attributes.
 
   # Direct hash access to attributes is also available
   print $dom->{foo};
+  print $dom->div->{id};
 
 =head2 C<charset>
 
@@ -1723,6 +1726,7 @@ Parse XML document.
 
 Replace elements.
 
+  # "<div><h2>B</h2></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace('<h2>B</h2>');
 
 =head2 C<replace_inner>
@@ -1731,6 +1735,7 @@ Replace elements.
 
 Replace element content.
 
+  # "<div><h1>B</h1></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace_inner('B');
 
 =head2 C<root>

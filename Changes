@@ -2,6 +2,10 @@ This file documents the revision history for Perl extension Mojolicious.
 
 1.4     2011-05-29 00:00:00
         - Code name "Smiling Face With Sunglasses", this is a major release.
+        - Deprecated Mojo::DOM add_after method in favor of the append
+          method.
+        - Deprecated Mojo::DOM add_before method in favor of the prepend
+          method.
         - Added EXPERIMENTAL direct hash access for attributes and child
           element accessor support to Mojo::DOM.
         - Added EXPERIMENTAL support for collections to children method and
@@ -9,6 +13,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL to_xml method to Mojo::DOM collections.
         - Added EXPERIMENTAL eval command.
         - Added EXPERIMENTAL load_app method to Mojo::Server.
+        - Added append_inner and prepend_inner methods to Mojo::DOM.
         - Added HTTP method support to routes command. (trone)
         - Improved documentation.
         - Improved compatibility with Feersum PSGI web servers. (audreyt)

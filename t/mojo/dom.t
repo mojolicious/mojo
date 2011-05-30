@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 587;
+use Test::More tests => 591;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -944,7 +944,7 @@ $dom = Mojo::DOM->new->parse(<<EOF);
 </ul>
 <div>D</div>
 EOF
-$dom->at('li')->add_after('<p>A1</p>23');
+$dom->at('li')->append('<p>A1</p>23');
 is "$dom", <<EOF, 'right result';
 <ul>
     <li>A</li><p>A1</p>23
@@ -953,7 +953,7 @@ is "$dom", <<EOF, 'right result';
 </ul>
 <div>D</div>
 EOF
-$dom->at('li')->add_before('24')->add_before('<div>A-1</div>25');
+$dom->at('li')->prepend('24')->prepend('<div>A-1</div>25');
 is "$dom", <<EOF, 'right result';
 <ul>
     24<div>A-1</div>25<li>A</li><p>A1</p>23
@@ -964,7 +964,7 @@ is "$dom", <<EOF, 'right result';
 EOF
 is $dom->at('div')->text, 'A-1', 'right text';
 is $dom->at('iv'), undef, 'no result';
-$dom->add_before('l')->add_before('alal')->add_before('a');
+$dom->prepend('l')->prepend('alal')->prepend('a');
 is "$dom", <<EOF, 'no change';
 <ul>
     24<div>A-1</div>25<li>A</li><p>A1</p>23
@@ -973,7 +973,7 @@ is "$dom", <<EOF, 'no change';
 </ul>
 <div>D</div>
 EOF
-$dom->add_after('lalala');
+$dom->append('lalala');
 is "$dom", <<EOF, 'no change';
 <ul>
     24<div>A-1</div>25<li>A</li><p>A1</p>23
@@ -982,12 +982,32 @@ is "$dom", <<EOF, 'no change';
 </ul>
 <div>D</div>
 EOF
-$dom->find('div')->each(sub { shift->add_after('works') });
+$dom->find('div')->each(sub { shift->append('works') });
 is "$dom", <<EOF, 'right result';
 <ul>
     24<div>A-1</div>works25<li>A</li><p>A1</p>23
     <p>B</p>
     <li>C</li>
+</ul>
+<div>D</div>works
+EOF
+$dom->at('li')->prepend_inner('A3<p>A2</p>')->prepend_inner('A4');
+is $dom->at('li')->text, 'A4 A3 A', 'right text';
+is "$dom", <<EOF, 'right result';
+<ul>
+    24<div>A-1</div>works25<li>A4A3<p>A2</p>A</li><p>A1</p>23
+    <p>B</p>
+    <li>C</li>
+</ul>
+<div>D</div>works
+EOF
+$dom->find('li')->[1]->append_inner('<p>C2</p>C3')->append_inner('C4');
+is $dom->find('li')->[1]->text, 'C C3 C4', 'right text';
+is "$dom", <<EOF, 'right result';
+<ul>
+    24<div>A-1</div>works25<li>A4A3<p>A2</p>A</li><p>A1</p>23
+    <p>B</p>
+    <li>C<p>C2</p>C3C4</li>
 </ul>
 <div>D</div>works
 EOF

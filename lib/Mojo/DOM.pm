@@ -157,8 +157,21 @@ sub new {
   return $self;
 }
 
-sub add_after  { shift->_add(1, @_) }
-sub add_before { shift->_add(0, @_) }
+# DEPRECATED in Smiling Face With Sunglasses!
+sub add_after {
+  warn <<EOF;
+Mojo::DOM->add_after is DEPRECATED in favor of Mojo::DOM->append!!!
+EOF
+  shift->append(@_);
+}
+
+# DEPRECATED in Smiling Face With Sunglasses!
+sub add_before {
+  warn <<EOF;
+Mojo::DOM->add_before is DEPRECATED in favor of Mojo::DOM->prepend!!!
+EOF
+  shift->prepend(@_);
+}
 
 sub all_text {
   my $self = shift;
@@ -187,6 +200,15 @@ sub all_text {
   }
 
   return $text;
+}
+
+sub append { shift->_add(1, @_) }
+
+sub append_inner {
+  my ($self, $new) = @_;
+  my $tree = $self->tree;
+  push @$tree, @{_parent($self->_parse_xml("$new"), $tree->[3])};
+  return $self;
 }
 
 sub at { shift->find(@_)->[0] }
@@ -329,6 +351,16 @@ sub parse {
   $self->tree($self->_parse_xml($xml));
 }
 
+sub prepend { shift->_add(0, @_) }
+
+sub prepend_inner {
+  my ($self, $new) = @_;
+  my $tree = $self->tree;
+  splice @$tree, $tree->[0] eq 'root' ? 1 : 4, 0,
+    @{_parent($self->_parse_xml("$new"), $tree->[3])};
+  return $self;
+}
+
 sub replace {
   my ($self, $new) = @_;
 
@@ -338,17 +370,8 @@ sub replace {
   $new = $self->_parse_xml("$new");
   return $self->tree($new) if $r;
 
-  # Parent
-  my $parent = $tree->[3];
-
-  # Replacements
-  my @new;
-  for my $e (@$new[1 .. $#$new]) {
-    $e->[3] = $parent if $e->[0] eq 'tag';
-    push @new, $e;
-  }
-
   # Find
+  my $parent = $tree->[3];
   my $i = $parent->[0] eq 'root' ? 1 : 4;
   for my $e (@$parent[$i .. $#$parent]) {
     last if $e == $tree;
@@ -356,7 +379,7 @@ sub replace {
   }
 
   # Replace
-  splice @$parent, $i, 1, @new;
+  splice @$parent, $i, 1, @{_parent($new, $parent)};
 
   return $self;
 }
@@ -481,17 +504,8 @@ sub _add {
   my $tree = $self->tree;
   return $self if $tree->[0] eq 'root';
 
-  # Parent
-  my $parent = $tree->[3];
-
-  # Siblings
-  my @new;
-  for my $e (@$new[1 .. $#$new]) {
-    $e->[3] = $parent if $e->[0] eq 'tag';
-    push @new, $e;
-  }
-
   # Find
+  my $parent = $tree->[3];
   my $i = $parent->[0] eq 'root' ? 1 : 4;
   for my $e (@$parent[$i .. $#$parent]) {
     last if $e == $tree;
@@ -499,7 +513,7 @@ sub _add {
   }
 
   # Add
-  splice @$parent, $i + $offset, 0, @new;
+  splice @$parent, $i + $offset, 0, @{_parent($new, $parent)};
 
   return $self;
 }
@@ -948,6 +962,16 @@ sub _match_tree {
   return bless \@results, 'Mojo::DOM::_Collection';
 }
 
+sub _parent {
+  my ($children, $parent) = @_;
+  my @new;
+  for my $e (@$children[1 .. $#$children]) {
+    $e->[3] = $parent if $e->[0] eq 'tag';
+    push @new, $e;
+  }
+  return \@new;
+}
+
 sub _parse_css {
   my ($self, $css) = @_;
 
@@ -1353,7 +1377,7 @@ Mojo::DOM - Minimalistic XML/HTML5 DOM Parser With CSS3 Selectors
   }
 
   # Modify
-  $dom->div->p->[1]->add_after('<p id="c">C</p>');
+  $dom->div->p->[1]->append('<p id="c">C</p>');
 
   # Render
   print $dom;
@@ -1579,29 +1603,29 @@ following new ones.
 
 Construct a new L<Mojo::DOM> object.
 
-=head2 C<add_after>
-
-  $dom = $dom->add_after('<p>Hi!</p>');
-
-Add after element.
-
-  # "<div><h1>A</h1><h2>B</h2></div>"
-  $dom->parse('<div><h1>A</h1></div>')->at('h1')->add_after('<h2>B</h2>');
-
-=head2 C<add_before>
-
-  $dom = $dom->add_before('<p>Hi!</p>');
-
-Add before element.
-
-  # "<div><h1>A</h1><h2>B</h2></div>"
-  $dom->parse('<div><h2>B</h2></div>')->at('h2')->add_before('<h1>A</h1>');
-
 =head2 C<all_text>
 
   my $text = $dom->all_text;
 
 Extract all text content from DOM structure.
+
+=head2 C<append>
+
+  $dom = $dom->append('<p>Hi!</p>');
+
+Append to element.
+
+  # "<div><h1>A</h1><h2>B</h2></div>"
+  $dom->parse('<div><h1>A</h1></div>')->at('h1')->append('<h2>B</h2>');
+
+=head2 C<append_inner>
+
+  $dom = $dom->append_inner('<p>Hi!</p>');
+
+Append to element content.
+
+  # "<div><h1>AB</h1></div>"
+  $dom->parse('<div><h1>A</h1></div>')->at('h1')->append_inner('B');
 
 =head2 C<at>
 
@@ -1719,6 +1743,24 @@ Parent of element.
   $dom = $dom->parse('<foo bar="baz">test</foo>');
 
 Parse XML document.
+
+=head2 C<prepend>
+
+  $dom = $dom->prepend('<p>Hi!</p>');
+
+Prepend to element.
+
+  # "<div><h1>A</h1><h2>B</h2></div>"
+  $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend('<h1>A</h1>');
+
+=head2 C<prepend_inner>
+
+  $dom = $dom->prepend_inner('<p>Hi!</p>');
+
+Prepend to element content.
+
+  # "<div><h2>AB</h2></div>"
+  $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend_inner('A');
 
 =head2 C<replace>
 

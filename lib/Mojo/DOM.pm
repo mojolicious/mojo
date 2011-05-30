@@ -1302,7 +1302,7 @@ use overload 'bool' => sub {1}, fallback => 1;
 use overload '""' => sub { shift->to_xml }, fallback => 1;
 
 sub each   { shift->_iterate(@_) }
-sub to_xml { join '', map({"$_"} @{$_[0]}) }
+sub to_xml { join "\n", map({"$_"} @{$_[0]}) }
 sub until  { shift->_iterate(@_, 1) }
 sub while  { shift->_iterate(@_, 0) }
 

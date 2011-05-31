@@ -804,9 +804,9 @@ It will also run the C<before_render> plugin hook.
 =head2 C<render_content>
 
   my $output = $c->render_content;
-  my $output = $c->render_content('content');
-  my $output = $c->render_content(content => 'Hello world!');
-  my $output = $c->render_content(content => sub { 'Hello world!' });
+  my $output = $c->render_content('header');
+  my $output = $c->render_content(header => 'Hello world!');
+  my $output = $c->render_content(header => sub { 'Hello world!' });
 
 Contains partial rendered templates, used for the renderers C<layout> and
 C<extends> features.

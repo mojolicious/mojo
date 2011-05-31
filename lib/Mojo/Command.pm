@@ -123,13 +123,13 @@ sub get_all_data {
   return unless defined(my $content = $CACHE->{$class});
 
   # Ignore everything before __DATA__ (windows will seek to start of file)
-  $content =~ s/^.*\n__DATA__\n/\n/s;
+  $content =~ s/^.*\n__DATA__\r?\n/\n/s;
 
   # Ignore everything after __END__
-  $content =~ s/\n__END__\n.*$/\n/s;
+  $content =~ s/\n__END__\r?\n.*$/\n/s;
 
   # Split
-  my @data = split /^@@\s+(.+)\s*\r?\n/m, $content;
+  my @data = split /^@@\s+(.+?)\s*\r?\n/m, $content;
 
   # Remove split garbage
   shift @data;

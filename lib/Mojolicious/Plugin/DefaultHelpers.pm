@@ -12,14 +12,14 @@ sub register {
   $app->helper(app => sub { shift->app });
 
   # Add "content" helper
-  $app->helper(content => sub { shift->render_inner(@_) });
+  $app->helper(content => sub { shift->render_content(@_) });
 
   # Add "content_for" helper
   $app->helper(
     content_for => sub {
       my $self = shift;
       my $name = shift;
-      $self->render_inner($name, $self->render_inner($name), @_);
+      $self->render_content($name, $self->render_content($name), @_);
     }
   );
 

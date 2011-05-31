@@ -90,7 +90,7 @@ sub new {
   # Hide own controller methods
   $r->hide(qw/AUTOLOAD DESTROY client cookie delayed finish finished/);
   $r->hide(qw/flash handler helper on_message param redirect_to render/);
-  $r->hide(qw/render_data render_exception render_inner render_json/);
+  $r->hide(qw/render_content render_data render_exception render_json/);
   $r->hide(qw/render_not_found render_partial render_static render_text/);
   $r->hide(qw/rendered send_message session signed_cookie url_for/);
   $r->hide(qw/write write_chunk/);

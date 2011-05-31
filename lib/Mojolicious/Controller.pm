@@ -270,6 +270,39 @@ sub render {
   return 1;
 }
 
+sub render_content {
+  my $self    = shift;
+  my $name    = shift;
+  my $content = pop;
+
+  # Initialize
+  my $stash = $self->stash;
+  my $c = $stash->{'mojo.content'} ||= {};
+  $name ||= 'content';
+
+  # Set
+  if (defined $content) {
+
+    # Reset with multiple values
+    if (@_) {
+      $c->{$name} = '';
+      for my $part (@_, $content) {
+        $c->{$name} .= ref $part eq 'CODE' ? $part->() : $part;
+      }
+    }
+
+    # First come
+    else {
+      $c->{$name} ||= ref $content eq 'CODE' ? $content->() : $content;
+    }
+  }
+
+  # Get
+  $content = $c->{$name};
+  $content = '' unless defined $content;
+  return Mojo::ByteStream->new("$content");
+}
+
 sub render_data { shift->render(data => shift, @_) }
 
 # "The path to robot hell is paved with human flesh.
@@ -321,37 +354,13 @@ sub render_exception {
   }
 }
 
+# DEPRECATED in Smiling Face With Sunglasses!
 sub render_inner {
-  my $self    = shift;
-  my $name    = shift;
-  my $content = pop;
-
-  # Initialize
-  my $stash = $self->stash;
-  my $c = $stash->{'mojo.content'} ||= {};
-  $name ||= 'content';
-
-  # Set
-  if (defined $content) {
-
-    # Reset with multiple values
-    if (@_) {
-      $c->{$name} = '';
-      for my $part (@_, $content) {
-        $c->{$name} .= ref $part eq 'CODE' ? $part->() : $part;
-      }
-    }
-
-    # First come
-    else {
-      $c->{$name} ||= ref $content eq 'CODE' ? $content->() : $content;
-    }
-  }
-
-  # Get
-  $content = $c->{$name};
-  $content = '' unless defined $content;
-  return Mojo::ByteStream->new("$content");
+  warn <<EOF;
+Mojolicious::Controller->render_inner is DEPRECATED in favor of
+Mojolicious::Controller->render_content!!!
+EOF
+  shift->render_content(@_);
 }
 
 # "If you hate intolerance and being punched in the face by me,
@@ -792,6 +801,16 @@ You can call it with a hash of options which can be preceded by an optional
 template name.
 It will also run the C<before_render> plugin hook.
 
+=head2 C<render_content>
+
+  my $output = $c->render_content;
+  my $output = $c->render_content('content');
+  my $output = $c->render_content(content => 'Hello world!');
+  my $output = $c->render_content(content => sub { 'Hello world!' });
+
+Contains partial rendered templates, used for the renderers C<layout> and
+C<extends> features.
+
 =head2 C<render_data>
 
   $c->render_data($bits);
@@ -807,16 +826,6 @@ will not be encoded.
 
 Render the exception template C<exception.$mode.html.$handler> or
 C<exception.html.$handler> and set the response status code to C<500>.
-
-=head2 C<render_inner>
-
-  my $output = $c->render_inner;
-  my $output = $c->render_inner('content');
-  my $output = $c->render_inner(content => 'Hello world!');
-  my $output = $c->render_inner(content => sub { 'Hello world!' });
-
-Contains partial rendered templates, used for the renderers C<layout> and
-C<extends> features.
 
 =head2 C<render_json>
 

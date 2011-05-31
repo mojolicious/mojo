@@ -6,6 +6,8 @@ This file documents the revision history for Perl extension Mojolicious.
           method.
         - Deprecated Mojo::DOM add_before method in favor of the prepend
           method.
+        - Deprecated all methods containing the word "inner" in favor of ones
+          containing the word "content".
         - Added EXPERIMENTAL direct hash access for attributes and child
           element accessor support to Mojo::DOM.
         - Added EXPERIMENTAL support for collections to children method and
@@ -13,7 +15,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL to_xml method to Mojo::DOM collections.
         - Added EXPERIMENTAL eval command.
         - Added EXPERIMENTAL load_app method to Mojo::Server.
-        - Added append_inner and prepend_inner methods to Mojo::DOM.
+        - Added append_content and prepend_content methods to Mojo::DOM.
         - Added HTTP method support to routes command. (trone)
         - Improved documentation.
         - Improved compatibility with Feersum PSGI web servers. (audreyt)

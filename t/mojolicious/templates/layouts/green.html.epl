@@ -5,6 +5,6 @@
 <!doctype html><html>
 <head></head>
 <body>
-Same old in green <%= $self->render_inner %>
+Same old in green <%= $self->render_content %>
 </body>
 </html>

@@ -204,7 +204,7 @@ sub all_text {
 
 sub append { shift->_add(1, @_) }
 
-sub append_inner {
+sub append_content {
   my ($self, $new) = @_;
   my $tree = $self->tree;
   push @$tree, @{_parent($self->_parse_xml("$new"), $tree->[3])};
@@ -265,17 +265,7 @@ sub children {
   return bless \@children, 'Mojo::DOM::_Collection';
 }
 
-sub find {
-  my ($self, $css) = @_;
-
-  # Parse CSS selectors
-  my $pattern = $self->_parse_css($css);
-
-  # Filter tree
-  return $self->_match_tree($self->tree, $pattern);
-}
-
-sub inner_xml {
+sub content_xml {
   my $self = shift;
 
   # Walk tree
@@ -293,6 +283,24 @@ sub inner_xml {
   encode $charset, $result if $charset;
 
   return $result;
+}
+
+sub find {
+  my ($self, $css) = @_;
+
+  # Parse CSS selectors
+  my $pattern = $self->_parse_css($css);
+
+  # Filter tree
+  return $self->_match_tree($self->tree, $pattern);
+}
+
+# DEPRECATED in Smiling Face With Sunglasses!
+sub inner_xml {
+  warn <<EOF;
+Mojo::DOM->inner_xml is DEPRECATED in favor of Mojo::DOM->content_xml!!!
+EOF
+  shift->content_xml(@_);
 }
 
 sub namespace {
@@ -353,7 +361,7 @@ sub parse {
 
 sub prepend { shift->_add(0, @_) }
 
-sub prepend_inner {
+sub prepend_content {
   my ($self, $new) = @_;
   my $tree = $self->tree;
   splice @$tree, $tree->[0] eq 'root' ? 1 : 4, 0,
@@ -384,7 +392,7 @@ sub replace {
   return $self;
 }
 
-sub replace_inner {
+sub replace_content {
   my ($self, $new) = @_;
 
   # Parse
@@ -403,6 +411,15 @@ sub replace_inner {
   splice @$tree, $start, $#$tree, @new;
 
   return $self;
+}
+
+# DEPRECATED in Smiling Face With Sunglasses!
+sub replace_inner {
+  warn <<EOF;
+Mojo::DOM->replace_inner is DEPRECATED in favor of
+Mojo::DOM->replace_content!!!
+EOF
+  shift->content_xml(@_);
 }
 
 sub root {
@@ -1618,14 +1635,14 @@ Append to element.
   # "<div><h1>A</h1><h2>B</h2></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->append('<h2>B</h2>');
 
-=head2 C<append_inner>
+=head2 C<append_content>
 
-  $dom = $dom->append_inner('<p>Hi!</p>');
+  $dom = $dom->append_content('<p>Hi!</p>');
 
 Append to element content.
 
   # "<div><h1>AB</h1></div>"
-  $dom->parse('<div><h1>A</h1></div>')->at('h1')->append_inner('B');
+  $dom->parse('<div><h1>A</h1></div>')->at('h1')->append_content('B');
 
 =head2 C<at>
 
@@ -1665,6 +1682,12 @@ C<find>.
   print $dom->div->text;
   print $dom->div->[23]->text;
   $dom->div->each(sub { print $_->text });
+
+=head2 C<content_xml>
+
+  my $xml = $dom->content_xml;
+
+Render content of this element to XML.
 
 =head2 C<find>
 
@@ -1720,12 +1743,6 @@ Iterate over collection while closure returns true.
 
 =back
 
-=head2 C<inner_xml>
-
-  my $xml = $dom->inner_xml;
-
-Render content of this element to XML.
-
 =head2 C<namespace>
 
   my $namespace = $dom->namespace;
@@ -1753,14 +1770,14 @@ Prepend to element.
   # "<div><h1>A</h1><h2>B</h2></div>"
   $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend('<h1>A</h1>');
 
-=head2 C<prepend_inner>
+=head2 C<prepend_content>
 
-  $dom = $dom->prepend_inner('<p>Hi!</p>');
+  $dom = $dom->prepend_content('<p>Hi!</p>');
 
 Prepend to element content.
 
   # "<div><h2>AB</h2></div>"
-  $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend_inner('A');
+  $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend_content('A');
 
 =head2 C<replace>
 
@@ -1771,14 +1788,14 @@ Replace elements.
   # "<div><h2>B</h2></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace('<h2>B</h2>');
 
-=head2 C<replace_inner>
+=head2 C<replace_content>
 
-  $dom = $dom->replace_inner('test');
+  $dom = $dom->replace_content('test');
 
 Replace element content.
 
   # "<div><h1>B</h1></div>"
-  $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace_inner('B');
+  $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace_content('B');
 
 =head2 C<root>
 

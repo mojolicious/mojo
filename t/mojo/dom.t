@@ -315,34 +315,34 @@ is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right text';
 $dom->find('p')->each(sub { shift->replace('') });
 is "$dom", '<div>foobar</div>', 'right text';
 $dom = Mojo::DOM->new->parse('<div>♥</div>');
-$dom->at('div')->replace_inner('☃');
+$dom->at('div')->replace_content('☃');
 is "$dom", '<div>☃</div>', 'right text';
 $dom = Mojo::DOM->new->parse('<div>♥</div>');
-$dom->at('div')->replace_inner("\x{2603}");
+$dom->at('div')->replace_content("\x{2603}");
 is "$dom", '<div>☃</div>', 'right text';
 
 # Replace element content
 $dom = Mojo::DOM->new->parse('<div>foo<p>lalala</p>bar</div>');
-$dom->at('p')->replace_inner('bar');
+$dom->at('p')->replace_content('bar');
 is "$dom", '<div>foo<p>bar</p>bar</div>', 'right text';
-$dom->at('p')->replace_inner(Mojo::DOM->new->parse('text'));
+$dom->at('p')->replace_content(Mojo::DOM->new->parse('text'));
 is "$dom", '<div>foo<p>text</p>bar</div>', 'right text';
 $dom = Mojo::DOM->new->parse('<div>foo</div><div>bar</div>');
-$dom->find('div')->each(sub { shift->replace_inner('<p>test</p>') });
+$dom->find('div')->each(sub { shift->replace_content('<p>test</p>') });
 is "$dom", '<div><p>test</p></div><div><p>test</p></div>', 'right text';
-$dom->find('p')->each(sub { shift->replace_inner('') });
+$dom->find('p')->each(sub { shift->replace_content('') });
 is "$dom", '<div><p /></div><div><p /></div>', 'right text';
 $dom = Mojo::DOM->new->parse('<div><p id="☃" /></div>');
-$dom->at('#☃')->replace_inner('♥');
+$dom->at('#☃')->replace_content('♥');
 is "$dom", '<div><p id="☃">♥</p></div>', 'right text';
 $dom = Mojo::DOM->new->parse('<div>foo<p>lalala</p>bar</div>');
-$dom->replace_inner('♥');
+$dom->replace_content('♥');
 is "$dom", '♥', 'right text';
-$dom->replace_inner('<div>foo<p>lalala</p>bar</div>');
+$dom->replace_content('<div>foo<p>lalala</p>bar</div>');
 is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right text';
-$dom->replace_inner('');
+$dom->replace_content('');
 is "$dom", '', 'right text';
-$dom->replace_inner('<div>foo<p>lalala</p>bar</div>');
+$dom->replace_content('<div>foo<p>lalala</p>bar</div>');
 is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right text';
 
 # Mixed search and tree walk
@@ -518,8 +518,8 @@ is $dom->at('div')->attrs->{test2}, '', 'empty attribute value';
 # Whitespaces before closing bracket
 $dom = Mojo::DOM->new->parse(qq/<div >content<\/div>/);
 ok $dom->at('div'), 'tag found';
-is $dom->at('div')->text,      'content', 'right text';
-is $dom->at('div')->inner_xml, 'content', 'right text';
+is $dom->at('div')->text,        'content', 'right text';
+is $dom->at('div')->content_xml, 'content', 'right text';
 
 # Class with hyphen
 $dom = Mojo::DOM->new->parse(
@@ -541,12 +541,12 @@ is_deeply \@div, [qw/A B 0/], 'found all div elements with id';
 # Empty tags
 $dom = Mojo::DOM->new->parse('<hr /><br/><br id="br"/><br />');
 is "$dom", '<hr /><br /><br id="br" /><br />', 'right result';
-is $dom->at('br')->inner_xml, '', 'empty result';
+is $dom->at('br')->content_xml, '', 'empty result';
 
 # Inner XML
 $dom = Mojo::DOM->new->parse('<a>xxx<x>x</x>xxx</a>');
-is $dom->at('a')->inner_xml, 'xxx<x>x</x>xxx', 'right result';
-is $dom->inner_xml, '<a>xxx<x>x</x>xxx</a>', 'right result';
+is $dom->at('a')->content_xml, 'xxx<x>x</x>xxx', 'right result';
+is $dom->content_xml, '<a>xxx<x>x</x>xxx</a>', 'right result';
 
 # Multiple selectors
 $dom = Mojo::DOM->new->parse(
@@ -991,7 +991,7 @@ is "$dom", <<EOF, 'right result';
 </ul>
 <div>D</div>works
 EOF
-$dom->at('li')->prepend_inner('A3<p>A2</p>')->prepend_inner('A4');
+$dom->at('li')->prepend_content('A3<p>A2</p>')->prepend_content('A4');
 is $dom->at('li')->text, 'A4 A3 A', 'right text';
 is "$dom", <<EOF, 'right result';
 <ul>
@@ -1001,7 +1001,7 @@ is "$dom", <<EOF, 'right result';
 </ul>
 <div>D</div>works
 EOF
-$dom->find('li')->[1]->append_inner('<p>C2</p>C3')->append_inner('C4');
+$dom->find('li')->[1]->append_content('<p>C2</p>C3')->append_content('C4');
 is $dom->find('li')->[1]->text, 'C C3 C4', 'right text';
 is "$dom", <<EOF, 'right result';
 <ul>
@@ -1587,7 +1587,7 @@ $dom = Mojo::DOM->new->parse(<<'EOF');
 <XMLTest />
 EOF
 is $dom->xml, 1, 'xml mode detected';
-$dom->at('XMLTest')->replace_inner('<Element />');
+$dom->at('XMLTest')->replace_content('<Element />');
 my $element = $dom->at('Element');
 is $element->type, 'Element', 'right type';
 is $element->xml,  1,         'xml mode detected';

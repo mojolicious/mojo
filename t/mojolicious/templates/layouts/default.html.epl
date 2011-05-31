@@ -4,6 +4,6 @@
 <!doctype html><html>
 <head></head>
 <body>
-<%= $self->render_partial(template => '23') %><%= $self->render_inner %>
+<%= $self->render_partial(template => '23') %><%= $self->render_content %>
 </body>
 </html>

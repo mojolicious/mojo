@@ -115,7 +115,7 @@ sub register {
           $anchor =~ s/\%//g;
           push @$sections, [] if $tag->type eq 'h1' || !@$sections;
           push @{$sections->[-1]}, $text, "/$url#$anchor";
-          $tag->replace_inner(
+          $tag->replace_content(
             $self->link_to(
               $text => "/$url#toc",
               class => 'mojoscroll',

@@ -760,7 +760,7 @@ sub _start_tx {
     }
   }
 
-  # We identify ourself
+  # We identify ourselves
   my $headers = $req->headers;
   $headers->user_agent($self->name) unless $headers->user_agent;
 

@@ -5,7 +5,7 @@ Mojolicious::Guides::FAQ - Frequently Asked Questions
 
 =head1 OVERVIEW
 
-This document contains the most frequently asked questions about
+This L<Mojolicious guide|Mojolicious::Guides> contains the most frequently asked questions about
 L<Mojolicious> together with the right answers.
 
 =head1 QUESTIONS

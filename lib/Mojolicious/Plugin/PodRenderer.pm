@@ -60,11 +60,13 @@ sub register {
 
   # Perldoc
   $app->routes->any(
-    '/perldoc' => sub {
+    '/perldoc(:slash)(:mod)' => [slash => qr/\/*/, mod => qr/.*/] => sub {
       my $self = shift;
 
       # Find module
-      my $module = $self->req->url->query->params->[0]
+      my $module =
+           $self->req->url->query->params->[0]
+        || $self->param('mod')
         || 'Mojolicious::Guides';
       $module =~ s/\//\:\:/g;
       my $path = Pod::Simple::Search->new->find($module, @PATHS);
@@ -80,12 +82,13 @@ sub register {
       my $html = _pod_to_html(join '', <$file>);
 
       # Rewrite links
-      my $dom = Mojo::DOM->new("$html");
+      my $dom     = Mojo::DOM->new("$html");
+      my $perldoc = $self->url_for('/perldoc/');
       $dom->find('a[href]')->each(
         sub {
           my $attrs = shift->attrs;
           if ($attrs->{href} =~ /^$cpan/) {
-            $attrs->{href} =~ s/^$cpan/perldoc/;
+            $attrs->{href} =~ s/^$cpan\?/$perldoc/;
             $attrs->{href} =~ s/%3A%3A/\//gi;
           }
         }

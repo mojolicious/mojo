@@ -192,7 +192,6 @@ sub render_to_rel_file {
   $self->render_to_file($data, $self->rel_dir($path), @_);
 }
 
-# "My cat's breath smells like cat food."
 sub run {
   my ($self, $name, @args) = @_;
 

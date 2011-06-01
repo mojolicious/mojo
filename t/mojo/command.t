@@ -3,25 +3,36 @@
 use strict;
 use warnings;
 
-use lib 'lib';
+use Test::More tests => 7;
 
-use Test::More tests => 2;
-
-# Windows Inline template
-my $test_string =
-    qq{@@ template1\r\n} .
-    qq{First Template\r\n} .
-    qq{@@ template2\r\n} .
-    qq{Second Template\r\n};
-
-open(my $fh, '<', \$test_string);
-no strict 'refs';
-*{"Example::Package::DATA"} = $fh;
+# "My cat's breath smells like cat food."
 use_ok 'Mojo::Command';
 
-my $cmd = Mojo::Command->new;
+my $command = Mojo::Command->new;
 
-like $cmd->get_data('template1', 'Example::Package'),
-    qr/^First Template/, 'correct template';
+# UNIX DATA templates
+my $unix = "@@ template1\nFirst Template\n@@ template2\r\nSecond Template\n";
+open my $data, '<', \$unix;
+no strict 'refs';
+*{"Example::Package::UNIX::DATA"} = $data;
+is $command->get_data('template1', 'Example::Package::UNIX'),
+  "First Template\n", 'right template';
+is $command->get_data('template2', 'Example::Package::UNIX'),
+  "Second Template\n", 'right template';
+is_deeply [sort keys %{$command->get_all_data('Example::Package::UNIX')}],
+  [qw/template1 template2/], 'right DATA files';
+close $data;
 
-close($fh);
+# Windows DATA templates
+my $windows =
+  "@@ template3\r\nThird Template\r\n@@ template4\r\nFourth Template\r\n";
+open $data, '<', \$windows;
+no strict 'refs';
+*{"Example::Package::Windows::DATA"} = $data;
+is $command->get_data('template3', 'Example::Package::Windows'),
+  "Third Template\r\n", 'right template';
+is $command->get_data('template4', 'Example::Package::Windows'),
+  "Fourth Template\r\n", 'right template';
+is_deeply [sort keys %{$command->get_all_data('Example::Package::Windows')}],
+  [qw/template3 template4/], 'right DATA files';
+close $data;

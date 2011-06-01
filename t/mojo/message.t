@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 968;
+use Test::More tests => 974;
 
 use File::Spec;
 use File::Temp;
@@ -1790,11 +1790,35 @@ my $count  = 0;
 my $offset = 0;
 while (1) {
   my $chunk = $res->get_body_chunk($offset);
-  last unless defined $chunk;
+  last unless $chunk;
   $full .= $chunk;
   $offset = length($full);
   $count++;
 }
+$res->fix_headers;
+is $res->headers->connection, undef, 'no "Connection" value';
+is $res->is_dynamic, undef, 'no dynamic content';
+is $count, length($body), 'right length';
+is $full, $body, 'right content';
+
+# Build response with callback (no Content-Length header)
+$res  = Mojo::Message::Response->new;
+$body = 'I is here';
+$cb   = sub { shift->write(substr($body, pop, 1), $cb) };
+$res->write('', $cb);
+$res->fix_headers;
+$full   = '';
+$count  = 0;
+$offset = 0;
+while (1) {
+  my $chunk = $res->get_body_chunk($offset);
+  last unless $chunk;
+  $full .= $chunk;
+  $offset = length($full);
+  $count++;
+}
+is $res->headers->connection, 'close', 'right "Connection" value';
+is $res->is_dynamic, 1, 'dynamic content';
 is $count, length($body), 'right length';
 is $full, $body, 'right content';
 

@@ -17,6 +17,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL load_app method to Mojo::Server.
         - Added append_content and prepend_content methods to Mojo::DOM.
         - Added HTTP method support to routes command. (trone)
+        - Improved long poll support.
         - Improved documentation.
         - Improved compatibility with Feersum PSGI web servers. (audreyt)
         - Switched from Storable to JSON serialization for Mojolicious

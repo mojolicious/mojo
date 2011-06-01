@@ -312,7 +312,7 @@ sub _read {
   $tx->server_read($chunk);
 
   # Last keep alive request
-  $tx->res->headers->connection('Close')
+  $tx->res->headers->connection('close')
     if ($c->{requests} || 0) >= $self->max_requests;
 
   # Finish

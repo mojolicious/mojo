@@ -100,7 +100,7 @@ $ua->start($tx);
 ok !$tx->keep_alive, 'will not be kept alive';
 ok $tx->kept_alive, 'was kept alive';
 is $tx->res->code, 200, 'right status';
-is $tx->res->headers->connection, 'Close', 'right "Connection" value';
+is $tx->res->headers->connection, 'close', 'right "Connection" value';
 like $tx->res->body, qr/Mojo/, 'right content';
 
 # Second non keep alive request
@@ -112,7 +112,7 @@ $ua->start($tx);
 ok !$tx->keep_alive, 'will not be kept alive';
 ok !$tx->kept_alive, 'was not kept alive';
 is $tx->res->code, 200, 'right status';
-is $tx->res->headers->connection, 'Close', 'right "Connection" value';
+is $tx->res->headers->connection, 'close', 'right "Connection" value';
 like $tx->res->body, qr/Mojo/, 'right content';
 
 # POST request

@@ -80,7 +80,7 @@ sub generate_body_chunk {
   $chunk = '' unless defined $chunk;
   $self->{_b2} = '';
 
-  # EOF
+  # EOF or delay
   return $self->{_eof} ? '' : undef unless length $chunk;
 
   return $chunk;
@@ -120,6 +120,12 @@ sub is_chunked {
 
 sub is_done {
   return 1 if (shift->{_state} || '') eq 'done';
+  return;
+}
+
+sub is_dynamic {
+  my $self = shift;
+  return 1 if $self->on_read && !defined $self->headers->content_length;
   return;
 }
 
@@ -283,6 +289,9 @@ sub write {
 
   # Drain callback
   $self->{_drain} = $cb if $cb;
+
+  # Finish
+  $self->{_eof} = 1 if defined $chunk && $chunk eq '';
 }
 
 # "Here's to alcohol, the cause of—and solution to—all life's problems."
@@ -539,6 +548,13 @@ Chunked transfer encoding.
   my $done = $content->is_done;
 
 Check if parser is done.
+
+=head2 C<is_dynamic>
+
+  my $dynamic = $content->is_dynamic;
+
+Dynamic content.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<is_multipart>
 

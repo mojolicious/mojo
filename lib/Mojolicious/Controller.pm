@@ -978,12 +978,17 @@ Generate a portable L<Mojo::URL> object with base for a route, path or URL.
   $c->write(sub {...});
   $c->write('Hello!', sub {...});
 
-Write dynamic content matching the corresponding C<Content-Length> header
-chunk wise, the optional drain callback will be invoked once all data has
-been written to the kernel send buffer or equivalent.
+Write dynamic content chunk wise, the optional drain callback will be invoked
+once all data has been written to the kernel send buffer or equivalent.
 
+  # Keep connection alive (with Content-Length header)
   $c->res->headers->content_length(6);
   $c->write('Hel', sub { shift->write('lo!') });
+
+  # Close connection when done, an empty chunk marks the end of the stream
+  $c->write('Hel');
+  $c->write('lo!');
+  $c->write('');
 
 =head2 C<write_chunk>
 

@@ -233,11 +233,15 @@ sub error {
 sub fix_headers {
   my $self = shift;
 
-  # Content-Length header is required in HTTP 1.0 (and above)
+  # Content-Length header or connection close is required in HTTP 1.0
+  # unless the chunked transfer encoding is used
   if ($self->at_least_version('1.0') && !$self->is_chunked) {
     my $headers = $self->headers;
-    $headers->content_length($self->body_size)
-      unless $headers->content_length;
+    unless ($headers->content_length) {
+      $self->is_dynamic
+        ? $headers->connection('close')
+        : $headers->content_length($self->body_size);
+    }
   }
 
   return $self;
@@ -310,6 +314,8 @@ sub is_done {
   return 1 if (shift->{_state} || '') eq 'done';
   return;
 }
+
+sub is_dynamic { shift->content->is_dynamic }
 
 sub is_limit_exceeded {
   my $self = shift;
@@ -778,6 +784,13 @@ Check if message content is chunked.
   my $done = $message->is_done;
 
 Check if parser is done.
+
+=head2 C<is_dynamic>
+
+  my $dynamic = $message->is_dynamic;
+
+Check if message content will be dynamic.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<is_limit_exceeded>
 

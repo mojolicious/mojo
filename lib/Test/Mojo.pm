@@ -334,7 +334,8 @@ sub _request_ok {
   $ua->max_redirects($self->max_redirects);
   $self->tx($ua->$method($url, %$headers, $body));
   local $Test::Builder::Level = $Test::Builder::Level + 2;
-  Test::More::ok($self->tx->is_done, $desc);
+  my ($error, $code) = $self->tx->error;
+  Test::More::ok(!$error || $code, $desc);
 
   return $self;
 }

@@ -22,8 +22,7 @@ get '/shortpoll' => sub {
   $self->on_finish(sub { $shortpoll++ });
   $self->res->code(200);
   $self->res->headers->content_type('text/plain');
-  $self->write_chunk('this was short.');
-  $self->write_chunk('');
+  $self->finish('this was short.');
 } => 'shortpoll';
 
 # GET /shortpoll/plain
@@ -59,7 +58,7 @@ get '/longpoll' => sub {
   Mojo::IOLoop->timer(
     '0.5' => sub {
       $self->write_chunk('there,', sub { shift->write_chunk(' whats up?'); });
-      shift->timer('0.5' => sub { $self->write_chunk('') });
+      shift->timer('0.5' => sub { $self->finish });
     }
   );
 };
@@ -75,7 +74,7 @@ get '/longpoll/nolength' => sub {
   Mojo::IOLoop->timer(
     '0.5' => sub {
       $self->write('there,', sub { shift->write(' what length?'); });
-      shift->timer('0.5' => sub { $self->write('') });
+      shift->timer('0.5' => sub { $self->finish });
     }
   );
 };
@@ -125,8 +124,7 @@ get '/longpoll/delayed' => sub {
         sub {
           my $self = shift;
           $self->write_chunk('how');
-          $self->write_chunk('dy!');
-          $self->write_chunk('');
+          $self->finish('dy!');
         }
       );
     }
@@ -169,8 +167,7 @@ get '/longpoll/nolength/delayed' => sub {
         sub {
           my $self = shift;
           $self->write('how');
-          $self->write('dy nolength!');
-          $self->write('');
+          $self->finish('dy nolength!');
         }
       );
     }

@@ -102,10 +102,21 @@ sub cookie {
 
 # "Something's wrong, she's not responding to my poking stick."
 sub finish {
-  my $self = shift;
-  my $tx   = $self->tx;
-  Carp::croak('No WebSocket connection to finish') unless $tx->is_websocket;
-  $tx->finish;
+  my ($self, $chunk) = @_;
+
+  # WebSocket
+  my $tx = $self->tx;
+  return $tx->finish if $tx->is_websocket;
+
+  # Chunked stream
+  if ($tx->res->is_chunked) {
+    $self->write_chunk($chunk) if defined $chunk;
+    return $self->write_chunk('');
+  }
+
+  # Normal stream
+  $self->write($chunk) if defined $chunk;
+  $self->write('');
 }
 
 # "You two make me ashamed to call myself an idiot."
@@ -715,8 +726,9 @@ Access request cookie values and create new response cookies.
 =head2 C<finish>
 
   $c->finish;
+  $c->finish('Bye!');
 
-Gracefully end WebSocket connection.
+Gracefully end WebSocket connection or long poll stream.
 
 =head2 C<flash>
 
@@ -985,10 +997,10 @@ once all data has been written to the kernel send buffer or equivalent.
   $c->res->headers->content_length(6);
   $c->write('Hel', sub { shift->write('lo!') });
 
-  # Close connection when done, an empty chunk marks the end of the stream
+  # Close connection when done (without Content-Length header)
   $c->write('Hel');
   $c->write('lo!');
-  $c->write('');
+  $c->finish;
 
 =head2 C<write_chunk>
 
@@ -1002,16 +1014,18 @@ which doesn't require a C<Content-Length> header, the optional drain callback
 will be invoked once all data has been written to the kernel send buffer or
 equivalent.
 
-  $c->write_chunk('Hel');
-  $c->write_chunk('lo!');
-  $c->write_chunk('');
+  $c->write_chunk('He');
+  $c->write_chunk('ll');
+  $c->finish('o!');
 
-An empty chunk marks the end of the stream.
+You can call C<finish> at any time to end the stream.
 
-  3
-  Hel
-  3
-  lo!
+  2
+  He
+  2
+  ll
+  2
+  o!
   0
 
 =head1 SEE ALSO

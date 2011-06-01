@@ -64,10 +64,7 @@ sub register {
       my $self = shift;
 
       # Find module
-      my $module =
-           $self->req->url->query->params->[0]
-        || $self->param('mod')
-        || 'Mojolicious::Guides';
+      my $module = $self->param('mod') || 'Mojolicious::Guides';
       $module =~ s/\//\:\:/g;
       my $path = Pod::Simple::Search->new->find($module, @PATHS);
 
@@ -135,6 +132,7 @@ sub register {
       # Combine everything to a proper response
       $self->content_for(mojobar => $self->include(inline => $MOJOBAR));
       $self->content_for(perldoc => "$dom");
+      $self->app->plugins->run_hook(before_perldoc => $self);
       $self->render(
         inline   => $PERLDOC,
         title    => $title,

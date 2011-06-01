@@ -390,8 +390,7 @@ sub render_later { shift->stash->{'mojo.rendered'} = 1 }
 #  Lick my frozen metal ass."
 sub render_not_found {
   my ($self, $resource) = @_;
-  $self->app->log->debug(qq/Resource "$resource" not found./)
-    if $resource;
+  $self->app->log->debug(qq/Resource "$resource" not found./) if $resource;
 
   # Recursion
   my $stash = $self->stash;

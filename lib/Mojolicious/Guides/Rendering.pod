@@ -119,7 +119,7 @@ controller instance as C<$self>.
 
   Hello <%= $name %>.
 
-There are also many built in helper functions such as C<url_for>, which
+There are also many built-in helper functions such as C<url_for>, which
 allows you to generate the URL of a specific route just from its name.
 
   $r->route('/foo/:name')->to('foo#bar')->name('some_route');
@@ -449,11 +449,11 @@ executed more than once.
 
 =head2 Mode Specific C<exception> And C<not_found> Templates
 
-While the built in C<exception> and C<not_found> templates are very useful
+While the built-in C<exception> and C<not_found> templates are very useful
 during development, you most likely want to show your users something more
 related to your application in production.
 That's why L<Mojolicious> will always try to render C<exception.$mode.html.*>
-or C<not_found.$mode.html.*> before falling back to the built in default
+or C<not_found.$mode.html.*> before falling back to the built-in default
 templates.
 
   @@ exception.production.html.ep

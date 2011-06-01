@@ -206,7 +206,7 @@ When we say L<Mojolicious> is a web framework we actually mean it.
 =head2 Web Scraping
 
 Scraping information from web sites has never been this much fun before.
-The built in XML/HTML5 parser L<Mojo::DOM> supports all CSS3 selectors that
+The built-in XML/HTML5 parser L<Mojo::DOM> supports all CSS3 selectors that
 make sense for a standalone parser.
 
   # Fetch web site

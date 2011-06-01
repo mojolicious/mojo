@@ -107,7 +107,7 @@ Web development for humans, making hard things possible and everything fun.
     The time is <%= $hour %>:<%= $minute %>:<%= $second %>.
   <% end %>
 
-To run this example with the built in development server just put the code
+To run this example with the built-in development server just put the code
 into a file and execute it with C<perl>.
 
   % perl example.pl daemon

@@ -26,6 +26,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed small Windows line ending problem in Mojo::Command. (akron)
         - Fixed a UTF-8 bug in Mojo::Exception. (jamadam)
         - Fixed "Can't locate object method x via package y" error messages.
+        - Fixed woff MIME type.
 
 1.34    2011-05-22 00:00:00
         - Fixed nested selector bug in Mojo::DOM.

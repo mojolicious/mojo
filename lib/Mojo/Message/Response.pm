@@ -9,13 +9,13 @@ has [qw/code message/];
 
 # Start line regex
 my $START_LINE_RE = qr/
-  ^\s*             # Start
+  ^\s*
   HTTP\/(\d\.\d)   # Version
-  \s+              # Whitespace
+  \s+
   (\d\d\d)         # Code
-  \s*              # Whitespace
+  \s*
   ([\w\'\s]+)?     # Message (with "I'm a teapot" support)
-  $                # End
+  $
 /x;
 
 # Umarked codes are from RFC 2616 (mostly taken from LWP)

@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+1.41    2011-06-02 00:00:00
+        - Fixed typos.
+
 1.4     2011-06-02 00:00:00
         - Code name "Smiling Face With Sunglasses", this is a major release.
         - Deprecated Mojo::DOM add_after method in favor of the append

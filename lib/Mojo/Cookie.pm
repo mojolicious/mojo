@@ -12,9 +12,11 @@ has [qw/name path value version/];
 my $COOKIE_SEPARATOR_RE = qr/^\s*\,\s*/;
 my $EXPIRES_RE          = qr/^([^\;\,]+\,?[^\;\,]+)\s*/;
 my $NAME_RE             = qr/
-  ^\s*           # Start
+  ^\s*
   ([^\=\;\,]+)   # Relaxed Netscape token, allowing whitespace
-  \s*\=?\s*      # '=' (optional)
+  \s*
+  \=?            # '=' (optional)
+  \s*
 /x;
 my $SEPARATOR_RE = qr/^\s*\;\s*/;
 my $VALUE_RE     = qr/^([^\;\,]+)\s*/;

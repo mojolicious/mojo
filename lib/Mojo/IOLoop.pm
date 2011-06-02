@@ -736,14 +736,12 @@ sub start_tls {
   }
   else { $loop->remove($socket) if defined $writing }
 
-  # Start
+  # TLS upgrade
   $self->drop($id) and return
     unless my $new = IO::Socket::SSL->start_SSL($socket, %options);
-
-  # Upgrade
-  $c->{handle}              = $new;
+  $c->{handle} = $new;
   $self->{_reverse}->{$new} = $id;
-  $c->{tls_connect}         = 1;
+  $c->{tls_connect} = 1;
   $self->_writing($id);
 
   return $id;

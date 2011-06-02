@@ -12,14 +12,14 @@ has url => sub { Mojo::URL->new };
 
 # Start line regex
 my $START_LINE_RE = qr/
-  ^\s*                                                         # Start
+  ^\s*
   ([a-zA-Z]+)                                                  # Method
-  \s+                                                          # Whitespace
+  \s+
   (
   [0-9a-zA-Z\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\%]+   # Path
   )
   (?:\s+HTTP\/(\d+\.\d+))?                                     # Version
-  $                                                            # End
+  $
 /x;
 
 # Host regex

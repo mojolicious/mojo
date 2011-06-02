@@ -115,22 +115,15 @@ sub decode {
 
 sub encode {
   my ($self, $ref) = @_;
-
-  # Encode
   my $string = _encode_values($ref);
-
-  # Unicode
   Mojo::Util::encode 'UTF-8', $string;
   return $string;
 }
 
 sub false {$FALSE}
-
-sub true {$TRUE}
+sub true  {$TRUE}
 
 sub _decode_array {
-
-  # Array
   my @array;
   until (m/\G$WHITESPACE_RE\]/xogc) {
 
@@ -143,7 +136,7 @@ sub _decode_array {
     # End
     last if m/\G$WHITESPACE_RE\]/xogc;
 
-    # Exception
+    # Invalid character
     _exception('Expected comma or right square bracket while parsing array');
   }
 
@@ -151,8 +144,6 @@ sub _decode_array {
 }
 
 sub _decode_object {
-
-  # Object
   my %hash;
   until (m/\G$WHITESPACE_RE\}/xogc) {
 
@@ -176,7 +167,7 @@ sub _decode_object {
     # End
     last if m/\G$WHITESPACE_RE\}/xogc;
 
-    # Exception
+    # Invalid character
     _exception(q/Expected comma or right curly bracket while parsing object/);
   }
 
@@ -184,8 +175,6 @@ sub _decode_object {
 }
 
 sub _decode_string {
-
-  # Position
   my $pos = pos;
 
   # String
@@ -208,8 +197,6 @@ sub _decode_string {
   # Everything else
   my $buffer = '';
   while ($str =~ m/\G([^\\]*)\\(?:([^u])|u(.{4}))/gc) {
-
-    # Pass through
     $buffer .= $1;
 
     # Popular character
@@ -274,7 +261,7 @@ sub _decode_value {
   # Null
   return undef if m/\Gnull/gc;
 
-  # Exception
+  # Invalid data
   _exception('Expected string, array, object, number, boolean or null');
 }
 

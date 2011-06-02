@@ -272,7 +272,7 @@ sub parse {
   # Perl line regex
   my $line_re = qr/
     ^
-    (\s*)                  # Leading whitespace
+    (\s*)
     $line_start            # Line start
     ($expr)?               # Expression
     ($escp)?               # Escaped expression

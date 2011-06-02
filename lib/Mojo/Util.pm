@@ -12,13 +12,15 @@ require MIME::QuotedPrint;
 use constant SHA1 => eval 'use Digest::SHA (); 1';
 
 # Punycode bootstring parameters
-use constant PUNYCODE_BASE         => 36;
-use constant PUNYCODE_TMIN         => 1;
-use constant PUNYCODE_TMAX         => 26;
-use constant PUNYCODE_SKEW         => 38;
-use constant PUNYCODE_DAMP         => 700;
-use constant PUNYCODE_INITIAL_BIAS => 72;
-use constant PUNYCODE_INITIAL_N    => 128;
+use constant {
+  PUNYCODE_BASE         => 36,
+  PUNYCODE_TMIN         => 1,
+  PUNYCODE_TMAX         => 26,
+  PUNYCODE_SKEW         => 38,
+  PUNYCODE_DAMP         => 700,
+  PUNYCODE_INITIAL_BIAS => 72,
+  PUNYCODE_INITIAL_N    => 128
+};
 
 # Punycode delimiter
 my $DELIMITER = chr 0x2D;

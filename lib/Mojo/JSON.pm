@@ -357,11 +357,10 @@ sub _exception {
 # Emulate boolean type
 package Mojo::JSON::_Bool;
 use Mojo::Base -base;
-use overload (
+use overload
   '0+'     => sub { $_[0]->{_value} },
   '""'     => sub { $_[0]->{_value} },
-  fallback => 1
-);
+  fallback => 1;
 
 sub new { shift->SUPER::new(_value => shift) }
 

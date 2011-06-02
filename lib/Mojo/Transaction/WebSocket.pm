@@ -12,12 +12,14 @@ use constant DEBUG => $ENV{MOJO_WEBSOCKET_DEBUG} || 0;
 use constant GUID => '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 
 # Opcodes
-use constant CONTINUATION => 0;
-use constant TEXT         => 1;
-use constant BINARY       => 2;
-use constant CLOSE        => 8;
-use constant PING         => 9;
-use constant PONG         => 10;
+use constant {
+  CONTINUATION => 0,
+  TEXT         => 1,
+  BINARY       => 2,
+  CLOSE        => 8,
+  PING         => 9,
+  PONG         => 10
+};
 
 # Core module since Perl 5.9.3
 use constant SHA1 => eval 'use Digest::SHA (); 1';

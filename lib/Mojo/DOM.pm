@@ -1,8 +1,10 @@
 package Mojo::DOM;
 use Mojo::Base -base;
-use overload 'bool' => sub {1}, fallback => 1;
-use overload '""' => sub { shift->to_xml }, fallback => 1;
-use overload '%{}' => sub { shift->attrs };
+use overload
+  '%{}'    => sub { shift->attrs },
+  'bool'   => sub {1},
+  '""'     => sub { shift->to_xml },
+  fallback => 1;
 
 use Carp 'croak';
 use Mojo::Util qw/decode encode html_unescape xml_escape/;
@@ -1339,8 +1341,7 @@ sub _trim {
 }
 
 package Mojo::DOM::_Collection;
-use overload 'bool' => sub {1}, fallback => 1;
-use overload '""' => sub { shift->to_xml }, fallback => 1;
+use overload 'bool' => sub {1}, '""' => sub { shift->to_xml }, fallback => 1;
 
 sub each   { shift->_iterate(@_) }
 sub to_xml { join "\n", map({"$_"} @{$_[0]}) }

@@ -1,7 +1,9 @@
 package Mojo::Parameters;
 use Mojo::Base -base;
-use overload 'bool' => sub {1}, fallback => 1;
-use overload '""' => sub { shift->to_string }, fallback => 1;
+use overload
+  'bool'   => sub {1},
+  '""'     => sub { shift->to_string },
+  fallback => 1;
 
 use Mojo::Util qw/encode decode url_escape url_unescape/;
 use Mojo::URL;

@@ -60,6 +60,7 @@ sub load_app {
   die qq/"$file" is not a valid application.\n/
     unless blessed $app && $app->isa('Mojo');
   $self->app($app);
+  return $app;
 }
 
 # "Are you saying you're never going to eat any animal again? What about
@@ -158,12 +159,12 @@ following new ones.
 
 =head2 C<load_app>
 
-  $server->load_app('./myapp.pl');
+  my $app = $server->load_app('./myapp.pl');
 
 Load application from script.
 Note that this method is EXPERIMENTAL and might change without warning!
 
-  print Mojo::Server->new->load_app('./myapp.pl')->app->home;
+  print Mojo::Server->new->load_app('./myapp.pl')->home;
 
 =head2 C<run>
 

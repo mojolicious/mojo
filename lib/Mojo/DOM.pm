@@ -1,8 +1,8 @@
 package Mojo::DOM;
 use Mojo::Base -base;
+use overload '%{}' => sub { shift->attrs };
 use overload 'bool' => sub {1}, fallback => 1;
 use overload '""' => sub { shift->to_xml }, fallback => 1;
-use overload '%{}' => sub { shift->attrs };
 
 use Carp 'croak';
 use Mojo::Util qw/decode encode html_unescape xml_escape/;

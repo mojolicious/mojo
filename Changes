@@ -23,6 +23,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Switched from Storable to JSON serialization for Mojolicious
           sessions to increase efficiency.
         - Reduced memory usage of Hypnotoad workers by at least 1MB (each).
+        - Fixed a small Mojo::Loader bug.
         - Fixed small Windows line ending problem in Mojo::Command. (akron)
         - Fixed a UTF-8 bug in Mojo::Exception. (jamadam)
         - Fixed "Can't locate object method x via package y" error messages.

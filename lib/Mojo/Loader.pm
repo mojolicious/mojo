@@ -121,6 +121,7 @@ sub _purge {
 
 sub _reload {
   my $key = shift;
+  return if $key eq 'Mojo/Loader.pm';
   warn "CLEANING $key\n" if DEBUG;
   _unload($key);
   warn "RELOADING $key\n" if DEBUG;

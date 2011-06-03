@@ -2,7 +2,7 @@ package Mojolicious::Command::Generate::Makefile;
 use Mojo::Base 'Mojo::Command';
 
 has description => <<'EOF';
-Generate Makefile.PL.
+Generate "Makefile.PL".
 EOF
 has usage => <<"EOF";
 usage: $0 generate makefile

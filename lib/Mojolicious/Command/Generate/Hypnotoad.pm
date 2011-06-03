@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo::Command';
 # "As a scientist,
 #  I can assure you that we did in fact evolve from filthy monkey-men."
 has description => <<'EOF';
-Generate hypnotoad.conf.
+Generate "hypnotoad.conf".
 EOF
 has usage => <<"EOF";
 usage: $0 generate hypnotoad

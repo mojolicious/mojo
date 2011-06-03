@@ -2,7 +2,7 @@ package Mojolicious::Command::Generate::LiteApp;
 use Mojo::Base 'Mojo::Command';
 
 has description => <<'EOF';
-Generate a minimalistic web application.
+Generate Mojolicious::Lite application.
 EOF
 has usage => <<"EOF";
 usage: $0 generate lite_app [NAME]

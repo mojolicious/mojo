@@ -12,7 +12,7 @@ BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 my $backup;
 BEGIN { $backup = $ENV{MOJO_MODE} || ''; $ENV{MOJO_MODE} = 'development' }
 
-use Test::More tests => 782;
+use Test::More tests => 787;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -119,7 +119,7 @@ get '/auto_name' => sub {
 # GET /reserved
 get '/reserved' => sub {
   my $self = shift;
-  $self->render(text => $self->param('cb'));
+  $self->render_text($self->param('data') . join(',', $self->param));
 };
 
 # GET /custom_name
@@ -764,10 +764,16 @@ $t->get_ok('/auto_name')->status_is(200)
   ->content_is('/custom_name');
 
 # GET /reserved
-$t->get_ok('/reserved?cb=just-works')->status_is(200)
+$t->get_ok('/reserved?data=just-works')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('just-works');
+  ->content_is('just-worksdata');
+
+# GET /reserved
+$t->get_ok('/reserved?data=just-works&json=test')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('just-worksdata,json');
 
 # GET /inline/exception
 $t->get_ok('/inline/exception')->status_is(500)

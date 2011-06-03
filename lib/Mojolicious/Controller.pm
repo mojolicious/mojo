@@ -181,7 +181,9 @@ sub param {
   my $p = $self->stash->{'mojo.captures'} || {};
   unless (defined $name) {
     my %seen;
-    return sort grep { !$seen{$_}++ } keys %$p, $self->req->param;
+    my @keys = grep { !$seen{$_}++ } $self->req->param;
+    push @keys, grep { !$RESERVED{$_} && !$seen{$_}++ } keys %$p;
+    return sort @keys;
   }
 
   # Override value

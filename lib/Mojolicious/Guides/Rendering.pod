@@ -468,6 +468,8 @@ templates.
     <body>Page does not seem to exist.</body>
   </html>
 
+Note that both templates can't have layouts.
+
 =head1 ADVANCED
 
 Less commonly used and more powerful features.

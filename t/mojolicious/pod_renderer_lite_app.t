@@ -9,7 +9,7 @@ BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 use Test::More;
 plan skip_all => 'Perl 5.10 or Pod::Simple required for this test!'
   unless eval { require Pod::Simple::HTML; 1 };
-plan tests => 16;
+plan tests => 28;
 
 # "Amy get your pants back on and get to work.
 #  They think were making out.
@@ -47,7 +47,17 @@ $t->post_ok('/')->status_is(200)
 $t->post_ok('/block')->status_is(200)
   ->content_like(qr/test321\s+<h2>lalala<\/h2>\s+<p><code>test<\/code><\/p>/);
 
-# Perldoc browser
+# Perldoc browser (Welcome)
+$t->get_ok('/perldoc')->status_is(200)->text_is('h1 a[id="NAME"]', 'NAME')
+  ->text_is('a[id="TUTORIAL"]', 'TUTORIAL')
+  ->text_is('a[id="GUIDES"]',   'GUIDES')->content_like(qr/Galaxy/);
+
+# Perldoc browser (Welcome with slash)
+$t->get_ok('/perldoc/')->status_is(200)->text_is('h1 a[id="NAME"]', 'NAME')
+  ->text_is('a[id="TUTORIAL"]', 'TUTORIAL')
+  ->text_is('a[id="GUIDES"]',   'GUIDES')->content_like(qr/Galaxy/);
+
+# Perldoc browser (Mojolicious)
 $t->get_ok('/perldoc/Mojolicious')->status_is(200)
   ->text_is('h1 a[id="NAME"]', 'NAME')->text_is('a[id="handler"]', 'handler')
   ->text_like('p', qr/Mojolicious/)->content_like(qr/Sebastian\ Riedel/);

@@ -224,28 +224,19 @@ sub _tokenize {
       next;
     }
 
-    # Relaxed start
-    if ($quoted && $char eq $relaxed_start) {
-
-      # Upgrade relaxed to wildcard
-      if ($state eq 'symbol') {
-        $state = 'relaxed';
-        $tree->[-1]->[0] = 'relaxed';
-        next;
-      }
-
+    # Relaxed start (needs to be quoted)
+    if ($quoted && $char eq $relaxed_start && $state eq 'symbol') {
+      $state = 'relaxed';
+      $tree->[-1]->[0] = 'relaxed';
+      next;
     }
 
-    # Wildcard start
-    if ($quoted && $char eq $wildcard_start) {
-
-      # Upgrade relaxed to wildcard
-      if ($state eq 'symbol') {
-        $state = 'wildcard';
-        $tree->[-1]->[0] = 'wildcard';
-        next;
-      }
-
+    # Wildcard start (upgrade when quoted)
+    if ($char eq $wildcard_start) {
+      push @$tree, ['symbol', ''] unless $quoted;
+      $state = 'wildcard';
+      $tree->[-1]->[0] = 'wildcard';
+      next;
     }
 
     # Quote end

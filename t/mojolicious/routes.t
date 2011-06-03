@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 232;
+use Test::More tests => 237;
 
 # "They're not very heavy, but you don't hear me not complaining."
 use_ok 'Mojolicious::Routes';
@@ -68,6 +68,10 @@ $r->route('/wildcards/2/(*wildcard)')
 # /wildcards/3/*/foo
 $r->route('/wildcards/3/(*wildcard)/foo')
   ->to(controller => 'very', action => 'dangerous');
+
+# /wildcards/4/*/foo
+$r->route('/wildcards/4/*wildcard/foo')
+  ->to(controller => 'somewhat', action => 'dangerous');
 
 # /format
 # /format.html
@@ -312,6 +316,14 @@ is $m->stack->[0]->{controller}, 'very',        'right value';
 is $m->stack->[0]->{action},     'dangerous',   'right value';
 is $m->stack->[0]->{wildcard},   'hello/there', 'right value';
 is $m->path_for, '/wildcards/3/hello/there/foo', 'right path';
+is @{$m->stack}, 1, 'right number of elements';
+$m =
+  Mojolicious::Routes::Match->new(get => '/wildcards/4/hello/there/foo')
+  ->match($r);
+is $m->stack->[0]->{controller}, 'somewhat',    'right value';
+is $m->stack->[0]->{action},     'dangerous',   'right value';
+is $m->stack->[0]->{wildcard},   'hello/there', 'right value';
+is $m->path_for, '/wildcards/4/hello/there/foo', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
 
 # Escaped

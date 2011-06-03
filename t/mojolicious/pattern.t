@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 50;
+use Test::More tests => 53;
 
 use Mojo::ByteStream 'b';
 
@@ -91,6 +91,12 @@ is $result->{controller}, 'foo',          'right value';
 is $result->{action},     'bar.baz/yada', 'right value';
 is $pattern->render({controller => 'foo', action => 'bar.baz/yada'}),
   '/test/foo/bar.baz/yada', 'right result';
+$pattern = Mojolicious::Routes::Pattern->new('/tset/:controller/*action');
+$result  = $pattern->match('/tset/foo/bar.baz/yada');
+is $result->{controller}, 'foo',          'right value';
+is $result->{action},     'bar.baz/yada', 'right value';
+is $pattern->render({controller => 'foo', action => 'bar.baz/yada'}),
+  '/tset/foo/bar.baz/yada', 'right result';
 
 # Render false value
 $pattern = Mojolicious::Routes::Pattern->new('/:id');
@@ -103,10 +109,10 @@ is $result->{test}, 'test(test)(\Qtest\E)(', 'right value';
 is $pattern->render({test => '23'}), '/23', 'right result';
 
 # Regex in pattern
-$pattern = Mojolicious::Routes::Pattern->new('/.+.*(:test)');
-$result  = $pattern->match('/.+.*test');
+$pattern = Mojolicious::Routes::Pattern->new('/.+(:test)');
+$result  = $pattern->match('/.+test');
 is $result->{test}, 'test', 'right value';
-is $pattern->render({test => '23'}), '/.+.*23', 'right result';
+is $pattern->render({test => '23'}), '/.+23', 'right result';
 
 # Unusual values
 $pattern = Mojolicious::Routes::Pattern->new('/:test');

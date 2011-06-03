@@ -107,7 +107,7 @@ get('/yada/yada/yada')
 get('/basic')->detour(MyTestApp::Basic->new, test => 'lalala');
 
 # /third/* (dispatch to embedded app)
-get '/third/(*path)' =>
+get '/third/*path' =>
   {app => 'MyTestApp::Test2', name => 'third embedded', path => '/'};
 
 # /hello/* (dispatch to embedded app)

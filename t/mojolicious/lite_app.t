@@ -12,7 +12,7 @@ BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 my $backup;
 BEGIN { $backup = $ENV{MOJO_MODE} || ''; $ENV{MOJO_MODE} = 'development' }
 
-use Test::More tests => 787;
+use Test::More tests => 792;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -264,6 +264,12 @@ get '/foo_relaxed/(.test)' => sub {
 
 # GET /foo_wildcard/*
 get '/foo_wildcard/(*test)' => sub {
+  my $self = shift;
+  $self->render_text($self->stash('test'));
+};
+
+# GET /foo_wildcard_too/*
+get '/foo_wildcard_too/*test' => sub {
   my $self = shift;
   $self->render_text($self->stash('test'));
 };
@@ -1042,6 +1048,12 @@ $t->get_ok('/foo_wildcard/123')->status_is(200)->content_is('123');
 
 # GET /foo_wildcard
 $t->get_ok('/foo_wildcard/')->status_is(404);
+
+# GET /foo_wildcard_too/123
+$t->get_ok('/foo_wildcard_too/123')->status_is(200)->content_is('123');
+
+# GET /foo_wildcard_too
+$t->get_ok('/foo_wildcard_too/')->status_is(404);
 
 # GET /with/header/condition
 $t->get_ok('/with/header/condition', {'X-Secret-Header' => 'bar'})

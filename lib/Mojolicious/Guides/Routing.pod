@@ -108,9 +108,21 @@ surrounding text.
   /sebastian23hello  -> /(:name)hello -> {name => 'sebastian23'}
   /sebastian 23hello -> /(:name)hello -> {name => 'sebastian 23'}
 
+=head2 Wildcard Placeholders
+
+Wildcard placeholders are just like generic placeholders, but match
+absolutely everything.
+
+  /hello              -> /*name/hello -> undef
+  /sebastian/23/hello -> /*name/hello -> {name => 'sebastian/23'}
+  /sebastian.23/hello -> /*name/hello -> {name => 'sebastian.23'}
+  /sebastian/hello    -> /*name/hello -> {name => 'sebastian'}
+  /sebastian23/hello  -> /*name/hello -> {name => 'sebastian23'}
+  /sebastian 23/hello -> /*name/hello -> {name => 'sebastian 23'}
+
 =head2 Relaxed Placeholders
 
-Relaxed placeholders are very similar to generic placeholders but always
+Relaxed placeholders are similar to the two placeholders above, but always
 require brackets and match all characters except C</>.
 
   /hello              -> /(.name)/hello -> undef
@@ -119,18 +131,6 @@ require brackets and match all characters except C</>.
   /sebastian/hello    -> /(.name)/hello -> {name => 'sebastian'}
   /sebastian23/hello  -> /(.name)/hello -> {name => 'sebastian23'}
   /sebastian 23/hello -> /(.name)/hello -> {name => 'sebastian 23'}
-
-=head2 Wildcard Placeholders
-
-Wildcard placeholders are just like relaxed placeholders but match absolutely
-everything.
-
-  /hello              -> /(*name)/hello -> undef
-  /sebastian/23/hello -> /(*name)/hello -> {name => 'sebastian/23'}
-  /sebastian.23/hello -> /(*name)/hello -> {name => 'sebastian.23'}
-  /sebastian/hello    -> /(*name)/hello -> {name => 'sebastian'}
-  /sebastian23/hello  -> /(*name)/hello -> {name => 'sebastian23'}
-  /sebastian 23/hello -> /(*name)/hello -> {name => 'sebastian 23'}
 
 =head1 BASICS
 
@@ -661,7 +661,7 @@ Because the remaining path always gets stored in the C<path> stash value, you
 could also just use it directly instead of C<detour>.
 
   # /foo/*
-  $r->route('/foo/(*path)')->to('bar#', name => 'Mojo');
+  $r->route('/foo/*path')->to('bar#', name => 'Mojo');
 
 =head2 Application Plugins
 
@@ -746,9 +746,9 @@ The C<routes> command can be used from the command line to list all available
 routes together with name and underlying regular expressions.
 
   % script/myapp routes
-  /foo/:name          GET   fooname        (?-xism:^/foo/([^\/\.]+))
-  /bar/(.test)        *     bartest        (?-xism:^/bar/([^\/]+))
-  /baz/(*everything)  POST  bazeverything  (?-xism:^/baz/(.+))
+  /foo/:name        GET   fooname        (?-xism:^/foo/([^\/\.]+))
+  /baz/*everything  POST  bazeverything  (?-xism:^/baz/(.+))
+  /bar/(.test)      *     bartest        (?-xism:^/bar/([^\/]+))
 
 =head1 MORE
 

@@ -363,23 +363,6 @@ C<param>.
     $self->render(text => "Our :bar placeholder matched $bar");
   };
 
-=head2 Relaxed Placeholders
-
-Relaxed placeholders allow matching of everything until a C</> occurs.
-
-  # /*/hello (everything except "/")
-  # /test/hello
-  # /test123/hello
-  # /test.123/hello
-  get '/(.you)/hello' => sub {
-    shift->render('groovy');
-  };
-
-  __DATA__
-
-  @@ groovy.html.ep
-  Your name is <%= $you %>.
-
 =head2 Wildcard Placeholders
 
 Wildcard placeholders allow matching absolutely everything, including
@@ -389,7 +372,7 @@ C</> and C<.>.
   # /hello/test
   # /hello/test123
   # /hello/test.123/test/123
-  get '/hello/(*you)' => sub {
+  get '/hello/*you' => sub {
     shift->render('groovy');
   };
 

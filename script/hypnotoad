@@ -45,7 +45,8 @@ These options are available:
   --test            Test application/configuration and exit.
 EOF
 
-# Have fun!
+# "This is it.
+#  The moment we should've trained for."
 $toad->run($app, $config);
 
 __END__

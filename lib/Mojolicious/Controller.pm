@@ -343,8 +343,6 @@ sub render_exception {
     format           => 'html',
     handler          => undef,
     status           => 500,
-    layout           => undef,
-    extends          => undef,
     snapshot         => $snapshot,
     exception        => $e,
     'mojo.exception' => 1
@@ -358,6 +356,8 @@ sub render_exception {
     unless ($self->render($options)) {
 
       # Inline template
+      delete $options->{layout};
+      delete $options->{extends};
       delete $options->{template};
       $options->{inline} =
         $mode eq 'development' ? $DEVELOPMENT_EXCEPTION : $EXCEPTION;
@@ -410,8 +410,6 @@ sub render_not_found {
     template         => "not_found.$mode",
     format           => 'html',
     status           => 404,
-    layout           => undef,
-    extends          => undef,
     guide            => $guide,
     'mojo.not_found' => 1
   };
@@ -424,6 +422,8 @@ sub render_not_found {
     unless ($self->render($options)) {
 
       # Inline template
+      delete $options->{layout};
+      delete $options->{extends};
       delete $options->{template};
       $options->{inline} =
         $mode eq 'development' ? $DEVELOPMENT_NOT_FOUND : $NOT_FOUND;

@@ -239,7 +239,7 @@ equal to the route itself without non-word characters.
 
 Templates can have layouts.
 
-  # GET /with_layout
+  # /with_layout
   get '/with_layout' => sub {
     my $self = shift;
     $self->render('with_layout');
@@ -263,7 +263,7 @@ Templates can have layouts.
 Template blocks can be used like normal Perl functions and are always
 delimited by the C<begin> and C<end> keywords.
 
-  # GET /with_block
+  # /with_block
   get '/with_block' => 'block';
 
   __DATA__
@@ -286,7 +286,7 @@ delimited by the C<begin> and C<end> keywords.
 The C<content_for> helper can be used to pass around blocks of captured
 content.
 
-  # GET /captured
+  # /captured
   get '/captured' => sub {
     my $self = shift;
     $self->render('captured');
@@ -327,7 +327,7 @@ L<Mojolicious::Plugin::TagHelpers>.
     return "$agent ($ip)";
   };
 
-  # GET /secret
+  # /secret
   get '/secret' => sub {
     my $self = shift;
     my $user = $self->whois;
@@ -393,7 +393,7 @@ Routes can be restricted to specific request methods.
     shift->render(text => 'Bye!');
   };
 
-  # /baz
+  # * /baz
   any '/baz' => sub {
     my $self   = shift;
     my $method = $self->req->method;
@@ -530,7 +530,7 @@ true value.
     return;
   };
 
-  # GET / (with authentication)
+  # / (with authentication)
   get '/' => 'index';
 
   app->start;
@@ -549,10 +549,10 @@ Prefixing multiple routes is another good use for C<under>.
   # /foo
   under '/foo';
 
-  # GET /foo/bar
+  # /foo/bar
   get '/bar' => sub { shift->render(text => 'bar!') };
 
-  # GET /foo/baz
+  # /foo/baz
   get '/baz' => sub { shift->render(text => 'baz!') };
 
   app->start;

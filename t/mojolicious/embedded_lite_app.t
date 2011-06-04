@@ -34,6 +34,7 @@ use Mojolicious::Lite;
 
 use Mojo::IOLoop;
 
+# GET /yada (embedded)
 get '/yada' => sub {
   my $self = shift;
   my $name = $self->stash('name');
@@ -87,33 +88,33 @@ app->routes->namespace('MyTestApp');
 # GET /hello
 get '/hello' => 'works';
 
-# /bye/* (dispatch to embedded app)
+# GET /bye/* (dispatch to embedded app)
 get('/bye' => {name => 'second embedded'})->detour('MyTestApp::Test1');
 
-# /bar/* (dispatch to embedded app)
+# GET /bar/* (dispatch to embedded app)
 get('/bar' => {name => 'third embedded'})->detour(app => 'MyTestApp::Test1');
 
-# /baz/* (dispatch to embedded app)
+# GET /baz/* (dispatch to embedded app)
 get('/baz')->detour('test1#', name => 'fourth embedded');
 
-# /yada (dispatch to embedded app)
+# GET /yada (dispatch to embedded app)
 get('/yada')->to('test1#', name => 'fifth embedded');
 
-# /yada/yada/yada (dispatch to embedded app)
+# GET /yada/yada/yada (dispatch to embedded app)
 get('/yada/yada/yada')
   ->to('test1#', path => '/yada', name => 'sixth embedded');
 
-# /basic (dispatch to embedded app)
+# GET /basic (dispatch to embedded app)
 get('/basic')->detour(MyTestApp::Basic->new, test => 'lalala');
 
-# /third/* (dispatch to embedded app)
+# GET /third/* (dispatch to embedded app)
 get '/third/*path' =>
   {app => 'MyTestApp::Test2', name => 'third embedded', path => '/'};
 
-# /hello/* (dispatch to embedded app)
+# GET /hello/* (dispatch to embedded app)
 app->routes->route('/hello')->detour(TestApp::app())->to(name => 'embedded');
 
-# /just/* (external embedded app)
+# GET /just/* (external embedded app)
 get('/just' => {name => 'working'})->detour('EmbeddedTestApp');
 
 my $t = Test::Mojo->new;

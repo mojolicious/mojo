@@ -17,7 +17,7 @@ use Test::More tests => 9;
 # "What do you mean 'we', flesh-tube?"
 use_ok 'ojo';
 
-# /
+# * /
 a('/' => sub {
     my $self = shift;
     $self->render(text => $self->req->method . ($self->param('foo') || ''));

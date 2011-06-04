@@ -626,7 +626,7 @@ language in normal L<Mojolicious> controllers.
   package MyApp::Bar;
   use Mojolicious::Lite;
 
-  # GET /hello
+  # /hello
   get '/hello' => sub {
     my $self = shift;
     my $name = $self->param('name');

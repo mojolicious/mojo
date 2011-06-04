@@ -76,7 +76,7 @@ get '/' => 'root';
 # DELETE /
 del sub { shift->render(text => 'Hello!') };
 
-# /
+# * /
 any sub { shift->render(text => 'Bye!') };
 
 # POST /multipart/form
@@ -145,7 +145,7 @@ get '/with-format' => {format => 'html'} => 'with-format';
 # GET /without-format
 get '/without-format' => 'without-format';
 
-# /json_too
+# * /json_too
 any '/json_too' => {json => {hello => 'world'}};
 
 # GET /null/0

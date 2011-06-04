@@ -345,7 +345,6 @@ Route placeholders allow capturing parts of a request path until a C</> or
 C<.> separator occurs, results will be stored by name in the C<stash> and
 C<param>.
 
-  # /foo/* (everything except "/" and ".")
   # /foo/test
   # /foo/test123
   get '/foo/:bar' => sub {
@@ -354,7 +353,6 @@ C<param>.
     $self->render(text => "Our :bar placeholder matched $bar");
   };
 
-  # /*something/foo (everything except "/" and ".")
   # /test/foo
   # /test123/foo
   get '/(:bar)something/foo' => sub {
@@ -368,7 +366,6 @@ C<param>.
 Wildcard placeholders allow matching absolutely everything, including
 C</> and C<.>.
 
-  # /hello/* (everything)
   # /hello/test
   # /hello/test123
   # /hello/test.123/test/123
@@ -408,14 +405,17 @@ Routes can be restricted to specific request methods.
 All placeholders get compiled to a regex internally, with regex constraints
 this process can be easily customized.
 
-  # /* (digits)
+  # /1
+  # /123
   any '/:foo' => [foo => qr/\d+/] => sub {
     my $self = shift;
     my $foo  = $self->param('foo');
     $self->render(text => "Our :foo placeholder matched $foo");
   };
 
-  # /* (everything else)
+  # /test
+  # /test.123
+  # /test/1.2.3
   any '/:bar' => [bar => qr/.*/] => sub {
     my $self = shift;
     my $bar  = $self->param('bar');
@@ -430,7 +430,8 @@ C<(?:...)> is fine though.
 
 Routes allow default values to make placeholders optional.
 
-  # /hello/*
+  # /hello
+  # /hello/Sara
   get '/hello/:name' => {name => 'Sebastian'} => sub {
     my $self = shift;
     $self->render('groovy', format => 'txt');
@@ -445,7 +446,8 @@ Routes allow default values to make placeholders optional.
 
 All those features can be easily used together.
 
-  # /everything/*?name=*
+  # /everything?name=Sebastian
+  # /everything/123?name=Sebastian
   get '/everything/:stuff' => [stuff => qr/\d+/] => {stuff => 23} => sub {
     shift->render('welcome');
   };

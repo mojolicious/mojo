@@ -47,6 +47,9 @@ sub load {
   return;
 }
 
+# "Don't let Krusty's death get you down, boy.
+#  People die all the time, just like that.
+#  Why, you could wake up dead tomorrow! Well, good night."
 sub reload {
 
   # Cleanup script and "main" namespace
@@ -109,6 +112,8 @@ sub search {
   return $modules;
 }
 
+# "This is the worst thing you've ever done.
+#  You say that so often that it lost its meaning."
 sub _purge {
   for my $sub (@_) {
     warn "PURGE $sub\n" if DEBUG;

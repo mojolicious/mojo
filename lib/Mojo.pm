@@ -41,6 +41,7 @@ sub new {
   return $self;
 }
 
+# "D’oh."
 sub handler { croak 'Method "handler" not implemented in subclass' }
 
 1;

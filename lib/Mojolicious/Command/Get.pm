@@ -34,7 +34,9 @@ These options are available:
   --verbose    Print verbose debug information to STDERR.
 EOF
 
-# "I hope this has taught you kids a lesson: kids never learn."
+# "Objection.
+#  In the absence of pants, defense's suspenders serve no purpose.
+#  I'm going to allow them... for now."
 sub run {
   my $self = shift;
 

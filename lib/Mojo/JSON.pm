@@ -234,6 +234,8 @@ sub _decode_string {
   return $buffer;
 }
 
+# "Eternity with nerds.
+#  It's the Pasadena Star Trek convention all over again."
 sub _decode_value {
 
   # Leading whitespace

@@ -14,7 +14,7 @@ usage: $0 version
 
 EOF
 
-# "If at first you don't succeed, give up."
+# "It's so cold, my processor is running at peak efficiency!"
 sub run {
   my $self = shift;
 

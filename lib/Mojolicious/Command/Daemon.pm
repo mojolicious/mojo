@@ -28,8 +28,9 @@ These options are available:
   --websocket <seconds>   Set WebSocket timeout, defaults to 300.
 EOF
 
-# "This is the worst thing you've ever done.
-#  You say that so often that it lost its meaning."
+# "It's an albino humping worm!
+#  Why do they call it that?
+#  Cause it has no pigment."
 sub run {
   my $self   = shift;
   my $daemon = Mojo::Server::Daemon->new;

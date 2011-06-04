@@ -353,6 +353,7 @@ sub _reap {
   }
 }
 
+# "I hope this has taught you kids a lesson: kids never learn."
 sub _spawn {
   my $self = shift;
 

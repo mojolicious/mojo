@@ -10,7 +10,7 @@ has usage => <<"EOF";
 usage: $0 fastcgi
 EOF
 
-# "Oh boy! Sleep! That's when I'm a Viking!"
+# "Interesting... Oh no wait, the other thing, tedious."
 sub run {
   my $self    = shift;
   my $fastcgi = Mojo::Server::FastCGI->new;

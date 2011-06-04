@@ -133,6 +133,10 @@ sub element_exists_not {
   return $self;
 }
 
+# "Okay folks, show's over. Nothing to see here, show's... Oh my god!
+#  A horrible plane crash!
+#  Hey everybody, get a load of this flaming wreckage!
+#  Come on, crowd around, crowd around!"
 sub get_ok  { shift->_request_ok('get',  @_) }
 sub head_ok { shift->_request_ok('head', @_) }
 

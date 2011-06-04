@@ -18,8 +18,7 @@ These options are available:
                        templates.
 EOF
 
-# "Eternity with nerds.
-#  It's the Pasadena Star Trek convention all over again."
+# "Come on stem cells! Work your astounding scientific nonsense!"
 sub run {
   my $self = shift;
 

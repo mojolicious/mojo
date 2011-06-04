@@ -9,6 +9,7 @@ use Mojo::Exception;
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 131072;
 
+# "If for any reason you're not completely satisfied, I hate you."
 has [qw/auto_escape compiled/];
 has [qw/append code prepend/] => '';
 has capture_end     => 'end';

@@ -10,7 +10,8 @@ has usage => <<"EOF";
 usage: $0 psgi
 EOF
 
-# "D’oh."
+# "In the end it was not guns or bombs that defeated the aliens,
+#  but that humblest of all God's creatures... the Tyrannosaurus Rex."
 sub run {
   my $self = shift;
   my $psgi = Mojo::Server::PSGI->new;

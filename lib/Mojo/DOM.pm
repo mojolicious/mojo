@@ -245,6 +245,7 @@ sub charset {
   return $self;
 }
 
+# "Oh boy! Sleep! That's when I'm a Viking!"
 sub children {
   my ($self, $type) = @_;
 
@@ -336,6 +337,7 @@ sub namespace {
   }
 }
 
+# "Why can't she just drink herself happy like a normal person?"
 sub parent {
   my $self = shift;
 
@@ -1340,6 +1342,7 @@ sub _trim {
   return $text;
 }
 
+# "Hi, Super Nintendo Chalmers!"
 package Mojo::DOM::_Collection;
 use overload 'bool' => sub {1}, '""' => sub { shift->to_xml }, fallback => 1;
 

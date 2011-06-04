@@ -19,6 +19,7 @@ EOF
 
 use Getopt::Long 'GetOptions';
 
+# "Hey sexy mama, wanna kill all humans?"
 my $toad   = Mojo::Server::Hypnotoad->new;
 my $config = 'hypnotoad.conf';
 my $help;

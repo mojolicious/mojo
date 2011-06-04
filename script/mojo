@@ -17,7 +17,7 @@ Please visit http://mojolicio.us for detailed installation instructions.
 
 EOF
 
-# Start the command system
+# "My eyes! The goggles do nothing!"
 Mojolicious::Commands->start;
 
 __END__

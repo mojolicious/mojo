@@ -8,7 +8,7 @@ has usage => <<"EOF";
 usage: $0 generate app [NAME]
 EOF
 
-# "Why can't she just drink herself happy like a normal person?"
+# "I say, you've damaged our servants quarters... and our servants."
 sub run {
   my ($self, $class) = @_;
   $class ||= 'MyMojoliciousApp';

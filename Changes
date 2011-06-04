@@ -5,8 +5,8 @@ This file documents the revision history for Perl extension Mojolicious.
           Mojolicious::Routes::Pattern.
         - Improved layout tests.
         - Improved documentation.
-        - Fixed a bug that prevented Mojo::Base subclasses to use the -base
-          flag.
+        - Fixed a bug that prevented Mojo::Base subclasses from using the
+          "-base" flag.
 
 1.41    2011-06-03 00:00:00
         - Fixed param list bug in Mojolicious::Controller.

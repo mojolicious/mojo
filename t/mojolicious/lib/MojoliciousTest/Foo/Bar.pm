@@ -1,5 +1,5 @@
 package MojoliciousTest::Foo::Bar;
-use Mojo::Base 'Mojolicious::Controller';
+use Mojolicious::Controller -base;
 
 # "Poor Bender. Without his brain he's become all quiet and helpful."
 sub index {1}

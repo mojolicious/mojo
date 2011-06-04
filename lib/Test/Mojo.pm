@@ -133,10 +133,6 @@ sub element_exists_not {
   return $self;
 }
 
-# "Okay folks, show's over. Nothing to see here, show's... Oh my god!
-#  A horrible plane crash!
-#  Hey everybody, get a load of this flaming wreckage!
-#  Come on, crowd around, crowd around!"
 sub get_ok  { shift->_request_ok('get',  @_) }
 sub head_ok { shift->_request_ok('head', @_) }
 
@@ -198,7 +194,6 @@ sub json_content_is {
 # "God bless those pagans."
 sub post_ok { shift->_request_ok('post', @_) }
 
-# "Hey, I asked for ketchup! I'm eatin' salad here!"
 sub post_form_ok {
   my $self = shift;
   my $url  = $_[0];

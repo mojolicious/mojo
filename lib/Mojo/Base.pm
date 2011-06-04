@@ -25,7 +25,7 @@ sub import {
   no warnings 'redefine';
 
   # Base
-  if ($flag eq '-base') { $flag = 'Mojo::Base' }
+  if ($flag eq '-base') { $flag = $class }
 
   # Module
   else {

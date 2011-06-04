@@ -1,15 +1,12 @@
 #!/usr/bin/env perl
 
-package BaseTest::Base1;
-use Mojo::Base -base;
+use strict;
+use warnings;
 
-has 'bananas';
+use Test::More tests => 411;
 
-package BaseTest::Base2;
-use Mojo::Base 'BaseTest::Base1';
-
-has [qw/ears eyes/] => sub {2};
-has coconuts => 0;
+use FindBin;
+use lib "$FindBin::Bin/lib";
 
 package BaseTest;
 
@@ -27,14 +24,10 @@ __PACKAGE__->attr('name');
 
 package main;
 
-use strict;
-use warnings;
-
-use Test::More tests => 405;
-
-# "I've done everything the Bible says,
-#  even the stuff that contradicts the other stuff!"
 use_ok 'Mojo::Base';
+use_ok 'BaseTest::Base1';
+use_ok 'BaseTest::Base2';
+use_ok 'BaseTest::Base3';
 
 # Basic functionality
 my $monkeys = [];
@@ -82,5 +75,12 @@ for my $i (151 .. 200) {
   is $monkeys->[$i]->eyes, 2, 'right attribute value';
   is $monkeys->[$i]->eyes(6)->eyes, 6, 'right chained attribute value';
 }
+
+# Inherit -base flag
+$monkey = BaseTest::Base3->new(evil => 1);
+is $monkey->evil,    1,     'monkey is evil';
+is $monkey->bananas, undef, 'monkey has no bananas';
+$monkey->bananas(3);
+is $monkey->bananas, 3, 'monkey has 3 bananas';
 
 1;

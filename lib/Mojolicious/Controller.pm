@@ -165,8 +165,7 @@ sub on_message {
     unless $tx->is_websocket;
   my $cb = shift;
   $tx->on_message(sub { shift and $self->$cb(@_) });
-  $tx->res->code(101);
-  $self->rendered;
+  $self->rendered(101);
 
   return $self;
 }
@@ -205,16 +204,10 @@ sub param {
 sub redirect_to {
   my $self = shift;
 
-  # Code
-  my $res = $self->res;
-  $res->code(302);
-
-  # Headers
-  my $headers = $res->headers;
+  my $headers = $self->res->headers;
   $headers->location($self->url_for(@_)->to_abs);
   $headers->content_length(0);
-
-  $self->rendered;
+  $self->rendered(302);
 
   return $self;
 }
@@ -272,12 +265,10 @@ sub render {
 
   # Prepare response
   my $res = $self->res;
-  if    ($stash->{status}) { $res->code($stash->{status}) }
-  elsif (!$res->code)      { $res->code(200) }
   $res->body($output) unless $res->body;
   my $headers = $res->headers;
   $headers->content_type($type) unless $headers->content_type;
-  $self->rendered;
+  $self->rendered($stash->{status});
 
   # Success
   return 1;
@@ -461,17 +452,18 @@ sub render_text { shift->render(text => shift, @_) }
 #  as if Futurama had never been canceled by idiots,
 #  then brought back by bigger idiots. One. Two."
 sub rendered {
-  my $self = shift;
+  my ($self, $status) = @_;
 
   # Disable auto rendering
   $self->render_later;
 
-  # Already finished
+  # Make sure we have a status
+  my $res = $self->res;
+  $res->code($status) if $status;
+
+  # Finish transaction
   my $stash = $self->stash;
   unless ($stash->{'mojo.finished'}) {
-
-    # Finalize transaction
-    my $res = $self->res;
     $res->code(200) unless $res->code;
     my $app = $self->app;
     $app->sessions->store($self);
@@ -493,8 +485,7 @@ sub send_message {
   Carp::croak('No WebSocket connection to send message to')
     unless $tx->is_websocket;
   $tx->send_message($message, sub { shift and $self->$cb(@_) if $cb });
-  $tx->res->code(101);
-  $self->rendered;
+  $self->rendered(101);
 
   return $self;
 }
@@ -898,6 +889,7 @@ C<text/html;charset=UTF-8> by default.
 =head2 C<rendered>
 
   $c->rendered;
+  $c->rendered(302);
 
 Finalize response and run C<after_dispatch> plugin hook.
 

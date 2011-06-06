@@ -3,6 +3,8 @@ This file documents the revision history for Perl extension Mojolicious.
 1.42    2011-06-03 00:00:00
         - Added EXPERIMENTAL support for unquoted wildcard placeholders in
           Mojolicious::Routes::Pattern.
+        - Added EXPERIMENTAL status code support to rendred method in
+          Mojolicious::Controller.
         - Improved layout tests.
         - Improved documentation.
         - Fixed a bug that prevented Mojo::Base subclasses from using the

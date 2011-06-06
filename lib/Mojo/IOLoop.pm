@@ -1321,7 +1321,7 @@ sub _timer {
   for my $id (keys %$ts) {
     my $t = $ts->{$id};
     my $after = $t->{after} || 0;
-    if ($after <= time - ($t->{started} || $t->{recurring})) {
+    if ($after <= time - ($t->{started} || $t->{recurring} || 0)) {
       warn "TIMER $id\n" if DEBUG;
 
       # Normal timer

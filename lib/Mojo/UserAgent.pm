@@ -911,7 +911,7 @@ Mojo::UserAgent - Async IO HTTP 1.1 And WebSocket User Agent
   print $ua->max_redirects(3)->get($latest)->res->body;
 
   # Quick JSON request
-  my $trends = 'http://search.twitter.com/trends.json';
+  my $trends = 'https://api.twitter.com/1/trends.json';
   print $ua->get($trends)->res->json->{trends}->[0]->{name};
 
   # Extract data from HTML and XML resources

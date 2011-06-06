@@ -10,7 +10,7 @@ BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 my $backup;
 BEGIN { $backup = $ENV{MOJO_MODE} || ''; $ENV{MOJO_MODE} = 'development' }
 
-use Test::More tests => 22;
+use Test::More tests => 28;
 
 # "This calls for a party, baby.
 #  I'm ordering 100 kegs, 100 hookers and 100 Elvis impersonators that aren't
@@ -59,6 +59,14 @@ get '/trapped/too' => sub {
 };
 
 my $t = Test::Mojo->new;
+
+# GET /does_not_exist ("not_found.development.html.ep" route suggestion)
+$t->get_ok('/does_not_exist')->status_is(404)
+  ->content_like(qr/get '\/does_not_exist'/);
+
+# POST /does_not_exist ("not_found.development.html.ep" route suggestion)
+$t->post_ok('/does_not_exist')->status_is(404)
+  ->content_like(qr/any '\/does_not_exist'/);
 
 # GET /dead_template
 $t->get_ok('/dead_template')->status_is(500)->content_like(qr/1\./)

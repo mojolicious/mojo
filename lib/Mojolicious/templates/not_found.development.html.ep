@@ -82,8 +82,9 @@
       %= image '/mojolicious-arrow.png', alt => 'Arrow'
       <h1>Perhaps you would like to add a route for it?</h1>
       <div id="preview">
+	    % my $m = lc $self->req->method eq 'get' ? 'get' : 'any';
         <pre class="prettyprint">
-get '<%= $self->req->url->path->to_abs_string %>' => sub {
+<%= $m %> '<%= $self->req->url->path->to_abs_string %>' => sub {
     my $self = shift;
     $self->render_text('Hello world!');
 };</pre>

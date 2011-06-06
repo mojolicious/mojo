@@ -104,7 +104,7 @@ sub cookies {
   return $cookies;
 }
 
-sub default_message { $MESSAGES{$_[1] || $_[0]->code || 200} || '' }
+sub default_message { $MESSAGES{$_[1] || $_[0]->code || 404} || '' }
 
 sub fix_headers {
   my $self = shift;
@@ -134,7 +134,7 @@ sub _build_start_line {
   return '' if $version eq '0.9';
 
   # HTTP 1.0 and above
-  my $code    = $self->code    || 200;
+  my $code    = $self->code    || 404;
   my $message = $self->message || $self->default_message;
   return "HTTP/$version $code $message\x0d\x0a";
 }

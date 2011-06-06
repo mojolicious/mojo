@@ -872,9 +872,9 @@ is $req->body, "hello world!hello world2!\n\n", 'right content';
 
 # Status code and message
 my $res = Mojo::Message::Response->new;
-is $res->code,            undef, 'no status';
-is $res->default_message, 'OK',  'right default message';
-is $res->message,         undef, 'no message';
+is $res->code,            undef,       'no status';
+is $res->default_message, 'Not Found', 'right default message';
+is $res->message,         undef,       'no message';
 $res->message('Test');
 is $res->message, 'Test', 'right message';
 $res->code(500);

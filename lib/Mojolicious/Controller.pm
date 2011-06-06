@@ -471,6 +471,8 @@ sub rendered {
   unless ($stash->{'mojo.finished'}) {
 
     # Finalize transaction
+    my $res = $self->res;
+    $res->code(200) unless $res->code;
     my $app = $self->app;
     $app->sessions->store($self);
     $app->plugins->run_hook_reverse(after_dispatch => $self);

@@ -7,6 +7,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved documentation.
         - Fixed a bug that prevented Mojo::Base subclasses from using the
           "-base" flag.
+        - Fixed a few small default status code bugs.
 
 1.41    2011-06-03 00:00:00
         - Fixed param list bug in Mojolicious::Controller.

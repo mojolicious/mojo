@@ -136,7 +136,7 @@ optimized for rapid prototyping.
 =head2 Differences
 
 You likely know the feeling, you've got a really cool idea and want to try it
-as quickly as possible, thats exactly why L<Mojolicious::Lite> applications
+as quickly as possible, that's exactly why L<Mojolicious::Lite> applications
 don't need more than a single file.
 
   myapp.pl   # Templates and even static files can be inlined

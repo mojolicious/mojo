@@ -133,7 +133,7 @@ Most commonly used features every L<Mojolicious> developer should know about.
 =head2 Automatic Rendering
 
 The renderer can be manually started by calling the C<render> controller
-method, but thats usually not necessary, because it will get automatically
+method, but that's usually not necessary, because it will get automatically
 called if nothing has been rendered after the routes dispatcher finished its
 work.
 This also means you can have routes pointing only to templates without actual
@@ -281,7 +281,7 @@ L<Mojolicious::Plugin::TagHelpers> contain all of them.
 =head2 Layouts
 
 Most of the time when using C<ep> templates you will want to wrap your
-generated content in a HTML skeleton, thanks to layouts thats absolutely
+generated content in a HTML skeleton, thanks to layouts that's absolutely
 trivial.
 
   @@ foo/bar.html.ep
@@ -347,7 +347,7 @@ Of course you can also pass stash values.
 
 =head2 Reusable Template Blocks
 
-It's never fun to repeat yourself, thats why you can build reusable template
+It's never fun to repeat yourself, that's why you can build reusable template
 blocks in C<ep> that work very similar normal Perl functions.
 
   <% my $block = begin %>
@@ -475,7 +475,7 @@ Less commonly used and more powerful features.
 =head2 Chunked Transfer Encoding
 
 For very dynamic content you might not know the response C<Content-Length>
-in advance, thats where the C<chunked> C<Transfer-Encoding> comes in handy.
+in advance, that's where the C<chunked> C<Transfer-Encoding> comes in handy.
 A common use would be to send the C<head> section of an HTML document to the
 browser in advance and speed up preloading of referenced images and
 stylesheets.

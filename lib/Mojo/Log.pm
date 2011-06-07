@@ -142,7 +142,7 @@ following new ones.
 
 =head2 C<debug>
 
-  $log = $log->debug('You screwed up, but thats ok');
+  $log = $log->debug('You screwed up, but that is ok');
 
 Log debug message.
 

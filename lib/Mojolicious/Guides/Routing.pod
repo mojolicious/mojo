@@ -33,7 +33,7 @@ to some kind of response generator.
 
 While it is very well possible to make all these connections static, it is
 also rather inefficient.
-Thats why regular expressions are commonly used to make the dispatch process
+That's why regular expressions are commonly used to make the dispatch process
 more dynamic.
 
   qr|/user/show/(\d+)| -> $self->render(text => $users{$1});

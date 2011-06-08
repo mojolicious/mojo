@@ -338,6 +338,22 @@ Fresh code based upon years of experience developing L<Catalyst>.
 
 =back
 
+=head2 Getting Started
+
+These three lines are a whole web application.
+
+  use Mojolicious::Lite;
+
+  get '/' => sub { shift->render_text('Hello World!') };
+
+  app->start;
+
+To run this example with the built-in development server just put the code
+into a file and execute it with C<perl>.
+
+  % perl hello.pl daemon
+  Server available at http://127.0.0.1:3000.
+
 =head2 Duct Tape For The HTML5 Web
 
 Web development for humans, making hard things possible and everything fun.
@@ -345,7 +361,7 @@ Web development for humans, making hard things possible and everything fun.
   use Mojolicious::Lite;
 
   # Simple route with plain text response
-  get '/hello' => sub { shift->render_text('Hello World!') };
+  get '/' => sub { shift->render_text('Hello World!') };
 
   # Route to template in DATA section
   get '/time' => 'clock';
@@ -383,12 +399,6 @@ Web development for humans, making hard things possible and everything fun.
     The time is <%= $hour %>:<%= $minute %>:<%= $second %>.
   <% end %>
 
-To run this example with the built-in development server just put the code
-into a file and execute it with C<perl>.
-
-  % perl example.pl daemon
-  Server available at http://127.0.0.1:3000.
-
 =head2 Growing
 
 Single file prototypes like the one above can easily grow into well
@@ -406,7 +416,7 @@ structured applications.
     my $example = $r->route('/example')->to('example#');
 
     # GET routes connecting the controller prefix with actions
-    $example->get('/hello')->to('#hello');
+    $example->get('/')->to('#hello');
     $example->get('/time')->to('#clock');
     $example->get('/:offset')->to('#restful');
 

@@ -479,7 +479,7 @@ especially when working in a team.
     $example->post('/title')->to('#title');
 
     # ... and much, much more
-    # including multiple, auto-discovered controllers
+    # (including multiple, auto-discovered controllers)
     $r->websocket('/echo')->to('realtime#echo');
   }
 

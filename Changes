@@ -6,7 +6,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL status code support to rendred method in
           Mojolicious::Controller.
         - Improved layout tests.
-        - Improved documentation.
+        - Improved documentation. (chromatic, sri)
         - Fixed a bug that prevented Mojo::Base subclasses from using the
           "-base" flag.
         - Fixed a few small default status code bugs.

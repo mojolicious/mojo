@@ -283,12 +283,11 @@ Mojolicious - The Web In A Box!
 
 =head1 DESCRIPTION
 
-Back in the early days of the web there was this wonderful Perl library
-called L<CGI>, many people only learned Perl because of it.
+Back in the early days of the web, many people learned Perl because of a
+wonderful Perl library called L<CGI>.
 It was simple enough to get started without knowing much about the language
 and powerful enough to keep you going, learning by doing was much fun.
-While most of the techniques used are outdated now, the idea behind it is
-not.
+While most of the techniques used are outdated now, the idea behind it is not.
 L<Mojolicious> is a new attempt at implementing this idea using state of the
 art technology.
 
@@ -326,7 +325,7 @@ hot deployment, perfect for embedding.
 
 =item *
 
-Automatic CGI, FastCGI and L<PSGI> detection.
+Automatic CGI, FastCGI, and L<PSGI> detection.
 
 =item *
 
@@ -337,6 +336,12 @@ JSON and XML/HTML5 parser with CSS3 selector support.
 Fresh code based upon years of experience developing L<Catalyst>.
 
 =back
+
+=head2 Installation
+
+All you need is a oneliner.
+
+  sudo sh -c "curl -L cpanmin.us | perl - Mojolicious"
 
 =head2 Getting Started
 
@@ -363,10 +368,10 @@ Web development for humans, making hard things possible and everything fun.
 
   use Mojolicious::Lite;
 
-  # Simple route with plain text response
+  # Simple plain text response
   get '/' => sub { shift->render_text('Hello World!') };
 
-  # Route to template in DATA section
+  # Route associating the "/time" URL to template in DATA section
   get '/time' => 'clock';
 
   # RESTful web service sending JSON responses
@@ -376,7 +381,7 @@ Web development for humans, making hard things possible and everything fun.
     $self->render_json({list => [0 .. $offset]});
   };
 
-  # Scrape information from remote sites
+  # Scrape and return information from remote sites
   post '/title' => sub {
     my $self = shift;
     my $url  = $self->param('url') || 'http://mojolicio.us';
@@ -404,36 +409,8 @@ Web development for humans, making hard things possible and everything fun.
 
 =head2 Growing
 
-Single file prototypes like the one above can easily grow into well
-structured applications.
-
-  package MyApp;
-  use Mojo::Base 'Mojolicious';
-
-  # Runs once on application startup
-  sub startup {
-    my $self = shift;
-    my $r    = $self->routes;
-
-    # Route prefix for "MyApp::Example" controller
-    my $example = $r->route('/example')->to('example#');
-
-    # GET routes connecting the controller prefix with actions
-    $example->get('/')->to('#hello');
-    $example->get('/time')->to('#clock');
-    $example->get('/:offset')->to('#restful');
-
-    # All common verbs are supported
-    $example->post('/title')->to('#title');
-
-    # And much more
-    $r->websocket('/echo')->to('realtime#echo');
-  }
-
-  1;
-
-Bigger applications are a lot easier to maintain once routing information has
-been separated from action code, especially when working in teams.
+Single file prototypes can easily grow into well-structured applications.
+A controller collects several actions together.
 
   package MyApp::Example;
   use Mojo::Base 'Mojolicious::Controller';
@@ -478,13 +455,46 @@ you like.
 
   1;
 
-Action code and templates can stay almost exactly the same, everything was
-designed from the ground up for this very unique and fun workflow.
+Larger applications benefit from the separation of actions and routes,
+especially when working in a team.
+
+  package MyApp;
+  use Mojo::Base 'Mojolicious';
+
+  # Runs once on application startup
+  sub startup {
+    my $self = shift;
+    my $r    = $self->routes;
+
+    # Create a route at "/example" for the "MyApp::Example" controller
+    my $example = $r->route('/example')->to('example#');
+
+    # Connect these HTTP GET requests to routes in the controller
+    # (paths are relative to the controller)
+    $example->get('/')->to('#hello');
+    $example->get('/time')->to('#clock');
+    $example->get('/:offset')->to('#restful');
+
+    # All common HTTP verbs are supported
+    $example->post('/title')->to('#title');
+
+    # ... and much, much more
+    # including multiple, auto-discovered controllers
+    $r->websocket('/echo')->to('realtime#echo');
+  }
+
+  1;
+
+Through all of these changes, your action code and templates can stay almost
+exactly the same.
 
   % my ($second, $minute, $hour) = (localtime(time))[0, 1, 2];
   <%= link_to clock => begin %>
     The time is <%= $hour %>:<%= $minute %>:<%= $second %>.
   <% end %>
+
+Mojolicious has been designed from the ground up for a fun and unique
+workflow.
 
 =head2 Have Some Cake
 
@@ -984,6 +994,8 @@ Charlie Brady
 Chas. J. Owens IV
 
 Christian Hansen
+
+Chromatic
 
 Curt Tilmes
 

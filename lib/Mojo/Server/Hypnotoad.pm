@@ -532,7 +532,7 @@ C<Hypnotoad> configuration files are normal Perl scripts returning a hash.
   # hypnotoad.conf
   {listen => ['http://*:3000', 'http://*:4000'], workers => 10};
 
-The following parameters are currently available.
+The following parameters are currently available:
 
 =head2 C<accepts>
 

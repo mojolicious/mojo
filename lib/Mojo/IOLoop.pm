@@ -1652,7 +1652,7 @@ Open a TCP connection to a remote host.
 Note that TLS support depends on L<IO::Socket::SSL> and IPv6 support on
 L<IO::Socket::IP>.
 
-These options are currently available.
+These options are currently available:
 
 =over 2
 
@@ -1778,7 +1778,7 @@ Create a new listen socket.
 Note that TLS support depends on L<IO::Socket::SSL> and IPv6 support on
 L<IO::Socket::IP>.
 
-These options are currently available.
+These options are currently available:
 
 =over 2
 

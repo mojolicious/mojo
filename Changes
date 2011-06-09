@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+1.43    2011-06-09 00:00:00
+        - Fixed typos.
+
 1.42    2011-06-09 00:00:00
         - Added EXPERIMENTAL support for unquoted wildcard placeholders in
           Mojolicious::Routes::Pattern.

@@ -1769,7 +1769,7 @@ is $res2->cookie('baz')->value, 'yada',     'right value';
 is $res2->cookie('bar')->path,  '/test/23', 'right path';
 is $res2->cookie('bar')->value, 'baz',      'right value';
 
-# Build response with callback (make sure its called)
+# Build response with callback (make sure it's called)
 $res = Mojo::Message::Response->new;
 $res->code(200);
 $res->headers->content_length(10);

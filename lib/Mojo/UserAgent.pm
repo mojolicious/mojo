@@ -721,7 +721,7 @@ sub _redirect {
   return 1;
 }
 
-# "It's greeat! We can do *anything* now that Science has invented Magic."
+# "It's great! We can do *anything* now that Science has invented Magic."
 sub _start_tx {
   my ($self, $tx, $cb) = @_;
 

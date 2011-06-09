@@ -179,6 +179,19 @@ requests.
 
 =head2 Embedding
 
+From time to time you might want to reuse parts of L<Mojolicious>
+applications like configuration files, database connection or helpers for
+other scripts, with this little mock server you can just embed them.
+
+  use Mojo::Server;
+
+  # Load application with mock server
+  my $server = Mojo::Server->new;
+  my $app = $server->load_app('./myapp.pl');
+
+  # Access fully initialized application
+  print $app->static->root;
+
 You can also use the builtin web server to embed L<Mojolicious> applications
 into alien environments like foreign event loops.
 

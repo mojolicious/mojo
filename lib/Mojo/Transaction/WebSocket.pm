@@ -48,6 +48,7 @@ sub client_handshake {
   $headers->connection('Upgrade') unless $headers->connection;
   $headers->sec_websocket_protocol('mojo')
     unless $headers->sec_websocket_protocol;
+  $headers->sec_websocket_version(8) unless $headers->sec_websocket_version;
 
   # Generate challenge
   my $key = pack 'N*', int(rand 9999999);

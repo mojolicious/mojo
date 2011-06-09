@@ -5,6 +5,7 @@ This file documents the revision history for Perl extension Mojolicious.
           Mojolicious::Routes::Pattern.
         - Added EXPERIMENTAL status code support to rendred method in
           Mojolicious::Controller.
+        - Updated WebSocket implementation to ietf-08.
         - Improved layout tests.
         - Improved documentation. (chromatic, sri)
         - Fixed a bug that prevented Mojo::Base subclasses from using the

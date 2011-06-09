@@ -66,6 +66,7 @@ my @WEBSOCKET_HEADERS = qw/
   Sec-WebSocket-Key
   Sec-WebSocket-Origin
   Sec-WebSocket-Protocol
+  Sec-WebSocket-Version
   /;
 my @MISC_HEADERS = qw/DNT/;
 my @HEADERS      = (
@@ -246,6 +247,24 @@ sub remove {
   return $self;
 }
 
+sub sec_websocket_accept {
+  scalar shift->header('Sec-WebSocket-Accept' => @_);
+}
+
+sub sec_websocket_key { scalar shift->header('Sec-WebSocket-Key' => @_) }
+
+sub sec_websocket_origin {
+  scalar shift->header('Sec-WebSocket-Origin' => @_);
+}
+
+sub sec_websocket_protocol {
+  scalar shift->header('Sec-WebSocket-Protocol' => @_);
+}
+
+sub sec_websocket_version {
+  scalar shift->header('Sec-WebSocket-Version' => @_);
+}
+
 sub server      { scalar shift->header(Server        => @_) }
 sub set_cookie  { scalar shift->header('Set-Cookie'  => @_) }
 sub set_cookie2 { scalar shift->header('Set-Cookie2' => @_) }
@@ -298,21 +317,7 @@ sub trailer           { scalar shift->header(Trailer             => @_) }
 sub transfer_encoding { scalar shift->header('Transfer-Encoding' => @_) }
 sub upgrade           { scalar shift->header(Upgrade             => @_) }
 sub user_agent        { scalar shift->header('User-Agent'        => @_) }
-
-sub sec_websocket_accept {
-  scalar shift->header('Sec-WebSocket-Accept' => @_);
-}
-
-sub sec_websocket_key { scalar shift->header('Sec-WebSocket-Key' => @_) }
-
-sub sec_websocket_origin {
-  scalar shift->header('Sec-WebSocket-Origin' => @_);
-}
-
-sub sec_websocket_protocol {
-  scalar shift->header('Sec-WebSocket-Protocol' => @_);
-}
-sub www_authenticate { scalar shift->header('WWW-Authenticate' => @_) }
+sub www_authenticate  { scalar shift->header('WWW-Authenticate'  => @_) }
 
 1;
 __END__
@@ -595,6 +600,13 @@ Shortcut for the C<Sec-WebSocket-Origin> header.
   $headers     = $headers->sec_websocket_protocol('sample');
 
 Shortcut for the C<Sec-WebSocket-Protocol> header.
+
+=head2 C<sec_websocket_version>
+
+  my $version = $headers->sec_websocket_version;
+  $headers    = $headers->sec_websocket_version(8);
+
+Shortcut for the C<Sec-WebSocket-Version> header.
 
 =head2 C<server>
 

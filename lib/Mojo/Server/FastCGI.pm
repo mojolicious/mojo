@@ -293,11 +293,9 @@ sub write_response {
   my ($self, $tx) = @_;
   $self->app->log->debug('Writing FastCGI response.') if DEBUG;
 
-  my $c   = $tx->connection;
-  my $res = $tx->res;
-
   # Status
-  my $code    = $res->code    || 404;
+  my $res     = $tx->res;
+  my $code    = $res->code || 404;
   my $message = $res->message || $res->default_message;
   $res->headers->status("$code $message") unless $res->headers->status;
 
@@ -305,6 +303,7 @@ sub write_response {
   $res->fix_headers;
 
   # Headers
+  my $c      = $tx->connection;
   my $offset = 0;
   while (1) {
     my $chunk = $res->get_header_chunk($offset);

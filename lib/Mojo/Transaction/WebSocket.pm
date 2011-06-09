@@ -100,15 +100,13 @@ sub send_message {
 sub server_handshake {
   my $self = shift;
 
-  my $req         = $self->req;
-  my $res         = $self->res;
-  my $req_headers = $req->headers;
-  my $res_headers = $res->headers;
-
   # Handshake
+  my $res         = $self->res;
+  my $res_headers = $res->headers;
   $res->code(101);
   $res_headers->upgrade('websocket');
   $res_headers->connection('Upgrade');
+  my $req_headers = $self->req->headers;
   my $protocol = $req_headers->sec_websocket_protocol || '';
   $protocol =~ /^\s*([^\,]+)/;
   $res_headers->sec_websocket_protocol($1) if $1;
@@ -191,7 +189,6 @@ sub server_write {
 
 sub _build_frame {
   my ($self, $op, $payload) = @_;
-
   warn "BUILDING FRAME\n" if DEBUG;
 
   # Head
@@ -262,7 +259,6 @@ sub _challenge {
 
 sub _parse_frame {
   my $self = shift;
-
   warn "PARSING FRAME\n" if DEBUG;
 
   # Head
@@ -326,7 +322,6 @@ sub _parse_frame {
     warn "UNMASKING PAYLOAD\n" if DEBUG;
     $payload = _xor_mask($payload, substr($payload, 0, 4, ''));
   }
-
   warn "PAYLOAD: $payload\n" if DEBUG;
   $self->{_read} = $buffer;
 

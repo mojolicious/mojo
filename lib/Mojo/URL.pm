@@ -164,7 +164,6 @@ sub parse {
   # Official regex
   my ($scheme, $authority, $path, $query, $fragment) = $url
     =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
-
   $self->scheme($scheme);
   $self->authority($authority);
   $self->path->parse($path);
@@ -300,12 +299,10 @@ sub to_rel {
   $rel->scheme('');
   $rel->authority('');
 
+  # Characters after the right-most '/' need to go
   $rel->base($base->clone);
   my $splice = @{$base->path->parts};
-
-  # Characters after the right-most '/' need to go
   $splice -= 1 unless $base->path->trailing_slash;
-
   my $path = $rel->path->clone;
   splice @{$path->parts}, 0, $splice if $splice;
   $rel->path($path);
@@ -320,25 +317,24 @@ sub to_rel {
 sub to_string {
   my $self = shift;
 
+  # Scheme and authority
+  my $url       = '';
   my $scheme    = $self->scheme;
   my $authority = $self->authority;
-  my $path      = $self->path;
-  my $query     = $self->query;
-  my $url       = '';
-
-  # Scheme and authority
   if ($scheme && $authority) {
     $url .= lc "$scheme://";
     $url .= "$authority";
   }
 
   # Path
+  my $path  = $self->path;
   my $slash = $path->leading_slash;
   $path->leading_slash(0) if !$scheme && @{$self->base->path->parts};
   $url .= $path;
   $path->leading_slash($slash);
 
   # Query
+  my $query = $self->query;
   $url .= "?$query" if @{$query->params};
 
   # Fragment

@@ -28,6 +28,7 @@ sub append {
 
     push @{$self->parts}, $value;
   }
+
   return $self;
 }
 

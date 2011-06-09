@@ -183,15 +183,12 @@ sub names {
 sub parse {
   my ($self, $chunk) = @_;
 
+  # Parse headers with size limit
+  $self->{_state} = 'headers';
   $self->{_buffer} = '' unless defined $self->{_buffer};
   $self->{_buffer} .= $chunk if defined $chunk;
-
-  # Maximum line size
-  my $max = $self->max_line_size;
-
-  # Parse headers
   my $headers = $self->{_cache} || [];
-  $self->{_state} = 'headers';
+  my $max = $self->max_line_size;
   while (defined(my $line = get_line $self->{_buffer})) {
 
     # Check line size

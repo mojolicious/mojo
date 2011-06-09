@@ -45,8 +45,9 @@ sub expires {
 #  Then why did I have the bowl Bart? Why did I have the bowl?"
 sub parse {
   my ($self, $string) = @_;
-  my @cookies;
 
+  # Walk tree
+  my @cookies;
   for my $knot ($self->_tokenize($string)) {
     for my $i (0 .. $#{$knot}) {
       my ($name, $value) = @{$knot->[$i]};

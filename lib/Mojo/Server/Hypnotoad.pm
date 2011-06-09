@@ -131,10 +131,9 @@ sub run {
 sub _config {
   my $self = shift;
 
+  # Load config file
   my $file = $ENV{HYPNOTOAD_CONFIG};
   warn "CONFIG $file\n" if DEBUG;
-
-  # Load config file
   my $c = {};
   if (-r $file) {
     unless ($c = do $file) {
@@ -193,9 +192,8 @@ sub _heartbeat {
 sub _manage {
   my $self = shift;
 
-  my $c = $self->{_config};
-
   # Housekeeping
+  my $c = $self->{_config};
   if (!$self->{_done}) {
 
     # Spawn more workers

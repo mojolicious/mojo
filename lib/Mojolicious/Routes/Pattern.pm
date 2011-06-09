@@ -55,6 +55,7 @@ sub render {
   $values ||= {};
   $values = {%{$self->defaults}, %$values};
 
+  # Turn pattern into path
   my $string   = '';
   my $optional = 1;
   for my $token (reverse @{$self->tree}) {
@@ -120,6 +121,7 @@ sub shape_match {
 sub _compile {
   my $self = shift;
 
+  # Compile tree to regular expression
   my $block    = '';
   my $regex    = '';
   my $optional = 1;
@@ -184,16 +186,18 @@ sub _compile {
 sub _tokenize {
   my $self = shift;
 
-  my $pattern        = $self->pattern;
+  # Token
   my $quote_end      = $self->quote_end;
   my $quote_start    = $self->quote_start;
   my $relaxed_start  = $self->relaxed_start;
   my $symbol_start   = $self->symbol_start;
   my $wildcard_start = $self->wildcard_start;
-  my $tree           = [];
-  my $state          = 'text';
-  my $quoted         = 0;
 
+  # Parse the pattern character wise
+  my $pattern = $self->pattern;
+  my $tree    = [];
+  my $state   = 'text';
+  my $quoted  = 0;
   while (length(my $char = substr $pattern, 0, 1, '')) {
 
     # Inside a symbol
@@ -255,7 +259,6 @@ sub _tokenize {
 
     # Text
     else {
-
       $state = 'text';
 
       # New text element

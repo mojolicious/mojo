@@ -38,9 +38,8 @@ my $SOCKET_RE = qr/^
 sub DESTROY {
   my $self = shift;
 
-  return unless my $loop = $self->ioloop;
-
   # Cleanup connections
+  return unless my $loop = $self->ioloop;
   my $cs = $self->{_cs} || {};
   for my $id (keys %$cs) { $loop->drop($id) }
 
@@ -234,10 +233,9 @@ sub _listen {
   my ($self, $listen) = @_;
   return unless $listen;
 
+  # UNIX domain socket
   my $options = {};
   my $tls;
-
-  # UNIX domain socket
   if ($listen =~ /^file\:\/\/(.+)$/) { unlink $options->{file} = $1 }
 
   # Internet socket

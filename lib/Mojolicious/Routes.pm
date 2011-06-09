@@ -382,7 +382,6 @@ sub _dispatch_controller {
   return 1
     unless my $app = $field->{app} || $self->_generate_class($field, $c);
   my $method = $self->_generate_method($field, $c);
-
   my $dispatch = ref $app || $app;
   $dispatch .= "->$method" if $method;
   $c->app->log->debug("Dispatching $dispatch.");
@@ -512,10 +511,9 @@ sub _generate_method {
 sub _generate_route {
   my ($self, $methods, @args) = @_;
 
+  # Route information
   my ($cb, $constraints, $defaults, $name, $pattern);
   my $conditions = [];
-
-  # Route information
   while (defined(my $arg = shift @args)) {
 
     # First scalar is the pattern
@@ -539,6 +537,7 @@ sub _generate_route {
     elsif (ref $arg eq 'HASH') { $defaults = $arg }
   }
 
+  # Defaults
   $constraints ||= [];
   $defaults    ||= {};
   $defaults->{cb} = $cb if $cb;
@@ -563,12 +562,11 @@ sub _walk_stack {
   local $SIG{__DIE__} =
     sub { ref $_[0] ? CORE::die($_[0]) : Mojo::Exception->throw(@_) };
 
-  my $stack = $c->match->stack;
-  my $stash = $c->stash;
-  $stash->{'mojo.captures'} ||= {};
-
   # Walk the stack
+  my $stack   = $c->match->stack;
+  my $stash   = $c->stash;
   my $staging = @$stack;
+  $stash->{'mojo.captures'} ||= {};
   for my $field (@$stack) {
     $staging--;
 

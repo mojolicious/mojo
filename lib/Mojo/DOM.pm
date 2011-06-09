@@ -186,6 +186,7 @@ sub all_text {
   while (my $e = shift @stack) {
     my $type = $e->[0];
 
+    # Add children of nested tag to stack
     unshift @stack, @$e[4 .. $#$e] and next if $type eq 'tag';
 
     # Text
@@ -271,8 +272,8 @@ sub content_xml {
   my $self = shift;
 
   # Walk tree
-  my $tree   = $self->tree;
   my $result = '';
+  my $tree   = $self->tree;
   my $start  = $tree->[0] eq 'root' ? 1 : 4;
   for my $e (@$tree[$start .. $#$tree]) {
     $result .= $self->_render($e);
@@ -287,12 +288,7 @@ sub content_xml {
 
 sub find {
   my ($self, $css) = @_;
-
-  # Parse CSS selectors
-  my $pattern = $self->_parse_css($css);
-
-  # Filter tree
-  return $self->_match_tree($self->tree, $pattern);
+  return $self->_match_tree($self->tree, $self->_parse_css($css));
 }
 
 # DEPRECATED in Smiling Face With Sunglasses!
@@ -316,7 +312,6 @@ sub namespace {
   # Walk tree
   while ($current) {
     return if $current->[0] eq 'root';
-
     my $attrs = $current->[2];
 
     # Namespace for prefix
@@ -439,14 +434,10 @@ sub root {
 sub text {
   my $self = shift;
 
-  my $text = '';
-
   # Walk stack
+  my $text = '';
   for my $e (@{$self->tree}) {
-
-    # Meta data
     next unless ref $e eq 'ARRAY';
-
     my $type = $e->[0];
 
     # Text
@@ -536,22 +527,18 @@ sub _cdata {
 
 sub _close {
   my ($self, $current, $tags, $stop) = @_;
-
-  # Default to table tags
   $tags ||= \%HTML_TABLE;
-
-  # Default to table tag
   $stop ||= 'table';
 
-  # Check parents
+  # Check if parents need to be closed
   my $parent = $$current;
   while ($parent) {
     last if $parent->[0] eq 'root' || $parent->[1] eq $stop;
 
-    # Match
+    # Close
     $tags->{$parent->[1]} and $self->_end($parent->[1], $current);
 
-    # Next
+    # Try next
     $parent = $parent->[3];
   }
 }
@@ -563,9 +550,9 @@ sub _comment {
 
 sub _css_equation {
   my ($self, $equation) = @_;
-  my $num = [1, 1];
 
   # "even"
+  my $num = [1, 1];
   if ($equation =~ /^even$/i) { $num = [2, 2] }
 
   # "odd"
@@ -585,13 +572,11 @@ sub _css_equation {
 
 sub _css_regex {
   my ($self, $op, $value) = @_;
-
   return unless $value;
   $value = quotemeta $self->_css_unescape($value);
 
-  my $regex;
-
   # "~=" (word)
+  my $regex;
   if ($op eq '~') { $regex = qr/(?:^|.*\s+)$value(?:\s+.*|$)/ }
 
   # "*=" (contains)
@@ -631,7 +616,6 @@ sub _doctype {
 
 sub _end {
   my ($self, $end, $current) = @_;
-
   warn "END $end\n" if DEBUG;
 
   # Not a tag
@@ -1050,15 +1034,13 @@ sub _parse_css {
 sub _parse_xml {
   my ($self, $xml) = @_;
 
-  my $tree    = ['root'];
-  my $current = $tree;
-
   # Decode
   my $charset = $self->charset;
   decode $charset, $xml if $charset && !utf8::is_utf8 $xml;
-  return $tree unless $xml;
 
   # Tokenize
+  my $tree    = ['root'];
+  my $current = $tree;
   while ($xml =~ m/\G$XML_TOKEN_RE/gcs) {
     my $text    = $1;
     my $pi      = $2;
@@ -1069,10 +1051,7 @@ sub _parse_xml {
 
     # Text
     if (length $text) {
-
-      # Unescape
       html_unescape $text if (index $text, '&') >= 0;
-
       $self->_text($text, \$current);
     }
 
@@ -1139,12 +1118,10 @@ sub _parse_xml {
   return $tree;
 }
 
+# Try to detect XML from processing instructions
 sub _pi {
   my ($self, $pi, $current) = @_;
-
-  # Try to detect XML
   $self->xml(1) if !defined $self->xml && $pi =~ /xml/i;
-
   push @$$current, ['pi', $pi];
 }
 
@@ -1156,9 +1133,8 @@ sub _raw {
 sub _render {
   my ($self, $tree) = @_;
 
-  my $e = $tree->[0];
-
   # Text (escaped)
+  my $e = $tree->[0];
   if ($e eq 'text') {
     my $escaped = $tree->[1];
     xml_escape $escaped;
@@ -1183,9 +1159,8 @@ sub _render {
   # Offset
   my $start = $e eq 'root' ? 1 : 2;
 
-  my $content = '';
-
   # Start tag
+  my $content = '';
   if ($e eq 'tag') {
 
     # Offset
@@ -1202,10 +1177,8 @@ sub _render {
       # No value
       push @attrs, $key and next unless defined $value;
 
-      # Escape
-      xml_escape $value;
-
       # Key and value
+      xml_escape $value;
       push @attrs, qq/$key="$value"/;
     }
     my $attrs = join ' ', @attrs;
@@ -1219,11 +1192,7 @@ sub _render {
   }
 
   # Walk tree
-  for my $i ($start .. $#$tree) {
-
-    # Render next element
-    $content .= $self->_render($tree->[$i]);
-  }
+  $content .= $self->_render($tree->[$_]) for $start .. $#$tree;
 
   # End tag
   $content .= '</' . $tree->[1] . '>' if $e eq 'tag';
@@ -1235,7 +1204,6 @@ sub _render {
 #  or who got exposed to tainted what..."
 sub _start {
   my ($self, $start, $attrs, $current) = @_;
-
   warn "START $start\n" if DEBUG;
 
   # Autoclose optional HTML tags

@@ -84,11 +84,10 @@ sub get_body_chunk {
   # Body generator
   return $self->generate_body_chunk($offset) if $self->on_read;
 
+  # First boundary
   my $boundary        = $self->build_boundary;
   my $boundary_length = length($boundary) + 6;
   my $len             = $boundary_length - 2;
-
-  # First boundary
   return substr "--$boundary\x0d\x0a", $offset if $len > $offset;
 
   # Parts

@@ -33,13 +33,12 @@ sub match {
   my ($self, $r, $c) = @_;
   return unless $r;
 
+  # Match
   $self->root($r) unless $self->root;
   my $dictionary = $self->{_dictionary} ||= $r->dictionary;
   my $path       = $self->{_path};
   my $pattern    = $r->pattern;
-
-  # Match
-  my $captures = $pattern->shape_match(\$path);
+  my $captures   = $pattern->shape_match(\$path);
   return unless $captures;
   $self->{_path} = $path;
 

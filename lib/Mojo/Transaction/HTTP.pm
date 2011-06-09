@@ -13,17 +13,16 @@ has res => sub { Mojo::Message::Response->new };
 sub client_read {
   my ($self, $chunk) = @_;
 
-  my $req  = $self->req;
-  my $res  = $self->res;
-  my $read = length $chunk;
-
   # Preserve state
   my $preserved = $self->{_state};
 
   # Done
+  my $read = length $chunk;
   $self->{_state} = 'done' if $read == 0;
 
   # HEAD response
+  my $req = $self->req;
+  my $res = $self->res;
   if ($req->method =~ /^head$/i) {
     $res->parse_until_body($chunk);
     $self->{_state} = 'done' if $res->content->is_parsing_body;
@@ -52,14 +51,12 @@ sub client_read {
 sub client_write {
   my $self = shift;
 
-  my $chunk = '';
-  my $req   = $self->req;
-
   # Offsets
   $self->{_offset} ||= 0;
   $self->{_write}  ||= 0;
 
   # Writing
+  my $req = $self->req;
   unless ($self->{_state}) {
 
     # Connection header
@@ -77,6 +74,7 @@ sub client_write {
   }
 
   # Start line
+  my $chunk = '';
   if ($self->{_state} eq 'write_start_line') {
     my $buffer = $req->get_start_line_chunk($self->{_offset});
 
@@ -84,7 +82,6 @@ sub client_write {
     my $written = defined $buffer ? length $buffer : 0;
     $self->{_write}  = $self->{_write} - $written;
     $self->{_offset} = $self->{_offset} + $written;
-
     $chunk .= $buffer;
 
     # Done
@@ -103,7 +100,6 @@ sub client_write {
     my $written = defined $buffer ? length $buffer : 0;
     $self->{_write}  = $self->{_write} - $written;
     $self->{_offset} = $self->{_offset} + $written;
-
     $chunk .= $buffer;
 
     # Done
@@ -126,7 +122,6 @@ sub client_write {
     my $written = defined $buffer ? length $buffer : 0;
     $self->{_write}  = $self->{_write} - $written;
     $self->{_offset} = $self->{_offset} + $written;
-
     $chunk .= $buffer if defined $buffer;
 
     # End
@@ -152,12 +147,11 @@ sub keep_alive {
     return $self;
   }
 
-  my $req = $self->req;
-  my $res = $self->res;
-
   # No keep alive for 0.9 and 1.0
+  my $req     = $self->req;
   my $version = $req->version;
   $self->{keep_alive} ||= 0 if $req->version eq '0.9' || $version eq '1.0';
+  my $res = $self->res;
   $version = $res->version;
   $self->{keep_alive} ||= 0 if $version eq '0.9' || $version eq '1.0';
 
@@ -197,14 +191,13 @@ sub server_leftovers {
 sub server_read {
   my ($self, $chunk) = @_;
 
-  my $req = $self->req;
-  my $res = $self->res;
-
   # Parse
+  my $req = $self->req;
   $req->parse($chunk) unless $req->error;
   $self->{_state} ||= 'read';
 
   # Parser error
+  my $res     = $self->res;
   my $handled = $self->{_handled};
   if ($req->error && !$handled) {
 
@@ -259,10 +252,8 @@ sub server_write {
   $self->{_offset} ||= 0;
   $self->{_write}  ||= 0;
 
-  my $req = $self->req;
-  my $res = $self->res;
-
   # Writing
+  my $res = $self->res;
   if ($self->{_state} eq 'write') {
 
     # Connection header
@@ -285,7 +276,6 @@ sub server_write {
     my $written = defined $buffer ? length $buffer : 0;
     $self->{_write}  = $self->{_write} - $written;
     $self->{_offset} = $self->{_offset} + $written;
-
     $chunk .= $buffer;
 
     # Done
@@ -304,14 +294,13 @@ sub server_write {
     my $written = defined $buffer ? length $buffer : 0;
     $self->{_write}  = $self->{_write} - $written;
     $self->{_offset} = $self->{_offset} + $written;
-
     $chunk .= $buffer;
 
     # Done
     if ($self->{_write} <= 0) {
 
       # HEAD request
-      if ($req->method =~ /^head$/i) {
+      if ($self->req->method =~ /^head$/i) {
 
         # Don't send body if request method is HEAD
         $self->{_state} = 'done';
@@ -356,7 +345,6 @@ sub server_write {
       my $written = defined $buffer ? length $buffer : 0;
       $self->{_write}  = $self->{_write} - $written;
       $self->{_offset} = $self->{_offset} + $written;
-
       if (defined $buffer) {
         $chunk .= $buffer;
         delete $self->{_delay};

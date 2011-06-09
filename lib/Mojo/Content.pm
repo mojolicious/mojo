@@ -20,6 +20,7 @@ sub body_size { croak 'Method "body_size" not implemented by subclass' }
 sub build_body {
   my $self = shift;
 
+  # Concatenate all chunks in memory
   my $body   = '';
   my $offset = 0;
   while (1) {
@@ -42,6 +43,7 @@ sub build_body {
 sub build_headers {
   my $self = shift;
 
+  # Concatenate all chunks in memory
   my $headers = '';
   my $offset  = 0;
   while (1) {

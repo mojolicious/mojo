@@ -78,6 +78,7 @@ sub lib_dir {
 sub list_files {
   my ($self, $dir) = @_;
 
+  # Build portable directory
   my $parts = $self->{_parts} || [];
   my $root = File::Spec->catdir(@$parts);
   $dir = File::Spec->catdir($root, split '/', ($dir || ''));

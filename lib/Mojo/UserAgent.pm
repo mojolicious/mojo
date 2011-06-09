@@ -221,6 +221,7 @@ sub delete {
 sub detect_proxy {
   my $self = shift;
 
+  # Uppercase gets priority
   $self->http_proxy($ENV{HTTP_PROXY}   || $ENV{http_proxy});
   $self->https_proxy($ENV{HTTPS_PROXY} || $ENV{https_proxy});
   if (my $no = $ENV{NO_PROXY} || $ENV{no_proxy}) {
@@ -278,8 +279,8 @@ sub put {
 sub start {
   my ($self, $tx, $cb) = @_;
 
-  # Default loop
-  $self->{_loop} ||= $self->ioloop;
+  # Blocking loop
+  my $loop = $self->{_loop} ||= $self->ioloop;
 
   # Non-blocking
   if ($cb) {
@@ -300,10 +301,10 @@ sub start {
   $self->_start_tx($tx, sub { $tx = $_[1] });
 
   # Start loop
-  $self->{_loop}->start;
+  $loop->start;
 
   # Cleanup
-  $self->{_loop}->one_tick(0);
+  $loop->one_tick(0);
 
   return $tx;
 }
@@ -417,14 +418,13 @@ sub _close { shift->_handle(pop, 1) }
 #  Uh, second word, chief."
 sub _connect {
   my ($self, $tx, $cb) = @_;
-  my $loop = $self->{_loop};
-
-  my $id = $tx->connection;
-  my ($scheme, $address, $port) = $self->_tx_info($tx);
 
   weaken $self;
 
   # Keep alive connection
+  my $loop = $self->{_loop};
+  my $id   = $tx->connection;
+  my ($scheme, $address, $port) = $self->_tx_info($tx);
   $id ||= $self->_cache("$scheme:$address:$port");
   if ($id && !ref $id) {
     warn "KEEP ALIVE CONNECTION ($scheme:$address:$port)\n" if DEBUG;
@@ -469,13 +469,12 @@ sub _connect {
 sub _connect_proxy {
   my ($self, $old, $cb) = @_;
 
-  my $req = $old->req;
-  my $url = $req->url;
-
   # No proxy
+  my $req = $old->req;
   return unless my $proxy = $req->proxy;
 
   # WebSocket and/or HTTPS
+  my $url = $req->url;
   return
     unless ($req->headers->upgrade || '') eq 'websocket'
     || ($url->scheme || '') eq 'https';
@@ -527,11 +526,10 @@ sub _connect_proxy {
 sub _connected {
   my ($self, $id) = @_;
 
+  # Store connection information in transaction
   my $loop = $self->{_loop};
   my $tx   = $self->{_cs}->{$id}->{tx};
   $tx->connection($id);
-
-  # Store connection information in transaction
   my $local = $loop->local_info($id);
   $tx->local_address($local->{address});
   $tx->local_port($local->{port});
@@ -605,10 +603,9 @@ sub _finish_tx {
 sub _handle {
   my ($self, $id, $close) = @_;
 
+  # WebSocket
   my $c   = $self->{_cs}->{$id};
   my $old = $c->{tx};
-
-  # WebSocket
   if ($old && $old->is_websocket) {
 
     # Finish transaction
@@ -741,11 +738,10 @@ sub _start_tx {
   # Detect proxy
   $self->detect_proxy if $ENV{MOJO_PROXY};
 
+  # Proxy
   my $req    = $tx->req;
   my $url    = $req->url;
   my $scheme = $url->scheme || '';
-
-  # Proxy
   if ($self->need_proxy($url->host)) {
 
     # HTTP proxy
@@ -790,9 +786,8 @@ sub _switch_blocking {
   croak 'Non-blocking requests in progress' if $self->{_processing};
   warn "SWITCHING TO BLOCKING MODE\n" if DEBUG;
 
-  $self->_cleanup;
-
   # Normal loop
+  $self->_cleanup;
   $self->{_loop} = $self->ioloop;
   $self->{_nb}   = 0;
 }
@@ -804,9 +799,8 @@ sub _switch_non_blocking {
   croak 'Blocking request in progress' if $self->{_processing};
   warn "SWITCHING TO NON-BLOCKING MODE\n" if DEBUG;
 
-  $self->_cleanup;
-
   # Global loop
+  $self->_cleanup;
   $self->{_loop} = Mojo::IOLoop->singleton;
   $self->{_nb}   = 1;
 }
@@ -814,13 +808,12 @@ sub _switch_non_blocking {
 sub _tx_info {
   my ($self, $tx) = @_;
 
+  # Proxy info
   my $req    = $tx->req;
   my $url    = $req->url;
   my $scheme = $url->scheme || 'http';
   my $host   = $url->ihost;
   my $port   = $url->port;
-
-  # Proxy info
   if (my $proxy = $req->proxy) {
     $scheme = $proxy->scheme;
     $host   = $proxy->ihost;
@@ -837,10 +830,9 @@ sub _tx_info {
 sub _upgrade {
   my ($self, $id) = @_;
 
+  # No upgrade request
   my $c   = $self->{_cs}->{$id};
   my $old = $c->{tx};
-
-  # No upgrade request
   return unless $old->req->headers->upgrade;
 
   # Handshake failed

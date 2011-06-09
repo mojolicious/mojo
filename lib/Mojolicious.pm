@@ -77,15 +77,14 @@ sub new {
     }
   );
 
+  # Root directories
+  my $home = $self->home;
+  $self->renderer->root($home->rel_dir('templates'));
+  $self->static->root($home->rel_dir('public'));
+
+  # Default to application namespace
   my $r = $self->routes;
   $r->namespace(ref $self);
-  my $renderer = $self->renderer;
-  my $static   = $self->static;
-  my $home     = $self->home;
-
-  # Root
-  $renderer->root($home->rel_dir('templates'));
-  $static->root($home->rel_dir('public'));
 
   # Hide own controller methods
   $r->hide(qw/AUTOLOAD DESTROY client cookie delayed finish finished/);

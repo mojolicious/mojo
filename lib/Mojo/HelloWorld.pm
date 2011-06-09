@@ -222,10 +222,8 @@ EOF
 sub _upload {
   my ($self, $tx) = @_;
 
-  my $res = $tx->res;
-  $res->code(200);
-
   # File
+  my $res = $tx->res;
   my $req = $tx->req;
   if (my $file = $req->upload('file')) {
     my $headers = $res->headers;
@@ -254,6 +252,9 @@ sub _upload {
 </html>
 EOF
   }
+
+  # Response
+  $res->code(200);
   $tx->resume;
 }
 

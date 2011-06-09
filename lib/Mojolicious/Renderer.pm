@@ -75,17 +75,16 @@ sub render {
   my ($self, $c, $args) = @_;
   $args ||= {};
 
-  my $stash = $c->stash;
-  my $content = $stash->{'mojo.content'} ||= {};
-
   # Localize extends and layout
   my $partial = $args->{partial};
+  my $stash   = $c->stash;
   local $stash->{layout}  = $partial ? undef : $stash->{layout};
   local $stash->{extends} = $partial ? undef : $stash->{extends};
 
   # Merge stash and arguments
   while (my ($key, $value) = each %$args) { $stash->{$key} = $value }
 
+  # Extract important stash values
   my $template = delete $stash->{template};
   my $class    = $stash->{template_class};
   my $format   = $stash->{format} || $self->default_format;
@@ -94,6 +93,8 @@ sub render {
   my $json     = delete $stash->{json};
   my $text     = delete $stash->{text};
   my $inline   = delete $stash->{inline};
+
+  # Pick handler
   $handler = $self->default_handler if defined $inline && !defined $handler;
   my $options = {
     template       => $template,
@@ -103,9 +104,10 @@ sub render {
     inline         => $inline,
     template_class => $class
   };
-  my $output;
 
   # Text
+  my $output;
+  my $content = $stash->{'mojo.content'} ||= {};
   if (defined $text) {
     $self->handlers->{text}->($self, $c, \$output, {text => $text});
     $content->{content} = b("$output")

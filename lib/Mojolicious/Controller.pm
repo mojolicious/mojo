@@ -224,10 +224,9 @@ sub render {
     return '';
   }
 
-  # Template as single argument
+  # Template may be first argument
   my $template;
   $template = shift if @_ % 2 && !ref $_[0];
-
   my $args = ref $_[0] ? $_[0] : {@_};
 
   # Template

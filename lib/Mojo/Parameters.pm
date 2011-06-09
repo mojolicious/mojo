@@ -85,10 +85,9 @@ sub parse {
   # Clear
   $self->params([]);
 
+  # Detect query string without key/value pairs
   return $self unless defined $string;
   my $charset = $self->charset;
-
-  # Detect query string without key/value pairs
   if ($string !~ /\=/) {
 
     # Replace "+" with whitespace
@@ -189,10 +188,9 @@ sub to_hash {
 sub to_string {
   my $self = shift;
 
+  # Build pairs
   my $params = $self->params;
   return '' unless @{$self->params};
-
-  # Format
   my @params;
   my $charset = $self->charset;
   for (my $i = 0; $i < @$params; $i += 2) {
@@ -214,6 +212,7 @@ sub to_string {
     push @params, defined $value ? "$name=$value" : "$name";
   }
 
+  # Concatenate pairs
   my $separator = $self->pair_separator;
   return join $separator, @params;
 }

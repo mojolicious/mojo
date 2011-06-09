@@ -9,10 +9,9 @@ use Mojo::Util 'unquote';
 sub parse {
   my ($self, $string) = @_;
 
+  # Walk tree
   my @cookies;
   my $version = 1;
-
-  # Walk tree
   for my $knot ($self->_tokenize($string)) {
     for my $token (@{$knot}) {
       my ($name, $value) = @{$token};

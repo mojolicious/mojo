@@ -416,10 +416,9 @@ sub listen {
 sub local_info {
   my ($self, $id) = @_;
 
+  # UNIX domain socket info
   return {} unless my $c      = $self->{_cs}->{$id};
   return {} unless my $socket = $c->{handle};
-
-  # UNIX domain socket info
   return {path => $socket->hostpath} if $socket->can('hostpath');
 
   # TCP socket info
@@ -476,14 +475,14 @@ sub one_tick {
   my ($self, $timeout) = @_;
   $timeout = $self->timeout unless defined $timeout;
 
+  # Housekeeping
   $self->_prepare_listen;
   $self->_prepare_connections;
-
-  my $loop  = $self->_prepare_loop;
-  my $r     = $self->{_reverse};
-  my $ready = {};
+  my $loop = $self->_prepare_loop;
 
   # KQueue
+  my $r     = $self->{_reverse};
+  my $ready = {};
   if (KQUEUE) {
 
     # Catch interrupted system call errors
@@ -549,10 +548,9 @@ sub handle {
 sub remote_info {
   my ($self, $id) = @_;
 
+  # UNIX domain socket info
   return {} unless my $c      = $self->{_cs}->{$id};
   return {} unless my $socket = $c->{handle};
-
-  # UNIX domain socket info
   return {path => $socket->peerpath} if $socket->can('peerpath');
 
   # TCP socket info
@@ -563,15 +561,11 @@ sub resolve {
   my ($self, $name, $type, $cb) = @_;
   $self = $self->singleton unless ref $self;
 
-  my $ipv4;
-  $ipv4 = 1 if $name =~ $Mojo::URL::IPV4_RE;
-  my $ipv6;
-  $ipv6 = 1 if IPV6_DNS && $name =~ $Mojo::URL::IPV6_RE;
-
+  # No lookup required or record type not supported
+  my $ipv4 = $name =~ $Mojo::URL::IPV4_RE ? 1 : 0;
+  my $ipv6   = IPV6_DNS && $name =~ $Mojo::URL::IPV6_RE ? 1 : 0;
   my $t      = $DNS_TYPES->{$type};
   my $server = $self->dns_servers;
-
-  # No lookup required or record type not supported
   if (!$server || !$t || ($t ne $DNS_TYPES->{PTR} && ($ipv4 || $ipv6))) {
     $self->timer(0 => sub { $self->$cb([]) });
     return $self;
@@ -610,15 +604,12 @@ sub resolve {
         $req .= pack 'C/a*', $part if defined $part;
       }
       $req .= pack 'Cnn', 0, $t, 0x0001;
-
       $self->write($id => $req);
     },
     on_error => sub {
       my ($self, $id) = @_;
-
       warn "FAILED $type $name ($server)\n" if DEBUG;
       $CURRENT_DNS_SERVER++;
-
       $self->drop($timer) if $timer;
       $self->$cb([]);
     },
@@ -629,15 +620,13 @@ sub resolve {
       $self->drop($id);
       $self->drop($timer) if $timer;
 
+      # Check answers
       my @packet = unpack 'nnnnnna*', $chunk;
       warn "ANSWERS $packet[3] ($server)\n" if DEBUG;
-
-      # Wrong response
       return $self->$cb([]) unless $packet[0] eq $tx;
 
-      my $content = $packet[6];
-
       # Questions
+      my $content = $packet[6];
       for (1 .. $packet[2]) {
         my $n;
         do { ($n, $content) = unpack 'C/aa*', $content } while ($n ne '');
@@ -660,7 +649,6 @@ sub resolve {
         push @answers, [@answer, $ttl];
         warn "ANSWER $answer[0] $answer[1]\n" if DEBUG;
       }
-
       $self->$cb(\@answers);
     }
   );
@@ -669,11 +657,10 @@ sub resolve {
   $timer = $self->timer(
     $self->dns_timeout => sub {
       my $self = shift;
-
       warn "RESOLVE TIMEOUT ($server)\n" if DEBUG;
-      $CURRENT_DNS_SERVER++;
 
       # Abort
+      $CURRENT_DNS_SERVER++;
       $self->drop($id);
       $self->$cb([]);
     }
@@ -756,10 +743,9 @@ sub stop {
 sub test {
   my ($self, $id) = @_;
 
+  # Handle is tainted if readable
   return unless my $c      = $self->{_cs}->{$id};
   return unless my $socket = $c->{handle};
-
-  # Test
   my $test = $self->{_test} ||= IO::Poll->new;
   $test->mask($socket, POLLIN);
   $test->poll(0);
@@ -778,6 +764,7 @@ sub timer {
 sub write {
   my ($self, $id, $chunk, $cb) = @_;
 
+  # Prepare chunk for writing
   my $c = $self->{_cs}->{$id};
   $c->{buffer} .= $chunk;
 
@@ -868,8 +855,7 @@ sub _add_loop_event {
 sub _connect {
   my ($self, $id, $args) = @_;
 
-  return unless my $c = $self->{_cs}->{$id};
-
+  # Default socket options
   my %options = (
     Blocking => 0,
     PeerAddr => $args->{address},
@@ -881,6 +867,7 @@ sub _connect {
 
   # Handle
   my $handle;
+  return unless my $c = $self->{_cs}->{$id};
   unless ($handle = $args->{handle} || $args->{socket}) {
 
     # IPv6
@@ -1017,6 +1004,7 @@ sub _not_listening {
 sub _not_writing {
   my ($self, $id) = @_;
 
+  # Make sure the handle is ready
   return unless my $c = $self->{_cs}->{$id};
   return $c->{read_only} = 1 if length $c->{buffer} || $c->{drain};
   return unless my $handle = $c->{handle};
@@ -1121,6 +1109,7 @@ sub _parse_name {
 sub _prepare_cert {
   my $self = shift;
 
+  # Check if temporary TLS cert file already exists
   my $cert = $self->{_cert};
   return $cert if $cert && -r $cert;
 
@@ -1138,9 +1127,8 @@ sub _prepare_cert {
 sub _prepare_connections {
   my $self = shift;
 
-  my $cs = $self->{_cs} ||= {};
-
   # Prepare
+  my $cs = $self->{_cs} ||= {};
   while (my ($id, $c) = each %$cs) {
 
     # Connection needs to be finished
@@ -1168,6 +1156,7 @@ sub _prepare_connections {
 sub _prepare_key {
   my $self = shift;
 
+  # Check if temporary TLS key file already exists
   my $key = $self->{_key};
   return $key if $key && -r $key;
 
@@ -1292,13 +1281,13 @@ sub _run_callback {
   return $value;
 }
 
-# Failed events should not kill everything
 sub _run_event {
   my $self  = shift;
   my $event = shift;
   my $cb    = shift;
   my $id    = shift;
 
+  # Failed events should not kill everything
   my $value = eval { $self->$cb($id, @_) };
   if ($@) {
     my $message = qq/Event "$event" failed for connection "$id": $@/;

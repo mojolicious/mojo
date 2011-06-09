@@ -7,11 +7,8 @@ use Mojo::Base 'Mojolicious::Plugin';
 sub register {
   my ($self, $app, $conf) = @_;
 
-  # Config
-  $conf ||= {};
-
-
   # Got a charset
+  $conf ||= {};
   if (my $charset = $conf->{charset}) {
 
     # Add charset to text/html content type

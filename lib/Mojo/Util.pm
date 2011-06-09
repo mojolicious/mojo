@@ -399,8 +399,6 @@ sub html_escape {
 }
 
 sub html_unescape {
-
-  # Unescape
   $_[0] =~ s/
     &
     (?:
@@ -616,8 +614,6 @@ sub url_escape {
 
 sub url_unescape {
   return if index($_[0], '%') == -1;
-
-  # Unescape
   $_[0] =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge;
 }
 

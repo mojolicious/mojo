@@ -6,7 +6,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 sub register {
   my ($self, $app) = @_;
 
-  # Agent
+  # "agent" condition
   $app->routes->add_condition(
     agent => sub {
       my ($r, $c, $captures, $pattern) = @_;
@@ -18,7 +18,7 @@ sub register {
       my $agent = $c->req->headers->user_agent;
       return 1 if $agent && $agent =~ $pattern;
 
-      # Nothing
+      # No match
       return;
     }
   );

@@ -21,14 +21,8 @@ sub new {
 
 sub match {
   my ($self, $path) = @_;
-
-  # Match
   my $result = $self->shape_match(\$path);
-
-  # Endpoint
   return $result if !$path || $path eq '/';
-
-  # Partial or no match
   return;
 }
 

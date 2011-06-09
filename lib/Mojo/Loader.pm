@@ -95,12 +95,9 @@ sub search {
 
     # Check files
     for my $file (@files) {
-      my $full = File::Spec->catfile(File::Spec->splitdir($path), $file);
+      next if -d File::Spec->catfile(File::Spec->splitdir($path), $file);
 
-      # Directory
-      next if -d $full;
-
-      # Found
+      # Module found
       my $name = File::Basename::fileparse($file, qr/\.pm/);
       my $class = "$namespace\::$name";
       push @$modules, $class unless $found{$class};

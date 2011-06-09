@@ -46,7 +46,7 @@ sub add_child {
   $route->parent($self);
   weaken $route->{parent};
 
-  # Shortcuts
+  # Inherit shortcuts
   $route->shortcuts($self->shortcuts);
 
   # Add to tree
@@ -316,11 +316,9 @@ sub to {
     }
   }
 
-  # Pattern
-  my $pattern = $self->pattern;
-
   # Defaults
-  my $old = $pattern->defaults;
+  my $pattern = $self->pattern;
+  my $old     = $pattern->defaults;
   $pattern->defaults({%$old, %$defaults}) if $defaults;
 
   return $self;

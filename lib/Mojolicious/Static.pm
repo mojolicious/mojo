@@ -84,8 +84,8 @@ sub serve {
     }
   }
 
-  # Inline file
-  if (!$asset && defined(my $file = $self->_get_inline_file($c, $rel))) {
+  # DATA file
+  if (!$asset && defined(my $file = $self->_get_data_file($c, $rel))) {
     $size  = length $file;
     $asset = Mojo::Asset::Memory->new->add_chunk($file);
   }
@@ -144,25 +144,23 @@ sub serve {
   return 1;
 }
 
-sub _get_inline_file {
+sub _get_data_file {
   my ($self, $c, $rel) = @_;
 
   # Protect templates
   return if $rel =~ /\.\w+\.\w+$/;
 
-  # Class
+  # Detect DATA class
   my $class =
        $c->stash->{static_class}
     || $ENV{MOJO_STATIC_CLASS}
     || $self->default_static_class
     || 'main';
 
-  # Inline files
-  my $inline = $self->{_inline_files}->{$class}
+  # Find DATA file
+  my $data = $self->{_data_files}->{$class}
     ||= [keys %{Mojo::Command->new->get_all_data($class) || {}}];
-
-  # Find inline file
-  for my $path (@$inline) {
+  for my $path (@$data) {
     return Mojo::Command->new->get_data($path, $class) if $path eq $rel;
   }
 

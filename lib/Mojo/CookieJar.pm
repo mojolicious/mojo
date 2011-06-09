@@ -32,10 +32,8 @@ sub add {
     my $value = $cookie->value;
     next if length(defined $value ? $value : '') > $self->max_cookie_size;
 
-    # Initialize
-    $self->{_jar}->{$domain} ||= [];
-
     # Check if we already have a similar cookie
+    $self->{_jar}->{$domain} ||= [];
     my @new;
     for my $old (@{$self->{_jar}->{$domain}}) {
 

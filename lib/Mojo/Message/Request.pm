@@ -84,14 +84,10 @@ sub fix_headers {
 }
 
 sub is_secure {
-  my $self = shift;
-
-  # Secure
-  my $url = $self->url;
+  my $self   = shift;
+  my $url    = $self->url;
   my $scheme = $url->scheme || $url->base->scheme || '';
   return 1 if $scheme eq 'https';
-
-  # Not secure
   return;
 }
 

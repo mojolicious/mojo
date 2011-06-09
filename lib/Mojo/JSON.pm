@@ -300,7 +300,7 @@ sub _encode_object {
 sub _encode_string {
   my $string = shift;
 
-  # Escape
+  # Escape string
   $string
     =~ s/([\x00-\x1F\x7F\x{2028}\x{2029}\\\"\/\b\f\n\r\t])/$REVERSE{$1}/gs;
 

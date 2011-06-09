@@ -33,11 +33,7 @@ sub load_plugin {
 
     # Try all namspaces
     for my $namespace (@{$self->namespaces}) {
-
-      # Module
       my $module = "${namespace}::$class";
-
-      # Load and register
       return $module->new if $self->_load($module);
     }
   }

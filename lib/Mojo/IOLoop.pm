@@ -270,7 +270,7 @@ sub drop {
   # Drop connection gracefully
   if (my $c = $self->{_cs}->{$id}) { return $c->{finish} = 1 }
 
-  # Drop
+  # Drop right away
   return $self->_drop_immediately($id);
 }
 
@@ -422,7 +422,7 @@ sub local_info {
   # UNIX domain socket info
   return {path => $socket->hostpath} if $socket->can('hostpath');
 
-  # Info
+  # TCP socket info
   return {address => $socket->sockhost, port => $socket->sockport};
 }
 
@@ -555,7 +555,7 @@ sub remote_info {
   # UNIX domain socket info
   return {path => $socket->peerpath} if $socket->can('peerpath');
 
-  # Info
+  # TCP socket info
   return {address => $socket->peerhost, port => $socket->peerport};
 }
 

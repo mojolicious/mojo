@@ -255,7 +255,7 @@ sub children {
   my $start = $tree->[0] eq 'root' ? 1 : 4;
   for my $e (@$tree[$start .. $#$tree]) {
 
-    # Tag
+    # Make sure child is a tag
     next unless $e->[0] eq 'tag';
     next if defined $type && $e->[1] ne $type;
 
@@ -264,7 +264,6 @@ sub children {
       $self->new(charset => $self->charset, tree => $e, xml => $self->xml);
   }
 
-  # Collection
   return bless \@children, 'Mojo::DOM::_Collection';
 }
 
@@ -276,8 +275,6 @@ sub content_xml {
   my $result = '';
   my $start  = $tree->[0] eq 'root' ? 1 : 4;
   for my $e (@$tree[$start .. $#$tree]) {
-
-    # Render
     $result .= $self->_render($e);
   }
 
@@ -355,11 +352,7 @@ sub parent {
 
 sub parse {
   my ($self, $xml) = @_;
-
-  # Detect Perl characters
   $self->charset(undef) if utf8::is_utf8 $xml;
-
-  # Parse
   $self->tree($self->_parse_xml($xml));
 }
 
@@ -473,15 +466,10 @@ sub text {
 }
 
 sub to_xml {
-  my $self = shift;
-
-  # Render
-  my $result = $self->_render($self->tree);
-
-  # Encode
+  my $self    = shift;
+  my $result  = $self->_render($self->tree);
   my $charset = $self->charset;
   encode $charset, $result if $charset;
-
   return $result;
 }
 
@@ -655,7 +643,7 @@ sub _end {
   while ($next) {
     last if $next->[0] eq 'root';
 
-    # Found
+    # Right tag
     ++$found and last if $next->[1] eq $end;
 
     # Don't cross block tags that are not optional tags
@@ -664,6 +652,7 @@ sub _end {
         && $HTML_BLOCK{$next->[1]}
         && !$HTML_OPTIONAL{$next->[1]};
 
+    # Parent
     $next = $next->[3];
   }
 
@@ -708,8 +697,6 @@ sub _match_element {
     # Combinator
     $parentonly-- if $parentonly > 0;
     if ($selector->[0] eq 'combinator') {
-
-      # Combinator
       my $c = $selector->[1];
 
       # Parent only ">"
@@ -882,10 +869,8 @@ sub _match_selector {
         $args = $c->[2] = $self->_css_equation($args)
           unless ref $args;
 
-        # Parent
-        my $parent = $current->[3];
-
         # Siblings
+        my $parent = $current->[3];
         my $start = $parent->[0] eq 'root' ? 1 : 4;
         my @siblings;
         my $type = $class =~ /of-type$/ ? $current->[1] : undef;
@@ -917,10 +902,8 @@ sub _match_selector {
       elsif ($class =~ /^only-(?:child|(of-type))$/) {
         my $type = $1 ? $current->[1] : undef;
 
-        # Parent
-        my $parent = $current->[3];
-
         # Siblings
+        my $parent = $current->[3];
         my $start = $parent->[0] eq 'root' ? 1 : 4;
         for my $j ($start .. $#$parent) {
           my $sibling = $parent->[$j];
@@ -966,8 +949,6 @@ sub _match_tree {
 
       # Parts
       for my $part (@$pattern) {
-
-        # Match
         push(@results, $current) and last
           if $self->_match_element($current, $part);
       }
@@ -979,7 +960,6 @@ sub _match_tree {
     $self->new(charset => $self->charset, tree => $_, xml => $self->xml)
   } @results;
 
-  # Collection
   return bless \@results, 'Mojo::DOM::_Collection';
 }
 
@@ -1070,7 +1050,6 @@ sub _parse_css {
 sub _parse_xml {
   my ($self, $xml) = @_;
 
-  # State
   my $tree    = ['root'];
   my $current = $tree;
 
@@ -1132,13 +1111,11 @@ sub _parse_xml {
         $value = $3 unless defined $value;
         $value = $4 unless defined $value;
 
-        # End
+        # Empty tag
         next if $key eq '/';
 
-        # Unescape
+        # Add unescaped value
         html_unescape $value if $value && (index $value, '&') >= 0;
-
-        # Merge
         $attrs->{$key} = $value;
       }
 

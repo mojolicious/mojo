@@ -45,10 +45,8 @@ sub import {
   $app->static->default_static_class($caller);
   $app->renderer->default_template_class($caller);
 
-  # Root
-  my $root = $routes;
-
   # Export
+  my $root = $routes;
   *{"${caller}::new"} = *{"${caller}::app"} = sub {$app};
   *{"${caller}::any"}    = sub { $routes->any(@_) };
   *{"${caller}::del"}    = sub { $routes->del(@_) };

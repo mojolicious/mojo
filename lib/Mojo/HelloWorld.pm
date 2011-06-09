@@ -222,7 +222,6 @@ EOF
 sub _upload {
   my ($self, $tx) = @_;
 
-  # Code
   my $res = $tx->res;
   $res->code(200);
 

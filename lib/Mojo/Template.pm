@@ -152,9 +152,8 @@ sub build {
 sub compile {
   my $self = shift;
 
-  return unless my $code = $self->code;
-
   # Compile
+  return unless my $code = $self->code;
   my $compiled = eval $code;
 
   # Use local stacktrace for compile exceptions
@@ -172,8 +171,6 @@ sub interpret {
   # Compile
   unless ($self->compiled) {
     my $e = $self->compile;
-
-    # Exception
     return $e if ref $e;
   }
   my $compiled = $self->compiled;
@@ -291,8 +288,6 @@ sub parse {
 
     # Perl line
     if ($line =~ /$line_re/) {
-
-      # Token
       my @token = ();
 
       # Capture end
@@ -472,8 +467,6 @@ sub render_file_to_file {
 
   # Render
   my $output = $self->render_file($spath, @_);
-
-  # Exception
   return $output if ref $output;
 
   # Write to file
@@ -487,8 +480,6 @@ sub render_to_file {
 
   # Render
   my $output = $self->render($tmpl, @_);
-
-  # Exception
   return $output if ref $output;
 
   # Write to file

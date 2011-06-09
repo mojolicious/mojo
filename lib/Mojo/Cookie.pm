@@ -36,7 +36,6 @@ sub _tokenize {
 
     # Name
     if ($string =~ s/$NAME_RE//o) {
-
       my $name = $1;
       my $value;
 

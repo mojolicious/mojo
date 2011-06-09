@@ -91,14 +91,9 @@ sub resume {
 
 sub send_message {
   my ($self, $message, $cb) = @_;
-
-  # Drain callback
   $self->{_drain} = $cb if $cb;
-
-  # Encode
   $message = '' unless defined $message;
   encode 'UTF-8', $message;
-
   $self->_send_frame(TEXT, $message);
 }
 
@@ -137,8 +132,6 @@ sub server_read {
 
   # Full frames
   while (my $frame = $self->_parse_frame) {
-
-    # Op
     my $op = $frame->[1] || CONTINUATION;
 
     # Ping

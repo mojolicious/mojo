@@ -50,7 +50,6 @@ sub register {
   $app->helper(l => sub { shift->stash->{i18n}->localize(@_) });
 }
 
-# Container
 package Mojolicious::Plugin::I18n::_Handler;
 use Mojo::Base -base;
 
@@ -74,8 +73,6 @@ sub languages {
 sub localize {
   my $self = shift;
   my $key  = shift;
-
-  # Localize
   return $key unless my $handle = $self->{_handle};
   return $handle->maketext($key, @_);
 }

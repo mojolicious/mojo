@@ -16,7 +16,6 @@ sub body_contains {
     $found += $part->body_contains($chunk);
   }
 
-  # Found
   return $found ? 1 : 0;
 }
 
@@ -27,11 +26,8 @@ sub body_size {
   my $content_length = $self->headers->content_length;
   return $content_length if $content_length;
 
-  # Boundary
-  my $boundary = $self->build_boundary;
-
   # Calculate length of whole body
-  my $boundary_length = length($boundary) + 6;
+  my $boundary_length = length($self->build_boundary) + 6;
   my $len             = 0;
   $len += $boundary_length - 2;
   for my $part (@{$self->parts}) {
@@ -88,7 +84,6 @@ sub get_body_chunk {
   # Body generator
   return $self->generate_body_chunk($offset) if $self->on_read;
 
-  # Multipart
   my $boundary        = $self->build_boundary;
   my $boundary_length = length($boundary) + 6;
   my $len             = $boundary_length - 2;
@@ -148,10 +143,8 @@ sub parse {
 sub _parse_multipart {
   my $self = shift;
 
-  # Need a boundary
-  my $boundary = $self->is_multipart;
-
   # Parse
+  my $boundary = $self->is_multipart;
   while (1) {
 
     # Done

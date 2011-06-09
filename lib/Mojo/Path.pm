@@ -76,7 +76,7 @@ sub clone {
 sub parse {
   my ($self, $path) = @_;
 
-  # Meta
+  # Leading and trailing slash
   $path = '' unless defined $path;
   $path =~ /^\// ? $self->leading_slash(1)  : $self->leading_slash(0);
   $path =~ /\/$/ ? $self->trailing_slash(1) : $self->trailing_slash(0);

@@ -140,9 +140,8 @@ sub to_string {
   # Message only
   return $self->message unless $self->verbose;
 
+  # Start with message
   my $string = '';
-
-  # Message
   $string .= $self->message if $self->message;
 
   # Before

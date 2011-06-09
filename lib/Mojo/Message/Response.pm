@@ -127,10 +127,8 @@ sub is_status_class {
 sub _build_start_line {
   my $self = shift;
 
-  # Version
-  my $version = $self->version;
-
   # HTTP 0.9 has no start line
+  my $version = $self->version;
   return '' if $version eq '0.9';
 
   # HTTP 1.0 and above

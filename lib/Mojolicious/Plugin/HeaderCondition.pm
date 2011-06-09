@@ -7,7 +7,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 sub register {
   my ($self, $app) = @_;
 
-  # Header
+  # "headers" condition
   $app->routes->add_condition(
     headers => sub {
       my ($r, $c, $captures, $patterns) = @_;
@@ -29,10 +29,9 @@ sub register {
         }
         $passed = undef;
       }
-
-      # Success
       return 1 if $passed;
 
+      # No match
       return;
     }
   );

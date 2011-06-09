@@ -31,7 +31,7 @@ has ua => sub {
 sub new {
   my $self = shift->SUPER::new(@_);
 
-  # Home
+  # Detect home directory
   $self->home->detect(ref $self);
 
   # Log directory

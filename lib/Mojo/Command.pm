@@ -108,14 +108,8 @@ sub get_all_data {
 
   # Refresh
   if (fileno $d) {
-
-    # Reset
     seek $d, 0, 0;
-
-    # Slurp
     $CACHE->{$class} = join '', <$d>;
-
-    # Close
     close $d;
   }
 
@@ -130,8 +124,6 @@ sub get_all_data {
 
   # Split
   my @data = split /^@@\s+(.+?)\s*\r?\n/m, $content;
-
-  # Remove split garbage
   shift @data;
 
   # Find data
@@ -309,10 +301,8 @@ sub start {
   # Executable
   $ENV{MOJO_EXE} ||= (caller)[1] if $ENV{MOJO_APP};
 
-  # Arguments
-  my @args = @_ ? @_ : @ARGV;
-
   # Run
+  my @args = @_ ? @_ : @ARGV;
   return ref $self ? $self->run(@args) : $self->new->run(@args);
 }
 

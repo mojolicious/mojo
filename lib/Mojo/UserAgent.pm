@@ -419,7 +419,6 @@ sub _connect {
   my ($self, $tx, $cb) = @_;
   my $loop = $self->{_loop};
 
-  # Info
   my $id = $tx->connection;
   my ($scheme, $address, $port) = $self->_tx_info($tx);
 
@@ -576,13 +575,13 @@ sub _drop {
 sub _error {
   my ($self, $loop, $id, $error) = @_;
 
-  # Transaction
+  # Store error in response
   if (my $tx = $self->{_cs}->{$id}->{tx}) { $tx->res->error($error) }
 
-  # Log
+  # Log error
   $self->log->error($error);
 
-  # Finished
+  # Finish connection
   $self->_handle($id, $error);
 }
 
@@ -622,17 +621,17 @@ sub _handle {
   # Upgrade connection to WebSocket
   elsif ($old && (my $new = $self->_upgrade($id))) {
 
-    # Finish
+    # Finish transaction
     $self->_finish_tx($new, $c->{cb});
 
-    # Leftovers
+    # Parse leftovers
     $new->client_read($old->res->leftovers);
   }
 
   # Normal connection
   else {
 
-    # Cleanup
+    # Cleanup connection
     $self->_drop($id, $close);
 
     # Idle connection

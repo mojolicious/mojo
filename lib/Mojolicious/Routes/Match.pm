@@ -33,13 +33,10 @@ sub match {
   my ($self, $r, $c) = @_;
   return unless $r;
 
-  my $dictionary = $self->{_dictionary} ||= $r->dictionary;
-
-  # Root
   $self->root($r) unless $self->root;
-
-  my $path    = $self->{_path};
-  my $pattern = $r->pattern;
+  my $dictionary = $self->{_dictionary} ||= $r->dictionary;
+  my $path       = $self->{_path};
+  my $pattern    = $r->pattern;
 
   # Match
   my $captures = $pattern->shape_match(\$path);
@@ -113,8 +110,6 @@ sub match {
   # Match children
   my $snapshot = [@{$self->stack}];
   for my $child (@{$r->children}) {
-
-    # Match
     $self->match($child, $c);
 
     # Endpoint found

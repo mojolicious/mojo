@@ -20,11 +20,9 @@ sub load {
   # Session cookie
   return unless my $value = $c->signed_cookie($self->cookie_name);
 
-  # Decode
+  # Deserialize
   $value =~ s/\-/\=/g;
   b64_decode $value;
-
-  # Deserialize
   return unless my $session = $JSON->decode($value);
 
   # Expiration
@@ -69,8 +67,6 @@ sub store {
 
     # Serialize
     $value = $JSON->encode($session);
-
-    # Encode
     b64_encode $value, '';
     $value =~ s/\=/\-/g;
   }

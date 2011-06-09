@@ -9,11 +9,7 @@ has asset => sub { Mojo::Asset::Memory->new };
 
 sub body_contains {
   my ($self, $chunk) = @_;
-
-  # Found
   return 1 if $self->asset->contains($chunk) >= 0;
-
-  # Not found
   return 0;
 }
 
@@ -41,9 +37,6 @@ sub parse {
 
   # Still parsing headers or using a custom body parser
   return $self if ($self->{_state} || '') eq 'headers' || $self->on_read;
-
-  # Headers
-  my $headers = $self->headers;
 
   # Content needs to be upgraded to multipart
   if ($self->is_multipart) {

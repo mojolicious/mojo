@@ -66,11 +66,8 @@ sub build_headers {
 sub generate_body_chunk {
   my ($self, $offset) = @_;
 
-  # Delay
-  my $delay = delete $self->{_delay};
-
   # Callback
-  if (!$delay && !length $self->{_b2}) {
+  if (!delete $self->{_delay} && !length $self->{_b2}) {
     my $cb = delete $self->{_drain};
     $self->$cb($offset) if $cb;
   }
@@ -100,11 +97,7 @@ sub get_header_chunk {
 
 sub has_leftovers {
   my $self = shift;
-
-  # Leftovers
   return 1 if length $self->{_b2} || length $self->{_b1};
-
-  # Empty buffer
   return;
 }
 
@@ -112,8 +105,6 @@ sub header_size { length shift->build_headers }
 
 sub is_chunked {
   my $self = shift;
-
-  # Chunked
   my $encoding = $self->headers->transfer_encoding || '';
   return $encoding =~ /chunked/i ? 1 : 0;
 }
@@ -131,8 +122,6 @@ sub is_dynamic {
 
 sub is_multipart {
   my $self = shift;
-
-  # Multipart
   my $type = $self->headers->content_type || '';
   $type =~ /multipart.*boundary=\"*([a-zA-Z0-9\'\(\)\,\.\:\?\-\_\+\/]+)/i
     and return $1;
@@ -202,7 +191,7 @@ sub parse {
     # Normal content
     else {
 
-      # Need
+      # Bytes needed
       my $len = $self->headers->content_length || 0;
       $self->{_size} ||= 0;
       my $need = $len - $self->{_size};
@@ -330,14 +319,9 @@ sub _build_chunk {
 }
 
 sub _build_headers {
-  my $self = shift;
-
-  # Build
+  my $self    = shift;
   my $headers = $self->headers->to_string;
-
-  # Empty
   return "\x0d\x0a" unless $headers;
-
   return "$headers\x0d\x0a\x0d\x0a";
 }
 

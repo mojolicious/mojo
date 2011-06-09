@@ -21,8 +21,6 @@ sub register {
       my $ua     = $req->headers->user_agent || 'Anonymojo';
       $self->app->log->debug("$method $path ($ua).")
         unless $stash->{'mojo.static'};
-
-      # Start
       $stash->{'mojo.started'} = [Time::HiRes::gettimeofday()];
     }
   );
@@ -32,7 +30,7 @@ sub register {
     after_dispatch => sub {
       my $self = shift;
 
-      # Time
+      # Request done
       my $stash = $self->stash;
       return unless my $started = $stash->{'mojo.started'};
       my $elapsed = sprintf '%f',

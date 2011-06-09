@@ -15,11 +15,9 @@ has [qw/cleanup path/];
 has handle => sub {
   my $self = shift;
 
-  # Handle
-  my $handle = IO::File->new;
-
   # Already got a file without handle
-  my $file = $self->path;
+  my $handle = IO::File->new;
+  my $file   = $self->path;
   if ($file && -f $file) {
     $handle->open("< $file")
       or croak qq/Can't open file "$file": $!/;
@@ -53,8 +51,6 @@ has tmpdir => sub { $ENV{MOJO_TMPDIR} || File::Spec->tmpdir };
 #  claws!"
 sub DESTROY {
   my $self = shift;
-
-  # Cleanup
   my $path = $self->path;
   if ($self->cleanup && -f $path) {
     close $self->handle;

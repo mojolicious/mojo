@@ -86,10 +86,8 @@ sub setuidgid {
   if (my $group = $self->group) {
     if (my $gid = (getgrnam($group))[2]) {
 
-      # Cleanup
-      undef $!;
-
       # Switch
+      undef $!;
       $) = $gid;
       croak qq/Can't switch to effective group "$group": $!/ if $!;
     }
@@ -99,10 +97,8 @@ sub setuidgid {
   if (my $user = $self->user) {
     if (my $uid = (getpwnam($user))[2]) {
 
-      # Cleanup
-      undef $!;
-
       # Switch
+      undef $!;
       $> = $uid;
       croak qq/Can't switch to effective user "$user": $!/ if $!;
     }
@@ -168,7 +164,7 @@ sub _close {
 sub _drop {
   my ($self, $id) = @_;
 
-  # Finish
+  # Finish gracefully
   my $c = $self->{_cs}->{$id};
   if (my $tx = $c->{websocket} || $c->{transaction}) { $tx->server_close }
 

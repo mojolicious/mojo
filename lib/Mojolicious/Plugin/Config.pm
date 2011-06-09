@@ -92,7 +92,7 @@ sub register {
     }
   );
 
-  # Default
+  # Add default stash value
   $app->defaults(($conf->{stash_key} || 'config') => $config);
 
   return $config;

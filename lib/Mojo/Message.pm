@@ -98,6 +98,7 @@ sub body_params {
       # File
       next if $filename;
 
+      # Form value
       $params->append($name, $value);
     }
   }
@@ -182,7 +183,6 @@ sub cookie {
   my @cookies;
   @cookies = ref $cookies eq 'ARRAY' ? @$cookies : ($cookies) if $cookies;
 
-  # Context
   return wantarray ? @cookies : $cookies[0];
 }
 
@@ -564,8 +564,6 @@ sub _parse_formdata {
 
     # Form value
     unless ($filename) {
-
-      # Slurp
       $value = $part->asset->slurp;
 
       # Decode

@@ -130,7 +130,7 @@ $stream = b('0');
 is $stream->size,      1,   'size is 1';
 is $stream->to_string, '0', 'right content';
 
-# hmac_md5_sum (RFC2202)
+# hmac_md5_sum (RFC 2202)
 is b("Hi There")->hmac_md5_sum(chr(0x0b) x 16),
   '9294727a3638bb1c13f48ef8158bfc9d', 'right hmac md5 checksum';
 is b("what do ya want for nothing?")->hmac_md5_sum("Jefe"),
@@ -151,7 +151,7 @@ is b(
   ->hmac_md5_sum(chr(0xaa) x 80), '6f630fad67cda0ee1fb1f562db3aa53e',
   'right hmac md5 checksum';
 
-# hmac_sha1_sum (RFC2202)
+# hmac_sha1_sum (RFC 2202)
 is b("Hi There")->hmac_sha1_sum(chr(0x0b) x 20),
   'b617318655057264e28bc0b6fb378c8ef146be00', 'right hmac sha1 checksum';
 is b("what do ya want for nothing?")->hmac_sha1_sum("Jefe"),

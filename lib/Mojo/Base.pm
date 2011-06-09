@@ -13,12 +13,7 @@ require Carp;
 #  The lesson is, never try."
 sub import {
   my $class = shift;
-
-  # Flag
   return unless my $flag = shift;
-
-  # Caller
-  my $caller = caller;
 
   # No limits!
   no strict 'refs';
@@ -35,6 +30,7 @@ sub import {
   }
 
   # ISA
+  my $caller = caller;
   push @{"${caller}::ISA"}, $flag;
 
   # Can haz?
@@ -50,8 +46,6 @@ sub import {
 
 sub new {
   my $class = shift;
-
-  # Instantiate
   return bless
     exists $_[0] ? exists $_[1] ? {@_} : {%{$_[0]}} : {},
     ref $class || $class;
@@ -69,9 +63,6 @@ sub attr {
   Carp::croak('Attribute generator called with too many arguments') if @_;
   return unless $class && $attrs;
   $class = ref $class || $class;
-
-  # Allow symbolic references
-  no strict 'refs';
 
   # Check default
   Carp::croak('Default has to be a code reference or constant value')
@@ -121,6 +112,7 @@ sub attr {
     $code .= '};';
 
     # We compile custom attribute code for speed
+    no strict 'refs';
     no warnings 'redefine';
     *{"${class}::$attr"} = eval $code;
 

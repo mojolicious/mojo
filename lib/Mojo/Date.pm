@@ -12,8 +12,6 @@ has 'epoch';
 # Days and months
 my @DAYS   = qw/Sun Mon Tue Wed Thu Fri Sat/;
 my @MONTHS = qw/Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec/;
-
-# Reverse months
 my %MONTHS;
 {
   my $i = 0;
@@ -35,7 +33,6 @@ sub new {
 #  at you?"
 sub parse {
   my ($self, $date) = @_;
-
   return $self unless defined $date;
 
   # epoch - 784111777
@@ -53,7 +50,7 @@ sub parse {
 
   my ($day, $month, $year, $hour, $minute, $second);
 
-  # RFC822/1123 - Sun, 06 Nov 1994 08:49:37 GMT
+  # RFC 822/1123 - Sun, 06 Nov 1994 08:49:37 GMT
   if ($date =~ /^(\d+)\s+(\w+)\s+(\d+)\s+(\d+):(\d+):(\d+)$/) {
     $day    = $1;
     $month  = $MONTHS{$2};
@@ -63,7 +60,7 @@ sub parse {
     $second = $6;
   }
 
-  # RFC850/1036 - Sunday, 06-Nov-94 08:49:37 GMT
+  # RFC 850/1036 - Sunday, 06-Nov-94 08:49:37 GMT
   elsif ($date =~ /^(\d+)-(\w+)-(\d+)\s+(\d+):(\d+):(\d+)$/) {
     $day    = $1;
     $month  = $MONTHS{$2};
@@ -105,7 +102,7 @@ sub to_string {
   $epoch = time unless defined $epoch;
   my ($second, $minute, $hour, $mday, $month, $year, $wday) = gmtime $epoch;
 
-  # Format
+  # RFC 822/1123
   return sprintf(
     "%s, %02d %s %04d %02d:%02d:%02d GMT",
     $DAYS[$wday], $mday, $MONTHS[$month], $year + 1900,

@@ -14,10 +14,8 @@ has [qw/filename name/];
 #  This game makes no sense.
 #  Tell that to the good men who just lost their lives... SEMPER-FI!"
 sub move_to { shift->asset->move_to(@_) }
-
-sub size { shift->asset->size }
-
-sub slurp { shift->asset->slurp }
+sub size    { shift->asset->size }
+sub slurp   { shift->asset->slurp }
 
 1;
 __END__

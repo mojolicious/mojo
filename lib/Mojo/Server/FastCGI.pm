@@ -236,17 +236,13 @@ sub type_number {
 
 sub write_records {
   my ($self, $c, $type, $id, $body) = @_;
-
-  # Required
   return unless defined $c && defined $type && defined $id;
-
-  # Defaults
   $body ||= '';
-  my $body_len = length $body;
 
   # Write records
-  my $empty = $body ? 0 : 1;
-  my $offset = 0;
+  my $empty    = $body ? 0 : 1;
+  my $offset   = 0;
+  my $body_len = length $body;
   while (($body_len > 0) || $empty) {
 
     # Need to split content

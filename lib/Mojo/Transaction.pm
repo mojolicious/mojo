@@ -92,10 +92,7 @@ sub resume {
 
 sub server_close {
   my $self = shift;
-
-  # Transaction finished
   $self->on_finish->($self);
-
   return $self;
 }
 

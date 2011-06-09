@@ -541,11 +541,8 @@ sub _generate_route {
     elsif (ref $arg eq 'HASH') { $defaults = $arg }
   }
 
-  # Defaults
   $constraints ||= [];
-
-  # Defaults
-  $defaults ||= {};
+  $defaults    ||= {};
   $defaults->{cb} = $cb if $cb;
 
   # Create bridge

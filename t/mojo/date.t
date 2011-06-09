@@ -8,11 +8,11 @@ use Test::More tests => 10;
 # "Can't we have one meeting that doesn't end with digging up a corpse?"
 use_ok 'Mojo::Date';
 
-# RFC822/1123
+# RFC 822/1123
 my $date = Mojo::Date->new('Sun, 06 Nov 1994 08:49:37 GMT');
 is $date->epoch, 784111777, 'right epoch value';
 
-# RFC850/1036
+# RFC 850/1036
 is $date->parse('Sunday, 06-Nov-94 08:49:37 GMT')->epoch,
   784111777, 'right epoch value';
 

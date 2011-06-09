@@ -177,7 +177,7 @@ sub _decode_object {
 sub _decode_string {
   my $pos = pos;
 
-  # String
+  # Extract string with escaped characters
   m/\G(((?:[^\x00-\x1F\\"]|\\(?:["\\\/bfnrt]|u[A-Fa-f0-9]{4})){0,32766})*)/gc;
   my $str = $1;
 
@@ -188,13 +188,13 @@ sub _decode_string {
     _exception('Unterminated string');
   }
 
-  # Popular characters
+  # Unescape popular characters
   if (index($str, '\\u') < 0) {
     $str =~ s/\\(["\\\/bfnrt])/$ESCAPE{$1}/gs;
     return $str;
   }
 
-  # Everything else
+  # Unescape everything else
   my $buffer = '';
   while ($str =~ m/\G([^\\]*)\\(?:([^u])|u(.{4}))/gc) {
     $buffer .= $1;
@@ -383,7 +383,7 @@ Mojo::JSON - Minimalistic JSON
 
 =head1 DESCRIPTION
 
-L<Mojo::JSON> is a minimalistic and relaxed implementation of RFC4627.
+L<Mojo::JSON> is a minimalistic and relaxed implementation of RFC 4627.
 While it is possibly the fastest pure-Perl JSON parser available, you should
 not use it for validation.
 

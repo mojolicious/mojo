@@ -100,11 +100,11 @@ especially XS based modules due to its remarkable toolchain.
 With it you can even install modules straight from the source as you would do
 on a Unix based machine.
 
-=head2 Is it possible to run the builtin webserver on Windows?
+=head2 Is it possible to run the built-in webserver on Windows?
 
 It is!
-The builtin webserver is great way to run your L<Mojolicious> web application
-on any platform.
+The built-in webserver is great way to run your L<Mojolicious> web
+application on any platform.
 See L<Mojolicious::Guides::Cookbook> for more information about running and
 deploying L<Mojolicious> applications.
 

@@ -320,8 +320,8 @@ TLS, Bonjour, IDNA, Comet (long polling), chunking and multipart support.
 
 =item *
 
-Builtin async IO web server supporting epoll, kqueue, UNIX domain sockets and
-hot deployment, perfect for embedding.
+Built-in async IO web server supporting epoll, kqueue, UNIX domain sockets
+and hot deployment, perfect for embedding.
 
 =item *
 

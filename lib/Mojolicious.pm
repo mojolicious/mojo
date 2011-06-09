@@ -428,7 +428,7 @@ A controller collects several actions together.
     $self->render_json({list => [0 .. $offset]});
   }
 
-  # Scrape information from remote sites
+  # Scrape and return information from remote sites
   sub title {
     my $self = shift;
     my $url  = $self->param('url') || 'http://mojolicio.us';
@@ -469,7 +469,7 @@ especially when working in a team.
     # Create a route at "/example" for the "MyApp::Example" controller
     my $example = $r->route('/example')->to('example#');
 
-    # Connect these HTTP GET requests to routes in the controller
+    # Connect these HTTP GET routes to actions in the controller
     # (paths are relative to the controller)
     $example->get('/')->to('#hello');
     $example->get('/time')->to('#clock');

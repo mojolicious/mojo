@@ -89,7 +89,6 @@ sub register {
       my $cb = pop;
       return '' unless ref $cb && ref $cb eq 'CODE';
       my $name = shift;
-
       my $args;
       if (ref $name && ref $name eq 'HASH') {
         $args = $name;

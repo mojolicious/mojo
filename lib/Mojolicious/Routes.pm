@@ -491,9 +491,8 @@ sub _generate_method {
     $self->{_hidden}->{$_}++ for @{$self->hidden};
   }
 
-  return unless my $method = $field->{method} || $field->{action};
-
   # Hidden
+  return unless my $method = $field->{method} || $field->{action};
   if ($self->{_hidden}->{$method} || index($method, '_') == 0) {
     $c->app->log->debug(qq/Action "$method" is not allowed./);
     return;

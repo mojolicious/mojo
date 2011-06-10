@@ -40,6 +40,7 @@ EOF
 sub run {
   my $self = shift;
 
+  # Options
   local @ARGV = @_ if @_;
   my $method = 'GET';
   my @headers;

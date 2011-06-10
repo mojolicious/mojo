@@ -274,6 +274,7 @@ sub _input {
   # Value
   my $p = $c->param($name);
 
+  # Special selection value
   my $t = $attrs{type} || '';
   if (defined $p && $t ne 'submit') {
 

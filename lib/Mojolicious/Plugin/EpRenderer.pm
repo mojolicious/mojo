@@ -29,8 +29,6 @@ sub register {
       my $list = join ', ', sort keys %{$c->stash};
       my $key = $options->{cache} = md5_sum "$path($list)";
 
-      $c->stash->{layout} ||= undef;
-
       # Cache
       my $cache = $r->cache;
       unless ($cache->get($key)) {

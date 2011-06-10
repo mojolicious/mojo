@@ -12,7 +12,7 @@ BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 my $backup;
 BEGIN { $backup = $ENV{MOJO_MODE} || ''; $ENV{MOJO_MODE} = 'development' }
 
-use Test::More tests => 792;
+use Test::More tests => 801;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -1551,13 +1551,31 @@ $t->get_ok('/redirect/condition/1' => {'X-Condition-Test' => 1})
 $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
   ->content_is("stash too!!!!!!!!\n");
 
+# GET /bridge2stash (with cookies, session and flash)
+$t->get_ok('/bridge2stash')->status_is(200)
+  ->content_is(
+  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!flash!/!\n");
+
+# GET /bridge2stash (broken session cookie)
+$t->reset_session;
+my $session = b("☃☃☃☃☃")->b64_encode('');
+my $hmac    = $session->clone->hmac_md5_sum($t->ua->app->secret);
+my $broken  = "\$Version=1; mojolicious=$session--$hmac; \$Path=/";
+$t->get_ok('/bridge2stash' => {Cookie => $broken})->status_is(200)
+  ->content_is("stash too!!!!!!!/!\n");
+
+# GET /bridge2stash (fresh start)
+$t->reset_session;
+$t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
+  ->content_is("stash too!!!!!!!!\n");
+
 # GET /favicon.ico (random static requests)
 $t->get_ok('/favicon.ico')->status_is(200);
 $t->get_ok('/mojolicious-white.png')->status_is(200);
 $t->get_ok('/mojolicious-black.png')->status_is(200);
 $t->get_ok('/favicon.ico')->status_is(200);
 
-# GET /bridge2stash (with cookies, session and flash)
+# GET /bridge2stash (with cookies, session and flash again)
 $t->get_ok('/bridge2stash')->status_is(200)
   ->content_is(
   "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!flash!/!\n");

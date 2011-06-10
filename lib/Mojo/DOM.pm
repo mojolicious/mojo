@@ -302,10 +302,9 @@ EOF
 sub namespace {
   my $self = shift;
 
+  # Prefix
   my $current = $self->tree;
   return if $current->[0] eq 'root';
-
-  # Prefix
   my $prefix = '';
   if ($current->[1] =~ /^(.*?)\:/) { $prefix = $1 }
 
@@ -668,13 +667,12 @@ sub _end {
 sub _match_element {
   my ($self, $candidate, $selectors) = @_;
 
+  # Match
   my @selectors  = reverse @$selectors;
   my $first      = 2;
   my $parentonly = 0;
   my $tree       = $self->tree;
   my ($current, $marker, $snapback, $siblings);
-
-  # Match
   for (my $i = 0; $i <= $#selectors; $i++) {
     my $selector = $selectors[$i];
 

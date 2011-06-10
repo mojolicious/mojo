@@ -419,9 +419,8 @@ sub _close { shift->_handle(pop, 1) }
 sub _connect {
   my ($self, $tx, $cb) = @_;
 
-  weaken $self;
-
   # Keep alive connection
+  weaken $self;
   my $loop = $self->{_loop};
   my $id   = $tx->connection;
   my ($scheme, $address, $port) = $self->_tx_info($tx);

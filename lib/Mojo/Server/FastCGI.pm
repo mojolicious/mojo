@@ -199,6 +199,7 @@ sub run {
   # Preload application
   $self->app;
 
+  # New incoming request
   while (my $c = $self->accept_connection) {
 
     # Request
@@ -258,11 +259,11 @@ sub write_records {
         qq/Writing FastCGI record: $type - $id - "$chunk"./);
     }
 
+    # Write whole record
     my $record = pack $template, 1, $self->type_number($type), $id,
       $payload_len,
       $pad_len,
       substr($body, $offset, $payload_len);
-
     my $woffset = 0;
     while ($woffset < length $record) {
       my $written = $c->syswrite($record, undef, $woffset);
@@ -279,10 +280,10 @@ sub write_records {
 
       $woffset += $written;
     }
-
     $body_len -= $payload_len;
     $offset += $payload_len;
 
+    # Done
     last if $empty;
   }
 

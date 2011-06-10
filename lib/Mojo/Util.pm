@@ -384,7 +384,6 @@ sub hmac_md5_sum { _hmac(\&_md5, @_) }
 sub hmac_sha1_sum { _hmac(\&_sha1, @_) }
 
 sub html_escape {
-
   my $escaped = '';
   for (1 .. length $_[0]) {
 

@@ -8,12 +8,11 @@ use I18N::LangTags::Detect;
 #  No, the cat shelter’s onto me."
 sub register {
   my ($self, $app, $conf) = @_;
-
   $conf ||= {};
-  my $namespace = $conf->{namespace} || ((ref $app) . "::I18N");
-  my $default   = $conf->{default}   || 'en';
 
   # Initialize
+  my $namespace = $conf->{namespace} || ((ref $app) . "::I18N");
+  my $default   = $conf->{default}   || 'en';
   eval "package $namespace; use base 'Locale::Maketext'; 1;";
   eval "require ${namespace}::${default};";
   unless (eval "\%${namespace}::${default}::Lexicon") {
@@ -56,7 +55,6 @@ use Mojo::Base -base;
 # "Robot 1-X, save my friends! And Zoidberg!"
 sub languages {
   my ($self, @languages) = @_;
-
   return $self->{_language} unless @languages;
 
   # Handle

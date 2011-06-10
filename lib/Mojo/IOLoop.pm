@@ -1344,7 +1344,7 @@ sub _tls_accept {
     return;
   }
 
-  # Handle error
+  # Switch between reading and writing
   $self->_tls_error($id);
 }
 
@@ -1362,18 +1362,14 @@ sub _tls_connect {
     return;
   }
 
-  # Handle error
+  # Switch between reading and writing
   $self->_tls_error($id);
 }
 
 sub _tls_error {
   my ($self, $id) = @_;
   my $error = $IO::Socket::SSL::SSL_ERROR;
-
-  # Reading
-  if ($error == TLS_READ) { $self->_not_writing($id) }
-
-  # Writing
+  if    ($error == TLS_READ)  { $self->_not_writing($id) }
   elsif ($error == TLS_WRITE) { $self->_writing($id) }
 }
 

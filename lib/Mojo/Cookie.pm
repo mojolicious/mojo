@@ -31,6 +31,7 @@ sub to_string { croak 'Method "to_string" not implemented by subclass' }
 sub _tokenize {
   my ($self, $string) = @_;
 
+  # Nibbling parser
   my (@tree, @token);
   while ($string) {
 

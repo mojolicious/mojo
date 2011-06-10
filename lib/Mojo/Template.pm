@@ -72,7 +72,7 @@ sub build {
       if ($type eq 'cpen') {
 
         # End block
-        $lines[-1] .= 'return Mojo::ByteStream->new($_M) }';
+        $lines[-1] .= 'return b($_M) }';
 
         # No following code
         my $next = $line->[$j + 3];

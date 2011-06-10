@@ -5,14 +5,14 @@ use overload '""' => sub { shift->to_string }, fallback => 1;
 use Mojo::Util;
 
 sub import {
-  return unless @_ > 1;
+  my $class = shift;
+  return unless @_ > 0;
 
   # Alternative constructor
   no strict 'refs';
   no warnings 'redefine';
   my $caller = caller;
-  *{"${caller}::b"} =
-    sub { bless {bytestream => join('', @_)}, 'Mojo::ByteStream' };
+  *{"${caller}::b"} = sub { bless {bytestream => join('', @_)}, $class };
 }
 
 # "Do we have any food that wasn't brutally slaughtered?

@@ -63,12 +63,12 @@
       <ul>
         % for my $section (@$sections) {
           <li>
-            %== $link->(splice @$section, 0, 2)
+            %= $link->(splice @$section, 0, 2)
             % if (@$section) {
               <ul>
                 % while (@$section) {
                   <li>
-                    %== $link->(splice @$section, 0, 2)
+                    %= $link->(splice @$section, 0, 2)
                   </li>
                 % }
               </ul>

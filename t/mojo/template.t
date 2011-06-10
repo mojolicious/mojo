@@ -174,7 +174,7 @@ $output = $mt->render(<<'EOF');
 EOF
 is $output, "<html>\n\n", 'expression block';
 
-# Escaped expression block (extra whitespace)
+# Escaped expression block (passed through with extra whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 <% my $block =  begin %>
@@ -182,9 +182,10 @@ $output = $mt->render(<<'EOF');
 <% end  %>
 <%== $block->() %>
 EOF
-is $output, "\n\n&lt;html&gt;\n\n", 'escaped expression block';
+is $output, "\n\n<html>\n\n", 'escaped expression block';
 
-# Escaped expression block (perl lines and extra whitespace)
+# Escaped expression block
+# (passed through with perl lines and extra whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 % my $block =  begin
@@ -192,9 +193,10 @@ $output = $mt->render(<<'EOF');
 <% end  %>
 <%== $block->() %>
 EOF
-is $output, "\n&lt;html&gt;\n\n", 'escaped expression block';
+is $output, "\n<html>\n\n", 'escaped expression block';
 
-# Escaped expression block (indented perl lines and extra whitespace)
+# Escaped expression block
+# (passed through with indented perl lines and extra whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
  % my $block =  begin
@@ -202,9 +204,9 @@ $output = $mt->render(<<'EOF');
    % end
 <%== $block->() %>
 EOF
-is $output, "&lt;html&gt;\n\n", 'escaped expression block';
+is $output, "<html>\n\n", 'escaped expression block';
 
-# Captured escaped expression block (extra whitespace)
+# Captured escaped expression block (passed through with extra whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 <%== my $result = capture begin  =%>
@@ -212,9 +214,10 @@ $output = $mt->render(<<'EOF');
 <%  end =%>
 <%= $result =%>
 EOF
-is $output, '&lt;html&gt;<html>', 'captured escaped expression block';
+is $output, '<html><html>', 'captured escaped expression block';
 
-# Captured escaped expression block (perl lines and extra whitespace)
+# Captured escaped expression block
+# (passed through with perl lines and extra whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 %== my $result = capture  begin
@@ -224,12 +227,13 @@ $output = $mt->render(<<'EOF');
 EOF
 is $output, <<EOF, 'captured escaped expression block';
 
-&lt;html&gt;
+<html>
 
 <html>
 EOF
 
-# Captured escaped expression block (indented perl lines and extra whitespace)
+# Captured escaped expression block
+# (passed through with indented perl lines and extra whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 %== my $result = capture  begin
@@ -239,12 +243,12 @@ $output = $mt->render(<<'EOF');
 EOF
 is $output, <<EOF, 'captured escaped expression block';
 
-&lt;html&gt;
+<html>
 
 <html>
 EOF
 
-# Capture lines (extra whitespace)
+# Capture lines (passed through with extra whitespace)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 <% my $result = escape capture begin                  %>
@@ -252,46 +256,46 @@ $output = $mt->render(<<'EOF');
 <%                        end %>
 %= $result
 EOF
-is $output, "\n\n&lt;html&gt;\n\n", 'captured lines';
+is $output, "\n\n<html>\n\n", 'captured lines';
 
-# Capture tags
+# Capture tags (passed through)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 <% my $result = escape capture begin %><html><% end %><%= $result %>
 EOF
-is $output, "&lt;html&gt;\n", 'capture tags';
+is $output, "<html>\n", 'capture tags';
 
-# Capture tags (alternative)
+# Capture tags (passed through alternative)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 <% my $result = escape capture begin %><html><% end %><%= $result %>
 EOF
-is $output, "&lt;html&gt;\n", 'capture tags';
+is $output, "<html>\n", 'capture tags';
 
-# Capture tags with appended code
+# Capture tags with appended code (passed through)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 <% my $result = escape( capture begin %><html><% end ); %><%= $result %>
 EOF
-is $output, "&lt;html&gt;\n", 'capture tags with appended code';
+is $output, "<html>\n", 'capture tags with appended code';
 
-# Capture tags with appended code (alternative)
+# Capture tags with appended code (passed through alternative)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 <% my $result = escape( capture begin %><html><% end ); %><%= $result %>
 EOF
-is $output, "&lt;html&gt;\n", 'capture tags with appended code';
+is $output, "<html>\n", 'capture tags with appended code';
 
-# Nested capture tags
+# Nested capture tags (passed through)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 <% my $result = capture
   begin %><%= escape capture begin %><html><% end
   %><% end %><%= $result %>
 EOF
-is $output, "&lt;html&gt;\n", 'nested capture tags';
+is $output, "<html>\n", 'nested capture tags';
 
-# Nested capture tags (alternative)
+# Nested capture tags (passed through alternative)
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 <% my $result = capture begin =%>
@@ -301,7 +305,7 @@ $output = $mt->render(<<'EOF');
 <% end =%>
 <%= $result =%>
 EOF
-is $output, '&lt;html&gt;', 'nested capture tags';
+is $output, '<html>', 'nested capture tags';
 
 # Advanced capturing (extra whitespace)
 $mt     = Mojo::Template->new;

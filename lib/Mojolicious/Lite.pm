@@ -274,8 +274,8 @@ delimited by the C<begin> and C<end> keywords.
   <!doctype html><html>
     <head><title>Sebastians Frameworks!</title></head>
     <body>
-      <%== $link->('http://mojolicio.us', 'Mojolicious') %>
-      <%== $link->('http://catalystframework.org', 'Catalyst') %>
+      <%= $link->('http://mojolicio.us', 'Mojolicious') %>
+      <%= $link->('http://catalystframework.org', 'Catalyst') %>
     </body>
   </html>
 

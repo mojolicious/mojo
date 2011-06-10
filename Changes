@@ -2,6 +2,8 @@ This file documents the revision history for Perl extension Mojolicious.
 
 1.43    2011-06-09 00:00:00
         - Improved documentation.
+        - Fixed a bug in Mojo::Template that caused template blocks to be
+          auto escaped.
         - Fixed typos.
 
 1.42    2011-06-09 00:00:00

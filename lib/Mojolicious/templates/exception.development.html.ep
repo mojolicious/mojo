@@ -112,7 +112,7 @@
       %= tag 'tr', $i ? (class => 'important') : undef, begin
         <td class="key"><%= $key %>.</td>
         <td class="value">
-          %== $code->($value)
+          %= $code->($value)
         </td>
       % end
     % end
@@ -130,13 +130,13 @@
       <div id="context">
         <table>
           % for my $line (@{$e->lines_before}) {
-            %== $cv->($line->[0], $line->[1])
+            %= $cv->($line->[0], $line->[1])
           % }
           % if (defined $e->line->[1]) {
-            %== $cv->($e->line->[0], $e->line->[1], 1)
+            %= $cv->($e->line->[0], $e->line->[1], 1)
           % }
           % for my $line (@{$e->lines_after}) {
-            %== $cv->($line->[0], $line->[1])
+            %= $cv->($line->[0], $line->[1])
           % }
         </table>
       </div>
@@ -144,11 +144,11 @@
         <div id="insight">
           <table>
             % for my $line (@{$e->lines_before}) {
-              %== $cv->($line->[0], $line->[2])
+              %= $cv->($line->[0], $line->[2])
             % }
-            %== $cv->($e->line->[0], $e->line->[2], 1)
+            %= $cv->($e->line->[0], $e->line->[2], 1)
             % for my $line (@{$e->lines_after}) {
-              %== $cv->($line->[0], $line->[2])
+              %= $cv->($line->[0], $line->[2])
             % }
           </table>
         </div>
@@ -178,7 +178,7 @@
               <div class="file"><%= $frame->[1] %></div>
               <div class="code preview">
                 %= "$frame->[2]."
-                %== $code->($line)
+                %= $code->($line)
               </div>
             % }
           % }
@@ -195,33 +195,33 @@
     <div class="box infobox" id="request">
       <table>
         % my $req = $self->req;
-        %== $kv->(Method => $req->method)
+        %= $kv->(Method => $req->method)
         % my $url = $req->url;
-        %== $kv->(Path => $url->to_string)
-        %== $kv->(Base => $url->base->to_string)
-        %== $kv->(Parameters => dumper $req->params->to_hash)
-        %== $kv->(Stash => dumper $snapshot)
-        %== $kv->(Session => dumper session)
-        %== $kv->(Version => $req->version)
+        %= $kv->(Path => $url->to_string)
+        %= $kv->(Base => $url->base->to_string)
+        %= $kv->(Parameters => dumper $req->params->to_hash)
+        %= $kv->(Stash => dumper $snapshot)
+        %= $kv->(Session => dumper session)
+        %= $kv->(Version => $req->version)
         % for my $name (@{$self->req->headers->names}) {
           % my $value = $self->req->headers->header($name);
-          %== $kv->($name, $value)
+          %= $kv->($name, $value)
         % }
       </table>
     </div>
     <div class="box infobox" id="more">
       <div id="infos">
         <table>
-          %== $kv->(Perl => "$] ($^O)")
+          %= $kv->(Perl => "$] ($^O)")
           % my $version  = $Mojolicious::VERSION;
           % my $codename = $Mojolicious::CODENAME;
-          %== $kv->(Mojolicious => "$version ($codename)")
-          %== $kv->(Home => app->home)
-          %== $kv->(Include => dumper \@INC)
-          %== $kv->(PID => $$)
-          %== $kv->(Name => $0)
-          %== $kv->(Executable => $^X)
-          %== $kv->(Time => scalar localtime(time))
+          %= $kv->(Mojolicious => "$version ($codename)")
+          %= $kv->(Home => app->home)
+          %= $kv->(Include => dumper \@INC)
+          %= $kv->(PID => $$)
+          %= $kv->(Name => $0)
+          %= $kv->(Executable => $^X)
+          %= $kv->(Time => scalar localtime(time))
         </table>
       </div>
       <div class="tap">tap for more</div>

@@ -160,7 +160,7 @@ sub _pod_to_html {
   # Parse
   my $output;
   $parser->output_string(\$output);
-  eval { $parser->parse_string_document($pod) };
+  eval { $parser->parse_string_document("$pod") };
   return $@ if $@;
 
   # Filter

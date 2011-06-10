@@ -19,9 +19,8 @@ Your application name has to be a well formed (camel case) Perl module name
 like "MyApp".
 EOF
 
-  my $name = $self->class_to_file($class);
-
   # Script
+  my $name = $self->class_to_file($class);
   $self->render_to_rel_file('mojo', "$name/script/$name", $class);
   $self->chmod_file("$name/script/$name", 0744);
 

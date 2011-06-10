@@ -62,11 +62,10 @@ sub run {
     $headers->{$1} = $2;
   }
 
-  # URL
+  # URL and selector
   my $url = shift @ARGV;
   die $self->usage unless $url;
   decode 'UTF-8', $url;
-
   my $selector = shift @ARGV;
 
   # Fresh user agent

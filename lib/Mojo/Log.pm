@@ -25,6 +25,7 @@ has handle => sub {
 has level => 'debug';
 has 'path';
 
+# Supported log level
 my $LEVEL = {debug => 1, info => 2, warn => 3, error => 4, fatal => 5};
 
 # "Yes, I got the most! I win X-Mas!"
@@ -57,10 +58,6 @@ sub log {
   $level = lc $level;
   return $self unless $level && $self->is_level($level);
 
-  my $time = localtime(time);
-  my $msgs = join "\n",
-    map { utf8::decode $_ unless utf8::is_utf8 $_; $_ } @msgs;
-
   # Caller
   my ($pkg, $line) = (caller())[0, 2];
   ($pkg, $line) = (caller(1))[0, 2] if $pkg eq ref $self;
@@ -69,7 +66,10 @@ sub log {
   my $handle = $self->handle;
   flock $handle, LOCK_EX;
 
-  # Log message
+  # Log messages
+  my $time = localtime(time);
+  my $msgs = join "\n",
+    map { utf8::decode $_ unless utf8::is_utf8 $_; $_ } @msgs;
   $handle->syswrite("$time $level $pkg:$line [$$]: $msgs\n");
 
   # Unlock

@@ -78,10 +78,8 @@ sub render {
       my $name = $token->[1];
       $rendered = $values->{$name};
       $rendered = '' unless defined $rendered;
-
       my $default = $self->defaults->{$name};
       $default = '' unless defined $default;
-
       $optional = 0 unless $default eq $rendered;
       $rendered = '' if $optional && $default eq $rendered;
     }
@@ -150,7 +148,6 @@ sub _compile {
     # Symbol
     elsif ($op eq 'relaxed' || $op eq 'symbol' || $op eq 'wildcard') {
       my $name = $token->[1];
-
       unshift @{$self->symbols}, $name;
 
       # Relaxed
@@ -162,11 +159,12 @@ sub _compile {
       # Wildcard
       elsif ($op eq 'wildcard') { $compiled = '(.+)' }
 
+      # Custom regex
       my $req = $self->reqs->{$name};
       $compiled = "($req)" if $req;
 
+      # Optional placeholder
       $optional = 0 unless exists $self->defaults->{$name};
-
       $compiled .= '?' if $optional;
     }
 

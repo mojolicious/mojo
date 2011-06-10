@@ -164,7 +164,6 @@ sub template_name {
 
   return unless my $template = $options->{template} || '';
   return unless my $format = $options->{format};
-
   my $handler = $options->{handler};
   my $file    = "$template.$format";
   $file = "$file.$handler" if defined $handler;

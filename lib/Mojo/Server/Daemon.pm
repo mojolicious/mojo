@@ -23,6 +23,7 @@ has max_clients        => 1000;
 has max_requests       => 25;
 has websocket_timeout  => 300;
 
+# Regex for listen sockets
 my $SOCKET_RE = qr/^
   (http(?:s)?)\:\/\/   # Scheme
   (.+)                 # Host

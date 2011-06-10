@@ -17,7 +17,6 @@ sub run {
   my $class = $ENV{MOJO_APP} || 'MyApp';
   my $path  = $self->class_to_path($class);
   my $name  = $self->class_to_file($class);
-
   $self->render_to_rel_file('makefile', 'Makefile.PL', $class, $path, $name);
   $self->chmod_file('Makefile.PL', 0744);
 }

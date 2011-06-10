@@ -313,21 +313,19 @@ sub start {
 sub test_server {
   my ($self, $protocol) = @_;
 
-  # Server
+  # Start test server
   unless ($self->{_port}) {
     my $loop = $self->{_loop} || $self->ioloop;
-
     my $server = $self->{_server} =
       Mojo::Server::Daemon->new(ioloop => $loop, silent => 1);
     my $port = $self->{_port} = $loop->generate_port;
     die "Couldn't find a free TCP port for testing.\n" unless $port;
-
     $self->{_protocol} = $protocol ||= 'http';
     $server->listen(["$protocol://*:$port"]);
     $server->prepare_ioloop;
   }
 
-  # Application
+  # Prepare application for testing
   my $server = $self->{_server};
   delete $server->{app};
   my $app = $self->app;

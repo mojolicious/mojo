@@ -14,6 +14,7 @@ EOF
 sub run {
   my $self = shift;
 
+  # Check if application has routes
   my $app = Mojo::Server->new->app;
   die "Application has no routes.\n" unless $app->can('routes');
 

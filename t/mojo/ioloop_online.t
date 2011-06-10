@@ -118,7 +118,7 @@ ok $found, 'found MX records';
 # Resolve A record and perform PTR roundtrip
 my ($a1, $ptr, $a2);
 $loop->resolve(
-  'perl.org',
+  'mojolicio.us',
   'A',
   sub {
     my ($self, $records) = @_;

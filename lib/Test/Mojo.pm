@@ -320,20 +320,18 @@ sub _get_content {
 # "Are you sure this is the Sci-Fi Convention? It's full of nerds!"
 sub _request_ok {
   my ($self, $method, $url, $headers, $body) = @_;
-
-  my $desc = "$method $url";
-  utf8::encode $desc;
-
-  # Body without headers
   $body = $headers if !ref $headers && @_ > 3;
   $headers = {} if !ref $headers;
 
+  # Perform request against application
   my $ua = $self->ua;
   $ua->app($self->app);
   $ua->max_redirects($self->max_redirects);
   $self->tx($ua->$method($url, %$headers, $body));
   local $Test::Builder::Level = $Test::Builder::Level + 2;
   my ($error, $code) = $self->tx->error;
+  my $desc = "$method $url";
+  utf8::encode $desc;
   Test::More::ok(!$error || $code, $desc);
 
   return $self;

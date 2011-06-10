@@ -106,9 +106,8 @@ sub run {
     open STDERR, '>&STDOUT';
   }
 
-  my $c = $self->{_config};
-
   # Manager signals
+  my $c = $self->{_config};
   $SIG{INT} = $SIG{TERM} = sub { $self->{_done} = 1 };
   $SIG{CHLD} = sub {
     while ((my $pid = waitpid -1, WNOHANG) > 0) { $self->_reap($pid) }

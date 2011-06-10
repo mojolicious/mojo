@@ -312,19 +312,13 @@ sub listen {
   $self = $self->singleton unless ref $self;
   my $args = ref $_[0] ? $_[0] : {@_};
 
+  # No TLS support
   croak "IO::Socket::SSL 1.43 required for TLS support"
     if $args->{tls} && !TLS;
 
-  my %options = (
-    Listen => $args->{backlog} || SOMAXCONN,
-    Proto  => 'tcp',
-    Type   => SOCK_STREAM,
-    %{$args->{args} || {}}
-  );
-  my $file = $args->{file};
-  my $port = $args->{port} || 3000;
-
   # File descriptor reuse
+  my $file  = $args->{file};
+  my $port  = $args->{port} || 3000;
   my $reuse = defined $file ? $file : $port;
   $ENV{MOJO_REUSE} ||= '';
   my $fd;
@@ -338,6 +332,12 @@ sub listen {
 
   # Listen on UNIX domain socket
   my $socket;
+  my %options = (
+    Listen => $args->{backlog} || SOMAXCONN,
+    Proto  => 'tcp',
+    Type   => SOCK_STREAM,
+    %{$args->{args} || {}}
+  );
   if (defined $file) {
     $options{Local} = $file;
     $socket =
@@ -688,6 +688,7 @@ sub start {
 sub start_tls {
   my $self = shift;
   my $id   = shift;
+  my $args = ref $_[0] ? $_[0] : {@_};
 
   # No TLS support
   unless (TLS) {
@@ -695,7 +696,20 @@ sub start_tls {
     return;
   }
 
-  my $args = ref $_[0] ? $_[0] : {@_};
+  # Cleanup
+  $self->drop($id) and return unless my $c      = $self->{_cs}->{$id};
+  $self->drop($id) and return unless my $socket = $c->{handle};
+  my $fd = fileno $socket;
+  delete $self->{_reverse}->{$socket};
+  my $writing = delete $c->{writing};
+  my $loop    = $self->_prepare_loop;
+  if (KQUEUE) {
+    $loop->EV_SET($fd, KQUEUE_READ,  KQUEUE_DELETE) if defined $writing;
+    $loop->EV_SET($fd, KQUEUE_WRITE, KQUEUE_DELETE) if $writing;
+  }
+  else { $loop->remove($socket) if defined $writing }
+
+  # TLS upgrade
   weaken $self;
   my %options = (
     SSL_startHandshake => 0,
@@ -708,22 +722,6 @@ sub start_tls {
     Timeout => $self->connect_timeout,
     %{$args->{tls_args} || {}}
   );
-
-  $self->drop($id) and return unless my $c      = $self->{_cs}->{$id};
-  $self->drop($id) and return unless my $socket = $c->{handle};
-
-  # Cleanup
-  my $fd = fileno $socket;
-  delete $self->{_reverse}->{$socket};
-  my $writing = delete $c->{writing};
-  my $loop    = $self->_prepare_loop;
-  if (KQUEUE) {
-    $loop->EV_SET($fd, KQUEUE_READ,  KQUEUE_DELETE) if defined $writing;
-    $loop->EV_SET($fd, KQUEUE_WRITE, KQUEUE_DELETE) if $writing;
-  }
-  else { $loop->remove($socket) if defined $writing }
-
-  # TLS upgrade
   $self->drop($id) and return
     unless my $new = IO::Socket::SSL->start_SSL($socket, %options);
   $c->{handle} = $new;
@@ -1027,7 +1025,6 @@ sub _not_writing {
       $loop->remove($handle);
       $writing = undef;
     }
-
     my $mask = EPOLL ? EPOLL_POLLIN : POLLIN;
     $loop->mask($handle, $mask) unless defined $writing;
   }

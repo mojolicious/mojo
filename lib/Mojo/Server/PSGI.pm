@@ -10,10 +10,9 @@ use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 131072;
 sub run {
   my ($self, $env) = @_;
 
+  # Environment
   my $tx  = $self->on_transaction->($self);
   my $req = $tx->req;
-
-  # Environment
   $req->parse($env);
 
   # Store connection information

@@ -446,14 +446,12 @@ sub punycode_decode {
       # Digit
       my $digit = ord substr $_[0], 0, 1, '';
       $digit = $digit < 0x40 ? $digit + (26 - 0x30) : ($digit & 0x1f) - 1;
-
       $i += $digit * $w;
       my $t = $k - $bias;
       $t =
           $t < PUNYCODE_TMIN ? PUNYCODE_TMIN
         : $t > PUNYCODE_TMAX ? PUNYCODE_TMAX
         :                      $t;
-
       last if $digit < $t;
 
       $w *= (PUNYCODE_BASE - $t);
@@ -461,7 +459,6 @@ sub punycode_decode {
 
     # Bias
     $bias = _adapt($i - $oldi, @output + 1, $oldi == 0);
-
     $n += $i / (@output + 1);
     $i = $i % (@output + 1);
 
@@ -469,12 +466,14 @@ sub punycode_decode {
     splice @output, $i, 0, chr($n);
     $i++;
   }
+
   $_[0] = join '', @output;
 }
 
 sub punycode_encode {
   use integer;
 
+  # Defaults
   my $output = $_[0];
   my $len    = length $_[0];
 
@@ -522,7 +521,6 @@ sub punycode_encode {
               $t < PUNYCODE_TMIN ? PUNYCODE_TMIN
             : $t > PUNYCODE_TMAX ? PUNYCODE_TMAX
             :                      $t;
-
           last if $q < $t;
 
           # Code point for digit "t"
@@ -537,7 +535,6 @@ sub punycode_encode {
 
         # Bias
         $bias = _adapt($delta, $h + 1, $h == $b);
-
         $delta = 0;
         $h++;
       }
@@ -546,6 +543,7 @@ sub punycode_encode {
     $delta++;
     $n++;
   }
+
   $_[0] = $output;
 }
 
@@ -633,11 +631,8 @@ sub _adapt {
   my ($delta, $numpoints, $firsttime) = @_;
 
   use integer;
-
-  # Delta
   $delta = $firsttime ? $delta / PUNYCODE_DAMP : $delta / 2;
   $delta += $delta / $numpoints;
-
   my $k = 0;
   while ($delta > ((PUNYCODE_BASE - PUNYCODE_TMIN) * PUNYCODE_TMAX) / 2) {
     $delta /= PUNYCODE_BASE - PUNYCODE_TMIN;

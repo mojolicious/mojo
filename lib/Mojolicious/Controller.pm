@@ -327,6 +327,7 @@ sub render_exception {
     $snapshot->{$key} = $value;
   }
 
+  # Mode specific template
   my $mode    = $self->app->mode;
   my $options = {
     template         => "exception.$mode",
@@ -337,8 +338,6 @@ sub render_exception {
     exception        => $e,
     'mojo.exception' => 1
   };
-
-  # Mode specific template
   unless ($self->render($options)) {
 
     # Template
@@ -395,6 +394,7 @@ sub render_not_found {
     ? $self->url_for('/perldoc')
     : 'http://mojolicio.us/perldoc';
 
+  # Mode specific template
   my $mode    = $self->app->mode;
   my $options = {
     template         => "not_found.$mode",
@@ -403,8 +403,6 @@ sub render_not_found {
     guide            => $guide,
     'mojo.not_found' => 1
   };
-
-  # Mode specific template
   unless ($self->render($options)) {
 
     # Template

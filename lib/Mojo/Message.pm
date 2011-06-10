@@ -73,10 +73,9 @@ sub body_params {
   # Cached
   return $self->{_body_params} if $self->{_body_params};
 
+  # Charset
   my $params = Mojo::Parameters->new;
   my $type = $self->headers->content_type || '';
-
-  # Charset
   $params->charset($self->default_charset);
   $type =~ /charset=\"?(\S+)\"?/ and $params->charset($1);
 

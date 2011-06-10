@@ -48,9 +48,8 @@ sub parse {
   $date =~ s/GMT\s*$//i;
   $date =~ s/\s+$//;
 
-  my ($day, $month, $year, $hour, $minute, $second);
-
   # RFC 822/1123 - Sun, 06 Nov 1994 08:49:37 GMT
+  my ($day, $month, $year, $hour, $minute, $second);
   if ($date =~ /^(\d+)\s+(\w+)\s+(\d+)\s+(\d+):(\d+):(\d+)$/) {
     $day    = $1;
     $month  = $MONTHS{$2};
@@ -98,11 +97,10 @@ sub parse {
 sub to_string {
   my $self = shift;
 
+  # RFC 822/1123
   my $epoch = $self->epoch;
   $epoch = time unless defined $epoch;
   my ($second, $minute, $hour, $mday, $month, $year, $wday) = gmtime $epoch;
-
-  # RFC 822/1123
   return sprintf(
     "%s, %02d %s %04d %02d:%02d:%02d GMT",
     $DAYS[$wday], $mday, $MONTHS[$month], $year + 1900,

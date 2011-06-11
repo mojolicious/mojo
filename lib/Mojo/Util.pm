@@ -397,7 +397,10 @@ sub html_escape {
   $_[0] = $escaped;
 }
 
-sub html_unescape { $_[0] =~ s/&(\#?)(\w+);/_unescape($1, $2)/gex }
+sub html_unescape {
+  $_[0]
+    =~ s/&(?:\#((?:\d{1,7}|x[0-9A-Fa-f]{1,6}))|(\w+));/_unescape($1, $2)/ge;
+}
 
 sub md5_bytes {
   my $data = shift;
@@ -660,8 +663,8 @@ EOF
 # Helper for html_unescape
 sub _unescape {
   if ($_[0]) {
-    return chr hex $_[1] if substr($_[1], 0, 1) eq 'x';
-    return chr $_[1];
+    return chr hex $_[0] if substr($_[0], 0, 1) eq 'x';
+    return chr $_[0];
   }
   return exists $ENTITIES{$_[1]} ? chr $ENTITIES{$_[1]} : "&$_[1];";
 }

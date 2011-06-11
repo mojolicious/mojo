@@ -398,8 +398,22 @@ sub html_escape {
 }
 
 sub html_unescape {
-  $_[0]
-    =~ s/&(?:\#((?:\d{1,7}|x[0-9A-Fa-f]{1,6}))|(\w+));/_unescape($1, $2)/ge;
+  $_[0] =~ s/
+    &
+    (?:
+      \#
+      (
+        (?:
+          \d{1,7}             # Number
+          |
+          x[0-9A-Fa-f]{1,6}   # Hex
+        )
+      )
+      |
+      ([A-Za-z]{1,8})         # Name
+    )
+    ;
+  /_unescape($1, $2)/gex;
 }
 
 sub md5_bytes {

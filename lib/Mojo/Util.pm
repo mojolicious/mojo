@@ -397,19 +397,23 @@ sub html_escape {
   $_[0] = $escaped;
 }
 
-sub html_unescape {
-  $_[0] =~ s/
-    &
-    (?:
-      \#(\d{1,7})             # Number
-      |
-      ([A-Za-z]{1,8})         # Named
-      |
-      \#x([0-9A-Fa-f]{1,6})   # Hex
-    )
-    ;
-    /_unescape($1, $2, $3)/gex;
+sub _unescape_ {
+  my ($num, $entity, $hex) = @_;
+
+  # Named to number
+  if (defined $entity) { $num = $ENTITIES{$entity} }
+
+  # Hex to number
+  elsif (defined $hex) { $num = hex $hex }
+
+  # Number
+  return _unescape_num($num) if $num;
+
+  # Unknown entity
+  return "&$entity;";
 }
+
+sub html_unescape { $_[0] =~ s/&(\#?)(\w+);/_unescape($1, $2)/gex }
 
 sub md5_bytes {
   my $data = shift;
@@ -671,19 +675,11 @@ EOF
 
 # Helper for html_unescape
 sub _unescape {
-  my ($num, $entitie, $hex) = @_;
-
-  # Named to number
-  if (defined $entitie) { $num = $ENTITIES{$entitie} }
-
-  # Hex to number
-  elsif (defined $hex) { $num = hex $hex }
-
-  # Number
-  return pack 'U', $num if $num;
-
-  # Unknown entitie
-  return "&$entitie;";
+  if ($_[0]) {
+    return chr hex $_[1] if substr($_[1], 0, 1) eq 'x';
+    return chr $_[1];
+  }
+  return exists $ENTITIES{$_[1]} ? chr $ENTITIES{$_[1]} : "&$_[1];";
 }
 
 1;

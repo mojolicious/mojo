@@ -1312,13 +1312,13 @@ Note that this method is EXPERIMENTAL and might change without warning!
 Open a non-blocking WebSocket connection with transparent handshake.
 
   $ua->websocket('ws://localhost:3000/echo' => sub {
-      my $tx = pop;
-      $tx->on_finish(sub  { Mojo::IOLoop->stop });
-      $tx->on_message(sub {
-        my ($tx, $message) = @_;
-        print "$message\n";
-      });
-      $tx->send_message('Hi!');
+    my $tx = pop;
+    $tx->on_finish(sub  { Mojo::IOLoop->stop });
+    $tx->on_message(sub {
+      my ($tx, $message) = @_;
+      print "$message\n";
+    });
+    $tx->send_message('Hi!');
   });
   Mojo::IOLoop->start;
 

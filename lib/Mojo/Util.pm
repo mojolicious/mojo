@@ -397,22 +397,6 @@ sub html_escape {
   $_[0] = $escaped;
 }
 
-sub _unescape_ {
-  my ($num, $entity, $hex) = @_;
-
-  # Named to number
-  if (defined $entity) { $num = $ENTITIES{$entity} }
-
-  # Hex to number
-  elsif (defined $hex) { $num = hex $hex }
-
-  # Number
-  return _unescape_num($num) if $num;
-
-  # Unknown entity
-  return "&$entity;";
-}
-
 sub html_unescape { $_[0] =~ s/&(\#?)(\w+);/_unescape($1, $2)/gex }
 
 sub md5_bytes {

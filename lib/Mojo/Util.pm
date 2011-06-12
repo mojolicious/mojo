@@ -324,17 +324,12 @@ sub camelize {
 sub decamelize {
   return if $_[0] !~ /^[A-Z\:]+/;
 
-  # Module parts
-  my @parts;
-  for my $part (split /\:\:/, $_[0]) {
-
-    # Camelcase words
-    my @words;
-    push @words, $1 while ($part =~ s/([A-Z]{1}[^A-Z]*)//);
-    @words = map {lc} @words;
-    push @parts, join '_', @words;
-  }
-  $_[0] = join '-', @parts;
+  $_[0] =~ s/::/-/g;
+  # ClassicCamelCase -> classic_camel_case
+  $_[0] =~ s/(?<=[a-z])(?=[A-Z])/_/g;
+  # NotSoCLASSICCase -> not_so_classic_case
+  $_[0] =~ s/(?<=[A-Za-z])(?=[A-Z][a-z])/_/g;
+  $_[0] = lc $_[0];
 }
 
 sub decode {

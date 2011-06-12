@@ -12,7 +12,7 @@ use Test::More;
 
 plan skip_all => 'Perl 5.10 or Digest::SHA required for this test!'
   unless eval { require Digest::SHA; 1 };
-plan tests => 106;
+plan tests => 112;
 
 use_ok 'Mojo::Util',       'md5_bytes';
 use_ok 'Mojo::ByteStream', 'b';
@@ -36,6 +36,17 @@ $stream = b('FooBB');
 is $stream->decamelize, 'foo_b_b', 'right decamelized result';
 $stream = b('Foo::BB');
 is $stream->decamelize, 'foo-b_b', 'right decamelized result';
+
+# camelize/decamelize roundtrip
+my $original = 'MyApp::Controller::FooBAR';
+$stream = b($original);
+my $result = $stream->decamelize->to_string;
+is "$stream", $result, 'stringified successfully';
+isnt $result, $original, 'decamelized result is different';
+is $stream->camelize,   $original, 'successful roundtrip';
+is $stream->decamelize, $result,   'right decamelized result';
+isnt "$stream", $original, 'decamelized result is different';
+is $stream->camelize, $original, 'successful roundtrip again';
 
 # b64_encode
 $stream = b('foobar$%^&3217');
@@ -98,8 +109,8 @@ $stream = b('"foo 23 \"bar"');
 is $stream->unquote, 'foo 23 "bar', 'right unquoted result';
 
 # md5_bytes
-my $original = 'foo bar baz ♥';
-my $copy     = $original;
+$original = 'foo bar baz ♥';
+my $copy = $original;
 $stream = b($copy);
 is unpack('H*', $stream->md5_bytes), "a740aeb6e066f158cbf19fd92e890d2d",
   'right binary md5 checksum';

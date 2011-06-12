@@ -466,6 +466,21 @@ This can be an invaluable tool for testing your applications.
 
 Fun hacks you might not use very often but that might come in handy some day.
 
+=head2 Running Code Against Your Application
+
+Ever thought about running a quick oneliner against your L<Mojolicious>
+application to test something?
+Thanks to the C<eval> command you can do just that, the application instance
+itself can be accessed via C<app>.
+
+  % mojo generate lite_app
+  ...
+  % ./myapp.pl eval 'print app->static->root, "\n"'
+
+The C<verbose> option will automatically print the return value to C<STDOUT>.
+
+  % ./myapp.pl eval -v 'app->static->root'
+
 =head2 Making Your Application Installable
 
 Ever thought about releasing your L<Mojolicious> application to CPAN?

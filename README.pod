@@ -94,9 +94,8 @@ Web development for humans, making hard things possible and everything fun.
 
   # RESTful web service sending JSON responses
   get '/list/:offset' => sub {
-    my $self   = shift;
-    my $offset = $self->param('offset') || 23;
-    $self->render_json({list => [0 .. $offset]});
+    my $self = shift;
+    $self->render_json({list => [0 .. $self->param('offset')]});
   };
 
   # Scrape and return information from remote sites
@@ -141,9 +140,8 @@ A controller collects several actions together.
 
   # RESTful web service sending JSON responses
   sub restful {
-    my $self   = shift;
-    my $offset = $self->param('offset') || 23;
-    $self->render_json({list => [0 .. $offset]});
+    my $self = shift;
+    $self->render_json({list => [0 .. $self->param('offset')]});
   }
 
   # Scrape and return information from remote sites

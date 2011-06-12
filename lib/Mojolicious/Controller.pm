@@ -463,8 +463,8 @@ sub rendered {
   unless ($stash->{'mojo.finished'}) {
     $res->code(200) unless $res->code;
     my $app = $self->app;
-    $app->sessions->store($self);
     $app->plugins->run_hook_reverse(after_dispatch => $self);
+    $app->sessions->store($self);
     $stash->{'mojo.finished'} = 1;
   }
   $self->tx->resume;

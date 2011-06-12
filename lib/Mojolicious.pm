@@ -374,7 +374,7 @@ Web development for humans, making hard things possible and everything fun.
   get '/time' => 'clock';
 
   # RESTful web service sending JSON responses
-  get '/:offset' => sub {
+  get '/list/:offset' => sub {
     my $self   = shift;
     my $offset = $self->param('offset') || 23;
     $self->render_json({list => [0 .. $offset]});
@@ -472,7 +472,7 @@ especially when working in a team.
     # (paths are relative to the controller)
     $example->get('/')->to('#hello');
     $example->get('/time')->to('#clock');
-    $example->get('/:offset')->to('#restful');
+    $example->get('/list/:offset')->to('#restful');
 
     # All common HTTP verbs are supported
     $example->post('/title')->to('#title');

@@ -139,6 +139,8 @@ Mojo::Path - Path
   use Mojo::Path;
 
   my $path = Mojo::Path->new('/foo/bar%3B/baz.html');
+  shift @{$path->parts};
+  print "$path";
 
 =head1 DESCRIPTION
 

@@ -12,7 +12,7 @@ BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 my $backup;
 BEGIN { $backup = $ENV{MOJO_MODE} || ''; $ENV{MOJO_MODE} = 'development' }
 
-use Test::More tests => 807;
+use Test::More tests => 810;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -1607,6 +1607,9 @@ $t->get_ok('/bridge2stash')->status_is(200)
 $t->get_ok('/late/session')->status_is(200)->content_is('not yet!');
 
 # GET /late/session (previous late session does affect rendering)
+$t->get_ok('/late/session')->status_is(200)->content_is('works!');
+
+# GET /late/session (previous late session does affect rendering again)
 $t->get_ok('/late/session')->status_is(200)->content_is('works!');
 
 # GET /with/under/count

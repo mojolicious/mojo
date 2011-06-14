@@ -20,10 +20,10 @@ Mojolicious::Plugin::Embed - Application Embedding Plugin
 =head1 SYNOPSIS
 
   # Mojolicious
-  $self->plugin('embed', '/test' => '/Users/sri/testapp.pl');
+  $self->plugin('embed', '/prefix' => '/Users/sri/myapp.pl');
 
   # Mojolicious::Lite
-  plugin 'embed', '/test' => '/Users/sri/testapp.pl';
+  plugin 'embed', '/prefix' => '/Users/sri/myapp.pl';
 
 =head1 DESCRIPTION
 

@@ -796,6 +796,10 @@ Perl-ish configuration files.
 
 General purpose helper collection.
 
+=item L<Mojolicious::Plugin::Embed>
+
+Embed L<Mojolicious> applications.
+
 =item L<Mojolicious::Plugin::EplRenderer>
 
 Renderer for plain embedded Perl templates.

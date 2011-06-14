@@ -1,4 +1,4 @@
-package Mojolicious::Plugin::Embed;
+package Mojolicious::Plugin::Mount;
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::Server;
@@ -15,31 +15,32 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::Embed - Application Embedding Plugin
+Mojolicious::Plugin::Mount - Application Mount Plugin
 
 =head1 SYNOPSIS
 
   # Mojolicious
-  $self->plugin('embed', '/prefix' => '/Users/sri/myapp.pl');
+  $self->plugin('mount', '/prefix' => '/Users/sri/myapp.pl');
 
   # Mojolicious::Lite
-  plugin 'embed', '/prefix' => '/Users/sri/myapp.pl';
+  plugin 'mount', '/prefix' => '/Users/sri/myapp.pl';
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Plugin::Embed> is a simple application embeddign plugin.
+L<Mojolicious::Plugin::Mount> is a plugin that allows you to mount whole
+L<Mojolicious> applications.
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS
 
-L<Mojolicious::Plugin::Embed> inherits all methods from
+L<Mojolicious::Plugin::Mount> inherits all methods from
 L<Mojolicious::Plugin> and implements the following new ones.
 
 =head2 C<register>
 
   $plugin->register;
 
-Embed L<Mojolicious> application.
+Mount L<Mojolicious> application.
 
 =head1 SEE ALSO
 

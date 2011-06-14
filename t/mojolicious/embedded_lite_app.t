@@ -88,11 +88,11 @@ plugin 'PluginWithEmbeddedApp';
 
 app->routes->namespace('MyTestApp');
 
-# Embed full external application twice
+# Mount full external application twice
 use FindBin;
 my $external = "$FindBin::Bin/external/myapp.pl";
-plugin 'embed', '/external/1' => $external;
-plugin('embed', '/external/2' => $external)->to(message => 'works 2!');
+plugin 'mount', '/external/1' => $external;
+plugin('mount', '/external/2' => $external)->to(message => 'works 2!');
 
 # GET /hello
 get '/hello' => 'works';

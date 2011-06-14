@@ -990,9 +990,11 @@ once all data has been written to the kernel send buffer or equivalent.
   $c->write('Hel', sub { shift->write('lo!') });
 
   # Close connection when done (without Content-Length header)
-  $c->write('Hel');
-  $c->write('lo!');
-  $c->finish;
+  $c->write('Hel', sub {
+    shift->write('lo!', sub {
+      shift->finish;
+    });
+  });
 
 =head2 C<write_chunk>
 
@@ -1006,9 +1008,11 @@ which doesn't require a C<Content-Length> header, the optional drain callback
 will be invoked once all data has been written to the kernel send buffer or
 equivalent.
 
-  $c->write_chunk('He');
-  $c->write_chunk('ll');
-  $c->finish('o!');
+  $c->write_chunk('He', sub {
+    shift->write_chunk('ll', sub {
+      shift->finish('o!');
+    });
+  });
 
 You can call C<finish> at any time to end the stream.
 

@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_MODE} = 'testing';
 }
 
-use Test::More tests => 59;
+use Test::More tests => 65;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -190,6 +190,9 @@ $t->get_ok('/external/1/index.html')->status_is(200)
 # GET /external/1/echo (full external application)
 $t->get_ok('/external/1/echo')->status_is(200)->content_is('echo: nothing!');
 
+# GET /external/1/stream (full external application)
+$t->get_ok('/external/1/stream')->status_is(200)->content_is('hello!');
+
 # GET /external/2/ (full external application)
 $t->get_ok('/external/2/')->status_is(200)
   ->content_is("works!\n\ntoo!works!!!\n");
@@ -200,6 +203,9 @@ $t->get_ok('/external/2/index.html')->status_is(200)
 
 # GET /external/2/echo (full external application)
 $t->get_ok('/external/2/echo')->status_is(200)->content_is('echo: works 2!');
+
+# GET /external/2/stream (full external application)
+$t->get_ok('/external/2/stream')->status_is(200)->content_is('hello!');
 
 __DATA__
 @@ works.html.ep

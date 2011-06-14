@@ -76,8 +76,8 @@ sub match {
   my $empty = !length $path || $path eq '/' ? 1 : 0;
 
   # Partial
-  if (my $partial = $r->partial) {
-    $captures->{$partial} = $path;
+  if ($r->partial) {
+    $captures->{path} = $path;
     $self->endpoint($r);
     $empty = 1;
   }

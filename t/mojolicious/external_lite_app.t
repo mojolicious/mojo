@@ -12,7 +12,7 @@ BEGIN {
 }
 
 # "Who are you, and why should I care?"
-use Test::More tests => 6;
+use Test::More tests => 12;
 
 # "Of all the parasites I've had over the years,
 #  these worms are among the best."
@@ -28,3 +28,9 @@ $t->get_ok('/')->status_is(200)->content_is("works!\n\ntoo!works!!!\n");
 # GET /index.html
 $t->get_ok('/index.html')->status_is(200)
   ->content_is('External static file!');
+
+# GET /echo
+$t->get_ok('/echo')->status_is(200)->content_is('echo: nothing!');
+
+# GET /stream
+$t->get_ok('/stream')->status_is(200)->content_is('hello!');

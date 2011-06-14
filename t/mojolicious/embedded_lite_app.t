@@ -91,8 +91,8 @@ app->routes->namespace('MyTestApp');
 # Mount full external application twice
 use FindBin;
 my $external = "$FindBin::Bin/external/myapp.pl";
-plugin 'mount', '/external/1' => $external;
-plugin('mount', '/external/2' => $external)->to(message => 'works 2!');
+plugin mount => {'/external/1' => $external};
+plugin(mount => ('/external/2' => $external))->to(message => 'works 2!');
 
 # GET /hello
 get '/hello' => 'works';

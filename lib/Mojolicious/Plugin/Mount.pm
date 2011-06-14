@@ -20,10 +20,14 @@ Mojolicious::Plugin::Mount - Application Mount Plugin
 =head1 SYNOPSIS
 
   # Mojolicious
-  $self->plugin('mount', '/prefix' => '/Users/sri/myapp.pl');
+  $self->plugin(mount => {'/prefix' => '/home/sri/myapp.pl'});
 
   # Mojolicious::Lite
-  plugin 'mount', '/prefix' => '/Users/sri/myapp.pl';
+  plugin mount => {'/prefix' => '/home/sri/myapp.pl'};
+
+  # Adjust the generated route
+  my $example = plugin mount => {'/example' => '/home/sri/example.pl'};
+  $example->to(message => 'It works great!');
 
 =head1 DESCRIPTION
 

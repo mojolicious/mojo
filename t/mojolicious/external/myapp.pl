@@ -12,7 +12,14 @@ plugin 'config';
 # GET /
 get '/' => 'index';
 
+# GET /echo
+get '/echo' => sub {
+  my $self = shift;
+  $self->render_text('echo: ' . ($self->stash('message') || 'nothing!'));
+};
+
 app->start;
 __DATA__
-@@ index.html.ep
-<%= $config->{just} . $config->{works} . stash('also') %>
+
+@@ menubar.html.ep
+<%= $config->{just} %>

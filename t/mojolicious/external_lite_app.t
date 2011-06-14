@@ -23,7 +23,7 @@ use Test::Mojo;
 my $t = Test::Mojo->new;
 
 # GET /
-$t->get_ok('/')->status_is(200)->content_is("works!too!works!!!\n");
+$t->get_ok('/')->status_is(200)->content_is("works!\n\ntoo!works!!!\n");
 
 # GET /index.html
 $t->get_ok('/index.html')->status_is(200)

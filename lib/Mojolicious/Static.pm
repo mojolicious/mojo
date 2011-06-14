@@ -20,7 +20,10 @@ sub dispatch {
   return if $c->res->code;
 
   # Canonical path
-  my $path = $c->req->url->path->clone->canonicalize->to_string;
+  my $stash = $c->stash;
+  my $path  = $stash->{path};
+  $path = $c->req->url->path->clone->canonicalize->to_string
+    unless defined $path;
 
   # Split parts
   my @parts = @{Mojo::Path->new->parse($path)->parts};
@@ -31,7 +34,7 @@ sub dispatch {
 
   # Serve static file
   unless ($self->serve($c, join('/', @parts))) {
-    $c->stash->{'mojo.static'} = 1;
+    $stash->{'mojo.static'} = 1;
     $c->rendered;
     return;
   }

@@ -1,0 +1,2 @@
+%= include 'menubar'
+<%= $config->{works} . stash('also') %>

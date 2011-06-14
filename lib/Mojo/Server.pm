@@ -3,7 +3,8 @@ use Mojo::Base -base;
 
 use Carp 'croak';
 use Mojo::Loader;
-use Scalar::Util 'blessed';
+
+require Scalar::Util;
 
 has app => sub {
   my $self = shift;
@@ -50,15 +51,23 @@ has reload => sub { $ENV{MOJO_RELOAD} || 0 };
 
 sub load_app {
   my ($self, $file) = @_;
-  my $app;
+
+  # Cleanup environment
+  package Mojo::Server::_App;
   local $ENV{MOJO_APP_LOADER} = 1;
+  local $ENV{MOJO_APP};
+  local $ENV{MOJO_EXE};
+  local $ENV{MOJO_COMMANDS_DONE};
+
+  # Try to load application from script
+  my $app;
   unless ($app = do $file) {
     die qq/Can't load application "$file": $@/ if $@;
     die qq/Can't load application "$file": $!/ unless defined $app;
     die qq/Can't load application' "$file".\n/ unless $app;
   }
   die qq/"$file" is not a valid application.\n/
-    unless blessed $app && $app->isa('Mojo');
+    unless Scalar::Util::blessed($app) && $app->isa('Mojo');
   $self->app($app);
   return $app;
 }

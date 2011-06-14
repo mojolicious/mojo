@@ -4,9 +4,12 @@ use strict;
 use warnings;
 
 # Disable IPv6, epoll and kqueue
-BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
+BEGIN {
+  $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1;
+  $ENV{MOJO_MODE} = 'testing';
+}
 
-use Test::More tests => 41;
+use Test::More tests => 59;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -84,6 +87,12 @@ package main;
 plugin 'PluginWithEmbeddedApp';
 
 app->routes->namespace('MyTestApp');
+
+# Embed full external application twice
+use FindBin;
+my $external = "$FindBin::Bin/external/myapp.pl";
+plugin 'embed', '/external/1' => $external;
+plugin('embed', '/external/2' => $external)->to(message => 'works 2!');
 
 # GET /hello
 get '/hello' => 'works';
@@ -169,6 +178,28 @@ $t->get_ok('/third')->status_is(200)
 
 # GET /just/works (from external embedded app)
 $t->get_ok('/just/works')->status_is(200)->content_is("It is working!\n");
+
+# GET /external/1/ (full external application)
+$t->get_ok('/external/1/')->status_is(200)
+  ->content_is("works!\n\ntoo!works!!!\n");
+
+# GET /external/1/index.html (full external application)
+$t->get_ok('/external/1/index.html')->status_is(200)
+  ->content_is('External static file!');
+
+# GET /external/1/echo (full external application)
+$t->get_ok('/external/1/echo')->status_is(200)->content_is('echo: nothing!');
+
+# GET /external/2/ (full external application)
+$t->get_ok('/external/2/')->status_is(200)
+  ->content_is("works!\n\ntoo!works!!!\n");
+
+# GET /external/2/index.html (full external application)
+$t->get_ok('/external/2/index.html')->status_is(200)
+  ->content_is('External static file!');
+
+# GET /external/2/echo (full external application)
+$t->get_ok('/external/2/echo')->status_is(200)->content_is('echo: works 2!');
 
 __DATA__
 @@ works.html.ep

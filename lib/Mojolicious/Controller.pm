@@ -987,12 +987,17 @@ once all data has been written to the kernel send buffer or equivalent.
 
   # Keep connection alive (with Content-Length header)
   $c->res->headers->content_length(6);
-  $c->write('Hel', sub { shift->write('lo!') });
+  $c->write('Hel', sub {
+    my $c = shift;
+    $c->write('lo!')
+  });
 
   # Close connection when done (without Content-Length header)
   $c->write('Hel', sub {
-    shift->write('lo!', sub {
-      shift->finish;
+    my $c = shift;
+    $c->write('lo!', sub {
+      my $c = shift;
+      $c->finish;
     });
   });
 
@@ -1009,8 +1014,10 @@ will be invoked once all data has been written to the kernel send buffer or
 equivalent.
 
   $c->write_chunk('He', sub {
-    shift->write_chunk('ll', sub {
-      shift->finish('o!');
+    my $c = shift;
+    $c->write_chunk('ll', sub {
+      my $c = shift;
+      $c->finish('o!');
     });
   });
 

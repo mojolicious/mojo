@@ -164,7 +164,7 @@ Local interface port.
   my $cb = $tx->on_finish;
   $tx    = $tx->on_finish(sub {...});
 
-Callback signaling that the transaction has been finished.
+Callback to be invoked when the transaction has been finished.
 
   $tx->on_finish(sub {
     my $self = shift;

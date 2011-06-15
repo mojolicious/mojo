@@ -137,7 +137,7 @@ L<Mojo::HelloWorld>.
     my ($self, $tx) = @_;
   });
 
-Request callback.
+Callback to be invoked for requests that need a response.
 
 =head2 C<on_transaction>
 
@@ -147,7 +147,7 @@ Request callback.
     return Mojo::Transaction::HTTP->new;
   });
 
-Transaction builder callback.
+Callback to be invoked when a new transaction is needed.
 
 =head2 C<on_websocket>
 
@@ -156,7 +156,7 @@ Transaction builder callback.
     my ($self, $tx) = @_;
   });
 
-WebSocket handshake callback.
+Callback to be invoked for WebSocket handshakes.
 
 =head2 C<reload>
 

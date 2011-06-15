@@ -617,7 +617,7 @@ Default charset used for form data parsing, defaults to C<UTF-8>.
   my $class = $message->dom_class;
   $message  = $message->dom_class('Mojo::DOM');
 
-Class to be used for DOM manipulation with the C<dom> methos, defaults to
+Class to be used for DOM manipulation with the C<dom> method, defaults to
 L<Mojo::DOM>.
 
 =head2 C<json_class>

@@ -383,7 +383,8 @@ L<Mojo::Transaction> and implements the following new ones.
   my $handshake = $ws->handshake;
   $ws           = $ws->handshake(Mojo::Transaction::HTTP->new);
 
-The original handshake transaction.
+The original handshake transaction, defaults to a L<Mojo::Transaction::HTTP>
+object.
 
 =head2 C<masked>
 
@@ -404,7 +405,7 @@ Maximum WebSocket message size in bytes, defaults to C<262144>.
   my $cb = $ws->on_message;
   $ws    = $ws->on_message(sub {...});
 
-The callback that receives decoded messages one by one.
+Callback to be invoked for each decoded message.
 
   $ws->on_message(sub {
     my ($self, $message) = @_;

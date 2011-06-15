@@ -397,26 +397,19 @@ described in RFC 2616.
 L<Mojo::Transaction::HTTP> inherits all attributes from L<Mojo::Transaction>
 and implements the following new ones.
 
-=head2 C<keep_alive>
-
-  my $keep_alive = $tx->keep_alive;
-  $tx            = $tx->keep_alive(1);
-
-Connection can be kept alive.
-
 =head2 C<on_upgrade>
 
   my $cb = $tx->on_upgrade;
   $tx    = $tx->on_upgrade(sub {...});
 
-WebSocket upgrade callback.
+Callback to be invoked for WebSocket upgrades.
 
 =head2 C<on_request>
 
   my $cb = $tx->on_request;
   $tx    = $tx->on_request(sub {...});
 
-Request callback.
+Callback to be invoked for requests.
 
 =head2 C<req>
 
@@ -448,6 +441,13 @@ Read and process client data.
   my $chunk = $tx->client_write;
 
 Write client data.
+
+=head2 C<keep_alive>
+
+  my $keep_alive = $tx->keep_alive;
+  $tx            = $tx->keep_alive(1);
+
+Connection can be kept alive.
 
 =head2 C<server_leftovers>
 

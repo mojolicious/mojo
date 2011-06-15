@@ -749,21 +749,20 @@ Data storage persistent for the next request, stored in the session.
 
   $c->on_finish(sub {...});
 
-Callback signaling that the transaction has been finished.
+Callback to be invoked when the transaction has been finished.
 
   $c->on_finish(sub {
-    my $self = shift;
+    my $c = shift;
   });
 
 =head2 C<on_message>
 
   $c = $c->on_message(sub {...});
 
-Receive messages via WebSocket, only works if there is currently a WebSocket
-connection in progress.
+Callback to be invoked when new WebSocket messages arrive.
 
   $c->on_message(sub {
-    my ($self, $message) = @_;
+    my ($c, $message) = @_;
   });
 
 =head2 C<param>

@@ -93,8 +93,8 @@ app->routes->namespace('MyTestApp');
 # Mount full external application twice
 use FindBin;
 my $external = "$FindBin::Bin/external/myapp.pl";
-plugin mount => {'/external/1' => $external};
-plugin(mount => ('/external/2' => $external))->to(message => 'works 2!');
+plugin mount => {'/x/1' => $external};
+plugin(mount => ('/x/♥' => $external))->to(message => 'works 2!');
 
 # GET /hello
 get '/hello' => 'works';
@@ -181,41 +181,40 @@ $t->get_ok('/third')->status_is(200)
 # GET /just/works (from external embedded app)
 $t->get_ok('/just/works')->status_is(200)->content_is("It is working!\n");
 
-# GET /external/1/ (full external application)
-$t->get_ok('/external/1/')->status_is(200)
-  ->content_is("works!\n\ntoo!works!!!\n");
+# GET /x/1/ (full external application)
+$t->get_ok('/x/1/')->status_is(200)->content_is("works!\n\ntoo!works!!!\n");
 
-# GET /external/1/index.html (full external application)
-$t->get_ok('/external/1/index.html')->status_is(200)
+# GET /x/1/index.html (full external application)
+$t->get_ok('/x/1/index.html')->status_is(200)
   ->content_is('External static file!');
 
-# GET /external/1/echo (full external application)
-$t->get_ok('/external/1/echo')->status_is(200)->content_is('echo: nothing!');
+# GET /x/1/echo (full external application)
+$t->get_ok('/x/1/echo')->status_is(200)->content_is('echo: nothing!');
 
-# GET /external/1/stream (full external application)
-$t->get_ok('/external/1/stream')->status_is(200)->content_is('hello!');
+# GET /x/1/stream (full external application)
+$t->get_ok('/x/1/stream')->status_is(200)->content_is('hello!');
 
-# GET /external/1/url/☃ (full external application)
-$t->get_ok('/external/1/url/☃')->status_is(200)
-  ->content_is('/external/1/url/%E2%98%83 -> /external/1/%E2%98%83/stream!');
+# GET /x/1/url/☃ (full external application)
+$t->get_ok('/x/1/url/☃')->status_is(200)
+  ->content_is('/x/1/url/%E2%98%83 -> /x/1/%E2%98%83/stream!');
 
-# GET /external/2/ (full external application)
-$t->get_ok('/external/2/')->status_is(200)
-  ->content_is("works!\n\ntoo!works!!!\n");
+# GET /x/♥/ (full external application)
+$t->get_ok('/x/♥/')->status_is(200)->content_is("works!\n\ntoo!works!!!\n");
 
-# GET /external/2/index.html (full external application)
-$t->get_ok('/external/2/index.html')->status_is(200)
+# GET /x/♥/index.html (full external application)
+$t->get_ok('/x/♥/index.html')->status_is(200)
   ->content_is('External static file!');
 
-# GET /external/2/echo (full external application)
-$t->get_ok('/external/2/echo')->status_is(200)->content_is('echo: works 2!');
+# GET /x/♥/echo (full external application)
+$t->get_ok('/x/♥/echo')->status_is(200)->content_is('echo: works 2!');
 
-# GET /external/2/stream (full external application)
-$t->get_ok('/external/2/stream')->status_is(200)->content_is('hello!');
+# GET /x/♥/stream (full external application)
+$t->get_ok('/x/♥/stream')->status_is(200)->content_is('hello!');
 
-# GET /external/1/url/☃ (full external application)
-$t->get_ok('/external/2/url/☃')->status_is(200)
-  ->content_is('/external/2/url/%E2%98%83 -> /external/2/%E2%98%83/stream!');
+# GET /x/♥/url/☃ (full external application)
+$t->get_ok('/x/♥/url/☃')->status_is(200)
+  ->content_is(
+  '/x/%E2%99%A5/url/%E2%98%83 -> /x/%E2%99%A5/%E2%98%83/stream!');
 
 __DATA__
 

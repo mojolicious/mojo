@@ -114,10 +114,10 @@ sub register {
           url_escape $anchor, 'A-Za-z0-9_';
           $anchor =~ s/\%//g;
           push @$sections, [] if $tag->type eq 'h1' || !@$sections;
-          push @{$sections->[-1]}, $text, "/$url#$anchor";
+          push @{$sections->[-1]}, $text, $url->fragment($anchor)->to_abs;
           $tag->replace_content(
             $self->link_to(
-              $text => "/$url#toc",
+              $text => $url->fragment('toc')->to_abs,
               class => 'mojoscroll',
               id    => $anchor
             )

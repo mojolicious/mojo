@@ -608,7 +608,18 @@ sub url_for {
 
   # Relative URL
   my $path = $url->path;
-  if ($target =~ /^\//) { $url->parse($target) }
+  if ($target =~ /^\//) {
+    if (my $e = $self->stash->{path}) {
+      my $real = $req->url->path->to_abs_string;
+      Mojo::Util::url_unescape($real);
+      my $backup = $real;
+      Mojo::Util::decode('UTF-8', $real);
+      $real = $backup unless defined $real;
+      $real =~ s/\/?$e$/$target/;
+      $target = $real;
+    }
+    $url->parse($target);
+  }
 
   # Route
   else {

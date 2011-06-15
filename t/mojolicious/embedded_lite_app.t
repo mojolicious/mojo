@@ -3,13 +3,15 @@
 use strict;
 use warnings;
 
+use utf8;
+
 # Disable IPv6, epoll and kqueue
 BEGIN {
   $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1;
   $ENV{MOJO_MODE} = 'testing';
 }
 
-use Test::More tests => 65;
+use Test::More tests => 71;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -193,6 +195,10 @@ $t->get_ok('/external/1/echo')->status_is(200)->content_is('echo: nothing!');
 # GET /external/1/stream (full external application)
 $t->get_ok('/external/1/stream')->status_is(200)->content_is('hello!');
 
+# GET /external/1/url/☃ (full external application)
+$t->get_ok('/external/1/url/☃')->status_is(200)
+  ->content_is('/external/1/url/%E2%98%83 -> /external/1/%E2%98%83/stream!');
+
 # GET /external/2/ (full external application)
 $t->get_ok('/external/2/')->status_is(200)
   ->content_is("works!\n\ntoo!works!!!\n");
@@ -207,6 +213,11 @@ $t->get_ok('/external/2/echo')->status_is(200)->content_is('echo: works 2!');
 # GET /external/2/stream (full external application)
 $t->get_ok('/external/2/stream')->status_is(200)->content_is('hello!');
 
+# GET /external/1/url/☃ (full external application)
+$t->get_ok('/external/2/url/☃')->status_is(200)
+  ->content_is('/external/2/url/%E2%98%83 -> /external/2/%E2%98%83/stream!');
+
 __DATA__
+
 @@ works.html.ep
 Hello from the main app!

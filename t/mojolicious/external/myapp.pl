@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 
+use utf8;
+
 # "Boy, who knew a cooler could also make a handy wang coffin?"
 use Mojolicious::Lite;
 
@@ -26,6 +28,14 @@ get '/stream' => sub {
       shift->write_chunk('ll', sub { shift->finish('o!') });
     }
   );
+};
+
+# GET /url/☃
+get '/url/☃' => sub {
+  my $self  = shift;
+  my $route = $self->url_for;
+  my $rel   = $self->url_for('/☃/stream');
+  $self->render_text("$route -> $rel!");
 };
 
 app->start;

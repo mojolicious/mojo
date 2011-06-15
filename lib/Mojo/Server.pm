@@ -3,8 +3,8 @@ use Mojo::Base -base;
 
 use Carp 'croak';
 use Mojo::Loader;
-
-require Scalar::Util;
+use Mojo::Util 'md5_sum';
+use Scalar::Util 'blessed';
 
 has app => sub {
   my $self = shift;
@@ -53,21 +53,25 @@ sub load_app {
   my ($self, $file) = @_;
 
   # Cleanup environment
-  package Mojo::Server::_App;
   local $ENV{MOJO_APP_LOADER} = 1;
   local $ENV{MOJO_APP};
   local $ENV{MOJO_EXE};
   local $ENV{MOJO_COMMANDS_DONE};
 
   # Try to load application from script
+  my $class = 'Mojo::Server::_' . md5_sum($file . $$);
   my $app;
-  unless ($app = do $file) {
-    die qq/Can't load application "$file": $@/ if $@;
-    die qq/Can't load application "$file": $!/ unless defined $app;
-    die qq/Can't load application' "$file".\n/ unless $app;
-  }
+  die $@ unless eval <<EOF;
+package $class;
+unless (\$app = do \$file) {
+  die qq/Can't load application "\$file": \$@/ if \$@;
+  die qq/Can't load application "\$file": \$!/ unless defined \$app;
+  die qq/Can't load application' "\$file".\n/ unless \$app;
+}
+1;
+EOF
   die qq/"$file" is not a valid application.\n/
-    unless Scalar::Util::blessed($app) && $app->isa('Mojo');
+    unless blessed $app && $app->isa('Mojo');
   $self->app($app);
   return $app;
 }

@@ -901,9 +901,9 @@ development. jQuery is designed to change the way that you write JavaScript.
 
 Licensed under the MIT License, L<http://creativecommons.org/licenses/MIT>.
 
-=head2 Prettify.js
+=head2 prettify.js
 
-  Version 21-Jul-2010
+  Version 1-Jun-2011
 
 A Javascript module and CSS file that allows syntax highlighting of source
 code snippets in an html page.

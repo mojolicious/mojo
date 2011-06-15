@@ -259,7 +259,8 @@ and implements the following new ones.
 
   my $parts = $content->parts;
 
-Content parts embedded in this multipart content.
+Content parts embedded in this multipart content, usually
+L<Mojo::Content::Single> objects.
 
 =head1 METHODS
 
@@ -294,7 +295,7 @@ Get a chunk of content starting from a specfic position.
 
   $content = $content->parse('Content-Type: multipart/mixed');
 
-Parse content.
+Parse content chunk.
 
 =head1 SEE ALSO
 

@@ -443,14 +443,14 @@ Try to detect broken web servers and turn on relaxed parsing automatically.
   my $headers = $content->headers;
   $content    = $content->headers(Mojo::Headers->new);
 
-The headers.
+Content headers, defaults to a L<Mojo::Headers> object.
 
 =head2 C<on_read>
 
   my $cb   = $content->on_read;
   $content = $content->on_read(sub {...});
 
-Content parser callback.
+Callback to be invoked when new content arrives.
 
   $content = $content->on_read(sub {
     my ($self, $chunk) = @_;
@@ -527,7 +527,7 @@ Size of headers in bytes.
 
   my $chunked = $content->is_chunked;
 
-Chunked transfer encoding.
+Check if content is chunked.
 
 =head2 C<is_done>
 
@@ -539,14 +539,14 @@ Check if parser is done.
 
   my $dynamic = $content->is_dynamic;
 
-Dynamic content.
+Check if content will be dynamic.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<is_multipart>
 
   my $multipart = $content->is_multipart;
 
-Multipart content.
+Check if content is multipart.
 
 =head2 C<is_parsing_body>
 
@@ -558,25 +558,25 @@ Check if body parsing started yet.
 
   my $bytes = $content->leftovers;
 
-Leftovers for next HTTP message.
+Remove leftover data from content parser.
 
 =head2 C<parse>
 
   $content = $content->parse("Content-Length: 12\r\n\r\nHello World!");
 
-Parse content.
+Parse content chunk.
 
 =head2 C<parse_body>
 
   $content = $content->parse_body("Hi!");
 
-Parse body.
+Parse body chunk.
 
 =head2 C<parse_body_once>
 
   $content = $content->parse_body_once("Hi!");
 
-Parse body once.
+Parse body chunk once.
 
 =head2 C<parse_until_body>
 
@@ -584,7 +584,7 @@ Parse body once.
     "Content-Length: 12\r\n\r\nHello World!"
   );
 
-Parse and stop after headers.
+Parse chunk and stop after headers.
 
 =head2 C<progress>
 

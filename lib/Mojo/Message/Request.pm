@@ -384,13 +384,19 @@ Mojo::Message::Request - HTTP 1.1 Request Container
 
   use Mojo::Message::Request;
 
+  # Parse
+  my $req = Mojo::Message::Request->new;
+  $req->parse("GET /foo HTTP/1.0\x0a\x0d");
+  $req->parse("Content-Length: 12\x0a\x0d\x0a\x0d");
+  $req->parse("Content-Type: text/plain\x0a\x0d\x0a\x0d");
+  $req->parse('Hello World!');
+  print $req->body;
+
+  # Build
   my $req = Mojo::Message::Request->new;
   $req->url->parse('http://127.0.0.1/foo/bar');
   $req->method('GET');
-
-  print "$req";
-
-  $req->parse('GET /foo/bar HTTP/1.1');
+  print $req->to_string;
 
 =head1 DESCRIPTION
 
@@ -416,18 +422,6 @@ Direct access to the environment hash if available.
 
 HTTP request method.
 
-=head2 C<params>
-
-  my $params = $req->params;
-
-All C<GET> and C<POST> parameters, defaults to a L<Mojo::Parameters> object.
-
-=head2 C<query_params>
-
-  my $params = $req->query_params;
-
-All C<GET> parameters, defaults to a L<Mojo::Parameters> object.
-
 =head2 C<url>
 
   my $url = $req->url;
@@ -446,7 +440,7 @@ implements the following new ones.
   $req        = $req->cookies(Mojo::Cookie::Request->new);
   $req        = $req->cookies({name => 'foo', value => 'bar'});
 
-Access request cookies.
+Access request cookies, usually L<Mojo::Cookie::Request> objects.
 
 =head2 C<fix_headers>
 
@@ -470,8 +464,13 @@ Check C<X-Requested-With> header for C<XMLHttpRequest> value.
 
   my $param = $req->param('foo');
 
-Access C<GET> and C<POST> parameters, defaults to a L<Mojo::Parameters>
-object.
+Access C<GET> and C<POST> parameters.
+
+=head2 C<params>
+
+  my $params = $req->params;
+
+All C<GET> and C<POST> parameters, usually a L<Mojo::Parameters> object.
 
 =head2 C<parse>
 
@@ -488,6 +487,12 @@ Parse HTTP request chunks or environment hash.
   $req      = $req->proxy(Mojo::URL->new('http://127.0.0.1:3000'));
 
 Proxy URL for message.
+
+=head2 C<query_params>
+
+  my $params = $req->query_params;
+
+All C<GET> parameters, usually a L<Mojo::Parameters> object.
 
 =head1 SEE ALSO
 

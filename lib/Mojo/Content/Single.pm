@@ -107,7 +107,7 @@ implements the following new ones.
   my $asset = $content->asset;
   $content  = $content->asset(Mojo::Asset::Memory->new);
 
-The actual content.
+The actual content, defaults to a L<Mojo::Asset::Memory> object.
 
 =head1 METHODS
 
@@ -136,7 +136,7 @@ Get a chunk of content starting from a specfic position.
 
   $content = $content->parse("Content-Length: 12\r\n\r\nHello World!");
 
-Parse content.
+Parse content chunk.
 
 =head1 SEE ALSO
 

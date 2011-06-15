@@ -1778,7 +1778,7 @@ A unix domain socket to listen on.
 
 =item C<on_accept>
 
-Callback to invoke for each accepted connection.
+Callback to be invoked for each accepted connection.
 
 =item C<on_close>
 

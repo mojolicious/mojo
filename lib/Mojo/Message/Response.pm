@@ -188,14 +188,20 @@ Mojo::Message::Response - HTTP 1.1 Response Container
 
   use Mojo::Message::Response;
 
+  # Parse
+  my $res = Mojo::Message::Reponse->new;
+  $res->parse("HTTP/1.0 200 OK\x0a\x0d");
+  $res->parse("Content-Length: 12\x0a\x0d\x0a\x0d");
+  $res->parse("Content-Type: text/plain\x0a\x0d\x0a\x0d");
+  $res->parse('Hello World!');
+  print $res->body;
+
+  # Build
   my $res = Mojo::Message::Response->new;
   $res->code(200);
   $res->headers->content_type('text/plain');
   $res->body('Hello World!');
-
-  print "$res";
-
-  $res->parse('HTTP/1.1 200 OK');
+  print $res->to_string;
 
 =head1 DESCRIPTION
 
@@ -232,7 +238,7 @@ implements the following new ones.
   $res        = $res->cookies(Mojo::Cookie::Response->new);
   $req        = $req->cookies({name => 'foo', value => 'bar'});
 
-Access response cookies.
+Access response cookies, usually L<Mojo::Cookie::Response> objects.
 
 =head2 C<default_message>
 

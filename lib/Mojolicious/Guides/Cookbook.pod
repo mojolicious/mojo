@@ -350,14 +350,14 @@ Uploading a large file is even easier.
   # Upload file via POST and "multipart/form-data"
   my $ua = Mojo::UserAgent->new;
   $ua->post_form('mojolicio.us/upload',
-    {image => {file => '/Users/sri/hello.png'}});
+    {image => {file => '/home/sri/hello.png'}});
 
 And once again you don't have to worry about memory usage, all data will be
 streamed directly from the file.
 
   # Upload file via PUT
   my $ua     = Mojo::UserAgent->new;
-  my $asset  = Mojo::Asset::File->new(path => '/Users/sri/hello.png');
+  my $asset  = Mojo::Asset::File->new(path => '/home/sri/hello.png');
   my $tx     = $ua->build_tx(PUT => 'mojolicio.us/upload');
   $tx->req->content->asset($asset);
   $ua->start($tx);

@@ -657,11 +657,18 @@ containing a C<handler> method accepting L<Mojolicious::Controller> objects.
 
   1;
 
-Because the remaining path always gets stored in the C<path> stash value, you
-could also just use it directly instead of C<detour>.
+You can also just use L<Mojolicious::Plugin::Mount> to mount whole
+self-contained applications under a prefix.
 
-  # /foo/*
-  $r->route('/foo/*path')->to('bar#', name => 'Mojo');
+  use Mojolicious::Lite;
+
+  # Whole application mounted under "/prefix"
+  plugin mount => {'/prefix' => '/home/sri/myapp.pl'};
+
+  # Normal route
+  get '/' => sub { shift->render_text('Hello World!') };
+
+  app->start;
 
 =head2 Application Plugins
 

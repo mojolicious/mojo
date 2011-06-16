@@ -37,8 +37,6 @@ get '/hello' => sub {
 package MyTestApp::Test1;
 use Mojolicious::Lite;
 
-use Mojo::IOLoop;
-
 # GET /yada (embedded)
 get '/yada' => sub {
   my $self = shift;

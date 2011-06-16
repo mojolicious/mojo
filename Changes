@@ -3,6 +3,8 @@ This file documents the revision history for Perl extension Mojolicious.
 1.44    2011-06-13 00:00:00
         - Added EXPERIMENTAL application mount plugin.
         - Updated prettify.js to version 1-Jun-2011.
+        - Updated WebSocket diagnostics test in Mojo::HelloWorld for latest
+          Firefox Aurora.
         - Improved documentation.
         - Improved tests.
         - Fixed a few application embedding bugs.

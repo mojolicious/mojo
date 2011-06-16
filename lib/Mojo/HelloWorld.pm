@@ -283,8 +283,14 @@ sub _websocket {
   <head>
     <title>Mojo Diagnostics</title>
     <script language="javascript">
-      if ("WebSocket" in window) {
+      var ws;
+      if ("MozWebSocket" in window) {
+        ws = new MozWebSocket("$url");
+      }
+      else if ("WebSocket" in window) {
         ws = new WebSocket("$url");
+      }
+      if(typeof(ws) !== 'undefined') {
         function wsmessage(event) {
           data = event.data;
           alert(data);

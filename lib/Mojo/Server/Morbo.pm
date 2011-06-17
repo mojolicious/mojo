@@ -10,7 +10,8 @@ use POSIX 'WNOHANG';
 use constant DEBUG => $ENV{MORBO_DEBUG} || 0;
 
 has 'app';
-has [qw/listen watch/] => sub { [] };
+has listen => sub { [] };
+has watch  => sub { [qw/lib templates public/] };
 
 # Cache stats
 my $STATS = {};
@@ -39,6 +40,7 @@ sub _manage {
   my $self = shift;
 
   # Discover files
+  warn "DISCOVERING NEW FILES\n" if DEBUG;
   my @files;
   for my $watch (@{$self->watch}) {
     if (-d $watch) {
@@ -140,7 +142,8 @@ List of ports and files to listen on, defaults to C<http://*:3000>.
   $morbo    = $morbo->watch(['/home/sri/myapp']);
 
 Files and directories to watch for changes, defaults to the application
-script.
+script as well as the C<lib>, C<templates> and C<public> directories in the
+current working directory.
 
 =head1 METHODS
 

@@ -41,14 +41,15 @@ These options are available:
   --listen <location>        Set one or more locations you want to listen on,
                              defaults to http://*:3000.
   --watch <directory/file>   Set one or more directories and files to watch
-                             for changes, defaults to the application script.
+                             for changes, defaults to the application script
+                             as well as the "lib", "templates" and "public"
+                             directories in the current working directory.
 EOF
 
 # "All humans are vermin in the eyes of Morbo!"
-$morbo->app($app);
-$morbo->listen(\@listen);
-$morbo->watch(\@watch);
-$morbo->run;
+$morbo->listen(\@listen) if @listen;
+$morbo->watch(\@watch)   if @watch;
+$morbo->app($app)->run;
 
 __END__
 

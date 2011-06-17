@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 595;
+use Test::More tests => 597;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -1309,7 +1309,7 @@ is $dom->find('body > ul > li > p')->[2]->text, '',           'no text';
 is $dom->find('body > ul > li')->[2]->all_text, 'Test 3 2 1', 'right text';
 is $dom->find('body > ul > li > p')->[2]->all_text, '', 'no text';
 
-# Advanced whitespace trimming
+# Advanced whitespace trimming (punctuation)
 $dom = Mojo::DOM->new->parse(<<EOF);
 <html>
   <head>
@@ -1317,12 +1317,16 @@ $dom = Mojo::DOM->new->parse(<<EOF);
   <body>
     <div>foo <strong>bar</strong>.</div>
     <div>foo<strong>, bar</strong>baz<strong>; yada</strong>.</div>
+    <div>foo<strong>: bar</strong>baz<strong>? yada</strong>!</div>
 EOF
 is $dom->find('html > head > title')->[0]->text, 'Real World!', 'right text';
 is $dom->find('body > div')->[0]->all_text,      'foo bar.',    'right text';
 is $dom->find('body > div')->[1]->all_text, 'foo, bar baz; yada.',
   'right text';
 is $dom->find('body > div')->[1]->text, 'foo baz.', 'right text';
+is $dom->find('body > div')->[2]->all_text, 'foo: bar baz? yada!',
+  'right text';
+is $dom->find('body > div')->[2]->text, 'foo baz!', 'right text';
 
 # Real world JavaScript and CSS
 $dom = Mojo::DOM->new->parse(<<EOF);

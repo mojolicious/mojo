@@ -2,6 +2,7 @@ package Mojo::Server::Morbo;
 use Mojo::Base -base;
 
 use Carp 'croak';
+use Cwd 'abs_path';
 use Mojo::Home;
 use Mojo::Server::Daemon;
 use POSIX 'WNOHANG';
@@ -25,6 +26,11 @@ sub run {
     while ((waitpid -1, WNOHANG) > 0) { $self->{_running} = 0 }
   };
 
+  # Resolve paths
+  @{$self->watch} = map { abs_path $_ } @{$self->watch};
+  $self->app(abs_path $self->app);
+  push @{$self->watch}, $self->app;
+
   # Manage
   $self->_manage while 1;
 }
@@ -32,9 +38,9 @@ sub run {
 sub _manage {
   my $self = shift;
 
-  # Resolve directories
+  # Discover files
   my @files;
-  for my $watch (@{$self->watch}, $self->app) {
+  for my $watch (@{$self->watch}) {
     if (-d $watch) {
       my $home = Mojo::Home->new->parse($watch);
       push @files, $home->rel_file($_) for @{$home->list_files};

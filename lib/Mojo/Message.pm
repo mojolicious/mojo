@@ -4,7 +4,8 @@ use Mojo::Base -base;
 use Carp 'croak';
 use Mojo::Asset::Memory;
 use Mojo::Content::Single;
-use Mojo::Loader;
+use Mojo::DOM;
+use Mojo::JSON;
 use Mojo::Parameters;
 use Mojo::Upload;
 use Mojo::Util qw/decode url_unescape/;
@@ -191,21 +192,13 @@ sub dom {
   # Multipart
   return if $self->is_multipart;
 
-  # Load DOM class
-  my $class = $self->dom_class;
-  if (my $e = Mojo::Loader->load($class)) {
-    croak ref $e
-      ? qq/Can't load DOM class "$class": $e/
-      : qq/DOM class "$class" doesn't exist./;
-  }
-
   # Charset
   my $charset;
   ($self->headers->content_type || '') =~ /charset=\"?([^\"\s;]+)\"?/
     and $charset = $1;
 
   # Parse
-  my $dom = $class->new(charset => $charset)->parse($self->body);
+  my $dom = $self->dom_class->new(charset => $charset)->parse($self->body);
 
   # Find right away
   return $dom->find(@_) if @_;
@@ -327,20 +320,8 @@ sub is_multipart { shift->content->is_multipart }
 
 sub json {
   my $self = shift;
-
-  # Multipart
   return if $self->is_multipart;
-
-  # Load JSON class
-  my $class = $self->json_class;
-  if (my $e = Mojo::Loader->load($class)) {
-    croak ref $e
-      ? qq/Can't load JSON class "$class": $e/
-      : qq/JSON class "$class" doesn't exist./;
-  }
-
-  # Decode
-  return $class->new->decode($self->body);
+  return $self->json_class->new->decode($self->body);
 }
 
 sub leftovers { shift->content->leftovers }

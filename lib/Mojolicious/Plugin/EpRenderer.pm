@@ -1,6 +1,7 @@
 package Mojolicious::Plugin::EpRenderer;
 use Mojo::Base 'Mojolicious::Plugin';
 
+use Mojo::Loader;
 use Mojo::Template;
 use Mojo::Util 'md5_sum';
 
@@ -14,6 +15,11 @@ sub register {
   $conf ||= {};
   my $name     = $conf->{name}     || 'ep';
   my $template = $conf->{template} || {};
+
+  # Custom sandbox
+  $template->{namespace} =
+    'Mojo::Template::SandBox::' . md5_sum(($ENV{MOJO_EXE} || ref $app) . $$)
+    unless defined $template->{namespace};
 
   # Auto escape by default to prevent XSS attacks
   $template->{auto_escape} = 1 unless defined $template->{auto_escape};

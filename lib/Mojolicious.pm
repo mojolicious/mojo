@@ -3,6 +3,7 @@ use Mojo::Base 'Mojo';
 
 use Carp 'croak';
 use Mojolicious::Commands;
+use Mojolicious::Controller;
 use Mojolicious::Plugins;
 use Mojolicious::Renderer;
 use Mojolicious::Routes;
@@ -46,18 +47,8 @@ sub AUTOLOAD {
   croak qq/Can't locate object method "$method" via package "$package"/
     unless my $helper = $self->renderer->helpers->{$method};
 
-  # Load controller class
-  my $class = $self->controller_class;
-  if (my $e = Mojo::Loader->load($class)) {
-    $self->log->error(
-      ref $e
-      ? qq/Can't load controller class "$class": $e/
-      : qq/Controller class "$class" doesn't exist./
-    );
-  }
-
   # Call helper with fresh controller
-  return $class->new(app => $self)->$helper(@_);
+  return $self->controller_class->new(app => $self)->$helper(@_);
 }
 
 sub DESTROY { }
@@ -162,22 +153,15 @@ sub dispatch {
   return if $res->code;
   if (my $code = ($tx->req->error)[1]) { $res->code($code) }
   elsif ($tx->is_websocket) { $res->code(426) }
-  if ($self->routes->dispatch($c)) { $c->render_not_found unless $res->code }
+  if ($self->routes->dispatch($c)) {
+    $c->render_not_found
+      unless $res->code;
+  }
 }
 
 # "Bite my shiny metal ass!"
 sub handler {
   my ($self, $tx) = @_;
-
-  # Load controller class
-  my $class = $self->controller_class;
-  if (my $e = Mojo::Loader->load($class)) {
-    $self->log->error(
-      ref $e
-      ? qq/Can't load controller class "$class": $e/
-      : qq/Controller class "$class" doesn't exist./
-    );
-  }
 
   # Embedded application
   my $stash = {};
@@ -189,7 +173,8 @@ sub handler {
   # Build default controller and process
   my $defaults = $self->defaults;
   @{$stash}{keys %$defaults} = values %$defaults;
-  my $c = $class->new(app => $self, stash => $stash, tx => $tx);
+  my $c =
+    $self->controller_class->new(app => $self, stash => $stash, tx => $tx);
   unless (eval { $self->on_process->($self, $c); 1 }) {
     $self->log->fatal("Processing request failed: $@");
     $tx->res->code(500);

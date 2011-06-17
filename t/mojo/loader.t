@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 44;
+use Test::More tests => 34;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -68,30 +68,3 @@ ok !!LoaderTest::C->can('new'), 'loaded successfully';
 
 # Class does not exist
 ok $loader->load('LoaderTest'), 'nothing to load';
-
-# Reload
-my $file = IO::File->new;
-my $dir  = File::Temp::tempdir(CLEANUP => 1);
-my $path = File::Spec->catfile($dir, 'MojoTestReloader.pm');
-$file->open("> $path");
-$file->syswrite(
-  "package MojoTestReloader;\nsub test1 { 23 }\nsub test3 { 32 }\n1;");
-$file->close;
-push @INC, $dir;
-require MojoTestReloader;
-ok my $t1 = MojoTestReloader->can('test1'), 'loaded successfully';
-ok !MojoTestReloader->can('test2'), 'package is clean';
-is $t1->(), 23, 'right result';
-ok my $t3 = MojoTestReloader->can('test3'), 'loaded successfully';
-is $t3->(), 32, 'right result';
-sleep 2;
-$file->open("> $path");
-$file->syswrite(
-  "package MojoTestReloader;\nsub test2 { 26 }\nsub test3 { 62 }\n1;");
-$file->close;
-Mojo::Loader->reload;
-ok my $t2 = MojoTestReloader->can('test2'), 'loaded successfully';
-ok !MojoTestReloader->can('test1'), 'package is clean';
-is $t2->(), 26, 'right result';
-ok $t3 = MojoTestReloader->can('test3'), 'loaded successfully';
-is $t3->(), 62, 'right result';

@@ -13,10 +13,10 @@ sub register {
   $app->renderer->add_handler(
     epl => sub {
       my ($r, $c, $output, $options) = @_;
-      my $inline = $options->{inline};
 
       # Template
-      my $path = $r->template_path($options);
+      my $inline = $options->{inline};
+      my $path   = $r->template_path($options);
       $path = md5_sum $inline if defined $inline;
       return unless defined $path;
 
@@ -25,9 +25,8 @@ sub register {
       my $key   = delete $options->{cache} || $path;
       my $mt    = $cache->get($key);
 
-      $mt ||= Mojo::Template->new;
-
       # Cached
+      $mt ||= Mojo::Template->new;
       if ($mt->compiled) { $$output = $mt->interpret($c) }
 
       # Not cached

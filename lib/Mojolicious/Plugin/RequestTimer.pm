@@ -13,14 +13,14 @@ sub register {
     after_static_dispatch => sub {
       my $self = shift;
 
-      # New request
-      my $stash  = $self->stash;
+      # Ignore static files
+      my $stash = $self->stash;
+      return if $stash->{'mojo.static'} || $stash->{'mojo.started'};
       my $req    = $self->req;
       my $method = $req->method;
       my $path   = $req->url->path->to_abs_string;
       my $ua     = $req->headers->user_agent || 'Anonymojo';
-      $self->app->log->debug("$method $path ($ua).")
-        unless $stash->{'mojo.static'};
+      $self->app->log->debug("$method $path ($ua).");
       $stash->{'mojo.started'} = [Time::HiRes::gettimeofday()];
     }
   );
@@ -30,17 +30,17 @@ sub register {
     after_dispatch => sub {
       my $self = shift;
 
-      # Request done
+      # Ignore static files
       my $stash = $self->stash;
-      return unless my $started = $stash->{'mojo.started'};
+      return unless my $started = delete $stash->{'mojo.started'};
+      return if $stash->{'mojo.static'};
       my $elapsed = sprintf '%f',
         Time::HiRes::tv_interval($started, [Time::HiRes::gettimeofday()]);
       my $rps     = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
       my $res     = $self->res;
       my $code    = $res->code || 200;
       my $message = $res->message || $res->default_message($code);
-      $self->app->log->debug("$code $message (${elapsed}s, $rps/s).")
-        unless $stash->{'mojo.static'};
+      $self->app->log->debug("$code $message (${elapsed}s, $rps/s).");
     }
   );
 }

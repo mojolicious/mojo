@@ -287,13 +287,6 @@ security reasons this is disabled by default.
 
   MOJO_PROXY=1
 
-=head2 C<MOJO_RELOAD>
-
-Enable L<Mojolicious> application reloading, changes to your application will
-be detected automatically so you don't have to restart the server manually.
-
-  MOJO_RELOAD=1
-
 =head2 C<MOJO_REVERSE_PROXY>
 
 Enable reverse proxy support for L<Mojolicious> application.

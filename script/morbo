@@ -1,0 +1,72 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Basename 'dirname';
+use File::Spec;
+
+use lib join '/', File::Spec->splitdir(dirname(__FILE__)), 'lib';
+use lib join '/', File::Spec->splitdir(dirname(__FILE__)), '..', 'lib';
+
+# Check if Mojo is installed
+eval 'use Mojo::Server::Morbo';
+die <<EOF if $@;
+It looks like you don't have the Mojolicious Framework installed.
+Please visit http://mojolicio.us for detailed installation instructions.
+
+EOF
+
+use Getopt::Long 'GetOptions';
+
+# "Morbo demands comments!"
+my $morbo = Mojo::Server::Morbo->new;
+my ($help, @listen, @watch);
+GetOptions(
+  help => sub { $help = 1 },
+  'listen=s' => \@listen,
+  'watch=s'  => \@watch
+);
+$help = 1 unless my $app = shift;
+
+# Usage
+die <<"EOF" if $help;
+usage: $0 [OPTIONS] [APPLICATION]
+
+  morbo script/myapp
+  morbo myapp.pl
+
+These options are available:
+  --help                     Show this message.
+  --listen <location>        Set one or more locations you want to listen on,
+                             defaults to http://*:3000.
+  --watch <directory/file>   Set one or more directories and files to watch
+                             for changes, defaults to the application script.
+EOF
+
+# "All humans are vermin in the eyes of Morbo!"
+$morbo->app($app);
+$morbo->listen(\@listen);
+$morbo->watch(\@watch);
+$morbo->run;
+
+__END__
+
+=head1 NAME
+
+morbo - Morbo HTTP 1.1 And WebSocket Development Server
+
+=head1 SYNOPSIS
+
+    morbo myapp.pl
+
+=head1 DESCRIPTION
+
+Start L<Mojolicious> and L<Mojolicious::Lite> applications with the
+L<Mojo::Server::Hypnotoad> web server.
+
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
+
+=cut

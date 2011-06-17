@@ -20,7 +20,7 @@ has escape_mark     => '=';
 has expression_mark => '=';
 has line_start      => '%';
 has name            => 'template';
-has namespace       => 'Mojo::Template::Context';
+has namespace       => 'Mojo::Template::SandBox';
 has tag_start       => '<%';
 has tag_end         => '%>';
 has template        => '';
@@ -785,7 +785,7 @@ Note that this method is attribute and might change without warning!
   my $namespace = $mt->namespace;
   $mt           = $mt->namespace('main');
 
-Namespace used to compile templates, defaults to C<Mojo::Template::Context>.
+Namespace used to compile templates, defaults to C<Mojo::Template::SandBox>.
 
 =head2 C<prepend>
 

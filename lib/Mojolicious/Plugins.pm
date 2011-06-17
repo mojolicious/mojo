@@ -71,9 +71,10 @@ sub _load {
   my ($self, $module) = @_;
 
   # Load
-  my $e = Mojo::Loader->load($module);
-  if (ref $e) { die $e }
-  return if $e;
+  if (my $e = Mojo::Loader->load($module)) {
+    die $e if ref $e;
+    return $e;
+  }
 
   # Module is a plugin
   return unless $module->can('new') && $module->can('register');

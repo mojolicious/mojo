@@ -31,13 +31,6 @@ has on_request => sub {
 has on_transaction => sub {
   sub {
     my $self = shift;
-
-    # Reload
-    if ($self->reload) {
-      if (my $e = Mojo::Loader->reload) { warn $e }
-      delete $self->{app};
-    }
-
     $self->app->on_transaction->($self->app);
   };
 };
@@ -47,7 +40,6 @@ has on_websocket => sub {
     $self->app->on_websocket->($self->app, @_)->server_handshake;
   };
 };
-has reload => sub { $ENV{MOJO_RELOAD} || 0 };
 
 sub load_app {
   my ($self, $file) = @_;
@@ -56,17 +48,18 @@ sub load_app {
   local $ENV{MOJO_APP_LOADER} = 1;
   local $ENV{MOJO_APP};
   local $ENV{MOJO_EXE};
-  local $ENV{MOJO_COMMANDS_DONE};
 
-  # Try to load application from script
-  my $class = 'Mojo::Server::_' . md5_sum($file . $$);
+  # Try to load application from script into sandbox
+  my $class = 'Mojo::Server::SandBox::' . md5_sum($file . $$);
   my $app;
   die $@ unless eval <<EOF;
 package $class;
-unless (\$app = do \$file) {
-  die qq/Can't load application "\$file": \$@/ if \$@;
-  die qq/Can't load application "\$file": \$!/ unless defined \$app;
-  die qq/Can't load application' "\$file".\n/ unless \$app;
+{
+  unless (\$app = do \$file) {
+    die qq/Can't load application "\$file": \$@/ if \$@;
+    die qq/Can't load application "\$file": \$!/ unless defined \$app;
+    die qq/Can't load application' "\$file".\n/ unless \$app;
+  }
 }
 1;
 EOF
@@ -157,13 +150,6 @@ Callback to be invoked when a new transaction is needed.
   });
 
 Callback to be invoked for WebSocket handshakes.
-
-=head2 C<reload>
-
-  my $reload = $server->reload;
-  $server    = $server->reload(1);
-
-Activate automatic reloading.
 
 =head1 METHODS
 

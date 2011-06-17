@@ -14,9 +14,7 @@ use POSIX qw/setsid WNOHANG/;
 use Scalar::Util 'weaken';
 
 # Preload
-use Mojo::DOM;
 use Mojo::UserAgent;
-use Mojolicious::Controller;
 
 use constant DEBUG => $ENV{HYPNOTOAD_DEBUG} || 0;
 
@@ -64,10 +62,6 @@ sub run {
   # Executable
   $ENV{HYPNOTOAD_EXE} ||= $0;
   $0 = $ENV{HYPNOTOAD_APP};
-
-  # Cleanup
-  delete $ENV{MOJO_COMMANDS_DONE};
-  delete $ENV{MOJO_RELOAD};
 
   # Clean start
   exec $ENV{HYPNOTOAD_EXE} unless $ENV{HYPNOTOAD_REV}++;
@@ -396,9 +390,6 @@ Mojo::Server::Hypnotoad - ALL GLORY TO THE HYPNOTOAD!
 
   use Mojo::Server::Hypnotoad;
 
-  my $toad = Mojo::Server::Hypnotoad->new;
-  $toad->run('myapp.pl', 'hypnotoad.conf');
-
 =head1 DESCRIPTION
 
 L<Mojo::Server::Hypnotoad> is a full featured UNIX optimized preforking async
@@ -610,7 +601,7 @@ Start server.
 You can set the C<HYPNOTOAD_DEBUG> environment variable to get some advanced
 diagnostics information printed to C<STDERR>.
 
-  MOJO_HYPNOTOAD_DEBUG=1
+  HYPNOTOAD_DEBUG=1
 
 =head1 SEE ALSO
 

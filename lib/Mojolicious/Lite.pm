@@ -151,10 +151,11 @@ customized to override normal C<@ARGV> use.
 
 =head2 Reloading
 
-Your application will automatically reload itself if you set the C<--reload>
-option, so you don't have to restart the server after every change.
+Your application will automatically reload itself if you start it with the
+C<morbo> development server, so you don't have to restart the server after
+every change.
 
-  % ./myapp.pl daemon --reload
+  % morbo myapp.pl
   Server available at http://127.0.0.1:3000.
 
 =head2 Routes

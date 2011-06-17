@@ -108,12 +108,6 @@ application on any platform.
 See L<Mojolicious::Guides::Cookbook> for more information about running and
 deploying L<Mojolicious> applications.
 
-Note that if you run your application with the C<--reload> option Windows
-will lock your files.
-A simple Windows editor like C<WordPad> will complain that the file has
-already been opened by a different proccess.
-More capable editors can handle this accordingly and force the change.
-
 =head2 Whats the easiest way to install L<Mojolicious> on UNIX?
 
 Quite possibly this oneliner.

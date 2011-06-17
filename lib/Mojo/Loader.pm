@@ -1,19 +1,14 @@
 package Mojo::Loader;
 use Mojo::Base -base;
 
+# "Don't let Krusty's death get you down, boy.
+#  People die all the time, just like that.
+#  Why, you could wake up dead tomorrow! Well, good night."
 use Carp 'carp';
 use File::Basename;
 use File::Spec;
 use Mojo::Command;
 use Mojo::Exception;
-
-use constant DEBUG => $ENV{MOJO_LOADER_DEBUG} || 0;
-
-# Cache stats
-my $STATS = {};
-
-# Debugger sub tracking
-BEGIN { $^P |= 0x10 }
 
 # "Homer no function beer well without."
 sub load {
@@ -22,16 +17,8 @@ sub load {
   # Check module name
   return 1 if !$module || $module !~ /^[\w\:\']+$/;
 
-  # Forced reload
-  if ($ENV{MOJO_RELOAD}) {
-    my $key = $module;
-    $key =~ s/\:\:/\//g;
-    $key .= '.pm';
-    _unload($key);
-  }
-
   # Already loaded
-  else { return if $module->can('new') }
+  return if $module->can('new');
 
   # Load
   unless (eval "require $module; 1") {
@@ -47,37 +34,8 @@ sub load {
   return;
 }
 
-# "Don't let Krusty's death get you down, boy.
-#  People die all the time, just like that.
-#  Why, you could wake up dead tomorrow! Well, good night."
-sub reload {
-
-  # Cleanup script and "main" namespace
-  delete $INC{$0};
-  $STATS->{$0} = 1;
-  _purge(grep { index($_, 'main::') == 0 } keys %DB::sub);
-
-  # Reload
-  while (my ($key, $file) = each %INC) {
-
-    # Modified time
-    next unless $file;
-    my $mtime = (stat $file)[9];
-
-    # Startup time as default
-    $STATS->{$file} = $^T unless defined $STATS->{$file};
-
-    # Modified
-    if ($mtime > $STATS->{$file}) {
-      if (my $e = _reload($key)) { return $e }
-      $STATS->{$file} = $mtime;
-    }
-  }
-
-  # Force script reloading
-  return _reload($0);
-}
-
+# "This is the worst thing you've ever done.
+#  You say that so often that it lost its meaning."
 sub search {
   my ($self, $namespace) = @_;
 
@@ -109,35 +67,6 @@ sub search {
   return $modules;
 }
 
-# "This is the worst thing you've ever done.
-#  You say that so often that it lost its meaning."
-sub _purge {
-  for my $sub (@_) {
-    warn "PURGE $sub\n" if DEBUG;
-    carp "Can't unload sub '$sub': $@" unless eval { undef &$sub; 1 };
-    delete $DB::sub{$sub};
-    no strict 'refs';
-    $sub =~ /^(.*::)(.*?)$/ and delete *{$1}->{$2};
-  }
-}
-
-sub _reload {
-  my $key = shift;
-  return if $key eq 'Mojo/Loader.pm';
-  warn "CLEANING $key\n" if DEBUG;
-  _unload($key);
-  warn "RELOADING $key\n" if DEBUG;
-  return Mojo::Exception->new($@)
-    unless eval { package main; require $key; 1 };
-  return;
-}
-
-sub _unload {
-  my $key = shift;
-  return unless my $file = delete $INC{$key};
-  _purge(grep { index($DB::sub{$_}, "$file:") == 0 } keys %DB::sub);
-}
-
 1;
 __END__
 
@@ -152,9 +81,6 @@ Mojo::Loader - Loader
   my $loader = Mojo::Loader->new;
   my $modules = $loader->search('Some::Namespace');
   $loader->load($modules->[0]);
-
-  # Reload
-  Mojo::Loader->reload;
 
 =head1 DESCRIPTION
 
@@ -172,24 +98,11 @@ following new ones.
 Load a class, note that classes are checked for a C<new> method to see if
 they are already loaded.
 
-=head2 C<reload>
-
-  my $e = Mojo::Loader->reload;
-
-Reload all Perl files with changes.
-
 =head2 C<search>
 
   my $modules = $loader->search('MyApp::Namespace');
 
 Search modules in a namespace.
-
-=head1 DEBUGGING
-
-You can set the C<MOJO_LOADER_DEBUG> environment variable to get some
-advanced diagnostics information printed to C<STDERR>.
-
-  MOJO_LOADER_DEBUG=1
 
 =head1 SEE ALSO
 

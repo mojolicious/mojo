@@ -20,8 +20,6 @@ These options are available:
                           defaults to http://*:3000.
   --proxy                 Activate reverse proxy support, defaults to the
                           value of MOJO_REVERSE_PROXY.
-  --reload                Automatically reload application when the source
-                          code changes.
   --requests <number>     Set maximum number of requests per keep-alive
                           connection, defaults to 100.
   --user <name>           Set user name for process.
@@ -44,7 +42,6 @@ sub run {
     'keepalive=i' => sub { $daemon->keep_alive_timeout($_[1]) },
     'listen=s'    => \@listen,
     'proxy' => sub { $ENV{MOJO_REVERSE_PROXY} = 1 },
-    reload  => sub { $ENV{MOJO_RELOAD}        = 1 },
     'requests=i'  => sub { $daemon->max_requests($_[1]) },
     'user=s'      => sub { $daemon->user($_[1]) },
     'websocket=i' => sub { $daemon->websocket_timeout($_[1]) }

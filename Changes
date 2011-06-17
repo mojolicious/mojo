@@ -4,11 +4,14 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL self-restarting Morbo development web server and
           removed old "--reload" support since there have been too many
           negative side effects.
+          This also improves overall performance by about 5-10% and reduces
+          memory usage by about 10%.
         - Added EXPERIMENTAL application mount plugin.
         - Updated prettify.js to version 1-Jun-2011.
         - Updated WebSocket diagnostics test in Mojo::HelloWorld for latest
           Firefox Aurora.
         - Improved inline template and static file performance.
+        - Improved whitespace trimming in Mojo::DOM. (sri, DaTa)
         - Improved documentation.
         - Improved tests.
         - Fixed Morbo file discovery bug. (crab)

@@ -1280,7 +1280,7 @@ sub _trim {
   $text =~ s/\s*\n+\s*/\ /g;
 
   # Add leading whitespace
-  $text = " $text" if $ws;
+  $text = " $text" if $ws && $text =~ /^[^\,\.\;]/;
 
   return $text;
 }

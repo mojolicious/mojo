@@ -18,8 +18,9 @@ plan skip_all => 'set TEST_MORBO to enable this test (developer only!)'
   unless $ENV{TEST_MORBO};
 plan tests => 40;
 
-# "Daddy, I'm scared. Too scared to even wet my pants.
-#  Just relax and it'll come, son."
+# "Morbo wishes these stalwart nomads peace among the Dutch tulips.
+#  At least all those windmills will keep them cool.
+#  WINDMILLS DO NOT WORK THAT WAY! GOODNIGHT!"
 use_ok 'Mojo::Server::Morbo';
 
 # Start

@@ -397,6 +397,8 @@ sub html_escape {
   $_[0] = $escaped;
 }
 
+# "Daddy, I'm scared. Too scared to even wet my pants.
+#  Just relax and it'll come, son."
 sub html_unescape {
   $_[0] =~ s/
     &

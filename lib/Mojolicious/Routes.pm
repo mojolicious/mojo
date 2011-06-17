@@ -256,8 +256,6 @@ sub render {
   return $path;
 }
 
-# "Morbo forget how you spell that letter that looks like a man wearing a hat.
-#  Hello, tiny man. I will destroy you!"
 sub route {
   my $self  = shift;
   my $route = $self->new(@_);

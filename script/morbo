@@ -19,7 +19,10 @@ EOF
 
 use Getopt::Long 'GetOptions';
 
-# "Morbo demands comments!"
+# "Welcome to 'Entertainment And Earth Invasion Tonite'.
+#  Across the galaxy my people are completing the mighty space fleet that
+#  will exterminate the human race!
+#  But first, this news from Tinseltown."
 my $morbo = Mojo::Server::Morbo->new;
 my ($help, @listen, @watch);
 GetOptions(
@@ -46,7 +49,9 @@ These options are available:
                              directories in the current working directory.
 EOF
 
-# "All humans are vermin in the eyes of Morbo!"
+# "With Halley's Comet out of ice, Earth is experiencing a sudden case of
+#  global warming.
+#  Morbo is pleased but sticky."
 $morbo->listen(\@listen) if @listen;
 $morbo->watch(\@watch)   if @watch;
 $morbo->app($app)->run;

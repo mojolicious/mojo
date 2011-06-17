@@ -8,37 +8,25 @@ BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
 use Test::More;
 
-use File::Spec;
-use File::Temp;
 use FindBin;
 use IO::Socket::INET;
 use Mojo::IOLoop;
-use Mojo::Template;
 use Mojo::Transaction::HTTP;
 use Mojo::UserAgent;
 
-plan skip_all => 'set TEST_HYPNOTOAD to enable this test (developer only!)'
-  unless $ENV{TEST_HYPNOTOAD};
+plan skip_all => 'set TEST_MORBO to enable this test (developer only!)'
+  unless $ENV{TEST_MORBO};
 plan tests => 40;
 
-# "I ate the blue ones... they taste like burning."
-use_ok 'Mojo::Server::Hypnotoad';
-
-# Config
-my $dir = File::Temp::tempdir(CLEANUP => 1);
-my $config = File::Spec->catfile($dir, 'hypnotoad.conf');
-my $port   = Mojo::IOLoop->generate_port;
-my $mt     = Mojo::Template->new;
-$mt->render_to_file(<<'EOF', $config, $port);
-% my $port = shift;
-{listen => "http://*:<%= $port %>"};
-EOF
+# "Daddy, I'm scared. Too scared to even wet my pants.
+#  Just relax and it'll come, son."
+use_ok 'Mojo::Server::Morbo';
 
 # Start
+my $port   = Mojo::IOLoop->generate_port;
 my $prefix = "$FindBin::Bin/../../script";
-my $pid = open my $server, '-|', $^X, "$prefix/hypnotoad", '--foreground',
-  '--config',
-  $config, "$prefix/mojo";
+my $pid    = open my $server, '-|', $^X, "$prefix/morbo", '--listen',
+  "http://*:$port", "$prefix/mojo";
 sleep 1
   while !IO::Socket::INET->new(
   Proto    => 'tcp',

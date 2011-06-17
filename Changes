@@ -11,6 +11,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved inline template and static file performance.
         - Improved documentation.
         - Improved tests.
+        - Fixed Morbo file discovery bug. (crab)
         - Fixed a few application embedding bugs.
         - Fixed link generation bug in Mojolicious::Plugin::PodRenderer.
         - Fixed small embedding bug in Mojolicious::Plugin::RequestTimer.

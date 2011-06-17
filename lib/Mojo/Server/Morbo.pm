@@ -20,15 +20,13 @@ sub run {
   warn "MANAGER STARTED $$\n" if DEBUG;
 
   # Manager signals
-  $SIG{INT} = $SIG{TERM} = sub { $self->{_done} = 1 };
+  $SIG{INT} = $SIG{TERM} = $SIG{QUIT} = sub { $self->{_done} = 1 };
   $SIG{CHLD} = sub {
     while ((waitpid -1, WNOHANG) > 0) { $self->{_running} = 0 }
   };
 
   # Manage
-  $self->_manage while $self->{_running} || !$self->{_done};
-
-  exit 0;
+  $self->_manage while 1;
 }
 
 sub _manage {
@@ -38,14 +36,16 @@ sub _manage {
   my @files;
   for my $watch (@{$self->watch}, $self->app) {
     if (-d $watch) {
-      push @files, @{Mojo::Home->new->parse($watch)->list_files};
+      my $home = Mojo::Home->new->parse($watch);
+      push @files, $home->rel_file($_) for @{$home->list_files};
     }
     elsif (-r $watch) { push @files, $watch }
   }
 
   # Check files
   for my $file (@files) {
-    my $mtime = (stat $file)[9];
+    warn "CHECKING $file\n" if DEBUG;
+    next unless defined(my $mtime = (stat $file)[9]);
 
     # Startup time as default
     $STATS->{$file} = $^T unless defined $STATS->{$file};
@@ -59,6 +59,7 @@ sub _manage {
   }
 
   # Housekeeping
+  exit 0 if !$self->{_running} && $self->{_done};
   unless ($self->{_done}) {
     $self->_spawn if !$self->{_running};
     sleep 1;

@@ -131,14 +131,13 @@ L<Mojo::Server::Morbo> is a full featured self-restart capable async io HTTP
 L<Mojo::Server::Daemon> with C<IPv6>, C<TLS>, C<Bonjour>, C<epoll> and
 C<kqueue> support.
 
+To start applications with it you can use the L<morbo> script.
+
+  % morbo myapp.pl
+
 Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::IP>,
 L<IO::Socket::SSL> and L<Net::Rendezvous::Publish> are supported
 transparently and used if installed.
-
-The L<morbo> script is usually used to start applications with it.
-
-  % morbo myapp.pl
-  ...
 
 Note that this module is EXPERIMENTAL and might change without warning!
 

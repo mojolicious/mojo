@@ -400,14 +400,13 @@ io HTTP 1.1 and WebSocket server built around the very well tested and
 reliable L<Mojo::Server::Daemon> with C<IPv6>, C<TLS>, C<Bonjour>, C<epoll>,
 C<kqueue> and hot deployment support that just works.
 
+To start applications with it you can use the L<hypnotoad> script.
+
+  % hypnotoad myapp.pl
+
 Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::IP>,
 L<IO::Socket::SSL> and L<Net::Rendezvous::Publish> are supported
 transparently and used if installed.
-
-The L<hypnotoad> script is usually used to start applications with it.
-
-  % hypnotoad myapp.pl
-  ...
 
 See L<Mojolicious::Guides::Cookbook> for deployment recipes.
 

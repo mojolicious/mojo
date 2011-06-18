@@ -11,7 +11,7 @@ use constant DEBUG => $ENV{MORBO_DEBUG} || 0;
 
 has 'app';
 has listen => sub { [] };
-has watch  => sub { [qw/lib templates public/] };
+has watch  => sub { [qw/lib templates/] };
 
 # Cache stats
 my $STATS = {};
@@ -154,8 +154,8 @@ List of ports and files to listen on, defaults to C<http://*:3000>.
   $morbo    = $morbo->watch(['/home/sri/myapp']);
 
 Files and directories to watch for changes, defaults to the application
-script as well as the C<lib>, C<templates> and C<public> directories in the
-current working directory.
+script as well as the C<lib> and C<templates> directories in the current
+working directory.
 
 =head1 METHODS
 

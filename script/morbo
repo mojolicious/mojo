@@ -45,8 +45,8 @@ These options are available:
                              defaults to http://*:3000.
   --watch <directory/file>   Set one or more directories and files to watch
                              for changes, defaults to the application script
-                             as well as the "lib", "templates" and "public"
-                             directories in the current working directory.
+                             as well as the "lib" and "templates" directories
+                             in the current working directory.
 EOF
 
 # "With Halley's Comet out of ice, Earth is experiencing a sudden case of

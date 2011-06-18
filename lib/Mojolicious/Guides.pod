@@ -73,8 +73,8 @@ Minimalistic JSON implementation that just works.
 
 =item L<Mojo::Server::Daemon>
 
-Highly portable async io HTTP 1.1 and WebSocket server, perfect for
-development and testing.
+Highly portable async io HTTP 1.1 and WebSocket server with self-restart
+support through L<Mojo::Server::Morbo>, perfect for development and testing.
 
 =item L<Mojo::Server::Hypnotoad>
 

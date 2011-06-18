@@ -126,10 +126,10 @@ Mojo::Server::Morbo - DOOOOOOOOOOOOOOOOOOM!
 
 =head1 DESCRIPTION
 
-L<Mojo::Server::Morbo> is a full featured async io development HTTP 1.1 and
-WebSocket server built around the very well tested and reliable
-L<Mojo::Server::Daemon> with C<IPv6>, C<TLS>, C<Bonjour>, C<epoll>, C<kqueue>
-and self-restart support.
+L<Mojo::Server::Morbo> is a full featured self-restart capable async io HTTP
+1.1 and WebSocket server built around the very well tested and reliable
+L<Mojo::Server::Daemon> with C<IPv6>, C<TLS>, C<Bonjour>, C<epoll> and
+C<kqueue> support.
 
 Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::IP>,
 L<IO::Socket::SSL> and L<Net::Rendezvous::Publish> are supported

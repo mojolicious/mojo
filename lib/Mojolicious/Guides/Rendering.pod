@@ -546,7 +546,6 @@ C<DATA> section into actual files in the C<templates> and C<public>
 directories.
 
   % ./myapp.pl inflate
-  ...
 
 =head2 Customizing The Template Syntax
 

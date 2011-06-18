@@ -166,10 +166,7 @@ organized CPAN distribution to maximize maintainability.
 Both application skeletons can be automatically generated.
 
   % mojo generate lite_app
-  ...
-
   % mojo generate app
-  ...
 
 =head2 Foundation
 
@@ -321,9 +318,7 @@ From now on you can always check your progress by running these unit tests
 against your application.
 
   % ./myapp.pl test
-  ...
   % ./myapp.pl test t/login.t
-  ...
 
 To make the tests less noisy and limit log output to just C<error> messages
 you can also add a line like this.
@@ -476,7 +471,6 @@ automatically turned into separate files in the C<templates> and C<public>
 directories.
 
   % ./myapp.pl inflate
-  ...
 
 Those directories always get priority, so inflating can also be a great way
 to allow your users to customize their applications.

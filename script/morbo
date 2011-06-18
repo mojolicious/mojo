@@ -64,12 +64,13 @@ morbo - Morbo HTTP 1.1 And WebSocket Development Server
 
 =head1 SYNOPSIS
 
-    morbo myapp.pl
+  % morbo --help
+  % morbo myapp.pl
 
 =head1 DESCRIPTION
 
 Start L<Mojolicious> and L<Mojolicious::Lite> applications with the
-L<Mojo::Server::Hypnotoad> web server.
+L<Mojo::Server::Morbo> web server.
 
 =head1 SEE ALSO
 

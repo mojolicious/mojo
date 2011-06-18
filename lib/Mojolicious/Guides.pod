@@ -95,7 +95,7 @@ Countless portable and very convenient bytestream manipulation methods.
 
 =item L<Mojolicious::Commands>
 
-Pluggable command line system and the backbone of the C<mojo> script.
+Pluggable command line system and the backbone of the L<mojo> script.
 
 =item L<Test::Mojo>
 

@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-1.44    2011-06-13 00:00:00
+1.44    2011-06-18 00:00:00
         - Added EXPERIMENTAL self-restarting Morbo development web server and
           removed old "--reload" support since there have been too many
           negative side effects.

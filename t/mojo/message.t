@@ -1529,7 +1529,7 @@ is $req->version, '1.0', 'right version';
 is $req->at_least_version('1.0'), 1,     'at least version 1.0';
 is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->body, 'hello=world', 'right content';
-is_deeply $req->param('hello'), 'world', 'right paramaters';
+is_deeply $req->param('hello'), 'world', 'right parameters';
 is $req->url->to_abs->to_string, 'http://localhost/test/index.cgi',
   'right absolute URL';
 

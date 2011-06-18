@@ -33,7 +33,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Smiling Face With Sunglasses';
-our $VERSION  = '1.44';
+our $VERSION  = '1.45';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -309,7 +309,7 @@ and hot deployment, perfect for embedding.
 
 =item *
 
-Automatic CGI, FastCGI, and L<PSGI> detection.
+Automatic CGI, FastCGI and L<PSGI> detection.
 
 =item *
 
@@ -337,8 +337,8 @@ These three lines are a whole web application.
 
   app->start;
 
-To run this example with the built-in development server just put the code
-into a file and execute it with C<perl>.
+To run this example with the built-in development web server just put the
+code into a file and execute it with C<perl>.
 
   % perl hello.pl daemon
   Server available at http://127.0.0.1:3000.

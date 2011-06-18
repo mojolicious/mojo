@@ -390,6 +390,9 @@ Mojo::Server::Hypnotoad - ALL GLORY TO THE HYPNOTOAD!
 
   use Mojo::Server::Hypnotoad;
 
+  my $toad = Mojo::Server::Hypnotoad->new;
+  $toad->run('./myapp.pl', './hypnotoad.conf');
+
 =head1 DESCRIPTION
 
 L<Mojo::Server::Hypnotoad> is a full featured UNIX optimized preforking async

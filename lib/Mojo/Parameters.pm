@@ -86,7 +86,7 @@ sub parse {
   $self->params([]);
 
   # Detect query string without key/value pairs
-  return $self unless defined $string;
+  return $self unless defined $string && length $string;
   my $charset = $self->charset;
   if ($string !~ /\=/) {
 

@@ -152,8 +152,8 @@ customized to override normal C<@ARGV> use.
 =head2 Reloading
 
 Your application will automatically reload itself if you start it with the
-C<morbo> development server, so you don't have to restart the server after
-every change.
+C<morbo> development web server, so you don't have to restart the server
+after every change.
 
   % morbo myapp.pl
   Server available at http://127.0.0.1:3000.

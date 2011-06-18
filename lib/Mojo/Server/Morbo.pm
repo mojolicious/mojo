@@ -8,7 +8,6 @@ use POSIX 'WNOHANG';
 
 use constant DEBUG => $ENV{MORBO_DEBUG} || 0;
 
-has 'app';
 has listen => sub { [] };
 has watch  => sub { [qw/lib templates/] };
 
@@ -21,7 +20,7 @@ my $STATS = {};
 #  Blame rests with known human Professor Hubert Farnsworth and his tiny,
 #  inferior brain."
 sub run {
-  my $self = shift;
+  my ($self, $app) = @_;
   warn "MANAGER STARTED $$\n" if DEBUG;
 
   # Manager signals
@@ -31,8 +30,7 @@ sub run {
   };
 
   # Watch application
-  $self->app($self->app);
-  push @{$self->watch}, $self->app;
+  unshift @{$self->watch}, $app;
 
   # Manage
   $self->_manage while 1;
@@ -101,7 +99,7 @@ sub _spawn {
   warn "WORKER STARTED $$\n" if DEBUG;
   $SIG{INT} = $SIG{TERM} = $SIG{CHLD} = 'DEFAULT';
   my $daemon = Mojo::Server::Daemon->new;
-  $daemon->load_app($self->app);
+  $daemon->load_app($self->watch->[0]);
   $daemon->silent(1) if $ENV{MORBO_REV} > 1;
   $daemon->listen($self->listen) if @{$self->listen};
   $daemon->prepare_ioloop;
@@ -123,21 +121,25 @@ Mojo::Server::Morbo - DOOOOOOOOOOOOOOOOOOM!
 
   use Mojo::Server::Morbo;
 
+  my $morbo = Mojo::Server::Morbo->new;
+  $morbo->run('./myapp.pl');
+
 =head1 DESCRIPTION
 
-L<Mojo::Server::Morbo> is a HTTP 1.1 and WebSocket development server.
+L<Mojo::Server::Morbo> is a full featured async io development HTTP 1.1 and
+WebSocket server built around the very well tested and reliable
+L<Mojo::Server::Daemon> with C<IPv6>, C<TLS>, C<Bonjour>, C<epoll>, C<kqueue>
+and self-restart support.
+
+Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::IP>,
+L<IO::Socket::SSL> and L<Net::Rendezvous::Publish> are supported
+transparently and used if installed.
+
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 ATTRIBUTES
 
 L<Mojo::Server::Morbo> implements the following attributes.
-
-=head2 C<app>
-
-  my $app = $morbo->app;
-  $morbo  = $morbo->app('/home/sri/myapp.pl');
-
-Application script.
 
 =head2 C<listen>
 
@@ -162,7 +164,7 @@ the following new ones.
 
 =head2 C<run>
 
-  $morbo->run;
+  $morbo->run('script/myapp');
 
 Start server.
 

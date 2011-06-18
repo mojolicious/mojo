@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 44;
+use Test::More tests => 46;
 
 # "Now that's a wave of destruction that's easy on the eyes."
 use_ok 'Mojo::Parameters';
@@ -89,6 +89,9 @@ $params->remove('c');
 is $params->to_string, "=c&=", 'right format';
 $params->remove(undef);
 ok !$params->to_string, 'empty';
+$params->parse('');
+ok !$params->to_string, 'empty';
+is_deeply $params->to_hash, {}, 'right structure';
 
 # +
 $params = Mojo::Parameters->new('foo=%2B');

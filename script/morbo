@@ -54,7 +54,7 @@ EOF
 #  Morbo is pleased but sticky."
 $morbo->listen(\@listen) if @listen;
 $morbo->watch(\@watch)   if @watch;
-$morbo->app($app)->run;
+$morbo->run($app);
 
 __END__
 

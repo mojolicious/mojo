@@ -2,7 +2,6 @@ package Mojo::Server::Morbo;
 use Mojo::Base -base;
 
 use Carp 'croak';
-use Cwd 'abs_path';
 use Mojo::Home;
 use Mojo::Server::Daemon;
 use POSIX 'WNOHANG';
@@ -31,9 +30,8 @@ sub run {
     while ((waitpid -1, WNOHANG) > 0) { $self->{_running} = 0 }
   };
 
-  # Resolve paths
-  @{$self->watch} = map { abs_path $_ } @{$self->watch};
-  $self->app(abs_path $self->app);
+  # Watch application
+  $self->app($self->app);
   push @{$self->watch}, $self->app;
 
   # Manage

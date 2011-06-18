@@ -8,6 +8,7 @@ use Getopt::Long qw/GetOptions :config pass_through/;
 has hint => <<"EOF";
 
 These options are available for all commands:
+    --help          Get more information on a specific command.
     --home <path>   Path to your applications home directory, defaults to
                     the value of MOJO_HOME or auto detection.
     --mode <name>   Run mode of your application, defaults to the value of
@@ -17,9 +18,10 @@ See '$0 help COMMAND' for more information on a specific command.
 EOF
 has namespaces => sub { [qw/Mojolicious::Command Mojo::Command/] };
 
-# Command line options for MOJO_HOME and MOJO_MODE
+# Command line options for MOJO_HELP, MOJO_HOME and MOJO_MODE
 BEGIN {
   GetOptions(
+    'help|h' => sub { $ENV{MOJO_HELP} = 1 },
     'home=s' => sub { $ENV{MOJO_HOME} = $_[1] },
     'mode=s' => sub { $ENV{MOJO_MODE} = $_[1] }
   ) unless Mojo::Command->detect;

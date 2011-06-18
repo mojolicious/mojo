@@ -193,6 +193,7 @@ sub run {
     # Help
     my $help = $name eq 'help' ? 1 : 0;
     $name = shift @args if $help;
+    $help = 1           if $ENV{MOJO_HELP};
 
     # Try all namespaces
     my $module;

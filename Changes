@@ -7,6 +7,7 @@ This file documents the revision history for Perl extension Mojolicious.
           This also improves overall performance by about 5-10% and reduces
           memory usage by about 10%.
         - Added EXPERIMENTAL application mount plugin.
+        - Added EXPERIMENTAL --help support for all commands.
         - Updated prettify.js to version 1-Jun-2011.
         - Updated WebSocket diagnostics test in Mojo::HelloWorld for latest
           Firefox Aurora.

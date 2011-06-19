@@ -597,6 +597,15 @@ HTML5 tag generator.
   <div id="foo" />
   <div>Content</div>
 
+Very useful for reuse in more specific tag helpers.
+
+  $self->tag('div');
+  $self->tag('div', id => 'foo');
+  $self->tag(div => sub { 'Content' });
+
+Results are automatically wrapped in L<Mojo::ByteStream> objects to prevent
+accidental double escaping.
+
 =head2 C<text_field>
 
   <%= text_field 'first_name' %>

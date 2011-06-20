@@ -94,7 +94,8 @@ sub _spawn {
 
   # Worker
   warn "WORKER STARTED $$\n" if DEBUG;
-  $SIG{INT} = $SIG{TERM} = $SIG{CHLD} = sub { $self->{_done} = 1 };
+  $SIG{CHLD} = 'DEFAULT';
+  $SIG{INT} = $SIG{TERM} = $SIG{QUIT} = sub { $self->{_done} = 1 };
   my $daemon = Mojo::Server::Daemon->new;
   $daemon->load_app($self->watch->[0]);
   $daemon->silent(1) if $ENV{MORBO_REV} > 1;

@@ -80,7 +80,7 @@ $t->get_ok('/dead_included_template')->status_is(500)->content_like(qr/1\./)
 
 # GET /dead_template_with_layout
 $t->get_ok('/dead_template_with_layout')->status_is(500)
-  ->content_like(qr/3\./)->content_like(qr/dead\ template\ with\ layout!/);
+  ->content_like(qr/2\./)->content_like(qr/dead\ template\ with\ layout!/);
 
 # GET /dead_action
 $t->get_ok('/dead_action')->status_is(500)->content_like(qr/32\./)
@@ -98,9 +98,7 @@ $t->get_ok('/trapped/too')->status_is(200)->content_is('works');
 
 __DATA__
 @@ layouts/green.html.ep
-earlier
 %= content
-later
 
 @@ dead_template.html.ep
 % die 'dead template!';
@@ -112,6 +110,4 @@ works!
 
 @@ dead_template_with_layout.html.ep
 % layout 'green';
-earlier
 % die 'dead template with layout!';
-later

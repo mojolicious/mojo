@@ -167,7 +167,7 @@ sub parse {
   $self->scheme($scheme);
   $self->authority($authority);
   $self->path->parse($path);
-  $self->query->parse($query);
+  $self->query($query);
   $self->fragment($fragment);
 
   return $self;
@@ -231,11 +231,8 @@ sub query {
       $q->append(%{$_[0]});
     }
 
-    # Replace with string or object
-    else {
-      $self->{query} =
-        !ref $_[0] ? Mojo::Parameters->new->append($_[0]) : $_[0];
-    }
+    # Replace with string
+    else { $self->{query} = Mojo::Parameters->new($_[0]) }
 
     return $self;
   }
@@ -334,8 +331,8 @@ sub to_string {
   $path->leading_slash($slash);
 
   # Query
-  my $query = $self->query;
-  $url .= "?$query" if @{$query->params};
+  my $query = join '', $self->query;
+  $url .= "?$query" if length $query;
 
   # Fragment
   if (my $fragment = $self->fragment) {

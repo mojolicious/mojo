@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 321;
+use Test::More tests => 322;
 
 # "I don't want you driving around in a car you built yourself.
 #  You can sit there complaining, or you can knit me some seat belts."
@@ -59,22 +59,23 @@ is "$url", 'http://sri:foobar@kraih.com:8080?monkey=bar&foo=bar#23',
 $url->query('foo');
 is "$url", 'http://sri:foobar@kraih.com:8080?foo#23', 'right format';
 $url->query('foo=bar');
-is "$url", 'http://sri:foobar@kraih.com:8080?foo%3Dbar#23', 'right format';
+is "$url", 'http://sri:foobar@kraih.com:8080?foo=bar#23', 'right format';
 
 # Query string
 $url = Mojo::URL->new(
   'http://sri:foobar@kraih.com:8080?_monkeybiz%3B&_monkey;23#23');
-is $url->is_abs,   1,                              'is absolute';
-is $url->scheme,   'http',                         'right scheme';
-is $url->userinfo, 'sri:foobar',                   'right userinfo';
-is $url->host,     'kraih.com',                    'right host';
-is $url->port,     '8080',                         'right port';
-is $url->path,     '',                             'no path';
-is $url->query,    '_monkeybiz%3B%26_monkey%3B23', 'right query';
-is_deeply $url->query->params, ['_monkeybiz;&_monkey;23', undef],
+is $url->is_abs,   1,                          'is absolute';
+is $url->scheme,   'http',                     'right scheme';
+is $url->userinfo, 'sri:foobar',               'right userinfo';
+is $url->host,     'kraih.com',                'right host';
+is $url->port,     '8080',                     'right port';
+is $url->path,     '',                         'no path';
+is $url->query,    '_monkeybiz%3B&_monkey;23', 'right query';
+is_deeply $url->query->params, ['_monkeybiz;', '', '_monkey', '', 23, ''],
   'right structure';
+is $url->query, '_monkeybiz%3B=&_monkey=&23=', 'right query';
 is $url->fragment, '23', 'right fragment';
-is "$url", 'http://sri:foobar@kraih.com:8080?_monkeybiz%3B%26_monkey%3B23#23',
+is "$url", 'http://sri:foobar@kraih.com:8080?_monkeybiz%3B=&_monkey=&23=#23',
   'right format';
 
 # Relative

@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 54;
+use Test::More tests => 62;
 
 # "Now that's a wave of destruction that's easy on the eyes."
 use_ok 'Mojo::Parameters';
@@ -16,6 +16,8 @@ my $params2 = Mojo::Parameters->new('x', 1, 'y', 2);
 is $params->pair_separator, '&',                 'right pair separator';
 is $params->to_string,      'foo=b%3Bar&baz=23', 'right format';
 is $params2->to_string,     'x=1&y=2',           'right format';
+is $params->to_string,      'foo=b%3Bar&baz=23', 'right format';
+is_deeply $params->params, ['foo', 'b;ar', 'baz', 23], 'right structure';
 $params->pair_separator(';');
 is $params->to_string, 'foo=b%3Bar;baz=23', 'right format';
 is "$params", 'foo=b%3Bar;baz=23', 'right format';
@@ -74,10 +76,12 @@ is $params->to_string, 'foo=0', 'right format';
 
 # Semicolon
 $params = Mojo::Parameters->new('foo=bar;baz');
-is $params->pair_separator, ';', 'right pair separator';
+is $params->pair_separator, '&',           'right pair separator';
+is $params->to_string,      'foo=bar;baz', 'right format';
 is_deeply $params->params, [foo => 'bar', baz => ''], 'right structure';
 is_deeply $params->to_hash, {foo => 'bar', baz => ''}, 'right structure';
-is $params->to_string, 'foo=bar;baz=', 'right format';
+is $params->pair_separator, ';',            'right pair separator';
+is $params->to_string,      'foo=bar;baz=', 'right format';
 $params = Mojo::Parameters->new('foo=bar%3Bbaz');
 is $params->pair_separator, '&', 'right pair separator';
 is_deeply $params->params, [foo => 'bar;baz'], 'right structure';
@@ -116,6 +120,11 @@ is_deeply $params->to_hash, {foo => '+'}, 'right structure';
 $params->append('1 2', '3+3');
 is $params->param('1 2'), '3+3', 'right value';
 is_deeply $params->to_hash, {foo => '+', '1 2' => '3+3'}, 'right structure';
+$params = Mojo::Parameters->new('a=works+too');
+is "$params", 'a=works+too', 'right format';
+is_deeply $params->to_hash, {a => 'works too'}, 'right structure';
+is $params->param('a'), 'works too', 'right value';
+is "$params", 'a=works+too', 'right format';
 
 # Array values
 $params = Mojo::Parameters->new;

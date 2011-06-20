@@ -6,11 +6,10 @@ use warnings;
 use utf8;
 
 # Disable IPv6, epoll and kqueue
-BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
-
-# Development
-my $backup;
-BEGIN { $backup = $ENV{MOJO_MODE} || ''; $ENV{MOJO_MODE} = 'development' }
+BEGIN {
+  $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1;
+  $ENV{MOJO_MODE} = 'development';
+}
 
 use Test::More tests => 9;
 

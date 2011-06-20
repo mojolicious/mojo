@@ -345,8 +345,8 @@ sub render_exception {
     unless ($self->render($options)) {
 
       # Inline template
-      delete $options->{layout};
-      delete $options->{extends};
+      delete $stash->{layout};
+      delete $stash->{extends};
       delete $options->{template};
       $options->{inline} =
         $mode eq 'development' ? $DEVELOPMENT_EXCEPTION : $EXCEPTION;

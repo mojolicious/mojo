@@ -4,7 +4,10 @@ use strict;
 use warnings;
 
 # Disable IPv6, epoll and kqueue
-BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
+BEGIN {
+  $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1;
+  $ENV{MOJO_MODE} = 'production';
+}
 
 use Test::More tests => 51;
 
@@ -17,9 +20,6 @@ use Test::Mojo;
 use_ok 'MojoliciousTest';
 
 my $t = Test::Mojo->new(app => 'MojoliciousTest');
-
-my $backup = $ENV{MOJO_MODE} || '';
-$ENV{MOJO_MODE} = 'production';
 
 # SyntaxError::foo in production mode (syntax error in controller)
 $t->get_ok('/syntax_error/foo')->status_is(500)
@@ -81,5 +81,3 @@ $t->get_ok('/../../mojolicious/secret.txt')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/Not Found/);
-
-$ENV{MOJO_MODE} = $backup;

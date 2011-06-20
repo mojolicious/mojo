@@ -6,11 +6,10 @@ use warnings;
 use utf8;
 
 # Disable IPv6, epoll and kqueue
-BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
-
-# Development
-my $backup;
-BEGIN { $backup = $ENV{MOJO_MODE} || ''; $ENV{MOJO_MODE} = 'development' }
+BEGIN {
+  $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1;
+  $ENV{MOJO_MODE} = 'development';
+}
 
 use Test::More tests => 813;
 
@@ -1699,8 +1698,6 @@ $tua->ioloop->one_tick('0.1');
 is $timer,
   "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\nworks!",
   'right content';
-
-$ENV{MOJO_MODE} = $backup;
 
 __DATA__
 @@ with-format.html.ep

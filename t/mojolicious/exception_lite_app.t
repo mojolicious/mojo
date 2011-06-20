@@ -4,13 +4,12 @@ use strict;
 use warnings;
 
 # Disable IPv6, epoll and kqueue
-BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
+BEGIN {
+  $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1;
+  $ENV{MOJO_MODE} = 'development';
+}
 
-# Development
-my $backup;
-BEGIN { $backup = $ENV{MOJO_MODE} || ''; $ENV{MOJO_MODE} = 'development' }
-
-use Test::More tests => 28;
+use Test::More tests => 32;
 
 # "This calls for a party, baby.
 #  I'm ordering 100 kegs, 100 hookers and 100 Elvis impersonators that aren't
@@ -25,6 +24,9 @@ get '/dead_template';
 
 # GET /dead_included_template
 get '/dead_included_template';
+
+# GET /dead_template_with_layout
+get '/dead_template_with_layout';
 
 # GET /dead_action
 get '/dead_action' => sub { die 'dead action!' };
@@ -76,8 +78,12 @@ $t->get_ok('/dead_template')->status_is(500)->content_like(qr/1\./)
 $t->get_ok('/dead_included_template')->status_is(500)->content_like(qr/1\./)
   ->content_like(qr/dead\ template!/);
 
+# GET /dead_template_with_layout
+$t->get_ok('/dead_template_with_layout')->status_is(500)
+  ->content_like(qr/3\./)->content_like(qr/dead\ template\ with\ layout!/);
+
 # GET /dead_action
-$t->get_ok('/dead_action')->status_is(500)->content_like(qr/26\./)
+$t->get_ok('/dead_action')->status_is(500)->content_like(qr/32\./)
   ->content_like(qr/dead\ action!/);
 
 # GET /double_dead_action
@@ -90,9 +96,12 @@ $t->get_ok('/trapped')->status_is(200)->content_is('bar');
 # GET /trapped/too
 $t->get_ok('/trapped/too')->status_is(200)->content_is('works');
 
-$ENV{MOJO_MODE} = $backup;
-
 __DATA__
+@@ layouts/green.html.ep
+earlier
+%= content
+later
+
 @@ dead_template.html.ep
 % die 'dead template!';
 
@@ -100,3 +109,9 @@ __DATA__
 this
 %= include 'dead_template'
 works!
+
+@@ dead_template_with_layout.html.ep
+% layout 'green';
+earlier
+% die 'dead template with layout!';
+later

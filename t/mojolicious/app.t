@@ -4,7 +4,10 @@ use strict;
 use warnings;
 
 # Disable IPv6, epoll and kqueue
-BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
+BEGIN {
+  $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1;
+  $ENV{MOJO_MODE} = 'development';
+}
 
 use Test::More tests => 249;
 
@@ -23,9 +26,6 @@ use Mojolicious;
 use_ok 'MojoliciousTest';
 
 my $t = Test::Mojo->new(app => 'MojoliciousTest');
-
-my $backup = $ENV{MOJO_MODE} || '';
-$ENV{MOJO_MODE} = 'development';
 
 # Foo::fun
 my $url = $t->build_url;
@@ -329,5 +329,3 @@ $t->get_ok('/foo/session')->status_is(200)
 # Mixed formats
 $t->get_ok('/rss.xml')->status_is(200)->content_type_is('application/rss+xml')
   ->content_like(qr/<\?xml version="1.0" encoding="UTF-8"\?><rss \/>/);
-
-$ENV{MOJO_MODE} = $backup;

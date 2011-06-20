@@ -24,9 +24,7 @@ sub run {
   warn "MANAGER STARTED $$\n" if DEBUG;
 
   # Watch files and manage worker
-  $SIG{CHLD} = sub {
-    while ((waitpid -1, WNOHANG) > 0) { $self->{_running} = 0 }
-  };
+  $SIG{CHLD} = sub { $self->_reap };
   unshift @{$self->watch}, $app;
   $self->_manage while 1;
 }
@@ -67,14 +65,16 @@ sub _manage {
   }
 
   # Housekeeping
-  exit 0 if !$self->{_running} && $self->{_done};
-  unless ($self->{_done}) {
-    $self->{_running} = 0 if $self->{_running} && !kill 0, $self->{_running};
-    $self->_spawn if !$self->{_running};
-    sleep 1;
-  }
+  $self->_reap;
+  $self->{_running} = 0 if $self->{_running} && !kill 0, $self->{_running};
+  $self->_spawn if !$self->{_running};
+  sleep 1;
   $SIG{INT} = $SIG{TERM} = $SIG{QUIT} = 'DEFAULT';
-  kill 'TERM', $self->{_running} if $self->{_running} && $self->{_done};
+}
+
+sub _reap {
+  my $self = shift;
+  while ((waitpid -1, WNOHANG) > 0) { $self->{_running} = 0 }
 }
 
 # "Morbo cannot read his teleprompter.

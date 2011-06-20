@@ -11,7 +11,7 @@ BEGIN {
   $ENV{MOJO_MODE} = 'development';
 }
 
-use Test::More tests => 813;
+use Test::More tests => 814;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -35,6 +35,11 @@ use Test::Mojo;
 
 # User agent
 my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton, app => app);
+
+# Missing plugin
+eval { plugin 'does_not_exist'; };
+is $@, "Plugin \"does_not_exist\" missing, maybe you need to install it?\n",
+  'right error';
 
 # Header condition plugin
 plugin 'header_condition';

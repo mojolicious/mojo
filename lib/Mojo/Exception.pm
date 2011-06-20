@@ -21,7 +21,7 @@ sub new {
   return $self unless @_;
 
   # Detect
-  return $self->_detect(@_);
+  $self->_detect(@_);
 }
 
 sub throw {
@@ -49,7 +49,7 @@ sub trace {
   }
   $e->frames(\@frames);
 
-  return $e;
+  $e;
 }
 
 sub _detect {
@@ -129,7 +129,7 @@ sub _detect {
   # Context
   $self->_parse_context($line, \@lines) if $line;
 
-  return $self;
+  $self;
 }
 
 # "You killed zombie Flanders!
@@ -158,7 +158,7 @@ sub to_string {
     $string .= $line->[0] . ': ' . $line->[1] . "\n";
   }
 
-  return $string;
+  $string;
 }
 
 sub _parse_context {
@@ -207,7 +207,7 @@ sub _parse_context {
     }
   }
 
-  return $self;
+  $self;
 }
 
 1;

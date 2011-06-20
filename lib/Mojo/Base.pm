@@ -46,7 +46,7 @@ sub import {
 
 sub new {
   my $class = shift;
-  return bless
+  bless
     exists $_[0] ? exists $_[1] ? {@_} : {%{$_[0]}} : {},
     ref $class || $class;
 }
@@ -106,7 +106,7 @@ sub attr {
     $code .= "$ws\$_[0]->{'$attr'} = \$_[1];\n";
 
     # Return invocant
-    $code .= "${ws}return \$_[0];\n";
+    $code .= "${ws}\$_[0];\n";
 
     # Footer
     $code .= '};';

@@ -15,7 +15,7 @@ sub run {
   my $self    = shift;
   my $fastcgi = Mojo::Server::FastCGI->new;
   $fastcgi->run;
-  return $self;
+  $self;
 }
 
 1;

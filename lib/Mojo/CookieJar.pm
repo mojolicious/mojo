@@ -46,7 +46,7 @@ sub add {
     $self->{_jar}->{$domain} = \@new;
   }
 
-  return $self;
+  $self;
 }
 
 sub empty { shift->{_jar} = {} }
@@ -121,7 +121,7 @@ sub find {
   # Remove leading dot or part
   continue { $domain =~ s/^(?:\.|[^\.]+)// }
 
-  return @found;
+  @found;
 }
 
 sub inject {

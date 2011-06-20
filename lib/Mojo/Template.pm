@@ -43,7 +43,7 @@ sub escape;
     $v = "$_[0]";
   }
   Mojo::Util::xml_escape $v;
-  return $v;
+  $v;
 };
 use strict; use warnings;
 EOF
@@ -146,7 +146,7 @@ sub build {
   $self->code(join "\n", @lines);
   $self->tree([]);
 
-  return $self;
+  $self;
 }
 
 sub compile {
@@ -162,7 +162,7 @@ sub compile {
     if $@;
 
   $self->compiled($compiled);
-  return;
+  undef;
 }
 
 sub interpret {
@@ -189,7 +189,7 @@ sub interpret {
     Mojo::Exception->new($@, [$self->template], $self->name)->verbose(1)
     if $@;
 
-  return $output;
+  $output;
 }
 
 # "I am so smart! I am so smart! S-M-R-T! I mean S-M-A-R-T..."
@@ -417,7 +417,7 @@ sub parse {
     push @{$self->tree}, \@token;
   }
 
-  return $self;
+  $self;
 }
 
 sub render {
@@ -435,7 +435,7 @@ sub render {
   return $e if $e;
 
   # Interpret
-  return $self->interpret(@_);
+  $self->interpret(@_);
 }
 
 sub render_file {
@@ -457,7 +457,7 @@ sub render_file {
   $tmpl = decode($self->encoding, $tmpl) if $self->encoding;
 
   # Render
-  return $self->render($tmpl, @_);
+  $self->render($tmpl, @_);
 }
 
 sub render_file_to_file {
@@ -470,7 +470,7 @@ sub render_file_to_file {
   return $output if ref $output;
 
   # Write to file
-  return $self->_write_file($tpath, $output);
+  $self->_write_file($tpath, $output);
 }
 
 sub render_to_file {
@@ -483,7 +483,7 @@ sub render_to_file {
   return $output if ref $output;
 
   # Write to file
-  return $self->_write_file($path, $output);
+  $self->_write_file($path, $output);
 }
 
 sub _trim_line {
@@ -514,7 +514,7 @@ sub _trim_line {
     return 1 if length $value;
   }
 
-  return;
+  undef;
 }
 
 sub _write_file {
@@ -530,7 +530,7 @@ sub _write_file {
   # Write to file
   $file->syswrite($output) or croak "Can't write to file '$path': $!";
 
-  return;
+  undef;
 }
 
 1;

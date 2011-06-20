@@ -37,7 +37,7 @@ sub expires {
   $self->{expires} = Mojo::Date->new($self->{expires})
     unless ref $self->{expires};
 
-  return $self->{expires};
+  $self->{expires};
 }
 
 # "Remember the time he ate my goldfish?
@@ -75,7 +75,7 @@ sub parse {
     }
   }
 
-  return \@cookies;
+  \@cookies;
 }
 
 sub to_string {
@@ -116,7 +116,7 @@ sub to_string {
   # Comment
   if (my $comment = $self->comment) { $cookie .= "; Comment=$comment" }
 
-  return $cookie;
+  $cookie;
 }
 
 1;

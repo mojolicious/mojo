@@ -151,7 +151,7 @@ sub run {
   # Select
   $self->_select($buffer, $charset, $selector) if $selector;
 
-  return $self;
+  $self;
 }
 
 sub _select {

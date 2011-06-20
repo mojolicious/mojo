@@ -192,7 +192,7 @@ sub new {
   # Ignore PIPE signal
   $SIG{PIPE} = 'IGNORE';
 
-  return $self;
+  $self;
 }
 
 sub connect {
@@ -234,14 +234,14 @@ sub connect {
   # Connect
   else { $self->_connect($id, $args) }
 
-  return $id;
+  $id;
 }
 
 sub connection_timeout {
   my ($self, $id, $timeout) = @_;
   return unless my $c = $self->{_cs}->{$id};
   $c->{timeout} = $timeout and return $self if $timeout;
-  return $c->{timeout};
+  $c->{timeout};
 }
 
 sub dns_servers {
@@ -260,7 +260,7 @@ sub dns_servers {
 
   # Current server
   $CURRENT_DNS_SERVER = 0 unless $DNS_SERVERS->[$CURRENT_DNS_SERVER];
-  return $DNS_SERVERS->[$CURRENT_DNS_SERVER];
+  $DNS_SERVERS->[$CURRENT_DNS_SERVER];
 }
 
 sub drop {
@@ -271,7 +271,7 @@ sub drop {
   if (my $c = $self->{_cs}->{$id}) { return $c->{finish} = 1 }
 
   # Drop right away
-  return $self->_drop_immediately($id);
+  $self->_drop_immediately($id);
 }
 
 sub generate_port {
@@ -290,7 +290,7 @@ sub generate_port {
       );
   }
 
-  return;
+  undef;
 }
 
 sub idle {
@@ -410,7 +410,7 @@ sub listen {
   # Accept limit
   $self->{_accepts} = $self->max_accepts if $self->max_accepts;
 
-  return $id;
+  $id;
 }
 
 sub local_info {
@@ -422,7 +422,7 @@ sub local_info {
   return {path => $socket->hostpath} if $socket->can('hostpath');
 
   # TCP socket info
-  return {address => $socket->sockhost, port => $socket->sockport};
+  {address => $socket->sockhost, port => $socket->sockport};
 }
 
 sub lookup {
@@ -542,7 +542,7 @@ sub one_tick {
 sub handle {
   my ($self, $id) = @_;
   return unless my $c = $self->{_cs}->{$id};
-  return $c->{handle};
+  $c->{handle};
 }
 
 sub remote_info {
@@ -554,7 +554,7 @@ sub remote_info {
   return {path => $socket->peerpath} if $socket->can('peerpath');
 
   # TCP socket info
-  return {address => $socket->peerhost, port => $socket->peerport};
+  {address => $socket->peerhost, port => $socket->peerport};
 }
 
 sub resolve {
@@ -666,7 +666,7 @@ sub resolve {
     }
   );
 
-  return $self;
+  $self;
 }
 
 sub singleton { $LOOP ||= shift->new(@_) }
@@ -682,7 +682,7 @@ sub start {
   # Mainloop
   $self->one_tick while $self->{_running};
 
-  return $self;
+  $self;
 }
 
 sub start_tls {
@@ -729,7 +729,7 @@ sub start_tls {
   $c->{tls_connect} = 1;
   $self->_writing($id);
 
-  return $id;
+  $id;
 }
 
 sub stop {
@@ -750,7 +750,7 @@ sub test {
   my $result = $test->handles(POLLIN | POLLERR | POLLHUP);
   $test->remove($socket);
 
-  return !$result;
+  !$result;
 }
 
 sub timer {
@@ -835,7 +835,7 @@ sub _add_event {
   my ($self, $event, $id, $cb) = @_;
   return unless my $c = $self->{_cs}->{$id};
   $c->{$event} = $cb if $cb;
-  return $self;
+  $self;
 }
 
 sub _add_loop_event {
@@ -847,7 +847,7 @@ sub _add_loop_event {
   (my $id) = "$e" =~ /0x([\da-f]+)/;
   $self->{"_$event"}->{$id} = $e;
 
-  return $id;
+  $id;
 }
 
 sub _connect {
@@ -959,7 +959,7 @@ sub _drop_immediately {
     close $handle;
   }
 
-  return $self;
+  $self;
 }
 
 sub _error {
@@ -1071,7 +1071,7 @@ sub _parse_answer {
   return $type => _parse_name($packet, $offset) if $type;
 
   # Not supported
-  return;
+  undef;
 }
 
 # Domain name helper for "resolve"
@@ -1100,7 +1100,7 @@ sub _parse_name {
     else { return join '.', @elements }
   }
 
-  return;
+  undef;
 }
 
 sub _prepare_cert {
@@ -1118,7 +1118,7 @@ sub _prepare_cert {
     or croak qq/Can't create temporary TLS cert file "$cert"/;
   print $file CERT;
 
-  return $self->{_cert} = $cert;
+  $self->{_cert} = $cert;
 }
 
 sub _prepare_connections {
@@ -1165,7 +1165,7 @@ sub _prepare_key {
     or croak qq/Can't create temporary TLS key file "$key"/;
   print $file KEY;
 
-  return $self->{_key} = $key;
+  $self->{_key} = $key;
 }
 
 sub _prepare_listen {
@@ -1223,7 +1223,7 @@ sub _prepare_loop {
     $self->{_loop} = IO::Poll->new;
   }
 
-  return $self->{_loop};
+  $self->{_loop};
 }
 
 sub _read {
@@ -1275,7 +1275,7 @@ sub _run_callback {
   my $value = eval { $self->$cb(@_) };
   warn qq/Callback "$event" failed: $@/ if $@;
 
-  return $value;
+  $value;
 }
 
 sub _run_event {
@@ -1293,7 +1293,7 @@ sub _run_event {
       : $self->_error($id, $message);
   }
 
-  return $value;
+  $value;
 }
 
 sub _timer {
@@ -1324,7 +1324,7 @@ sub _timer {
     }
   }
 
-  return $count;
+  $count;
 }
 
 sub _tls_accept {

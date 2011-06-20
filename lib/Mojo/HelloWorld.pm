@@ -17,7 +17,7 @@ sub new {
   $self->log->level('error');
   $self->log->path(undef);
 
-  return $self;
+  $self;
 }
 
 sub handler {

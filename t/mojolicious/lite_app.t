@@ -604,7 +604,7 @@ under sub {
   return unless $self->req->headers->header('X-Bender');
   $self->res->headers->add('X-Under' => 23);
   $self->res->headers->add('X-Under' => 24);
-  return 1;
+  1;
 };
 
 # GET /with_under
@@ -628,7 +628,7 @@ under sub {
 
   # Not authenticated
   $self->render('param_auth_denied');
-  return;
+  undef;
 };
 
 # GET /param_auth
@@ -644,7 +644,7 @@ under sub {
   $self->cookie(foo => 'cookie', {expires => (time + 60)});
   $self->signed_cookie(bar => 'signed_cookie', {expires => (time + 120)});
   $self->cookie(bad => 'bad_cookie--12345678');
-  return 1;
+  1;
 };
 
 # GET /bridge2stash
@@ -669,7 +669,7 @@ get '/late/session' => sub {
 my $under = 0;
 under sub {
   shift->res->headers->header('X-Under' => ++$under);
-  return 1;
+  1;
 };
 
 # GET /with_under_count
@@ -678,7 +678,7 @@ get '/with/under/count';
 # Everything gets past this
 under sub {
   shift->res->headers->header('X-Possible' => 1);
-  return 1;
+  1;
 };
 
 # GET /possible
@@ -687,7 +687,7 @@ get '/possible' => 'possible';
 # Nothing gets past this
 under sub {
   shift->res->headers->header('X-Impossible' => 1);
-  return 0;
+  0;
 };
 
 # GET /impossible

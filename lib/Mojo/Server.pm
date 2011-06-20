@@ -66,7 +66,7 @@ EOF
   die qq/"$file" is not a valid application.\n/
     unless blessed $app && $app->isa('Mojo');
   $self->app($app);
-  return $app;
+  $app;
 }
 
 # "Are you saying you're never going to eat any animal again? What about

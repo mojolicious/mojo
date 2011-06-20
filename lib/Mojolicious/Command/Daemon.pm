@@ -50,7 +50,7 @@ sub run {
   $daemon->listen(\@listen) if @listen;
   $daemon->run;
 
-  return $self;
+  $self;
 }
 
 1;

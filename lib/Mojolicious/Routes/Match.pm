@@ -25,7 +25,7 @@ sub new {
   # WebSocket
   $self->{_websocket} = shift;
 
-  return $self;
+  $self;
 }
 
 # "Life can be hilariously cruel."
@@ -125,7 +125,7 @@ sub match {
     }
   }
 
-  return $self;
+  $self;
 }
 
 sub path_for {
@@ -204,7 +204,7 @@ sub path_for {
   # Render
   my $path = $endpoint->render('', $values);
   utf8::downgrade $path, 1;
-  return wantarray ? ($path, $endpoint->has_websocket) : $path;
+  wantarray ? ($path, $endpoint->has_websocket) : $path;
 }
 
 1;

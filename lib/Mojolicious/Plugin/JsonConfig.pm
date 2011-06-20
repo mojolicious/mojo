@@ -19,7 +19,7 @@ sub parse {
   die qq/Couldn't parse config "$file": $error/ if !$config && $error;
   die qq/Invalid config "$file"./ if !$config || ref $config ne 'HASH';
 
-  return $config;
+  $config;
 }
 
 sub register {
@@ -49,7 +49,7 @@ sub render {
   $content = $mt->render($content, $app);
   utf8::encode $content;
 
-  return $content;
+  $content;
 }
 
 1;

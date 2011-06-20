@@ -10,13 +10,13 @@ has asset => sub { Mojo::Asset::Memory->new };
 sub body_contains {
   my ($self, $chunk) = @_;
   return 1 if $self->asset->contains($chunk) >= 0;
-  return 0;
+  0;
 }
 
 sub body_size {
   my $self = shift;
   return ($self->headers->content_length || 0) if $self->on_read;
-  return $self->asset->size;
+  $self->asset->size;
 }
 
 sub get_body_chunk {
@@ -26,7 +26,7 @@ sub get_body_chunk {
   return $self->generate_body_chunk($offset) if $self->on_read;
 
   # Normal content
-  return $self->asset->get_chunk($offset);
+  $self->asset->get_chunk($offset);
 }
 
 sub parse {
@@ -75,7 +75,7 @@ sub parse {
     $self->{_state} = 'done' if $len <= $self->progress;
   }
 
-  return $self;
+  $self;
 }
 
 1;

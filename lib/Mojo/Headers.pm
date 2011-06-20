@@ -99,7 +99,7 @@ sub add {
   push @{$self->{_headers}->{$name}}, (ref $_ || '') eq 'ARRAY' ? $_ : [$_]
     for @_;
 
-  return $self;
+  $self;
 }
 
 sub connection          { scalar shift->header(Connection            => @_) }
@@ -132,7 +132,7 @@ sub from_hash {
     $self->add($header => ref $value eq 'ARRAY' ? @$value : $value);
   }
 
-  return $self;
+  $self;
 }
 
 # "Will you be my mommy? You smell like dead bunnies..."
@@ -152,7 +152,7 @@ sub header {
   return join ', ', map { join ', ', @$_ } @$headers unless wantarray;
 
   # Array
-  return @$headers;
+  @$headers;
 }
 
 sub host { scalar shift->header(Host => @_) }
@@ -177,7 +177,7 @@ sub names {
     push @headers, $NORMALCASE_HEADERS{$name} || $name;
   }
 
-  return \@headers;
+  \@headers;
 }
 
 sub parse {
@@ -230,7 +230,7 @@ sub parse {
     $self->{_limit} = 1;
   }
 
-  return $self;
+  $self;
 }
 
 sub proxy_authenticate  { scalar shift->header('Proxy-Authenticate'  => @_) }
@@ -241,7 +241,7 @@ sub referrer            { scalar shift->header(Referer               => @_) }
 sub remove {
   my ($self, $name) = @_;
   delete $self->{_headers}->{lc $name};
-  return $self;
+  $self;
 }
 
 sub sec_websocket_accept {
@@ -288,7 +288,7 @@ sub to_hash {
     }
   }
 
-  return $hash;
+  $hash;
 }
 
 sub to_string {
@@ -307,7 +307,7 @@ sub to_string {
 
   # Format headers
   my $headers = join "\x0d\x0a", @headers;
-  return length $headers ? $headers : undef;
+  length $headers ? $headers : undef;
 }
 
 sub trailer           { scalar shift->header(Trailer             => @_) }

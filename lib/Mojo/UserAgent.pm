@@ -160,7 +160,7 @@ sub build_form_tx {
   }
 
   return $tx unless wantarray;
-  return $tx, $cb;
+  $tx, $cb;
 }
 
 # "Homer, it's easy to criticize.
@@ -187,7 +187,7 @@ sub build_tx {
   $req->headers->from_hash(ref $_[0] eq 'HASH' ? $_[0] : {@_});
 
   return $tx unless wantarray;
-  return $tx, $cb;
+  $tx, $cb;
 }
 
 sub build_websocket_tx {
@@ -208,14 +208,14 @@ sub build_websocket_tx {
     ->client_handshake;
 
   return $tx unless wantarray;
-  return $tx, $cb;
+  $tx, $cb;
 }
 
 # "The only thing I asked you to do for this party was put on clothes,
 #  and you didn't do it."
 sub delete {
   my $self = shift;
-  return $self->start($self->build_tx('DELETE', @_));
+  $self->start($self->build_tx('DELETE', @_));
 }
 
 sub detect_proxy {
@@ -228,18 +228,18 @@ sub detect_proxy {
     $self->no_proxy([split /,/, $no]);
   }
 
-  return $self;
+  $self;
 }
 
 # "'What are you lookin at?' - the innocent words of a drunken child."
 sub get {
   my $self = shift;
-  return $self->start($self->build_tx('GET', @_));
+  $self->start($self->build_tx('GET', @_));
 }
 
 sub head {
   my $self = shift;
-  return $self->start($self->build_tx('HEAD', @_));
+  $self->start($self->build_tx('HEAD', @_));
 }
 
 sub need_proxy {
@@ -252,19 +252,19 @@ sub need_proxy {
   $host =~ /\Q$_\E$/ and return for @$no;
 
   # Proxy needed
-  return 1;
+  1;
 }
 
 # "Olive oil? Asparagus? If your mother wasn't so fancy,
 #  we could just shop at the gas station like normal people."
 sub post {
   my $self = shift;
-  return $self->start($self->build_tx('POST', @_));
+  $self->start($self->build_tx('POST', @_));
 }
 
 sub post_form {
   my $self = shift;
-  return $self->start($self->build_form_tx(@_));
+  $self->start($self->build_form_tx(@_));
 }
 
 # "And I gave that man directions, even though I didn't know the way,
@@ -306,7 +306,7 @@ sub start {
   # Cleanup
   $loop->one_tick(0);
 
-  return $tx;
+  $tx;
 }
 
 # "It's like my dad always said: eventually, everybody gets shot."
@@ -332,7 +332,7 @@ sub test_server {
   ref $app ? $server->app($app) : $server->app_class($app);
   $self->log($server->app->log);
 
-  return $self->{_port};
+  $self->{_port};
 }
 
 # "Are we there yet?
@@ -387,7 +387,7 @@ sub _cache {
   }
   $self->{_cache} = \@cache;
 
-  return $result;
+  $result;
 }
 
 sub _cleanup {
@@ -459,7 +459,7 @@ sub _connect {
   $loop->on_error($id => sub { $self->_error(@_) });
   $loop->on_read($id => sub { $self->_read(@_) });
 
-  return $id;
+  $id;
 }
 
 # "Hey, Weener Boy... where do you think you're going?"
@@ -515,7 +515,7 @@ sub _connect_proxy {
     }
   );
 
-  return 1;
+  1;
 }
 
 # "I don't mind being called a liar when I'm lying, or about to lie,
@@ -711,7 +711,7 @@ sub _redirect {
   $self->{_cs}->{$new_id}->{redirects} = $r + 1;
 
   # Redirecting
-  return 1;
+  1;
 }
 
 # "It's great! We can do *anything* now that Science has invented Magic."
@@ -773,7 +773,7 @@ sub _start_tx {
   $self->{_processing} ||= 0;
   $self->{_processing} += 1;
 
-  return $id;
+  $id;
 }
 
 sub _switch_blocking {
@@ -820,7 +820,7 @@ sub _tx_info {
   # Default port
   $port ||= $scheme eq 'https' ? 443 : 80;
 
-  return ($scheme, $host, $port);
+  ($scheme, $host, $port);
 }
 
 # "Once the government approves something, it's no longer immoral!"
@@ -852,7 +852,7 @@ sub _upgrade {
   weaken $self;
   $new->on_resume(sub { $self->_write($id) });
 
-  return $new;
+  $new;
 }
 
 # "Oh well. At least we'll die doing what we love: inhaling molten rock."

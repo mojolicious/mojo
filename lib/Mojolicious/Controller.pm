@@ -59,7 +59,7 @@ sub AUTOLOAD {
   # Call helper
   Carp::croak(qq/Can't locate object method "$method" via package "$package"/)
     unless my $helper = $self->app->renderer->helpers->{$method};
-  return $self->$helper(@_);
+  $self->$helper(@_);
 }
 
 sub DESTROY { }
@@ -97,7 +97,7 @@ sub cookie {
 
   # Request cookies
   my @cookies = $self->req->cookie($name);
-  return map { $_->value } @cookies;
+  map { $_->value } @cookies;
 }
 
 # "Something's wrong, she's not responding to my poking stick."
@@ -145,7 +145,7 @@ sub flash {
   my $values = exists $_[1] ? {@_} : $_[0];
   $session->{new_flash} = {%$flash, %$values};
 
-  return $self;
+  $self;
 }
 
 # "My parents may be evil, but at least they're stupid."
@@ -167,7 +167,7 @@ sub on_message {
   $tx->on_message(sub { shift and $self->$cb(@_) });
   $self->rendered(101);
 
-  return $self;
+  $self;
 }
 
 # "Just make a simple cake. And this time, if someone's going to jump out of
@@ -195,7 +195,7 @@ sub param {
   return $p->{$name} if !$RESERVED{$name} && exists $p->{$name};
 
   # Param value
-  return $self->req->param($name);
+  $self->req->param($name);
 }
 
 # "Is there an app for kissing my shiny metal ass?
@@ -209,7 +209,7 @@ sub redirect_to {
   $headers->content_length(0);
   $self->rendered(302);
 
-  return $self;
+  $self;
 }
 
 # "Mamma Mia! The cruel meatball of war has rolled onto our laps and ruined
@@ -270,7 +270,7 @@ sub render {
   $self->rendered($stash->{status});
 
   # Success
-  return 1;
+  1;
 }
 
 sub render_content {
@@ -303,7 +303,7 @@ sub render_content {
   # Get
   $content = $c->{$name};
   $content = '' unless defined $content;
-  return Mojo::ByteStream->new("$content");
+  Mojo::ByteStream->new("$content");
 }
 
 sub render_data { shift->render(data => shift, @_) }
@@ -372,7 +372,7 @@ sub render_json {
   my $json = shift;
   my $args = ref $_[0] ? $_[0] : {@_};
   $args->{json} = $json;
-  return $self->render($args);
+  $self->render($args);
 }
 
 sub render_later { shift->stash->{'mojo.rendered'} = 1 }
@@ -431,7 +431,7 @@ sub render_partial {
   $args->{template} = $template if defined $template;
   $args->{partial} = 1;
 
-  return Mojo::ByteStream->new($self->render($args));
+  Mojo::ByteStream->new($self->render($args));
 }
 
 sub render_static {
@@ -469,7 +469,7 @@ sub rendered {
   }
   $self->tx->resume;
 
-  return $self;
+  $self;
 }
 
 sub req { shift->tx->req }
@@ -484,7 +484,7 @@ sub send_message {
   $tx->send_message($message, sub { shift and $self->$cb(@_) if $cb });
   $self->rendered(101);
 
-  return $self;
+  $self;
 }
 
 # "Why am I sticky and naked? Did I miss something fun?"
@@ -508,7 +508,7 @@ sub session {
   my $values = exists $_[1] ? {@_} : $_[0];
   $stash->{'mojo.session'} = {%$session, %$values};
 
-  return $self;
+  $self;
 }
 
 sub signed_cookie {
@@ -552,7 +552,7 @@ sub signed_cookie {
     else { $self->app->log->debug(qq/Cookie "$name" not signed./) }
   }
 
-  return wantarray ? @results : $results[0];
+  wantarray ? @results : $results[0];
 }
 
 # "All this knowledge is giving me a raging brainer."
@@ -574,7 +574,7 @@ sub stash {
     $self->{stash}->{$key} = $values->{$key};
   }
 
-  return $self;
+  $self;
 }
 
 sub ua { shift->app->ua }
@@ -635,7 +635,7 @@ sub url_for {
   unshift @{$path->parts}, @{$base_path->parts};
   $base_path->parts([]);
 
-  return $url;
+  $url;
 }
 
 # "I wax my rocket every day!"
@@ -649,7 +649,7 @@ sub write {
   $self->res->write($chunk, sub { shift and $self->$cb(@_) if $cb });
   $self->rendered;
 
-  return $self;
+  $self;
 }
 
 sub write_chunk {
@@ -662,7 +662,7 @@ sub write_chunk {
   $self->res->write_chunk($chunk, sub { shift and $self->$cb(@_) if $cb });
   $self->rendered;
 
-  return $self;
+  $self;
 }
 
 1;

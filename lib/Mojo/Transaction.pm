@@ -19,12 +19,12 @@ sub error {
   return $req->error if $req->error;
   my $res = $self->res;
   return $res->error if $res->error;
-  return;
+  undef;
 }
 
 sub is_done {
   return 1 if (shift->{_state} || '') eq 'done';
-  return;
+  undef;
 }
 
 sub is_websocket {0}
@@ -36,7 +36,7 @@ sub is_writing {
       || $state eq 'write_start_line'
       || $state eq 'write_headers'
       || $state eq 'write_body';
-  return;
+  undef;
 }
 
 sub remote_address {
@@ -67,7 +67,7 @@ sub remote_address {
   }
 
   # Get
-  return $self->{remote_address};
+  $self->{remote_address};
 }
 
 sub req { croak 'Method "req" not implemented by subclass' }
@@ -87,13 +87,13 @@ sub resume {
   # Callback
   $self->on_resume->($self);
 
-  return $self;
+  $self;
 }
 
 sub server_close {
   my $self = shift;
   $self->on_finish->($self);
-  return $self;
+  $self;
 }
 
 sub server_read  { croak 'Method "server_read" not implemented by subclass' }
@@ -102,7 +102,7 @@ sub server_write { croak 'Method "server_write" not implemented by subclass' }
 sub success {
   my $self = shift;
   return $self->res unless $self->error;
-  return;
+  undef;
 }
 
 1;

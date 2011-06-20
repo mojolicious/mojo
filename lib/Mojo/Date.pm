@@ -24,7 +24,7 @@ my %MONTHS;
 sub new {
   my $self = shift->SUPER::new();
   $self->parse(@_);
-  return $self;
+  $self;
 }
 
 # "I suggest you leave immediately.
@@ -91,7 +91,7 @@ sub parse {
   return $self if $@ || $epoch < 0;
   $self->epoch($epoch);
 
-  return $self;
+  $self;
 }
 
 sub to_string {

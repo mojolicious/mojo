@@ -376,7 +376,7 @@ sub get_line {
   my $line = substr $_[0], 0, $pos + 1, '';
   $line =~ s/\x0d?\x0a$//;
 
-  return $line;
+  $line;
 }
 
 sub hmac_md5_sum { _hmac(\&_md5, @_) }
@@ -421,13 +421,13 @@ sub html_unescape {
 sub md5_bytes {
   my $data = shift;
   utf8::encode $data if utf8::is_utf8 $data;
-  return _md5($data);
+  _md5($data);
 }
 
 sub md5_sum {
   my $data = shift;
   utf8::encode $data if utf8::is_utf8 $data;
-  return Digest::MD5::md5_hex($data);
+  Digest::MD5::md5_hex($data);
 }
 
 sub punycode_decode {
@@ -571,7 +571,7 @@ sub quote {
 sub sha1_bytes {
   my $data = shift;
   utf8::encode $data if utf8::is_utf8 $data;
-  return _sha1($data);
+  _sha1($data);
 }
 
 sub sha1_sum {
@@ -581,7 +581,7 @@ Please install it manually or upgrade Perl to at least version 5.10.
 EOF
   my $data = shift;
   utf8::encode $data if utf8::is_utf8 $data;
-  return Digest::SHA::sha1_hex($data);
+  Digest::SHA::sha1_hex($data);
 }
 
 sub trim {
@@ -661,7 +661,7 @@ sub _hmac {
   # HMAC
   my $ipad = $secret ^ (chr(0x36) x 64);
   my $opad = $secret ^ (chr(0x5c) x 64);
-  return unpack 'H*', $_[0]->($opad . $_[0]->($ipad . $_[1]));
+  unpack 'H*', $_[0]->($opad . $_[0]->($ipad . $_[1]));
 }
 
 # Helper for md5_bytes
@@ -682,7 +682,7 @@ sub _unescape {
     return chr hex $_[0] if substr($_[0], 0, 1) eq 'x';
     return chr $_[0];
   }
-  return exists $ENTITIES{$_[1]} ? chr $ENTITIES{$_[1]} : "&$_[1];";
+  exists $ENTITIES{$_[1]} ? chr $ENTITIES{$_[1]} : "&$_[1];";
 }
 
 1;

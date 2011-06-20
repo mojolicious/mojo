@@ -28,7 +28,7 @@ sub AUTOLOAD {
   # Call shortcut
   Carp::croak(qq/Can't locate object method "$method" via package "$package"/)
     unless my $shortcut = $self->shortcuts->{$method};
-  return $self->$shortcut(@_);
+  $self->$shortcut(@_);
 }
 
 sub DESTROY { }
@@ -36,7 +36,7 @@ sub DESTROY { }
 sub new {
   my $self = shift->SUPER::new();
   $self->parse(@_);
-  return $self;
+  $self;
 }
 
 sub add_child {
@@ -52,19 +52,19 @@ sub add_child {
   # Add to tree
   push @{$self->children}, $route;
 
-  return $self;
+  $self;
 }
 
 sub add_condition {
   my ($self, $name, $cb) = @_;
   $self->dictionary->{$name} = $cb;
-  return $self;
+  $self;
 }
 
 sub add_shortcut {
   my ($self, $name, $cb) = @_;
   $self->shortcuts->{$name} = $cb;
-  return $self;
+  $self;
 }
 
 sub any {
@@ -88,7 +88,7 @@ sub auto_render {
     1;
   } or $c->render_exception($@);
 
-  return;
+  undef;
 }
 
 sub bridge { shift->route(@_)->inline(1) }
@@ -99,7 +99,7 @@ sub detour {
   my $self = shift;
   $self->partial(1);
   $self->to(@_);
-  return $self;
+  $self;
 }
 
 sub dispatch {
@@ -151,7 +151,7 @@ sub dispatch {
   return 1 if $self->_walk_stack($c);
 
   # Render
-  return $self->auto_render($c);
+  $self->auto_render($c);
 }
 
 sub get { shift->_generate_route('get', @_) }
@@ -160,19 +160,19 @@ sub has_conditions {
   my $self = shift;
   return 1 if @{$self->conditions};
   if (my $parent = $self->parent) { return $parent->has_conditions }
-  return;
+  undef;
 }
 
 sub has_custom_name {
   return 1 if shift->{_custom};
-  return;
+  undef;
 }
 
 sub has_websocket {
   my $self = shift;
   return 1 if $self->is_websocket;
   if (my $parent = $self->parent) { return $parent->is_websocket }
-  return;
+  undef;
 }
 
 sub hide { push @{shift->hidden}, @_ }
@@ -182,12 +182,12 @@ sub is_endpoint {
   return   if $self->inline;
   return 1 if $self->block;
   return   if @{$self->children};
-  return 1;
+  1;
 }
 
 sub is_websocket {
   return 1 if shift->{_websocket};
-  return;
+  undef;
 }
 
 sub name {
@@ -204,7 +204,7 @@ sub name {
   elsif (@_) { return $self }
 
   # Name
-  return $self->{_name};
+  $self->{_name};
 }
 
 sub over {
@@ -212,7 +212,7 @@ sub over {
   return $self unless @_;
   my $conditions = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
   push @{$self->conditions}, @$conditions;
-  return $self;
+  $self;
 }
 
 sub parse {
@@ -228,7 +228,7 @@ sub parse {
   $self->{_name}   = $name;
   $self->{_custom} = 0;
 
-  return $self;
+  $self;
 }
 
 sub post { shift->_generate_route('post', @_) }
@@ -253,14 +253,14 @@ sub render {
   # Parent
   $path = $self->parent->render($path, $values) if $self->parent;
 
-  return $path;
+  $path;
 }
 
 sub route {
   my $self  = shift;
   my $route = $self->new(@_);
   $self->add_child($route);
-  return $route;
+  $route;
 }
 
 sub to {
@@ -319,14 +319,14 @@ sub to {
   my $old     = $pattern->defaults;
   $pattern->defaults({%$old, %$defaults}) if $defaults;
 
-  return $self;
+  $self;
 }
 
 sub to_string {
   my $self = shift;
   my $pattern = $self->parent ? $self->parent->to_string : '';
   $pattern .= $self->pattern->pattern if $self->pattern->pattern;
-  return $pattern;
+  $pattern;
 }
 
 sub under { shift->_generate_route('under', @_) }
@@ -342,7 +342,7 @@ sub via {
   }
 
   # Get
-  return $self->{_via};
+  $self->{_via};
 }
 
 sub waypoint { shift->route(@_)->block(1) }
@@ -351,7 +351,7 @@ sub websocket {
   my $self  = shift;
   my $route = $self->any(@_);
   $route->{_websocket} = 1;
-  return $route;
+  $route;
 }
 
 sub _dispatch_callback {
@@ -370,7 +370,7 @@ sub _dispatch_callback {
   }
 
   return 1 if !$staging || $continue;
-  return;
+  undef;
 }
 
 sub _dispatch_controller {
@@ -453,7 +453,7 @@ sub _dispatch_controller {
   }
 
   return 1 if !$staging || $continue;
-  return;
+  undef;
 }
 
 sub _generate_class {
@@ -477,7 +477,7 @@ sub _generate_class {
   # Invalid
   return unless $class =~ /^[a-zA-Z0-9_:]+$/;
 
-  return $class;
+  $class;
 }
 
 sub _generate_method {
@@ -502,7 +502,7 @@ sub _generate_method {
     return;
   }
 
-  return $method;
+  $method;
 }
 
 sub _generate_route {
@@ -549,7 +549,7 @@ sub _generate_route {
     $self->route($pattern, {@$constraints})->over($conditions)->via($methods)
     ->to($defaults)->name($name);
 
-  return $route;
+  $route;
 }
 
 sub _walk_stack {
@@ -591,7 +591,7 @@ sub _walk_stack {
   }
 
   # Done
-  return;
+  undef;
 }
 
 1;

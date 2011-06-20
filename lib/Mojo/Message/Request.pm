@@ -49,7 +49,7 @@ sub cookies {
   }
 
   # No cookies
-  return [];
+  [];
 }
 
 sub fix_headers {
@@ -80,7 +80,7 @@ sub fix_headers {
     }
   }
 
-  return $self;
+  $self;
 }
 
 sub is_secure {
@@ -88,27 +88,27 @@ sub is_secure {
   my $url    = $self->url;
   my $scheme = $url->scheme || $url->base->scheme || '';
   return 1 if $scheme eq 'https';
-  return;
+  undef;
 }
 
 sub is_xhr {
   my $self = shift;
   return unless my $with = $self->headers->header('X-Requested-With');
   return 1 if $with =~ /XMLHttpRequest/i;
-  return;
+  undef;
 }
 
 sub param {
   my $self = shift;
   $self->{_params} = $self->params unless $self->{_params};
-  return $self->{_params}->param(@_);
+  $self->{_params}->param(@_);
 }
 
 sub params {
   my $self   = shift;
   my $params = Mojo::Parameters->new;
   $params->merge($self->body_params, $self->query_params);
-  return $params;
+  $params;
 }
 
 sub parse {
@@ -170,7 +170,7 @@ sub parse {
     }
   }
 
-  return $self;
+  $self;
 }
 
 sub proxy {
@@ -188,7 +188,7 @@ sub proxy {
     return $self;
   }
 
-  return $self->{proxy};
+  $self->{proxy};
 }
 
 sub query_params { shift->url->query }
@@ -225,7 +225,7 @@ sub _build_start_line {
   return "$method $path\x0d\x0a" if $version eq '0.9';
 
   # HTTP 1.0 and above
-  return "$method $path HTTP/$version\x0d\x0a";
+  "$method $path HTTP/$version\x0d\x0a";
 }
 
 sub _parse_basic_auth {
@@ -233,7 +233,7 @@ sub _parse_basic_auth {
   return unless $header =~ /Basic (.+)$/;
   my $auth = $1;
   b64_decode $auth;
-  return $auth;
+  $auth;
 }
 
 sub _parse_env {

@@ -56,7 +56,7 @@ sub run {
   # Run tests
   runtests(@tests);
 
-  return $self;
+  $self;
 }
 
 1;

@@ -36,7 +36,7 @@ sub type {
     $self->types->{$ext} = $type;
     return $self;
   }
-  return $self->types->{$ext || ''};
+  $self->types->{$ext || ''};
 }
 
 1;

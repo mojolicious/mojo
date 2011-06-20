@@ -69,7 +69,7 @@ OPTIONAL
 $message
 EOF
 
-  return $self;
+  $self;
 }
 
 1;

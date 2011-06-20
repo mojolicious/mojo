@@ -332,7 +332,7 @@ sub _tag {
   else { $tag .= ' />' }
 
   # Prevent escaping
-  return b($tag);
+  b($tag);
 }
 
 1;

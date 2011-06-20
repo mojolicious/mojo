@@ -41,7 +41,7 @@ sub stage1 {
 
   # Fail
   $self->render_text('Go away!');
-  return;
+  undef;
 }
 
 sub stage2 {

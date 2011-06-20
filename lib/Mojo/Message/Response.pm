@@ -101,7 +101,7 @@ sub cookies {
   }
 
   # No cookies
-  return $cookies;
+  $cookies;
 }
 
 sub default_message { $MESSAGES{$_[1] || $_[0]->code || 404} || '' }
@@ -114,14 +114,14 @@ sub fix_headers {
   my $headers = $self->headers;
   $headers->date(Mojo::Date->new->to_string) unless $headers->date;
 
-  return $self;
+  $self;
 }
 
 sub is_status_class {
   my ($self, $class) = @_;
   return unless my $code = $self->code;
   return 1 if $code >= $class && $code < ($class + 100);
-  return;
+  undef;
 }
 
 sub _build_start_line {
@@ -134,7 +134,7 @@ sub _build_start_line {
   # HTTP 1.0 and above
   my $code    = $self->code    || 404;
   my $message = $self->message || $self->default_message;
-  return "HTTP/$version $code $message\x0d\x0a";
+  "HTTP/$version $code $message\x0d\x0a";
 }
 
 # "Weaseling out of things is important to learn.

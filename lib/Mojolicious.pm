@@ -26,7 +26,7 @@ has secret   => sub {
   $self->log->debug('Your secret passphrase needs to be changed!!!');
 
   # Default to application name
-  return ref $self;
+  ref $self;
 };
 has sessions => sub { Mojolicious::Sessions->new };
 has static   => sub { Mojolicious::Static->new };
@@ -48,7 +48,7 @@ sub AUTOLOAD {
     unless my $helper = $self->renderer->helpers->{$method};
 
   # Call helper with fresh controller
-  return $self->controller_class->new(app => $self)->$helper(@_);
+  $self->controller_class->new(app => $self)->$helper(@_);
 }
 
 sub DESTROY { }
@@ -109,7 +109,7 @@ sub new {
   # Startup
   $self->startup(@_);
 
-  return $self;
+  $self;
 }
 
 # "Amy, technology isn't intrinsically good or evil. It's how it's used.
@@ -130,7 +130,7 @@ sub defaults {
     $self->{defaults}->{$key} = $values->{$key};
   }
 
-  return $self;
+  $self;
 }
 
 # The default dispatchers with exception handling
@@ -223,7 +223,7 @@ sub start {
   $ENV{MOJO_APP} = ref $class ? $class : $class->new;
 
   # Start!
-  return Mojolicious::Commands->start(@_);
+  Mojolicious::Commands->start(@_);
 }
 
 # This will run once at startup

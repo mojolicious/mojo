@@ -16,7 +16,7 @@ sub body_contains {
     $found += $part->body_contains($chunk);
   }
 
-  return $found ? 1 : 0;
+  $found ? 1 : 0;
 }
 
 sub body_size {
@@ -42,7 +42,7 @@ sub body_size {
     $len += $boundary_length;
   }
 
-  return $len;
+  $len;
 }
 
 sub build_boundary {
@@ -75,7 +75,7 @@ sub build_boundary {
   my $after  = $2 || '';
   $headers->content_type("$before; boundary=$boundary$after");
 
-  return $boundary;
+  $boundary;
 }
 
 sub get_body_chunk {
@@ -136,7 +136,7 @@ sub parse {
   # Parse multipart content
   $self->_parse_multipart;
 
-  return $self;
+  $self;
 }
 
 sub _parse_multipart {
@@ -185,7 +185,7 @@ sub _parse_multipart_body {
   my $chunk = substr $self->{_b2}, 0, $pos, '';
   $self->parts->[-1] = $self->parts->[-1]->parse($chunk);
   $self->{_multi_state} = 'multipart_boundary';
-  return 1;
+  1;
 }
 
 sub _parse_multipart_boundary {
@@ -210,7 +210,7 @@ sub _parse_multipart_boundary {
     $self->{_state} = $self->{_multi_state} = 'done';
   }
 
-  return;
+  undef;
 }
 
 sub _parse_multipart_preamble {
@@ -227,7 +227,7 @@ sub _parse_multipart_preamble {
   }
 
   # No boundary yet
-  return;
+  undef;
 }
 
 1;

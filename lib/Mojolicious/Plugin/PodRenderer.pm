@@ -231,7 +231,7 @@ Where to show this in the webtree. Default F</perldoc>.
 
 =head2 C<perldoc_asset>
 
-A template string. Default F<Mojolicious/templates/perldoc.html.ep>.
+A template string. Default is the contents of F<Mojolicious/templates/perldoc.html.ep>.
 
 =head2 C<content_assets>
 

@@ -23,9 +23,14 @@ sub run {
   my ($self, $app) = @_;
   warn "MANAGER STARTED $$\n" if DEBUG;
 
+  # Init vars
+  $self->{_done} = 0;
+  $self->{_running} = 0;
+
   # Manager signals
   $SIG{INT} = $SIG{TERM} = $SIG{QUIT} = sub { $self->{_done} = 1 };
   $SIG{CHLD} = sub {
+    warn "[$$] MANAGER: SIGCHILD received\n" if DEBUG;
     while ((waitpid -1, WNOHANG) > 0) { $self->{_running} = 0 }
   };
 
@@ -74,9 +79,18 @@ sub _manage {
   # Housekeeping
   exit 0 if !$self->{_running} && $self->{_done};
   unless ($self->{_done}) {
+    ### Win32 hack to cleanup worker process
+    while ((waitpid -1, WNOHANG) > 0) { $self->{_running} = 0 }
+    $self->{_running} = 0 unless kill 0, $self->{_running};
+
+    warn "[$$] MANAGER: WATCH (running: " . $self->{_running} . ", done: " . $self->{_done}. ")\n" if DEBUG;
     $self->_spawn if !$self->{_running};
     sleep 1;
   }
+
+  # Win32 hack to avoid loop on exit
+  $SIG{INT} = $SIG{TERM} = $SIG{QUIT} = 'DEFAULT';
+
   kill 'TERM', $self->{_running} if $self->{_done};
 }
 
@@ -96,15 +110,26 @@ sub _spawn {
   return $self->{_running} = $pid if $pid;
 
   # Worker
-  warn "WORKER STARTED $$\n" if DEBUG;
-  $SIG{INT} = $SIG{TERM} = $SIG{CHLD} = 'DEFAULT';
+  warn "[$$] WORKER: STARTED PID $$ WITH MANAGER $manager\n" if DEBUG;
+  $SIG{INT} = $SIG{TERM} = $SIG{CHLD} = sub {
+    warn "[$$] WORKER: RECEIVED SIGNAL, TERMINATING\n" if DEBUG;
+    $self->{_done} = 1;
+  };
   my $daemon = Mojo::Server::Daemon->new;
   $daemon->load_app($self->watch->[0]);
   $daemon->silent(1) if $ENV{MORBO_REV} > 1;
   $daemon->listen($self->listen) if @{$self->listen};
   $daemon->prepare_ioloop;
+  warn "[$$] WORKER: RUNNING IOLOOP\n" if DEBUG;
   my $loop = $daemon->ioloop;
-  $loop->recurring(1 => sub { shift->stop unless kill 0, $manager });
+  $loop->recurring(1  => sub {
+    warn "[$$] WORKER: PING MANAGER $manager (done: " . $self->{_done} . ")\n" if DEBUG;
+    if (!(kill 0, $manager) || $self->{_done}) {
+      warn "[$$] WORKER: TERMINATING SELF\n" if DEBUG;
+      shift->stop;
+      kill 15, $$;
+    }
+  });
   $loop->start;
 
   exit 0;

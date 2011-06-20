@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 46;
+use Test::More tests => 54;
 
 # "Now that's a wave of destruction that's easy on the eyes."
 use_ok 'Mojo::Parameters';
@@ -71,6 +71,18 @@ is $params->to_string, 'foo=0', 'right format';
 $params = Mojo::Parameters->new($params->to_string);
 is_deeply $params->param('foo'), 0, 'right structure';
 is $params->to_string, 'foo=0', 'right format';
+
+# Semicolon
+$params = Mojo::Parameters->new('foo=bar;baz');
+is $params->pair_separator, ';', 'right pair separator';
+is_deeply $params->params, [foo => 'bar', baz => ''], 'right structure';
+is_deeply $params->to_hash, {foo => 'bar', baz => ''}, 'right structure';
+is $params->to_string, 'foo=bar;baz=', 'right format';
+$params = Mojo::Parameters->new('foo=bar%3Bbaz');
+is $params->pair_separator, '&', 'right pair separator';
+is_deeply $params->params, [foo => 'bar;baz'], 'right structure';
+is_deeply $params->to_hash, {foo => 'bar;baz'}, 'right structure';
+is $params->to_string, 'foo=bar%3Bbaz', 'right format';
 
 # Reconstruction
 $params = Mojo::Parameters->new('foo=bar&baz=23');

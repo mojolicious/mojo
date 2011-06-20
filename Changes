@@ -5,6 +5,7 @@ This file documents the revision history for Perl extension Mojolicious.
           optimizations.
         - Improved query string support in Mojo::Parameters.
         - Improved tests.
+        - Fixed typos.
 
 1.45    2011-06-20 00:00:00
         - Improved documentation.

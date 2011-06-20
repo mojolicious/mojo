@@ -73,7 +73,7 @@ sub _load {
   # Load
   if (my $e = Mojo::Loader->load($module)) {
     die $e if ref $e;
-    return $e;
+    return;
   }
 
   # Module is a plugin

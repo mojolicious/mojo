@@ -484,11 +484,8 @@ sub one_tick {
   my $r     = $self->{_reverse};
   my $ready = {};
   if (KQUEUE) {
-
-    # Catch interrupted system call errors
     my @ret;
-    my $success = eval { @ret = $loop->kevent(1000 * $timeout); 1 };
-    die "KQueue error: $@" if !$success && $@;
+    eval { @ret = $loop->kevent(1000 * $timeout) };
 
     # Events
     for my $kev (@ret) {

@@ -24,26 +24,22 @@ our @PATHS = map { $_, "$_/pods" } @INC;
 # Template directory
 my $T = File::Spec->catdir(dirname(__FILE__), '..', 'templates');
 
-# Mojobar template
-our $MOJOBAR =
-  Mojo::Asset::File->new(path => File::Spec->catfile($T, 'mojobar.html.ep'))
-  ->slurp;
-
-# Perldoc template
-our $PERLDOC =
-  Mojo::Asset::File->new(path => File::Spec->catfile($T, 'perldoc.html.ep'))
-  ->slurp;
 
 # "This is my first visit to the Galaxy of Terror and I'd like it to be a
 #  pleasant one."
 sub register {
   my ($self, $app, $conf) = @_;
-
   # Config
   $conf ||= {};
   my $name       = $conf->{name}       || 'pod';
   my $preprocess = $conf->{preprocess} || 'ep';
-
+  my $index      = $conf->{index}      || 'Mojolicious::Guides';
+  my $root       = $conf->{root}       || '/perldoc';
+  my $perldoc_asset = $conf->{template_perldoc} || Mojo::Asset::File->new(path=>File::Spec->catfile($T, 'perldoc.html.ep'))->slurp;
+  my $content_assets = $conf->{template_content} || {
+        mojobar => Mojo::Asset::File->new(path=>File::Spec->catfile($T, 'mojobar.html.ep'))->slurp
+  };
+    
   # Add "pod" handler
   $app->renderer->add_handler(
     $name => sub {
@@ -60,7 +56,7 @@ sub register {
 
   # Perldoc
   $app->routes->any(
-    '/perldoc/(*module)' => {module => 'Mojolicious/Guides'} => sub {
+      $root.'/(*module)' => { module => $index } => sub {
       my $self = shift;
 
       # Find module
@@ -80,7 +76,7 @@ sub register {
 
       # Rewrite links
       my $dom     = Mojo::DOM->new("$html");
-      my $perldoc = $self->url_for('/perldoc/');
+      my $perldoc = $self->url_for($root.'/');
       $dom->find('a[href]')->each(
         sub {
           my $attrs = shift->attrs;
@@ -130,11 +126,13 @@ sub register {
       $dom->find('h1 + p')->until(sub { $title = shift->text });
 
       # Combine everything to a proper response
-      $self->content_for(mojobar => $self->include(inline => $MOJOBAR));
+      for my $key (keys %$content_assets) {
+          $self->content_for($key => $self->include(inline => $content_assets->{$key}));
+      }
       $self->content_for(perldoc => "$dom");
       $self->app->plugins->run_hook(before_perldoc => $self);
       $self->render(
-        inline   => $PERLDOC,
+        inline   => $perldoc_asset,
         title    => $title,
         sections => $sections
       );
@@ -167,7 +165,7 @@ sub _pod_to_html {
   $output =~ s/<a name='___top' class='dummyTopAnchor'\s*?><\/a>\n//g;
   $output =~ s/<a class='u'.*?name=".*?"\s*>(.*?)<\/a>/$1/sg;
 
-  $output;
+  return $output;
 }
 
 1;
@@ -222,6 +220,24 @@ Note that this option is EXPERIMENTAL and might change without warning!
   plugin pod_renderer => {preprocess => 'epl'};
 
 Handler name of preprocessor.
+
+=head2 C<index>
+
+Name of the page to show when called without module name. Default F<Mojolicious::Guides>
+
+=head2 C<root>
+
+Where to show this in the webtree. Default F</perldoc>.
+
+=head2 C<perldoc_asset>
+
+A template string. Default F<Mojolicious/templates/perldoc.html.ep>.
+
+=head2 C<content_assets>
+
+A hash of strings. They can be used with content_for and their key name. Default is
+
+ { mojobar => Mojo::Asset::File->new(File::Spec->catfile($T, 'mojobar.html.ep'))->slurp }
 
 =head1 HELPERS
 

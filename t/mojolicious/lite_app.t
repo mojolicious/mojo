@@ -11,7 +11,7 @@ BEGIN {
   $ENV{MOJO_MODE} = 'development';
 }
 
-use Test::More tests => 814;
+use Test::More tests => 820;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -46,6 +46,9 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 plugin 'PluginWithTemplate';
 
+# Callback condition plugin
+plugin 'callback_condition';
+
 # Default
 app->defaults(default => 23);
 
@@ -76,6 +79,16 @@ get '/unicode/:stuff' => sub {
   my $self = shift;
   $self->render(text => $self->param('stuff') . $self->url_for);
 };
+
+# GET /conditional
+get '/conditional' => (
+  cb => sub {
+    my ($r, $c, $captures) = @_;
+    $captures->{condition} = $c->req->headers->header('X-Condition');
+    return unless $captures->{condition};
+    1;
+  }
+) => {inline => '<%= $condition %>'};
 
 # GET /
 get '/' => 'root';
@@ -742,6 +755,13 @@ $t->get_ok('/unicode/a b')->status_is(200)->content_is('a b/unicode/a%20b');
 
 # GET /unicode/a\b
 $t->get_ok('/unicode/a\\b')->status_is(200)->content_is('a\\b/unicode/a%5Cb');
+
+# GET /conditional
+$t->get_ok('/conditional' => {'X-Condition' => 'Conditions rock!'})
+  ->status_is(200)->content_is("Conditions rock!\n");
+
+# GET /conditional (missing header)
+$t->get_ok('/conditional')->status_is(404)->content_is("Oops!\n");
 
 # GET /
 $t->get_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')

@@ -154,9 +154,6 @@ sub on_finish {
   $self->tx->on_finish(sub { shift and $self->$cb(@_) });
 }
 
-# "Stop being such a spineless jellyfish!
-#  You know full well I'm more closely related to the sea cucumber.
-#  Not where it counts."
 sub on_message {
   my $self = shift;
 

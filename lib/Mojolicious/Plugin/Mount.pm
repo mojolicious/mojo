@@ -5,9 +5,27 @@ use Mojo::Server;
 
 sub register {
   my ($self, $app, $conf) = @_;
+
+  # Extract domain and path
   my $prefix = (keys %$conf)[0];
-  $app->routes->route($prefix)
+  my ($domain, $path);
+  if ($prefix =~ /^(\*\.)?([^\/]+)(\/.*)?$/) {
+    $domain = quotemeta $2;
+    $domain = "(?:.*\\.)?$domain" if $1;
+    $path   = $3;
+    $path   = '/' unless defined $path;
+    $domain = qr/^$domain$/i;
+    $app->routes->cache(undef);
+  }
+  else { $path = $prefix }
+
+  # Generate route
+  my $route =
+    $app->routes->route($path)
     ->detour(app => Mojo::Server->new->load_app($conf->{$prefix}));
+  $route->over(headers => {Host => $domain}) if $domain;
+
+  $route;
 }
 
 1;
@@ -28,6 +46,15 @@ Mojolicious::Plugin::Mount - Application Mount Plugin
   # Adjust the generated route
   my $example = plugin mount => {'/example' => '/home/sri/example.pl'};
   $example->to(message => 'It works great!');
+
+  # Mount application with domain (automatically disables route caching)
+  plugin mount => {'mojolicio.us' => '/home/sri/myapp.pl'};
+
+  # Domain and path
+  plugin mount => {'mojolicio.us/myapp' => '/home/sri/myapp.pl'};
+
+  # Or even wildcard subdomains
+  plugin mount => {'*.mojolicio.us/myapp' => '/home/sri/myapp.pl'};
 
 =head1 DESCRIPTION
 

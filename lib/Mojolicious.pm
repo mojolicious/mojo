@@ -92,6 +92,7 @@ sub new {
 
   # Load default plugins
   $self->plugin('agent_condition');
+  $self->plugin('header_condition');
   $self->plugin('default_helpers');
   $self->plugin('tag_helpers');
   $self->plugin('epl_renderer');
@@ -942,6 +943,8 @@ Abhijit Menon-Sen
 Adam Kennedy
 
 Adriano Ferreira
+
+Al Newkirk
 
 Alex Salimon
 

@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.47    2011-06-21 00:00:00
+        - Added support for domains to Mojolicious::Plugin::Mount.
+          (sri, alnewkirk)
         - Improved overall performance slightly.
 
 1.46    2011-06-21 00:00:00

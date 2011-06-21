@@ -38,6 +38,12 @@ get '/url/☃' => sub {
   $self->render_text("$route -> $rel!");
 };
 
+# GET /host
+get '/host' => sub {
+  my $self = shift;
+  $self->render(text => $self->url_for->base->host);
+};
+
 app->start;
 __DATA__
 

@@ -41,9 +41,6 @@ eval { plugin 'does_not_exist'; };
 is $@, "Plugin \"does_not_exist\" missing, maybe you need to install it?\n",
   'right error';
 
-# Header condition plugin
-plugin 'header_condition';
-
 # Plugin with a template
 use FindBin;
 use lib "$FindBin::Bin/lib";

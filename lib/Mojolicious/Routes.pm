@@ -119,7 +119,7 @@ sub dispatch {
 
   # Cached
   my $cache = $self->cache;
-  if (my $cached = $cache->get("$method:$path:$websocket")) {
+  if ($cache && (my $cached = $cache->get("$method:$path:$websocket"))) {
     $m->root($self);
     $m->stack($cached->{stack});
     $m->captures($cached->{captures});
@@ -131,7 +131,7 @@ sub dispatch {
     $m->match($self, $c);
 
     # Endpoint found
-    if (my $endpoint = $m->endpoint) {
+    if ($cache && (my $endpoint = $m->endpoint)) {
 
       # Cache routes without conditions
       $cache->set(
@@ -672,7 +672,8 @@ The children of this routes object, used for nesting routes.
   my $cache = $r->cache;
   $r        = $r->cache(Mojo::Cache->new);
 
-Routing cache, by default a L<Mojo::Cache> object.
+Routing cache, can be disabled with C<undef>, by default a L<Mojo::Cache>
+object.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<conditions>

@@ -13,26 +13,16 @@ sub register {
       my ($r, $c, $captures, $patterns) = @_;
 
       # Patterns
-      return unless $patterns && ref $patterns eq 'HASH';
+      return unless $patterns && ref $patterns eq 'HASH' && keys %$patterns;
 
       # Match
-      my $passed;
-      while (my ($k, $v) = each(%$patterns)) {
+      while (my ($k, $v) = each %$patterns) {
         my $header = $c->req->headers->header($k);
-        if ($header && $v && ref $v eq 'Regexp' && $header =~ $v) {
-          $passed = 1;
-          next;
-        }
-        elsif ($header && defined $v && $v eq $header) {
-          $passed = 1;
-          next;
-        }
-        $passed = undef;
+        if ($header && $v && ref $v eq 'Regexp' && $header =~ $v) {next}
+        elsif ($header && defined $v && $v eq $header) {next}
+        else                                           {return}
       }
-      return 1 if $passed;
-
-      # No match
-      return;
+      return 1;
     }
   );
 }
@@ -51,7 +41,7 @@ Mojolicious::Plugin::HeaderCondition - Header Condition Plugin
 
   # Must match all of these headers
   $self->routes->route('/:controller/:action')->over(headers => {
-    X-Secret-Header => 'Foo',
+    'X-Secret-Header' => 'Foo',
     Referer => qr/^https?:\/\/example\.com\//
   })->to('foo#bar');
 
@@ -64,6 +54,8 @@ Mojolicious::Plugin::HeaderCondition - Header Condition Plugin
 
 L<Mojolicious::Plugin::HeaderCondition> is a routes condition for header
 based routes.
+This is a core plugin, that means it is always enabled and its code a good
+example for learning to build new plugins.
 
 =head1 METHODS
 

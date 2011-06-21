@@ -11,7 +11,7 @@ BEGIN {
   $ENV{MOJO_MODE} = 'testing';
 }
 
-use Test::More tests => 71;
+use Test::More tests => 113;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -93,6 +93,11 @@ use FindBin;
 my $external = "$FindBin::Bin/external/myapp.pl";
 plugin mount => {'/x/1' => $external};
 plugin(mount => ('/x/♥' => $external))->to(message => 'works 2!');
+plugin mount => {'mojolicious.org' => $external};
+plugin mount => {'MOJOLICIO.US/'   => $external};
+plugin mount => {'*.kraih.com'     => $external};
+plugin(mount => ('*.foo-bar.de/♥/123' => $external))
+  ->to(message => 'works 3!');
 
 # GET /hello
 get '/hello' => 'works';
@@ -125,6 +130,8 @@ app->routes->route('/hello')->detour(TestApp::app())->to(name => 'embedded');
 
 # GET /just/* (external embedded app)
 get('/just' => {name => 'working'})->detour('EmbeddedTestApp');
+
+get '/host' => {text => 'main application!'};
 
 my $t = Test::Mojo->new;
 
@@ -213,6 +220,61 @@ $t->get_ok('/x/♥/stream')->status_is(200)->content_is('hello!');
 $t->get_ok('/x/♥/url/☃')->status_is(200)
   ->content_is(
   '/x/%E2%99%A5/url/%E2%98%83 -> /x/%E2%99%A5/%E2%98%83/stream!');
+
+# GET /host (main application)
+$t->get_ok('/host')->status_is(200)->content_is('main application!');
+
+# GET / (full external application with domain)
+$t->get_ok('/' => {Host => 'mojolicious.org'})->status_is(200)
+  ->content_is("works!\n\ntoo!works!!!\n");
+
+# GET /host (full external application with domain)
+$t->get_ok('/host' => {Host => 'mojolicious.org'})->status_is(200)
+  ->content_is('mojolicious.org');
+
+# GET / (full external application with domain)
+$t->get_ok('/' => {Host => 'mojolicio.us'})->status_is(200)
+  ->content_is("works!\n\ntoo!works!!!\n");
+
+# GET /host (full external application with domain)
+$t->get_ok('/host' => {Host => 'mojolicio.us'})->status_is(200)
+  ->content_is('mojolicio.us');
+
+# GET / (full external application with domain)
+$t->get_ok('/' => {Host => 'kraih.com'})->status_is(200)
+  ->content_is("works!\n\ntoo!works!!!\n");
+
+# GET /host (full external application with domain)
+$t->get_ok('/host' => {Host => 'KRaIH.CoM'})->status_is(200)
+  ->content_is('kraih.com');
+
+# GET /host (full external application with wildcard domain)
+$t->get_ok('/host' => {Host => 'www.kraih.com'})->status_is(200)
+  ->content_is('www.kraih.com');
+
+# GET /host (full external application with wildcard domain)
+$t->get_ok('/host' => {Host => 'foo.bar.kraih.com'})->status_is(200)
+  ->content_is('foo.bar.kraih.com');
+
+# GET /♥/123/host (full external application with a bit of everything)
+$t->get_ok('/♥/123/' => {Host => 'foo-bar.de'})->status_is(200)
+  ->content_is("works!\n\ntoo!works!!!\n");
+
+# GET /♥/123/host (full external application with a bit of everything)
+$t->get_ok('/♥/123/host' => {Host => 'foo-bar.de'})->status_is(200)
+  ->content_is('foo-bar.de');
+
+# GET /♥/123/echo (full external application with a bit of everything)
+$t->get_ok('/♥/123/echo' => {Host => 'foo-bar.de'})->status_is(200)
+  ->content_is('echo: works 3!');
+
+# GET /♥/123/host (full external application with a bit of everything)
+$t->get_ok('/♥/123/host' => {Host => 'www.foo-bar.de'})->status_is(200)
+  ->content_is('www.foo-bar.de');
+
+# GET /♥/123/echo (full external application with a bit of everything)
+$t->get_ok('/♥/123/echo' => {Host => 'www.foo-bar.de'})->status_is(200)
+  ->content_is('echo: works 3!');
 
 __DATA__
 

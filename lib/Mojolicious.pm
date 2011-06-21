@@ -770,6 +770,10 @@ examples.
 
 Route condition for C<User-Agent> headers.
 
+=item L<Mojolicious::Plugin::CallbackCondition>
+
+Very versatile route condition for arbitrary callbacks.
+
 =item L<Mojolicious::Plugin::Charset>
 
 Change the application charset.

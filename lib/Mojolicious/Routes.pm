@@ -672,9 +672,12 @@ The children of this routes object, used for nesting routes.
   my $cache = $r->cache;
   $r        = $r->cache(Mojo::Cache->new);
 
-Routing cache, can be disabled with C<undef>, by default a L<Mojo::Cache>
-object.
+Routing cache, by default a L<Mojo::Cache> object.
 Note that this attribute is EXPERIMENTAL and might change without warning!
+
+  $r->cache(0);
+
+Route caching can also be disabled with a false value.
 
 =head2 C<conditions>
 

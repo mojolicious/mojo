@@ -15,7 +15,7 @@ sub register {
     $path   = $3;
     $path   = '/' unless defined $path;
     $domain = qr/^$domain$/i;
-    $app->routes->cache(undef);
+    $app->routes->cache(0);
   }
   else { $path = $prefix }
 

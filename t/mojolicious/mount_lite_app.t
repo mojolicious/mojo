@@ -11,7 +11,7 @@ BEGIN {
   $ENV{MOJO_MODE} = 'testing';
 }
 
-use Test::More tests => 3;
+use Test::More tests => 15;
 use Mojolicious::Lite;
 use Test::Mojo;
 
@@ -19,28 +19,15 @@ plugin mount => {
   '/prefix'               => './mount1.pl',
   'futurama.com/gonads'   => './mount2.pl',
   '*.futurama.com/nutsso' => './mount2.pl',
+  '*.zaboomafoo.com'      => './mount3.pl',
 };
-
-# GET /
-get '/' => 'index';
 
 my $t = Test::Mojo->new;
 
-# GET /
-$t->get_ok('/')->status_is(200)->content_like(qr/Welcome to Mojolicious/);
+# virtual-host serving
 $t->get_ok('/prefix')->status_is(200)->content_like(qr/Welcome to Mounted 1 Mojolicious/);
 $t->get_ok('/gonads', {HOST => 'futurama.com'})->status_is(200)->content_like(qr/Welcome to Mounted 2 Mojolicious/);
 $t->get_ok('/nutsso', {HOST => 'futurama.com'})->status_is(200)->content_like(qr/Welcome to Mounted 2 Mojolicious/);
+$t->get_ok('/nutsso', {HOST => 'www.futurama.com'})->status_is(200)->content_like(qr/Welcome to Mounted 2 Mojolicious/);
+$t->get_ok('/', {HOST => 'zaboomafoo.com'})->status_is(200)->content_like(qr/Welcome to Mounted 3 Mojolicious/);
 
-__DATA__
-
-@@ index.html.ep
-% layout 'default';
-% title 'Welcome';
-Welcome to Mojolicious!
-
-@@ layouts/default.html.ep
-<!doctype html><html>
-  <head><title><%= title %></title></head>
-  <body><%= content %></body>
-</html>

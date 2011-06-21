@@ -6,7 +6,13 @@ use Mojo::Server;
 
 sub register {
   my ($self, $app, $conf) = @_;
+  
+  # require header condition
+  $app->plugin('header_condition');
+  
+  # get app routes
   my $routes = $app->routes;
+  
   while (my ($key, $value) = each (%$conf)) {
     my $route  = $key;
     my $script = $conf->{$route};
@@ -15,14 +21,15 @@ sub register {
     if ($route !~ /^\//) {
       # assumed to be a domain (w/wo route)
       ($domain, $route) = split /\//, $route;
-      $domain =~ s/\./\\\./g; $domain =~ s/\*/\.\*/g;
+      $domain =~ s/\./\\\./g;
+      $domain =~ s/\*\\\./\(\.\*\\\.\)\?/g;
       $route = $route ? "/$route" : '/';
     }
     
     my $goto = $routes->route($route)->detour(
         app => Mojo::Server->new->load_app($script));
     
-       $goto->over(headers => { HOST => qr/$domain/ }) if $domain;
+       $goto->over(headers => { HOST => qr/^$domain$/ }) if $domain;
   }
 }
 

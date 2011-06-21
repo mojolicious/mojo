@@ -1,13 +1,29 @@
 package Mojolicious::Plugin::Mount;
 use Mojo::Base 'Mojolicious::Plugin';
+use Mojolicious::Plugin::HeaderCondition;
 
 use Mojo::Server;
 
 sub register {
   my ($self, $app, $conf) = @_;
-  my $prefix = (keys %$conf)[0];
-  $app->routes->route($prefix)
-    ->detour(app => Mojo::Server->new->load_app($conf->{$prefix}));
+  my $routes = $app->routes;
+  while (my ($key, $value) = each (%$conf)) {
+    my $route  = $key;
+    my $script = $conf->{$route};
+    my $domain = undef ;
+    
+    if ($route !~ /^\//) {
+      # assumed to be a domain (w/wo route)
+      ($domain, $route) = split /\//, $route;
+      $domain =~ s/\./\\\./g; $domain =~ s/\*/\.\*/g;
+      $route = $route ? "/$route" : '/';
+    }
+    
+    my $goto = $routes->route($route)->detour(
+        app => Mojo::Server->new->load_app($script));
+    
+       $goto->over(headers => { HOST => qr/$domain/ }) if $domain;
+  }
 }
 
 1;

@@ -74,7 +74,10 @@ sub _manage {
 
 sub _reap {
   my $self = shift;
-  while ((waitpid -1, WNOHANG) > 0) { $self->{_running} = 0 }
+  while ((my $pid = waitpid -1, WNOHANG) > 0) {
+    warn "WORKER STOPPED $pid\n" if DEBUG;
+    $self->{_running} = 0;
+  }
 }
 
 # "Morbo cannot read his teleprompter.

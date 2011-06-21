@@ -54,7 +54,7 @@ sub register {
         for my $name (sort keys %{$r->helpers}) {
           next unless $name =~ /^\w+$/;
           $prepend .= "sub $name; *$name = sub { ";
-          $prepend .= "return \$_H->{'$name'}->(\$self, \@_) };";
+          $prepend .= "\$_H->{'$name'}->(\$self, \@_) };";
         }
 
         # Be less relaxed for everything else
@@ -75,7 +75,7 @@ sub register {
       }
 
       # Render with epl
-      return $r->handlers->{epl}->($r, $c, $output, $options);
+      $r->handlers->{epl}->($r, $c, $output, $options);
     }
   );
 

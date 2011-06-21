@@ -38,7 +38,7 @@ sub register {
       my $stash = $self->stash;
       $stash->{extends} = shift if @_;
       $self->stash(@_) if @_;
-      return $stash->{extends};
+      $stash->{extends};
     }
   );
 
@@ -66,7 +66,7 @@ sub register {
       $i++;
       goto START unless $i >= @keys;
 
-      return $self->render_partial(layout => $layout, extend => $extends);
+      $self->render_partial(layout => $layout, extend => $extends);
     }
   );
 
@@ -77,7 +77,7 @@ sub register {
       my $stash = $self->stash;
       $stash->{layout} = shift if @_;
       $self->stash(@_) if @_;
-      return $stash->{layout};
+      $stash->{layout};
     }
   );
 
@@ -133,7 +133,7 @@ sub register {
       my $stash = $self->stash;
       $stash->{title} = shift if @_;
       $self->stash(@_) if @_;
-      return $stash->{title};
+      $stash->{title};
     }
   );
 

@@ -78,7 +78,7 @@ sub register {
       }
 
       # Success or exception
-      return ref $$output ? 0 : 1;
+      ref $$output ? 0 : 1;
     }
   );
 }

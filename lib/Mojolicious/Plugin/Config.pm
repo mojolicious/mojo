@@ -88,7 +88,7 @@ sub register {
     config => sub {
       my $self = shift;
       return $config unless @_;
-      return $config->{$_[0]};
+      $config->{$_[0]};
     }
   );
 

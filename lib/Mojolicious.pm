@@ -33,7 +33,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Smiling Face With Sunglasses';
-our $VERSION  = '1.46';
+our $VERSION  = '1.47';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -64,7 +64,7 @@ sub new {
       my $self = shift;
       my $tx   = Mojo::Transaction::HTTP->new;
       $self->plugins->run_hook(after_build_tx => ($tx, $self));
-      return $tx;
+      $tx;
     }
   );
 

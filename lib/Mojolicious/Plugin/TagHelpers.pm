@@ -182,7 +182,7 @@ sub register {
             else { $parts .= $cb->($o) }
           }
 
-          return $parts;
+          $parts;
         }
       );
     }

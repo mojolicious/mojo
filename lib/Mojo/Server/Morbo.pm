@@ -25,9 +25,14 @@ sub run {
 
   # Watch files and manage worker
   $SIG{CHLD} = sub { $self->_reap };
+  $SIG{INT} = $SIG{TERM} = $SIG{QUIT} = sub {
+    $self->{_done} = 1;
+    kill 'TERM', $self->{_running} if $self->{_running};
+  };
   unshift @{$self->watch}, $app;
   $self->{_modified} = 1;
-  $self->_manage while 1;
+  $self->_manage while !$self->{_done};
+  exit 0;
 }
 
 # "And so with two weeks left in the campaign, the question on everyone’s
@@ -71,7 +76,6 @@ sub _manage {
   $self->{_running} = 0 if $self->{_running} && !kill 0, $self->{_running};
   $self->_spawn if !$self->{_running} && delete $self->{_modified};
   sleep 1;
-  $SIG{INT} = $SIG{TERM} = $SIG{QUIT} = 'DEFAULT';
 }
 
 sub _reap {

@@ -1,13 +1,14 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.46    2011-06-21 00:00:00
+        - Improved Morbo to only attempt restarting applications after a file
+          change has been detected.
         - Improved overall performance by about 3% with many small
           optimizations.
         - Improved query string support in Mojo::Parameters.
         - Improved tests.
-        - Fixed Windows restart issues in Mojo::Server::Morbo. (lammel)
+        - Fixed Windows restart issues in Morbo. (lammel)
         - Fixed missing plugin error message.
-        - Fixed small Windows line ending issue in Mojo::Template.
 
 1.45    2011-06-20 00:00:00
         - Improved documentation.
@@ -256,7 +257,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added more Perl-ish configuration plugin.
         - Added drain callback support for WebSockets.
         - Added line numbers to Mojo::JSON error messages. (marcus)
-        - Removed experimental status from hypnotoad and
+        - Removed experimental status from Hypnotoad and
           Mojolicious::Plugin::TagHelpers.
         - Removed experimental status from many attributes and methods all
           over Mojolicious.
@@ -279,7 +280,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed Mojo::Client async mode.
         - Fixed session cookie encoding bug.
         - Fixed small route bug.
-        - Fixed small hypnotoad bug. (bduggan)
+        - Fixed small Hypnotoad bug. (bduggan)
 
 1.1     2011-02-14 00:00:00
         - Code name "Smiling Cat Face With Heart-Shaped Eyes", this is a

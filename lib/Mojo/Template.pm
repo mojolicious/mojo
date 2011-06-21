@@ -446,7 +446,6 @@ sub render_file {
   $self->name($path) unless defined $self->{name};
   my $file = IO::File->new;
   $file->open("< $path") or croak "Can't open template '$path': $!";
-  $file->binmode;
 
   # Slurp file
   my $tmpl = '';

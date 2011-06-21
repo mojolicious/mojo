@@ -31,7 +31,7 @@ sub run {
   };
   unshift @{$self->watch}, $app;
   $self->{_modified} = 1;
-  $self->_manage while !$self->{_done};
+  $self->_manage while !$self->{_done} || $self->{_running};
   exit 0;
 }
 
@@ -73,7 +73,7 @@ sub _manage {
 
   # Housekeeping
   $self->_reap;
-  $self->{_running} = 0 if $self->{_running} && !kill 0, $self->{_running};
+  delete $self->{_running} if $self->{_running} && !kill 0, $self->{_running};
   $self->_spawn if !$self->{_running} && delete $self->{_modified};
   sleep 1;
 }
@@ -82,7 +82,7 @@ sub _reap {
   my $self = shift;
   while ((my $pid = waitpid -1, WNOHANG) > 0) {
     warn "WORKER STOPPED $pid\n" if DEBUG;
-    $self->{_running} = 0;
+    delete $self->{_running};
   }
 }
 

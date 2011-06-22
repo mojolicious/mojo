@@ -12,18 +12,16 @@ sub register {
 
   # "agent" condition
   $app->routes->add_condition(
-    agent => sub { _headers(shift, shift, shift, {'User-Agent' => shift}) });
+    agent => sub { _headers(@_[0 .. 2], {'User-Agent' => $_[3]}) });
 }
 
 # "Wow, there's a million aliens! I've never seen something so mind-blowing!
 #  Ooh, a reception table with muffins!"
 sub _headers {
   my ($r, $c, $captures, $patterns) = @_;
-
-  # Patterns
   return unless $patterns && ref $patterns eq 'HASH' && keys %$patterns;
 
-  # Match
+  # All headers need to match
   while (my ($k, $v) = each %$patterns) {
     my $header = $c->req->headers->header($k);
     if ($header && $v && ref $v eq 'Regexp' && $header =~ $v) {next}
@@ -46,18 +44,19 @@ Mojolicious::Plugin::HeaderCondition - Header Condition Plugin
   $self->plugin('header_condition');
   $self->routes->route('/:controller/:action')
     ->over(headers => {Referer => qr/example\.com/});
-  $self->routes->route('/:controller/:action')->over(agent => qr/Firefox/);
 
   # Mojolicious::Lite
   plugin 'header_condition';
   get '/' => (headers => {Referer => qr/example\.com/}) => sub {...};
-  get '/' => (agent => qr/Firefox/) => sub {...};
 
-  # Must match all of these headers
+  # All headers need to match
   $self->routes->route('/:controller/:action')->over(headers => {
     'X-Secret-Header' => 'Foo',
-    Referer => qr/^https?:\/\/example\.com\//
-  })->to('foo#bar');
+    Referer => qr/example\.com/
+  });
+
+  # The "agent" condition is a shortcut for the "User-Agent" header
+  get '/' => (agent => qr/Firefox/) => sub {...};
 
 =head1 DESCRIPTION
 

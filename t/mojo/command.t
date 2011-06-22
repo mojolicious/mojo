@@ -3,7 +3,10 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 17;
+
+use File::Spec;
+use File::Temp;
 
 # "My cat's breath smells like cat food."
 use_ok 'Mojo::Command';
@@ -36,3 +39,43 @@ is $command->get_data('template4', 'Example::Package::Windows'),
 is_deeply [sort keys %{$command->get_all_data('Example::Package::Windows')}],
   [qw/template3 template4/], 'right DATA files';
 close $data;
+
+# Class to file and path
+is $command->class_to_file('Foo::Bar'), 'foo_bar',    'right file';
+is $command->class_to_path('Foo::Bar'), 'Foo/Bar.pm', 'right path';
+
+# Environment detection
+{
+  local $ENV{PLACK_ENV} = 'production';
+  is $command->detect, 'psgi', 'right environment';
+}
+{
+  local $ENV{PATH_INFO} = '/test';
+  is $command->detect, 'cgi', 'right environment';
+}
+{
+  local $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+  is $command->detect, 'cgi', 'right environment';
+}
+{
+  local %ENV = ();
+  is $command->detect, 'fastcgi', 'right environment';
+}
+
+# Generating files
+my $dir = File::Temp::tempdir(CLEANUP => 1);
+chdir $dir;
+$command->create_rel_dir('foo/bar');
+is -d File::Spec->catdir($dir, qw/foo bar/), 1, 'directory exists';
+my $template = "@@ foo_bar\njust <%= 'works' %>!\n";
+open $data, '<', \$template;
+no strict 'refs';
+*{"Mojo::Command::DATA"} = $data;
+$command->render_to_rel_file('foo_bar', 'bar/baz.txt');
+open my $txt, '<', $command->rel_file('bar/baz.txt');
+is join('', <$txt>), "just works!\n", 'right result';
+$command->chmod_rel_file('bar/baz.txt', 700);
+is -e $command->rel_file('bar/baz.txt'), 1, 'file is executable';
+$command->write_rel_file('123.xml', "seems\nto\nwork");
+open my $xml, '<', $command->rel_file('123.xml');
+is join('', <$xml>), "seems\nto\nwork", 'right result';

@@ -558,7 +558,8 @@ Prefixing multiple routes is another good use for C<under>.
 
 =head2 Conditions
 
-Conditions such as C<agent> and C<host> allow even more powerful route
+Conditions such as C<agent> and C<host> from
+L<Mojolicious::Plugin::HeaderCondition> allow even more powerful route
 constructs.
 
   # /foo

@@ -6,15 +6,15 @@ use Mojo::Server;
 sub register {
   my ($self, $app, $conf) = @_;
 
-  # Extract domain and path
+  # Extract host and path
   my $prefix = (keys %$conf)[0];
-  my ($domain, $path);
+  my ($host, $path);
   if ($prefix =~ /^(\*\.)?([^\/]+)(\/.*)?$/) {
-    $domain = quotemeta $2;
-    $domain = "(?:.*\\.)?$domain" if $1;
-    $path   = $3;
-    $path   = '/' unless defined $path;
-    $domain = qr/^$domain$/i;
+    $host = quotemeta $2;
+    $host = "(?:.*\\.)?$host" if $1;
+    $path = $3;
+    $path = '/' unless defined $path;
+    $host = qr/^$host$/i;
     $app->routes->cache(0);
   }
   else { $path = $prefix }
@@ -23,7 +23,7 @@ sub register {
   my $route =
     $app->routes->route($path)
     ->detour(app => Mojo::Server->new->load_app($conf->{$prefix}));
-  $route->over(headers => {Host => $domain}) if $domain;
+  $route->over(host => $host) if $host;
 
   $route;
 }
@@ -47,13 +47,13 @@ Mojolicious::Plugin::Mount - Application Mount Plugin
   my $example = plugin mount => {'/example' => '/home/sri/example.pl'};
   $example->to(message => 'It works great!');
 
-  # Mount application with domain (automatically disables route caching)
+  # Mount application with host (automatically disables route caching)
   plugin mount => {'mojolicio.us' => '/home/sri/myapp.pl'};
 
-  # Domain and path
+  # Host and path
   plugin mount => {'mojolicio.us/myapp' => '/home/sri/myapp.pl'};
 
-  # Or even wildcard subdomains
+  # Or even hosts with wildcard subdomains
   plugin mount => {'*.mojolicio.us/myapp' => '/home/sri/myapp.pl'};
 
 =head1 DESCRIPTION

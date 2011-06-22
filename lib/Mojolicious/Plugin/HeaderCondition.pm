@@ -13,6 +13,10 @@ sub register {
   # "agent" condition
   $app->routes->add_condition(
     agent => sub { _headers(@_[0 .. 2], {'User-Agent' => $_[3]}) });
+
+  # "host" condition
+  $app->routes->add_condition(
+    host => sub { _headers(@_[0 .. 2], {'Host' => $_[3]}) });
 }
 
 # "Wow, there's a million aliens! I've never seen something so mind-blowing!
@@ -57,6 +61,9 @@ Mojolicious::Plugin::HeaderCondition - Header Condition Plugin
 
   # The "agent" condition is a shortcut for the "User-Agent" header
   get '/' => (agent => qr/Firefox/) => sub {...};
+
+  # The "host" condition is a shortcut for the "Host" header
+  get '/' => (host => qr/mojolicio\.us/) => sub {...};
 
 =head1 DESCRIPTION
 

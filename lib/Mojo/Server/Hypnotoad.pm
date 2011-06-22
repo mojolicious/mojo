@@ -320,15 +320,13 @@ sub _spawn {
   my $lock = IO::File->new("> $file")
     or croak qq/Can't open lock file "$file": $!/;
 
-  weaken $self;
-
   # Accept mutex
   $loop->on_lock(
     sub {
 
       # Blocking
       my $l;
-      if (my $blocking = $_[1]) {
+      if ($_[1]) {
         eval {
           local $SIG{ALRM} = sub { die "alarm\n" };
           my $old = alarm 1;
@@ -350,6 +348,7 @@ sub _spawn {
   $loop->on_unlock(sub { flock $lock, LOCK_UN });
 
   # Heartbeat
+  weaken $self;
   my $cb;
   $cb = sub {
     my $loop = shift;

@@ -558,7 +558,8 @@ Prefixing multiple routes is another good use for C<under>.
 
 =head2 Conditions
 
-Conditions such as C<agent> allow even more powerful route constructs.
+Conditions such as C<agent> and C<host> allow even more powerful route
+constructs.
 
   # /foo
   get '/foo' => (agent => qr/Firefox/) => sub {
@@ -569,6 +570,17 @@ Conditions such as C<agent> allow even more powerful route constructs.
   get '/foo' => (agent => qr/Internet Explorer/) => sub {
     shift->render(text => 'Dude, you really need to upgrade to Firefox!');
   };
+
+  # /bar
+  get '/bar' => (host => 'mojolicio.us') => sub {
+    shift->render(text => 'Hello Mojolicious!');
+  };
+
+However you might want to disable automatic route caching in case there are
+routes responding to the same path without conditions attached, since those
+would otherwise get precedence once cached.
+
+  app->routes->cache(0);
 
 =head2 Formats
 

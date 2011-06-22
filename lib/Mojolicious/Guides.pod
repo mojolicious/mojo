@@ -15,8 +15,8 @@ updates.
 A really fast and fun way to get started developing web applications with
 Mojolicious is the tutorial in L<Mojolicious::Lite>.
 Almost everything you learn there can also be applied to normal
-L<Mojolicious> applications and is considered a prereqisite for the guides.
-You should take a look!
+L<Mojolicious> applications and is considered a prerequisite for the guides.
+You should definitely take a look!
 
 =head1 GUIDES
 

@@ -8,23 +8,29 @@ sub register {
   my ($self, $app) = @_;
 
   # "headers" condition
+  $app->routes->add_condition(headers => \&_headers);
+
+  # "agent" condition
   $app->routes->add_condition(
-    headers => sub {
-      my ($r, $c, $captures, $patterns) = @_;
+    agent => sub { _headers(shift, shift, shift, {'User-Agent' => shift}) });
+}
 
-      # Patterns
-      return unless $patterns && ref $patterns eq 'HASH' && keys %$patterns;
+# "Wow, there's a million aliens! I've never seen something so mind-blowing!
+#  Ooh, a reception table with muffins!"
+sub _headers {
+  my ($r, $c, $captures, $patterns) = @_;
 
-      # Match
-      while (my ($k, $v) = each %$patterns) {
-        my $header = $c->req->headers->header($k);
-        if ($header && $v && ref $v eq 'Regexp' && $header =~ $v) {next}
-        elsif ($header && defined $v && $v eq $header) {next}
-        else                                           {return}
-      }
-      return 1;
-    }
-  );
+  # Patterns
+  return unless $patterns && ref $patterns eq 'HASH' && keys %$patterns;
+
+  # Match
+  while (my ($k, $v) = each %$patterns) {
+    my $header = $c->req->headers->header($k);
+    if ($header && $v && ref $v eq 'Regexp' && $header =~ $v) {next}
+    elsif ($header && defined $v && $v eq $header) {next}
+    else                                           {return}
+  }
+  return 1;
 }
 
 1;
@@ -38,17 +44,20 @@ Mojolicious::Plugin::HeaderCondition - Header Condition Plugin
 
   # Mojolicious
   $self->plugin('header_condition');
+  $self->routes->route('/:controller/:action')
+    ->over(headers => {Referer => qr/example\.com/});
+  $self->routes->route('/:controller/:action')->over(agent => qr/Firefox/);
+
+  # Mojolicious::Lite
+  plugin 'header_condition';
+  get '/' => (headers => {Referer => qr/example\.com/}) => sub {...};
+  get '/' => (agent => qr/Firefox/) => sub {...};
 
   # Must match all of these headers
   $self->routes->route('/:controller/:action')->over(headers => {
     'X-Secret-Header' => 'Foo',
     Referer => qr/^https?:\/\/example\.com\//
   })->to('foo#bar');
-
-  # Mojolicious::Lite
-  plugin 'header_condition';
-  get '/' => (headers => {'Referer' => qr/^https?:\/\/example\.com\//})
-    => sub {...};
 
 =head1 DESCRIPTION
 

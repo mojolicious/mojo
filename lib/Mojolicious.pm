@@ -91,7 +91,7 @@ sub new {
     if -w $home->rel_file('log');
 
   # Load default plugins
-  $self->plugin('agent_condition');
+  $self->plugin('callback_condition');
   $self->plugin('header_condition');
   $self->plugin('default_helpers');
   $self->plugin('tag_helpers');
@@ -765,10 +765,6 @@ The following plugins are included in the L<Mojolicious> distribution as
 examples.
 
 =over 2
-
-=item L<Mojolicious::Plugin::AgentCondition>
-
-Route condition for C<User-Agent> headers.
 
 =item L<Mojolicious::Plugin::CallbackCondition>
 

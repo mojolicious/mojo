@@ -4,6 +4,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL callback condition plugin.
         - Added support for domains to Mojolicious::Plugin::Mount.
           (sri, alnewkirk)
+        - Removed Mojolicious::Plugin::AgentCondition and added its
+          functionality to Mojolicious::Plugin::HeaderCondition.
         - Improved overall performance slightly.
 
 1.46    2011-06-21 00:00:00

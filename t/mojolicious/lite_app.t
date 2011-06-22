@@ -11,7 +11,7 @@ BEGIN {
   $ENV{MOJO_MODE} = 'development';
 }
 
-use Test::More tests => 820;
+use Test::More tests => 823;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -270,7 +270,12 @@ get '/inline/ep/partial' => sub {
 };
 
 # GET /source
-get '/source' => sub { shift->render_static('../lite_app.t') };
+get '/source' => sub {
+  my $self = shift;
+  my $file = $self->param('fail') ? 'does_not_exist.txt' : '../lite_app.t';
+  $self->render_static($file)
+    or $self->render_text('does not exist!', status => 404);
+};
 
 # GET /foo_relaxed/*
 get '/foo_relaxed/(.test)' => sub {
@@ -1065,6 +1070,9 @@ $t->get_ok('/inline/ep/partial')->status_is(200)
 
 # GET /source
 $t->get_ok('/source')->status_is(200)->content_like(qr/get_ok\('\/source/);
+
+# GET /source (file does not exist)
+$t->get_ok('/source?fail=1')->status_is(404)->content_is('does not exist!');
 
 # GET / (with body and max message size)
 $backup2 = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';

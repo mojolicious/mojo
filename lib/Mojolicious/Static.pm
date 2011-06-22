@@ -17,7 +17,7 @@ sub dispatch {
   my ($self, $c) = @_;
 
   # Already rendered
-  return if $c->res->code;
+  return 1 if $c->res->code;
 
   # Canonical path
   my $stash = $c->stash;
@@ -27,16 +27,16 @@ sub dispatch {
 
   # Split parts
   my @parts = @{Mojo::Path->new->parse($path)->parts};
-  return 1 unless @parts;
+  return unless @parts;
 
   # Prevent directory traversal
-  return 1 if $parts[0] eq '..';
+  return if $parts[0] eq '..';
 
   # Serve static file
-  unless ($self->serve($c, join('/', @parts))) {
+  if ($self->serve($c, join('/', @parts))) {
     $stash->{'mojo.static'} = 1;
     $c->rendered;
-    return;
+    return 1;
   }
 
   1;
@@ -79,7 +79,7 @@ sub serve {
       # Exists, but is forbidden
       else {
         $c->app->log->debug(qq/File "$rel" forbidden./);
-        $res->code(403) and return;
+        $res->code(403) and return 1;
       }
 
       # Done
@@ -108,7 +108,7 @@ sub serve {
         $rsh->remove('Content-Type');
         $rsh->remove('Content-Length');
         $rsh->remove('Content-Disposition');
-        return;
+        return 1;
       }
     }
 
@@ -129,7 +129,7 @@ sub serve {
 
         # Not satisfiable
         $res->code(416);
-        return;
+        return 1;
       }
     }
     $asset->start_range($start);
@@ -141,10 +141,10 @@ sub serve {
     $rsh->content_type($c->app->types->type($ext) || 'text/plain');
     $rsh->accept_ranges('bytes');
     $rsh->last_modified(Mojo::Date->new($modified));
-    return;
+    return 1;
   }
 
-  1;
+  undef;
 }
 
 sub _get_data_file {

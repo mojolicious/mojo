@@ -430,7 +430,7 @@ sub render_static {
   my ($self, $file) = @_;
 
   my $app = $self->app;
-  if ($app->static->serve($self, $file)) {
+  unless ($app->static->serve($self, $file)) {
     $app->log->debug(
       qq/Static file "$file" not found, public directory missing?/);
     return;

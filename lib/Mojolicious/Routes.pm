@@ -88,7 +88,7 @@ sub auto_render {
     1;
   } or $c->render_exception($@);
 
-  undef;
+  1;
 }
 
 sub bridge { shift->route(@_)->inline(1) }
@@ -145,10 +145,10 @@ sub dispatch {
   }
 
   # No match
-  return 1 unless $m && @{$m->stack};
+  return unless $m && @{$m->stack};
 
   # Walk the stack
-  return 1 if $self->_walk_stack($c);
+  return if $self->_walk_stack($c);
 
   # Render
   $self->auto_render($c);
@@ -828,7 +828,7 @@ application embedding.
 
 =head2 C<dispatch>
 
-  my $e = $r->dispatch(Mojolicious::Controller->new);
+  my $success = $r->dispatch(Mojolicious::Controller->new);
 
 Match routes and dispatch.
 

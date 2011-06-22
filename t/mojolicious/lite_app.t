@@ -46,9 +46,6 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 plugin 'PluginWithTemplate';
 
-# Callback condition plugin
-plugin 'callback_condition';
-
 # Default
 app->defaults(default => 23);
 

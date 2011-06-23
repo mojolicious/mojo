@@ -382,7 +382,7 @@ sub _dispatch_controller {
   my $method = $self->_generate_method($field, $c);
   my $dispatch = ref $app || $app;
   $dispatch .= "->$method" if $method;
-  $c->app->log->debug("Dispatching $dispatch.");
+  $c->app->log->debug(qq/Dispatching "$dispatch"./);
 
   # Load class
   if (!ref $app && !$self->{_loaded}->{$app}) {
@@ -419,7 +419,12 @@ sub _dispatch_controller {
       }
 
       # Render
-      elsif (!$staging) { $self->auto_render($app) }
+      else {
+        $c->app->log->debug(
+          qq/Action "$dispatch" not found, assuming template without action./
+        );
+        $self->auto_render($app) unless $staging;
+      }
 
       # Merge stash
       my $new = $app->stash;

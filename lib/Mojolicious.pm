@@ -183,8 +183,7 @@ sub handler {
   }
 
   # Delayed
-  $self->log->debug(
-    'Waiting for delayed response, forgot to render or resume?')
+  $self->log->debug('Nothing has been rendered, assuming delayed response.')
     unless $stash->{'mojo.rendered'} || $tx->is_writing;
 }
 

@@ -16,8 +16,6 @@ sub add {
 
   # Add cookies
   for my $cookie (@cookies) {
-
-    # Unique cookie id
     my $domain = $cookie->domain;
     my $path   = $cookie->path;
     my $name   = $cookie->name;
@@ -28,7 +26,7 @@ sub add {
     # Default to session cookie
     $cookie->max_age(0) unless $cookie->expires || $cookie->max_age;
 
-    # Cookie too big
+    # Check cookie size
     my $value = $cookie->value;
     next if length(defined $value ? $value : '') > $self->max_cookie_size;
 
@@ -36,12 +34,10 @@ sub add {
     $self->{_jar}->{$domain} ||= [];
     my @new;
     for my $old (@{$self->{_jar}->{$domain}}) {
-
-      # Unique cookie id
       push @new, $old unless $old->path eq $path && $old->name eq $name;
     }
 
-    # Add
+    # Yummy!
     push @new, $cookie;
     $self->{_jar}->{$domain} = \@new;
   }
@@ -54,16 +50,12 @@ sub empty { shift->{_jar} = {} }
 sub extract {
   my ($self, $tx) = @_;
 
-  # Fix cookies
+  # Repair cookies and put them in the jar
   my $url     = $tx->req->url;
   my @cookies = @{$tx->res->cookies};
   for my $cookie (@cookies) {
-
-    # Domain
     $cookie->domain($url->host) unless $cookie->domain;
-
-    # Path
-    $cookie->path($url->path) unless $cookie->path;
+    $cookie->path($url->path)   unless $cookie->path;
   }
   $self->add(@cookies);
 }
@@ -71,40 +63,28 @@ sub extract {
 sub find {
   my ($self, $url) = @_;
 
-  # Pattern
+  # Look through the jar
   return unless my $domain = $url->host;
   my $path = $url->path->to_string || '/';
-
-  # Find
   my @found;
   while ($domain =~ /[^\.]+\.[^\.]+|localhost$/) {
-
-    # Nothing
     next unless my $jar = $self->{_jar}->{$domain};
 
-    # Look inside
+    # Grab cookies
     my @new;
     for my $cookie (@$jar) {
 
-      # Session cookie
+      # Check if cookie has expired
       my $session = defined $cookie->max_age && $cookie->max_age > 0 ? 1 : 0;
-      if ($cookie->expires && !$session) {
-
-        # Expired
-        next if time > ($cookie->expires->epoch || 0);
+      if ((my $expires = $cookie->expires) && !$session) {
+        next if time > ($expires->epoch || 0);
       }
-
-      # Not expired
       push @new, $cookie;
 
-      # Port
+      # Taste cookie
       my $port = $url->port || 80;
       next if $cookie->port && $port != $cookie->port;
-
-      # Protocol
       next if $cookie->secure && $url->scheme ne 'https';
-
-      # Path
       my $cpath = $cookie->path;
       push @found,
         Mojo::Cookie::Request->new(
@@ -115,11 +95,12 @@ sub find {
         secure  => $cookie->secure
         ) if $path =~ /^$cpath/;
     }
+
     $self->{_jar}->{$domain} = \@new;
   }
 
-  # Remove leading dot or part
-  continue { $domain =~ s/^(?:\.|[^\.]+)// }
+  # Remove another part
+  continue { $domain =~ s/^(?:\.?[^\.]+)// }
 
   @found;
 }
@@ -127,10 +108,8 @@ sub find {
 sub inject {
   my ($self, $tx) = @_;
 
-  # Empty jar
+  # Look for delicious pastries in the jar
   return unless keys %{$self->{_jar}};
-
-  # Fetch
   my $req = $tx->req;
   my $url = $req->url->clone;
   if (my $host = $req->headers->host) { $url->host($host) }
@@ -151,7 +130,8 @@ Mojo::CookieJar - Cookie Jar For HTTP 1.1 User Agents
 
 =head1 DESCRIPTION
 
-L<Mojo::CookieJar> is a minimalistic cookie jar for HTTP 1.1 user agents.
+L<Mojo::CookieJar> is a minimalistic and relaxed cookie jar for HTTP 1.1 user
+agents.
 
 =head1 ATTRIBUTES
 

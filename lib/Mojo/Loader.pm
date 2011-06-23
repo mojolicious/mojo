@@ -95,14 +95,21 @@ following new ones.
 
   my $e = $loader->load('Foo::Bar');
 
-Load a class, note that classes are checked for a C<new> method to see if
-they are already loaded.
+Load a class and catch exceptions.
+Note that classes are checked for a C<new> method to see if they are already
+loaded.
+
+  if (my $e = $loader->load('Foo::Bar')) {
+    die "Exception: $e" if ref $e;
+  }
 
 =head2 C<search>
 
   my $modules = $loader->search('MyApp::Namespace');
 
-Search modules in a namespace.
+Search for modules in a namespace non-recursively.
+
+  $loader->load($_) for @{$loader->search('MyApp::Namespace')};
 
 =head1 SEE ALSO
 

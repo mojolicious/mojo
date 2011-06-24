@@ -4,6 +4,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added debug log message for missing action to router.
         - Improved Mojo::Command tests.
         - Improved documentation.
+        - Fixed support for multiple checkboxes with same name in
+          Mojolicious::Plugin::TagHelper.
 
 1.47    2011-06-22 00:00:00
         - Added EXPERIMENTAL callback condition plugin.

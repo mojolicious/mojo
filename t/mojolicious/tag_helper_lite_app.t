@@ -6,7 +6,7 @@ use warnings;
 # Disable IPv6, epoll and kqueue
 BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 30;
+use Test::More tests => 45;
 
 # "Hey! Bite my glorious golden ass!"
 use Mojolicious::Lite;
@@ -26,6 +26,9 @@ get 'style';
 
 # GET /basicform
 get '/basicform';
+
+# GET /multibox
+get '/multibox';
 
 # GET /form
 get 'form/:test' => 'form';
@@ -92,8 +95,53 @@ $t->get_ok('/basicform')->status_is(200)->content_is(<<EOF);
 </form>
 EOF
 
+# GET /multibox
+$t->get_ok('/multibox')->status_is(200)->content_is(<<EOF);
+<form action="/multibox">
+  <input name="foo" type="checkbox" value="one" />
+  <input name="foo" type="checkbox" value="two" />
+  <input type="submit" value="Ok" />
+</form>
+EOF
+
+# GET /multibox (with one value)
+$t->get_ok('/multibox?foo=two')->status_is(200)->content_is(<<EOF);
+<form action="/multibox">
+  <input name="foo" type="checkbox" value="one" />
+  <input checked="checked" name="foo" type="checkbox" value="two" />
+  <input type="submit" value="Ok" />
+</form>
+EOF
+
+# GET /multibox (with one right and one wrong value)
+$t->get_ok('/multibox?foo=one&foo=three')->status_is(200)->content_is(<<EOF);
+<form action="/multibox">
+  <input checked="checked" name="foo" type="checkbox" value="one" />
+  <input name="foo" type="checkbox" value="two" />
+  <input type="submit" value="Ok" />
+</form>
+EOF
+
+# GET /multibox (with wrong value)
+$t->get_ok('/multibox?foo=bar')->status_is(200)->content_is(<<EOF);
+<form action="/multibox">
+  <input name="foo" type="checkbox" value="one" />
+  <input name="foo" type="checkbox" value="two" />
+  <input type="submit" value="Ok" />
+</form>
+EOF
+
+# GET /multibox (with two values)
+$t->get_ok('/multibox?foo=two&foo=one')->status_is(200)->content_is(<<EOF);
+<form action="/multibox">
+  <input checked="checked" name="foo" type="checkbox" value="one" />
+  <input checked="checked" name="foo" type="checkbox" value="two" />
+  <input type="submit" value="Ok" />
+</form>
+EOF
+
 # GET /form
-$t->get_ok('/form/lala?a=b&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
+$t->get_ok('/form/lala?a=2&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
   ->content_is(<<EOF);
 <form action="/links" method="post">
   <input name="foo" />
@@ -119,8 +167,8 @@ $t->get_ok('/form/lala?a=b&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
   <input name="foo" />
 </form>
 <input name="escaped" value="1&quot; &quot;2" />
-<input name="a" value="b" />
-<input name="a" value="b" />
+<input name="a" value="2" />
+<input name="a" value="2" />
 EOF
 
 # GET /form (alternative)
@@ -260,6 +308,13 @@ __DATA__
   %= text_field bar => 'baz', class => 'test'
   %= text_field yada => undef
   %= input_tag baz => 'yada', class => 'tset'
+  %= submit_button
+%= end
+
+@@ multibox.html.ep
+%= form_for multibox => begin
+  %= check_box foo => 'one'
+  %= check_box foo => 'two'
   %= submit_button
 %= end
 

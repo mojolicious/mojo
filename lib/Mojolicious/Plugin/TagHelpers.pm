@@ -1,6 +1,7 @@
 package Mojolicious::Plugin::TagHelpers;
 use Mojo::Base 'Mojolicious::Plugin';
 
+use List::Util 'first';
 use Mojo::ByteStream 'b';
 use Mojo::Util 'xml_escape';
 
@@ -272,26 +273,22 @@ sub _input {
   else { %attrs = @_ }
 
   # Value
-  my $p = $c->param($name);
+  my @p = $c->param($name);
 
   # Special selection value
   my $t = $attrs{type} || '';
-  if (defined $p && $t ne 'submit') {
+  if (@p && $t ne 'submit') {
 
-    # Checkbox
-    if ($t eq 'checkbox') {
-      $attrs{checked} = 'checked';
-    }
-
-    # Radiobutton
-    elsif ($t eq 'radio') {
-      my $value = $attrs{value};
-      $value = '' unless defined $value;
-      $attrs{checked} = 'checked' if $value eq $p;
+    # Checkbox or radiobutton
+    my $value = $attrs{value};
+    $value = '' unless defined $value;
+    if ($t eq 'checkbox' || $t eq 'radio') {
+      $attrs{value} = $value;
+      $attrs{checked} = 'checked' if defined first { $value eq $_ } @p;
     }
 
     # Other
-    else { $attrs{value} = $p }
+    else { $attrs{value} = $p[0] }
 
     return $self->_tag('input', name => $name, %attrs);
   }

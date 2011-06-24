@@ -11,7 +11,7 @@ BEGIN {
   $ENV{MOJO_MODE} = 'development';
 }
 
-use Test::More tests => 823;
+use Test::More tests => 826;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -62,7 +62,7 @@ app->renderer->add_handler(dead => sub { die 'renderer works!' });
 # GET /☃
 get '/☃' => sub {
   my $self = shift;
-  $self->render_text($self->url_for);
+  $self->render_text($self->url_for . $self->url_for('current'));
 };
 
 # GET /unicode/a%E4b
@@ -743,7 +743,10 @@ $tua->ioloop->timer(
 );
 
 # GET /☃
-$t->get_ok('/☃')->status_is(200)->content_is('/%E2%98%83');
+$t->get_ok('/☃')->status_is(200)->content_is('/%E2%98%83/%E2%98%83');
+
+# GET /☃ (with trailing slash)
+$t->get_ok('/☃/')->status_is(200)->content_is('/%E2%98%83//%E2%98%83/');
 
 # GET /unicode/a%E4b
 $t->get_ok('/unicode/a%E4b')->status_is(200)->content_is('/unicode/a%E4b');

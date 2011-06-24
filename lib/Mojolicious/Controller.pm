@@ -623,6 +623,11 @@ sub url_for {
     my ($p, $ws) = $match->path_for($target, @_);
     $path->parse($p) if $p;
 
+    # Fix trailing slash
+    $path->trailing_slash(1)
+      if (!$target || $target eq 'current')
+      && $req->url->path->trailing_slash;
+
     # Fix scheme for WebSockets
     $base->scheme(($base->scheme || '') eq 'https' ? 'wss' : 'ws') if $ws;
   }

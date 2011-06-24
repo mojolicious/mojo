@@ -77,6 +77,10 @@ best of both worlds with a little bit of experience.
 
   /user/show/:id -> qr/(?-xism:^\/user\/show/([^\/\.]+))/
 
+A trailing slash is always optional.
+
+  /user/show/23/ -> /user/:action/:id -> {action => 'show', id => 23}
+
 =head2 Reversibility
 
 One more huge advantage routes have over regular expressions is that they are

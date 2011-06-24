@@ -6,6 +6,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved documentation.
         - Fixed support for multiple checkboxes with same name in
           Mojolicious::Plugin::TagHelper.
+        - Fixed portability issue in "lite_app.t". (marcus)
 
 1.47    2011-06-22 00:00:00
         - Added EXPERIMENTAL callback condition plugin.
@@ -1256,7 +1257,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Updated Mojo::Server::FastCGI and Mojo::Server::Daemon::Prefork to
           use the application logger.
         - Fixed import problem in Mojo::Server::Daemon::Prefork. (James Duncan)
-        - Fixed warning in template.t.
+        - Fixed warning in "template.t".
 
 0.991238 2009-07-16 00:00:00
         - Fixed all shebang lines.
@@ -1287,7 +1288,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Simplified Mojo::Home.
         - Moved executable detection to Test::Mojo::Server.
         - Improved Mojo::Loader::Exception.
-        - Moved persistent_error.t tests to app.t.
+        - Moved "persistent_error.t" tests to "app.t".
         - Cleaned up code.
         - Fixed at_least_version. (yuki-kimoto)
 
@@ -1455,7 +1456,7 @@ This file documents the revision history for Perl extension Mojolicious.
 0.8007  2008-11-07 00:00:00
         - Cleaned up the api some more.
         - Added param to Mojo::Message.
-        - Added server.t. (Mark Stosberg)
+        - Added "server.t". (Mark Stosberg)
         - Added documentation. (Mark Stosberg)
         - Cleaned up Mojo::File api.
         - Fixed infinite loop in Mojo::File. (Leon Brocard)
@@ -1494,7 +1495,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Removed OS X resource fork files.
 
 0.8.1   2008-11-01 00:00:00
-        - Made daemon.t developer only.
+        - Made "daemon.t" developer only.
         - Fixed typos.
 
 0.8     2008-10-21 00:00:00

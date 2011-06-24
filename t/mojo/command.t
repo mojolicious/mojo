@@ -5,6 +5,7 @@ use warnings;
 
 use Test::More tests => 17;
 
+use Cwd 'getcwd';
 use File::Spec;
 use File::Temp;
 
@@ -64,6 +65,7 @@ is $command->class_to_path('Foo::Bar'), 'Foo/Bar.pm', 'right path';
 
 # Generating files
 my $dir = File::Temp::tempdir(CLEANUP => 1);
+my $cwd = getcwd;
 chdir $dir;
 $command->create_rel_dir('foo/bar');
 is -d File::Spec->catdir($dir, qw/foo bar/), 1, 'directory exists';
@@ -79,3 +81,4 @@ is -e $command->rel_file('bar/baz.txt'), 1, 'file is executable';
 $command->write_rel_file('123.xml', "seems\nto\nwork");
 open my $xml, '<', $command->rel_file('123.xml');
 is join('', <$xml>), "seems\nto\nwork", 'right result';
+chdir $cwd;

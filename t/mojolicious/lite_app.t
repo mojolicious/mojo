@@ -1018,9 +1018,9 @@ $t->get_ok('/.html')->status_is(200)
   "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
 
 # GET /0 ("X-Forwarded-For")
+my $source = $t->tx->local_address;
 $t->get_ok('/0', {'X-Forwarded-For' => '192.168.2.2, 192.168.2.1'})
-  ->status_is(200)
-  ->content_like(qr/http\:\/\/localhost\:\d+\/0\-127\.0\.0\.1\-0/);
+  ->status_is(200)->content_like(qr/http\:\/\/localhost\:\d+\/0\-$source\-0/);
 
 # GET /0 (reverse proxy with "X-Forwarded-For")
 my $backup2 = $ENV{MOJO_REVERSE_PROXY};
@@ -1032,27 +1032,26 @@ $ENV{MOJO_REVERSE_PROXY} = $backup2;
 
 # GET /0 ("X-Forwarded-Host")
 $t->get_ok('/0', {'X-Forwarded-Host' => 'mojolicio.us:8080'})->status_is(200)
-  ->content_like(qr/http\:\/\/localhost\:\d+\/0\-127\.0\.0\.1\-0/);
+  ->content_like(qr/http\:\/\/localhost\:\d+\/0\-$source\-0/);
 
 # GET /0 (reverse proxy with "X-Forwarded-Host")
 $backup2 = $ENV{MOJO_REVERSE_PROXY};
 $ENV{MOJO_REVERSE_PROXY} = 1;
 $t->get_ok('/0', {'X-Forwarded-Host' => 'mojolicio.us:8080'})->status_is(200)
-  ->content_is('http://mojolicio.us:8080/0-127.0.0.1-0');
+  ->content_is("http://mojolicio.us:8080/0-$source-0");
 $ENV{MOJO_REVERSE_PROXY} = $backup2;
 
 # GET /0 ("X-Forwarded-HTTPS" and "X-Forwarded-Host")
 $t->get_ok('/0',
   {'X-Forwarded-HTTPS' => 1, 'X-Forwarded-Host' => 'mojolicio.us'})
-  ->status_is(200)
-  ->content_like(qr/http\:\/\/localhost\:\d+\/0\-127\.0\.0\.1\-0/);
+  ->status_is(200)->content_like(qr/http\:\/\/localhost\:\d+\/0\-$source\-0/);
 
 # GET /0 (reverse proxy with "X-Forwarded-HTTPS" and "X-Forwarded-Host")
 $backup2 = $ENV{MOJO_REVERSE_PROXY};
 $ENV{MOJO_REVERSE_PROXY} = 1;
 $t->get_ok('/0',
   {'X-Forwarded-HTTPS' => 1, 'X-Forwarded-Host' => 'mojolicio.us'})
-  ->status_is(200)->content_is('https://mojolicio.us/0-127.0.0.1-0');
+  ->status_is(200)->content_is("https://mojolicio.us/0-$source-0");
 $ENV{MOJO_REVERSE_PROXY} = $backup2;
 
 # DELETE /inline/epl

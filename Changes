@@ -5,7 +5,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved Mojo::Command tests.
         - Improved documentation.
         - Fixed support for multiple checkboxes with same name in
-          Mojolicious::Plugin::TagHelper.
+          Mojolicious::Plugin::TagHelper. (sri, kimoto)
         - Fixed portability issue in "lite_app.t". (marcus)
 
 1.47    2011-06-22 00:00:00

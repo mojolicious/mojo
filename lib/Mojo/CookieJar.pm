@@ -108,7 +108,7 @@ sub find {
 sub inject {
   my ($self, $tx) = @_;
 
-  # Look for delicious pastries in the jar
+  # Take delicious cookies from the jar
   return unless keys %{$self->{_jar}};
   my $req = $tx->req;
   my $url = $req->url->clone;

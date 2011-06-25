@@ -6,7 +6,7 @@ use warnings;
 # Disable IPv6, epoll and kqueue
 BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 11;
+use Test::More tests => 12;
 
 use_ok 'Mojo::IOLoop';
 
@@ -122,5 +122,35 @@ $idle = 0;
 Mojo::IOLoop->idle(sub { Mojo::IOLoop->stop if $idle++ });
 Mojo::IOLoop->start;
 is $idle, 2, 'two idle ticks';
+
+$port = Mojo::IOLoop->generate_port;
+$id = $loop->listen(port => $port);
+$loop->connect(
+  address    => 'localhost',
+  port       => $port,
+  on_connect => sub {
+    my $loop = shift;
+    $loop->drop($id);
+    $loop->stop;
+  }
+);
+
+$loop->start;
+
+my $not_connected;
+$loop->connect(
+  address    => 'localhost',
+  port       => $port,
+  on_error   => sub { shift->stop },
+  on_connect => sub {
+    my $loop = shift;
+    $not_connected = 0;
+    $loop->stop;
+  }
+);
+
+$loop->start;
+
+ok $not_connected;
 
 __DATA__

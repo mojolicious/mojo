@@ -9,7 +9,7 @@ BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 use Test::More;
 plan skip_all => 'Windows is too fragile for this test!'
   if $^O eq 'MSWin32' || $^O =~ /cygwin/;
-plan tests => 68;
+plan tests => 70;
 
 use_ok 'Mojo::UserAgent';
 
@@ -294,3 +294,17 @@ $ua->get(
 );
 Mojo::IOLoop->start;
 is_deeply \@kept_alive, [1, 1], 'connections kept alive';
+
+# Server just drops connection
+$port   = Mojo::IOLoop->generate_port;
+my $id = Mojo::IOLoop->listen(
+  port      => $port,
+  on_accept => sub {
+    my ($loop, $id) = @_;
+    $loop->drop($id);
+  }
+);
+
+$tx = $ua->get("http://localhost:$port/");
+ok !$tx->success;
+ok $tx->error;

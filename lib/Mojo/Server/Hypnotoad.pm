@@ -403,6 +403,9 @@ To start applications with it you can use the L<hypnotoad> script.
 
   % hypnotoad myapp.pl
 
+For L<Mojolicious> and L<Mojolicious::Lite> applications it will default to
+C<production> mode.
+
 Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::IP>,
 L<IO::Socket::SSL> and L<Net::Rendezvous::Publish> are supported
 transparently and used if installed.

@@ -583,12 +583,20 @@ sub _error {
 # "Oh, I'm in no condition to drive. Wait a minute.
 #  I don't have to listen to myself. I'm drunk."
 sub _finish_tx {
-  my ($self, $tx, $cb) = @_;
+  my ($self, $tx, $cb, $close) = @_;
 
-  # 400/500
+  # Common errors
   my $res = $tx->res;
-  $res->error($res->message, $res->code)
-    if $res->is_status_class(400) || $res->is_status_class(500);
+  unless ($res->error) {
+
+    # Premature connection close
+    if ($close && !$res->code) { $res->error('Premature connection close.') }
+
+    # 400/500
+    elsif ($res->is_status_class(400) || $res->is_status_class(500)) {
+      $res->error($res->message, $res->code);
+    }
+  }
 
   # Callback
   return unless $cb;
@@ -638,7 +646,7 @@ sub _handle {
     $self->{_processing} -= 1;
 
     # Redirect or callback
-    $self->_finish_tx($new || $old, $c->{cb})
+    $self->_finish_tx($new || $old, $c->{cb}, $close)
       unless $self->_redirect($c, $old);
   }
 

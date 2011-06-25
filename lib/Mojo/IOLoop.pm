@@ -910,11 +910,9 @@ sub _drop_immediately {
     }
   }
 
-  # Delete connection
-  my $c = delete $self->{_cs}->{$id};
-  delete $self->{_reverse}->{$id};
-
   # Drop listen socket
+  my $c = $self->{_cs}->{$id};
+  return if $c->{drop}++;
   if (!$c && ($c = delete $self->{_listen}->{$id})) {
 
     # Not listening
@@ -935,6 +933,10 @@ sub _drop_immediately {
 
     # Handle close
     if (my $event = $c->{close}) { $self->_run_event('close', $event, $id) }
+
+    # Delete connection
+    delete $self->{_cs}->{$id};
+    delete $self->{_reverse}->{$id};
 
     # Remove file descriptor
     return $self unless my $fd = fileno $handle;

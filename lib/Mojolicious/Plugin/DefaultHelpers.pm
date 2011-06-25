@@ -273,10 +273,10 @@ Page title.
 
 Generate a portable L<Mojo::URL> object with base for a route, path or URL.
 
-  %# Generate "/perldoc" if application is deployed under "/"
+  %# "/perldoc" if application is deployed under "/"
   %= url_for '/perldoc'
 
-  %# Generate "/myapp/perldoc" if application is deployed under "/myapp"
+  %# "/myapp/perldoc" if application is deployed under "/myapp"
   %= url_for '/perldoc'
 
 =head1 METHODS

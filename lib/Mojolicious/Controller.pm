@@ -987,10 +987,10 @@ A L<Mojo::UserAgent> prepared for the current environment.
 
 Generate a portable L<Mojo::URL> object with base for a route, path or URL.
 
-  # Generate "/perldoc" if application is deployed under "/"
+  # "/perldoc" if application is deployed under "/"
   print $c->url_for('/perldoc');
 
-  # Generate "/myapp/perldoc" if application is deployed under "/myapp"
+  # "/myapp/perldoc" if application is deployed under "/myapp"
   print $c->url_for('/perldoc');
 
 =head2 C<write>

@@ -912,8 +912,8 @@ sub _drop_immediately {
 
   # Drop listen socket
   my $c = $self->{_cs}->{$id};
-  return if $c->{drop}++;
-  if (!$c && ($c = delete $self->{_listen}->{$id})) {
+  if ($c) { return if $c->{drop}++ }
+  elsif ($c = delete $self->{_listen}->{$id}) {
 
     # Not listening
     return $self unless $self->{_listening};

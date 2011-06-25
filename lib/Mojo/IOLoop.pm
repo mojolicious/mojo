@@ -1885,8 +1885,9 @@ Run reactor for exactly one tick.
   my $id = Mojo::IOLoop->recurring(0 => sub {...});
   my $id = $loop->recurring(3 => sub {...});
 
-Callback to be invoked on every reactor tick, this for example allows you to
-run multiple reactors next to each other.
+Create a new recurring timer, invoking the callback repeatedly after a given
+amount of seconds.
+This for example allows you to run multiple reactors next to each other.
 
   my $loop2 = Mojo::IOLoop->new(timeout => 0);
   Mojo::IOLoop->recurring(0 => sub { $loop2->one_tick });

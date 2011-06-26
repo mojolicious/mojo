@@ -25,7 +25,6 @@ __DATA__
 @@ liteapp
 %% my $class = shift;
 #!/usr/bin/env perl
-
 use Mojolicious::Lite;
 
 # Documentation browser under "/perldoc" (this plugin requires Perl 5.10)

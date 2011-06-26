@@ -333,7 +333,7 @@ These three lines are a whole web application.
 
   use Mojolicious::Lite;
 
-  get '/' => sub { shift->render_text('Hello World!') };
+  get '/' => {text => 'Hello World!'};
 
   app->start;
 

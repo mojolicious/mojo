@@ -101,16 +101,18 @@ applications.
 
 =head2 Hello World!
 
-A minimal Hello World application looks like this, L<strict> and L<warnings>
+A small Hello World application looks like this, L<strict> and L<warnings>
 are automatically enabled and a few functions imported when you use
 L<Mojolicious::Lite>, turning your script into a full featured web
 application.
 
   #!/usr/bin/env perl
-
   use Mojolicious::Lite;
 
-  get '/' => sub { shift->render(text => 'Hello World!') };
+  get '/' => sub {
+    my $self = shift;
+    $self->render(text => 'Hello World!');
+  };
 
   app->start;
 
@@ -461,7 +463,6 @@ Here's a fully functional example for a html form handling application using
 multiple features at once.
 
   #!/usr/bin/env perl
-
   use Mojolicious::Lite;
 
   get '/' => 'index';

@@ -130,6 +130,12 @@ example for learning to build new plugins.
 
 =head1 HELPERS
 
+=head2 C<app>
+
+  <%= app->secret %>
+
+Alias for the C<app> method in L<Mojolicious::Controller>.
+
 =head2 C<content>
 
   <%= content %>

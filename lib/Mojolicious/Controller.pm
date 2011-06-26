@@ -154,6 +154,8 @@ sub on_finish {
   $self->tx->on_finish(sub { shift and $self->$cb(@_) });
 }
 
+# "I like being a women.
+#  Now when I say something stupid, everyone laughs and buys me things."
 sub on_message {
   my $self = shift;
 
@@ -265,6 +267,7 @@ sub render {
   1;
 }
 
+# "She's built like a steakhouse, but she handles like a bistro!"
 sub render_content {
   my $self    = shift;
   my $name    = shift;
@@ -469,6 +472,7 @@ sub rendered {
   $self;
 }
 
+# "A three month calendar? What is this, Mercury?"
 sub req { shift->tx->req }
 sub res { shift->tx->res }
 

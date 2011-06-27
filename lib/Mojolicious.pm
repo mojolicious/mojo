@@ -353,7 +353,10 @@ Web development for humans, making hard things possible and everything fun.
   use Mojolicious::Lite;
 
   # Simple plain text response
-  get '/' => sub { shift->render_text('Hello World!') };
+  get '/' => sub {
+    my $self = shift;
+    $self->render_text('Hello World!');
+  };
 
   # Route associating the "/time" URL to template in DATA section
   get '/time' => 'clock';
@@ -399,10 +402,13 @@ A controller collects several actions together.
   use Mojo::Base 'Mojolicious::Controller';
 
   # Plain text response
-  sub hello { shift->render_text('Hello World!') }
+  sub hello {
+    my $self = shift;
+    $self->render_text('Hello World!');
+  }
 
   # Render external template "templates/example/clock.html.ep"
-  sub clock { shift->render }
+  sub clock { }
 
   # RESTful web service sending JSON responses
   sub restful {

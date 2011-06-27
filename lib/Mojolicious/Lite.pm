@@ -101,9 +101,9 @@ applications.
 
 =head2 Hello World!
 
-A small Hello World application looks like this, L<strict> and L<warnings>
-are automatically enabled and a few functions imported when you use
-L<Mojolicious::Lite>, turning your script into a full featured web
+A simple Hello World application can look like this, L<strict> and
+L<warnings> are automatically enabled and a few functions imported when you
+use L<Mojolicious::Lite>, turning your script into a full featured web
 application.
 
   #!/usr/bin/env perl

@@ -23,10 +23,10 @@ sub check_file {
   my ($self, $file) = @_;
 
   # Check if modify time and/or size have changed
-  return unless defined(my $mtime = (stat $file)[9]);
-  my $size = (stat $file)[7];
-  $STATS->{$file} = [$^T, $size] unless exists $STATS->{$file};
-  return if $mtime <= $STATS->{$file}->[0] && $size == $STATS->{$file}->[1];
+  my ($size, $mtime) = (stat $file)[7, 9];
+  return unless defined $mtime;
+  my $stats = $STATS->{$file} ||= [$^T, $size];
+  return if $mtime <= $stats->[0] && $size == $stats->[1];
   $STATS->{$file} = [$mtime, $size];
 
   1;
@@ -182,7 +182,7 @@ the following new ones.
 
   $morbo->check_file('script/myapp');
 
-Check if file has changed since last check.
+Check if file has been modified since last check.
 
 =head2 C<run>
 

@@ -18,7 +18,7 @@ use Mojo::UserAgent;
 
 plan skip_all => 'set TEST_MORBO to enable this test (developer only!)'
   unless $ENV{TEST_MORBO};
-plan tests => 29;
+plan tests => 28;
 
 # "Morbo wishes these stalwart nomads peace among the Dutch tulips.
 #  At least all those windmills will keep them cool.
@@ -42,7 +42,6 @@ get '/hello' => {text => 'Hello Morbo!'};
 
 app->start;
 EOF
-ok !$morbo->check_file($script), 'file has not changed';
 
 # Start
 my $port   = Mojo::IOLoop->generate_port;

@@ -848,6 +848,15 @@ startup.
     my $self = shift;
   }
 
+=head1 HELPERS
+
+In addition to the attributes and methods above you can also call helpers on
+instances of L<Mojolicious>.
+This includes all helpers from L<Mojolicious::Plugin::DefaultHelpers> and
+L<Mojolicious::Plugin::TagHelpers>.
+
+  $app->log->debug($app->dumper({foo => 'bar'}));
+
 =head1 SUPPORT
 
 =head2 Web

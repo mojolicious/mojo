@@ -957,8 +957,8 @@ Stringifies the whole route.
 
 =head2 C<under>
 
-  my $under = $route->under(sub {...});
-  my $under = $route->under('/:foo');
+  my $under = $r->under(sub {...});
+  my $under = $r->under('/:foo');
 
 Generate bridges.
 See also the L<Mojolicious::Lite> tutorial for more argument variations.
@@ -975,17 +975,30 @@ restrictions.
 
 =head2 C<waypoint>
 
-  my $route = $r->waypoint('/:c/:a', a => qr/\w+/);
+  my $r = $r->waypoint('/:c/:a', a => qr/\w+/);
 
 Add a waypoint to this route as nested child.
 
 =head2 C<websocket>
 
-  my $websocket = $route->websocket('/:foo' => sub {...});
+  my $websocket = $r->websocket('/:foo' => sub {...});
 
 Generate route matching only C<WebSocket> handshakes.
 See also the L<Mojolicious::Lite> tutorial for more argument variations.
 Note that this method is EXPERIMENTAL and might change without warning!
+
+=head1 SHORTCUTS
+
+In addition to the attributes and methods above you can also call shortcuts
+on instances of L<Mojolicious::Routes>.
+
+  $r->add_shortcut(firefox => sub {
+    my ($r, $path) = @_;
+    $r->get($path, agent => qr/Firefox/);
+  });
+
+  $r->firefox('/welcome')->to('firefox#welcome');
+  $r->firefox('/bye')->to('firefox#bye);
 
 =head1 SEE ALSO
 

@@ -87,9 +87,10 @@ sub params {
 
 sub parse {
   my ($self, $string) = @_;
-  $string = delete $self->{_string} unless defined $string;
+  $string = $self->{_string} unless defined $string;
 
   # Clear
+  delete $self->{_string};
   $self->params([]);
 
   # Detect pair separator for reconstruction

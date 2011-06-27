@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More tests => 17;
 
-use Cwd 'getcwd';
+use Cwd 'cwd';
 use File::Spec;
 use File::Temp;
 
@@ -64,8 +64,8 @@ is $command->class_to_path('Foo::Bar'), 'Foo/Bar.pm', 'right path';
 }
 
 # Generating files
+my $cwd = cwd;
 my $dir = File::Temp::tempdir(CLEANUP => 1);
-my $cwd = getcwd;
 chdir $dir;
 $command->create_rel_dir('foo/bar');
 is -d File::Spec->catdir($dir, qw/foo bar/), 1, 'directory exists';
@@ -76,7 +76,7 @@ no strict 'refs';
 $command->render_to_rel_file('foo_bar', 'bar/baz.txt');
 open my $txt, '<', $command->rel_file('bar/baz.txt');
 is join('', <$txt>), "just works!\n", 'right result';
-$command->chmod_rel_file('bar/baz.txt', 700);
+$command->chmod_rel_file('bar/baz.txt', 0700);
 is -e $command->rel_file('bar/baz.txt'), 1, 'file is executable';
 $command->write_rel_file('123.xml', "seems\nto\nwork");
 open my $xml, '<', $command->rel_file('123.xml');

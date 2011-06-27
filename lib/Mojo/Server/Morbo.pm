@@ -19,6 +19,19 @@ my $STATS = {};
 #  In lighter news, the city of New New York is doomed.
 #  Blame rests with known human Professor Hubert Farnsworth and his tiny,
 #  inferior brain."
+sub check_file {
+  my ($self, $file) = @_;
+
+  # Check if modify time and/or size have changed
+  return unless defined(my $mtime = (stat $file)[9]);
+  my $size = (stat $file)[7];
+  $STATS->{$file} = [$^T, $size] unless exists $STATS->{$file};
+  return if $mtime <= $STATS->{$file}->[0] && $size == $STATS->{$file}->[1];
+  $STATS->{$file} = [$mtime, $size];
+
+  1;
+}
+
 sub run {
   my ($self, $app) = @_;
   warn "MANAGER STARTED $$\n" if DEBUG;
@@ -57,18 +70,10 @@ sub _manage {
   # Check files
   for my $file (@files) {
     warn "CHECKING $file\n" if DEBUG;
-    next unless defined(my $mtime = (stat $file)[9]);
-
-    # Startup time as default
-    $STATS->{$file} = $^T unless defined $STATS->{$file};
-
-    # Modified
-    if ($mtime > $STATS->{$file}) {
-      warn "MODIFIED $file\n" if DEBUG;
-      kill 'TERM', $self->{_running} if $self->{_running};
-      $self->{_modified} = 1;
-      $STATS->{$file} = $mtime;
-    }
+    next unless $self->check_file($file);
+    warn "MODIFIED $file\n" if DEBUG;
+    kill 'TERM', $self->{_running} if $self->{_running};
+    $self->{_modified} = 1;
   }
 
   # Housekeeping
@@ -172,6 +177,12 @@ working directory.
 
 L<Mojo::Server::Morbo> inherits all methods from L<Mojo::Base> and implements
 the following new ones.
+
+=head2 C<check_file>
+
+  $morbo->check_file('script/myapp');
+
+Check if file has changed since last check.
 
 =head2 C<run>
 

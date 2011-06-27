@@ -8,26 +8,47 @@ BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
 use Test::More;
 
+use Cwd 'cwd';
+use File::Temp;
 use FindBin;
 use IO::Socket::INET;
+use Mojo::Command;
 use Mojo::IOLoop;
-use Mojo::Transaction::HTTP;
 use Mojo::UserAgent;
 
 plan skip_all => 'set TEST_MORBO to enable this test (developer only!)'
   unless $ENV{TEST_MORBO};
-plan tests => 40;
+plan tests => 29;
 
 # "Morbo wishes these stalwart nomads peace among the Dutch tulips.
 #  At least all those windmills will keep them cool.
 #  WINDMILLS DO NOT WORK THAT WAY! GOODNIGHT!"
 use_ok 'Mojo::Server::Morbo';
 
+# Prepare script
+my $cwd = cwd;
+my $dir = File::Temp::tempdir(CLEANUP => 1);
+chdir $dir;
+my $command = Mojo::Command->new;
+my $script  = $command->rel_file('myapp.pl');
+my $morbo   = Mojo::Server::Morbo->new;
+ok !$morbo->check_file($script), 'file has not changed';
+$command->write_rel_file('myapp.pl', <<EOF);
+use Mojolicious::Lite;
+
+app->log->level('fatal');
+
+get '/hello' => {text => 'Hello Morbo!'};
+
+app->start;
+EOF
+ok !$morbo->check_file($script), 'file has not changed';
+
 # Start
 my $port   = Mojo::IOLoop->generate_port;
 my $prefix = "$FindBin::Bin/../../script";
 my $pid    = open my $server, '-|', $^X, "$prefix/morbo", '--listen',
-  "http://*:$port", "$prefix/mojo";
+  "http://*:$port", $script;
 sleep 1
   while !IO::Socket::INET->new(
   Proto    => 'tcp',
@@ -37,125 +58,76 @@ sleep 1
 
 my $ua = Mojo::UserAgent->new;
 
-# Single request without keep alive
-my $tx = Mojo::Transaction::HTTP->new;
-$tx->req->method('GET');
-$tx->req->url->parse("http://127.0.0.1:$port/0/");
-$tx->req->headers->connection('close');
-$ua->start($tx);
+# Application is alive
+my $tx = $ua->get("http://127.0.0.1:$port/hello");
 ok $tx->is_done, 'transaction is done';
-is $tx->res->code, 200, 'right status';
-like $tx->res->headers->connection, qr/close/i, 'right "Connection" header';
-like $tx->res->body, qr/Mojo/, 'right content';
+is $tx->res->code, 200,            'right status';
+is $tx->res->body, 'Hello Morbo!', 'right content';
 
-# Multiple requests
-$tx = Mojo::Transaction::HTTP->new;
-$tx->req->method('GET');
-$tx->req->url->parse("http://127.0.0.1:$port/1/");
-my $tx2 = Mojo::Transaction::HTTP->new;
-$tx2->req->method('GET');
-$tx2->req->url->parse("http://127.0.0.1:$port/2/");
-$tx2->req->headers->expect('fun');
-$tx2->req->body('foo bar baz');
-my $tx3 = Mojo::Transaction::HTTP->new;
-$tx3->req->method('GET');
-$tx3->req->url->parse("http://127.0.0.1:$port/3/");
-my $tx4 = Mojo::Transaction::HTTP->new;
-$tx4->req->method('GET');
-$tx4->req->url->parse("http://127.0.0.1:$port/4/");
-$ua->start($tx);
-$ua->start($tx2);
-$ua->start($tx3);
-$ua->start($tx4);
-ok $tx->is_done,  'transaction is done';
-ok $tx2->is_done, 'transaction is done';
-ok $tx3->is_done, 'transaction is done';
-ok $tx4->is_done, 'transaction is done';
-is $tx->res->code,  200, 'right status';
-is $tx2->res->code, 200, 'right status';
-is $tx3->res->code, 200, 'right status';
-is $tx4->res->code, 200, 'right status';
-like $tx2->res->content->asset->slurp, qr/Mojo/, 'right content';
+# Same result
+$tx = $ua->get("http://127.0.0.1:$port/hello");
+ok $tx->is_done, 'transaction is done';
+is $tx->res->code, 200,            'right status';
+is $tx->res->body, 'Hello Morbo!', 'right content';
 
-# Request
-$tx = Mojo::Transaction::HTTP->new;
-$tx->req->method('GET');
-$tx->req->url->parse("http://127.0.0.1:$port/5/");
-$tx->req->headers->expect('fun');
-$tx->req->body('Hello Mojo!');
-$ua->start($tx);
-is $tx->res->code, 200, 'right status';
-like $tx->res->headers->connection, qr/Keep-Alive/i,
-  'right "Connection" header';
-like $tx->res->body, qr/Mojo/, 'right content';
+# Update script without changing size
+my ($size, $mtime) = (stat $script)[7, 9];
+ok !$morbo->check_file($script), 'file has not changed';
+$command->write_rel_file('myapp.pl', <<EOF);
+use Mojolicious::Lite;
 
-# Second keep alive request
-$tx = Mojo::Transaction::HTTP->new;
-$tx->req->method('GET');
-$tx->req->url->parse("http://127.0.0.1:$port/6/");
-$ua->start($tx);
-is $tx->res->code, 200, 'right status';
-is $tx->kept_alive, 1, 'connection was alive';
-like $tx->res->headers->connection,
-  qr/Keep-Alive/i, 'right "Connection" header';
-like $tx->res->body, qr/Mojo/, 'right content';
+app->log->level('fatal');
 
-# Third keep alive request
-$tx = Mojo::Transaction::HTTP->new;
-$tx->req->method('GET');
-$tx->req->url->parse("http://127.0.0.1:$port/7/");
-$ua->start($tx);
-is $tx->res->code, 200, 'right status';
-is $tx->kept_alive, 1, 'connection was kept alive';
-like $tx->res->headers->connection,
-  qr/Keep-Alive/i, 'right "Connection" header';
-like $tx->res->body, qr/Mojo/, 'right content';
+get '/hello' => {text => 'Hello World!'};
 
-# Multiple requests
-$tx = Mojo::Transaction::HTTP->new;
-$tx->req->method('GET');
-$tx->req->url->parse("http://127.0.0.1:$port/8/");
-$tx2 = Mojo::Transaction::HTTP->new;
-$tx2->req->method('GET');
-$tx2->req->url->parse("http://127.0.0.1:$port/9/");
-$ua->start($tx);
-$ua->start($tx2);
-ok $tx->is_done,  'transaction is done';
-ok $tx2->is_done, 'transaction is done';
-is $tx->res->code,  200, 'right status';
-is $tx2->res->code, 200, 'right status';
-like $tx2->res->content->asset->slurp, qr/Mojo/, 'right content';
+app->start;
+EOF
+ok $morbo->check_file($script), 'file has changed';
+ok((stat $script)[9] > $mtime, 'modify time has changed');
+is((stat $script)[7], $size, 'still equal size');
+sleep 1;
 
-# Multiple requests with a chunked response
-$tx = Mojo::Transaction::HTTP->new;
-$tx->req->method('GET');
-$tx->req->url->parse("http://127.0.0.1:$port/10/");
-$tx2 = Mojo::Transaction::HTTP->new;
-$tx2->req->method('GET');
-$tx2->req->url->parse("http://127.0.0.1:$port/11/");
-$tx2->req->headers->expect('fun');
-$tx2->req->body('foo bar baz');
-$tx3 = Mojo::Transaction::HTTP->new;
-$tx3->req->method('GET');
-$tx3->req->url->parse(
-  "http://127.0.0.1:$port/diag/chunked_params?a=foo&b=12");
-$tx4 = Mojo::Transaction::HTTP->new;
-$tx4->req->method('GET');
-$tx4->req->url->parse("http://127.0.0.1:$port/13/");
-$ua->start($tx);
-$ua->start($tx2);
-$ua->start($tx3);
-$ua->start($tx4);
-ok $tx->is_done,  'transaction is done';
-ok $tx2->is_done, 'transaction is done';
-ok $tx3->is_done, 'transaction is done';
-ok $tx4->is_done, 'transaction is done';
-is $tx->res->code,  200, 'right status';
-is $tx2->res->code, 200, 'right status';
-is $tx3->res->code, 200, 'right status';
-is $tx4->res->code, 200, 'right status';
-like $tx2->res->content->asset->slurp, qr/Mojo/, 'right content';
-is $tx3->res->content->asset->slurp,   'foo12',  'right content';
+# Application has been reloaded
+$tx = $ua->get("http://127.0.0.1:$port/hello");
+ok $tx->is_done, 'transaction is done';
+is $tx->res->code, 200,            'right status';
+is $tx->res->body, 'Hello World!', 'right content';
+
+# Same result
+$tx = $ua->get("http://127.0.0.1:$port/hello");
+ok $tx->is_done, 'transaction is done';
+is $tx->res->code, 200,            'right status';
+is $tx->res->body, 'Hello World!', 'right content';
+
+# Update script without changing mtime
+($size, $mtime) = (stat $script)[7, 9];
+ok !$morbo->check_file($script), 'file has not changed';
+$command->write_rel_file('myapp.pl', <<EOF);
+use Mojolicious::Lite;
+
+app->log->level('fatal');
+
+get '/hello' => {text => 'Hello!'};
+
+app->start;
+EOF
+utime $mtime, $mtime, $script;
+ok $morbo->check_file($script), 'file has changed';
+ok((stat $script)[9] == $mtime, 'modify time has not changed');
+isnt((stat $script)[7], $size, 'size has changed');
+sleep 1;
+
+# Application has been reloaded again
+$tx = $ua->get("http://127.0.0.1:$port/hello");
+ok $tx->is_done, 'transaction is done';
+is $tx->res->code, 200,      'right status';
+is $tx->res->body, 'Hello!', 'right content';
+
+# Same result
+$tx = $ua->get("http://127.0.0.1:$port/hello");
+ok $tx->is_done, 'transaction is done';
+is $tx->res->code, 200,      'right status';
+is $tx->res->body, 'Hello!', 'right content';
 
 # Stop
 kill 'INT', $pid;
@@ -165,3 +137,6 @@ sleep 1
   PeerAddr => 'localhost',
   PeerPort => $port
   );
+
+# Cleanup
+chdir $cwd;

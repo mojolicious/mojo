@@ -88,7 +88,7 @@ plugin 'PluginWithEmbeddedApp';
 
 app->routes->namespace('MyTestApp');
 
-# Mount full external application twice
+# Mount full external application a few times
 use FindBin;
 my $external = "$FindBin::Bin/external/myapp.pl";
 plugin mount => {'/x/1' => $external};

@@ -403,21 +403,23 @@ Routes can be restricted to specific request methods.
 
 =head2 Route Constraints
 
-All placeholders get compiled to a regex internally, with regex constraints
-this process can be easily customized.
+The simplest form of route constraints available are alternatives, you just
+make a list of possible values.
 
-  # /1
+  # /test
   # /123
-  any '/:foo' => [foo => qr/\d+/] => sub {
+  any '/:foo' => [foo => [qw/test 123/]] => sub {
     my $self = shift;
     my $foo  = $self->param('foo');
     $self->render(text => "Our :foo placeholder matched $foo");
   };
 
-  # /test
-  # /test.123
-  # /test/1.2.3
-  any '/:bar' => [bar => qr/.*/] => sub {
+All placeholders get compiled to a regex internally, with regex constraints
+this process can be easily customized.
+
+  # /1
+  # /123
+  any '/:bar' => [bar => qr/\d+/] => sub {
     my $self = shift;
     my $bar  = $self->param('bar');
     $self->render(text => "Our :bar placeholder matched $bar");

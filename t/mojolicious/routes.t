@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 237;
+use Test::More tests => 289;
 
 # "They're not very heavy, but you don't hear me not complaining."
 use_ok 'Mojolicious::Routes';
@@ -20,6 +20,17 @@ $r->route('/clean/too')->to(something => 1);
 
 # /0
 $r->route('/0')->to(null => 1);
+
+# /alternatives
+# /alternatives/0
+# /alternatives/test
+# /alternatives/23
+$r->route('/alternatives/:foo', foo => [qw/0 test 23/])->to(foo => 11);
+
+# /alternatives2/0
+# /alternatives2/test
+# /alternatives2/23
+$r->route('/alternatives2/:foo', foo => [qw/0 test 23/]);
 
 # /*/test
 my $test = $r->route('/:controller/test')->to(action => 'test');
@@ -89,6 +100,17 @@ $r->route('/format3/:foo.html')->to(controller => 'me', action => 'bye');
 
 # /format3/*.json
 $r->route('/format3/:foo.json')->to(controller => 'me', action => 'bye_json');
+
+# /format4
+# /format4.txt
+$r->route('/format4', format => qr/txt/)
+  ->to(controller => 'we', action => 'howdy');
+
+# /format5
+# /format5.txt
+# /format5.text
+$r->route('/format5', format => [qw/txt text/])
+  ->to(controller => 'we', action => 'cheers');
 
 # /articles
 # /articles.html
@@ -161,6 +183,56 @@ is @{$m->stack}, 1, 'right number of elements';
 $m = Mojolicious::Routes::Match->new(get => '/0')->match($r);
 is $m->stack->[0]->{null}, 1, 'right value';
 is $m->path_for, '/0', 'right path';
+
+# Alternatives with default
+$m = Mojolicious::Routes::Match->new(get => '/alternatives')->match($r);
+is $m->stack->[0]->{foo}, 11, 'right value';
+is @{$m->stack}, 1, 'right number of elements';
+is $m->path_for, '/alternatives', 'right path';
+$m = Mojolicious::Routes::Match->new(get => '/alternatives/0')->match($r);
+is $m->stack->[0]->{foo}, 0, 'right value';
+is @{$m->stack}, 1, 'right number of elements';
+is $m->path_for, '/alternatives/0', 'right path';
+$m = Mojolicious::Routes::Match->new(get => '/alternatives/test')->match($r);
+is $m->stack->[0]->{foo}, 'test', 'right value';
+is @{$m->stack}, 1, 'right number of elements';
+is $m->path_for, '/alternatives/test', 'right path';
+$m = Mojolicious::Routes::Match->new(get => '/alternatives/23')->match($r);
+is $m->stack->[0]->{foo}, 23, 'right value';
+is @{$m->stack}, 1, 'right number of elements';
+is $m->path_for, '/alternatives/23', 'right path';
+$m = Mojolicious::Routes::Match->new(get => '/alternatives/24')->match($r);
+is @{$m->stack}, 0, 'right number of elements';
+$m = Mojolicious::Routes::Match->new(get => '/alternatives/tset')->match($r);
+is @{$m->stack}, 0, 'right number of elements';
+$m = Mojolicious::Routes::Match->new(get => '/alternatives/00')->match($r);
+is @{$m->stack}, 0, 'right number of elements';
+is $m->path_for('alternativesfoo'), '/alternatives', 'right path';
+
+# Alternatives without default
+$m = Mojolicious::Routes::Match->new(get => '/alternatives2')->match($r);
+is @{$m->stack}, 0, 'right number of elements';
+$m = Mojolicious::Routes::Match->new(get => '/alternatives2/0')->match($r);
+is $m->stack->[0]->{foo}, 0, 'right value';
+is @{$m->stack}, 1, 'right number of elements';
+is $m->path_for, '/alternatives2/0', 'right path';
+$m = Mojolicious::Routes::Match->new(get => '/alternatives2/test')->match($r);
+is $m->stack->[0]->{foo}, 'test', 'right value';
+is @{$m->stack}, 1, 'right number of elements';
+is $m->path_for, '/alternatives2/test', 'right path';
+$m = Mojolicious::Routes::Match->new(get => '/alternatives2/23')->match($r);
+is $m->stack->[0]->{foo}, 23, 'right value';
+is @{$m->stack}, 1, 'right number of elements';
+is $m->path_for, '/alternatives2/23', 'right path';
+$m = Mojolicious::Routes::Match->new(get => '/alternatives2/24')->match($r);
+is @{$m->stack}, 0, 'right number of elements';
+$m = Mojolicious::Routes::Match->new(get => '/alternatives2/tset')->match($r);
+is @{$m->stack}, 0, 'right number of elements';
+$m = Mojolicious::Routes::Match->new(get => '/alternatives2/00')->match($r);
+is @{$m->stack}, 0, 'right number of elements';
+is $m->path_for('alternatives2foo'), '/alternatives2', 'right path';
+is $m->path_for('alternatives2foo', foo => 0), '/alternatives2/0',
+  'right path';
 
 # Real world example using most features at once
 $m = Mojolicious::Routes::Match->new(get => '/articles.html')->match($r);
@@ -389,6 +461,36 @@ is $m->stack->[0]->{format},     'json',     'right value';
 is $m->stack->[0]->{foo},        'baz',      'right value';
 is $m->path_for, '/format3/baz.json', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
+$m = Mojolicious::Routes::Match->new(GET => '/format4')->match($r);
+is @{$m->stack}, 0, 'right number of elements';
+$m = Mojolicious::Routes::Match->new(GET => '/format4.txt')->match($r);
+is $m->stack->[0]->{controller}, 'we',    'right value';
+is $m->stack->[0]->{action},     'howdy', 'right value';
+is $m->stack->[0]->{format},     'txt',   'right value';
+is $m->path_for, '/format4.txt', 'right path';
+is @{$m->stack}, 1, 'right number of elements';
+$m = Mojolicious::Routes::Match->new(GET => '/format4.html')->match($r);
+is @{$m->stack}, 0, 'right number of elements';
+$m = Mojolicious::Routes::Match->new(GET => '/format4.txt.txt')->match($r);
+is @{$m->stack}, 0, 'right number of elements';
+$m = Mojolicious::Routes::Match->new(GET => '/format5')->match($r);
+is @{$m->stack}, 0, 'right number of elements';
+$m = Mojolicious::Routes::Match->new(GET => '/format5.txt')->match($r);
+is $m->stack->[0]->{controller}, 'we',     'right value';
+is $m->stack->[0]->{action},     'cheers', 'right value';
+is $m->stack->[0]->{format},     'txt',    'right value';
+is $m->path_for, '/format5.txt', 'right path';
+is @{$m->stack}, 1, 'right number of elements';
+$m = Mojolicious::Routes::Match->new(GET => '/format5.text')->match($r);
+is $m->stack->[0]->{controller}, 'we',     'right value';
+is $m->stack->[0]->{action},     'cheers', 'right value';
+is $m->stack->[0]->{format},     'text',   'right value';
+is $m->path_for, '/format5.text', 'right path';
+is @{$m->stack}, 1, 'right number of elements';
+$m = Mojolicious::Routes::Match->new(GET => '/format5.html')->match($r);
+is @{$m->stack}, 0, 'right number of elements';
+$m = Mojolicious::Routes::Match->new(GET => '/format5.txt.txt')->match($r);
+is @{$m->stack}, 0, 'right number of elements';
 
 # Request methods
 $m = Mojolicious::Routes::Match->new(get => '/method/get.html')->match($r);

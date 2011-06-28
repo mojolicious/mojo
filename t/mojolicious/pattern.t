@@ -63,12 +63,12 @@ is $result, undef, 'no result';
 
 # Format
 $pattern = Mojolicious::Routes::Pattern->new('/(controller)test/(action)');
-is $pattern->format, undef, 'no value';
+is $pattern->defaults->{format}, undef, 'no value';
 $pattern =
   Mojolicious::Routes::Pattern->new('/(:controller)test/:action.html');
-is $pattern->format, 'html', 'right value';
+is $pattern->defaults->{format}, 'html', 'right value';
 $pattern = Mojolicious::Routes::Pattern->new('/index.cgi');
-is $pattern->format, 'cgi', 'right value';
+is $pattern->defaults->{format}, 'cgi', 'right value';
 
 # Relaxed
 $pattern = Mojolicious::Routes::Pattern->new('/test/(.controller)/:action');
@@ -79,7 +79,7 @@ is $pattern->render({controller => 'foo.bar', action => 'baz'}),
   '/test/foo.bar/baz', 'right result';
 $pattern = Mojolicious::Routes::Pattern->new('/test/(.groovy)');
 $result  = $pattern->match('/test/foo.bar');
-is $pattern->format, undef, 'no value';
+is $pattern->defaults->{format}, undef, 'no value';
 is $result->{groovy}, 'foo.bar', 'right value';
 is $result->{format}, undef,     'no value';
 is $pattern->render({groovy => 'foo.bar'}), '/test/foo.bar', 'right result';

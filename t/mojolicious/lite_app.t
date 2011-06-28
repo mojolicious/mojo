@@ -11,7 +11,7 @@ BEGIN {
   $ENV{MOJO_MODE} = 'development';
 }
 
-use Test::More tests => 836;
+use Test::More tests => 861;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -89,6 +89,13 @@ get '/conditional' => (
 
 # GET /
 get '/' => 'root';
+
+# GET /alternatives/☃
+# GET /alternatives/♥
+get '/alternatives/:char' => [char => [qw/☃ ♥/]] => sub {
+  my $self = shift;
+  $self->render_text($self->url_for);
+};
 
 # DELETE /
 del sub { shift->render(text => 'Hello!') };
@@ -794,6 +801,33 @@ $t->delete_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
 # POST /
 $t->post_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('Bye!');
+
+# GET /alternatives/☃
+$t->get_ok('/alternatives/☃')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('/alternatives/%E2%98%83');
+
+# GET /alternatives/♥
+$t->get_ok('/alternatives/♥')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('/alternatives/%E2%99%A5');
+
+# GET /alternatives/☃23 (invalid alternative)
+$t->get_ok('/alternatives/☃23')->status_is(404)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is("Oops!\n");
+
+# GET /alternatives (invalid alternative)
+$t->get_ok('/alternatives')->status_is(404)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is("Oops!\n");
+
+# GET /alternatives/test (invalid alternative)
+$t->get_ok('/alternatives/test')->status_is(404)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is("Oops!\n");
 
 # POST /multipart/form ("application/x-www-form-urlencoded")
 $t->post_form_ok('/multipart/form', {test => [1 .. 5]})->status_is(200)

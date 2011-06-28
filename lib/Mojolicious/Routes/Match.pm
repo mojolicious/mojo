@@ -82,15 +82,8 @@ sub match {
     $empty = 1;
   }
 
-  # Format
-  my $endpoint = $r->is_endpoint;
-  if ($endpoint && !$pattern->format && $path =~ /^\/?\.([^\/]+)$/) {
-    $captures->{format} = $1;
-    $empty = 1;
-  }
-  $captures->{format} ||= $pattern->format if $pattern->format;
-
   # Update stack
+  my $endpoint = $r->is_endpoint;
   if ($r->inline || ($endpoint && $empty)) {
     push @{$self->stack}, {%$captures};
     delete $captures->{cb};
@@ -200,6 +193,12 @@ sub path_for {
 
   # Merge values
   $values = {%$captures, format => undef, %$values};
+  my $pattern = $endpoint->pattern;
+  $values->{format} =
+    defined $captures->{format}
+    ? $captures->{format}
+    : $pattern->defaults->{format}
+    if $pattern->reqs->{format};
 
   # Render
   my $path = $endpoint->render('', $values);

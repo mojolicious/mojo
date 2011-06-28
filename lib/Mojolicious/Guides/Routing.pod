@@ -501,8 +501,17 @@ will be broken, this makes bridges a very powerful tool for authentication.
 
 =head2 More Restrictive Placeholders
 
-You can adjust the regular expressions behind placeholders to better suit
-your needs.
+A very easy way to make placeholders more restrictive are alternatives, you
+just make a list of possible values.
+
+  # /bender -> {controller => 'foo', action => 'bar', name => 'bender'}
+  # /leela  -> {controller => 'foo', action => 'bar', name => 'leela'}
+  # /fry    -> undef
+  $r->route('/:name', name => [qw/bender leela/])
+    ->to(controller => 'foo', action => 'bar');
+
+You can also adjust the regular expressions behind placeholders to better
+suit your needs.
 Just make sure not to use C<^> and C<$> or capturing groups C<(...)>, because
 placeholders become part of a larger regular expression internally,
 C<(?:...)> is fine though.

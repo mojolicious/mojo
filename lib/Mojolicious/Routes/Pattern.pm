@@ -34,12 +34,15 @@ sub parse {
   return $self if !defined $pattern || $pattern eq '/';
   $pattern = "/$pattern" unless $pattern =~ /^\//;
 
-  # Format
-  if ($pattern =~ /\.([^\/\)]+)$/) { $self->format($1) }
-
   # Requirements
   my $reqs = ref $_[0] eq 'HASH' ? $_[0] : {@_};
   $self->reqs($reqs);
+
+  # Format
+  if ($pattern =~ s/\.([^\/\)]+)$//) {
+    $reqs->{format} = quotemeta $1;
+    $self->defaults->{format} = $1;
+  }
 
   # Tokenize
   $self->pattern($pattern);
@@ -110,6 +113,12 @@ sub shape_match {
       my $capture = shift @captures;
       $result->{$symbol} = $capture if defined $capture;
     }
+
+    # Format
+    my $format = $self->format;
+    if ($$pathref =~ s/$format//) { $result->{format} ||= $1 }
+    elsif ($self->reqs->{format}) {return}
+
     return $result;
   }
 
@@ -119,10 +128,17 @@ sub shape_match {
 sub _compile {
   my $self = shift;
 
+  # Compile format regular expression
+  my $reqs = $self->reqs;
+  my $format =
+    defined $reqs->{format} ? _compile_req($reqs->{format}) : '([^\/]+)';
+  $self->format(qr/^\/?\.$format$/);
+
   # Compile tree to regular expression
   my $block    = '';
   my $regex    = '';
   my $optional = 1;
+  my $defaults = $self->defaults;
   for my $token (reverse @{$self->tree}) {
     my $op       = $token->[0];
     my $compiled = '';
@@ -132,10 +148,8 @@ sub _compile {
 
       # Full block
       $block = $optional ? "(?:/$block)?" : "/$block";
-
       $regex = "$block$regex";
       $block = '';
-
       next;
     }
 
@@ -160,11 +174,11 @@ sub _compile {
       elsif ($op eq 'wildcard') { $compiled = '(.+)' }
 
       # Custom regex
-      my $req = $self->reqs->{$name};
-      $compiled = "($req)" if $req;
+      my $req = $reqs->{$name};
+      $compiled = _compile_req($req) if $req;
 
       # Optional placeholder
-      $optional = 0 unless exists $self->defaults->{$name};
+      $optional = 0 unless exists $defaults->{$name};
       $compiled .= '?' if $optional;
     }
 
@@ -175,10 +189,17 @@ sub _compile {
   # Not rooted with a slash
   $regex = "$block$regex" if $block;
 
+  # Compile
   $regex = qr/^$regex/;
   $self->regex($regex);
 
   $regex;
+}
+
+sub _compile_req {
+  my $req = shift;
+  return "($req)" if !ref $req || ref $req ne 'ARRAY';
+  '(' . join('|', @$req) . ')';
 }
 
 sub _tokenize {
@@ -301,6 +322,14 @@ L<Mojolicious::Routes::Pattern> implements the following attributes.
 
 Default parameters.
 
+=head2 C<format>
+
+  my $regex = $pattern->format;
+  $pattern  = $pattern->format($regex);
+
+Compiled regex for format matching.
+Note that this attribute is EXPERIMENTAL and might change without warning!
+
 =head2 C<pattern>
 
   my $pattern = $pattern->pattern;
@@ -325,7 +354,7 @@ Character indicating the start of a quoted placeholder, defaults to C<(>.
 =head2 C<regex>
 
   my $regex = $pattern->regex;
-  $pattern  = $pattern->regex(qr/\/foo/);
+  $pattern  = $pattern->regex($regex;
 
 Pattern in compiled regex form.
 

@@ -11,7 +11,7 @@ BEGIN {
   $ENV{MOJO_MODE} = 'development';
 }
 
-use Test::More tests => 826;
+use Test::More tests => 836;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -234,8 +234,11 @@ get '/finished' => sub {
 get '/привет/мир' =>
   sub { shift->render(text => 'привет мир') };
 
-# GET /root
+# GET /root.html
 get '/root.html' => 'root_path';
+
+# GET /root
+get '/root' => sub { shift->render_text('root fallback!') };
 
 # GET /template.txt
 get '/template.txt' => 'template';
@@ -1008,10 +1011,21 @@ $t->get_ok('/привет/мир')->status_is(200)
   ->content_type_is('text/html;charset=UTF-8')
   ->content_is('привет мир');
 
-# GET /root
+# GET /root.html
 $t->get_ok('/root.html')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is("/\n");
+
+# GET /root (fallback route without format)
+$t->get_ok('/root')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('root fallback!');
+
+# GET /root.txt (fallback route without format)
+$t->get_ok('/root.txt')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('root fallback!');
 
 # GET /.html
 $t->get_ok('/.html')->status_is(200)

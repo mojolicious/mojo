@@ -312,6 +312,16 @@ automatically detected and stored in the stash value C<format>.
 
 This for example allows multiple templates for different formats to share the
 same code.
+You can also mention a format in the route pattern to only match one.
+
+  # /foo.txt -> {controller => 'foo', action => 'bar', format => 'txt'}
+  $r->route('/foo.txt')->to(controller => 'foo', action => 'text');
+
+  # /foo      -> {controller => 'foo', action => 'bar'}
+  # /foo.html -> {controller => 'foo', action => 'bar', format => 'html'}
+  $r->route('/foo')->to(controller => 'foo', action => 'html');
+
+Just make sure the more specific ones go first.
 
 =head2 Placeholders And Destinations
 

@@ -354,7 +354,7 @@ Character indicating the start of a quoted placeholder, defaults to C<(>.
 =head2 C<regex>
 
   my $regex = $pattern->regex;
-  $pattern  = $pattern->regex($regex;
+  $pattern  = $pattern->regex($regex);
 
 Pattern in compiled regex form.
 

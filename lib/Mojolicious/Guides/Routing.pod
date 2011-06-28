@@ -300,6 +300,36 @@ callback instead.
 This technique is the foundation of L<Mojolicious::Lite>, you can learn more
 about it from the included tutorial.
 
+=head2 More Restrictive Placeholders
+
+A very easy way to make placeholders more restrictive are alternatives, you
+just make a list of possible values.
+
+  # /bender -> {controller => 'foo', action => 'bar', name => 'bender'}
+  # /leela  -> {controller => 'foo', action => 'bar', name => 'leela'}
+  # /fry    -> undef
+  $r->route('/:name', name => [qw/bender leela/])
+    ->to(controller => 'foo', action => 'bar');
+
+You can also adjust the regular expressions behind placeholders to better
+suit your needs.
+Just make sure not to use C<^> and C<$> or capturing groups C<(...)>, because
+placeholders become part of a larger regular expression internally,
+C<(?:...)> is fine though.
+
+  # /23   -> {controller => 'foo', action => 'bar', number => 23}
+  # /test -> undef
+  $r->route('/:number', number => qr/\d+/)
+    ->to(controller => 'foo', action => 'bar');
+
+  # /23   -> undef
+  # /test -> {controller => 'foo', action => 'bar', name => 'test'}
+  $r->route('/:name', name => qr/[a-zA-Z]+/)
+    ->to(controller => 'foo', action => 'bar');
+
+This way you get easily readable routes and the raw power of regular
+expressions.
+
 =head2 Formats
 
 File extensions like C<.html> and C<.txt> at the end of a route are
@@ -312,16 +342,23 @@ automatically detected and stored in the stash value C<format>.
 
 This for example allows multiple templates for different formats to share the
 same code.
-You can also mention a format in the route pattern to only match one.
+You can also mention a format in the route pattern to only match one, just
+make sure the more specific routes go first.
 
   # /foo.txt -> {controller => 'foo', action => 'text', format => 'txt'}
   $r->route('/foo.txt')->to(controller => 'foo', action => 'text');
 
-  # /foo      -> {controller => 'foo', action => 'html'}
-  # /foo.html -> {controller => 'foo', action => 'html', format => 'html'}
-  $r->route('/foo')->to(controller => 'foo', action => 'html');
+  # /foo      -> {controller => 'foo', action => 'hyper'}
+  # /foo.html -> {controller => 'foo', action => 'hyper', format => 'html'}
+  $r->route('/foo')->to(controller => 'foo', action => 'hyper');
 
-Just make sure the more specific ones go first.
+Restrictive placeholders can also be used for format detection.
+
+  # /foo.rss -> {controller => 'foo', action => 'feed', format => 'rss'}
+  # /foo.xml -> {controller => 'foo', action => 'feed', format => 'xml'}
+  # /foo.txt -> undef
+  $r->route('/foo', format => [qw/rss xml/])
+    ->to(controller => 'foo', action => 'feed');
 
 =head2 Placeholders And Destinations
 
@@ -498,36 +535,6 @@ will be broken, this makes bridges a very powerful tool for authentication.
     return;
   });
   $foo->route('/bar')->to(controller => 'foo', action => 'bar');
-
-=head2 More Restrictive Placeholders
-
-A very easy way to make placeholders more restrictive are alternatives, you
-just make a list of possible values.
-
-  # /bender -> {controller => 'foo', action => 'bar', name => 'bender'}
-  # /leela  -> {controller => 'foo', action => 'bar', name => 'leela'}
-  # /fry    -> undef
-  $r->route('/:name', name => [qw/bender leela/])
-    ->to(controller => 'foo', action => 'bar');
-
-You can also adjust the regular expressions behind placeholders to better
-suit your needs.
-Just make sure not to use C<^> and C<$> or capturing groups C<(...)>, because
-placeholders become part of a larger regular expression internally,
-C<(?:...)> is fine though.
-
-  # /23   -> {controller => 'foo', action => 'bar', number => 23}
-  # /test -> undef
-  $r->route('/:number', number => qr/\d+/)
-    ->to(controller => 'foo', action => 'bar');
-
-  # /23   -> undef
-  # /test -> {controller => 'foo', action => 'bar', name => 'test'}
-  $r->route('/:name', name => qr/[a-zA-Z]+/)
-    ->to(controller => 'foo', action => 'bar');
-
-This way you get easily readable routes and the raw power of regular
-expressions.
 
 =head2 Shortcuts
 

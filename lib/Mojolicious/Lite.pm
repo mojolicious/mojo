@@ -401,34 +401,6 @@ Routes can be restricted to specific request methods.
     $self->render(text => "You called /baz with $method");
   };
 
-=head2 Route Constraints
-
-The simplest form of route constraints available are alternatives, you just
-make a list of possible values.
-
-  # /test
-  # /123
-  any '/:foo' => [foo => [qw/test 123/]] => sub {
-    my $self = shift;
-    my $foo  = $self->param('foo');
-    $self->render(text => "Our :foo placeholder matched $foo");
-  };
-
-All placeholders get compiled to a regex internally, with regex constraints
-this process can be easily customized.
-
-  # /1
-  # /123
-  any '/:bar' => [bar => qr/\d+/] => sub {
-    my $self = shift;
-    my $bar  = $self->param('bar');
-    $self->render(text => "Our :bar placeholder matched $bar");
-  };
-
-Just make sure not to use C<^> and C<$> or capturing groups C<(...)>, because
-placeholders become part of a larger regular expression internally,
-C<(?:...)> is fine though.
-
 =head2 Optional Placeholders
 
 Routes allow default values to make placeholders optional.
@@ -445,70 +417,65 @@ Routes allow default values to make placeholders optional.
   @@ groovy.txt.ep
   My name is <%= $name %>.
 
-=head2 A Little Bit Of Everything
+=head2 Restrictive Placeholders
 
-All those features can be easily used together.
+The easiest way to make placeholders more restrictive are alternatives, you
+just make a list of possible values.
 
-  # /everything?name=Sebastian
-  # /everything/123?name=Sebastian
-  get '/everything/:stuff' => [stuff => qr/\d+/] => {stuff => 23} => sub {
-    shift->render('welcome');
+  # /test
+  # /123
+  any '/:foo' => [foo => [qw/test 123/]] => sub {
+    my $self = shift;
+    my $foo  = $self->param('foo');
+    $self->render(text => "Our :foo placeholder matched $foo");
+  };
+
+All placeholders get compiled to a regex internally, this process can also be
+easily customized.
+
+  # /1
+  # /123
+  any '/:bar' => [bar => qr/\d+/] => sub {
+    my $self = shift;
+    my $bar  = $self->param('bar');
+    $self->render(text => "Our :bar placeholder matched $bar");
+  };
+
+Just make sure not to use C<^> and C<$> or capturing groups C<(...)>, because
+placeholders become part of a larger regular expression internally,
+C<(?:...)> is fine though.
+
+=head2 Formats
+
+Formats can be automatically detected by looking at file extensions.
+
+  # /detection.html
+  # /detection.txt
+  get '/detection' => sub {
+    my $self = shift;
+    $self->render('detected');
   };
 
   __DATA__
 
-  @@ welcome.html.ep
-  Stuff is <%= $stuff %>.
-  Query param name is <%= param 'name' %>.
-
-Here's a fully functional example for a html form handling application using
-multiple features at once.
-
-  #!/usr/bin/env perl
-  use Mojolicious::Lite;
-
-  get '/' => 'index';
-
-  post '/test' => sub {
-    my $self = shift;
-
-    my $groovy = $self->param('groovy') || 'Austin Powers';
-    $groovy =~ s/[^\w\s]+//g;
-
-    $self->render(
-      template => 'welcome',
-      title    => 'Welcome!',
-      layout   => 'funky',
-      groovy   => $groovy
-    );
-  } => 'test';
-
-  app->start;
-  __DATA__
-
-  @@ index.html.ep
-  % title 'Groovy!';
-  % layout 'funky';
-  Who is groovy?
-  <%= form_for test => (method => 'post') => begin %>
-    <%= text_field 'groovy' %>
-    <%= submit_button 'Woosh!' %>
-  <% end %>
-
-  @@ welcome.html.ep
-  <%= $groovy %> is groovy!
-  <%= include 'menu' %>
-
-  @@ menu.html.ep
-  <%= link_to index => begin %>
-    Try again
-  <% end %>
-
-  @@ layouts/funky.html.ep
+  @@ detected.html.ep
   <!doctype html><html>
-    <head><title><%= title %></title></head>
-    <body><%= content %></body>
+    <head><title>Detected!</title></head>
+    <body>HTML was detected.</body>
   </html>
+
+  @@ detected.txt.ep
+  TXT was detected.
+
+Restrictive placeholders can also be used for format detection.
+
+  # /hello.json
+  # /hello.txt
+  get '/hello' => [format => [qw/json txt/]] => sub {
+    my $self = shift;
+    return $self->render_json({hello => 'world!'});
+    $self->render_text('hello world!');
+  };
 
 =head2 Under
 
@@ -585,28 +552,6 @@ routes responding to the same path without conditions attached, since those
 would otherwise get precedence once cached.
 
   app->routes->cache(0);
-
-=head2 Formats
-
-Formats can be automatically detected by looking at file extensions.
-
-  # /detection.html
-  # /detection.txt
-  get '/detection' => sub {
-    my $self = shift;
-    $self->render('detected');
-  };
-
-  __DATA__
-
-  @@ detected.html.ep
-  <!doctype html><html>
-    <head><title>Detected!</title></head>
-    <body>HTML was detected.</body>
-  </html>
-
-  @@ detected.txt.ep
-  TXT was detected.
 
 =head2 Sessions
 

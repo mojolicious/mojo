@@ -283,7 +283,7 @@ The C<controller> is always appended to the C<namespace> if available.
   # /bye -> MyApp::Controller::Foo->bye
   $r->route('/bye')->to('foo#bye', namespace => 'MyApp::Controller');
 
-You can also change the default namespace for all routes.
+You can also change the default namespace for all routes in the application.
 
   $r->namespace('MyApp::Controller');
 

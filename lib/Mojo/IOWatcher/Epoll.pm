@@ -1,5 +1,5 @@
 package Mojo::IOWatcher::Epoll;
-use Mojo::Base 'Mojo::IOWatcher::Poll';
+use Mojo::Base 'Mojo::IOWatcher';
 
 use IO::Epoll 0.02 ':compat';
 use Time::HiRes 'usleep';

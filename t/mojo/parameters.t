@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 62;
+use Test::More tests => 63;
 
 # "Now that's a wave of destruction that's easy on the eyes."
 use_ok 'Mojo::Parameters';
@@ -146,3 +146,8 @@ $params->parse('input=say%20%22%C2%AB%22;');
 is $params->params->[1], 'say "«"', 'right value';
 is $params->param('input'), 'say "«"', 'right value';
 is "$params", 'input=say+%22%C2%AB%22', 'right result';
+
+# Reparse
+$params = Mojo::Parameters->new('foo=bar&baz=23');
+$params->parse('foo=bar&baz=23');
+is "$params", 'foo=bar&baz=23', 'right result';

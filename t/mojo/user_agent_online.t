@@ -33,7 +33,7 @@ $ua->get(
 $loop->start;
 $ua = undef;
 my $ticks     = 0;
-my $recurring = $loop->recurring(sub { $ticks++ });
+my $recurring = $loop->recurring(0 => sub { $ticks++ });
 my $idle      = $loop->idle(sub { $loop->stop });
 $loop->start;
 $loop->drop($recurring);

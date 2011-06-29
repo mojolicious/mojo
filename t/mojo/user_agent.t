@@ -184,7 +184,7 @@ is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
 # Close connection (bypassing safety net)
-Mojo::IOLoop->singleton->_drop_immediately($last);
+Mojo::IOLoop->singleton->_drop($last);
 
 # GET / (mock server closed connection)
 $tx = $ua->get("http://localhost:$port/mock");
@@ -201,7 +201,7 @@ is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
 # Close connection (bypassing safety net)
-Mojo::IOLoop->singleton->_drop_immediately($last);
+Mojo::IOLoop->singleton->_drop($last);
 
 # GET / (mock server closed connection)
 $tx = $ua->get("http://localhost:$port/mock");

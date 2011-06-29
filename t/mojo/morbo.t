@@ -84,7 +84,7 @@ EOF
 ok $morbo->check_file($script), 'file has changed';
 ok((stat $script)[9] > $mtime, 'modify time has changed');
 is((stat $script)[7], $size, 'still equal size');
-sleep 1;
+sleep 3;
 sleep 1
   while !IO::Socket::INET->new(
   Proto    => 'tcp',
@@ -120,7 +120,7 @@ utime $mtime, $mtime, $script;
 ok $morbo->check_file($script), 'file has changed';
 ok((stat $script)[9] == $mtime, 'modify time has not changed');
 isnt((stat $script)[7], $size, 'size has changed');
-sleep 1;
+sleep 3;
 sleep 1
   while !IO::Socket::INET->new(
   Proto    => 'tcp',

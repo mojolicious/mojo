@@ -94,7 +94,7 @@ has iowatcher => sub {
   }
 
   # "epoll"
-  elsif (EPOLL) {
+  if (EPOLL) {
     warn "EPOLL MAINLOOP\n" if DEBUG;
     return Mojo::IOWatcher::Epoll->new;
   }
@@ -127,10 +127,17 @@ sub DESTROY {
 sub new {
   my $class = shift;
 
-  # Build new loop from singleton if possible
+  # Build new loop from singleton and inherit watcher
   my $loop = $LOOP;
   local $LOOP = undef;
-  my $self = $loop ? $loop->new(@_) : $class->SUPER::new(@_);
+  my $self;
+  if ($loop) {
+    $self = $loop->new(@_);
+    $self->iowatcher($loop->iowatcher->new);
+  }
+
+  # Start from scratch
+  else { $self = $class->SUPER::new(@_) }
 
   # Ignore PIPE signal
   $SIG{PIPE} = 'IGNORE';

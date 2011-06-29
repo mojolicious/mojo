@@ -6,17 +6,27 @@ use warnings;
 # Disable IPv6, epoll and kqueue
 BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 13;
-
-use_ok 'Mojo::IOLoop';
-
-use IO::Handle;
+use Test::More tests => 14;
 
 # "Marge, you being a cop makes you the man!
 #  Which makes me the woman, and I have no interest in that,
 #  besides occasionally wearing the underwear,
 #  which as we discussed, is strictly a comfort thing."
+use_ok 'Mojo::IOLoop';
+
+use IO::Handle;
+
+# Custom watcher
+package MyWatcher;
+use Mojo::Base 'Mojo::IOWatcher';
+
+package main;
+Mojo::IOLoop->singleton->iowatcher(MyWatcher->new);
+
+# Watcher inheritance
 my $loop = Mojo::IOLoop->new;
+Mojo::IOLoop->iowatcher(MyWatcher->new);
+is ref $loop->iowatcher, 'MyWatcher', 'right class';
 
 # Readonly handle
 my $ro = IO::Handle->new;

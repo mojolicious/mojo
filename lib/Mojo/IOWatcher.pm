@@ -6,6 +6,11 @@ use Time::HiRes 'usleep';
 
 use constant DEBUG => $ENV{MOJO_IOWATCHER_DEBUG} || 0;
 
+# "I don't know.
+#  Can I really betray my country?
+#  I say the Pledge of Allegiance every day.
+#  You pledge allegiance to the flag.
+#  And the flag is made in China."
 sub add {
   my $self   = shift;
   my $handle = shift;
@@ -64,6 +69,7 @@ sub on_writable {
   $self;
 }
 
+# "This was such a pleasant St. Patrick's Day until Irish people showed up."
 sub one_tick {
   my ($self, $timeout) = @_;
 
@@ -113,6 +119,8 @@ sub remove {
   $self;
 }
 
+# "Bart, how did you get a cellphone?
+#  The same way you got me, by accident on a golf course."
 sub timer {
   my $self = shift;
   $self->_event(_timers => pop, after => pop, started => time);

@@ -99,8 +99,6 @@ sub put {
   $self->start($self->build_tx('PUT', @_));
 }
 
-# "Wow, Barney. You brought a whole beer keg.
-#  Yeah... where do I fill it up?"
 sub start {
   my ($self, $tx, $cb) = @_;
 

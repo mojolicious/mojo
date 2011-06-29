@@ -3,6 +3,8 @@ use Mojo::Base 'Mojo::IOWatcher';
 
 use IO::KQueue 0.34;
 
+# "Wow, Barney. You brought a whole beer keg.
+#  Yeah... where do I fill it up?"
 sub not_writing {
   my ($self, $handle) = @_;
 

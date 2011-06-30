@@ -990,7 +990,7 @@ dropped, defaults to C<3>.
   $loop       = $loop->iowatcher(Mojo::IOWatcher->new);
 
 Low level event watcher, usually a L<Mojo::IOWatcher>,
-L<Mojo::IOWatcher::KQueue> or L<Mojo::IOLoop->Epoll> object.
+L<Mojo::IOWatcher::KQueue> or L<Mojo::IOLoop::Epoll> object.
 Replacing the event watcher of the singleton loop makes all new loops use the
 same type of event watcher.
 Note that this attribute is EXPERIMENTAL and might change without warning!

@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+1.50    2011-06-30 00:00:00
+        - Fixed typos.
+
 1.49    2011-06-30 00:00:00
         - Added EXPERIMENTAL Mojo::IOWatcher and Mojo::Resolver modules,
           which contain extracted functionality from Mojo::IOLoop.
@@ -14,7 +17,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed small reparse bug in Mojo::Parameters. (dmw397)
         - Fixed url_for to incorporate trailing slash for current route.
         - Fixed a few small error reporting bugs around Mojo::UserAgent.
-        - Foxed portability issue in "command.t".
+        - Fixed portability issue in "command.t".
 
 1.48    2011-06-24 00:00:00
         - Added debug log message for missing action to router.

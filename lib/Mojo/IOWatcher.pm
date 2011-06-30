@@ -57,18 +57,6 @@ sub not_writing {
   $self;
 }
 
-sub on_readable {
-  my ($self, $handle, $cb) = @_;
-  $self->{_handles}->{fileno $handle}->{on_readable} = $cb;
-  $self;
-}
-
-sub on_writable {
-  my ($self, $handle, $cb) = @_;
-  $self->{_handles}->{fileno $handle}->{on_writable} = $cb;
-  $self;
-}
-
 # "This was such a pleasant St. Patrick's Day until Irish people showed up."
 sub one_tick {
   my ($self, $timeout) = @_;
@@ -267,18 +255,6 @@ sockets.
   $watcher = $watcher->not_writing($handle);
 
 Only watch handle for readable events.
-
-=head2 C<on_readable>
-
-  $watcher = $watcher->on_readable($handle, sub {...});
-
-Callback to be invoked once the handle becomes readable.
-
-=head2 C<on_writable>
-
-  $watcher = $watcher->on_writable($handle, sub {...});
-
-Callback to be invoked once the handle becomes writable.
 
 =head2 C<one_tick>
 

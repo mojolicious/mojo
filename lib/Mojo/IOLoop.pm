@@ -556,8 +556,9 @@ sub _accept {
 
   # Accept callback
   warn "ACCEPTED $id\n" if DEBUG;
-  my $cb = $c->{on_accept} = $l->{on_accept};
-  $self->_sandbox('accept', $cb, $id) if $cb && !$l->{tls};
+  if ((my $cb = $c->{on_accept} = $l->{on_accept}) && !$l->{tls}) {
+    $self->_sandbox('accept', $cb, $id);
+  }
 
   # Stop listening
   $self->_not_listening;
@@ -637,7 +638,7 @@ sub _drop {
     warn "DISCONNECTED $id\n" if DEBUG;
 
     # Handle close
-    if (my $event = $c->{close}) { $self->_sandbox('close', $event, $id) }
+    if (my $cb = $c->{close}) { $self->_sandbox('close', $cb, $id) }
 
     # Delete connection
     delete $self->{cs}->{$id};
@@ -656,9 +657,8 @@ sub _error {
 
   # Handle error
   return unless my $c = $self->{cs}->{$id};
-  my $event = $c->{error};
-  warn "Unhandled event error: $error" and return unless $event;
-  $self->_sandbox('error', $event, $id, $error);
+  if (my $cb = $c->{error}) { $self->_sandbox('error', $cb, $id, $error) }
+  else { warn "Unhandled event error: $error" and return }
   $self->_drop($id);
 }
 
@@ -777,9 +777,7 @@ sub _read {
   return $self->_drop($id) if $read == 0;
 
   # Handle read
-  if (my $event = $c->{read}) {
-    $self->_sandbox('read', $event, $id, $buffer);
-  }
+  if (my $cb = $c->{read}) { $self->_sandbox('read', $cb, $id, $buffer) }
 
   # Active
   $c->{active} = time;
@@ -792,15 +790,15 @@ sub _sandbox {
   my $id    = shift;
 
   # Sandbox event
-  my $value = eval { $self->$cb($id, @_) };
-  if ($@) {
+  my $result;
+  unless (eval { $result = $self->$cb($id, @_); 1 }) {
     my $message = qq/Event "$event" failed for connection "$id": $@/;
     $event eq 'error'
       ? ($self->_drop($id) and warn $message)
       : $self->_error($id, $message);
   }
 
-  $value;
+  $result;
 }
 
 sub _tls_accept {
@@ -812,8 +810,7 @@ sub _tls_accept {
 
     # Handle TLS accept
     delete $c->{tls_accept};
-    my $cb = $c->{on_accept};
-    $self->_sandbox('accept', $cb, $id) if $cb;
+    if (my $cb = $c->{on_accept}) { $self->_sandbox('accept', $cb, $id) }
     return;
   }
 
@@ -830,8 +827,7 @@ sub _tls_connect {
 
     # Handle TLS connect
     delete $c->{tls_connect};
-    my $cb = $c->{on_connect};
-    $self->_sandbox('connect', $cb, $id) if $cb;
+    if (my $cb = $c->{on_connect}) { $self->_sandbox('connect', $cb, $id) }
     return;
   }
 
@@ -866,13 +862,15 @@ sub _write {
 
     # Handle connect
     warn "CONNECTED $id\n" if DEBUG;
-    my $cb = $c->{on_connect};
-    $self->_sandbox('connect', $cb, $id) if $cb && !$c->{tls};
+    if (!$c->{tls} && (my $cb = $c->{on_connect})) {
+      $self->_sandbox('connect', $cb, $id);
+    }
   }
 
   # Handle drain
-  $self->_sandbox('drain', delete $c->{drain}, $id)
-    if !length $c->{buffer} && $c->{drain};
+  if (!length $c->{buffer} && (my $cb = delete $c->{drain})) {
+    $self->_sandbox('drain', $cb, $id);
+  }
 
   # Write as much as possible
   if (length $c->{buffer}) {

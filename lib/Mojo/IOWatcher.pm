@@ -178,7 +178,7 @@ sub _poll { shift->{_poll} ||= IO::Poll->new }
 sub _sandbox {
   my $self = shift;
   my $desc = shift;
-  my $cb   = shift;
+  return unless my $cb = shift;
   warn "$desc failed: $@" unless eval { $self->$cb(@_); 1 };
 }
 

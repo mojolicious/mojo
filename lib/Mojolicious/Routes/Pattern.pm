@@ -38,10 +38,11 @@ sub parse {
   my $reqs = ref $_[0] eq 'HASH' ? $_[0] : {@_};
   $self->reqs($reqs);
 
-  # Format
+  # Format in pattern
   if ($pattern =~ s/\.([^\/\)]+)$//) {
-    $reqs->{format} = quotemeta $1;
+    $reqs->{format}           = quotemeta $1;
     $self->defaults->{format} = $1;
+    $self->{_strict}          = 1;
   }
 
   # Tokenize
@@ -116,8 +117,12 @@ sub shape_match {
 
     # Format
     my $format = $self->format;
-    if ($$pathref =~ s/$format//) { $result->{format} ||= $1 }
-    elsif ($self->reqs->{format}) {return}
+    if (defined $format && $$pathref =~ s/$format//) {
+      $result->{format} ||= $1;
+    }
+    elsif ($self->reqs->{format}) {
+      return if !$result->{format} || $self->{_strict};
+    }
 
     return $result;
   }
@@ -130,9 +135,11 @@ sub _compile {
 
   # Compile format regular expression
   my $reqs = $self->reqs;
-  my $format =
-    defined $reqs->{format} ? _compile_req($reqs->{format}) : '([^\/]+)';
-  $self->format(qr/^\/?\.$format$/);
+  if (!exists $reqs->{format} || defined $reqs->{format}) {
+    my $format =
+      defined $reqs->{format} ? _compile_req($reqs->{format}) : '([^\/]+)';
+    $self->format(qr/^\/?\.$format$/);
+  }
 
   # Compile tree to regular expression
   my $block    = '';

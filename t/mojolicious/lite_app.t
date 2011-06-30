@@ -11,7 +11,7 @@ BEGIN {
   $ENV{MOJO_MODE} = 'development';
 }
 
-use Test::More tests => 861;
+use Test::More tests => 886;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -95,6 +95,19 @@ get '/' => 'root';
 get '/alternatives/:char' => [char => [qw/☃ ♥/]] => sub {
   my $self = shift;
   $self->render_text($self->url_for);
+};
+
+# GET /alterformat
+# GET /alterformat.json
+get '/alterformat' => [format => ['json']] => {format => 'json'} => sub {
+  my $self = shift;
+  $self->render_text($self->stash('format'));
+};
+
+# GET /noformat
+get '/noformat' => [format => undef] => {format => 'xml'} => sub {
+  my $self = shift;
+  $self->render_text($self->stash('format') . $self->url_for);
 };
 
 # DELETE /
@@ -826,6 +839,32 @@ $t->get_ok('/alternatives')->status_is(404)
 
 # GET /alternatives/test (invalid alternative)
 $t->get_ok('/alternatives/test')->status_is(404)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is("Oops!\n");
+
+# GET /alterformat
+$t->get_ok('/alterformat')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('json');
+
+# GET /alterformat.json
+$t->get_ok('/alterformat.json')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('json');
+
+# GET /alterformat.html (invalid format)
+$t->get_ok('/alterformat.html')->status_is(404)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is("Oops!\n");
+
+# GET /noformat
+$t->get_ok('/noformat')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('xml/noformat');
+
+# GET /noformat.xml
+$t->get_ok('/noformat.xml')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is("Oops!\n");
 

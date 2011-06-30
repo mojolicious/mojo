@@ -360,6 +360,13 @@ Restrictive placeholders can also be used for format detection.
   $r->route('/foo', format => [qw/rss xml/])
     ->to(controller => 'foo', action => 'feed');
 
+Or you can just disable format detection.
+
+  # /foo      -> {controller => 'foo', action => 'bar'}
+  # /foo.html -> undef
+  $r->route('/foo', format => undef)
+    ->to(controller => 'foo', action => 'bar');
+
 =head2 Placeholders And Destinations
 
 Extracted placeholder values will simply redefine older stash values if they

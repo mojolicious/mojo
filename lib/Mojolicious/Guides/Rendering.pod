@@ -151,16 +151,16 @@ application class.
 The renderer will always try to detect the right template but you can also
 use the C<template> stash value to render a specific one.
 
-  $self->render(template => 'foo');
+  $self->render(template => 'foo/bar');
 
 Choosing a specific C<format> and C<handler> is just as easy.
 
-  $self->render(template => 'foo', format => 'txt', handler => 'epl');
+  $self->render(template => 'foo/bar', format => 'txt', handler => 'epl');
 
 Because rendering a specific template is the most common task it also has a
 shortcut.
 
-  $self->render('foo');
+  $self->render('foo/bar');
 
 All values passed to the C<render> call are only temporarily assigned to the
 stash and get reset again once rendering is finished.

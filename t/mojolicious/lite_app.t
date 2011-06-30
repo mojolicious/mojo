@@ -105,7 +105,7 @@ get '/alterformat' => [format => ['json']] => {format => 'json'} => sub {
 };
 
 # GET /noformat
-get '/noformat' => [format => undef] => {format => 'xml'} => sub {
+get '/noformat' => [format => 0] => {format => 'xml'} => sub {
   my $self = shift;
   $self->render_text($self->stash('format') . $self->url_for);
 };

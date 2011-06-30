@@ -364,8 +364,7 @@ Or you can just disable format detection.
 
   # /foo      -> {controller => 'foo', action => 'bar'}
   # /foo.html -> undef
-  $r->route('/foo', format => undef)
-    ->to(controller => 'foo', action => 'bar');
+  $r->route('/foo', format => 0)->to(controller => 'foo', action => 'bar');
 
 =head2 Placeholders And Destinations
 

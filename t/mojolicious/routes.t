@@ -116,11 +116,10 @@ $r->route('/format6', format => ['html'])
   ->to(controller => 'us', action => 'yay', format => 'html');
 
 # /format7
-$r->route('/format7', format => undef)
-  ->to(controller => 'us', action => 'wow');
+$r->route('/format7', format => 0)->to(controller => 'us', action => 'wow');
 
 # /format8
-$r->route('/format8', format => undef)
+$r->route('/format8', format => 0)
   ->to(controller => 'us', action => 'doh', format => 'xml');
 
 # /articles

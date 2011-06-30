@@ -2,6 +2,8 @@ This file documents the revision history for Perl extension Mojolicious.
 
 1.50    2011-06-30 00:00:00
         - Fixed typos.
+        - Fixed small routes bug that prevented some false values from
+          disabling format detection.
 
 1.49    2011-06-30 00:00:00
         - Added EXPERIMENTAL Mojo::IOWatcher and Mojo::Resolver modules,
@@ -13,7 +15,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved Morbo restarter to also check for changed file size in
           addition to mtime.
         - Improved documentation.
-        - Fixed many small route bugs.
+        - Fixed many small routes bugs.
         - Fixed small reparse bug in Mojo::Parameters. (dmw397)
         - Fixed url_for to incorporate trailing slash for current route.
         - Fixed a few small error reporting bugs around Mojo::UserAgent.

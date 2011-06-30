@@ -100,7 +100,7 @@ Remove handle.
 
 =head2 C<watch>
 
-  $watcher->watch('0.25');
+  my $activity = $watcher->watch('0.25');
 
 Run for exactly one tick and watch only for io events.
 

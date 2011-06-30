@@ -998,6 +998,10 @@ dropped, defaults to C<3>.
 
 Low level event watcher, usually a L<Mojo::IOWatcher>,
 L<Mojo::IOWatcher::KQueue> or L<Mojo::IOLoop->Epoll> object.
+Replacing the event watcher of the singleton loop makes all new loops use the
+same type of event watcher.
+
+  Mojo::IOLoop->singleton->iowatcher(MyWatcher->new);
 
 =head2 C<max_accepts>
 

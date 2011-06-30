@@ -212,8 +212,10 @@ Mojo::IOWatcher - Async IO Watcher
 
 =head1 DESCRIPTION
 
-L<Mojo::IOWatcher> is a minimalistic async io watcher that can be easily
-extended for more scalability.
+L<Mojo::IOWatcher> is a minimalistic async io watcher and the foundation of
+L<Mojo::IOLoop>.
+L<Mojo::IOWatcher::KQueue> and L<Mojo::IOWatcher::Epoll> are good examples
+for its extensibility.
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS
@@ -243,7 +245,7 @@ Callback to be invoked once the handle becomes writable.
 
 =head2 C<cancel>
 
-  $watcher->cancel($id);
+  my $success = $watcher->cancel($id);
 
 Cancel timer or idle event.
 
@@ -305,7 +307,7 @@ Create a new timer, invoking the callback after a given amount of seconds.
 
 =head2 C<watch>
 
-  $watcher->watch('0.25');
+  my $activity = $watcher->watch('0.25');
 
 Run for exactly one tick and watch only for io events.
 

@@ -317,6 +317,13 @@ Run for exactly one tick and watch only for io events.
 
 Watch handle for readable and writable events.
 
+=head1 DEBUGGING
+
+You can set the C<MOJO_IOWATCHER_DEBUG> environment variable to get some
+advanced diagnostics information printed to C<STDERR>.
+
+  MOJO_IOWATCHER_DEBUG=1
+
 =head1 SEE ALSO
 
 L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.

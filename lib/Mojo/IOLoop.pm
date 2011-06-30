@@ -529,7 +529,7 @@ sub _accept {
     $c->{tls_accept} = 1;
   }
 
-  # Watch
+  # Start watching for events
   $self->iowatcher->add(
     $handle,
     on_readable => sub { $self->_read($id) },
@@ -567,7 +567,7 @@ sub _accept {
 sub _connect {
   my ($self, $id, $args) = @_;
 
-  # Handle
+  # New handle
   my $handle;
   return unless my $c = $self->{cs}->{$id};
   unless ($handle = $args->{handle}) {
@@ -615,18 +615,14 @@ sub _drop {
   my ($self, $id) = @_;
 
   # Cancel watcher events
-  return unless my $watcher = $self->iowatcher;
+  return $self unless my $watcher = $self->iowatcher;
   return $self if $watcher->cancel($id);
 
   # Drop listen socket
   my $c = $self->{cs}->{$id};
   if ($c) { return if $c->{drop}++ }
   elsif ($c = delete $self->{listen}->{$id}) {
-
-    # Not listening
     return $self unless $self->{listening};
-
-    # Not listening anymore
     delete $self->{listening};
   }
 
@@ -640,7 +636,7 @@ sub _drop {
     # Handle close
     if (my $cb = $c->{close}) { $self->_sandbox('close', $cb, $id) }
 
-    # Delete connection
+    # Cleanup
     delete $self->{cs}->{$id};
     delete $self->{reverse}->{$id};
     $watcher->remove($handle);
@@ -790,15 +786,12 @@ sub _sandbox {
   my $id    = shift;
 
   # Sandbox event
-  my $result;
-  unless (eval { $result = $self->$cb($id, @_); 1 }) {
+  unless (eval { $self->$cb($id, @_); 1 }) {
     my $message = qq/Event "$event" failed for connection "$id": $@/;
     $event eq 'error'
       ? ($self->_drop($id) and warn $message)
       : $self->_error($id, $message);
   }
-
-  $result;
 }
 
 sub _tls_accept {
@@ -886,11 +879,11 @@ sub _write {
       return $self->_error($id, $!);
     }
 
-    # Active
-    else { $c->{active} = time }
-
     # Remove written chunk from buffer
     substr $c->{buffer}, 0, $written, '';
+
+    # Active
+    $c->{active} = time;
   }
 
   # Not writing

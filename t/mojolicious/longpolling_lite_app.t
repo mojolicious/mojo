@@ -218,7 +218,7 @@ get '/too_long' => sub {
   $self->res->headers->content_length(12);
   $self->write('how');
   Mojo::IOLoop->timer(
-    '5' => sub {
+    5 => sub {
       $self->write(
         sub {
           my $self = shift;

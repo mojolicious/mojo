@@ -1002,6 +1002,7 @@ Low level event watcher, usually a L<Mojo::IOWatcher>,
 L<Mojo::IOWatcher::KQueue> or L<Mojo::IOLoop->Epoll> object.
 Replacing the event watcher of the singleton loop makes all new loops use the
 same type of event watcher.
+Note that this attribute is EXPERIMENTAL and might change without warning!
 
   Mojo::IOLoop->singleton->iowatcher(MyWatcher->new);
 
@@ -1059,6 +1060,7 @@ Note that exceptions in this callback are not captured.
   $loop        = $loop->resolver(Mojo::Resolver->new);
 
 DNS stub resolver, usually a L<Mojo::Resolver> object.
+Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<timeout>
 

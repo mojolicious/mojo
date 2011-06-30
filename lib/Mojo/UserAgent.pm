@@ -870,6 +870,7 @@ redirects.
   $ua   = $ua->transactor(Mojo::Transactor->new);
 
 Transaction builder, by default a L<Mojo::Transactor> object.
+Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<websocket_timeout>
 

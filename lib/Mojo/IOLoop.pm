@@ -21,7 +21,9 @@ use constant IPV6 => $ENV{MOJO_NO_IPV6}
   : eval 'use IO::Socket::IP 0.06 (); 1';
 
 # Epoll support requires IO::Epoll
-use constant EPOLL => $ENV{MOJO_POLL} ? 0 : eval 'Mojo::IOWatcher::Epoll; 1';
+use constant EPOLL => $ENV{MOJO_POLL}
+  ? 0
+  : eval 'use Mojo::IOWatcher::Epoll; 1';
 
 # KQueue support requires IO::KQueue
 use constant KQUEUE => $ENV{MOJO_POLL}

@@ -8,6 +8,7 @@ use Mojo::Content::Single;
 use Mojo::Parameters;
 use Mojo::Transaction::HTTP;
 use Mojo::Transaction::WebSocket;
+use Mojo::URL;
 use Mojo::Util qw/encode url_escape/;
 
 # "I cheated the wrong way!
@@ -139,6 +140,56 @@ sub form {
   $tx, $cb;
 }
 
+sub proxy_connect {
+  my ($self, $old) = @_;
+
+  # No proxy
+  my $req = $old->req;
+  return unless my $proxy = $req->proxy;
+
+  # WebSocket and/or HTTPS
+  my $url = $req->url;
+  return
+    unless ($req->headers->upgrade || '') eq 'websocket'
+    || ($url->scheme || '') eq 'https';
+
+  # CONNECT request
+  my $new = $self->tx(CONNECT => $url->clone);
+  $new->req->proxy($proxy);
+
+  $new;
+}
+
+sub redirect {
+  my ($self, $old) = @_;
+
+  # Code
+  my $res = $old->res;
+  return unless $res->is_status_class('300');
+  return if $res->code == 305;
+
+  # Location
+  return unless my $location = $res->headers->location;
+  $location = Mojo::URL->new($location);
+
+  # Fix broken location without authority and/or scheme
+  my $req = $old->req;
+  my $url = $req->url;
+  $location->authority($url->authority) unless $location->authority;
+  $location->scheme($url->scheme)       unless $location->scheme;
+
+  # Method
+  my $method = $req->method;
+  $method = 'GET' unless $method =~ /^GET|HEAD$/i;
+
+  # New transaction
+  my $new = Mojo::Transaction::HTTP->new;
+  $new->req->method($method)->url($location);
+  $new->previous($old);
+
+  $new;
+}
+
 sub tx {
   my $self = shift;
 
@@ -248,6 +299,18 @@ Versatile L<Mojo::Transaction::HTTP> builder for form requests.
   my $tx = $t->form('http://kraih.com/foo' => {test => 123});
   $tx->res->body(sub { print $_[1] });
   $ua->start($tx);
+
+=head2 C<proxy_connect>
+
+  my $tx = $t->proxy_connect($old);
+
+Build L<Mojo::Transaction::HTTP> proxy connect request for transaction.
+
+=head2 C<redirect>
+
+  my $tx = $t->redirect($old);
+
+Build L<Mojo::Transaction::HTTP> followup request for redirect response.
 
 =head2 C<tx>
 

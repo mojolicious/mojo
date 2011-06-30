@@ -6,10 +6,8 @@ use Mojo::CookieJar;
 use Mojo::IOLoop;
 use Mojo::Log;
 use Mojo::Server::Daemon;
-use Mojo::Transaction::HTTP;
 use Mojo::Transaction::WebSocket;
 use Mojo::Transactor;
-use Mojo::URL;
 use Scalar::Util 'weaken';
 
 use constant DEBUG => $ENV{MOJO_USERAGENT_DEBUG} || 0;
@@ -448,19 +446,8 @@ sub _info {
 sub _proxy_connect {
   my ($self, $old, $cb) = @_;
 
-  # No proxy
-  my $req = $old->req;
-  return unless my $proxy = $req->proxy;
-
-  # WebSocket and/or HTTPS
-  my $url = $req->url;
-  return
-    unless ($req->headers->upgrade || '') eq 'websocket'
-    || ($url->scheme || '') eq 'https';
-
   # CONNECT request
-  my $new = $self->build_tx(CONNECT => $url->clone);
-  $new->req->proxy($proxy);
+  return unless my $new = $self->transactor->proxy_connect($old);
 
   # Start CONNECT request
   $self->_start(
@@ -529,40 +516,19 @@ sub _read {
 sub _redirect {
   my ($self, $c, $old) = @_;
 
-  # Code
-  my $res = $old->res;
-  return unless $res->is_status_class('300');
-  return if $res->code == 305;
-
-  # Location
-  return unless my $location = $res->headers->location;
-  $location = Mojo::URL->new($location);
-
-  # Fix broken location without authority and/or scheme
-  my $req = $old->req;
-  my $url = $req->url;
-  $location->authority($url->authority) unless $location->authority;
-  $location->scheme($url->scheme)       unless $location->scheme;
-
-  # Method
-  my $method = $req->method;
-  $method = 'GET' unless $method =~ /^GET|HEAD$/i;
+  # Build followup transaction
+  return unless my $new = $self->transactor->redirect($old);
 
   # Max redirects
-  my $r = $c->{redirects} || 0;
+  my $redirects = $c->{redirects} || 0;
   my $max = $self->max_redirects;
-  return unless $r < $max;
-
-  # New transaction
-  my $new = Mojo::Transaction::HTTP->new;
-  $new->req->method($method)->url($location);
-  $new->previous($old);
+  return unless $redirects < $max;
 
   # Start redirected request
   return 1 unless my $new_id = $self->_start($new, $c->{cb});
 
   # Create new connection
-  $self->{_cs}->{$new_id}->{redirects} = $r + 1;
+  $self->{_cs}->{$new_id}->{redirects} = $redirects + 1;
 
   # Redirecting
   1;

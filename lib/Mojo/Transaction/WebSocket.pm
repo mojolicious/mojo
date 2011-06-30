@@ -69,7 +69,7 @@ sub finish {
   $self->_send_frame(CLOSE, '');
 
   # Finish after writing
-  $self->{_finished} = 1;
+  $self->{finished} = 1;
 
   $self;
 }
@@ -91,7 +91,7 @@ sub resume {
 
 sub send_message {
   my ($self, $message, $cb) = @_;
-  $self->{_drain} = $cb if $cb;
+  $self->{drain} = $cb if $cb;
   $message = '' unless defined $message;
   encode 'UTF-8', $message;
   $self->_send_frame(TEXT, $message);
@@ -122,11 +122,11 @@ sub server_read {
   my ($self, $chunk) = @_;
 
   # Add chunk
-  $self->{_read} = '' unless defined $self->{_read};
-  $self->{_read} .= $chunk if defined $chunk;
+  $self->{read} = '' unless defined $self->{read};
+  $self->{read} .= $chunk if defined $chunk;
 
   # Message buffer
-  $self->{_message} = '' unless defined $self->{_message};
+  $self->{message} = '' unless defined $self->{message};
 
   # Full frames
   while (my $frame = $self->_parse_frame) {
@@ -147,16 +147,16 @@ sub server_read {
     }
 
     # Append chunk and check message size
-    $self->{_message} .= $frame->[2];
+    $self->{message} .= $frame->[2];
     $self->finish and last
-      if length $self->{_message} > $self->max_websocket_size;
+      if length $self->{message} > $self->max_websocket_size;
 
     # No FIN bit (Continuation)
     next unless $frame->[0];
 
     # Callback
-    my $message = $self->{_message};
-    $self->{_message} = '';
+    my $message = $self->{message};
+    $self->{message} = '';
     decode 'UTF-8', $message if $message;
     return $self->finish unless my $cb = $self->on_message;
     $self->$cb($message);
@@ -172,18 +172,18 @@ sub server_write {
   my $self = shift;
 
   # Not writing anymore
-  $self->{_write} = '' unless defined $self->{_write};
-  unless (length $self->{_write}) {
-    $self->{_state} = $self->{_finished} ? 'done' : 'read';
+  $self->{write} = '' unless defined $self->{write};
+  unless (length $self->{write}) {
+    $self->{state} = $self->{finished} ? 'done' : 'read';
 
     # Drain callback
-    my $cb = delete $self->{_drain};
+    my $cb = delete $self->{drain};
     $self->$cb if $cb;
   }
 
   # Empty buffer
-  my $write = $self->{_write};
-  $self->{_write} = '';
+  my $write = $self->{write};
+  $self->{write} = '';
   $write;
 }
 
@@ -262,7 +262,7 @@ sub _parse_frame {
   warn "PARSING FRAME\n" if DEBUG;
 
   # Head
-  my $buffer = $self->{_read};
+  my $buffer = $self->{read};
   return unless length $buffer > 2;
   my $head = substr $buffer, 0, 2;
   warn 'HEAD: ' . unpack('B*', $head) . "\n" if DEBUG;
@@ -323,7 +323,7 @@ sub _parse_frame {
     $payload = _xor_mask($payload, substr($payload, 0, 4, ''));
   }
   warn "PAYLOAD: $payload\n" if DEBUG;
-  $self->{_read} = $buffer;
+  $self->{read} = $buffer;
 
   [$fin, $op, $payload];
 }
@@ -332,11 +332,11 @@ sub _send_frame {
   my ($self, $op, $payload) = @_;
 
   # Build frame
-  $self->{_write} = '' unless defined $self->{_write};
-  $self->{_write} .= $self->_build_frame($op, $payload);
+  $self->{write} = '' unless defined $self->{write};
+  $self->{write} .= $self->_build_frame($op, $payload);
 
   # Writing
-  $self->{_state} = 'write';
+  $self->{state} = 'write';
 
   # Resume
   $self->on_resume->($self);

@@ -47,7 +47,7 @@ sub accept_connection {
   my $self = shift;
 
   # Listen socket
-  unless ($self->{_listen}) {
+  unless ($self->{listen}) {
     my $listen = IO::Socket->new;
 
     # Open
@@ -56,13 +56,13 @@ sub accept_connection {
       return;
     }
 
-    $self->{_listen} = $listen;
+    $self->{listen} = $listen;
   }
   $self->app->log->debug('FastCGI listen socket opened.') if DEBUG;
 
   # Accept
   my $c;
-  unless ($c = $self->{_listen}->accept) {
+  unless ($c = $self->{listen}->accept) {
     $self->app->log->error("Can't accept FastCGI connection: $!");
     return;
   }

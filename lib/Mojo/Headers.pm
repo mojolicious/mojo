@@ -96,7 +96,7 @@ sub add {
   $name = $lcname;
 
   # Add lines
-  push @{$self->{_headers}->{$name}}, (ref $_ || '') eq 'ARRAY' ? $_ : [$_]
+  push @{$self->{headers}->{$name}}, (ref $_ || '') eq 'ARRAY' ? $_ : [$_]
     for @_;
 
   $self;
@@ -123,7 +123,7 @@ sub from_hash {
 
   # Empty hash deletes all headers
   if (keys %{$hash} == 0) {
-    $self->{_headers} = {};
+    $self->{headers} = {};
     return $self;
   }
 
@@ -146,7 +146,7 @@ sub header {
     return $self->add($name, @_);
   }
 
-  return unless my $headers = $self->{_headers}->{lc $name};
+  return unless my $headers = $self->{headers}->{lc $name};
 
   # String
   return join ', ', map { join ', ', @$_ } @$headers unless wantarray;
@@ -158,13 +158,13 @@ sub header {
 sub host { scalar shift->header(Host => @_) }
 sub if_modified_since { scalar shift->header('If-Modified-Since' => @_) }
 
-sub is_done { (shift->{_state} || '') eq 'done' }
+sub is_done { (shift->{state} || '') eq 'done' }
 
-sub is_limit_exceeded { shift->{_limit} }
+sub is_limit_exceeded { shift->{limit} }
 
 sub last_modified { scalar shift->header('Last-Modified' => @_) }
 
-sub leftovers { shift->{_buffer} }
+sub leftovers { shift->{buffer} }
 
 sub location { scalar shift->header(Location => @_) }
 
@@ -173,7 +173,7 @@ sub names {
 
   # Normal case
   my @headers;
-  for my $name (keys %{$self->{_headers}}) {
+  for my $name (keys %{$self->{headers}}) {
     push @headers, $NORMALCASE_HEADERS{$name} || $name;
   }
 
@@ -184,19 +184,19 @@ sub parse {
   my ($self, $chunk) = @_;
 
   # Parse headers with size limit
-  $self->{_state} = 'headers';
-  $self->{_buffer} = '' unless defined $self->{_buffer};
-  $self->{_buffer} .= $chunk if defined $chunk;
-  my $headers = $self->{_cache} || [];
+  $self->{state} = 'headers';
+  $self->{buffer} = '' unless defined $self->{buffer};
+  $self->{buffer} .= $chunk if defined $chunk;
+  my $headers = $self->{cache} || [];
   my $max = $self->max_line_size;
-  while (defined(my $line = get_line $self->{_buffer})) {
+  while (defined(my $line = get_line $self->{buffer})) {
 
     # Check line size
     if (length $line > $max) {
 
       # Abort
-      $self->{_state} = 'done';
-      $self->{_limit} = 1;
+      $self->{state} = 'done';
+      $self->{limit} = 1;
       return $self;
     }
 
@@ -215,19 +215,19 @@ sub parse {
       }
 
       # Done
-      $self->{_state} = 'done';
-      $self->{_cache} = [];
+      $self->{state} = 'done';
+      $self->{cache} = [];
       return $self;
     }
   }
-  $self->{_cache} = $headers;
+  $self->{cache} = $headers;
 
   # Check line size
-  if (length $self->{_buffer} > $max) {
+  if (length $self->{buffer} > $max) {
 
     # Abort
-    $self->{_state} = 'done';
-    $self->{_limit} = 1;
+    $self->{state} = 'done';
+    $self->{limit} = 1;
   }
 
   $self;
@@ -240,7 +240,7 @@ sub referrer            { scalar shift->header(Referer               => @_) }
 
 sub remove {
   my ($self, $name) = @_;
-  delete $self->{_headers}->{lc $name};
+  delete $self->{headers}->{lc $name};
   $self;
 }
 

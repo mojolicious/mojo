@@ -8,7 +8,7 @@ use Time::HiRes 'usleep';
 #  Iran, Iraq, China, Mordor, the hoochies that laid low Tiger Woods,
 #  undesirable immigrants - by which I mean everyone that came after me,
 #  including my children..."
-sub _poll { shift->{_poll} ||= IO::Epoll->new }
+sub _poll { shift->{poll} ||= IO::Epoll->new }
 
 1;
 __END__

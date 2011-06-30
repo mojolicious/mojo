@@ -12,7 +12,7 @@ sub new {
   my $self = shift->SUPER::new();
 
   # Method
-  $self->{_method} = lc shift;
+  $self->{method} = lc shift;
 
   # Path
   my $path = shift;
@@ -20,10 +20,10 @@ sub new {
   my $backup = $path;
   decode 'UTF-8', $path;
   $path = $backup unless defined $path;
-  $self->{_path} = $path;
+  $self->{path} = $path;
 
   # WebSocket
-  $self->{_websocket} = shift;
+  $self->{websocket} = shift;
 
   $self;
 }
@@ -35,12 +35,12 @@ sub match {
 
   # Match
   $self->root($r) unless $self->root;
-  my $dictionary = $self->{_dictionary} ||= $r->dictionary;
-  my $path       = $self->{_path};
+  my $dictionary = $self->{dictionary} ||= $r->dictionary;
+  my $path       = $self->{path};
   my $pattern    = $r->pattern;
   my $captures   = $pattern->shape_match(\$path);
   return unless $captures;
-  $self->{_path} = $path;
+  $self->{path} = $path;
 
   # Merge captures
   $captures = {%{$self->captures}, %$captures};
@@ -48,7 +48,7 @@ sub match {
 
   # Method
   if (my $methods = $r->via) {
-    my $method = lc $self->{_method};
+    my $method = lc $self->{method};
     $method = 'get' if $method eq 'head';
     my $found = 0;
     for my $m (@$methods) { ++$found and last if $method eq $m }
@@ -70,7 +70,7 @@ sub match {
   }
 
   # WebSocket
-  return if $r->is_websocket && !$self->{_websocket};
+  return if $r->is_websocket && !$self->{websocket};
 
   # Empty path
   my $empty = !length $path || $path eq '/' ? 1 : 0;
@@ -108,7 +108,7 @@ sub match {
     return $self if $self->endpoint;
 
     # Reset path
-    $self->{_path} = $path;
+    $self->{path} = $path;
 
     # Reset stack
     if ($r->parent) { $self->stack([@$snapshot]) }

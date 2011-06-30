@@ -25,7 +25,7 @@ sub detect {
   # Environment variable
   if ($ENV{MOJO_HOME}) {
     my @parts = File::Spec->splitdir(abs_path $ENV{MOJO_HOME});
-    $self->{_parts} = \@parts;
+    $self->{parts} = \@parts;
     return $self;
   }
 
@@ -52,13 +52,13 @@ sub detect {
       }
 
       # Turn into absolute path
-      $self->{_parts} =
+      $self->{parts} =
         [File::Spec->splitdir(abs_path(File::Spec->catdir(@home) || '.'))];
     }
   }
 
   # FindBin fallback
-  $self->{_parts} = [split /\//, $FindBin::Bin] unless $self->{_parts};
+  $self->{parts} = [split /\//, $FindBin::Bin] unless $self->{parts};
 
   $self;
 }
@@ -67,7 +67,7 @@ sub lib_dir {
   my $self = shift;
 
   # Directory found
-  my $parts = $self->{_parts} || [];
+  my $parts = $self->{parts} || [];
   my $path = File::Spec->catdir(@$parts, 'lib');
   return $path if -d $path;
 
@@ -79,7 +79,7 @@ sub list_files {
   my ($self, $dir) = @_;
 
   # Build portable directory
-  my $parts = $self->{_parts} || [];
+  my $parts = $self->{parts} || [];
   my $root = File::Spec->catdir(@$parts);
   $dir = File::Spec->catdir($root, split '/', ($dir || ''));
 
@@ -117,25 +117,25 @@ sub list_files {
 sub parse {
   my ($self, $path) = @_;
   my @parts = File::Spec->splitdir($path);
-  $self->{_parts} = \@parts;
+  $self->{parts} = \@parts;
   $self;
 }
 
 sub rel_dir {
   my $self = shift;
-  my $parts = $self->{_parts} || [];
+  my $parts = $self->{parts} || [];
   File::Spec->catdir(@$parts, split '/', shift);
 }
 
 sub rel_file {
   my $self = shift;
-  my $parts = $self->{_parts} || [];
+  my $parts = $self->{parts} || [];
   File::Spec->catfile(@$parts, split '/', shift);
 }
 
 sub to_string {
   my $self = shift;
-  my $parts = $self->{_parts} || [];
+  my $parts = $self->{parts} || [];
   File::Spec->catdir(@$parts);
 }
 

@@ -100,8 +100,8 @@ sub is_xhr {
 
 sub param {
   my $self = shift;
-  $self->{_params} = $self->params unless $self->{_params};
-  $self->{_params}->param(@_);
+  $self->{params} = $self->params unless $self->{params};
+  $self->{params}->param(@_);
 }
 
 sub params {
@@ -130,7 +130,7 @@ sub parse {
   $self->SUPER::parse($chunk);
 
   # Fix things we only know after parsing headers
-  if (!$self->{_state} || $self->{_state} ne 'headers') {
+  if (!$self->{state} || $self->{state} ne 'headers') {
 
     # Base URL
     my $base = $self->url->base;
@@ -332,7 +332,7 @@ sub _parse_env {
 
   # There won't be a start line or header when you parse environment
   # variables
-  $self->{_state} = 'body';
+  $self->{state} = 'body';
 }
 
 # "Bart, with $10,000, we'd be millionaires!
@@ -341,9 +341,9 @@ sub _parse_start_line {
   my $self = shift;
 
   # Ignore any leading empty lines
-  my $line = get_line $self->{_buffer};
+  my $line = get_line $self->{buffer};
   while ((defined $line) && ($line =~ m/^\s*$/)) {
-    $line = get_line $self->{_buffer};
+    $line = get_line $self->{buffer};
   }
 
   # We have a (hopefully) full request line
@@ -358,15 +358,15 @@ sub _parse_start_line {
       # HTTP 0.9 is identified by the missing version
       if (defined $3) {
         $self->version($3);
-        $self->{_state} = 'content';
+        $self->{state} = 'content';
       }
       else {
         $self->version('0.9');
-        $self->{_state} = 'done';
+        $self->{state} = 'done';
 
         # HTTP 0.9 has no headers or body and does not support
         # pipelining
-        $self->{_buffer} = '';
+        $self->{buffer} = '';
       }
     }
     else { $self->error('Bad request start line.', 400) }

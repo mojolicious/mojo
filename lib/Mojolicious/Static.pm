@@ -54,13 +54,13 @@ sub serve {
   my $ext = $1;
 
   # Bundled file
-  $self->{_root}
+  $self->{bundled}
     ||= File::Spec->catdir(File::Spec->splitdir(dirname(__FILE__)), 'public');
-  my $bundled = File::Spec->catfile($self->{_root}, split('/', $rel));
+  my $bundled = File::Spec->catfile($self->{bundled}, split('/', $rel));
 
   # Files
   my $res      = $c->res;
-  my $modified = $self->{_modified} ||= time;
+  my $modified = $self->{modified} ||= time;
   my $size     = 0;
   my $asset;
   for my $path ($file, $bundled) {
@@ -161,7 +161,7 @@ sub _get_data_file {
     || 'main';
 
   # Find DATA file
-  my $data = $self->{_data_files}->{$class}
+  my $data = $self->{data_files}->{$class}
     ||= [keys %{Mojo::Command->new->get_all_data($class) || {}}];
   for my $path (@$data) {
     return Mojo::Command->new->get_data($path, $class) if $path eq $rel;

@@ -36,7 +36,7 @@ sub parse {
   $self->SUPER::parse(@_);
 
   # Still parsing headers or using a custom body parser
-  return $self if ($self->{_state} || '') eq 'headers' || $self->on_read;
+  return $self if ($self->{state} || '') eq 'headers' || $self->on_read;
 
   # Content needs to be upgraded to multipart
   if ($self->is_multipart) {
@@ -58,8 +58,8 @@ sub parse {
 
   # Chunked body or relaxed content
   if ($self->is_chunked || $self->relaxed) {
-    $self->asset->add_chunk($self->{_b2});
-    $self->{_b2} = '';
+    $self->asset->add_chunk($self->{b2});
+    $self->{b2} = '';
   }
 
   # Normal body
@@ -69,10 +69,10 @@ sub parse {
     my $len   = $self->headers->content_length || 0;
     my $asset = $self->asset;
     my $need  = $len - $asset->size;
-    $asset->add_chunk(substr $self->{_b2}, 0, $need, '') if $need > 0;
+    $asset->add_chunk(substr $self->{b2}, 0, $need, '') if $need > 0;
 
     # Done
-    $self->{_state} = 'done' if $len <= $self->progress;
+    $self->{state} = 'done' if $len <= $self->progress;
   }
 
   $self;

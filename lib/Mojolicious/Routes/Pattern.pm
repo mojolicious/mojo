@@ -42,7 +42,7 @@ sub parse {
   if ($pattern =~ s/\.([^\/\)]+)$//) {
     $reqs->{format}           = quotemeta $1;
     $self->defaults->{format} = $1;
-    $self->{_strict}          = 1;
+    $self->{strict}           = 1;
   }
 
   # Tokenize
@@ -121,7 +121,7 @@ sub shape_match {
       $result->{format} ||= $1;
     }
     elsif ($self->reqs->{format}) {
-      return if !$result->{format} || $self->{_strict};
+      return if !$result->{format} || $self->{strict};
     }
 
     return $result;

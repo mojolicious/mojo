@@ -23,7 +23,7 @@ sub new {
   if (@_ > 1) { $self->append(@_) }
 
   # String
-  else { $self->{_string} = $_[0] }
+  else { $self->{string} = $_[0] }
 
   $self;
 }
@@ -46,8 +46,8 @@ sub clone {
   my $self  = shift;
   my $clone = Mojo::Parameters->new;
   $clone->pair_separator($self->pair_separator);
-  if (defined $self->{_string}) { $clone->{_string} = $self->{_string} }
-  else                          { $clone->params([@{$self->params}]) }
+  if (defined $self->{string}) { $clone->{string} = $self->{string} }
+  else                         { $clone->params([@{$self->params}]) }
   $clone;
 }
 
@@ -80,17 +80,17 @@ sub param {
 
 sub params {
   my ($self, $params) = @_;
-  if ($params) { $self->{_params} = $params }
-  elsif (defined $self->{_string}) { $self->parse }
-  $self->{_params} ||= [];
+  if ($params) { $self->{params} = $params }
+  elsif (defined $self->{string}) { $self->parse }
+  $self->{params} ||= [];
 }
 
 sub parse {
   my ($self, $string) = @_;
-  $string = $self->{_string} unless defined $string;
+  $string = $self->{string} unless defined $string;
 
   # Clear
-  delete $self->{_string};
+  delete $self->{string};
   $self->params([]);
 
   # Detect pair separator for reconstruction
@@ -178,7 +178,7 @@ sub to_string {
 
   # String
   my $charset = $self->charset;
-  if (defined(my $string = $self->{_string})) {
+  if (defined(my $string = $self->{string})) {
 
     # Escape
     encode $charset, $string if $charset;

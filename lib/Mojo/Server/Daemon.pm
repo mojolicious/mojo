@@ -41,11 +41,11 @@ sub DESTROY {
 
   # Cleanup connections
   return unless my $loop = $self->ioloop;
-  my $cs = $self->{_cs} || {};
+  my $cs = $self->{cs} || {};
   for my $id (keys %$cs) { $loop->drop($id) }
 
   # Cleanup listen sockets
-  return unless my $listen = $self->{_listen};
+  return unless my $listen = $self->{listening};
   for my $id (@$listen) { $loop->drop($id) }
 }
 
@@ -165,11 +165,11 @@ sub _drop {
   my ($self, $id) = @_;
 
   # Finish gracefully
-  my $c = $self->{_cs}->{$id};
+  my $c = $self->{cs}->{$id};
   if (my $tx = $c->{websocket} || $c->{transaction}) { $tx->server_close }
 
   # Drop connection
-  delete $self->{_cs}->{$id};
+  delete $self->{cs}->{$id};
 }
 
 sub _error {
@@ -188,7 +188,7 @@ sub _finish {
   }
 
   # Finish transaction
-  my $c = $self->{_cs}->{$id};
+  my $c = $self->{cs}->{$id};
   delete $c->{transaction};
   $tx->server_close;
 
@@ -262,7 +262,7 @@ sub _listen {
     my ($loop, $id) = @_;
 
     # Add new connection
-    $self->{_cs}->{$id} = {tls => $tls};
+    $self->{cs}->{$id} = {tls => $tls};
 
     # Keep alive timeout
     $loop->connection_timeout($id => $self->keep_alive_timeout);
@@ -273,8 +273,8 @@ sub _listen {
 
   # Listen
   my $id = $self->ioloop->listen($options);
-  $self->{_listen} ||= [];
-  push @{$self->{_listen}}, $id;
+  $self->{listening} ||= [];
+  push @{$self->{listening}}, $id;
 
   # Bonjour
   if (BONJOUR && (my $p = Net::Rendezvous::Publish->new)) {
@@ -300,7 +300,7 @@ sub _read {
   warn "< $chunk\n" if DEBUG;
 
   # Make sure we have a transaction
-  my $c = $self->{_cs}->{$id};
+  my $c = $self->{cs}->{$id};
   my $tx = $c->{transaction} || $c->{websocket};
   $tx = $c->{transaction} = $self->_build_tx($id, $c) unless $tx;
 
@@ -325,7 +325,7 @@ sub _upgrade {
   return unless $tx->req->headers->upgrade =~ /WebSocket/i;
 
   # WebSocket handshake handler
-  my $c = $self->{_cs}->{$id};
+  my $c = $self->{cs}->{$id};
   my $ws = $c->{websocket} = $self->on_websocket->($self, $tx);
 
   # Not resumable yet
@@ -336,7 +336,7 @@ sub _write {
   my ($self, $id) = @_;
 
   # Not writing
-  my $c = $self->{_cs}->{$id};
+  my $c = $self->{cs}->{$id};
   return unless my $tx = $c->{transaction} || $c->{websocket};
   return unless $tx->is_writing;
 

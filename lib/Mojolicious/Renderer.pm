@@ -184,15 +184,15 @@ sub _detect_handler {
   return unless $self->detect_templates;
 
   # Templates
-  my $templates = $self->{_templates};
+  my $templates = $self->{templates};
   unless ($templates) {
-    $templates = $self->{_templates} =
+    $templates = $self->{templates} =
       Mojo::Home->new->parse($self->root)->list_files;
   }
 
   # DATA templates
   my $class  = $self->_detect_template_class($options);
-  my $inline = $self->{_data_templates}->{$class}
+  my $inline = $self->{data_templates}->{$class}
     ||= $self->_list_data_templates($class);
 
   # Detect

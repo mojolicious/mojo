@@ -14,18 +14,18 @@ sub client_read {
   my ($self, $chunk) = @_;
 
   # Preserve state
-  my $preserved = $self->{_state};
+  my $preserved = $self->{state};
 
   # Done
   my $read = length $chunk;
-  $self->{_state} = 'done' if $read == 0;
+  $self->{state} = 'done' if $read == 0;
 
   # HEAD response
   my $req = $self->req;
   my $res = $self->res;
   if ($req->method =~ /^head$/i) {
     $res->parse_until_body($chunk);
-    $self->{_state} = 'done' if $res->content->is_parsing_body;
+    $self->{state} = 'done' if $res->content->is_parsing_body;
   }
 
   # Normal response
@@ -33,17 +33,17 @@ sub client_read {
     $res->parse($chunk);
 
     # Done
-    $self->{_state} = 'done' if $res->is_done;
+    $self->{state} = 'done' if $res->is_done;
   }
 
   # Unexpected 100 Continue
-  if ($self->{_state} eq 'done' && ($res->code || '') eq '100') {
+  if ($self->{state} eq 'done' && ($res->code || '') eq '100') {
     $self->res($res->new);
-    $self->{_state} = $preserved;
+    $self->{state} = $preserved;
   }
 
   # Check for errors
-  $self->{_state} = 'done' if $self->error;
+  $self->{state} = 'done' if $self->error;
 
   $self;
 }
@@ -52,12 +52,12 @@ sub client_write {
   my $self = shift;
 
   # Offsets
-  $self->{_offset} ||= 0;
-  $self->{_write}  ||= 0;
+  $self->{offset} ||= 0;
+  $self->{write}  ||= 0;
 
   # Writing
   my $req = $self->req;
-  unless ($self->{_state}) {
+  unless ($self->{state}) {
 
     # Connection header
     my $headers = $req->headers;
@@ -69,70 +69,70 @@ sub client_write {
     }
 
     # Ready for next state
-    $self->{_state} = 'write_start_line';
-    $self->{_write} = $req->start_line_size;
+    $self->{state} = 'write_start_line';
+    $self->{write} = $req->start_line_size;
   }
 
   # Start line
   my $chunk = '';
-  if ($self->{_state} eq 'write_start_line') {
-    my $buffer = $req->get_start_line_chunk($self->{_offset});
+  if ($self->{state} eq 'write_start_line') {
+    my $buffer = $req->get_start_line_chunk($self->{offset});
 
     # Written
     my $written = defined $buffer ? length $buffer : 0;
-    $self->{_write}  = $self->{_write} - $written;
-    $self->{_offset} = $self->{_offset} + $written;
+    $self->{write}  = $self->{write} - $written;
+    $self->{offset} = $self->{offset} + $written;
     $chunk .= $buffer;
 
     # Done
-    if ($self->{_write} <= 0) {
-      $self->{_state}  = 'write_headers';
-      $self->{_offset} = 0;
-      $self->{_write}  = $req->header_size;
+    if ($self->{write} <= 0) {
+      $self->{state}  = 'write_headers';
+      $self->{offset} = 0;
+      $self->{write}  = $req->header_size;
     }
   }
 
   # Headers
-  if ($self->{_state} eq 'write_headers') {
-    my $buffer = $req->get_header_chunk($self->{_offset});
+  if ($self->{state} eq 'write_headers') {
+    my $buffer = $req->get_header_chunk($self->{offset});
 
     # Written
     my $written = defined $buffer ? length $buffer : 0;
-    $self->{_write}  = $self->{_write} - $written;
-    $self->{_offset} = $self->{_offset} + $written;
+    $self->{write}  = $self->{write} - $written;
+    $self->{offset} = $self->{offset} + $written;
     $chunk .= $buffer;
 
     # Done
-    if ($self->{_write} <= 0) {
+    if ($self->{write} <= 0) {
 
-      $self->{_state}  = 'write_body';
-      $self->{_offset} = 0;
-      $self->{_write}  = $req->body_size;
+      $self->{state}  = 'write_body';
+      $self->{offset} = 0;
+      $self->{write}  = $req->body_size;
 
       # Chunked
-      $self->{_write} = 1 if $req->is_chunked;
+      $self->{write} = 1 if $req->is_chunked;
     }
   }
 
   # Body
-  if ($self->{_state} eq 'write_body') {
-    my $buffer = $req->get_body_chunk($self->{_offset});
+  if ($self->{state} eq 'write_body') {
+    my $buffer = $req->get_body_chunk($self->{offset});
 
     # Written
     my $written = defined $buffer ? length $buffer : 0;
-    $self->{_write}  = $self->{_write} - $written;
-    $self->{_offset} = $self->{_offset} + $written;
+    $self->{write}  = $self->{write} - $written;
+    $self->{offset} = $self->{offset} + $written;
     $chunk .= $buffer if defined $buffer;
 
     # End
-    $self->{_state} = 'read_response'
+    $self->{state} = 'read_response'
       if defined $buffer && !length $buffer;
 
     # Chunked
-    $self->{_write} = 1 if $req->is_chunked;
+    $self->{write} = 1 if $req->is_chunked;
 
     # Done
-    $self->{_state} = 'read_response' if $self->{_write} <= 0;
+    $self->{state} = 'read_response' if $self->{write} <= 0;
   }
 
   $chunk;
@@ -183,7 +183,7 @@ sub server_leftovers {
   my $leftovers = $req->leftovers;
 
   # Done
-  $req->{_state} = 'done';
+  $req->{state} = 'done';
 
   $leftovers;
 }
@@ -194,11 +194,11 @@ sub server_read {
   # Parse
   my $req = $self->req;
   $req->parse($chunk) unless $req->error;
-  $self->{_state} ||= 'read';
+  $self->{state} ||= 'read';
 
   # Parser error
   my $res     = $self->res;
-  my $handled = $self->{_handled};
+  my $handled = $self->{handled};
   if ($req->error && !$handled) {
 
     # Handler callback
@@ -208,7 +208,7 @@ sub server_read {
     $res->headers->connection('close');
 
     # Protect handler from incoming pipelined requests
-    $self->{_handled} = 1;
+    $self->{handled} = 1;
   }
 
   # EOF
@@ -222,19 +222,19 @@ sub server_read {
     $self->on_request->($ws ? ($ws, $self) : $self);
 
     # Protect handler from incoming pipelined requests
-    $self->{_handled} = 1;
+    $self->{handled} = 1;
   }
 
   # Expect 100 Continue
-  elsif ($req->content->is_parsing_body && !defined $self->{_continued}) {
+  elsif ($req->content->is_parsing_body && !defined $self->{continued}) {
     if (($req->headers->expect || '') =~ /100-continue/i) {
 
       # Writing
-      $self->{_state} = 'write';
+      $self->{state} = 'write';
 
       # Continue
       $res->code(100);
-      $self->{_continued} = 0;
+      $self->{continued} = 0;
     }
   }
 
@@ -246,15 +246,15 @@ sub server_write {
 
   # Not writing
   my $chunk = '';
-  return $chunk unless $self->{_state};
+  return $chunk unless $self->{state};
 
   # Offsets
-  $self->{_offset} ||= 0;
-  $self->{_write}  ||= 0;
+  $self->{offset} ||= 0;
+  $self->{write}  ||= 0;
 
   # Writing
   my $res = $self->res;
-  if ($self->{_state} eq 'write') {
+  if ($self->{state} eq 'write') {
 
     # Connection header
     my $headers = $res->headers;
@@ -264,105 +264,105 @@ sub server_write {
     }
 
     # Ready for next state
-    $self->{_state} = 'write_start_line';
-    $self->{_write} = $res->start_line_size;
+    $self->{state} = 'write_start_line';
+    $self->{write} = $res->start_line_size;
   }
 
   # Start line
-  if ($self->{_state} eq 'write_start_line') {
-    my $buffer = $res->get_start_line_chunk($self->{_offset});
+  if ($self->{state} eq 'write_start_line') {
+    my $buffer = $res->get_start_line_chunk($self->{offset});
 
     # Written
     my $written = defined $buffer ? length $buffer : 0;
-    $self->{_write}  = $self->{_write} - $written;
-    $self->{_offset} = $self->{_offset} + $written;
+    $self->{write}  = $self->{write} - $written;
+    $self->{offset} = $self->{offset} + $written;
     $chunk .= $buffer;
 
     # Done
-    if ($self->{_write} <= 0) {
-      $self->{_state}  = 'write_headers';
-      $self->{_offset} = 0;
-      $self->{_write}  = $res->header_size;
+    if ($self->{write} <= 0) {
+      $self->{state}  = 'write_headers';
+      $self->{offset} = 0;
+      $self->{write}  = $res->header_size;
     }
   }
 
   # Headers
-  if ($self->{_state} eq 'write_headers') {
-    my $buffer = $res->get_header_chunk($self->{_offset});
+  if ($self->{state} eq 'write_headers') {
+    my $buffer = $res->get_header_chunk($self->{offset});
 
     # Written
     my $written = defined $buffer ? length $buffer : 0;
-    $self->{_write}  = $self->{_write} - $written;
-    $self->{_offset} = $self->{_offset} + $written;
+    $self->{write}  = $self->{write} - $written;
+    $self->{offset} = $self->{offset} + $written;
     $chunk .= $buffer;
 
     # Done
-    if ($self->{_write} <= 0) {
+    if ($self->{write} <= 0) {
 
       # HEAD request
       if ($self->req->method =~ /^head$/i) {
 
         # Don't send body if request method is HEAD
-        $self->{_state} = 'done';
+        $self->{state} = 'done';
       }
 
       # Body
       else {
-        $self->{_state}  = 'write_body';
-        $self->{_offset} = 0;
-        $self->{_write}  = $res->body_size;
+        $self->{state}  = 'write_body';
+        $self->{offset} = 0;
+        $self->{write}  = $res->body_size;
 
         # Dynamic
-        $self->{_write} = 1 if $res->is_dynamic;
+        $self->{write} = 1 if $res->is_dynamic;
       }
     }
   }
 
   # Body
-  if ($self->{_state} eq 'write_body') {
+  if ($self->{state} eq 'write_body') {
 
     # 100 Continue
-    if ($self->{_write} <= 0) {
+    if ($self->{write} <= 0) {
 
       # Continue done
-      if (defined $self->{_continued} && $self->{_continued} == 0) {
-        $self->{_continued} = 1;
-        $self->{_state}     = 'read';
+      if (defined $self->{continued} && $self->{continued} == 0) {
+        $self->{continued} = 1;
+        $self->{state}     = 'read';
 
         # New response after continue
         $self->res($res->new);
       }
 
       # Everything done
-      elsif (!defined $self->{_continued}) { $self->{_state} = 'done' }
+      elsif (!defined $self->{continued}) { $self->{state} = 'done' }
     }
 
     # Normal body
     else {
-      my $buffer = $res->get_body_chunk($self->{_offset});
+      my $buffer = $res->get_body_chunk($self->{offset});
 
       # Written
       my $written = defined $buffer ? length $buffer : 0;
-      $self->{_write}  = $self->{_write} - $written;
-      $self->{_offset} = $self->{_offset} + $written;
+      $self->{write}  = $self->{write} - $written;
+      $self->{offset} = $self->{offset} + $written;
       if (defined $buffer) {
         $chunk .= $buffer;
-        delete $self->{_delay};
+        delete $self->{delay};
       }
 
       # Delayed
       else {
-        my $delay = delete $self->{_delay};
-        $self->{_state} = 'paused' if $delay;
-        $self->{_delay} = 1 unless $delay;
+        my $delay = delete $self->{delay};
+        $self->{state} = 'paused' if $delay;
+        $self->{delay} = 1 unless $delay;
       }
 
       # Dynamic
-      $self->{_write} = 1 if $res->is_dynamic;
+      $self->{write} = 1 if $res->is_dynamic;
 
       # Done
-      $self->{_state} = 'done'
-        if $self->{_write} <= 0 || (defined $buffer && !length $buffer);
+      $self->{state} = 'done'
+        if $self->{write} <= 0 || (defined $buffer && !length $buffer);
     }
   }
 

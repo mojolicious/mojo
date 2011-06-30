@@ -9,7 +9,7 @@ sub not_writing {
   my ($self, $handle) = @_;
 
   my $fd     = fileno $handle;
-  my $h      = $self->{_handles}->{$fd};
+  my $h      = $self->{handles}->{$fd};
   my $kqueue = $self->_kqueue;
   $kqueue->EV_SET($fd, EVFILT_READ, EV_ADD)
     unless defined $h->{writing};
@@ -23,7 +23,7 @@ sub remove {
   my ($self, $handle) = @_;
 
   my $fd     = fileno $handle;
-  my $h      = delete $self->{_handles}->{$fd};
+  my $h      = delete $self->{handles}->{$fd};
   my $kqueue = $self->_kqueue;
   $kqueue->EV_SET($fd, EVFILT_READ,  EV_DELETE) if defined $h->{writing};
   $kqueue->EV_SET($fd, EVFILT_WRITE, EV_DELETE) if $h->{writing};
@@ -39,7 +39,7 @@ sub watch {
   my $activity;
   for my $kev (@ret) {
     my ($fd, $filter, $flags, $fflags) = @$kev;
-    my $h = $self->{_handles}->{$fd};
+    my $h = $self->{handles}->{$fd};
     $self->_sandbox('Read', $h->{on_readable}, $h->{handle})
       if $filter == EVFILT_READ || $flags == EV_EOF;
     $self->_sandbox('Write', $h->{on_writable}, $h->{handle})
@@ -54,7 +54,7 @@ sub writing {
   my ($self, $handle) = @_;
 
   my $fd = fileno $handle;
-  my $h  = $self->{_handles}->{$fd};
+  my $h  = $self->{handles}->{$fd};
   $self->_kqueue->EV_SET($fd, EVFILT_READ, EV_ADD)
     unless defined $h->{writing};
   $self->_kqueue->EV_SET($fd, EVFILT_WRITE, EV_ADD) unless $h->{writing};
@@ -63,7 +63,7 @@ sub writing {
   $self;
 }
 
-sub _kqueue { shift->{_kqueue} ||= IO::KQueue->new }
+sub _kqueue { shift->{kqueue} ||= IO::KQueue->new }
 
 1;
 __END__

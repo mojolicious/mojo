@@ -101,14 +101,14 @@ sub start {
   my ($self, $tx, $cb) = @_;
 
   # Blocking loop
-  my $loop = $self->{_loop} ||= $self->ioloop;
+  my $loop = $self->{loop} ||= $self->ioloop;
 
   # Non-blocking
   if ($cb) {
 
     # Switch to non-blocking
     warn "NEW NON-BLOCKING REQUEST\n" if DEBUG;
-    $self->_switch_non_blocking unless $self->{_nb};
+    $self->_switch_non_blocking unless $self->{nb};
 
     # Start
     return $self->_start($tx, $cb);
@@ -116,7 +116,7 @@ sub start {
 
   # Switch to blocking
   warn "NEW BLOCKING REQUEST\n" if DEBUG;
-  $self->_switch_blocking if $self->{_nb};
+  $self->_switch_blocking if $self->{nb};
 
   # Quick start
   $self->_start($tx, sub { $tx = $_[1] });
@@ -135,25 +135,25 @@ sub test_server {
   my ($self, $protocol) = @_;
 
   # Start test server
-  unless ($self->{_port}) {
-    my $loop = $self->{_loop} || $self->ioloop;
-    my $server = $self->{_server} =
+  unless ($self->{port}) {
+    my $loop = $self->{loop} || $self->ioloop;
+    my $server = $self->{server} =
       Mojo::Server::Daemon->new(ioloop => $loop, silent => 1);
-    my $port = $self->{_port} = $loop->generate_port;
+    my $port = $self->{port} = $loop->generate_port;
     die "Couldn't find a free TCP port for testing.\n" unless $port;
-    $self->{_protocol} = $protocol ||= 'http';
+    $self->{protocol} = $protocol ||= 'http';
     $server->listen(["$protocol://*:$port"]);
     $server->prepare_ioloop;
   }
 
   # Prepare application for testing
-  my $server = $self->{_server};
+  my $server = $self->{server};
   delete $server->{app};
   my $app = $self->app;
   ref $app ? $server->app($app) : $server->app_class($app);
   $self->log($server->app->log);
 
-  $self->{_port};
+  $self->{port};
 }
 
 # "Are we there yet?
@@ -174,7 +174,7 @@ sub _cache {
   my ($self, $name, $id) = @_;
 
   # Enqueue
-  my $cache = $self->{_cache} ||= [];
+  my $cache = $self->{cache} ||= [];
   if ($id) {
 
     # Limit keep alive connections
@@ -189,7 +189,7 @@ sub _cache {
   }
 
   # Dequeue
-  my $loop = $self->{_loop};
+  my $loop = $self->{loop};
   my $result;
   my @cache;
   for my $cached (@$cache) {
@@ -208,26 +208,26 @@ sub _cache {
     # Cache again
     else { push @cache, $cached }
   }
-  $self->{_cache} = \@cache;
+  $self->{cache} = \@cache;
 
   $result;
 }
 
 sub _cleanup {
   my $self = shift;
-  return unless my $loop = $self->{_loop};
+  return unless my $loop = $self->{loop};
 
   # Stop server
-  delete $self->{_port};
-  delete $self->{_server};
+  delete $self->{port};
+  delete $self->{server};
 
   # Cleanup active connections
   warn "DROPPING ALL CONNECTIONS\n" if DEBUG;
-  my $cs = $self->{_cs} || {};
+  my $cs = $self->{cs} || {};
   $loop->drop($_) for keys %$cs;
 
   # Cleanup keep alive connections
-  my $cache = $self->{_cache} || [];
+  my $cache = $self->{cache} || [];
   for my $cached (@$cache) {
     $loop->drop($cached->[1]);
   }
@@ -242,13 +242,13 @@ sub _connect {
 
   # Keep alive connection
   weaken $self;
-  my $loop = $self->{_loop};
+  my $loop = $self->{loop};
   my $id   = $tx->connection;
   my ($scheme, $address, $port) = $self->_info($tx);
   $id ||= $self->_cache("$scheme:$address:$port");
   if ($id && !ref $id) {
     warn "KEEP ALIVE CONNECTION ($scheme:$address:$port)\n" if DEBUG;
-    $self->{_cs}->{$id} = {cb => $cb, tx => $tx};
+    $self->{cs}->{$id} = {cb => $cb, tx => $tx};
     $tx->kept_alive(1);
     $self->_connected($id);
   }
@@ -274,7 +274,7 @@ sub _connect {
       tls_key  => $self->key,
       on_connect => sub { $self->_connected($_[1]) }
     );
-    $self->{_cs}->{$id} = {cb => $cb, tx => $tx};
+    $self->{cs}->{$id} = {cb => $cb, tx => $tx};
   }
 
   # Callbacks
@@ -291,8 +291,8 @@ sub _connected {
   my ($self, $id) = @_;
 
   # Store connection information in transaction
-  my $loop = $self->{_loop};
-  my $tx   = $self->{_cs}->{$id}->{tx};
+  my $loop = $self->{loop};
+  my $tx   = $self->{cs}->{$id}->{tx};
   $tx->connection($id);
   my $local = $loop->local_info($id);
   $tx->local_address($local->{address});
@@ -314,7 +314,7 @@ sub _drop {
   my ($self, $id, $close) = @_;
 
   # Drop connection
-  my $c = delete $self->{_cs}->{$id};
+  my $c = delete $self->{cs}->{$id};
 
   # Transaction
   my $tx = $c->{tx};
@@ -331,14 +331,14 @@ sub _drop {
 
   # Connection close
   $self->_cache($id);
-  $self->{_loop}->drop($id);
+  $self->{loop}->drop($id);
 }
 
 sub _error {
   my ($self, $loop, $id, $error) = @_;
 
   # Store error in response
-  if (my $tx = $self->{_cs}->{$id}->{tx}) { $tx->res->error($error) }
+  if (my $tx = $self->{cs}->{$id}->{tx}) { $tx->res->error($error) }
 
   # Log error
   $self->log->error($error);
@@ -376,14 +376,14 @@ sub _handle {
   my ($self, $id, $close) = @_;
 
   # WebSocket
-  my $c   = $self->{_cs}->{$id};
+  my $c   = $self->{cs}->{$id};
   my $old = $c->{tx};
   if ($old && $old->is_websocket) {
 
     # Finish transaction
     $old->client_close;
-    $self->{_processing} -= 1;
-    delete $self->{_cs}->{$id};
+    $self->{processing} -= 1;
+    delete $self->{cs}->{$id};
     $self->_drop($id, $close);
   }
 
@@ -410,7 +410,7 @@ sub _handle {
     if (my $jar = $self->cookie_jar) { $jar->extract($old) }
 
     # Finished transaction
-    $self->{_processing} -= 1;
+    $self->{processing} -= 1;
 
     # Redirect or callback
     $self->_finish($new || $old, $c->{cb}, $close)
@@ -418,7 +418,7 @@ sub _handle {
   }
 
   # Stop loop
-  $self->{_loop}->stop if !$self->{_nb} && !$self->{_processing};
+  $self->{loop}->stop if !$self->{nb} && !$self->{processing};
 }
 
 sub _info {
@@ -468,11 +468,11 @@ sub _proxy_connect {
         return unless my $old_id = $tx->connection;
 
         # Start TLS
-        my $new_id = $self->{_loop}->start_tls($old_id);
+        my $new_id = $self->{loop}->start_tls($old_id);
 
         # Cleanup
         $old->req->proxy(undef);
-        delete $self->{_cs}->{$old_id};
+        delete $self->{cs}->{$old_id};
         $tx->connection($new_id);
       }
 
@@ -494,7 +494,7 @@ sub _read {
   warn "< $chunk\n" if DEBUG;
 
   # Transaction
-  return unless my $c = $self->{_cs}->{$id};
+  return unless my $c = $self->{cs}->{$id};
   if (my $tx = $c->{tx}) {
 
     # Read
@@ -528,7 +528,7 @@ sub _redirect {
   return 1 unless my $new_id = $self->_start($new, $c->{cb});
 
   # Create new connection
-  $self->{_cs}->{$new_id}->{redirects} = $redirects + 1;
+  $self->{cs}->{$new_id}->{redirects} = $redirects + 1;
 
   # Redirecting
   1;
@@ -545,7 +545,7 @@ sub _start {
 
     # Relative
     unless ($url->host) {
-      $url->scheme($self->{_protocol});
+      $url->scheme($self->{protocol});
       $url->host('localhost');
       $url->port($self->test_server);
       $req->url($url);
@@ -590,8 +590,8 @@ sub _start {
   $tx->on_resume(sub { $self->_write($id) });
 
   # Counter
-  $self->{_processing} ||= 0;
-  $self->{_processing} += 1;
+  $self->{processing} ||= 0;
+  $self->{processing} += 1;
 
   $id;
 }
@@ -600,26 +600,26 @@ sub _switch_blocking {
   my $self = shift;
 
   # Can't switch while processing non-blocking requests
-  croak 'Non-blocking requests in progress' if $self->{_processing};
+  croak 'Non-blocking requests in progress' if $self->{processing};
   warn "SWITCHING TO BLOCKING MODE\n" if DEBUG;
 
   # Normal loop
   $self->_cleanup;
-  $self->{_loop} = $self->ioloop;
-  $self->{_nb}   = 0;
+  $self->{loop} = $self->ioloop;
+  $self->{nb}   = 0;
 }
 
 sub _switch_non_blocking {
   my $self = shift;
 
   # Can't switch while processing blocking requests
-  croak 'Blocking request in progress' if $self->{_processing};
+  croak 'Blocking request in progress' if $self->{processing};
   warn "SWITCHING TO NON-BLOCKING MODE\n" if DEBUG;
 
   # Global loop
   $self->_cleanup;
-  $self->{_loop} = Mojo::IOLoop->singleton;
-  $self->{_nb}   = 1;
+  $self->{loop} = Mojo::IOLoop->singleton;
+  $self->{nb}   = 1;
 }
 
 # "Once the government approves something, it's no longer immoral!"
@@ -627,7 +627,7 @@ sub _upgrade {
   my ($self, $id) = @_;
 
   # No upgrade request
-  my $c   = $self->{_cs}->{$id};
+  my $c   = $self->{cs}->{$id};
   my $old = $c->{tx};
   return unless $old->req->headers->upgrade;
 
@@ -645,7 +645,7 @@ sub _upgrade {
   $c->{tx} = $new;
 
   # Upgrade connection timeout
-  $self->{_loop}->connection_timeout($id, $self->websocket_timeout);
+  $self->{loop}->connection_timeout($id, $self->websocket_timeout);
 
   # Resume callback
   weaken $self;
@@ -659,7 +659,7 @@ sub _write {
   my ($self, $id) = @_;
 
   # Writing
-  return unless my $c  = $self->{_cs}->{$id};
+  return unless my $c  = $self->{cs}->{$id};
   return unless my $tx = $c->{tx};
   return unless $tx->is_writing;
 
@@ -674,7 +674,7 @@ sub _write {
   }
 
   # Write
-  $self->{_loop}->write($id, $chunk, $cb);
+  $self->{loop}->write($id, $chunk, $cb);
 
   # Finish
   $self->_handle($id) if $tx->is_done;

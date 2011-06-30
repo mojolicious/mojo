@@ -164,7 +164,7 @@ sub has_conditions {
 }
 
 sub has_custom_name {
-  return 1 if shift->{_custom};
+  return 1 if shift->{custom};
   undef;
 }
 
@@ -186,7 +186,7 @@ sub is_endpoint {
 }
 
 sub is_websocket {
-  return 1 if shift->{_websocket};
+  return 1 if shift->{websocket};
   undef;
 }
 
@@ -195,8 +195,8 @@ sub name {
 
   # New name
   if (defined $_[0]) {
-    $self->{_name}   = $_[0];
-    $self->{_custom} = 1;
+    $self->{name}   = $_[0];
+    $self->{custom} = 1;
     return $self;
   }
 
@@ -204,7 +204,7 @@ sub name {
   elsif (@_) { return $self }
 
   # Name
-  $self->{_name};
+  $self->{name};
 }
 
 sub over {
@@ -225,8 +225,8 @@ sub parse {
   my $name = $self->pattern->pattern;
   $name = '' unless defined $name;
   $name =~ s/\W+//g;
-  $self->{_name}   = $name;
-  $self->{_custom} = 0;
+  $self->{name}   = $name;
+  $self->{custom} = 0;
 
   $self;
 }
@@ -337,12 +337,12 @@ sub via {
   # Set
   if (@_) {
     my $methods = [map { lc $_ } @{ref $_[0] ? $_[0] : [@_]}];
-    $self->{_via} = $methods if @$methods;
+    $self->{via} = $methods if @$methods;
     return $self;
   }
 
   # Get
-  $self->{_via};
+  $self->{via};
 }
 
 sub waypoint { shift->route(@_)->block(1) }
@@ -350,7 +350,7 @@ sub waypoint { shift->route(@_)->block(1) }
 sub websocket {
   my $self  = shift;
   my $route = $self->any(@_);
-  $route->{_websocket} = 1;
+  $route->{websocket} = 1;
   $route;
 }
 
@@ -385,7 +385,7 @@ sub _dispatch_controller {
   $c->app->log->debug(qq/Dispatching "$dispatch"./);
 
   # Load class
-  if (!ref $app && !$self->{_loaded}->{$app}) {
+  if (!ref $app && !$self->{loaded}->{$app}) {
     if (my $e = Mojo::Loader->load($app)) {
 
       # Doesn't exist
@@ -400,7 +400,7 @@ sub _dispatch_controller {
     }
 
     # Loaded
-    $self->{_loaded}->{$app}++;
+    $self->{loaded}->{$app}++;
   }
 
   # Dispatch
@@ -489,14 +489,14 @@ sub _generate_method {
   my ($self, $field, $c) = @_;
 
   # Prepare hidden
-  unless ($self->{_hidden}) {
-    $self->{_hidden} = {};
-    $self->{_hidden}->{$_}++ for @{$self->hidden};
+  unless ($self->{hiding}) {
+    $self->{hiding} = {};
+    $self->{hiding}->{$_}++ for @{$self->hidden};
   }
 
   # Hidden
   return unless my $method = $field->{method} || $field->{action};
-  if ($self->{_hidden}->{$method} || index($method, '_') == 0) {
+  if ($self->{hiding}->{$method} || index($method, '_') == 0) {
     $c->app->log->debug(qq/Action "$method" is not allowed./);
     return;
   }

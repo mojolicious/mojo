@@ -39,12 +39,12 @@ sub run {
   # Watch files and manage worker
   $SIG{CHLD} = sub { $self->_reap };
   $SIG{INT} = $SIG{TERM} = $SIG{QUIT} = sub {
-    $self->{_done} = 1;
-    kill 'TERM', $self->{_running} if $self->{_running};
+    $self->{done} = 1;
+    kill 'TERM', $self->{running} if $self->{running};
   };
   unshift @{$self->watch}, $app;
-  $self->{_modified} = 1;
-  $self->_manage while !$self->{_done} || $self->{_running};
+  $self->{modified} = 1;
+  $self->_manage while !$self->{done} || $self->{running};
   exit 0;
 }
 
@@ -72,14 +72,14 @@ sub _manage {
     warn "CHECKING $file\n" if DEBUG;
     next unless $self->check_file($file);
     warn "MODIFIED $file\n" if DEBUG;
-    kill 'TERM', $self->{_running} if $self->{_running};
-    $self->{_modified} = 1;
+    kill 'TERM', $self->{running} if $self->{running};
+    $self->{modified} = 1;
   }
 
   # Housekeeping
   $self->_reap;
-  delete $self->{_running} if $self->{_running} && !kill 0, $self->{_running};
-  $self->_spawn if !$self->{_running} && delete $self->{_modified};
+  delete $self->{running} if $self->{running} && !kill 0, $self->{running};
+  $self->_spawn if !$self->{running} && delete $self->{modified};
   sleep 1;
 }
 
@@ -87,7 +87,7 @@ sub _reap {
   my $self = shift;
   while ((my $pid = waitpid -1, WNOHANG) > 0) {
     warn "WORKER STOPPED $pid\n" if DEBUG;
-    delete $self->{_running};
+    delete $self->{running};
   }
 }
 
@@ -104,12 +104,12 @@ sub _spawn {
   croak "Can't fork: $!" unless defined(my $pid = fork);
 
   # Manager
-  return $self->{_running} = $pid if $pid;
+  return $self->{running} = $pid if $pid;
 
   # Worker
   warn "WORKER STARTED $$\n" if DEBUG;
   $SIG{CHLD} = 'DEFAULT';
-  $SIG{INT} = $SIG{TERM} = $SIG{QUIT} = sub { $self->{_done} = 1 };
+  $SIG{INT} = $SIG{TERM} = $SIG{QUIT} = sub { $self->{done} = 1 };
   my $daemon = Mojo::Server::Daemon->new;
   $daemon->load_app($self->watch->[0]);
   $daemon->silent(1) if $ENV{MORBO_REV} > 1;
@@ -117,7 +117,7 @@ sub _spawn {
   $daemon->prepare_ioloop;
   my $loop = $daemon->ioloop;
   $loop->recurring(
-    1 => sub { shift->stop if !kill(0, $manager) || $self->{_done} });
+    1 => sub { shift->stop if !kill(0, $manager) || $self->{done} });
   $loop->start;
   exit 0;
 }

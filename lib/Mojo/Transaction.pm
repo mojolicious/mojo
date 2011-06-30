@@ -23,14 +23,14 @@ sub error {
 }
 
 sub is_done {
-  return 1 if (shift->{_state} || '') eq 'done';
+  return 1 if (shift->{state} || '') eq 'done';
   undef;
 }
 
 sub is_websocket {0}
 
 sub is_writing {
-  return 1 unless my $state = shift->{_state};
+  return 1 unless my $state = shift->{state};
   return 1
     if $state eq 'write'
       || $state eq 'write_start_line'
@@ -52,7 +52,7 @@ sub remote_address {
   if ($ENV{MOJO_REVERSE_PROXY}) {
 
     # Forwarded
-    my $forwarded = $self->{_forwarded_for};
+    my $forwarded = $self->{forwarded_for};
     return $forwarded if $forwarded;
 
     # Reverse proxy
@@ -60,7 +60,7 @@ sub remote_address {
 
       # Real address
       if ($forwarded =~ /([^,\s]+)$/) {
-        $self->{_forwarded_for} = $1;
+        $self->{forwarded_for} = $1;
         return $1;
       }
     }
@@ -77,12 +77,12 @@ sub resume {
   my $self = shift;
 
   # Delayed
-  if (($self->{_state} || '') eq 'paused') {
-    $self->{_state} = 'write_body';
+  if (($self->{state} || '') eq 'paused') {
+    $self->{state} = 'write_body';
   }
 
   # Writing
-  elsif (!$self->is_writing) { $self->{_state} = 'write' }
+  elsif (!$self->is_writing) { $self->{state} = 'write' }
 
   # Callback
   $self->on_resume->($self);

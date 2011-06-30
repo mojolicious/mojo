@@ -360,11 +360,11 @@ sub _exception {
 package Mojo::JSON::_Bool;
 use Mojo::Base -base;
 use overload
-  '0+'     => sub { $_[0]->{_value} },
-  '""'     => sub { $_[0]->{_value} },
+  '0+'     => sub { $_[0]->{value} },
+  '""'     => sub { $_[0]->{value} },
   fallback => 1;
 
-sub new { shift->SUPER::new(_value => shift) }
+sub new { shift->SUPER::new(value => shift) }
 
 1;
 __END__

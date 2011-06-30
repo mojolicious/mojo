@@ -25,7 +25,7 @@ sub DESTROY {
   return if $ENV{HYPNOTOAD_WORKER};
 
   # Manager
-  return unless my $file = $self->{_config}->{pid_file};
+  return unless my $file = $self->{config}->{pid_file};
   unlink $file if -f $file;
 }
 
@@ -67,7 +67,7 @@ sub run {
   exec $ENV{HYPNOTOAD_EXE} unless $ENV{HYPNOTOAD_REV}++;
 
   # Preload application
-  my $daemon = $self->{_daemon} = Mojo::Server::Daemon->new;
+  my $daemon = $self->{daemon} = Mojo::Server::Daemon->new;
   warn "APPLICATION $ENV{HYPNOTOAD_APP}\n" if DEBUG;
   $daemon->load_app($ENV{HYPNOTOAD_APP});
 
@@ -81,10 +81,10 @@ sub run {
   $daemon->prepare_ioloop;
 
   # Pipe for worker communication
-  pipe($self->{_reader}, $self->{_writer})
+  pipe($self->{reader}, $self->{writer})
     or croak "Can't create pipe: $!";
-  $self->{_poll} = IO::Poll->new;
-  $self->{_poll}->mask($self->{_reader}, POLLIN);
+  $self->{poll} = IO::Poll->new;
+  $self->{poll}->mask($self->{reader}, POLLIN);
 
   # Daemonize
   if (!DEBUG && !$ENV{HYPNOTOAD_FOREGROUND}) {
@@ -101,19 +101,18 @@ sub run {
   }
 
   # Manager signals
-  my $c = $self->{_config};
-  $SIG{INT} = $SIG{TERM} = sub { $self->{_done} = 1 };
+  my $c = $self->{config};
+  $SIG{INT} = $SIG{TERM} = sub { $self->{done} = 1 };
   $SIG{CHLD} = sub {
     while ((my $pid = waitpid -1, WNOHANG) > 0) { $self->_reap($pid) }
   };
-  $SIG{QUIT} = sub { $self->{_done} = $self->{_graceful} = 1 };
-  $SIG{USR2} = sub { $self->{_upgrade} ||= time };
+  $SIG{QUIT} = sub { $self->{done} = $self->{graceful} = 1 };
+  $SIG{USR2} = sub { $self->{upgrade} ||= time };
   $SIG{TTIN} = sub { $c->{workers}++ };
   $SIG{TTOU} = sub {
     return unless $c->{workers};
     $c->{workers}--;
-    $self->{_workers}->{shuffle keys %{$self->{_workers}}}->{graceful}
-      ||= time;
+    $self->{workers}->{shuffle keys %{$self->{workers}}}->{graceful} ||= time;
   };
 
   # Mainloop
@@ -136,7 +135,7 @@ sub _config {
         unless ref $c eq 'HASH';
     }
   }
-  $self->{_config} = $c;
+  $self->{config} = $c;
 
   # Hypnotoad settings
   $c->{graceful_timeout}   ||= 30;
@@ -152,7 +151,7 @@ sub _config {
 
   # Daemon settings
   $ENV{MOJO_REVERSE_PROXY} = 1 if $c->{proxy};
-  my $daemon = $self->{_daemon};
+  my $daemon = $self->{daemon};
   $daemon->backlog($c->{backlog}) if defined $c->{backlog};
   $daemon->max_clients($c->{clients} || 1000);
   $daemon->group($c->{group}) if $c->{group};
@@ -170,15 +169,15 @@ sub _heartbeat {
   my $self = shift;
 
   # Poll for heartbeats
-  my $poll = $self->{_poll};
+  my $poll = $self->{poll};
   $poll->poll(1);
   return unless $poll->handles(POLLIN);
-  return unless $self->{_reader}->sysread(my $chunk, 4194304);
+  return unless $self->{reader}->sysread(my $chunk, 4194304);
 
   # Heartbeats
   while ($chunk =~ /(\d+)\n/g) {
     my $pid = $1;
-    $self->{_workers}->{$pid}->{time} = time if $self->{_workers}->{$pid};
+    $self->{workers}->{$pid}->{time} = time if $self->{workers}->{$pid};
   }
 }
 
@@ -186,18 +185,18 @@ sub _manage {
   my $self = shift;
 
   # Housekeeping
-  my $c = $self->{_config};
-  if (!$self->{_done}) {
+  my $c = $self->{config};
+  if (!$self->{done}) {
 
     # Spawn more workers
-    $self->_spawn while keys %{$self->{_workers}} < $c->{workers};
+    $self->_spawn while keys %{$self->{workers}} < $c->{workers};
 
     # Check PID file
     $self->_pid;
   }
 
   # Shutdown
-  elsif (!keys %{$self->{_workers}}) { exit 0 }
+  elsif (!keys %{$self->{workers}}) { exit 0 }
 
   # Upgraded
   if ($ENV{HYPNOTOAD_PID} && $ENV{HYPNOTOAD_PID} ne $$) {
@@ -210,27 +209,27 @@ sub _manage {
   $self->_heartbeat;
 
   # Upgrade
-  if ($self->{_upgrade} && !$self->{_done}) {
+  if ($self->{upgrade} && !$self->{done}) {
 
     # Start
-    unless ($self->{_new}) {
+    unless ($self->{new}) {
 
       # Fork
       warn "UPGRADING\n" if DEBUG;
       croak "Can't fork: $!" unless defined(my $pid = fork);
-      $self->{_new} = $pid if $pid;
+      $self->{new} = $pid if $pid;
 
       # Fresh start
       exec $ENV{HYPNOTOAD_EXE} unless $pid;
     }
 
     # Timeout
-    kill 'TERM', $self->{_new}
-      if $self->{_upgrade} + $c->{upgrade_timeout} <= time;
+    kill 'TERM', $self->{new}
+      if $self->{upgrade} + $c->{upgrade_timeout} <= time;
   }
 
   # Workers
-  while (my ($pid, $w) = each %{$self->{_workers}}) {
+  while (my ($pid, $w) = each %{$self->{workers}}) {
 
     # No heartbeat
     my $interval = $c->{heartbeat_interval};
@@ -243,7 +242,7 @@ sub _manage {
     }
 
     # Graceful stop
-    $w->{graceful} ||= time if $self->{_graceful};
+    $w->{graceful} ||= time if $self->{graceful};
     if ($w->{graceful}) {
 
       # Kill
@@ -256,7 +255,7 @@ sub _manage {
     }
 
     # Normal stop
-    if (($self->{_done} && !$self->{_graceful}) || $w->{force}) {
+    if (($self->{done} && !$self->{graceful}) || $w->{force}) {
 
       # Kill
       warn "TERM $pid\n" if DEBUG;
@@ -269,7 +268,7 @@ sub _pid {
   my $self = shift;
 
   # Check PID file
-  my $file = $self->{_config}->{pid_file};
+  my $file = $self->{config}->{pid_file};
   return if -e $file;
   warn "PID $file\n" if DEBUG;
 
@@ -286,16 +285,16 @@ sub _reap {
   my ($self, $pid) = @_;
 
   # Cleanup failed upgrade
-  if (($self->{_new} || '') eq $pid) {
+  if (($self->{new} || '') eq $pid) {
     warn "UPGRADE FAILED\n" if DEBUG;
-    delete $self->{_upgrade};
-    delete $self->{_new};
+    delete $self->{upgrade};
+    delete $self->{new};
   }
 
   # Cleanup worker
   else {
     warn "WORKER DIED $pid\n" if DEBUG;
-    delete $self->{_workers}->{$pid};
+    delete $self->{workers}->{$pid};
   }
 }
 
@@ -307,13 +306,13 @@ sub _spawn {
   croak "Can't fork: $!" unless defined(my $pid = fork);
 
   # Manager
-  return $self->{_workers}->{$pid} = {time => time} if $pid;
+  return $self->{workers}->{$pid} = {time => time} if $pid;
 
   # Worker
   $ENV{HYPNOTOAD_WORKER} = 1;
-  my $daemon = $self->{_daemon};
+  my $daemon = $self->{daemon};
   my $loop   = $daemon->ioloop;
-  my $c      = $self->{_config};
+  my $c      = $self->{config};
 
   # Prepare lock file
   my $file = $c->{lock_file};
@@ -353,7 +352,7 @@ sub _spawn {
   $cb = sub {
     my $loop = shift;
     $loop->timer($c->{heartbeat} => $cb) if $loop->max_connections;
-    $self->{_writer}->syswrite("$$\n") or exit 0;
+    $self->{writer}->syswrite("$$\n") or exit 0;
   };
   $cb->($loop);
   weaken $cb;
@@ -364,8 +363,8 @@ sub _spawn {
   $SIG{QUIT} = sub { $loop->max_connections(0) };
 
   # Cleanup
-  delete $self->{_reader};
-  delete $self->{_poll};
+  delete $self->{reader};
+  delete $self->{poll};
 
   # User and group
   $daemon->setuidgid;

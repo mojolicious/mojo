@@ -607,7 +607,7 @@ sub _connect {
 sub _drop {
   my ($self, $id) = @_;
 
-  # Cancel timer events
+  # Cancel timer
   return $self unless my $watcher = $self->iowatcher;
   return $self if $watcher->cancel($id);
 

@@ -49,19 +49,19 @@ sub new {
     }
   );
 
-  $self;
+  return $self;
 }
 
 sub add_handler {
   my ($self, $name, $cb) = @_;
   $self->handlers->{$name} = $cb;
-  $self;
+  return $self;
 }
 
 sub add_helper {
   my ($self, $name, $cb) = @_;
   $self->helpers->{$name} = $cb;
-  $self;
+  return $self;
 }
 
 sub get_data_template {
@@ -156,7 +156,7 @@ sub render {
     encode $encoding, $output if $encoding && $output && !$json && !$data;
   }
 
-  ($output, $c->app->types->type($format) || 'text/plain');
+  return $output, $c->app->types->type($format) || 'text/plain';
 }
 
 sub template_name {
@@ -168,13 +168,13 @@ sub template_name {
   my $file    = "$template.$format";
   $file = "$file.$handler" if defined $handler;
 
-  $file;
+  return $file;
 }
 
 sub template_path {
   my $self = shift;
   return unless my $name = $self->template_name(shift);
-  File::Spec->catfile($self->root, split '/', $name);
+  return File::Spec->catfile($self->root, split '/', $name);
 }
 
 sub _detect_handler {
@@ -202,7 +202,7 @@ sub _detect_handler {
     if ($template =~ /^$file\.(\w+)$/) { return $1 }
   }
 
-  undef;
+  return;
 }
 
 # "You are hereby conquered.
@@ -221,13 +221,13 @@ sub _extends {
   if (my $layout = delete $stash->{layout}) {
     $stash->{extends} ||= $self->layout_prefix . '/' . $layout;
   }
-  delete $stash->{extends};
+  return delete $stash->{extends};
 }
 
 sub _list_data_templates {
   my ($self, $class) = @_;
   my $all = Mojo::Command->new->get_all_data($class);
-  [keys %$all];
+  return [keys %$all];
 }
 
 # "Well, at least here you'll be treated with dignity.
@@ -253,7 +253,7 @@ sub _render_template {
   return unless $renderer->($self, $c, $output, $options);
 
   # Success!
-  1;
+  return 1;
 }
 
 1;

@@ -44,7 +44,7 @@ sub register {
       # Captures
       push @url, shift if ref $_[0] eq 'HASH';
 
-      $self->_tag('form', action => $c->url_for(@url), @_);
+      return $self->_tag('form', action => $c->url_for(@url), @_);
     }
   );
 
@@ -89,7 +89,7 @@ sub register {
       my %attrs = @_;
       $attrs{src} = $c->url_for($src) if $src;
 
-      $self->_tag('script', type => 'text/javascript', %attrs, $cb);
+      return $self->_tag('script', type => 'text/javascript', %attrs, $cb);
     }
   );
 
@@ -110,7 +110,7 @@ sub register {
       # Captures
       push @url, shift if ref $_[0] eq 'HASH';
 
-      $self->_tag('a', href => $c->url_for(@url), @_);
+      return $self->_tag('a', href => $c->url_for(@url), @_);
     }
   );
 
@@ -183,7 +183,7 @@ sub register {
             else { $parts .= $cb->($o) }
           }
 
-          $parts;
+          return $parts;
         }
       );
     }
@@ -219,7 +219,7 @@ sub register {
       ) if $href;
 
       # Style
-      $self->_tag('style', type => 'text/css', %attrs, $cb);
+      return $self->_tag('style', type => 'text/css', %attrs, $cb);
     }
   );
 
@@ -229,7 +229,7 @@ sub register {
       my $c     = shift;
       my $value = shift;
       $value = 'Ok' unless defined $value;
-      $self->_tag('input', value => $value, type => 'submit', @_);
+      return $self->_tag('input', value => $value, type => 'submit', @_);
     }
   );
 
@@ -248,7 +248,7 @@ sub register {
         $cb = sub {$value}
       }
 
-      $self->_tag('textarea', name => $name, @_, $cb);
+      return $self->_tag('textarea', name => $name, @_, $cb);
     }
   );
 
@@ -294,7 +294,7 @@ sub _input {
   }
 
   # Empty tag
-  $self->_tag('input', name => $name, %attrs);
+  return $self->_tag('input', name => $name, %attrs);
 }
 
 # "We’ve lost power of the forward Gameboy! Mario not responding!"
@@ -329,7 +329,7 @@ sub _tag {
   else { $tag .= ' />' }
 
   # Prevent escaping
-  b($tag);
+  return b($tag);
 }
 
 1;

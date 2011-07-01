@@ -107,7 +107,7 @@ sub run {
   # Finish transaction
   $tx->on_finish->($tx);
 
-  $res->code;
+  return $res->code;
 }
 
 1;

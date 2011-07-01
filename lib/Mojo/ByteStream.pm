@@ -20,36 +20,36 @@ sub import {
 sub new {
   my $self = shift->SUPER::new();
   $self->{bytestream} = join '', @_;
-  $self;
+  return $self;
 }
 
 sub b64_decode {
   my $self = shift;
   $self->{bytestream} = Mojo::Util::b64_decode($self->{bytestream});
-  $self;
+  return $self;
 }
 
 sub b64_encode {
   my $self = shift;
   $self->{bytestream} = Mojo::Util::b64_encode($self->{bytestream}, @_);
-  $self;
+  return $self;
 }
 
 sub camelize {
   my $self = shift;
   Mojo::Util::camelize $self->{bytestream};
-  $self;
+  return $self;
 }
 
 sub clone {
   my $self = shift;
-  $self->new($self->{bytestream});
+  return $self->new($self->{bytestream});
 }
 
 sub decamelize {
   my $self = shift;
   Mojo::Util::decamelize $self->{bytestream};
-  $self;
+  return $self;
 }
 
 # "I want to share something with you: The three little sentences that will
@@ -60,61 +60,61 @@ sub decamelize {
 sub decode {
   my $self = shift;
   Mojo::Util::decode shift || 'UTF-8', $self->{bytestream};
-  $self;
+  return $self;
 }
 
 sub encode {
   my $self = shift;
   Mojo::Util::encode shift || 'UTF-8', $self->{bytestream};
-  $self;
+  return $self;
 }
 
 sub hmac_md5_sum {
   my $self = shift;
   $self->{bytestream} = Mojo::Util::hmac_md5_sum $self->{bytestream}, @_;
-  $self;
+  return $self;
 }
 
 sub hmac_sha1_sum {
   my $self = shift;
   $self->{bytestream} = Mojo::Util::hmac_sha1_sum $self->{bytestream}, @_;
-  $self;
+  return $self;
 }
 
 sub html_escape {
   my $self = shift;
   Mojo::Util::html_escape $self->{bytestream};
-  $self;
+  return $self;
 }
 
 sub html_unescape {
   my $self = shift;
   Mojo::Util::html_unescape $self->{bytestream};
-  $self;
+  return $self;
 }
 
 sub md5_bytes {
   my $self = shift;
   $self->{bytestream} = Mojo::Util::md5_bytes $self->{bytestream};
-  $self;
+  return $self;
 }
 
 sub md5_sum {
   my $self = shift;
   $self->{bytestream} = Mojo::Util::md5_sum $self->{bytestream};
-  $self;
+  return $self;
 }
 
 sub punycode_decode {
   my $self = shift;
   Mojo::Util::punycode_decode $self->{bytestream};
-  $self;
+  return $self;
 }
 
 sub punycode_encode {
   my $self = shift;
   Mojo::Util::punycode_encode $self->{bytestream};
-  $self;
+  return $self;
 }
 
 # "Old people don't need companionship.
@@ -123,19 +123,19 @@ sub punycode_encode {
 sub qp_decode {
   my $self = shift;
   Mojo::Util::qp_decode $self->{bytestream};
-  $self;
+  return $self;
 }
 
 sub qp_encode {
   my $self = shift;
   Mojo::Util::qp_encode $self->{bytestream};
-  $self;
+  return $self;
 }
 
 sub quote {
   my $self = shift;
   Mojo::Util::quote $self->{bytestream};
-  $self;
+  return $self;
 }
 
 sub say {
@@ -148,13 +148,13 @@ sub say {
 sub sha1_bytes {
   my $self = shift;
   $self->{bytestream} = Mojo::Util::sha1_bytes $self->{bytestream};
-  $self;
+  return $self;
 }
 
 sub sha1_sum {
   my $self = shift;
   $self->{bytestream} = Mojo::Util::sha1_sum $self->{bytestream};
-  $self;
+  return $self;
 }
 
 sub size { length shift->{bytestream} }
@@ -164,31 +164,31 @@ sub to_string { shift->{bytestream} }
 sub trim {
   my $self = shift;
   Mojo::Util::trim $self->{bytestream}, @_;
-  $self;
+  return $self;
 }
 
 sub unquote {
   my $self = shift;
   Mojo::Util::unquote $self->{bytestream}, @_;
-  $self;
+  return $self;
 }
 
 sub url_escape {
   my $self = shift;
   Mojo::Util::url_escape $self->{bytestream}, @_;
-  $self;
+  return $self;
 }
 
 sub url_unescape {
   my $self = shift;
   Mojo::Util::url_unescape $self->{bytestream};
-  $self;
+  return $self;
 }
 
 sub xml_escape {
   my $self = shift;
   Mojo::Util::xml_escape $self->{bytestream};
-  $self;
+  return $self;
 }
 
 1;

@@ -40,7 +40,7 @@ our $IPV6_RE = qr/(?:
 sub new {
   my $self = shift->SUPER::new();
   $self->parse(@_);
-  $self;
+  return $self;
 }
 
 sub authority {
@@ -87,7 +87,7 @@ sub authority {
   $authority .= lc($host || '');
   $authority .= ":$port" if $port;
 
-  $authority;
+  return $authority;
 }
 
 sub clone {
@@ -101,7 +101,7 @@ sub clone {
   $clone->fragment($self->fragment);
   $clone->base($self->base->clone) if $self->{base};
 
-  $clone;
+  return $clone;
 }
 
 sub ihost {
@@ -138,23 +138,23 @@ sub ihost {
     push @encoded, $part;
   }
 
-  join '.', @encoded;
+  return join '.', @encoded;
 }
 
 sub is_abs {
   my $self = shift;
   return 1 if $self->scheme && $self->authority;
-  undef;
+  return;
 }
 
 sub is_ipv4 {
   return 1 if shift->host =~ $IPV4_RE;
-  undef;
+  return;
 }
 
 sub is_ipv6 {
   return 1 if shift->host =~ $IPV6_RE;
-  undef;
+  return;
 }
 
 sub parse {
@@ -170,7 +170,7 @@ sub parse {
   $self->query($query);
   $self->fragment($fragment);
 
-  $self;
+  return $self;
 }
 
 sub path {
@@ -201,8 +201,7 @@ sub path {
   }
 
   # Get
-  $self->{path} ||= Mojo::Path->new;
-  $self->{path};
+  return $self->{path} ||= Mojo::Path->new;
 }
 
 sub query {
@@ -238,8 +237,7 @@ sub query {
   }
 
   # Get
-  $self->{query} ||= Mojo::Parameters->new;
-  $self->{query};
+  return $self->{query} ||= Mojo::Parameters->new;
 }
 
 sub to_abs {
@@ -276,7 +274,7 @@ sub to_abs {
   $new->trailing_slash($old->trailing_slash);
   $abs->path($new);
 
-  $abs;
+  return $abs;
 }
 
 sub to_rel {
@@ -305,7 +303,7 @@ sub to_rel {
   $rel->path($path);
   $rel->path->leading_slash(0);
 
-  $rel;
+  return $rel;
 }
 
 # "Dad, what's a Muppet?
@@ -342,7 +340,7 @@ sub to_string {
     $url .= "#$fragment";
   }
 
-  $url;
+  return $url;
 }
 
 1;

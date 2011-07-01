@@ -24,7 +24,7 @@ has ua => sub {
   my $ua = Mojo::UserAgent->new(app => $self, log => $self->log);
   weaken $ua->{app};
 
-  $ua;
+  return $ua;
 };
 
 # "Oh, so they have internet on computers now!"
@@ -38,7 +38,7 @@ sub new {
   $self->log->path($self->home->rel_file('log/mojo.log'))
     if -w $self->home->rel_file('log');
 
-  $self;
+  return $self;
 }
 
 # "D’oh."

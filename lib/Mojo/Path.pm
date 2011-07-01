@@ -14,7 +14,7 @@ has parts => sub { [] };
 sub new {
   my $self = shift->SUPER::new();
   $self->parse(@_);
-  $self;
+  return $self;
 }
 
 sub append {
@@ -29,7 +29,7 @@ sub append {
     push @{$self->parts}, $value;
   }
 
-  $self;
+  return $self;
 }
 
 sub canonicalize {
@@ -57,7 +57,7 @@ sub canonicalize {
   }
   $self->parts(\@path);
 
-  $self;
+  return $self;
 }
 
 # "Homer, the plant called.
@@ -71,7 +71,7 @@ sub clone {
   $clone->leading_slash($self->leading_slash);
   $clone->trailing_slash($self->trailing_slash);
 
-  $clone;
+  return $clone;
 }
 
 sub parse {
@@ -97,13 +97,13 @@ sub parse {
   }
   $self->parts(\@parts);
 
-  $self;
+  return $self;
 }
 
 sub to_abs_string {
   my $self = shift;
   return $self->to_string if $self->leading_slash;
-  '/' . $self->to_string;
+  return '/' . $self->to_string;
 }
 
 sub to_string {
@@ -124,7 +124,7 @@ sub to_string {
   $path = "/$path" if $self->leading_slash;
   $path = "$path/" if @path && $self->trailing_slash;
 
-  $path;
+  return $path;
 }
 
 1;

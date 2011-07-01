@@ -16,14 +16,14 @@ has [qw/format pattern regex/];
 sub new {
   my $self = shift->SUPER::new();
   $self->parse(@_);
-  $self;
+  return $self;
 }
 
 sub match {
   my ($self, $path) = @_;
   my $result = $self->shape_match(\$path);
   return $result if !$path || $path eq '/';
-  undef;
+  return;
 }
 
 sub parse {
@@ -49,7 +49,7 @@ sub parse {
   $self->pattern($pattern);
   $self->_tokenize;
 
-  $self;
+  return $self;
 }
 
 sub render {
@@ -91,7 +91,7 @@ sub render {
     $string = "$rendered$string";
   }
 
-  $string || '/';
+  return $string || '/';
 }
 
 sub shape_match {
@@ -125,7 +125,7 @@ sub shape_match {
     return $result;
   }
 
-  undef;
+  return;
 }
 
 sub _compile {
@@ -198,13 +198,13 @@ sub _compile {
   $regex = qr/^$regex/;
   $self->regex($regex);
 
-  $regex;
+  return $regex;
 }
 
 sub _compile_req {
   my $req = shift;
   return "($req)" if !ref $req || ref $req ne 'ARRAY';
-  '(' . join('|', @$req) . ')';
+  return '(' . join('|', @$req) . ')';
 }
 
 sub _tokenize {
@@ -297,7 +297,7 @@ sub _tokenize {
   }
   $self->tree($tree);
 
-  $self;
+  return $self;
 }
 
 1;

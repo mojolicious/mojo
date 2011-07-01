@@ -376,7 +376,7 @@ sub get_line {
   my $line = substr $_[0], 0, $pos + 1, '';
   $line =~ s/\x0d?\x0a$//;
 
-  $line;
+  return $line;
 }
 
 sub hmac_md5_sum { _hmac(\&_md5, @_) }
@@ -661,7 +661,7 @@ sub _hmac {
   # HMAC
   my $ipad = $secret ^ (chr(0x36) x 64);
   my $opad = $secret ^ (chr(0x5c) x 64);
-  unpack 'H*', $_[0]->($opad . $_[0]->($ipad . $_[1]));
+  return unpack 'H*', $_[0]->($opad . $_[0]->($ipad . $_[1]));
 }
 
 # Helper for md5_bytes
@@ -682,7 +682,7 @@ sub _unescape {
     return chr hex $_[0] if substr($_[0], 0, 1) eq 'x';
     return chr $_[0];
   }
-  exists $ENTITIES{$_[1]} ? chr $ENTITIES{$_[1]} : "&$_[1];";
+  return exists $ENTITIES{$_[1]} ? chr $ENTITIES{$_[1]} : "&$_[1];";
 }
 
 1;

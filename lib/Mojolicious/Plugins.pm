@@ -13,7 +13,7 @@ sub add_hook {
   return $self unless $name && $cb;
   $self->hooks->{$name} ||= [];
   push @{$self->hooks->{$name}}, $cb;
-  $self;
+  return $self;
 }
 
 # "Also you have a rectangular object in your colon.
@@ -55,7 +55,7 @@ sub run_hook {
   return $self unless my $name  = shift;
   return $self unless my $hooks = $self->hooks->{$name};
   for my $hook (@$hooks) { $hook->(@_) }
-  $self;
+  return $self;
 }
 
 # "Everybody's a jerk. You, me, this jerk."
@@ -64,7 +64,7 @@ sub run_hook_reverse {
   return $self unless my $name  = shift;
   return $self unless my $hooks = $self->hooks->{$name};
   for my $hook (reverse @$hooks) { $hook->(@_) }
-  $self;
+  return $self;
 }
 
 sub _load {
@@ -78,7 +78,7 @@ sub _load {
 
   # Module is a plugin
   return unless $module->can('new') && $module->can('register');
-  1;
+  return 1;
 }
 
 1;

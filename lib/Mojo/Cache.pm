@@ -22,7 +22,7 @@ sub set {
   push @$stack, $key;
   $cache->{$key} = $value;
 
-  $self;
+  return $self;
 }
 
 1;

@@ -214,7 +214,7 @@ sub resolve {
     }
   );
 
-  $self;
+  return $self;
 }
 
 sub servers {
@@ -232,7 +232,7 @@ sub servers {
 
   # Current server
   $CURRENT_SERVER = 0 unless $SERVERS->[$CURRENT_SERVER];
-  $SERVERS->[$CURRENT_SERVER];
+  return $SERVERS->[$CURRENT_SERVER];
 }
 
 # Answer helper for "resolve"
@@ -273,7 +273,7 @@ sub _parse_answer {
   return $type => _parse_name($packet, $offset) if $type;
 
   # Not supported
-  undef;
+  return;
 }
 
 # Domain name helper for "resolve"
@@ -302,7 +302,7 @@ sub _parse_name {
     else { return join '.', @elements }
   }
 
-  undef;
+  return;
 }
 
 1;

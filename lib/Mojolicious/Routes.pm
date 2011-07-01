@@ -28,7 +28,7 @@ sub AUTOLOAD {
   # Call shortcut
   Carp::croak(qq/Can't locate object method "$method" via package "$package"/)
     unless my $shortcut = $self->shortcuts->{$method};
-  $self->$shortcut(@_);
+  return $self->$shortcut(@_);
 }
 
 sub DESTROY { }
@@ -36,7 +36,7 @@ sub DESTROY { }
 sub new {
   my $self = shift->SUPER::new();
   $self->parse(@_);
-  $self;
+  return $self;
 }
 
 sub add_child {
@@ -52,19 +52,19 @@ sub add_child {
   # Add to tree
   push @{$self->children}, $route;
 
-  $self;
+  return $self;
 }
 
 sub add_condition {
   my ($self, $name, $cb) = @_;
   $self->dictionary->{$name} = $cb;
-  $self;
+  return $self;
 }
 
 sub add_shortcut {
   my ($self, $name, $cb) = @_;
   $self->shortcuts->{$name} = $cb;
-  $self;
+  return $self;
 }
 
 sub any {
@@ -88,7 +88,7 @@ sub auto_render {
     1;
   } or $c->render_exception($@);
 
-  1;
+  return 1;
 }
 
 sub bridge { shift->route(@_)->inline(1) }
@@ -99,7 +99,7 @@ sub detour {
   my $self = shift;
   $self->partial(1);
   $self->to(@_);
-  $self;
+  return $self;
 }
 
 sub dispatch {
@@ -160,19 +160,19 @@ sub has_conditions {
   my $self = shift;
   return 1 if @{$self->conditions};
   if (my $parent = $self->parent) { return $parent->has_conditions }
-  undef;
+  return;
 }
 
 sub has_custom_name {
   return 1 if shift->{custom};
-  undef;
+  return;
 }
 
 sub has_websocket {
   my $self = shift;
   return 1 if $self->is_websocket;
   if (my $parent = $self->parent) { return $parent->is_websocket }
-  undef;
+  return;
 }
 
 sub hide { push @{shift->hidden}, @_ }
@@ -182,12 +182,12 @@ sub is_endpoint {
   return   if $self->inline;
   return 1 if $self->block;
   return   if @{$self->children};
-  1;
+  return 1;
 }
 
 sub is_websocket {
   return 1 if shift->{websocket};
-  undef;
+  return;
 }
 
 sub name {
@@ -204,7 +204,7 @@ sub name {
   elsif (@_) { return $self }
 
   # Name
-  $self->{name};
+  return $self->{name};
 }
 
 sub over {
@@ -212,7 +212,7 @@ sub over {
   return $self unless @_;
   my $conditions = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
   push @{$self->conditions}, @$conditions;
-  $self;
+  return $self;
 }
 
 sub parse {
@@ -228,7 +228,7 @@ sub parse {
   $self->{name}   = $name;
   $self->{custom} = 0;
 
-  $self;
+  return $self;
 }
 
 sub post { shift->_generate_route('post', @_) }
@@ -253,14 +253,14 @@ sub render {
   # Parent
   $path = $self->parent->render($path, $values) if $self->parent;
 
-  $path;
+  return $path;
 }
 
 sub route {
   my $self  = shift;
   my $route = $self->new(@_);
   $self->add_child($route);
-  $route;
+  return $route;
 }
 
 sub to {
@@ -319,14 +319,14 @@ sub to {
   my $old     = $pattern->defaults;
   $pattern->defaults({%$old, %$defaults}) if $defaults;
 
-  $self;
+  return $self;
 }
 
 sub to_string {
   my $self = shift;
   my $pattern = $self->parent ? $self->parent->to_string : '';
   $pattern .= $self->pattern->pattern if $self->pattern->pattern;
-  $pattern;
+  return $pattern;
 }
 
 sub under { shift->_generate_route('under', @_) }
@@ -342,7 +342,7 @@ sub via {
   }
 
   # Get
-  $self->{via};
+  return $self->{via};
 }
 
 sub waypoint { shift->route(@_)->block(1) }
@@ -351,7 +351,7 @@ sub websocket {
   my $self  = shift;
   my $route = $self->any(@_);
   $route->{websocket} = 1;
-  $route;
+  return $route;
 }
 
 sub _dispatch_callback {
@@ -370,7 +370,7 @@ sub _dispatch_callback {
   }
 
   return 1 if !$staging || $continue;
-  undef;
+  return;
 }
 
 sub _dispatch_controller {
@@ -458,7 +458,7 @@ sub _dispatch_controller {
   }
 
   return 1 if !$staging || $continue;
-  undef;
+  return;
 }
 
 sub _generate_class {
@@ -482,7 +482,7 @@ sub _generate_class {
   # Invalid
   return unless $class =~ /^[a-zA-Z0-9_:]+$/;
 
-  $class;
+  return $class;
 }
 
 sub _generate_method {
@@ -507,7 +507,7 @@ sub _generate_method {
     return;
   }
 
-  $method;
+  return $method;
 }
 
 sub _generate_route {
@@ -554,7 +554,7 @@ sub _generate_route {
     $self->route($pattern, {@$constraints})->over($conditions)->via($methods)
     ->to($defaults)->name($name);
 
-  $route;
+  return $route;
 }
 
 sub _walk_stack {
@@ -596,7 +596,7 @@ sub _walk_stack {
   }
 
   # Done
-  undef;
+  return;
 }
 
 1;

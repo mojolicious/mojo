@@ -20,7 +20,7 @@ sub run {
   $psgi->app;
 
   # Return app callback
-  sub { $psgi->run(@_) };
+  return sub { $psgi->run(@_) };
 }
 
 1;

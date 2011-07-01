@@ -38,7 +38,7 @@ sub chmod_file {
   chmod $mod, $path or croak qq/Can't chmod path "$path": $!/;
   $mod = sprintf '%lo', $mod;
   print "  [chmod] $path $mod\n" unless $self->quiet;
-  $self;
+  return $self;
 }
 
 sub chmod_rel_file {
@@ -50,13 +50,13 @@ sub class_to_file {
   my ($self, $class) = @_;
   $class =~ s/:://g;
   decamelize $class;
-  $class;
+  return $class;
 }
 
 sub class_to_path {
   my ($self, $class) = @_;
   my $path = join '/', split /::/, $class;
-  "$path.pm";
+  return "$path.pm";
 }
 
 sub create_dir {
@@ -71,7 +71,7 @@ sub create_dir {
   # Create
   File::Path::mkpath($path) or croak qq/Can't make directory "$path": $!/;
   print "  [mkdir] $path\n" unless $self->quiet;
-  $self;
+  return $self;
 }
 
 sub create_rel_dir {
@@ -96,7 +96,7 @@ sub detect {
   return 'fastcgi' if !defined $ENV{WINDIR} && !defined $ENV{USER};
 
   # Nothing
-  undef;
+  return;
 }
 
 sub get_all_data {
@@ -128,13 +128,13 @@ sub get_all_data {
     $all->{$name} = $content;
   }
 
-  $all;
+  return $all;
 }
 
 sub get_data {
   my ($self, $data, $class) = @_;
   my $all = $self->get_all_data($class);
-  $all->{$data};
+  return $all->{$data};
 }
 
 # "You don’t like your job, you don’t strike.
@@ -148,13 +148,13 @@ sub help {
 sub rel_dir {
   my ($self, $path) = @_;
   my @parts = split /\//, $path;
-  File::Spec->catdir(Cwd::getcwd(), @parts);
+  return File::Spec->catdir(Cwd::getcwd(), @parts);
 }
 
 sub rel_file {
   my ($self, $path) = @_;
   my @parts = split /\//, $path;
-  File::Spec->catfile(Cwd::getcwd(), @parts);
+  return File::Spec->catfile(Cwd::getcwd(), @parts);
 }
 
 sub render_data {
@@ -168,7 +168,7 @@ sub render_to_file {
   my $data = shift;
   my $path = shift;
   $self->write_file($path, $self->render_data($data, @_));
-  $self;
+  return $self;
 }
 
 sub render_to_rel_file {
@@ -283,7 +283,7 @@ sub run {
   }
   print $self->hint;
 
-  $self;
+  return $self;
 }
 
 sub start {
@@ -314,7 +314,7 @@ sub write_file {
   $file->syswrite($data);
   print "  [write] $path\n" unless $self->quiet;
 
-  $self;
+  return $self;
 }
 
 sub write_rel_file {

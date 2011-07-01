@@ -23,7 +23,7 @@ sub run {
   $self->_walk($_, 0, $routes) for @{$app->routes->children};
   $self->_draw($routes);
 
-  $self;
+  return $self;
 }
 
 sub _draw {

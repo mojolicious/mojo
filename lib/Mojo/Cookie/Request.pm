@@ -36,13 +36,13 @@ sub parse {
     }
   }
 
-  \@cookies;
+  return \@cookies;
 }
 
 sub prefix {
   my $self = shift;
   my $version = $self->version || 1;
-  "\$Version=$version";
+  return "\$Version=$version";
 }
 
 sub to_string {
@@ -55,7 +55,7 @@ sub to_string {
   $cookie .= "=$value" if defined $value && length $value;
   if (my $path = $self->path) { $cookie .= "; \$Path=$path" }
 
-  $cookie;
+  return $cookie;
 }
 
 sub to_string_with_prefix {
@@ -64,7 +64,7 @@ sub to_string_with_prefix {
   # Render with prefix
   my $prefix = $self->prefix;
   my $cookie = $self->to_string;
-  "$prefix; $cookie";
+  return "$prefix; $cookie";
 }
 
 1;

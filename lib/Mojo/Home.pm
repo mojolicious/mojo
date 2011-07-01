@@ -60,7 +60,7 @@ sub detect {
   # FindBin fallback
   $self->{parts} = [split /\//, $FindBin::Bin] unless $self->{parts};
 
-  $self;
+  return $self;
 }
 
 sub lib_dir {
@@ -72,7 +72,7 @@ sub lib_dir {
   return $path if -d $path;
 
   # No lib directory
-  undef;
+  return;
 }
 
 sub list_files {
@@ -109,7 +109,7 @@ sub list_files {
     push @files, @$new;
   }
 
-  [sort @files];
+  return [sort @files];
 }
 
 # "And now to create an unstoppable army of between one million and two
@@ -118,7 +118,7 @@ sub parse {
   my ($self, $path) = @_;
   my @parts = File::Spec->splitdir($path);
   $self->{parts} = \@parts;
-  $self;
+  return $self;
 }
 
 sub rel_dir {

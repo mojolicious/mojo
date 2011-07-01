@@ -75,7 +75,7 @@ sub register {
       }
 
       # Render with epl
-      $r->handlers->{epl}->($r, $c, $output, $options);
+      return $r->handlers->{epl}->($r, $c, $output, $options);
     }
   );
 

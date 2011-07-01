@@ -34,7 +34,7 @@ sub client_challenge {
   # WebSocket challenge
   my $solution = $self->_challenge($self->req->headers->sec_websocket_key);
   return unless $solution eq $self->res->headers->sec_websocket_accept;
-  1;
+  return 1;
 }
 
 sub client_close { shift->server_close(@_) }
@@ -55,7 +55,7 @@ sub client_handshake {
   b64_encode $key, '';
   $headers->sec_websocket_key($key) unless $headers->sec_websocket_key;
 
-  $self;
+  return $self;
 }
 
 sub client_read  { shift->server_read(@_) }
@@ -71,7 +71,7 @@ sub finish {
   # Finish after writing
   $self->{finished} = 1;
 
-  $self;
+  return $self;
 }
 
 sub is_websocket {1}
@@ -86,7 +86,7 @@ sub res            { shift->handshake->res(@_) }
 sub resume {
   my $self = shift;
   $self->handshake->resume;
-  $self;
+  return $self;
 }
 
 sub send_message {
@@ -113,7 +113,7 @@ sub server_handshake {
   $res_headers->sec_websocket_accept(
     $self->_challenge($req_headers->sec_websocket_key));
 
-  $self;
+  return $self;
 }
 
 # "Being eaten by crocodile is just like going to sleep...
@@ -165,7 +165,7 @@ sub server_read {
   # Resume
   $self->on_resume->($self);
 
-  $self;
+  return $self;
 }
 
 sub server_write {
@@ -184,7 +184,7 @@ sub server_write {
   # Empty buffer
   my $write = $self->{write};
   $self->{write} = '';
-  $write;
+  return $write;
 }
 
 sub _build_frame {
@@ -239,7 +239,7 @@ sub _build_frame {
   # Payload
   $frame .= $payload;
 
-  $frame;
+  return $frame;
 }
 
 sub _challenge {
@@ -254,7 +254,7 @@ sub _challenge {
   # Accept
   b64_encode $challenge, '';
 
-  $challenge;
+  return $challenge;
 }
 
 sub _parse_frame {
@@ -325,7 +325,7 @@ sub _parse_frame {
   warn "PAYLOAD: $payload\n" if DEBUG;
   $self->{read} = $buffer;
 
-  [$fin, $op, $payload];
+  return [$fin, $op, $payload];
 }
 
 sub _send_frame {
@@ -353,7 +353,7 @@ sub _xor_mask {
   $output .= $_ ^ $mask while length($_ = substr($input, 0, 512, '')) == 512;
   $output .= $_ ^ substr($mask, 0, length, '');
 
-  $output;
+  return $output;
 }
 
 1;

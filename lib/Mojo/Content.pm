@@ -37,7 +37,7 @@ sub build_body {
     $body .= $chunk;
   }
 
-  $body;
+  return $body;
 }
 
 sub build_headers {
@@ -60,7 +60,7 @@ sub build_headers {
     $headers .= $chunk;
   }
 
-  $headers;
+  return $headers;
 }
 
 # "Aren't we forgetting the true meaning of Christmas?
@@ -82,7 +82,7 @@ sub generate_body_chunk {
   # EOF or delay
   return $self->{eof} ? '' : undef unless length $chunk;
 
-  $chunk;
+  return $chunk;
 }
 
 sub get_body_chunk {
@@ -94,13 +94,13 @@ sub get_header_chunk {
 
   # Normal headers
   my $copy = $self->{b1} ||= $self->_build_headers;
-  substr($copy, $offset, CHUNK_SIZE);
+  return substr($copy, $offset, CHUNK_SIZE);
 }
 
 sub has_leftovers {
   my $self = shift;
   return 1 if length $self->{b2} || length $self->{b1};
-  undef;
+  return;
 }
 
 sub header_size { length shift->build_headers }
@@ -108,18 +108,18 @@ sub header_size { length shift->build_headers }
 sub is_chunked {
   my $self = shift;
   my $encoding = $self->headers->transfer_encoding || '';
-  $encoding =~ /chunked/i ? 1 : 0;
+  return $encoding =~ /chunked/i ? 1 : 0;
 }
 
 sub is_done {
   return 1 if (shift->{state} || '') eq 'done';
-  undef;
+  return;
 }
 
 sub is_dynamic {
   my $self = shift;
   return 1 if $self->on_read && !defined $self->headers->content_length;
-  undef;
+  return;
 }
 
 sub is_multipart {
@@ -127,12 +127,12 @@ sub is_multipart {
   my $type = $self->headers->content_type || '';
   $type =~ /multipart.*boundary=\"*([a-zA-Z0-9\'\(\)\,\.\:\?\-\_\+\/]+)/i
     and return $1;
-  undef;
+  return;
 }
 
 sub is_parsing_body {
   return 1 if (shift->{state} || '') eq 'body';
-  undef;
+  return;
 }
 
 sub leftovers {
@@ -143,7 +143,7 @@ sub leftovers {
   return $self->{b1} if length $self->{b1};
 
   # Normal leftovers
-  $self->{b2};
+  return $self->{b2};
 }
 
 sub parse {
@@ -210,7 +210,7 @@ sub parse {
     }
   }
 
-  $self;
+  return $self;
 }
 
 sub parse_body {
@@ -223,7 +223,7 @@ sub parse_body_once {
   my $self = shift;
   $self->parse_body(@_);
   $self->{state} = 'done';
-  $self;
+  return $self;
 }
 
 # "Quick Smithers. Bring the mind eraser device!
@@ -255,12 +255,12 @@ sub parse_until_body {
   # Parse headers
   $self->_parse_headers if ($self->{state} || '') eq 'headers';
 
-  $self;
+  return $self;
 }
 
 sub progress {
   my $self = shift;
-  $self->{raw_size} - ($self->{header_size} || 0);
+  return $self->{raw_size} - ($self->{header_size} || 0);
 }
 
 sub write {
@@ -317,14 +317,14 @@ sub _build_chunk {
     $formatted .= sprintf('%x', length $chunk) . "\x0d\x0a$chunk";
   }
 
-  $formatted;
+  return $formatted;
 }
 
 sub _build_headers {
   my $self    = shift;
   my $headers = $self->headers->to_string;
   return "\x0d\x0a" unless $headers;
-  "$headers\x0d\x0a\x0d\x0a";
+  return "$headers\x0d\x0a\x0d\x0a";
 }
 
 sub _parse_chunked {

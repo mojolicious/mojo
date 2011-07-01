@@ -48,7 +48,7 @@ sub run {
     $self->write_file($path, $content);
   }
 
-  $self;
+  return $self;
 }
 
 1;

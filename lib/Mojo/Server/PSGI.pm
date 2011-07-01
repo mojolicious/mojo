@@ -54,7 +54,7 @@ sub run {
 
   # PSGI response
   my $code = $res->code || 404;
-  [$code, \@headers, $body];
+  return [$code, \@headers, $body];
 }
 
 package Mojo::Server::PSGI::_Handle;
@@ -86,7 +86,7 @@ sub getline {
     return $chunk;
   }
 
-  undef;
+  return;
 }
 
 1;

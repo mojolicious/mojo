@@ -31,7 +31,7 @@ sub load {
     return Mojo::Exception->new($@);
   }
 
-  undef;
+  return;
 }
 
 # "This is the worst thing you've ever done.
@@ -64,7 +64,7 @@ sub search {
   }
 
   return unless @$modules;
-  $modules;
+  return $modules;
 }
 
 1;

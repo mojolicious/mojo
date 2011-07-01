@@ -341,7 +341,7 @@ sub _spawn {
       # Non blocking
       else { $l = flock $lock, LOCK_EX | LOCK_NB }
 
-      $l;
+      return $l;
     }
   );
   $loop->on_unlock(sub { flock $lock, LOCK_UN });

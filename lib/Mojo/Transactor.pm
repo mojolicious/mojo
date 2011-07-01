@@ -137,7 +137,7 @@ sub form {
   }
 
   return $tx unless wantarray;
-  $tx, $cb;
+  return $tx, $cb;
 }
 
 sub proxy_connect {
@@ -157,7 +157,7 @@ sub proxy_connect {
   my $new = $self->tx(CONNECT => $url->clone);
   $new->req->proxy($proxy);
 
-  $new;
+  return $new;
 }
 
 sub redirect {
@@ -187,7 +187,7 @@ sub redirect {
   $new->req->method($method)->url($location);
   $new->previous($old);
 
-  $new;
+  return $new;
 }
 
 sub tx {
@@ -212,7 +212,7 @@ sub tx {
   $req->headers->from_hash(ref $_[0] eq 'HASH' ? $_[0] : {@_});
 
   return $tx unless wantarray;
-  $tx, $cb;
+  return $tx, $cb;
 }
 
 # "She found my one weakness... that I'm weak!"
@@ -234,7 +234,7 @@ sub websocket {
     ->client_handshake;
 
   return $tx unless wantarray;
-  $tx, $cb;
+  return $tx, $cb;
 }
 
 1;

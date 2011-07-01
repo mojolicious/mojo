@@ -20,7 +20,7 @@ has handle => sub {
   $file->open(">> $path") or croak qq/Can't open log file "$path": $!/;
   binmode $file, ':utf8';
 
-  $file;
+  return $file;
 };
 has level => 'debug';
 has 'path';
@@ -44,7 +44,7 @@ sub is_level {
   return unless $level;
   $level = lc $level;
   my $current = $ENV{MOJO_LOG_LEVEL} || $self->level;
-  $LEVEL->{$level} >= $LEVEL->{$current};
+  return $LEVEL->{$level} >= $LEVEL->{$current};
 }
 
 sub is_warn { shift->is_level('warn') }
@@ -75,7 +75,7 @@ sub log {
   # Unlock
   flock $handle, LOCK_UN;
 
-  $self;
+  return $self;
 }
 
 sub warn { shift->log('warn', @_) }

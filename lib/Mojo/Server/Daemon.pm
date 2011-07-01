@@ -104,7 +104,7 @@ sub setuidgid {
     }
   }
 
-  $self;
+  return $self;
 }
 
 sub _build_tx {
@@ -153,7 +153,7 @@ sub _build_tx {
   # Kept alive if we have more than one request on the connection
   $tx->kept_alive(1) if $c->{requests} > 1;
 
-  $tx;
+  return $tx;
 }
 
 sub _close {

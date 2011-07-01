@@ -52,7 +52,7 @@ sub detect_proxy {
     $self->no_proxy([split /,/, $no]);
   }
 
-  $self;
+  return $self;
 }
 
 # "'What are you lookin at?' - the innocent words of a drunken child."
@@ -76,7 +76,7 @@ sub need_proxy {
   $host =~ /\Q$_\E$/ and return for @$no;
 
   # Proxy needed
-  1;
+  return 1;
 }
 
 # "Olive oil? Asparagus? If your mother wasn't so fancy,
@@ -128,7 +128,7 @@ sub start {
   # Cleanup
   $loop->one_tick(0);
 
-  $tx;
+  return $tx;
 }
 
 # "It's like my dad always said: eventually, everybody gets shot."
@@ -160,7 +160,7 @@ sub test_server {
   }
 
   # Build absolute URL for test server
-  Mojo::URL->new->scheme($self->{scheme})->host('localhost')
+  return Mojo::URL->new->scheme($self->{scheme})->host('localhost')
     ->port($self->{port})->path('/');
 }
 
@@ -218,7 +218,7 @@ sub _cache {
   }
   $self->{cache} = \@cache;
 
-  $result;
+  return $result;
 }
 
 sub _cleanup {
@@ -290,7 +290,7 @@ sub _connect {
   $loop->on_error($id => sub { $self->_error(@_) });
   $loop->on_read($id => sub { $self->_read(@_) });
 
-  $id;
+  return $id;
 }
 
 # "I don't mind being called a liar when I'm lying, or about to lie,
@@ -447,7 +447,7 @@ sub _info {
   # Default port
   $port ||= $scheme eq 'https' ? 443 : 80;
 
-  ($scheme, $host, $port);
+  return $scheme, $host, $port;
 }
 
 # "Hey, Weener Boy... where do you think you're going?"
@@ -492,7 +492,7 @@ sub _proxy_connect {
     }
   );
 
-  1;
+  return 1;
 }
 
 # "Have you ever seen that Blue Man Group? Total ripoff of the Smurfs.
@@ -539,7 +539,7 @@ sub _redirect {
   $self->{cs}->{$new_id}->{redirects} = $redirects + 1;
 
   # Redirecting
-  1;
+  return 1;
 }
 
 # "It's great! We can do *anything* now that Science has invented Magic."
@@ -594,7 +594,7 @@ sub _start {
   $self->{processing} ||= 0;
   $self->{processing} += 1;
 
-  $id;
+  return $id;
 }
 
 sub _switch_blocking {
@@ -652,7 +652,7 @@ sub _upgrade {
   weaken $self;
   $new->on_resume(sub { $self->_write($id) });
 
-  $new;
+  return $new;
 }
 
 # "Oh well. At least we'll die doing what we love: inhaling molten rock."

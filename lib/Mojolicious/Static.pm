@@ -39,7 +39,7 @@ sub dispatch {
     return 1;
   }
 
-  1;
+  return 1;
 }
 
 sub serve {
@@ -144,7 +144,7 @@ sub serve {
     return 1;
   }
 
-  undef;
+  return;
 }
 
 sub _get_data_file {
@@ -167,7 +167,7 @@ sub _get_data_file {
     return Mojo::Command->new->get_data($path, $class) if $path eq $rel;
   }
 
-  undef;
+  return;
 }
 
 1;

@@ -45,7 +45,7 @@ sub client_read {
   # Check for errors
   $self->{state} = 'done' if $self->error;
 
-  $self;
+  return $self;
 }
 
 sub client_write {
@@ -135,7 +135,7 @@ sub client_write {
     $self->{state} = 'read_response' if $self->{write} <= 0;
   }
 
-  $chunk;
+  return $chunk;
 }
 
 sub keep_alive {
@@ -171,7 +171,7 @@ sub keep_alive {
   # Default
   $self->{keep_alive} = 1 unless defined $self->{keep_alive};
 
-  $self->{keep_alive};
+  return $self->{keep_alive};
 }
 
 sub server_leftovers {
@@ -185,7 +185,7 @@ sub server_leftovers {
   # Done
   $req->{state} = 'done';
 
-  $leftovers;
+  return $leftovers;
 }
 
 sub server_read {
@@ -238,7 +238,7 @@ sub server_read {
     }
   }
 
-  $self;
+  return $self;
 }
 
 sub server_write {
@@ -366,7 +366,7 @@ sub server_write {
     }
   }
 
-  $chunk;
+  return $chunk;
 }
 
 1;

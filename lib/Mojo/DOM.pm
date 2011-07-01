@@ -156,7 +156,7 @@ sub new {
   # Parse right away
   $self->parse($xml) if defined $xml;
 
-  $self;
+  return $self;
 }
 
 # DEPRECATED in Smiling Face With Sunglasses!
@@ -202,7 +202,7 @@ sub all_text {
     $text .= $content if $content =~ /\S+/;
   }
 
-  $text;
+  return $text;
 }
 
 sub append { shift->_add(1, @_) }
@@ -211,7 +211,7 @@ sub append_content {
   my ($self, $new) = @_;
   my $tree = $self->tree;
   push @$tree, @{_parent($self->_parse_xml("$new"), $tree->[3])};
-  $self;
+  return $self;
 }
 
 sub at { shift->find(@_)->[0] }
@@ -236,14 +236,14 @@ sub attrs {
     $attrs->{$key} = $values->{$key};
   }
 
-  $self;
+  return $self;
 }
 
 sub charset {
   my $self = shift;
   return $self->[1] if @_ == 0;
   $self->[1] = shift;
-  $self;
+  return $self;
 }
 
 # "Oh boy! Sleep! That's when I'm a Viking!"
@@ -265,7 +265,7 @@ sub children {
       $self->new(charset => $self->charset, tree => $e, xml => $self->xml);
   }
 
-  bless \@children, 'Mojo::DOM::_Collection';
+  return bless \@children, 'Mojo::DOM::_Collection';
 }
 
 sub content_xml {
@@ -283,7 +283,7 @@ sub content_xml {
   my $charset = $self->charset;
   encode $charset, $result if $charset;
 
-  $result;
+  return $result;
 }
 
 sub find {
@@ -347,7 +347,7 @@ sub parent {
 sub parse {
   my ($self, $xml) = @_;
   $self->charset(undef) if utf8::is_utf8 $xml;
-  $self->tree($self->_parse_xml($xml));
+  return $self->tree($self->_parse_xml($xml));
 }
 
 sub prepend { shift->_add(0, @_) }
@@ -357,7 +357,7 @@ sub prepend_content {
   my $tree = $self->tree;
   splice @$tree, $tree->[0] eq 'root' ? 1 : 4, 0,
     @{_parent($self->_parse_xml("$new"), $tree->[3])};
-  $self;
+  return $self;
 }
 
 sub replace {
@@ -380,7 +380,7 @@ sub replace {
   # Replace
   splice @$parent, $i, 1, @{_parent($new, $parent)};
 
-  $self;
+  return $self;
 }
 
 sub replace_content {
@@ -401,7 +401,7 @@ sub replace_content {
   my $start = $tree->[0] eq 'root' ? 1 : 4;
   splice @$tree, $start, $#$tree, @new;
 
-  $self;
+  return $self;
 }
 
 # DEPRECATED in Smiling Face With Sunglasses!
@@ -452,7 +452,7 @@ sub text {
     $text .= $content if $content =~ /\S+/;
   }
 
-  $text;
+  return $text;
 }
 
 sub to_xml {
@@ -460,14 +460,14 @@ sub to_xml {
   my $result  = $self->_render($self->tree);
   my $charset = $self->charset;
   encode $charset, $result if $charset;
-  $result;
+  return $result;
 }
 
 sub tree {
   my $self = shift;
   return $self->[0] if @_ == 0;
   $self->[0] = shift;
-  $self;
+  return $self;
 }
 
 sub type {
@@ -483,14 +483,14 @@ sub type {
   # Set
   $tree->[1] = $type;
 
-  $self;
+  return $self;
 }
 
 sub xml {
   my $self = shift;
   return $self->[2] if @_ == 0;
   $self->[2] = shift;
-  $self;
+  return $self;
 }
 
 sub _add {
@@ -514,7 +514,7 @@ sub _add {
   # Add
   splice @$parent, $i + $offset, 0, @{_parent($new, $parent)};
 
-  $self;
+  return $self;
 }
 
 # "Woah! God is so in your face!
@@ -566,7 +566,7 @@ sub _css_equation {
     $num->[1] =~ s/\s+//g;
   }
 
-  $num;
+  return $num;
 }
 
 sub _css_regex {
@@ -590,7 +590,7 @@ sub _css_regex {
   # Everything else
   else { $regex = qr/^$value$/ }
 
-  $regex;
+  return $regex;
 }
 
 sub _css_unescape {
@@ -605,7 +605,7 @@ sub _css_unescape {
   # Remove backslash
   $value =~ s/\\//g;
 
-  $value;
+  return $value;
 }
 
 sub _doctype {
@@ -767,7 +767,7 @@ sub _match_element {
     }
   }
 
-  1;
+  return 1;
 }
 
 sub _match_selector {
@@ -903,7 +903,7 @@ sub _match_selector {
     return;
   }
 
-  1;
+  return 1;
 }
 
 sub _match_tree {
@@ -942,7 +942,7 @@ sub _match_tree {
     $self->new(charset => $self->charset, tree => $_, xml => $self->xml)
   } @results;
 
-  bless \@results, 'Mojo::DOM::_Collection';
+  return bless \@results, 'Mojo::DOM::_Collection';
 }
 
 sub _parent {
@@ -952,7 +952,7 @@ sub _parent {
     $e->[3] = $parent if $e->[0] eq 'tag';
     push @new, $e;
   }
-  \@new;
+  return \@new;
 }
 
 sub _parse_css {
@@ -1026,7 +1026,7 @@ sub _parse_css {
     push @$part, ['combinator', $combinator] if $combinator;
   }
 
-  $pattern;
+  return $pattern;
 }
 
 sub _parse_xml {
@@ -1113,7 +1113,7 @@ sub _parse_xml {
     }
   }
 
-  $tree;
+  return $tree;
 }
 
 # Try to detect XML from processing instructions
@@ -1195,7 +1195,7 @@ sub _render {
   # End tag
   $content .= '</' . $tree->[1] . '>' if $e eq 'tag';
 
-  $content;
+  return $content;
 }
 
 # "It's not important to talk about who got rich off of whom,
@@ -1282,7 +1282,7 @@ sub _trim {
   # Add leading whitespace if punctuation allows it
   $text = " $text" if $ws && $text =~ /^[^\.\!\?\,\;\:]/;
 
-  $text;
+  return $text;
 }
 
 # "Hi, Super Nintendo Chalmers!"
@@ -1307,7 +1307,7 @@ sub _iterate {
 
   # Root
   return unless my $start = $self->[0];
-  $start->root;
+  return $start->root;
 }
 
 1;

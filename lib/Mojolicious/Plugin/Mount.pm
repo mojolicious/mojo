@@ -25,7 +25,7 @@ sub register {
     ->detour(app => Mojo::Server->new->load_app($conf->{$prefix}));
   $route->over(host => $host) if $host;
 
-  $route;
+  return $route;
 }
 
 1;

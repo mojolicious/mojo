@@ -144,7 +144,7 @@ sub new {
   # Ignore PIPE signal
   $SIG{PIPE} = 'IGNORE';
 
-  $self;
+  return $self;
 }
 
 sub connect {
@@ -187,7 +187,7 @@ sub connect {
   # Connect
   else { $self->_connect($id, $args) }
 
-  $id;
+  return $id;
 }
 
 sub connection_timeout {
@@ -222,13 +222,13 @@ sub generate_port {
       );
   }
 
-  undef;
+  return;
 }
 
 sub is_running {
   my $self = shift;
   $self = $self->singleton unless ref $self;
-  $self->{running};
+  return $self->{running};
 }
 
 # "Fat Tony is a cancer on this fair city!
@@ -329,7 +329,7 @@ sub listen {
   # Accept limit
   $self->{accepts} = $self->max_accepts if $self->max_accepts;
 
-  $id;
+  return $id;
 }
 
 sub local_info {
@@ -341,7 +341,7 @@ sub local_info {
   return {path => $handle->hostpath} if $handle->can('hostpath');
 
   # TCP socket info
-  {address => $handle->sockhost, port => $handle->sockport};
+  return {address => $handle->sockhost, port => $handle->sockport};
 }
 
 sub on_close { shift->_event(close => @_) }
@@ -352,7 +352,7 @@ sub recurring {
   my ($self, $after, $cb) = @_;
   $self = $self->singleton unless ref $self;
   weaken $self;
-  $self->iowatcher->recurring($after => sub { $self->$cb(pop) });
+  return $self->iowatcher->recurring($after => sub { $self->$cb(pop) });
 }
 
 sub one_tick {
@@ -388,7 +388,7 @@ sub one_tick {
 sub handle {
   my ($self, $id) = @_;
   return unless my $c = $self->{cs}->{$id};
-  $c->{handle};
+  return $c->{handle};
 }
 
 sub remote_info {
@@ -400,7 +400,7 @@ sub remote_info {
   return {path => $handle->peerpath} if $handle->can('peerpath');
 
   # TCP socket info
-  {address => $handle->peerhost, port => $handle->peerport};
+  return {address => $handle->peerhost, port => $handle->peerport};
 }
 
 sub singleton { $LOOP ||= shift->new(@_) }
@@ -416,7 +416,7 @@ sub start {
   # Mainloop
   $self->one_tick while $self->{running};
 
-  $self;
+  return $self;
 }
 
 sub start_tls {
@@ -460,7 +460,7 @@ sub start_tls {
     on_writable => sub { $self->_write($id) }
   )->writing($new);
 
-  $id;
+  return $id;
 }
 
 sub stop {
@@ -473,14 +473,14 @@ sub test {
   my ($self, $id) = @_;
   return unless my $c      = $self->{cs}->{$id};
   return unless my $handle = $c->{handle};
-  $self->iowatcher->is_readable($handle);
+  return $self->iowatcher->is_readable($handle);
 }
 
 sub timer {
   my ($self, $after, $cb) = @_;
   $self = $self->singleton unless ref $self;
   weaken $self;
-  $self->iowatcher->timer($after => sub { $self->$cb(pop) });
+  return $self->iowatcher->timer($after => sub { $self->$cb(pop) });
 }
 
 sub write {
@@ -636,7 +636,7 @@ sub _drop {
     close $handle;
   }
 
-  $self;
+  return $self;
 }
 
 sub _error {
@@ -655,7 +655,7 @@ sub _event {
   my ($self, $event, $id, $cb) = @_;
   return unless my $c = $self->{cs}->{$id};
   $c->{$event} = $cb if $cb;
-  $self;
+  return $self;
 }
 
 sub _listening {

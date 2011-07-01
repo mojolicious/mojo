@@ -65,14 +65,14 @@ sub languages {
     $self->{language} = $handle->language_tag;
   }
 
-  $self;
+  return $self;
 }
 
 sub localize {
   my $self = shift;
   my $key  = shift;
   return $key unless my $handle = $self->{handle};
-  $handle->maketext($key, @_);
+  return $handle->maketext($key, @_);
 }
 
 1;

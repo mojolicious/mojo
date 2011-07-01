@@ -668,7 +668,7 @@ under sub {
 
   # Not authenticated
   $self->render('param_auth_denied');
-  undef;
+  return;
 };
 
 # GET /param_auth

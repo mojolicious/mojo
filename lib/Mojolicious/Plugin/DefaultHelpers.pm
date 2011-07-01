@@ -21,7 +21,7 @@ sub register {
         my $stash = $self->stash;
         $stash->{$name} = shift if @_;
         $self->stash(@_) if @_;
-        $stash->{$name};
+        return $stash->{$name};
       }
     );
   }
@@ -67,7 +67,7 @@ sub register {
       $i++;
       goto START unless $i >= @keys;
 
-      $self->render_partial(layout => $layout, extend => $extends);
+      return $self->render_partial(layout => $layout, extend => $extends);
     }
   );
 

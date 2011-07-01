@@ -16,7 +16,7 @@ sub not_writing {
   $kqueue->EV_SET($fd, EVFILT_WRITE, EV_DELETE) if $h->{writing};
   $h->{writing} = 0;
 
-  $self;
+  return $self;
 }
 
 sub remove {
@@ -28,7 +28,7 @@ sub remove {
   $kqueue->EV_SET($fd, EVFILT_READ,  EV_DELETE) if defined $h->{writing};
   $kqueue->EV_SET($fd, EVFILT_WRITE, EV_DELETE) if $h->{writing};
 
-  $self;
+  return $self;
 }
 
 sub watch {
@@ -56,7 +56,7 @@ sub writing {
   $self->_kqueue->EV_SET($fd, EVFILT_WRITE, EV_ADD) unless $h->{writing};
   $h->{writing} = 1;
 
-  $self;
+  return $self;
 }
 
 sub _kqueue { shift->{kqueue} ||= IO::KQueue->new }

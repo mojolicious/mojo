@@ -28,7 +28,7 @@ sub content_is {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::is($self->_get_content($tx), $value, $desc);
 
-  $self;
+  return $self;
 }
 
 sub content_isnt {
@@ -39,7 +39,7 @@ sub content_isnt {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::isnt($self->_get_content($tx), $value, $desc);
 
-  $self;
+  return $self;
 }
 
 sub content_like {
@@ -50,7 +50,7 @@ sub content_like {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::like($self->_get_content($tx), $regex, $desc);
 
-  $self;
+  return $self;
 }
 
 sub content_unlike {
@@ -61,7 +61,7 @@ sub content_unlike {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::unlike($self->_get_content($tx), $regex, $desc);
 
-  $self;
+  return $self;
 }
 
 # "Marge, I can't wear a pink shirt to work.
@@ -73,7 +73,7 @@ sub content_type_is {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::is($tx->res->headers->content_type,
     $type, "Content-Type: $type");
-  $self;
+  return $self;
 }
 
 sub content_type_isnt {
@@ -82,7 +82,7 @@ sub content_type_isnt {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::isnt($tx->res->headers->content_type,
     $type, "not Content-Type: $type");
-  $self;
+  return $self;
 }
 
 sub content_type_like {
@@ -93,7 +93,7 @@ sub content_type_like {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::like($tx->res->headers->content_type, $regex, $desc);
 
-  $self;
+  return $self;
 }
 
 sub content_type_unlike {
@@ -104,7 +104,7 @@ sub content_type_unlike {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::unlike($tx->res->headers->content_type, $regex, $desc);
 
-  $self;
+  return $self;
 }
 
 # "A job's a job. I mean, take me.
@@ -117,7 +117,7 @@ sub element_exists {
   $desc ||= qq/"$selector" exists/;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::ok($self->tx->res->dom->at($selector), $desc);
-  $self;
+  return $self;
 }
 
 sub element_exists_not {
@@ -125,7 +125,7 @@ sub element_exists_not {
   $desc ||= qq/"$selector" exists not/;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::ok(!$self->tx->res->dom->at($selector), $desc);
-  $self;
+  return $self;
 }
 
 sub get_ok  { shift->_request_ok('get',  @_) }
@@ -139,7 +139,7 @@ sub header_is {
   Test::More::is(scalar $tx->res->headers->header($name),
     $value, "$name: " . ($value ? $value : ''));
 
-  $self;
+  return $self;
 }
 
 sub header_isnt {
@@ -150,7 +150,7 @@ sub header_isnt {
   Test::More::isnt(scalar $tx->res->headers->header($name),
     $value, "not $name: " . ($value ? $value : ''));
 
-  $self;
+  return $self;
 }
 
 sub header_like {
@@ -161,7 +161,7 @@ sub header_like {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::like(scalar $tx->res->headers->header($name), $regex, $desc);
 
-  $self;
+  return $self;
 }
 
 sub header_unlike {
@@ -172,7 +172,7 @@ sub header_unlike {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::unlike(scalar $tx->res->headers->header($name), $regex, $desc);
 
-  $self;
+  return $self;
 }
 
 sub json_content_is {
@@ -183,7 +183,7 @@ sub json_content_is {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::is_deeply($tx->res->json, $struct, $desc);
 
-  $self;
+  return $self;
 }
 
 # "God bless those pagans."
@@ -202,7 +202,7 @@ sub post_form_ok {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::ok($self->tx->is_done, $desc);
 
-  $self;
+  return $self;
 }
 
 # "WHO IS FONZY!?! Don't they teach you anything at school?"
@@ -213,7 +213,7 @@ sub reset_session {
   $self->ua->cookie_jar->empty;
   $self->ua->max_redirects($self->max_redirects);
   $self->tx(undef);
-  $self;
+  return $self;
 }
 
 # "Internet! Is that thing still around?"
@@ -225,7 +225,7 @@ sub status_is {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::is($self->tx->res->code, $status, "$status $message");
 
-  $self;
+  return $self;
 }
 
 sub status_isnt {
@@ -236,7 +236,7 @@ sub status_isnt {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::isnt($self->tx->res->code, $status, "not $status $message");
 
-  $self;
+  return $self;
 }
 
 sub test_server { shift->ua->test_server(@_) }
@@ -252,7 +252,7 @@ sub text_is {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::is($text, $value, $desc);
 
-  $self;
+  return $self;
 }
 
 sub text_isnt {
@@ -266,7 +266,7 @@ sub text_isnt {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::isnt($text, $value, $desc);
 
-  $self;
+  return $self;
 }
 
 # "Hello, my name is Barney Gumble, and I'm an alcoholic.
@@ -283,7 +283,7 @@ sub text_like {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::like($text, $regex, $desc);
 
-  $self;
+  return $self;
 }
 
 sub text_unlike {
@@ -297,7 +297,7 @@ sub text_unlike {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::unlike($text, $regex, $desc);
 
-  $self;
+  return $self;
 }
 
 sub _get_content {
@@ -311,7 +311,7 @@ sub _get_content {
   # Content
   my $content = $tx->res->body;
   decode $charset, $content if $charset;
-  $content;
+  return $content;
 }
 
 # "Are you sure this is the Sci-Fi Convention? It's full of nerds!"
@@ -331,7 +331,7 @@ sub _request_ok {
   utf8::encode $desc;
   Test::More::ok(!$error || $code, $desc);
 
-  $self;
+  return $self;
 }
 
 1;

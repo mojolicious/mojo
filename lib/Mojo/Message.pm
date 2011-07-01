@@ -36,7 +36,7 @@ sub at_least_version {
     if $search_major == $current_major && $search_minor <= $current_minor;
 
   # Version is older
-  undef;
+  return;
 }
 
 sub body {
@@ -65,7 +65,7 @@ sub body {
   # Set text content
   elsif (length $new) { $content->asset->add_chunk($new) }
 
-  $self;
+  return $self;
 }
 
 sub body_params {
@@ -104,7 +104,7 @@ sub body_params {
   }
 
   # Cache
-  $self->{body_params} = $params;
+  return $self->{body_params} = $params;
 }
 
 sub body_size { shift->content->body_size }
@@ -118,7 +118,7 @@ sub build_body {
   my $body = $self->content->build_body(@_);
   $self->{state} = 'done';
   if (my $cb = $self->on_finish) { $self->$cb }
-  $body;
+  return $body;
 }
 
 sub build_headers {
@@ -128,7 +128,7 @@ sub build_headers {
   return '' if $self->version eq '0.9';
 
   $self->fix_headers;
-  $self->content->build_headers;
+  return $self->content->build_headers;
 }
 
 sub build_start_line {
@@ -150,7 +150,7 @@ sub build_start_line {
     $startline .= $chunk;
   }
 
-  $startline;
+  return $startline;
 }
 
 sub cookie {
@@ -183,7 +183,7 @@ sub cookie {
   my @cookies;
   @cookies = ref $cookies eq 'ARRAY' ? @$cookies : ($cookies) if $cookies;
 
-  wantarray ? @cookies : $cookies[0];
+  return wantarray ? @cookies : $cookies[0];
 }
 
 sub dom {
@@ -203,7 +203,7 @@ sub dom {
   # Find right away
   return $dom->find(@_) if @_;
 
-  $dom;
+  return $dom;
 }
 
 sub error {
@@ -219,7 +219,7 @@ sub error {
   $self->{error} = [@_];
   $self->{state} = 'done';
 
-  $self;
+  return $self;
 }
 
 sub fix_headers {
@@ -236,7 +236,7 @@ sub fix_headers {
     }
   }
 
-  $self;
+  return $self;
 }
 
 sub get_body_chunk {
@@ -253,7 +253,7 @@ sub get_body_chunk {
   $self->{state} = 'done';
   if (my $cb = $self->on_finish) { $self->$cb }
 
-  $chunk;
+  return $chunk;
 }
 
 sub get_header_chunk {
@@ -265,7 +265,7 @@ sub get_header_chunk {
   # HTTP 0.9 has no headers
   return '' if $self->version eq '0.9';
 
-  $self->content->get_header_chunk(@_);
+  return $self->content->get_header_chunk(@_);
 }
 
 sub get_start_line_chunk {
@@ -276,7 +276,7 @@ sub get_start_line_chunk {
 
   # Get chunk
   my $copy = $self->{buffer} ||= $self->_build_start_line;
-  substr $copy, $offset, CHUNK_SIZE;
+  return substr $copy, $offset, CHUNK_SIZE;
 }
 
 sub has_leftovers { shift->content->has_leftovers }
@@ -284,7 +284,7 @@ sub has_leftovers { shift->content->has_leftovers }
 sub header_size {
   my $self = shift;
   $self->fix_headers;
-  $self->content->header_size;
+  return $self->content->header_size;
 }
 
 sub headers {
@@ -297,14 +297,14 @@ sub headers {
   }
 
   # Get
-  $self->content->headers(@_);
+  return $self->content->headers(@_);
 }
 
 sub is_chunked { shift->content->is_chunked }
 
 sub is_done {
   return 1 if (shift->{state} || '') eq 'done';
-  undef;
+  return;
 }
 
 sub is_dynamic { shift->content->is_dynamic }
@@ -313,7 +313,7 @@ sub is_limit_exceeded {
   my $self = shift;
   return unless my $code = ($self->error)[1];
   return unless $code eq '413';
-  1;
+  return 1;
 }
 
 sub is_multipart { shift->content->is_multipart }
@@ -321,7 +321,7 @@ sub is_multipart { shift->content->is_multipart }
 sub json {
   my $self = shift;
   return if $self->is_multipart;
-  $self->json_class->new->decode($self->body);
+  return $self->json_class->new->decode($self->body);
 }
 
 sub leftovers { shift->content->leftovers }
@@ -331,7 +331,7 @@ sub max_line_size { shift->headers->max_line_size(@_) }
 sub param {
   my $self = shift;
   $self->{body_params} ||= $self->body_params;
-  $self->{body_params}->param(@_);
+  return $self->{body_params}->param(@_);
 }
 
 sub parse            { shift->_parse(0, @_) }
@@ -374,7 +374,7 @@ sub upload {
   my @uploads;
   @uploads = ref $uploads eq 'ARRAY' ? @$uploads : ($uploads) if $uploads;
 
-  wantarray ? @uploads : $uploads[0];
+  return wantarray ? @uploads : $uploads[0];
 }
 
 sub uploads {
@@ -403,7 +403,7 @@ sub uploads {
     push @uploads, $upload;
   }
 
-  \@uploads;
+  return \@uploads;
 }
 
 sub write       { shift->content->write(@_) }
@@ -484,7 +484,7 @@ sub _parse {
   # Finished
   if ((my $cb = $self->on_finish) && $self->is_done) { $self->$cb }
 
-  $self;
+  return $self;
 }
 
 sub _parse_start_line {
@@ -556,7 +556,7 @@ sub _parse_formdata {
     push @formdata, [$name, $filename, $value];
   }
 
-  \@formdata;
+  return \@formdata;
 }
 
 1;

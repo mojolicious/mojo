@@ -29,7 +29,7 @@ sub check_file {
   return if $mtime <= $stats->[0] && $size == $stats->[1];
   $STATS->{$file} = [$mtime, $size];
 
-  1;
+  return 1;
 }
 
 sub run {

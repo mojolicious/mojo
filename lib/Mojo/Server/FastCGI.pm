@@ -68,7 +68,7 @@ sub accept_connection {
   }
   $self->app->log->debug('Accepted FastCGI connection.') if DEBUG;
 
-  $c;
+  return $c;
 }
 
 sub read_record {
@@ -95,7 +95,7 @@ sub read_record {
       qq/Reading FastCGI record: $type - $id - "$body"./);
   }
 
-  $self->type_name($type), $id, $body;
+  return $self->type_name($type), $id, $body;
 }
 
 sub read_request {
@@ -178,19 +178,19 @@ sub read_request {
     }
   }
 
-  $tx;
+  return $tx;
 }
 
 sub role_name {
   my ($self, $role) = @_;
   return unless $role;
-  $ROLES[$role - 1];
+  return $ROLES[$role - 1];
 }
 
 sub role_number {
   my ($self, $role) = @_;
   return unless $role;
-  $ROLE_NUMBERS{uc $role};
+  return $ROLE_NUMBERS{uc $role};
 }
 
 sub run {
@@ -226,13 +226,13 @@ sub run {
 sub type_name {
   my ($self, $type) = @_;
   return unless $type;
-  $TYPES[$type - 1];
+  return $TYPES[$type - 1];
 }
 
 sub type_number {
   my ($self, $type) = @_;
   return unless $type;
-  $TYPE_NUMBERS{uc $type};
+  return $TYPE_NUMBERS{uc $type};
 }
 
 sub write_records {
@@ -287,7 +287,7 @@ sub write_records {
     last if $empty;
   }
 
-  1;
+  return 1;
 }
 
 sub write_response {
@@ -365,7 +365,7 @@ sub _nv_length {
     $len = unpack 'N', $len;
   }
 
-  $len;
+  return $len;
 }
 
 sub _read_chunk {
@@ -383,7 +383,7 @@ sub _read_chunk {
     $chunk .= $buffer;
   }
 
-  $chunk;
+  return $chunk;
 }
 
 1;

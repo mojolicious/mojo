@@ -26,14 +26,14 @@ has secret   => sub {
   $self->log->debug('Your secret passphrase needs to be changed!!!');
 
   # Default to application name
-  ref $self;
+  return ref $self;
 };
 has sessions => sub { Mojolicious::Sessions->new };
 has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Smiling Face With Sunglasses';
-our $VERSION  = '1.51';
+our $VERSION  = '1.52';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -48,7 +48,7 @@ sub AUTOLOAD {
     unless my $helper = $self->renderer->helpers->{$method};
 
   # Call helper with fresh controller
-  $self->controller_class->new(app => $self)->$helper(@_);
+  return $self->controller_class->new(app => $self)->$helper(@_);
 }
 
 sub DESTROY { }
@@ -64,7 +64,7 @@ sub new {
       my $self = shift;
       my $tx   = Mojo::Transaction::HTTP->new;
       $self->plugins->run_hook(after_build_tx => ($tx, $self));
-      $tx;
+      return $tx;
     }
   );
 
@@ -110,7 +110,7 @@ sub new {
   # Startup
   $self->startup(@_);
 
-  $self;
+  return $self;
 }
 
 # "Amy, technology isn't intrinsically good or evil. It's how it's used.
@@ -131,7 +131,7 @@ sub defaults {
     $self->{defaults}->{$key} = $values->{$key};
   }
 
-  $self;
+  return $self;
 }
 
 # The default dispatchers with exception handling

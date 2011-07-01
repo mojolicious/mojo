@@ -23,7 +23,7 @@ sub run {
   GetOptions(nph => sub { $cgi->nph(1) });
   $cgi->run;
 
-  $self;
+  return $self;
 }
 
 1;

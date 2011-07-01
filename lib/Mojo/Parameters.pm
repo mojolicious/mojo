@@ -25,7 +25,7 @@ sub new {
   # String
   else { $self->{string} = $_[0] }
 
-  $self;
+  return $self;
 }
 
 sub append {
@@ -39,7 +39,7 @@ sub append {
   }
   push @{$self->params}, map { defined $_ ? "$_" : '' } @params;
 
-  $self;
+  return $self;
 }
 
 sub clone {
@@ -48,13 +48,13 @@ sub clone {
   $clone->pair_separator($self->pair_separator);
   if (defined $self->{string}) { $clone->{string} = $self->{string} }
   else                         { $clone->params([@{$self->params}]) }
-  $clone;
+  return $clone;
 }
 
 sub merge {
   my $self = shift;
   push @{$self->params}, @{$_->params} for @_;
-  $self;
+  return $self;
 }
 
 sub param {
@@ -75,14 +75,14 @@ sub param {
     push @values, $params->[$i + 1] if $params->[$i] eq $name;
   }
 
-  wantarray ? @values : $values[0];
+  return wantarray ? @values : $values[0];
 }
 
 sub params {
   my ($self, $params) = @_;
   if ($params) { $self->{params} = $params }
   elsif (defined $self->{string}) { $self->parse }
-  $self->{params} ||= [];
+  return $self->{params} ||= [];
 }
 
 sub parse {
@@ -129,7 +129,7 @@ sub parse {
     push @{$self->params}, $name, $value;
   }
 
-  $self;
+  return $self;
 }
 
 # "Don't kid yourself, Jimmy. If a cow ever got the chance,
@@ -146,7 +146,7 @@ sub remove {
   }
   $self->params($params);
 
-  $self;
+  return $self;
 }
 
 sub to_hash {
@@ -170,7 +170,7 @@ sub to_hash {
     else { $params{$name} = $value }
   }
 
-  \%params;
+  return \%params;
 }
 
 sub to_string {
@@ -212,7 +212,7 @@ sub to_string {
 
   # Concatenate pairs
   my $separator = $self->pair_separator;
-  join $separator, @params;
+  return join $separator, @params;
 }
 
 1;

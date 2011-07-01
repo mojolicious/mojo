@@ -38,7 +38,7 @@ sub run {
   my $result = eval "package main; sub app { \$app }; $code";
   print "$result\n" if $verbose && defined $result;
   die $@ if $@;
-  $result;
+  return $result;
 }
 
 1;

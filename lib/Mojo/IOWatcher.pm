@@ -21,13 +21,13 @@ sub add {
     ? $self->writing($handle)
     : $self->not_writing($handle);
 
-  $self;
+  return $self;
 }
 
 sub cancel {
   my ($self, $id) = @_;
   return 1 if delete $self->{timers}->{$id};
-  undef;
+  return;
 }
 
 sub is_readable {
@@ -40,7 +40,7 @@ sub is_readable {
   my $result = $test->handles(POLLIN | POLLERR | POLLHUP);
   $test->remove($handle);
 
-  !$result;
+  return !$result;
 }
 
 sub not_writing {
@@ -52,7 +52,7 @@ sub not_writing {
     if delete $self->{handles}->{fileno $handle}->{writing};
   $poll->mask($handle, $self->POLLIN);
 
-  $self;
+  return $self;
 }
 
 # "This was such a pleasant St. Patrick's Day until Irish people showed up."
@@ -91,7 +91,7 @@ sub remove {
   my ($self, $handle) = @_;
   delete $self->{handles}->{fileno $handle};
   $self->_poll->remove($handle);
-  $self;
+  return $self;
 }
 
 # "Bart, how did you get a cellphone?
@@ -125,7 +125,7 @@ sub writing {
   $poll->mask($handle, $self->POLLIN | $self->POLLOUT);
   $self->{handles}->{fileno $handle}->{writing} = 1;
 
-  $self;
+  return $self;
 }
 
 sub _event {
@@ -138,7 +138,7 @@ sub _event {
   (my $id) = "$e" =~ /0x([\da-f]+)/;
   $self->{$pool}->{$id} = $e;
 
-  $id;
+  return $id;
 }
 
 sub _poll { shift->{poll} ||= IO::Poll->new }

@@ -17,7 +17,7 @@ sub load {
   my $content = do { local $/; <$handle> };
 
   # Process
-  $self->parse($content, $file, $conf, $app);
+  return $self->parse($content, $file, $conf, $app);
 }
 
 sub parse {
@@ -30,7 +30,7 @@ sub parse {
   die qq/Config file "$file" did not return a hashref.\n/
     unless ref $config && ref $config eq 'HASH';
 
-  $config;
+  return $config;
 }
 
 sub register {
@@ -95,7 +95,7 @@ sub register {
   # Add default stash value
   $app->defaults(($conf->{stash_key} || 'config') => $config);
 
-  $config;
+  return $config;
 }
 
 1;

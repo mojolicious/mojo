@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+1.51    2011-07-01 00:00:00
+        - Fixed small timing issue in "morbo.t".
+
 1.50    2011-07-01 00:00:00
         - Removed idle event from Mojo::IOLoop.
         - Updated jQuery to version 1.6.2.

@@ -18,7 +18,7 @@ use Mojo::UserAgent;
 
 plan skip_all => 'set TEST_MORBO to enable this test (developer only!)'
   unless $ENV{TEST_MORBO};
-plan tests => 28;
+plan tests => 27;
 
 # "Morbo wishes these stalwart nomads peace among the Dutch tulips.
 #  At least all those windmills will keep them cool.
@@ -71,7 +71,6 @@ is $tx->res->body, 'Hello Morbo!', 'right content';
 
 # Update script without changing size
 my ($size, $mtime) = (stat $script)[7, 9];
-ok !$morbo->check_file($script), 'file has not changed';
 $command->write_rel_file('myapp.pl', <<EOF);
 use Mojolicious::Lite;
 

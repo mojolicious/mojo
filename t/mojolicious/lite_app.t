@@ -11,7 +11,7 @@ BEGIN {
   $ENV{MOJO_MODE} = 'development';
 }
 
-use Test::More tests => 886;
+use Test::More tests => 889;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -1707,11 +1707,13 @@ $t->reset_session;
 $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
   ->content_is("stash too!!!!!!!!\n");
 
-# GET /favicon.ico (random static requests)
-$t->get_ok('/favicon.ico')->status_is(200);
+# GET /mojolicious-white.png
+# GET /mojolicious-black.png
+# (random static requests)
 $t->get_ok('/mojolicious-white.png')->status_is(200);
 $t->get_ok('/mojolicious-black.png')->status_is(200);
-$t->get_ok('/favicon.ico')->status_is(200);
+$t->get_ok('/mojolicious-white.png')->status_is(200);
+$t->get_ok('/mojolicious-black.png')->status_is(200);
 
 # GET /bridge2stash (with cookies, session and flash again)
 $t->get_ok('/bridge2stash')->status_is(200)
@@ -1808,6 +1810,9 @@ $t->get_ok('/captures/♥/☃')->status_is(200)
   ->content_is('/captures/%E2%99%A5/%E2%98%83');
 is b($t->tx->res->body)->url_unescape->decode('UTF-8'),
   '/captures/♥/☃', 'right result';
+
+# GET /favicon.ico (bundled file in DATA section)
+$t->get_ok('/favicon.ico')->status_is(200)->content_is("Not a favicon!\n\n");
 
 # User agent timer
 $tua->ioloop->one_tick('0.1');
@@ -2028,6 +2033,9 @@ Possible!
 
 @@ impossible.html.ep
 Impossible
+
+@@ favicon.ico
+Not a favicon!
 
 __END__
 This is not a template!

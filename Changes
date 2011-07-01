@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension Mojolicious.
 
 1.52    2011-07-01 00:00:00
         - Fixed typos.
+        - Fixed small static file in DATA section bug.
 
 1.51    2011-07-01 00:00:00
         - Renamed build_url method in Test::Mojo to test_server.

@@ -47,50 +47,43 @@ sub serve {
 
   # Append path to root
   $root = $self->root unless defined $root;
-  my $file = File::Spec->catfile($root, split('/', $rel));
+  my $path = File::Spec->catfile($root, split('/', $rel));
 
   # Extension
-  $file =~ /\.(\w+)$/;
+  $path =~ /\.(\w+)$/;
   my $ext = $1;
 
-  # Bundled file
+  # Root for bundled files
   $self->{bundled}
     ||= File::Spec->catdir(File::Spec->splitdir(dirname(__FILE__)), 'public');
-  my $bundled = File::Spec->catfile($self->{bundled}, split('/', $rel));
 
-  # Files
-  my $res      = $c->res;
+  # Normal file
+  my $asset;
   my $modified = $self->{modified} ||= time;
   my $size     = 0;
-  my $asset;
-  for my $path ($file, $bundled) {
+  my $res      = $c->res;
+  if (my $file = $self->_get_file($path)) {
+    if (@$file) { ($asset, $modified, $size) = @$file }
 
-    # Exists
-    if (-f $path) {
-
-      # Readable
-      if (-r $path) {
-        my $stat = stat($path);
-        $modified = $stat->mtime;
-        $size     = $stat->size;
-        $asset    = Mojo::Asset::File->new(path => $path);
-      }
-
-      # Exists, but is forbidden
-      else {
-        $c->app->log->debug(qq/File "$rel" forbidden./);
-        $res->code(403) and return 1;
-      }
-
-      # Done
-      last;
+    # Exists but is forbidden
+    else {
+      $c->app->log->debug(qq/File "$rel" is forbidden./);
+      $res->code(403) and return;
     }
   }
 
   # DATA file
-  if (!$asset && defined(my $file = $self->_get_data_file($c, $rel))) {
-    $size  = length $file;
-    $asset = Mojo::Asset::Memory->new->add_chunk($file);
+  elsif (!$asset && defined(my $data = $self->_get_data_file($c, $rel))) {
+    $size  = length $data;
+    $asset = Mojo::Asset::Memory->new->add_chunk($data);
+  }
+
+  # Bundled file
+  else {
+    $path = File::Spec->catfile($self->{bundled}, split('/', $rel));
+    if (my $bundled = $self->_get_file($path)) {
+      ($asset, $modified, $size) = @$bundled if @$bundled;
+    }
   }
 
   # Found
@@ -112,11 +105,9 @@ sub serve {
       }
     }
 
-    # Start and end
+    # Range
     my $start = 0;
     my $end = $size - 1 >= 0 ? $size - 1 : 0;
-
-    # Range
     if (my $range = $rqh->range) {
       if ($range =~ m/^bytes=(\d+)\-(\d+)?/ && $1 <= $end) {
         $start = $1;
@@ -168,6 +159,14 @@ sub _get_data_file {
   }
 
   return;
+}
+
+sub _get_file {
+  my ($self, $path, $rel) = @_;
+  return unless -f $path;
+  return [] unless -r $path;
+  my $stat = stat($path);
+  return [Mojo::Asset::File->new(path => $path), $stat->mtime, $stat->size];
 }
 
 1;

@@ -3,7 +3,6 @@ use Mojo::Base -base;
 
 use Mojo::IOLoop;
 use Mojo::Message::Response;
-use Mojo::URL;
 use Mojo::UserAgent;
 use Mojo::Util 'decode';
 
@@ -18,10 +17,6 @@ has 'tx';
 
 # Silent or loud tests
 $ENV{MOJO_LOG_LEVEL} ||= $ENV{HARNESS_IS_VERBOSE} ? 'debug' : 'fatal';
-
-sub build_url {
-  Mojo::URL->new('http://localhost:' . shift->ua->test_server . '/');
-}
 
 # "Ooh, a graduate student huh?
 #  How come you guys can go to the moon but can't make my shoes smell good?"
@@ -244,6 +239,8 @@ sub status_isnt {
   $self;
 }
 
+sub test_server { shift->ua->test_server(@_) }
+
 sub text_is {
   my ($self, $selector, $value, $desc) = @_;
 
@@ -406,15 +403,6 @@ Maximum number of redirects, defaults to C<0>.
 
 L<Test::Mojo> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
-
-=head2 C<build_url>
-
-  my $url = $t->build_url;
-
-Build absolute L<Mojo::URL> object for test server.
-Note that this method is EXPERIMENTAL and might change without warning!
-
-  $t->get_ok($t->build_url->userinfo('sri:secr3t')->path('/protected'));
 
 =head2 C<content_is>
 
@@ -601,6 +589,17 @@ Check response status for exact match.
   $t = $t->status_isnt(200);
 
 Opposite of C<status_is>.
+
+=head2 C<test_server>
+
+  my $url = $t->test_server;
+  my $url = $t->test_server('http');
+  my $url = $t->test_server('https');
+
+Alias for the C<test_server> method in L<Mojo::UserAgent>.
+Note that this method is EXPERIMENTAL and might change without warning!
+
+  $t->get_ok($t->test_server->userinfo('sri:secr3t')->path('/protected'));
 
 =head2 C<text_is>
 

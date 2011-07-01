@@ -44,7 +44,7 @@ has on_websocket => sub {
 sub load_app {
   my ($self, $file) = @_;
 
-  # Cleanup environment
+  # Clean up environment
   local $ENV{MOJO_APP_LOADER} = 1;
   local $ENV{MOJO_APP};
   local $ENV{MOJO_EXE};

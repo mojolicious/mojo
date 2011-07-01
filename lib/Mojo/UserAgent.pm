@@ -8,6 +8,7 @@ use Mojo::Log;
 use Mojo::Server::Daemon;
 use Mojo::Transaction::WebSocket;
 use Mojo::Transactor;
+use Mojo::URL;
 use Scalar::Util 'weaken';
 
 use constant DEBUG => $ENV{MOJO_USERAGENT_DEBUG} || 0;
@@ -132,7 +133,13 @@ sub start {
 
 # "It's like my dad always said: eventually, everybody gets shot."
 sub test_server {
-  my ($self, $protocol) = @_;
+  my ($self, $scheme) = @_;
+
+  # New test server
+  if ($scheme) {
+    delete $self->{port};
+    delete $self->{server};
+  }
 
   # Start test server
   unless ($self->{port}) {
@@ -141,19 +148,20 @@ sub test_server {
       Mojo::Server::Daemon->new(ioloop => $loop, silent => 1);
     my $port = $self->{port} = $loop->generate_port;
     die "Couldn't find a free TCP port for testing.\n" unless $port;
-    $self->{protocol} = $protocol ||= 'http';
-    $server->listen(["$protocol://*:$port"]);
+    $self->{scheme} = $scheme ||= 'http';
+    $server->listen(["$scheme://*:$port"]);
     $server->prepare_ioloop;
+
+    # Prepare application for testing
+    delete $server->{app};
+    my $app = $self->app;
+    ref $app ? $server->app($app) : $server->app_class($app);
+    $self->log($server->app->log);
   }
 
-  # Prepare application for testing
-  my $server = $self->{server};
-  delete $server->{app};
-  my $app = $self->app;
-  ref $app ? $server->app($app) : $server->app_class($app);
-  $self->log($server->app->log);
-
-  $self->{port};
+  # Build absolute URL for test server
+  Mojo::URL->new->scheme($self->{scheme})->host('localhost')
+    ->port($self->{port})->path('/');
 }
 
 # "Are we there yet?
@@ -221,12 +229,12 @@ sub _cleanup {
   delete $self->{port};
   delete $self->{server};
 
-  # Cleanup active connections
+  # Clean up active connections
   warn "DROPPING ALL CONNECTIONS\n" if DEBUG;
   my $cs = $self->{cs} || {};
   $loop->drop($_) for keys %$cs;
 
-  # Cleanup keep alive connections
+  # Clean up keep alive connections
   my $cache = $self->{cache} || [];
   for my $cached (@$cache) {
     $loop->drop($cached->[1]);
@@ -400,7 +408,7 @@ sub _handle {
   # Normal connection
   else {
 
-    # Cleanup connection
+    # Clean up connection
     $self->_drop($id, $close);
 
     # Idle connection
@@ -542,14 +550,7 @@ sub _start {
   if ($self->app) {
     my $req = $tx->req;
     my $url = $req->url->to_abs;
-
-    # Relative
-    unless ($url->host) {
-      $url->scheme($self->{protocol});
-      $url->host('localhost');
-      $url->port($self->test_server);
-      $req->url($url);
-    }
+    $req->url($url->base($self->test_server)->to_abs) unless $url->host;
   }
 
   # Detect proxy
@@ -1054,10 +1055,12 @@ You can also append a callback to perform transactions non-blocking.
 
 =head2 C<test_server>
 
-  my $port = $ua->test_server;
-  my $port = $ua->test_server('https');
+  my $url = $ua->test_server;
+  my $url = $ua->test_server('http');
+  my $url = $ua->test_server('https');
 
-Starts a test server for C<app> if necessary and returns the port number.
+Starts a test server for C<app> if necessary and returns absolute
+L<Mojo::URL> object for it.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<websocket>

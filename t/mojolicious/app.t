@@ -28,7 +28,7 @@ use_ok 'MojoliciousTest';
 my $t = Test::Mojo->new(app => 'MojoliciousTest');
 
 # Foo::fun
-my $url = $t->build_url;
+my $url = $t->test_server;
 $url->path('/fun/time');
 $t->get_ok($url, {'X-Test' => 'Hi there!'})->status_isnt(404)->status_is(200)
   ->header_isnt('X-Bender' => 'Bite my shiny metal ass!')
@@ -97,7 +97,7 @@ $t->get_ok('/fun/time', {'X-Test' => 'Hi there!'})->status_is(200)
   ->content_is('Have fun!');
 
 # Foo::fun
-$url = $t->build_url;
+$url = $t->test_server;
 $url->path('/fun/time');
 $t->get_ok($url, {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')

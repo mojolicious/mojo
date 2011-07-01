@@ -87,7 +87,7 @@ $t->get_ok('/dead_action')->status_is(500)->content_like(qr/32\./)
   ->content_like(qr/dead\ action!/);
 
 # GET /double_dead_action
-$t->get_ok('/double_dead_action')->status_is(500)->content_like(qr/30\./)
+$t->get_ok('/double_dead_action')->status_is(500)->content_like(qr/36\./)
   ->content_like(qr/double\ dead\ action!/);
 
 # GET /trapped

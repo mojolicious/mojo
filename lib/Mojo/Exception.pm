@@ -96,7 +96,7 @@ sub _detect {
   my @lines;
   for my $lines (@$files) { push @lines, [split /\n/, $lines] }
 
-  # Cleanup plain messages
+  # Clean up plain messages
   return $self unless my $name = shift;
   unless (ref $message) {
     my $filter = sub {

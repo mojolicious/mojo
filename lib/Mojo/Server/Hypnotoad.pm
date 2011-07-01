@@ -284,14 +284,14 @@ sub _pid {
 sub _reap {
   my ($self, $pid) = @_;
 
-  # Cleanup failed upgrade
+  # Clean up failed upgrade
   if (($self->{new} || '') eq $pid) {
     warn "UPGRADE FAILED\n" if DEBUG;
     delete $self->{upgrade};
     delete $self->{new};
   }
 
-  # Cleanup worker
+  # Clean up worker
   else {
     warn "WORKER DIED $pid\n" if DEBUG;
     delete $self->{workers}->{$pid};

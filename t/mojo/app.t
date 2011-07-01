@@ -27,7 +27,7 @@ $app = Mojo::HelloWorld->new;
 my $ua = Mojo::UserAgent->new->app($app);
 
 # Continue
-my $port   = $ua->test_server;
+my $port   = $ua->test_server->port;
 my $buffer = '';
 $ua->ioloop->connect(
   address    => 'localhost',

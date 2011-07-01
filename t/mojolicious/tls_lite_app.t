@@ -47,7 +47,7 @@ get '/again' => sub {
 my $t = Test::Mojo->new;
 
 # Use HTTPS
-$t->ua->test_server('https');
+$t->test_server('https');
 
 # GET /login
 $t->get_ok('/login?name=sri')->status_is(200)->content_is('Welcome sri!');
@@ -56,8 +56,7 @@ $t->get_ok('/login?name=sri')->status_is(200)->content_is('Welcome sri!');
 $t->get_ok('/again')->status_is(200)->content_is('Welcome back sri!');
 
 # Use HTTP
-$t->ua(Mojo::UserAgent->new);
-$t->ua->test_server('http');
+$t->test_server('http');
 
 # GET /login
 $t->get_ok('/login?name=sri')->status_is(200)->content_is('Welcome sri!');
@@ -66,8 +65,7 @@ $t->get_ok('/login?name=sri')->status_is(200)->content_is('Welcome sri!');
 $t->get_ok('/again')->status_is(200)->content_is('Welcome back anonymous!');
 
 # Use HTTPS again
-$t->ua(Mojo::UserAgent->new);
-$t->ua->test_server('https');
+$t->test_server('https');
 
 # GET /login
 $t->get_ok('/login?name=sri')->status_is(200)->content_is('Welcome sri!');

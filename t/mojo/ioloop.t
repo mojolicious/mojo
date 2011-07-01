@@ -6,7 +6,7 @@ use warnings;
 # Disable IPv6, epoll and kqueue
 BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 14;
+use Test::More tests => 12;
 
 # "Marge, you being a cop makes you the man!
 #  Which makes me the woman, and I have no interest in that,
@@ -71,18 +71,11 @@ is $flag, 23, 'recursive timer works';
 # HiRes timer
 is $hiresflag, 42, 'hires timer';
 
-# Idle callback
-my $idle = 0;
-$loop->idle(sub { $idle++ });
-
 # Another tick
 $loop->one_tick;
 
 # Ticks
 ok $ticks > 2, 'more than two ticks';
-
-# Idle callback
-is $idle, 1, 'one idle event';
 
 # Run again without first tick event handler
 my $before = $ticks;
@@ -126,12 +119,6 @@ isa_ok $handle, 'IO::Socket', 'right reference';
 
 # Readonly handle
 is $error, undef, 'no error';
-
-# Idle
-$idle = 0;
-Mojo::IOLoop->idle(sub { Mojo::IOLoop->stop if $idle++ });
-Mojo::IOLoop->start;
-is $idle, 2, 'two idle ticks';
 
 # Dropped listen socket
 $port = Mojo::IOLoop->generate_port;

@@ -26,11 +26,9 @@ sub add {
 
 sub cancel {
   my ($self, $id) = @_;
-  delete $self->{$_}->{$id} and return 1 for qw/timers idle/;
+  return 1 if delete $self->{timers}->{$id};
   undef;
 }
-
-sub idle { shift->_event(idle => shift) }
 
 sub is_readable {
   my ($self, $handle) = @_;
@@ -61,8 +59,8 @@ sub not_writing {
 sub one_tick {
   my ($self, $timeout) = @_;
 
-  # IO events
-  my $activity = $self->watch($timeout);
+  # IO
+  $self->watch($timeout);
 
   # Timers
   my $timers = $self->{timers} || {};
@@ -79,18 +77,7 @@ sub one_tick {
       elsif ($after && $t->{recurring}) { $t->{recurring} += $after }
 
       # Handle timer
-      if (my $cb = $t->{cb}) {
-        $self->_sandbox("Timer $id", $cb, $id);
-        $activity++ if $t->{started};
-      }
-    }
-  }
-
-  # Idle
-  unless ($activity) {
-    for my $id (keys %{$self->{idle} || {}}) {
-      warn "IDLE $id\n" if DEBUG;
-      $self->_sandbox("Idle $id", $self->{idle}->{$id}->{cb}, $id);
+      if (my $cb = $t->{cb}) { $self->_sandbox("Timer $id", $cb, $id) }
     }
   }
 }
@@ -120,21 +107,14 @@ sub watch {
   # Check for IO events
   my $poll = $self->_poll;
   $poll->poll($timeout);
-  my $activity;
   my $handles = $self->{handles};
-  for ($poll->handles($self->POLLIN | $self->POLLHUP | $self->POLLERR)) {
-    $self->_sandbox('Read', $handles->{fileno $_}->{on_readable}, $_);
-    $activity++;
-  }
-  for ($poll->handles($self->POLLOUT)) {
-    $self->_sandbox('Write', $handles->{fileno $_}->{on_writable}, $_);
-    $activity++;
-  }
+  $self->_sandbox('Read', $handles->{fileno $_}->{on_readable}, $_)
+    for $poll->handles($self->POLLIN | $self->POLLHUP | $self->POLLERR);
+  $self->_sandbox('Write', $handles->{fileno $_}->{on_writable}, $_)
+    for $poll->handles($self->POLLOUT);
 
   # Wait for timeout
   usleep 1000000 * $timeout unless keys %{$self->{handles}};
-
-  $activity;
 }
 
 sub writing {
@@ -235,13 +215,7 @@ Callback to be invoked once the handle becomes writable.
 
   my $success = $watcher->cancel($id);
 
-Cancel timer or idle event.
-
-=head2 C<idle>
-
-  my $id = $watcher->idle(sub {...});
-
-Callback to be invoked on every tick if no other events occurred.
+Cancel timer.
 
 =head2 C<is_readable>
 
@@ -260,7 +234,7 @@ Only watch handle for readable events.
 
   $watcher->one_tick('0.25');
 
-Run for exactly one tick and watch for io, timer and idle events.
+Run for exactly one tick and watch for io and timer events.
 
 =head2 C<recurring>
 
@@ -283,7 +257,7 @@ Create a new timer, invoking the callback after a given amount of seconds.
 
 =head2 C<watch>
 
-  my $activity = $watcher->watch('0.25');
+  $watcher->watch('0.25');
 
 Run for exactly one tick and watch only for io events.
 

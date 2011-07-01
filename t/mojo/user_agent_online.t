@@ -22,24 +22,20 @@ use_ok 'ojo';
 # Make sure user agents dont taint the ioloop
 my $loop = Mojo::IOLoop->singleton;
 my $ua   = Mojo::UserAgent->new;
-my $code;
+my ($id, $code);
 $ua->get(
   'http://cpan.org' => sub {
     my $tx = pop;
+    $id   = $tx->connection;
     $code = $tx->res->code;
     $loop->stop;
   }
 );
 $loop->start;
 $ua = undef;
-my $ticks     = 0;
-my $recurring = $loop->recurring(0 => sub { $ticks++ });
-my $idle      = $loop->idle(sub { $loop->stop });
-$loop->start;
-$loop->drop($recurring);
-$loop->drop($idle);
-is $ticks, 1,   'loop not tainted';
-is $code,  301, 'right status';
+$loop->one_tick(0);
+ok !$loop->handle($id), 'loop not tainted';
+is $code, 301, 'right status';
 
 # Fresh user agent
 $ua = Mojo::UserAgent->new;

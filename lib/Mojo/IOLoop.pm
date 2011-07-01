@@ -225,13 +225,6 @@ sub generate_port {
   undef;
 }
 
-sub idle {
-  my ($self, $cb) = @_;
-  $self = $self->singleton unless ref $self;
-  weaken $self;
-  $self->iowatcher->idle(sub { $self->$cb(pop) });
-}
-
 sub is_running {
   my $self = shift;
   $self = $self->singleton unless ref $self;
@@ -614,7 +607,7 @@ sub _connect {
 sub _drop {
   my ($self, $id) = @_;
 
-  # Cancel watcher events
+  # Cancel timer events
   return $self unless my $watcher = $self->iowatcher;
   return $self if $watcher->cancel($id);
 
@@ -1169,14 +1162,6 @@ Find a free TCP port, this is a utility function primarily used for tests.
   my $handle = $loop->handle($id);
 
 Get handle for id.
-Note that this method is EXPERIMENTAL and might change without warning!
-
-=head2 C<idle>
-
-  my $id = Mojo::IOLoop->idle(sub {...});
-  my $id = $loop->idle(sub {...});
-
-Callback to be invoked on every reactor tick if no other events occurred.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<is_running>

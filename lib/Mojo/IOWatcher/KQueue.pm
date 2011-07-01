@@ -36,7 +36,6 @@ sub watch {
 
   my @ret;
   eval { @ret = $self->_kqueue->kevent(1000 * $timeout) };
-  my $activity;
   for my $kev (@ret) {
     my ($fd, $filter, $flags, $fflags) = @$kev;
     my $h = $self->{handles}->{$fd};
@@ -44,10 +43,7 @@ sub watch {
       if $filter == EVFILT_READ || $flags == EV_EOF;
     $self->_sandbox('Write', $h->{on_writable}, $h->{handle})
       if $filter == EVFILT_WRITE;
-    $activity++;
   }
-
-  $activity;
 }
 
 sub writing {
@@ -100,7 +96,7 @@ Remove handle.
 
 =head2 C<watch>
 
-  my $activity = $watcher->watch('0.25');
+  $watcher->watch('0.25');
 
 Run for exactly one tick and watch only for io events.
 

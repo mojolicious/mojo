@@ -698,7 +698,7 @@ The following events are available and run in the listed order.
 =item after_build_tx
 
 Triggered right after the transaction is built and before the HTTP request
-gets parsed.
+gets parsed, the callbacks of this hook run in the order they were added.
 One use case would be upload progress bars.
 (Passed the transaction and application instances)
 
@@ -708,7 +708,8 @@ One use case would be upload progress bars.
 
 =item before_dispatch
 
-Triggered right before the static and routes dispatchers start their work.
+Triggered right before the static and routes dispatchers start their work,
+the callbacks of this hook run in the order they were added.
 Very useful for rewriting incoming requests and other preprocessing tasks.
 (Passed the default controller instance)
 
@@ -730,7 +731,8 @@ Mostly used for custom dispatchers and postprocessing static file responses.
 
 =item before_render
 
-Triggered right before the renderer turns the stash into a response.
+Triggered right before the renderer turns the stash into a response, the
+callbacks of this hook run in the order they were added.
 Very useful for making adjustments to the stash right before rendering.
 (Passed the current controller instance and argument hash)
 

@@ -68,14 +68,8 @@ sub head {
 
 sub need_proxy {
   my ($self, $host) = @_;
-
-  # No proxy list
   return 1 unless my $no = $self->no_proxy;
-
-  # No proxy needed
   $host =~ /\Q$_\E$/ and return for @$no;
-
-  # Proxy needed
   return 1;
 }
 
@@ -107,25 +101,19 @@ sub start {
   # Non-blocking
   if ($cb) {
 
-    # Switch to non-blocking
+    # Start non-blocking
     warn "NEW NON-BLOCKING REQUEST\n" if DEBUG;
     $self->_switch_non_blocking unless $self->{nb};
-
-    # Start
     return $self->_start($tx, $cb);
   }
 
-  # Switch to blocking
+  # Start blocking
   warn "NEW BLOCKING REQUEST\n" if DEBUG;
   $self->_switch_blocking if $self->{nb};
-
-  # Quick start
   $self->_start($tx, sub { $tx = $_[1] });
 
   # Start loop
   $loop->start;
-
-  # Cleanup
   $loop->one_tick(0);
 
   return $tx;
@@ -206,11 +194,9 @@ sub _cache {
     if (!$result && ($cached->[1] eq $name || $cached->[0] eq $name)) {
       my $id = $cached->[1];
 
-      # Test connection
-      if ($loop->test($id)) { $result = $id }
-
       # Drop corrupted connection
-      else { $loop->drop($id) }
+      if ($loop->test($id)) { $result = $id }
+      else                  { $loop->drop($id) }
     }
 
     # Cache again
@@ -264,10 +250,8 @@ sub _connect {
   # New connection
   else {
 
-    # TLS/WebSocket proxy
+    # CONNECT request to proxy required
     unless (($tx->req->method || '') eq 'CONNECT') {
-
-      # CONNECT request to proxy required
       return if $self->_proxy_connect($tx, $cb);
     }
 
@@ -308,8 +292,6 @@ sub _connected {
   my $remote = $loop->remote_info($id);
   $tx->remote_address($remote->{address});
   $tx->remote_port($remote->{port});
-
-  # Keep alive timeout
   $loop->connection_timeout($id => $self->keep_alive_timeout);
 
   # Write
@@ -321,37 +303,25 @@ sub _connected {
 sub _drop {
   my ($self, $id, $close) = @_;
 
-  # Drop connection
-  my $c = delete $self->{cs}->{$id};
-
-  # Transaction
+  # Keep non-CONNECTed connection alive
+  my $c  = delete $self->{cs}->{$id};
   my $tx = $c->{tx};
   if (!$close && $tx && $tx->keep_alive && !$tx->error) {
-
-    # Keep non-CONNECTed connection alive
     $self->_cache(join(':', $self->_info($tx)), $id)
       unless (($tx->req->method || '') =~ /^connect$/i
       && ($tx->res->code || '') eq '200');
-
-    # Still active
     return;
   }
 
-  # Connection close
+  # Close connection
   $self->_cache($id);
   $self->{loop}->drop($id);
 }
 
 sub _error {
   my ($self, $loop, $id, $error) = @_;
-
-  # Store error in response
   if (my $tx = $self->{cs}->{$id}->{tx}) { $tx->res->error($error) }
-
-  # Log error
   $self->log->error($error);
-
-  # Finish connection
   $self->_handle($id, $error);
 }
 
@@ -383,12 +353,10 @@ sub _finish {
 sub _handle {
   my ($self, $id, $close) = @_;
 
-  # WebSocket
+  # Finish WebSocket
   my $c   = $self->{cs}->{$id};
   my $old = $c->{tx};
   if ($old && $old->is_websocket) {
-
-    # Finish transaction
     $old->client_close;
     $self->{processing} -= 1;
     delete $self->{cs}->{$id};
@@ -398,26 +366,16 @@ sub _handle {
   # Upgrade connection to WebSocket
   elsif ($old && (my $new = $self->_upgrade($id))) {
 
-    # Finish transaction
+    # Finish transaction and parse leftovers
     $self->_finish($new, $c->{cb});
-
-    # Parse leftovers
     $new->client_read($old->res->leftovers);
   }
 
-  # Normal connection
+  # Finish normal connection
   else {
-
-    # Clean up connection
     $self->_drop($id, $close);
-
-    # Idle connection
     return unless $old;
-
-    # Extract cookies
     if (my $jar = $self->cookie_jar) { $jar->extract($old) }
-
-    # Finished transaction
     $self->{processing} -= 1;
 
     # Redirect or callback
@@ -432,7 +390,6 @@ sub _handle {
 sub _info {
   my ($self, $tx) = @_;
 
-  # Proxy info
   my $req    = $tx->req;
   my $url    = $req->url;
   my $scheme = $url->scheme || 'http';
@@ -443,8 +400,6 @@ sub _info {
     $host   = $proxy->ihost;
     $port   = $proxy->port;
   }
-
-  # Default port
   $port ||= $scheme eq 'https' ? 443 : 80;
 
   return $scheme, $host, $port;
@@ -454,10 +409,8 @@ sub _info {
 sub _proxy_connect {
   my ($self, $old, $cb) = @_;
 
-  # CONNECT request
-  return unless my $new = $self->transactor->proxy_connect($old);
-
   # Start CONNECT request
+  return unless my $new = $self->transactor->proxy_connect($old);
   $self->_start(
     $new => sub {
       my ($self, $tx) = @_;
@@ -465,8 +418,7 @@ sub _proxy_connect {
       # CONNECT failed
       unless (($tx->res->code || '') eq '200') {
         $old->req->error('Proxy connection failed.');
-        $self->_finish($old, $cb);
-        return;
+        return $self->_finish($old, $cb);
       }
 
       # TLS upgrade
@@ -477,17 +429,13 @@ sub _proxy_connect {
 
         # Start TLS
         my $new_id = $self->{loop}->start_tls($old_id);
-
-        # Cleanup
         $old->req->proxy(undef);
         delete $self->{cs}->{$old_id};
         $tx->connection($new_id);
       }
 
-      # Share connection
+      # Share connection and start real transaction
       $old->connection($tx->connection);
-
-      # Start real transaction
       $self->_start($old, $cb);
     }
   );
@@ -501,24 +449,18 @@ sub _read {
   my ($self, $loop, $id, $chunk) = @_;
   warn "< $chunk\n" if DEBUG;
 
-  # Transaction
-  return unless my $c = $self->{cs}->{$id};
-  if (my $tx = $c->{tx}) {
-
-    # Read
-    $tx->client_read($chunk);
-
-    # Finish
-    if ($tx->is_done) { $self->_handle($id) }
-
-    # Writing
-    elsif ($c->{tx}->is_writing) { $self->_write($id) }
-
-    return;
-  }
-
   # Corrupted connection
-  $self->_drop($id);
+  return                   unless my $c  = $self->{cs}->{$id};
+  return $self->_drop($id) unless my $tx = $c->{tx};
+
+  # Read
+  $tx->client_read($chunk);
+
+  # Finish
+  if ($tx->is_done) { $self->_handle($id) }
+
+  # Write
+  elsif ($c->{tx}->is_writing) { $self->_write($id) }
 }
 
 sub _redirect {
@@ -533,12 +475,8 @@ sub _redirect {
   return unless $redirects < $max;
 
   # Start redirected request
-  return 1 unless my $new_id = $self->_start($new, $c->{cb});
-
-  # Create new connection
-  $self->{cs}->{$new_id}->{redirects} = $redirects + 1;
-
-  # Redirecting
+  return 1 unless my $id = $self->_start($new, $c->{cb});
+  $self->{cs}->{$id}->{redirects} = $redirects + 1;
   return 1;
 }
 
@@ -553,10 +491,8 @@ sub _start {
     $req->url($url->base($self->test_server)->to_abs) unless $url->host;
   }
 
-  # Detect proxy
-  $self->detect_proxy if $ENV{MOJO_PROXY};
-
   # Proxy
+  $self->detect_proxy if $ENV{MOJO_PROXY};
   my $req    = $tx->req;
   my $url    = $req->url;
   my $scheme = $url->scheme || '';
@@ -580,17 +516,11 @@ sub _start {
   # Inject cookies
   if (my $jar = $self->cookie_jar) { $jar->inject($tx) }
 
-  # Start
-  if (my $start = $self->on_start) { $self->$start($tx) }
-
   # Connect
+  if (my $start = $self->on_start) { $self->$start($tx) }
   return unless my $id = $self->_connect($tx, $cb);
-
-  # Resume callback
   weaken $self;
   $tx->on_resume(sub { $self->_write($id) });
-
-  # Counter
   $self->{processing} ||= 0;
   $self->{processing} += 1;
 
@@ -639,16 +569,10 @@ sub _upgrade {
   # Upgrade to WebSocket transaction
   my $new = Mojo::Transaction::WebSocket->new(handshake => $old, masked => 1);
   $new->kept_alive($old->kept_alive);
-
-  # WebSocket challenge
   $res->error('WebSocket challenge failed.') and return
     unless $new->client_challenge;
   $c->{tx} = $new;
-
-  # Upgrade connection timeout
   $self->{loop}->connection_timeout($id, $self->websocket_timeout);
-
-  # Resume callback
   weaken $self;
   $new->on_resume(sub { $self->_write($id) });
 
@@ -659,15 +583,13 @@ sub _upgrade {
 sub _write {
   my ($self, $id) = @_;
 
-  # Writing
+  # Get chunk
   return unless my $c  = $self->{cs}->{$id};
   return unless my $tx = $c->{tx};
   return unless $tx->is_writing;
+  my $chunk = $tx->client_write;
 
-  # Get chunk
-  my $chunk = $c->{tx}->client_write;
-
-  # Still writing
+  # More to write
   my $cb;
   if ($tx->is_writing) {
     weaken $self;
@@ -676,10 +598,10 @@ sub _write {
 
   # Write
   $self->{loop}->write($id, $chunk, $cb);
+  warn "> $chunk\n" if DEBUG;
 
   # Finish
   $self->_handle($id) if $tx->is_done;
-  warn "> $chunk\n"   if DEBUG;
 }
 
 1;

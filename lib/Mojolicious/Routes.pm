@@ -574,9 +574,7 @@ sub _walk_stack {
 
     # Merge in captures
     if (my @keys = keys %$field) {
-      my @values = values %$field;
-      @{$stash->{'mojo.captures'}}{@keys} = @values;
-      @{$c->stash}{@keys} = @values;
+      @{$stash}{@keys} = @{$stash->{'mojo.captures'}}{@keys} = values %$field;
     }
 
     # Dispatch

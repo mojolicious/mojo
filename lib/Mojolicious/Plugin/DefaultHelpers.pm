@@ -59,9 +59,8 @@ sub register {
       my $extends = delete $args->{extends};
 
       # Localize arguments
-      my @keys  = keys %$args;
-      my $stash = $self->stash;
-      local @{$stash}{@keys} = @{$args}{@keys};
+      my @keys = keys %$args;
+      local @{$self->stash}{@keys} = @{$args}{@keys};
 
       return $self->render_partial(layout => $layout, extend => $extends);
     }

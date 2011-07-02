@@ -60,12 +60,8 @@ sub register {
 
       # Localize arguments
       my @keys  = keys %$args;
-      my $i     = 0;
       my $stash = $self->stash;
-    START:
-      local $stash->{$keys[$i]} = $args->{$keys[$i]};
-      $i++;
-      goto START unless $i >= @keys;
+      local @{$stash}{@keys} = @{$args}{@keys};
 
       return $self->render_partial(layout => $layout, extend => $extends);
     }

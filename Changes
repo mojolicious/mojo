@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-1.53    2011-07-01 00:00:00
+1.53    2011-07-02 00:00:00
         - Added EXPERIMENTAL format method to Mojo::Log and simplified the
           default log file format.
         - Improved include helper argument localization. (miyagawa)

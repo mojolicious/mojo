@@ -165,7 +165,7 @@ sub _get_file {
   my ($self, $path, $rel) = @_;
   return unless -f $path;
   return [] unless -r $path;
-  my $stat = stat($path);
+  return unless my $stat = stat $path;
   return [Mojo::Asset::File->new(path => $path), $stat->mtime, $stat->size];
 }
 

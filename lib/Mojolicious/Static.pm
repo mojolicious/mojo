@@ -2,7 +2,6 @@ package Mojolicious::Static;
 use Mojo::Base -base;
 
 use File::Basename 'dirname';
-use File::stat;
 use File::Spec;
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
@@ -63,7 +62,7 @@ sub serve {
   my $size     = 0;
   my $res      = $c->res;
   if (my $file = $self->_get_file($path)) {
-    if (@$file) { ($asset, $modified, $size) = @$file }
+    if (@$file) { ($asset, $size, $modified) = @$file }
 
     # Exists but is forbidden
     else {
@@ -82,7 +81,7 @@ sub serve {
   else {
     $path = File::Spec->catfile($self->{bundled}, split('/', $rel));
     if (my $bundled = $self->_get_file($path)) {
-      ($asset, $modified, $size) = @$bundled if @$bundled;
+      ($asset, $size, $modified) = @$bundled if @$bundled;
     }
   }
 
@@ -165,8 +164,7 @@ sub _get_file {
   my ($self, $path, $rel) = @_;
   return unless -f $path;
   return [] unless -r $path;
-  return unless my $stat = stat $path;
-  return [Mojo::Asset::File->new(path => $path), $stat->mtime, $stat->size];
+  return [Mojo::Asset::File->new(path => $path), (stat $path)[7, 9]];
 }
 
 1;

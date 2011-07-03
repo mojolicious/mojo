@@ -14,7 +14,6 @@ use Test::More tests => 249;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use File::stat;
 use File::Spec;
 use Mojo::Date;
 use Mojo::Transaction::HTTP;
@@ -206,15 +205,15 @@ $t->get_ok('/', {'X-Test' => 'Hi there!'})->status_is(404)
 
 # Check Last-Modified header for static files
 my $path  = File::Spec->catdir($FindBin::Bin, 'public_dev', 'hello.txt');
-my $stat  = stat($path);
-my $mtime = Mojo::Date->new(stat($path)->mtime)->to_string;
+my $size  = (stat $path)[7];
+my $mtime = Mojo::Date->new((stat $path)[9])->to_string;
 
 # Static file /hello.txt
 $t->get_ok('/hello.txt')->status_is(200)
-  ->header_is(Server           => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
-  ->header_is('Last-Modified'  => $mtime)
-  ->header_is('Content-Length' => $stat->size)->content_type_is('text/plain')
+  ->header_is(Server          => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
+  ->header_is('Last-Modified' => $mtime)->header_is('Content-Length' => $size)
+  ->content_type_is('text/plain')
   ->content_like(qr/Hello Mojo from a development static file!/);
 
 # Try to access a file which is not under the web root via path

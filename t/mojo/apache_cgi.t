@@ -35,20 +35,20 @@ my $mt     = Mojo::Template->new;
 
 $mt->render_to_file(<<'EOF', $config, $dir, $port);
 % my ($dir, $port) = @_;
-% use File::Spec::Functions 'catfile';
+% use File::Spec;
 ServerName 127.0.0.1
 Listen <%= $port %>
 DocumentRoot  <%= $dir %>
 
 LoadModule log_config_module libexec/apache2/mod_log_config.so
 
-ErrorLog <%= catfile $dir, 'error.log' %>
+ErrorLog <%= File::Spec->catfile($dir, 'error.log') %>
 
 LoadModule alias_module libexec/apache2/mod_alias.so
 LoadModule cgi_module libexec/apache2/mod_cgi.so
 
-PidFile <%= catfile $dir, 'httpd.pid' %>
-LockFile <%= catfile $dir, 'accept.lock' %>
+PidFile <%= File::Spec->catfile($dir, 'httpd.pid') %>
+LockFile <%= File::Spec->catfile($dir, 'accept.lock') %>
 
 ScriptAlias /cgi-bin <%= $dir %>
 EOF

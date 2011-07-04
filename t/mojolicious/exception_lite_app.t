@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 
-# Disable IPv6, epoll and kqueue
+# Disable Bonjour, IPv6, epoll and kqueue
 BEGIN {
-  $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1;
+  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1;
   $ENV{MOJO_MODE} = 'development';
 }
 

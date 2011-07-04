@@ -335,14 +335,13 @@ argument.
   <head><title>Howdy!</title></head>
 
 But there is one small difference between the two, if you pass stash values
-to C<include> they will get localized automatically and are only available in
-the partial template.
+to C<include>, they will get localized automatically and are only available
+in the partial template.
 
   @@ foo/bar.html.ep
   <!doctype html><html>
-    % my $title = 'Bye!';
     <%= include 'header', title => 'Hello!' %>
-    <body><h1><%= $title %></h1></body>
+    <body>Bar!</body>
   </html>
 
   @@ header.html.ep

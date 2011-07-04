@@ -334,12 +334,15 @@ argument.
   @@ header.html.ep
   <head><title>Howdy!</title></head>
 
-Of course you can also pass stash values.
+But there is one small difference between the two, if you pass stash values
+to C<include> they will get localized automatically and are only available in
+the partial template.
 
   @@ foo/bar.html.ep
   <!doctype html><html>
+    % my $title = 'Bye!';
     <%= include 'header', title => 'Hello!' %>
-    <body>Bar!</body>
+    <body><h1><%= $title %></h1></body>
   </html>
 
   @@ header.html.ep

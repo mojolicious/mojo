@@ -1555,24 +1555,21 @@ An C<E> element whose attributes match all following attribute selectors.
 
 =head1 CASE SENSITIVITY
 
-L<Mojo::DOM> defaults to HTML5 semantics, so all tags and attributes will be
-lowercased and selectors need to be lowercase as well.
+L<Mojo::DOM> defaults to HTML5 semantics, that means all tags and attributes
+are lowercased and selectors need to be lowercase as well.
 
-  my $dom = Mojo::DOM->new('<A HREF="http://kraih.com">Kraih</A>');
-  print $dom->at('a')->text;
-  print $dom->a->{href};
+  my $dom = Mojo::DOM->new('<P ID="greeting">Hi!</P>'');
+  print $dom->at('p')->text;
+  print $dom->p->{id};
 
-If XML processing instructions are found the parser will automatically switch
-into XML mode and everything becomes case sensitive.
+If XML processing instructions are found, the parser will automatically
+switch into XML mode and everything becomes case sensitive.
 
-  my $dom = Mojo::DOM->new(<<EOF);
-  <?xml version="1.0" encoding="UTF-8"?>
-  <A HREF="http://kraih.com">Kraih</A>
-  EOF
-  print $dom->at('A')->text;
-  print $dom->A->{HREF};
+  my $dom = Mojo::DOM->new('<?xml version="1.0"?><P ID="greeting">Hi!</P>');
+  print $dom->at('P')->text;
+  print $dom->P->{ID};
 
-HTML5/XML detection can be also deactivated with the C<xml> method.
+XML detection can be also deactivated with the C<xml> method.
 
   # XML sematics
   $dom->xml(1);

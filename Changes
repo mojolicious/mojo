@@ -1,7 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.56    2011-07-04 00:00:00
-        - Fixed small memory leak in Hypnotoad.
+        - Fixed small memory leaks in Hypnotoad and Mojo::IOLoop.
 
 1.55    2011-07-04 00:00:00
         - Improved documentation.

@@ -632,7 +632,7 @@ sub _drop {
 
     # Cleanup
     delete $self->{cs}->{$id};
-    delete $self->{reverse}->{$id};
+    delete $self->{reverse}->{$handle};
     $watcher->remove($handle);
     close $handle;
   }

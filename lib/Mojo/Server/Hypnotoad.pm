@@ -348,8 +348,7 @@ sub _spawn {
 
   # Heartbeat
   weaken $self;
-  my $id;
-  $id = $loop->recurring(
+  $loop->recurring(
     $c->{heartbeat_interval} => sub {
       return unless shift->max_connections;
       $self->{writer}->syswrite("$$\n") or exit 0;

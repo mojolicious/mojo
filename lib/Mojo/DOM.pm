@@ -1558,7 +1558,7 @@ An C<E> element whose attributes match all following attribute selectors.
 L<Mojo::DOM> defaults to HTML5 semantics, that means all tags and attributes
 are lowercased and selectors need to be lowercase as well.
 
-  my $dom = Mojo::DOM->new('<P ID="greeting">Hi!</P>'');
+  my $dom = Mojo::DOM->new('<P ID="greeting">Hi!</P>');
   print $dom->at('p')->text;
   print $dom->p->{id};
 

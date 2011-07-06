@@ -74,8 +74,7 @@ sub register {
         unless $path && -r $path;
 
       # Turn POD into HTML
-      my $file = IO::File->new;
-      $file->open("< $path");
+      my $file = IO::File->new("< $path");
       my $html = _pod_to_html(join '', <$file>);
 
       # Rewrite links

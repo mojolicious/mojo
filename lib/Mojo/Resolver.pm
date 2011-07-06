@@ -34,8 +34,7 @@ my $SERVERS = ['8.8.8.8', '8.8.4.4'];
 
 # Try to detect DNS server
 if (-r '/etc/resolv.conf') {
-  my $file = IO::File->new;
-  $file->open('< /etc/resolv.conf');
+  my $file = IO::File->new('< /etc/resolv.conf');
   my @servers;
   for my $line (<$file>) {
 

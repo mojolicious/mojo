@@ -62,9 +62,10 @@ But one of its biggest advantages is the support for effortless zero downtime
 software upgrades.
 That means you can upgrade L<Mojolicious>, Perl or even system libraries at
 runtime without ever stopping the server or losing a single incoming
-connection, just by sending it a C<USR2> signal.
+connection, just by running the command above again.
 
-  % kill -s 'USR2' `cat hypnotoad.pid`
+  % hypnotoad script/myapp
+  Initiating hot deployment for Hypnotoad server 31841.
 
 =head2 Nginx
 

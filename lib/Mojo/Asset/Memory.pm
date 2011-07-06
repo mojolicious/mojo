@@ -46,8 +46,8 @@ sub get_chunk {
 
 sub move_to {
   my ($self, $path) = @_;
-  my $file = IO::File->new;
-  $file->open("> $path") or croak qq/Can't open file "$path": $!/;
+  croak qq/Can't open file "$path": $!/
+    unless my $file = IO::File->new("> $path");
   $file->syswrite($self->{content});
   return $self;
 }

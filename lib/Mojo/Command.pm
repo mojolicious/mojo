@@ -306,11 +306,9 @@ sub write_file {
   my $dir = File::Spec->catdir(@parts);
   $self->create_dir($dir);
 
-  # Open file
-  my $file = IO::File->new;
-  $file->open(">$path") or croak qq/Can't open file "$path": $!/;
-
   # Write unbuffered
+  croak qq/Can't open file "$path": $!/
+    unless my $file = IO::File->new("> $path");
   $file->syswrite($data);
   print "  [write] $path\n" unless $self->quiet;
 

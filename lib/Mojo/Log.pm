@@ -14,10 +14,10 @@ has handle => sub {
     return \*STDERR;
   }
 
-  # Open
-  my $file = IO::File->new;
+  # Append to file
   my $path = $self->path;
-  $file->open(">> $path") or croak qq/Can't open log file "$path": $!/;
+  croak qq/Can't open log file "$path": $!/
+    unless my $file = IO::File->new(">> $path");
   binmode $file, ':utf8';
 
   return $file;

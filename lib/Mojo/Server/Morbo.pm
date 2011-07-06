@@ -146,6 +146,7 @@ C<kqueue> support.
 To start applications with it you can use the L<morbo> script.
 
   % morbo myapp.pl
+  Server available at http://127.0.0.1:3000.
 
 Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::IP>,
 L<IO::Socket::SSL> and L<Net::Rendezvous::Publish> are supported

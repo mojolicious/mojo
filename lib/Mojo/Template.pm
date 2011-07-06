@@ -442,21 +442,17 @@ sub render_file {
   my $self = shift;
   my $path = shift;
 
-  # Open file
-  $self->name($path) unless defined $self->{name};
-  my $file = IO::File->new;
-  $file->open("< $path") or croak "Can't open template '$path': $!";
-
   # Slurp file
+  $self->name($path) unless defined $self->{name};
+  croak "Can't open template '$path': $!"
+    unless my $file = IO::File->new("< $path");
   my $tmpl = '';
   while ($file->sysread(my $buffer, CHUNK_SIZE, 0)) {
     $tmpl .= $buffer;
   }
 
-  # Encoding
+  # Decode and render
   $tmpl = decode($self->encoding, $tmpl) if $self->encoding;
-
-  # Render
   return $self->render($tmpl, @_);
 }
 
@@ -520,14 +516,10 @@ sub _trim_line {
 sub _write_file {
   my ($self, $path, $output) = @_;
 
-  # Open file
-  my $file = IO::File->new;
-  $file->open("> $path") or croak "Can't open file '$path': $!";
-
-  # Encoding
+  # Encode and write to file
+  croak "Can't open file '$path': $!"
+    unless my $file = IO::File->new("> $path");
   $output = encode($self->encoding, $output) if $self->encoding;
-
-  # Write to file
   $file->syswrite($output) or croak "Can't write to file '$path': $!";
 
   return;

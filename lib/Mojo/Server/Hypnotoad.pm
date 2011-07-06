@@ -77,6 +77,9 @@ sub run {
   # Testing
   die "Everything looks good!\n" if $ENV{HYPNOTOAD_TEST};
 
+  # Initiate hot deployment
+  $self->_hot_deploy unless $ENV{HYPNOTOAD_PID};
+
   # Prepare loop
   $daemon->prepare_ioloop;
 
@@ -181,6 +184,23 @@ sub _heartbeat {
   }
 }
 
+sub _hot_deploy {
+  my $self = shift;
+
+  # Get PID from running server
+  return if $self->_pid;
+  return unless my $file = IO::File->new($self->{config}->{pid_file}, '<');
+  my $pid = <$file>;
+  undef $file;
+  chomp $pid;
+
+  # Hot deployment
+  return unless kill 0, $pid;
+  kill 'USR2', $pid;
+  print "Initiating hot deployment for Hypnotoad server $pid.\n";
+  exit 0;
+}
+
 sub _manage {
   my $self = shift;
 
@@ -276,6 +296,8 @@ sub _pid {
   my $pid = IO::File->new($file, O_WRONLY | O_CREAT | O_EXCL, 0644)
     or croak qq/Can't create PID file "$file": $!/;
   print $pid $$;
+
+  return 1;
 }
 
 # "Dear Mr. President, there are too many states nowadays.
@@ -399,6 +421,12 @@ C<kqueue> and hot deployment support that just works.
 To start applications with it you can use the L<hypnotoad> script.
 
   % hypnotoad myapp.pl
+  Server available at http://127.0.0.1:8080.
+
+You can run the exact same command again for automatic hot deployment.
+
+  % hypnotoad myapp.pl
+  Initiating hot deployment for Hypnotoad server 31841.
 
 For L<Mojolicious> and L<Mojolicious::Lite> applications it will default to
 C<production> mode.

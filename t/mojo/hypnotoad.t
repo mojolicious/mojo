@@ -8,171 +8,137 @@ BEGIN { $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
 use Test::More;
 
-use File::Spec;
+use Cwd 'cwd';
 use File::Temp;
 use FindBin;
+use IO::File;
 use IO::Socket::INET;
+use Mojo::Command;
 use Mojo::IOLoop;
-use Mojo::Template;
-use Mojo::Transaction::HTTP;
 use Mojo::UserAgent;
 
 plan skip_all => 'set TEST_HYPNOTOAD to enable this test (developer only!)'
   unless $ENV{TEST_HYPNOTOAD};
-plan tests => 40;
+plan tests => 26;
 
 # "I ate the blue ones... they taste like burning."
 use_ok 'Mojo::Server::Hypnotoad';
 
-# Config
+# Prepare script
+my $cwd = cwd;
 my $dir = File::Temp::tempdir(CLEANUP => 1);
-my $config = File::Spec->catfile($dir, 'hypnotoad.conf');
-my $port   = Mojo::IOLoop->generate_port;
-my $mt     = Mojo::Template->new;
-$mt->render_to_file(<<'EOF', $config, $port);
-% my $port = shift;
-{listen => "http://*:<%= $port %>"};
+chdir $dir;
+my $command = Mojo::Command->new;
+my $script  = $command->rel_file('myapp.pl');
+$command->write_rel_file('myapp.pl', <<EOF);
+use Mojolicious::Lite;
+
+app->log->level('fatal');
+
+get '/hello' => {text => 'Hello Hypnotoad!'};
+
+app->start;
+EOF
+
+# Prepare config
+my $port = Mojo::IOLoop->generate_port;
+$command->write_rel_file('hypnotoad.conf', <<EOF);
+{listen => "http://*:$port", workers => 1};
 EOF
 
 # Start
 my $prefix = "$FindBin::Bin/../../script";
-my $pid = open my $server, '-|', $^X, "$prefix/hypnotoad", '--foreground',
-  '--config',
-  $config, "$prefix/mojo";
+open my $server, '-|', $^X, "$prefix/hypnotoad", $script;
 sleep 1
   while !IO::Socket::INET->new(
   Proto    => 'tcp',
   PeerAddr => 'localhost',
   PeerPort => $port
   );
+my $old = _pid();
 
 my $ua = Mojo::UserAgent->new;
 
-# Single request without keep alive
-my $tx = Mojo::Transaction::HTTP->new;
-$tx->req->method('GET');
-$tx->req->url->parse("http://127.0.0.1:$port/0/");
-$tx->req->headers->connection('close');
-$ua->start($tx);
-ok $tx->is_done, 'transaction is done';
+# Application is alive
+my $tx = $ua->get("http://127.0.0.1:$port/hello");
+ok $tx->is_done,    'transaction is done';
+is $tx->keep_alive, 1, 'connection will be kept alive';
+is $tx->kept_alive, undef, 'connection was not kept alive';
 is $tx->res->code, 200, 'right status';
-like $tx->res->headers->connection, qr/close/i, 'right "Connection" header';
-like $tx->res->body, qr/Mojo/, 'right content';
+is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 
-# Multiple requests
-$tx = Mojo::Transaction::HTTP->new;
-$tx->req->method('GET');
-$tx->req->url->parse("http://127.0.0.1:$port/1/");
-my $tx2 = Mojo::Transaction::HTTP->new;
-$tx2->req->method('GET');
-$tx2->req->url->parse("http://127.0.0.1:$port/2/");
-$tx2->req->headers->expect('fun');
-$tx2->req->body('foo bar baz');
-my $tx3 = Mojo::Transaction::HTTP->new;
-$tx3->req->method('GET');
-$tx3->req->url->parse("http://127.0.0.1:$port/3/");
-my $tx4 = Mojo::Transaction::HTTP->new;
-$tx4->req->method('GET');
-$tx4->req->url->parse("http://127.0.0.1:$port/4/");
-$ua->start($tx);
-$ua->start($tx2);
-$ua->start($tx3);
-$ua->start($tx4);
-ok $tx->is_done,  'transaction is done';
-ok $tx2->is_done, 'transaction is done';
-ok $tx3->is_done, 'transaction is done';
-ok $tx4->is_done, 'transaction is done';
-is $tx->res->code,  200, 'right status';
-is $tx2->res->code, 200, 'right status';
-is $tx3->res->code, 200, 'right status';
-is $tx4->res->code, 200, 'right status';
-like $tx2->res->content->asset->slurp, qr/Mojo/, 'right content';
-
-# Request
-$tx = Mojo::Transaction::HTTP->new;
-$tx->req->method('GET');
-$tx->req->url->parse("http://127.0.0.1:$port/5/");
-$tx->req->headers->expect('fun');
-$tx->req->body('Hello Mojo!');
-$ua->start($tx);
+# Same result
+$tx = $ua->get("http://127.0.0.1:$port/hello");
+ok $tx->is_done,    'transaction is done';
+is $tx->keep_alive, 1, 'connection will be kept alive';
+is $tx->kept_alive, 1, 'connection was not kept alive';
 is $tx->res->code, 200, 'right status';
-like $tx->res->headers->connection, qr/Keep-Alive/i,
-  'right "Connection" header';
-like $tx->res->body, qr/Mojo/, 'right content';
+is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 
-# Second keep alive request
-$tx = Mojo::Transaction::HTTP->new;
-$tx->req->method('GET');
-$tx->req->url->parse("http://127.0.0.1:$port/6/");
-$ua->start($tx);
-is $tx->res->code, 200, 'right status';
-is $tx->kept_alive, 1, 'connection was alive';
-like $tx->res->headers->connection,
-  qr/Keep-Alive/i, 'right "Connection" header';
-like $tx->res->body, qr/Mojo/, 'right content';
+# Update script
+$command->write_rel_file('myapp.pl', <<EOF);
+use Mojolicious::Lite;
 
-# Third keep alive request
-$tx = Mojo::Transaction::HTTP->new;
-$tx->req->method('GET');
-$tx->req->url->parse("http://127.0.0.1:$port/7/");
-$ua->start($tx);
-is $tx->res->code, 200, 'right status';
+app->log->level('fatal');
+
+get '/hello' => {text => 'Hello World!'};
+
+app->start;
+EOF
+open my $restarter, '-|', $^X, "$prefix/hypnotoad", $script;
+
+# Keep alive connection
+$tx = $ua->get("http://127.0.0.1:$port/hello");
+ok $tx->is_done,    'transaction is done';
+is $tx->keep_alive, 1, 'connection will be kept alive';
 is $tx->kept_alive, 1, 'connection was kept alive';
-like $tx->res->headers->connection,
-  qr/Keep-Alive/i, 'right "Connection" header';
-like $tx->res->body, qr/Mojo/, 'right content';
+is $tx->res->code, 200, 'right status';
+is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 
-# Multiple requests
-$tx = Mojo::Transaction::HTTP->new;
-$tx->req->method('GET');
-$tx->req->url->parse("http://127.0.0.1:$port/8/");
-$tx2 = Mojo::Transaction::HTTP->new;
-$tx2->req->method('GET');
-$tx2->req->url->parse("http://127.0.0.1:$port/9/");
-$ua->start($tx);
-$ua->start($tx2);
-ok $tx->is_done,  'transaction is done';
-ok $tx2->is_done, 'transaction is done';
-is $tx->res->code,  200, 'right status';
-is $tx2->res->code, 200, 'right status';
-like $tx2->res->content->asset->slurp, qr/Mojo/, 'right content';
+# Drop keep alive connections
+$ua = Mojo::UserAgent->new;
 
-# Multiple requests with a chunked response
-$tx = Mojo::Transaction::HTTP->new;
-$tx->req->method('GET');
-$tx->req->url->parse("http://127.0.0.1:$port/10/");
-$tx2 = Mojo::Transaction::HTTP->new;
-$tx2->req->method('GET');
-$tx2->req->url->parse("http://127.0.0.1:$port/11/");
-$tx2->req->headers->expect('fun');
-$tx2->req->body('foo bar baz');
-$tx3 = Mojo::Transaction::HTTP->new;
-$tx3->req->method('GET');
-$tx3->req->url->parse(
-  "http://127.0.0.1:$port/diag/chunked_params?a=foo&b=12");
-$tx4 = Mojo::Transaction::HTTP->new;
-$tx4->req->method('GET');
-$tx4->req->url->parse("http://127.0.0.1:$port/13/");
-$ua->start($tx);
-$ua->start($tx2);
-$ua->start($tx3);
-$ua->start($tx4);
-ok $tx->is_done,  'transaction is done';
-ok $tx2->is_done, 'transaction is done';
-ok $tx3->is_done, 'transaction is done';
-ok $tx4->is_done, 'transaction is done';
-is $tx->res->code,  200, 'right status';
-is $tx2->res->code, 200, 'right status';
-is $tx3->res->code, 200, 'right status';
-is $tx4->res->code, 200, 'right status';
-like $tx2->res->content->asset->slurp, qr/Mojo/, 'right content';
-is $tx3->res->content->asset->slurp,   'foo12',  'right content';
+# Wait for hot deployment to finish
+while (1) {
+  sleep 1;
+  $tx = Mojo::UserAgent->new->get("http://127.0.0.1:$port/hello");
+  next unless $tx->res->body eq 'Hello World!';
+  next unless my $new = _pid();
+  last if $new ne $old;
+}
+
+# Application is alive
+$tx = $ua->get("http://127.0.0.1:$port/hello");
+ok $tx->is_done,    'transaction is done';
+is $tx->keep_alive, 1, 'connection will be kept alive';
+is $tx->kept_alive, undef, 'connection was not kept alive';
+is $tx->res->code, 200,            'right status';
+is $tx->res->body, 'Hello World!', 'right content';
+
+# Same result
+$tx = $ua->get("http://127.0.0.1:$port/hello");
+ok $tx->is_done,    'transaction is done';
+is $tx->keep_alive, 1, 'connection will be kept alive';
+is $tx->kept_alive, 1, 'connection was kept alive';
+is $tx->res->code, 200,            'right status';
+is $tx->res->body, 'Hello World!', 'right content';
 
 # Stop
-kill 'INT', $pid;
+kill 'INT', _pid();
 sleep 1
   while IO::Socket::INET->new(
   Proto    => 'tcp',
   PeerAddr => 'localhost',
   PeerPort => $port
   );
+
+# Cleanup
+chdir $cwd;
+
+sub _pid {
+  return
+    unless my $file = IO::File->new($command->rel_file('hypnotoad.pid'), '<');
+  my $pid = <$file>;
+  chomp $pid;
+  return $pid;
+}

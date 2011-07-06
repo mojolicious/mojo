@@ -444,6 +444,15 @@ dropped, defaults to C<5>.
 
 List of ports and files to listen on, defaults to C<http://*:3000>.
 
+  # Listen on two ports with HTTP and HTTPS at the same time
+  $daemon->listen(['http://*:3000', 'https://*:4000']);
+
+  # Use a custom certificate and key
+  $daemon->listen(['https://*:3000:/x/server.crt:/y/server.key']);
+
+  # Or even a custom certificate authority
+  $daemon->listen(['https://*:3000:/x/server.crt:/y/server.key:/z/ca.crt']);
+
 =head2 C<max_clients>
 
   my $max_clients = $daemon->max_clients;

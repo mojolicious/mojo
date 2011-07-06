@@ -65,7 +65,7 @@ runtime without ever stopping the server or losing a single incoming
 connection, just by running the command above again.
 
   % hypnotoad script/myapp
-  Initiating hot deployment for Hypnotoad server 31841.
+  Starting hot deployment for Hypnotoad server 31841.
 
 =head2 Nginx
 

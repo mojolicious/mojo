@@ -27,7 +27,8 @@ GetOptions(
   'config=s' => sub { $config                    = $_[1] },
   foreground => sub { $ENV{HYPNOTOAD_FOREGROUND} = 1 },
   help       => sub { $help                      = 1 },
-  test       => sub { $ENV{HYPNOTOAD_TEST}       = 1 },
+  stop       => sub { $ENV{HYPNOTOAD_STOP}       = 1 },
+  test       => sub { $ENV{HYPNOTOAD_TEST}       = 1 }
 );
 $help = 1 unless my $app = shift || $ENV{HYPNOTOAD_APP};
 
@@ -43,6 +44,7 @@ These options are available:
                     same directory as the application script.
   --foreground      Keep manager process in foreground.
   --help            Show this message.
+  --stop            Stop server gracefully.
   --test            Test application/configuration and exit.
 EOF
 

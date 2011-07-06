@@ -47,7 +47,7 @@ sub run {
   my ($self, $app, $config) = @_;
 
   # No windows support
-  die "Hypnotoad not available for Windows.\n"
+  _message('Hypnotoad not available for Windows.')
     if $^O eq 'MSWin32' || $^O =~ /cygwin/;
 
   # Application
@@ -75,7 +75,10 @@ sub run {
   $self->_config;
 
   # Testing
-  die "Everything looks good!\n" if $ENV{HYPNOTOAD_TEST};
+  _message('Everything looks good!') if $ENV{HYPNOTOAD_TEST};
+
+  # Stop already running server
+  $self->_stop if $ENV{HYPNOTOAD_STOP};
 
   # Initiate hot deployment
   $self->_hot_deploy unless $ENV{HYPNOTOAD_PID};
@@ -186,19 +189,10 @@ sub _heartbeat {
 
 sub _hot_deploy {
   my $self = shift;
-
-  # Get PID from running server
-  return if $self->_pid;
-  return unless my $file = IO::File->new($self->{config}->{pid_file}, '<');
-  my $pid = <$file>;
-  undef $file;
-  chomp $pid;
-
-  # Hot deployment
+  return unless my $pid = $self->_pid;
   return unless kill 0, $pid;
   kill 'USR2', $pid;
-  print "Initiating hot deployment for Hypnotoad server $pid.\n";
-  exit 0;
+  _message("Starting hot deployment for Hypnotoad server $pid.");
 }
 
 sub _manage {
@@ -212,7 +206,7 @@ sub _manage {
     $self->_spawn while keys %{$self->{workers}} < $c->{workers};
 
     # Check PID file
-    $self->_pid;
+    $self->_pid_file;
   }
 
   # Shutdown
@@ -284,15 +278,26 @@ sub _manage {
   }
 }
 
+sub _message { print shift, "\n" and exit 0 }
+
 sub _pid {
   my $self = shift;
+  return if $self->_pid_file;
+  return unless my $file = IO::File->new($self->{config}->{pid_file}, '<');
+  my $pid = <$file>;
+  chomp $pid;
+  return $pid;
+}
 
-  # Check PID file
+sub _pid_file {
+  my $self = shift;
+
+  # Check PID file already exists
   my $file = $self->{config}->{pid_file};
   return if -e $file;
   warn "PID $file\n" if DEBUG;
 
-  # Create one if it doesn't exist
+  # Create PID file
   my $pid = IO::File->new($file, O_WRONLY | O_CREAT | O_EXCL, 0644)
     or croak qq/Can't create PID file "$file": $!/;
   print $pid $$;
@@ -397,6 +402,13 @@ sub _spawn {
   exit 0;
 }
 
+sub _stop {
+  my $self = shift;
+  _message('Hypnotoad server not running.') unless my $pid = $self->_pid;
+  kill 'QUIT', $pid;
+  _message("Stopping Hypnotoad server $pid gracefully.");
+}
+
 1;
 __END__
 
@@ -426,7 +438,7 @@ To start applications with it you can use the L<hypnotoad> script.
 You can run the exact same command again for automatic hot deployment.
 
   % hypnotoad myapp.pl
-  Initiating hot deployment for Hypnotoad server 31841.
+  Starting hot deployment for Hypnotoad server 31841.
 
 For L<Mojolicious> and L<Mojolicious::Lite> applications it will default to
 C<production> mode.

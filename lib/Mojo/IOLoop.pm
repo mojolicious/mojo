@@ -314,8 +314,8 @@ sub listen {
   if ($args->{tls}) {
     my %options = (
       SSL_startHandshake => 0,
-      SSL_cert_file      => $args->{tls_cert} || $self->_prepare_cert,
-      SSL_key_file       => $args->{tls_key} || $self->_prepare_key,
+      SSL_cert_file      => $args->{tls_cert} || $self->_cert_file,
+      SSL_key_file       => $args->{tls_key} || $self->_key_file,
     );
     %options = (
       SSL_verify_callback => $args->{tls_verify},
@@ -558,6 +558,23 @@ sub _accept {
   $self->_not_listening;
 }
 
+sub _cert_file {
+  my $self = shift;
+
+  # Check if temporary TLS cert file already exists
+  my $cert = $self->{cert};
+  return $cert if $cert && -r $cert;
+
+  # Create temporary TLS cert file
+  $cert = File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
+    'mojocert.pem');
+  croak qq/Can't create temporary TLS cert file "$cert"/
+    unless my $file = IO::File->new("> $cert");
+  print $file CERT;
+
+  $self->{cert} = $cert;
+}
+
 sub _connect {
   my ($self, $id, $args) = @_;
 
@@ -659,6 +676,23 @@ sub _event {
   return $self;
 }
 
+sub _key_file {
+  my $self = shift;
+
+  # Check if temporary TLS key file already exists
+  my $key = $self->{key};
+  return $key if $key && -r $key;
+
+  # Create temporary TLS key file
+  $key = File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
+    'mojokey.pem');
+  croak qq/Can't create temporary TLS key file "$key"/
+    unless my $file = IO::File->new("> $key");
+  print $file KEY;
+
+  $self->{key} = $key;
+}
+
 sub _listening {
   my $self = shift;
 
@@ -700,40 +734,6 @@ sub _not_writing {
   return $c->{read_only} = 1 if length $c->{buffer} || $c->{drain};
   return unless my $handle = $c->{handle};
   $self->iowatcher->not_writing($handle);
-}
-
-sub _prepare_cert {
-  my $self = shift;
-
-  # Check if temporary TLS cert file already exists
-  my $cert = $self->{cert};
-  return $cert if $cert && -r $cert;
-
-  # Create temporary TLS cert file
-  $cert = File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
-    'mojocert.pem');
-  croak qq/Can't create temporary TLS cert file "$cert"/
-    unless my $file = IO::File->new("> $cert");
-  print $file CERT;
-
-  $self->{cert} = $cert;
-}
-
-sub _prepare_key {
-  my $self = shift;
-
-  # Check if temporary TLS key file already exists
-  my $key = $self->{key};
-  return $key if $key && -r $key;
-
-  # Create temporary TLS key file
-  $key = File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
-    'mojokey.pem');
-  croak qq/Can't create temporary TLS key file "$key"/
-    unless my $file = IO::File->new("> $key");
-  print $file KEY;
-
-  $self->{key} = $key;
 }
 
 sub _read {

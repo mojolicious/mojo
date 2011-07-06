@@ -48,7 +48,7 @@ EOF
 
 # Start
 my $prefix = "$FindBin::Bin/../../script";
-open my $server, '-|', $^X, "$prefix/hypnotoad", $script;
+open my $start, '-|', $^X, "$prefix/hypnotoad", $script;
 sleep 1
   while !IO::Socket::INET->new(
   Proto    => 'tcp',
@@ -85,7 +85,7 @@ get '/hello' => {text => 'Hello World!'};
 
 app->start;
 EOF
-open my $restarter, '-|', $^X, "$prefix/hypnotoad", $script;
+open my $hot_deploy, '-|', $^X, "$prefix/hypnotoad", $script;
 
 # Keep alive connection
 $tx = $ua->get("http://127.0.0.1:$port/hello");
@@ -124,7 +124,7 @@ is $tx->res->code, 200,            'right status';
 is $tx->res->body, 'Hello World!', 'right content';
 
 # Stop
-kill 'INT', _pid();
+open my $stop, '-|', $^X, "$prefix/hypnotoad", $script, '--stop';
 sleep 1
   while IO::Socket::INET->new(
   Proto    => 'tcp',

@@ -295,7 +295,7 @@ I18N, first class unicode support and much more for you to discover.
 =item *
 
 Very clean, portable and Object Oriented pure Perl API without any hidden
-magic and no requirements besides Perl 5.8.7 (although 5.10+ is recommended).
+magic and no requirements besides Perl 5.8.7 (although 5.12+ is recommended).
 
 =item *
 

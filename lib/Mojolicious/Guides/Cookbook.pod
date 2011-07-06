@@ -33,7 +33,10 @@ Another huge advantage is that it supports TLS and WebSockets out of the box.
   Server available at https://127.0.0.1:3000.
 
 A development certificate for testing purposes is built right in, so it just
-works.
+works, but you can also use your own.
+
+  % ./script/myapp daemon --listen https://*:3000:/x/server.crt:/y/server.key
+  Server available at https://127.0.0.1:3000.
 
 =head2 Hypnotoad
 

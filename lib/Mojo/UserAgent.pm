@@ -277,8 +277,6 @@ sub _connect {
   return $id;
 }
 
-# "I don't mind being called a liar when I'm lying, or about to lie,
-#  or just finished lying, but NOT WHEN I'M TELLING THE TRUTH."
 sub _connected {
   my ($self, $id) = @_;
 
@@ -443,8 +441,6 @@ sub _proxy_connect {
   return 1;
 }
 
-# "Have you ever seen that Blue Man Group? Total ripoff of the Smurfs.
-#  And the Smurfs, well, they SUCK."
 sub _read {
   my ($self, $loop, $id, $chunk) = @_;
   warn "< $chunk\n" if DEBUG;
@@ -579,7 +575,6 @@ sub _upgrade {
   return $new;
 }
 
-# "Oh well. At least we'll die doing what we love: inhaling molten rock."
 sub _write {
   my ($self, $id) = @_;
 

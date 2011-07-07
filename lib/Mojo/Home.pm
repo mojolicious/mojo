@@ -6,6 +6,7 @@ use overload
   fallback => 1;
 
 use Cwd 'abs_path';
+use File::Find 'find';
 use File::Spec;
 use FindBin;
 use Mojo::Command;
@@ -78,36 +79,14 @@ sub lib_dir {
 sub list_files {
   my ($self, $dir) = @_;
 
-  # Build portable directory
+  # Files relative to directory
   my $parts = $self->{parts} || [];
   my $root = File::Spec->catdir(@$parts);
   $dir = File::Spec->catdir($root, split '/', ($dir || ''));
-
-  # Read directory
-  my (@files, @dirs);
-  opendir DIR, $dir or return [];
-  for my $file (readdir DIR) {
-
-    # Hidden file
-    next if $file =~ /^\./;
-
-    # File
-    my $path = File::Spec->catfile($dir, $file);
-    my $rel = File::Spec->abs2rel($path, $root);
-    if (-f $path) {
-      push @files, join '/', File::Spec->splitdir($rel);
-    }
-
-    # Directory
-    elsif (-d $path) { push @dirs, join('/', File::Spec->splitdir($rel)) }
-  }
-  closedir DIR;
-
-  # Walk directories
-  for my $path (@dirs) {
-    my $new = $self->list_files($path);
-    push @files, @$new;
-  }
+  return [] unless -d $dir;
+  my @files;
+  find sub { push @files, File::Spec->abs2rel($File::Find::name, $dir) },
+    $dir;
 
   return [sort @files];
 }

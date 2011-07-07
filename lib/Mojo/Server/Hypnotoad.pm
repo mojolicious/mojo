@@ -20,7 +20,11 @@ use constant DEBUG => $ENV{HYPNOTOAD_DEBUG} || 0;
 
 sub DESTROY {
   my $self = shift;
+
+  # Worker or command
   return if $ENV{HYPNOTOAD_WORKER} || !$self->{done};
+
+  # Manager
   return unless my $file = $self->{config}->{pid_file};
   unlink $file if -w $file;
 }
@@ -43,7 +47,7 @@ sub run {
   my ($self, $app, $config) = @_;
 
   # No windows support
-  _message('Hypnotoad not available for Windows.')
+  _exit('Hypnotoad not available for Windows.')
     if $^O eq 'MSWin32' || $^O =~ /cygwin/;
 
   # Application
@@ -71,7 +75,7 @@ sub run {
   $self->_config;
 
   # Testing
-  _message('Everything looks good!') if $ENV{HYPNOTOAD_TEST};
+  _exit('Everything looks good!') if $ENV{HYPNOTOAD_TEST};
 
   # Stop running server
   $self->_stop if $ENV{HYPNOTOAD_STOP};
@@ -102,7 +106,7 @@ sub run {
     open STDERR, '>&STDOUT';
   }
 
-  # Manager signals
+  # Manager environment
   my $c = $self->{config};
   $SIG{INT} = $SIG{TERM} = sub { $self->{done} = 1 };
   $SIG{CHLD} = sub {
@@ -167,6 +171,8 @@ sub _config {
   $daemon->listen($listen);
 }
 
+sub _exit { print shift, "\n" and exit 0 }
+
 sub _heartbeat {
   my $self = shift;
 
@@ -176,7 +182,7 @@ sub _heartbeat {
   return unless $poll->handles(POLLIN);
   return unless $self->{reader}->sysread(my $chunk, 4194304);
 
-  # Heartbeats
+  # Update heartbeats
   while ($chunk =~ /(\d+)\n/g) {
     my $pid = $1;
     $self->{workers}->{$pid}->{time} = time if $self->{workers}->{$pid};
@@ -185,10 +191,14 @@ sub _heartbeat {
 
 sub _hot_deploy {
   my $self = shift;
+
+  # Make sure server is running
   return unless my $pid = $self->_pid;
   return unless kill 0, $pid;
+
+  # Start hot deployment
   kill 'USR2', $pid;
-  _message("Starting hot deployment for Hypnotoad server $pid.");
+  _exit("Starting hot deployment for Hypnotoad server $pid.");
 }
 
 sub _manage {
@@ -221,15 +231,11 @@ sub _manage {
   # Upgrade
   if ($self->{upgrade} && !$self->{done}) {
 
-    # Start
+    # Fresh start
     unless ($self->{new}) {
-
-      # Fork
       warn "UPGRADING\n" if DEBUG;
       croak "Can't fork: $!" unless defined(my $pid = fork);
       $self->{new} = $pid if $pid;
-
-      # Fresh start
       exec $ENV{HYPNOTOAD_EXE} unless $pid;
     }
 
@@ -254,8 +260,6 @@ sub _manage {
     # Graceful stop
     $w->{graceful} ||= time if $self->{graceful};
     if ($w->{graceful}) {
-
-      # Kill
       warn "QUIT $pid\n" if DEBUG;
       kill 'QUIT', $pid;
 
@@ -274,8 +278,6 @@ sub _manage {
   }
 }
 
-sub _message { print shift, "\n" and exit 0 }
-
 sub _pid {
   my $self = shift;
   return unless my $file = IO::File->new($self->{config}->{pid_file}, '<');
@@ -287,9 +289,12 @@ sub _pid {
 sub _pid_file {
   my $self = shift;
 
+  # Don't need a PID file anymore
+  return if $self->{done};
+
   # Check if PID file already exists
   my $file = $self->{config}->{pid_file};
-  return if $self->{done} || -e $file;
+  return if -e $file;
 
   # Create PID file
   warn "PID $file\n" if DEBUG;
@@ -375,30 +380,24 @@ sub _spawn {
     }
   );
 
-  # Worker signals
+  # Clean worker environment
   $SIG{INT} = $SIG{TERM} = $SIG{CHLD} = $SIG{USR2} = $SIG{TTIN} = $SIG{TTOU} =
     'DEFAULT';
   $SIG{QUIT} = sub { $loop->max_connections(0) };
-
-  # Cleanup
   delete $self->{reader};
   delete $self->{poll};
-
-  # User and group
   $daemon->setuidgid;
 
   # Start
   warn "WORKER STARTED $$\n" if DEBUG;
   $loop->start;
-
-  # Shutdown
   exit 0;
 }
 
 sub _stop {
-  _message('Hypnotoad server not running.') unless my $pid = shift->_pid;
+  _exit('Hypnotoad server not running.') unless my $pid = shift->_pid;
   kill 'QUIT', $pid;
-  _message("Stopping Hypnotoad server $pid gracefully.");
+  _exit("Stopping Hypnotoad server $pid gracefully.");
 }
 
 1;

@@ -14,7 +14,7 @@ plan skip_all => 'set TEST_EPOLL to enable this test (developer only!)'
   unless $ENV{TEST_EPOLL};
 plan skip_all => 'IO::Epoll 0.02 required for this test!'
   unless eval 'use IO::Epoll 0.02; 1';
-plan tests => 25;
+plan tests => 29;
 
 use_ok 'Mojo::IOWatcher::Epoll';
 
@@ -44,7 +44,7 @@ is $writable, undef, 'handle is not writable';
 
 # Accept
 my $server = $listen->accept;
-$watcher = Mojo::IOWatcher::Epoll->new;
+$watcher = $watcher->new;
 $readable = $writable = undef;
 $watcher->add(
   $client,
@@ -55,7 +55,7 @@ $watcher->one_tick(0);
 is $readable, undef, 'handle is not readable';
 is $writable, 1,     'handle is writable';
 print $client 'hello!';
-$watcher = Mojo::IOWatcher::Epoll->new;
+$watcher = $watcher->new;
 $readable = $writable = undef;
 $watcher->add(
   $server,
@@ -69,7 +69,8 @@ is $writable, 1, 'handle is writable';
 # Timers
 my ($timer, $recurring);
 $watcher->timer(0 => sub { $timer++ });
-$watcher->recurring(0 => sub { $recurring++ });
+$watcher->cancel($watcher->timer(0 => sub { $timer++ }));
+my $id = $watcher->recurring(0 => sub { $recurring++ });
 $watcher->one_tick(0);
 is $readable,  2, 'handle is readable again';
 is $writable,  2, 'handle is writable again';
@@ -90,3 +91,9 @@ is $readable,  5, 'handle is readable again';
 is $writable,  5, 'handle is writable again';
 is $timer,     1, 'timer was not triggered';
 is $recurring, 3, 'recurring was triggered again';
+$watcher->cancel($id);
+$watcher->one_tick(0);
+is $readable,  6, 'handle is readable again';
+is $writable,  6, 'handle is writable again';
+is $timer,     1, 'timer was not triggered';
+is $recurring, 3, 'recurring was not triggered again';

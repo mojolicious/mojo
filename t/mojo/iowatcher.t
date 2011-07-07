@@ -8,7 +8,7 @@ BEGIN { $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
 # "I don't mind being called a liar when I'm lying, or about to lie,
 #  or just finished lying, but NOT WHEN I'M TELLING THE TRUTH."
-use Test::More tests => 25;
+use Test::More tests => 29;
 
 use_ok 'Mojo::IOWatcher';
 
@@ -38,7 +38,7 @@ is $writable, undef, 'handle is not writable';
 
 # Accept
 my $server = $listen->accept;
-$watcher = Mojo::IOWatcher->new;
+$watcher = $watcher->new;
 $readable = $writable = undef;
 $watcher->add(
   $client,
@@ -49,7 +49,7 @@ $watcher->one_tick(0);
 is $readable, undef, 'handle is not readable';
 is $writable, 1,     'handle is writable';
 print $client 'hello!';
-$watcher = Mojo::IOWatcher->new;
+$watcher = $watcher->new;
 $readable = $writable = undef;
 $watcher->add(
   $server,
@@ -63,7 +63,8 @@ is $writable, 1, 'handle is writable';
 # Timers
 my ($timer, $recurring);
 $watcher->timer(0 => sub { $timer++ });
-$watcher->recurring(0 => sub { $recurring++ });
+$watcher->cancel($watcher->timer(0 => sub { $timer++ }));
+my $id = $watcher->recurring(0 => sub { $recurring++ });
 $watcher->one_tick(0);
 is $readable,  2, 'handle is readable again';
 is $writable,  2, 'handle is writable again';
@@ -84,3 +85,9 @@ is $readable,  5, 'handle is readable again';
 is $writable,  5, 'handle is writable again';
 is $timer,     1, 'timer was not triggered';
 is $recurring, 3, 'recurring was triggered again';
+$watcher->cancel($id);
+$watcher->one_tick(0);
+is $readable,  6, 'handle is readable again';
+is $writable,  6, 'handle is writable again';
+is $timer,     1, 'timer was not triggered';
+is $recurring, 3, 'recurring was not triggered again';

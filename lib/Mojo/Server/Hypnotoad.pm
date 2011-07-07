@@ -20,13 +20,9 @@ use constant DEBUG => $ENV{HYPNOTOAD_DEBUG} || 0;
 
 sub DESTROY {
   my $self = shift;
-
-  # Worker
-  return if $ENV{HYPNOTOAD_WORKER};
-
-  # Manager
+  return if $ENV{HYPNOTOAD_WORKER} || !$self->{done};
   return unless my $file = $self->{config}->{pid_file};
-  unlink $file if -f $file;
+  unlink $file if -w $file;
 }
 
 # "Marge? Since I'm not talking to Lisa,
@@ -77,7 +73,7 @@ sub run {
   # Testing
   _message('Everything looks good!') if $ENV{HYPNOTOAD_TEST};
 
-  # Stop already running server
+  # Stop running server
   $self->_stop if $ENV{HYPNOTOAD_STOP};
 
   # Initiate hot deployment
@@ -282,7 +278,6 @@ sub _message { print shift, "\n" and exit 0 }
 
 sub _pid {
   my $self = shift;
-  return if $self->_pid_file;
   return unless my $file = IO::File->new($self->{config}->{pid_file}, '<');
   my $pid = <$file>;
   chomp $pid;
@@ -292,17 +287,15 @@ sub _pid {
 sub _pid_file {
   my $self = shift;
 
-  # Check PID file already exists
+  # Check if PID file already exists
   my $file = $self->{config}->{pid_file};
-  return if -e $file;
-  warn "PID $file\n" if DEBUG;
+  return if $self->{done} || -e $file;
 
   # Create PID file
-  my $pid = IO::File->new($file, O_WRONLY | O_CREAT | O_EXCL, 0644)
-    or croak qq/Can't create PID file "$file": $!/;
+  warn "PID $file\n" if DEBUG;
+  croak qq/Can't create PID file "$file": $!/
+    unless my $pid = IO::File->new($file, '>', 0644);
   print $pid $$;
-
-  return 1;
 }
 
 # "Dear Mr. President, there are too many states nowadays.
@@ -403,8 +396,7 @@ sub _spawn {
 }
 
 sub _stop {
-  my $self = shift;
-  _message('Hypnotoad server not running.') unless my $pid = $self->_pid;
+  _message('Hypnotoad server not running.') unless my $pid = shift->_pid;
   kill 'QUIT', $pid;
   _message("Stopping Hypnotoad server $pid gracefully.");
 }

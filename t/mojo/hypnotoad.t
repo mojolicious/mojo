@@ -87,7 +87,7 @@ app->start;
 EOF
 open my $hot_deploy, '-|', $^X, "$prefix/hypnotoad", $script;
 
-# Keep alive connection
+# Connection did not get lost
 $tx = $ua->get("http://127.0.0.1:$port/hello");
 ok $tx->is_done,    'transaction is done';
 is $tx->keep_alive, 1, 'connection will be kept alive';
@@ -101,13 +101,11 @@ $ua = Mojo::UserAgent->new;
 # Wait for hot deployment to finish
 while (1) {
   sleep 1;
-  $tx = Mojo::UserAgent->new->get("http://127.0.0.1:$port/hello");
-  next unless $tx->res->body eq 'Hello World!';
   next unless my $new = _pid();
   last if $new ne $old;
 }
 
-# Application is alive
+# Application has been reloaded
 $tx = $ua->get("http://127.0.0.1:$port/hello");
 ok $tx->is_done,    'transaction is done';
 is $tx->keep_alive, 1, 'connection will be kept alive';

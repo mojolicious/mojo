@@ -484,7 +484,11 @@ exactly the same.
 Mojolicious has been designed from the ground up for a fun and unique
 workflow.
 
-=head2 Have Some Cake
+=head2 Want To Know More?
+
+Take a look at our excellent documentation in L<Mojolicious::Guides>!
+
+=head1 ARCHITECTURE
 
 Loosely coupled building blocks, use what you like and just ignore the rest.
 
@@ -503,9 +507,6 @@ Loosely coupled building blocks, use what you like and just ignore the rest.
   .-------. .-----------. .--------. .------------. .-------------.
   |  CGI  | |  FastCGI  | |  PSGI  | |  HTTP 1.1  | |  WebSocket  |
   '-------' '-----------' '--------' '------------' '-------------'
-
-For more documentation see L<Mojolicious::Guides> and the tutorial in
-L<Mojolicious::Lite>!
 
 =head1 ATTRIBUTES
 

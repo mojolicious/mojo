@@ -22,8 +22,13 @@ use IO::Socket::INET;
 use Mojo::IOLoop;
 
 # Listen
-my $port    = Mojo::IOLoop->generate_port;
-my $listen  = IO::Socket::INET->new(Listen => 1, LocalPort => $port);
+my $port   = Mojo::IOLoop->generate_port;
+my $listen = IO::Socket::INET->new(
+  Listen    => 5,
+  LocalAddr => '127.0.0.1',
+  LocalPort => $port,
+  Proto     => 'tcp'
+);
 my $watcher = Mojo::IOWatcher::Epoll->new;
 my ($readable, $writable);
 $watcher->add(

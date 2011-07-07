@@ -14,7 +14,7 @@ plan skip_all => 'set TEST_EPOLL to enable this test (developer only!)'
   unless $ENV{TEST_EPOLL};
 plan skip_all => 'IO::Epoll 0.02 required for this test!'
   unless eval 'use IO::Epoll 0.02; 1';
-plan tests => 29;
+plan tests => 35;
 
 use_ok 'Mojo::IOWatcher::Epoll';
 
@@ -54,8 +54,26 @@ $watcher->add(
 $watcher->one_tick(0);
 is $readable, undef, 'handle is not readable';
 is $writable, 1,     'handle is writable';
-print $client 'hello!';
+print $client "hello!\n";
 $watcher = $watcher->new;
+$readable = $writable = undef;
+$watcher->add(
+  $server,
+  on_readable => sub { $readable++ },
+  on_writable => sub { $writable++ }
+);
+$watcher->not_writing($server);
+$watcher->one_tick(0);
+is $readable, 1,     'handle is readable';
+is $writable, undef, 'handle is not writable';
+$watcher->writing($server);
+$watcher->one_tick(0);
+is $readable, 2, 'handle is readable';
+is $writable, 1, 'handle is writable';
+$watcher->not_writing($server);
+$watcher->one_tick(0);
+is $readable, 3, 'handle is readable';
+is $writable, 1, 'handle is not writable';
 $readable = $writable = undef;
 $watcher->add(
   $server,

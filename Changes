@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojolicious.
 1.58    2011-07-07 00:00:00
         - Improved documentation.
         - Fixed fork bug in Mojo::IOLoop.
+        - Fixed small Hypnotoad issues.
         - Fixed typos.
 
 1.57    2011-07-07 00:00:00

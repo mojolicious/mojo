@@ -240,7 +240,7 @@ sub _manage {
     }
 
     # Timeout
-    kill 'TERM', $self->{new}
+    kill 'KILL', $self->{new}
       if $self->{upgrade} + $c->{upgrade_timeout} <= time;
   }
 
@@ -272,8 +272,8 @@ sub _manage {
     if (($self->{done} && !$self->{graceful}) || $w->{force}) {
 
       # Kill
-      warn "TERM $pid\n" if DEBUG;
-      kill 'TERM', $pid;
+      warn "KILL $pid\n" if DEBUG;
+      kill 'KILL', $pid;
     }
   }
 }

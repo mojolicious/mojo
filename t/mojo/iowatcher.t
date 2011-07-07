@@ -54,6 +54,7 @@ $watcher->one_tick(0);
 is $readable, undef, 'handle is not readable';
 is $writable, 1,     'handle is writable';
 print $client "hello!\n";
+sleep 1;
 $watcher = $watcher->new;
 $readable = $writable = undef;
 $watcher->add(

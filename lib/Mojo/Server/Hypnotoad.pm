@@ -22,7 +22,7 @@ sub DESTROY {
   my $self = shift;
 
   # Worker or command
-  return if $ENV{HYPNOTOAD_WORKER} || !$self->{done};
+  return unless $self->{done};
 
   # Manager
   return unless my $file = $self->{config}->{pid_file};
@@ -334,7 +334,6 @@ sub _spawn {
   return $self->{workers}->{$pid} = {time => time} if $pid;
 
   # Worker
-  $ENV{HYPNOTOAD_WORKER} = 1;
   my $daemon = $self->{daemon};
   my $loop   = $daemon->ioloop;
   my $c      = $self->{config};

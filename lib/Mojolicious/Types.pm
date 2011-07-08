@@ -25,6 +25,7 @@ has types => sub {
     txt  => 'text/plain',
     woff => 'application/x-font-woff',
     xml  => 'text/xml',
+    xsl  => 'text/xml',
     zip  => 'application/zip'
   };
 };

@@ -818,6 +818,7 @@ following new ones.
 =head2 C<app>
 
   my $app = $ua->app;
+  $ua     = $ua->app('MyApp');
   $ua     = $ua->app(MyApp->new);
 
 Application relative URLs will be processed with, defaults to the value of

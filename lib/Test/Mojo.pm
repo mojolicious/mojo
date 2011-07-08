@@ -8,9 +8,7 @@ use Mojo::Util 'decode';
 
 require Test::More;
 
-has ua => sub {
-  Mojo::UserAgent->new->ioloop(Mojo::IOLoop->singleton)->max_redirects(0);
-};
+has ua => sub { Mojo::UserAgent->new->ioloop(Mojo::IOLoop->singleton) };
 has 'tx';
 
 # Silent or loud tests
@@ -228,9 +226,7 @@ sub post_form_ok {
 
   my $desc = "post $url";
   utf8::encode $desc;
-  my $ua = $self->ua;
-  $ua->max_redirects($self->max_redirects);
-  $self->tx($ua->post_form(@_));
+  $self->tx($self->ua->post_form(@_));
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::ok($self->tx->is_done, $desc);
 
@@ -352,9 +348,7 @@ sub _request_ok {
   $headers = {} if !ref $headers;
 
   # Perform request against application
-  my $ua = $self->ua;
-  $ua->max_redirects($self->max_redirects);
-  $self->tx($ua->$method($url, %$headers, $body));
+  $self->tx($self->ua->$method($url, %$headers, $body));
   local $Test::Builder::Level = $Test::Builder::Level + 2;
   my ($error, $code) = $self->tx->error;
   my $desc = "$method $url";
@@ -376,7 +370,7 @@ Test::Mojo - Testing Mojo!
   use Test::More tests => 10;
   use Test::Mojo;
 
-  my $t = Test::Mojo->new(app => 'MyApp');
+  my $t = Test::Mojo->new('MyApp');
 
   $t->get_ok('/welcome')
     ->status_is(200)
@@ -413,7 +407,7 @@ Current transaction, usually a L<Mojo::Transaction::HTTP> object.
   my $ua = $t->ua;
   $t     = $t->ua(Mojo::UserAgent->new);
 
-User agent used for testing.
+User agent used for testing, defaults to a L<Mojo::UserAgent> object.
 
 =head1 METHODS
 
@@ -423,6 +417,7 @@ following new ones.
 =head2 C<new>
 
   my $t = Test::Mojo->new;
+  my $t = Test::Mojo->new('MyApp');
   my $t = Test::Mojo->new(MyApp->new);
 
 Construct a new L<Test::Mojo> object.

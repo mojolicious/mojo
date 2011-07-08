@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.59    2011-07-08 00:00:00
+        - Added peer method to Mojo::Transactor.
         - Deprecated Test::Mojo->new(app => 'MyApp') in favor of
           Test::Mojo->new('MyApp').
         - Made $t->app always return the application instance in tests.

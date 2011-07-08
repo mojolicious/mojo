@@ -321,7 +321,7 @@ Versatile L<Mojo::Transaction::HTTP> builder for form requests.
 
 =head2 C<peer>
 
-  my ($scheme, $host, $port) = $t->peer($tx);
+  my ($scheme, $address, $port) = $t->peer($tx);
 
 Actual peer for transaction.
 

@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 63;
+use Test::More tests => 74;
 
 # "Now that's a wave of destruction that's easy on the eyes."
 use_ok 'Mojo::Parameters';
@@ -72,6 +72,8 @@ is_deeply $params->param('foo'), 0, 'right structure';
 is $params->to_string, 'foo=0', 'right format';
 $params = Mojo::Parameters->new($params->to_string);
 is_deeply $params->param('foo'), 0, 'right structure';
+is $params->to_hash->{foo}, 0, 'right value';
+is_deeply $params->to_hash, {foo => 0}, 'right structure';
 is $params->to_string, 'foo=0', 'right format';
 
 # Semicolon
@@ -108,6 +110,20 @@ ok !$params->to_string, 'empty';
 $params->parse('');
 ok !$params->to_string, 'empty';
 is_deeply $params->to_hash, {}, 'right structure';
+
+# Empty params
+$params = Mojo::Parameters->new('c=');
+is $params->to_hash->{c}, '', 'right value';
+is_deeply $params->to_hash, {c => ''}, 'right structure';
+$params = Mojo::Parameters->new('c=&d=');
+is $params->to_hash->{c}, '', 'right value';
+is $params->to_hash->{d}, '', 'right value';
+is_deeply $params->to_hash, {c => '', d => ''}, 'right structure';
+$params = Mojo::Parameters->new('c=&d=0&e=');
+is $params->to_hash->{c}, '', 'right value';
+is $params->to_hash->{d}, 0,  'right value';
+is $params->to_hash->{e}, '', 'right value';
+is_deeply $params->to_hash, {c => '', d => 0, e => ''}, 'right structure';
 
 # +
 $params = Mojo::Parameters->new('foo=%2B');

@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.60    2011-07-08 00:00:00
+        - Added xsl MIME type. (shiftycow)
         - Improved documentation.
 
 1.59    2011-07-08 00:00:00
@@ -284,7 +285,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL xml attribute to Mojo::DOM.
         - Added EXPERIMENTAL build_url method to Test::Mojo.
         - Added EXPERIMENTAL dnt (Do Not Track) method to Mojo::Headers.
-        - Added WOFF mime type. (reezer)
+        - Added WOFF MIME type. (reezer)
         - Updated WebSocket implementation to ietf-06. (sri, crab)
         - Updated jQuery to version 1.5.2.
         - Improved documentation.
@@ -1369,7 +1370,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added name and value filters to Mojo::Headers. (acajou)
         - Added clean multiline value handling to Mojo::Headers.
         - Added prepare/finalize methods to Mojolicious.
-        - Added some additional mime types to MojoX::Types.
+        - Added some additional MIME types to MojoX::Types.
         - Renamed method add_line to add in Mojo::Headers.
         - Updated generator scripts to play nice with MM->parse_version.
 

@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_MODE} = 'development';
 }
 
-use Test::More tests => 249;
+use Test::More tests => 250;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -24,7 +24,10 @@ use Mojolicious;
 #  Amy's rich, she's probably got other characteristics..."
 use_ok 'MojoliciousTest';
 
-my $t = Test::Mojo->new(app => 'MojoliciousTest');
+my $t = Test::Mojo->new('MojoliciousTest');
+
+# Application is already available
+is $t->app->sessions->cookie_domain, '.example.com', 'right domain';
 
 # Foo::fun
 my $url = $t->test_server;
@@ -259,7 +262,7 @@ is $tx->res->code, 200, 'right status';
 like $tx->res->body, qr/Hello Mojo from the template \/foo! Hello World!/,
   'right content';
 
-$t = Test::Mojo->new(app => 'SingleFileTestApp');
+$t = Test::Mojo->new('SingleFileTestApp');
 
 # SingleFileTestApp::Foo::index
 $t->get_ok('/foo')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
@@ -290,7 +293,7 @@ $t->get_ok('/foo/bar')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('/foo/bar');
 
-$t = Test::Mojo->new(app => 'MojoliciousTest');
+$t = Test::Mojo->new('MojoliciousTest');
 
 # MojoliciousTestController::Foo::stage2
 $t->get_ok('/staged', {'X-Pass' => '1'})->status_is(200)

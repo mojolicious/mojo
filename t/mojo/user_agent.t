@@ -69,7 +69,7 @@ $ENV{https_proxy} = $backup5;
 $ENV{no_proxy}    = $backup6;
 
 # User agent
-$ua = Mojo::UserAgent->new(app => app);
+$ua = Mojo::UserAgent->new->app(app);
 
 # Server
 my $port   = Mojo::IOLoop->generate_port;
@@ -158,7 +158,7 @@ is $code,    200, 'right status';
 is $body,    'works!', 'right content';
 
 # Fresh blocking user agent
-$ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton, app => app);
+$ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton)->app(app);
 
 # GET / (missing Content-Lengt header)
 $tx = $ua->get("http://localhost:$port2/");

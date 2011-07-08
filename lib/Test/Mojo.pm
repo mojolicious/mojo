@@ -8,11 +8,9 @@ use Mojo::Util 'decode';
 
 require Test::More;
 
-has app => sub { return $ENV{MOJO_APP} if ref $ENV{MOJO_APP} };
 has ua => sub {
-  Mojo::UserAgent->new->ioloop(Mojo::IOLoop->singleton)->app(shift->app);
+  Mojo::UserAgent->new->ioloop(Mojo::IOLoop->singleton)->max_redirects(0);
 };
-has max_redirects => 0;
 has 'tx';
 
 # Silent or loud tests
@@ -20,6 +18,34 @@ $ENV{MOJO_LOG_LEVEL} ||= $ENV{HARNESS_IS_VERBOSE} ? 'debug' : 'fatal';
 
 # "Ooh, a graduate student huh?
 #  How come you guys can go to the moon but can't make my shoes smell good?"
+sub new {
+  my $self = shift->SUPER::new;
+
+  # Application
+  if (@_ % 2) { $self->app(shift) }
+
+  # DEPRECATED in Smiling Face With Sunglasses!
+  elsif (@_) {
+    warn <<EOF;
+Test::Mojo->new(app => 'MyApp') is DEPRECATED in favor of
+Test::Mojo->new('MyApp')!!!
+EOF
+    my $args = {@_};
+    for my $key (qw/app max_redirects tx ua/) {
+      $self->$key($args->{$key}) if $args->{$key};
+    }
+  }
+
+  return $self;
+}
+
+sub app {
+  my $self = shift;
+  return $self->ua->app unless @_;
+  $self->ua->app(@_);
+  return $self;
+}
+
 sub content_is {
   my ($self, $value, $desc) = @_;
 
@@ -186,6 +212,13 @@ sub json_content_is {
   return $self;
 }
 
+sub max_redirects {
+  my $self = shift;
+  return $self->ua->max_redirects unless @_;
+  $self->ua->max_redirects(@_);
+  return $self;
+}
+
 # "God bless those pagans."
 sub post_ok { shift->_request_ok('post', @_) }
 
@@ -196,7 +229,6 @@ sub post_form_ok {
   my $desc = "post $url";
   utf8::encode $desc;
   my $ua = $self->ua;
-  $ua->app($self->app);
   $ua->max_redirects($self->max_redirects);
   $self->tx($ua->post_form(@_));
   local $Test::Builder::Level = $Test::Builder::Level + 1;
@@ -211,7 +243,6 @@ sub put_ok { shift->_request_ok('put', @_) }
 sub reset_session {
   my $self = shift;
   $self->ua->cookie_jar->empty;
-  $self->ua->max_redirects($self->max_redirects);
   $self->tx(undef);
   return $self;
 }
@@ -322,7 +353,6 @@ sub _request_ok {
 
   # Perform request against application
   my $ua = $self->ua;
-  $ua->app($self->app);
   $ua->max_redirects($self->max_redirects);
   $self->tx($ua->$method($url, %$headers, $body));
   local $Test::Builder::Level = $Test::Builder::Level + 2;
@@ -371,13 +401,6 @@ L<Mojo> and L<Mojolicious> applications.
 
 L<Test::Mojo> implements the following attributes.
 
-=head2 C<app>
-
-  my $app = $t->app;
-  $t      = $t->app(MyApp->new);
-
-Application to be tested.
-
 =head2 C<tx>
 
   my $tx = $t->tx;
@@ -392,17 +415,26 @@ Current transaction, usually a L<Mojo::Transaction::HTTP> object.
 
 User agent used for testing.
 
-=head2 C<max_redirects>
-
-  my $max_redirects = $t->max_redirects;
-  $t                = $t->max_redirects(3);
-
-Maximum number of redirects, defaults to C<0>.
-
 =head1 METHODS
 
 L<Test::Mojo> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
+
+=head2 C<new>
+
+  my $t = Test::Mojo->new;
+  my $t = Test::Mojo->new(MyApp->new);
+
+Construct a new L<Test::Mojo> object.
+
+=head2 C<app>
+
+  my $app = $t->app;
+  $t      = $t->app(MyApp->new);
+
+Alias for the C<app> method of L<Mojo::UserAgent>.
+
+  my $secret = $t->app->secret;
 
 =head2 C<content_is>
 
@@ -533,6 +565,13 @@ Opposite of C<header_like>.
   $t = $t->json_content_is({foo => 'bar', baz => 23}, 'right content!');
 
 Check response content for JSON data.
+
+=head2 C<max_redirects>
+
+  my $max_redirects = $t->max_redirects;
+  $t                = $t->max_redirects(3);
+
+Alias for the C<max_redirects> attribute in L<Mojo::UserAgent>.
 
 =head2 C<post_ok>
 

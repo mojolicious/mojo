@@ -19,7 +19,7 @@ use Test::Mojo;
 # "This concludes the part of the tour where you stay alive."
 use_ok 'MojoliciousTest';
 
-my $t = Test::Mojo->new(app => 'MojoliciousTest');
+my $t = Test::Mojo->new('MojoliciousTest');
 
 # SyntaxError::foo in production mode (syntax error in controller)
 $t->get_ok('/syntax_error/foo')->status_is(500)

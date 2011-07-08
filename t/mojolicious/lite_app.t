@@ -11,7 +11,7 @@ BEGIN {
   $ENV{MOJO_MODE} = 'development';
 }
 
-use Test::More tests => 889;
+use Test::More tests => 890;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -34,7 +34,7 @@ use Mojolicious::Lite;
 use Test::Mojo;
 
 # User agent
-my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton, app => app);
+my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton)->app(app);
 
 # Missing plugin
 eval { plugin 'does_not_exist'; };
@@ -749,8 +749,11 @@ get '/works' => sub { shift->render(text => 'prefix works!') };
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
 my $t = Test::Mojo->new;
 
+# Application is already available
+is $t->app->test_helper2, 'Mojolicious::Controller', 'right class';
+
 # User agent timer
-my $tua = Mojo::UserAgent->new(ioloop => $ua->ioloop, app => app);
+my $tua = Mojo::UserAgent->new(ioloop => $ua->ioloop)->app(app);
 my $timer;
 $tua->ioloop->timer(
   '0.1' => sub {
@@ -1560,7 +1563,7 @@ $t->get_ok('/redirect_named')->status_is(200)
   ->text_is('div' => 'Redirect works!')->text_unlike('[id="foo"]' => qr/Foo/)
   ->text_like('[id="foo"]' => qr/^Redirect/);
 $t->max_redirects(0);
-Test::Mojo->new(tx => $t->tx->previous)->status_is(302)
+Test::Mojo->new->tx($t->tx->previous)->status_is(302)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->header_like(Location => qr/\/template.txt$/)->content_is('Redirecting!');
@@ -1697,7 +1700,7 @@ $t->get_ok('/bridge2stash')->status_is(200)
 # GET /bridge2stash (broken session cookie)
 $t->reset_session;
 my $session = b("☃☃☃☃☃")->b64_encode('');
-my $hmac    = $session->clone->hmac_md5_sum($t->ua->app->secret);
+my $hmac    = $session->clone->hmac_md5_sum($t->app->secret);
 my $broken  = "\$Version=1; mojolicious=$session--$hmac; \$Path=/";
 $t->get_ok('/bridge2stash' => {Cookie => $broken})->status_is(200)
   ->content_is("stash too!!!!!!!/!\n");

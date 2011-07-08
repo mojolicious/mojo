@@ -21,7 +21,7 @@ has ua => sub {
 
   # Fresh user agent
   require Mojo::UserAgent;
-  my $ua = Mojo::UserAgent->new(app => $self, log => $self->log);
+  my $ua = Mojo::UserAgent->new(log => $self->log)->app($self);
   weaken $ua->{app};
 
   return $ua;

@@ -293,7 +293,7 @@ on L<Mojo::DOM>.
   require "$FindBin::Bin/../myapp.pl";
 
   # Allow 302 redirect responses
-  my $t = Test::Mojo->new(max_redirects => 1);
+  my $t = Test::Mojo->new->max_redirects(1);
 
   # Test if the HTML login form exists
   $t->get_ok('/')->status_is(200)
@@ -675,7 +675,7 @@ help with home directory detection, so C<t/login.t> can be simplified.
   use Test::Mojo;
 
   # Load application class
-  my $t = Test::Mojo->new(app => 'MyApp', max_redirects => 1);
+  my $t = Test::Mojo->new('MyApp')->max_redirects(1);
 
   $t->get_ok('/')->status_is(200)
     ->element_exists('form input[name="user"]')

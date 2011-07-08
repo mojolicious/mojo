@@ -19,7 +19,7 @@ use Test::Mojo;
 # "Anything less than immortality is a complete waste of time!"
 use_ok 'MojoliciousTest';
 
-my $t = Test::Mojo->new(app => 'MojoliciousTest');
+my $t = Test::Mojo->new('MojoliciousTest');
 
 # SyntaxError::foo in testing mode (syntax error in controller)
 $t->get_ok('/syntax_error/foo')->status_is(500)

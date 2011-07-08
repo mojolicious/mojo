@@ -14,10 +14,10 @@ use Scalar::Util 'weaken';
 use constant DEBUG => $ENV{MOJO_USERAGENT_DEBUG} || 0;
 
 # "You can't let a single bad experience scare you away from drugs."
-has [qw/app http_proxy https_proxy no_proxy on_start/];
 has cert       => sub { $ENV{MOJO_CERT_FILE} };
 has cookie_jar => sub { Mojo::CookieJar->new };
-has ioloop     => sub { Mojo::IOLoop->new };
+has [qw/http_proxy https_proxy no_proxy on_start/];
+has ioloop => sub { Mojo::IOLoop->new };
 has keep_alive_timeout => 15;
 has key                => sub { $ENV{MOJO_KEY_FILE} };
 has log                => sub { Mojo::Log->new };
@@ -29,6 +29,20 @@ has websocket_timeout => 300;
 
 # Make sure we leave a clean ioloop behind
 sub DESTROY { shift->_cleanup }
+
+sub app {
+  my ($self, $app) = @_;
+
+  # Try to detect application
+  $self->{app} ||= $ENV{MOJO_APP} if ref $ENV{MOJO_APP};
+  if ($app) {
+    my $server = $self->_test_server;
+    $self->{app} = ref $app ? $app : $server->app_class($app)->app;
+    return $self;
+  }
+
+  return $self->{app};
+}
 
 # "Ah, alcohol and night-swimming. It's a winning combination."
 sub build_form_tx      { shift->transactor->form(@_) }
@@ -121,31 +135,13 @@ sub start {
 
 # "It's like my dad always said: eventually, everybody gets shot."
 sub test_server {
-  my ($self, $scheme) = @_;
+  my $self = shift;
 
-  # New test server
-  if ($scheme) {
-    delete $self->{port};
-    delete $self->{server};
-  }
-
-  # Start test server
-  unless ($self->{port}) {
-    my $loop = $self->{loop} || $self->ioloop;
-    my $server = $self->{server} =
-      Mojo::Server::Daemon->new(ioloop => $loop, silent => 1);
-    my $port = $self->{port} = $loop->generate_port;
-    die "Couldn't find a free TCP port for testing.\n" unless $port;
-    $self->{scheme} = $scheme ||= 'http';
-    $server->listen(["$scheme://*:$port"]);
-    $server->prepare_ioloop;
-
-    # Prepare application for testing
-    delete $server->{app};
-    my $app = $self->app;
-    ref $app ? $server->app($app) : $server->app_class($app);
-    $self->log($server->app->log);
-  }
+  # Prepare application for testing
+  my $server = $self->_test_server(@_);
+  delete $server->{app};
+  $server->app($self->app);
+  $self->log($server->app->log);
 
   # Build absolute URL for test server
   return Mojo::URL->new->scheme($self->{scheme})->host('localhost')
@@ -549,6 +545,30 @@ sub _switch_non_blocking {
   $self->{nb}   = 1;
 }
 
+sub _test_server {
+  my ($self, $scheme) = @_;
+
+  # Fresh start
+  if ($scheme) {
+    delete $self->{port};
+    delete $self->{server};
+  }
+
+  # Start test server
+  unless ($self->{port}) {
+    my $loop = $self->{loop} || $self->ioloop;
+    my $server = $self->{server} =
+      Mojo::Server::Daemon->new(ioloop => $loop, silent => 1);
+    my $port = $self->{port} = $loop->generate_port;
+    die "Couldn't find a free TCP port for testing.\n" unless $port;
+    $self->{scheme} = $scheme ||= 'http';
+    $server->listen(["$scheme://*:$port"]);
+    $server->prepare_ioloop;
+  }
+
+  return $self->{server};
+}
+
 # "Once the government approves something, it's no longer immoral!"
 sub _upgrade {
   my ($self, $id) = @_;
@@ -668,14 +688,6 @@ L<IO::Socket::SSL> are supported transparently and used if installed.
 =head1 ATTRIBUTES
 
 L<Mojo::UserAgent> implements the following attributes.
-
-=head2 C<app>
-
-  my $app = $ua->app;
-  $ua     = $ua->app(MyApp->new);
-
-A Mojo application to associate this user agent with.
-If set, local requests will be processed in this application.
 
 =head2 C<cert>
 
@@ -802,6 +814,14 @@ before being dropped, defaults to C<300>.
 
 L<Mojo::UserAgent> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
+
+=head2 C<app>
+
+  my $app = $ua->app;
+  $ua     = $ua->app(MyApp->new);
+
+Application relative URLs will be processed with, defaults to the value of
+C<MOJO_APP>.
 
 =head2 C<build_form_tx>
 

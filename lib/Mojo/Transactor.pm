@@ -140,6 +140,25 @@ sub form {
   return $tx, $cb;
 }
 
+sub peer {
+  my ($self, $tx) = @_;
+
+  # Peer for transaction
+  my $req    = $tx->req;
+  my $url    = $req->url;
+  my $scheme = $url->scheme || 'http';
+  my $host   = $url->ihost;
+  my $port   = $url->port;
+  if (my $proxy = $req->proxy) {
+    $scheme = $proxy->scheme;
+    $host   = $proxy->ihost;
+    $port   = $proxy->port;
+  }
+  $port ||= $scheme eq 'https' ? 443 : 80;
+
+  return $scheme, $host, $port;
+}
+
 sub proxy_connect {
   my ($self, $old) = @_;
 
@@ -299,6 +318,12 @@ Versatile L<Mojo::Transaction::HTTP> builder for form requests.
   my $tx = $t->form('http://kraih.com/foo' => {test => 123});
   $tx->res->body(sub { print $_[1] });
   $ua->start($tx);
+
+=head2 C<peer>
+
+  my ($scheme, $host, $port) = $t->peer($tx);
+
+Actual peer for transaction.
 
 =head2 C<proxy_connect>
 

@@ -36,8 +36,8 @@ sub app {
   # Try to detect application
   $self->{app} ||= $ENV{MOJO_APP} if ref $ENV{MOJO_APP};
   if ($app) {
-    my $server = $self->_test_server;
-    $self->{app} = ref $app ? $app : $server->app_class($app)->app;
+    $self->{app} =
+      ref $app ? $app : $self->_test_server->app_class($app)->app;
     return $self;
   }
 
@@ -59,7 +59,7 @@ sub delete {
 sub detect_proxy {
   my $self = shift;
 
-  # Uppercase gets priority
+  # Upper case gets priority
   $self->http_proxy($ENV{HTTP_PROXY}   || $ENV{http_proxy});
   $self->https_proxy($ENV{HTTPS_PROXY} || $ENV{https_proxy});
   if (my $no = $ENV{NO_PROXY} || $ENV{no_proxy}) {
@@ -234,7 +234,7 @@ sub _connect {
   weaken $self;
   my $loop = $self->{loop};
   my $id   = $tx->connection;
-  my ($scheme, $address, $port) = $self->_info($tx);
+  my ($scheme, $address, $port) = $self->transactor->peer($tx);
   $id ||= $self->_cache("$scheme:$address:$port");
   if ($id && !ref $id) {
     warn "KEEP ALIVE CONNECTION ($scheme:$address:$port)\n" if DEBUG;
@@ -301,7 +301,7 @@ sub _drop {
   my $c  = delete $self->{cs}->{$id};
   my $tx = $c->{tx};
   if (!$close && $tx && $tx->keep_alive && !$tx->error) {
-    $self->_cache(join(':', $self->_info($tx)), $id)
+    $self->_cache(join(':', $self->transactor->peer($tx)), $id)
       unless (($tx->req->method || '') =~ /^connect$/i
       && ($tx->res->code || '') eq '200');
     return;
@@ -379,24 +379,6 @@ sub _handle {
 
   # Stop loop
   $self->{loop}->stop if !$self->{nb} && !$self->{processing};
-}
-
-sub _info {
-  my ($self, $tx) = @_;
-
-  my $req    = $tx->req;
-  my $url    = $req->url;
-  my $scheme = $url->scheme || 'http';
-  my $host   = $url->ihost;
-  my $port   = $url->port;
-  if (my $proxy = $req->proxy) {
-    $scheme = $proxy->scheme;
-    $host   = $proxy->ihost;
-    $port   = $proxy->port;
-  }
-  $port ||= $scheme eq 'https' ? 443 : 80;
-
-  return $scheme, $host, $port;
 }
 
 # "Hey, Weener Boy... where do you think you're going?"
@@ -823,6 +805,8 @@ following new ones.
 
 Application relative URLs will be processed with, defaults to the value of
 C<MOJO_APP>.
+
+  print $ua->app->secret;
 
 =head2 C<build_form_tx>
 

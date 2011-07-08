@@ -234,10 +234,10 @@ sub _connect {
   weaken $self;
   my $loop = $self->{loop};
   my $id   = $tx->connection;
-  my ($scheme, $address, $port) = $self->transactor->peer($tx);
-  $id ||= $self->_cache("$scheme:$address:$port");
+  my ($scheme, $host, $port) = $self->transactor->peer($tx);
+  $id ||= $self->_cache("$scheme:$host:$port");
   if ($id && !ref $id) {
-    warn "KEEP ALIVE CONNECTION ($scheme:$address:$port)\n" if DEBUG;
+    warn "KEEP ALIVE CONNECTION ($scheme:$host:$port)\n" if DEBUG;
     $self->{cs}->{$id} = {cb => $cb, tx => $tx};
     $tx->kept_alive(1);
     $self->_connected($id);
@@ -252,9 +252,9 @@ sub _connect {
     }
 
     # Connect
-    warn "NEW CONNECTION ($scheme:$address:$port)\n" if DEBUG;
+    warn "NEW CONNECTION ($scheme:$host:$port)\n" if DEBUG;
     $id = $loop->connect(
-      address  => $address,
+      address  => $host,
       port     => $port,
       handle   => $id,
       tls      => $scheme eq 'https' ? 1 : 0,

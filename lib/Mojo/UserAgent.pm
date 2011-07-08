@@ -807,6 +807,8 @@ Application relative URLs will be processed with, defaults to the value of
 C<MOJO_APP>.
 
   print $ua->app->secret;
+  $ua->app->log->level('fatal');
+  $ua->app->defaults(testing => 'oh yea!');
 
 =head2 C<build_form_tx>
 

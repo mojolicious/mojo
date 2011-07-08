@@ -430,6 +430,8 @@ Construct a new L<Test::Mojo> object.
 Alias for the C<app> method of L<Mojo::UserAgent>.
 
   my $secret = $t->app->secret;
+  $t->app->log->level('fatal');
+  $t->app->defaults(testing => 'oh yea!');
 
 =head2 C<content_is>
 

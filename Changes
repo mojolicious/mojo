@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojolicious.
 1.60    2011-07-08 00:00:00
         - Added xsl MIME type. (shiftycow)
         - Improved documentation.
+        - Fixed Windows portability issue.
 
 1.59    2011-07-08 00:00:00
         - Added peer method to Mojo::Transactor.

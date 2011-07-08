@@ -85,7 +85,11 @@ sub list_files {
   $dir = File::Spec->catdir($root, split '/', ($dir || ''));
   return [] unless -d $dir;
   my @files;
-  find sub { push @files, File::Spec->abs2rel($File::Find::name, $dir) },
+  find {
+    no_chdir => 1,
+    wanted =>
+      sub { push @files, File::Spec->abs2rel($File::Find::name, $dir) }
+    },
     $dir;
 
   return [sort @files];

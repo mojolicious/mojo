@@ -5,10 +5,12 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 90;
+use Test::More tests => 94;
 
 # "Why can't she just drink herself happy like a normal person?"
 use_ok 'Mojo::Tree';
+
+use Mojo::Util 'encode';
 
 # Simple nesting with healing (tree structure)
 my $t = Mojo::Tree->new->parse(<<EOF);
@@ -192,13 +194,13 @@ is "$t", <<EOF, 'right result';
 </ul>
 <div>D</div>works
 EOF
-$t->ul->li->[1]->append_content('<p>C2</p>C3')->append_content('C4');
-is $t->ul->li->[1]->text, 'C C3 C4', 'right text';
+$t->ul->li->[1]->append_content('<p>C2</p>C3')->append_content('♥');
+is $t->ul->li->[1]->text, 'C C3 ♥', 'right text';
 is "$t", <<EOF, 'right result';
 <ul>
     24<div>A-1</div>works25<li>A4A3<p>A2</p>A</li><p>A1</p>23
     <p>B</p>
-    <li>C<p>C2</p>C3C4</li>
+    <li>C<p>C2</p>C3♥</li>
 </ul>
 <div>D</div>works
 EOF
@@ -251,3 +253,14 @@ $t->replace(<<EOF);
 EOF
 is $t->xml, 1, 'xml mode detected';
 is $t->children->[0], '<XMLTest3 />', 'right result';
+
+# Unicode
+my $unicode =
+  qq/<html><div id="☃x">Snowman<\/div><div class="x ♥">Heart<\/div><\/html>/;
+encode 'UTF-8', $unicode;
+$t = Mojo::Tree->new(charset => 'UTF-8');
+$t->parse($unicode);
+is $t->html->div->[0]->{id}, '☃x', 'right attribute';
+is $t->html->div->[0]->text, 'Snowman', 'right text';
+is $t->html->div->[1]->{class}, 'x ♥', 'right attribute';
+is $t->html->div->[1]->text, 'Heart', 'right text';

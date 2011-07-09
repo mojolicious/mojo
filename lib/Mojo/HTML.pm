@@ -797,7 +797,7 @@ __END__
 
 =head1 NAME
 
-Mojo::HTML - Minimalistic XML/HTML5 Parser
+Mojo::HTML - Minimalistic HTML5/XML Parser
 
 =head1 SYNOPSIS
 
@@ -818,7 +818,7 @@ Mojo::HTML - Minimalistic XML/HTML5 Parser
 
 =head1 DESCRIPTION
 
-L<Mojo::HTML> is a minimalistic and very relaxed XML/HTML5 parser and the
+L<Mojo::HTML> is a minimalistic and very relaxed HTML5/XML parser and the
 foundation of L<Mojo::DOM>.
 It will even try to interpret broken XML, so you should not use it for
 validation.

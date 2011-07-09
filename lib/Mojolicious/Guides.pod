@@ -74,7 +74,7 @@ Full featured async io HTTP 1.1 and WebSocket user agent.
 
 =item L<Mojo::DOM>
 
-Very fun and minimalistic XML/HTML5 DOM parser with CSS3 selector support.
+Very fun and minimalistic HTML5/XML DOM parser with CSS3 selector support.
 
 =item L<Mojo::JSON>
 

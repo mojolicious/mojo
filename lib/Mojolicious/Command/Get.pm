@@ -26,7 +26,7 @@ usage: $0 get [OPTIONS] URL [SELECTOR] [COMMANDS]
   mojo get mojolicio.us 'h1, h2, h3' 3 text
 
 These options are available:
-  --charset    Charset of XML/HTML5 content, defaults to auto detection or
+  --charset    Charset of HTML5/XML content, defaults to auto detection or
                UTF-8.
   --header     Additional HTTP header.
   --method     HTTP method to use.

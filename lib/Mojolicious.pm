@@ -313,7 +313,7 @@ Automatic CGI, FastCGI and L<PSGI> detection.
 
 =item *
 
-JSON and XML/HTML5 parser with CSS3 selector support.
+JSON and HTML5/XML parser with CSS3 selector support.
 
 =item *
 

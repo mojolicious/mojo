@@ -822,7 +822,6 @@ L<Mojo::Tree> is a minimalistic and very relaxed XML/HTML5 tree parser and
 the foundation of L<Mojo::DOM>.
 It will even try to interpret broken XML, so you should not use it for
 validation.
-Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 CASE SENSITIVITY
 
@@ -1014,6 +1013,7 @@ Element type.
 
 Disable HTML5 semantics in parser and activate case sensitivity, defaults to
 auto detection based on processing instructions.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head1 SEE ALSO
 

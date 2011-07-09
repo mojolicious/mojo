@@ -820,30 +820,6 @@ Mojo::HTML - Relaxed HTML5/XML Parser
 
 L<Mojo::HTML> is a relaxed HTML5/XML parser and the foundation of
 L<Mojo::DOM>.
-It will even try to interpret broken XML, so you should not use it for
-validation.
-
-=head1 CASE SENSITIVITY
-
-L<Mojo::HTML> defaults to HTML5 semantics, that means all tags and attributes
-are lowercased.
-
-  my $html = Mojo::HTML->new('<P ID="greeting">Hi</P>');
-  print $html->p->{id};
-
-If XML processing instructions are found, the parser will automatically
-switch into XML mode and everything becomes case sensitive.
-
-  my $html = Mojo::HTML->new('<?xml version="1.0"?><P ID="greeting">Hi</P>');
-  print $html->P->{ID};
-
-XML detection can be also deactivated with the C<xml> method.
-
-  # XML sematics
-  $html->xml(1);
-
-  # HTML5 semantics
-  $html->xml(0);
 
 =head1 METHODS
 

@@ -863,7 +863,7 @@ Construct a new L<Mojo::HTML> object.
 
   my $text = $html->all_text;
 
-Extract all text content from tree structure.
+Extract all text content from element and child eleemnts.
 
 =head2 C<append>
 
@@ -908,7 +908,7 @@ Charset used for decoding and encoding XML.
   my $children = $html->children;
   my $children = $html->children('div')
 
-Return array containing the children of this element.
+Return an array containing the child elements of this element.
 
   # Child elements are also automatically available as object methods
   print $html->div->text;
@@ -990,19 +990,19 @@ Extract text content from element only, not including child elements.
 
   my $xml = $html->to_xml;
 
-Render tree to XML.
+Render element and child elements to XML.
 
 =head2 C<tree>
 
   my $tree = $html->tree;
   $html    = $html->tree(['root', ['text', 'lalala']]);
 
-HTML tree.
+HTML5/XML tree.
 
 =head2 C<type>
 
   my $type = $html->type;
-  $html    = $html->type('html');
+  $html    = $html->type('title');
 
 Element type.
 

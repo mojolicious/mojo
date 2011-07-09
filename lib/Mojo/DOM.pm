@@ -801,7 +801,7 @@ Find a single element with CSS3 selectors.
   my $collection = $dom->children;
   my $collection = $dom->children('div')
 
-Return a collection containing the children of this element, similar to
+Return a collection containing the child elements of this element, similar to
 C<find>.
 
   # Child elements are also automatically available as object methods

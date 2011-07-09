@@ -523,7 +523,7 @@ __END__
 
 =head1 NAME
 
-Mojo::DOM - Relaxed HTML5/XML DOM Parser With CSS3 Selectors
+Mojo::DOM - Relaxed HTML5/XML Parser With CSS3 Selectors
 
 =head1 SYNOPSIS
 
@@ -556,8 +556,8 @@ Mojo::DOM - Relaxed HTML5/XML DOM Parser With CSS3 Selectors
 
 =head1 DESCRIPTION
 
-L<Mojo::DOM> is a relaxed HTML5/XML DOM parser based on L<Mojo::HTML> with
-CSS3 selector support.
+L<Mojo::DOM> is a relaxed HTML5/XML parser based on L<Mojo::HTML> with CSS3
+selector support.
 It will even try to interpret broken XML, so you should not use it for
 validation.
 

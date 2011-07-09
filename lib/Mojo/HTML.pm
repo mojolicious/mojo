@@ -797,7 +797,7 @@ __END__
 
 =head1 NAME
 
-Mojo::HTML - Minimalistic HTML5/XML Parser
+Mojo::HTML - Minimalistic HTML5/XML DOM Parser
 
 =head1 SYNOPSIS
 
@@ -818,7 +818,7 @@ Mojo::HTML - Minimalistic HTML5/XML Parser
 
 =head1 DESCRIPTION
 
-L<Mojo::HTML> is a minimalistic and very relaxed HTML5/XML parser and the
+L<Mojo::HTML> is a minimalistic and very relaxed HTML5/XML DOM parser and the
 foundation of L<Mojo::DOM>.
 It will even try to interpret broken XML, so you should not use it for
 validation.
@@ -997,7 +997,7 @@ Render element and child elements to XML.
   my $tree = $html->tree;
   $html    = $html->tree(['root', ['text', 'lalala']]);
 
-HTML5/XML tree.
+HTML5/XML Document Object Model.
 
 =head2 C<type>
 

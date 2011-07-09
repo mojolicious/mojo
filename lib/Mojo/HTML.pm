@@ -1,4 +1,4 @@
-package Mojo::Tree;
+package Mojo::HTML;
 use Mojo::Base -base;
 use overload
   '%{}'    => sub { shift->attrs },
@@ -797,219 +797,219 @@ __END__
 
 =head1 NAME
 
-Mojo::Tree - Minimalistic XML/HTML5 Tree Parser
+Mojo::HTML - Minimalistic XML/HTML5 Parser
 
 =head1 SYNOPSIS
 
-  use Mojo::Tree;
+  use Mojo::HTML;
 
   # Parse
-  my $t = Mojo::Tree->new('<div><p id="a">A</p><p id="b">B</p></div>');
+  my $html = Mojo::HTML->new('<div><p id="a">A</p><p id="b">B</p></div>');
 
   # Walk
-  print $t->div->p->[0]->text;
-  print $t->div->p->[1]->{id};
+  print $html->div->p->[0]->text;
+  print $html->div->p->[1]->{id};
 
   # Modify
-  $t->div->p->[1]->append('<p id="c">C</p>');
+  $html->div->p->[1]->append('<p id="c">C</p>');
 
   # Render
-  print $t;
+  print $html;
 
 =head1 DESCRIPTION
 
-L<Mojo::Tree> is a minimalistic and very relaxed XML/HTML5 tree parser and
-the foundation of L<Mojo::DOM>.
+L<Mojo::HTML> is a minimalistic and very relaxed XML/HTML5 parser and the
+foundation of L<Mojo::DOM>.
 It will even try to interpret broken XML, so you should not use it for
 validation.
 
 =head1 CASE SENSITIVITY
 
-L<Mojo::Tree> defaults to HTML5 semantics, that means all tags and attributes
+L<Mojo::HTML> defaults to HTML5 semantics, that means all tags and attributes
 are lowercased.
 
-  my $t = Mojo::Tree->new('<P ID="greeting">Hi</P>');
-  print $t->p->{id};
+  my $html = Mojo::HTML->new('<P ID="greeting">Hi</P>');
+  print $html->p->{id};
 
 If XML processing instructions are found, the parser will automatically
 switch into XML mode and everything becomes case sensitive.
 
-  my $t = Mojo::Tree->new('<?xml version="1.0"?><P ID="greeting">Hi</P>');
-  print $t->P->{ID};
+  my $html = Mojo::HTML->new('<?xml version="1.0"?><P ID="greeting">Hi</P>');
+  print $html->P->{ID};
 
 XML detection can be also deactivated with the C<xml> method.
 
   # XML sematics
-  $t->xml(1);
+  $html->xml(1);
 
   # HTML5 semantics
-  $t->xml(0);
+  $html->xml(0);
 
 =head1 METHODS
 
-L<Mojo::Tree> inherits all methods from L<Mojo::Base> and implements the
+L<Mojo::HTML> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
 =head2 C<new>
 
-  my $t = Mojo::Tree->new;
-  my $t = Mojo::Tree->new(xml => 1);
-  my $t = Mojo::Tree->new('<foo bar="baz">test</foo>');
-  my $t = Mojo::Tree->new('<foo bar="baz">test</foo>', xml => 1);
+  my $html = Mojo::HTML->new;
+  my $html = Mojo::HTML->new(xml => 1);
+  my $html = Mojo::HTML->new('<foo bar="baz">test</foo>');
+  my $html = Mojo::HTML->new('<foo bar="baz">test</foo>', xml => 1);
 
-Construct a new L<Mojo::Tree> object.
+Construct a new L<Mojo::HTML> object.
 
 =head2 C<all_text>
 
-  my $text = $t->all_text;
+  my $text = $html->all_text;
 
 Extract all text content from tree structure.
 
 =head2 C<append>
 
-  $t = $t->append('<p>Hi!</p>');
+  $html = $html->append('<p>Hi!</p>');
 
 Append to element.
 
   # "<div><h1>A</h1><h2>B</h2></div>"
-  $t->parse('<div><h1>A</h1></div>')->at('h1')->append('<h2>B</h2>');
+  $html->parse('<div><h1>A</h1></div>')->at('h1')->append('<h2>B</h2>');
 
 =head2 C<append_content>
 
-  $t = $t->append_content('<p>Hi!</p>');
+  $html = $html->append_content('<p>Hi!</p>');
 
 Append to element content.
 
   # "<div><h1>AB</h1></div>"
-  $t->parse('<div><h1>A</h1></div>')->at('h1')->append_content('B');
+  $html->parse('<div><h1>A</h1></div>')->at('h1')->append_content('B');
 
 =head2 C<attrs>
 
-  my $attrs = $t->attrs;
-  my $foo   = $t->attrs('foo');
-  $t        = $t->attrs({foo => 'bar'});
-  $t        = $t->attrs(foo => 'bar');
+  my $attrs = $html->attrs;
+  my $foo   = $html->attrs('foo');
+  $html     = $html->attrs({foo => 'bar'});
+  $html     = $html->attrs(foo => 'bar');
 
 Element attributes.
 
   # Direct hash access to attributes is also available
-  print $t->{foo};
-  print $t->div->{id};
+  print $html->{foo};
+  print $html->div->{id};
 
 =head2 C<charset>
 
-  my $charset = $t->charset;
-  $t          = $t->charset('UTF-8');
+  my $charset = $html->charset;
+  $html       = $html->charset('UTF-8');
 
 Charset used for decoding and encoding XML.
 
 =head2 C<children>
 
-  my $children = $t->children;
-  my $children = $t->children('div')
+  my $children = $html->children;
+  my $children = $html->children('div')
 
 Return array containing the children of this element.
 
   # Child elements are also automatically available as object methods
-  print $t->div->text;
-  print $t->div->[23]->text;
+  print $html->div->text;
+  print $html->div->[23]->text;
 
 =head2 C<content_xml>
 
-  my $xml = $t->content_xml;
+  my $xml = $html->content_xml;
 
 Render content of this element to XML.
 
 =head2 C<namespace>
 
-  my $namespace = $t->namespace;
+  my $namespace = $html->namespace;
 
 Find element namespace.
 
 =head2 C<parent>
 
-  my $parent = $t->parent;
+  my $parent = $html->parent;
 
 Parent of element.
 
 =head2 C<parse>
 
-  $t = $t->parse('<foo bar="baz">test</foo>');
+  $html = $html->parse('<foo bar="baz">test</foo>');
 
 Parse XML document.
 
 =head2 C<prepend>
 
-  $t = $t->prepend('<p>Hi!</p>');
+  $html = $html->prepend('<p>Hi!</p>');
 
 Prepend to element.
 
   # "<div><h1>A</h1><h2>B</h2></div>"
-  $t->parse('<div><h2>B</h2></div>')->at('h2')->prepend('<h1>A</h1>');
+  $html->parse('<div><h2>B</h2></div>')->at('h2')->prepend('<h1>A</h1>');
 
 =head2 C<prepend_content>
 
-  $t = $t->prepend_content('<p>Hi!</p>');
+  $html = $html->prepend_content('<p>Hi!</p>');
 
 Prepend to element content.
 
   # "<div><h2>AB</h2></div>"
-  $t->parse('<div><h2>B</h2></div>')->at('h2')->prepend_content('A');
+  $html->parse('<div><h2>B</h2></div>')->at('h2')->prepend_content('A');
 
 =head2 C<replace>
 
-  $t = $t->replace('<div>test</div>');
+  $html = $html->replace('<div>test</div>');
 
 Replace elements.
 
   # "<div><h2>B</h2></div>"
-  $t->parse('<div><h1>A</h1></div>')->at('h1')->replace('<h2>B</h2>');
+  $html->parse('<div><h1>A</h1></div>')->at('h1')->replace('<h2>B</h2>');
 
 =head2 C<replace_content>
 
-  $t = $t->replace_content('test');
+  $html = $html->replace_content('test');
 
 Replace element content.
 
   # "<div><h1>B</h1></div>"
-  $t->parse('<div><h1>A</h1></div>')->at('h1')->replace_content('B');
+  $html->parse('<div><h1>A</h1></div>')->at('h1')->replace_content('B');
 
 =head2 C<root>
 
-  my $root = $t->root;
+  my $root = $html->root;
 
 Find root element.
 
 =head2 C<text>
 
-  my $text = $t->text;
+  my $text = $html->text;
 
 Extract text content from element only, not including child elements.
 
 =head2 C<to_xml>
 
-  my $xml = $t->to_xml;
+  my $xml = $html->to_xml;
 
 Render tree to XML.
 
 =head2 C<tree>
 
-  my $tree = $t->tree;
-  $t       = $t->tree(['root', ['text', 'lalala']]);
+  my $tree = $html->tree;
+  $html    = $html->tree(['root', ['text', 'lalala']]);
 
-Tree structure.
+HTML tree.
 
 =head2 C<type>
 
-  my $type = $t->type;
-  $t       = $t->type('html');
+  my $type = $html->type;
+  $html    = $html->type('html');
 
 Element type.
 
 =head2 C<xml>
 
-  my $xml = $t->xml;
-  $t      = $t->xml(1);
+  my $xml = $html->xml;
+  $html   = $html->xml(1);
 
 Disable HTML5 semantics in parser and activate case sensitivity, defaults to
 auto detection based on processing instructions.

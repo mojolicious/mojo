@@ -1,5 +1,5 @@
 package Mojo::DOM;
-use Mojo::Base 'Mojo::Tree';
+use Mojo::Base 'Mojo::HTML';
 
 # Regex
 my $CSS_ESCAPE_RE = qr/\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}/;
@@ -787,7 +787,7 @@ XML detection can be also deactivated with the C<xml> method.
 
 =head1 METHODS
 
-L<Mojo::DOM> inherits all methods from L<Mojo::Tree> and implements the
+L<Mojo::DOM> inherits all methods from L<Mojo::HTML> and implements the
 following new ones.
 
 =head2 C<at>

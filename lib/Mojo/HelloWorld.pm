@@ -133,6 +133,9 @@ sub _dump_env {
   $tx->resume;
 }
 
+# "Don't worry, son.
+#  I'm sure he's up in heaven right now laughing it up with all the other
+#  celebrities: John Dilinger, Ty Cobb, Joseph Stalin."
 sub _dump_params {
   my ($self, $tx) = @_;
   my $res = $tx->res;
@@ -219,6 +222,10 @@ EOF
   $tx->resume;
 }
 
+# "Dear Homer, IOU one emergency donut.
+#  Signed Homer.
+#  Bastard!
+#  He's always one step ahead."
 sub _upload {
   my ($self, $tx) = @_;
 
@@ -258,6 +265,7 @@ EOF
   $tx->resume;
 }
 
+# "Does whisky count as beer?"
 sub _websocket {
   my ($self, $tx) = @_;
 

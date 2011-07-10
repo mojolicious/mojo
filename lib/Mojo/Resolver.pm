@@ -104,6 +104,7 @@ sub lookup {
   );
 }
 
+# "I can't believe it! Reading and writing actually paid off!"
 sub resolve {
   my ($self, $name, $type, $cb) = @_;
 
@@ -216,6 +217,7 @@ sub resolve {
   return $self;
 }
 
+# "I wonder where Bart is, his dinner's getting all cold... and eaten."
 sub servers {
   my $self = shift;
 

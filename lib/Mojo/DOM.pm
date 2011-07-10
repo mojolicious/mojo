@@ -175,6 +175,7 @@ sub content_xml {
   return $result;
 }
 
+# "But I was going to loot you a present."
 sub find {
   my ($self, $selector) = @_;
 
@@ -241,6 +242,9 @@ sub parent {
   );
 }
 
+# "Back you robots!
+#  Nobody ruins my family vacation but me!
+#  And maybe the boy."
 sub parse {
   my ($self, $xml) = @_;
   $self->charset(undef) if utf8::is_utf8 $xml;
@@ -378,6 +382,7 @@ sub type {
   return $self;
 }
 
+# "I want to set the record straight, I thought the cop was a prostitute."
 sub xml {
   my $self = shift;
   return $self->[0]->xml if @_ == 0;

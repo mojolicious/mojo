@@ -88,6 +88,9 @@ $HTML_BLOCK{$_}++ for @BLOCK_TAGS;
 has [qw/charset xml/];
 has tree => sub { ['root'] };
 
+# "No one believes me.
+#  I believe you, dad.
+#  Then can you stop the cats from swearing?"
 sub parse {
   my ($self, $html) = @_;
 

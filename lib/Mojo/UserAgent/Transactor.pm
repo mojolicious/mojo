@@ -140,6 +140,8 @@ sub form {
   return $tx, $cb;
 }
 
+# "This kid's a wonder!
+#  He organized all the law suits against me into one class action suit."
 sub peer {
   my ($self, $tx) = @_;
 
@@ -159,6 +161,9 @@ sub peer {
   return $scheme, $host, $port;
 }
 
+# "America's health care system is second only to Japan...
+#  Canada, Sweden, Great Britain... well, all of Europe.
+#  But you can thank your lucky stars we don't live in Paraguay!"
 sub proxy_connect {
   my ($self, $old) = @_;
 
@@ -209,6 +214,7 @@ sub redirect {
   return $new;
 }
 
+# "If he is so smart, how come he is dead?"
 sub tx {
   my $self = shift;
 
@@ -261,7 +267,7 @@ __END__
 
 =head1 NAME
 
-Mojo::UserAgent::Transactor - Transaction Builder
+Mojo::UserAgent::Transactor - User Agent Transactor
 
 =head1 SYNOPSIS
 
@@ -272,8 +278,8 @@ Mojo::UserAgent::Transactor - Transaction Builder
 
 =head1 DESCRIPTION
 
-L<Mojo::UserAgent::Transactor> is the transaction building framework used by
-L<Mojo::UserAgent>.
+L<Mojo::UserAgent::Transactor> is the transaction building and manipulation
+framework used by L<Mojo::UserAgent>.
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS

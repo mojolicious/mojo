@@ -13,6 +13,9 @@ sub to_xml { join "\n", map({"$_"} @{$_[0]}) }
 sub until  { shift->_iterate(@_, 1) }
 sub while  { shift->_iterate(@_, 0) }
 
+# "All right, let's not panic.
+#  I'll make the money by selling one of my livers.
+#  I can get by with one."
 sub _iterate {
   my ($self, $cb, $cond) = @_;
   return @$self unless $cb;
@@ -34,7 +37,7 @@ __END__
 
 =head1 NAME
 
-Mojo::DOM::Collection - Element Collections
+Mojo::DOM::Collection - Element Collection
 
 =head1 SYNOPSIS
 
@@ -42,7 +45,7 @@ Mojo::DOM::Collection - Element Collections
 
 =head1 DESCRIPTION
 
-L<Mojo::DOM::Collection> is the element collection class used by
+L<Mojo::DOM::Collection> is a container for element collections used by
 L<Mojo::DOM>.
 Note that this module is EXPERIMENTAL and might change without warning!
 

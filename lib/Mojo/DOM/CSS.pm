@@ -37,10 +37,10 @@ has 'tree';
 
 # "Why can't she just drink herself happy like a normal person?"
 sub select {
-  my ($self, $selector) = @_;
+  my $self = shift;
 
   # Compile selector
-  my $pattern = $self->_compile($selector);
+  my $pattern = $self->_compile(shift);
 
   # Walk tree
   my @results;
@@ -253,6 +253,7 @@ sub _element {
   return 1;
 }
 
+# "Rock stars... is there anything they don't know?"
 sub _equation {
   my ($self, $equation) = @_;
 
@@ -299,6 +300,9 @@ sub _regex {
   return $regex;
 }
 
+# "All right, brain.
+#  You don't like me and I don't like you,
+#  but let's just do this and I can get back to killing you with beer."
 sub _selector {
   my ($self, $selector, $current) = @_;
 

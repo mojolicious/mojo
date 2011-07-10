@@ -163,7 +163,7 @@ sub _select {
 
   # Commands
   my $done = 0;
-  while (my $command = shift @ARGV) {
+  while (defined(my $command = shift @ARGV)) {
 
     # Number
     if ($command =~ /^\d+$/) {

@@ -1,5 +1,10 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+1.63    2011-07-10 00:00:00
+        - Added EXPERIMENTAL modules Mojo::DOM::CSS and
+          Mojo::DOM::Collection.
+        - Renamed Mojo::Transactor to Mojo::UserAgent::Transactor.
+
 1.62    2011-07-10 00:00:00
         - Merged Mojo::HTML into Mojo::DOM again.
         - Improved documentation.

@@ -7,8 +7,8 @@ use Mojo::IOLoop;
 use Mojo::Log;
 use Mojo::Server::Daemon;
 use Mojo::Transaction::WebSocket;
-use Mojo::Transactor;
 use Mojo::URL;
+use Mojo::UserAgent::Transactor;
 use Scalar::Util 'weaken';
 
 use constant DEBUG => $ENV{MOJO_USERAGENT_DEBUG} || 0;
@@ -24,7 +24,7 @@ has log                => sub { Mojo::Log->new };
 has max_connections    => 5;
 has max_redirects      => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 };
 has name               => 'Mojolicious (Perl)';
-has transactor => sub { Mojo::Transactor->new };
+has transactor => sub { Mojo::UserAgent::Transactor->new };
 has websocket_timeout => 300;
 
 # Make sure we leave a clean ioloop behind
@@ -779,9 +779,9 @@ redirects.
 =head2 C<transactor>
 
   my $t = $ua->transactor;
-  $ua   = $ua->transactor(Mojo::Transactor->new);
+  $ua   = $ua->transactor(Mojo::UserAgent::Transactor->new);
 
-Transaction builder, by default a L<Mojo::Transactor> object.
+Transaction builder, by default a L<Mojo::UserAgent::Transactor> object.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<websocket_timeout>
@@ -814,19 +814,19 @@ C<MOJO_APP>.
 
   my $tx = $ua->build_form_tx('http://kraih.com/foo' => {test => 123});
 
-Alias for the C<form> method in L<Mojo::Transactor>.
+Alias for the C<form> method in L<Mojo::UserAgent::Transactor>.
 
 =head2 C<build_tx>
 
   my $tx = $ua->build_tx(GET => 'mojolicio.us');
 
-Alias for the C<tx> method in L<Mojo::Transactor>.
+Alias for the C<tx> method in L<Mojo::UserAgent::Transactor>.
 
 =head2 C<build_websocket_tx>
 
   my $tx = $ua->build_websocket_tx('ws://localhost:3000');
 
-Alias for the C<websocket> method in L<Mojo::Transactor>.
+Alias for the C<websocket> method in L<Mojo::UserAgent::Transactor>.
 
 =head2 C<delete>
 

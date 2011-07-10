@@ -1,4 +1,4 @@
-package Mojo::Transactor;
+package Mojo::UserAgent::Transactor;
 use Mojo::Base -base;
 
 use Mojo::Asset::File;
@@ -261,25 +261,25 @@ __END__
 
 =head1 NAME
 
-Mojo::Transactor - Transaction Builder
+Mojo::UserAgent::Transactor - Transaction Builder
 
 =head1 SYNOPSIS
 
-  use Mojo::Transactor;
+  use Mojo::UserAgent::Transactor;
 
-  my $t  = Mojo::Transactor->new;
+  my $t  = Mojo::UserAgent::Transactor->new;
   my $tx = $t->tx(GET => 'http://mojolicio.us');
 
 =head1 DESCRIPTION
 
-L<Mojo::Transactor> is the request building framework used by
+L<Mojo::UserAgent::Transactor> is the transaction building framework used by
 L<Mojo::UserAgent>.
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS
 
-L<Mojo::Transactor> inherits all methods from L<Mojo::Base> and implements
-the following new ones.
+L<Mojo::UserAgent::Transactor> inherits all methods from L<Mojo::Base> and
+implements the following new ones.
 
 =head2 C<form>
 

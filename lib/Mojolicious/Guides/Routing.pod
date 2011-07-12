@@ -102,8 +102,8 @@ all characters except C</> and C<.>.
   /sebastian23/hello  -> /:name/hello -> {name => 'sebastian23'}
   /sebastian 23/hello -> /:name/hello -> {name => 'sebastian 23'}
 
-A generic placeholder can be surrounded by brackets to separate it from the
-surrounding text.
+A generic placeholder can be surrounded by parentheses to separate it from
+the surrounding text.
 
   /hello             -> /(:name)hello -> undef
   /sebastian/23hello -> /(:name)hello -> undef
@@ -127,7 +127,7 @@ absolutely everything.
 =head2 Relaxed Placeholders
 
 Relaxed placeholders are similar to the two placeholders above, but always
-require brackets and match all characters except C</>.
+require parentheses and match all characters except C</>.
 
   /hello              -> /(.name)/hello -> undef
   /sebastian/23/hello -> /(.name)/hello -> undef

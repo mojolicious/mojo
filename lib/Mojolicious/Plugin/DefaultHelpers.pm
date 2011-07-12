@@ -42,7 +42,7 @@ sub register {
   $app->helper(
     dumper => sub {
       shift;
-      Data::Dumper->new([@_])->Maxdepth(2)->Indent(1)->Terse(1)->Dump;
+      Data::Dumper->new([@_])->Indent(1)->Terse(1)->Dump;
     }
   );
 

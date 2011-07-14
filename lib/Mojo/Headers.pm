@@ -117,6 +117,9 @@ sub date         { scalar shift->header(Date           => @_) }
 sub dnt          { scalar shift->header(DNT            => @_) }
 sub expect       { scalar shift->header(Expect         => @_) }
 
+sub expires       { scalar shift->header(Expires         => @_) }
+sub cache_control { scalar shift->header('Cache-Control' => @_) }
+
 sub from_hash {
   my $self = shift;
   my $hash = shift;

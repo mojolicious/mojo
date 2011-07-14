@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # "Remember, you can always find East by staring directly at the sun."
-use Test::More tests => 37;
+use Test::More tests => 41;
 
 # "So, have a merry Christmas, a happy Hanukkah, a kwaazy Kwanza,
 #  a tip-top Tet, and a solemn, dignified, Ramadan.
@@ -34,6 +34,10 @@ is_deeply $hash->{Expect},         [['continue-100']], 'right structure';
 is_deeply $hash->{'Content-Type'}, [['text/html']],    'right structure';
 is_deeply [sort @{$headers->names}], [qw/Connection Content-Type Expect/],
   'right structure';
+$headers->expires('Thu, 01 Dec 1994 16:00:00 GMT');
+$headers->cache_control('public');
+is $headers->expires, 'Thu, 01 Dec 1994 16:00:00 GMT', 'right value';
+is $headers->cache_control, 'public', 'right value';
 
 # Multiline values
 $headers = Mojo::Headers->new;
@@ -56,11 +60,15 @@ $headers = Mojo::Headers->new;
 isa_ok $headers->parse(<<'EOF'), 'Mojo::Headers', 'right return value';
 Content-Type: text/plain
 Expect: 100-continue
+Cache-control: public
+Expires: Thu, 01 Dec 1994 16:00:00 GMT
 
 EOF
-ok $headers->is_done,      'parser is done';
-is $headers->content_type, 'text/plain', 'right value';
-is $headers->expect,       '100-continue', 'right value';
+ok $headers->is_done,       'parser is done';
+is $headers->content_type,  'text/plain', 'right value';
+is $headers->expect,        '100-continue', 'right value';
+is $headers->cache_control, 'public', 'right value';
+is $headers->expires,       'Thu, 01 Dec 1994 16:00:00 GMT', 'right value';
 
 # Set headers from hash
 $headers = Mojo::Headers->new;

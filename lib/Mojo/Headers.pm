@@ -102,6 +102,7 @@ sub add {
   return $self;
 }
 
+sub cache_control       { scalar shift->header('Cache-Control'       => @_) }
 sub connection          { scalar shift->header(Connection            => @_) }
 sub content_disposition { scalar shift->header('Content-Disposition' => @_) }
 sub content_length      { scalar shift->header('Content-Length'      => @_) }
@@ -116,6 +117,7 @@ sub cookie       { scalar shift->header(Cookie         => @_) }
 sub date         { scalar shift->header(Date           => @_) }
 sub dnt          { scalar shift->header(DNT            => @_) }
 sub expect       { scalar shift->header(Expect         => @_) }
+sub expires      { scalar shift->header(Expires        => @_) }
 
 sub from_hash {
   my $self = shift;
@@ -379,6 +381,13 @@ Add one or more header lines.
 
 Shortcut for the C<Authorization> header.
 
+=head2 C<cache_control>
+
+  my $cache_control = $headers->cache_control;
+  $headers          = $headers->cache_control('max-age=1, no-cache');
+
+Shortcut for the C<Cache-Control> header.
+
 =head2 C<connection>
 
   my $connection = $headers->connection;
@@ -449,6 +458,13 @@ Note that this method is EXPERIMENTAL and might change without warning!
   $headers   = $headers->expect('100-continue');
 
 Shortcut for the C<Expect> header.
+
+=head2 C<expires>
+
+  my $expires = $headers->expires;
+  $headers    = $headers->expires('Thu, 01 Dec 1994 16:00:00 GMT');
+
+Shortcut for the C<Expires> header.
 
 =head2 C<from_hash>
 

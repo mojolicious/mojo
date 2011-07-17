@@ -138,7 +138,10 @@ my $connected;
 $loop->connect(
   address    => 'localhost',
   port       => $port,
-  on_connect => sub { $connected = 1 },
+  on_connect => sub { 
+    $connected = 1;
+    shift->stop;
+  },
   on_error   => sub {
     shift->stop;
     $error = pop;

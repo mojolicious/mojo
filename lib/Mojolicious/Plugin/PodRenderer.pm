@@ -69,8 +69,7 @@ sub register {
       my $path = Pod::Simple::Search->new->find($module, @PATHS);
 
       # Redirect to CPAN
-      my $cpan = 'http://search.cpan.org/perldoc';
-      return $self->redirect_to("$cpan?$module")
+      return $self->redirect_to("http://metacpan.org/module/$module")
         unless $path && -r $path;
 
       # Turn POD into HTML
@@ -83,8 +82,9 @@ sub register {
       $dom->find('a[href]')->each(
         sub {
           my $attrs = shift->attrs;
-          if ($attrs->{href} =~ /^$cpan/) {
-            $attrs->{href} =~ s/^$cpan\?/$perldoc/;
+          if ($attrs->{href} =~ /^http\:\/\/search\.cpan\.org\/perldoc/) {
+            $attrs->{href}
+              =~ s/^http\:\/\/search\.cpan\.org\/perldoc\?/$perldoc/;
             $attrs->{href} =~ s/%3A%3A/\//gi;
           }
         }

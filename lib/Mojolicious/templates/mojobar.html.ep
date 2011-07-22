@@ -63,7 +63,7 @@
     %= link_to Documentation => 'http://mojolicio.us/perldoc'
     %= link_to Wiki => 'https://github.com/kraih/mojo/wiki'
     %= link_to GitHub => 'https://github.com/kraih/mojo'
-    %= link_to CPAN => 'http://search.cpan.org/dist/Mojolicious'
+    %= link_to CPAN => 'http://metacpan.org/release/Mojolicious/'
     %= link_to MailingList => 'http://groups.google.com/group/mojolicious'
     %= link_to Blog => 'http://blog.kraih.com'
     %= link_to Twitter => 'http://twitter.com/kraih'

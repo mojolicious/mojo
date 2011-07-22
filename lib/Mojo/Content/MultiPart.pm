@@ -163,6 +163,10 @@ sub _parse_multipart {
     elsif (($self->{multi_state} || '') eq 'multipart_body') {
       last unless $self->_parse_multipart_body($boundary);
     }
+    
+    else {
+      last;
+    }
   }
 }
 

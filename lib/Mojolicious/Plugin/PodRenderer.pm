@@ -82,11 +82,9 @@ sub register {
       $dom->find('a[href]')->each(
         sub {
           my $attrs = shift->attrs;
-          if ($attrs->{href} =~ /^http\:\/\/search\.cpan\.org\/perldoc/) {
-            $attrs->{href}
+          $attrs->{href} =~ s/%3A%3A/\//gi
+            if $attrs->{href}
               =~ s/^http\:\/\/search\.cpan\.org\/perldoc\?/$perldoc/;
-            $attrs->{href} =~ s/%3A%3A/\//gi;
-          }
         }
       );
 

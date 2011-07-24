@@ -16,6 +16,7 @@ use constant EV => $ENV{MOJO_POLL}
   ? 0
   : eval 'use Mojo::IOWatcher::EV; 1';
 
+has client_class    => 'Mojo::IOLoop::Client';
 has connect_timeout => 3;
 has iowatcher       => sub {
 
@@ -39,7 +40,9 @@ has resolver => sub {
   weaken $resolver->{ioloop};
   return $resolver;
 };
-has timeout => '0.025';
+has server_class => 'Mojo::IOLoop::Server';
+has stream_class => 'Mojo::IOLoop::Stream';
+has timeout      => '0.025';
 
 # Singleton
 our $LOOP;
@@ -71,7 +74,7 @@ sub connect {
   my $args = ref $_[0] ? $_[0] : {@_};
 
   # New client
-  my $client = Mojo::IOLoop::Client->new;
+  my $client = $self->client_class->new;
   (my $id) = "$client" =~ /0x([\da-f]+)/;
   $id = $args->{id} if $args->{id};
   my $c = $self->{connections}->{$id} ||= {};
@@ -92,7 +95,7 @@ sub connect {
       # New stream
       my $c = $self->{connections}->{$id};
       delete $c->{client};
-      my $stream = $c->{stream} = Mojo::IOLoop::Stream->new($handle);
+      my $stream = $c->{stream} = $self->stream_class->new($handle);
       $stream->iowatcher($self->iowatcher);
       weaken $stream->{iowatcher};
 
@@ -175,7 +178,7 @@ sub listen {
   my $args = ref $_[0] ? $_[0] : {@_};
 
   # New server
-  my $server = Mojo::IOLoop::Server->new;
+  my $server = $self->server_class->new;
   (my $id) = "$server" =~ /0x([\da-f]+)/;
   $self->{servers}->{$id} = $server;
   $server->iowatcher($self->iowatcher);
@@ -192,7 +195,7 @@ sub listen {
       my $handle = pop;
 
       # New stream
-      my $stream = Mojo::IOLoop::Stream->new($handle);
+      my $stream = $self->stream_class->new($handle);
       (my $id) = "$stream" =~ /0x([\da-f]+)/;
       my $c = $self->{connections}->{$id} ||= {};
       $c->{stream} = $stream;
@@ -470,6 +473,15 @@ servers as easy as possible.
 
 L<Mojo::IOLoop> implements the following attributes.
 
+=head2 C<client_class>
+
+  my $class = $loop->client_class;
+  $loop     = $loop->client_class('Mojo::IOLoop::Client');
+
+Class to be used for performing non-blocking socket connections with the
+C<connect> method, defaults to L<Mojo::IOLoop::Client>.
+Note that this attribute is EXPERIMENTAL and might change without warning!
+
 =head2 C<connect_timeout>
 
   my $timeout = $loop->connect_timeout;
@@ -545,6 +557,23 @@ Note that exceptions in this callback are not captured.
   $loop        = $loop->resolver(Mojo::Resolver->new);
 
 DNS stub resolver, usually a L<Mojo::Resolver> object.
+Note that this attribute is EXPERIMENTAL and might change without warning!
+
+=head2 C<server_class>
+
+  my $class = $loop->server_class;
+  $loop     = $loop->server_class('Mojo::IOLoop::Server');
+
+Class to be used for accepting incoming connections with the C<listen>
+method, defaults to L<Mojo::IOLoop::Server>.
+Note that this attribute is EXPERIMENTAL and might change without warning!
+
+=head2 C<stream_class>
+
+  my $class = $loop->stream_class;
+  $loop     = $loop->stream_class('Mojo::IOLoop::Stream');
+
+Class to be used for streaming io, defaults to L<Mojo::IOLoop::Stream>.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<timeout>

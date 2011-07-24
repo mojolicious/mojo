@@ -282,7 +282,7 @@ Mojo::IOLoop::Server - IOLoop TCP Server
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Server> is the TCP server used by L<Mojo::IOLoop>.
+L<Mojo::IOLoop::Server> accepts incoming connections for L<Mojo::IOLoop>.
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 ATTRIBUTES

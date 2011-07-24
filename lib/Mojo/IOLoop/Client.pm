@@ -177,7 +177,8 @@ Mojo::IOLoop::Client - IOLoop TCP Client
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Client> is the TCP client used by L<Mojo::IOLoop>.
+L<Mojo::IOLoop::Client> performs non-blocking socket connections for
+L<Mojo::IOLoop>.
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 ATTRIBUTES

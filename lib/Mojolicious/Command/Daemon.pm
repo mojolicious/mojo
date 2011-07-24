@@ -42,6 +42,7 @@ sub run {
     'keepalive=i' => sub { $daemon->keep_alive_timeout($_[1]) },
     'listen=s'    => \@listen,
     'proxy' => sub { $ENV{MOJO_REVERSE_PROXY} = 1 },
+    'reload' => sub { warn "Ignoring --reload (use 'morbo myapp.pl' instead)!\n" },
     'requests=i'  => sub { $daemon->max_requests($_[1]) },
     'user=s'      => sub { $daemon->user($_[1]) },
     'websocket=i' => sub { $daemon->websocket_timeout($_[1]) }

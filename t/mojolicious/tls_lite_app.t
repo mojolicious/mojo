@@ -3,23 +3,25 @@
 use strict;
 use warnings;
 
-# Disable Bonjour, IPv6, epoll and kqueue
+# Disable Bonjour, IPv6 and libev
 BEGIN { $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
 use Test::More;
-use Mojo::IOLoop;
+use Mojo::IOLoop::Server;
+use Mojo::IOLoop::Stream;
 plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
   unless $ENV{TEST_TLS};
 plan skip_all => 'IO::Socket::SSL 1.43 required for this test!'
-  unless Mojo::IOLoop::TLS;
+  unless Mojo::IOLoop::Server::TLS;
 plan skip_all => 'Windows is too fragile for this test!'
-  if Mojo::IOLoop::WINDOWS;
+  if Mojo::IOLoop::Stream::WINDOWS;
 plan tests => 18;
 
 # "Look at these low, low prices on famous brand-name electronics!
 #  Don't be a sap, Dad. These are just crappy knockoffs.
 #  Pfft. I know a genuine Panaphonics when I see it.
 #  And look, there's a Magnetbox and Sorny."
+use Mojo::IOLoop;
 use Mojo::UserAgent;
 use Mojolicious::Lite;
 use Test::Mojo;

@@ -2,7 +2,6 @@ package Mojo::DOM::Collection;
 use Mojo::Base -base;
 use overload 'bool' => sub {1}, '""' => sub { shift->to_xml }, fallback => 1;
 
-# "Hi, Super Nintendo Chalmers!"
 sub new {
   my $class = shift;
   bless shift, ref $class || $class;

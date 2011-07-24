@@ -8,15 +8,13 @@ BEGIN { $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1 }
 
 use Test::More;
 
-# "Have you ever seen that Blue Man Group? Total ripoff of the Smurfs.
-#  And the Smurfs, well, they SUCK."
-plan skip_all => 'set TEST_EPOLL to enable this test (developer only!)'
-  unless $ENV{TEST_EPOLL};
-plan skip_all => 'IO::Epoll 0.02 required for this test!'
-  unless eval 'use IO::Epoll 0.02; 1';
-plan tests => 35;
+# "Oh well. At least we'll die doing what we love: inhaling molten rock."
+plan skip_all => 'set TEST_EV to enable this test (developer only!)'
+  unless $ENV{TEST_EV};
+plan skip_all => 'EV required for this test!' unless eval 'use EV; 1';
+plan tests => 50;
 
-use_ok 'Mojo::IOWatcher::Epoll';
+use_ok 'Mojo::IOWatcher::EV';
 
 use IO::Socket::INET;
 use Mojo::IOLoop;
@@ -29,7 +27,8 @@ my $listen = IO::Socket::INET->new(
   LocalPort => $port,
   Proto     => 'tcp'
 );
-my $watcher = Mojo::IOWatcher::Epoll->new;
+my $watcher = Mojo::IOWatcher::EV->new;
+isa_ok $watcher, 'Mojo::IOWatcher::EV', 'right object';
 my ($readable, $writable);
 $watcher->add(
   $listen,
@@ -49,7 +48,9 @@ is $writable, undef, 'handle is not writable';
 
 # Accept
 my $server = $listen->accept;
-$watcher = $watcher->new;
+$watcher = undef;
+$watcher = Mojo::IOWatcher::EV->new;
+isa_ok $watcher, 'Mojo::IOWatcher::EV', 'right object';
 $readable = $writable = undef;
 $watcher->add(
   $client,
@@ -61,7 +62,9 @@ is $readable, undef, 'handle is not readable';
 is $writable, 1,     'handle is writable';
 print $client "hello!\n";
 sleep 1;
-$watcher = $watcher->new;
+$watcher = undef;
+$watcher = Mojo::IOWatcher::EV->new;
+isa_ok $watcher, 'Mojo::IOWatcher::EV', 'right object';
 $readable = $writable = undef;
 $watcher->add(
   $server,
@@ -86,7 +89,7 @@ $watcher->add(
   on_readable => sub { $readable++ },
   on_writable => sub { $writable++ }
 );
-$watcher->watch(0);
+$watcher->one_tick(0);
 is $readable, 1, 'handle is readable';
 is $writable, 1, 'handle is writable';
 
@@ -105,19 +108,47 @@ is $readable,  3, 'handle is readable again';
 is $writable,  3, 'handle is writable again';
 is $timer,     1, 'timer was not triggered';
 is $recurring, 2, 'recurring was triggered again';
-$watcher->watch(0);
+$watcher->one_tick(0);
 is $readable,  4, 'handle is readable again';
 is $writable,  4, 'handle is writable again';
 is $timer,     1, 'timer was not triggered';
-is $recurring, 2, 'recurring was not triggered';
+is $recurring, 3, 'recurring was not triggered';
 $watcher->one_tick(0);
 is $readable,  5, 'handle is readable again';
 is $writable,  5, 'handle is writable again';
 is $timer,     1, 'timer was not triggered';
-is $recurring, 3, 'recurring was triggered again';
+is $recurring, 4, 'recurring was triggered again';
 $watcher->cancel($id);
 $watcher->one_tick(0);
 is $readable,  6, 'handle is readable again';
 is $writable,  6, 'handle is writable again';
 is $timer,     1, 'timer was not triggered';
-is $recurring, 3, 'recurring was not triggered again';
+is $recurring, 4, 'recurring was not triggered again';
+
+# Reset
+$watcher = undef;
+$watcher = Mojo::IOWatcher::EV->new;
+isa_ok $watcher, 'Mojo::IOWatcher::EV', 'right object';
+$watcher->one_tick(0);
+is $readable, 6, 'io event was not triggered again';
+is $writable, 6, 'io event was not triggered again';
+my $watcher2 = Mojo::IOWatcher::EV->new;
+isa_ok $watcher2, 'Mojo::IOWatcher', 'right object';
+
+# Parallel loops
+$timer = 0;
+$watcher->recurring(0 => sub { $timer++ });
+my $timer2 = 0;
+$watcher2->recurring(0 => sub { $timer2++ });
+$watcher->one_tick(0);
+is $timer,  1, 'timer was triggered';
+is $timer2, 0, 'timer was not triggered';
+$watcher2->one_tick(0);
+is $timer,  1, 'timer was not triggered';
+is $timer2, 1, 'timer was triggered';
+$watcher->one_tick(0);
+is $timer,  2, 'timer was triggered';
+is $timer2, 1, 'timer was not triggered';
+$watcher2->one_tick(0);
+is $timer,  2, 'timer was not triggered';
+is $timer2, 2, 'timer was triggered';

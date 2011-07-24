@@ -242,9 +242,6 @@ sub parent {
   );
 }
 
-# "Back you robots!
-#  Nobody ruins my family vacation but me!
-#  And maybe the boy."
 sub parse {
   my ($self, $xml) = @_;
   $self->charset(undef) if utf8::is_utf8 $xml;

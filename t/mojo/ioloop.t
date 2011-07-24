@@ -3,18 +3,16 @@
 use strict;
 use warnings;
 
-# Disable Bonjour, IPv6, epoll and kqueue
+# Disable Bonjour, IPv6 and libev
 BEGIN { $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 12;
+use Test::More tests => 11;
 
 # "Marge, you being a cop makes you the man!
 #  Which makes me the woman, and I have no interest in that,
 #  besides occasionally wearing the underwear,
 #  which as we discussed, is strictly a comfort thing."
 use_ok 'Mojo::IOLoop';
-
-use IO::Handle;
 
 # Custom watcher
 package MyWatcher;
@@ -27,16 +25,6 @@ Mojo::IOLoop->singleton->iowatcher(MyWatcher->new);
 my $loop = Mojo::IOLoop->new;
 Mojo::IOLoop->iowatcher(MyWatcher->new);
 is ref $loop->iowatcher, 'MyWatcher', 'right class';
-
-# Readonly handle
-my $ro = IO::Handle->new;
-$ro->fdopen(fileno(DATA), 'r');
-my $error;
-$loop->connect(
-  handle   => $ro,
-  on_read  => sub { },
-  on_error => sub { $error = pop }
-);
 
 # Ticks
 my $ticks = 0;
@@ -87,7 +75,6 @@ $loop->start;
 ok $after > 2, 'more than two ticks';
 is $ticks, $before, 'no additional ticks';
 
-
 # Recurring timer
 my $count = 0;
 $loop->recurring(0.5 => sub { $count++ });
@@ -117,9 +104,6 @@ $loop->connect(
 $loop->start;
 isa_ok $handle, 'IO::Socket', 'right reference';
 
-# Readonly handle
-is $error, undef, 'no error';
-
 # Dropped listen socket
 $port = Mojo::IOLoop->generate_port;
 $id = $loop->listen(port => $port);
@@ -133,7 +117,7 @@ $loop->connect(
   }
 );
 $loop->start;
-$error = undef;
+my $error;
 my $connected;
 $loop->connect(
   address    => 'localhost',
@@ -147,5 +131,3 @@ $loop->connect(
 $loop->start;
 ok $error, 'has error';
 ok !$connected, 'not connected';
-
-__DATA__

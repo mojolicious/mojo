@@ -304,8 +304,8 @@ TLS, Bonjour, IDNA, Comet (long polling), chunking and multipart support.
 
 =item *
 
-Built-in async IO web server supporting epoll, kqueue, UNIX domain sockets
-and hot deployment, perfect for embedding.
+Built-in async IO web server supporting libev and hot deployment, perfect for
+embedding.
 
 =item *
 
@@ -466,7 +466,7 @@ especially when working in a team.
     # All common HTTP verbs are supported
     $example->post('/title')->to('#title');
 
-    # ... and much, much more
+    # ...and much, much more
     # (including multiple, auto-discovered controllers)
     $r->websocket('/echo')->to('realtime#echo');
   }

@@ -230,9 +230,9 @@ make sense for a standalone parser.
   # Extract title
   print 'Title: ', $tx->res->dom->at('head > title')->text, "\n";
 
-  # Extract headers
+  # Extract headings
   $tx->res->dom('h1, h2, h3')->each(sub {
-    print 'Header: ', shift->all_text, "\n";
+    print 'Heading: ', shift->all_text, "\n";
   });
 
 Especially for unit testing your L<Mojolicious> applications this can be a
@@ -429,11 +429,11 @@ How about a list of all id attributes?
 
   % mojo get http://mojolicio.us '*' attr id
 
-Or the text content of all header tags?
+Or the text content of all heading tags?
 
   % mojo get http://mojolicio.us 'h1, h2, h3' text
 
-Maybe just the text of the third header?
+Maybe just the text of the third heading?
 
   % mojo get http://mojolicio.us 'h1, h2, h3' 3 text
 

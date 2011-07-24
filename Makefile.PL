@@ -68,7 +68,6 @@ WriteMakefile(
     'IO::Poll'               => 0,
     'IO::Socket'             => 0,
     'IO::Socket::INET'       => 0,
-    'IO::Socket::UNIX'       => 0,
     'List::Util'             => 0,
     'Locale::Maketext'       => 0,
     'MIME::Base64'           => 0,

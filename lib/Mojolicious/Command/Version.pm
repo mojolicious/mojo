@@ -2,6 +2,7 @@ package Mojolicious::Command::Version;
 use Mojo::Base 'Mojo::Command';
 
 use Mojo::IOLoop;
+use Mojo::IOLoop::Server;
 use Mojo::Server::Daemon;
 use Mojo::UserAgent;
 use Mojolicious;
@@ -34,19 +35,16 @@ sub run {
   $message = "You might want to update your Mojolicious to $latest."
     if $latest > $current;
 
-  # Epoll
-  my $epoll = Mojo::IOLoop::EPOLL() ? $IO::Epoll::VERSION : 'not installed';
-
-  # KQueue
-  my $kqueue =
-    Mojo::IOLoop::KQUEUE() ? $IO::KQueue::VERSION : 'not installed';
+  # EV
+  my $ev = Mojo::IOLoop::EV() ? $EV::VERSION : 'not installed';
 
   # IPv6
   my $ipv6 =
-    Mojo::IOLoop::IPV6() ? $IO::Socket::IP::VERSION : 'not installed';
+    Mojo::IOLoop::Server::IPV6() ? $IO::Socket::IP::VERSION : 'not installed';
 
   # TLS
-  my $tls = Mojo::IOLoop::TLS() ? $IO::Socket::SSL::VERSION : 'not installed';
+  my $tls =
+    Mojo::IOLoop::Server::TLS() ? $IO::Socket::SSL::VERSION : 'not installed';
 
   # Bonjour
   my $bonjour =
@@ -60,8 +58,7 @@ CORE
   Mojolicious ($Mojolicious::VERSION, $Mojolicious::CODENAME)
 
 OPTIONAL
-  IO::Epoll                ($epoll)
-  IO::KQueue               ($kqueue)
+  EV                       ($ev)
   IO::Socket::IP           ($ipv6)
   IO::Socket::SSL          ($tls)
   Net::Rendezvous::Publish ($bonjour)

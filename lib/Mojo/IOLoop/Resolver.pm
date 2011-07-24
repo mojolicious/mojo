@@ -1,8 +1,9 @@
-package Mojo::Resolver;
+package Mojo::IOLoop::Resolver;
 use Mojo::Base -base;
 
+use IO::File;
+use IO::Socket::INET;
 use List::Util 'first';
-use Mojo::IOLoop;
 use Mojo::URL;
 
 use constant DEBUG => $ENV{MOJO_RESOLVER_DEBUG} || 0;
@@ -26,7 +27,10 @@ BEGIN {
 # IPv6 DNS support requires "AF_INET6" and "inet_pton"
 use constant IPV6 => defined IPV6_AF_INET6 && defined &inet_pton;
 
-has ioloop => sub { Mojo::IOLoop->new };
+has ioloop => sub {
+  require Mojo::IOLoop;
+  Mojo::IOLoop->singleton;
+};
 has timeout => 3;
 
 # DNS server (default to Google Public DNS)
@@ -72,8 +76,7 @@ sub lookup {
   my ($self, $name, $cb) = @_;
 
   # "localhost"
-  my $loop = $self->ioloop;
-  return $loop->timer(0 => sub { shift->$cb($LOCALHOST) })
+  return $self->ioloop->timer(0 => sub { $self->$cb($LOCALHOST) })
     if $name eq 'localhost';
 
   # IPv4
@@ -126,7 +129,6 @@ sub resolve {
   my $id = $loop->connect(
     address    => $server,
     port       => 53,
-    proto      => 'udp',
     on_connect => sub {
       my ($loop, $id) = @_;
 
@@ -198,7 +200,8 @@ sub resolve {
         warn "ANSWER $answer[0] $answer[1]\n" if DEBUG;
       }
       $self->$cb(\@answers);
-    }
+    },
+    args => {Proto => 'udp', Type => SOCK_DGRAM}
   );
 
   # Timer
@@ -311,20 +314,20 @@ __END__
 
 =head1 NAME
 
-Mojo::Resolver - Async IO DNS Resolver
+Mojo::IOLoop::Resolver - IOLoop Stub Resolver
 
 =head1 SYNOPSIS
 
-  use Mojo::Resolver;
+  use Mojo::IOLoop::Resolver;
 
 =head1 DESCRIPTION
 
-L<Mojo::Resolver> is a minimalistic async io stub resolver.
+L<Mojo::IOLoop::Resolver> is a minimalistic async io stub resolver.
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 ATTRIBUTES
 
-L<Mojo::Resolver> implements the following attributes.
+L<Mojo::IOLoop::Resolver> implements the following attributes.
 
 =head2 C<ioloop>
 
@@ -343,8 +346,8 @@ Maximum time in seconds a C<DNS> lookup can take, defaults to C<3>.
 
 =head1 METHODS
 
-L<Mojo::Resolver> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Mojo::IOLoop::Resolver> inherits all methods from L<Mojo::Base> and
+implements the following new ones.
 
 =head2 C<servers>
 

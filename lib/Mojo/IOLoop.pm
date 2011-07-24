@@ -1,108 +1,31 @@
 package Mojo::IOLoop;
 use Mojo::Base -base;
 
-use Carp 'croak';
-use Errno qw/EAGAIN EINTR ECONNRESET EWOULDBLOCK/;
-use File::Spec;
-use IO::File;
-use IO::Socket::INET;
-use IO::Socket::UNIX;
+use Mojo::IOLoop::Client;
+use Mojo::IOLoop::Resolver;
+use Mojo::IOLoop::Server;
+use Mojo::IOLoop::Stream;
 use Mojo::IOWatcher;
-use Mojo::Resolver;
 use Scalar::Util 'weaken';
-use Socket qw/IPPROTO_TCP TCP_NODELAY/;
 use Time::HiRes 'time';
 
-use constant DEBUG      => $ENV{MOJO_IOLOOP_DEBUG} || 0;
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE}   || 131072;
+use constant DEBUG => $ENV{MOJO_IOLOOP_DEBUG} || 0;
 
-# IPv6 support requires IO::Socket::IP
-use constant IPV6 => $ENV{MOJO_NO_IPV6}
+# libev support requires EV
+use constant EV => $ENV{MOJO_POLL}
   ? 0
-  : eval 'use IO::Socket::IP 0.06 (); 1';
+  : eval 'use Mojo::IOWatcher::EV; 1';
 
-# Epoll support requires IO::Epoll
-use constant EPOLL => $ENV{MOJO_POLL}
-  ? 0
-  : eval 'use Mojo::IOWatcher::Epoll; 1';
+has connect_timeout => 3;
+has iowatcher       => sub {
 
-# KQueue support requires IO::KQueue
-use constant KQUEUE => $ENV{MOJO_POLL}
-  ? 0
-  : eval 'use Mojo::IOWatcher::KQueue; 1';
-
-# TLS support requires IO::Socket::SSL
-use constant TLS => $ENV{MOJO_NO_TLS}
-  ? 0
-  : eval 'use IO::Socket::SSL 1.43 "inet4"; 1';
-use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
-use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
-
-# Windows
-use constant WINDOWS => $^O eq 'MSWin32' || $^O =~ /cygwin/ ? 1 : 0;
-
-# Default TLS cert (20.03.2010)
-# (openssl req -new -x509 -keyout cakey.pem -out cacert.pem -nodes -days 7300)
-use constant CERT => <<EOF;
------BEGIN CERTIFICATE-----
-MIIDbzCCAtigAwIBAgIJAM+kFv1MwalmMA0GCSqGSIb3DQEBBQUAMIGCMQswCQYD
-VQQGEwJERTEWMBQGA1UECBMNTmllZGVyc2FjaHNlbjESMBAGA1UEBxMJSGFtYmVy
-Z2VuMRQwEgYDVQQKEwtNb2pvbGljaW91czESMBAGA1UEAxMJbG9jYWxob3N0MR0w
-GwYJKoZIhvcNAQkBFg5rcmFpaEBjcGFuLm9yZzAeFw0xMDAzMjAwMDQ1MDFaFw0z
-MDAzMTUwMDQ1MDFaMIGCMQswCQYDVQQGEwJERTEWMBQGA1UECBMNTmllZGVyc2Fj
-aHNlbjESMBAGA1UEBxMJSGFtYmVyZ2VuMRQwEgYDVQQKEwtNb2pvbGljaW91czES
-MBAGA1UEAxMJbG9jYWxob3N0MR0wGwYJKoZIhvcNAQkBFg5rcmFpaEBjcGFuLm9y
-ZzCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAzu9mOiyUJB2NBuf1lZxViNM2
-VISqRAoaXXGOBa6RgUoVfA/n81RQlgvVA0qCSQHC534DdYRk3CdyJR9UGPuxF8k4
-CckOaHWgcJJsd8H0/q73PjbA5ItIpGTTJNh8WVpFDjHTJmQ5ihwddap4/offJxZD
-dPrMFtw1ZHBRug5tHUECAwEAAaOB6jCB5zAdBgNVHQ4EFgQUo+Re5wuuzVFqH/zV
-cxRGXL0j5K4wgbcGA1UdIwSBrzCBrIAUo+Re5wuuzVFqH/zVcxRGXL0j5K6hgYik
-gYUwgYIxCzAJBgNVBAYTAkRFMRYwFAYDVQQIEw1OaWVkZXJzYWNoc2VuMRIwEAYD
-VQQHEwlIYW1iZXJnZW4xFDASBgNVBAoTC01vam9saWNpb3VzMRIwEAYDVQQDEwls
-b2NhbGhvc3QxHTAbBgkqhkiG9w0BCQEWDmtyYWloQGNwYW4ub3JnggkAz6QW/UzB
-qWYwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQUFAAOBgQCZZcOeAobctD9wtPtO
-40CKHpiGYEM3rh7VvBhjTcVnX6XlLvffIg3uTrVRhzmlEQCZz3O5TsBzfMAVnjYz
-llhwgRF6Xn8ict9L8yKDoGSbw0Q7HaCb8/kOe0uKhcSDUd3PjJU0ZWgc20zcGFA9
-R65bABoJ2vU1rlQFmjs0RT4UcQ==
------END CERTIFICATE-----
-EOF
-
-# Default TLS key (20.03.2010)
-# (openssl req -new -x509 -keyout cakey.pem -out cacert.pem -nodes -days 7300)
-use constant KEY => <<EOF;
------BEGIN RSA PRIVATE KEY-----
-MIICXAIBAAKBgQDO72Y6LJQkHY0G5/WVnFWI0zZUhKpEChpdcY4FrpGBShV8D+fz
-VFCWC9UDSoJJAcLnfgN1hGTcJ3IlH1QY+7EXyTgJyQ5odaBwkmx3wfT+rvc+NsDk
-i0ikZNMk2HxZWkUOMdMmZDmKHB11qnj+h98nFkN0+swW3DVkcFG6Dm0dQQIDAQAB
-AoGAeLmd8C51tqQu1GqbEc+E7zAZsDE9jDhArWdELfhsFvt7kUdOUN1Nrlv0x9i+
-LY2Dgb44kmTM2suAgjvGulSMOYBGosZcM0w3ES76nmeAVJ1NBFhbZTCJqo9svoD/
-NKdctRflUuvFSWimoui+vj9D5p/4lvAMdBHUWj5FlQsYiOECQQD/FRXtsDetptFu
-Vp8Kw+6bZ5+efcjVfciTp7fQKI2xZ2n1QyloaV4zYXgDC2y3fMYuRigCGrX9XeFX
-oGHGMyYFAkEAz635I8f4WQa/wvyl/SR5agtDVnkJqMHMgOuykytiF8NFbDSkJv+b
-1VfyrWcfK/PVsSGBI67LCMDoP+PZBVOjDQJBAIInoCjH4aEZnYNPb5duojFpjmiw
-helpZQ7yZTgxeRssSUR8IITGPuq4sSPckHyPjg/OfFuWhYXigTjU/Q7EyoECQERT
-Dykna9wWLVZ/+jgLHOq3Y+L6FSRxBc/QO0LRvgblVlygAPVXmLQaqBtGVuoF4WLS
-DANqSR/LH12Nn2NyPa0CQBbzoHgx2i3RncWoq1EeIg2mSMevEcjA6sxgYmsyyzlv
-AnqxHi90n/p912ynLg2SjBq+03GaECeGzC/QqKK2gtA=
------END RSA PRIVATE KEY-----
-EOF
-
-has [qw/accept_timeout connect_timeout/] => 3;
-has iowatcher => sub {
-
-  # "kqueue"
-  if (KQUEUE) {
-    warn "KQUEUE MAINLOOP\n" if DEBUG;
-    return Mojo::IOWatcher::KQueue->new;
+  # libev
+  if (EV) {
+    warn "EV MAINLOOP\n" if DEBUG;
+    return Mojo::IOWatcher::EV->new;
   }
 
-  # "epoll"
-  if (EPOLL) {
-    warn "EPOLL MAINLOOP\n" if DEBUG;
-    return Mojo::IOWatcher::Epoll->new;
-  }
-
-  # "poll"
+  # poll
   warn "POLL MAINLOOP\n" if DEBUG;
   Mojo::IOWatcher->new;
 };
@@ -112,20 +35,14 @@ has [qw/on_lock on_unlock/] => sub {
   sub {1}
 };
 has resolver => sub {
-  my $self = shift;
-  weaken $self;
-  Mojo::Resolver->new(ioloop => $self);
+  my $resolver = Mojo::IOLoop::Resolver->new(ioloop => shift);
+  weaken $resolver->{ioloop};
+  return $resolver;
 };
 has timeout => '0.025';
 
 # Singleton
 our $LOOP;
-
-sub DESTROY {
-  my $self = shift;
-  if (my $cert = $self->{cert}) { unlink $cert if -w $cert }
-  if (my $key  = $self->{key})  { unlink $key  if -w $key }
-}
 
 sub new {
   my $class = shift;
@@ -152,48 +69,78 @@ sub connect {
   my $self = shift;
   $self = $self->singleton unless ref $self;
   my $args = ref $_[0] ? $_[0] : {@_};
-  $args->{proto} ||= 'tcp';
 
-  # New connection
-  my $c = {
-    buffer     => '',
-    on_connect => $args->{on_connect},
-    connecting => 1,
-    tls        => $args->{tls},
-    tls_cert   => $args->{tls_cert},
-    tls_key    => $args->{tls_key}
-  };
-  (my $id) = "$c" =~ /0x([\da-f]+)/;
-  $self->{cs}->{$id} = $c;
+  # New client
+  my $client = Mojo::IOLoop::Client->new;
+  (my $id) = "$client" =~ /0x([\da-f]+)/;
+  $id = $args->{id} if $args->{id};
+  my $c = $self->{connections}->{$id} ||= {};
+  $c->{client} = $client;
+  $client->resolver($self->resolver);
+  weaken $client->{resolver};
 
-  # Register callbacks
-  for my $name (qw/close error read/) {
-    my $cb    = $args->{"on_$name"};
-    my $event = "on_$name";
-    $self->$event($id => $cb) if $cb;
-  }
+  # Events
+  $c->{close}   ||= delete $args->{on_close};
+  $c->{connect} ||= delete $args->{on_connect};
+  $c->{error}   ||= delete $args->{on_error};
+  $c->{read}    ||= delete $args->{on_read};
+  weaken $self;
+  $client->on(
+    connect => sub {
+      my $handle = pop;
 
-  # Lookup
-  if (!$args->{handle} && (my $address = $args->{address})) {
-    weaken $self;
-    $self->resolver->lookup(
-      $address => sub {
-        my $resolver = shift;
-        $args->{address} = shift || $args->{address};
-        $self->_connect($id, $args);
-      }
-    );
-  }
+      # New stream
+      my $c = $self->{connections}->{$id};
+      delete $c->{client};
+      my $stream = $c->{stream} = Mojo::IOLoop::Stream->new($handle);
+      $stream->iowatcher($self->iowatcher);
+      weaken $stream->{iowatcher};
+
+      # Events
+      $stream->on(
+        close => sub {
+          $c->{close}->($self, $id) if $c->{close};
+          $self->drop($id);
+        }
+      );
+      weaken $c;
+      $stream->on(
+        error => sub {
+          my $c = delete $self->{connections}->{$id};
+          $c->{error}->($self, $id, pop) if $c->{error};
+        }
+      );
+      $stream->on(
+        read => sub {
+          my $c = $self->{connections}->{$id};
+          $c->{active} = time;
+          $c->{read}->($self, $id, pop) if $c->{read};
+        }
+      );
+
+      # Connected
+      $stream->resume;
+      $self->write($id, @$_) for @{$c->{write} || []};
+      $c->{connect}->($self, $id) if $c->{connect};
+    }
+  );
+  $client->on(
+    error => sub {
+      my $c = delete $self->{connections}->{$id};
+      $c->{error}->($self, $id, pop) if $c->{error};
+    }
+  );
 
   # Connect
-  else { $self->_connect($id, $args) }
+  $args->{timeout} ||= $self->connect_timeout;
+  $client->connect($args);
 
   return $id;
 }
 
 sub connection_timeout {
   my ($self, $id, $timeout) = @_;
-  return unless my $c = $self->{cs}->{$id};
+  return unless my $c = $self->{connections}->{$id};
   $c->{timeout} = $timeout and return $self if $timeout;
   $c->{timeout};
 }
@@ -201,29 +148,17 @@ sub connection_timeout {
 sub drop {
   my ($self, $id) = @_;
   $self = $self->singleton unless ref $self;
-
-  # Drop connections gracefully
-  if (my $c = $self->{cs}->{$id}) { return $c->{finish} = 1 }
-
-  # Drop everything else right away
+  if (my $c = $self->{connections}->{$id}) { return $c->{finish} = 1 }
   $self->_drop($id);
 }
 
-sub generate_port {
+sub generate_port { Mojo::IOLoop::Server->generate_port }
 
-  # Try random ports
-  my $port = 1 . int(rand 10) . int(rand 10) . int(rand 10) . int(rand 10);
-  while ($port++ < 30000) {
-    return $port
-      if IO::Socket::INET->new(
-      Listen    => 5,
-      LocalAddr => '127.0.0.1',
-      LocalPort => $port,
-      Proto     => 'tcp'
-      );
-  }
-
-  return;
+sub handle {
+  my ($self, $id) = @_;
+  return unless my $c      = $self->{connections}->{$id};
+  return unless my $stream = $c->{stream};
+  return $stream->handle;
 }
 
 sub is_running {
@@ -239,109 +174,75 @@ sub listen {
   $self = $self->singleton unless ref $self;
   my $args = ref $_[0] ? $_[0] : {@_};
 
-  # No TLS support
-  croak "IO::Socket::SSL 1.43 required for TLS support"
-    if $args->{tls} && !TLS;
+  # New server
+  my $server = Mojo::IOLoop::Server->new;
+  (my $id) = "$server" =~ /0x([\da-f]+)/;
+  $self->{servers}->{$id} = $server;
+  $server->iowatcher($self->iowatcher);
+  weaken $server->{iowatcher};
 
-  # Look for reusable file descriptor
-  my $file  = $args->{file};
-  my $port  = $args->{port} || 3000;
-  my $reuse = defined $file ? $file : $port;
-  $ENV{MOJO_REUSE} ||= '';
-  my $fd;
-  if ($ENV{MOJO_REUSE} =~ /(?:^|\,)$reuse\:(\d+)/) { $fd = $1 }
+  # Events
+  my $accept = delete $args->{on_accept};
+  my $close  = delete $args->{on_close};
+  my $error  = delete $args->{on_error};
+  my $read   = delete $args->{on_read};
+  weaken $self;
+  $server->on(
+    accept => sub {
+      my $handle = pop;
 
-  # Stop listening so the new socket has a chance to join
-  $self->_not_listening;
+      # New stream
+      my $stream = Mojo::IOLoop::Stream->new($handle);
+      (my $id) = "$stream" =~ /0x([\da-f]+)/;
+      my $c = $self->{connections}->{$id} ||= {};
+      $c->{stream} = $stream;
+      $stream->iowatcher($self->iowatcher);
+      weaken $stream->{iowatcher};
 
-  # Allow file descriptor inheritance
-  local $^F = 1000;
+      # Events
+      $c->{close} = $close;
+      $c->{error} = $error;
+      $c->{read}  = $read;
+      $stream->on(
+        close => sub {
+          my $c = delete $self->{connections}->{$id};
+          $c->{close}->($self, $id) if $c->{close};
+        }
+      );
+      $stream->on(
+        error => sub {
+          my $c = delete $self->{connections}->{$id};
+          $c->{error}->($self, $id, pop) if $c->{error};
+        }
+      );
+      $stream->on(
+        read => sub {
+          my $c = $self->{connections}->{$id};
+          $c->{active} = time;
+          $c->{read}->($self, $id, pop) if $c->{read};
+        }
+      );
 
-  # Listen on UNIX domain socket
-  my $handle;
-  my %options = (
-    Listen => $args->{backlog} || SOMAXCONN,
-    Proto  => 'tcp',
-    Type   => SOCK_STREAM,
-    %{$args->{args} || {}}
+      # Accept and enforce limit
+      $stream->resume;
+      $accept->($self, $id) if $accept;
+      $self->max_connections(0)
+        if defined $self->{accepts} && --$self->{accepts} == 0;
+      $self->_not_listening;
+    }
   );
-  if (defined $file) {
-    $options{Local} = $file;
-    $handle =
-      defined $fd
-      ? IO::Socket::UNIX->new
-      : IO::Socket::UNIX->new(%options)
-      or croak "Can't create listen socket: $!";
-  }
 
-  # Listen on TCP port
-  else {
-    $options{LocalAddr} = $args->{address} || '0.0.0.0';
-    $options{LocalPort} = $port;
-    $options{Proto}     = 'tcp';
-    $options{ReuseAddr} = 1;
-    $options{LocalAddr} =~ s/[\[\]]//g;
-    my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';
-    $handle = defined $fd ? $class->new : $class->new(%options)
-      or croak "Can't create listen socket: $!";
-  }
-
-  # Reuse file descriptor
-  if (defined $fd) {
-    $handle->fdopen($fd, 'r')
-      or croak "Can't open file descriptor $fd: $!";
-  }
-  else {
-    $fd = fileno $handle;
-    $reuse = ",$reuse" if length $ENV{MOJO_REUSE};
-    $ENV{MOJO_REUSE} .= "$reuse:$fd";
-  }
-
-  # New connection
-  my $c = {
-    file => $args->{file} ? 1 : 0,
-    on_accept => $args->{on_accept},
-    on_close  => $args->{on_close},
-    on_error  => $args->{on_error},
-    on_read   => $args->{on_read},
-  };
-  (my $id) = "$c" =~ /0x([\da-f]+)/;
-  $self->{listen}->{$id}      = $c;
-  $c->{handle}                = $handle;
-  $self->{reverse}->{$handle} = $id;
-
-  # TLS
-  if ($args->{tls}) {
-    my %options = (
-      SSL_startHandshake => 0,
-      SSL_cert_file      => $args->{tls_cert} || $self->_cert_file,
-      SSL_key_file       => $args->{tls_key} || $self->_key_file,
-    );
-    %options = (
-      SSL_verify_callback => $args->{tls_verify},
-      SSL_ca_file         => -T $args->{tls_ca} ? $args->{tls_ca} : undef,
-      SSL_ca_path         => -d $args->{tls_ca} ? $args->{tls_ca} : undef,
-      SSL_verify_mode     => $args->{tls_ca} ? 0x03 : undef,
-      %options
-    ) if $args->{tls_ca};
-    $c->{tls} = {%options, %{$args->{tls_args} || {}}};
-  }
-
-  # Accept limit
+  # Listen
+  $server->listen($args);
   $self->{accepts} = $self->max_accepts if $self->max_accepts;
+  $self->_not_listening;
 
   return $id;
 }
 
 sub local_info {
   my ($self, $id) = @_;
-
-  # UNIX domain socket info
-  return {} unless my $c      = $self->{cs}->{$id};
-  return {} unless my $handle = $c->{handle};
-  return {path => $handle->hostpath} if $handle->can('hostpath');
-
-  # TCP socket info
+  return {} unless my $handle = $self->handle($id);
   return {address => $handle->sockhost, port => $handle->sockport};
 }
 
@@ -349,30 +250,20 @@ sub on_close { shift->_event(close => @_) }
 sub on_error { shift->_event(error => @_) }
 sub on_read  { shift->_event(read  => @_) }
 
-sub recurring {
-  my ($self, $after, $cb) = @_;
-  $self = $self->singleton unless ref $self;
-  weaken $self;
-  return $self->iowatcher->recurring($after => sub { $self->$cb(pop) });
-}
-
 sub one_tick {
   my ($self, $timeout) = @_;
   $timeout = $self->timeout unless defined $timeout;
 
   # Housekeeping
   $self->_listening;
-  my $connections = $self->{cs} ||= {};
+  my $connections = $self->{connections} ||= {};
   while (my ($id, $c) = each %$connections) {
 
     # Connection needs to be finished
-    if ($c->{finish} && !length $c->{buffer} && !$c->{drain}) {
+    if ($c->{finish} && (!$c->{stream} || $c->{stream}->is_finished)) {
       $self->_drop($id);
       next;
     }
-
-    # Read only
-    $self->_not_writing($id) if delete $c->{read_only};
 
     # Connection timeout
     my $time = $c->{active} ||= time;
@@ -386,21 +277,16 @@ sub one_tick {
   $self->iowatcher->one_tick($timeout);
 }
 
-sub handle {
-  my ($self, $id) = @_;
-  return unless my $c = $self->{cs}->{$id};
-  return $c->{handle};
+sub recurring {
+  my ($self, $after, $cb) = @_;
+  $self = $self->singleton unless ref $self;
+  weaken $self;
+  return $self->iowatcher->recurring($after => sub { $self->$cb(pop) });
 }
 
 sub remote_info {
   my ($self, $id) = @_;
-
-  # UNIX domain socket info
-  return {} unless my $c      = $self->{cs}->{$id};
-  return {} unless my $handle = $c->{handle};
-  return {path => $handle->peerpath} if $handle->can('peerpath');
-
-  # TCP socket info
+  return {} unless my $handle = $self->handle($id);
   return {address => $handle->peerhost, port => $handle->peerport};
 }
 
@@ -425,43 +311,12 @@ sub start_tls {
   my $id   = shift;
   my $args = ref $_[0] ? $_[0] : {@_};
 
-  # No TLS support
-  unless (TLS) {
-    $self->_error($id, 'IO::Socket::SSL 1.43 required for TLS support.');
-    return;
-  }
-
-  # Cleanup
-  $self->drop($id) and return unless my $c      = $self->{cs}->{$id};
-  $self->drop($id) and return unless my $handle = $c->{handle};
-  delete $self->{reverse}->{$handle};
-  my $watcher = $self->iowatcher->remove($handle);
-
-  # TLS upgrade
-  weaken $self;
-  my %options = (
-    SSL_startHandshake => 0,
-    SSL_error_trap     => sub { $self->_error($id, $_[1]) },
-    SSL_cert_file      => $args->{tls_cert},
-    SSL_key_file       => $args->{tls_key},
-    SSL_verify_mode    => 0x00,
-    SSL_create_ctx_callback =>
-      sub { Net::SSLeay::CTX_sess_set_cache_size(shift, 128) },
-    Timeout => $self->connect_timeout,
-    %{$args->{tls_args} || {}}
-  );
-  $self->drop($id) and return
-    unless my $new = IO::Socket::SSL->start_SSL($handle, %options);
-  $c->{handle} = $new;
-  $self->{reverse}->{$new} = $id;
-  $c->{tls_connect} = 1;
-  $watcher->add(
-    $new,
-    on_readable => sub { $self->_read($id) },
-    on_writable => sub { $self->_write($id) }
-  )->writing($new);
-
-  return $id;
+  # Steal handle and upgrade to TLS
+  my $stream = delete $self->{connections}->{$id}->{stream};
+  $args->{handle} = $stream->steal_handle;
+  $args->{id}     = $id;
+  $args->{tls}    = 1;
+  $self->connect($args);
 }
 
 sub stop {
@@ -472,9 +327,9 @@ sub stop {
 
 sub test {
   my ($self, $id) = @_;
-  return unless my $c      = $self->{cs}->{$id};
-  return unless my $handle = $c->{handle};
-  return $self->iowatcher->is_readable($handle);
+  return unless my $c      = $self->{connections}->{$id};
+  return unless my $stream = $c->{stream};
+  return $self->iowatcher->is_readable($stream->handle);
 }
 
 sub timer {
@@ -487,408 +342,62 @@ sub timer {
 sub write {
   my ($self, $id, $chunk, $cb) = @_;
 
-  # Prepare chunk for writing
-  my $c = $self->{cs}->{$id};
-  $c->{buffer} .= $chunk;
-
-  # UNIX only quick write
-  unless (WINDOWS) {
-    $c->{drain} = 0 if $cb;
-    $self->_write($id);
+  # Write right away
+  my $c = $self->{connections}->{$id};
+  $c->{active} = time;
+  if (my $stream = $c->{stream}) {
+    return $stream->write($chunk) unless $cb;
+    weaken $self;
+    return $stream->write($chunk, sub { $self->$cb($id) });
   }
 
-  # Write with roundtrip
-  $c->{drain} = $cb if $cb;
-  $self->_writing($id) if $cb || length $c->{buffer};
-}
-
-sub _accept {
-  my ($self, $listen) = @_;
-
-  # Accept
-  my $handle = $listen->accept or return;
-  my $r      = $self->{reverse};
-  my $l      = $self->{listen}->{$r->{$listen}};
-
-  # New connection
-  my $c = {buffer => ''};
-  (my $id) = "$c" =~ /0x([\da-f]+)/;
-  $self->{cs}->{$id} = $c;
-
-  # TLS handshake
-  weaken $self;
-  if (my $tls = $l->{tls}) {
-    $tls->{SSL_error_trap} = sub { $self->_error($id, $_[1]) };
-    $handle = IO::Socket::SSL->start_SSL($handle, %$tls);
-    $c->{tls_accept} = 1;
-  }
-
-  # Start watching for events
-  $self->iowatcher->add(
-    $handle,
-    on_readable => sub { $self->_read($id) },
-    on_writable => sub { $self->_write($id) }
-  );
-  $c->{handle} = $handle;
-  $r->{$handle} = $id;
-
-  # Non-blocking
-  $handle->blocking(0);
-
-  # Disable Nagle's algorithm
-  setsockopt($handle, IPPROTO_TCP, TCP_NODELAY, 1) unless $l->{file};
-
-  # Register callbacks
-  for my $name (qw/on_close on_error on_read/) {
-    my $cb = $l->{$name};
-    $self->$name($id => $cb) if $cb;
-  }
-
-  # Accept limit
-  $self->max_connections(0)
-    if defined $self->{accepts} && --$self->{accepts} == 0;
-
-  # Accept callback
-  warn "ACCEPTED $id\n" if DEBUG;
-  if ((my $cb = $c->{on_accept} = $l->{on_accept}) && !$l->{tls}) {
-    $self->_sandbox('accept', $cb, $id);
-  }
-
-  # Stop listening
-  $self->_not_listening;
-}
-
-sub _cert_file {
-  my $self = shift;
-
-  # Check if temporary TLS cert file already exists
-  my $cert = $self->{cert};
-  return $cert if $cert && -r $cert;
-
-  # Create temporary TLS cert file
-  $cert = File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
-    'mojocert.pem');
-  croak qq/Can't create temporary TLS cert file "$cert"/
-    unless my $file = IO::File->new("> $cert");
-  print $file CERT;
-
-  $self->{cert} = $cert;
-}
-
-sub _connect {
-  my ($self, $id, $args) = @_;
-
-  # New handle
-  my $handle;
-  return unless my $c = $self->{cs}->{$id};
-  unless ($handle = $args->{handle}) {
-
-    # New socket
-    my %options = (
-      Blocking => 0,
-      PeerAddr => $args->{address},
-      PeerPort => $args->{port} || ($args->{tls} ? 443 : 80),
-      Proto    => $args->{proto},
-      Type     => $args->{proto} eq 'udp' ? SOCK_DGRAM : SOCK_STREAM,
-      %{$args->{args} || {}}
-    );
-    $options{PeerAddr} =~ s/[\[\]]//g if $options{PeerAddr};
-    my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';
-    return $self->_error($id, "Couldn't connect.")
-      unless $handle = $class->new(%options);
-
-    # Timer
-    $c->{connect_timer} =
-      $self->timer($self->connect_timeout,
-      sub { shift->_error($id, 'Connect timeout.') });
-
-    # IPv6 needs an early start
-    $handle->connect if IPV6;
-  }
-  $c->{handle} = $handle;
-  $self->{reverse}->{$handle} = $id;
-
-  # Non-blocking
-  $handle->blocking(0);
-
-  # Start writing right away
-  $self->iowatcher->add(
-    $handle,
-    on_readable => sub { $self->_read($id) },
-    on_writable => sub { $self->_write($id) }
-  )->writing($handle);
-
-  # Start TLS
-  if ($args->{tls}) { $self->start_tls($id => $args) }
+  # Delayed write
+  $c->{write} ||= [];
+  push @{$c->{write}}, [$chunk, $cb];
 }
 
 sub _drop {
   my ($self, $id) = @_;
-
-  # Cancel timer
   return $self unless my $watcher = $self->iowatcher;
   return $self if $watcher->cancel($id);
-
-  # Drop listen socket
-  my $c = $self->{cs}->{$id};
-  if ($c) { return if $c->{drop}++ }
-  elsif ($c = delete $self->{listen}->{$id}) {
-    return $self unless $self->{listening};
-    delete $self->{listening};
-  }
-
-  # Delete associated timers
-  if (my $t = $c->{connect_timer} || $c->{accept_timer}) { $self->_drop($t) }
-
-  # Drop handle
-  if (my $handle = $c->{handle}) {
-    warn "DISCONNECTED $id\n" if DEBUG;
-
-    # Handle close
-    if (my $cb = $c->{close}) { $self->_sandbox('close', $cb, $id) }
-
-    # Cleanup
-    delete $self->{cs}->{$id};
-    delete $self->{reverse}->{$handle};
-    $watcher->remove($handle);
-    close $handle;
-  }
-
+  if (delete $self->{servers}->{$id}) { delete $self->{listening} }
+  else { delete((delete($self->{connections}->{$id}) || {})->{stream}) }
   return $self;
-}
-
-sub _error {
-  my ($self, $id, $error) = @_;
-  $error ||= 'Unknown error, probably harmless.';
-  warn qq/ERROR $id "$error"\n/ if DEBUG;
-
-  # Handle error
-  return unless my $c = $self->{cs}->{$id};
-  if (my $cb = $c->{error}) { $self->_sandbox('error', $cb, $id, $error) }
-  else { warn "Unhandled event error: $error" and return }
-  $self->_drop($id);
 }
 
 sub _event {
   my ($self, $event, $id, $cb) = @_;
-  return unless my $c = $self->{cs}->{$id};
+  return unless my $c = $self->{connections}->{$id};
   $c->{$event} = $cb if $cb;
   return $self;
-}
-
-sub _key_file {
-  my $self = shift;
-
-  # Check if temporary TLS key file already exists
-  my $key = $self->{key};
-  return $key if $key && -r $key;
-
-  # Create temporary TLS key file
-  $key = File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
-    'mojokey.pem');
-  croak qq/Can't create temporary TLS key file "$key"/
-    unless my $file = IO::File->new("> $key");
-  print $file KEY;
-
-  $self->{key} = $key;
 }
 
 sub _listening {
   my $self = shift;
 
-  # Already listening or no listen sockets
+  # Check if we should be listening
   return if $self->{listening};
-  my $listen = $self->{listen} ||= {};
-  return unless keys %$listen;
-
-  # Check if we are allowed to listen and lock
-  my $i = keys %{$self->{cs}};
+  my $servers = $self->{servers} ||= {};
+  return unless keys %$servers;
+  my $i = keys %{$self->{connections}};
   return unless $i < $self->max_connections;
   return unless $self->on_lock->($self, !$i);
 
-  # Listen
-  weaken $self;
-  my $watcher = $self->iowatcher;
-  for my $lid (keys %$listen) {
-    $watcher->add($listen->{$lid}->{handle},
-      on_readable => sub { $self->_accept(pop) });
-  }
+  # Start listening
+  $_->resume for values %$servers;
   $self->{listening} = 1;
 }
 
 sub _not_listening {
   my $self = shift;
 
-  # Check if we are listening and unlock
+  # Check if we are listening
   return unless delete $self->{listening};
   $self->on_unlock->($self);
 
   # Stop listening
-  my $listen = $self->{listen} || {};
-  $self->iowatcher->remove($listen->{$_}->{handle}) for keys %$listen;
+  $_->pause for values %{$self->{servers} || {}};
   delete $self->{listening};
-}
-
-sub _not_writing {
-  my ($self, $id) = @_;
-  return unless my $c = $self->{cs}->{$id};
-  return $c->{read_only} = 1 if length $c->{buffer} || $c->{drain};
-  return unless my $handle = $c->{handle};
-  $self->iowatcher->not_writing($handle);
-}
-
-sub _read {
-  my ($self, $id) = @_;
-
-  # Check if everything is ready to read
-  my $c = $self->{cs}->{$id};
-  return $self->_tls_accept($id)  if $c->{tls_accept};
-  return $self->_tls_connect($id) if $c->{tls_connect};
-  return unless defined(my $handle = $c->{handle});
-
-  # Read
-  my $read = $handle->sysread(my $buffer, CHUNK_SIZE, 0);
-
-  # Error
-  unless (defined $read) {
-
-    # Retry
-    return if $! == EAGAIN || $! == EINTR || $! == EWOULDBLOCK;
-
-    # Connection reset
-    return $self->_drop($id) if $! == ECONNRESET;
-
-    # Read error
-    return $self->_error($id, $!);
-  }
-
-  # EOF
-  return $self->_drop($id) if $read == 0;
-
-  # Handle read
-  if (my $cb = $c->{read}) { $self->_sandbox('read', $cb, $id, $buffer) }
-
-  # Active
-  $c->{active} = time;
-}
-
-sub _sandbox {
-  my $self  = shift;
-  my $event = shift;
-  my $cb    = shift;
-  my $id    = shift;
-
-  # Sandbox event
-  unless (eval { $self->$cb($id, @_); 1 }) {
-    my $message = qq/Event "$event" failed for connection "$id": $@/;
-    $event eq 'error'
-      ? ($self->_drop($id) and warn $message)
-      : $self->_error($id, $message);
-  }
-}
-
-sub _tls_accept {
-  my ($self, $id) = @_;
-
-  # Accepted
-  my $c = $self->{cs}->{$id};
-  if ($c->{handle}->accept_SSL) {
-
-    # Handle TLS accept
-    delete $c->{tls_accept};
-    if (my $cb = $c->{on_accept}) { $self->_sandbox('accept', $cb, $id) }
-    return;
-  }
-
-  # Switch between reading and writing
-  $self->_tls_error($id);
-}
-
-sub _tls_connect {
-  my ($self, $id) = @_;
-
-  # Connected
-  my $c = $self->{cs}->{$id};
-  if ($c->{handle}->connect_SSL) {
-
-    # Handle TLS connect
-    delete $c->{tls_connect};
-    if (my $cb = $c->{on_connect}) { $self->_sandbox('connect', $cb, $id) }
-    return;
-  }
-
-  # Switch between reading and writing
-  $self->_tls_error($id);
-}
-
-sub _tls_error {
-  my ($self, $id) = @_;
-  my $error = $IO::Socket::SSL::SSL_ERROR;
-  if    ($error == TLS_READ)  { $self->_not_writing($id) }
-  elsif ($error == TLS_WRITE) { $self->_writing($id) }
-}
-
-sub _write {
-  my ($self, $id) = @_;
-
-  # Check if we are ready for writing
-  my $c = $self->{cs}->{$id};
-  return $self->_tls_accept($id)  if $c->{tls_accept};
-  return $self->_tls_connect($id) if $c->{tls_connect};
-  return unless my $handle = $c->{handle};
-
-  # Connected
-  if ($c->{connecting}) {
-    delete $c->{connecting};
-    my $timer = delete $c->{connect_timer};
-    $self->_drop($timer) if $timer;
-
-    # Disable Nagle's algorithm
-    setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1;
-
-    # Handle connect
-    warn "CONNECTED $id\n" if DEBUG;
-    if (!$c->{tls} && (my $cb = $c->{on_connect})) {
-      $self->_sandbox('connect', $cb, $id);
-    }
-  }
-
-  # Handle drain
-  if (!length $c->{buffer} && (my $cb = delete $c->{drain})) {
-    $self->_sandbox('drain', $cb, $id);
-  }
-
-  # Write as much as possible
-  if (length $c->{buffer}) {
-    my $written = $handle->syswrite($c->{buffer});
-
-    # Error
-    unless (defined $written) {
-
-      # Retry
-      return if $! == EAGAIN || $! == EINTR || $! == EWOULDBLOCK;
-
-      # Write error
-      return $self->_error($id, $!);
-    }
-
-    # Remove written chunk from buffer
-    substr $c->{buffer}, 0, $written, '';
-
-    # Active
-    $c->{active} = time;
-  }
-
-  # Not writing
-  $self->_not_writing($id) unless exists $c->{drain} || length $c->{buffer};
-}
-
-sub _writing {
-  my ($self, $id) = @_;
-  my $c = $self->{cs}->{$id};
-  delete $c->{read_only};
-  return unless my $handle = $c->{handle};
-  $self->iowatcher->writing($handle);
 }
 
 1;
@@ -951,8 +460,8 @@ L<Mojo::IOLoop> is a very minimalistic reactor that has been reduced to the
 absolute minimal feature set required to build solid and scalable async TCP
 clients and servers.
 
-Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::IP> and
-L<IO::Socket::SSL> are supported transparently and used if installed.
+Optional modules L<EV>, L<IO::Socket::IP> and L<IO::Socket::SSL> are
+supported transparently and used if installed.
 
 A TLS certificate and key are also built right in to make writing test
 servers as easy as possible.
@@ -961,20 +470,12 @@ servers as easy as possible.
 
 L<Mojo::IOLoop> implements the following attributes.
 
-=head2 C<accept_timeout>
-
-  my $timeout = $loop->accept_timeout;
-  $loop       = $loop->accept_timeout(5);
-
-Maximum time in seconds a connection can take to be accepted before being
-dropped, defaults to C<3>.
-
 =head2 C<connect_timeout>
 
   my $timeout = $loop->connect_timeout;
   $loop       = $loop->connect_timeout(5);
 
-Maximum time in seconds a conenction can take to be connected before being
+Maximum time in seconds a connection can take to be connected before being
 dropped, defaults to C<3>.
 
 =head2 C<iowatcher>
@@ -982,8 +483,8 @@ dropped, defaults to C<3>.
   my $watcher = $loop->iowatcher;
   $loop       = $loop->iowatcher(Mojo::IOWatcher->new);
 
-Low level event watcher, usually a L<Mojo::IOWatcher>,
-L<Mojo::IOWatcher::KQueue> or L<Mojo::IOLoop::Epoll> object.
+Low level event watcher, usually a L<Mojo::IOWatcher> or
+L<Mojo::IOWatcher::EV> object.
 Replacing the event watcher of the singleton loop makes all new loops use the
 same type of event watcher.
 Note that this attribute is EXPERIMENTAL and might change without warning!
@@ -1105,7 +606,7 @@ Callback to be invoked if the connection gets closed.
 
 =item C<on_error>
 
-Callback to be invoked if an error event happens on the connection.
+Callback to be invoked if an error happens on the connection.
 
 =item C<on_read>
 
@@ -1114,10 +615,6 @@ Callback to be invoked if new data arrives on the connection.
 =item C<port>
 
 Port to connect to.
-
-=item C<proto>
-
-Protocol to use, defaults to C<tcp>.
 
 =item C<tls>
 
@@ -1178,7 +675,6 @@ Check if loop is running.
   my $id = Mojo::IOLoop->listen(port => 3000);
   my $id = $loop->listen(port => 3000);
   my $id = $loop->listen({port => 3000});
-  my $id = $loop->listen(file => '/foo/myapp.sock');
   my $id = $loop->listen(
     port     => 443,
     tls      => 1,
@@ -1202,10 +698,6 @@ Local address to listen on, defaults to all.
 
 Maximum backlog size, defaults to C<SOMAXCONN>.
 
-=item C<file>
-
-A unix domain socket to listen on.
-
 =item C<on_accept>
 
 Callback to be invoked for each accepted connection.
@@ -1216,7 +708,7 @@ Callback to be invoked if the connection gets closed.
 
 =item C<on_error>
 
-Callback to be invoked if an error event happens on the connection.
+Callback to be invoked if an error happens on the connection.
 
 =item C<on_read>
 
@@ -1276,7 +768,7 @@ Callback to be invoked if the connection gets closed.
 
   $loop = $loop->on_error($id => sub {...});
 
-Callback to be invoked if an error event happens on the connection.
+Callback to be invoked if an error happens on the connection.
 
 =head2 C<on_read>
 
@@ -1357,7 +849,7 @@ if the loop is already running.
 
 =head2 C<start_tls>
 
-  my $id = $loop->start_tls($id);
+  $loop->start_tls($id);
 
 Start new TLS connection inside old connection.
 Note that TLS support depends on L<IO::Socket::SSL>.

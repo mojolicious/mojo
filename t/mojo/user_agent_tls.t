@@ -3,15 +3,15 @@
 use strict;
 use warnings;
 
-# Disable Bonjour, IPv6, epoll and kqueue
+# Disable Bonjour, IPv6 and libev
 BEGIN { $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
 use Test::More;
-use Mojo::IOLoop;
+use Mojo::IOLoop::Server;
 plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
   unless $ENV{TEST_TLS};
 plan skip_all => 'IO::Socket::SSL 1.43 required for this test!'
-  unless Mojo::IOLoop::TLS;
+  unless Mojo::IOLoop::Server::TLS;
 plan tests => 14;
 
 # "That does not compute.
@@ -50,12 +50,12 @@ my $id = $ua->ioloop->listen(
 my $tx = $ua->get("https://localhost:$port");
 ok !$tx->success, 'not successful';
 ok $tx->error, 'has error';
-ok $error, 'has error';
+ok !$error, 'no error';
 $error = '';
 $tx    = $ua->cert('')->key('')->get("https://localhost:$port");
 ok !$tx->success, 'not successful';
 ok $tx->error, 'has error';
-ok $error, 'has error';
+ok !$error, 'no error';
 
 # Valid certificate
 $tx =
@@ -85,8 +85,8 @@ $ENV{MOJO_KEY_FILE}  = $backup2;
 $tx =
   $ua->cert('t/mojo/certs/badclient.crt')->key('t/mojo/certs/badclient.key')
   ->get("https://localhost:$port");
-ok $error, 'has error';
+ok !$error, 'no error';
 
 # Empty certificate
 $tx = $ua->cert('no file')->key('no file')->get("https://localhost:$port");
-ok $error, 'has error';
+ok !$error, 'no error';

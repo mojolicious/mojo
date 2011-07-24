@@ -234,23 +234,16 @@ sub _listen {
   my ($self, $listen) = @_;
   return unless $listen;
 
-  # UNIX domain socket
+  # Check listen value
+  croak qq/Invalid listen value "$listen"/ unless $listen =~ $SOCKET_RE;
   my $options = {};
   my $tls;
-  if ($listen =~ /^file\:\/\/(.+)$/) { unlink $options->{file} = $1 }
-
-  # Internet socket
-  elsif ($listen =~ $SOCKET_RE) {
-    $tls = $options->{tls} = 1 if $1 eq 'https';
-    $options->{address}  = $2 if $2 ne '*';
-    $options->{port}     = $3;
-    $options->{tls_cert} = $4 if $4;
-    $options->{tls_key}  = $5 if $5;
-    $options->{tls_ca}   = $6 if $6;
-  }
-
-  # Invalid
-  else { croak qq/Invalid listen value "$listen"/ }
+  $tls = $options->{tls} = 1 if $1 eq 'https';
+  $options->{address}  = $2 if $2 ne '*';
+  $options->{port}     = $3;
+  $options->{tls_cert} = $4 if $4;
+  $options->{tls_key}  = $5 if $5;
+  $options->{tls_ca}   = $6 if $6;
 
   # Listen backlog size
   my $backlog = $self->backlog;
@@ -395,11 +388,11 @@ Mojo::Server::Daemon - Async IO HTTP 1.1 And WebSocket Server
 =head1 DESCRIPTION
 
 L<Mojo::Server::Daemon> is a full featured async io HTTP 1.1 and WebSocket
-server with C<IPv6>, C<TLS>, C<Bonjour>, C<epoll> and C<kqueue> support.
+server with C<IPv6>, C<TLS>, C<Bonjour> and C<libev> support.
 
-Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::IP>,
-L<IO::Socket::SSL> and L<Net::Rendezvous::Publish> are supported
-transparently and used if installed.
+Optional modules L<EV>, L<IO::Socket::IP>, L<IO::Socket::SSL> and
+L<Net::Rendezvous::Publish> are supported transparently and used if
+installed.
 
 See L<Mojolicious::Guides::Cookbook> for deployment recipes.
 
@@ -442,7 +435,7 @@ dropped, defaults to C<5>.
   my $listen = $daemon->listen;
   $daemon    = $daemon->listen(['https://localhost:3000']);
 
-List of ports and files to listen on, defaults to C<http://*:3000>.
+List of one or more locations to listen on, defaults to C<http://*:3000>.
 
   # Listen on two ports with HTTP and HTTPS at the same time
   $daemon->listen(['http://*:3000', 'https://*:4000']);

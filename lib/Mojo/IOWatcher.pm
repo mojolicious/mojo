@@ -50,7 +50,7 @@ sub not_writing {
   my $poll = $self->_poll;
   $poll->remove($handle)
     if delete $self->{handles}->{fileno $handle}->{writing};
-  $poll->mask($handle, $self->POLLIN);
+  $poll->mask($handle, POLLIN);
 
   return $self;
 }
@@ -60,7 +60,16 @@ sub one_tick {
   my ($self, $timeout) = @_;
 
   # IO
-  $self->watch($timeout);
+  my $poll = $self->_poll;
+  $poll->poll($timeout);
+  my $handles = $self->{handles};
+  $self->_sandbox('Read', $handles->{fileno $_}->{on_readable}, $_)
+    for $poll->handles(POLLIN | POLLHUP | POLLERR);
+  $self->_sandbox('Write', $handles->{fileno $_}->{on_writable}, $_)
+    for $poll->handles(POLLOUT);
+
+  # Wait for timeout
+  usleep 1000000 * $timeout unless keys %{$self->{handles}};
 
   # Timers
   my $timers = $self->{timers} || {};
@@ -82,10 +91,7 @@ sub one_tick {
   }
 }
 
-sub recurring {
-  my $self = shift;
-  $self->_event(timers => pop, after => pop, recurring => time);
-}
+sub recurring { shift->_timer(pop, after => pop, recurring => time) }
 
 sub remove {
   my ($self, $handle) = @_;
@@ -96,48 +102,25 @@ sub remove {
 
 # "Bart, how did you get a cellphone?
 #  The same way you got me, by accident on a golf course."
-sub timer {
-  my $self = shift;
-  $self->_event(timers => pop, after => pop, started => time);
-}
-
-sub watch {
-  my ($self, $timeout) = @_;
-
-  # Check for IO events
-  my $poll = $self->_poll;
-  $poll->poll($timeout);
-  my $handles = $self->{handles};
-  $self->_sandbox('Read', $handles->{fileno $_}->{on_readable}, $_)
-    for $poll->handles($self->POLLIN | $self->POLLHUP | $self->POLLERR);
-  $self->_sandbox('Write', $handles->{fileno $_}->{on_writable}, $_)
-    for $poll->handles($self->POLLOUT);
-
-  # Wait for timeout
-  usleep 1000000 * $timeout unless keys %{$self->{handles}};
-}
+sub timer { shift->_timer(pop, after => pop, started => time) }
 
 sub writing {
   my ($self, $handle) = @_;
 
   my $poll = $self->_poll;
   $poll->remove($handle);
-  $poll->mask($handle, $self->POLLIN | $self->POLLOUT);
+  $poll->mask($handle, POLLIN | POLLOUT);
   $self->{handles}->{fileno $handle}->{writing} = 1;
 
   return $self;
 }
 
-sub _event {
+sub _timer {
   my $self = shift;
-  my $pool = shift;
   my $cb   = shift;
-
-  # Events have an id for easy removal
-  my $e = {cb => $cb, @_};
-  (my $id) = "$e" =~ /0x([\da-f]+)/;
-  $self->{$pool}->{$id} = $e;
-
+  my $t    = {cb => $cb, @_};
+  (my $id) = "$t" =~ /0x([\da-f]+)/;
+  $self->{timers}->{$id} = $t;
   return $id;
 }
 
@@ -182,8 +165,7 @@ Mojo::IOWatcher - Async IO Watcher
 
 L<Mojo::IOWatcher> is a minimalistic async io watcher and the foundation of
 L<Mojo::IOLoop>.
-L<Mojo::IOWatcher::KQueue> and L<Mojo::IOWatcher::Epoll> are good examples
-for its extensibility.
+L<Mojo::IOWatcher::EV> is a good example for its extensibility.
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS
@@ -254,12 +236,6 @@ Remove handle.
   my $id = $watcher->timer(3 => sub {...});
 
 Create a new timer, invoking the callback after a given amount of seconds.
-
-=head2 C<watch>
-
-  $watcher->watch('0.25');
-
-Run for exactly one tick and watch only for io events.
 
 =head2 C<writing>
 

@@ -399,15 +399,9 @@ sub _proxy_connect {
 
       # TLS upgrade
       if ($tx->req->url->scheme eq 'https') {
-
-        # Connection from keep alive cache
-        return unless my $old_id = $tx->connection;
-
-        # Start TLS
-        my $new_id = $self->{loop}->start_tls($old_id);
+        return unless my $id = $tx->connection;
+        $self->{loop}->start_tls($id);
         $old->req->proxy(undef);
-        delete $self->{cs}->{$old_id};
-        $tx->connection($new_id);
       }
 
       # Share connection and start real transaction
@@ -427,13 +421,9 @@ sub _read {
   return                   unless my $c  = $self->{cs}->{$id};
   return $self->_drop($id) unless my $tx = $c->{tx};
 
-  # Read
+  # Process incoming data
   $tx->client_read($chunk);
-
-  # Finish
-  if ($tx->is_done) { $self->_handle($id) }
-
-  # Write
+  if    ($tx->is_done)         { $self->_handle($id) }
   elsif ($c->{tx}->is_writing) { $self->_write($id) }
 }
 
@@ -546,6 +536,7 @@ sub _test_server {
     $self->{scheme} = $scheme ||= 'http';
     $server->listen(["$scheme://*:$port"]);
     $server->prepare_ioloop;
+    warn "TEST SERVER STARTED ($scheme://*:$port)\n" if DEBUG;
   }
 
   return $self->{server};
@@ -580,24 +571,22 @@ sub _upgrade {
 sub _write {
   my ($self, $id) = @_;
 
-  # Get chunk
+  # Prepare outgoing data
   return unless my $c  = $self->{cs}->{$id};
   return unless my $tx = $c->{tx};
   return unless $tx->is_writing;
   my $chunk = $tx->client_write;
 
-  # More to write
+  # More data to follow
   my $cb;
   if ($tx->is_writing) {
     weaken $self;
     $cb = sub { $self->_write($id) };
   }
 
-  # Write
+  # Write data
   $self->{loop}->write($id, $chunk, $cb);
-  warn "> $chunk\n" if DEBUG;
-
-  # Finish
+  warn "> $chunk\n"   if DEBUG;
   $self->_handle($id) if $tx->is_done;
 }
 
@@ -662,10 +651,10 @@ Mojo::UserAgent - Async IO HTTP 1.1 And WebSocket User Agent
 =head1 DESCRIPTION
 
 L<Mojo::UserAgent> is a full featured async io HTTP 1.1 and WebSocket user
-agent with C<IPv6>, C<TLS>, C<epoll> and C<kqueue> support.
+agent with C<IPv6>, C<TLS> and C<libev> support.
 
-Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::IP> and
-L<IO::Socket::SSL> are supported transparently and used if installed.
+Optional modules L<EV>, L<IO::Socket::IP> and L<IO::Socket::SSL> are
+supported transparently and used if installed.
 
 =head1 ATTRIBUTES
 

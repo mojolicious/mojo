@@ -1,6 +1,14 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-1.65    2011-07-10 00:00:00
+1.65    2011-07-24 00:00:00
+        - Added EXPERIMENTAL modules Mojo::IOLoop::Client,
+          Mojo::IOLoop::EventEmitter, Mojo::IOLoop::Server and
+          Mojo::IOLoop::Stream, which contain extracted functionality from
+          Mojo::IOLoop.
+        - Added EXPERIMENTAL module Mojo::IOWatcher::EV. (xantus)
+        - Removed modules Mojo::IOWatcher::Epoll and Mojo::IOWatcher::KQueue,
+          since Mojo::IOWatcher::EV is a much better alternative.
+        - Renamed Mojo::Resolver to Mojo::IOLoop::Resolver.
         - Improved documentation.
         - Fixed small bug in get command.
 
@@ -18,7 +26,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved documentation.
 
 1.61    2011-07-09 00:00:00
-        - Added Mojo::HTML module, which contains extracted functionality
+        - Added module Mojo::HTML, which contains extracted functionality
           from Mojo::DOM.
         - Improved documentation.
 
@@ -78,9 +86,9 @@ This file documents the revision history for Perl extension Mojolicious.
           disabling format detection.
 
 1.49    2011-06-30 00:00:00
-        - Added EXPERIMENTAL Mojo::IOWatcher and Mojo::Resolver modules,
+        - Added EXPERIMENTAL modules Mojo::IOWatcher and Mojo::Resolver,
           which contain extracted functionality from Mojo::IOLoop.
-        - Added EXPERIMENTAL Mojo::Transactor module, which contains
+        - Added EXPERIMENTAL module Mojo::Transactor, which contains
           extracted functionality from Mojo::UserAgent.
         - Added EXPERIMENTAL support for simple alternative placeholder
           values to routes.
@@ -952,7 +960,6 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added transparent kqueue and epoll support to daemons and client.
         - Added support for listening to multiple locations to the daemons.
               mojo daemon --listen http://127.0.0.1:3000
-              mojo daemon --listen http://127.0.0.1:3000,file:///tmp/my.sock
               mojo daemon --listen http://*:3000,http://*:3001,http://*:3002
               mojo daemon --listen http://[::1]:3000
               mojo daemon --listen https://*:443:/x/server.crt:/x/server.key

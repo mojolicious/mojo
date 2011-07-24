@@ -3,14 +3,14 @@
 use strict;
 use warnings;
 
-# Disable epoll, kqueue and TLS
+# Disable libev and TLS
 BEGIN { $ENV{MOJO_POLL} = $ENV{MOJO_NO_TLS} = 1 }
 
 use Test::More;
 
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
-plan tests => 96;
+plan tests => 104;
 
 # "So then I said to the cop, "No, you're driving under the influence...
 #  of being a jerk"."
@@ -154,6 +154,18 @@ is $tx->req->headers->content_length, 17, 'right content length';
 is $tx->req->body,   'query=mojolicious', 'right content';
 like $tx->res->body, qr/Mojolicious/,     'right content';
 is $tx->res->code,   200,                 'right status';
+is $tx->keep_alive, 1, 'connection will be kept alive';
+
+# Simple keep alive form post
+$tx =
+  $ua->post_form('http://search.cpan.org/search' => {query => 'mojolicious'});
+is $tx->req->method, 'POST', 'right method';
+is $tx->req->url, 'http://search.cpan.org/search', 'right url';
+is $tx->req->headers->content_length, 17, 'right content length';
+is $tx->req->body,   'query=mojolicious', 'right content';
+like $tx->res->body, qr/Mojolicious/,     'right content';
+is $tx->res->code,   200,                 'right status';
+is $tx->kept_alive, 1, 'connection was kept alive';
 
 # Simple request
 $tx = $ua->get('http://www.apache.org');

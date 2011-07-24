@@ -140,17 +140,17 @@ Mojo::Server::Morbo - DOOOOOOOOOOOOOOOOOOM!
 
 L<Mojo::Server::Morbo> is a full featured self-restart capable async io HTTP
 1.1 and WebSocket server built around the very well tested and reliable
-L<Mojo::Server::Daemon> with C<IPv6>, C<TLS>, C<Bonjour>, C<epoll> and
-C<kqueue> support.
+L<Mojo::Server::Daemon> with C<IPv6>, C<TLS>, C<Bonjour> and C<libev>
+support.
 
 To start applications with it you can use the L<morbo> script.
 
   % morbo myapp.pl
   Server available at http://127.0.0.1:3000.
 
-Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::IP>,
-L<IO::Socket::SSL> and L<Net::Rendezvous::Publish> are supported
-transparently and used if installed.
+Optional modules L<EV>, L<IO::Socket::IP>, L<IO::Socket::SSL> and
+L<Net::Rendezvous::Publish> are supported transparently and used if
+installed.
 
 Note that this module is EXPERIMENTAL and might change without warning!
 
@@ -163,7 +163,7 @@ L<Mojo::Server::Morbo> implements the following attributes.
   my $listen = $morbo->listen;
   $morbo     = $morbo->listen(['http://*:3000']);
 
-List of ports and files to listen on, defaults to C<http://*:3000>.
+List of one or more locations to listen on, defaults to C<http://*:3000>.
 
 =head2 C<watch>
 

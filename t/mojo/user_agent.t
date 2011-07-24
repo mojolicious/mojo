@@ -3,13 +3,13 @@
 use strict;
 use warnings;
 
-# Disable Bonjour, IPv6, epoll and kqueue
+# Disable Bonjour, IPv6 and libev
 BEGIN { $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 
 use Test::More;
 plan skip_all => 'Windows is too fragile for this test!'
   if $^O eq 'MSWin32' || $^O =~ /cygwin/;
-plan tests => 70;
+plan tests => 73;
 
 use_ok 'Mojo::UserAgent';
 
@@ -245,6 +245,12 @@ ok $tx->success, 'successful';
 is $tx->kept_alive, undef, 'kept connection not alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
+
+# GET / (built-in server)
+$tx = $ua->get('/');
+ok $tx->success, 'successful';
+is $tx->res->code, 200,     'right status';
+is $tx->res->body, 'works', 'right content';
 
 # Nested keep alive
 my @kept_alive;

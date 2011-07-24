@@ -81,7 +81,7 @@ Mojo::IOLoop::EventEmitter - IOLoop Event Emitter
     my ($self, $message) = @_;
     die "test: $message\n";
   });
-  $e->emit('test', );
+  $e->emit(test => 'Hello!');
 
 =head1 DESCRIPTION
 

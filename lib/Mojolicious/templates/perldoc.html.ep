@@ -53,8 +53,8 @@
       }
       #perldoc > ul:first-of-type a { text-decoration: none; }
       #wrapperlicious {
-	    max-width: 1000px;
-		margin: 0 auto;
+        max-width: 1000px;
+        margin: 0 auto;
       }
     % end
   </head>

@@ -144,12 +144,6 @@ amount of seconds.
 
 Remove handle.
 
-=head2 C<remove>
-
-  $watcher = $watcher->remove($handle);
-
-Remove handle.
-
 =head2 C<timer>
 
   my $id = $watcher->timer(3 => sub {...});

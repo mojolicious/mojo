@@ -15,7 +15,6 @@ sub register {
     $path = $3;
     $path = '/' unless defined $path;
     $host = qr/^$host$/i;
-    $app->routes->cache(0);
   }
   else { $path = $prefix }
 
@@ -47,7 +46,7 @@ Mojolicious::Plugin::Mount - Application Mount Plugin
   my $example = plugin mount => {'/example' => '/home/sri/example.pl'};
   $example->to(message => 'It works great!');
 
-  # Mount application with host (automatically disables route caching)
+  # Mount application with host
   plugin mount => {'mojolicio.us' => '/home/sri/myapp.pl'};
 
   # Host and path

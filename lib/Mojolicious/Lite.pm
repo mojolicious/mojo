@@ -548,12 +548,6 @@ constructs.
     shift->render(text => 'Hello Mojolicious!');
   };
 
-However you might want to disable automatic route caching in case there are
-routes responding to the same path without conditions attached, since those
-would otherwise get precedence once cached.
-
-  app->routes->cache(0);
-
 =head2 Sessions
 
 Signed cookie based sessions just work out of the box as soon as you start

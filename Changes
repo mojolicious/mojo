@@ -9,6 +9,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Removed modules Mojo::IOWatcher::Epoll and Mojo::IOWatcher::KQueue,
           since Mojo::IOWatcher::EV is a much better alternative.
         - Renamed Mojo::Resolver to Mojo::IOLoop::Resolver.
+        - Improved Mojolicious::Routes to automatically disable the routing
+          cache if conditions are used.
         - Improved documentation browser CSS. (judofyr)
         - Improved documentation.
         - Fixed small bug in get command.

@@ -212,6 +212,9 @@ sub over {
   return $self unless @_;
   my $conditions = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
   push @{$self->conditions}, @$conditions;
+  my $root = my $parent = $self;
+  while ($parent = $parent->parent) { $root = $parent }
+  $root->cache(0);
   return $self;
 }
 
@@ -677,10 +680,6 @@ The children of this routes object, used for nesting routes.
 Routing cache, by default a L<Mojo::Cache> object.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
-  $r->cache(0);
-
-Route caching can also be disabled with a false value.
-
 =head2 C<conditions>
 
   my $conditions  = $r->conditions;
@@ -894,7 +893,7 @@ Note that the name C<current> is reserved for refering to the current route.
 
   $r = $r->over(foo => qr/\w+/);
 
-Apply condition parameters to this route.
+Apply condition parameters to this route and disable routing cache.
 
 =head2 C<parse>
 

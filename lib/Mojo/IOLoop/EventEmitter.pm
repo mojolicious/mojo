@@ -72,7 +72,10 @@ Mojo::IOLoop::EventEmitter - IOLoop Event Emitter
 
   use Mojo::IOLoop::EventEmitter;
 
+  # Create new event emitter
   my $e = Mojo::IOLoop::EventEmitter->new;
+
+  # Subscribe to events
   $e->on(error => sub {
     my ($self, $error) = @_;
     warn $error;
@@ -81,6 +84,8 @@ Mojo::IOLoop::EventEmitter - IOLoop Event Emitter
     my ($self, $message) = @_;
     die "test: $message\n";
   });
+
+  # Emit events
   $e->emit(test => 'Hello!');
 
 =head1 DESCRIPTION

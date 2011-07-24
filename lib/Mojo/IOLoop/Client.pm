@@ -164,7 +164,7 @@ Mojo::IOLoop::Client - IOLoop TCP Client
   use Mojo::IOLoop::Client;
 
   # Create socket connection
-  my $client = Mojo::IOLoop::Server->new;
+  my $client = Mojo::IOLoop::Client->new;
   $client->on(connect => sub {
     my ($self, $handle) = @_;
     ...
@@ -182,7 +182,7 @@ Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 ATTRIBUTES
 
-L<Mojo::IOLoop::Server> implements the following attributes.
+L<Mojo::IOLoop::Client> implements the following attributes.
 
 =head2 C<resolver>
 
@@ -193,7 +193,7 @@ DNS stub resolver, usually a L<Mojo::Resolver> object.
 
 =head1 METHODS
 
-L<Mojo::IOLoop::Server> inherits all methods from
+L<Mojo::IOLoop::Client> inherits all methods from
 L<Mojo::IOLoop::EventEmitter> and implements the following new ones.
 
 =head2 C<connect>

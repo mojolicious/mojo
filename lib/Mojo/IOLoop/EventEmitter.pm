@@ -74,8 +74,8 @@ Mojo::IOLoop::EventEmitter - IOLoop Event Emitter
 
   my $e = Mojo::IOLoop::EventEmitter->new;
   $e->on(error => sub {
-    my ($self, $event, $error) = @_;
-    warn qq/Event "$event" failed: $error/;
+    my ($self, $error) = @_;
+    warn $error;
   });
   $e->on(test => sub {
     my ($self, $message) = @_;

@@ -240,19 +240,17 @@ sub run {
   for my $namespace (@{$self->namespaces}) {
 
     # Search
-    if (my $modules = Mojo::Loader->search($namespace)) {
-      for my $module (@$modules) {
+    for my $module (@{Mojo::Loader->search($namespace)}) {
 
-        # Load
-        if (my $e = Mojo::Loader->load($module)) { die $e }
+      # Load
+      if (my $e = Mojo::Loader->load($module)) { die $e }
 
-        # Seen
-        my $command = $module;
-        $command =~ s/^$namespace\:://;
-        push @$commands, [$command => $module]
-          unless $seen->{$command};
-        $seen->{$command} = 1;
-      }
+      # Seen
+      my $command = $module;
+      $command =~ s/^$namespace\:://;
+      push @$commands, [$command => $module]
+        unless $seen->{$command};
+      $seen->{$command} = 1;
     }
   }
 

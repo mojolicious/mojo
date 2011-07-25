@@ -63,7 +63,6 @@ sub search {
     }
   }
 
-  return unless @$modules;
   return $modules;
 }
 
@@ -113,8 +112,6 @@ loaded.
   my $modules = $loader->search('MyApp::Namespace');
 
 Search for modules in a namespace non-recursively.
-
-  $loader->load($_) for @{$loader->search('MyApp::Namespace')};
 
 =head1 SEE ALSO
 

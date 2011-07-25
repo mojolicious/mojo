@@ -11,7 +11,8 @@ use_ok 'Mojo::IOLoop::EventEmitter';
 # Normal event
 my $e      = Mojo::IOLoop::EventEmitter->new;
 my $called = 0;
-$e->on(test1 => sub { $called++ })->emit('test1');
+$e->on(test1 => sub { $called++ });
+$e->emit('test1');
 is $called, 1, 'event was emitted once';
 
 # Error fallback
@@ -95,10 +96,10 @@ is $once, 1, 'event was not emitted again';
 # Unsubscribe
 $e = Mojo::IOLoop::EventEmitter->new;
 my $counter = 0;
-$cb = sub { $counter++ };
-$e->on(foo => $cb);
+$cb = $e->on(foo => sub { $counter++ });
 $e->on(foo => sub { $counter++ });
 $e->on(foo => sub { $counter++ });
+$e->unsubscribe(foo => $e->on(foo => sub { $counter++ }));
 is scalar @{$e->subscribers('foo')}, 3, 'three subscribers';
 $e->emit('foo');
 is $counter, 3, 'event was emitted three times';

@@ -27,7 +27,7 @@ sub on {
   my ($self, $name, $cb) = @_;
   my $subscribers = $self->{events}->{$name} ||= [];
   push @$subscribers, $cb;
-  return $self;
+  return $cb;
 }
 
 sub once {
@@ -41,6 +41,7 @@ sub once {
   };
   $self->on($name => $wrapper);
   weaken $wrapper;
+  return $wrapper;
 }
 
 sub subscribers {
@@ -107,13 +108,13 @@ Emit event.
 
 =head2 C<on>
 
-  $e = $e->on(foo => sub {...});
+  my $cb = $e->on(foo => sub {...});
 
 Subscribe to event.
 
 =head2 C<once>
 
-  $e = $e->once(foo => sub {...});
+  my $cb = $e->once(foo => sub {...});
 
 Subscribe to event and unsubscribe again after it has been emitted once.
 

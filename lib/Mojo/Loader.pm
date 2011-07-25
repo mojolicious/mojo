@@ -78,9 +78,14 @@ Mojo::Loader - Loader
 
   use Mojo::Loader;
 
+  # Find modules in a namespace
   my $loader = Mojo::Loader->new;
-  my $modules = $loader->search('Some::Namespace');
-  $loader->load($modules->[0]);
+  for my $module (@{$loader->search('Some::Namespace')}) {
+
+    # And load them safely
+    my $e = $loader->load($module);
+    warn qq/Loading "$module" failed: $e/ if ref $e;
+  }
 
 =head1 DESCRIPTION
 

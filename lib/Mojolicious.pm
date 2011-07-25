@@ -388,9 +388,10 @@ Web development for humans, making hard things possible and everything fun.
   __DATA__
 
   @@ clock.html.ep
-  % my ($second, $minute, $hour) = (localtime(time))[0, 1, 2];
+  % use Time::Piece;
+  % my $now = localtime;
   <%= link_to clock => begin %>
-    The time is <%= $hour %>:<%= $minute %>:<%= $second %>.
+    The time is <%= $now->hms %>.
   <% end %>
 
 =head2 Growing
@@ -476,9 +477,10 @@ especially when working in a team.
 Through all of these changes, your action code and templates can stay almost
 exactly the same.
 
-  % my ($second, $minute, $hour) = (localtime(time))[0, 1, 2];
+  % use Time::Piece;
+  % my $now = localtime;
   <%= link_to clock => begin %>
-    The time is <%= $hour %>:<%= $minute %>:<%= $second %>.
+    The time is <%= $now->hms %>.
   <% end %>
 
 Mojolicious has been designed from the ground up for a fun and unique

@@ -573,7 +573,7 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
   my $class = $loop->stream_class;
   $loop     = $loop->stream_class('Mojo::IOLoop::Stream');
 
-Class to be used for streaming io, defaults to L<Mojo::IOLoop::Stream>.
+Class to be used for streaming handles, defaults to L<Mojo::IOLoop::Stream>.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<timeout>

@@ -180,7 +180,8 @@ Mojo::IOLoop::Stream - IOLoop Stream
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Stream> is a container for streams used by L<Mojo::IOLoop>.
+L<Mojo::IOLoop::Stream> is a container for streaming handles used by
+L<Mojo::IOLoop>.
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 ATTRIBUTES

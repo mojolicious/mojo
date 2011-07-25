@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+1.66    2011-07-26 00:00:00
+        - Improved documentation.
+
 1.65    2011-07-25 00:00:00
         - Added EXPERIMENTAL modules Mojo::IOLoop::Client,
           Mojo::IOLoop::EventEmitter, Mojo::IOLoop::Server and

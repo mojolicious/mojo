@@ -157,7 +157,7 @@ __END__
 
 =head1 NAME
 
-Mojo::IOLoop::Client - IOLoop TCP Client
+Mojo::IOLoop::Client - IOLoop Socket Client
 
 =head1 SYNOPSIS
 

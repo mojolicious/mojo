@@ -99,7 +99,7 @@ my $counter = 0;
 $cb = $e->on(foo => sub { $counter++ });
 $e->on(foo => sub { $counter++ });
 $e->on(foo => sub { $counter++ });
-$e->unsubscribe(foo => $e->on(foo => sub { $counter++ }));
+$e->unsubscribe(foo => $e->once(foo => sub { $counter++ }));
 is scalar @{$e->subscribers('foo')}, 3, 'three subscribers';
 $e->emit('foo');
 is $counter, 3, 'event was emitted three times';

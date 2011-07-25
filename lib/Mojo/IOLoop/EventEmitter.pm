@@ -101,8 +101,8 @@ implements the following new ones.
 
 =head2 C<emit>
 
-  $e = $e->emit('foo');
-  $e = $e->emit('foo', 123);
+  $e->emit('foo');
+  $e->emit('foo', 123);
 
 Emit event.
 
@@ -126,7 +126,7 @@ All subscribers for event.
 
 =head2 C<unsubscribe>
 
-  $e = $e->unsubscribe(foo => $cb);
+  $e->unsubscribe(foo => $cb);
 
 Unsubscribe from event.
 

@@ -6,6 +6,63 @@ use Time::HiRes 'usleep';
 
 use constant DEBUG => $ENV{MOJO_IOWATCHER_DEBUG} || 0;
 
+# all possible implementations
+my @_impls = ();
+push(@_impls, 'EV') if (! exists($ENV{MOJO_POLL}) || $ENV{MOJO_POLL});
+
+sub factory {
+  my $self = shift;
+  my $impl = shift;
+  
+  # choose implementation class
+  my $class = __PACKAGE__->_get_impl_class($impl);
+  
+  unless (defined $class) {
+    no warnings;
+    die "Invalid Mojo::IOWatcher implementation '$impl'";
+  }
+
+  # create object
+  my $w = $class->new(@_);
+  die "Mojo::IOWatcher implementation '$class' returned undefined object." unless (defined $w);
+  warn "IOWatcher implementation class: $class, object: $w\n" if DEBUG;
+  return $w;
+}
+
+sub _get_impl_class {
+  my $self = shift;
+  my $impl = shift;
+
+  # no implementation argument? check environment
+  $impl = $ENV{MOJO_IOWATCHER_IMPL} unless (defined $impl && length($impl));
+
+  # check all available implementations, select best available
+  my $class = undef;
+  foreach my $i ($impl, @_impls) {
+    next unless (defined $i && length($i));
+    $class = __PACKAGE__->_check_impl_class($i);
+    last if (defined $class);
+  }
+
+  return (defined $class) ? $class : __PACKAGE__;
+}
+
+sub _check_impl_class {
+  my $self = shift;
+  my $class = shift;
+  return undef unless (defined $class && length($class) > 0);
+
+  # fix incomplete class name
+  $class = __PACKAGE__ . '::' . $class unless ($class =~ m/::/);
+
+  # try to load class
+  local $@;
+  eval "require $class; 1";
+  return undef if ($@);
+
+  return $class;
+}
+
 # "I don't know.
 #  Can I really betray my country?
 #  I say the Pledge of Allegiance every day.

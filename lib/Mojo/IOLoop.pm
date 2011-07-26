@@ -11,24 +11,12 @@ use Time::HiRes 'time';
 
 use constant DEBUG => $ENV{MOJO_IOLOOP_DEBUG} || 0;
 
-# libev support requires EV
-use constant EV => $ENV{MOJO_POLL}
-  ? 0
-  : eval 'use Mojo::IOWatcher::EV; 1';
-
 has client_class    => 'Mojo::IOLoop::Client';
 has connect_timeout => 3;
 has iowatcher       => sub {
-
-  # libev
-  if (EV) {
-    warn "EV MAINLOOP\n" if DEBUG;
-    return Mojo::IOWatcher::EV->new;
-  }
-
-  # poll
-  warn "POLL MAINLOOP\n" if DEBUG;
-  Mojo::IOWatcher->new;
+  my $class = Mojo::IOWatcher->detect;
+  warn "MAINLOOP ($class)\n" if DEBUG;
+  $class->new;
 };
 has max_accepts     => 0;
 has max_connections => 1000;

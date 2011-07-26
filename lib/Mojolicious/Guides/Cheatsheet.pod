@@ -189,6 +189,12 @@ path like C</home/sri/myapp>.
 
   MOJO_HOME=/home/sri/myapp
 
+=head2 C<MOJO_IOWATCHER>
+
+Alternative L<Mojo::IOWatcher> implementation to try.
+
+  MOJO_IOWATCHER=Mojo::IOWatcher::EV
+
 =head2 C<MOJO_KEY_FILE>
 
 The path to the TLS key, should always contain a path like

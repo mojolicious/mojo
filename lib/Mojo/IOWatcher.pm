@@ -30,6 +30,12 @@ sub cancel {
   return;
 }
 
+sub detect {
+  my $try = $ENV{MOJO_IOWATCHER} || 'Mojo::IOWatcher::EV';
+  return $try if !$ENV{MOJO_POLL} && eval "use $try; 1";
+  return 'Mojo::IOWatcher';
+}
+
 sub is_readable {
   my ($self, $handle) = @_;
 
@@ -198,6 +204,14 @@ Callback to be invoked once the handle becomes writable.
   my $success = $watcher->cancel($id);
 
 Cancel timer.
+
+=head2 C<detect>
+
+  my $class = Mojo::IOWatcher->detect;
+
+Detect the best watcher implementation available, will try the value of
+C<MOJO_IOWATCHER> or L<Mojo::IOWatcher::EV>.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<is_readable>
 

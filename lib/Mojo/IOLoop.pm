@@ -554,9 +554,9 @@ Note that exceptions in this callback are not captured.
 =head2 C<resolver>
 
   my $resolver = $loop->resolver;
-  $loop        = $loop->resolver(Mojo::Resolver->new);
+  $loop        = $loop->resolver(Mojo::IOLoop::Resolver->new);
 
-DNS stub resolver, usually a L<Mojo::Resolver> object.
+DNS stub resolver, usually a L<Mojo::IOLoop::Resolver> object.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<server_class>

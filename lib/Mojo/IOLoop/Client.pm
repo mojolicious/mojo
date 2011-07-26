@@ -190,7 +190,7 @@ L<Mojo::IOLoop::Client> implements the following attributes.
   my $resolver = $client->resolver;
   $client      = $client->resolver(Mojo::IOLoop::Resolver->new);
 
-DNS stub resolver, usually a L<Mojo::Resolver> object.
+DNS stub resolver, usually a L<Mojo::IOLoop::Resolver> object.
 
 =head1 METHODS
 

@@ -314,7 +314,7 @@ __END__
 
 =head1 NAME
 
-Mojo::IOLoop::Resolver - IOLoop Stub Resolver
+Mojo::IOLoop::Resolver - IOLoop DNS Stub Resolver
 
 =head1 SYNOPSIS
 
@@ -322,7 +322,8 @@ Mojo::IOLoop::Resolver - IOLoop Stub Resolver
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Resolver> is a minimalistic async io stub resolver.
+L<Mojo::IOLoop::Resolver> is a minimalistic async io DNS stub resolver used
+by L<Mojo:IOLoop>.
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 ATTRIBUTES

@@ -105,8 +105,9 @@ Mojo::IOWatcher::EV - EV Async I/O Watcher
 
 =head1 DESCRIPTION
 
-L<Mojo::IOWatcher> is a minimalistic async I/O watcher with C<libev> support.
-Note that this module is EXPERIMENTAL and might change without warning!
+L<Mojo::IOWatcher::EV> is a minimalistic async I/O watcher with C<libev>
+support. Note that this module is EXPERIMENTAL and might change without
+warning!
 
 =head1 METHODS
 

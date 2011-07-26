@@ -534,9 +534,9 @@ C<development>.
 Mojo will name the log file after the current mode and modes other than
 C<development> will result in limited log output.
 
-If you want to add per mode logic to your application, you can defined
-methods named C<$mode_mode> in the application class that will be called
-right before C<startup>.
+If you want to add per mode logic to your application, you can define methods
+named C<$mode_mode> in the application class, which will be called right
+before C<startup>.
 
   sub development_mode {
     my $self = shift;

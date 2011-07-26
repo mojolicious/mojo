@@ -197,6 +197,7 @@ sub _bind {
   my $id = $self->{id} = $loop->connect(
     address  => $server,
     port     => 53,
+    on_close => sub { $self->_cleanup },
     on_error => sub {
       my ($loop, $id) = @_;
       warn "RESOLVE FAILURE ($server)\n" if DEBUG;

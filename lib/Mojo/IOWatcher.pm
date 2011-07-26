@@ -59,7 +59,7 @@ sub not_writing {
 sub one_tick {
   my ($self, $timeout) = @_;
 
-  # IO
+  # I/O
   my $poll = $self->_poll;
   $poll->poll($timeout);
   my $handles = $self->{handles};
@@ -138,13 +138,13 @@ __END__
 
 =head1 NAME
 
-Mojo::IOWatcher - Async IO Watcher
+Mojo::IOWatcher - Async I/O Watcher
 
 =head1 SYNOPSIS
 
   use Mojo::IOWatcher;
 
-  # Watch if io handles become readable or writable
+  # Watch if I/O handles become readable or writable
   my $watcher = Mojo::IOWatcher->new;
   $watcher->add($handle, on_readable => sub {
     my ($watcher, $handle) = @_;
@@ -163,7 +163,7 @@ Mojo::IOWatcher - Async IO Watcher
 
 =head1 DESCRIPTION
 
-L<Mojo::IOWatcher> is a minimalistic async io watcher and the foundation of
+L<Mojo::IOWatcher> is a minimalistic async I/O watcher and the foundation of
 L<Mojo::IOLoop>.
 L<Mojo::IOWatcher::EV> is a good example for its extensibility.
 Note that this module is EXPERIMENTAL and might change without warning!
@@ -177,7 +177,7 @@ following new ones.
 
   $watcher = $watcher->add($handle, on_readable => sub {...});
 
-Add handles and watch for io events.
+Add handles and watch for I/O events.
 
 These options are currently available:
 
@@ -216,7 +216,7 @@ Only watch handle for readable events.
 
   $watcher->one_tick('0.25');
 
-Run for exactly one tick and watch for io and timer events.
+Run for exactly one tick and watch for I/O and timer events.
 
 =head2 C<recurring>
 

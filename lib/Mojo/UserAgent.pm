@@ -595,7 +595,7 @@ __END__
 
 =head1 NAME
 
-Mojo::UserAgent - Async IO HTTP 1.1 And WebSocket User Agent
+Mojo::UserAgent - Async I/O HTTP 1.1 And WebSocket User Agent
 
 =head1 SYNOPSIS
 
@@ -650,7 +650,7 @@ Mojo::UserAgent - Async IO HTTP 1.1 And WebSocket User Agent
 
 =head1 DESCRIPTION
 
-L<Mojo::UserAgent> is a full featured async io HTTP 1.1 and WebSocket user
+L<Mojo::UserAgent> is a full featured async I/O HTTP 1.1 and WebSocket user
 agent with C<IPv6>, C<TLS> and C<libev> support.
 
 Optional modules L<EV>, L<IO::Socket::IP> and L<IO::Socket::SSL> are
@@ -694,7 +694,7 @@ Proxy server to use for HTTPS and WebSocket requests.
   my $loop = $ua->ioloop;
   $ua      = $ua->ioloop(Mojo::IOLoop->new);
 
-Loop object to use for blocking io operations, by default a L<Mojo::IOLoop>
+Loop object to use for blocking I/O operations, by default a L<Mojo::IOLoop>
 object will be used.
 
 =head2 C<keep_alive_timeout>

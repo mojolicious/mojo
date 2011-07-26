@@ -361,7 +361,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Server::Daemon - Async IO HTTP 1.1 And WebSocket Server
+Mojo::Server::Daemon - Async I/O HTTP 1.1 And WebSocket Server
 
 =head1 SYNOPSIS
 
@@ -387,7 +387,7 @@ Mojo::Server::Daemon - Async IO HTTP 1.1 And WebSocket Server
 
 =head1 DESCRIPTION
 
-L<Mojo::Server::Daemon> is a full featured async io HTTP 1.1 and WebSocket
+L<Mojo::Server::Daemon> is a full featured async I/O HTTP 1.1 and WebSocket
 server with C<IPv6>, C<TLS>, C<Bonjour> and C<libev> support.
 
 Optional modules L<EV>, L<IO::Socket::IP>, L<IO::Socket::SSL> and
@@ -420,7 +420,7 @@ Group for server process.
   my $loop = $daemon->ioloop;
   $daemon  = $daemon->ioloop(Mojo::IOLoop->new);
 
-Event loop for server IO, defaults to the global L<Mojo::IOLoop> singleton.
+Event loop for server I/O, defaults to the global L<Mojo::IOLoop> singleton.
 
 =head2 C<keep_alive_timeout>
 

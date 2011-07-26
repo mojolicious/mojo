@@ -304,8 +304,8 @@ TLS, Bonjour, IDNA, Comet (long polling), chunking and multipart support.
 
 =item *
 
-Built-in async IO web server supporting libev and hot deployment, perfect for
-embedding.
+Built-in async I/O web server supporting libev and hot deployment, perfect
+for embedding.
 
 =item *
 

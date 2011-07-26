@@ -164,8 +164,8 @@ Note that L<IO::Socket::SSL> must be installed for TLS support.
 
 =head2 C<MOJO_CHUNK_SIZE>
 
-Chunk size used for IO operations in bytes, a bigger chunk size speeds up IO
-operations but will also use more memory, defaults to C<131072>.
+Chunk size used for I/O operations in bytes, a bigger chunk size speeds up
+I/O operations but will also use more memory, defaults to C<131072>.
 
   MOJO_CHUNK_SIZE=1024
 
@@ -275,7 +275,7 @@ Note that L<IO::Socket::SSL> must be installed for TLS support.
 
 =head2 C<MOJO_POLL>
 
-Force poll mainloop for IO operations, this should only be used for testing
+Force poll mainloop for I/O operations, this should only be used for testing
 since other mainloops are generally faster and scale better.
 
   MOJO_POLL=1

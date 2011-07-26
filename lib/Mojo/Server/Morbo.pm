@@ -138,7 +138,7 @@ Mojo::Server::Morbo - DOOOOOOOOOOOOOOOOOOM!
 
 =head1 DESCRIPTION
 
-L<Mojo::Server::Morbo> is a full featured self-restart capable async io HTTP
+L<Mojo::Server::Morbo> is a full featured self-restart capable async I/O HTTP
 1.1 and WebSocket server built around the very well tested and reliable
 L<Mojo::Server::Daemon> with C<IPv6>, C<TLS>, C<Bonjour> and C<libev>
 support.

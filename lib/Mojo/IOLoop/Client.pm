@@ -25,8 +25,9 @@ has resolver => sub {
 sub DESTROY {
   my $self = shift;
   return if $self->{connected};
-  return unless my $loop    = $self->resolver->ioloop;
-  return unless my $watcher = $loop->iowatcher;
+  return unless my $resolver = $self->resolver;
+  return unless my $loop     = $resolver->ioloop;
+  return unless my $watcher  = $loop->iowatcher;
   $watcher->cancel($self->{timer})  if $self->{timer};
   $watcher->remove($self->{handle}) if $self->{handle};
 }
@@ -47,8 +48,6 @@ sub connect {
 
   # Connect
   else { $self->_connect($args) }
-
-  return $self;
 }
 
 sub _connect {

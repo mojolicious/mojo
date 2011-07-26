@@ -5,6 +5,7 @@ use IO::File;
 use IO::Socket::INET;
 use List::Util 'first';
 use Mojo::URL;
+use Scalar::Util 'weaken';
 
 use constant DEBUG => $ENV{MOJO_RESOLVER_DEBUG} || 0;
 
@@ -72,10 +73,13 @@ my $DNS_TYPES = {
 # "localhost"
 our $LOCALHOST = '127.0.0.1';
 
+sub DESTROY { shift->_cleanup }
+
 sub lookup {
   my ($self, $name, $cb) = @_;
 
   # "localhost"
+  weaken $self;
   return $self->ioloop->timer(0 => sub { $self->$cb($LOCALHOST) })
     if $name eq 'localhost';
 
@@ -99,7 +103,7 @@ sub lookup {
           my $result = first { $_->[0] eq 'AAAA' } @$records;
           return $self->$cb($result->[1]) if $result;
 
-          # Pass through
+          # Nothing
           $self->$cb();
         }
       );
@@ -112,68 +116,101 @@ sub resolve {
   my ($self, $name, $type, $cb) = @_;
 
   # No lookup required or record type not supported
-  my $ipv4 = $name =~ $Mojo::URL::IPV4_RE ? 1 : 0;
-  my $ipv6   = IPV6 && $name =~ $Mojo::URL::IPV6_RE ? 1 : 0;
-  my $t      = $DNS_TYPES->{$type};
   my $server = $self->servers;
+  my $t      = $DNS_TYPES->{$type};
+  my $ipv4   = $name =~ $Mojo::URL::IPV4_RE ? 1 : 0;
+  my $ipv6   = IPV6 && $name =~ $Mojo::URL::IPV6_RE ? 1 : 0;
   my $loop   = $self->ioloop;
-  if (!$server || !$t || ($t ne $DNS_TYPES->{PTR} && ($ipv4 || $ipv6))) {
-    $loop->timer(0 => sub { $self->$cb([]) });
-    return $self;
+  weaken $self;
+  return $loop->timer(0 => sub { $self->$cb([]) })
+    if !$server || !$t || ($t ne $DNS_TYPES->{PTR} && ($ipv4 || $ipv6));
+
+  # Build request
+  warn "RESOLVE $type $name ($server)\n" if DEBUG;
+  my $tx;
+  do { $tx = int rand 0x10000 } while ($self->{requests}->{$tx});
+
+  # Header (one question with recursion)
+  my $req = pack 'nnnnnn', $tx, 0x0100, 1, 0, 0, 0;
+
+  # Reverse
+  my @parts = split /\./, $name;
+  if ($t eq $DNS_TYPES->{PTR}) {
+
+    # IPv4
+    if ($ipv4) { @parts = reverse 'arpa', 'in-addr', @parts }
+
+    # IPv6
+    elsif ($ipv6) {
+      @parts = reverse 'arpa', 'ip6', split //, unpack 'H32',
+        inet_pton(IPV6_AF_INET6, $name);
+    }
   }
 
-  # Request
-  warn "RESOLVE $type $name ($server)\n" if DEBUG;
-  my $timer;
-  my $tx = int rand 0x10000;
-  my $id = $loop->connect(
-    address    => $server,
-    port       => 53,
-    on_connect => sub {
-      my ($loop, $id) = @_;
+  # Query (Internet)
+  for my $part (@parts) { $req .= pack 'C/a*', $part if defined $part }
+  $req .= pack 'Cnn', 0, $t, 0x0001;
 
-      # Header (one question with recursion)
-      my $req = pack 'nnnnnn', $tx, 0x0100, 1, 0, 0, 0;
-
-      # Reverse
-      my @parts = split /\./, $name;
-      if ($t eq $DNS_TYPES->{PTR}) {
-
-        # IPv4
-        if ($ipv4) { @parts = reverse 'arpa', 'in-addr', @parts }
-
-        # IPv6
-        elsif ($ipv6) {
-          @parts = reverse 'arpa', 'ip6', split //, unpack 'H32',
-            inet_pton(IPV6_AF_INET6, $name);
-        }
+  # Send request
+  $self->_bind($server);
+  $self->{requests}->{$tx} = {
+    cb    => $cb,
+    timer => $loop->timer(
+      $self->timeout => sub {
+        my $loop = shift;
+        warn "RESOLVE TIMEOUT ($server)\n" if DEBUG;
+        $CURRENT_SERVER++;
+        $self->_cleanup;
       }
+    )
+  };
+  $loop->write($self->{id} => $req);
+}
 
-      # Query (Internet)
-      for my $part (@parts) {
-        $req .= pack 'C/a*', $part if defined $part;
-      }
-      $req .= pack 'Cnn', 0, $t, 0x0001;
-      $loop->write($id => $req);
-    },
+# "I wonder where Bart is, his dinner's getting all cold... and eaten."
+sub servers {
+  my $self = shift;
+
+  # New servers
+  if (@_) {
+    @$SERVERS       = @_;
+    $CURRENT_SERVER = 0;
+  }
+
+  # List all
+  return @$SERVERS if wantarray;
+
+  # Current server
+  $CURRENT_SERVER = 0 unless $SERVERS->[$CURRENT_SERVER];
+  return $SERVERS->[$CURRENT_SERVER];
+}
+
+sub _bind {
+  my ($self, $server) = @_;
+
+  # Reuse socket
+  return if $self->{id};
+
+  # New socket
+  my $loop = $self->ioloop;
+  weaken $self;
+  my $id = $self->{id} = $loop->connect(
+    address  => $server,
+    port     => 53,
     on_error => sub {
       my ($loop, $id) = @_;
-      warn "FAILED $type $name ($server)\n" if DEBUG;
+      warn "RESOLVE FAILURE ($server)\n" if DEBUG;
       $CURRENT_SERVER++;
-      $loop->drop($timer) if $timer;
-      $self->$cb([]);
+      $self->_cleanup;
     },
     on_read => sub {
       my ($loop, $id, $chunk) = @_;
 
-      # Cleanup
-      $loop->drop($id);
-      $loop->drop($timer) if $timer;
-
-      # Check answers
+      # Parse response
       my @packet = unpack 'nnnnnna*', $chunk;
       warn "ANSWERS $packet[3] ($server)\n" if DEBUG;
-      return $self->$cb([]) unless $packet[0] eq $tx;
+      return unless my $r = delete $self->{requests}->{$packet[0]};
+      $loop->drop($r->{timer});
 
       # Questions
       my $content = $packet[6];
@@ -199,47 +236,23 @@ sub resolve {
         push @answers, [@answer, $ttl];
         warn "ANSWER $answer[0] $answer[1]\n" if DEBUG;
       }
-      $self->$cb(\@answers);
+      $r->{cb}->($self, \@answers);
     },
     args => {Proto => 'udp', Type => SOCK_DGRAM}
   );
-
-  # Timer
-  $timer = $loop->timer(
-    $self->timeout => sub {
-      my $loop = shift;
-      warn "RESOLVE TIMEOUT ($server)\n" if DEBUG;
-
-      # Abort
-      $CURRENT_SERVER++;
-      $loop->drop($id);
-      $self->$cb([]);
-    }
-  );
-
-  return $self;
+  $loop->connection_timeout($id => 0);
 }
 
-# "I wonder where Bart is, his dinner's getting all cold... and eaten."
-sub servers {
+sub _cleanup {
   my $self = shift;
-
-  # New servers
-  if (@_) {
-    @$SERVERS       = @_;
-    $CURRENT_SERVER = 0;
-    return $self;
+  return unless my $loop = $self->ioloop;
+  $loop->drop(delete $self->{id}) if $self->{id};
+  for my $tx (keys %{$self->{requests}}) {
+    my $r = delete $self->{requests}->{$tx};
+    $r->{cb}->($self, []);
   }
-
-  # List all
-  return @$SERVERS if wantarray;
-
-  # Current server
-  $CURRENT_SERVER = 0 unless $SERVERS->[$CURRENT_SERVER];
-  return $SERVERS->[$CURRENT_SERVER];
 }
 
-# Answer helper for "resolve"
 sub _parse_answer {
   my ($t, $a, $packet, $rest) = @_;
 
@@ -280,7 +293,6 @@ sub _parse_answer {
   return;
 }
 
-# Domain name helper for "resolve"
 sub _parse_name {
   my ($packet, $offset) = @_;
 
@@ -322,7 +334,7 @@ Mojo::IOLoop::Resolver - IOLoop DNS Stub Resolver
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Resolver> is a minimalistic async io DNS stub resolver used
+L<Mojo::IOLoop::Resolver> is a minimalistic async I/O DNS stub resolver used
 by L<Mojo:IOLoop>.
 Note that this module is EXPERIMENTAL and might change without warning!
 
@@ -335,7 +347,7 @@ L<Mojo::IOLoop::Resolver> implements the following attributes.
   my $ioloop = $resolver->ioloop;
   $resolver  = $resolver->ioloop(Mojo::IOLoop->new);
 
-Loop object to use for io operations, by default a L<Mojo::IOLoop> object
+Loop object to use for I/O operations, by default a L<Mojo::IOLoop> object
 will be used.
 
 =head2 C<timeout>
@@ -354,14 +366,14 @@ implements the following new ones.
 
   my @all     = $resolver->servers;
   my $current = $resolver->servers;
-  $resolver   = $resolver->servers('8.8.8.8', '8.8.4.4');
+  $resolver->servers('8.8.8.8', '8.8.4.4');
 
 IP addresses of C<DNS> servers used for lookups, defaults to the value of
 C<MOJO_DNS_SERVER>, auto detection, C<8.8.8.8> or C<8.8.4.4>.
 
 =head2 C<lookup>
 
-  $resolver = $resolver->lookup('mojolicio.us' => sub {...});
+  $resolver->lookup('mojolicio.us' => sub {...});
 
 Lookup C<IPv4> or C<IPv6> address for domain.
 
@@ -374,7 +386,7 @@ Lookup C<IPv4> or C<IPv6> address for domain.
 
 =head2 C<resolve>
 
-  $resolver = $resolver->resolve('mojolicio.us', 'A', sub {...});
+  $resolver->resolve('mojolicio.us', 'A', sub {...});
 
 Resolve domain into C<A>, C<AAAA>, C<CNAME>, C<MX>, C<NS>, C<PTR> or C<TXT>
 records, C<*> will query for all at once.

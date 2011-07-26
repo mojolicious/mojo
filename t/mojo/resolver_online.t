@@ -167,13 +167,14 @@ Mojo::IOLoop->start;
 ok $found, 'found IPv6 PTR record';
 
 # Invalid DNS server
-ok scalar $r->servers, 'got a dns server';
+$r = Mojo::IOLoop::Resolver->new;
+ok scalar $r->servers, 'got a DNS server';
 $r->servers('192.0.2.1', $r->servers);
-is $r->servers, '192.0.2.1', 'new invalid dns server';
+is $r->servers, '192.0.2.1', 'new invalid DNS server';
 $r->lookup('google.com', sub { Mojo::IOLoop->stop });
 Mojo::IOLoop->start;
 my $fallback = $r->servers;
-isnt $fallback, '192.0.2.1', 'valid dns server';
+isnt $fallback, '192.0.2.1', 'valid DNS server';
 $result = undef;
 $r->lookup(
   'google.com',
@@ -185,5 +186,5 @@ $r->lookup(
 );
 Mojo::IOLoop->start;
 ok $result, 'got an address';
-is scalar $r->servers, $fallback, 'still the same dns server';
-isnt $fallback, '192.0.2.1', 'still valid dns server';
+is scalar $r->servers, $fallback, 'still the same DNS server';
+isnt $fallback, '192.0.2.1', 'still valid DNS server';

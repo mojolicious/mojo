@@ -145,8 +145,6 @@ sub listen {
     ) if $args->{tls_ca};
     $self->{tls} = {%options, %{$args->{tls_args} || {}}};
   }
-
-  return $self;
 }
 
 sub generate_port {

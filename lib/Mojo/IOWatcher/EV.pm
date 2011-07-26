@@ -97,7 +97,7 @@ __END__
 
 =head1 NAME
 
-Mojo::IOWatcher::EV - EV Async IO Watcher
+Mojo::IOWatcher::EV - EV Async I/O Watcher
 
 =head1 SYNOPSIS
 
@@ -105,7 +105,7 @@ Mojo::IOWatcher::EV - EV Async IO Watcher
 
 =head1 DESCRIPTION
 
-L<Mojo::IOWatcher> is a minimalistic async io watcher with C<libev> support.
+L<Mojo::IOWatcher> is a minimalistic async I/O watcher with C<libev> support.
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS
@@ -129,7 +129,7 @@ Only watch handle for readable events.
 
   $watcher->one_tick('0.25');
 
-Run for exactly one tick and watch for io and timer events.
+Run for exactly one tick and watch for I/O and timer events.
 
 =head2 C<recurring>
 

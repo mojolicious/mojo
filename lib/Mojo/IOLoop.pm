@@ -144,7 +144,7 @@ sub connect {
 sub connection_timeout {
   my ($self, $id, $timeout) = @_;
   return unless my $c = $self->{connections}->{$id};
-  $c->{timeout} = $timeout and return $self if $timeout;
+  $c->{timeout} = $timeout and return $self if defined $timeout;
   $c->{timeout};
 }
 
@@ -270,7 +270,9 @@ sub one_tick {
 
     # Connection timeout
     my $time = $c->{active} ||= time;
-    $self->_drop($id) if (time - $time) >= ($c->{timeout} || 15);
+    $c->{timeout} = 15 unless defined $c->{timeout};
+    next unless my $timeout = $c->{timeout};
+    $self->_drop($id) if (time - $time) >= $timeout;
   }
 
   # Graceful shutdown

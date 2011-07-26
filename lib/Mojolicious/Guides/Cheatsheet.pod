@@ -279,13 +279,6 @@ Note that L<IO::Socket::SSL> must be installed for TLS support.
 
   MOJO_NO_TLS=1
 
-=head2 C<MOJO_POLL>
-
-Force poll mainloop for I/O operations, this should only be used for testing
-since other mainloops are generally faster and scale better.
-
-  MOJO_POLL=1
-
 =head2 C<MOJO_PROXY>
 
 Enable automatic HTTP and HTTPS proxy detection in L<Mojo::UserAgent>, for

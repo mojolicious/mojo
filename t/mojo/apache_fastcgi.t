@@ -4,7 +4,10 @@ use strict;
 use warnings;
 
 # Disable Bonjour, IPv6 and libev
-BEGIN { $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
+BEGIN {
+  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
+}
 
 # mod_fastcgi doesn't like small chunks
 BEGIN { $ENV{MOJO_CHUNK_SIZE} = 131072 }

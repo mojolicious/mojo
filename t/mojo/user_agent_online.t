@@ -4,7 +4,10 @@ use strict;
 use warnings;
 
 # Disable libev and TLS
-BEGIN { $ENV{MOJO_POLL} = $ENV{MOJO_NO_TLS} = 1 }
+BEGIN {
+  $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
+  $ENV{MOJO_NO_TLS}    = 1;
+}
 
 use Test::More;
 

@@ -209,8 +209,8 @@ Cancel timer.
 
   my $class = Mojo::IOWatcher->detect;
 
-Detect the best watcher implementation available, will try the value of
-C<MOJO_IOWATCHER> or L<Mojo::IOWatcher::EV>.
+Detect and load the best watcher implementation available, will try the value
+of C<MOJO_IOWATCHER> or L<Mojo::IOWatcher::EV>.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<is_readable>

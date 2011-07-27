@@ -40,7 +40,7 @@ is $writable, undef, 'handle is not writable';
 
 # Connect
 my $client =
-  IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $port);
+ IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $port);
 $watcher->one_tick(0);
 is $readable, 1,     'handle is readable';
 is $writable, undef, 'handle is not writable';

@@ -22,7 +22,7 @@ sub dispatch {
   my $stash = $c->stash;
   my $path  = $stash->{path};
   $path = $c->req->url->path->clone->canonicalize->to_string
-    unless defined $path;
+   unless defined $path;
 
   # Split parts
   my @parts = @{Mojo::Path->new->parse($path)->parts};
@@ -54,7 +54,7 @@ sub serve {
 
   # Root for bundled files
   $self->{bundled}
-    ||= File::Spec->catdir(File::Spec->splitdir(dirname(__FILE__)), 'public');
+   ||= File::Spec->catdir(File::Spec->splitdir(dirname(__FILE__)), 'public');
 
   # Normal file
   my $asset;
@@ -145,14 +145,14 @@ sub _get_data_file {
 
   # Detect DATA class
   my $class =
-       $c->stash->{static_class}
-    || $ENV{MOJO_STATIC_CLASS}
-    || $self->default_static_class
-    || 'main';
+      $c->stash->{static_class}
+   || $ENV{MOJO_STATIC_CLASS}
+   || $self->default_static_class
+   || 'main';
 
   # Find DATA file
   my $data = $self->{data_files}->{$class}
-    ||= [keys %{Mojo::Command->new->get_all_data($class) || {}}];
+   ||= [keys %{Mojo::Command->new->get_all_data($class) || {}}];
   for my $path (@$data) {
     return Mojo::Command->new->get_data($path, $class) if $path eq $rel;
   }

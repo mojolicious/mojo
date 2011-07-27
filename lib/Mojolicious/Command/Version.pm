@@ -24,33 +24,33 @@ sub run {
   my $latest = $current;
   eval {
     Mojo::UserAgent->new->max_redirects(3)
-      ->get('search.cpan.org/dist/Mojolicious')->res->dom('.version')
-      ->each(sub { $latest = $_->text if $_->text =~ /^[\d\.]+$/ });
+     ->get('search.cpan.org/dist/Mojolicious')->res->dom('.version')
+     ->each(sub { $latest = $_->text if $_->text =~ /^[\d\.]+$/ });
   };
 
   # Message
   my $message = 'This version is up to date, have fun!';
   $message = 'Thanks for testing a development release, you are awesome!'
-    if $latest < $current;
+   if $latest < $current;
   $message = "You might want to update your Mojolicious to $latest."
-    if $latest > $current;
+   if $latest > $current;
 
   # EV
   my $ev = Mojo::IOLoop::EV() ? $EV::VERSION : 'not installed';
 
   # IPv6
   my $ipv6 =
-    Mojo::IOLoop::Server::IPV6() ? $IO::Socket::IP::VERSION : 'not installed';
+   Mojo::IOLoop::Server::IPV6() ? $IO::Socket::IP::VERSION : 'not installed';
 
   # TLS
   my $tls =
-    Mojo::IOLoop::Server::TLS() ? $IO::Socket::SSL::VERSION : 'not installed';
+   Mojo::IOLoop::Server::TLS() ? $IO::Socket::SSL::VERSION : 'not installed';
 
   # Bonjour
   my $bonjour =
-    eval 'Mojo::Server::Daemon::BONJOUR()'
-    ? $Net::Rendezvous::Publish::VERSION
-    : 'not installed';
+   eval 'Mojo::Server::Daemon::BONJOUR()'
+   ? $Net::Rendezvous::Publish::VERSION
+   : 'not installed';
 
   print <<"EOF";
 CORE

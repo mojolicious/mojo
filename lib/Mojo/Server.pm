@@ -20,7 +20,7 @@ has app => sub {
   $self->app_class->new;
 };
 has app_class =>
-  sub { ref $ENV{MOJO_APP} || $ENV{MOJO_APP} || 'Mojo::HelloWorld' };
+ sub { ref $ENV{MOJO_APP} || $ENV{MOJO_APP} || 'Mojo::HelloWorld' };
 has on_request => sub {
   sub {
     my $app = shift->app;
@@ -64,7 +64,7 @@ package $class;
 1;
 EOF
   die qq/"$file" is not a valid application.\n/
-    unless blessed $app && $app->isa('Mojo');
+   unless blessed $app && $app->isa('Mojo');
   $self->app($app);
   return $app;
 }

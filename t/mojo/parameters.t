@@ -34,7 +34,7 @@ is "$params", "$clone", 'equal results';
 # Merge
 $params->merge($params2);
 is $params->to_string, 'foo=b%3Bar;baz=23;a=4;a=5;b=6;b=7;x=1;y=2',
-  'right format';
+ 'right format';
 is $params2->to_string, 'x=1&y=2', 'right format';
 
 # Param
@@ -60,7 +60,7 @@ is_deeply [$params->param], [qw/q t w/], 'right structure';
 # Append
 $params->append('a', 4, 'a', 5, 'b', 6, 'b', 7);
 is_deeply $params->to_hash,
-  {a => [4, 5], b => [6, 7], q => 1, w => 2, t => 7}, 'right structure';
+ {a => [4, 5], b => [6, 7], q => 1, w => 2, t => 7}, 'right structure';
 $params = Mojo::Parameters->new(foo => undef, bar => 'bar');
 is $params->to_string, 'foo=&bar=bar', 'right format';
 $params = Mojo::Parameters->new(bar => 'bar', foo => undef);
@@ -149,12 +149,11 @@ is_deeply [$params->param('foo')], [qw/bar baz/], 'right values';
 is $params->param('a'), 'b', 'right value';
 is_deeply [$params->param('bar')], [qw/bas test/], 'right values';
 is_deeply $params->to_hash,
-  {
-  foo => ['bar', 'baz'],
+ {foo => ['bar', 'baz'],
   a   => 'b',
   bar => ['bas', 'test']
-  },
-  'right structure';
+ },
+ 'right structure';
 
 # Unicode
 $params = Mojo::Parameters->new;

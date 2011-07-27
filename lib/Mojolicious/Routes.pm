@@ -27,7 +27,7 @@ sub AUTOLOAD {
 
   # Call shortcut
   Carp::croak(qq/Can't locate object method "$method" via package "$package"/)
-    unless my $shortcut = $self->shortcuts->{$method};
+   unless my $shortcut = $self->shortcuts->{$method};
   return $self->$shortcut(@_);
 }
 
@@ -381,7 +381,7 @@ sub _dispatch_controller {
 
   # Class and method
   return 1
-    unless my $app = $field->{app} || $self->_generate_class($field, $c);
+   unless my $app = $field->{app} || $self->_generate_class($field, $c);
   my $method = $self->_generate_method($field, $c);
   my $dispatch = ref $app || $app;
   $dispatch .= "->$method" if $method;
@@ -480,7 +480,7 @@ sub _generate_class {
   return unless $class || $namespace;
   $namespace = $self->namespace unless defined $namespace;
   $class = length $class ? "${namespace}::$class" : $namespace
-    if length $namespace;
+   if length $namespace;
 
   # Invalid
   return unless $class =~ /^[a-zA-Z0-9_:]+$/;
@@ -549,13 +549,13 @@ sub _generate_route {
 
   # Create bridge
   return $self->bridge($pattern, {@$constraints})->over($conditions)
-    ->to($defaults)->name($name)
-    if !ref $methods && $methods eq 'under';
+   ->to($defaults)->name($name)
+   if !ref $methods && $methods eq 'under';
 
   # Create route
   my $route =
-    $self->route($pattern, {@$constraints})->over($conditions)->via($methods)
-    ->to($defaults)->name($name);
+   $self->route($pattern, {@$constraints})->over($conditions)->via($methods)
+   ->to($defaults)->name($name);
 
   return $route;
 }
@@ -565,7 +565,7 @@ sub _walk_stack {
 
   # Stacktrace
   local $SIG{__DIE__} =
-    sub { ref $_[0] ? CORE::die($_[0]) : Mojo::Exception->throw(@_) };
+   sub { ref $_[0] ? CORE::die($_[0]) : Mojo::Exception->throw(@_) };
 
   # Walk the stack
   my $stack   = $c->match->stack;
@@ -581,9 +581,9 @@ sub _walk_stack {
 
     # Dispatch
     my $e =
-        $field->{cb}
-      ? $self->_dispatch_callback($c, $field, $staging)
-      : $self->_dispatch_controller($c, $field, $staging);
+       $field->{cb}
+     ? $self->_dispatch_callback($c, $field, $staging)
+     : $self->_dispatch_controller($c, $field, $staging);
 
     # Exception
     if (ref $e) {

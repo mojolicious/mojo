@@ -218,7 +218,7 @@ sub listen {
       $stream->resume;
       $accept->($self, $id) if $accept;
       $self->max_connections(0)
-        if defined $self->{accepts} && --$self->{accepts} == 0;
+       if defined $self->{accepts} && --$self->{accepts} == 0;
       $self->_not_listening;
     }
   );

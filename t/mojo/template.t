@@ -566,7 +566,7 @@ test
 EOF
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/^Missing right curly or square bracket/,
-  'right message';
+ 'right message';
 like $output->message, qr/syntax error at template line 5.$/, 'right message';
 is $output->lines_before->[0]->[0], 1,          'right number';
 is $output->lines_before->[0]->[1], 'test',     'right line';
@@ -594,7 +594,7 @@ isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/ohoh/, 'right message';
 is $output->lines_before->[0]->[0], 14, 'right number';
 is $output->lines_before->[0]->[1], 'package MyTemplateException;',
-  'right line';
+ 'right line';
 is $output->lines_before->[1]->[0], 15,              'right number';
 is $output->lines_before->[1]->[1], '',              'right line';
 is $output->lines_before->[2]->[0], 16,              'right number';
@@ -633,7 +633,7 @@ is $output->lines_after->[0]->[1], '%= 1 + 1', 'right line';
 is $output->lines_after->[1]->[0], 5,          'right number';
 is $output->lines_after->[1]->[1], 'test',     'right line';
 like "$output", qr/oops\! at template line 3, near "%= 1 \+ 1"./,
-  'right result';
+ 'right result';
 
 # Exception in template (empty perl lines)
 $mt     = Mojo::Template->new;
@@ -970,7 +970,7 @@ EOF
 # File
 $mt = Mojo::Template->new;
 my $file =
-  File::Spec->catfile(File::Spec->splitdir($FindBin::Bin), qw/lib test.mt/);
+ File::Spec->catfile(File::Spec->splitdir($FindBin::Bin), qw/lib test.mt/);
 $output = $mt->render_file($file, 3);
 like $output, qr/23\nHello World!/, 'file';
 
@@ -981,7 +981,7 @@ $file = File::Spec->catfile(File::Spec->splitdir($FindBin::Bin),
 $output = $mt->render_file($file);
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/exception\.mt\ line\ 2/,
-  'message contains file name';
+ 'message contains file name';
 is $output->lines_before->[0]->[0], 1,      'right number';
 is $output->lines_before->[0]->[1], 'test', 'right line';
 is $output->line->[0], 2,        'right number';

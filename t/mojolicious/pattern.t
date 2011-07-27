@@ -37,7 +37,7 @@ is $pattern->render, '/', 'right result';
 
 # Regex in pattern
 $pattern =
-  Mojolicious::Routes::Pattern->new('/test/(controller)/:action/(id)',
+ Mojolicious::Routes::Pattern->new('/test/(controller)/:action/(id)',
   id => '\d+');
 $pattern->defaults({action => 'index', id => 1});
 $result = $pattern->match('/test/foo/bar/203');
@@ -47,7 +47,7 @@ is $result->{id},         203,   'right value';
 $result = $pattern->match('/test/foo/bar/baz');
 is_deeply $result, undef, 'no result';
 is $pattern->render({controller => 'zzz', action => 'index', id => 13}),
-  '/test/zzz/index/13', 'right result';
+ '/test/zzz/index/13', 'right result';
 is $pattern->render({controller => 'zzz'}), '/test/zzz', 'right result';
 
 # Quoted symbol
@@ -57,7 +57,7 @@ $result = $pattern->match('/footest/bar');
 is $result->{controller}, 'foo', 'right value';
 is $result->{action},     'bar', 'right value';
 is $pattern->render({controller => 'zzz', action => 'lala'}), '/zzztest/lala',
-  'right result';
+ 'right result';
 $result = $pattern->match('/test/lala');
 is $result, undef, 'no result';
 
@@ -65,7 +65,7 @@ is $result, undef, 'no result';
 $pattern = Mojolicious::Routes::Pattern->new('/(controller)test/(action)');
 is $pattern->defaults->{format}, undef, 'no value';
 $pattern =
-  Mojolicious::Routes::Pattern->new('/(:controller)test/:action.html');
+ Mojolicious::Routes::Pattern->new('/(:controller)test/:action.html');
 is $pattern->defaults->{format}, 'html', 'right value';
 $pattern = Mojolicious::Routes::Pattern->new('/index.cgi');
 is $pattern->defaults->{format}, 'cgi', 'right value';
@@ -76,7 +76,7 @@ $result  = $pattern->match('/test/foo.bar/baz');
 is $result->{controller}, 'foo.bar', 'right value';
 is $result->{action},     'baz',     'right value';
 is $pattern->render({controller => 'foo.bar', action => 'baz'}),
-  '/test/foo.bar/baz', 'right result';
+ '/test/foo.bar/baz', 'right result';
 $pattern = Mojolicious::Routes::Pattern->new('/test/(.groovy)');
 $result  = $pattern->match('/test/foo.bar');
 is $pattern->defaults->{format}, undef, 'no value';
@@ -90,13 +90,13 @@ $result  = $pattern->match('/test/foo/bar.baz/yada');
 is $result->{controller}, 'foo',          'right value';
 is $result->{action},     'bar.baz/yada', 'right value';
 is $pattern->render({controller => 'foo', action => 'bar.baz/yada'}),
-  '/test/foo/bar.baz/yada', 'right result';
+ '/test/foo/bar.baz/yada', 'right result';
 $pattern = Mojolicious::Routes::Pattern->new('/tset/:controller/*action');
 $result  = $pattern->match('/tset/foo/bar.baz/yada');
 is $result->{controller}, 'foo',          'right value';
 is $result->{action},     'bar.baz/yada', 'right value';
 is $pattern->render({controller => 'foo', action => 'bar.baz/yada'}),
-  '/tset/foo/bar.baz/yada', 'right result';
+ '/tset/foo/bar.baz/yada', 'right result';
 
 # Render false value
 $pattern = Mojolicious::Routes::Pattern->new('/:id');

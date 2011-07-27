@@ -66,7 +66,7 @@ sub decode {
 
   # Wide characters
   $self->error('Wide character in input.') and return
-    unless utf8::downgrade($_, 1);
+   unless utf8::downgrade($_, 1);
 
   # Detect and decode unicode
   my $encoding = 'UTF-8';
@@ -149,14 +149,14 @@ sub _decode_object {
 
     # Quote
     m/\G$WHITESPACE_RE"/xogc
-      or _exception("Expected string while parsing object");
+     or _exception("Expected string while parsing object");
 
     # Key
     my $key = _decode_string();
 
     # Colon
     m/\G$WHITESPACE_RE:/xogc
-      or _exception('Expected colon while parsing object');
+     or _exception('Expected colon while parsing object');
 
     # Value
     $hash{$key} = _decode_value();
@@ -184,7 +184,7 @@ sub _decode_string {
   # Missing quote
   unless (m/\G"/gc) {
     _exception('Unexpected character or invalid escape while parsing string')
-      if m/\G[\x00-\x1F\\]/x;
+     if m/\G[\x00-\x1F\\]/x;
     _exception('Unterminated string');
   }
 
@@ -211,13 +211,13 @@ sub _decode_string {
 
         # High surrogate
         ($ord & 0xFC00) == 0xD800
-          or pos($_) = $pos + pos($str),
-          _exception('Missing high-surrogate');
+         or pos($_) = $pos + pos($str),
+         _exception('Missing high-surrogate');
 
         # Low surrogate
         $str =~ m/\G\\u([Dd][C-Fc-f]..)/gc
-          or pos($_) = $pos + pos($str),
-          _exception('Missing low-surrogate');
+         or pos($_) = $pos + pos($str),
+         _exception('Missing low-surrogate');
 
         # Pair
         $ord = 0x10000 + ($ord - 0xD800) * 0x400 + (hex($1) - 0xDC00);
@@ -252,7 +252,7 @@ sub _decode_value {
 
   # Number
   return 0 + $1
-    if m/\G([-]?(?:0|[1-9][0-9]*)(?:\.[0-9]*)?(?:[eE][+-]?[0-9]+)?)/gc;
+   if m/\G([-]?(?:0|[1-9][0-9]*)(?:\.[0-9]*)?(?:[eE][+-]?[0-9]+)?)/gc;
 
   # True
   return $TRUE if m/\Gtrue/gc;
@@ -302,7 +302,7 @@ sub _encode_string {
 
   # Escape string
   $string
-    =~ s/([\x00-\x1F\x7F\x{2028}\x{2029}\\\"\/\b\f\n\r\t])/$REVERSE{$1}/gs;
+   =~ s/([\x00-\x1F\x7F\x{2028}\x{2029}\\\"\/\b\f\n\r\t])/$REVERSE{$1}/gs;
 
   # Stringify
   return "\"$string\"";
@@ -333,7 +333,7 @@ sub _encode_values {
   # Number
   my $flags = B::svref_2object(\$value)->FLAGS;
   return $value
-    if $flags & (B::SVp_IOK | B::SVp_NOK) && !($flags & B::SVp_POK);
+   if $flags & (B::SVp_IOK | B::SVp_NOK) && !($flags & B::SVp_POK);
 
   # String
   _encode_string($value);
@@ -360,9 +360,9 @@ sub _exception {
 package Mojo::JSON::_Bool;
 use Mojo::Base -base;
 use overload
-  '0+'     => sub { $_[0]->{value} },
-  '""'     => sub { $_[0]->{value} },
-  fallback => 1;
+ '0+'     => sub { $_[0]->{value} },
+ '""'     => sub { $_[0]->{value} },
+ fallback => 1;
 
 sub new { shift->SUPER::new(value => shift) }
 

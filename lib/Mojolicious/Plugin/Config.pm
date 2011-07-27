@@ -13,7 +13,7 @@ sub load {
 
   # Slurp UTF-8 file
   open my $handle, "<:encoding(UTF-8)", $file
-    or die qq/Couldn't open config file "$file": $!/;
+   or die qq/Couldn't open config file "$file": $!/;
   my $content = do { local $/; <$handle> };
 
   # Process
@@ -26,9 +26,9 @@ sub parse {
   # Run Perl code
   no warnings;
   die qq/Couldn't parse config file "$file": $@/
-    unless my $config = eval "sub app { \$app }; $content";
+   unless my $config = eval "sub app { \$app }; $content";
   die qq/Config file "$file" did not return a hashref.\n/
-    unless ref $config && ref $config eq 'HASH';
+   unless ref $config && ref $config eq 'HASH';
 
   return $config;
 }
@@ -61,9 +61,9 @@ sub register {
 
   # Absolute path
   $file = $app->home->rel_file($file)
-    unless File::Spec->file_name_is_absolute($file);
+   unless File::Spec->file_name_is_absolute($file);
   $mode = $app->home->rel_file($mode)
-    if defined $mode && !File::Spec->file_name_is_absolute($mode);
+   if defined $mode && !File::Spec->file_name_is_absolute($mode);
 
   # Read config file
   my $config = {};
@@ -74,13 +74,13 @@ sub register {
 
     # All missing
     die qq/Config file "$file" missing, maybe you need to create it?\n/
-      unless $conf->{default};
+     unless $conf->{default};
     $app->log->debug(qq/Config file "$file" missing, using default config./);
   }
 
   # Merge everything
   $config = {%$config, %{$self->load($mode, $conf, $app)}}
-    if defined $mode && -e $mode;
+   if defined $mode && -e $mode;
   $config = {%{$conf->{default}}, %$config} if $conf->{default};
 
   # Add "config" helper

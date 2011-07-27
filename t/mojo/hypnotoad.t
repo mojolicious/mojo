@@ -21,7 +21,7 @@ use Mojo::IOLoop;
 use Mojo::UserAgent;
 
 plan skip_all => 'set TEST_HYPNOTOAD to enable this test (developer only!)'
-  unless $ENV{TEST_HYPNOTOAD};
+ unless $ENV{TEST_HYPNOTOAD};
 plan tests => 51;
 
 # "I ate the blue ones... they taste like burning."
@@ -54,11 +54,11 @@ EOF
 my $prefix = "$FindBin::Bin/../../script";
 open my $start, '-|', $^X, "$prefix/hypnotoad", $script;
 sleep 1
-  while !IO::Socket::INET->new(
+ while !IO::Socket::INET->new(
   Proto    => 'tcp',
   PeerAddr => 'localhost',
   PeerPort => $port2
-  );
+ );
 my $old = _pid();
 
 my $ua = Mojo::UserAgent->new;
@@ -168,18 +168,18 @@ is $tx->res->body, 'Hello World!', 'right content';
 # Stop
 open my $stop, '-|', $^X, "$prefix/hypnotoad", $script, '--stop';
 sleep 1
-  while IO::Socket::INET->new(
+ while IO::Socket::INET->new(
   Proto    => 'tcp',
   PeerAddr => 'localhost',
   PeerPort => $port2
-  );
+ );
 
 # Cleanup
 chdir $cwd;
 
 sub _pid {
   return
-    unless my $file = IO::File->new($command->rel_file('hypnotoad.pid'), '<');
+   unless my $file = IO::File->new($command->rel_file('hypnotoad.pid'), '<');
   my $pid = <$file>;
   chomp $pid;
   return $pid;

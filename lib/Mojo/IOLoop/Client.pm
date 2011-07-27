@@ -7,13 +7,13 @@ use Socket qw/IPPROTO_TCP SO_ERROR TCP_NODELAY/;
 
 # IPv6 support requires IO::Socket::IP
 use constant IPV6 => $ENV{MOJO_NO_IPV6}
-  ? 0
-  : eval 'use IO::Socket::IP 0.06 (); 1';
+ ? 0
+ : eval 'use IO::Socket::IP 0.06 (); 1';
 
 # TLS support requires IO::Socket::SSL
 use constant TLS => $ENV{MOJO_NO_TLS}
-  ? 0
-  : eval 'use IO::Socket::SSL 1.43 "inet4"; 1';
+ ? 0
+ : eval 'use IO::Socket::SSL 1.43 "inet4"; 1';
 use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
@@ -68,11 +68,11 @@ sub _connect {
     $options{PeerAddr} =~ s/[\[\]]//g if $options{PeerAddr};
     my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';
     return $self->emit(error => "Couldn't connect.")
-      unless $handle = $class->new(%options);
+     unless $handle = $class->new(%options);
 
     # Timer
     $self->{timer} =
-      $watcher->timer($timeout,
+     $watcher->timer($timeout,
       sub { $self->emit(error => 'Connect timeout.') });
 
     # IPv6 needs an early start
@@ -91,7 +91,7 @@ sub _connect {
     # No TLS support
     return $self->emit(
       error => 'IO::Socket::SSL 1.43 required for TLS support.')
-      unless TLS;
+     unless TLS;
 
     # Upgrade
     weaken $self;
@@ -109,13 +109,13 @@ sub _connect {
       SSL_key_file    => $args->{tls_key},
       SSL_verify_mode => 0x00,
       SSL_create_ctx_callback =>
-        sub { Net::SSLeay::CTX_sess_set_cache_size(shift, 128) },
+       sub { Net::SSLeay::CTX_sess_set_cache_size(shift, 128) },
       Timeout => $timeout,
       %{$args->{tls_args} || {}}
     );
     $self->{tls} = 1;
     return $self->emit(error => 'TLS upgrade failed.')
-      unless $handle = IO::Socket::SSL->start_SSL($handle, %options);
+     unless $handle = IO::Socket::SSL->start_SSL($handle, %options);
   }
 
   # Start writing right away
@@ -142,7 +142,7 @@ sub _connecting {
 
   # Check for errors
   return $self->emit(error => $! = $handle->sockopt(SO_ERROR))
-    unless $handle->connected;
+   unless $handle->connected;
 
   # Connected
   $self->{connected} = 1;

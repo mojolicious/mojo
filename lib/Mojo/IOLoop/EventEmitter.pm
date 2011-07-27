@@ -17,7 +17,7 @@ sub emit {
   warn "EMIT $name (" . scalar(@subscribers) . ")\n" if DEBUG;
   for my $cb (@subscribers) {
     $self->emit('error', qq/Event "$name" failed: $@/)
-      if !eval { $self->$cb(@_); 1 } && $name ne 'error';
+     if !eval { $self->$cb(@_); 1 } && $name ne 'error';
   }
 
   return $self;

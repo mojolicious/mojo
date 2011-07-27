@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+1.67    2011-07-27 00:00:00
+        - Improved ".perltidyrc".
+
 1.66    2011-07-27 00:00:00
         - Added EXPERIMENTAL detect method to Mojo::IOWatcher.
         - Improved Mojo::IOLoop::Resolver efficiency.
@@ -1519,7 +1522,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed / routes matching too much.
         - New Windows workaround in Mojo::Client and Mojo::Server::Daemon.
         - Cleaned up Mojo::Transaction. (Ask Bjoern Hansen)
-        - Added .perltidyrc. (Ask Bjoern Hansen)
+        - Added ".perltidyrc". (Ask Bjoern Hansen)
         - Allow chains to be broken with return values in
           MojoX::Dispatcher::Routes.
         - The stack in MojoX::Routes resets now.

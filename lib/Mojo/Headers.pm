@@ -7,67 +7,67 @@ has max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 10240 };
 
 # Headers
 my @GENERAL_HEADERS = qw/
-  Connection
-  Cache-Control
-  Date
-  Pragma
-  Trailer
-  Transfer-Encoding
-  Upgrade
-  Via
-  Warning
-  /;
+ Connection
+ Cache-Control
+ Date
+ Pragma
+ Trailer
+ Transfer-Encoding
+ Upgrade
+ Via
+ Warning
+ /;
 my @REQUEST_HEADERS = qw/
-  Accept
-  Accept-Charset
-  Accept-Encoding
-  Accept-Language
-  Authorization
-  Expect
-  From
-  Host
-  If-Match
-  If-Modified-Since
-  If-None-Match
-  If-Range
-  If-Unmodified-Since
-  Max-Forwards
-  Proxy-Authorization
-  Range
-  Referer
-  TE
-  User-Agent
-  /;
+ Accept
+ Accept-Charset
+ Accept-Encoding
+ Accept-Language
+ Authorization
+ Expect
+ From
+ Host
+ If-Match
+ If-Modified-Since
+ If-None-Match
+ If-Range
+ If-Unmodified-Since
+ Max-Forwards
+ Proxy-Authorization
+ Range
+ Referer
+ TE
+ User-Agent
+ /;
 my @RESPONSE_HEADERS = qw/
-  Accept-Ranges
-  Age
-  ETag
-  Location
-  Proxy-Authenticate
-  Retry-After
-  Server
-  Vary
-  WWW-Authenticate
-  /;
+ Accept-Ranges
+ Age
+ ETag
+ Location
+ Proxy-Authenticate
+ Retry-After
+ Server
+ Vary
+ WWW-Authenticate
+ /;
 my @ENTITY_HEADERS = qw/
-  Allow
-  Content-Encoding
-  Content-Language
-  Content-Length
-  Content-Location
-  Content-MD5
-  Content-Range
-  Content-Type
-  Expires
-  Last-Modified
-  /;
+ Allow
+ Content-Encoding
+ Content-Language
+ Content-Length
+ Content-Location
+ Content-MD5
+ Content-Range
+ Content-Type
+ Expires
+ Last-Modified
+ /;
 my @WEBSOCKET_HEADERS = qw/
-  Sec-WebSocket-Accept
-  Sec-WebSocket-Key
-  Sec-WebSocket-Origin
-  Sec-WebSocket-Protocol
-  Sec-WebSocket-Version
-  /;
+ Sec-WebSocket-Accept
+ Sec-WebSocket-Key
+ Sec-WebSocket-Origin
+ Sec-WebSocket-Protocol
+ Sec-WebSocket-Version
+ /;
 my @MISC_HEADERS = qw/DNT/;
 my @HEADERS      = (
   @GENERAL_HEADERS, @REQUEST_HEADERS,   @RESPONSE_HEADERS,
@@ -92,12 +92,12 @@ sub add {
   # Make sure we have a normal case entry for name
   my $lcname = lc $name;
   $NORMALCASE_HEADERS{$lcname} = $name
-    unless exists $NORMALCASE_HEADERS{$lcname};
+   unless exists $NORMALCASE_HEADERS{$lcname};
   $name = $lcname;
 
   # Add lines
   push @{$self->{headers}->{$name}}, (ref $_ || '') eq 'ARRAY' ? $_ : [$_]
-    for @_;
+   for @_;
 
   return $self;
 }

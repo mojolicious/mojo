@@ -19,18 +19,18 @@ my %ROLE_NUMBERS;
 
 # Types
 my @TYPES = qw/
-  BEGIN_REQUEST
-  ABORT_REQUEST
-  END_REQUEST
-  PARAMS
-  STDIN
-  STDOUT
-  STDERR
-  DATA
-  GET_VALUES
-  GET_VALUES_RESULT
-  UNKNOWN_TYPE
-  /;
+ BEGIN_REQUEST
+ ABORT_REQUEST
+ END_REQUEST
+ PARAMS
+ STDIN
+ STDOUT
+ STDERR
+ DATA
+ GET_VALUES
+ GET_VALUES_RESULT
+ UNKNOWN_TYPE
+ /;
 my %TYPE_NUMBERS;
 {
   my $i = 1;
@@ -150,7 +150,7 @@ sub read_request {
         # Environment
         $env->{$name} = $value;
         $self->app->log->debug(qq/FastCGI param: $name - "$value"./)
-          if DEBUG;
+         if DEBUG;
 
         # Store connection information
         $tx->remote_address($value) if $name =~ /REMOTE_ADDR/i;
@@ -261,9 +261,9 @@ sub write_records {
 
     # Write whole record
     my $record = pack $template, 1, $self->type_number($type), $id,
-      $payload_len,
-      $pad_len,
-      substr($body, $offset, $payload_len);
+     $payload_len,
+     $pad_len,
+     substr($body, $offset, $payload_len);
     my $woffset = 0;
     while ($woffset < length $record) {
       my $written = $c->syswrite($record, undef, $woffset);
@@ -321,7 +321,7 @@ sub write_response {
     # Headers
     $offset += length $chunk;
     return
-      unless $self->write_records($c, 'STDOUT', $tx->{fcgi_id}, $chunk);
+     unless $self->write_records($c, 'STDOUT', $tx->{fcgi_id}, $chunk);
   }
 
   # Body
@@ -341,14 +341,14 @@ sub write_response {
     # Content
     $offset += length $chunk;
     return
-      unless $self->write_records($c, 'STDOUT', $tx->{fcgi_id}, $chunk);
+     unless $self->write_records($c, 'STDOUT', $tx->{fcgi_id}, $chunk);
   }
 
   # The end
   return
-    unless $self->write_records($c, 'STDOUT', $tx->{fcgi_id}, undef);
+   unless $self->write_records($c, 'STDOUT', $tx->{fcgi_id}, undef);
   return
-    unless $self->write_records($c, 'END_REQUEST', $tx->{fcgi_id},
+   unless $self->write_records($c, 'END_REQUEST', $tx->{fcgi_id},
     pack('CCCCCCCC', 0));
 }
 

@@ -126,7 +126,7 @@ sub client_write {
 
     # End
     $self->{state} = 'read_response'
-      if defined $buffer && !length $buffer;
+     if defined $buffer && !length $buffer;
 
     # Chunked
     $self->{write} = 1 if $req->is_chunked;
@@ -161,12 +161,12 @@ sub keep_alive {
 
   # Keep alive
   $self->{keep_alive} = 1
-    if $req_connection =~ /^keep-alive$/i
-      || $res_connection =~ /^keep-alive$/i;
+   if $req_connection =~ /^keep-alive$/i
+     || $res_connection =~ /^keep-alive$/i;
 
   # Close
   $self->{keep_alive} = 0
-    if $req_connection =~ /^close$/i || $res_connection =~ /^close$/i;
+   if $req_connection =~ /^close$/i || $res_connection =~ /^close$/i;
 
   # Default
   $self->{keep_alive} = 1 unless defined $self->{keep_alive};
@@ -362,7 +362,7 @@ sub server_write {
 
       # Done
       $self->{state} = 'done'
-        if $self->{write} <= 0 || (defined $buffer && !length $buffer);
+       if $self->{write} <= 0 || (defined $buffer && !length $buffer);
     }
   }
 

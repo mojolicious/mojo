@@ -11,7 +11,7 @@ BEGIN {
 
 use Test::More;
 plan skip_all => 'Windows is too fragile for this test!'
-  if $^O eq 'MSWin32' || $^O =~ /cygwin/;
+ if $^O eq 'MSWin32' || $^O =~ /cygwin/;
 plan tests => 73;
 
 use_ok 'Mojo::UserAgent';
@@ -91,8 +91,8 @@ my $id = Mojo::IOLoop->listen(
     if (index $buffer->{$id}, "\x0d\x0a\x0d\x0a") {
       delete $buffer->{$id};
       $loop->write($id => "HTTP/1.1 200 OK\x0d\x0a"
-          . "Connection: keep-alive\x0d\x0a"
-          . "Content-Length: 6\x0d\x0a\x0d\x0aworks!");
+         . "Connection: keep-alive\x0d\x0a"
+         . "Content-Length: 6\x0d\x0a\x0d\x0aworks!");
     }
   },
   on_error => sub {
@@ -117,7 +117,7 @@ Mojo::IOLoop->listen(
       delete $buffer2->{$id};
       $loop->write(
         $id => "HTTP/1.1 200 OK\x0d\x0a"
-          . "Content-Type: text/plain\x0d\x0a\x0d\x0aworks too!",
+         . "Content-Type: text/plain\x0d\x0a\x0d\x0aworks too!",
         sub { shift->drop(shift) }
       );
     }

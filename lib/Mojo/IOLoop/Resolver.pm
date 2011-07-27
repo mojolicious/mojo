@@ -11,7 +11,7 @@ use constant DEBUG => $ENV{MOJO_RESOLVER_DEBUG} || 0;
 
 # "AF_INET6" requires Socket6 or Perl 5.12
 use constant IPV6_AF_INET6 => eval { Socket::AF_INET6() }
-  || eval { require Socket6 and Socket6::AF_INET6() };
+ || eval { require Socket6 and Socket6::AF_INET6() };
 
 # "inet_pton" requires Socket6 or Perl 5.12
 BEGIN {
@@ -81,7 +81,7 @@ sub lookup {
   # "localhost"
   weaken $self;
   return $self->ioloop->timer(0 => sub { $self->$cb($LOCALHOST) })
-    if $name eq 'localhost';
+   if $name eq 'localhost';
 
   # IPv4
   $self->resolve(
@@ -123,7 +123,7 @@ sub resolve {
   my $loop   = $self->ioloop;
   weaken $self;
   return $loop->timer(0 => sub { $self->$cb([]) })
-    if !$server || !$t || ($t ne $DNS_TYPES->{PTR} && ($ipv4 || $ipv6));
+   if !$server || !$t || ($t ne $DNS_TYPES->{PTR} && ($ipv4 || $ipv6));
 
   # Build request
   warn "RESOLVE $type $name ($server)\n" if DEBUG;
@@ -143,7 +143,7 @@ sub resolve {
     # IPv6
     elsif ($ipv6) {
       @parts = reverse 'arpa', 'ip6', split //, unpack 'H32',
-        inet_pton(IPV6_AF_INET6, $name);
+       inet_pton(IPV6_AF_INET6, $name);
     }
   }
 
@@ -227,7 +227,7 @@ sub _bind {
 
         # Parse
         (my ($t, $ttl, $a), $content) =
-          (unpack 'nnnNn/aa*', $content)[1, 3, 4, 5];
+         (unpack 'nnnNn/aa*', $content)[1, 3, 4, 5];
         my @answer = _parse_answer($t, $a, $chunk, $content);
 
         # No answer

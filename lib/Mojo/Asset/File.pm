@@ -20,7 +20,7 @@ has handle => sub {
   my $file   = $self->path;
   if ($file && -f $file) {
     $handle->open("< $file")
-      or croak qq/Can't open file "$file": $!/;
+     or croak qq/Can't open file "$file": $!/;
     return $handle;
   }
 
@@ -80,7 +80,7 @@ sub contains {
   my $end = defined $self->end_range ? $self->end_range : $self->size;
   my $window_size = length($pattern) * 2;
   $window_size = $end - $self->start_range
-    if $window_size > $end - $self->start_range;
+   if $window_size > $end - $self->start_range;
 
   # Read
   my $read         = $self->handle->sysread(my $window, $window_size);
@@ -140,7 +140,7 @@ sub move_to {
   # Move
   my $src = $self->path;
   File::Copy::move($src, $path)
-    or croak qq/Can't move file "$src" to "$path": $!/;
+   or croak qq/Can't move file "$src" to "$path": $!/;
   $self->path($path);
 
   # Don't clean up a moved file

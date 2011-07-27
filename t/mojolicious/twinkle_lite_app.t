@@ -11,7 +11,7 @@ BEGIN {
 
 use Test::More;
 plan skip_all => 'Perl 5.10 required for this test!'
-  unless eval { require Pod::Simple::HTML; 1 };
+ unless eval { require Pod::Simple::HTML; 1 };
 plan tests => 17;
 
 # "Pizza delivery for...
@@ -37,7 +37,7 @@ plugin ep_renderer => {name => 'twinkle', template => $twinkle};
 plugin 'pod_renderer';
 plugin pod_renderer => {name => 'teapod', preprocess => 'twinkle'};
 my $config = plugin json_config =>
-  {default => {foo => 'bar'}, ext => 'conf', template => $twinkle};
+ {default => {foo => 'bar'}, ext => 'conf', template => $twinkle};
 is $config->{foo},  'bar', 'right value';
 is $config->{test}, 23,    'right value';
 
@@ -63,7 +63,7 @@ $t->get_ok('/')->status_is(200)->content_like(qr/testHello <sebastian>!123/);
 
 # GET /advanced
 $t->get_ok('/advanced')->status_is(200)
-  ->content_is("&lt;escape me&gt;\n123423");
+ ->content_is("&lt;escape me&gt;\n123423");
 
 # GET /docs
 $t->get_ok('/docs')->status_is(200)->content_like(qr/<h3>snowman<\/h3>/);

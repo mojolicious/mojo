@@ -37,8 +37,8 @@ Mojo::IOLoop->listen(
             print "Forwarding to $address:$port.\n";
             $c->{$client}->{connection} = $server;
             $loop->write($client,
-                  "HTTP/1.1 200 OK\x0d\x0a"
-                . "Connection: keep-alive\x0d\x0a\x0d\x0a");
+                 "HTTP/1.1 200 OK\x0d\x0a"
+               . "Connection: keep-alive\x0d\x0a\x0d\x0a");
           },
           on_read => sub {
             my ($loop, $server, $chunk) = @_;
@@ -56,7 +56,7 @@ Mojo::IOLoop->listen(
   on_error => sub {
     my ($self, $client) = @_;
     shift->drop($c->{$client}->{connection})
-      if $c->{$client}->{connection};
+     if $c->{$client}->{connection};
     delete $c->{$client};
   }
 ) or die "Couldn't create listen socket!\n";

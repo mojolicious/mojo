@@ -11,7 +11,7 @@ BEGIN {
 
 use Test::More;
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
-  unless $ENV{TEST_ONLINE};
+ unless $ENV{TEST_ONLINE};
 plan tests => 18;
 
 use_ok 'Mojo::IOLoop';
@@ -119,7 +119,7 @@ $r->resolve(
   sub {
     my ($self, $records) = @_;
     $found++
-      if first { $_->[1] =~ /gmail-smtp-in\.l\.google\.com/ } @$records;
+     if first { $_->[1] =~ /gmail-smtp-in\.l\.google\.com/ } @$records;
     Mojo::IOLoop->stop;
   }
 );

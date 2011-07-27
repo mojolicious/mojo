@@ -38,7 +38,7 @@ Mojo::IOLoop->listen(
       # Write a minimal HTTP response
       # (the "Hello World!" message has been optimized away!)
       $loop->write($id => "HTTP/1.1 200 OK\x0d\x0a"
-          . "Connection: keep-alive\x0d\x0a\x0d\x0a");
+         . "Connection: keep-alive\x0d\x0a\x0d\x0a");
     }
   },
   on_error => sub {

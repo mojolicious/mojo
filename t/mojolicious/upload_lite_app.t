@@ -13,7 +13,7 @@ BEGIN {
 
 use Test::More;
 plan skip_all => 'Windows is too fragile for this test!'
-  if $^O eq 'MSWin32' || $^O =~ /cygwin/;
+ if $^O eq 'MSWin32' || $^O =~ /cygwin/;
 plan tests => 31;
 
 # "Um, Leela,
@@ -40,15 +40,15 @@ app->hook(
 
         # Expected content length
         return
-          unless my $len = $req->headers->content_length;
+         unless my $len = $req->headers->content_length;
 
         # Current progress
         my $progress = $req->content->progress;
 
         # Update cache
         push @$c, $progress == $len
-          ? 100
-          : int($progress / ($len / 100));
+         ? 100
+         : int($progress / ($len / 100));
       }
     );
   }
@@ -60,10 +60,10 @@ post '/upload' => sub {
   my $file = $self->req->upload('file');
   my $h    = $file->headers;
   $self->render_text($file->filename
-      . $file->asset->slurp
-      . $self->param('test')
-      . $h->content_type
-      . ($h->header('X-X') || ''));
+     . $file->asset->slurp
+     . $self->param('test')
+     . $h->content_type
+     . ($h->header('X-X') || ''));
 };
 
 # POST /multi_reverse
@@ -72,9 +72,9 @@ post '/multi_reverse' => sub {
   my $file2 = $self->req->upload('file2');
   my $file1 = $self->req->upload('file1');
   $self->render_text($file1->filename
-      . $file1->asset->slurp
-      . $file2->filename
-      . $file2->asset->slurp);
+     . $file1->asset->slurp
+     . $file2->filename
+     . $file2->asset->slurp);
 };
 
 # POST /multi
@@ -83,9 +83,9 @@ post '/multi' => sub {
   my $file1 = $self->req->upload('file1');
   my $file2 = $self->req->upload('file2');
   $self->render_text($file1->filename
-      . $file1->asset->slurp
-      . $file2->filename
-      . $file2->asset->slurp);
+     . $file1->asset->slurp
+     . $file2->filename
+     . $file2->asset->slurp);
 };
 
 # GET /progress
@@ -113,35 +113,35 @@ my $t = Test::Mojo->new;
 my $file = Mojo::Asset::File->new->add_chunk('lalala');
 $t->post_form_ok('/upload',
   {file => {file => $file, filename => 'x'}, test => 'tset'})->status_is(200)
-  ->content_is('xlalalatsetapplication/octet-stream');
+ ->content_is('xlalalatsetapplication/octet-stream');
 
 # POST /upload (path)
 $t->post_form_ok('/upload', {file => {file => $file->path}, test => 'foo'})
-  ->status_is(200)->content_like(qr/lalalafooapplication\/octet-stream$/);
+ ->status_is(200)->content_like(qr/lalalafooapplication\/octet-stream$/);
 
 # POST /upload (memory)
 $t->post_form_ok('/upload', {file => {content => 'alalal'}, test => 'tset'})
-  ->status_is(200)->content_is('filealalaltsetapplication/octet-stream');
+ ->status_is(200)->content_is('filealalaltsetapplication/octet-stream');
 
 # POST /upload (memory with headers)
 my $hash = {content => 'alalal', 'Content-Type' => 'foo/bar', 'X-X' => 'Y'};
 $t->post_form_ok('/upload', {file => $hash, test => 'tset'})->status_is(200)
-  ->content_is('filealalaltsetfoo/barY');
+ ->content_is('filealalaltsetfoo/barY');
 
 # POST /upload (with progress)
 $t->post_form_ok('/upload?upload_id=23',
   {file => {content => 'alalal'}, test => 'tset'})->status_is(200)
-  ->content_is('filealalaltsetapplication/octet-stream');
+ ->content_is('filealalaltsetapplication/octet-stream');
 
 # POST /multi_reverse
 $t->post_form_ok('/multi_reverse',
   {file1 => {content => '1111'}, file2 => {content => '11112222'},})
-  ->status_is(200)->content_is('file11111file211112222');
+ ->status_is(200)->content_is('file11111file211112222');
 
 # POST /multi
 $t->post_form_ok('/multi',
   {file1 => {content => '1111'}, file2 => {content => '11112222'},})
-  ->status_is(200)->content_is('file11111file211112222');
+ ->status_is(200)->content_is('file11111file211112222');
 
 # GET/progress/23
 $t->get_ok('/progress/23')->status_is(200)->content_is('100%');
@@ -193,5 +193,5 @@ $ua->start($tx);
 ok $tx->is_done, 'transaction is done';
 is $tx->res->code, 200, 'right status';
 is b($tx->res->body)->decode('UTF-8')->to_string,
-  'called, Вячеслав.jpg4096', 'right content';
+ 'called, Вячеслав.jpg4096', 'right content';
 $ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;

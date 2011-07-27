@@ -135,7 +135,7 @@ sub _compile {
   my $reqs = $self->reqs;
   if (!exists $reqs->{format} || $reqs->{format}) {
     my $format =
-      defined $reqs->{format} ? _compile_req($reqs->{format}) : '([^\/]+)';
+     defined $reqs->{format} ? _compile_req($reqs->{format}) : '([^\/]+)';
     $self->format(qr/^\/?\.$format$/);
   }
 
@@ -227,9 +227,9 @@ sub _tokenize {
     # Inside a symbol
     my $symbol = 0;
     $symbol = 1
-      if $state eq 'relaxed'
-        || $state eq 'symbol'
-        || $state eq 'wildcard';
+     if $state eq 'relaxed'
+       || $state eq 'symbol'
+       || $state eq 'wildcard';
 
     # Quote start
     if ($char eq $quote_start) {

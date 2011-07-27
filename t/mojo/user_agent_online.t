@@ -12,7 +12,7 @@ BEGIN {
 use Test::More;
 
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
-  unless $ENV{TEST_ONLINE};
+ unless $ENV{TEST_ONLINE};
 plan tests => 104;
 
 # "So then I said to the cop, "No, you're driving under the influence...
@@ -150,7 +150,7 @@ is $tx->res->code, 200,         'right status';
 
 # Simple form post
 $tx =
-  $ua->post_form('http://search.cpan.org/search' => {query => 'mojolicious'});
+ $ua->post_form('http://search.cpan.org/search' => {query => 'mojolicious'});
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->url, 'http://search.cpan.org/search', 'right url';
 is $tx->req->headers->content_length, 17, 'right content length';
@@ -161,7 +161,7 @@ is $tx->keep_alive, 1, 'connection will be kept alive';
 
 # Simple keep alive form post
 $tx =
-  $ua->post_form('http://search.cpan.org/search' => {query => 'mojolicious'});
+ $ua->post_form('http://search.cpan.org/search' => {query => 'mojolicious'});
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->url, 'http://search.cpan.org/search', 'right url';
 is $tx->req->headers->content_length, 17, 'right content length';

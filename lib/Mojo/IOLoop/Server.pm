@@ -10,13 +10,13 @@ use Socket qw/IPPROTO_TCP TCP_NODELAY/;
 
 # IPv6 support requires IO::Socket::IP
 use constant IPV6 => $ENV{MOJO_NO_IPV6}
-  ? 0
-  : eval 'use IO::Socket::IP 0.06 (); 1';
+ ? 0
+ : eval 'use IO::Socket::IP 0.06 (); 1';
 
 # TLS support requires IO::Socket::SSL
 use constant TLS => $ENV{MOJO_NO_TLS}
-  ? 0
-  : eval 'use IO::Socket::SSL 1.43 "inet4"; 1';
+ ? 0
+ : eval 'use IO::Socket::SSL 1.43 "inet4"; 1';
 use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
@@ -101,7 +101,7 @@ sub listen {
   if (defined $fd) {
     $handle = $class->new;
     $handle->fdopen($fd, 'r')
-      or croak "Can't open file descriptor $fd: $!";
+     or croak "Can't open file descriptor $fd: $!";
   }
 
   # New socket
@@ -117,7 +117,7 @@ sub listen {
     );
     $options{LocalAddr} =~ s/[\[\]]//g;
     $handle = $class->new(%options)
-      or croak "Can't create listen socket: $!";
+     or croak "Can't create listen socket: $!";
     $fd = fileno $handle;
     $reuse = ",$reuse" if length $ENV{MOJO_REUSE};
     $ENV{MOJO_REUSE} .= "$reuse:$fd";
@@ -153,12 +153,12 @@ sub generate_port {
   my $port = 1 . int(rand 10) . int(rand 10) . int(rand 10) . int(rand 10);
   while ($port++ < 30000) {
     return $port
-      if IO::Socket::INET->new(
+     if IO::Socket::INET->new(
       Listen    => 5,
       LocalAddr => '127.0.0.1',
       LocalPort => $port,
       Proto     => 'tcp'
-      );
+     );
   }
 
   return;
@@ -216,7 +216,7 @@ sub _cert_file {
   $cert = File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
     'mojocert.pem');
   croak qq/Can't create temporary TLS cert file "$cert"/
-    unless my $file = IO::File->new("> $cert");
+   unless my $file = IO::File->new("> $cert");
   print $file CERT;
 
   $self->{cert} = $cert;
@@ -230,10 +230,11 @@ sub _key_file {
   return $key if $key && -r $key;
 
   # Create temporary TLS key file
-  $key = File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
+  $key =
+   File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
     'mojokey.pem');
   croak qq/Can't create temporary TLS key file "$key"/
-    unless my $file = IO::File->new("> $key");
+   unless my $file = IO::File->new("> $key");
   print $file KEY;
 
   $self->{key} = $key;

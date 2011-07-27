@@ -28,7 +28,7 @@ $t->get_ok('/')->status_is(200)->content_is("works!\n\ntoo!works!!!\n");
 
 # GET /index.html
 $t->get_ok('/index.html')->status_is(200)
-  ->content_is('External static file!');
+ ->content_is('External static file!');
 
 # GET /echo
 $t->get_ok('/echo')->status_is(200)->content_is('echo: nothing!');
@@ -38,4 +38,4 @@ $t->get_ok('/stream')->status_is(200)->content_is('hello!');
 
 # GET /url/☃
 $t->get_ok('/url/☃')->status_is(200)
-  ->content_is('/url/%E2%98%83 -> /%E2%98%83/stream!');
+ ->content_is('/url/%E2%98%83 -> /%E2%98%83/stream!');

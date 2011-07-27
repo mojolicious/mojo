@@ -12,7 +12,7 @@ BEGIN {
 # FreeBSD 8.0 and 8.1 are known to cause problems
 use Test::More;
 plan skip_all => 'This test does not work on some older versions of FreeBSD!'
-  if $^O =~ /freebsd/;
+ if $^O =~ /freebsd/;
 plan tests => 41;
 
 # "Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
@@ -59,7 +59,7 @@ websocket '/' => sub {
 get '/something/else' => sub {
   my $self = shift;
   my $timeout =
-    Mojo::IOLoop->singleton->connection_timeout($self->tx->connection);
+   Mojo::IOLoop->singleton->connection_timeout($self->tx->connection);
   $self->render(text => "${timeout}failed!");
 };
 
@@ -149,7 +149,7 @@ websocket '/dead' => sub { die 'i see dead processes' };
 
 # WebSocket /foo
 websocket '/foo' =>
-  sub { shift->rendered->res->code('403')->message("i'm a teapot") };
+ sub { shift->rendered->res->code('403')->message("i'm a teapot") };
 
 # WebSocket /deadcallback
 websocket '/deadcallback' => sub {
@@ -208,7 +208,7 @@ my $port = $ua->test_server->port;
 $result = '';
 my $tx = $ua->build_websocket_tx('ws://lalala/socket');
 my $socket =
-  IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $port);
+ IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $port);
 $socket->blocking(0);
 $tx->connection($socket);
 my $local;

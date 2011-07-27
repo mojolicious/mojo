@@ -26,8 +26,8 @@ sub import {
 
   # Home
   local $ENV{MOJO_HOME} =
-    File::Spec->catdir(split '/', dirname($ENV{MOJO_EXE}))
-    unless $ENV{MOJO_HOME};
+   File::Spec->catdir(split '/', dirname($ENV{MOJO_EXE}))
+   unless $ENV{MOJO_HOME};
 
   # Initialize app
   my $app = $class->new;
@@ -54,7 +54,7 @@ sub import {
   *{"${caller}::helper"} = sub { $app->helper(@_) };
   *{"${caller}::hook"}   = sub { $app->hook(@_) };
   *{"${caller}::under"}  = *{"${caller}::ladder"} =
-    sub { $routes = $root->under(@_) };
+   sub { $routes = $root->under(@_) };
   *{"${caller}::plugin"}    = sub { $app->plugin(@_) };
   *{"${caller}::post"}      = sub { $routes->post(@_) };
   *{"${caller}::put"}       = sub { $routes->put(@_) };
@@ -647,7 +647,7 @@ C<250KB> will be automatically streamed into a temporary file.
     <head><title>Upload</title></head>
     <body>
       <%= form_for upload =>
-            (method => 'post', enctype => 'multipart/form-data') => begin %>
+           (method => 'post', enctype => 'multipart/form-data') => begin %>
         <%= file_field 'example' %>
         <%= submit_button 'Upload' %>
       <% end %>

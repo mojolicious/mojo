@@ -35,7 +35,7 @@ sub register {
       return unless my $started = delete $stash->{'mojo.started'};
       return if $stash->{'mojo.static'};
       my $elapsed = sprintf '%f',
-        Time::HiRes::tv_interval($started, [Time::HiRes::gettimeofday()]);
+       Time::HiRes::tv_interval($started, [Time::HiRes::gettimeofday()]);
       my $rps     = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
       my $res     = $self->res;
       my $code    = $res->code || 200;

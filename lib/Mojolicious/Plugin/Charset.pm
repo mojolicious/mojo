@@ -17,9 +17,9 @@ sub register {
     # Allow defined but blank encoding to suppress unwanted
     # conversion
     my $encoding =
-      defined $conf->{encoding}
-      ? $conf->{encoding}
-      : $conf->{charset};
+     defined $conf->{encoding}
+     ? $conf->{encoding}
+     : $conf->{charset};
     $app->renderer->encoding($encoding) if $encoding;
 
     # This has to be done before params are cloned

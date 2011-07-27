@@ -32,11 +32,11 @@ sub cookies {
   if (@_) {
     my $cookies = shift;
     $cookies = Mojo::Cookie::Request->new($cookies)
-      if ref $cookies eq 'HASH';
+     if ref $cookies eq 'HASH';
     $cookies = $cookies->to_string_with_prefix;
     for my $cookie (@_) {
       $cookie = Mojo::Cookie::Request->new($cookie)
-        if ref $cookie eq 'HASH';
+       if ref $cookie eq 'HASH';
       $cookies .= "; $cookie";
     }
     $self->headers->add('Cookie', $cookies);
@@ -352,8 +352,8 @@ sub _parse_start_line {
       $self->method($1);
       my $url = $self->url;
       $self->method eq 'CONNECT'
-        ? $url->authority($2)
-        : $url->parse($2);
+       ? $url->authority($2)
+       : $url->parse($2);
 
       # HTTP 0.9 is identified by the missing version
       if (defined $3) {

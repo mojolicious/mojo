@@ -98,13 +98,13 @@ sub get_body_chunk {
     # Headers
     my $header_length = $part->header_size;
     return $part->get_header_chunk($offset - $len)
-      if ($len + $header_length) > $offset;
+     if ($len + $header_length) > $offset;
     $len += $header_length;
 
     # Content
     my $content_length = $part->body_size;
     return $part->get_body_chunk($offset - $len)
-      if ($len + $content_length) > $offset;
+     if ($len + $content_length) > $offset;
     $len += $content_length;
 
     # Boundary
@@ -112,7 +112,7 @@ sub get_body_chunk {
 
       # Last boundary
       return substr "\x0d\x0a--$boundary--", $offset - $len
-        if $#{$parts} == $i;
+       if $#{$parts} == $i;
 
       # Middle boundary
       return substr "\x0d\x0a--$boundary\x0d\x0a", $offset - $len;

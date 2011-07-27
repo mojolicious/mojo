@@ -13,11 +13,11 @@ use Test::More;
 use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
 plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
-  unless $ENV{TEST_TLS};
+ unless $ENV{TEST_TLS};
 plan skip_all => 'IO::Socket::SSL 1.43 required for this test!'
-  unless Mojo::IOLoop::Server::TLS;
+ unless Mojo::IOLoop::Server::TLS;
 plan skip_all => 'Windows is too fragile for this test!'
-  if Mojo::IOLoop::Stream::WINDOWS;
+ if Mojo::IOLoop::Stream::WINDOWS;
 plan tests => 15;
 
 # "I was a hero to broken robots 'cause I was one of them, but how can I sing
@@ -82,9 +82,9 @@ my $c     = {};
 my $connected;
 my ($read, $sent, $fail) = 0;
 my $nf =
-    "HTTP/1.1 404 NOT FOUND\x0d\x0a"
-  . "Content-Length: 0\x0d\x0a"
-  . "Connection: close\x0d\x0a\x0d\x0a";
+   "HTTP/1.1 404 NOT FOUND\x0d\x0a"
+ . "Content-Length: 0\x0d\x0a"
+ . "Connection: close\x0d\x0a\x0d\x0a";
 my $ok = "HTTP/1.0 200 OK\x0d\x0aX-Something: unimportant\x0d\x0a\x0d\x0a";
 $loop->listen(
   port    => $proxy,
@@ -127,7 +127,7 @@ $loop->listen(
   on_error => sub {
     my ($self, $client) = @_;
     shift->drop($c->{$client}->{connection})
-      if $c->{$client}->{connection};
+     if $c->{$client}->{connection};
     delete $c->{$client};
   }
 );

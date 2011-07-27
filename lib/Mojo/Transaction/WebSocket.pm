@@ -47,7 +47,7 @@ sub client_handshake {
   $headers->upgrade('websocket')  unless $headers->upgrade;
   $headers->connection('Upgrade') unless $headers->connection;
   $headers->sec_websocket_protocol('mojo')
-    unless $headers->sec_websocket_protocol;
+   unless $headers->sec_websocket_protocol;
   $headers->sec_websocket_version(8) unless $headers->sec_websocket_version;
 
   # Generate challenge
@@ -149,7 +149,7 @@ sub server_read {
     # Append chunk and check message size
     $self->{message} .= $frame->[2];
     $self->finish and last
-      if length $self->{message} > $self->max_websocket_size;
+     if length $self->{message} > $self->max_websocket_size;
 
     # No FIN bit (Continuation)
     next unless $frame->[0];

@@ -11,8 +11,8 @@ use Sys::Hostname;
 
 # Bonjour
 use constant BONJOUR => $ENV{MOJO_NO_BONJOUR}
-  ? 0
-  : eval 'use Net::Rendezvous::Publish 0.04 (); 1';
+ ? 0
+ : eval 'use Net::Rendezvous::Publish 0.04 (); 1';
 
 use constant DEBUG => $ENV{MOJO_DAEMON_DEBUG} || 0;
 
@@ -302,7 +302,7 @@ sub _read {
 
   # Last keep alive request
   $tx->res->headers->connection('close')
-    if ($c->{requests} || 0) >= $self->max_requests;
+   if ($c->{requests} || 0) >= $self->max_requests;
 
   # Finish
   if ($tx->is_done) { $self->_finish($id, $tx) }

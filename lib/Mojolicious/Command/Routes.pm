@@ -44,9 +44,9 @@ sub _draw {
 
     # Methods
     my $l3 =
-      defined($node->[1]->via)
-      ? length(join ',', @{$node->[1]->via})
-      : length('*');
+     defined($node->[1]->via)
+     ? length(join ',', @{$node->[1]->via})
+     : length('*');
     $ml = $l3 if $l3 > $ml;
   }
 
@@ -68,9 +68,9 @@ sub _draw {
 
     # Methods
     my $methods =
-      defined $node->[1]->via
-      ? uc join ',', @{$node->[1]->via}
-      : '*';
+     defined $node->[1]->via
+     ? uc join ',', @{$node->[1]->via}
+     : '*';
     my $mp = ' ' x ($ml - length $methods);
 
     # Route

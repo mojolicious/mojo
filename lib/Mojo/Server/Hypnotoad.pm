@@ -48,7 +48,7 @@ sub run {
 
   # No windows support
   _exit('Hypnotoad not available for Windows.')
-    if $^O eq 'MSWin32' || $^O =~ /cygwin/;
+   if $^O eq 'MSWin32' || $^O =~ /cygwin/;
 
   # Application
   $ENV{HYPNOTOAD_APP} ||= abs_path $app;
@@ -88,7 +88,7 @@ sub run {
 
   # Pipe for worker communication
   pipe($self->{reader}, $self->{writer})
-    or croak "Can't create pipe: $!";
+   or croak "Can't create pipe: $!";
   $self->{poll} = IO::Poll->new;
   $self->{poll}->mask($self->{reader}, POLLIN);
 
@@ -138,7 +138,7 @@ sub _config {
       die qq/Can't load config file "$file": $@/ if $@;
       die qq/Can't load config file "$file": $!/ unless defined $c;
       die qq/Config file "$file" did not return a hashref.\n/
-        unless ref $c eq 'HASH';
+       unless ref $c eq 'HASH';
     }
   }
   $self->{config} = $c;
@@ -148,10 +148,10 @@ sub _config {
   $c->{heartbeat_interval} ||= 5;
   $c->{heartbeat_timeout}  ||= 5;
   $c->{lock_file}
-    ||= File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
+   ||= File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
     "hypnotoad.$$.lock");
   $c->{pid_file}
-    ||= File::Spec->catfile(dirname($ENV{HYPNOTOAD_APP}), 'hypnotoad.pid');
+   ||= File::Spec->catfile(dirname($ENV{HYPNOTOAD_APP}), 'hypnotoad.pid');
   $c->{upgrade_timeout} ||= 30;
   $c->{workers}         ||= 4;
 
@@ -241,7 +241,7 @@ sub _manage {
 
     # Timeout
     kill 'KILL', $self->{new}
-      if $self->{upgrade} + $c->{upgrade_timeout} <= time;
+     if $self->{upgrade} + $c->{upgrade_timeout} <= time;
   }
 
   # Workers
@@ -265,7 +265,7 @@ sub _manage {
 
       # Timeout
       $w->{force} = 1
-        if $w->{graceful} + $c->{graceful_timeout} <= time;
+       if $w->{graceful} + $c->{graceful_timeout} <= time;
     }
 
     # Normal stop
@@ -299,7 +299,7 @@ sub _pid_file {
   # Create PID file
   warn "PID $file\n" if DEBUG;
   croak qq/Can't create PID file "$file": $!/
-    unless my $pid = IO::File->new($file, '>', 0644);
+   unless my $pid = IO::File->new($file, '>', 0644);
   print $pid $$;
 }
 
@@ -341,7 +341,7 @@ sub _spawn {
   # Prepare lock file
   my $file = $c->{lock_file};
   my $lock = IO::File->new("> $file")
-    or croak qq/Can't open lock file "$file": $!/;
+   or croak qq/Can't open lock file "$file": $!/;
 
   # Accept mutex
   $loop->on_lock(
@@ -381,7 +381,7 @@ sub _spawn {
 
   # Clean worker environment
   $SIG{INT} = $SIG{TERM} = $SIG{CHLD} = $SIG{USR2} = $SIG{TTIN} = $SIG{TTOU} =
-    'DEFAULT';
+   'DEFAULT';
   $SIG{QUIT} = sub { $loop->max_connections(0) };
   delete $self->{reader};
   delete $self->{poll};

@@ -22,7 +22,7 @@ use Mojo::UserAgent;
 # Mac OS X only test
 plan skip_all => 'Mac OS X required for this test!' unless $^O eq 'darwin';
 plan skip_all => 'set TEST_APACHE to enable this test (developer only!)'
-  unless $ENV{TEST_APACHE};
+ unless $ENV{TEST_APACHE};
 plan tests => 12;
 
 # "I'm not a robot!
@@ -79,11 +79,11 @@ ok -x $cgi, 'script is executable';
 # Start
 my $pid = open my $server, '-|', '/usr/sbin/httpd', '-X', '-f', $config;
 sleep 1
-  while !IO::Socket::INET->new(
+ while !IO::Socket::INET->new(
   Proto    => 'tcp',
   PeerAddr => 'localhost',
   PeerPort => $port
-  );
+ );
 
 # Request
 my $ua = Mojo::UserAgent->new;
@@ -112,16 +112,16 @@ is $tx->res->body, $result, 'right content';
 # Upload
 ($code, $body) = undef;
 $tx =
-  $ua->post_form("http://127.0.0.1:$port/cgi-bin/test.cgi/diag/upload" =>
-    {file => {content => $result}});
+ $ua->post_form("http://127.0.0.1:$port/cgi-bin/test.cgi/diag/upload" =>
+   {file => {content => $result}});
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, $result, 'right content';
 
 # Stop
 kill 'INT', $pid;
 sleep 1
-  while IO::Socket::INET->new(
+ while IO::Socket::INET->new(
   Proto    => 'tcp',
   PeerAddr => 'localhost',
   PeerPort => $port
-  );
+ );

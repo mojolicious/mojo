@@ -33,7 +33,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Smiling Face With Sunglasses';
-our $VERSION  = '1.66';
+our $VERSION  = '1.67';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -45,7 +45,7 @@ sub AUTOLOAD {
 
   # Check for helper
   croak qq/Can't locate object method "$method" via package "$package"/
-    unless my $helper = $self->renderer->helpers->{$method};
+   unless my $helper = $self->renderer->helpers->{$method};
 
   # Call helper with fresh controller
   return $self->controller_class->new(app => $self)->$helper(@_);
@@ -88,7 +88,7 @@ sub new {
   # Prepare log
   my $mode = $self->mode;
   $self->log->path($home->rel_file("log/$mode.log"))
-    if -w $home->rel_file('log');
+   if -w $home->rel_file('log');
 
   # Load default plugins
   $self->plugin('callback_condition');
@@ -156,7 +156,7 @@ sub dispatch {
   elsif ($tx->is_websocket) { $res->code(426) }
   unless ($self->routes->dispatch($c)) {
     $c->render_not_found
-      unless $res->code;
+     unless $res->code;
   }
 }
 
@@ -175,7 +175,7 @@ sub handler {
   my $defaults = $self->defaults;
   @{$stash}{keys %$defaults} = values %$defaults;
   my $c =
-    $self->controller_class->new(app => $self, stash => $stash, tx => $tx);
+   $self->controller_class->new(app => $self, stash => $stash, tx => $tx);
   unless (eval { $self->on_process->($self, $c); 1 }) {
     $self->log->fatal("Processing request failed: $@");
     $tx->res->code(500);
@@ -184,7 +184,7 @@ sub handler {
 
   # Delayed
   $self->log->debug('Nothing has been rendered, assuming delayed response.')
-    unless $stash->{'mojo.rendered'} || $tx->is_writing;
+   unless $stash->{'mojo.rendered'} || $tx->is_writing;
 }
 
 # "This snow is beautiful. I'm glad global warming never happened.
@@ -194,7 +194,7 @@ sub helper {
   my $name = shift;
   my $r    = $self->renderer;
   $self->log->debug(qq/Helper "$name" already exists, replacing./)
-    if exists $r->helpers->{$name};
+   if exists $r->helpers->{$name};
   $r->add_helper($name, @_);
 }
 
@@ -372,7 +372,7 @@ Web development for humans, making hard things possible and everything fun.
     my $self = shift;
     my $url  = $self->param('url') || 'http://mojolicio.us';
     $self->render_text(
-      $self->ua->get($url)->res->dom->html->head->title->text);
+     $self->ua->get($url)->res->dom->html->head->title->text);
   };
 
   # WebSocket echo service
@@ -422,7 +422,7 @@ A controller collects several actions together.
     my $self = shift;
     my $url  = $self->param('url') || 'http://mojolicio.us';
     $self->render_text(
-      $self->ua->get($url)->res->dom->html->head->title->text);
+     $self->ua->get($url)->res->dom->html->head->title->text);
   }
 
   1;

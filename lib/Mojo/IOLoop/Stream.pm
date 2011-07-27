@@ -130,7 +130,7 @@ sub _write {
 
       # Close
       return $self->emit('close')
-        if $handle->can('connected') && !$handle->connected;
+       if $handle->can('connected') && !$handle->connected;
 
       # Write error
       return $self->emit(error => $!);
@@ -142,9 +142,9 @@ sub _write {
 
   # Stop writing
   return
-    if length $self->{buffer}
-      || $self->{quick}
-      || @{$self->subscribers('drain')};
+   if length $self->{buffer}
+     || $self->{quick}
+     || @{$self->subscribers('drain')};
   $self->iowatcher->not_writing($handle);
 }
 

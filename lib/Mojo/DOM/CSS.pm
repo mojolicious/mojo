@@ -66,7 +66,7 @@ sub select {
       # Parts
       for my $part (@$pattern) {
         push(@results, $current) and last
-          if $self->_element($current, $part, $tree);
+         if $self->_element($current, $part, $tree);
       }
     }
   }
@@ -88,7 +88,7 @@ sub _compile {
 
     # Trash
     next
-      unless $separator || $element || $pc || $attributes || $combinator;
+     unless $separator || $element || $pc || $attributes || $combinator;
 
     # New selector
     push @$pattern, [] if $separator;
@@ -111,11 +111,11 @@ sub _compile {
 
       # Class
       push @$selector, ['attribute', 'class', $self->_regex('~', $1)]
-        if defined $1;
+       if defined $1;
 
       # ID
       push @$selector, ['attribute', 'id', $self->_regex('', $2)]
-        if defined $2;
+       if defined $2;
     }
 
     # Pseudo classes
@@ -216,7 +216,7 @@ sub _element {
       # Next parent
       else {
         return
-          unless $current = $current ? $current->[3] : $candidate;
+         unless $current = $current ? $current->[3] : $candidate;
 
         # Don't search beyond the current tree
         return if $current eq $tree;
@@ -332,7 +332,7 @@ sub _selector {
       for my $name (keys %$attrs) {
         if ($name =~ /\:?$key$/) {
           ++$found and last
-            if !$regex || ($attrs->{$name} || '') =~ /$regex/;
+           if !$regex || ($attrs->{$name} || '') =~ /$regex/;
         }
       }
       next if $found;
@@ -382,7 +382,7 @@ sub _selector {
 
         # Numbers
         $args = $c->[2] = $self->_equation($args)
-          unless ref $args;
+         unless ref $args;
 
         # Siblings
         my $parent = $current->[3];

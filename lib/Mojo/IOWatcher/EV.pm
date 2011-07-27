@@ -55,7 +55,7 @@ sub writing {
   else {
     weaken $self;
     $h->{watcher} =
-      EV::io($fd, EV::WRITE | EV::READ, sub { $self->_io($fd, @_) });
+     EV::io($fd, EV::WRITE | EV::READ, sub { $self->_io($fd, @_) });
   }
   $h->{writing} = 1;
 
@@ -66,9 +66,9 @@ sub _io {
   my ($self, $fd, $w, $revents) = @_;
   my $h = $self->{handles}->{$fd};
   $self->_sandbox('Read', $h->{on_readable}, $h->{handle})
-    if EV::READ &$revents;
+   if EV::READ &$revents;
   $self->_sandbox('Write', $h->{on_writable}, $h->{handle})
-    if EV::WRITE &$revents;
+   if EV::WRITE &$revents;
 }
 
 sub _timer {

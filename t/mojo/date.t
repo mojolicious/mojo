@@ -14,11 +14,11 @@ is $date->epoch, 784111777, 'right epoch value';
 
 # RFC 850/1036
 is $date->parse('Sunday, 06-Nov-94 08:49:37 GMT')->epoch,
-  784111777, 'right epoch value';
+ 784111777, 'right epoch value';
 
 # ANSI C asctime()
 is $date->parse('Sun Nov  6 08:49:37 1994')->epoch,
-  784111777, 'right epoch value';
+ 784111777, 'right epoch value';
 
 # to_string
 $date->parse(784111777);
@@ -29,7 +29,7 @@ $date->parse(0);
 is $date->epoch, 0, 'right epoch value';
 is "$date", 'Thu, 01 Jan 1970 00:00:00 GMT', 'right format';
 is $date->parse('Thu, 01 Jan 1970 00:00:00 GMT')->epoch,
-  0, 'right epoch value';
+ 0, 'right epoch value';
 
 # Negative epoch value
 $date = Mojo::Date->new;

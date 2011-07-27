@@ -20,7 +20,7 @@ use Mojo::IOLoop;
 use Mojo::UserAgent;
 
 plan skip_all => 'set TEST_MORBO to enable this test (developer only!)'
-  unless $ENV{TEST_MORBO};
+ unless $ENV{TEST_MORBO};
 plan tests => 27;
 
 # "Morbo wishes these stalwart nomads peace among the Dutch tulips.
@@ -50,13 +50,13 @@ EOF
 my $port   = Mojo::IOLoop->generate_port;
 my $prefix = "$FindBin::Bin/../../script";
 my $pid    = open my $server, '-|', $^X, "$prefix/morbo", '--listen',
-  "http://*:$port", $script;
+ "http://*:$port", $script;
 sleep 1
-  while !IO::Socket::INET->new(
+ while !IO::Socket::INET->new(
   Proto    => 'tcp',
   PeerAddr => 'localhost',
   PeerPort => $port
-  );
+ );
 
 my $ua = Mojo::UserAgent->new;
 
@@ -88,11 +88,11 @@ ok((stat $script)[9] > $mtime, 'modify time has changed');
 is((stat $script)[7], $size, 'still equal size');
 sleep 3;
 sleep 1
-  while !IO::Socket::INET->new(
+ while !IO::Socket::INET->new(
   Proto    => 'tcp',
   PeerAddr => 'localhost',
   PeerPort => $port
-  );
+ );
 
 # Application has been reloaded
 $tx = $ua->get("http://127.0.0.1:$port/hello");
@@ -124,11 +124,11 @@ ok((stat $script)[9] == $mtime, 'modify time has not changed');
 isnt((stat $script)[7], $size, 'size has changed');
 sleep 3;
 sleep 1
-  while !IO::Socket::INET->new(
+ while !IO::Socket::INET->new(
   Proto    => 'tcp',
   PeerAddr => 'localhost',
   PeerPort => $port
-  );
+ );
 
 # Application has been reloaded again
 $tx = $ua->get("http://127.0.0.1:$port/hello");
@@ -145,11 +145,11 @@ is $tx->res->body, 'Hello!', 'right content';
 # Stop
 kill 'INT', $pid;
 sleep 1
-  while IO::Socket::INET->new(
+ while IO::Socket::INET->new(
   Proto    => 'tcp',
   PeerAddr => 'localhost',
   PeerPort => $port
-  );
+ );
 
 # Cleanup
 chdir $cwd;

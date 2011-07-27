@@ -195,10 +195,10 @@ sub path_for {
   $values = {%$captures, format => undef, %$values};
   my $pattern = $endpoint->pattern;
   $values->{format} =
-    defined $captures->{format}
-    ? $captures->{format}
-    : $pattern->defaults->{format}
-    if $pattern->reqs->{format};
+   defined $captures->{format}
+   ? $captures->{format}
+   : $pattern->defaults->{format}
+   if $pattern->reqs->{format};
 
   # Render
   my $path = $endpoint->render('', $values);

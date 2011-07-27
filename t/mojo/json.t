@@ -66,7 +66,7 @@ $array = $json->decode('["hello\t\"world!"]');
 is_deeply $array, ["hello\t\"world!"], 'decode ["hello\t\"world!"]';
 $array = $json->decode('["hello\u0152world\u0152!"]');
 is_deeply $array, ["hello\x{0152}world\x{0152}!"],
-  'decode ["hello\u0152world\u0152!"]';
+ 'decode ["hello\u0152world\u0152!"]';
 $array = $json->decode('["0."]');
 is_deeply $array, ['0.'], 'decode ["0."]';
 $array = $json->decode('[" 0"]');
@@ -102,7 +102,7 @@ is $hash->{Image}->{Width},  800,                    'right value';
 is $hash->{Image}->{Height}, 600,                    'right value';
 is $hash->{Image}->{Title},  'View from 15th Floor', 'right value';
 is $hash->{Image}->{Thumbnail}->{Url},
-  'http://www.example.com/image/481989943', 'right value';
+ 'http://www.example.com/image/481989943', 'right value';
 is $hash->{Image}->{Thumbnail}->{Height}, 125, 'right value';
 is $hash->{Image}->{Thumbnail}->{Width},  100, 'right value';
 is $hash->{Image}->{IDs}->[0], 116,   'right value';
@@ -129,7 +129,7 @@ $string = $json->encode(["hello\t\"world!"]);
 is $string, '["hello\t\"world!"]', 'encode ["hello\t\"world!"]';
 $string = $json->encode(["hello\x{0003}\x{0152}world\x{0152}!"]);
 is b($string)->decode('UTF-8'), "[\"hello\\u0003\x{0152}world\x{0152}!\"]",
-  'encode ["hello\x{0003}\x{0152}world\x{0152}!"]';
+ 'encode ["hello\x{0003}\x{0152}world\x{0152}!"]';
 $string = $json->encode(["123abc"]);
 is $string, '["123abc"]', 'encode ["123abc"]';
 
@@ -186,10 +186,10 @@ $array = $json->decode(b("\x{feff}[\"\\ud800\\udf46\"]")->encode('UTF-16LE'));
 is_deeply $array, ["\x{10346}"], 'decode \x{feff}[\"\\ud800\\udf46\"]';
 
 # Decode UTF-16LE with faihu surrogate pair and BOM value
-$array = $json->decode(
-  b("\x{feff}[\"\\ud800\\udf46\x{feff}\"]")->encode('UTF-16LE'));
+$array =
+ $json->decode(b("\x{feff}[\"\\ud800\\udf46\x{feff}\"]")->encode('UTF-16LE'));
 is_deeply $array, ["\x{10346}\x{feff}"],
-  'decode \x{feff}[\"\\ud800\\udf46\x{feff}\"]';
+ 'decode \x{feff}[\"\\ud800\\udf46\x{feff}\"]';
 
 # Decode UTF-16BE with faihu surrogate pair
 $array = $json->decode(b("\x{feff}[\"\\ud800\\udf46\"]")->encode('UTF-16BE'));
@@ -205,22 +205,22 @@ is_deeply $array, [$json->true], 'decode \x{feff}[true]';
 
 # Decode UTF-16LE without BOM
 $array =
-  $json->decode(b("[\"\\ud800\\udf46\"]")->encode('UTF-16LE')->to_string);
+ $json->decode(b("[\"\\ud800\\udf46\"]")->encode('UTF-16LE')->to_string);
 is_deeply $array, ["\x{10346}"], 'decode [\"\\ud800\\udf46\"]';
 
 # Decode UTF-16BE without BOM
 $array =
-  $json->decode(b("[\"\\ud800\\udf46\"]")->encode('UTF-16BE')->to_string);
+ $json->decode(b("[\"\\ud800\\udf46\"]")->encode('UTF-16BE')->to_string);
 is_deeply $array, ["\x{10346}"], 'decode [\"\\ud800\\udf46\"]';
 
 # Decode UTF-32LE without BOM
 $array =
-  $json->decode(b("[\"\\ud800\\udf46\"]")->encode('UTF-32LE')->to_string);
+ $json->decode(b("[\"\\ud800\\udf46\"]")->encode('UTF-32LE')->to_string);
 is_deeply $array, ["\x{10346}"], 'decode [\"\\ud800\\udf46\"]';
 
 # Decode UTF-32BE without BOM
 $array =
-  $json->decode(b("[\"\\ud800\\udf46\"]")->encode('UTF-32BE')->to_string);
+ $json->decode(b("[\"\\ud800\\udf46\"]")->encode('UTF-32BE')->to_string);
 is_deeply $array, ["\x{10346}"], 'decode [\"\\ud800\\udf46\"]';
 
 # Complicated roudtrips
@@ -236,10 +236,10 @@ is_deeply $json->decode($string), $array, 'successful roundtrip';
 # Real world roundtrip
 $string = $json->encode({foo => 'c:\progra~1\mozill~1\firefox.exe'});
 is $string, '{"foo":"c:\\\\progra~1\\\\mozill~1\\\\firefox.exe"}',
-  'encode {foo => \'c:\progra~1\mozill~1\firefox.exe\'}';
+ 'encode {foo => \'c:\progra~1\mozill~1\firefox.exe\'}';
 $hash = $json->decode($string);
 is_deeply $hash, {foo => 'c:\progra~1\mozill~1\firefox.exe'},
-  'successful roundtrip';
+ 'successful roundtrip';
 
 # Huge string
 $string = $json->encode(['a' x 32768]);
@@ -251,7 +251,7 @@ $string = $json->encode(["\x{2028}test\x{2029}123"]);
 is index($string, b("\x{2028}")->encode), -1, 'properly escaped';
 is index($string, b("\x{2029}")->encode), -1, 'properly escaped';
 is_deeply $json->decode($string), ["\x{2028}test\x{2029}123"],
-  'right roundtrip';
+ 'right roundtrip';
 
 # Blessed reference
 $string = $json->encode([b('test')]);
@@ -259,52 +259,52 @@ is_deeply $json->decode($string), ['test'], 'right roundtrip';
 
 # Errors
 is $json->decode(b("\x{feff}[\"\\ud800\"]")->encode('UTF-16LE')), undef,
-  'missing high surrogate';
+ 'missing high surrogate';
 is $json->error,
-  'Malformed JSON: Missing low-surrogate at line 1, offset 8.',
-  'right error';
+ 'Malformed JSON: Missing low-surrogate at line 1, offset 8.',
+ 'right error';
 is $json->decode(b("\x{feff}[\"\\udf46\"]")->encode('UTF-16LE')), undef,
-  'missing low surrogate';
+ 'missing low surrogate';
 is $json->error,
-  'Malformed JSON: Missing high-surrogate at line 1, offset 8.',
-  'right error';
+ 'Malformed JSON: Missing high-surrogate at line 1, offset 8.',
+ 'right error';
 is $json->decode('[[]'), undef, 'missing right square bracket';
 is $json->error,
-  'Malformed JSON: Expected comma or right square bracket while'
-  . ' parsing array at line 1, offset 3.', 'right error';
+ 'Malformed JSON: Expected comma or right square bracket while'
+ . ' parsing array at line 1, offset 3.', 'right error';
 is $json->decode('{{}'), undef, 'missing right curly bracket';
 is $json->error,
-  'Malformed JSON: Expected string while'
-  . ' parsing object at line 1, offset 1.', 'right error';
+ 'Malformed JSON: Expected string while'
+ . ' parsing object at line 1, offset 1.', 'right error';
 is $json->decode('[[]...'), undef, 'syntax error';
 is $json->error,
-  'Malformed JSON: Expected comma or right square bracket while'
-  . ' parsing array at line 1, offset 3.', 'right error';
+ 'Malformed JSON: Expected comma or right square bracket while'
+ . ' parsing array at line 1, offset 3.', 'right error';
 is $json->decode('{{}...'), undef, 'syntax error';
 is $json->error, 'Malformed JSON: Expected string while'
-  . ' parsing object at line 1, offset 1.', 'right error';
+ . ' parsing object at line 1, offset 1.', 'right error';
 is $json->decode('[nan]'), undef, 'syntax error';
 is $json->error, 'Malformed JSON: Expected string, array, object, number,'
-  . ' boolean or null at line 1, offset 1.', 'right error';
+ . ' boolean or null at line 1, offset 1.', 'right error';
 is $json->decode('["foo]'), undef, 'syntax error';
 is $json->error, 'Malformed JSON: Unterminated string at line 1, offset 6.',
-  'right error';
+ 'right error';
 is $json->decode('["foo"]lala'), undef, 'syntax error';
 is $json->error,
-  'Malformed JSON: Unexpected data after array at line 1, offset 7.',
-  'right error';
+ 'Malformed JSON: Unexpected data after array at line 1, offset 7.',
+ 'right error';
 is $json->decode('false'), undef, 'no object or array';
 is $json->error,
-  'Malformed JSON: Expected array or object at line 0, offset 0.',
-  'right error';
+ 'Malformed JSON: Expected array or object at line 0, offset 0.',
+ 'right error';
 is $json->decode(''), undef, 'no object or array';
 is $json->error, 'Missing or empty input.', 'right error';
 is $json->decode("[\"foo\",\n\"bar\"]lala"), undef, 'syntax error';
 is $json->error,
-  'Malformed JSON: Unexpected data after array at line 2, offset 6.',
-  'right error';
+ 'Malformed JSON: Unexpected data after array at line 2, offset 6.',
+ 'right error';
 is $json->decode("[\"foo\",\n\"bar\",\n\"bazra\"]lalala"), undef,
-  'syntax error';
+ 'syntax error';
 is $json->error,
-  'Malformed JSON: Unexpected data after array at line 3, offset 8.',
-  'right error';
+ 'Malformed JSON: Unexpected data after array at line 3, offset 8.',
+ 'right error';

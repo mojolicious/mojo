@@ -33,7 +33,7 @@ is_deeply $hash->{Connection},     [['close']],        'right structure';
 is_deeply $hash->{Expect},         [['continue-100']], 'right structure';
 is_deeply $hash->{'Content-Type'}, [['text/html']],    'right structure';
 is_deeply [sort @{$headers->names}], [qw/Connection Content-Type Expect/],
-  'right structure';
+ 'right structure';
 $headers->expires('Thu, 01 Dec 1994 16:00:00 GMT');
 $headers->cache_control('public');
 is $headers->expires, 'Thu, 01 Dec 1994 16:00:00 GMT', 'right value';
@@ -43,15 +43,15 @@ is $headers->cache_control, 'public', 'right value';
 $headers = Mojo::Headers->new;
 $headers->header('X-Test', [23, 24], 'single line', [25, 26]);
 is $headers->to_string,
-    "X-Test: 23\x0d\x0a 24\x0d\x0a"
-  . "X-Test: single line\x0d\x0a"
-  . "X-Test: 25\x0d\x0a 26", 'right format';
+   "X-Test: 23\x0d\x0a 24\x0d\x0a"
+ . "X-Test: single line\x0d\x0a"
+ . "X-Test: 25\x0d\x0a 26", 'right format';
 my @array = $headers->header('X-Test');
 is_deeply \@array, [[23, 24], ['single line'], [25, 26]], 'right structure';
 is_deeply $headers->to_hash(arrayref => 1),
-  {'X-Test' => [[23, 24], ['single line'], [25, 26]]}, 'right structure';
+ {'X-Test' => [[23, 24], ['single line'], [25, 26]]}, 'right structure';
 is_deeply $headers->to_hash,
-  {'X-Test' => [[23, 24], 'single line', [25, 26]]}, 'right structure';
+ {'X-Test' => [[23, 24], 'single line', [25, 26]]}, 'right structure';
 my $string = $headers->header('X-Test');
 is $string, "23, 24, single line, 25, 26", 'right format';
 
@@ -74,7 +74,7 @@ is $headers->expires,       'Thu, 01 Dec 1994 16:00:00 GMT', 'right value';
 $headers = Mojo::Headers->new;
 $headers->from_hash({Connection => 'close', 'Content-Type' => 'text/html'});
 is_deeply $headers->to_hash,
-  {Connection => 'close', 'Content-Type' => 'text/html'}, 'right structure';
+ {Connection => 'close', 'Content-Type' => 'text/html'}, 'right structure';
 
 # Remove all headers
 $headers->from_hash({});
@@ -85,11 +85,11 @@ $headers->from_hash(
   {'X-Test' => [[23, 24], ['single line'], [25, 26]], 'X-Test2' => 'foo'});
 $hash = $headers->to_hash;
 is_deeply $hash->{'X-Test'}, [[23, 24], 'single line', [25, 26]],
-  'right structure';
+ 'right structure';
 is_deeply $hash->{'X-Test2'}, 'foo', 'right structure';
 $hash = $headers->to_hash(arrayref => 1);
 is_deeply $hash->{'X-Test'}, [[23, 24], ['single line'], [25, 26]],
-  'right structure';
+ 'right structure';
 is_deeply $hash->{'X-Test2'}, [['foo']], 'right structure';
 
 # Headers in chunks

@@ -13,7 +13,7 @@ use Mojo::IOLoop;
 
 # Run as root only
 die "Server needs to run as user root to be able to listen to port 843.\n"
-  unless $> == 0 && $< == 0;
+ unless $> == 0 && $< == 0;
 
 # Flash policy XML
 my $xml = <<'EOF';

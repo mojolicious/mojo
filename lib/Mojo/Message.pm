@@ -33,7 +33,7 @@ sub at_least_version {
   # Version is equal or newer
   return 1 if $search_major < $current_major;
   return 1
-    if $search_major == $current_major && $search_minor <= $current_minor;
+   if $search_major == $current_major && $search_minor <= $current_minor;
 
   # Version is older
   return;
@@ -44,12 +44,12 @@ sub body {
 
   # Downgrade multipart content
   $self->content(Mojo::Content::Single->new)
-    if $self->content->isa('Mojo::Content::MultiPart');
+   if $self->content->isa('Mojo::Content::MultiPart');
 
   # Get
   my $content = $self->content;
   return $content->on_read ? $content->on_read : $self->content->asset->slurp
-    unless @_;
+   unless @_;
 
   # New content
   my $new = shift;
@@ -166,7 +166,7 @@ sub cookie {
       # Multiple cookies with same name
       if (exists $cookies->{$cookie_name}) {
         $cookies->{$cookie_name} = [$cookies->{$cookie_name}]
-          unless ref $cookies->{$cookie_name} eq 'ARRAY';
+         unless ref $cookies->{$cookie_name} eq 'ARRAY';
         push @{$cookies->{$cookie_name}}, $cookie;
       }
 
@@ -195,7 +195,7 @@ sub dom {
   # Charset
   my $charset;
   ($self->headers->content_type || '') =~ /charset=\"?([^\"\s;]+)\"?/
-    and $charset = $1;
+   and $charset = $1;
 
   # Parse
   my $dom = $self->dom_class->new(charset => $charset)->parse($self->body);
@@ -231,8 +231,8 @@ sub fix_headers {
     my $headers = $self->headers;
     unless ($headers->content_length) {
       $self->is_dynamic
-        ? $headers->connection('close')
-        : $headers->content_length($self->body_size);
+       ? $headers->connection('close')
+       : $headers->content_length($self->body_size);
     }
   }
 
@@ -357,7 +357,7 @@ sub upload {
       # Multiple uploads with same name
       if (exists $uploads->{$uname}) {
         $uploads->{$uname} = [$uploads->{$uname}]
-          unless ref $uploads->{$uname} eq 'ARRAY';
+         unless ref $uploads->{$uname} eq 'ARRAY';
         push @{$uploads->{$uname}}, $upload;
       }
 
@@ -428,7 +428,7 @@ sub _parse {
 
   # Check message size
   return $self->error('Maximum message size exceeded.', 413)
-    if $self->{raw_size} > $self->max_message_size;
+   if $self->{raw_size} > $self->max_message_size;
 
   # Start line
   unless ($self->{state}) {
@@ -437,7 +437,7 @@ sub _parse {
     my $len = index $self->{buffer}, "\x0a";
     $len = length $self->{buffer} if $len < 0;
     return $self->error('Maximum line size exceeded.', 413)
-      if $len > $self->max_line_size;
+     if $len > $self->max_line_size;
 
     # Parse
     $self->_parse_start_line;
@@ -473,7 +473,7 @@ sub _parse {
 
   # Check line size
   return $self->error('Maximum line size exceeded.', 413)
-    if $self->headers->is_limit_exceeded;
+   if $self->headers->is_limit_exceeded;
 
   # Done
   $self->{state} = 'done' if $self->content->is_done;
@@ -502,7 +502,7 @@ sub _parse_formdata {
   # Default charset
   my $default = $self->default_charset;
   ($self->headers->content_type || '') =~ /charset=\"?(\S+)\"?/
-    and $default = $1;
+   and $default = $1;
 
   # Walk the tree
   my @parts;
@@ -518,7 +518,7 @@ sub _parse_formdata {
     # Charset
     my $charset = $default;
     ($part->headers->content_type || '') =~ /charset=\"?(\S+)\"?/
-      and $charset = $1;
+     and $charset = $1;
 
     # "Content-Disposition"
     my $disposition = $part->headers->content_disposition;

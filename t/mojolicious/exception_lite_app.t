@@ -65,31 +65,31 @@ my $t = Test::Mojo->new;
 
 # GET /does_not_exist ("not_found.development.html.ep" route suggestion)
 $t->get_ok('/does_not_exist')->status_is(404)
-  ->content_like(qr/get '\/does_not_exist'/);
+ ->content_like(qr/get '\/does_not_exist'/);
 
 # POST /does_not_exist ("not_found.development.html.ep" route suggestion)
 $t->post_ok('/does_not_exist')->status_is(404)
-  ->content_like(qr/any '\/does_not_exist'/);
+ ->content_like(qr/any '\/does_not_exist'/);
 
 # GET /dead_template
 $t->get_ok('/dead_template')->status_is(500)->content_like(qr/1\./)
-  ->content_like(qr/dead\ template!/);
+ ->content_like(qr/dead\ template!/);
 
 # GET /dead_included_template
 $t->get_ok('/dead_included_template')->status_is(500)->content_like(qr/1\./)
-  ->content_like(qr/dead\ template!/);
+ ->content_like(qr/dead\ template!/);
 
 # GET /dead_template_with_layout
 $t->get_ok('/dead_template_with_layout')->status_is(500)
-  ->content_like(qr/2\./)->content_like(qr/dead\ template\ with\ layout!/);
+ ->content_like(qr/2\./)->content_like(qr/dead\ template\ with\ layout!/);
 
 # GET /dead_action
 $t->get_ok('/dead_action')->status_is(500)->content_like(qr/32\./)
-  ->content_like(qr/dead\ action!/);
+ ->content_like(qr/dead\ action!/);
 
 # GET /double_dead_action
 $t->get_ok('/double_dead_action')->status_is(500)->content_like(qr/36\./)
-  ->content_like(qr/double\ dead\ action!/);
+ ->content_like(qr/double\ dead\ action!/);
 
 # GET /trapped
 $t->get_ok('/trapped')->status_is(200)->content_is('bar');

@@ -10,7 +10,7 @@ use Test::More;
 
 # "Oh well. At least we'll die doing what we love: inhaling molten rock."
 plan skip_all => 'set TEST_EV to enable this test (developer only!)'
-  unless $ENV{TEST_EV};
+ unless $ENV{TEST_EV};
 plan skip_all => 'EV required for this test!' unless eval 'use EV; 1';
 plan tests => 50;
 
@@ -41,7 +41,7 @@ is $writable, undef, 'handle is not writable';
 
 # Connect
 my $client =
-  IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $port);
+ IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $port);
 $watcher->one_tick(0);
 is $readable, 1,     'handle is readable';
 is $writable, undef, 'handle is not writable';

@@ -98,7 +98,7 @@ plugin mount => {'mojolicious.org' => $external};
 plugin mount => {'MOJOLICIO.US/'   => $external};
 plugin mount => {'*.kraih.com'     => $external};
 plugin(mount => ('*.foo-bar.de/♥/123' => $external))
-  ->to(message => 'works 3!');
+ ->to(message => 'works 3!');
 
 # GET /hello
 get '/hello' => 'works';
@@ -117,14 +117,14 @@ get('/yada')->to('test1#', name => 'fifth embedded');
 
 # GET /yada/yada/yada (dispatch to embedded app)
 get('/yada/yada/yada')
-  ->to('test1#', path => '/yada', name => 'sixth embedded');
+ ->to('test1#', path => '/yada', name => 'sixth embedded');
 
 # GET /basic (dispatch to embedded app)
 get('/basic')->detour(MyTestApp::Basic->new, test => 'lalala');
 
 # GET /third/* (dispatch to embedded app)
 get '/third/*path' =>
-  {app => 'MyTestApp::Test2', name => 'third embedded', path => '/'};
+ {app => 'MyTestApp::Test2', name => 'third embedded', path => '/'};
 
 # GET /hello/* (dispatch to embedded app)
 app->routes->route('/hello')->detour(TestApp::app())->to(name => 'embedded');
@@ -141,31 +141,31 @@ $t->get_ok('/foo/bar')->status_is(200)->content_is('plugin works!');
 
 # GET /hello (from main app)
 $t->get_ok('/hello')->status_is(200)
-  ->content_is("Hello from the main app!\n");
+ ->content_is("Hello from the main app!\n");
 
 # GET /hello/hello (from embedded app)
 $t->get_ok('/hello/hello')->status_is(200)
-  ->content_is('Hello from the embedded (1) app!');
+ ->content_is('Hello from the embedded (1) app!');
 
 # GET /hello/hello (from embedded app again)
 $t->get_ok('/hello/hello')->status_is(200)
-  ->content_is('Hello from the embedded (2) app!');
+ ->content_is('Hello from the embedded (2) app!');
 
 # GET /hello/hello (from embedded app again)
 $t->get_ok('/hello/hello')->status_is(200)
-  ->content_is('Hello from the embedded (3) app!');
+ ->content_is('Hello from the embedded (3) app!');
 
 # GET /bye/bye (from embedded app)
 $t->get_ok('/bye/bye')->status_is(200)
-  ->content_is('Hello from the embedded (1) app!second embedded! success!');
+ ->content_is('Hello from the embedded (1) app!second embedded! success!');
 
 # GET /bar/bye (from embedded app)
 $t->get_ok('/bar/bye')->status_is(200)
-  ->content_is('Hello from the embedded (2) app!third embedded! success!');
+ ->content_is('Hello from the embedded (2) app!third embedded! success!');
 
 # GET /baz/bye (from embedded app)
 $t->get_ok('/baz/bye')->status_is(200)
-  ->content_is('Hello from the embedded (3) app!fourth embedded! success!');
+ ->content_is('Hello from the embedded (3) app!fourth embedded! success!');
 
 # GET /yada (from embedded app)
 $t->get_ok('/yada')->status_is(200)->content_is('yada fifth embedded works!');
@@ -175,14 +175,14 @@ $t->get_ok('/yada/yada')->status_is(404);
 
 # GET /yada/yada/yada (from embedded app)
 $t->get_ok('/yada/yada/yada')->status_is(200)
-  ->content_is('yada sixth embedded works!');
+ ->content_is('yada sixth embedded works!');
 
 # GET /basic (from embedded app)
 $t->get_ok('/basic')->status_is(200)->content_is('Hello lalala!');
 
 # GET /third/ (from embedded app)
 $t->get_ok('/third')->status_is(200)
-  ->content_is('Bye from the third embedded app! /third!');
+ ->content_is('Bye from the third embedded app! /third!');
 
 # GET /just/works (from external embedded app)
 $t->get_ok('/just/works')->status_is(200)->content_is("It is working!\n");
@@ -192,7 +192,7 @@ $t->get_ok('/x/1/')->status_is(200)->content_is("works!\n\ntoo!works!!!\n");
 
 # GET /x/1/index.html (full external application)
 $t->get_ok('/x/1/index.html')->status_is(200)
-  ->content_is('External static file!');
+ ->content_is('External static file!');
 
 # GET /x/1/echo (full external application)
 $t->get_ok('/x/1/echo')->status_is(200)->content_is('echo: nothing!');
@@ -202,14 +202,14 @@ $t->get_ok('/x/1/stream')->status_is(200)->content_is('hello!');
 
 # GET /x/1/url/☃ (full external application)
 $t->get_ok('/x/1/url/☃')->status_is(200)
-  ->content_is('/x/1/url/%E2%98%83 -> /x/1/%E2%98%83/stream!');
+ ->content_is('/x/1/url/%E2%98%83 -> /x/1/%E2%98%83/stream!');
 
 # GET /x/♥/ (full external application)
 $t->get_ok('/x/♥/')->status_is(200)->content_is("works!\n\ntoo!works!!!\n");
 
 # GET /x/♥/index.html (full external application)
 $t->get_ok('/x/♥/index.html')->status_is(200)
-  ->content_is('External static file!');
+ ->content_is('External static file!');
 
 # GET /x/♥/echo (full external application)
 $t->get_ok('/x/♥/echo')->status_is(200)->content_is('echo: works 2!');
@@ -219,63 +219,62 @@ $t->get_ok('/x/♥/stream')->status_is(200)->content_is('hello!');
 
 # GET /x/♥/url/☃ (full external application)
 $t->get_ok('/x/♥/url/☃')->status_is(200)
-  ->content_is(
-  '/x/%E2%99%A5/url/%E2%98%83 -> /x/%E2%99%A5/%E2%98%83/stream!');
+ ->content_is('/x/%E2%99%A5/url/%E2%98%83 -> /x/%E2%99%A5/%E2%98%83/stream!');
 
 # GET /host (main application)
 $t->get_ok('/host')->status_is(200)->content_is('main application!');
 
 # GET / (full external application with domain)
 $t->get_ok('/' => {Host => 'mojolicious.org'})->status_is(200)
-  ->content_is("works!\n\ntoo!works!!!\n");
+ ->content_is("works!\n\ntoo!works!!!\n");
 
 # GET /host (full external application with domain)
 $t->get_ok('/host' => {Host => 'mojolicious.org'})->status_is(200)
-  ->content_is('mojolicious.org');
+ ->content_is('mojolicious.org');
 
 # GET / (full external application with domain)
 $t->get_ok('/' => {Host => 'mojolicio.us'})->status_is(200)
-  ->content_is("works!\n\ntoo!works!!!\n");
+ ->content_is("works!\n\ntoo!works!!!\n");
 
 # GET /host (full external application with domain)
 $t->get_ok('/host' => {Host => 'mojolicio.us'})->status_is(200)
-  ->content_is('mojolicio.us');
+ ->content_is('mojolicio.us');
 
 # GET / (full external application with domain)
 $t->get_ok('/' => {Host => 'kraih.com'})->status_is(200)
-  ->content_is("works!\n\ntoo!works!!!\n");
+ ->content_is("works!\n\ntoo!works!!!\n");
 
 # GET /host (full external application with domain)
 $t->get_ok('/host' => {Host => 'KRaIH.CoM'})->status_is(200)
-  ->content_is('kraih.com');
+ ->content_is('kraih.com');
 
 # GET /host (full external application with wildcard domain)
 $t->get_ok('/host' => {Host => 'www.kraih.com'})->status_is(200)
-  ->content_is('www.kraih.com');
+ ->content_is('www.kraih.com');
 
 # GET /host (full external application with wildcard domain)
 $t->get_ok('/host' => {Host => 'foo.bar.kraih.com'})->status_is(200)
-  ->content_is('foo.bar.kraih.com');
+ ->content_is('foo.bar.kraih.com');
 
 # GET /♥/123/host (full external application with a bit of everything)
 $t->get_ok('/♥/123/' => {Host => 'foo-bar.de'})->status_is(200)
-  ->content_is("works!\n\ntoo!works!!!\n");
+ ->content_is("works!\n\ntoo!works!!!\n");
 
 # GET /♥/123/host (full external application with a bit of everything)
 $t->get_ok('/♥/123/host' => {Host => 'foo-bar.de'})->status_is(200)
-  ->content_is('foo-bar.de');
+ ->content_is('foo-bar.de');
 
 # GET /♥/123/echo (full external application with a bit of everything)
 $t->get_ok('/♥/123/echo' => {Host => 'foo-bar.de'})->status_is(200)
-  ->content_is('echo: works 3!');
+ ->content_is('echo: works 3!');
 
 # GET /♥/123/host (full external application with a bit of everything)
 $t->get_ok('/♥/123/host' => {Host => 'www.foo-bar.de'})->status_is(200)
-  ->content_is('www.foo-bar.de');
+ ->content_is('www.foo-bar.de');
 
 # GET /♥/123/echo (full external application with a bit of everything)
 $t->get_ok('/♥/123/echo' => {Host => 'www.foo-bar.de'})->status_is(200)
-  ->content_is('echo: works 3!');
+ ->content_is('echo: works 3!');
 
 __DATA__
 

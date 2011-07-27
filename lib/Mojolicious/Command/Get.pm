@@ -111,7 +111,7 @@ sub run {
         my $code    = $res->code;
         my $message = $res->message;
         warn "HTTP/$version $code $message\n",
-          $res->headers->to_string, "\n\n";
+         $res->headers->to_string, "\n\n";
 
         # Done
         $v = 0;
@@ -145,8 +145,8 @@ sub run {
 
   # Charset
   ($tx->res->headers->content_type || '') =~ /charset=\"?([^\"\s;]+)\"?/
-    and $charset = $1
-    unless defined $charset;
+   and $charset = $1
+   unless defined $charset;
 
   # Select
   $self->_select($buffer, $charset, $selector) if $selector;

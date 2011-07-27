@@ -60,11 +60,11 @@ for my $i (101 .. 150) {
   $y = !$y;
   $monkeys->[$i] = BaseTest->new;
   isa_ok $monkeys->[$i]->name('foobarbaz'),
-    'BaseTest', 'attribute value has right class';
+   'BaseTest', 'attribute value has right class';
   $monkeys->[$i]->heads('3') if $y;
   $y
-    ? is($monkeys->[$i]->heads, 3, 'right attribute value')
-    : is($monkeys->[$i]->heads, 1, 'right attribute default value');
+   ? is($monkeys->[$i]->heads, 3, 'right attribute value')
+   : is($monkeys->[$i]->heads, 1, 'right attribute default value');
 }
 
 # "chained" and coderef "default" support

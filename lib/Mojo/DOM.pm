@@ -99,7 +99,7 @@ sub append { shift->_add(1, @_) }
 sub append_content {
   my ($self, $new) = @_;
   my $tree = $self->tree;
-  push @$tree, @{_parent($self->_parse("$new"), $tree->[3])};
+  push @$tree, @{_parent($self->_parse("$new"), $tree)};
   return $self;
 }
 
@@ -255,7 +255,7 @@ sub prepend_content {
   my ($self, $new) = @_;
   my $tree = $self->tree;
   splice @$tree, $tree->[0] eq 'root' ? 1 : 4, 0,
-    @{_parent($self->_parse("$new"), $tree->[3])};
+    @{_parent($self->_parse("$new"), $tree)};
   return $self;
 }
 

@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 597;
+use Test::More tests => 603;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -1808,3 +1808,14 @@ is $dom->a->b->c, qq/<c id="three">bar<\/c>\n<c id="four">baz<\/c>/,
   'right result';
 is_deeply [keys %$dom], [], 'root has no attributes';
 is $dom->find('#nothing'), '', 'no result';
+
+# Append and prepend content
+$dom = Mojo::DOM->new('<a><b>Test<c /></b></a>');
+$dom->at('b')->append_content('<d />');
+is $dom->children->[0]->type, 'a', 'right element';
+is $dom->all_text, 'Test', 'right text';
+is $dom->at('c')->parent->type, 'b', 'right element';
+is $dom->at('d')->parent->type, 'b', 'right element';
+$dom->at('b')->prepend_content('<e>Mojo</e>');
+is $dom->at('e')->parent->type, 'b', 'right element';
+is $dom->all_text, 'Mojo Test', 'right text';

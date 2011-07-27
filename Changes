@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojolicious.
 1.67    2011-07-27 00:00:00
         - Documentation improvements.
         - Fixed version command.
+        - Fixed small Mojo::DOM bug. (akron)
 
 1.66    2011-07-27 00:00:00
         - Added EXPERIMENTAL detect method to Mojo::IOWatcher.

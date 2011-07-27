@@ -79,11 +79,11 @@ Mojo::IOLoop::EventEmitter - IOLoop Event Emitter
   # Subscribe to events
   $e->on(error => sub {
     my ($self, $error) = @_;
-    warn $error;
+    warn "Catched: $error";
   });
   $e->on(test => sub {
     my ($self, $message) = @_;
-    die "test: $message\n";
+    die "test: $message";
   });
 
   # Emit events

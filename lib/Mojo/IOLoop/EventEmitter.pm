@@ -32,7 +32,6 @@ sub on {
 
 sub once {
   my ($self, $name, $cb) = @_;
-  weaken $self;
   my $wrapper;
   $wrapper = sub {
     my $self = shift;

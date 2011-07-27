@@ -51,8 +51,8 @@ sub run {
     'content=s' => sub { $content  = $_[1] },
     'header=s'  => \@headers,
     'method=s'  => sub { $method   = $_[1] },
-    'redirect'  => sub { $redirect = 1 },
-    'verbose'   => sub { $verbose  = 1 }
+    redirect    => sub { $redirect = 1 },
+    verbose     => sub { $verbose  = 1 }
   );
 
   # Headers

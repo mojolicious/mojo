@@ -30,7 +30,7 @@ sub run {
 
   local @ARGV = @_ if @_;
   my $verbose;
-  GetOptions('verbose' => sub { $verbose = 1 });
+  GetOptions(verbose => sub { $verbose = 1 });
   my $code = shift @ARGV || '';
 
   # Run code against application

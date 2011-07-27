@@ -531,9 +531,9 @@ L<Mojolicious::Controller>.
 The operating mode for your application.
 It defaults to the value of the C<MOJO_MODE> environment variable or
 C<development>.
-L<Mojolicious> will pick up the current mode right before calling C<startup>
-and name the log file after it, modes other than C<development> will also
-result in limited log output.
+Right before calling C<startup>, L<Mojolicious> will pick up the current
+mode, name the log file after it and raise the log level from C<debug> to
+C<info> if it has a value other than C<development>.
 
 If you want to add per mode logic to your application, you can define methods
 named C<$mode_mode> in the application class, which will be called right

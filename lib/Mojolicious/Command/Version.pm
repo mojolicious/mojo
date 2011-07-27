@@ -1,7 +1,6 @@
 package Mojolicious::Command::Version;
 use Mojo::Base 'Mojo::Command';
 
-use Mojo::IOLoop;
 use Mojo::IOLoop::Server;
 use Mojo::Server::Daemon;
 use Mojo::UserAgent;
@@ -36,7 +35,7 @@ sub run {
     if $latest > $current;
 
   # EV
-  my $ev = Mojo::IOLoop::EV() ? $EV::VERSION : 'not installed';
+  my $ev = eval 'use Mojo::IOWatcher::EV; 1' ? $EV::VERSION : 'not installed';
 
   # IPv6
   my $ipv6 =

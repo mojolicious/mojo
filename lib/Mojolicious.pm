@@ -529,10 +529,11 @@ L<Mojolicious::Controller>.
   $app     = $app->mode('production');
 
 The operating mode for your application.
-It defaults to the value of the environment variable C<MOJO_MODE> or
+It defaults to the value of the C<MOJO_MODE> environment variable or
 C<development>.
-Mojo will name the log file after the current mode and modes other than
-C<development> will result in limited log output.
+L<Mojolicious> will pick up the current mode right before calling C<startup>
+and name the log file after it, modes other than C<development> will also
+result in limited log output.
 
 If you want to add per mode logic to your application, you can define methods
 named C<$mode_mode> in the application class, which will be called right

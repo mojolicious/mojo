@@ -665,7 +665,8 @@ L<Mojo::UserAgent> implements the following attributes.
   my $cert = $ua->cert;
   $ua      = $ua->cert('tls.crt');
 
-Path to TLS certificate file, defaults to the value of C<MOJO_CERT_FILE>.
+Path to TLS certificate file, defaults to the value of the C<MOJO_CERT_FILE>
+environment variable.
 
 =head2 C<cookie_jar>
 
@@ -710,7 +711,8 @@ dropped, defaults to C<15>.
   my $key = $ua->key;
   $ua     = $ua->key('tls.crt');
 
-Path to TLS key file, defaults to the value of C<MOJO_KEY_FILE>.
+Path to TLS key file, defaults to the value of the C<MOJO_KEY_FILE>
+environment variable.
 
 =head2 C<log>
 
@@ -734,7 +736,8 @@ before it starts closing the oldest cached ones, defaults to C<5>.
   $ua               = $ua->max_redirects(3);
 
 Maximum number of redirects the user agent will follow before it fails,
-defaults to the value of C<MOJO_MAX_REDIRECTS> or C<0>.
+defaults to the value of the C<MOJO_MAX_REDIRECTS> environment variable or
+C<0>.
 
 =head2 C<name>
 
@@ -793,7 +796,7 @@ following new ones.
   $ua     = $ua->app(MyApp->new);
 
 Application relative URLs will be processed with, defaults to the value of
-C<MOJO_APP>.
+the C<MOJO_APP> environment variable.
 
   print $ua->app->secret;
   $ua->app->log->level('fatal');

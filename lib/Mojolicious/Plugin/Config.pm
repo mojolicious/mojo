@@ -157,8 +157,8 @@ File extension of config file, defaults to C<conf>.
   plugin config => {file => 'myapp.conf'};
   plugin config => {file => '/etc/foo.stuff'};
 
-Configuration file, defaults to the value of C<MOJO_CONFIG> or C<myapp.conf>
-in the application home directory.
+Configuration file, defaults to the value of the C<MOJO_CONFIG> environment
+variable or C<myapp.conf> in the application home directory.
 
 =head2 C<stash_key>
 

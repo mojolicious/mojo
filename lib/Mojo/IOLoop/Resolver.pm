@@ -370,7 +370,8 @@ implements the following new ones.
   $resolver->servers('8.8.8.8', '8.8.4.4');
 
 IP addresses of C<DNS> servers used for lookups, defaults to the value of
-C<MOJO_DNS_SERVER>, auto detection, C<8.8.8.8> or C<8.8.4.4>.
+the C<MOJO_DNS_SERVER> environment variable, auto detection, C<8.8.8.8> or
+C<8.8.4.4>.
 
 =head2 C<lookup>
 

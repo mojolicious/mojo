@@ -1,9 +1,9 @@
 package Mojo::Home;
 use Mojo::Base -base;
 use overload
- 'bool'   => sub {1},
- '""'     => sub { shift->to_string },
- fallback => 1;
+  'bool'   => sub {1},
+  '""'     => sub { shift->to_string },
+  fallback => 1;
 
 use Cwd 'abs_path';
 use File::Find 'find';
@@ -54,7 +54,7 @@ sub detect {
 
       # Turn into absolute path
       $self->{parts} =
-       [File::Spec->splitdir(abs_path(File::Spec->catdir(@home) || '.'))];
+        [File::Spec->splitdir(abs_path(File::Spec->catdir(@home) || '.'))];
     }
   }
 
@@ -87,7 +87,7 @@ sub list_files {
   my @files;
   find sub {
     push @files, join '/',
-     File::Spec->splitdir(File::Spec->abs2rel($File::Find::name, $dir));
+      File::Spec->splitdir(File::Spec->abs2rel($File::Find::name, $dir));
   }, $dir;
 
   return [sort @files];

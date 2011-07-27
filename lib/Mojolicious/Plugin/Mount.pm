@@ -20,8 +20,8 @@ sub register {
 
   # Generate route
   my $route =
-   $app->routes->route($path)
-   ->detour(app => Mojo::Server->new->load_app($conf->{$prefix}));
+    $app->routes->route($path)
+    ->detour(app => Mojo::Server->new->load_app($conf->{$prefix}));
   $route->over(host => $host) if $host;
 
   return $route;

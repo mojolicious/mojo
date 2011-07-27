@@ -18,8 +18,8 @@ sub add {
 
   $self->{handles}->{fileno $handle} = $args;
   $args->{on_writable}
-   ? $self->writing($handle)
-   : $self->not_writing($handle);
+    ? $self->writing($handle)
+    : $self->not_writing($handle);
 
   return $self;
 }
@@ -55,7 +55,7 @@ sub not_writing {
   # Make sure we only watch for readable events
   my $poll = $self->_poll;
   $poll->remove($handle)
-   if delete $self->{handles}->{fileno $handle}->{writing};
+    if delete $self->{handles}->{fileno $handle}->{writing};
   $poll->mask($handle, POLLIN);
 
   return $self;
@@ -70,9 +70,9 @@ sub one_tick {
   $poll->poll($timeout);
   my $handles = $self->{handles};
   $self->_sandbox('Read', $handles->{fileno $_}->{on_readable}, $_)
-   for $poll->handles(POLLIN | POLLHUP | POLLERR);
+    for $poll->handles(POLLIN | POLLHUP | POLLERR);
   $self->_sandbox('Write', $handles->{fileno $_}->{on_writable}, $_)
-   for $poll->handles(POLLOUT);
+    for $poll->handles(POLLOUT);
 
   # Wait for timeout
   usleep 1000000 * $timeout unless keys %{$self->{handles}};

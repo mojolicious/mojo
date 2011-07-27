@@ -36,7 +36,7 @@ sub new {
 
   # Log directory
   $self->log->path($self->home->rel_file('log/mojo.log'))
-   if -w $self->home->rel_file('log');
+    if -w $self->home->rel_file('log');
 
   return $self;
 }

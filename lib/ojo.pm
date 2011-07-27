@@ -40,7 +40,7 @@ sub import {
   *{"${caller}::Oo"} = *{"${caller}::b"} = \&b;
   *{"${caller}::oO"} = sub { _request(@_) };
   *{"${caller}::a"} =
-   sub { *{"${caller}::any"}->(@_) and return *{"${caller}::app"}->() };
+    sub { *{"${caller}::any"}->(@_) and return *{"${caller}::app"}->() };
   *{"${caller}::d"} = sub { _request('delete',    @_) };
   *{"${caller}::f"} = sub { _request('post_form', @_) };
   *{"${caller}::g"} = sub { _request('get',       @_) };
@@ -58,9 +58,9 @@ sub _request {
 
   # Transaction
   my $tx =
-     $method eq 'post_form'
-   ? $UA->build_form_tx(@_)
-   : $UA->build_tx($method, @_);
+      $method eq 'post_form'
+    ? $UA->build_form_tx(@_)
+    : $UA->build_tx($method, @_);
 
   # Process
   $tx = $UA->start($tx);

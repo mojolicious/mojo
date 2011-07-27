@@ -58,23 +58,23 @@ my $t = Test::Mojo->new;
 
 # German (detected)
 $t->get_ok('/' => {'Accept-Language' => 'de, en-US'})->status_is(200)
- ->content_is("Hallo Weltde\n");
+  ->content_is("Hallo Weltde\n");
 
 # English (detected)
 $t->get_ok('/' => {'Accept-Language' => 'en-US'})->status_is(200)
- ->content_is("Hello Worlden\n");
+  ->content_is("Hello Worlden\n");
 
 # English (manual)
 $t->get_ok('/english' => {'Accept-Language' => 'de'})->status_is(200)
- ->content_is("Hello Worlden\n");
+  ->content_is("Hello Worlden\n");
 
 # German (manual)
 $t->get_ok('/german' => {'Accept-Language' => 'en-US'})->status_is(200)
- ->content_is("Hallo Weltde\n");
+  ->content_is("Hallo Weltde\n");
 
 # Mixed (manual)
 $t->get_ok('/mixed' => {'Accept-Language' => 'de, en-US'})->status_is(200)
- ->content_is("Hallo Weltde\nHello Worlden\n");
+  ->content_is("Hallo Weltde\nHello Worlden\n");
 
 # Nothing
 $t->get_ok('/nothing')->status_is(200)->content_is("Hello Worlden\n");
@@ -84,7 +84,7 @@ $t->get_ok('/unknown')->status_is(200)->content_is("unknownde\nunknownen\n");
 
 # Unknwon (manual)
 $t->get_ok('/unknown' => {'Accept-Language' => 'de, en-US'})->status_is(200)
- ->content_is("unknownde\nunknownen\n");
+  ->content_is("unknownde\nunknownen\n");
 
 __DATA__
 @@ index.html.ep

@@ -96,7 +96,7 @@ sub _diag {
   # Defaults
   $tx->res->code(200);
   $tx->res->headers->content_type('text/plain')
-   unless $tx->res->headers->content_type;
+    unless $tx->res->headers->content_type;
 
   # Dispatch
   return $self->_cookies($tx)        if $path =~ /^\/cookies/;
@@ -235,9 +235,9 @@ sub _upload {
   if (my $file = $req->upload('file')) {
     my $headers = $res->headers;
     $headers->content_type($file->headers->content_type
-       || 'application/octet-stream');
+        || 'application/octet-stream');
     $headers->header('X-Upload-Limit-Exceeded' => 1)
-     if $req->is_limit_exceeded;
+      if $req->is_limit_exceeded;
     $res->body($file->slurp);
   }
 

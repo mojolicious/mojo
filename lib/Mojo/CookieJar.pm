@@ -87,13 +87,13 @@ sub find {
       next if $cookie->secure && $url->scheme ne 'https';
       my $cpath = $cookie->path;
       push @found,
-       Mojo::Cookie::Request->new(
+        Mojo::Cookie::Request->new(
         name    => $cookie->name,
         value   => $cookie->value,
         path    => $cookie->path,
         version => $cookie->version,
         secure  => $cookie->secure
-       ) if $path =~ /^$cpath/;
+        ) if $path =~ /^$cpath/;
     }
 
     $self->{jar}->{$domain} = \@new;

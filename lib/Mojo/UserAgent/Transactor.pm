@@ -48,7 +48,7 @@ sub form {
 
         # Upgrade
         $file = $hash->{file} = Mojo::Asset::File->new(path => $file)
-         unless ref $file;
+          unless ref $file;
 
         # Filename
         $hash->{filename} ||= $file->path if $file->can('path');
@@ -174,8 +174,8 @@ sub proxy_connect {
   # WebSocket and/or HTTPS
   my $url = $req->url;
   return
-   unless ($req->headers->upgrade || '') eq 'websocket'
-   || ($url->scheme || '') eq 'https';
+    unless ($req->headers->upgrade || '') eq 'websocket'
+    || ($url->scheme || '') eq 'https';
 
   # CONNECT request
   my $new = $self->tx(CONNECT => $url->clone);
@@ -231,7 +231,7 @@ sub tx {
 
   # Body
   $req->body(pop @_)
-   if @_ & 1 == 1 && ref $_[0] ne 'HASH' || ref $_[-2] eq 'HASH';
+    if @_ & 1 == 1 && ref $_[0] ne 'HASH' || ref $_[-2] eq 'HASH';
 
   # Headers
   $req->headers->from_hash(ref $_[0] eq 'HASH' ? $_[0] : {@_});
@@ -256,7 +256,7 @@ sub websocket {
 
   # Handshake
   Mojo::Transaction::WebSocket->new(handshake => $tx, masked => 1)
-   ->client_handshake;
+    ->client_handshake;
 
   return $tx unless wantarray;
   return $tx, $cb;

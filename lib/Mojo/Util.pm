@@ -348,7 +348,7 @@ sub decode {
     # Everything else
     else {
       $_[1] =
-       ($ENCODE{$_[0]} ||= Encode::find_encoding($_[0]))->decode($_[1], 1);
+        ($ENCODE{$_[0]} ||= Encode::find_encoding($_[0]))->decode($_[1], 1);
     }
   };
 
@@ -456,9 +456,9 @@ sub punycode_decode {
       $i += $digit * $w;
       my $t = $k - $bias;
       $t =
-         $t < PUNYCODE_TMIN ? PUNYCODE_TMIN
-       : $t > PUNYCODE_TMAX ? PUNYCODE_TMAX
-       :                      $t;
+          $t < PUNYCODE_TMIN ? PUNYCODE_TMIN
+        : $t > PUNYCODE_TMAX ? PUNYCODE_TMAX
+        :                      $t;
       last if $digit < $t;
 
       $w *= (PUNYCODE_BASE - $t);
@@ -525,9 +525,9 @@ sub punycode_encode {
         for (my $k = PUNYCODE_BASE; 1; $k += PUNYCODE_BASE) {
           my $t = $k - $bias;
           $t =
-             $t < PUNYCODE_TMIN ? PUNYCODE_TMIN
-           : $t > PUNYCODE_TMAX ? PUNYCODE_TMAX
-           :                      $t;
+              $t < PUNYCODE_TMIN ? PUNYCODE_TMIN
+            : $t > PUNYCODE_TMAX ? PUNYCODE_TMAX
+            :                      $t;
           last if $q < $t;
 
           # Code point for digit "t"
@@ -647,9 +647,9 @@ sub _adapt {
   }
 
   return $k
-   + (
+    + (
     ((PUNYCODE_BASE - PUNYCODE_TMIN + 1) * $delta) / ($delta + PUNYCODE_SKEW)
-   );
+    );
 }
 
 sub _hmac {

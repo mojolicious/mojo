@@ -22,22 +22,22 @@ my $T = File::Spec->catdir(File::Basename::dirname(__FILE__), 'templates');
 
 # Exception template
 our $EXCEPTION =
- Mojo::Asset::File->new(path => File::Spec->catfile($T, 'exception.html.ep'))
- ->slurp;
+  Mojo::Asset::File->new(path => File::Spec->catfile($T, 'exception.html.ep'))
+  ->slurp;
 
 # Exception template (development)
 our $DEVELOPMENT_EXCEPTION =
- Mojo::Asset::File->new(
+  Mojo::Asset::File->new(
   path => File::Spec->catfile($T, 'exception.development.html.ep'))->slurp;
 
 # Not found template
 our $NOT_FOUND =
- Mojo::Asset::File->new(path => File::Spec->catfile($T, 'not_found.html.ep'))
- ->slurp;
+  Mojo::Asset::File->new(path => File::Spec->catfile($T, 'not_found.html.ep'))
+  ->slurp;
 
 # Not found template (development)
 our $DEVELOPMENT_NOT_FOUND =
- Mojo::Asset::File->new(
+  Mojo::Asset::File->new(
   path => File::Spec->catfile($T, 'not_found.development.html.ep'))->slurp;
 
 # Reserved stash values
@@ -58,7 +58,7 @@ sub AUTOLOAD {
 
   # Call helper
   Carp::croak(qq/Can't locate object method "$method" via package "$package"/)
-   unless my $helper = $self->app->renderer->helpers->{$method};
+    unless my $helper = $self->app->renderer->helpers->{$method};
   return $self->$helper(@_);
 }
 
@@ -76,7 +76,7 @@ sub cookie {
 
     # Cookie too big
     $self->app->log->error(qq/Cookie "$name" is bigger than 4096 bytes./)
-     if length $value > 4096;
+      if length $value > 4096;
 
     # Create new cookie
     $options ||= {};
@@ -161,7 +161,7 @@ sub on_message {
 
   my $tx = $self->tx;
   Carp::croak('No WebSocket connection to receive messages from')
-   unless $tx->is_websocket;
+    unless $tx->is_websocket;
   my $cb = shift;
   $tx->on_message(sub { shift and $self->$cb(@_) });
   $self->rendered(101);
@@ -344,7 +344,7 @@ sub render_exception {
       delete $stash->{extends};
       delete $options->{template};
       $options->{inline} =
-       $mode eq 'development' ? $DEVELOPMENT_EXCEPTION : $EXCEPTION;
+        $mode eq 'development' ? $DEVELOPMENT_EXCEPTION : $EXCEPTION;
       $options->{handler} = 'ep';
       $self->render($options);
     }
@@ -385,9 +385,9 @@ sub render_not_found {
 
   # Check for POD plugin
   my $guide =
-     $self->app->renderer->helpers->{pod_to_html}
-   ? $self->url_for('/perldoc')
-   : 'http://mojolicio.us/perldoc';
+      $self->app->renderer->helpers->{pod_to_html}
+    ? $self->url_for('/perldoc')
+    : 'http://mojolicio.us/perldoc';
 
   # Mode specific template
   my $mode    = $self->app->mode;
@@ -409,7 +409,7 @@ sub render_not_found {
       delete $options->{extends};
       delete $options->{template};
       $options->{inline} =
-       $mode eq 'development' ? $DEVELOPMENT_NOT_FOUND : $NOT_FOUND;
+        $mode eq 'development' ? $DEVELOPMENT_NOT_FOUND : $NOT_FOUND;
       $options->{handler} = 'ep';
       $self->render($options);
     }
@@ -481,7 +481,7 @@ sub send_message {
 
   my $tx = $self->tx;
   Carp::croak('No WebSocket connection to send message to')
-   unless $tx->is_websocket;
+    unless $tx->is_websocket;
   $tx->send_message($message, sub { shift and $self->$cb(@_) if $cb });
   $self->rendered(101);
 
@@ -571,7 +571,7 @@ sub stash {
   my $values = ref $_[0] ? $_[0] : {@_};
   for my $key (keys %$values) {
     $self->app->log->debug(qq/Careful, "$key" is a reserved stash value./)
-     if $RESERVED{$key};
+      if $RESERVED{$key};
     $self->{stash}->{$key} = $values->{$key};
   }
 
@@ -629,8 +629,8 @@ sub url_for {
 
     # Fix trailing slash
     $path->trailing_slash(1)
-     if (!$target || $target eq 'current')
-     && $req->url->path->trailing_slash;
+      if (!$target || $target eq 'current')
+      && $req->url->path->trailing_slash;
 
     # Fix scheme for WebSockets
     $base->scheme(($base->scheme || '') eq 'https' ? 'wss' : 'ws') if $ws;

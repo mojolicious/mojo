@@ -19,7 +19,7 @@ $path = Mojo::Path->new(
 is "$path", '/../../../../../../../../../../etc/passwd', 'rigth result';
 is $path->parts->[0], '..', 'right part';
 is $path->canonicalize, '/../../../../../../../../../../etc/passwd',
- 'rigth result';
+  'rigth result';
 is $path->parts->[0], '..', 'right part';
 $path = Mojo::Path->new(
   '/%2ftest%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2fetc%2fpasswd');

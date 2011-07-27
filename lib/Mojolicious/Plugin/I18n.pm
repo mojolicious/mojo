@@ -17,7 +17,7 @@ sub register {
   eval "require ${namespace}::${default};";
   unless (eval "\%${namespace}::${default}::Lexicon") {
     eval "package ${namespace}::$default; use base '$namespace';"
-     . 'our %Lexicon = (_AUTO => 1); 1;';
+      . 'our %Lexicon = (_AUTO => 1); 1;';
     die qq/Couldn't initialize I18N class "$namespace": $@/ if $@;
   }
 
@@ -35,7 +35,7 @@ sub register {
 
       # Handler
       $self->stash->{i18n} =
-       Mojolicious::Plugin::I18n::_Handler->new(namespace => $namespace);
+        Mojolicious::Plugin::I18n::_Handler->new(namespace => $namespace);
 
       # Languages
       $self->stash->{i18n}->languages(@languages, $default);

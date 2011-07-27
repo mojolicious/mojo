@@ -111,14 +111,14 @@ sub render {
   if (defined $text) {
     $self->handlers->{text}->($self, $c, \$output, {text => $text});
     $content->{content} = b("$output")
-     if ($c->stash->{extends} || $c->stash->{layout});
+      if ($c->stash->{extends} || $c->stash->{layout});
   }
 
   # Data
   elsif (defined $data) {
     $self->handlers->{data}->($self, $c, \$output, {data => $data});
     $content->{content} = b("$output")
-     if ($c->stash->{extends} || $c->stash->{layout});
+      if ($c->stash->{extends} || $c->stash->{layout});
   }
 
   # JSON
@@ -126,14 +126,14 @@ sub render {
     $self->handlers->{json}->($self, $c, \$output, {json => $json});
     $format = 'json';
     $content->{content} = b("$output")
-     if ($c->stash->{extends} || $c->stash->{layout});
+      if ($c->stash->{extends} || $c->stash->{layout});
   }
 
   # Template or templateless handler
   else {
     return unless $self->_render_template($c, \$output, $options);
     $content->{content} = b($output)
-     if ($c->stash->{extends} || $c->stash->{layout});
+      if ($c->stash->{extends} || $c->stash->{layout});
   }
 
   # Extends
@@ -187,13 +187,13 @@ sub _detect_handler {
   my $templates = $self->{templates};
   unless ($templates) {
     $templates = $self->{templates} =
-     Mojo::Home->new->parse($self->root)->list_files;
+      Mojo::Home->new->parse($self->root)->list_files;
   }
 
   # DATA templates
   my $class  = $self->_detect_template_class($options);
   my $inline = $self->{data_templates}->{$class}
-   ||= $self->_list_data_templates($class);
+    ||= $self->_list_data_templates($class);
 
   # Detect
   return unless my $file = $self->template_name($options);
@@ -209,10 +209,10 @@ sub _detect_handler {
 #  Please line up in order of how much beryllium it takes to kill you."
 sub _detect_template_class {
   my ($self, $options) = @_;
-      $options->{template_class}
-   || $ENV{MOJO_TEMPLATE_CLASS}
-   || $self->default_template_class
-   || 'main';
+       $options->{template_class}
+    || $ENV{MOJO_TEMPLATE_CLASS}
+    || $self->default_template_class
+    || 'main';
 }
 
 sub _extends {
@@ -237,9 +237,9 @@ sub _render_template {
 
   # Renderer
   my $handler =
-      $options->{handler}
-   || $self->_detect_handler($options)
-   || $self->default_handler;
+       $options->{handler}
+    || $self->_detect_handler($options)
+    || $self->default_handler;
   $options->{handler} = $handler;
   my $renderer = $self->handlers->{$handler};
 

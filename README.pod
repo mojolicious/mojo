@@ -106,7 +106,7 @@ Web development for humans, making hard things possible and everything fun.
     my $self = shift;
     my $url  = $self->param('url') || 'http://mojolicio.us';
     $self->render_text(
-     $self->ua->get($url)->res->dom->html->head->title->text);
+      $self->ua->get($url)->res->dom->html->head->title->text);
   };
 
   # WebSocket echo service
@@ -156,7 +156,7 @@ A controller collects several actions together.
     my $self = shift;
     my $url  = $self->param('url') || 'http://mojolicio.us';
     $self->render_text(
-     $self->ua->get($url)->res->dom->html->head->title->text);
+      $self->ua->get($url)->res->dom->html->head->title->text);
   }
 
   1;

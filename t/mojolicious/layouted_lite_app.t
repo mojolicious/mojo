@@ -34,39 +34,39 @@ my $t = Test::Mojo->new;
 
 # GET /works
 $t->get_ok('/works')->status_is(200)
- ->content_is("DefaultJust worksThis template just works!\n\n");
+  ->content_is("DefaultJust worksThis template just works!\n\n");
 
 # GET /works (different layout)
 $t->get_ok('/works?green=1')->status_is(200)
- ->content_is("GreenJust worksThis template just works!\n\n");
+  ->content_is("GreenJust worksThis template just works!\n\n");
 
 # GET /works (extended)
 $t->get_ok('/works?blue=1')->status_is(200)
- ->content_is("BlueJust worksThis template just works!\n\n");
+  ->content_is("BlueJust worksThis template just works!\n\n");
 
 # GET /doesnotexist
 $t->get_ok('/doesnotexist')->status_is(404)
- ->content_is("DefaultNot found happenedNot found happened!\n\n");
+  ->content_is("DefaultNot found happenedNot found happened!\n\n");
 
 # GET /doesnotexist (different layout)
 $t->get_ok('/doesnotexist?green=1')->status_is(404)
- ->content_is("GreenNot found happenedNot found happened!\n\n");
+  ->content_is("GreenNot found happenedNot found happened!\n\n");
 
 # GET /doesnotexist (extended)
 $t->get_ok('/doesnotexist?blue=1')->status_is(404)
- ->content_is("BlueNot found happenedNot found happened!\n\n");
+  ->content_is("BlueNot found happenedNot found happened!\n\n");
 
 # GET /dies
 $t->get_ok('/dies')->status_is(500)
- ->content_is("DefaultException happenedException happened!\n\n");
+  ->content_is("DefaultException happenedException happened!\n\n");
 
 # GET /dies (different layout)
 $t->get_ok('/dies?green=1')->status_is(500)
- ->content_is("GreenException happenedException happened!\n\n");
+  ->content_is("GreenException happenedException happened!\n\n");
 
 # GET /dies (extended)
 $t->get_ok('/dies?blue=1')->status_is(500)
- ->content_is("BlueException happenedException happened!\n\n");
+  ->content_is("BlueException happenedException happened!\n\n");
 
 __DATA__
 @@ layouts/default.html.ep

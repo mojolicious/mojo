@@ -61,8 +61,8 @@ is $req->body, '', 'no content';
 $req = Mojo::Message::Request->new;
 $req->parse("GET / HTTP/1.1\x0d\x0a");
 $req->parse("Content-Length: 4\x0d\x0aCookie: "
-   . ('a=b; ' x (128 * 1024))
-   . "\x0d\x0aX-Test: 23\x0d\x0a\x0d\x0aabcd");
+    . ('a=b; ' x (128 * 1024))
+    . "\x0d\x0aX-Test: 23\x0d\x0a\x0d\x0aabcd");
 ok $req->is_done, 'request is done';
 is $req->error,   'Maximum line size exceeded.', 'right error';
 is $req->method,  'GET', 'right method';
@@ -144,7 +144,7 @@ $req = Mojo::Message::Request->new;
 $req->parse("GET / HTTP/1.1\x0d\x0a\x0d\x0aGET / HTTP/1.1\x0d\x0a\x0d\x0a");
 ok $req->is_done,   'request is done';
 is $req->leftovers, "GET / HTTP/1.1\x0d\x0a\x0d\x0a",
- 'second request in leftovers';
+  'second request in leftovers';
 
 # Parse HTTP 1.1 start line, no headers and body with leading CRLFs
 # (SHOULD be ignored, RFC 2616, Section 4.1)
@@ -174,10 +174,10 @@ is $req->url, '/demo', 'right URL';
 is $req->headers->host,       'example.com', 'right "Host" value';
 is $req->headers->connection, 'Upgrade',     'right "Connection" value';
 is $req->headers->sec_websocket_protocol, 'sample',
- 'right "Sec-WebSocket-Protocol" value';
+  'right "Sec-WebSocket-Protocol" value';
 is $req->headers->upgrade, 'WebSocket', 'right "Upgrade" value';
 is $req->headers->sec_websocket_key, 'abcdef=',
- 'right "Sec-WebSocket-Key" value';
+  'right "Sec-WebSocket-Key" value';
 is $req->body, '', 'no content';
 
 # Parse HTTP 1.0 start line and headers, no body
@@ -294,7 +294,7 @@ is $req->at_least_version('1.0'), 1,     'at least version 1.0';
 is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
 is $req->url->to_abs, 'http://mojolicio.us/foo/bar/baz.html?foo=13#23',
- 'right absolute URL';
+  'right absolute URL';
 is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $req->headers->content_length, 27, 'right "Content-Length" value';
 
@@ -334,7 +334,7 @@ is $req->at_least_version('1.0'), 1,     'at least version 1.0';
 is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
 is $req->headers->content_type, 'application/x-www-form-urlencoded',
- 'right "Content-Type" value';
+  'right "Content-Type" value';
 is $req->headers->content_length, 53, 'right "Content-Length" value';
 is $req->param('name'), 'Вячеслав', 'right value';
 
@@ -404,7 +404,7 @@ is $req->at_least_version('1.0'), 1,     'at least version 1.0';
 is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
 is $req->headers->content_type,
- 'x-application-urlencoded', 'right "Content-Type" value';
+  'x-application-urlencoded', 'right "Content-Type" value';
 is $req->content->asset->size, 26, 'right size';
 is $req->content->asset->slurp, 'foo=bar& tset=23+;&foo=bar', 'right content';
 is $req->body_params, 'foo=bar&+tset=23+&foo=bar', 'right parameters';
@@ -425,8 +425,8 @@ is $req->at_least_version('1.0'), 1,     'at least version 1.0';
 is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
 is $req->headers->content_type,
- 'application/x-www-form-urlencoded',
- 'right "Content-Type" value';
+  'application/x-www-form-urlencoded',
+  'right "Content-Type" value';
 is $req->content->asset->size, 26, 'right size';
 is $req->content->asset->slurp, 'foo=bar&+tset=23+;&foo=bar', 'right content';
 is $req->body_params, 'foo=bar&+tset=23+&foo=bar', 'right parameters';
@@ -439,7 +439,7 @@ $req->param('set', 'single');
 is_deeply $req->param('set'), 'single', 'setting single param works';
 $req->param('multi', 1, 2, 3);
 is_deeply [$req->param('multi')],
- [qw/1 2 3/], 'setting multiple value param works';
+  [qw/1 2 3/], 'setting multiple value param works';
 is $req->param('test23'), undef, 'no value';
 
 # Parse HTTP 1.1 chunked request with trailing headers
@@ -573,14 +573,14 @@ is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->url, '/foo/bar/baz.html?foo13#23', 'right URL';
 is $req->query_params, 'foo13', 'right parameters';
 like $req->headers->content_type,
- qr/multipart\/form-data/, 'right "Content-Type" value';
+  qr/multipart\/form-data/, 'right "Content-Type" value';
 isa_ok $req->content->parts->[0], 'Mojo::Content::Single', 'right part';
 isa_ok $req->content->parts->[1], 'Mojo::Content::Single', 'right part';
 isa_ok $req->content->parts->[2], 'Mojo::Content::Single', 'right part';
 is $req->content->parts->[0]->asset->slurp, "hallo welt test123\n",
- 'right content';
+  'right content';
 is_deeply $req->body_params->to_hash->{text1}, "hallo welt test123\n",
- 'right value';
+  'right value';
 is_deeply $req->body_params->to_hash->{text2}, '', 'right value';
 is $req->upload('upload')->filename,  'hello.pl',            'right filename';
 isa_ok $req->upload('upload')->asset, 'Mojo::Asset::Memory', 'right file';
@@ -605,7 +605,7 @@ is $req->version, '1.1', 'right version';
 is $req->at_least_version('1.0'), 1,     'at least version 1.0';
 is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->url->base, 'http://Aladdin:open%20sesame@127.0.0.1',
- 'right base URL';
+  'right base URL';
 is $req->url->base->userinfo, 'Aladdin:open sesame', 'right base userinfo';
 is $req->url, 'http://127.0.0.1/foo/bar', 'right URL';
 is $req->proxy->userinfo, 'Aladdin:open sesame', 'right proxy userinfo';
@@ -715,9 +715,9 @@ is $req->headers->upgrade,    'WebSocket',   'right "Upgrade" value';
 is $req->headers->host,       'example.com', 'right "Host" value';
 is $req->headers->content_length, 0, 'right "Content-Length" value';
 is $req->headers->sec_websocket_accept, 'abcdef=',
- 'right "Sec-WebSocket-Key" value';
+  'right "Sec-WebSocket-Key" value';
 is $req->headers->sec_websocket_protocol, 'sample',
- 'right "Sec-WebSocket-Protocol" value';
+  'right "Sec-WebSocket-Protocol" value';
 is $req->body, '', 'no content';
 ok $finished, 'finish callback was called';
 ok $req->is_done, 'request is done';
@@ -759,11 +759,11 @@ is $req->url, 'http://127.0.0.1/foo/bar', 'right URL';
 is $req->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL';
 is $req->proxy->userinfo, 'Aladdin:open sesame',      'right proxy userinfo';
 is $req->headers->authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
- 'right "Authorization" value';
+  'right "Authorization" value';
 is $req->headers->expect, '100-continue', 'right "Expect" value';
 is $req->headers->host,   '127.0.0.1',    'right "Host" value';
 is $req->headers->proxy_authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
- 'right "Proxy-Authorization" value';
+  'right "Proxy-Authorization" value';
 is $req->headers->content_length, '13', 'right "Content-Length" value';
 is $req->body, "Hello World!\n", 'right content';
 
@@ -782,13 +782,13 @@ is $req->url, '', 'no full URL';
 is $req->url->host, '127.0.0.1', 'right host';
 is $req->url->port, '3000',      'right port';
 is $req->url->to_abs, 'http://Aladdin:open%20sesame@127.0.0.1:3000/',
- 'right absolute URL';
+  'right absolute URL';
 is $req->proxy->userinfo, 'Aladdin:open sesame', 'right proxy userinfo';
 is $req->headers->authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
- 'right "Authorization" value';
+  'right "Authorization" value';
 is $req->headers->host, '127.0.0.1:3000', 'right "Host" value';
 is $req->headers->proxy_authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
- 'right "Proxy-Authorization" value';
+  'right "Proxy-Authorization" value';
 
 # Build HTTP 1.1 multipart request
 $req = Mojo::Message::Request->new;
@@ -813,13 +813,13 @@ is $req->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
 is $req->headers->host, '127.0.0.1', 'right "Host" value';
 is $req->headers->content_length, '104', 'right "Content-Length" value';
 is $req->headers->content_type, 'multipart/mixed; boundary=7am1X',
- 'right "Content-Type" value';
+  'right "Content-Type" value';
 is $req->content->parts->[0]->asset->slurp, 'Hallo Welt lalalala!',
- 'right content';
+  'right content';
 is $req->content->parts->[1]->headers->content_type, 'text/plain',
- 'right "Content-Type" value';
+  'right "Content-Type" value';
 is $req->content->parts->[1]->asset->slurp, "lala\nfoobar\nperl rocks\n",
- 'right content';
+  'right content';
 
 # Build HTTP 1.1 chunked request
 $req = Mojo::Message::Request->new;
@@ -914,7 +914,7 @@ is $res->version, '0.9', 'right version';
 is $res->at_least_version('0.9'), 1,     'at least version 0.9';
 is $res->at_least_version('1.2'), undef, 'not version 1.2';
 is $res->body, "HTT... this is just a document and valid HTTP 0.9\n\n",
- 'right content';
+  'right content';
 
 # Parse HTTP 1.0 response start line and headers but no body
 $res = Mojo::Message::Response->new;
@@ -995,10 +995,10 @@ is $res->body, "Hello World!\n1234\nlalalala\n", 'right content';
 # Parse HTTP 1.1 response (413 error in one big chunk)
 $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.1 413 Request Entity Too Large\x0d\x0a"
-   . "Connection: Close\x0d\x0a"
-   . "Date: Tue, 09 Feb 2010 16:34:51 GMT\x0d\x0a"
-   . "Server: Mojolicious (Perl)\x0d\x0a"
-   . "X-Powered-By: Mojolicious (Perl)\x0d\x0a\x0d\x0a");
+    . "Connection: Close\x0d\x0a"
+    . "Date: Tue, 09 Feb 2010 16:34:51 GMT\x0d\x0a"
+    . "Server: Mojolicious (Perl)\x0d\x0a"
+    . "X-Powered-By: Mojolicious (Perl)\x0d\x0a\x0d\x0a");
 ok !$res->is_done, 'response is not done';
 is $res->code,    413,                        'right status';
 is $res->message, 'Request Entity Too Large', 'right message';
@@ -1054,12 +1054,12 @@ is $res->version, '1.1', 'right version';
 is $res->at_least_version('1.0'), 1,     'at least version 1.0';
 is $res->at_least_version('1.2'), undef, 'not version 1.2';
 ok $res->headers->content_type =~ /multipart\/form-data/,
- 'right "Content-Type" value';
+  'right "Content-Type" value';
 isa_ok $res->content->parts->[0], 'Mojo::Content::Single', 'right part';
 isa_ok $res->content->parts->[1], 'Mojo::Content::Single', 'right part';
 isa_ok $res->content->parts->[2], 'Mojo::Content::Single', 'right part';
 is $res->content->parts->[0]->asset->slurp, "hallo welt test123\n",
- 'right content';
+  'right content';
 
 # Parse HTTP 1.1 multipart response with missing boundary
 $res = Mojo::Message::Response->new;
@@ -1087,7 +1087,7 @@ is $res->version, '1.1', 'right version';
 is $res->at_least_version('1.0'), 1,     'at least version 1.0';
 is $res->at_least_version('1.2'), undef, 'not version 1.2';
 ok $res->headers->content_type =~ /multipart\/form-data/,
- 'right "Content-Type" value';
+  'right "Content-Type" value';
 isa_ok $res->content, 'Mojo::Content::Single', 'right content';
 like $res->content->asset->slurp, qr/hallo\ welt/, 'right content';
 
@@ -1144,7 +1144,7 @@ $res = Mojo::Message::Response->new;
 $res->version('0.9');
 $res->body("this is just a document and valid HTTP 0.9\nlalala\n");
 is $res->to_string, "this is just a document and valid HTTP 0.9\nlalala\n",
- 'right message';
+  'right message';
 $res = Mojo::Message::Response->new->parse($res->to_string);
 ok $res->is_done, 'response is done';
 is $res->code,    undef, 'no status';
@@ -1153,7 +1153,7 @@ is $res->version, '0.9', 'right version';
 is $res->at_least_version('0.9'), 1,     'at least version 0.9';
 is $res->at_least_version('1.2'), undef, 'not version 1.2';
 is $res->body, "this is just a document and valid HTTP 0.9\nlalala\n",
- 'right content';
+  'right content';
 
 # Build HTTP 1.1 multipart response
 $res = Mojo::Message::Response->new;
@@ -1162,7 +1162,7 @@ $res->code(200);
 $res->headers->content_type('multipart/mixed; boundary=7am1X');
 $res->headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
 push @{$res->content->parts},
- Mojo::Content::Single->new(asset => Mojo::Asset::File->new);
+  Mojo::Content::Single->new(asset => Mojo::Asset::File->new);
 $res->content->parts->[-1]->asset->add_chunk('Hallo Welt lalalalalala!');
 $content = Mojo::Content::Single->new;
 $content->asset->add_chunk("lala\nfoobar\nperl rocks\n");
@@ -1178,13 +1178,13 @@ is $res->at_least_version('1.2'), undef, 'not version 1.2';
 is $res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT', 'right "Date" value';
 is $res->headers->content_length, '108', 'right "Content-Length" value';
 is $res->headers->content_type, 'multipart/mixed; boundary=7am1X',
- 'right "Content-Type" value';
+  'right "Content-Type" value';
 is $res->content->parts->[0]->asset->slurp, 'Hallo Welt lalalalalala!',
- 'right content';
+  'right content';
 is $res->content->parts->[1]->headers->content_type, 'text/plain',
- 'right "Content-Type" value';
+  'right "Content-Type" value';
 is $res->content->parts->[1]->asset->slurp, "lala\nfoobar\nperl rocks\n",
- 'right content';
+  'right content';
 
 # Parse Lighttpd like CGI environment variables and a body
 $req = Mojo::Message::Request->new;
@@ -1212,8 +1212,8 @@ is $req->at_least_version('1.0'), 1,     'at least version 1.0';
 is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->body, 'Hello World', 'right content';
 is $req->url->to_abs->to_string,
- 'http://localhost:8080/test/index.cgi/foo/bar?lalala=23&bar=baz',
- 'right absolute URL';
+  'http://localhost:8080/test/index.cgi/foo/bar?lalala=23&bar=baz',
+  'right absolute URL';
 
 # Parse Lighttpd like CGI environment variables and a body
 # (behind reverse proxy)
@@ -1243,8 +1243,8 @@ is $req->at_least_version('1.0'), 1,     'at least version 1.0';
 is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->body, 'Hello World', 'right content';
 is $req->url->to_abs->to_string,
- 'http://mojolicio.us/test/index.cgi/foo/bar?lalala=23&bar=baz',
- 'right absolute URL';
+  'http://mojolicio.us/test/index.cgi/foo/bar?lalala=23&bar=baz',
+  'right absolute URL';
 
 # Parse Apache like CGI environment variables and a body
 $req = Mojo::Message::Request->new;
@@ -1274,8 +1274,8 @@ is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right value';
 is $req->url->to_abs->to_string,
- 'http://localhost:8080/test/index.cgi/foo/bar?lalala=23&bar=baz',
- 'right absolute URL';
+  'http://localhost:8080/test/index.cgi/foo/bar?lalala=23&bar=baz',
+  'right absolute URL';
 
 # Parse Apache like CGI environment variables with basic authorization
 $req = Mojo::Message::Request->new;
@@ -1307,10 +1307,10 @@ is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right value';
 is $req->url->to_abs->to_string, 'http://Aladdin:open%20sesame@localhost:8080'
- . '/test/index.cgi/foo/bar?lalala=23&bar=baz', 'right absolute URL';
+  . '/test/index.cgi/foo/bar?lalala=23&bar=baz', 'right absolute URL';
 is $req->url->base,
- 'http://Aladdin:open%20sesame@localhost:8080/test/index.cgi/',
- 'right base URL';
+  'http://Aladdin:open%20sesame@localhost:8080/test/index.cgi/',
+  'right base URL';
 is $req->url->base->userinfo, 'Aladdin:open sesame', 'right userinfo';
 is $req->url, 'foo/bar?lalala=23&bar=baz', 'right URL';
 is $req->proxy->userinfo, 'Aladdin:open sesame', 'right proxy userinfo';
@@ -1340,14 +1340,14 @@ is $req->version, '1.1', 'right version';
 is $req->at_least_version('1.0'), 1,     'at least version 1.0';
 is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->body, 'request=&ajax=true&login=test&password=111&'
- . 'edition=db6d8b30-16df-4ecd-be2f-c8194f94e1f4', 'right content';
+  . 'edition=db6d8b30-16df-4ecd-be2f-c8194f94e1f4', 'right content';
 is $req->param('ajax'),     'true', 'right value';
 is $req->param('login'),    'test', 'right value';
 is $req->param('password'), '111',  'right value';
 is $req->param('edition'), 'db6d8b30-16df-4ecd-be2f-c8194f94e1f4',
- 'right value';
+  'right value';
 is $req->url->to_abs->to_string, 'http://test1/index.pl',
- 'right absolute URL';
+  'right absolute URL';
 
 # Parse Apache 2.2 (win32) like CGI environment variables and a body
 $req = Mojo::Message::Request->new;
@@ -1374,14 +1374,14 @@ is $req->version, '1.1', 'right version';
 is $req->at_least_version('1.0'), 1,     'at least version 1.0';
 is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->body, 'request=&ajax=true&login=test&password=111&'
- . 'edition=db6d8b30-16df-4ecd-be2f-c8194f94e1f4', 'right content';
+  . 'edition=db6d8b30-16df-4ecd-be2f-c8194f94e1f4', 'right content';
 is $req->param('ajax'),     'true', 'right value';
 is $req->param('login'),    'test', 'right value';
 is $req->param('password'), '111',  'right value';
 is $req->param('edition'), 'db6d8b30-16df-4ecd-be2f-c8194f94e1f4',
- 'right value';
+  'right value';
 is $req->url->to_abs->to_string, 'http://test1/index.pl',
- 'right absolute URL';
+  'right absolute URL';
 
 # Parse Apache 2.2.14 like CGI environment variables and a body (root)
 $req = Mojo::Message::Request->new;
@@ -1424,7 +1424,7 @@ is $req->is_secure, undef,         'not secure';
 is $req->body,      'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right parameters';
 is $req->url->to_abs->to_string, 'http://127.0.0.1:13028/diag/upload',
- 'right absolute URL';
+  'right absolute URL';
 
 # Parse Apache 2.2.11 like CGI environment variables and a body (HTTPS)
 $req = Mojo::Message::Request->new;
@@ -1452,7 +1452,7 @@ is $req->is_secure, 1,             'is secure';
 is $req->body,      'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right parameters';
 is $req->url->to_abs->to_string, 'https://localhost/test/index.cgi/foo/bar',
- 'right absolute URL';
+  'right absolute URL';
 
 # Parse Apache 2.2.11 like CGI environment variables and a body
 # (trailing slash)
@@ -1479,7 +1479,7 @@ is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right parameters';
 is $req->url->to_abs->to_string, 'http://localhost/test/index.cgi/foo/bar/',
- 'right absolute URL';
+  'right absolute URL';
 
 # Parse Apache 2.2.11 like CGI environment variables and a body
 # (no SCRIPT_NAME)
@@ -1505,7 +1505,7 @@ is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right parameters';
 is $req->url->to_abs->to_string, 'http://localhost/foo/bar',
- 'right absolute URL';
+  'right absolute URL';
 
 # Parse Apache 2.2.11 like CGI environment variables and a body
 # (no PATH_INFO)
@@ -1531,7 +1531,7 @@ is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right parameters';
 is $req->url->to_abs->to_string, 'http://localhost/test/index.cgi',
- 'right absolute URL';
+  'right absolute URL';
 
 # Parse Apache 2.2.9 like CGI environment variables (root without PATH_INFO)
 $req = Mojo::Message::Request->new;
@@ -1549,13 +1549,13 @@ is $req->method, 'GET', 'right method';
 is $req->url->base->host, 'getbootylicious.org', 'right base host';
 is $req->url->path, '', 'right path';
 is $req->url->base->path, '/cgi-bin/bootylicious/bootylicious.pl/',
- 'right base path';
+  'right base path';
 is $req->version, '1.1', 'right version';
 is $req->at_least_version('1.0'), 1,     'at least version 1.0';
 is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->url->to_abs->to_string,
- 'http://getbootylicious.org/cgi-bin/bootylicious/bootylicious.pl',
- 'right absolute URL';
+  'http://getbootylicious.org/cgi-bin/bootylicious/bootylicious.pl',
+  'right absolute URL';
 
 # Parse Apache mod_fastcgi like CGI environment variables
 # (multipart file upload)
@@ -1589,7 +1589,7 @@ $req->parse(
 $req->parse("--8jXGX\x0d\x0a");
 $req->parse(
   "Content-Disposition: form-data; name=\"file\"; filename=\"file\"\x0d\x0a"
-   . "Content-Type: application/octet-stream\x0d\x0a\x0d\x0a");
+    . "Content-Type: application/octet-stream\x0d\x0a\x0d\x0a");
 $req->parse('11023456789');
 $req->parse("\x0d\x0a--8jXGX--");
 ok $req->is_done, 'request is done';
@@ -1601,8 +1601,8 @@ is $req->version, '1.1', 'right version';
 is $req->at_least_version('1.0'), 1,     'at least version 1.0';
 is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->url->to_abs->to_string,
- 'http://127.0.0.1:13028/diag/upload',
- 'right absolute URL';
+  'http://127.0.0.1:13028/diag/upload',
+  'right absolute URL';
 $file = $req->upload('file');
 is $file->slurp, '11023456789', 'right uploaded content';
 
@@ -1628,13 +1628,13 @@ is $req->version, '1.1', 'right version';
 is $req->at_least_version('1.0'), 1,     'at least version 1.0';
 is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->url->to_abs->to_string,
- 'http://kraih.com/sandbox-myapp/monkey.cgi/feed/bannana',
- 'right absolute URL';
+  'http://kraih.com/sandbox-myapp/monkey.cgi/feed/bannana',
+  'right absolute URL';
 ok $req->url->base->parse('http://kraih.com/sandbox-myapp/'), 'rewritten';
 is $req->url, 'feed/bannana', 'right relative URL';
 is $req->url->to_abs->to_string,
- 'http://kraih.com/sandbox-myapp/feed/bannana',
- 'right absolute URL';
+  'http://kraih.com/sandbox-myapp/feed/bannana',
+  'right absolute URL';
 
 # Parse Apache 2.2.9 like CGI environment variables with mod_rewrite
 # (root and "RewriteRule ^(.*)$ monkey.cgi/$1 [L]")
@@ -1657,12 +1657,12 @@ is $req->version, '1.1', 'right version';
 is $req->at_least_version('1.0'), 1,     'at least version 1.0';
 is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->url->to_abs->to_string,
- 'http://kraih.com/sandbox-myapp/monkey.cgi',
- 'right absolute URL';
+  'http://kraih.com/sandbox-myapp/monkey.cgi',
+  'right absolute URL';
 ok $req->url->base->parse('http://kraih.com/sandbox-myapp/'), 'rewritten';
 is $req->url->base->path, '/sandbox-myapp/', 'right base path';
 is $req->url->to_abs->to_string, 'http://kraih.com/sandbox-myapp',
- 'right absolute URL';
+  'right absolute URL';
 
 # Parse response with cookie
 $res = Mojo::Message::Response->new;
@@ -1680,7 +1680,7 @@ is $res->at_least_version('1.2'), undef, 'not version 1.2';
 is $res->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, 27, 'right "Content-Length" value';
 is $res->headers->set_cookie, 'foo=bar; Version=1; Path=/test',
- 'right "Set-Cookie" value';
+  'right "Set-Cookie" value';
 my $cookies = $res->cookies;
 is $cookies->[0]->name,    'foo',   'right name';
 is $cookies->[0]->value,   'bar',   'right value';
@@ -1705,9 +1705,9 @@ is $res->at_least_version('1.2'), undef, 'not version 1.2';
 is $res->headers->upgrade,    'WebSocket', 'right "Upgrade" value';
 is $res->headers->connection, 'Upgrade',   'right "Connection" value';
 is $res->headers->sec_websocket_accept, 'abcdef=',
- 'right "Sec-WebSocket-Accept" value';
+  'right "Sec-WebSocket-Accept" value';
 is $res->headers->sec_websocket_protocol, 'sample',
- 'right "Sec-WebSocket-Protocol" value';
+  'right "Sec-WebSocket-Protocol" value';
 is $res->body, '', 'no content';
 
 # Build WebSocket handshake response
@@ -1730,9 +1730,9 @@ is $res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT', 'right "Date" value';
 is $res->headers->upgrade,        'WebSocket', 'right "Upgrade" value';
 is $res->headers->content_length, 0,           'right "Content-Length" value';
 is $res->headers->sec_websocket_accept, 'abcdef=',
- 'right "Sec-WebSocket-Accept" value';
+  'right "Sec-WebSocket-Accept" value';
 is $res->headers->sec_websocket_protocol,
- 'sample', 'right "Sec-WebSocket-Protocol" value';
+  'sample', 'right "Sec-WebSocket-Protocol" value';
 is $res->body, '', 'no content';
 
 # Build and parse HTTP 1.1 response with 3 cookies
@@ -1854,8 +1854,8 @@ is $req2->headers->expect, '100-continue', 'right "Expect" value';
 is $req2->headers->host,   '127.0.0.1',    'right "Host" value';
 is $req2->headers->content_length, 13, 'right "Content-Length" value';
 is $req2->headers->cookie,
- '$Version=1; foo=bar; $Path=/foobar; bar=baz; $Path=/test/23',
- 'right "Cookie" value';
+  '$Version=1; foo=bar; $Path=/foobar; bar=baz; $Path=/test/23',
+  'right "Cookie" value';
 is $req2->url, '/foo/bar', 'right URL';
 is $req2->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
 is defined $req2->cookie('foo'), 1,  'right value';
@@ -1901,66 +1901,66 @@ is $cookies->[1]->path,    '/test/23', 'right path';
 # WebKit multipart/form-data request
 $req = Mojo::Message::Request->new;
 $req->parse("POST /example/testform_handler HTTP/1.1\x0d\x0a"
-   . "User-Agent: Mozilla/5.0\x0d\x0a"
-   . 'Content-Type: multipart/form-data; '
-   . "boundary=----WebKitFormBoundaryi5BnD9J9zoTMiSuP\x0d\x0a"
-   . "Content-Length: 323\x0d\x0aConnection: keep-alive\x0d\x0a"
-   . "Host: 127.0.0.1:3000\x0d\x0a\x0d\x0a"
-   . "------WebKitFormBoundaryi5BnD9J9zoTMiSuP\x0d\x0a"
-   . "Content-Disposition: form-data; name=\"Vorname\"\x0d\x0a"
-   . "\x0d\x0aT\x0d\x0a------WebKitFormBoundaryi5BnD9J9zoTMiSuP\x0d"
-   . "\x0aContent-Disposition: form-data; name=\"Zuname\"\x0d\x0a"
-   . "\x0d\x0a\x0d\x0a------WebKitFormBoundaryi5BnD9J9zoTMiSuP\x0d"
-   . "\x0aContent-Disposition: form-data; name=\"Text\"\x0d\x0a"
-   . "\x0d\x0a\x0d\x0a------WebKitFormBoundaryi5BnD9J9zoTMiSuP--"
-   . "\x0d\x0a");
+    . "User-Agent: Mozilla/5.0\x0d\x0a"
+    . 'Content-Type: multipart/form-data; '
+    . "boundary=----WebKitFormBoundaryi5BnD9J9zoTMiSuP\x0d\x0a"
+    . "Content-Length: 323\x0d\x0aConnection: keep-alive\x0d\x0a"
+    . "Host: 127.0.0.1:3000\x0d\x0a\x0d\x0a"
+    . "------WebKitFormBoundaryi5BnD9J9zoTMiSuP\x0d\x0a"
+    . "Content-Disposition: form-data; name=\"Vorname\"\x0d\x0a"
+    . "\x0d\x0aT\x0d\x0a------WebKitFormBoundaryi5BnD9J9zoTMiSuP\x0d"
+    . "\x0aContent-Disposition: form-data; name=\"Zuname\"\x0d\x0a"
+    . "\x0d\x0a\x0d\x0a------WebKitFormBoundaryi5BnD9J9zoTMiSuP\x0d"
+    . "\x0aContent-Disposition: form-data; name=\"Text\"\x0d\x0a"
+    . "\x0d\x0a\x0d\x0a------WebKitFormBoundaryi5BnD9J9zoTMiSuP--"
+    . "\x0d\x0a");
 ok $req->is_done, 'request is done';
 is_deeply $req->param('Vorname'), 'T', 'right value';
 
 # Google Chrome multipart/form-data request
 $req = Mojo::Message::Request->new;
 $req->parse("POST / HTTP/1.0\x0d\x0a"
-   . "Host: 127.0.0.1:10002\x0d\x0a"
-   . "Connection: close\x0d\x0a"
-   . "User-Agent: Mozilla/5.0 (X11; U; Linux x86_64; en-US) AppleWebKit/5"
-   . "32.9 (KHTML, like Gecko) Chrome/5.0.307.11 Safari/532.9\x0d\x0a"
-   . "Referer: http://example.org/\x0d\x0a"
-   . "Content-Length: 819\x0d\x0a"
-   . "Cache-Control: max-age=0\x0d\x0a"
-   . "Origin: http://example.org\x0d\x0a"
-   . "Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryY"
-   . "GjwdkpB6ZLCZQbX\x0d\x0a"
-   . "Accept: application/xml,application/xhtml+xml,text/html;q=0.9,text/"
-   . "plain;q=0.8,image/png,*/*;q=0.5\x0d\x0a"
-   . "Accept-Encoding: gzip,deflate,sdch\x0d\x0a"
-   . "Cookie: mojolicious=BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQ"
-   . "AAAB1c2VyBp6FjksAAAAABwAAAGV4cGlyZXM=--1641adddfe885276cda0deb7475f"
-   . "153a\x0d\x0a"
-   . "Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4\x0d\x0a"
-   . "Accept-Charset: windows-1251,utf-8;q=0.7,*;q=0.3\x0d\x0a\x0d\x0a"
-   . "------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
-   . "Content-Disposition: form-data; name=\"fname\"\x0d\x0a\x0d\x0a"
-   . "Иван"
-   . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
-   . "Content-Disposition: form-data; name=\"sname\"\x0d\x0a\x0d\x0a"
-   . "Иванов"
-   . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
-   . "Content-Disposition: form-data; name=\"sex\"\x0d\x0a\x0d\x0a"
-   . "мужской"
-   . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
-   . "Content-Disposition: form-data; name=\"bdate\"\x0d\x0a\x0d\x0a"
-   . "16.02.1987"
-   . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
-   . "Content-Disposition: form-data; name=\"phone\"\x0d\x0a\x0d\x0a"
-   . "1234567890"
-   . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
-   . "Content-Disposition: form-data; name=\"avatar\"; filename=\"аватар."
-   . "jpg\"\x0d\x0a"
-   . "Content-Type: image/jpeg\x0d\x0a\x0d\x0a" . "1234"
-   . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
-   . "Content-Disposition: form-data; name=\"submit\"\x0d\x0a\x0d\x0a"
-   . "Сохранить"
-   . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX--\x0d\x0a");
+    . "Host: 127.0.0.1:10002\x0d\x0a"
+    . "Connection: close\x0d\x0a"
+    . "User-Agent: Mozilla/5.0 (X11; U; Linux x86_64; en-US) AppleWebKit/5"
+    . "32.9 (KHTML, like Gecko) Chrome/5.0.307.11 Safari/532.9\x0d\x0a"
+    . "Referer: http://example.org/\x0d\x0a"
+    . "Content-Length: 819\x0d\x0a"
+    . "Cache-Control: max-age=0\x0d\x0a"
+    . "Origin: http://example.org\x0d\x0a"
+    . "Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryY"
+    . "GjwdkpB6ZLCZQbX\x0d\x0a"
+    . "Accept: application/xml,application/xhtml+xml,text/html;q=0.9,text/"
+    . "plain;q=0.8,image/png,*/*;q=0.5\x0d\x0a"
+    . "Accept-Encoding: gzip,deflate,sdch\x0d\x0a"
+    . "Cookie: mojolicious=BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQ"
+    . "AAAB1c2VyBp6FjksAAAAABwAAAGV4cGlyZXM=--1641adddfe885276cda0deb7475f"
+    . "153a\x0d\x0a"
+    . "Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4\x0d\x0a"
+    . "Accept-Charset: windows-1251,utf-8;q=0.7,*;q=0.3\x0d\x0a\x0d\x0a"
+    . "------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
+    . "Content-Disposition: form-data; name=\"fname\"\x0d\x0a\x0d\x0a"
+    . "Иван"
+    . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
+    . "Content-Disposition: form-data; name=\"sname\"\x0d\x0a\x0d\x0a"
+    . "Иванов"
+    . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
+    . "Content-Disposition: form-data; name=\"sex\"\x0d\x0a\x0d\x0a"
+    . "мужской"
+    . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
+    . "Content-Disposition: form-data; name=\"bdate\"\x0d\x0a\x0d\x0a"
+    . "16.02.1987"
+    . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
+    . "Content-Disposition: form-data; name=\"phone\"\x0d\x0a\x0d\x0a"
+    . "1234567890"
+    . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
+    . "Content-Disposition: form-data; name=\"avatar\"; filename=\"аватар."
+    . "jpg\"\x0d\x0a"
+    . "Content-Type: image/jpeg\x0d\x0a\x0d\x0a" . "1234"
+    . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
+    . "Content-Disposition: form-data; name=\"submit\"\x0d\x0a\x0d\x0a"
+    . "Сохранить"
+    . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX--\x0d\x0a");
 ok $req->is_done, 'request is done';
 is $req->method,  'POST', 'right method';
 is $req->version, '1.0', 'right version';
@@ -1968,10 +1968,10 @@ is $req->at_least_version('1.0'), 1,     'at least version 1.0';
 is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->url, '/', 'right URL';
 is $req->cookie('mojolicious')->value,
- 'BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQAAAB1c2VyBp6FjksAAAAABwA'
- . 'AAGV4cGlyZXM=--1641adddfe885276cda0deb7475f153a', 'right value';
+  'BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQAAAB1c2VyBp6FjksAAAAABwA'
+  . 'AAGV4cGlyZXM=--1641adddfe885276cda0deb7475f153a', 'right value';
 like $req->headers->content_type, qr/multipart\/form-data/,
- 'right "Content-Type" value';
+  'right "Content-Type" value';
 is $req->param('fname'), 'Иван',       'right value';
 is $req->param('sname'), 'Иванов',   'right value';
 is $req->param('sex'),   'мужской', 'right value';
@@ -1987,52 +1987,52 @@ is $upload->slurp,    '1234',             'right content';
 # Firefox multipart/form-data request
 $req = Mojo::Message::Request->new;
 $req->parse("POST / HTTP/1.0\x0d\x0a"
-   . "Host: 127.0.0.1:10002\x0d\x0a"
-   . "Connection: close\x0d\x0a"
-   . "User-Agent: Mozilla/5.0 (X11; U; Linux x86_64; ru; rv:1.9.1.8) Geck"
-   . "o/20100214 Ubuntu/9.10 (karmic) Firefox/3.5.8\x0d\x0a"
-   . "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q"
-   . "=0.8\x0d\x0a"
-   . "Accept-Language: ru,en-us;q=0.7,en;q=0.3\x0d\x0a"
-   . "Accept-Encoding: gzip,deflate\x0d\x0a"
-   . "Accept-Charset: windows-1251,utf-8;q=0.7,*;q=0.7\x0d\x0a"
-   . "Referer: http://example.org/\x0d\x0a"
-   . "Cookie: mojolicious=BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQ"
-   . "AAAB1c2VyBiWFjksAAAAABwAAAGV4cGlyZXM=--cd933a37999e0fa8d7804205e891"
-   . "93a7\x0d\x0a"
-   . "Content-Type: multipart/form-data; boundary=-----------------------"
-   . "----213090722714721300002030499922\x0d\x0a"
-   . "Content-Length: 971\x0d\x0a\x0d\x0a"
-   . "-----------------------------213090722714721300002030499922\x0d\x0a"
-   . "Content-Disposition: form-data; name=\"fname\"\x0d\x0a\x0d\x0a"
-   . "Иван"
-   . "\x0d\x0a-----------------------------213090722714721300002030499922"
-   . "\x0d\x0a"
-   . "Content-Disposition: form-data; name=\"sname\"\x0d\x0a\x0d\x0a"
-   . "Иванов"
-   . "\x0d\x0a-----------------------------213090722714721300002030499922"
-   . "\x0d\x0a"
-   . "Content-Disposition: form-data; name=\"sex\"\x0d\x0a\x0d\x0a"
-   . "мужской"
-   . "\x0d\x0a-----------------------------213090722714721300002030499922"
-   . "\x0d\x0a"
-   . "Content-Disposition: form-data; name=\"bdate\"\x0d\x0a\x0d\x0a"
-   . "16.02.1987"
-   . "\x0d\x0a-----------------------------213090722714721300002030499922"
-   . "\x0d\x0a"
-   . "Content-Disposition: form-data; name=\"phone\"\x0d\x0a\x0d\x0a"
-   . "1234567890"
-   . "\x0d\x0a-----------------------------213090722714721300002030499922"
-   . "\x0d\x0a"
-   . "Content-Disposition: form-data; name=\"avatar\"; filename=\"аватар."
-   . "jpg\"\x0d\x0a"
-   . "Content-Type: image/jpeg\x0d\x0a\x0d\x0a" . "1234"
-   . "\x0d\x0a-----------------------------213090722714721300002030499922"
-   . "\x0d\x0a"
-   . "Content-Disposition: form-data; name=\"submit\"\x0d\x0a\x0d\x0a"
-   . "Сохранить"
-   . "\x0d\x0a-----------------------------2130907227147213000020304999"
-   . "22--");
+    . "Host: 127.0.0.1:10002\x0d\x0a"
+    . "Connection: close\x0d\x0a"
+    . "User-Agent: Mozilla/5.0 (X11; U; Linux x86_64; ru; rv:1.9.1.8) Geck"
+    . "o/20100214 Ubuntu/9.10 (karmic) Firefox/3.5.8\x0d\x0a"
+    . "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q"
+    . "=0.8\x0d\x0a"
+    . "Accept-Language: ru,en-us;q=0.7,en;q=0.3\x0d\x0a"
+    . "Accept-Encoding: gzip,deflate\x0d\x0a"
+    . "Accept-Charset: windows-1251,utf-8;q=0.7,*;q=0.7\x0d\x0a"
+    . "Referer: http://example.org/\x0d\x0a"
+    . "Cookie: mojolicious=BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQ"
+    . "AAAB1c2VyBiWFjksAAAAABwAAAGV4cGlyZXM=--cd933a37999e0fa8d7804205e891"
+    . "93a7\x0d\x0a"
+    . "Content-Type: multipart/form-data; boundary=-----------------------"
+    . "----213090722714721300002030499922\x0d\x0a"
+    . "Content-Length: 971\x0d\x0a\x0d\x0a"
+    . "-----------------------------213090722714721300002030499922\x0d\x0a"
+    . "Content-Disposition: form-data; name=\"fname\"\x0d\x0a\x0d\x0a"
+    . "Иван"
+    . "\x0d\x0a-----------------------------213090722714721300002030499922"
+    . "\x0d\x0a"
+    . "Content-Disposition: form-data; name=\"sname\"\x0d\x0a\x0d\x0a"
+    . "Иванов"
+    . "\x0d\x0a-----------------------------213090722714721300002030499922"
+    . "\x0d\x0a"
+    . "Content-Disposition: form-data; name=\"sex\"\x0d\x0a\x0d\x0a"
+    . "мужской"
+    . "\x0d\x0a-----------------------------213090722714721300002030499922"
+    . "\x0d\x0a"
+    . "Content-Disposition: form-data; name=\"bdate\"\x0d\x0a\x0d\x0a"
+    . "16.02.1987"
+    . "\x0d\x0a-----------------------------213090722714721300002030499922"
+    . "\x0d\x0a"
+    . "Content-Disposition: form-data; name=\"phone\"\x0d\x0a\x0d\x0a"
+    . "1234567890"
+    . "\x0d\x0a-----------------------------213090722714721300002030499922"
+    . "\x0d\x0a"
+    . "Content-Disposition: form-data; name=\"avatar\"; filename=\"аватар."
+    . "jpg\"\x0d\x0a"
+    . "Content-Type: image/jpeg\x0d\x0a\x0d\x0a" . "1234"
+    . "\x0d\x0a-----------------------------213090722714721300002030499922"
+    . "\x0d\x0a"
+    . "Content-Disposition: form-data; name=\"submit\"\x0d\x0a\x0d\x0a"
+    . "Сохранить"
+    . "\x0d\x0a-----------------------------2130907227147213000020304999"
+    . "22--");
 ok $req->is_done, 'request is done';
 is $req->method,  'POST', 'right method';
 is $req->version, '1.0', 'right version';
@@ -2040,10 +2040,10 @@ is $req->at_least_version('1.0'), 1,     'at least version 1.0';
 is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->url, '/', 'right URL';
 is $req->cookie('mojolicious')->value,
- 'BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQAAAB1c2VyBiWFjksAAAAABwA'
- . 'AAGV4cGlyZXM=--cd933a37999e0fa8d7804205e89193a7', 'right value';
+  'BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQAAAB1c2VyBiWFjksAAAAABwA'
+  . 'AAGV4cGlyZXM=--cd933a37999e0fa8d7804205e89193a7', 'right value';
 like $req->headers->content_type, qr/multipart\/form-data/,
- 'right "Content-Type" value';
+  'right "Content-Type" value';
 is $req->param('fname'), 'Иван',       'right value';
 is $req->param('sname'), 'Иванов',   'right value';
 is $req->param('sex'),   'мужской', 'right value';
@@ -2059,47 +2059,47 @@ is $upload->slurp,    '1234',             'right content';
 # Opera multipart/form-data request
 $req = Mojo::Message::Request->new;
 $req->parse("POST / HTTP/1.0\x0d\x0a"
-   . "Host: 127.0.0.1:10002\x0d\x0a"
-   . "Connection: close\x0d\x0a"
-   . "User-Agent: Opera/9.80 (X11; Linux x86_64; U; ru) Presto/2.2.15 Ver"
-   . "sion/10.10\x0d\x0a"
-   . "Accept: text/html, application/xml;q=0.9, application/xhtml+xml, im"
-   . "age/png, image/jpeg, image/gif, image/x-xbitmap, */*;q=0.1\x0d\x0a"
-   . "Accept-Language: ru-RU,ru;q=0.9,en;q=0.8\x0d\x0a"
-   . "Accept-Charset: iso-8859-1, utf-8, utf-16, *;q=0.1\x0d\x0a"
-   . "Accept-Encoding: deflate, gzip, x-gzip, identity, *;q=0\x0d\x0a"
-   . "Referer: http://example.org/\x0d\x0a"
-   . "Cookie: mojolicious=BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQ"
-   . "AAAB1c2VyBhaIjksAAAAABwAAAGV4cGlyZXM=--78a58a94f98ae5b75a489be1189f"
-   . "2672\x0d\x0a"
-   . "Cookie2: \$Version=1\x0d\x0a"
-   . "TE: deflate, gzip, chunked, identity, trailers\x0d\x0a"
-   . "Content-Length: 771\x0d\x0a"
-   . "Content-Type: multipart/form-data; boundary=----------IWq9cR9mYYG66"
-   . "8xwSn56f0\x0d\x0a\x0d\x0a"
-   . "------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
-   . "Content-Disposition: form-data; name=\"fname\"\x0d\x0a\x0d\x0a"
-   . "Иван"
-   . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
-   . "Content-Disposition: form-data; name=\"sname\"\x0d\x0a\x0d\x0a"
-   . "Иванов"
-   . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
-   . "Content-Disposition: form-data; name=\"sex\"\x0d\x0a\x0d\x0a"
-   . "мужской"
-   . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
-   . "Content-Disposition: form-data; name=\"bdate\"\x0d\x0a\x0d\x0a"
-   . "16.02.1987"
-   . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
-   . "Content-Disposition: form-data; name=\"phone\"\x0d\x0a\x0d\x0a"
-   . "1234567890"
-   . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
-   . "Content-Disposition: form-data; name=\"avatar\"; filename=\"аватар."
-   . "jpg\"\x0d\x0a"
-   . "Content-Type: image/jpeg\x0d\x0a\x0d\x0a" . "1234"
-   . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
-   . "Content-Disposition: form-data; name=\"submit\"\x0d\x0a\x0d\x0a"
-   . "Сохранить"
-   . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0--");
+    . "Host: 127.0.0.1:10002\x0d\x0a"
+    . "Connection: close\x0d\x0a"
+    . "User-Agent: Opera/9.80 (X11; Linux x86_64; U; ru) Presto/2.2.15 Ver"
+    . "sion/10.10\x0d\x0a"
+    . "Accept: text/html, application/xml;q=0.9, application/xhtml+xml, im"
+    . "age/png, image/jpeg, image/gif, image/x-xbitmap, */*;q=0.1\x0d\x0a"
+    . "Accept-Language: ru-RU,ru;q=0.9,en;q=0.8\x0d\x0a"
+    . "Accept-Charset: iso-8859-1, utf-8, utf-16, *;q=0.1\x0d\x0a"
+    . "Accept-Encoding: deflate, gzip, x-gzip, identity, *;q=0\x0d\x0a"
+    . "Referer: http://example.org/\x0d\x0a"
+    . "Cookie: mojolicious=BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQ"
+    . "AAAB1c2VyBhaIjksAAAAABwAAAGV4cGlyZXM=--78a58a94f98ae5b75a489be1189f"
+    . "2672\x0d\x0a"
+    . "Cookie2: \$Version=1\x0d\x0a"
+    . "TE: deflate, gzip, chunked, identity, trailers\x0d\x0a"
+    . "Content-Length: 771\x0d\x0a"
+    . "Content-Type: multipart/form-data; boundary=----------IWq9cR9mYYG66"
+    . "8xwSn56f0\x0d\x0a\x0d\x0a"
+    . "------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
+    . "Content-Disposition: form-data; name=\"fname\"\x0d\x0a\x0d\x0a"
+    . "Иван"
+    . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
+    . "Content-Disposition: form-data; name=\"sname\"\x0d\x0a\x0d\x0a"
+    . "Иванов"
+    . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
+    . "Content-Disposition: form-data; name=\"sex\"\x0d\x0a\x0d\x0a"
+    . "мужской"
+    . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
+    . "Content-Disposition: form-data; name=\"bdate\"\x0d\x0a\x0d\x0a"
+    . "16.02.1987"
+    . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
+    . "Content-Disposition: form-data; name=\"phone\"\x0d\x0a\x0d\x0a"
+    . "1234567890"
+    . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
+    . "Content-Disposition: form-data; name=\"avatar\"; filename=\"аватар."
+    . "jpg\"\x0d\x0a"
+    . "Content-Type: image/jpeg\x0d\x0a\x0d\x0a" . "1234"
+    . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
+    . "Content-Disposition: form-data; name=\"submit\"\x0d\x0a\x0d\x0a"
+    . "Сохранить"
+    . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0--");
 ok $req->is_done, 'request is done';
 is $req->method,  'POST', 'right method';
 is $req->version, '1.0', 'right version';
@@ -2107,10 +2107,10 @@ is $req->at_least_version('1.0'), 1,     'at least version 1.0';
 is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->url, '/', 'right URL';
 is $req->cookie('mojolicious')->value,
- 'BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQAAAB1c2VyBhaIjksAAAAABwA'
- . 'AAGV4cGlyZXM=--78a58a94f98ae5b75a489be1189f2672', 'right value';
+  'BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQAAAB1c2VyBhaIjksAAAAABwA'
+  . 'AAGV4cGlyZXM=--78a58a94f98ae5b75a489be1189f2672', 'right value';
 like $req->headers->content_type, qr/multipart\/form-data/,
- 'right "Content-Type" value';
+  'right "Content-Type" value';
 is $req->param('fname'), 'Иван',       'right value';
 is $req->param('sname'), 'Иванов',   'right value';
 is $req->param('sex'),   'мужской', 'right value';
@@ -2197,8 +2197,8 @@ $res->parse("\x0a");
 $res->body('<p>foo <a href="/">bar</a><a href="/baz">baz</a></p>');
 ok !$res->is_done, 'request is not done';
 is $res->headers->content_type,
- 'application/atom+xml; charset=UTF-8; type=feed',
- 'right "Content-Type" value';
+  'application/atom+xml; charset=UTF-8; type=feed',
+  'right "Content-Type" value';
 ok $res->dom, 'dom built';
 $count = 0;
 $res->dom('a')->each(sub { $count++ });

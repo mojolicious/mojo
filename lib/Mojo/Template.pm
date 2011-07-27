@@ -111,7 +111,7 @@ sub build {
 
         # Multiline
         $multi = ($line->[$j + 2] || '') eq 'text'
-         && ($line->[$j + 3] || '') eq '' ? 0 : 1;
+          && ($line->[$j + 3] || '') eq '' ? 0 : 1;
 
         # Append semicolon
         $lines[-1] .= ';' if !$multi && !$cpst;
@@ -138,8 +138,8 @@ sub build {
   my $namespace = $self->namespace;
   $lines[0] ||= '';
   $lines[0] =
-   "package $namespace; $HELPERS sub { my \$_M = ''; $prepend; do {"
-   . $lines[0];
+    "package $namespace; $HELPERS sub { my \$_M = ''; $prepend; do {"
+    . $lines[0];
   $lines[-1] .= "$append; \$_M; } };";
 
   # Done
@@ -158,8 +158,8 @@ sub compile {
 
   # Use local stacktrace for compile exceptions
   return Mojo::Exception->new($@, [$self->template, $code], $self->name)
-   ->trace->verbose(1)
-   if $@;
+    ->trace->verbose(1)
+    if $@;
 
   $self->compiled($compiled);
   return;
@@ -186,8 +186,8 @@ sub interpret {
   # Interpret
   my $output = eval { $compiled->(@_) };
   $output =
-   Mojo::Exception->new($@, [$self->template], $self->name)->verbose(1)
-   if $@;
+    Mojo::Exception->new($@, [$self->template], $self->name)->verbose(1)
+    if $@;
 
   return $output;
 }
@@ -346,7 +346,7 @@ sub parse {
 
       # Capture end
       @capture_token = ('cpen', undef)
-       if $token =~ s/$capture_end_re/$1/;
+        if $token =~ s/$capture_end_re/$1/;
 
       # End
       if ($state ne 'text' && $token =~ /$end_re/) {
@@ -445,7 +445,7 @@ sub render_file {
   # Slurp file
   $self->name($path) unless defined $self->{name};
   croak "Can't open template '$path': $!"
-   unless my $file = IO::File->new("< $path");
+    unless my $file = IO::File->new("< $path");
   my $tmpl = '';
   while ($file->sysread(my $buffer, CHUNK_SIZE, 0)) {
     $tmpl .= $buffer;
@@ -518,7 +518,7 @@ sub _write_file {
 
   # Encode and write to file
   croak "Can't open file '$path': $!"
-   unless my $file = IO::File->new("> $path");
+    unless my $file = IO::File->new("> $path");
   $output = encode($self->encoding, $output) if $self->encoding;
   $file->syswrite($output) or croak "Can't write to file '$path': $!";
 

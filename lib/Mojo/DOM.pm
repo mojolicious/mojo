@@ -1,10 +1,10 @@
 package Mojo::DOM;
 use Mojo::Base -base;
 use overload
- '%{}'    => sub { shift->attrs },
- 'bool'   => sub {1},
- '""'     => sub { shift->to_xml },
- fallback => 1;
+  '%{}'    => sub { shift->attrs },
+  'bool'   => sub {1},
+  '""'     => sub { shift->to_xml },
+  fallback => 1;
 
 use Carp 'croak';
 use Mojo::DOM::Collection;
@@ -151,7 +151,7 @@ sub children {
 
     # Add child
     push @children,
-     $self->new(charset => $self->charset, tree => $e, xml => $self->xml);
+      $self->new(charset => $self->charset, tree => $e, xml => $self->xml);
   }
 
   return Mojo::DOM::Collection->new(\@children);
@@ -255,7 +255,7 @@ sub prepend_content {
   my ($self, $new) = @_;
   my $tree = $self->tree;
   splice @$tree, $tree->[0] eq 'root' ? 1 : 4, 0,
-   @{_parent($self->_parse("$new"), $tree->[3])};
+    @{_parent($self->_parse("$new"), $tree->[3])};
   return $self;
 }
 
@@ -424,7 +424,7 @@ sub _parent {
 sub _parse {
   my $self = shift;
   Mojo::DOM::HTML->new(charset => $self->charset, xml => $self->xml)
-   ->parse(shift)->tree;
+    ->parse(shift)->tree;
 }
 
 sub _trim {

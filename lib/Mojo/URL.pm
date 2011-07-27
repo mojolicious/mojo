@@ -1,9 +1,9 @@
 package Mojo::URL;
 use Mojo::Base -base;
 use overload
- 'bool'   => sub {1},
- '""'     => sub { shift->to_string },
- fallback => 1;
+  'bool'   => sub {1},
+  '""'     => sub { shift->to_string },
+  fallback => 1;
 
 use Mojo::Parameters;
 use Mojo::Path;
@@ -20,7 +20,7 @@ our $PCHAR      = "$UNRESERVED$SUBDELIM\%\:\@";
 # IPv4 regex (RFC 3986)
 my $DEC_OCTET_RE = qr/(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])/;
 our $IPV4_RE =
- qr/^$DEC_OCTET_RE\.$DEC_OCTET_RE\.$DEC_OCTET_RE\.$DEC_OCTET_RE$/;
+  qr/^$DEC_OCTET_RE\.$DEC_OCTET_RE\.$DEC_OCTET_RE\.$DEC_OCTET_RE$/;
 
 # IPv6 regex (RFC 3986)
 my $H16_RE  = qr/[0-9A-Fa-f]{1,4}/;
@@ -69,8 +69,8 @@ sub authority {
     # Host
     url_unescape $host;
     return $host =~ /[^\x00-\x7f]/
-     ? $self->ihost($host)
-     : $self->host($host);
+      ? $self->ihost($host)
+      : $self->host($host);
   }
 
   # *( unreserved / pct-encoded / sub-delims ), extended with "[" and "]"
@@ -163,7 +163,7 @@ sub parse {
 
   # Official regex
   my ($scheme, $authority, $path, $query, $fragment) = $url
-   =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
+    =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
   $self->scheme($scheme);
   $self->authority($authority);
   $self->path->parse($path);
@@ -287,8 +287,8 @@ sub to_rel {
 
   # Different locations
   return $rel
-   unless lc $base->scheme eq lc $rel->scheme
-     && $base->authority eq $rel->authority;
+    unless lc $base->scheme eq lc $rel->scheme
+      && $base->authority eq $rel->authority;
 
   # Remove scheme and authority
   $rel->scheme('');

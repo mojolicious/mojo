@@ -50,7 +50,7 @@ sub store {
   # Flash
   my $old = delete $session->{flash};
   @{$session->{new_flash}}{keys %$old} = values %$old
-   if $stash->{'mojo.static'};
+    if $stash->{'mojo.static'};
   delete $session->{new_flash} unless keys %{$session->{new_flash}};
 
   # Default to expiring session
@@ -63,7 +63,7 @@ sub store {
 
     # Expiration
     $expires = $session->{expires} = $default
-     ||= time + $self->default_expiration;
+      ||= time + $self->default_expiration;
 
     # Serialize
     $value = $JSON->encode($session);

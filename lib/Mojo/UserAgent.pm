@@ -37,7 +37,7 @@ sub app {
   $self->{app} ||= $ENV{MOJO_APP} if ref $ENV{MOJO_APP};
   if ($app) {
     $self->{app} =
-     ref $app ? $app : $self->_test_server->app_class($app)->app;
+      ref $app ? $app : $self->_test_server->app_class($app)->app;
     return $self;
   }
 
@@ -145,7 +145,7 @@ sub test_server {
 
   # Build absolute URL for test server
   return Mojo::URL->new->scheme($self->{scheme})->host('localhost')
-   ->port($self->{port})->path('/');
+    ->port($self->{port})->path('/');
 }
 
 # "Are we there yet?
@@ -302,7 +302,7 @@ sub _drop {
   my $tx = $c->{tx};
   if (!$close && $tx && $tx->keep_alive && !$tx->error) {
     $self->_cache(join(':', $self->transactor->peer($tx)), $id)
-     unless (($tx->req->method || '') =~ /^connect$/i
+      unless (($tx->req->method || '') =~ /^connect$/i
       && ($tx->res->code || '') eq '200');
     return;
   }
@@ -374,7 +374,7 @@ sub _handle {
 
     # Redirect or callback
     $self->_finish($new || $old, $c->{cb}, $close)
-     unless $self->_redirect($c, $old);
+      unless $self->_redirect($c, $old);
   }
 
   # Stop loop
@@ -530,7 +530,7 @@ sub _test_server {
   unless ($self->{port}) {
     my $loop = $self->{loop} || $self->ioloop;
     my $server = $self->{server} =
-     Mojo::Server::Daemon->new(ioloop => $loop, silent => 1);
+      Mojo::Server::Daemon->new(ioloop => $loop, silent => 1);
     my $port = $self->{port} = $loop->generate_port;
     die "Couldn't find a free TCP port for testing.\n" unless $port;
     $self->{scheme} = $scheme ||= 'http';
@@ -559,7 +559,7 @@ sub _upgrade {
   my $new = Mojo::Transaction::WebSocket->new(handshake => $old, masked => 1);
   $new->kept_alive($old->kept_alive);
   $res->error('WebSocket challenge failed.') and return
-   unless $new->client_challenge;
+    unless $new->client_challenge;
   $c->{tx} = $new;
   $self->{loop}->connection_timeout($id, $self->websocket_timeout);
   weaken $self;

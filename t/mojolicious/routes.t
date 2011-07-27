@@ -74,24 +74,24 @@ $r->route('/')->to(controller => 'hello', action => 'world');
 
 # /wildcards/1/*
 $r->route('/wildcards/1/(*wildcard)', wildcard => qr/(.*)/)
- ->to(controller => 'wild', action => 'card');
+  ->to(controller => 'wild', action => 'card');
 
 # /wildcards/2/*
 $r->route('/wildcards/2/(*wildcard)')
- ->to(controller => 'card', action => 'wild');
+  ->to(controller => 'card', action => 'wild');
 
 # /wildcards/3/*/foo
 $r->route('/wildcards/3/(*wildcard)/foo')
- ->to(controller => 'very', action => 'dangerous');
+  ->to(controller => 'very', action => 'dangerous');
 
 # /wildcards/4/*/foo
 $r->route('/wildcards/4/*wildcard/foo')
- ->to(controller => 'somewhat', action => 'dangerous');
+  ->to(controller => 'somewhat', action => 'dangerous');
 
 # /format
 # /format.html
 $r->route('/format')
- ->to(controller => 'hello', action => 'you', format => 'html');
+  ->to(controller => 'hello', action => 'you', format => 'html');
 
 # /format2.html
 $r->route('/format2.html')->to(controller => 'you', action => 'hello');
@@ -107,24 +107,24 @@ $r->route('/format3/:foo.json')->to(controller => 'me', action => 'bye_json');
 
 # /format4.txt
 $r->route('/format4', format => qr/txt/)
- ->to(controller => 'we', action => 'howdy');
+  ->to(controller => 'we', action => 'howdy');
 
 # /format5.txt
 # /format5.text
 $r->route('/format5', format => [qw/txt text/])
- ->to(controller => 'we', action => 'cheers');
+  ->to(controller => 'we', action => 'cheers');
 
 # /format6
 # /format6.html
 $r->route('/format6', format => ['html'])
- ->to(controller => 'us', action => 'yay', format => 'html');
+  ->to(controller => 'us', action => 'yay', format => 'html');
 
 # /format7
 $r->route('/format7', format => 0)->to(controller => 'us', action => 'wow');
 
 # /format8
 $r->route('/format8', format => 0)
- ->to(controller => 'us', action => 'doh', format => 'xml');
+  ->to(controller => 'us', action => 'doh', format => 'xml');
 
 # /format9.foo
 # /fomrat9.foobar
@@ -160,15 +160,15 @@ $bridge->route('/delete')->to(
 
 # GET /method/get
 $r->route('/method/get')->via('GET')
- ->to(controller => 'method', action => 'get');
+  ->to(controller => 'method', action => 'get');
 
 # POST /method/post
 $r->route('/method/post')->via('post')
- ->to(controller => 'method', action => 'post');
+  ->to(controller => 'method', action => 'post');
 
 # POST|GET /method/post_get
 $r->route('/method/post_get')->via(qw/POST get/)
- ->to(controller => 'method', action => 'post_get');
+  ->to(controller => 'method', action => 'post_get');
 
 # /simple/form
 $r->route('/simple/form')->to('test-test#test');
@@ -183,7 +183,7 @@ $auth->route('/gift/')->to('gift#index')->name('gift');
 # /regex/alternatives/*
 $r->route('/regex/alternatives/:alternatives',
   alternatives => qr/foo|bar|baz/)
- ->to(controller => 'regex', action => 'alternatives');
+  ->to(controller => 'regex', action => 'alternatives');
 
 # Make sure stash stays clean
 my $m = Mojolicious::Routes::Match->new(get => '/clean')->match($r);
@@ -250,7 +250,7 @@ $m = Mojolicious::Routes::Match->new(get => '/alternatives2/00')->match($r);
 is @{$m->stack}, 0, 'right number of elements';
 is $m->path_for('alternatives2foo'), '/alternatives2', 'right path';
 is $m->path_for('alternatives2foo', foo => 0), '/alternatives2/0',
- 'right path';
+  'right path';
 
 # Alternatives with similar start
 $m = Mojolicious::Routes::Match->new(get => '/alternatives3/foo')->match($r);
@@ -258,7 +258,7 @@ is $m->stack->[0]->{foo}, 'foo', 'right value';
 is @{$m->stack}, 1, 'right number of elements';
 is $m->path_for, '/alternatives3/foo', 'right path';
 $m =
- Mojolicious::Routes::Match->new(get => '/alternatives3/foobar')->match($r);
+  Mojolicious::Routes::Match->new(get => '/alternatives3/foobar')->match($r);
 is $m->stack->[0]->{foo}, 'foobar', 'right value';
 is @{$m->stack}, 1, 'right number of elements';
 is $m->path_for, '/alternatives3/foobar', 'right path';
@@ -284,10 +284,10 @@ is $m->stack->[1]->{format},     'html',     'right value';
 is $m->path_for, '/articles/1/edit', 'right path';
 is $m->path_for(format => 'html'), '/articles/1/edit.html', 'right path';
 is $m->path_for('articles_delete', format => undef), '/articles/delete',
- 'right path';
+  'right path';
 is $m->path_for('articles_delete'), '/articles/delete', 'right path';
 is $m->path_for('articles_delete', id => 12), '/articles/12/delete',
- 'right path';
+  'right path';
 is @{$m->stack}, 2, 'right number of elements';
 $m = Mojolicious::Routes::Match->new(get => '/articles/1/delete')->match($r);
 is $m->stack->[1]->{controller}, 'articles', 'right value';
@@ -388,39 +388,39 @@ is @{$m->stack}, 1, 'right number of elements';
 $m = Mojolicious::Routes::Match->new(get => '/test3')->match($r);
 is $m->path_for, '/test3', 'right path';
 is $m->path_for('test_edit', controller => 'foo'), '/foo/test/edit',
- 'right path';
+  'right path';
 is $m->path_for('test_edit', {controller => 'foo'}), '/foo/test/edit',
- 'right path';
+  'right path';
 is @{$m->stack}, 1, 'right number of elements';
 
 # Wildcards
 $m =
- Mojolicious::Routes::Match->new(get => '/wildcards/1/hello/there')
- ->match($r);
+  Mojolicious::Routes::Match->new(get => '/wildcards/1/hello/there')
+  ->match($r);
 is $m->stack->[0]->{controller}, 'wild',        'right value';
 is $m->stack->[0]->{action},     'card',        'right value';
 is $m->stack->[0]->{wildcard},   'hello/there', 'right value';
 is $m->path_for, '/wildcards/1/hello/there', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
 $m =
- Mojolicious::Routes::Match->new(get => '/wildcards/2/hello/there')
- ->match($r);
+  Mojolicious::Routes::Match->new(get => '/wildcards/2/hello/there')
+  ->match($r);
 is $m->stack->[0]->{controller}, 'card',        'right value';
 is $m->stack->[0]->{action},     'wild',        'right value';
 is $m->stack->[0]->{wildcard},   'hello/there', 'right value';
 is $m->path_for, '/wildcards/2/hello/there', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
 $m =
- Mojolicious::Routes::Match->new(get => '/wildcards/3/hello/there/foo')
- ->match($r);
+  Mojolicious::Routes::Match->new(get => '/wildcards/3/hello/there/foo')
+  ->match($r);
 is $m->stack->[0]->{controller}, 'very',        'right value';
 is $m->stack->[0]->{action},     'dangerous',   'right value';
 is $m->stack->[0]->{wildcard},   'hello/there', 'right value';
 is $m->path_for, '/wildcards/3/hello/there/foo', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
 $m =
- Mojolicious::Routes::Match->new(get => '/wildcards/4/hello/there/foo')
- ->match($r);
+  Mojolicious::Routes::Match->new(get => '/wildcards/4/hello/there/foo')
+  ->match($r);
 is $m->stack->[0]->{controller}, 'somewhat',    'right value';
 is $m->stack->[0]->{action},     'dangerous',   'right value';
 is $m->stack->[0]->{wildcard},   'hello/there', 'right value';
@@ -429,15 +429,15 @@ is @{$m->stack}, 1, 'right number of elements';
 
 # Escaped
 $m =
- Mojolicious::Routes::Match->new(get => '/wildcards/1/http://www.google.com')
- ->match($r);
+  Mojolicious::Routes::Match->new(get => '/wildcards/1/http://www.google.com')
+  ->match($r);
 is $m->stack->[0]->{controller}, 'wild',                  'right value';
 is $m->stack->[0]->{action},     'card',                  'right value';
 is $m->stack->[0]->{wildcard},   'http://www.google.com', 'right value';
 is $m->path_for, '/wildcards/1/http://www.google.com', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
 $m =
- Mojolicious::Routes::Match->new(
+  Mojolicious::Routes::Match->new(
   get => '/wildcards/1/http%3A%2F%2Fwww.google.com')->match($r);
 is $m->stack->[0]->{controller}, 'wild',                  'right value';
 is $m->stack->[0]->{action},     'card',                  'right value';
@@ -618,7 +618,7 @@ is @{$m->stack}, 1, 'right number of elements';
 # Not found
 $m = Mojolicious::Routes::Match->new(get => '/not_found')->match($r);
 is $m->path_for('test_edit', controller => 'foo'), '/foo/test/edit',
- 'right path';
+  'right path';
 is @{$m->stack}, 0, 'no elements';
 
 # Simplified form
@@ -646,7 +646,8 @@ is @{$m->stack}, 2, 'right number of elements';
 
 # Special edge case with nested bridges (regex)
 $m =
- Mojolicious::Routes::Match->new(get => '/regex/alternatives/foo')->match($r);
+  Mojolicious::Routes::Match->new(get => '/regex/alternatives/foo')
+  ->match($r);
 is $m->stack->[0]->{controller},   'regex',        'right value';
 is $m->stack->[0]->{action},       'alternatives', 'right value';
 is $m->stack->[0]->{alternatives}, 'foo',          'right value';
@@ -654,7 +655,8 @@ is $m->stack->[0]->{format},       undef,          'no value';
 is $m->stack->[1], undef, 'no value';
 is $m->path_for, '/regex/alternatives/foo', 'right path';
 $m =
- Mojolicious::Routes::Match->new(get => '/regex/alternatives/bar')->match($r);
+  Mojolicious::Routes::Match->new(get => '/regex/alternatives/bar')
+  ->match($r);
 is $m->stack->[0]->{controller},   'regex',        'right value';
 is $m->stack->[0]->{action},       'alternatives', 'right value';
 is $m->stack->[0]->{alternatives}, 'bar',          'right value';
@@ -662,7 +664,8 @@ is $m->stack->[0]->{format},       undef,          'no value';
 is $m->stack->[1], undef, 'no value';
 is $m->path_for, '/regex/alternatives/bar', 'right path';
 $m =
- Mojolicious::Routes::Match->new(get => '/regex/alternatives/baz')->match($r);
+  Mojolicious::Routes::Match->new(get => '/regex/alternatives/baz')
+  ->match($r);
 is $m->stack->[0]->{controller},   'regex',        'right value';
 is $m->stack->[0]->{action},       'alternatives', 'right value';
 is $m->stack->[0]->{alternatives}, 'baz',          'right value';
@@ -670,6 +673,6 @@ is $m->stack->[0]->{format},       undef,          'no value';
 is $m->stack->[1], undef, 'no value';
 is $m->path_for, '/regex/alternatives/baz', 'right path';
 $m =
- Mojolicious::Routes::Match->new(get => '/regex/alternatives/yada')
- ->match($r);
+  Mojolicious::Routes::Match->new(get => '/regex/alternatives/yada')
+  ->match($r);
 is $m->stack->[0], undef, 'no value';

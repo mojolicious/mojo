@@ -24,7 +24,7 @@ use Mojo::UserAgent;
 # Mac OS X only test
 plan skip_all => 'Mac OS X required for this test!' unless $^O eq 'darwin';
 plan skip_all => 'set TEST_APACHE to enable this test (developer only!)'
- unless $ENV{TEST_APACHE};
+  unless $ENV{TEST_APACHE};
 plan tests => 12;
 
 # "Robots don't have any emotions, and sometimes that makes me very sad."
@@ -82,11 +82,11 @@ EOF
 # Start
 my $pid = open my $server, '-|', '/usr/sbin/httpd', '-X', '-f', $config;
 sleep 1
- while !IO::Socket::INET->new(
+  while !IO::Socket::INET->new(
   Proto    => 'tcp',
   PeerAddr => 'localhost',
   PeerPort => $port
- );
+  );
 
 # Request
 my $ua = Mojo::UserAgent->new;
@@ -121,8 +121,8 @@ is $tx->res->body, $result, 'right content';
 # Stop
 kill 'INT', $pid;
 sleep 1
- while IO::Socket::INET->new(
+  while IO::Socket::INET->new(
   Proto    => 'tcp',
   PeerAddr => 'localhost',
   PeerPort => $port
- );
+  );

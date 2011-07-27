@@ -126,7 +126,7 @@ sub is_multipart {
   my $self = shift;
   my $type = $self->headers->content_type || '';
   $type =~ /multipart.*boundary=\"*([a-zA-Z0-9\'\(\)\,\.\:\?\-\_\+\/]+)/i
-   and return $1;
+    and return $1;
   return;
 }
 
@@ -162,8 +162,8 @@ sub parse {
     my $len        = $headers->content_length;
     $len = '' unless defined $len;
     $self->relaxed(1)
-     if !length $len
-       && ($connection =~ /close/i || $headers->content_type);
+      if !length $len
+        && ($connection =~ /close/i || $headers->content_type);
   }
 
   # Parse chunked content
@@ -367,7 +367,7 @@ sub _parse_chunked {
 
   # Trailing headers
   $self->_parse_chunked_trailing_headers
-   if ($self->{chunked} || '') eq 'trailing_headers';
+    if ($self->{chunked} || '') eq 'trailing_headers';
 }
 
 sub _parse_chunked_trailing_headers {
@@ -386,8 +386,8 @@ sub _parse_chunked_trailing_headers {
     my $encoding = $headers->transfer_encoding;
     $encoding =~ s/,?\s*chunked//ig;
     $encoding
-     ? $headers->transfer_encoding($encoding)
-     : $headers->remove('Transfer-Encoding');
+      ? $headers->transfer_encoding($encoding)
+      : $headers->remove('Transfer-Encoding');
     $headers->content_length($self->{real_size});
 
     $self->{chunked} = 'done';

@@ -14,7 +14,7 @@ sub startup {
 
   # Plugin
   unshift @{$self->plugins->namespaces},
-   $self->routes->namespace . '::Plugin';
+    $self->routes->namespace . '::Plugin';
   $self->plugin('test_plugin');
 
   # Templateless renderer
@@ -47,7 +47,7 @@ sub startup {
 
   # /exceptional_too/*
   $r->bridge('/exceptional_too')->to('exceptional#this_one_might_die')
-   ->route('/:action');
+    ->route('/:action');
 
   # /fun/time
   $r->fun('/time')->to('foo#fun');
@@ -68,11 +68,11 @@ sub startup {
 
   # /stash_config
   $r->route('/stash_config')
-   ->to(controller => 'foo', action => 'config', config => {test => 123});
+    ->to(controller => 'foo', action => 'config', config => {test => 123});
 
   # /test4 - named route for url_for
   $r->route('/test4/:something')->to('foo#something', something => 23)
-   ->name('something');
+    ->name('something');
 
   # /somethingtest - refer to another route with url_for
   $r->route('/somethingtest')->to('foo#something');
@@ -82,7 +82,7 @@ sub startup {
 
   # /test3 - no class, just a namespace
   $r->route('/test3')
-   ->to(namespace => 'MojoliciousTestController', method => 'index');
+    ->to(namespace => 'MojoliciousTestController', method => 'index');
 
   # /test2 - different namespace test
   $r->route('/test2')->to(
@@ -115,11 +115,11 @@ sub startup {
   # /shortcut/ctrl
   # /shortcut/ctrl-act - shortcuts to controller#action
   $r->route('/shortcut/ctrl-act')
-   ->to('foo#config', config => {test => 'ctrl-act'});
+    ->to('foo#config', config => {test => 'ctrl-act'});
   $r->route('/shortcut/ctrl')
-   ->to('foo#', action => 'config', config => {test => 'ctrl'});
+    ->to('foo#', action => 'config', config => {test => 'ctrl'});
   $r->route('/shortcut/act')
-   ->to('#config', controller => 'foo', config => {test => 'act'});
+    ->to('#config', controller => 'foo', config => {test => 'act'});
 
   # /foo/session - session cookie with domain
   $r->route('/foo/session')->to('foo#session_domain');

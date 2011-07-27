@@ -1,9 +1,9 @@
 package Mojo::Date;
 use Mojo::Base -base;
 use overload
- 'bool'   => sub {1},
- '""'     => sub { shift->to_string },
- fallback => 1;
+  'bool'   => sub {1},
+  '""'     => sub { shift->to_string },
+  fallback => 1;
 
 require Time::Local;
 
@@ -86,7 +86,7 @@ sub parse {
   my $epoch;
   eval {
     $epoch =
-     Time::Local::timegm($second, $minute, $hour, $day, $month, $year);
+      Time::Local::timegm($second, $minute, $hour, $day, $month, $year);
   };
   return $self if $@ || $epoch < 0;
   $self->epoch($epoch);

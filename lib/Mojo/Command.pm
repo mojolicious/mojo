@@ -87,7 +87,7 @@ sub detect {
 
   # CGI
   return 'cgi'
-   if defined $ENV{PATH_INFO} || defined $ENV{GATEWAY_INTERFACE};
+    if defined $ENV{PATH_INFO} || defined $ENV{GATEWAY_INTERFACE};
 
   # No further detection if we have a guess
   return $guess if $guess;
@@ -224,7 +224,7 @@ sub run {
 
     # Command missing
     die qq/Command "$name" missing, maybe you need to install it?\n/
-     unless $module;
+      unless $module;
 
     # Run
     my $command = $module->new;
@@ -249,7 +249,7 @@ sub run {
       my $command = $module;
       $command =~ s/^$namespace\:://;
       push @$commands, [$command => $module]
-       unless $seen->{$command};
+        unless $seen->{$command};
       $seen->{$command} = 1;
     }
   }
@@ -306,7 +306,7 @@ sub write_file {
 
   # Write unbuffered
   croak qq/Can't open file "$path": $!/
-   unless my $file = IO::File->new("> $path");
+    unless my $file = IO::File->new("> $path");
   $file->syswrite($data);
   print "  [write] $path\n" unless $self->quiet;
 

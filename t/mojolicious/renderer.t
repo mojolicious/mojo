@@ -33,14 +33,14 @@ $c->stash->{template} = 'something';
 $c->stash->{layout}   = 'something';
 $c->stash->{handler}  = 'debug';
 is_deeply [$r->render($c)], ['Hello Mojo!Hello Mojo!', 'text/plain'],
- 'normal rendering with layout';
+  'normal rendering with layout';
 is delete $c->stash->{layout}, 'something';
 
 # Rendering a path with dots
 $c->stash->{template} = 'some.path.with.dots/template';
 $c->stash->{handler}  = 'debug';
 is_deeply [$r->render($c)], ['Hello Mojo!', 'text/plain'],
- 'rendering a path with dots';
+  'rendering a path with dots';
 
 # Unrecognized handler
 $c->stash->{handler} = 'not_defined';

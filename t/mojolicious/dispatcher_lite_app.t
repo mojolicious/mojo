@@ -21,7 +21,7 @@ app->hook(
   before_dispatch => sub {
     my $self = shift;
     $self->render_text($self->param('a'), status => 205)
-     if $self->req->url->path eq '/custom';
+      if $self->req->url->path eq '/custom';
   }
 );
 
@@ -30,7 +30,7 @@ app->hook(
   after_static_dispatch => sub {
     my $self = shift;
     $self->render_text('this works too')
-     if $self->req->url->path eq '/custom_too';
+      if $self->req->url->path eq '/custom_too';
   }
 );
 

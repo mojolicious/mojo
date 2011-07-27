@@ -17,7 +17,7 @@ has handle => sub {
   # Append to file
   my $path = $self->path;
   croak qq/Can't open log file "$path": $!/
-   unless my $file = IO::File->new(">> $path");
+    unless my $file = IO::File->new(">> $path");
   binmode $file, ':utf8';
 
   return $file;
@@ -36,7 +36,7 @@ sub fatal { shift->log('fatal', @_) }
 sub format {
   my ($self, $level, @msgs) = @_;
   my $msgs = join "\n",
-   map { utf8::decode $_ unless utf8::is_utf8 $_; $_ } @msgs;
+    map { utf8::decode $_ unless utf8::is_utf8 $_; $_ } @msgs;
   return '[' . localtime(time) . "] [$level] $msgs\n";
 }
 

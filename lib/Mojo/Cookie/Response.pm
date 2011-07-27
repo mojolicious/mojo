@@ -35,7 +35,7 @@ sub expires {
 
   # Upgrade
   $self->{expires} = Mojo::Date->new($self->{expires})
-   unless ref $self->{expires};
+    unless ref $self->{expires};
 
   return $self->{expires};
 }

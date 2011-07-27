@@ -24,61 +24,61 @@ my $t = Test::Mojo->new('MojoliciousTest');
 
 # SyntaxError::foo in production mode (syntax error in controller)
 $t->get_ok('/syntax_error/foo')->status_is(500)
- ->header_is(Server         => 'Mojolicious (Perl)')
- ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
- ->content_like(qr/Internal Server Error/);
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_like(qr/Internal Server Error/);
 
 # Foo::syntaxerror in production mode (syntax error in template)
 $t->get_ok('/foo/syntaxerror')->status_is(500)
- ->header_is(Server         => 'Mojolicious (Perl)')
- ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
- ->content_like(qr/Internal Server Error/);
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_like(qr/Internal Server Error/);
 
 # Exceptional::this_one_dies (action dies)
 $t->get_ok('/exceptional/this_one_dies')->status_is(500)
- ->header_is(Server         => 'Mojolicious (Perl)')
- ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
- ->content_is("Action died: doh!\n");
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("Action died: doh!\n");
 
 # Exceptional::this_one_might_die (bridge dies)
 $t->get_ok('/exceptional_too/this_one_dies')->status_is(500)
- ->header_is(Server         => 'Mojolicious (Perl)')
- ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
- ->content_is("Action died: double doh!\n");
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("Action died: double doh!\n");
 
 # Exceptional::this_one_might_die (action dies)
 $t->get_ok('/exceptional_too/this_one_dies', {'X-DoNotDie' => 1})
- ->status_is(500)->header_is(Server => 'Mojolicious (Perl)')
- ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
- ->content_is("Action died: doh!\n");
+  ->status_is(500)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("Action died: doh!\n");
 
 # Exceptional::this_one_does_not_exist (action does not exist)
 $t->get_ok('/exceptional/this_one_does_not_exist')->status_is(200)
- ->header_is(Server         => 'Mojolicious (Perl)')
- ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
- ->json_content_is({error => 'not found!'});
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->json_content_is({error => 'not found!'});
 
 # Exceptional::this_one_does_not_exist (action behind bridge does not exist)
 $t->get_ok('/exceptional_too/this_one_does_not_exist', {'X-DoNotDie' => 1})
- ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
- ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
- ->json_content_is({error => 'not found!'});
+  ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->json_content_is({error => 'not found!'});
 
 # Static file /hello.txt in production mode
 $t->get_ok('/hello.txt')->status_is(200)
- ->header_is(Server         => 'Mojolicious (Perl)')
- ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
- ->content_like(qr/Hello Mojo from a static file!/);
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_like(qr/Hello Mojo from a static file!/);
 
 # Foo::bar in production mode (missing action)
 $t->get_ok('/foo/baz')->status_is(404)
- ->header_is(Server         => 'Mojolicious (Perl)')
- ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
- ->content_like(qr/Not Found/);
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_like(qr/Not Found/);
 
 # Try to access a file which is not under the web root via path
 # traversal in production mode
 $t->get_ok('/../../mojolicious/secret.txt')->status_is(404)
- ->header_is(Server         => 'Mojolicious (Perl)')
- ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
- ->content_like(qr/Not Found/);
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_like(qr/Not Found/);

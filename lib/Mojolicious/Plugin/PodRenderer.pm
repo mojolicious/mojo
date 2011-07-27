@@ -26,13 +26,13 @@ my $T = File::Spec->catdir(dirname(__FILE__), '..', 'templates');
 
 # Mojobar template
 our $MOJOBAR =
- Mojo::Asset::File->new(path => File::Spec->catfile($T, 'mojobar.html.ep'))
- ->slurp;
+  Mojo::Asset::File->new(path => File::Spec->catfile($T, 'mojobar.html.ep'))
+  ->slurp;
 
 # Perldoc template
 our $PERLDOC =
- Mojo::Asset::File->new(path => File::Spec->catfile($T, 'perldoc.html.ep'))
- ->slurp;
+  Mojo::Asset::File->new(path => File::Spec->catfile($T, 'perldoc.html.ep'))
+  ->slurp;
 
 # "This is my first visit to the Galaxy of Terror and I'd like it to be a
 #  pleasant one."
@@ -51,7 +51,7 @@ sub register {
 
       # Preprocess with ep and then render
       $$output = _pod_to_html($$output)
-       if $r->handlers->{$preprocess}->($r, $c, $output, $options);
+        if $r->handlers->{$preprocess}->($r, $c, $output, $options);
     }
   );
 
@@ -70,7 +70,7 @@ sub register {
 
       # Redirect to CPAN
       return $self->redirect_to("http://metacpan.org/module/$module")
-       unless $path && -r $path;
+        unless $path && -r $path;
 
       # Turn POD into HTML
       my $file = IO::File->new("< $path");
@@ -83,8 +83,8 @@ sub register {
         sub {
           my $attrs = shift->attrs;
           $attrs->{href} =~ s/%3A%3A/\//gi
-           if $attrs->{href}
-             =~ s/^http\:\/\/search\.cpan\.org\/perldoc\?/$perldoc/;
+            if $attrs->{href}
+              =~ s/^http\:\/\/search\.cpan\.org\/perldoc\?/$perldoc/;
         }
       );
 
@@ -94,7 +94,7 @@ sub register {
           my $attrs = shift->attrs;
           my $class = $attrs->{class};
           $attrs->{class} =
-           defined $class ? "$class prettyprint" : 'prettyprint';
+            defined $class ? "$class prettyprint" : 'prettyprint';
         }
       );
 

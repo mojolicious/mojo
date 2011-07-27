@@ -47,8 +47,8 @@ sub import {
 sub new {
   my $class = shift;
   bless
-   exists $_[0] ? exists $_[1] ? {@_} : {%{$_[0]}} : {},
-   ref $class || $class;
+    exists $_[0] ? exists $_[1] ? {@_} : {%{$_[0]}} : {},
+    ref $class || $class;
 }
 
 # Performance is very important for something as often used as accessors,
@@ -66,7 +66,7 @@ sub attr {
 
   # Check default
   Carp::croak('Default has to be a code reference or constant value')
-   if ref $default && ref $default ne 'CODE';
+    if ref $default && ref $default ne 'CODE';
 
   # Create attributes
   $attrs = [$attrs] unless ref $attrs eq 'ARRAY';
@@ -74,7 +74,7 @@ sub attr {
   for my $attr (@$attrs) {
 
     Carp::croak(qq/Attribute "$attr" invalid/)
-     unless $attr =~ /^[a-zA-Z_]\w*$/;
+      unless $attr =~ /^[a-zA-Z_]\w*$/;
 
     # Header
     my $code = "sub {\n";
@@ -95,9 +95,9 @@ sub attr {
       # Return default value
       $code .= "$ws${ws}return \$_[0]->{'$attr'} = ";
       $code .=
-       ref $default eq 'CODE'
-       ? '$default->($_[0])'
-       : '$default';
+        ref $default eq 'CODE'
+        ? '$default->($_[0])'
+        : '$default';
       $code .= ";\n";
     }
     $code .= "$ws}\n";

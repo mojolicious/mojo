@@ -50,7 +50,7 @@ my $HTML_TOKEN_RE = qr/
 
 # Optional HTML tags
 my @OPTIONAL_TAGS =
- qw/body colgroup dd head li optgroup option p rt rp tbody td tfoot th/;
+  qw/body colgroup dd head li optgroup option p rt rp tbody td tfoot th/;
 my %HTML_OPTIONAL;
 $HTML_OPTIONAL{$_}++ for @OPTIONAL_TAGS;
 
@@ -162,7 +162,7 @@ sub parse {
 
       # Empty tag
       $self->_end($start, \$current)
-       if (!$self->xml && $HTML_VOID{$start}) || $attr =~ /\/\s*$/;
+        if (!$self->xml && $HTML_VOID{$start}) || $attr =~ /\/\s*$/;
 
       # Relaxed "script" or "style"
       if ($start eq 'script' || $start eq 'style') {
@@ -238,9 +238,9 @@ sub _end {
 
     # Don't cross block tags that are not optional tags
     return
-     if !$self->xml
-       && $HTML_BLOCK{$next->[1]}
-       && !$HTML_OPTIONAL{$next->[1]};
+      if !$self->xml
+        && $HTML_BLOCK{$next->[1]}
+        && !$HTML_OPTIONAL{$next->[1]};
 
     # Parent
     $next = $next->[3];

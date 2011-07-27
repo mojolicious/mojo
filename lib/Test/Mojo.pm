@@ -248,7 +248,7 @@ sub status_is {
   my ($self, $status) = @_;
 
   my $message =
-   Mojo::Message::Response->new(code => $status)->default_message;
+    Mojo::Message::Response->new(code => $status)->default_message;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::is($self->tx->res->code, $status, "$status $message");
 
@@ -259,7 +259,7 @@ sub status_isnt {
   my ($self, $status) = @_;
 
   my $message =
-   Mojo::Message::Response->new(code => $status)->default_message;
+    Mojo::Message::Response->new(code => $status)->default_message;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::isnt($self->tx->res->code, $status, "not $status $message");
 
@@ -333,7 +333,7 @@ sub _get_content {
   # Charset
   my $charset;
   ($tx->res->headers->content_type || '') =~ /charset=\"?([^"\s]+)\"?/
-   and $charset = $1;
+    and $charset = $1;
 
   # Content
   my $content = $tx->res->body;

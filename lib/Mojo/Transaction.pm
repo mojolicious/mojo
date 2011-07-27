@@ -32,10 +32,10 @@ sub is_websocket {0}
 sub is_writing {
   return 1 unless my $state = shift->{state};
   return 1
-   if $state eq 'write'
-     || $state eq 'write_start_line'
-     || $state eq 'write_headers'
-     || $state eq 'write_body';
+    if $state eq 'write'
+      || $state eq 'write_start_line'
+      || $state eq 'write_headers'
+      || $state eq 'write_body';
   return;
 }
 

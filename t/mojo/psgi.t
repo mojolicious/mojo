@@ -44,11 +44,12 @@ my $params = '';
 while (defined(my $chunk = $res->[2]->getline)) { $params .= $chunk }
 $params = Mojo::JSON->new->decode($params);
 is_deeply $params,
- {bar    => 'baz',
+  {
+  bar    => 'baz',
   hello  => 'world',
   lalala => 23
- },
- 'right structure';
+  },
+  'right structure';
 
 # Command
 $content = 'world=hello';
@@ -82,11 +83,12 @@ $params = '';
 while (defined(my $chunk = $res->[2]->getline)) { $params .= $chunk }
 $params = Mojo::JSON->new->decode($params);
 is_deeply $params,
- {bar    => 'baz',
+  {
+  bar    => 'baz',
   world  => 'hello',
   lalala => 23
- },
- 'right structure';
+  },
+  'right structure';
 is $ENV{MOJO_HELLO}, 'world', 'on_finish callback';
 
 # Cookies

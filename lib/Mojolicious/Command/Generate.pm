@@ -14,7 +14,7 @@ usage: $0 generate GENERATOR [OPTIONS]
 These generators are currently available:
 EOF
 has namespaces =>
- sub { [qw/Mojolicious::Command::Generate Mojo::Command::Generate/] };
+  sub { [qw/Mojolicious::Command::Generate Mojo::Command::Generate/] };
 has usage => <<"EOF";
 usage: $0 generate GENERATOR [OPTIONS]
 EOF

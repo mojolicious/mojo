@@ -1,9 +1,9 @@
 package Mojo::Exception;
 use Mojo::Base -base;
 use overload
- 'bool'   => sub {1},
- '""'     => sub { shift->to_string },
- fallback => 1;
+  'bool'   => sub {1},
+  '""'     => sub { shift->to_string },
+  fallback => 1;
 
 use IO::File;
 use Scalar::Util 'blessed';
@@ -70,7 +70,7 @@ sub _detect {
   # Stacktrace
   if (my $first = $self->frames->[0]) {
     unshift @trace, {file => $first->[1], line => $first->[2]}
-     if $first->[1];
+      if $first->[1];
   }
 
   # Frames
@@ -151,7 +151,7 @@ sub to_string {
 
   # Line
   $string .= ($self->line->[0] . ': ' . $self->line->[1] . "\n")
-   if $self->line->[0];
+    if $self->line->[0];
 
   # After
   for my $line (@{$self->lines_after}) {

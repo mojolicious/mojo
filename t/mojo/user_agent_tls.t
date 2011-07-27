@@ -12,9 +12,9 @@ BEGIN {
 use Test::More;
 use Mojo::IOLoop::Server;
 plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
- unless $ENV{TEST_TLS};
+  unless $ENV{TEST_TLS};
 plan skip_all => 'IO::Socket::SSL 1.43 required for this test!'
- unless Mojo::IOLoop::Server::TLS;
+  unless Mojo::IOLoop::Server::TLS;
 plan tests => 14;
 
 # "That does not compute.
@@ -39,8 +39,8 @@ my $id = $ua->ioloop->listen(
   on_read  => sub {
     my ($loop, $id) = @_;
     $loop->write($id => "HTTP/1.1 200 OK\x0d\x0a"
-       . "Connection: keep-alive\x0d\x0a"
-       . "Content-Length: 6\x0d\x0a\x0d\x0aworks!");
+        . "Connection: keep-alive\x0d\x0a"
+        . "Content-Length: 6\x0d\x0a\x0d\x0aworks!");
     $loop->drop($id);
   },
   on_error => sub {
@@ -62,8 +62,8 @@ ok !$error, 'no error';
 
 # Valid certificate
 $tx =
- $ua->cert('t/mojo/certs/client.crt')->key('t/mojo/certs/client.key')
- ->get("https://localhost:$port");
+  $ua->cert('t/mojo/certs/client.crt')->key('t/mojo/certs/client.key')
+  ->get("https://localhost:$port");
 ok $tx->success, 'successful';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
@@ -86,8 +86,8 @@ $ENV{MOJO_KEY_FILE}  = $backup2;
 
 # Invalid certificate
 $tx =
- $ua->cert('t/mojo/certs/badclient.crt')->key('t/mojo/certs/badclient.key')
- ->get("https://localhost:$port");
+  $ua->cert('t/mojo/certs/badclient.crt')->key('t/mojo/certs/badclient.key')
+  ->get("https://localhost:$port");
 ok !$error, 'no error';
 
 # Empty certificate

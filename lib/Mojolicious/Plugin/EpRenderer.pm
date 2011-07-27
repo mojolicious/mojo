@@ -18,8 +18,8 @@ sub register {
 
   # Custom sandbox
   $template->{namespace} =
-   'Mojo::Template::SandBox::' . md5_sum(($ENV{MOJO_EXE} || ref $app) . $$)
-   unless defined $template->{namespace};
+    'Mojo::Template::SandBox::' . md5_sum(($ENV{MOJO_EXE} || ref $app) . $$)
+    unless defined $template->{namespace};
 
   # Auto escape by default to prevent XSS attacks
   $template->{auto_escape} = 1 unless defined $template->{auto_escape};

@@ -470,6 +470,206 @@ Mojo::DOM::CSS - CSS3 Selector Engine
 L<Mojo::DOM::CSS> is the CSS3 selector engine used by L<Mojo::DOM>.
 Note that this module is EXPERIMENTAL and might change without warning!
 
+=head1 SELECTORS
+
+All CSS3 selectors that make sense for a standalone parser are supported.
+
+=head2 C<*>
+
+Any element.
+
+  my $first = $css->select('*');
+
+=head2 C<E>
+
+An element of type C<E>.
+
+  my $title = $css->select('title');
+
+=head2 C<E[foo]>
+
+An C<E> element with a C<foo> attribute.
+
+  my $links = $css->select('a[href]');
+
+=head2 C<E[foo="bar"]>
+
+An C<E> element whose C<foo> attribute value is exactly equal to C<bar>.
+
+  my $fields = $css->select('input[name="foo"]');
+
+=head2 C<E[foo~="bar"]>
+
+An C<E> element whose C<foo> attribute value is a list of
+whitespace-separated values, one of which is exactly equal to C<bar>.
+
+  my $fields = $css->select('input[name~="foo"]');
+
+=head2 C<E[foo^="bar"]>
+
+An C<E> element whose C<foo> attribute value begins exactly with the string
+C<bar>.
+
+  my $fields = $css->select('input[name^="f"]');
+
+=head2 C<E[foo$="bar"]>
+
+An C<E> element whose C<foo> attribute value ends exactly with the string
+C<bar>.
+
+  my $fields = $css->select('input[name$="o"]');
+
+=head2 C<E[foo*="bar"]>
+
+An C<E> element whose C<foo> attribute value contains the substring C<bar>.
+
+  my $fields = $css->select('input[name*="fo"]');
+
+=head2 C<E:root>
+
+An C<E> element, root of the document.
+
+  my $root = $css->select(':root');
+
+=head2 C<E:checked>
+
+A user interface element C<E> which is checked (for instance a radio-button
+or checkbox).
+
+  my $input = $css->select(':checked');
+
+=head2 C<E:empty>
+
+An C<E> element that has no children (including text nodes).
+
+  my $empty = $css->select(':empty');
+
+=head2 C<E:nth-child(n)>
+
+An C<E> element, the C<n-th> child of its parent.
+
+  my $third = $css->select('div:nth-child(3)');
+  my $odd   = $css->select('div:nth-child(odd)');
+  my $even  = $css->select('div:nth-child(even)');
+  my $top3  = $css->select('div:nth-child(-n+3)');
+
+=head2 C<E:nth-last-child(n)>
+
+An C<E> element, the C<n-th> child of its parent, counting from the last one.
+
+  my $third    = $css->select('div:nth-last-child(3)');
+  my $odd      = $css->select('div:nth-last-child(odd)');
+  my $even     = $css->select('div:nth-last-child(even)');
+  my $bottom3  = $css->select('div:nth-last-child(-n+3)');
+
+=head2 C<E:nth-of-type(n)>
+
+An C<E> element, the C<n-th> sibling of its type.
+
+  my $third = $css->select('div:nth-of-type(3)');
+  my $odd   = $css->select('div:nth-of-type(odd)');
+  my $even  = $css->select('div:nth-of-type(even)');
+  my $top3  = $css->select('div:nth-of-type(-n+3)');
+
+=head2 C<E:nth-last-of-type(n)>
+
+An C<E> element, the C<n-th> sibling of its type, counting from the last one.
+
+  my $third    = $css->select('div:nth-last-of-type(3)');
+  my $odd      = $css->select('div:nth-last-of-type(odd)');
+  my $even     = $css->select('div:nth-last-of-type(even)');
+  my $bottom3  = $css->select('div:nth-last-of-type(-n+3)');
+
+=head2 C<E:first-child>
+
+An C<E> element, first child of its parent.
+
+  my $first = $css->select('div p:first-child');
+
+=head2 C<E:last-child>
+
+An C<E> element, last child of its parent.
+
+  my $last = $css->select('div p:last-child');
+
+=head2 C<E:first-of-type>
+
+An C<E> element, first sibling of its type.
+
+  my $first = $css->select('div p:first-of-type');
+
+=head2 C<E:last-of-type>
+
+An C<E> element, last sibling of its type.
+
+  my $last = $css->select('div p:last-of-type');
+
+=head2 C<E:only-child>
+
+An C<E> element, only child of its parent.
+
+  my $lonely = $css->select('div p:only-child');
+
+=head2 C<E:only-of-type>
+
+An C<E> element, only sibling of its type.
+
+  my $lonely = $css->select('div p:only-of-type');
+
+=head2 C<E.warning>
+
+  my $warning = $css->select('div.warning');
+
+An C<E> element whose class is "warning".
+
+=head2 C<E#myid>
+
+  my $foo = $css->select('div#foo');
+
+An C<E> element with C<ID> equal to "myid".
+
+=head2 C<E:not(s)>
+
+An C<E> element that does not match simple selector C<s>.
+
+  my $others = $css->select('div p:not(:first-child)');
+
+=head2 C<E F>
+
+An C<F> element descendant of an C<E> element.
+
+  my $headlines = $css->select('div h1');
+
+=head2 C<E E<gt> F>
+
+An C<F> element child of an C<E> element.
+
+  my $headlines = $css->select('html > body > div > h1');
+
+=head2 C<E + F>
+
+An C<F> element immediately preceded by an C<E> element.
+
+  my $second = $css->select('h1 + h2');
+
+=head2 C<E ~ F>
+
+An C<F> element preceded by an C<E> element.
+
+  my $second = $css->select('h1 ~ h2');
+
+=head2 C<E, F, G>
+
+Elements of type C<E>, C<F> and C<G>.
+
+  my $headlines = $css->select('h1, h2, h3');
+
+=head2 C<E[foo=bar][bar=baz]>
+
+An C<E> element whose attributes match all following attribute selectors.
+
+  my $links = $css->select('a[foo^="b"][foo$="ar"]');
+
 =head1 ATTRIBUTES
 
 L<Mojo::DOM::CSS> implements the following attributes.

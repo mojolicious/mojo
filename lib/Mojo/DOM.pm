@@ -484,206 +484,6 @@ selector support.
 It will even try to interpret broken XML, so you should not use it for
 validation.
 
-=head1 SELECTORS
-
-All CSS3 selectors that make sense for a standalone parser are supported.
-
-=head2 C<*>
-
-Any element.
-
-  my $first = $dom->at('*');
-
-=head2 C<E>
-
-An element of type C<E>.
-
-  my $title = $dom->at('title');
-
-=head2 C<E[foo]>
-
-An C<E> element with a C<foo> attribute.
-
-  my $links = $dom->find('a[href]');
-
-=head2 C<E[foo="bar"]>
-
-An C<E> element whose C<foo> attribute value is exactly equal to C<bar>.
-
-  my $fields = $dom->find('input[name="foo"]');
-
-=head2 C<E[foo~="bar"]>
-
-An C<E> element whose C<foo> attribute value is a list of
-whitespace-separated values, one of which is exactly equal to C<bar>.
-
-  my $fields = $dom->find('input[name~="foo"]');
-
-=head2 C<E[foo^="bar"]>
-
-An C<E> element whose C<foo> attribute value begins exactly with the string
-C<bar>.
-
-  my $fields = $dom->find('input[name^="f"]');
-
-=head2 C<E[foo$="bar"]>
-
-An C<E> element whose C<foo> attribute value ends exactly with the string
-C<bar>.
-
-  my $fields = $dom->find('input[name$="o"]');
-
-=head2 C<E[foo*="bar"]>
-
-An C<E> element whose C<foo> attribute value contains the substring C<bar>.
-
-  my $fields = $dom->find('input[name*="fo"]');
-
-=head2 C<E:root>
-
-An C<E> element, root of the document.
-
-  my $root = $dom->at(':root');
-
-=head2 C<E:checked>
-
-A user interface element C<E> which is checked (for instance a radio-button
-or checkbox).
-
-  my $input = $dom->at(':checked');
-
-=head2 C<E:empty>
-
-An C<E> element that has no children (including text nodes).
-
-  my $empty = $dom->find(':empty');
-
-=head2 C<E:nth-child(n)>
-
-An C<E> element, the C<n-th> child of its parent.
-
-  my $third = $dom->at('div:nth-child(3)');
-  my $odd   = $dom->find('div:nth-child(odd)');
-  my $even  = $dom->find('div:nth-child(even)');
-  my $top3  = $dom->find('div:nth-child(-n+3)');
-
-=head2 C<E:nth-last-child(n)>
-
-An C<E> element, the C<n-th> child of its parent, counting from the last one.
-
-  my $third    = $dom->at('div:nth-last-child(3)');
-  my $odd      = $dom->find('div:nth-last-child(odd)');
-  my $even     = $dom->find('div:nth-last-child(even)');
-  my $bottom3  = $dom->find('div:nth-last-child(-n+3)');
-
-=head2 C<E:nth-of-type(n)>
-
-An C<E> element, the C<n-th> sibling of its type.
-
-  my $third = $dom->at('div:nth-of-type(3)');
-  my $odd   = $dom->find('div:nth-of-type(odd)');
-  my $even  = $dom->find('div:nth-of-type(even)');
-  my $top3  = $dom->find('div:nth-of-type(-n+3)');
-
-=head2 C<E:nth-last-of-type(n)>
-
-An C<E> element, the C<n-th> sibling of its type, counting from the last one.
-
-  my $third    = $dom->at('div:nth-last-of-type(3)');
-  my $odd      = $dom->find('div:nth-last-of-type(odd)');
-  my $even     = $dom->find('div:nth-last-of-type(even)');
-  my $bottom3  = $dom->find('div:nth-last-of-type(-n+3)');
-
-=head2 C<E:first-child>
-
-An C<E> element, first child of its parent.
-
-  my $first = $dom->at('div p:first-child');
-
-=head2 C<E:last-child>
-
-An C<E> element, last child of its parent.
-
-  my $last = $dom->at('div p:last-child');
-
-=head2 C<E:first-of-type>
-
-An C<E> element, first sibling of its type.
-
-  my $first = $dom->at('div p:first-of-type');
-
-=head2 C<E:last-of-type>
-
-An C<E> element, last sibling of its type.
-
-  my $last = $dom->at('div p:last-of-type');
-
-=head2 C<E:only-child>
-
-An C<E> element, only child of its parent.
-
-  my $lonely = $dom->at('div p:only-child');
-
-=head2 C<E:only-of-type>
-
-An C<E> element, only sibling of its type.
-
-  my $lonely = $dom->at('div p:only-of-type');
-
-=head2 C<E.warning>
-
-  my $warning = $dom->at('div.warning');
-
-An C<E> element whose class is "warning".
-
-=head2 C<E#myid>
-
-  my $foo = $dom->at('div#foo');
-
-An C<E> element with C<ID> equal to "myid".
-
-=head2 C<E:not(s)>
-
-An C<E> element that does not match simple selector C<s>.
-
-  my $others = $dom->at('div p:not(:first-child)');
-
-=head2 C<E F>
-
-An C<F> element descendant of an C<E> element.
-
-  my $headlines = $dom->find('div h1');
-
-=head2 C<E E<gt> F>
-
-An C<F> element child of an C<E> element.
-
-  my $headlines = $dom->find('html > body > div > h1');
-
-=head2 C<E + F>
-
-An C<F> element immediately preceded by an C<E> element.
-
-  my $second = $dom->find('h1 + h2');
-
-=head2 C<E ~ F>
-
-An C<F> element preceded by an C<E> element.
-
-  my $second = $dom->find('h1 ~ h2');
-
-=head2 C<E, F, G>
-
-Elements of type C<E>, C<F> and C<G>.
-
-  my $headlines = $dom->find('h1, h2, h3');
-
-=head2 C<E[foo=bar][bar=baz]>
-
-An C<E> element whose attributes match all following attribute selectors.
-
-  my $links = $dom->find('a[foo^="b"][foo$="ar"]');
-
 =head1 CASE SENSITIVITY
 
 L<Mojo::DOM> defaults to HTML5 semantics, that means all tags and attributes
@@ -751,6 +551,7 @@ Append to element content.
   my $result = $dom->at('html title');
 
 Find a single element with CSS3 selectors.
+All selectors from L<Mojo::DOM::CSS> are supported.
 
 =head2 C<attrs>
 
@@ -797,6 +598,7 @@ Render content of this element to XML.
 
 Find elements with CSS3 selectors and return a L<Mojo::DOM::Collection>
 object.
+All selectors from L<Mojo::DOM::CSS> are supported.
 
   print $dom->find('div')->[23]->text;
 
@@ -816,7 +618,7 @@ Parent of element.
 
   $dom = $dom->parse('<foo bar="baz">test</foo>');
 
-Parse HTML5/XML document.
+Parse HTML5/XML document with L<Mojo::DOM::HTML>.
 
 =head2 C<prepend>
 

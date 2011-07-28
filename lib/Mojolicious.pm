@@ -528,16 +528,11 @@ L<Mojolicious::Controller>.
   my $mode = $app->mode;
   $app     = $app->mode('production');
 
-The operating mode for your application.
-It defaults to the value of the C<MOJO_MODE> environment variable or
-C<development>.
-Right before calling C<startup>, L<Mojolicious> will pick up the current
-mode, name the log file after it and raise the log level from C<debug> to
-C<info> if it has a value other than C<development>.
-
-If you want to add per mode logic to your application, you can define methods
-named C<$mode_mode> in the application class, which will be called right
-before C<startup>.
+The operating mode for your application, defaults to the value of the
+C<MOJO_MODE> environment variable or C<development>.
+You can also add per mode logic to your application by defining methods named
+C<$mode_mode> in the application class, which will be called right before
+C<startup>.
 
   sub development_mode {
     my $self = shift;
@@ -548,6 +543,10 @@ before C<startup>.
     my $self = shift;
     ...
   }
+
+Right before calling C<startup> and mode specific methods, L<Mojolicious>
+will pick up the current mode, name the log file after it and raise the log
+level from C<debug> to C<info> if it has a value other than C<development>.
 
 =head2 C<on_process>
 

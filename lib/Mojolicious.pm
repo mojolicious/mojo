@@ -338,9 +338,9 @@ These three lines are a whole web application.
   app->start;
 
 To run this example with the built-in development web server just put the
-code into a file and execute it with C<perl>.
+code into a file and start it with C<morbo>.
 
-  $ perl hello.pl daemon
+  $ morbo hello.pl
   Server available at http://127.0.0.1:3000.
 
   $ curl http://127.0.0.1:3000/

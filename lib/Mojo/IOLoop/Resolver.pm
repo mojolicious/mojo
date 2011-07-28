@@ -4,7 +4,6 @@ use Mojo::Base -base;
 use IO::File;
 use IO::Socket::INET;
 use List::Util 'first';
-use Mojo::URL;
 use Scalar::Util 'weaken';
 
 use constant DEBUG => $ENV{MOJO_RESOLVER_DEBUG} || 0;
@@ -33,6 +32,26 @@ has ioloop => sub {
   Mojo::IOLoop->singleton;
 };
 has timeout => 3;
+
+# IPv4 regex (RFC 3986)
+my $DEC_OCTET_RE = qr/(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])/;
+our $IPV4_RE =
+  qr/^$DEC_OCTET_RE\.$DEC_OCTET_RE\.$DEC_OCTET_RE\.$DEC_OCTET_RE$/;
+
+# IPv6 regex (RFC 3986)
+my $H16_RE  = qr/[0-9A-Fa-f]{1,4}/;
+my $LS32_RE = qr/(?:$H16_RE:$H16_RE|$IPV4_RE)/;
+our $IPV6_RE = qr/(?:
+                                           (?: $H16_RE : ){6} $LS32_RE
+  |                                     :: (?: $H16_RE : ){5} $LS32_RE
+  | (?:                      $H16_RE )? :: (?: $H16_RE : ){4} $LS32_RE
+  | (?: (?: $H16_RE : ){0,1} $H16_RE )? :: (?: $H16_RE : ){3} $LS32_RE
+  | (?: (?: $H16_RE : ){0,2} $H16_RE )? :: (?: $H16_RE : ){2} $LS32_RE
+  | (?: (?: $H16_RE : ){0,3} $H16_RE )? ::     $H16_RE :      $LS32_RE
+  | (?: (?: $H16_RE : ){0,4} $H16_RE )? ::                    $LS32_RE
+  | (?: (?: $H16_RE : ){0,5} $H16_RE )? ::                    $H16_RE
+  | (?: (?: $H16_RE : ){0,6} $H16_RE )? ::
+)/x;
 
 # DNS server (default to Google Public DNS)
 my $SERVERS = ['8.8.8.8', '8.8.4.4'];
@@ -74,6 +93,16 @@ my $DNS_TYPES = {
 our $LOCALHOST = '127.0.0.1';
 
 sub DESTROY { shift->_cleanup }
+
+sub is_ipv4 {
+  return 1 if $_[1] =~ $IPV4_RE;
+  return;
+}
+
+sub is_ipv6 {
+  return 1 if $_[1] =~ $IPV6_RE;
+  return;
+}
 
 sub lookup {
   my ($self, $name, $cb) = @_;
@@ -118,8 +147,8 @@ sub resolve {
   # No lookup required or record type not supported
   my $server = $self->servers;
   my $t      = $DNS_TYPES->{$type};
-  my $ipv4   = $name =~ $Mojo::URL::IPV4_RE ? 1 : 0;
-  my $ipv6   = IPV6 && $name =~ $Mojo::URL::IPV6_RE ? 1 : 0;
+  my $ipv4   = $self->is_ipv4($name);
+  my $ipv6   = IPV6 && $self->is_ipv6($name) ? 1 : 0;
   my $loop   = $self->ioloop;
   weaken $self;
   return $loop->timer(0 => sub { $self->$cb([]) })
@@ -362,15 +391,17 @@ Maximum time in seconds a C<DNS> lookup can take, defaults to C<3>.
 L<Mojo::IOLoop::Resolver> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
 
-=head2 C<servers>
+=head2 C<is_ipv4>
 
-  my @all     = $resolver->servers;
-  my $current = $resolver->servers;
-  $resolver->servers('8.8.8.8', '8.8.4.4');
+  my $is_ipv4 = $resolver->is_ipv4('127.0.0.1');
 
-IP addresses of C<DNS> servers used for lookups, defaults to the value of
-the C<MOJO_DNS_SERVER> environment variable, auto detection, C<8.8.8.8> or
-C<8.8.4.4>.
+Check if value is a valid C<IPv4> address.
+
+=head2 C<is_ipv6>
+
+  my $is_ipv6 = $resolver->is_ipv6('::1');
+
+Check if value is a valid C<IPv4> address.
 
 =head2 C<lookup>
 
@@ -393,6 +424,16 @@ Resolve domain into C<A>, C<AAAA>, C<CNAME>, C<MX>, C<NS>, C<PTR> or C<TXT>
 records, C<*> will query for all at once.
 Since this is a "stub resolver" it depends on a recursive name server for DNS
 resolution.
+
+=head2 C<servers>
+
+  my @all     = $resolver->servers;
+  my $current = $resolver->servers;
+  $resolver->servers('8.8.8.8', '8.8.4.4');
+
+IP addresses of C<DNS> servers used for lookups, defaults to the value of
+the C<MOJO_DNS_SERVER> environment variable, auto detection, C<8.8.8.8> or
+C<8.8.4.4>.
 
 =head1 DEBUGGING
 

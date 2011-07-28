@@ -319,8 +319,6 @@ sub _error {
   $self->_handle($id, $error);
 }
 
-# "Oh, I'm in no condition to drive. Wait a minute.
-#  I don't have to listen to myself. I'm drunk."
 sub _finish {
   my ($self, $tx, $cb, $close) = @_;
 

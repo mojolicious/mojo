@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 322;
+use Test::More tests => 298;
 
 # "I don't want you driving around in a car you built yourself.
 #  You can sit there complaining, or you can knit me some seat belts."
@@ -282,56 +282,6 @@ is $url->to_abs, 'http://kraih.com/foo///bar/23/', 'right absolute version';
 is $url->is_abs, 1,                                'is absolute';
 is $url->to_rel, 'foo///bar/23/',                  'right relative version';
 
-# Check host for IPv4 and IPv6 addresses
-$url = Mojo::URL->new('http://mojolicio.us');
-is $url->host,    'mojolicio.us', 'right host';
-is $url->is_ipv4, undef,          'not an IPv4 address';
-is $url->is_ipv6, undef,          'not an IPv6 address';
-$url = Mojo::URL->new('http://[::1]');
-is $url->host,    '[::1]', 'right host';
-is $url->is_ipv4, undef,   'not an IPv4 address';
-is $url->is_ipv6, 1,       'is an IPv6 address';
-$url = Mojo::URL->new('http://127.0.0.1');
-is $url->host,    '127.0.0.1', 'right host';
-is $url->is_ipv4, 1,           'is an IPv4 address';
-is $url->is_ipv6, undef,       'not an IPv6 address';
-$url = Mojo::URL->new('http://0::127.0.0.1');
-is $url->host,    '0::127.0.0.1', 'right host';
-is $url->is_ipv4, undef,          'not an IPv4 address';
-is $url->is_ipv6, 1,              'is an IPv6 address';
-$url = Mojo::URL->new('http://[0::127.0.0.1]');
-is $url->host,    '[0::127.0.0.1]', 'right host';
-is $url->is_ipv4, undef,            'not an IPv4 address';
-is $url->is_ipv6, 1,                'is an IPv6 address';
-$url = Mojo::URL->new('http://mojolicio.us:3000');
-is $url->host,    'mojolicio.us', 'right host';
-is $url->is_ipv4, undef,          'not an IPv4 address';
-is $url->is_ipv6, undef,          'not an IPv6 address';
-$url = Mojo::URL->new('http://[::1]:3000');
-is $url->host,    '[::1]', 'right host';
-is $url->is_ipv4, undef,   'not an IPv4 address';
-is $url->is_ipv6, 1,       'is an IPv6 address';
-$url = Mojo::URL->new('http://127.0.0.1:3000');
-is $url->host,    '127.0.0.1', 'right host';
-is $url->is_ipv4, 1,           'is an IPv4 address';
-is $url->is_ipv6, undef,       'not an IPv6 address';
-$url = Mojo::URL->new('http://0::127.0.0.1:3000');
-is $url->host,    '0::127.0.0.1', 'right host';
-is $url->is_ipv4, undef,          'not an IPv4 address';
-is $url->is_ipv6, 1,              'is an IPv6 address';
-$url = Mojo::URL->new('http://[0::127.0.0.1]:3000');
-is $url->host,    '[0::127.0.0.1]', 'right host';
-is $url->is_ipv4, undef,            'not an IPv4 address';
-is $url->is_ipv6, 1,                'is an IPv6 address';
-$url = Mojo::URL->new('http://foo.1.1.1.1.de/');
-is $url->host,    'foo.1.1.1.1.de', 'right host';
-is $url->is_ipv4, undef,            'not an IPv4 address';
-is $url->is_ipv6, undef,            'not an IPv4 address';
-$url = Mojo::URL->new('http://1.1.1.1.1.1/');
-is $url->host,    '1.1.1.1.1.1', 'right host';
-is $url->is_ipv4, undef,         'not an IPv4 address';
-is $url->is_ipv6, undef,         'not an IPv4 address';
-
 # Merge relative path
 $url = Mojo::URL->new('http://foo.bar/baz?yada');
 is $url->base,     '',        'no base';
@@ -514,3 +464,29 @@ is $url->path,     '/baz/zzz',                                 'right path';
 is $url->query,    '',                                         'right query';
 is $url->fragment, undef,                                      'no fragment';
 is "$url", 'http://foo.bar/baz/zzz', 'right absolute URL';
+
+# Hosts
+$url = Mojo::URL->new('http://mojolicio.us');
+is $url->host, 'mojolicio.us', 'right host';
+$url = Mojo::URL->new('http://[::1]');
+is $url->host, '[::1]', 'right host';
+$url = Mojo::URL->new('http://127.0.0.1');
+is $url->host, '127.0.0.1', 'right host';
+$url = Mojo::URL->new('http://0::127.0.0.1');
+is $url->host, '0::127.0.0.1', 'right host';
+$url = Mojo::URL->new('http://[0::127.0.0.1]');
+is $url->host, '[0::127.0.0.1]', 'right host';
+$url = Mojo::URL->new('http://mojolicio.us:3000');
+is $url->host, 'mojolicio.us', 'right host';
+$url = Mojo::URL->new('http://[::1]:3000');
+is $url->host, '[::1]', 'right host';
+$url = Mojo::URL->new('http://127.0.0.1:3000');
+is $url->host, '127.0.0.1', 'right host';
+$url = Mojo::URL->new('http://0::127.0.0.1:3000');
+is $url->host, '0::127.0.0.1', 'right host';
+$url = Mojo::URL->new('http://[0::127.0.0.1]:3000');
+is $url->host, '[0::127.0.0.1]', 'right host';
+$url = Mojo::URL->new('http://foo.1.1.1.1.de/');
+is $url->host, 'foo.1.1.1.1.de', 'right host';
+$url = Mojo::URL->new('http://1.1.1.1.1.1/');
+is $url->host, '1.1.1.1.1.1', 'right host';

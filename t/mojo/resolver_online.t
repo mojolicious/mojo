@@ -17,8 +17,6 @@ plan tests => 18;
 use_ok 'Mojo::IOLoop';
 
 use List::Util 'first';
-use Mojo::IOLoop;
-use Mojo::URL;
 
 # "Your guilty consciences may make you vote Democratic, but secretly you all
 #  yearn for a Republican president to lower taxes, brutalize criminals, and
@@ -94,7 +92,7 @@ $r->resolve(
   }
 );
 Mojo::IOLoop->start;
-like $result, $Mojo::URL::IPV6_RE, 'valid IPv6 record';
+is $r->is_ipv6($result), 1, 'valid IPv6 record';
 ok $ttl, 'got a TTL value';
 
 # Resolve CNAME record
@@ -152,7 +150,7 @@ $r->resolve(
   }
 );
 Mojo::IOLoop->start;
-like $a1, $Mojo::URL::IPV4_RE, 'valid IPv4 record';
+is $r->is_ipv4($a1), 1, 'valid IPv4 record';
 is $a1, $a2, 'PTR roundtrip succeeded';
 
 # Resolve PTR record (IPv6)

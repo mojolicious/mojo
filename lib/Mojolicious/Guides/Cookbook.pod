@@ -565,7 +565,7 @@ And you can use all the commands from L<Mojolicious::Commands>.
 
 This tasty oneliner will keep your L<Mojolicious> as fresh as possible.
 
-  sudo sh -c "curl -L cpanmin.us | perl - http://latest.mojolicio.us"
+  $ sudo sh -c "curl -L cpanmin.us | perl - http://latest.mojolicio.us"
 
 =head2 jQuery (Content Distribution Network)
 

@@ -111,7 +111,7 @@ deploying L<Mojolicious> applications.
 
 Quite possibly this oneliner.
 
-  sudo sh -c "curl -L cpanmin.us | perl - Mojolicious"
+  $ sudo sh -c "curl -L cpanmin.us | perl - Mojolicious"
 
 =head2 I think L<Mojolicious> is awesome, how can i support you guys?
 

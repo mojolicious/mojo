@@ -567,7 +567,7 @@ the sledgehammer in your toolbox.
   my $plugins = $app->plugins;
   $app        = $app->plugins(Mojolicious::Plugins->new);
 
-The plugin loader, by default a L<Mojolicious::Plugins> object.
+The plugin loader, defaults to a L<Mojolicious::Plugins> object.
 You can usually leave this alone, see L<Mojolicious::Plugin> if you want to
 write a plugin.
 
@@ -576,7 +576,7 @@ write a plugin.
   my $renderer = $app->renderer;
   $app         = $app->renderer(Mojolicious::Renderer->new);
 
-Used in your application to render content, by default a
+Used in your application to render content, defaults to a
 L<Mojolicious::Renderer> object.
 The two main renderer plugins L<Mojolicious::Plugin::EpRenderer> and
 L<Mojolicious::Plugin::EplRenderer> contain more specific information.
@@ -586,7 +586,7 @@ L<Mojolicious::Plugin::EplRenderer> contain more specific information.
   my $routes = $app->routes;
   $app       = $app->routes(Mojolicious::Routes->new);
 
-The routes dispatcher, by default a L<Mojolicious::Routes> object.
+The routes dispatcher, defaults to a L<Mojolicious::Routes> object.
 You use this in your startup method to define the url endpoints for your
 application.
 
@@ -612,7 +612,7 @@ the log file reminding you to change your passphrase.
   my $sessions = $app->sessions;
   $app         = $app->sessions(Mojolicious::Sessions->new);
 
-Simple signed cookie based sessions, by default a L<Mojolicious::Sessions>
+Simple signed cookie based sessions, defaults to a L<Mojolicious::Sessions>
 object.
 
 =head2 C<static>
@@ -620,7 +620,7 @@ object.
   my $static = $app->static;
   $app       = $app->static(Mojolicious::Static->new);
 
-For serving static assets from your C<public> directory, by default a
+For serving static assets from your C<public> directory, defaults to a
 L<Mojolicious::Static> object.
 
 =head2 C<types>
@@ -629,7 +629,7 @@ L<Mojolicious::Static> object.
   $app      = $app->types(Mojolicious::Types->new);
 
 Responsible for tracking the types of content you want to serve in your
-application, by default a L<Mojolicious::Types> object.
+application, defaults to a L<Mojolicious::Types> object.
 You can easily register new types.
 
   $app->types->type(twitter => 'text/tweet');

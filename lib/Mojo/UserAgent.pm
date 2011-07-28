@@ -673,7 +673,7 @@ environment variable.
   my $cookie_jar = $ua->cookie_jar;
   $ua            = $ua->cookie_jar(Mojo::CookieJar->new);
 
-Cookie jar to use for this user agents requests, by default a
+Cookie jar to use for this user agents requests, defaults to a
 L<Mojo::CookieJar> object.
 
 =head2 C<http_proxy>
@@ -695,8 +695,8 @@ Proxy server to use for HTTPS and WebSocket requests.
   my $loop = $ua->ioloop;
   $ua      = $ua->ioloop(Mojo::IOLoop->new);
 
-Loop object to use for blocking I/O operations, by default a L<Mojo::IOLoop>
-object will be used.
+Loop object to use for blocking I/O operations, defaults to a L<Mojo::IOLoop>
+object.
 
 =head2 C<keep_alive_timeout>
 
@@ -719,8 +719,8 @@ environment variable.
   my $log = $ua->log;
   $ua     = $ua->log(Mojo::Log->new);
 
-A L<Mojo::Log> object used for logging, by default the application log will
-be used.
+A L<Mojo::Log> object used for logging, defaults to the application log or a
+L<Mojo::Log> object.
 
 =head2 C<max_connections>
 
@@ -773,7 +773,7 @@ redirects.
   my $t = $ua->transactor;
   $ua   = $ua->transactor(Mojo::UserAgent::Transactor->new);
 
-Transaction builder, by default a L<Mojo::UserAgent::Transactor> object.
+Transaction builder, defaults to a L<Mojo::UserAgent::Transactor> object.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<websocket_timeout>

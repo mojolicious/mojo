@@ -348,8 +348,7 @@ L<Mojo::IOLoop::Resolver> implements the following attributes.
   my $ioloop = $resolver->ioloop;
   $resolver  = $resolver->ioloop(Mojo::IOLoop->new);
 
-Loop object to use for I/O operations, by default a L<Mojo::IOLoop> object
-will be used.
+Loop object to use for I/O operations, defaults to a L<Mojo::IOLoop> object.
 
 =head2 C<timeout>
 

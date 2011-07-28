@@ -493,8 +493,8 @@ Generate script tag for C<Javascript> asset.
   <%= link_to 'http://mojolicio.us' => begin %>Mojolicious<% end %>
   <%= link_to url_for->query(foo => $foo) => begin %>Retry<% end %>
 
-Generate link to route, path or URL, by default the capitalized link target
-will be used as content.
+Generate link to route, path or URL, defaults to using the capitalized link
+target as content.
 
   <a href="/path/to/index">Home</a>
   <a href="/path/to/index">Home</a>

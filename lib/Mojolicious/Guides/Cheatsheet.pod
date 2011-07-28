@@ -310,8 +310,8 @@ defaults to C<main>.
 
 =head2 C<MOJO_TMPDIR>
 
-Directory for temporary files like huge uploads, by default a random platform
-specific temporary directory will be used.
+Directory for temporary files like huge uploads, defaults to using a random
+platform specific temporary directory.
 
   MOJO_TMPDIR=/tmp/mojo
 

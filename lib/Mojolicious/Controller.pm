@@ -935,7 +935,7 @@ connection in progress.
   $c          = $c->session({foo => 'bar'});
   $c          = $c->session(foo => 'bar');
 
-Persistent data storage, by default stored in a signed cookie.
+Persistent data storage, defaults to using signed cookies.
 Note that cookies are generally limited to 4096 bytes of data.
 
   $c->session->{foo} = 'bar';

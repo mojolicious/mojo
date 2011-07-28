@@ -416,14 +416,14 @@ Callback to be invoked for requests.
   my $req = $tx->req;
   $tx     = $tx->req(Mojo::Message::Request->new);
 
-HTTP 1.1 request, by default a L<Mojo::Message::Request> object.
+HTTP 1.1 request, defaults to a L<Mojo::Message::Request> object.
 
 =head2 C<res>
 
   my $res = $tx->res;
   $tx     = $tx->res(Mojo::Message::Response->new);
 
-HTTP 1.1 response, by default a L<Mojo::Message::Response> object.
+HTTP 1.1 response, defaults to a L<Mojo::Message::Response> object.
 
 =head1 METHODS
 

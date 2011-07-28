@@ -90,7 +90,7 @@ L<Mojo> implements the following attributes.
   my $home = $app->home;
   $app     = $app->home(Mojo::Home->new);
 
-The home directory of your application, by default a L<Mojo::Home> object
+The home directory of your application, defaults to a L<Mojo::Home> object
 which stringifies to the actual path.
 
 =head2 C<log>
@@ -98,14 +98,14 @@ which stringifies to the actual path.
   my $log = $app->log;
   $app    = $app->log(Mojo::Log->new);
     
-The logging layer of your application, by default a L<Mojo::Log> object.
+The logging layer of your application, defaults to a L<Mojo::Log> object.
 
 =head2 C<on_transaction>
 
   my $cb = $app->on_transaction;
   $app   = $app->on_transaction(sub {...});
 
-Callback to be invoked when a new transaction is needed, by default it builds
+Callback to be invoked when a new transaction is needed, defaults to building
 a L<Mojo::Transaction::HTTP> object.
 
 =head2 C<on_websocket>
@@ -113,7 +113,7 @@ a L<Mojo::Transaction::HTTP> object.
   my $cb = $app->on_websocket;
   $app   = $app->on_websocket(sub {...});
 
-Callback to be invoked for WebSocket handshakes, by default it builds a
+Callback to be invoked for WebSocket handshakes, defaults to building a
 L<Mojo::Transaction::WebSocket> object and handles the response for the
 handshake request.
 
@@ -122,7 +122,7 @@ handshake request.
   my $ua = $app->ua;
   $app   = $app->ua(Mojo::UserAgent->new);
 
-A full featured HTTP 1.1 user agent for use in your applications, by default
+A full featured HTTP 1.1 user agent for use in your applications, defaults to
 a L<Mojo::UserAgent> object.
 
 =head1 METHODS

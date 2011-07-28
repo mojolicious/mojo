@@ -677,7 +677,7 @@ The children of this routes object, used for nesting routes.
   my $cache = $r->cache;
   $r        = $r->cache(Mojo::Cache->new);
 
-Routing cache, by default a L<Mojo::Cache> object.
+Routing cache, defaults to a L<Mojo::Cache> object.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<conditions>
@@ -742,8 +742,7 @@ Route has no specific end, remaining characters will be captured in C<path>.
   my $pattern = $r->pattern;
   $r          = $r->pattern(Mojolicious::Routes::Pattern->new);
 
-Pattern for this route, by default a L<Mojolicious::Routes::Pattern> object
-and used for matching.
+Pattern for this route, defaults to a L<Mojolicious::Routes::Pattern> object.
 
 =head2 C<shortcuts>
 

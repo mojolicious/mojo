@@ -165,17 +165,17 @@ organized CPAN distribution to maximize maintainability.
 
 Both application skeletons can be automatically generated.
 
-  % mojo generate lite_app
-  % mojo generate app
+  $ mojo generate lite_app
+  $ mojo generate app
 
 =head2 Foundation
 
 We start our new application with a single executable Perl script.
 
-  % mkdir myapp
-  % cd myapp
-  % touch myapp.pl
-  % chmod 744 myapp.pl
+  $ mkdir myapp
+  $ cd myapp
+  $ touch myapp.pl
+  $ chmod 744 myapp.pl
 
 This will be the foundation for our login manager example application.
 
@@ -192,7 +192,7 @@ This will be the foundation for our login manager example application.
 The built-in development web server makes working on your application a lot
 of fun thanks to automatic reloading.
 
-  % morbo myapp.pl
+  $ morbo myapp.pl
   Server available at http://127.0.0.1:3000.
 
 Just save your changes and they will be automatically in effect the next time
@@ -204,9 +204,9 @@ In L<Mojolicious> we consider web applications simple frontends for existing
 business logic, that means L<Mojolicious> is by design entirely L<model>
 layer agnostic and you just use whatever Perl modules you like most.
 
-  % mkdir lib
-  % touch lib/MyUsers.pm
-  % chmod 644 lib/MyUsers.pm
+  $ mkdir lib
+  $ touch lib/MyUsers.pm
+  $ chmod 644 lib/MyUsers.pm
 
 Our login manager will simply use a plain old Perl module abstracting away
 all logic related to matching user names and passwords.
@@ -277,9 +277,9 @@ access query parameters, POST parameters and route placeholders, all at once.
 In L<Mojolicious> we take test driven development very serious and try to
 promote it wherever we can.
 
-  % mkdir t
-  % touch t/login.t
-  % chmod 644 t/login.t
+  $ mkdir t
+  $ touch t/login.t
+  $ chmod 644 t/login.t
 
 L<Test::Mojo> is a scriptable HTTP user agent designed specifically for
 testing, with many fun state of the art features such as CSS3 selectors based
@@ -317,8 +317,8 @@ on L<Mojo::DOM>.
 From now on you can always check your progress by running these unit tests
 against your application.
 
-  % ./myapp.pl test
-  % ./myapp.pl test t/login.t
+  $ ./myapp.pl test
+  $ ./myapp.pl test t/login.t
 
 To make the tests less noisy and limit log output to just C<error> messages
 you can also add a line like this.
@@ -327,10 +327,10 @@ you can also add a line like this.
 
 Quick C<GET> requests can be performed right from the command line.
 
-  % ./myapp.pl get /
+  $ ./myapp.pl get /
   Wrong username or password!
 
-  % ./myapp.pl get -v '/?user=sri&pass=secr3t'
+  $ ./myapp.pl get -v '/?user=sri&pass=secr3t'
   HTTP/1.1 200 OK
   Connection: Keep-Alive
   Date: Sun, 18 Jul 2010 13:09:58 GMT
@@ -470,7 +470,7 @@ All templates and static files inlined in the C<DATA> section can be
 automatically turned into separate files in the C<templates> and C<public>
 directories.
 
-  % ./myapp.pl inflate
+  $ ./myapp.pl inflate
 
 Those directories always get priority, so inflating can also be a great way
 to allow your users to customize their applications.
@@ -480,8 +480,8 @@ to allow your users to customize their applications.
 This is the heart of every full L<Mojolicious> application and always gets
 instantiated during server startup.
 
-  % touch lib/MyApp.pm
-  % chmod 644 lib/MyApp.pm
+  $ touch lib/MyApp.pm
+  $ chmod 644 lib/MyApp.pm
 
 We will start by extracting all actions from C<myapp.pl> and turn them into
 simplified hybrid routes in the L<Mojolicious::Routes> router, none of the
@@ -554,9 +554,9 @@ allow running unit tests again.
 Hybrid routes are a nice intermediate step, but to maximize maintainability
 it makes sense to split our action code from its routing information.
 
-  % mkdir lib/MyApp
-  % touch lib/MyApp/Login.pm
-  % chmod 644 lib/MyApp/Login.pm
+  $ mkdir lib/MyApp
+  $ touch lib/MyApp/Login.pm
+  $ chmod 644 lib/MyApp/Login.pm
 
 Once again the actual action code does not change at all.
 
@@ -625,18 +625,18 @@ most.
 Templates are usually bound to controllers, so they need to be moved into the
 appropriate directories.
 
-  % mkdir templates/login
-  % mv templates/index.html.ep templates/login/index.html.ep
-  % mv templates/protected.html.ep templates/login/protected.html.ep
+  $ mkdir templates/login
+  $ mv templates/index.html.ep templates/login/index.html.ep
+  $ mv templates/protected.html.ep templates/login/protected.html.ep
 
 =head2 Script
 
 Finally C<myapp.pl> can be replaced with a proper L<Mojolicious> script.
 
-  % rm myapp.pl
-  % mkdir script
-  % touch script/myapp
-  % chmod 744 script/myapp
+  $ rm myapp.pl
+  $ mkdir script
+  $ touch script/myapp
+  $ chmod 744 script/myapp
 
 The library detection code was specifically designed for tricky production
 environments.

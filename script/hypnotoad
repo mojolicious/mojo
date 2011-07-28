@@ -60,8 +60,8 @@ hypnotoad - Hypnotoad HTTP 1.1 And WebSocket Server
 
 =head1 SYNOPSIS
 
-  % hypnotoad --help
-  % hypnotoad myapp.pl
+  $ hypnotoad --help
+  $ hypnotoad myapp.pl
 
 =head1 DESCRIPTION
 

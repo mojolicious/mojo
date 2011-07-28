@@ -64,8 +64,8 @@ morbo - Morbo HTTP 1.1 And WebSocket Development Server
 
 =head1 SYNOPSIS
 
-  % morbo --help
-  % morbo myapp.pl
+  $ morbo --help
+  $ morbo myapp.pl
 
 =head1 DESCRIPTION
 

@@ -18,18 +18,18 @@ L<Mojolicious> contains a very portable HTTP 1.1 compliant web server.
 It is usually used during development but is solid and fast enough for small
 to mid sized applications.
 
-  % ./script/myapp daemon
+  $ ./script/myapp daemon
   Server available at http://127.0.0.1:3000.
 
 It has many configuration options and is known to work on every platform
 Perl works on.
 
-  % ./script/myapp help daemon
+  $ ./script/myapp help daemon
   ...List of available options...
 
 Another huge advantage is that it supports TLS and WebSockets out of the box.
 
-  % ./script/myapp daemon --listen https://*:3000
+  $ ./script/myapp daemon --listen https://*:3000
   Server available at https://127.0.0.1:3000.
 
 A development certificate for testing purposes is built right in, so it just
@@ -50,7 +50,7 @@ of multiple cpu cores and copy-on-write.
 It is based on the normal built-in web server but optimized specifically for
 production environments out of the box.
 
-  % hypnotoad script/myapp
+  $ hypnotoad script/myapp
   Server available at http://127.0.0.1:8080.
 
 Config files are plain Perl scripts for maximal customizability.
@@ -64,7 +64,7 @@ That means you can upgrade L<Mojolicious>, Perl or even system libraries at
 runtime without ever stopping the server or losing a single incoming
 connection, just by running the command above again.
 
-  % hypnotoad script/myapp
+  $ hypnotoad script/myapp
   Starting hot deployment for Hypnotoad server 31841.
 
 =head2 Nginx
@@ -118,7 +118,7 @@ and adapters to web servers.
 L<PSGI> and L<Plack> are inspired by Python's WSGI and Ruby's Rack.
 L<Mojolicious> applications are ridiculously simple to deploy with L<Plack>.
 
-  % plackup ./script/myapp
+  $ plackup ./script/myapp
   HTTP::Server::PSGI: Accepting connections at http://0:5000/
 
 L<Plack> provides many server and protocol adapters for you to choose from
@@ -126,7 +126,7 @@ such as C<FCGI>, C<SCGI> and C<mod_perl>.
 Make sure to run C<plackup> from your applications home directory, otherwise
 libraries might not be found.
 
-  % plackup ./script/myapp -s FCGI -l /tmp/myapp.sock
+  $ plackup ./script/myapp -s FCGI -l /tmp/myapp.sock
 
 Because C<plackup> uses a weird trick to load your script, L<Mojolicious> is
 not always able to detect the applications home directory, if that's the case
@@ -134,7 +134,7 @@ you can simply use the C<MOJO_HOME> environment variable.
 Also note that C<app-E<gt>start> needs to be the last Perl statement in the
 application script for the same reason.
 
-  % MOJO_HOME=/home/sri/myapp plackup ./script/myapp
+  $ MOJO_HOME=/home/sri/myapp plackup ./script/myapp
   HTTP::Server::PSGI: Accepting connections at http://0:5000/
 
 Some server adapters might ask for a C<.psgi> file, if that's the case you
@@ -423,36 +423,36 @@ Thanks to the C<mojo get> command that is about to change.
 You can just pick the parts that actually matter with the CSS3 selectors from
 L<Mojo::DOM>.
 
-  % mojo get http://mojolicio.us 'head > title'
+  $ mojo get http://mojolicio.us 'head > title'
 
 How about a list of all id attributes?
 
-  % mojo get http://mojolicio.us '*' attr id
+  $ mojo get http://mojolicio.us '*' attr id
 
 Or the text content of all heading tags?
 
-  % mojo get http://mojolicio.us 'h1, h2, h3' text
+  $ mojo get http://mojolicio.us 'h1, h2, h3' text
 
 Maybe just the text of the third heading?
 
-  % mojo get http://mojolicio.us 'h1, h2, h3' 3 text
+  $ mojo get http://mojolicio.us 'h1, h2, h3' 3 text
 
 You can also extract all text from nested child elements.
 
-  % mojo get http://mojolicio.us '#mojobar' all
+  $ mojo get http://mojolicio.us '#mojobar' all
 
 The request can be customized as well.
 
-  % mojo get --method post --content 'Hello!' http://mojolicio.us
-  % mojo get --header 'X-Bender: Bite my shiny metal ass!' http://google.com
+  $ mojo get --method post --content 'Hello!' http://mojolicio.us
+  $ mojo get --header 'X-Bender: Bite my shiny metal ass!' http://google.com
 
 You can follow redirects and view the headers for all messages.
 
-  % mojo get --redirect --verbose http://reddit.com 'head > title'
+  $ mojo get --redirect --verbose http://reddit.com 'head > title'
 
 This can be an invaluable tool for testing your applications.
 
-  % ./myapp.pl get /welcome 'head > title'
+  $ ./myapp.pl get /welcome 'head > title'
 
 =head1 HACKS
 
@@ -464,7 +464,7 @@ Don't you hate waiting for C<make test> to finally finish?
 In newer Perl versions you can set the C<HARNESS_OPTIONS> environment
 variable to take advantage of multiple cpu cores and run tests parallel.
 
-  % HARNESS_OPTIONS=j5 make test
+  $ HARNESS_OPTIONS=j5 make test
   ...
 
 The C<j5> allows 5 tests to run at the same time, which makes for example the
@@ -477,22 +477,22 @@ application to test something?
 Thanks to the C<eval> command you can do just that, the application instance
 itself can be accessed via C<app>.
 
-  % mojo generate lite_app
-  % ./myapp.pl eval 'print app->static->root, "\n"'
+  $ mojo generate lite_app
+  $ ./myapp.pl eval 'print app->static->root, "\n"'
 
 The C<verbose> option will automatically print the return value to C<STDOUT>.
 
-  % ./myapp.pl eval -v 'app->static->root'
+  $ ./myapp.pl eval -v 'app->static->root'
 
 =head2 Making Your Application Installable
 
 Ever thought about releasing your L<Mojolicious> application to CPAN?
 It's actually much easier than you might think.
 
-  % mojo generate app
-  % cd my_mojolicious_app
-  % mv public lib/MyMojoliciousApp/
-  % mv templates lib/MyMojoliciousApp/
+  $ mojo generate app
+  $ cd my_mojolicious_app
+  $ mv public lib/MyMojoliciousApp/
+  $ mv templates lib/MyMojoliciousApp/
 
 The trick is to move the C<public> and C<templates> directories so they can
 get automatically installed with the modules.
@@ -530,11 +530,11 @@ get automatically installed with the modules.
 That's really everything, now you can package your application like any other
 CPAN module.
 
-  % ./script/my_mojolicious_app generate makefile
-  % perl Makefile.PL
-  % make test
-  % make manifest
-  % make dist
+  $ ./script/my_mojolicious_app generate makefile
+  $ perl Makefile.PL
+  $ make test
+  $ make manifest
+  $ make dist
 
 =head2 Hello World
 

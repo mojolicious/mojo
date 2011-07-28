@@ -547,7 +547,7 @@ The C<inflate> command will write all templates and static files from the
 C<DATA> section into actual files in the C<templates> and C<public>
 directories.
 
-  % ./myapp.pl inflate
+  $ ./myapp.pl inflate
 
 =head2 Customizing The Template Syntax
 

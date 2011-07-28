@@ -340,10 +340,10 @@ These three lines are a whole web application.
 To run this example with the built-in development web server just put the
 code into a file and execute it with C<perl>.
 
-  % perl hello.pl daemon
+  $ perl hello.pl daemon
   Server available at http://127.0.0.1:3000.
 
-  % curl http://127.0.0.1:3000/
+  $ curl http://127.0.0.1:3000/
   Hello World!
 
 =head2 Duct Tape For The HTML5 Web

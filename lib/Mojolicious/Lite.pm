@@ -120,7 +120,7 @@ application.
 
 There is also a helper command to generate a small example application.
 
-  % mojo generate lite_app
+  $ mojo generate lite_app
 
 =head2 Commands
 
@@ -129,19 +129,19 @@ available from the command line.
 Note that CGI, FastCGI and PSGI environments can usually be auto detected and
 will just work without commands.
 
-  % ./myapp.pl daemon
+  $ ./myapp.pl daemon
   Server available at http://127.0.0.1:3000.
 
-  % ./myapp.pl daemon --listen http://*:8080
+  $ ./myapp.pl daemon --listen http://*:8080
   Server available at http://127.0.0.1:8080.
 
-  % ./myapp.pl cgi
+  $ ./myapp.pl cgi
   ...CGI output...
 
-  % ./myapp.pl fastcgi
+  $ ./myapp.pl fastcgi
   ...Blocking FastCGI main loop...
 
-  % ./myapp.pl
+  $ ./myapp.pl
   ...List of available commands (or automatically detected environment)...
 
 =head2 Start
@@ -157,7 +157,7 @@ Your application will automatically reload itself if you start it with the
 C<morbo> development web server, so you don't have to restart the server
 after every change.
 
-  % morbo myapp.pl
+  $ morbo myapp.pl
   Server available at http://127.0.0.1:3000.
 
 =head2 Routes
@@ -709,8 +709,8 @@ Static files will be automatically served from the C<DATA> section
   @@ test.txt (base64)
   dGVzdCAxMjMKbGFsYWxh
 
-  % mkdir public
-  % mv something.js public/something.js
+  $ mkdir public
+  $ mv something.js public/something.js
 
 =head2 Testing
 
@@ -728,7 +728,7 @@ it with normal Perl unit tests.
 
 Run all unit tests with the C<test> command.
 
-  % ./myapp.pl test
+  $ ./myapp.pl test
 
 To make your tests more noisy and show you all log messages you can also
 change the application log level directly in your test files.
@@ -740,14 +740,14 @@ change the application log level directly in your test files.
 To disable debug messages later in a production setup you can change the
 L<Mojolicious> mode, default will be C<development>.
 
-  % ./myapp.pl --mode production
+  $ ./myapp.pl --mode production
 
 =head2 Logging
 
 L<Mojo::Log> messages will be automatically written to a C<log/$mode.log>
 file if a C<log> directory exists.
 
-  % mkdir log
+  $ mkdir log
 
 For more control the L<Mojolicious> instance can be accessed directly.
 
@@ -784,7 +784,7 @@ L<Mojolicious::Lite> and L<Mojolicious> applications.
 Both share about 99% of the same code, so almost everything you learned in
 this tutorial applies there too. :)
 
-  % mojo generate app
+  $ mojo generate app
 
 =head2 More
 

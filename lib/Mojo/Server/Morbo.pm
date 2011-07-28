@@ -145,7 +145,7 @@ support.
 
 To start applications with it you can use the L<morbo> script.
 
-  % morbo myapp.pl
+  $ morbo myapp.pl
   Server available at http://127.0.0.1:3000.
 
 Optional modules L<EV>, L<IO::Socket::IP>, L<IO::Socket::SSL> and

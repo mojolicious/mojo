@@ -401,7 +401,7 @@ Check if value is a valid C<IPv4> address.
 
   my $is_ipv6 = $resolver->is_ipv6('::1');
 
-Check if value is a valid C<IPv4> address.
+Check if value is a valid C<IPv6> address.
 
 =head2 C<lookup>
 

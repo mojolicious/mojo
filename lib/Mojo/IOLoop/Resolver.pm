@@ -207,12 +207,12 @@ sub _bind {
   # New socket
   my $loop = $self->ioloop;
   weaken $self;
-  my $id = $self->{id} = $loop->connect(
+  $self->{id} = $loop->connect(
     address  => $server,
     port     => 53,
     on_close => sub { $self->_cleanup },
     on_error => sub {
-      my ($loop, $id) = @_;
+      my $loop = shift;
       warn "RESOLVE FAILURE ($server)\n" if DEBUG;
       $CURRENT_SERVER++;
       $self->_cleanup;
@@ -224,7 +224,6 @@ sub _bind {
       my @packet = unpack 'nnnnnna*', $chunk;
       warn "ANSWERS $packet[3] ($server)\n" if DEBUG;
       return unless my $r = delete $self->{requests}->{$packet[0]};
-      $loop->drop($r->{timer});
 
       # Questions
       my $content = $packet[6];
@@ -250,11 +249,11 @@ sub _bind {
         push @answers, [@answer, $ttl];
         warn "ANSWER $answer[0] $answer[1]\n" if DEBUG;
       }
+      $loop->drop($r->{timer});
       $r->{cb}->($self, \@answers);
     },
     args => {Proto => 'udp', Type => SOCK_DGRAM}
   );
-  $loop->connection_timeout($id => 0);
 }
 
 sub _cleanup {

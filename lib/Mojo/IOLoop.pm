@@ -257,10 +257,8 @@ sub one_tick {
     }
 
     # Connection timeout
-    my $time = $c->{active} ||= time;
-    $c->{timeout} = 15 unless defined $c->{timeout};
-    next unless my $timeout = $c->{timeout};
-    $self->_drop($id) if (time - $time) >= $timeout;
+    $self->_drop($id)
+      if (time - ($c->{active} || time)) >= ($c->{timeout} || 15);
   }
 
   # Graceful shutdown

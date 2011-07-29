@@ -33,7 +33,7 @@ is $r->is_ipv6('foo.1.1.1.1.de'), undef, 'not an IPv4 address';
 is $r->is_ipv4('1.1.1.1.1.1'),    undef, 'not an IPv4 address';
 is $r->is_ipv6('1.1.1.1.1.1'),    undef, 'not an IPv4 address';
 
-# Lookup "localhost"
+# Lookup "localhost" (pass through)
 my $result;
 $r->lookup(
   'localhost',

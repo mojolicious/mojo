@@ -3,15 +3,16 @@
 use strict;
 use warnings;
 
-# Disable Bonjour, IPv6 and libev
+# Disable Bonjour and libev
 BEGIN {
-  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
-  $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
+  $ENV{MOJO_NO_BONJOUR} = 1;
+  $ENV{MOJO_IOWATCHER}  = 'Mojo::IOWatcher';
 }
 
 use Test::More;
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
+plan skip_all => 'Perl 5.12 required for this test!' unless $] >= 5.012;
 plan tests => 18;
 
 use_ok 'Mojo::IOLoop';

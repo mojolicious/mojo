@@ -2,30 +2,14 @@ package Mojo::IOLoop::Resolver;
 use Mojo::Base -base;
 
 use IO::File;
-use IO::Socket::INET;
 use List::Util 'first';
 use Scalar::Util 'weaken';
+use Socket;
 
 use constant DEBUG => $ENV{MOJO_RESOLVER_DEBUG} || 0;
 
-# "AF_INET6" requires Socket6 or Perl 5.12
-use constant IPV6_AF_INET6 => eval { Socket::AF_INET6() }
-  || eval { require Socket6 and Socket6::AF_INET6() };
-
-# "inet_pton" requires Socket6 or Perl 5.12
-BEGIN {
-
-  # Socket
-  if (defined &Socket::inet_pton) { *inet_pton = \&Socket::inet_pton }
-
-  # Socket6
-  elsif (eval { require Socket6 and defined &Socket6::inet_pton }) {
-    *inet_pton = \&Socket6::inet_pton;
-  }
-}
-
 # IPv6 DNS support requires "AF_INET6" and "inet_pton"
-use constant IPV6 => defined IPV6_AF_INET6 && defined &inet_pton;
+use constant IPV6 => defined &Socket::AF_INET6 && defined &Socket::inet_pton;
 
 has ioloop => sub {
   require Mojo::IOLoop;
@@ -145,14 +129,14 @@ sub resolve {
   my ($self, $name, $type, $cb) = @_;
 
   # No lookup required or record type not supported
-  my $server = $self->servers;
   my $t      = $DNS_TYPES->{$type};
-  my $ipv4   = $self->is_ipv4($name);
-  my $ipv6   = IPV6 && $self->is_ipv6($name) ? 1 : 0;
+  my $v4     = $self->is_ipv4($name);
+  my $v6     = IPV6 ? $self->is_ipv6($name) : 0;
+  my $server = $self->servers;
   my $loop   = $self->ioloop;
   weaken $self;
   return $loop->timer(0 => sub { $self->$cb([]) })
-    if !$server || !$t || ($t ne $DNS_TYPES->{PTR} && ($ipv4 || $ipv6));
+    if !$server || !$t || ($t ne $DNS_TYPES->{PTR} && ($v4 || $v6));
 
   # Build request
   warn "RESOLVE $type $name ($server)\n" if DEBUG;
@@ -167,12 +151,12 @@ sub resolve {
   if ($t eq $DNS_TYPES->{PTR}) {
 
     # IPv4
-    if ($ipv4) { @parts = reverse 'arpa', 'in-addr', @parts }
+    if ($v4) { @parts = reverse 'arpa', 'in-addr', @parts }
 
     # IPv6
-    elsif ($ipv6) {
+    elsif ($v6) {
       @parts = reverse 'arpa', 'ip6', split //, unpack 'H32',
-        inet_pton(IPV6_AF_INET6, $name);
+        Socket::inet_pton(Socket::AF_INET6(), $name);
     }
   }
 

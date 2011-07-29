@@ -75,7 +75,8 @@ $loop->recurring(0 => sub { $after++ });
 $loop->drop($id);
 $loop->timer(1 => sub { shift->stop });
 $loop->start;
-ok $after > 2, 'more than two ticks';
+$loop->one_tick;
+ok $after > 1, 'more than one tick';
 is $ticks, $before, 'no additional ticks';
 
 # Recurring timer
@@ -83,7 +84,8 @@ my $count = 0;
 $loop->recurring(0.5 => sub { $count++ });
 $loop->timer(3 => sub { shift->stop });
 $loop->start;
-ok $count > 4, 'more than four recurring events';
+$loop->one_tick;
+ok $count > 3, 'more than three recurring events';
 
 # Handle
 my $port = Mojo::IOLoop->generate_port;

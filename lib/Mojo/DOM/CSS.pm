@@ -465,6 +465,10 @@ Mojo::DOM::CSS - CSS3 Selector Engine
 
   use Mojo::DOM::CSS;
 
+  # Select elements from DOM tree
+  my $css = Mojo::DOM::CSS->new(tree => $tree);
+  my $elements = $css->select('h1, h2, h3');
+
 =head1 DESCRIPTION
 
 L<Mojo::DOM::CSS> is the CSS3 selector engine used by L<Mojo::DOM>.

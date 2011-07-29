@@ -436,6 +436,11 @@ Mojo::DOM::HTML - HTML5/XML Engine
 
   use Mojo::DOM::HTML;
 
+  # Turn HTML5 into DOM tree
+  my $html = Mojo::DOM::HTML->new;
+  $html->parse('<div><p id="a">A</p><p id="b">B</p></div>');
+  my $tree = $html->tree;
+
 =head1 DESCRIPTION
 
 L<Mojo::DOM::HTML> is the HTML5/XML engine used by L<Mojo::DOM>.

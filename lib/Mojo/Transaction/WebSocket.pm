@@ -370,7 +370,7 @@ Mojo::Transaction::WebSocket - WebSocket Transaction Container
 =head1 DESCRIPTION
 
 L<Mojo::Transaction::WebSocket> is a container for WebSocket transactions as
-described in C<The WebSocket protocol>.
+described in C<draft-ietf-hybi-thewebsocketprotocol-10>.
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 ATTRIBUTES

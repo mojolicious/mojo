@@ -714,8 +714,8 @@ current request.
 
   my $tx = $c->tx;
 
-The transaction that is currently being processed, defaults to a
-L<Mojo::Transaction::HTTP> object.
+The transaction that is currently being processed, usually a
+L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object.
 
 =head1 METHODS
 

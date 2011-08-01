@@ -628,11 +628,10 @@ L<Mojolicious::Static> object.
   my $types = $app->types;
   $app      = $app->types(Mojolicious::Types->new);
 
-Responsible for tracking the types of content you want to serve in your
-application, defaults to a L<Mojolicious::Types> object.
-You can easily register new types.
+Responsible for connecting file extensions with MIME types, defaults to a
+L<Mojolicious::Types> object.
 
-  $app->types->type(twitter => 'text/tweet');
+  $app->types->type(twt => 'text/tweet');
 
 =head1 METHODS
 

@@ -7,6 +7,8 @@ BEGIN {
   $ENV{MOJO_APP} = $backup;
 }
 
+sub import { }
+
 # "Don't worry, son.
 #  I'm sure he's up in heaven right now laughing it up with all the other
 #  celebrities: John Dilinger, Ty Cobb, Joseph Stalin."

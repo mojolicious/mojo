@@ -1,15 +1,15 @@
 package Mojo::HelloWorld;
 use Mojo::Base 'Mojolicious::Lite';
 
-# "Don't worry, son.
-#  I'm sure he's up in heaven right now laughing it up with all the other
-#  celebrities: John Dilinger, Ty Cobb, Joseph Stalin."
 BEGIN {
   my $backup = $ENV{MOJO_APP} || '';
   Mojo::HelloWorld->import;
   $ENV{MOJO_APP} = $backup;
 }
 
+# "Don't worry, son.
+#  I'm sure he's up in heaven right now laughing it up with all the other
+#  celebrities: John Dilinger, Ty Cobb, Joseph Stalin."
 use Scalar::Util 'weaken';
 
 # "Does whisky count as beer?"
@@ -102,20 +102,18 @@ any '/upload' => sub {
   }
 };
 
-get '/websocket' => sub {
+any '/websocket' => sub {
   my $self = shift;
   $self->on_message(sub { shift->send_message(shift) })
     if $self->tx->is_websocket;
 };
 
-# "How is education supposed to make me feel smarter? Besides,
-#  every time I learn something new,
+# "How is education supposed to make me feel smarter?
+#  Besides, every time I learn something new,
 #  it pushes some old stuff out of my brain.
 #  Remember when I took that home winemaking course,
 #  and I forgot how to drive?"
-under '/';
-
-any '/*everything' => {text => 'Your Mojo is working!'};
+under->any('/*everything' => {text => 'Your Mojo is working!'});
 
 1;
 __DATA__
@@ -159,7 +157,7 @@ Non-Blocking:
 
 @@ upload.html.ep
 % layout 'default';
-% title 'Uplaod';
+% title 'Upload';
 File:
 <%= form_for 'upload', method => 'POST',
       enctype => 'multipart/form-data' => begin %>
@@ -210,8 +208,8 @@ Mojo::HelloWorld - Hello World!
 
 =head1 DESCRIPTION
 
-L<Mojo::HelloWorld> is the default L<Mojo> application, used mostly for
-testing.
+L<Mojo::HelloWorld> is the default L<Mojolicious> application, used mostly
+for testing.
 
 =head1 SEE ALSO
 

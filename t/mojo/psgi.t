@@ -36,7 +36,7 @@ my $env = {
 my $res = $app->($env);
 is $res->[0], 200, 'right status';
 my %headers = @{$res->[1]};
-is keys(%headers), 3, 'right number of headers';
+ok keys(%headers) >= 3, 'enough headers';
 ok $headers{Date}, 'right "Date" value';
 is $headers{'Content-Length'}, 43, 'right "Content-Length" value';
 is $headers{'Content-Type'}, 'application/json', 'right "Content-Type" value';
@@ -75,7 +75,7 @@ $app = Mojolicious::Command::Psgi->new->run;
 $res = $app->($env);
 is $res->[0], 200, 'right status';
 %headers = @{$res->[1]};
-is keys(%headers), 3, 'right number of headers';
+ok keys(%headers) >= 3, 'enough headers';
 ok $headers{Date}, 'right "Date" value';
 is $headers{'Content-Length'}, 43, 'right "Content-Length" value';
 is $headers{'Content-Type'}, 'application/json', 'right "Content-Type" value';
@@ -111,7 +111,7 @@ $env = {
 $app = Mojolicious::Command::Psgi->new->run;
 $res = $app->($env);
 is $res->[0], 200, 'right status';
-is scalar @{$res->[1]}, 10, 'right number of values';
+ok scalar @{$res->[1]} >= 10, 'enough headers';
 my $i = 0;
 for my $header (@{$res->[1]}) { $i++ if $header eq 'Set-Cookie' }
 is $i, 2, 'right number of "Set-Cookie" headers';

@@ -2,9 +2,8 @@ package Mojo::HelloWorld;
 use Mojo::Base 'Mojolicious::Lite';
 
 BEGIN {
-  my $backup = $ENV{MOJO_APP} || '';
+  local $ENV{MOJO_APP};
   Mojo::HelloWorld->import;
-  $ENV{MOJO_APP} = $backup;
 }
 
 sub import { }

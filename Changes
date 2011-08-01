@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-1.69    2011-07-29 00:00:00
+1.69    2011-08-01 00:00:00
         - Modernized Mojo::HelloWorld.
         - Improved documentation.
 

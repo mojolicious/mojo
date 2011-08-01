@@ -44,7 +44,9 @@ any '/chunked_params' => sub {
 };
 
 any '/cookies' => sub {
-  my $self   = shift;
+  my $self = shift;
+
+  # Turn parameters into cookies
   my $params = $self->req->params->to_hash;
   for my $key (sort keys %$params) {
     $self->cookie($key, $params->{$key});
@@ -92,15 +94,16 @@ any '/proxy' => sub {
 
 any '/upload' => sub {
   my $self = shift;
-  my $req  = $self->req;
-  if (my $file = $req->upload('file')) {
-    my $headers = $self->res->headers;
-    $headers->content_type($file->headers->content_type
-        || 'application/octet-stream');
-    $headers->header('X-Upload-Limit-Exceeded' => 1)
-      if $req->is_limit_exceeded;
-    $self->render_data($file->slurp);
-  }
+
+  # Echo uploaded file
+  my $req = $self->req;
+  return unless my $file = $req->upload('file');
+  my $headers = $self->res->headers;
+  $headers->content_type($file->headers->content_type
+      || 'application/octet-stream');
+  $headers->header('X-Upload-Limit-Exceeded' => 1)
+    if $req->is_limit_exceeded;
+  $self->render_data($file->slurp);
 };
 
 any '/websocket' => sub {
@@ -114,7 +117,7 @@ any '/websocket' => sub {
 #  it pushes some old stuff out of my brain.
 #  Remember when I took that home winemaking course,
 #  and I forgot how to drive?"
-under->any('/*everything' => {text => 'Your Mojo is working!'});
+under->any('/*whatever' => {text => 'Your Mojo is working!'});
 
 1;
 __DATA__

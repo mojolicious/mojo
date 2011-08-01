@@ -64,35 +64,7 @@ EOF
   shift->prepend(@_);
 }
 
-sub all_text {
-  my $self = shift;
-
-  # Walk tree
-  my $text  = '';
-  my $tree  = $self->tree;
-  my $start = $tree->[0] eq 'root' ? 1 : 4;
-  my @stack = @$tree[$start .. $#$tree];
-  while (my $e = shift @stack) {
-    my $type = $e->[0];
-
-    # Add children of nested tag to stack
-    unshift @stack, @$e[4 .. $#$e] and next if $type eq 'tag';
-
-    # Text
-    my $content = '';
-    if ($type eq 'text') {
-      $content = $self->_trim($e->[1], $text =~ /\S$/);
-    }
-
-    # CDATA or raw text
-    elsif ($type eq 'cdata' || $type eq 'raw') { $content = $e->[1] }
-
-    # Ignore whitespace blocks
-    $text .= $content if $content =~ /\S+/;
-  }
-
-  return $text;
-}
+sub all_text { shift->_text(1) }
 
 sub append { shift->_add(1, @_) }
 
@@ -329,30 +301,7 @@ sub root {
   );
 }
 
-sub text {
-  my $self = shift;
-
-  # Walk stack
-  my $text = '';
-  for my $e (@{$self->tree}) {
-    next unless ref $e eq 'ARRAY';
-    my $type = $e->[0];
-
-    # Text
-    my $content = '';
-    if ($type eq 'text') {
-      $content = $self->_trim($e->[1], $text =~ /\S$/);
-    }
-
-    # CDATA or raw text
-    elsif ($type eq 'cdata' || $type eq 'raw') { $content = $e->[1] }
-
-    # Ignore whitespace blocks
-    $text .= $content if $content =~ /\S+/;
-  }
-
-  return $text;
-}
+sub text { shift->_text(0) }
 
 sub to_xml { shift->[0]->render }
 
@@ -427,16 +376,44 @@ sub _parse {
     ->parse(shift)->tree;
 }
 
-sub _trim {
-  my ($self, $text, $ws) = @_;
+sub _text {
+  my ($self, $recursive) = @_;
 
-  # Trim whitespace
-  $text =~ s/^\s*\n+\s*//;
-  $text =~ s/\s*\n+\s*$//;
-  $text =~ s/\s*\n+\s*/\ /g;
+  # Walk tree
+  my $text  = '';
+  my $tree  = $self->tree;
+  my $start = $tree->[0] eq 'root' ? 1 : 4;
+  my @stack = @$tree[$start .. $#$tree];
+  while (my $e = shift @stack) {
+    my $type = $e->[0];
 
-  # Add leading whitespace if punctuation allows it
-  $text = " $text" if $ws && $text =~ /^[^\.\!\?\,\;\:]/;
+    # Add children of nested tag to stack
+    if ($type eq 'tag') {
+      unshift @stack, @$e[4 .. $#$e] if $recursive;
+      next;
+    }
+
+    # Text
+    my $content = '';
+    if ($type eq 'text') {
+      $content = $e->[1];
+
+      # Trim whitespace
+      $content =~ s/^\s*\n+\s*//;
+      $content =~ s/\s*\n+\s*$//;
+      $content =~ s/\s*\n+\s*/\ /g;
+
+      # Add leading whitespace if punctuation allows it
+      $content = " $content"
+        if $text =~ /\S$/ && $content =~ /^[^\.\!\?\,\;\:]/;
+    }
+
+    # CDATA or raw text
+    elsif ($type eq 'cdata' || $type eq 'raw') { $content = $e->[1] }
+
+    # Ignore whitespace blocks
+    $text .= $content if $content =~ /\S+/;
+  }
 
   return $text;
 }

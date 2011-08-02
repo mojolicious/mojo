@@ -5,9 +5,13 @@ use Scalar::Util 'weaken';
 
 use constant DEBUG => $ENV{MOJO_EVENTEMITTER_DEBUG} || 0;
 
-# "Back you robots!
-#  Nobody ruins my family vacation but me!
-#  And maybe the boy."
+# "Are we there yet?
+#  No
+#  Are we there yet?
+#  No
+#  Are we there yet?
+#  No
+#  ...Where are we going?"
 sub emit {
   my $self = shift;
   my $name = shift;
@@ -49,6 +53,9 @@ sub subscribers {
   return [@{$self->{events}->{$name} || []}];
 }
 
+# "Back you robots!
+#  Nobody ruins my family vacation but me!
+#  And maybe the boy."
 sub unsubscribe {
   my ($self, $name, $cb) = @_;
   my $subscribers = $self->{events}->{$name} || [];

@@ -22,6 +22,7 @@ has resolver => sub {
   Mojo::IOLoop::Resolver->new;
 };
 
+# "It's like my dad always said: eventually, everybody gets shot."
 sub DESTROY {
   my $self = shift;
   return if $self->{connected};
@@ -127,6 +128,8 @@ sub _connect {
   );
 }
 
+# "Have you ever seen that Blue Man Group? Total ripoff of the Smurfs.
+#  And the Smurfs, well, they SUCK."
 sub _connecting {
   my $self = shift;
 

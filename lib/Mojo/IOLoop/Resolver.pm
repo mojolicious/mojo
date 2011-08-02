@@ -256,6 +256,8 @@ sub _bind {
   );
 }
 
+# "Mrs. Simpson, bathroom is not for customers.
+#  Please use the crack house across the street."
 sub _cleanup {
   my $self = shift;
   return unless my $loop = $self->ioloop;

@@ -27,7 +27,6 @@ has name               => 'Mojolicious (Perl)';
 has transactor => sub { Mojo::UserAgent::Transactor->new };
 has websocket_timeout => 300;
 
-# Make sure we leave a clean ioloop behind
 sub DESTROY { shift->_cleanup }
 
 sub app {
@@ -49,8 +48,6 @@ sub build_form_tx      { shift->transactor->form(@_) }
 sub build_tx           { shift->transactor->tx(@_) }
 sub build_websocket_tx { shift->transactor->websocket(@_) }
 
-# "The only thing I asked you to do for this party was put on clothes,
-#  and you didn't do it."
 sub delete {
   my $self = shift;
   $self->start($self->build_tx('DELETE', @_));
@@ -69,7 +66,6 @@ sub detect_proxy {
   return $self;
 }
 
-# "'What are you lookin at?' - the innocent words of a drunken child."
 sub get {
   my $self = shift;
   $self->start($self->build_tx('GET', @_));
@@ -87,8 +83,7 @@ sub need_proxy {
   return 1;
 }
 
-# "Olive oil? Asparagus? If your mother wasn't so fancy,
-#  we could just shop at the gas station like normal people."
+# "'What are you lookin at?' - the innocent words of a drunken child."
 sub post {
   my $self = shift;
   $self->start($self->build_tx('POST', @_));
@@ -99,8 +94,6 @@ sub post_form {
   $self->start($self->build_form_tx(@_));
 }
 
-# "And I gave that man directions, even though I didn't know the way,
-#  because that's the kind of guy I am this week."
 sub put {
   my $self = shift;
   $self->start($self->build_tx('PUT', @_));
@@ -133,7 +126,6 @@ sub start {
   return $tx;
 }
 
-# "It's like my dad always said: eventually, everybody gets shot."
 sub test_server {
   my $self = shift;
 
@@ -148,20 +140,11 @@ sub test_server {
     ->port($self->{port})->path('/');
 }
 
-# "Are we there yet?
-#  No
-#  Are we there yet?
-#  No
-#  Are we there yet?
-#  No
-#  ...Where are we going?"
 sub websocket {
   my $self = shift;
   $self->start($self->build_websocket_tx(@_));
 }
 
-# "Homer, it's easy to criticize.
-#  Fun, too."
 sub _cache {
   my ($self, $name, $id) = @_;
 
@@ -223,10 +206,6 @@ sub _cleanup {
   }
 }
 
-sub _close { shift->_handle(pop, 1) }
-
-# "Where on my badge does it say anything about protecting people?
-#  Uh, second word, chief."
 sub _connect {
   my ($self, $tx, $cb) = @_;
 
@@ -266,7 +245,7 @@ sub _connect {
   }
 
   # Callbacks
-  $loop->on_close($id => sub { $self->_close(@_) });
+  $loop->on_close($id => sub { $self->_handle(pop, 1) });
   $loop->on_error($id => sub { $self->_error(@_) });
   $loop->on_read($id => sub { $self->_read(@_) });
 
@@ -292,8 +271,6 @@ sub _connected {
   $self->_write($id);
 }
 
-# "Mrs. Simpson, bathroom is not for customers.
-#  Please use the crack house across the street."
 sub _drop {
   my ($self, $id, $close) = @_;
 
@@ -340,8 +317,6 @@ sub _finish {
   $self->$cb($tx);
 }
 
-# "No children have ever meddled with the Republican Party and lived to tell
-#  about it."
 sub _handle {
   my ($self, $id, $close) = @_;
 
@@ -442,7 +417,6 @@ sub _redirect {
   return 1;
 }
 
-# "It's great! We can do *anything* now that Science has invented Magic."
 sub _start {
   my ($self, $tx, $cb) = @_;
 

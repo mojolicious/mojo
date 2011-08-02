@@ -14,16 +14,16 @@ has iowatcher => sub {
   Mojo::IOLoop->singleton->iowatcher;
 };
 
+# "And America has so many enemies.
+#  Iran, Iraq, China, Mordor, the hoochies that laid low Tiger Woods,
+#  undesirable immigrants - by which I mean everyone that came after me,
+#  including my children..."
 sub DESTROY {
   my $self = shift;
   $self->pause;
   $self->emit('close') if $self->{handle};
 }
 
-# "And America has so many enemies.
-#  Iran, Iraq, China, Mordor, the hoochies that laid low Tiger Woods,
-#  undesirable immigrants - by which I mean everyone that came after me,
-#  including my children..."
 sub new {
   my $self = shift->SUPER::new;
   $self->{handle} = shift;
@@ -58,6 +58,8 @@ sub resume {
   );
 }
 
+# "No children have ever meddled with the Republican Party and lived to tell
+#  about it."
 sub steal_handle {
   my $self = shift;
   $self->pause;

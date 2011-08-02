@@ -79,6 +79,8 @@ sub create_rel_dir {
   $self->create_dir($self->rel_dir($path));
 }
 
+# "Olive oil? Asparagus? If your mother wasn't so fancy,
+#  we could just shop at the gas station like normal people."
 sub detect {
   my ($self, $guess) = @_;
 
@@ -178,6 +180,8 @@ sub render_to_rel_file {
   $self->render_to_file($data, $self->rel_dir($path), @_);
 }
 
+# "The only thing I asked you to do for this party was put on clothes,
+#  and you didn't do it."
 sub run {
   my ($self, $name, @args) = @_;
 

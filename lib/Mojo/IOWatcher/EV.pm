@@ -71,6 +71,7 @@ sub _io {
     if EV::WRITE &$revents;
 }
 
+# "It's great! We can do *anything* now that Science has invented Magic."
 sub _timer {
   my $self      = shift;
   my $after     = shift || '0.0001';

@@ -17,6 +17,8 @@ our $UNRESERVED = 'A-Za-z0-9\-\.\_\~';
 our $SUBDELIM   = '!\$\&\'\(\)\*\+\,\;\=';
 our $PCHAR      = "$UNRESERVED$SUBDELIM\%\:\@";
 
+# "Homer, it's easy to criticize.
+#  Fun, too."
 sub new {
   my $self = shift->SUPER::new();
   $self->parse(@_);

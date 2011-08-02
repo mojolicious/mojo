@@ -80,8 +80,8 @@ sub DESTROY {
   $watcher->remove($_) for values %{$self->{handles}};
 }
 
-# "Have you ever seen that Blue Man Group? Total ripoff of the Smurfs.
-#  And the Smurfs, well, they SUCK."
+# "And I gave that man directions, even though I didn't know the way,
+#  because that's the kind of guy I am this week."
 sub listen {
   my $self = shift;
   my $args = ref $_[0] ? $_[0] : {@_};
@@ -239,6 +239,8 @@ sub _key_file {
   $self->{key} = $key;
 }
 
+# "Where on my badge does it say anything about protecting people?
+#  Uh, second word, chief."
 sub _tls {
   my ($self, $handle) = @_;
 

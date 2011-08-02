@@ -317,7 +317,8 @@ sub _render {
     $start = 4;
 
     # Open tag
-    $content .= '<' . $tree->[1];
+    my $tag = $tree->[1];
+    $content .= "<$tag";
 
     # Attributes
     my @attrs;
@@ -335,7 +336,8 @@ sub _render {
     $content .= " $attrs" if $attrs;
 
     # Empty tag
-    return "$content />" unless $tree->[4];
+    return $self->xml || $VOID{$tag} ? "$content />" : "$content></$tag>"
+      unless $tree->[4];
 
     # Close tag
     $content .= '>';

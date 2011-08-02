@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 606;
+use Test::More tests => 608;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -75,7 +75,7 @@ is $dom->tree->[1]->[4]->[5]->[6]->[1], 't',    'right text';
 is $dom->tree->[1]->[5]->[0], 'text',  'right element';
 is $dom->tree->[1]->[5]->[1], 'works', 'right text';
 is "$dom", <<EOF, 'stringified right';
-<foo><bar a="b&lt;c">ju<baz a23>s<bazz />t</baz></bar>works</foo>
+<foo><bar a="b&lt;c">ju<baz a23>s<bazz></bazz>t</baz></bar>works</foo>
 EOF
 
 # Select based on parent
@@ -116,13 +116,13 @@ is "$dom", <<EOF, 'stringified right';
 <foo bar="ba&lt;z">
   test
   <simple class="working">easy</simple>
-  <test foo="bar" id="test" />
+  <test foo="bar" id="test"></test>
   <!-- lala -->
   works well
   <![CDATA[ yada yada]]>
   <?boom lalalala ?>
   <a bit broken little>
-  <very <br broken />
+  <very <br broken></very>
   more text
 </a></foo>
 EOF
@@ -331,7 +331,7 @@ $dom = Mojo::DOM->new->parse('<div>foo</div><div>bar</div>');
 $dom->find('div')->each(sub { shift->replace_content('<p>test</p>') });
 is "$dom", '<div><p>test</p></div><div><p>test</p></div>', 'right text';
 $dom->find('p')->each(sub { shift->replace_content('') });
-is "$dom", '<div><p /></div><div><p /></div>', 'right text';
+is "$dom", '<div><p></p></div><div><p></p></div>', 'right text';
 $dom = Mojo::DOM->new->parse('<div><p id="☃" /></div>');
 $dom->at('#☃')->replace_content('♥');
 is "$dom", '<div><p id="☃">♥</p></div>', 'right text';
@@ -1426,7 +1426,8 @@ SYSTEM "usr.dtd"
 [
   <!ENTITY test "yeah">
 ]', 'right doctype';
-is $dom->at('foo'), '<foo />', 'right element';
+is $dom->xml, undef, 'xml mode not detected';
+is $dom->at('foo'), '<foo></foo>', 'right element';
 $dom = Mojo::DOM->new->parse(<<EOF);
 <?xml version="1.0" encoding = 'utf-8'?>
 <!DOCTYPE foo [
@@ -1616,7 +1617,7 @@ is $element->parent->type, 'XMLTest', 'right parent';
 is $element->root->xml,    1,         'xml mode detected';
 $dom->replace('<XMLTest2 />');
 is $dom->xml, undef, 'xml mode not detected';
-is $dom->children->[0], '<xmltest2 />', 'right result';
+is $dom->children->[0], '<xmltest2></xmltest2>', 'right result';
 $dom->replace(<<EOF);
 <?xml version='1.0' encoding='UTF-8'?>
 <XMLTest3 />
@@ -1821,8 +1822,22 @@ is $dom->at('e')->parent->type, 'b', 'right element';
 is $dom->all_text, 'Mojo Test', 'right text';
 
 # Broken "div" in "td"
-$dom = Mojo::DOM->new(
-  '<table><tr><td><div id="A"></td><td><div id="B"></td></tr></table>');
+$dom = Mojo::DOM->new(<<EOF);
+<table>
+  <tr>
+    <td><div id="A"></td>
+    <td><div id="B"></td>
+  </tr>
+</table>
+EOF
 is $dom->table->tr->td->[0]->div->{id}, 'A', 'right attribute';
 is $dom->table->tr->td->[1]->div->{id}, 'B', 'right attribute';
 is $dom->table->tr->td->[2], undef, 'no result';
+is "$dom", <<EOF, 'right result';
+<table>
+  <tr>
+    <td><div id="A"></div></td>
+    <td><div id="B"></div></td>
+  </tr>
+</table>
+EOF

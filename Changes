@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojolicious.
 1.69    2011-08-01 00:00:00
         - Modernized Mojo::HelloWorld.
         - Improved HTML healing capabilities of Mojo::DOM::HTML.
+        - Improved HTML rendering in Mojo::DOM::HTML.
         - Improved 64bit support in Mojo::Transaction::WebSocket.
         - Improved documentation.
 

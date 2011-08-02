@@ -5,7 +5,7 @@ use Mojo::Util qw/decode encode html_unescape xml_escape/;
 use Scalar::Util 'weaken';
 
 # Regex
-my $HTML_ATTR_RE = qr/
+my $ATTR_RE = qr/
   \s*
   ([^=\s>]+)       # Key
   (?:
@@ -22,9 +22,9 @@ my $HTML_ATTR_RE = qr/
   )?
   \s*
 /x;
-my $HTML_END_RE   = qr/^\s*\/\s*(.+)\s*/;
-my $HTML_START_RE = qr/([^\s\/]+)([\s\S]*)/;
-my $HTML_TOKEN_RE = qr/
+my $END_RE   = qr/^\s*\/\s*(.+)\s*/;
+my $START_RE = qr/([^\s\/]+)([\s\S]*)/;
+my $TOKEN_RE = qr/
   ([^<]*)                                           # Text
   (?:
     <\?(.*?)\?>                                     # Processing Instruction
@@ -43,47 +43,47 @@ my $HTML_TOKEN_RE = qr/
     <(
       \s*
       [^>\s]+                                       # Tag
-      (?:$HTML_ATTR_RE)*                            # Attributes
+      (?:$ATTR_RE)*                                 # Attributes
     )>
   )??
 /xis;
 
-# Optional HTML tags
-my @OPTIONAL_TAGS =
+# Optional HTML elements
+my @OPTIONAL =
   qw/body colgroup dd head li optgroup option p rt rp tbody td tfoot th/;
-my %HTML_OPTIONAL;
-$HTML_OPTIONAL{$_}++ for @OPTIONAL_TAGS;
+my %OPTIONAL;
+$OPTIONAL{$_}++ for @OPTIONAL;
 
-# Tags that break HTML paragraphs
-my @PARAGRAPH_TAGS = (
+# Elements that break HTML paragraphs
+my @PARAGRAPH = (
   qw/address article aside blockquote dir div dl fieldset footer form h1 h2/,
   qw/h3 h4 h5 h6 header hgroup hr menu nav ol p pre section table or ul/
 );
-my %HTML_PARAGRAPH;
-$HTML_PARAGRAPH{$_}++ for @PARAGRAPH_TAGS;
+my %PARAGRAPH;
+$PARAGRAPH{$_}++ for @PARAGRAPH;
 
-# HTML table tags
-my @TABLE_TAGS = qw/col colgroup tbody td th thead tr/;
-my %HTML_TABLE;
-$HTML_TABLE{$_}++ for @TABLE_TAGS;
+# HTML table elements
+my @TABLE = qw/col colgroup tbody td th thead tr/;
+my %TABLE;
+$TABLE{$_}++ for @TABLE;
 
-# HTML5 void tags
-my @VOID_TAGS = (
+# HTML5 void elements
+my @VOID = (
   qw/area base br col command embed hr img input keygen link meta param/,
   qw/source track wbr/
 );
-my %HTML_VOID;
-$HTML_VOID{$_}++ for @VOID_TAGS;
+my %VOID;
+$VOID{$_}++ for @VOID;
 
-# HTML5 block tags + "<head>" + "<html>"
-my @BLOCK_TAGS = (
-  qw/article aside blockquote body br button canvas caption col colgroup dd/,
-  qw/div dl dt embed fieldset figcaption figure footer form h1 h2 h3 h4 h5/,
-  qw/h6 head header hgroup hr html li map object ol output p pre progress/,
-  qw/section table tbody textarea tfooter th thead tr ul video/
+# HTML4/5 inline elements
+my @HTML4_INLINE = qw/applet basefont big del font iframe ins s strike u/;
+my @HTML5_INLINE = (
+  qw/a abbr acronym b bdo big br button cite code dfn em i img input kbd/,
+  qw/label map object q samp script select small strong span sub sup/,
+  qw/textarea tt var/
 );
-my %HTML_BLOCK;
-$HTML_BLOCK{$_}++ for @BLOCK_TAGS;
+my %INLINE;
+$INLINE{$_}++ for @HTML4_INLINE, @HTML5_INLINE;
 
 has [qw/charset xml/];
 has tree => sub { ['root'] };
@@ -101,7 +101,7 @@ sub parse {
   # Tokenize
   my $tree    = ['root'];
   my $current = $tree;
-  while ($html =~ m/\G$HTML_TOKEN_RE/gcs) {
+  while ($html =~ m/\G$TOKEN_RE/gcs) {
     my $text    = $1;
     my $pi      = $2;
     my $comment = $3;
@@ -132,18 +132,18 @@ sub parse {
     # End
     next unless $tag;
     my $cs = $self->xml;
-    if ($tag =~ /$HTML_END_RE/) {
+    if ($tag =~ /$END_RE/) {
       if (my $end = $cs ? $1 : lc($1)) { $self->_end($end, \$current) }
     }
 
     # Start
-    elsif ($tag =~ /$HTML_START_RE/) {
+    elsif ($tag =~ /$START_RE/) {
       my $start = $cs ? $1 : lc($1);
       my $attr = $2;
 
       # Attributes
       my $attrs = {};
-      while ($attr =~ /$HTML_ATTR_RE/g) {
+      while ($attr =~ /$ATTR_RE/g) {
         my $key = $cs ? $1 : lc($1);
         my $value = $2;
         $value = $3 unless defined $value;
@@ -160,9 +160,9 @@ sub parse {
       # Start
       $self->_start($start, $attrs, \$current);
 
-      # Empty tag
+      # Empty element
       $self->_end($start, \$current)
-        if (!$self->xml && $HTML_VOID{$start}) || $attr =~ /\/\s*$/;
+        if (!$self->xml && $VOID{$start}) || $attr =~ /\/\s*$/;
 
       # Relaxed "script" or "style"
       if ($start eq 'script' || $start eq 'style') {
@@ -195,7 +195,7 @@ sub _cdata {
 
 sub _close {
   my ($self, $current, $tags, $stop) = @_;
-  $tags ||= \%HTML_TABLE;
+  $tags ||= \%TABLE;
   $stop ||= 'table';
 
   # Check if parents need to be closed
@@ -236,11 +236,8 @@ sub _end {
     # Right tag
     ++$found and last if $next->[1] eq $end;
 
-    # Don't cross block tags that are not optional tags
-    return
-      if !$self->xml
-        && $HTML_BLOCK{$next->[1]}
-        && !$HTML_OPTIONAL{$next->[1]};
+    # Inline elements can only cross other inline elements
+    return if !$self->xml && $INLINE{$end} && !$INLINE{$next->[1]};
 
     # Parent
     $next = $next->[3];
@@ -258,8 +255,8 @@ sub _end {
     # Match
     if ($end eq $$current->[1]) { return $$current = $$current->[3] }
 
-    # Optional tags
-    elsif ($HTML_OPTIONAL{$$current->[1]}) {
+    # Optional elements
+    elsif ($OPTIONAL{$$current->[1]}) {
       $self->_end($$current->[1], $current);
     }
 
@@ -358,14 +355,14 @@ sub _render {
 sub _start {
   my ($self, $start, $attrs, $current) = @_;
 
-  # Autoclose optional HTML tags
+  # Autoclose optional HTML elements
   if (!$self->xml && $$current->[0] ne 'root') {
 
     # "<li>"
     if ($start eq 'li') { $self->_close($current, {li => 1}, 'ul') }
 
     # "<p>"
-    elsif ($HTML_PARAGRAPH{$start}) { $self->_end('p', $current) }
+    elsif ($PARAGRAPH{$start}) { $self->_end('p', $current) }
 
     # "<head>"
     elsif ($start eq 'body') { $self->_end('head', $current) }
@@ -392,12 +389,12 @@ sub _start {
     elsif ($start eq 'tfoot') { $self->_close($current) }
 
     # "<tr>"
-    elsif ($start eq 'tr') { $self->_end('tr', $current) }
+    elsif ($start eq 'tr') { $self->_close($current, {tr => 1}) }
 
     # "<th>" and "<td>"
     elsif ($start eq 'th' || $start eq 'td') {
-      $self->_end('th', $current);
-      $self->_end('td', $current);
+      $self->_close($current, {th => 1});
+      $self->_close($current, {td => 1});
     }
 
     # "<dt>" and "<dd>"

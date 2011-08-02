@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 603;
+use Test::More tests => 606;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -1819,3 +1819,10 @@ is $dom->at('d')->parent->type, 'b', 'right element';
 $dom->at('b')->prepend_content('<e>Mojo</e>');
 is $dom->at('e')->parent->type, 'b', 'right element';
 is $dom->all_text, 'Mojo Test', 'right text';
+
+# Broken "div" in "td"
+$dom = Mojo::DOM->new(
+  '<table><tr><td><div id="A"></td><td><div id="B"></td></tr></table>');
+is $dom->table->tr->td->[0]->div->{id}, 'A', 'right attribute';
+is $dom->table->tr->td->[1]->div->{id}, 'B', 'right attribute';
+is $dom->table->tr->td->[2], undef, 'no result';

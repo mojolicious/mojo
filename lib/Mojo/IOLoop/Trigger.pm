@@ -10,8 +10,7 @@ sub begin { shift->{counter}++ }
 
 sub end {
   my $self = shift;
-  $self->{args} ||= [];
-  push @{$self->{args}}, @_;
+  push @{$self->{args} ||= []}, @_;
   $self->emit('done', @{$self->{args}}) if --$self->{counter} <= 0;
 }
 

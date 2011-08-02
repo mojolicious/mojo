@@ -3,6 +3,12 @@
 use strict;
 use warnings;
 
+# Disable Bonjour, IPv6 and libev
+BEGIN {
+  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
+}
+
 use Test::More tests => 6;
 
 use Mojo::IOLoop;

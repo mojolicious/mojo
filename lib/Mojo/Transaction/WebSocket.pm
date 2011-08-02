@@ -3,6 +3,7 @@ use Mojo::Base 'Mojo::Transaction';
 
 # "I'm not calling you a liar but...
 #  I can't think of a way to finish that sentence."
+use Config;
 use Mojo::Transaction::HTTP;
 use Mojo::Util qw/b64_encode decode encode sha1_bytes/;
 
@@ -228,7 +229,10 @@ sub _build_frame {
   else {
     vec($prefix, 0, 8) = $masked ? (127 | 0b10000000) : 127;
     $frame .= $prefix;
-    $frame .= pack 'NN', $len >> 32, $len & 0xFFFFFFFF;
+    $frame .=
+      $Config{ivsize} > 4
+      ? pack('Q>', $len)
+      : pack('NN', $len >> 32, $len & 0xFFFFFFFF);
   }
 
   if (DEBUG) {
@@ -300,7 +304,10 @@ sub _parse_frame {
     return unless length $buffer > 10;
     $hlen = 10;
     my $ext = substr $buffer, 2, 8;
-    $len = unpack 'N', substr($ext, 4, 4);
+    $len =
+      $Config{ivsize} > 4
+      ? unpack('Q>', $ext)
+      : unpack('N', substr($ext, 4, 4));
     warn "EXTENDED (64bit): $len\n" if DEBUG;
   }
 

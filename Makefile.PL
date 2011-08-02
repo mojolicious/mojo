@@ -46,6 +46,7 @@ WriteMakefile(
   PREREQ_PM => {
     'B'                      => 0,
     'Carp'                   => 0,
+    'Config'                 => 0,
     'Cwd'                    => 0,
     'Data::Dumper'           => 0,
     'Digest::MD5'            => 0,

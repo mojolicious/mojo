@@ -607,12 +607,11 @@ Mojo::UserAgent - Async I/O HTTP 1.1 And WebSocket User Agent
   $ua->cert('tls.crt')->key('tls.key')->get('https://mojolicio.us');
 
   # Parallel requests
-  my $t = Mojo::IOLoop->trigger(sub { print "Done!\n" });
+  my $t = Mojo::IOLoop->trigger(sub { print "Have a nice day!\n" });
   for my $url ('mojolicio.us', 'cpan.org') {
     $t->begin;
     $ua->get($url => sub {
-      my ($ua, $tx) = @_;
-      print $tx->res->dom->html->head->title->text, "\n";
+      print pop->res->dom->html->head->title->text, "\n";
       $t->end;
     });
   }

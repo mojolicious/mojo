@@ -64,11 +64,12 @@ sub writing {
 
 sub _io {
   my ($self, $fd, $w, $revents) = @_;
-  my $h = $self->{handles}->{$fd};
+  my $handles = $self->{handles};
+  my $h       = $handles->{$fd};
   $self->_sandbox('Read', $h->{on_readable}, $h->{handle})
     if EV::READ &$revents;
   $self->_sandbox('Write', $h->{on_writable}, $h->{handle})
-    if EV::WRITE &$revents;
+    if EV::WRITE &$revents && $handles->{$fd};
 }
 
 # "It's great! We can do *anything* now that Science has invented Magic."

@@ -87,6 +87,7 @@ sub _connect {
   setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1;
 
   # TLS
+  weaken $self;
   if ($args->{tls}) {
 
     # No TLS support
@@ -95,7 +96,6 @@ sub _connect {
       unless TLS;
 
     # Upgrade
-    weaken $self;
     my %options = (
       SSL_startHandshake => 0,
       SSL_error_trap     => sub {

@@ -43,7 +43,6 @@ sub app {
   return $self->{app};
 }
 
-# "Ah, alcohol and night-swimming. It's a winning combination."
 sub build_form_tx      { shift->transactor->form(@_) }
 sub build_tx           { shift->transactor->tx(@_) }
 sub build_websocket_tx { shift->transactor->websocket(@_) }
@@ -606,6 +605,18 @@ Mojo::UserAgent - Async I/O HTTP 1.1 And WebSocket User Agent
 
   # TLS certificate authentication
   $ua->cert('tls.crt')->key('tls.key')->get('https://mojolicio.us');
+
+  # Parallel requests
+  my $t = Mojo::IOLoop->trigger(sub { print "Done!\n" });
+  for my $url ('mojolicio.us', 'cpan.org') {
+    $t->begin;
+    $ua->get($url => sub {
+      my ($ua, $tx) = @_;
+      print $tx->res->dom->html->head->title->text, "\n";
+      $t->end;
+    });
+  }
+  $t->start;
 
   # Websocket request
   $ua->websocket('ws://websockets.org:8787' => sub {

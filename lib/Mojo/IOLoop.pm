@@ -5,6 +5,7 @@ use Mojo::IOLoop::Client;
 use Mojo::IOLoop::Resolver;
 use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
+use Mojo::IOLoop::Trigger;
 use Mojo::IOWatcher;
 use Scalar::Util 'weaken';
 use Time::HiRes 'time';
@@ -328,6 +329,16 @@ sub timer {
   $self = $self->singleton unless ref $self;
   weaken $self;
   return $self->iowatcher->timer($after => sub { $self->$cb(pop) });
+}
+
+sub trigger {
+  my ($self, $cb) = @_;
+  $self = $self->singleton unless ref $self;
+  my $trigger = Mojo::IOLoop::Trigger->new;
+  $trigger->ioloop($self);
+  weaken $trigger->{ioloop};
+  $trigger->once(done => $cb) if $cb;
+  return $trigger;
 }
 
 sub write {
@@ -893,6 +904,26 @@ Note that this method is EXPERIMENTAL and might change without warning!
   my $id = $loop->timer(0.25 => sub {...});
 
 Create a new timer, invoking the callback after a given amount of seconds.
+
+=head2 C<trigger>
+
+  my $trigger = Mojo::IOLoop->trigger;
+  my $trigger = $loop->trigger;
+  my $trigger = $loop->trigger(sub {...});
+
+Get L<Mojo::IOLoop::Trigger> remote control for the loop.
+Note that this method is EXPERIMENTAL and might change without warning!
+
+  # Synchronize multiple events
+  my $t = Mojo::IOLoop->trigger(sub { print "BOOM!\n" });
+  for my $i (1 .. 10) {
+    $t->begin;
+    Mojo::IOLoop->timer($i => sub {
+      print 10 - $i,"\n";
+      $t->end;
+    });
+  }
+  $t->start;
 
 =head2 C<write>
 

@@ -637,7 +637,7 @@ Replace element content.
 
   my $root = $dom->root;
 
-Find root element.
+Find root node.
 
 =head2 C<text>
 

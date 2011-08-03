@@ -923,6 +923,8 @@ Note that this method is EXPERIMENTAL and might change without warning!
       $t->end;
     });
   }
+
+  # Stop automatically when done
   $t->start;
 
 =head2 C<write>

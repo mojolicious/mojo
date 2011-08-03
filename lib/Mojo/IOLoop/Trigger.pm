@@ -42,6 +42,8 @@ Mojo::IOLoop::Trigger - IOLoop Trigger
       $t->end;
     });
   }
+
+  # Stop automatically when done
   $t->start;
 
 =head1 DESCRIPTION

@@ -41,9 +41,9 @@ is $writable, undef, 'handle is not writable';
 # Connect
 my $client =
   IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $port);
-$watcher->one_tick(0);
-is $readable, 1,     'handle is readable';
-is $writable, undef, 'handle is not writable';
+$watcher->one_tick(1);
+ok $readable, 'handle is readable';
+ok !$writable, 'handle is not writable';
 
 # Accept
 my $server = $listen->accept;

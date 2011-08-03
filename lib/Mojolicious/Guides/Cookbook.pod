@@ -416,6 +416,16 @@ time.
 
 You can take full control of the L<Mojo::IOLoop> event loop.
 
+=head2 Parallel Blocking Requests
+
+You can emulate blocking behavior by using a trigger to synchronize multiple
+non-blocking requests.
+
+  my $t = Mojo::IOLoop->trigger;
+  $ua->get('http://mojolicio.us'         => $t->begin);
+  $ua->get('http://mojolicio.us/perldoc' => $t->begin);
+  my ($tx, $tx2) = $t->start;
+
 =head2 Command Line
 
 Don't you hate checking huge HTML files from the command line?

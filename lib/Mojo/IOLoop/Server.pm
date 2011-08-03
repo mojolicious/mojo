@@ -186,40 +186,23 @@ sub _accept {
   $handle->blocking(0);
 
   # Disable Nagle's algorithm
-  setsockopt($handle, IPPROTO_TCP, TCP_NODELAY, 1);
+  setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1;
 
   # Start TLS handshake
+  return $self->emit(accept => $handle) unless my $tls = $self->{tls};
   weaken $self;
-  if (my $tls = $self->{tls}) {
-    $tls->{SSL_error_trap} = sub {
-      my $handle = delete $self->{handles}->{$handle};
-      $self->iowatcher->remove($handle);
-      close $handle;
-    };
-    $handle = IO::Socket::SSL->start_SSL($handle, %$tls);
-    $self->iowatcher->add(
-      $handle,
-      on_readable => sub { $self->_tls($handle) },
-      on_writable => sub { $self->_tls($handle) }
-    );
-  }
-
-  # Wait for non-blocking accept
-  else {
-    $self->iowatcher->add(
-      $handle,
-      on_readable => sub { $self->_accepted($handle) },
-      on_writable => sub { $self->_accepted($handle) }
-    );
-  }
+  $tls->{SSL_error_trap} = sub {
+    my $handle = delete $self->{handles}->{$handle};
+    $self->iowatcher->remove($handle);
+    close $handle;
+  };
+  $handle = IO::Socket::SSL->start_SSL($handle, %$tls);
+  $self->iowatcher->add(
+    $handle,
+    on_readable => sub { $self->_tls($handle) },
+    on_writable => sub { $self->_tls($handle) }
+  );
   $self->{handles}->{$handle} = $handle;
-}
-
-sub _accepted {
-  my ($self, $handle) = @_;
-  $self->iowatcher->remove($handle);
-  delete $self->{handles}->{$handle};
-  return $self->emit(accept => $handle);
 }
 
 sub _cert_file {
@@ -262,7 +245,11 @@ sub _tls {
   my ($self, $handle) = @_;
 
   # Accepted
-  return $self->_accepted($handle) if $handle->accept_SSL;
+  if ($handle->accept_SSL) {
+    $self->iowatcher->remove($handle);
+    delete $self->{handles}->{$handle};
+    return $self->emit(accept => $handle);
+  }
 
   # Switch between reading and writing
   my $error = $IO::Socket::SSL::SSL_ERROR;

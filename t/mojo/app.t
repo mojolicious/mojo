@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 43;
+use Test::More tests => 47;
 
 # "I was so bored I cut the pony tail off the guy in front of us.
 #  Look at me, I'm a grad student.
@@ -17,6 +17,7 @@ use Test::More tests => 43;
 #  Bart, don't make fun of grad students.
 #  They've just made a terrible life choice."
 use_ok 'Mojo';
+use_ok 'Mojo::IOLoop';
 use_ok 'Mojo::HelloWorld';
 use_ok 'Mojo::Transaction::HTTP';
 use_ok 'Mojo::UserAgent';
@@ -27,12 +28,12 @@ my $app = Mojo->new({log => $logger});
 is $app->log, $logger, 'right logger';
 
 $app = Mojo::HelloWorld->new;
-my $ua = Mojo::UserAgent->new->app($app);
+my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton)->app($app);
 
 # Continue
 my $port   = $ua->test_server->port;
 my $buffer = '';
-$ua->ioloop->connect(
+Mojo::IOLoop->connect(
   address    => 'localhost',
   port       => $port,
   on_connect => sub {
@@ -50,12 +51,12 @@ $ua->ioloop->connect(
       if $buffer =~ /HTTP\/1.1 100 Continue.*\x0d\x0a\x0d\x0a/gs;
   }
 );
-$ua->ioloop->start;
+Mojo::IOLoop->start;
 like $buffer, qr/HTTP\/1.1 100 Continue/, 'request was continued';
 
 # Pipelined
 $buffer = '';
-$ua->ioloop->connect(
+Mojo::IOLoop->connect(
   address    => 'localhost',
   port       => $port,
   on_connect => sub {
@@ -72,7 +73,7 @@ $ua->ioloop->connect(
     $self->drop($id) and $self->stop if $buffer =~ /Mojo.*Mojo/gs;
   }
 );
-$ua->ioloop->start;
+Mojo::IOLoop->start;
 like $buffer, qr/Mojo/, 'transactions were pipelined';
 
 # Normal request
@@ -153,28 +154,6 @@ ok defined $tx2->connection, 'has connection id';
 ok $tx->is_done,  'transaction is done';
 ok $tx2->is_done, 'transaction is done';
 
-# Multiple requests
-$tx = Mojo::Transaction::HTTP->new;
-$tx->req->method('GET');
-$tx->req->url->parse('/13/');
-$tx2 = Mojo::Transaction::HTTP->new;
-$tx2->req->method('POST');
-$tx2->req->url->parse('/14/');
-$tx2->req->headers->expect('fun');
-$tx2->req->body('bar baz foo' x 128);
-my $tx3 = Mojo::Transaction::HTTP->new;
-$tx3->req->method('GET');
-$tx3->req->url->parse('/15/');
-$ua->start($tx);
-$ua->start($tx2);
-$ua->start($tx3);
-ok $tx->is_done, 'transaction is done';
-ok !$tx->error, 'has no errors';
-ok $tx2->is_done, 'transaction is done';
-ok !$tx2->error, 'has no error';
-ok $tx3->is_done, 'transaction is done';
-ok !$tx3->error, 'has no error';
-
 # Form with chunked response
 my $params = {};
 for my $i (1 .. 10) { $params->{"test$i"} = $i }
@@ -191,3 +170,19 @@ $tx = $ua->post_form(
   "http://127.0.0.1:$port/diag/upload" => {file => {content => $result}});
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, $result, 'right content';
+
+# Parallel requests
+my $t = Mojo::IOLoop->trigger;
+$ua->get('/13/', $t->begin);
+$ua->post('/14/', {Expect => 'fun'}, 'bar baz foo' x 128, $t->begin);
+$ua->get('/15/', $t->begin);
+($tx, $tx2, my $tx3) = $t->start;
+ok $tx->is_done, 'transaction is done';
+is $tx->res->body, 'Your Mojo is working!', 'right content';
+ok !$tx->error, 'has no errors';
+ok $tx2->is_done, 'transaction is done';
+is $tx2->res->body, 'Your Mojo is working!', 'right content';
+ok !$tx2->error, 'has no error';
+ok $tx3->is_done, 'transaction is done';
+is $tx3->res->body, 'Your Mojo is working!', 'right content';
+ok !$tx3->error, 'has no error';

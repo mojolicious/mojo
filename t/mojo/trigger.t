@@ -43,8 +43,8 @@ is_deeply \@results, [0, 1], 'right results';
 $done = undef;
 $t = Mojo::IOLoop->trigger(sub { shift; $done = [@_, 'too!'] });
 for my $i (0, 1) {
-  $t->begin;
-  Mojo::IOLoop->timer($i => sub { $t->end($i) });
+  my $cb = $t->begin;
+  Mojo::IOLoop->timer($i => sub { $t->$cb($i) });
 }
 @results = $t->start;
 is_deeply $done, [0, 1, 'too!'], 'right results';

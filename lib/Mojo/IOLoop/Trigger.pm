@@ -6,7 +6,11 @@ use Mojo::IOLoop;
 has ioloop => sub { Mojo::IOLoop->singleton };
 
 # "Ah, alcohol and night-swimming. It's a winning combination."
-sub begin { shift->{counter}++ }
+sub begin {
+  my $self = shift;
+  $self->{counter}++;
+  return sub { shift; $self->end(@_) };
+}
 
 sub end {
   my $self = shift;
@@ -69,9 +73,14 @@ L<Mojo::IOLoop::EventEmitter> and implements the following new ones.
 
 =head2 C<begin>
 
-  $t->begin;
+  my $cb = $t->begin;
 
-Increment active event counter.
+Increment active event counter, the returned callback can be used instead of
+C<end>.
+
+  my $t = Mojo::IOLoop->trigger;
+  Mojo::IOLoop->resolver->lookup('mojolicio.us' => $t->begin);
+  my $address = $t->start;
 
 =head2 C<end>
 

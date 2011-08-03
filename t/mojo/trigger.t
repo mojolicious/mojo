@@ -31,21 +31,21 @@ is_deeply \@results, [0, 0], 'right results';
 $t = Mojo::IOLoop::Trigger->new;
 my $done;
 $t->on(done => sub { shift; $done = [@_, 'works!'] });
-for my $i (0, 1) {
+for my $i (0, 0) {
   $t->begin;
   Mojo::IOLoop->timer($i => sub { $t->end($i) });
 }
 @results = $t->start;
-is_deeply $done, [0, 1, 'works!'], 'right results';
-is_deeply \@results, [0, 1], 'right results';
+is_deeply $done, [0, 0, 'works!'], 'right results';
+is_deeply \@results, [0, 0], 'right results';
 
 # Mojo::IOLoop
 $done = undef;
 $t = Mojo::IOLoop->trigger(sub { shift; $done = [@_, 'too!'] });
-for my $i (0, 1) {
+for my $i ('0.5', '0.5') {
   my $cb = $t->begin;
   Mojo::IOLoop->timer($i => sub { $t->$cb($i) });
 }
 @results = $t->start;
-is_deeply $done, [0, 1, 'too!'], 'right results';
-is_deeply \@results, [0, 1], 'right results';
+is_deeply $done, ['0.5', '0.5', 'too!'], 'right results';
+is_deeply \@results, ['0.5', '0.5'], 'right results';

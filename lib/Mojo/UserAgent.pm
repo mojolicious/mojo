@@ -609,15 +609,14 @@ Mojo::UserAgent - Non-Blocking I/O HTTP 1.1 And WebSocket User Agent
   $ua->cert('tls.crt')->key('tls.key')->get('https://mojolicio.us');
 
   # Parallel requests
-  my $t = Mojo::IOLoop->trigger(sub { print "Have a nice day!\n" });
+  my $t = Mojo::IOLoop->trigger;
   for my $url ('mojolicio.us', 'cpan.org') {
     $t->begin;
     $ua->get($url => sub {
-      print pop->res->dom->html->head->title->text, "\n";
-      $t->end;
+      $t->end(pop->res->dom->html->head->title->text);
     });
   }
-  $t->start;
+  my @titles = $t->start;
 
   # Websocket request
   $ua->websocket('ws://websockets.org:8787' => sub {

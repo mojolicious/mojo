@@ -986,14 +986,12 @@ A L<Mojo::UserAgent> prepared for the current environment.
     my ($t, @titles) = @_;
     $c->render_json(\@titles);
   });
-  $t->begin;
-  $c->ua->get('http://mojolicio.us' => sub {
-    $t->end(pop->res->dom->html->head->title->text);
-  });
-  $t->begin;
-  $c->ua->get('https://metacpan.org' => sub {
-    $t->end(pop->res->dom->html->head->title->text);
-  });
+  for my $url ('http://mojolicio.us', 'https://metacpan.org') {
+    $t->begin;
+    $c->ua->get($url => sub {
+      $t->end(pop->res->dom->html->head->title->text);
+    });
+  }
 
 =head2 C<url_for>
 

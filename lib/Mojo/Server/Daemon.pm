@@ -41,7 +41,7 @@ sub DESTROY {
 
   # Clean up connections
   return unless my $loop = $self->ioloop;
-  my $cs = $self->{cs} || {};
+  my $cs = $self->{connections} || {};
   for my $id (keys %$cs) { $loop->drop($id) }
 
   # Clean up listen sockets
@@ -165,11 +165,11 @@ sub _drop {
   my ($self, $id) = @_;
 
   # Finish gracefully
-  my $c = $self->{cs}->{$id};
+  my $c = $self->{connections}->{$id};
   if (my $tx = $c->{websocket} || $c->{transaction}) { $tx->server_close }
 
   # Drop connection
-  delete $self->{cs}->{$id};
+  delete $self->{connections}->{$id};
 }
 
 sub _error {
@@ -188,7 +188,7 @@ sub _finish {
   }
 
   # Finish transaction
-  my $c = $self->{cs}->{$id};
+  my $c = $self->{connections}->{$id};
   delete $c->{transaction};
   $tx->server_close;
 
@@ -255,7 +255,7 @@ sub _listen {
     my ($loop, $id) = @_;
 
     # Add new connection
-    $self->{cs}->{$id} = {tls => $tls};
+    $self->{connections}->{$id} = {tls => $tls};
 
     # Keep alive timeout
     $loop->connection_timeout($id => $self->keep_alive_timeout);
@@ -293,7 +293,7 @@ sub _read {
   warn "< $chunk\n" if DEBUG;
 
   # Make sure we have a transaction
-  my $c = $self->{cs}->{$id};
+  my $c = $self->{connections}->{$id};
   my $tx = $c->{transaction} || $c->{websocket};
   $tx = $c->{transaction} = $self->_build_tx($id, $c) unless $tx;
 
@@ -318,7 +318,7 @@ sub _upgrade {
   return unless $tx->req->headers->upgrade =~ /WebSocket/i;
 
   # WebSocket handshake handler
-  my $c = $self->{cs}->{$id};
+  my $c = $self->{connections}->{$id};
   my $ws = $c->{websocket} = $self->on_websocket->($self, $tx);
 
   # Not resumable yet
@@ -329,7 +329,7 @@ sub _write {
   my ($self, $id) = @_;
 
   # Not writing
-  my $c = $self->{cs}->{$id};
+  my $c = $self->{connections}->{$id};
   return unless my $tx = $c->{transaction} || $c->{websocket};
   return unless $tx->is_writing;
 
@@ -361,7 +361,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Server::Daemon - Async I/O HTTP 1.1 And WebSocket Server
+Mojo::Server::Daemon - Non-Blocking I/O HTTP 1.1 And WebSocket Server
 
 =head1 SYNOPSIS
 
@@ -387,8 +387,8 @@ Mojo::Server::Daemon - Async I/O HTTP 1.1 And WebSocket Server
 
 =head1 DESCRIPTION
 
-L<Mojo::Server::Daemon> is a full featured async I/O HTTP 1.1 and WebSocket
-server with C<IPv6>, C<TLS>, C<Bonjour> and C<libev> support.
+L<Mojo::Server::Daemon> is a full featured non-blocking I/O HTTP 1.1 and
+WebSocket server with C<IPv6>, C<TLS>, C<Bonjour> and C<libev> support.
 
 Optional modules L<EV>, L<IO::Socket::IP>, L<IO::Socket::SSL> and
 L<Net::Rendezvous::Publish> are supported transparently and used if

@@ -47,17 +47,17 @@ get '/yada' => sub {
 
 # GET /bye (embedded)
 get '/bye' => sub {
-  my $self  = shift;
-  my $name  = $self->stash('name');
-  my $async = '';
+  my $self = shift;
+  my $name = $self->stash('name');
+  my $nb   = '';
   $self->render_later;
   $self->ua->app(main::app())->get(
     '/hello/hello' => sub {
       my $tx = pop;
-      $self->render_text($tx->res->body . "$name! $async");
+      $self->render_text($tx->res->body . "$name! $nb");
     }
   );
-  $async .= 'success!';
+  $nb .= 'success!';
 };
 
 package MyTestApp::Test2;

@@ -10,6 +10,7 @@ use Mojolicious::Routes;
 use Mojolicious::Sessions;
 use Mojolicious::Static;
 use Mojolicious::Types;
+use Scalar::Util 'weaken';
 
 has controller_class => 'Mojolicious::Controller';
 has mode             => sub { ($ENV{MOJO_MODE} || 'development') };
@@ -176,6 +177,7 @@ sub handler {
   @{$stash}{keys %$defaults} = values %$defaults;
   my $c =
     $self->controller_class->new(app => $self, stash => $stash, tx => $tx);
+  weaken $c->{app};
   unless (eval { $self->on_process->($self, $c); 1 }) {
     $self->log->fatal("Processing request failed: $@");
     $tx->res->code(500);
@@ -304,8 +306,8 @@ TLS, Bonjour, IDNA, Comet (long polling), chunking and multipart support.
 
 =item *
 
-Built-in async I/O web server supporting libev and hot deployment, perfect
-for embedding.
+Built-in non-blocking I/O web server supporting libev and hot deployment,
+perfect for embedding.
 
 =item *
 

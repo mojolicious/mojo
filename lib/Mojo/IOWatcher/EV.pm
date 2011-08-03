@@ -99,7 +99,7 @@ __END__
 
 =head1 NAME
 
-Mojo::IOWatcher::EV - EV Async I/O Watcher
+Mojo::IOWatcher::EV - EV Non-Blocking I/O Watcher
 
 =head1 SYNOPSIS
 
@@ -107,8 +107,8 @@ Mojo::IOWatcher::EV - EV Async I/O Watcher
 
 =head1 DESCRIPTION
 
-L<Mojo::IOWatcher::EV> is a minimalistic async I/O watcher with C<libev>
-support.
+L<Mojo::IOWatcher::EV> is a minimalistic non-blocking I/O watcher with
+C<libev> support.
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS

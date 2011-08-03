@@ -299,7 +299,7 @@ is $result,   'test0test1', 'right result';
 is $finished, 4,            'finished client websocket';
 is $subreq,   3,            'finished server websocket';
 
-# WebSocket /subreq (async)
+# WebSocket /subreq (non-blocking)
 my $running = 2;
 my ($code2, $result2);
 ($code, $result) = undef;

@@ -349,8 +349,8 @@ Mojo::IOLoop::Resolver - IOLoop DNS Stub Resolver
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Resolver> is a minimalistic async I/O DNS stub resolver used
-by L<Mojo:IOLoop>.
+L<Mojo::IOLoop::Resolver> is a minimalistic non-blocking I/O DNS stub
+resolver used by L<Mojo:IOLoop>.
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 ATTRIBUTES

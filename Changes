@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-1.69    2011-08-01 00:00:00
+1.69    2011-08-03 00:00:00
         - Added EXPERIMENTAL module Mojo::IOLoop::Trigger.
         - Modernized Mojo::HelloWorld.
         - Improved HTML healing capabilities of Mojo::DOM::HTML.
@@ -8,6 +8,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved 64bit support in Mojo::Transaction::WebSocket.
         - Improved documentation.
         - Fixed memory leak in Mojo::IOLoop::Client.
+        - Fixed memory leak in Mojolicious.
         - Fixed small bug in Mojo::IOLoop::Server.
 
 1.68    2011-07-29 00:00:00

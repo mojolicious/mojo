@@ -195,7 +195,7 @@ sub _cleanup {
 
   # Clean up active connections
   warn "DROPPING ALL CONNECTIONS\n" if DEBUG;
-  my $cs = $self->{cs} || {};
+  my $cs = $self->{connections} || {};
   $loop->drop($_) for keys %$cs;
 
   # Clean up keep alive connections
@@ -216,7 +216,7 @@ sub _connect {
   $id ||= $self->_cache("$scheme:$host:$port");
   if ($id && !ref $id) {
     warn "KEEP ALIVE CONNECTION ($scheme:$host:$port)\n" if DEBUG;
-    $self->{cs}->{$id} = {cb => $cb, tx => $tx};
+    $self->{connections}->{$id} = {cb => $cb, transaction => $tx};
     $tx->kept_alive(1);
     $self->_connected($id);
   }
@@ -240,7 +240,7 @@ sub _connect {
       tls_key  => $self->key,
       on_connect => sub { $self->_connected($_[1]) }
     );
-    $self->{cs}->{$id} = {cb => $cb, tx => $tx};
+    $self->{connections}->{$id} = {cb => $cb, transaction => $tx};
   }
 
   # Callbacks
@@ -256,7 +256,7 @@ sub _connected {
 
   # Store connection information in transaction
   my $loop = $self->{loop};
-  my $tx   = $self->{cs}->{$id}->{tx};
+  my $tx   = $self->{connections}->{$id}->{transaction};
   $tx->connection($id);
   my $local = $loop->local_info($id);
   $tx->local_address($local->{address});
@@ -274,8 +274,8 @@ sub _drop {
   my ($self, $id, $close) = @_;
 
   # Keep non-CONNECTed connection alive
-  my $c  = delete $self->{cs}->{$id};
-  my $tx = $c->{tx};
+  my $c  = delete $self->{connections}->{$id};
+  my $tx = $c->{transaction};
   if (!$close && $tx && $tx->keep_alive && !$tx->error) {
     $self->_cache(join(':', $self->transactor->peer($tx)), $id)
       unless (($tx->req->method || '') =~ /^connect$/i
@@ -290,7 +290,9 @@ sub _drop {
 
 sub _error {
   my ($self, $loop, $id, $error) = @_;
-  if (my $tx = $self->{cs}->{$id}->{tx}) { $tx->res->error($error) }
+  if (my $tx = $self->{connections}->{$id}->{transaction}) {
+    $tx->res->error($error);
+  }
   $self->log->error($error);
   $self->_handle($id, $error);
 }
@@ -320,12 +322,12 @@ sub _handle {
   my ($self, $id, $close) = @_;
 
   # Finish WebSocket
-  my $c   = $self->{cs}->{$id};
-  my $old = $c->{tx};
+  my $c   = $self->{connections}->{$id};
+  my $old = $c->{transaction};
   if ($old && $old->is_websocket) {
     $old->client_close;
     $self->{processing} -= 1;
-    delete $self->{cs}->{$id};
+    delete $self->{connections}->{$id};
     $self->_drop($id, $close);
   }
 
@@ -390,13 +392,13 @@ sub _read {
   warn "< $chunk\n" if DEBUG;
 
   # Corrupted connection
-  return                   unless my $c  = $self->{cs}->{$id};
-  return $self->_drop($id) unless my $tx = $c->{tx};
+  return                   unless my $c  = $self->{connections}->{$id};
+  return $self->_drop($id) unless my $tx = $c->{transaction};
 
   # Process incoming data
   $tx->client_read($chunk);
-  if    ($tx->is_done)         { $self->_handle($id) }
-  elsif ($c->{tx}->is_writing) { $self->_write($id) }
+  if ($tx->is_done) { $self->_handle($id) }
+  elsif ($c->{transaction}->is_writing) { $self->_write($id) }
 }
 
 sub _redirect {
@@ -412,7 +414,7 @@ sub _redirect {
 
   # Start redirected request
   return 1 unless my $id = $self->_start($new, $c->{cb});
-  $self->{cs}->{$id}->{redirects} = $redirects + 1;
+  $self->{connections}->{$id}->{redirects} = $redirects + 1;
   return 1;
 }
 
@@ -518,8 +520,8 @@ sub _upgrade {
   my ($self, $id) = @_;
 
   # No upgrade request
-  my $c   = $self->{cs}->{$id};
-  my $old = $c->{tx};
+  my $c   = $self->{connections}->{$id};
+  my $old = $c->{transaction};
   return unless $old->req->headers->upgrade;
 
   # Handshake failed
@@ -531,7 +533,7 @@ sub _upgrade {
   $new->kept_alive($old->kept_alive);
   $res->error('WebSocket challenge failed.') and return
     unless $new->client_challenge;
-  $c->{tx} = $new;
+  $c->{transaction} = $new;
   $self->{loop}->connection_timeout($id, $self->websocket_timeout);
   weaken $self;
   $new->on_resume(sub { $self->_write($id) });
@@ -543,8 +545,8 @@ sub _write {
   my ($self, $id) = @_;
 
   # Prepare outgoing data
-  return unless my $c  = $self->{cs}->{$id};
-  return unless my $tx = $c->{tx};
+  return unless my $c  = $self->{connections}->{$id};
+  return unless my $tx = $c->{transaction};
   return unless $tx->is_writing;
   my $chunk = $tx->client_write;
 
@@ -566,7 +568,7 @@ __END__
 
 =head1 NAME
 
-Mojo::UserAgent - Async I/O HTTP 1.1 And WebSocket User Agent
+Mojo::UserAgent - Non-Blocking I/O HTTP 1.1 And WebSocket User Agent
 
 =head1 SYNOPSIS
 
@@ -632,8 +634,8 @@ Mojo::UserAgent - Async I/O HTTP 1.1 And WebSocket User Agent
 
 =head1 DESCRIPTION
 
-L<Mojo::UserAgent> is a full featured async I/O HTTP 1.1 and WebSocket user
-agent with C<IPv6>, C<TLS> and C<libev> support.
+L<Mojo::UserAgent> is a full featured non-blocking I/O HTTP 1.1 and WebSocket
+user agent with C<IPv6>, C<TLS> and C<libev> support.
 
 Optional modules L<EV>, L<IO::Socket::IP> and L<IO::Socket::SSL> are
 supported transparently and used if installed.

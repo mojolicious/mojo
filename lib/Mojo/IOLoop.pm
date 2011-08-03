@@ -334,11 +334,11 @@ sub timer {
 sub trigger {
   my ($self, $cb) = @_;
   $self = $self->singleton unless ref $self;
-  my $trigger = Mojo::IOLoop::Trigger->new;
-  $trigger->ioloop($self);
-  weaken $trigger->{ioloop};
-  $trigger->once(done => $cb) if $cb;
-  return $trigger;
+  my $t = Mojo::IOLoop::Trigger->new;
+  $t->ioloop($self);
+  weaken $t->{ioloop};
+  $t->once(done => $cb) if $cb;
+  return $t;
 }
 
 sub write {
@@ -407,7 +407,7 @@ __END__
 
 =head1 NAME
 
-Mojo::IOLoop - Minimalistic Reactor For Async TCP Clients And Servers
+Mojo::IOLoop - Minimalistic Reactor For Non-Blocking TCP Clients And Servers
 
 =head1 SYNOPSIS
 
@@ -459,8 +459,8 @@ Mojo::IOLoop - Minimalistic Reactor For Async TCP Clients And Servers
 =head1 DESCRIPTION
 
 L<Mojo::IOLoop> is a very minimalistic reactor that has been reduced to the
-absolute minimal feature set required to build solid and scalable async TCP
-clients and servers.
+absolute minimal feature set required to build solid and scalable
+non-blocking TCP clients and servers.
 
 Optional modules L<EV>, L<IO::Socket::IP> and L<IO::Socket::SSL> are
 supported transparently and used if installed.
@@ -907,9 +907,9 @@ Create a new timer, invoking the callback after a given amount of seconds.
 
 =head2 C<trigger>
 
-  my $trigger = Mojo::IOLoop->trigger;
-  my $trigger = $loop->trigger;
-  my $trigger = $loop->trigger(sub {...});
+  my $t = Mojo::IOLoop->trigger;
+  my $t = $loop->trigger;
+  my $t = $loop->trigger(sub {...});
 
 Get L<Mojo::IOLoop::Trigger> remote control for the loop.
 Note that this method is EXPERIMENTAL and might change without warning!

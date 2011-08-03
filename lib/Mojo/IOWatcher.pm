@@ -144,7 +144,7 @@ __END__
 
 =head1 NAME
 
-Mojo::IOWatcher - Async I/O Watcher
+Mojo::IOWatcher - Non-Blocking I/O Watcher
 
 =head1 SYNOPSIS
 
@@ -169,8 +169,8 @@ Mojo::IOWatcher - Async I/O Watcher
 
 =head1 DESCRIPTION
 
-L<Mojo::IOWatcher> is a minimalistic async I/O watcher and the foundation of
-L<Mojo::IOLoop>.
+L<Mojo::IOWatcher> is a minimalistic non-blocking I/O watcher and the
+foundation of L<Mojo::IOLoop>.
 L<Mojo::IOWatcher::EV> is a good example for its extensibility.
 Note that this module is EXPERIMENTAL and might change without warning!
 

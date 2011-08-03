@@ -536,28 +536,28 @@ get '/subrequest_simple' => sub {
   $self->render_text($self->ua->post('/template')->res->body);
 };
 
-# GET /subrequest_sync
-get '/subrequest_sync' => sub {
+# GET /subrequest_blocking
+get '/subrequest_blocking' => sub {
   my $self = shift;
   $self->ua->post('/template');
   $self->render_text($self->ua->post('/template')->res->body);
 };
 
-# Make sure hook runs async
-hook after_dispatch => sub { shift->stash->{async} = 'broken!' };
+# Make sure hook runs non-blocking
+hook after_dispatch => sub { shift->stash->{nb} = 'broken!' };
 
-# GET /subrequest_async
-my $async;
-get '/subrequest_async' => sub {
+# GET /subrequest_non_blocking
+my $nb;
+get '/subrequest_non_blocking' => sub {
   my $self = shift;
   $self->ua->post(
     '/template' => sub {
       my $tx = pop;
-      $self->render_text($tx->res->body . $self->stash->{'async'});
-      $async = $self->stash->{async};
+      $self->render_text($tx->res->body . $self->stash->{nb});
+      $nb = $self->stash->{nb};
     }
   );
-  $self->stash->{'async'} = 'success!';
+  $self->stash->{nb} = 'success!';
 };
 
 # GET /redirect_url
@@ -758,14 +758,14 @@ my $tua = Mojo::UserAgent->new(ioloop => $ua->ioloop)->app(app);
 my $timer;
 $tua->ioloop->timer(
   '0.1' => sub {
-    my $async = '';
+    my $nb = '';
     $tua->get(
       '/' => sub {
         my $tx = pop;
-        $timer = $tx->res->body . $async;
+        $timer = $tx->res->body . $nb;
       }
     );
-    $async = 'works!';
+    $nb = 'works!';
   }
 );
 
@@ -1505,18 +1505,18 @@ $t->get_ok('/subrequest_simple')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('Just works!');
 
-# GET /subrequest_sync
-$t->get_ok('/subrequest_sync')->status_is(200)
+# GET /subrequest_blocking
+$t->get_ok('/subrequest_blocking')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('Just works!');
 
-# GET /subrequest_async
-$t->get_ok('/subrequest_async')->status_is(200)
+# GET /subrequest_non_blocking
+$t->get_ok('/subrequest_non_blocking')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('Just works!success!');
-is $async, 'broken!', 'right text';
+is $nb, 'broken!', 'right text';
 
 # GET /redirect_url
 $t->get_ok('/redirect_url')->status_is(302)

@@ -418,13 +418,17 @@ You can take full control of the L<Mojo::IOLoop> event loop.
 
 =head2 Parallel Blocking Requests
 
-You can emulate blocking behavior by using a trigger to synchronize multiple
-non-blocking requests.
+You can emulate blocking behavior by using a L<Mojo::IOLoop> trigger to
+synchronize multiple non-blocking requests.
 
-  my $t = Mojo::IOLoop->trigger;
+  # Synchronize non-blocking requests and capture result
+  my $ua = Mojo::UserAgent->new;
+  my $t  = Mojo::IOLoop->trigger;
   $ua->get('http://mojolicio.us'         => $t->begin);
   $ua->get('http://mojolicio.us/perldoc' => $t->begin);
   my ($tx, $tx2) = $t->start;
+
+Just be aware that the resulting transactions will be in random order.
 
 =head2 Command Line
 

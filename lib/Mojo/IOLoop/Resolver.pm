@@ -93,7 +93,7 @@ sub lookup {
 
   # "localhost"
   weaken $self;
-  return $self->ioloop->timer(0 => sub { $self->$cb($LOCALHOST) })
+  return $self->ioloop->defer(sub { $self->$cb($LOCALHOST) })
     if $name eq 'localhost';
 
   # IPv4
@@ -135,7 +135,7 @@ sub resolve {
   my $server = $self->servers;
   my $loop   = $self->ioloop;
   weaken $self;
-  return $loop->timer(0 => sub { $self->$cb([]) })
+  return $loop->defer(sub { $self->$cb([]) })
     if !$server || !$t || ($t ne $DNS_TYPES->{PTR} && ($v4 || $v6));
 
   # Build request

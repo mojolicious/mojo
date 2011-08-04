@@ -137,6 +137,8 @@ sub connection_timeout {
   $c->{timeout};
 }
 
+sub defer { shift->timer(0 => @_) }
+
 sub drop {
   my ($self, $id) = @_;
   $self = $self->singleton unless ref $self;
@@ -665,6 +667,14 @@ Path to the TLS key file.
 
 Maximum amount of time in seconds a connection can be inactive before being
 dropped, defaults to C<15>.
+
+=head2 C<defer>
+
+  Mojo::IOLoop->defer(sub {...});
+  $loop->defer(sub {...});
+
+Invoke callback on next reactor tick.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<drop>
 

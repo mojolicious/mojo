@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.70    2011-08-04 00:00:00
+        - Added EXPERIMENTAL defer method to Mojo::IOLoop.
         - Added extended callback support to Mojo::IOLoop::Trigger.
         - Improved documentation.
         - Improved tests.

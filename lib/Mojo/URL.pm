@@ -219,8 +219,6 @@ sub to_abs {
   # Absolute URL
   my $abs = $self->clone;
   return $abs if $abs->is_abs;
-
-  # Add scheme and authority
   $abs->scheme($base->scheme);
   $abs->authority($base->authority);
 
@@ -237,11 +235,11 @@ sub to_abs {
 
     # Characters after the right-most '/' need to go
     pop @{$new->parts} unless $new->trailing_slash;
-
     $new->append($_) for @{$old->parts};
   }
 
-  # Update
+  # Absolute path
+  $new->canonicalize;
   $new->leading_slash(1);
   $new->trailing_slash($old->trailing_slash);
   $abs->path($new);
@@ -253,27 +251,25 @@ sub to_rel {
   my $self = shift;
   my $base = shift || $self->base->clone;
 
-  # Relative
+  # Relative URL
   my $rel = $self->clone;
-  return $rel unless $rel->is_abs;
-
-  # Different locations
-  return $rel
-    unless lc $base->scheme eq lc $rel->scheme
-      && $base->authority eq $rel->authority;
-
-  # Remove scheme and authority
+  $rel->base($base);
   $rel->scheme('');
   $rel->authority('');
 
-  # Characters after the right-most '/' need to go
-  $rel->base($base->clone);
-  my $splice = @{$base->path->parts};
-  $splice -= 1 unless $base->path->trailing_slash;
-  my $path = $rel->path->clone;
-  splice @{$path->parts}, 0, $splice if $splice;
-  $rel->path($path);
-  $rel->path->leading_slash(0);
+  # Build relative path
+  my @rel_parts  = @{$rel->path->parts};
+  my $base_path  = $base->path;
+  my @base_parts = @{$base_path->parts};
+  pop @base_parts unless $base_path->trailing_slash;
+  while (@rel_parts && @base_parts && $rel_parts[0] eq $base_parts[0]) {
+    shift @rel_parts;
+    shift @base_parts;
+  }
+  $rel->path(Mojo::Path->new);
+  my $rel_path = $rel->path;
+  $rel_path->parts([('..') x @base_parts, @rel_parts]);
+  $rel_path->trailing_slash(1) if $self->path->trailing_slash;
 
   return $rel;
 }

@@ -1,9 +1,10 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-1.70    2011-08-03 00:00:00
+1.70    2011-08-04 00:00:00
         - Added extended callback support to Mojo::IOLoop::Trigger.
         - Improved documentation.
         - Improved tests.
+        - Fixed a few small bugs in Mojo::URL. (sshaw)
 
 1.69    2011-08-03 00:00:00
         - Added EXPERIMENTAL module Mojo::IOLoop::Trigger.

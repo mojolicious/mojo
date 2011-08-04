@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-use Test::More tests => 298;
+use Test::More tests => 307;
 
 # "I don't want you driving around in a car you built yourself.
 #  You can sit there complaining, or you can knit me some seat belts."
@@ -90,6 +90,11 @@ $url->base->parse('http://sri:foobar@kraih.com:8080/');
 is $url->is_abs, 1, 'is absolute';
 is $url->to_rel, 'foo?foo=bar#23', 'right relative version';
 
+# Relative (base without trailing slash)
+$url = Mojo::URL->new('http://sri:foobar@kraih.com:8080/baz/foo?foo=bar#23');
+$url->base->parse('http://sri:foobar@kraih.com:8080');
+is $url->to_rel, 'baz/foo?foo=bar#23', 'right relative version';
+
 # Relative with path
 $url = Mojo::URL->new('http://kraih.com/foo/index.html?foo=bar#23');
 $url->base->parse('http://kraih.com/foo/');
@@ -98,6 +103,30 @@ is $rel, 'index.html?foo=bar#23', 'right format';
 is $rel->is_abs, undef, 'not absolute';
 is $rel->to_abs, 'http://kraih.com/foo/index.html?foo=bar#23',
   'right absolute version';
+
+# Relative path with a base argument
+$url = Mojo::URL->new('http://kraih.com/');
+my $base = $url->clone;
+is $url->to_rel($base), '', 'right relative version';
+$base = Mojo::URL->new('http://kraih.com/a/');
+is $url->to_rel($base), '../', 'right relative version';
+$base = Mojo::URL->new('http://kraih.com/a/b/');
+is $url->to_rel($base), '../../', 'right relative version';
+$url = Mojo::URL->new('http://kraih.com/index.html');
+$base = Mojo::URL->new('http://kraih.com/');
+is $url->to_rel($base), 'index.html', 'right relative version';
+$url = Mojo::URL->new('http://kraih.com/index.html');
+$base = Mojo::URL->new('http://kraih.com/a/');
+is $url->to_rel($base), '../index.html', 'right relative version';
+$url = Mojo::URL->new('http://kraih.com/index.html');
+$base = Mojo::URL->new('http://kraih.com/a/b/');
+is $url->to_rel($base), '../../index.html', 'right relative version';
+$url = Mojo::URL->new('http://kraih.com/a/b/c/index.html');
+$base = Mojo::URL->new('http://kraih.com/a/b/');
+is $url->to_rel($base), 'c/index.html', 'right relative version';
+$url = Mojo::URL->new('http://kraih.com/a/b/c/d/index.html');
+$base = Mojo::URL->new('http://kraih.com/a/b/');
+is $url->to_rel($base), 'c/d/index.html', 'right relative version';
 
 # Relative path
 $url = Mojo::URL->new('http://kraih.com/foo/?foo=bar#23');

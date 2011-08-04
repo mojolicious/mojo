@@ -266,14 +266,23 @@ sub to_rel {
   $rel->scheme('');
   $rel->authority('');
 
-  # Characters after the right-most '/' need to go
-  $rel->base($base->clone);
-  my $splice = @{$base->path->parts};
-  $splice -= 1 unless $base->path->trailing_slash;
-  my $path = $rel->path->clone;
-  splice @{$path->parts}, 0, $splice if $splice;
-  $rel->path($path);
-  $rel->path->leading_slash(0);
+  my @rel_parts = @{$rel->path->parts};
+  my @base_parts = @{$base->path->parts};
+
+  # Remove file
+  pop @base_parts unless $base->path->trailing_slash;
+
+  # Build the relative path      
+  while(@rel_parts && @base_parts && $rel_parts[0] eq $base_parts[0]) {
+    shift @rel_parts; 
+    shift @base_parts;
+  }
+
+  # Merge parts
+  @rel_parts = (('..') x @base_parts, @rel_parts);
+  $rel->path(Mojo::Path->new);
+  $rel->path->parts([@rel_parts]);
+  $rel->path->trailing_slash(1) if $self->path->trailing_slash;
 
   return $rel;
 }

@@ -160,7 +160,7 @@ Path has a leading slash.
 =head2 C<parts>
 
   my $parts = $path->parts;
-  $path     = $path->parts(qw/foo bar baz/);
+  $path     = $path->parts([qw/foo bar baz/]);
 
 The path parts.
 

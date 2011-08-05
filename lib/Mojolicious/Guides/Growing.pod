@@ -411,7 +411,7 @@ like this.
 
     # Redirect to main page with a 302 response if user is not logged in
     return $self->redirect_to('index') unless $self->session('user');
-  } => 'protected';
+  };
 
   # Logout action
   get '/logout' => sub {
@@ -422,7 +422,7 @@ like this.
 
     # Redirect to main page with a 302 response
     $self->redirect_to('index');
-  } => 'logout';
+  };
 
   app->start;
   __DATA__
@@ -507,7 +507,6 @@ actual action code needs to be changed.
 
       my $user = $self->param('user') || '';
       my $pass = $self->param('pass') || '';
-
       return $self->render unless $self->users->check($user, $pass);
 
       $self->session(user => $user);
@@ -518,13 +517,13 @@ actual action code needs to be changed.
     $r->get('/protected' => sub {
       my $self = shift;
       return $self->redirect_to('index') unless $self->session('user');
-    } => 'protected');
+    });
 
     $r->get('/logout' => sub {
       my $self = shift;
       $self->session(expires => 1);
       $self->redirect_to('index');
-    } => 'logout');
+    });
   }
 
   1;
@@ -568,7 +567,6 @@ Once again the actual action code does not change at all.
 
     my $user = $self->param('user') || '';
     my $pass = $self->param('pass') || '';
-
     return $self->render unless $self->users->check($user, $pass);
 
     $self->session(user => $user);

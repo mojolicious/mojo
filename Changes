@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.72    2011-08-05 00:00:00
+        - Improved documentation.
         - Fixed small alternative placeholder value bug in routes.
 
 1.71    2011-08-05 00:00:00

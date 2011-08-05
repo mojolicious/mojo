@@ -560,25 +560,26 @@ request), this is very useful in combination with C<redirect_to>.
 
   get '/login' => sub {
     my $self = shift;
+
     my $name = $self->param('name') || '';
     my $pass = $self->param('pass') || '';
     return $self->render unless $name eq 'sebastian' && $pass eq '1234';
+
     $self->session(name => $name);
     $self->flash(message => 'Thanks for logging in!');
     $self->redirect_to('index');
-  } => 'login';
+  };
 
   get '/' => sub {
     my $self = shift;
-    return $self->redirect_to('login') unless $self->session('name');
-    $self->render;
+    $self->redirect_to('login') unless $self->session('name');
   } => 'index';
 
   get '/logout' => sub {
     my $self = shift;
     $self->session(expires => 1);
     $self->redirect_to('index');
-  } => 'logout';
+  };
 
   app->start;
   __DATA__

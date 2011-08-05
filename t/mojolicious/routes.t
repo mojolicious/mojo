@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 330;
+use Test::More tests => 339;
 
 # "They're not very heavy, but you don't hear me not complaining."
 use_ok 'Mojolicious::Routes';
@@ -35,6 +35,10 @@ $r->route('/alternatives2/:foo', foo => [qw/0 test 23/]);
 # /alternatives3/foo
 # /alternatives3/foobar
 $r->route('/alternatives3/:foo', foo => [qw/foo foobar/]);
+
+# /alternatives4/foo
+# /alternatives4/foo.bar
+$r->route('/alternatives4/:foo', foo => [qw/foo foo.bar/]);
 
 # /*/test
 my $test = $r->route('/:controller/test')->to(action => 'test');
@@ -262,6 +266,25 @@ $m =
 is $m->stack->[0]->{foo}, 'foobar', 'right value';
 is @{$m->stack}, 1, 'right number of elements';
 is $m->path_for, '/alternatives3/foobar', 'right path';
+
+# Alternatives with special characters
+$m = Mojolicious::Routes::Match->new(get => '/alternatives4/foo')->match($r);
+is $m->stack->[0]->{foo}, 'foo', 'right value';
+is @{$m->stack}, 1, 'right number of elements';
+is $m->path_for, '/alternatives4/foo', 'right path';
+$m =
+  Mojolicious::Routes::Match->new(get => '/alternatives4/foo.bar')->match($r);
+is $m->stack->[0]->{foo}, 'foo.bar', 'right value';
+is @{$m->stack}, 1, 'right number of elements';
+is $m->path_for, '/alternatives4/foo.bar', 'right path';
+$m =
+  Mojolicious::Routes::Match->new(get => '/alternatives4/fooobar')->match($r);
+is @{$m->stack}, 0, 'right number of elements';
+$m = Mojolicious::Routes::Match->new(get => '/alternatives4/bar')->match($r);
+is @{$m->stack}, 0, 'right number of elements';
+$m =
+  Mojolicious::Routes::Match->new(get => '/alternatives4/bar.foo')->match($r);
+is @{$m->stack}, 0, 'right number of elements';
 
 # Real world example using most features at once
 $m = Mojolicious::Routes::Match->new(get => '/articles.html')->match($r);

@@ -204,7 +204,7 @@ sub _compile {
 sub _compile_req {
   my $req = shift;
   return "($req)" if !ref $req || ref $req ne 'ARRAY';
-  return '(' . join('|', reverse sort @$req) . ')';
+  return '(' . join('|', map {quotemeta} reverse sort @$req) . ')';
 }
 
 sub _tokenize {

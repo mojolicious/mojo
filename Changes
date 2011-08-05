@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-1.71    2011-08-04 00:00:00
+1.71    2011-08-05 00:00:00
         - Improved Mojo::IOWatcher to use higher resolution timers.
 
 1.70    2011-08-04 00:00:00

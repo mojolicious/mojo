@@ -2,7 +2,7 @@ package Mojo::IOWatcher;
 use Mojo::Base -base;
 
 use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
-use Time::HiRes 'usleep';
+use Time::HiRes qw/time usleep/;
 
 use constant DEBUG => $ENV{MOJO_IOWATCHER_DEBUG} || 0;
 

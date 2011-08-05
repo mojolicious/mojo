@@ -566,7 +566,7 @@ Number of keep alive requests per connection, defaults to C<25>.
   keep_alive_timeout => 10
 
 Maximum amount of time in seconds a connection can be inactive before being
-dropped, defaults to C<5>.
+dropped, defaults to C<15>.
 
 =head2 C<listen>
 

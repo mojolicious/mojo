@@ -18,7 +18,7 @@ use constant DEBUG => $ENV{MOJO_DAEMON_DEBUG} || 0;
 
 has [qw/backlog group listen silent user/];
 has ioloop => sub { Mojo::IOLoop->singleton };
-has keep_alive_timeout => 5;
+has keep_alive_timeout => 15;
 has max_clients        => 1000;
 has max_requests       => 25;
 has websocket_timeout  => 300;
@@ -425,10 +425,10 @@ Event loop for server I/O, defaults to the global L<Mojo::IOLoop> singleton.
 =head2 C<keep_alive_timeout>
 
   my $keep_alive_timeout = $daemon->keep_alive_timeout;
-  $daemon                = $daemon->keep_alive_timeout(15);
+  $daemon                = $daemon->keep_alive_timeout(5);
 
 Maximum amount of time in seconds a connection can be inactive before being
-dropped, defaults to C<5>.
+dropped, defaults to C<15>.
 
 =head2 C<listen>
 

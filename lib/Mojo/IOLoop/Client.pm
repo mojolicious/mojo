@@ -38,7 +38,6 @@ sub connect {
   my $args = ref $_[0] ? $_[0] : {@_};
 
   # Lookup
-  weaken $self;
   if (!$args->{handle} && (my $address = $args->{address})) {
     $self->resolver->lookup(
       $address => sub {

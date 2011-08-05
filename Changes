@@ -4,6 +4,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved documentation.
         - Fixed small alternative placeholder value bug in routes.
         - Fixed small bug in Mojo::IOWatcher.
+        - Fixed small bug in Mojo::IOLoop::Client.
 
 1.71    2011-08-05 00:00:00
         - Improved Mojo::IOWatcher to use higher resolution timers.

@@ -22,7 +22,7 @@ my $t = Mojo::IOLoop::Trigger->new;
 my @results;
 for my $i (0, 0) {
   $t->begin;
-  Mojo::IOLoop->timer($i => sub { push @results, $i; $t->end });
+  Mojo::IOLoop->defer(sub { push @results, $i; $t->end });
 }
 $t->start;
 is_deeply \@results, [0, 0], 'right results';
@@ -33,7 +33,7 @@ my $done;
 $t->on(done => sub { shift; $done = [@_, 'works!'] });
 for my $i (0, 0) {
   $t->begin;
-  Mojo::IOLoop->timer($i => sub { $t->end($i) });
+  Mojo::IOLoop->defer(sub { $t->end($i) });
 }
 @results = $t->start;
 is_deeply $done, [0, 0, 'works!'], 'right results';
@@ -42,10 +42,10 @@ is_deeply \@results, [0, 0], 'right results';
 # Mojo::IOLoop
 $done = undef;
 $t = Mojo::IOLoop->trigger(sub { shift; $done = [@_, 'too!'] });
-for my $i ('0.5', '0.5') {
+for my $i (1, 1) {
   my $cb = $t->begin;
-  Mojo::IOLoop->timer($i => sub { $t->$cb($i) });
+  Mojo::IOLoop->defer(sub { $t->$cb($i) });
 }
 @results = $t->start;
-is_deeply $done, ['0.5', '0.5', 'too!'], 'right results';
-is_deeply \@results, ['0.5', '0.5'], 'right results';
+is_deeply $done, [1, 1, 'too!'], 'right results';
+is_deeply \@results, [1, 1], 'right results';

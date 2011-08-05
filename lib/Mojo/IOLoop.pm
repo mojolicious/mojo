@@ -323,7 +323,7 @@ sub test {
   my ($self, $id) = @_;
   return unless my $c      = $self->{connections}->{$id};
   return unless my $stream = $c->{stream};
-  return $self->iowatcher->is_readable($stream->handle);
+  return !$self->iowatcher->is_readable($stream->handle);
 }
 
 sub timer {

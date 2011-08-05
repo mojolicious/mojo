@@ -46,7 +46,7 @@ sub is_readable {
   my $result = $test->handles(POLLIN | POLLERR | POLLHUP);
   $test->remove($handle);
 
-  return !$result;
+  return !!$result;
 }
 
 sub not_writing {

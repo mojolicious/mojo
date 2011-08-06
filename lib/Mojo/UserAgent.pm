@@ -101,24 +101,32 @@ sub put {
 sub start {
   my ($self, $tx, $cb) = @_;
 
-  # Blocking loop
-  my $loop = $self->{loop} ||= $self->ioloop;
-
   # Non-blocking
   if ($cb) {
 
     # Start non-blocking
     warn "NEW NON-BLOCKING REQUEST\n" if DEBUG;
-    $self->_switch_non_blocking unless $self->{nb};
+    unless ($self->{nb}) {
+      croak 'Blocking request in progress' if $self->{processing};
+      warn "SWITCHING TO NON-BLOCKING MODE\n" if DEBUG;
+      $self->_cleanup;
+      $self->{nb} = 1;
+    }
     return $self->_start($tx, $cb);
   }
 
   # Start blocking
   warn "NEW BLOCKING REQUEST\n" if DEBUG;
-  $self->_switch_blocking if $self->{nb};
+  if ($self->{nb}) {
+    croak 'Non-blocking requests in progress' if $self->{processing};
+    warn "SWITCHING TO BLOCKING MODE\n" if DEBUG;
+    $self->_cleanup;
+    $self->{nb} = 0;
+  }
   $self->_start($tx, sub { $tx = $_[1] });
 
   # Start loop
+  my $loop = $self->ioloop;
   $loop->start;
   $loop->one_tick(0);
 
@@ -163,7 +171,7 @@ sub _cache {
   }
 
   # Dequeue
-  my $loop = $self->{loop};
+  my $loop = $self->_loop;
   my $result;
   my @cache;
   for my $cached (@$cache) {
@@ -187,7 +195,7 @@ sub _cache {
 
 sub _cleanup {
   my $self = shift;
-  return unless my $loop = $self->{loop};
+  return unless my $loop = $self->_loop;
 
   # Stop server
   delete $self->{port};
@@ -210,7 +218,7 @@ sub _connect {
 
   # Keep alive connection
   weaken $self;
-  my $loop = $self->{loop};
+  my $loop = $self->_loop;
   my $id   = $tx->connection;
   my ($scheme, $host, $port) = $self->transactor->peer($tx);
   $id ||= $self->_cache("$scheme:$host:$port");
@@ -255,7 +263,7 @@ sub _connected {
   my ($self, $id) = @_;
 
   # Store connection information in transaction
-  my $loop = $self->{loop};
+  my $loop = $self->_loop;
   my $tx   = $self->{connections}->{$id}->{transaction};
   $tx->connection($id);
   my $local = $loop->local_info($id);
@@ -285,7 +293,7 @@ sub _drop {
 
   # Close connection
   $self->_cache($id);
-  $self->{loop}->drop($id);
+  $self->_loop->drop($id);
 }
 
 sub _error {
@@ -352,7 +360,12 @@ sub _handle {
   }
 
   # Stop loop
-  $self->{loop}->stop if !$self->{nb} && !$self->{processing};
+  $self->ioloop->stop if !$self->{nb} && !$self->{processing};
+}
+
+sub _loop {
+  my $self = shift;
+  return $self->{nb} ? Mojo::IOLoop->singleton : $self->ioloop;
 }
 
 # "Hey, Weener Boy... where do you think you're going?"
@@ -374,7 +387,7 @@ sub _proxy_connect {
       # TLS upgrade
       if ($tx->req->url->scheme eq 'https') {
         return unless my $id = $tx->connection;
-        $self->{loop}->start_tls($id);
+        $self->_loop->start_tls($id);
         $old->req->proxy(undef);
       }
 
@@ -464,32 +477,6 @@ sub _start {
   return $id;
 }
 
-sub _switch_blocking {
-  my $self = shift;
-
-  # Can't switch while processing non-blocking requests
-  croak 'Non-blocking requests in progress' if $self->{processing};
-  warn "SWITCHING TO BLOCKING MODE\n" if DEBUG;
-
-  # Normal loop
-  $self->_cleanup;
-  $self->{loop} = $self->ioloop;
-  $self->{nb}   = 0;
-}
-
-sub _switch_non_blocking {
-  my $self = shift;
-
-  # Can't switch while processing blocking requests
-  croak 'Blocking request in progress' if $self->{processing};
-  warn "SWITCHING TO NON-BLOCKING MODE\n" if DEBUG;
-
-  # Global loop
-  $self->_cleanup;
-  $self->{loop} = Mojo::IOLoop->singleton;
-  $self->{nb}   = 1;
-}
-
 sub _test_server {
   my ($self, $scheme) = @_;
 
@@ -501,7 +488,7 @@ sub _test_server {
 
   # Start test server
   unless ($self->{port}) {
-    my $loop = $self->{loop} || $self->ioloop;
+    my $loop   = $self->_loop;
     my $server = $self->{server} =
       Mojo::Server::Daemon->new(ioloop => $loop, silent => 1);
     my $port = $self->{port} = $loop->generate_port;
@@ -534,7 +521,7 @@ sub _upgrade {
   $res->error('WebSocket challenge failed.') and return
     unless $new->client_challenge;
   $c->{transaction} = $new;
-  $self->{loop}->connection_timeout($id, $self->websocket_timeout);
+  $self->_loop->connection_timeout($id, $self->websocket_timeout);
   weaken $self;
   $new->on_resume(sub { $self->_write($id) });
 
@@ -558,7 +545,7 @@ sub _write {
   }
 
   # Write data
-  $self->{loop}->write($id, $chunk, $cb);
+  $self->_loop->write($id, $chunk, $cb);
   warn "> $chunk\n"   if DEBUG;
   $self->_handle($id) if $tx->is_done;
 }

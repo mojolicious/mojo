@@ -19,13 +19,13 @@ has timeout => 3;
 
 # IPv4 regex (RFC 3986)
 my $DEC_OCTET_RE = qr/(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])/;
-our $IPV4_RE =
+my $IPV4_RE =
   qr/^$DEC_OCTET_RE\.$DEC_OCTET_RE\.$DEC_OCTET_RE\.$DEC_OCTET_RE$/;
 
 # IPv6 regex (RFC 3986)
 my $H16_RE  = qr/[0-9A-Fa-f]{1,4}/;
 my $LS32_RE = qr/(?:$H16_RE:$H16_RE|$IPV4_RE)/;
-our $IPV6_RE = qr/(?:
+my $IPV6_RE = qr/(?:
                                            (?: $H16_RE : ){6} $LS32_RE
   |                                     :: (?: $H16_RE : ){5} $LS32_RE
   | (?:                      $H16_RE )? :: (?: $H16_RE : ){4} $LS32_RE
@@ -346,6 +346,19 @@ Mojo::IOLoop::Resolver - IOLoop DNS Stub Resolver
 =head1 SYNOPSIS
 
   use Mojo::IOLoop::Resolver;
+
+  # Lookup address
+  my $resolver = Mojo::IOLoop::Resolver->new;
+  $resolver->lookup('mojolicio.us' => sub {
+    my ($self, $address) = @_;
+    ...
+  });
+
+  # Resolve "MX" records
+  $resolver->resolve('mojolicio.us', 'MX', sub {
+    my ($self, $records) = @_;
+    ...
+  });
 
 =head1 DESCRIPTION
 

@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension Mojolicious.
 
 1.73    2011-08-06 00:00:00
         - Made Mojo::UserAgent slightly more efficient.
+        - Improved documentation.
 
 1.72    2011-08-05 00:00:00
         - Changed default keep alive timeout in Mojo::Server::Daemon from 5

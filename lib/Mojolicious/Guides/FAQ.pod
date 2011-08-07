@@ -22,7 +22,7 @@ stack called L<Mojo>, which was heavily inspired by the original C<LWPng>
 effort and carefully designed with these new requirements in mind.
 So while some of the higher abstraction layers might look similar to other
 web frameworks, it actually defines a whole new category and could even be
-the foundation for new ones in the future.
+the foundation for more advanced ones in the future.
 
 =head2 Why doesn't Mojolicious have any dependencies?
 

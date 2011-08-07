@@ -137,6 +137,7 @@ sub run {
 
   # Get
   my $tx = $ua->build_tx($method, $url, $headers, $content);
+  STDOUT->autoflush(1);
   $tx = $ua->start($tx);
 
   # Error

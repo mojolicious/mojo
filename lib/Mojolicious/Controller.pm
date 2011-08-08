@@ -478,27 +478,36 @@ sub res { shift->tx->res }
 
 sub respond_to {
   my $self = shift;
+  my $args = ref $_[0] ? $_[0] : {@_};
 
   # Detect formats
-  my %formats;
+  my @formats;
   my $app = $self->app;
-  $formats{$_}++ for @{$app->types->detect($self->req->headers->accept)};
+  push @formats, @{$app->types->detect($self->req->headers->accept)};
   my $stash = $self->stash;
-  unless (keys %formats) {
-    if (my $format = $stash->{format}) { $formats{$format}++ }
-    else { $formats{$app->renderer->default_format}++ }
+  unless (@formats) {
+    if (my $format = $stash->{format}) { push @formats, $format }
+    else { push @formats, $app->renderer->default_format }
   }
 
-  # Dispatch formats
-  while (my $ext = shift) {
-    return unless my $cb = shift;
-    next unless $formats{$ext};
-    $stash->{format} = $ext;
-    $cb->($self);
-    return 1;
+  # Find target
+  my $target;
+  for my $format (@formats) {
+    if ($target = $args->{$format}) {
+      $stash->{format} = $format;
+      last;
+    }
   }
 
-  return;
+  # Fallback
+  unless ($target) {
+    return unless $target = $args->{any};
+    delete $stash->{format};
+  }
+
+  # Dispatch
+  ref $target eq 'CODE' ? $target->($self) : $self->render($target);
+  return 1;
 }
 
 sub send_message {
@@ -948,7 +957,8 @@ Usually refers to a L<Mojo::Message::Response> object.
 
   my $success = $c->respond_to(
     json => sub {...},
-    xml  => sub {...}
+    xml  => {data => 'hello!'},
+    any  => sub {...}
   );
 
 Automatically select best possible representation for resource from C<Accept>
@@ -957,8 +967,9 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
   $c->respond_to(
     json => sub { $c->render_json({just => 'works'}) },
-    xml  => sub { $c->render_data('<just>works</just>') }
-  ) or $c->rendered(204);
+    xml  => {data => '<just>works</just>'},
+    any  => {data => '', status => 204}
+  );
 
 =head2 C<send_message>
 

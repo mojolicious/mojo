@@ -90,9 +90,9 @@ following ones.
 
 =head2 C<detect>
 
-  my $extensions = $types->detect('application/json');
+  my $extensions = $types->detect('application/json;q=9');
 
-Detect file extensions from MIME type.
+Detect file extensions from C<Accept> header value.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<type>

@@ -490,9 +490,10 @@ content negotiation you can also use C<respond_to>.
   get '/hello' => sub {
     my $self = shift;
     $self->respond_to(
-      json => sub { $self->render_json({hello => 'world'}) },
-      xml  => sub { $self->render_data('<hello>world</hello>') }
-    ) or $self->rendered(204);
+      json => {json => {hello => 'world'}},
+      xml  => {data => '<hello>world</hello>'},
+      any  => {data => '', status => 204}
+    );
   };
 
 =head2 Under

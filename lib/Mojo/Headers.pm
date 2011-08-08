@@ -81,7 +81,7 @@ for my $name (@HEADERS) {
   $NORMALCASE_HEADERS{$lowercase} = $name;
 }
 
-sub accept          { scalar shift->header('Accept'          => @_) }
+sub accept          { scalar shift->header(Accept            => @_) }
 sub accept_language { scalar shift->header('Accept-Language' => @_) }
 sub accept_ranges   { scalar shift->header('Accept-Ranges'   => @_) }
 sub authorization   { scalar shift->header(Authorization     => @_) }

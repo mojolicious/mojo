@@ -958,7 +958,7 @@ Note that this method is EXPERIMENTAL and might change without warning!
   $c->respond_to(
     json => sub { $c->render_json({just => 'works'}) },
     xml  => sub { $c->render_data('<just>works</just>') }
-  );
+  ) or $c->rendered(204);
 
 =head2 C<send_message>
 

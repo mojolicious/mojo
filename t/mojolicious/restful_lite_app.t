@@ -22,7 +22,7 @@ get '/rest' => sub {
     json => sub { $self->render_json({just => 'works'}) },
     html => sub { $self->render_data('<html><body>works') },
     xml  => sub { $self->render_data('<just>works</just>') }
-  ) or $self->render_text('', status => 204);
+  ) or $self->rendered(204);
 };
 
 # "Raise the solar sails! I'm going after that Mobius Dick!"

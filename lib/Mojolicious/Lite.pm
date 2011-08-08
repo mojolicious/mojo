@@ -492,7 +492,7 @@ C<respond_to>.
     $self->respond_to(
       json => sub { $self->render_json({hello => 'world'}) },
       xml  => sub { $self->render_data('<hello>world</hello>') }
-    ) or $self->render_text('', status => 204);
+    ) or $self->rendered(204);
   };
 
 =head2 Under

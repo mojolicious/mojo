@@ -31,7 +31,8 @@ has trim_mark       => '=';
 my $HELPERS = <<'EOF';
 use Mojo::ByteStream 'b';
 use Mojo::Util;
-no strict 'refs'; no warnings 'redefine';
+no strict 'refs';
+no warnings 'redefine';
 sub capture;
 *capture = sub { shift->(@_) };
 sub escape;
@@ -45,7 +46,7 @@ sub escape;
   Mojo::Util::xml_escape $v;
   $v;
 };
-use strict; use warnings;
+use Mojo::Base -strict;
 EOF
 $HELPERS =~ s/\n//g;
 

@@ -1,7 +1,5 @@
 #!/usr/bin/env perl
-
-use strict;
-use warnings;
+use Mojo::Base -strict;
 
 use Test::More;
 plan skip_all => 'Perl 5.10 required for this test!' unless $] >= 5.010;

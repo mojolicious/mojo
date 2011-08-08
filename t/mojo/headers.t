@@ -1,7 +1,5 @@
 #!/usr/bin/env perl
-
-use strict;
-use warnings;
+use Mojo::Base -strict;
 
 # "Remember, you can always find East by staring directly at the sun."
 use Test::More tests => 41;

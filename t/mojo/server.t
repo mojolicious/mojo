@@ -1,7 +1,5 @@
 #!/usr/bin/env perl
-
-use strict;
-use warnings;
+use Mojo::Base -strict;
 
 # "Would you kindly shut your noise-hole?"
 use Test::More tests => 5;

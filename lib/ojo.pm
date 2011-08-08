@@ -1,7 +1,5 @@
 package ojo;
-
-use strict;
-use warnings;
+use Mojo::Base -strict;
 
 # "I heard beer makes you stupid.
 #  No I'm... doesn't."

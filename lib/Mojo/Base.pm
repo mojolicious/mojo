@@ -22,6 +22,9 @@ sub import {
   # Base
   if ($flag eq '-base') { $flag = $class }
 
+  # Strict
+  elsif ($flag eq '-strict') { $flag = undef }
+
   # Module
   else {
     my $file = $flag;
@@ -30,15 +33,17 @@ sub import {
   }
 
   # ISA
-  my $caller = caller;
-  push @{"${caller}::ISA"}, $flag;
+  if ($flag) {
+    my $caller = caller;
+    push @{"${caller}::ISA"}, $flag;
 
-  # Can haz?
-  *{"${caller}::has"} = sub { attr($caller, @_) };
+    # Can haz?
+    *{"${caller}::has"} = sub { attr($caller, @_) };
+  }
 
   # Mojo modules are strict!
   strict->import;
-  warnings->import;
+  warnings->import(FATAL => 'all');
 
   # Mojo modules are modern!
   feature->import(':5.10') if $] >= 5.010;
@@ -167,14 +172,20 @@ L<Mojo::Base> exports the following functions if imported with the C<-base>
 flag or a base class.
 
   # Automatically enables "strict" and "warnings"
+  use Mojo::Base -strict;
   use Mojo::Base -base;
   use Mojo::Base 'SomeBaseClass';
 
-Both forms save a lot of typing.
+All three forms save a lot of typing.
+
+  # use Mojo::Base -strict;
+  use strict;
+  use warnings FATAL => 'all';
+  use feature ':5.10';
 
   # use Mojo::Base -base;
   use strict;
-  use warnings;
+  use warnings FATAL => 'all';
   use feature ':5.10';
   use Mojo::Base;
   push @ISA, 'Mojo::Base';
@@ -182,7 +193,7 @@ Both forms save a lot of typing.
 
   # use Mojo::Base 'SomeBaseClass';
   use strict;
-  use warnings;
+  use warnings FATAL => 'all';
   use feature ':5.10';
   require SomeBaseClass;
   push @ISA, 'SomeBaseClass';

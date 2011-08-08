@@ -41,7 +41,7 @@ sub render {
   $prepend .= "sub app; *app = sub { \$app };";
 
   # Be strict again
-  $prepend .= q/use strict; use warnings;/;
+  $prepend .= q/use Mojo::Base -strict;/;
 
   # Render
   my $mt = Mojo::Template->new($conf->{template} || {});

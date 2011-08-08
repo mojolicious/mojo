@@ -1,7 +1,5 @@
 #!/usr/bin/env perl
-
-use strict;
-use warnings;
+use Mojo::Base -strict;
 
 # Disable Bonjour, IPv6 and libev
 BEGIN {
@@ -12,18 +10,14 @@ BEGIN {
 use Test::More tests => 24;
 
 package MyTestApp::I18N::en;
+use Mojo::Base -strict;
 use base 'MyTestApp::I18N';
-
-use strict;
-use warnings;
 
 our %Lexicon = (hello => 'Hello World');
 
 package MyTestApp::I18N::de;
+use Mojo::Base -strict;
 use base 'MyTestApp::I18N';
-
-use strict;
-use warnings;
 
 our %Lexicon = (hello => 'Hallo Welt');
 

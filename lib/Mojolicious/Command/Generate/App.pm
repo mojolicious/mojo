@@ -57,9 +57,7 @@ __DATA__
 @@ mojo
 % my $class = shift;
 #!/usr/bin/env perl
-
-use strict;
-use warnings;
+use Mojo::Base -strict;
 
 use File::Basename 'dirname';
 use File::Spec;
@@ -126,9 +124,7 @@ sub welcome {
 @@ test
 % my $class = shift;
 #!/usr/bin/env perl
-
-use strict;
-use warnings;
+use Mojo::Base -strict;
 
 use Test::More tests => 5;
 use Test::Mojo;

@@ -315,7 +315,7 @@ sub camelize {
 
     # Camelcase words
     my @words = split /_/, $part;
-    @words = map {ucfirst} map {lc} @words;
+    @words = map { ucfirst lc } @words;
     push @parts, join '', @words;
   }
   $_[0] = join '::', @parts;

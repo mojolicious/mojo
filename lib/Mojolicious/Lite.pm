@@ -491,7 +491,7 @@ content negotiation you can also use C<respond_to>.
     my $self = shift;
     $self->respond_to(
       json => {json => {hello => 'world'}},
-      xml  => {data => '<hello>world</hello>'},
+      xml  => {text => '<hello>world</hello>'},
       any  => {data => '', status => 204}
     );
   };

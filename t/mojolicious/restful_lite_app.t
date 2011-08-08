@@ -31,7 +31,7 @@ post sub {
   my $self = shift;
   $self->respond_to(
     json => {json => {just => 'works too'}},
-    html => {data => '<html><body>works too'},
+    html => {text => '<html><body>works too'},
     xml  => {data => '<just>works too</just>'},
     any => {text => 'works too', status => 201}
   );

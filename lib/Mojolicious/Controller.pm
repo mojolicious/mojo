@@ -957,7 +957,7 @@ Usually refers to a L<Mojo::Message::Response> object.
 
   my $success = $c->respond_to(
     json => sub {...},
-    xml  => {data => 'hello!'},
+    xml  => {text => 'hello!'},
     any  => sub {...}
   );
 
@@ -967,7 +967,7 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
   $c->respond_to(
     json => sub { $c->render_json({just => 'works'}) },
-    xml  => {data => '<just>works</just>'},
+    xml  => {text => '<just>works</just>'},
     any  => {data => '', status => 204}
   );
 

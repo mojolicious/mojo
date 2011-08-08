@@ -478,6 +478,23 @@ Restrictive placeholders can also be used for format detection.
     $self->render_text('hello world!');
   };
 
+=head2 RESTful Resources
+
+To give your truly C<RESTful> resources different representations you can use
+C<respond_to>.
+
+  # /hello (Accept: application/json)
+  # /hello (Accept: text/xml)
+  # /hello.json
+  # /hello.xml
+  get '/hello' => sub {
+    my $self = shift;
+    $self->respond_to(
+      json => sub { $self->render_json({hello => 'world'}) },
+      xml  => sub { $self->render_data('<hello>world</hello>') }
+    ) or $self->render_text('', status => 204);
+  };
+
 =head2 Under
 
 Authentication and code shared between multiple routes can be realized easily

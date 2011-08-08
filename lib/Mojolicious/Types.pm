@@ -31,6 +31,23 @@ has types => sub {
 };
 
 # "Magic. Got it."
+sub detect {
+  my ($self, $accept) = @_;
+
+  # Detect extensions from MIME type
+  return [] unless (($accept || '') =~ /^([^,]+?)(?:\;[^,]*)*$/);
+  my $pattern = $1;
+  my @exts;
+  my $types = $self->types;
+  for my $ext (keys %$types) {
+    my $type = $types->{$ext};
+    $type =~ s/\;.*$//;
+    push @exts, $ext if $pattern =~ /^$type$/i;
+  }
+
+  return \@exts;
+}
+
 sub type {
   my ($self, $ext, $type) = @_;
   if ($type) {
@@ -70,6 +87,13 @@ List of MIME types.
 
 L<Mojolicious::Types> inherits all methods from L<Mojo::Base> and implements the
 following ones.
+
+=head2 C<detect>
+
+  my $extensions = $types->detect('application/json');
+
+Detect file extensions from MIME type.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<type>
 

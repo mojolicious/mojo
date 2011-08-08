@@ -81,6 +81,7 @@ for my $name (@HEADERS) {
   $NORMALCASE_HEADERS{$lowercase} = $name;
 }
 
+sub accept          { scalar shift->header('Accept'          => @_) }
 sub accept_language { scalar shift->header('Accept-Language' => @_) }
 sub accept_ranges   { scalar shift->header('Accept-Ranges'   => @_) }
 sub authorization   { scalar shift->header(Authorization     => @_) }
@@ -353,6 +354,13 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
 
 L<Mojo::Headers> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
+
+=head2 C<accept>
+
+  my $accept = $headers->accept;
+  $headers   = $headers->accept('application/json');
+
+Shortcut for the C<Accept> header.
 
 =head2 C<accept_language>
 

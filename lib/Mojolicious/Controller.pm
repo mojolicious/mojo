@@ -476,6 +476,31 @@ sub rendered {
 sub req { shift->tx->req }
 sub res { shift->tx->res }
 
+sub respond_to {
+  my $self = shift;
+
+  # Detect formats
+  my %formats;
+  my $app = $self->app;
+  $formats{$_}++ for @{$app->types->detect($self->req->headers->accept)};
+  my $stash = $self->stash;
+  unless (keys %formats) {
+    if (my $format = $stash->{format}) { $formats{$format}++ }
+    else { $formats{$app->renderer->default_format}++ }
+  }
+
+  # Dispatch formats
+  while (my $ext = shift) {
+    return unless my $cb = shift;
+    next unless $formats{$ext};
+    $stash->{format} = $ext;
+    $cb->($self);
+    return 1;
+  }
+
+  return;
+}
+
 sub send_message {
   my ($self, $message, $cb) = @_;
 
@@ -672,7 +697,6 @@ sub write_chunk {
 }
 
 1;
-
 __END__
 
 =head1 NAME
@@ -919,6 +943,22 @@ Usually refers to a L<Mojo::Message::Request> object.
 
 Alias for C<$c-E<gt>tx-E<gt>res>.
 Usually refers to a L<Mojo::Message::Response> object.
+
+=head2 C<respond_to>
+
+  my $success = $c->respond_to(
+    json => sub {...},
+    xml  => sub {...}
+  );
+
+Automatically select best possible representation for resource from C<Accept>
+request header and route C<format>.
+Note that this method is EXPERIMENTAL and might change without warning!
+
+  $c->respond_to(
+    json => sub { $c->render_json({just => 'works'}) },
+    xml  => sub { $c->render_data('<just>works</just>') }
+  );
 
 =head2 C<send_message>
 

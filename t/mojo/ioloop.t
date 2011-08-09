@@ -120,13 +120,15 @@ $loop->connect(
   }
 );
 $loop->start;
-my $error;
-my $connected;
+my ($connected, $error);
 $loop->connect(
   address    => 'localhost',
   port       => $port,
-  on_connect => sub { $connected = 1 },
-  on_error   => sub {
+  on_connect => sub {
+    shift->stop;
+    $connected = 1;
+  },
+  on_error => sub {
     shift->stop;
     $error = pop;
   }

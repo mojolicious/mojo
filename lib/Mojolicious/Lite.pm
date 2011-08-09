@@ -16,7 +16,7 @@ sub import {
 
   # Lite apps are strict!
   strict->import;
-  warnings->import(FATAL => 'all');
+  warnings->import;
 
   # Lite apps are modern!
   feature->import(':5.10') if $] >= 5.010;

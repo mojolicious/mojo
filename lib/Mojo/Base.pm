@@ -43,7 +43,7 @@ sub import {
 
   # Mojo modules are strict!
   strict->import;
-  warnings->import(FATAL => 'all');
+  warnings->import;
 
   # Mojo modules are modern!
   feature->import(':5.10') if $] >= 5.010;
@@ -180,12 +180,12 @@ All three forms save a lot of typing.
 
   # use Mojo::Base -strict;
   use strict;
-  use warnings FATAL => 'all';
+  use warnings;
   use feature ':5.10';
 
   # use Mojo::Base -base;
   use strict;
-  use warnings FATAL => 'all';
+  use warnings;
   use feature ':5.10';
   use Mojo::Base;
   push @ISA, 'Mojo::Base';
@@ -193,7 +193,7 @@ All three forms save a lot of typing.
 
   # use Mojo::Base 'SomeBaseClass';
   use strict;
-  use warnings FATAL => 'all';
+  use warnings;
   use feature ':5.10';
   require SomeBaseClass;
   push @ISA, 'SomeBaseClass';

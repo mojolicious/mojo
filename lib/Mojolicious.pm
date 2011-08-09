@@ -34,7 +34,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Smiling Face With Sunglasses';
-our $VERSION  = '1.74';
+our $VERSION  = '1.75';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -348,7 +348,7 @@ code into a file and start it with C<morbo>.
   $ curl http://127.0.0.1:3000/
   Hello World!
 
-=head2 Duct Tape For The HTML5 Web
+=head2 Duct Tape For The Web
 
 Web development for humans, making hard things possible and everything fun.
 

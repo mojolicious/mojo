@@ -80,7 +80,7 @@ code into a file and start it with C<morbo>.
   $ curl http://127.0.0.1:3000/
   Hello World!
 
-=head2 Duct Tape For The HTML5 Web
+=head2 Duct Tape For The Web
 
 Web development for humans, making hard things possible and everything fun.
 

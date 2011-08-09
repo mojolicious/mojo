@@ -49,7 +49,7 @@ __END__
 
 =head1 NAME
 
-Mojo - The Box!
+Mojo - The Duct Tape!
 
 =head1 SYNOPSIS
 

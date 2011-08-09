@@ -236,7 +236,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious - The Web In A Box!
+Mojolicious - Perl Duct Tape For The HTML5 Web!
 
 =head1 SYNOPSIS
 

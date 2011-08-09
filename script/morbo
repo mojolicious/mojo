@@ -28,6 +28,7 @@ my ($help, @listen, @watch);
 GetOptions(
   help => sub { $help = 1 },
   'listen=s' => \@listen,
+  verbose    => sub { $ENV{MORBO_VERBOSE} = 1 },
   'watch=s'  => \@watch
 );
 $help = 1 unless my $app = shift;
@@ -43,6 +44,8 @@ These options are available:
   --help                     Show this message.
   --listen <location>        Set one or more locations you want to listen on,
                              defaults to http://*:3000.
+  --verbose                  Print details about what files changed to
+                             STDOUT.
   --watch <directory/file>   Set one or more directories and files to watch
                              for changes, defaults to the application script
                              as well as the "lib" and "templates" directories

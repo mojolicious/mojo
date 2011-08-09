@@ -242,7 +242,7 @@ is_deeply $hash, {foo => 'c:\progra~1\mozill~1\firefox.exe'},
 # Huge string
 $string = $json->encode(['a' x 32768]);
 is_deeply $json->decode($string), ['a' x 32768], 'successful roundtrip';
-is $json->error, undef, 'no errors';
+is $json->error, undef, 'no error';
 
 # u2028 and u2029
 $string = $json->encode(["\x{2028}test\x{2029}123"]);

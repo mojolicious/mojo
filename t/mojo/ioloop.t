@@ -127,7 +127,7 @@ $loop->connect(
 );
 $loop->start;
 ok $connected, 'connected';
-ok !$error, 'has no error';
+ok !$error, 'no error';
 $connected = $error = undef;
 $loop->connect(
   address    => 'localhost',

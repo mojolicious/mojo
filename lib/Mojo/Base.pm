@@ -166,11 +166,6 @@ Mojo::Base - Minimal Base Class For Mojo Projects
 
 L<Mojo::Base> is a simple base class for L<Mojo> projects.
 
-=head1 FUNCTIONS
-
-L<Mojo::Base> exports the following functions if imported with the C<-base>
-flag or a base class.
-
   # Automatically enables "strict" and "warnings"
   use Mojo::Base -strict;
   use Mojo::Base -base;
@@ -199,6 +194,11 @@ All three forms save a lot of typing.
   push @ISA, 'SomeBaseClass';
   use Mojo::Base;
   sub has { Mojo::Base::attr(__PACKAGE__, @_) }
+
+=head1 FUNCTIONS
+
+L<Mojo::Base> exports the following functions if imported with the C<-base>
+flag or a base class.
 
 =head2 C<has>
 

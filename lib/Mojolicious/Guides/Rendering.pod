@@ -255,6 +255,40 @@ Since everything is just Perl normal control structures just work.
     <%= $app %> is a <%= $description %>.
   <% } %>
 
+=head2 Content Negotiation
+
+For resources with different representations and that require truly
+C<RESTful> content negotiation you can also use C<respond_to> instead of
+C<render>.
+
+  $self->respond_to(
+    json => {json => {hello => 'world'}},
+    xml  => {text => '<hello>world</hello>'}
+  );
+
+The best possible representation will be automatically selected from the
+C<Accept> request header and route C<format>.
+
+  $self->respond_to(
+    json => {json => {hello => 'world'}},
+    html => sub {
+      $self->content_for(head => '<meta name="author" content="sri" />');
+      $self->render(template => 'hello', message => 'world')
+    }
+  );
+
+Callbacks can be used for representations that are too complex to fit into a
+single C<render> call.
+
+  $self->respond_to(
+    json => {json => {hello => 'world'}},
+    html => {template => 'hello', message => 'world'},
+    any  => {text => '', status => 204}
+  );
+
+And if no viable representation could be found, the C<any> fallback will be
+used.
+
 =head2 Helpers
 
 Helpers are little functions you can use in templates and controller code.

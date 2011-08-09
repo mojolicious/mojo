@@ -479,8 +479,8 @@ Restrictive placeholders can also be used for format detection.
 
 =head2 Content Negotiation
 
-For resources with different representations that require truly C<RESTful>
-content negotiation you can also use C<respond_to>.
+For resources with different representations and that require truly
+C<RESTful> content negotiation you can also use C<respond_to>.
 
   # /hello (Accept: application/json)
   # /hello (Accept: text/xml)

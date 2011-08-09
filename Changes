@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-1.73    2011-08-08 00:00:00
+1.73    2011-08-09 00:00:00
         - Added EXPERIMENTAL -strict flag to Mojo::Base.
         - Added EXPERIMENTAL respond_to method to Mojolicious::Controller.
         - Added EXPERIMENTAL detect method to Mojolicious::Types.

@@ -261,6 +261,8 @@ For resources with different representations and that require truly
 C<RESTful> content negotiation you can also use C<respond_to> instead of
 C<render>.
 
+  # "Accept: application/json" -> "json"
+  # "Accept: text/xml"         -> "xml"
   $self->respond_to(
     json => {json => {hello => 'world'}},
     xml  => {text => '<hello>world</hello>'}
@@ -280,6 +282,9 @@ C<Accept> request header and route C<format>.
 Callbacks can be used for representations that are too complex to fit into a
 single C<render> call.
 
+  # "Accept: application/json" -> "json"
+  # "Accept: text/html"        -> "html"
+  # "Accept: image/png"        -> "any"
   $self->respond_to(
     json => {json => {hello => 'world'}},
     html => {template => 'hello', message => 'world'},

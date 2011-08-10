@@ -1,6 +1,8 @@
 package Mojo::DOM::CSS;
 use Mojo::Base -base;
 
+use List::Util 'first';
+
 # Regex
 my $CSS_ESCAPE_RE = qr/\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}/;
 my $CSS_ATTR_RE   = qr/
@@ -65,8 +67,9 @@ sub select {
 
       # Parts
       for my $part (@$pattern) {
-        push(@results, $current) and last
-          if $self->_element($current, $part, $tree);
+        my $result = $self->_element($current, $part, $tree);
+        push(@results, $result) and last
+          if $result && !first { $_ eq $result } @results;
       }
     }
   }
@@ -100,10 +103,14 @@ sub _compile {
 
     # Element
     $element ||= '';
-    my $tag = '*';
+    my $tag = '';
     $element =~ s/$CSS_ELEMENT_RE// and $tag = $self->_unescape($1);
 
+    # Subject
+    $selector->[0] = 'subject' if $tag =~ s/^\$//;
+
     # Tag
+    $tag = '*' unless $tag;
     push @$selector, ['tag', $tag];
 
     # Class or ID
@@ -195,7 +202,6 @@ sub _element {
         }
       }
 
-      # Move on
       next;
     }
 
@@ -225,6 +231,9 @@ sub _element {
       # Not a tag
       return if $current->[0] ne 'tag';
 
+      # Subject
+      $candidate = $current if $selector->[0] eq 'subject';
+
       # Compare part to element
       if ($self->_selector($selector, $current)) {
         $siblings = undef;
@@ -250,7 +259,7 @@ sub _element {
     }
   }
 
-  return 1;
+  return $candidate;
 }
 
 # "Rock stars... is there anything they don't know?"
@@ -673,6 +682,19 @@ Elements of type C<E>, C<F> and C<G>.
 An C<E> element whose attributes match all following attribute selectors.
 
   my $links = $css->select('a[foo^="b"][foo$="ar"]');
+
+=head2 C<E $F G>
+
+An C<F> element descendant of an C<E> element and ancestor of an C<G>
+element.
+
+  my $checked = $css->select('$div > :checked');
+
+By default, the subjects of a selector are the elements represented by the
+last compound selector.
+In CSS4 however the subject can be explicitly identified by prepending a
+dollar sign to one of the compound selectors.
+Note that this selector is EXPERIMENTAL and might change without warning!
 
 =head1 ATTRIBUTES
 

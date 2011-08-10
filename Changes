@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.75    2011-08-09 00:00:00
+        - Added experimental CSS4 selector subject support to Mojo::DOM::CSS.
         - Improved documentation.
         - Fixed typos.
 

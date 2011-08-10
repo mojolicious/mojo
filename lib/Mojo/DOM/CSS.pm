@@ -372,7 +372,7 @@ sub _selector {
       }
 
       # ":empty"
-      elsif ($class eq 'empty') { next unless exists $current->[4] }
+      elsif ($class eq 'empty') { next unless defined $current->[4] }
 
       # ":root"
       elsif ($class eq 'root') {

@@ -51,9 +51,7 @@ sub import {
 
 sub new {
   my $class = shift;
-  bless
-    exists $_[0] ? exists $_[1] ? {@_} : {%{$_[0]}} : {},
-    ref $class || $class;
+  bless @_ ? @_ > 1 ? {@_} : {%{$_[0]}} : {}, ref $class || $class;
 }
 
 # Performance is very important for something as often used as accessors,

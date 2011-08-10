@@ -142,7 +142,7 @@ sub flash {
   return $flash unless @_;
 
   # Set
-  my $values = exists $_[1] ? {@_} : $_[0];
+  my $values = @_ > 1 ? {@_} : $_[0];
   $session->{new_flash} = {%$flash, %$values};
 
   return $self;
@@ -540,7 +540,7 @@ sub session {
   return $session unless @_;
 
   # Set
-  my $values = exists $_[1] ? {@_} : $_[0];
+  my $values = @_ > 1 ? {@_} : $_[0];
   $stash->{'mojo.session'} = {%$session, %$values};
 
   return $self;

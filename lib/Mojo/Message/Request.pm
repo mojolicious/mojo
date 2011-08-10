@@ -116,8 +116,8 @@ sub parse {
 
   # CGI like environment
   my $env;
-  if   (exists $_[1]) { $env = {@_} }
-  else                { $env = $_[0] if ref $_[0] eq 'HASH' }
+  if   (@_ > 1) { $env = {@_} }
+  else          { $env = $_[0] if ref $_[0] eq 'HASH' }
 
   # Parse CGI like environment
   my $chunk;

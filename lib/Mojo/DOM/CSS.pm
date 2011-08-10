@@ -688,7 +688,7 @@ An C<E> element whose attributes match all following attribute selectors.
 An C<F> element descendant of an C<E> element and ancestor of an C<G>
 element.
 
-  my $checked = $css->select('$div > :checked');
+  my $wrappers = $css->select('$div.wrapper > :checked');
 
 By default, the subjects of a selector are the elements represented by the
 last compound selector.

@@ -575,7 +575,7 @@ Mojo::UserAgent - Non-Blocking I/O HTTP 1.1 And WebSocket User Agent
   print $ua->get('mojolicio.us')->res->dom->html->head->title->text;
 
   # Scrape the latest headlines from a news site
-  $ua->max_redirects(3)->get('www.reddit.com/r/perl/')
+  $ua->max_redirects(5)->get('www.reddit.com/r/perl/')
     ->res->dom('p.title > a.title')->each(sub { print $_->text, "\n" });
 
   # Form post with exception handling
@@ -588,7 +588,7 @@ Mojo::UserAgent - Non-Blocking I/O HTTP 1.1 And WebSocket User Agent
 
   # Grab the latest Mojolicious release :)
   $ua->max_redirects(5)->get('latest.mojolicio.us')
-    ->res->content->asset->move_to("/Users/sri/mojo.tar.gz");
+    ->res->content->asset->move_to('/Users/sri/mojo.tar.gz');
 
   # Parallel requests
   my $t = Mojo::IOLoop->trigger;

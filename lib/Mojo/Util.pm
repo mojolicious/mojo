@@ -296,7 +296,7 @@ our @EXPORT_OK = qw/b64_decode b64_encode camelize decamelize decode encode/;
 push @EXPORT_OK, qw/get_line hmac_md5_sum hmac_sha1_sum/;
 push @EXPORT_OK, qw/html_escape html_unescape md5_bytes md5_sum/;
 push @EXPORT_OK, qw/punycode_decode punycode_encode qp_decode qp_encode/;
-push @EXPORT_OK, qw/quote sha1_bytes sha1_sum trim unquote/;
+push @EXPORT_OK, qw/quote secure_compare sha1_bytes sha1_sum trim unquote/;
 push @EXPORT_OK, qw/url_escape url_unescape xml_escape/;
 
 sub b64_decode { $_[0] = MIME::Base64::decode_base64($_[0]); }
@@ -568,6 +568,14 @@ sub quote {
   $_[0] = '"' . $_[0] . '"';
 }
 
+sub secure_compare {
+  my ($a, $b) = @_;
+  return if length $a != length $b;
+  my $r = 0;
+  $r |= ord(substr $a, $_) ^ ord(substr $b, $_) for 0 .. length($a) - 1;
+  return $r == 0 ? 1 : undef;
+}
+
 sub sha1_bytes {
   my $data = shift;
   utf8::encode $data if utf8::is_utf8 $data;
@@ -822,6 +830,12 @@ Quoted Printable decode in-place.
   qp_encode $string;
 
 Quoted Printable encode in-place.
+
+=head2 C<secure_compare>
+
+  my $success = secure_compare $string1, $string2;
+
+Constant time comparison algorithm to prevent timing attacks.
 
 =head2 C<sha1_bytes>
 

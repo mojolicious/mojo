@@ -555,8 +555,8 @@ sub signed_cookie {
   if (defined $value) {
 
     # Sign value
-    my $signature = Mojo::Util::hmac_md5_sum $value, $secret;
-    $value = $value .= "--$signature";
+    my $sig = Mojo::Util::hmac_md5_sum $value, $secret;
+    $value = $value .= "--$sig";
 
     # Create cookie
     my $cookie = $self->cookie($name, $value, $options);
@@ -570,11 +570,11 @@ sub signed_cookie {
 
     # Check signature
     if ($value =~ s/\-\-([^\-]+)$//) {
-      my $signature = $1;
+      my $sig = $1;
       my $check = Mojo::Util::hmac_md5_sum $value, $secret;
 
       # Verified
-      if ($signature eq $check) { push @results, $value }
+      if (Mojo::Util::secure_compare $sig, $check) { push @results, $value }
 
       # Bad cookie
       else {

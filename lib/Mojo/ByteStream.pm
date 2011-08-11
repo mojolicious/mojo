@@ -145,6 +145,11 @@ sub say {
   print $handle $self->{bytestream}, "\n";
 }
 
+sub secure_compare {
+  my ($self, $check) = @_;
+  return Mojo::Util::secure_compare $self->{bytestream}, $check;
+}
+
 sub sha1_bytes {
   my $self = shift;
   $self->{bytestream} = Mojo::Util::sha1_bytes $self->{bytestream};
@@ -386,6 +391,12 @@ Quote bytestream.
   $stream->say(*STDERR);
 
 Print bytestream to handle or STDOUT and append a newline.
+
+=head2 C<secure_compare>
+
+  my $success = $stream->secure_compare($string);
+
+Constant time comparison algorithm to prevent timing attacks.
 
 =head2 C<sha1_bytes>
 

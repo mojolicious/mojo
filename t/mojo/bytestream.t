@@ -10,7 +10,7 @@ use Test::More;
 
 plan skip_all => 'Perl 5.10 or Digest::SHA required for this test!'
   unless eval { require Digest::SHA; 1 };
-plan tests => 112;
+plan tests => 129;
 
 use_ok 'Mojo::Util',       'md5_bytes';
 use_ok 'Mojo::ByteStream', 'b';
@@ -370,3 +370,22 @@ $stream = b(b('test'));
 ok !ref $stream->to_string, 'nested bytestream stringified';
 $stream = Mojo::ByteStream->new(Mojo::ByteStream->new('test'));
 ok !ref $stream->to_string, 'nested bytestream stringified';
+
+# Secure compare
+is b('hello')->secure_compare('hello'), 1,     'values are equal';
+is b('hell')->secure_compare('hello'),  undef, 'values are not equal';
+is b('hallo')->secure_compare('hello'), undef, 'values are not equal';
+is b('0')->secure_compare('0'),         1,     'values are equal';
+is b('1')->secure_compare('1'),         1,     'values are equal';
+is b('1')->secure_compare('0'),         undef, 'values are not equal';
+is b('0')->secure_compare('1'),         undef, 'values are not equal';
+is b('00')->secure_compare('00'),       1,     'values are equal';
+is b('11')->secure_compare('11'),       1,     'values are equal';
+is b('11')->secure_compare('00'),       undef, 'values are not equal';
+is b('00')->secure_compare('11'),       undef, 'values are not equal';
+is b('♥')->secure_compare('♥'),     1,     'values are equal';
+is b('0♥')->secure_compare('0♥'),   1,     'values are equal';
+is b('♥1')->secure_compare('♥1'),   1,     'values are equal';
+is b('♥')->secure_compare('♥0'),    undef, 'values are not equal';
+is b('0♥')->secure_compare('♥'),    undef, 'values are not equal';
+is b('0♥1')->secure_compare('1♥0'), undef, 'values are not equal';

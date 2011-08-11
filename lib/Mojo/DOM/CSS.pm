@@ -694,7 +694,8 @@ By default, the subjects of a selector are the elements represented by the
 last compound selector.
 In CSS4 however the subject can be explicitly identified by prepending a
 dollar sign to one of the compound selectors.
-Note that this selector is EXPERIMENTAL and might change without warning!
+Note that the CSS4 spec is still a work in progress, so this selector might
+change without warning!
 
 =head1 ATTRIBUTES
 

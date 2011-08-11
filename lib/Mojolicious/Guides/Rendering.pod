@@ -347,6 +347,26 @@ You can also pass along normal stash values to the C<layout> helper.
     <body><%= content %></body>
   </html>
 
+Instead of the C<layout> helper you could also just use the C<layout> stash
+value, or call C<render> with the C<layout> argument.
+
+  $self->render(template => 'mytemplate', layout => 'mylayout');
+
+To set a C<layout> stash value application wide you can use C<defaults>.
+
+  # Application
+  package MyApp;
+  use Mojo::Base 'Mojolicious';
+
+  sub startup {
+    my $self = shift;
+
+    # Default layout
+    $self->defaults(layout => 'mylayout');
+  }
+
+  1;
+
 =head2 Including Partial Templates
 
 Like most helpers the C<include> helper is just a shortcut to make your life

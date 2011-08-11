@@ -293,10 +293,10 @@ my %ENCODE;
 
 # "Bart, stop pestering Satan!"
 our @EXPORT_OK = qw/b64_decode b64_encode camelize decamelize decode encode/;
-push @EXPORT_OK, qw/get_line hmac_md5_sum hmac_sha1_sum/;
-push @EXPORT_OK, qw/html_escape html_unescape md5_bytes md5_sum/;
-push @EXPORT_OK, qw/punycode_decode punycode_encode qp_decode qp_encode/;
-push @EXPORT_OK, qw/quote secure_compare sha1_bytes sha1_sum trim unquote/;
+push @EXPORT_OK, qw/get_line hmac_md5_sum hmac_sha1_sum html_escape/;
+push @EXPORT_OK, qw/html_unescape md5_bytes md5_sum punycode_decode/;
+push @EXPORT_OK, qw/punycode_encode qp_decode qp_encode quote/;
+push @EXPORT_OK, qw/secure_compare sha1_bytes sha1_sum trim unquote/;
 push @EXPORT_OK, qw/url_escape url_unescape xml_escape/;
 
 sub b64_decode { $_[0] = MIME::Base64::decode_base64($_[0]); }

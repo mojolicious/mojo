@@ -32,7 +32,7 @@ get '/proxy' => sub {
   $self->render_text($self->req->url);
 };
 
-# Websocket /test
+# WebSocket /test
 websocket '/test' => sub {
   my $self = shift;
   my $flag = 0;

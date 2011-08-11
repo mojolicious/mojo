@@ -553,6 +553,8 @@ sub _write {
 1;
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::UserAgent - Non-Blocking I/O HTTP 1.1 And WebSocket User Agent
@@ -562,50 +564,44 @@ Mojo::UserAgent - Non-Blocking I/O HTTP 1.1 And WebSocket User Agent
   use Mojo::UserAgent;
   my $ua = Mojo::UserAgent->new;
 
-  # Grab the latest Mojolicious release :)
-  my $latest = 'http://latest.mojolicio.us';
-  print $ua->max_redirects(3)->get($latest)->res->body;
+  # Say hello to the unicode snowman
+  print $ua->get('☃.net')->res->body;
 
-  # Quick JSON request
-  my $trends = 'https://api.twitter.com/1/trends.json';
-  print $ua->get($trends)->res->json->{trends}->[0]->{name};
+  # Quick JSON API request with Basic authentication
+  print $ua->get('https://sri:s3cret@api.twitter.com/1/trends.json')
+    ->res->json->{trends}->[0]->{name};
 
   # Extract data from HTML and XML resources
   print $ua->get('mojolicio.us')->res->dom->html->head->title->text;
 
   # Scrape the latest headlines from a news site
-  my $news = 'http://digg.com';
-  $ua->max_redirects(3);
-  $ua->get($news)->res->dom('h3.story-item-title > a[href]')->each(sub {
-    my $e = shift;
-    print "$e->{href}:\n";
-    print $e->text, "\n";
-  });
+  $ua->max_redirects(3)->get('www.reddit.com/r/perl/')
+    ->res->dom('p.title > a.title')->each(sub { print $_->text, "\n" });
 
   # Form post with exception handling
-  my $cpan   = 'http://search.cpan.org/search';
-  my $search = {q => 'mojo'};
-  my $tx     = $ua->post_form($cpan => $search);
+  my $tx = $ua->post_form('search.cpan.org/search' => {q => 'mojo'});
   if (my $res = $tx->success) { print $res->body }
   else {
     my ($message, $code) = $tx->error;
     print "Error: $message";
   }
 
-  # TLS certificate authentication
-  $ua->cert('tls.crt')->key('tls.key')->get('https://mojolicio.us');
+  # Grab the latest Mojolicious release :)
+  $ua->max_redirects(5)->get('latest.mojolicio.us')
+    ->res->content->asset->move_to("/Users/sri/mojo.tar.gz");
 
   # Parallel requests
   my $t = Mojo::IOLoop->trigger;
   for my $url ('mojolicio.us', 'cpan.org') {
     $t->begin;
-    $ua->get($url => sub {
-      $t->end(pop->res->dom->html->head->title->text);
-    });
+    $ua->get($url => sub { $t->end(pop->res->dom->at('title')->text) });
   }
   my @titles = $t->start;
 
-  # Websocket request
+  # TLS certificate authentication
+  my $tx = $ua->cert('tls.crt')->key('tls.key')->get('https://mojolicio.us');
+
+  # WebSocket request
   $ua->websocket('ws://websockets.org:8787' => sub {
     my $tx = pop;
     $tx->on_finish(sub { Mojo::IOLoop->stop });

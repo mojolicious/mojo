@@ -8,7 +8,7 @@ use overload
 use Mojo::Util qw/url_escape url_unescape/;
 use Mojo::URL;
 
-has [qw/leading_slash trailing_slash/] => 0;
+has [qw/leading_slash trailing_slash/];
 has parts => sub { [] };
 
 sub new {
@@ -64,8 +64,8 @@ sub parse {
 
   # Leading and trailing slash
   $path = '' unless defined $path;
-  $path =~ /^\// ? $self->leading_slash(1)  : $self->leading_slash(0);
-  $path =~ /\/$/ ? $self->trailing_slash(1) : $self->trailing_slash(0);
+  $path =~ /^\// ? $self->leading_slash(1)  : $self->leading_slash(undef);
+  $path =~ /\/$/ ? $self->trailing_slash(1) : $self->trailing_slash(undef);
 
   # Parse
   url_unescape $path;

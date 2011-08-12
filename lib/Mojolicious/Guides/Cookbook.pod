@@ -142,6 +142,23 @@ can just point them at your application script because it will automatically
 act like one if it detects the presence of a C<PLACK_ENV> environment
 variable.
 
+=head2 Plack Middleware
+
+You can even use middleware right in your application.
+
+  use Mojolicious::Lite;
+  use Plack::Builder;
+
+  get '/welcome' => sub {
+      my $self = shift;
+      $self->render(text => 'Hello Mojo!');
+  };
+
+  builder {
+      enable 'Deflater';
+      app->start;
+  };
+
 =head2 Apache/mod_perl (PSGI/Plack)
 
 C<mod_perl> is a good example for a L<PSGI> adapter that is used without
@@ -155,6 +172,7 @@ required for L<Mojolicious> L<PSGI> detection.
     <Perl>
       $ENV{PLACK_ENV} = 'production';
       $ENV{MOJO_HOME} = '/home/sri/myapp';
+      $ENV{MOJO_MODE} = 'deployment';
     </Perl>
 
     <Location /myapp>

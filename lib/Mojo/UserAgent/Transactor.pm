@@ -308,11 +308,11 @@ implements the following new ones.
   );
   my $tx = $t->form(
     'http://kraih.com/foo',
-    {file => {file => '/foo/bar.txt'}}
+    {mytext => {file => '/foo/bar.txt'}}
   );
   my $tx = $t->form(
     'http://kraih.com/foo',
-    {file => {content => 'lalala'}}
+    {mytext => {content => 'lalala'}}
   );
   my $tx = $t->form(
     'http://kraih.com/foo',
@@ -324,6 +324,16 @@ Versatile L<Mojo::Transaction::HTTP> builder for form requests.
   my $tx = $t->form('http://kraih.com/foo' => {test => 123});
   $tx->res->body(sub { print $_[1] });
   $ua->start($tx);
+
+While the "multipart/form-data" content type will be automatically used
+instead of "application/x-www-form-urlencoded" when necessary, you can also
+enforce it by setting the header manually.
+
+  my $tx = $t->form(
+    'http://kraih.com/foo',
+    {test => 123},
+    {'Content-Type' => 'multipart/form-data'}
+  );
 
 =head2 C<peer>
 
@@ -367,6 +377,8 @@ Versatile general purpose L<Mojo::Transaction::HTTP> builder for requests.
 =head2 C<websocket>
 
   my $tx = $t->websocket('ws://localhost:3000');
+  my $tx =
+    $ua->websocket('ws://localhost:3000' => {'User-Agent' => 'Agent 1.0'});
 
 Versatile L<Mojo::Transaction::WebSocket> builder for WebSocket handshake
 requests.

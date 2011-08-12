@@ -490,11 +490,9 @@ Opposite of C<content_type_like>.
 =head2 C<delete_ok>
 
   $t = $t->delete_ok('/foo');
-  $t = $t->delete_ok('/foo', {Accept => '*/*'});
-  $t = $t->delete_ok('/foo', 'Hi!');
-  $t = $t->delete_ok('/foo', {Accept => '*/*'}, 'Hi!');
 
-Perform a C<DELETE> request and check for success.
+Perform a C<DELETE> request and check for success, takes the exact same
+arguments as C<delete> in L<Mojo::UserAgent>.
 
 =head2 C<element_exists>
 
@@ -514,20 +512,16 @@ Opposite of C<element_exists>.
 =head2 C<get_ok>
 
   $t = $t->get_ok('/foo');
-  $t = $t->get_ok('/foo', {Accept => '*/*'});
-  $t = $t->get_ok('/foo', 'Hi!');
-  $t = $t->get_ok('/foo', {Accept => '*/*'}, 'Hi!');
 
-Perform a C<GET> request and check for success.
+Perform a C<GET> request and check for success, takes the exact same
+arguments as C<get> in L<Mojo::UserAgent>.
 
 =head2 C<head_ok>
 
   $t = $t->head_ok('/foo');
-  $t = $t->head_ok('/foo', {Accept => '*/*'});
-  $t = $t->head_ok('/foo', 'Hi!');
-  $t = $t->head_ok('/foo', {Accept => '*/*'}, 'Hi!');
 
-Perform a C<HEAD> request and check for success.
+Perform a C<HEAD> request and check for success, takes the exact same
+arguments as C<head> in L<Mojo::UserAgent>.
 
 =head2 C<header_is>
 
@@ -573,40 +567,23 @@ Alias for the C<max_redirects> attribute in L<Mojo::UserAgent>.
 =head2 C<post_ok>
 
   $t = $t->post_ok('/foo');
-  $t = $t->post_ok('/foo', {Accept => '*/*'});
-  $t = $t->post_ok('/foo', 'Hi!');
-  $t = $t->post_ok('/foo', {Accept => '*/*'}, 'Hi!');
-  $t = $t->post_ok('/foo', 'Hi!', 'request worked');
 
-Perform a C<POST> request and check for success.
+Perform a C<POST> request and check for success, takes the exact same
+arguments as C<post> in L<Mojo::UserAgent>.
 
 =head2 C<post_form_ok>
 
   $t = $t->post_form_ok('/foo' => {test => 123});
-  $t = $t->post_form_ok('/foo' => 'UTF-8' => {test => 123});
-  $t = $t->post_form_ok('/foo', {test => 123}, {Accept => '*/*'});
-  $t = $t->post_form_ok('/foo', 'UTF-8', {test => 123}, {Accept => '*/*'});
-  $t = $t->post_form_ok('/foo', {test => 123}, 'Hi!');
-  $t = $t->post_form_ok('/foo', 'UTF-8', {test => 123}, 'Hi!');
-  $t = $t->post_form_ok('/foo', {test => 123}, {Accept => '*/*'}, 'Hi!');
-  $t = $t->post_form_ok(
-    '/foo',
-    'UTF-8',
-    {test   => 123},
-    {Accept => '*/*'},
-    'Hi!'
-  );
 
-Submit a C<POST> form and check for success.
+Submit a C<POST> form and check for success, takes the exact same arguments
+as C<post_form> in L<Mojo::UserAgent>.
 
 =head2 C<put_ok>
 
   $t = $t->put_ok('/foo');
-  $t = $t->put_ok('/foo', {Accept => '*/*'});
-  $t = $t->put_ok('/foo', 'Hi!');
-  $t = $t->put_ok('/foo', {Accept => '*/*'}, 'Hi!');
 
-Perform a C<PUT> request and check for success.
+Perform a C<PUT> request and check for success, takes the exact same
+arguments as C<put> in L<Mojo::UserAgent>.
 
 =head2 C<reset_session>
 

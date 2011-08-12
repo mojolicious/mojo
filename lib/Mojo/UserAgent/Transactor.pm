@@ -378,7 +378,7 @@ Versatile general purpose L<Mojo::Transaction::HTTP> builder for requests.
 
   my $tx = $t->websocket('ws://localhost:3000');
   my $tx =
-    $ua->websocket('ws://localhost:3000' => {'User-Agent' => 'Agent 1.0'});
+    $t->websocket('ws://localhost:3000' => {'User-Agent' => 'Agent 1.0'});
 
 Versatile L<Mojo::Transaction::WebSocket> builder for WebSocket handshake
 requests.

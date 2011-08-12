@@ -8,16 +8,9 @@ use Scalar::Util 'blessed';
 
 has app => sub {
   my $self = shift;
-
-  # App in environment
   return $ENV{MOJO_APP} if ref $ENV{MOJO_APP};
-
-  # Load
-  if (my $e = Mojo::Loader->load($self->app_class)) {
-    die $e if ref $e;
-  }
-
-  $self->app_class->new;
+  if (my $e = Mojo::Loader->load($self->app_class)) { die $e if ref $e }
+  return $self->app_class->new;
 };
 has app_class =>
   sub { ref $ENV{MOJO_APP} || $ENV{MOJO_APP} || 'Mojo::HelloWorld' };

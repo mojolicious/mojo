@@ -129,7 +129,7 @@ example for learning to build new plugins.
 
   <%= app->secret %>
 
-Alias for the C<app> method in L<Mojolicious::Controller>.
+Alias for L<Mojolicious::Controller/"app">.
 
 =head2 C<content>
 
@@ -170,7 +170,7 @@ Extend a template.
 
   <%= flash 'foo' %>
 
-Alias for the C<flash> method in L<Mojolicious::Controller>.
+Alias for L<Mojolicious::Controller/"flash">.
 
 =head2 C<include>
 
@@ -207,20 +207,20 @@ Memorize block result in memory and prevent future execution.
 
   <%= param 'foo' %>
 
-Alias for the C<param> method in L<Mojolicious::Controller>.
+Alias for L<Mojolicious::Controller/"param">.
 
 =head2 C<session>
 
   <%= session 'foo' %>
 
-Alias for the C<session> method in L<Mojolicious::Controller>.
+Alias for L<Mojolicious::Controller/"session">.
 
 =head2 C<stash>
 
   <%= stash 'foo' %>
   <% stash foo => 'bar'; %>
 
-Alias for the C<stash> method in L<Mojolicious::Controller>.
+Alias for L<Mojolicious::Controller/"stash">.
 
 =head2 C<title>
 
@@ -231,19 +231,9 @@ Page title.
 
 =head2 C<url_for>
 
-  <%= url_for %>
-  <%= url_for controller => 'bar', action => 'baz' %>
   <%= url_for 'named', controller => 'bar', action => 'baz' %>
-  <%= url_for '/perldoc' %>
-  <%= url_for 'http://mojolicio.us/perldoc' %>
 
-Alias for the C<url_for> method in L<Mojolicious::Controller>.
-
-  %# "/perldoc" if application is deployed under "/"
-  %= url_for '/perldoc'
-
-  %# "/myapp/perldoc" if application is deployed under "/myapp"
-  %= url_for '/perldoc'
+Alias for L<Mojolicious::Controller/"url_for">.
 
 =head1 METHODS
 

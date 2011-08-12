@@ -427,7 +427,7 @@ Construct a new L<Test::Mojo> object.
   my $app = $t->app;
   $t      = $t->app(MyApp->new);
 
-Alias for the C<app> method of L<Mojo::UserAgent>.
+Alias for L<Mojo::UserAgent/"app">.
 
   my $secret = $t->app->secret;
   $t->app->log->level('fatal');
@@ -492,7 +492,7 @@ Opposite of C<content_type_like>.
   $t = $t->delete_ok('/foo');
 
 Perform a C<DELETE> request and check for success, takes the exact same
-arguments as C<delete> in L<Mojo::UserAgent>.
+arguments as L<Mojo::UserAgent/"delete">.
 
 =head2 C<element_exists>
 
@@ -514,14 +514,14 @@ Opposite of C<element_exists>.
   $t = $t->get_ok('/foo');
 
 Perform a C<GET> request and check for success, takes the exact same
-arguments as C<get> in L<Mojo::UserAgent>.
+arguments as L<Mojo::UserAgent/"get">.
 
 =head2 C<head_ok>
 
   $t = $t->head_ok('/foo');
 
 Perform a C<HEAD> request and check for success, takes the exact same
-arguments as C<head> in L<Mojo::UserAgent>.
+arguments as L<Mojo::UserAgent/"head">.
 
 =head2 C<header_is>
 
@@ -562,28 +562,28 @@ Check response content for JSON data.
   my $max_redirects = $t->max_redirects;
   $t                = $t->max_redirects(3);
 
-Alias for the C<max_redirects> attribute in L<Mojo::UserAgent>.
+Alias for the L<Mojo::UserAgent/"max_redirects">.
 
 =head2 C<post_ok>
 
   $t = $t->post_ok('/foo');
 
 Perform a C<POST> request and check for success, takes the exact same
-arguments as C<post> in L<Mojo::UserAgent>.
+arguments as L<Mojo::UserAgent/"post">.
 
 =head2 C<post_form_ok>
 
   $t = $t->post_form_ok('/foo' => {test => 123});
 
 Submit a C<POST> form and check for success, takes the exact same arguments
-as C<post_form> in L<Mojo::UserAgent>.
+as L<Mojo::UserAgent/"post_form">.
 
 =head2 C<put_ok>
 
   $t = $t->put_ok('/foo');
 
 Perform a C<PUT> request and check for success, takes the exact same
-arguments as C<put> in L<Mojo::UserAgent>.
+arguments as L<Mojo::UserAgent/"put">.
 
 =head2 C<reset_session>
 
@@ -609,7 +609,7 @@ Opposite of C<status_is>.
   my $url = $t->test_server('http');
   my $url = $t->test_server('https');
 
-Alias for the C<test_server> method in L<Mojo::UserAgent>.
+Alias for L<Mojo::UserAgent/"test_server">.
 Note that this method is EXPERIMENTAL and might change without warning!
 
   $t->get_ok($t->test_server->userinfo('sri:secr3t')->path('/protected'));

@@ -17,12 +17,8 @@ use_ok 'Mojo::Server';
 my $server = Mojo::Server->new;
 isa_ok $server, 'Mojo::Server', 'right object';
 
-# Test the default
-my $app = $server->new->app;
-isa_ok $app, 'Mojo::HelloWorld', 'right default app';
-
 # Test an explicit class name
-$app = $server->new(app_class => 'Mojo::TestServerViaApp')->app;
+my $app = $server->new(app_class => 'Mojo::TestServerViaApp')->app;
 isa_ok $app, 'Mojo::TestServerViaApp', 'right object';
 
 # Test setting the class name through the environment
@@ -31,3 +27,7 @@ $ENV{MOJO_APP} = 'Mojo::TestServerViaEnv';
 $app = $server->new->app;
 isa_ok $app, 'Mojo::TestServerViaEnv', 'right object';
 $ENV{MOJO_APP} = $backup;
+
+# Test the default
+$app = $server->new->app;
+isa_ok $app, 'Mojolicious::Lite', 'right default app';

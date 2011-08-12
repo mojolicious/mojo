@@ -1,12 +1,5 @@
 package Mojo::HelloWorld;
-use Mojo::Base 'Mojolicious::Lite';
-
-BEGIN {
-  local $ENV{MOJO_APP};
-  Mojo::HelloWorld->import;
-}
-
-sub import { }
+use Mojolicious::Lite;
 
 # "Don't worry, son.
 #  I'm sure he's up in heaven right now laughing it up with all the other
@@ -117,7 +110,7 @@ any '/websocket' => sub {
 #  it pushes some old stuff out of my brain.
 #  Remember when I took that home winemaking course,
 #  and I forgot how to drive?"
-under->any('/*whatever' => {text => 'Your Mojo is working!'});
+under->any('/*whatever' => {whatever => '', text => 'Your Mojo is working!'});
 
 1;
 __DATA__

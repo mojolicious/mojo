@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-1.75    2011-08-09 00:00:00
+1.75    2011-08-12 00:00:00
         - Added secure_compare function to Mojo::Util as a precaution against
           timing attacks in the future. (judofyr)
         - Added EXPERIMENTAL CSS4 selector subject support to Mojo::DOM::CSS.

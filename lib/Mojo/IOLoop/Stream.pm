@@ -20,7 +20,7 @@ has iowatcher => sub {
 #  including my children..."
 sub DESTROY {
   my $self = shift;
-  $self->pause;
+  $self->pause if $self->{iowatcher};
   $self->emit('close') if $self->{handle};
 }
 
@@ -43,9 +43,7 @@ sub is_finished {
 
 sub pause {
   my $self = shift;
-  return unless my $handle  = $self->{handle};
-  return unless my $watcher = $self->iowatcher;
-  $watcher->remove($handle);
+  $self->iowatcher->remove($self->{handle}) if $self->{handle};
 }
 
 sub resume {

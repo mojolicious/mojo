@@ -75,7 +75,7 @@ sub DESTROY {
   my $self = shift;
   if (my $cert = $self->{cert}) { unlink $cert if -w $cert }
   if (my $key  = $self->{key})  { unlink $key  if -w $key }
-  return unless my $watcher = $self->iowatcher;
+  return unless my $watcher = $self->{iowatcher};
   $self->pause if $self->{handle};
   $watcher->remove($_) for values %{$self->{handles}};
 }

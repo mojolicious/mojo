@@ -235,7 +235,7 @@ sub to_abs {
 
     # Characters after the right-most '/' need to go
     pop @{$new->parts} unless $new->trailing_slash;
-    $new->append($_) for @{$old->parts};
+    push @{$new->parts}, @{$old->parts};
   }
 
   # Absolute path
@@ -302,8 +302,6 @@ sub to_string {
 
   # Fragment
   if (my $fragment = $self->fragment) {
-
-    # *( pchar / "/" / "?" )
     url_escape $fragment, "$PCHAR\/\?";
     $url .= "#$fragment";
   }

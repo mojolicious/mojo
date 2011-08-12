@@ -17,21 +17,6 @@ sub new {
   return $self;
 }
 
-sub append {
-  my $self = shift;
-
-  for (@_) {
-    my $value = "$_";
-
-    # *( pchar / "/" / "?" )
-    url_escape $value, $Mojo::URL::PCHAR;
-
-    push @{$self->parts}, $value;
-  }
-
-  return $self;
-}
-
 sub canonicalize {
   my $self = shift;
 
@@ -112,10 +97,8 @@ sub to_string {
   # Escape
   my @path;
   for my $part (@{$self->parts}) {
-
-    # *( pchar / "/" / "?" )
     my $escaped = $part;
-    url_escape $escaped, $Mojo::URL::PCHAR;
+    url_escape $escaped, "$Mojo::URL::UNRESERVED$Mojo::URL::SUBDELIM\:\@";
     push @path, $escaped;
   }
 
@@ -182,12 +165,6 @@ following new ones.
   my $path = Mojo::Path->new('/foo/bar%3B/baz.html');
 
 Construct a new L<Mojo::Path> object.
-
-=head2 C<append>
-
-  $path = $path->append(qw/foo bar/);
-
-Append parts to path.
 
 =head2 C<canonicalize>
 

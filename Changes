@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+1.76    2011-08-12 00:00:00
+        - Fixed small Mojo::URL escaping bug.
+
 1.75    2011-08-12 00:00:00
         - Added secure_compare function to Mojo::Util as a precaution against
           timing attacks in the future. (judofyr)

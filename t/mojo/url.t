@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 331;
+use Test::More tests => 340;
 
 # "I don't want you driving around in a car you built yourself.
 #  You can sit there complaining, or you can knit me some seat belts."
@@ -556,3 +556,17 @@ $url = Mojo::URL->new('http://foo.1.1.1.1.de/');
 is $url->host, 'foo.1.1.1.1.de', 'right host';
 $url = Mojo::URL->new('http://1.1.1.1.1.1/');
 is $url->host, '1.1.1.1.1.1', 'right host';
+
+# "%" in path
+$url = Mojo::URL->new('http://mojolicio.us/100%_fun');
+is $url->path->parts->[0], '100%_fun', 'right part';
+is $url->path, '/100%25_fun', 'right path';
+is "$url", 'http://mojolicio.us/100%25_fun', 'right format';
+$url = Mojo::URL->new('http://mojolicio.us/100%fun');
+is $url->path->parts->[0], '100%fun', 'right part';
+is $url->path, '/100%25fun', 'right path';
+is "$url", 'http://mojolicio.us/100%25fun', 'right format';
+$url = Mojo::URL->new('http://mojolicio.us/100%25_fun');
+is $url->path->parts->[0], '100%_fun', 'right part';
+is $url->path, '/100%25_fun', 'right path';
+is "$url", 'http://mojolicio.us/100%25_fun', 'right format';

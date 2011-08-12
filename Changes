@@ -1,5 +1,9 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+1.77    2011-08-12 00:00:00
+        - Improved documentation.
+        - Fixed small unicode bug in get command.
+
 1.76    2011-08-12 00:00:00
         - Fixed small Mojo::URL escaping bug.
 

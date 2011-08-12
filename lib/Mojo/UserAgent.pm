@@ -565,7 +565,7 @@ Mojo::UserAgent - Non-Blocking I/O HTTP 1.1 And WebSocket User Agent
   my $ua = Mojo::UserAgent->new;
 
   # Say hello to the unicode snowman
-  print $ua->get('☃.net')->res->body;
+  print $ua->get('www.☃.net?hello=there')->res->body;
 
   # Quick JSON API request with Basic authentication
   print $ua->get('https://sri:s3cret@api.twitter.com/1/trends.json')

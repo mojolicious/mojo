@@ -64,7 +64,9 @@ EOF
   shift->prepend(@_);
 }
 
-sub all_text { shift->_text(1) }
+sub all_raw_text { $_[0]->_text($_[0]->tree, 1, 0) }
+
+sub all_text { $_[0]->_text($_[0]->tree, 1, 1) }
 
 sub append { shift->_add(1, @_) }
 
@@ -231,6 +233,8 @@ sub prepend_content {
   return $self;
 }
 
+sub raw_text { $_[0]->_text($_[0]->tree, 0, 0) }
+
 sub replace {
   my ($self, $new) = @_;
 
@@ -301,7 +305,7 @@ sub root {
   );
 }
 
-sub text { shift->_text(0) }
+sub text { $_[0]->_text($_[0]->tree, 0, 1) }
 
 sub to_xml { shift->[0]->render }
 
@@ -377,42 +381,46 @@ sub _parse {
 }
 
 sub _text {
-  my ($self, $recursive) = @_;
+  my ($self, $stack, $recurse, $trim) = @_;
+
+  # Don't trim preformatted text
+  my $start;
+  if ($stack->[0] eq 'root') { $start = 1 }
+  else {
+    $trim = $stack->[1] eq 'pre' ? 0 : $trim;
+    $start = 4;
+  }
 
   # Walk tree
-  my $text  = '';
-  my $tree  = $self->tree;
-  my $start = $tree->[0] eq 'root' ? 1 : 4;
-  my @stack = @$tree[$start .. $#$tree];
-  while (my $e = shift @stack) {
+  my $text = '';
+  for my $e (@$stack[$start .. $#$stack]) {
     my $type = $e->[0];
 
-    # Add children of nested tag to stack
-    if ($type eq 'tag') {
-      unshift @stack, @$e[4 .. $#$e] if $recursive;
-      next;
-    }
+    # Nested tag
+    my $content = '';
+    if ($type eq 'tag' && $recurse) { $content = $self->_text($e, 1, $trim) }
 
     # Text
-    my $content = '';
-    if ($type eq 'text') {
+    elsif ($type eq 'text') {
       $content = $e->[1];
 
       # Trim whitespace
-      $content =~ s/^\s*\n+\s*//;
-      $content =~ s/\s*\n+\s*$//;
-      $content =~ s/\s*\n+\s*/\ /g;
-
-      # Add leading whitespace if punctuation allows it
-      $content = " $content"
-        if $text =~ /\S$/ && $content =~ /^[^\.\!\?\,\;\:]/;
+      if ($trim) {
+        $content =~ s/^\s*\n+\s*//;
+        $content =~ s/\s*\n+\s*$//;
+        $content =~ s/\s*\n+\s*/\ /g;
+      }
     }
 
     # CDATA or raw text
     elsif ($type eq 'cdata' || $type eq 'raw') { $content = $e->[1] }
 
+    # Add leading whitespace if punctuation allows it
+    $content = " $content"
+      if $text =~ /\S$/ && $content =~ /^[^\.\!\?\,\;\:\s]+/;
+
     # Ignore whitespace blocks
-    $text .= $content if $content =~ /\S+/;
+    $text .= $content if $content =~ /\S+/ || !$trim;
   }
 
   return $text;
@@ -498,6 +506,13 @@ following new ones.
   my $dom = Mojo::DOM->new('<foo bar="baz">test</foo>', xml => 1);
 
 Construct a new L<Mojo::DOM> object.
+
+=head2 C<all_raw_text>
+
+  my $text = $dom->all_raw_text;
+
+Extract all text content raw and unformatted from DOM structure.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<all_text>
 
@@ -614,6 +629,14 @@ Prepend to element content.
 
   # "<div><h2>AB</h2></div>"
   $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend_content('A');
+
+=head2 C<raw_text>
+
+  my $text = $dom->raw_text;
+
+Extract text content raw and unformatted from element only, not including
+child elements.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<replace>
 

@@ -64,7 +64,10 @@ EOF
   shift->prepend(@_);
 }
 
-sub all_text { $_[0]->_text($_[0]->tree, 1, 1) }
+sub all_text {
+  my $self = shift;
+  return $self->_text($self->tree, 1, 1);
+}
 
 sub append { shift->_add(1, @_) }
 
@@ -301,7 +304,10 @@ sub root {
   );
 }
 
-sub text { $_[0]->_text($_[0]->tree, 0, 1) }
+sub text {
+  my $self = shift;
+  return $self->_text($self->tree, 0, 1);
+}
 
 sub to_xml { shift->[0]->render }
 
@@ -377,19 +383,19 @@ sub _parse {
 }
 
 sub _text {
-  my ($self, $stack, $recurse, $trim) = @_;
+  my ($self, $tree, $recurse, $trim) = @_;
 
   # Don't trim preformatted text
   my $start;
-  if ($stack->[0] eq 'root') { $start = 1 }
+  if ($tree->[0] eq 'root') { $start = 1 }
   else {
-    $trim = $stack->[1] eq 'pre' ? 0 : $trim;
+    $trim = $tree->[1] eq 'pre' ? 0 : $trim;
     $start = 4;
   }
 
   # Walk tree
   my $text = '';
-  for my $e (@$stack[$start .. $#$stack]) {
+  for my $e (@$tree[$start .. $#$tree]) {
     my $type = $e->[0];
 
     # Nested tag
@@ -415,8 +421,8 @@ sub _text {
     $content = " $content"
       if $text =~ /\S$/ && $content =~ /^[^\.\!\?\,\;\:\s]+/;
 
-    # Ignore whitespace blocks
-    $text .= $content if $content =~ /\S+/ || !$trim;
+    # Trim whitespace blocks
+    $text .= $content if $content =~ /\S+/;
   }
 
   return $text;

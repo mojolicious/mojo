@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 641;
+use Test::More tests => 635;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -1885,17 +1885,9 @@ $dom = Mojo::DOM->new(<<EOF);
   works
 </div>
 EOF
-is $dom->text,     '',                                   'no text';
-is $dom->raw_text, "\n",                                 'right text';
+is $dom->text, '', 'right text';
 is $dom->all_text, "looks like\n  it\n    really works", 'right text';
-is $dom->all_raw_text, "\n  looks\n  like\n  it\n    really\n  works\n\n",
-  'right text';
-is $dom->div->text,     'looks works',                        'right text';
-is $dom->div->raw_text, "\n  looks\n  \n  works\n",           'right text';
+is $dom->div->text, 'looks works', 'right text';
 is $dom->div->all_text, "looks like\n  it\n    really works", 'right text';
-is $dom->div->all_raw_text, "\n  looks\n  like\n  it\n    really\n  works\n",
-  'right text';
-is $dom->div->pre->text,         "like\n  it\n    really", 'right text';
-is $dom->div->pre->raw_text,     "like\n  it\n    really", 'right text';
-is $dom->div->pre->all_text,     "like\n  it\n    really", 'right text';
-is $dom->div->pre->all_raw_text, "like\n  it\n    really", 'right text';
+is $dom->div->pre->text,     "like\n  it\n    really", 'right text';
+is $dom->div->pre->all_text, "like\n  it\n    really", 'right text';

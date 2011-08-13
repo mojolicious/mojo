@@ -175,21 +175,15 @@ sub _select {
 
     # Number
     if ($command =~ /^\d+$/) {
-      $results = [$results->[$command]];
+      return unless ($results = [$results->[$command]])->[0];
       next;
     }
 
     # Text
     elsif ($command eq 'text') { _say($_->text) for @$results }
 
-    # Raw text
-    elsif ($command eq 'raw') { _say($_->text) for @$results }
-
     # All text
     elsif ($command eq 'all') { _say($_->all_text) for @$results }
-
-    # All raw text
-    elsif ($command eq 'all_raw') { _say($_->all_raw_text) for @$results }
 
     # Attribute
     elsif ($command eq 'attr') {
@@ -205,10 +199,7 @@ sub _select {
   }
 
   # Render
-  unless ($done) {
-    _say($_) for @$results;
-    return;
-  }
+  unless ($done) { _say($_) for @$results }
 }
 
 1;

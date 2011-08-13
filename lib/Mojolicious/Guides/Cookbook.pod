@@ -465,17 +465,13 @@ Or the text content of all heading tags?
 
   $ mojo get http://mojolicio.us 'h1, h2, h3' text
 
-Maybe just the raw unformatted text of the third heading?
+Maybe just the text of the third heading?
 
-  $ mojo get http://mojolicio.us 'h1, h2, h3' 3 raw
+  $ mojo get http://mojolicio.us 'h1, h2, h3' 3 text
 
 You can also extract all text from nested child elements.
 
   $ mojo get http://mojolicio.us '#mojobar' all
-
-Or all raw unformatted text from the whole document.
-
-  $ mojo get http://mojolicio.us 'html > body' all_raw
 
 The request can be customized as well.
 

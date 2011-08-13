@@ -64,8 +64,6 @@ EOF
   shift->prepend(@_);
 }
 
-sub all_raw_text { $_[0]->_text($_[0]->tree, 1, 0) }
-
 sub all_text { $_[0]->_text($_[0]->tree, 1, 1) }
 
 sub append { shift->_add(1, @_) }
@@ -232,8 +230,6 @@ sub prepend_content {
     @{_parent($self->_parse("$new"), $tree)};
   return $self;
 }
-
-sub raw_text { $_[0]->_text($_[0]->tree, 0, 0) }
 
 sub replace {
   my ($self, $new) = @_;
@@ -507,13 +503,6 @@ following new ones.
 
 Construct a new L<Mojo::DOM> object.
 
-=head2 C<all_raw_text>
-
-  my $text = $dom->all_raw_text;
-
-Extract all text content raw and unformatted from DOM structure.
-Note that this method is EXPERIMENTAL and might change without warning!
-
 =head2 C<all_text>
 
   my $text = $dom->all_text;
@@ -629,14 +618,6 @@ Prepend to element content.
 
   # "<div><h2>AB</h2></div>"
   $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend_content('A');
-
-=head2 C<raw_text>
-
-  my $text = $dom->raw_text;
-
-Extract text content raw and unformatted from element only, not including
-child elements.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<replace>
 

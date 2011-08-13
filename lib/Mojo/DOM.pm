@@ -389,7 +389,11 @@ sub _text {
   my $start;
   if ($tree->[0] eq 'root') { $start = 1 }
   else {
-    $trim = $tree->[1] eq 'pre' ? 0 : $trim;
+    my $parent = $tree;
+    while ($parent->[0] eq 'tag') {
+      $trim = 0 if $parent->[1] eq 'pre';
+      last unless $parent = $parent->[3];
+    }
     $start = 4;
   }
 

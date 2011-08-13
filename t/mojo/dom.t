@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 635;
+use Test::More tests => 637;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -1879,9 +1879,10 @@ is $dom->find('$[class] > div')->[2], undef, 'no result';
 $dom = Mojo::DOM->new(<<EOF);
 <div>
   looks
-  <pre>like
+  <pre><code>like
   it
-    really</pre>
+    really</code>
+  </pre>
   works
 </div>
 EOF
@@ -1889,5 +1890,7 @@ is $dom->text, '', 'right text';
 is $dom->all_text, "looks like\n  it\n    really works", 'right text';
 is $dom->div->text, 'looks works', 'right text';
 is $dom->div->all_text, "looks like\n  it\n    really works", 'right text';
-is $dom->div->pre->text,     "like\n  it\n    really", 'right text';
+is $dom->div->pre->text, '', 'right text';
 is $dom->div->pre->all_text, "like\n  it\n    really", 'right text';
+is $dom->div->pre->code->text,     "like\n  it\n    really", 'right text';
+is $dom->div->pre->code->all_text, "like\n  it\n    really", 'right text';

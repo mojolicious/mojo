@@ -386,15 +386,14 @@ sub _text {
   my ($self, $tree, $recurse, $trim) = @_;
 
   # Don't trim preformatted text
-  my $start;
+  my $start = 4;
   if ($tree->[0] eq 'root') { $start = 1 }
-  else {
+  elsif ($trim) {
     my $parent = $tree;
     while ($parent->[0] eq 'tag') {
       $trim = 0 if $parent->[1] eq 'pre';
       last unless $parent = $parent->[3];
     }
-    $start = 4;
   }
 
   # Walk tree
@@ -423,7 +422,7 @@ sub _text {
 
     # Add leading whitespace if punctuation allows it
     $content = " $content"
-      if $text =~ /\S$/ && $content =~ /^[^\.\!\?\,\;\:\s]+/;
+      if $text =~ /\S\z/ && $content =~ /^[^\.\!\?\,\;\:\s]+/;
 
     # Trim whitespace blocks
     $text .= $content if $content =~ /\S+/;

@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-1.77    2011-08-12 00:00:00
+1.77    2011-08-14 00:00:00
+        - Deprecated Mojo::Path->append in favor of using Mojo::Path->parts
+          directly.
         - Improved handling of preformatted text in Mojo::DOM.
         - Improved Mojo::DOM to allow smart whitespace trimming to be
           disabled. (akron)

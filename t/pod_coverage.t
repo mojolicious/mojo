@@ -10,7 +10,7 @@ plan skip_all => 'set TEST_POD to enable this test (developer only!)'
 
 # DEPRECATED in Smiling Face With Sunglasses!
 my @sunglasses =
-  qw/add_after add_before inner_xml render_inner replace_inner/;
+  qw/add_after add_before append inner_xml render_inner replace_inner/;
 
 # "Marge, I'm going to miss you so much. And it's not just the sex.
 #  It's also the food preparation."

@@ -17,6 +17,17 @@ sub new {
   return $self;
 }
 
+# DEPRECATED in Smiling Face With Sunglasses!
+sub append {
+  warn <<EOF;
+Mojo::Path->append is DEPRECATED in favor of using Mojo::Path->parts
+directly!!!
+EOF
+  my $self = shift;
+  push @{$self->parts}, @_;
+  return $self;
+}
+
 sub canonicalize {
   my $self = shift;
 

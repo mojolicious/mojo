@@ -93,12 +93,16 @@ L<Mojo> implements the following attributes.
 The home directory of your application, defaults to a L<Mojo::Home> object
 which stringifies to the actual path.
 
+  my $path = $app->home->rel_file('data/important.txt');
+
 =head2 C<log>
 
   my $log = $app->log;
   $app    = $app->log(Mojo::Log->new);
     
 The logging layer of your application, defaults to a L<Mojo::Log> object.
+
+  $app->log->debug('It works!');
 
 =head2 C<on_transaction>
 
@@ -114,8 +118,7 @@ a L<Mojo::Transaction::HTTP> object.
   $app   = $app->on_websocket(sub {...});
 
 Callback to be invoked for WebSocket handshakes, defaults to building a
-L<Mojo::Transaction::WebSocket> object and handles the response for the
-handshake request.
+L<Mojo::Transaction::WebSocket> object.
 
 =head2 C<ua>
 
@@ -136,15 +139,15 @@ new ones.
 
 Construct a new L<Mojo> application.
 Will automatically detect your home directory and set up logging to
-C<log/mojo.log> if there's a log directory.
+C<log/mojo.log> if there's a C<log> directory.
 
 =head2 C<handler>
 
   $tx = $app->handler($tx);
 
 The handler is the main entry point to your application or framework and
-will be called for each new transaction, usually a L<Mojo::Transaction::HTTP>
-or L<Mojo::Transaction::WebSocket> object.
+will be called for each new transaction, which will usually be a
+L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object.
 
   sub handler {
     my ($self, $tx) = @_;

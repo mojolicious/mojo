@@ -1887,10 +1887,10 @@ $dom = Mojo::DOM->new(<<EOF);
 </div>
 EOF
 is $dom->text, '', 'right text';
-is $dom->all_text, "looks like\n  it\n    really works", 'right text';
+is $dom->all_text, "looks like\n  it\n    really\n  works", 'right text';
 is $dom->div->text, 'looks works', 'right text';
-is $dom->div->all_text, "looks like\n  it\n    really works", 'right text';
-is $dom->div->pre->text, '', 'right text';
-is $dom->div->pre->all_text, "like\n  it\n    really", 'right text';
+is $dom->div->all_text, "looks like\n  it\n    really\n  works", 'right text';
+is $dom->div->pre->text, "\n  ", 'right text';
+is $dom->div->pre->all_text, "like\n  it\n    really\n  ", 'right text';
 is $dom->div->pre->code->text,     "like\n  it\n    really", 'right text';
 is $dom->div->pre->code->all_text, "like\n  it\n    really", 'right text';

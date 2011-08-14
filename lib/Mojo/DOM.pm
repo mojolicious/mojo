@@ -425,7 +425,7 @@ sub _text {
       if $text =~ /\S\z/ && $content =~ /^[^\.\!\?\,\;\:\s]+/;
 
     # Trim whitespace blocks
-    $text .= $content if $content =~ /\S+/;
+    $text .= $content if $content =~ /\S+/ || !$trim;
   }
 
   return $text;

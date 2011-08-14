@@ -66,7 +66,8 @@ EOF
 
 sub all_text {
   my $self = shift;
-  return $self->_text($self->tree, 1, 1);
+  my $trim = defined $_[0] ? shift : 1;
+  return $self->_text($trim, $self->tree, 1, 1);
 }
 
 sub append { shift->_add(1, @_) }
@@ -306,7 +307,8 @@ sub root {
 
 sub text {
   my $self = shift;
-  return $self->_text($self->tree, 0, 1);
+  my $trim = defined $_[0] ? shift : 1;
+  return $self->_text($trim, $self->tree, 0, 1);
 }
 
 sub to_xml { shift->[0]->render }
@@ -383,7 +385,7 @@ sub _parse {
 }
 
 sub _text {
-  my ($self, $tree, $recurse, $trim) = @_;
+  my ($self, $trim, $tree, $recurse) = @_;
 
   # Don't trim preformatted text
   my $start = 4;
@@ -391,7 +393,9 @@ sub _text {
   elsif ($trim) {
     my $parent = $tree;
     while ($parent->[0] eq 'tag') {
-      $trim = 0 if $parent->[1] eq 'pre';
+      if (!$self->xml && $parent->[1] eq 'pre') {
+        $trim = 0;
+      }
       last unless $parent = $parent->[3];
     }
   }
@@ -403,7 +407,7 @@ sub _text {
 
     # Nested tag
     my $content = '';
-    if ($type eq 'tag' && $recurse) { $content = $self->_text($e, 1, $trim) }
+    if ($type eq 'tag' && $recurse) { $content = $self->_text($trim, $e, 1) }
 
     # Text
     elsif ($type eq 'text') {
@@ -515,8 +519,10 @@ Construct a new L<Mojo::DOM> object.
 =head2 C<all_text>
 
   my $text = $dom->all_text;
+  my $text = $dom->all_text(0);
 
 Extract all text content from DOM structure.
+By default this will trim all whitespaces, which can be disabled.
 
 =head2 C<append>
 
@@ -655,8 +661,10 @@ Find root node.
 =head2 C<text>
 
   my $text = $dom->text;
+  my $text = $dom->text(0);
 
 Extract text content from element only, not including child elements.
+By default this will trim all whitespaces, which can be disabled.
 
 =head2 C<to_xml>
 

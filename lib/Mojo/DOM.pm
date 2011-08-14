@@ -65,8 +65,8 @@ EOF
 }
 
 sub all_text {
-  my $self = shift;
-  return $self->_text($self->tree, 1, 1);
+  my ($self, $trim) = @_;
+  return $self->_text($self->tree, 1, defined $trim ? $trim : 1);
 }
 
 sub append { shift->_add(1, @_) }
@@ -305,8 +305,8 @@ sub root {
 }
 
 sub text {
-  my $self = shift;
-  return $self->_text($self->tree, 0, 1);
+  my ($self, $trim) = @_;
+  return $self->_text($self->tree, 0, defined $trim ? $trim : 1);
 }
 
 sub to_xml { shift->[0]->render }
@@ -514,9 +514,11 @@ Construct a new L<Mojo::DOM> object.
 
 =head2 C<all_text>
 
-  my $text = $dom->all_text;
+  my $trimmed   = $dom->all_text;
+  my $untrimmed = $dom->all_text(0);
 
-Extract all text content from DOM structure.
+Extract all text content from DOM structure, smart whitespace trimming is
+activated by default.
 
 =head2 C<append>
 
@@ -654,9 +656,11 @@ Find root node.
 
 =head2 C<text>
 
-  my $text = $dom->text;
+  my $trimmed   = $dom->text;
+  my $untrimmed = $dom->text(0);
 
-Extract text content from element only, not including child elements.
+Extract text content from element only (not including child elements), smart
+whitespace trimming is activated by default.
 
 =head2 C<to_xml>
 

@@ -519,6 +519,8 @@ Construct a new L<Mojo::DOM> object.
 
 Extract all text content from DOM structure, smart whitespace trimming is
 activated by default.
+Note that the trim argument of this method is EXPERIMENTAL and might change
+without warning!
 
 =head2 C<append>
 
@@ -661,6 +663,8 @@ Find root node.
 
 Extract text content from element only (not including child elements), smart
 whitespace trimming is activated by default.
+Note that the trim argument of this method is EXPERIMENTAL and might change
+without warning!
 
 =head2 C<to_xml>
 

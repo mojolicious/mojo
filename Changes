@@ -5,6 +5,7 @@ This file documents the revision history for Perl extension Mojolicious.
           Mojolicious::Command::Generate::Plugin. (sri, yko, tempire)
         - Improved documentation.
         - Fixed "websocket_lite_app.t" to require Perl 5.10+.
+        - Fixed small empty cookie bug.
 
 1.77    2011-08-14 00:00:00
         - Deprecated Mojo::Path->append in favor of using Mojo::Path->parts

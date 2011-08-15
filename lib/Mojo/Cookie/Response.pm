@@ -59,6 +59,7 @@ sub parse {
       if (not $i) {
         push @cookies, Mojo::Cookie::Response->new;
         $cookies[-1]->name($name);
+        $value = '' unless defined $value;
         $cookies[-1]->value($value);
         next;
       }
@@ -85,7 +86,7 @@ sub to_string {
   return '' unless $self->name;
   my $cookie = $self->name;
   my $value  = $self->value;
-  $cookie .= "=$value" if defined $value && length $value;
+  $cookie .= defined $value ? "=$value" : '=';
   $cookie .= sprintf "; Version=%d", ($self->version || 1);
 
   # Domain

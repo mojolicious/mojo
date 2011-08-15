@@ -30,6 +30,7 @@ sub parse {
         push @cookies, Mojo::Cookie::Request->new;
         $cookies[-1]->name($name);
         unquote $value if $value;
+        $value = '' unless defined $value;
         $cookies[-1]->value($value);
         $cookies[-1]->version($version);
       }
@@ -52,7 +53,7 @@ sub to_string {
   return '' unless $self->name;
   my $cookie = $self->name;
   my $value  = $self->value;
-  $cookie .= "=$value" if defined $value && length $value;
+  $cookie .= defined $value ? "=$value" : '=';
   if (my $path = $self->path) { $cookie .= "; \$Path=$path" }
 
   return $cookie;

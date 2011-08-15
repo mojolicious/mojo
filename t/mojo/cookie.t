@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 69;
+use Test::More tests => 91;
 
 # "What good is money if it can't inspire terror in your fellow man?"
 use_ok 'Mojo::Cookie::Request';
@@ -15,6 +15,23 @@ $cookie->path('/test');
 $cookie->version(1);
 is $cookie->to_string, 'foo=ba =r; $Path=/test', 'right format';
 is $cookie->to_string_with_prefix, '$Version=1; foo=ba =r; $Path=/test',
+  'right format';
+
+# Request cookie without value as string
+$cookie = Mojo::Cookie::Request->new;
+$cookie->name('foo');
+$cookie->path('/test');
+$cookie->version(1);
+is $cookie->to_string, 'foo=; $Path=/test', 'right format';
+is $cookie->to_string_with_prefix, '$Version=1; foo=; $Path=/test',
+  'right format';
+$cookie = Mojo::Cookie::Request->new;
+$cookie->name('foo');
+$cookie->value('');
+$cookie->path('/test');
+$cookie->version(1);
+is $cookie->to_string, 'foo=; $Path=/test', 'right format';
+is $cookie->to_string_with_prefix, '$Version=1; foo=; $Path=/test',
   'right format';
 
 # Empty cookie
@@ -31,12 +48,20 @@ is $cookies->[0]->version, '1',     'right version';
 
 # Parse request cookie without value
 $cookie  = Mojo::Cookie::Request->new;
-$cookies = $cookie->parse('$Version=1; foo; $Path="/test"');
+$cookies = $cookie->parse('$Version=1; foo=; $Path="/test"');
 is $cookies->[0]->name,    'foo',   'right name';
-is $cookies->[0]->value,   undef,   'no value';
+is $cookies->[0]->value,   '',      'no value';
 is $cookies->[0]->path,    '/test', 'right path';
 is $cookies->[0]->version, '1',     'right version';
-is $cookies->[0]->to_string_with_prefix, '$Version=1; foo; $Path=/test',
+is $cookies->[0]->to_string_with_prefix, '$Version=1; foo=; $Path=/test',
+  'right result';
+$cookie  = Mojo::Cookie::Request->new;
+$cookies = $cookie->parse('$Version=1; foo=""; $Path="/test"');
+is $cookies->[0]->name,    'foo',   'right name';
+is $cookies->[0]->value,   '',      'no value';
+is $cookies->[0]->path,    '/test', 'right path';
+is $cookies->[0]->version, '1',     'right version';
+is $cookies->[0]->to_string_with_prefix, '$Version=1; foo=; $Path=/test',
   'right result';
 
 # Parse quoted request cookie
@@ -66,6 +91,19 @@ $cookie->value('ba r');
 $cookie->path('/test');
 $cookie->version(1);
 is $cookie->to_string, 'foo=ba r; Version=1; Path=/test', 'right format';
+
+# Response cookie without value as string
+$cookie = Mojo::Cookie::Response->new;
+$cookie->name('foo');
+$cookie->path('/test');
+$cookie->version(1);
+is $cookie->to_string, 'foo=; Version=1; Path=/test', 'right format';
+$cookie = Mojo::Cookie::Response->new;
+$cookie->name('foo');
+$cookie->value('');
+$cookie->path('/test');
+$cookie->version(1);
+is $cookie->to_string, 'foo=; Version=1; Path=/test', 'right format';
 
 # Full response cookie as string
 $cookie = Mojo::Cookie::Response->new;
@@ -121,11 +159,11 @@ is $cookies->[0]->version, '1',        'right version';
 
 # Parse response cookie without value
 $cookies = Mojo::Cookie::Response->parse(
-      'foo; Version=1; Domain=kraih.com; Path=/test; Max-Age=60;'
+      'foo=""; Version=1; Domain=kraih.com; Path=/test; Max-Age=60;'
     . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; Port="80 8080"; Secure;'
     . ' Comment=lalalala');
 is $cookies->[0]->name,    'foo',       'right name';
-is $cookies->[0]->value,   undef,       'no value';
+is $cookies->[0]->value,   '',          'no value';
 is $cookies->[0]->domain,  'kraih.com', 'right domain';
 is $cookies->[0]->path,    '/test',     'right path';
 is $cookies->[0]->max_age, 60,          'right max age value';
@@ -136,7 +174,26 @@ is $cookies->[0]->secure,  '1',        'right secure flag';
 is $cookies->[0]->comment, 'lalalala', 'right comment';
 is $cookies->[0]->version, '1',        'right version';
 is $cookies->[0]->to_string,
-    'foo; Version=1; Domain=kraih.com; Path=/test; Max-Age=60;'
+    'foo=; Version=1; Domain=kraih.com; Path=/test; Max-Age=60;'
+  . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; Port="80 8080"; Secure;'
+  . ' Comment=lalalala', 'right result';
+$cookies = Mojo::Cookie::Response->parse(
+      'foo=; Version=1; Domain=kraih.com; Path=/test; Max-Age=60;'
+    . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; Port="80 8080"; Secure;'
+    . ' Comment=lalalala');
+is $cookies->[0]->name,    'foo',       'right name';
+is $cookies->[0]->value,   '',          'no value';
+is $cookies->[0]->domain,  'kraih.com', 'right domain';
+is $cookies->[0]->path,    '/test',     'right path';
+is $cookies->[0]->max_age, 60,          'right max age value';
+is $cookies->[0]->expires, 'Thu, 07 Aug 2008 07:07:59 GMT',
+  'right expires value';
+is $cookies->[0]->port,    '80 8080',  'right port';
+is $cookies->[0]->secure,  '1',        'right secure flag';
+is $cookies->[0]->comment, 'lalalala', 'right comment';
+is $cookies->[0]->version, '1',        'right version';
+is $cookies->[0]->to_string,
+    'foo=; Version=1; Domain=kraih.com; Path=/test; Max-Age=60;'
   . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; Port="80 8080"; Secure;'
   . ' Comment=lalalala', 'right result';
 

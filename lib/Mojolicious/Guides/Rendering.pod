@@ -559,6 +559,53 @@ allows very pleasant to use tag helpers and filters.
 Wrapping the helper result into a L<Mojo::ByteStream> object can prevent
 accidental double escaping.
 
+=head2 Helper Plugins
+
+Some helpers might be useful enough for you to share them between multiple
+applications, plugins make that very simple.
+
+  package Mojolicious::Plugin::DebugHelper;
+  use Mojo::Base 'Mojolicious::Plugin';
+
+  sub register {
+    my ($self, $app) = @_;
+    $app->helper(debug => {
+      my ($self, $string) = @_;
+      $self->app->log->debug($string);
+    });
+  }
+
+  1;
+
+The C<register> method will be called when you load the plugin.
+
+  use Mojolicious::Lite;
+
+  plugin 'debug_helper';
+
+  get '/' => sub {
+    my $self = shift;
+    $self->debug('It works.');
+    $self->render_text('Hello!');
+  };
+
+  app->start;
+
+A skeleton for a full C<CPAN> compatible plugin distribution can be
+automatically generated.
+
+  $ mojo generate plugin debug_helper
+
+And if you have a C<PAUSE> account (which can be requested at
+L<http://pause.perl.org>), you are only a few commands away from relasing it
+to C<CPAN>.
+
+  $ perl Makefile.PL
+  $ make test
+  $ make manifest
+  $ make dist
+  $ mojo cpanify -u USER -p PASS Mojolicious-Plugin-DebugHelper-0.01.tar.gz
+
 =head2 Mode Specific C<exception> And C<not_found> Templates
 
 While the built-in C<exception> and C<not_found> templates are very useful

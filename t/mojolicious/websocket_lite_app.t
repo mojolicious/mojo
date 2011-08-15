@@ -9,6 +9,7 @@ BEGIN {
 
 # FreeBSD 8.0 and 8.1 are known to cause problems
 use Test::More;
+plan skip_all => 'Perl 5.10 required for this test!' unless $] >= 5.010;
 plan skip_all => 'This test does not work on some older versions of FreeBSD!'
   if $^O =~ /freebsd/;
 plan tests => 41;

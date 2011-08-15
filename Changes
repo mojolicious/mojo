@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+1.78    2011-08-15 00:00:00
+        - Fixed "websocket_lite_app.t" to require Perl 5.10+.
+
 1.77    2011-08-14 00:00:00
         - Deprecated Mojo::Path->append in favor of using Mojo::Path->parts
           directly.

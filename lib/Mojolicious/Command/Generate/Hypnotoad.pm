@@ -18,12 +18,14 @@ sub run {
 
 1;
 __DATA__
+
 @@ hypnotoad
 # See "perldoc Mojo::Server::Hypnotoad" for a full list of options
 {
   listen  => ['http://*:8080'],
   workers => 4
 };
+
 __END__
 =head1 NAME
 

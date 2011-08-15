@@ -70,18 +70,14 @@ sub run {
 
   # Fresh user agent
   my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
-
-  # Silence
   $ua->log->level('fatal');
+  $ua->max_redirects(5) if $redirect;
 
   # Absolute URL
   if ($url =~ /^\w+:\/\//) { $ua->detect_proxy }
 
   # Application
   else { $ua->app($ENV{MOJO_APP} || 'Mojo::HelloWorld') }
-
-  # Follow redirects
-  $ua->max_redirects(5) if $redirect;
 
   # Start
   my $v;

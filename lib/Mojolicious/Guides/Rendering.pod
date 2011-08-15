@@ -508,6 +508,57 @@ executed more than once.
     This template was compiled at <%= localtime time %>.
   <% end %>
 
+=head2 Adding Helpers
+
+Adding and redefining helpers is very easy, you can use them to do pretty
+much everything.
+
+  use Mojolicious::Lite;
+
+  helper debug => sub {
+    my ($self, $string) = @_;
+    $self->app->log->debug($string);
+  };
+
+  get '/' => sub {
+    my $self = shift;
+    $self->debug('action');
+  } => 'index';
+
+  app->start;
+  __DATA__
+
+  @@ index.html.ep
+  % debug 'template';
+
+Helpers can also accept template blocks as last argument, this for example
+allows very pleasant to use tag helpers and filters.
+
+  use Mojolicious::Lite;
+  use Mojo::ByteStream;
+
+  helper trim_newline => sub {
+    my ($self, $block) = @_;
+    my $result = $block->();
+    $result =~ s/\n//g;
+    return Mojo::ByteStream->new($result);
+  };
+
+  get '/' => 'index';
+
+  app->start;
+  __DATA__
+
+  @@ index.html.ep
+  <%= trim_newline begin %>
+    Some text.
+    <%= 1 + 1 %>
+    More text.
+  <% end %>
+
+Wrapping the helper result into a L<Mojo::ByteStream> object can prevent
+accidental double escaping.
+
 =head2 Mode Specific C<exception> And C<not_found> Templates
 
 While the built-in C<exception> and C<not_found> templates are very useful
@@ -632,57 +683,6 @@ plugin with a custom configuration.
   Hello {{= $name }}.
 
 L<Mojo::Template> contains the whole list of available options.
-
-=head2 Adding Helpers
-
-Adding and redefining helpers is very easy, you can use them to do pretty
-much everything.
-
-  use Mojolicious::Lite;
-
-  helper debug => sub {
-    my ($self, $string) = @_;
-    $self->app->log->debug($string);
-  };
-
-  get '/' => sub {
-    my $self = shift;
-    $self->debug('action');
-  } => 'index';
-
-  app->start;
-  __DATA__
-
-  @@ index.html.ep
-  % debug 'template';
-
-Helpers can also accept template blocks as last argument, this for example
-allows very pleasant to use tag helpers and filters.
-
-  use Mojolicious::Lite;
-  use Mojo::ByteStream;
-
-  helper trim_newline => sub {
-    my ($self, $block) = @_;
-    my $result = $block->();
-    $result =~ s/\n//g;
-    return Mojo::ByteStream->new($result);
-  };
-
-  get '/' => 'index';
-
-  app->start;
-  __DATA__
-
-  @@ index.html.ep
-  <%= trim_newline begin %>
-    Some text.
-    <%= 1 + 1 %>
-    More text.
-  <% end %>
-
-Wrapping the helper result into a L<Mojo::ByteStream> object can prevent
-accidental double escaping.
 
 =head2 Adding Your Favorite Template System
 

@@ -20,6 +20,7 @@ sub run {
 
 1;
 __DATA__
+
 @@ gitignore
 .*
 !.gitignore
@@ -32,6 +33,7 @@ Makefile*
 MANIFEST*
 !MANIFEST.SKIP
 pm_to_blib
+
 __END__
 =head1 NAME
 

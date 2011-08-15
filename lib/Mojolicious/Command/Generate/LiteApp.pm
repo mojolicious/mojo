@@ -22,6 +22,7 @@ sub run {
 
 1;
 __DATA__
+
 @@ liteapp
 %% my $class = shift;
 #!/usr/bin/env perl
@@ -36,18 +37,19 @@ get '/welcome' => sub {
 };
 
 app->start;
-<%%= '__DATA__' %%>
+<%%%%>__DATA__
 
-<%%= '@@ index.html.ep' %%>
+<%%%%>@@ index.html.ep
 % layout 'default';
 % title 'Welcome';
 Welcome to Mojolicious!
 
-<%%= '@@ layouts/default.html.ep' %%>
+<%%%%>@@ layouts/default.html.ep
 <!doctype html><html>
   <head><title><%= title %></title></head>
   <body><%= content %></body>
 </html>
+
 __END__
 =head1 NAME
 

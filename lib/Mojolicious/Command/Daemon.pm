@@ -22,7 +22,7 @@ These options are available:
                           value of MOJO_REVERSE_PROXY.
   --requests <number>     Set maximum number of requests per keep-alive
                           connection, defaults to 25.
-  --user <name>           Set user name for process.
+  --user <name>           Set username for process.
   --websocket <seconds>   Set WebSocket timeout, defaults to 300.
 EOF
 

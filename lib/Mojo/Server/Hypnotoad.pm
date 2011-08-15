@@ -605,7 +605,7 @@ aborted, defaults to C<30>.
 
   user => 'sri'
 
-User name for worker processes.
+Username for worker processes.
 
 =head2 C<websocket_timeout>
 

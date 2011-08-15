@@ -209,7 +209,7 @@ layer agnostic and you just use whatever Perl modules you like most.
   $ chmod 644 lib/MyUsers.pm
 
 Our login manager will simply use a plain old Perl module abstracting away
-all logic related to matching user names and passwords.
+all logic related to matching usernames and passwords.
 
   package MyUsers;
 
@@ -395,7 +395,7 @@ like this.
     # Check password and render "index.html.ep" if necessary
     return $self->render unless $self->users->check($user, $pass);
 
-    # Store user name in session
+    # Store username in session
     $self->session(user => $user);
 
     # Store a friendly message for the next page in flash

@@ -5,7 +5,7 @@ has description => <<'EOF';
 Generate Mojolicious application directory structure.
 EOF
 has usage => <<"EOF";
-usage: $0 generate app [NAME]
+usage: $0 generate app [CLASS]
 EOF
 
 # "I say, you've damaged our servants quarters... and our servants."
@@ -54,6 +54,7 @@ EOF
 
 1;
 __DATA__
+
 @@ mojo
 % my $class = shift;
 #!/usr/bin/env perl
@@ -78,6 +79,7 @@ $ENV{MOJO_APP} ||= '<%= $class %>';
 
 # Start commands
 Mojolicious::Commands->start;
+
 @@ appclass
 % my $class = shift;
 package <%= $class %>;
@@ -98,6 +100,7 @@ sub startup {
 }
 
 1;
+
 @@ controller
 % my $class = shift;
 package <%= $class %>;
@@ -112,6 +115,7 @@ sub welcome {
 }
 
 1;
+
 @@ static
 <!doctype html><html>
   <head><title>Welcome to the Mojolicious Web Framework!</title></head>
@@ -121,26 +125,26 @@ sub welcome {
     <a href="/welcome">click here</a> to get back to the start.
   </body>
 </html>
+
 @@ test
 % my $class = shift;
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 5;
+use Test::More tests => 4;
 use Test::Mojo;
 
 use_ok '<%= $class %>';
 
-# Test
 my $t = Test::Mojo->new('<%= $class %>');
-$t->get_ok('/welcome')->status_is(200)
-  ->content_type_is('text/html;charset=UTF-8')
-  ->content_like(qr/Mojolicious Web Framework/i);
+$t->get_ok('/welcome')->status_is(200)->content_like(qr/Mojolicious/i);
+
 @@ layout
 <!doctype html><html>
   <head><title><%= title %></title></head>
   <body><%= content %></body>
 </html>
+
 @@ welcome
 % layout 'default';
 % title 'Welcome';
@@ -152,6 +156,7 @@ This page was generated from the template
 to reload the page or
 <a href="/index.html">here</a>
 to move forward to a static page.
+
 __END__
 =head1 NAME
 
@@ -166,7 +171,7 @@ Mojolicious::Command::Generate::App - App Generator Command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::Generate::App> is a application generator.
+L<Mojolicious::Command::Generate::App> is an application generator.
 
 =head1 ATTRIBUTES
 

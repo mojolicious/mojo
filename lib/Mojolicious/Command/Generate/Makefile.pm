@@ -12,22 +12,19 @@ EOF
 #  the entire universe will be destroyed...
 #  And as an environmentalist, I'm against that."
 sub run {
-  my $self = shift;
-
+  my $self  = shift;
   my $class = $ENV{MOJO_APP} || 'MyApp';
   my $path  = $self->class_to_path($class);
   my $name  = $self->class_to_file($class);
   $self->render_to_rel_file('makefile', 'Makefile.PL', $class, $path, $name);
-  $self->chmod_file('Makefile.PL', 0744);
 }
 
 1;
 __DATA__
+
 @@ makefile
 % my ($class, $path, $name) = @_;
 #!/usr/bin/env perl
-
-use 5.008007;
 
 use strict;
 use warnings;
@@ -38,10 +35,11 @@ WriteMakefile(
   NAME         => '<%= $class %>',
   VERSION_FROM => 'lib/<%= $path %>',
   AUTHOR       => 'A Good Programmer <nospam@cpan.org>',
-  EXE_FILES => ['script/<%= $name %>'],
-  PREREQ_PM => { 'Mojolicious' => '1.0' },
-  test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t'}
+  EXE_FILES    => ['script/<%= $name %>'],
+  PREREQ_PM    => {'Mojolicious' => '1.4'},
+  test         => {TESTS => 't/*.t'}
 );
+
 __END__
 =head1 NAME
 

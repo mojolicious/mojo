@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.78    2011-08-15 00:00:00
+        - Added EXPERIMENTAL modules Mojolicious::Command::Cpanify and
+          Mojolicious::Command::Generate::Plugin.
         - Fixed "websocket_lite_app.t" to require Perl 5.10+.
 
 1.77    2011-08-14 00:00:00

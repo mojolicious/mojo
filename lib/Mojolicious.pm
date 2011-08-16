@@ -533,7 +533,7 @@ L<Mojolicious::Controller>.
 The operating mode for your application, defaults to the value of the
 C<MOJO_MODE> environment variable or C<development>.
 You can also add per mode logic to your application by defining methods named
-C<$mode_mode> in the application class, which will be called right before
+C<${mode}_mode> in the application class, which will be called right before
 C<startup>.
 
   sub development_mode {
@@ -571,7 +571,7 @@ the sledgehammer in your toolbox.
 
 The plugin loader, defaults to a L<Mojolicious::Plugins> object.
 You can usually leave this alone, see L<Mojolicious::Plugin> if you want to
-write a plugin.
+write a plugin or the C<plugin> method below if you want to load a plugin.
 
 =head2 C<renderer>
 
@@ -581,7 +581,7 @@ write a plugin.
 Used in your application to render content, defaults to a
 L<Mojolicious::Renderer> object.
 The two main renderer plugins L<Mojolicious::Plugin::EpRenderer> and
-L<Mojolicious::Plugin::EplRenderer> contain more specific information.
+L<Mojolicious::Plugin::EplRenderer> contain more information.
 
 =head2 C<routes>
 
@@ -616,6 +616,8 @@ the log file reminding you to change your passphrase.
 
 Simple signed cookie based sessions, defaults to a L<Mojolicious::Sessions>
 object.
+You can usually leave this alone, see L<Mojolicious::Controller/"sessions">
+for more information about working with session data.
 
 =head2 C<static>
 
@@ -945,16 +947,6 @@ that have been used in the past.
 
 Sebastian Riedel, C<sri@cpan.org>.
 
-=head1 CORE DEVELOPERS EMERITUS
-
-Retired members of the core team, we thank you dearly for your service.
-
-=over 2
-
-Viacheslav Tykhanovskyi, C<vti@cpan.org>.
-
-=back
-
 =head1 CREDITS
 
 In alphabetical order.
@@ -1132,6 +1124,8 @@ Ulrich Habel
 Ulrich Kautz
 
 Uwe Voelker
+
+Viacheslav Tykhanovskyi
 
 Victor Engmark
 

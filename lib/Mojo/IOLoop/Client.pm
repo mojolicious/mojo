@@ -185,6 +185,18 @@ L<Mojo::IOLoop::Client> performs non-blocking socket connections for
 L<Mojo::IOLoop>.
 Note that this module is EXPERIMENTAL and might change without warning!
 
+=head1 EVENTS
+
+L<Mojo::IOLoop::Client> can emit the following events.
+
+=head2 C<connect>
+
+Emitted once the connection is established.
+
+=head2 C<error>
+
+Emitted if an error happens on the connection.
+
 =head1 ATTRIBUTES
 
 L<Mojo::IOLoop::Client> implements the following attributes.
@@ -241,18 +253,6 @@ Path to the TLS certificate file.
 Path to the TLS key file.
 
 =back
-
-=head1 EVENTS
-
-L<Mojo::IOLoop::Client> can emit the following events.
-
-=head2 C<connect>
-
-Emitted once the connection is established.
-
-=head2 C<error>
-
-Emitted if an error happens on the connection.
 
 =head1 SEE ALSO
 

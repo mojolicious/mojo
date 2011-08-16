@@ -184,6 +184,26 @@ L<Mojo::IOLoop::Stream> is a container for streaming handles used by
 L<Mojo::IOLoop>.
 Note that this module is EXPERIMENTAL and might change without warning!
 
+=head1 EVENTS
+
+L<Mojo::IOLoop::Stream> can emit the following events.
+
+=head2 C<close>
+
+Emitted if the stream gets closed.
+
+=head2 C<drain>
+
+Emitted once all data has been written.
+
+=head2 C<error>
+
+Emitted if an error happens on the stream.
+
+=head2 C<read>
+
+Emitted if new data arrives on the stream.
+
 =head1 ATTRIBUTES
 
 L<Mojo::IOLoop::Stream> implements the following attributes.
@@ -243,26 +263,6 @@ Steal handle from stream and prevent it from getting closed automatically.
 
 Write data to stream, the optional drain callback will be invoked once all
 data has been written.
-
-=head1 EVENTS
-
-L<Mojo::IOLoop::Stream> can emit the following events.
-
-=head2 C<close>
-
-Emitted if the stream gets closed.
-
-=head2 C<drain>
-
-Emitted once all data has been written.
-
-=head2 C<error>
-
-Emitted if an error happens on the stream.
-
-=head2 C<read>
-
-Emitted if new data arrives on the stream.
 
 =head1 SEE ALSO
 

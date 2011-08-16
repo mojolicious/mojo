@@ -616,7 +616,7 @@ the log file reminding you to change your passphrase.
 
 Simple signed cookie based sessions, defaults to a L<Mojolicious::Sessions>
 object.
-You can usually leave this alone, see L<Mojolicious::Controller/"sessions">
+You can usually leave this alone, see L<Mojolicious::Controller/"session">
 for more information about working with session data.
 
 =head2 C<static>

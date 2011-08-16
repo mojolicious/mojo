@@ -55,6 +55,14 @@ Mojo::IOLoop::Trigger - IOLoop Trigger
 L<Mojo::IOLoop::Trigger> is a remote control for L<Mojo::IOLoop>.
 Note that this module is EXPERIMENTAL and might change without warning!
 
+=head1 EVENTS
+
+L<Mojo::IOLoop::Trigger> can emit the following events.
+
+=head2 C<done>
+
+Emitted once the active event counter reaches zero.
+
 =head1 ATTRIBUTES
 
 L<Mojo::IOLoop::Trigger> implements the following attributes.
@@ -95,14 +103,6 @@ Decrement active event counter.
 
 Start C<ioloop> and register C<done> event that stops it again once the
 active event counter reaches zero.
-
-=head1 EVENTS
-
-L<Mojo::IOLoop::Trigger> can emit the following events.
-
-=head2 C<done>
-
-Emitted once the active event counter reaches zero.
 
 =head1 SEE ALSO
 

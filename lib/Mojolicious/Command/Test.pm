@@ -55,8 +55,6 @@ sub run {
 
   # Run tests
   runtests(@tests);
-
-  return $self;
 }
 
 1;
@@ -103,7 +101,7 @@ implements the following new ones.
 
 =head2 C<run>
 
-  $test = $test->run(@ARGV);
+  $test->run(@ARGV);
 
 Run this command.
 

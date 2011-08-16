@@ -64,8 +64,6 @@ OPTIONAL
 
 $message
 EOF
-
-  return $self;
 }
 
 1;
@@ -112,7 +110,7 @@ and implements the following new ones.
 
 =head2 C<run>
 
-  $get = $v->run(@ARGV);
+  $v->run(@ARGV);
 
 Run this command.
 

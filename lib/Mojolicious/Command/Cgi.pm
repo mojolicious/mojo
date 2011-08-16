@@ -17,13 +17,10 @@ EOF
 # "Fire all weapons and open a hailing frequency for my victory yodel."
 sub run {
   my $self = shift;
-
-  my $cgi = Mojo::Server::CGI->new;
-  local @ARGV = @_ if @_;
+  my $cgi  = Mojo::Server::CGI->new;
+  local @ARGV = @_;
   GetOptions(nph => sub { $cgi->nph(1) });
   $cgi->run;
-
-  return $self;
 }
 
 1;
@@ -70,7 +67,7 @@ implements the following new ones.
 
 =head2 C<run>
 
-  $cgi = $cgi->run(@ARGV);
+  $cgi->run(@ARGV);
 
 Run this command.
 

@@ -1,6 +1,7 @@
 package Mojolicious::Command::Generate;
 use Mojo::Base 'Mojolicious::Commands';
 
+# "Ah, nothing like a warm fire and a SuperSoaker of fine cognac."
 has description => <<'EOF';
 Generate files and directories from templates.
 EOF
@@ -18,8 +19,6 @@ has namespaces =>
 has usage => <<"EOF";
 usage: $0 generate GENERATOR [OPTIONS]
 EOF
-
-# "Ah, nothing like a warm fire and a SuperSoaker of fine cognac."
 
 1;
 __END__

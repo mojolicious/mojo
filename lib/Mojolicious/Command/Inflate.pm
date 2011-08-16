@@ -27,7 +27,8 @@ sub run {
   my $public    = 'public';
   my $templates = 'templates';
 
-  local @ARGV = @_ if @_;
+  # Options
+  local @ARGV = @_;
   GetOptions(
     'class=s'     => sub { $class     = $_[1] },
     'public=s'    => sub { $public    = $_[1] },
@@ -47,8 +48,6 @@ sub run {
     utf8::encode $content if utf8::is_utf8 $content;
     $self->write_file($path, $content);
   }
-
-  return $self;
 }
 
 1;
@@ -96,7 +95,7 @@ and implements the following new ones.
 
 =head2 C<run>
 
-  $inflate = $inflate->run(@ARGV);
+  $inflate->run(@ARGV);
 
 Run this command.
 

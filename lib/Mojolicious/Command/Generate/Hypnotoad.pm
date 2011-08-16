@@ -69,7 +69,7 @@ L<Mojo::Command> and implements the following new ones.
 
 =head2 C<run>
 
-  $hypnotoad = $hypnotoad->run(@ARGV);
+  $hypnotoad->run(@ARGV);
 
 Run this command.
 

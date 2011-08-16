@@ -28,7 +28,8 @@ sub run {
   my $server = Mojo::Server->new;
   my $app    = $server->app;
 
-  local @ARGV = @_ if @_;
+  # Options
+  local @ARGV = @_;
   my $verbose;
   GetOptions(verbose => sub { $verbose = 1 });
   my $code = shift @ARGV || '';

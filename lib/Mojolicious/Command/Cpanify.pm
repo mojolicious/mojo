@@ -23,7 +23,7 @@ sub run {
   my $self = shift;
 
   # Options
-  local @ARGV = @_ if @_;
+  local @ARGV = @_;
   my $password = my $user = '';
   GetOptions(
     'password=s' => sub { $password = $_[1] },

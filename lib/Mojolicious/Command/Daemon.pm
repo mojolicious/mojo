@@ -33,7 +33,8 @@ sub run {
   my $self   = shift;
   my $daemon = Mojo::Server::Daemon->new;
 
-  local @ARGV = @_ if @_;
+  # Options
+  local @ARGV = @_;
   my @listen;
   GetOptions(
     'backlog=i'   => sub { $daemon->backlog($_[1]) },
@@ -47,10 +48,9 @@ sub run {
     'websocket=i' => sub { $daemon->websocket_timeout($_[1]) }
   );
 
+  # Start
   $daemon->listen(\@listen) if @listen;
   $daemon->run;
-
-  return $self;
 }
 
 1;
@@ -98,7 +98,7 @@ and implements the following new ones.
 
 =head2 C<run>
 
-  $daemon = $daemon->run(@ARGV);
+  $daemon->run(@ARGV);
 
 Run this command.
 

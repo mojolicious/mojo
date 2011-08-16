@@ -82,7 +82,7 @@ L<Mojo::Command> and implements the following new ones.
 
 =head2 C<run>
 
-  $makefile = $makefile->run(@ARGV);
+  $makefile->run(@ARGV);
 
 Run this command.
 

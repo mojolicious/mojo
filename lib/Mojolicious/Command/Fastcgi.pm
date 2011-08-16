@@ -11,12 +11,7 @@ usage: $0 fastcgi
 EOF
 
 # "Interesting... Oh no wait, the other thing, tedious."
-sub run {
-  my $self    = shift;
-  my $fastcgi = Mojo::Server::FastCGI->new;
-  $fastcgi->run;
-  return $self;
-}
+sub run { Mojo::Server::FastCGI->new->run }
 
 1;
 __END__
@@ -63,7 +58,7 @@ and implements the following new ones.
 
 =head2 C<run>
 
-  $fastcgi = $fastcgi->run;
+  $fastcgi->run;
 
 Run this command.
 

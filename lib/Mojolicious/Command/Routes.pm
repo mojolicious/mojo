@@ -22,8 +22,6 @@ sub run {
   my $routes = [];
   $self->_walk($_, 0, $routes) for @{$app->routes->children};
   $self->_draw($routes);
-
-  return $self;
 }
 
 sub _draw {
@@ -143,7 +141,7 @@ and implements the following new ones.
 
 =head2 C<run>
 
-  $routes = $routes->run(@ARGV);
+  $routes->run(@ARGV);
 
 Run this command.
 

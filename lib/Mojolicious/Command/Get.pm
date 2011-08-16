@@ -41,7 +41,7 @@ sub run {
   my $self = shift;
 
   # Options
-  local @ARGV = @_ if @_;
+  local @ARGV = @_;
   my $method = 'GET';
   my @headers;
   my $content = '';
@@ -148,8 +148,6 @@ sub run {
 
   # Select
   $self->_select($buffer, $charset, $selector) if $selector;
-
-  return $self;
 }
 
 sub _say {
@@ -189,8 +187,6 @@ sub _select {
 
     # Unknown
     else { die qq/Unknown command "$command".\n/ }
-
-    # Done
     $done++;
   }
 
@@ -242,7 +238,7 @@ implements the following new ones.
 
 =head2 C<run>
 
-  $get = $get->run(@ARGV);
+  $get->run(@ARGV);
 
 Run this command.
 

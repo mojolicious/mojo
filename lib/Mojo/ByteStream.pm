@@ -282,9 +282,10 @@ Base64 encode bytestream.
 
   $stream = $stream->camelize;
 
-Camelize bytestream.
+Convert snake case bytestream to camel case and replace C<-> with C<::>.
 
-  foo_bar -> FooBar
+  foo_bar     -> FooBar
+  foo_bar-baz -> FooBar::Baz
 
 =head2 C<clone>
 
@@ -296,9 +297,10 @@ Clone bytestream.
 
   $stream = $stream->decamelize;
 
-Decamelize bytestream.
+Convert camel case bytestream to snake case and replace C<::> with C<->.
 
-  FooBar -> foo_bar
+  FooBar      -> foo_bar
+  FooBar::Baz -> foo_bar-baz
 
 =head2 C<decode>
 

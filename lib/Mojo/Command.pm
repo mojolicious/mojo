@@ -144,7 +144,7 @@ sub get_data {
 sub help {
   my $self = shift;
   print $self->usage;
-  exit;
+  exit 0;
 }
 
 sub rel_dir {
@@ -284,8 +284,6 @@ sub run {
     print "  $name$padding   $description";
   }
   print $self->hint;
-
-  return $self;
 }
 
 sub start {

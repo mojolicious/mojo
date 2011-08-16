@@ -26,12 +26,13 @@ usage: $0 get [OPTIONS] URL [SELECTOR] [COMMANDS]
   mojo get mojolicio.us 'h1, h2, h3' 3 text
 
 These options are available:
-  --charset    Charset of HTML5/XML content, defaults to auto detection or
-               UTF-8.
-  --header     Additional HTTP header.
-  --method     HTTP method to use.
-  --redirect   Follow up to 5 redirects.
-  --verbose    Print verbose debug information to STDERR.
+  --charset <charset>      Charset of HTML5/XML content, defaults to auto
+                           detection or UTF-8.
+  --content <content>      Content to send with request.
+  --header <name: value>   Additional HTTP header.
+  --method <method>        HTTP method to use.
+  --redirect               Follow up to 5 redirects.
+  --verbose                Print verbose debug information to STDERR.
 EOF
 
 # "Objection.

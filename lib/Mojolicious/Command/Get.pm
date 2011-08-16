@@ -9,7 +9,7 @@ use Mojo::UserAgent;
 use Mojo::Util 'decode';
 
 has description => <<'EOF';
-Get file from URL.
+Perform HTTP 1.1 request.
 EOF
 has usage => <<"EOF";
 usage: $0 get [OPTIONS] URL [SELECTOR] [COMMANDS]

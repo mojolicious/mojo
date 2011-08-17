@@ -22,19 +22,19 @@ sub load_plugin {
   my ($self, $name) = @_;
 
   # Module
-  if ($name =~ /^[A-Z]+/) { return $name->new if $self->_load($name) }
+  if ($name =~ /^[A-Z]+/ && $self->_load($name)) { return $name->new }
 
   # Search plugin by name
   else {
 
     # Class
     my $class = $name;
-    camelize $class;
+    camelize $class unless $class =~ /^[A-Z]+/;
 
     # Try all namspaces
     for my $namespace (@{$self->namespaces}) {
-      my $module = "${namespace}::$class";
-      return $module->new if $self->_load($module);
+        my $module = "${namespace}::$class";
+        return $module->new if $self->_load($module);
     }
   }
 
@@ -44,10 +44,10 @@ sub load_plugin {
 
 # "Let's see how crazy I am now, Nixon. The correct answer is very."
 sub register_plugin {
-  my $self = shift;
-  my $name = shift;
-  my $app  = shift;
-  $self->load_plugin($name)->register($app, ref $_[0] ? $_[0] : {@_});
+my $self = shift;
+my $name = shift;
+my $app  = shift;
+$self->load_plugin($name)->register($app, ref $_[0] ? $_[0] : {@_});
 }
 
 sub run_hook {

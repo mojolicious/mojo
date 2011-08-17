@@ -16,6 +16,7 @@ sub startup {
   unshift @{$self->plugins->namespaces},
     $self->routes->namespace . '::Plugin';
   $self->plugin('test_plugin');
+  $self->plugin('UPPERCASETestPlugin');
 
   # Templateless renderer
   $self->renderer->add_handler(
@@ -106,6 +107,10 @@ sub startup {
 
   # /withblock - template with blocks
   $r->route('/withblock')->to('foo#withblock');
+
+  # /plugin/uppercase - plugin loaded correctly in uppercase and camelcase
+  $r->route('/plugin/uppercase/')->to('foo#pluginuppercase');
+  $r->route('/plugin/camelcase/')->to('foo#plugincamelcase');
 
   # /staged - authentication with bridges
   my $b = $r->bridge('/staged')->to(controller => 'foo', action => 'stage1');

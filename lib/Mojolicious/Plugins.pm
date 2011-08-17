@@ -29,7 +29,7 @@ sub load_plugin {
 
     # Class
     my $class = $name;
-    camelize $class unless $class =~ /^[A-Z]/;
+    camelize $class if $class =~ /^[a-z]/;
 
     # Try all namspaces
     for my $namespace (@{$self->namespaces}) {

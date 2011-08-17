@@ -569,7 +569,7 @@ applications, plugins make that very simple.
 
   sub register {
     my ($self, $app) = @_;
-    $app->helper(debug => {
+    $app->helper(debug => sub {
       my ($self, $string) = @_;
       $self->app->log->debug($string);
     });

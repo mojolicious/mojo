@@ -34,7 +34,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Smiling Face With Sunglasses';
-our $VERSION  = '1.80';
+our $VERSION  = '1.81';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."

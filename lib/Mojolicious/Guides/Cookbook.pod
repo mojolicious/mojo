@@ -568,6 +568,11 @@ CPAN module.
   $ make manifest
   $ make dist
 
+And if you have a C<PAUSE> account (which can be requested at
+L<http://pause.perl.org>) even upload it.
+
+  $ mojo cpanify -u USER -p PASS MyMojoliciousApp-0.01.tar.gz
+
 =head2 Hello World
 
 If every byte matters this is the smallest C<Hello World> application you can

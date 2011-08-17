@@ -8,7 +8,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'development';
 }
 
-use Test::More tests => 250;
+use Test::More tests => 260;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -293,6 +293,18 @@ $t->get_ok('/foo/bar')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('/foo/bar');
 
 $t = Test::Mojo->new('MojoliciousTest');
+
+# MojoliciousTestController::Foo::pluginupper
+$t->get_ok('/plugin/uppercase')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('WELCOME aboard!');
+
+# MojoliciousTestController::Foo::plugincamelcase
+$t->get_ok('/plugin/camelcase')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('Welcome aboard!');
 
 # MojoliciousTestController::Foo::stage2
 $t->get_ok('/staged', {'X-Pass' => '1'})->status_is(200)

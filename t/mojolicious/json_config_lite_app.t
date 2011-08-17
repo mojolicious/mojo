@@ -18,7 +18,7 @@ use Test::Mojo;
 
 # Load plugin
 my $config =
-  plugin json_config => {default => {foo => 'baz', hello => 'there'}};
+  plugin JsonConfig => {default => {foo => 'baz', hello => 'there'}};
 is $config->{foo},   'bar',    'right value';
 is $config->{hello}, 'there',  'right value';
 is $config->{utf},   'утф', 'right value';

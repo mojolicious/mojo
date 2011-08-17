@@ -20,7 +20,7 @@ my $yatta      = 'やった';
 my $yatta_sjis = b($yatta)->encode('shift_jis')->to_string;
 
 # Charset plugin
-plugin charset => {charset => 'Shift_JIS'};
+plugin Charset => {charset => 'Shift_JIS'};
 
 # UTF-8 text renderer
 app->renderer->add_handler(

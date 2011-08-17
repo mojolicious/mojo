@@ -90,12 +90,12 @@ app->routes->namespace('MyTestApp');
 # Mount full external application a few times
 use FindBin;
 my $external = "$FindBin::Bin/external/myapp.pl";
-plugin mount => {'/x/1' => $external};
-plugin(mount => ('/x/♥' => $external))->to(message => 'works 2!');
-plugin mount => {'mojolicious.org' => $external};
-plugin mount => {'MOJOLICIO.US/'   => $external};
-plugin mount => {'*.kraih.com'     => $external};
-plugin(mount => ('*.foo-bar.de/♥/123' => $external))
+plugin Mount => {'/x/1' => $external};
+plugin(Mount => ('/x/♥' => $external))->to(message => 'works 2!');
+plugin Mount => {'mojolicious.org' => $external};
+plugin Mount => {'MOJOLICIO.US/'   => $external};
+plugin Mount => {'*.kraih.com'     => $external};
+plugin(Mount => ('*.foo-bar.de/♥/123' => $external))
   ->to(message => 'works 3!');
 
 # GET /hello

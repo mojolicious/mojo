@@ -22,7 +22,7 @@ use Mojolicious::Lite;
 use Test::Mojo;
 
 # I18N plugin
-plugin i18n => {namespace => 'MyTestApp::I18N'};
+plugin I18n => {namespace => 'MyTestApp::I18N'};
 
 # GET /
 get '/' => 'index';

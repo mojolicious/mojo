@@ -49,6 +49,16 @@ sub stage2 {
   $self->render_text($self->test_plugin);
 }
 
+sub plugincamelcase {
+  my $self = shift;
+  $self->render_text($self->test_plugin);
+}
+
+sub pluginuppercase {
+  my $self = shift;
+  $self->render_text($self->uppercase_test_plugin);
+}
+
 sub syntaxerror { shift->render('syntaxerror', format => 'html') }
 
 sub templateless { shift->render(handler => 'test') }

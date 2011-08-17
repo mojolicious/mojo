@@ -172,7 +172,7 @@ I/O operations but will also use more memory, defaults to C<131072>.
 =head2 C<MOJO_CONFIG>
 
 Config file to be used by L<Mojolicious::Plugin::Config> and
-L<Mojolicious::Plugin::JsonConfig>, quite useful for testing.
+L<Mojolicious::Plugin::JSONConfig>, quite useful for testing.
 
    MOJO_CONFIG=myapp.conf
 

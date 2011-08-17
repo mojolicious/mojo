@@ -19,7 +19,7 @@ use Mojolicious::Lite;
 use Test::Mojo;
 
 # Load plugin
-plugin 'JsonConfig';
+plugin 'JSONConfig';
 
 # GET /
 get '/' => 'index';

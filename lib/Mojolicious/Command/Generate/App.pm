@@ -90,7 +90,7 @@ sub startup {
   my $self = shift;
 
   # Documentation browser under "/perldoc" (this plugin requires Perl 5.10)
-  $self->plugin('PodRenderer');
+  $self->plugin('PODRenderer');
 
   # Routes
   my $r = $self->routes;

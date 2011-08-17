@@ -713,7 +713,7 @@ plugin with a custom configuration.
 
   use Mojolicious::Lite;
 
-  plugin EpRenderer => {
+  plugin EPRenderer => {
     name     => 'mustache',
     template => {
       tag_start => '{{',

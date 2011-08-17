@@ -1,5 +1,17 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+1.80    2011-08-17 00:00:00
+        - Deprecated Mojolicious::Plugin::EpRenderer in favor of
+          Mojolicious::Plugin::EPRenderer.
+        - Deprecated Mojolicious::Plugin::EplRenderer in favor of
+          Mojolicious::Plugin::EPLRenderer.
+        - Deprecated Mojolicious::Plugin::I18n in favor of
+          Mojolicious::Plugin::I18N.
+        - Deprecated Mojolicious::Plugin::JsonConfig in favor of
+          Mojolicious::Plugin::JSONConfig.
+        - Deprecated Mojolicious::Plugin::PodRenderer in favor of
+          Mojolicious::Plugin::PODRenderer.
+
 1.79    2011-08-17 00:00:00
         - Added support for upper case relative plugin names. (lammel)
         - Improved documentation.

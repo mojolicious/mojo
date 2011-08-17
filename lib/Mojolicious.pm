@@ -34,7 +34,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Smiling Face With Sunglasses';
-our $VERSION  = '1.79';
+our $VERSION  = '1.80';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -96,8 +96,8 @@ sub new {
   $self->plugin('HeaderCondition');
   $self->plugin('DefaultHelpers');
   $self->plugin('TagHelpers');
-  $self->plugin('EplRenderer');
-  $self->plugin('EpRenderer');
+  $self->plugin('EPLRenderer');
+  $self->plugin('EPRenderer');
   $self->plugin('RequestTimer');
   $self->plugin('PoweredBy');
 
@@ -580,8 +580,8 @@ write a plugin or the C<plugin> method below if you want to load a plugin.
 
 Used in your application to render content, defaults to a
 L<Mojolicious::Renderer> object.
-The two main renderer plugins L<Mojolicious::Plugin::EpRenderer> and
-L<Mojolicious::Plugin::EplRenderer> contain more information.
+The two main renderer plugins L<Mojolicious::Plugin::EPRenderer> and
+L<Mojolicious::Plugin::EPLRenderer> contain more information.
 
 =head2 C<routes>
 
@@ -801,11 +801,11 @@ Perl-ish configuration files.
 
 General purpose helper collection.
 
-=item L<Mojolicious::Plugin::EplRenderer>
+=item L<Mojolicious::Plugin::EPLRenderer>
 
 Renderer for plain embedded Perl templates.
 
-=item L<Mojolicious::Plugin::EpRenderer>
+=item L<Mojolicious::Plugin::EPRenderer>
 
 Renderer for more sophisiticated embedded Perl templates.
 
@@ -813,11 +813,11 @@ Renderer for more sophisiticated embedded Perl templates.
 
 Route condition for all kinds of headers.
 
-=item L<Mojolicious::Plugin::I18n>
+=item L<Mojolicious::Plugin::I18N>
 
 Internationalization helpers.
 
-=item L<Mojolicious::Plugin::JsonConfig>
+=item L<Mojolicious::Plugin::JSONConfig>
 
 JSON configuration files.
 
@@ -825,7 +825,7 @@ JSON configuration files.
 
 Mount whole L<Mojolicious> applications.
 
-=item L<Mojolicious::Plugin::PodRenderer>
+=item L<Mojolicious::Plugin::PODRenderer>
 
 Renderer for POD files and documentation browser.
 

@@ -19,7 +19,7 @@ use Mojolicious::Lite;
 use Test::Mojo;
 
 # POD renderer plugin
-plugin 'PodRenderer';
+plugin 'PODRenderer';
 
 # GET /
 get '/' => sub {

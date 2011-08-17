@@ -29,7 +29,7 @@ __DATA__
 use Mojolicious::Lite;
 
 # Documentation browser under "/perldoc" (this plugin requires Perl 5.10)
-plugin 'PodRenderer';
+plugin 'PODRenderer';
 
 get '/welcome' => sub {
   my $self = shift;

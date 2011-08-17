@@ -307,11 +307,11 @@ detection doesn't work, like for C<inline> templates.
 
 =item epl
 
-C<Embedded Perl Lite> handled by L<Mojolicious::Plugin::EplRenderer>.
+C<Embedded Perl Lite> handled by L<Mojolicious::Plugin::EPLRenderer>.
 
 =item ep
 
-C<Embedded Perl> handled by L<Mojolicious::Plugin::EpRenderer>.
+C<Embedded Perl> handled by L<Mojolicious::Plugin::EPRenderer>.
 
 =back
 
@@ -382,14 +382,14 @@ Construct a new renderer.
   $renderer = $renderer->add_handler(epl => sub {...});
     
 Add a new handler to the renderer.
-See L<Mojolicious::Plugin::EpRenderer> for a sample renderer.
+See L<Mojolicious::Plugin::EPRenderer> for a sample renderer.
 
 =head2 C<add_helper>
 
   $renderer = $renderer->add_helper(url_for => sub {...});
 
 Add a new helper to the renderer.
-See L<Mojolicious::Plugin::EpRenderer> for sample helpers.
+See L<Mojolicious::Plugin::EPRenderer> for sample helpers.
 
 =head2 C<get_data_template>
 

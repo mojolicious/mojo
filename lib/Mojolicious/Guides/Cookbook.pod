@@ -551,7 +551,7 @@ get automatically installed with the modules.
     # Switch to installable "templates" directory
     $self->renderer->root($self->home->rel_dir('templates'));
 
-    $self->plugin('PodRenderer');
+    $self->plugin('PODRenderer');
 
     my $r = $self->routes;
     $r->route('/welcome')->to('example#welcome');

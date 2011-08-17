@@ -581,7 +581,7 @@ The C<register> method will be called when you load the plugin.
 
   use Mojolicious::Lite;
 
-  plugin 'debug_helper';
+  plugin 'DebugHelper';
 
   get '/' => sub {
     my $self = shift;
@@ -594,7 +594,7 @@ The C<register> method will be called when you load the plugin.
 A skeleton for a full C<CPAN> compatible plugin distribution can be
 automatically generated.
 
-  $ mojo generate plugin debug_helper
+  $ mojo generate plugin DebugHelper
 
 And if you have a C<PAUSE> account (which can be requested at
 L<http://pause.perl.org>), you are only a few commands away from relasing it
@@ -713,7 +713,7 @@ plugin with a custom configuration.
 
   use Mojolicious::Lite;
 
-  plugin ep_renderer => {
+  plugin EpRenderer => {
     name     => 'mustache',
     template => {
       tag_start => '{{',

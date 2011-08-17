@@ -27,14 +27,14 @@ Mojolicious::Plugin::CallbackCondition - Callback Condition Plugin
 =head1 SYNOPSIS
 
   # Mojolicious
-  $self->plugin('callback_condition');
+  $self->plugin('CallbackCondition');
   $self->routes->route('/:controller/:action')->over(cb => sub {
     my ($r, $c, $captures) = @_;
     ...
   });
 
   # Mojolicious::Lite
-  plugin 'callback_condition';
+  plugin 'CallbackCondition';
   get '/' => (cb => sub {
     my ($r, $c, $captures) = @_;
     ...

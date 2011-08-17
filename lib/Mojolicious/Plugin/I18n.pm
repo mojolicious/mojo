@@ -85,12 +85,12 @@ Mojolicious::Plugin::I18n - Intenationalization Plugin
 =head1 SYNOPSIS
 
   # Mojolicious
-  $self->plugin('i18n');
+  $self->plugin('I18n');
   % languages 'de';
   <%=l 'hello' %>
 
   # Mojolicious::Lite
-  plugin 'i18n' => {namespace => 'MyApp::I18N'};
+  plugin I18n => {namespace => 'MyApp::I18N'};
   <%=l 'hello' %>
 
   # Lexicon
@@ -113,7 +113,7 @@ request header.
 This plugin can save a lot of typing, since it will generate the following
 code by default.
 
-  # $self->plugin('i18n');
+  # $self->plugin('I18n');
   package MyApp::I18N;
   use base 'Locale::Maketext';
   package MyApp::I18N::en;
@@ -130,14 +130,14 @@ The default lexicon class will only be generated if it doesn't already exist.
 =head2 C<default>
 
   # Mojolicious::Lite
-  plugin i18n => {default => 'en'};
+  plugin I18n => {default => 'en'};
 
 Default language, defaults to C<en>.
 
 =head2 C<namespace>
 
   # Mojolicious::Lite
-  plugin i18n => {namespace => 'MyApp::I18N'};
+  plugin I18n => {namespace => 'MyApp::I18N'};
 
 Lexicon namespace, defaults to the application class followed by C<::I18N>.
 

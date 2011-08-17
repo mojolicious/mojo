@@ -92,14 +92,14 @@ sub new {
     if -w $home->rel_file('log');
 
   # Load default plugins
-  $self->plugin('callback_condition');
-  $self->plugin('header_condition');
-  $self->plugin('default_helpers');
-  $self->plugin('tag_helpers');
-  $self->plugin('epl_renderer');
-  $self->plugin('ep_renderer');
-  $self->plugin('request_timer');
-  $self->plugin('powered_by');
+  $self->plugin('CallbackCondition');
+  $self->plugin('HeaderCondition');
+  $self->plugin('DefaultHelpers');
+  $self->plugin('TagHelpers');
+  $self->plugin('EplRenderer');
+  $self->plugin('EpRenderer');
+  $self->plugin('RequestTimer');
+  $self->plugin('PoweredBy');
 
   # Reduced log output outside of development mode
   $self->log->level('info') unless $mode eq 'development';

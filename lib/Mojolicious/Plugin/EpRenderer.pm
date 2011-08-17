@@ -88,19 +88,19 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::EpRenderer - EP Renderer Plugin
+Mojolicious::Plugin::EpRenderer - Embedded Perl Renderer Plugin
 
 =head1 SYNOPSIS
 
   # Mojolicious
-  $self->plugin('ep_renderer');
-  $self->plugin(ep_renderer => {name => 'foo'});
-  $self->plugin(ep_renderer => {template => {line_start => '.'}});
+  $self->plugin('EpRenderer');
+  $self->plugin(EpRenderer => {name => 'foo'});
+  $self->plugin(EpRenderer => {template => {line_start => '.'}});
 
   # Mojolicious::Lite
-  plugin 'ep_renderer';
-  plugin ep_renderer => {name => 'foo'};
-  plugin ep_renderer => {template => {line_start => '.'}};
+  plugin 'EpRenderer';
+  plugin EpRenderer => {name => 'foo'};
+  plugin EpRenderer => {template => {line_start => '.'}};
 
 =head1 DESCRIPTION
 
@@ -122,14 +122,14 @@ example for learning to build new plugins.
 =head2 C<name>
 
   # Mojolicious::Lite
-  plugin ep_renderer => {name => 'foo'};
+  plugin EpRenderer => {name => 'foo'};
 
 Handler name.
 
 =head2 C<template>
 
   # Mojolicious::Lite
-  plugin ep_renderer => {template => {line_start => '.'}};
+  plugin EpRenderer => {template => {line_start => '.'}};
 
 Template options.
 

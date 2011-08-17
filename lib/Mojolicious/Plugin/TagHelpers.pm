@@ -342,10 +342,10 @@ Mojolicious::Plugin::TagHelpers - Tag Helpers Plugin
 =head1 SYNOPSIS
 
   # Mojolicious
-  $self->plugin('tag_helpers');
+  $self->plugin('TagHelpers');
 
   # Mojolicious::Lite
-  plugin 'tag_helpers';
+  plugin 'TagHelpers';
 
 =head1 DESCRIPTION
 

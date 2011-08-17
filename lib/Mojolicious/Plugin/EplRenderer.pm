@@ -88,15 +88,15 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::EplRenderer - EPL Renderer Plugin
+Mojolicious::Plugin::EplRenderer - Embedded Perl Lite Renderer Plugin
 
 =head1 SYNOPSIS
 
   # Mojolicious
-  $self->plugin('epl_renderer');
+  $self->plugin('EplRenderer');
 
   # Mojolicious::Lite
-  plugin 'epl_renderer';
+  plugin 'EplRenderer';
 
 =head1 DESCRIPTION
 

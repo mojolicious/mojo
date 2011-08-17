@@ -55,10 +55,10 @@ Mojolicious::Plugin::RequestTimer - Request Timer Plugin
 =head1 SYNOPSIS
 
   # Mojolicious
-  $self->plugin('request_timer');
+  $self->plugin('RequestTimer');
 
   # Mojolicious::Lite
-  plugin 'request_timer';
+  plugin 'RequestTimer';
 
 =head1 DESCRIPTION
 

@@ -853,7 +853,7 @@ Note that this function is EXPERIMENTAL and might change without warning!
 
 =head2 C<plugin>
 
-  plugin 'something';
+  plugin 'SomeThing';
 
 Alias for L<Mojolicious/"plugin">.
 

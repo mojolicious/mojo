@@ -639,7 +639,7 @@ applications.
     my $self = shift;
 
     # Plugin
-    $self->plugin('werewolf_condition');
+    $self->plugin('WerewolfCondition');
 
     # Routes
     my $r = $self->routes;
@@ -699,7 +699,7 @@ self-contained applications under a prefix.
   use Mojolicious::Lite;
 
   # Whole application mounted under "/prefix"
-  plugin mount => {'/prefix' => '/home/sri/myapp.pl'};
+  plugin Mount => {'/prefix' => '/home/sri/myapp.pl'};
 
   # Normal route
   get '/' => sub { shift->render_text('Hello World!') };
@@ -743,7 +743,7 @@ Now just load the plugin and you're done.
     my $self = shift;
 
     # Plugin
-    $self->plugin('my_embedded_app');
+    $self->plugin('MyEmbeddedApp');
   }
 
   1;

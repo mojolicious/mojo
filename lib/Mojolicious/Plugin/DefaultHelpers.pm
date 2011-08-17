@@ -111,10 +111,10 @@ Mojolicious::Plugin::DefaultHelpers - Default Helpers Plugin
 =head1 SYNOPSIS
 
   # Mojolicious
-  $self->plugin('default_helpers');
+  $self->plugin('DefaultHelpers');
 
   # Mojolicious::Lite
-  plugin 'default_helpers';
+  plugin 'DefaultHelpers';
 
 =head1 DESCRIPTION
 

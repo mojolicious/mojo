@@ -31,10 +31,10 @@ my $twinkle = {
 };
 
 # Plugins
-plugin ep_renderer => {name => 'twinkle', template => $twinkle};
-plugin 'pod_renderer';
-plugin pod_renderer => {name => 'teapod', preprocess => 'twinkle'};
-my $config = plugin json_config =>
+plugin EpRenderer => {name => 'twinkle', template => $twinkle};
+plugin 'PodRenderer';
+plugin PodRenderer => {name => 'teapod', preprocess => 'twinkle'};
+my $config = plugin JsonConfig =>
   {default => {foo => 'bar'}, ext => 'conf', template => $twinkle};
 is $config->{foo},  'bar', 'right value';
 is $config->{test}, 23,    'right value';

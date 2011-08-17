@@ -7,7 +7,7 @@ use utf8;
 use Mojolicious::Lite;
 
 # Load plugin
-plugin 'config';
+plugin 'Config';
 
 # GET /
 get '/' => 'index';

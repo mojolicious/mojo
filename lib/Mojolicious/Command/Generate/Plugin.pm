@@ -17,15 +17,11 @@ EOF
 #  So I had to hit her with this purse I found."
 sub run {
   my ($self, $name) = @_;
-  $name ||= 'my_plugin';
-
-  # Prevent bad plugins
-  die qq/Your plugin name has to be snake case, like "my_plugin".\n/
-    unless $name =~ /^[a-z_]+$/;
+  $name ||= 'MyPlugin';
 
   # Class
   my $class = $name;
-  camelize $class;
+  camelize $class if $name =~ /^[a-z]/;
   $class = "Mojolicious::Plugin::$class";
   my $app = $self->class_to_path($class);
   $self->render_to_rel_file('class', "$name/lib/$app", $class, $name);
@@ -120,7 +116,7 @@ WriteMakefile(
   NAME         => '<%= $class %>',
   VERSION_FROM => 'lib/<%= $path %>',
   AUTHOR       => 'A Good Programmer <nospam@cpan.org>',
-  PREREQ_PM    => {'Mojolicious' => '1.78'},
+  PREREQ_PM    => {'Mojolicious' => '1.79'},
   test         => {TESTS => 't/*.t'}
 );
 

@@ -45,12 +45,12 @@ Mojolicious::Plugin::HeaderCondition - Header Condition Plugin
 =head1 SYNOPSIS
 
   # Mojolicious
-  $self->plugin('header_condition');
+  $self->plugin('HeaderCondition');
   $self->routes->route('/:controller/:action')
     ->over(headers => {Referer => qr/example\.com/});
 
   # Mojolicious::Lite
-  plugin 'header_condition';
+  plugin 'HeaderCondition';
   get '/' => (headers => {Referer => qr/example\.com/}) => sub {...};
 
   # All headers need to match

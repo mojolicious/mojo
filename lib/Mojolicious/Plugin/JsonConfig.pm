@@ -68,16 +68,16 @@ Mojolicious::Plugin::JsonConfig - JSON Configuration Plugin
   }
 
   # Mojolicious
-  my $config = $self->plugin('json_config');
+  my $config = $self->plugin('JsonConfig');
 
   # Mojolicious::Lite
-  my $config = plugin 'json_config';
+  my $config = plugin 'JsonConfig';
 
   # Reads myapp.json by default and puts the parsed version into the stash
   my $config = $self->stash('config');
 
   # Everything can be customized with options
-  my $config = plugin json_config => {
+  my $config = plugin JsonConfig => {
     file      => '/etc/myapp.conf',
     stash_key => 'conf'
   };
@@ -98,7 +98,7 @@ L<Mojolicious::Plugin::Config> and the following new ones.
 =head2 C<template>
 
   # Mojolicious::Lite
-  plugin json_config => {template => {line_start => '.'}};
+  plugin JsonConfig => {template => {line_start => '.'}};
 
 Template options.
 

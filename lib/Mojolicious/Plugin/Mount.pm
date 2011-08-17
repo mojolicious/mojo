@@ -37,23 +37,23 @@ Mojolicious::Plugin::Mount - Application Mount Plugin
 =head1 SYNOPSIS
 
   # Mojolicious
-  $self->plugin(mount => {'/prefix' => '/home/sri/myapp.pl'});
+  $self->plugin(Mount => {'/prefix' => '/home/sri/myapp.pl'});
 
   # Mojolicious::Lite
-  plugin mount => {'/prefix' => '/home/sri/myapp.pl'};
+  plugin Mount => {'/prefix' => '/home/sri/myapp.pl'};
 
   # Adjust the generated route
-  my $example = plugin mount => {'/example' => '/home/sri/example.pl'};
+  my $example = plugin Mount => {'/example' => '/home/sri/example.pl'};
   $example->to(message => 'It works great!');
 
   # Mount application with host
-  plugin mount => {'mojolicio.us' => '/home/sri/myapp.pl'};
+  plugin Mount => {'mojolicio.us' => '/home/sri/myapp.pl'};
 
   # Host and path
-  plugin mount => {'mojolicio.us/myapp' => '/home/sri/myapp.pl'};
+  plugin Mount => {'mojolicio.us/myapp' => '/home/sri/myapp.pl'};
 
   # Or even hosts with wildcard subdomains
-  plugin mount => {'*.mojolicio.us/myapp' => '/home/sri/myapp.pl'};
+  plugin Mount => {'*.mojolicio.us/myapp' => '/home/sri/myapp.pl'};
 
 =head1 DESCRIPTION
 

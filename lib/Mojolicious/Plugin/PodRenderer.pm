@@ -178,16 +178,16 @@ Mojolicious::Plugin::PodRenderer - POD Renderer Plugin
 =head1 SYNOPSIS
 
   # Mojolicious
-  $self->plugin('pod_renderer');
-  $self->plugin(pod_renderer => {name => 'foo'});
-  $self->plugin(pod_renderer => {preprocess => 'epl'});
+  $self->plugin('PodRenderer');
+  $self->plugin(PodRenderer => {name => 'foo'});
+  $self->plugin(PodRenderer => {preprocess => 'epl'});
   $self->render('some_template', handler => 'pod');
   <%= pod_to_html "=head1 TEST\n\nC<123>" %>
 
   # Mojolicious::Lite
-  plugin 'pod_renderer';
-  plugin pod_renderer => {name => 'foo'};
-  plugin pod_renderer => {preprocess => 'epl'};
+  plugin 'PodRenderer';
+  plugin PodRenderer => {name => 'foo'};
+  plugin PodRenderer => {preprocess => 'epl'};
   $self->render('some_template', handler => 'pod');
   <%= pod_to_html "=head1 TEST\n\nC<123>" %>
 
@@ -201,14 +201,14 @@ rawr!
 =head2 C<name>
 
   # Mojolicious::Lite
-  plugin pod_renderer => {name => 'foo'};
+  plugin PodRenderer => {name => 'foo'};
 
 Handler name.
 
 =head2 C<no_perldoc>
 
   # Mojolicious::Lite
-  plugin pod_renderer => {no_perldoc => 1};
+  plugin PodRenderer => {no_perldoc => 1};
 
 Disable perldoc browser.
 Note that this option is EXPERIMENTAL and might change without warning!
@@ -216,7 +216,7 @@ Note that this option is EXPERIMENTAL and might change without warning!
 =head2 C<preprocess>
 
   # Mojolicious::Lite
-  plugin pod_renderer => {preprocess => 'epl'};
+  plugin PodRenderer => {preprocess => 'epl'};
 
 Handler name of preprocessor.
 

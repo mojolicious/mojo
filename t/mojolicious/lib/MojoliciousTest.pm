@@ -12,7 +12,7 @@ sub development_mode {
 sub startup {
   my $self = shift;
 
-  # Plugin
+  # Plugins in custom namespace
   unshift @{$self->plugins->namespaces},
     $self->routes->namespace . '::Plugin';
   $self->plugin('test_plugin');
@@ -43,6 +43,11 @@ sub startup {
   # Routes
   my $r = $self->routes;
 
+  # /plugin/upper_case
+  # /plugin/camel_case (plugins loaded correctly)
+  $r->route('/plugin/upper_case')->to('foo#plugin_upper_case');
+  $r->route('/plugin/camel_case')->to('foo#plugin_camel_case');
+
   # /exceptional/*
   $r->route('/exceptional/:action')->to('exceptional#');
 
@@ -71,54 +76,50 @@ sub startup {
   $r->route('/stash_config')
     ->to(controller => 'foo', action => 'config', config => {test => 123});
 
-  # /test4 - named route for url_for
+  # /test4 (named route for url_for)
   $r->route('/test4/:something')->to('foo#something', something => 23)
     ->name('something');
 
-  # /somethingtest - refer to another route with url_for
+  # /somethingtest (refer to another route with url_for)
   $r->route('/somethingtest')->to('foo#something');
 
-  # /something_missing - refer to a non existing route with url_for
+  # /something_missing (refer to a non existing route with url_for)
   $r->route('/something_missing')->to('foo#url_for_missing');
 
-  # /test3 - no class, just a namespace
+  # /test3 (no class, just a namespace)
   $r->route('/test3')
     ->to(namespace => 'MojoliciousTestController', method => 'index');
 
-  # /test2 - different namespace test
+  # /test2 (different namespace test)
   $r->route('/test2')->to(
     namespace => 'MojoliciousTest2',
     class     => 'Foo',
     method    => 'test'
   );
 
-  # /test5 - only namespace test
+  # /test5 (only namespace test)
   $r->route('/test5')->to(
     namespace => 'MojoliciousTest2::Foo',
     method    => 'test'
   );
 
-  # /test6 - no namespace test
+  # /test6 (no namespace test)
   $r->route('/test6')->to(
     namespace  => '',
     controller => 'mojolicious_test2-foo',
     action     => 'test'
   );
 
-  # /withblock - template with blocks
+  # /withblock (template with blocks)
   $r->route('/withblock')->to('foo#withblock');
 
-  # /plugin/uppercase - plugin loaded correctly in uppercase and camelcase
-  $r->route('/plugin/uppercase/')->to('foo#pluginuppercase');
-  $r->route('/plugin/camelcase/')->to('foo#plugincamelcase');
-
-  # /staged - authentication with bridges
+  # /staged (authentication with bridges)
   my $b = $r->bridge('/staged')->to(controller => 'foo', action => 'stage1');
   $b->route->to(action => 'stage2');
 
   # /shortcut/act
   # /shortcut/ctrl
-  # /shortcut/ctrl-act - shortcuts to controller#action
+  # /shortcut/ctrl-act (shortcuts to controller#action)
   $r->route('/shortcut/ctrl-act')
     ->to('foo#config', config => {test => 'ctrl-act'});
   $r->route('/shortcut/ctrl')
@@ -126,13 +127,13 @@ sub startup {
   $r->route('/shortcut/act')
     ->to('#config', controller => 'foo', config => {test => 'act'});
 
-  # /foo/session - session cookie with domain
+  # /foo/session (session cookie with domain)
   $r->route('/foo/session')->to('foo#session_domain');
 
-  # /rss.xml - mixed formats
+  # /rss.xml (mixed formats)
   $r->route('/rss.xml')->to('foo#bar', format => 'rss');
 
-  # /*/* - the default route
+  # /*/* (the default route)
   $r->route('/(controller)/(action)')->to(action => 'index');
 }
 

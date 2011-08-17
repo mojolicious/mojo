@@ -22,19 +22,19 @@ sub load_plugin {
   my ($self, $name) = @_;
 
   # Module
-  if ($name =~ /^[A-Z]+/ && $self->_load($name)) { return $name->new }
+  if ($name =~ /^[A-Z]/ && $self->_load($name)) { return $name->new }
 
   # Search plugin by name
   else {
 
     # Class
     my $class = $name;
-    camelize $class unless $class =~ /^[A-Z]+/;
+    camelize $class unless $class =~ /^[A-Z]/;
 
     # Try all namspaces
     for my $namespace (@{$self->namespaces}) {
-        my $module = "${namespace}::$class";
-        return $module->new if $self->_load($module);
+      my $module = "${namespace}::$class";
+      return $module->new if $self->_load($module);
     }
   }
 
@@ -44,10 +44,10 @@ sub load_plugin {
 
 # "Let's see how crazy I am now, Nixon. The correct answer is very."
 sub register_plugin {
-my $self = shift;
-my $name = shift;
-my $app  = shift;
-$self->load_plugin($name)->register($app, ref $_[0] ? $_[0] : {@_});
+  my $self = shift;
+  my $name = shift;
+  my $app  = shift;
+  $self->load_plugin($name)->register($app, ref $_[0] ? $_[0] : {@_});
 }
 
 sub run_hook {
@@ -134,19 +134,23 @@ from your application.
 
 =head2 C<load_plugin>
 
-  my $plugin = $plugins->load_plugin('something');
-  my $plugin = $plugins->load_plugin('Foo::Bar');
+  my $plugin = $plugins->load_plugin('some_thing');
+  my $plugin = $plugins->load_plugin('SomeThing');
+  my $plugin = $plugins->load_plugin('MyApp::Plugin::SomeThing');
 
 Load a plugin from the configured namespaces or by full module name.
 
 =head2 C<register_plugin>
 
-  $plugins->register_plugin('something', $app);
-  $plugins->register_plugin('something', $app, foo => 23);
-  $plugins->register_plugin('something', $app, {foo => 23});
-  $plugins->register_plugin('Foo::Bar', $app);
-  $plugins->register_plugin('Foo::Bar', $app, foo => 23);
-  $plugins->register_plugin('Foo::Bar', $app, {foo => 23});
+  $plugins->register_plugin('some_thing', $app);
+  $plugins->register_plugin('some_thing', $app, foo => 23);
+  $plugins->register_plugin('some_thing', $app, {foo => 23});
+  $plugins->register_plugin('SomeThing', $app);
+  $plugins->register_plugin('SomeThing', $app, foo => 23);
+  $plugins->register_plugin('SomeThing', $app, {foo => 23});
+  $plugins->register_plugin('MyApp::Plugin::SomeThing', $app);
+  $plugins->register_plugin('MyApp::Plugin::SomeThing', $app, foo => 23);
+  $plugins->register_plugin('MyApp::Plugin::SomeThing', $app, {foo => 23});
 
 Load a plugin from the configured namespaces or by full module name and run
 C<register>.

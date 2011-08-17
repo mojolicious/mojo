@@ -294,14 +294,14 @@ $t->get_ok('/foo/bar')->status_is(200)
 
 $t = Test::Mojo->new('MojoliciousTest');
 
-# MojoliciousTestController::Foo::pluginupper
-$t->get_ok('/plugin/uppercase')->status_is(200)
+# MojoliciousTestController::Foo::plugin_upper_case
+$t->get_ok('/plugin/upper_case')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('WELCOME aboard!');
 
-# MojoliciousTestController::Foo::plugincamelcase
-$t->get_ok('/plugin/camelcase')->status_is(200)
+# MojoliciousTestController::Foo::plugin_camel_case
+$t->get_ok('/plugin/camel_case')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('Welcome aboard!');

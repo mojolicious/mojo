@@ -841,38 +841,21 @@ See also the tutorial above for more argument variations.
 
   helper foo => sub {...};
 
-Add a new helper that will be available as a method of the controller object
-and the application object, as well as a function in C<ep> templates.
-
-  # Helper
-  helper add => sub { $_[1] + $_[2] };
-
-  # Controller/Application
-  my $result = $self->add(2, 3);
-
-  # Template
-  <%= add 2, 3 %>
-
+Alias for L<Mojolicious/"helper">.
 Note that this function is EXPERIMENTAL and might change without warning!
 
 =head2 C<hook>
 
   hook after_dispatch => sub {...};
 
-Add hooks to named events, see L<Mojolicious> for a list of all available
-events.
+Alias for L<Mojolicious/"hook">.
 Note that this function is EXPERIMENTAL and might change without warning!
 
 =head2 C<plugin>
 
   plugin 'something';
-  plugin 'something', foo => 23;
-  plugin 'something', {foo => 23};
-  plugin 'Foo::Bar';
-  plugin 'Foo::Bar', foo => 23;
-  plugin 'Foo::Bar', {foo => 23};
 
-Load plugins, see L<Mojolicious> for a list of all included example plugins.
+Alias for L<Mojolicious/"plugin">.
 
 =head2 C<post>
 

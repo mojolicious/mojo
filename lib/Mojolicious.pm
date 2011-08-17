@@ -768,14 +768,17 @@ Useful for all kinds of postprocessing tasks.
 
 =head2 C<plugin>
 
-  $app->plugin('something');
-  $app->plugin('something', foo => 23);
-  $app->plugin('something', {foo => 23});
-  $app->plugin('Foo::Bar');
-  $app->plugin('Foo::Bar', foo => 23);
-  $app->plugin('Foo::Bar', {foo => 23});
+  $app->plugin('some_thing');
+  $app->plugin('some_thing', foo => 23);
+  $app->plugin('some_thing', {foo => 23});
+  $app->plugin('SomeThing');
+  $app->plugin('SomeThing', foo => 23);
+  $app->plugin('SomeThing', {foo => 23});
+  $app->plugin('MyApp::Plugin::SomeThing');
+  $app->plugin('MyApp::Plugin::SomeThing', foo => 23);
+  $app->plugin('MyApp::Plugin::SomeThing', {foo => 23});
 
-Load a plugin.
+Load a plugin with L<Mojolicious::Plugins/"register_plugin">.
 
 The following plugins are included in the L<Mojolicious> distribution as
 examples.

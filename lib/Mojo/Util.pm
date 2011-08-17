@@ -313,7 +313,7 @@ sub camelize {
   for my $part (split /-/, $_[0]) {
     next unless $part;
 
-    # Camelcase words
+    # Camel case words
     my @words = split /_/, $part;
     @words = map { ucfirst lc } @words;
     push @parts, join '', @words;
@@ -328,7 +328,7 @@ sub decamelize {
   my @parts;
   for my $part (split /\:\:/, $_[0]) {
 
-    # Camelcase words
+    # Camel case words
     my @words;
     push @words, $1 while ($part =~ s/([A-Z]{1}[^A-Z]*)//);
     @words = map {lc} @words;

@@ -349,8 +349,8 @@ C<param>.
     $self->render(text => "Our :bar placeholder matched $bar");
   };
 
-  # /test/foo
-  # /test123/foo
+  # /testsomething/foo
+  # /test123something/foo
   get '/(:bar)something/foo' => sub {
     my $self = shift;
     my $bar  = $self->param('bar');

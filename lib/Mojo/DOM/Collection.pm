@@ -8,6 +8,7 @@ sub new {
 }
 
 sub each   { shift->_iterate(@_) }
+sub size   { scalar @{$_[0]} }
 sub to_xml { join "\n", map({"$_"} @{$_[0]}) }
 sub until  { shift->_iterate(@_, 1) }
 sub while  { shift->_iterate(@_, 0) }
@@ -69,6 +70,12 @@ Construct a new L<Mojo::DOM::Collection> object.
   });
 
 Iterate over whole collection.
+
+=head2 C<size>
+
+  my $size = $collection->size;
+
+Number of elements in collection.
 
 =head2 C<to_xml>
 

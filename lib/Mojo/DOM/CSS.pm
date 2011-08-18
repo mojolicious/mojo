@@ -4,10 +4,10 @@ use Mojo::Base -base;
 use List::Util 'first';
 
 # Regex
-my $CSS_ESCAPE_RE = qr/\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}/;
-my $CSS_ATTR_RE   = qr/
+my $ESCAPE_RE = qr/\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}/;
+my $ATTR_RE   = qr/
   \[
-  ((?:$CSS_ESCAPE_RE|\w)+)        # Key
+  ((?:$ESCAPE_RE|\w)+)            # Key
   (?:
     (\W)?                         # Operator
     =
@@ -15,23 +15,23 @@ my $CSS_ATTR_RE   = qr/
   )?
   \]
 /x;
-my $CSS_CLASS_ID_RE = qr/
+my $CLASS_ID_RE = qr/
   (?:
     (?:\.((?:\\\.|[^\#\.])+))   # Class
   |
     (?:\#((?:\\\#|[^\.\#])+))   # ID
   )
 /x;
-my $CSS_ELEMENT_RE      = qr/^((?:\\\.|\\\#|[^\.\#])+)/;
-my $CSS_PSEUDO_CLASS_RE = qr/(?:\:([\w\-]+)(?:\(((?:\([^\)]+\)|[^\)])+)\))?)/;
-my $CSS_TOKEN_RE        = qr/
-  (\s*,\s*)?                                # Separator
-  ((?:[^\[\\\:\s\,]|$CSS_ESCAPE_RE\s?)+)?   # Element
-  ($CSS_PSEUDO_CLASS_RE*)?                  # Pseudoclass
-  ((?:$CSS_ATTR_RE)*)?                      # Attributes
+my $ELEMENT_RE      = qr/^((?:\\\.|\\\#|[^\.\#])+)/;
+my $PSEUDO_CLASS_RE = qr/(?:\:([\w\-]+)(?:\(((?:\([^\)]+\)|[^\)])+)\))?)/;
+my $TOKEN_RE        = qr/
+  (\s*,\s*)?                            # Separator
+  ((?:[^\[\\\:\s\,]|$ESCAPE_RE\s?)+)?   # Element
+  ($PSEUDO_CLASS_RE*)?                  # Pseudoclass
+  ((?:$ATTR_RE)*)?                      # Attributes
   (?:
   \s*
-  ([\>\+\~])                                # Combinator
+  ([\>\+\~])                            # Combinator
   )?
 /x;
 
@@ -82,7 +82,7 @@ sub _compile {
 
   # Tokenize
   my $pattern = [[]];
-  while ($css =~ /$CSS_TOKEN_RE/g) {
+  while ($css =~ /$TOKEN_RE/g) {
     my $separator  = $1;
     my $element    = $2;
     my $pc         = $3;
@@ -104,7 +104,7 @@ sub _compile {
     # Element
     $element ||= '';
     my $tag = '';
-    $element =~ s/$CSS_ELEMENT_RE// and $tag = $self->_unescape($1);
+    $element =~ s/$ELEMENT_RE// and $tag = $self->_unescape($1);
 
     # Subject
     $selector->[0] = 'subject' if $tag =~ s/^\$//;
@@ -114,7 +114,7 @@ sub _compile {
     push @$selector, ['tag', $tag];
 
     # Class or ID
-    while ($element =~ /$CSS_CLASS_ID_RE/g) {
+    while ($element =~ /$CLASS_ID_RE/g) {
 
       # Class
       push @$selector, ['attribute', 'class', $self->_regex('~', $1)]
@@ -126,7 +126,7 @@ sub _compile {
     }
 
     # Pseudo classes
-    while ($pc =~ /$CSS_PSEUDO_CLASS_RE/g) {
+    while ($pc =~ /$PSEUDO_CLASS_RE/g) {
 
       # "not"
       if ($1 eq 'not') {
@@ -139,7 +139,7 @@ sub _compile {
     }
 
     # Attributes
-    while ($attributes =~ /$CSS_ATTR_RE/g) {
+    while ($attributes =~ /$ATTR_RE/g) {
       my $key   = $self->_unescape($1);
       my $op    = $2 || '';
       my $value = $3;

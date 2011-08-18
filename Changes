@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojolicious.
 1.81    2011-08-17 00:00:00
         - Made Mojolicious::Plugins loader quite a bit smarter.
         - Improved documentation.
+        - Improved Test::Mojo diagnostics.
 
 1.80    2011-08-17 00:00:00
         - Deprecated Mojolicious::Plugin::EpRenderer in favor of

@@ -50,7 +50,7 @@ sub content_is {
   $desc ||= 'exact match for content';
   my $tx = $self->tx;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  Test::More::is($self->_get_content($tx), $value, $desc);
+  Test::More::is $self->_get_content($tx), $value, $desc;
 
   return $self;
 }
@@ -61,7 +61,7 @@ sub content_isnt {
   $desc ||= 'no match for content';
   my $tx = $self->tx;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  Test::More::isnt($self->_get_content($tx), $value, $desc);
+  Test::More::isnt $self->_get_content($tx), $value, $desc;
 
   return $self;
 }
@@ -72,7 +72,7 @@ sub content_like {
   $desc ||= 'content is similar';
   my $tx = $self->tx;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  Test::More::like($self->_get_content($tx), $regex, $desc);
+  Test::More::like $self->_get_content($tx), $regex, $desc;
 
   return $self;
 }
@@ -83,7 +83,7 @@ sub content_unlike {
   $desc ||= 'content is not similar';
   my $tx = $self->tx;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  Test::More::unlike($self->_get_content($tx), $regex, $desc);
+  Test::More::unlike $self->_get_content($tx), $regex, $desc;
 
   return $self;
 }
@@ -95,8 +95,8 @@ sub content_type_is {
   my ($self, $type) = @_;
   my $tx = $self->tx;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  Test::More::is($tx->res->headers->content_type,
-    $type, "Content-Type: $type");
+  Test::More::is $tx->res->headers->content_type,
+    $type, "Content-Type: $type";
   return $self;
 }
 
@@ -104,8 +104,8 @@ sub content_type_isnt {
   my ($self, $type) = @_;
   my $tx = $self->tx;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  Test::More::isnt($tx->res->headers->content_type,
-    $type, "not Content-Type: $type");
+  Test::More::isnt $tx->res->headers->content_type,
+    $type, "not Content-Type: $type";
   return $self;
 }
 
@@ -115,7 +115,7 @@ sub content_type_like {
   $desc ||= 'Content-Type is similar';
   my $tx = $self->tx;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  Test::More::like($tx->res->headers->content_type, $regex, $desc);
+  Test::More::like $tx->res->headers->content_type, $regex, $desc;
 
   return $self;
 }
@@ -126,7 +126,7 @@ sub content_type_unlike {
   $desc ||= 'Content-Type is not similar';
   my $tx = $self->tx;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  Test::More::unlike($tx->res->headers->content_type, $regex, $desc);
+  Test::More::unlike $tx->res->headers->content_type, $regex, $desc;
 
   return $self;
 }
@@ -140,7 +140,7 @@ sub element_exists {
   my ($self, $selector, $desc) = @_;
   $desc ||= qq/"$selector" exists/;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  Test::More::ok($self->tx->res->dom->at($selector), $desc);
+  Test::More::ok $self->tx->res->dom->at($selector), $desc;
   return $self;
 }
 
@@ -148,7 +148,7 @@ sub element_exists_not {
   my ($self, $selector, $desc) = @_;
   $desc ||= qq/"$selector" exists not/;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  Test::More::ok(!$self->tx->res->dom->at($selector), $desc);
+  Test::More::ok !$self->tx->res->dom->at($selector), $desc;
   return $self;
 }
 
@@ -160,8 +160,8 @@ sub header_is {
 
   my $tx = $self->tx;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  Test::More::is(scalar $tx->res->headers->header($name),
-    $value, "$name: " . ($value ? $value : ''));
+  Test::More::is scalar $tx->res->headers->header($name),
+    $value, "$name: " . ($value ? $value : '');
 
   return $self;
 }
@@ -171,8 +171,8 @@ sub header_isnt {
 
   my $tx = $self->tx;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  Test::More::isnt(scalar $tx->res->headers->header($name),
-    $value, "not $name: " . ($value ? $value : ''));
+  Test::More::isnt scalar $tx->res->headers->header($name),
+    $value, "not $name: " . ($value ? $value : '');
 
   return $self;
 }
@@ -183,7 +183,7 @@ sub header_like {
   $desc ||= "$name is similar";
   my $tx = $self->tx;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  Test::More::like(scalar $tx->res->headers->header($name), $regex, $desc);
+  Test::More::like scalar $tx->res->headers->header($name), $regex, $desc;
 
   return $self;
 }
@@ -194,7 +194,7 @@ sub header_unlike {
   $desc ||= "$name is not similar";
   my $tx = $self->tx;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  Test::More::unlike(scalar $tx->res->headers->header($name), $regex, $desc);
+  Test::More::unlike scalar $tx->res->headers->header($name), $regex, $desc;
 
   return $self;
 }
@@ -205,7 +205,7 @@ sub json_content_is {
   $desc ||= 'exact match for JSON structure';
   my $tx = $self->tx;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  Test::More::is_deeply($tx->res->json, $struct, $desc);
+  Test::More::is_deeply $tx->res->json, $struct, $desc;
 
   return $self;
 }
@@ -228,7 +228,7 @@ sub post_form_ok {
   utf8::encode $desc;
   $self->tx($self->ua->post_form(@_));
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  Test::More::ok($self->tx->is_done, $desc);
+  Test::More::ok $self->tx->is_done, $desc;
 
   return $self;
 }
@@ -250,7 +250,7 @@ sub status_is {
   my $message =
     Mojo::Message::Response->new(code => $status)->default_message;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  Test::More::is($self->tx->res->code, $status, "$status $message");
+  Test::More::is $self->tx->res->code, $status, "$status $message";
 
   return $self;
 }
@@ -261,7 +261,7 @@ sub status_isnt {
   my $message =
     Mojo::Message::Response->new(code => $status)->default_message;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  Test::More::isnt($self->tx->res->code, $status, "not $status $message");
+  Test::More::isnt $self->tx->res->code, $status, "not $status $message";
 
   return $self;
 }
@@ -277,7 +277,7 @@ sub text_is {
     $text = $element->text;
   }
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  Test::More::is($text, $value, $desc);
+  Test::More::is $text, $value, $desc;
 
   return $self;
 }
@@ -291,7 +291,7 @@ sub text_isnt {
     $text = $element->text;
   }
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  Test::More::isnt($text, $value, $desc);
+  Test::More::isnt $text, $value, $desc;
 
   return $self;
 }
@@ -308,7 +308,7 @@ sub text_like {
     $text = $element->text;
   }
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  Test::More::like($text, $regex, $desc);
+  Test::More::like $text, $regex, $desc;
 
   return $self;
 }
@@ -322,7 +322,7 @@ sub text_unlike {
     $text = $element->text;
   }
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  Test::More::unlike($text, $regex, $desc);
+  Test::More::unlike $text, $regex, $desc;
 
   return $self;
 }
@@ -353,7 +353,8 @@ sub _request_ok {
   my ($error, $code) = $self->tx->error;
   my $desc = "$method $url";
   utf8::encode $desc;
-  Test::More::ok(!$error || $code, $desc);
+  Test::More::diag $error if !(my $ok = !$error || $code) && $error;
+  Test::More::ok $ok, $desc;
 
   return $self;
 }

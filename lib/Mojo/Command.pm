@@ -236,7 +236,7 @@ sub run {
   }
 
   # Test
-  return $self if $ENV{HARNESS_ACTIVE};
+  return 1 if $ENV{HARNESS_ACTIVE};
 
   # Try all namespaces
   my $commands = [];
@@ -284,6 +284,7 @@ sub run {
     print "  $name$padding   $description";
   }
   print $self->hint;
+  return 1;
 }
 
 sub start {

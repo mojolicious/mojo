@@ -201,14 +201,10 @@ sub run {
 
     # Try all namespaces
     my $module;
+    my $camelized = $name;
+    camelize $camelized;
     for my $namespace (@{$self->namespaces}) {
-
-      # Generate module
-      my $camelized = $name;
-      camelize $camelized;
       my $try = "$namespace\::$camelized";
-
-      # Load
       if (my $e = Mojo::Loader->load($try)) {
 
         # Module missing
@@ -218,10 +214,8 @@ sub run {
         die $e;
       }
 
-      # Module is a command
+      # Found a command
       next unless $try->can('new') && $try->can('run');
-
-      # Found
       $module = $try;
       last;
     }
@@ -245,8 +239,6 @@ sub run {
 
     # Search
     for my $module (@{Mojo::Loader->search($namespace)}) {
-
-      # Load
       if (my $e = Mojo::Loader->load($module)) { die $e }
 
       # Seen
@@ -265,12 +257,8 @@ sub run {
   my $list = [];
   my $len  = 0;
   foreach my $command (@$commands) {
-
-    # Generate name
     my $name = $command->[0];
     decamelize $name;
-
-    # Add to list
     my $l = length $name;
     $len = $l if $l > $len;
     push @$list, [$name, $command->[1]->new->description];

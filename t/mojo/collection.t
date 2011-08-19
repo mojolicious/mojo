@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 33;
+use Test::More tests => 39;
 
 # "'What are you lookin at?' - the innocent words of a drunken child."
 use_ok 'Mojo::Collection', 'c';
@@ -54,6 +54,21 @@ is $collection->map(sub { $_ + 1 })->join(''), '234', 'right result';
 is_deeply [@$collection], [1, 2, 3], 'right elements';
 is $collection->map(sub { shift() + 2 })->join(''), '345', 'right result';
 is_deeply [@$collection], [1, 2, 3], 'right elements';
+
+# reverse
+$collection = c(3, 2, 1);
+is_deeply [$collection->reverse->each], [1, 2, 3], 'right order';
+$collection = c(3);
+is_deeply [$collection->reverse->each], [3], 'right order';
+$collection = c();
+is_deeply [$collection->reverse->each], [], 'no elements';
+
+# shuffle
+$collection = c(0 .. 10000);
+my $random = $collection->shuffle;
+is $collection->size, $random->size, 'same number of elements';
+isnt "@$collection", "@$random", 'different order';
+is_deeply [c()->shuffle->each], [], 'no elements';
 
 # size
 $collection = c();

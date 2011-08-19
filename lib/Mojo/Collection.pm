@@ -54,6 +54,16 @@ sub map {
   $self->new(map { $_->$cb } @$self);
 }
 
+sub reverse {
+  my $self = shift;
+  $self->new(reverse @$self);
+}
+
+sub shuffle {
+  my $self = shift;
+  $self->new(List::Util::shuffle @$self);
+}
+
 sub size { scalar @{$_[0]} }
 
 sub sort {
@@ -146,6 +156,18 @@ Evaluate closure for each element in collection and create a new collection
 from the results.
 
   my $doubled = $collection->map(sub { $_ * 2 });
+
+=head2 C<reverse>
+
+  my $new = $collection->reverse;
+
+Create a new collection with all elements in reverse order.
+
+=head2 C<shuffle>
+
+  my $new = $collection->shuffle;
+
+Create a new collection with all elements in random order.
 
 =head2 C<size>
 

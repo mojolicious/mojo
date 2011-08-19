@@ -65,16 +65,15 @@ Mojo::Collection - Collection
 
   # Manipulate collections
   use Mojo::Collection;
-  my $collection = Mojo::Collection->new(1, 2, 3);
-  my $doubled    = $collection->map(sub { $_ * 2 });
-  $doubled->each(sub {
-    my ($num, $count) = @_;
-    print "$count: $num\n";
+  my $collection = Mojo::Collection->new(qw/just works/);
+  $collection->map(sub { ucfirst })->each(sub {
+    my ($word, $count) = @_;
+    print "$count: $word\n";
   });
 
   # Use the alternative constructor
   use Mojo::Collection 'c';
-  c(1, 2, 3)->join("\n")->say;
+  c(qw/a b c/)->join('/')->url_escape->say;
 
 =head1 DESCRIPTION
 

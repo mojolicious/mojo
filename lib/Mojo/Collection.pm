@@ -138,7 +138,7 @@ which the closure returns true.
 Evaluate closure for each element in collection and create a new collection
 with all elements for which the closure returned true.
 
-  my $mojo = $collection->grep(sub { /mojo/i });
+  my $interesting = $collection->grep(sub { /mojo/i });
 
 =head2 C<join>
 

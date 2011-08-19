@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 23;
+use Test::More tests => 29;
 
 # "'What are you lookin at?' - the innocent words of a drunken child."
 use_ok 'Mojo::Collection', 'c';
@@ -16,6 +16,17 @@ is_deeply \@results, [3, 2, 1], 'right elements';
 @results = ();
 $collection->each(sub { push @results, shift->[0], shift });
 is_deeply \@results, [3, 1, 2, 2, 1, 3], 'right elements';
+
+# first
+$collection = c(5, 4, [3, 2], 1);
+is $collection->first, 5, 'right result';
+is_deeply $collection->first(sub { ref $_ eq 'ARRAY' }), [3, 2],
+  'right result';
+is $collection->first(sub { shift() < 5 }), 4, 'right result';
+is $collection->first(sub { ref $_ eq 'CODE' }), undef, 'no result';
+$collection = c();
+is $collection->first, undef, 'no result';
+is $collection->first(sub { defined $_ }), undef, 'no result';
 
 # grep
 $collection = c(1, 2, 3, 4, 5, 6, 7, 8, 9);

@@ -5,6 +5,7 @@ use overload
   '""'     => sub { shift->join("\n") },
   fallback => 1;
 
+use List::Util;
 use Mojo::ByteStream;
 
 sub import {
@@ -27,6 +28,12 @@ sub each {
   my $i = 1;
   $_->$cb($i++) for @$self;
   return $self;
+}
+
+sub first {
+  my ($self, $cb) = @_;
+  return $self->[0] unless $cb;
+  return List::Util::first { $_->$cb } @$self;
 }
 
 # "All right, let's not panic.
@@ -98,6 +105,16 @@ Evaluate closure for each element in collection.
     print "$count: $e\n";
   });
 
+=head2 C<first>
+
+  my $first = $collection->first;
+  my $first = $collection->first(sub {...});
+
+Evaluate closure for each element in collection and return the first one for
+which the closure returns true.
+
+  my $five = $collection->first(sub { $_ == 5 });
+
 =head2 C<grep>
 
   my $new = $collection->grep(sub {...});
@@ -105,7 +122,7 @@ Evaluate closure for each element in collection.
 Evaluate closure for each element in collection and create a new collection
 with all elements for which the closure returned true.
 
-  my $fiveplus = $collection->grep(sub { $_ >= 5 });
+  my $overfive = $collection->grep(sub { $_ >= 5 });
 
 =head2 C<join>
 

@@ -123,9 +123,8 @@ sub register {
       );
 
       # Try to find a title
-      my $title;
-      $dom->find('h1 + p')->each(sub { $title ||= shift->text });
-      $title ||= 'Perldoc';
+      my $title = 'Perldoc';
+      $dom->find('h1 + p')->first(sub { $title = shift->text });
 
       # Combine everything to a proper response
       $self->content_for(mojobar => $self->include(inline => $MOJOBAR));

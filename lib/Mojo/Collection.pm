@@ -138,7 +138,7 @@ which the closure returns true.
 Evaluate closure for each element in collection and create a new collection
 with all elements for which the closure returned true.
 
-  my $overfive = $collection->grep(sub { $_ >= 5 });
+  my $mojo = $collection->grep(sub { /mojo/i });
 
 =head2 C<join>
 
@@ -183,7 +183,7 @@ Number of elements in collection.
 Sort elements based on return value of closure and create a new collection
 from the results.
 
-  my $reverse = $collection->sort(sub { $_[1] cmp $_[0] });
+  my $insensitive = $collection->sort(sub { uc(shift) cmp uc(shift) });
 
 =head1 SEE ALSO
 

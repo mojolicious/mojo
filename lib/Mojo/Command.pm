@@ -95,7 +95,10 @@ sub detect {
   return $guess if $guess;
 
   # FastCGI (detect absence of WINDIR for Windows and USER for UNIX)
-  return 'fastcgi' if !defined $ENV{WINDIR} && !defined $ENV{USER};
+  return 'fastcgi'
+    if !defined $ENV{WINDIR}
+      && !defined $ENV{USER}
+      && !defined $ENV{HARNESS_ACTIVE};
 
   # Nothing
   return;
@@ -272,7 +275,6 @@ sub run {
     print "  $name$padding   $description";
   }
   print $self->hint;
-  return 1;
 }
 
 sub start {

@@ -304,9 +304,9 @@ is $m->stack->[1]->{action},     'edit',     'right value';
 is $m->stack->[1]->{format},     'html',     'right value';
 is $m->path_for, '/articles/1/edit', 'right path';
 is $m->path_for(format => 'html'), '/articles/1/edit.html', 'right path';
-is $m->path_for('articles_delete', format => undef), '/articles/delete',
+is $m->path_for('articles_delete', format => undef), '/articles/1/delete',
   'right path';
-is $m->path_for('articles_delete'), '/articles/delete', 'right path';
+is $m->path_for('articles_delete'), '/articles/1/delete', 'right path';
 is $m->path_for('articles_delete', id => 12), '/articles/12/delete',
   'right path';
 is @{$m->stack}, 2, 'right number of elements';

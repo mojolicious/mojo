@@ -169,9 +169,6 @@ sub path_for {
 
   # Find endpoint
   else {
-    $captures = {};
-
-    # Find
     my @children = ($self->root);
     my $candidate;
     while (my $child = shift @children) {

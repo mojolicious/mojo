@@ -1,7 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.81    2011-08-17 00:00:00
-        - Added EXPERIMENTAL size method to Mojo::DOM::Collection.
+        - Renamed Mojo::DOM::Collection to Mojo::Collection and added a few
+          new methods.
         - Made Mojolicious::Plugins loader quite a bit smarter.
         - Improved documentation.
         - Improved Test::Mojo diagnostics.

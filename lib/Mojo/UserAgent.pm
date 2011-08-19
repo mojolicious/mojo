@@ -82,7 +82,6 @@ sub need_proxy {
   return 1;
 }
 
-# "'What are you lookin at?' - the innocent words of a drunken child."
 sub post {
   my $self = shift;
   $self->start($self->build_tx('POST', @_));

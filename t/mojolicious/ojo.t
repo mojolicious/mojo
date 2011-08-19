@@ -10,7 +10,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'development';
 }
 
-use Test::More tests => 9;
+use Test::More tests => 10;
 
 # "What do you mean 'we', flesh-tube?"
 use_ok 'ojo';
@@ -43,5 +43,8 @@ is f('/' => {foo => 'bar'})->body, 'POSTbar', 'right content';
 # Parse XML
 is x('<title>works</title>')->at('title')->text, 'works', 'right text';
 
-# Bytestream
+# ByteStream
 is b('<foo>')->url_escape, '%3Cfoo%3E', 'right result';
+
+# Collection
+is c(1, 2, 3)->join('-'), '1-2-3', 'right result';

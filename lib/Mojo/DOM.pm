@@ -7,7 +7,7 @@ use overload
   fallback => 1;
 
 use Carp 'croak';
-use Mojo::DOM::Collection;
+use Mojo::Collection;
 use Mojo::DOM::CSS;
 use Mojo::DOM::HTML;
 
@@ -129,7 +129,7 @@ sub children {
       $self->new(charset => $self->charset, tree => $e, xml => $self->xml);
   }
 
-  return Mojo::DOM::Collection->new(\@children);
+  return Mojo::Collection->new(@children);
 }
 
 sub content_xml {
@@ -162,7 +162,7 @@ sub find {
     $self->new(charset => $self->charset, tree => $_, xml => $self->xml)
   } @$results;
 
-  return Mojo::DOM::Collection->new($results);
+  return Mojo::Collection->new(@$results);
 }
 
 # DEPRECATED in Smiling Face With Sunglasses!
@@ -572,8 +572,8 @@ Charset used for decoding and encoding HTML5/XML.
   my $collection = $dom->children;
   my $collection = $dom->children('div')
 
-Return a L<Mojo::DOM::Collection> object containing the children of this
-element, similar to C<find>.
+Return a L<Mojo::Collection> object containing the children of this element,
+similar to C<find>.
 
   # Child elements are also automatically available as object methods
   print $dom->div->text;
@@ -590,11 +590,14 @@ Render content of this element to XML.
 
   my $collection = $dom->find('html title');
 
-Find elements with CSS3 selectors and return a L<Mojo::DOM::Collection>
-object.
+Find elements with CSS3 selectors and return a L<Mojo::Collection> object.
 All selectors from L<Mojo::DOM::CSS> are supported.
 
-  print $dom->find('div')->[23]->text;
+  # Find a specific element and extract information
+  my $id = $dom->find('div')->[23]->{id};
+
+  # Extract information from multiple elements
+  my @headers = $dom->find('h1, h2, h3')->map(sub { shift->text })->each;
 
 =head2 C<namespace>
 

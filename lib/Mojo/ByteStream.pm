@@ -7,12 +7,10 @@ use Mojo::Util;
 sub import {
   my $class = shift;
   return unless @_ > 0;
-
-  # Alternative constructor
   no strict 'refs';
   no warnings 'redefine';
   my $caller = caller;
-  *{"${caller}::b"} = sub { bless {bytestream => join('', @_)}, $class };
+  *{"${caller}::b"} = sub { $class->new(@_) };
 }
 
 # "Do we have any food that wasn't brutally slaughtered?
@@ -205,47 +203,17 @@ Mojo::ByteStream - ByteStream
 
 =head1 SYNOPSIS
 
+  # Manipulate bytestreams
   use Mojo::ByteStream;
+  my $stream = Mojo::ByteStream->new('foo_bar_baz');
+  print $stream->camelize;
 
-  my $stream = Mojo::ByteStream->new('foobarbaz');
-
-  $stream->camelize;
-  $stream->decamelize;
-  $stream->b64_encode;
-  $stream->b64_decode;
-  $stream->encode('UTF-8');
-  $stream->decode('UTF-8');
-  $stream->hmac_md5_sum('secret');
-  $stream->hmac_sha1_sum('secret');
-  $stream->html_escape;
-  $stream->html_unescape;
-  $stream->md5_bytes;
-  $stream->md5_sum;
-  $stream->qp_encode;
-  $stream->qp_decode;
-  $stream->quote;
-  $stream->sha1_bytes;
-  $stream->sha1_sum;
-  $stream->trim;
-  $stream->unquote;
-  $stream->url_escape;
-  $stream->url_unescape;
-  $stream->xml_escape;
-  $stream->punycode_encode;
-  $stream->punycode_decode;
-
-  my $size = $stream->size;
-
-  my $stream2 = $stream->clone;
-  print $stream2->to_string;
-  $stream2->say;
-
-  # Chained
+  # Chain methods
   my $stream = Mojo::ByteStream->new('foo bar baz')->quote;
   $stream = $stream->unquote->encode('UTF-8')->b64_encode;
   print "$stream";
 
-  # Alternative constructor
+  # Use the alternative constructor
   use Mojo::ByteStream 'b';
   my $stream = b('foobarbaz')->html_escape;
 
@@ -261,7 +229,7 @@ the following new ones.
 
 =head2 C<new>
 
-  my $stream = Mojo::ByteStream->new($string);
+  my $stream = Mojo::ByteStream->new('test123');
 
 Construct a new L<Mojo::ByteStream> object.
 

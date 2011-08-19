@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+1.83    2011-08-19 00:00:00
+        - Improved documentation.
+
 1.82    2011-08-19 00:00:00
         - Added EXPERIMENTAL filter method to Mojo::Collection.
         - Removed while and until methods from Mojo::Collection.

@@ -95,7 +95,7 @@ Construct a new L<Mojo::Collection> object.
 
 Iterate over whole collection.
 
-  $collection  = $collection->each(sub {
+  $collection->each(sub {
     my ($e, $count) = @_;
     print "$count: $e\n";
   });

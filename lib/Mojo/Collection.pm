@@ -91,7 +91,7 @@ Construct a new L<Mojo::Collection> object.
   my @elements = $collection->each;
   $collection  = $collection->each(sub {...});
 
-Iterate over whole collection.
+Evaluate closure for each element in collection.
 
   $collection->each(sub {
     my ($e, $count) = @_;
@@ -103,7 +103,7 @@ Iterate over whole collection.
   my $new = $collection->grep(sub {...});
 
 Evaluate closure for each element in collection and create a new collection
-with all elements that passed.
+with all elements for which the closure returned true.
 
   my $fiveplus = $collection->grep(sub { $_ >= 5 });
 

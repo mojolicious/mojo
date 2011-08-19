@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 23;
+use Test::More tests => 25;
 
 # "'What are you lookin at?' - the innocent words of a drunken child."
 use_ok 'Mojo::Collection', 'c';
@@ -25,6 +25,8 @@ is_deeply [$collection->filter(sub { $_ < 5 })->each], [1, 2, 3, 4],
   'right elements';
 is_deeply [$collection->filter(sub { shift == 5 })->each], [5],
   'right elements';
+is_deeply [$collection->filter(sub { $_ < 1 })->each], [], 'no elements';
+is_deeply [$collection->filter(sub { $_ > 9 })->each], [], 'no elements';
 
 # join
 $collection = c(1, 2, 3);

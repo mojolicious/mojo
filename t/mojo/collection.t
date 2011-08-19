@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 25;
+use Test::More tests => 23;
 
 # "'What are you lookin at?' - the innocent words of a drunken child."
 use_ok 'Mojo::Collection', 'c';
@@ -55,15 +55,3 @@ $collection = c([2, 3]);
 is $collection->size, 1, 'right size';
 $collection = c(5, 4, 3, 2, 1);
 is $collection->size, 5, 'right size';
-
-# until
-$collection = c(1, 2, 3, 4, 5);
-@results = ();
-$collection->until(sub { push(@results, @_) && $_ > 3 });
-is_deeply \@results, [1, 1, 2, 2, 3, 3, 4, 4], 'right elements';
-
-# while
-$collection = c(5, 4, 3, 2, 1);
-@results = ();
-$collection->while(sub { $_ > 3 && push(@results, @_) });
-is_deeply \@results, [5, 1, 4, 2], 'right elements';

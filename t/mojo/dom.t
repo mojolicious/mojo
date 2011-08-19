@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 679;
+use Test::More tests => 675;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -25,18 +25,6 @@ is_deeply \@div, [qw/A B/], 'found all div elements with id';
 @div = ();
 $dom->find('div[id]')->each(sub { push @div, $_->text });
 is_deeply \@div, [qw/A B/], 'found all div elements with id';
-@div = ();
-$dom->find('div[id]')->until(sub { push @div, shift->text; @div == 1 });
-is_deeply \@div, [qw/A/], 'found first div elements with id';
-@div = ();
-$dom->find('div[id]')->until(sub { pop == 1 && push @div, $_->text });
-is_deeply \@div, [qw/A/], 'found first div elements with id';
-@div = ();
-$dom->find('div[id]')->while(sub { push @div, shift->text; @div < 1 });
-is_deeply \@div, [qw/A/], 'found first div elements with id';
-@div = ();
-$dom->find('div[id]')->while(sub { pop() < 2 && push @div, $_->text });
-is_deeply \@div, [qw/A/], 'found first div elements with id';
 is $dom->at('#a')->attrs('foo'), 0, 'right attribute';
 is $dom->at('#a')->attrs->{foo}, 0, 'right attribute';
 is "$dom", '<div><div foo="0" id="a">A</div><div id="b">B</div></div>',

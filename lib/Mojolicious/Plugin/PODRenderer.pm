@@ -124,7 +124,7 @@ sub register {
 
       # Try to find a title
       my $title = 'Perldoc';
-      $dom->find('h1 + p')->until(sub { $title = shift->text });
+      $dom->find('h1 + p')->each(sub { $title ||= shift->text });
 
       # Combine everything to a proper response
       $self->content_for(mojobar => $self->include(inline => $MOJOBAR));

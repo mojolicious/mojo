@@ -32,11 +32,9 @@ sub each {
 # "All right, let's not panic.
 #  I'll make the money by selling one of my livers.
 #  I can get by with one."
-sub filter {
+sub grep {
   my ($self, $cb) = @_;
-  my $new = $self->new;
-  $cb->($_) and push(@$new, $_) for @$self;
-  return $new;
+  return $self->new(grep { $_->$cb } @$self);
 }
 
 sub join {
@@ -46,7 +44,7 @@ sub join {
 
 sub map {
   my ($self, $cb) = @_;
-  return $self->new(map { $cb->($_) } @$self);
+  return $self->new(map { $_->$cb } @$self);
 }
 
 sub size { scalar @{$_[0]} }
@@ -100,14 +98,14 @@ Iterate over whole collection.
     print "$count: $e\n";
   });
 
-=head2 C<filter>
+=head2 C<grep>
 
-  my $new = $collection->filter(sub {...});
+  my $new = $collection->grep(sub {...});
 
 Evaluate closure for each element in collection and create a new collection
 with all elements that passed.
 
-  my $fiveplus = $collection->filter(sub { $_ > 5 });
+  my $fiveplus = $collection->grep(sub { $_ >= 5 });
 
 =head2 C<join>
 

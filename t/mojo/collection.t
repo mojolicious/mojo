@@ -17,16 +17,16 @@ is_deeply \@results, [3, 2, 1], 'right elements';
 $collection->each(sub { push @results, shift->[0], shift });
 is_deeply \@results, [3, 1, 2, 2, 1, 3], 'right elements';
 
-# filter
+# grep
 $collection = c(1, 2, 3, 4, 5, 6, 7, 8, 9);
-is_deeply [$collection->filter(sub { $_ > 5 })->each], [6, 7, 8, 9],
+is_deeply [$collection->grep(sub { $_ > 5 })->each], [6, 7, 8, 9],
   'right elements';
-is_deeply [$collection->filter(sub { $_ < 5 })->each], [1, 2, 3, 4],
+is_deeply [$collection->grep(sub { $_ < 5 })->each], [1, 2, 3, 4],
   'right elements';
-is_deeply [$collection->filter(sub { shift == 5 })->each], [5],
+is_deeply [$collection->grep(sub { shift == 5 })->each], [5],
   'right elements';
-is_deeply [$collection->filter(sub { $_ < 1 })->each], [], 'no elements';
-is_deeply [$collection->filter(sub { $_ > 9 })->each], [], 'no elements';
+is_deeply [$collection->grep(sub { $_ < 1 })->each], [], 'no elements';
+is_deeply [$collection->grep(sub { $_ > 9 })->each], [], 'no elements';
 
 # join
 $collection = c(1, 2, 3);

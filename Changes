@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.83    2011-08-19 00:00:00
+        - Renamed filter method in Mojo::Collection to grep.
         - Improved documentation.
 
 1.82    2011-08-19 00:00:00

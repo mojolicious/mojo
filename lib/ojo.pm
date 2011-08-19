@@ -104,7 +104,7 @@ the application.
 
   my $stream = b('lalala');
 
-Turn input into a L<Mojo::ByteStream> object.
+Turn string into a L<Mojo::ByteStream> object.
 
   perl -Mojo -e 'b(g("mojolicio.us")->body)->html_unescape->say'
 
@@ -112,7 +112,7 @@ Turn input into a L<Mojo::ByteStream> object.
 
   my $collection = c(1, 2, 3);
 
-Turn input into a L<Mojo::Collection> object.
+Turn list into a L<Mojo::Collection> object.
 Note that this function is EXPERIMENTAL and might change without warning!
 
 =head2 C<d>

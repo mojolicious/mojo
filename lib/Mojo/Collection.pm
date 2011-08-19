@@ -34,17 +34,17 @@ sub each {
 #  I can get by with one."
 sub grep {
   my ($self, $cb) = @_;
-  return $self->new(grep { $_->$cb } @$self);
+  $self->new(grep { $_->$cb } @$self);
 }
 
 sub join {
   my ($self, $chunk) = @_;
-  return Mojo::ByteStream->new(join $chunk, map({"$_"} @$self));
+  Mojo::ByteStream->new(join $chunk, map({"$_"} @$self));
 }
 
 sub map {
   my ($self, $cb) = @_;
-  return $self->new(map { $_->$cb } @$self);
+  $self->new(map { $_->$cb } @$self);
 }
 
 sub size { scalar @{$_[0]} }

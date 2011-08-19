@@ -56,6 +56,12 @@ sub map {
 
 sub size { scalar @{$_[0]} }
 
+sub sort {
+  my ($self, $cb) = @_;
+  return $self->new(sort @$self) unless $cb;
+  return $self->new(sort { $a->$cb($b) } @$self);
+}
+
 1;
 __END__
 
@@ -146,6 +152,16 @@ from the results.
   my $size = $collection->size;
 
 Number of elements in collection.
+
+=head2 C<sort>
+
+  my $new = $collection->sort;
+  my $new = $collection->sort(sub {...});
+
+Sort elements based on return value of closure and create a new collection
+from the results.
+
+  my $reverse = $collection->sort(sub { $_[1] cmp $_[0] });
 
 =head1 SEE ALSO
 

@@ -275,6 +275,7 @@ sub run {
     print "  $name$padding   $description";
   }
   print $self->hint;
+  return 1;
 }
 
 sub start {

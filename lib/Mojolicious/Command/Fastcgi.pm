@@ -11,7 +11,7 @@ usage: $0 fastcgi
 EOF
 
 # "Interesting... Oh no wait, the other thing, tedious."
-sub run { Mojo::Server::FastCGI->new->run }
+sub run { my $self = shift; Mojo::Server::FastCGI->new->run; return $self }
 
 1;
 __END__

@@ -23,6 +23,13 @@ sub new {
 
 sub each { shift->_iterate(@_) }
 
+sub filter {
+  my ($self, $cb) = @_;
+  my $new = $self->new;
+  $cb->($_) and push(@$new, $_) for @$self;
+  return $new;
+}
+
 sub join {
   my ($self, $chunk) = @_;
   return Mojo::ByteStream->new(join $chunk, map({"$_"} @$self));
@@ -101,6 +108,15 @@ Construct a new L<Mojo::Collection> object.
   });
 
 Iterate over whole collection.
+
+=head2 C<filter>
+
+  my $new = $collection->filter(sub {...});
+
+Evaluate closure for each element in collection and create a new collection
+with all elements that passed.
+
+  my $over_five = $collection->filter(sub { $_ > 5 });
 
 =head2 C<join>
 

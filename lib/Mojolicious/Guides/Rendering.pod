@@ -611,9 +611,9 @@ to C<CPAN>.
 While the built-in C<exception> and C<not_found> templates are very useful
 during development, you most likely want to show your users something more
 related to your application in production.
-That's why L<Mojolicious> will always try to render C<exception.$mode.html.*>
-or C<not_found.$mode.html.*> before falling back to the built-in default
-templates.
+That's why L<Mojolicious> will always try to render
+C<exception.${mode}.html.*> or C<not_found.${mode}.html.*> before falling
+back to the built-in default templates.
 
   @@ exception.production.html.ep
   <!doctype html><html>

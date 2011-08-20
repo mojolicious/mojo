@@ -88,7 +88,7 @@ L<Mojolicious::Plugin::JSONConfig> is a JSON configuration plugin that
 preprocesses it's input with L<Mojo::Template>.
 The application object can be accessed via C<$app> or the C<app> helper.
 You can extend the normal config file C<myapp.json> with C<mode> specific
-ones like C<myapp.$mode.json>.
+ones like C<myapp.${mode}.json>.
 
 =head1 OPTIONS
 

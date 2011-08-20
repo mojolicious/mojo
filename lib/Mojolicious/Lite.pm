@@ -759,7 +759,7 @@ L<Mojolicious> mode, default will be C<development>.
 =head2 Logging
 
 L<Mojo::Log> messages will be automatically written to C<STDERR> or a
-C<log/$mode.log> file if a C<log> directory exists.
+C<log/${mode}.log> file if a C<log> directory exists.
 
   $ mkdir log
 

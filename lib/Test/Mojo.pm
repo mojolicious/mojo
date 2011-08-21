@@ -250,9 +250,8 @@ sub reset_session {
 sub send_message_ok {
   my ($self, $message, $desc) = @_;
 
-  my $t = Mojo::IOLoop->trigger;
-  $self->tx->send_message($message, $t->begin);
-  $t->start;
+  $self->tx->send_message($message, sub { Mojo::IOLoop->stop });
+  Mojo::IOLoop->start;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::ok 1, $desc || 'send message';
 
@@ -317,18 +316,16 @@ sub websocket_ok {
   utf8::encode $desc;
   $self->{messages} = [];
   $self->{finished} = 0;
-  my $t = Mojo::IOLoop->trigger;
-  $t->begin;
   $self->ua->websocket(
     $url, @_,
     sub {
       $self->tx(my $tx = pop);
       $tx->on_finish(sub { $self->{finished} = 1 });
       $tx->on_message(sub { push @{$self->{messages}}, pop });
-      $t->end;
+      Mojo::IOLoop->stop;
     }
   );
-  $t->start;
+  Mojo::IOLoop->start;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::ok $self->tx->res->code eq 101, $desc;
 

@@ -502,6 +502,31 @@ variable to take advantage of multiple cpu cores and run tests parallel.
 The C<j5> allows 5 tests to run at the same time, which makes for example the
 L<Mojolicious> test suite finish 3 times as fast on a dual core laptop!
 
+=head2 Adding Commands To Mojolicious
+
+By now you've propably used many of the built-in commands described in
+L<Mojolicious::Commands>, but did you know that you can just add new ones and
+that they will be picked up automatically by the command line interface?
+
+  package Mojolicious::Command::echo;
+  use Mojo::Base 'Mojo::Command';
+
+  sub run {
+    my ($self, $whatever) = @_;
+    print "Echo: $whatever";
+  }
+
+  1;
+
+There are many more useful methods and attributes in L<Mojo::Command> that
+you can use or overload.
+
+  $ mojo echo test123
+  Echo: test123
+
+  $ ./myapp.pl echo test123
+  Echo: test123
+
 =head2 Running Code Against Your Application
 
 Ever thought about running a quick oneliner against your L<Mojolicious>

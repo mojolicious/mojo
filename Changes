@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+1.87    2011-08-22 00:00:00
+        - Improved documentation.
+
 1.86    2011-08-21 00:00:00
         - Deprecated camel case command modules and lowercased all the
           built-in ones.

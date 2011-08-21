@@ -7,7 +7,7 @@ use Mojo::JSON;
 
 # "We need some more secret sauce. Put the mayonnaise in the sun."
 use_ok 'Mojo::Server::PSGI';
-use_ok 'Mojolicious::Command::Psgi';
+use_ok 'Mojolicious::Command::psgi';
 
 # Binding
 my $psgi    = Mojo::Server::PSGI->new;
@@ -69,7 +69,7 @@ $env = {
   'psgi.multiprocess' => 1,
   'psgi.run_once'     => 0
 };
-$app = Mojolicious::Command::Psgi->new->run;
+$app = Mojolicious::Command::psgi->new->run;
 $res = $app->($env);
 is $res->[0], 200, 'right status';
 %headers = @{$res->[1]};
@@ -106,7 +106,7 @@ $env = {
   'psgi.multiprocess' => 1,
   'psgi.run_once'     => 0
 };
-$app = Mojolicious::Command::Psgi->new->run;
+$app = Mojolicious::Command::psgi->new->run;
 $res = $app->($env);
 is $res->[0], 200, 'right status';
 ok scalar @{$res->[1]} >= 10, 'enough headers';

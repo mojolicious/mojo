@@ -573,6 +573,7 @@ dropped, defaults to C<15>.
   listen => ['http://*:80']
 
 List of one or more locations to listen on, defaults to C<http://*:8080>.
+See also L<Mojo::Server::Daemon/"listen"> for more examples.
 
 =head2 C<lock_file>
 

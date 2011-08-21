@@ -124,7 +124,6 @@ sub lookup {
   );
 }
 
-# "I can't believe it! Reading and writing actually paid off!"
 sub resolve {
   my ($self, $name, $type, $cb) = @_;
 

@@ -367,7 +367,6 @@ sub _loop {
   return $self->{nb} ? Mojo::IOLoop->singleton : $self->ioloop;
 }
 
-# "Hey, Weener Boy... where do you think you're going?"
 sub _proxy_connect {
   my ($self, $old, $cb) = @_;
 

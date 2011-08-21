@@ -7,21 +7,10 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More;
-use Mojo::IOLoop::Server;
-use Mojo::IOLoop::Stream;
-plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
-  unless $ENV{TEST_TLS};
-plan skip_all => 'IO::Socket::SSL 1.43 required for this test!'
-  unless Mojo::IOLoop::Server::TLS;
-plan skip_all => 'Windows is too fragile for this test!'
-  if Mojo::IOLoop::Stream::WINDOWS;
-plan tests => 15;
+use Test::More tests => 9;
 
-# "I was a hero to broken robots 'cause I was one of them, but how can I sing
-#  about being damaged if I'm not?
-#  That's like Christina Aguilera singing Spanish.
-#  Ooh, wait! That's it! I'll fake it!"
+# "I cheated the wrong way!
+#  I wrote the Lisa name and gave the Ralph answers!"
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
 use Mojo::UserAgent;
@@ -33,18 +22,9 @@ app->log->level('fatal');
 # GET /
 get '/' => sub {
   my $self = shift;
-  $self->res->headers->header('X-Works',
-    $self->req->headers->header('X-Works'));
-  my $rel = $self->req->url;
-  my $abs = $rel->to_abs;
+  my $rel  = $self->req->url;
+  my $abs  = $rel->to_abs;
   $self->render_text("Hello World! $rel $abs");
-};
-
-# GET /broken_redirect
-get '/broken_redirect' => sub {
-  my $self = shift;
-  $self->render(text => 'Redirecting!', status => 302);
-  $self->res->headers->location('/');
 };
 
 # GET /proxy
@@ -71,7 +51,7 @@ my $ua     = Mojo::UserAgent->new;
 my $loop   = Mojo::IOLoop->singleton;
 my $server = Mojo::Server::Daemon->new(app => app, ioloop => $loop);
 my $port   = Mojo::IOLoop->new->generate_port;
-$server->listen(["https://*:$port"]);
+$server->listen(["http://*:$port"]);
 $server->prepare_ioloop;
 
 # Connect proxy server for testing
@@ -83,7 +63,7 @@ my $nf =
     "HTTP/1.1 404 NOT FOUND\x0d\x0a"
   . "Content-Length: 0\x0d\x0a"
   . "Connection: close\x0d\x0a\x0d\x0a";
-my $ok = "HTTP/1.0 200 OK\x0d\x0aX-Something: unimportant\x0d\x0a\x0d\x0a";
+my $ok = "HTTP/1.1 200 OK\x0d\x0aConnection: keep-alive\x0d\x0a\x0d\x0a";
 $loop->listen(
   port    => $proxy,
   on_read => sub {
@@ -133,42 +113,18 @@ $loop->listen(
 # GET / (normal request)
 my $result;
 $ua->get(
-  "https://localhost:$port/" => sub {
+  "http://localhost:$port/" => sub {
     $result = pop->success->body;
     $loop->stop;
   }
 );
 $loop->start;
-is $result, "Hello World! / https://localhost:$port/", 'right content';
-
-# GET /broken_redirect (broken redirect)
-my $start = 0;
-$ua->on_start(
-  sub {
-    $start++;
-    pop->req->headers->header('X-Works', 'it does!');
-  }
-);
-$result = undef;
-my $works;
-$ua->max_redirects(3)->get(
-  "https://localhost:$port/broken_redirect" => sub {
-    my $tx = pop;
-    $result = $tx->success->body;
-    $works  = $tx->res->headers->header('X-Works');
-    $loop->stop;
-  }
-);
-$loop->start;
-is $result, "Hello World! / https://localhost:$port/", 'right content';
-is $works,  'it does!',                                'right header';
-is $start,  2,                                         'redirected once';
-$ua->on_start(undef);
+is $result, "Hello World! / http://localhost:$port/", 'right content';
 
 # WebSocket /test (normal websocket)
 $result = undef;
 $ua->websocket(
-  "wss://localhost:$port/test" => sub {
+  "ws://localhost:$port/test" => sub {
     my $tx = pop;
     $tx->on_finish(sub { $loop->stop });
     $tx->on_message(
@@ -184,41 +140,24 @@ $ua->websocket(
 $loop->start;
 is $result, 'test1test2', 'right result';
 
-# GET /proxy (proxy request)
-$ua->https_proxy("http://localhost:$proxy");
+# GET http://kraih.com/proxy (proxy request)
+$ua->http_proxy("http://localhost:$port");
 $result = undef;
 $ua->get(
-  "https://localhost:$port/proxy" => sub {
+  "http://kraih.com/proxy" => sub {
     $result = pop->success->body;
     $loop->stop;
   }
 );
 $loop->start;
-is $result, "https://localhost:$port/proxy", 'right content';
+is $result, 'http://kraih.com/proxy', 'right content';
 
-# GET /proxy (kept alive proxy request)
+# WebSocket /test (proxy websocket)
+$ua->http_proxy("http://localhost:$proxy");
 $result = undef;
-my $kept_alive;
-$ua->get(
-  "https://localhost:$port/proxy" => sub {
-    my $tx = pop;
-    $result     = $tx->success->body;
-    $kept_alive = $tx->kept_alive;
-    $loop->stop;
-  }
-);
-$loop->start;
-is $result, "https://localhost:$port/proxy", 'right content';
-is $kept_alive, 1, 'kept alive';
-
-# WebSocket /test (kept alive proxy websocket)
-$ua->https_proxy("http://localhost:$proxy");
-$result     = undef;
-$kept_alive = undef;
 $ua->websocket(
-  "wss://localhost:$port/test" => sub {
+  "ws://localhost:$port/test" => sub {
     my $tx = pop;
-    $kept_alive = $tx->kept_alive;
     $tx->on_finish(sub { $loop->stop });
     $tx->on_message(
       sub {
@@ -231,18 +170,17 @@ $ua->websocket(
   }
 );
 $loop->start;
-is $kept_alive, 1,                 'kept alive';
-is $connected,  "localhost:$port", 'connected';
-is $result,     'test1test2',      'right result';
+is $connected, "localhost:$port", 'connected';
+is $result,    'test1test2',      'right result';
 ok $read > 25, 'read enough';
 ok $sent > 25, 'sent enough';
 
 # WebSocket /test (proxy websocket with bad target)
-$ua->https_proxy("http://localhost:$proxy");
+$ua->http_proxy("http://localhost:$proxy");
 my $port2 = $port + 1;
 my ($success, $error);
 $ua->websocket(
-  "wss://localhost:$port2/test" => sub {
+  "ws://localhost:$port2/test" => sub {
     my $tx = pop;
     $success = $tx->success;
     $error   = $tx->error;

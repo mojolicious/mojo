@@ -11,8 +11,6 @@ use Mojo::Transaction::WebSocket;
 use Mojo::URL;
 use Mojo::Util qw/encode url_escape/;
 
-# "I cheated the wrong way!
-#  I wrote the Lisa name and gave the Ralph answers!"
 sub form {
   my $self = shift;
   my $url  = shift;

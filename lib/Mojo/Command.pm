@@ -232,12 +232,8 @@ sub run {
   my $commands = [];
   my $seen     = {};
   for my $namespace (@{$self->namespaces}) {
-
-    # Search
     for my $module (@{Mojo::Loader->search($namespace)}) {
-      if (my $e = Mojo::Loader->load($module)) { die $e }
-      next unless $module->can('new') && $module->can('description');
-      my $command = $module;
+      next unless my $command = _command($module);
       $command =~ s/^$namespace\:://;
       push @$commands, [$command => $module]
         unless $seen->{$command};
@@ -310,7 +306,7 @@ sub _command {
     return unless ref $e;
     die $e;
   }
-  return unless $module->can('new') && $module->can('run');
+  return unless $module->can('new') && $module->isa('Mojo::Command');
 
   return $module;
 }

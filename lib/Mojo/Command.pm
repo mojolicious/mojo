@@ -49,6 +49,7 @@ sub chmod_rel_file {
 sub class_to_file {
   my ($self, $class) = @_;
   $class =~ s/:://g;
+  $class =~ s/([A-Z])([A-Z]*)/$1.lc($2)/gex;
   decamelize $class;
   return $class;
 }
@@ -426,7 +427,10 @@ Portably change mode of a relative file.
 
 Convert a class name to a file.
 
-  FooBar -> foo_bar
+  Foo::Bar -> foo_bar
+  FOO::Bar -> foobar
+  FooBar   -> foo_bar
+  FOOBar   -> foobar
 
 =head2 C<class_to_path>
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 17;
+use Test::More tests => 23;
 
 use Cwd 'cwd';
 use File::Spec;
@@ -39,8 +39,16 @@ is_deeply [sort keys %{$command->get_all_data('Example::Package::Windows')}],
   [qw/template3 template4/], 'right DATA files';
 close $data;
 
-# Class to file and path
-is $command->class_to_file('Foo::Bar'), 'foo_bar',    'right file';
+# Class to file
+is $command->class_to_file('Foo::Bar'), 'foo_bar', 'right file';
+is $command->class_to_file('FooBar'),   'foo_bar', 'right file';
+is $command->class_to_file('FOOBar'),   'foobar',  'right file';
+is $command->class_to_file('FOOBAR'),   'foobar',  'right file';
+is $command->class_to_file('FOO::Bar'), 'foobar',  'right file';
+is $command->class_to_file('FooBAR'),   'foo_bar', 'right file';
+is $command->class_to_file('Foo::BAR'), 'foo_bar', 'right file';
+
+# Class to path
 is $command->class_to_path('Foo::Bar'), 'Foo/Bar.pm', 'right path';
 
 # Environment detection

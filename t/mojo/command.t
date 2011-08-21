@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 23;
+use Test::More tests => 24;
 
 use Cwd 'cwd';
 use File::Spec;
@@ -11,6 +11,9 @@ use File::Temp;
 use_ok 'Mojo::Command';
 
 my $command = Mojo::Command->new;
+
+# Application
+isa_ok $command->app, 'Mojo', 'right application';
 
 # UNIX DATA templates
 my $unix = "@@ template1\nFirst Template\n@@ template2\r\nSecond Template\n";

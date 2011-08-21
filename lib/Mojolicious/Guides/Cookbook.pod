@@ -508,12 +508,17 @@ By now you've propably used many of the built-in commands described in
 L<Mojolicious::Commands>, but did you know that you can just add new ones and
 that they will be picked up automatically by the command line interface?
 
-  package Mojolicious::Command::echo;
+  package Mojolicious::Command::spy;
   use Mojo::Base 'Mojo::Command';
 
   sub run {
     my ($self, $whatever) = @_;
-    print "Echo: $whatever";
+
+    # Leak secret passphrase
+    if ($whatever eq 'secret') {
+      my $secret = $self->app->secret;
+      print qq/The secret of this application is "$secret".\n/;
+    }
   }
 
   1;
@@ -521,11 +526,11 @@ that they will be picked up automatically by the command line interface?
 There are many more useful methods and attributes in L<Mojo::Command> that
 you can use or overload.
 
-  $ mojo echo test123
-  Echo: test123
+  $ mojo spy secret
+  The secret of this application is "Mojolicious::Lite".
 
-  $ ./myapp.pl echo test123
-  Echo: test123
+  $ ./myapp.pl spy secret
+  The secret of this application is "secr3t".
 
 =head2 Running Code Against Your Application
 

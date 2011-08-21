@@ -33,6 +33,8 @@ has usage      => "usage: $0\n";
 # Cache
 my $CACHE = {};
 
+sub app { Mojo::Server->new->app }
+
 sub chmod_file {
   my ($self, $path, $mod) = @_;
   chmod $mod, $path or croak qq/Can't chmod path "$path": $!/;
@@ -190,7 +192,7 @@ sub run {
   my ($self, $name, @args) = @_;
 
   # Application loader
-  return Mojo::Server->new->app if defined $ENV{MOJO_APP_LOADER};
+  return $self->app if defined $ENV{MOJO_APP_LOADER};
 
   # Try to detect environment
   $name = $self->detect($name) unless $ENV{MOJO_NO_DETECT};
@@ -408,6 +410,13 @@ Usage information for command, used for the help screen.
 
 L<Mojo::Command> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
+
+=head2 C<app>
+
+  my $app = $command->app;
+
+Currently active application, defaults to a L<Mojo::HelloWorld> object.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<chmod_file>
 

@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension Mojolicious.
 
 1.86    2011-08-21 00:00:00
         - Added EXPERIMENTAL support for testing WebSockets with Test::Mojo.
+        - Added GET/POST parameter support to respond_to.
         - Improved documentation.
 
 1.85    2011-08-20 00:00:00

@@ -482,6 +482,8 @@ C<RESTful> content negotiation you can also use C<respond_to>.
   # /hello (Accept: text/xml)
   # /hello.json
   # /hello.xml
+  # /hello?format=json
+  # /hello?format=xml
   get '/hello' => sub {
     my $self = shift;
     $self->respond_to(

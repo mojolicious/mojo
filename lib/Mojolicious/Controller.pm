@@ -486,7 +486,9 @@ sub respond_to {
   push @formats, @{$app->types->detect($self->req->headers->accept)};
   my $stash = $self->stash;
   unless (@formats) {
-    if (my $format = $stash->{format}) { push @formats, $format }
+    if (my $format = $stash->{format} || $self->req->param('format')) {
+      push @formats, $format;
+    }
     else { push @formats, $app->renderer->default_format }
   }
 
@@ -962,7 +964,7 @@ Usually refers to a L<Mojo::Message::Response> object.
   );
 
 Automatically select best possible representation for resource from C<Accept>
-request header and route C<format>.
+request header, C<format> stash value or C<format> GET/POST parameter.
 Note that this method is EXPERIMENTAL and might change without warning!
 
   $c->respond_to(

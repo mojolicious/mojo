@@ -210,10 +210,7 @@ sub run {
       last if $module = _command("${namespace}::$name");
 
       # DEPRECATED in Smiling Face With Sunglasses!
-      if ($module = _command("${namespace}::$class")) {
-        warn qq/Camel case command "$name" is DEPRECATED!!!\n/;
-        last;
-      }
+      last if $module = _command("${namespace}::$class");
     }
 
     # Command missing

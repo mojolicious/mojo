@@ -14,7 +14,8 @@ usage: $0 generate GENERATOR [OPTIONS]
 
 These generators are currently available:
 EOF
-has namespaces => sub { [qw/Mojolicious::Command::generate/] };
+has namespaces =>
+  sub { [qw/Mojolicious::Command::generate Mojo::Command::generate/] };
 has usage => <<"EOF";
 usage: $0 generate GENERATOR [OPTIONS]
 EOF
@@ -69,7 +70,7 @@ Short usage message shown before listing available generator commands.
   $generator     = $generator->namespaces(['Mojo::Command::generate']);
 
 Namespaces to search for available generator commands, defaults to
-L<Mojolicious::Command::generate>.
+L<Mojolicious::Command::generate> and L<Mojo::Command::generate>.
 
 =head1 METHODS
 

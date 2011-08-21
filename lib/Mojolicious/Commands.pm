@@ -16,7 +16,7 @@ These options are available for all commands:
 
 See '$0 help COMMAND' for more information on a specific command.
 EOF
-has namespaces => sub { [qw/Mojolicious::Command/] };
+has namespaces => sub { [qw/Mojolicious::Command Mojo::Command/] };
 
 # Command line options for MOJO_HELP, MOJO_HOME and MOJO_MODE
 BEGIN {
@@ -187,7 +187,7 @@ Short hint shown after listing available commands.
   $commands      = $commands->namespaces(['Mojolicious::Commands']);
 
 Namespaces to search for available commands, defaults to
-L<Mojolicious::Command>.
+L<Mojolicious::Command> and L<Mojo::Command>.
 
 =head1 METHODS
 

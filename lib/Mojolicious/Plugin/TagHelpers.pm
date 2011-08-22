@@ -320,7 +320,7 @@ sub _tag {
   }
 
   # Block
-  if ($cb || defined($content)) {
+  if ($cb || defined $content) {
     $tag .= '>';
     $tag .= $cb ? $cb->() : $content;
     $tag .= "<\/$name>";
@@ -587,15 +587,15 @@ Generate submit input element.
 
   <%= tag 'div' %>
   <%= tag 'div', id => 'foo' %>
-  <%= tag div => begin %>Content<% end %>
-  <%= tag div => 'Content' %>
+  <%= tag div => 'some & content' %>
+  <%= tag div => begin %>some & content<% end %>
 
 HTML5 tag generator.
 
   <div />
   <div id="foo" />
-  <div>Content</div>
-  <div>Content</div>
+  <div>some &amp; content</div>
+  <div>some & content</div>
 
 Very useful for reuse in more specific tag helpers.
 

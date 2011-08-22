@@ -304,7 +304,8 @@ sub _tag {
 
   # Callback
   my $cb = defined $_[-1] && ref($_[-1]) eq 'CODE' ? pop @_ : undef;
-  pop if @_ % 2;
+  my $content = pop if @_ % 2;
+  xml_escape $content if defined $content;
 
   # Tag
   my $tag = "<$name";
@@ -319,9 +320,9 @@ sub _tag {
   }
 
   # Block
-  if ($cb) {
+  if ($cb || defined($content)) {
     $tag .= '>';
-    $tag .= $cb->();
+    $tag .= $cb ? $cb->() : $content;
     $tag .= "<\/$name>";
   }
 
@@ -587,11 +588,13 @@ Generate submit input element.
   <%= tag 'div' %>
   <%= tag 'div', id => 'foo' %>
   <%= tag div => begin %>Content<% end %>
+  <%= tag div => 'Content' %>
 
 HTML5 tag generator.
 
   <div />
   <div id="foo" />
+  <div>Content</div>
   <div>Content</div>
 
 Very useful for reuse in more specific tag helpers.

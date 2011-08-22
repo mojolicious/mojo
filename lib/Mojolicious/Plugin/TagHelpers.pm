@@ -233,6 +233,9 @@ sub register {
     }
   );
 
+  # Add "t" helper
+  $app->helper(t => sub { shift; $self->_tag(@_) });
+
   # Add "tag" helper
   $app->helper(tag => sub { shift; $self->_tag(@_) });
 
@@ -582,6 +585,15 @@ Generate submit input element.
 
   <input type="submit" value="Ok" />
   <input id="foo" type="submit" value="Ok!" />
+
+=head2 C<t>
+
+  <%=t div => 'some & content' %>
+
+Alias for C<tag>.
+Note that this helper is EXPERIMENTAL and might change without warning!
+
+  <div>some &amp; content</div>
 
 =head2 C<tag>
 

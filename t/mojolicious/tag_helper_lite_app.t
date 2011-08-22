@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 48;
+use Test::More tests => 51;
 
 # "Hey! Bite my glorious golden ass!"
 use Mojolicious::Lite;
@@ -18,6 +18,9 @@ get 'tags';
 
 # GET /more_tags
 get 'more_tags';
+
+# GET /small_tags
+get 'small_tags';
 
 # GET /links
 get 'links';
@@ -55,6 +58,16 @@ $t->get_ok('/more_tags')->status_is(200)->content_is(<<EOF);
 <bar>0</bar>
 <bar class="test">0</bar>
 <bar class="test"></bar>
+EOF
+
+# GET /small_tags
+$t->get_ok('/small_tags')->status_is(200)->content_is(<<EOF);
+<div>some &amp; content</div>
+<div>
+  <p id="0">just</p>
+  <p>0</p>
+</div>
+<div>works</div>
 EOF
 
 # GET /links
@@ -294,6 +307,14 @@ __DATA__
 %= tag bar => 0
 %= tag 'bar', class => 'test', 0
 %= tag 'bar', class => 'test', ''
+
+@@ small_tags.html.ep
+%=t div => 'some & content'
+%=t div => begin
+  %=t p => (id => 0) => 'just'
+  %=t p => 0
+%= end
+%=t div => 'works'
 
 @@ links.html.ep
 <%= link_to 'Pa<th' => '/path' %>

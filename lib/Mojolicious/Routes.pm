@@ -402,20 +402,36 @@ sub _dispatch_controller {
       return $e;
     }
 
-    # Loaded
+    # Don't try again in the future
     $self->{loaded}->{$app}++;
   }
 
   # Dispatch
+  return unless $app->isa($self->controller_base_class) || $app->isa('Mojo');
   my $continue;
   my $success = eval {
     $app = $app->new($c) unless ref $app;
 
+    # Handler
+    if ($app->isa('Mojo')) {
+
+      # Connect routes
+      if ($app->can('routes')) {
+        my $r = $app->routes;
+        unless ($r->parent) {
+          $r->parent($c->match->endpoint);
+          weaken $r->{parent};
+        }
+      }
+
+      $app->handler($c);
+    }
+
     # Action
-    if ($method && $app->isa($self->controller_base_class)) {
-      my $stash = $c->stash;
+    elsif ($method) {
 
       # Call action
+      my $stash = $c->stash;
       if ($app->can($method)) {
         $stash->{'mojo.routed'} = 1 unless $staging;
         $continue = $app->$method;
@@ -432,21 +448,6 @@ sub _dispatch_controller {
       # Merge stash
       my $new = $app->stash;
       @{$stash}{keys %$new} = values %$new;
-    }
-
-    # Handler
-    elsif ($app->isa('Mojo')) {
-
-      # Connect routes
-      if ($app->can('routes')) {
-        my $r = $app->routes;
-        unless ($r->parent) {
-          $r->parent($c->match->endpoint);
-          weaken $r->{parent};
-        }
-      }
-
-      $app->handler($c);
     }
 
     1;

@@ -23,22 +23,21 @@ sub import {
     unless $ENV{MOJO_HOME};
 
   # Initialize app
+  no strict 'refs';
+  my $caller = caller;
+  push @{"${caller}::ISA"}, $class;
   my $app = $class->new;
 
   # Initialize routes
   my $routes = $app->routes;
   $routes->namespace('');
 
-  # Prepare exports
-  my $caller = caller;
-  no strict 'refs';
-  no warnings 'redefine';
-
   # Default static and template class
   $app->static->default_static_class($caller);
   $app->renderer->default_template_class($caller);
 
   # Export
+  no warnings 'redefine';
   my $root = $routes;
   *{"${caller}::new"} = *{"${caller}::app"} = sub {$app};
   *{"${caller}::any"}    = sub { $routes->any(@_) };

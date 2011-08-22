@@ -306,7 +306,7 @@ sub _command {
     return unless ref $e;
     die $e;
   }
-  return unless $module->can('new') && $module->isa('Mojo::Command');
+  return unless $module->isa('Mojo::Command');
 
   return $module;
 }

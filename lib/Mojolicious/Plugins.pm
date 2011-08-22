@@ -84,7 +84,7 @@ sub _load {
   }
 
   # Module is a plugin
-  return unless $module->can('new') && $module->can('register');
+  return unless $module->isa('Mojolicious::Plugin');
   return 1;
 }
 

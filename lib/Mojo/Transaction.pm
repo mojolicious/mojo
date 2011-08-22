@@ -42,7 +42,7 @@ sub is_writing {
 sub remote_address {
   my ($self, $address) = @_;
 
-  # Set
+  # New address
   if ($address) {
     $self->{remote_address} = $address;
     return $self;
@@ -66,7 +66,6 @@ sub remote_address {
     }
   }
 
-  # Get
   return $self->{remote_address};
 }
 

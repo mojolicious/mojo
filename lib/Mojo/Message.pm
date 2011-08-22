@@ -289,14 +289,10 @@ sub header_size {
 
 sub headers {
   my $self = shift;
-
-  # Set
   if (@_) {
     $self->content->headers(@_);
     return $self;
   }
-
-  # Get
   return $self->content->headers(@_);
 }
 

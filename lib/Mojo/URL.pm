@@ -28,7 +28,7 @@ sub new {
 sub authority {
   my ($self, $authority) = @_;
 
-  # Set
+  # New authority
   if (defined $authority) {
     my $userinfo = '';
     my $host     = $authority;
@@ -89,7 +89,7 @@ sub clone {
 sub ihost {
   my ($self, $host) = @_;
 
-  # Set
+  # Generate host
   if (defined $host) {
 
     # Decode parts
@@ -148,10 +148,8 @@ sub parse {
 sub path {
   my ($self, $path) = @_;
 
-  # Set
+  # New path
   if ($path) {
-
-    # Plain path
     if (!ref $path) {
 
       # Absolute path
@@ -172,14 +170,13 @@ sub path {
     return $self;
   }
 
-  # Get
   return $self->{path} ||= Mojo::Path->new;
 }
 
 sub query {
   my $self = shift;
 
-  # Set
+  # Merge or replace parameters
   if (@_) {
 
     # Replace with list
@@ -208,7 +205,6 @@ sub query {
     return $self;
   }
 
-  # Get
   return $self->{query} ||= Mojo::Parameters->new;
 }
 

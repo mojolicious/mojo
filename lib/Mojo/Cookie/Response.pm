@@ -25,7 +25,7 @@ my $FLAG_RE = qr/(?:Secure|HttpOnly)/i;
 sub expires {
   my ($self, $expires) = @_;
 
-  # Set
+  # New expires value
   if (defined $expires) {
     $self->{expires} = $expires;
     return $self;

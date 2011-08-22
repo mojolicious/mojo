@@ -42,14 +42,9 @@ sub new {
 sub add_child {
   my ($self, $route) = @_;
 
-  # We are the parent
   $route->parent($self);
   weaken $route->{parent};
-
-  # Inherit shortcuts
   $route->shortcuts($self->shortcuts);
-
-  # Add to tree
   push @{$self->children}, $route;
 
   return $self;
@@ -75,11 +70,9 @@ sub any {
 sub auto_render {
   my ($self, $c) = @_;
 
-  # Rendering
-  my $tx = $c->tx;
   eval {
     my $stash = $c->stash;
-    unless ($stash->{'mojo.rendered'} || $tx->is_websocket) {
+    unless ($stash->{'mojo.rendered'} || $c->tx->is_websocket) {
 
       # Render template or not_found if the route never reached an action
       $c->render or ($stash->{'mojo.routed'} or $c->render_not_found);
@@ -149,8 +142,6 @@ sub dispatch {
 
   # Walk the stack
   return if $self->_walk_stack($c);
-
-  # Render
   $self->auto_render($c);
 }
 
@@ -193,17 +184,15 @@ sub is_websocket {
 sub name {
   my $self = shift;
 
-  # New name
-  if (defined $_[0]) {
-    $self->{name}   = $_[0];
-    $self->{custom} = 1;
+  # Custom names get precedence
+  if (@_) {
+    if (defined(my $name = shift)) {
+      $self->{name}   = $name;
+      $self->{custom} = 1;
+    }
     return $self;
   }
 
-  # Nothing
-  elsif (@_) { return $self }
-
-  # Name
   return $self->{name};
 }
 
@@ -211,10 +200,13 @@ sub over {
   my $self = shift;
   return $self unless @_;
   my $conditions = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
+
+  # Routes with conditions can't be cached
   push @{$self->conditions}, @$conditions;
   my $root = my $parent = $self;
   while ($parent = $parent->parent) { $root = $parent }
   $root->cache(0);
+
   return $self;
 }
 
@@ -337,14 +329,13 @@ sub under { shift->_generate_route('under', @_) }
 sub via {
   my $self = shift;
 
-  # Set
+  # Restrict methods
   if (@_) {
     my $methods = [map { lc $_ } @{ref $_[0] ? $_[0] : [@_]}];
     $self->{via} = $methods if @$methods;
     return $self;
   }
 
-  # Get
   return $self->{via};
 }
 
@@ -597,7 +588,6 @@ sub _walk_stack {
     return 1 if $staging && !$e;
   }
 
-  # Done
   return;
 }
 

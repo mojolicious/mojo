@@ -353,12 +353,10 @@ Build L<Mojo::Transaction::HTTP> followup request for redirect response.
 
 =head2 C<tx>
 
-  my $tx = $t->tx(GET => 'mojolicio.us');
+  my $tx = $t->tx(GET  => 'mojolicio.us');
   my $tx = $t->tx(POST => 'http://mojolicio.us');
-  my $tx = $t->tx(GET => 'http://kraih.com' => {Accept => '*/*'});
-  my $tx = $t->tx(
-    POST => 'http://kraih.com' => {{Accept => '*/*'} => 'Hi!'
-  );
+  my $tx = $t->tx(GET  => 'http://kraih.com' => {Accept => '*/*'});
+  my $tx = $t->tx(POST => 'http://kraih.com' => {Accept => '*/*'} => 'Hi!');
 
 Versatile general purpose L<Mojo::Transaction::HTTP> builder for requests.
 

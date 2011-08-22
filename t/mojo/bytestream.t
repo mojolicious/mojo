@@ -10,7 +10,7 @@ use Test::More;
 
 plan skip_all => 'Perl 5.10 or Digest::SHA required for this test!'
   unless eval { require Digest::SHA; 1 };
-plan tests => 129;
+plan tests => 131;
 
 use_ok 'Mojo::Util',       'md5_bytes';
 use_ok 'Mojo::ByteStream', 'b';
@@ -19,11 +19,15 @@ use_ok 'Mojo::ByteStream', 'b';
 my $stream = b('foo_bar_baz');
 is $stream->camelize, 'FooBarBaz', 'right camelized result';
 $stream = b('FooBarBaz');
-is $stream->camelize, 'Foobarbaz', 'right camelized result';
+is $stream->camelize, 'FooBarBaz', 'right camelized result';
 $stream = b('foo_b_b');
 is $stream->camelize, 'FooBB', 'right camelized result';
 $stream = b('foo-b_b');
 is $stream->camelize, 'Foo::BB', 'right camelized result';
+$stream = b('FooBar');
+is $stream->camelize, 'FooBar', 'already camlized';
+$stream = b('Foo::Bar');
+is $stream->camelize, 'Foo::Bar', 'already camelized';
 
 # decamelize
 $stream = b('FooBarBaz');

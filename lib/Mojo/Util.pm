@@ -307,6 +307,7 @@ sub b64_encode {
 }
 
 sub camelize {
+  return if $_[0] =~ /^[A-Z]/;
 
   # Module parts
   my @parts;
@@ -322,7 +323,7 @@ sub camelize {
 }
 
 sub decamelize {
-  return if $_[0] !~ /^[A-Z\:]+/;
+  return if $_[0] !~ /^[A-Z]/;
 
   # Module parts
   my @parts;

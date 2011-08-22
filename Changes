@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojolicious.
 1.87    2011-08-22 00:00:00
         - Added EXPERIMENTAL app method to Mojo::Command.
         - Made tag helper a little smarter.
+        - Made camelize a little smarter.
         - Improved documentation.
 
 1.86    2011-08-21 00:00:00

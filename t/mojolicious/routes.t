@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 339;
+use Test::More tests => 340;
 
 # "They're not very heavy, but you don't hear me not complaining."
 use_ok 'Mojolicious::Routes';
@@ -250,7 +250,7 @@ $m = Mojolicious::Routes::Match->new(get => '/alternatives2/tset')->match($r);
 is @{$m->stack}, 0, 'right number of elements';
 $m = Mojolicious::Routes::Match->new(get => '/alternatives2/00')->match($r);
 is @{$m->stack}, 0, 'right number of elements';
-is $m->path_for('alternatives2foo'), '/alternatives2', 'right path';
+is $m->path_for('alternatives2foo'), '/alternatives2/', 'right path';
 is $m->path_for('alternatives2foo', foo => 0), '/alternatives2/0',
   'right path';
 
@@ -422,6 +422,7 @@ is $m->stack->[0]->{controller}, 'wild',        'right value';
 is $m->stack->[0]->{action},     'card',        'right value';
 is $m->stack->[0]->{wildcard},   'hello/there', 'right value';
 is $m->path_for, '/wildcards/1/hello/there', 'right path';
+is $m->path_for(wildcard => ''), '/wildcards/1/', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
 $m =
   Mojolicious::Routes::Match->new(get => '/wildcards/2/hello/there')

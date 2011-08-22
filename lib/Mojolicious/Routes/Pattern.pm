@@ -83,9 +83,8 @@ sub render {
       $rendered = $values->{$name};
       $rendered = '' unless defined $rendered;
       my $default = $self->defaults->{$name};
-      $default = '' unless defined $default;
-      $optional = 0 unless $default eq $rendered;
-      $rendered = '' if $optional && $default eq $rendered;
+      if (!defined $default || ($default ne $rendered)) { $optional = 0 }
+      elsif ($optional) { $rendered = '' }
     }
 
     $string = "$rendered$string";

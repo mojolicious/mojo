@@ -299,7 +299,7 @@ been initialized and before a connection gets associated with them.
 
   # Add a witty header to every request
   $ua->on_start(sub {
-    my $tx = pop;
+    my ($self, $tx) = @_;
     $tx->req->headers->header('X-Bender' => 'Bite my shiny metal ass!');
     print 'Request: ', $tx->req->url->clone->to_abs, "\n";
   });
@@ -406,7 +406,7 @@ time.
 
     # Fetch non-blocking just by adding a callback
     $ua->get($url => sub {
-      my $tx = pop;
+      my ($self, $tx) = @_;
 
       # Extract URLs
       print "[$id] $url\n";

@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-1.90    2011-08-23 00:00:00
+1.90    2011-08-24 00:00:00
+        - Improved render_exception and render_not_found to use the current
+          format if available. (alnewkirk)
         - Improved documentation.
 
 1.89    2011-08-23 00:00:00

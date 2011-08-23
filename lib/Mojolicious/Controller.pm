@@ -322,33 +322,21 @@ sub render_exception {
     $snapshot->{$key} = $value;
   }
 
-  # Mode specific template
+  # Render with fallbacks
   my $mode    = $self->app->mode;
   my $options = {
     template         => "exception.$mode",
-    format           => 'html',
+    format           => $stash->{format} || 'html',
     handler          => undef,
     status           => 500,
     snapshot         => $snapshot,
     exception        => $e,
     'mojo.exception' => 1
   };
-  unless ($self->render($options)) {
-
-    # Template
-    $options->{template} = 'exception';
-    unless ($self->render($options)) {
-
-      # Inline template
-      delete $stash->{layout};
-      delete $stash->{extends};
-      delete $options->{template};
-      $options->{inline} =
-        $mode eq 'development' ? $DEVELOPMENT_EXCEPTION : $EXCEPTION;
-      $options->{handler} = 'ep';
-      $self->render($options);
-    }
-  }
+  my $inline = $mode eq 'development' ? $DEVELOPMENT_EXCEPTION : $EXCEPTION;
+  return if $self->_render_fallbacks($options, 'exception', $inline);
+  $options->{format} = 'html';
+  $self->_render_fallbacks($options, 'exception', $inline);
 }
 
 # DEPRECATED in Smiling Face With Sunglasses!
@@ -389,31 +377,19 @@ sub render_not_found {
     ? $self->url_for('/perldoc')
     : 'http://mojolicio.us/perldoc';
 
-  # Mode specific template
+  # Render with fallbacks
   my $mode    = $self->app->mode;
   my $options = {
     template         => "not_found.$mode",
-    format           => 'html',
+    format           => $stash->{format} || 'html',
     status           => 404,
     guide            => $guide,
     'mojo.not_found' => 1
   };
-  unless ($self->render($options)) {
-
-    # Template
-    $options->{template} = 'not_found';
-    unless ($self->render($options)) {
-
-      # Inline template
-      delete $options->{layout};
-      delete $options->{extends};
-      delete $options->{template};
-      $options->{inline} =
-        $mode eq 'development' ? $DEVELOPMENT_NOT_FOUND : $NOT_FOUND;
-      $options->{handler} = 'ep';
-      $self->render($options);
-    }
-  }
+  my $inline = $mode eq 'development' ? $DEVELOPMENT_NOT_FOUND : $NOT_FOUND;
+  return if $self->_render_fallbacks($options, 'not_found', $inline);
+  $options->{format} = 'html';
+  $self->_render_fallbacks($options, 'not_found', $inline);
 }
 
 # "You called my thesis a fat sack of barf, and then you stole it?
@@ -707,6 +683,29 @@ sub write_chunk {
   return $self;
 }
 
+sub _render_fallbacks {
+  my ($self, $options, $template, $inline) = @_;
+
+  # Mode specific template
+  unless ($self->render($options)) {
+
+    # Template
+    $options->{template} = $template;
+    unless ($self->render($options)) {
+
+      # Inline template
+      my $stash = $self->stash;
+      return unless $stash->{format} eq 'html';
+      delete $stash->{layout};
+      delete $stash->{extends};
+      delete $options->{template};
+      $options->{inline}  = $inline;
+      $options->{handler} = 'ep';
+      return $self->render($options);
+    }
+  }
+}
+
 1;
 __END__
 
@@ -878,8 +877,8 @@ will not be encoded.
   $c->render_exception('Oops!');
   $c->render_exception(Mojo::Exception->new('Oops!'));
 
-Render the exception template C<exception.$mode.html.$handler> or
-C<exception.html.$handler> and set the response status code to C<500>.
+Render the exception template C<exception.$mode.$format.$handler> or
+C<exception.$format.$handler> and set the response status code to C<500>.
 
 =head2 C<render_json>
 

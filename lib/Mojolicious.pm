@@ -308,8 +308,6 @@ Web development for humans, making hard things possible and everything fun.
     The time is <%= $now->hms %>.
   <% end %>
 
-=head2 Growing
-
 Single file prototypes can easily grow into well-structured applications.
 A controller collects several actions together.
 

@@ -240,115 +240,28 @@ Mojolicious - Duct Tape For The Web!
 
 =head1 SYNOPSIS
 
-  # Mojolicious application
+  # Application
   package MyApp;
   use Mojo::Base 'Mojolicious';
 
+  # Route
   sub startup {
     my $self = shift;
-
-    # Routes
-    my $r = $self->routes;
-
-    # Default route
-    $r->route('/:controller/:action/:id')->to('foo#welcome');
+    my $r    = $self->routes;
+    $r->route('/')->to('foo#hello');
   }
 
-  # Mojolicious controller
+  # Controller
   package MyApp::Foo;
   use Mojo::Base 'Mojolicious::Controller';
 
-  # Say hello
-  sub welcome {
+  # Action
+  sub hello {
     my $self = shift;
-    $self->render_text('Hi there!');
+    $self->render_text('Hello World!');
   }
 
-  # Say goodbye from a template (foo/bye.html.ep)
-  sub bye { shift->render }
-
 =head1 DESCRIPTION
-
-Back in the early days of the web, many people learned Perl because of a
-wonderful Perl library called L<CGI>.
-It was simple enough to get started without knowing much about the language
-and powerful enough to keep you going, learning by doing was much fun.
-While most of the techniques used are outdated now, the idea behind it is not.
-L<Mojolicious> is a new attempt at implementing this idea using state of the
-art technology.
-
-=head2 Features
-
-=over 2
-
-=item *
-
-An amazing MVC web framework supporting a simplified single file mode through
-L<Mojolicious::Lite>.
-
-=over 2
-
-Powerful out of the box with RESTful routes, plugins, Perl-ish templates,
-session management, signed cookies, testing framework, static file server,
-I18N, first class unicode support and much more for you to discover.
-
-=back
-
-=item *
-
-Very clean, portable and Object Oriented pure Perl API without any hidden
-magic and no requirements besides Perl 5.8.7 (although 5.12+ is recommended).
-
-=item *
-
-Full stack HTTP 1.1 and WebSocket client/server implementation with IPv6,
-TLS, Bonjour, IDNA, Comet (long polling), chunking and multipart support.
-
-=item *
-
-Built-in non-blocking I/O web server supporting libev and hot deployment,
-perfect for embedding.
-
-=item *
-
-Automatic CGI, FastCGI and L<PSGI> detection.
-
-=item *
-
-JSON and HTML5/XML parser with CSS3 selector support.
-
-=item *
-
-Fresh code based upon years of experience developing L<Catalyst>.
-
-=back
-
-=head2 Installation
-
-All you need is a oneliner, it takes less than a minute.
-
-  $ sudo sh -c "curl -L cpanmin.us | perl - Mojolicious"
-
-=head2 Getting Started
-
-These three lines are a whole web application.
-
-  use Mojolicious::Lite;
-
-  get '/' => {text => 'Hello World!'};
-
-  app->start;
-
-To run this example with the built-in development web server just put the
-code into a file and start it with C<morbo>.
-
-  $ morbo hello.pl
-  Server available at http://127.0.0.1:3000.
-
-  $ curl http://127.0.0.1:3000/
-  Hello World!
-
-=head2 Duct Tape For The Web
 
 Web development for humans, making hard things possible and everything fun.
 

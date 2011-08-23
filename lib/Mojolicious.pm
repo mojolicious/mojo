@@ -247,8 +247,7 @@ Mojolicious - Duct Tape For The Web!
   # Route
   sub startup {
     my $self = shift;
-    my $r    = $self->routes;
-    $r->route('/')->to('foo#hello');
+    $self->routes->get('/hello')->to('foo#hello');
   }
 
   # Controller

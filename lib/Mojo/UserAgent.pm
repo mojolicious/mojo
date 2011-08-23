@@ -592,7 +592,10 @@ Mojo::UserAgent - Non-Blocking I/O HTTP 1.1 And WebSocket User Agent
   my $t = Mojo::IOLoop->trigger;
   for my $url ('mojolicio.us', 'cpan.org') {
     $t->begin;
-    $ua->get($url => sub { $t->end(pop->res->dom->at('title')->text) });
+    $ua->get($url => sub {
+      my ($self, $tx) = @_;
+      $t->end($tx->res->dom->at('title')->text);
+    });
   }
   my @titles = $t->start;
 

@@ -10,7 +10,7 @@ use Test::More;
 
 plan skip_all => 'Perl 5.10 or Digest::SHA required for this test!'
   unless eval { require Digest::SHA; 1 };
-plan tests => 131;
+plan tests => 137;
 
 use_ok 'Mojo::Util',       'md5_bytes';
 use_ok 'Mojo::ByteStream', 'b';
@@ -358,6 +358,15 @@ $stream = b("\n la\nla la \n")->trim;
 is "$stream", "la\nla la", 'right trimmed result';
 $stream = b(" \nla\nla\nla\n ")->trim;
 is "$stream", "la\nla\nla", 'right trimmed result';
+
+# split
+$stream = b('1,2,3,4,5');
+is_deeply [$stream->split(',')->each],   [1, 2, 3, 4, 5], 'right elements';
+is_deeply [$stream->split(qr/,/)->each], [1, 2, 3, 4, 5], 'right elements';
+is_deeply [b('54321')->split->each],     [5, 4, 3, 2, 1], 'right elements';
+is_deeply [b('')->split->each],        [], 'no elements';
+is_deeply [b('')->split(',')->each],   [], 'no elements';
+is_deeply [b('')->split(qr/,/)->each], [], 'no elements';
 
 # say and autojoin
 my $buffer = '';

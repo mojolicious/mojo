@@ -2,6 +2,7 @@ package Mojo::ByteStream;
 use Mojo::Base -base;
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
+use Mojo::Collection;
 use Mojo::Util;
 
 sub import {
@@ -161,6 +162,11 @@ sub sha1_sum {
 }
 
 sub size { length shift->{bytestream} }
+
+sub split {
+  my ($self, $p) = @_;
+  Mojo::Collection->new(split defined $p ? $p : '', $self->{bytestream});
+}
 
 sub to_string { shift->{bytestream} }
 
@@ -387,6 +393,15 @@ Note that Perl 5.10 or L<Digest::SHA> are required for C<SHA1> support.
   my $size = $stream->size;
 
 Size of bytestream.
+
+=head2 C<split>
+
+  my $collection = $stream->split(',');
+
+Turn bytestream into L<Mojo::Collection>.
+Note that this method is EXPERIMENTAL and might change without warning!
+
+  $stream->split(',')->join("\n")->say;
 
 =head2 C<to_string>
 

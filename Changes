@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+1.88    2011-08-23 00:00:00
+        - Added EXPERIMENTAL split method to Mojo::ByteStream.
+
 1.87    2011-08-23 00:00:00
         - Added EXPERIMENTAL app method to Mojo::Command.
         - Added EXPERIMENTAL t helper to Mojolicious::Plugin::TagHelpers.

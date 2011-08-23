@@ -110,6 +110,36 @@ script.
   FastCgiServer /home/sri/myapp/script/myapp -processes 1
   Alias / /home/sri/myapp/script/myapp/
 
+=head2 Apache/Hypnotoad/Proxy
+
+You could set up an Apache VirtualHost for your web app, and proxy all requests
+through to it to your Hypnotoad server:
+
+<VirtualHost mywebapp.example.com:80>
+  ProxyPass / http://127.0.0.1:8080/
+  ProxyPassReverse / http://127.0.0.1:8080/
+</VirtualHost>
+
+Or, if you want your webapp to share an existing VirtualHost, you could have it
+proxy from a specified dir:
+
+ProxyPass /mywebapp/ http://localhost:3000/
+ProxyPassReverse /mywebapp/ http://localhost:3000/
+
+It is important for you to note that the Apache2 modules mod_proxy and
+mod_proxy_http must be enabled.
+
+a2enmod proxy
+a2enmod proxy_http
+
+It is also important to set permissions for proxying for security purposes,
+below is an example.
+
+<Proxy *>
+  Order allow,deny
+  Allow from all
+</Proxy>
+
 =head2 PSGI/Plack
 
 L<PSGI> is an interface between Perl web frameworks and web servers, and

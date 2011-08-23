@@ -393,7 +393,7 @@ sub render_not_found {
   my $mode    = $self->app->mode;
   my $options = {
     template         => "not_found.$mode",
-    format           => 'html',
+    format           => $self->stash->{format} || 'html',
     status           => 404,
     guide            => $guide,
     'mojo.not_found' => 1

@@ -1,5 +1,6 @@
 package Mojolicious::Plugin::Mount;
 use Mojo::Base 'Mojolicious::Plugin';
+use Mojolicious::Plugin::HeaderCondition;
 
 use Mojo::Server;
 
